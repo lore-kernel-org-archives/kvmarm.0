@@ -1,23 +1,26 @@
-From: Jan Kiszka <jan.kiszka@web.de>
+From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: arm: warning at virt/kvm/arm/vgic.c:1468
-Date: Sun, 15 Feb 2015 09:53:30 +0100
-Message-ID: <54E05E8A.5020109@web.de>
+Date: Sun, 15 Feb 2015 13:37:15 +0000
+Message-ID: <87wq3je1o4.fsf@why.wild-wind.fr.eu.org>
 References: <54D714B9.6090106@web.de> <20150213044613.GA47577@lvm>
  <87k2zms4ub.fsf@linaro.org> <87iof6s3o7.fsf@linaro.org>
+ <54E05E8A.5020109@web.de>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============5721542282673059997=="
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7455C45AE5
- for <kvmarm@lists.cs.columbia.edu>; Sun, 15 Feb 2015 03:48:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C943745993
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 15 Feb 2015 08:32:28 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6hpHe2L8itIM for <kvmarm@lists.cs.columbia.edu>;
- Sun, 15 Feb 2015 03:48:24 -0500 (EST)
-Received: from mout.web.de (mout.web.de [212.227.17.12])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 42CE745AD5
- for <kvmarm@lists.cs.columbia.edu>; Sun, 15 Feb 2015 03:48:23 -0500 (EST)
-In-Reply-To: <87iof6s3o7.fsf@linaro.org>
+ with ESMTP id f0gQ8WjF3lHs for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 15 Feb 2015 08:32:23 -0500 (EST)
+Received: from usa-sjc-mx-foss1.foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B97A74579A
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 15 Feb 2015 08:32:23 -0500 (EST)
+In-Reply-To: <54E05E8A.5020109@web.de> (Jan Kiszka's message of "Sun, 15 Feb
+ 2015 08:53:30 +0000")
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,88 +30,43 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm <kvmarm@lists.cs.columbia.edu>, kvm <kvm@vger.kernel.org>
+To: Jan Kiszka <jan.kiszka@web.de>
+Cc: kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---===============5721542282673059997==
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="HpD1xnkVMNipUmi6jNmCMHisJSDiecA83"
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HpD1xnkVMNipUmi6jNmCMHisJSDiecA83
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2015-02-13 07:53, Alex Benn=C3=A9e wrote:
->=20
-> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
->=20
->> Christoffer Dall <christoffer.dall@linaro.org> writes:
-> <snip>
->>> On Sun, Feb 08, 2015 at 08:48:09AM +0100, Jan Kiszka wrote:
-> <snip>
->>>> BTW, KVM tracing support on ARM seems like it requires some care. E.=
-g.:
->>>> kvm_exit does not report an exit reason. The in-kernel vgic also see=
-ms
->>>> to lack instrumentation. Unfortunate. Tracing is usually the first s=
-top
->>>> when KVM is stuck on a guest.
->>>
->>> I know, the exit reason is on my todo list, and Alex B is sitting on
->>> trace patches for the gic.  Coming soon to a git repo near your.
->>
->> For the impatient the raw patches are in:
->>
->> git.linaro.org/people/alex.bennee/linux.git
->> migration/v3.19-rc7-improve-tracing
->=20
-> OK try tracing/kvm-exit-entry for something cleaner.
-
-Doesn't build for ARM (vcpu_sys_reg is ARM64-only so far).
-
-But the values traced seem useful. Wei Huang's patch in kvm.git queue
-traces the exception class, but unfortunately nothing else. When would
-we need that class? Do we need it at all?
-
-In any case, please add symbolic printing of the magic values whenever
-possible, just like on x86.
-
-I'm now throwing trace_printk at my broken KVM. Already found out that I
-get ARM_EXCEPTION_IRQ every few 10 =C2=B5s. Not seeing any irq_* traces,
-though. Weird.
-
-Thanks,
-Jan
-
-
---HpD1xnkVMNipUmi6jNmCMHisJSDiecA83
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iEYEARECAAYFAlTgXooACgkQitSsb3rl5xRW1QCgspVogBxO1kGyJOr2A2p/IqCD
-0yoAoO2Z0zbVpq6E1P+hkrzbOd3ifZwq
-=lE5d
------END PGP SIGNATURE-----
-
---HpD1xnkVMNipUmi6jNmCMHisJSDiecA83--
-
---===============5721542282673059997==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============5721542282673059997==--
+T24gU3VuLCBGZWIgMTUgMjAxNSBhdCAgODo1MzozMCBhbSBHTVQsIEphbiBLaXN6a2EgPGphbi5r
+aXN6a2FAd2ViLmRlPiB3cm90ZToKPiBPbiAyMDE1LTAyLTEzIDA3OjUzLCBBbGV4IEJlbm7DqWUg
+d3JvdGU6Cj4+IAo+PiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+IHdyaXRl
+czoKPj4gCj4+PiBDaHJpc3RvZmZlciBEYWxsIDxjaHJpc3RvZmZlci5kYWxsQGxpbmFyby5vcmc+
+IHdyaXRlczoKPj4gPHNuaXA+Cj4+Pj4gT24gU3VuLCBGZWIgMDgsIDIwMTUgYXQgMDg6NDg6MDlB
+TSArMDEwMCwgSmFuIEtpc3prYSB3cm90ZToKPj4gPHNuaXA+Cj4+Pj4+IEJUVywgS1ZNIHRyYWNp
+bmcgc3VwcG9ydCBvbiBBUk0gc2VlbXMgbGlrZSBpdCByZXF1aXJlcyBzb21lIGNhcmUuIEUuZy46
+Cj4+Pj4+IGt2bV9leGl0IGRvZXMgbm90IHJlcG9ydCBhbiBleGl0IHJlYXNvbi4gVGhlIGluLWtl
+cm5lbCB2Z2ljIGFsc28gc2VlbXMKPj4+Pj4gdG8gbGFjayBpbnN0cnVtZW50YXRpb24uIFVuZm9y
+dHVuYXRlLiBUcmFjaW5nIGlzIHVzdWFsbHkgdGhlIGZpcnN0IHN0b3AKPj4+Pj4gd2hlbiBLVk0g
+aXMgc3R1Y2sgb24gYSBndWVzdC4KPj4+Pgo+Pj4+IEkga25vdywgdGhlIGV4aXQgcmVhc29uIGlz
+IG9uIG15IHRvZG8gbGlzdCwgYW5kIEFsZXggQiBpcyBzaXR0aW5nIG9uCj4+Pj4gdHJhY2UgcGF0
+Y2hlcyBmb3IgdGhlIGdpYy4gIENvbWluZyBzb29uIHRvIGEgZ2l0IHJlcG8gbmVhciB5b3VyLgo+
+Pj4KPj4+IEZvciB0aGUgaW1wYXRpZW50IHRoZSByYXcgcGF0Y2hlcyBhcmUgaW46Cj4+Pgo+Pj4g
+Z2l0LmxpbmFyby5vcmcvcGVvcGxlL2FsZXguYmVubmVlL2xpbnV4LmdpdAo+Pj4gbWlncmF0aW9u
+L3YzLjE5LXJjNy1pbXByb3ZlLXRyYWNpbmcKPj4gCj4+IE9LIHRyeSB0cmFjaW5nL2t2bS1leGl0
+LWVudHJ5IGZvciBzb21ldGhpbmcgY2xlYW5lci4KPgo+IERvZXNuJ3QgYnVpbGQgZm9yIEFSTSAo
+dmNwdV9zeXNfcmVnIGlzIEFSTTY0LW9ubHkgc28gZmFyKS4KPgo+IEJ1dCB0aGUgdmFsdWVzIHRy
+YWNlZCBzZWVtIHVzZWZ1bC4gV2VpIEh1YW5nJ3MgcGF0Y2ggaW4ga3ZtLmdpdCBxdWV1ZQo+IHRy
+YWNlcyB0aGUgZXhjZXB0aW9uIGNsYXNzLCBidXQgdW5mb3J0dW5hdGVseSBub3RoaW5nIGVsc2Uu
+IFdoZW4gd291bGQKPiB3ZSBuZWVkIHRoYXQgY2xhc3M/IERvIHdlIG5lZWQgaXQgYXQgYWxsPwo+
+Cj4gSW4gYW55IGNhc2UsIHBsZWFzZSBhZGQgc3ltYm9saWMgcHJpbnRpbmcgb2YgdGhlIG1hZ2lj
+IHZhbHVlcyB3aGVuZXZlcgo+IHBvc3NpYmxlLCBqdXN0IGxpa2Ugb24geDg2Lgo+Cj4gSSdtIG5v
+dyB0aHJvd2luZyB0cmFjZV9wcmludGsgYXQgbXkgYnJva2VuIEtWTS4gQWxyZWFkeSBmb3VuZCBv
+dXQgdGhhdCBJCj4gZ2V0IEFSTV9FWENFUFRJT05fSVJRIGV2ZXJ5IGZldyAxMCDCtXMuIE5vdCBz
+ZWVpbmcgYW55IGlycV8qIHRyYWNlcywKPiB0aG91Z2guIFdlaXJkLgoKVGhpcyB2ZXJ5IG11Y2gg
+bG9va3MgbGlrZSBhIHNjcmVhbWluZyBpbnRlcnJ1cHQuIEF0IHN1Y2ggYSByYXRlLCBubwp3b25k
+ZXIgeW91ciBWTSBtYWtlIG11Y2ggcHJvZ3Jlc3MuIENhbiB5b3UgZmluZCBvdXQgd2hpY2ggaW50
+ZXJydXB0IGlzCnNjcmVhbWluZyBsaWtlIHRoaXM/IExvb2tpbmcgYXQgR0lDQ19IUFBJUiBzaG91
+bGQgaGVscCwgYnV0IHlvdSdsbCBoYXZlCnRvIG1hcCB0aGUgQ1BVIGludGVyZmFjZSBpbiBIWVAg
+YmVmb3JlIGJlaW5nIGFibGUgdG8gYWNjZXNzIGl0IHRoZXJlLgoKRG8geW91IGhhdmUgYW4gZm9y
+bSBvZiBwb3dlci1tYW5hZ2VtZW50IG9uIHRoaXMgc3lzdGVtPwoKVGhhbmtzLAoKICAgICAgICBN
+LgotLSAKV2l0aG91dCBkZXZpYXRpb24gZnJvbSB0aGUgbm9ybSwgcHJvZ3Jlc3MgaXMgbm90IHBv
+c3NpYmxlLgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpr
+dm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9s
+aXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
