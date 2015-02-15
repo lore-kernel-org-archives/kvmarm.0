@@ -1,41 +1,43 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] ARM: KVM: Fix size check in __coherent_cache_guest_page
-Date: Sun, 15 Feb 2015 21:22:24 +0100
-Message-ID: <20150215202224.GD8034@cbox>
-References: <54D670EA.2090504@web.de>
- <20150207202648.53857923@arm.com>
- <54D678EA.90803@web.de>
- <54D681D0.8040309@web.de>
- <20150213045735.GB47577@lvm>
- <54DE7595.7090504@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: [GIT PULL 0/2] KVM/ARM Fixes for 3.20
+Date: Sun, 15 Feb 2015 21:22:41 +0100
+Message-ID: <1424031763-9534-1-git-send-email-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <54DE7595.7090504@redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Jan Kiszka <jan.kiszka@web.de>, Marc Zyngier <marc.zyngier@arm.com>, kvm <kvm@vger.kernel.org>, kvmarm <kvmarm@lists.cs.columbia.edu>
+To: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Feb 13, 2015 at 11:07:17PM +0100, Paolo Bonzini wrote:
-> 
-> 
-> On 13/02/2015 05:57, Christoffer Dall wrote:
-> > On Sat, Feb 07, 2015 at 10:21:20PM +0100, Jan Kiszka wrote:
-> >> From: Jan Kiszka <jan.kiszka@siemens.com>
-> >> 
-> >> The check is supposed to catch page-unaligned sizes, not the
-> >> inverse.
-> >> 
-> >> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-> > 
-> > Thanks, applied.
-> 
-> Thanks, can you send a pull request as soon as possible with this and
-> "arm/arm64: KVM: Add exit reaons to kvm_exit event tracing"?
-> 
-Yep, done.
+Hi Paolo,
+
+The following changes since commit bfa76d49576599a4b9f9b7a71f23d73d6dcff735:
+
+  Linux 3.19 (2015-02-08 18:54:22 -0800)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-fixes-3.20
+
+for you to fetch changes up to 42e387ed20c012e37e60535bdbe809e65ce1559b:
+
+  arm/arm64: KVM: Add exit reaons to kvm_exit event tracing (2015-02-15 17:12:27 +0100)
 
 Thanks,
 -Christoffer
+
+----------------------------------------------------------------
+First round of KVM/ARM fixes for 3.20 (or what it will be called).
+
+Fixes a VM_BUG_ON error check and adds exit reasons to tracing.
+
+----------------------------------------------------------------
+Jan Kiszka (1):
+      ARM: KVM: Fix size check in __coherent_cache_guest_page
+
+Wei Huang (1):
+      arm/arm64: KVM: Add exit reaons to kvm_exit event tracing
+
+ arch/arm/include/asm/kvm_mmu.h |  2 +-
+ arch/arm/kvm/arm.c             |  2 +-
+ arch/arm/kvm/trace.h           | 10 +++++++---
+ 3 files changed, 9 insertions(+), 5 deletions(-)
