@@ -1,153 +1,136 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH 0/6] ARM64: KVM: PMU infrastructure support
-Date: Sun, 15 Feb 2015 16:33:37 +0100
-Message-ID: <20150215153337.GB8034@cbox>
-References: <20141124143753.GO3401@cbox>
- <CAAhSdy0+Z8o6dx=Bq+Ep7ybQpTpj+QNJm4oJbKa8yCM7WS8oxg@mail.gmail.com>
- <20141125134239.GI31297@cbox>
- <CAAhSdy32G+-BVQk-=dWjfM1S-cytGavp4qq942m=3y7HUudguw@mail.gmail.com>
- <5476FFAF.2010601@arm.com>
- <CAAhSdy3US4H9DZLDmwawR6D22GUpQ8H5NqrZ8XvYJjhsnPzzRQ@mail.gmail.com>
- <547705BF.5040609@arm.com>
- <CAAhSdy32-MsRORQ9j3YfH4Fn7xCEEFV5O7D43sYbXZCsF4VgaQ@mail.gmail.com>
- <20150111191131.GC3868@cbox>
- <CAAhSdy0FjX0TfkzThkmCz0k=mbnhJiE7tHU=jYUTFpxgDZZXeQ@mail.gmail.com>
+From: Jan Kiszka <jan.kiszka@web.de>
+Subject: Re: arm: warning at virt/kvm/arm/vgic.c:1468
+Date: Sun, 15 Feb 2015 16:35:14 +0100
+Message-ID: <54E0BCB2.9000103@web.de>
+References: <54D714B9.6090106@web.de> <20150213044613.GA47577@lvm>	<87k2zms4ub.fsf@linaro.org> <87iof6s3o7.fsf@linaro.org>	<54E05E8A.5020109@web.de> <87wq3je1o4.fsf@why.wild-wind.fr.eu.org>	<54E0AFE8.20202@web.de> <87oaovdxvb.fsf@why.wild-wind.fr.eu.org>	<54E0B646.6030601@web.de> <87k2zjdwg4.fsf@why.wild-wind.fr.eu.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="eQ7wA6StLbf0N6wWXOx6BDeXC4hOV1Gnt"
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAAhSdy0FjX0TfkzThkmCz0k=mbnhJiE7tHU=jYUTFpxgDZZXeQ@mail.gmail.com>
+In-Reply-To: <87k2zjdwg4.fsf@why.wild-wind.fr.eu.org>
 Sender: kvm-owner@vger.kernel.org
-To: Anup Patel <anup@brainfault.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, KVM General <kvm@vger.kernel.org>, patches <patches@apm.com>, Will Deacon <Will.Deacon@arm.com>, "Ian.Campbell@citrix.com" <Ian.Campbell@citrix.com>, Pranavkumar Sawargaonkar <pranavkumar@linaro.org>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm <kvmarm@lists.cs.columbia.edu>, kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Wei Huang <wei@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Anup,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eQ7wA6StLbf0N6wWXOx6BDeXC4hOV1Gnt
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 12, 2015 at 09:49:13AM +0530, Anup Patel wrote:
-> On Mon, Jan 12, 2015 at 12:41 AM, Christoffer Dall
-> <christoffer.dall@linaro.org> wrote:
-> > On Tue, Dec 30, 2014 at 11:19:13AM +0530, Anup Patel wrote:
-> >> (dropping previous conversation for easy reading)
-> >>
-> >> Hi Marc/Christoffer,
-> >>
-> >> I tried implementing PMU context-switch via C code
-> >> in EL1 mode and in atomic context with irqs disabled.
-> >> The context switch itself works perfectly fine but
-> >> irq forwarding is not clean for PMU irq.
-> >>
-> >> I found another issue that is GIC only samples irq
-> >> lines if they are enabled. This means for using
-> >> irq forwarding we will need to ensure that host PMU
-> >> irq is enabled.  The arch_timer code does this by
-> >> doing request_irq() for host virtual timer interrupt.
-> >> For PMU, we can either enable/disable host PMU
-> >> irq in context switch or we need to do have shared
-> >> irq handler between kvm pmu and host kernel pmu.
-> >
-> > could we simply require the host PMU driver to request the IRQ and have
-> > the driver inject the corresponding IRQ to the VM via a mechanism
-> > similar to VFIO using an eventfd and irqfds etc.?
-> 
-> Currently, the host PMU driver does request_irq() only when
-> there is some event to be monitored. This means host will do
-> request_irq() only when we run perf application on host
-> user space.
-> 
-> Initially, I though that we could simply pass IRQF_SHARED
-> for request_irq() in host PMU driver and do the same for
-> reqest_irq() in KVM PMU code but the PMU irq can be
-> SPI or PPI. If the PMU irq is SPI then IRQF_SHARED
-> flag would fine but if its PPI then we have no way to
-> set IRQF_SHARED flag because request_percpu_irq()
-> does not have irq flags parameter.
-> 
-> >
-> > (I haven't quite thought through if there's a way for the host PMU
-> > driver to distinguish between an IRQ for itself and one for the guest,
-> > though).
-> >
-> > It does feel like we will need some sort of communication/coordination
-> > between the host PMU driver and KVM...
-> >
-> >>
-> >> I have rethinked about our discussion so far. I
-> >> understand that we need KVM PMU virtualization
-> >> to meet following criteria:
-> >> 1. No modification in host PMU driver
-> >
-> > is this really a strict requirement?  one of the advantages of KVM
-> > should be that the rest of the kernel should be supportive of KVM.
-> 
-> I guess so because host PMU driver should not do things
-> differently for host and guest. I think this the reason why
-> we discarded the mask/unmask PMU irq approach which
-> I had implemented in RFC v1.
-> 
-> >
-> >> 2. No modification in guest PMU driver
-> >> 3. No mask/unmask dance for sharing host PMU irq
-> >> 4. Clean way to avoid infinite VM exits due to
-> >> PMU interrupt
-> >>
-> >> I have discovered new approach which is as follows:
-> >> 1. Context switch PMU in atomic context (i.e. local_irq_disable())
-> >> 2. Ensure that host PMU irq is disabled when entering guest
-> >> mode and re-enable host PMU irq when exiting guest mode if
-> >> it was enabled previously.
-> >
-> > How does this look like software-engineering wise?  Would you be looking
-> > up the IRQ number from the DT in the KVM code again?  How does KVM then
-> > synchronize with the host PMU driver so they're not both requesting the
-> > same IRQ at the same time?
-> 
-> We only lookup host PMU irq numbers from DT at HYP init time.
-> 
-> During context switch we know the host PMU irq number for
-> current host CPU so we can get state of host PMU irq in
-> context switch code.
-> 
-> If we go by the shard irq handler approach then both KVM
-> and host PMU driver will do request_irq() on same host
-> PMU irq. In other words, there is no virtual PMU irq provided
-> by HW for guest.
-> 
+On 2015-02-15 16:30, Marc Zyngier wrote:
+> On Sun, Feb 15 2015 at  3:07:50 pm GMT, Jan Kiszka <jan.kiszka@web.de> =
+wrote:
+>> On 2015-02-15 15:59, Marc Zyngier wrote:
+>>> On Sun, Feb 15 2015 at  2:40:40 pm GMT, Jan Kiszka <jan.kiszka@web.de=
+> wrote:
+>>>> On 2015-02-15 14:37, Marc Zyngier wrote:
+>>>>> On Sun, Feb 15 2015 at 8:53:30 am GMT, Jan Kiszka
+>>>>> <jan.kiszka@web.de> wrote:
+>>>>>> I'm now throwing trace_printk at my broken KVM. Already found out =
+that I
+>>>>>> get ARM_EXCEPTION_IRQ every few 10 =C2=B5s. Not seeing any irq_* t=
+races,
+>>>>>> though. Weird.
+>>>>>
+>>>>> This very much looks like a screaming interrupt. At such a rate, no=
 
-Sorry for the *really* long delay in this response.
+>>>>> wonder your VM make much progress. Can you find out which interrupt=
+ is
+>>>>> screaming like this? Looking at GICC_HPPIR should help, but you'll =
+have
+>>>>> to map the CPU interface in HYP before being able to access it ther=
+e.
+>>>>
+>>>> OK... let me figure this out. I had this suspect as well - the host =
+gets
+>>>> a VM exit for each injected guest IRQ?
+>>>
+>>> Not exactly. There is a VM exit for each physical interrupt that fire=
+s
+>>> while the guest is running. Injecting an interrupt also causes a VM
+>>> exit, as we force the vcpu to reload its context.
+>>
+>> Ah, GICC !=3D GICV - you are referring to host-side pending IRQs. Any
+>> hints on how to get access to that register would accelerate the
+>> analysis (ARM KVM code is still new to me).
+>=20
+> Map the GICC region in HYP using create_hyp_io_mapping (see
+> vgic_v2_probe for an example of how we map GICH), and stash the read of=
 
-We had a chat about this subject with Will Deacon and Marc Zyngier
-during connect, and basically we came to think of a number of problems
-with the current approach:
+> GICC_HPPIR before leaving HYP mode (and before saving the guest timer).=
 
-1. As you pointed out, there is a need for a shared IRQ handler, and
-   there is no immediately nice way to implement this without a more
-   sophisticated perf/kvm interface, probably comprising eventfds or
-   something similar.
 
-2. Hijacking the counters for the VM without perf knowing about it
-   basically makes it impossible to do system-wide event counting, an
-   important use case for a virtualization host.
+OK.
 
-So the approach we will be taking now would be to:
+>=20
+> BTW, when you look at /proc/interrupts on the host, don't you see an
+> interrupt that's a bit too eager to fire?
 
-First, implement a strictly trap-and-emulate in software approach.  This
-would allow any software relying on access to performance counters to
-work, although potentially with slightly unprecise values.  This is the
-approach taken by x86 and would be significantly simpler to support on
-systems like big.LITTLE as well.
+No - but that makes sense given that we do not enter any interrupt
+handler according to ftrace, thus there can't be any counter incrementati=
+on.
 
-Second, if there are values obtained from within the guest that are so
-skewed by the trap-and-emulate approach that we need to give the guest
-access to counters, we should try to share the hardware by partitioning
-the physical counters, but again, we need to coordinate with the host
-perf system for this.  We would only be pursuing this approach if
-absolutely necessary.
+>=20
+>>>> BTW, I also tried with in-kernel GIC disabled (in the kernel config)=
+,
+>>>> but I guess that's pointless. Linux seems to be stuck on a
+>>>> non-functional architectural timer then, right?
+>>>
+>>> Yes. Useful for bringup, but nothing more.
+>>
+>> Maybe we should perform a feature check and issue a warning from QEMU?=
 
-Apologies for the change in direction on this.
+>=20
+> I'd assume this is already in place (but I almost never run QEMU, so I
+> could be wrong here).
 
-What are your thoughts?  Do you still have time/interest to work
-on any of this?
+Nope, QEMU starts up fine, just lets the guest starve while waiting for
+jiffies to increase.
 
-Thanks,
--Christoffer
+>=20
+>>> I still wonder if the 4+1 design on the K1 is not playing tricks behi=
+nd
+>>> our back. Having talked to Ian Campbell earlier this week, he also ca=
+n't
+>>> manage to run guests in Xen on this platform, so there's something
+>>> rather fishy here.
+>>
+>> Interesting. The announcements of his PSCI patches [1] sounded more
+>> promising. Maybe it was only referring to getting the hypervisor itsel=
+f
+>> running...
+>=20
+> This is my understanding so far.
+>=20
+>> To my current (still limited understanding) of that platform would say=
+
+>> that this little core is parked after power-up of the main APs. And as=
+
+>> we do not power them down, there is no reason to perform a cluster
+>> switch or anything similarly nasty, no?
+>=20
+> I can't see why this would happen, but I've learned not to assume
+> anything when it come to braindead creativity on the HW side...
+
+True.
+
+Jan
+
+
+
+--eQ7wA6StLbf0N6wWXOx6BDeXC4hOV1Gnt
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlTgvLIACgkQitSsb3rl5xQJAQCfcYXX5NUeIQbhwS8ojy5N/lWy
+PFgAnRBLP7wePezKgg2YCuh3cuaw/5y0
+=7xyD
+-----END PGP SIGNATURE-----
+
+--eQ7wA6StLbf0N6wWXOx6BDeXC4hOV1Gnt--
