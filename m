@@ -1,262 +1,121 @@
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v10 5/7] hw/vfio: calxeda xgmac device
-Date: Tue, 17 Feb 2015 11:29:18 +0000
-Message-ID: <87d258zshd.fsf@linaro.org>
+Subject: Re: [PATCH v10 6/7] hw/arm/sysbus-fdt: enable vfio-calxeda-xgmac
+ dynamic instantiation
+Date: Tue, 17 Feb 2015 11:36:49 +0000
+Message-ID: <87bnkszs4u.fsf@linaro.org>
 References: <1423799232-10816-1-git-send-email-eric.auger@linaro.org>
-	<1423799232-10816-6-git-send-email-eric.auger@linaro.org>
+ <1423799232-10816-7-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Return-path: <qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org>
-In-reply-to: <1423799232-10816-6-git-send-email-eric.auger@linaro.org>
-List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
-	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
-List-Archive: <http://lists.nongnu.org/archive/html/qemu-devel>
-List-Post: <mailto:qemu-devel@nongnu.org>
-List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
-List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
-	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Errors-To: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
-Sender: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B9A045D23
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Feb 2015 06:31:28 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id CZItZ5xkFeJ7 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Feb 2015 06:31:27 -0500 (EST)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E405945D21
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Feb 2015 06:31:26 -0500 (EST)
+In-reply-to: <1423799232-10816-7-git-send-email-eric.auger@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Eric Auger <eric.auger@linaro.org>
-Cc: peter.maydell@linaro.org, eric.auger@st.com, patches@linaro.org, qemu-devel@nongnu.org, agraf@suse.de, alex.williamson@redhat.com, pbonzini@redhat.com, b.reynal@virtualopensystems.com, feng.wu@intel.com, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: eric.auger@st.com, patches@linaro.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, pbonzini@redhat.com, feng.wu@intel.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-Eric Auger <eric.auger@linaro.org> writes:
-
-> The platform device class has become abstract. This patch introduces
-> a calxeda xgmac device that can be be instantiated on command line
-> using such option.
->
-> -device vfio-calxeda-xgmac,host="fff51000.ethernet"
->
-> Signed-off-by: Eric Auger <eric.auger@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
->
-> ---
-> v8 -> v9:
-> - renamed calxeda_xgmac.c into calxeda-xgmac.c
->
-> v7 -> v8:
-> - add a comment in the header about the MMIO regions and IRQ which
->   are exposed by the device
->
-> v5 -> v6
-> - back again following Alex Graf advises
-> - fix a bug related to compat override
->
-> v4 -> v5:
-> removed since device tree was moved to hw/arm/dyn_sysbus_devtree.c
->
-> v4: creation for device tree specialization
-> ---
->  hw/arm/virt.c                        | 15 +++++++---
->  hw/vfio/Makefile.objs                |  1 +
->  hw/vfio/calxeda-xgmac.c              | 54 ++++++++++++++++++++++++++++++++++++
->  include/hw/vfio/vfio-calxeda-xgmac.h | 46 ++++++++++++++++++++++++++++++
->  4 files changed, 112 insertions(+), 4 deletions(-)
->  create mode 100644 hw/vfio/calxeda-xgmac.c
->  create mode 100644 include/hw/vfio/vfio-calxeda-xgmac.h
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 9df9b60..c1e0a10 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -44,6 +44,7 @@
->  #include "qemu/error-report.h"
->  #include "hw/arm/sysbus-fdt.h"
->  #include "hw/platform-bus.h"
-> +#include "hw/vfio/vfio-platform.h"
->  
->  #define NUM_VIRTIO_TRANSPORTS 32
->  
-> @@ -342,7 +343,7 @@ static void fdt_add_gic_node(const VirtBoardInfo *vbi)
->      qemu_fdt_setprop_cell(vbi->fdt, "/intc", "phandle", gic_phandle);
->  }
->  
-> -static void create_gic(const VirtBoardInfo *vbi, qemu_irq *pic)
-> +static DeviceState *create_gic(const VirtBoardInfo *vbi, qemu_irq *pic)
->  {
->      /* We create a standalone GIC v2 */
->      DeviceState *gicdev;
-> @@ -390,6 +391,7 @@ static void create_gic(const VirtBoardInfo *vbi, qemu_irq *pic)
->      }
->  
->      fdt_add_gic_node(vbi);
-> +    return gicdev;
->  }
->  
->  static void create_uart(const VirtBoardInfo *vbi, qemu_irq *pic)
-> @@ -594,7 +596,8 @@ static void create_fw_cfg(const VirtBoardInfo *vbi)
->      g_free(nodename);
->  }
->  
-> -static void create_platform_bus(VirtBoardInfo *vbi, qemu_irq *pic)
-> +static void create_platform_bus(VirtBoardInfo *vbi, qemu_irq *pic,
-> +                                DeviceState *gic)
->  {
->      DeviceState *dev;
->      SysBusDevice *s;
-> @@ -633,6 +636,9 @@ static void create_platform_bus(VirtBoardInfo *vbi, qemu_irq *pic)
->      memory_region_add_subregion(sysmem,
->                                  platform_bus_params.platform_bus_base,
->                                  sysbus_mmio_get_region(s, 0));
-> +
-> +    /* setup VFIO signaling/IRQFD for all VFIO platform sysbus devices */
-> +    qemu_register_reset(vfio_kick_irqs, gic);
->  }
->  
->  static void *machvirt_dtb(const struct arm_boot_info *binfo, int *fdt_size)
-> @@ -652,6 +658,7 @@ static void machvirt_init(MachineState *machine)
->      MemoryRegion *ram = g_new(MemoryRegion, 1);
->      const char *cpu_model = machine->cpu_model;
->      VirtBoardInfo *vbi;
-> +    DeviceState *gic;
->  
->      if (!cpu_model) {
->          cpu_model = "cortex-a15";
-> @@ -713,7 +720,7 @@ static void machvirt_init(MachineState *machine)
->  
->      create_flash(vbi);
->  
-> -    create_gic(vbi, pic);
-> +    gic = create_gic(vbi, pic);
->  
->      create_uart(vbi, pic);
->  
-> @@ -744,7 +751,7 @@ static void machvirt_init(MachineState *machine)
->       * another notifier is registered which adds platform bus nodes.
->       * Notifiers are executed in registration reverse order.
->       */
-> -    create_platform_bus(vbi, pic);
-> +    create_platform_bus(vbi, pic, gic);
->  }
->  
->  static bool virt_get_secure(Object *obj, Error **errp)
-> diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
-> index c5c76fe..d540c9d 100644
-> --- a/hw/vfio/Makefile.objs
-> +++ b/hw/vfio/Makefile.objs
-> @@ -2,4 +2,5 @@ ifeq ($(CONFIG_LINUX), y)
->  obj-$(CONFIG_SOFTMMU) += common.o
->  obj-$(CONFIG_PCI) += pci.o
->  obj-$(CONFIG_SOFTMMU) += platform.o
-> +obj-$(CONFIG_SOFTMMU) += calxeda-xgmac.o
->  endif
-> diff --git a/hw/vfio/calxeda-xgmac.c b/hw/vfio/calxeda-xgmac.c
-> new file mode 100644
-> index 0000000..199e076
-> --- /dev/null
-> +++ b/hw/vfio/calxeda-xgmac.c
-> @@ -0,0 +1,54 @@
-> +/*
-> + * calxeda xgmac example VFIO device
-> + *
-> + * Copyright Linaro Limited, 2014
-> + *
-> + * Authors:
-> + *  Eric Auger <eric.auger@linaro.org>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2.  See
-> + * the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +#include "hw/vfio/vfio-calxeda-xgmac.h"
-> +
-> +static void calxeda_xgmac_realize(DeviceState *dev, Error **errp)
-> +{
-> +    VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(dev);
-> +    VFIOCalxedaXgmacDeviceClass *k = VFIO_CALXEDA_XGMAC_DEVICE_GET_CLASS(dev);
-> +
-> +    vdev->compat = g_strdup("calxeda,hb-xgmac");
-> +
-> +    k->parent_realize(dev, errp);
-> +}
-> +
-> +static const VMStateDescription vfio_platform_vmstate = {
-> +    .name = TYPE_VFIO_CALXEDA_XGMAC,
-> +    .unmigratable = 1,
-> +};
-> +
-> +static void vfio_calxeda_xgmac_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +    VFIOCalxedaXgmacDeviceClass *vcxc =
-> +        VFIO_CALXEDA_XGMAC_DEVICE_CLASS(klass);
-> +    vcxc->parent_realize = dc->realize;
-> +    dc->realize = calxeda_xgmac_realize;
-> +    dc->desc = "VFIO Calxeda XGMAC";
-> +}
-> +
-> +static const TypeInfo vfio_calxeda_xgmac_dev_info = {
-> +    .name = TYPE_VFIO_CALXEDA_XGMAC,
-> +    .parent = TYPE_VFIO_PLATFORM,
-> +    .instance_size = sizeof(VFIOCalxedaXgmacDevice),
-> +    .class_init = vfio_calxeda_xgmac_class_init,
-> +    .class_size = sizeof(VFIOCalxedaXgmacDeviceClass),
-> +};
-> +
-> +static void register_calxeda_xgmac_dev_type(void)
-> +{
-> +    type_register_static(&vfio_calxeda_xgmac_dev_info);
-> +}
-> +
-> +type_init(register_calxeda_xgmac_dev_type)
-> diff --git a/include/hw/vfio/vfio-calxeda-xgmac.h b/include/hw/vfio/vfio-calxeda-xgmac.h
-> new file mode 100644
-> index 0000000..f994775
-> --- /dev/null
-> +++ b/include/hw/vfio/vfio-calxeda-xgmac.h
-> @@ -0,0 +1,46 @@
-> +/*
-> + * VFIO calxeda xgmac device
-> + *
-> + * Copyright Linaro Limited, 2014
-> + *
-> + * Authors:
-> + *  Eric Auger <eric.auger@linaro.org>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2.  See
-> + * the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +#ifndef HW_VFIO_VFIO_CALXEDA_XGMAC_H
-> +#define HW_VFIO_VFIO_CALXEDA_XGMAC_H
-> +
-> +#include "hw/vfio/vfio-platform.h"
-> +
-> +#define TYPE_VFIO_CALXEDA_XGMAC "vfio-calxeda-xgmac"
-> +
-> +/**
-> + * This device exposes:
-> + * - a single MMIO region corresponding to its register space
-> + * - 3 IRQS (main and 2 power related IRQs)
-> + */
-> +typedef struct VFIOCalxedaXgmacDevice {
-> +    VFIOPlatformDevice vdev;
-> +} VFIOCalxedaXgmacDevice;
-> +
-> +typedef struct VFIOCalxedaXgmacDeviceClass {
-> +    /*< private >*/
-> +    VFIOPlatformDeviceClass parent_class;
-> +    /*< public >*/
-> +    DeviceRealize parent_realize;
-> +} VFIOCalxedaXgmacDeviceClass;
-> +
-> +#define VFIO_CALXEDA_XGMAC_DEVICE(obj) \
-> +     OBJECT_CHECK(VFIOCalxedaXgmacDevice, (obj), TYPE_VFIO_CALXEDA_XGMAC)
-> +#define VFIO_CALXEDA_XGMAC_DEVICE_CLASS(klass) \
-> +     OBJECT_CLASS_CHECK(VFIOCalxedaXgmacDeviceClass, (klass), \
-> +                        TYPE_VFIO_CALXEDA_XGMAC)
-> +#define VFIO_CALXEDA_XGMAC_DEVICE_GET_CLASS(obj) \
-> +     OBJECT_GET_CLASS(VFIOCalxedaXgmacDeviceClass, (obj), \
-> +                      TYPE_VFIO_CALXEDA_XGMAC)
-> +
-> +#endif
-
--- 
-Alex Bennée
+CkVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAbGluYXJvLm9yZz4gd3JpdGVzOgoKPiB2ZmlvLWNhbHhl
+ZGEteGdtYWMgbm93IGNhbiBiZSBpbnN0YW50aWF0ZWQgdXNpbmcgdGhlIC1kZXZpY2Ugb3B0aW9u
+Lgo+IFRoZSBub2RlIGNyZWF0aW9uIGZ1bmN0aW9uIGdlbmVyYXRlcyBhIHZlcnkgYmFzaWMgZHQg
+bm9kZSBjb21wb3NlZAo+IG9mIHRoZSBjb21wYXQsIHJlZyBhbmQgaW50ZXJydXB0cyBwcm9wZXJ0
+aWVzCj4KPiBTaWduZWQtb2ZmLWJ5OiBFcmljIEF1Z2VyIDxlcmljLmF1Z2VyQGxpbmFyby5vcmc+
+Cj4KPiAtLS0KPiB2OCAtPiB2OToKPiAtIHByb3Blcmx5IGZyZWUgcmVzb3VyY2VzIGluIGNhc2Ug
+b2YgZXJyb3JzIGluCj4gICBhZGRfY2FseGVkYV9taWR3YXlfeGdtYWNfZmR0X25vZGUKPgo+IHY3
+IC0+IHY4Ogo+IC0gbW92ZSB0aGUgYWRkX2ZkdF9ub2RlX2Z1bmN0aW9ucyBhcnJheSBkZWNsYXJh
+dGlvbiBiZXR3ZWVuIHRoZSBkZXZpY2UKPiAgIHNwZWNpZmljIGNvZGUgYW5kIHRoZSBnZW5lcmlj
+IGNvZGUgdG8gYXZvaWQgZm9yd2FyZCBkZWNsYXJhdGlvbnMgb2YKPiAgIGRlY2ljZSBzcGVjaWZp
+YyBmdW5jdGlvbnMKPiAtIHJlbmFtZSBhZGRfYmFzaWNfdmZpb19mZHRfbm9kZSBpbnRvCj4gICBh
+ZGRfY2FseGVkYV9taWR3YXlfeGdtYWNfZmR0X25vZGUKPgo+IHY2IC0+IHY3Ogo+IC0gY29tcGF0
+IHN0cmluZyByZS1mb3JtYXR0aW5nIHJlbW92ZWQgc2luY2UgY29tcGF0IHN0cmluZyBpcyBub3Qg
+ZXhwb3NlZAo+ICAgYW55bW9yZSBhcyBhIHVzZXIgb3B0aW9uCj4gLSBWRklPIElSUSBraWNrLW9m
+ZiByZW1vdmVkIGZyb20gc3lzYnVzLWZkdCBhbmQgbW92ZWQgdG8gVkZJTyBwbGF0Zm9ybQo+ICAg
+ZGV2aWNlCj4gLS0tCj4gIGh3L2FybS9zeXNidXMtZmR0LmMgfCA4MyArKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwo+ICAxIGZpbGUgY2hhbmdlZCwg
+ODMgaW5zZXJ0aW9ucygrKQo+Cj4gZGlmZiAtLWdpdCBhL2h3L2FybS9zeXNidXMtZmR0LmMgYi9o
+dy9hcm0vc3lzYnVzLWZkdC5jCj4gaW5kZXggMzAzOGI5NC4uZDRmOTdmNSAxMDA2NDQKPiAtLS0g
+YS9ody9hcm0vc3lzYnVzLWZkdC5jCj4gKysrIGIvaHcvYXJtL3N5c2J1cy1mZHQuYwo+IEBAIC0y
+Niw2ICsyNiw4IEBACj4gICNpbmNsdWRlICJzeXNlbXUvZGV2aWNlX3RyZWUuaCIKPiAgI2luY2x1
+ZGUgImh3L3BsYXRmb3JtLWJ1cy5oIgo+ICAjaW5jbHVkZSAic3lzZW11L3N5c2VtdS5oIgo+ICsj
+aW5jbHVkZSAiaHcvdmZpby92ZmlvLXBsYXRmb3JtLmgiCj4gKyNpbmNsdWRlICJody92ZmlvL3Zm
+aW8tY2FseGVkYS14Z21hYy5oIgo+ICAKPiAgLyoKPiAgICogaW50ZXJuYWwgc3RydWN0IHRoYXQg
+Y29udGFpbnMgdGhlIGluZm9ybWF0aW9uIHRvIGNyZWF0ZSBkeW5hbWljCj4gQEAgLTUzLDExICs1
+NSw5MiBAQCB0eXBlZGVmIHN0cnVjdCBOb2RlQ3JlYXRpb25QYWlyIHsKPiAgICAgIGludCAoKmFk
+ZF9mZHRfbm9kZV9mbikoU3lzQnVzRGV2aWNlICpzYmRldiwgdm9pZCAqb3BhcXVlKTsKPiAgfSBO
+b2RlQ3JlYXRpb25QYWlyOwo+ICAKPiArLyogRGV2aWNlIFNwZWNpZmljIENvZGUgKi8KPiArCj4g
+Ky8qKgo+ICsgKiBhZGRfY2FseGVkYV9taWR3YXlfeGdtYWNfZmR0X25vZGUKPiArICoKPiArICog
+R2VuZXJhdGVzIGEgdmVyeSBzaW1wbGUgbm9kZSB3aXRoIGZvbGxvd2luZyBwcm9wZXJ0aWVzOgo+
+ICsgKiBjb21wYXRpYmxlIHN0cmluZywgcmVncywgaW50ZXJydXB0cwo+ICsgKi8KPiArc3RhdGlj
+IGludCBhZGRfY2FseGVkYV9taWR3YXlfeGdtYWNfZmR0X25vZGUoU3lzQnVzRGV2aWNlICpzYmRl
+diwgdm9pZCAqb3BhcXVlKQo+ICt7Cj4gKyAgICBQbGF0Zm9ybUJ1c0ZEVERhdGEgKmRhdGEgPSBv
+cGFxdWU7Cj4gKyAgICBQbGF0Zm9ybUJ1c0RldmljZSAqcGJ1cyA9IGRhdGEtPnBidXM7Cj4gKyAg
+ICB2b2lkICpmZHQgPSBkYXRhLT5mZHQ7Cj4gKyAgICBjb25zdCBjaGFyICpwYXJlbnRfbm9kZSA9
+IGRhdGEtPnBidXNfbm9kZV9uYW1lOwo+ICsgICAgaW50IGNvbXBhdF9zdHJfbGVuOwo+ICsgICAg
+Y2hhciAqbm9kZW5hbWU7Cj4gKyAgICBpbnQgaSwgcmV0ID0gLTE7Cj4gKyAgICB1aW50MzJfdCAq
+aXJxX2F0dHI7Cj4gKyAgICB1aW50NjRfdCAqcmVnX2F0dHI7Cj4gKyAgICB1aW50NjRfdCBtbWlv
+X2Jhc2U7Cj4gKyAgICB1aW50NjRfdCBpcnFfbnVtYmVyOwo+ICsgICAgVkZJT1BsYXRmb3JtRGV2
+aWNlICp2ZGV2ID0gVkZJT19QTEFURk9STV9ERVZJQ0Uoc2JkZXYpOwo+ICsgICAgVkZJT0Rldmlj
+ZSAqdmJhc2VkZXYgPSAmdmRldi0+dmJhc2VkZXY7Cj4gKyAgICBPYmplY3QgKm9iaiA9IE9CSkVD
+VChzYmRldik7Cj4gKwo+ICsgICAgbW1pb19iYXNlID0gb2JqZWN0X3Byb3BlcnR5X2dldF9pbnQo
+b2JqLCAibW1pb1swXSIsIE5VTEwpOwo+ICsKPiArICAgIG5vZGVuYW1lID0gZ19zdHJkdXBfcHJp
+bnRmKCIlcy8lc0AlIiBQUkl4NjQsIHBhcmVudF9ub2RlLAo+ICsgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgdmJhc2VkZXYtPm5hbWUsCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBtbWlvX2Jhc2UpOwo+ICsKPiArICAgIHFlbXVfZmR0X2FkZF9zdWJub2RlKGZkdCwgbm9k
+ZW5hbWUpOwo+ICsKPiArICAgIGNvbXBhdF9zdHJfbGVuID0gc3RybGVuKHZkZXYtPmNvbXBhdCkg
+KyAxOwo+ICsgICAgcWVtdV9mZHRfc2V0cHJvcChmZHQsIG5vZGVuYW1lLCAiY29tcGF0aWJsZSIs
+Cj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgdmRldi0+Y29tcGF0LCBjb21wYXRfc3RyX2xl
+bik7Cj4gKwo+ICsgICAgcmVnX2F0dHIgPSBnX25ldyh1aW50NjRfdCwgdmJhc2VkZXYtPm51bV9y
+ZWdpb25zKjQpOwo+ICsKPiArICAgIGZvciAoaSA9IDA7IGkgPCB2YmFzZWRldi0+bnVtX3JlZ2lv
+bnM7IGkrKykgewo+ICsgICAgICAgIG1taW9fYmFzZSA9IHBsYXRmb3JtX2J1c19nZXRfbW1pb19h
+ZGRyKHBidXMsIHNiZGV2LCBpKTsKPiArICAgICAgICByZWdfYXR0cls0KmldID0gMTsKPiArICAg
+ICAgICByZWdfYXR0cls0KmkrMV0gPSBtbWlvX2Jhc2U7Cj4gKyAgICAgICAgcmVnX2F0dHJbNCpp
+KzJdID0gMTsKPiArICAgICAgICByZWdfYXR0cls0KmkrM10gPSBtZW1vcnlfcmVnaW9uX3NpemUo
+JnZkZXYtPnJlZ2lvbnNbaV0tPm1lbSk7Cj4gKyAgICB9Cj4gKwo+ICsgICAgcmV0ID0gcWVtdV9m
+ZHRfc2V0cHJvcF9zaXplZF9jZWxsc19mcm9tX2FycmF5KGZkdCwgbm9kZW5hbWUsICJyZWciLAo+
+ICsgICAgICAgICAgICAgICAgICAgICB2YmFzZWRldi0+bnVtX3JlZ2lvbnMqMiwgcmVnX2F0dHIp
+OwoKQ291bGQgd2UgdXNlIHFlbXVfZmR0X3NldHByb3Bfc2l6ZWRfY2VsbHMoKSBsaWtlIGV2ZXJ5
+b25lIGVsc2UgdG8gaGlkZQp0aGUgdWdseW5lc3Mgb2YgdGhlIF9mcm9tX2FycmF5PwoKPiArICAg
+IGlmIChyZXQpIHsKPiArICAgICAgICBlcnJvcl9yZXBvcnQoImNvdWxkIG5vdCBzZXQgcmVnIHBy
+b3BlcnR5IG9mIG5vZGUgJXMiLCBub2RlbmFtZSk7Cj4gKyAgICAgICAgZ290byBmYWlsX3JlZzsK
+PiArICAgIH0KPiArCj4gKyAgICBpcnFfYXR0ciA9IGdfbmV3KHVpbnQzMl90LCB2YmFzZWRldi0+
+bnVtX2lycXMqMyk7Cj4gKwo+ICsgICAgZm9yIChpID0gMDsgaSA8IHZiYXNlZGV2LT5udW1faXJx
+czsgaSsrKSB7Cj4gKyAgICAgICAgaXJxX251bWJlciA9IHBsYXRmb3JtX2J1c19nZXRfaXJxbihw
+YnVzLCBzYmRldiAsIGkpCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICArIGRhdGEtPmlycV9z
+dGFydDsKPiArICAgICAgICBpcnFfYXR0clszKmldID0gY3B1X3RvX2JlMzIoMCk7Cj4gKyAgICAg
+ICAgaXJxX2F0dHJbMyppKzFdID0gY3B1X3RvX2JlMzIoaXJxX251bWJlcik7Cj4gKyAgICAgICAg
+aXJxX2F0dHJbMyppKzJdID0gY3B1X3RvX2JlMzIoMHg0KTsKPiArICAgIH0KPiArCj4gKyAgIHJl
+dCA9IHFlbXVfZmR0X3NldHByb3AoZmR0LCBub2RlbmFtZSwgImludGVycnVwdHMiLAo+ICsgICAg
+ICAgICAgICAgICAgICAgICBpcnFfYXR0ciwKPiB2YmFzZWRldi0+bnVtX2lycXMqMypzaXplb2Yo
+dWludDMyX3QpKTsKCkRpdHRvLgoKPiArICAgIGlmIChyZXQpIHsKPiArICAgICAgICBlcnJvcl9y
+ZXBvcnQoImNvdWxkIG5vdCBzZXQgaW50ZXJydXB0cyBwcm9wZXJ0eSBvZiBub2RlICVzIiwKPiAr
+ICAgICAgICAgICAgICAgICAgICAgbm9kZW5hbWUpOwo+ICsgICAgfQo+ICsKPiArICAgIGdfZnJl
+ZShpcnFfYXR0cik7Cj4gK2ZhaWxfcmVnOgo+ICsgICAgZ19mcmVlKHJlZ19hdHRyKTsKPiArICAg
+IGdfZnJlZShub2RlbmFtZSk7Cj4gKyAgICByZXR1cm4gcmV0Owo+ICt9Cj4gKwo+ICAvKiBsaXN0
+IG9mIHN1cHBvcnRlZCBkeW5hbWljIHN5c2J1cyBkZXZpY2VzICovCj4gIHN0YXRpYyBjb25zdCBO
+b2RlQ3JlYXRpb25QYWlyIGFkZF9mZHRfbm9kZV9mdW5jdGlvbnNbXSA9IHsKPiArICAgIHtUWVBF
+X1ZGSU9fQ0FMWEVEQV9YR01BQywgYWRkX2NhbHhlZGFfbWlkd2F5X3hnbWFjX2ZkdF9ub2RlfSwK
+PiAgICAgIHsiIiwgTlVMTH0sIC8qIGxhc3QgZWxlbWVudCAqLwo+ICB9Owo+ICAKPiArLyogR2Vu
+ZXJpYyBDb2RlICovCj4gKwo+ICAvKioKPiAgICogYWRkX2ZkdF9ub2RlIC0gYWRkIHRoZSBkZXZp
+Y2UgdHJlZSBub2RlIG9mIGEgZHluYW1pYyBzeXNidXMgZGV2aWNlCj4gICAqCgotLSAKQWxleCBC
+ZW5uw6llCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2
+bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xp
+c3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
