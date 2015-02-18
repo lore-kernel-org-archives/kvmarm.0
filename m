@@ -1,176 +1,54 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v10 7/7] hw/vfio/platform: add irqfd support
-Date: Tue, 17 Feb 2015 11:41:02 +0000
-Message-ID: <87a90czrxt.fsf@linaro.org>
-References: <1423799232-10816-1-git-send-email-eric.auger@linaro.org>
- <1423799232-10816-8-git-send-email-eric.auger@linaro.org>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: stand-alone kvmtool
+Date: Wed, 18 Feb 2015 15:50:42 +0000
+Message-ID: <20150218155042.GF22017@arm.com>
+References: <54DDD465.3050300@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD25145D23
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Feb 2015 06:35:41 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mmIo4XCnGmDj for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Feb 2015 06:35:40 -0500 (EST)
-Received: from socrates.bennee.com
- (static.88-198-71-155.clients.your-server.de [88.198.71.155])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4F14F45D21
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Feb 2015 06:35:40 -0500 (EST)
-In-reply-to: <1423799232-10816-8-git-send-email-eric.auger@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>
-Cc: eric.auger@st.com, patches@linaro.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, pbonzini@redhat.com, feng.wu@intel.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <54DDD465.3050300@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Pekka Enberg <penberg@kernel.org>, Sasha Levin <sasha.levin@oracle.com>, Cyrill Gorcunov <gorcunov@gmail.com>, Asias He <asias.hejun@gmail.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Ronald Minnich <rminnich@google.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAbGluYXJvLm9yZz4gd3JpdGVzOgoKPiBUaGlzIHBhdGNo
-IGFpbXMgYXQgb3B0aW1pemluZyBJUlEgaGFuZGxpbmcgdXNpbmcgaXJxZmQgZnJhbWV3b3JrLgo+
-Cj4gSW5zdGVhZCBvZiBoYW5kbGluZyB0aGUgZXZlbnRmZHMgb24gdXNlci1zaWRlIHRoZXkgYXJl
-IGhhbmRsZWQgb24KPiBrZXJuZWwgc2lkZSB1c2luZwo+IC0gdGhlIEtWTSBpcnFmZCBmcmFtZXdv
-cmssCj4gLSB0aGUgVkZJTyBkcml2ZXIgdmlycWZkIGZyYW1ld29yay4KPgo+IHRoZSB2aXJ0dWFs
-IElSUSBjb21wbGV0aW9uIGlzIHRyYXBwZWQgYXQgaW50ZXJydXB0IGNvbnRyb2xsZXIKPiBUaGlz
-IHJlbW92ZXMgdGhlIG5lZWQgZm9yIGZhc3Qvc2xvdyBwYXRoIHN3YXAuCj4KPiBPdmVyYWxsIHRo
-aXMgYnJpbmdzIHNpZ25pZmljYW50IHBlcmZvcm1hbmNlIGltcHJvdmVtZW50cy4KPgo+IGl0IGRl
-cGVuZHMgb24gaG9zdCBrZXJuZWwgS1ZNIGlycWZkLgo+Cj4gU2lnbmVkLW9mZi1ieTogQWx2aXNl
-IFJpZ28gPGEucmlnb0B2aXJ0dWFsb3BlbnN5c3RlbXMuY29tPgo+IFNpZ25lZC1vZmYtYnk6IEVy
-aWMgQXVnZXIgPGVyaWMuYXVnZXJAbGluYXJvLm9yZz4KClJldmlld2VkLWJ5OiBBbGV4IEJlbm7D
-qWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+Cgo+Cj4gLS0tCj4gdjUgLT4gdjYKPiAtIHJlbHkg
-b24ga3ZtX2lycWZkc19lbmFibGVkKCkgYW5kIGt2bV9yZXNhbXBsZWZkc19lbmFibGVkKCkKPiAt
-IGd1YXJkIEtWTSBjb2RlIHdpdGggI2lmZGVmIENPTkZJR19LVk0KPgo+IHYzIC0+IHY0Ogo+IFtB
-bHZpc2UgUmlnb10KPiBVc2Ugb2YgVkZJTyBQbGF0Zm9ybSBkcml2ZXIgdjYgdW5tYXNrL3ZpcnFm
-ZCBmZWF0dXJlIGFuZCByZW1vdmFsCj4gb2YgcmVzYW1wbGVmZCBoYW5kbGVyLiBQaHlzaWNhbCBJ
-UlEgdW5tYXNraW5nIGlzIG5vdyBkb25lIGluCj4gVkZJTyBkcml2ZXIuCj4KPiB2MzoKPiBbRXJp
-YyBBdWdlcl0KPiBpbml0aWFsIHN1cHBvcnQgd2l0aCByZXNhbXBsZWZkIGhhbmRsZWQgb24gUUVN
-VSBzaWRlIHNpbmNlIHRoZQo+IHVubWFzayB3YXMgbm90IHN1cHBvcnRlZCBvbiBWRklPIHBsYXRm
-b3JtIGRyaXZlciB2NS4KPgo+IENvbmZsaWN0czoKPiAJaHcvdmZpby9wbGF0Zm9ybS5jCj4gLS0t
-Cj4gIGh3L3ZmaW8vcGxhdGZvcm0uYyAgICAgICAgICAgICAgfCAxMDQgKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrLQo+ICBpbmNsdWRlL2h3L3ZmaW8vdmZpby1wbGF0Zm9y
-bS5oIHwgICAxICsKPiAgdHJhY2UtZXZlbnRzICAgICAgICAgICAgICAgICAgICB8ICAgMiArCj4g
-IDMgZmlsZXMgY2hhbmdlZCwgMTA2IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKPgo+IGRp
-ZmYgLS1naXQgYS9ody92ZmlvL3BsYXRmb3JtLmMgYi9ody92ZmlvL3BsYXRmb3JtLmMKPiBpbmRl
-eCAzMDc5OGQ4Li5jYWRjODI0IDEwMDY0NAo+IC0tLSBhL2h3L3ZmaW8vcGxhdGZvcm0uYwo+ICsr
-KyBiL2h3L3ZmaW8vcGxhdGZvcm0uYwo+IEBAIC0yNiw2ICsyNiw3IEBACj4gICNpbmNsdWRlICJo
-dy9zeXNidXMuaCIKPiAgI2luY2x1ZGUgInRyYWNlLmgiCj4gICNpbmNsdWRlICJody9wbGF0Zm9y
-bS1idXMuaCIKPiArI2luY2x1ZGUgInN5c2VtdS9rdm0uaCIKPiAgCj4gIHN0YXRpYyB2b2lkIHZm
-aW9faW50cF9pbnRlcnJ1cHQoVkZJT0lOVHAgKmludHApOwo+ICB0eXBlZGVmIHZvaWQgKCpldmVu
-dGZkX3VzZXJfc2lkZV9oYW5kbGVyX3QpKFZGSU9JTlRwICppbnRwKTsKPiBAQCAtMjM3LDYgKzIz
-OCw4MyBAQCBzdGF0aWMgaW50IHZmaW9fc3RhcnRfZXZlbnRmZF9pbmplY3Rpb24oVkZJT0lOVHAg
-KmludHApCj4gIH0KPiAgCj4gIC8qCj4gKyAqIEZ1bmN0aW9ucyB1c2VkIGZvciBpcnFmZAo+ICsg
-Ki8KPiArCj4gKyNpZmRlZiBDT05GSUdfS1ZNCj4gKwo+ICsvKioKPiArICogdmZpb19zZXRfcmVz
-YW1wbGVfZXZlbnRmZCAtIHNldHMgdGhlIHJlc2FtcGxlZmQgZm9yIGFuIElSUQo+ICsgKiBAaW50
-cDogdGhlIElSUSBzdHJ1Y3QgcG9pbnRlcgo+ICsgKiBwcm9ncmFtcyB0aGUgVkZJTyBkcml2ZXIg
-dG8gdW5tYXNrIHRoaXMgSVJRIHdoZW4gdGhlCj4gKyAqIGludHAtPnVubWFzayBldmVudGZkIGlz
-IHRyaWdnZXJlZAo+ICsgKi8KPiArc3RhdGljIGludCB2ZmlvX3NldF9yZXNhbXBsZV9ldmVudGZk
-KFZGSU9JTlRwICppbnRwKQo+ICt7Cj4gKyAgICBWRklPRGV2aWNlICp2YmFzZWRldiA9ICZpbnRw
-LT52ZGV2LT52YmFzZWRldjsKPiArICAgIHN0cnVjdCB2ZmlvX2lycV9zZXQgKmlycV9zZXQ7Cj4g
-KyAgICBpbnQgYXJnc3osIHJldDsKPiArICAgIGludDMyX3QgKnBmZDsKPiArCj4gKyAgICBhcmdz
-eiA9IHNpemVvZigqaXJxX3NldCkgKyBzaXplb2YoKnBmZCk7Cj4gKyAgICBpcnFfc2V0ID0gZ19t
-YWxsb2MwKGFyZ3N6KTsKPiArICAgIGlycV9zZXQtPmFyZ3N6ID0gYXJnc3o7Cj4gKyAgICBpcnFf
-c2V0LT5mbGFncyA9IFZGSU9fSVJRX1NFVF9EQVRBX0VWRU5URkQgfCBWRklPX0lSUV9TRVRfQUNU
-SU9OX1VOTUFTSzsKPiArICAgIGlycV9zZXQtPmluZGV4ID0gaW50cC0+cGluOwo+ICsgICAgaXJx
-X3NldC0+c3RhcnQgPSAwOwo+ICsgICAgaXJxX3NldC0+Y291bnQgPSAxOwo+ICsgICAgcGZkID0g
-KGludDMyX3QgKikmaXJxX3NldC0+ZGF0YTsKPiArICAgICpwZmQgPSBldmVudF9ub3RpZmllcl9n
-ZXRfZmQoJmludHAtPnVubWFzayk7Cj4gKyAgICBxZW11X3NldF9mZF9oYW5kbGVyKCpwZmQsIE5V
-TEwsIE5VTEwsIGludHApOwo+ICsgICAgcmV0ID0gaW9jdGwodmJhc2VkZXYtPmZkLCBWRklPX0RF
-VklDRV9TRVRfSVJRUywgaXJxX3NldCk7Cj4gKyAgICBnX2ZyZWUoaXJxX3NldCk7Cj4gKyAgICBp
-ZiAocmV0IDwgMCkgewo+ICsgICAgICAgIGVycm9yX3JlcG9ydCgidmZpbzogRmFpbGVkIHRvIHNl
-dCByZXNhbXBsZSBldmVudGZkOiAlbSIpOwo+ICsgICAgICAgIHFlbXVfc2V0X2ZkX2hhbmRsZXIo
-KnBmZCwgTlVMTCwgTlVMTCwgTlVMTCk7Cj4gKyAgICB9Cj4gKyAgICByZXR1cm4gcmV0Owo+ICt9
-Cj4gKwo+ICsvKioKPiArICogdmZpb19zdGFydF9pcnFmZF9pbmplY3Rpb24gLSBzdGFydHMgaXJx
-ZmQgaW5qZWN0aW9uIGZvciBhbiBJUlEKPiArICogcHJvZ3JhbXMgVkZJTyBkcml2ZXIgd2l0aCBi
-b3RoIHRoZSB0cmlnZ2VyIGFuZCByZXNhbXBsZWZkCj4gKyAqIHByb2dyYW1zIEtWTSB3aXRoIHRo
-ZSBnc2ksIHRyaWdnZXIgJiByZXNhbXBsZSBldmVudGZkcwo+ICsgKi8KPiArc3RhdGljIGludCB2
-ZmlvX3N0YXJ0X2lycWZkX2luamVjdGlvbihWRklPSU5UcCAqaW50cCkKPiArewo+ICsgICAgc3Ry
-dWN0IGt2bV9pcnFmZCBpcnFmZCA9IHsKPiArICAgICAgICAuZmQgPSBldmVudF9ub3RpZmllcl9n
-ZXRfZmQoJmludHAtPmludGVycnVwdCksCj4gKyAgICAgICAgLnJlc2FtcGxlZmQgPSBldmVudF9u
-b3RpZmllcl9nZXRfZmQoJmludHAtPnVubWFzayksCj4gKyAgICAgICAgLmdzaSA9IGludHAtPnZp
-cnR1YWxJRCwKPiArICAgICAgICAuZmxhZ3MgPSBLVk1fSVJRRkRfRkxBR19SRVNBTVBMRSwKPiAr
-ICAgIH07Cj4gKwo+ICsgICAgaWYgKGt2bV92bV9pb2N0bChrdm1fc3RhdGUsIEtWTV9JUlFGRCwg
-JmlycWZkKSkgewo+ICsgICAgICAgIGVycm9yX3JlcG9ydCgidmZpbzogRXJyb3I6IEZhaWxlZCB0
-byBhc3NpZ24gdGhlIGlycWZkOiAlbSIpOwo+ICsgICAgICAgIGdvdG8gZmFpbF9pcnFmZDsKPiAr
-ICAgIH0KPiArICAgIGlmICh2ZmlvX3NldF90cmlnZ2VyX2V2ZW50ZmQoaW50cCwgTlVMTCkgPCAw
-KSB7Cj4gKyAgICAgICAgZ290byBmYWlsX3ZmaW87Cj4gKyAgICB9Cj4gKyAgICBpZiAodmZpb19z
-ZXRfcmVzYW1wbGVfZXZlbnRmZChpbnRwKSA8IDApIHsKPiArICAgICAgICBnb3RvIGZhaWxfdmZp
-bzsKPiArICAgIH0KPiArCj4gKyAgICBpbnRwLT5rdm1fYWNjZWwgPSB0cnVlOwo+ICsgICAgdHJh
-Y2VfdmZpb19wbGF0Zm9ybV9zdGFydF9pcnFmZF9pbmplY3Rpb24oaW50cC0+cGluLCBpbnRwLT52
-aXJ0dWFsSUQsCj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpcnFmZC5m
-ZCwgaXJxZmQucmVzYW1wbGVmZCk7Cj4gKyAgICByZXR1cm4gMDsKPiArCj4gK2ZhaWxfdmZpbzoK
-PiArICAgIGlycWZkLmZsYWdzID0gS1ZNX0lSUUZEX0ZMQUdfREVBU1NJR047Cj4gKyAgICBrdm1f
-dm1faW9jdGwoa3ZtX3N0YXRlLCBLVk1fSVJRRkQsICZpcnFmZCk7Cj4gK2ZhaWxfaXJxZmQ6Cj4g
-KyAgICByZXR1cm4gLTE7Cj4gK30KPiArCj4gKyNlbmRpZgo+ICsKPiArLyoKPiAgICogRnVuY3Rp
-b25zIHVzZWQgd2hhdGV2ZXIgdGhlIGluamVjdGlvbiBtZXRob2QKPiAgICovCj4gIAo+IEBAIC0z
-MTUsNiArMzkzLDEzIEBAIHN0YXRpYyBWRklPSU5UcCAqdmZpb19pbml0X2ludHAoVkZJT0Rldmlj
-ZSAqdmJhc2VkZXYsIHVuc2lnbmVkIGludCBpbmRleCkKPiAgICAgICAgICBlcnJvcl9yZXBvcnQo
-InZmaW86IEVycm9yOiB0cmlnZ2VyIGV2ZW50X25vdGlmaWVyX2luaXQgZmFpbGVkICIpOwo+ICAg
-ICAgICAgIHJldHVybiBOVUxMOwo+ICAgICAgfQo+ICsgICAgLyogR2V0IGFuIGV2ZW50ZmQgZm9y
-IHJlc2FtcGxlL3VubWFzayAqLwo+ICsgICAgcmV0ID0gZXZlbnRfbm90aWZpZXJfaW5pdCgmaW50
-cC0+dW5tYXNrLCAwKTsKPiArICAgIGlmIChyZXQpIHsKPiArICAgICAgICBnX2ZyZWUoaW50cCk7
-Cj4gKyAgICAgICAgZXJyb3JfcmVwb3J0KCJ2ZmlvOiBFcnJvcjogcmVzYW1wbGUgZXZlbnRfbm90
-aWZpZXJfaW5pdCBmYWlsZWQgZW9pIik7Cj4gKyAgICAgICAgcmV0dXJuIE5VTEw7Cj4gKyAgICB9
-Cj4gIAo+ICAgICAgLyogc3RvcmUgdGhlIG5ldyBpbnRwIGluIHFsaXN0ICovCj4gICAgICBRTElT
-VF9JTlNFUlRfSEVBRCgmdmRldi0+aW50cF9saXN0LCBpbnRwLCBuZXh0KTsKPiBAQCAtNDA5LDcg
-KzQ5NCw2IEBAIHN0YXRpYyBWRklPRGV2aWNlT3BzIHZmaW9fcGxhdGZvcm1fb3BzID0gewo+ICAg
-ICAgLnZmaW9fY29tcHV0ZV9uZWVkc19yZXNldCA9IHZmaW9fcGxhdGZvcm1fY29tcHV0ZV9uZWVk
-c19yZXNldCwKPiAgICAgIC52ZmlvX2hvdF9yZXNldF9tdWx0aSA9IHZmaW9fcGxhdGZvcm1faG90
-X3Jlc2V0X211bHRpLAo+ICAgICAgLnZmaW9fZW9pID0gdmZpb19wbGF0Zm9ybV9lb2ksCj4gLSAg
-ICAudmZpb19wb3B1bGF0ZV9kZXZpY2UgPSB2ZmlvX3BvcHVsYXRlX2RldmljZSwKPiAgfTsKPiAg
-Cj4gIC8qKgo+IEBAIC00ODEsNiArNTY1LDEzIEBAIHN0YXRpYyBpbnQgdmZpb19iYXNlX2Rldmlj
-ZV9pbml0KFZGSU9EZXZpY2UgKnZiYXNlZGV2KQo+ICAgICAgICAgIGVycm9yX3JlcG9ydCgidmZp
-bzogZmFpbGVkIHRvIGdldCBkZXZpY2UgJXMiLCBwYXRoKTsKPiAgICAgICAgICB2ZmlvX3B1dF9n
-cm91cChncm91cCk7Cj4gICAgICB9Cj4gKwo+ICsgICAgcmV0ID0gdmZpb19wb3B1bGF0ZV9kZXZp
-Y2UodmJhc2VkZXYpOwo+ICsgICAgaWYgKHJldCkgewo+ICsgICAgICAgIGVycm9yX3JlcG9ydCgi
-dmZpbzogZmFpbGVkIHRvIHBvcHVsYXRlIGRldmljZSAlcyIsIHBhdGgpOwo+ICsgICAgICAgIHZm
-aW9fcHV0X2dyb3VwKGdyb3VwKTsKPiArICAgIH0KPiArCj4gICAgICByZXR1cm4gcmV0Owo+ICB9
-Cj4gIAo+IEBAIC01MzYsNyArNjI3LDE3IEBAIHN0YXRpYyB2b2lkIHZmaW9fcGxhdGZvcm1fcmVh
-bGl6ZShEZXZpY2VTdGF0ZSAqZGV2LCBFcnJvciAqKmVycnApCj4gIAo+ICAgICAgdmJhc2VkZXYt
-PnR5cGUgPSBWRklPX0RFVklDRV9UWVBFX1BMQVRGT1JNOwo+ICAgICAgdmJhc2VkZXYtPm9wcyA9
-ICZ2ZmlvX3BsYXRmb3JtX29wczsKPiArCj4gKyNpZmRlZiBDT05GSUdfS1ZNCj4gKyAgICBpZiAo
-a3ZtX2lycWZkc19lbmFibGVkKCkgJiYga3ZtX3Jlc2FtcGxlZmRzX2VuYWJsZWQoKSAmJgo+ICsg
-ICAgICAgIHZkZXYtPmlycWZkX2FsbG93ZWQpIHsKPiArICAgICAgICB2ZGV2LT5zdGFydF9pcnFf
-Zm4gPSB2ZmlvX3N0YXJ0X2lycWZkX2luamVjdGlvbjsKPiArICAgIH0gZWxzZSB7Cj4gKyAgICAg
-ICAgdmRldi0+c3RhcnRfaXJxX2ZuID0gdmZpb19zdGFydF9ldmVudGZkX2luamVjdGlvbjsKPiAr
-ICAgIH0KPiArI2Vsc2UKPiAgICAgIHZkZXYtPnN0YXJ0X2lycV9mbiA9IHZmaW9fc3RhcnRfZXZl
-bnRmZF9pbmplY3Rpb247Cj4gKyNlbmRpZgo+ICAKPiAgICAgIHRyYWNlX3ZmaW9fcGxhdGZvcm1f
-cmVhbGl6ZSh2YmFzZWRldi0+bmFtZSwgdmRldi0+Y29tcGF0KTsKPiAgCj4gQEAgLTYxNCw2ICs3
-MTUsNyBAQCBzdGF0aWMgUHJvcGVydHkgdmZpb19wbGF0Zm9ybV9kZXZfcHJvcGVydGllc1tdID0g
-ewo+ICAgICAgREVGSU5FX1BST1BfU1RSSU5HKCJob3N0IiwgVkZJT1BsYXRmb3JtRGV2aWNlLCB2
-YmFzZWRldi5uYW1lKSwKPiAgICAgIERFRklORV9QUk9QX1VJTlQzMigibW1hcC10aW1lb3V0LW1z
-IiwgVkZJT1BsYXRmb3JtRGV2aWNlLAo+ICAgICAgICAgICAgICAgICAgICAgICAgIG1tYXBfdGlt
-ZW91dCwgMTEwMCksCj4gKyAgICBERUZJTkVfUFJPUF9CT09MKCJ4LWlycWZkIiwgVkZJT1BsYXRm
-b3JtRGV2aWNlLCBpcnFmZF9hbGxvd2VkLCB0cnVlKSwKPiAgICAgIERFRklORV9QUk9QX0VORF9P
-Rl9MSVNUKCksCj4gIH07Cj4gIAo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2h3L3ZmaW8vdmZpby1w
-bGF0Zm9ybS5oIGIvaW5jbHVkZS9ody92ZmlvL3ZmaW8tcGxhdGZvcm0uaAo+IGluZGV4IGJkMTIw
-NmUuLjA5NzQ0OGIgMTAwNjQ0Cj4gLS0tIGEvaW5jbHVkZS9ody92ZmlvL3ZmaW8tcGxhdGZvcm0u
-aAo+ICsrKyBiL2luY2x1ZGUvaHcvdmZpby92ZmlvLXBsYXRmb3JtLmgKPiBAQCAtNTgsNiArNTgs
-NyBAQCB0eXBlZGVmIHN0cnVjdCBWRklPUGxhdGZvcm1EZXZpY2Ugewo+ICAgICAgUUVNVVRpbWVy
-ICptbWFwX3RpbWVyOyAvKiBlbmFibGUgbW1hcHMgYWZ0ZXIgcGVyaW9kcyB3L28gaW50ZXJydXB0
-cyAqLwo+ICAgICAgc3RhcnRfaXJxX2ZuX3Qgc3RhcnRfaXJxX2ZuOwo+ICAgICAgUWVtdU11dGV4
-ICBpbnRwX211dGV4Owo+ICsgICAgYm9vbCBpcnFmZF9hbGxvd2VkOyAvKiBkZWJ1ZyBvcHRpb24g
-dG8gZm9yY2UgaXJxZmQgb24vb2ZmICovCj4gIH0gVkZJT1BsYXRmb3JtRGV2aWNlOwo+ICAKPiAg
-Cj4gZGlmZiAtLWdpdCBhL3RyYWNlLWV2ZW50cyBiL3RyYWNlLWV2ZW50cwo+IGluZGV4IGQzNjg1
-YzkuLjdhNmE2YWEgMTAwNjQ0Cj4gLS0tIGEvdHJhY2UtZXZlbnRzCj4gKysrIGIvdHJhY2UtZXZl
-bnRzCj4gQEAgLTE1NjcsNiArMTU2Nyw4IEBAIHZmaW9fcGxhdGZvcm1fYmFzZV9kZXZpY2VfaW5p
-dChjaGFyICpuYW1lLCBpbnQgZ3JvdXBpZCkgIiVzIGJlbG9uZ3MgdG8gZ3JvdXAgIyVkCj4gIHZm
-aW9fcGxhdGZvcm1fcmVhbGl6ZShjaGFyICpuYW1lLCBjaGFyICpjb21wYXQpICJ2ZmlvIGRldmlj
-ZSAlcywgY29tcGF0ID0gJXMiCj4gIHZmaW9faW50cF9pbnRlcnJ1cHRfc2V0X3BlbmRpbmcoaW50
-IGluZGV4KSAiaXJxICVkIGlzIHNldCBQRU5ESU5HIgo+ICB2ZmlvX3BsYXRmb3JtX2VvaV9oYW5k
-bGVfcGVuZGluZyhpbnQgaW5kZXgpICJoYW5kbGUgUEVORElORyBJUlEgJWQiCj4gK3ZmaW9fcGxh
-dGZvcm1fc3RhcnRfaXJxZmRfaW5qZWN0aW9uKGludCBpbmRleCwgaW50IGdzaSwgaW50IGZkLCBp
-bnQgcmVzYW1wbGVmZCkgIklSUSBpbmRleD0lZCwgZ3NpID0lZCwgZmQgPSAlZCwgcmVzYW1wbGVm
-ZCA9ICVkIgo+ICt2ZmlvX3N0YXJ0X2V2ZW50ZmRfaW5qZWN0aW9uKGludCBpbmRleCwgaW50IGZk
-KSAiSVJRIGluZGV4PSVkLCBmZCA9ICVkIgo+ICAKPiAgI2h3L2FjcGkvbWVtb3J5X2hvdHBsdWcu
-Ywo+ICBtaHBfYWNwaV9pbnZhbGlkX3Nsb3Rfc2VsZWN0ZWQodWludDMyX3Qgc2xvdCkgIjB4JSJQ
-Ukl4MzIKCi0tIApBbGV4IEJlbm7DqWUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1i
-aWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3Zt
-YXJtCg==
+Hi Andre,
+
+Thanks for doing this. Since it looks unlikely that kvmtool will ever be
+merged back into the kernel tree, it makes sense to cut the dependency
+in my opinion.
+
+On Fri, Feb 13, 2015 at 10:39:33AM +0000, Andre Przywara wrote:
+> as I found it increasingly inconvenient to use kvmtool[1] as part of a
+> Linux repository, I decided to give it a go and make it a stand-alone
+> project. So I filtered all the respective commits, adjusted the paths in
+> there (while keeping authorship and commit date, of course) and then
+> added the missing bits to let it compile without a kernel tree nearby.
+> The result is now available on:
+> 
+> git://linux-arm.org/kvmtool.git
+> http://linux-arm.org/kvmtool.git
+> 
+> You can simply check it out, type make and use "./lkvm run" for a quick
+> test. So far I briefly tested x86-64, arm and arm64, the later two were
+> also cross-compiled. For sure there are rough edges in there (for
+> instance copying a few non-uapi header files into), but I deem it worthy
+> enough to get some public comments.
+> For me that also fixed some nasty warnings about libfdt, which now are
+> gone due it using your system library version of it.
+> I also managed to get rid of the libc-i386-dev dependency when compiling
+> for x86-64, but that still needs to be cleaned up and thus is not in the
+> current HEAD.
+> I haven't got around to compile-test the other supported architectures,
+> but supporting them should be as easy as copying over the uapi kvm.h
+> header file (see the respective ARM commit). Contributions (and tests!)
+> are welcome.
+> 
+> Please give it a go and tell me what you think. I don't want to fork the
+> project, so I am happy if someone "official" picks it up.
+
+In which case, it's probably best to post the patches for review rather
+than just point me at your git repo!
+
+Will
