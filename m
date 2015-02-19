@@ -1,54 +1,63 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: stand-alone kvmtool
-Date: Wed, 18 Feb 2015 15:50:42 +0000
-Message-ID: <20150218155042.GF22017@arm.com>
-References: <54DDD465.3050300@arm.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [RFC/RFT PATCH 0/3] arm64: KVM: work around incoherency with uncached
+ guest mappings
+Date: Thu, 19 Feb 2015 10:54:43 +0000
+Message-ID: <1424343286-6792-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <54DDD465.3050300@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Pekka Enberg <penberg@kernel.org>, Sasha Levin <sasha.levin@oracle.com>, Cyrill Gorcunov <gorcunov@gmail.com>, Asias He <asias.hejun@gmail.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Ronald Minnich <rminnich@google.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D74345FBB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Feb 2015 05:49:34 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id vvHtgJLg-pJU for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Feb 2015 05:49:33 -0500 (EST)
+Received: from mail-wg0-f42.google.com (mail-wg0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8101845FAA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Feb 2015 05:49:33 -0500 (EST)
+Received: by mail-wg0-f42.google.com with SMTP id n12so6500921wgh.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Feb 2015 02:55:01 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: lersek@redhat.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, peter.maydell@linaro.org
+Cc: pbonzini@redhat.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
+This is a 0th order approximation of how we could potentially force the guest
+to avoid uncached mappings, at least from the moment the MMU is on. (Before
+that, all of memory is implicitly classified as Device-nGnRnE)
 
-Thanks for doing this. Since it looks unlikely that kvmtool will ever be
-merged back into the kernel tree, it makes sense to cut the dependency
-in my opinion.
+The idea (patch #2) is to trap writes to MAIR_EL1, and replace uncached mappings
+with cached ones. This way, there is no need to mangle any guest page tables.
 
-On Fri, Feb 13, 2015 at 10:39:33AM +0000, Andre Przywara wrote:
-> as I found it increasingly inconvenient to use kvmtool[1] as part of a
-> Linux repository, I decided to give it a go and make it a stand-alone
-> project. So I filtered all the respective commits, adjusted the paths in
-> there (while keeping authorship and commit date, of course) and then
-> added the missing bits to let it compile without a kernel tree nearby.
-> The result is now available on:
-> 
-> git://linux-arm.org/kvmtool.git
-> http://linux-arm.org/kvmtool.git
-> 
-> You can simply check it out, type make and use "./lkvm run" for a quick
-> test. So far I briefly tested x86-64, arm and arm64, the later two were
-> also cross-compiled. For sure there are rough edges in there (for
-> instance copying a few non-uapi header files into), but I deem it worthy
-> enough to get some public comments.
-> For me that also fixed some nasty warnings about libfdt, which now are
-> gone due it using your system library version of it.
-> I also managed to get rid of the libc-i386-dev dependency when compiling
-> for x86-64, but that still needs to be cleaned up and thus is not in the
-> current HEAD.
-> I haven't got around to compile-test the other supported architectures,
-> but supporting them should be as easy as copying over the uapi kvm.h
-> header file (see the respective ARM commit). Contributions (and tests!)
-> are welcome.
-> 
-> Please give it a go and tell me what you think. I don't want to fork the
-> project, so I am happy if someone "official" picks it up.
+The downside is that, to do this correctly, we need to always trap writes to
+the VM sysreg group, which includes registers that the guest may write to very
+often. To reduce the associated performance hit, patch #1 introduces a fast path
+for EL2 to perform trivial sysreg writes on behalf of the guest, without the
+need for a full world switch to the host and back.
 
-In which case, it's probably best to post the patches for review rather
-than just point me at your git repo!
+The main purpose of these patches is to quantify the performance hit, and
+verify whether the MAIR_EL1 handling works correctly. 
 
-Will
+Ard Biesheuvel (3):
+  arm64: KVM: handle some sysreg writes in EL2
+  arm64: KVM: mangle MAIR register to prevent uncached guest mappings
+  arm64: KVM: keep trapping of VM sysreg writes enabled
+
+ arch/arm/kvm/mmu.c               |   2 +-
+ arch/arm64/include/asm/kvm_arm.h |   2 +-
+ arch/arm64/kvm/hyp.S             | 101 +++++++++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c        |  63 ++++++++++++++++++++----
+ 4 files changed, 156 insertions(+), 12 deletions(-)
+
+-- 
+1.8.3.2
