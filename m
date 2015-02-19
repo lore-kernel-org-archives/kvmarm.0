@@ -1,54 +1,80 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC/RFT PATCH 0/3] arm64: KVM: work around incoherency with
- uncached guest mappings
-Date: Thu, 19 Feb 2015 18:57:24 +0100
-Message-ID: <54E62404.9040702@redhat.com>
-References: <1424343286-6792-1-git-send-email-ard.biesheuvel@linaro.org>
- <20150219165731.GA26965@hawk.usersys.redhat.com>
- <CAKv+Gu8Je3RRrgEFCZ7JUWtOgk3WqA_qdBEOPAMc3OqnKr1bwg@mail.gmail.com>
- <20150219175518.GB26965@hawk.usersys.redhat.com>
+From: Rob Herring <robherring2-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Subject: Re: [PATCH] arm64: dts: Fix GIC reg sizes for APM X-Gene
+Date: Thu, 19 Feb 2015 12:23:15 -0600
+Message-ID: <CAL_JsqJQcuX2cp50oHod-QAbhdMg48TaRP+gLGEO2kbFnQ3B+A@mail.gmail.com>
+References: <1422342206-4750-1-git-send-email-psawargaonkar@apm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D2B744610E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Feb 2015 12:52:09 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id L-QPAIfcO7MJ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Feb 2015 12:52:08 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D9FEB460E6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Feb 2015 12:52:07 -0500 (EST)
-In-Reply-To: <20150219175518.GB26965@hawk.usersys.redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: KVM devel mailing list <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1422342206-4750-1-git-send-email-psawargaonkar-qTEPVZfXA3Y@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pranavkumar Sawargaonkar <psawargaonkar-qTEPVZfXA3Y@public.gmane.org>
+Cc: "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Feng Kan <fkan-qTEPVZfXA3Y@public.gmane.org>, Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, "jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "patches-qTEPVZfXA3Y@public.gmane.org" <patches-qTEPVZfXA3Y@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Tushar Jagad <tjagad-qTEPVZfXA3Y@public.gmane.org>, "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org" <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On Tue, Jan 27, 2015 at 1:03 AM, Pranavkumar Sawargaonkar
+<psawargaonkar-qTEPVZfXA3Y@public.gmane.org> wrote:
+> In APM X-Gene, GIC register space is 64K aligned while the sizes mentioned
+> in the dt are 4K aligned. This breaks KVM when kernel is built with 64K page
+> size due to size alignment checking in vgic driver for VCPU Control and
+> VCPU register.
+>
+> This patch corrects the sizes to be inline with the hardware spec.
 
+This does not make sense. The GIC regions are still only 4 or 8KB and
+the h/w description should reflect that. For implementations using
+gic-400 and the addressing decode trick, the rest of the register
+range is also not safe to access given it is multiple mapped. Also,
+this wastes virtual space, but I guess we don't care on 64-bit.
 
-On 19/02/2015 18:55, Andrew Jones wrote:
->> > > (I don't have an exact number for how many times it went to EL1 because
->> > >  access_mair() doesn't have a trace point.)
->> > > (I got the 62873 number by testing a 3rd kernel build that only had patch
->> > >  3/3 applied to the base, and counting kvm_toggle_cache events.)
->> > > (The number 50 is the number of kvm_toggle_cache events *without* 3/3
->> > >  applied.)
->> > >
->> > > I consider this bad news because, even considering it only goes to EL2,
->> > > it goes a ton more than it used to. I realize patch 3/3 isn't the final
->> > > plan for enabling traps though.
+KVM should be fixed to only check base address alignment. Size
+alignment does not matter (if it does, then you need to fix all
+register blocks).
 
-If a full guest boots, can you try timing a kernel compile?
+Rob
 
-Paolo
+>
+> CC: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+> CC: kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+> CC: arnd-r2nGTMty4D4@public.gmane.org
+> CC: marc.zyngier-5wv7dgnIgG8@public.gmane.org
+> CC: christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
+> CC: jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+> Signed-off-by: Pranavkumar Sawargaonkar <psawargaonkar-qTEPVZfXA3Y@public.gmane.org>
+> Signed-off-by: Tushar Jagad <tjagad-qTEPVZfXA3Y@public.gmane.org>
+> Signed-off-by: Feng Kan <fkan-qTEPVZfXA3Y@public.gmane.org>
+> ---
+>  arch/arm64/boot/dts/apm/apm-storm.dtsi |    8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/arm64/boot/dts/apm/apm-storm.dtsi b/arch/arm64/boot/dts/apm/apm-storm.dtsi
+> index f1ad9c2..65f0e6d 100644
+> --- a/arch/arm64/boot/dts/apm/apm-storm.dtsi
+> +++ b/arch/arm64/boot/dts/apm/apm-storm.dtsi
+> @@ -81,10 +81,10 @@
+>                 compatible = "arm,cortex-a15-gic";
+>                 #interrupt-cells = <3>;
+>                 interrupt-controller;
+> -               reg = <0x0 0x78010000 0x0 0x1000>,      /* GIC Dist */
+> -                     <0x0 0x78020000 0x0 0x1000>,      /* GIC CPU */
+> -                     <0x0 0x78040000 0x0 0x2000>,      /* GIC VCPU Control */
+> -                     <0x0 0x78060000 0x0 0x2000>;      /* GIC VCPU */
+> +               reg = <0x0 0x78010000 0x0 0x10000>,     /* GIC Dist */
+> +                     <0x0 0x78020000 0x0 0x20000>,     /* GIC CPU */
+> +                     <0x0 0x78040000 0x0 0x10000>,     /* GIC VCPU Control */
+> +                     <0x0 0x78060000 0x0 0x20000>;     /* GIC VCPU */
+>                 interrupts = <1 9 0xf04>;       /* GIC Maintenence IRQ */
+>         };
+>
+> --
+> 1.7.9.5
+>
+>
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
