@@ -1,60 +1,85 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [RFC/RFT PATCH 0/3] arm64: KVM: work around incoherency with
- uncached guest mappings
-Date: Thu, 19 Feb 2015 15:31:07 +0000
-Message-ID: <CAKv+Gu-RCG-px7gN=S8WKSvbY2hmLiN04fziKyBHtxmsCLc8YQ@mail.gmail.com>
-References: <1424343286-6792-1-git-send-email-ard.biesheuvel@linaro.org>
-	<54E5F847.6050602@suse.de>
-	<CAKv+Gu9zciD-KuRXbQhLJBgW6i4jk0-=hG6UrBWr6-g-uZkO1A@mail.gmail.com>
-	<54E600D5.4070803@suse.de>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH] arm64: dts: Fix GIC reg sizes for APM X-Gene
+Date: Thu, 19 Feb 2015 16:51:38 +0100
+Message-ID: <20150219155138.GA24460@cbox>
+References: <1422342206-4750-1-git-send-email-psawargaonkar@apm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <54E600D5.4070803@suse.de>
-Sender: kvm-owner@vger.kernel.org
-To: Alexander Graf <agraf@suse.de>
-Cc: Laszlo Ersek <lersek@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Peter Maydell <peter.maydell@linaro.org>, KVM devel mailing list <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 47747460B0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Feb 2015 10:45:51 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id GAAbeg9XeeiX for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Feb 2015 10:45:50 -0500 (EST)
+Received: from mail-lb0-f179.google.com (mail-lb0-f179.google.com
+ [209.85.217.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E27A7460AF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Feb 2015 10:45:49 -0500 (EST)
+Received: by lbvp9 with SMTP id p9so668561lbv.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Feb 2015 07:51:17 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <1422342206-4750-1-git-send-email-psawargaonkar@apm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Pranavkumar Sawargaonkar <psawargaonkar@apm.com>
+Cc: devicetree@vger.kernel.org, arnd@arndb.de, Feng Kan <fkan@apm.com>, marc.zyngier@arm.com, jcm@redhat.com, patches@apm.com, Tushar Jagad <tjagad@apm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 19 February 2015 at 15:27, Alexander Graf <agraf@suse.de> wrote:
->
->
-> On 19.02.15 15:56, Ard Biesheuvel wrote:
->> On 19 February 2015 at 14:50, Alexander Graf <agraf@suse.de> wrote:
->>>
->>>
->>> On 19.02.15 11:54, Ard Biesheuvel wrote:
->>>> This is a 0th order approximation of how we could potentially force the guest
->>>> to avoid uncached mappings, at least from the moment the MMU is on. (Before
->>>> that, all of memory is implicitly classified as Device-nGnRnE)
->>>>
->>>> The idea (patch #2) is to trap writes to MAIR_EL1, and replace uncached mappings
->>>> with cached ones. This way, there is no need to mangle any guest page tables.
->>>
->>> Would you mind to give a brief explanation on what this does? What
->>> happens to actually assigned devices that need to be mapped as uncached?
->>> What happens to DMA from such devices when the guest assumes that it's
->>> accessing RAM uncached and then triggers DMA?
->>>
->>
->> On ARM, stage 2 mappings that are more strict will supersede stage 1
->> mappings, so the idea is to use cached mappings exclusively for stage
->> 1 so that the host is fully in control of the actual memory attributes
->> by setting the attributes at stage 2. This also makes sense because
->> the host will ultimately know better whether some range that the guest
->> thinks is a device is actually a device or just emulated (no stage 2
->> mapping), backed by host memory (such as the NOR flash read case) or
->> backed by a passthrough device.
->
-> Ok, so that means if the guest maps RAM as uncached, it will actually
-> end up as cached memory. Now if the guest triggers a DMA request to a
-> passed through device to that RAM, it will conflict with the cache.
->
-> I don't know whether it's a big deal, but it's the scenario that came up
-> with the approach above before when I talked to people about it.
->
+On Tue, Jan 27, 2015 at 12:33:26PM +0530, Pranavkumar Sawargaonkar wrote:
+> In APM X-Gene, GIC register space is 64K aligned while the sizes mentioned
+> in the dt are 4K aligned. This breaks KVM when kernel is built with 64K page
+> size due to size alignment checking in vgic driver for VCPU Control and
+> VCPU register.
+> 
+> This patch corrects the sizes to be inline with the hardware spec.
+> 
+> CC: linux-arm-kernel@lists.infradead.org
+> CC: kvmarm@lists.cs.columbia.edu
+> CC: arnd@arndb.de
+> CC: marc.zyngier@arm.com
+> CC: christoffer.dall@linaro.org
+> CC: jcm@redhat.com
+> Signed-off-by: Pranavkumar Sawargaonkar <psawargaonkar@apm.com>
+> Signed-off-by: Tushar Jagad <tjagad@apm.com>
+> Signed-off-by: Feng Kan <fkan@apm.com>
+> ---
+>  arch/arm64/boot/dts/apm/apm-storm.dtsi |    8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/boot/dts/apm/apm-storm.dtsi b/arch/arm64/boot/dts/apm/apm-storm.dtsi
+> index f1ad9c2..65f0e6d 100644
+> --- a/arch/arm64/boot/dts/apm/apm-storm.dtsi
+> +++ b/arch/arm64/boot/dts/apm/apm-storm.dtsi
+> @@ -81,10 +81,10 @@
+>  		compatible = "arm,cortex-a15-gic";
+>  		#interrupt-cells = <3>;
+>  		interrupt-controller;
+> -		reg = <0x0 0x78010000 0x0 0x1000>,	/* GIC Dist */
+> -		      <0x0 0x78020000 0x0 0x1000>,	/* GIC CPU */
+> -		      <0x0 0x78040000 0x0 0x2000>,	/* GIC VCPU Control */
+> -		      <0x0 0x78060000 0x0 0x2000>;	/* GIC VCPU */
+> +		reg = <0x0 0x78010000 0x0 0x10000>,	/* GIC Dist */
+> +		      <0x0 0x78020000 0x0 0x20000>,	/* GIC CPU */
+> +		      <0x0 0x78040000 0x0 0x10000>,	/* GIC VCPU Control */
+> +		      <0x0 0x78060000 0x0 0x20000>;	/* GIC VCPU */
+>  		interrupts = <1 9 0xf04>;	/* GIC Maintenence IRQ */
+>  	};
+> 
+> --
+> 1.7.9.5
+> 
 
-Well, I am using write-through read+write allocate, which hopefully
-means that the actual RAM is kept in sync with the cache, but I must
-confess I am a bit out of my depth here with the fine print in the ARM
-ARM.
+This looks good to me and works with 4K and 64K pages on the mustang I
+have at hand.
+
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
