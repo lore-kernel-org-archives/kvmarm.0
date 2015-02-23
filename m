@@ -1,45 +1,98 @@
-From: Peter Maydell <peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH] arm64: dts: Fix GIC reg sizes for APM X-Gene
-Date: Sun, 22 Feb 2015 08:58:15 +0900
-Message-ID: <CAFEAcA9pg5v_+RAehwf5XWopgeJtWfDb+Xej+579ikeiRjhg_Q@mail.gmail.com>
-References: <1422342206-4750-1-git-send-email-psawargaonkar@apm.com>
- <CAL_JsqJQcuX2cp50oHod-QAbhdMg48TaRP+gLGEO2kbFnQ3B+A@mail.gmail.com>
- <20150219190348.GB24460@cbox> <CAL_JsqLcBOC+AnVe7oATjg2g6Fz2vqwacu8QzS4tXMaxxOP_Xg@mail.gmail.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: stand-alone kvmtool
+Date: Mon, 23 Feb 2015 10:11:53 +0000
+Message-ID: <54EAFCE9.5030000@arm.com>
+References: <54DDD465.3050300@arm.com> <20150218155042.GF22017@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CAL_JsqLcBOC+AnVe7oATjg2g6Fz2vqwacu8QzS4tXMaxxOP_Xg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Rob Herring <robherring2-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Cc: Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>, Feng Kan <fkan-qTEPVZfXA3Y@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, "jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "patches-qTEPVZfXA3Y@public.gmane.org" <patches-qTEPVZfXA3Y@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, Tushar Jagad <tjagad-qTEPVZfXA3Y@public.gmane.org>, Pranavkumar Sawargaonkar <psawargaonkar-qTEPVZfXA3Y@public.gmane.org>, "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org" <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ACD4446435
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Feb 2015 05:06:24 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 1fMZnPKmY93o for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Feb 2015 05:06:23 -0500 (EST)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 006AE4641B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Feb 2015 05:06:21 -0500 (EST)
+In-Reply-To: <20150218155042.GF22017@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Will Deacon <will.deacon@arm.com>
+Cc: Cyrill Gorcunov <gorcunov@gmail.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Asias He <asias.hejun@gmail.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Pekka Enberg <penberg@kernel.org>, Ronald Minnich <rminnich@google.com>, Sasha Levin <sasha.levin@oracle.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 22 February 2015 at 06:56, Rob Herring <robherring2-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
-> On Thu, Feb 19, 2015 at 1:03 PM, Christoffer Dall
-> <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
->> It matters if you want to ensure that the 64K page you are assigning to
->> a guest for the GIC virtual CPU interface contains only GIC virtual CPU
->> mappings, and not other random stuff that the guest is not allowed to
->> touch.
->
-> Good point.
->
->> How else should this be enforced?
->
-> Rely on correct h/w design? You'll have to repeat this every time you
-> want to do pass-thru of a device.
+Hi Will,
 
-The idea is that the device tree lets us describe whether
-the hardware design is correct or not :-)
+On 18/02/15 15:50, Will Deacon wrote:
+> Hi Andre,
+> 
+> Thanks for doing this. Since it looks unlikely that kvmtool will ever be
+> merged back into the kernel tree, it makes sense to cut the dependency
+> in my opinion.
+> 
+> On Fri, Feb 13, 2015 at 10:39:33AM +0000, Andre Przywara wrote:
+>> as I found it increasingly inconvenient to use kvmtool[1] as part of a
+>> Linux repository, I decided to give it a go and make it a stand-alone
+>> project. So I filtered all the respective commits, adjusted the paths in
+>> there (while keeping authorship and commit date, of course) and then
+>> added the missing bits to let it compile without a kernel tree nearby.
+>> The result is now available on:
+>>
+>> git://linux-arm.org/kvmtool.git
+>> http://linux-arm.org/kvmtool.git
+>>
+>> You can simply check it out, type make and use "./lkvm run" for a quick
+>> test. So far I briefly tested x86-64, arm and arm64, the later two were
+>> also cross-compiled. For sure there are rough edges in there (for
+>> instance copying a few non-uapi header files into), but I deem it worthy
+>> enough to get some public comments.
+>> For me that also fixed some nasty warnings about libfdt, which now are
+>> gone due it using your system library version of it.
+>> I also managed to get rid of the libc-i386-dev dependency when compiling
+>> for x86-64, but that still needs to be cleaned up and thus is not in the
+>> current HEAD.
+>> I haven't got around to compile-test the other supported architectures,
+>> but supporting them should be as easy as copying over the uapi kvm.h
+>> header file (see the respective ARM commit). Contributions (and tests!)
+>> are welcome.
+>>
+>> Please give it a go and tell me what you think. I don't want to fork the
+>> project, so I am happy if someone "official" picks it up.
+> 
+> In which case, it's probably best to post the patches for review rather
+> than just point me at your git repo!
 
-> What do you do if 64K mapping is not supported? Fallback to emulation
-> of the CPU interface?
+Makes some sense, although part of the exercise was to get rid of the
+huge, now unneeded Linux kernel code base.
+So this approach required a fresh repository, and due to the different
+paths there is no out-of-the-box patch compatibility between the two.
+Also I wanted to provide an easy way for people to give it a test.
 
-In this case KVM can't be supported -- use 4K host pages with this
-hardware, or don't use KVM...
+So what I could do is to send the top-most patches against Pekka's
+github repository, which would eliminate the references to the kernel
+directory (at the cost of duplicating some files).
+Once this is settled, acked and applied, one could try to create a new
+repository with the tools/kvm directory being the new root.
 
--- PMM
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Let me know if that makes more sense and I will rework the patches to
+apply against the current upstream kvmtool.
+
+Cheers,
+Andre.
+
+P.S. Although both approaches still provide the kvmtool patch history,
+they do not compile before the dependency cut patches. If that is an
+issue, one could think about injecting those new patches back into the
+repository time line. Admittedly that sounds scary, but would solve the
+problem.
