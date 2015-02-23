@@ -1,24 +1,24 @@
 From: Andre Przywara <andre.przywara@arm.com>
 Subject: Re: stand-alone kvmtool
-Date: Mon, 23 Feb 2015 10:11:53 +0000
-Message-ID: <54EAFCE9.5030000@arm.com>
-References: <54DDD465.3050300@arm.com> <20150218155042.GF22017@arm.com>
+Date: Mon, 23 Feb 2015 11:12:14 +0000
+Message-ID: <54EB0B0E.3010308@arm.com>
+References: <54DDD465.3050300@arm.com> <54E5C16D.3060109@oracle.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ACD4446435
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Feb 2015 05:06:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 40B754644B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Feb 2015 06:06:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1fMZnPKmY93o for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Feb 2015 05:06:23 -0500 (EST)
+ with ESMTP id GbTuHaEsIaWY for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Feb 2015 06:06:43 -0500 (EST)
 Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
  [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 006AE4641B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Feb 2015 05:06:21 -0500 (EST)
-In-Reply-To: <20150218155042.GF22017@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BF2E4643B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Feb 2015 06:06:42 -0500 (EST)
+In-Reply-To: <54E5C16D.3060109@oracle.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,20 +28,18 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>
-Cc: Cyrill Gorcunov <gorcunov@gmail.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Asias He <asias.hejun@gmail.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Pekka Enberg <penberg@kernel.org>, Ronald Minnich <rminnich@google.com>, Sasha Levin <sasha.levin@oracle.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Sasha Levin <sasha.levin@oracle.com>, Pekka Enberg <penberg@kernel.org>, Cyrill Gorcunov <gorcunov@gmail.com>, Asias He <asias.hejun@gmail.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Will Deacon <Will.Deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ronald Minnich <rminnich@google.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Will,
+Hi Sasha,
 
-On 18/02/15 15:50, Will Deacon wrote:
-> Hi Andre,
-> 
-> Thanks for doing this. Since it looks unlikely that kvmtool will ever be
-> merged back into the kernel tree, it makes sense to cut the dependency
-> in my opinion.
-> 
-> On Fri, Feb 13, 2015 at 10:39:33AM +0000, Andre Przywara wrote:
+thanks for taking a look!
+
+On 19/02/15 10:56, Sasha Levin wrote:
+> On 02/13/2015 05:39 AM, Andre Przywara wrote:
+>> Hi,
+>>
 >> as I found it increasingly inconvenient to use kvmtool[1] as part of a
 >> Linux repository, I decided to give it a go and make it a stand-alone
 >> project. So I filtered all the respective commits, adjusted the paths in
@@ -51,48 +49,57 @@ On 18/02/15 15:50, Will Deacon wrote:
 >>
 >> git://linux-arm.org/kvmtool.git
 >> http://linux-arm.org/kvmtool.git
->>
->> You can simply check it out, type make and use "./lkvm run" for a quick
->> test. So far I briefly tested x86-64, arm and arm64, the later two were
->> also cross-compiled. For sure there are rough edges in there (for
->> instance copying a few non-uapi header files into), but I deem it worthy
->> enough to get some public comments.
->> For me that also fixed some nasty warnings about libfdt, which now are
->> gone due it using your system library version of it.
->> I also managed to get rid of the libc-i386-dev dependency when compiling
->> for x86-64, but that still needs to be cleaned up and thus is not in the
->> current HEAD.
->> I haven't got around to compile-test the other supported architectures,
->> but supporting them should be as easy as copying over the uapi kvm.h
->> header file (see the respective ARM commit). Contributions (and tests!)
->> are welcome.
->>
->> Please give it a go and tell me what you think. I don't want to fork the
->> project, so I am happy if someone "official" picks it up.
 > 
-> In which case, it's probably best to post the patches for review rather
-> than just point me at your git repo!
+> Hi Andre,
+> 
+> What inconvenience is caused by having it sit inside the kernel tree
+> beyond an increased requirement in disk space?
 
-Makes some sense, although part of the exercise was to get rid of the
-huge, now unneeded Linux kernel code base.
-So this approach required a fresh repository, and due to the different
-paths there is no out-of-the-box patch compatibility between the two.
-Also I wanted to provide an easy way for people to give it a test.
+Reduced disk space is admittedly one of the benefits of this exercise.
+Also it makes cloning a lot easier and would allow easier packaging.
 
-So what I could do is to send the top-most patches against Pekka's
-github repository, which would eliminate the references to the kernel
-directory (at the cost of duplicating some files).
-Once this is settled, acked and applied, one could try to create a new
-repository with the tools/kvm directory being the new root.
+Many of the issues we face here come from the fact that kvmtool lives in
+_a_ kernel repository, but it's not upstream. So we loose the benefit of
+joined kernel-userland development. In fact we have to do regular merges
+of mostly unrelated upstream kernel code into the branch to get it
+compiled with a new feature.
+Also having a pure userland tool in the kernel repository sounds just
+wrong to me, especially as KVM has a nice API with compatibility
+features. There is a clear interface between the KVM kernel and the
+controlling userland, so they should not need to share code beyond the
+API defining header files. Having a shared code base lures people into
+breaking the interface.
 
-Let me know if that makes more sense and I will rework the patches to
-apply against the current upstream kvmtool.
+> Moving it out will make us lose all the new features and bug fixes we
+> gain from using the kernel code directly rather than copying it once
+> in a while.
+
+Which code are you exactly thinking of?
+>From the code I copied I don't see that rbtree or the Linux list
+implementations for instance justify a common code base. If in dire
+need, one could setup alerts on the few code files copied to spot
+upstream bug fixes.
+I see there is a slight drawback in this regard, but I think the
+benefits outweigh it.
+
+> With your suggestion we'll end up needing something that copies stuff
+> from the kernel into that standalone tree, just like what qemu does.
+
+While I see that copying is not the best solution, QEMU lives very well
+with it, doesn't it? With KVM's feature compatibility API and the
+kernel's "don't break userland" policy there should be no real problem.
+Also with the current situation we just replace "copy uapi header files"
+with "merge in upstream kernel code base", which is also manually
+triggered and much more ugly IMHO.
+
+
+I agree that the whole argumentation would be much different if kvmtool
+would be upstream, but it is not and as Will pointed out will probably
+never be. So to make it's usage easier for the users and distribution
+package maintainers, I'd like to see it live on in a separate
+(kernel.org) repository.
+I could imagine that the easier accessibility would make it more
+appealing to potential users (and packagers!)
 
 Cheers,
 Andre.
-
-P.S. Although both approaches still provide the kvmtool patch history,
-they do not compile before the dependency cut patches. If that is an
-issue, one could think about injecting those new patches back into the
-repository time line. Admittedly that sounds scary, but would solve the
-problem.
