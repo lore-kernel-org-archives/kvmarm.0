@@ -1,105 +1,69 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: stand-alone kvmtool
-Date: Mon, 23 Feb 2015 11:12:14 +0000
-Message-ID: <54EB0B0E.3010308@arm.com>
-References: <54DDD465.3050300@arm.com> <54E5C16D.3060109@oracle.com>
+From: Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH] arm64: dts: Fix GIC reg sizes for APM X-Gene
+Date: Mon, 23 Feb 2015 13:07:44 +0100
+Message-ID: <20150223120744.GA5609@cbox>
+References: <1422342206-4750-1-git-send-email-psawargaonkar@apm.com>
+ <CAL_JsqJQcuX2cp50oHod-QAbhdMg48TaRP+gLGEO2kbFnQ3B+A@mail.gmail.com>
+ <20150219190348.GB24460@cbox>
+ <CAL_JsqLcBOC+AnVe7oATjg2g6Fz2vqwacu8QzS4tXMaxxOP_Xg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 40B754644B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Feb 2015 06:06:45 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GbTuHaEsIaWY for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Feb 2015 06:06:43 -0500 (EST)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6BF2E4643B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Feb 2015 06:06:42 -0500 (EST)
-In-Reply-To: <54E5C16D.3060109@oracle.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Sasha Levin <sasha.levin@oracle.com>, Pekka Enberg <penberg@kernel.org>, Cyrill Gorcunov <gorcunov@gmail.com>, Asias He <asias.hejun@gmail.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Will Deacon <Will.Deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ronald Minnich <rminnich@google.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <CAL_JsqLcBOC+AnVe7oATjg2g6Fz2vqwacu8QzS4tXMaxxOP_Xg-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Rob Herring <robherring2-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Pranavkumar Sawargaonkar <psawargaonkar-qTEPVZfXA3Y@public.gmane.org>, "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Feng Kan <fkan-qTEPVZfXA3Y@public.gmane.org>, Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, "jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "patches-qTEPVZfXA3Y@public.gmane.org" <patches-qTEPVZfXA3Y@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, Tushar Jagad <tjagad-qTEPVZfXA3Y@public.gmane.org>, "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org" <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Sasha,
-
-thanks for taking a look!
-
-On 19/02/15 10:56, Sasha Levin wrote:
-> On 02/13/2015 05:39 AM, Andre Przywara wrote:
->> Hi,
->>
->> as I found it increasingly inconvenient to use kvmtool[1] as part of a
->> Linux repository, I decided to give it a go and make it a stand-alone
->> project. So I filtered all the respective commits, adjusted the paths in
->> there (while keeping authorship and commit date, of course) and then
->> added the missing bits to let it compile without a kernel tree nearby.
->> The result is now available on:
->>
->> git://linux-arm.org/kvmtool.git
->> http://linux-arm.org/kvmtool.git
+On Sat, Feb 21, 2015 at 03:56:17PM -0600, Rob Herring wrote:
+> On Thu, Feb 19, 2015 at 1:03 PM, Christoffer Dall
+> <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
+> > On Thu, Feb 19, 2015 at 12:23:15PM -0600, Rob Herring wrote:
+> >> On Tue, Jan 27, 2015 at 1:03 AM, Pranavkumar Sawargaonkar
+> >> <psawargaonkar-qTEPVZfXA3Y@public.gmane.org> wrote:
+> >> > In APM X-Gene, GIC register space is 64K aligned while the sizes mentioned
+> >> > in the dt are 4K aligned. This breaks KVM when kernel is built with 64K page
+> >> > size due to size alignment checking in vgic driver for VCPU Control and
+> >> > VCPU register.
+> >> >
+> >> > This patch corrects the sizes to be inline with the hardware spec.
+> >>
+> >> This does not make sense. The GIC regions are still only 4 or 8KB and
+> >> the h/w description should reflect that. For implementations using
+> >> gic-400 and the addressing decode trick, the rest of the register
+> >> range is also not safe to access given it is multiple mapped. Also,
+> >> this wastes virtual space, but I guess we don't care on 64-bit.
+> >>
+> >> KVM should be fixed to only check base address alignment. Size
+> >> alignment does not matter (if it does, then you need to fix all
+> >> register blocks).
+> >>
+> > It matters if you want to ensure that the 64K page you are assigning to
+> > a guest for the GIC virtual CPU interface contains only GIC virtual CPU
+> > mappings, and not other random stuff that the guest is not allowed to
+> > touch.
 > 
-> Hi Andre,
+> Good point.
 > 
-> What inconvenience is caused by having it sit inside the kernel tree
-> beyond an increased requirement in disk space?
+> > How else should this be enforced?
+> 
+> Rely on correct h/w design? You'll have to repeat this every time you
+> want to do pass-thru of a device.
+> 
+> What do you do if 64K mapping is not supported? Fallback to emulation
+> of the CPU interface?
 
-Reduced disk space is admittedly one of the benefits of this exercise.
-Also it makes cloning a lot easier and would allow easier packaging.
+Agree with Peter on these two points.
 
-Many of the issues we face here come from the fact that kvmtool lives in
-_a_ kernel repository, but it's not upstream. So we loose the benefit of
-joined kernel-userland development. In fact we have to do regular merges
-of mostly unrelated upstream kernel code into the branch to get it
-compiled with a new feature.
-Also having a pure userland tool in the kernel repository sounds just
-wrong to me, especially as KVM has a nice API with compatibility
-features. There is a clear interface between the KVM kernel and the
-controlling userland, so they should not need to share code beyond the
-API defining header files. Having a shared code base lures people into
-breaking the interface.
+> 
+> Are there other DTSs that need to be fixed?
+> 
+Not sure really, AMD Seattle works with 64K pages IIRC.
 
-> Moving it out will make us lose all the new features and bug fixes we
-> gain from using the kernel code directly rather than copying it once
-> in a while.
-
-Which code are you exactly thinking of?
->From the code I copied I don't see that rbtree or the Linux list
-implementations for instance justify a common code base. If in dire
-need, one could setup alerts on the few code files copied to spot
-upstream bug fixes.
-I see there is a slight drawback in this regard, but I think the
-benefits outweigh it.
-
-> With your suggestion we'll end up needing something that copies stuff
-> from the kernel into that standalone tree, just like what qemu does.
-
-While I see that copying is not the best solution, QEMU lives very well
-with it, doesn't it? With KVM's feature compatibility API and the
-kernel's "don't break userland" policy there should be no real problem.
-Also with the current situation we just replace "copy uapi header files"
-with "merge in upstream kernel code base", which is also manually
-triggered and much more ugly IMHO.
-
-
-I agree that the whole argumentation would be much different if kvmtool
-would be upstream, but it is not and as Will pointed out will probably
-never be. So to make it's usage easier for the users and distribution
-package maintainers, I'd like to see it live on in a separate
-(kernel.org) repository.
-I could imagine that the easier accessibility would make it more
-appealing to potential users (and packagers!)
-
-Cheers,
-Andre.
+Thanks,
+-Christoffer
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
