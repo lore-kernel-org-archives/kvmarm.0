@@ -1,25 +1,29 @@
-From: Ronald Minnich <rminnich@google.com>
-Subject: Re: stand-alone kvmtool
-Date: Mon, 23 Feb 2015 16:35:43 +0000
-Message-ID: <CAPAv03N7crW93BZYD34wg=yuKumE7NYjMKzsYTEQmGXgq200dQ@mail.gmail.com>
-References: <54DDD465.3050300@arm.com> <54E5C16D.3060109@oracle.com>
- <20150223142721.GC5609@cbox>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v8 4/5] KVM: arm/arm64: remove coarse grain dist locking
+ at kvm_vgic_sync_hwstate
+Date: Mon, 23 Feb 2015 21:38:45 +0100
+Message-ID: <20150223203845.GE5609@cbox>
+References: <1421685793-3547-1-git-send-email-eric.auger@linaro.org>
+ <1421685793-3547-5-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============1470676377825867010=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5010F465C3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Feb 2015 11:30:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9FF04466DD
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Feb 2015 15:32:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dd+McRRQT88c for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Feb 2015 11:30:05 -0500 (EST)
-Received: from mail-ob0-f178.google.com (mail-ob0-f178.google.com
- [209.85.214.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 735E54659C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Feb 2015 11:30:04 -0500 (EST)
-Received: by mail-ob0-f178.google.com with SMTP id uz6so37425420obc.9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Feb 2015 08:35:44 -0800 (PST)
+ with ESMTP id j7rpS1OdQBJo for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Feb 2015 15:32:39 -0500 (EST)
+Received: from mail-lb0-f170.google.com (mail-lb0-f170.google.com
+ [209.85.217.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 98426466DB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Feb 2015 15:32:39 -0500 (EST)
+Received: by lbdu10 with SMTP id u10so21049907lbd.7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Feb 2015 12:38:18 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <1421685793-3547-5-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,43 +33,15 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, Sasha Levin <sasha.levin@oracle.com>
-Cc: Cyrill Gorcunov <gorcunov@gmail.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Pekka Enberg <penberg@kernel.org>, Asias He <asias.hejun@gmail.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Eric Auger <eric.auger@linaro.org>
+Cc: eric.auger@st.com, kvm@vger.kernel.org, patches@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, linux-kernel@vger.kernel.org, gleb@kernel.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============1470676377825867010==
-Content-Type: multipart/alternative; boundary=001a113ce1ee5ddc61050fc3fe46
+On Mon, Jan 19, 2015 at 05:43:12PM +0100, Eric Auger wrote:
+> To prepare for irqfd addition, coarse grain locking is removed at
+> kvm_vgic_sync_hwstate level and finer grain locking is introduced in
+> vgic_process_maintenance only.
+> 
+> Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
---001a113ce1ee5ddc61050fc3fe46
-Content-Type: text/plain; charset=UTF-8
-
-I much prefer kvmtool to be standalone outside the kernel tree. I don't see
-any benefit in putting it in the kernel or putting the kernel in it.
-
-I think Andre is doing the right thing here.
-
-ron
-
---001a113ce1ee5ddc61050fc3fe46
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">I much prefer kvmtool to be standalone outside the kernel =
-tree. I don&#39;t see any benefit in putting it in the kernel or putting th=
-e kernel in it.<div><br></div><div>I think Andre is doing the right thing h=
-ere.</div><div><br></div><div>ron</div></div>
-
---001a113ce1ee5ddc61050fc3fe46--
-
---===============1470676377825867010==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============1470676377825867010==--
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
