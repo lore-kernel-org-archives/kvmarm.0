@@ -1,31 +1,28 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [RFC/RFT PATCH 0/3] arm64: KVM: work around incoherency with
- uncached guest mappings
-Date: Tue, 24 Feb 2015 15:55:31 +0100
-Message-ID: <20150224145529.GA5498@hawk.usersys.redhat.com>
-References: <1424343286-6792-1-git-send-email-ard.biesheuvel@linaro.org>
- <20150219165731.GA26965@hawk.usersys.redhat.com>
- <CAKv+Gu8Je3RRrgEFCZ7JUWtOgk3WqA_qdBEOPAMc3OqnKr1bwg@mail.gmail.com>
- <20150219175518.GB26965@hawk.usersys.redhat.com>
- <54E62404.9040702@redhat.com>
- <20150220142905.GA10942@hawk.usersys.redhat.com>
- <CAKv+Gu-YUzmnACZQi98OPRgKKL+gAGqwWYq2-_dwCdNqcktNUg@mail.gmail.com>
- <20150220153626.GB10942@hawk.usersys.redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: kvm [2087]: load/store instruction decoding not implemented
+Date: Tue, 24 Feb 2015 15:03:29 +0000
+Message-ID: <54EC92C1.9050002@arm.com>
+References: <20150224115935.GA26241@redhat.com>
+ <CAFEAcA-+xCkUNirq0zqQFotCSAjR25V25SkzPH7ktDOXQuhoFA@mail.gmail.com>
+ <20150224122925.GL11603@redhat.com> <20150224124710.GB21364@cbox>
+ <54EC78D1.3030703@arm.com> <20150224134533.GM11603@redhat.com>
+ <54EC8654.1060905@arm.com> <20150224143608.GO11603@redhat.com>
+ <54EC8DE6.8000105@arm.com> <20150224144336.GP11603@redhat.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="+QahgC5+KEYLbs62"
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AD11446634
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Feb 2015 09:50:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B01534676A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Feb 2015 09:57:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wTUGoJgDHFWm for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Feb 2015 09:50:02 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 90E0B46611
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Feb 2015 09:50:01 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20150220153626.GB10942@hawk.usersys.redhat.com>
+ with ESMTP id eaMaEvDwDuKT for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Feb 2015 09:57:50 -0500 (EST)
+Received: from usa-sjc-mx-foss1.foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4CF9B46733
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Feb 2015 09:57:50 -0500 (EST)
+In-Reply-To: <20150224144336.GP11603@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,153 +32,67 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: KVM devel mailing list <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
---+QahgC5+KEYLbs62
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Fri, Feb 20, 2015 at 04:36:26PM +0100, Andrew Jones wrote:
-> On Fri, Feb 20, 2015 at 02:37:25PM +0000, Ard Biesheuvel wrote:
-> > On 20 February 2015 at 14:29, Andrew Jones <drjones@redhat.com> wrote:
-> > > So looks like the 3 orders of magnitude greater number of traps
-> > > (only to el2) don't impact kernel compiles.
-> > >
-> > 
-> > OK, good! That was what I was hoping for, obviously.
-> > 
-> > > Then I thought I'd be able to quick measure the number of cycles
-> > > a trap to el2 takes with this kvm-unit-tests test
-> > >
-> > > int main(void)
-> > > {
-> > >         unsigned long start, end;
-> > >         unsigned int sctlr;
-> > >
-> > >         asm volatile(
-> > >         "       mrs %0, sctlr_el1\n"
-> > >         "       msr pmcr_el0, %1\n"
-> > >         : "=&r" (sctlr) : "r" (5));
-> > >
-> > >         asm volatile(
-> > >         "       mrs %0, pmccntr_el0\n"
-> > >         "       msr sctlr_el1, %2\n"
-> > >         "       mrs %1, pmccntr_el0\n"
-> > >         : "=&r" (start), "=&r" (end) : "r" (sctlr));
-> > >
-> > >         printf("%llx\n", end - start);
-> > >         return 0;
-> > > }
-> > >
-> > > after applying this patch to kvm
-> > >
-> > > diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-> > > index bb91b6fc63861..5de39d740aa58 100644
-> > > --- a/arch/arm64/kvm/hyp.S
-> > > +++ b/arch/arm64/kvm/hyp.S
-> > > @@ -770,7 +770,7 @@
-> > >
-> > >         mrs     x2, mdcr_el2
-> > >         and     x2, x2, #MDCR_EL2_HPMN_MASK
-> > > -       orr     x2, x2, #(MDCR_EL2_TPM | MDCR_EL2_TPMCR)
-> > > +//     orr     x2, x2, #(MDCR_EL2_TPM | MDCR_EL2_TPMCR)
-> > >         orr     x2, x2, #(MDCR_EL2_TDRA | MDCR_EL2_TDOSA)
-> > >
-> > >         // Check for KVM_ARM64_DEBUG_DIRTY, and set debug to trap
-> > >
-> > > But I get zero for the cycle count. Not sure what I'm missing.
-> > >
-> > 
-> > No clue tbh. Does the counter work as expected in the host?
-> >
+On 24/02/15 14:43, Richard W.M. Jones wrote:
+> On Tue, Feb 24, 2015 at 02:42:46PM +0000, Marc Zyngier wrote:
+>> On 24/02/15 14:36, Richard W.M. Jones wrote:
+>>> On Tue, Feb 24, 2015 at 02:10:28PM +0000, Marc Zyngier wrote:
+>>>> On 24/02/15 13:45, Richard W.M. Jones wrote:
+>>>>> On Tue, Feb 24, 2015 at 01:12:49PM +0000, Marc Zyngier wrote:
+>>>>>> Here's my theory: userspace is accessing something it should never
+>>>>>> access (outside of RAM, basically), and doing so via a kernel interface.
+>>>>>>
+>>>>>> Is this process accessing /dev/mem by any chance? dmidecode anyone?
+>>>>>
+>>>>> Not as far as I know.  The userspace process is inserting modules.
+>>>>>
+>>>>> Here is the userspace function which is most likely to be running:
+>>>>>
+>>>>> https://github.com/libguestfs/supermin/blob/master/src/init.c#L292
+>>>>
+>>>> Hmmm. That seems quite inoffensive indeed...
+>>>>
+>>>>> Unfortunately because of lack of a full stack trace, I can't be sure
+>>>>> exactly what system call is failing, but I'll probably add more debug
+>>>>> to the userspace program later.
+>>>>>
+>>>>> BTW this worked fine in 3.19.  It's started failing in 3.20/4.0.  It
+>>>>> also works fine on x86.
+>>>>
+>>>> Any chance you could find out whether that's a host or guest regression?
+>>>
+>>> Here is a summary of the test combinations that I have run:
+>>>
+>>>   guest kernel         host kernel         result
+>>> --------------------------------------------------------
+>>>   3.19.0-0.rc7         3.19.0-0.rc7        no bug seen
+>>>
+>>>   3.20.0-0.rc0         3.19.0-0.rc7        bug seen
+>>>
+>>>   3.19.0-0.rc7         4.0.0-0.rc1         no bug seen
+>>>
+>>>   4.0.0-0.rc1          4.0.0-0.rc1         bug seen
+>>>
+>>> So a guest regression, I think?
+>>
+>> Looks like it. Is your .config stashed somewhere? I'd like to give it a
+>> go on my own setup...
 > 
-> Guess not. I dropped the test into a module_init and inserted
-> it on the host. Always get zero for pmccntr_el0 reads. Or, if
-> I set it to something non-zero with a write, then I always get
-> that back - no increments. pmcr_el0 looks OK... I had forgotten
-> to set bit 31 of pmcntenset_el0, but doing that still doesn't
-> help. Anyway, I assume the problem is me. I'll keep looking to
-> see what I'm missing.
->
+> Attached.
 
-I returned to this and see that the problem was indeed me. I needed yet
-another enable bit set (the filter register needed to be instructed to
-count cycles while in el2). I've attached the code for the curious.
-The numbers are mean=6999, std_dev=242. Run on the host, or in a guest
-running on a host without this patch series (after TVM traps have been
-disabled), I get a pretty consistent 40.
+Thanks. I can reproduce that behaviour by just doing an "insmod
+crc32.ko", having booted the guest using kvmtool.
 
-I checked how many vm-sysreg traps we do during the kernel compile
-benchmark. It's 124924. So it's a bit strange that we don't see the
-benchmark taking 10 to 20 seconds longer on average. I should probably
-double check my runs. In any case, while I like the approach of this
-series, the overhead is looking non-negligible.
+Which means that meither your userspace or qemu are at fault here, but
+that it probably is a genuine kernel bug that KVM happens to uncover.
 
-drew
+Off to debug the sucker.
 
---+QahgC5+KEYLbs62
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="trapcycles.c"
+Thanks,
 
-#include <libcflat.h>
-
-static void prep_cc(void)
-{
-	asm volatile(
-	"	msr pmovsclr_el0, %0\n"
-	"	msr pmccfiltr_el0, %1\n"
-	"	msr pmcntenset_el0, %2\n"
-	"	msr pmcr_el0, %3\n"
-	"	isb\n"
-	:
-	: "r" (1 << 31), "r" (1 << 27), "r" (1 << 31),
-	  "r" (1 << 6 | 1 << 2 | 1 << 0));
-}
-
-int main(void)
-{
-	unsigned long start, end;
-	unsigned int sctlr;
-	int i, zeros = 0;
-
-	asm volatile("mrs %0, sctlr_el1" : "=&r" (sctlr));
-	prep_cc();
-
-	for (i = 0; i < 100000; ++i) {
-		asm volatile(
-		"	mrs %0, pmccntr_el0\n"
-		"	msr sctlr_el1, %2\n"
-		"	mrs %1, pmccntr_el0\n"
-		"	isb\n"
-		: "=&r" (start), "=&r" (end) : "r" (sctlr));
-
-		if ((i % 10) == 0)
-			printf("\n");
-
-		printf(" %d", end - start);
-
-		if ((end - start) == 0) {
-			++zeros;
-			prep_cc();
-		}
-	}
-
-	printf("\nnum zero counts = %d\n", zeros);
-	return 0;
-}
-
---+QahgC5+KEYLbs62
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---+QahgC5+KEYLbs62--
+	M.
+-- 
+Jazz is not dead. It just smells funny...
