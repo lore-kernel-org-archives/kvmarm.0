@@ -1,28 +1,27 @@
-From: "Richard W.M. Jones" <rjones@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: kvm [2087]: load/store instruction decoding not implemented
-Date: Tue, 24 Feb 2015 14:36:08 +0000
-Message-ID: <20150224143608.GO11603@redhat.com>
+Date: Tue, 24 Feb 2015 14:42:46 +0000
+Message-ID: <54EC8DE6.8000105@arm.com>
 References: <20150224115935.GA26241@redhat.com>
  <CAFEAcA-+xCkUNirq0zqQFotCSAjR25V25SkzPH7ktDOXQuhoFA@mail.gmail.com>
  <20150224122925.GL11603@redhat.com> <20150224124710.GB21364@cbox>
  <54EC78D1.3030703@arm.com> <20150224134533.GM11603@redhat.com>
- <54EC8654.1060905@arm.com>
+ <54EC8654.1060905@arm.com> <20150224143608.GO11603@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF5C146756
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Feb 2015 09:30:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DCEC74675E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Feb 2015 09:37:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Suiu3Lj5uDoz for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Feb 2015 09:30:33 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 21A3C4670E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Feb 2015 09:30:32 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <54EC8654.1060905@arm.com>
+ with ESMTP id VdOU+bSd9wuh for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Feb 2015 09:37:09 -0500 (EST)
+Received: from usa-sjc-mx-foss1.foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3EF0F46753
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Feb 2015 09:37:09 -0500 (EST)
+In-Reply-To: <20150224143608.GO11603@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,61 +31,62 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
+To: "Richard W.M. Jones" <rjones@redhat.com>
 Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Feb 24, 2015 at 02:10:28PM +0000, Marc Zyngier wrote:
-> On 24/02/15 13:45, Richard W.M. Jones wrote:
-> > On Tue, Feb 24, 2015 at 01:12:49PM +0000, Marc Zyngier wrote:
-> >> Here's my theory: userspace is accessing something it should never
-> >> access (outside of RAM, basically), and doing so via a kernel interface.
-> >>
-> >> Is this process accessing /dev/mem by any chance? dmidecode anyone?
-> > 
-> > Not as far as I know.  The userspace process is inserting modules.
-> > 
-> > Here is the userspace function which is most likely to be running:
-> > 
-> > https://github.com/libguestfs/supermin/blob/master/src/init.c#L292
+On 24/02/15 14:36, Richard W.M. Jones wrote:
+> On Tue, Feb 24, 2015 at 02:10:28PM +0000, Marc Zyngier wrote:
+>> On 24/02/15 13:45, Richard W.M. Jones wrote:
+>>> On Tue, Feb 24, 2015 at 01:12:49PM +0000, Marc Zyngier wrote:
+>>>> Here's my theory: userspace is accessing something it should never
+>>>> access (outside of RAM, basically), and doing so via a kernel interface.
+>>>>
+>>>> Is this process accessing /dev/mem by any chance? dmidecode anyone?
+>>>
+>>> Not as far as I know.  The userspace process is inserting modules.
+>>>
+>>> Here is the userspace function which is most likely to be running:
+>>>
+>>> https://github.com/libguestfs/supermin/blob/master/src/init.c#L292
+>>
+>> Hmmm. That seems quite inoffensive indeed...
+>>
+>>> Unfortunately because of lack of a full stack trace, I can't be sure
+>>> exactly what system call is failing, but I'll probably add more debug
+>>> to the userspace program later.
+>>>
+>>> BTW this worked fine in 3.19.  It's started failing in 3.20/4.0.  It
+>>> also works fine on x86.
+>>
+>> Any chance you could find out whether that's a host or guest regression?
 > 
-> Hmmm. That seems quite inoffensive indeed...
+> Here is a summary of the test combinations that I have run:
 > 
-> > Unfortunately because of lack of a full stack trace, I can't be sure
-> > exactly what system call is failing, but I'll probably add more debug
-> > to the userspace program later.
-> > 
-> > BTW this worked fine in 3.19.  It's started failing in 3.20/4.0.  It
-> > also works fine on x86.
+>   guest kernel         host kernel         result
+> --------------------------------------------------------
+>   3.19.0-0.rc7         3.19.0-0.rc7        no bug seen
 > 
-> Any chance you could find out whether that's a host or guest regression?
+>   3.20.0-0.rc0         3.19.0-0.rc7        bug seen
+> 
+>   3.19.0-0.rc7         4.0.0-0.rc1         no bug seen
+> 
+>   4.0.0-0.rc1          4.0.0-0.rc1         bug seen
+> 
+> So a guest regression, I think?
 
-Here is a summary of the test combinations that I have run:
+Looks like it. Is your .config stashed somewhere? I'd like to give it a
+go on my own setup...
 
-  guest kernel         host kernel         result
---------------------------------------------------------
-  3.19.0-0.rc7         3.19.0-0.rc7        no bug seen
+> It's also possible the bug existed in old kernels but was masked
+> somehow, eg. different memory layout.
+> 
+> I can probably bisect this given time, but I'm going to try putting
+> some debug into the userspace process to find out which system call
+> fails first.
 
-  3.20.0-0.rc0         3.19.0-0.rc7        bug seen
+That'd be interesting indeed.
 
-  3.19.0-0.rc7         4.0.0-0.rc1         no bug seen
-
-  4.0.0-0.rc1          4.0.0-0.rc1         bug seen
-
-So a guest regression, I think?
-
-It's also possible the bug existed in old kernels but was masked
-somehow, eg. different memory layout.
-
-I can probably bisect this given time, but I'm going to try putting
-some debug into the userspace process to find out which system call
-fails first.
-
-Rich.
-
+	M.
 -- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-Fedora Windows cross-compiler. Compile Windows programs, test, and
-build Windows installers. Over 100 libraries supported.
-http://fedoraproject.org/wiki/MinGW
+Jazz is not dead. It just smells funny...
