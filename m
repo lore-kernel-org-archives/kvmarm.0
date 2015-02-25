@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 1/3] arm64: KVM: Fix stage-2 PGD allocation to have per-page
- refcounting
-Date: Wed, 25 Feb 2015 16:55:38 +0000
-Message-ID: <1424883340-29940-2-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 3/3] arm64: KVM: Fix outdated comment about VTCR_EL2.PS
+Date: Wed, 25 Feb 2015 16:55:40 +0000
+Message-ID: <1424883340-29940-4-git-send-email-marc.zyngier@arm.com>
 References: <1424883340-29940-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EA4AF46934
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Feb 2015 11:50:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5547546927
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Feb 2015 11:50:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jJA2bwkGdaTx for <kvmarm@lists.cs.columbia.edu>;
- Wed, 25 Feb 2015 11:50:14 -0500 (EST)
+ with ESMTP id QZT+QZYg-LAU for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Feb 2015 11:50:15 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D6EC346916
- for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Feb 2015 11:50:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 924BB46939
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Feb 2015 11:50:15 -0500 (EST)
 In-Reply-To: <1424883340-29940-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,108 +31,47 @@ To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 Cc: Christoffer Dall <christoffer.dall@linaro.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We're using __get_free_pages with to allocate the guest's stage-2
-PGD. The standard behaviour of this function is to return a set of
-pages where only the head page has a valid refcount.
+Commit 87366d8cf7b3 ("arm64: Add boot time configuration of
+Intermediate Physical Address size") removed the hardcoded setting
+of VTCR_EL2.PS to use ID_AA64MMFR0_EL1.PARange instead, but didn't
+remove the (now rather misleading) comment.
 
-This behaviour gets us into trouble when we're trying to increment
-the refount on a non-head page:
+Fix the comments to match reality (at least for the next few minutes).
 
-page:ffff7c00cfb693c0 count:0 mapcount:0 mapping:          (null) index:0x0
-flags: 0x4000000000000000()
-page dumped because: VM_BUG_ON_PAGE((*({ __attribute__((unused)) typeof((&page->_count)->counter) __var = ( typeof((&page->_count)->counter)) 0; (volatile typeof((&page->_count)->counter) *)&((&page->_count)->counter); })) <= 0)
-BUG: failure at include/linux/mm.h:548/get_page()!
-Kernel panic - not syncing: BUG!
-CPU: 1 PID: 1695 Comm: kvm-vcpu-0 Not tainted 4.0.0-rc1+ #3825
-Hardware name: APM X-Gene Mustang board (DT)
-Call trace:
-[<ffff80000008a09c>] dump_backtrace+0x0/0x13c
-[<ffff80000008a1e8>] show_stack+0x10/0x1c
-[<ffff800000691da8>] dump_stack+0x74/0x94
-[<ffff800000690d78>] panic+0x100/0x240
-[<ffff8000000a0bc4>] stage2_get_pmd+0x17c/0x2bc
-[<ffff8000000a1dc4>] kvm_handle_guest_abort+0x4b4/0x6b0
-[<ffff8000000a420c>] handle_exit+0x58/0x180
-[<ffff80000009e7a4>] kvm_arch_vcpu_ioctl_run+0x114/0x45c
-[<ffff800000099df4>] kvm_vcpu_ioctl+0x2e0/0x754
-[<ffff8000001c0a18>] do_vfs_ioctl+0x424/0x5c8
-[<ffff8000001c0bfc>] SyS_ioctl+0x40/0x78
-CPU0: stopping
-
-Passing the (unintuitively named) __GFP_COMP flag to __get_free_pages
-forces the allocator to maintain a per-page refcount, which is exactly
-what we need.
-
-This has been tested on an X-Gene platform with a 4kB/48bit-VA host
-kernel, and kvmtool hacked to place memory in the second page of
-the hardware PGD (PUD for the host kernel).
-
-Reported-by: Mark Rutland <mark.rutland@arm.com>
-Tested-by: Mark Rutland <mark.rutland@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_mmu.h   | 7 +++++++
- arch/arm/kvm/mmu.c               | 2 +-
- arch/arm64/include/asm/kvm_mmu.h | 9 ++++++++-
- 3 files changed, 16 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 37ca2a4..1cac89b 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -162,6 +162,13 @@ static inline bool kvm_page_empty(void *ptr)
- 
- #define KVM_PREALLOC_LEVEL	0
- 
-+/*
-+ * We need to ensure that stage-2 PGDs are allocated with a per-page
-+ * refcount, as we fiddle with the refcounts of non-head pages.
-+ * __GFP_COMP forces the allocator to do what we want.
-+ */
-+#define KVM_GFP_S2_PGD	(GFP_KERNEL | __GFP_ZERO | __GFP_COMP)
-+
- static inline int kvm_prealloc_hwpgd(struct kvm *kvm, pgd_t *pgd)
- {
- 	return 0;
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 3e6859b..a6a8252 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -666,7 +666,7 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
- 		 * Allocate actual first-level Stage-2 page table used by the
- 		 * hardware for Stage-2 page table walks.
- 		 */
--		pgd = (pgd_t *)__get_free_pages(GFP_KERNEL | __GFP_ZERO, S2_PGD_ORDER);
-+		pgd = (pgd_t *)__get_free_pages(KVM_GFP_S2_PGD, S2_PGD_ORDER);
- 	}
- 
- 	if (!pgd)
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 6458b53..06c733a 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -171,6 +171,13 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
- #define KVM_PREALLOC_LEVEL	(0)
- #endif
- 
-+/*
-+ * We need to ensure that stage-2 PGDs are allocated with a per-page
-+ * refcount, as we fiddle with the refcounts of non-head pages.
-+ * __GFP_COMP forces the allocator to do what we want.
-+ */
-+#define KVM_GFP_S2_PGD	(GFP_KERNEL | __GFP_ZERO | __GFP_COMP)
-+
- /**
-  * kvm_prealloc_hwpgd - allocate inital table for VTTBR
-  * @kvm:	The KVM struct pointer for the VM.
-@@ -192,7 +199,7 @@ static inline int kvm_prealloc_hwpgd(struct kvm *kvm, pgd_t *pgd)
- 	if (KVM_PREALLOC_LEVEL == 0)
- 		return 0;
- 
--	hwpgd = __get_free_pages(GFP_KERNEL | __GFP_ZERO, PTRS_PER_S2_PGD_SHIFT);
-+	hwpgd = __get_free_pages(KVM_GFP_S2_PGD, PTRS_PER_S2_PGD_SHIFT);
- 	if (!hwpgd)
- 		return -ENOMEM;
- 
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 94674eb..54bb4ba 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -129,6 +129,9 @@
+  * 40 bits wide (T0SZ = 24).  Systems with a PARange smaller than 40 bits are
+  * not known to exist and will break with this configuration.
+  *
++ * VTCR_EL2.PS is extracted from ID_AA64MMFR0_EL1.PARange at boot time
++ * (see hyp-init.S).
++ *
+  * Note that when using 4K pages, we concatenate two first level page tables
+  * together.
+  *
+@@ -138,7 +141,6 @@
+ #ifdef CONFIG_ARM64_64K_PAGES
+ /*
+  * Stage2 translation configuration:
+- * 40bits output (PS = 2)
+  * 40bits input  (T0SZ = 24)
+  * 64kB pages (TG0 = 1)
+  * 2 level page tables (SL = 1)
+@@ -150,7 +152,6 @@
+ #else
+ /*
+  * Stage2 translation configuration:
+- * 40bits output (PS = 2)
+  * 40bits input  (T0SZ = 24)
+  * 4kB pages (TG0 = 0)
+  * 3 level page tables (SL = 1)
 -- 
 2.1.4
