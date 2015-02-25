@@ -1,43 +1,99 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: stand-alone kvmtool
-Date: Wed, 25 Feb 2015 12:16:11 +0000
-Message-ID: <20150225121610.GA12377@arm.com>
-References: <54DDD465.3050300@arm.com>
- <20150218155042.GF22017@arm.com>
- <54EB622E.3020700@iki.fi>
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH 1/4] arm: KVM: export vcpi->pause state via MP_STATE ioctls
+Date: Wed, 25 Feb 2015 15:36:19 +0000
+Message-ID: <1424878582-26397-2-git-send-email-alex.bennee@linaro.org>
+References: <1424878582-26397-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <54EB622E.3020700@iki.fi>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Pekka Enberg <penberg@iki.fi>
-Cc: Andre Przywara <Andre.Przywara@arm.com>, Pekka Enberg <penberg@kernel.org>, Sasha Levin <sasha.levin@oracle.com>, Cyrill Gorcunov <gorcunov@gmail.com>, Asias He <asias.hejun@gmail.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Ronald Minnich <rminnich@google.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB85446890
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Feb 2015 10:30:53 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 0PHbWI4vRNd0 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 25 Feb 2015 10:30:52 -0500 (EST)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 84E434684F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 25 Feb 2015 10:30:52 -0500 (EST)
+In-Reply-To: <1424878582-26397-1-git-send-email-alex.bennee@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: Russell King <linux@arm.linux.org.uk>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Gleb Natapov <gleb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, open list <linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Feb 23, 2015 at 05:23:58PM +0000, Pekka Enberg wrote:
-> Hi,
-
-Hi Pekka,
-
-Sorry for the delay, I've been away from email for a few days.
-
-> On 2/18/15 5:50 PM, Will Deacon wrote:
-> > Thanks for doing this. Since it looks unlikely that kvmtool will ever be
-> > merged back into the kernel tree, it makes sense to cut the dependency
-> > in my opinion.
-> 
-> I am certainly OK with a standalone repository which preserves the 
-> history. Will, would you like to take over the proposed new repository 
-> and put it somewhere on git.kernel.org, perhaps?
-
-Sure thing. I'll sync-up with Andre and reply back here when we've got
-something sensible.
-
-One extra point that I don't think has been mentioned in this thread so
-far is that separating kvmtool from the kernel sources is likely a
-prerequisite for distribution packaging. Once we've got something sorted
-out, I'll poke some friendly local debian developers and see if they can't
-package it up for us.
-
-Will
+VG8gY2xlYW5seSByZXN0b3JlIGFuIFNNUCBWTSB3ZSBuZWVkIHRvIGVuc3VyZSB0aGF0IHRoZSBj
+dXJyZW50IHBhdXNlCnN0YXRlIG9mIGVhY2ggdmNwdSBpcyBjb3JyZWN0bHkgcmVjb3JkZWQuIFRo
+aW5ncyBjb3VsZCBnZXQgY29uZnVzZWQgaWYKdGhlIENQVSBzdGFydHMgcnVubmluZyBhZnRlciBt
+aWdyYXRpb24gcmVzdG9yZSBjb21wbGV0ZXMgd2hlbiBpdCB3YXMKcGF1c2VkIGJlZm9yZSBpdCBz
+dGF0ZSB3YXMgY2FwdHVyZWQuCgpXZSB1c2UgdGhlIGV4aXN0aW5nIEtWTV9HRVQvU0VUX01QX1NU
+QVRFIGlvY3RsIHRvIGRvIHRoaXMuIFRoZSBhcm0vYXJtNjQKaW50ZXJmYWNlIGlzIGEgbG90IHNp
+bXBsZXIgYXMgdGhlIG9ubHkgdmFsaWQgc3RhdGVzIGFyZQpLVk1fTVBfU1RBVEVfUlVOTkFCTEUg
+YW5kIEtWTV9NUF9TVEFURV9IQUxURUQuCgpTaWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFs
+ZXguYmVubmVlQGxpbmFyby5vcmc+CgpkaWZmIC0tZ2l0IGEvRG9jdW1lbnRhdGlvbi92aXJ0dWFs
+L2t2bS9hcGkudHh0IGIvRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGkudHh0CmluZGV4IGIx
+MTJlZmMuLjYwMjE1NmYgMTAwNjQ0Ci0tLSBhL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0vYXBp
+LnR4dAorKysgYi9Eb2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL2FwaS50eHQKQEAgLTk5Nyw3ICs5
+OTcsNyBAQCBmb3Igdm0td2lkZSBjYXBhYmlsaXRpZXMuCiA0LjM4IEtWTV9HRVRfTVBfU1RBVEUK
+IAogQ2FwYWJpbGl0eTogS1ZNX0NBUF9NUF9TVEFURQotQXJjaGl0ZWN0dXJlczogeDg2LCBzMzkw
+CitBcmNoaXRlY3R1cmVzOiB4ODYsIHMzOTAsIGFybSwgYXJtNjQKIFR5cGU6IHZjcHUgaW9jdGwK
+IFBhcmFtZXRlcnM6IHN0cnVjdCBrdm1fbXBfc3RhdGUgKG91dCkKIFJldHVybnM6IDAgb24gc3Vj
+Y2VzczsgLTEgb24gZXJyb3IKQEAgLTEwMjcsMTUgKzEwMjcsMjEgQEAgUG9zc2libGUgdmFsdWVz
+IGFyZToKICAtIEtWTV9NUF9TVEFURV9MT0FEOiAgICAgICAgICAgIHRoZSB2Y3B1IGlzIGluIGEg
+c3BlY2lhbCBsb2FkL3N0YXJ0dXAgc3RhdGUKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIFtzMzkwXQogCi1PbiB4ODYsIHRoaXMgaW9jdGwgaXMgb25seSB1c2VmdWwgYWZ0ZXIgS1ZN
+X0NSRUFURV9JUlFDSElQLiBXaXRob3V0IGFuCi1pbi1rZXJuZWwgaXJxY2hpcCwgdGhlIG11bHRp
+cHJvY2Vzc2luZyBzdGF0ZSBtdXN0IGJlIG1haW50YWluZWQgYnkgdXNlcnNwYWNlIG9uCitGb3Ig
+eDg2OgorCitUaGlzIGlvY3RsIGlzIG9ubHkgdXNlZnVsIGFmdGVyIEtWTV9DUkVBVEVfSVJRQ0hJ
+UC4gIFdpdGhvdXQgYW4gaW4ta2VybmVsCitpcnFjaGlwLCB0aGUgbXVsdGlwcm9jZXNzaW5nIHN0
+YXRlIG11c3QgYmUgbWFpbnRhaW5lZCBieSB1c2Vyc3BhY2Ugb24KIHRoZXNlIGFyY2hpdGVjdHVy
+ZXMuCiAKK0ZvciBhcm0vYXJtNjQ6CisKK1RoZSBvbmx5IHN0YXRlcyB0aGF0IGFyZSB2YWxpZCBh
+cmUgS1ZNX01QX1NUQVRFX0hBTFRFRCBhbmQKK0tWTV9NUF9TVEFURV9SVU5OQUJMRSB3aGljaCBy
+ZWZsZWN0IGlmIHRoZSB2Y3B1IGlzIHBhdXNlZCBvciBub3QuCiAKIDQuMzkgS1ZNX1NFVF9NUF9T
+VEFURQogCiBDYXBhYmlsaXR5OiBLVk1fQ0FQX01QX1NUQVRFCi1BcmNoaXRlY3R1cmVzOiB4ODYs
+IHMzOTAKK0FyY2hpdGVjdHVyZXM6IHg4NiwgczM5MCwgYXJtLCBhcm02NAogVHlwZTogdmNwdSBp
+b2N0bAogUGFyYW1ldGVyczogc3RydWN0IGt2bV9tcF9zdGF0ZSAoaW4pCiBSZXR1cm5zOiAwIG9u
+IHN1Y2Nlc3M7IC0xIG9uIGVycm9yCkBAIC0xMDQzLDEwICsxMDQ5LDE2IEBAIFJldHVybnM6IDAg
+b24gc3VjY2VzczsgLTEgb24gZXJyb3IKIFNldHMgdGhlIHZjcHUncyBjdXJyZW50ICJtdWx0aXBy
+b2Nlc3Npbmcgc3RhdGUiOyBzZWUgS1ZNX0dFVF9NUF9TVEFURSBmb3IKIGFyZ3VtZW50cy4KIAot
+T24geDg2LCB0aGlzIGlvY3RsIGlzIG9ubHkgdXNlZnVsIGFmdGVyIEtWTV9DUkVBVEVfSVJRQ0hJ
+UC4gV2l0aG91dCBhbgotaW4ta2VybmVsIGlycWNoaXAsIHRoZSBtdWx0aXByb2Nlc3Npbmcgc3Rh
+dGUgbXVzdCBiZSBtYWludGFpbmVkIGJ5IHVzZXJzcGFjZSBvbgorRm9yIHg4NjoKKworVGhpcyBp
+b2N0bCBpcyBvbmx5IHVzZWZ1bCBhZnRlciBLVk1fQ1JFQVRFX0lSUUNISVAuICBXaXRob3V0IGFu
+IGluLWtlcm5lbAoraXJxY2hpcCwgdGhlIG11bHRpcHJvY2Vzc2luZyBzdGF0ZSBtdXN0IGJlIG1h
+aW50YWluZWQgYnkgdXNlcnNwYWNlIG9uCiB0aGVzZSBhcmNoaXRlY3R1cmVzLgogCitGb3IgYXJt
+L2FybTY0OgorCitUaGUgb25seSBzdGF0ZXMgdGhhdCBhcmUgdmFsaWQgYXJlIEtWTV9NUF9TVEFU
+RV9IQUxURUQgYW5kCitLVk1fTVBfU1RBVEVfUlVOTkFCTEUgd2hpY2ggcmVmbGVjdCBpZiB0aGUg
+dmNwdSBzaG91bGQgYmUgcGF1c2VkIG9yIG5vdC4KIAogNC40MCBLVk1fU0VUX0lERU5USVRZX01B
+UF9BRERSCiAKZGlmZiAtLWdpdCBhL2FyY2gvYXJtL2t2bS9hcm0uYyBiL2FyY2gvYXJtL2t2bS9h
+cm0uYwppbmRleCA1NTYwZjc0Li44NTMxNTM2IDEwMDY0NAotLS0gYS9hcmNoL2FybS9rdm0vYXJt
+LmMKKysrIGIvYXJjaC9hcm0va3ZtL2FybS5jCkBAIC0xODMsNiArMTgzLDcgQEAgaW50IGt2bV92
+bV9pb2N0bF9jaGVja19leHRlbnNpb24oc3RydWN0IGt2bSAqa3ZtLCBsb25nIGV4dCkKIAljYXNl
+IEtWTV9DQVBfQVJNX1BTQ0k6CiAJY2FzZSBLVk1fQ0FQX0FSTV9QU0NJXzBfMjoKIAljYXNlIEtW
+TV9DQVBfUkVBRE9OTFlfTUVNOgorCWNhc2UgS1ZNX0NBUF9NUF9TVEFURToKIAkJciA9IDE7CiAJ
+CWJyZWFrOwogCWNhc2UgS1ZNX0NBUF9DT0FMRVNDRURfTU1JTzoKQEAgLTMxMywxMyArMzE0LDI5
+IEBAIGludCBrdm1fYXJjaF92Y3B1X2lvY3RsX3NldF9ndWVzdF9kZWJ1ZyhzdHJ1Y3Qga3ZtX3Zj
+cHUgKnZjcHUsCiBpbnQga3ZtX2FyY2hfdmNwdV9pb2N0bF9nZXRfbXBzdGF0ZShzdHJ1Y3Qga3Zt
+X3ZjcHUgKnZjcHUsCiAJCQkJICAgIHN0cnVjdCBrdm1fbXBfc3RhdGUgKm1wX3N0YXRlKQogewot
+CXJldHVybiAtRUlOVkFMOworCWlmICh2Y3B1LT5hcmNoLnBhdXNlKQorCQltcF9zdGF0ZS0+bXBf
+c3RhdGUgPSBLVk1fTVBfU1RBVEVfSEFMVEVEOworCWVsc2UKKwkJbXBfc3RhdGUtPm1wX3N0YXRl
+ID0gS1ZNX01QX1NUQVRFX1JVTk5BQkxFOworCisJcmV0dXJuIDA7CiB9CiAKIGludCBrdm1fYXJj
+aF92Y3B1X2lvY3RsX3NldF9tcHN0YXRlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKIAkJCQkgICAg
+c3RydWN0IGt2bV9tcF9zdGF0ZSAqbXBfc3RhdGUpCiB7Ci0JcmV0dXJuIC1FSU5WQUw7CisJc3dp
+dGNoIChtcF9zdGF0ZS0+bXBfc3RhdGUpIHsKKwljYXNlIEtWTV9NUF9TVEFURV9SVU5OQUJMRToK
+KwkJdmNwdS0+YXJjaC5wYXVzZSA9IGZhbHNlOworCQlicmVhazsKKwljYXNlIEtWTV9NUF9TVEFU
+RV9IQUxURUQ6CisJCXZjcHUtPmFyY2gucGF1c2UgPSB0cnVlOworCQlicmVhazsKKwlkZWZhdWx0
+OgorCQlyZXR1cm4gLUVJTlZBTDsKKwl9CisKKwlyZXR1cm4gMDsKIH0KIAogLyoqCi0tIAoyLjMu
+MAoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJt
+IG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMu
+Y3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
