@@ -1,120 +1,156 @@
-From: Marcelo Tosatti <mtosatti@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 00/18] arm/arm64: add smp support
-Date: Thu, 26 Feb 2015 21:46:56 -0300
-Message-ID: <20150227004656.GA12325@amt.cnet>
-References: <1422815686-24591-1-git-send-email-drjones@redhat.com>
+From: Pranavkumar Sawargaonkar <psawargaonkar-qTEPVZfXA3Y@public.gmane.org>
+Subject: Re: [PATCH] arm64: dts: Fix GIC reg sizes for APM X-Gene
+Date: Fri, 27 Feb 2015 09:27:13 +0530
+Message-ID: <CANFfpkR_atJn2bU2ZaFrpjRqSmOHKPnKFoXObNQeH-RQT225Jw@mail.gmail.com>
+References: <1422342206-4750-1-git-send-email-psawargaonkar@apm.com>
+	<CAL_JsqJQcuX2cp50oHod-QAbhdMg48TaRP+gLGEO2kbFnQ3B+A@mail.gmail.com>
+	<20150219190348.GB24460@cbox>
+	<CAL_JsqLcBOC+AnVe7oATjg2g6Fz2vqwacu8QzS4tXMaxxOP_Xg@mail.gmail.com>
+	<20150223120744.GA5609@cbox>
+	<CAL_JsqJ6E+05psDCXS7k74Mz-DgSEroQ2ODpe2Bp2_50fL3imA@mail.gmail.com>
+	<CANFfpkQF-8Kzq-UoP=xLpkTafGn6ScyiEb6oCs-Lxygb+ummLA@mail.gmail.com>
+	<CAL_JsqLs4HdT6N=Vb4s--x3ugXKbWYQ5R2WGbiWFhhnYxnK-xw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1422815686-24591-1-git-send-email-drjones@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, pbonzini@redhat.com
+Content-Type: text/plain; charset=UTF-8
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAL_JsqLs4HdT6N=Vb4s--x3ugXKbWYQ5R2WGbiWFhhnYxnK-xw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Rob Herring <robherring2-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Cc: Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Feng Kan <fkan-qTEPVZfXA3Y@public.gmane.org>, Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>, Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, "jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "patches-qTEPVZfXA3Y@public.gmane.org" <patches-qTEPVZfXA3Y@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, Tushar Jagad <tjagad-qTEPVZfXA3Y@public.gmane.org>, "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org" <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sun, Feb 01, 2015 at 07:34:28PM +0100, Andrew Jones wrote:
-> This series extends the kvm-unit-tests/arm[64] framework to support smp.
-> A break down of the patches is as follows
-> 
-> 01-02: prepare general framework for smp use
-> 03-06: arm/arm64 fixups not 100% related to this series,
->        but need to post some time...
-> 07-09: add thread_info (for per-thread data) and suck some global
->        data into it
-> 10-11: add cpumask support (for per-cpu data) and suck some more
->        global data in
->    12: add arm64 simple spinlock implementation
-> 13-14: add some PSCI support
-> 15-16: further prep for smp_boot_secondary
->    17: finally add smp_boot_secondary
->    18: as usual, add a selftest to make sure it all works
-> 
-> These patches are also available here:
-> https://github.com/rhdrjones/kvm-unit-tests/tree/arm/smp
-> 
-> Thanks in advance for reviews!
-> 
-> 
-> Andrew Jones (18):
->   x86: expose spin_lock/unlock to lib code
->   lib/report: guard access to counters
->   arm: fixups: add barriers, actually set MAIR
->   arm64: fixup: use id_aa64mmfr0_el1 to set tcr
->   arm/arm64: processor.[ch] cleanups
->   arm/arm64: get rid of get_sp()
->   arm/arm64: introduce thread_info
->   arm/arm64: add per thread user_mode flag
->   arm/arm64: maintain per thread exception handlers
->   arm/arm64: add simple cpumask API
->   arm/arm64: make mmu_on per cpu
->   arm64: implement spinlocks
->   arm/arm64: import include/uapi/linux/psci.h
->   arm/arm64: add some PSCI API
->   arm/arm64: add cpu_relax() and friends
->   arm: clarify comment about exception stack use
->   arm/arm64: add smp_boot_secondary
->   arm/arm64: Add smp selftest
-> 
->  arm/cstart.S                 |  47 +++++++++++++----
->  arm/cstart64.S               |  48 +++++++++++-------
->  arm/flat.lds                 |   6 +++
->  arm/selftest.c               |  70 +++++++++++++++++++++++--
->  arm/unittests.cfg            |  11 +++-
->  config/config-arm-common.mak |   3 ++
->  config/config-arm64.mak      |   1 +
->  lib/arm/asm-offsets.c        |   3 ++
->  lib/arm/asm/barrier.h        |   5 ++
->  lib/arm/asm/bitops.h         |  53 +++++++++++++++++++
->  lib/arm/asm/cpumask.h        | 118 +++++++++++++++++++++++++++++++++++++++++++
->  lib/arm/asm/mmu-api.h        |   1 +
->  lib/arm/asm/processor.h      |  12 ++++-
->  lib/arm/asm/psci.h           |  15 ++++++
->  lib/arm/asm/smp.h            |  56 ++++++++++++++++++++
->  lib/arm/asm/thread_info.h    |  60 ++++++++++++++++++++++
->  lib/arm/asm/uapi-psci.h      |  73 ++++++++++++++++++++++++++
->  lib/arm/bitops.c             |  81 +++++++++++++++++++++++++++++
->  lib/arm/mmu.c                |  15 ++++--
->  lib/arm/processor.c          |  44 +++++++++++-----
->  lib/arm/psci.c               |  49 ++++++++++++++++++
->  lib/arm/setup.c              |  11 +++-
->  lib/arm/smp.c                |  57 +++++++++++++++++++++
->  lib/arm64/asm-offsets.c      |   2 +
->  lib/arm64/asm/barrier.h      |   5 ++
->  lib/arm64/asm/bitops.h       |  51 +++++++++++++++++++
->  lib/arm64/asm/cpumask.h      |   1 +
->  lib/arm64/asm/processor.h    |  18 ++++++-
->  lib/arm64/asm/psci.h         |  15 ++++++
->  lib/arm64/asm/smp.h          |   1 +
->  lib/arm64/asm/spinlock.h     |   8 +--
->  lib/arm64/asm/thread_info.h  |   1 +
->  lib/arm64/asm/uapi-psci.h    |   1 +
->  lib/arm64/processor.c        |  81 +++++++++++++++++++----------
->  lib/arm64/spinlock.c         |  43 ++++++++++++++++
->  lib/report.c                 |  16 ++++++
->  lib/x86/asm/spinlock.h       |  11 ++++
->  lib/x86/smp.h                |   7 +--
->  38 files changed, 1008 insertions(+), 92 deletions(-)
->  create mode 100644 lib/arm/asm/bitops.h
->  create mode 100644 lib/arm/asm/cpumask.h
->  create mode 100644 lib/arm/asm/psci.h
->  create mode 100644 lib/arm/asm/smp.h
->  create mode 100644 lib/arm/asm/thread_info.h
->  create mode 100644 lib/arm/asm/uapi-psci.h
->  create mode 100644 lib/arm/bitops.c
->  create mode 100644 lib/arm/psci.c
->  create mode 100644 lib/arm/smp.c
->  create mode 100644 lib/arm64/asm/bitops.h
->  create mode 100644 lib/arm64/asm/cpumask.h
->  create mode 100644 lib/arm64/asm/psci.h
->  create mode 100644 lib/arm64/asm/smp.h
->  create mode 100644 lib/arm64/asm/thread_info.h
->  create mode 100644 lib/arm64/asm/uapi-psci.h
->  create mode 100644 lib/arm64/spinlock.c
->  create mode 100644 lib/x86/asm/spinlock.h
-> 
-> -- 
-> 1.9.3
+Hi Rob,
 
-Applied, thanks.
+On Tue, Feb 24, 2015 at 8:00 PM, Rob Herring <robherring2-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+> On Tue, Feb 24, 2015 at 12:34 AM, Pranavkumar Sawargaonkar
+> <psawargaonkar-qTEPVZfXA3Y@public.gmane.org> wrote:
+>> Hi Rob,
+>>
+>> On Mon, Feb 23, 2015 at 10:09 PM, Rob Herring <robherring2-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
+>>> On Mon, Feb 23, 2015 at 6:07 AM, Christoffer Dall
+>>> <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
+>>>> On Sat, Feb 21, 2015 at 03:56:17PM -0600, Rob Herring wrote:
+>>>>> On Thu, Feb 19, 2015 at 1:03 PM, Christoffer Dall
+>>>>> <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
+>>>>> > On Thu, Feb 19, 2015 at 12:23:15PM -0600, Rob Herring wrote:
+>>>>> >> On Tue, Jan 27, 2015 at 1:03 AM, Pranavkumar Sawargaonkar
+>>>>> >> <psawargaonkar-qTEPVZfXA3Y@public.gmane.org> wrote:
+>>>>> >> > In APM X-Gene, GIC register space is 64K aligned while the sizes mentioned
+>>>>> >> > in the dt are 4K aligned. This breaks KVM when kernel is built with 64K page
+>>>>> >> > size due to size alignment checking in vgic driver for VCPU Control and
+>>>>> >> > VCPU register.
+>>>>> >> >
+>>>>> >> > This patch corrects the sizes to be inline with the hardware spec.
+>>>>> >>
+>>>>> >> This does not make sense. The GIC regions are still only 4 or 8KB and
+>>>>> >> the h/w description should reflect that. For implementations using
+>>>>> >> gic-400 and the addressing decode trick, the rest of the register
+>>>>> >> range is also not safe to access given it is multiple mapped. Also,
+>>>>> >> this wastes virtual space, but I guess we don't care on 64-bit.
+>>>>> >>
+>>>>> >> KVM should be fixed to only check base address alignment. Size
+>>>>> >> alignment does not matter (if it does, then you need to fix all
+>>>>> >> register blocks).
+>>>>> >>
+>>>>> > It matters if you want to ensure that the 64K page you are assigning to
+>>>>> > a guest for the GIC virtual CPU interface contains only GIC virtual CPU
+>>>>> > mappings, and not other random stuff that the guest is not allowed to
+>>>>> > touch.
+>>>>>
+>>>>> Good point.
+>>>>>
+>>>>> > How else should this be enforced?
+>>>>>
+>>>>> Rely on correct h/w design? You'll have to repeat this every time you
+>>>>> want to do pass-thru of a device.
+>>>>>
+>>>>> What do you do if 64K mapping is not supported? Fallback to emulation
+>>>>> of the CPU interface?
+>>>>
+>>>> Agree with Peter on these two points.
+>>>>
+>>>>>
+>>>>> Are there other DTSs that need to be fixed?
+>>>>>
+>>>> Not sure really, AMD Seattle works with 64K pages IIRC.
+>>>
+>>> Well, looks we have been inconsistent here:
+>>>
+>>> arch/arm64/boot/dts/amd/amd-seattle-soc.dtsi-           reg = <0x0
+>>> 0xe1110000 0 0x1000>,
+>>> arch/arm64/boot/dts/amd/amd-seattle-soc.dtsi-                 <0x0
+>>> 0xe112f000 0 0x2000>,
+>>> arch/arm64/boot/dts/amd/amd-seattle-soc.dtsi-                 <0x0
+>>> 0xe1140000 0 0x10000>,
+>>> arch/arm64/boot/dts/amd/amd-seattle-soc.dtsi-                 <0x0
+>>> 0xe1160000 0 0x10000>;
+>>>
+>>> arch/arm64/boot/dts/arm/juno.dts-               reg = <0x0 0x2c010000 0 0x1000>,
+>>> arch/arm64/boot/dts/arm/juno.dts-                     <0x0 0x2c02f000 0 0x2000>,
+>>> arch/arm64/boot/dts/arm/juno.dts-                     <0x0 0x2c04f000 0 0x2000>,
+>>> arch/arm64/boot/dts/arm/juno.dts-                     <0x0 0x2c06f000 0 0x2000>;
+>>>
+>>> If we are going to use 64K sizes, can we have some consistency here
+>>> please. Which ranges really need 64KB sizes? It should only be the
+>>> VCPU interface. right? Why does XGene need 128K? If XGene is doing
+>>> address swizzling, then the CPU and VCPU base addresses are wrong.
+>>> Seattle is also wrong for the VCPU, but no one has noticed because we
+>>> don't use the DIR register IIRC.
+>>>
+>>> XGene should also add an "arm,gic-400" compatible string or something
+>>> XGene specific if in fact it is not GIC-400.
+>>
+>> X-Gene has gic-400 as an interrupt controller.
+>> Only thing is GIC pages are mapped at 64K boundary (with 64K page size)
+>> Hence CPU, VCPU interfaces has a size of 128K (2GIC pages)
+>> Regarding GICC_DIR, yes there is a problem which needs to be solved
+>> since the first page size is 64K.
+>> In XEN we already have a small fix to access GICC_DIR with 64K page
+>> offset instead of standard 4K.
+>
+> Right, and in order for this to work, you should use the last 4K alias
+> for the cpu interface(s). This is why other platforms use xxxf000 as
+> their cpu interface base.
+>
+> It is of course possible that xgene does not properly do the address
+> swizzling and therefore you have to use 64K aligned addresses. But in
+> that case you need a unique compatible string.
+>
+>> I remember a small discussion in this regard in past
+>> (http://lists.infradead.org/pipermail/linux-arm-kernel/2014-June/266468.html)
+>> which was deferred at that time.
+>> Once this patch is accepted we can post RFC patch to address GICC_DIR
+>> and discuss further.
+>
+> No, let's get this right now and not keep changing the dts.
+>
 
+So should we add some string specific to apm/xgnene (something like
+apm,cortex-a15-gic) or specific to 64K GIC page size
+(arm,cortex-a15-gic-64Kpg) ?
+Also till 3.19, I am not sure if any code is accessing GICC_DIR so for
+now only thing which seems to be needed is a new dt string for 64K gic
+pages.
+
+
+Thanks,
+Pranav
+
+> Rob
+>
+>>
+>>>
+>>> I think perhaps we need a specific compatible property to indicate a
+>>> GIC-400 with address swizzling. While we could get away with using the
+>>> aliased addresses, that seems to be hard to get right and we may
+>>> regret not doing it in the long term. It would indicate at least it is
+>>> 64K page safe for example.
+>>>
+>>> Rob
+>>
+>> Thanks,
+>> Pranav
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
