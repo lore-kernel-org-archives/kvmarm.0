@@ -1,25 +1,26 @@
 From: Baptiste Reynal <b.reynal@virtualopensystems.com>
-Subject: [PATCH v4 1/5] vfio: implement iommu driver capabilities with an enum
-Date: Mon,  2 Mar 2015 17:58:23 +0100
-Message-ID: <1425315507-29661-2-git-send-email-b.reynal@virtualopensystems.com>
+Subject: [PATCH v4 4/5] vfio: type1: replace vfio_domains_have_iommu_cache
+ with generic function
+Date: Mon,  2 Mar 2015 17:58:26 +0100
+Message-ID: <1425315507-29661-5-git-send-email-b.reynal@virtualopensystems.com>
 References: <1425315507-29661-1-git-send-email-b.reynal@virtualopensystems.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 61481475A7
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:53:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A9241475EC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:53:31 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fyLm2GjVZ44X for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Mar 2015 11:53:17 -0500 (EST)
-Received: from mail-wi0-f174.google.com (mail-wi0-f174.google.com
- [209.85.212.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 746CF475AD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:53:17 -0500 (EST)
-Received: by wivr20 with SMTP id r20so16472910wiv.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Mar 2015 08:59:14 -0800 (PST)
+ with ESMTP id NprcOgWS63u5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Mar 2015 11:53:30 -0500 (EST)
+Received: from mail-wi0-f180.google.com (mail-wi0-f180.google.com
+ [209.85.212.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2011475D9
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:53:30 -0500 (EST)
+Received: by wivr20 with SMTP id r20so16412042wiv.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Mar 2015 08:59:28 -0800 (PST)
 In-Reply-To: <1425315507-29661-1-git-send-email-b.reynal@virtualopensystems.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,57 +32,82 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: iommu@lists.linux-foundation.org, kvmarm@lists.cs.columbia.edu
-Cc: "open list:VFIO DRIVER" <kvm@vger.kernel.org>, "open list:ABI/API" <linux-api@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, Alex Williamson <alex.williamson@redhat.com>, tech@virtualopensystems.com
+Cc: "open list:VFIO DRIVER" <kvm@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, Alex Williamson <alex.williamson@redhat.com>, tech@virtualopensystems.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Antonios Motakis <a.motakis@virtualopensystems.com>
 
-Currently a VFIO driver's IOMMU capabilities are encoded as a series of
-numerical defines. Replace this with an enum for future maintainability.
+Replace the function vfio_domains_have_iommu_cache() with a more generic
+function vfio_domains_have_iommu_cap() which allows to check all domains
+of an vfio_iommu structure for a given cached capability.
 
 Signed-off-by: Antonios Motakis <a.motakis@virtualopensystems.com>
 Signed-off-by: Baptiste Reynal <b.reynal@virtualopensystems.com>
 ---
- include/uapi/linux/vfio.h | 24 +++++++++++-------------
- 1 file changed, 11 insertions(+), 13 deletions(-)
+ drivers/vfio/vfio_iommu_type1.c | 37 +++++++++++++++++++------------------
+ 1 file changed, 19 insertions(+), 18 deletions(-)
 
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 82889c3..5fb3d46 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -19,22 +19,20 @@
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 998619b..0ea371b 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -82,6 +82,23 @@ struct vfio_group {
+ 	struct list_head	next;
+ };
  
- /* Kernel & User level defines for VFIO IOCTLs. */
- 
--/* Extensions */
--
--#define VFIO_TYPE1_IOMMU		1
--#define VFIO_SPAPR_TCE_IOMMU		2
--#define VFIO_TYPE1v2_IOMMU		3
++static int vfio_domains_have_iommu_cap(struct vfio_iommu *iommu, int cap)
++{
++	struct vfio_domain *domain;
++	int ret = 1;
++
++	mutex_lock(&iommu->lock);
++	list_for_each_entry(domain, &iommu->domain_list, next) {
++		if (!(domain->caps & cap)) {
++			ret = 0;
++			break;
++		}
++	}
++	mutex_unlock(&iommu->lock);
++
++	return ret;
++}
++
  /*
-- * IOMMU enforces DMA cache coherence (ex. PCIe NoSnoop stripping).  This
-- * capability is subject to change as groups are added or removed.
-+ * Capabilities exposed by the VFIO IOMMU driver. Some capabilities are subject
-+ * to change as groups are added or removed.
-  */
--#define VFIO_DMA_CC_IOMMU		4
+  * This code handles mapping and unmapping of user data buffers
+  * into DMA'ble space using the IOMMU
+@@ -948,23 +965,6 @@ static void vfio_iommu_type1_release(void *iommu_data)
+ 	kfree(iommu);
+ }
+ 
+-static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
+-{
+-	struct vfio_domain *domain;
+-	int ret = 1;
 -
--/* Check if EEH is supported */
--#define VFIO_EEH			5
-+enum vfio_iommu_cap {
-+	VFIO_TYPE1_IOMMU = 1,
-+	VFIO_SPAPR_TCE_IOMMU = 2,
-+	VFIO_TYPE1v2_IOMMU = 3,
-+	VFIO_DMA_CC_IOMMU = 4,		/* IOMMU enforces DMA cache coherence
-+					   (ex. PCIe NoSnoop stripping) */
-+	VFIO_EEH = 5,			/* Check if EEH is supported */
-+	VFIO_TYPE1_NESTING_IOMMU = 6,	/* Two-stage IOMMU, implies v2  */
-+};
- 
--/* Two-stage IOMMU */
--#define VFIO_TYPE1_NESTING_IOMMU	6	/* Implies v2 */
- 
- /*
-  * The IOCTL interface is designed for extensibility by embedding the
+-	mutex_lock(&iommu->lock);
+-	list_for_each_entry(domain, &iommu->domain_list, next) {
+-		if (!(domain->caps & IOMMU_CAP_CACHE_COHERENCY)) {
+-			ret = 0;
+-			break;
+-		}
+-	}
+-	mutex_unlock(&iommu->lock);
+-
+-	return ret;
+-}
+-
+ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 				   unsigned int cmd, unsigned long arg)
+ {
+@@ -980,7 +980,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 		case VFIO_DMA_CC_IOMMU:
+ 			if (!iommu)
+ 				return 0;
+-			return vfio_domains_have_iommu_cache(iommu);
++			return vfio_domains_have_iommu_cap(iommu,
++						  IOMMU_CAP_CACHE_COHERENCY);
+ 		default:
+ 			return 0;
+ 		}
 -- 
 2.3.1
