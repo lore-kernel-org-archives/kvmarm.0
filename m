@@ -1,25 +1,25 @@
 From: Baptiste Reynal <b.reynal@virtualopensystems.com>
-Subject: [PATCH v4 2/5] vfio: introduce the VFIO_DMA_MAP_FLAG_NOEXEC flag
-Date: Mon,  2 Mar 2015 17:58:24 +0100
-Message-ID: <1425315507-29661-3-git-send-email-b.reynal@virtualopensystems.com>
+Subject: [PATCH v4 1/5] vfio: implement iommu driver capabilities with an enum
+Date: Mon,  2 Mar 2015 17:58:23 +0100
+Message-ID: <1425315507-29661-2-git-send-email-b.reynal@virtualopensystems.com>
 References: <1425315507-29661-1-git-send-email-b.reynal@virtualopensystems.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 71963475DF
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:53:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 61481475A7
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:53:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tCTIY3LMvekl for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Mar 2015 11:53:22 -0500 (EST)
-Received: from mail-we0-f176.google.com (mail-we0-f176.google.com
- [74.125.82.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 888DC475D3
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:53:22 -0500 (EST)
-Received: by wesw55 with SMTP id w55so34583056wes.4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Mar 2015 08:59:19 -0800 (PST)
+ with ESMTP id fyLm2GjVZ44X for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Mar 2015 11:53:17 -0500 (EST)
+Received: from mail-wi0-f174.google.com (mail-wi0-f174.google.com
+ [209.85.212.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 746CF475AD
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:53:17 -0500 (EST)
+Received: by wivr20 with SMTP id r20so16472910wiv.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Mar 2015 08:59:14 -0800 (PST)
 In-Reply-To: <1425315507-29661-1-git-send-email-b.reynal@virtualopensystems.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -36,47 +36,52 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Antonios Motakis <a.motakis@virtualopensystems.com>
 
-We introduce the VFIO_DMA_MAP_FLAG_NOEXEC flag to the VFIO dma map call,
-and expose its availability via the capability VFIO_DMA_NOEXEC_IOMMU.
-This way the user can control whether the XN flag will be set on the
-requested mappings. The IOMMU_NOEXEC flag needs to be available for all
-the IOMMUs of the container used.
+Currently a VFIO driver's IOMMU capabilities are encoded as a series of
+numerical defines. Replace this with an enum for future maintainability.
 
 Signed-off-by: Antonios Motakis <a.motakis@virtualopensystems.com>
 Signed-off-by: Baptiste Reynal <b.reynal@virtualopensystems.com>
 ---
- include/uapi/linux/vfio.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ include/uapi/linux/vfio.h | 24 +++++++++++-------------
+ 1 file changed, 11 insertions(+), 13 deletions(-)
 
 diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 5fb3d46..30801a7 100644
+index 82889c3..5fb3d46 100644
 --- a/include/uapi/linux/vfio.h
 +++ b/include/uapi/linux/vfio.h
-@@ -31,6 +31,7 @@ enum vfio_iommu_cap {
- 					   (ex. PCIe NoSnoop stripping) */
- 	VFIO_EEH = 5,			/* Check if EEH is supported */
- 	VFIO_TYPE1_NESTING_IOMMU = 6,	/* Two-stage IOMMU, implies v2  */
-+	VFIO_DMA_NOEXEC_IOMMU = 7,
- };
+@@ -19,22 +19,20 @@
  
+ /* Kernel & User level defines for VFIO IOCTLs. */
  
-@@ -397,12 +398,17 @@ struct vfio_iommu_type1_info {
-  *
-  * Map process virtual addresses to IO virtual addresses using the
-  * provided struct vfio_dma_map. Caller sets argsz. READ &/ WRITE required.
-+ *
-+ * To use the VFIO_DMA_MAP_FLAG_NOEXEC flag, the container must support the
-+ * VFIO_DMA_NOEXEC_IOMMU capability. If mappings are created using this flag,
-+ * any groups subsequently added to the container must support this capability.
+-/* Extensions */
+-
+-#define VFIO_TYPE1_IOMMU		1
+-#define VFIO_SPAPR_TCE_IOMMU		2
+-#define VFIO_TYPE1v2_IOMMU		3
+ /*
+- * IOMMU enforces DMA cache coherence (ex. PCIe NoSnoop stripping).  This
+- * capability is subject to change as groups are added or removed.
++ * Capabilities exposed by the VFIO IOMMU driver. Some capabilities are subject
++ * to change as groups are added or removed.
   */
- struct vfio_iommu_type1_dma_map {
- 	__u32	argsz;
- 	__u32	flags;
- #define VFIO_DMA_MAP_FLAG_READ (1 << 0)		/* readable from device */
- #define VFIO_DMA_MAP_FLAG_WRITE (1 << 1)	/* writable from device */
-+#define VFIO_DMA_MAP_FLAG_NOEXEC (1 << 2)	/* not executable from device */
- 	__u64	vaddr;				/* Process virtual address */
- 	__u64	iova;				/* IO virtual address */
- 	__u64	size;				/* Size of mapping (bytes) */
+-#define VFIO_DMA_CC_IOMMU		4
+-
+-/* Check if EEH is supported */
+-#define VFIO_EEH			5
++enum vfio_iommu_cap {
++	VFIO_TYPE1_IOMMU = 1,
++	VFIO_SPAPR_TCE_IOMMU = 2,
++	VFIO_TYPE1v2_IOMMU = 3,
++	VFIO_DMA_CC_IOMMU = 4,		/* IOMMU enforces DMA cache coherence
++					   (ex. PCIe NoSnoop stripping) */
++	VFIO_EEH = 5,			/* Check if EEH is supported */
++	VFIO_TYPE1_NESTING_IOMMU = 6,	/* Two-stage IOMMU, implies v2  */
++};
+ 
+-/* Two-stage IOMMU */
+-#define VFIO_TYPE1_NESTING_IOMMU	6	/* Implies v2 */
+ 
+ /*
+  * The IOCTL interface is designed for extensibility by embedding the
 -- 
 2.3.1
