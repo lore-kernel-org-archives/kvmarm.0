@@ -1,53 +1,82 @@
-From: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-Subject: [PATCH v4 0/5] vfio: type1: support for ARM SMMUS with
-	VFIO_IOMMU_TYPE1
-Date: Mon,  2 Mar 2015 17:58:22 +0100
-Message-ID: <1425315507-29661-1-git-send-email-b.reynal@virtualopensystems.com>
+From: Baptiste Reynal <b.reynal@virtualopensystems.com>
+Subject: [PATCH v4 2/5] vfio: introduce the VFIO_DMA_MAP_FLAG_NOEXEC flag
+Date: Mon,  2 Mar 2015 17:58:24 +0100
+Message-ID: <1425315507-29661-3-git-send-email-b.reynal@virtualopensystems.com>
+References: <1425315507-29661-1-git-send-email-b.reynal@virtualopensystems.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
-Cc: tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 71963475DF
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:53:23 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id tCTIY3LMvekl for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Mar 2015 11:53:22 -0500 (EST)
+Received: from mail-we0-f176.google.com (mail-we0-f176.google.com
+ [74.125.82.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 888DC475D3
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:53:22 -0500 (EST)
+Received: by wesw55 with SMTP id w55so34583056wes.4
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Mar 2015 08:59:19 -0800 (PST)
+In-Reply-To: <1425315507-29661-1-git-send-email-b.reynal@virtualopensystems.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: iommu@lists.linux-foundation.org, kvmarm@lists.cs.columbia.edu
+Cc: "open list:VFIO DRIVER" <kvm@vger.kernel.org>, "open list:ABI/API" <linux-api@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, Alex Williamson <alex.williamson@redhat.com>, tech@virtualopensystems.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch series makes the VFIO_IOMMU_TYPE1 driver buildable on ARM, so it
-may be used with ARM SMMUs. It also adds support for the IOMMU_NOEXEC flag
-supported by SMMUs adhering to the ARM SMMU specification so the VFIO user can
-specify whether the target memory can be executed by the device behind the
-SMMU.
+From: Antonios Motakis <a.motakis@virtualopensystems.com>
 
-Changes from v3:
- - Rebased on linux v4.0-rc1
- - Use bit shifting for domain->caps
- - Baptiste Reynal is the new maintainer of this serie
-Changes from v2:
- - Rebased on latest iommu/next branch by Joerg Roedel
-Changes from v1:
- - Bugfixes and corrected some typos
- - Use enum for VFIO IOMMU driver capabilities
+We introduce the VFIO_DMA_MAP_FLAG_NOEXEC flag to the VFIO dma map call,
+and expose its availability via the capability VFIO_DMA_NOEXEC_IOMMU.
+This way the user can control whether the XN flag will be set on the
+requested mappings. The IOMMU_NOEXEC flag needs to be available for all
+the IOMMUs of the container used.
 
-Antonios Motakis (5):
-  vfio: implement iommu driver capabilities with an enum
-  vfio: introduce the VFIO_DMA_MAP_FLAG_NOEXEC flag
-  vfio: type1: replace domain wide protection flags with supported
-    capabilities
-  vfio: type1: replace vfio_domains_have_iommu_cache with generic
-    function
-  vfio: type1: implement the VFIO_DMA_MAP_FLAG_NOEXEC flag
+Signed-off-by: Antonios Motakis <a.motakis@virtualopensystems.com>
+Signed-off-by: Baptiste Reynal <b.reynal@virtualopensystems.com>
+---
+ include/uapi/linux/vfio.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
- drivers/vfio/vfio_iommu_type1.c | 91 +++++++++++++++++++++++++++++------------
- include/uapi/linux/vfio.h       | 30 ++++++++------
- 2 files changed, 81 insertions(+), 40 deletions(-)
-
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 5fb3d46..30801a7 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -31,6 +31,7 @@ enum vfio_iommu_cap {
+ 					   (ex. PCIe NoSnoop stripping) */
+ 	VFIO_EEH = 5,			/* Check if EEH is supported */
+ 	VFIO_TYPE1_NESTING_IOMMU = 6,	/* Two-stage IOMMU, implies v2  */
++	VFIO_DMA_NOEXEC_IOMMU = 7,
+ };
+ 
+ 
+@@ -397,12 +398,17 @@ struct vfio_iommu_type1_info {
+  *
+  * Map process virtual addresses to IO virtual addresses using the
+  * provided struct vfio_dma_map. Caller sets argsz. READ &/ WRITE required.
++ *
++ * To use the VFIO_DMA_MAP_FLAG_NOEXEC flag, the container must support the
++ * VFIO_DMA_NOEXEC_IOMMU capability. If mappings are created using this flag,
++ * any groups subsequently added to the container must support this capability.
+  */
+ struct vfio_iommu_type1_dma_map {
+ 	__u32	argsz;
+ 	__u32	flags;
+ #define VFIO_DMA_MAP_FLAG_READ (1 << 0)		/* readable from device */
+ #define VFIO_DMA_MAP_FLAG_WRITE (1 << 1)	/* writable from device */
++#define VFIO_DMA_MAP_FLAG_NOEXEC (1 << 2)	/* not executable from device */
+ 	__u64	vaddr;				/* Process virtual address */
+ 	__u64	iova;				/* IO virtual address */
+ 	__u64	size;				/* Size of mapping (bytes) */
 -- 
 2.3.1
