@@ -1,25 +1,37 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: tlbi  va, vaa vs. val, vaal
-Date: Mon, 2 Mar 2015 16:23:37 +0000
-Message-ID: <20150302162337.GR22541@e104818-lin.cambridge.arm.com>
-References: <54EFB670.2070501@samsung.com> <20150227102435.GC3628@arm.com>
- <54F0DE8D.3030306@samsung.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [RFC/RFT PATCH 0/3] arm64: KVM: work around incoherency with
+ uncached guest mappings
+Date: Mon, 2 Mar 2015 08:31:46 -0800
+Message-ID: <20150302163146.GB9686@lvm>
+References: <1424343286-6792-1-git-send-email-ard.biesheuvel@linaro.org>
+ <20150219165731.GA26965@hawk.usersys.redhat.com>
+ <CAKv+Gu8Je3RRrgEFCZ7JUWtOgk3WqA_qdBEOPAMc3OqnKr1bwg@mail.gmail.com>
+ <20150219175518.GB26965@hawk.usersys.redhat.com>
+ <54E62404.9040702@redhat.com>
+ <20150220142905.GA10942@hawk.usersys.redhat.com>
+ <CAKv+Gu-YUzmnACZQi98OPRgKKL+gAGqwWYq2-_dwCdNqcktNUg@mail.gmail.com>
+ <20150220153626.GB10942@hawk.usersys.redhat.com>
+ <20150224145529.GA5498@hawk.usersys.redhat.com>
+ <CAKv+Gu-Uk2wg1OkoWgQe4da_EiFoEz_u8VuD8Ees6qU1UYMDvQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A7AB4757A
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:17:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D10247588
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:26:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fLn26-nIbrpu for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Mar 2015 11:17:44 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 69A4047576
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:17:44 -0500 (EST)
+ with ESMTP id aCcs5pimFHIJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Mar 2015 11:26:19 -0500 (EST)
+Received: from mail-qa0-f41.google.com (mail-qa0-f41.google.com
+ [209.85.216.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 842844756C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:26:19 -0500 (EST)
+Received: by mail-qa0-f41.google.com with SMTP id x12so23716169qac.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Mar 2015 08:32:17 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <54F0DE8D.3030306@samsung.com>
+In-Reply-To: <CAKv+Gu-Uk2wg1OkoWgQe4da_EiFoEz_u8VuD8Ees6qU1UYMDvQ@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,47 +41,114 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mario Smarduch <m.smarduch@samsung.com>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: KVM devel mailing list <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Feb 27, 2015 at 01:15:57PM -0800, Mario Smarduch wrote:
-> On 02/27/2015 02:24 AM, Will Deacon wrote:
-> > On Fri, Feb 27, 2015 at 12:12:32AM +0000, Mario Smarduch wrote:
-> >> I noticed kernel tlbflush.h use tlbi va*, vaa* variants instead of
-> >> val, vaal ones. Reading the manual D.5.7.2 it appears that
-> >> va*, vaa* versions invalidate intermediate caching of
-> >> translation structures.
+On Tue, Feb 24, 2015 at 05:47:19PM +0000, Ard Biesheuvel wrote:
+> On 24 February 2015 at 14:55, Andrew Jones <drjones@redhat.com> wrote:
+> > On Fri, Feb 20, 2015 at 04:36:26PM +0100, Andrew Jones wrote:
+> >> On Fri, Feb 20, 2015 at 02:37:25PM +0000, Ard Biesheuvel wrote:
+> >> > On 20 February 2015 at 14:29, Andrew Jones <drjones@redhat.com> wrote:
+> >> > > So looks like the 3 orders of magnitude greater number of traps
+> >> > > (only to el2) don't impact kernel compiles.
+> >> > >
+> >> >
+> >> > OK, good! That was what I was hoping for, obviously.
+> >> >
+> >> > > Then I thought I'd be able to quick measure the number of cycles
+> >> > > a trap to el2 takes with this kvm-unit-tests test
+> >> > >
+> >> > > int main(void)
+> >> > > {
+> >> > >         unsigned long start, end;
+> >> > >         unsigned int sctlr;
+> >> > >
+> >> > >         asm volatile(
+> >> > >         "       mrs %0, sctlr_el1\n"
+> >> > >         "       msr pmcr_el0, %1\n"
+> >> > >         : "=&r" (sctlr) : "r" (5));
+> >> > >
+> >> > >         asm volatile(
+> >> > >         "       mrs %0, pmccntr_el0\n"
+> >> > >         "       msr sctlr_el1, %2\n"
+> >> > >         "       mrs %1, pmccntr_el0\n"
+> >> > >         : "=&r" (start), "=&r" (end) : "r" (sctlr));
+> >> > >
+> >> > >         printf("%llx\n", end - start);
+> >> > >         return 0;
+> >> > > }
+> >> > >
+> >> > > after applying this patch to kvm
+> >> > >
+> >> > > diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+> >> > > index bb91b6fc63861..5de39d740aa58 100644
+> >> > > --- a/arch/arm64/kvm/hyp.S
+> >> > > +++ b/arch/arm64/kvm/hyp.S
+> >> > > @@ -770,7 +770,7 @@
+> >> > >
+> >> > >         mrs     x2, mdcr_el2
+> >> > >         and     x2, x2, #MDCR_EL2_HPMN_MASK
+> >> > > -       orr     x2, x2, #(MDCR_EL2_TPM | MDCR_EL2_TPMCR)
+> >> > > +//     orr     x2, x2, #(MDCR_EL2_TPM | MDCR_EL2_TPMCR)
+> >> > >         orr     x2, x2, #(MDCR_EL2_TDRA | MDCR_EL2_TDOSA)
+> >> > >
+> >> > >         // Check for KVM_ARM64_DEBUG_DIRTY, and set debug to trap
+> >> > >
+> >> > > But I get zero for the cycle count. Not sure what I'm missing.
+> >> > >
+> >> >
+> >> > No clue tbh. Does the counter work as expected in the host?
+> >> >
 > >>
-> >> With stage2 enabled that may result in 20+ memory lookups
-> >> for a 4 level page table walk. That's assuming that intermediate
-> >> caching structures cache mappings from stage1 table entry to
-> >> host page.
-> > 
-> > Yeah, Catalin and I discussed improving the kernel support for this,
-> > but it requires some changes to the generic mmu_gather code so that we
-> > can distinguish the leaf cases. I'd also like to see that done in a way
-> > that takes into account different granule sizes (we currently iterate
-> > over huge pages in 4k chunks). Last time I touched that, I entered a
-> > world of pain and don't plan to return there immediately :)
-> > 
-> > Catalin -- feeling brave?
-> > 
-> > FWIW: the new IOMMU page-table stuff I just got merged *does* make use
-> > of leaf-invalidation for the SMMU.
+> >> Guess not. I dropped the test into a module_init and inserted
+> >> it on the host. Always get zero for pmccntr_el0 reads. Or, if
+> >> I set it to something non-zero with a write, then I always get
+> >> that back - no increments. pmcr_el0 looks OK... I had forgotten
+> >> to set bit 31 of pmcntenset_el0, but doing that still doesn't
+> >> help. Anyway, I assume the problem is me. I'll keep looking to
+> >> see what I'm missing.
+> >>
+> >
+> > I returned to this and see that the problem was indeed me. I needed yet
+> > another enable bit set (the filter register needed to be instructed to
+> > count cycles while in el2). I've attached the code for the curious.
+> > The numbers are mean=6999, std_dev=242. Run on the host, or in a guest
+> > running on a host without this patch series (after TVM traps have been
+> > disabled), I get a pretty consistent 40.
+> >
+> > I checked how many vm-sysreg traps we do during the kernel compile
+> > benchmark. It's 124924. So it's a bit strange that we don't see the
+> > benchmark taking 10 to 20 seconds longer on average. I should probably
+> > double check my runs. In any case, while I like the approach of this
+> > series, the overhead is looking non-negligible.
+> >
 > 
->   thanks for the background. I'm guessing how much of PTWalk
-> is cached is implementation dependent. One old paper quotes upto 40%
-> improvement for some industry benchmarks that cache all stage1/2 PTWalk
-> entries.
+> Thanks a lot for producing these numbers. 125k x 7k == <1 billion
+> cycles == <1 second on a >1 GHz machine, I think?
+> Or am I missing something? How long does the actual compile take?
+> 
+I ran a sequence of benchmarks that I occasionally run (pbzip,
+kernbench, and hackbench) and I also saw < 1% performance degradation,
+so I think we can trust that somewhat.  (I can post the raw numbers when
+I have ssh access to my Linux desktop - sending this from Somewhere Over
+The Atlantic).
 
-Is it caching in the TLB or in the level 1 CPU cache?
+However, my concern with these patches are on two points:
 
-I would indeed expect some improvement without many drawbacks. The only
-thing we need in Linux is to distinguish between leaf TLBI and TLBI for
-page table tearing down. It's not complicated, it just needs some
-testing (strangely enough, I tried to replace all user TLBI with the L
-variants on a Juno board and no signs of any crashes).
+1. It's not a fix-all.  We still have the case where the guest expects
+the behavior of device memory (for strong ordering for example) on a RAM
+region, which we now break.  Similiarly this doesn't support the
+non-coherent DMA to RAM region case.
 
--- 
-Catalin
+2. While the code is probably as nice as this kind of stuff gets, it
+is non-trivial and extremely difficult to debug.  The counter-point here
+is that we may end up handling other stuff at EL2 for performanc reasons
+in the future.
+
+Mainly because of point 1 above, I am leaning to thinking userspace
+should do the invalidation when it knows it needs to, either through KVM
+via a memslot flag or through some other syscall mechanism.
+
+Thanks,
+-Christoffer
