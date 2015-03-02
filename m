@@ -1,59 +1,53 @@
-From: Baptiste Reynal <b.reynal@virtualopensystems.com>
-Subject: [PATCH 1/1] iommu/arm-smmu: fix ARM_SMMU_FEAT_TRANS_OPS condition
-Date: Mon,  2 Mar 2015 17:57:22 +0100
-Message-ID: <1425315442-29584-1-git-send-email-b.reynal@virtualopensystems.com>
+From: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+Subject: [PATCH v4 0/5] vfio: type1: support for ARM SMMUS with
+	VFIO_IOMMU_TYPE1
+Date: Mon,  2 Mar 2015 17:58:22 +0100
+Message-ID: <1425315507-29661-1-git-send-email-b.reynal@virtualopensystems.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 22A0F47513
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:52:01 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ysC1l5zrjx0k for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Mar 2015 11:51:59 -0500 (EST)
-Received: from mail-we0-f172.google.com (mail-we0-f172.google.com
- [74.125.82.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 99DF54750E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:51:59 -0500 (EST)
-Received: by wevk48 with SMTP id k48so34619974wev.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Mar 2015 08:57:56 -0800 (PST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: iommu@lists.linux-foundation.org, kvmarm@lists.cs.columbia.edu
-Cc: Joerg Roedel <joro@8bytes.org>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, tech@virtualopensystems.com, "moderated list:ARM SMMU DRIVER" <linux-arm-kernel@lists.infradead.org>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+Cc: tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch is a fix to "iommu/arm-smmu: add support for iova_to_phys
-through ATS1PR".
-According to ARM documentation, translation registers are optional even
-in SMMUv1, so ID0_S1TS needs to be checked to verify their presence.
+This patch series makes the VFIO_IOMMU_TYPE1 driver buildable on ARM, so it
+may be used with ARM SMMUs. It also adds support for the IOMMU_NOEXEC flag
+supported by SMMUs adhering to the ARM SMMU specification so the VFIO user can
+specify whether the target memory can be executed by the device behind the
+SMMU.
 
-Signed-off-by: Baptiste Reynal <b.reynal@virtualopensystems.com>
----
- drivers/iommu/arm-smmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes from v3:
+ - Rebased on linux v4.0-rc1
+ - Use bit shifting for domain->caps
+ - Baptiste Reynal is the new maintainer of this serie
+Changes from v2:
+ - Rebased on latest iommu/next branch by Joerg Roedel
+Changes from v1:
+ - Bugfixes and corrected some typos
+ - Use enum for VFIO IOMMU driver capabilities
 
-diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
-index fc13dd5..d4beca4 100644
---- a/drivers/iommu/arm-smmu.c
-+++ b/drivers/iommu/arm-smmu.c
-@@ -1556,7 +1556,7 @@ static int arm_smmu_device_cfg_probe(struct arm_smmu_device *smmu)
- 		return -ENODEV;
- 	}
- 
--	if (smmu->version == 1 || (!(id & ID0_ATOSNS) && (id & ID0_S1TS))) {
-+	if ((id & ID0_S1TS) && ((smmu->version == 1) || (id & ID0_ATOSNS))) {
- 		smmu->features |= ARM_SMMU_FEAT_TRANS_OPS;
- 		dev_notice(smmu->dev, "\taddress translation ops\n");
- 	}
+Antonios Motakis (5):
+  vfio: implement iommu driver capabilities with an enum
+  vfio: introduce the VFIO_DMA_MAP_FLAG_NOEXEC flag
+  vfio: type1: replace domain wide protection flags with supported
+    capabilities
+  vfio: type1: replace vfio_domains_have_iommu_cache with generic
+    function
+  vfio: type1: implement the VFIO_DMA_MAP_FLAG_NOEXEC flag
+
+ drivers/vfio/vfio_iommu_type1.c | 91 +++++++++++++++++++++++++++++------------
+ include/uapi/linux/vfio.h       | 30 ++++++++------
+ 2 files changed, 81 insertions(+), 40 deletions(-)
+
 -- 
 2.3.1
