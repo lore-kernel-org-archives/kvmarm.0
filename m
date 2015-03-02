@@ -1,136 +1,315 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH 3/4] arm/arm64: KVM: Fix migration race in the arch timer
-Date: Mon, 02 Mar 2015 14:20:33 +0000
-Message-ID: <87a8zv32ha.fsf@linaro.org>
-References: <1424878582-26397-1-git-send-email-alex.bennee@linaro.org>
- <1424878582-26397-4-git-send-email-alex.bennee@linaro.org>
- <20150228133003.29d59e96@arm.com> <87twy36avw.fsf@linaro.org>
- <54F4297A.40905@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v8 5/5] KVM: arm/arm64: add irqfd support
+Date: Mon, 02 Mar 2015 17:11:37 +0100
+Message-ID: <54F48BB9.3040609@linaro.org>
+References: <1421685793-3547-1-git-send-email-eric.auger@linaro.org> <1421685793-3547-6-git-send-email-eric.auger@linaro.org> <20150223214555.GF5609@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4509A4733A
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 09:14:28 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R6mLoFsB0gWm for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Mar 2015 09:14:26 -0500 (EST)
-Received: from socrates.bennee.com
- (static.88-198-71-155.clients.your-server.de [88.198.71.155])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6E08472EC
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 09:14:26 -0500 (EST)
-In-reply-to: <54F4297A.40905@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Russell King <linux@arm.linux.org.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Gleb Natapov <gleb@kernel.org>, open list <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <20150223214555.GF5609@cbox>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: eric.auger@st.com, marc.zyngier@arm.com, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, gleb@kernel.org, pbonzini@redhat.com, linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Ck1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+IHdyaXRlczoKCj4gT24gMDIvMDMv
-MTUgMDg6NTAsIEFsZXggQmVubsOpZSB3cm90ZToKPj4gCj4+IE1hcmMgWnluZ2llciA8bWFyYy56
-eW5naWVyQGFybS5jb20+IHdyaXRlczoKPj4gCj4+PiBPbiBXZWQsIDI1IEZlYiAyMDE1IDE1OjM2
-OjIxICswMDAwCj4+PiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+IHdyb3Rl
-Ogo+Pj4KPj4+IEFsZXgsIENocmlzdG9mZmVyLAo+Pj4KPj4gPHNuaXA+Cj4+Pgo+Pj4gU28gdGhl
-IGZpcnN0IGhhbGYgb2YgdGhlIHBhdGNoIGxvb2tzIHBlcmZlY3RseSBPSyB0byBtZS4uLgo+Pj4K
-Pj4+PiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0vYXJtL3ZnaWMuYyBiL3ZpcnQva3ZtL2FybS92Z2lj
-LmMKPj4+PiBpbmRleCBhZjZhNTIxLi4zYjRkZWQyIDEwMDY0NAo+Pj4+IC0tLSBhL3ZpcnQva3Zt
-L2FybS92Z2ljLmMKPj4+PiArKysgYi92aXJ0L2t2bS9hcm0vdmdpYy5jCj4+Pj4gQEAgLTI2Myw2
-ICsyNjMsMTMgQEAgc3RhdGljIGludCB2Z2ljX2lycV9pc19xdWV1ZWQoc3RydWN0IGt2bV92Y3B1
-Cj4+Pj4gKnZjcHUsIGludCBpcnEpIHJldHVybiB2Z2ljX2JpdG1hcF9nZXRfaXJxX3ZhbCgmZGlz
-dC0+aXJxX3F1ZXVlZCwKPj4+PiB2Y3B1LT52Y3B1X2lkLCBpcnEpOyB9Cj4+Pj4gIAo+Pj4+ICtz
-dGF0aWMgaW50IHZnaWNfaXJxX2lzX2FjdGl2ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGludCBp
-cnEpCj4+Pj4gK3sKPj4+PiArCXN0cnVjdCB2Z2ljX2Rpc3QgKmRpc3QgPSAmdmNwdS0+a3ZtLT5h
-cmNoLnZnaWM7Cj4+Pj4gKwo+Pj4+ICsJcmV0dXJuIHZnaWNfYml0bWFwX2dldF9pcnFfdmFsKCZk
-aXN0LT5pcnFfYWN0aXZlLAo+Pj4+IHZjcHUtPnZjcHVfaWQsIGlycSk7ICt9Cj4+Pj4gKwo+Pj4+
-ICBzdGF0aWMgdm9pZCB2Z2ljX2lycV9zZXRfcXVldWVkKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwg
-aW50IGlycSkKPj4+PiAgewo+Pj4+ICAJc3RydWN0IHZnaWNfZGlzdCAqZGlzdCA9ICZ2Y3B1LT5r
-dm0tPmFyY2gudmdpYzsKPj4+PiBAQCAtMjg1LDYgKzI5MiwxMyBAQCBzdGF0aWMgdm9pZCB2Z2lj
-X2lycV9zZXRfYWN0aXZlKHN0cnVjdCBrdm1fdmNwdQo+Pj4+ICp2Y3B1LCBpbnQgaXJxKSB2Z2lj
-X2JpdG1hcF9zZXRfaXJxX3ZhbCgmZGlzdC0+aXJxX2FjdGl2ZSwKPj4+PiB2Y3B1LT52Y3B1X2lk
-LCBpcnEsIDEpOyB9Cj4+Pj4gIAo+Pj4+ICtzdGF0aWMgdm9pZCB2Z2ljX2lycV9jbGVhcl9hY3Rp
-dmUoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBpbnQgaXJxKQo+Pj4+ICt7Cj4+Pj4gKwlzdHJ1Y3Qg
-dmdpY19kaXN0ICpkaXN0ID0gJnZjcHUtPmt2bS0+YXJjaC52Z2ljOwo+Pj4+ICsKPj4+PiArCXZn
-aWNfYml0bWFwX3NldF9pcnFfdmFsKCZkaXN0LT5pcnFfYWN0aXZlLCB2Y3B1LT52Y3B1X2lkLAo+
-Pj4+IGlycSwgMCk7ICt9Cj4+Pj4gKwo+Pj4+ICBzdGF0aWMgaW50IHZnaWNfZGlzdF9pcnFfZ2V0
-X2xldmVsKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgaW50IGlycSkKPj4+PiAgewo+Pj4+ICAJc3Ry
-dWN0IHZnaWNfZGlzdCAqZGlzdCA9ICZ2Y3B1LT5rdm0tPmFyY2gudmdpYzsKPj4+PiBAQCAtNjM0
-LDE2ICs2NDgsMTIgQEAgYm9vbCB2Z2ljX2hhbmRsZV9jZmdfcmVnKHUzMiAqcmVnLCBzdHJ1Y3QK
-Pj4+PiBrdm1fZXhpdF9tbWlvICptbWlvLCB9Cj4+Pj4gIAo+Pj4+ICAvKioKPj4+PiAtICogdmdp
-Y191bnF1ZXVlX2lycXMgLSBtb3ZlIHBlbmRpbmcgSVJRcyBmcm9tIExScyB0byB0aGUgZGlzdHJp
-YnV0b3IKPj4+PiArICogdmdpY191bnF1ZXVlX2lycXMgLSBtb3ZlIHBlbmRpbmcvYWN0aXZlIElS
-UXMgZnJvbSBMUnMgdG8gdGhlCj4+Pj4gZGlzdHJpYnV0b3IKPj4+PiAgICogQHZnaWNfY3B1OiBQ
-b2ludGVyIHRvIHRoZSB2Z2ljX2NwdSBzdHJ1Y3QgaG9sZGluZyB0aGUgTFJzCj4+Pj4gICAqCj4+
-Pj4gLSAqIE1vdmUgYW55IHBlbmRpbmcgSVJRcyB0aGF0IGhhdmUgYWxyZWFkeSBiZWVuIGFzc2ln
-bmVkIHRvIExScyBiYWNrCj4+Pj4gdG8gdGhlCj4+Pj4gKyAqIE1vdmUgYW55IElSUXMgdGhhdCBo
-YXZlIGFscmVhZHkgYmVlbiBhc3NpZ25lZCB0byBMUnMgYmFjayB0byB0aGUKPj4+PiAgICogZW11
-bGF0ZWQgZGlzdHJpYnV0b3Igc3RhdGUgc28gdGhhdCB0aGUgY29tcGxldGUgZW11bGF0ZWQgc3Rh
-dGUKPj4+PiBjYW4gYmUgcmVhZAo+Pj4+ICAgKiBmcm9tIHRoZSBtYWluIGVtdWxhdGlvbiBzdHJ1
-Y3R1cmVzIHdpdGhvdXQgaW52ZXN0aWdhdGluZyB0aGUgTFJzLgo+Pj4+IC0gKgo+Pj4+IC0gKiBO
-b3RlIHRoYXQgSVJRcyBpbiB0aGUgYWN0aXZlIHN0YXRlIGluIHRoZSBMUnMgZ2V0IHRoZWlyIHBl
-bmRpbmcKPj4+PiBzdGF0ZSBtb3ZlZAo+Pj4+IC0gKiB0byB0aGUgZGlzdHJpYnV0b3IgYnV0IHRo
-ZSBhY3RpdmUgc3RhdGUgc3RheXMgaW4gdGhlIExScywgYmVjYXVzZQo+Pj4+IHdlIGRvbid0Cj4+
-Pj4gLSAqIHRyYWNrIHRoZSBhY3RpdmUgc3RhdGUgb24gdGhlIGRpc3RyaWJ1dG9yIHNpZGUuCj4+
-Pj4gICAqLwo+Pj4+ICB2b2lkIHZnaWNfdW5xdWV1ZV9pcnFzKHN0cnVjdCBrdm1fdmNwdSAqdmNw
-dSkKPj4+PiAgewo+Pj4+IEBAIC05MTksNyArOTI5LDcgQEAgc3RhdGljIGludCBjb21wdXRlX3Bl
-bmRpbmdfZm9yX2NwdShzdHJ1Y3QKPj4+PiBrdm1fdmNwdSAqdmNwdSkgCj4+Pj4gIC8qCj4+Pj4g
-ICAqIFVwZGF0ZSB0aGUgaW50ZXJydXB0IHN0YXRlIGFuZCBkZXRlcm1pbmUgd2hpY2ggQ1BVcyBo
-YXZlIHBlbmRpbmcKPj4+PiAtICogaW50ZXJydXB0cy4gTXVzdCBiZSBjYWxsZWQgd2l0aCBkaXN0
-cmlidXRvciBsb2NrIGhlbGQuCj4+Pj4gKyAqIG9yIGFjdGl2ZSBpbnRlcnJ1cHRzLiBNdXN0IGJl
-IGNhbGxlZCB3aXRoIGRpc3RyaWJ1dG9yIGxvY2sgaGVsZC4KPj4+PiAgICovCj4+Pj4gIHZvaWQg
-dmdpY191cGRhdGVfc3RhdGUoc3RydWN0IGt2bSAqa3ZtKQo+Pj4+ICB7Cj4+Pj4gQEAgLTEwMzYs
-NiArMTA0NiwyNSBAQCBzdGF0aWMgdm9pZCB2Z2ljX3JldGlyZV9kaXNhYmxlZF9pcnFzKHN0cnVj
-dAo+Pj4+IGt2bV92Y3B1ICp2Y3B1KSB9Cj4+Pj4gIH0KPj4+PiAgCj4+Pj4gK3N0YXRpYyB2b2lk
-IHZnaWNfcXVldWVfaXJxX3RvX2xyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgaW50IGlycSwKPj4+
-PiArCQkJCSBpbnQgbHJfbnIsIHN0cnVjdCB2Z2ljX2xyIHZscikKPj4+PiArewo+Pj4+ICsJaWYg
-KHZnaWNfaXJxX2lzX2FjdGl2ZSh2Y3B1LCBpcnEpKSB7Cj4+Pj4gKwkJdmxyLnN0YXRlIHw9IExS
-X1NUQVRFX0FDVElWRTsKPj4+PiArCQlrdm1fZGVidWcoIlNldCBhY3RpdmUsIGNsZWFyIGRpc3Ry
-aWJ1dG9yOiAweCV4XG4iLAo+Pj4+IHZsci5zdGF0ZSk7Cj4+Pj4gKwkJdmdpY19pcnFfY2xlYXJf
-YWN0aXZlKHZjcHUsIGlycSk7Cj4+Pj4gKwkJdmdpY191cGRhdGVfc3RhdGUodmNwdS0+a3ZtKTsK
-Pj4+PiArCX0gZWxzZSBpZiAodmdpY19kaXN0X2lycV9pc19wZW5kaW5nKHZjcHUsIGlycSkpIHsK
-Pj4+PiArCQl2bHIuc3RhdGUgfD0gTFJfU1RBVEVfUEVORElORzsKPj4+PiArCQlrdm1fZGVidWco
-IlNldCBwZW5kaW5nOiAweCV4XG4iLCB2bHIuc3RhdGUpOwo+Pj4+ICsJfQo+Pj4+ICsKPj4+PiAr
-CWlmICghdmdpY19pcnFfaXNfZWRnZSh2Y3B1LCBpcnEpKQo+Pj4+ICsJCXZsci5zdGF0ZSB8PSBM
-Ul9FT0lfSU5UOwo+Pj4+ICsKPj4+PiArCXZnaWNfc2V0X2xyKHZjcHUsIGxyX25yLCB2bHIpOwo+
-Pj4+ICt9Cj4+Pj4gKwo+Pj4+ICAvKgo+Pj4+ICAgKiBRdWV1ZSBhbiBpbnRlcnJ1cHQgdG8gYSBD
-UFUgdmlydHVhbCBpbnRlcmZhY2UuIFJldHVybiB0cnVlIG9uCj4+Pj4gc3VjY2VzcywKPj4+PiAg
-ICogb3IgZmFsc2UgaWYgaXQgd2Fzbid0IHBvc3NpYmxlIHRvIHF1ZXVlIGl0Lgo+Pj4+IEBAIC0x
-MDYzLDggKzEwOTIsNyBAQCBib29sIHZnaWNfcXVldWVfaXJxKHN0cnVjdCBrdm1fdmNwdSAqdmNw
-dSwgdTgKPj4+PiBzZ2lfc291cmNlX2lkLCBpbnQgaXJxKSBpZiAodmxyLnNvdXJjZSA9PSBzZ2lf
-c291cmNlX2lkKSB7Cj4+Pj4gIAkJCWt2bV9kZWJ1ZygiTFIlZCBwaWdneWJhY2sgZm9yIElSUSVk
-XG4iLCBsciwKPj4+PiB2bHIuaXJxKTsgQlVHX09OKCF0ZXN0X2JpdChsciwgdmdpY19jcHUtPmxy
-X3VzZWQpKTsKPj4+PiAtCQkJdmxyLnN0YXRlIHw9IExSX1NUQVRFX1BFTkRJTkc7Cj4+Pj4gLQkJ
-CXZnaWNfc2V0X2xyKHZjcHUsIGxyLCB2bHIpOwo+Pj4+ICsJCQl2Z2ljX3F1ZXVlX2lycV90b19s
-cih2Y3B1LCBpcnEsIGxyLCB2bHIpOwo+Pj4+ICAJCQlyZXR1cm4gdHJ1ZTsKPj4+PiAgCQl9Cj4+
-Pj4gIAl9Cj4+Pj4gQEAgLTEwODEsMTEgKzExMDksOCBAQCBib29sIHZnaWNfcXVldWVfaXJxKHN0
-cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTgKPj4+PiBzZ2lfc291cmNlX2lkLCBpbnQgaXJxKSAKPj4+
-PiAgCXZsci5pcnEgPSBpcnE7Cj4+Pj4gIAl2bHIuc291cmNlID0gc2dpX3NvdXJjZV9pZDsKPj4+
-PiAtCXZsci5zdGF0ZSA9IExSX1NUQVRFX1BFTkRJTkc7Cj4+Pj4gLQlpZiAoIXZnaWNfaXJxX2lz
-X2VkZ2UodmNwdSwgaXJxKSkKPj4+PiAtCQl2bHIuc3RhdGUgfD0gTFJfRU9JX0lOVDsKPj4+PiAt
-Cj4+Pj4gLQl2Z2ljX3NldF9scih2Y3B1LCBsciwgdmxyKTsKPj4+PiArCXZsci5zdGF0ZSA9IDA7
-Cj4+Pj4gKwl2Z2ljX3F1ZXVlX2lycV90b19scih2Y3B1LCBpcnEsIGxyLCB2bHIpOwo+Pj4+ICAK
-Pj4+PiAgCXJldHVybiB0cnVlOwo+Pj4+ICB9Cj4+Pgo+Pj4KPj4+IC4uLiBidXQgdGhpcyB3aG9s
-ZSB2Z2ljIHJld29yayBzZWVtcyByYXRoZXIgb3V0IG9mIHBsYWNlLCBhbmQgSSBjYW4ndAo+Pj4g
-cmVhbGx5IHNlZSBpdHMgY29ubmVjdGlvbiB3aXRoIHRoZSB0aW1lci4gSXNuJ3QgaXQgbG9naWNh
-bGx5IHBhcnQgb2YgdGhlCj4+PiBwcmV2aW91cyBwYXRjaD8KPj4gCj4+IFByb2JhYmx5IC0gSSB3
-YXMgZ29pbmcgdG8gcmUtZmFjdG9yIHRoYXQgY29kZSB3aXRoIHRoZSBvcmlnaW5hbCBwYXRjaAo+
-PiBidXQgaXQgd2FzIG9uIHRoZSB0b2RvIGxpc3Qgb25jZSB3ZSBoYWQgaXQgd29ya2luZy4gQ2hy
-aXN0b2ZmZXIgdGhhbgo+PiBjbGVhbmVkIGl0IHVwIHdoZW4gaGUgZml4ZWQgdGhlIHJhY2UgaGVu
-Y2UgaXQgYmVpbmcgaGVyZS4KPj4gCj4+IFdvdWxkIHlvdSBsaWtlIGl0IGFzIGEgc2VwYXJhdGUg
-cGF0Y2ggKGJldHdlZW4gMiBhbmQgMykgb3IganVzdCByb2xsZWQKPj4gaW50byB0aGUgcHJldmlv
-dXMgcGF0Y2g/Cj4KPiBJbiBnZW5lcmFsLCBJIHByZWZlciBzbWFsbGVyIHBhdGNoZXMgKGtlZXBz
-IHRoZSBmZXcgYnJhaW4gY2VsbHMgbGVmdAo+IGZyb20gb3ZlcmhlYXRpbmcpLCBzbyBpZiB0aGVz
-ZSBjaGFuZ2VzIG1ha2Ugc2Vuc2Ugb24gdGhlaXIgb3duLCBwbGVhc2UKPiBwb3N0IHRoZW0gYXMg
-YSBzZXBhcmF0ZSBwYXRjaC4KCkRvbmUsIG5ldyBzZXJpZXMgcmUtc2VudC4KCj4KPiBUaGFua3Ms
-Cj4KPiAJTS4KCi0tIApBbGV4IEJlbm7DqWUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29s
-dW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8v
-a3ZtYXJtCg==
+On 02/23/2015 10:45 PM, Christoffer Dall wrote:
+> On Mon, Jan 19, 2015 at 05:43:13PM +0100, Eric Auger wrote:
+>> This patch enables irqfd on arm/arm64.
+>>
+>> Both irqfd and resamplefd are supported. Injection is implemented
+>> in vgic.c without routing.
+>>
+>> This patch enables CONFIG_HAVE_KVM_EVENTFD and CONFIG_HAVE_KVM_IRQFD.
+>>
+>> KVM_CAP_IRQFD is now advertised. KVM_CAP_IRQFD_RESAMPLE capability
+>> automatically is advertised as soon as CONFIG_HAVE_KVM_IRQFD is set.
+>>
+>> Irqfd injection is restricted to SPI. The rationale behind not
+>> supporting PPI irqfd injection is that any device using a PPI would
+>> be a private-to-the-CPU device (timer for instance), so its state
+>> would have to be context-switched along with the VCPU and would
+>> require in-kernel wiring anyhow. It is not a relevant use case for
+>> irqfds.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+>>
+>> ---
+>> v7 -> v8:
+>> - remove kvm_irq_has_notifier call
+>> - part of dist locking changes now are part of previous patch file
+>> - remove gic_initialized() check in kvm_set_irq
+>> - remove Christoffer's Reviewed-by after this change
+>>
+>> v5 -> v6:
+>> - KVM_CAP_IRQFD support depends on vgic_present
+>> - add Christoffer's Reviewed-by
+>>
+>> v4 -> v5:
+>> - squash [PATCH v4 3/3] KVM: arm64: add irqfd support into this patch
+>> - some rewording in Documentation/virtual/kvm/api.txt and in vgic
+>>   vgic_process_maintenance unlock comment.
+>> - move explanation of why not supporting PPI into commit message
+>> - in case of injection before gic readiness, -ENODEV is returned. It is
+>>   up to the user space to avoid this situation.
+>>
+>> v3 -> v4:
+>> - reword commit message
+>> - explain why we unlock the distributor before calling kvm_notify_acked_irq
+>> - rename is_assigned_irq into has_notifier
+>> - change EOI and injection kvm_debug format string
+>> - remove error local variable in kvm_set_irq
+>> - Move HAVE_KVM_IRQCHIP unset in a separate patch
+>> - handle case were the irqfd injection is attempted before the vgic is ready.
+>>   in such a case the notifier, if any, is called immediatly
+>> - use nr_irqs to test spi is within correct range
+>>
+>> v2 -> v3:
+>> - removal of irq.h from eventfd.c put in a separate patch to increase
+>>   visibility
+>> - properly expose KVM_CAP_IRQFD capability in arm.c
+>> - remove CONFIG_HAVE_KVM_IRQCHIP meaningfull only if irq_comm.c is used
+>>
+>> v1 -> v2:
+>> - rebase on 3.17rc1
+>> - move of the dist unlock in process_maintenance
+>> - remove of dist lock in __kvm_vgic_sync_hwstate
+>> - rewording of the commit message (add resamplefd reference)
+>> - remove irq.h
+>> ---
+>>  Documentation/virtual/kvm/api.txt |  6 +++++-
+>>  arch/arm/include/uapi/asm/kvm.h   |  3 +++
+>>  arch/arm/kvm/Kconfig              |  2 ++
+>>  arch/arm/kvm/Makefile             |  2 +-
+>>  arch/arm/kvm/arm.c                |  5 +++++
+>>  arch/arm64/include/uapi/asm/kvm.h |  3 +++
+>>  arch/arm64/kvm/Kconfig            |  2 ++
+>>  arch/arm64/kvm/Makefile           |  2 +-
+>>  virt/kvm/arm/vgic.c               | 45 +++++++++++++++++++++++++++++++++++++++
+>>  9 files changed, 67 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+>> index 0007fef..5ed8088 100644
+>> --- a/Documentation/virtual/kvm/api.txt
+>> +++ b/Documentation/virtual/kvm/api.txt
+>> @@ -2231,7 +2231,7 @@ into the hash PTE second double word).
+>>  4.75 KVM_IRQFD
+>>  
+>>  Capability: KVM_CAP_IRQFD
+>> -Architectures: x86 s390
+>> +Architectures: x86 s390 arm arm64
+>>  Type: vm ioctl
+>>  Parameters: struct kvm_irqfd (in)
+>>  Returns: 0 on success, -1 on error
+>> @@ -2257,6 +2257,10 @@ Note that closing the resamplefd is not sufficient to disable the
+>>  irqfd.  The KVM_IRQFD_FLAG_RESAMPLE is only necessary on assignment
+>>  and need not be specified with KVM_IRQFD_FLAG_DEASSIGN.
+>>  
+>> +On ARM/ARM64, the gsi field in the kvm_irqfd struct specifies the Shared
+>> +Peripheral Interrupt (SPI) index, such that the GIC interrupt ID is
+>> +given by gsi + 32.
+>> +
+>>  4.76 KVM_PPC_ALLOCATE_HTAB
+>>  
+>>  Capability: KVM_CAP_PPC_ALLOC_HTAB
+>> diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+>> index 0db25bc..2499867 100644
+>> --- a/arch/arm/include/uapi/asm/kvm.h
+>> +++ b/arch/arm/include/uapi/asm/kvm.h
+>> @@ -198,6 +198,9 @@ struct kvm_arch_memory_slot {
+>>  /* Highest supported SPI, from VGIC_NR_IRQS */
+>>  #define KVM_ARM_IRQ_GIC_MAX		127
+>>  
+>> +/* One single KVM irqchip, ie. the VGIC */
+>> +#define KVM_NR_IRQCHIPS          1
+>> +
+>>  /* PSCI interface */
+>>  #define KVM_PSCI_FN_BASE		0x95c1ba5e
+>>  #define KVM_PSCI_FN(n)			(KVM_PSCI_FN_BASE + (n))
+>> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+>> index 9f581b1..e519a40 100644
+>> --- a/arch/arm/kvm/Kconfig
+>> +++ b/arch/arm/kvm/Kconfig
+>> @@ -24,6 +24,7 @@ config KVM
+>>  	select KVM_MMIO
+>>  	select KVM_ARM_HOST
+>>  	depends on ARM_VIRT_EXT && ARM_LPAE
+>> +	select HAVE_KVM_EVENTFD
+>>  	---help---
+>>  	  Support hosting virtualized guest machines. You will also
+>>  	  need to select one or more of the processor modules below.
+>> @@ -55,6 +56,7 @@ config KVM_ARM_MAX_VCPUS
+>>  config KVM_ARM_VGIC
+>>  	bool "KVM support for Virtual GIC"
+>>  	depends on KVM_ARM_HOST && OF
+>> +	select HAVE_KVM_IRQFD
+>>  	default y
+>>  	---help---
+>>  	  Adds support for a hardware assisted, in-kernel GIC emulation.
+>> diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+>> index f7057ed..859db09 100644
+>> --- a/arch/arm/kvm/Makefile
+>> +++ b/arch/arm/kvm/Makefile
+>> @@ -15,7 +15,7 @@ AFLAGS_init.o := -Wa,-march=armv7-a$(plus_virt)
+>>  AFLAGS_interrupts.o := -Wa,-march=armv7-a$(plus_virt)
+>>  
+>>  KVM := ../../../virt/kvm
+>> -kvm-arm-y = $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o
+>> +kvm-arm-y = $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o
+>>  
+>>  obj-y += kvm-arm.o init.o interrupts.o
+>>  obj-y += arm.o handle_exit.o guest.o mmu.o emulate.o reset.o
+>> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+>> index 9c905b4..8f8c1da 100644
+>> --- a/arch/arm/kvm/arm.c
+>> +++ b/arch/arm/kvm/arm.c
+>> @@ -172,6 +172,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  	case KVM_CAP_IRQCHIP:
+>>  		r = vgic_present;
+>>  		break;
+>> +#ifdef CONFIG_HAVE_KVM_IRQFD
+>> +	case KVM_CAP_IRQFD:
+>> +		r = vgic_present;
+>> +		break;
+>> +#endif
+>>  	case KVM_CAP_DEVICE_CTRL:
+>>  	case KVM_CAP_USER_MEMORY:
+>>  	case KVM_CAP_SYNC_MMU:
+>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+>> index 480af34..b35c95a 100644
+>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>> @@ -184,6 +184,9 @@ struct kvm_arch_memory_slot {
+>>  /* Highest supported SPI, from VGIC_NR_IRQS */
+>>  #define KVM_ARM_IRQ_GIC_MAX		127
+>>  
+>> +/* One single KVM irqchip, ie. the VGIC */
+>> +#define KVM_NR_IRQCHIPS          1
+>> +
+>>  /* PSCI interface */
+>>  #define KVM_PSCI_FN_BASE		0x95c1ba5e
+>>  #define KVM_PSCI_FN(n)			(KVM_PSCI_FN_BASE + (n))
+>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+>> index 279e1a0..09c25c2 100644
+>> --- a/arch/arm64/kvm/Kconfig
+>> +++ b/arch/arm64/kvm/Kconfig
+>> @@ -26,6 +26,7 @@ config KVM
+>>  	select KVM_ARM_HOST
+>>  	select KVM_ARM_VGIC
+>>  	select KVM_ARM_TIMER
+>> +	select HAVE_KVM_EVENTFD
+>>  	---help---
+>>  	  Support hosting virtualized guest machines.
+>>  
+>> @@ -50,6 +51,7 @@ config KVM_ARM_MAX_VCPUS
+>>  config KVM_ARM_VGIC
+>>  	bool
+>>  	depends on KVM_ARM_HOST && OF
+>> +	select HAVE_KVM_IRQFD
+>>  	---help---
+>>  	  Adds support for a hardware assisted, in-kernel GIC emulation.
+>>  
+>> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+>> index 32a0961..2e6b827 100644
+>> --- a/arch/arm64/kvm/Makefile
+>> +++ b/arch/arm64/kvm/Makefile
+>> @@ -11,7 +11,7 @@ ARM=../../../arch/arm/kvm
+>>  
+>>  obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
+>>  
+>> -kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o
+>> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/arm.o $(ARM)/mmu.o $(ARM)/mmio.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/psci.o $(ARM)/perf.o
+>>  
+>> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+>> index 18060ea..2c269dd 100644
+>> --- a/virt/kvm/arm/vgic.c
+>> +++ b/virt/kvm/arm/vgic.c
+>> @@ -1449,6 +1449,7 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+>>  	u32 status = vgic_get_interrupt_status(vcpu);
+>>  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+>>  	bool level_pending = false;
+>> +	struct kvm *kvm = vcpu->kvm;
+>>  
+>>  	kvm_debug("STATUS = %08x\n", status);
+>>  
+>> @@ -1484,6 +1485,17 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+>>  			 */
+>>  			vgic_dist_irq_clear_soft_pend(vcpu, vlr.irq);
+>>  
+>> +			/*
+>> +			 * kvm_notify_acked_irq calls kvm_set_irq()
+>> +			 * to reset the IRQ level. Need to release the
+>> +			 * lock for kvm_set_irq to grab it.
+>> +			 */
+>> +			spin_unlock(&dist->lock);
+>> +
+>> +			kvm_notify_acked_irq(kvm, 0,
+>> +					     vlr.irq - VGIC_NR_PRIVATE_IRQS);
+>> +			spin_lock(&dist->lock);
+>> +
+>>  			/* Any additional pending interrupt? */
+>>  			if (vgic_dist_irq_get_level(vcpu, vlr.irq)) {
+>>  				vgic_cpu_irq_set(vcpu, vlr.irq);
+>> @@ -2490,3 +2502,36 @@ out_free_irq:
+>>  	free_percpu_irq(vgic->maint_irq, kvm_get_running_vcpus());
+>>  	return ret;
+>>  }
+>> +
+>> +int kvm_irq_map_gsi(struct kvm *kvm,
+>> +		    struct kvm_kernel_irq_routing_entry *entries,
+>> +		    int gsi)
+>> +{
+>> +	return gsi;
+>> +}
+>> +
+>> +int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned irqchip, unsigned pin)
+>> +{
+>> +	return pin;
+>> +}
+>> +
+>> +int kvm_set_irq(struct kvm *kvm, int irq_source_id,
+>> +		u32 irq, int level, bool line_status)
+>> +{
+>> +	unsigned int spi = irq + VGIC_NR_PRIVATE_IRQS;
+>> +
+>> +	kvm_debug("irqfd sets vIRQ %d to %d\n", irq, level);
+> 
+> I think it would be good to add a BUG_ON(!vgic_initialized(kvm)) here
+> and convert the kvm_debug into a tracepoint.
+> 
+>> +
+>> +	if (spi > kvm->arch.vgic.nr_irqs)
+>> +		return -EINVAL;
+>> +	return kvm_vgic_inject_irq(kvm, 0, spi, level);
+>> +
+>> +}
+>> +
+>> +/* MSI not implemented yet */
+>> +int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+>> +		struct kvm *kvm, int irq_source_id,
+>> +		int level, bool line_status)
+>> +{
+>> +	return 0;
+>> +}
+>> -- 
+>> 1.9.1
+>>
+> 
+> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> 
+> I can adress the two issues above when applying this if you don't have
+> to do a re-spin.
+
+Hi Christoffer,
+
+I noticed the trace event already exists in #include
+<trace/events/kvm.h>. I will do the modifications and re-post it quickly
+
+Thanks
+
+Eric
+> 
+> -Christoffer
+> 
