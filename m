@@ -1,130 +1,68 @@
-From: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-Subject: [PATCH v14 20/20] vfio/platform: implement IRQ masking/unmasking via
-	an eventfd
-Date: Mon,  2 Mar 2015 18:00:00 +0100
-Message-ID: <1425315600-29761-21-git-send-email-b.reynal@virtualopensystems.com>
-References: <1425315600-29761-1-git-send-email-b.reynal@virtualopensystems.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [RFC/RFT PATCH 0/3] arm64: KVM: work around incoherency with
+ uncached guest mappings
+Date: Mon, 2 Mar 2015 18:05:19 +0100
+Message-ID: <20150302170519.GB14186@hawk.usersys.redhat.com>
+References: <20150219175518.GB26965@hawk.usersys.redhat.com>
+ <54E62404.9040702@redhat.com>
+ <20150220142905.GA10942@hawk.usersys.redhat.com>
+ <CAKv+Gu-YUzmnACZQi98OPRgKKL+gAGqwWYq2-_dwCdNqcktNUg@mail.gmail.com>
+ <20150220153626.GB10942@hawk.usersys.redhat.com>
+ <20150224145529.GA5498@hawk.usersys.redhat.com>
+ <CAKv+Gu-Uk2wg1OkoWgQe4da_EiFoEz_u8VuD8Ees6qU1UYMDvQ@mail.gmail.com>
+ <20150302163146.GB9686@lvm> <54F49418.5070108@redhat.com>
+ <54F49610.6090000@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <1425315600-29761-1-git-send-email-b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
-Cc: "open list:VFIO DRIVER" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, open list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>, tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 846434760B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:59:39 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id P23u6aejD05f for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Mar 2015 11:59:32 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AFDBF475D8
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:59:32 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <54F49610.6090000@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: KVM devel mailing list <kvm@vger.kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+On Mon, Mar 02, 2015 at 05:55:44PM +0100, Laszlo Ersek wrote:
+> On 03/02/15 17:47, Paolo Bonzini wrote:
+> > 
+> > Also, we may want to invalidate the cache for dirty pages before
+> > returning the dirty bitmap, and probably should do that directly in
+> > KVM_GET_DIRTY_LOG.
+> 
+> "I agree."
+> 
+> If KVM_GET_DIRTY_LOG is supposed to be atomic fetch and clear (from
+> userspace's aspect), then the cache invalidation should be an atomic
+> part of it too (from the same aspect).
+> 
+> (Sorry if I just said something incredibly stupid.)
+>
 
-With this patch the VFIO user will be able to set an eventfd that can be
-used in order to mask and unmask IRQs of platform devices.
+With the path I'm headed down, all cache maintenance operations will
+be done before exiting to userspace (and after returning). I was
+actually already letting a feature creep into this PoC by setting
+KVM_MEM_LOG_DIRTY_PAGES when we see KVM_MEM_INCOHERENT has been set,
+and the region isn't readonly. The dirty log would then be used by
+KVM internally to know exactly which pages need to be invalidated
+before the exit.
 
-Signed-off-by: Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-Signed-off-by: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
----
- drivers/vfio/platform/vfio_platform_irq.c     | 47 ++++++++++++++++++++++++---
- drivers/vfio/platform/vfio_platform_private.h |  2 ++
- 2 files changed, 45 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
-index e0e6388..88bba57 100644
---- a/drivers/vfio/platform/vfio_platform_irq.c
-+++ b/drivers/vfio/platform/vfio_platform_irq.c
-@@ -37,6 +37,15 @@ static void vfio_platform_mask(struct vfio_platform_irq *irq_ctx)
- 	spin_unlock_irqrestore(&irq_ctx->lock, flags);
- }
- 
-+static int vfio_platform_mask_handler(void *opaque, void *unused)
-+{
-+	struct vfio_platform_irq *irq_ctx = opaque;
-+
-+	vfio_platform_mask(irq_ctx);
-+
-+	return 0;
-+}
-+
- static int vfio_platform_set_irq_mask(struct vfio_platform_device *vdev,
- 				      unsigned index, unsigned start,
- 				      unsigned count, uint32_t flags,
-@@ -48,8 +57,18 @@ static int vfio_platform_set_irq_mask(struct vfio_platform_device *vdev,
- 	if (!(vdev->irqs[index].flags & VFIO_IRQ_INFO_MASKABLE))
- 		return -EINVAL;
- 
--	if (flags & VFIO_IRQ_SET_DATA_EVENTFD)
--		return -EINVAL; /* not implemented yet */
-+	if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
-+		int32_t fd = *(int32_t *)data;
-+
-+		if (fd >= 0)
-+			return vfio_virqfd_enable((void *) &vdev->irqs[index],
-+						  vfio_platform_mask_handler,
-+						  NULL, NULL,
-+						  &vdev->irqs[index].mask, fd);
-+
-+		vfio_virqfd_disable(&vdev->irqs[index].mask);
-+		return 0;
-+	}
- 
- 	if (flags & VFIO_IRQ_SET_DATA_NONE) {
- 		vfio_platform_mask(&vdev->irqs[index]);
-@@ -78,6 +97,15 @@ static void vfio_platform_unmask(struct vfio_platform_irq *irq_ctx)
- 	spin_unlock_irqrestore(&irq_ctx->lock, flags);
- }
- 
-+static int vfio_platform_unmask_handler(void *opaque, void *unused)
-+{
-+	struct vfio_platform_irq *irq_ctx = opaque;
-+
-+	vfio_platform_unmask(irq_ctx);
-+
-+	return 0;
-+}
-+
- static int vfio_platform_set_irq_unmask(struct vfio_platform_device *vdev,
- 					unsigned index, unsigned start,
- 					unsigned count, uint32_t flags,
-@@ -89,8 +117,19 @@ static int vfio_platform_set_irq_unmask(struct vfio_platform_device *vdev,
- 	if (!(vdev->irqs[index].flags & VFIO_IRQ_INFO_MASKABLE))
- 		return -EINVAL;
- 
--	if (flags & VFIO_IRQ_SET_DATA_EVENTFD)
--		return -EINVAL; /* not implemented yet */
-+	if (flags & VFIO_IRQ_SET_DATA_EVENTFD) {
-+		int32_t fd = *(int32_t *)data;
-+
-+		if (fd >= 0)
-+			return vfio_virqfd_enable((void *) &vdev->irqs[index],
-+						  vfio_platform_unmask_handler,
-+						  NULL, NULL,
-+						  &vdev->irqs[index].unmask,
-+						  fd);
-+
-+		vfio_virqfd_disable(&vdev->irqs[index].unmask);
-+		return 0;
-+	}
- 
- 	if (flags & VFIO_IRQ_SET_DATA_NONE) {
- 		vfio_platform_unmask(&vdev->irqs[index]);
-diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
-index ff2db1d..5d31e04 100644
---- a/drivers/vfio/platform/vfio_platform_private.h
-+++ b/drivers/vfio/platform/vfio_platform_private.h
-@@ -35,6 +35,8 @@ struct vfio_platform_irq {
- 	struct eventfd_ctx	*trigger;
- 	bool			masked;
- 	spinlock_t		lock;
-+	struct virqfd		*unmask;
-+	struct virqfd		*mask;
- };
- 
- struct vfio_platform_region {
--- 
-2.3.1
+drew
