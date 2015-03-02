@@ -1,564 +1,142 @@
-From: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-Subject: [PATCH v14 18/20] vfio: move eventfd support code for VFIO_PCI to a
-	separate file
-Date: Mon,  2 Mar 2015 17:59:58 +0100
-Message-ID: <1425315600-29761-19-git-send-email-b.reynal@virtualopensystems.com>
+From: Baptiste Reynal <b.reynal@virtualopensystems.com>
+Subject: [PATCH v14 19/20] vfio: initialize the virqfd workqueue in VFIO
+ generic code
+Date: Mon,  2 Mar 2015 17:59:59 +0100
+Message-ID: <1425315600-29761-20-git-send-email-b.reynal@virtualopensystems.com>
 References: <1425315600-29761-1-git-send-email-b.reynal@virtualopensystems.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <1425315600-29761-1-git-send-email-b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
-Cc: "open list:VFIO DRIVER" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Gavin Shan <gwshan-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>, open list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>, Thomas Gleixner <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org, Jiang Liu <jiang.liu-VuQAYsv1563Yd54FQh9/CA@public.gmane.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 15FE9475A0
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:57:38 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id SH3ELvX+99Yg for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Mar 2015 11:57:36 -0500 (EST)
+Received: from mail-wg0-f44.google.com (mail-wg0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1E4A0475D8
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 11:57:35 -0500 (EST)
+Received: by wghl18 with SMTP id l18so34735165wgh.8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Mar 2015 09:03:32 -0800 (PST)
+In-Reply-To: <1425315600-29761-1-git-send-email-b.reynal@virtualopensystems.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: iommu@lists.linux-foundation.org, kvmarm@lists.cs.columbia.edu
+Cc: Wei Yang <weiyang@linux.vnet.ibm.com>, "open list:VFIO DRIVER" <kvm@vger.kernel.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Gavin Shan <gwshan@linux.vnet.ibm.com>, open list <linux-kernel@vger.kernel.org>, Alex Williamson <alex.williamson@redhat.com>, tech@virtualopensystems.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+From: Antonios Motakis <a.motakis@virtualopensystems.com>
 
-The virqfd functionality that is used by VFIO_PCI to implement interrupt
-masking and unmasking via an eventfd, is generic enough and can be reused
-by another driver. Move it to a separate file in order to allow the code
-to be shared.
+Now we have finally completely decoupled virqfd from VFIO_PCI. We can
+initialize it from the VFIO generic code, in order to safely use it from
+multiple independent VFIO bus drivers.
 
-Signed-off-by: Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-Signed-off-by: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+Signed-off-by: Antonios Motakis <a.motakis@virtualopensystems.com>
+Signed-off-by: Baptiste Reynal <b.reynal@virtualopensystems.com>
 ---
- drivers/vfio/pci/Makefile           |   3 +-
- drivers/vfio/pci/vfio_pci_intrs.c   | 215 ------------------------------------
- drivers/vfio/pci/vfio_pci_private.h |   3 -
- drivers/vfio/virqfd.c               | 213 +++++++++++++++++++++++++++++++++++
- include/linux/vfio.h                |  27 +++++
- 5 files changed, 242 insertions(+), 219 deletions(-)
- create mode 100644 drivers/vfio/virqfd.c
+ drivers/vfio/Makefile       | 4 +++-
+ drivers/vfio/pci/Makefile   | 3 +--
+ drivers/vfio/pci/vfio_pci.c | 8 --------
+ drivers/vfio/vfio.c         | 8 ++++++++
+ 4 files changed, 12 insertions(+), 11 deletions(-)
 
+diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+index dadf0ca..d798b09 100644
+--- a/drivers/vfio/Makefile
++++ b/drivers/vfio/Makefile
+@@ -1,4 +1,6 @@
+-obj-$(CONFIG_VFIO) += vfio.o
++vfio_core-y := vfio.o virqfd.o
++
++obj-$(CONFIG_VFIO) += vfio_core.o
+ obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
+ obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
+ obj-$(CONFIG_VFIO_SPAPR_EEH) += vfio_spapr_eeh.o
 diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-index 1310792..c7c8644 100644
+index c7c8644..1310792 100644
 --- a/drivers/vfio/pci/Makefile
 +++ b/drivers/vfio/pci/Makefile
-@@ -1,4 +1,5 @@
+@@ -1,5 +1,4 @@
  
--vfio-pci-y := vfio_pci.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
-+vfio-pci-y := vfio_pci.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o \
-+	      ../virqfd.o
+-vfio-pci-y := vfio_pci.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o \
+-	      ../virqfd.o
++vfio-pci-y := vfio_pci.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
  
  obj-$(CONFIG_VFIO_PCI) += vfio-pci.o
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 1a16da3..da6616e 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -19,228 +19,13 @@
- #include <linux/msi.h>
- #include <linux/pci.h>
- #include <linux/file.h>
--#include <linux/poll.h>
- #include <linux/vfio.h>
- #include <linux/wait.h>
--#include <linux/workqueue.h>
- #include <linux/slab.h>
- 
- #include "vfio_pci_private.h"
- 
- /*
-- * IRQfd - generic
-- */
--struct virqfd {
--	void			*opaque;
--	struct eventfd_ctx	*eventfd;
--	int			(*handler)(void *, void *);
--	void			(*thread)(void *, void *);
--	void			*data;
--	struct work_struct	inject;
--	wait_queue_t		wait;
--	poll_table		pt;
--	struct work_struct	shutdown;
--	struct virqfd		**pvirqfd;
--};
--
--static struct workqueue_struct *vfio_irqfd_cleanup_wq;
--DEFINE_SPINLOCK(virqfd_lock);
--
--int __init vfio_virqfd_init(void)
--{
--	vfio_irqfd_cleanup_wq =
--		create_singlethread_workqueue("vfio-irqfd-cleanup");
--	if (!vfio_irqfd_cleanup_wq)
--		return -ENOMEM;
--
--	return 0;
--}
--
--void vfio_virqfd_exit(void)
--{
--	destroy_workqueue(vfio_irqfd_cleanup_wq);
--}
--
--static void virqfd_deactivate(struct virqfd *virqfd)
--{
--	queue_work(vfio_irqfd_cleanup_wq, &virqfd->shutdown);
--}
--
--static int virqfd_wakeup(wait_queue_t *wait, unsigned mode, int sync, void *key)
--{
--	struct virqfd *virqfd = container_of(wait, struct virqfd, wait);
--	unsigned long flags = (unsigned long)key;
--
--	if (flags & POLLIN) {
--		/* An event has been signaled, call function */
--		if ((!virqfd->handler ||
--		     virqfd->handler(virqfd->opaque, virqfd->data)) &&
--		    virqfd->thread)
--			schedule_work(&virqfd->inject);
--	}
--
--	if (flags & POLLHUP) {
--		unsigned long flags;
--		spin_lock_irqsave(&virqfd_lock, flags);
--
--		/*
--		 * The eventfd is closing, if the virqfd has not yet been
--		 * queued for release, as determined by testing whether the
--		 * virqfd pointer to it is still valid, queue it now.  As
--		 * with kvm irqfds, we know we won't race against the virqfd
--		 * going away because we hold the lock to get here.
--		 */
--		if (*(virqfd->pvirqfd) == virqfd) {
--			*(virqfd->pvirqfd) = NULL;
--			virqfd_deactivate(virqfd);
--		}
--
--		spin_unlock_irqrestore(&virqfd_lock, flags);
--	}
--
--	return 0;
--}
--
--static void virqfd_ptable_queue_proc(struct file *file,
--				     wait_queue_head_t *wqh, poll_table *pt)
--{
--	struct virqfd *virqfd = container_of(pt, struct virqfd, pt);
--	add_wait_queue(wqh, &virqfd->wait);
--}
--
--static void virqfd_shutdown(struct work_struct *work)
--{
--	struct virqfd *virqfd = container_of(work, struct virqfd, shutdown);
--	u64 cnt;
--
--	eventfd_ctx_remove_wait_queue(virqfd->eventfd, &virqfd->wait, &cnt);
--	flush_work(&virqfd->inject);
--	eventfd_ctx_put(virqfd->eventfd);
--
--	kfree(virqfd);
--}
--
--static void virqfd_inject(struct work_struct *work)
--{
--	struct virqfd *virqfd = container_of(work, struct virqfd, inject);
--	if (virqfd->thread)
--		virqfd->thread(virqfd->opaque, virqfd->data);
--}
--
--int vfio_virqfd_enable(void *opaque,
--		       int (*handler)(void *, void *),
--		       void (*thread)(void *, void *),
--		       void *data, struct virqfd **pvirqfd, int fd)
--{
--	struct fd irqfd;
--	struct eventfd_ctx *ctx;
--	struct virqfd *virqfd;
--	int ret = 0;
--	unsigned int events;
--
--	virqfd = kzalloc(sizeof(*virqfd), GFP_KERNEL);
--	if (!virqfd)
--		return -ENOMEM;
--
--	virqfd->pvirqfd = pvirqfd;
--	virqfd->opaque = opaque;
--	virqfd->handler = handler;
--	virqfd->thread = thread;
--	virqfd->data = data;
--
--	INIT_WORK(&virqfd->shutdown, virqfd_shutdown);
--	INIT_WORK(&virqfd->inject, virqfd_inject);
--
--	irqfd = fdget(fd);
--	if (!irqfd.file) {
--		ret = -EBADF;
--		goto err_fd;
--	}
--
--	ctx = eventfd_ctx_fileget(irqfd.file);
--	if (IS_ERR(ctx)) {
--		ret = PTR_ERR(ctx);
--		goto err_ctx;
--	}
--
--	virqfd->eventfd = ctx;
--
--	/*
--	 * virqfds can be released by closing the eventfd or directly
--	 * through ioctl.  These are both done through a workqueue, so
--	 * we update the pointer to the virqfd under lock to avoid
--	 * pushing multiple jobs to release the same virqfd.
--	 */
--	spin_lock_irq(&virqfd_lock);
--
--	if (*pvirqfd) {
--		spin_unlock_irq(&virqfd_lock);
--		ret = -EBUSY;
--		goto err_busy;
--	}
--	*pvirqfd = virqfd;
--
--	spin_unlock_irq(&virqfd_lock);
--
--	/*
--	 * Install our own custom wake-up handling so we are notified via
--	 * a callback whenever someone signals the underlying eventfd.
--	 */
--	init_waitqueue_func_entry(&virqfd->wait, virqfd_wakeup);
--	init_poll_funcptr(&virqfd->pt, virqfd_ptable_queue_proc);
--
--	events = irqfd.file->f_op->poll(irqfd.file, &virqfd->pt);
--
--	/*
--	 * Check if there was an event already pending on the eventfd
--	 * before we registered and trigger it as if we didn't miss it.
--	 */
--	if (events & POLLIN) {
--		if ((!handler || handler(opaque, data)) && thread)
--			schedule_work(&virqfd->inject);
--	}
--
--	/*
--	 * Do not drop the file until the irqfd is fully initialized,
--	 * otherwise we might race against the POLLHUP.
--	 */
--	fdput(irqfd);
--
--	return 0;
--err_busy:
--	eventfd_ctx_put(ctx);
--err_ctx:
--	fdput(irqfd);
--err_fd:
--	kfree(virqfd);
--
--	return ret;
--}
--EXPORT_SYMBOL_GPL(vfio_virqfd_enable);
--
--void vfio_virqfd_disable(struct virqfd **pvirqfd)
--{
--	unsigned long flags;
--
--	spin_lock_irqsave(&virqfd_lock, flags);
--
--	if (*pvirqfd) {
--		virqfd_deactivate(*pvirqfd);
--		*pvirqfd = NULL;
--	}
--
--	spin_unlock_irqrestore(&virqfd_lock, flags);
--
--	/*
--	 * Block until we know all outstanding shutdown jobs have completed.
--	 * Even if we don't queue the job, flush the wq to be sure it's
--	 * been released.
--	 */
--	flush_workqueue(vfio_irqfd_cleanup_wq);
--}
--EXPORT_SYMBOL_GPL(vfio_virqfd_disable);
--
--/*
-  * INTx
-  */
- static void vfio_send_intx_eventfd(void *opaque, void *unused)
-diff --git a/drivers/vfio/pci/vfio_pci_private.h b/drivers/vfio/pci/vfio_pci_private.h
-index 0253965..ae0e1b4 100644
---- a/drivers/vfio/pci/vfio_pci_private.h
-+++ b/drivers/vfio/pci/vfio_pci_private.h
-@@ -87,9 +87,6 @@ extern ssize_t vfio_pci_vga_rw(struct vfio_pci_device *vdev, char __user *buf,
- extern int vfio_pci_init_perm_bits(void);
- extern void vfio_pci_uninit_perm_bits(void);
- 
--extern int vfio_virqfd_init(void);
--extern void vfio_virqfd_exit(void);
--
- extern int vfio_config_init(struct vfio_pci_device *vdev);
- extern void vfio_config_free(struct vfio_pci_device *vdev);
- #endif /* VFIO_PCI_PRIVATE_H */
-diff --git a/drivers/vfio/virqfd.c b/drivers/vfio/virqfd.c
-new file mode 100644
-index 0000000..5967899
---- /dev/null
-+++ b/drivers/vfio/virqfd.c
-@@ -0,0 +1,213 @@
-+/*
-+ * VFIO generic eventfd code for IRQFD support.
-+ * Derived from drivers/vfio/pci/vfio_pci_intrs.c
-+ *
-+ * Copyright (C) 2012 Red Hat, Inc.  All rights reserved.
-+ *     Author: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#include <linux/vfio.h>
-+#include <linux/eventfd.h>
-+#include <linux/file.h>
-+#include <linux/slab.h>
-+
-+static struct workqueue_struct *vfio_irqfd_cleanup_wq;
-+DEFINE_SPINLOCK(virqfd_lock);
-+
-+int __init vfio_virqfd_init(void)
-+{
-+	vfio_irqfd_cleanup_wq =
-+		create_singlethread_workqueue("vfio-irqfd-cleanup");
-+	if (!vfio_irqfd_cleanup_wq)
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
-+void vfio_virqfd_exit(void)
-+{
-+	destroy_workqueue(vfio_irqfd_cleanup_wq);
-+}
-+
-+static void virqfd_deactivate(struct virqfd *virqfd)
-+{
-+	queue_work(vfio_irqfd_cleanup_wq, &virqfd->shutdown);
-+}
-+
-+static int virqfd_wakeup(wait_queue_t *wait, unsigned mode, int sync, void *key)
-+{
-+	struct virqfd *virqfd = container_of(wait, struct virqfd, wait);
-+	unsigned long flags = (unsigned long)key;
-+
-+	if (flags & POLLIN) {
-+		/* An event has been signaled, call function */
-+		if ((!virqfd->handler ||
-+		     virqfd->handler(virqfd->opaque, virqfd->data)) &&
-+		    virqfd->thread)
-+			schedule_work(&virqfd->inject);
-+	}
-+
-+	if (flags & POLLHUP) {
-+		unsigned long flags;
-+		spin_lock_irqsave(&virqfd_lock, flags);
-+
-+		/*
-+		 * The eventfd is closing, if the virqfd has not yet been
-+		 * queued for release, as determined by testing whether the
-+		 * virqfd pointer to it is still valid, queue it now.  As
-+		 * with kvm irqfds, we know we won't race against the virqfd
-+		 * going away because we hold the lock to get here.
-+		 */
-+		if (*(virqfd->pvirqfd) == virqfd) {
-+			*(virqfd->pvirqfd) = NULL;
-+			virqfd_deactivate(virqfd);
-+		}
-+
-+		spin_unlock_irqrestore(&virqfd_lock, flags);
-+	}
-+
-+	return 0;
-+}
-+
-+static void virqfd_ptable_queue_proc(struct file *file,
-+				     wait_queue_head_t *wqh, poll_table *pt)
-+{
-+	struct virqfd *virqfd = container_of(pt, struct virqfd, pt);
-+	add_wait_queue(wqh, &virqfd->wait);
-+}
-+
-+static void virqfd_shutdown(struct work_struct *work)
-+{
-+	struct virqfd *virqfd = container_of(work, struct virqfd, shutdown);
-+	u64 cnt;
-+
-+	eventfd_ctx_remove_wait_queue(virqfd->eventfd, &virqfd->wait, &cnt);
-+	flush_work(&virqfd->inject);
-+	eventfd_ctx_put(virqfd->eventfd);
-+
-+	kfree(virqfd);
-+}
-+
-+static void virqfd_inject(struct work_struct *work)
-+{
-+	struct virqfd *virqfd = container_of(work, struct virqfd, inject);
-+	if (virqfd->thread)
-+		virqfd->thread(virqfd->opaque, virqfd->data);
-+}
-+
-+int vfio_virqfd_enable(void *opaque,
-+		       int (*handler)(void *, void *),
-+		       void (*thread)(void *, void *),
-+		       void *data, struct virqfd **pvirqfd, int fd)
-+{
-+	struct fd irqfd;
-+	struct eventfd_ctx *ctx;
-+	struct virqfd *virqfd;
-+	int ret = 0;
-+	unsigned int events;
-+
-+	virqfd = kzalloc(sizeof(*virqfd), GFP_KERNEL);
-+	if (!virqfd)
-+		return -ENOMEM;
-+
-+	virqfd->pvirqfd = pvirqfd;
-+	virqfd->opaque = opaque;
-+	virqfd->handler = handler;
-+	virqfd->thread = thread;
-+	virqfd->data = data;
-+
-+	INIT_WORK(&virqfd->shutdown, virqfd_shutdown);
-+	INIT_WORK(&virqfd->inject, virqfd_inject);
-+
-+	irqfd = fdget(fd);
-+	if (!irqfd.file) {
-+		ret = -EBADF;
-+		goto err_fd;
-+	}
-+
-+	ctx = eventfd_ctx_fileget(irqfd.file);
-+	if (IS_ERR(ctx)) {
-+		ret = PTR_ERR(ctx);
-+		goto err_ctx;
-+	}
-+
-+	virqfd->eventfd = ctx;
-+
-+	/*
-+	 * virqfds can be released by closing the eventfd or directly
-+	 * through ioctl.  These are both done through a workqueue, so
-+	 * we update the pointer to the virqfd under lock to avoid
-+	 * pushing multiple jobs to release the same virqfd.
-+	 */
-+	spin_lock_irq(&virqfd_lock);
-+
-+	if (*pvirqfd) {
-+		spin_unlock_irq(&virqfd_lock);
-+		ret = -EBUSY;
-+		goto err_busy;
-+	}
-+	*pvirqfd = virqfd;
-+
-+	spin_unlock_irq(&virqfd_lock);
-+
-+	/*
-+	 * Install our own custom wake-up handling so we are notified via
-+	 * a callback whenever someone signals the underlying eventfd.
-+	 */
-+	init_waitqueue_func_entry(&virqfd->wait, virqfd_wakeup);
-+	init_poll_funcptr(&virqfd->pt, virqfd_ptable_queue_proc);
-+
-+	events = irqfd.file->f_op->poll(irqfd.file, &virqfd->pt);
-+
-+	/*
-+	 * Check if there was an event already pending on the eventfd
-+	 * before we registered and trigger it as if we didn't miss it.
-+	 */
-+	if (events & POLLIN) {
-+		if ((!handler || handler(opaque, data)) && thread)
-+			schedule_work(&virqfd->inject);
-+	}
-+
-+	/*
-+	 * Do not drop the file until the irqfd is fully initialized,
-+	 * otherwise we might race against the POLLHUP.
-+	 */
-+	fdput(irqfd);
-+
-+	return 0;
-+err_busy:
-+	eventfd_ctx_put(ctx);
-+err_ctx:
-+	fdput(irqfd);
-+err_fd:
-+	kfree(virqfd);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(vfio_virqfd_enable);
-+
-+void vfio_virqfd_disable(struct virqfd **pvirqfd)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&virqfd_lock, flags);
-+
-+	if (*pvirqfd) {
-+		virqfd_deactivate(*pvirqfd);
-+		*pvirqfd = NULL;
-+	}
-+
-+	spin_unlock_irqrestore(&virqfd_lock, flags);
-+
-+	/*
-+	 * Block until we know all outstanding shutdown jobs have completed.
-+	 * Even if we don't queue the job, flush the wq to be sure it's
-+	 * been released.
-+	 */
-+	flush_workqueue(vfio_irqfd_cleanup_wq);
-+}
-+EXPORT_SYMBOL_GPL(vfio_virqfd_disable);
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index 2d67b89..683b514 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -14,6 +14,8 @@
- 
- #include <linux/iommu.h>
- #include <linux/mm.h>
-+#include <linux/workqueue.h>
-+#include <linux/poll.h>
- #include <uapi/linux/vfio.h>
- 
- /**
-@@ -123,4 +125,29 @@ static inline long vfio_spapr_iommu_eeh_ioctl(struct iommu_group *group,
- 	return -ENOTTY;
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 668d37c..2f865d07 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -1030,7 +1030,6 @@ put_devs:
+ static void __exit vfio_pci_cleanup(void)
+ {
+ 	pci_unregister_driver(&vfio_pci_driver);
+-	vfio_virqfd_exit();
+ 	vfio_pci_uninit_perm_bits();
  }
- #endif /* CONFIG_EEH */
+ 
+@@ -1043,11 +1042,6 @@ static int __init vfio_pci_init(void)
+ 	if (ret)
+ 		return ret;
+ 
+-	/* Start the virqfd cleanup handler */
+-	ret = vfio_virqfd_init();
+-	if (ret)
+-		goto out_virqfd;
+-
+ 	/* Register and scan for devices */
+ 	ret = pci_register_driver(&vfio_pci_driver);
+ 	if (ret)
+@@ -1056,8 +1050,6 @@ static int __init vfio_pci_init(void)
+ 	return 0;
+ 
+ out_driver:
+-	vfio_virqfd_exit();
+-out_virqfd:
+ 	vfio_pci_uninit_perm_bits();
+ 	return ret;
+ }
+diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+index 4cde855..23ba12a 100644
+--- a/drivers/vfio/vfio.c
++++ b/drivers/vfio/vfio.c
+@@ -1553,6 +1553,11 @@ static int __init vfio_init(void)
+ 	if (ret)
+ 		goto err_cdev_add;
+ 
++	/* Start the virqfd cleanup handler used by some VFIO bus drivers */
++	ret = vfio_virqfd_init();
++	if (ret)
++		goto err_virqfd;
 +
-+/*
-+ * IRQfd - generic
-+ */
-+struct virqfd {
-+	void			*opaque;
-+	struct eventfd_ctx	*eventfd;
-+	int			(*handler)(void *, void *);
-+	void			(*thread)(void *, void *);
-+	void			*data;
-+	struct work_struct	inject;
-+	wait_queue_t		wait;
-+	poll_table		pt;
-+	struct work_struct	shutdown;
-+	struct virqfd		**pvirqfd;
-+};
-+
-+extern int vfio_virqfd_init(void);
-+extern void vfio_virqfd_exit(void);
-+extern int vfio_virqfd_enable(void *opaque,
-+			      int (*handler)(void *, void *),
-+			      void (*thread)(void *, void *),
-+			      void *data, struct virqfd **pvirqfd, int fd);
-+extern void vfio_virqfd_disable(struct virqfd **pvirqfd);
-+
- #endif /* VFIO_H */
+ 	pr_info(DRIVER_DESC " version: " DRIVER_VERSION "\n");
+ 
+ 	/*
+@@ -1565,6 +1570,8 @@ static int __init vfio_init(void)
+ 
+ 	return 0;
+ 
++err_virqfd:
++	cdev_del(&vfio.group_cdev);
+ err_cdev_add:
+ 	unregister_chrdev_region(vfio.group_devt, MINORMASK);
+ err_alloc_chrdev:
+@@ -1579,6 +1586,7 @@ static void __exit vfio_cleanup(void)
+ {
+ 	WARN_ON(!list_empty(&vfio.group_list));
+ 
++	vfio_virqfd_exit();
+ 	idr_destroy(&vfio.group_idr);
+ 	cdev_del(&vfio.group_cdev);
+ 	unregister_chrdev_region(vfio.group_devt, MINORMASK);
 -- 
 2.3.1
