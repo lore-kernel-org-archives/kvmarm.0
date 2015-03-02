@@ -1,29 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 1/3] arm64: KVM: Fix stage-2 PGD allocation to have
- per-page refcounting
-Date: Mon, 2 Mar 2015 10:27:05 -0800
-Message-ID: <20150302182705.GD10137@lvm>
+Subject: Re: [PATCH 2/3] arm64: KVM: Do not use pgd_index to index stage-2 pgd
+Date: Mon, 2 Mar 2015 10:45:00 -0800
+Message-ID: <20150302184500.GE10137@lvm>
 References: <1424883340-29940-1-git-send-email-marc.zyngier@arm.com>
- <1424883340-29940-2-git-send-email-marc.zyngier@arm.com>
+ <1424883340-29940-3-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DA9C47722
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 13:21:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A670B4770F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 13:39:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V+iLNZZ9WyFK for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Mar 2015 13:21:30 -0500 (EST)
-Received: from mail-qa0-f46.google.com (mail-qa0-f46.google.com
- [209.85.216.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 650E0476AC
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 13:21:29 -0500 (EST)
-Received: by mail-qa0-f46.google.com with SMTP id n4so24280793qaq.5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Mar 2015 10:27:28 -0800 (PST)
+ with ESMTP id l95884GnBU23 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Mar 2015 13:39:15 -0500 (EST)
+Received: from mail-qc0-f172.google.com (mail-qc0-f172.google.com
+ [209.85.216.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 975B747666
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 13:39:15 -0500 (EST)
+Received: by qcwr17 with SMTP id r17so26222018qcw.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Mar 2015 10:45:13 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1424883340-29940-2-git-send-email-marc.zyngier@arm.com>
+In-Reply-To: <1424883340-29940-3-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,132 +36,105 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Christoffer Dall <christoffer.dall@linaro.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 25, 2015 at 04:55:38PM +0000, Marc Zyngier wrote:
-> We're using __get_free_pages with to allocate the guest's stage-2
-> PGD. The standard behaviour of this function is to return a set of
-> pages where only the head page has a valid refcount.
+On Wed, Feb 25, 2015 at 04:55:39PM +0000, Marc Zyngier wrote:
+> The kernel's pgd_index macro is designed to index a normal, page
+> sized array. KVM is a bit diffferent, as we can use concatenated
+> pages to have a bigger address space (for example 40bit IPA with
+> 4kB pages gives us an 8kB PGD.
 > 
-> This behaviour gets us into trouble when we're trying to increment
-> the refount on a non-head page:
+> In the above case, the use of pgd_index will always return an index
+> inside the first 4kB, which makes a guest that has memory above
+> 0x8000000000 rather unhappy, as it spins forever in a page fault,
+> whist the host happilly corrupts the lower pgd.
 > 
-> page:ffff7c00cfb693c0 count:0 mapcount:0 mapping:          (null) index:0x0
-> flags: 0x4000000000000000()
-> page dumped because: VM_BUG_ON_PAGE((*({ __attribute__((unused)) typeof((&page->_count)->counter) __var = ( typeof((&page->_count)->counter)) 0; (volatile typeof((&page->_count)->counter) *)&((&page->_count)->counter); })) <= 0)
-> BUG: failure at include/linux/mm.h:548/get_page()!
-> Kernel panic - not syncing: BUG!
-> CPU: 1 PID: 1695 Comm: kvm-vcpu-0 Not tainted 4.0.0-rc1+ #3825
-> Hardware name: APM X-Gene Mustang board (DT)
-> Call trace:
-> [<ffff80000008a09c>] dump_backtrace+0x0/0x13c
-> [<ffff80000008a1e8>] show_stack+0x10/0x1c
-> [<ffff800000691da8>] dump_stack+0x74/0x94
-> [<ffff800000690d78>] panic+0x100/0x240
-> [<ffff8000000a0bc4>] stage2_get_pmd+0x17c/0x2bc
-> [<ffff8000000a1dc4>] kvm_handle_guest_abort+0x4b4/0x6b0
-> [<ffff8000000a420c>] handle_exit+0x58/0x180
-> [<ffff80000009e7a4>] kvm_arch_vcpu_ioctl_run+0x114/0x45c
-> [<ffff800000099df4>] kvm_vcpu_ioctl+0x2e0/0x754
-> [<ffff8000001c0a18>] do_vfs_ioctl+0x424/0x5c8
-> [<ffff8000001c0bfc>] SyS_ioctl+0x40/0x78
-> CPU0: stopping
+> The obvious fix is to get our own kvm_pgd_index that does the right
+> thing(tm).
 > 
-> Passing the (unintuitively named) __GFP_COMP flag to __get_free_pages
-> forces the allocator to maintain a per-page refcount, which is exactly
-> what we need.
-
-There's a concerning comment with what seems to be the same kind of
-scenario in arch/tile/mm/pgtable.c:248.
-
-I'm a little confused here, because it looks like prep_new_page() calls
-prep_compound_page(), which is the effect you're looking for, but it
-sets the page count of all tail pages to 0, and I think our code expects
-all page table pages with all entries clear to have a page count of 1,
-i.e. the allocation count itself, so don't we still have a discrepency
-between head and tail pages for compound allocations?
-
-So I'm wondering if we should simply call split_page() on the allocation
-or if there's some other way of doing individual multiple contigous page
-allocations?  Am I seeing ghosts?
-
+> Tested on X-Gene with a hacked kvmtool that put memory at a stupidly
+> high address.
 > 
-> This has been tested on an X-Gene platform with a 4kB/48bit-VA host
-> kernel, and kvmtool hacked to place memory in the second page of
-> the hardware PGD (PUD for the host kernel).
-> 
-> Reported-by: Mark Rutland <mark.rutland@arm.com>
-> Tested-by: Mark Rutland <mark.rutland@arm.com>
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm/include/asm/kvm_mmu.h   | 7 +++++++
->  arch/arm/kvm/mmu.c               | 2 +-
->  arch/arm64/include/asm/kvm_mmu.h | 9 ++++++++-
->  3 files changed, 16 insertions(+), 2 deletions(-)
+>  arch/arm/include/asm/kvm_mmu.h   | 3 ++-
+>  arch/arm/kvm/mmu.c               | 8 ++++----
+>  arch/arm64/include/asm/kvm_mmu.h | 2 ++
+>  3 files changed, 8 insertions(+), 5 deletions(-)
 > 
 > diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-> index 37ca2a4..1cac89b 100644
+> index 1cac89b..ec669a6 100644
 > --- a/arch/arm/include/asm/kvm_mmu.h
 > +++ b/arch/arm/include/asm/kvm_mmu.h
-> @@ -162,6 +162,13 @@ static inline bool kvm_page_empty(void *ptr)
+> @@ -149,13 +149,14 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
+>  	(__boundary - 1 < (end) - 1)? __boundary: (end);		\
+>  })
 >  
->  #define KVM_PREALLOC_LEVEL	0
->  
-> +/*
-> + * We need to ensure that stage-2 PGDs are allocated with a per-page
-> + * refcount, as we fiddle with the refcounts of non-head pages.
-> + * __GFP_COMP forces the allocator to do what we want.
-> + */
-> +#define KVM_GFP_S2_PGD	(GFP_KERNEL | __GFP_ZERO | __GFP_COMP)
+> +#define kvm_pgd_index(addr)			pgd_index(addr)
 > +
->  static inline int kvm_prealloc_hwpgd(struct kvm *kvm, pgd_t *pgd)
+>  static inline bool kvm_page_empty(void *ptr)
 >  {
-
-what about the case for kvm_prealloc_hwpgd, why doesn't it need to use
-the new GFP mask?
-
->  	return 0;
+>  	struct page *ptr_page = virt_to_page(ptr);
+>  	return page_count(ptr_page) == 1;
+>  }
+>  
+> -
+>  #define kvm_pte_table_empty(kvm, ptep) kvm_page_empty(ptep)
+>  #define kvm_pmd_table_empty(kvm, pmdp) kvm_page_empty(pmdp)
+>  #define kvm_pud_table_empty(kvm, pudp) (0)
 > diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> index 3e6859b..a6a8252 100644
+> index a6a8252..39a0903 100644
 > --- a/arch/arm/kvm/mmu.c
 > +++ b/arch/arm/kvm/mmu.c
-> @@ -666,7 +666,7 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
->  		 * Allocate actual first-level Stage-2 page table used by the
->  		 * hardware for Stage-2 page table walks.
->  		 */
-> -		pgd = (pgd_t *)__get_free_pages(GFP_KERNEL | __GFP_ZERO, S2_PGD_ORDER);
-> +		pgd = (pgd_t *)__get_free_pages(KVM_GFP_S2_PGD, S2_PGD_ORDER);
->  	}
+> @@ -290,7 +290,7 @@ static void unmap_range(struct kvm *kvm, pgd_t *pgdp,
+>  	phys_addr_t addr = start, end = start + size;
+>  	phys_addr_t next;
 >  
->  	if (!pgd)
+> -	pgd = pgdp + pgd_index(addr);
+> +	pgd = pgdp + kvm_pgd_index(addr);
+>  	do {
+>  		next = kvm_pgd_addr_end(addr, end);
+>  		if (!pgd_none(*pgd))
+> @@ -355,7 +355,7 @@ static void stage2_flush_memslot(struct kvm *kvm,
+>  	phys_addr_t next;
+>  	pgd_t *pgd;
+>  
+> -	pgd = kvm->arch.pgd + pgd_index(addr);
+> +	pgd = kvm->arch.pgd + kvm_pgd_index(addr);
+>  	do {
+>  		next = kvm_pgd_addr_end(addr, end);
+>  		stage2_flush_puds(kvm, pgd, addr, next);
+> @@ -799,7 +799,7 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
+>  	pgd_t *pgd;
+>  	pud_t *pud;
+>  
+> -	pgd = kvm->arch.pgd + pgd_index(addr);
+> +	pgd = kvm->arch.pgd + kvm_pgd_index(addr);
+>  	if (WARN_ON(pgd_none(*pgd))) {
+>  		if (!cache)
+>  			return NULL;
+> @@ -1089,7 +1089,7 @@ static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+>  	pgd_t *pgd;
+>  	phys_addr_t next;
+>  
+> -	pgd = kvm->arch.pgd + pgd_index(addr);
+> +	pgd = kvm->arch.pgd + kvm_pgd_index(addr);
+>  	do {
+>  		/*
+>  		 * Release kvm_mmu_lock periodically if the memory region is
 > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 6458b53..06c733a 100644
+> index 06c733a..c6300fd 100644
 > --- a/arch/arm64/include/asm/kvm_mmu.h
 > +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -171,6 +171,13 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
->  #define KVM_PREALLOC_LEVEL	(0)
->  #endif
+> @@ -158,6 +158,8 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
+>  #define PTRS_PER_S2_PGD		(1 << PTRS_PER_S2_PGD_SHIFT)
+>  #define S2_PGD_ORDER		get_order(PTRS_PER_S2_PGD * sizeof(pgd_t))
 >  
-> +/*
-> + * We need to ensure that stage-2 PGDs are allocated with a per-page
-> + * refcount, as we fiddle with the refcounts of non-head pages.
-> + * __GFP_COMP forces the allocator to do what we want.
-> + */
-> +#define KVM_GFP_S2_PGD	(GFP_KERNEL | __GFP_ZERO | __GFP_COMP)
+> +#define kvm_pgd_index(addr)	(((addr) >> PGDIR_SHIFT) & (PTRS_PER_S2_PGD - 1))
 > +
->  /**
->   * kvm_prealloc_hwpgd - allocate inital table for VTTBR
->   * @kvm:	The KVM struct pointer for the VM.
-> @@ -192,7 +199,7 @@ static inline int kvm_prealloc_hwpgd(struct kvm *kvm, pgd_t *pgd)
->  	if (KVM_PREALLOC_LEVEL == 0)
->  		return 0;
->  
-> -	hwpgd = __get_free_pages(GFP_KERNEL | __GFP_ZERO, PTRS_PER_S2_PGD_SHIFT);
-> +	hwpgd = __get_free_pages(KVM_GFP_S2_PGD, PTRS_PER_S2_PGD_SHIFT);
->  	if (!hwpgd)
->  		return -ENOMEM;
->  
+>  /*
+>   * If we are concatenating first level stage-2 page tables, we would have less
+>   * than or equal to 16 pointers in the fake PGD, because that's what the
 > -- 
 > 2.1.4
 > 
 
-Thanks,
--Christoffer
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
