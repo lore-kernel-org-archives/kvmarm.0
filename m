@@ -1,173 +1,194 @@
-From: Mario Smarduch <m.smarduch@samsung.com>
-Subject: Re: [RFC/RFT PATCH 0/3] arm64: KVM: work around incoherency with
- uncached guest mappings
-Date: Mon, 02 Mar 2015 18:20:19 -0800
-Message-ID: <54F51A63.4060302@samsung.com>
-References: <1424343286-6792-1-git-send-email-ard.biesheuvel@linaro.org>
- <20150219165731.GA26965@hawk.usersys.redhat.com>
- <CAKv+Gu8Je3RRrgEFCZ7JUWtOgk3WqA_qdBEOPAMc3OqnKr1bwg@mail.gmail.com>
- <20150219175518.GB26965@hawk.usersys.redhat.com> <54E62404.9040702@redhat.com>
- <20150220142905.GA10942@hawk.usersys.redhat.com>
- <CAKv+Gu-YUzmnACZQi98OPRgKKL+gAGqwWYq2-_dwCdNqcktNUg@mail.gmail.com>
- <20150220153626.GB10942@hawk.usersys.redhat.com>
- <20150224145529.GA5498@hawk.usersys.redhat.com>
- <CAKv+Gu-Uk2wg1OkoWgQe4da_EiFoEz_u8VuD8Ees6qU1UYMDvQ@mail.gmail.com>
- <20150302163146.GB9686@lvm>
+From: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+Subject: Re: [PATCH 1/1] iommu/arm-smmu: fix ARM_SMMU_FEAT_TRANS_OPS condition
+Date: Tue, 3 Mar 2015 09:57:44 +0100
+Message-ID: <CAN9JPjF6vu6dd1ZbsDMGETj_+UUXcK-mcO+PH_A6-K2U5Yrc=w@mail.gmail.com>
+References: <1425315442-29584-1-git-send-email-b.reynal@virtualopensystems.com>
+	<20150302172444.GB7919@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CFCA9477B9
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 21:14:24 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1fD3r5LVsC01 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Mar 2015 21:14:22 -0500 (EST)
-Received: from usmailout1.samsung.com (mailout1.w2.samsung.com
- [211.189.100.11])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9D74347790
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Mar 2015 21:14:22 -0500 (EST)
-Received: from uscpsbgex2.samsung.com
- (u123.gpu85.samsung.co.kr [203.254.195.123]) by mailout1.w2.samsung.com
- (Oracle Communications Messaging Server 7u4-24.01(7.0.4.24.0) 64bit (built Nov
- 17 2011)) with ESMTP id <0NKM003H96HVKF80@mailout1.w2.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Mon, 02 Mar 2015 21:20:20 -0500 (EST)
-In-reply-to: <20150302163146.GB9686@lvm>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: KVM devel mailing list <kvm@vger.kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: multipart/mixed; boundary="===============3237994777211180098=="
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20150302172444.GB7919-5wv7dgnIgG8@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>
+Cc: open list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org" <tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, "moderated list:ARM SMMU DRIVER" <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+--===============3237994777211180098==
+Content-Type: multipart/alternative; boundary=001a1144d81235302a05105e87cc
 
-I don't understand how can the CPU handle different cache attributes
-used by
-QEMU and Guest won't you run into B2.9 checklist? Wouldn't cache
-evictions or
-cleans wipe out guest updates to same cache line(s)?
+--001a1144d81235302a05105e87cc
+Content-Type: text/plain; charset=UTF-8
 
-- Mario
+Good point, I didn't thought about it. I will publish a new version with
+your modifications.
+
+Thanks
+
+On Mon, Mar 2, 2015 at 6:24 PM, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org> wrote:
+
+> On Mon, Mar 02, 2015 at 04:57:22PM +0000, Baptiste Reynal wrote:
+> > This patch is a fix to "iommu/arm-smmu: add support for iova_to_phys
+> > through ATS1PR".
+> > According to ARM documentation, translation registers are optional even
+> > in SMMUv1, so ID0_S1TS needs to be checked to verify their presence.
+> >
+> > Signed-off-by: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+> > ---
+> >  drivers/iommu/arm-smmu.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
+> > index fc13dd5..d4beca4 100644
+> > --- a/drivers/iommu/arm-smmu.c
+> > +++ b/drivers/iommu/arm-smmu.c
+> > @@ -1556,7 +1556,7 @@ static int arm_smmu_device_cfg_probe(struct
+> arm_smmu_device *smmu)
+> >               return -ENODEV;
+> >       }
+> >
+> > -     if (smmu->version == 1 || (!(id & ID0_ATOSNS) && (id & ID0_S1TS)))
+> {
+> > +     if ((id & ID0_S1TS) && ((smmu->version == 1) || (id &
+> ID0_ATOSNS))) {
+> >               smmu->features |= ARM_SMMU_FEAT_TRANS_OPS;
+> >               dev_notice(smmu->dev, "\taddress translation ops\n");
+>
+> I'm not sure this is a complete fix. Shouldn't we also check that the
+> domain
+> is a stage-1 domain in arm_smmu_iova_to_phys? (potential fixup below).
+>
+> Will
+>
+> --->8
+>
+> diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
+> index fc13dd56953e..107163295cbc 100644
+> --- a/drivers/iommu/arm-smmu.c
+> +++ b/drivers/iommu/arm-smmu.c
+> @@ -1288,12 +1288,15 @@ static phys_addr_t arm_smmu_iova_to_phys(struct
+> iommu_domain *domain,
+>                 return 0;
+>
+>         spin_lock_irqsave(&smmu_domain->pgtbl_lock, flags);
+> -       if (smmu_domain->smmu->features & ARM_SMMU_FEAT_TRANS_OPS)
+> +
+> +       if (smmu_domain->smmu->features & ARM_SMMU_FEAT_TRANS_OPS &&
+> +           smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
+>                 ret = arm_smmu_iova_to_phys_hard(domain, iova);
+> -       else
+> +       } else {
+>                 ret = ops->iova_to_phys(ops, iova);
+> -       spin_unlock_irqrestore(&smmu_domain->pgtbl_lock, flags);
+> +       }
+>
+> +       spin_unlock_irqrestore(&smmu_domain->pgtbl_lock, flags);
+>         return ret;
+>  }
+>
+>
+
+--001a1144d81235302a05105e87cc
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Good point, I didn&#39;t thought about it. I will pub=
+lish a new version with your modifications.<br><br></div>Thanks<br></div><d=
+iv class=3D"gmail_extra"><br><div class=3D"gmail_quote">On Mon, Mar 2, 2015=
+ at 6:24 PM, Will Deacon <span dir=3D"ltr">&lt;<a href=3D"mailto:will.deaco=
+n@arm.com" target=3D"_blank">will.deacon-5wv7dgnIgG8@public.gmane.org</a>&gt;</span> wrote:<br><=
+blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px=
+ #ccc solid;padding-left:1ex"><div class=3D"HOEnZb"><div class=3D"h5">On Mo=
+n, Mar 02, 2015 at 04:57:22PM +0000, Baptiste Reynal wrote:<br>
+&gt; This patch is a fix to &quot;iommu/arm-smmu: add support for iova_to_p=
+hys<br>
+&gt; through ATS1PR&quot;.<br>
+&gt; According to ARM documentation, translation registers are optional eve=
+n<br>
+&gt; in SMMUv1, so ID0_S1TS needs to be checked to verify their presence.<b=
+r>
+&gt;<br>
+&gt; Signed-off-by: Baptiste Reynal &lt;<a href=3D"mailto:b.reynal@virtualo=
+pensystems.com">b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org</a>&gt;<br>
+&gt; ---<br>
+&gt;=C2=A0 drivers/iommu/arm-smmu.c | 2 +-<br>
+&gt;=C2=A0 1 file changed, 1 insertion(+), 1 deletion(-)<br>
+&gt;<br>
+&gt; diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c<br>
+&gt; index fc13dd5..d4beca4 100644<br>
+&gt; --- a/drivers/iommu/arm-smmu.c<br>
+&gt; +++ b/drivers/iommu/arm-smmu.c<br>
+&gt; @@ -1556,7 +1556,7 @@ static int arm_smmu_device_cfg_probe(struct arm_=
+smmu_device *smmu)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return -ENODEV;<=
+br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+&gt;<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0if (smmu-&gt;version =3D=3D 1 || (!(id &amp; ID0_=
+ATOSNS) &amp;&amp; (id &amp; ID0_S1TS))) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0if ((id &amp; ID0_S1TS) &amp;&amp; ((smmu-&gt;ver=
+sion =3D=3D 1) || (id &amp; ID0_ATOSNS))) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0smmu-&gt;feature=
+s |=3D ARM_SMMU_FEAT_TRANS_OPS;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dev_notice(smmu-=
+&gt;dev, &quot;\taddress translation ops\n&quot;);<br>
+<br>
+</div></div>I&#39;m not sure this is a complete fix. Shouldn&#39;t we also =
+check that the domain<br>
+is a stage-1 domain in arm_smmu_iova_to_phys? (potential fixup below).<br>
+<br>
+Will<br>
+<br>
+---&gt;8<br>
+<br>
+diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c<br>
+index fc13dd56953e..107163295cbc 100644<br>
+--- a/drivers/iommu/arm-smmu.c<br>
++++ b/drivers/iommu/arm-smmu.c<br>
+@@ -1288,12 +1288,15 @@ static phys_addr_t arm_smmu_iova_to_phys(struct iom=
+mu_domain *domain,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 spin_lock_irqsave(&amp;smmu_domain-&gt;pgtbl_lo=
+ck, flags);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0if (smmu_domain-&gt;smmu-&gt;features &amp; ARM=
+_SMMU_FEAT_TRANS_OPS)<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0if (smmu_domain-&gt;smmu-&gt;features &amp; ARM=
+_SMMU_FEAT_TRANS_OPS &amp;&amp;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0smmu_domain-&gt;stage =3D=3D ARM_=
+SMMU_DOMAIN_S1) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D arm_smmu_io=
+va_to_phys_hard(domain, iova);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0else<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0} else {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ret =3D ops-&gt;iov=
+a_to_phys(ops, iova);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0spin_unlock_irqrestore(&amp;smmu_domain-&gt;pgt=
+bl_lock, flags);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0spin_unlock_irqrestore(&amp;smmu_domain-&gt;pgt=
+bl_lock, flags);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return ret;<br>
+=C2=A0}<br>
+<br>
+</blockquote></div><br></div>
+
+--001a1144d81235302a05105e87cc--
+
+--===============3237994777211180098==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
 
-On 03/02/2015 08:31 AM, Christoffer Dall wrote:
-> On Tue, Feb 24, 2015 at 05:47:19PM +0000, Ard Biesheuvel wrote:
->> On 24 February 2015 at 14:55, Andrew Jones <drjones@redhat.com> wrote:
->>> On Fri, Feb 20, 2015 at 04:36:26PM +0100, Andrew Jones wrote:
->>>> On Fri, Feb 20, 2015 at 02:37:25PM +0000, Ard Biesheuvel wrote:
->>>>> On 20 February 2015 at 14:29, Andrew Jones <drjones@redhat.com> wrote:
->>>>>> So looks like the 3 orders of magnitude greater number of traps
->>>>>> (only to el2) don't impact kernel compiles.
->>>>>>
->>>>>
->>>>> OK, good! That was what I was hoping for, obviously.
->>>>>
->>>>>> Then I thought I'd be able to quick measure the number of cycles
->>>>>> a trap to el2 takes with this kvm-unit-tests test
->>>>>>
->>>>>> int main(void)
->>>>>> {
->>>>>>         unsigned long start, end;
->>>>>>         unsigned int sctlr;
->>>>>>
->>>>>>         asm volatile(
->>>>>>         "       mrs %0, sctlr_el1\n"
->>>>>>         "       msr pmcr_el0, %1\n"
->>>>>>         : "=&r" (sctlr) : "r" (5));
->>>>>>
->>>>>>         asm volatile(
->>>>>>         "       mrs %0, pmccntr_el0\n"
->>>>>>         "       msr sctlr_el1, %2\n"
->>>>>>         "       mrs %1, pmccntr_el0\n"
->>>>>>         : "=&r" (start), "=&r" (end) : "r" (sctlr));
->>>>>>
->>>>>>         printf("%llx\n", end - start);
->>>>>>         return 0;
->>>>>> }
->>>>>>
->>>>>> after applying this patch to kvm
->>>>>>
->>>>>> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
->>>>>> index bb91b6fc63861..5de39d740aa58 100644
->>>>>> --- a/arch/arm64/kvm/hyp.S
->>>>>> +++ b/arch/arm64/kvm/hyp.S
->>>>>> @@ -770,7 +770,7 @@
->>>>>>
->>>>>>         mrs     x2, mdcr_el2
->>>>>>         and     x2, x2, #MDCR_EL2_HPMN_MASK
->>>>>> -       orr     x2, x2, #(MDCR_EL2_TPM | MDCR_EL2_TPMCR)
->>>>>> +//     orr     x2, x2, #(MDCR_EL2_TPM | MDCR_EL2_TPMCR)
->>>>>>         orr     x2, x2, #(MDCR_EL2_TDRA | MDCR_EL2_TDOSA)
->>>>>>
->>>>>>         // Check for KVM_ARM64_DEBUG_DIRTY, and set debug to trap
->>>>>>
->>>>>> But I get zero for the cycle count. Not sure what I'm missing.
->>>>>>
->>>>>
->>>>> No clue tbh. Does the counter work as expected in the host?
->>>>>
->>>>
->>>> Guess not. I dropped the test into a module_init and inserted
->>>> it on the host. Always get zero for pmccntr_el0 reads. Or, if
->>>> I set it to something non-zero with a write, then I always get
->>>> that back - no increments. pmcr_el0 looks OK... I had forgotten
->>>> to set bit 31 of pmcntenset_el0, but doing that still doesn't
->>>> help. Anyway, I assume the problem is me. I'll keep looking to
->>>> see what I'm missing.
->>>>
->>>
->>> I returned to this and see that the problem was indeed me. I needed yet
->>> another enable bit set (the filter register needed to be instructed to
->>> count cycles while in el2). I've attached the code for the curious.
->>> The numbers are mean=6999, std_dev=242. Run on the host, or in a guest
->>> running on a host without this patch series (after TVM traps have been
->>> disabled), I get a pretty consistent 40.
->>>
->>> I checked how many vm-sysreg traps we do during the kernel compile
->>> benchmark. It's 124924. So it's a bit strange that we don't see the
->>> benchmark taking 10 to 20 seconds longer on average. I should probably
->>> double check my runs. In any case, while I like the approach of this
->>> series, the overhead is looking non-negligible.
->>>
->>
->> Thanks a lot for producing these numbers. 125k x 7k == <1 billion
->> cycles == <1 second on a >1 GHz machine, I think?
->> Or am I missing something? How long does the actual compile take?
->>
-> I ran a sequence of benchmarks that I occasionally run (pbzip,
-> kernbench, and hackbench) and I also saw < 1% performance degradation,
-> so I think we can trust that somewhat.  (I can post the raw numbers when
-> I have ssh access to my Linux desktop - sending this from Somewhere Over
-> The Atlantic).
-> 
-> However, my concern with these patches are on two points:
-> 
-> 1. It's not a fix-all.  We still have the case where the guest expects
-> the behavior of device memory (for strong ordering for example) on a RAM
-> region, which we now break.  Similiarly this doesn't support the
-> non-coherent DMA to RAM region case.
-> 
-> 2. While the code is probably as nice as this kind of stuff gets, it
-> is non-trivial and extremely difficult to debug.  The counter-point here
-> is that we may end up handling other stuff at EL2 for performanc reasons
-> in the future.
-> 
-> Mainly because of point 1 above, I am leaning to thinking userspace
-> should do the invalidation when it knows it needs to, either through KVM
-> via a memslot flag or through some other syscall mechanism.
-> 
-> Thanks,
-> -Christoffer
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
+--===============3237994777211180098==--
