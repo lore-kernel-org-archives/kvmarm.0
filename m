@@ -1,89 +1,64 @@
-From: Laszlo Ersek <lersek@redhat.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
 Subject: Re: [RFC/RFT PATCH 0/3] arm64: KVM: work around incoherency with
  uncached guest mappings
-Date: Tue, 03 Mar 2015 19:13:48 +0100
-Message-ID: <54F5F9DC.3020206@redhat.com>
+Date: Tue, 3 Mar 2015 18:32:28 +0000
+Message-ID: <20150303183228.GR28951@e104818-lin.cambridge.arm.com>
 References: <1424343286-6792-1-git-send-email-ard.biesheuvel@linaro.org>
- <54F5F090.6090707@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E68D478B5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Mar 2015 13:08:10 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id G6t1GIRjNnSz for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Mar 2015 13:08:03 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BCA9D478A5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Mar 2015 13:08:03 -0500 (EST)
-In-Reply-To: <54F5F090.6090707@suse.de>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, peter.maydell@linaro.org
-Cc: pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1424343286-6792-1-git-send-email-ard.biesheuvel@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: lersek@redhat.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, peter.maydell@linaro.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, agraf@suse.de
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/03/15 18:34, Alexander Graf wrote:
-> On 02/19/2015 11:54 AM, Ard Biesheuvel wrote:
->> This is a 0th order approximation of how we could potentially force
->> the guest
->> to avoid uncached mappings, at least from the moment the MMU is on.
->> (Before
->> that, all of memory is implicitly classified as Device-nGnRnE)
->>
->> The idea (patch #2) is to trap writes to MAIR_EL1, and replace
->> uncached mappings
->> with cached ones. This way, there is no need to mangle any guest page
->> tables.
->>
->> The downside is that, to do this correctly, we need to always trap
->> writes to
->> the VM sysreg group, which includes registers that the guest may write
->> to very
->> often. To reduce the associated performance hit, patch #1 introduces a
->> fast path
->> for EL2 to perform trivial sysreg writes on behalf of the guest,
->> without the
->> need for a full world switch to the host and back.
->>
->> The main purpose of these patches is to quantify the performance hit, and
->> verify whether the MAIR_EL1 handling works correctly.
-> 
-> I gave this a quick spin on a VM running with QEMU.
-> 
->   * VGA output is still distorted, I get random junk black lines in the
-> output in between
->   * When I add -device nec-usb-xhci -device usb-kbd the VM doesn't even
-> boot up
+On Thu, Feb 19, 2015 at 10:54:43AM +0000, Ard Biesheuvel wrote:
+> This is a 0th order approximation of how we could potentially force the guest
+> to avoid uncached mappings, at least from the moment the MMU is on. (Before
+> that, all of memory is implicitly classified as Device-nGnRnE)
 
-Do you also have the dirty page tracking patches in your host kernel? I
-needed both (and got them via Drew's backport, thanks) and then both VGA
-and USB started working fine.
+That's just for data accesses. IIRC instructions are cacheable on ARMv8
+(though I think without allocation in the unified caches).
 
-Without the MAIR patches, I got cache-line size "random" corruptions in
-the VGA display (16 pixel wide small segments). Without dirty page
-tracking, big chunks (sometimes even almost the entire screen) was blank.
+> The idea (patch #2) is to trap writes to MAIR_EL1, and replace uncached mappings
+> with cached ones. This way, there is no need to mangle any guest page tables.
 
-Regarding USB, unless you have both of the patchsets in the host kernel,
-the guest will indeed crash early during boot. Gerd confirmed for me
-that "usb controller (all uhci/ehci/xhci) pci regions see both read
-(status bits) and write (control bits) access". So if there's any
-corruption in there, on read, that looks like a malfunctioning piece of
-hw for the guest kernel, and in this case it happens to crash.
+There is another big downside to this - breaking the guest assumptions
+about the (non-)cacheability of its mappings. It also only works for
+guests that use MAIR_EL1 (LPAE).
 
-> With TCG, both bits work fine.
+We have two main cases where the guest and host cacheability do not
+match:
 
-Yep.
+1. During boot, as you said, when the MMU is off. What we have done in
+   the guest kernel is to invalidate the data ranges that it writes with
+   the MMU off in case there were any speculatively loaded cache lines
+   via the cacheable mappings (in the host). We don't have any nice
+   solution in the host here and MAIR_EL1 tweaking does not work
 
-Thanks
-Laszlo
+2. Guest explicitly creating a non-cacheable mapping (MMU enabled). Here
+   we have two sub-cases:
+   a) guest-only accesses to such mapping. The guest would need to
+      perform cache maintenance as required if it ever accesses such
+      memory via cacheable mappings (we do this already, see the
+      streaming DMA API)
+   b) memory shared with the host: e.g Qemu emulating DMA (frame buffer
+      etc.)
+
+This 2.b case is not any different than the OS dealing with a
+(non-)coherent DMA-capable device. If the device is coherent, the
+DMA buffer in the guest must be coherent as well, otherwise
+non-coherent. Imagine a real VGA device that always snoops CPU caches.
+You would not create a non-cacheable frame buffer mapping since the
+device cannot see the updates and only read stale cache entries.
+
+We don't (can't) have a safe set of DMA ops that would work in both
+cases. So if Qemu cannot use a non-cacheable mapping or cannot perform
+cache maintenance, the only solution is to tell the guest that such
+virtual device is cache _coherent_. This also gives you better
+performance overall anyway.
+
+-- 
+Catalin
