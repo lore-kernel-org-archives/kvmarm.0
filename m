@@ -1,25 +1,25 @@
-From: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v4 0/5] vfio: type1: support for ARM SMMUS with
- VFIO_IOMMU_TYPE1
-Date: Tue, 03 Mar 2015 11:01:55 -0700
-Message-ID: <1425405715.5200.217.camel@redhat.com>
-References: <1425315507-29661-1-git-send-email-b.reynal@virtualopensystems.com>
- <54F5F37E.2070002@linaro.org>
+From: Laszlo Ersek <lersek@redhat.com>
+Subject: Re: [RFC/RFT PATCH 0/3] arm64: KVM: work around incoherency with
+ uncached guest mappings
+Date: Tue, 03 Mar 2015 19:13:48 +0100
+Message-ID: <54F5F9DC.3020206@redhat.com>
+References: <1424343286-6792-1-git-send-email-ard.biesheuvel@linaro.org>
+ <54F5F090.6090707@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 20AE347880
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Mar 2015 12:56:00 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E68D478B5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Mar 2015 13:08:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5+9gF7hfEUu0 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Mar 2015 12:55:58 -0500 (EST)
+ with ESMTP id G6t1GIRjNnSz for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 Mar 2015 13:08:03 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B381F47879
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Mar 2015 12:55:58 -0500 (EST)
-In-Reply-To: <54F5F37E.2070002@linaro.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BCA9D478A5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Mar 2015 13:08:03 -0500 (EST)
+In-Reply-To: <54F5F090.6090707@suse.de>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,77 +29,61 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>
-Cc: iommu@lists.linux-foundation.org, tech@virtualopensystems.com, kvmarm@lists.cs.columbia.edu
+To: Alexander Graf <agraf@suse.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, peter.maydell@linaro.org
+Cc: pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, 2015-03-03 at 18:46 +0100, Eric Auger wrote:
-> Hi Baptiste,
+On 03/03/15 18:34, Alexander Graf wrote:
+> On 02/19/2015 11:54 AM, Ard Biesheuvel wrote:
+>> This is a 0th order approximation of how we could potentially force
+>> the guest
+>> to avoid uncached mappings, at least from the moment the MMU is on.
+>> (Before
+>> that, all of memory is implicitly classified as Device-nGnRnE)
+>>
+>> The idea (patch #2) is to trap writes to MAIR_EL1, and replace
+>> uncached mappings
+>> with cached ones. This way, there is no need to mangle any guest page
+>> tables.
+>>
+>> The downside is that, to do this correctly, we need to always trap
+>> writes to
+>> the VM sysreg group, which includes registers that the guest may write
+>> to very
+>> often. To reduce the associated performance hit, patch #1 introduces a
+>> fast path
+>> for EL2 to perform trivial sysreg writes on behalf of the guest,
+>> without the
+>> need for a full world switch to the host and back.
+>>
+>> The main purpose of these patches is to quantify the performance hit, and
+>> verify whether the MAIR_EL1 handling works correctly.
 > 
-> In "vfio: type1: implement the VFIO_DMA_MAP_FLAG_NOEXEC flag" you still
-> kept domain->caps |= IOMMU_CAP_NOEXEC so potentially overwriting 1<<
-> IOMMU_CAP_CACHE_COHERENCY I guess.
+> I gave this a quick spin on a VM running with QEMU.
 > 
-> Sorry I do not have this 4th patch file in my mailbox.
-> 
-> Best Regards
-> 
-> Eric
-> 
-> 	if (iommu_capable(bus, IOMMU_CAP_CACHE_COHERENCY))
-> 		domain->caps |= (1 << IOMMU_CAP_CACHE_COHERENCY);
-> 
-> 	if (iommu_capable(bus, IOMMU_CAP_NOEXEC))
-> 		domain->caps |= IOMMU_CAP_NOEXEC;
+>   * VGA output is still distorted, I get random junk black lines in the
+> output in between
+>   * When I add -device nec-usb-xhci -device usb-kbd the VM doesn't even
+> boot up
 
+Do you also have the dirty page tracking patches in your host kernel? I
+needed both (and got them via Drew's backport, thanks) and then both VGA
+and USB started working fine.
 
-Patch 4/5 has problems too, vfio_domains_have_iommu_cap() is called with
-IOMMU_CAP_CACHE_COHERENCY, but nobody is shifting that into a bitmap
-before doing the comparison.
+Without the MAIR patches, I got cache-line size "random" corruptions in
+the VGA display (16 pixel wide small segments). Without dirty page
+tracking, big chunks (sometimes even almost the entire screen) was blank.
 
-TBH, I don't see the point of creating this artificial bitmap out of the
-capabilities.  Why can't we keep everything in the domain of actual
-flags passed to iommu_ops functions?  It's just silly to test for cached
-capability and re-invent the mapping flags on every mapping call and
-it's just as easy to generalize a test using the actual flags as to use
-the capabilities, perhaps easier.  Thanks,
+Regarding USB, unless you have both of the patchsets in the host kernel,
+the guest will indeed crash early during boot. Gerd confirmed for me
+that "usb controller (all uhci/ehci/xhci) pci regions see both read
+(status bits) and write (control bits) access". So if there's any
+corruption in there, on read, that looks like a malfunctioning piece of
+hw for the guest kernel, and in this case it happens to crash.
 
-Alex
+> With TCG, both bits work fine.
 
+Yep.
 
-
-> On 03/02/2015 05:58 PM, Baptiste Reynal wrote:
-> > This patch series makes the VFIO_IOMMU_TYPE1 driver buildable on ARM, so it
-> > may be used with ARM SMMUs. It also adds support for the IOMMU_NOEXEC flag
-> > supported by SMMUs adhering to the ARM SMMU specification so the VFIO user can
-> > specify whether the target memory can be executed by the device behind the
-> > SMMU.
-> > 
-> > Changes from v3:
-> >  - Rebased on linux v4.0-rc1
-> >  - Use bit shifting for domain->caps
-> >  - Baptiste Reynal is the new maintainer of this serie
-> > Changes from v2:
-> >  - Rebased on latest iommu/next branch by Joerg Roedel
-> > Changes from v1:
-> >  - Bugfixes and corrected some typos
-> >  - Use enum for VFIO IOMMU driver capabilities
-> > 
-> > Antonios Motakis (5):
-> >   vfio: implement iommu driver capabilities with an enum
-> >   vfio: introduce the VFIO_DMA_MAP_FLAG_NOEXEC flag
-> >   vfio: type1: replace domain wide protection flags with supported
-> >     capabilities
-> >   vfio: type1: replace vfio_domains_have_iommu_cache with generic
-> >     function
-> >   vfio: type1: implement the VFIO_DMA_MAP_FLAG_NOEXEC flag
-> > 
-> >  drivers/vfio/vfio_iommu_type1.c | 91 +++++++++++++++++++++++++++++------------
-> >  include/uapi/linux/vfio.h       | 30 ++++++++------
-> >  2 files changed, 81 insertions(+), 40 deletions(-)
-> > 
-> 
-> _______________________________________________
-> iommu mailing list
-> iommu@lists.linux-foundation.org
-> https://lists.linuxfoundation.org/mailman/listinfo/iommu
+Thanks
+Laszlo
