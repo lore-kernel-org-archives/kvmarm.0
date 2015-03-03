@@ -1,131 +1,64 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH 5/6] target-arm/kvm64: fix save/restore of SPSR regs
-Date: Tue, 03 Mar 2015 11:28:21 +0000
-Message-ID: <874mq27222.fsf@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 1/6] target-arm: kvm: save/restore mp state
+Date: Tue, 3 Mar 2015 20:51:37 +0900
+Message-ID: <CAFEAcA8SaBuH6izzuD6CmknSU9mbQPo0YNO=knTgRCPZ2EvXcQ@mail.gmail.com>
 References: <1424880159-29348-1-git-send-email-alex.bennee@linaro.org>
- <1424880159-29348-7-git-send-email-alex.bennee@linaro.org>
- <20150302172212.GB10137@lvm>
+ <1424880159-29348-2-git-send-email-alex.bennee@linaro.org>
+ <CAFEAcA9oWeYGYcGtf8So6VrYLMXjWr4FiZ2tS+jBnDtv87jAKw@mail.gmail.com>
+ <8761ai73j1.fsf@linaro.org> <54F595C0.5060004@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 14C3746972
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Mar 2015 06:22:25 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id z7aFxqE+O3lX for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Mar 2015 06:22:23 -0500 (EST)
-Received: from socrates.bennee.com
- (static.88-198-71-155.clients.your-server.de [88.198.71.155])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CAAB3477EB
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Mar 2015 06:22:23 -0500 (EST)
-In-reply-to: <20150302172212.GB10137@lvm>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <54F595C0.5060004@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkNocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4gd3JpdGVzOgoK
-PiBIaSBBbGV4LAo+Cj4gU2VlbXMgbGlrZSB5b3UgYWNjaWRlbnRhbGx5IHNlbnQgb3V0IHR3byBj
-b3BpZXMgb2YgdGhpcyBwYXRjaCwgaG9wZWZ1bGx5Cj4gSSdtIHJldmlld2luZyB0aGUgcmlnaHQg
-b25lLi4uCgpPb3BzLCBwZXJpbHMgb2Ygbm90IHdpcGluZyB5b3VyIG91dHB1dCBkaXJlY3Rvcnku
-IEkgdGhpbmsgaXQgd2FzIGp1c3QgYQp0aXRsZSB0d2VhayEKCj4gT24gV2VkLCBGZWIgMjUsIDIw
-MTUgYXQgMDQ6MDI6MzhQTSArMDAwMCwgQWxleCBCZW5uw6llIHdyb3RlOgo+PiBGcm9tOiBDaHJp
-c3RvZmZlciBEYWxsIDxjaHJpc3RvZmZlci5kYWxsQGxpbmFyby5vcmc+Cj4+IAo+PiBUaGUgY3Vy
-cmVudCBjb2RlIHdhcyBuZWdhdGl2ZWx5IGluZGV4aW5nIHRoZSBjcHUgc3RhdGUgYXJyYXkgYW5k
-IG5vdAo+PiBzeW5jaHJvbml6aW5nIGJhbmtlZCBzcHNyIHJlZ2lzdGVyIHN0YXRlIHdpdGggdGhl
-IGN1cnJlbnQgbW9kZSdzIHNwc3IKPj4gc3RhdGUsIGNhdXNpbmcgb2NjYXNpb25hbCBmYWlsdXJl
-cyB3aXRoIG1pZ3JhdGlvbi4KPj4gCj4+IFNvbWUgbXVuZ2luZyBpcyBkb25lIHRvIHRha2UgY2Fy
-ZSBvZiB0aGUgYWFyY2g2NCBtYXBwaW5nIGFuZCBhbHNvIHRvCj4+IGVuc3VyZSB0aGUgbW9zdCBj
-dXJyZW50IHZhbHVlIG9mIHRoZSBzcHNyIGlzIHVwZGF0ZWQgdG8gdGhlIGJhbmtlZAo+PiByZWdp
-c3RlcnMgKHJlbGV2YW50IGZvciBLVk08LT5UQ0cgbWlncmF0aW9uKS4KPj4gCj4+IFNpZ25lZC1v
-ZmYtYnk6IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4KPj4g
-U2lnbmVkLW9mZi1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgo+PiAK
-Pj4gLS0tCj4+IHYyIChhamIpCj4+ICAgLSBtaW5vciB0d2Vha3MgYW5kIGNsYXJpZmljYXRpb25z
-Cj4+IAo+PiBkaWZmIC0tZ2l0IGEvdGFyZ2V0LWFybS9rdm02NC5jIGIvdGFyZ2V0LWFybS9rdm02
-NC5jCj4+IGluZGV4IGM2MGU5ODkuLjFlMzZiMGEgMTAwNjQ0Cj4+IC0tLSBhL3RhcmdldC1hcm0v
-a3ZtNjQuYwo+PiArKysgYi90YXJnZXQtYXJtL2t2bTY0LmMKPj4gQEAgLTE0MCw2ICsxNDAsNyBA
-QCBpbnQga3ZtX2FyY2hfcHV0X3JlZ2lzdGVycyhDUFVTdGF0ZSAqY3MsIGludCBsZXZlbCkKPj4g
-ICAgICB1aW50NjRfdCB2YWw7Cj4+ICAgICAgaW50IGk7Cj4+ICAgICAgaW50IHJldDsKPj4gKyAg
-ICB1bnNpZ25lZCBpbnQgZWw7Cj4+ICAKPj4gICAgICBBUk1DUFUgKmNwdSA9IEFSTV9DUFUoY3Mp
-Owo+PiAgICAgIENQVUFSTVN0YXRlICplbnYgPSAmY3B1LT5lbnY7Cj4+IEBAIC0yMDYsOSArMjA3
-LDI1IEBAIGludCBrdm1fYXJjaF9wdXRfcmVnaXN0ZXJzKENQVVN0YXRlICpjcywgaW50IGxldmVs
-KQo+PiAgICAgICAgICByZXR1cm4gcmV0Owo+PiAgICAgIH0KPj4gIAo+PiArICAgIC8qIFNhdmVk
-IFByb2dyYW0gU3RhdGUgUmVnaXN0ZXJzCj4+ICsgICAgICoKPj4gKyAgICAgKiBCZWZvcmUgd2Ug
-cmVzdG9yZSBmcm9tIHRoZSBiYW5rZWRfc3BzcltdIGFycmF5IHdlIG5lZWQgdG8KPj4gKyAgICAg
-KiBlbnN1cmUgdGhhdCBhbnkgbW9kaWZpY2F0aW9ucyB0byBlbnYtPnNwc3IgYXJlIGNvcnJlY3Rs
-eQo+PiArICAgICAqIHJlZmxlY3RlZCBhbmQgbWFwIGFhcmNoNjQgZXhjZXB0aW9uIGxldmVscyBp
-ZiByZXF1aXJlZC4KPj4gKyAgICAgKi8KPj4gKyAgICBlbCA9IGFybV9jdXJyZW50X2VsKGVudik7
-Cj4+ICsgICAgaWYgKGlzX2E2NChlbnYpICYmIGVsID4gMCkgewo+PiArICAgICAgICBnX2Fzc2Vy
-dChlbCA9PSAxKTsKPj4gKyAgICAgICAgLyogS1ZNIG1hcHMgS1ZNX1NQU1JfU1ZDIHRvIEtWTV9T
-UFNSX0VMMSBmb3IgYWFyY2g2NCAqLwo+PiArICAgICAgICBlbnYtPmJhbmtlZF9zcHNyWzFdID0g
-ZW52LT5iYW5rZWRfc3BzclswXTsKPj4gKyAgICAgICAgZW52LT5iYW5rZWRfc3BzclthYXJjaDY0
-X2JhbmtlZF9zcHNyX2luZGV4KGVsKV0gPSBlbnYtPnNwc3I7Cj4+ICsgICAgfSBlbHNlIHsKPj4g
-KyAgICAgICAgZW52LT5iYW5rZWRfc3BzcltlbF0gPSBlbnYtPnNwc3I7Cj4KPiBpcyB0aGlzIHZh
-bGlkIGlmIChpc19hNjQoZW52KSAmJiBlbCA9PSAwKSkgPyAgSSB0aG91Z2h0IHRoYXQgaWYgeW91
-J3JlCj4gaW4gZWwgPT0gMCwgdGhlbiBlbnYtPmJhbmtlZF9zcHNyW3hdIGlzIHRoZSBtb3N0IHVw
-LXRvLWRhdGUgb25lLCBub3QKPiBlbnYtPnNwc3IgPwoKQWN0dWFsbHkgdGhleSB3aWxsIGJvdGgg
-YmUgdGhlIHNhbWUgKGF0IGxlYXN0IGZvciBLVk0pLiBJbiB0aGUgZW5kIGJvdGg6CgogICAgICAg
-IFZNU1RBVEVfVUlOVDMyKGVudi5zcHNyLCBBUk1DUFUpLAogICAgICAgIFZNU1RBVEVfVUlOVDY0
-X0FSUkFZKGVudi5iYW5rZWRfc3BzciwgQVJNQ1BVLCA4KSwKCmdldCBzZXJpYWxpc2VkIGluIHRo
-ZSBzdHJlYW0gYW5kIHdoZW4gd2Ugc2F2ZSB0aGUgc3RyZWFtIG91dCB3ZSBtYWtlCnN1cmUgZXZl
-cnl0aGluZyBpcyBpbiBzeW5jIChpLmUuIGVudi0+c3BzciBpcyBjb3JyZWN0KS4gSW4gcmVhbGl0
-eSB0aGlzCm1ha2VzIG1vcmUgc2Vuc2UgZm9yIFRDRyB0aGFuIEtWTSB3aGljaCBpcyB0aGUgb25s
-eSByZWFzb24gZW52LT5zcHNyCmV4aXN0cy4KCj4KPiBmb3IgIWlzX2E2NChlbnYpIHRoaXMgbG9v
-a3Mgd3JvbmcsIGJlY2F1c2Ugb2YgdGhlIHNhbWUgYXMgYWJvdmUgaWYgZWwgPT0KPiAwLCBidXQg
-YWxzbyBiZWNhdXNlIEkgdGhpbmsgeW91IG5lZWQKPiBiYW5rX251bWJlcihlbnYtPnVuY2FjaGVk
-X2Nwc3IgJiBDUFNSX00pIHRvIGluZGV4IGludG8gdGhlIGFycmF5Lgo+CgpHb29kIGNhdGNoLiBG
-b3Igc29tZSByZWFzb24gSSB3YXMgdHJlYXRpbmcgdGhlIG51bWJlciBmcm9tCmFybV9jdXJyZW50
-X2VsKCkgYXMgZXF1aXZhbGVudC4gSG93IGFib3V0OgoKICAgIGVsID0gYXJtX2N1cnJlbnRfZWwo
-ZW52KTsKICAgIGlmIChpc19hNjQoZW52KSAmJiBlbCA+IDApIHsKICAgICAgICBnX2Fzc2VydChl
-bCA9PSAxKTsKICAgICAgICAvKiBLVk0gb25seSBtYXBzIEtWTV9TUFNSX1NWQyB0byBLVk1fU1BT
-Ul9FTDEgZm9yIGFhcmNoNjQgQVRNICovCiAgICAgICAgZW52LT5iYW5rZWRfc3BzclsxXSA9IGVu
-di0+YmFua2VkX3Nwc3JbMF07CiAgICB9CiAgICBpID0gaXNfYTY0KGVudikgPwogICAgICAgIGFh
-cmNoNjRfYmFua2VkX3Nwc3JfaW5kZXgoZWwpIDogYmFua19udW1iZXIoZW52LT51bmFjaGVkX2Nw
-c3IgJiBDUFNSX00pOwogICAgZW52LT5iYW5rZWRfc3BzcltpXSA9IGVudi0+c3BzcjsKCgo+PiAr
-ICAgIH0KPj4gKwo+PiAgICAgIGZvciAoaSA9IDA7IGkgPCBLVk1fTlJfU1BTUjsgaSsrKSB7Cj4+
-ICAgICAgICAgIHJlZy5pZCA9IEFBUkNINjRfQ09SRV9SRUcoc3BzcltpXSk7Cj4+IC0gICAgICAg
-IHJlZy5hZGRyID0gKHVpbnRwdHJfdCkgJmVudi0+YmFua2VkX3Nwc3JbaSAtIDFdOwo+PiArICAg
-ICAgICByZWcuYWRkciA9ICh1aW50cHRyX3QpICZlbnYtPmJhbmtlZF9zcHNyW2krMV07Cj4+ICAg
-ICAgICAgIHJldCA9IGt2bV92Y3B1X2lvY3RsKGNzLCBLVk1fU0VUX09ORV9SRUcsICZyZWcpOwo+
-PiAgICAgICAgICBpZiAocmV0KSB7Cj4+ICAgICAgICAgICAgICByZXR1cm4gcmV0Owo+PiBAQCAt
-MjUzLDYgKzI3MCw3IEBAIGludCBrdm1fYXJjaF9nZXRfcmVnaXN0ZXJzKENQVVN0YXRlICpjcykK
-Pj4gICAgICBzdHJ1Y3Qga3ZtX29uZV9yZWcgcmVnOwo+PiAgICAgIHVpbnQ2NF90IHZhbDsKPj4g
-ICAgICB1aW50MzJfdCBmcHI7Cj4+ICsgICAgdW5zaWduZWQgaW50IGVsOwo+PiAgICAgIGludCBp
-Owo+PiAgICAgIGludCByZXQ7Cj4+ICAKPj4gQEAgLTMyNSwxNSArMzQzLDMyIEBAIGludCBrdm1f
-YXJjaF9nZXRfcmVnaXN0ZXJzKENQVVN0YXRlICpjcykKPj4gICAgICAgICAgcmV0dXJuIHJldDsK
-Pj4gICAgICB9Cj4+ICAKPj4gKyAgICAvKiBGZXRjaCB0aGUgU1BTUiByZWdpc3RlcnMKPj4gKyAg
-ICAgKgo+PiArICAgICAqIEtWTSBoYXMgYW4gYXJyYXkgb2Ygc3RhdGUgaW5kZXhlZCBmb3IgYWxs
-IHRoZSBwb3NzaWJsZSBhYXJjaDMyCj4+ICsgICAgICogcHJpdmlsYWdlIGxldmVscy4gQWx0aG91
-Z2ggbm90IGFsbCBhcmUgdmFsaWQgYXQgYWxsIHBvaW50cwo+PiArICAgICAqIHRoZXJlIGFyZSBz
-b21lIHRyYW5zaXRpb25zIHBvc3NpYmxlIHdoaWNoIGNhbiBhY2Nlc3Mgb2xkIHN0YXRlCj4+ICsg
-ICAgICogc28gaXQgaXMgd29ydGgga2VlcGluZyB0aGVtIGFsbC4KPj4gKyAgICAgKi8KPj4gICAg
-ICBmb3IgKGkgPSAwOyBpIDwgS1ZNX05SX1NQU1I7IGkrKykgewo+PiAgICAgICAgICByZWcuaWQg
-PSBBQVJDSDY0X0NPUkVfUkVHKHNwc3JbaV0pOwo+PiAtICAgICAgICByZWcuYWRkciA9ICh1aW50
-cHRyX3QpICZlbnYtPmJhbmtlZF9zcHNyW2kgLSAxXTsKPj4gKyAgICAgICAgcmVnLmFkZHIgPSAo
-dWludHB0cl90KSAmZW52LT5iYW5rZWRfc3BzcltpKzFdOwo+PiAgICAgICAgICByZXQgPSBrdm1f
-dmNwdV9pb2N0bChjcywgS1ZNX0dFVF9PTkVfUkVHLCAmcmVnKTsKPj4gICAgICAgICAgaWYgKHJl
-dCkgewo+PiAgICAgICAgICAgICAgcmV0dXJuIHJldDsKPj4gICAgICAgICAgfQo+PiAgICAgIH0K
-Pj4gIAo+PiArICAgIGVsID0gYXJtX2N1cnJlbnRfZWwoZW52KTsKPj4gKyAgICBpZiAoaXNfYTY0
-KGVudikgJiYgZWwgPiAwKSB7Cj4+ICsgICAgICAgIGdfYXNzZXJ0KGVsID09IDEpOwo+PiArICAg
-ICAgICAvKiBLVk0gbWFwcyBLVk1fU1BTUl9TVkMgdG8gS1ZNX1NQU1JfRUwxIGZvciBhYXJjaDY0
-ICovCj4+ICsgICAgICAgIGVudi0+YmFua2VkX3Nwc3JbMF0gPSBlbnYtPmJhbmtlZF9zcHNyWzFd
-Owo+PiArICAgICAgICBlbnYtPnNwc3IgPSBlbnYtPmJhbmtlZF9zcHNyW2FhcmNoNjRfYmFua2Vk
-X3Nwc3JfaW5kZXgoZWwpXTsKPj4gKyAgICB9IGVsc2Ugewo+PiArICAgICAgICBlbnYtPnNwc3Ig
-PSBlbnYtPmJhbmtlZF9zcHNyW2VsXTsKPgo+IHNhbWUgY29uY2VybiB3aXRoIGJhbmtfbnVtYmVy
-IGFzIGFib3ZlLgo+Cj4+ICsgICAgfQo+PiArCj4+ICAgICAgLyogQWR2YW5jZWQgU0lNRCBhbmQg
-RlAgcmVnaXN0ZXJzICovCj4+ICAgICAgZm9yIChpID0gMDsgaSA8IDMyOyBpKyspIHsKPj4gICAg
-ICAgICAgcmVnLmlkID0gQUFSQ0g2NF9TSU1EX0NPUkVfUkVHKGZwX3JlZ3MudnJlZ3NbaV0pOwo+
-PiAtLSAKPj4gMi4zLjAKPj4gCj4KPiBUaGFua3MsCj4gLUNocmlzdG9mZmVyCgotLSAKQWxleCBC
-ZW5uw6llCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2
-bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xp
-c3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On 3 March 2015 at 20:06, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+>
+> On 03/03/2015 11:56, Alex Benn=C3=A9e wrote:
+>> > > This adds the saving and restore of the current Multi-Processing=
+ state
+>> > > of the machine. While the KVM_GET/SET_MP_STATE API exposes a num=
+ber of
+>> > > potential states for x86 we only use two for ARM. Either the pro=
+cess is
+>> > > running or not.
+>> >
+>> > By this you mean "is the CPU in the PSCI powered down state or not=
+",
+>> > right?
+>>
+>> From the vcpu's perspective it is either running or not. However it =
+is
+>> the same mechanism that is used when PSCI_0_2_FN_CPU_OFF is passed t=
+he
+>> VM, internally setting vcpu->arch.paused.
+
+Well, it has to be (ABI defined to be) identical with being PSCI
+powered down/up, because that's how userspace is going to be
+treating it. If we might tell userspace we're in the "not running"
+state for other cases than PSCI-powered-down then we probably need
+to consider separating those out into separate states.
+
+> I suggest that you define a new MP_STATE constant for this.  HALTED i=
+n
+> x86 and s390 is the state an ARM processor enters when you execute wf=
+i.
+
+Architecturally the CPU doesn't have to enter any state at all
+if you execute a WFI -- it might be implemented as "go to low
+power state and wait for an interrupt" or "go low power but
+maybe be unnecessarily woken up" or "nop, do nothing"...
+
+>  Right now this is not migrated on ARM if I remember correctly, but
+> perhaps you'll want to add it in the future.
+
+=2E..which is why we don't need to migrate this: it just means
+that migration during WFI causes an unnecessary-wakeup, which
+is architecturally fine.
+
+-- PMM
