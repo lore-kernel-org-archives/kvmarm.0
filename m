@@ -1,26 +1,26 @@
-From: Baptiste Reynal <b.reynal@virtualopensystems.com>
-Subject: Re: [PATCH v4 0/5] vfio: type1: support for ARM SMMUS with
- VFIO_IOMMU_TYPE1
-Date: Tue, 3 Mar 2015 11:07:16 +0100
-Message-ID: <CAN9JPjFMLYFyRQ9i+9-K80H9C=zkroPDZ4cBk82g6Hyh=W0+gQ@mail.gmail.com>
-References: <1425315507-29661-1-git-send-email-b.reynal@virtualopensystems.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH 1/6] target-arm: kvm: save/restore mp state
+Date: Tue, 03 Mar 2015 10:56:34 +0000
+Message-ID: <8761ai73j1.fsf@linaro.org>
+References: <1424880159-29348-1-git-send-email-alex.bennee@linaro.org>
+ <1424880159-29348-2-git-send-email-alex.bennee@linaro.org>
+ <CAFEAcA9oWeYGYcGtf8So6VrYLMXjWr4FiZ2tS+jBnDtv87jAKw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============8884118132916334700=="
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B92BE47811
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Mar 2015 05:01:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D4BE64781C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Mar 2015 05:50:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Bfn13XqLQRSM for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Mar 2015 05:01:17 -0500 (EST)
-Received: from mail-qc0-f174.google.com (mail-qc0-f174.google.com
- [209.85.216.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F12E84780E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Mar 2015 05:01:16 -0500 (EST)
-Received: by qcwb13 with SMTP id b13so29463220qcw.7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 03 Mar 2015 02:07:16 -0800 (PST)
-In-Reply-To: <1425315507-29661-1-git-send-email-b.reynal@virtualopensystems.com>
+ with ESMTP id HUY2IxMOs4Fo for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 Mar 2015 05:50:40 -0500 (EST)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 456FA47819
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Mar 2015 05:50:39 -0500 (EST)
+In-reply-to: <CAFEAcA9oWeYGYcGtf8So6VrYLMXjWr4FiZ2tS+jBnDtv87jAKw@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,118 +30,82 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Linux IOMMU <iommu@lists.linux-foundation.org>, kvm-arm <kvmarm@lists.cs.columbia.edu>
-Cc: VirtualOpenSystems Technical Team <tech@virtualopensystems.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============8884118132916334700==
-Content-Type: multipart/alternative; boundary=001a11490592d65c7b05105f7fdb
-
---001a11490592d65c7b05105f7fdb
-Content-Type: text/plain; charset=UTF-8
-
-Added Eric Auger for comments.
-
-On Mon, Mar 2, 2015 at 5:58 PM, Baptiste Reynal <
-b.reynal@virtualopensystems.com> wrote:
-
-> This patch series makes the VFIO_IOMMU_TYPE1 driver buildable on ARM, so it
-> may be used with ARM SMMUs. It also adds support for the IOMMU_NOEXEC flag
-> supported by SMMUs adhering to the ARM SMMU specification so the VFIO user
-> can
-> specify whether the target memory can be executed by the device behind the
-> SMMU.
->
-> Changes from v3:
->  - Rebased on linux v4.0-rc1
->  - Use bit shifting for domain->caps
->  - Baptiste Reynal is the new maintainer of this serie
-> Changes from v2:
->  - Rebased on latest iommu/next branch by Joerg Roedel
-> Changes from v1:
->  - Bugfixes and corrected some typos
->  - Use enum for VFIO IOMMU driver capabilities
->
-> Antonios Motakis (5):
->   vfio: implement iommu driver capabilities with an enum
->   vfio: introduce the VFIO_DMA_MAP_FLAG_NOEXEC flag
->   vfio: type1: replace domain wide protection flags with supported
->     capabilities
->   vfio: type1: replace vfio_domains_have_iommu_cache with generic
->     function
->   vfio: type1: implement the VFIO_DMA_MAP_FLAG_NOEXEC flag
->
->  drivers/vfio/vfio_iommu_type1.c | 91
-> +++++++++++++++++++++++++++++------------
->  include/uapi/linux/vfio.h       | 30 ++++++++------
->  2 files changed, 81 insertions(+), 40 deletions(-)
->
-> --
-> 2.3.1
->
->
-
---001a11490592d65c7b05105f7fdb
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Added Eric Auger for comments.</div><div class=3D"gmail_ex=
-tra"><br><div class=3D"gmail_quote">On Mon, Mar 2, 2015 at 5:58 PM, Baptist=
-e Reynal <span dir=3D"ltr">&lt;<a href=3D"mailto:b.reynal@virtualopensystem=
-s.com" target=3D"_blank">b.reynal@virtualopensystems.com</a>&gt;</span> wro=
-te:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-=
-left:1px #ccc solid;padding-left:1ex"><div class=3D"HOEnZb"><div class=3D"h=
-5">This patch series makes the VFIO_IOMMU_TYPE1 driver buildable on ARM, so=
- it<br>
-may be used with ARM SMMUs. It also adds support for the IOMMU_NOEXEC flag<=
-br>
-supported by SMMUs adhering to the ARM SMMU specification so the VFIO user =
-can<br>
-specify whether the target memory can be executed by the device behind the<=
-br>
-SMMU.<br>
-<br>
-Changes from v3:<br>
-=C2=A0- Rebased on linux v4.0-rc1<br>
-=C2=A0- Use bit shifting for domain-&gt;caps<br>
-=C2=A0- Baptiste Reynal is the new maintainer of this serie<br>
-Changes from v2:<br>
-=C2=A0- Rebased on latest iommu/next branch by Joerg Roedel<br>
-Changes from v1:<br>
-=C2=A0- Bugfixes and corrected some typos<br>
-=C2=A0- Use enum for VFIO IOMMU driver capabilities<br>
-<br>
-Antonios Motakis (5):<br>
-=C2=A0 vfio: implement iommu driver capabilities with an enum<br>
-=C2=A0 vfio: introduce the VFIO_DMA_MAP_FLAG_NOEXEC flag<br>
-=C2=A0 vfio: type1: replace domain wide protection flags with supported<br>
-=C2=A0 =C2=A0 capabilities<br>
-=C2=A0 vfio: type1: replace vfio_domains_have_iommu_cache with generic<br>
-=C2=A0 =C2=A0 function<br>
-=C2=A0 vfio: type1: implement the VFIO_DMA_MAP_FLAG_NOEXEC flag<br>
-<br>
-=C2=A0drivers/vfio/vfio_iommu_type1.c | 91 +++++++++++++++++++++++++++++---=
----------<br>
-=C2=A0include/uapi/linux/vfio.h=C2=A0 =C2=A0 =C2=A0 =C2=A0| 30 ++++++++----=
---<br>
-=C2=A02 files changed, 81 insertions(+), 40 deletions(-)<br>
-<br>
---<br>
-2.3.1<br>
-<br>
-</div></div></blockquote></div><br></div>
-
---001a11490592d65c7b05105f7fdb--
-
---===============8884118132916334700==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============8884118132916334700==--
+ClBldGVyIE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz4gd3JpdGVzOgoKPiBPbiAy
+NiBGZWJydWFyeSAyMDE1IGF0IDAxOjAyLCBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFy
+by5vcmc+IHdyb3RlOgo+PiBUaGlzIGFkZHMgdGhlIHNhdmluZyBhbmQgcmVzdG9yZSBvZiB0aGUg
+Y3VycmVudCBNdWx0aS1Qcm9jZXNzaW5nIHN0YXRlCj4+IG9mIHRoZSBtYWNoaW5lLiBXaGlsZSB0
+aGUgS1ZNX0dFVC9TRVRfTVBfU1RBVEUgQVBJIGV4cG9zZXMgYSBudW1iZXIgb2YKPj4gcG90ZW50
+aWFsIHN0YXRlcyBmb3IgeDg2IHdlIG9ubHkgdXNlIHR3byBmb3IgQVJNLiBFaXRoZXIgdGhlIHBy
+b2Nlc3MgaXMKPj4gcnVubmluZyBvciBub3QuCj4KPiBCeSB0aGlzIHlvdSBtZWFuICJpcyB0aGUg
+Q1BVIGluIHRoZSBQU0NJIHBvd2VyZWQgZG93biBzdGF0ZSBvciBub3QiLAo+IHJpZ2h0PwoKRnJv
+bSB0aGUgdmNwdSdzIHBlcnNwZWN0aXZlIGl0IGlzIGVpdGhlciBydW5uaW5nIG9yIG5vdC4gSG93
+ZXZlciBpdCBpcwp0aGUgc2FtZSBtZWNoYW5pc20gdGhhdCBpcyB1c2VkIHdoZW4gUFNDSV8wXzJf
+Rk5fQ1BVX09GRiBpcyBwYXNzZWQgdGhlClZNLCBpbnRlcm5hbGx5IHNldHRpbmcgdmNwdS0+YXJj
+aC5wYXVzZWQuCgo+Cj4+IFNpZ25lZC1vZmYtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVA
+bGluYXJvLm9yZz4KPj4KPj4gZGlmZiAtLWdpdCBhL3RhcmdldC1hcm0va3ZtLmMgYi90YXJnZXQt
+YXJtL2t2bS5jCj4+IGluZGV4IDIzY2VmZTkuLjg3MzI4NTQgMTAwNjQ0Cj4+IC0tLSBhL3Rhcmdl
+dC1hcm0va3ZtLmMKPj4gKysrIGIvdGFyZ2V0LWFybS9rdm0uYwo+PiBAQCAtMjUsNiArMjUsNyBA
+QAo+PiAgI2luY2x1ZGUgImh3L2FybS9hcm0uaCIKPj4KPj4gIGNvbnN0IEtWTUNhcGFiaWxpdHlJ
+bmZvIGt2bV9hcmNoX3JlcXVpcmVkX2NhcGFiaWxpdGllc1tdID0gewo+PiArICAgIEtWTV9DQVBf
+SU5GTyhNUF9TVEFURSksCj4KPiBEb2VzIHRoaXMgcmVhbGx5IHdhbnQgdG8gYmUgYSByZXF1aXJl
+ZCBjYXA/IEkgaGF2ZW4ndCBjaGVja2VkLAo+IGJ1dCBhc3N1bWluZyAncmVxdWlyZWQnIG1lYW5z
+IHdoYXQgaXQgc2F5cyB0aGlzIHByZXN1bWFibHkKPiBtZWFucyB3ZSdsbCBzdG9wIHdvcmtpbmcg
+b24gaG9zdCBrZXJuZWxzIHdlIHByZXZpb3VzbHkgcmFuCj4gZmluZSBvbiAoZXZlbiBpZiBtaWdy
+YXRpb24gZGlkbid0IHdvcmsgdGhlcmUpLgoKWW91IGFyZSByaWdodCwgSSdsbCBtb3ZlIHRoZSBD
+QVAgY2hlY2sgdG8gdGhlIGt2bV9lbmFibGVkKCkgbGVnIG9mCmdldC9zZXQgZnVuY3Rpb25zLgoK
+Pgo+PiAgICAgIEtWTV9DQVBfTEFTVF9JTkZPCj4+ICB9Owo+Pgo+PiBkaWZmIC0tZ2l0IGEvdGFy
+Z2V0LWFybS9tYWNoaW5lLmMgYi90YXJnZXQtYXJtL21hY2hpbmUuYwo+PiBpbmRleCA5NDQ2ZTVh
+Li43MGIxYmM0IDEwMDY0NAo+PiAtLS0gYS90YXJnZXQtYXJtL21hY2hpbmUuYwo+PiArKysgYi90
+YXJnZXQtYXJtL21hY2hpbmUuYwo+PiBAQCAtMTYxLDYgKzE2MSwzNCBAQCBzdGF0aWMgY29uc3Qg
+Vk1TdGF0ZUluZm8gdm1zdGF0ZV9jcHNyID0gewo+PiAgICAgIC5wdXQgPSBwdXRfY3BzciwKPj4g
+IH07Cj4+Cj4+ICsjaWYgZGVmaW5lZCBDT05GSUdfS1ZNCj4+ICtzdGF0aWMgaW50IGdldF9tcHN0
+YXRlKFFFTVVGaWxlICpmLCB2b2lkICpvcGFxdWUsIHNpemVfdCBzaXplKQo+PiArewo+PiArICAg
+IEFSTUNQVSAqY3B1ID0gb3BhcXVlOwo+PiArICAgIHN0cnVjdCBrdm1fbXBfc3RhdGUgbXBfc3Rh
+dGUgPSB7IC5tcF9zdGF0ZSA9ICBxZW11X2dldF9iZTMyKGYpfTsKPj4gKyAgICByZXR1cm4ga3Zt
+X3ZjcHVfaW9jdGwoQ1BVKGNwdSksIEtWTV9TRVRfTVBfU1RBVEUsICZtcF9zdGF0ZSk7Cj4+ICt9
+Cj4KPiBXb24ndCB0aGlzIGJyZWFrIGlmIHlvdSdyZSBydW5uaW5nIGEgUUVNVSBidWlsdCB3aXRo
+IEtWTQo+IHN1cHBvcnQgaW4gVENHIG1vZGUgb24gYW4gYWFyY2g2NCBob3N0Pwo+Cj4gSW4gYW55
+IGNhc2UsIGZvciB0aGF0IGNvbmZpZ3VyYXRpb24gd2Ugc2hvdWxkIGJlIG1pZ3JhdGluZyB0aGUK
+PiBUQ0cgY3B1LT5wb3dlcmVkX29mZiBmbGFnLCB3aGljaCBpcyB3aGVyZSB3ZSBrZWVwIHRoZSBQ
+U0NJCj4gcG93ZXIgc3RhdGUgZm9yIFRDRy4KClllYWgsIEknbGwgbWFrZSB0aGUgYWNjZXNzIGZ1
+bmN0aW9ucyBhd2FyZSBvZiB0aGUgbW9kZS4gSW4gaXRzZWxmIGl0Cndvbid0IGVuYWJsZSBLVk08
+LT5UQ0cgbWlncmF0aW9uIHRob3VnaCEKCj4KPj4gKwo+PiArc3RhdGljIHZvaWQgcHV0X21wc3Rh
+dGUoUUVNVUZpbGUgKmYsIHZvaWQgKm9wYXF1ZSwgc2l6ZV90IHNpemUpCj4+ICt7Cj4+ICsgICAg
+QVJNQ1BVICpjcHUgPSBvcGFxdWU7Cj4+ICsgICAgc3RydWN0IGt2bV9tcF9zdGF0ZSBtcF9zdGF0
+ZTsKPj4gKyAgICBpbnQgcmV0ID0ga3ZtX3ZjcHVfaW9jdGwoQ1BVKGNwdSksIEtWTV9HRVRfTVBf
+U1RBVEUsICZtcF9zdGF0ZSk7Cj4+ICsgICAgaWYgKHJldCkgewo+PiArICAgICAgICBmcHJpbnRm
+KHN0ZGVyciwgIiVzOiBmYWlsZWQgdG8gZ2V0IE1QX1NUQVRFICVkLyVzXG4iLAo+PiArICAgICAg
+ICAgICAgICAgIF9fZnVuY19fLCByZXQsIHN0cmVycm9yKHJldCkpOwo+PiArICAgICAgICBhYm9y
+dCgpOwo+PiArICAgIH0KPj4gKyAgICBxZW11X3B1dF9iZTMyKGYsIG1wX3N0YXRlLm1wX3N0YXRl
+KTsKPj4gK30KPj4gKwo+PiArc3RhdGljIGNvbnN0IFZNU3RhdGVJbmZvIHZtc3RhdGVfbXBzdGF0
+ZSA9IHsKPj4gKyAgICAubmFtZSA9ICJtcHN0YXRlIiwKPj4gKyAgICAuZ2V0ID0gZ2V0X21wc3Rh
+dGUsCj4+ICsgICAgLnB1dCA9IHB1dF9tcHN0YXRlLAo+PiArfTsKPj4gKyNlbmRpZgo+PiArCj4+
+ICBzdGF0aWMgdm9pZCBjcHVfcHJlX3NhdmUodm9pZCAqb3BhcXVlKQo+PiAgewo+PiAgICAgIEFS
+TUNQVSAqY3B1ID0gb3BhcXVlOwo+PiBAQCAtMjQ0LDYgKzI3MiwxNiBAQCBjb25zdCBWTVN0YXRl
+RGVzY3JpcHRpb24gdm1zdGF0ZV9hcm1fY3B1ID0gewo+PiAgICAgICAgICBWTVNUQVRFX1VJTlQz
+Ml9BUlJBWShlbnYucmVncywgQVJNQ1BVLCAxNiksCj4+ICAgICAgICAgIFZNU1RBVEVfVUlOVDY0
+X0FSUkFZKGVudi54cmVncywgQVJNQ1BVLCAzMiksCj4+ICAgICAgICAgIFZNU1RBVEVfVUlOVDY0
+KGVudi5wYywgQVJNQ1BVKSwKPj4gKyNpZiBkZWZpbmVkIENPTkZJR19LVk0KPj4gKyAgICAgICAg
+ewo+PiArICAgICAgICAgICAgLm5hbWUgPSAibXBfc3RhdGUiLAo+PiArICAgICAgICAgICAgLnZl
+cnNpb25faWQgPSAwLAo+PiArICAgICAgICAgICAgLnNpemUgPSBzaXplb2YodWludDMyX3QpLAo+
+PiArICAgICAgICAgICAgLmluZm8gPSAmdm1zdGF0ZV9tcHN0YXRlLAo+PiArICAgICAgICAgICAg
+LmZsYWdzID0gVk1TX1NJTkdMRSwKPj4gKyAgICAgICAgICAgIC5vZmZzZXQgPSAwLAo+PiArICAg
+ICAgICB9LAo+PiArI2VuZGlmCj4KPiBUaGlzIG1lYW5zIHRoZSBtaWdyYXRpb24gZm9ybWF0IHdp
+bGwgYmUgZGlmZmVyZW50IG9uIGRpZmZlcmVudAo+IGJ1aWxkIGNvbmZpZ3VyYXRpb25zLCB3aGlj
+aCBzZWVtcyBsaWtlIGEgcmVhbGx5IGJhZCBpZGVhLgo+Cj4gSGF2ZSB5b3UgY29uc2lkZXJlZCBo
+YXZpbmcgdGhlIEtWTSBzdGF0ZSBzeW5jIGZ1bmN0aW9ucyBqdXN0Cj4gc3luYyB0aGUga2VybmVs
+J3MgTVAgc3RhdGUgaW50byBjcHUtPnBvd2VyZWRfb2ZmLCBhbmQgdGhlbgo+IG1pZ3JhdGluZyB0
+aGF0IGZsYWcgaGVyZSB1bmNvbmRpdGlvbmFsbHk/CgpJIHdhcyBsb29raW5nIGF0IHVzaW5nOgoK
+ICAuZmllbGRfZXhpc3RzID0gbXBzdGF0ZV92YWxpZAoKZm9yIHRoZSBmaWVsZC4gSWYgd2UgaGF2
+ZSB0aGUgZmllbGQgaW4gdGhlIG1pZ3JhdGlvbiBzdHJlYW0gYW5kIHRoZQprZXJuZWwgZG9lc24n
+dCBoYXZlIHRoZSBjYXBhYmlsaXR5IHRvIHNldCB0aGUgc3RhdGUgd2UgbmVlZCB0byBmYWlsIGhh
+cmQKcmlnaHQ/CgoKPgo+PiAgICAgICAgICB7Cj4+ICAgICAgICAgICAgICAubmFtZSA9ICJjcHNy
+IiwKPj4gICAgICAgICAgICAgIC52ZXJzaW9uX2lkID0gMCwKPj4gLS0KPj4gMi4zLjAKPj4KPgo+
+IC0tIFBNTQoKLS0gCkFsZXggQmVubsOpZQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1
+bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9r
+dm1hcm0K
