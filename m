@@ -1,57 +1,53 @@
-From: Baptiste Reynal <b.reynal@virtualopensystems.com>
-Subject: [PATCH v2 1/1] iommu/arm-smmu: fix ARM_SMMU_FEAT_TRANS_OPS condition
-Date: Wed,  4 Mar 2015 16:51:06 +0100
-Message-ID: <1425484266-5449-1-git-send-email-b.reynal@virtualopensystems.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: iommu@lists.linux-foundation.org, kvmarm@lists.cs.columbia.edu, will.deacon@arm.com
-Cc: tech@virtualopensystems.com, Baptiste Reynal <b.reynal@virtualopensystems.com>, Joerg Roedel <joro@8bytes.org>, "moderated list:ARM SMMU DRIVER" <linux-arm-kernel@lists.infradead.org>, open list <linux-kernel@vger.kernel.org>
+From: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+Subject: [PATCH v5 0/4] vfio: type1: support for ARM SMMUS with
+	VFIO_IOMMU_TYPE1
+Date: Wed,  4 Mar 2015 17:07:50 +0100
+Message-ID: <1425485274-5709-1-git-send-email-b.reynal@virtualopensystems.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+Cc: tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org, eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch is a fix to "iommu/arm-smmu: add support for iova_to_phys
-through ATS1PR".
-According to ARM documentation, translation registers are optional even
-in SMMUv1, so ID0_S1TS needs to be checked to verify their presence.
-Also, we check that the domain is a stage-1 domain.
+This patch series makes the VFIO_IOMMU_TYPE1 driver buildable on ARM, so it
+may be used with ARM SMMUs. It also adds support for the IOMMU_NOEXEC flag
+supported by SMMUs adhering to the ARM SMMU specification so the VFIO user can
+specify whether the target memory can be executed by the device behind the
+SMMU.
 
-Signed-off-by: Baptiste Reynal <b.reynal@virtualopensystems.com>
+Changes from v4:
+ - Remove domain->caps, use iommu capacity flags instead
+Changes from v3:
+ - Rebased on linux v4.0-rc1
+ - Use bit shifting for domain->caps
+ - Baptiste Reynal is the new maintainer of this serie
+Changes from v2:
+ - Rebased on latest iommu/next branch by Joerg Roedel
+Changes from v1:
+ - Bugfixes and corrected some typos
+ - Use enum for VFIO IOMMU driver capabilities
 
----
-v1 -> v2:
-Add domain stage test (Thanks to Will Deacon)
+Antonios Motakis (4):
+  vfio: implement iommu driver capabilities with an enum
+  vfio: introduce the VFIO_DMA_MAP_FLAG_NOEXEC flag
+  vfio: type1: replace vfio_domains_have_iommu_cache with generic
+    function
+  vfio: type1: implement the VFIO_DMA_MAP_FLAG_NOEXEC flag
 
----
- drivers/iommu/arm-smmu.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ drivers/vfio/vfio_iommu_type1.c | 60 ++++++++++++++++++++++++++++-------------
+ include/uapi/linux/vfio.h       | 30 ++++++++++++---------
+ 2 files changed, 58 insertions(+), 32 deletions(-)
 
-diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
-index fc13dd5..a3adde6 100644
---- a/drivers/iommu/arm-smmu.c
-+++ b/drivers/iommu/arm-smmu.c
-@@ -1288,10 +1288,13 @@ static phys_addr_t arm_smmu_iova_to_phys(struct iommu_domain *domain,
- 		return 0;
- 
- 	spin_lock_irqsave(&smmu_domain->pgtbl_lock, flags);
--	if (smmu_domain->smmu->features & ARM_SMMU_FEAT_TRANS_OPS)
-+	if (smmu_domain->smmu->features & ARM_SMMU_FEAT_TRANS_OPS &&
-+			smmu_domain->stage == ARM_SMMU_DOMAIN_S1) {
- 		ret = arm_smmu_iova_to_phys_hard(domain, iova);
--	else
-+	} else {
- 		ret = ops->iova_to_phys(ops, iova);
-+	}
-+
- 	spin_unlock_irqrestore(&smmu_domain->pgtbl_lock, flags);
- 
- 	return ret;
-@@ -1556,7 +1559,7 @@ static int arm_smmu_device_cfg_probe(struct arm_smmu_device *smmu)
- 		return -ENODEV;
- 	}
- 
--	if (smmu->version == 1 || (!(id & ID0_ATOSNS) && (id & ID0_S1TS))) {
-+	if ((id & ID0_S1TS) && ((smmu->version == 1) || (id & ID0_ATOSNS))) {
- 		smmu->features |= ARM_SMMU_FEAT_TRANS_OPS;
- 		dev_notice(smmu->dev, "\taddress translation ops\n");
- 	}
 -- 
 2.3.1
