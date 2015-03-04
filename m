@@ -1,105 +1,74 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v9 4/5] KVM: arm/arm64: remove coarse grain dist locking at
- kvm_vgic_sync_hwstate
-Date: Wed,  4 Mar 2015 11:14:35 +0100
-Message-ID: <1425464076-20558-5-git-send-email-eric.auger@linaro.org>
-References: <1425464076-20558-1-git-send-email-eric.auger@linaro.org>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [RFC/RFT PATCH 0/3] arm64: KVM: work around incoherency with
+ uncached guest mappings
+Date: Wed, 4 Mar 2015 11:35:06 +0000
+Message-ID: <20150304113505.GS28951@e104818-lin.cambridge.arm.com>
+References: <CAKv+Gu8Je3RRrgEFCZ7JUWtOgk3WqA_qdBEOPAMc3OqnKr1bwg@mail.gmail.com>
+ <20150219175518.GB26965@hawk.usersys.redhat.com>
+ <54E62404.9040702@redhat.com>
+ <20150220142905.GA10942@hawk.usersys.redhat.com>
+ <CAKv+Gu-YUzmnACZQi98OPRgKKL+gAGqwWYq2-_dwCdNqcktNUg@mail.gmail.com>
+ <20150220153626.GB10942@hawk.usersys.redhat.com>
+ <20150224145529.GA5498@hawk.usersys.redhat.com>
+ <CAKv+Gu-Uk2wg1OkoWgQe4da_EiFoEz_u8VuD8Ees6qU1UYMDvQ@mail.gmail.com>
+ <20150302163146.GB9686@lvm>
+ <54F51A63.4060302@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C6A547959
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2015 05:11:25 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YE5x5iOhn6h2 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Mar 2015 05:11:24 -0500 (EST)
-Received: from mail-wi0-f182.google.com (mail-wi0-f182.google.com
- [209.85.212.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 68D4F47975
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2015 05:11:24 -0500 (EST)
-Received: by wibhm9 with SMTP id hm9so6105175wib.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Mar 2015 02:17:25 -0800 (PST)
-In-Reply-To: <1425464076-20558-1-git-send-email-eric.auger@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@st.com, eric.auger@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: gleb@kernel.org, andre.przywara@arm.com, pbonzini@redhat.com, linux-kernel@vger.kernel.org, patches@linaro.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <54F51A63.4060302@samsung.com>
+Sender: kvm-owner@vger.kernel.org
+To: Mario Smarduch <m.smarduch@samsung.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, KVM devel mailing list <kvm@vger.kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To prepare for irqfd addition, coarse grain locking is removed at
-kvm_vgic_sync_hwstate level and finer grain locking is introduced in
-vgic_process_maintenance only.
+(please try to avoid top-posting)
 
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- virt/kvm/arm/vgic.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+On Mon, Mar 02, 2015 at 06:20:19PM -0800, Mario Smarduch wrote:
+> On 03/02/2015 08:31 AM, Christoffer Dall wrote:
+> > However, my concern with these patches are on two points:
+> > 
+> > 1. It's not a fix-all.  We still have the case where the guest expects
+> > the behavior of device memory (for strong ordering for example) on a RAM
+> > region, which we now break.  Similiarly this doesn't support the
+> > non-coherent DMA to RAM region case.
+> > 
+> > 2. While the code is probably as nice as this kind of stuff gets, it
+> > is non-trivial and extremely difficult to debug.  The counter-point here
+> > is that we may end up handling other stuff at EL2 for performanc reasons
+> > in the future.
+> > 
+> > Mainly because of point 1 above, I am leaning to thinking userspace
+> > should do the invalidation when it knows it needs to, either through KVM
+> > via a memslot flag or through some other syscall mechanism.
 
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 0cc6ab6..4e9b6d3 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -1081,6 +1081,7 @@ epilog:
- static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
- {
- 	u32 status = vgic_get_interrupt_status(vcpu);
-+	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
- 	bool level_pending = false;
- 
- 	kvm_debug("STATUS = %08x\n", status);
-@@ -1098,6 +1099,7 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
- 			struct vgic_lr vlr = vgic_get_lr(vcpu, lr);
- 			WARN_ON(vgic_irq_is_edge(vcpu, vlr.irq));
- 
-+			spin_lock(&dist->lock);
- 			vgic_irq_clear_queued(vcpu, vlr.irq);
- 			WARN_ON(vlr.state & LR_STATE_MASK);
- 			vlr.state = 0;
-@@ -1125,6 +1127,8 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
- 				vgic_cpu_irq_clear(vcpu, vlr.irq);
- 			}
- 
-+			spin_unlock(&dist->lock);
-+
- 			/*
- 			 * Despite being EOIed, the LR may not have
- 			 * been marked as empty.
-@@ -1139,10 +1143,7 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
- 	return level_pending;
- }
- 
--/*
-- * Sync back the VGIC state after a guest run. The distributor lock is
-- * needed so we don't get preempted in the middle of the state processing.
-- */
-+/* Sync back the VGIC state after a guest run */
- static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-@@ -1189,14 +1190,10 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
- 
- void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- {
--	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
--
- 	if (!irqchip_in_kernel(vcpu->kvm))
- 		return;
- 
--	spin_lock(&dist->lock);
- 	__kvm_vgic_sync_hwstate(vcpu);
--	spin_unlock(&dist->lock);
- }
- 
- int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+I expressed my concerns as well, I'm definitely against merging this
+series.
+
+> I don't understand how can the CPU handle different cache attributes
+> used by QEMU and Guest won't you run into B2.9 checklist? Wouldn't
+> cache evictions or cleans wipe out guest updates to same cache
+> line(s)?
+
+"Clean+invalidate" is a safe operation even if the guest accesses the
+memory in a cacheable way. But if the guest can update the cache lines,
+Qemu should avoid cache maintenance from a performance perspective.
+
+The guest is either told that the DMA is coherent (via DT properties) or
+Qemu deals with (non-)coherency itself. The latter is fully in line with
+the B2.9 chapter in the ARM ARM, more precisely point 5:
+
+  If the mismatched attributes for a memory location all assign the same
+  shareability attribute to the location, any loss of uniprocessor
+  semantics or coherency within a shareability domain can be avoided by
+  use of software cache management.
+
+... it continues with what kind of cache maintenance is required,
+together with:
+
+  A clean and invalidate instruction can be used instead of a clean
+  instruction, or instead of an invalidate instruction.
+
 -- 
-1.9.1
+Catalin
