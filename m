@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v2 2/6] hw/intc: arm_gic_kvm.c restore config first
-Date: Wed,  4 Mar 2015 14:35:49 +0000
-Message-ID: <1425479753-18349-3-git-send-email-alex.bennee@linaro.org>
+Subject: [PATCH v2 3/6] hw/char: pl011 don't keep setting the IRQ if nothing changed
+Date: Wed,  4 Mar 2015 14:35:50 +0000
+Message-ID: <1425479753-18349-4-git-send-email-alex.bennee@linaro.org>
 References: <1425479753-18349-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -13,38 +13,45 @@ To: qemu-devel@nongnu.org
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As there is logic to deal with the difference between edge and level
-triggered interrupts in the kernel we must ensure it knows the
-configuration of the IRQs before we restore the pending state.
+While observing KVM traces I can see additional IRQ calls on pretty muc=
+h
+every MMIO access which is just plain inefficient. Only update the QEMU
+IRQ level if something has actually changed from last time. Otherwise w=
+e
+may be papering over other failure modes.
 
 Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 
-diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
-index 1ad3eb0..2f21ae7 100644
---- a/hw/intc/arm_gic_kvm.c
-+++ b/hw/intc/arm_gic_kvm.c
-@@ -370,6 +370,11 @@ static void kvm_arm_gic_put(GICState *s)
-      * the appropriate CPU interfaces in the kernel) */
-     kvm_dist_put(s, 0x800, 8, s->num_irq, translate_targets);
-=20
-+    /* irq_state[n].trigger -> GICD_ICFGRn
-+     * (restore targets before pending IRQs so we treat level/edge
-+     * correctly */
-+    kvm_dist_put(s, 0xc00, 2, s->num_irq, translate_trigger);
+diff --git a/hw/char/pl011.c b/hw/char/pl011.c
+index 0a45115..bb554bc 100644
+--- a/hw/char/pl011.c
++++ b/hw/char/pl011.c
+@@ -36,6 +36,9 @@ typedef struct PL011State {
+     CharDriverState *chr;
+     qemu_irq irq;
+     const unsigned char *id;
 +
-     /* irq_state[n].pending + irq_state[n].level -> GICD_ISPENDRn */
-     kvm_dist_put(s, 0x280, 1, s->num_irq, translate_clear);
-     kvm_dist_put(s, 0x200, 1, s->num_irq, translate_pending);
-@@ -378,8 +383,6 @@ static void kvm_arm_gic_put(GICState *s)
-     kvm_dist_put(s, 0x380, 1, s->num_irq, translate_clear);
-     kvm_dist_put(s, 0x300, 1, s->num_irq, translate_active);
++    /* not serialised, prevents pl011_update doing extra set_irqs */
++    uint32_t current_irq;
+ } PL011State;
 =20
--    /* irq_state[n].trigger -> GICD_ICFRn */
--    kvm_dist_put(s, 0xc00, 2, s->num_irq, translate_trigger);
+ #define PL011_INT_TX 0x20
+@@ -53,10 +56,11 @@ static const unsigned char pl011_id_luminary[8] =3D
 =20
-     /* s->priorityX[irq] -> ICD_IPRIORITYRn */
-     kvm_dist_put(s, 0x400, 8, s->num_irq, translate_priority);
+ static void pl011_update(PL011State *s)
+ {
+-    uint32_t flags;
+-
+-    flags =3D s->int_level & s->int_enabled;
+-    qemu_set_irq(s->irq, flags !=3D 0);
++    uint32_t flags =3D s->int_level & s->int_enabled;
++    if (flags !=3D s->current_irq) {
++        s->current_irq =3D flags;
++        qemu_set_irq(s->irq, s->current_irq !=3D 0);
++    }
+ }
+=20
+ static uint64_t pl011_read(void *opaque, hwaddr offset,
 --=20
 2.3.1
 
