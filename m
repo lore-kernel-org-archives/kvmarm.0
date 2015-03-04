@@ -1,26 +1,24 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v4 3/3] hw/intc/arm_gic: Initialize the vgic in the realize
- function
-Date: Wed,  4 Mar 2015 14:16:17 +0000
-Message-ID: <1425478577-32556-4-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v4 1/3] update-linux-headers.sh: export virtio_types.h
+Date: Wed,  4 Mar 2015 14:16:15 +0000
+Message-ID: <1425478577-32556-2-git-send-email-eric.auger@linaro.org>
 References: <1425478577-32556-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D7FB478D6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2015 09:10:56 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9170647A35
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2015 09:10:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hyijfbhcCnTK for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Mar 2015 09:10:55 -0500 (EST)
-Received: from mail-we0-f169.google.com (mail-we0-f169.google.com
- [74.125.82.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7637B47A3B
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2015 09:10:55 -0500 (EST)
-Received: by wesx3 with SMTP id x3so45684wes.4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Mar 2015 06:16:57 -0800 (PST)
+ with ESMTP id zNBjnUh24rNr for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Mar 2015 09:10:51 -0500 (EST)
+Received: from mail-wg0-f46.google.com (mail-wg0-f46.google.com [74.125.82.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF21F47A25
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2015 09:10:50 -0500 (EST)
+Received: by wghn12 with SMTP id n12so47041215wgh.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Mar 2015 06:16:52 -0800 (PST)
 In-Reply-To: <1425478577-32556-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,34 +33,26 @@ To: eric.auger@st.com, christoffer.dall@linaro.org, qemu-devel@nongnu.org, agraf
 Cc: alex.williamson@redhat.com, patches@linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch forces vgic initialization in the vgic realize function.
-It uses a new group/attribute that allows such operation:
-KVM_DEV_ARM_VGIC_GRP_CTRL/KVM_DEV_ARM_VGIC_CTRL_INIT
-
-This earlier initialization allows, for example, to setup VFIO
-signaling and irqfd after vgic initialization, on a reset notifier.
+virtio_ring.h now includes virtio_types.h. update-linux-headers.sh
+now exports this latter.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 ---
- hw/intc/arm_gic_kvm.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ scripts/update-linux-headers.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
-index 1ad3eb0..1395c9e 100644
---- a/hw/intc/arm_gic_kvm.c
-+++ b/hw/intc/arm_gic_kvm.c
-@@ -573,6 +573,12 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
-         kvm_gic_access(s, KVM_DEV_ARM_VGIC_GRP_NR_IRQS, 0, 0, &numirqs, 1);
-     }
- 
-+    if (kvm_gic_supports_attr(s, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+                              KVM_DEV_ARM_VGIC_CTRL_INIT)) {
-+        kvm_gic_access(s, KVM_DEV_ARM_VGIC_GRP_CTRL,
-+                          KVM_DEV_ARM_VGIC_CTRL_INIT, 0, 0, 1);
-+    }
-+
-     /* Distributor */
-     memory_region_init_reservation(&s->iomem, OBJECT(s),
-                                    "kvm-gic_dist", 0x1000);
+diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
+index c8e026d..bbe6185 100755
+--- a/scripts/update-linux-headers.sh
++++ b/scripts/update-linux-headers.sh
+@@ -62,7 +62,7 @@ done
+ rm -rf "$output/linux-headers/linux"
+ mkdir -p "$output/linux-headers/linux"
+ for header in kvm.h kvm_para.h vfio.h vhost.h virtio_config.h virtio_ring.h \
+-              psci.h; do
++              virtio_types.h psci.h; do
+     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
+ done
+ rm -rf "$output/linux-headers/asm-generic"
 -- 
 1.8.3.2
