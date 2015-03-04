@@ -1,53 +1,63 @@
-From: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-Subject: [PATCH v5 0/4] vfio: type1: support for ARM SMMUS with
-	VFIO_IOMMU_TYPE1
-Date: Wed,  4 Mar 2015 17:07:50 +0100
-Message-ID: <1425485274-5709-1-git-send-email-b.reynal@virtualopensystems.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
-Cc: tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org, eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
+From: Baptiste Reynal <b.reynal@virtualopensystems.com>
+Subject: [PATCH v5 1/4] vfio: implement iommu driver capabilities with an enum
+Date: Wed,  4 Mar 2015 17:07:51 +0100
+Message-ID: <1425485274-5709-2-git-send-email-b.reynal@virtualopensystems.com>
+References: <1425485274-5709-1-git-send-email-b.reynal@virtualopensystems.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1425485274-5709-1-git-send-email-b.reynal@virtualopensystems.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: iommu@lists.linux-foundation.org, kvmarm@lists.cs.columbia.edu
+Cc: eric.auger@linaro.org, alex.williamson@redhat.com, tech@virtualopensystems.com, Antonios Motakis <a.motakis@virtualopensystems.com>, Baptiste Reynal <b.reynal@virtualopensystems.com>, "open list:VFIO DRIVER" <kvm@vger.kernel.org>, "open list:ABI/API" <linux-api@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch series makes the VFIO_IOMMU_TYPE1 driver buildable on ARM, so it
-may be used with ARM SMMUs. It also adds support for the IOMMU_NOEXEC flag
-supported by SMMUs adhering to the ARM SMMU specification so the VFIO user can
-specify whether the target memory can be executed by the device behind the
-SMMU.
+From: Antonios Motakis <a.motakis@virtualopensystems.com>
 
-Changes from v4:
- - Remove domain->caps, use iommu capacity flags instead
-Changes from v3:
- - Rebased on linux v4.0-rc1
- - Use bit shifting for domain->caps
- - Baptiste Reynal is the new maintainer of this serie
-Changes from v2:
- - Rebased on latest iommu/next branch by Joerg Roedel
-Changes from v1:
- - Bugfixes and corrected some typos
- - Use enum for VFIO IOMMU driver capabilities
+Currently a VFIO driver's IOMMU capabilities are encoded as a series of
+numerical defines. Replace this with an enum for future maintainability.
 
-Antonios Motakis (4):
-  vfio: implement iommu driver capabilities with an enum
-  vfio: introduce the VFIO_DMA_MAP_FLAG_NOEXEC flag
-  vfio: type1: replace vfio_domains_have_iommu_cache with generic
-    function
-  vfio: type1: implement the VFIO_DMA_MAP_FLAG_NOEXEC flag
+Signed-off-by: Antonios Motakis <a.motakis@virtualopensystems.com>
+Signed-off-by: Baptiste Reynal <b.reynal@virtualopensystems.com>
+---
+ include/uapi/linux/vfio.h | 24 +++++++++++-------------
+ 1 file changed, 11 insertions(+), 13 deletions(-)
 
- drivers/vfio/vfio_iommu_type1.c | 60 ++++++++++++++++++++++++++++-------------
- include/uapi/linux/vfio.h       | 30 ++++++++++++---------
- 2 files changed, 58 insertions(+), 32 deletions(-)
-
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 82889c3..5fb3d46 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -19,22 +19,20 @@
+ 
+ /* Kernel & User level defines for VFIO IOCTLs. */
+ 
+-/* Extensions */
+-
+-#define VFIO_TYPE1_IOMMU		1
+-#define VFIO_SPAPR_TCE_IOMMU		2
+-#define VFIO_TYPE1v2_IOMMU		3
+ /*
+- * IOMMU enforces DMA cache coherence (ex. PCIe NoSnoop stripping).  This
+- * capability is subject to change as groups are added or removed.
++ * Capabilities exposed by the VFIO IOMMU driver. Some capabilities are subject
++ * to change as groups are added or removed.
+  */
+-#define VFIO_DMA_CC_IOMMU		4
+-
+-/* Check if EEH is supported */
+-#define VFIO_EEH			5
++enum vfio_iommu_cap {
++	VFIO_TYPE1_IOMMU = 1,
++	VFIO_SPAPR_TCE_IOMMU = 2,
++	VFIO_TYPE1v2_IOMMU = 3,
++	VFIO_DMA_CC_IOMMU = 4,		/* IOMMU enforces DMA cache coherence
++					   (ex. PCIe NoSnoop stripping) */
++	VFIO_EEH = 5,			/* Check if EEH is supported */
++	VFIO_TYPE1_NESTING_IOMMU = 6,	/* Two-stage IOMMU, implies v2  */
++};
+ 
+-/* Two-stage IOMMU */
+-#define VFIO_TYPE1_NESTING_IOMMU	6	/* Implies v2 */
+ 
+ /*
+  * The IOCTL interface is designed for extensibility by embedding the
 -- 
 2.3.1
