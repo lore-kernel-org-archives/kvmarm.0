@@ -1,113 +1,104 @@
-From: Baptiste Reynal <b.reynal@virtualopensystems.com>
-Subject: [PATCH v5 3/4] vfio: type1: replace vfio_domains_have_iommu_cache
- with generic function
-Date: Wed,  4 Mar 2015 17:07:53 +0100
-Message-ID: <1425485274-5709-4-git-send-email-b.reynal@virtualopensystems.com>
+From: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+Subject: [PATCH v5 4/4] vfio: type1: implement the VFIO_DMA_MAP_FLAG_NOEXEC
+	flag
+Date: Wed,  4 Mar 2015 17:07:54 +0100
+Message-ID: <1425485274-5709-5-git-send-email-b.reynal@virtualopensystems.com>
 References: <1425485274-5709-1-git-send-email-b.reynal@virtualopensystems.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9604847B36
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2015 11:02:48 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bQpsDORfLRfg for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Mar 2015 11:02:44 -0500 (EST)
-Received: from mail-we0-f178.google.com (mail-we0-f178.google.com
- [74.125.82.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C5F7547B54
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2015 11:02:42 -0500 (EST)
-Received: by wevm14 with SMTP id m14so47304756wev.13
- for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Mar 2015 08:08:44 -0800 (PST)
-In-Reply-To: <1425485274-5709-1-git-send-email-b.reynal@virtualopensystems.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: iommu@lists.linux-foundation.org, kvmarm@lists.cs.columbia.edu
-Cc: "open list:VFIO DRIVER" <kvm@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, alex.williamson@redhat.com, tech@virtualopensystems.com
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <1425485274-5709-1-git-send-email-b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+Cc: "open list:VFIO DRIVER" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, open list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>, tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Antonios Motakis <a.motakis@virtualopensystems.com>
+From: Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
 
-Replace the function vfio_domains_have_iommu_cache() with a more generic
-function vfio_domains_have_iommu_cap() which allows to check all domains
-of an vfio_iommu structure for a given cached capability.
+Some IOMMU drivers, such as the ARM SMMU driver, make available the
+IOMMU_NOEXEC flag to set the page tables for a device as XN (execute never).
+This affects devices such as the ARM PL330 DMA Controller, which respects
+this flag and will refuse to fetch DMA instructions from memory where the
+XN flag has been set.
 
-Signed-off-by: Antonios Motakis <a.motakis@virtualopensystems.com>
-Signed-off-by: Baptiste Reynal <b.reynal@virtualopensystems.com>
+The flag can be used only if all IOMMU domains behind the container support
+the IOMMU_NOEXEC flag. Also, if any mappings are created with the flag, any
+new domains with devices will have to support it as well.
+
+Signed-off-by: Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+Signed-off-by: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
 ---
- drivers/vfio/vfio_iommu_type1.c | 37 +++++++++++++++++++------------------
- 1 file changed, 19 insertions(+), 18 deletions(-)
+ drivers/vfio/vfio_iommu_type1.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 57d8c37..a5847e8 100644
+index a5847e8..ec313e5 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -82,6 +82,23 @@ struct vfio_group {
- 	struct list_head	next;
- };
+@@ -591,6 +591,12 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+ 	if (!prot || !size || (size | iova | vaddr) & mask)
+ 		return -EINVAL;
  
-+static int vfio_domains_have_iommu_cap(struct vfio_iommu *iommu, int cap)
-+{
-+	struct vfio_domain *domain;
-+	int ret = 1;
-+
-+	mutex_lock(&iommu->lock);
-+	list_for_each_entry(domain, &iommu->domain_list, next) {
-+		if (!(domain->domain->ops->capable(cap))) {
-+			ret = 0;
-+			break;
-+		}
++	if (map->flags & VFIO_DMA_MAP_FLAG_NOEXEC) {
++		if (!vfio_domains_have_iommu_cap(iommu, IOMMU_CAP_NOEXEC))
++			return -EINVAL;
++		prot |= IOMMU_NOEXEC;
 +	}
-+	mutex_unlock(&iommu->lock);
 +
-+	return ret;
-+}
-+
- /*
-  * This code handles mapping and unmapping of user data buffers
-  * into DMA'ble space using the IOMMU
-@@ -935,23 +952,6 @@ static void vfio_iommu_type1_release(void *iommu_data)
- 	kfree(iommu);
- }
+ 	/* Don't allow IOVA or virtual address wrap */
+ 	if (iova + size - 1 < iova || vaddr + size - 1 < vaddr)
+ 		return -EINVAL;
+@@ -672,11 +678,20 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
  
--static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
--{
--	struct vfio_domain *domain;
--	int ret = 1;
--
--	mutex_lock(&iommu->lock);
--	list_for_each_entry(domain, &iommu->domain_list, next) {
--		if (!(domain->prot & IOMMU_CACHE)) {
--			ret = 0;
--			break;
--		}
--	}
--	mutex_unlock(&iommu->lock);
--
--	return ret;
--}
--
- static long vfio_iommu_type1_ioctl(void *iommu_data,
- 				   unsigned int cmd, unsigned long arg)
- {
-@@ -967,7 +967,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 		case VFIO_DMA_CC_IOMMU:
- 			if (!iommu)
+ 	for (; n; n = rb_next(n)) {
+ 		struct vfio_dma *dma;
++		const struct iommu_ops *ops = domain->domain->ops;
+ 		dma_addr_t iova;
+ 
+ 		dma = rb_entry(n, struct vfio_dma, node);
+ 		iova = dma->iova;
+ 
++		/*
++		 * if any of the mappings to be replayed has the NOEXEC flag
++		 * set, then the new iommu domain must support it
++		 */
++		if ((dma->prot & IOMMU_NOEXEC) &&
++				!(ops->capable(IOMMU_CAP_NOEXEC)))
++			return -EINVAL;
++
+ 		while (iova < dma->iova + dma->size) {
+ 			phys_addr_t phys = iommu_iova_to_phys(d->domain, iova);
+ 			size_t size;
+@@ -969,6 +984,11 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
  				return 0;
--			return vfio_domains_have_iommu_cache(iommu);
+ 			return vfio_domains_have_iommu_cap(iommu,
+ 						  IOMMU_CAP_CACHE_COHERENCY);
++		case VFIO_DMA_NOEXEC_IOMMU:
++			if (!iommu)
++				return 0;
 +			return vfio_domains_have_iommu_cap(iommu,
-+						  IOMMU_CAP_CACHE_COHERENCY);
++							   IOMMU_CAP_NOEXEC);
  		default:
  			return 0;
  		}
+@@ -992,7 +1012,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 	} else if (cmd == VFIO_IOMMU_MAP_DMA) {
+ 		struct vfio_iommu_type1_dma_map map;
+ 		uint32_t mask = VFIO_DMA_MAP_FLAG_READ |
+-				VFIO_DMA_MAP_FLAG_WRITE;
++				VFIO_DMA_MAP_FLAG_WRITE |
++				VFIO_DMA_MAP_FLAG_NOEXEC;
+ 
+ 		minsz = offsetofend(struct vfio_iommu_type1_dma_map, size);
+ 
 -- 
 2.3.1
