@@ -1,104 +1,128 @@
-From: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-Subject: [PATCH v5 4/4] vfio: type1: implement the VFIO_DMA_MAP_FLAG_NOEXEC
-	flag
-Date: Wed,  4 Mar 2015 17:07:54 +0100
-Message-ID: <1425485274-5709-5-git-send-email-b.reynal@virtualopensystems.com>
-References: <1425485274-5709-1-git-send-email-b.reynal@virtualopensystems.com>
+From: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v4 0/5] vfio: type1: support for ARM SMMUS with
+ VFIO_IOMMU_TYPE1
+Date: Wed, 04 Mar 2015 09:10:06 -0700
+Message-ID: <1425485406.5200.233.camel@redhat.com>
+References: <1425315507-29661-1-git-send-email-b.reynal@virtualopensystems.com>
+ <54F5F37E.2070002@linaro.org> <1425405715.5200.217.camel@redhat.com>
+ <CAN9JPjEOHozQzQj9fdSww1ueC5yVdoBG=i=JYqDFMwNdosLvKQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <1425485274-5709-1-git-send-email-b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
-Cc: "open list:VFIO DRIVER" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, open list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>, tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 459A447B4F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2015 11:04:43 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id wzoUKGztl2bj for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Mar 2015 11:04:36 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 73EE047B39
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2015 11:04:35 -0500 (EST)
+In-Reply-To: <CAN9JPjEOHozQzQj9fdSww1ueC5yVdoBG=i=JYqDFMwNdosLvKQ@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Baptiste Reynal <b.reynal@virtualopensystems.com>
+Cc: Linux IOMMU <iommu@lists.linux-foundation.org>, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>, kvm-arm <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+On Wed, 2015-03-04 at 16:21 +0100, Baptiste Reynal wrote:
+> Thanks for your comments. A v5 is ongoing, with the removal of
+> domain->caps, instead domain->domain->ops->capable(cap) is tested.
 
-Some IOMMU drivers, such as the ARM SMMU driver, make available the
-IOMMU_NOEXEC flag to set the page tables for a device as XN (execute never).
-This affects devices such as the ARM PL330 DMA Controller, which respects
-this flag and will refuse to fetch DMA instructions from memory where the
-XN flag has been set.
+Doesn't that defeat the whole purpose of caching a subset of the mapping
+flags on the domain?  I also hope we're not ignoring the abstraction of
+the iommu api by following iommu_ops pointers directly.  Thanks,
 
-The flag can be used only if all IOMMU domains behind the container support
-the IOMMU_NOEXEC flag. Also, if any mappings are created with the flag, any
-new domains with devices will have to support it as well.
+Alex
 
-Signed-off-by: Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-Signed-off-by: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
----
- drivers/vfio/vfio_iommu_type1.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index a5847e8..ec313e5 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -591,6 +591,12 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
- 	if (!prot || !size || (size | iova | vaddr) & mask)
- 		return -EINVAL;
- 
-+	if (map->flags & VFIO_DMA_MAP_FLAG_NOEXEC) {
-+		if (!vfio_domains_have_iommu_cap(iommu, IOMMU_CAP_NOEXEC))
-+			return -EINVAL;
-+		prot |= IOMMU_NOEXEC;
-+	}
-+
- 	/* Don't allow IOVA or virtual address wrap */
- 	if (iova + size - 1 < iova || vaddr + size - 1 < vaddr)
- 		return -EINVAL;
-@@ -672,11 +678,20 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 
- 	for (; n; n = rb_next(n)) {
- 		struct vfio_dma *dma;
-+		const struct iommu_ops *ops = domain->domain->ops;
- 		dma_addr_t iova;
- 
- 		dma = rb_entry(n, struct vfio_dma, node);
- 		iova = dma->iova;
- 
-+		/*
-+		 * if any of the mappings to be replayed has the NOEXEC flag
-+		 * set, then the new iommu domain must support it
-+		 */
-+		if ((dma->prot & IOMMU_NOEXEC) &&
-+				!(ops->capable(IOMMU_CAP_NOEXEC)))
-+			return -EINVAL;
-+
- 		while (iova < dma->iova + dma->size) {
- 			phys_addr_t phys = iommu_iova_to_phys(d->domain, iova);
- 			size_t size;
-@@ -969,6 +984,11 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 				return 0;
- 			return vfio_domains_have_iommu_cap(iommu,
- 						  IOMMU_CAP_CACHE_COHERENCY);
-+		case VFIO_DMA_NOEXEC_IOMMU:
-+			if (!iommu)
-+				return 0;
-+			return vfio_domains_have_iommu_cap(iommu,
-+							   IOMMU_CAP_NOEXEC);
- 		default:
- 			return 0;
- 		}
-@@ -992,7 +1012,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 	} else if (cmd == VFIO_IOMMU_MAP_DMA) {
- 		struct vfio_iommu_type1_dma_map map;
- 		uint32_t mask = VFIO_DMA_MAP_FLAG_READ |
--				VFIO_DMA_MAP_FLAG_WRITE;
-+				VFIO_DMA_MAP_FLAG_WRITE |
-+				VFIO_DMA_MAP_FLAG_NOEXEC;
- 
- 		minsz = offsetofend(struct vfio_iommu_type1_dma_map, size);
- 
--- 
-2.3.1
+> On Tue, Mar 3, 2015 at 7:01 PM, Alex Williamson <alex.williamson@redhat.com>
+> wrote:
+> 
+> > On Tue, 2015-03-03 at 18:46 +0100, Eric Auger wrote:
+> > > Hi Baptiste,
+> > >
+> > > In "vfio: type1: implement the VFIO_DMA_MAP_FLAG_NOEXEC flag" you still
+> > > kept domain->caps |= IOMMU_CAP_NOEXEC so potentially overwriting 1<<
+> > > IOMMU_CAP_CACHE_COHERENCY I guess.
+> > >
+> > > Sorry I do not have this 4th patch file in my mailbox.
+> > >
+> > > Best Regards
+> > >
+> > > Eric
+> > >
+> > >       if (iommu_capable(bus, IOMMU_CAP_CACHE_COHERENCY))
+> > >               domain->caps |= (1 << IOMMU_CAP_CACHE_COHERENCY);
+> > >
+> > >       if (iommu_capable(bus, IOMMU_CAP_NOEXEC))
+> > >               domain->caps |= IOMMU_CAP_NOEXEC;
+> >
+> >
+> > Patch 4/5 has problems too, vfio_domains_have_iommu_cap() is called with
+> > IOMMU_CAP_CACHE_COHERENCY, but nobody is shifting that into a bitmap
+> > before doing the comparison.
+> >
+> > TBH, I don't see the point of creating this artificial bitmap out of the
+> > capabilities.  Why can't we keep everything in the domain of actual
+> > flags passed to iommu_ops functions?  It's just silly to test for cached
+> > capability and re-invent the mapping flags on every mapping call and
+> > it's just as easy to generalize a test using the actual flags as to use
+> > the capabilities, perhaps easier.  Thanks,
+> >
+> > Alex
+> >
+> >
+> >
+> > > On 03/02/2015 05:58 PM, Baptiste Reynal wrote:
+> > > > This patch series makes the VFIO_IOMMU_TYPE1 driver buildable on ARM,
+> > so it
+> > > > may be used with ARM SMMUs. It also adds support for the IOMMU_NOEXEC
+> > flag
+> > > > supported by SMMUs adhering to the ARM SMMU specification so the VFIO
+> > user can
+> > > > specify whether the target memory can be executed by the device behind
+> > the
+> > > > SMMU.
+> > > >
+> > > > Changes from v3:
+> > > >  - Rebased on linux v4.0-rc1
+> > > >  - Use bit shifting for domain->caps
+> > > >  - Baptiste Reynal is the new maintainer of this serie
+> > > > Changes from v2:
+> > > >  - Rebased on latest iommu/next branch by Joerg Roedel
+> > > > Changes from v1:
+> > > >  - Bugfixes and corrected some typos
+> > > >  - Use enum for VFIO IOMMU driver capabilities
+> > > >
+> > > > Antonios Motakis (5):
+> > > >   vfio: implement iommu driver capabilities with an enum
+> > > >   vfio: introduce the VFIO_DMA_MAP_FLAG_NOEXEC flag
+> > > >   vfio: type1: replace domain wide protection flags with supported
+> > > >     capabilities
+> > > >   vfio: type1: replace vfio_domains_have_iommu_cache with generic
+> > > >     function
+> > > >   vfio: type1: implement the VFIO_DMA_MAP_FLAG_NOEXEC flag
+> > > >
+> > > >  drivers/vfio/vfio_iommu_type1.c | 91
+> > +++++++++++++++++++++++++++++------------
+> > > >  include/uapi/linux/vfio.h       | 30 ++++++++------
+> > > >  2 files changed, 81 insertions(+), 40 deletions(-)
+> > > >
+> > >
+> > > _______________________________________________
+> > > iommu mailing list
+> > > iommu@lists.linux-foundation.org
+> > > https://lists.linuxfoundation.org/mailman/listinfo/iommu
+> >
+> >
+> >
+> >
