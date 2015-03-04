@@ -1,33 +1,24 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [RFC/RFT PATCH 0/3] arm64: KVM: work around incoherency with
- uncached guest mappings
-Date: Wed, 4 Mar 2015 15:12:12 +0100
-Message-ID: <20150304141212.GA5352@hawk.usersys.redhat.com>
-References: <CAKv+Gu-YUzmnACZQi98OPRgKKL+gAGqwWYq2-_dwCdNqcktNUg@mail.gmail.com>
- <20150220153626.GB10942@hawk.usersys.redhat.com>
- <20150224145529.GA5498@hawk.usersys.redhat.com>
- <CAKv+Gu-Uk2wg1OkoWgQe4da_EiFoEz_u8VuD8Ees6qU1UYMDvQ@mail.gmail.com>
- <20150302163146.GB9686@lvm> <54F51A63.4060302@samsung.com>
- <20150304113505.GS28951@e104818-lin.cambridge.arm.com>
- <CAKv+Gu8OUtcpaQh5+gb6vNrdi+Q7eu_zKOujmyoRPrzrs+GJVQ@mail.gmail.com>
- <20150304122956.GT28951@e104818-lin.cambridge.arm.com>
- <CAKv+Gu-JnvXFzr-fpjZZ-zTt8hOSfGqefw69s+4JX2iu_6_BMw@mail.gmail.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [PATCH v4 0/3] explicit VGIC initialization in finalize function
+Date: Wed,  4 Mar 2015 14:16:14 +0000
+Message-ID: <1425478577-32556-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA4CA479F6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2015 09:06:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A770447A11
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2015 09:10:49 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ezwlIxc7tcIV for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Mar 2015 09:06:20 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B6592479F5
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2015 09:06:20 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu-JnvXFzr-fpjZZ-zTt8hOSfGqefw69s+4JX2iu_6_BMw@mail.gmail.com>
+ with ESMTP id DMQbVDiQ05L6 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Mar 2015 09:10:48 -0500 (EST)
+Received: from mail-we0-f177.google.com (mail-we0-f177.google.com
+ [74.125.82.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 59CD7479F6
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2015 09:10:48 -0500 (EST)
+Received: by wevl61 with SMTP id l61so9698417wev.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Mar 2015 06:16:50 -0800 (PST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,58 +28,64 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: KVM devel mailing list <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: eric.auger@st.com, christoffer.dall@linaro.org, qemu-devel@nongnu.org, agraf@suse.de, pbonzini@redhat.com, mst@redhat.com, b.reynal@virtualopensystems.com
+Cc: alex.williamson@redhat.com, patches@linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Mar 04, 2015 at 01:43:02PM +0100, Ard Biesheuvel wrote:
-> On 4 March 2015 at 13:29, Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > On Wed, Mar 04, 2015 at 12:50:57PM +0100, Ard Biesheuvel wrote:
-> >> On 4 March 2015 at 12:35, Catalin Marinas <catalin.marinas@arm.com> wrote:
-> >> > On Mon, Mar 02, 2015 at 06:20:19PM -0800, Mario Smarduch wrote:
-> >> >> On 03/02/2015 08:31 AM, Christoffer Dall wrote:
-> >> >> > However, my concern with these patches are on two points:
-> >> >> >
-> >> >> > 1. It's not a fix-all.  We still have the case where the guest expects
-> >> >> > the behavior of device memory (for strong ordering for example) on a RAM
-> >> >> > region, which we now break.  Similiarly this doesn't support the
-> >> >> > non-coherent DMA to RAM region case.
-> >> >> >
-> >> >> > 2. While the code is probably as nice as this kind of stuff gets, it
-> >> >> > is non-trivial and extremely difficult to debug.  The counter-point here
-> >> >> > is that we may end up handling other stuff at EL2 for performanc reasons
-> >> >> > in the future.
-> >> >> >
-> >> >> > Mainly because of point 1 above, I am leaning to thinking userspace
-> >> >> > should do the invalidation when it knows it needs to, either through KVM
-> >> >> > via a memslot flag or through some other syscall mechanism.
-> >> >
-> >> > I expressed my concerns as well, I'm definitely against merging this
-> >> > series.
-> >>
-> >> Don't worry, that was never the intention, at least not as-is :-)
-> >
-> > I wasn't worried, just wanted to make my position clearer ;).
-> >
-> >> I think we have established that the performance hit is not the
-> >> problem but the correctness is.
-> >
-> > I haven't looked at the performance figures but has anyone assessed the
-> > hit caused by doing cache maintenance in Qemu vs cacheable guest
-> > accesses (and no maintenance)?
-> >
+With current implementation the vgic is initialized implicitly,
+on-demand. This patch forces the init in the vgic finalize function.
+At that point all the dimensioning parameters are known.
 
-I'm working on a PoC of a QEMU/KVM cache maintenance approach now.
-Hopefully I'll send it out this evening. Tomorrow at the latest.
-Getting numbers of that approach vs. a guest's use of cached memory
-for devices would take a decent amount of additional work, so won't
-be part of that post. I'm actually not sure we should care about
-the numbers for a guest using normal mem attributes for device
-memory - other than out of curiosity. For correctness this issue
-really needs to be solved 100% host-side. We can't rely on a
-guest to do different/weird things, just because it's a guest.
-Ideally guests don't even know that they're guests. (Even if we
-describe the memory as cache-able to the guest, I don't think we
-can rely on the guest believing us.)
+A new group/attribute in VGIC KVM device is used for that:
+KVM_DEV_ARM_VGIC_GRP_CTRL/KVM_DEV_ARM_VGIC_CTRL_INIT.
 
-drew
+Among other things, this earlier VGIC initialization allows to
+have a simpler handling of VFIO. VFIO platform signaling can be
+setup on reset handler, making sure the VGIC is ready, at that time,
+to accept injected virtual IRQs.
+
+Tested on Calxeda Midway with VFIO platform use case
+
+Can be found on
+http://git.linaro.org/people/eric.auger/qemu.git,
+branch early_vgic_init_v4
+
+v3 -> v4:
+- now integrates all the header updates of update-linux-headers.sh applied
+  on top of 4.0-rc2 kernel (and not a partial export as in v3).
+- VIRTIO_TRANSPORT_F_END value needed to be changed to 33 in
+  include/hw/virtio/virtio.h to fix a duplicate definition compilation error
+  (also defined in virtio_config.h)
+- integrates a new patch file that add export of virtio_types.h, now
+  included by virtio_ring.h.
+
+v2 -> v3:
+- changed to a patch since the kernel dependency was pulled
+
+v1 -> v2:
+- The init is not mandated to be done in a machine init done notifier
+  anymore since only the number of vcpus and number of IRQs must be known
+  at init time.
+
+Eric Auger (3):
+  update-linux-headers.sh: export virtio_types.h
+  linux-headers: update to 4.0-rc2
+  hw/intc/arm_gic: Initialize the vgic in the realize function
+
+ hw/intc/arm_gic_kvm.c               |  6 +++++
+ include/hw/virtio/virtio.h          |  4 +--
+ linux-headers/asm-arm/kvm.h         |  2 ++
+ linux-headers/asm-arm64/kvm.h       |  9 +++++++
+ linux-headers/asm-s390/kvm.h        | 37 ++++++++++++++++++++++++++
+ linux-headers/asm-x86/hyperv.h      | 11 ++++++++
+ linux-headers/linux/kvm.h           | 20 +++++++-------
+ linux-headers/linux/vfio.h          |  1 +
+ linux-headers/linux/virtio_config.h | 11 ++++++--
+ linux-headers/linux/virtio_ring.h   | 52 +++++++++++++++++++++----------------
+ linux-headers/linux/virtio_types.h  | 46 ++++++++++++++++++++++++++++++++
+ scripts/update-linux-headers.sh     |  2 +-
+ 12 files changed, 163 insertions(+), 38 deletions(-)
+ create mode 100644 linux-headers/linux/virtio_types.h
+
+-- 
+1.8.3.2
