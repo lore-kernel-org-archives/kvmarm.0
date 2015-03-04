@@ -1,138 +1,112 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v9 0/5] irqfd support for arm/arm64
-Date: Wed,  4 Mar 2015 11:14:31 +0100
-Message-ID: <1425464076-20558-1-git-send-email-eric.auger@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Subject: [PATCH v9 2/5] KVM: introduce kvm_arch_intc_initialized and use it in
+ irqfd
+Date: Wed,  4 Mar 2015 11:14:33 +0100
+Message-ID: <1425464076-20558-3-git-send-email-eric.auger@linaro.org>
+References: <1425464076-20558-1-git-send-email-eric.auger@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DFC047932
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2015 05:11:18 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id j7WtJIcYXykB for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Mar 2015 05:11:17 -0500 (EST)
+Received: from mail-wi0-f169.google.com (mail-wi0-f169.google.com
+ [209.85.212.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 776474795D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Mar 2015 05:11:17 -0500 (EST)
+Received: by wiwh11 with SMTP id h11so29449721wiw.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Mar 2015 02:17:18 -0800 (PST)
+In-Reply-To: <1425464076-20558-1-git-send-email-eric.auger@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger@st.com, eric.auger@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: andre.przywara@arm.com, linux-kernel@vger.kernel.org, patches@linaro.org, gleb@kernel.org, pbonzini@redhat.com
+Cc: gleb@kernel.org, andre.przywara@arm.com, pbonzini@redhat.com, linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch series enables irqfd on arm and arm64.
+Introduce __KVM_HAVE_ARCH_INTC_INITIALIZED define and
+associated kvm_arch_intc_initialized function. This latter
+allows to test whether the virtual interrupt controller is initialized
+and ready to accept virtual IRQ injection. On some architectures,
+the virtual interrupt controller is dynamically instantiated, justifying
+that kind of check.
 
-Irqfd framework enables to inject a virtual IRQ into a guest upon an
-eventfd trigger. User-side uses KVM_IRQFD VM ioctl to provide KVM with
-a kvm_irqfd struct that associates a VM, an eventfd, a virtual IRQ number
-(aka. the gsi). When an actor signals the eventfd (typically a VFIO
-platform driver), the kvm irqfd subsystem injects the gsi into the VM.
+The new function can now be used by irqfd to check whether the
+virtual interrupt controller is ready on KVM_IRQFD request. If not,
+KVM_IRQFD returns -EAGAIN.
 
-Resamplefd also is supported for level sensitive interrupts, ie. the
-user can provide another eventfd that is triggered when the completion
-of the virtual IRQ (gsi) is detected by the GIC.
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 
-The gsi must correspond to a shared peripheral interrupt (SPI), ie the
-GIC interrupt ID is gsi + 32.
-
-The rationale behind not supporting PPI irqfd injection is that
-any device using a PPI would be a private-to-the-CPU device (timer for
-instance), so its state would have to be context-switched along with the
-VCPU and would require in-kernel wiring anyhow. It is not a relevant use
-case for irqfds.
-
-This patch enables CONFIG_HAVE_KVM_EVENTFD and CONFIG_HAVE_KVM_IRQFD.
-
-No IRQ routing table is used, enabling to remove CONFIG_HAVE_KVM_IRQCHIP
-
-The ARM virtual interrupt controller, the VGIC, is dynamically
-instantiated. The user-space may attempt to assign an irqfd before
-the virtual interrupt controller is ready. For that reason a
-check is added in the generic irqfd code to test whether the virtual
-interrupt controller is ready.
-
-This work was tested with Calxeda Midway xgmac main interrupt with
-qemu-system-arm and QEMU VFIO platform device. Also irqfd was proven
-functional on several vhost-net prototypes.
-
-Available on ssh://git.linaro.org/people/eric.auger/linux.git
-branch irqfd_v9_stdalone_official_release
-
-v8 -> v9:
-- add Christoffer's Reviewed-by on "KVM: arm/arm64: add irqfd support"
-  and Acked-by on "KVM: arm/arm64: remove coarse grain dist locking at
-  kvm_vgic_sync_hwstate"
-- replace kvm_debug by trace_kvm_set_irq and add
-  BUG_ON(!vgic_initialized(kvm)) in vgic.c kvm_set_irq.
-
+---
 v7 -> v8:
-- Address Andre's comments:
-  - introduce a separate patch file for coarse grain dist lock removal at
-    kvm_vgic_sync_hwstate level
-  - update comment above __kvm_vgic_sync_hwstate
-  - remove kvm_irq_has_notifier call
-  - remove gic_initialized() check in kvm_set_irq
-  - fix a typo in one comment (kvm_host.h)
+- correct typo in comment
+- add Andre's Reviewed-by
 
 v6 -> v7:
-- kvm_arch_intc_initialized call introduced in first patch file
-  related to kvm_arch_intc_initialized (generic part)
-- add Christoffer's acks
+- From now on, kvm_irqfd_assign calls kvm_arch_intc_initialized
+  (previously introduced in subsequent patch file).
+- add Christoffer's ack
 
 v5 -> v6:
-- take into account Christoffer's comments:
-  - rename macro and function enabling to check the state of virtual
-    interrupt controller (kvm_arch_intc_initialized)
-  - kvm_arch_intc_initialized is declared in kvm_host.h whatever the
-    archi support.
-  - squash v5 patch files 3 & 4
-  - KVM_CAP_IRQFD support depends on vgic_present
-  - add Christoffer's Reviewed-by on last patch file
+- rename function name and macro
+- add kvm_arch_intc_initialized declaration in case the archi defines
+  the macro
+---
+ include/linux/kvm_host.h | 14 ++++++++++++++
+ virt/kvm/eventfd.c       |  3 +++
+ 2 files changed, 17 insertions(+)
 
-v4 -> v5:
-- add the capability to check whether vgic is initialized when
-  assigning an irqfd.  objective is to avoid injecting IRQ before
-  this vgic is ready: this corresponds to new patch files 2, 3, 4.
-- do not specifically handle early virtual IRQ injections in
-  kvm_set_irq.  In case of injection when vgic is not yet ready,
-  simply return an error.  User-space now has means to force vgic
-  init and get notified if irqfd assign takes place too early.
-- squash [PATCH v4 2/3] KVM: arm: add irqfd support and
-         [PATCH v4 3/3] KVM: arm64: add irqfd support
-- add Acked-by's in KVM: arm/arm64: unset CONFIG_HAVE_KVM_IRQCHIP
-- some comment rewording in vgic
-
-v3 -> v4:
-- rebase on 3.18rc5
-- vgic dynamic instantiation brought new challenges:
-  handling of irqfd injection when vgic is not ready
-- unset of CONFIG_HAVE_KVM_IRQCHIP in a separate patch
-- add arm64 enable
-- vgic.c style modifications according to Christoffer comments
-
-v2 -> v3:
-- removal of irq.h from eventfd.c put in a separate patch to increase
-  visibility
-- properly expose KVM_CAP_IRQFD capability in arm.c
-- remove CONFIG_HAVE_KVM_IRQCHIP meaningfull only if irq_comm.c is used
-
-v1 -> v2:
-- rebase on 3.17rc1
-- move of the dist unlock in process_maintenance
-- remove of dist lock in __kvm_vgic_sync_hwstate
-- rewording of the commit message (add resamplefd reference)
-- remove irq.h
-
-Eric Auger (5):
-  KVM: arm/arm64: unset CONFIG_HAVE_KVM_IRQCHIP
-  KVM: introduce kvm_arch_intc_initialized and use it in irqfd
-  KVM: arm/arm64: implement kvm_arch_intc_initialized
-  KVM: arm/arm64: remove coarse grain dist locking at
-    kvm_vgic_sync_hwstate
-  KVM: arm/arm64: add irqfd support
-
- Documentation/virtual/kvm/api.txt |  6 +++-
- arch/arm/include/asm/kvm_host.h   |  2 ++
- arch/arm/include/uapi/asm/kvm.h   |  3 ++
- arch/arm/kvm/Kconfig              |  4 +--
- arch/arm/kvm/Makefile             |  2 +-
- arch/arm/kvm/arm.c                | 10 +++++++
- arch/arm64/include/asm/kvm_host.h |  2 ++
- arch/arm64/include/uapi/asm/kvm.h |  3 ++
- arch/arm64/kvm/Kconfig            |  3 +-
- arch/arm64/kvm/Makefile           |  2 +-
- include/linux/kvm_host.h          | 14 +++++++++
- virt/kvm/arm/vgic.c               | 61 ++++++++++++++++++++++++++++++++++-----
- virt/kvm/eventfd.c                |  3 ++
- 13 files changed, 101 insertions(+), 14 deletions(-)
-
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index d12b210..ae9c720 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -700,6 +700,20 @@ static inline wait_queue_head_t *kvm_arch_vcpu_wq(struct kvm_vcpu *vcpu)
+ #endif
+ }
+ 
++#ifdef __KVM_HAVE_ARCH_INTC_INITIALIZED
++/*
++ * returns true if the virtual interrupt controller is initialized and
++ * ready to accept virtual IRQ. On some architectures the virtual interrupt
++ * controller is dynamically instantiated and this is not always true.
++ */
++bool kvm_arch_intc_initialized(struct kvm *kvm);
++#else
++static inline bool kvm_arch_intc_initialized(struct kvm *kvm)
++{
++	return true;
++}
++#endif
++
+ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type);
+ void kvm_arch_destroy_vm(struct kvm *kvm);
+ void kvm_arch_sync_events(struct kvm *kvm);
+diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+index 148b239..fc5f43e 100644
+--- a/virt/kvm/eventfd.c
++++ b/virt/kvm/eventfd.c
+@@ -311,6 +311,9 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
+ 	unsigned int events;
+ 	int idx;
+ 
++	if (!kvm_arch_intc_initialized(kvm))
++		return -EAGAIN;
++
+ 	irqfd = kzalloc(sizeof(*irqfd), GFP_KERNEL);
+ 	if (!irqfd)
+ 		return -ENOMEM;
 -- 
 1.9.1
