@@ -1,179 +1,351 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 1/3] arm64: KVM: Fix stage-2 PGD allocation to have
- per-page refcounting
-Date: Thu, 05 Mar 2015 13:58:47 +0000
-Message-ID: <54F86117.5000903@arm.com>
-References: <1424883340-29940-1-git-send-email-marc.zyngier@arm.com>
- <1424883340-29940-2-git-send-email-marc.zyngier@arm.com>
- <20150302182705.GD10137@lvm>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v9 5/5] KVM: arm/arm64: add irqfd support
+Date: Thu, 05 Mar 2015 15:04:09 +0100
+Message-ID: <54F86259.20704@linaro.org>
+References: <1425464076-20558-1-git-send-email-eric.auger@linaro.org> <1425464076-20558-6-git-send-email-eric.auger@linaro.org> <54F8359A.4020405@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F61B47D95
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Mar 2015 08:52:47 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id B8lx64cM8rlw for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Mar 2015 08:52:45 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DE6047CB3
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Mar 2015 08:52:45 -0500 (EST)
-In-Reply-To: <20150302182705.GD10137@lvm>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <54F8359A.4020405@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, "eric.auger@st.com" <eric.auger@st.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: Andre Przywara <Andre.Przywara@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "patches@linaro.org" <patches@linaro.org>, "gleb@kernel.org" <gleb@kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 02/03/15 18:27, Christoffer Dall wrote:
-> On Wed, Feb 25, 2015 at 04:55:38PM +0000, Marc Zyngier wrote:
->> We're using __get_free_pages with to allocate the guest's stage-2
->> PGD. The standard behaviour of this function is to return a set of
->> pages where only the head page has a valid refcount.
+Hi Marc,
+On 03/05/2015 11:53 AM, Marc Zyngier wrote:
+> On 04/03/15 10:14, Eric Auger wrote:
+>> This patch enables irqfd on arm/arm64.
 >>
->> This behaviour gets us into trouble when we're trying to increment
->> the refount on a non-head page:
+>> Both irqfd and resamplefd are supported. Injection is implemented
+>> in vgic.c without routing.
 >>
->> page:ffff7c00cfb693c0 count:0 mapcount:0 mapping:          (null) index:0x0
->> flags: 0x4000000000000000()
->> page dumped because: VM_BUG_ON_PAGE((*({ __attribute__((unused)) typeof((&page->_count)->counter) __var = ( typeof((&page->_count)->counter)) 0; (volatile typeof((&page->_count)->counter) *)&((&page->_count)->counter); })) <= 0)
->> BUG: failure at include/linux/mm.h:548/get_page()!
->> Kernel panic - not syncing: BUG!
->> CPU: 1 PID: 1695 Comm: kvm-vcpu-0 Not tainted 4.0.0-rc1+ #3825
->> Hardware name: APM X-Gene Mustang board (DT)
->> Call trace:
->> [<ffff80000008a09c>] dump_backtrace+0x0/0x13c
->> [<ffff80000008a1e8>] show_stack+0x10/0x1c
->> [<ffff800000691da8>] dump_stack+0x74/0x94
->> [<ffff800000690d78>] panic+0x100/0x240
->> [<ffff8000000a0bc4>] stage2_get_pmd+0x17c/0x2bc
->> [<ffff8000000a1dc4>] kvm_handle_guest_abort+0x4b4/0x6b0
->> [<ffff8000000a420c>] handle_exit+0x58/0x180
->> [<ffff80000009e7a4>] kvm_arch_vcpu_ioctl_run+0x114/0x45c
->> [<ffff800000099df4>] kvm_vcpu_ioctl+0x2e0/0x754
->> [<ffff8000001c0a18>] do_vfs_ioctl+0x424/0x5c8
->> [<ffff8000001c0bfc>] SyS_ioctl+0x40/0x78
->> CPU0: stopping
+>> This patch enables CONFIG_HAVE_KVM_EVENTFD and CONFIG_HAVE_KVM_IRQFD.
 >>
->> Passing the (unintuitively named) __GFP_COMP flag to __get_free_pages
->> forces the allocator to maintain a per-page refcount, which is exactly
->> what we need.
-> 
-> There's a concerning comment with what seems to be the same kind of
-> scenario in arch/tile/mm/pgtable.c:248.
-> 
-> I'm a little confused here, because it looks like prep_new_page() calls
-> prep_compound_page(), which is the effect you're looking for, but it
-> sets the page count of all tail pages to 0, and I think our code expects
-> all page table pages with all entries clear to have a page count of 1,
-> i.e. the allocation count itself, so don't we still have a discrepency
-> between head and tail pages for compound allocations?
-
-I wondered about that, but couldn't decide either way. If that was the
-case, we'd trigger some nasty warnings when tearing down a VM, and I
-couldn't see any.
-
-> So I'm wondering if we should simply call split_page() on the allocation
-> or if there's some other way of doing individual multiple contigous page
-> allocations?  Am I seeing ghosts?
-
-Could well be a nicer solution. At least I can understand the code.
-
-I'll give it a go.
-
+>> KVM_CAP_IRQFD is now advertised. KVM_CAP_IRQFD_RESAMPLE capability
+>> automatically is advertised as soon as CONFIG_HAVE_KVM_IRQFD is set.
 >>
->> This has been tested on an X-Gene platform with a 4kB/48bit-VA host
->> kernel, and kvmtool hacked to place memory in the second page of
->> the hardware PGD (PUD for the host kernel).
+>> Irqfd injection is restricted to SPI. The rationale behind not
+>> supporting PPI irqfd injection is that any device using a PPI would
+>> be a private-to-the-CPU device (timer for instance), so its state
+>> would have to be context-switched along with the VCPU and would
+>> require in-kernel wiring anyhow. It is not a relevant use case for
+>> irqfds.
 >>
->> Reported-by: Mark Rutland <mark.rutland@arm.com>
->> Tested-by: Mark Rutland <mark.rutland@arm.com>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+>> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+>>
 >> ---
->>  arch/arm/include/asm/kvm_mmu.h   | 7 +++++++
->>  arch/arm/kvm/mmu.c               | 2 +-
->>  arch/arm64/include/asm/kvm_mmu.h | 9 ++++++++-
->>  3 files changed, 16 insertions(+), 2 deletions(-)
+>> v8 -> v9:
+>> - replace kvm_debug by trace_kvm_set_irq and add
+>>   BUG_ON(!vgic_initialized(kvm));
 >>
->> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
->> index 37ca2a4..1cac89b 100644
->> --- a/arch/arm/include/asm/kvm_mmu.h
->> +++ b/arch/arm/include/asm/kvm_mmu.h
->> @@ -162,6 +162,13 @@ static inline bool kvm_page_empty(void *ptr)
+>> v7 -> v8:
+>> - remove kvm_irq_has_notifier call
+>> - part of dist locking changes now are part of previous patch file
+>> - remove gic_initialized() check in kvm_set_irq
+>> - remove Christoffer's Reviewed-by after this change
+>>
+>> v5 -> v6:
+>> - KVM_CAP_IRQFD support depends on vgic_present
+>> - add Christoffer's Reviewed-by
+>>
+>> v4 -> v5:
+>> - squash [PATCH v4 3/3] KVM: arm64: add irqfd support into this patch
+>> - some rewording in Documentation/virtual/kvm/api.txt and in vgic
+>>   vgic_process_maintenance unlock comment.
+>> - move explanation of why not supporting PPI into commit message
+>> - in case of injection before gic readiness, -ENODEV is returned. It is
+>>   up to the user space to avoid this situation.
+>>
+>> v3 -> v4:
+>> - reword commit message
+>> - explain why we unlock the distributor before calling kvm_notify_acked_irq
+>> - rename is_assigned_irq into has_notifier
+>> - change EOI and injection kvm_debug format string
+>> - remove error local variable in kvm_set_irq
+>> - Move HAVE_KVM_IRQCHIP unset in a separate patch
+>> - handle case were the irqfd injection is attempted before the vgic is ready.
+>>   in such a case the notifier, if any, is called immediatly
+>> - use nr_irqs to test spi is within correct range
+>>
+>> v2 -> v3:
+>> - removal of irq.h from eventfd.c put in a separate patch to increase
+>>   visibility
+>> - properly expose KVM_CAP_IRQFD capability in arm.c
+>> - remove CONFIG_HAVE_KVM_IRQCHIP meaningfull only if irq_comm.c is used
+>>
+>> v1 -> v2:
+>> - rebase on 3.17rc1
+>> - move of the dist unlock in process_maintenance
+>> - remove of dist lock in __kvm_vgic_sync_hwstate
+>> - rewording of the commit message (add resamplefd reference)
+>> - remove irq.h
+>>
+>> Conflicts:
+>> 	arch/arm64/kvm/Kconfig
+>> ---
+>>  Documentation/virtual/kvm/api.txt |  6 ++++-
+>>  arch/arm/include/uapi/asm/kvm.h   |  3 +++
+>>  arch/arm/kvm/Kconfig              |  2 ++
+>>  arch/arm/kvm/Makefile             |  2 +-
+>>  arch/arm/kvm/arm.c                |  5 ++++
+>>  arch/arm64/include/uapi/asm/kvm.h |  3 +++
+>>  arch/arm64/kvm/Kconfig            |  2 ++
+>>  arch/arm64/kvm/Makefile           |  2 +-
+>>  virt/kvm/arm/vgic.c               | 48 +++++++++++++++++++++++++++++++++++++++
+>>  9 files changed, 70 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+>> index b112efc..b265d8e 100644
+>> --- a/Documentation/virtual/kvm/api.txt
+>> +++ b/Documentation/virtual/kvm/api.txt
+>> @@ -2234,7 +2234,7 @@ into the hash PTE second double word).
+>>  4.75 KVM_IRQFD
 >>  
->>  #define KVM_PREALLOC_LEVEL	0
+>>  Capability: KVM_CAP_IRQFD
+>> -Architectures: x86 s390
+>> +Architectures: x86 s390 arm arm64
+>>  Type: vm ioctl
+>>  Parameters: struct kvm_irqfd (in)
+>>  Returns: 0 on success, -1 on error
+>> @@ -2260,6 +2260,10 @@ Note that closing the resamplefd is not sufficient to disable the
+>>  irqfd.  The KVM_IRQFD_FLAG_RESAMPLE is only necessary on assignment
+>>  and need not be specified with KVM_IRQFD_FLAG_DEASSIGN.
 >>  
->> +/*
->> + * We need to ensure that stage-2 PGDs are allocated with a per-page
->> + * refcount, as we fiddle with the refcounts of non-head pages.
->> + * __GFP_COMP forces the allocator to do what we want.
->> + */
->> +#define KVM_GFP_S2_PGD	(GFP_KERNEL | __GFP_ZERO | __GFP_COMP)
+>> +On ARM/ARM64, the gsi field in the kvm_irqfd struct specifies the Shared
+>> +Peripheral Interrupt (SPI) index, such that the GIC interrupt ID is
+>> +given by gsi + 32.
 >> +
->>  static inline int kvm_prealloc_hwpgd(struct kvm *kvm, pgd_t *pgd)
->>  {
+>>  4.76 KVM_PPC_ALLOCATE_HTAB
+>>  
+>>  Capability: KVM_CAP_PPC_ALLOC_HTAB
+>> diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+>> index 0db25bc..2499867 100644
+>> --- a/arch/arm/include/uapi/asm/kvm.h
+>> +++ b/arch/arm/include/uapi/asm/kvm.h
+>> @@ -198,6 +198,9 @@ struct kvm_arch_memory_slot {
+>>  /* Highest supported SPI, from VGIC_NR_IRQS */
+>>  #define KVM_ARM_IRQ_GIC_MAX		127
+>>  
+>> +/* One single KVM irqchip, ie. the VGIC */
+>> +#define KVM_NR_IRQCHIPS          1
+>> +
+>>  /* PSCI interface */
+>>  #define KVM_PSCI_FN_BASE		0x95c1ba5e
+>>  #define KVM_PSCI_FN(n)			(KVM_PSCI_FN_BASE + (n))
+>> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+>> index aae5242..d735a3e 100644
+>> --- a/arch/arm/kvm/Kconfig
+>> +++ b/arch/arm/kvm/Kconfig
+>> @@ -27,6 +27,7 @@ config KVM
+>>  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+>>  	select SRCU
+>>  	depends on ARM_VIRT_EXT && ARM_LPAE
+>> +	select HAVE_KVM_EVENTFD
+>>  	---help---
+>>  	  Support hosting virtualized guest machines. You will also
+>>  	  need to select one or more of the processor modules below.
+>> @@ -58,6 +59,7 @@ config KVM_ARM_MAX_VCPUS
+>>  config KVM_ARM_VGIC
+>>  	bool "KVM support for Virtual GIC"
+>>  	depends on KVM_ARM_HOST && OF
+>> +	select HAVE_KVM_IRQFD
+>>  	default y
+>>  	---help---
+>>  	  Adds support for a hardware assisted, in-kernel GIC emulation.
+>> diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+>> index 443b8be..539c1a5 100644
+>> --- a/arch/arm/kvm/Makefile
+>> +++ b/arch/arm/kvm/Makefile
+>> @@ -15,7 +15,7 @@ AFLAGS_init.o := -Wa,-march=armv7-a$(plus_virt)
+>>  AFLAGS_interrupts.o := -Wa,-march=armv7-a$(plus_virt)
+>>  
+>>  KVM := ../../../virt/kvm
+>> -kvm-arm-y = $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o
+>> +kvm-arm-y = $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o
+>>  
+>>  obj-y += kvm-arm.o init.o interrupts.o
+>>  obj-y += arm.o handle_exit.o guest.o mmu.o emulate.o reset.o
+>> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+>> index 5300d5a..4313776 100644
+>> --- a/arch/arm/kvm/arm.c
+>> +++ b/arch/arm/kvm/arm.c
+>> @@ -175,6 +175,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>  	case KVM_CAP_IRQCHIP:
+>>  		r = vgic_present;
+>>  		break;
+>> +#ifdef CONFIG_HAVE_KVM_IRQFD
+>> +	case KVM_CAP_IRQFD:
+>> +		r = vgic_present;
+>> +		break;
+>> +#endif
 > 
-> what about the case for kvm_prealloc_hwpgd, why doesn't it need to use
-> the new GFP mask?
-
-I don't think so. It is always at most a page.
-
->>  	return 0;
->> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
->> index 3e6859b..a6a8252 100644
->> --- a/arch/arm/kvm/mmu.c
->> +++ b/arch/arm/kvm/mmu.c
->> @@ -666,7 +666,7 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
->>  		 * Allocate actual first-level Stage-2 page table used by the
->>  		 * hardware for Stage-2 page table walks.
->>  		 */
->> -		pgd = (pgd_t *)__get_free_pages(GFP_KERNEL | __GFP_ZERO, S2_PGD_ORDER);
->> +		pgd = (pgd_t *)__get_free_pages(KVM_GFP_S2_PGD, S2_PGD_ORDER);
->>  	}
+> Nitpick: we have "select HAVE_KVM_IRQFD", so we can lose the #ifdef-ery.
+right. Also I think the vgic_present can be removed since
+CONFIG_HAVE_KVM_IRQFD always is set when CONFIG_KVM_ARM_VGIC is set.
+So overall this indeed can simply be replaced by Paolo's patch.
+> 
+>>  	case KVM_CAP_DEVICE_CTRL:
+>>  	case KVM_CAP_USER_MEMORY:
+>>  	case KVM_CAP_SYNC_MMU:
+>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+>> index 3ef77a4..c154c0b 100644
+>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>> @@ -191,6 +191,9 @@ struct kvm_arch_memory_slot {
+>>  /* Highest supported SPI, from VGIC_NR_IRQS */
+>>  #define KVM_ARM_IRQ_GIC_MAX		127
 >>  
->>  	if (!pgd)
->> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
->> index 6458b53..06c733a 100644
->> --- a/arch/arm64/include/asm/kvm_mmu.h
->> +++ b/arch/arm64/include/asm/kvm_mmu.h
->> @@ -171,6 +171,13 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
->>  #define KVM_PREALLOC_LEVEL	(0)
->>  #endif
->>  
->> +/*
->> + * We need to ensure that stage-2 PGDs are allocated with a per-page
->> + * refcount, as we fiddle with the refcounts of non-head pages.
->> + * __GFP_COMP forces the allocator to do what we want.
->> + */
->> +#define KVM_GFP_S2_PGD	(GFP_KERNEL | __GFP_ZERO | __GFP_COMP)
+>> +/* One single KVM irqchip, ie. the VGIC */
+>> +#define KVM_NR_IRQCHIPS          1
 >> +
->>  /**
->>   * kvm_prealloc_hwpgd - allocate inital table for VTTBR
->>   * @kvm:	The KVM struct pointer for the VM.
->> @@ -192,7 +199,7 @@ static inline int kvm_prealloc_hwpgd(struct kvm *kvm, pgd_t *pgd)
->>  	if (KVM_PREALLOC_LEVEL == 0)
->>  		return 0;
+>>  /* PSCI interface */
+>>  #define KVM_PSCI_FN_BASE		0x95c1ba5e
+>>  #define KVM_PSCI_FN(n)			(KVM_PSCI_FN_BASE + (n))
+>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+>> index 039d8cf..143c9fd 100644
+>> --- a/arch/arm64/kvm/Kconfig
+>> +++ b/arch/arm64/kvm/Kconfig
+>> @@ -29,6 +29,7 @@ config KVM
+>>  	select KVM_ARM_TIMER
+>>  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+>>  	select SRCU
+>> +	select HAVE_KVM_EVENTFD
+>>  	---help---
+>>  	  Support hosting virtualized guest machines.
 >>  
->> -	hwpgd = __get_free_pages(GFP_KERNEL | __GFP_ZERO, PTRS_PER_S2_PGD_SHIFT);
->> +	hwpgd = __get_free_pages(KVM_GFP_S2_PGD, PTRS_PER_S2_PGD_SHIFT);
->>  	if (!hwpgd)
->>  		return -ENOMEM;
+>> @@ -53,6 +54,7 @@ config KVM_ARM_MAX_VCPUS
+>>  config KVM_ARM_VGIC
+>>  	bool
+>>  	depends on KVM_ARM_HOST && OF
+>> +	select HAVE_KVM_IRQFD
+> 
+> Hmmm. There is way too many selects here. Can't we just select it with
+> CONFIG_KVM_ARM_VGIC, and be done with it?
+
+I did that way since CONFIG_KVM_ARM_VGIC is not selected in the config
+KVM section on 32b. Currently the IRQFD select location is same for arm
+and arm64.
+
+do you prefer I select HAVE_KVM_IRQFD in the config KVM section, ie. at
+the same place we select CONFIG_KVM_ARM_VGIC?
+
+
+> 
+>>  	---help---
+>>  	  Adds support for a hardware assisted, in-kernel GIC emulation.
 >>  
->> -- 
->> 2.1.4
+>> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+>> index 4e6e09e..0dffb5f 100644
+>> --- a/arch/arm64/kvm/Makefile
+>> +++ b/arch/arm64/kvm/Makefile
+>> @@ -11,7 +11,7 @@ ARM=../../../arch/arm/kvm
+>>  
+>>  obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
+>>  
+>> -kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o
+>> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/arm.o $(ARM)/mmu.o $(ARM)/mmio.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/psci.o $(ARM)/perf.o
+>>  
+>> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+>> index 4e9b6d3..2dfb299 100644
+>> --- a/virt/kvm/arm/vgic.c
+>> +++ b/virt/kvm/arm/vgic.c
+>> @@ -31,6 +31,7 @@
+>>  #include <asm/kvm_emulate.h>
+>>  #include <asm/kvm_arm.h>
+>>  #include <asm/kvm_mmu.h>
+>> +#include <trace/events/kvm.h>
+>>  
+>>  /*
+>>   * How the whole thing works (courtesy of Christoffer Dall):
+>> @@ -1083,6 +1084,7 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+>>  	u32 status = vgic_get_interrupt_status(vcpu);
+>>  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+>>  	bool level_pending = false;
+>> +	struct kvm *kvm = vcpu->kvm;
+>>  
+>>  	kvm_debug("STATUS = %08x\n", status);
+>>  
+>> @@ -1118,6 +1120,17 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+>>  			 */
+>>  			vgic_dist_irq_clear_soft_pend(vcpu, vlr.irq);
+>>  
+>> +			/*
+>> +			 * kvm_notify_acked_irq calls kvm_set_irq()
+>> +			 * to reset the IRQ level. Need to release the
+>> +			 * lock for kvm_set_irq to grab it.
+>> +			 */
+>> +			spin_unlock(&dist->lock);
+>> +
+>> +			kvm_notify_acked_irq(kvm, 0,
+>> +					     vlr.irq - VGIC_NR_PRIVATE_IRQS);
+>> +			spin_lock(&dist->lock);
+>> +
+> 
+> I tried hard to break that one, and failed. It must be correct! ;-)
+Knock on wood!
+
+Do I need to post a v10 based on Paolo's patch?
+
+Thanks
+
+Eric
+> 
+>>  			/* Any additional pending interrupt? */
+>>  			if (vgic_dist_irq_get_level(vcpu, vlr.irq)) {
+>>  				vgic_cpu_irq_set(vcpu, vlr.irq);
+>> @@ -1911,3 +1924,38 @@ out_free_irq:
+>>  	free_percpu_irq(vgic->maint_irq, kvm_get_running_vcpus());
+>>  	return ret;
+>>  }
+>> +
+>> +int kvm_irq_map_gsi(struct kvm *kvm,
+>> +		    struct kvm_kernel_irq_routing_entry *entries,
+>> +		    int gsi)
+>> +{
+>> +	return gsi;
+>> +}
+>> +
+>> +int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned irqchip, unsigned pin)
+>> +{
+>> +	return pin;
+>> +}
+>> +
+>> +int kvm_set_irq(struct kvm *kvm, int irq_source_id,
+>> +		u32 irq, int level, bool line_status)
+>> +{
+>> +	unsigned int spi = irq + VGIC_NR_PRIVATE_IRQS;
+>> +
+>> +	trace_kvm_set_irq(irq, level, irq_source_id);
+>> +
+>> +	BUG_ON(!vgic_initialized(kvm));
+>> +
+>> +	if (spi > kvm->arch.vgic.nr_irqs)
+>> +		return -EINVAL;
+>> +	return kvm_vgic_inject_irq(kvm, 0, spi, level);
+>> +
+>> +}
+>> +
+>> +/* MSI not implemented yet */
+>> +int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+>> +		struct kvm *kvm, int irq_source_id,
+>> +		int level, bool line_status)
+>> +{
+>> +	return 0;
+>> +}
 >>
+> 
+> Despite from the nits mentionned before, this looks good, and I think we
+> should merge it in 4.1 (or whatever this is called).
+> 
+> So for the whole series:
+> 
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> 
+> 	M.
+> 
 
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
