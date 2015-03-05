@@ -1,110 +1,124 @@
-From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH v5 0/4] vfio: type1: support for ARM SMMUS with
-	VFIO_IOMMU_TYPE1
-Date: Thu, 05 Mar 2015 18:34:59 +0100
-Message-ID: <54F893C3.6020006@linaro.org>
-References: <1425485274-5709-1-git-send-email-b.reynal@virtualopensystems.com>
-	<1425491104.5200.268.camel@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC/RFT PATCH 0/3] arm64: KVM: work around incoherency with
+ uncached guest mappings
+Date: Thu, 05 Mar 2015 18:43:36 +0100
+Message-ID: <54F895C8.2070306@redhat.com>
+References: <CAKv+Gu-JnvXFzr-fpjZZ-zTt8hOSfGqefw69s+4JX2iu_6_BMw@mail.gmail.com>
+ <20150304141212.GA5352@hawk.usersys.redhat.com>
+ <20150304142943.GU28951@e104818-lin.cambridge.arm.com>
+ <54F73ACF.1090605@redhat.com>
+ <20150304172855.GA28951@e104818-lin.cambridge.arm.com>
+ <54F82C06.2000701@redhat.com>
+ <20150305110415.GA7712@e104818-lin.cambridge.arm.com>
+ <CAFEAcA98j_EsP4Hy20tQCKdnP3=NuvS3Ona37peBjan8aWLSEA@mail.gmail.com>
+ <20150305120348.GD7712@e104818-lin.cambridge.arm.com>
+ <54F84B7F.5010007@redhat.com>
+ <20150305145831.GA11447@e104818-lin.cambridge.arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <1425491104.5200.268.camel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>, Will Deacon <Will.Deacon-5wv7dgnIgG8@public.gmane.org>
-Cc: iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 11B4847DBF
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Mar 2015 12:37:51 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id BywWTaY1mWt2 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Mar 2015 12:37:49 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2EF147D84
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Mar 2015 12:37:49 -0500 (EST)
+In-Reply-To: <20150305145831.GA11447@e104818-lin.cambridge.arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: KVM devel mailing list <kvm@vger.kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi All,
-
-Ironically, since the correction of the IOMMU_CAP_CACHE_COHERENCY bug
-(https://lkml.org/lkml/2015/1/29/514) in vfio_iommu_type1.c, my Calxeda
-Midway VFIO use case is not working anymore. This is also observable
-when I do not apply at all the whole [PATCH v5 0/4] vfio: type1: support
-for ARM SMMUS with VFIO_IOMMU_TYPE1 series.
-
-My understanding is this series should not be requested for me since my
-xgmac device does not care about the XN attribute.
-
-My understanding is that without the bug or the series, the IOMMU_CACHE
-flag is set whereas before it was not. Patching vfio_iommu_type1.c
-vfio_iommu_type1_attach_group and unsetting IOMMU_CAP_CACHE_COHERENCY
-makes the use case functional again.
-
-I do not understand the exact semantic of IOMMU_CAP_CACHE_COHERENCY. I
-see the arm smmu always returns true, and if my understanding is correct
-the vfio_iommu_type1 sets the IOMMU_CACHE attribute which eventually
-make the ARM SMMU sets the memory attribute to cacheable in the PTE. But
-naively I would say the interco used in Midway may not be cache coherent
-capability (ARM ACE, ACE-lite), hence the issue.
-
-Please could you share your knowledge/understanding about this topic.
-Adding Will in to ;-)
-
-Thank you in advance
-
-Best Regards
-
-Eric
 
 
-
-On 03/04/2015 06:45 PM, Alex Williamson wrote:
-> On Wed, 2015-03-04 at 17:07 +0100, Baptiste Reynal wrote:
->> This patch series makes the VFIO_IOMMU_TYPE1 driver buildable on ARM, so it
->> may be used with ARM SMMUs. It also adds support for the IOMMU_NOEXEC flag
->> supported by SMMUs adhering to the ARM SMMU specification so the VFIO user can
->> specify whether the target memory can be executed by the device behind the
->> SMMU.
+On 05/03/2015 15:58, Catalin Marinas wrote:
+>> It would especially suck if the user has a cluster with different
+>> machines, some of them coherent and others non-coherent, and then has to
+>> debug why the same configuration works on some machines and not on others.
 > 
-> Ok, so the differences between IOMMU_CACHE and IOMMU_NOEXEC are twofold.
-> First is that when the IOMMU is IOMMU_CAP_CACHE_COHERENCY we always use
-> IOMMU_CACHE for all mappings within the domain.  This is not a user
-> provided mapping flag.  Second, if a device is added behind an IOMMU
-> that is not IOMMU_CAP_CACHE_COHERENCY capable, this simply means that it
-> needs to be managed as a separate domain within the same container.
-> vfio_domains_have_iommu_cache() reports true only if all domains within
-> the container support, and are therefore using, IOMMU_CACHE.
+> That's a problem indeed, especially with guest migration. But I don't
+> think we have any sane solution here for the bus master DMA.
+
+I do not oppose doing cache management in QEMU for bus master DMA
+(though if the solution you outlined below works it would be great).
+
+> ARM can override them as well but only making them stricter. Otherwise,
+> on a weakly ordered architecture, it's not always safe (let's say the
+> guest thinks it accesses Strongly Ordered memory and avoids barriers for
+> flag updates but the host "upgrades" it to Cacheable which breaks the
+> memory order).
+
+The same can happen on x86 though, even if it's rarer.  You still need a
+barrier between stores and loads.
+
+> If we want the host to enforce guest memory mapping attributes via stage
+> 2, we could do it the other way around: get the guests to always assume
+> full cache coherency, generating Normal Cacheable mappings, but use the
+> stage 2 attributes restriction in the host to make such mappings
+> non-cacheable when needed (it works this way on ARM but not in the other
+> direction to relax the attributes).
+
+That sounds like a plan for device assignment.  But it still would not
+solve the problem of the MMIO framebuffer, right?
+
+>> The problem arises with MMIO areas that the guest can reasonably expect
+>> to be uncacheable, but that are optimized by the host so that they end
+>> up backed by cacheable RAM.  It's perfectly reasonable that the same
+>> device needs cacheable mapping with one userspace, and works with
+>> uncacheable mapping with another userspace that doesn't optimize the
+>> MMIO area to RAM.
 > 
-> On the other hand, IOMMU_NOEXEC is a feature, but not a global mapping
-> flag for a domain.  There are potentially some mappings with it within a
-> domain and some without, just like the IOMMU_READ/IOMMU_WRITE.  It's
-> therefore a per-DMA mapping flag as you've implemented in patch 4.
-> Second, as a user specified flag, support for it is mandatory.  If a
-> device is added behind an IOMMU that does not support NOEXEC and NOEXEC
-> mappings are in use, the device must be rejected from addition to the
-> container.
+> Unless the guest allocates the framebuffer itself (e.g.
+> dma_alloc_coherent), we can't control the cacheability via
+> "dma-coherent" properties as it refers to bus master DMA.
+
+Okay, it's good to rule that out.  One less thing to think about. :)
+Same for _DSD.
+
+> So for MMIO with the buffer allocated by the host (Qemu), the only
+> solution I see on ARM is for the host to ensure coherency, either via
+> explicit cache maintenance (new KVM API) or by changing the memory
+> attributes used by Qemu to access such virtual MMIO.
 > 
-> Hopefully that's correct, because I think that's what the code does.
-> The problem I have with the code is that I don't think it's acceptable
-> to call iommu_ops.capable() directly.  This is breaking an abstraction
-> of the IOMMU API.  The obvious problem with that is:
+> Basically Qemu is acting as a bus master when reading the framebuffer it
+> allocated but the guest considers it a slave access and we don't have a
+> way to tell the guest that such accesses should be cacheable, nor can we
+> upgrade them via architecture features.
+
+Yes, that's a way to put it.
+
+>> In practice, the VGA framebuffer has an optimization that uses dirty
+>> page tracking, so we could piggyback on the ioctls that return which
+>> pages are dirty.  It turns out that piggybacking on those ioctls also
+>> should fix the case of migrating a guest while the MMU is disabled.
 > 
-> bool iommu_capable(struct bus_type *bus, enum iommu_cap cap)
+> Yes, Qemu would need to invalidate the cache before reading a dirty
+> framebuffer page.
 > 
-> I assume you're calling the op directly because of bus_type, but that's
-> no excuse to misuse the API.  Our choice is either to try to extend the
-> API, maybe create:
-> 
-> bool iommu_domain_capable(struct iommu_domain *domain, enum iommu_cap cap)
-> 
-> Or to use the available function by either caching the value when we do
-> have a bus_type available to us, or storing or discovering bus_type.  It
-> doesn't seem that terrible to cache it on the domain.  Be careful though
-> that if a device imposing lack of NOEXEC on a domain is removed, the
-> ability to do NOEXEC mappings should be reinstated.  That would be easy
-> if we use separate vfio_domains to manage NOEXEC capable vs NOEXEC
-> in-capable devices (like we do CACHE vs no-CACHE), but there's some
-> additional overhead to do that since it implies a separate iommu_domain.
-> Thanks,
-> 
-> Alex
-> 
+> As I said above, an API that allows non-cacheable mappings for the VGA
+> framebuffer in Qemu would also solve the problem. I'm not sure what KVM
+> provides here (or whether we can add such API).
+
+Nothing for now; other architectures simply do not have the issue.
+
+As long as it's just VGA, we can quirk it.  There's just a couple
+vendor/device IDs to catch, and the guest can then use a cacheable mapping.
+
+For a more generic solution, the API would be madvise(MADV_DONTCACHE).
+It would be easy for QEMU to use it, but I am not too optimistic about
+convincing the mm folks about it.  We can try.
+
+Paolo
