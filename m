@@ -1,34 +1,24 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [RFC/RFT PATCH 0/3] arm64: KVM: work around incoherency with
- uncached guest mappings
-Date: Thu, 5 Mar 2015 11:04:16 +0000
-Message-ID: <20150305110415.GA7712@e104818-lin.cambridge.arm.com>
-References: <54F51A63.4060302@samsung.com>
- <20150304113505.GS28951@e104818-lin.cambridge.arm.com>
- <CAKv+Gu8OUtcpaQh5+gb6vNrdi+Q7eu_zKOujmyoRPrzrs+GJVQ@mail.gmail.com>
- <20150304122956.GT28951@e104818-lin.cambridge.arm.com>
- <CAKv+Gu-JnvXFzr-fpjZZ-zTt8hOSfGqefw69s+4JX2iu_6_BMw@mail.gmail.com>
- <20150304141212.GA5352@hawk.usersys.redhat.com>
- <20150304142943.GU28951@e104818-lin.cambridge.arm.com>
- <54F73ACF.1090605@redhat.com>
- <20150304172855.GA28951@e104818-lin.cambridge.arm.com>
- <54F82C06.2000701@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH] KVM: arm/arm64: prefer IS_ENABLED to a static variable
+Date: Thu,  5 Mar 2015 12:26:06 +0100
+Message-ID: <1425554766-4119-1-git-send-email-pbonzini@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6253147D51
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Mar 2015 05:58:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AA4947D38
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Mar 2015 06:20:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yedQJdshA-nI for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 Mar 2015 05:58:22 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 59F3E47D4D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Mar 2015 05:58:22 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <54F82C06.2000701@redhat.com>
+ with ESMTP id PTc9fespnNvu for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Mar 2015 06:20:10 -0500 (EST)
+Received: from mail-wi0-f175.google.com (mail-wi0-f175.google.com
+ [209.85.212.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1547547C39
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Mar 2015 06:20:09 -0500 (EST)
+Received: by wivr20 with SMTP id r20so5997898wiv.5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 05 Mar 2015 03:26:14 -0800 (PST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -38,34 +28,79 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: KVM devel mailing list <kvm@vger.kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Mar 05, 2015 at 11:12:22AM +0100, Paolo Bonzini wrote:
-> On 04/03/2015 18:28, Catalin Marinas wrote:
-> >> > Can you add that property to the device tree for PCI devices too?
-> >
-> > Yes but not with mainline yet:
-> > 
-> > http://thread.gmane.org/gmane.linux.kernel.iommu/8935
-> > 
-> > We can add the property at the PCI host bridge level (with the drawback
-> > that it covers all the PCI devices), like here:
-> 
-> Even covering all PCI devices is not enough if we want to support device
-> assignment of PCI host devices. 
+IS_ENABLED gives compile-time checking and keeps the code clearer.
 
-Can we not have another PCI bridge node in the DT for the host device
-assignments?
+The one exception is inside kvm_vm_ioctl_check_extension, where
+the established idiom is to wrap the case labels with an #ifdef.
 
-> I'd rather not spend effort on a solution that we know will only
-> half-work a few months down the road.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+--
+	Untested...
+---
+ arch/arm/kvm/arm.c | 17 +++++------------
+ 1 file changed, 5 insertions(+), 12 deletions(-)
 
-Which of the solutions are you referring to? On the Applied Micro
-boards, for example, the PCIe is coherent. If you do device assignment,
-the guest must be aware of the coherency property of the physical device
-and behave accordingly, there isn't much the host can do about it.
-
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 07e7eb1d7ab6..706769fb0f2e 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -61,8 +61,6 @@ static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
+ static u8 kvm_next_vmid;
+ static DEFINE_SPINLOCK(kvm_vmid_lock);
+ 
+-static bool vgic_present;
+-
+ static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
+ {
+ 	BUG_ON(preemptible());
+@@ -172,9 +170,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ {
+ 	int r;
+ 	switch (ext) {
++#ifdef CONFIG_KVM_ARM_VGIC
+ 	case KVM_CAP_IRQCHIP:
+-		r = vgic_present;
+-		break;
++#endif
+ 	case KVM_CAP_DEVICE_CTRL:
+ 	case KVM_CAP_USER_MEMORY:
+ 	case KVM_CAP_SYNC_MMU:
+@@ -831,7 +829,7 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+ 
+ 	switch (dev_id) {
+ 	case KVM_ARM_DEVICE_VGIC_V2:
+-		if (!vgic_present)
++		if (!IS_ENABLED(CONFIG_KVM_ARM_VGIC))
+ 			return -ENXIO;
+ 		return kvm_vgic_addr(kvm, type, &dev_addr->addr, true);
+ 	default:
+@@ -847,10 +845,9 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 
+ 	switch (ioctl) {
+ 	case KVM_CREATE_IRQCHIP: {
+-		if (vgic_present)
+-			return kvm_vgic_create(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
+-		else
++		if (!IS_ENABLED(CONFIG_KVM_ARM_VGIC))
+ 			return -ENXIO;
++		return kvm_vgic_create(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
+ 	}
+ 	case KVM_ARM_SET_DEVICE_ADDR: {
+ 		struct kvm_arm_device_addr dev_addr;
+@@ -1035,10 +1032,6 @@ static int init_hyp_mode(void)
+ 	if (err)
+ 		goto out_free_context;
+ 
+-#ifdef CONFIG_KVM_ARM_VGIC
+-		vgic_present = true;
+-#endif
+-
+ 	/*
+ 	 * Init HYP architected timer support
+ 	 */
 -- 
-Catalin
+2.3.0
