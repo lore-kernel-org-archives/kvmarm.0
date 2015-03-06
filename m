@@ -1,23 +1,24 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [RFC PATCH 0/6] flush/invalidate on entry/exit
-Date: Fri,  6 Mar 2015 13:52:27 -0500
-Message-ID: <1425667953-3566-1-git-send-email-drjones@redhat.com>
+Subject: [RFC PATCH 1/6] kvm: promote KVM_MEMSLOT_INCOHERENT to uapi
+Date: Fri,  6 Mar 2015 13:52:28 -0500
+Message-ID: <1425667953-3566-2-git-send-email-drjones@redhat.com>
 References: <1425667780-3449-1-git-send-email-drjones@redhat.com>
+ <1425667953-3566-1-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B9BC647FCB
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EE29347FC9
  for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Mar 2015 13:46:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id T38IAarf0ef8 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id jqS8JsFBBpdj for <kvmarm@lists.cs.columbia.edu>;
  Fri,  6 Mar 2015 13:46:34 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C611A47FAC
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 86B5D47F41
  for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Mar 2015 13:46:34 -0500 (EST)
-In-Reply-To: <1425667780-3449-1-git-send-email-drjones@redhat.com>
+In-Reply-To: <1425667953-3566-1-git-send-email-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,30 +32,71 @@ To: kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, ard.biesheuvel@linaro.o
 Cc: pbonzini@redhat.com, lersek@redhat.com, catalin.marinas@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Userspace flags memory regions as incoherent and kvm flushes/
-invalidates those regions on entry/exit from userspace.
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ arch/arm/kvm/mmu.c       | 9 +++++++--
+ include/linux/kvm_host.h | 1 -
+ include/uapi/linux/kvm.h | 1 +
+ 3 files changed, 8 insertions(+), 3 deletions(-)
 
- Result before patch 6/6: restores coherency, waaaaay toooo sloooooow
- Result with patch 6/6: fast again - well, we removed the code...
-
-Andrew Jones (6):
-  kvm: promote KVM_MEMSLOT_INCOHERENT to uapi
-  KVM: Introduce incoherent cache maintenance API
-  KVM: ARM: change __coherent_cache_guest_page interface
-  KVM: ARM: extend __coherent_cache_guest_page
-  KVM: ARM: implement kvm_*_incoherent_memory_regions
-  KVM: ARM: no need for kvm_arch_flush_incoherent
-
- arch/arm/include/asm/kvm_mmu.h    | 12 +++----
- arch/arm/include/uapi/asm/kvm.h   |  1 +
- arch/arm/kvm/arm.c                |  4 +++
- arch/arm/kvm/mmu.c                | 72 +++++++++++++++++++++++++++++++++++++--
- arch/arm64/include/asm/kvm_mmu.h  | 12 ++++---
- arch/arm64/include/uapi/asm/kvm.h |  1 +
- include/linux/kvm_host.h          | 15 +++++++-
- include/uapi/linux/kvm.h          |  1 +
- virt/kvm/kvm_main.c               | 45 +++++++++++++++++++++++-
- 9 files changed, 147 insertions(+), 16 deletions(-)
-
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index bcc1b3ad2adce..a806e8cecc01b 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -1260,7 +1260,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (!hugetlb && !force_pte)
+ 		hugetlb = transparent_hugepage_adjust(&pfn, &fault_ipa);
+ 
+-	fault_ipa_uncached = memslot->flags & KVM_MEMSLOT_INCOHERENT;
++	fault_ipa_uncached = memslot->flags & KVM_MEM_INCOHERENT;
+ 
+ 	if (hugetlb) {
+ 		pmd_t new_pmd = pfn_pmd(pfn, mem_type);
+@@ -1784,15 +1784,20 @@ void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *free,
+ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 			    unsigned long npages)
+ {
++#if 1
+ 	/*
+ 	 * Readonly memslots are not incoherent with the caches by definition,
+ 	 * but in practice, they are used mostly to emulate ROMs or NOR flashes
+ 	 * that the guest may consider devices and hence map as uncached.
+ 	 * To prevent incoherency issues in these cases, tag all readonly
+ 	 * regions as incoherent.
++	 *
++	 * This heuristic can be removed after userspace has been updated to
++	 * use KVM_MEM_INCOHERENT on readonly regions when necessary.
+ 	 */
+ 	if (slot->flags & KVM_MEM_READONLY)
+-		slot->flags |= KVM_MEMSLOT_INCOHERENT;
++		slot->flags |= KVM_MEM_INCOHERENT;
++#endif
+ 	return 0;
+ }
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 3b934cc94cc83..9dfb519c51e5b 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -43,7 +43,6 @@
+  * include/linux/kvm_h.
+  */
+ #define KVM_MEMSLOT_INVALID	(1UL << 16)
+-#define KVM_MEMSLOT_INCOHERENT	(1UL << 17)
+ 
+ /* Two fragments for cross MMIO pages. */
+ #define KVM_MAX_MMIO_FRAGMENTS	2
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index a37fd1224f363..f7f9432bcf485 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -108,6 +108,7 @@ struct kvm_userspace_memory_region {
+  */
+ #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
+ #define KVM_MEM_READONLY	(1UL << 1)
++#define KVM_MEM_INCOHERENT	(1UL << 2)
+ 
+ /* for KVM_IRQ_LINE */
+ struct kvm_irq_level {
 -- 
 1.8.3.1
