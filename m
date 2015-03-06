@@ -1,53 +1,85 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: [RFC PATCH 5/6] vga: flag vram as incoherent
-Date: Fri,  6 Mar 2015 13:53:37 -0500
-Message-ID: <1425668018-3649-6-git-send-email-drjones@redhat.com>
-References: <1425667780-3449-1-git-send-email-drjones@redhat.com>
- <1425668018-3649-1-git-send-email-drjones@redhat.com>
+From: Mario Smarduch <m.smarduch@samsung.com>
+Subject: Re: [RFC/RFT PATCH 0/3] arm64: KVM: work around incoherency with
+ uncached guest mappings
+Date: Fri, 06 Mar 2015 12:33:01 -0800
+Message-ID: <54FA0EFD.7050306@samsung.com>
+References: <CAKv+Gu8Je3RRrgEFCZ7JUWtOgk3WqA_qdBEOPAMc3OqnKr1bwg@mail.gmail.com>
+ <20150219175518.GB26965@hawk.usersys.redhat.com> <54E62404.9040702@redhat.com>
+ <20150220142905.GA10942@hawk.usersys.redhat.com>
+ <CAKv+Gu-YUzmnACZQi98OPRgKKL+gAGqwWYq2-_dwCdNqcktNUg@mail.gmail.com>
+ <20150220153626.GB10942@hawk.usersys.redhat.com>
+ <20150224145529.GA5498@hawk.usersys.redhat.com>
+ <CAKv+Gu-Uk2wg1OkoWgQe4da_EiFoEz_u8VuD8Ees6qU1UYMDvQ@mail.gmail.com>
+ <20150302163146.GB9686@lvm> <54F51A63.4060302@samsung.com>
+ <20150304113505.GS28951@e104818-lin.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A8C924802B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Mar 2015 13:47:46 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Kb8xDcXaxEzJ for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Mar 2015 13:47:46 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A88CA48016
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Mar 2015 13:47:44 -0500 (EST)
-In-Reply-To: <1425668018-3649-1-git-send-email-drjones@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, ard.biesheuvel@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org
-Cc: pbonzini@redhat.com, lersek@redhat.com, catalin.marinas@arm.com
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <20150304113505.GS28951@e104818-lin.cambridge.arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, KVM devel mailing list <kvm@vger.kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- hw/display/vga.c | 1 +
- 1 file changed, 1 insertion(+)
+On 03/04/2015 03:35 AM, Catalin Marinas wrote:
+> (please try to avoid top-posting)
+> 
+> On Mon, Mar 02, 2015 at 06:20:19PM -0800, Mario Smarduch wrote:
+>> On 03/02/2015 08:31 AM, Christoffer Dall wrote:
+>>> However, my concern with these patches are on two points:
+>>>
+>>> 1. It's not a fix-all.  We still have the case where the guest expects
+>>> the behavior of device memory (for strong ordering for example) on a RAM
+>>> region, which we now break.  Similiarly this doesn't support the
+>>> non-coherent DMA to RAM region case.
+>>>
+>>> 2. While the code is probably as nice as this kind of stuff gets, it
+>>> is non-trivial and extremely difficult to debug.  The counter-point here
+>>> is that we may end up handling other stuff at EL2 for performanc reasons
+>>> in the future.
+>>>
+>>> Mainly because of point 1 above, I am leaning to thinking userspace
+>>> should do the invalidation when it knows it needs to, either through KVM
+>>> via a memslot flag or through some other syscall mechanism.
+> 
+> I expressed my concerns as well, I'm definitely against merging this
+> series.
+> 
+>> I don't understand how can the CPU handle different cache attributes
+>> used by QEMU and Guest won't you run into B2.9 checklist? Wouldn't
+>> cache evictions or cleans wipe out guest updates to same cache
+>> line(s)?
+> 
+> "Clean+invalidate" is a safe operation even if the guest accesses the
+> memory in a cacheable way. But if the guest can update the cache lines,
+> Qemu should avoid cache maintenance from a performance perspective.
+> 
+> The guest is either told that the DMA is coherent (via DT properties) or
+> Qemu deals with (non-)coherency itself. The latter is fully in line with
+> the B2.9 chapter in the ARM ARM, more precisely point 5:
+> 
+>   If the mismatched attributes for a memory location all assign the same
+>   shareability attribute to the location, any loss of uniprocessor
+>   semantics or coherency within a shareability domain can be avoided by
+>   use of software cache management.
+> 
+> ... it continues with what kind of cache maintenance is required,
+> together with:
+> 
+>   A clean and invalidate instruction can be used instead of a clean
+>   instruction, or instead of an invalidate instruction.
+> 
+Hi Catalin,
+  sorry for the top posting. I'm struggling with QEMU cache
+maintenance for devices that don't have registers cache line aligned
+and may be multi-function, for lack of a better
+one I thought of sp804 that supports two devices with registers
+covered by one cache line. Wouldn't QEMU cache maintenance
+of one device have potential to corrupt the second device?
+These could be used by two guest threads in parallel.
 
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index c8c49abc6e8ba..2b74eb8e96462 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -2135,6 +2135,7 @@ void vga_common_init(VGACommonState *s, Object *obj, bool global_vmstate)
-     s->is_vbe_vmstate = 1;
-     memory_region_init_ram(&s->vram, obj, "vga.vram", s->vram_size,
-                            &error_abort);
-+    memory_region_set_incoherent_cache(&s->vram);
-     vmstate_register_ram(&s->vram, global_vmstate ? NULL : DEVICE(obj));
-     xen_register_framebuffer(&s->vram);
-     s->vram_ptr = memory_region_get_ram_ptr(&s->vram);
--- 
-1.8.3.1
+I get bullet 2,3 still working on 1st one it will take a while.
+
+Thanks,
+- Mario
