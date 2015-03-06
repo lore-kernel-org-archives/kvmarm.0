@@ -1,143 +1,67 @@
-From: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-Subject: Re: [PATCH v5 0/4] vfio: type1: support for ARM SMMUS with
-	VFIO_IOMMU_TYPE1
-Date: Fri, 6 Mar 2015 14:44:43 +0100
-Message-ID: <CAN9JPjGLrODZPbEd=nNTRuQPxa8qff1HTa7B06H+Un2cM4__yQ@mail.gmail.com>
-References: <1425485274-5709-1-git-send-email-b.reynal@virtualopensystems.com>
-	<1425491104.5200.268.camel@redhat.com>
-	<54F893C3.6020006@linaro.org>
-	<1425589915.5200.336.camel@redhat.com>
-	<54F96D96.8040207@linaro.org> <20150306104148.GC22377@arm.com>
-	<CAN9JPjHWcXuzkByJY1gnbvi28nZX8RBbZXDA2t-VeK6v8OrSRg@mail.gmail.com>
-	<54F9A8EE.9020008@linaro.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH roundup 0/4] extend VA range of ID map for core kernel and KVM
+Date: Fri,  6 Mar 2015 15:34:38 +0100
+Message-ID: <1425652482-31411-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <54F9A8EE.9020008-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Cc: "tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org" <tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, "iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 212FA47BB8
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Mar 2015 09:29:00 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id hKv6nG9LDIwo for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Mar 2015 09:28:56 -0500 (EST)
+Received: from mail-wi0-f177.google.com (mail-wi0-f177.google.com
+ [209.85.212.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 08E7E47A40
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Mar 2015 09:28:55 -0500 (EST)
+Received: by wiwl15 with SMTP id l15so3834394wiw.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 06 Mar 2015 06:35:02 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: marc.zyngier@arm.com, christoffer.dall@linaro.org, linux@arm.linux.org.uk, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: will.deacon@arm.com, arnd@arndb.de, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Good news Eric !
+These are the VA range patches presented as a coherent set. The bounce page
+and 'HYP init code too big' error are probably not prerequisites anymore now
+that I switched from merging the HYP runtime map with the HYP id map rather
+than the kernel ID map, but I would strongly prefer to keep it as a single
+series.
 
-Here are more information about the NOEXEC flag. This flag is used to
-set the XN flag on the PTE, which make the page non-executable (XN is
-set if NOEXEC is set).
+Ard Biesheuvel (3):
+  arm64: mm: increase VA range of identity map
+  ARM, arm64: kvm: get rid of the bounce page
+  arm64: KVM: use ID map with increased VA range if required
 
-As it used to be an EXEC flag (XN was set by default, unset if EXEC
-was set), this patch serie was mandatory for PL330 test, since it
-executes some code from memory. Now that it has been reversed to
-NOEXEC (XN is not set by default), every page is executable, so it
-works but there may be a security issue.
+Arnd Bergmann (1):
+  ARM: KVM: avoid "HYP init code too big" error
 
-I think it is better to have it if it is working, but for
-simplification we can add it later (as the requirement dropped when
-the flag has been reversed).
+ arch/arm/include/asm/kvm_mmu.h         | 10 +++++
+ arch/arm/kernel/vmlinux.lds.S          | 35 ++++++++++++++---
+ arch/arm/kvm/init.S                    |  3 ++
+ arch/arm/kvm/mmu.c                     | 69 +++++++++++++++-------------------
+ arch/arm64/include/asm/kvm_mmu.h       | 33 ++++++++++++++++
+ arch/arm64/include/asm/mmu_context.h   | 43 +++++++++++++++++++++
+ arch/arm64/include/asm/page.h          |  6 ++-
+ arch/arm64/include/asm/pgtable-hwdef.h |  7 +++-
+ arch/arm64/kernel/head.S               | 38 +++++++++++++++++++
+ arch/arm64/kernel/smp.c                |  1 +
+ arch/arm64/kernel/vmlinux.lds.S        | 18 ++++++---
+ arch/arm64/kvm/hyp-init.S              | 26 +++++++++++++
+ arch/arm64/mm/mmu.c                    |  7 +++-
+ arch/arm64/mm/proc-macros.S            | 11 ++++++
+ arch/arm64/mm/proc.S                   |  3 ++
+ 15 files changed, 256 insertions(+), 54 deletions(-)
 
-Best regards,
-Baptiste
-
-
-On Fri, Mar 6, 2015 at 2:17 PM, Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
-> On 03/06/2015 12:27 PM, Baptiste Reynal wrote:
->> Hi everyone,
->>
->> Indeed, the NOEXEC flag is needed for our tests and VFIO should work
->> without it for some other devices (including xgmac). I think it is
->> reasonable to drop this patch serie for now.
->>
->> Still we have the IOMMU_CACHE issue. To answer Will, the SMMU page
->> tables are installed at stage-2. Currently, the dma-coherent flag is
->> not preserved to the guest, that may be the issue (As we don't have it
->> in the host in our case). "[RFC PATCH v3 0/3] vfio: platform: return
->> device properties for a platform device"
->> (http://lists.celinuxforum.org/pipermail/iommu/2014-December/011425.html)
->> may be a solution to figure out if the device is coherent or not.
->
-> I confirm the problem is fixed with proper guest device-tree. Sorry for
-> the noise and thanks for your support. indeed in the future the above
-> series will help in getting the info dynamically.
->
-> Best Regards
->
-> Eric
->>
->>
->> On Fri, Mar 6, 2015 at 11:41 AM, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org> wrote:
->>> Hi Eric,
->>>
->>> On Fri, Mar 06, 2015 at 09:04:22AM +0000, Eric Auger wrote:
->>>> Yes to me "vfio: type1: support for ARM SMMUS with VFIO_IOMMU_TYPE1" is
->>>> not a direct dependency of vfio-platform driver although I understand
->>>> Baptiste needs it to test with PL330 device. On my side I can test
->>>> vfio-platform driver without it, assigning the Midway Calxeda xgmac.
->>>
->>> Realistically, I don't expect anybody using device passthrough for
->>> practical applications to be using a PL330. Your xgmac example is far
->>> more compelling.
->>>
->>>> Also if I am not wrong the title of the series now does not really
->>>> reflect anymore what the series aims at. since "[PATCH v3 2/6] vfio:
->>>> type1: support for ARM SMMUs"  withdrawal, the series now "only" aims at
->>>> supporting the VFIO_DMA_MAP_FLAG_NOEXEC flag.
->>>>
->>>> However with this issue of IOMMU_CACHE always set along with arm-smmu,
->>>> there is a need for an adaptation of either vfio_iommu_type1 or arm-smmu
->>>> since the integrated pieces are not functional.
->>>
->>> Well, I'm still trying to understand exactly what is happening in your case:
->>>
->>>   - Is the xgmac coherent or not? Does it have a "dma-coherent" property?
->>>   - Are you installing the SMMU page tables at stage-1 or stage-2?
->>>   - If it *is* coherent, then we should use IOMMU_CACHE mappings for the
->>>     DMA buffers and ensure that the guest knows it is coherent (by
->>>     preserving the "dma-coherent" flag).
->>>   - If it is *not* coherent, then the behaviour of IOMMU_CACHE depends
->>>     on the stage of translation:
->>>
->>>     * Stage-1: we will make the transactions cacheable, and you'll need
->>>       to tell the guest that the device is actually cache coherent
->>>     * Stage-2: IOMMU_CACHE won't actually have any effect, so everything
->>>       should work as non-coherent.
->>>
->>> In other words, I think you're probably just telling the guest the wrong
->>> thing.
->>>
->>>> On top of the dma-coherent property of the *master*, should not we also
->>>> query the cache-coherent property of the interconnect downstream to the
->>>> smmu?
->>>
->>> I don't think so... "dma-coherent" should only be set on a master if the
->>> interconnect is properly configured. It's supposed to be a "If you DMA now,
->>> it will snoop the CPU caches" flag as opposed to "If you write a random
->>> selection of MMIO registers in the SoC, then this device will be coherent".
->>>
->>>> How can we progress quickly on this topic? is it acceptable to return
->>>> false on arm_smmu_capable(IOMMU_CAP_CACHE_COHERENCY) as a quick hack?
->>>
->>> No; pretending that a device is not coherent when it actually is can lead
->>> to corruption of DMA buffers due to unnecessary cache invalidation.
->>>
->>>> As a longer term solution, would it make sense to add a user flag at VFIO
->>>> user API level to turn the IOMMU_CACHE on?
->>>
->>> I think userspace certainly needs a way to figure out if a device is
->>> coherent or not, otherwise it can't generate the correct device-tree
->>> properties for something like a KVM guest but the IOMMU_* setting should
->>> remain in the kernel IMO. Similarly for things like MSI pages, which would
->>> need to be mapped as device memory on ARM -- that should be exposed as a
->>> higher level "please map my MSI page here" ioctl as opposed to requiring
->>> userspace to supply the correct memory attributes.
->>>
->>> Will
->
+-- 
+1.8.3.2
