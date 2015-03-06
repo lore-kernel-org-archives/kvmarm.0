@@ -1,17 +1,19 @@
-From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+From: Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>
 Subject: Re: [PATCH v5 0/4] vfio: type1: support for ARM SMMUS with
 	VFIO_IOMMU_TYPE1
-Date: Fri, 06 Mar 2015 10:04:22 +0100
-Message-ID: <54F96D96.8040207@linaro.org>
-References: <1425485274-5709-1-git-send-email-b.reynal@virtualopensystems.com>	
+Date: Fri, 6 Mar 2015 10:41:48 +0000
+Message-ID: <20150306104148.GC22377@arm.com>
+References: <1425485274-5709-1-git-send-email-b.reynal@virtualopensystems.com>
 	<1425491104.5200.268.camel@redhat.com>
 	<54F893C3.6020006@linaro.org>
 	<1425589915.5200.336.camel@redhat.com>
+	<54F96D96.8040207@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <1425589915.5200.336.camel-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <54F96D96.8040207-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
 	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
 List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
@@ -21,65 +23,73 @@ List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
 	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
 Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
 Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Cc: Will Deacon <Will.Deacon-5wv7dgnIgG8@public.gmane.org>, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+To: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Cc: "tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org" <tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>, "iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/05/2015 10:11 PM, Alex Williamson wrote:
-> On Thu, 2015-03-05 at 18:34 +0100, Eric Auger wrote:
->> Hi All,
->>
->> Ironically, since the correction of the IOMMU_CAP_CACHE_COHERENCY bug
->> (https://lkml.org/lkml/2015/1/29/514) in vfio_iommu_type1.c, my Calxeda
->> Midway VFIO use case is not working anymore. This is also observable
->> when I do not apply at all the whole [PATCH v5 0/4] vfio: type1: support
->> for ARM SMMUS with VFIO_IOMMU_TYPE1 series.
->>
->> My understanding is this series should not be requested for me since my
->> xgmac device does not care about the XN attribute.
+Hi Eric,
+
+On Fri, Mar 06, 2015 at 09:04:22AM +0000, Eric Auger wrote:
+> Yes to me "vfio: type1: support for ARM SMMUS with VFIO_IOMMU_TYPE1" is
+> not a direct dependency of vfio-platform driver although I understand
+> Baptiste needs it to test with PL330 device. On my side I can test
+> vfio-platform driver without it, assigning the Midway Calxeda xgmac.
+
+Realistically, I don't expect anybody using device passthrough for
+practical applications to be using a PL330. Your xgmac example is far
+more compelling.
+
+> Also if I am not wrong the title of the series now does not really
+> reflect anymore what the series aims at. since "[PATCH v3 2/6] vfio:
+> type1: support for ARM SMMUs"  withdrawal, the series now "only" aims at
+> supporting the VFIO_DMA_MAP_FLAG_NOEXEC flag.
 > 
-> This also raises the concern that we're continuing to put optional
-> features as prerequisites to base vfio-platform support and creating
-> self-induced stalls at getting anything upstream :-\  Thanks,
-Dear all,
+> However with this issue of IOMMU_CACHE always set along with arm-smmu,
+> there is a need for an adaptation of either vfio_iommu_type1 or arm-smmu
+> since the integrated pieces are not functional.
 
-Thanks Alex, Will for your inputs on this topic.
+Well, I'm still trying to understand exactly what is happening in your case:
 
-Yes to me "vfio: type1: support for ARM SMMUS with VFIO_IOMMU_TYPE1" is
-not a direct dependency of vfio-platform driver although I understand
-Baptiste needs it to test with PL330 device. On my side I can test
-vfio-platform driver without it, assigning the Midway Calxeda xgmac.
+  - Is the xgmac coherent or not? Does it have a "dma-coherent" property?
+  - Are you installing the SMMU page tables at stage-1 or stage-2?
+  - If it *is* coherent, then we should use IOMMU_CACHE mappings for the
+    DMA buffers and ensure that the guest knows it is coherent (by
+    preserving the "dma-coherent" flag).
+  - If it is *not* coherent, then the behaviour of IOMMU_CACHE depends
+    on the stage of translation:
 
-Also if I am not wrong the title of the series now does not really
-reflect anymore what the series aims at. since "[PATCH v3 2/6] vfio:
-type1: support for ARM SMMUs"  withdrawal, the series now "only" aims at
-supporting the VFIO_DMA_MAP_FLAG_NOEXEC flag.
+    * Stage-1: we will make the transactions cacheable, and you'll need
+      to tell the guest that the device is actually cache coherent
+    * Stage-2: IOMMU_CACHE won't actually have any effect, so everything
+      should work as non-coherent.
 
-However with this issue of IOMMU_CACHE always set along with arm-smmu,
-there is a need for an adaptation of either vfio_iommu_type1 or arm-smmu
-since the integrated pieces are not functional.
+In other words, I think you're probably just telling the guest the wrong
+thing.
 
-On top of the dma-coherent property of the *master*, should not we also
-query the cache-coherent property of the interconnect downstream to the
-smmu?
+> On top of the dma-coherent property of the *master*, should not we also
+> query the cache-coherent property of the interconnect downstream to the
+> smmu?
 
-How can we progress quickly on this topic? is it acceptable to return
-false on arm_smmu_capable(IOMMU_CAP_CACHE_COHERENCY) as a quick hack? As
-a longer term solution, would it make sense to add a user flag at VFIO
-user API level to turn the IOMMU_CACHE on?
+I don't think so... "dma-coherent" should only be set on a master if the
+interconnect is properly configured. It's supposed to be a "If you DMA now,
+it will snoop the CPU caches" flag as opposed to "If you write a random
+selection of MMIO registers in the SoC, then this device will be coherent".
 
-Best Regards
+> How can we progress quickly on this topic? is it acceptable to return
+> false on arm_smmu_capable(IOMMU_CAP_CACHE_COHERENCY) as a quick hack?
 
-Eric
+No; pretending that a device is not coherent when it actually is can lead
+to corruption of DMA buffers due to unnecessary cache invalidation.
 
+> As a longer term solution, would it make sense to add a user flag at VFIO
+> user API level to turn the IOMMU_CACHE on?
 
-Best Regards
+I think userspace certainly needs a way to figure out if a device is
+coherent or not, otherwise it can't generate the correct device-tree
+properties for something like a KVM guest but the IOMMU_* setting should
+remain in the kernel IMO. Similarly for things like MSI pages, which would
+need to be mapped as device memory on ARM -- that should be exposed as a
+higher level "please map my MSI page here" ioctl as opposed to requiring
+userspace to supply the correct memory attributes.
 
-Eric
-
-Best Regards
-
-Eric
-> 
-> Alex
-> 
+Will
