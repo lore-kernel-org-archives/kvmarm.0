@@ -1,26 +1,27 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH roundup 2/4] ARM: KVM: avoid "HYP init code too big" error
-Date: Fri,  6 Mar 2015 15:34:40 +0100
-Message-ID: <1425652482-31411-3-git-send-email-ard.biesheuvel@linaro.org>
-References: <1425652482-31411-1-git-send-email-ard.biesheuvel@linaro.org>
+From: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v5 0/4] vfio: type1: support for ARM SMMUS with
+ VFIO_IOMMU_TYPE1
+Date: Fri, 06 Mar 2015 07:46:22 -0700
+Message-ID: <1425653182.5200.379.camel@redhat.com>
+References: <1425485274-5709-1-git-send-email-b.reynal@virtualopensystems.com>
+ <1425491104.5200.268.camel@redhat.com> <54F893C3.6020006@linaro.org>
+ <1425589915.5200.336.camel@redhat.com> <54F96D96.8040207@linaro.org>
+ <20150306104148.GC22377@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 82FE447DCE
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Mar 2015 09:29:04 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BB9E347E6D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Mar 2015 09:40:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mZfrCiAllWbb for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Mar 2015 09:29:03 -0500 (EST)
-Received: from mail-we0-f182.google.com (mail-we0-f182.google.com
- [74.125.82.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C95047A40
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Mar 2015 09:29:01 -0500 (EST)
-Received: by wesw55 with SMTP id w55so6468324wes.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 06 Mar 2015 06:35:08 -0800 (PST)
-In-Reply-To: <1425652482-31411-1-git-send-email-ard.biesheuvel@linaro.org>
+ with ESMTP id uhkKsKyl50iW for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Mar 2015 09:40:22 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AB1F047E6B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Mar 2015 09:40:22 -0500 (EST)
+In-Reply-To: <20150306104148.GC22377@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,59 +31,27 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: marc.zyngier@arm.com, christoffer.dall@linaro.org, linux@arm.linux.org.uk, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: will.deacon@arm.com, arnd@arndb.de, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Will Deacon <will.deacon@arm.com>
+Cc: "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "tech@virtualopensystems.com" <tech@virtualopensystems.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Fri, 2015-03-06 at 10:41 +0000, Will Deacon wrote:
+> > As a longer term solution, would it make sense to add a user flag at VFIO
+> > user API level to turn the IOMMU_CACHE on?
+> 
+> I think userspace certainly needs a way to figure out if a device is
+> coherent or not, otherwise it can't generate the correct device-tree
+> properties for something like a KVM guest but the IOMMU_* setting should
+> remain in the kernel IMO. Similarly for things like MSI pages, which would
+> need to be mapped as device memory on ARM -- that should be exposed as a
+> higher level "please map my MSI page here" ioctl as opposed to requiring
+> userspace to supply the correct memory attributes.
 
-When building large kernels, the linker will emit lots of veneers
-into the .hyp.idmap.text section, which causes it to grow beyond
-one page, and that triggers the build error.
+Userspace already has a way to determine if all the IOMMUs for a
+container support cache coherence, as does KVM via the kvm-vfio pseudo
+device.  It's inadvisable to allow userspace to control whether
+IOMMU_CACHE is used on x86 as emulating cache sync instructions hurts
+the overall system performance.  We don't want users to arbitrarily
+decide to enable those heavy-weight operations.  Thanks,
 
-This moves the section into .rodata instead, which avoids the
-veneers and is safe because the code is not executed directly
-but remapped by the hypervisor into its own executable address
-space.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-[ardb: move the ALIGN() to .rodata as well, update log s/copied/remapped/]
-Tested-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm/kernel/vmlinux.lds.S | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm/kernel/vmlinux.lds.S b/arch/arm/kernel/vmlinux.lds.S
-index b31aa73e8076..2787eb8d3616 100644
---- a/arch/arm/kernel/vmlinux.lds.S
-+++ b/arch/arm/kernel/vmlinux.lds.S
-@@ -22,11 +22,15 @@
- 	ALIGN_FUNCTION();						\
- 	VMLINUX_SYMBOL(__idmap_text_start) = .;				\
- 	*(.idmap.text)							\
--	VMLINUX_SYMBOL(__idmap_text_end) = .;				\
-+	VMLINUX_SYMBOL(__idmap_text_end) = .;
-+
-+#define IDMAP_RODATA							\
-+	.rodata : {							\
- 	. = ALIGN(32);							\
- 	VMLINUX_SYMBOL(__hyp_idmap_text_start) = .;			\
- 	*(.hyp.idmap.text)						\
--	VMLINUX_SYMBOL(__hyp_idmap_text_end) = .;
-+	VMLINUX_SYMBOL(__hyp_idmap_text_end) = .;			\
-+	}
- 
- #ifdef CONFIG_HOTPLUG_CPU
- #define ARM_CPU_DISCARD(x)
-@@ -124,6 +128,7 @@ SECTIONS
- 	. = ALIGN(1<<SECTION_SHIFT);
- #endif
- 	RO_DATA(PAGE_SIZE)
-+	IDMAP_RODATA
- 
- 	. = ALIGN(4);
- 	__ex_table : AT(ADDR(__ex_table) - LOAD_OFFSET) {
--- 
-1.8.3.2
+Alex
