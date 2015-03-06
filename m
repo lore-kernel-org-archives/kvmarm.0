@@ -1,8 +1,8 @@
 From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 Subject: Re: [PATCH v5 0/4] vfio: type1: support for ARM SMMUS with
 	VFIO_IOMMU_TYPE1
-Date: Fri, 06 Mar 2015 13:41:03 +0100
-Message-ID: <54F9A05F.3080603@linaro.org>
+Date: Fri, 06 Mar 2015 14:17:34 +0100
+Message-ID: <54F9A8EE.9020008@linaro.org>
 References: <1425485274-5709-1-git-send-email-b.reynal@virtualopensystems.com>	<1425491104.5200.268.camel@redhat.com>	<54F893C3.6020006@linaro.org>	<1425589915.5200.336.camel@redhat.com>	<54F96D96.8040207@linaro.org>	<20150306104148.GC22377@arm.com>
 	<CAN9JPjHWcXuzkByJY1gnbvi28nZX8RBbZXDA2t-VeK6v8OrSRg@mail.gmail.com>
 Mime-Version: 1.0
@@ -23,8 +23,6 @@ To: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
 Cc: "tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org" <tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>, "iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi All,
-
 On 03/06/2015 12:27 PM, Baptiste Reynal wrote:
 > Hi everyone,
 > 
@@ -39,6 +37,14 @@ On 03/06/2015 12:27 PM, Baptiste Reynal wrote:
 > device properties for a platform device"
 > (http://lists.celinuxforum.org/pipermail/iommu/2014-December/011425.html)
 > may be a solution to figure out if the device is coherent or not.
+
+I confirm the problem is fixed with proper guest device-tree. Sorry for
+the noise and thanks for your support. indeed in the future the above
+series will help in getting the info dynamically.
+
+Best Regards
+
+Eric
 > 
 > 
 > On Fri, Mar 6, 2015 at 11:41 AM, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org> wrote:
@@ -66,13 +72,10 @@ On 03/06/2015 12:27 PM, Baptiste Reynal wrote:
 >> Well, I'm still trying to understand exactly what is happening in your case:
 >>
 >>   - Is the xgmac coherent or not? Does it have a "dma-coherent" property?
-Yes it has the dma-coherent property
 >>   - Are you installing the SMMU page tables at stage-1 or stage-2?
-stage2
 >>   - If it *is* coherent, then we should use IOMMU_CACHE mappings for the
 >>     DMA buffers and ensure that the guest knows it is coherent (by
 >>     preserving the "dma-coherent" flag).
-indeed that's the point then.
 >>   - If it is *not* coherent, then the behaviour of IOMMU_CACHE depends
 >>     on the stage of translation:
 >>
@@ -92,7 +95,6 @@ indeed that's the point then.
 >> interconnect is properly configured. It's supposed to be a "If you DMA now,
 >> it will snoop the CPU caches" flag as opposed to "If you write a random
 >> selection of MMIO registers in the SoC, then this device will be coherent".
-OK
 >>
 >>> How can we progress quickly on this topic? is it acceptable to return
 >>> false on arm_smmu_capable(IOMMU_CAP_CACHE_COHERENCY) as a quick hack?
@@ -110,11 +112,5 @@ OK
 >> need to be mapped as device memory on ARM -- that should be exposed as a
 >> higher level "please map my MSI page here" ioctl as opposed to requiring
 >> userspace to supply the correct memory attributes.
-
-Many thanks for the explanations.
-
-Best Regards
-
-Eric
 >>
 >> Will
