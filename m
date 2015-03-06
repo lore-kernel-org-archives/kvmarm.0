@@ -1,21 +1,23 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: the arm cache coherency cluster
-Date: Fri,  6 Mar 2015 13:49:40 -0500
-Message-ID: <1425667780-3449-1-git-send-email-drjones@redhat.com>
+Subject: [RFC PATCH 0/6] flush/invalidate on entry/exit
+Date: Fri,  6 Mar 2015 13:52:27 -0500
+Message-ID: <1425667953-3566-1-git-send-email-drjones@redhat.com>
+References: <1425667780-3449-1-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A9A8447FB0
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Mar 2015 13:43:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B9BC647FCB
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Mar 2015 13:46:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jmNcZ5Mo32dY for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Mar 2015 13:43:43 -0500 (EST)
+ with ESMTP id T38IAarf0ef8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Mar 2015 13:46:34 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9DFB647FAC
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Mar 2015 13:43:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C611A47FAC
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Mar 2015 13:46:34 -0500 (EST)
+In-Reply-To: <1425667780-3449-1-git-send-email-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,51 +31,30 @@ To: kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, ard.biesheuvel@linaro.o
 Cc: pbonzini@redhat.com, lersek@redhat.com, catalin.marinas@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In reply to this message I'll send two series' one for KVM and
-one for QEMU. The two series' are their respective component
-complements, and attempt to implement cache coherency for arm
-guests using emulated devices, where the emulator (qemu) uses
-cached memory for the device memory, but the guest uses
-uncached - as device memory is generally used. Right now I've
-just focused on VGA vram.
+Userspace flags memory regions as incoherent and kvm flushes/
+invalidates those regions on entry/exit from userspace.
 
-This approach starts as the "add a new memslot flag" approach,
-and then turns into the "make qemu do some cache maintenance"
-approach with the final patch of each series (6/6). It stops
-short of the "add syscalls..." approach. Below is a summary of
-all the approaches discussed so far, to my knowledge.
+ Result before patch 6/6: restores coherency, waaaaay toooo sloooooow
+ Result with patch 6/6: fast again - well, we removed the code...
 
-"MAIR manipulating"
-Posted[1] by Ard. Works. No performance degradation. Potential
-issues with device assignment and the guest getting confused.
+Andrew Jones (6):
+  kvm: promote KVM_MEMSLOT_INCOHERENT to uapi
+  KVM: Introduce incoherent cache maintenance API
+  KVM: ARM: change __coherent_cache_guest_page interface
+  KVM: ARM: extend __coherent_cache_guest_page
+  KVM: ARM: implement kvm_*_incoherent_memory_regions
+  KVM: ARM: no need for kvm_arch_flush_incoherent
 
-"add a new memslot flag"
-This posting (not counting patches 6/6). Works. Huge performance
-degradation.
+ arch/arm/include/asm/kvm_mmu.h    | 12 +++----
+ arch/arm/include/uapi/asm/kvm.h   |  1 +
+ arch/arm/kvm/arm.c                |  4 +++
+ arch/arm/kvm/mmu.c                | 72 +++++++++++++++++++++++++++++++++++++--
+ arch/arm64/include/asm/kvm_mmu.h  | 12 ++++---
+ arch/arm64/include/uapi/asm/kvm.h |  1 +
+ include/linux/kvm_host.h          | 15 +++++++-
+ include/uapi/linux/kvm.h          |  1 +
+ virt/kvm/kvm_main.c               | 45 +++++++++++++++++++++++-
+ 9 files changed, 147 insertions(+), 16 deletions(-)
 
-"make qemu do some cache maintenance"
-This posting (patches 6/6). We can only do so much in qemu
-without syscalls. This series does what it can. Almost works,
-probably could work, after playing 'find the missing flush'.
-This approach still requires the new memslot flag, as userspace
-can't invalidate the cache, only clean, or clean+invalidate.
-No noticeable performance degradation.
-
-"add syscalls to make qemu do all cache maintenance"
-Variant 1: implement as kvm ioctls - to avoid trying to get
-           syscalls into the general kernel
-Variant 2: add real syscalls, or maybe just ARM private SWIs
-           like __ARM_NR_cacheflush
-This approach should work, and if we add an invalidate syscall,
-then we shouldn't need any kvm changes at all, i.e. no need for
-the memslot flag. I haven't experimented with this yet, but I'm
-starting to like the idea of variant 2, with a private SWI, so
-will try to pull something together soon for that.
-
-"describe the problematic memory as cached to the guest"
-Not an ideal solution for virt. Could maybe be workable as a
-quirk for a specific device though.
-
-re: $SUBJECT; Here 'cluster' is defined by the urban dictionary.
-
-[1] http://thread.gmane.org/gmane.comp.emulators.kvm.arm.devel/34/
+-- 
+1.8.3.1
