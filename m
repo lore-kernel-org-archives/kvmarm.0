@@ -1,85 +1,124 @@
 From: Mario Smarduch <m.smarduch@samsung.com>
 Subject: Re: [RFC/RFT PATCH 0/3] arm64: KVM: work around incoherency with
  uncached guest mappings
-Date: Fri, 06 Mar 2015 12:33:01 -0800
-Message-ID: <54FA0EFD.7050306@samsung.com>
-References: <CAKv+Gu8Je3RRrgEFCZ7JUWtOgk3WqA_qdBEOPAMc3OqnKr1bwg@mail.gmail.com>
- <20150219175518.GB26965@hawk.usersys.redhat.com> <54E62404.9040702@redhat.com>
- <20150220142905.GA10942@hawk.usersys.redhat.com>
- <CAKv+Gu-YUzmnACZQi98OPRgKKL+gAGqwWYq2-_dwCdNqcktNUg@mail.gmail.com>
- <20150220153626.GB10942@hawk.usersys.redhat.com>
- <20150224145529.GA5498@hawk.usersys.redhat.com>
- <CAKv+Gu-Uk2wg1OkoWgQe4da_EiFoEz_u8VuD8Ees6qU1UYMDvQ@mail.gmail.com>
- <20150302163146.GB9686@lvm> <54F51A63.4060302@samsung.com>
- <20150304113505.GS28951@e104818-lin.cambridge.arm.com>
+Date: Fri, 06 Mar 2015 13:08:29 -0800
+Message-ID: <54FA174D.4030807@samsung.com>
+References: <CAKv+Gu-JnvXFzr-fpjZZ-zTt8hOSfGqefw69s+4JX2iu_6_BMw@mail.gmail.com>
+ <20150304141212.GA5352@hawk.usersys.redhat.com>
+ <20150304142943.GU28951@e104818-lin.cambridge.arm.com>
+ <54F73ACF.1090605@redhat.com>
+ <20150304172855.GA28951@e104818-lin.cambridge.arm.com>
+ <54F82C06.2000701@redhat.com>
+ <20150305110415.GA7712@e104818-lin.cambridge.arm.com>
+ <CAFEAcA98j_EsP4Hy20tQCKdnP3=NuvS3Ona37peBjan8aWLSEA@mail.gmail.com>
+ <20150305120348.GD7712@e104818-lin.cambridge.arm.com>
+ <54F84B7F.5010007@redhat.com>
+ <20150305145831.GA11447@e104818-lin.cambridge.arm.com>
+ <54F895C8.2070306@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <20150304113505.GS28951@e104818-lin.cambridge.arm.com>
+In-reply-to: <54F895C8.2070306@redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, KVM devel mailing list <kvm@vger.kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, KVM devel mailing list <kvm@vger.kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/04/2015 03:35 AM, Catalin Marinas wrote:
-> (please try to avoid top-posting)
+On 03/05/2015 09:43 AM, Paolo Bonzini wrote:
 > 
-> On Mon, Mar 02, 2015 at 06:20:19PM -0800, Mario Smarduch wrote:
->> On 03/02/2015 08:31 AM, Christoffer Dall wrote:
->>> However, my concern with these patches are on two points:
->>>
->>> 1. It's not a fix-all.  We still have the case where the guest expects
->>> the behavior of device memory (for strong ordering for example) on a RAM
->>> region, which we now break.  Similiarly this doesn't support the
->>> non-coherent DMA to RAM region case.
->>>
->>> 2. While the code is probably as nice as this kind of stuff gets, it
->>> is non-trivial and extremely difficult to debug.  The counter-point here
->>> is that we may end up handling other stuff at EL2 for performanc reasons
->>> in the future.
->>>
->>> Mainly because of point 1 above, I am leaning to thinking userspace
->>> should do the invalidation when it knows it needs to, either through KVM
->>> via a memslot flag or through some other syscall mechanism.
 > 
-> I expressed my concerns as well, I'm definitely against merging this
-> series.
+> On 05/03/2015 15:58, Catalin Marinas wrote:
+>>> It would especially suck if the user has a cluster with different
+>>> machines, some of them coherent and others non-coherent, and then has to
+>>> debug why the same configuration works on some machines and not on others.
+>>
+>> That's a problem indeed, especially with guest migration. But I don't
+>> think we have any sane solution here for the bus master DMA.
 > 
->> I don't understand how can the CPU handle different cache attributes
->> used by QEMU and Guest won't you run into B2.9 checklist? Wouldn't
->> cache evictions or cleans wipe out guest updates to same cache
->> line(s)?
+> I do not oppose doing cache management in QEMU for bus master DMA
+> (though if the solution you outlined below works it would be great).
 > 
-> "Clean+invalidate" is a safe operation even if the guest accesses the
-> memory in a cacheable way. But if the guest can update the cache lines,
-> Qemu should avoid cache maintenance from a performance perspective.
+>> ARM can override them as well but only making them stricter. Otherwise,
+>> on a weakly ordered architecture, it's not always safe (let's say the
+>> guest thinks it accesses Strongly Ordered memory and avoids barriers for
+>> flag updates but the host "upgrades" it to Cacheable which breaks the
+>> memory order).
 > 
-> The guest is either told that the DMA is coherent (via DT properties) or
-> Qemu deals with (non-)coherency itself. The latter is fully in line with
-> the B2.9 chapter in the ARM ARM, more precisely point 5:
+> The same can happen on x86 though, even if it's rarer.  You still need a
+> barrier between stores and loads.
 > 
->   If the mismatched attributes for a memory location all assign the same
->   shareability attribute to the location, any loss of uniprocessor
->   semantics or coherency within a shareability domain can be avoided by
->   use of software cache management.
+>> If we want the host to enforce guest memory mapping attributes via stage
+>> 2, we could do it the other way around: get the guests to always assume
+>> full cache coherency, generating Normal Cacheable mappings, but use the
+>> stage 2 attributes restriction in the host to make such mappings
+>> non-cacheable when needed (it works this way on ARM but not in the other
+>> direction to relax the attributes).
 > 
-> ... it continues with what kind of cache maintenance is required,
-> together with:
+> That sounds like a plan for device assignment.  But it still would not
+> solve the problem of the MMIO framebuffer, right?
 > 
->   A clean and invalidate instruction can be used instead of a clean
->   instruction, or instead of an invalidate instruction.
+>>> The problem arises with MMIO areas that the guest can reasonably expect
+>>> to be uncacheable, but that are optimized by the host so that they end
+>>> up backed by cacheable RAM.  It's perfectly reasonable that the same
+>>> device needs cacheable mapping with one userspace, and works with
+>>> uncacheable mapping with another userspace that doesn't optimize the
+>>> MMIO area to RAM.
+>>
+>> Unless the guest allocates the framebuffer itself (e.g.
+>> dma_alloc_coherent), we can't control the cacheability via
+>> "dma-coherent" properties as it refers to bus master DMA.
 > 
-Hi Catalin,
-  sorry for the top posting. I'm struggling with QEMU cache
-maintenance for devices that don't have registers cache line aligned
-and may be multi-function, for lack of a better
-one I thought of sp804 that supports two devices with registers
-covered by one cache line. Wouldn't QEMU cache maintenance
-of one device have potential to corrupt the second device?
-These could be used by two guest threads in parallel.
+> Okay, it's good to rule that out.  One less thing to think about. :)
+> Same for _DSD.
+> 
+>> So for MMIO with the buffer allocated by the host (Qemu), the only
+>> solution I see on ARM is for the host to ensure coherency, either via
+>> explicit cache maintenance (new KVM API) or by changing the memory
+>> attributes used by Qemu to access such virtual MMIO.
+>>
+>> Basically Qemu is acting as a bus master when reading the framebuffer it
+>> allocated but the guest considers it a slave access and we don't have a
+>> way to tell the guest that such accesses should be cacheable, nor can we
+>> upgrade them via architecture features.
+> 
+> Yes, that's a way to put it.
+> 
+>>> In practice, the VGA framebuffer has an optimization that uses dirty
+>>> page tracking, so we could piggyback on the ioctls that return which
+>>> pages are dirty.  It turns out that piggybacking on those ioctls also
+>>> should fix the case of migrating a guest while the MMU is disabled.
+>>
+>> Yes, Qemu would need to invalidate the cache before reading a dirty
+>> framebuffer page.
+>>
+>> As I said above, an API that allows non-cacheable mappings for the VGA
+>> framebuffer in Qemu would also solve the problem. I'm not sure what KVM
+>> provides here (or whether we can add such API).
+> 
+> Nothing for now; other architectures simply do not have the issue.
+> 
+> As long as it's just VGA, we can quirk it.  There's just a couple
+> vendor/device IDs to catch, and the guest can then use a cacheable mapping.
+> 
+> For a more generic solution, the API would be madvise(MADV_DONTCACHE).
+> It would be easy for QEMU to use it, but I am not too optimistic about
+> convincing the mm folks about it.  We can try.
 
-I get bullet 2,3 still working on 1st one it will take a while.
+Interested to see the outcome.
 
-Thanks,
-- Mario
+I was thinking of a very basic memory driver that can provide
+an uncached memslot to QEMU - in mmap() file operation
+apply pgprot_uncached to allocated pages, lock them, flush TLB
+call remap_pfn_range().
+
+Mario
+
+> 
+> Paolo
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> 
+
