@@ -1,29 +1,33 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 1/5] arm: KVM: export vcpi->pause state via MP_STATE
- ioctls
-Date: Mon, 9 Mar 2015 14:50:55 +0100
-Message-ID: <20150309135055.GC20559@cbox>
-References: <1425302944-6276-1-git-send-email-alex.bennee@linaro.org>
- <1425302944-6276-2-git-send-email-alex.bennee@linaro.org>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [RFC/RFT PATCH 0/3] arm64: KVM: work around incoherency with
+ uncached guest mappings
+Date: Mon, 9 Mar 2015 15:26:02 +0100
+Message-ID: <20150309142601.GA4171@hawk.usersys.redhat.com>
+References: <54F73ACF.1090605@redhat.com>
+ <20150304172855.GA28951@e104818-lin.cambridge.arm.com>
+ <54F82C06.2000701@redhat.com>
+ <20150305110415.GA7712@e104818-lin.cambridge.arm.com>
+ <CAFEAcA98j_EsP4Hy20tQCKdnP3=NuvS3Ona37peBjan8aWLSEA@mail.gmail.com>
+ <20150305120348.GD7712@e104818-lin.cambridge.arm.com>
+ <54F84B7F.5010007@redhat.com>
+ <20150305145831.GA11447@e104818-lin.cambridge.arm.com>
+ <54F895C8.2070306@redhat.com> <54FA174D.4030807@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D89BA481AA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Mar 2015 09:44:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF35A48209
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Mar 2015 10:20:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Cqpht1Fj8KYC for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Mar 2015 09:44:25 -0400 (EDT)
-Received: from mail-lb0-f174.google.com (mail-lb0-f174.google.com
- [209.85.217.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9BF0A481BE
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Mar 2015 09:44:24 -0400 (EDT)
-Received: by lbiz11 with SMTP id z11so45165009lbi.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 09 Mar 2015 06:50:39 -0700 (PDT)
+ with ESMTP id bxDmTumy8V3v for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Mar 2015 10:19:58 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BBAB348207
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Mar 2015 10:19:57 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <1425302944-6276-2-git-send-email-alex.bennee@linaro.org>
+In-Reply-To: <54FA174D.4030807@samsung.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,171 +37,115 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, marc.zyngier@arm.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, Gleb Natapov <gleb@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Mario Smarduch <m.smarduch@samsung.com>
+Cc: KVM devel mailing list <kvm@vger.kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Alex,
+On Fri, Mar 06, 2015 at 01:08:29PM -0800, Mario Smarduch wrote:
+> On 03/05/2015 09:43 AM, Paolo Bonzini wrote:
+> > 
+> > 
+> > On 05/03/2015 15:58, Catalin Marinas wrote:
+> >>> It would especially suck if the user has a cluster with different
+> >>> machines, some of them coherent and others non-coherent, and then has to
+> >>> debug why the same configuration works on some machines and not on others.
+> >>
+> >> That's a problem indeed, especially with guest migration. But I don't
+> >> think we have any sane solution here for the bus master DMA.
+> > 
+> > I do not oppose doing cache management in QEMU for bus master DMA
+> > (though if the solution you outlined below works it would be great).
+> > 
+> >> ARM can override them as well but only making them stricter. Otherwise,
+> >> on a weakly ordered architecture, it's not always safe (let's say the
+> >> guest thinks it accesses Strongly Ordered memory and avoids barriers for
+> >> flag updates but the host "upgrades" it to Cacheable which breaks the
+> >> memory order).
+> > 
+> > The same can happen on x86 though, even if it's rarer.  You still need a
+> > barrier between stores and loads.
+> > 
+> >> If we want the host to enforce guest memory mapping attributes via stage
+> >> 2, we could do it the other way around: get the guests to always assume
+> >> full cache coherency, generating Normal Cacheable mappings, but use the
+> >> stage 2 attributes restriction in the host to make such mappings
+> >> non-cacheable when needed (it works this way on ARM but not in the other
+> >> direction to relax the attributes).
+> > 
+> > That sounds like a plan for device assignment.  But it still would not
+> > solve the problem of the MMIO framebuffer, right?
+> > 
+> >>> The problem arises with MMIO areas that the guest can reasonably expect
+> >>> to be uncacheable, but that are optimized by the host so that they end
+> >>> up backed by cacheable RAM.  It's perfectly reasonable that the same
+> >>> device needs cacheable mapping with one userspace, and works with
+> >>> uncacheable mapping with another userspace that doesn't optimize the
+> >>> MMIO area to RAM.
+> >>
+> >> Unless the guest allocates the framebuffer itself (e.g.
+> >> dma_alloc_coherent), we can't control the cacheability via
+> >> "dma-coherent" properties as it refers to bus master DMA.
+> > 
+> > Okay, it's good to rule that out.  One less thing to think about. :)
+> > Same for _DSD.
+> > 
+> >> So for MMIO with the buffer allocated by the host (Qemu), the only
+> >> solution I see on ARM is for the host to ensure coherency, either via
+> >> explicit cache maintenance (new KVM API) or by changing the memory
+> >> attributes used by Qemu to access such virtual MMIO.
+> >>
+> >> Basically Qemu is acting as a bus master when reading the framebuffer it
+> >> allocated but the guest considers it a slave access and we don't have a
+> >> way to tell the guest that such accesses should be cacheable, nor can we
+> >> upgrade them via architecture features.
+> > 
+> > Yes, that's a way to put it.
+> > 
+> >>> In practice, the VGA framebuffer has an optimization that uses dirty
+> >>> page tracking, so we could piggyback on the ioctls that return which
+> >>> pages are dirty.  It turns out that piggybacking on those ioctls also
+> >>> should fix the case of migrating a guest while the MMU is disabled.
+> >>
+> >> Yes, Qemu would need to invalidate the cache before reading a dirty
+> >> framebuffer page.
+> >>
+> >> As I said above, an API that allows non-cacheable mappings for the VGA
+> >> framebuffer in Qemu would also solve the problem. I'm not sure what KVM
+> >> provides here (or whether we can add such API).
+> > 
+> > Nothing for now; other architectures simply do not have the issue.
+> > 
+> > As long as it's just VGA, we can quirk it.  There's just a couple
+> > vendor/device IDs to catch, and the guest can then use a cacheable mapping.
+> > 
+> > For a more generic solution, the API would be madvise(MADV_DONTCACHE).
+> > It would be easy for QEMU to use it, but I am not too optimistic about
+> > convincing the mm folks about it.  We can try.
 
-The subject of this change has a typo, and I also think it's not about
-exposing the pause state (that's just an internal name/concept), but
-about exposing the PSCI state, or simply the VCPU power state.
+I forgot to list this one in my summary of approaches[*]. This is a
+nice, clean approach. Avoids getting cache maintenance into everything.
+However, besides the difficulty to get it past mm people, it reduces
+performance for any userspace-userspace uses/sharing of the memory.
+userspace-guest requires cache maintenance, but nothing else. Maybe
+that's not an important concern for the few emulated devices that need
+it though.
 
-On Mon, Mar 02, 2015 at 01:29:00PM +0000, Alex Benn=E9e wrote:
-> To cleanly restore an SMP VM we need to ensure that the current pause
-> state of each vcpu is correctly recorded. Things could get confused if
-> the CPU starts running after migration restore completes when it was
-> paused before it state was captured.
-> =
+> 
+> Interested to see the outcome.
+> 
+> I was thinking of a very basic memory driver that can provide
+> an uncached memslot to QEMU - in mmap() file operation
+> apply pgprot_uncached to allocated pages, lock them, flush TLB
+> call remap_pfn_range().
 
-> We use the existing KVM_GET/SET_MP_STATE ioctl to do this. The arm/arm64
-> interface is a lot simpler as the only valid states are
-> KVM_MP_STATE_RUNNABLE and KVM_MP_STATE_HALTED.
-> =
+I guess this is the same as the madvise approach, but with a driver.
+KVM could take this approach itself when memslots are added/updated
+with the INCOHERENT flag. Maybe worth some experimental patches to
+find out?
 
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> =
+I'm still thinking about experimenting with the ARM private syscalls
+next though.
 
-> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kv=
-m/api.txt
-> index b112efc..602156f 100644
-> --- a/Documentation/virtual/kvm/api.txt
-> +++ b/Documentation/virtual/kvm/api.txt
-> @@ -997,7 +997,7 @@ for vm-wide capabilities.
->  4.38 KVM_GET_MP_STATE
->  =
+drew
 
->  Capability: KVM_CAP_MP_STATE
-> -Architectures: x86, s390
-> +Architectures: x86, s390, arm, arm64
->  Type: vcpu ioctl
->  Parameters: struct kvm_mp_state (out)
->  Returns: 0 on success; -1 on error
-> @@ -1027,15 +1027,21 @@ Possible values are:
->   - KVM_MP_STATE_LOAD:            the vcpu is in a special load/startup s=
-tate
->                                   [s390]
->  =
-
-> -On x86, this ioctl is only useful after KVM_CREATE_IRQCHIP. Without an
-> -in-kernel irqchip, the multiprocessing state must be maintained by users=
-pace on
-> +For x86:
-> +
-> +This ioctl is only useful after KVM_CREATE_IRQCHIP.  Without an in-kernel
-> +irqchip, the multiprocessing state must be maintained by userspace on
-
-Nit: I would not taint the git log with this change but instead just
-introduce a paragraph below starting with "On arm/arm64, " and you would
-get the same effect.
-
->  these architectures.
->  =
-
-> +For arm/arm64:
-> +
-> +The only states that are valid are KVM_MP_STATE_HALTED and
-> +KVM_MP_STATE_RUNNABLE which reflect if the vcpu is paused or not.
-
-As suggested on the QEMU series, HALTED is probably not the right thing
-to use.
-
->  =
-
->  4.39 KVM_SET_MP_STATE
->  =
-
->  Capability: KVM_CAP_MP_STATE
-> -Architectures: x86, s390
-> +Architectures: x86, s390, arm, arm64
->  Type: vcpu ioctl
->  Parameters: struct kvm_mp_state (in)
->  Returns: 0 on success; -1 on error
-> @@ -1043,10 +1049,16 @@ Returns: 0 on success; -1 on error
->  Sets the vcpu's current "multiprocessing state"; see KVM_GET_MP_STATE for
->  arguments.
->  =
-
-> -On x86, this ioctl is only useful after KVM_CREATE_IRQCHIP. Without an
-> -in-kernel irqchip, the multiprocessing state must be maintained by users=
-pace on
-> +For x86:
-> +
-> +This ioctl is only useful after KVM_CREATE_IRQCHIP.  Without an in-kernel
-> +irqchip, the multiprocessing state must be maintained by userspace on
->  these architectures.
->  =
-
-> +For arm/arm64:
-> +
-> +The only states that are valid are KVM_MP_STATE_HALTED and
-> +KVM_MP_STATE_RUNNABLE which reflect if the vcpu should be paused or not.
-
-same as above
-
->  =
-
->  4.40 KVM_SET_IDENTITY_MAP_ADDR
->  =
-
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index 5560f74..8531536 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -183,6 +183,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, lon=
-g ext)
->  	case KVM_CAP_ARM_PSCI:
->  	case KVM_CAP_ARM_PSCI_0_2:
->  	case KVM_CAP_READONLY_MEM:
-> +	case KVM_CAP_MP_STATE:
->  		r =3D 1;
->  		break;
->  	case KVM_CAP_COALESCED_MMIO:
-> @@ -313,13 +314,29 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_=
-vcpu *vcpu,
->  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
->  				    struct kvm_mp_state *mp_state)
->  {
-> -	return -EINVAL;
-> +	if (vcpu->arch.pause)
-> +		mp_state->mp_state =3D KVM_MP_STATE_HALTED;
-> +	else
-> +		mp_state->mp_state =3D KVM_MP_STATE_RUNNABLE;
-> +
-> +	return 0;
->  }
->  =
-
->  int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
->  				    struct kvm_mp_state *mp_state)
->  {
-> -	return -EINVAL;
-> +	switch (mp_state->mp_state) {
-> +	case KVM_MP_STATE_RUNNABLE:
-> +		vcpu->arch.pause =3D false;
-> +		break;
-> +	case KVM_MP_STATE_HALTED:
-> +		vcpu->arch.pause =3D true;
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	return 0;
->  }
->  =
-
->  /**
-
-Are we capturing the vcpu features in some way or do we expect userspace
-to migrate these on its own?  The reason I'm asking, is if you create
-multiple VCPUs, where all the non-primary VCPUs are started in power off
-mode, and then you boot your guest which powers on all VCPUs, and then
-you restart your guest (with PSCI RESET), the system will not power on
-all the non-primary VCPUs but hold them in power-off.
-
-We need to make sure this behavior is preserved for a reboot across a
-migration.  Is it?
-
-Thanks,
--Christoffer
+[*] http://lists.gnu.org/archive/html/qemu-devel/2015-03/msg01254.html
