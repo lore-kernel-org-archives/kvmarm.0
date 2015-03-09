@@ -1,146 +1,188 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 5/6] target-arm/kvm64: fix save/restore of SPSR regs
-Date: Mon, 9 Mar 2015 13:56:50 +0100
-Message-ID: <20150309125650.GA20559@cbox>
-References: <1424880159-29348-1-git-send-email-alex.bennee@linaro.org>
- <1424880159-29348-7-git-send-email-alex.bennee@linaro.org>
- <20150302172212.GB10137@lvm>
- <874mq27222.fsf@linaro.org>
+Subject: Re: [PATCH v2 5/6] target-arm: kvm64 fix save/restore of SPSR regs
+Date: Mon, 9 Mar 2015 14:26:11 +0100
+Message-ID: <20150309132611.GB20559@cbox>
+References: <1425479753-18349-1-git-send-email-alex.bennee@linaro.org>
+ <1425479753-18349-6-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE0D148180
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Mar 2015 09:19:43 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id KX86+fP4sBjY for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Mar 2015 09:19:43 -0400 (EDT)
+Received: from mail-lb0-f180.google.com (mail-lb0-f180.google.com
+ [209.85.217.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C895648172
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Mar 2015 09:19:42 -0400 (EDT)
+Received: by lbiz12 with SMTP id z12so48168639lbi.5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 09 Mar 2015 06:25:56 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <874mq27222.fsf@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+In-Reply-To: <1425479753-18349-6-git-send-email-alex.bennee@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, Peter Maydell <peter.maydell@linaro.org>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 03, 2015 at 11:28:21AM +0000, Alex Benn=E9e wrote:
->=20
-> Christoffer Dall <christoffer.dall@linaro.org> writes:
->=20
-> > Hi Alex,
-> >
-> > Seems like you accidentally sent out two copies of this patch, hope=
-fully
-> > I'm reviewing the right one...
->=20
-> Oops, perils of not wiping your output directory. I think it was just=
- a
-> title tweak!
->=20
-> > On Wed, Feb 25, 2015 at 04:02:38PM +0000, Alex Benn=E9e wrote:
-> >> From: Christoffer Dall <christoffer.dall@linaro.org>
-> >>=20
-> >> The current code was negatively indexing the cpu state array and n=
-ot
-> >> synchronizing banked spsr register state with the current mode's s=
-psr
-> >> state, causing occasional failures with migration.
-> >>=20
-> >> Some munging is done to take care of the aarch64 mapping and also =
-to
-> >> ensure the most current value of the spsr is updated to the banked
-> >> registers (relevant for KVM<->TCG migration).
-> >>=20
-> >> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> >> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> >>=20
-> >> ---
-> >> v2 (ajb)
-> >>   - minor tweaks and clarifications
-> >>=20
-> >> diff --git a/target-arm/kvm64.c b/target-arm/kvm64.c
-> >> index c60e989..1e36b0a 100644
-> >> --- a/target-arm/kvm64.c
-> >> +++ b/target-arm/kvm64.c
-> >> @@ -140,6 +140,7 @@ int kvm_arch_put_registers(CPUState *cs, int l=
-evel)
-> >>      uint64_t val;
-> >>      int i;
-> >>      int ret;
-> >> +    unsigned int el;
-> >> =20
-> >>      ARMCPU *cpu =3D ARM_CPU(cs);
-> >>      CPUARMState *env =3D &cpu->env;
-> >> @@ -206,9 +207,25 @@ int kvm_arch_put_registers(CPUState *cs, int =
-level)
-> >>          return ret;
-> >>      }
-> >> =20
-> >> +    /* Saved Program State Registers
-> >> +     *
-> >> +     * Before we restore from the banked_spsr[] array we need to
-> >> +     * ensure that any modifications to env->spsr are correctly
-> >> +     * reflected and map aarch64 exception levels if required.
-> >> +     */
-> >> +    el =3D arm_current_el(env);
-> >> +    if (is_a64(env) && el > 0) {
-> >> +        g_assert(el =3D=3D 1);
-> >> +        /* KVM maps KVM_SPSR_SVC to KVM_SPSR_EL1 for aarch64 */
-> >> +        env->banked_spsr[1] =3D env->banked_spsr[0];
-> >> +        env->banked_spsr[aarch64_banked_spsr_index(el)] =3D env->=
-spsr;
-> >> +    } else {
-> >> +        env->banked_spsr[el] =3D env->spsr;
-> >
-> > is this valid if (is_a64(env) && el =3D=3D 0)) ?  I thought that if=
- you're
-> > in el =3D=3D 0, then env->banked_spsr[x] is the most up-to-date one=
-, not
-> > env->spsr ?
->=20
-> Actually they will both be the same (at least for KVM). In the end bo=
-th:
->=20
->         VMSTATE_UINT32(env.spsr, ARMCPU),
->         VMSTATE_UINT64_ARRAY(env.banked_spsr, ARMCPU, 8),
->=20
-> get serialised in the stream and when we save the stream out we make
-> sure everything is in sync (i.e. env->spsr is correct). In reality th=
-is
-> makes more sense for TCG than KVM which is the only reason env->spsr
-> exists.
->=20
+On Wed, Mar 04, 2015 at 02:35:52PM +0000, Alex Benn=E9e wrote:
+> From: Christoffer Dall <christoffer.dall@linaro.org>
+> =
 
-this function, however, is not used only when migration, but should
-generally cover the case where you want to synchronize QEMU's state int=
-o
-KVM's state, right?  So while it may not be harmful in currently
-supported use cases, is there ever a situation where (is_a64(env) && el
-=3D=3D 0) and env->spsr !=3D banked_spsr[el], and where env->spsr is
-out-of-date?
+> The current code was negatively indexing the cpu state array and not
+> synchronizing banked spsr register state with the current mode's spsr
+> state, causing occasional failures with migration.
+> =
 
-If that's the case, I think it would be better to have an assert that
-says "don't call the code in this situation" than relying on limited us=
-e
-cases for callers of this function.
+> Some munging is done to take care of the aarch64 mapping and also to
+> ensure the most current value of the spsr is updated to the banked
+> registers (relevant for KVM<->TCG migration).
+> =
 
-> >
-> > for !is_a64(env) this looks wrong, because of the same as above if =
-el =3D=3D
-> > 0, but also because I think you need
-> > bank_number(env->uncached_cpsr & CPSR_M) to index into the array.
-> >
->=20
-> Good catch. For some reason I was treating the number from
-> arm_current_el() as equivalent. How about:
->=20
->     el =3D arm_current_el(env);
->     if (is_a64(env) && el > 0) {
->         g_assert(el =3D=3D 1);
->         /* KVM only maps KVM_SPSR_SVC to KVM_SPSR_EL1 for aarch64 ATM=
- */
->         env->banked_spsr[1] =3D env->banked_spsr[0];
->     }
->     i =3D is_a64(env) ?
->         aarch64_banked_spsr_index(el) : bank_number(env->unached_cpsr=
- & CPSR_M);
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> =
 
-I think that will fail due to the assert in aarch64_banked_spsr_index()
-for el =3D=3D 0.
+> ---
+> v2 (ajb)
+>   - minor tweaks and clarifications
+> v3
+>   - Use the correct bank index function for setting/getting env->spsr
+>   - only deal with spsrs in elevated exception levels
+> =
+
+> diff --git a/target-arm/kvm64.c b/target-arm/kvm64.c
+> index c60e989..45e5c3f 100644
+> --- a/target-arm/kvm64.c
+> +++ b/target-arm/kvm64.c
+> @@ -140,6 +140,7 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+>      uint64_t val;
+>      int i;
+>      int ret;
+> +    unsigned int el;
+>  =
+
+>      ARMCPU *cpu =3D ARM_CPU(cs);
+>      CPUARMState *env =3D &cpu->env;
+> @@ -206,9 +207,27 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+>          return ret;
+>      }
+>  =
+
+> +    /* Saved Program State Registers
+> +     *
+> +     * Before we restore from the banked_spsr[] array we need to
+> +     * ensure that any modifications to env->spsr are correctly
+> +     * reflected and map aarch64 exception levels if required.
+> +     */
+> +    el =3D arm_current_el(env);
+> +    if (el > 0) {
+> +        if (is_a64(env)) {
+> +            g_assert(el =3D=3D 1);
+> +            /* KVM only maps KVM_SPSR_SVC to KVM_SPSR_EL1 for aarch64 AT=
+M */
+
+not sure about the 'for aarch64' comment; I would say that it's for
+aarch32 support.  Also, you can drop the ATM, since this is user space
+ABI that we don't change easily.
 
 
--Christoffer
+don't you need to do env->banked_spsr[0] =3D env->spsr first?
+
+> +            env->banked_spsr[1] =3D env->banked_spsr[0];
+
+
+> +        } else {
+> +            i =3D bank_number(env->uncached_cpsr & CPSR_M);
+> +            env->banked_spsr[i] =3D env->spsr;
+
+so here we don't need to worry about banked_spsr[1] =3D banked_spsr[0]
+because banked_spsr[0] is meaningless for 32-bit state and we only sync
+banked_spsr[1] and up to KVM, correct?  I think this is what may deserve
+a comment.
+
+> +        }
+> +    }
+> +
+>      for (i =3D 0; i < KVM_NR_SPSR; i++) {
+>          reg.id =3D AARCH64_CORE_REG(spsr[i]);
+> -        reg.addr =3D (uintptr_t) &env->banked_spsr[i - 1];
+> +        reg.addr =3D (uintptr_t) &env->banked_spsr[i+1];
+>          ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>          if (ret) {
+>              return ret;
+> @@ -253,6 +272,7 @@ int kvm_arch_get_registers(CPUState *cs)
+>      struct kvm_one_reg reg;
+>      uint64_t val;
+>      uint32_t fpr;
+> +    unsigned int el;
+>      int i;
+>      int ret;
+>  =
+
+> @@ -325,15 +345,35 @@ int kvm_arch_get_registers(CPUState *cs)
+>          return ret;
+>      }
+>  =
+
+> +    /* Fetch the SPSR registers
+> +     *
+> +     * KVM has an array of state indexed for all the possible aarch32
+> +     * privilage levels. Although not all are valid at all points
+
+privilege
+
+> +     * there are some transitions possible which can access old state
+> +     * so it is worth keeping them all.
+> +     */
+
+dubious comment overall
+
+>      for (i =3D 0; i < KVM_NR_SPSR; i++) {
+>          reg.id =3D AARCH64_CORE_REG(spsr[i]);
+> -        reg.addr =3D (uintptr_t) &env->banked_spsr[i - 1];
+> +        reg.addr =3D (uintptr_t) &env->banked_spsr[i+1];
+>          ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+>          if (ret) {
+>              return ret;
+>          }
+>      }
+>  =
+
+> +    el =3D arm_current_el(env);
+> +    if (el > 0) {
+> +        if (is_a64(env)) {
+> +            g_assert(el =3D=3D 1);
+> +            /* KVM maps KVM_SPSR_SVC to KVM_SPSR_EL1 for aarch64 */
+
+same as above
+
+> +            env->banked_spsr[0] =3D env->banked_spsr[1];
+> +            i =3D aarch64_banked_spsr_index(el);
+> +        } else {
+> +            i =3D bank_number(env->uncached_cpsr & CPSR_M);
+
+same potential place for comment as above.
+
+> +        }
+> +        env->spsr =3D env->banked_spsr[i];
+> +    }
+> +
+>      /* Advanced SIMD and FP registers */
+>      for (i =3D 0; i < 32; i++) {
+>          reg.id =3D AARCH64_SIMD_CORE_REG(fp_regs.vregs[i]);
+> -- =
+
+> 2.3.1
+> =
