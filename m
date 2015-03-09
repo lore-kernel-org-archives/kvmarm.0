@@ -1,35 +1,63 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 5/6] target-arm/kvm64: fix save/restore of SPSR regs
-Date: Mon, 9 Mar 2015 20:31:44 +0100
-Message-ID: <20150309193144.GG20559@cbox>
-References: <1424880159-29348-1-git-send-email-alex.bennee@linaro.org>
- <1424880159-29348-7-git-send-email-alex.bennee@linaro.org>
- <20150302172212.GB10137@lvm>
- <874mq27222.fsf@linaro.org>
- <20150309125650.GA20559@cbox>
- <CAFEAcA_DqHx-sDMuhSr0-uQL20-uJzXXpBvr6YLUWmzMN2mL4w@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 1/5] arm: KVM: export vcpi->pause state via MP_STATE ioctls
+Date: Tue, 10 Mar 2015 04:55:29 +0900
+Message-ID: <CAFEAcA_43_2Qi2e8c9PKN4gMSM30-r4CeNWDzrJ6-odaaU3HNw@mail.gmail.com>
+References: <1425302944-6276-1-git-send-email-alex.bennee@linaro.org>
+ <1425302944-6276-2-git-send-email-alex.bennee@linaro.org> <20150309135055.GC20559@cbox>
+ <87pp8ib04y.fsf@linaro.org> <20150309192942.GF20559@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_DqHx-sDMuhSr0-uQL20-uJzXXpBvr6YLUWmzMN2mL4w@mail.gmail.com>
-Sender: kvm-owner@vger.kernel.org
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <linux-doc-owner@vger.kernel.org>
+In-Reply-To: <20150309192942.GF20559@cbox>
+Sender: linux-doc-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Russell King <linux@arm.linux.org.uk>, kvm-devel <kvm@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <marc.zyngier@arm.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, Gleb Natapov <gleb@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Mar 09, 2015 at 10:31:19PM +0900, Peter Maydell wrote:
-> On 9 March 2015 at 21:56, Christoffer Dall <christoffer.dall@linaro.org> wrote:
-> > this function, however, is not used only when migration, but should
-> > generally cover the case where you want to synchronize QEMU's state into
-> > KVM's state, right?  So while it may not be harmful in currently
-> > supported use cases, is there ever a situation where (is_a64(env) && el
-> > == 0) and env->spsr != banked_spsr[el], and where env->spsr is
-> > out-of-date?
-> 
-> If EL == 0 then you can't access any SPSR, so env->spsr is by
-> definition out of date.
-> 
-ok, never mind then.
+On 10 March 2015 at 04:29, Christoffer Dall <christoffer.dall@linaro.or=
+g> wrote:
+> On Mon, Mar 09, 2015 at 04:34:21PM +0000, Alex Benn=C3=A9e wrote:
+>> - Boot
+>> - Power on secondary CPUs
+>> - Power off one secondary CPU
+>> - Migrate to file (cpu_powered reflects state of each CPU)
+>>
+>> - Start fresh QEMU
+>> - Restore from file (cpu_powered -> vcpu->paused via ioctl)
+>> - Run (we continue with the same power state pre-migrate)
+>>
+>> - PSCI RESET
+>> - Does what it does, power all secondaries down?
+>> - Kernel boots, turns them on?
+>>
+> Hmmm. As long as QEMU always inits all VCPUs in the exact same way
+> (including the KVM_ARM_VCPU_POWER_OFF feature bit) I guess it works a=
+nd
+> that's probably a reasonable requirement for migration.
 
--Christoffer
+We init the VCPUs with the POWER_OFF flag set for exactly the
+set of CPUs that we want to start powered off. Typically that
+means that the first CPU is inited with POWER_OFF clear and the
+rest are inited with it set.
+
+Regardless, if we're doing an incoming migration, then the
+incoming data will be used to set the VCPU on/off state
+appropriately for resuming the VM. (This might include
+powering on a VCPU that's been inited in power-off and never
+run, or powering down a VCPU that was inited power-on but
+never ran. In the 'migration moves a vcpu to powered-on'
+case we'll also set the vcpu's PC and other registers so
+when it is run it will DTRT.)
+
+If the resumed guest subsequently does a PSCI reset then
+QEMU will re-init the VCPUs with the set of feature bits that
+the machine model/etc defines for a reset condition for this
+board, which will be the same "first CPU powered on, all the
+rest powered off" config we started with.
+
+(It's the user's responsibility to ensure that when doing a
+migration the QEMUs at both ends are identically configured,
+incidentally.)
+
+-- PMM
