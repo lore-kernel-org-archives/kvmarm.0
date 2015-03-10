@@ -1,70 +1,62 @@
-From: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v14 00/20] VFIO support for platform devices
-Date: Tue, 10 Mar 2015 12:04:40 -0600
-Message-ID: <1426010680.25026.77.camel@redhat.com>
-References: <1425315600-29761-1-git-send-email-b.reynal@virtualopensystems.com>
-	<CAN9JPjH0MQ-f2Vp-Cpd4GZfBtvVjWZKh_WDKrZz40AK14_Awrw@mail.gmail.com>
-	<54FF2CEF.1050705@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH v2 0/3] arm64: KVM: High memory guest fixes
+Date: Tue, 10 Mar 2015 19:06:58 +0000
+Message-ID: <1426014421-5579-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <54FF2CEF.1050705-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Cc: Linux IOMMU <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, VirtualOpenSystems Technical Team <tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>, kvm-arm <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 09A5648504
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Mar 2015 15:00:53 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id WgkYQDxo0wNf for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 Mar 2015 15:00:51 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ABF6A484FF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Mar 2015 15:00:51 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, 2015-03-10 at 18:42 +0100, Eric Auger wrote:
-> Hi Baptiste,
-> 
-> Please add:
-> Reviewed-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> on the whole series
-> Tested-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> on the whole series except
-> AMBA specific patches.
-> 
-> I currently exercise the following functionalities on Calxeda Midway HW:
-> - MMIO read/write/mmap,
-> - automasked IRQ + mask/unmask (NONE flag),
-> - virqfd (unmask handler only).
-> 
-> Despite a new thorough review I failed in pointing out any new
-> interesting issues in this series.
-> 
-> just minor points below:
-> 
-> - PIO regions: currently read/write/mmap is not supported. I can't
-> figure out how much this is a problem at this point?
+I've been playing with a hacked-up kvmtool that places the memory much
+higher than usual, in an effort to emulate what some arm64 platforms
+do (typically AMD Seattle).
 
-AIUI, nobody has any way to test this, which is why it's not
-implemented.  I think we've done due diligence in accommodating PIO into
-the vfio-platform framework though and hopefully it will be a simple
-matter to add when someone has a use case for it.
+Unexpectedly (hey, what could possibly go wrong...), I've discovered a
+couple of mm related issues, ranging from the host exploding to the
+guest being stuck on a page fault. Additionally, I noticed a minor
+documentation issue.
 
-> - nit: vfio_pci_intrs.c: may not need wait.h anymore after removal of
-> virqfd code. may be added in vfio.h
-> - nit: interrupt.h not needed at early stage in vfio_platform_private.h,
-> until irq introduction
-> - version of the driver: 0.10?
+With these fixes in, I'm able to run a guest that has its memory
+located just under the 40bit limit.
 
-None of these seem like blockers, I'd be willing to accept header
-cleanups as follow-on and driver versions are mostly arbitrary anyway.
+* From v1 [1]:
+- Reworked patch #1 to use split_page() instead. This leads to much
+  refactoring, but is slightly nicer (more common code).
+- Dropped Mark's Tested-by (too many changes)
 
-> Since there is no real dependency on "[PATCH v4 0/6] vfio: type1:
-> support for ARM SMMUS with VFIO_IOMMU_TYPE1" I hope we can get this
-> upstreamed soon.
+[1]: https://lists.cs.columbia.edu/pipermail/kvmarm/2015-February/013672.html
 
-Me too, I also re-reviewed the series yesterday.  If Baptiste agrees
-that there's no dependency on the other series, I can add your R-b/T-b,
-do some additional testing, and queue the series for linux-next.
-Thanks,
+Marc Zyngier (3):
+  arm64: KVM: Fix stage-2 PGD allocation to have per-page refcounting
+  arm64: KVM: Do not use pgd_index to index stage-2 pgd
+  arm64: KVM: Fix outdated comment about VTCR_EL2.PS
 
-Alex
+ arch/arm/include/asm/kvm_mmu.h   | 12 ++----
+ arch/arm/kvm/mmu.c               | 85 ++++++++++++++++++++++++++++++----------
+ arch/arm64/include/asm/kvm_arm.h |  5 ++-
+ arch/arm64/include/asm/kvm_mmu.h | 48 +++--------------------
+ 4 files changed, 77 insertions(+), 73 deletions(-)
+
+-- 
+2.1.4
