@@ -1,75 +1,74 @@
-From: Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH] arm64: dts: Fix GIC reg sizes for APM X-Gene
-Date: Wed, 11 Mar 2015 14:53:49 +0000
-Message-ID: <550056FD.8060804@arm.com>
-References: <1422342206-4750-1-git-send-email-psawargaonkar@apm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v4 3/3] hw/intc/arm_gic: Initialize the vgic in the
+ realize function
+Date: Wed, 11 Mar 2015 14:56:22 +0000
+Message-ID: <CAFEAcA-eg4ox+wH9ca7q6CCoyf4DskDWehz5G7Z5YyOgqE7oDw@mail.gmail.com>
+References: <1425478577-32556-1-git-send-email-eric.auger@linaro.org>
+ <1425478577-32556-4-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <1422342206-4750-1-git-send-email-psawargaonkar-qTEPVZfXA3Y@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pranavkumar Sawargaonkar <psawargaonkar-qTEPVZfXA3Y@public.gmane.org>, "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Cc: "patches-qTEPVZfXA3Y@public.gmane.org" <patches-qTEPVZfXA3Y@public.gmane.org>, "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org" <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, "arnd-r2nGTMty4D4@public.gmane.org" <arnd-r2nGTMty4D4@public.gmane.org>, "christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org" <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, "jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Tushar Jagad <tjagad-qTEPVZfXA3Y@public.gmane.org>, Feng Kan <fkan-qTEPVZfXA3Y@public.gmane.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E535148769
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2015 10:50:25 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ZcG8LrAbD3HP for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Mar 2015 10:50:24 -0400 (EDT)
+Received: from mail-lb0-f175.google.com (mail-lb0-f175.google.com
+ [209.85.217.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 172494867C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2015 10:50:23 -0400 (EDT)
+Received: by lbiw7 with SMTP id w7so9438166lbi.7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2015 07:56:43 -0700 (PDT)
+In-Reply-To: <1425478577-32556-4-git-send-email-eric.auger@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Eric Auger <eric.auger@linaro.org>
+Cc: eric.auger@st.com, "Michael S. Tsirkin" <mst@redhat.com>, Patch Tracking <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 27/01/15 07:03, Pranavkumar Sawargaonkar wrote:
-> In APM X-Gene, GIC register space is 64K aligned while the sizes mentioned
-> in the dt are 4K aligned. This breaks KVM when kernel is built with 64K page
-> size due to size alignment checking in vgic driver for VCPU Control and
-> VCPU register.
-> 
-> This patch corrects the sizes to be inline with the hardware spec.
-
-This patch may be correct, but it is useless. The firmware on my APM
-system (some version of u-boot) repaints the DT at boot time, negating
-the effect of this patch.
-
-Another system I can remove from my 64k-capable list.
-
-	M.
-
-> CC: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
-> CC: kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
-> CC: arnd-r2nGTMty4D4@public.gmane.org
-> CC: marc.zyngier-5wv7dgnIgG8@public.gmane.org
-> CC: christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
-> CC: jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
-> Signed-off-by: Pranavkumar Sawargaonkar <psawargaonkar-qTEPVZfXA3Y@public.gmane.org>
-> Signed-off-by: Tushar Jagad <tjagad-qTEPVZfXA3Y@public.gmane.org>
-> Signed-off-by: Feng Kan <fkan-qTEPVZfXA3Y@public.gmane.org>
+On 4 March 2015 at 14:16, Eric Auger <eric.auger@linaro.org> wrote:
+> This patch forces vgic initialization in the vgic realize function.
+> It uses a new group/attribute that allows such operation:
+> KVM_DEV_ARM_VGIC_GRP_CTRL/KVM_DEV_ARM_VGIC_CTRL_INIT
+>
+> This earlier initialization allows, for example, to setup VFIO
+> signaling and irqfd after vgic initialization, on a reset notifier.
+>
+> Signed-off-by: Eric Auger <eric.auger@linaro.org>
 > ---
->  arch/arm64/boot/dts/apm/apm-storm.dtsi |    8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/boot/dts/apm/apm-storm.dtsi b/arch/arm64/boot/dts/apm/apm-storm.dtsi
-> index f1ad9c2..65f0e6d 100644
-> --- a/arch/arm64/boot/dts/apm/apm-storm.dtsi
-> +++ b/arch/arm64/boot/dts/apm/apm-storm.dtsi
-> @@ -81,10 +81,10 @@
->  		compatible = "arm,cortex-a15-gic";
->  		#interrupt-cells = <3>;
->  		interrupt-controller;
-> -		reg = <0x0 0x78010000 0x0 0x1000>,	/* GIC Dist */
-> -		      <0x0 0x78020000 0x0 0x1000>,	/* GIC CPU */
-> -		      <0x0 0x78040000 0x0 0x2000>,	/* GIC VCPU Control */
-> -		      <0x0 0x78060000 0x0 0x2000>;	/* GIC VCPU */
-> +		reg = <0x0 0x78010000 0x0 0x10000>,	/* GIC Dist */
-> +		      <0x0 0x78020000 0x0 0x20000>,	/* GIC CPU */
-> +		      <0x0 0x78040000 0x0 0x10000>,	/* GIC VCPU Control */
-> +		      <0x0 0x78060000 0x0 0x20000>;	/* GIC VCPU */
->  		interrupts = <1 9 0xf04>;	/* GIC Maintenence IRQ */
->  	};
-> 
-> --
-> 1.7.9.5
-> 
-> 
+>  hw/intc/arm_gic_kvm.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
+> index 1ad3eb0..1395c9e 100644
+> --- a/hw/intc/arm_gic_kvm.c
+> +++ b/hw/intc/arm_gic_kvm.c
+> @@ -573,6 +573,12 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
+>          kvm_gic_access(s, KVM_DEV_ARM_VGIC_GRP_NR_IRQS, 0, 0, &numirqs, 1);
+>      }
+>
+> +    if (kvm_gic_supports_attr(s, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> +                              KVM_DEV_ARM_VGIC_CTRL_INIT)) {
+> +        kvm_gic_access(s, KVM_DEV_ARM_VGIC_GRP_CTRL,
+> +                          KVM_DEV_ARM_VGIC_CTRL_INIT, 0, 0, 1);
+> +    }
 
+This is opaque enough that I think a comment in front of it
+would be nice; something like
+    /* Tell the kernel to complete initialization of the VGIC now */
 
--- 
-Jazz is not dead. It just smells funny...
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
