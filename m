@@ -1,70 +1,75 @@
-From: Greg Bellows <greg.bellows@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2 3/6] hw/char: pl011 don't keep setting the
- IRQ if nothing changed
-Date: Wed, 11 Mar 2015 09:44:11 -0500
-Message-ID: <CAOgzsHVVw-gZE0_O=NH3xn_4jV2+7=Adrs2tsogwKK_ofptL9Q@mail.gmail.com>
-References: <1425479753-18349-1-git-send-email-alex.bennee@linaro.org>
- <1425479753-18349-4-git-send-email-alex.bennee@linaro.org>
+From: Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [PATCH] arm64: dts: Fix GIC reg sizes for APM X-Gene
+Date: Wed, 11 Mar 2015 14:53:49 +0000
+Message-ID: <550056FD.8060804@arm.com>
+References: <1422342206-4750-1-git-send-email-psawargaonkar@apm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D2D874875B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2015 10:37:51 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qlTo9cd0z4Sh for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Mar 2015 10:37:50 -0400 (EDT)
-Received: from mail-qc0-f173.google.com (mail-qc0-f173.google.com
- [209.85.216.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C4D4D48741
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2015 10:37:50 -0400 (EDT)
-Received: by qcvx3 with SMTP id x3so10717035qcv.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2015 07:44:11 -0700 (PDT)
-In-Reply-To: <1425479753-18349-4-git-send-email-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, QEMU Developers <qemu-devel@nongnu.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1422342206-4750-1-git-send-email-psawargaonkar-qTEPVZfXA3Y@public.gmane.org>
+Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Pranavkumar Sawargaonkar <psawargaonkar-qTEPVZfXA3Y@public.gmane.org>, "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: "patches-qTEPVZfXA3Y@public.gmane.org" <patches-qTEPVZfXA3Y@public.gmane.org>, "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org" <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, "arnd-r2nGTMty4D4@public.gmane.org" <arnd-r2nGTMty4D4@public.gmane.org>, "christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org" <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, "jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, Tushar Jagad <tjagad-qTEPVZfXA3Y@public.gmane.org>, Feng Kan <fkan-qTEPVZfXA3Y@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gV2VkLCBNYXIgNCwgMjAxNSBhdCA4OjM1IEFNLCBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVl
-QGxpbmFyby5vcmc+IHdyb3RlOgo+IFdoaWxlIG9ic2VydmluZyBLVk0gdHJhY2VzIEkgY2FuIHNl
-ZSBhZGRpdGlvbmFsIElSUSBjYWxscyBvbiBwcmV0dHkgbXVjaAo+IGV2ZXJ5IE1NSU8gYWNjZXNz
-IHdoaWNoIGlzIGp1c3QgcGxhaW4gaW5lZmZpY2llbnQuIE9ubHkgdXBkYXRlIHRoZSBRRU1VCj4g
-SVJRIGxldmVsIGlmIHNvbWV0aGluZyBoYXMgYWN0dWFsbHkgY2hhbmdlZCBmcm9tIGxhc3QgdGlt
-ZS4gT3RoZXJ3aXNlIHdlCj4gbWF5IGJlIHBhcGVyaW5nIG92ZXIgb3RoZXIgZmFpbHVyZSBtb2Rl
-cy4KPgo+IFNpZ25lZC1vZmYtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9y
-Zz4KPgo+IGRpZmYgLS1naXQgYS9ody9jaGFyL3BsMDExLmMgYi9ody9jaGFyL3BsMDExLmMKPiBp
-bmRleCAwYTQ1MTE1Li5iYjU1NGJjIDEwMDY0NAo+IC0tLSBhL2h3L2NoYXIvcGwwMTEuYwo+ICsr
-KyBiL2h3L2NoYXIvcGwwMTEuYwo+IEBAIC0zNiw2ICszNiw5IEBAIHR5cGVkZWYgc3RydWN0IFBM
-MDExU3RhdGUgewo+ICAgICAgQ2hhckRyaXZlclN0YXRlICpjaHI7Cj4gICAgICBxZW11X2lycSBp
-cnE7Cj4gICAgICBjb25zdCB1bnNpZ25lZCBjaGFyICppZDsKPiArCj4gKyAgICAvKiBub3Qgc2Vy
-aWFsaXNlZCwgcHJldmVudHMgcGwwMTFfdXBkYXRlIGRvaW5nIGV4dHJhIHNldF9pcnFzICovCj4g
-KyAgICB1aW50MzJfdCBjdXJyZW50X2lycTsKPiAgfSBQTDAxMVN0YXRlOwo+Cj4gICNkZWZpbmUg
-UEwwMTFfSU5UX1RYIDB4MjAKPiBAQCAtNTMsMTAgKzU2LDExIEBAIHN0YXRpYyBjb25zdCB1bnNp
-Z25lZCBjaGFyIHBsMDExX2lkX2x1bWluYXJ5WzhdID0KPgo+ICBzdGF0aWMgdm9pZCBwbDAxMV91
-cGRhdGUoUEwwMTFTdGF0ZSAqcykKPiAgewo+IC0gICAgdWludDMyX3QgZmxhZ3M7Cj4gLQo+IC0g
-ICAgZmxhZ3MgPSBzLT5pbnRfbGV2ZWwgJiBzLT5pbnRfZW5hYmxlZDsKPiAtICAgIHFlbXVfc2V0
-X2lycShzLT5pcnEsIGZsYWdzICE9IDApOwo+ICsgICAgdWludDMyX3QgZmxhZ3MgPSBzLT5pbnRf
-bGV2ZWwgJiBzLT5pbnRfZW5hYmxlZDsKPiArICAgIGlmIChmbGFncyAhPSBzLT5jdXJyZW50X2ly
-cSkgewo+ICsgICAgICAgIHMtPmN1cnJlbnRfaXJxID0gZmxhZ3M7Cj4gKyAgICAgICAgcWVtdV9z
-ZXRfaXJxKHMtPmlycSwgcy0+Y3VycmVudF9pcnEgIT0gMCk7Cj4gKyAgICB9Cj4gIH0KPgo+ICBz
-dGF0aWMgdWludDY0X3QgcGwwMTFfcmVhZCh2b2lkICpvcGFxdWUsIGh3YWRkciBvZmZzZXQsCj4g
-LS0KPiAyLjMuMQo+Cj4KCkRpZCB5b3UgZmluZCB0aGUgc291cmNlIG9mIHRoZSBhZGRpdGlvbmFs
-IElSUXM/IFRoaXMgc2VlbXMgbGlrZSBpdApjb3VsZCBiZSBwb3RlbnRpYWxseSBiZSBoaWRpbmcg
-YW4gaXNzdWUuICBGcm9tIGxvb2tpbmcgYXQgdGhlIGNvZGUsIGl0CmFwcGVhcnMgdGhhdCBvbmUg
-c291cmNlIG9mIHRoZSBhZGRpdGlvbmFsIHVwZGF0ZXMgaXMgaW4gcGwwMTFfcmVhZCwKd2hlcmUg
-d2UgcG9zc2libHkgZG8gYW4gdXBkYXRlIHdpdGhvdXQgYSBjaGFuZ2UgaW4gaW50X2xldmVsLiAg
-SQp3b25kZXIgaWYgZmluZGluZyBhbmQgZml4aW5nIHRoZSB1cGRhdGVzIGlzIGEgYmV0dGVyIGFw
-cHJvYWNoLgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpr
-dm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9s
-aXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On 27/01/15 07:03, Pranavkumar Sawargaonkar wrote:
+> In APM X-Gene, GIC register space is 64K aligned while the sizes mentioned
+> in the dt are 4K aligned. This breaks KVM when kernel is built with 64K page
+> size due to size alignment checking in vgic driver for VCPU Control and
+> VCPU register.
+> 
+> This patch corrects the sizes to be inline with the hardware spec.
+
+This patch may be correct, but it is useless. The firmware on my APM
+system (some version of u-boot) repaints the DT at boot time, negating
+the effect of this patch.
+
+Another system I can remove from my 64k-capable list.
+
+	M.
+
+> CC: linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+> CC: kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
+> CC: arnd-r2nGTMty4D4@public.gmane.org
+> CC: marc.zyngier-5wv7dgnIgG8@public.gmane.org
+> CC: christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
+> CC: jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+> Signed-off-by: Pranavkumar Sawargaonkar <psawargaonkar-qTEPVZfXA3Y@public.gmane.org>
+> Signed-off-by: Tushar Jagad <tjagad-qTEPVZfXA3Y@public.gmane.org>
+> Signed-off-by: Feng Kan <fkan-qTEPVZfXA3Y@public.gmane.org>
+> ---
+>  arch/arm64/boot/dts/apm/apm-storm.dtsi |    8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/boot/dts/apm/apm-storm.dtsi b/arch/arm64/boot/dts/apm/apm-storm.dtsi
+> index f1ad9c2..65f0e6d 100644
+> --- a/arch/arm64/boot/dts/apm/apm-storm.dtsi
+> +++ b/arch/arm64/boot/dts/apm/apm-storm.dtsi
+> @@ -81,10 +81,10 @@
+>  		compatible = "arm,cortex-a15-gic";
+>  		#interrupt-cells = <3>;
+>  		interrupt-controller;
+> -		reg = <0x0 0x78010000 0x0 0x1000>,	/* GIC Dist */
+> -		      <0x0 0x78020000 0x0 0x1000>,	/* GIC CPU */
+> -		      <0x0 0x78040000 0x0 0x2000>,	/* GIC VCPU Control */
+> -		      <0x0 0x78060000 0x0 0x2000>;	/* GIC VCPU */
+> +		reg = <0x0 0x78010000 0x0 0x10000>,	/* GIC Dist */
+> +		      <0x0 0x78020000 0x0 0x20000>,	/* GIC CPU */
+> +		      <0x0 0x78040000 0x0 0x10000>,	/* GIC VCPU Control */
+> +		      <0x0 0x78060000 0x0 0x20000>;	/* GIC VCPU */
+>  		interrupts = <1 9 0xf04>;	/* GIC Maintenence IRQ */
+>  	};
+> 
+> --
+> 1.7.9.5
+> 
+> 
+
+
+-- 
+Jazz is not dead. It just smells funny...
+--
+To unsubscribe from this list: send the line "unsubscribe devicetree" in
+the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
