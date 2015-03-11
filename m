@@ -1,45 +1,96 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 6/6] target-arm/cpu.h: document why env->spsr exists
-Date: Wed, 11 Mar 2015 15:47:44 +0000
-Message-ID: <CAFEAcA8jRtdCtxCE5KLNCBLi7CgEb3=qSUVU--HPu=QTt5wadw@mail.gmail.com>
-References: <1424880159-29348-1-git-send-email-alex.bennee@linaro.org> <1424880159-29348-8-git-send-email-alex.bennee@linaro.org>
+From: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [PATCH v14 00/20] VFIO support for platform devices
+Date: Wed, 11 Mar 2015 09:54:17 -0600
+Message-ID: <1426089257.25026.112.camel@redhat.com>
+References: <1425315600-29761-1-git-send-email-b.reynal@virtualopensystems.com>
+	<CAN9JPjH0MQ-f2Vp-Cpd4GZfBtvVjWZKh_WDKrZz40AK14_Awrw@mail.gmail.com>
+	<54FF2CEF.1050705@linaro.org> <1426010680.25026.77.camel@redhat.com>
+	<54FFFF96.4010200@linaro.org>
+	<CAN9JPjFpcu7NkgoCmMGZTw191g79mmtsbqzmj6z8s_bTMNKMPA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1424880159-29348-8-git-send-email-alex.bennee@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <CAN9JPjFpcu7NkgoCmMGZTw191g79mmtsbqzmj6z8s_bTMNKMPA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+Cc: Linux IOMMU <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, VirtualOpenSystems Technical Team <tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>, kvm-arm <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 25 February 2015 at 16:02, Alex Benn=C3=A9e <alex.bennee@linaro.org>=
- wrote:
-> I was getting very confused about the duplication of state. Perhaps w=
-e
-> should just get rid of env->spsr and use helpers that understand the
-> banking?
+On Wed, 2015-03-11 at 11:08 +0100, Baptiste Reynal wrote:
+> Thanks Eric and Alex for your reviews.
+> 
+> I can confirm we can drop the dependency, as I re-tested without it.
+> Do you need a fix for the headers issue underlined by Eric ?
 
-I've already disagreed with this. I would suggest putting
-tentative questions about future direction of the codebase
-below the '---' rather than in the commit log :-)
+Sure, send it as a follow-on patch though, don't respin the series for
+that.  Thanks,
 
+Alex
 
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->
-> diff --git a/target-arm/cpu.h b/target-arm/cpu.h
-> index 11845a6..d7fd13f 100644
-> --- a/target-arm/cpu.h
-> +++ b/target-arm/cpu.h
-> @@ -155,6 +155,11 @@ typedef struct CPUARMState {
->         This contains all the other bits.  Use cpsr_{read,write} to a=
-ccess
->         the whole CPSR.  */
->      uint32_t uncached_cpsr;
-> +    /* The spsr is a alias for spsr_elN where N is the current
-> +     * exception level.
-
-This isn't true for AArch32 (which has multiple different SPSRs
-any of which might be the one in env->spsr when we're at EL1).
-
--- PMM
+> On Wed, Mar 11, 2015 at 9:40 AM, Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
+> > On 03/10/2015 07:04 PM, Alex Williamson wrote:
+> >> On Tue, 2015-03-10 at 18:42 +0100, Eric Auger wrote:
+> >>> Hi Baptiste,
+> >>>
+> >>> Please add:
+> >>> Reviewed-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> on the whole series
+> >>> Tested-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> on the whole series except
+> >>> AMBA specific patches.
+> >>>
+> >>> I currently exercise the following functionalities on Calxeda Midway HW:
+> >>> - MMIO read/write/mmap,
+> >>> - automasked IRQ + mask/unmask (NONE flag),
+> >>> - virqfd (unmask handler only).
+> >>>
+> >>> Despite a new thorough review I failed in pointing out any new
+> >>> interesting issues in this series.
+> >>>
+> >>> just minor points below:
+> >>>
+> >>> - PIO regions: currently read/write/mmap is not supported. I can't
+> >>> figure out how much this is a problem at this point?
+> >>
+> >> AIUI, nobody has any way to test this, which is why it's not
+> >> implemented.  I think we've done due diligence in accommodating PIO into
+> >> the vfio-platform framework though and hopefully it will be a simple
+> >> matter to add when someone has a use case for it.
+> >>
+> >>> - nit: vfio_pci_intrs.c: may not need wait.h anymore after removal of
+> >>> virqfd code. may be added in vfio.h
+> >>> - nit: interrupt.h not needed at early stage in vfio_platform_private.h,
+> >>> until irq introduction
+> >>> - version of the driver: 0.10?
+> >>
+> >> None of these seem like blockers, I'd be willing to accept header
+> >> cleanups as follow-on and driver versions are mostly arbitrary anyway.
+> >>
+> >>> Since there is no real dependency on "[PATCH v4 0/6] vfio: type1:
+> >>> support for ARM SMMUS with VFIO_IOMMU_TYPE1" I hope we can get this
+> >>> upstreamed soon.
+> >>
+> >> Me too, I also re-reviewed the series yesterday.  If Baptiste agrees
+> >> that there's no dependency on the other series, I can add your R-b/T-b,
+> >> do some additional testing, and queue the series for linux-next.
+> >> Thanks,
+> >
+> > Hi Alex,
+> >
+> > I let Baptiste answer. If he agrees please do as proposed. I am looking
+> > forward to seeing the series in linux-next!
+> >
+> > Best Regards
+> >
+> > Eric
+> >>
+> >> Alex
+> >>
+> >
