@@ -1,27 +1,28 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v14 00/20] VFIO support for platform devices
-Date: Wed, 11 Mar 2015 16:52:41 +0100
-Message-ID: <550064C9.9050408@linaro.org>
-References: <1425315600-29761-1-git-send-email-b.reynal@virtualopensystems.com>	<CAN9JPjH0MQ-f2Vp-Cpd4GZfBtvVjWZKh_WDKrZz40AK14_Awrw@mail.gmail.com>	<54FF2CEF.1050705@linaro.org>	<1426010680.25026.77.camel@redhat.com>	<54FFFF96.4010200@linaro.org>
- <CAN9JPjFpcu7NkgoCmMGZTw191g79mmtsbqzmj6z8s_bTMNKMPA@mail.gmail.com>
+Subject: Re: [PATCH v9 5/5] KVM: arm/arm64: add irqfd support
+Date: Wed, 11 Mar 2015 17:54:52 +0100
+Message-ID: <5500735C.4070903@linaro.org>
+References: <1425464076-20558-1-git-send-email-eric.auger@linaro.org>
+ <1425464076-20558-6-git-send-email-eric.auger@linaro.org>
+ <54F8359A.4020405@arm.com> <54F83DAE.2060607@redhat.com>
+ <20150311142418.GB14799@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E9A6F487A0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2015 11:48:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8809E487DC
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2015 12:50:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WhgA3T4UL6Ic for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Mar 2015 11:48:42 -0400 (EDT)
-Received: from mail-wi0-f171.google.com (mail-wi0-f171.google.com
- [209.85.212.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7A6FE4879B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2015 11:48:41 -0400 (EDT)
-Received: by wiwl15 with SMTP id l15so37993223wiw.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2015 08:55:02 -0700 (PDT)
-In-Reply-To: <CAN9JPjFpcu7NkgoCmMGZTw191g79mmtsbqzmj6z8s_bTMNKMPA@mail.gmail.com>
+ with ESMTP id talBZqV7mXIC for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 11 Mar 2015 12:50:53 -0400 (EDT)
+Received: from mail-wg0-f41.google.com (mail-wg0-f41.google.com [74.125.82.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 50773487DA
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2015 12:50:52 -0400 (EDT)
+Received: by wggx13 with SMTP id x13so10680119wgg.4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2015 09:57:13 -0700 (PDT)
+In-Reply-To: <20150311142418.GB14799@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,82 +32,42 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Baptiste Reynal <b.reynal@virtualopensystems.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>, Linux IOMMU <iommu@lists.linux-foundation.org>, kvm-arm <kvmarm@lists.cs.columbia.edu>
+To: Christoffer Dall <christoffer.dall@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "eric.auger@st.com" <eric.auger@st.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "patches@linaro.org" <patches@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <Andre.Przywara@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "gleb@kernel.org" <gleb@kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/11/2015 11:08 AM, Baptiste Reynal wrote:
-> Thanks Eric and Alex for your reviews.
+On 03/11/2015 03:24 PM, Christoffer Dall wrote:
+> On Thu, Mar 05, 2015 at 12:27:42PM +0100, Paolo Bonzini wrote:
+>>
+>>
+>> On 05/03/2015 11:53, Marc Zyngier wrote:
+>>>> +#ifdef CONFIG_HAVE_KVM_IRQFD
+>>>> +	case KVM_CAP_IRQFD:
+>>>> +		r = vgic_present;
+>>>> +		break;
+>>>> +#endif
+>>>
+>>> Nitpick: we have "select HAVE_KVM_IRQFD", so we can lose the #ifdef-ery.
+>>
+>> Alternatively, I've just posted a patch to move the KVM_CAP_IRQFD case
+>> to common code.
+>>
+>> vgic_present probably should be replaced by
+>> IS_ENABLED(CONFIG_KVM_ARM_VGIC).  I've sent a patch for this.
+>>
+> I have applied all of this together with my kill-the-vgic-config-option
+> patch here:
 > 
-> I can confirm we can drop the dependency, as I re-tested without it.
-> Do you need a fix for the headers issue underlined by Eric ?
-
-Hi Baptiste,
-
-As far as I am concerned I do not have such request ;-)
-
-Best Regards
-
-Eric
+> git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git queue
 > 
-> Best regards,
-> Baptiste
+> Take a look please.
+
+Hi Christoffer,
+
+This looks good to me. Thanks for the integration.
+
+- Eric
 > 
-> On Wed, Mar 11, 2015 at 9:40 AM, Eric Auger <eric.auger@linaro.org> wrote:
->> On 03/10/2015 07:04 PM, Alex Williamson wrote:
->>> On Tue, 2015-03-10 at 18:42 +0100, Eric Auger wrote:
->>>> Hi Baptiste,
->>>>
->>>> Please add:
->>>> Reviewed-by: Eric Auger <eric.auger@linaro.org> on the whole series
->>>> Tested-by: Eric Auger <eric.auger@linaro.org> on the whole series except
->>>> AMBA specific patches.
->>>>
->>>> I currently exercise the following functionalities on Calxeda Midway HW:
->>>> - MMIO read/write/mmap,
->>>> - automasked IRQ + mask/unmask (NONE flag),
->>>> - virqfd (unmask handler only).
->>>>
->>>> Despite a new thorough review I failed in pointing out any new
->>>> interesting issues in this series.
->>>>
->>>> just minor points below:
->>>>
->>>> - PIO regions: currently read/write/mmap is not supported. I can't
->>>> figure out how much this is a problem at this point?
->>>
->>> AIUI, nobody has any way to test this, which is why it's not
->>> implemented.  I think we've done due diligence in accommodating PIO into
->>> the vfio-platform framework though and hopefully it will be a simple
->>> matter to add when someone has a use case for it.
->>>
->>>> - nit: vfio_pci_intrs.c: may not need wait.h anymore after removal of
->>>> virqfd code. may be added in vfio.h
->>>> - nit: interrupt.h not needed at early stage in vfio_platform_private.h,
->>>> until irq introduction
->>>> - version of the driver: 0.10?
->>>
->>> None of these seem like blockers, I'd be willing to accept header
->>> cleanups as follow-on and driver versions are mostly arbitrary anyway.
->>>
->>>> Since there is no real dependency on "[PATCH v4 0/6] vfio: type1:
->>>> support for ARM SMMUS with VFIO_IOMMU_TYPE1" I hope we can get this
->>>> upstreamed soon.
->>>
->>> Me too, I also re-reviewed the series yesterday.  If Baptiste agrees
->>> that there's no dependency on the other series, I can add your R-b/T-b,
->>> do some additional testing, and queue the series for linux-next.
->>> Thanks,
->>
->> Hi Alex,
->>
->> I let Baptiste answer. If he agrees please do as proposed. I am looking
->> forward to seeing the series in linux-next!
->>
->> Best Regards
->>
->> Eric
->>>
->>> Alex
->>>
->>
+> Thanks,
+> -Christoffer
+> 
