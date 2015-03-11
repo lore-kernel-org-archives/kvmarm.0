@@ -1,106 +1,57 @@
 From: Greg Bellows <greg.bellows@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2 4/6] target-arm: kvm64 sync FP register
- state
-Date: Wed, 11 Mar 2015 10:17:47 -0500
-Message-ID: <CAOgzsHUdDtj4SntgXShurAzd1725_z+80eLm20HnxzZZcg1mHQ@mail.gmail.com>
-References: <1425479753-18349-1-git-send-email-alex.bennee@linaro.org>
- <1425479753-18349-5-git-send-email-alex.bennee@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH 6/6] target-arm/cpu.h: document why env->spsr exists
+Date: Wed, 11 Mar 2015 10:39:47 -0500
+Message-ID: <CAOgzsHWzroog_K3DAXtS=UzP_s9488LT=Q54FykN3yuC+xOvqQ@mail.gmail.com>
+References: <1424880159-29348-1-git-send-email-alex.bennee@linaro.org>
+	<1424880159-29348-8-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E08C04877C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2015 11:11:27 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YsVPfcbP1lFe for <kvmarm@lists.cs.columbia.edu>;
- Wed, 11 Mar 2015 11:11:27 -0400 (EDT)
-Received: from mail-qc0-f180.google.com (mail-qc0-f180.google.com
- [209.85.216.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1553B48779
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2015 11:11:26 -0400 (EDT)
-Received: by qcvx3 with SMTP id x3so11012187qcv.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 11 Mar 2015 08:17:47 -0700 (PDT)
-In-Reply-To: <1425479753-18349-5-git-send-email-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1424880159-29348-8-git-send-email-alex.bennee@linaro.org>
+Sender: kvm-owner@vger.kernel.org
 To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gV2VkLCBNYXIgNCwgMjAxNSBhdCA4OjM1IEFNLCBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVl
-QGxpbmFyby5vcmc+IHdyb3RlOgo+IEZvciBtaWdyYXRpb24gdG8gd29yayB3ZSBuZWVkIHRvIHN5
-bmMgYWxsIG9mIHRoZSByZWdpc3RlciBzdGF0ZS4gVGhpcyBpcwo+IGVzcGVjaWFsbHkgbm90aWNl
-YWJsZSB3aGVuIEdDQyBzdGFydHMgdXNpbmcgRlAgcmVnaXN0ZXJzIGFzIHNwaWxsCj4gcmVnaXN0
-ZXJzIGV2ZW4gd2l0aCBpbnRlZ2VyIHByb2dyYW1zLgo+Cj4gU2lnbmVkLW9mZi1ieTogQWxleCBC
-ZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgo+Cj4gZGlmZiAtLWdpdCBhL3RhcmdldC1h
-cm0va3ZtNjQuYyBiL3RhcmdldC1hcm0va3ZtNjQuYwo+IGluZGV4IDhjZjNhNjIuLmM2MGU5ODkg
-MTAwNjQ0Cj4gLS0tIGEvdGFyZ2V0LWFybS9rdm02NC5jCj4gKysrIGIvdGFyZ2V0LWFybS9rdm02
-NC5jCj4gQEAgLTEyNiw5ICsxMjYsMTcgQEAgYm9vbCBrdm1fYXJtX3JlZ19zeW5jc192aWFfY3By
-ZWdfbGlzdCh1aW50NjRfdCByZWdpZHgpCj4gICNkZWZpbmUgQUFSQ0g2NF9DT1JFX1JFRyh4KSAg
-IChLVk1fUkVHX0FSTTY0IHwgS1ZNX1JFR19TSVpFX1U2NCB8IFwKPiAgICAgICAgICAgICAgICAg
-ICBLVk1fUkVHX0FSTV9DT1JFIHwgS1ZNX1JFR19BUk1fQ09SRV9SRUcoeCkpCj4KPiArLyogVGhl
-IGxpbnV4IGhlYWRlcnMgZG9uJ3QgZGVmaW5lIGEgMTI4IGJpdCB3aWRlIFNJTUQgbWFjcm8gZm9y
-IHVzICovCj4gKyNkZWZpbmUgQUFSQ0g2NF9TSU1EX0NPUkVfUkVHKHgpICAgKEtWTV9SRUdfQVJN
-NjQgfCBLVk1fUkVHX1NJWkVfVTEyOCB8IFwKPiArICAgICAgICAgICAgICAgICBLVk1fUkVHX0FS
-TV9DT1JFIHwgS1ZNX1JFR19BUk1fQ09SRV9SRUcoeCkpCj4gKwo+ICsjZGVmaW5lIEFBUkNINjRf
-U0lNRF9DVFJMX1JFRyh4KSAgIChLVk1fUkVHX0FSTTY0IHwgS1ZNX1JFR19TSVpFX1UzMiB8IFwK
-PiArICAgICAgICAgICAgICAgICBLVk1fUkVHX0FSTV9DT1JFIHwgS1ZNX1JFR19BUk1fQ09SRV9S
-RUcoeCkpCj4gKwo+ICBpbnQga3ZtX2FyY2hfcHV0X3JlZ2lzdGVycyhDUFVTdGF0ZSAqY3MsIGlu
-dCBsZXZlbCkKPiAgewo+ICAgICAgc3RydWN0IGt2bV9vbmVfcmVnIHJlZzsKPiArICAgIHVpbnQz
-Ml90IGZwcjsKPiAgICAgIHVpbnQ2NF90IHZhbDsKPiAgICAgIGludCBpOwo+ICAgICAgaW50IHJl
-dDsKPiBAQCAtMjA3LDEzICsyMTUsMzYgQEAgaW50IGt2bV9hcmNoX3B1dF9yZWdpc3RlcnMoQ1BV
-U3RhdGUgKmNzLCBpbnQgbGV2ZWwpCj4gICAgICAgICAgfQo+ICAgICAgfQo+Cj4gKyAgICAvKiBB
-ZHZhbmNlZCBTSU1EIGFuZCBGUCByZWdpc3RlcnMgKi8KPiArICAgIGZvciAoaSA9IDA7IGkgPCAz
-MjsgaSsrKSB7Cj4gKyAgICAgICAgcmVnLmlkID0gQUFSQ0g2NF9TSU1EX0NPUkVfUkVHKGZwX3Jl
-Z3MudnJlZ3NbaV0pOwo+ICsgICAgICAgIHJlZy5hZGRyID0gKHVpbnRwdHJfdCkoJmVudi0+dmZw
-LnJlZ3NbaV0pOwo+ICsgICAgICAgIHJldCA9IGt2bV92Y3B1X2lvY3RsKGNzLCBLVk1fU0VUX09O
-RV9SRUcsICZyZWcpOwo+ICsgICAgICAgIGlmIChyZXQpIHsKPiArICAgICAgICAgICAgcmV0dXJu
-IHJldDsKPiArICAgICAgICB9Cj4gKyAgICAgICAgcmVnLmlkKys7CgpXaGF0IGRvZXMgdGhpcyBp
-bmNyZW1lbnQgZG8/ICBJdCBhcHBlYXJzIHRoYXQgaXQganVzdCBnZXRzIHRocm93biBhd2F5Cm9u
-IHRoZSBuZXh0IGl0ZXJhdGlvbiBvZiB0aGUgbG9vcCB1bmxlc3MgaW9jdGwoU0VUKSByZXR1cm4g
-c29tZXRoaW5nLApidXQgbWF5YmUgSSBhbSBtaXNzaW5nIHNvbWV0aGluZy4KCj4gKyAgICB9Cj4g
-Kwo+ICsgICAgcmVnLmFkZHIgPSAodWludHB0cl90KSgmZnByKTsKPiArICAgIGZwciA9IHZmcF9n
-ZXRfZnBzcihlbnYpOwo+ICsgICAgcmVnLmlkID0gQUFSQ0g2NF9TSU1EX0NUUkxfUkVHKGZwX3Jl
-Z3MuZnBzcik7Cj4gKyAgICByZXQgPSBrdm1fdmNwdV9pb2N0bChjcywgS1ZNX1NFVF9PTkVfUkVH
-LCAmcmVnKTsKPiArICAgIGlmIChyZXQpIHsKPiArICAgICAgICByZXR1cm4gcmV0Owo+ICsgICAg
-fQo+ICsKPiArICAgIGZwciA9IHZmcF9nZXRfZnBjcihlbnYpOwo+ICsgICAgcmVnLmlkID0gQUFS
-Q0g2NF9TSU1EX0NUUkxfUkVHKGZwX3JlZ3MuZnBjcik7Cj4gKyAgICByZXQgPSBrdm1fdmNwdV9p
-b2N0bChjcywgS1ZNX1NFVF9PTkVfUkVHLCAmcmVnKTsKPiArICAgIGlmIChyZXQpIHsKPiArICAg
-ICAgICByZXR1cm4gcmV0Owo+ICsgICAgfQo+ICsKPiAgICAgIGlmICghd3JpdGVfbGlzdF90b19r
-dm1zdGF0ZShjcHUpKSB7Cj4gICAgICAgICAgcmV0dXJuIEVJTlZBTDsKPiAgICAgIH0KPgo+IC0g
-ICAgLyogVE9ETzoKPiAtICAgICAqIEZQIHN0YXRlCj4gLSAgICAgKi8KPiAgICAgIHJldHVybiBy
-ZXQ7Cj4gIH0KPgo+IEBAIC0yMjEsNiArMjUyLDcgQEAgaW50IGt2bV9hcmNoX2dldF9yZWdpc3Rl
-cnMoQ1BVU3RhdGUgKmNzKQo+ICB7Cj4gICAgICBzdHJ1Y3Qga3ZtX29uZV9yZWcgcmVnOwo+ICAg
-ICAgdWludDY0X3QgdmFsOwo+ICsgICAgdWludDMyX3QgZnByOwo+ICAgICAgaW50IGk7Cj4gICAg
-ICBpbnQgcmV0Owo+Cj4gQEAgLTMwMiw5ICszMzQsMzYgQEAgaW50IGt2bV9hcmNoX2dldF9yZWdp
-c3RlcnMoQ1BVU3RhdGUgKmNzKQo+ICAgICAgICAgIH0KPiAgICAgIH0KPgo+ICsgICAgLyogQWR2
-YW5jZWQgU0lNRCBhbmQgRlAgcmVnaXN0ZXJzICovCj4gKyAgICBmb3IgKGkgPSAwOyBpIDwgMzI7
-IGkrKykgewo+ICsgICAgICAgIHJlZy5pZCA9IEFBUkNINjRfU0lNRF9DT1JFX1JFRyhmcF9yZWdz
-LnZyZWdzW2ldKTsKPiArICAgICAgICByZWcuYWRkciA9ICh1aW50cHRyX3QpKCZlbnYtPnZmcC5y
-ZWdzW2ldKTsKPiArICAgICAgICByZXQgPSBrdm1fdmNwdV9pb2N0bChjcywgS1ZNX0dFVF9PTkVf
-UkVHLCAmcmVnKTsKPiArICAgICAgICBpZiAocmV0KSB7Cj4gKyAgICAgICAgICAgIHJldHVybiBy
-ZXQ7Cj4gKyAgICAgICAgfQo+ICsgICAgICAgIHJlZy5pZCsrOwo+ICsgICAgfQo+ICsKPiArICAg
-IHJlZy5hZGRyID0gKHVpbnRwdHJfdCkoJmZwcik7Cj4gKyAgICByZWcuaWQgPSBBQVJDSDY0X1NJ
-TURfQ1RSTF9SRUcoZnBfcmVncy5mcHNyKTsKPiArICAgIHJldCA9IGt2bV92Y3B1X2lvY3RsKGNz
-LCBLVk1fR0VUX09ORV9SRUcsICZyZWcpOwo+ICsgICAgaWYgKHJldCkgewo+ICsgICAgICAgIHJl
-dHVybiByZXQ7Cj4gKyAgICB9Cj4gKyAgICB2ZnBfc2V0X2Zwc3IoZW52LCBmcHIpOwo+ICsKPiAr
-ICAgIHJlZy5pZCA9IEFBUkNINjRfU0lNRF9DVFJMX1JFRyhmcF9yZWdzLmZwY3IpOwo+ICsgICAg
-cmV0ID0ga3ZtX3ZjcHVfaW9jdGwoY3MsIEtWTV9HRVRfT05FX1JFRywgJnJlZyk7Cj4gKyAgICBp
-ZiAocmV0KSB7Cj4gKyAgICAgICAgcmV0dXJuIHJldDsKPiArICAgIH0KPiArICAgIHZmcF9zZXRf
-ZnBjcihlbnYsIGZwcik7Cj4gKwo+ICAgICAgaWYgKCF3cml0ZV9rdm1zdGF0ZV90b19saXN0KGNw
-dSkpIHsKPiAgICAgICAgICByZXR1cm4gRUlOVkFMOwo+ICAgICAgfQo+ICsKPiAgICAgIC8qIE5v
-dGUgdGhhdCBpdCdzIE9LIHRvIGhhdmUgcmVnaXN0ZXJzIHdoaWNoIGFyZW4ndCBpbiBDUFVTdGF0
-ZSwKPiAgICAgICAqIHNvIHdlIGNhbiBpZ25vcmUgYSBmYWlsdXJlIHJldHVybiBoZXJlLgo+ICAg
-ICAgICovCj4gLS0KPiAyLjMuMQo+Cj4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1i
-aWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3Zt
-YXJtCg==
+On Wed, Feb 25, 2015 at 10:02 AM, Alex Benn=C3=A9e <alex.bennee@linaro.=
+org> wrote:
+> I was getting very confused about the duplication of state. Perhaps w=
+e
+> should just get rid of env->spsr and use helpers that understand the
+> banking?
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> diff --git a/target-arm/cpu.h b/target-arm/cpu.h
+> index 11845a6..d7fd13f 100644
+> --- a/target-arm/cpu.h
+> +++ b/target-arm/cpu.h
+> @@ -155,6 +155,11 @@ typedef struct CPUARMState {
+>         This contains all the other bits.  Use cpsr_{read,write} to a=
+ccess
+>         the whole CPSR.  */
+>      uint32_t uncached_cpsr;
+> +    /* The spsr is a alias for spsr_elN where N is the current
+
+"an alias"
+
+> +     * exception level. It is provided for here so the TCG msr/mrs
+
+remove "for here"
+
+> +     * implementation can access one register. Care needs to be take=
+n
+> +     * to ensure the banked_spsr[] is also updated.
+> +     */
+>      uint32_t spsr;
+>
+>      /* Banked registers.  */
+> --
+> 2.3.0
+>
+>
+
+Otherwise...
+
+Reviewed-by: Greg Bellows <greg.bellows@linaro.org>
