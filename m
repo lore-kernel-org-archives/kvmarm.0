@@ -1,24 +1,21 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 1/3] arm/arm64: KVM: Allow handle_hva_to_gpa to return a
- value
-Date: Thu, 12 Mar 2015 18:16:50 +0000
-Message-ID: <1426184212-29333-2-git-send-email-marc.zyngier@arm.com>
-References: <1426184212-29333-1-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 0/3] arm/arm64: KVM: Add support for page aging
+Date: Thu, 12 Mar 2015 18:16:49 +0000
+Message-ID: <1426184212-29333-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3173C48BA4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2015 14:10:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D32D48BA6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2015 14:10:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id K2b3+MVqmluj for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id BD8BzUGUJE-6 for <kvmarm@lists.cs.columbia.edu>;
  Thu, 12 Mar 2015 14:10:36 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A19548BA3
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 48DDF48BA2
  for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2015 14:10:35 -0400 (EDT)
-In-Reply-To: <1426184212-29333-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,81 +28,50 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-So far, handle_hva_to_gpa was never required to return a value.
-As we prepare to age pages at Stage-2, we need to be able to
-return a value from the iterator (kvm_test_age_hva).
+So far, KVM/arm doesn't implement any support for page aging, leading
+to rather bad performance when the system is swapping. This short
+series implements the required hooks and fault handling to deal with
+pages being marked old/young.
 
-Adapt the code to handle this situation. No semantic change.
+The three patches are fairly straightforward:
 
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm/kvm/mmu.c | 23 ++++++++++++++---------
- 1 file changed, 14 insertions(+), 9 deletions(-)
+- First patch changes the range iterator to be able to return a value
 
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 3e6859b..ffa06e0 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -1377,15 +1377,16 @@ out_unlock:
- 	return ret;
- }
- 
--static void handle_hva_to_gpa(struct kvm *kvm,
--			      unsigned long start,
--			      unsigned long end,
--			      void (*handler)(struct kvm *kvm,
--					      gpa_t gpa, void *data),
--			      void *data)
-+static int handle_hva_to_gpa(struct kvm *kvm,
-+			     unsigned long start,
-+			     unsigned long end,
-+			     int (*handler)(struct kvm *kvm,
-+					    gpa_t gpa, void *data),
-+			     void *data)
- {
- 	struct kvm_memslots *slots;
- 	struct kvm_memory_slot *memslot;
-+	int ret = 0;
- 
- 	slots = kvm_memslots(kvm);
- 
-@@ -1409,14 +1410,17 @@ static void handle_hva_to_gpa(struct kvm *kvm,
- 
- 		for (; gfn < gfn_end; ++gfn) {
- 			gpa_t gpa = gfn << PAGE_SHIFT;
--			handler(kvm, gpa, data);
-+			ret |= handler(kvm, gpa, data);
- 		}
- 	}
-+
-+	return ret;
- }
- 
--static void kvm_unmap_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
-+static int kvm_unmap_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
- {
- 	unmap_stage2_range(kvm, gpa, PAGE_SIZE);
-+	return 0;
- }
- 
- int kvm_unmap_hva(struct kvm *kvm, unsigned long hva)
-@@ -1442,7 +1446,7 @@ int kvm_unmap_hva_range(struct kvm *kvm,
- 	return 0;
- }
- 
--static void kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, void *data)
-+static int kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, void *data)
- {
- 	pte_t *pte = (pte_t *)data;
- 
-@@ -1454,6 +1458,7 @@ static void kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, void *data)
- 	 * through this calling path.
- 	 */
- 	stage2_set_pte(kvm, NULL, gpa, pte, 0);
-+	return 0;
- }
- 
- 
+- Second patch implements the actual page aging (clearing the AF bit
+  in the page tables, and relying on the normal faulting code to set
+  the bit again).
+
+- Last patch optimizes the access fault path by only doing the minimum
+  to satisfy the fault.
+
+The end result is a system that behaves visibly better under load, as
+VM pages don't get evicted that easily.
+
+Based on 4.0-rc3, tested on Seattle and X-Gene.
+
+Also at git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/page-aging
+
+* From v1 [1]:
+- Removed all TLBIs from kvm_age_hva_handler, as the core KVM code
+  already does use quite a large hammer to nuke the TLBs on its own
+- Don't mark old a page that is already old
+- Rebased on top of 4.0-rc3
+
+[1]: https://lists.cs.columbia.edu/pipermail/kvmarm/2015-January/013315.html
+
+Marc Zyngier (3):
+  arm/arm64: KVM: Allow handle_hva_to_gpa to return a value
+  arm/arm64: KVM: Implement Stage-2 page aging
+  arm/arm64: KVM: Optimize handling of Access Flag faults
+
+ arch/arm/include/asm/kvm_arm.h    |   1 +
+ arch/arm/include/asm/kvm_host.h   |  13 +---
+ arch/arm/kvm/mmu.c                | 134 +++++++++++++++++++++++++++++++++++---
+ arch/arm/kvm/trace.h              |  48 ++++++++++++++
+ arch/arm64/include/asm/esr.h      |   1 +
+ arch/arm64/include/asm/kvm_arm.h  |   1 +
+ arch/arm64/include/asm/kvm_host.h |  13 +---
+ 7 files changed, 179 insertions(+), 32 deletions(-)
+
 -- 
 2.1.4
