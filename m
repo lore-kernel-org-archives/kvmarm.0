@@ -1,21 +1,29 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 0/3] arm/arm64: KVM: Add support for page aging
-Date: Thu, 12 Mar 2015 18:16:49 +0000
-Message-ID: <1426184212-29333-1-git-send-email-marc.zyngier@arm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 3/6] hw/char: pl011 don't keep setting the IRQ if
+ nothing changed
+Date: Thu, 12 Mar 2015 20:27:20 +0000
+Message-ID: <CAFEAcA-UOfgxBA969U6ADdra75fxYQPi6JFe017J6-oMG1rGhg@mail.gmail.com>
+References: <1425479753-18349-1-git-send-email-alex.bennee@linaro.org>
+ <1425479753-18349-4-git-send-email-alex.bennee@linaro.org>
+ <CAFEAcA-RhZVe1qwKQ3LzfWbzYVcBQ-jrwTnhH0OX69GNtnoysw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D32D48BA6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2015 14:10:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5475A48B9F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2015 16:21:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BD8BzUGUJE-6 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Mar 2015 14:10:36 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 48DDF48BA2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2015 14:10:35 -0400 (EDT)
+ with ESMTP id PvU+yzSWEviX for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Mar 2015 16:21:18 -0400 (EDT)
+Received: from mail-lb0-f176.google.com (mail-lb0-f176.google.com
+ [209.85.217.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 131B348B9E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2015 16:21:17 -0400 (EDT)
+Received: by lbdu14 with SMTP id u14so18660027lbd.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2015 13:27:40 -0700 (PDT)
+In-Reply-To: <CAFEAcA-RhZVe1qwKQ3LzfWbzYVcBQ-jrwTnhH0OX69GNtnoysw@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -25,53 +33,31 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, QEMU Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-So far, KVM/arm doesn't implement any support for page aging, leading
-to rather bad performance when the system is swapping. This short
-series implements the required hooks and fault handling to deal with
-pages being marked old/young.
-
-The three patches are fairly straightforward:
-
-- First patch changes the range iterator to be able to return a value
-
-- Second patch implements the actual page aging (clearing the AF bit
-  in the page tables, and relying on the normal faulting code to set
-  the bit again).
-
-- Last patch optimizes the access fault path by only doing the minimum
-  to satisfy the fault.
-
-The end result is a system that behaves visibly better under load, as
-VM pages don't get evicted that easily.
-
-Based on 4.0-rc3, tested on Seattle and X-Gene.
-
-Also at git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/page-aging
-
-* From v1 [1]:
-- Removed all TLBIs from kvm_age_hva_handler, as the core KVM code
-  already does use quite a large hammer to nuke the TLBs on its own
-- Don't mark old a page that is already old
-- Rebased on top of 4.0-rc3
-
-[1]: https://lists.cs.columbia.edu/pipermail/kvmarm/2015-January/013315.html
-
-Marc Zyngier (3):
-  arm/arm64: KVM: Allow handle_hva_to_gpa to return a value
-  arm/arm64: KVM: Implement Stage-2 page aging
-  arm/arm64: KVM: Optimize handling of Access Flag faults
-
- arch/arm/include/asm/kvm_arm.h    |   1 +
- arch/arm/include/asm/kvm_host.h   |  13 +---
- arch/arm/kvm/mmu.c                | 134 +++++++++++++++++++++++++++++++++++---
- arch/arm/kvm/trace.h              |  48 ++++++++++++++
- arch/arm64/include/asm/esr.h      |   1 +
- arch/arm64/include/asm/kvm_arm.h  |   1 +
- arch/arm64/include/asm/kvm_host.h |  13 +---
- 7 files changed, 179 insertions(+), 32 deletions(-)
-
--- 
-2.1.4
+T24gMTIgTWFyY2ggMjAxNSBhdCAxNTo1MSwgUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIubWF5ZGVsbEBs
+aW5hcm8ub3JnPiB3cm90ZToKPiBPbiA0IE1hcmNoIDIwMTUgYXQgMTQ6MzUsIEFsZXggQmVubsOp
+ZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4gd3JvdGU6Cj4+IFdoaWxlIG9ic2VydmluZyBLVk0g
+dHJhY2VzIEkgY2FuIHNlZSBhZGRpdGlvbmFsIElSUSBjYWxscyBvbiBwcmV0dHkgbXVjaAo+PiBl
+dmVyeSBNTUlPIGFjY2VzcyB3aGljaCBpcyBqdXN0IHBsYWluIGluZWZmaWNpZW50LiBPbmx5IHVw
+ZGF0ZSB0aGUgUUVNVQo+PiBJUlEgbGV2ZWwgaWYgc29tZXRoaW5nIGhhcyBhY3R1YWxseSBjaGFu
+Z2VkIGZyb20gbGFzdCB0aW1lLiBPdGhlcndpc2Ugd2UKPj4gbWF5IGJlIHBhcGVyaW5nIG92ZXIg
+b3RoZXIgZmFpbHVyZSBtb2Rlcy4KCj4gQ29uc2lkZXIgdGhpcyBzZXF1ZW5jZSBvZiBldmVudHM6
+CgpJbmNpZGVudGFsbHksIHRoZSBjb2RlIHJldmlldyBydWxlIG9mIHRodW1iIHRoYXQgbGVkIG1l
+IHRvCmNvbnN0cnVjdCB0aGF0IHNjZW5hcmlvIGlzOgogKiBzdGF0ZSBpbnNpZGUgdGhlIGRldmlj
+ZSBzdHJ1Y3Qgd2hpY2ggZG9lc24ndCBjb3JyZXNwb25kCiAgIHRvIHJlYWwgaGFyZHdhcmUgc3Rh
+dGUgaXMgc3VzcGljaW91cwogKiBzdGF0ZSB3aGljaCBkb2Vzbid0IGhhdmUgYW55IGhhbmRsaW5n
+IG9uIG1pZ3JhdGlvbgogICBzYXZlL3Jlc3RvcmUgaXMgZG91Ymx5IHN1c3BpY2lvdXMKLi4uYW5k
+IHRoZW4gaXQgd2FzIGp1c3QgYSBtYXR0ZXIgb2YgImZpbmQgdGhlIHNpdHVhdGlvbgp3aGVyZSB0
+aGlzIGlzIGJyb2tlbiIgOi0pCgpJZiB3ZSB3YW50IHRvIGF2b2lkIG1ha2luZyBzeXNjYWxscyBi
+YWNrIGludG8gS1ZNIGl0IG1pZ2h0CmJlIGJldHRlciB0byBhdHRhY2sgdGhlIHByb2JsZW0gaW4g
+dGhlIEdJQyBvYmplY3QgcmF0aGVyCnRoYW4gaW4gYWxsIHRoZSBkZXZpY2VzIHRoYXQgbWlnaHQg
+YmUgY29ubmVjdGVkIHRvIGl0LgpJbiBnZW5lcmFsIFFFTVUgZGV2aWNlcyB0ZW5kIHRvIGFzc3Vt
+ZSB0aGV5IGNhbiBqdXN0CmFsd2F5cyBjYWxsIHFlbXVfc2V0X2lycSgpIGFuZCBpdCdzIHRoZSBv
+dGhlciBlbmQncwpqb2IgdG8gYXZvaWQgZG9pbmcgYW55dGhpbmcgdG9vIGV4cGVuc2l2ZSBpbiB0
+aGF0IHNpdHVhdGlvbi4KCi0tIFBNTQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
+YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
+cm0K
