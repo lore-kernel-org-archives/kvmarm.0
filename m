@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 3/3] arm/arm64: KVM: Optimize handling of Access Flag faults
-Date: Thu, 12 Mar 2015 18:16:52 +0000
-Message-ID: <1426184212-29333-4-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 1/3] arm/arm64: KVM: Allow handle_hva_to_gpa to return a
+ value
+Date: Thu, 12 Mar 2015 18:16:50 +0000
+Message-ID: <1426184212-29333-2-git-send-email-marc.zyngier@arm.com>
 References: <1426184212-29333-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EAA7A48BC0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2015 14:10:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3173C48BA4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2015 14:10:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wczqIfeTxjje for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Mar 2015 14:10:40 -0400 (EDT)
+ with ESMTP id K2b3+MVqmluj for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 12 Mar 2015 14:10:36 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D47F148BAD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2015 14:10:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A19548BA3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Mar 2015 14:10:35 -0400 (EDT)
 In-Reply-To: <1426184212-29333-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,113 +31,81 @@ Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that we have page aging in Stage-2, it becomes obvious that
-we're doing way too much work handling the fault.
+So far, handle_hva_to_gpa was never required to return a value.
+As we prepare to age pages at Stage-2, we need to be able to
+return a value from the iterator (kvm_test_age_hva).
 
-The page is not going anywhere (it is still mapped), the page
-tables are already allocated, and all we want is to flip a bit
-in the PMD or PTE. Also, we can avoid any form of TLB invalidation,
-since a page with the AF bit off is not allowed to be cached.
+Adapt the code to handle this situation. No semantic change.
 
-An obvious solution is to have a separate handler for FSC_ACCESS,
-where we pride ourselves to only do the very minimum amount of
-work.
-
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/mmu.c   | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- arch/arm/kvm/trace.h | 15 +++++++++++++++
- 2 files changed, 61 insertions(+)
+ arch/arm/kvm/mmu.c | 23 ++++++++++++++---------
+ 1 file changed, 14 insertions(+), 9 deletions(-)
 
 diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 1831aa2..56c8b03 100644
+index 3e6859b..ffa06e0 100644
 --- a/arch/arm/kvm/mmu.c
 +++ b/arch/arm/kvm/mmu.c
-@@ -1304,6 +1304,46 @@ out_unlock:
+@@ -1377,15 +1377,16 @@ out_unlock:
  	return ret;
  }
  
-+/*
-+ * Resolve the access fault by making the page young again.
-+ * Note that because the faulting entry is guaranteed not to be
-+ * cached in the TLB, we don't need to invalidate anything.
-+ */
-+static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
-+{
-+	pmd_t *pmd;
-+	pte_t *pte;
-+	pfn_t pfn;
-+	bool pfn_valid = false;
-+
-+	trace_kvm_access_fault(fault_ipa);
-+
-+	spin_lock(&vcpu->kvm->mmu_lock);
-+
-+	pmd = stage2_get_pmd(vcpu->kvm, NULL, fault_ipa);
-+	if (!pmd || pmd_none(*pmd))	/* Nothing there */
-+		goto out;
-+
-+	if (kvm_pmd_huge(*pmd)) {	/* THP, HugeTLB */
-+		*pmd = pmd_mkyoung(*pmd);
-+		pfn = pmd_pfn(*pmd);
-+		pfn_valid = true;
-+		goto out;
-+	}
-+
-+	pte = pte_offset_kernel(pmd, fault_ipa);
-+	if (pte_none(*pte))		/* Nothing there either */
-+		goto out;
-+
-+	*pte = pte_mkyoung(*pte);	/* Just a page... */
-+	pfn = pte_pfn(*pte);
-+	pfn_valid = true;
-+out:
-+	spin_unlock(&vcpu->kvm->mmu_lock);
-+	if (pfn_valid)
-+		kvm_set_pfn_accessed(pfn);
-+}
-+
- /**
-  * kvm_handle_guest_abort - handles all 2nd stage aborts
-  * @vcpu:	the VCPU pointer
-@@ -1371,6 +1411,12 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	/* Userspace should not be able to register out-of-bounds IPAs */
- 	VM_BUG_ON(fault_ipa >= KVM_PHYS_SIZE);
+-static void handle_hva_to_gpa(struct kvm *kvm,
+-			      unsigned long start,
+-			      unsigned long end,
+-			      void (*handler)(struct kvm *kvm,
+-					      gpa_t gpa, void *data),
+-			      void *data)
++static int handle_hva_to_gpa(struct kvm *kvm,
++			     unsigned long start,
++			     unsigned long end,
++			     int (*handler)(struct kvm *kvm,
++					    gpa_t gpa, void *data),
++			     void *data)
+ {
+ 	struct kvm_memslots *slots;
+ 	struct kvm_memory_slot *memslot;
++	int ret = 0;
  
-+	if (fault_status == FSC_ACCESS) {
-+		handle_access_fault(vcpu, fault_ipa);
-+		ret = 1;
-+		goto out_unlock;
-+	}
-+
- 	ret = user_mem_abort(vcpu, fault_ipa, memslot, hva, fault_status);
- 	if (ret == 0)
- 		ret = 1;
-diff --git a/arch/arm/kvm/trace.h b/arch/arm/kvm/trace.h
-index c09f37f..0ec3539 100644
---- a/arch/arm/kvm/trace.h
-+++ b/arch/arm/kvm/trace.h
-@@ -68,6 +68,21 @@ TRACE_EVENT(kvm_guest_fault,
- 		  __entry->hxfar, __entry->vcpu_pc)
- );
+ 	slots = kvm_memslots(kvm);
  
-+TRACE_EVENT(kvm_access_fault,
-+	TP_PROTO(unsigned long ipa),
-+	TP_ARGS(ipa),
+@@ -1409,14 +1410,17 @@ static void handle_hva_to_gpa(struct kvm *kvm,
+ 
+ 		for (; gfn < gfn_end; ++gfn) {
+ 			gpa_t gpa = gfn << PAGE_SHIFT;
+-			handler(kvm, gpa, data);
++			ret |= handler(kvm, gpa, data);
+ 		}
+ 	}
 +
-+	TP_STRUCT__entry(
-+		__field(	unsigned long,	ipa		)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->ipa		= ipa;
-+	),
-+
-+	TP_printk("IPA: %lx", __entry->ipa)
-+);
-+
- TRACE_EVENT(kvm_irq_line,
- 	TP_PROTO(unsigned int type, int vcpu_idx, int irq_num, int level),
- 	TP_ARGS(type, vcpu_idx, irq_num, level),
++	return ret;
+ }
+ 
+-static void kvm_unmap_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
++static int kvm_unmap_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
+ {
+ 	unmap_stage2_range(kvm, gpa, PAGE_SIZE);
++	return 0;
+ }
+ 
+ int kvm_unmap_hva(struct kvm *kvm, unsigned long hva)
+@@ -1442,7 +1446,7 @@ int kvm_unmap_hva_range(struct kvm *kvm,
+ 	return 0;
+ }
+ 
+-static void kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, void *data)
++static int kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, void *data)
+ {
+ 	pte_t *pte = (pte_t *)data;
+ 
+@@ -1454,6 +1458,7 @@ static void kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, void *data)
+ 	 * through this calling path.
+ 	 */
+ 	stage2_set_pte(kvm, NULL, gpa, pte, 0);
++	return 0;
+ }
+ 
+ 
 -- 
 2.1.4
