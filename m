@@ -1,23 +1,24 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 07/12] KVM: arm/arm64: simplify vgic_find_range() and callers
-Date: Fri, 13 Mar 2015 16:10:07 +0000
-Message-ID: <1426263012-22935-8-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH 09/12] KVM: arm/arm64: prepare GICv2 emulation to be handled
+ by kvm_io_bus
+Date: Fri, 13 Mar 2015 16:10:09 +0000
+Message-ID: <1426263012-22935-10-git-send-email-andre.przywara@arm.com>
 References: <1426263012-22935-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 757F848C39
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Mar 2015 12:03:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D58548C3A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Mar 2015 12:03:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vn7oWgs6p5ls for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Mar 2015 12:03:50 -0400 (EDT)
+ with ESMTP id p0aupzvS8seA for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Mar 2015 12:03:51 -0400 (EDT)
 Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
  [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E447148C3B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Mar 2015 12:03:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C2DD548C3C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Mar 2015 12:03:50 -0400 (EDT)
 In-Reply-To: <1426263012-22935-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,93 +33,111 @@ To: marc.zyngier@arm.com, christoffer.dall@linaro.org, pbonzini@redhat.com
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The vgic_find_range() function in vgic.c takes a struct kvm_exit_mmio
-argument, but actually only used the length field in there. Since we
-need to get rid of that structure in that part of the code anyway,
-let's rework the function (and it's callers) to pass the length
-argument to the function directly.
+Using the framework provided by the recent vgic.c changes we register
+a kvm_io_bus device when initializing the virtual GICv2.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- virt/kvm/arm/vgic-v2-emul.c |    2 +-
- virt/kvm/arm/vgic.c         |   22 ++++++++--------------
- virt/kvm/arm/vgic.h         |    3 +--
- 3 files changed, 10 insertions(+), 17 deletions(-)
+ include/kvm/arm_vgic.h      |    1 +
+ virt/kvm/arm/vgic-v2-emul.c |   13 +++++++++----
+ virt/kvm/arm/vgic.c         |   16 ++++++++++++++++
+ 3 files changed, 26 insertions(+), 4 deletions(-)
 
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 4bfc6a3..74a4ac4 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -245,6 +245,7 @@ struct vgic_dist {
+ 	unsigned long		*irq_pending_on_cpu;
+ 
+ 	struct vgic_vm_ops	vm_ops;
++	struct vgic_io_device	dist_iodev;
+ };
+ 
+ struct vgic_v2_cpu_if {
 diff --git a/virt/kvm/arm/vgic-v2-emul.c b/virt/kvm/arm/vgic-v2-emul.c
-index 5002905..0defac6 100644
+index 0defac6..6f685c9 100644
 --- a/virt/kvm/arm/vgic-v2-emul.c
 +++ b/virt/kvm/arm/vgic-v2-emul.c
-@@ -699,7 +699,7 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
- 	default:
- 		BUG();
- 	}
--	r = vgic_find_range(ranges, &mmio, offset);
-+	r = vgic_find_range(ranges, 4, offset);
+@@ -490,6 +490,7 @@ static bool vgic_v2_queue_sgi(struct kvm_vcpu *vcpu, int irq)
+ static int vgic_v2_map_resources(struct kvm *kvm,
+ 				 const struct vgic_params *params)
+ {
++	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	int ret = 0;
  
- 	if (unlikely(!r || !r->handle_mmio)) {
+ 	if (!irqchip_in_kernel(kvm))
+@@ -500,13 +501,17 @@ static int vgic_v2_map_resources(struct kvm *kvm,
+ 	if (vgic_ready(kvm))
+ 		goto out;
+ 
+-	if (IS_VGIC_ADDR_UNDEF(kvm->arch.vgic.vgic_dist_base) ||
+-	    IS_VGIC_ADDR_UNDEF(kvm->arch.vgic.vgic_cpu_base)) {
++	if (IS_VGIC_ADDR_UNDEF(dist->vgic_dist_base) ||
++	    IS_VGIC_ADDR_UNDEF(dist->vgic_cpu_base)) {
+ 		kvm_err("Need to set vgic cpu and dist addresses first\n");
  		ret = -ENXIO;
+ 		goto out;
+ 	}
+ 
++	vgic_register_kvm_io_dev(kvm, dist->vgic_dist_base,
++				 KVM_VGIC_V2_DIST_SIZE,
++				 vgic_dist_ranges, -1, &dist->dist_iodev);
++
+ 	/*
+ 	 * Initialize the vgic if this hasn't already been done on demand by
+ 	 * accessing the vgic state from userspace.
+@@ -517,7 +522,7 @@ static int vgic_v2_map_resources(struct kvm *kvm,
+ 		goto out;
+ 	}
+ 
+-	ret = kvm_phys_addr_ioremap(kvm, kvm->arch.vgic.vgic_cpu_base,
++	ret = kvm_phys_addr_ioremap(kvm, dist->vgic_cpu_base,
+ 				    params->vcpu_base, KVM_VGIC_V2_CPU_SIZE,
+ 				    true);
+ 	if (ret) {
+@@ -525,7 +530,7 @@ static int vgic_v2_map_resources(struct kvm *kvm,
+ 		goto out;
+ 	}
+ 
+-	kvm->arch.vgic.ready = true;
++	dist->ready = true;
+ out:
+ 	if (ret)
+ 		kvm_vgic_destroy(kvm);
 diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index fe3ac08..7aae19b 100644
+index 71389b8..b1dd717 100644
 --- a/virt/kvm/arm/vgic.c
 +++ b/virt/kvm/arm/vgic.c
-@@ -650,16 +650,13 @@ void vgic_unqueue_irqs(struct kvm_vcpu *vcpu)
+@@ -908,6 +908,20 @@ int vgic_register_kvm_io_dev(struct kvm *kvm, gpa_t base, int len,
+ 	return 0;
+ }
  
- const
- struct vgic_io_range *vgic_find_range(const struct vgic_io_range *ranges,
--				      struct kvm_exit_mmio *mmio,
--				      phys_addr_t offset)
-+				      int len, gpa_t offset)
++static void vgic_unregister_kvm_io_dev(struct kvm *kvm)
++{
++	struct vgic_dist *dist = &kvm->arch.vgic;
++
++	if (!dist || !kvm->buses[KVM_MMIO_BUS])
++		return;
++
++	mutex_lock(&kvm->slots_lock);
++	if (dist->dist_iodev.dev.ops)
++		kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
++					  &dist->dist_iodev.dev);
++	mutex_unlock(&kvm->slots_lock);
++}
++
+ static int vgic_nr_shared_irqs(struct vgic_dist *dist)
  {
--	const struct vgic_io_range *r = ranges;
--
--	while (r->len) {
--		if (offset >= r->base &&
--		    (offset + mmio->len) <= (r->base + r->len))
--			return r;
--		r++;
-+	while (ranges->len) {
-+		if (offset >= ranges->base &&
-+		    (offset + len) <= (ranges->base + ranges->len))
-+			return ranges;
-+		ranges++;
- 	}
+ 	return dist->nr_irqs - VGIC_NR_PRIVATE_IRQS;
+@@ -1546,6 +1560,8 @@ void kvm_vgic_destroy(struct kvm *kvm)
+ 	struct kvm_vcpu *vcpu;
+ 	int i;
  
- 	return NULL;
-@@ -750,7 +747,7 @@ bool vgic_handle_mmio_range(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	unsigned long offset;
++	vgic_unregister_kvm_io_dev(kvm);
++
+ 	kvm_for_each_vcpu(i, vcpu, kvm)
+ 		kvm_vgic_vcpu_destroy(vcpu);
  
- 	offset = mmio->phys_addr - mmio_base;
--	range = vgic_find_range(ranges, mmio, offset);
-+	range = vgic_find_range(ranges, mmio->len, offset);
- 	if (unlikely(!range || !range->handle_mmio)) {
- 		pr_warn("Unhandled access %d %08llx %d\n",
- 			mmio->is_write, mmio->phys_addr, mmio->len);
-@@ -1839,10 +1836,7 @@ int vgic_get_common_attr(struct kvm_device *dev, struct kvm_device_attr *attr)
- 
- int vgic_has_attr_regs(const struct vgic_io_range *ranges, phys_addr_t offset)
- {
--	struct kvm_exit_mmio dev_attr_mmio;
--
--	dev_attr_mmio.len = 4;
--	if (vgic_find_range(ranges, &dev_attr_mmio, offset))
-+	if (vgic_find_range(ranges, 4, offset))
- 		return 0;
- 	else
- 		return -ENXIO;
-diff --git a/virt/kvm/arm/vgic.h b/virt/kvm/arm/vgic.h
-index 21d062f..ffafb15 100644
---- a/virt/kvm/arm/vgic.h
-+++ b/virt/kvm/arm/vgic.h
-@@ -90,8 +90,7 @@ static inline bool is_in_range(phys_addr_t addr, unsigned long len,
- 
- const
- struct vgic_io_range *vgic_find_range(const struct vgic_io_range *ranges,
--				      struct kvm_exit_mmio *mmio,
--				      phys_addr_t offset);
-+				      int len, gpa_t offset);
- 
- bool vgic_handle_mmio_range(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 			    struct kvm_exit_mmio *mmio,
 -- 
 1.7.9.5
