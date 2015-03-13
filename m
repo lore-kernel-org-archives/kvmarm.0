@@ -1,53 +1,55 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH] arm/arm64: KVM: fix missing unlock on error in
- kvm_vgic_create()
-Date: Fri, 13 Mar 2015 10:24:21 +0000
-Message-ID: <5502BAD5.3040004@arm.com>
-References: <1425037305-23292-1-git-send-email-weiyj_lk@163.com>
- <20150302172947.GC10137@lvm>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v2 3/6] hw/char: pl011 don't keep setting the IRQ if nothing changed
+Date: Fri, 13 Mar 2015 10:38:58 +0000
+Message-ID: <87ioe5b2rh.fsf@linaro.org>
+References: <1425479753-18349-1-git-send-email-alex.bennee@linaro.org> <1425479753-18349-4-git-send-email-alex.bennee@linaro.org> <CAFEAcA-RhZVe1qwKQ3LzfWbzYVcBQ-jrwTnhH0OX69GNtnoysw@mail.gmail.com> <CAFEAcA-UOfgxBA969U6ADdra75fxYQPi6JFe017J6-oMG1rGhg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D500E4883A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Mar 2015 06:18:20 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jXeQLv1Zcu8L for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Mar 2015 06:18:17 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 300DD487E2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Mar 2015 06:18:16 -0400 (EDT)
-In-Reply-To: <20150302172947.GC10137@lvm>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, weiyj_lk@163.com
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Gleb Natapov <gleb@kernel.org>, Wei Yongjun <yongjun_wei@trendmicro.com.cn>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <CAFEAcA-UOfgxBA969U6ADdra75fxYQPi6JFe017J6-oMG1rGhg@mail.gmail.com>
+Sender: kvm-owner@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hej Christoffer,
 
-On 02/03/15 17:29, Christoffer Dall wrote:
-> On Fri, Feb 27, 2015 at 07:41:45PM +0800, weiyj_lk@163.com wrote:
->> From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
->>
->> Add the missing unlock before return from function kvm_vgic_create()
->> in the error handling case.
->>
->> Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
-> 
-> Thanks, applied.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Have I missed this or is this patch nor appearing in any of your branches?
+> On 12 March 2015 at 15:51, Peter Maydell <peter.maydell@linaro.org> w=
+rote:
+>> On 4 March 2015 at 14:35, Alex Benn=C3=A9e <alex.bennee@linaro.org> =
+wrote:
+>>> While observing KVM traces I can see additional IRQ calls on pretty=
+ much
+>>> every MMIO access which is just plain inefficient. Only update the =
+QEMU
+>>> IRQ level if something has actually changed from last time. Otherwi=
+se we
+>>> may be papering over other failure modes.
+>
+>> Consider this sequence of events:
+>
+> Incidentally, the code review rule of thumb that led me to
+> construct that scenario is:
+>  * state inside the device struct which doesn't correspond
+>    to real hardware state is suspicious
+>  * state which doesn't have any handling on migration
+>    save/restore is doubly suspicious
+> ...and then it was just a matter of "find the situation
+> where this is broken" :-)
+>
+> If we want to avoid making syscalls back into KVM it might
+> be better to attack the problem in the GIC object rather
+> than in all the devices that might be connected to it.
+> In general QEMU devices tend to assume they can just
+> always call qemu_set_irq() and it's the other end's
+> job to avoid doing anything too expensive in that situation.
 
-Cheers,
-Andre.
+=46air enough - I'll drop this patch on the re-spin
+
+>
+> -- PMM
+
+--=20
+Alex Benn=C3=A9e
