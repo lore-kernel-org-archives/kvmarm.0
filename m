@@ -1,24 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 09/12] KVM: arm/arm64: prepare GICv2 emulation to be handled
- by kvm_io_bus
-Date: Fri, 13 Mar 2015 16:10:09 +0000
-Message-ID: <1426263012-22935-10-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH 06/12] KVM: mark kvm->buses as empty once they were destroyed
+Date: Fri, 13 Mar 2015 16:10:06 +0000
+Message-ID: <1426263012-22935-7-git-send-email-andre.przywara@arm.com>
 References: <1426263012-22935-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D58548C3A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Mar 2015 12:03:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F54D48C48
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Mar 2015 12:03:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id p0aupzvS8seA for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Mar 2015 12:03:51 -0400 (EDT)
+ with ESMTP id NTgso5rTNBTZ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 13 Mar 2015 12:03:50 -0400 (EDT)
 Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
  [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C2DD548C3C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Mar 2015 12:03:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EB9748C39
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Mar 2015 12:03:49 -0400 (EDT)
 In-Reply-To: <1426263012-22935-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,111 +32,35 @@ To: marc.zyngier@arm.com, christoffer.dall@linaro.org, pbonzini@redhat.com
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Using the framework provided by the recent vgic.c changes we register
-a kvm_io_bus device when initializing the virtual GICv2.
+In kvm_destroy_vm() we call kvm_io_bus_destroy() pretty early,
+especially before calling kvm_arch_destroy_vm(). To avoid
+unregistering devices from the already destroyed bus, let's mark
+the bus with NULL to let other users know it has been destroyed
+already.
+This avoids a crash on a VM shutdown with the VGIC using the
+kvm_io_bus later (the unregistering is in there to be able to roll
+back a faulting init).
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- include/kvm/arm_vgic.h      |    1 +
- virt/kvm/arm/vgic-v2-emul.c |   13 +++++++++----
- virt/kvm/arm/vgic.c         |   16 ++++++++++++++++
- 3 files changed, 26 insertions(+), 4 deletions(-)
+ virt/kvm/kvm_main.c |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 4bfc6a3..74a4ac4 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -245,6 +245,7 @@ struct vgic_dist {
- 	unsigned long		*irq_pending_on_cpu;
- 
- 	struct vgic_vm_ops	vm_ops;
-+	struct vgic_io_device	dist_iodev;
- };
- 
- struct vgic_v2_cpu_if {
-diff --git a/virt/kvm/arm/vgic-v2-emul.c b/virt/kvm/arm/vgic-v2-emul.c
-index 0defac6..6f685c9 100644
---- a/virt/kvm/arm/vgic-v2-emul.c
-+++ b/virt/kvm/arm/vgic-v2-emul.c
-@@ -490,6 +490,7 @@ static bool vgic_v2_queue_sgi(struct kvm_vcpu *vcpu, int irq)
- static int vgic_v2_map_resources(struct kvm *kvm,
- 				 const struct vgic_params *params)
- {
-+	struct vgic_dist *dist = &kvm->arch.vgic;
- 	int ret = 0;
- 
- 	if (!irqchip_in_kernel(kvm))
-@@ -500,13 +501,17 @@ static int vgic_v2_map_resources(struct kvm *kvm,
- 	if (vgic_ready(kvm))
- 		goto out;
- 
--	if (IS_VGIC_ADDR_UNDEF(kvm->arch.vgic.vgic_dist_base) ||
--	    IS_VGIC_ADDR_UNDEF(kvm->arch.vgic.vgic_cpu_base)) {
-+	if (IS_VGIC_ADDR_UNDEF(dist->vgic_dist_base) ||
-+	    IS_VGIC_ADDR_UNDEF(dist->vgic_cpu_base)) {
- 		kvm_err("Need to set vgic cpu and dist addresses first\n");
- 		ret = -ENXIO;
- 		goto out;
- 	}
- 
-+	vgic_register_kvm_io_dev(kvm, dist->vgic_dist_base,
-+				 KVM_VGIC_V2_DIST_SIZE,
-+				 vgic_dist_ranges, -1, &dist->dist_iodev);
-+
- 	/*
- 	 * Initialize the vgic if this hasn't already been done on demand by
- 	 * accessing the vgic state from userspace.
-@@ -517,7 +522,7 @@ static int vgic_v2_map_resources(struct kvm *kvm,
- 		goto out;
- 	}
- 
--	ret = kvm_phys_addr_ioremap(kvm, kvm->arch.vgic.vgic_cpu_base,
-+	ret = kvm_phys_addr_ioremap(kvm, dist->vgic_cpu_base,
- 				    params->vcpu_base, KVM_VGIC_V2_CPU_SIZE,
- 				    true);
- 	if (ret) {
-@@ -525,7 +530,7 @@ static int vgic_v2_map_resources(struct kvm *kvm,
- 		goto out;
- 	}
- 
--	kvm->arch.vgic.ready = true;
-+	dist->ready = true;
- out:
- 	if (ret)
- 		kvm_vgic_destroy(kvm);
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 71389b8..b1dd717 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -908,6 +908,20 @@ int vgic_register_kvm_io_dev(struct kvm *kvm, gpa_t base, int len,
- 	return 0;
- }
- 
-+static void vgic_unregister_kvm_io_dev(struct kvm *kvm)
-+{
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+
-+	if (!dist || !kvm->buses[KVM_MMIO_BUS])
-+		return;
-+
-+	mutex_lock(&kvm->slots_lock);
-+	if (dist->dist_iodev.dev.ops)
-+		kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
-+					  &dist->dist_iodev.dev);
-+	mutex_unlock(&kvm->slots_lock);
-+}
-+
- static int vgic_nr_shared_irqs(struct vgic_dist *dist)
- {
- 	return dist->nr_irqs - VGIC_NR_PRIVATE_IRQS;
-@@ -1546,6 +1560,8 @@ void kvm_vgic_destroy(struct kvm *kvm)
- 	struct kvm_vcpu *vcpu;
- 	int i;
- 
-+	vgic_unregister_kvm_io_dev(kvm);
-+
- 	kvm_for_each_vcpu(i, vcpu, kvm)
- 		kvm_vgic_vcpu_destroy(vcpu);
- 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 8c7ab0b..6f164eb 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -604,8 +604,10 @@ static void kvm_destroy_vm(struct kvm *kvm)
+ 	list_del(&kvm->vm_list);
+ 	spin_unlock(&kvm_lock);
+ 	kvm_free_irq_routing(kvm);
+-	for (i = 0; i < KVM_NR_BUSES; i++)
++	for (i = 0; i < KVM_NR_BUSES; i++) {
+ 		kvm_io_bus_destroy(kvm->buses[i]);
++		kvm->buses[i] = NULL;
++	}
+ 	kvm_coalesced_mmio_free(kvm);
+ #if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
+ 	mmu_notifier_unregister(&kvm->mmu_notifier, kvm->mm);
 -- 
 1.7.9.5
