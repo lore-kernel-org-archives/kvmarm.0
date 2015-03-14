@@ -1,126 +1,41 @@
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v3 4/5] arm/arm64: KVM: Fix migration race in the arch timer
-Date: Fri, 13 Mar 2015 17:02:55 +0000
-Message-ID: <1426266176-14933-5-git-send-email-alex.bennee@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v3 0/5] KVM ARM64 Migration Fixes
+Date: Sat, 14 Mar 2015 13:44:28 +0100
+Message-ID: <20150314124428.GA10935@cbox>
 References: <1426266176-14933-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 842E748CA8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Mar 2015 12:56:28 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vRDj-F6cVtqw for <kvmarm@lists.cs.columbia.edu>;
- Fri, 13 Mar 2015 12:56:27 -0400 (EDT)
-Received: from socrates.bennee.com
- (static.88-198-71-155.clients.your-server.de [88.198.71.155])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0852948CA1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 13 Mar 2015 12:56:26 -0400 (EDT)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
 In-Reply-To: <1426266176-14933-1-git-send-email-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: Gleb Natapov <gleb@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, open list <linux-kernel@vger.kernel.org>, Russell King <linux@arm.linux.org.uk>
+Sender: kvm-owner@vger.kernel.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-RnJvbTogQ2hyaXN0b2ZmZXIgRGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPgoKV2hl
-biBhIFZDUFUgaXMgbm8gbG9uZ2VyIHJ1bm5pbmcsIHdlIGN1cnJlbnRseSBjaGVjayB0byBzZWUg
-aWYgaXQgaGFzIGEKdGltZXIgc2NoZWR1bGVkIGluIHRoZSBmdXR1cmUsIGFuZCBpZiBpdCBkb2Vz
-LCB3ZSBzY2hlZHVsZSBhIGhvc3QKaHJ0aW1lciB0byBub3RpZnkgaXMgaW4gY2FzZSB0aGUgdGlt
-ZXIgZXhwaXJlcyB3aGlsZSB0aGUgVkNQVSBpcyBzdGlsbApub3QgcnVubmluZy4gIFdoZW4gdGhl
-IGhydGltZXIgZmlyZXMsIHdlIG1hc2sgdGhlIGd1ZXN0J3MgdGltZXIgYW5kCmluamVjdCB0aGUg
-dGltZXIgSVJRIChzdGlsbCByZWx5aW5nIG9uIHRoZSBndWVzdCB1bm1hc2tpbmcgdGhlIHRpbWUg
-d2hlbgppdCByZWNlaXZlcyB0aGUgSVJRKS4KClRoaXMgaXMgYWxsIGdvb2QgYW5kIGZpbmUsIGJ1
-dCB3aGVuIG1pZ3JhdGlvbiBhIFZNIChjaGVja3BvaW50L3Jlc3RvcmUpCnRoaXMgaW50cm9kdWNl
-cyBhIHJhY2UuICBJdCBpcyB1bmxpa2VseSwgYnV0IHBvc3NpYmxlLCBmb3IgdGhlIGZvbGxvd2lu
-ZwpzZXF1ZW5jZSBvZiBldmVudHMgdG8gaGFwcGVuOgoKIDEuIFVzZXJzcGFjZSBzdG9wcyB0aGUg
-Vk0KIDIuIEhydGltZXIgZm9yIFZDUFUgaXMgc2NoZWR1bGVkCiAzLiBVc2Vyc3BhY2UgY2hlY2tw
-b2ludHMgdGhlIFZHSUMgc3RhdGUgKG5vIHBlbmRpbmcgdGltZXIgaW50ZXJydXB0cykKIDQuIFRo
-ZSBocnRpbWVyIGZpcmVzLCBzY2hlZHVsZXMgd29yayBpbiBhIHdvcmtxdWV1ZQogNS4gV29ya3F1
-ZXVlIGZ1bmN0aW9uIHJ1bnMsIG1hc2tzIHRoZSB0aW1lciBhbmQgaW5qZWN0cyB0aW1lciBpbnRl
-cnJ1cHQKIDYuIFVzZXJzcGFjZSBjaGVja3BvaW50cyB0aGUgdGltZXIgc3RhdGUgKHRpbWVyIG1h
-c2tlZCkKCkF0IHJlc3RvcmUgdGltZSwgeW91IGVuZCB1cCB3aXRoIGEgbWFza2VkIHRpbWVyIHdp
-dGhvdXQgYW55IHRpbWVyCmludGVycnVwdHMgYW5kIHlvdXIgZ3Vlc3QgaGFsdHMgbmV2ZXIgcmVj
-ZWl2aW5nIHRpbWVyIGludGVycnVwdHMuCgpGaXggdGhpcyBieSBvbmx5IGtpY2tpbmcgdGhlIFZD
-UFUgaW4gdGhlIHdvcmtxdWV1ZSBmdW5jdGlvbiwgYW5kIHNhbXBsZQp0aGUgZXhwaXJlZCBzdGF0
-ZSBvZiB0aGUgdGltZXIgd2hlbiBlbnRlcmluZyB0aGUgZ3Vlc3QgYWdhaW4gYW5kIGluamVjdAp0
-aGUgaW50ZXJydXB0IGFuZCBtYXNrIHRoZSB0aW1lciBvbmx5IHRoZW4uCgpTaWduZWQtb2ZmLWJ5
-OiBDaHJpc3RvZmZlciBEYWxsIDxjaHJpc3RvZmZlci5kYWxsQGxpbmFyby5vcmc+ClNpZ25lZC1v
-ZmYtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KCmRpZmYgLS1naXQg
-YS9hcmNoL2FybS9rdm0vYXJtLmMgYi9hcmNoL2FybS9rdm0vYXJtLmMKaW5kZXggMzg3MjFkMi4u
-ZWI5MzI0MCAxMDA2NDQKLS0tIGEvYXJjaC9hcm0va3ZtL2FybS5jCisrKyBiL2FyY2gvYXJtL2t2
-bS9hcm0uYwpAQCAtMjY5LDcgKzI2OSw3IEBAIHZvaWQga3ZtX2FyY2hfdmNwdV9kZXN0cm95KHN0
-cnVjdCBrdm1fdmNwdSAqdmNwdSkKIAogaW50IGt2bV9jcHVfaGFzX3BlbmRpbmdfdGltZXIoc3Ry
-dWN0IGt2bV92Y3B1ICp2Y3B1KQogewotCXJldHVybiAwOworCXJldHVybiBrdm1fdGltZXJfc2hv
-dWxkX2ZpcmUodmNwdSk7CiB9CiAKIGludCBrdm1fYXJjaF92Y3B1X2luaXQoc3RydWN0IGt2bV92
-Y3B1ICp2Y3B1KQpkaWZmIC0tZ2l0IGEvaW5jbHVkZS9rdm0vYXJtX2FyY2hfdGltZXIuaCBiL2lu
-Y2x1ZGUva3ZtL2FybV9hcmNoX3RpbWVyLmgKaW5kZXggYjNmNDVhNS4uOThjYzlmNCAxMDA2NDQK
-LS0tIGEvaW5jbHVkZS9rdm0vYXJtX2FyY2hfdGltZXIuaAorKysgYi9pbmNsdWRlL2t2bS9hcm1f
-YXJjaF90aW1lci5oCkBAIC03Miw2ICs3Miw4IEBAIHZvaWQga3ZtX3RpbWVyX3ZjcHVfdGVybWlu
-YXRlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSk7CiB1NjQga3ZtX2FybV90aW1lcl9nZXRfcmVnKHN0
-cnVjdCBrdm1fdmNwdSAqLCB1NjQgcmVnaWQpOwogaW50IGt2bV9hcm1fdGltZXJfc2V0X3JlZyhz
-dHJ1Y3Qga3ZtX3ZjcHUgKiwgdTY0IHJlZ2lkLCB1NjQgdmFsdWUpOwogCitib29sIGt2bV90aW1l
-cl9zaG91bGRfZmlyZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOworCiAjZWxzZQogc3RhdGljIGlu
-bGluZSBpbnQga3ZtX3RpbWVyX2h5cF9pbml0KHZvaWQpCiB7CkBAIC05Niw2ICs5OCwxMSBAQCBz
-dGF0aWMgaW5saW5lIHU2NCBrdm1fYXJtX3RpbWVyX2dldF9yZWcoc3RydWN0IGt2bV92Y3B1ICp2
-Y3B1LCB1NjQgcmVnaWQpCiB7CiAJcmV0dXJuIDA7CiB9CisKK3N0YXRpYyBpbmxpbmUgYm9vbCBr
-dm1fdGltZXJfc2hvdWxkX2ZpcmUoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQoreworCXJldHVybiBm
-YWxzZTsKK30KICNlbmRpZgogCiAjZW5kaWYKZGlmZiAtLWdpdCBhL3ZpcnQva3ZtL2FybS9hcmNo
-X3RpbWVyLmMgYi92aXJ0L2t2bS9hcm0vYXJjaF90aW1lci5jCmluZGV4IDZlNTRmMzUuLjk4Yzk1
-ZjIgMTAwNjQ0Ci0tLSBhL3ZpcnQva3ZtL2FybS9hcmNoX3RpbWVyLmMKKysrIGIvdmlydC9rdm0v
-YXJtL2FyY2hfdGltZXIuYwpAQCAtODUsMTMgKzg1LDIyIEBAIHN0YXRpYyBpcnFyZXR1cm5fdCBr
-dm1fYXJjaF90aW1lcl9oYW5kbGVyKGludCBpcnEsIHZvaWQgKmRldl9pZCkKIAlyZXR1cm4gSVJR
-X0hBTkRMRUQ7CiB9CiAKKy8qCisgKiBXb3JrIGZ1bmN0aW9uIGZvciBoYW5kbGluZyB0aGUgYmFj
-a3VwIHRpbWVyIHRoYXQgd2Ugc2NoZWR1bGUgd2hlbiBhIHZjcHUgaXMKKyAqIG5vIGxvbmdlciBy
-dW5uaW5nLCBidXQgaGFkIGEgdGltZXIgcHJvZ3JhbW1lZCB0byBmaXJlIGluIHRoZSBmdXR1cmUu
-CisgKi8KIHN0YXRpYyB2b2lkIGt2bV90aW1lcl9pbmplY3RfaXJxX3dvcmsoc3RydWN0IHdvcmtf
-c3RydWN0ICp3b3JrKQogewogCXN0cnVjdCBrdm1fdmNwdSAqdmNwdTsKIAogCXZjcHUgPSBjb250
-YWluZXJfb2Yod29yaywgc3RydWN0IGt2bV92Y3B1LCBhcmNoLnRpbWVyX2NwdS5leHBpcmVkKTsK
-IAl2Y3B1LT5hcmNoLnRpbWVyX2NwdS5hcm1lZCA9IGZhbHNlOwotCWt2bV90aW1lcl9pbmplY3Rf
-aXJxKHZjcHUpOworCisJLyoKKwkgKiBJZiB0aGUgdmNwdSBpcyBibG9ja2VkIHdlIHdhbnQgdG8g
-d2FrZSBpdCB1cCBzbyB0aGF0IGl0IHdpbGwgc2VlCisJICogdGhlIHRpbWVyIGhhcyBleHBpcmVk
-IHdoZW4gZW50ZXJpbmcgdGhlIGd1ZXN0LgorCSAqLworCWt2bV92Y3B1X2tpY2sodmNwdSk7CiB9
-CiAKIHN0YXRpYyBlbnVtIGhydGltZXJfcmVzdGFydCBrdm1fdGltZXJfZXhwaXJlKHN0cnVjdCBo
-cnRpbWVyICpocnQpCkBAIC0xMDIsNiArMTExLDIxIEBAIHN0YXRpYyBlbnVtIGhydGltZXJfcmVz
-dGFydCBrdm1fdGltZXJfZXhwaXJlKHN0cnVjdCBocnRpbWVyICpocnQpCiAJcmV0dXJuIEhSVElN
-RVJfTk9SRVNUQVJUOwogfQogCitib29sIGt2bV90aW1lcl9zaG91bGRfZmlyZShzdHJ1Y3Qga3Zt
-X3ZjcHUgKnZjcHUpCit7CisJc3RydWN0IGFyY2hfdGltZXJfY3B1ICp0aW1lciA9ICZ2Y3B1LT5h
-cmNoLnRpbWVyX2NwdTsKKwljeWNsZV90IGN2YWwsIG5vdzsKKworCWlmICgodGltZXItPmNudHZf
-Y3RsICYgQVJDSF9USU1FUl9DVFJMX0lUX01BU0spIHx8CisJCSEodGltZXItPmNudHZfY3RsICYg
-QVJDSF9USU1FUl9DVFJMX0VOQUJMRSkpCisJCXJldHVybiBmYWxzZTsKKworCWN2YWwgPSB0aW1l
-ci0+Y250dl9jdmFsOworCW5vdyA9IGt2bV9waHlzX3RpbWVyX3JlYWQoKSAtIHZjcHUtPmt2bS0+
-YXJjaC50aW1lci5jbnR2b2ZmOworCisJcmV0dXJuIGN2YWwgPD0gbm93OworfQorCiAvKioKICAq
-IGt2bV90aW1lcl9mbHVzaF9od3N0YXRlIC0gcHJlcGFyZSB0byBtb3ZlIHRoZSB2aXJ0IHRpbWVy
-IHRvIHRoZSBjcHUKICAqIEB2Y3B1OiBUaGUgdmNwdSBwb2ludGVyCkBAIC0xMTksNiArMTQzLDEz
-IEBAIHZvaWQga3ZtX3RpbWVyX2ZsdXNoX2h3c3RhdGUoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQog
-CSAqIHBvcHVsYXRlIHRoZSBDUFUgdGltZXIgYWdhaW4uCiAJICovCiAJdGltZXJfZGlzYXJtKHRp
-bWVyKTsKKworCS8qCisJICogSWYgdGhlIHRpbWVyIGV4cGlyZWQgd2hpbGUgd2Ugd2VyZSBub3Qg
-c2NoZWR1bGVkLCBub3cgaXMgdGhlIHRpbWUKKwkgKiB0byBpbmplY3QgaXQuCisJICovCisJaWYg
-KGt2bV90aW1lcl9zaG91bGRfZmlyZSh2Y3B1KSkKKwkJa3ZtX3RpbWVyX2luamVjdF9pcnEodmNw
-dSk7CiB9CiAKIC8qKgpAQCAtMTM0LDE2ICsxNjUsOSBAQCB2b2lkIGt2bV90aW1lcl9zeW5jX2h3
-c3RhdGUoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQogCWN5Y2xlX3QgY3ZhbCwgbm93OwogCXU2NCBu
-czsKIAotCWlmICgodGltZXItPmNudHZfY3RsICYgQVJDSF9USU1FUl9DVFJMX0lUX01BU0spIHx8
-Ci0JCSEodGltZXItPmNudHZfY3RsICYgQVJDSF9USU1FUl9DVFJMX0VOQUJMRSkpCi0JCXJldHVy
-bjsKLQotCWN2YWwgPSB0aW1lci0+Y250dl9jdmFsOwotCW5vdyA9IGt2bV9waHlzX3RpbWVyX3Jl
-YWQoKSAtIHZjcHUtPmt2bS0+YXJjaC50aW1lci5jbnR2b2ZmOwotCiAJQlVHX09OKHRpbWVyX2lz
-X2FybWVkKHRpbWVyKSk7CiAKLQlpZiAoY3ZhbCA8PSBub3cpIHsKKwlpZiAoa3ZtX3RpbWVyX3No
-b3VsZF9maXJlKHZjcHUpKSB7CiAJCS8qCiAJCSAqIFRpbWVyIGhhcyBhbHJlYWR5IGV4cGlyZWQg
-d2hpbGUgd2Ugd2VyZSBub3QKIAkJICogbG9va2luZy4gSW5qZWN0IHRoZSBpbnRlcnJ1cHQgYW5k
-IGNhcnJ5IG9uLgpAQCAtMTUyLDYgKzE3Niw5IEBAIHZvaWQga3ZtX3RpbWVyX3N5bmNfaHdzdGF0
-ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiAJCXJldHVybjsKIAl9CiAKKwljdmFsID0gdGltZXIt
-PmNudHZfY3ZhbDsKKwlub3cgPSBrdm1fcGh5c190aW1lcl9yZWFkKCkgLSB2Y3B1LT5rdm0tPmFy
-Y2gudGltZXIuY250dm9mZjsKKwogCW5zID0gY3ljbGVjb3VudGVyX2N5YzJucyh0aW1lY291bnRl
-ci0+Y2MsIGN2YWwgLSBub3csIHRpbWVjb3VudGVyLT5tYXNrLAogCQkJCSAmdGltZWNvdW50ZXIt
-PmZyYWMpOwogCXRpbWVyX2FybSh0aW1lciwgbnMpOwotLSAKMi4zLjIKCl9fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3Zt
-YXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9t
-YWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+Hi Alex and Marc,
+
+On Fri, Mar 13, 2015 at 05:02:51PM +0000, Alex Benn=E9e wrote:
+> Some fairly minor updates from the last series I sent out:
+>=20
+>   - Re-based on v4.0-rc3
+>   - Use KVM_MP_STATE_STOPPED instead of KVM_MP_STATE_HALTED
+>   - Some minor textual tidy ups on commit msgs and comments
+>   - Move the re-factored vgic_queue_irq_to_lr to before the active ch=
+anges
+>=20
+> The branch I've been working with can be found at:
+>=20
+>   http://git.linaro.org/people/alex.bennee/linux.git
+>   branch: migration/kvmarm-fixes-for-4.0-v3
+>=20
+
+These look good to me.
+
+Marc, unless you have objections, I'll go ahead and take patch 5 as a
+fix and get that in for the next -rc, and will queue the rest?  This
+will conflict, but we can fix it up with the linux-next merge.
+
+
+-Christoffer
