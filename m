@@ -1,63 +1,280 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [GIT PULL 0/5] arm/arm64: KVM: Fixes for KVM for 4.0-rc5
-Date: Mon, 16 Mar 2015 13:54:58 +0100
-Message-ID: <1426510503-27995-1-git-send-email-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: [GIT PULL 1/5] arm64: KVM: Fix stage-2 PGD allocation to have per-page refcounting
+Date: Mon, 16 Mar 2015 13:54:59 +0100
+Message-ID: <1426510503-27995-2-git-send-email-christoffer.dall@linaro.org>
+References: <1426510503-27995-1-git-send-email-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1426510503-27995-1-git-send-email-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
 Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marcelo and Paolo,
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-Please pull the following fixes for KVM/ARM for 4.0-rc5.
+We're using __get_free_pages with to allocate the guest's stage-2
+PGD. The standard behaviour of this function is to return a set of
+pages where only the head page has a valid refcount.
 
-They fix page refcounting issues in our Stage-2 page table management code, a
-missing unlock in a gicv3 error path, and a race that can cause lost interrupts
-if signals are pending just prior to entering the guest.
+This behaviour gets us into trouble when we're trying to increment
+the refcount on a non-head page:
 
-The following changes since commit bfb8fb4775d3397908ae3a7ff65807097d81d713:
+page:ffff7c00cfb693c0 count:0 mapcount:0 mapping:          (null) index:0x0
+flags: 0x4000000000000000()
+page dumped because: VM_BUG_ON_PAGE((*({ __attribute__((unused)) typeof((&page->_count)->counter) __var = ( typeof((&page->_count)->counter)) 0; (volatile typeof((&page->_count)->counter) *)&((&page->_count)->counter); })) <= 0)
+BUG: failure at include/linux/mm.h:548/get_page()!
+Kernel panic - not syncing: BUG!
+CPU: 1 PID: 1695 Comm: kvm-vcpu-0 Not tainted 4.0.0-rc1+ #3825
+Hardware name: APM X-Gene Mustang board (DT)
+Call trace:
+[<ffff80000008a09c>] dump_backtrace+0x0/0x13c
+[<ffff80000008a1e8>] show_stack+0x10/0x1c
+[<ffff800000691da8>] dump_stack+0x74/0x94
+[<ffff800000690d78>] panic+0x100/0x240
+[<ffff8000000a0bc4>] stage2_get_pmd+0x17c/0x2bc
+[<ffff8000000a1dc4>] kvm_handle_guest_abort+0x4b4/0x6b0
+[<ffff8000000a420c>] handle_exit+0x58/0x180
+[<ffff80000009e7a4>] kvm_arch_vcpu_ioctl_run+0x114/0x45c
+[<ffff800000099df4>] kvm_vcpu_ioctl+0x2e0/0x754
+[<ffff8000001c0a18>] do_vfs_ioctl+0x424/0x5c8
+[<ffff8000001c0bfc>] SyS_ioctl+0x40/0x78
+CPU0: stopping
 
-  Merge tag 'kvm-s390-master-20150303' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux (2015-03-05 14:42:48 -0300)
+A possible approach for this is to split the compound page using
+split_page() at allocation time, and change the teardown path to
+free one page at a time.  It turns out that alloc_pages_exact() and
+free_pages_exact() does exactly that.
 
-are available in the git repository at:
+While we're at it, the PGD allocation code is reworked to reduce
+duplication.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git kvm-arm-fixes-4.0-rc5
+This has been tested on an X-Gene platform with a 4kB/48bit-VA host
+kernel, and kvmtool hacked to place memory in the second page of
+the hardware PGD (PUD for the host kernel). Also regression-tested
+on a Cubietruck (Cortex-A7).
 
-for you to fetch changes up to ae705930fca6322600690df9dc1c7d0516145a93:
+ [ Reworked to use alloc_pages_exact() and free_pages_exact() and to
+   return pointers directly instead of by reference as arguments
+    - Christoffer ]
 
-  arm/arm64: KVM: Keep elrsr/aisr in sync with software model (2015-03-14 13:42:07 +0100)
-
-
-Thanks,
--Christoffer
-
+Reported-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
+ arch/arm/include/asm/kvm_mmu.h   | 10 +++---
+ arch/arm/kvm/mmu.c               | 67 +++++++++++++++++++++++++++++-----------
+ arch/arm64/include/asm/kvm_mmu.h | 46 +++------------------------
+ 3 files changed, 57 insertions(+), 66 deletions(-)
 
-Christoffer Dall (1):
-  arm/arm64: KVM: Keep elrsr/aisr in sync with software model
-
-Marc Zyngier (3):
-  arm64: KVM: Fix stage-2 PGD allocation to have per-page refcounting
-  arm64: KVM: Do not use pgd_index to index stage-2 pgd
-  arm64: KVM: Fix outdated comment about VTCR_EL2.PS
-
-Wei Yongjun (1):
-  arm/arm64: KVM: fix missing unlock on error in kvm_vgic_create()
-
- arch/arm/include/asm/kvm_mmu.h   | 13 ++++---
- arch/arm/kvm/mmu.c               | 75 ++++++++++++++++++++++++++++------------
- arch/arm64/include/asm/kvm_arm.h |  5 +--
- arch/arm64/include/asm/kvm_mmu.h | 48 ++++---------------------
- include/kvm/arm_vgic.h           |  1 +
- virt/kvm/arm/vgic-v2.c           |  8 +++++
- virt/kvm/arm/vgic-v3.c           |  8 +++++
- virt/kvm/arm/vgic.c              | 22 ++++++++++--
- 8 files changed, 105 insertions(+), 75 deletions(-)
-
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index bf0fe99..c57c41dc 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -162,16 +162,14 @@ static inline bool kvm_page_empty(void *ptr)
+ 
+ #define KVM_PREALLOC_LEVEL	0
+ 
+-static inline int kvm_prealloc_hwpgd(struct kvm *kvm, pgd_t *pgd)
++static inline void *kvm_get_hwpgd(struct kvm *kvm)
+ {
+-	return 0;
++	return kvm->arch.pgd;
+ }
+ 
+-static inline void kvm_free_hwpgd(struct kvm *kvm) { }
+-
+-static inline void *kvm_get_hwpgd(struct kvm *kvm)
++static inline unsigned int kvm_get_hwpgd_size(void)
+ {
+-	return kvm->arch.pgd;
++	return PTRS_PER_S2_PGD * sizeof(pgd_t);
+ }
+ 
+ struct kvm;
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index 3e6859b..a48a73c 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -632,6 +632,20 @@ int create_hyp_io_mappings(void *from, void *to, phys_addr_t phys_addr)
+ 				     __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
+ }
+ 
++/* Free the HW pgd, one page at a time */
++static void kvm_free_hwpgd(void *hwpgd)
++{
++	free_pages_exact(hwpgd, kvm_get_hwpgd_size());
++}
++
++/* Allocate the HW PGD, making sure that each page gets its own refcount */
++static void *kvm_alloc_hwpgd(void)
++{
++	unsigned int size = kvm_get_hwpgd_size();
++
++	return alloc_pages_exact(size, GFP_KERNEL | __GFP_ZERO);
++}
++
+ /**
+  * kvm_alloc_stage2_pgd - allocate level-1 table for stage-2 translation.
+  * @kvm:	The KVM struct pointer for the VM.
+@@ -645,15 +659,31 @@ int create_hyp_io_mappings(void *from, void *to, phys_addr_t phys_addr)
+  */
+ int kvm_alloc_stage2_pgd(struct kvm *kvm)
+ {
+-	int ret;
+ 	pgd_t *pgd;
++	void *hwpgd;
+ 
+ 	if (kvm->arch.pgd != NULL) {
+ 		kvm_err("kvm_arch already initialized?\n");
+ 		return -EINVAL;
+ 	}
+ 
++	hwpgd = kvm_alloc_hwpgd();
++	if (!hwpgd)
++		return -ENOMEM;
++
++	/* When the kernel uses more levels of page tables than the
++	 * guest, we allocate a fake PGD and pre-populate it to point
++	 * to the next-level page table, which will be the real
++	 * initial page table pointed to by the VTTBR.
++	 *
++	 * When KVM_PREALLOC_LEVEL==2, we allocate a single page for
++	 * the PMD and the kernel will use folded pud.
++	 * When KVM_PREALLOC_LEVEL==1, we allocate 2 consecutive PUD
++	 * pages.
++	 */
+ 	if (KVM_PREALLOC_LEVEL > 0) {
++		int i;
++
+ 		/*
+ 		 * Allocate fake pgd for the page table manipulation macros to
+ 		 * work.  This is not used by the hardware and we have no
+@@ -661,30 +691,32 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
+ 		 */
+ 		pgd = (pgd_t *)kmalloc(PTRS_PER_S2_PGD * sizeof(pgd_t),
+ 				       GFP_KERNEL | __GFP_ZERO);
++
++		if (!pgd) {
++			kvm_free_hwpgd(hwpgd);
++			return -ENOMEM;
++		}
++
++		/* Plug the HW PGD into the fake one. */
++		for (i = 0; i < PTRS_PER_S2_PGD; i++) {
++			if (KVM_PREALLOC_LEVEL == 1)
++				pgd_populate(NULL, pgd + i,
++					     (pud_t *)hwpgd + i * PTRS_PER_PUD);
++			else if (KVM_PREALLOC_LEVEL == 2)
++				pud_populate(NULL, pud_offset(pgd, 0) + i,
++					     (pmd_t *)hwpgd + i * PTRS_PER_PMD);
++		}
+ 	} else {
+ 		/*
+ 		 * Allocate actual first-level Stage-2 page table used by the
+ 		 * hardware for Stage-2 page table walks.
+ 		 */
+-		pgd = (pgd_t *)__get_free_pages(GFP_KERNEL | __GFP_ZERO, S2_PGD_ORDER);
++		pgd = (pgd_t *)hwpgd;
+ 	}
+ 
+-	if (!pgd)
+-		return -ENOMEM;
+-
+-	ret = kvm_prealloc_hwpgd(kvm, pgd);
+-	if (ret)
+-		goto out_err;
+-
+ 	kvm_clean_pgd(pgd);
+ 	kvm->arch.pgd = pgd;
+ 	return 0;
+-out_err:
+-	if (KVM_PREALLOC_LEVEL > 0)
+-		kfree(pgd);
+-	else
+-		free_pages((unsigned long)pgd, S2_PGD_ORDER);
+-	return ret;
+ }
+ 
+ /**
+@@ -785,11 +817,10 @@ void kvm_free_stage2_pgd(struct kvm *kvm)
+ 		return;
+ 
+ 	unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
+-	kvm_free_hwpgd(kvm);
++	kvm_free_hwpgd(kvm_get_hwpgd(kvm));
+ 	if (KVM_PREALLOC_LEVEL > 0)
+ 		kfree(kvm->arch.pgd);
+-	else
+-		free_pages((unsigned long)kvm->arch.pgd, S2_PGD_ORDER);
++
+ 	kvm->arch.pgd = NULL;
+ }
+ 
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 6458b53..a099cd9 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -171,43 +171,6 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
+ #define KVM_PREALLOC_LEVEL	(0)
+ #endif
+ 
+-/**
+- * kvm_prealloc_hwpgd - allocate inital table for VTTBR
+- * @kvm:	The KVM struct pointer for the VM.
+- * @pgd:	The kernel pseudo pgd
+- *
+- * When the kernel uses more levels of page tables than the guest, we allocate
+- * a fake PGD and pre-populate it to point to the next-level page table, which
+- * will be the real initial page table pointed to by the VTTBR.
+- *
+- * When KVM_PREALLOC_LEVEL==2, we allocate a single page for the PMD and
+- * the kernel will use folded pud.  When KVM_PREALLOC_LEVEL==1, we
+- * allocate 2 consecutive PUD pages.
+- */
+-static inline int kvm_prealloc_hwpgd(struct kvm *kvm, pgd_t *pgd)
+-{
+-	unsigned int i;
+-	unsigned long hwpgd;
+-
+-	if (KVM_PREALLOC_LEVEL == 0)
+-		return 0;
+-
+-	hwpgd = __get_free_pages(GFP_KERNEL | __GFP_ZERO, PTRS_PER_S2_PGD_SHIFT);
+-	if (!hwpgd)
+-		return -ENOMEM;
+-
+-	for (i = 0; i < PTRS_PER_S2_PGD; i++) {
+-		if (KVM_PREALLOC_LEVEL == 1)
+-			pgd_populate(NULL, pgd + i,
+-				     (pud_t *)hwpgd + i * PTRS_PER_PUD);
+-		else if (KVM_PREALLOC_LEVEL == 2)
+-			pud_populate(NULL, pud_offset(pgd, 0) + i,
+-				     (pmd_t *)hwpgd + i * PTRS_PER_PMD);
+-	}
+-
+-	return 0;
+-}
+-
+ static inline void *kvm_get_hwpgd(struct kvm *kvm)
+ {
+ 	pgd_t *pgd = kvm->arch.pgd;
+@@ -224,12 +187,11 @@ static inline void *kvm_get_hwpgd(struct kvm *kvm)
+ 	return pmd_offset(pud, 0);
+ }
+ 
+-static inline void kvm_free_hwpgd(struct kvm *kvm)
++static inline unsigned int kvm_get_hwpgd_size(void)
+ {
+-	if (KVM_PREALLOC_LEVEL > 0) {
+-		unsigned long hwpgd = (unsigned long)kvm_get_hwpgd(kvm);
+-		free_pages(hwpgd, PTRS_PER_S2_PGD_SHIFT);
+-	}
++	if (KVM_PREALLOC_LEVEL > 0)
++		return PTRS_PER_S2_PGD * PAGE_SIZE;
++	return PTRS_PER_S2_PGD * sizeof(pgd_t);
+ }
+ 
+ static inline bool kvm_page_empty(void *ptr)
 -- 
 2.1.2.330.g565301e.dirty
 
