@@ -1,75 +1,50 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH] arm: KVM: force execution of HCPTR access on VM exit
-Date: Mon, 16 Mar 2015 10:59:43 +0000
-Message-ID: <1426503583-8958-1-git-send-email-marc.zyngier@arm.com>
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH v4 2/5] hw/intc: arm_gic_kvm.c restore config first
+Date: Mon, 16 Mar 2015 11:01:53 +0000
+Message-ID: <1426503716-13931-3-git-send-email-alex.bennee@linaro.org>
+References: <1426503716-13931-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EB47248DF7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2015 06:53:18 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id asO5hTdwQbs2 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Mar 2015 06:53:17 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B00D948D61
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2015 06:53:17 -0400 (EDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1426503716-13931-1-git-send-email-alex.bennee@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On VM entry, we disable access to the VFP registers in order to
-perform a lazy save/restore of these registers.
+As there is logic to deal with the difference between edge and level
+triggered interrupts in the kernel we must ensure it knows the
+configuration of the IRQs before we restore the pending state.
 
-On VM exit, we restore access, test if we did enable them before,
-and save/restore the guest/host registers if necessary. In this
-sequence, the FPEXC register is always accessed, irrespective
-of the trapping configuration.
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 
-If the guest didn't touch the VFP registers, then the HCPTR access
-has now enabled such access, but we're missing a barrier to ensure
-architectural execution of the new HCPTR configuration. If the HCPTR
-access has been delayed/reordered, the subsequent access to FPEXC
-will cause a trap, which we aren't prepared to handle at all.
-
-The fix is to introduce a barrier that only takes place if the
-guest hasn't accessed its view of the VFP registers, making
-the access to FPEXC safe.
-
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm/kvm/interrupts.S | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
-index 79caf79..3ac7aca 100644
---- a/arch/arm/kvm/interrupts.S
-+++ b/arch/arm/kvm/interrupts.S
-@@ -175,10 +175,13 @@ __kvm_vcpu_return:
- #ifdef CONFIG_VFPv3
- 	@ Save floating point registers we if let guest use them.
- 	tst	r2, #(HCPTR_TCP(10) | HCPTR_TCP(11))
--	bne	after_vfp_restore
-+	beq	1f
+diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
+index 1ad3eb0..2f21ae7 100644
+--- a/hw/intc/arm_gic_kvm.c
++++ b/hw/intc/arm_gic_kvm.c
+@@ -370,6 +370,11 @@ static void kvm_arm_gic_put(GICState *s)
+      * the appropriate CPU interfaces in the kernel) */
+     kvm_dist_put(s, 0x800, 8, s->num_irq, translate_targets);
+=20
++    /* irq_state[n].trigger -> GICD_ICFGRn
++     * (restore targets before pending IRQs so we treat level/edge
++     * correctly */
++    kvm_dist_put(s, 0xc00, 2, s->num_irq, translate_trigger);
 +
-+	isb	@ Force execution of HCPTR if we've just reenabled VFP access
-+	b	after_vfp_restore
- 
- 	@ Switch VFP/NEON hardware state to the host's
--	add	r7, vcpu, #VCPU_VFP_GUEST
-+1:	add	r7, vcpu, #VCPU_VFP_GUEST
- 	store_vfp_state r7
- 	add	r7, vcpu, #VCPU_VFP_HOST
- 	ldr	r7, [r7]
--- 
-2.1.4
+     /* irq_state[n].pending + irq_state[n].level -> GICD_ISPENDRn */
+     kvm_dist_put(s, 0x280, 1, s->num_irq, translate_clear);
+     kvm_dist_put(s, 0x200, 1, s->num_irq, translate_pending);
+@@ -378,8 +383,6 @@ static void kvm_arm_gic_put(GICState *s)
+     kvm_dist_put(s, 0x380, 1, s->num_irq, translate_clear);
+     kvm_dist_put(s, 0x300, 1, s->num_irq, translate_active);
+=20
+-    /* irq_state[n].trigger -> GICD_ICFRn */
+-    kvm_dist_put(s, 0xc00, 2, s->num_irq, translate_trigger);
+=20
+     /* s->priorityX[irq] -> ICD_IPRIORITYRn */
+     kvm_dist_put(s, 0x400, 8, s->num_irq, translate_priority);
+--=20
+2.3.2
+
