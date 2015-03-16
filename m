@@ -1,56 +1,92 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v4 0/5] QEMU ARM64 Migration Fixes
-Date: Mon, 16 Mar 2015 11:01:51 +0000
-Message-ID: <1426503716-13931-1-git-send-email-alex.bennee@linaro.org>
+Subject: [PATCH v4 3/5] target-arm: kvm64 sync FP register state
+Date: Mon, 16 Mar 2015 11:01:54 +0000
+Message-ID: <1426503716-13931-4-git-send-email-alex.bennee@linaro.org>
+References: <1426503716-13931-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D09348E07
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2015 07:00:08 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id eyejoSnKR+Jt for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Mar 2015 07:00:06 -0400 (EDT)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C738048E03
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2015 07:00:06 -0400 (EDT)
+In-Reply-To: <1426503716-13931-1-git-send-email-alex.bennee@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This is hopefully the final update to the series. I've skipped v3 for
-the purposes of having a sane relationship to the branch name ;-)
-
-v4
-  - Dropped the pl011 IRQ fiddling patch
-  - Save/Restore MP STATE
-    - moved into kvm.c
-    - changed MP_STATE to STOPPED
-  - Sync FP State
-    - Removed superfluous reg.id++
-  - Save/Restore SPSR
-    - try and make commentary clearer
-    - ensure env->banked_spsr[0] =3D env->spsr before we sync
-  - document env->spsr
-    - briefer commit message, leaving questions for the list ;-)
-
-I submitted the kernel side of this on Friday
-
-Branch: https://github.com/stsquad/qemu/tree/migration/fixes-v4
-Kernel: https://git.linaro.org/people/alex.bennee/linux.git/shortlog/re=
-fs/heads/migration/kvmarm-fixes-for-4.0-v3
-
-Alex Benn=C3=A9e (4):
-  target-arm: kvm: save/restore mp state
-  hw/intc: arm_gic_kvm.c restore config first
-  target-arm: kvm64 sync FP register state
-  target-arm: cpu.h document why env->spsr exists
-
-Christoffer Dall (1):
-  target-arm: kvm64 fix save/restore of SPSR regs
-
- hw/intc/arm_gic_kvm.c |   7 +++-
- target-arm/cpu.h      |   5 +++
- target-arm/kvm.c      |  40 ++++++++++++++++++
- target-arm/kvm32.c    |   4 ++
- target-arm/kvm64.c    | 111 ++++++++++++++++++++++++++++++++++++++++++=
-+++++---
- target-arm/kvm_arm.h  |  18 ++++++++
- 6 files changed, 178 insertions(+), 7 deletions(-)
-
---=20
-2.3.2
-
+Rm9yIG1pZ3JhdGlvbiB0byB3b3JrIHdlIG5lZWQgdG8gc3luYyBhbGwgb2YgdGhlIHJlZ2lzdGVy
+IHN0YXRlLiBUaGlzIGlzCmVzcGVjaWFsbHkgbm90aWNlYWJsZSB3aGVuIEdDQyBzdGFydHMgdXNp
+bmcgRlAgcmVnaXN0ZXJzIGFzIHNwaWxsCnJlZ2lzdGVycyBldmVuIHdpdGggaW50ZWdlciBwcm9n
+cmFtcy4KClNpZ25lZC1vZmYtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9y
+Zz4KCi0tLQoKdjQ6CiAgLSBmaXhlZCBtZXJnZSBjb25mbGljdHMKICAtIHJtIHN1cGVyZmx1b3Vz
+IHJlZy5pZCsrCgpkaWZmIC0tZ2l0IGEvdGFyZ2V0LWFybS9rdm02NC5jIGIvdGFyZ2V0LWFybS9r
+dm02NC5jCmluZGV4IGZlZDAzZjIuLjhmZDBjOGQgMTAwNjQ0Ci0tLSBhL3RhcmdldC1hcm0va3Zt
+NjQuYworKysgYi90YXJnZXQtYXJtL2t2bTY0LmMKQEAgLTEyNiw5ICsxMjYsMTcgQEAgYm9vbCBr
+dm1fYXJtX3JlZ19zeW5jc192aWFfY3ByZWdfbGlzdCh1aW50NjRfdCByZWdpZHgpCiAjZGVmaW5l
+IEFBUkNINjRfQ09SRV9SRUcoeCkgICAoS1ZNX1JFR19BUk02NCB8IEtWTV9SRUdfU0laRV9VNjQg
+fCBcCiAgICAgICAgICAgICAgICAgIEtWTV9SRUdfQVJNX0NPUkUgfCBLVk1fUkVHX0FSTV9DT1JF
+X1JFRyh4KSkKIAorLyogVGhlIGxpbnV4IGhlYWRlcnMgZG9uJ3QgZGVmaW5lIGEgMTI4IGJpdCB3
+aWRlIFNJTUQgbWFjcm8gZm9yIHVzICovCisjZGVmaW5lIEFBUkNINjRfU0lNRF9DT1JFX1JFRyh4
+KSAgIChLVk1fUkVHX0FSTTY0IHwgS1ZNX1JFR19TSVpFX1UxMjggfCBcCisgICAgICAgICAgICAg
+ICAgIEtWTV9SRUdfQVJNX0NPUkUgfCBLVk1fUkVHX0FSTV9DT1JFX1JFRyh4KSkKKworI2RlZmlu
+ZSBBQVJDSDY0X1NJTURfQ1RSTF9SRUcoeCkgICAoS1ZNX1JFR19BUk02NCB8IEtWTV9SRUdfU0la
+RV9VMzIgfCBcCisgICAgICAgICAgICAgICAgIEtWTV9SRUdfQVJNX0NPUkUgfCBLVk1fUkVHX0FS
+TV9DT1JFX1JFRyh4KSkKKwogaW50IGt2bV9hcmNoX3B1dF9yZWdpc3RlcnMoQ1BVU3RhdGUgKmNz
+LCBpbnQgbGV2ZWwpCiB7CiAgICAgc3RydWN0IGt2bV9vbmVfcmVnIHJlZzsKKyAgICB1aW50MzJf
+dCBmcHI7CiAgICAgdWludDY0X3QgdmFsOwogICAgIGludCBpOwogICAgIGludCByZXQ7CkBAIC0y
+MDcsMTUgKzIxNSwzNyBAQCBpbnQga3ZtX2FyY2hfcHV0X3JlZ2lzdGVycyhDUFVTdGF0ZSAqY3Ms
+IGludCBsZXZlbCkKICAgICAgICAgfQogICAgIH0KIAorICAgIC8qIEFkdmFuY2VkIFNJTUQgYW5k
+IEZQIHJlZ2lzdGVycyAqLworICAgIGZvciAoaSA9IDA7IGkgPCAzMjsgaSsrKSB7CisgICAgICAg
+IHJlZy5pZCA9IEFBUkNINjRfU0lNRF9DT1JFX1JFRyhmcF9yZWdzLnZyZWdzW2ldKTsKKyAgICAg
+ICAgcmVnLmFkZHIgPSAodWludHB0cl90KSgmZW52LT52ZnAucmVnc1tpXSk7CisgICAgICAgIHJl
+dCA9IGt2bV92Y3B1X2lvY3RsKGNzLCBLVk1fU0VUX09ORV9SRUcsICZyZWcpOworICAgICAgICBp
+ZiAocmV0KSB7CisgICAgICAgICAgICByZXR1cm4gcmV0OworICAgICAgICB9CisgICAgfQorCisg
+ICAgcmVnLmFkZHIgPSAodWludHB0cl90KSgmZnByKTsKKyAgICBmcHIgPSB2ZnBfZ2V0X2Zwc3Io
+ZW52KTsKKyAgICByZWcuaWQgPSBBQVJDSDY0X1NJTURfQ1RSTF9SRUcoZnBfcmVncy5mcHNyKTsK
+KyAgICByZXQgPSBrdm1fdmNwdV9pb2N0bChjcywgS1ZNX1NFVF9PTkVfUkVHLCAmcmVnKTsKKyAg
+ICBpZiAocmV0KSB7CisgICAgICAgIHJldHVybiByZXQ7CisgICAgfQorCisgICAgZnByID0gdmZw
+X2dldF9mcGNyKGVudik7CisgICAgcmVnLmlkID0gQUFSQ0g2NF9TSU1EX0NUUkxfUkVHKGZwX3Jl
+Z3MuZnBjcik7CisgICAgcmV0ID0ga3ZtX3ZjcHVfaW9jdGwoY3MsIEtWTV9TRVRfT05FX1JFRywg
+JnJlZyk7CisgICAgaWYgKHJldCkgeworICAgICAgICByZXR1cm4gcmV0OworICAgIH0KKwogICAg
+IGlmICghd3JpdGVfbGlzdF90b19rdm1zdGF0ZShjcHUpKSB7CiAgICAgICAgIHJldHVybiBFSU5W
+QUw7CiAgICAgfQogCiAgICAga3ZtX2FybV9zeW5jX21wc3RhdGVfdG9fa3ZtKGNwdSk7CiAKLSAg
+ICAvKiBUT0RPOgotICAgICAqIEZQIHN0YXRlCi0gICAgICovCiAgICAgcmV0dXJuIHJldDsKIH0K
+IApAQCAtMjIzLDYgKzI1Myw3IEBAIGludCBrdm1fYXJjaF9nZXRfcmVnaXN0ZXJzKENQVVN0YXRl
+ICpjcykKIHsKICAgICBzdHJ1Y3Qga3ZtX29uZV9yZWcgcmVnOwogICAgIHVpbnQ2NF90IHZhbDsK
+KyAgICB1aW50MzJfdCBmcHI7CiAgICAgaW50IGk7CiAgICAgaW50IHJldDsKIApAQCAtMzA0LDYg
+KzMzNSwzMSBAQCBpbnQga3ZtX2FyY2hfZ2V0X3JlZ2lzdGVycyhDUFVTdGF0ZSAqY3MpCiAgICAg
+ICAgIH0KICAgICB9CiAKKyAgICAvKiBBZHZhbmNlZCBTSU1EIGFuZCBGUCByZWdpc3RlcnMgKi8K
+KyAgICBmb3IgKGkgPSAwOyBpIDwgMzI7IGkrKykgeworICAgICAgICByZWcuaWQgPSBBQVJDSDY0
+X1NJTURfQ09SRV9SRUcoZnBfcmVncy52cmVnc1tpXSk7CisgICAgICAgIHJlZy5hZGRyID0gKHVp
+bnRwdHJfdCkoJmVudi0+dmZwLnJlZ3NbaV0pOworICAgICAgICByZXQgPSBrdm1fdmNwdV9pb2N0
+bChjcywgS1ZNX0dFVF9PTkVfUkVHLCAmcmVnKTsKKyAgICAgICAgaWYgKHJldCkgeworICAgICAg
+ICAgICAgcmV0dXJuIHJldDsKKyAgICAgICAgfQorICAgIH0KKworICAgIHJlZy5hZGRyID0gKHVp
+bnRwdHJfdCkoJmZwcik7CisgICAgcmVnLmlkID0gQUFSQ0g2NF9TSU1EX0NUUkxfUkVHKGZwX3Jl
+Z3MuZnBzcik7CisgICAgcmV0ID0ga3ZtX3ZjcHVfaW9jdGwoY3MsIEtWTV9HRVRfT05FX1JFRywg
+JnJlZyk7CisgICAgaWYgKHJldCkgeworICAgICAgICByZXR1cm4gcmV0OworICAgIH0KKyAgICB2
+ZnBfc2V0X2Zwc3IoZW52LCBmcHIpOworCisgICAgcmVnLmlkID0gQUFSQ0g2NF9TSU1EX0NUUkxf
+UkVHKGZwX3JlZ3MuZnBjcik7CisgICAgcmV0ID0ga3ZtX3ZjcHVfaW9jdGwoY3MsIEtWTV9HRVRf
+T05FX1JFRywgJnJlZyk7CisgICAgaWYgKHJldCkgeworICAgICAgICByZXR1cm4gcmV0OworICAg
+IH0KKyAgICB2ZnBfc2V0X2ZwY3IoZW52LCBmcHIpOworCiAgICAgaWYgKCF3cml0ZV9rdm1zdGF0
+ZV90b19saXN0KGNwdSkpIHsKICAgICAgICAgcmV0dXJuIEVJTlZBTDsKICAgICB9Ci0tIAoyLjMu
+MgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJt
+IG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMu
+Y3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
