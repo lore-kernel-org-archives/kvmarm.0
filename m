@@ -1,22 +1,28 @@
-From: Diana Craciun <diana.craciun@freescale.com>
-Subject: "info cpus" issue
-Date: Mon, 16 Mar 2015 16:35:49 +0200
-Message-ID: <5506EA45.1060407@freescale.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH roundup 1/4] arm64: mm: increase VA range of identity map
+Date: Mon, 16 Mar 2015 15:39:07 +0100
+Message-ID: <CAKv+Gu-q+Zoz8M+a5CO8T3FgHaud3Uc-GMzRsp7sqKLPvQ4azA@mail.gmail.com>
+References: <1425652482-31411-1-git-send-email-ard.biesheuvel@linaro.org>
+ <1425652482-31411-2-git-send-email-ard.biesheuvel@linaro.org>
+ <20150316142813.GC26480@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D876C48E6B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2015 10:29:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 20AA548E73
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2015 10:32:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RnKiSkKbSb4v for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Mar 2015 10:29:40 -0400 (EDT)
-Received: from na01-bn1-obe.outbound.protection.outlook.com
- (mail-bn1bbn0108.outbound.protection.outlook.com [157.56.111.108])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5063848E56
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2015 10:29:39 -0400 (EDT)
+ with ESMTP id mbSA0cS39oV4 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Mar 2015 10:32:34 -0400 (EDT)
+Received: from mail-ie0-f177.google.com (mail-ie0-f177.google.com
+ [209.85.223.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F81A48E72
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2015 10:32:34 -0400 (EDT)
+Received: by iecsl2 with SMTP id sl2so171631916iec.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Mar 2015 07:39:08 -0700 (PDT)
+In-Reply-To: <20150316142813.GC26480@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -26,164 +32,299 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>, Arnd Bergmann <arnd@arndb.de>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+On 16 March 2015 at 15:28, Christoffer Dall <christoffer.dall@linaro.org> wrote:
+> On Fri, Mar 06, 2015 at 03:34:39PM +0100, Ard Biesheuvel wrote:
+>> The page size and the number of translation levels, and hence the supported
+>> virtual address range, are build-time configurables on arm64 whose optimal
+>> values are use case dependent. However, in the current implementation, if
+>> the system's RAM is located at a very high offset, the virtual address range
+>> needs to reflect that merely because the identity mapping, which is only used
+>> to enable or disable the MMU, requires the extended virtual range to map the
+>> physical memory at an equal virtual offset.
+>>
+>> This patch relaxes that requirement, by increasing the number of translation
+>> levels for the identity mapping only, and only when actually needed, i.e.,
+>> when system RAM's offset is found to be out of reach at runtime.
+>>
+>> Tested-by: Laura Abbott <lauraa@codeaurora.org>
+>> Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
+>> Tested-by: Marc Zyngier <marc.zyngier@arm.com>
+>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>> ---
+>>  arch/arm64/include/asm/mmu_context.h   | 43 ++++++++++++++++++++++++++++++++++
+>>  arch/arm64/include/asm/page.h          |  6 +++--
+>>  arch/arm64/include/asm/pgtable-hwdef.h |  7 +++++-
+>>  arch/arm64/kernel/head.S               | 38 ++++++++++++++++++++++++++++++
+>>  arch/arm64/kernel/smp.c                |  1 +
+>>  arch/arm64/mm/mmu.c                    |  7 +++++-
+>>  arch/arm64/mm/proc-macros.S            | 11 +++++++++
+>>  arch/arm64/mm/proc.S                   |  3 +++
+>>  8 files changed, 112 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/mmu_context.h b/arch/arm64/include/asm/mmu_context.h
+>> index a9eee33dfa62..ecf2d060036b 100644
+>> --- a/arch/arm64/include/asm/mmu_context.h
+>> +++ b/arch/arm64/include/asm/mmu_context.h
+>> @@ -64,6 +64,49 @@ static inline void cpu_set_reserved_ttbr0(void)
+>>       : "r" (ttbr));
+>>  }
+>>
+>> +/*
+>> + * TCR.T0SZ value to use when the ID map is active. Usually equals
+>> + * TCR_T0SZ(VA_BITS), unless system RAM is positioned very high in
+>> + * physical memory, in which case it will be smaller.
+>> + */
+>> +extern u64 idmap_t0sz;
+>> +
+>> +static inline bool __cpu_uses_extended_idmap(void)
+>> +{
+>> +     return (!IS_ENABLED(CONFIG_ARM64_VA_BITS_48) &&
+>> +             unlikely(idmap_t0sz != TCR_T0SZ(VA_BITS)));
+>> +}
+>> +
+>> +static inline void __cpu_set_tcr_t0sz(u64 t0sz)
+>> +{
+>> +     unsigned long tcr;
+>> +
+>> +     if (__cpu_uses_extended_idmap())
+>> +             asm volatile (
+>> +             "       mrs     %0, tcr_el1     ;"
+>> +             "       bfi     %0, %1, %2, %3  ;"
+>> +             "       msr     tcr_el1, %0     ;"
+>> +             "       isb"
+>> +             : "=&r" (tcr)
+>> +             : "r"(t0sz), "I"(TCR_T0SZ_OFFSET), "I"(TCR_TxSZ_WIDTH));
+>> +}
+>> +
+>> +/*
+>> + * Set TCR.T0SZ to the value appropriate for activating the identity map.
+>> + */
+>> +static inline void cpu_set_idmap_tcr_t0sz(void)
+>> +{
+>> +     __cpu_set_tcr_t0sz(idmap_t0sz);
+>> +}
+>> +
+>> +/*
+>> + * Set TCR.T0SZ to its default value (based on VA_BITS)
+>> + */
+>> +static inline void cpu_set_default_tcr_t0sz(void)
+>> +{
+>> +     __cpu_set_tcr_t0sz(TCR_T0SZ(VA_BITS));
+>> +}
+>> +
+>>  static inline void switch_new_context(struct mm_struct *mm)
+>>  {
+>>       unsigned long flags;
+>> diff --git a/arch/arm64/include/asm/page.h b/arch/arm64/include/asm/page.h
+>> index 22b16232bd60..3d02b1869eb8 100644
+>> --- a/arch/arm64/include/asm/page.h
+>> +++ b/arch/arm64/include/asm/page.h
+>> @@ -33,7 +33,9 @@
+>>   * image. Both require pgd, pud (4 levels only) and pmd tables to (section)
+>>   * map the kernel. With the 64K page configuration, swapper and idmap need to
+>>   * map to pte level. The swapper also maps the FDT (see __create_page_tables
+>> - * for more information).
+>> + * for more information). Note that the number of ID map translation levels
+>> + * could be increased on the fly if system RAM is out of reach for the default
+>> + * VA range, so 3 pages are reserved in all cases.
+>>   */
+>>  #ifdef CONFIG_ARM64_64K_PAGES
+>>  #define SWAPPER_PGTABLE_LEVELS       (CONFIG_ARM64_PGTABLE_LEVELS)
+>> @@ -42,7 +44,7 @@
+>>  #endif
+>>
+>>  #define SWAPPER_DIR_SIZE     (SWAPPER_PGTABLE_LEVELS * PAGE_SIZE)
+>> -#define IDMAP_DIR_SIZE               (SWAPPER_DIR_SIZE)
+>> +#define IDMAP_DIR_SIZE               (3 * PAGE_SIZE)
+>>
+>>  #ifndef __ASSEMBLY__
+>>
+>> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+>> index 5f930cc9ea83..847e864202cc 100644
+>> --- a/arch/arm64/include/asm/pgtable-hwdef.h
+>> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
+>> @@ -143,7 +143,12 @@
+>>  /*
+>>   * TCR flags.
+>>   */
+>> -#define TCR_TxSZ(x)          (((UL(64) - (x)) << 16) | ((UL(64) - (x)) << 0))
+>> +#define TCR_T0SZ_OFFSET              0
+>> +#define TCR_T1SZ_OFFSET              16
+>> +#define TCR_T0SZ(x)          ((UL(64) - (x)) << TCR_T0SZ_OFFSET)
+>> +#define TCR_T1SZ(x)          ((UL(64) - (x)) << TCR_T1SZ_OFFSET)
+>> +#define TCR_TxSZ(x)          (TCR_T0SZ(x) | TCR_T1SZ(x))
+>> +#define TCR_TxSZ_WIDTH               6
+>>  #define TCR_IRGN_NC          ((UL(0) << 8) | (UL(0) << 24))
+>>  #define TCR_IRGN_WBWA                ((UL(1) << 8) | (UL(1) << 24))
+>>  #define TCR_IRGN_WT          ((UL(2) << 8) | (UL(2) << 24))
+>> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+>> index 8ce88e08c030..a3612eadab3c 100644
+>> --- a/arch/arm64/kernel/head.S
+>> +++ b/arch/arm64/kernel/head.S
+>> @@ -387,6 +387,44 @@ __create_page_tables:
+>>       mov     x0, x25                         // idmap_pg_dir
+>>       ldr     x3, =KERNEL_START
+>>       add     x3, x3, x28                     // __pa(KERNEL_START)
+>> +
+>> +#ifndef CONFIG_ARM64_VA_BITS_48
+>> +#define EXTRA_SHIFT  (PGDIR_SHIFT + PAGE_SHIFT - 3)
+>> +#define EXTRA_PTRS   (1 << (48 - EXTRA_SHIFT))
+>
+> How does this math work exactly?
+>
 
-I have played the last couple of days with info CPUs command in qemu and 
-discovered two issues with it:
+PAGE_SHIFT - 3 is the number of bits translated at each level.
+EXTRA_SHIFT is the number of VA low bits that is translated by the
+higher tables.
+EXTRA_PTRS is the size of the root table (in 64-bit words)
 
-1. One core is displayed as halted, but the core is actually running ok.
+> I also had to look at the create_pgd_entry macros to understand that these
+> mean the shift for the 'extra' pgtable, and not the extra amount of
+> shifts compared to PGDIR_SHIFT.  Not sure if that warrants a comment?
+>
 
-(qemu) info cpus
-* CPU #0: thread_id=400
-   CPU #1: (halted) thread_id=401
+I am not sure if I understand what 'the extra amount of shifts' means,
+so I should at least add a comment that that's not it :-)
+But yes, I can clarify that.
 
-Looking a little bit into the qemu code, it seems to be relatively 
-benign. qemu displays "halted" on info cpus command depending on the 
-value of the halted variable, but this variable does not seem to be 
-updated in case of qemu + KVM.
+>
+>> +
+>> +     /*
+>> +      * If VA_BITS < 48, it may be too small to allow for an ID mapping to be
+>> +      * created that covers system RAM if that is located sufficiently high
+>> +      * in the physical address space. So for the ID map, use an extended
+>> +      * virtual range in that case, by configuring an additional translation
+>> +      * level.
+>> +      * First, we have to verify our assumption that the current value of
+>> +      * VA_BITS was chosen such that all translation levels are fully
+>> +      * utilised, and that lowering T0SZ will always result in an additional
+>> +      * translation level to be configured.
+>> +      */
+>> +#if VA_BITS != EXTRA_SHIFT
+>> +#error "Mismatch between VA_BITS and page size/number of translation levels"
+>> +#endif
+>> +
+>> +     /*
+>> +      * Calculate the maximum allowed value for TCR_EL1.T0SZ so that the
+>> +      * entire kernel image can be ID mapped. As T0SZ == (64 - #bits used),
+>> +      * this number conveniently equals the number of leading zeroes in
+>> +      * the physical address of KERNEL_END.
+>> +      */
+>> +     adrp    x5, KERNEL_END
+>> +     clz     x5, x5
+>> +     cmp     x5, TCR_T0SZ(VA_BITS)   // default T0SZ small enough?
+>> +     b.ge    1f                      // .. then skip additional level
+>> +
+>> +     adrp    x6, idmap_t0sz
+>> +     str     x5, [x6, :lo12:idmap_t0sz]
+>> +
+>> +     create_table_entry x0, x3, EXTRA_SHIFT, EXTRA_PTRS, x5, x6
+>
+> can you explain me how the subsequent call to create_pgd_entry with the
+> same tbl (x0) value ends up passing the right pointer from the extra
+> level to the pgd to the block mappings?
+>
 
-2. When issuing "info cpus" while the guest is booting bad things 
-happen. I saw 3 different behaviours:
-- the guest just freezes during boot
-- the guest crashes (see bellow the crash log)
-- the host/qemu is displaying this message and the guest freezes:
+x0 is not preserved by the macro but incremented by 1 page.
 
-(qemu) [16777.503115] kvm [400]: load/store instruction decoding not 
-implementd
-error: kvm run failed Function not implemented
+Look at create_pgd_entry: it calls create_table_entry twice with the
+same \tbl register, but each call sets another level.
 
-I did not get the chance to dig into it, but wanted to let you know 
-about this, perhaps is an already known issue?
-
-I saw this on 2 different platforms: on a Freescale platform (but with a 
-3.12 kernel) and on a cubieboard2 ( Linux version 4.0.0-rc3-00148-gc202baf )
-
-Guest crash:
------------
-
-Populating dev cache
-[    2.635462] Unable to handle kernel paging request at virtual address 
-0009c778
-[    2.640037] pgd = de50e400
-[    2.641707] [0009c778] *pgd=5e500003, *pmd=5e501003, *pte=00000000
-[    2.645077] Internal error: Oops: 8000020f [#1] SMP ARM
-[    2.647782] CPU: 0 PID: 51 Comm: udevd Not tainted 
-4.0.0-rc3-00148-gc202baf #4
-[    2.651470] Hardware name: Generic DT based system
-[    2.653874] task: de4a6400 ti: de48c000 task.ti: de48c000
-[    2.656715] PC is at 0x9c778
-[    2.658243] LR is at __wake_up_common+0x4c/0x80
-[    2.660552] pc : [<0009c778>]    lr : [<c005d870>] psr: 20030193
-[    2.660552] sp : de48dcd8  ip : de48df68  fp : 0009c778
-[    2.666224] r10: 00000008  r9 : 00000001  r8 : 00000003
-[    2.668964] r7 : 00000000  r6 : 00000000  r5 : ded05e20  r4 : 0000003b
-[    2.672256] r3 : 00000000  r2 : 00000000  r1 : 00000003  r0 : de48df68
-[    2.674996] Flags: nzCv  IRQs off  FIQs on  Mode SVC_32  ISA ARM 
-Segment user
-[    2.678305] Control: 30c5387d  Table: 5e46a3c0  DAC: fffffffd
-[    2.680954] Process udevd (pid: 51, stack limit = 0xde48c210)
-[    2.683507] Stack: (0xde48dcd8 to 0xde48e000)
-[    2.685648] 
-dcc0:                                                       00000000 
-ded05e00
-[    2.689566] dce0: ded05a00 00000000 40030193 00000003 00000001 
-ded22480 c01191b4 c005dac8
-[    2.693564] dd00: 00000000 c004e76c de4a4d80 c0119258 00000000 
-00000000 ded2248c 00000000
-[    2.697693] dd20: 00000000 c005d870 00000000 ded22488 80030193 
-00000000 00000001 00000003
-[    2.701786] dd40: de4a67b0 00000000 0000000a c005daa0 00000000 
-00000000 de4a6400 de48dde0
-[    2.705873] dd60: 0000000b de51e000 00000000 c003b740 de51cd80 
-00000000 40070093 de48dde0
-[    2.709905] dd80: de4a6400 0000000b 60030113 de48dde0 00000000 
-de50857c 00000054 c003b780
-[    2.713928] dda0: 00000000 00000000 decf6c04 000000c3 00000001 
-de4a6400 0000000b ded22048
-[    2.718036] ddc0: 60030113 c003c07c 00030002 de508540 00000207 
-de4a6400 b6f82328 c0029aa0
-[    2.721944] dde0: 0000000b 00000000 00030002 b6f82328 de48f200 
-df061300 00000008 c032c0f8
-[    2.725968] de00: 00007b35 c052a100 c052a614 c052a614 dfbec180 
-c0526180 00000001 dfbec1c0
-[    2.730073] de20: c052a614 c0058ec4 00000001 c0524218 00000000 
-dfbec1c0 00000000 00000107
-[    2.734061] de40: c052a100 c0526180 c00097b8 c00b4350 b6f82328 
-c00c210c 00000000 de48df50
-[    2.738136] de60: de48df50 c0029f00 00030002 c0049c28 00000000 
-00000000 00020000 c0022a9c
-[    2.742233] de80: 00000000 00000000 00000000 00000207 c0029c14 
-c052e24c b6f82328 de48df50
-[    2.745372] dea0: 00000014 b6faa960 be9f7a3c c0008510 ded05e34 
-00000000 de48decc c03e7b7c
-[    2.749418] dec0: 00000001 de48c000 00000000 c03ea634 beada220 
-ded05e34 00000000 00000019
-[    2.753284] dee0: 00000001 c01188ac ded05e00 ded05e34 de48df08 
-de48df60 00000000 00000000
-[    2.757444] df00: ded05e00 c0119110 de48df08 de48df08 00000000 
-de4a3240 00000004 de48c000
-[    2.761479] df20: 00000000 beada298 de4a3240 ded05e00 ded05e34 
-c011a358 b6f9ccd4 00030010
-[    2.765605] df40: ffffffff 30c5387d 30c5387d c002279c 0009c778 
-b6f82328 00000004 00000034
-[    2.769646] df60: 0000955c 0000b3d8 0000003b 000091ac 0009c778 
-00000014 b6faa960 be9f7a3c
-[    2.773707] df80: 0009c778 be9f7978 b6f8efe0 b6f9ccd4 00030010 
-ffffffff de48c000 00000000
-[    2.777134] dfa0: ffffe598 c001e820 00033220 00033008 00000004 
-beada298 00000004 ffffffff
-[    2.780579] dfc0: 00033220 00033008 000323dc 000000fc ffffec00 
-beada220 00032420 ffffe598
-[    2.783951] dfe0: 00000000 beada1a4 0000dc04 b6f027ec 60070010 
-00000004 00000000 00000000
-[    2.787839] [<c005d870>] (__wake_up_common) from [<c005dac8>] 
-(__wake_up_locked+0x14/0x1c)
-[    2.792037] [<c005dac8>] (__wake_up_locked) from [<c0119258>] 
-(ep_poll_callback+0xa4/0x13c)
-[    2.796327] [<c0119258>] (ep_poll_callback) from [<c005d870>] 
-(__wake_up_common+0x4c/0x80)
-[    2.800399] [<c005d870>] (__wake_up_common) from [<c005daa0>] 
-(__wake_up+0x38/0x4c)
-[    2.804319] [<c005daa0>] (__wake_up) from [<c003b740>] 
-(__send_signal+0x2e4/0x2ec)
-[    2.808110] [<c003b740>] (__send_signal) from [<c003b780>] 
-(send_signal+0x38/0x88)
-[    2.811663] [<c003b780>] (send_signal) from [<c003c07c>] 
-(force_sig_info+0xc0/0xe0)
-[    2.815536] [<c003c07c>] (force_sig_info) from [<c0029aa0>] 
-(__do_user_fault.isra.7+0x44/0x4c)
-[    2.819440] [<c0029aa0>] (__do_user_fault.isra.7) from [<c0029f00>] 
-(do_page_fault+0x2ec/0x344)
-[    2.823452] [<c0029f00>] (do_page_fault) from [<c0008510>] 
-(do_DataAbort+0x30/0x90)
-[    2.826712] [<c0008510>] (do_DataAbort) from [<c002279c>] 
-(__dabt_usr+0x3c/0x40)
-[    2.829789] Exception stack(0xde48df50 to 0xde48df98)
-[    2.830934] df40:                                     0009c778 
-b6f82328 00000004 00000034
-[    2.834235] df60: 0000955c 0000b3d8 0000003b 000091ac 0009c778 
-00000014 b6faa960 be9f7a3c
-[    2.837981] df80: 0009c778 be9f7978 b6f8efe0 b6f9ccd4 00030010 ffffffff
-[    2.841182] Code: 00000000 b6f7fb58 00000001 00000000 (00000000)
-[    2.844367] ---[ end trace 9ed69020210a081b ]---
-
-
-Host messages:
------------
-(qemu) info cpus
-* CPU #0: thread_id=383
-(qemu) [16371.225508] kvm [383]: load/store instruction decoding not 
-implementd
-error: kvm run failed Function not implemented
-R00=c0555d0c R01=00000207 R02=10070193 R03=e0830000
-R04=e0831120 R05=c0029c14 R06=00000207 R07=e083000c
-R08=e083000c R09=b6f70960 R10=00000000 R11=be90544c
-R12=e0831038 R13=e082ffec R14=c0008510 R15=c00224ac
-PSR=50070193 -Z-V A svc32
-
-Thanks,
-
-Diana
+>> +1:
+>> +#endif
+>> +
+>>       create_pgd_entry x0, x3, x5, x6
+>>       ldr     x6, =KERNEL_END
+>>       mov     x5, x3                          // __pa(KERNEL_START)
+>> diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
+>> index 328b8ce4b007..74554dfcce73 100644
+>> --- a/arch/arm64/kernel/smp.c
+>> +++ b/arch/arm64/kernel/smp.c
+>> @@ -151,6 +151,7 @@ asmlinkage void secondary_start_kernel(void)
+>>        */
+>>       cpu_set_reserved_ttbr0();
+>>       flush_tlb_all();
+>> +     cpu_set_default_tcr_t0sz();
+>>
+>>       preempt_disable();
+>>       trace_hardirqs_off();
+>> diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+>> index c6daaf6c6f97..c4f60393383e 100644
+>> --- a/arch/arm64/mm/mmu.c
+>> +++ b/arch/arm64/mm/mmu.c
+>> @@ -40,6 +40,8 @@
+>>
+>>  #include "mm.h"
+>>
+>> +u64 idmap_t0sz = TCR_T0SZ(VA_BITS);
+>> +
+>>  /*
+>>   * Empty_zero_page is a special page that is used for zero-initialized data
+>>   * and COW.
+>> @@ -454,6 +456,7 @@ void __init paging_init(void)
+>>        */
+>>       cpu_set_reserved_ttbr0();
+>>       flush_tlb_all();
+>> +     cpu_set_default_tcr_t0sz();
+>>  }
+>>
+>>  /*
+>> @@ -461,8 +464,10 @@ void __init paging_init(void)
+>>   */
+>>  void setup_mm_for_reboot(void)
+>>  {
+>> -     cpu_switch_mm(idmap_pg_dir, &init_mm);
+>> +     cpu_set_reserved_ttbr0();
+>>       flush_tlb_all();
+>> +     cpu_set_idmap_tcr_t0sz();
+>> +     cpu_switch_mm(idmap_pg_dir, &init_mm);
+>>  }
+>>
+>>  /*
+>> diff --git a/arch/arm64/mm/proc-macros.S b/arch/arm64/mm/proc-macros.S
+>> index 005d29e2977d..c17fdd6a19bc 100644
+>> --- a/arch/arm64/mm/proc-macros.S
+>> +++ b/arch/arm64/mm/proc-macros.S
+>> @@ -52,3 +52,14 @@
+>>       mov     \reg, #4                        // bytes per word
+>>       lsl     \reg, \reg, \tmp                // actual cache line size
+>>       .endm
+>> +
+>> +/*
+>> + * tcr_set_idmap_t0sz - update TCR.T0SZ so that we can load the ID map
+>> + */
+>> +     .macro  tcr_set_idmap_t0sz, valreg, tmpreg
+>> +#ifndef CONFIG_ARM64_VA_BITS_48
+>> +     adrp    \tmpreg, idmap_t0sz
+>> +     ldr     \tmpreg, [\tmpreg, #:lo12:idmap_t0sz]
+>> +     bfi     \valreg, \tmpreg, #TCR_T0SZ_OFFSET, #TCR_TxSZ_WIDTH
+>> +#endif
+>> +     .endm
+>> diff --git a/arch/arm64/mm/proc.S b/arch/arm64/mm/proc.S
+>> index 28eebfb6af76..cdd754e19b9b 100644
+>> --- a/arch/arm64/mm/proc.S
+>> +++ b/arch/arm64/mm/proc.S
+>> @@ -156,6 +156,7 @@ ENTRY(cpu_do_resume)
+>>       msr     cpacr_el1, x6
+>>       msr     ttbr0_el1, x1
+>>       msr     ttbr1_el1, x7
+>> +     tcr_set_idmap_t0sz x8, x7
+>>       msr     tcr_el1, x8
+>>       msr     vbar_el1, x9
+>>       msr     mdscr_el1, x10
+>> @@ -233,6 +234,8 @@ ENTRY(__cpu_setup)
+>>        */
+>>       ldr     x10, =TCR_TxSZ(VA_BITS) | TCR_CACHE_FLAGS | TCR_SMP_FLAGS | \
+>>                       TCR_TG_FLAGS | TCR_ASID16 | TCR_TBI0
+>> +     tcr_set_idmap_t0sz      x10, x9
+>> +
+>>       /*
+>>        * Read the PARange bits from ID_AA64MMFR0_EL1 and set the IPS bits in
+>>        * TCR_EL1.
+>> --
+>> 1.8.3.2
+>>
