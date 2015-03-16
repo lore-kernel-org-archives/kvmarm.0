@@ -1,7 +1,7 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v4 4/5] target-arm: kvm64 fix save/restore of SPSR regs
-Date: Mon, 16 Mar 2015 11:01:55 +0000
-Message-ID: <1426503716-13931-5-git-send-email-alex.bennee@linaro.org>
+Subject: [PATCH v4 1/5] target-arm: kvm: save/restore mp state
+Date: Mon, 16 Mar 2015 11:01:52 +0000
+Message-ID: <1426503716-13931-2-git-send-email-alex.bennee@linaro.org>
 References: <1426503716-13931-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -10,120 +10,154 @@ Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1426503716-13931-1-git-send-email-alex.bennee@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-=46rom: Christoffer Dall <christoffer.dall@linaro.org>
+This adds the saving and restore of the current Multi-Processing state
+of the machine. While the KVM_GET/SET_MP_STATE API exposes a number of
+potential states for x86 we only use two for ARM. Either the process is
+running or not. We then save this state into the cpu_powered TCG state
+to avoid changing the serialisation format.
 
-The current code was negatively indexing the cpu state array and not
-synchronizing banked spsr register state with the current mode's spsr
-state, causing occasional failures with migration.
-
-Some munging is done to take care of the aarch64 mapping and also to
-ensure the most current value of the spsr is updated to the banked
-registers (relevant for KVM<->TCG migration).
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 ---
-v2 (ajb)
-  - minor tweaks and clarifications
-v3
-  - Use the correct bank index function for setting/getting env->spsr
-  - only deal with spsrs in elevated exception levels
-v4
- - try and make commentary clearer
- - ensure env->banked_spsr[0] =3D env->spsr before we sync
+v2
+  - make mpstate field runtime dependant (kvm_enabled())
+  - drop initial KVM_CAP_MP_STATE requirement
+  - re-use cpu_powered instead of new field
 
+v4
+  - s/HALTED/STOPPED/
+  - move code from machine.c to kvm.
+
+diff --git a/target-arm/kvm.c b/target-arm/kvm.c
+index 72c1fa1..a74832c 100644
+--- a/target-arm/kvm.c
++++ b/target-arm/kvm.c
+@@ -458,6 +458,46 @@ void kvm_arm_reset_vcpu(ARMCPU *cpu)
+     }
+ }
+=20
++/*
++ * Update KVM's MP_STATE based on what QEMU thinks it is
++ */
++int kvm_arm_sync_mpstate_to_kvm(ARMCPU *cpu)
++{
++    if (kvm_check_extension(CPU(cpu)->kvm_state, KVM_CAP_MP_STATE)) {
++        struct kvm_mp_state mp_state =3D {
++            .mp_state =3D
++            cpu->powered_off ? KVM_MP_STATE_STOPPED : KVM_MP_STATE_RUN=
+NABLE
++        };
++        int ret =3D kvm_vcpu_ioctl(CPU(cpu), KVM_SET_MP_STATE, &mp_sta=
+te);
++        if (ret) {
++            fprintf(stderr, "%s: failed to set MP_STATE %d/%s\n",
++                    __func__, ret, strerror(ret));
++            return -1;
++        }
++    }
++
++    return 0;
++}
++
++/*
++ * Sync the KVM MP_STATE into QEMU
++ */
++int kvm_arm_sync_mpstate_to_qemu(ARMCPU *cpu)
++{
++    if (kvm_check_extension(CPU(cpu)->kvm_state, KVM_CAP_MP_STATE)) {
++        struct kvm_mp_state mp_state;
++        int ret =3D kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MP_STATE, &mp_sta=
+te);
++        if (ret) {
++            fprintf(stderr, "%s: failed to get MP_STATE %d/%s\n",
++                    __func__, ret, strerror(ret));
++            abort();
++        }
++        cpu->powered_off =3D (mp_state.mp_state =3D=3D KVM_MP_STATE_ST=
+OPPED);
++    }
++
++    return 0;
++}
++
+ void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
+ {
+ }
+diff --git a/target-arm/kvm32.c b/target-arm/kvm32.c
+index 94030d1..49b6bab 100644
+--- a/target-arm/kvm32.c
++++ b/target-arm/kvm32.c
+@@ -356,6 +356,8 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+         return EINVAL;
+     }
+=20
++    kvm_arm_sync_mpstate_to_kvm(cpu);
++
+     return ret;
+ }
+=20
+@@ -427,5 +429,7 @@ int kvm_arch_get_registers(CPUState *cs)
+      */
+     write_list_to_cpustate(cpu);
+=20
++    kvm_arm_sync_mpstate_to_qemu(cpu);
++
+     return 0;
+ }
 diff --git a/target-arm/kvm64.c b/target-arm/kvm64.c
-index 8fd0c8d..7ddb1b1 100644
+index 8cf3a62..fed03f2 100644
 --- a/target-arm/kvm64.c
 +++ b/target-arm/kvm64.c
-@@ -140,6 +140,7 @@ int kvm_arch_put_registers(CPUState *cs, int level)
-     uint64_t val;
-     int i;
-     int ret;
-+    unsigned int el;
-=20
-     ARMCPU *cpu =3D ARM_CPU(cs);
-     CPUARMState *env =3D &cpu->env;
-@@ -206,9 +207,29 @@ int kvm_arch_put_registers(CPUState *cs, int level=
-)
-         return ret;
+@@ -211,6 +211,8 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+         return EINVAL;
      }
 =20
-+    /* Saved Program State Registers
-+     *
-+     * Before we restore from the banked_spsr[] array we need to
-+     * ensure that any modifications to env->spsr are correctly
-+     * reflected and map aarch64 exception levels if required.
-+     */
-+    el =3D arm_current_el(env);
-+    if (el > 0) {
-+        if (is_a64(env)) {
-+            g_assert(el =3D=3D 1);
-+            env->banked_spsr[0] =3D env->spsr;
-+            /* QEMUs AARCH64 EL1 SPSR is in bank 0, so map it to
-+             * KVM_SPSR_SVC for syncing to KVM */
-+            env->banked_spsr[1] =3D env->banked_spsr[0];
-+        } else {
-+            i =3D bank_number(env->uncached_cpsr & CPSR_M);
-+            env->banked_spsr[i] =3D env->spsr;
-+        }
-+    }
++    kvm_arm_sync_mpstate_to_kvm(cpu);
 +
-     for (i =3D 0; i < KVM_NR_SPSR; i++) {
-         reg.id =3D AARCH64_CORE_REG(spsr[i]);
--        reg.addr =3D (uintptr_t) &env->banked_spsr[i - 1];
-+        reg.addr =3D (uintptr_t) &env->banked_spsr[i+1];
-         ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-         if (ret) {
-             return ret;
-@@ -254,6 +275,7 @@ int kvm_arch_get_registers(CPUState *cs)
-     struct kvm_one_reg reg;
-     uint64_t val;
-     uint32_t fpr;
-+    unsigned int el;
-     int i;
-     int ret;
+     /* TODO:
+      * FP state
+      */
+@@ -310,6 +312,8 @@ int kvm_arch_get_registers(CPUState *cs)
+      */
+     write_list_to_cpustate(cpu);
 =20
-@@ -326,15 +348,34 @@ int kvm_arch_get_registers(CPUState *cs)
-         return ret;
-     }
-=20
-+    /* Fetch the SPSR registers
-+     *
-+     * KVM has an array of state indexed for all the possible aarch32
-+     * privilege levels. These map onto QEMUs aarch32 banks 1 - 4.
-+     */
-     for (i =3D 0; i < KVM_NR_SPSR; i++) {
-         reg.id =3D AARCH64_CORE_REG(spsr[i]);
--        reg.addr =3D (uintptr_t) &env->banked_spsr[i - 1];
-+        reg.addr =3D (uintptr_t) &env->banked_spsr[i+1];
-         ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-         if (ret) {
-             return ret;
-         }
-     }
-=20
-+    el =3D arm_current_el(env);
-+    if (el > 0) {
-+        if (is_a64(env)) {
-+            g_assert(el =3D=3D 1);
-+            /* KVM_SPSR_SVC holds the AARCH64 EL1 SPSR which QEMU
-+             * keeps in bank 0 so copy it across. */
-+            env->banked_spsr[0] =3D env->banked_spsr[1];
-+            i =3D aarch64_banked_spsr_index(el);
-+        } else {
-+            i =3D bank_number(env->uncached_cpsr & CPSR_M);
-+        }
-+        env->spsr =3D env->banked_spsr[i];
-+    }
++    kvm_arm_sync_mpstate_to_qemu(cpu);
 +
-     /* Advanced SIMD and FP registers */
-     for (i =3D 0; i < 32; i++) {
-         reg.id =3D AARCH64_SIMD_CORE_REG(fp_regs.vregs[i]);
+     /* TODO: other registers */
+     return ret;
+ }
+diff --git a/target-arm/kvm_arm.h b/target-arm/kvm_arm.h
+index 455dea3..7b75758 100644
+--- a/target-arm/kvm_arm.h
++++ b/target-arm/kvm_arm.h
+@@ -162,6 +162,24 @@ typedef struct ARMHostCPUClass {
+  */
+ bool kvm_arm_get_host_cpu_features(ARMHostCPUClass *ahcc);
+=20
++
++/**
++ * kvm_arm_sync_mpstate_to_kvm
++ * @cpu: ARMCPU
++ *
++ * If supported set the KVM MP_STATE based on QEMUs migration data.
++ */
++int kvm_arm_sync_mpstate_to_kvm(ARMCPU *cpu);
++
++/**
++ * kvm_arm_sync_mpstate_to_qemu
++ * @cpu: ARMCPU
++ *
++ * If supported get the MP_STATE from KVM and store in QEMUs migration
++ * data.
++ */
++int kvm_arm_sync_mpstate_to_qemu(ARMCPU *cpu);
++
+ #endif
+=20
+ #endif
 --=20
 2.3.2
 
