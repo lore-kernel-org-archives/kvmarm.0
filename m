@@ -1,115 +1,190 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [GIT PULL 2/5] arm64: KVM: Do not use pgd_index to index stage-2 pgd
-Date: Mon, 16 Mar 2015 13:55:00 +0100
-Message-ID: <1426510503-27995-3-git-send-email-christoffer.dall@linaro.org>
+Subject: [GIT PULL 5/5] arm/arm64: KVM: Keep elrsr/aisr in sync with software model
+Date: Mon, 16 Mar 2015 13:55:03 +0100
+Message-ID: <1426510503-27995-6-git-send-email-christoffer.dall@linaro.org>
 References: <1426510503-27995-1-git-send-email-christoffer.dall@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1426510503-27995-1-git-send-email-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+There is an interesting bug in the vgic code, which manifests itself
+when the KVM run loop has a signal pending or needs a vmid generation
+rollover after having disabled interrupts but before actually switching
+to the guest.
 
-The kernel's pgd_index macro is designed to index a normal, page
-sized array. KVM is a bit diffferent, as we can use concatenated
-pages to have a bigger address space (for example 40bit IPA with
-4kB pages gives us an 8kB PGD.
+In this case, we flush the vgic as usual, but we sync back the vgic
+state and exit to userspace before entering the guest.  The consequence
+is that we will be syncing the list registers back to the software mode=
+l
+using the GICH_ELRSR and GICH_EISR from the last execution of the guest=
+,
+potentially overwriting a list register containing an interrupt.
 
-In the above case, the use of pgd_index will always return an index
-inside the first 4kB, which makes a guest that has memory above
-0x8000000000 rather unhappy, as it spins forever in a page fault,
-whist the host happilly corrupts the lower pgd.
+This showed up during migration testing where we would capture a state
+where the VM has masked the arch timer but there were no interrupts,
+resulting in a hung test.
 
-The obvious fix is to get our own kvm_pgd_index that does the right
-thing(tm).
-
-Tested on X-Gene with a hacked kvmtool that put memory at a stupidly
-high address.
-
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Reported-by: Alex Bennee <alex.bennee@linaro.org>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/include/asm/kvm_mmu.h   | 3 ++-
- arch/arm/kvm/mmu.c               | 8 ++++----
- arch/arm64/include/asm/kvm_mmu.h | 2 ++
- 3 files changed, 8 insertions(+), 5 deletions(-)
+ include/kvm/arm_vgic.h |  1 +
+ virt/kvm/arm/vgic-v2.c |  8 ++++++++
+ virt/kvm/arm/vgic-v3.c |  8 ++++++++
+ virt/kvm/arm/vgic.c    | 16 ++++++++++++++++
+ 4 files changed, 33 insertions(+)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index c57c41dc..4cf48c3 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -149,13 +149,14 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
- 	(__boundary - 1 < (end) - 1)? __boundary: (end);		\
- })
- 
-+#define kvm_pgd_index(addr)			pgd_index(addr)
-+
- static inline bool kvm_page_empty(void *ptr)
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 7c55dd5..66203b2 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -114,6 +114,7 @@ struct vgic_ops {
+ 	void	(*sync_lr_elrsr)(struct kvm_vcpu *, int, struct vgic_lr);
+ 	u64	(*get_elrsr)(const struct kvm_vcpu *vcpu);
+ 	u64	(*get_eisr)(const struct kvm_vcpu *vcpu);
++	void	(*clear_eisr)(struct kvm_vcpu *vcpu);
+ 	u32	(*get_interrupt_status)(const struct kvm_vcpu *vcpu);
+ 	void	(*enable_underflow)(struct kvm_vcpu *vcpu);
+ 	void	(*disable_underflow)(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
+index a0a7b5d..f9b9c7c 100644
+--- a/virt/kvm/arm/vgic-v2.c
++++ b/virt/kvm/arm/vgic-v2.c
+@@ -72,6 +72,8 @@ static void vgic_v2_sync_lr_elrsr(struct kvm_vcpu *vc=
+pu, int lr,
  {
- 	struct page *ptr_page = virt_to_page(ptr);
- 	return page_count(ptr_page) == 1;
+ 	if (!(lr_desc.state & LR_STATE_MASK))
+ 		vcpu->arch.vgic_cpu.vgic_v2.vgic_elrsr |=3D (1ULL << lr);
++	else
++		vcpu->arch.vgic_cpu.vgic_v2.vgic_elrsr &=3D ~(1ULL << lr);
  }
- 
--
- #define kvm_pte_table_empty(kvm, ptep) kvm_page_empty(ptep)
- #define kvm_pmd_table_empty(kvm, pmdp) kvm_page_empty(pmdp)
- #define kvm_pud_table_empty(kvm, pudp) (0)
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index a48a73c..5656d79 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -290,7 +290,7 @@ static void unmap_range(struct kvm *kvm, pgd_t *pgdp,
- 	phys_addr_t addr = start, end = start + size;
- 	phys_addr_t next;
- 
--	pgd = pgdp + pgd_index(addr);
-+	pgd = pgdp + kvm_pgd_index(addr);
- 	do {
- 		next = kvm_pgd_addr_end(addr, end);
- 		if (!pgd_none(*pgd))
-@@ -355,7 +355,7 @@ static void stage2_flush_memslot(struct kvm *kvm,
- 	phys_addr_t next;
- 	pgd_t *pgd;
- 
--	pgd = kvm->arch.pgd + pgd_index(addr);
-+	pgd = kvm->arch.pgd + kvm_pgd_index(addr);
- 	do {
- 		next = kvm_pgd_addr_end(addr, end);
- 		stage2_flush_puds(kvm, pgd, addr, next);
-@@ -830,7 +830,7 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
- 	pgd_t *pgd;
- 	pud_t *pud;
- 
--	pgd = kvm->arch.pgd + pgd_index(addr);
-+	pgd = kvm->arch.pgd + kvm_pgd_index(addr);
- 	if (WARN_ON(pgd_none(*pgd))) {
- 		if (!cache)
- 			return NULL;
-@@ -1120,7 +1120,7 @@ static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
- 	pgd_t *pgd;
- 	phys_addr_t next;
- 
--	pgd = kvm->arch.pgd + pgd_index(addr);
-+	pgd = kvm->arch.pgd + kvm_pgd_index(addr);
- 	do {
- 		/*
- 		 * Release kvm_mmu_lock periodically if the memory region is
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index a099cd9..bbfb600 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -158,6 +158,8 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
- #define PTRS_PER_S2_PGD		(1 << PTRS_PER_S2_PGD_SHIFT)
- #define S2_PGD_ORDER		get_order(PTRS_PER_S2_PGD * sizeof(pgd_t))
- 
-+#define kvm_pgd_index(addr)	(((addr) >> PGDIR_SHIFT) & (PTRS_PER_S2_PGD - 1))
+=20
+ static u64 vgic_v2_get_elrsr(const struct kvm_vcpu *vcpu)
+@@ -84,6 +86,11 @@ static u64 vgic_v2_get_eisr(const struct kvm_vcpu *v=
+cpu)
+ 	return vcpu->arch.vgic_cpu.vgic_v2.vgic_eisr;
+ }
+=20
++static void vgic_v2_clear_eisr(struct kvm_vcpu *vcpu)
++{
++	vcpu->arch.vgic_cpu.vgic_v2.vgic_eisr =3D 0;
++}
 +
+ static u32 vgic_v2_get_interrupt_status(const struct kvm_vcpu *vcpu)
+ {
+ 	u32 misr =3D vcpu->arch.vgic_cpu.vgic_v2.vgic_misr;
+@@ -148,6 +155,7 @@ static const struct vgic_ops vgic_v2_ops =3D {
+ 	.sync_lr_elrsr		=3D vgic_v2_sync_lr_elrsr,
+ 	.get_elrsr		=3D vgic_v2_get_elrsr,
+ 	.get_eisr		=3D vgic_v2_get_eisr,
++	.clear_eisr		=3D vgic_v2_clear_eisr,
+ 	.get_interrupt_status	=3D vgic_v2_get_interrupt_status,
+ 	.enable_underflow	=3D vgic_v2_enable_underflow,
+ 	.disable_underflow	=3D vgic_v2_disable_underflow,
+diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
+index 3a62d8a..dff0602 100644
+--- a/virt/kvm/arm/vgic-v3.c
++++ b/virt/kvm/arm/vgic-v3.c
+@@ -104,6 +104,8 @@ static void vgic_v3_sync_lr_elrsr(struct kvm_vcpu *=
+vcpu, int lr,
+ {
+ 	if (!(lr_desc.state & LR_STATE_MASK))
+ 		vcpu->arch.vgic_cpu.vgic_v3.vgic_elrsr |=3D (1U << lr);
++	else
++		vcpu->arch.vgic_cpu.vgic_v3.vgic_elrsr &=3D ~(1U << lr);
+ }
+=20
+ static u64 vgic_v3_get_elrsr(const struct kvm_vcpu *vcpu)
+@@ -116,6 +118,11 @@ static u64 vgic_v3_get_eisr(const struct kvm_vcpu =
+*vcpu)
+ 	return vcpu->arch.vgic_cpu.vgic_v3.vgic_eisr;
+ }
+=20
++static void vgic_v3_clear_eisr(struct kvm_vcpu *vcpu)
++{
++	vcpu->arch.vgic_cpu.vgic_v3.vgic_eisr =3D 0;
++}
++
+ static u32 vgic_v3_get_interrupt_status(const struct kvm_vcpu *vcpu)
+ {
+ 	u32 misr =3D vcpu->arch.vgic_cpu.vgic_v3.vgic_misr;
+@@ -192,6 +199,7 @@ static const struct vgic_ops vgic_v3_ops =3D {
+ 	.sync_lr_elrsr		=3D vgic_v3_sync_lr_elrsr,
+ 	.get_elrsr		=3D vgic_v3_get_elrsr,
+ 	.get_eisr		=3D vgic_v3_get_eisr,
++	.clear_eisr		=3D vgic_v3_clear_eisr,
+ 	.get_interrupt_status	=3D vgic_v3_get_interrupt_status,
+ 	.enable_underflow	=3D vgic_v3_enable_underflow,
+ 	.disable_underflow	=3D vgic_v3_disable_underflow,
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 4b2c2e7..c9f60f5 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -883,6 +883,11 @@ static inline u64 vgic_get_eisr(struct kvm_vcpu *v=
+cpu)
+ 	return vgic_ops->get_eisr(vcpu);
+ }
+=20
++static inline void vgic_clear_eisr(struct kvm_vcpu *vcpu)
++{
++	vgic_ops->clear_eisr(vcpu);
++}
++
+ static inline u32 vgic_get_interrupt_status(struct kvm_vcpu *vcpu)
+ {
+ 	return vgic_ops->get_interrupt_status(vcpu);
+@@ -922,6 +927,7 @@ static void vgic_retire_lr(int lr_nr, int irq, stru=
+ct kvm_vcpu *vcpu)
+ 	vgic_set_lr(vcpu, lr_nr, vlr);
+ 	clear_bit(lr_nr, vgic_cpu->lr_used);
+ 	vgic_cpu->vgic_irq_lr_map[irq] =3D LR_EMPTY;
++	vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
+ }
+=20
  /*
-  * If we are concatenating first level stage-2 page tables, we would have less
-  * than or equal to 16 pointers in the fake PGD, because that's what the
--- 
+@@ -978,6 +984,7 @@ bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_s=
+ource_id, int irq)
+ 			BUG_ON(!test_bit(lr, vgic_cpu->lr_used));
+ 			vlr.state |=3D LR_STATE_PENDING;
+ 			vgic_set_lr(vcpu, lr, vlr);
++			vgic_sync_lr_elrsr(vcpu, lr, vlr);
+ 			return true;
+ 		}
+ 	}
+@@ -999,6 +1006,7 @@ bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_=
+source_id, int irq)
+ 		vlr.state |=3D LR_EOI_INT;
+=20
+ 	vgic_set_lr(vcpu, lr, vlr);
++	vgic_sync_lr_elrsr(vcpu, lr, vlr);
+=20
+ 	return true;
+ }
+@@ -1136,6 +1144,14 @@ static bool vgic_process_maintenance(struct kvm_=
+vcpu *vcpu)
+ 	if (status & INT_STATUS_UNDERFLOW)
+ 		vgic_disable_underflow(vcpu);
+=20
++	/*
++	 * In the next iterations of the vcpu loop, if we sync the vgic state
++	 * after flushing it, but before entering the guest (this happens for
++	 * pending signals and vmid rollovers), then make sure we don't pick
++	 * up any old maintenance interrupts here.
++	 */
++	vgic_clear_eisr(vcpu);
++
+ 	return level_pending;
+ }
+=20
+--=20
 2.1.2.330.g565301e.dirty
 
