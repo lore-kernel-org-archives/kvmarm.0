@@ -1,190 +1,165 @@
 From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v4 1/5] target-arm: kvm: save/restore mp state
-Date: Tue, 17 Mar 2015 15:17:15 +0000
-Message-ID: <CAFEAcA9VZrH07DB5+3Gb1dPg4bzt6uHdK9uXMPCp8JeC0EvBYQ@mail.gmail.com>
-References: <1426503716-13931-1-git-send-email-alex.bennee@linaro.org> <1426503716-13931-2-git-send-email-alex.bennee@linaro.org>
+Subject: Re: [PATCH v4 3/5] target-arm: kvm64 sync FP register
+	state
+Date: Tue, 17 Mar 2015 15:29:15 +0000
+Message-ID: <CAFEAcA8VnJgk7gCj5Adedo_eb1Dc=-egf6c5YiyYoaDt-O2GhA@mail.gmail.com>
+References: <1426503716-13931-1-git-send-email-alex.bennee@linaro.org>
+	<1426503716-13931-4-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1426503716-13931-2-git-send-email-alex.bennee@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Return-path: <qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org>
+In-Reply-To: <1426503716-13931-4-git-send-email-alex.bennee@linaro.org>
+List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
+	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
+List-Archive: <http://lists.nongnu.org/archive/html/qemu-devel>
+List-Post: <mailto:qemu-devel@nongnu.org>
+List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
+List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
+	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Errors-To: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
+Sender: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
 To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 16 March 2015 at 11:01, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
-ote:
-> This adds the saving and restore of the current Multi-Processing stat=
-e
-> of the machine. While the KVM_GET/SET_MP_STATE API exposes a number o=
-f
-> potential states for x86 we only use two for ARM. Either the process =
-is
-> running or not. We then save this state into the cpu_powered TCG stat=
-e
-> to avoid changing the serialisation format.
-
-This (and the comments and function names below) still seem to
-be looking at this in terms of some ambiguous "multiprocessing
-state". What we are actually dealing with here is "is the
-vCPU powered on or not", and I'd rather we said so explicitly.
-
+On 16 March 2015 at 11:01, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrote:
+> For migration to work we need to sync all of the register state. This is
+> especially noticeable when GCC starts using FP registers as spill
+> registers even with integer programs.
+>
 > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 >
 > ---
-> v2
->   - make mpstate field runtime dependant (kvm_enabled())
->   - drop initial KVM_CAP_MP_STATE requirement
->   - re-use cpu_powered instead of new field
 >
-> v4
->   - s/HALTED/STOPPED/
->   - move code from machine.c to kvm.
+> v4:
+>   - fixed merge conflicts
+>   - rm superfluous reg.id++
 >
-> diff --git a/target-arm/kvm.c b/target-arm/kvm.c
-> index 72c1fa1..a74832c 100644
-> --- a/target-arm/kvm.c
-> +++ b/target-arm/kvm.c
-> @@ -458,6 +458,46 @@ void kvm_arm_reset_vcpu(ARMCPU *cpu)
->      }
->  }
->
-> +/*
-> + * Update KVM's MP_STATE based on what QEMU thinks it is
-> + */
-> +int kvm_arm_sync_mpstate_to_kvm(ARMCPU *cpu)
-> +{
-> +    if (kvm_check_extension(CPU(cpu)->kvm_state, KVM_CAP_MP_STATE)) =
-{
-
-Doesn't seem like a great idea to do the extension check
-every time we sync state, when it's always going to be the
-same for any particular run of QEMU.
-
-> +        struct kvm_mp_state mp_state =3D {
-> +            .mp_state =3D
-> +            cpu->powered_off ? KVM_MP_STATE_STOPPED : KVM_MP_STATE_R=
-UNNABLE
-> +        };
-> +        int ret =3D kvm_vcpu_ioctl(CPU(cpu), KVM_SET_MP_STATE, &mp_s=
-tate);
-> +        if (ret) {
-> +            fprintf(stderr, "%s: failed to set MP_STATE %d/%s\n",
-> +                    __func__, ret, strerror(ret));
-
-kvm_vcpu_ioctl() returns a negative errno, but strerror wants
-a positive one.
-
-> +            return -1;
-> +        }
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +/*
-> + * Sync the KVM MP_STATE into QEMU
-> + */
-> +int kvm_arm_sync_mpstate_to_qemu(ARMCPU *cpu)
-> +{
-> +    if (kvm_check_extension(CPU(cpu)->kvm_state, KVM_CAP_MP_STATE)) =
-{
-> +        struct kvm_mp_state mp_state;
-> +        int ret =3D kvm_vcpu_ioctl(CPU(cpu), KVM_GET_MP_STATE, &mp_s=
-tate);
-> +        if (ret) {
-> +            fprintf(stderr, "%s: failed to get MP_STATE %d/%s\n",
-> +                    __func__, ret, strerror(ret));
-> +            abort();
-> +        }
-> +        cpu->powered_off =3D (mp_state.mp_state =3D=3D KVM_MP_STATE_=
-STOPPED);
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  void kvm_arch_pre_run(CPUState *cs, struct kvm_run *run)
->  {
->  }
-> diff --git a/target-arm/kvm32.c b/target-arm/kvm32.c
-> index 94030d1..49b6bab 100644
-> --- a/target-arm/kvm32.c
-> +++ b/target-arm/kvm32.c
-> @@ -356,6 +356,8 @@ int kvm_arch_put_registers(CPUState *cs, int leve=
-l)
->          return EINVAL;
->      }
->
-> +    kvm_arm_sync_mpstate_to_kvm(cpu);
-> +
->      return ret;
->  }
->
-> @@ -427,5 +429,7 @@ int kvm_arch_get_registers(CPUState *cs)
->       */
->      write_list_to_cpustate(cpu);
->
-> +    kvm_arm_sync_mpstate_to_qemu(cpu);
-> +
->      return 0;
->  }
 > diff --git a/target-arm/kvm64.c b/target-arm/kvm64.c
-> index 8cf3a62..fed03f2 100644
+> index fed03f2..8fd0c8d 100644
 > --- a/target-arm/kvm64.c
 > +++ b/target-arm/kvm64.c
-> @@ -211,6 +211,8 @@ int kvm_arch_put_registers(CPUState *cs, int leve=
-l)
+> @@ -126,9 +126,17 @@ bool kvm_arm_reg_syncs_via_cpreg_list(uint64_t regid=
+x)
+>  #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+>                   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+>
+> +/* The linux headers don't define a 128 bit wide SIMD macro for us */
+
+I'm not clear what this comment is trying to tell me...
+
+> +#define AARCH64_SIMD_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U128 | =
+\
+> +                 KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+> +
+> +#define AARCH64_SIMD_CTRL_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U32 | \
+> +                 KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+> +
+>  int kvm_arch_put_registers(CPUState *cs, int level)
+>  {
+>      struct kvm_one_reg reg;
+> +    uint32_t fpr;
+>      uint64_t val;
+>      int i;
+>      int ret;
+> @@ -207,15 +215,37 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+>          }
+>      }
+>
+> +    /* Advanced SIMD and FP registers */
+> +    for (i =3D 0; i < 32; i++) {
+> +        reg.id =3D AARCH64_SIMD_CORE_REG(fp_regs.vregs[i]);
+> +        reg.addr =3D (uintptr_t)(&env->vfp.regs[i]);
+
+env->vfp.regs[] is a 64 entry array, but here we
+are only dealing with the first 32 entries (and
+furthermore trying to write 128 bits into a 64 bit
+element...)
+
+> +        ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+
+Does this work right for bigendian? (ie do the kernel and
+QEMU agree on which order the two halves of the 128 bit
+value go in? I suspect not...)
+
+> +        if (ret) {
+> +            return ret;
+> +        }
+> +    }
+> +
+> +    reg.addr =3D (uintptr_t)(&fpr);
+> +    fpr =3D vfp_get_fpsr(env);
+> +    reg.id =3D AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
+> +    ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+> +    fpr =3D vfp_get_fpcr(env);
+> +    reg.id =3D AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
+> +    ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +
+>      if (!write_list_to_kvmstate(cpu)) {
 >          return EINVAL;
 >      }
 >
-> +    kvm_arm_sync_mpstate_to_kvm(cpu);
-> +
->      /* TODO:
->       * FP state
->       */
-> @@ -310,6 +312,8 @@ int kvm_arch_get_registers(CPUState *cs)
->       */
->      write_list_to_cpustate(cpu);
+>      kvm_arm_sync_mpstate_to_kvm(cpu);
 >
-> +    kvm_arm_sync_mpstate_to_qemu(cpu);
-> +
->      /* TODO: other registers */
+> -    /* TODO:
+> -     * FP state
+> -     */
 >      return ret;
 >  }
-> diff --git a/target-arm/kvm_arm.h b/target-arm/kvm_arm.h
-> index 455dea3..7b75758 100644
-> --- a/target-arm/kvm_arm.h
-> +++ b/target-arm/kvm_arm.h
-> @@ -162,6 +162,24 @@ typedef struct ARMHostCPUClass {
->   */
->  bool kvm_arm_get_host_cpu_features(ARMHostCPUClass *ahcc);
 >
+> @@ -223,6 +253,7 @@ int kvm_arch_get_registers(CPUState *cs)
+>  {
+>      struct kvm_one_reg reg;
+>      uint64_t val;
+> +    uint32_t fpr;
+>      int i;
+>      int ret;
+>
+> @@ -304,6 +335,31 @@ int kvm_arch_get_registers(CPUState *cs)
+>          }
+>      }
+>
+> +    /* Advanced SIMD and FP registers */
+> +    for (i =3D 0; i < 32; i++) {
+> +        reg.id =3D AARCH64_SIMD_CORE_REG(fp_regs.vregs[i]);
+> +        reg.addr =3D (uintptr_t)(&env->vfp.regs[i]);
+> +        ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+
+Same remarks apply here as for the set loop.
+
+> +        if (ret) {
+> +            return ret;
+> +        }
+> +    }
 > +
-> +/**
-> + * kvm_arm_sync_mpstate_to_kvm
-> + * @cpu: ARMCPU
-> + *
-> + * If supported set the KVM MP_STATE based on QEMUs migration data.
-
-"QEMU's". Also, not migration data, it's just our state.
-
-> + */
-> +int kvm_arm_sync_mpstate_to_kvm(ARMCPU *cpu);
+> +    reg.addr =3D (uintptr_t)(&fpr);
+> +    reg.id =3D AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
+> +    ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +    vfp_set_fpsr(env, fpr);
 > +
-> +/**
-> + * kvm_arm_sync_mpstate_to_qemu
-> + * @cpu: ARMCPU
-> + *
-> + * If supported get the MP_STATE from KVM and store in QEMUs migrati=
-on
-> + * data.
+> +    reg.id =3D AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
+> +    ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +    vfp_set_fpcr(env, fpr);
+> +
+>      if (!write_kvmstate_to_list(cpu)) {
+>          return EINVAL;
+>      }
+> --
+> 2.3.2
+>
 
-Apostrophe again.
-
-> + */
-> +int kvm_arm_sync_mpstate_to_qemu(ARMCPU *cpu);
-
-thanks
 -- PMM
