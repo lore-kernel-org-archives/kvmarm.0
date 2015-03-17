@@ -1,57 +1,177 @@
 From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v4 5/5] target-arm: cpu.h document why env->spsr exists
-Date: Tue, 17 Mar 2015 15:50:37 +0000
-Message-ID: <CAFEAcA97OF2rMPNew8kiJrWBC+f=70c=G-pAC5tiYnEx6r6AYA@mail.gmail.com>
-References: <1426503716-13931-1-git-send-email-alex.bennee@linaro.org>
- <1426503716-13931-6-git-send-email-alex.bennee@linaro.org>
+Subject: Re: [PATCH v4 4/5] target-arm: kvm64 fix save/restore of SPSR regs
+Date: Tue, 17 Mar 2015 16:18:16 +0000
+Message-ID: <CAFEAcA8hJTFeR63gJO9QX7nWuFktkehDzGmJjqhTBkTjw4=7Jw@mail.gmail.com>
+References: <1426503716-13931-1-git-send-email-alex.bennee@linaro.org> <1426503716-13931-5-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ABAD048F49
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Mar 2015 11:44:22 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FpLiwVD9SCq5 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Mar 2015 11:44:21 -0400 (EDT)
-Received: from mail-ie0-f170.google.com (mail-ie0-f170.google.com
- [209.85.223.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9E0BF48F40
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Mar 2015 11:44:20 -0400 (EDT)
-Received: by iecsl2 with SMTP id sl2so13727130iec.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Mar 2015 08:50:57 -0700 (PDT)
-In-Reply-To: <1426503716-13931-6-git-send-email-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1426503716-13931-5-git-send-email-alex.bennee@linaro.org>
+Sender: kvm-owner@vger.kernel.org
 To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMTYgTWFyY2ggMjAxNSBhdCAxMTowMSwgQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5h
-cm8ub3JnPiB3cm90ZToKPiBJIHdhcyBnZXR0aW5nIHZlcnkgY29uZnVzZWQgYWJvdXQgdGhlIGR1
-cGxpY2F0aW9uIG9mIHN0YXRlIHNvIHdhbnRlZCB0bwo+IG1ha2UgaXQgZXhwbGljaXQuCj4KPiBT
-aWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+Cj4KPiBk
-aWZmIC0tZ2l0IGEvdGFyZ2V0LWFybS9jcHUuaCBiL3RhcmdldC1hcm0vY3B1LmgKPiBpbmRleCAw
-ODMyMTFjLi42ZGMxNzk5IDEwMDY0NAo+IC0tLSBhL3RhcmdldC1hcm0vY3B1LmgKPiArKysgYi90
-YXJnZXQtYXJtL2NwdS5oCj4gQEAgLTE1NSw2ICsxNTUsMTEgQEAgdHlwZWRlZiBzdHJ1Y3QgQ1BV
-QVJNU3RhdGUgewo+ICAgICAgICAgVGhpcyBjb250YWlucyBhbGwgdGhlIG90aGVyIGJpdHMuICBV
-c2UgY3Bzcl97cmVhZCx3cml0ZX0gdG8gYWNjZXNzCj4gICAgICAgICB0aGUgd2hvbGUgQ1BTUi4g
-ICovCj4gICAgICB1aW50MzJfdCB1bmNhY2hlZF9jcHNyOwo+ICsgICAgLyogVGhlIHNwc3IgaXMg
-YSBhbGlhcyBmb3Igc3Bzcl9lbE4gd2hlcmUgTiBpcyB0aGUgY3VycmVudAo+ICsgICAgICogZXhj
-ZXB0aW9uIGxldmVsLgoKSSBjb3VsZCBoYXZlIHN3b3JuIEknZCBjb21tZW50ZWQgYWJvdXQgdGhp
-cyBpbiBhbiBlYXJsaWVyCnZlcnNpb24uIEl0J3Mgbm90IGFuIGFsaWFzIGZvciBzcHNyX2VsTiwg
-YmVjYXVzZSBvbiBBQXJjaDMyIHRoZXJlIGFyZQptdWx0aXBsZSBTUFNScyBhdCBFTDE7IGl0IGlz
-IHRoZSBjdXJyZW50IFNQU1IsIGFuZAp0aGUgU1BTUnMgZm9yIG90aGVyIG1vZGVzIGFyZSBzdG9y
-ZWQgaW4gYmFua2VkX3Nwc3JbXS4KCiAgICAvKiBTUFNSIGZvciBjdXJyZW50IG1vZGUuICovCgp3
-b3VsZCBkbyBJTUhPIChtYXRjaGluZyB0aGUgY29tbWVudCBmb3IgZW52LT5yZWdzW10uKQoKLS0g
-UE1NCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFy
-bSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3Rz
-LmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On 16 March 2015 at 11:01, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
+ote:
+> From: Christoffer Dall <christoffer.dall@linaro.org>
+>
+> The current code was negatively indexing the cpu state array and not
+> synchronizing banked spsr register state with the current mode's spsr
+> state, causing occasional failures with migration.
+>
+> Some munging is done to take care of the aarch64 mapping and also to
+> ensure the most current value of the spsr is updated to the banked
+> registers (relevant for KVM<->TCG migration).
+>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> ---
+> v2 (ajb)
+>   - minor tweaks and clarifications
+> v3
+>   - Use the correct bank index function for setting/getting env->spsr
+>   - only deal with spsrs in elevated exception levels
+> v4
+>  - try and make commentary clearer
+>  - ensure env->banked_spsr[0] =3D env->spsr before we sync
+>
+> diff --git a/target-arm/kvm64.c b/target-arm/kvm64.c
+> index 8fd0c8d..7ddb1b1 100644
+> --- a/target-arm/kvm64.c
+> +++ b/target-arm/kvm64.c
+> @@ -140,6 +140,7 @@ int kvm_arch_put_registers(CPUState *cs, int leve=
+l)
+>      uint64_t val;
+>      int i;
+>      int ret;
+> +    unsigned int el;
+>
+>      ARMCPU *cpu =3D ARM_CPU(cs);
+>      CPUARMState *env =3D &cpu->env;
+> @@ -206,9 +207,29 @@ int kvm_arch_put_registers(CPUState *cs, int lev=
+el)
+>          return ret;
+>      }
+>
+> +    /* Saved Program State Registers
+> +     *
+> +     * Before we restore from the banked_spsr[] array we need to
+> +     * ensure that any modifications to env->spsr are correctly
+> +     * reflected and map aarch64 exception levels if required.
+
+"AArch64". Not entirely sure what the "map exception levels"
+is saying.
+
+> +     */
+> +    el =3D arm_current_el(env);
+> +    if (el > 0) {
+> +        if (is_a64(env)) {
+> +            g_assert(el =3D=3D 1);
+> +            env->banked_spsr[0] =3D env->spsr;
+
+If we're in AArch64 mode then I don't believe
+env->spsr has valid content at this point. The live
+copy is in env->banked_sprsr[] for all cases.
+
+> +            /* QEMUs AARCH64 EL1 SPSR is in bank 0, so map it to
+> +             * KVM_SPSR_SVC for syncing to KVM */
+
+"QEMU's" and "AArch64", but this is just a bug in our
+implementation -- the mapping between AArch64 SPSR_EL1
+and AArch32 SPSR_svc is architecturally mandated.
+We should be using banked_spsr[1] for our regdef for
+SPSR_EL1 in helper.c.
+
+Also the "*/" should be on its own line.
+
+> +            env->banked_spsr[1] =3D env->banked_spsr[0];
+
+What is going on here? Architecturally, AArch64 SPSR_EL1
+is mapped to AArch32 SPSR_svc, which is env->banked_spsr[1].
+env->banked_spsr[0] would be the SPSR for USR and SYS, except
+they don't have an SPSR (you cannot take exceptions into them).
+I think QEMU just has a banked_spsr[0] for convenience of
+implementation and it should never actually be used.
+Is this code just working around the QEMU SPSR_EL1 bug?
+
+> +            i =3D bank_number(env->uncached_cpsr & CPSR_M);
+> +            env->banked_spsr[i] =3D env->spsr;
+> +        }
+> +    }
+> +
+>      for (i =3D 0; i < KVM_NR_SPSR; i++) {
+>          reg.id =3D AARCH64_CORE_REG(spsr[i]);
+> -        reg.addr =3D (uintptr_t) &env->banked_spsr[i - 1];
+> +        reg.addr =3D (uintptr_t) &env->banked_spsr[i+1];
+
+Coding style demands spaces around the "+" operator.
+
+Note that this code is implicitly relying on the
+ordering of register banks defined by the bank_number()
+function, which is a bit icky.
+
+>          ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+>          if (ret) {
+>              return ret;
+> @@ -254,6 +275,7 @@ int kvm_arch_get_registers(CPUState *cs)
+>      struct kvm_one_reg reg;
+>      uint64_t val;
+>      uint32_t fpr;
+> +    unsigned int el;
+>      int i;
+>      int ret;
+>
+> @@ -326,15 +348,34 @@ int kvm_arch_get_registers(CPUState *cs)
+>          return ret;
+>      }
+>
+> +    /* Fetch the SPSR registers
+> +     *
+> +     * KVM has an array of state indexed for all the possible aarch3=
+2
+> +     * privilege levels. These map onto QEMUs aarch32 banks 1 - 4.
+
+QEMU's. AArch32. Also, you mean "1 - 5".
+
+> +     */
+>      for (i =3D 0; i < KVM_NR_SPSR; i++) {
+>          reg.id =3D AARCH64_CORE_REG(spsr[i]);
+> -        reg.addr =3D (uintptr_t) &env->banked_spsr[i - 1];
+> +        reg.addr =3D (uintptr_t) &env->banked_spsr[i+1];
+
+Spaces again.
+
+>          ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+>          if (ret) {
+>              return ret;
+>          }
+>      }
+>
+> +    el =3D arm_current_el(env);
+> +    if (el > 0) {
+> +        if (is_a64(env)) {
+> +            g_assert(el =3D=3D 1);
+> +            /* KVM_SPSR_SVC holds the AARCH64 EL1 SPSR which QEMU
+> +             * keeps in bank 0 so copy it across. */
+> +            env->banked_spsr[0] =3D env->banked_spsr[1];
+> +            i =3D aarch64_banked_spsr_index(el);
+
+More workarounds for a bug we should just fix, I think.
+
+> +        } else {
+> +            i =3D bank_number(env->uncached_cpsr & CPSR_M);
+> +        }
+> +        env->spsr =3D env->banked_spsr[i];
+> +    }
+> +
+>      /* Advanced SIMD and FP registers */
+>      for (i =3D 0; i < 32; i++) {
+>          reg.id =3D AARCH64_SIMD_CORE_REG(fp_regs.vregs[i]);
+> --
+> 2.3.2
+
+thanks
+-- PMM
