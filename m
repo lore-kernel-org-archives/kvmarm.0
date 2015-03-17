@@ -1,70 +1,56 @@
 From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v4 4/5] target-arm: kvm64 fix save/restore of SPSR regs
-Date: Tue, 17 Mar 2015 19:08:00 +0000
-Message-ID: <CAFEAcA-=mAu-T_JRk4cGjMzmgL61_aOWhWm9O-+fhOqVHd_F6w@mail.gmail.com>
-References: <1426503716-13931-1-git-send-email-alex.bennee@linaro.org>
- <1426503716-13931-5-git-send-email-alex.bennee@linaro.org>
- <CAFEAcA8hJTFeR63gJO9QX7nWuFktkehDzGmJjqhTBkTjw4=7Jw@mail.gmail.com> <20150317190458.GE26480@cbox>
+Subject: [PATCH] target-arm: Store SPSR_EL1 state in banked_spsr[1] (SPSR_svc)
+Date: Tue, 17 Mar 2015 19:19:35 +0000
+Message-ID: <1426619975-2346-1-git-send-email-peter.maydell@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20150317190458.GE26480@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A746048F93
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Mar 2015 15:13:04 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3EmPT-ZrbHaG for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 17 Mar 2015 15:13:02 -0400 (EDT)
+Received: from mnementh.archaic.org.uk (mnementh.archaic.org.uk [81.2.115.146])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B0D8648F4C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Mar 2015 15:13:02 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: qemu-devel@nongnu.org
+Cc: Greg Bellows <greg.bellows@linaro.org>, kvmarm@lists.cs.columbia.edu, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17 March 2015 at 19:04, Christoffer Dall <christoffer.dall@linaro.org> wrote:
-> On Tue, Mar 17, 2015 at 04:18:16PM +0000, Peter Maydell wrote:
->> Note that this code is implicitly relying on the
->> ordering of register banks defined by the bank_number()
->> function, which is a bit icky.
->
-> right, I thought you wrote this code with some deeper intention of doing
-> it this way so I tried to stick with the general idea - but now I
-> actually looked at git blame and realized that you didn't even write it.
->
-> Given all this churn around this, probably it's much cleaner to get rid
-> of the loop and have an explicit sync for each architecturally
-> implemented register, i.e. the SPSR_EL1 and the various mode-specific
-> AArch32 SPSR registers?
+The AArch64 SPSR_EL1 register is architecturally mandated to
+be mapped to the AArch32 SPSR_svc register. This means its
+state should live in QEMU's env->banked_spsr[1] field.
+Correct the buggy regdef that put it in banked_spsr[0] instead.
 
-Yes, this seems like a good idea. I almost suggested it when
-I was writing out my review comments, in fact...
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target-arm/helper.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->> >      for (i = 0; i < KVM_NR_SPSR; i++) {
->> >          reg.id = AARCH64_CORE_REG(spsr[i]);
->> > -        reg.addr = (uintptr_t) &env->banked_spsr[i - 1];
->> > +        reg.addr = (uintptr_t) &env->banked_spsr[i+1];
->>
->> Spaces again.
->>
->> >          ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
->> >          if (ret) {
->> >              return ret;
->> >          }
->> >      }
->> >
->> > +    el = arm_current_el(env);
->> > +    if (el > 0) {
->> > +        if (is_a64(env)) {
->> > +            g_assert(el == 1);
->> > +            /* KVM_SPSR_SVC holds the AARCH64 EL1 SPSR which QEMU
->> > +             * keeps in bank 0 so copy it across. */
->> > +            env->banked_spsr[0] = env->banked_spsr[1];
->> > +            i = aarch64_banked_spsr_index(el);
->>
->> More workarounds for a bug we should just fix, I think.
->>
->
-> again, this is just for the loop above to be generic, and then fix
-> things up afterwards so that things work both for is_a64() and
-> !is_a64().
-
-But the only reason we're fixing anything up is that we're
-working around the bug. If we didn't have that bug and the
-QEMU definition of where SPSR_EL1's state lived correctly
-pointed at banked_spsr[1], then the only thing you'd need
-to do for syncing is copy the KVM SPSRs into banked_spsr[1..5].
-
--- PMM
+diff --git a/target-arm/helper.c b/target-arm/helper.c
+index 10886c5..d77c6de 100644
+--- a/target-arm/helper.c
++++ b/target-arm/helper.c
+@@ -2438,7 +2438,7 @@ static const ARMCPRegInfo v8_cp_reginfo[] = {
+     { .name = "SPSR_EL1", .state = ARM_CP_STATE_AA64,
+       .type = ARM_CP_ALIAS,
+       .opc0 = 3, .opc1 = 0, .crn = 4, .crm = 0, .opc2 = 0,
+-      .access = PL1_RW, .fieldoffset = offsetof(CPUARMState, banked_spsr[0]) },
++      .access = PL1_RW, .fieldoffset = offsetof(CPUARMState, banked_spsr[1]) },
+     /* We rely on the access checks not allowing the guest to write to the
+      * state field when SPSel indicates that it's being used as the stack
+      * pointer.
+-- 
+1.9.1
