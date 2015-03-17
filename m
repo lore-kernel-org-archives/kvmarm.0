@@ -1,129 +1,201 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 09/12] KVM: arm/arm64: prepare GICv2 emulation to be
- handled by kvm_io_bus
-Date: Tue, 17 Mar 2015 19:51:18 +0100
-Message-ID: <20150317185118.GD26480@cbox>
-References: <1426263012-22935-1-git-send-email-andre.przywara@arm.com>
- <1426263012-22935-10-git-send-email-andre.przywara@arm.com>
- <20150314143044.GE10935@cbox>
- <55086C41.9070209@arm.com>
+Subject: Re: [PATCH v4 4/5] target-arm: kvm64 fix save/restore of SPSR regs
+Date: Tue, 17 Mar 2015 20:04:58 +0100
+Message-ID: <20150317190458.GE26480@cbox>
+References: <1426503716-13931-1-git-send-email-alex.bennee@linaro.org>
+ <1426503716-13931-5-git-send-email-alex.bennee@linaro.org>
+ <CAFEAcA8hJTFeR63gJO9QX7nWuFktkehDzGmJjqhTBkTjw4=7Jw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <55086C41.9070209@arm.com>
+In-Reply-To: <CAFEAcA8hJTFeR63gJO9QX7nWuFktkehDzGmJjqhTBkTjw4=7Jw@mail.gmail.com>
 Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "n.nikolaev@virtualopensystems.com" <n.nikolaev@virtualopensystems.com>, "eric.auger@linaro.org" <eric.auger@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 17, 2015 at 06:02:41PM +0000, Andre Przywara wrote:
-> Hej,
-> 
-> On 14/03/15 14:30, Christoffer Dall wrote:
-> > On Fri, Mar 13, 2015 at 04:10:09PM +0000, Andre Przywara wrote:
-> >> Using the framework provided by the recent vgic.c changes we register
-> >> a kvm_io_bus device when initializing the virtual GICv2.
-> >>
-> >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> >> ---
-> >>  include/kvm/arm_vgic.h      |    1 +
-> >>  virt/kvm/arm/vgic-v2-emul.c |   13 +++++++++----
-> >>  virt/kvm/arm/vgic.c         |   16 ++++++++++++++++
-> >>  3 files changed, 26 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> >> index 4bfc6a3..74a4ac4 100644
-> >> --- a/include/kvm/arm_vgic.h
-> >> +++ b/include/kvm/arm_vgic.h
-> >> @@ -245,6 +245,7 @@ struct vgic_dist {
-> >>  	unsigned long		*irq_pending_on_cpu;
-> >>  
-> >>  	struct vgic_vm_ops	vm_ops;
-> >> +	struct vgic_io_device	dist_iodev;
-> >>  };
-> >>  
-> >>  struct vgic_v2_cpu_if {
-> >> diff --git a/virt/kvm/arm/vgic-v2-emul.c b/virt/kvm/arm/vgic-v2-emul.c
-> >> index 0defac6..6f685c9 100644
-> >> --- a/virt/kvm/arm/vgic-v2-emul.c
-> >> +++ b/virt/kvm/arm/vgic-v2-emul.c
-> >> @@ -490,6 +490,7 @@ static bool vgic_v2_queue_sgi(struct kvm_vcpu *vcpu, int irq)
-> >>  static int vgic_v2_map_resources(struct kvm *kvm,
-> >>  				 const struct vgic_params *params)
-> >>  {
-> >> +	struct vgic_dist *dist = &kvm->arch.vgic;
-> >>  	int ret = 0;
-> >>  
-> >>  	if (!irqchip_in_kernel(kvm))
-> >> @@ -500,13 +501,17 @@ static int vgic_v2_map_resources(struct kvm *kvm,
-> >>  	if (vgic_ready(kvm))
-> >>  		goto out;
-> >>  
-> >> -	if (IS_VGIC_ADDR_UNDEF(kvm->arch.vgic.vgic_dist_base) ||
-> >> -	    IS_VGIC_ADDR_UNDEF(kvm->arch.vgic.vgic_cpu_base)) {
-> >> +	if (IS_VGIC_ADDR_UNDEF(dist->vgic_dist_base) ||
-> >> +	    IS_VGIC_ADDR_UNDEF(dist->vgic_cpu_base)) {
-> >>  		kvm_err("Need to set vgic cpu and dist addresses first\n");
-> >>  		ret = -ENXIO;
-> >>  		goto out;
-> >>  	}
-> >>  
-> >> +	vgic_register_kvm_io_dev(kvm, dist->vgic_dist_base,
-> >> +				 KVM_VGIC_V2_DIST_SIZE,
-> >> +				 vgic_dist_ranges, -1, &dist->dist_iodev);
-> >> +
-> >>  	/*
-> >>  	 * Initialize the vgic if this hasn't already been done on demand by
-> >>  	 * accessing the vgic state from userspace.
-> >> @@ -517,7 +522,7 @@ static int vgic_v2_map_resources(struct kvm *kvm,
-> >>  		goto out;
-> >>  	}
-> >>  
-> >> -	ret = kvm_phys_addr_ioremap(kvm, kvm->arch.vgic.vgic_cpu_base,
-> >> +	ret = kvm_phys_addr_ioremap(kvm, dist->vgic_cpu_base,
-> >>  				    params->vcpu_base, KVM_VGIC_V2_CPU_SIZE,
-> >>  				    true);
-> >>  	if (ret) {
-> >> @@ -525,7 +530,7 @@ static int vgic_v2_map_resources(struct kvm *kvm,
-> >>  		goto out;
-> >>  	}
-> >>  
-> >> -	kvm->arch.vgic.ready = true;
-> >> +	dist->ready = true;
-> >>  out:
-> >>  	if (ret)
-> >>  		kvm_vgic_destroy(kvm);
-> >> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> >> index 71389b8..b1dd717 100644
-> >> --- a/virt/kvm/arm/vgic.c
-> >> +++ b/virt/kvm/arm/vgic.c
-> >> @@ -908,6 +908,20 @@ int vgic_register_kvm_io_dev(struct kvm *kvm, gpa_t base, int len,
-> >>  	return 0;
-> >>  }
-> >>  
-> >> +static void vgic_unregister_kvm_io_dev(struct kvm *kvm)
-> >> +{
-> >> +	struct vgic_dist *dist = &kvm->arch.vgic;
-> >> +
-> >> +	if (!dist || !kvm->buses[KVM_MMIO_BUS])
-> >> +		return;
-> >> +
-> >> +	mutex_lock(&kvm->slots_lock);
-> >> +	if (dist->dist_iodev.dev.ops)
-> >> +		kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
-> >> +					  &dist->dist_iodev.dev);
-> > 
-> > why are we only unregisttering the iodev when we have ops?
-> 
-> Because vgic_unregister_kvm_io_dev() is called by kvm_vgic_destroy(),
-> which we call on some occasions during vgic_init() when we encounter an
-> error. There is quite a window of cases where the kvm_io_bus devices
-> haven't been registered yet, so we shouldn't try to unregister them at
-> this place. Using the .ops parameter seemed like an elegant way to
-> detect this case.
-> Does that make sense? Or have I missed something?
-> 
-That's ok, but it derserves a comment explaining this.
+On Tue, Mar 17, 2015 at 04:18:16PM +0000, Peter Maydell wrote:
+> On 16 March 2015 at 11:01, Alex Benn=E9e <alex.bennee@linaro.org> wro=
+te:
+> > From: Christoffer Dall <christoffer.dall@linaro.org>
+> >
+> > The current code was negatively indexing the cpu state array and no=
+t
+> > synchronizing banked spsr register state with the current mode's sp=
+sr
+> > state, causing occasional failures with migration.
+> >
+> > Some munging is done to take care of the aarch64 mapping and also t=
+o
+> > ensure the most current value of the spsr is updated to the banked
+> > registers (relevant for KVM<->TCG migration).
+> >
+> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> >
+> > ---
+> > v2 (ajb)
+> >   - minor tweaks and clarifications
+> > v3
+> >   - Use the correct bank index function for setting/getting env->sp=
+sr
+> >   - only deal with spsrs in elevated exception levels
+> > v4
+> >  - try and make commentary clearer
+> >  - ensure env->banked_spsr[0] =3D env->spsr before we sync
+> >
+> > diff --git a/target-arm/kvm64.c b/target-arm/kvm64.c
+> > index 8fd0c8d..7ddb1b1 100644
+> > --- a/target-arm/kvm64.c
+> > +++ b/target-arm/kvm64.c
+> > @@ -140,6 +140,7 @@ int kvm_arch_put_registers(CPUState *cs, int le=
+vel)
+> >      uint64_t val;
+> >      int i;
+> >      int ret;
+> > +    unsigned int el;
+> >
+> >      ARMCPU *cpu =3D ARM_CPU(cs);
+> >      CPUARMState *env =3D &cpu->env;
+> > @@ -206,9 +207,29 @@ int kvm_arch_put_registers(CPUState *cs, int l=
+evel)
+> >          return ret;
+> >      }
+> >
+> > +    /* Saved Program State Registers
+> > +     *
+> > +     * Before we restore from the banked_spsr[] array we need to
+> > +     * ensure that any modifications to env->spsr are correctly
+> > +     * reflected and map aarch64 exception levels if required.
+>=20
+> "AArch64". Not entirely sure what the "map exception levels"
+> is saying.
+>=20
+> > +     */
+> > +    el =3D arm_current_el(env);
+> > +    if (el > 0) {
+> > +        if (is_a64(env)) {
+> > +            g_assert(el =3D=3D 1);
+> > +            env->banked_spsr[0] =3D env->spsr;
+>=20
+> If we're in AArch64 mode then I don't believe
+> env->spsr has valid content at this point. The live
+> copy is in env->banked_sprsr[] for all cases.
+>=20
 
+ah, ok, so we can just get rid of that one.
+
+> > +            /* QEMUs AARCH64 EL1 SPSR is in bank 0, so map it to
+> > +             * KVM_SPSR_SVC for syncing to KVM */
+>=20
+> "QEMU's" and "AArch64", but this is just a bug in our
+> implementation -- the mapping between AArch64 SPSR_EL1
+> and AArch32 SPSR_svc is architecturally mandated.
+> We should be using banked_spsr[1] for our regdef for
+> SPSR_EL1 in helper.c.
+>=20
+> Also the "*/" should be on its own line.
+>=20
+> > +            env->banked_spsr[1] =3D env->banked_spsr[0];
+>=20
+> What is going on here? Architecturally, AArch64 SPSR_EL1
+> is mapped to AArch32 SPSR_svc, which is env->banked_spsr[1].
+> env->banked_spsr[0] would be the SPSR for USR and SYS, except
+> they don't have an SPSR (you cannot take exceptions into them).
+> I think QEMU just has a banked_spsr[0] for convenience of
+> implementation and it should never actually be used.
+> Is this code just working around the QEMU SPSR_EL1 bug?
+>=20
+
+no, the idea was just to let the loop below just work.  We accomplish
+this by taking the AArch64 spsr (which is stored in banked_spsr[0]) and
+copying it into banked_spsr[1], which is not used in AArch64 and we can
+do the QEMU's spsr are indexed at kvm-index + 1.
+
+
+
+> > +            i =3D bank_number(env->uncached_cpsr & CPSR_M);
+> > +            env->banked_spsr[i] =3D env->spsr;
+> > +        }
+> > +    }
+> > +
+> >      for (i =3D 0; i < KVM_NR_SPSR; i++) {
+> >          reg.id =3D AARCH64_CORE_REG(spsr[i]);
+> > -        reg.addr =3D (uintptr_t) &env->banked_spsr[i - 1];
+> > +        reg.addr =3D (uintptr_t) &env->banked_spsr[i+1];
+>=20
+> Coding style demands spaces around the "+" operator.
+>=20
+> Note that this code is implicitly relying on the
+> ordering of register banks defined by the bank_number()
+> function, which is a bit icky.
+
+right, I thought you wrote this code with some deeper intention of doin=
+g
+it this way so I tried to stick with the general idea - but now I
+actually looked at git blame and realized that you didn't even write it=
+=2E
+
+Given all this churn around this, probably it's much cleaner to get rid
+of the loop and have an explicit sync for each architecturally
+implemented register, i.e. the SPSR_EL1 and the various mode-specific
+AArch32 SPSR registers?
+
+>=20
+> >          ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
+> >          if (ret) {
+> >              return ret;
+> > @@ -254,6 +275,7 @@ int kvm_arch_get_registers(CPUState *cs)
+> >      struct kvm_one_reg reg;
+> >      uint64_t val;
+> >      uint32_t fpr;
+> > +    unsigned int el;
+> >      int i;
+> >      int ret;
+> >
+> > @@ -326,15 +348,34 @@ int kvm_arch_get_registers(CPUState *cs)
+> >          return ret;
+> >      }
+> >
+> > +    /* Fetch the SPSR registers
+> > +     *
+> > +     * KVM has an array of state indexed for all the possible aarc=
+h32
+> > +     * privilege levels. These map onto QEMUs aarch32 banks 1 - 4.
+>=20
+> QEMU's. AArch32. Also, you mean "1 - 5".
+>=20
+> > +     */
+> >      for (i =3D 0; i < KVM_NR_SPSR; i++) {
+> >          reg.id =3D AARCH64_CORE_REG(spsr[i]);
+> > -        reg.addr =3D (uintptr_t) &env->banked_spsr[i - 1];
+> > +        reg.addr =3D (uintptr_t) &env->banked_spsr[i+1];
+>=20
+> Spaces again.
+>=20
+> >          ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
+> >          if (ret) {
+> >              return ret;
+> >          }
+> >      }
+> >
+> > +    el =3D arm_current_el(env);
+> > +    if (el > 0) {
+> > +        if (is_a64(env)) {
+> > +            g_assert(el =3D=3D 1);
+> > +            /* KVM_SPSR_SVC holds the AARCH64 EL1 SPSR which QEMU
+> > +             * keeps in bank 0 so copy it across. */
+> > +            env->banked_spsr[0] =3D env->banked_spsr[1];
+> > +            i =3D aarch64_banked_spsr_index(el);
+>=20
+> More workarounds for a bug we should just fix, I think.
+>=20
+
+again, this is just for the loop above to be generic, and then fix
+things up afterwards so that things work both for is_a64() and
+!is_a64().
+
+Thanks,
 -Christoffer
