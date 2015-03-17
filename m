@@ -1,66 +1,60 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2] target-arm: Store SPSR_EL1 state in banked_spsr[1]
- (SPSR_svc)
-Date: Tue, 17 Mar 2015 19:44:47 +0000
-Message-ID: <CAFEAcA9CMAG3sU5dH7mo4YVuqC5EeoTD3PTS2BypNcG7wAKxnA@mail.gmail.com>
-References: <1426620735-2454-1-git-send-email-peter.maydell@linaro.org>
- <20150317193816.GB23225@cbox>
+From: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v14 19/20] vfio: initialize the virqfd workqueue in VFIO
+ generic code
+Date: Tue, 17 Mar 2015 16:29:28 -0600
+Message-ID: <1426631368.3643.348.camel@redhat.com>
+References: <1425315600-29761-1-git-send-email-b.reynal@virtualopensystems.com>
+	 <1425315600-29761-20-git-send-email-b.reynal@virtualopensystems.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9850848FB3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Mar 2015 15:38:32 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qiuYVPKacyMO for <kvmarm@lists.cs.columbia.edu>;
- Tue, 17 Mar 2015 15:38:31 -0400 (EDT)
-Received: from mail-ig0-f173.google.com (mail-ig0-f173.google.com
- [209.85.213.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9089948FB2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Mar 2015 15:38:31 -0400 (EDT)
-Received: by igcau2 with SMTP id au2so44265122igc.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 17 Mar 2015 12:45:08 -0700 (PDT)
-In-Reply-To: <20150317193816.GB23225@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Greg Bellows <greg.bellows@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1425315600-29761-20-git-send-email-b.reynal@virtualopensystems.com>
+Sender: kvm-owner@vger.kernel.org
+To: Baptiste Reynal <b.reynal@virtualopensystems.com>
+Cc: iommu@lists.linux-foundation.org, kvmarm@lists.cs.columbia.edu, tech@virtualopensystems.com, Antonios Motakis <a.motakis@virtualopensystems.com>, Gavin Shan <gwshan@linux.vnet.ibm.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Wei Yang <weiyang@linux.vnet.ibm.com>, "open list:VFIO DRIVER" <kvm@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17 March 2015 at 19:38, Christoffer Dall <christoffer.dall@linaro.org> wrote:
-> On Tue, Mar 17, 2015 at 07:32:15PM +0000, Peter Maydell wrote:
->> The AArch64 SPSR_EL1 register is architecturally mandated to
->> be mapped to the AArch32 SPSR_svc register. This means its
->> state should live in QEMU's env->banked_spsr[1] field.
->> Correct the various places in the code that incorrectly
->> put it in banked_spsr[0].
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->
-> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+On Mon, 2015-03-02 at 17:59 +0100, Baptiste Reynal wrote:
+> From: Antonios Motakis <a.motakis@virtualopensystems.com>
+> 
+> Now we have finally completely decoupled virqfd from VFIO_PCI. We can
+> initialize it from the VFIO generic code, in order to safely use it from
+> multiple independent VFIO bus drivers.
+> 
+> Signed-off-by: Antonios Motakis <a.motakis@virtualopensystems.com>
+> Signed-off-by: Baptiste Reynal <b.reynal@virtualopensystems.com>
+> ---
+>  drivers/vfio/Makefile       | 4 +++-
+>  drivers/vfio/pci/Makefile   | 3 +--
+>  drivers/vfio/pci/vfio_pci.c | 8 --------
+>  drivers/vfio/vfio.c         | 8 ++++++++
+>  4 files changed, 12 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/vfio/Makefile b/drivers/vfio/Makefile
+> index dadf0ca..d798b09 100644
+> --- a/drivers/vfio/Makefile
+> +++ b/drivers/vfio/Makefile
+> @@ -1,4 +1,6 @@
+> -obj-$(CONFIG_VFIO) += vfio.o
+> +vfio_core-y := vfio.o virqfd.o
+> +
+> +obj-$(CONFIG_VFIO) += vfio_core.o
+>  obj-$(CONFIG_VFIO_IOMMU_TYPE1) += vfio_iommu_type1.o
+>  obj-$(CONFIG_VFIO_IOMMU_SPAPR_TCE) += vfio_iommu_spapr_tce.o
+>  obj-$(CONFIG_VFIO_SPAPR_EEH) += vfio_spapr_eeh.o
 
-Thanks. It also occurs to me that we could avoid some of these
-magic 1/6/7 numbers by defining some constants BANK_USR,
-BANK_SVC, BANK_ABT, etc for the return values from bank_number
-(ie the indexes into env->banked_* arrays),
-and then using them where we need to refer to particular
-banked_* entries elsewhere. Then for instance this array
-in aarch64_banked_spsr_index() looks like
+This inadvertently (I assume) renames the main vfio module to vfio_core.
+That potentially breaks numerous userspace scripts that might try to
+load the "vfio" module.  I don't think that's acceptable.  A brute force
+way to fix this would be to rename vfio.c to vfio_core.c and change the
+Makefile to:
 
-         [1] = BANK_SVC, /* EL1.  */
-         [2] = BANK_HYP, /* EL2.  */
-         [3] = BANK_MON, /* EL3.  */
+vfio-y := vfio_core.o virqfd.o
+obj-$(CONFIG_VFIO) += vfio.o
 
-and the mapping between the AArch32 and AArch64 SPSRs is
-suddenly much more obvious and easy to check.
+Is there any other trickery available to us that could include virqfd.o
+in vfio.o w/o source file renaming?  Thanks,
 
--- PMM
+Alex
+
