@@ -1,7 +1,7 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [RFC PATCH 2/4] HACK: linux header update
-Date: Wed, 18 Mar 2015 15:11:46 -0400
-Message-ID: <1426705908-2765-3-git-send-email-drjones@redhat.com>
+Subject: [RFC PATCH 4/4] vga: flag vram as uncached
+Date: Wed, 18 Mar 2015 15:11:48 -0400
+Message-ID: <1426705908-2765-5-git-send-email-drjones@redhat.com>
 References: <1426705700-2564-1-git-send-email-drjones@redhat.com>
  <1426705908-2765-1-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
@@ -9,14 +9,14 @@ Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 25FC0491C7
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EDE0C491C3
  for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Mar 2015 15:05:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WBPGdoy+TyL7 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id ZodgmrbbrWPF for <kvmarm@lists.cs.columbia.edu>;
  Wed, 18 Mar 2015 15:05:22 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 30F25491C9
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 32B05491CB
  for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Mar 2015 15:05:21 -0400 (EDT)
 In-Reply-To: <1426705908-2765-1-git-send-email-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -32,32 +32,25 @@ To: kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, ard.biesheuvel@linaro.o
 Cc: catalin.marinas@arm.com, lersek@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Should do a proper update-linux-headers.sh update.
+Video RAM is typically mapped as uncached by guests. Flag it as
+such.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- linux-headers/linux/kvm.h | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/display/vga.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 60a54c82a3b76..34c03cd80aa69 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -108,6 +108,7 @@ struct kvm_userspace_memory_region {
-  */
- #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
- #define KVM_MEM_READONLY	(1UL << 1)
-+#define KVM_MEM_UNCACHED	(1UL << 2)
- 
- /* for KVM_IRQ_LINE */
- struct kvm_irq_level {
-@@ -760,6 +761,7 @@ struct kvm_ppc_smmu_info {
- #define KVM_CAP_PPC_ENABLE_HCALL 104
- #define KVM_CAP_CHECK_EXTENSION_VM 105
- #define KVM_CAP_S390_USER_SIGP 106
-+#define KVM_CAP_UNCACHED_MEM 107
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
+diff --git a/hw/display/vga.c b/hw/display/vga.c
+index c0f7b343bbab5..5c8c249a8d780 100644
+--- a/hw/display/vga.c
++++ b/hw/display/vga.c
+@@ -2143,6 +2143,7 @@ void vga_common_init(VGACommonState *s, Object *obj, bool global_vmstate)
+     s->is_vbe_vmstate = 1;
+     memory_region_init_ram(&s->vram, obj, "vga.vram", s->vram_size,
+                            &error_abort);
++    memory_region_set_uncached(&s->vram);
+     vmstate_register_ram(&s->vram, global_vmstate ? NULL : DEVICE(obj));
+     xen_register_framebuffer(&s->vram);
+     s->vram_ptr = memory_region_get_ram_ptr(&s->vram);
 -- 
 1.8.3.1
