@@ -1,24 +1,24 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [RFC PATCH 4/4] vga: flag vram as uncached
-Date: Wed, 18 Mar 2015 15:11:48 -0400
-Message-ID: <1426705908-2765-5-git-send-email-drjones@redhat.com>
+Subject: Re: the arm cache coherency cluster "v2"
+Date: Wed, 18 Mar 2015 20:18:20 +0100
+Message-ID: <20150318191819.GB7077@hawk.usersys.redhat.com>
 References: <1426705700-2564-1-git-send-email-drjones@redhat.com>
- <1426705908-2765-1-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EDE0C491C3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Mar 2015 15:05:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 34D2C491D0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Mar 2015 15:11:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZodgmrbbrWPF for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Mar 2015 15:05:22 -0400 (EDT)
+ with ESMTP id ZmILWfLZE8Rd for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Mar 2015 15:11:53 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 32B05491CB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Mar 2015 15:05:21 -0400 (EDT)
-In-Reply-To: <1426705908-2765-1-git-send-email-drjones@redhat.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 11316491C7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Mar 2015 15:11:52 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <1426705700-2564-1-git-send-email-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,25 +32,38 @@ To: kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, ard.biesheuvel@linaro.o
 Cc: catalin.marinas@arm.com, lersek@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Video RAM is typically mapped as uncached by guests. Flag it as
-such.
+On Wed, Mar 18, 2015 at 03:08:20PM -0400, Andrew Jones wrote:
+> In reply to this message I'll send two series' one for KVM and
+> one for QEMU. The two series' are their respective component
+> complements, and attempt to implement cache coherency for arm
+> guests using emulated devices, where the emulator (qemu) uses
+> cached memory for the device memory, but the guest uses
+> uncached - as device memory is generally used. Right now I've
+> just focused on VGA vram.
+> 
+> This approach is the "MADV_UNCACHED" type that Paolo suggested.
+> This type of approach could also be described as "make userspace's
+> memory access type match the expected access type of the guest",
+> and Mario has suggested using a memory driver, which could have
+> the same result.
+> 
+> The coming series' is inspired by both Paolo's and Mario's
+> suggestions, but it uses a kvm memslot flag, rather than an
+> madvise flag, and thus for the memory driver, it's just KVM.
+> 
+> See the thread
+> 
+> https://lists.gnu.org/archive/html/qemu-devel/2015-03/msg01254.html
+> 
+> for some more background.
+> 
+> Thanks in advance for comments.
+> 
+> drew
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- hw/display/vga.c | 1 +
- 1 file changed, 1 insertion(+)
+I forgot to mention that I've done some light testing with this.
+It seems to work, and without (to eye) noticeable performance
+degradation.
 
-diff --git a/hw/display/vga.c b/hw/display/vga.c
-index c0f7b343bbab5..5c8c249a8d780 100644
---- a/hw/display/vga.c
-+++ b/hw/display/vga.c
-@@ -2143,6 +2143,7 @@ void vga_common_init(VGACommonState *s, Object *obj, bool global_vmstate)
-     s->is_vbe_vmstate = 1;
-     memory_region_init_ram(&s->vram, obj, "vga.vram", s->vram_size,
-                            &error_abort);
-+    memory_region_set_uncached(&s->vram);
-     vmstate_register_ram(&s->vram, global_vmstate ? NULL : DEVICE(obj));
-     xen_register_framebuffer(&s->vram);
-     s->vram_ptr = memory_region_get_ram_ptr(&s->vram);
--- 
-1.8.3.1
+Thanks,
+drew
