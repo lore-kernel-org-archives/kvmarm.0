@@ -1,7 +1,7 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [RFC PATCH 3/4] memory: add uncached flag
-Date: Wed, 18 Mar 2015 15:11:47 -0400
-Message-ID: <1426705908-2765-4-git-send-email-drjones@redhat.com>
+Subject: [RFC PATCH 1/4] kvm-all: put kvm_mem_flags to more work
+Date: Wed, 18 Mar 2015 15:11:45 -0400
+Message-ID: <1426705908-2765-2-git-send-email-drjones@redhat.com>
 References: <1426705700-2564-1-git-send-email-drjones@redhat.com>
  <1426705908-2765-1-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
@@ -9,15 +9,15 @@ Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 507DE491B8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Mar 2015 15:05:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A5DC49191
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Mar 2015 15:05:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ipRJbHFNz5lj for <kvmarm@lists.cs.columbia.edu>;
- Wed, 18 Mar 2015 15:05:19 -0400 (EDT)
+ with ESMTP id 5GjL83ewMVha for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 18 Mar 2015 15:05:18 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6486649191
- for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Mar 2015 15:05:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C8487491B4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 18 Mar 2015 15:05:17 -0400 (EDT)
 In-Reply-To: <1426705908-2765-1-git-send-email-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,118 +32,102 @@ To: kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, ard.biesheuvel@linaro.o
 Cc: catalin.marinas@arm.com, lersek@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add an 'uncached' flag, which will result in the KVM_MEM_UNCACHED
-flag getting set on KVM's corresponding memory slot.
+Currently kvm_mem_flags just translates bools to bits, let's
+make it also determine the bools first. This avoids its parameter
+list growing each time we add a flag.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- include/exec/memory.h | 25 +++++++++++++++++++++++++
- kvm-all.c             |  9 +++++++++
- memory.c              | 15 +++++++++++++++
- 3 files changed, 49 insertions(+)
+ kvm-all.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 06ffa1d185b93..2a0d016f5fe6d 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -158,6 +158,7 @@ struct MemoryRegion {
-     bool rom_device;
-     bool warning_printed; /* For reservations */
-     bool flush_coalesced_mmio;
-+    bool uncached;
-     MemoryRegion *alias;
-     hwaddr alias_offset;
-     int32_t priority;
-@@ -778,6 +779,30 @@ void memory_region_set_flush_coalesced(MemoryRegion *mr);
- void memory_region_clear_flush_coalesced(MemoryRegion *mr);
- 
- /**
-+ * memory_region_set_uncached: Flag this memory region (for e.g. kvm) as
-+ *                             typically being mapped uncached.
-+ *
-+ * @mr: the memory region to be updated.
-+ */
-+void memory_region_set_uncached(MemoryRegion *mr);
-+
-+/**
-+ * memory_region_clear_uncached: Remove the 'uncached' flag.
-+ *
-+ * @mr: the memory region to be updated.
-+ */
-+void memory_region_clear_uncached(MemoryRegion *mr);
-+
-+/**
-+ * memory_region_may_map_uncached: Return the 'uncached' flag, which
-+ *                                 indicates the region is typically
-+ *                                 mapped uncached.
-+ *
-+ * @mr: the memory region to check.
-+ */
-+bool memory_region_may_map_uncached(MemoryRegion *mr);
-+
-+/**
-  * memory_region_add_eventfd: Request an eventfd to be triggered when a word
-  *                            is written to a location.
-  *
 diff --git a/kvm-all.c b/kvm-all.c
-index a1bc05a8d5c5c..4c826d0eab37b 100644
+index 55025cc366992..a1bc05a8d5c5c 100644
 --- a/kvm-all.c
 +++ b/kvm-all.c
-@@ -126,6 +126,7 @@ bool kvm_gsi_routing_allowed;
- bool kvm_gsi_direct_mapping;
- bool kvm_allowed;
- bool kvm_readonly_mem_allowed;
-+bool kvm_uncached_mem_allowed;
- bool kvm_vm_attributes_allowed;
+@@ -295,10 +295,14 @@ err:
+  * dirty pages logging control
+  */
  
- static const KVMCapabilityInfo kvm_required_capabilites[] = {
-@@ -306,6 +307,9 @@ static int kvm_mem_flags(MemoryRegion *mr)
+-static int kvm_mem_flags(KVMState *s, bool log_dirty, bool readonly)
++static int kvm_mem_flags(MemoryRegion *mr)
+ {
++    bool readonly = mr->readonly || memory_region_is_romd(mr);
+     int flags = 0;
+-    flags = log_dirty ? KVM_MEM_LOG_DIRTY_PAGES : 0;
++
++    if (memory_region_is_logging(mr)) {
++        flags |= KVM_MEM_LOG_DIRTY_PAGES;
++    }
      if (readonly && kvm_readonly_mem_allowed) {
          flags |= KVM_MEM_READONLY;
      }
-+    if (memory_region_may_map_uncached(mr) && kvm_uncached_mem_allowed) {
-+        flags |= KVM_MEM_UNCACHED;
+@@ -313,7 +317,10 @@ static int kvm_slot_dirty_pages_log_change(KVMSlot *mem, bool log_dirty)
+ 
+     old_flags = mem->flags;
+ 
+-    flags = (mem->flags & ~mask) | kvm_mem_flags(s, log_dirty, false);
++    flags = mem->flags & ~mask;
++    if (log_dirty) {
++        flags |= KVM_MEM_LOG_DIRTY_PAGES;
 +    }
-     return flags;
- }
+     mem->flags = flags;
  
-@@ -1595,6 +1599,11 @@ static int kvm_init(MachineState *ms)
-         (kvm_check_extension(s, KVM_CAP_READONLY_MEM) > 0);
- #endif
+     /* If nothing changed effectively, no need to issue ioctl */
+@@ -643,9 +650,7 @@ static void kvm_set_phys_mem(MemoryRegionSection *section, bool add)
+     KVMSlot *mem, old;
+     int err;
+     MemoryRegion *mr = section->mr;
+-    bool log_dirty = memory_region_is_logging(mr);
+     bool writeable = !mr->readonly && !mr->rom_device;
+-    bool readonly_flag = mr->readonly || memory_region_is_romd(mr);
+     hwaddr start_addr = section->offset_within_address_space;
+     ram_addr_t size = int128_get64(section->size);
+     void *ram = NULL;
+@@ -689,7 +694,7 @@ static void kvm_set_phys_mem(MemoryRegionSection *section, bool add)
+             (ram - start_addr == mem->ram - mem->start_addr)) {
+             /* The new slot fits into the existing one and comes with
+              * identical parameters - update flags and done. */
+-            kvm_slot_dirty_pages_log_change(mem, log_dirty);
++            kvm_slot_dirty_pages_log_change(mem, memory_region_is_logging(mr));
+             return;
+         }
  
-+#ifdef KVM_CAP_UNCACHED_MEM
-+    kvm_uncached_mem_allowed =
-+        (kvm_check_extension(s, KVM_CAP_UNCACHED_MEM) > 0);
-+#endif
-+
-     kvm_eventfds_allowed =
-         (kvm_check_extension(s, KVM_CAP_IOEVENTFD) > 0);
+@@ -722,7 +727,7 @@ static void kvm_set_phys_mem(MemoryRegionSection *section, bool add)
+             mem->memory_size = old.memory_size;
+             mem->start_addr = old.start_addr;
+             mem->ram = old.ram;
+-            mem->flags = kvm_mem_flags(s, log_dirty, readonly_flag);
++            mem->flags = kvm_mem_flags(mr);
  
-diff --git a/memory.c b/memory.c
-index ee3f2a8a954ef..495cec1b6650c 100644
---- a/memory.c
-+++ b/memory.c
-@@ -1549,6 +1549,21 @@ void memory_region_clear_flush_coalesced(MemoryRegion *mr)
-     }
- }
+             err = kvm_set_user_memory_region(s, mem);
+             if (err) {
+@@ -743,7 +748,7 @@ static void kvm_set_phys_mem(MemoryRegionSection *section, bool add)
+             mem->memory_size = start_addr - old.start_addr;
+             mem->start_addr = old.start_addr;
+             mem->ram = old.ram;
+-            mem->flags =  kvm_mem_flags(s, log_dirty, readonly_flag);
++            mem->flags =  kvm_mem_flags(mr);
  
-+void memory_region_set_uncached(MemoryRegion *mr)
-+{
-+    mr->uncached = true;
-+}
-+
-+void memory_region_clear_uncached(MemoryRegion *mr)
-+{
-+    mr->uncached = false;
-+}
-+
-+bool memory_region_may_map_uncached(MemoryRegion *mr)
-+{
-+    return mr->uncached;
-+}
-+
- void memory_region_add_eventfd(MemoryRegion *mr,
-                                hwaddr addr,
-                                unsigned size,
+             err = kvm_set_user_memory_region(s, mem);
+             if (err) {
+@@ -767,7 +772,7 @@ static void kvm_set_phys_mem(MemoryRegionSection *section, bool add)
+             size_delta = mem->start_addr - old.start_addr;
+             mem->memory_size = old.memory_size - size_delta;
+             mem->ram = old.ram + size_delta;
+-            mem->flags = kvm_mem_flags(s, log_dirty, readonly_flag);
++            mem->flags = kvm_mem_flags(mr);
+ 
+             err = kvm_set_user_memory_region(s, mem);
+             if (err) {
+@@ -789,7 +794,7 @@ static void kvm_set_phys_mem(MemoryRegionSection *section, bool add)
+     mem->memory_size = size;
+     mem->start_addr = start_addr;
+     mem->ram = ram;
+-    mem->flags = kvm_mem_flags(s, log_dirty, readonly_flag);
++    mem->flags = kvm_mem_flags(mr);
+ 
+     err = kvm_set_user_memory_region(s, mem);
+     if (err) {
 -- 
 1.8.3.1
