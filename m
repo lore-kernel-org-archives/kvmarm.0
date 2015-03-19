@@ -1,24 +1,26 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH 0/3] KVM: Introduce KVM_MEM_UNCACHED
-Date: Thu, 19 Mar 2015 17:56:20 +0100
-Message-ID: <550AFFB4.1000504@redhat.com>
-References: <1426705700-2564-1-git-send-email-drjones@redhat.com>
- <1426705833-2679-1-git-send-email-drjones@redhat.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [PATCH v12 1/9] linux-headers: update VFIO header for VFIO
+ platform/amba drivers
+Date: Thu, 19 Mar 2015 17:16:33 +0000
+Message-ID: <1426785402-2091-2-git-send-email-eric.auger@linaro.org>
+References: <1426785402-2091-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CFDCF4930A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 12:50:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8360E4933A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 13:10:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3AYVaQAqGotz for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Mar 2015 12:49:57 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 207FD492E3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 12:49:56 -0400 (EDT)
-In-Reply-To: <1426705833-2679-1-git-send-email-drjones@redhat.com>
+ with ESMTP id JTCLeqrQtrF0 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Mar 2015 13:10:08 -0400 (EDT)
+Received: from mail-wg0-f54.google.com (mail-wg0-f54.google.com [74.125.82.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C9EA49330
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 13:10:07 -0400 (EDT)
+Received: by wgbcc7 with SMTP id cc7so68262372wgb.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 10:16:49 -0700 (PDT)
+In-Reply-To: <1426785402-2091-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,47 +30,53 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, ard.biesheuvel@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org
-Cc: catalin.marinas@arm.com, lersek@redhat.com
+To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, peter.maydell@linaro.org, agraf@suse.de
+Cc: patches@linaro.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Update according to the vfio.h header found in
+ssh://git@git.linaro.org/people/eric.auger/linux.git
+branch 4.0-rc3-v14
 
+---
 
-On 18/03/2015 20:10, Andrew Jones wrote:
-> Introduce a new memory region flag, KVM_MEM_UNCACHED, which
-> is needed by ARM. This flag informs KVM that the given memory
-> region is typically mapped by the guest as uncached. KVM for
-> ARM then maps that region as uncached for userspace as well,
-> in order to keep coherency.
-> 
-> Andrew Jones (3):
->   KVM: promote KVM_MEMSLOT_INCOHERENT to uapi
->   arm/arm64: KVM: decouple READONLY and UNCACHED
->   arm/arm64: KVM: implement KVM_MEM_UNCACHED
-> 
->  Documentation/virtual/kvm/api.txt | 16 ++++---
->  arch/arm/include/asm/kvm_mmu.h    |  9 ++++
->  arch/arm/include/uapi/asm/kvm.h   |  2 +
->  arch/arm/kvm/arm.c                |  1 +
->  arch/arm/kvm/mmu.c                | 90 ++++++++++++++++++++++++++++++++++-----
->  arch/arm64/include/asm/kvm_mmu.h  |  9 ++++
->  arch/arm64/include/uapi/asm/kvm.h |  2 +
->  include/linux/kvm_host.h          |  1 -
->  include/uapi/linux/kvm.h          |  2 +
->  virt/kvm/kvm_main.c               |  7 ++-
->  10 files changed, 121 insertions(+), 18 deletions(-)
-> 
+v10 -> v11:
+- only includes header modifications related to vfio platform
+  driver v14 and not those related to
+  "vfio: type1: support for ARM SMMUS with VFIO_IOMMU_TYPE1"
+---
+ linux-headers/linux/vfio.h | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-I think the pinning breaks running KVM as non-root (the default ulimit
--l is just 64 KiB).  Can you do something about it with the MMU
-notifiers instead?
-
-It looks very clean.
-
-The fly in the ointment is that some kind of quirk is probably needed in
-the future for ivshmem---it's definitely not acceptable performance-wise
-to mark it uncached, neither in the guests not in the host.  On the
-other hand that quirk would be necessary only in the guest, not in the
-firmware, so we can live with a mixture of the two approaches.
-
-Paolo
+diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
+index 95ba870..b57b750 100644
+--- a/linux-headers/linux/vfio.h
++++ b/linux-headers/linux/vfio.h
+@@ -8,8 +8,8 @@
+  * it under the terms of the GNU General Public License version 2 as
+  * published by the Free Software Foundation.
+  */
+-#ifndef VFIO_H
+-#define VFIO_H
++#ifndef _UAPIVFIO_H
++#define _UAPIVFIO_H
+ 
+ #include <linux/types.h>
+ #include <linux/ioctl.h>
+@@ -160,6 +160,8 @@ struct vfio_device_info {
+ 	__u32	flags;
+ #define VFIO_DEVICE_FLAGS_RESET	(1 << 0)	/* Device supports reset */
+ #define VFIO_DEVICE_FLAGS_PCI	(1 << 1)	/* vfio-pci device */
++#define VFIO_DEVICE_FLAGS_PLATFORM (1 << 2)	/* vfio-platform device */
++#define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
+ 	__u32	num_regions;	/* Max region index + 1 */
+ 	__u32	num_irqs;	/* Max IRQ index + 1 */
+ };
+@@ -495,4 +497,4 @@ struct vfio_eeh_pe_op {
+ 
+ /* ***************************************************************** */
+ 
+-#endif /* VFIO_H */
++#endif /* _UAPIVFIO_H */
+-- 
+1.8.3.2
