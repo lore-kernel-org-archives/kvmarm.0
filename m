@@ -1,24 +1,26 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v12 0/9] KVM platform device passthrough
-Date: Thu, 19 Mar 2015 17:16:32 +0000
-Message-ID: <1426785402-2091-1-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v12 2/9] hw/vfio/platform: vfio-platform skeleton
+Date: Thu, 19 Mar 2015 17:16:34 +0000
+Message-ID: <1426785402-2091-3-git-send-email-eric.auger@linaro.org>
+References: <1426785402-2091-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A2AF49330
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 13:10:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DF0E249330
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 13:10:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9NBn5QVT24Sg for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Mar 2015 13:10:08 -0400 (EDT)
-Received: from mail-we0-f181.google.com (mail-we0-f181.google.com
- [74.125.82.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6CA6949333
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 13:10:07 -0400 (EDT)
-Received: by wegp1 with SMTP id p1so62841375weg.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 10:16:48 -0700 (PDT)
+ with ESMTP id Kamu6HscYzW6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Mar 2015 13:10:09 -0400 (EDT)
+Received: from mail-wi0-f169.google.com (mail-wi0-f169.google.com
+ [209.85.212.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 416B549334
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 13:10:08 -0400 (EDT)
+Received: by wibg7 with SMTP id g7so123876170wib.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 10:16:50 -0700 (PDT)
+In-Reply-To: <1426785402-2091-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,172 +34,517 @@ To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, alex.willia
 Cc: patches@linaro.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhpcyBzZXJpZXMgYWltcyBhdCBlbmFibGluZyBLVk0gcGxhdGZvcm0gZGV2aWNlIHBhc3N0aHJv
-dWdoLgoKS2VybmVsIGRlcGVuZGVuY2llcyB3ZXJlIHB1bGxlZCBmb3IgNC4xLXJjMCAodmZpbyBw
-bGF0Zm9ybSBkcml2ZXIgYW5kCmlycWZkIGZvciBBUk0pCgpUaGlzIHNlcmllcyBub3cgb25seSBy
-ZWxpZXMgb24gdGhlIGZvbGxvd2luZyBRRU1VIHNlcmllcyB0aGF0IGFsbG93cwp0byBpbnN0YW50
-aWF0ZSB0aGUgVkZJTyBwbGF0Zm9ybSBkZXZpY2UgZnJvbSBRRU1VIGNvbW1hbmQgbGluZToKClsx
-XSBbUEFUQ0ggdjExIDAvNF0gbWFjaHZpcnQgZHluYW1pYyBzeXNidXMgZGV2aWNlIGluc3RhbnRp
-YXRpb24KICAgIGh0dHBzOi8vbGlzdHMuZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVtdS1kZXZlbC8y
-MDE1LTAzL21zZzAwODA0Lmh0bWwKCkJvdGggc2VyaWVzIGFyZSBjYW5kaWRhdGUgZm9yIFFFTVUg
-Mi40LgoKLSBRRU1VIHBpZWNlcyBjYW4gYmUgZm91bmQgYXQ6CiAgaHR0cDovL2dpdC5saW5hcm8u
-b3JnL3Blb3BsZS9lcmljLmF1Z2VyL3FlbXUuZ2l0CiAgKGJyYW5jaCB2ZmlvX2ludGVnX3YxMikK
-Ci0ga2VybmVsIHBpZWNlcyBjYW4gYmUgZm91bmQgYXQ6CiAgaHR0cDovL2dpdC5saW5hcm8ub3Jn
-L3Blb3BsZS9lcmljLmF1Z2VyL2xpbnV4LmdpdAogIChicmFuY2ggdmZpb19pbnRlZ192MTJfa2Vy
-bmVsKQoKVGhlIHNlcmllcyB3YXMgdGVzdGVkIG9uIENhbHhlZGEgTWlkd2F5IChBUk12Nykgd2hl
-cmUgb25lIHhnbWFjCmlzIGFzc2lnbmVkIHRvIEtWTSBob3N0IHdoaWxlIHRoZSBzZWNvbmQgb25l
-IGlzIGFzc2lnbmVkIHRvIHRoZSBndWVzdC4KCldpa2kgZm9yIENhbHhlZGEgTWlkd2F5IHNldHVw
-OgpodHRwczovL3dpa2kubGluYXJvLm9yZy9MRUcvRW5naW5lZXJpbmcvVmlydHVhbGl6YXRpb24v
-UGxhdGZvcm1fRGV2aWNlX1Bhc3N0aHJvdWdoX29uX01pZHdheQoKSGlzdG9yeToKCnYxMS0+djEy
-OgotIGFkZCB4LW1tYXAgcHJvcGVydHkgZGVmaW5pdGlvbiwgd2l0aG91dCB3aGljaCB0aGUgZGVm
-YXVsdCB2YWx1ZSBvZgogIHZiYXNlZGV2LmFsbG93X21tYXAgaXMgZmFsc2UsIGhlbmNlIHByZXZl
-bnRpbmcgdGhlIHJlZyBzcGFjZSBmcm9tCiAgYmVpbmcgbW1hcHBlZC4KCnYxMC0+djExOgotIHJl
-YmFzZSBvbnRvIHYyLjMuMC1yYzAgKG1haW5seSByZWxhdGVkIHRvIFBDSWUgc3VwcG9ydCBpbiB2
-aXJ0KQotIGFkZCBkbWEtY29oZXJlbnQgcHJvcGVydHkgZm9yIGNhbHhlZGEgbWlkd2F5IChmaXgg
-cmV2ZWFsZWQgYnkgcmVtb3ZhbAogIG9mIGtlcm5lbC1zaWRlICJ2ZmlvOiB0eXBlMTogc3VwcG9y
-dCBmb3IgQVJNIFNNTVVTIHdpdGggVkZJT19JT01NVV9UWVBFMSIpCi0gdmlydCBtb2RpZmljYXRp
-b25zIHRvIHN0YXJ0IFZGSU8gSVJRIGZvcndhcmRpbmcgYXJlIG5vdyBpbiBhIHNlcGFyYXRlCiAg
-cGF0Y2gKLSByZWFycmFuZ2UgbGludXggaGVhZGVyIGV4cG9ydHMgKHRob3NlIGFyZSBzdGlsbCBw
-YXJ0aWFsIGV4cG9ydHMKICB3YWl0aW5nIGZvciBkZWZpbml0aXZlIDQuMS1yYzApCi0gdGFrZSBp
-bnRvIGFjY291bnQgQWxleCBCZW5uw6llIGNvbW1lbnRzOgogIC0gdXNlIGdfbWFsbG9jMF9uIGlu
-c3RlYWQgb2YgZ19tYWxsb2MwCiAgLSB1c2UgYmxvY2sgZGVjbGFyYXRpb25zIHdoZW4gcG9zc2li
-bGUKICAtIHJld29yayByZWFkbGluayByZXR1cm5lZCB2YWx1ZSB0cmVhdG1lbnQKICAtIHVzZSBn
-X3N0cmxjYXQgaW4gcGxhY2Ugc3RybmNhdAogIC0gcmUtYXJyYW5nZSBtdXRleCBsb2NraW5nIGZv
-ciBtdWx0aXBsZSBJUlEgc3VwcG9ydCAodXNlci1zaWRlIGhhbmRsZWQKICAgIGV2ZW50ZmRzKQot
-IHVzZSBnX3NucHJpbnRmIGluc3RlYWQgb2Ygc25wcmludGYKLSBjaGFuZ2UgdGhlIG9yZGVyIG9m
-IGZ1bmN0aW9ucyB0byBhdm9pZCBwcmUtZGVjbGFyYXRpb24gaW4gcGxhdGZvcm0uYwotIGFkZCBm
-bGFncyBpbiBWRklPSU5UcCBzdHJ1Y3QgdG8gZGV0ZWN0IHdoZXRoZXIgdGhlIElSUSBpcyBhdXRv
-bWFza2VkCi0gc29tZSBjb21tZW50IHJld3JpdGluZwoKdjktPnYxMDoKLSByZWJhc2Ugb24gInZm
-aW86IGNsZWFudXAgdmZpb19nZXRfZGV2aWNlIGVycm9yIHBhdGgsIHJlbW92ZQogIHZmaW9fcG9w
-dWxhdGVfZGV2aWNlIjogdmZpb19wb3B1bGF0ZV9kZXZpY2Ugbm8gbW9yZSBjYWxsZWQgaW4KICB2
-ZmlvX2dldF9kZXZpY2UgYnV0IGluIHZmaW9fYmFzZV9kZXZpY2VfaW5pdAotIHVwZGF0ZSBWRklP
-IGhlYWRlciBhY2NvcmRpbmcgdG8gdmZpbyBwbGF0Zm9ybSBkcml2ZXIgdjEzIChubyBBTUJBKQoK
-djgtPnY5OgotIHJlYmFzZSBvbiAyLjIuMCBhbmQgbWFjaHZpcnQgZHluYW1pYyBzeXNidXMgaW5z
-dGFudGlhdGlvbiB2MTAKLSB2OCAxLTExIHdlcmUgcHVsbGVkCi0gcGF0Y2ggZmlsZXMgcmVsYXRl
-ZCB0byBmb3J3YXJkaW5nIGFyZSBtb3ZlZCBpbiBhIHNlcGVyYXRlIHNlcmllcyBzaW5jZQogIGl0
-IGRlcGVuZHMgb24ga2VybmVsIHNlcmllcyBzdGlsbCBpbiBSRkMuCi0gaW50cm9kdWN0aW9uIG9m
-IGJhc2ljIFZGSU8gcGxhdGZvcm0gZGV2aWNlIHNwbGl0IGludG8gMyBwYXRjaCBmaWxlcyB0bwog
-IGVhc2UgdGhlIHJldmlldyAoaG9wZSBpdCB3aWxsIGhlbHApLgotIGFkZCBhbiBhdXRob3IgaW4g
-cGxhdGZvcm0uYwotIGFkZCBkZWFsbG9jYXRpb24gaW4gdmZpb19wb3B1bGF0ZV9kZXZpY2UgZXJy
-b3IgY2FzZQotIGFkZCBwYXRjaCBmaWxlIGRvaW5nIHRoZSBWRklPIGhlYWRlciBzeW5jCi0gdXNl
-IFZGSU9fREVWSUNFX0ZMQUdTX1BMQVRGT1JNIGluIHZmaW9fcG9wdWxhdGVfZGV2aWNlCi0gcmVu
-YW1lIGNhbHhlZGFfeGdtYWMuYyBpbnRvIGNhbHhlZGEteGdtYWMuYwotIHN5c2J1cy1mZHQ6IGFk
-ZF9jYWx4ZWRhX21pZHdheV94Z21hY19mZHRfbm9kZSBnX2ZyZWUgaW4gY2FzZSBvZiBlcnJvcnMK
-LSByZXdvcmQgb2YgbGludXgtaGVhZGVycyBwYXRjaCBmaWxlcwoKdjctPnY4OgotIHJlYmFzZSBv
-biB2Mi4yLjAtcmMzIGFuZCBpbnRlZ3JhdGUKICAiQWRkIHNraXBfZHVtcCBmbGFnIHRvIGlnbm9y
-ZSBtZW1vcnkgcmVnaW9uIGR1cmluZyBkdW1wIgotIEtWTSBoZWFkZXIgZXZvbHV0aW9uIHdpdGgg
-c3ViaW5kZXggYWRkaXRpb24gaW4ga3ZtX2FyY2hfZm9yd2FyZGVkX2lycQotIHNwbGl0IFtQQVRD
-SCB2NyAwMy8xNl0gaHcvdmZpby9wY2k6IGludHJvZHVjZSBWRklPRGV2aWNlIGludG8gNCBwYXRj
-aGVzCi0gdmZpb19jb21wdXRlX25lZWRzX3Jlc2V0IGRvZXMgbm90IHJldHVybiBib29sIGFueW1v
-cmUKLSBhZGQgc29tZSBjb21tZW50cyBhYm91dCBleHBvc2VkIE1NSU8gcmVnaW9uIGFuZCBJUlEg
-aW4gY2FseGVkYSB4Z21hYwogIGRldmljZQotIHZmaW9fW3VuXW1hc2tfaXJxaW5kZXggcmVuYW1l
-ZCBpbnRvIHZmaW9fW3VuXW1hc2tfc2luZ2xlX2lycWluZGV4Ci0gcmV3b3JrIElSUSBzdGFydHVw
-OiBmb3JtZXIgbWFjaGluZSBpbml0IGRvbmUgbm90aWZpZXIgaXMgcmVwbGFjZWQgYnkgYQogIHJl
-c2V0IG5vdGlmaWVyLiBtYWNoaW5lIGZpbGUgcGFzc2VzIHRoZSBpbnRlcnJ1cHQgY29udHJvbGxl
-cgogIERldmljZVN0YXRlIGhhbmRsZSAobm90IHRoZSBwbGF0Zm9ybSBidXMgZmlyc3QgaXJxIHBh
-cmFtZXRlcikuCi0gc3lzYnVzLWZkdDoKICAtIG1vdmUgdGhlIGFkZF9mZHRfbm9kZV9mdW5jdGlv
-bnMgYXJyYXkgZGVjbGFyYXRpb24gYmV0d2VlbiB0aGUgZGV2aWNlCiAgICBzcGVjaWZpYyBjb2Rl
-IGFuZCB0aGUgZ2VuZXJpYyBjb2RlIHRvIGF2b2lkIGZvcndhcmQgZGVjbGFyYXRpb25zIG9mCiAg
-ICBkZWNpY2Ugc3BlY2lmaWMgZnVuY3Rpb25zCiAgLSByZW5hbWUgYWRkX2Jhc2ljX3ZmaW9fZmR0
-X25vZGUgaW50byBhZGRfY2FseGVkYV9taWR3YXlfeGdtYWNfZmR0X25vZGUKICAgIGVtcGhhc2l6
-aW5nIHRoZSBmYWN0IGl0IGlzIHhnbWFjIHNwZWNpZmljCgp2Ni0+djc6Ci0gZmFrZSBpbmplY3Rp
-b24gdGVzdCBtb2RhbGl0eSByZW1vdmVkCi0gVkZJT19ERVZJQ0VfVFlQRV9QTEFURk9STSBvbmx5
-IGludHJvZHVjZWQgd2l0aCBWRklPIHBsYXRmb3JtCi0gbmV3IGhlbHBlciBmdW5jdGlvbnMgdG8g
-c3RhcnQgVkZJTyBJUlEgb24gbWFjaGluZSBpbml0IGRvbmUgbm90aWZpZXIKICAoaW50cm9kdWNl
-ZCBpbiBody92ZmlvL3BsYXRmb3JtOiBhZGQgdmZpby1wbGF0Zm9ybSBzdXBwb3J0IGFuZCBub3Rp
-ZmllcgogIHJlZ2lzdHJhdGlvbiBpbnZva2VkIGluIGh3L2FybS92aXJ0OiBhZGQgc3VwcG9ydCBm
-b3IgVkZJTyBkZXZpY2VzKS4KICB2ZmlvX3N0YXJ0X2lycV9pbmplY3Rpb24gaXMgcmVwbGFjZWQg
-YnkgdmZpb19yZWdpc3Rlcl9pcnFfc3RhcnRlci4KCnY1LT52NjoKLSByZWJhc2Ugb24gMi4xcmM1
-IFBDSSBjb2RlCi0gZm9yd2FyZGVkIElSUSBmaXJzdCBpbnRlZ3JhdG9uCi0gdmZpb19kZXZpY2Ug
-cHJvcGVydHkgcmVuYW1lZCBpbnRvIGhvc3QgcHJvcGVydHkKLSBzcGxpdCBJUlEgc2V0dXAgaW4g
-ZGlmZmVyZW50IGZ1bmN0aW9ucyB0aGF0IG1hdGNoIHRoZSAzIHN1cHBvcnRlZAogIGluamVjdGlv
-biB0ZWNobmlxdWVzICh1c2VyIGhhbmRsZWQgZXZlbnRmZCwgaXJxZmQsIGZvcndhcmRlZCBJUlEp
-OgogIHJlbW92ZXMgZHluYW1pYyBzd2l0Y2ggYmV0d2VlbiBpbmplY3Rpb24gbWV0aG9kcwotIGlu
-dHJvZHVjZSBmYWtlIGludGVycnVwdHMgYXMgYSB0ZXN0IG1vZGFsaXR5OgogIHggbWFrZXMgcG9z
-c2libGUgdG8gdGVzdCBtdWx0aXBsZSBJUlEgdXNlci1zaWRlIGhhbmRsaW5nLgogIHggdGhpcyBp
-cyBhIHRlc3QgZmVhdHVyZSBvbmx5OiBlbmFibGUgdG8gdHJpZ2dlciBhIGZkIGFzIGlmIHRoZQog
-ICAgcmVhbCBwaHlzaWNhbCBJUlEgaGl0LiBObyB2aXJ0dWFsIElSUSBpcyBpbmplY3RlZCBpbnRv
-IHRoZSBndWVzdAogICAgYnV0IGhhbmRsaW5nIGlzIHNpbXVsYXRlZCBzbyB0aGF0IHRoZSBzdGF0
-ZSBtYWNoaW5lIGNhbiBiZSB0ZXN0ZWQKLSB1c2VyIGhhbmRsZWQgZXZlbnRmZDoKICB4IGFkZCBt
-dXRleCB0byBwcm90ZWN0IElSUSBzdGF0ZSAmIGxpc3QgbWFuaXB1bGF0aW9uLAogIHggY29ycmVj
-dCBtaXNsZWFkaW5nIGNvbW1lbnQgaW4gdmZpb19pbnRwX2ludGVycnVwdC4KICB4IEZpeCBidWdz
-IHVzaW5nIGZha2UgaW50ZXJydXB0IG1vZGFsaXR5Ci0gaXJxZmQgbm8gbW9yZSBhZHZlcnRpc2Vk
-IGluIHRoaXMgcGF0Y2hzZXQgKGhhbmRsZWQgaW4gWzNdKQotIFZGSU9QbGF0Zm9ybURldmljZUNs
-YXNzIGJlY29tZXMgYWJzdHJhY3QgYW5kIENhbHhlZGEgeGdtYWMgZGV2aWNlCiAgYW5kIGNsYXNz
-IGlzIHJlLWludHJvZHVjZWQgKGFzIHBlciB2NCkKLSBhbGwgRFBSSU5URiByZW1vdmVkIGluIHBs
-YXRmb3JtIGFuZCByZXBsYWNlZCBieSB0cmFjZS1wb2ludHMKLSBjb3JyZWN0cyBjb21waWxhdGlv
-biB3aXRoIGNvbmZpZ3VyZSAtLWRpc2FibGUta3ZtCi0gc2ltcGxpZmllcyB0aGUgc3BsaXQgZm9y
-IHZmaW9fZ2V0X2RldmljZSBhbmQgaW50cm9kdWNlIGEgdW5pcXVlCiAgc3BlY2lhbGl6ZWQgZnVu
-Y3Rpb24gbmFtZWQgdmZpb19wb3B1bGF0ZV9kZXZpY2UKLSBncm91cF9saXN0IHJlbmFtZWQgaW50
-byB2ZmlvX2dyb3VwX2xpc3QKLSBody9hcm0vZHluX3N5c2J1c19kZXZ0cmVlLmMgY3VycmVudGx5
-IG9ubHkgc3VwcG9ydCB2ZmlvLWNhbHhlZGEteGdtYWMKICBpbnN0YW50aWF0aW9uLiBOZWVkcyB0
-byBiZSBzcGVjaWFsaXplZCBmb3Igb3RoZXIgVkZJTyBkZXZpY2VzCi0gZml4IDIgYnVncyBpbiBk
-eW5fc3lzYnVzX2RldnRyZWUocmVnX2F0dHIgaW5kZXggYW5kIGNvbXBhdCkKCnY0LT52NToKLSBy
-ZWJhc2Ugb24gdjIuMS4wIFBDSSBjb2RlCi0gdGFrZSBpbnRvIGFjY291bnQgQWxleCBXaWxsaWFt
-c29uIGNvbW1lbnRzIG9uIFBDSSBjb2RlIHJld29yawogIC0gdHJhY2UgdXBkYXRlcyBpbiB2Zmlv
-X3JlZ2lvbl93cml0ZS9yZWFkCiAgLSByZW1vdmUgZmQgZnJvbSBWRklPUmVnaW9uCiAgLSBnZXQv
-cHV0IGNrZWFudXAKLSBidWcgZml4OiBiYXIgcmVnaW9uJ3MgdmJhc2VkZXYgZmllbGQgZHVseSBp
-bml0aWFsaXphdGlvbgotIG1pc2MgY2xlYW51cHMgaW4gcGxhdGZvcm0gZGV2aWNlCi0gZGV2aWNl
-IHRyZWUgbm9kZSBnZW5lcmF0aW9uIHJlbW92ZWQgZnJvbSBkZXZpY2UgYW5kIGhhbmRsZWQgaW4K
-ICBody9hcm0vZHluX3N5c2J1c19kZXZ0cmVlLmMKLSByZW1vdmUgImh3L3ZmaW86IGFkZCBhbiBl
-eGFtcGxlIGNhbHhlZGFfeGdtYWMiOiB3aXRoIHJlbW92YWwgb2YKICBkZXZpY2UgdHJlZSBub2Rl
-IGdlbmVyYXRpb24gd2UgZG8gbm90IGhhdmUgc28gbWFueSB0aGluZ3MgdG8KICBpbXBsZW1lbnQg
-aW4gdGhhdCBkZXJpdmVkIGRldmljZSB5ZXQuIE1heSBiZSByZS1pbnRyb2R1Y2VkIGxhdGVyCiAg
-b24gaWYgbmVlZGVkIHR5cGljYWxseSBmb3IgcmVzZXQvbWlncmF0aW9uLgotIG5vIEdTSSByb3V0
-aW5nIHRhYmxlIGFueW1vcmUKCnYzLT52NCBjaGFuZ2VzIChFcmljIEF1Z2VyLCBBbHZpc2UgUmln
-bykKLSByZWJhc2Ugb24gbGFzdCBWRklPIFBDSSBjb2RlICh2Mi4xLjAtcmMwKQotIGZ1bGwgZ2l0
-IGhpc3RvcnkgcmV3b3JrIHRvIGVhc2UgUENJIGNvZGUgY2hhbmdlIHJldmlldwotIG12IGluY2x1
-ZGUgZmlsZXMgaW4gaHcvdmZpbwotIERQUklOVEYgcmVmb3JtYXR0aW5nIHRlbXBvcmFyaWx5IG1v
-dmVkIG91dAotIHN1cHBvcnQgb2YgVkZJTyB2aXJxIChyZW1vdmFsIG9mIHJlc2FtcGxlZmQgaGFu
-ZGxlciBvbiB1c2VyLXNpZGUpCi0gaW50ZWdyYXRpb24gd2l0aCBzeXNidXMgZHluYW1pYyBpbnN0
-YW50aWF0aW9uIGZyYW13b3JrCi0gcmVtb3ZhbCBvZiB1bnJlYWxpemUgYW5kIGNsZWFudXAgcm91
-dGluZXMgdW50aWwgaXQgaXMgYmV0dGVyCiAgdW5kZXJzdG9vZCB3aGF0IGlzIHJlYWxseSBuZWVk
-ZWQKLSBTdXBwb3J0IG9mIFZGSU8gZm9yIEFtYmEgZGV2aWNlcyBzaG91bGQgYmUgaGFuZGxlZCBp
-biBhbiBpbmhlcml0ZWQKICBkZXZpY2UgdG8gc3BlY2lhbGl6ZSB0aGUgZGV2aWNlIHRyZWUgZ2Vu
-ZXJhdGlvbiAoY2xvY2sgaGFuZGxlIGN1cnJlbnRseQogIG1pc3NpbmcgaW4gZnJhbWV3b3JrIGhv
-d2V2ZXIpCi0gIkFsd2F5cyB1c2UgZXZlbnRmZCBhcyBub3RpZnlpbmcgbWVjaGFuaXNtIiB0ZW1w
-b3JhcmlseSBtb3ZlZCBvdXQKLSBzdGF0aWMgaW5zdGFudGlhdGlvbiBpcyBub3QgbWFpbnN0cmVh
-bSAoYWx0aG91Z2ggaXQgcmVtYWlucyBwb3NzaWJsZSkKICBub3RlIGlmIHN0YXRpYyBpbnN0YW50
-aWF0aW9uIGlzIHVzZWQsIGlycWZkIG11c3QgYmUgc2V0dXAgaW4gbWFjaGluZSBmaWxlCiAgd2hl
-biB2aXJ0dWFsIElSUSBpcyBrbm93bgotIGNyZWF0ZSB0aGUgR1NJIHJvdXRpbmcgdGFibGUgb24g
-cWVtdSBzaWRlCgp2Mi0+djMgY2hhbmdlcyAoQWx2aXNlIFJpZ28sIEVyaWMgQXVnZXIpOgotIEZv
-bGxvd2luZyBBbGV4IFcgcmVjb21tYW5kYXRpb25zLCBmdXJ0aGVyIGVmZm9ydHMgdG8gZmFjdG9y
-aXplIHRoZQogIGNvZGUgYmV0d2VlbiBQQ0k6aW50cm9kdWN0aW9uIG9mIFZGSU9EZXZpY2UgYW5k
-IFZGSU9SZWdpb24KICBhcyBiYXNlIGNsYXNzZXMKLSB1bmlxdWUgcmVzZXQgaGFuZGxlciBmb3Ig
-cGxhdGZvcm0gYW5kIFBDSQotIGNsZWFudXAgZm9sbG93aW5nIEtpbSdzIGNvbW1lbnRzCi0gbXVs
-dGlwbGUgSVJRIHN1cHBvcnQgbWVjaGFuaWNzIHNob3VsZCBiZSBpbiBwbGFjZSBhbHRob3VnaCBu
-b3QKICB0ZXN0ZWQKLSBCZXR0ZXIgaGFuZGxpbmcgb2YgTU1JTyBtdWx0aXBsZSByZWdpb25zCi0g
-TmV3IGZlYXR1cmVzIGFuZCBmaXhlcyBieSBBbHZpc2UgKG11bHRpcGxlIGNvbXBhdCBzdHJpbmcs
-IGV4ZWMKICBmbGFnLCBmb3JjZSBldmVudGZkIHVzYWdlLCBhbWJhIGRldmljZSB0cmVlIHN1cHBv
-cnQpCi0gaXJxZmQgc3VwcG9ydAoKdjEtPnYyIGNoYW5nZXMgKEtpbSBQaGlsbGlwcywgRXJpYyBB
-dWdlcik6Ci0gSVJRIGluaXRpYWwgc3VwcG9ydCAobGVnYWN5IG1vZGUgd2hlcmUgZXZlbnRmZHMg
-YXJlIGhhbmRsZWQgb24KICB1c2VyIHNpZGUpCi0gaGFja2VkIGR5bmFtaWMgaW5zdGFudGlhdGlv
-bgoKdjEgKEtpbSBQaGlsbGlwcyk6Ci0gaW5pdGlhbCBzcGxpdCBiZXR3ZWVuIFBDSSBhbmQgcGxh
-dGZvcm0KLSBNTUlPIHN1cHBvcnQgb25seQotIHN0YXRpYyBpbnN0YW50aWF0aW9uCgpCZXN0IFJl
-Z2FyZHMKCkVyaWMKCgpFcmljIEF1Z2VyICg5KToKICBsaW51eC1oZWFkZXJzOiB1cGRhdGUgVkZJ
-TyBoZWFkZXIgZm9yIFZGSU8gcGxhdGZvcm0vYW1iYSBkcml2ZXJzCiAgaHcvdmZpby9wbGF0Zm9y
-bTogdmZpby1wbGF0Zm9ybSBza2VsZXRvbgogIGh3L3ZmaW8vcGxhdGZvcm06IGFkZCBpcnEgYXNz
-aWdubWVudAogIGh3L3ZmaW8vcGxhdGZvcm06IGFkZCBjYXBhYmlsaXR5IHRvIHN0YXJ0IElSUSBw
-cm9wYWdhdGlvbgogIGh3L2FybS92aXJ0OiBzdGFydCBWRklPIElSUSBwcm9wYWdhdGlvbgogIGh3
-L3ZmaW8vcGxhdGZvcm06IGNhbHhlZGEgeGdtYWMgZGV2aWNlCiAgaHcvYXJtL3N5c2J1cy1mZHQ6
-IGVuYWJsZSB2ZmlvLWNhbHhlZGEteGdtYWMgZHluYW1pYyBpbnN0YW50aWF0aW9uCiAgbGludXgt
-aGVhZGVyczogdXBkYXRlIGFybS9hcm02NCBLVk0gaGVhZGVycyBmb3IgaXJxZmQKICBody92Zmlv
-L3BsYXRmb3JtOiBhZGQgaXJxZmQgc3VwcG9ydAoKIGh3L2FybS9zeXNidXMtZmR0LmMgICAgICAg
-ICAgICAgICAgICB8ICA3MiArKysrCiBody9hcm0vdmlydC5jICAgICAgICAgICAgICAgICAgICAg
-ICAgfCAgMzQgKy0KIGh3L3ZmaW8vTWFrZWZpbGUub2JqcyAgICAgICAgICAgICAgICB8ICAgMiAr
-CiBody92ZmlvL2NhbHhlZGEteGdtYWMuYyAgICAgICAgICAgICAgfCAgNTQgKysrCiBody92Zmlv
-L3BsYXRmb3JtLmMgICAgICAgICAgICAgICAgICAgfCA3NzMgKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysKIGluY2x1ZGUvaHcvdmZpby92ZmlvLWNhbHhlZGEteGdtYWMuaCB8ICA0
-NiArKysKIGluY2x1ZGUvaHcvdmZpby92ZmlvLWNvbW1vbi5oICAgICAgICB8ICAgMSArCiBpbmNs
-dWRlL2h3L3ZmaW8vdmZpby1wbGF0Zm9ybS5oICAgICAgfCAgOTAgKysrKwogbGludXgtaGVhZGVy
-cy9hc20tYXJtL2t2bS5oICAgICAgICAgIHwgICAzICsKIGxpbnV4LWhlYWRlcnMvYXNtLWFybTY0
-L2t2bS5oICAgICAgICB8ICAgMyArCiBsaW51eC1oZWFkZXJzL2xpbnV4L3ZmaW8uaCAgICAgICAg
-ICAgfCAgIDggKy0KIHRyYWNlLWV2ZW50cyAgICAgICAgICAgICAgICAgICAgICAgICB8ICAxNCAr
-CiAxMiBmaWxlcyBjaGFuZ2VkLCAxMDgzIGluc2VydGlvbnMoKyksIDE3IGRlbGV0aW9ucygtKQog
-Y3JlYXRlIG1vZGUgMTAwNjQ0IGh3L3ZmaW8vY2FseGVkYS14Z21hYy5jCiBjcmVhdGUgbW9kZSAx
-MDA2NDQgaHcvdmZpby9wbGF0Zm9ybS5jCiBjcmVhdGUgbW9kZSAxMDA2NDQgaW5jbHVkZS9ody92
-ZmlvL3ZmaW8tY2FseGVkYS14Z21hYy5oCiBjcmVhdGUgbW9kZSAxMDA2NDQgaW5jbHVkZS9ody92
-ZmlvL3ZmaW8tcGxhdGZvcm0uaAoKLS0gCjEuOC4zLjIKCl9fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3Rz
-LmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xp
-c3RpbmZvL2t2bWFybQo=
+Minimal VFIO platform implementation supporting register space
+user mapping but not IRQ assignment.
+
+Signed-off-by: Kim Phillips <kim.phillips@linaro.org>
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
+
+---
+v11 -> v12:
+- add x-mmap property definition, without which the default value of
+  vbasedev.allow_mmap is false, hence preventing the reg space from
+  being mapped.
+
+v10 -> v11:
+x Take into account Alex Bennee's comments:
+- use g_malloc0_n instead of g_malloc0
+- use block declarations when possible
+- rework readlink returned value treatment
+- use g_strlcat in place of strncat
+x use g_snprintf in place of snprintf
+x correct error handling in vfio_populate_device,
+  in case of flag not corresponding to platform device
+x various cosmetic changes
+
+v9 -> v10:
+- vfio_populate_device no more called in common vfio_get_device
+  but in vfio_base_device_init
+
+v8 -> v9:
+- irq management is moved into a separate patch to ease the review
+- VFIO_DEVICE_FLAGS_PLATFORM is checked in vfio_populate_device
+- g_free of regions added in vfio_populate_device error label
+- virtualID becomes 32b
+
+v7 -> v8:
+- change proto of vfio_platform_compute_needs_reset and sets
+  vbasedev->needs_reset to false there
+- vfio_[un]mask_irqindex renamed into vfio_[un]mask_single_irqindex
+- vfio_register_irq_starter renamed into vfio_kick_irqs
+  we now use a reset notifier instead of a machine init done notifier.
+  Enables to get rid of the VfioIrqStarterNotifierParams dangling
+  pointer. Previously we use pbus first_irq. This is no more possible
+  since the reset notifier takes a void * and first_irq is a field of
+  a const struct. So now we pass the DeviceState handle of the
+  interrupt controller. I tried to keep the code generic, reason why
+  I did not rely on an architecture specific accessor to retrieve
+  the gsi number (gic accessor as proposed by Alex). I would like to
+  avoid creating an ARM VFIO device model. I hope this model
+  model can work on other archs than arm (no multiple intc?);
+  wouldn't it be simpler to keep the previous first_irq parameter and
+  relax the const constraint.
+
+v6 -> v7:
+- compat is not exposed anymore as a user option. Rationale is
+  the vfio device became abstract and a specialization is needed
+  anyway. The derived device must set the compat string.
+- in v6 vfio_start_irq_injection was exposed in vfio-platform.h.
+  A new function dubbed vfio_register_irq_starter replaces it. It
+  registers a machine init done notifier that programs & starts
+  all dynamic VFIO device IRQs. This function is supposed to be
+  called by the machine file. A set of static helper routines are
+  added too. It must be called before the creation of the platform
+  bus device.
+
+v5 -> v6:
+- vfio_device property renamed into host property
+- correct error handling of VFIO_DEVICE_GET_IRQ_INFO ioctl
+  and remove PCI related comment
+- remove declaration of vfio_setup_irqfd and irqfd_allowed
+  property.Both belong to next patch (irqfd)
+- remove declaration of vfio_intp_interrupt in vfio-platform.h
+- functions that can be static get this characteristic
+- remove declarations of vfio_region_ops, vfio_memory_listener,
+  group_list, vfio_address_spaces. All are moved to vfio-common.h
+- remove vfio_put_device declaration and definition
+- print_regions removed. code moved into vfio_populate_regions
+- replace DPRINTF by trace events
+- new helper routine to set the trigger eventfd
+- dissociate intp init from the injection enablement:
+  vfio_enable_intp renamed into vfio_init_intp and new function
+  named vfio_start_eventfd_injection
+- injection start moved to vfio_start_irq_injection (not anymore
+  in vfio_populate_interrupt)
+- new start_irq_fn field in VFIOPlatformDevice corresponding to
+  the function that will be used for starting injection
+- user handled eventfd:
+  x add mutex to protect IRQ state & list manipulation,
+  x correct misleading comment in vfio_intp_interrupt.
+  x Fix bugs thanks to fake interrupt modality
+- VFIOPlatformDeviceClass becomes abstract
+- add error_setg in vfio_platform_realize
+
+v4 -> v5:
+- vfio-plaform.h included first
+- cleanup error handling in *populate*, vfio_get_device,
+  vfio_enable_intp
+- vfio_put_device not called anymore
+- add some includes to follow vfio policy
+
+v3 -> v4:
+[Eric Auger]
+- merge of "vfio: Add initial IRQ support in platform device"
+  to get a full functional patch although perfs are limited.
+- removal of unrealize function since I currently understand
+  it is only used with device hot-plug feature.
+
+v2 -> v3:
+[Eric Auger]
+- further factorization between PCI and platform (VFIORegion,
+  VFIODevice). same level of functionality.
+
+<= v2:
+[Kim Philipps]
+- Initial Creation of the device supporting register space mapping
+---
+ hw/vfio/Makefile.objs           |   1 +
+ hw/vfio/platform.c              | 288 ++++++++++++++++++++++++++++++++++++++++
+ include/hw/vfio/vfio-common.h   |   1 +
+ include/hw/vfio/vfio-platform.h |  44 ++++++
+ trace-events                    |  12 ++
+ 5 files changed, 346 insertions(+)
+ create mode 100644 hw/vfio/platform.c
+ create mode 100644 include/hw/vfio/vfio-platform.h
+
+diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
+index e31f30e..c5c76fe 100644
+--- a/hw/vfio/Makefile.objs
++++ b/hw/vfio/Makefile.objs
+@@ -1,4 +1,5 @@
+ ifeq ($(CONFIG_LINUX), y)
+ obj-$(CONFIG_SOFTMMU) += common.o
+ obj-$(CONFIG_PCI) += pci.o
++obj-$(CONFIG_SOFTMMU) += platform.o
+ endif
+diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
+new file mode 100644
+index 0000000..5ec2a18
+--- /dev/null
++++ b/hw/vfio/platform.c
+@@ -0,0 +1,288 @@
++/*
++ * vfio based device assignment support - platform devices
++ *
++ * Copyright Linaro Limited, 2014
++ *
++ * Authors:
++ *  Kim Phillips <kim.phillips@linaro.org>
++ *  Eric Auger <eric.auger@linaro.org>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ *
++ * Based on vfio based PCI device assignment support:
++ *  Copyright Red Hat, Inc. 2012
++ */
++
++#include <linux/vfio.h>
++#include <sys/ioctl.h>
++
++#include "hw/vfio/vfio-platform.h"
++#include "qemu/error-report.h"
++#include "qemu/range.h"
++#include "sysemu/sysemu.h"
++#include "exec/memory.h"
++#include "hw/sysbus.h"
++#include "trace.h"
++#include "hw/platform-bus.h"
++
++/* VFIO skeleton */
++
++/* not implemented yet */
++static void vfio_platform_compute_needs_reset(VFIODevice *vbasedev)
++{
++    vbasedev->needs_reset = false;
++}
++
++/* not implemented yet */
++static int vfio_platform_hot_reset_multi(VFIODevice *vbasedev)
++{
++    return 0;
++}
++
++/**
++ * vfio_populate_device - Allocate and populate MMIO region
++ * structs according to driver returned information
++ * @vbasedev: the VFIO device handle
++ *
++ */
++static int vfio_populate_device(VFIODevice *vbasedev)
++{
++    int i, ret = -1;
++    VFIOPlatformDevice *vdev =
++        container_of(vbasedev, VFIOPlatformDevice, vbasedev);
++
++    if (!(vbasedev->flags & VFIO_DEVICE_FLAGS_PLATFORM)) {
++        error_report("vfio: Um, this isn't a platform device");
++        return ret;
++    }
++
++    vdev->regions = g_malloc0_n(1,
++                                sizeof(VFIORegion *) * vbasedev->num_regions);
++
++    for (i = 0; i < vbasedev->num_regions; i++) {
++        struct vfio_region_info reg_info = { .argsz = sizeof(reg_info) };
++        VFIORegion *ptr;
++
++        vdev->regions[i] = g_malloc0_n(1, sizeof(VFIORegion));
++        ptr = vdev->regions[i];
++        reg_info.index = i;
++        ret = ioctl(vbasedev->fd, VFIO_DEVICE_GET_REGION_INFO, &reg_info);
++        if (ret) {
++            error_report("vfio: Error getting region %d info: %m", i);
++            goto reg_error;
++        }
++        ptr->flags = reg_info.flags;
++        ptr->size = reg_info.size;
++        ptr->fd_offset = reg_info.offset;
++        ptr->nr = i;
++        ptr->vbasedev = vbasedev;
++
++        trace_vfio_platform_populate_regions(ptr->nr,
++                            (unsigned long)ptr->flags,
++                            (unsigned long)ptr->size,
++                            ptr->vbasedev->fd,
++                            (unsigned long)ptr->fd_offset);
++    }
++
++    return 0;
++reg_error:
++    for (i = 0; i < vbasedev->num_regions; i++) {
++        g_free(vdev->regions[i]);
++    }
++    g_free(vdev->regions);
++    return ret;
++}
++
++/* specialized functions for VFIO Platform devices */
++static VFIODeviceOps vfio_platform_ops = {
++    .vfio_compute_needs_reset = vfio_platform_compute_needs_reset,
++    .vfio_hot_reset_multi = vfio_platform_hot_reset_multi,
++};
++
++/**
++ * vfio_base_device_init - perform preliminary VFIO setup
++ * @vbasedev: the VFIO device handle
++ *
++ * Implement the VFIO command sequence that allows to discover
++ * assigned device resources: group extraction, device
++ * fd retrieval, resource query.
++ * Precondition: the device name must be initialized
++ */
++static int vfio_base_device_init(VFIODevice *vbasedev)
++{
++    VFIOGroup *group;
++    VFIODevice *vbasedev_iter;
++    char path[PATH_MAX], iommu_group_path[PATH_MAX], *group_name;
++    ssize_t len;
++    struct stat st;
++    int groupid;
++    int ret;
++
++    /* name must be set prior to the call */
++    if (!vbasedev->name) {
++        return -EINVAL;
++    }
++
++    /* Check that the host device exists */
++    g_snprintf(path, sizeof(path), "/sys/bus/platform/devices/%s/",
++               vbasedev->name);
++
++    if (stat(path, &st) < 0) {
++        error_report("vfio: error: no such host device: %s", path);
++        return -errno;
++    }
++
++    g_strlcat(path, "iommu_group", sizeof(path));
++    len = readlink(path, iommu_group_path, sizeof(iommu_group_path));
++    if (len < 0) {
++        error_report("vfio: error no iommu_group for device");
++        return -errno;
++    }
++
++    iommu_group_path[len] = 0;
++    group_name = basename(iommu_group_path);
++
++    if (sscanf(group_name, "%d", &groupid) != 1) {
++        error_report("vfio: error reading %s: %m", path);
++        return -errno;
++    }
++
++    trace_vfio_platform_base_device_init(vbasedev->name, groupid);
++
++    group = vfio_get_group(groupid, &address_space_memory);
++    if (!group) {
++        error_report("vfio: failed to get group %d", groupid);
++        return -ENOENT;
++    }
++
++    g_snprintf(path, sizeof(path), "%s", vbasedev->name);
++
++    QLIST_FOREACH(vbasedev_iter, &group->device_list, next) {
++        if (strcmp(vbasedev_iter->name, vbasedev->name) == 0) {
++            error_report("vfio: error: device %s is already attached", path);
++            vfio_put_group(group);
++            return -EBUSY;
++        }
++    }
++    ret = vfio_get_device(group, path, vbasedev);
++    if (ret) {
++        error_report("vfio: failed to get device %s", path);
++        vfio_put_group(group);
++        return ret;
++    }
++
++    ret = vfio_populate_device(vbasedev);
++    if (ret) {
++        error_report("vfio: failed to populate device %s", path);
++        vfio_put_group(group);
++    }
++
++    return ret;
++}
++
++/**
++ * vfio_map_region - initialize the 2 memory regions for a given
++ * MMIO region index
++ * @vdev: the VFIO platform device handle
++ * @nr: the index of the region
++ *
++ * Init the top memory region and the mmapped memory region beneath
++ * VFIOPlatformDevice is used since VFIODevice is not a QOM Object
++ * and could not be passed to memory region functions
++*/
++static void vfio_map_region(VFIOPlatformDevice *vdev, int nr)
++{
++    VFIORegion *region = vdev->regions[nr];
++    unsigned size = region->size;
++    char name[64];
++
++    if (!size) {
++        return;
++    }
++
++    g_snprintf(name, sizeof(name), "VFIO %s region %d",
++               vdev->vbasedev.name, nr);
++
++    /* A "slow" read/write mapping underlies all regions */
++    memory_region_init_io(&region->mem, OBJECT(vdev), &vfio_region_ops,
++                          region, name, size);
++
++    g_strlcat(name, " mmap", sizeof(name));
++
++    if (vfio_mmap_region(OBJECT(vdev), region, &region->mem,
++                         &region->mmap_mem, &region->mmap, size, 0, name)) {
++        error_report("%s unsupported. Performance may be slow", name);
++    }
++}
++
++/**
++ * vfio_platform_realize  - the device realize function
++ * @dev: device state pointer
++ * @errp: error
++ *
++ * initialize the device, its memory regions and IRQ structures
++ * IRQ are started separately
++ */
++static void vfio_platform_realize(DeviceState *dev, Error **errp)
++{
++    VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(dev);
++    SysBusDevice *sbdev = SYS_BUS_DEVICE(dev);
++    VFIODevice *vbasedev = &vdev->vbasedev;
++    int i, ret;
++
++    vbasedev->type = VFIO_DEVICE_TYPE_PLATFORM;
++    vbasedev->ops = &vfio_platform_ops;
++
++    trace_vfio_platform_realize(vbasedev->name, vdev->compat);
++
++    ret = vfio_base_device_init(vbasedev);
++    if (ret) {
++        error_setg(errp, "vfio: vfio_base_device_init failed for %s",
++                   vbasedev->name);
++        return;
++    }
++
++    for (i = 0; i < vbasedev->num_regions; i++) {
++        vfio_map_region(vdev, i);
++        sysbus_init_mmio(sbdev, &vdev->regions[i]->mem);
++    }
++}
++
++static const VMStateDescription vfio_platform_vmstate = {
++    .name = TYPE_VFIO_PLATFORM,
++    .unmigratable = 1,
++};
++
++static Property vfio_platform_dev_properties[] = {
++    DEFINE_PROP_STRING("host", VFIOPlatformDevice, vbasedev.name),
++    DEFINE_PROP_BOOL("x-mmap", VFIOPlatformDevice, vbasedev.allow_mmap, true),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vfio_platform_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = vfio_platform_realize;
++    dc->props = vfio_platform_dev_properties;
++    dc->vmsd = &vfio_platform_vmstate;
++    dc->desc = "VFIO-based platform device assignment";
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++}
++
++static const TypeInfo vfio_platform_dev_info = {
++    .name = TYPE_VFIO_PLATFORM,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(VFIOPlatformDevice),
++    .class_init = vfio_platform_class_init,
++    .class_size = sizeof(VFIOPlatformDeviceClass),
++    .abstract   = true,
++};
++
++static void register_vfio_platform_dev_type(void)
++{
++    type_register_static(&vfio_platform_dev_info);
++}
++
++type_init(register_vfio_platform_dev_type)
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index 0d1fb80..59a321d 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -42,6 +42,7 @@
+ 
+ enum {
+     VFIO_DEVICE_TYPE_PCI = 0,
++    VFIO_DEVICE_TYPE_PLATFORM = 1,
+ };
+ 
+ typedef struct VFIORegion {
+diff --git a/include/hw/vfio/vfio-platform.h b/include/hw/vfio/vfio-platform.h
+new file mode 100644
+index 0000000..338f0c6
+--- /dev/null
++++ b/include/hw/vfio/vfio-platform.h
+@@ -0,0 +1,44 @@
++/*
++ * vfio based device assignment support - platform devices
++ *
++ * Copyright Linaro Limited, 2014
++ *
++ * Authors:
++ *  Kim Phillips <kim.phillips@linaro.org>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ *
++ * Based on vfio based PCI device assignment support:
++ *  Copyright Red Hat, Inc. 2012
++ */
++
++#ifndef HW_VFIO_VFIO_PLATFORM_H
++#define HW_VFIO_VFIO_PLATFORM_H
++
++#include "hw/sysbus.h"
++#include "hw/vfio/vfio-common.h"
++
++#define TYPE_VFIO_PLATFORM "vfio-platform"
++
++typedef struct VFIOPlatformDevice {
++    SysBusDevice sbdev;
++    VFIODevice vbasedev; /* not a QOM object */
++    VFIORegion **regions;
++    char *compat; /* compatibility string */
++} VFIOPlatformDevice;
++
++typedef struct VFIOPlatformDeviceClass {
++    /*< private >*/
++    SysBusDeviceClass parent_class;
++    /*< public >*/
++} VFIOPlatformDeviceClass;
++
++#define VFIO_PLATFORM_DEVICE(obj) \
++     OBJECT_CHECK(VFIOPlatformDevice, (obj), TYPE_VFIO_PLATFORM)
++#define VFIO_PLATFORM_DEVICE_CLASS(klass) \
++     OBJECT_CLASS_CHECK(VFIOPlatformDeviceClass, (klass), TYPE_VFIO_PLATFORM)
++#define VFIO_PLATFORM_DEVICE_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(VFIOPlatformDeviceClass, (obj), TYPE_VFIO_PLATFORM)
++
++#endif /*HW_VFIO_VFIO_PLATFORM_H*/
+diff --git a/trace-events b/trace-events
+index 30eba92..17c7108 100644
+--- a/trace-events
++++ b/trace-events
+@@ -1560,6 +1560,18 @@ vfio_put_group(int fd) "close group->fd=%d"
+ vfio_get_device(const char * name, unsigned int flags, unsigned int num_regions, unsigned int num_irqs) "Device %s flags: %u, regions: %u, irqs: %u"
+ vfio_put_base_device(int fd) "close vdev->fd=%d"
+ 
++# hw/vfio/platform.c
++vfio_platform_eoi(int pin, int fd) "EOI IRQ pin %d (fd=%d)"
++vfio_platform_mmap_set_enabled(bool enabled) "fast path = %d"
++vfio_platform_intp_mmap_enable(int pin) "IRQ #%d still active, stay in slow path"
++vfio_platform_intp_interrupt(int pin, int fd) "Handle IRQ #%d (fd = %d)"
++vfio_platform_populate_interrupts(int pin, int count, int flags) "- IRQ index %d: count %d, flags=0x%x"
++vfio_platform_populate_regions(int region_index, unsigned long flag, unsigned long size, int fd, unsigned long offset) "- region %d flags = 0x%lx, size = 0x%lx, fd= %d, offset = 0x%lx"
++vfio_platform_base_device_init(char *name, int groupid) "%s belongs to group #%d"
++vfio_platform_realize(char *name, char *compat) "vfio device %s, compat = %s"
++vfio_intp_interrupt_set_pending(int index) "irq %d is set PENDING"
++vfio_platform_eoi_handle_pending(int index) "handle PENDING IRQ %d"
++
+ #hw/acpi/memory_hotplug.c
+ mhp_acpi_invalid_slot_selected(uint32_t slot) "0x%"PRIx32
+ mhp_acpi_read_addr_lo(uint32_t slot, uint32_t addr) "slot[0x%"PRIx32"] addr lo: 0x%"PRIx32
+-- 
+1.8.3.2
