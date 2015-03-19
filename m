@@ -1,25 +1,24 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v12 4/9] hw/vfio/platform: add capability to start IRQ
- propagation
-Date: Thu, 19 Mar 2015 17:16:36 +0000
-Message-ID: <1426785402-2091-5-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v12 6/9] hw/vfio/platform: calxeda xgmac device
+Date: Thu, 19 Mar 2015 17:16:38 +0000
+Message-ID: <1426785402-2091-7-git-send-email-eric.auger@linaro.org>
 References: <1426785402-2091-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BD4A49347
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 13:10:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DD584934B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 13:10:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5AkObEvLS23w for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Mar 2015 13:10:11 -0400 (EDT)
-Received: from mail-wg0-f45.google.com (mail-wg0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E3FE749336
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 13:10:10 -0400 (EDT)
-Received: by wggv3 with SMTP id v3so68376682wgg.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 10:16:52 -0700 (PDT)
+ with ESMTP id WTzeXfcMGtNz for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Mar 2015 13:10:14 -0400 (EDT)
+Received: from mail-wg0-f53.google.com (mail-wg0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF4EC49338
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 13:10:12 -0400 (EDT)
+Received: by wgra20 with SMTP id a20so68313070wgr.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Mar 2015 10:16:54 -0700 (PDT)
 In-Reply-To: <1426785402-2091-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,113 +33,87 @@ To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, alex.willia
 Cc: patches@linaro.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a reset notify function that enables to start the propagation of
-interrupts to the guest.
-
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
-
----
-v10 -> v11:
-- comment reword
-
-v8 -> v9:
-- handle failure in vfio_irq_starter
----
- hw/vfio/platform.c              | 64 +++++++++++++++++++++++++++++++++++++++++
- include/hw/vfio/vfio-platform.h |  8 ++++++
- 2 files changed, 72 insertions(+)
-
-diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-index 31c2701..361e01b 100644
---- a/hw/vfio/platform.c
-+++ b/hw/vfio/platform.c
-@@ -572,6 +572,70 @@ static void vfio_platform_realize(DeviceState *dev, Error **errp)
-     }
- }
- 
-+/**
-+ * vfio_irq_starter: Start IRQ forwarding for a specific VFIO device
-+ * @sbdev: Sysbus device handle
-+ * @opaque: DeviceState handle of the interrupt controller the device
-+ *          is attached to
-+ *
-+ * The function retrieves the absolute GSI number each VFIO IRQ
-+ * corresponds to and start forwarding.
-+ */
-+static int vfio_irq_starter(SysBusDevice *sbdev, void *opaque)
-+{
-+    DeviceState *intc = (DeviceState *)opaque;
-+    VFIOPlatformDevice *vdev;
-+    VFIOINTp *intp;
-+    qemu_irq irq;
-+    int gsi, ret;
-+
-+    if (object_dynamic_cast(OBJECT(sbdev), TYPE_VFIO_PLATFORM)) {
-+        vdev = VFIO_PLATFORM_DEVICE(sbdev);
-+
-+        QLIST_FOREACH(intp, &vdev->intp_list, next) {
-+            gsi = 0;
-+            while (1) {
-+                irq = qdev_get_gpio_in(intc, gsi);
-+                if (irq == intp->qemuirq) {
-+                    break;
-+                }
-+                gsi++;
-+            }
-+            intp->virtualID = gsi;
-+            ret = vdev->start_irq_fn(intp);
-+            if (ret) {
-+                error_report("%s unable to start propagation of IRQ index %d",
-+                             vdev->vbasedev.name, intp->pin);
-+                exit(1);
-+            }
-+        }
-+    }
-+    return 0;
-+}
-+
-+/**
-+ * vfio_kick_irqs: start IRQ forwarding for all the VFIO devices
-+ * attached to the platform bus
-+ * @data: Device state handle of the interrupt controller the VFIO IRQs
-+ *        must be bound to
-+ *
-+ * Binding to the platform bus IRQs happens on a machine init done
-+ * notifier registered by the platform bus. Only at that time the
-+ * absolute virtual IRQ = GSI is known and allows to setup IRQFD.
-+ * This function typically can be called in a reset notifier registered
-+ * by the machine file.
-+ */
-+void vfio_kick_irqs(void *data)
-+{
-+    DeviceState *intc = (DeviceState *)data;
-+    DeviceState *dev =
-+        qdev_find_recursive(sysbus_get_default(), TYPE_PLATFORM_BUS_DEVICE);
-+    PlatformBusDevice *pbus = PLATFORM_BUS_DEVICE(dev);
-+
-+    assert(pbus->done_gathering);
-+    foreach_dynamic_sysbus_device(vfio_irq_starter, intc);
-+}
-+
- static const VMStateDescription vfio_platform_vmstate = {
-     .name = TYPE_VFIO_PLATFORM,
-     .unmigratable = 1,
-diff --git a/include/hw/vfio/vfio-platform.h b/include/hw/vfio/vfio-platform.h
-index 31893a3..c9ee898 100644
---- a/include/hw/vfio/vfio-platform.h
-+++ b/include/hw/vfio/vfio-platform.h
-@@ -77,4 +77,12 @@ typedef struct VFIOPlatformDeviceClass {
- #define VFIO_PLATFORM_DEVICE_GET_CLASS(obj) \
-      OBJECT_GET_CLASS(VFIOPlatformDeviceClass, (obj), TYPE_VFIO_PLATFORM)
- 
-+/**
-+ * vfio_kick_irqs - reset notifier that starts IRQ injection
-+ * for all VFIO dynamic sysbus devices attached to the platform bus.
-+ *
-+ * @opaque: handle to the interrupt controller DeviceState
-+ */
-+void vfio_kick_irqs(void *opaque);
-+
- #endif /*HW_VFIO_VFIO_PLATFORM_H*/
--- 
-1.8.3.2
+VGhlIHBsYXRmb3JtIGRldmljZSBjbGFzcyBoYXMgYmVjb21lIGFic3RyYWN0LiBUaGlzIHBhdGNo
+IGludHJvZHVjZXMKYSBjYWx4ZWRhIHhnbWFjIGRldmljZSB0aGF0IGRlcml2ZXMgZnJvbSBpdC4K
+ClNpZ25lZC1vZmYtYnk6IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAbGluYXJvLm9yZz4KUmV2aWV3
+ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KCi0tLQp2MTAgLT4g
+djExOgotIGFkZCBBbGV4IFJldmlld2VkLWJ5Ci0gbW92ZSB2aXJ0IG1vZGlmaWNhdGlvbnMgaW4g
+YSBzZXBhcmF0ZSBwYXRjaAoKdjggLT4gdjk6Ci0gcmVuYW1lZCBjYWx4ZWRhX3hnbWFjLmMgaW50
+byBjYWx4ZWRhLXhnbWFjLmMKCnY3IC0+IHY4OgotIGFkZCBhIGNvbW1lbnQgaW4gdGhlIGhlYWRl
+ciBhYm91dCB0aGUgTU1JTyByZWdpb25zIGFuZCBJUlEgd2hpY2gKICBhcmUgZXhwb3NlZCBieSB0
+aGUgZGV2aWNlCgp2NSAtPiB2NgotIGJhY2sgYWdhaW4gZm9sbG93aW5nIEFsZXggR3JhZiBhZHZp
+c2VzCi0gZml4IGEgYnVnIHJlbGF0ZWQgdG8gY29tcGF0IG92ZXJyaWRlCgp2NCAtPiB2NToKcmVt
+b3ZlZCBzaW5jZSBkZXZpY2UgdHJlZSB3YXMgbW92ZWQgdG8gaHcvYXJtL2R5bl9zeXNidXNfZGV2
+dHJlZS5jCgp2NDogY3JlYXRpb24gZm9yIGRldmljZSB0cmVlIHNwZWNpYWxpemF0aW9uCi0tLQog
+aHcvdmZpby9NYWtlZmlsZS5vYmpzICAgICAgICAgICAgICAgIHwgIDEgKwogaHcvdmZpby9jYWx4
+ZWRhLXhnbWFjLmMgICAgICAgICAgICAgIHwgNTQgKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrCiBpbmNsdWRlL2h3L3ZmaW8vdmZpby1jYWx4ZWRhLXhnbWFjLmggfCA0NiArKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysKIDMgZmlsZXMgY2hhbmdlZCwgMTAxIGluc2VydGlv
+bnMoKykKIGNyZWF0ZSBtb2RlIDEwMDY0NCBody92ZmlvL2NhbHhlZGEteGdtYWMuYwogY3JlYXRl
+IG1vZGUgMTAwNjQ0IGluY2x1ZGUvaHcvdmZpby92ZmlvLWNhbHhlZGEteGdtYWMuaAoKZGlmZiAt
+LWdpdCBhL2h3L3ZmaW8vTWFrZWZpbGUub2JqcyBiL2h3L3ZmaW8vTWFrZWZpbGUub2JqcwppbmRl
+eCBjNWM3NmZlLi5kNTQwYzlkIDEwMDY0NAotLS0gYS9ody92ZmlvL01ha2VmaWxlLm9ianMKKysr
+IGIvaHcvdmZpby9NYWtlZmlsZS5vYmpzCkBAIC0yLDQgKzIsNSBAQCBpZmVxICgkKENPTkZJR19M
+SU5VWCksIHkpCiBvYmotJChDT05GSUdfU09GVE1NVSkgKz0gY29tbW9uLm8KIG9iai0kKENPTkZJ
+R19QQ0kpICs9IHBjaS5vCiBvYmotJChDT05GSUdfU09GVE1NVSkgKz0gcGxhdGZvcm0ubworb2Jq
+LSQoQ09ORklHX1NPRlRNTVUpICs9IGNhbHhlZGEteGdtYWMubwogZW5kaWYKZGlmZiAtLWdpdCBh
+L2h3L3ZmaW8vY2FseGVkYS14Z21hYy5jIGIvaHcvdmZpby9jYWx4ZWRhLXhnbWFjLmMKbmV3IGZp
+bGUgbW9kZSAxMDA2NDQKaW5kZXggMDAwMDAwMC4uYzRiOGZlZgotLS0gL2Rldi9udWxsCisrKyBi
+L2h3L3ZmaW8vY2FseGVkYS14Z21hYy5jCkBAIC0wLDAgKzEsNTQgQEAKKy8qCisgKiBjYWx4ZWRh
+IHhnbWFjIFZGSU8gZGV2aWNlCisgKgorICogQ29weXJpZ2h0IExpbmFybyBMaW1pdGVkLCAyMDE0
+CisgKgorICogQXV0aG9yczoKKyAqICBFcmljIEF1Z2VyIDxlcmljLmF1Z2VyQGxpbmFyby5vcmc+
+CisgKgorICogVGhpcyB3b3JrIGlzIGxpY2Vuc2VkIHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05V
+IEdQTCwgdmVyc2lvbiAyLiAgU2VlCisgKiB0aGUgQ09QWUlORyBmaWxlIGluIHRoZSB0b3AtbGV2
+ZWwgZGlyZWN0b3J5LgorICoKKyAqLworCisjaW5jbHVkZSAiaHcvdmZpby92ZmlvLWNhbHhlZGEt
+eGdtYWMuaCIKKworc3RhdGljIHZvaWQgY2FseGVkYV94Z21hY19yZWFsaXplKERldmljZVN0YXRl
+ICpkZXYsIEVycm9yICoqZXJycCkKK3sKKyAgICBWRklPUGxhdGZvcm1EZXZpY2UgKnZkZXYgPSBW
+RklPX1BMQVRGT1JNX0RFVklDRShkZXYpOworICAgIFZGSU9DYWx4ZWRhWGdtYWNEZXZpY2VDbGFz
+cyAqayA9IFZGSU9fQ0FMWEVEQV9YR01BQ19ERVZJQ0VfR0VUX0NMQVNTKGRldik7CisKKyAgICB2
+ZGV2LT5jb21wYXQgPSBnX3N0cmR1cCgiY2FseGVkYSxoYi14Z21hYyIpOworCisgICAgay0+cGFy
+ZW50X3JlYWxpemUoZGV2LCBlcnJwKTsKK30KKworc3RhdGljIGNvbnN0IFZNU3RhdGVEZXNjcmlw
+dGlvbiB2ZmlvX3BsYXRmb3JtX3Ztc3RhdGUgPSB7CisgICAgLm5hbWUgPSBUWVBFX1ZGSU9fQ0FM
+WEVEQV9YR01BQywKKyAgICAudW5taWdyYXRhYmxlID0gMSwKK307CisKK3N0YXRpYyB2b2lkIHZm
+aW9fY2FseGVkYV94Z21hY19jbGFzc19pbml0KE9iamVjdENsYXNzICprbGFzcywgdm9pZCAqZGF0
+YSkKK3sKKyAgICBEZXZpY2VDbGFzcyAqZGMgPSBERVZJQ0VfQ0xBU1Moa2xhc3MpOworICAgIFZG
+SU9DYWx4ZWRhWGdtYWNEZXZpY2VDbGFzcyAqdmN4YyA9CisgICAgICAgIFZGSU9fQ0FMWEVEQV9Y
+R01BQ19ERVZJQ0VfQ0xBU1Moa2xhc3MpOworICAgIHZjeGMtPnBhcmVudF9yZWFsaXplID0gZGMt
+PnJlYWxpemU7CisgICAgZGMtPnJlYWxpemUgPSBjYWx4ZWRhX3hnbWFjX3JlYWxpemU7CisgICAg
+ZGMtPmRlc2MgPSAiVkZJTyBDYWx4ZWRhIFhHTUFDIjsKK30KKworc3RhdGljIGNvbnN0IFR5cGVJ
+bmZvIHZmaW9fY2FseGVkYV94Z21hY19kZXZfaW5mbyA9IHsKKyAgICAubmFtZSA9IFRZUEVfVkZJ
+T19DQUxYRURBX1hHTUFDLAorICAgIC5wYXJlbnQgPSBUWVBFX1ZGSU9fUExBVEZPUk0sCisgICAg
+Lmluc3RhbmNlX3NpemUgPSBzaXplb2YoVkZJT0NhbHhlZGFYZ21hY0RldmljZSksCisgICAgLmNs
+YXNzX2luaXQgPSB2ZmlvX2NhbHhlZGFfeGdtYWNfY2xhc3NfaW5pdCwKKyAgICAuY2xhc3Nfc2l6
+ZSA9IHNpemVvZihWRklPQ2FseGVkYVhnbWFjRGV2aWNlQ2xhc3MpLAorfTsKKworc3RhdGljIHZv
+aWQgcmVnaXN0ZXJfY2FseGVkYV94Z21hY19kZXZfdHlwZSh2b2lkKQoreworICAgIHR5cGVfcmVn
+aXN0ZXJfc3RhdGljKCZ2ZmlvX2NhbHhlZGFfeGdtYWNfZGV2X2luZm8pOworfQorCit0eXBlX2lu
+aXQocmVnaXN0ZXJfY2FseGVkYV94Z21hY19kZXZfdHlwZSkKZGlmZiAtLWdpdCBhL2luY2x1ZGUv
+aHcvdmZpby92ZmlvLWNhbHhlZGEteGdtYWMuaCBiL2luY2x1ZGUvaHcvdmZpby92ZmlvLWNhbHhl
+ZGEteGdtYWMuaApuZXcgZmlsZSBtb2RlIDEwMDY0NAppbmRleCAwMDAwMDAwLi5mOTk0Nzc1Ci0t
+LSAvZGV2L251bGwKKysrIGIvaW5jbHVkZS9ody92ZmlvL3ZmaW8tY2FseGVkYS14Z21hYy5oCkBA
+IC0wLDAgKzEsNDYgQEAKKy8qCisgKiBWRklPIGNhbHhlZGEgeGdtYWMgZGV2aWNlCisgKgorICog
+Q29weXJpZ2h0IExpbmFybyBMaW1pdGVkLCAyMDE0CisgKgorICogQXV0aG9yczoKKyAqICBFcmlj
+IEF1Z2VyIDxlcmljLmF1Z2VyQGxpbmFyby5vcmc+CisgKgorICogVGhpcyB3b3JrIGlzIGxpY2Vu
+c2VkIHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIEdQTCwgdmVyc2lvbiAyLiAgU2VlCisgKiB0
+aGUgQ09QWUlORyBmaWxlIGluIHRoZSB0b3AtbGV2ZWwgZGlyZWN0b3J5LgorICoKKyAqLworCisj
+aWZuZGVmIEhXX1ZGSU9fVkZJT19DQUxYRURBX1hHTUFDX0gKKyNkZWZpbmUgSFdfVkZJT19WRklP
+X0NBTFhFREFfWEdNQUNfSAorCisjaW5jbHVkZSAiaHcvdmZpby92ZmlvLXBsYXRmb3JtLmgiCisK
+KyNkZWZpbmUgVFlQRV9WRklPX0NBTFhFREFfWEdNQUMgInZmaW8tY2FseGVkYS14Z21hYyIKKwor
+LyoqCisgKiBUaGlzIGRldmljZSBleHBvc2VzOgorICogLSBhIHNpbmdsZSBNTUlPIHJlZ2lvbiBj
+b3JyZXNwb25kaW5nIHRvIGl0cyByZWdpc3RlciBzcGFjZQorICogLSAzIElSUVMgKG1haW4gYW5k
+IDIgcG93ZXIgcmVsYXRlZCBJUlFzKQorICovCit0eXBlZGVmIHN0cnVjdCBWRklPQ2FseGVkYVhn
+bWFjRGV2aWNlIHsKKyAgICBWRklPUGxhdGZvcm1EZXZpY2UgdmRldjsKK30gVkZJT0NhbHhlZGFY
+Z21hY0RldmljZTsKKwordHlwZWRlZiBzdHJ1Y3QgVkZJT0NhbHhlZGFYZ21hY0RldmljZUNsYXNz
+IHsKKyAgICAvKjwgcHJpdmF0ZSA+Ki8KKyAgICBWRklPUGxhdGZvcm1EZXZpY2VDbGFzcyBwYXJl
+bnRfY2xhc3M7CisgICAgLyo8IHB1YmxpYyA+Ki8KKyAgICBEZXZpY2VSZWFsaXplIHBhcmVudF9y
+ZWFsaXplOworfSBWRklPQ2FseGVkYVhnbWFjRGV2aWNlQ2xhc3M7CisKKyNkZWZpbmUgVkZJT19D
+QUxYRURBX1hHTUFDX0RFVklDRShvYmopIFwKKyAgICAgT0JKRUNUX0NIRUNLKFZGSU9DYWx4ZWRh
+WGdtYWNEZXZpY2UsIChvYmopLCBUWVBFX1ZGSU9fQ0FMWEVEQV9YR01BQykKKyNkZWZpbmUgVkZJ
+T19DQUxYRURBX1hHTUFDX0RFVklDRV9DTEFTUyhrbGFzcykgXAorICAgICBPQkpFQ1RfQ0xBU1Nf
+Q0hFQ0soVkZJT0NhbHhlZGFYZ21hY0RldmljZUNsYXNzLCAoa2xhc3MpLCBcCisgICAgICAgICAg
+ICAgICAgICAgICAgICBUWVBFX1ZGSU9fQ0FMWEVEQV9YR01BQykKKyNkZWZpbmUgVkZJT19DQUxY
+RURBX1hHTUFDX0RFVklDRV9HRVRfQ0xBU1Mob2JqKSBcCisgICAgIE9CSkVDVF9HRVRfQ0xBU1Mo
+VkZJT0NhbHhlZGFYZ21hY0RldmljZUNsYXNzLCAob2JqKSwgXAorICAgICAgICAgICAgICAgICAg
+ICAgIFRZUEVfVkZJT19DQUxYRURBX1hHTUFDKQorCisjZW5kaWYKLS0gCjEuOC4zLjIKCl9fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5n
+IGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVt
+YmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
