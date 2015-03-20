@@ -1,137 +1,121 @@
-From: Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH] arm64: dts: Fix GIC reg sizes for APM X-Gene
-Date: Thu, 19 Mar 2015 18:54:53 +0000
-Message-ID: <550B1B7D.50309@arm.com>
-References: <1422342206-4750-1-git-send-email-psawargaonkar@apm.com>	<CAL_JsqJQcuX2cp50oHod-QAbhdMg48TaRP+gLGEO2kbFnQ3B+A@mail.gmail.com>	<20150219190348.GB24460@cbox>	<CAL_JsqLcBOC+AnVe7oATjg2g6Fz2vqwacu8QzS4tXMaxxOP_Xg@mail.gmail.com>	<20150223120744.GA5609@cbox>	<CAL_JsqJ6E+05psDCXS7k74Mz-DgSEroQ2ODpe2Bp2_50fL3imA@mail.gmail.com> <CANFfpkQF-8Kzq-UoP=xLpkTafGn6ScyiEb6oCs-Lxygb+ummLA@mail.gmail.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH 08/12] KVM: arm/arm64: implement kvm_io_bus MMIO handling
+ for the VGIC
+Date: Fri, 20 Mar 2015 12:40:02 +0000
+Message-ID: <550C1522.80105@arm.com>
+References: <1426263012-22935-1-git-send-email-andre.przywara@arm.com>
+ <1426263012-22935-9-git-send-email-andre.przywara@arm.com>
+ <20150314142720.GD10935@cbox> <550AEEF3.80702@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <CANFfpkQF-8Kzq-UoP=xLpkTafGn6ScyiEb6oCs-Lxygb+ummLA-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Pranavkumar Sawargaonkar <psawargaonkar-qTEPVZfXA3Y@public.gmane.org>, Rob Herring <robherring2-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
-Cc: Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, "devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, Feng Kan <fkan-qTEPVZfXA3Y@public.gmane.org>, Arnd Bergmann <arnd-r2nGTMty4D4@public.gmane.org>, "jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "patches-qTEPVZfXA3Y@public.gmane.org" <patches-qTEPVZfXA3Y@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, Tushar Jagad <tjagad-qTEPVZfXA3Y@public.gmane.org>, "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org" <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>, Will Deacon <Will.Deacon-5wv7dgnIgG8@public.gmane.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 112CF494AC
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2015 08:33:47 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 6sJj-Uc-DJ0n for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 20 Mar 2015 08:33:45 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A90D494AB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Mar 2015 08:33:44 -0400 (EDT)
+In-Reply-To: <550AEEF3.80702@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 24/02/15 06:34, Pranavkumar Sawargaonkar wrote:
-> Hi Rob,
+On 03/19/2015 03:44 PM, Andre Przywara wrote:
+> Hej Christoffer,
 > 
-> On Mon, Feb 23, 2015 at 10:09 PM, Rob Herring <robherring2-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org> wrote:
->> On Mon, Feb 23, 2015 at 6:07 AM, Christoffer Dall
->> <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
->>> On Sat, Feb 21, 2015 at 03:56:17PM -0600, Rob Herring wrote:
->>>> On Thu, Feb 19, 2015 at 1:03 PM, Christoffer Dall
->>>> <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
->>>>> On Thu, Feb 19, 2015 at 12:23:15PM -0600, Rob Herring wrote:
->>>>>> On Tue, Jan 27, 2015 at 1:03 AM, Pranavkumar Sawargaonkar
->>>>>> <psawargaonkar-qTEPVZfXA3Y@public.gmane.org> wrote:
->>>>>>> In APM X-Gene, GIC register space is 64K aligned while the sizes mentioned
->>>>>>> in the dt are 4K aligned. This breaks KVM when kernel is built with 64K page
->>>>>>> size due to size alignment checking in vgic driver for VCPU Control and
->>>>>>> VCPU register.
->>>>>>>
->>>>>>> This patch corrects the sizes to be inline with the hardware spec.
->>>>>>
->>>>>> This does not make sense. The GIC regions are still only 4 or 8KB and
->>>>>> the h/w description should reflect that. For implementations using
->>>>>> gic-400 and the addressing decode trick, the rest of the register
->>>>>> range is also not safe to access given it is multiple mapped. Also,
->>>>>> this wastes virtual space, but I guess we don't care on 64-bit.
->>>>>>
->>>>>> KVM should be fixed to only check base address alignment. Size
->>>>>> alignment does not matter (if it does, then you need to fix all
->>>>>> register blocks).
->>>>>>
->>>>> It matters if you want to ensure that the 64K page you are assigning to
->>>>> a guest for the GIC virtual CPU interface contains only GIC virtual CPU
->>>>> mappings, and not other random stuff that the guest is not allowed to
->>>>> touch.
->>>>
->>>> Good point.
->>>>
->>>>> How else should this be enforced?
->>>>
->>>> Rely on correct h/w design? You'll have to repeat this every time you
->>>> want to do pass-thru of a device.
->>>>
->>>> What do you do if 64K mapping is not supported? Fallback to emulation
->>>> of the CPU interface?
->>>
->>> Agree with Peter on these two points.
->>>
->>>>
->>>> Are there other DTSs that need to be fixed?
->>>>
->>> Not sure really, AMD Seattle works with 64K pages IIRC.
+
+[ ... ]
+
+>>> +static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
+>>> +				   struct kvm_io_device *this, gpa_t addr,
+>>> +				   int len, void *val, bool is_write)
+>>> +{
+>>> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+>>> +	struct vgic_io_device *iodev = container_of(this,
+>>> +						    struct vgic_io_device, dev);
+>>> +	struct kvm_run *run = vcpu->run;
+>>> +	const struct vgic_io_range *range;
+>>> +	struct kvm_exit_mmio mmio;
+>>> +	bool updated_state;
+>>> +	gpa_t offset;
+>>> +
+>>> +	offset = addr - iodev->addr;
+>>> +	range = vgic_find_range(iodev->reg_ranges, len, offset);
+>>> +	if (unlikely(!range || !range->handle_mmio)) {
+>>> +		pr_warn("Unhandled access %d %08llx %d\n", is_write, addr, len);
+>>> +		return -ENXIO;
+>>> +	}
+>>> +
+>>> +	mmio.phys_addr = addr;
+>>> +	mmio.len = len;
+>>> +	mmio.is_write = is_write;
+>>> +	if (is_write)
+>>> +		memcpy(mmio.data, val, len);
+>>> +	mmio.private = iodev->redist_vcpu;
+>>> +
+>>> +	spin_lock(&dist->lock);
+>>> +	offset -= range->base;
+>>> +	if (vgic_validate_access(dist, range, offset)) {
+>>> +		updated_state = call_range_handler(vcpu, &mmio, offset, range);
+>>> +		if (!is_write)
+>>> +			memcpy(val, mmio.data, len);
+>>> +	} else {
+>>> +		if (!is_write)
+>>> +			memset(val, 0, len);
+>>> +		updated_state = false;
+>>> +	}
+>>> +	spin_unlock(&dist->lock);
+>>> +	kvm_prepare_mmio(run, &mmio);
 >>
->> Well, looks we have been inconsistent here:
->>
->> arch/arm64/boot/dts/amd/amd-seattle-soc.dtsi-           reg = <0x0
->> 0xe1110000 0 0x1000>,
->> arch/arm64/boot/dts/amd/amd-seattle-soc.dtsi-                 <0x0
->> 0xe112f000 0 0x2000>,
->> arch/arm64/boot/dts/amd/amd-seattle-soc.dtsi-                 <0x0
->> 0xe1140000 0 0x10000>,
->> arch/arm64/boot/dts/amd/amd-seattle-soc.dtsi-                 <0x0
->> 0xe1160000 0 0x10000>;
->>
->> arch/arm64/boot/dts/arm/juno.dts-               reg = <0x0 0x2c010000 0 0x1000>,
->> arch/arm64/boot/dts/arm/juno.dts-                     <0x0 0x2c02f000 0 0x2000>,
->> arch/arm64/boot/dts/arm/juno.dts-                     <0x0 0x2c04f000 0 0x2000>,
->> arch/arm64/boot/dts/arm/juno.dts-                     <0x0 0x2c06f000 0 0x2000>;
->>
->> If we are going to use 64K sizes, can we have some consistency here
->> please. Which ranges really need 64KB sizes? It should only be the
->> VCPU interface. right? Why does XGene need 128K? If XGene is doing
->> address swizzling, then the CPU and VCPU base addresses are wrong.
->> Seattle is also wrong for the VCPU, but no one has noticed because we
->> don't use the DIR register IIRC.
->>
->> XGene should also add an "arm,gic-400" compatible string or something
->> XGene specific if in fact it is not GIC-400.
+>> we're not the only user of kvm_exit_mmio I believe, so we could rename
 > 
-> X-Gene has gic-400 as an interrupt controller.
-> Only thing is GIC pages are mapped at 64K boundary (with 64K page size)
-> Hence CPU, VCPU interfaces has a size of 128K (2GIC pages)
-> Regarding GICC_DIR, yes there is a problem which needs to be solved
-> since the first page size is 64K.
-> In XEN we already have a small fix to access GICC_DIR with 64K page
-> offset instead of standard 4K.
-> I remember a small discussion in this regard in past
-> (http://lists.infradead.org/pipermail/linux-arm-kernel/2014-June/266468.html)
-> which was deferred at that time.
-> Once this patch is accepted we can post RFC patch to address GICC_DIR
-> and discuss further.
+> (assuming you mean we _are_ the only user here, which I can acknowledge)
+> 
+>> this to vgic_io as well and you could change the mmio.data array to be a
+>> void *val pointer, which just gets set to the pointer passed into this
+>> function (which I think points to the kvm_run structs data array) and
+>> you can avoid all these memcopies, right?
+> 
+> That sounds indeed tempting, but the comment on the struct kvm_exit_mmio
+> declaration reads:
+> /*
+>  * The in-kernel MMIO emulation code wants to use a copy of run->mmio,
+>  * which is an anonymous type. Use our own type instead.
+>  */
+> How I understand this the structure was introduced to _not_ use the same
+> memory, but use a copy instead. Do you remember any reason for this? And
+> in how far is this type anonymous? It's even in an uapi header.
+> 
+> Briefly looking at the code we do quite some memcpy on the way.
+> I am about to go all the way down into that ARM MMIO handling cave now
+> to check this (Marc, if I am not showing up again after some hours,
+> please come and rescue me ;-)
 
-I've had a look at my X-Gene board, and noticed the following thing:
+So, I feel that there is quite some unneeded copying and masking on the
+way, but a real fix would be quite invasive and needs quite some testing
+and review. I don't feel like rushing this into a v2 of this series.
+I quickly did what you proposed (replacing memcpy by pointer
+assignment), and that seems to work, but I don't have many chances of
+testing this this weekend, since I am on the road. Also I have to dig
+out my cross-endian test scripts first. So not sure if you want to take
+the risk with this series.
+I changed the other minor points you mentioned in the review though, so
+do you want to have a "v1.5" or how do we proceed from here?
 
-Mustang# md.l 0x78020000 0x10
-78020000: 000001e7 00000080 00000002 000003ff    ................
-78020010: 00000000 000000ff 000003ff 00000003    ................
-78020020: 000003ff 00000000 000003ff 00000000    ................
-78020030: 00000000 00000000 00000000 00000000    ................
-Mustang# md.l 0x7802f000 0x10
-7802f000: 000001e7 00000080 00000002 000003ff    ................
-7802f010: 00000000 000000ff 000003ff 00000003    ................
-7802f020: 000003ff 00000000 000003ff 00000000    ................
-7802f030: 00000000 00000000 00000000 00000000    ................
-
-Notice a pattern? Yes, X-Gene is aliasing the GICC region over the 64k
-page, repeated 16 times, as it should.
-
-So either the DT is fixed to show GICC and GICV at offset 0xf000 (and we
-don't support 64k pages with it), or we extend the binding to present an
-offset inside the 128K region.
-
-My preference goes of course to the latter, because for once we seem to
-have something designed as expected.
-
-Rob, what do you think?
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Cheers,
+Andre.
