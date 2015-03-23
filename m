@@ -1,24 +1,24 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v2 10/12] KVM: arm/arm64: prepare GICv3 emulation to use
- kvm_io_bus MMIO handling
-Date: Mon, 23 Mar 2015 15:58:27 +0000
-Message-ID: <1427126309-11223-11-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v2 11/12] KVM: arm/arm64: rework MMIO abort handling to use
+ KVM MMIO bus
+Date: Mon, 23 Mar 2015 15:58:28 +0000
+Message-ID: <1427126309-11223-12-git-send-email-andre.przywara@arm.com>
 References: <1427126309-11223-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9592249743
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2015 11:51:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 654C649743
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2015 11:51:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PyVBH0faydPE for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id E4Nl9bLY8bXj for <kvmarm@lists.cs.columbia.edu>;
  Mon, 23 Mar 2015 11:51:47 -0400 (EDT)
 Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
  [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E42E349757
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2015 11:51:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 445244975F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2015 11:51:46 -0400 (EDT)
 In-Reply-To: <1427126309-11223-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,120 +33,307 @@ To: marc.zyngier@arm.com, christoffer.dall@linaro.org, pbonzini@redhat.com
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Using the framework provided by the recent vgic.c changes, we
-register a kvm_io_bus device on mapping the virtual GICv3 resources.
-The distributor mapping is pretty straight forward, but the
-redistributors need some more love, since they need to be tagged with
-the respective redistributor (read: VCPU) they are connected with.
-We use the kvm_io_bus framework to register two devices per VCPU, as
-each block is handled independently by the VGIC code.
+Currently we have struct kvm_exit_mmio for encapsulating MMIO abort
+data to be passed on from syndrome decoding all the way down to the
+VGIC register handlers. Now as we switch the MMIO handling to be
+routed through the KVM MMIO bus, it does not make sense anymore to
+use that structure already from the beginning. So we put the data into
+kvm_run very early and use that encapsulation till the MMIO bus call.
+Then we fill kvm_exit_mmio in the VGIC only, making it a VGIC private
+structure. On that way we replace the data buffer in that structure
+with a pointer pointing to a single location in kvm_run, so we get
+rid of some copying on the way.
+I didn't bother to rename kvm_exit_mmio (to vgic_mmio or something),
+because that touches a lot of code lines without any good reason.
+
+This is based on an original patch by Nikolay.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Cc: Nikolay Nikolaev <n.nikolaev@virtualopensystems.com>
 ---
- include/kvm/arm_vgic.h      |    1 +
- virt/kvm/arm/vgic-v3-emul.c |   34 +++++++++++++++++++++++++++++++++-
- virt/kvm/arm/vgic.c         |   18 ++++++++++++++++++
- 3 files changed, 52 insertions(+), 1 deletion(-)
+ arch/arm/include/asm/kvm_mmio.h   |   22 --------------
+ arch/arm/kvm/mmio.c               |   60 ++++++++++++++++++++++++++-----------
+ arch/arm64/include/asm/kvm_mmio.h |   22 --------------
+ include/kvm/arm_vgic.h            |    3 --
+ virt/kvm/arm/vgic.c               |   18 +++--------
+ virt/kvm/arm/vgic.h               |    8 +++++
+ 6 files changed, 55 insertions(+), 78 deletions(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 4523984..d6705f4 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -252,6 +252,7 @@ struct vgic_dist {
- 
- 	struct vgic_vm_ops	vm_ops;
- 	struct vgic_io_device	dist_iodev;
-+	struct vgic_io_device	*redist_iodevs;
+diff --git a/arch/arm/include/asm/kvm_mmio.h b/arch/arm/include/asm/kvm_mmio.h
+index 3f83db2..d8e90c8 100644
+--- a/arch/arm/include/asm/kvm_mmio.h
++++ b/arch/arm/include/asm/kvm_mmio.h
+@@ -28,28 +28,6 @@ struct kvm_decode {
+ 	bool sign_extend;
  };
  
- struct vgic_v2_cpu_if {
-diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
-index 14943e3..35679d1 100644
---- a/virt/kvm/arm/vgic-v3-emul.c
-+++ b/virt/kvm/arm/vgic-v3-emul.c
-@@ -766,6 +766,9 @@ static int vgic_v3_map_resources(struct kvm *kvm,
- {
- 	int ret = 0;
- 	struct vgic_dist *dist = &kvm->arch.vgic;
-+	gpa_t rdbase = dist->vgic_redist_base;
-+	struct vgic_io_device *iodevs = NULL;
-+	int i;
- 
- 	if (!irqchip_in_kernel(kvm))
- 		return 0;
-@@ -791,7 +794,36 @@ static int vgic_v3_map_resources(struct kvm *kvm,
- 		goto out;
- 	}
- 
--	kvm->arch.vgic.ready = true;
-+	ret = vgic_register_kvm_io_dev(kvm, dist->vgic_dist_base,
-+				       GIC_V3_DIST_SIZE, vgic_v3_dist_ranges,
-+				       -1, &dist->dist_iodev);
-+	if (ret)
-+		goto out;
-+
-+	iodevs = kcalloc(dist->nr_cpus * 2, sizeof(iodevs[0]), GFP_KERNEL);
-+	if (!iodevs) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+
-+	/* kvm_vgic_destroy() will take care of destroying the devices later. */
-+	for (i = 0; i < dist->nr_cpus; i++) {
-+		ret = vgic_register_kvm_io_dev(kvm, rdbase,
-+					       SZ_64K, vgic_redist_ranges,
-+					       i, &iodevs[i * 2]);
-+		if (ret)
-+			goto out;
-+		ret = vgic_register_kvm_io_dev(kvm, rdbase + SGI_BASE_OFFSET,
-+					       SZ_64K, vgic_redist_sgi_ranges,
-+					       i, &iodevs[i * 2 + 1]);
-+		if (ret)
-+			goto out;
-+		rdbase += GIC_V3_REDIST_SIZE;
-+	}
-+
-+	dist->redist_iodevs = iodevs;
-+	dist->ready = true;
-+
- out:
- 	if (ret)
- 		kvm_vgic_destroy(kvm);
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 9a732d0..9cbb55f4 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -992,6 +992,8 @@ int vgic_register_kvm_io_dev(struct kvm *kvm, gpa_t base, int len,
- static void vgic_unregister_kvm_io_dev(struct kvm *kvm)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
-+	struct vgic_io_device *iodevs;
-+	int i;
- 
- 	if (!dist || !kvm->buses[KVM_MMIO_BUS])
- 		return;
-@@ -1001,6 +1003,22 @@ static void vgic_unregister_kvm_io_dev(struct kvm *kvm)
- 	if (dist->dist_iodev.dev.ops)
- 		kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
- 					  &dist->dist_iodev.dev);
-+
-+	iodevs = dist->redist_iodevs;
-+	if (iodevs) {
-+		for (i = 0; i < dist->nr_cpus * 2; i++) {
-+			/*
-+			 * Because of a failed initialization we could get here
-+			 * without ever having registered a device.
-+			 */
-+			if (!iodevs[i].dev.ops)
-+				continue;
-+			kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
-+						  &iodevs[i].dev);
-+		}
-+		kfree(iodevs);
-+		dist->redist_iodevs = NULL;
-+	}
- 	mutex_unlock(&kvm->slots_lock);
+-/*
+- * The in-kernel MMIO emulation code wants to use a copy of run->mmio,
+- * which is an anonymous type. Use our own type instead.
+- */
+-struct kvm_exit_mmio {
+-	phys_addr_t	phys_addr;
+-	u8		data[8];
+-	u32		len;
+-	bool		is_write;
+-	void		*private;
+-};
+-
+-static inline void kvm_prepare_mmio(struct kvm_run *run,
+-				    struct kvm_exit_mmio *mmio)
+-{
+-	run->mmio.phys_addr	= mmio->phys_addr;
+-	run->mmio.len		= mmio->len;
+-	run->mmio.is_write	= mmio->is_write;
+-	memcpy(run->mmio.data, mmio->data, mmio->len);
+-	run->exit_reason	= KVM_EXIT_MMIO;
+-}
+-
+ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		 phys_addr_t fault_ipa);
+diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
+index 5d3bfc0..bb2ab44 100644
+--- a/arch/arm/kvm/mmio.c
++++ b/arch/arm/kvm/mmio.c
+@@ -122,7 +122,7 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
  }
  
+ static int decode_hsr(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+-		      struct kvm_exit_mmio *mmio)
++		      struct kvm_run *run)
+ {
+ 	unsigned long rt;
+ 	int len;
+@@ -148,9 +148,9 @@ static int decode_hsr(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	sign_extend = kvm_vcpu_dabt_issext(vcpu);
+ 	rt = kvm_vcpu_dabt_get_rd(vcpu);
+ 
+-	mmio->is_write = is_write;
+-	mmio->phys_addr = fault_ipa;
+-	mmio->len = len;
++	run->mmio.is_write = is_write;
++	run->mmio.phys_addr = fault_ipa;
++	run->mmio.len = len;
+ 	vcpu->arch.mmio_decode.sign_extend = sign_extend;
+ 	vcpu->arch.mmio_decode.rt = rt;
+ 
+@@ -162,23 +162,49 @@ static int decode_hsr(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	return 0;
+ }
+ 
++/**
++ * handle_kernel_mmio - handle an in-kernel MMIO access
++ * @vcpu:	pointer to the vcpu performing the access
++ * @run:	pointer to the kvm_run structure
++ *
++ * returns true if the MMIO access has been performed in kernel space,
++ * and false if it needs to be emulated in user space.
++ */
++static bool handle_kernel_mmio(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++	int ret;
++
++	if (run->mmio.is_write) {
++		ret = kvm_io_bus_write(vcpu, KVM_MMIO_BUS, run->mmio.phys_addr,
++				       run->mmio.len, run->mmio.data);
++
++	} else {
++		ret = kvm_io_bus_read(vcpu, KVM_MMIO_BUS, run->mmio.phys_addr,
++				      run->mmio.len, run->mmio.data);
++	}
++	if (!ret) {
++		kvm_handle_mmio_return(vcpu, run);
++		return true;
++	}
++
++	return false;
++}
++
+ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		 phys_addr_t fault_ipa)
+ {
+-	struct kvm_exit_mmio mmio;
+ 	unsigned long data;
+ 	unsigned long rt;
+ 	int ret;
+ 
+ 	/*
+-	 * Prepare MMIO operation. First stash it in a private
+-	 * structure that we can use for in-kernel emulation. If the
+-	 * kernel can't handle it, copy it into run->mmio and let user
+-	 * space do its magic.
++	 * Prepare MMIO operation. First put the MMIO data into run->mmio.
++	 * Then try if some in-kernel emulation feels responsible, otherwise
++	 * let user space do its magic.
+ 	 */
+ 
+ 	if (kvm_vcpu_dabt_isvalid(vcpu)) {
+-		ret = decode_hsr(vcpu, fault_ipa, &mmio);
++		ret = decode_hsr(vcpu, fault_ipa, run);
+ 		if (ret)
+ 			return ret;
+ 	} else {
+@@ -188,21 +214,21 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 
+ 	rt = vcpu->arch.mmio_decode.rt;
+ 
+-	if (mmio.is_write) {
++	if (run->mmio.is_write) {
+ 		data = vcpu_data_guest_to_host(vcpu, *vcpu_reg(vcpu, rt),
+-					       mmio.len);
++					       run->mmio.len);
+ 
+-		trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, mmio.len,
++		trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, run->mmio.len,
+ 			       fault_ipa, data);
+-		mmio_write_buf(mmio.data, mmio.len, data);
++		mmio_write_buf(run->mmio.data, run->mmio.len, data);
+ 	} else {
+-		trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, mmio.len,
++		trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, run->mmio.len,
+ 			       fault_ipa, 0);
+ 	}
+ 
+-	if (vgic_handle_mmio(vcpu, run, &mmio))
++	if (handle_kernel_mmio(vcpu, run))
+ 		return 1;
+ 
+-	kvm_prepare_mmio(run, &mmio);
++	run->exit_reason = KVM_EXIT_MMIO;
+ 	return 0;
+ }
+diff --git a/arch/arm64/include/asm/kvm_mmio.h b/arch/arm64/include/asm/kvm_mmio.h
+index 9f52beb..889c908 100644
+--- a/arch/arm64/include/asm/kvm_mmio.h
++++ b/arch/arm64/include/asm/kvm_mmio.h
+@@ -31,28 +31,6 @@ struct kvm_decode {
+ 	bool sign_extend;
+ };
+ 
+-/*
+- * The in-kernel MMIO emulation code wants to use a copy of run->mmio,
+- * which is an anonymous type. Use our own type instead.
+- */
+-struct kvm_exit_mmio {
+-	phys_addr_t	phys_addr;
+-	u8		data[8];
+-	u32		len;
+-	bool		is_write;
+-	void		*private;
+-};
+-
+-static inline void kvm_prepare_mmio(struct kvm_run *run,
+-				    struct kvm_exit_mmio *mmio)
+-{
+-	run->mmio.phys_addr	= mmio->phys_addr;
+-	run->mmio.len		= mmio->len;
+-	run->mmio.is_write	= mmio->is_write;
+-	memcpy(run->mmio.data, mmio->data, mmio->len);
+-	run->exit_reason	= KVM_EXIT_MMIO;
+-}
+-
+ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		 phys_addr_t fault_ipa);
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index d6705f4..14853d8 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -314,7 +314,6 @@ struct vgic_cpu {
+ struct kvm;
+ struct kvm_vcpu;
+ struct kvm_run;
+-struct kvm_exit_mmio;
+ 
+ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
+ int kvm_vgic_hyp_init(void);
+@@ -330,8 +329,6 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
+ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
+ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+ int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
+-bool vgic_handle_mmio(struct kvm_vcpu *vcpu, struct kvm_run *run,
+-		      struct kvm_exit_mmio *mmio);
+ 
+ #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+ #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 9cbb55f4..2598fe8 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -758,7 +758,6 @@ static bool call_range_handler(struct kvm_vcpu *vcpu,
+ 			       unsigned long offset,
+ 			       const struct vgic_io_range *range)
+ {
+-	u32 *data32 = (void *)mmio->data;
+ 	struct kvm_exit_mmio mmio32;
+ 	bool ret;
+ 
+@@ -775,18 +774,12 @@ static bool call_range_handler(struct kvm_vcpu *vcpu,
+ 	mmio32.private = mmio->private;
+ 
+ 	mmio32.phys_addr = mmio->phys_addr + 4;
+-	if (mmio->is_write)
+-		*(u32 *)mmio32.data = data32[1];
++	mmio32.data = &((u32 *)mmio->data)[1];
+ 	ret = range->handle_mmio(vcpu, &mmio32, offset + 4);
+-	if (!mmio->is_write)
+-		data32[1] = *(u32 *)mmio32.data;
+ 
+ 	mmio32.phys_addr = mmio->phys_addr;
+-	if (mmio->is_write)
+-		*(u32 *)mmio32.data = data32[0];
++	mmio32.data = &((u32 *)mmio->data)[0];
+ 	ret |= range->handle_mmio(vcpu, &mmio32, offset);
+-	if (!mmio->is_write)
+-		data32[0] = *(u32 *)mmio32.data;
+ 
+ 	return ret;
+ }
+@@ -873,23 +866,20 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
+ 	mmio.phys_addr = addr;
+ 	mmio.len = len;
+ 	mmio.is_write = is_write;
+-	if (is_write)
+-		memcpy(mmio.data, val, len);
++	mmio.data = val;
+ 	mmio.private = iodev->redist_vcpu;
+ 
+ 	spin_lock(&dist->lock);
+ 	offset -= range->base;
+ 	if (vgic_validate_access(dist, range, offset)) {
+ 		updated_state = call_range_handler(vcpu, &mmio, offset, range);
+-		if (!is_write)
+-			memcpy(val, mmio.data, len);
+ 	} else {
+ 		if (!is_write)
+ 			memset(val, 0, len);
+ 		updated_state = false;
+ 	}
+ 	spin_unlock(&dist->lock);
+-	kvm_prepare_mmio(run, &mmio);
++	run->exit_reason = KVM_EXIT_MMIO;
+ 	kvm_handle_mmio_return(vcpu, run);
+ 
+ 	if (updated_state)
+diff --git a/virt/kvm/arm/vgic.h b/virt/kvm/arm/vgic.h
+index 28fa3aa..fc73103 100644
+--- a/virt/kvm/arm/vgic.h
++++ b/virt/kvm/arm/vgic.h
+@@ -59,6 +59,14 @@ void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq);
+ void vgic_unqueue_irqs(struct kvm_vcpu *vcpu);
+ 
++struct kvm_exit_mmio {
++	phys_addr_t	phys_addr;
++	void		*data;
++	u32		len;
++	bool		is_write;
++	void		*private;
++};
++
+ void vgic_reg_access(struct kvm_exit_mmio *mmio, u32 *reg,
+ 		     phys_addr_t offset, int mode);
+ bool handle_mmio_raz_wi(struct kvm_vcpu *vcpu, struct kvm_exit_mmio *mmio,
 -- 
 1.7.9.5
