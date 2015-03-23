@@ -1,112 +1,29 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 08/12] KVM: arm/arm64: implement kvm_io_bus MMIO handling
- for the VGIC
-Date: Fri, 20 Mar 2015 15:25:41 +0100
-Message-ID: <20150320142541.GG23225@cbox>
-References: <1426263012-22935-1-git-send-email-andre.przywara@arm.com>
- <1426263012-22935-9-git-send-email-andre.przywara@arm.com>
- <20150314142720.GD10935@cbox>
- <550AEEF3.80702@arm.com>
- <550C1522.80105@arm.com>
+From: Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH v2 1/1] iommu/arm-smmu: fix ARM_SMMU_FEAT_TRANS_OPS
+ condition
+Date: Mon, 23 Mar 2015 15:23:41 +0100
+Message-ID: <20150323142340.GA2226@8bytes.org>
+References: <1425484266-5449-1-git-send-email-b.reynal@virtualopensystems.com>
+ <20150304183258.GN17250@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <550C1522.80105@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "n.nikolaev@virtualopensystems.com" <n.nikolaev@virtualopensystems.com>, "eric.auger@linaro.org" <eric.auger@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+In-Reply-To: <20150304183258.GN17250@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: Baptiste Reynal <b.reynal@virtualopensystems.com>, "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "tech@virtualopensystems.com" <tech@virtualopensystems.com>, "moderated list:ARM SMMU DRIVER" <linux-arm-kernel@lists.infradead.org>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Mar 20, 2015 at 12:40:02PM +0000, Andre Przywara wrote:
-> On 03/19/2015 03:44 PM, Andre Przywara wrote:
-> > Hej Christoffer,
-> > 
+On Wed, Mar 04, 2015 at 06:32:58PM +0000, Will Deacon wrote:
+> > -	if (smmu->version == 1 || (!(id & ID0_ATOSNS) && (id & ID0_S1TS))) {
+> > +	if ((id & ID0_S1TS) && ((smmu->version == 1) || (id & ID0_ATOSNS))) {
+> >  		smmu->features |= ARM_SMMU_FEAT_TRANS_OPS;
+> >  		dev_notice(smmu->dev, "\taddress translation ops\n");
 > 
-> [ ... ]
+> Acked-by: Will Deacon <will.deacon@arm.com>
 > 
-> >>> +static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
-> >>> +				   struct kvm_io_device *this, gpa_t addr,
-> >>> +				   int len, void *val, bool is_write)
-> >>> +{
-> >>> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> >>> +	struct vgic_io_device *iodev = container_of(this,
-> >>> +						    struct vgic_io_device, dev);
-> >>> +	struct kvm_run *run = vcpu->run;
-> >>> +	const struct vgic_io_range *range;
-> >>> +	struct kvm_exit_mmio mmio;
-> >>> +	bool updated_state;
-> >>> +	gpa_t offset;
-> >>> +
-> >>> +	offset = addr - iodev->addr;
-> >>> +	range = vgic_find_range(iodev->reg_ranges, len, offset);
-> >>> +	if (unlikely(!range || !range->handle_mmio)) {
-> >>> +		pr_warn("Unhandled access %d %08llx %d\n", is_write, addr, len);
-> >>> +		return -ENXIO;
-> >>> +	}
-> >>> +
-> >>> +	mmio.phys_addr = addr;
-> >>> +	mmio.len = len;
-> >>> +	mmio.is_write = is_write;
-> >>> +	if (is_write)
-> >>> +		memcpy(mmio.data, val, len);
-> >>> +	mmio.private = iodev->redist_vcpu;
-> >>> +
-> >>> +	spin_lock(&dist->lock);
-> >>> +	offset -= range->base;
-> >>> +	if (vgic_validate_access(dist, range, offset)) {
-> >>> +		updated_state = call_range_handler(vcpu, &mmio, offset, range);
-> >>> +		if (!is_write)
-> >>> +			memcpy(val, mmio.data, len);
-> >>> +	} else {
-> >>> +		if (!is_write)
-> >>> +			memset(val, 0, len);
-> >>> +		updated_state = false;
-> >>> +	}
-> >>> +	spin_unlock(&dist->lock);
-> >>> +	kvm_prepare_mmio(run, &mmio);
-> >>
-> >> we're not the only user of kvm_exit_mmio I believe, so we could rename
-> > 
-> > (assuming you mean we _are_ the only user here, which I can acknowledge)
-> > 
-> >> this to vgic_io as well and you could change the mmio.data array to be a
-> >> void *val pointer, which just gets set to the pointer passed into this
-> >> function (which I think points to the kvm_run structs data array) and
-> >> you can avoid all these memcopies, right?
-> > 
-> > That sounds indeed tempting, but the comment on the struct kvm_exit_mmio
-> > declaration reads:
-> > /*
-> >  * The in-kernel MMIO emulation code wants to use a copy of run->mmio,
-> >  * which is an anonymous type. Use our own type instead.
-> >  */
-> > How I understand this the structure was introduced to _not_ use the same
-> > memory, but use a copy instead. Do you remember any reason for this? And
-> > in how far is this type anonymous? It's even in an uapi header.
-> > 
-> > Briefly looking at the code we do quite some memcpy on the way.
-> > I am about to go all the way down into that ARM MMIO handling cave now
-> > to check this (Marc, if I am not showing up again after some hours,
-> > please come and rescue me ;-)
-> 
-> So, I feel that there is quite some unneeded copying and masking on the
-> way, but a real fix would be quite invasive and needs quite some testing
-> and review. I don't feel like rushing this into a v2 of this series.
-> I quickly did what you proposed (replacing memcpy by pointer
-> assignment), and that seems to work, but I don't have many chances of
-> testing this this weekend, since I am on the road. Also I have to dig
-> out my cross-endian test scripts first. So not sure if you want to take
-> the risk with this series.
-> I changed the other minor points you mentioned in the review though, so
-> do you want to have a "v1.5" or how do we proceed from here?
-> 
-Why is it so invasive?  See my previous mail.  If you can convince me
-that we're touching something truly nasty (code snippet?) then ok, we
-can take a version without the cleanup and cleanup later.
+> Sorry Joerg, but this is the latest in the drip of ARM SMMU fixes for
+> 4.0! Please pick it up with the rest.
 
-If you're out of time, send me whatever you have, and we'll see if I fix
-it up further or just leave it for the future.
-
-Thanks,
--Christoffer
+Applied to iommu/fixes, thanks.
