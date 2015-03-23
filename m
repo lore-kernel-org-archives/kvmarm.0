@@ -1,102 +1,55 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v5 2/6] target-arm: kvm: save/restore mp state
-Date: Mon, 23 Mar 2015 17:05:40 +0000
-Message-ID: <1427130344-27986-3-git-send-email-alex.bennee@linaro.org>
-References: <1427130344-27986-1-git-send-email-alex.bennee@linaro.org>
+Subject: [PATCH v5 0/6] QEMU ARM64 Migration Fixes
+Date: Mon, 23 Mar 2015 17:05:38 +0000
+Message-ID: <1427130344-27986-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A8E48497C0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2015 12:58:30 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qfe63S9ksYxw for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Mar 2015 12:58:29 -0400 (EDT)
-Received: from socrates.bennee.com
- (static.88-198-71-155.clients.your-server.de [88.198.71.155])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 45D9D497B7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2015 12:58:28 -0400 (EDT)
-In-Reply-To: <1427130344-27986-1-git-send-email-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
 To: qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhpcyBhZGRzIHRoZSBzYXZpbmcgYW5kIHJlc3RvcmUgb2YgdGhlIGN1cnJlbnQgTXVsdGktUHJv
-Y2Vzc2luZyBzdGF0ZQpvZiB0aGUgbWFjaGluZS4gV2hpbGUgdGhlIEtWTV9HRVQvU0VUX01QX1NU
-QVRFIEFQSSBleHBvc2VzIGEgbnVtYmVyIG9mCnBvdGVudGlhbCBzdGF0ZXMgZm9yIHg4NiB3ZSBv
-bmx5IHVzZSB0d28gZm9yIEFSTS4gRWl0aGVyIHRoZSBwcm9jZXNzIGlzCnJ1bm5pbmcgb3Igbm90
-LiBXZSB0aGVuIHNhdmUgdGhpcyBzdGF0ZSBpbnRvIHRoZSBjcHVfcG93ZXJlZCBUQ0cgc3RhdGUK
-dG8gYXZvaWQgY2hhbmdpbmcgdGhlIHNlcmlhbGlzYXRpb24gZm9ybWF0LgoKU2lnbmVkLW9mZi1i
-eTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgoKLS0tCnYyCiAgLSBtYWtl
-IG1wc3RhdGUgZmllbGQgcnVudGltZSBkZXBlbmRhbnQgKGt2bV9lbmFibGVkKCkpCiAgLSBkcm9w
-IGluaXRpYWwgS1ZNX0NBUF9NUF9TVEFURSByZXF1aXJlbWVudAogIC0gcmUtdXNlIGNwdV9wb3dl
-cmVkIGluc3RlYWQgb2YgbmV3IGZpZWxkCgp2NAogIC0gcy9IQUxURUQvU1RPUFBFRC8KICAtIG1v
-dmUgY29kZSBmcm9tIG1hY2hpbmUuYyB0byBrdm0uCgpkaWZmIC0tZ2l0IGEvdGFyZ2V0LWFybS9r
-dm0uYyBiL3RhcmdldC1hcm0va3ZtLmMKaW5kZXggNzJjMWZhMS4uYTc0ODMyYyAxMDA2NDQKLS0t
-IGEvdGFyZ2V0LWFybS9rdm0uYworKysgYi90YXJnZXQtYXJtL2t2bS5jCkBAIC00NTgsNiArNDU4
-LDQ2IEBAIHZvaWQga3ZtX2FybV9yZXNldF92Y3B1KEFSTUNQVSAqY3B1KQogICAgIH0KIH0KIAor
-LyoKKyAqIFVwZGF0ZSBLVk0ncyBNUF9TVEFURSBiYXNlZCBvbiB3aGF0IFFFTVUgdGhpbmtzIGl0
-IGlzCisgKi8KK2ludCBrdm1fYXJtX3N5bmNfbXBzdGF0ZV90b19rdm0oQVJNQ1BVICpjcHUpCit7
-CisgICAgaWYgKGt2bV9jaGVja19leHRlbnNpb24oQ1BVKGNwdSktPmt2bV9zdGF0ZSwgS1ZNX0NB
-UF9NUF9TVEFURSkpIHsKKyAgICAgICAgc3RydWN0IGt2bV9tcF9zdGF0ZSBtcF9zdGF0ZSA9IHsK
-KyAgICAgICAgICAgIC5tcF9zdGF0ZSA9CisgICAgICAgICAgICBjcHUtPnBvd2VyZWRfb2ZmID8g
-S1ZNX01QX1NUQVRFX1NUT1BQRUQgOiBLVk1fTVBfU1RBVEVfUlVOTkFCTEUKKyAgICAgICAgfTsK
-KyAgICAgICAgaW50IHJldCA9IGt2bV92Y3B1X2lvY3RsKENQVShjcHUpLCBLVk1fU0VUX01QX1NU
-QVRFLCAmbXBfc3RhdGUpOworICAgICAgICBpZiAocmV0KSB7CisgICAgICAgICAgICBmcHJpbnRm
-KHN0ZGVyciwgIiVzOiBmYWlsZWQgdG8gc2V0IE1QX1NUQVRFICVkLyVzXG4iLAorICAgICAgICAg
-ICAgICAgICAgICBfX2Z1bmNfXywgcmV0LCBzdHJlcnJvcihyZXQpKTsKKyAgICAgICAgICAgIHJl
-dHVybiAtMTsKKyAgICAgICAgfQorICAgIH0KKworICAgIHJldHVybiAwOworfQorCisvKgorICog
-U3luYyB0aGUgS1ZNIE1QX1NUQVRFIGludG8gUUVNVQorICovCitpbnQga3ZtX2FybV9zeW5jX21w
-c3RhdGVfdG9fcWVtdShBUk1DUFUgKmNwdSkKK3sKKyAgICBpZiAoa3ZtX2NoZWNrX2V4dGVuc2lv
-bihDUFUoY3B1KS0+a3ZtX3N0YXRlLCBLVk1fQ0FQX01QX1NUQVRFKSkgeworICAgICAgICBzdHJ1
-Y3Qga3ZtX21wX3N0YXRlIG1wX3N0YXRlOworICAgICAgICBpbnQgcmV0ID0ga3ZtX3ZjcHVfaW9j
-dGwoQ1BVKGNwdSksIEtWTV9HRVRfTVBfU1RBVEUsICZtcF9zdGF0ZSk7CisgICAgICAgIGlmIChy
-ZXQpIHsKKyAgICAgICAgICAgIGZwcmludGYoc3RkZXJyLCAiJXM6IGZhaWxlZCB0byBnZXQgTVBf
-U1RBVEUgJWQvJXNcbiIsCisgICAgICAgICAgICAgICAgICAgIF9fZnVuY19fLCByZXQsIHN0cmVy
-cm9yKHJldCkpOworICAgICAgICAgICAgYWJvcnQoKTsKKyAgICAgICAgfQorICAgICAgICBjcHUt
-PnBvd2VyZWRfb2ZmID0gKG1wX3N0YXRlLm1wX3N0YXRlID09IEtWTV9NUF9TVEFURV9TVE9QUEVE
-KTsKKyAgICB9CisKKyAgICByZXR1cm4gMDsKK30KKwogdm9pZCBrdm1fYXJjaF9wcmVfcnVuKENQ
-VVN0YXRlICpjcywgc3RydWN0IGt2bV9ydW4gKnJ1bikKIHsKIH0KZGlmZiAtLWdpdCBhL3Rhcmdl
-dC1hcm0va3ZtMzIuYyBiL3RhcmdldC1hcm0va3ZtMzIuYwppbmRleCA5NDAzMGQxLi40OWI2YmFi
-IDEwMDY0NAotLS0gYS90YXJnZXQtYXJtL2t2bTMyLmMKKysrIGIvdGFyZ2V0LWFybS9rdm0zMi5j
-CkBAIC0zNTYsNiArMzU2LDggQEAgaW50IGt2bV9hcmNoX3B1dF9yZWdpc3RlcnMoQ1BVU3RhdGUg
-KmNzLCBpbnQgbGV2ZWwpCiAgICAgICAgIHJldHVybiBFSU5WQUw7CiAgICAgfQogCisgICAga3Zt
-X2FybV9zeW5jX21wc3RhdGVfdG9fa3ZtKGNwdSk7CisKICAgICByZXR1cm4gcmV0OwogfQogCkBA
-IC00MjcsNSArNDI5LDcgQEAgaW50IGt2bV9hcmNoX2dldF9yZWdpc3RlcnMoQ1BVU3RhdGUgKmNz
-KQogICAgICAqLwogICAgIHdyaXRlX2xpc3RfdG9fY3B1c3RhdGUoY3B1KTsKIAorICAgIGt2bV9h
-cm1fc3luY19tcHN0YXRlX3RvX3FlbXUoY3B1KTsKKwogICAgIHJldHVybiAwOwogfQpkaWZmIC0t
-Z2l0IGEvdGFyZ2V0LWFybS9rdm02NC5jIGIvdGFyZ2V0LWFybS9rdm02NC5jCmluZGV4IDhjZjNh
-NjIuLmZlZDAzZjIgMTAwNjQ0Ci0tLSBhL3RhcmdldC1hcm0va3ZtNjQuYworKysgYi90YXJnZXQt
-YXJtL2t2bTY0LmMKQEAgLTIxMSw2ICsyMTEsOCBAQCBpbnQga3ZtX2FyY2hfcHV0X3JlZ2lzdGVy
-cyhDUFVTdGF0ZSAqY3MsIGludCBsZXZlbCkKICAgICAgICAgcmV0dXJuIEVJTlZBTDsKICAgICB9
-CiAKKyAgICBrdm1fYXJtX3N5bmNfbXBzdGF0ZV90b19rdm0oY3B1KTsKKwogICAgIC8qIFRPRE86
-CiAgICAgICogRlAgc3RhdGUKICAgICAgKi8KQEAgLTMxMCw2ICszMTIsOCBAQCBpbnQga3ZtX2Fy
-Y2hfZ2V0X3JlZ2lzdGVycyhDUFVTdGF0ZSAqY3MpCiAgICAgICovCiAgICAgd3JpdGVfbGlzdF90
-b19jcHVzdGF0ZShjcHUpOwogCisgICAga3ZtX2FybV9zeW5jX21wc3RhdGVfdG9fcWVtdShjcHUp
-OworCiAgICAgLyogVE9ETzogb3RoZXIgcmVnaXN0ZXJzICovCiAgICAgcmV0dXJuIHJldDsKIH0K
-ZGlmZiAtLWdpdCBhL3RhcmdldC1hcm0va3ZtX2FybS5oIGIvdGFyZ2V0LWFybS9rdm1fYXJtLmgK
-aW5kZXggNDU1ZGVhMy4uN2I3NTc1OCAxMDA2NDQKLS0tIGEvdGFyZ2V0LWFybS9rdm1fYXJtLmgK
-KysrIGIvdGFyZ2V0LWFybS9rdm1fYXJtLmgKQEAgLTE2Miw2ICsxNjIsMjQgQEAgdHlwZWRlZiBz
-dHJ1Y3QgQVJNSG9zdENQVUNsYXNzIHsKICAqLwogYm9vbCBrdm1fYXJtX2dldF9ob3N0X2NwdV9m
-ZWF0dXJlcyhBUk1Ib3N0Q1BVQ2xhc3MgKmFoY2MpOwogCisKKy8qKgorICoga3ZtX2FybV9zeW5j
-X21wc3RhdGVfdG9fa3ZtCisgKiBAY3B1OiBBUk1DUFUKKyAqCisgKiBJZiBzdXBwb3J0ZWQgc2V0
-IHRoZSBLVk0gTVBfU1RBVEUgYmFzZWQgb24gUUVNVXMgbWlncmF0aW9uIGRhdGEuCisgKi8KK2lu
-dCBrdm1fYXJtX3N5bmNfbXBzdGF0ZV90b19rdm0oQVJNQ1BVICpjcHUpOworCisvKioKKyAqIGt2
-bV9hcm1fc3luY19tcHN0YXRlX3RvX3FlbXUKKyAqIEBjcHU6IEFSTUNQVQorICoKKyAqIElmIHN1
-cHBvcnRlZCBnZXQgdGhlIE1QX1NUQVRFIGZyb20gS1ZNIGFuZCBzdG9yZSBpbiBRRU1VcyBtaWdy
-YXRpb24KKyAqIGRhdGEuCisgKi8KK2ludCBrdm1fYXJtX3N5bmNfbXBzdGF0ZV90b19xZW11KEFS
-TUNQVSAqY3B1KTsKKwogI2VuZGlmCiAKICNlbmRpZgotLSAKMi4zLjIKCl9fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3Zt
-YXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9t
-YWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+Hi,
+
+=46ollowing some review comments (and a patch) from Peter I've re-spun
+this series:
+
+v5
+  - Added Peter's SPSR_EL1 state fix for architectural mapping
+  - As a result SPSR save/restore no longer does munge
+  - FP register save/restore re-done to deal float128 mapping
+  - Some minor [ spaces ] added
+
+I submitted the kernel side of this on Friday
+
+Branch: https://github.com/stsquad/qemu/tree/migration/fixes-v5
+Kernel: https://git.linaro.org/people/alex.bennee/linux.git/shortlog/re=
+fs/heads/migration/kvmarm-fixes-for-4.0-v3
+
+Alex Benn=C3=A9e (5):
+  target-arm: kvm: save/restore mp state
+  hw/intc: arm_gic_kvm.c restore config first
+  target-arm: kvm64 sync FP register state
+  target-arm: kvm64 fix save/restore of SPSR regs
+  target-arm: cpu.h document why env->spsr exists
+
+Peter Maydell (1):
+  target-arm: Store SPSR_EL1 state in banked_spsr[1] (SPSR_svc)
+
+ hw/intc/arm_gic_kvm.c   |   7 ++-
+ target-arm/cpu.h        |   5 +++
+ target-arm/helper-a64.c |   2 +-
+ target-arm/helper.c     |   2 +-
+ target-arm/internals.h  |   5 ++-
+ target-arm/kvm.c        |  40 +++++++++++++++++
+ target-arm/kvm32.c      |   4 ++
+ target-arm/kvm64.c      | 111 ++++++++++++++++++++++++++++++++++++++++=
++++++---
+ target-arm/kvm_arm.h    |  18 ++++++++
+ 9 files changed, 184 insertions(+), 10 deletions(-)
+
+--=20
+2.3.2
+
