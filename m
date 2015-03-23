@@ -1,59 +1,40 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v2 04/12] KVM: x86: remove now unneeded include directory from
- Makefile
-Date: Mon, 23 Mar 2015 15:58:21 +0000
-Message-ID: <1427126309-11223-5-git-send-email-andre.przywara@arm.com>
-References: <1427126309-11223-1-git-send-email-andre.przywara@arm.com>
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH v5 6/6] target-arm: cpu.h document why env->spsr exists
+Date: Mon, 23 Mar 2015 17:05:44 +0000
+Message-ID: <1427130344-27986-7-git-send-email-alex.bennee@linaro.org>
+References: <1427130344-27986-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F92449773
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2015 11:51:49 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LewfDScB4zY1 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 23 Mar 2015 11:51:45 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 95B7649736
- for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2015 11:51:44 -0400 (EDT)
-In-Reply-To: <1427126309-11223-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: marc.zyngier@arm.com, christoffer.dall@linaro.org, pbonzini@redhat.com
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1427130344-27986-1-git-send-email-alex.bennee@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-virt/kvm was never really a good include directory for anything else
-than locally included headers.
-With the move of iodev.h there is no need anymore to add this
-directory the compiler's include path, so remove it from the x86 kvm
-Makefile.
+I was getting very confused about the duplication of state so wanted to
+make it explicit.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- arch/x86/kvm/Makefile |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index 08f790d..16e8f96 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -1,5 +1,5 @@
- 
--ccflags-y += -Ivirt/kvm -Iarch/x86/kvm
-+ccflags-y += -Iarch/x86/kvm
- 
- CFLAGS_x86.o := -I.
- CFLAGS_svm.o := -I.
--- 
-1.7.9.5
+diff --git a/target-arm/cpu.h b/target-arm/cpu.h
+index 083211c..6dc1799 100644
+--- a/target-arm/cpu.h
++++ b/target-arm/cpu.h
+@@ -155,6 +155,11 @@ typedef struct CPUARMState {
+        This contains all the other bits.  Use cpsr_{read,write} to acc=
+ess
+        the whole CPSR.  */
+     uint32_t uncached_cpsr;
++    /* The spsr is a alias for spsr_elN where N is the current
++     * exception level. It is provided for here so the TCG msr/mrs
++     * implementation can access one register. Care needs to be taken
++     * to ensure the banked_spsr[] is also updated.
++     */
+     uint32_t spsr;
+=20
+     /* Banked registers.  */
+--=20
+2.3.2
+
