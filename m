@@ -1,153 +1,102 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v5 4/6] target-arm: kvm64 sync FP register state
-Date: Mon, 23 Mar 2015 17:05:42 +0000
-Message-ID: <1427130344-27986-5-git-send-email-alex.bennee@linaro.org>
+Subject: [PATCH v5 2/6] target-arm: kvm: save/restore mp state
+Date: Mon, 23 Mar 2015 17:05:40 +0000
+Message-ID: <1427130344-27986-3-git-send-email-alex.bennee@linaro.org>
 References: <1427130344-27986-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A8E48497C0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2015 12:58:30 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id qfe63S9ksYxw for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 23 Mar 2015 12:58:29 -0400 (EDT)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 45D9D497B7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 23 Mar 2015 12:58:28 -0400 (EDT)
 In-Reply-To: <1427130344-27986-1-git-send-email-alex.bennee@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-=46or migration to work we need to sync all of the register state. This=
- is
-especially noticeable when GCC starts using FP registers as spill
-registers even with integer programs.
-
-Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
----
-
-v4:
-  - fixed merge conflicts
-  - rm superfluous reg.id++
-v5:
-  - use interim float128 to deal with endianess
-  - correctly map into vfp.regs[]
-  - fix spacing around []s
-
-diff --git a/target-arm/kvm64.c b/target-arm/kvm64.c
-index fed03f2..857e970 100644
---- a/target-arm/kvm64.c
-+++ b/target-arm/kvm64.c
-@@ -126,9 +126,16 @@ bool kvm_arm_reg_syncs_via_cpreg_list(uint64_t reg=
-idx)
- #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
-                  KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
-=20
-+#define AARCH64_SIMD_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U128 =
-| \
-+                 KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
-+
-+#define AARCH64_SIMD_CTRL_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U32 |=
- \
-+                 KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
-+
- int kvm_arch_put_registers(CPUState *cs, int level)
- {
-     struct kvm_one_reg reg;
-+    uint32_t fpr;
-     uint64_t val;
-     int i;
-     int ret;
-@@ -207,15 +214,42 @@ int kvm_arch_put_registers(CPUState *cs, int leve=
-l)
-         }
-     }
-=20
-+    /* Advanced SIMD and FP registers
-+     * We map Qn =3D regs[2n+1]:regs[2n]
-+     */
-+    for (i =3D 0; i < 32; i++) {
-+        int rd =3D i << 1;
-+        float128 fp_val =3D make_float128(env->vfp.regs[rd + 1],
-+                                        env->vfp.regs[rd]);
-+        reg.id =3D AARCH64_SIMD_CORE_REG(fp_regs.vregs[i]);
-+        reg.addr =3D (uintptr_t)(&fp_val);
-+        ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-+        if (ret) {
-+            return ret;
-+        }
-+    }
-+
-+    reg.addr =3D (uintptr_t)(&fpr);
-+    fpr =3D vfp_get_fpsr(env);
-+    reg.id =3D AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
-+    ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    fpr =3D vfp_get_fpcr(env);
-+    reg.id =3D AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
-+    ret =3D kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-+    if (ret) {
-+        return ret;
-+    }
-+
-     if (!write_list_to_kvmstate(cpu)) {
-         return EINVAL;
-     }
-=20
-     kvm_arm_sync_mpstate_to_kvm(cpu);
-=20
--    /* TODO:
--     * FP state
--     */
-     return ret;
- }
-=20
-@@ -223,6 +257,7 @@ int kvm_arch_get_registers(CPUState *cs)
- {
-     struct kvm_one_reg reg;
-     uint64_t val;
-+    uint32_t fpr;
-     int i;
-     int ret;
-=20
-@@ -304,6 +339,38 @@ int kvm_arch_get_registers(CPUState *cs)
-         }
-     }
-=20
-+    /* Advanced SIMD and FP registers
-+     * We map Qn =3D regs[2n+1]:regs[2n]
-+     */
-+    for (i =3D 0; i < 32; i++) {
-+        float128 fp_val;
-+        reg.id =3D AARCH64_SIMD_CORE_REG(fp_regs.vregs[i]);
-+        reg.addr =3D (uintptr_t)(&fp_val);
-+        ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-+        if (ret) {
-+            return ret;
-+        } else {
-+            int rd =3D i << 1;
-+            env->vfp.regs[rd + 1] =3D fp_val.high;
-+            env->vfp.regs[rd] =3D fp_val.low;
-+        }
-+    }
-+
-+    reg.addr =3D (uintptr_t)(&fpr);
-+    reg.id =3D AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
-+    ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-+    if (ret) {
-+        return ret;
-+    }
-+    vfp_set_fpsr(env, fpr);
-+
-+    reg.id =3D AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
-+    ret =3D kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-+    if (ret) {
-+        return ret;
-+    }
-+    vfp_set_fpcr(env, fpr);
-+
-     if (!write_kvmstate_to_list(cpu)) {
-         return EINVAL;
-     }
---=20
-2.3.2
-
+VGhpcyBhZGRzIHRoZSBzYXZpbmcgYW5kIHJlc3RvcmUgb2YgdGhlIGN1cnJlbnQgTXVsdGktUHJv
+Y2Vzc2luZyBzdGF0ZQpvZiB0aGUgbWFjaGluZS4gV2hpbGUgdGhlIEtWTV9HRVQvU0VUX01QX1NU
+QVRFIEFQSSBleHBvc2VzIGEgbnVtYmVyIG9mCnBvdGVudGlhbCBzdGF0ZXMgZm9yIHg4NiB3ZSBv
+bmx5IHVzZSB0d28gZm9yIEFSTS4gRWl0aGVyIHRoZSBwcm9jZXNzIGlzCnJ1bm5pbmcgb3Igbm90
+LiBXZSB0aGVuIHNhdmUgdGhpcyBzdGF0ZSBpbnRvIHRoZSBjcHVfcG93ZXJlZCBUQ0cgc3RhdGUK
+dG8gYXZvaWQgY2hhbmdpbmcgdGhlIHNlcmlhbGlzYXRpb24gZm9ybWF0LgoKU2lnbmVkLW9mZi1i
+eTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgoKLS0tCnYyCiAgLSBtYWtl
+IG1wc3RhdGUgZmllbGQgcnVudGltZSBkZXBlbmRhbnQgKGt2bV9lbmFibGVkKCkpCiAgLSBkcm9w
+IGluaXRpYWwgS1ZNX0NBUF9NUF9TVEFURSByZXF1aXJlbWVudAogIC0gcmUtdXNlIGNwdV9wb3dl
+cmVkIGluc3RlYWQgb2YgbmV3IGZpZWxkCgp2NAogIC0gcy9IQUxURUQvU1RPUFBFRC8KICAtIG1v
+dmUgY29kZSBmcm9tIG1hY2hpbmUuYyB0byBrdm0uCgpkaWZmIC0tZ2l0IGEvdGFyZ2V0LWFybS9r
+dm0uYyBiL3RhcmdldC1hcm0va3ZtLmMKaW5kZXggNzJjMWZhMS4uYTc0ODMyYyAxMDA2NDQKLS0t
+IGEvdGFyZ2V0LWFybS9rdm0uYworKysgYi90YXJnZXQtYXJtL2t2bS5jCkBAIC00NTgsNiArNDU4
+LDQ2IEBAIHZvaWQga3ZtX2FybV9yZXNldF92Y3B1KEFSTUNQVSAqY3B1KQogICAgIH0KIH0KIAor
+LyoKKyAqIFVwZGF0ZSBLVk0ncyBNUF9TVEFURSBiYXNlZCBvbiB3aGF0IFFFTVUgdGhpbmtzIGl0
+IGlzCisgKi8KK2ludCBrdm1fYXJtX3N5bmNfbXBzdGF0ZV90b19rdm0oQVJNQ1BVICpjcHUpCit7
+CisgICAgaWYgKGt2bV9jaGVja19leHRlbnNpb24oQ1BVKGNwdSktPmt2bV9zdGF0ZSwgS1ZNX0NB
+UF9NUF9TVEFURSkpIHsKKyAgICAgICAgc3RydWN0IGt2bV9tcF9zdGF0ZSBtcF9zdGF0ZSA9IHsK
+KyAgICAgICAgICAgIC5tcF9zdGF0ZSA9CisgICAgICAgICAgICBjcHUtPnBvd2VyZWRfb2ZmID8g
+S1ZNX01QX1NUQVRFX1NUT1BQRUQgOiBLVk1fTVBfU1RBVEVfUlVOTkFCTEUKKyAgICAgICAgfTsK
+KyAgICAgICAgaW50IHJldCA9IGt2bV92Y3B1X2lvY3RsKENQVShjcHUpLCBLVk1fU0VUX01QX1NU
+QVRFLCAmbXBfc3RhdGUpOworICAgICAgICBpZiAocmV0KSB7CisgICAgICAgICAgICBmcHJpbnRm
+KHN0ZGVyciwgIiVzOiBmYWlsZWQgdG8gc2V0IE1QX1NUQVRFICVkLyVzXG4iLAorICAgICAgICAg
+ICAgICAgICAgICBfX2Z1bmNfXywgcmV0LCBzdHJlcnJvcihyZXQpKTsKKyAgICAgICAgICAgIHJl
+dHVybiAtMTsKKyAgICAgICAgfQorICAgIH0KKworICAgIHJldHVybiAwOworfQorCisvKgorICog
+U3luYyB0aGUgS1ZNIE1QX1NUQVRFIGludG8gUUVNVQorICovCitpbnQga3ZtX2FybV9zeW5jX21w
+c3RhdGVfdG9fcWVtdShBUk1DUFUgKmNwdSkKK3sKKyAgICBpZiAoa3ZtX2NoZWNrX2V4dGVuc2lv
+bihDUFUoY3B1KS0+a3ZtX3N0YXRlLCBLVk1fQ0FQX01QX1NUQVRFKSkgeworICAgICAgICBzdHJ1
+Y3Qga3ZtX21wX3N0YXRlIG1wX3N0YXRlOworICAgICAgICBpbnQgcmV0ID0ga3ZtX3ZjcHVfaW9j
+dGwoQ1BVKGNwdSksIEtWTV9HRVRfTVBfU1RBVEUsICZtcF9zdGF0ZSk7CisgICAgICAgIGlmIChy
+ZXQpIHsKKyAgICAgICAgICAgIGZwcmludGYoc3RkZXJyLCAiJXM6IGZhaWxlZCB0byBnZXQgTVBf
+U1RBVEUgJWQvJXNcbiIsCisgICAgICAgICAgICAgICAgICAgIF9fZnVuY19fLCByZXQsIHN0cmVy
+cm9yKHJldCkpOworICAgICAgICAgICAgYWJvcnQoKTsKKyAgICAgICAgfQorICAgICAgICBjcHUt
+PnBvd2VyZWRfb2ZmID0gKG1wX3N0YXRlLm1wX3N0YXRlID09IEtWTV9NUF9TVEFURV9TVE9QUEVE
+KTsKKyAgICB9CisKKyAgICByZXR1cm4gMDsKK30KKwogdm9pZCBrdm1fYXJjaF9wcmVfcnVuKENQ
+VVN0YXRlICpjcywgc3RydWN0IGt2bV9ydW4gKnJ1bikKIHsKIH0KZGlmZiAtLWdpdCBhL3Rhcmdl
+dC1hcm0va3ZtMzIuYyBiL3RhcmdldC1hcm0va3ZtMzIuYwppbmRleCA5NDAzMGQxLi40OWI2YmFi
+IDEwMDY0NAotLS0gYS90YXJnZXQtYXJtL2t2bTMyLmMKKysrIGIvdGFyZ2V0LWFybS9rdm0zMi5j
+CkBAIC0zNTYsNiArMzU2LDggQEAgaW50IGt2bV9hcmNoX3B1dF9yZWdpc3RlcnMoQ1BVU3RhdGUg
+KmNzLCBpbnQgbGV2ZWwpCiAgICAgICAgIHJldHVybiBFSU5WQUw7CiAgICAgfQogCisgICAga3Zt
+X2FybV9zeW5jX21wc3RhdGVfdG9fa3ZtKGNwdSk7CisKICAgICByZXR1cm4gcmV0OwogfQogCkBA
+IC00MjcsNSArNDI5LDcgQEAgaW50IGt2bV9hcmNoX2dldF9yZWdpc3RlcnMoQ1BVU3RhdGUgKmNz
+KQogICAgICAqLwogICAgIHdyaXRlX2xpc3RfdG9fY3B1c3RhdGUoY3B1KTsKIAorICAgIGt2bV9h
+cm1fc3luY19tcHN0YXRlX3RvX3FlbXUoY3B1KTsKKwogICAgIHJldHVybiAwOwogfQpkaWZmIC0t
+Z2l0IGEvdGFyZ2V0LWFybS9rdm02NC5jIGIvdGFyZ2V0LWFybS9rdm02NC5jCmluZGV4IDhjZjNh
+NjIuLmZlZDAzZjIgMTAwNjQ0Ci0tLSBhL3RhcmdldC1hcm0va3ZtNjQuYworKysgYi90YXJnZXQt
+YXJtL2t2bTY0LmMKQEAgLTIxMSw2ICsyMTEsOCBAQCBpbnQga3ZtX2FyY2hfcHV0X3JlZ2lzdGVy
+cyhDUFVTdGF0ZSAqY3MsIGludCBsZXZlbCkKICAgICAgICAgcmV0dXJuIEVJTlZBTDsKICAgICB9
+CiAKKyAgICBrdm1fYXJtX3N5bmNfbXBzdGF0ZV90b19rdm0oY3B1KTsKKwogICAgIC8qIFRPRE86
+CiAgICAgICogRlAgc3RhdGUKICAgICAgKi8KQEAgLTMxMCw2ICszMTIsOCBAQCBpbnQga3ZtX2Fy
+Y2hfZ2V0X3JlZ2lzdGVycyhDUFVTdGF0ZSAqY3MpCiAgICAgICovCiAgICAgd3JpdGVfbGlzdF90
+b19jcHVzdGF0ZShjcHUpOwogCisgICAga3ZtX2FybV9zeW5jX21wc3RhdGVfdG9fcWVtdShjcHUp
+OworCiAgICAgLyogVE9ETzogb3RoZXIgcmVnaXN0ZXJzICovCiAgICAgcmV0dXJuIHJldDsKIH0K
+ZGlmZiAtLWdpdCBhL3RhcmdldC1hcm0va3ZtX2FybS5oIGIvdGFyZ2V0LWFybS9rdm1fYXJtLmgK
+aW5kZXggNDU1ZGVhMy4uN2I3NTc1OCAxMDA2NDQKLS0tIGEvdGFyZ2V0LWFybS9rdm1fYXJtLmgK
+KysrIGIvdGFyZ2V0LWFybS9rdm1fYXJtLmgKQEAgLTE2Miw2ICsxNjIsMjQgQEAgdHlwZWRlZiBz
+dHJ1Y3QgQVJNSG9zdENQVUNsYXNzIHsKICAqLwogYm9vbCBrdm1fYXJtX2dldF9ob3N0X2NwdV9m
+ZWF0dXJlcyhBUk1Ib3N0Q1BVQ2xhc3MgKmFoY2MpOwogCisKKy8qKgorICoga3ZtX2FybV9zeW5j
+X21wc3RhdGVfdG9fa3ZtCisgKiBAY3B1OiBBUk1DUFUKKyAqCisgKiBJZiBzdXBwb3J0ZWQgc2V0
+IHRoZSBLVk0gTVBfU1RBVEUgYmFzZWQgb24gUUVNVXMgbWlncmF0aW9uIGRhdGEuCisgKi8KK2lu
+dCBrdm1fYXJtX3N5bmNfbXBzdGF0ZV90b19rdm0oQVJNQ1BVICpjcHUpOworCisvKioKKyAqIGt2
+bV9hcm1fc3luY19tcHN0YXRlX3RvX3FlbXUKKyAqIEBjcHU6IEFSTUNQVQorICoKKyAqIElmIHN1
+cHBvcnRlZCBnZXQgdGhlIE1QX1NUQVRFIGZyb20gS1ZNIGFuZCBzdG9yZSBpbiBRRU1VcyBtaWdy
+YXRpb24KKyAqIGRhdGEuCisgKi8KK2ludCBrdm1fYXJtX3N5bmNfbXBzdGF0ZV90b19xZW11KEFS
+TUNQVSAqY3B1KTsKKwogI2VuZGlmCiAKICNlbmRpZgotLSAKMi4zLjIKCl9fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3Zt
+YXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9t
+YWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
