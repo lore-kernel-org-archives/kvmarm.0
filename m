@@ -1,19 +1,19 @@
-From: Ian Campbell <ian.campbell@citrix.com>
-Subject: Re: [Xen-devel] ARM: KVM/XEN: how should we support virt-what?
-Date: Wed, 25 Mar 2015 11:08:56 +0000
-Message-ID: <1427281736.10784.63.camel@citrix.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: ARM: KVM/XEN: how should we support virt-what?
+Date: Wed, 25 Mar 2015 12:03:58 +0000
+Message-ID: <5512A42E.2070300@arm.com>
 References: <20150325094440.GB3163@hawk.usersys.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <20150325094440.GB3163@hawk.usersys.redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>
-Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, stefano.stabellini@eu.citrix.com, tim@xen.org, wei@redhat.com, kvm@vger.kernel.org, rjones@redhat.com, xen-devel@lists.xen.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Andrew Jones <drjones@redhat.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "Ian.Campbell@citrix.com" <Ian.Campbell@citrix.com>, "stefano.stabellini@eu.citrix.com" <stefano.stabellini@eu.citrix.com>, "tim@xen.org" <tim@xen.org>
+Cc: "rjones@redhat.com" <rjones@redhat.com>, "wei@redhat.com" <wei@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "xen-devel@lists.xen.org" <xen-devel@lists.xen.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, 2015-03-25 at 10:44 +0100, Andrew Jones wrote:
+On 25/03/15 09:44, Andrew Jones wrote:
 > Hello ARM virt maintainers,
 > 
 > I'd like to start a discussion about supporting virt-what[1]. virt-what
@@ -37,11 +37,16 @@ On Wed, 2015-03-25 at 10:44 +0100, Andrew Jones wrote:
 >    i.e. "have virtio mmio" && psci.method == hvc, or something,
 >    and we'd still need a way to know if we're kvm vs. xen vs. ??.
 
-FWIW Xen has a specific node,
-https://git.kernel.org/cgit/linux/kernel/git/devicetree/devicetree-rebasing.git/tree/Bindings/arm/xen.txt
+KVM doesn't have any specific DT node so far (at least kvmtool doesn't
+expose anything, and QEMU doesn't seem to do it either).
 
-Doesn't help you with ACPI systems though. IIRC there will be a Xen
-table of some sort.
+You could define KVM as being !Xen by looking for the Xen hypervisor
+node, but that's quite a heuristic.
 
-Ian.
+Overall, I'm quite reluctant to introduce things that would immediately
+become an ABI (cue the recent bogomips flame wars), forming a contract
+between the host userspace and the guest userspace.
 
+	M.
+-- 
+Jazz is not dead. It just smells funny...
