@@ -1,24 +1,25 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH 0/5] arm64: Patching branches for fun and profit
-Date: Thu, 26 Mar 2015 22:04:52 +0000
-Message-ID: <20150326220452.GB23836@arm.com>
-References: <1426773576-14062-1-git-send-email-marc.zyngier@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 10/11] KVM: arm/arm64: prepare GICv3 emulation to use
+ kvm_io_bus MMIO handling
+Date: Thu, 26 Mar 2015 22:06:32 +0000
+Message-ID: <20150326220632.64ee91ec@arm.com>
+References: <1427380778-942-1-git-send-email-andre.przywara@arm.com>
+ <1427380778-942-11-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0596C49DBF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 17:57:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 392E449DC8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 17:59:40 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wv+YB56dFKGG for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Mar 2015 17:57:54 -0400 (EDT)
+ with ESMTP id OU6Zfo27wD0o for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Mar 2015 17:59:39 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 53D7349DBE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 17:57:54 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <1426773576-14062-1-git-send-email-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 56FEB49B92
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 17:59:39 -0400 (EDT)
+In-Reply-To: <1427380778-942-11-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,36 +29,80 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Andre Przywara <Andre.Przywara@arm.com>, Dave P Martin <Dave.Martin@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Catalin Marinas <Catalin.Marinas@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Mar 19, 2015 at 01:59:31PM +0000, Marc Zyngier wrote:
-> The current alternative instruction framework is not kind to branches,
-> potentially leading to all kind of hacks in the code that uses
-> alternatives. This series expands it to deal with immediate branches
-> (for a start), and applies it to the VGIC world switch.
-> 
-> Patch #1 adds the required infrastructure to extract the immediate
-> from an instruction.
-> 
-> Patch #2 allows the use of an immediate b or bl instruction as an
-> alternative, computing the target branch as the instruction is being
-> patched in.
-> 
-> Patch #3 defines a feature framework that works exactly like the CPU
-> errata infrastructure (and shares a lot with it).
-> 
-> Patch #4 adds detection of the system register GICv3 CPU interface.
-> 
-> Patch #5 enables dynamic patching of the KVM code.
-> 
-> This has been tested with GICv3 on a FastModel.
+On Thu, 26 Mar 2015 14:39:37 +0000
+Andre Przywara <andre.przywara@arm.com> wrote:
 
-Modulo my one minor comment:
+> Using the framework provided by the recent vgic.c changes, we
+> register a kvm_io_bus device on mapping the virtual GICv3 resources.
+> The distributor mapping is pretty straight forward, but the
+> redistributors need some more love, since they need to be tagged with
+> the respective redistributor (read: VCPU) they are connected with.
+> We use the kvm_io_bus framework to register one devices per VCPU.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  include/kvm/arm_vgic.h      |    1 +
+>  virt/kvm/arm/vgic-v3-emul.c |   39 ++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 39 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 4523984..d6705f4 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -252,6 +252,7 @@ struct vgic_dist {
+>  
+>  	struct vgic_vm_ops	vm_ops;
+>  	struct vgic_io_device	dist_iodev;
+> +	struct vgic_io_device	*redist_iodevs;
+>  };
+>  
+>  struct vgic_v2_cpu_if {
+> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+> index 2f03a36..eb1a797 100644
+> --- a/virt/kvm/arm/vgic-v3-emul.c
+> +++ b/virt/kvm/arm/vgic-v3-emul.c
+> @@ -758,6 +758,9 @@ static int vgic_v3_map_resources(struct kvm *kvm,
+>  {
+>  	int ret = 0;
+>  	struct vgic_dist *dist = &kvm->arch.vgic;
+> +	gpa_t rdbase = dist->vgic_redist_base;
+> +	struct vgic_io_device *iodevs = NULL;
+> +	int i;
+>  
+>  	if (!irqchip_in_kernel(kvm))
+>  		return 0;
+> @@ -783,7 +786,41 @@ static int vgic_v3_map_resources(struct kvm *kvm,
+>  		goto out;
+>  	}
+>  
+> -	kvm->arch.vgic.ready = true;
+> +	ret = vgic_register_kvm_io_dev(kvm, dist->vgic_dist_base,
+> +				       GIC_V3_DIST_SIZE, vgic_v3_dist_ranges,
+> +				       -1, &dist->dist_iodev);
 
-  Acked-by: Will Deacon <will.deacon@arm.com>
+> +	if (ret)
+> +		goto out;
+> +
+> +	iodevs = kcalloc(dist->nr_cpus, sizeof(iodevs[0]), GFP_KERNEL);
+> +	if (!iodevs) {
+> +		ret = -ENOMEM;
+> +		goto out_unregister;
+> +	}
+> +
+> +	for (i = 0; i < dist->nr_cpus; i++) {
+> +		ret = vgic_register_kvm_io_dev(kvm, rdbase,
+> +					       SZ_128K, vgic_redist_ranges,
+> +					       i, &iodevs[i]);
 
-for the series.
+This looks really weird. You seems to be mapping all redistributors at
+the same IPA. Have you actually tested this with an SMP guest?
 
-Will
+Or maybe I don't get how this works?
+
+	M.
+-- 
+Jazz is not dead. It just smells funny.
