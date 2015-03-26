@@ -1,25 +1,26 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 10/11] KVM: arm/arm64: prepare GICv3 emulation to use
- kvm_io_bus MMIO handling
-Date: Thu, 26 Mar 2015 22:06:32 +0000
-Message-ID: <20150326220632.64ee91ec@arm.com>
-References: <1427380778-942-1-git-send-email-andre.przywara@arm.com>
- <1427380778-942-11-git-send-email-andre.przywara@arm.com>
+Subject: Re: [PATCH 2/5] arm64: alternative: Allow immediate branch as
+ alternative instruction
+Date: Thu, 26 Mar 2015 22:19:55 +0000
+Message-ID: <20150326221955.4b8fe6f0@arm.com>
+References: <1426773576-14062-1-git-send-email-marc.zyngier@arm.com>
+ <1426773576-14062-3-git-send-email-marc.zyngier@arm.com>
+ <20150326220323.GA23836@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 392E449DC8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 17:59:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E5DD549DCE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 18:13:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OU6Zfo27wD0o for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Mar 2015 17:59:39 -0400 (EDT)
+ with ESMTP id s9EgmqmDaLxy for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Mar 2015 18:13:05 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 56FEB49B92
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 17:59:39 -0400 (EDT)
-In-Reply-To: <1427380778-942-11-git-send-email-andre.przywara@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 294E249DC2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 18:13:04 -0400 (EDT)
+In-Reply-To: <20150326220323.GA23836@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,79 +30,70 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: Andre Przywara <Andre.Przywara@arm.com>, Dave P Martin <Dave.Martin@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Catalin Marinas <Catalin.Marinas@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, 26 Mar 2015 14:39:37 +0000
-Andre Przywara <andre.przywara@arm.com> wrote:
+On Thu, 26 Mar 2015 22:03:23 +0000
+Will Deacon <will.deacon@arm.com> wrote:
 
-> Using the framework provided by the recent vgic.c changes, we
-> register a kvm_io_bus device on mapping the virtual GICv3 resources.
-> The distributor mapping is pretty straight forward, but the
-> redistributors need some more love, since they need to be tagged with
-> the respective redistributor (read: VCPU) they are connected with.
-> We use the kvm_io_bus framework to register one devices per VCPU.
+> On Thu, Mar 19, 2015 at 01:59:33PM +0000, Marc Zyngier wrote:
+> > Since all immediate branches are PC-relative on Aarch64, these
+> > instructions cannot be used as an alternative with the simplistic
+> > approach we currently have (the immediate has been computed from
+> > the .altinstr_replacement section, and end-up being completely off
+> > if we insert it directly).
+> > 
+> > This patch handles the b and bl instructions in a different way,
+> > using the insn framework to recompute the immediate, and generate
+> > the right displacement.
+> > 
+> > Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> > ---
+> >  arch/arm64/kernel/alternative.c | 55 +++++++++++++++++++++++++++++++++++++++--
+> >  1 file changed, 53 insertions(+), 2 deletions(-)
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  include/kvm/arm_vgic.h      |    1 +
->  virt/kvm/arm/vgic-v3-emul.c |   39 ++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 39 insertions(+), 1 deletion(-)
+> [...]
 > 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 4523984..d6705f4 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -252,6 +252,7 @@ struct vgic_dist {
->  
->  	struct vgic_vm_ops	vm_ops;
->  	struct vgic_io_device	dist_iodev;
-> +	struct vgic_io_device	*redist_iodevs;
->  };
->  
->  struct vgic_v2_cpu_if {
-> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
-> index 2f03a36..eb1a797 100644
-> --- a/virt/kvm/arm/vgic-v3-emul.c
-> +++ b/virt/kvm/arm/vgic-v3-emul.c
-> @@ -758,6 +758,9 @@ static int vgic_v3_map_resources(struct kvm *kvm,
->  {
->  	int ret = 0;
->  	struct vgic_dist *dist = &kvm->arch.vgic;
-> +	gpa_t rdbase = dist->vgic_redist_base;
-> +	struct vgic_io_device *iodevs = NULL;
-> +	int i;
->  
->  	if (!irqchip_in_kernel(kvm))
->  		return 0;
-> @@ -783,7 +786,41 @@ static int vgic_v3_map_resources(struct kvm *kvm,
->  		goto out;
->  	}
->  
-> -	kvm->arch.vgic.ready = true;
-> +	ret = vgic_register_kvm_io_dev(kvm, dist->vgic_dist_base,
-> +				       GIC_V3_DIST_SIZE, vgic_v3_dist_ranges,
-> +				       -1, &dist->dist_iodev);
+> >  static int __apply_alternatives(void *alt_region)
+> >  {
+> >  	struct alt_instr *alt;
+> > @@ -40,16 +83,24 @@ static int __apply_alternatives(void *alt_region)
+> >  	u8 *origptr, *replptr;
+> >  
+> >  	for (alt = region->begin; alt < region->end; alt++) {
+> > +		u32 insn;
+> > +		int i;
+> > +
+> >  		if (!cpus_have_cap(alt->cpufeature))
+> >  			continue;
+> >  
+> > -		BUG_ON(alt->alt_len > alt->orig_len);
+> > +		BUG_ON(alt->alt_len != alt->orig_len);
+> >  
+> >  		pr_info_once("patching kernel code\n");
+> >  
+> >  		origptr = (u8 *)&alt->orig_offset + alt->orig_offset;
+> >  		replptr = (u8 *)&alt->alt_offset + alt->alt_offset;
+> > -		memcpy(origptr, replptr, alt->alt_len);
+> > +
+> > +		for (i = 0; i < alt->alt_len; i += sizeof(insn)) {
+> > +			insn = get_alt_insn(origptr + i, replptr + i);
+> > +			*(u32 *)(origptr + i) = insn;
+> 
+> My brain's not firing on all cylinders right now, but do you need a
+> cpu_to_le32 here?
 
-> +	if (ret)
-> +		goto out;
-> +
-> +	iodevs = kcalloc(dist->nr_cpus, sizeof(iodevs[0]), GFP_KERNEL);
-> +	if (!iodevs) {
-> +		ret = -ENOMEM;
-> +		goto out_unregister;
-> +	}
-> +
-> +	for (i = 0; i < dist->nr_cpus; i++) {
-> +		ret = vgic_register_kvm_io_dev(kvm, rdbase,
-> +					       SZ_128K, vgic_redist_ranges,
-> +					       i, &iodevs[i]);
+I'm not 100% awake myself (probably some acute form of firmwaritis),
+but I suspect you're quite right (get_alt_insn calls aarch64_insn_read,
+which does a le32_to_cpu). Obviously, we need to revert the conversion
+when writing the instruction back.
 
-This looks really weird. You seems to be mapping all redistributors at
-the same IPA. Have you actually tested this with an SMP guest?
+Do you want a fixup on top of this, or would you prefer me to respin
+the series?
 
-Or maybe I don't get how this works?
+Thanks,
 
 	M.
 -- 
