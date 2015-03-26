@@ -1,24 +1,26 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: ARM: KVM/XEN: how should we support virt-what?
-Date: Thu, 26 Mar 2015 10:01:51 +0100
-Message-ID: <20150326090150.GA3073@hawk.usersys.redhat.com>
-References: <20150325094440.GB3163@hawk.usersys.redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v11 2/4] hw/arm/boot: arm_load_kernel implemented as a
+ machine init done notifier
+Date: Thu, 26 Mar 2015 11:07:52 +0000
+Message-ID: <874mp8c8zb.fsf@linaro.org>
+References: <1425485909-5091-1-git-send-email-eric.auger@linaro.org>
+ <1425485909-5091-3-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 459E249BAC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 04:55:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B0E9849BB4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 07:00:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0-vJVABoA8DT for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Mar 2015 04:55:26 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2FE6C49BAB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 04:55:25 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20150325094440.GB3163@hawk.usersys.redhat.com>
+ with ESMTP id 9VAMXW8As-x0 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Mar 2015 07:00:22 -0400 (EDT)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A72A349BB3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 07:00:22 -0400 (EDT)
+In-reply-to: <1425485909-5091-3-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,59 +30,97 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@linaro.org, marc.zyngier@arm.com, Ian.Campbell@citrix.com, stefano.stabellini@eu.citrix.com, tim@xen.org
-Cc: kvm@vger.kernel.org, xen-devel@lists.xen.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Eric Auger <eric.auger@linaro.org>
+Cc: eric.auger@st.com, patches@linaro.org, qemu-devel@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Mar 25, 2015 at 10:44:42AM +0100, Andrew Jones wrote:
-> Hello ARM virt maintainers,
-> 
-> I'd like to start a discussion about supporting virt-what[1]. virt-what
-> allows userspace to determine if the system it's running on is running
-> in a guest, and of what type (KVM, Xen, etc.). Despite it being a best
-> effort tool, see the Caveat emptor in [1], it has become quite a useful
-> tool, and is showing up in different places, such as OpenStack. If you
-> look at the code[2], specifically [3], then you'll see how it works on
-> x86, which is to use the dedicated hypervisor cpuid leaves. I'm
-> wondering what equivalent we have, or can develop, for arm.
-> Here are some thoughts;
-> 0) there's already something we can use, and I just need to be told
->    about it.
-> 1) be as similar as possible to x86 by dedicating some currently
->    undefined sysreg bits. This would take buy-in from lots of parties,
->    so is not likely the way to go.
-> 2) create a specific DT node that will get exposed through sysfs, or
->    somewhere.
-> 3) same as (2), but just use the nodes currently in mach-virt's DT
->    as the indication we're a guest. This would just be a heuristic,
->    i.e. "have virtio mmio" && psci.method == hvc, or something,
->    and we'd still need a way to know if we're kvm vs. xen vs. ??.
-> 
-> Thanks,
-> drew 
-> 
-> [1] http://people.redhat.com/~rjones/virt-what/
-> [2] http://git.annexia.org/?p=virt-what.git;a=summary
-> [3] http://git.annexia.org/?p=virt-what.git;a=blob_plain;f=virt-what-cpuid-helper.c;hb=HEAD
-
-Thanks everyone for their responses. So, the current summary seems to
-be;
-1) Xen has both a DT node and an ACPI table, virt-what can learn how
-   to probe those.
-2) We don't have anything yet for KVM, and we're reluctant to create a
-   specific DT node. Anyway, we'd still need to address ACPI booted
-   guests some other way.
-
-For a short-term, DT-only, approach we could go with a heuristic, one
-that includes Marc's "if hypervisor node exists, then xen, else kvm"
-condition.
-
-How about SMBIOS for a long-term solution that works for both DT and
-ACPI? We're not populating SMBIOS for arm guests yet in qemu, but now
-that AAVMF has fw_cfg, we should be able to. On x86 we already have
-smbios populated from qemu, although not in a way that allows us to
-determine kvm vs. xen vs. tcg.
-
-Any other suggestions?
-
-drew
+CkVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAbGluYXJvLm9yZz4gd3JpdGVzOgoKPiBEZXZpY2UgdHJl
+ZSBub2RlcyBmb3IgdGhlIHBsYXRmb3JtIGJ1cyBhbmQgaXRzIGNoaWxkcmVuIGR5bmFtaWMgc3lz
+YnVzCj4gZGV2aWNlcyBhcmUgYWRkZWQgaW4gYSBtYWNoaW5lIGluaXQgZG9uZSBub3RpZmllci4g
+VG8gbG9hZCB0aGUgZHRiIG9uY2UsCj4gYWZ0ZXIgdGhvc2UgbGF0dGVyIG5vZGVzIGFyZSBidWls
+dCBhbmQgYmVmb3JlIFJPTSBmcmVlemUsIHRoZSBhY3R1YWwKPiBhcm1fbG9hZF9rZXJuZWwgZXhp
+c3RpbmcgY29kZSBpcyBtb3ZlZCBpbnRvIGEgbm90aWZpZXIgbm90aWZ5IGZ1bmN0aW9uLAo+IGFy
+bV9sb2FkX2tlcm5lbF9ub3RpZnkuIGFybV9sb2FkX2tlcm5lbCBub3cgb25seSByZWdpc3RlcnMg
+dGhlCj4gY29ycmVzcG9uZGluZyBub3RpZmllci4KPgo+IE1hY2hpbmUgZmlsZXMgdGhhdCBkbyBu
+b3Qgc3VwcG9ydCBwbGF0Zm9ybSBidXMgc3RheSB1bmNoYW5nZWQuIE1hY2hpbmUKPiBmaWxlcyB3
+aWxsaW5nIHRvIHN1cHBvcnQgZHluYW1pYyBzeXNidXMgZGV2aWNlcyBtdXN0IGNhbGwgYXJtX2xv
+YWRfa2VybmVsCj4gYmVmb3JlIHN5c2J1cy1mZHQgYXJtX3JlZ2lzdGVyX3BsYXRmb3JtX2J1c19m
+ZHRfY3JlYXRvciB0byBtYWtlIHN1cmUKPiBkeW5hbWljIHN5c2J1cyBkZXZpY2Ugbm9kZXMgYXJl
+IGludGVncmF0ZWQgaW4gdGhlIGR0Yi4KPgo+IFNpZ25lZC1vZmYtYnk6IEVyaWMgQXVnZXIgPGVy
+aWMuYXVnZXJAbGluYXJvLm9yZz4KPiBSZXZpZXdlZC1ieTogU2hhbm5vbiBaaGFvIDx6aGFvc2hl
+bmdsb25nQGh1YXdlaS5jb20+Cj4gUmV2aWV3ZWQtYnk6IEFsZXhhbmRlciBHcmFmIDxhZ3JhZkBz
+dXNlLmRlPgoKUmV2aWV3ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9y
+Zz4KCj4KPiAtLS0KPgo+IHY4IC0+IHY5Ogo+IC0gZml4IGNvbXBpbGF0aW9uIHdpdGggYXJtLWxp
+bnV4LXVzZXIKPiAtIHJlb3JkZXIgZmllbGRzIGluIEFybUxvYWRLZXJuZWxOb3RpZmllciBhbmQg
+dXNlIERPX1VQQ0FTVAo+Cj4gdjcgLT4gdjg6Cj4gLSBBZGQgUmV2aWV3ZWQtYnkgZnJvbSBBbGV4
+ICYgU2hhbm5vbgo+IC0gcmViYXNlIG9uIDIuMi4wCj4KPiB2NjogY3JlYXRpb24gb2YgdGhpcyBw
+YXRjaCBmaWxlCj4gLS0tCj4gIGh3L2FybS9ib290LmMgICAgICAgIHwgMTQgKysrKysrKysrKysr
+Ky0KPiAgaW5jbHVkZS9ody9hcm0vYXJtLmggfCAyOCArKysrKysrKysrKysrKysrKysrKysrKysr
+KysrCj4gIDIgZmlsZXMgY2hhbmdlZCwgNDEgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQo+
+Cj4gZGlmZiAtLWdpdCBhL2h3L2FybS9ib290LmMgYi9ody9hcm0vYm9vdC5jCj4gaW5kZXggYTQ4
+ZDFiMi4uNWFjNTQ3OSAxMDA2NDQKPiAtLS0gYS9ody9hcm0vYm9vdC5jCj4gKysrIGIvaHcvYXJt
+L2Jvb3QuYwo+IEBAIC01NTUsNyArNTU1LDcgQEAgc3RhdGljIHZvaWQgbG9hZF9pbWFnZV90b19m
+d19jZmcoRldDZmdTdGF0ZSAqZndfY2ZnLCB1aW50MTZfdCBzaXplX2tleSwKPiAgICAgIGZ3X2Nm
+Z19hZGRfYnl0ZXMoZndfY2ZnLCBkYXRhX2tleSwgZGF0YSwgc2l6ZSk7Cj4gIH0KPiAgCj4gLXZv
+aWQgYXJtX2xvYWRfa2VybmVsKEFSTUNQVSAqY3B1LCBzdHJ1Y3QgYXJtX2Jvb3RfaW5mbyAqaW5m
+bykKPiArc3RhdGljIHZvaWQgYXJtX2xvYWRfa2VybmVsX25vdGlmeShOb3RpZmllciAqbm90aWZp
+ZXIsIHZvaWQgKmRhdGEpCj4gIHsKPiAgICAgIENQVVN0YXRlICpjczsKPiAgICAgIGludCBrZXJu
+ZWxfc2l6ZTsKPiBAQCAtNTY2LDYgKzU2NiwxMSBAQCB2b2lkIGFybV9sb2FkX2tlcm5lbChBUk1D
+UFUgKmNwdSwgc3RydWN0IGFybV9ib290X2luZm8gKmluZm8pCj4gICAgICBod2FkZHIgZW50cnks
+IGtlcm5lbF9sb2FkX29mZnNldDsKPiAgICAgIGludCBiaWdfZW5kaWFuOwo+ICAgICAgc3RhdGlj
+IGNvbnN0IEFSTUluc25GaXh1cCAqcHJpbWFyeV9sb2FkZXI7Cj4gKyAgICBBcm1Mb2FkS2VybmVs
+Tm90aWZpZXIgKm4gPSBET19VUENBU1QoQXJtTG9hZEtlcm5lbE5vdGlmaWVyLAo+ICsgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG5vdGlmaWVyLCBub3RpZmllcik7Cj4g
+KyAgICBBUk1DUFUgKmNwdSA9IG4tPmNwdTsKPiArICAgIHN0cnVjdCBhcm1fYm9vdF9pbmZvICpp
+bmZvID0KPiArICAgICAgICBjb250YWluZXJfb2Yobiwgc3RydWN0IGFybV9ib290X2luZm8sIGxv
+YWRfa2VybmVsX25vdGlmaWVyKTsKPiAgCj4gICAgICAvKiBDUFUgb2JqZWN0cyAodW5saWtlIGRl
+dmljZXMpIGFyZSBub3QgYXV0b21hdGljYWxseSByZXNldCBvbiBzeXN0ZW0KPiAgICAgICAqIHJl
+c2V0LCBzbyB3ZSBtdXN0IGFsd2F5cyByZWdpc3RlciBhIGhhbmRsZXIgdG8gZG8gc28uIElmIHdl
+J3JlCj4gQEAgLTc3MywzICs3NzgsMTAgQEAgdm9pZCBhcm1fbG9hZF9rZXJuZWwoQVJNQ1BVICpj
+cHUsIHN0cnVjdCBhcm1fYm9vdF9pbmZvICppbmZvKQo+ICAgICAgICAgIEFSTV9DUFUoY3MpLT5l
+bnYuYm9vdF9pbmZvID0gaW5mbzsKPiAgICAgIH0KPiAgfQo+ICsKPiArdm9pZCBhcm1fbG9hZF9r
+ZXJuZWwoQVJNQ1BVICpjcHUsIHN0cnVjdCBhcm1fYm9vdF9pbmZvICppbmZvKQo+ICt7Cj4gKyAg
+ICBpbmZvLT5sb2FkX2tlcm5lbF9ub3RpZmllci5jcHUgPSBjcHU7Cj4gKyAgICBpbmZvLT5sb2Fk
+X2tlcm5lbF9ub3RpZmllci5ub3RpZmllci5ub3RpZnkgPSBhcm1fbG9hZF9rZXJuZWxfbm90aWZ5
+Owo+ICsgICAgcWVtdV9hZGRfbWFjaGluZV9pbml0X2RvbmVfbm90aWZpZXIoJmluZm8tPmxvYWRf
+a2VybmVsX25vdGlmaWVyLm5vdGlmaWVyKTsKPiArfQo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2h3
+L2FybS9hcm0uaCBiL2luY2x1ZGUvaHcvYXJtL2FybS5oCj4gaW5kZXggNWM5NDBlYi4uNzYwODA0
+YyAxMDA2NDQKPiAtLS0gYS9pbmNsdWRlL2h3L2FybS9hcm0uaAo+ICsrKyBiL2luY2x1ZGUvaHcv
+YXJtL2FybS5oCj4gQEAgLTEzLDExICsxMywyMSBAQAo+ICAKPiAgI2luY2x1ZGUgImV4ZWMvbWVt
+b3J5LmgiCj4gICNpbmNsdWRlICJody9pcnEuaCIKPiArI2luY2x1ZGUgInFlbXUvbm90aWZ5Lmgi
+Cj4gIAo+ICAvKiBhcm12N20uYyAqLwo+ICBxZW11X2lycSAqYXJtdjdtX2luaXQoTWVtb3J5UmVn
+aW9uICpzeXN0ZW1fbWVtb3J5LCBpbnQgbWVtX3NpemUsIGludCBudW1faXJxLAo+ICAgICAgICAg
+ICAgICAgICAgICAgICAgY29uc3QgY2hhciAqa2VybmVsX2ZpbGVuYW1lLCBjb25zdCBjaGFyICpj
+cHVfbW9kZWwpOwo+ICAKPiArLyoKPiArICogc3RydWN0IHVzZWQgYXMgYSBwYXJhbWV0ZXIgb2Yg
+dGhlIGFybV9sb2FkX2tlcm5lbCBtYWNoaW5lIGluaXQKPiArICogZG9uZSBub3RpZmllcgo+ICsg
+Ki8KPiArdHlwZWRlZiBzdHJ1Y3Qgewo+ICsgICAgTm90aWZpZXIgbm90aWZpZXI7IC8qIGFjdHVh
+bCBub3RpZmllciAqLwo+ICsgICAgQVJNQ1BVICpjcHU7IC8qIGhhbmRsZSB0byB0aGUgZmlyc3Qg
+Y3B1IG9iamVjdCAqLwo+ICt9IEFybUxvYWRLZXJuZWxOb3RpZmllcjsKPiArCj4gIC8qIGFybV9i
+b290LmMgKi8KPiAgc3RydWN0IGFybV9ib290X2luZm8gewo+ICAgICAgdWludDY0X3QgcmFtX3Np
+emU7Cj4gQEAgLTY0LDYgKzc0LDggQEAgc3RydWN0IGFybV9ib290X2luZm8gewo+ICAgICAgICog
+dGhlIHVzZXIgaXQgc2hvdWxkIGltcGxlbWVudCB0aGlzIGhvb2suCj4gICAgICAgKi8KPiAgICAg
+IHZvaWQgKCptb2RpZnlfZHRiKShjb25zdCBzdHJ1Y3QgYXJtX2Jvb3RfaW5mbyAqaW5mbywgdm9p
+ZCAqZmR0KTsKPiArICAgIC8qIG1hY2hpbmUgaW5pdCBkb25lIG5vdGlmaWVyIGV4ZWN1dGluZyBh
+cm1fbG9hZF9kdGIgKi8KPiArICAgIEFybUxvYWRLZXJuZWxOb3RpZmllciBsb2FkX2tlcm5lbF9u
+b3RpZmllcjsKPiAgICAgIC8qIFVzZWQgaW50ZXJuYWxseSBieSBhcm1fYm9vdC5jICovCj4gICAg
+ICBpbnQgaXNfbGludXg7Cj4gICAgICBod2FkZHIgaW5pdHJkX3N0YXJ0Owo+IEBAIC03NSw2ICs4
+NywyMiBAQCBzdHJ1Y3QgYXJtX2Jvb3RfaW5mbyB7Cj4gICAgICAgKi8KPiAgICAgIGJvb2wgZmly
+bXdhcmVfbG9hZGVkOwo+ICB9Owo+ICsKPiArLyoqCj4gKyAqIGFybV9sb2FkX2tlcm5lbCAtIExv
+YWRzIG1lbW9yeSB3aXRoIGV2ZXJ5dGhpbmcgbmVlZGVkIHRvIGJvb3QKPiArICoKPiArICogQGNw
+dTogaGFuZGxlIHRvIHRoZSBmaXJzdCBDUFUgb2JqZWN0Cj4gKyAqIEBpbmZvOiBoYW5kbGUgdG8g
+dGhlIGJvb3QgaW5mbyBzdHJ1Y3QKPiArICogUmVnaXN0ZXJzIGEgbWFjaGluZSBpbml0IGRvbmUg
+bm90aWZpZXIgdGhhdCBjb3BpZXMgdG8gbWVtb3J5Cj4gKyAqIGV2ZXJ5dGhpbmcgbmVlZGVkIHRv
+IGJvb3QsIGRlcGVuZGluZyBvbiBtYWNoaW5lIGFuZCB1c2VyIG9wdGlvbnM6Cj4gKyAqIGtlcm5l
+bCBpbWFnZSwgYm9vdCBsb2FkZXJzLCBpbml0cmQsIGR0Yi4gQWxzbyByZWdpc3RlcnMgdGhlIENQ
+VQo+ICsgKiByZXNldCBoYW5kbGVyLgo+ICsgKgo+ICsgKiBJbiBjYXNlIHRoZSBtYWNoaW5lIGZp
+bGUgc3VwcG9ydHMgdGhlIHBsYXRmb3JtIGJ1cyBkZXZpY2UgYW5kIGl0cwo+ICsgKiBkeW5hbWlj
+YWxseSBpbnN0YW50aWFibGUgc3lzYnVzIGRldmljZXMsIHRoaXMgZnVuY3Rpb24gbXVzdCBiZSBj
+YWxsZWQKPiArICogYmVmb3JlIHN5c2J1cy1mZHQgYXJtX3JlZ2lzdGVyX3BsYXRmb3JtX2J1c19m
+ZHRfY3JlYXRvci4gSW5kZWVkIHRoZQo+ICsgKiBtYWNoaW5lIGluaXQgZG9uZSBub3RpZmllcnMg
+YXJlIGNhbGxlZCBpbiByZWdpc3RyYXRpb24gcmV2ZXJzZSBvcmRlci4KPiArICovCj4gIHZvaWQg
+YXJtX2xvYWRfa2VybmVsKEFSTUNQVSAqY3B1LCBzdHJ1Y3QgYXJtX2Jvb3RfaW5mbyAqaW5mbyk7
+Cj4gIAo+ICAvKiBNdWx0aXBsaWNhdGlvbiBmYWN0b3IgdG8gY29udmVydCBmcm9tIHN5c3RlbSBj
+bG9jayB0aWNrcyB0byBxZW11IHRpbWVyCgotLSAKQWxleCBCZW5uw6llCl9fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3Zt
+YXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9t
+YWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
