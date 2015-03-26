@@ -1,24 +1,24 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v3 01/11] KVM: Redesign kvm_io_bus_ API to pass VCPU structure
- to the callbacks.
-Date: Thu, 26 Mar 2015 14:39:28 +0000
-Message-ID: <1427380778-942-2-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v3 11/11] KVM: arm/arm64: rework MMIO abort handling to use
+ KVM MMIO bus
+Date: Thu, 26 Mar 2015 14:39:38 +0000
+Message-ID: <1427380778-942-12-git-send-email-andre.przywara@arm.com>
 References: <1427380778-942-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EA4D49C22
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 10:32:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 61E4649C21
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 10:32:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6N5Yk9iQwM5I for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Mar 2015 10:32:41 -0400 (EDT)
+ with ESMTP id imeHq33qscQM for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Mar 2015 10:32:42 -0400 (EDT)
 Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
  [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 30DF249C17
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 10:32:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CF03749C1F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 10:32:41 -0400 (EDT)
 In-Reply-To: <1427380778-942-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,512 +33,524 @@ To: marc.zyngier@arm.com, christoffer.dall@linaro.org, pbonzini@redhat.com, Marc
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Nikolay Nikolaev <n.nikolaev@virtualopensystems.com>
+Currently we have struct kvm_exit_mmio for encapsulating MMIO abort
+data to be passed on from syndrome decoding all the way down to the
+VGIC register handlers. Now as we switch the MMIO handling to be
+routed through the KVM MMIO bus, it does not make sense anymore to
+use that structure already from the beginning. So we put the data into
+kvm_run very early and use that encapsulation till the MMIO bus call.
+Then we fill kvm_exit_mmio in the VGIC only, making it a VGIC private
+structure. On that way we replace the data buffer in that structure
+with a pointer pointing to a single location in kvm_run, so we get
+rid of some copying on the way.
+With all of the virtual GIC emulation code now being registered with
+the kvm_io_bus, we can remove all of the old MMIO handling code and
+its dispatching functionality.
 
-This is needed in e.g. ARM vGIC emulation, where the MMIO handling
-depends on the VCPU that does the access.
+I didn't bother to rename kvm_exit_mmio (to vgic_mmio or something),
+because that touches a lot of code lines without any good reason.
 
-Signed-off-by: Nikolay Nikolaev <n.nikolaev@virtualopensystems.com>
+This is based on an original patch by Nikolay.
+
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Nikolay Nikolaev <n.nikolaev@virtualopensystems.com>
 ---
- arch/powerpc/kvm/mpic.c    |   10 ++++++----
- arch/powerpc/kvm/powerpc.c |    4 ++--
- arch/s390/kvm/diag.c       |    2 +-
- arch/x86/kvm/i8254.c       |   14 +++++++++-----
- arch/x86/kvm/i8259.c       |   12 ++++++------
- arch/x86/kvm/ioapic.c      |    8 ++++----
- arch/x86/kvm/lapic.c       |    4 ++--
- arch/x86/kvm/vmx.c         |    2 +-
- arch/x86/kvm/x86.c         |   13 +++++++------
- include/linux/kvm_host.h   |   10 +++++-----
- virt/kvm/coalesced_mmio.c  |    5 +++--
- virt/kvm/eventfd.c         |    4 ++--
- virt/kvm/iodev.h           |   23 +++++++++++++++--------
- virt/kvm/kvm_main.c        |   32 ++++++++++++++++----------------
- 14 files changed, 79 insertions(+), 64 deletions(-)
+ arch/arm/include/asm/kvm_mmio.h   |   22 ---------
+ arch/arm/kvm/mmio.c               |   60 ++++++++++++++++++-------
+ arch/arm64/include/asm/kvm_mmio.h |   22 ---------
+ include/kvm/arm_vgic.h            |    6 ---
+ virt/kvm/arm/vgic-v2-emul.c       |   21 +--------
+ virt/kvm/arm/vgic-v3-emul.c       |   35 ---------------
+ virt/kvm/arm/vgic.c               |   89 ++-----------------------------------
+ virt/kvm/arm/vgic.h               |   13 +++---
+ 8 files changed, 57 insertions(+), 211 deletions(-)
 
-diff --git a/arch/powerpc/kvm/mpic.c b/arch/powerpc/kvm/mpic.c
-index 39b3a8f..8542f07 100644
---- a/arch/powerpc/kvm/mpic.c
-+++ b/arch/powerpc/kvm/mpic.c
-@@ -1374,8 +1374,9 @@ static int kvm_mpic_write_internal(struct openpic *opp, gpa_t addr, u32 val)
- 	return -ENXIO;
- }
- 
--static int kvm_mpic_read(struct kvm_io_device *this, gpa_t addr,
--			 int len, void *ptr)
-+static int kvm_mpic_read(struct kvm_vcpu *vcpu,
-+			 struct kvm_io_device *this,
-+			 gpa_t addr, int len, void *ptr)
- {
- 	struct openpic *opp = container_of(this, struct openpic, mmio);
- 	int ret;
-@@ -1415,8 +1416,9 @@ static int kvm_mpic_read(struct kvm_io_device *this, gpa_t addr,
- 	return ret;
- }
- 
--static int kvm_mpic_write(struct kvm_io_device *this, gpa_t addr,
--			  int len, const void *ptr)
-+static int kvm_mpic_write(struct kvm_vcpu *vcpu,
-+			  struct kvm_io_device *this,
-+			  gpa_t addr, int len, const void *ptr)
- {
- 	struct openpic *opp = container_of(this, struct openpic, mmio);
- 	int ret;
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 27c0fac..24bfe40 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -807,7 +807,7 @@ int kvmppc_handle_load(struct kvm_run *run, struct kvm_vcpu *vcpu,
- 
- 	idx = srcu_read_lock(&vcpu->kvm->srcu);
- 
--	ret = kvm_io_bus_read(vcpu->kvm, KVM_MMIO_BUS, run->mmio.phys_addr,
-+	ret = kvm_io_bus_read(vcpu, KVM_MMIO_BUS, run->mmio.phys_addr,
- 			      bytes, &run->mmio.data);
- 
- 	srcu_read_unlock(&vcpu->kvm->srcu, idx);
-@@ -880,7 +880,7 @@ int kvmppc_handle_store(struct kvm_run *run, struct kvm_vcpu *vcpu,
- 
- 	idx = srcu_read_lock(&vcpu->kvm->srcu);
- 
--	ret = kvm_io_bus_write(vcpu->kvm, KVM_MMIO_BUS, run->mmio.phys_addr,
-+	ret = kvm_io_bus_write(vcpu, KVM_MMIO_BUS, run->mmio.phys_addr,
- 			       bytes, &run->mmio.data);
- 
- 	srcu_read_unlock(&vcpu->kvm->srcu, idx);
-diff --git a/arch/s390/kvm/diag.c b/arch/s390/kvm/diag.c
-index 9254aff..329ec75 100644
---- a/arch/s390/kvm/diag.c
-+++ b/arch/s390/kvm/diag.c
-@@ -213,7 +213,7 @@ static int __diag_virtio_hypercall(struct kvm_vcpu *vcpu)
- 	 * - gpr 3 contains the virtqueue index (passed as datamatch)
- 	 * - gpr 4 contains the index on the bus (optionally)
- 	 */
--	ret = kvm_io_bus_write_cookie(vcpu->kvm, KVM_VIRTIO_CCW_NOTIFY_BUS,
-+	ret = kvm_io_bus_write_cookie(vcpu, KVM_VIRTIO_CCW_NOTIFY_BUS,
- 				      vcpu->run->s.regs.gprs[2] & 0xffffffff,
- 				      8, &vcpu->run->s.regs.gprs[3],
- 				      vcpu->run->s.regs.gprs[4]);
-diff --git a/arch/x86/kvm/i8254.c b/arch/x86/kvm/i8254.c
-index 298781d..4dce6f8 100644
---- a/arch/x86/kvm/i8254.c
-+++ b/arch/x86/kvm/i8254.c
-@@ -443,7 +443,8 @@ static inline int pit_in_range(gpa_t addr)
- 		(addr < KVM_PIT_BASE_ADDRESS + KVM_PIT_MEM_LENGTH));
- }
- 
--static int pit_ioport_write(struct kvm_io_device *this,
-+static int pit_ioport_write(struct kvm_vcpu *vcpu,
-+				struct kvm_io_device *this,
- 			    gpa_t addr, int len, const void *data)
- {
- 	struct kvm_pit *pit = dev_to_pit(this);
-@@ -519,7 +520,8 @@ static int pit_ioport_write(struct kvm_io_device *this,
- 	return 0;
- }
- 
--static int pit_ioport_read(struct kvm_io_device *this,
-+static int pit_ioport_read(struct kvm_vcpu *vcpu,
-+			   struct kvm_io_device *this,
- 			   gpa_t addr, int len, void *data)
- {
- 	struct kvm_pit *pit = dev_to_pit(this);
-@@ -589,7 +591,8 @@ static int pit_ioport_read(struct kvm_io_device *this,
- 	return 0;
- }
- 
--static int speaker_ioport_write(struct kvm_io_device *this,
-+static int speaker_ioport_write(struct kvm_vcpu *vcpu,
-+				struct kvm_io_device *this,
- 				gpa_t addr, int len, const void *data)
- {
- 	struct kvm_pit *pit = speaker_to_pit(this);
-@@ -606,8 +609,9 @@ static int speaker_ioport_write(struct kvm_io_device *this,
- 	return 0;
- }
- 
--static int speaker_ioport_read(struct kvm_io_device *this,
--			       gpa_t addr, int len, void *data)
-+static int speaker_ioport_read(struct kvm_vcpu *vcpu,
-+				   struct kvm_io_device *this,
-+				   gpa_t addr, int len, void *data)
- {
- 	struct kvm_pit *pit = speaker_to_pit(this);
- 	struct kvm_kpit_state *pit_state = &pit->pit_state;
-diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
-index cc31f7c..8ff4eaa 100644
---- a/arch/x86/kvm/i8259.c
-+++ b/arch/x86/kvm/i8259.c
-@@ -528,42 +528,42 @@ static int picdev_read(struct kvm_pic *s,
- 	return 0;
- }
- 
--static int picdev_master_write(struct kvm_io_device *dev,
-+static int picdev_master_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
- 			       gpa_t addr, int len, const void *val)
- {
- 	return picdev_write(container_of(dev, struct kvm_pic, dev_master),
- 			    addr, len, val);
- }
- 
--static int picdev_master_read(struct kvm_io_device *dev,
-+static int picdev_master_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
- 			      gpa_t addr, int len, void *val)
- {
- 	return picdev_read(container_of(dev, struct kvm_pic, dev_master),
- 			    addr, len, val);
- }
- 
--static int picdev_slave_write(struct kvm_io_device *dev,
-+static int picdev_slave_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
- 			      gpa_t addr, int len, const void *val)
- {
- 	return picdev_write(container_of(dev, struct kvm_pic, dev_slave),
- 			    addr, len, val);
- }
- 
--static int picdev_slave_read(struct kvm_io_device *dev,
-+static int picdev_slave_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
- 			     gpa_t addr, int len, void *val)
- {
- 	return picdev_read(container_of(dev, struct kvm_pic, dev_slave),
- 			    addr, len, val);
- }
- 
--static int picdev_eclr_write(struct kvm_io_device *dev,
-+static int picdev_eclr_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
- 			     gpa_t addr, int len, const void *val)
- {
- 	return picdev_write(container_of(dev, struct kvm_pic, dev_eclr),
- 			    addr, len, val);
- }
- 
--static int picdev_eclr_read(struct kvm_io_device *dev,
-+static int picdev_eclr_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
- 			    gpa_t addr, int len, void *val)
- {
- 	return picdev_read(container_of(dev, struct kvm_pic, dev_eclr),
-diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-index b1947e0..8bf2e49 100644
---- a/arch/x86/kvm/ioapic.c
-+++ b/arch/x86/kvm/ioapic.c
-@@ -498,8 +498,8 @@ static inline int ioapic_in_range(struct kvm_ioapic *ioapic, gpa_t addr)
- 		 (addr < ioapic->base_address + IOAPIC_MEM_LENGTH)));
- }
- 
--static int ioapic_mmio_read(struct kvm_io_device *this, gpa_t addr, int len,
--			    void *val)
-+static int ioapic_mmio_read(struct kvm_vcpu *vcpu, struct kvm_io_device *this,
-+				gpa_t addr, int len, void *val)
- {
- 	struct kvm_ioapic *ioapic = to_ioapic(this);
- 	u32 result;
-@@ -541,8 +541,8 @@ static int ioapic_mmio_read(struct kvm_io_device *this, gpa_t addr, int len,
- 	return 0;
- }
- 
--static int ioapic_mmio_write(struct kvm_io_device *this, gpa_t addr, int len,
--			     const void *val)
-+static int ioapic_mmio_write(struct kvm_vcpu *vcpu, struct kvm_io_device *this,
-+				 gpa_t addr, int len, const void *val)
- {
- 	struct kvm_ioapic *ioapic = to_ioapic(this);
- 	u32 data;
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index e55b5fc..ba57bb7 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1038,7 +1038,7 @@ static int apic_mmio_in_range(struct kvm_lapic *apic, gpa_t addr)
- 	    addr < apic->base_address + LAPIC_MMIO_LENGTH;
- }
- 
--static int apic_mmio_read(struct kvm_io_device *this,
-+static int apic_mmio_read(struct kvm_vcpu *vcpu, struct kvm_io_device *this,
- 			   gpa_t address, int len, void *data)
- {
- 	struct kvm_lapic *apic = to_lapic(this);
-@@ -1358,7 +1358,7 @@ static int apic_reg_write(struct kvm_lapic *apic, u32 reg, u32 val)
- 	return ret;
- }
- 
--static int apic_mmio_write(struct kvm_io_device *this,
-+static int apic_mmio_write(struct kvm_vcpu *vcpu, struct kvm_io_device *this,
- 			    gpa_t address, int len, const void *data)
- {
- 	struct kvm_lapic *apic = to_lapic(this);
-diff --git a/arch/x86/kvm/vmx.c b/arch/x86/kvm/vmx.c
-index f7b20b4..317da9b 100644
---- a/arch/x86/kvm/vmx.c
-+++ b/arch/x86/kvm/vmx.c
-@@ -5822,7 +5822,7 @@ static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
- 	gpa_t gpa;
- 
- 	gpa = vmcs_read64(GUEST_PHYSICAL_ADDRESS);
--	if (!kvm_io_bus_write(vcpu->kvm, KVM_FAST_MMIO_BUS, gpa, 0, NULL)) {
-+	if (!kvm_io_bus_write(vcpu, KVM_FAST_MMIO_BUS, gpa, 0, NULL)) {
- 		skip_emulated_instruction(vcpu);
- 		return 1;
- 	}
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index bd7a70b..5573d63 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4115,8 +4115,8 @@ static int vcpu_mmio_write(struct kvm_vcpu *vcpu, gpa_t addr, int len,
- 	do {
- 		n = min(len, 8);
- 		if (!(vcpu->arch.apic &&
--		      !kvm_iodevice_write(&vcpu->arch.apic->dev, addr, n, v))
--		    && kvm_io_bus_write(vcpu->kvm, KVM_MMIO_BUS, addr, n, v))
-+		      !kvm_iodevice_write(vcpu, &vcpu->arch.apic->dev, addr, n, v))
-+		    && kvm_io_bus_write(vcpu, KVM_MMIO_BUS, addr, n, v))
- 			break;
- 		handled += n;
- 		addr += n;
-@@ -4135,8 +4135,9 @@ static int vcpu_mmio_read(struct kvm_vcpu *vcpu, gpa_t addr, int len, void *v)
- 	do {
- 		n = min(len, 8);
- 		if (!(vcpu->arch.apic &&
--		      !kvm_iodevice_read(&vcpu->arch.apic->dev, addr, n, v))
--		    && kvm_io_bus_read(vcpu->kvm, KVM_MMIO_BUS, addr, n, v))
-+		      !kvm_iodevice_read(vcpu, &vcpu->arch.apic->dev,
-+					 addr, n, v))
-+		    && kvm_io_bus_read(vcpu, KVM_MMIO_BUS, addr, n, v))
- 			break;
- 		trace_kvm_mmio(KVM_TRACE_MMIO_READ, n, addr, *(u64 *)v);
- 		handled += n;
-@@ -4630,10 +4631,10 @@ static int kernel_pio(struct kvm_vcpu *vcpu, void *pd)
- 	int r;
- 
- 	if (vcpu->arch.pio.in)
--		r = kvm_io_bus_read(vcpu->kvm, KVM_PIO_BUS, vcpu->arch.pio.port,
-+		r = kvm_io_bus_read(vcpu, KVM_PIO_BUS, vcpu->arch.pio.port,
- 				    vcpu->arch.pio.size, pd);
- 	else
--		r = kvm_io_bus_write(vcpu->kvm, KVM_PIO_BUS,
-+		r = kvm_io_bus_write(vcpu, KVM_PIO_BUS,
- 				     vcpu->arch.pio.port, vcpu->arch.pio.size,
- 				     pd);
- 	return r;
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index ae9c720..9605e46 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -165,12 +165,12 @@ enum kvm_bus {
- 	KVM_NR_BUSES
+diff --git a/arch/arm/include/asm/kvm_mmio.h b/arch/arm/include/asm/kvm_mmio.h
+index 3f83db2..d8e90c8 100644
+--- a/arch/arm/include/asm/kvm_mmio.h
++++ b/arch/arm/include/asm/kvm_mmio.h
+@@ -28,28 +28,6 @@ struct kvm_decode {
+ 	bool sign_extend;
  };
  
--int kvm_io_bus_write(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
-+int kvm_io_bus_write(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
- 		     int len, const void *val);
--int kvm_io_bus_write_cookie(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
--			    int len, const void *val, long cookie);
--int kvm_io_bus_read(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr, int len,
--		    void *val);
-+int kvm_io_bus_write_cookie(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx,
-+			    gpa_t addr, int len, const void *val, long cookie);
-+int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
-+		    int len, void *val);
- int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
- 			    int len, struct kvm_io_device *dev);
- int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
-diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
-index 00d8642..c831a40 100644
---- a/virt/kvm/coalesced_mmio.c
-+++ b/virt/kvm/coalesced_mmio.c
-@@ -60,8 +60,9 @@ static int coalesced_mmio_has_room(struct kvm_coalesced_mmio_dev *dev)
- 	return 1;
+-/*
+- * The in-kernel MMIO emulation code wants to use a copy of run->mmio,
+- * which is an anonymous type. Use our own type instead.
+- */
+-struct kvm_exit_mmio {
+-	phys_addr_t	phys_addr;
+-	u8		data[8];
+-	u32		len;
+-	bool		is_write;
+-	void		*private;
+-};
+-
+-static inline void kvm_prepare_mmio(struct kvm_run *run,
+-				    struct kvm_exit_mmio *mmio)
+-{
+-	run->mmio.phys_addr	= mmio->phys_addr;
+-	run->mmio.len		= mmio->len;
+-	run->mmio.is_write	= mmio->is_write;
+-	memcpy(run->mmio.data, mmio->data, mmio->len);
+-	run->exit_reason	= KVM_EXIT_MMIO;
+-}
+-
+ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		 phys_addr_t fault_ipa);
+diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
+index 5d3bfc0..bb2ab44 100644
+--- a/arch/arm/kvm/mmio.c
++++ b/arch/arm/kvm/mmio.c
+@@ -122,7 +122,7 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
  }
  
--static int coalesced_mmio_write(struct kvm_io_device *this,
--				gpa_t addr, int len, const void *val)
-+static int coalesced_mmio_write(struct kvm_vcpu *vcpu,
-+				struct kvm_io_device *this, gpa_t addr,
-+				int len, const void *val)
+ static int decode_hsr(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+-		      struct kvm_exit_mmio *mmio)
++		      struct kvm_run *run)
  {
- 	struct kvm_coalesced_mmio_dev *dev = to_mmio(this);
- 	struct kvm_coalesced_mmio_ring *ring = dev->kvm->coalesced_mmio_ring;
-diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-index fc5f43e..26c72f3 100644
---- a/virt/kvm/eventfd.c
-+++ b/virt/kvm/eventfd.c
-@@ -715,8 +715,8 @@ ioeventfd_in_range(struct _ioeventfd *p, gpa_t addr, int len, const void *val)
+ 	unsigned long rt;
+ 	int len;
+@@ -148,9 +148,9 @@ static int decode_hsr(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	sign_extend = kvm_vcpu_dabt_issext(vcpu);
+ 	rt = kvm_vcpu_dabt_get_rd(vcpu);
  
- /* MMIO/PIO writes trigger an event if the addr/val match */
- static int
--ioeventfd_write(struct kvm_io_device *this, gpa_t addr, int len,
--		const void *val)
-+ioeventfd_write(struct kvm_vcpu *vcpu, struct kvm_io_device *this, gpa_t addr,
-+		int len, const void *val)
+-	mmio->is_write = is_write;
+-	mmio->phys_addr = fault_ipa;
+-	mmio->len = len;
++	run->mmio.is_write = is_write;
++	run->mmio.phys_addr = fault_ipa;
++	run->mmio.len = len;
+ 	vcpu->arch.mmio_decode.sign_extend = sign_extend;
+ 	vcpu->arch.mmio_decode.rt = rt;
+ 
+@@ -162,23 +162,49 @@ static int decode_hsr(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	return 0;
+ }
+ 
++/**
++ * handle_kernel_mmio - handle an in-kernel MMIO access
++ * @vcpu:	pointer to the vcpu performing the access
++ * @run:	pointer to the kvm_run structure
++ *
++ * returns true if the MMIO access has been performed in kernel space,
++ * and false if it needs to be emulated in user space.
++ */
++static bool handle_kernel_mmio(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++	int ret;
++
++	if (run->mmio.is_write) {
++		ret = kvm_io_bus_write(vcpu, KVM_MMIO_BUS, run->mmio.phys_addr,
++				       run->mmio.len, run->mmio.data);
++
++	} else {
++		ret = kvm_io_bus_read(vcpu, KVM_MMIO_BUS, run->mmio.phys_addr,
++				      run->mmio.len, run->mmio.data);
++	}
++	if (!ret) {
++		kvm_handle_mmio_return(vcpu, run);
++		return true;
++	}
++
++	return false;
++}
++
+ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		 phys_addr_t fault_ipa)
  {
- 	struct _ioeventfd *p = to_ioeventfd(this);
+-	struct kvm_exit_mmio mmio;
+ 	unsigned long data;
+ 	unsigned long rt;
+ 	int ret;
  
-diff --git a/virt/kvm/iodev.h b/virt/kvm/iodev.h
-index 12fd3ca..9ef709c 100644
---- a/virt/kvm/iodev.h
-+++ b/virt/kvm/iodev.h
-@@ -20,6 +20,7 @@
- #include <asm/errno.h>
+ 	/*
+-	 * Prepare MMIO operation. First stash it in a private
+-	 * structure that we can use for in-kernel emulation. If the
+-	 * kernel can't handle it, copy it into run->mmio and let user
+-	 * space do its magic.
++	 * Prepare MMIO operation. First put the MMIO data into run->mmio.
++	 * Then try if some in-kernel emulation feels responsible, otherwise
++	 * let user space do its magic.
+ 	 */
  
- struct kvm_io_device;
-+struct kvm_vcpu;
+ 	if (kvm_vcpu_dabt_isvalid(vcpu)) {
+-		ret = decode_hsr(vcpu, fault_ipa, &mmio);
++		ret = decode_hsr(vcpu, fault_ipa, run);
+ 		if (ret)
+ 			return ret;
+ 	} else {
+@@ -188,21 +214,21 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 
+ 	rt = vcpu->arch.mmio_decode.rt;
+ 
+-	if (mmio.is_write) {
++	if (run->mmio.is_write) {
+ 		data = vcpu_data_guest_to_host(vcpu, *vcpu_reg(vcpu, rt),
+-					       mmio.len);
++					       run->mmio.len);
+ 
+-		trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, mmio.len,
++		trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, run->mmio.len,
+ 			       fault_ipa, data);
+-		mmio_write_buf(mmio.data, mmio.len, data);
++		mmio_write_buf(run->mmio.data, run->mmio.len, data);
+ 	} else {
+-		trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, mmio.len,
++		trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, run->mmio.len,
+ 			       fault_ipa, 0);
+ 	}
+ 
+-	if (vgic_handle_mmio(vcpu, run, &mmio))
++	if (handle_kernel_mmio(vcpu, run))
+ 		return 1;
+ 
+-	kvm_prepare_mmio(run, &mmio);
++	run->exit_reason = KVM_EXIT_MMIO;
+ 	return 0;
+ }
+diff --git a/arch/arm64/include/asm/kvm_mmio.h b/arch/arm64/include/asm/kvm_mmio.h
+index 9f52beb..889c908 100644
+--- a/arch/arm64/include/asm/kvm_mmio.h
++++ b/arch/arm64/include/asm/kvm_mmio.h
+@@ -31,28 +31,6 @@ struct kvm_decode {
+ 	bool sign_extend;
+ };
+ 
+-/*
+- * The in-kernel MMIO emulation code wants to use a copy of run->mmio,
+- * which is an anonymous type. Use our own type instead.
+- */
+-struct kvm_exit_mmio {
+-	phys_addr_t	phys_addr;
+-	u8		data[8];
+-	u32		len;
+-	bool		is_write;
+-	void		*private;
+-};
+-
+-static inline void kvm_prepare_mmio(struct kvm_run *run,
+-				    struct kvm_exit_mmio *mmio)
+-{
+-	run->mmio.phys_addr	= mmio->phys_addr;
+-	run->mmio.len		= mmio->len;
+-	run->mmio.is_write	= mmio->is_write;
+-	memcpy(run->mmio.data, mmio->data, mmio->len);
+-	run->exit_reason	= KVM_EXIT_MMIO;
+-}
+-
+ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		 phys_addr_t fault_ipa);
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index d6705f4..16ec2c8 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -140,8 +140,6 @@ struct vgic_params {
+ };
+ 
+ struct vgic_vm_ops {
+-	bool	(*handle_mmio)(struct kvm_vcpu *, struct kvm_run *,
+-			       struct kvm_exit_mmio *);
+ 	bool	(*queue_sgi)(struct kvm_vcpu *, int irq);
+ 	void	(*add_sgi_source)(struct kvm_vcpu *, int irq, int source);
+ 	int	(*init_model)(struct kvm *);
+@@ -313,8 +311,6 @@ struct vgic_cpu {
+ 
+ struct kvm;
+ struct kvm_vcpu;
+-struct kvm_run;
+-struct kvm_exit_mmio;
+ 
+ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
+ int kvm_vgic_hyp_init(void);
+@@ -330,8 +326,6 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
+ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
+ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+ int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
+-bool vgic_handle_mmio(struct kvm_vcpu *vcpu, struct kvm_run *run,
+-		      struct kvm_exit_mmio *mmio);
+ 
+ #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+ #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
+diff --git a/virt/kvm/arm/vgic-v2-emul.c b/virt/kvm/arm/vgic-v2-emul.c
+index 7460b37..1390797 100644
+--- a/virt/kvm/arm/vgic-v2-emul.c
++++ b/virt/kvm/arm/vgic-v2-emul.c
+@@ -404,24 +404,6 @@ static const struct vgic_io_range vgic_dist_ranges[] = {
+ 	{}
+ };
+ 
+-static bool vgic_v2_handle_mmio(struct kvm_vcpu *vcpu, struct kvm_run *run,
+-				struct kvm_exit_mmio *mmio)
+-{
+-	unsigned long base = vcpu->kvm->arch.vgic.vgic_dist_base;
+-
+-	if (!is_in_range(mmio->phys_addr, mmio->len, base,
+-			 KVM_VGIC_V2_DIST_SIZE))
+-		return false;
+-
+-	/* GICv2 does not support accesses wider than 32 bits */
+-	if (mmio->len > 4) {
+-		kvm_inject_dabt(vcpu, mmio->phys_addr);
+-		return true;
+-	}
+-
+-	return vgic_handle_mmio_range(vcpu, run, mmio, vgic_dist_ranges, base);
+-}
+-
+ static void vgic_dispatch_sgi(struct kvm_vcpu *vcpu, u32 reg)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+@@ -580,7 +562,6 @@ void vgic_v2_init_emulation(struct kvm *kvm)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 
+-	dist->vm_ops.handle_mmio = vgic_v2_handle_mmio;
+ 	dist->vm_ops.queue_sgi = vgic_v2_queue_sgi;
+ 	dist->vm_ops.add_sgi_source = vgic_v2_add_sgi_source;
+ 	dist->vm_ops.init_model = vgic_v2_init_model;
+@@ -690,6 +671,7 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
+ 	struct kvm_vcpu *vcpu, *tmp_vcpu;
+ 	struct vgic_dist *vgic;
+ 	struct kvm_exit_mmio mmio;
++	u32 data;
+ 
+ 	offset = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
+ 	cpuid = (attr->attr & KVM_DEV_ARM_VGIC_CPUID_MASK) >>
+@@ -711,6 +693,7 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
+ 
+ 	mmio.len = 4;
+ 	mmio.is_write = is_write;
++	mmio.data = &data;
+ 	if (is_write)
+ 		mmio_data_write(&mmio, ~0, *reg);
+ 	switch (attr->group) {
+diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+index eb1a797..e9c3a7a 100644
+--- a/virt/kvm/arm/vgic-v3-emul.c
++++ b/virt/kvm/arm/vgic-v3-emul.c
+@@ -708,40 +708,6 @@ static const struct vgic_io_range vgic_redist_ranges[] = {
+ 	{},
+ };
+ 
+-/*
+- * This function splits accesses between the distributor and the two
+- * redistributor parts (private/SPI). As each redistributor is accessible
+- * from any CPU, we have to determine the affected VCPU by taking the faulting
+- * address into account. We then pass this VCPU to the handler function via
+- * the private parameter.
+- */
+-#define SGI_BASE_OFFSET SZ_64K
+-static bool vgic_v3_handle_mmio(struct kvm_vcpu *vcpu, struct kvm_run *run,
+-				struct kvm_exit_mmio *mmio)
+-{
+-	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+-	unsigned long dbase = dist->vgic_dist_base;
+-	unsigned long rdbase = dist->vgic_redist_base;
+-	int nrcpus = atomic_read(&vcpu->kvm->online_vcpus);
+-	int vcpu_id;
+-
+-	if (is_in_range(mmio->phys_addr, mmio->len, dbase, GIC_V3_DIST_SIZE)) {
+-		return vgic_handle_mmio_range(vcpu, run, mmio,
+-					      vgic_v3_dist_ranges, dbase);
+-	}
+-
+-	if (!is_in_range(mmio->phys_addr, mmio->len, rdbase,
+-	    GIC_V3_REDIST_SIZE * nrcpus))
+-		return false;
+-
+-	vcpu_id = (mmio->phys_addr - rdbase) / GIC_V3_REDIST_SIZE;
+-	rdbase += (vcpu_id * GIC_V3_REDIST_SIZE);
+-	mmio->private = kvm_get_vcpu(vcpu->kvm, vcpu_id);
+-
+-	return vgic_handle_mmio_range(vcpu, run, mmio, vgic_redist_ranges,
+-				      rdbase);
+-}
+-
+ static bool vgic_v3_queue_sgi(struct kvm_vcpu *vcpu, int irq)
+ {
+ 	if (vgic_queue_irq(vcpu, 0, irq)) {
+@@ -861,7 +827,6 @@ void vgic_v3_init_emulation(struct kvm *kvm)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 
+-	dist->vm_ops.handle_mmio = vgic_v3_handle_mmio;
+ 	dist->vm_ops.queue_sgi = vgic_v3_queue_sgi;
+ 	dist->vm_ops.add_sgi_source = vgic_v3_add_sgi_source;
+ 	dist->vm_ops.init_model = vgic_v3_init_model;
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index e968179..901c130 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -758,7 +758,6 @@ static bool call_range_handler(struct kvm_vcpu *vcpu,
+ 			       unsigned long offset,
+ 			       const struct vgic_io_range *range)
+ {
+-	u32 *data32 = (void *)mmio->data;
+ 	struct kvm_exit_mmio mmio32;
+ 	bool ret;
+ 
+@@ -775,70 +774,17 @@ static bool call_range_handler(struct kvm_vcpu *vcpu,
+ 	mmio32.private = mmio->private;
+ 
+ 	mmio32.phys_addr = mmio->phys_addr + 4;
+-	if (mmio->is_write)
+-		*(u32 *)mmio32.data = data32[1];
++	mmio32.data = &((u32 *)mmio->data)[1];
+ 	ret = range->handle_mmio(vcpu, &mmio32, offset + 4);
+-	if (!mmio->is_write)
+-		data32[1] = *(u32 *)mmio32.data;
+ 
+ 	mmio32.phys_addr = mmio->phys_addr;
+-	if (mmio->is_write)
+-		*(u32 *)mmio32.data = data32[0];
++	mmio32.data = &((u32 *)mmio->data)[0];
+ 	ret |= range->handle_mmio(vcpu, &mmio32, offset);
+-	if (!mmio->is_write)
+-		data32[0] = *(u32 *)mmio32.data;
+ 
+ 	return ret;
+ }
  
  /**
-  * kvm_io_device_ops are called under kvm slots_lock.
-@@ -27,11 +28,13 @@ struct kvm_io_device;
-  * or non-zero to have it passed to the next device.
-  **/
- struct kvm_io_device_ops {
--	int (*read)(struct kvm_io_device *this,
-+	int (*read)(struct kvm_vcpu *vcpu,
-+		    struct kvm_io_device *this,
- 		    gpa_t addr,
- 		    int len,
- 		    void *val);
--	int (*write)(struct kvm_io_device *this,
-+	int (*write)(struct kvm_vcpu *vcpu,
-+		     struct kvm_io_device *this,
- 		     gpa_t addr,
- 		     int len,
- 		     const void *val);
-@@ -49,16 +52,20 @@ static inline void kvm_iodevice_init(struct kvm_io_device *dev,
- 	dev->ops = ops;
+- * vgic_handle_mmio_range - handle an in-kernel MMIO access
+- * @vcpu:	pointer to the vcpu performing the access
+- * @run:	pointer to the kvm_run structure
+- * @mmio:	pointer to the data describing the access
+- * @ranges:	array of MMIO ranges in a given region
+- * @mmio_base:	base address of that region
+- *
+- * returns true if the MMIO access could be performed
+- */
+-bool vgic_handle_mmio_range(struct kvm_vcpu *vcpu, struct kvm_run *run,
+-			    struct kvm_exit_mmio *mmio,
+-			    const struct vgic_io_range *ranges,
+-			    unsigned long mmio_base)
+-{
+-	const struct vgic_io_range *range;
+-	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+-	bool updated_state;
+-	unsigned long offset;
+-
+-	offset = mmio->phys_addr - mmio_base;
+-	range = vgic_find_range(ranges, mmio->len, offset);
+-	if (unlikely(!range || !range->handle_mmio)) {
+-		pr_warn("Unhandled access %d %08llx %d\n",
+-			mmio->is_write, mmio->phys_addr, mmio->len);
+-		return false;
+-	}
+-
+-	spin_lock(&vcpu->kvm->arch.vgic.lock);
+-	offset -= range->base;
+-	if (vgic_validate_access(dist, range, offset)) {
+-		updated_state = call_range_handler(vcpu, mmio, offset, range);
+-	} else {
+-		if (!mmio->is_write)
+-			memset(mmio->data, 0, mmio->len);
+-		updated_state = false;
+-	}
+-	spin_unlock(&vcpu->kvm->arch.vgic.lock);
+-	kvm_prepare_mmio(run, mmio);
+-	kvm_handle_mmio_return(vcpu, run);
+-
+-	if (updated_state)
+-		vgic_kick_vcpus(vcpu->kvm);
+-
+-	return true;
+-}
+-
+-/**
+  * vgic_handle_mmio_access - handle an in-kernel MMIO access
+  * This is called by the read/write KVM IO device wrappers below.
+  * @vcpu:	pointer to the vcpu performing the access
+@@ -873,23 +819,20 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
+ 	mmio.phys_addr = addr;
+ 	mmio.len = len;
+ 	mmio.is_write = is_write;
+-	if (is_write)
+-		memcpy(mmio.data, val, len);
++	mmio.data = val;
+ 	mmio.private = iodev->redist_vcpu;
+ 
+ 	spin_lock(&dist->lock);
+ 	offset -= range->base;
+ 	if (vgic_validate_access(dist, range, offset)) {
+ 		updated_state = call_range_handler(vcpu, &mmio, offset, range);
+-		if (!is_write)
+-			memcpy(val, mmio.data, len);
+ 	} else {
+ 		if (!is_write)
+ 			memset(val, 0, len);
+ 		updated_state = false;
+ 	}
+ 	spin_unlock(&dist->lock);
+-	kvm_prepare_mmio(run, &mmio);
++	run->exit_reason = KVM_EXIT_MMIO;
+ 	kvm_handle_mmio_return(vcpu, run);
+ 
+ 	if (updated_state)
+@@ -898,30 +841,6 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
+ 	return 0;
  }
  
--static inline int kvm_iodevice_read(struct kvm_io_device *dev,
--				    gpa_t addr, int l, void *v)
-+static inline int kvm_iodevice_read(struct kvm_vcpu *vcpu,
-+				    struct kvm_io_device *dev, gpa_t addr,
-+				    int l, void *v)
- {
--	return dev->ops->read ? dev->ops->read(dev, addr, l, v) : -EOPNOTSUPP;
-+	return dev->ops->read ? dev->ops->read(vcpu, dev, addr, l, v)
-+				: -EOPNOTSUPP;
- }
+-/**
+- * vgic_handle_mmio - handle an in-kernel MMIO access for the GIC emulation
+- * @vcpu:      pointer to the vcpu performing the access
+- * @run:       pointer to the kvm_run structure
+- * @mmio:      pointer to the data describing the access
+- *
+- * returns true if the MMIO access has been performed in kernel space,
+- * and false if it needs to be emulated in user space.
+- * Calls the actual handling routine for the selected VGIC model.
+- */
+-bool vgic_handle_mmio(struct kvm_vcpu *vcpu, struct kvm_run *run,
+-		      struct kvm_exit_mmio *mmio)
+-{
+-	if (!irqchip_in_kernel(vcpu->kvm))
+-		return false;
+-
+-	/*
+-	 * This will currently call either vgic_v2_handle_mmio() or
+-	 * vgic_v3_handle_mmio(), which in turn will call
+-	 * vgic_handle_mmio_range() defined above.
+-	 */
+-	return vcpu->kvm->arch.vgic.vm_ops.handle_mmio(vcpu, run, mmio);
+-}
+-
+ static int vgic_handle_mmio_read(struct kvm_vcpu *vcpu,
+ 				 struct kvm_io_device *this,
+ 				 gpa_t addr, int len, void *val)
+diff --git a/virt/kvm/arm/vgic.h b/virt/kvm/arm/vgic.h
+index 28fa3aa..0df74cb 100644
+--- a/virt/kvm/arm/vgic.h
++++ b/virt/kvm/arm/vgic.h
+@@ -59,6 +59,14 @@ void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq);
+ void vgic_unqueue_irqs(struct kvm_vcpu *vcpu);
  
--static inline int kvm_iodevice_write(struct kvm_io_device *dev,
--				     gpa_t addr, int l, const void *v)
-+static inline int kvm_iodevice_write(struct kvm_vcpu *vcpu,
-+				     struct kvm_io_device *dev, gpa_t addr,
-+				     int l, const void *v)
- {
--	return dev->ops->write ? dev->ops->write(dev, addr, l, v) : -EOPNOTSUPP;
-+	return dev->ops->write ? dev->ops->write(vcpu, dev, addr, l, v)
-+				 : -EOPNOTSUPP;
- }
++struct kvm_exit_mmio {
++	phys_addr_t	phys_addr;
++	void		*data;
++	u32		len;
++	bool		is_write;
++	void		*private;
++};
++
+ void vgic_reg_access(struct kvm_exit_mmio *mmio, u32 *reg,
+ 		     phys_addr_t offset, int mode);
+ bool handle_mmio_raz_wi(struct kvm_vcpu *vcpu, struct kvm_exit_mmio *mmio,
+@@ -99,11 +107,6 @@ const
+ struct vgic_io_range *vgic_find_range(const struct vgic_io_range *ranges,
+ 				      int len, gpa_t offset);
  
- static inline void kvm_iodevice_destructor(struct kvm_io_device *dev)
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index a109370..664d67a 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2997,7 +2997,7 @@ static int kvm_io_bus_get_first_dev(struct kvm_io_bus *bus,
- 	return off;
- }
- 
--static int __kvm_io_bus_write(struct kvm_io_bus *bus,
-+static int __kvm_io_bus_write(struct kvm_vcpu *vcpu, struct kvm_io_bus *bus,
- 			      struct kvm_io_range *range, const void *val)
- {
- 	int idx;
-@@ -3008,7 +3008,7 @@ static int __kvm_io_bus_write(struct kvm_io_bus *bus,
- 
- 	while (idx < bus->dev_count &&
- 		kvm_io_bus_cmp(range, &bus->range[idx]) == 0) {
--		if (!kvm_iodevice_write(bus->range[idx].dev, range->addr,
-+		if (!kvm_iodevice_write(vcpu, bus->range[idx].dev, range->addr,
- 					range->len, val))
- 			return idx;
- 		idx++;
-@@ -3018,7 +3018,7 @@ static int __kvm_io_bus_write(struct kvm_io_bus *bus,
- }
- 
- /* kvm_io_bus_write - called under kvm->slots_lock */
--int kvm_io_bus_write(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
-+int kvm_io_bus_write(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
- 		     int len, const void *val)
- {
- 	struct kvm_io_bus *bus;
-@@ -3030,14 +3030,14 @@ int kvm_io_bus_write(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
- 		.len = len,
- 	};
- 
--	bus = srcu_dereference(kvm->buses[bus_idx], &kvm->srcu);
--	r = __kvm_io_bus_write(bus, &range, val);
-+	bus = srcu_dereference(vcpu->kvm->buses[bus_idx], &vcpu->kvm->srcu);
-+	r = __kvm_io_bus_write(vcpu, bus, &range, val);
- 	return r < 0 ? r : 0;
- }
- 
- /* kvm_io_bus_write_cookie - called under kvm->slots_lock */
--int kvm_io_bus_write_cookie(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
--			    int len, const void *val, long cookie)
-+int kvm_io_bus_write_cookie(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx,
-+			    gpa_t addr, int len, const void *val, long cookie)
- {
- 	struct kvm_io_bus *bus;
- 	struct kvm_io_range range;
-@@ -3047,12 +3047,12 @@ int kvm_io_bus_write_cookie(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
- 		.len = len,
- 	};
- 
--	bus = srcu_dereference(kvm->buses[bus_idx], &kvm->srcu);
-+	bus = srcu_dereference(vcpu->kvm->buses[bus_idx], &vcpu->kvm->srcu);
- 
- 	/* First try the device referenced by cookie. */
- 	if ((cookie >= 0) && (cookie < bus->dev_count) &&
- 	    (kvm_io_bus_cmp(&range, &bus->range[cookie]) == 0))
--		if (!kvm_iodevice_write(bus->range[cookie].dev, addr, len,
-+		if (!kvm_iodevice_write(vcpu, bus->range[cookie].dev, addr, len,
- 					val))
- 			return cookie;
- 
-@@ -3060,11 +3060,11 @@ int kvm_io_bus_write_cookie(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
- 	 * cookie contained garbage; fall back to search and return the
- 	 * correct cookie value.
- 	 */
--	return __kvm_io_bus_write(bus, &range, val);
-+	return __kvm_io_bus_write(vcpu, bus, &range, val);
- }
- 
--static int __kvm_io_bus_read(struct kvm_io_bus *bus, struct kvm_io_range *range,
--			     void *val)
-+static int __kvm_io_bus_read(struct kvm_vcpu *vcpu, struct kvm_io_bus *bus,
-+			     struct kvm_io_range *range, void *val)
- {
- 	int idx;
- 
-@@ -3074,7 +3074,7 @@ static int __kvm_io_bus_read(struct kvm_io_bus *bus, struct kvm_io_range *range,
- 
- 	while (idx < bus->dev_count &&
- 		kvm_io_bus_cmp(range, &bus->range[idx]) == 0) {
--		if (!kvm_iodevice_read(bus->range[idx].dev, range->addr,
-+		if (!kvm_iodevice_read(vcpu, bus->range[idx].dev, range->addr,
- 				       range->len, val))
- 			return idx;
- 		idx++;
-@@ -3085,7 +3085,7 @@ static int __kvm_io_bus_read(struct kvm_io_bus *bus, struct kvm_io_range *range,
- EXPORT_SYMBOL_GPL(kvm_io_bus_write);
- 
- /* kvm_io_bus_read - called under kvm->slots_lock */
--int kvm_io_bus_read(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
-+int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
- 		    int len, void *val)
- {
- 	struct kvm_io_bus *bus;
-@@ -3097,8 +3097,8 @@ int kvm_io_bus_read(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
- 		.len = len,
- 	};
- 
--	bus = srcu_dereference(kvm->buses[bus_idx], &kvm->srcu);
--	r = __kvm_io_bus_read(bus, &range, val);
-+	bus = srcu_dereference(vcpu->kvm->buses[bus_idx], &vcpu->kvm->srcu);
-+	r = __kvm_io_bus_read(vcpu, bus, &range, val);
- 	return r < 0 ? r : 0;
- }
+-bool vgic_handle_mmio_range(struct kvm_vcpu *vcpu, struct kvm_run *run,
+-			    struct kvm_exit_mmio *mmio,
+-			    const struct vgic_io_range *ranges,
+-			    unsigned long mmio_base);
+-
+ bool vgic_handle_enable_reg(struct kvm *kvm, struct kvm_exit_mmio *mmio,
+ 			    phys_addr_t offset, int vcpu_id, int access);
  
 -- 
 1.7.9.5
