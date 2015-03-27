@@ -1,101 +1,109 @@
-From: "Chen, Tiejun" <tiejun.chen@intel.com>
-Subject: Re: [PATCH v2 06/12] KVM: mark kvm->buses as empty once they were
- destroyed
-Date: Fri, 27 Mar 2015 10:10:46 +0800
-Message-ID: <5514BC26.3080103@intel.com>
-References: <1427126309-11223-1-git-send-email-andre.przywara@arm.com> <1427126309-11223-7-git-send-email-andre.przywara@arm.com> <5512EBB9.2050304@arm.com> <20150327013151.GA2882@amt.cnet>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 10/11] KVM: arm/arm64: prepare GICv3 emulation to use
+ kvm_io_bus MMIO handling
+Date: Fri, 27 Mar 2015 07:34:50 +0000
+Message-ID: <20150327073450.5cc33e5c@arm.com>
+References: <1427380778-942-1-git-send-email-andre.przywara@arm.com>
+	<1427380778-942-11-git-send-email-andre.przywara@arm.com>
+	<20150326220632.64ee91ec@arm.com>
+	<5514A0D4.4040302@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20150327013151.GA2882@amt.cnet>
+In-Reply-To: <5514A0D4.4040302@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Marcelo Tosatti <mtosatti@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
-Cc: "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "n.nikolaev@virtualopensystems.com" <n.nikolaev@virtualopensystems.com>, "eric.auger@linaro.org" <eric.auger@linaro.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "n.nikolaev@virtualopensystems.com" <n.nikolaev@virtualopensystems.com>, "eric.auger@linaro.org" <eric.auger@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 2015/3/27 9:31, Marcelo Tosatti wrote:
-> On Wed, Mar 25, 2015 at 05:09:13PM +0000, Marc Zyngier wrote:
->> On 23/03/15 15:58, Andre Przywara wrote:
->>> In kvm_destroy_vm() we call kvm_io_bus_destroy() pretty early,
->>> especially before calling kvm_arch_destroy_vm(). To avoid
->>> unregistering devices from the already destroyed bus, let's mark
->>> the bus with NULL to let other users know it has been destroyed
->>> already.
->>> This avoids a crash on a VM shutdown with the VGIC using the
->>> kvm_io_bus later (the unregistering is in there to be able to roll
->>> back a faulting init).
->>>
->>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>
->> That seems sensible, but I don't see why nobody else hits that. What are
->> we doing differently?
->>
->> Otherwise,
->>
->> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
->>
->> Paolo, Marcelo, can we have your Ack on this?
->>
->> Thanks,
->>
->> 	M.
->>
->>> ---
->>>   virt/kvm/kvm_main.c |    4 +++-
->>>   1 file changed, 3 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->>> index 8c7ab0b..6f164eb 100644
->>> --- a/virt/kvm/kvm_main.c
->>> +++ b/virt/kvm/kvm_main.c
->>> @@ -604,8 +604,10 @@ static void kvm_destroy_vm(struct kvm *kvm)
->>>   	list_del(&kvm->vm_list);
->>>   	spin_unlock(&kvm_lock);
->>>   	kvm_free_irq_routing(kvm);
->>> -	for (i = 0; i < KVM_NR_BUSES; i++)
->>> +	for (i = 0; i < KVM_NR_BUSES; i++) {
->>>   		kvm_io_bus_destroy(kvm->buses[i]);
->>> +		kvm->buses[i] = NULL;
+On Fri, 27 Mar 2015 00:14:12 +0000
+Andre Przywara <andre.przywara@arm.com> wrote:
 
-Could we fold this line into a common like,
+> On 03/26/2015 10:06 PM, Marc Zyngier wrote:
+> > On Thu, 26 Mar 2015 14:39:37 +0000
+> > Andre Przywara <andre.przywara@arm.com> wrote:
+> > 
+> >> Using the framework provided by the recent vgic.c changes, we
+> >> register a kvm_io_bus device on mapping the virtual GICv3 resources.
+> >> The distributor mapping is pretty straight forward, but the
+> >> redistributors need some more love, since they need to be tagged with
+> >> the respective redistributor (read: VCPU) they are connected with.
+> >> We use the kvm_io_bus framework to register one devices per VCPU.
+> >>
+> >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> >> ---
+> >>  include/kvm/arm_vgic.h      |    1 +
+> >>  virt/kvm/arm/vgic-v3-emul.c |   39 ++++++++++++++++++++++++++++++++++++++-
+> >>  2 files changed, 39 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> >> index 4523984..d6705f4 100644
+> >> --- a/include/kvm/arm_vgic.h
+> >> +++ b/include/kvm/arm_vgic.h
+> >> @@ -252,6 +252,7 @@ struct vgic_dist {
+> >>  
+> >>  	struct vgic_vm_ops	vm_ops;
+> >>  	struct vgic_io_device	dist_iodev;
+> >> +	struct vgic_io_device	*redist_iodevs;
+> >>  };
+> >>  
+> >>  struct vgic_v2_cpu_if {
+> >> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+> >> index 2f03a36..eb1a797 100644
+> >> --- a/virt/kvm/arm/vgic-v3-emul.c
+> >> +++ b/virt/kvm/arm/vgic-v3-emul.c
+> >> @@ -758,6 +758,9 @@ static int vgic_v3_map_resources(struct kvm *kvm,
+> >>  {
+> >>  	int ret = 0;
+> >>  	struct vgic_dist *dist = &kvm->arch.vgic;
+> >> +	gpa_t rdbase = dist->vgic_redist_base;
+> >> +	struct vgic_io_device *iodevs = NULL;
+> >> +	int i;
+> >>  
+> >>  	if (!irqchip_in_kernel(kvm))
+> >>  		return 0;
+> >> @@ -783,7 +786,41 @@ static int vgic_v3_map_resources(struct kvm *kvm,
+> >>  		goto out;
+> >>  	}
+> >>  
+> >> -	kvm->arch.vgic.ready = true;
+> >> +	ret = vgic_register_kvm_io_dev(kvm, dist->vgic_dist_base,
+> >> +				       GIC_V3_DIST_SIZE, vgic_v3_dist_ranges,
+> >> +				       -1, &dist->dist_iodev);
+> > 
+> >> +	if (ret)
+> >> +		goto out;
+> >> +
+> >> +	iodevs = kcalloc(dist->nr_cpus, sizeof(iodevs[0]), GFP_KERNEL);
+> >> +	if (!iodevs) {
+> >> +		ret = -ENOMEM;
+> >> +		goto out_unregister;
+> >> +	}
+> >> +
+> >> +	for (i = 0; i < dist->nr_cpus; i++) {
+> >> +		ret = vgic_register_kvm_io_dev(kvm, rdbase,
+> >> +					       SZ_128K, vgic_redist_ranges,
+> >> +					       i, &iodevs[i]);
+> > 
+> > This looks really weird. You seems to be mapping all redistributors at
+> > the same IPA. Have you actually tested this with an SMP guest?
+> 
+> But the patch continues:
+> 
+> +		if (ret)
+> +			goto out_unregister;
+> +		rdbase += GIC_V3_REDIST_SIZE;
+> 
+> Is that too confusing to re-use the rdbase variable? The spec speaks of
+> RD_base for each redistributor, so that seemed sane to me.
+> Shall I add a comment or use "rdbase + i * GIC_V3_REDIST_SIZE" for clarity?
 
-@@ -596,7 +597,6 @@ static void kvm_destroy_devices(struct kvm *kvm)
+That would have been nicer, but let's face the harsh truth: I can't
+read, ignore me (well, for this time only ;-).
 
-  static void kvm_destroy_vm(struct kvm *kvm)
-  {
--       int i;
-         struct mm_struct *mm = kvm->mm;
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
-         kvm_arch_sync_events(kvm);
-@@ -604,8 +604,7 @@ static void kvm_destroy_vm(struct kvm *kvm)
-         list_del(&kvm->vm_list);
-         spin_unlock(&kvm_lock);
-         kvm_free_irq_routing(kvm);
--       for (i = 0; i < KVM_NR_BUSES; i++)
--               kvm_io_bus_destroy(kvm->buses[i]);
-+       kvm_destroy_all_io_bus(kvm);
-         kvm_coalesced_mmio_free(kvm);
-  #if defined(CONFIG_MMU_NOTIFIER) && defined(KVM_ARCH_WANT_MMU_NOTIFIER)
-         mmu_notifier_unregister(&kvm->mmu_notifier, kvm->mm);
-@@ -2943,6 +2942,16 @@ static void kvm_io_bus_destroy(struct kvm_io_bus 
-*bus)
-         kfree(bus);
-  }
-
-+static void kvm_destroy_all_io_bus(struct kvm *kvm)
-+{
-+       int i;
-+
-+       for (i = 0; i < KVM_NR_BUSES; i++) {
-+           kvm_io_bus_destroy(kvm->buses[i]);
-+           kvm->buses[i] = NULL;
-+       }
-+}
-+
-  static inline int kvm_io_bus_cmp(const struct kvm_io_range *r1,
-                                   const struct kvm_io_range *r2)
-  {
-
-Thanks
-Tiejun
+	M.
+-- 
+Jazz is not dead. It just smells funny.
