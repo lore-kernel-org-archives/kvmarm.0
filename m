@@ -1,24 +1,31 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 2/5] arm64: alternative: Allow immediate branch as
- alternative instruction
-Date: Thu, 26 Mar 2015 22:48:25 +0000
-Message-ID: <1427410108-16253-3-git-send-email-marc.zyngier@arm.com>
-References: <1427410108-16253-1-git-send-email-marc.zyngier@arm.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [Linaro-uefi] UEFI on KVM fails to start on juno on cortex-a57
+ cluster
+Date: Fri, 27 Mar 2015 01:02:10 +0100
+Message-ID: <CAKv+Gu9djvNecwDGqyCNzdQG6-g=ivavfCGg-jqxrrZ+tnYDOQ@mail.gmail.com>
+References: <CAAqcGHmFGO8DaU-G0A6geOzDZDmWAtjHN6wOmJQVBjyi6_WVzQ@mail.gmail.com>
+ <CAKv+Gu_W0sk6vR+frYYNBoMjWs6mBcxPwXjwzaHv1D0Sh7GtAw@mail.gmail.com>
+ <CAKv+Gu8j0zWQcxiasCy2eozcLCJuT=FPY0rLeYG0z3Hjwf40=A@mail.gmail.com>
+ <CAKv+Gu9VE8kdq2chs=QKHvyhOoSwBPy2CmJp-ra5kYLiiifVQg@mail.gmail.com>
+ <CAAqcGHnNrnOLxfoTuGGMN4nwDupaaLK5sJ8TATTw33r1NMi0Dg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B18449DDE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 18:41:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7109B49E00
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 19:55:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OtkPTyOaoDuJ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Mar 2015 18:41:51 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 815B749DE2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 18:41:51 -0400 (EDT)
-In-Reply-To: <1427410108-16253-1-git-send-email-marc.zyngier@arm.com>
+ with ESMTP id dJJWf57eWwZh for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Mar 2015 19:55:10 -0400 (EDT)
+Received: from mail-ie0-f175.google.com (mail-ie0-f175.google.com
+ [209.85.223.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2FC4549DD1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 19:55:09 -0400 (EDT)
+Received: by iecvj10 with SMTP id vj10so59656125iec.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 17:02:10 -0700 (PDT)
+In-Reply-To: <CAAqcGHnNrnOLxfoTuGGMN4nwDupaaLK5sJ8TATTw33r1NMi0Dg@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,114 +35,57 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Dave Martin <dave.martin@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
+To: Riku Voipio <riku.voipio@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>
+Cc: Virtualization Team <virtualization@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Linaro UEFI Mailman List <linaro-uefi@lists.linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Since all immediate branches are PC-relative on Aarch64, these
-instructions cannot be used as an alternative with the simplistic
-approach we currently have (the immediate has been computed from
-the .altinstr_replacement section, and end-up being completely off
-if we insert it directly).
-
-This patch handles the b and bl instructions in a different way,
-using the insn framework to recompute the immediate, and generate
-the right displacement.
-
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
-Acked-by: Will Deacon <will.deacon@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm64/kernel/alternative.c | 55 +++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 53 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/kernel/alternative.c b/arch/arm64/kernel/alternative.c
-index ad7821d..a5f2e2e 100644
---- a/arch/arm64/kernel/alternative.c
-+++ b/arch/arm64/kernel/alternative.c
-@@ -24,6 +24,7 @@
- #include <asm/cacheflush.h>
- #include <asm/alternative.h>
- #include <asm/cpufeature.h>
-+#include <asm/insn.h>
- #include <linux/stop_machine.h>
- 
- extern struct alt_instr __alt_instructions[], __alt_instructions_end[];
-@@ -33,6 +34,48 @@ struct alt_region {
- 	struct alt_instr *end;
- };
- 
-+/*
-+ * Decode the imm field of a b/bl instruction, and return the byte
-+ * offset as a signed value (so it can be used when computing a new
-+ * branch target).
-+ */
-+static s32 get_branch_offset(u32 insn)
-+{
-+	s32 imm = aarch64_insn_decode_immediate(AARCH64_INSN_IMM_26, insn);
-+
-+	/* sign-extend the immediate before turning it into a byte offset */
-+	return (imm << 6) >> 4;
-+}
-+
-+static u32 get_alt_insn(u8 *insnptr, u8 *altinsnptr)
-+{
-+	u32 insn;
-+
-+	aarch64_insn_read(altinsnptr, &insn);
-+
-+	/* Stop the world on instructions we don't support... */
-+	BUG_ON(aarch64_insn_is_cbz(insn));
-+	BUG_ON(aarch64_insn_is_cbnz(insn));
-+	BUG_ON(aarch64_insn_is_bcond(insn));
-+	/* ... and there is probably more. */
-+
-+	if (aarch64_insn_is_b(insn) || aarch64_insn_is_bl(insn)) {
-+		enum aarch64_insn_branch_type type;
-+		unsigned long target;
-+
-+		if (aarch64_insn_is_b(insn))
-+			type = AARCH64_INSN_BRANCH_NOLINK;
-+		else
-+			type = AARCH64_INSN_BRANCH_LINK;
-+
-+		target = (unsigned long)altinsnptr + get_branch_offset(insn);
-+		insn = aarch64_insn_gen_branch_imm((unsigned long)insnptr,
-+						   target, type);
-+	}
-+
-+	return insn;
-+}
-+
- static int __apply_alternatives(void *alt_region)
- {
- 	struct alt_instr *alt;
-@@ -40,16 +83,24 @@ static int __apply_alternatives(void *alt_region)
- 	u8 *origptr, *replptr;
- 
- 	for (alt = region->begin; alt < region->end; alt++) {
-+		u32 insn;
-+		int i;
-+
- 		if (!cpus_have_cap(alt->cpufeature))
- 			continue;
- 
--		BUG_ON(alt->alt_len > alt->orig_len);
-+		BUG_ON(alt->alt_len != alt->orig_len);
- 
- 		pr_info_once("patching kernel code\n");
- 
- 		origptr = (u8 *)&alt->orig_offset + alt->orig_offset;
- 		replptr = (u8 *)&alt->alt_offset + alt->alt_offset;
--		memcpy(origptr, replptr, alt->alt_len);
-+
-+		for (i = 0; i < alt->alt_len; i += sizeof(insn)) {
-+			insn = get_alt_insn(origptr + i, replptr + i);
-+			*(u32 *)(origptr + i) = cpu_to_le32(insn);
-+		}
-+
- 		flush_icache_range((uintptr_t)origptr,
- 				   (uintptr_t)(origptr + alt->alt_len));
- 	}
--- 
-2.1.4
+T24gMjYgTWFyY2ggMjAxNSBhdCAwOTowOSwgUmlrdSBWb2lwaW8gPHJpa3Uudm9pcGlvQGxpbmFy
+by5vcmc+IHdyb3RlOgo+IE9uIDI1IE1hcmNoIDIwMTUgYXQgMjE6MzIsIEFyZCBCaWVzaGV1dmVs
+IDxhcmQuYmllc2hldXZlbEBsaW5hcm8ub3JnPiB3cm90ZToKPj4gT24gMjUgTWFyY2ggMjAxNSBh
+dCAxNzoxNCwgQXJkIEJpZXNoZXV2ZWwgPGFyZC5iaWVzaGV1dmVsQGxpbmFyby5vcmc+IHdyb3Rl
+Ogo+Pj4gT24gMjUgTWFyY2ggMjAxNSBhdCAxNzoxNCwgQXJkIEJpZXNoZXV2ZWwgPGFyZC5iaWVz
+aGV1dmVsQGxpbmFyby5vcmc+IHdyb3RlOgo+Pj4+IE9uIDI1IE1hcmNoIDIwMTUgYXQgMDc6NTks
+IFJpa3UgVm9pcGlvIDxyaWt1LnZvaXBpb0BsaW5hcm8ub3JnPiB3cm90ZToKPj4+Pj4gSGksCj4+
+Pj4+Cj4+Pj4+IEl0IGFwcGVhcnMgb24ganVubywgSSBjYW4gc3RhcnQga3ZtIHdpdGggVUVGSSBv
+bmx5IG9uIGNvcnRleC1hNTMgY29yZXM6Cj4+Pj4+Cj4+Pj4+Cj4+Pj4+IHRhc2tzZXQgLWMgMCBx
+ZW11LXN5c3RlbS1hYXJjaDY0IC1tIDEwMjQgLWNwdSBob3N0IC1NIHZpcnQgLWJpb3MKPj4+Pj4g
+UUVNVV9FRkkuZmQgLWVuYWJsZS1rdm0gLW5vZ3JhcGhpYwo+Pj4+PiAtPiB3b3JrczoKPj4+Pj4g
+VUVGSSBJbnRlcmFjdGl2ZSBTaGVsbCB2Mi4wCj4+Pj4+IHRhc2tzZXQgLWMgMSBxZW11LXN5c3Rl
+bS1hYXJjaDY0IC1tIDEwMjQgLWNwdSBob3N0IC1NIHZpcnQgLWJpb3MKPj4+Pj4gUUVNVV9FRkku
+ZmQgLWVuYWJsZS1rdm0gLW5vZ3JhcGhpYwo+Pj4+PiAtPiBoYW5ncyBhdCBjcHUgc3Bpbm5pbmcg
+MTAwJQo+Pj4+PiAuLi4KPj4+Pj4KPj4+Pgo+Pj4+IEkgY2FuIHJlcHJvZHVjZSB0aGUgaGFuZywg
+Ym90aCB3aXRoIHlvdXIgVUVGSSBiaW5hcnkgYW5kIG15IG93biByZWxlYXNlIGJ1aWxkLgo+Pj4+
+IFRoZSBkZWJ1ZyBidWlsZCB3b3JrcyBmaW5lLCB1bmZvcnR1bmF0ZWx5Li4uCj4+Pj4KPj4+Cj4+
+PiBUaWFub2NvcmUgYnVpbHQgZnJvbSBtYXN0ZXIgYXMgb2YgdG9kYXksIHRoYXQgaXMuCj4+Pgo+
+Pgo+PiBPSywgaXQgYXBwZWFycyB0aGF0IHdlIHdlcmUgbWlzc2luZyBzb21lIGNhY2hlIG1haW50
+ZW5hbmNlLiBJdCBpcyBub3QKPj4gb2J2aW91cyBob3cgdGhhdCBzaG91bGQgYWZmZWN0IEE1NyBv
+bmx5LCBidXQgd2l0aCB0aGVzZSBwYXRjaGVzLCBJIGNhbgo+PiBub3cgcmVsaWFibHkgcnVuIHRo
+ZSByZWxlYXNlIHZlcnNpb24gb24gbXkgU2VhdHRsZSBBNTcKPgo+PiBodHRwczovL2dpdC5saW5h
+cm8ub3JnL3Blb3BsZS9hcmQuYmllc2hldXZlbC91ZWZpLW5leHQuZ2l0L3Nob3J0bG9nL3JlZnMv
+aGVhZHMvcWVtdS14ZW4tY2FjaGUtbWFpbnRlbmFuY2UKPgo+IFRoYW5rcy4gRG8geW91IGtub3cg
+d2hlbiB0aGVyZSB3b3VsZCBiZSBhIG5ldyBidWlsZCBvbiByZWxlYXNlcyBvciBzbmFwc2hvdHM/
+Cj4KCkxldCBtZSBjaGVjayB3aXRoIExlaWYuIFdlIGhhdmUgYW5vdGhlciBjYW5kaWRhdGUgcGF0
+Y2ggbm93IHRoYXQgaGUKY291bGQgcGVyaGFwcyBhcHBseSBhbmQga2ljayBvZmYgYSBidWlsZD8K
+Cgo+Pj4+PiBRZW11IGFuZCBrZXJuZWwgYXJlIGxhdGVzdCBtYWlubGluZSwga3ZtIGZyb20gbGFz
+dCBtb250aHMgxLlpbmFybwo+Pj4+PiByZWxlYXNlLiBBY2NvcmRpbmcgdG8gY3B1aW5mbyBjb3Jl
+cyAwIGFuZCAzLTUgYXJlIGE1MyBhbmQgMS0yIGFyZSBhNTcuCj4+Pj4+IERldGFpbHM6Cj4+Pj4+
+Cj4+Pj4+ICMgd2dldCBodHRwOi8vcmVsZWFzZXMubGluYXJvLm9yZy8xNS4wMS9jb21wb25lbnRz
+L2tlcm5lbC91ZWZpLWxpbmFyby9yZWxlYXNlL3FlbXU2NC1pbnRlbGJkcy9RRU1VX0VGSS5mZAo+
+Pj4+PiB1bmFtZSAtYQo+Pj4+PiAjIExpbnV4IGxpbmFyby1uYW5vIDQuMC4wLXJjNS1saW5hcm8t
+anVubyAjMSBTTVAgUFJFRU1QVCBUdWUgTWFyIDI0Cj4+Pj4+IDEwOjQ2OjUzIFVUQyAyMDE1IGFh
+cmNoNjQgYWFyY2g2NCBhYXJjaDY0IEdOVS9MaW51eAo+Pj4+PiAjIHFlbXUtc3lzdGVtLWFhcmNo
+NjQgLS12ZXJzaW9uCj4+Pj4+IFFFTVUgZW11bGF0b3IgdmVyc2lvbiAyLjIuOTEgKERlYmlhbiAy
+LjMuMH5yYzEtMTg1bGluYXJvK3V0b3BpYyksCj4+Pj4+IENvcHlyaWdodCAoYykgMjAwMy0yMDA4
+IEZhYnJpY2UgQmVsbGFyZAo+Pj4+PiAjIGdyZXAgLUUgJyhwcm9jZXNzb3J8cGFydCknIC9wcm9j
+L2NwdWluZm8KPj4+Pj4gcHJvY2Vzc29yICAgICAgIDogMAo+Pj4+PiBDUFUgcGFydCAgICAgICAg
+OiAweGQwMwo+Pj4+PiBwcm9jZXNzb3IgICAgICAgOiAxCj4+Pj4+IENQVSBwYXJ0ICAgICAgICA6
+IDB4ZDA3Cj4+Pj4+IHByb2Nlc3NvciAgICAgICA6IDIKPj4+Pj4gQ1BVIHBhcnQgICAgICAgIDog
+MHhkMDcKPj4+Pj4gcHJvY2Vzc29yICAgICAgIDogMwo+Pj4+PiBDUFUgcGFydCAgICAgICAgOiAw
+eGQwMwo+Pj4+PiBwcm9jZXNzb3IgICAgICAgOiA0Cj4+Pj4+IENQVSBwYXJ0ICAgICAgICA6IDB4
+ZDAzCj4+Pj4+IHByb2Nlc3NvciAgICAgICA6IDUKPj4+Pj4gQ1BVIHBhcnQgICAgICAgIDogMHhk
+MDMKPj4+Pj4KPj4+Pj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX18KPj4+Pj4gTGluYXJvLXVlZmkgbWFpbGluZyBsaXN0Cj4+Pj4+IExpbmFyby11ZWZpQGxp
+c3RzLmxpbmFyby5vcmcKPj4+Pj4gaHR0cDovL2xpc3RzLmxpbmFyby5vcmcvbWFpbG1hbi9saXN0
+aW5mby9saW5hcm8tdWVmaQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
+aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
