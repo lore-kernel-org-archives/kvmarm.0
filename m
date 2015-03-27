@@ -1,31 +1,26 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [Linaro-uefi] UEFI on KVM fails to start on juno on cortex-a57
- cluster
-Date: Fri, 27 Mar 2015 01:02:10 +0100
-Message-ID: <CAKv+Gu9djvNecwDGqyCNzdQG6-g=ivavfCGg-jqxrrZ+tnYDOQ@mail.gmail.com>
-References: <CAAqcGHmFGO8DaU-G0A6geOzDZDmWAtjHN6wOmJQVBjyi6_WVzQ@mail.gmail.com>
- <CAKv+Gu_W0sk6vR+frYYNBoMjWs6mBcxPwXjwzaHv1D0Sh7GtAw@mail.gmail.com>
- <CAKv+Gu8j0zWQcxiasCy2eozcLCJuT=FPY0rLeYG0z3Hjwf40=A@mail.gmail.com>
- <CAKv+Gu9VE8kdq2chs=QKHvyhOoSwBPy2CmJp-ra5kYLiiifVQg@mail.gmail.com>
- <CAAqcGHnNrnOLxfoTuGGMN4nwDupaaLK5sJ8TATTw33r1NMi0Dg@mail.gmail.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v3 10/11] KVM: arm/arm64: prepare GICv3 emulation to use
+ kvm_io_bus MMIO handling
+Date: Fri, 27 Mar 2015 00:14:12 +0000
+Message-ID: <5514A0D4.4040302@arm.com>
+References: <1427380778-942-1-git-send-email-andre.przywara@arm.com>	<1427380778-942-11-git-send-email-andre.przywara@arm.com>
+ <20150326220632.64ee91ec@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7109B49E00
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 19:55:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 094DA49E1F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 20:10:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dJJWf57eWwZh for <kvmarm@lists.cs.columbia.edu>;
- Thu, 26 Mar 2015 19:55:10 -0400 (EDT)
-Received: from mail-ie0-f175.google.com (mail-ie0-f175.google.com
- [209.85.223.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2FC4549DD1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 19:55:09 -0400 (EDT)
-Received: by iecvj10 with SMTP id vj10so59656125iec.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 17:02:10 -0700 (PDT)
-In-Reply-To: <CAAqcGHnNrnOLxfoTuGGMN4nwDupaaLK5sJ8TATTw33r1NMi0Dg@mail.gmail.com>
+ with ESMTP id Sa54hMKqr6WY for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 26 Mar 2015 20:10:13 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 249DB49E0E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 26 Mar 2015 20:10:13 -0400 (EDT)
+In-Reply-To: <20150326220632.64ee91ec@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,57 +30,88 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Riku Voipio <riku.voipio@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>
-Cc: Virtualization Team <virtualization@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Linaro UEFI Mailman List <linaro-uefi@lists.linaro.org>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marcelo Tosatti <mtosatti@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMjYgTWFyY2ggMjAxNSBhdCAwOTowOSwgUmlrdSBWb2lwaW8gPHJpa3Uudm9pcGlvQGxpbmFy
-by5vcmc+IHdyb3RlOgo+IE9uIDI1IE1hcmNoIDIwMTUgYXQgMjE6MzIsIEFyZCBCaWVzaGV1dmVs
-IDxhcmQuYmllc2hldXZlbEBsaW5hcm8ub3JnPiB3cm90ZToKPj4gT24gMjUgTWFyY2ggMjAxNSBh
-dCAxNzoxNCwgQXJkIEJpZXNoZXV2ZWwgPGFyZC5iaWVzaGV1dmVsQGxpbmFyby5vcmc+IHdyb3Rl
-Ogo+Pj4gT24gMjUgTWFyY2ggMjAxNSBhdCAxNzoxNCwgQXJkIEJpZXNoZXV2ZWwgPGFyZC5iaWVz
-aGV1dmVsQGxpbmFyby5vcmc+IHdyb3RlOgo+Pj4+IE9uIDI1IE1hcmNoIDIwMTUgYXQgMDc6NTks
-IFJpa3UgVm9pcGlvIDxyaWt1LnZvaXBpb0BsaW5hcm8ub3JnPiB3cm90ZToKPj4+Pj4gSGksCj4+
-Pj4+Cj4+Pj4+IEl0IGFwcGVhcnMgb24ganVubywgSSBjYW4gc3RhcnQga3ZtIHdpdGggVUVGSSBv
-bmx5IG9uIGNvcnRleC1hNTMgY29yZXM6Cj4+Pj4+Cj4+Pj4+Cj4+Pj4+IHRhc2tzZXQgLWMgMCBx
-ZW11LXN5c3RlbS1hYXJjaDY0IC1tIDEwMjQgLWNwdSBob3N0IC1NIHZpcnQgLWJpb3MKPj4+Pj4g
-UUVNVV9FRkkuZmQgLWVuYWJsZS1rdm0gLW5vZ3JhcGhpYwo+Pj4+PiAtPiB3b3JrczoKPj4+Pj4g
-VUVGSSBJbnRlcmFjdGl2ZSBTaGVsbCB2Mi4wCj4+Pj4+IHRhc2tzZXQgLWMgMSBxZW11LXN5c3Rl
-bS1hYXJjaDY0IC1tIDEwMjQgLWNwdSBob3N0IC1NIHZpcnQgLWJpb3MKPj4+Pj4gUUVNVV9FRkku
-ZmQgLWVuYWJsZS1rdm0gLW5vZ3JhcGhpYwo+Pj4+PiAtPiBoYW5ncyBhdCBjcHUgc3Bpbm5pbmcg
-MTAwJQo+Pj4+PiAuLi4KPj4+Pj4KPj4+Pgo+Pj4+IEkgY2FuIHJlcHJvZHVjZSB0aGUgaGFuZywg
-Ym90aCB3aXRoIHlvdXIgVUVGSSBiaW5hcnkgYW5kIG15IG93biByZWxlYXNlIGJ1aWxkLgo+Pj4+
-IFRoZSBkZWJ1ZyBidWlsZCB3b3JrcyBmaW5lLCB1bmZvcnR1bmF0ZWx5Li4uCj4+Pj4KPj4+Cj4+
-PiBUaWFub2NvcmUgYnVpbHQgZnJvbSBtYXN0ZXIgYXMgb2YgdG9kYXksIHRoYXQgaXMuCj4+Pgo+
-Pgo+PiBPSywgaXQgYXBwZWFycyB0aGF0IHdlIHdlcmUgbWlzc2luZyBzb21lIGNhY2hlIG1haW50
-ZW5hbmNlLiBJdCBpcyBub3QKPj4gb2J2aW91cyBob3cgdGhhdCBzaG91bGQgYWZmZWN0IEE1NyBv
-bmx5LCBidXQgd2l0aCB0aGVzZSBwYXRjaGVzLCBJIGNhbgo+PiBub3cgcmVsaWFibHkgcnVuIHRo
-ZSByZWxlYXNlIHZlcnNpb24gb24gbXkgU2VhdHRsZSBBNTcKPgo+PiBodHRwczovL2dpdC5saW5h
-cm8ub3JnL3Blb3BsZS9hcmQuYmllc2hldXZlbC91ZWZpLW5leHQuZ2l0L3Nob3J0bG9nL3JlZnMv
-aGVhZHMvcWVtdS14ZW4tY2FjaGUtbWFpbnRlbmFuY2UKPgo+IFRoYW5rcy4gRG8geW91IGtub3cg
-d2hlbiB0aGVyZSB3b3VsZCBiZSBhIG5ldyBidWlsZCBvbiByZWxlYXNlcyBvciBzbmFwc2hvdHM/
-Cj4KCkxldCBtZSBjaGVjayB3aXRoIExlaWYuIFdlIGhhdmUgYW5vdGhlciBjYW5kaWRhdGUgcGF0
-Y2ggbm93IHRoYXQgaGUKY291bGQgcGVyaGFwcyBhcHBseSBhbmQga2ljayBvZmYgYSBidWlsZD8K
-Cgo+Pj4+PiBRZW11IGFuZCBrZXJuZWwgYXJlIGxhdGVzdCBtYWlubGluZSwga3ZtIGZyb20gbGFz
-dCBtb250aHMgxLlpbmFybwo+Pj4+PiByZWxlYXNlLiBBY2NvcmRpbmcgdG8gY3B1aW5mbyBjb3Jl
-cyAwIGFuZCAzLTUgYXJlIGE1MyBhbmQgMS0yIGFyZSBhNTcuCj4+Pj4+IERldGFpbHM6Cj4+Pj4+
-Cj4+Pj4+ICMgd2dldCBodHRwOi8vcmVsZWFzZXMubGluYXJvLm9yZy8xNS4wMS9jb21wb25lbnRz
-L2tlcm5lbC91ZWZpLWxpbmFyby9yZWxlYXNlL3FlbXU2NC1pbnRlbGJkcy9RRU1VX0VGSS5mZAo+
-Pj4+PiB1bmFtZSAtYQo+Pj4+PiAjIExpbnV4IGxpbmFyby1uYW5vIDQuMC4wLXJjNS1saW5hcm8t
-anVubyAjMSBTTVAgUFJFRU1QVCBUdWUgTWFyIDI0Cj4+Pj4+IDEwOjQ2OjUzIFVUQyAyMDE1IGFh
-cmNoNjQgYWFyY2g2NCBhYXJjaDY0IEdOVS9MaW51eAo+Pj4+PiAjIHFlbXUtc3lzdGVtLWFhcmNo
-NjQgLS12ZXJzaW9uCj4+Pj4+IFFFTVUgZW11bGF0b3IgdmVyc2lvbiAyLjIuOTEgKERlYmlhbiAy
-LjMuMH5yYzEtMTg1bGluYXJvK3V0b3BpYyksCj4+Pj4+IENvcHlyaWdodCAoYykgMjAwMy0yMDA4
-IEZhYnJpY2UgQmVsbGFyZAo+Pj4+PiAjIGdyZXAgLUUgJyhwcm9jZXNzb3J8cGFydCknIC9wcm9j
-L2NwdWluZm8KPj4+Pj4gcHJvY2Vzc29yICAgICAgIDogMAo+Pj4+PiBDUFUgcGFydCAgICAgICAg
-OiAweGQwMwo+Pj4+PiBwcm9jZXNzb3IgICAgICAgOiAxCj4+Pj4+IENQVSBwYXJ0ICAgICAgICA6
-IDB4ZDA3Cj4+Pj4+IHByb2Nlc3NvciAgICAgICA6IDIKPj4+Pj4gQ1BVIHBhcnQgICAgICAgIDog
-MHhkMDcKPj4+Pj4gcHJvY2Vzc29yICAgICAgIDogMwo+Pj4+PiBDUFUgcGFydCAgICAgICAgOiAw
-eGQwMwo+Pj4+PiBwcm9jZXNzb3IgICAgICAgOiA0Cj4+Pj4+IENQVSBwYXJ0ICAgICAgICA6IDB4
-ZDAzCj4+Pj4+IHByb2Nlc3NvciAgICAgICA6IDUKPj4+Pj4gQ1BVIHBhcnQgICAgICAgIDogMHhk
-MDMKPj4+Pj4KPj4+Pj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX18KPj4+Pj4gTGluYXJvLXVlZmkgbWFpbGluZyBsaXN0Cj4+Pj4+IExpbmFyby11ZWZpQGxp
-c3RzLmxpbmFyby5vcmcKPj4+Pj4gaHR0cDovL2xpc3RzLmxpbmFyby5vcmcvbWFpbG1hbi9saXN0
-aW5mby9saW5hcm8tdWVmaQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
-aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On 03/26/2015 10:06 PM, Marc Zyngier wrote:
+> On Thu, 26 Mar 2015 14:39:37 +0000
+> Andre Przywara <andre.przywara@arm.com> wrote:
+> 
+>> Using the framework provided by the recent vgic.c changes, we
+>> register a kvm_io_bus device on mapping the virtual GICv3 resources.
+>> The distributor mapping is pretty straight forward, but the
+>> redistributors need some more love, since they need to be tagged with
+>> the respective redistributor (read: VCPU) they are connected with.
+>> We use the kvm_io_bus framework to register one devices per VCPU.
+>>
+>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> ---
+>>  include/kvm/arm_vgic.h      |    1 +
+>>  virt/kvm/arm/vgic-v3-emul.c |   39 ++++++++++++++++++++++++++++++++++++++-
+>>  2 files changed, 39 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>> index 4523984..d6705f4 100644
+>> --- a/include/kvm/arm_vgic.h
+>> +++ b/include/kvm/arm_vgic.h
+>> @@ -252,6 +252,7 @@ struct vgic_dist {
+>>  
+>>  	struct vgic_vm_ops	vm_ops;
+>>  	struct vgic_io_device	dist_iodev;
+>> +	struct vgic_io_device	*redist_iodevs;
+>>  };
+>>  
+>>  struct vgic_v2_cpu_if {
+>> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+>> index 2f03a36..eb1a797 100644
+>> --- a/virt/kvm/arm/vgic-v3-emul.c
+>> +++ b/virt/kvm/arm/vgic-v3-emul.c
+>> @@ -758,6 +758,9 @@ static int vgic_v3_map_resources(struct kvm *kvm,
+>>  {
+>>  	int ret = 0;
+>>  	struct vgic_dist *dist = &kvm->arch.vgic;
+>> +	gpa_t rdbase = dist->vgic_redist_base;
+>> +	struct vgic_io_device *iodevs = NULL;
+>> +	int i;
+>>  
+>>  	if (!irqchip_in_kernel(kvm))
+>>  		return 0;
+>> @@ -783,7 +786,41 @@ static int vgic_v3_map_resources(struct kvm *kvm,
+>>  		goto out;
+>>  	}
+>>  
+>> -	kvm->arch.vgic.ready = true;
+>> +	ret = vgic_register_kvm_io_dev(kvm, dist->vgic_dist_base,
+>> +				       GIC_V3_DIST_SIZE, vgic_v3_dist_ranges,
+>> +				       -1, &dist->dist_iodev);
+> 
+>> +	if (ret)
+>> +		goto out;
+>> +
+>> +	iodevs = kcalloc(dist->nr_cpus, sizeof(iodevs[0]), GFP_KERNEL);
+>> +	if (!iodevs) {
+>> +		ret = -ENOMEM;
+>> +		goto out_unregister;
+>> +	}
+>> +
+>> +	for (i = 0; i < dist->nr_cpus; i++) {
+>> +		ret = vgic_register_kvm_io_dev(kvm, rdbase,
+>> +					       SZ_128K, vgic_redist_ranges,
+>> +					       i, &iodevs[i]);
+> 
+> This looks really weird. You seems to be mapping all redistributors at
+> the same IPA. Have you actually tested this with an SMP guest?
+
+But the patch continues:
+
++		if (ret)
++			goto out_unregister;
++		rdbase += GIC_V3_REDIST_SIZE;
+
+Is that too confusing to re-use the rdbase variable? The spec speaks of
+RD_base for each redistributor, so that seemed sane to me.
+Shall I add a comment or use "rdbase + i * GIC_V3_REDIST_SIZE" for clarity?
+
+Cheers,
+Andre.
