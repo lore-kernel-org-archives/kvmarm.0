@@ -1,49 +1,108 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 12/12] KVM: arm/arm64: remove now obsolete VGIC specific
- MMIO handling code
-Date: Fri, 27 Mar 2015 09:33:14 +0000
-Message-ID: <551523DA.9000705@arm.com>
-References: <1427126309-11223-1-git-send-email-andre.przywara@arm.com> <1427126309-11223-13-git-send-email-andre.przywara@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: ARM: KVM/XEN: how should we support virt-what?
+Date: Fri, 27 Mar 2015 11:25:04 +0100
+Message-ID: <20150327102503.GA3120@hawk.usersys.redhat.com>
+References: <20150325094440.GB3163@hawk.usersys.redhat.com>
+ <20150326090150.GA3073@hawk.usersys.redhat.com>
+ <alpine.DEB.2.02.1503261843410.9516@kaball.uk.xensource.com>
+ <CAKv+Gu9fzhfu7nJQ9GYvPr33OcY3RP4Ssyx_0o7q-Cw4g8_5Bg@mail.gmail.com>
+ <CAKv+Gu9YcrO=c0OWD2P6AXjMxPyaz=LhtB81FiCijAEC=XuW6g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1427126309-11223-13-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "n.nikolaev@virtualopensystems.com" <n.nikolaev@virtualopensystems.com>, "eric.auger@linaro.org" <eric.auger@linaro.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 05A1449E63
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Mar 2015 06:18:12 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 7lAwxh57jSgL for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Mar 2015 06:18:10 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F1D9249E5B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Mar 2015 06:18:08 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu9YcrO=c0OWD2P6AXjMxPyaz=LhtB81FiCijAEC=XuW6g@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Ian Campbell <Ian.Campbell@citrix.com>, KVM devel mailing list <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, tim@xen.org, "xen-devel@lists.xen.org" <xen-devel@lists.xen.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 23/03/15 15:58, Andre Przywara wrote:
-> With all of the virtual GIC emulation code now being registered with
-> the kvm_io_bus, we can remove all of the old MMIO handling code and
-> its dispatching functionality.
+On Thu, Mar 26, 2015 at 07:50:06PM +0100, Ard Biesheuvel wrote:
+> On 26 March 2015 at 19:49, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> > On 26 March 2015 at 19:45, Stefano Stabellini
+> > <stefano.stabellini@eu.citrix.com> wrote:
+> >> On Thu, 26 Mar 2015, Andrew Jones wrote:
+> >>> On Wed, Mar 25, 2015 at 10:44:42AM +0100, Andrew Jones wrote:
+> >>> > Hello ARM virt maintainers,
+> >>> >
+> >>> > I'd like to start a discussion about supporting virt-what[1]. virt-what
+> >>> > allows userspace to determine if the system it's running on is running
+> >>> > in a guest, and of what type (KVM, Xen, etc.). Despite it being a best
+> >>> > effort tool, see the Caveat emptor in [1], it has become quite a useful
+> >>> > tool, and is showing up in different places, such as OpenStack. If you
+> >>> > look at the code[2], specifically [3], then you'll see how it works on
+> >>> > x86, which is to use the dedicated hypervisor cpuid leaves. I'm
+> >>> > wondering what equivalent we have, or can develop, for arm.
+> >>> > Here are some thoughts;
+> >>> > 0) there's already something we can use, and I just need to be told
+> >>> >    about it.
+> >>> > 1) be as similar as possible to x86 by dedicating some currently
+> >>> >    undefined sysreg bits. This would take buy-in from lots of parties,
+> >>> >    so is not likely the way to go.
+> >>> > 2) create a specific DT node that will get exposed through sysfs, or
+> >>> >    somewhere.
+> >>> > 3) same as (2), but just use the nodes currently in mach-virt's DT
+> >>> >    as the indication we're a guest. This would just be a heuristic,
+> >>> >    i.e. "have virtio mmio" && psci.method == hvc, or something,
+> >>> >    and we'd still need a way to know if we're kvm vs. xen vs. ??.
+> >>> >
+> >>> > Thanks,
+> >>> > drew
+> >>> >
+> >>> > [1] http://people.redhat.com/~rjones/virt-what/
+> >>> > [2] http://git.annexia.org/?p=virt-what.git;a=summary
+> >>> > [3] http://git.annexia.org/?p=virt-what.git;a=blob_plain;f=virt-what-cpuid-helper.c;hb=HEAD
+> >>>
+> >>> Thanks everyone for their responses. So, the current summary seems to
+> >>> be;
+> >>> 1) Xen has both a DT node and an ACPI table, virt-what can learn how
+> >>>    to probe those.
+> >>> 2) We don't have anything yet for KVM, and we're reluctant to create a
+> >>>    specific DT node. Anyway, we'd still need to address ACPI booted
+> >>>    guests some other way.
+> >>>
+> >>> For a short-term, DT-only, approach we could go with a heuristic, one
+> >>> that includes Marc's "if hypervisor node exists, then xen, else kvm"
+> >>> condition.
+> >>>
+> >>> How about SMBIOS for a long-term solution that works for both DT and
+> >>> ACPI? We're not populating SMBIOS for arm guests yet in qemu, but now
+> >>> that AAVMF has fw_cfg, we should be able to. On x86 we already have
+> >>> smbios populated from qemu, although not in a way that allows us to
+> >>> determine kvm vs. xen vs. tcg.
+> >>
+> >> I don't think that SMBIOS works with DT.
+> >>
+> >
+> > SMBIOS works fine with DT
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  include/kvm/arm_vgic.h      |    2 --
->  virt/kvm/arm/vgic-v2-emul.c |   19 ------------
->  virt/kvm/arm/vgic-v3-emul.c |   39 ------------------------
->  virt/kvm/arm/vgic.c         |   71 -------------------------------------------
->  virt/kvm/arm/vgic.h         |    5 ---
->  5 files changed, 136 deletions(-)
+> ... but it needs UEFI ...
 
-Hi Andre,
+Yes. Perhaps the short-term solution will be a long-term solution for
+DT-only, non-UEFI guests, but we can do better for the guests with UEFI,
+that may or may not be ACPI, by using SMBIOS.
 
-I've given this some more thoughts, and one thing really worries me. Up
-to now, we've only filled the vcpu->run structure when we were about to
-give it to userspace, and would never use it ourselves.
-
-Now, we seem to be using much more extensively at various points in the
-code. What if userspace changes it under our feet? What guarantee do we
-have that this is always safe?
-
-That makes me feel very uncomfortable. I'd rather see an intermediate
-structure being used to pass the parameters around, and only fill run at
-the last moment. I'd probably sleep better... ;-)
+Unless somebody objects to either/both of these paths, then I guess
+we'll start heading down them both.
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+drew
