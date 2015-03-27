@@ -1,23 +1,21 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 1/5] arm64: insn: Add aarch64_insn_decode_immediate
-Date: Fri, 27 Mar 2015 13:09:21 +0000
-Message-ID: <1427461765-14462-2-git-send-email-marc.zyngier@arm.com>
-References: <1427461765-14462-1-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v3 0/5] arm64: Patching branches for fun and profit
+Date: Fri, 27 Mar 2015 13:09:20 +0000
+Message-ID: <1427461765-14462-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FC6D49FD7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Mar 2015 09:02:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3788649FD7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Mar 2015 09:02:51 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nysUO49eHrJz for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Mar 2015 09:02:51 -0400 (EDT)
+ with ESMTP id Z+F4dzdYaWMk for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Mar 2015 09:02:50 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F2FE49FD9
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Mar 2015 09:02:51 -0400 (EDT)
-In-Reply-To: <1427461765-14462-1-git-send-email-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 09A9049FC2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Mar 2015 09:02:49 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,132 +29,58 @@ To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 Cc: "Jon Medhurst (Tixy)" <tixy@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Dave Martin <dave.martin@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Patching an instruction sometimes requires extracting the immediate
-field from this instruction. To facilitate this, and avoid
-potential duplication of code, add aarch64_insn_decode_immediate
-as the reciprocal to aarch64_insn_encode_immediate.
+The current alternative instruction framework is not kind to branches,
+potentially leading to all kind of hacks in the code that uses
+alternatives. This series expands it to deal with immediate branches
+(for a start), and applies it to the VGIC world switch.
 
-Acked-by: Will Deacon <will.deacon@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm64/include/asm/insn.h |  1 +
- arch/arm64/kernel/insn.c      | 81 ++++++++++++++++++++++++++++++++++---------
- 2 files changed, 66 insertions(+), 16 deletions(-)
+Patch #1 adds the required infrastructure to extract the immediate
+from an instruction.
 
-diff --git a/arch/arm64/include/asm/insn.h b/arch/arm64/include/asm/insn.h
-index d2f4942..f81b328 100644
---- a/arch/arm64/include/asm/insn.h
-+++ b/arch/arm64/include/asm/insn.h
-@@ -285,6 +285,7 @@ bool aarch64_insn_is_nop(u32 insn);
- int aarch64_insn_read(void *addr, u32 *insnp);
- int aarch64_insn_write(void *addr, u32 insn);
- enum aarch64_insn_encoding_class aarch64_get_insn_class(u32 insn);
-+u64 aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type, u32 insn);
- u32 aarch64_insn_encode_immediate(enum aarch64_insn_imm_type type,
- 				  u32 insn, u64 imm);
- u32 aarch64_insn_gen_branch_imm(unsigned long pc, unsigned long addr,
-diff --git a/arch/arm64/kernel/insn.c b/arch/arm64/kernel/insn.c
-index c8eca88..9249020 100644
---- a/arch/arm64/kernel/insn.c
-+++ b/arch/arm64/kernel/insn.c
-@@ -265,23 +265,13 @@ int __kprobes aarch64_insn_patch_text(void *addrs[], u32 insns[], int cnt)
- 	return aarch64_insn_patch_text_sync(addrs, insns, cnt);
- }
- 
--u32 __kprobes aarch64_insn_encode_immediate(enum aarch64_insn_imm_type type,
--				  u32 insn, u64 imm)
-+static int __kprobes aarch64_get_imm_shift_mask(enum aarch64_insn_imm_type type,
-+						u32 *maskp, int *shiftp)
- {
--	u32 immlo, immhi, lomask, himask, mask;
-+	u32 mask;
- 	int shift;
- 
- 	switch (type) {
--	case AARCH64_INSN_IMM_ADR:
--		lomask = 0x3;
--		himask = 0x7ffff;
--		immlo = imm & lomask;
--		imm >>= 2;
--		immhi = imm & himask;
--		imm = (immlo << 24) | (immhi);
--		mask = (lomask << 24) | (himask);
--		shift = 5;
--		break;
- 	case AARCH64_INSN_IMM_26:
- 		mask = BIT(26) - 1;
- 		shift = 0;
-@@ -320,9 +310,68 @@ u32 __kprobes aarch64_insn_encode_immediate(enum aarch64_insn_imm_type type,
- 		shift = 16;
- 		break;
- 	default:
--		pr_err("aarch64_insn_encode_immediate: unknown immediate encoding %d\n",
--			type);
--		return 0;
-+		return -EINVAL;
-+	}
-+
-+	*maskp = mask;
-+	*shiftp = shift;
-+
-+	return 0;
-+}
-+
-+#define ADR_IMM_HILOSPLIT	2
-+#define ADR_IMM_SIZE		SZ_2M
-+#define ADR_IMM_LOMASK		((1 << ADR_IMM_HILOSPLIT) - 1)
-+#define ADR_IMM_HIMASK		((ADR_IMM_SIZE >> ADR_IMM_HILOSPLIT) - 1)
-+#define ADR_IMM_LOSHIFT		29
-+#define ADR_IMM_HISHIFT		5
-+
-+u64 aarch64_insn_decode_immediate(enum aarch64_insn_imm_type type, u32 insn)
-+{
-+	u32 immlo, immhi, mask;
-+	int shift;
-+
-+	switch (type) {
-+	case AARCH64_INSN_IMM_ADR:
-+		shift = 0;
-+		immlo = (insn >> ADR_IMM_LOSHIFT) & ADR_IMM_LOMASK;
-+		immhi = (insn >> ADR_IMM_HISHIFT) & ADR_IMM_HIMASK;
-+		insn = (immhi << ADR_IMM_HILOSPLIT) | immlo;
-+		mask = ADR_IMM_SIZE - 1;
-+		break;
-+	default:
-+		if (aarch64_get_imm_shift_mask(type, &mask, &shift) < 0) {
-+			pr_err("aarch64_insn_decode_immediate: unknown immediate encoding %d\n",
-+			       type);
-+			return 0;
-+		}
-+	}
-+
-+	return (insn >> shift) & mask;
-+}
-+
-+u32 __kprobes aarch64_insn_encode_immediate(enum aarch64_insn_imm_type type,
-+				  u32 insn, u64 imm)
-+{
-+	u32 immlo, immhi, mask;
-+	int shift;
-+
-+	switch (type) {
-+	case AARCH64_INSN_IMM_ADR:
-+		shift = 0;
-+		immlo = (imm & ADR_IMM_LOMASK) << ADR_IMM_LOSHIFT;
-+		imm >>= ADR_IMM_HILOSPLIT;
-+		immhi = (imm & ADR_IMM_HIMASK) << ADR_IMM_HISHIFT;
-+		imm = immlo | immhi;
-+		mask = ((ADR_IMM_LOMASK << ADR_IMM_LOSHIFT) |
-+			(ADR_IMM_HIMASK << ADR_IMM_HISHIFT));
-+		break;
-+	default:
-+		if (aarch64_get_imm_shift_mask(type, &mask, &shift) < 0) {
-+			pr_err("aarch64_insn_encode_immediate: unknown immediate encoding %d\n",
-+			       type);
-+			return 0;
-+		}
- 	}
- 
- 	/* Update the immediate field. */
+Patch #2 allows the use of an immediate b or bl instruction as an
+alternative, computing the target branch as the instruction is being
+patched in.
+
+Patch #3 defines a feature framework that works exactly like the CPU
+errata infrastructure (and shares a lot with it).
+
+Patch #4 adds detection of the system register GICv3 CPU interface.
+
+Patch #5 enables dynamic patching of the KVM code.
+
+This has been tested with GICv3 on a FastModel.
+
+* From v1:
+- Fixed missing cpu_to_le32 when writing back the instruction
+- Added Will's Acks.
+
+* From v2:
+- Replaced cpu_to_le32 with aarch_write_insn, which is the proper API
+  and takes care of the potential pitfall if the text is read-only.
+  Thanks to Tixy for suggesting this.
+
+Marc Zyngier (5):
+  arm64: insn: Add aarch64_insn_decode_immediate
+  arm64: alternative: Allow immediate branch as alternative instruction
+  arm64: Extract feature parsing code from cpu_errata.c
+  arm64: alternative: Introduce feature for GICv3 CPU interface
+  arm64: KVM: Switch vgic save/restore to alternative_insn
+
+ arch/arm/include/asm/kvm_host.h     |  5 ---
+ arch/arm64/include/asm/cpufeature.h | 23 ++++++++++-
+ arch/arm64/include/asm/insn.h       |  1 +
+ arch/arm64/include/asm/kvm_host.h   | 23 -----------
+ arch/arm64/kernel/Makefile          |  2 +-
+ arch/arm64/kernel/alternative.c     | 55 ++++++++++++++++++++++++-
+ arch/arm64/kernel/asm-offsets.c     |  1 -
+ arch/arm64/kernel/cpu_errata.c      | 36 ++---------------
+ arch/arm64/kernel/cpufeature.c      | 63 +++++++++++++++++++++++++++++
+ arch/arm64/kernel/cpuinfo.c         |  1 +
+ arch/arm64/kernel/insn.c            | 81 +++++++++++++++++++++++++++++--------
+ arch/arm64/kvm/hyp.S                | 18 ++-------
+ virt/kvm/arm/vgic.c                 |  3 --
+ 13 files changed, 214 insertions(+), 98 deletions(-)
+ create mode 100644 arch/arm64/kernel/cpufeature.c
+
 -- 
 2.1.4
