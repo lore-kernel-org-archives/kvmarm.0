@@ -1,42 +1,53 @@
-From: Joe Perches <joe@perches.com>
-Subject: Re: [PATCH 00/25] treewide: Use bool function return values of
- true/false not 1/0
-Date: Mon, 30 Mar 2015 17:14:48 -0700
-Message-ID: <1427760888.14276.37.camel@perches.com>
-References: <cover.1427759009.git.joe@perches.com>
-	 <5519E53B.5040504@schaufler-ca.com>
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH v2 01/10] KVM: add commentary for kvm_debug_exit_arch struct
+Date: Tue, 31 Mar 2015 16:07:59 +0100
+Message-ID: <1427814488-28467-2-git-send-email-alex.bennee@linaro.org>
+References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Return-path: <owner-linux-mm@kvack.org>
-In-Reply-To: <5519E53B.5040504@schaufler-ca.com>
-Sender: owner-linux-mm@kvack.org
-To: Casey Schaufler <casey@schaufler-ca.com>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-omap@vger.kernel.org, kvm-ppc@vger.kernel.org, virtualization@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org, linux-ide@vger.kernel.org, kgdb-bugreport@lists.sourceforge.net, linux-mm@kvack.org, linux-pm@vger.kernel.org, netdev@vger.kernel.org, alsa-devel@alsa-project.org, bridge@lists.linux-foundation.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, patches@opensource.wolfsonmicro.com, linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org, linux-mips@linux-mips.org, linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org, sparclinux@vger.kernel.org, linux-scsi@vger.kernel.org, linux-security-module@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 354794A6BA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Mar 2015 11:01:17 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id yDnh8pHrRS0N for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 31 Mar 2015 11:01:12 -0400 (EDT)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 99DBE4A6AE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Mar 2015 11:01:12 -0400 (EDT)
+In-Reply-To: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org
+Cc: Gleb Natapov <gleb@kernel.org>, jan.kiszka@siemens.com, open list <linux-kernel@vger.kernel.org>, "open list:ABI/API" <linux-api@vger.kernel.org>, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, 2015-03-30 at 17:07 -0700, Casey Schaufler wrote:
-> On 3/30/2015 4:45 PM, Joe Perches wrote:
-> > Joe Perches (25):
-> >   arm: Use bool function return values of true/false not 1/0
-
-[etc...]
-
-> Why, and why these in particular?
-
-bool functions are probably better returning
-bool values instead of 1 and 0.
-
-Especially when the functions intermix returning
-returning 1/0 and true/false.
-
-(there are only a couple of those though)
-
-These are all the remaining instances in the
-kernel tree.
-
---
-To unsubscribe, send a message with 'unsubscribe linux-mm' in
-the body to majordomo@kvack.org.  For more info on Linux MM,
-see: http://www.linux-mm.org/ .
-Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+QnJpbmcgaW50byBsaW5lIHdpdGggdGhlIGNvbW1lbnRhcnkgZm9yIHRoZSBvdGhlciBzdHJ1Y3R1
+cmVzIGFuZCB0aGVpcgpLVk1fRVhJVF8qIGNhc2VzLgoKU2lnbmVkLW9mZi1ieTogQWxleCBCZW5u
+w6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgoKLS0tCgp2MgogIC0gYWRkIGNvbW1lbnRzIGZv
+ciBvdGhlciBleGl0IHR5cGVzCgpkaWZmIC0tZ2l0IGEvaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5o
+IGIvaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oCmluZGV4IDgwNTU3MDYuLjVlZWRmODQgMTAwNjQ0
+Ci0tLSBhL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaAorKysgYi9pbmNsdWRlL3VhcGkvbGludXgv
+a3ZtLmgKQEAgLTIyNiw2ICsyMjYsNyBAQCBzdHJ1Y3Qga3ZtX3J1biB7CiAJCQlfX3UzMiBjb3Vu
+dDsKIAkJCV9fdTY0IGRhdGFfb2Zmc2V0OyAvKiByZWxhdGl2ZSB0byBrdm1fcnVuIHN0YXJ0ICov
+CiAJCX0gaW87CisJCS8qIEtWTV9FWElUX0RFQlVHICovCiAJCXN0cnVjdCB7CiAJCQlzdHJ1Y3Qg
+a3ZtX2RlYnVnX2V4aXRfYXJjaCBhcmNoOwogCQl9IGRlYnVnOwpAQCAtMjc0LDYgKzI3NSw3IEBA
+IHN0cnVjdCBrdm1fcnVuIHsKIAkJCV9fdTMyIGRhdGE7CiAJCQlfX3U4ICBpc193cml0ZTsKIAkJ
+fSBkY3I7CisJCS8qIEtWTV9FWElUX0lOVEVSTkFMX0VSUk9SICovCiAJCXN0cnVjdCB7CiAJCQlf
+X3UzMiBzdWJlcnJvcjsKIAkJCS8qIEF2YWlsYWJsZSB3aXRoIEtWTV9DQVBfSU5URVJOQUxfRVJS
+T1JfREFUQTogKi8KQEAgLTI4NCw2ICsyODYsNyBAQCBzdHJ1Y3Qga3ZtX3J1biB7CiAJCXN0cnVj
+dCB7CiAJCQlfX3U2NCBncHJzWzMyXTsKIAkJfSBvc2k7CisJCS8qIEtWTV9FWElUX1BBUFJfSENB
+TEwgKi8KIAkJc3RydWN0IHsKIAkJCV9fdTY0IG5yOwogCQkJX191NjQgcmV0OwotLSAKMi4zLjQK
+Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBt
+YWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNz
+LmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
