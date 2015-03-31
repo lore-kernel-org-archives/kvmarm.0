@@ -1,27 +1,23 @@
-From: Tony Lindgren <tony@atomide.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
 Subject: Re: [PATCH 01/25] arm: Use bool function return values of true/false
  not 1/0
-Date: Tue, 31 Mar 2015 08:54:26 -0700
-Message-ID: <20150331155426.GP10805@atomide.com>
-References: <cover.1427759009.git.joe@perches.com>
- <912ed0ebae3c6a16f58b1452d5ce9226681bc8df.1427759009.git.joe@perches.com>
+Date: Tue, 31 Mar 2015 17:58:28 +0200
+Message-ID: <551AC424.9010802@redhat.com>
+References: <cover.1427759009.git.joe@perches.com> <912ed0ebae3c6a16f58b1452d5ce9226681bc8df.1427759009.git.joe@perches.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-omap-owner@vger.kernel.org>
 In-Reply-To: <912ed0ebae3c6a16f58b1452d5ce9226681bc8df.1427759009.git.joe@perches.com>
-Sender: kvm-owner@vger.kernel.org
-To: Joe Perches <joe@perches.com>
-Cc: linux-kernel@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Gleb Natapov <gleb@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Russell King <linux@arm.linux.org.uk>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-omap@vger.kernel.org
+Sender: linux-omap-owner@vger.kernel.org
+To: Joe Perches <joe@perches.com>, linux-kernel@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Gleb Natapov <gleb@kernel.org>, Tony Lindgren <tony@atomide.com>
+Cc: Russell King <linux@arm.linux.org.uk>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-omap@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-* Joe Perches <joe@perches.com> [150330 16:47]:
+On 31/03/2015 01:45, Joe Perches wrote:
 > Use the normal return values for bool functions
 > 
 > Signed-off-by: Joe Perches <joe@perches.com>
-
-Acked-by: Tony Lindgren <tony@atomide.com>
-
 > ---
 >  arch/arm/include/asm/dma-mapping.h |  8 ++++----
 >  arch/arm/include/asm/kvm_emulate.h |  2 +-
@@ -112,6 +108,8 @@ Acked-by: Tony Lindgren <tony@atomide.com>
 > -	return 0;
 > +	return false;
 >  }
-> -- 
-> 2.1.2
 > 
+
+Marc/Christoffer, please pick this up yourself.
+
+Paolo
