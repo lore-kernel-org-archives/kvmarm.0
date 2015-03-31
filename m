@@ -1,110 +1,165 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v2 1/4] linux-headers: partial sync from my kernel tree (DEV)
-Date: Tue, 31 Mar 2015 16:40:43 +0100
-Message-ID: <1427816446-31586-2-git-send-email-alex.bennee@linaro.org>
+Subject: [PATCH v2 2/4] target-arm: kvm - implement software breakpoints
+Date: Tue, 31 Mar 2015 16:40:44 +0100
+Message-ID: <1427816446-31586-3-git-send-email-alex.bennee@linaro.org>
 References: <1427816446-31586-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D52594A786
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Mar 2015 11:33:48 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CDGcMecWpFHJ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 31 Mar 2015 11:33:47 -0400 (EDT)
-Received: from socrates.bennee.com
- (static.88-198-71-155.clients.your-server.de [88.198.71.155])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E79C14A778
- for <kvmarm@lists.cs.columbia.edu>; Tue, 31 Mar 2015 11:33:46 -0400 (EDT)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1427816446-31586-1-git-send-email-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org, christoffer.dall@linaro.org, zhichao.huang@linaro.org
-Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SSBhc3N1bWUgSSdsbCBwcm9wZXJseSBtZXJnZSB0aGUgS1ZNIEhlYWRlcnMgZGlyZWN0IGZyb20g
-TGludXggd2hlbgpkb25lLiBUaGVzZSBoZWFkZXJzIGNhbWUgZnJvbToKCmh0dHBzOi8vZ2l0Lmxp
-bmFyby5vcmcvcGVvcGxlL2FsZXguYmVubmVlL2xpbnV4LmdpdC9zaG9ydGxvZy9yZWZzL2hlYWRz
-L2d1ZXN0LWRlYnVnLzQuMC1yYzYtdjIKClNpZ25lZC1vZmYtYnk6IEFsZXggQmVubsOpZSA8YWxl
-eC5iZW5uZWVAbGluYXJvLm9yZz4KCi0tLQp2MgogIC0gdXBkYXRlIEFCSSB0byBpbmNsdWRlIC0+
-ZmFyCgpkaWZmIC0tZ2l0IGEvbGludXgtaGVhZGVycy9hc20tYXJtNjQva3ZtLmggYi9saW51eC1o
-ZWFkZXJzL2FzbS1hcm02NC9rdm0uaAppbmRleCAzZWY3N2E0Li43M2YyMWU0IDEwMDY0NAotLS0g
-YS9saW51eC1oZWFkZXJzL2FzbS1hcm02NC9rdm0uaAorKysgYi9saW51eC1oZWFkZXJzL2FzbS1h
-cm02NC9rdm0uaApAQCAtMTAwLDEwICsxMDAsMjUgQEAgc3RydWN0IGt2bV9zcmVncyB7CiBzdHJ1
-Y3Qga3ZtX2ZwdSB7CiB9OwogCisvKgorICogU2VlIEFSTSBBUk0gRDcuMzogRGVidWcgUmVnaXN0
-ZXJzCisgKgorICogVGhlIGNvbnRyb2wgcmVnaXN0ZXJzIGFyZSBhcmNoaXRlY3R1cmFsbHkgZGVm
-aW5lZCBhcyAzMiBiaXRzIGJ1dCBhcmUKKyAqIHN0b3JlZCBhcyA2NCBiaXQgdmFsdWVzIGFsb25n
-IHNpZGUgdGhlIHZhbHVlIHJlZ2lzdGVycyBhbmQgYWxpZ25lZAorICogd2l0aCB0aGUgcmVzdCA2
-NCBiaXQgcmVnaXN0ZXJzIGluIHRoZSBub3JtYWwgQ1BVIGNvbnRleHQuCisgKi8KKyNkZWZpbmUg
-S1ZNX0FSTV9OREJHX1JFR1MgMTYKIHN0cnVjdCBrdm1fZ3Vlc3RfZGVidWdfYXJjaCB7CisJX191
-NjQgZGJnX2JjcltLVk1fQVJNX05EQkdfUkVHU107CisJX191NjQgZGJnX2J2cltLVk1fQVJNX05E
-QkdfUkVHU107CisJX191NjQgZGJnX3djcltLVk1fQVJNX05EQkdfUkVHU107CisJX191NjQgZGJn
-X3d2cltLVk1fQVJNX05EQkdfUkVHU107CiB9OwogCiBzdHJ1Y3Qga3ZtX2RlYnVnX2V4aXRfYXJj
-aCB7CisJX191NjQgcGM7CisJX191MzIgaHNyOworCV9fdTY0IGZhcjsJLyogdXNlZCBmb3Igd2F0
-Y2hwb2ludHMgKi8KIH07CiAKIHN0cnVjdCBrdm1fc3luY19yZWdzIHsKQEAgLTIwNyw0ICsyMjIs
-MTEgQEAgc3RydWN0IGt2bV9hcmNoX21lbW9yeV9zbG90IHsKIAogI2VuZGlmCiAKKy8qCisgKiBB
-cmNoaXRlY3R1cmUgcmVsYXRlZCBkZWJ1ZyBkZWZpbmVzIC0gdXBwZXIgMTYgYml0cyBvZgorICog
-a3ZtX2d1ZXN0X2RlYnVnLT5jb250cm9sCisgKi8KKyNkZWZpbmUgS1ZNX0dVRVNUREJHX1VTRV9T
-V19CUAkgICAgICAgIF9fS1ZNX0dVRVNUREJHX1VTRV9TV19CUAorI2RlZmluZSBLVk1fR1VFU1RE
-QkdfVVNFX0hXX0JQCQlfX0tWTV9HVUVTVERCR19VU0VfSFdfQlAKKwogI2VuZGlmIC8qIF9fQVJN
-X0tWTV9IX18gKi8KZGlmZiAtLWdpdCBhL2xpbnV4LWhlYWRlcnMvYXNtLXBvd2VycGMva3ZtLmgg
-Yi9saW51eC1oZWFkZXJzL2FzbS1wb3dlcnBjL2t2bS5oCmluZGV4IGFiNGQ0NzMuLjE3MzE1Njkg
-MTAwNjQ0Ci0tLSBhL2xpbnV4LWhlYWRlcnMvYXNtLXBvd2VycGMva3ZtLmgKKysrIGIvbGludXgt
-aGVhZGVycy9hc20tcG93ZXJwYy9rdm0uaApAQCAtMzEwLDggKzMxMCw4IEBAIHN0cnVjdCBrdm1f
-Z3Vlc3RfZGVidWdfYXJjaCB7CiAgKiBhbmQgdXBwZXIgMTYgYml0cyBhcmUgYXJjaGl0ZWN0dXJl
-IHNwZWNpZmljLiBBcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcwogICogdGhhdCBpb2N0bCBp
-cyBmb3Igc2V0dGluZyBoYXJkd2FyZSBicmVha3BvaW50IG9yIHNvZnR3YXJlIGJyZWFrcG9pbnQu
-CiAgKi8KLSNkZWZpbmUgS1ZNX0dVRVNUREJHX1VTRV9TV19CUAkJMHgwMDAxMDAwMAotI2RlZmlu
-ZSBLVk1fR1VFU1REQkdfVVNFX0hXX0JQCQkweDAwMDIwMDAwCisjZGVmaW5lIEtWTV9HVUVTVERC
-R19VU0VfU1dfQlAJCV9fS1ZNX0dVRVNUREJHX1VTRV9TV19CUAorI2RlZmluZSBLVk1fR1VFU1RE
-QkdfVVNFX0hXX0JQCQlfX0tWTV9HVUVTVERCR19VU0VfSFdfQlAKIAogLyogZGVmaW5pdGlvbiBv
-ZiByZWdpc3RlcnMgaW4ga3ZtX3J1biAqLwogc3RydWN0IGt2bV9zeW5jX3JlZ3MgewpkaWZmIC0t
-Z2l0IGEvbGludXgtaGVhZGVycy9hc20teDg2L2t2bS5oIGIvbGludXgtaGVhZGVycy9hc20teDg2
-L2t2bS5oCmluZGV4IGQ3ZGNlZjUuLjE0MzgyMDIgMTAwNjQ0Ci0tLSBhL2xpbnV4LWhlYWRlcnMv
-YXNtLXg4Ni9rdm0uaAorKysgYi9saW51eC1oZWFkZXJzL2FzbS14ODYva3ZtLmgKQEAgLTI1MCw4
-ICsyNTAsOCBAQCBzdHJ1Y3Qga3ZtX2RlYnVnX2V4aXRfYXJjaCB7CiAJX191NjQgZHI3OwogfTsK
-IAotI2RlZmluZSBLVk1fR1VFU1REQkdfVVNFX1NXX0JQCQkweDAwMDEwMDAwCi0jZGVmaW5lIEtW
-TV9HVUVTVERCR19VU0VfSFdfQlAJCTB4MDAwMjAwMDAKKyNkZWZpbmUgS1ZNX0dVRVNUREJHX1VT
-RV9TV19CUAkJX19LVk1fR1VFU1REQkdfVVNFX1NXX0JQCisjZGVmaW5lIEtWTV9HVUVTVERCR19V
-U0VfSFdfQlAJCV9fS1ZNX0dVRVNUREJHX1VTRV9IV19CUAogI2RlZmluZSBLVk1fR1VFU1REQkdf
-SU5KRUNUX0RCCQkweDAwMDQwMDAwCiAjZGVmaW5lIEtWTV9HVUVTVERCR19JTkpFQ1RfQlAJCTB4
-MDAwODAwMDAKIApkaWZmIC0tZ2l0IGEvbGludXgtaGVhZGVycy9saW51eC9rdm0uaCBiL2xpbnV4
-LWhlYWRlcnMvbGludXgva3ZtLmgKaW5kZXggNjBhNTRjOC4uZmE2YzJhYyAxMDA2NDQKLS0tIGEv
-bGludXgtaGVhZGVycy9saW51eC9rdm0uaAorKysgYi9saW51eC1oZWFkZXJzL2xpbnV4L2t2bS5o
-CkBAIC0yMjYsNiArMjI2LDcgQEAgc3RydWN0IGt2bV9ydW4gewogCQkJX191MzIgY291bnQ7CiAJ
-CQlfX3U2NCBkYXRhX29mZnNldDsgLyogcmVsYXRpdmUgdG8ga3ZtX3J1biBzdGFydCAqLwogCQl9
-IGlvOworCQkvKiBLVk1fRVhJVF9ERUJVRyAqLwogCQlzdHJ1Y3QgewogCQkJc3RydWN0IGt2bV9k
-ZWJ1Z19leGl0X2FyY2ggYXJjaDsKIAkJfSBkZWJ1ZzsKQEAgLTI3NCw2ICsyNzUsNyBAQCBzdHJ1
-Y3Qga3ZtX3J1biB7CiAJCQlfX3UzMiBkYXRhOwogCQkJX191OCAgaXNfd3JpdGU7CiAJCX0gZGNy
-OworCQkvKiBLVk1fRVhJVF9JTlRFUk5BTF9FUlJPUiAqLwogCQlzdHJ1Y3QgewogCQkJX191MzIg
-c3ViZXJyb3I7CiAJCQkvKiBBdmFpbGFibGUgd2l0aCBLVk1fQ0FQX0lOVEVSTkFMX0VSUk9SX0RB
-VEE6ICovCkBAIC0yODQsNiArMjg2LDcgQEAgc3RydWN0IGt2bV9ydW4gewogCQlzdHJ1Y3Qgewog
-CQkJX191NjQgZ3Byc1szMl07CiAJCX0gb3NpOworCQkvKiBLVk1fRVhJVF9QQVBSX0hDQUxMICov
-CiAJCXN0cnVjdCB7CiAJCQlfX3U2NCBucjsKIAkJCV9fdTY0IHJldDsKQEAgLTUyMiw4ICs1MjUs
-MTYgQEAgc3RydWN0IGt2bV9zMzkwX2lycSB7CiAKIC8qIGZvciBLVk1fU0VUX0dVRVNUX0RFQlVH
-ICovCiAKLSNkZWZpbmUgS1ZNX0dVRVNUREJHX0VOQUJMRQkJMHgwMDAwMDAwMQotI2RlZmluZSBL
-Vk1fR1VFU1REQkdfU0lOR0xFU1RFUAkJMHgwMDAwMDAwMgorI2RlZmluZSBLVk1fR1VFU1REQkdf
-RU5BQkxFCQkoMSA8PCAwKQorI2RlZmluZSBLVk1fR1VFU1REQkdfU0lOR0xFU1RFUAkoMSA8PCAx
-KQorCisvKgorICogQXJjaGl0ZWN0dXJlIHNwZWNpZmljIHN0dWZmIHVzZXMgdGhlIHRvcCAxNiBi
-aXRzIG9mIHRoZSBmaWVsZCwKKyAqIGhvd2V2ZXIgdGhlcmUgaXMgc29tZSBzaGFyZWQgY29tbW9u
-YWxpdHkgZm9yIHRoZSBjb21tb24gY2FzZXMKKyAqLworI2RlZmluZSBfX0tWTV9HVUVTVERCR19V
-U0VfU1dfQlAJKDEgPDwgMTYpCisjZGVmaW5lIF9fS1ZNX0dVRVNUREJHX1VTRV9IV19CUAkoMSA8
-PCAxNykKKwogCiBzdHJ1Y3Qga3ZtX2d1ZXN0X2RlYnVnIHsKIAlfX3UzMiBjb250cm9sOwpAQCAt
-NzYwLDYgKzc3MSw4IEBAIHN0cnVjdCBrdm1fcHBjX3NtbXVfaW5mbyB7CiAjZGVmaW5lIEtWTV9D
-QVBfUFBDX0VOQUJMRV9IQ0FMTCAxMDQKICNkZWZpbmUgS1ZNX0NBUF9DSEVDS19FWFRFTlNJT05f
-Vk0gMTA1CiAjZGVmaW5lIEtWTV9DQVBfUzM5MF9VU0VSX1NJR1AgMTA2CisjZGVmaW5lIEtWTV9D
-QVBfR1VFU1RfREVCVUdfSFdfQlBTIDEwNworI2RlZmluZSBLVk1fQ0FQX0dVRVNUX0RFQlVHX0hX
-X1dQUyAxMDgKIAogI2lmZGVmIEtWTV9DQVBfSVJRX1JPVVRJTkcKIAotLSAKMi4zLjQKCl9fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5n
-IGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVt
-YmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+These don't involve messing around with debug registers, just setting
+the breakpoint instruction in memory. GDB will not use this mechanism i=
+f
+it can't access the memory to write the breakpoint.
+
+All the kernel has to do is ensure the hypervisor traps the breakpoint
+exceptions and returns to userspace.
+
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--
+v2
+  - handle debug exit with new hsr exception info
+  - add verbosity to UNIMP message
+
+diff --git a/target-arm/kvm.c b/target-arm/kvm.c
+index 72c1fa1..290c1fe 100644
+--- a/target-arm/kvm.c
++++ b/target-arm/kvm.c
+@@ -25,6 +25,7 @@
+ #include "hw/arm/arm.h"
+=20
+ const KVMCapabilityInfo kvm_arch_required_capabilities[] =3D {
++    KVM_CAP_INFO(SET_GUEST_DEBUG),
+     KVM_CAP_LAST_INFO
+ };
+=20
+@@ -466,9 +467,57 @@ void kvm_arch_post_run(CPUState *cs, struct kvm_ru=
+n *run)
+ {
+ }
+=20
++/* See ARM ARM D7.2.27 ESR_ELx, Exception Syndrome Register
++**
++** To minimise translating between kernel and user-space the kernel
++** ABI just provides user-space with the full exception syndrome
++** register value to be decoded in QEMU.
++*/
++
++#define HSR_EC_SHIFT            26
++#define HSR_EC_SW_BKPT          0x3c
++
++static int kvm_handle_debug(CPUState *cs, struct kvm_run *run)
++{
++    struct kvm_debug_exit_arch *arch_info =3D &run->debug.arch;
++    int hsr_ec =3D arch_info->hsr >> HSR_EC_SHIFT;
++
++    switch (hsr_ec) {
++    case HSR_EC_SW_BKPT:
++        if (kvm_find_sw_breakpoint(cs, arch_info->pc)) {
++            return true;
++        }
++        break;
++    default:
++        error_report("%s: unhandled debug exit (%x, %llx)\n",
++                     __func__, arch_info->hsr, arch_info->pc);
++    }
++
++    /* If we don't handle this it could be it really is for the
++       guest to handle */
++    qemu_log_mask(LOG_UNIMP,
++                  "%s: re-injecting exception not yet implemented (0x%=
+x, %llx)\n",
++                  __func__, hsr_ec, arch_info->pc);
++
++    return false;
++}
++
+ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+ {
+-    return 0;
++    int ret =3D 0;
++
++    switch (run->exit_reason) {
++    case KVM_EXIT_DEBUG:
++        if (kvm_handle_debug(cs, run)) {
++            ret =3D EXCP_DEBUG;
++        } /* otherwise return to guest */
++        break;
++    default:
++        qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
++                      __func__, run->exit_reason);
++        break;
++    }
++    return ret;
+ }
+=20
+ bool kvm_arch_stop_on_emulation_error(CPUState *cs)
+@@ -493,14 +542,33 @@ int kvm_arch_on_sigbus(int code, void *addr)
+=20
+ void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debug =
+*dbg)
+ {
+-    qemu_log_mask(LOG_UNIMP, "%s: not implemented\n", __func__);
++    if (kvm_sw_breakpoints_active(cs)) {
++        dbg->control |=3D KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_BP=
+;
++    }
+ }
+=20
+-int kvm_arch_insert_sw_breakpoint(CPUState *cs,
+-                                  struct kvm_sw_breakpoint *bp)
++/* C6.6.29 BRK instruction */
++int kvm_arch_insert_sw_breakpoint(CPUState *cs, struct kvm_sw_breakpoi=
+nt *bp)
+ {
+-    qemu_log_mask(LOG_UNIMP, "%s: not implemented\n", __func__);
+-    return -EINVAL;
++    static const uint32_t brk =3D 0xd4200000;
++
++    if (cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)&bp->saved_insn, 4,=
+ 0) ||
++        cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)&brk, 4, 1)) {
++        return -EINVAL;
++    }
++    return 0;
++}
++
++int kvm_arch_remove_sw_breakpoint(CPUState *cs, struct kvm_sw_breakpoi=
+nt *bp)
++{
++    static uint32_t brk;
++
++    if (cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)&brk, 4, 0) ||
++        brk !=3D 0xd4200000 ||
++        cpu_memory_rw_debug(cs, bp->pc, (uint8_t *)&bp->saved_insn, 4,=
+ 1)) {
++        return -EINVAL;
++    }
++    return 0;
+ }
+=20
+ int kvm_arch_insert_hw_breakpoint(target_ulong addr,
+@@ -517,12 +585,6 @@ int kvm_arch_remove_hw_breakpoint(target_ulong add=
+r,
+     return -EINVAL;
+ }
+=20
+-int kvm_arch_remove_sw_breakpoint(CPUState *cs,
+-                                  struct kvm_sw_breakpoint *bp)
+-{
+-    qemu_log_mask(LOG_UNIMP, "%s: not implemented\n", __func__);
+-    return -EINVAL;
+-}
+=20
+ void kvm_arch_remove_all_hw_breakpoints(void)
+ {
+--=20
+2.3.4
+
