@@ -1,97 +1,103 @@
-From: David Hildenbrand <dahi@linux.vnet.ibm.com>
-Subject: Re: [PATCH v2 04/10] KVM: arm: guest debug, add stub
- KVM_SET_GUEST_DEBUG ioctl
-Date: Wed, 1 Apr 2015 17:55:29 +0200
-Message-ID: <20150401175529.642f64af@thinkpad-w530>
-References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
-	<1427814488-28467-5-git-send-email-alex.bennee@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v2 03/10] KVM: arm: guest debug, define API headers
+Date: Wed, 01 Apr 2015 17:01:26 +0100
+Message-ID: <87h9szyh0p.fsf@linaro.org>
+References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org> <1427814488-28467-4-git-send-email-alex.bennee@linaro.org> <20150401174646.74f695bd@thinkpad-w530>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1427814488-28467-5-git-send-email-alex.bennee@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org, jan.kiszka@siemens.com, r65777@freescale.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Russell King <linux@arm.linux.org.uk>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <20150401174646.74f695bd@thinkpad-w530>
+Sender: kvm-owner@vger.kernel.org
+To: David Hildenbrand <dahi@linux.vnet.ibm.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org, jan.kiszka@siemens.com, r65777@freescale.com, bp@suse.de, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-> This commit adds a stub function to support the KVM_SET_GUEST_DEBUG
-> ioctl. Currently any operation flag will return EINVAL. Actual
 
-Well it won't return -EINVAL if you push in KVM_GUESTDBG_ENABLE or 0.
+David Hildenbrand <dahi@linux.vnet.ibm.com> writes:
 
-"Any unsupported flag will return -EINVAL. For now, only KVM_GUESTDBG_E=
-NABLE is
-supported, although it won't have any effects."
+>> This commit defines the API headers for guest debugging. There are t=
+wo
+>> architecture specific debug structures:
+>>=20
+>>   - kvm_guest_debug_arch, allows us to pass in HW debug registers
+>>   - kvm_debug_exit_arch, signals the exact debug exit and pc
+>>=20
+>> The type of debugging being used is control by the architecture spec=
+ific
+>
+> s/control/controlled/
 
-> functionality will be added with further patches.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>.
->=20
-> ---
-> v2
->   - simplified form of the ioctl (stuff will go into setup_debug)
->=20
-> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtua=
-l/kvm/api.txt
-> index b112efc..06c5064 100644
-> --- a/Documentation/virtual/kvm/api.txt
-> +++ b/Documentation/virtual/kvm/api.txt
-> @@ -2604,7 +2604,7 @@ handled.
->  4.87 KVM_SET_GUEST_DEBUG
->=20
->  Capability: KVM_CAP_SET_GUEST_DEBUG
-> -Architectures: x86, s390, ppc
-> +Architectures: x86, s390, ppc, arm64
->  Type: vcpu ioctl
->  Parameters: struct kvm_guest_debug (in)
->  Returns: 0 on success; -1 on error
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index 5560f74..445933d 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -183,6 +183,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm,=
- long ext)
->  	case KVM_CAP_ARM_PSCI:
->  	case KVM_CAP_ARM_PSCI_0_2:
->  	case KVM_CAP_READONLY_MEM:
-> +	case KVM_CAP_SET_GUEST_DEBUG:
->  		r =3D 1;
->  		break;
->  	case KVM_CAP_COALESCED_MMIO:
-> @@ -303,10 +304,21 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  	kvm_arm_set_running_vcpu(NULL);
->  }
->=20
-> +#define KVM_GUESTDBG_VALID (KVM_GUESTDBG_ENABLE)
+good catch
 
-That makes me rather think that it is another flag.
+>
+>> control bits of the kvm_guest_debug->control flags in the ioctl
+>> structure.
+>>=20
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>=20
+>> ---
+>> v2
+>>    - expose hsr and pc directly to user-space
+>>=20
+>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/=
+uapi/asm/kvm.h
+>> index 3ef77a4..6ee70a0 100644
+>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>> @@ -100,10 +100,24 @@ struct kvm_sregs {
+>>  struct kvm_fpu {
+>>  };
+>>=20
+>> +/*
+>> + * See ARM ARM D7.3: Debug Registers
+>
+> Maybe drop one ARM
 
-We(s390x) use VALID_GUESTDBG_FLAGS, what about that or KVM_GUESTDBG_VAL=
-ID_MASK?
+Well technically it is the ARM Architecture Reference Manual but that's
+quite long winded.
 
-> +
->  int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
->  					struct kvm_guest_debug *dbg)
->  {
-> -	return -EINVAL;
-> +	if (dbg->control & KVM_GUESTDBG_ENABLE) {
-> +		if (dbg->control & ~KVM_GUESTDBG_VALID)
-> +			return -EINVAL;
+>
+>> + *
+>> + * The control registers are architecturally defined as 32 bits but=
+ are
+>> + * stored as 64 bit values along side the value registers and align=
+ed
+>> + * with the rest 64 bit registers in the normal CPU context.
+>> + */
+>> +#define KVM_ARM_NDBG_REGS 16
+>>  struct kvm_guest_debug_arch {
+>> +	__u64 dbg_bcr[KVM_ARM_NDBG_REGS];
+>> +	__u64 dbg_bvr[KVM_ARM_NDBG_REGS];
+>> +	__u64 dbg_wcr[KVM_ARM_NDBG_REGS];
+>> +	__u64 dbg_wvr[KVM_ARM_NDBG_REGS];
+>>  };
+>>=20
+>>  struct kvm_debug_exit_arch {
+>> +	__u64 pc;
+>> +	__u32 hsr;
+>>  };
+>>=20
+>>  struct kvm_sync_regs {
+>> @@ -207,4 +221,11 @@ struct kvm_arch_memory_slot {
+>>=20
+>>  #endif
+>>=20
+>> +/*
+>> + * Architecture related debug defines - upper 16 bits of
+>> + * kvm_guest_debug->control
+>> + */
+>> +#define KVM_GUESTDBG_USE_SW_BP	        __KVM_GUESTDBG_USE_SW_BP
+>> +#define KVM_GUESTDBG_USE_HW_BP		__KVM_GUESTDBG_USE_HW_BP
+>> +
+>>  #endif /* __ARM_KVM_H__ */
+>
+> Looks good to me!
 
-I'd move that check directly to the start of the function and bail out =
-on any
-unsupported flag.
+Is that a Reviewed-by?
 
-> +
-> +		vcpu->guest_debug =3D dbg->control;
-> +	} else {
-> +		/* If not enabled clear all flags */
-> +		vcpu->guest_debug =3D 0;
-> +	}
-> +	return 0;
->  }
->=20
->=20
+>
+> David
 
-David
+--=20
+Alex Benn=C3=A9e
