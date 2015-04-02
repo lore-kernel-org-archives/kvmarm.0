@@ -1,156 +1,240 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 12/27] arm/arm64: KVM: export VCPU power state via MP_STATE ioctl
-Date: Thu,  2 Apr 2015 11:05:16 +0100
-Message-ID: <1427969131-8445-13-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 22/27] KVM: arm/arm64: implement kvm_io_bus MMIO handling for the VGIC
+Date: Thu,  2 Apr 2015 11:05:26 +0100
+Message-ID: <1427969131-8445-23-git-send-email-marc.zyngier@arm.com>
 References: <1427969131-8445-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1427969131-8445-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Mark Rutland <mark.rutland@arm.com>, Eric Auger <eric.auger@linaro.org>, Nikolay Nikolaev <n.nikolaev@virtualopensystems.com>, Andre Przywara <andre.przywara@arm.com>
+Cc: Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Nikolay Nikolaev <n.nikolaev@virtualopensystems.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-=46rom: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+From: Andre Przywara <andre.przywara@arm.com>
 
-To cleanly restore an SMP VM we need to ensure that the current pause
-state of each vcpu is correctly recorded. Things could get confused if
-the CPU starts running after migration restore completes when it was
-paused before it state was captured.
+Currently we use a lot of VGIC specific code to do the MMIO
+dispatching.
+Use the previous reworks to add kvm_io_bus style MMIO handlers.
 
-We use the existing KVM_GET/SET_MP_STATE ioctl to do this. The arm/arm6=
-4
-interface is a lot simpler as the only valid states are
-KVM_MP_STATE_RUNNABLE and KVM_MP_STATE_STOPPED.
+Those are not yet called by the MMIO abort handler, also the actual
+VGIC emulator function do not make use of it yet, but will be enabled
+with the following patches.
 
-Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- Documentation/virtual/kvm/api.txt | 16 ++++++++++++----
- arch/arm/kvm/arm.c                | 21 +++++++++++++++++++--
- 2 files changed, 31 insertions(+), 6 deletions(-)
+ include/kvm/arm_vgic.h |   9 ++++
+ virt/kvm/arm/vgic.c    | 129 +++++++++++++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic.h    |   7 +++
+ 3 files changed, 145 insertions(+)
 
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/=
-kvm/api.txt
-index b265d8e..71d10d7 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -997,7 +997,7 @@ for vm-wide capabilities.
- 4.38 KVM_GET_MP_STATE
-=20
- Capability: KVM_CAP_MP_STATE
--Architectures: x86, s390
-+Architectures: x86, s390, arm, arm64
- Type: vcpu ioctl
- Parameters: struct kvm_mp_state (out)
- Returns: 0 on success; -1 on error
-@@ -1011,7 +1011,7 @@ uniprocessor guests).
-=20
- Possible values are:
-=20
-- - KVM_MP_STATE_RUNNABLE:        the vcpu is currently running [x86]
-+ - KVM_MP_STATE_RUNNABLE:        the vcpu is currently running [x86,ar=
-m/arm64]
-  - KVM_MP_STATE_UNINITIALIZED:   the vcpu is an application processor =
-(AP)
-                                  which has not yet received an INIT si=
-gnal [x86]
-  - KVM_MP_STATE_INIT_RECEIVED:   the vcpu has received an INIT signal,=
- and is
-@@ -1020,7 +1020,7 @@ Possible values are:
-                                  is waiting for an interrupt [x86]
-  - KVM_MP_STATE_SIPI_RECEIVED:   the vcpu has just received a SIPI (ve=
-ctor
-                                  accessible via KVM_GET_VCPU_EVENTS) [=
-x86]
-- - KVM_MP_STATE_STOPPED:         the vcpu is stopped [s390]
-+ - KVM_MP_STATE_STOPPED:         the vcpu is stopped [s390,arm/arm64]
-  - KVM_MP_STATE_CHECK_STOP:      the vcpu is in a special error state =
-[s390]
-  - KVM_MP_STATE_OPERATING:       the vcpu is operating (running or hal=
-ted)
-                                  [s390]
-@@ -1031,11 +1031,15 @@ On x86, this ioctl is only useful after KVM_CRE=
-ATE_IRQCHIP. Without an
- in-kernel irqchip, the multiprocessing state must be maintained by use=
-rspace on
- these architectures.
-=20
-+For arm/arm64:
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 9092fad..f90140c 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -24,6 +24,7 @@
+ #include <linux/irqreturn.h>
+ #include <linux/spinlock.h>
+ #include <linux/types.h>
++#include <kvm/iodev.h>
+ 
+ #define VGIC_NR_IRQS_LEGACY	256
+ #define VGIC_NR_SGIS		16
+@@ -147,6 +148,14 @@ struct vgic_vm_ops {
+ 	int	(*map_resources)(struct kvm *, const struct vgic_params *);
+ };
+ 
++struct vgic_io_device {
++	gpa_t addr;
++	int len;
++	const struct vgic_io_range *reg_ranges;
++	struct kvm_vcpu *redist_vcpu;
++	struct kvm_io_device dev;
++};
 +
-+The only states that are valid are KVM_MP_STATE_STOPPED and
-+KVM_MP_STATE_RUNNABLE which reflect if the vcpu is paused or not.
-=20
- 4.39 KVM_SET_MP_STATE
-=20
- Capability: KVM_CAP_MP_STATE
--Architectures: x86, s390
-+Architectures: x86, s390, arm, arm64
- Type: vcpu ioctl
- Parameters: struct kvm_mp_state (in)
- Returns: 0 on success; -1 on error
-@@ -1047,6 +1051,10 @@ On x86, this ioctl is only useful after KVM_CREA=
-TE_IRQCHIP. Without an
- in-kernel irqchip, the multiprocessing state must be maintained by use=
-rspace on
- these architectures.
-=20
-+For arm/arm64:
-+
-+The only states that are valid are KVM_MP_STATE_STOPPED and
-+KVM_MP_STATE_RUNNABLE which reflect if the vcpu should be paused or no=
-t.
-=20
- 4.40 KVM_SET_IDENTITY_MAP_ADDR
-=20
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index cc96619..9a5f057 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -180,6 +180,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, l=
-ong ext)
- 	case KVM_CAP_ARM_PSCI:
- 	case KVM_CAP_ARM_PSCI_0_2:
- 	case KVM_CAP_READONLY_MEM:
-+	case KVM_CAP_MP_STATE:
- 		r =3D 1;
- 		break;
- 	case KVM_CAP_COALESCED_MMIO:
-@@ -310,13 +311,29 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kv=
-m_vcpu *vcpu,
- int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
- 				    struct kvm_mp_state *mp_state)
- {
--	return -EINVAL;
-+	if (vcpu->arch.pause)
-+		mp_state->mp_state =3D KVM_MP_STATE_STOPPED;
-+	else
-+		mp_state->mp_state =3D KVM_MP_STATE_RUNNABLE;
-+
-+	return 0;
+ struct vgic_dist {
+ 	spinlock_t		lock;
+ 	bool			in_kernel;
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 8802ad7..e968179 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -32,6 +32,8 @@
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_mmu.h>
+ #include <trace/events/kvm.h>
++#include <asm/kvm.h>
++#include <kvm/iodev.h>
+ 
+ /*
+  * How the whole thing works (courtesy of Christoffer Dall):
+@@ -837,6 +839,66 @@ bool vgic_handle_mmio_range(struct kvm_vcpu *vcpu, struct kvm_run *run,
  }
-=20
- int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
- 				    struct kvm_mp_state *mp_state)
- {
--	return -EINVAL;
-+	switch (mp_state->mp_state) {
-+	case KVM_MP_STATE_RUNNABLE:
-+		vcpu->arch.pause =3D false;
-+		break;
-+	case KVM_MP_STATE_STOPPED:
-+		vcpu->arch.pause =3D true;
-+		break;
-+	default:
-+		return -EINVAL;
+ 
+ /**
++ * vgic_handle_mmio_access - handle an in-kernel MMIO access
++ * This is called by the read/write KVM IO device wrappers below.
++ * @vcpu:	pointer to the vcpu performing the access
++ * @this:	pointer to the KVM IO device in charge
++ * @addr:	guest physical address of the access
++ * @len:	size of the access
++ * @val:	pointer to the data region
++ * @is_write:	read or write access
++ *
++ * returns true if the MMIO access could be performed
++ */
++static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
++				   struct kvm_io_device *this, gpa_t addr,
++				   int len, void *val, bool is_write)
++{
++	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
++	struct vgic_io_device *iodev = container_of(this,
++						    struct vgic_io_device, dev);
++	struct kvm_run *run = vcpu->run;
++	const struct vgic_io_range *range;
++	struct kvm_exit_mmio mmio;
++	bool updated_state;
++	gpa_t offset;
++
++	offset = addr - iodev->addr;
++	range = vgic_find_range(iodev->reg_ranges, len, offset);
++	if (unlikely(!range || !range->handle_mmio)) {
++		pr_warn("Unhandled access %d %08llx %d\n", is_write, addr, len);
++		return -ENXIO;
 +	}
 +
++	mmio.phys_addr = addr;
++	mmio.len = len;
++	mmio.is_write = is_write;
++	if (is_write)
++		memcpy(mmio.data, val, len);
++	mmio.private = iodev->redist_vcpu;
++
++	spin_lock(&dist->lock);
++	offset -= range->base;
++	if (vgic_validate_access(dist, range, offset)) {
++		updated_state = call_range_handler(vcpu, &mmio, offset, range);
++		if (!is_write)
++			memcpy(val, mmio.data, len);
++	} else {
++		if (!is_write)
++			memset(val, 0, len);
++		updated_state = false;
++	}
++	spin_unlock(&dist->lock);
++	kvm_prepare_mmio(run, &mmio);
++	kvm_handle_mmio_return(vcpu, run);
++
++	if (updated_state)
++		vgic_kick_vcpus(vcpu->kvm);
++
 +	return 0;
++}
++
++/**
+  * vgic_handle_mmio - handle an in-kernel MMIO access for the GIC emulation
+  * @vcpu:      pointer to the vcpu performing the access
+  * @run:       pointer to the kvm_run structure
+@@ -860,6 +922,73 @@ bool vgic_handle_mmio(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 	return vcpu->kvm->arch.vgic.vm_ops.handle_mmio(vcpu, run, mmio);
  }
-=20
- /**
---=20
+ 
++static int vgic_handle_mmio_read(struct kvm_vcpu *vcpu,
++				 struct kvm_io_device *this,
++				 gpa_t addr, int len, void *val)
++{
++	return vgic_handle_mmio_access(vcpu, this, addr, len, val, false);
++}
++
++static int vgic_handle_mmio_write(struct kvm_vcpu *vcpu,
++				  struct kvm_io_device *this,
++				  gpa_t addr, int len, const void *val)
++{
++	return vgic_handle_mmio_access(vcpu, this, addr, len, (void *)val,
++				       true);
++}
++
++struct kvm_io_device_ops vgic_io_ops = {
++	.read	= vgic_handle_mmio_read,
++	.write	= vgic_handle_mmio_write,
++};
++
++/**
++ * vgic_register_kvm_io_dev - register VGIC register frame on the KVM I/O bus
++ * @kvm:            The VM structure pointer
++ * @base:           The (guest) base address for the register frame
++ * @len:            Length of the register frame window
++ * @ranges:         Describing the handler functions for each register
++ * @redist_vcpu_id: The VCPU ID to pass on to the handlers on call
++ * @iodev:          Points to memory to be passed on to the handler
++ *
++ * @iodev stores the parameters of this function to be usable by the handler
++ * respectively the dispatcher function (since the KVM I/O bus framework lacks
++ * an opaque parameter). Initialization is done in this function, but the
++ * reference should be valid and unique for the whole VGIC lifetime.
++ * If the register frame is not mapped for a specific VCPU, pass -1 to
++ * @redist_vcpu_id.
++ */
++int vgic_register_kvm_io_dev(struct kvm *kvm, gpa_t base, int len,
++			     const struct vgic_io_range *ranges,
++			     int redist_vcpu_id,
++			     struct vgic_io_device *iodev)
++{
++	struct kvm_vcpu *vcpu = NULL;
++	int ret;
++
++	if (redist_vcpu_id >= 0)
++		vcpu = kvm_get_vcpu(kvm, redist_vcpu_id);
++
++	iodev->addr		= base;
++	iodev->len		= len;
++	iodev->reg_ranges	= ranges;
++	iodev->redist_vcpu	= vcpu;
++
++	kvm_iodevice_init(&iodev->dev, &vgic_io_ops);
++
++	mutex_lock(&kvm->slots_lock);
++
++	ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, base, len,
++				      &iodev->dev);
++	mutex_unlock(&kvm->slots_lock);
++
++	/* Mark the iodev as invalid if registration fails. */
++	if (ret)
++		iodev->dev.ops = NULL;
++
++	return ret;
++}
++
+ static int vgic_nr_shared_irqs(struct vgic_dist *dist)
+ {
+ 	return dist->nr_irqs - VGIC_NR_PRIVATE_IRQS;
+diff --git a/virt/kvm/arm/vgic.h b/virt/kvm/arm/vgic.h
+index 01aa622..28fa3aa 100644
+--- a/virt/kvm/arm/vgic.h
++++ b/virt/kvm/arm/vgic.h
+@@ -20,6 +20,8 @@
+ #ifndef __KVM_VGIC_H__
+ #define __KVM_VGIC_H__
+ 
++#include <kvm/iodev.h>
++
+ #define VGIC_ADDR_UNDEF		(-1)
+ #define IS_VGIC_ADDR_UNDEF(_x)  ((_x) == VGIC_ADDR_UNDEF)
+ 
+@@ -82,6 +84,11 @@ struct vgic_io_range {
+ 			    phys_addr_t offset);
+ };
+ 
++int vgic_register_kvm_io_dev(struct kvm *kvm, gpa_t base, int len,
++			     const struct vgic_io_range *ranges,
++			     int redist_id,
++			     struct vgic_io_device *iodev);
++
+ static inline bool is_in_range(phys_addr_t addr, unsigned long len,
+ 			       phys_addr_t baseaddr, unsigned long size)
+ {
+-- 
 2.1.4
 
