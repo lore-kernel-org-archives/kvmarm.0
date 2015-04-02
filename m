@@ -1,294 +1,182 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 24/27] KVM: arm/arm64: merge GICv3 RD_base and SGI_base register frames
-Date: Thu,  2 Apr 2015 11:05:28 +0100
-Message-ID: <1427969131-8445-25-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 15/27] arm/arm64: KVM: Fix migration race in the arch timer
+Date: Thu,  2 Apr 2015 11:05:19 +0100
+Message-ID: <1427969131-8445-16-git-send-email-marc.zyngier@arm.com>
 References: <1427969131-8445-1-git-send-email-marc.zyngier@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1427969131-8445-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
-Cc: Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Nikolay Nikolaev <n.nikolaev@virtualopensystems.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Mark Rutland <mark.rutland@arm.com>, Eric Auger <eric.auger@linaro.org>, Nikolay Nikolaev <n.nikolaev@virtualopensystems.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Andre Przywara <andre.przywara@arm.com>
+=46rom: Christoffer Dall <christoffer.dall@linaro.org>
 
-Currently we handle the redistributor registers in two separate MMIO
-regions, one for the overall behaviour and SPIs and one for the
-SGIs/PPIs. That latter forces the creation of _two_ KVM I/O bus
-devices for each redistributor.
-Since the spec mandates those two pages to be contigious, we could as
-well merge them and save the churn with the second KVM I/O bus device.
+When a VCPU is no longer running, we currently check to see if it has a
+timer scheduled in the future, and if it does, we schedule a host
+hrtimer to notify is in case the timer expires while the VCPU is still
+not running.  When the hrtimer fires, we mask the guest's timer and
+inject the timer IRQ (still relying on the guest unmasking the time whe=
+n
+it receives the IRQ).
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+This is all good and fine, but when migration a VM (checkpoint/restore)
+this introduces a race.  It is unlikely, but possible, for the followin=
+g
+sequence of events to happen:
+
+ 1. Userspace stops the VM
+ 2. Hrtimer for VCPU is scheduled
+ 3. Userspace checkpoints the VGIC state (no pending timer interrupts)
+ 4. The hrtimer fires, schedules work in a workqueue
+ 5. Workqueue function runs, masks the timer and injects timer interrup=
+t
+ 6. Userspace checkpoints the timer state (timer masked)
+
+At restore time, you end up with a masked timer without any timer
+interrupts and your guest halts never receiving timer interrupts.
+
+=46ix this by only kicking the VCPU in the workqueue function, and samp=
+le
+the expired state of the timer when entering the guest again and inject
+the interrupt and mask the timer only then.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic-v3-emul.c | 174 +++++++++++++++++++++-----------------------
- 1 file changed, 83 insertions(+), 91 deletions(-)
+ arch/arm/kvm/arm.c           |  2 +-
+ include/kvm/arm_arch_timer.h |  2 ++
+ virt/kvm/arm/arch_timer.c    | 45 +++++++++++++++++++++++++++++++++++-=
+--------
+ 3 files changed, 39 insertions(+), 10 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
-index 14943e3..2f03a36 100644
---- a/virt/kvm/arm/vgic-v3-emul.c
-+++ b/virt/kvm/arm/vgic-v3-emul.c
-@@ -502,6 +502,43 @@ static const struct vgic_io_range vgic_v3_dist_ranges[] = {
- 	{},
- };
- 
-+static bool handle_mmio_ctlr_redist(struct kvm_vcpu *vcpu,
-+				    struct kvm_exit_mmio *mmio,
-+				    phys_addr_t offset)
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 9a5f057..e98370c 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -266,7 +266,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+=20
+ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+ {
+-	return 0;
++	return kvm_timer_should_fire(vcpu);
+ }
+=20
+ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.=
+h
+index a74e4c2..e596675 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -67,4 +67,6 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu);
+ u64 kvm_arm_timer_get_reg(struct kvm_vcpu *, u64 regid);
+ int kvm_arm_timer_set_reg(struct kvm_vcpu *, u64 regid, u64 value);
+=20
++bool kvm_timer_should_fire(struct kvm_vcpu *vcpu);
++
+ #endif
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 6e54f35..98c95f2 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -85,13 +85,22 @@ static irqreturn_t kvm_arch_timer_handler(int irq, =
+void *dev_id)
+ 	return IRQ_HANDLED;
+ }
+=20
++/*
++ * Work function for handling the backup timer that we schedule when a=
+ vcpu is
++ * no longer running, but had a timer programmed to fire in the future=
+=2E
++ */
+ static void kvm_timer_inject_irq_work(struct work_struct *work)
+ {
+ 	struct kvm_vcpu *vcpu;
+=20
+ 	vcpu =3D container_of(work, struct kvm_vcpu, arch.timer_cpu.expired);
+ 	vcpu->arch.timer_cpu.armed =3D false;
+-	kvm_timer_inject_irq(vcpu);
++
++	/*
++	 * If the vcpu is blocked we want to wake it up so that it will see
++	 * the timer has expired when entering the guest.
++	 */
++	kvm_vcpu_kick(vcpu);
+ }
+=20
+ static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
+@@ -102,6 +111,21 @@ static enum hrtimer_restart kvm_timer_expire(struc=
+t hrtimer *hrt)
+ 	return HRTIMER_NORESTART;
+ }
+=20
++bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
 +{
-+	/* since we don't support LPIs, this register is zero for now */
-+	vgic_reg_access(mmio, NULL, offset,
-+			ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
-+	return false;
-+}
++	struct arch_timer_cpu *timer =3D &vcpu->arch.timer_cpu;
++	cycle_t cval, now;
 +
-+static bool handle_mmio_typer_redist(struct kvm_vcpu *vcpu,
-+				     struct kvm_exit_mmio *mmio,
-+				     phys_addr_t offset)
-+{
-+	u32 reg;
-+	u64 mpidr;
-+	struct kvm_vcpu *redist_vcpu = mmio->private;
-+	int target_vcpu_id = redist_vcpu->vcpu_id;
-+
-+	/* the upper 32 bits contain the affinity value */
-+	if ((offset & ~3) == 4) {
-+		mpidr = kvm_vcpu_get_mpidr_aff(redist_vcpu);
-+		reg = compress_mpidr(mpidr);
-+
-+		vgic_reg_access(mmio, &reg, offset,
-+				ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
++	if ((timer->cntv_ctl & ARCH_TIMER_CTRL_IT_MASK) ||
++		!(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE))
 +		return false;
-+	}
 +
-+	reg = redist_vcpu->vcpu_id << 8;
-+	if (target_vcpu_id == atomic_read(&vcpu->kvm->online_vcpus) - 1)
-+		reg |= GICR_TYPER_LAST;
-+	vgic_reg_access(mmio, &reg, offset,
-+			ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
-+	return false;
++	cval =3D timer->cntv_cval;
++	now =3D kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
++
++	return cval <=3D now;
 +}
 +
- static bool handle_mmio_set_enable_reg_redist(struct kvm_vcpu *vcpu,
- 					      struct kvm_exit_mmio *mmio,
- 					      phys_addr_t offset)
-@@ -570,146 +607,107 @@ static bool handle_mmio_cfg_reg_redist(struct kvm_vcpu *vcpu,
- 	return vgic_handle_cfg_reg(reg, mmio, offset);
- }
- 
--static const struct vgic_io_range vgic_redist_sgi_ranges[] = {
-+#define SGI_base(x) ((x) + SZ_64K)
+ /**
+  * kvm_timer_flush_hwstate - prepare to move the virt timer to the cpu
+  * @vcpu: The vcpu pointer
+@@ -119,6 +143,13 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu=
+)
+ 	 * populate the CPU timer again.
+ 	 */
+ 	timer_disarm(timer);
 +
-+static const struct vgic_io_range vgic_redist_ranges[] = {
-+	{
-+		.base           = GICR_CTLR,
-+		.len            = 0x04,
-+		.bits_per_irq   = 0,
-+		.handle_mmio    = handle_mmio_ctlr_redist,
-+	},
- 	{
--		.base		= GICR_IGROUPR0,
-+		.base           = GICR_TYPER,
-+		.len            = 0x08,
-+		.bits_per_irq   = 0,
-+		.handle_mmio    = handle_mmio_typer_redist,
-+	},
-+	{
-+		.base           = GICR_IIDR,
-+		.len            = 0x04,
-+		.bits_per_irq   = 0,
-+		.handle_mmio    = handle_mmio_iidr,
-+	},
-+	{
-+		.base           = GICR_WAKER,
-+		.len            = 0x04,
-+		.bits_per_irq   = 0,
-+		.handle_mmio    = handle_mmio_raz_wi,
-+	},
-+	{
-+		.base           = GICR_IDREGS,
-+		.len            = 0x30,
-+		.bits_per_irq   = 0,
-+		.handle_mmio    = handle_mmio_idregs,
-+	},
-+	{
-+		.base		= SGI_base(GICR_IGROUPR0),
- 		.len		= 0x04,
- 		.bits_per_irq	= 1,
- 		.handle_mmio	= handle_mmio_rao_wi,
- 	},
- 	{
--		.base		= GICR_ISENABLER0,
-+		.base		= SGI_base(GICR_ISENABLER0),
- 		.len		= 0x04,
- 		.bits_per_irq	= 1,
- 		.handle_mmio	= handle_mmio_set_enable_reg_redist,
- 	},
- 	{
--		.base		= GICR_ICENABLER0,
-+		.base		= SGI_base(GICR_ICENABLER0),
- 		.len		= 0x04,
- 		.bits_per_irq	= 1,
- 		.handle_mmio	= handle_mmio_clear_enable_reg_redist,
- 	},
- 	{
--		.base		= GICR_ISPENDR0,
-+		.base		= SGI_base(GICR_ISPENDR0),
- 		.len		= 0x04,
- 		.bits_per_irq	= 1,
- 		.handle_mmio	= handle_mmio_set_pending_reg_redist,
- 	},
- 	{
--		.base		= GICR_ICPENDR0,
-+		.base		= SGI_base(GICR_ICPENDR0),
- 		.len		= 0x04,
- 		.bits_per_irq	= 1,
- 		.handle_mmio	= handle_mmio_clear_pending_reg_redist,
- 	},
- 	{
--		.base		= GICR_ISACTIVER0,
-+		.base		= SGI_base(GICR_ISACTIVER0),
- 		.len		= 0x04,
- 		.bits_per_irq	= 1,
- 		.handle_mmio	= handle_mmio_raz_wi,
- 	},
- 	{
--		.base		= GICR_ICACTIVER0,
-+		.base		= SGI_base(GICR_ICACTIVER0),
- 		.len		= 0x04,
- 		.bits_per_irq	= 1,
- 		.handle_mmio	= handle_mmio_raz_wi,
- 	},
- 	{
--		.base		= GICR_IPRIORITYR0,
-+		.base		= SGI_base(GICR_IPRIORITYR0),
- 		.len		= 0x20,
- 		.bits_per_irq	= 8,
- 		.handle_mmio	= handle_mmio_priority_reg_redist,
- 	},
- 	{
--		.base		= GICR_ICFGR0,
-+		.base		= SGI_base(GICR_ICFGR0),
- 		.len		= 0x08,
- 		.bits_per_irq	= 2,
- 		.handle_mmio	= handle_mmio_cfg_reg_redist,
- 	},
- 	{
--		.base		= GICR_IGRPMODR0,
-+		.base		= SGI_base(GICR_IGRPMODR0),
- 		.len		= 0x04,
- 		.bits_per_irq	= 1,
- 		.handle_mmio	= handle_mmio_raz_wi,
- 	},
- 	{
--		.base		= GICR_NSACR,
-+		.base		= SGI_base(GICR_NSACR),
- 		.len		= 0x04,
- 		.handle_mmio	= handle_mmio_raz_wi,
- 	},
- 	{},
- };
- 
--static bool handle_mmio_ctlr_redist(struct kvm_vcpu *vcpu,
--				    struct kvm_exit_mmio *mmio,
--				    phys_addr_t offset)
--{
--	/* since we don't support LPIs, this register is zero for now */
--	vgic_reg_access(mmio, NULL, offset,
--			ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
--	return false;
--}
--
--static bool handle_mmio_typer_redist(struct kvm_vcpu *vcpu,
--				     struct kvm_exit_mmio *mmio,
--				     phys_addr_t offset)
--{
--	u32 reg;
--	u64 mpidr;
--	struct kvm_vcpu *redist_vcpu = mmio->private;
--	int target_vcpu_id = redist_vcpu->vcpu_id;
--
--	/* the upper 32 bits contain the affinity value */
--	if ((offset & ~3) == 4) {
--		mpidr = kvm_vcpu_get_mpidr_aff(redist_vcpu);
--		reg = compress_mpidr(mpidr);
--
--		vgic_reg_access(mmio, &reg, offset,
--				ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
--		return false;
--	}
--
--	reg = redist_vcpu->vcpu_id << 8;
--	if (target_vcpu_id == atomic_read(&vcpu->kvm->online_vcpus) - 1)
--		reg |= GICR_TYPER_LAST;
--	vgic_reg_access(mmio, &reg, offset,
--			ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
--	return false;
--}
--
--static const struct vgic_io_range vgic_redist_ranges[] = {
--	{
--		.base           = GICR_CTLR,
--		.len            = 0x04,
--		.bits_per_irq   = 0,
--		.handle_mmio    = handle_mmio_ctlr_redist,
--	},
--	{
--		.base           = GICR_TYPER,
--		.len            = 0x08,
--		.bits_per_irq   = 0,
--		.handle_mmio    = handle_mmio_typer_redist,
--	},
--	{
--		.base           = GICR_IIDR,
--		.len            = 0x04,
--		.bits_per_irq   = 0,
--		.handle_mmio    = handle_mmio_iidr,
--	},
--	{
--		.base           = GICR_WAKER,
--		.len            = 0x04,
--		.bits_per_irq   = 0,
--		.handle_mmio    = handle_mmio_raz_wi,
--	},
--	{
--		.base           = GICR_IDREGS,
--		.len            = 0x30,
--		.bits_per_irq   = 0,
--		.handle_mmio    = handle_mmio_idregs,
--	},
--	{},
--};
--
- /*
-  * This function splits accesses between the distributor and the two
-  * redistributor parts (private/SPI). As each redistributor is accessible
-@@ -726,7 +724,6 @@ static bool vgic_v3_handle_mmio(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	unsigned long rdbase = dist->vgic_redist_base;
- 	int nrcpus = atomic_read(&vcpu->kvm->online_vcpus);
- 	int vcpu_id;
--	const struct vgic_io_range *mmio_range;
- 
- 	if (is_in_range(mmio->phys_addr, mmio->len, dbase, GIC_V3_DIST_SIZE)) {
- 		return vgic_handle_mmio_range(vcpu, run, mmio,
-@@ -741,13 +738,8 @@ static bool vgic_v3_handle_mmio(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	rdbase += (vcpu_id * GIC_V3_REDIST_SIZE);
- 	mmio->private = kvm_get_vcpu(vcpu->kvm, vcpu_id);
- 
--	if (mmio->phys_addr >= rdbase + SGI_BASE_OFFSET) {
--		rdbase += SGI_BASE_OFFSET;
--		mmio_range = vgic_redist_sgi_ranges;
--	} else {
--		mmio_range = vgic_redist_ranges;
--	}
--	return vgic_handle_mmio_range(vcpu, run, mmio, mmio_range, rdbase);
-+	return vgic_handle_mmio_range(vcpu, run, mmio, vgic_redist_ranges,
-+				      rdbase);
++	/*
++	 * If the timer expired while we were not scheduled, now is the time
++	 * to inject it.
++	 */
++	if (kvm_timer_should_fire(vcpu))
++		kvm_timer_inject_irq(vcpu);
  }
- 
- static bool vgic_v3_queue_sgi(struct kvm_vcpu *vcpu, int irq)
--- 
+=20
+ /**
+@@ -134,16 +165,9 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+ 	cycle_t cval, now;
+ 	u64 ns;
+=20
+-	if ((timer->cntv_ctl & ARCH_TIMER_CTRL_IT_MASK) ||
+-		!(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE))
+-		return;
+-
+-	cval =3D timer->cntv_cval;
+-	now =3D kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
+-
+ 	BUG_ON(timer_is_armed(timer));
+=20
+-	if (cval <=3D now) {
++	if (kvm_timer_should_fire(vcpu)) {
+ 		/*
+ 		 * Timer has already expired while we were not
+ 		 * looking. Inject the interrupt and carry on.
+@@ -152,6 +176,9 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+ 		return;
+ 	}
+=20
++	cval =3D timer->cntv_cval;
++	now =3D kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
++
+ 	ns =3D cyclecounter_cyc2ns(timecounter->cc, cval - now, timecounter->=
+mask,
+ 				 &timecounter->frac);
+ 	timer_arm(timer, ns);
+--=20
 2.1.4
 
