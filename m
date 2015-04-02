@@ -1,25 +1,43 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 25/27] KVM: arm/arm64: prepare GICv3 emulation to use
- kvm_io_bus MMIO handling
-Date: Thu,  2 Apr 2015 11:05:29 +0100
-Message-ID: <1427969131-8445-26-git-send-email-marc.zyngier@arm.com>
-References: <1427969131-8445-1-git-send-email-marc.zyngier@arm.com>
+From: David Hildenbrand <dahi@linux.vnet.ibm.com>
+Subject: Re: [PATCH v2 06/10] KVM: arm64: guest debug, add SW break point
+ support
+Date: Thu, 2 Apr 2015 14:52:03 +0200
+Message-ID: <20150402145203.01c3654b@thinkpad-w530>
+References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
+ <1427814488-28467-7-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F00E94AE33
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 06:20:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F1274AE81
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 08:44:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9pTHqfH6ozsB for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Apr 2015 06:20:38 -0400 (EDT)
-Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
- [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 110514AE2B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 06:20:38 -0400 (EDT)
-In-Reply-To: <1427969131-8445-1-git-send-email-marc.zyngier@arm.com>
+ with ESMTP id 7SIMpc4qbUm9 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Apr 2015 08:44:55 -0400 (EDT)
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F29D74AE7D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 08:44:54 -0400 (EDT)
+Received: from /spool/local
+ by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <kvmarm@lists.cs.columbia.edu> from <dahi@linux.vnet.ibm.com>;
+ Thu, 2 Apr 2015 13:52:09 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com
+ (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+ by d06dlp03.portsmouth.uk.ibm.com (Postfix) with ESMTP id 4A8E81B08069
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 13:52:36 +0100 (BST)
+Received: from d06av01.portsmouth.uk.ibm.com (d06av01.portsmouth.uk.ibm.com
+ [9.149.37.212])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ t32Cq7w266519240
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 2 Apr 2015 12:52:07 GMT
+Received: from d06av01.portsmouth.uk.ibm.com (localhost [127.0.0.1])
+ by d06av01.portsmouth.uk.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+ t32Cq5mi006469
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 2 Apr 2015 06:52:06 -0600
+In-Reply-To: <1427814488-28467-7-git-send-email-alex.bennee@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,95 +47,90 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>
+Cc: Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, marc.zyngier@arm.com, jan.kiszka@siemens.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, Gleb Natapov <gleb@kernel.org>, linux-arm-kernel@lists.infradead.org, zhichao.huang@linaro.org, r65777@freescale.com, pbonzini@redhat.com, bp@suse.de, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Andre Przywara <andre.przywara@arm.com>
-
-Using the framework provided by the recent vgic.c changes, we
-register a kvm_io_bus device on mapping the virtual GICv3 resources.
-The distributor mapping is pretty straight forward, but the
-redistributors need some more love, since they need to be tagged with
-the respective redistributor (read: VCPU) they are connected with.
-We use the kvm_io_bus framework to register one devices per VCPU.
-
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- include/kvm/arm_vgic.h      |  1 +
- virt/kvm/arm/vgic-v3-emul.c | 39 ++++++++++++++++++++++++++++++++++++++-
- 2 files changed, 39 insertions(+), 1 deletion(-)
-
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 4523984..d6705f4 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -252,6 +252,7 @@ struct vgic_dist {
- 
- 	struct vgic_vm_ops	vm_ops;
- 	struct vgic_io_device	dist_iodev;
-+	struct vgic_io_device	*redist_iodevs;
- };
- 
- struct vgic_v2_cpu_if {
-diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
-index 2f03a36..eb1a797 100644
---- a/virt/kvm/arm/vgic-v3-emul.c
-+++ b/virt/kvm/arm/vgic-v3-emul.c
-@@ -758,6 +758,9 @@ static int vgic_v3_map_resources(struct kvm *kvm,
- {
- 	int ret = 0;
- 	struct vgic_dist *dist = &kvm->arch.vgic;
-+	gpa_t rdbase = dist->vgic_redist_base;
-+	struct vgic_io_device *iodevs = NULL;
-+	int i;
- 
- 	if (!irqchip_in_kernel(kvm))
- 		return 0;
-@@ -783,7 +786,41 @@ static int vgic_v3_map_resources(struct kvm *kvm,
- 		goto out;
- 	}
- 
--	kvm->arch.vgic.ready = true;
-+	ret = vgic_register_kvm_io_dev(kvm, dist->vgic_dist_base,
-+				       GIC_V3_DIST_SIZE, vgic_v3_dist_ranges,
-+				       -1, &dist->dist_iodev);
-+	if (ret)
-+		goto out;
-+
-+	iodevs = kcalloc(dist->nr_cpus, sizeof(iodevs[0]), GFP_KERNEL);
-+	if (!iodevs) {
-+		ret = -ENOMEM;
-+		goto out_unregister;
-+	}
-+
-+	for (i = 0; i < dist->nr_cpus; i++) {
-+		ret = vgic_register_kvm_io_dev(kvm, rdbase,
-+					       SZ_128K, vgic_redist_ranges,
-+					       i, &iodevs[i]);
-+		if (ret)
-+			goto out_unregister;
-+		rdbase += GIC_V3_REDIST_SIZE;
-+	}
-+
-+	dist->redist_iodevs = iodevs;
-+	dist->ready = true;
-+	goto out;
-+
-+out_unregister:
-+	kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS, &dist->dist_iodev.dev);
-+	if (iodevs) {
-+		for (i = 0; i < dist->nr_cpus; i++) {
-+			if (iodevs[i].dev.ops)
-+				kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
-+							  &iodevs[i].dev);
-+		}
-+	}
-+
- out:
- 	if (ret)
- 		kvm_vgic_destroy(kvm);
--- 
-2.1.4
+PiBUaGlzIGFkZHMgc3VwcG9ydCBmb3IgU1cgYnJlYWtwb2ludHMgaW5zZXJ0ZWQgYnkgdXNlcnNw
+YWNlLgo+IAo+IFdlIGRvIHRoaXMgYnkgdHJhcHBpbmcgYWxsIEJLUFQgZXhjZXB0aW9ucyBpbiB0
+aGUKPiBoeXBlcnZpc29yIChNRENSX0VMMl9UREUpLiBUaGUga3ZtX2RlYnVnX2V4aXRfYXJjaCBj
+YXJyaWVzIHRoZSBhZGRyZXNzCj4gb2YgdGhlIGV4Y2VwdGlvbi4gSWYgdXNlci1zcGFjZSBkb2Vz
+bid0IGtub3cgb2YgdGhlIGJyZWFrcG9pbnQgdGhlbiB3ZQo+IGhhdmUgYSBndWVzdCBpbnNlcnRl
+ZCBicmVha3BvaW50IGFuZCB0aGUgaHlwZXJ2aXNvciBuZWVkcyB0byBzdGFydCBhZ2Fpbgo+IGFu
+ZCBkZWxpdmVyIHRoZSBleGNlcHRpb24gdG8gZ3Vlc3QuCj4gCj4gU2lnbmVkLW9mZi1ieTogQWxl
+eCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgo+IAo+IC0tLQo+IHYyCj4gICAtIHVw
+ZGF0ZSB0byB1c2UgbmV3IGV4aXQgc3RydWN0Cj4gICAtIHR3ZWFrIGZvciBDIHNldHVwCj4gICAt
+IGRvIG91ciBzZXR1cCBpbiBkZWJ1Z19zZXR1cC9jbGVhciBjb2RlCj4gICAtIGZpeGVkIHVwIGNv
+bW1lbnRzCj4gCj4gZGlmZiAtLWdpdCBhL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4
+dCBiL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4dAo+IGluZGV4IDA2YzUwNjQuLjE3
+ZDRmOWMgMTAwNjQ0Cj4gLS0tIGEvRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGkudHh0Cj4g
+KysrIGIvRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGkudHh0Cj4gQEAgLTI2MjYsNyArMjYy
+Niw3IEBAIHdoZW4gcnVubmluZy4gQ29tbW9uIGNvbnRyb2wgYml0cyBhcmU6Cj4gIFRoZSB0b3Ag
+MTYgYml0cyBvZiB0aGUgY29udHJvbCBmaWVsZCBhcmUgYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGNv
+bnRyb2wKPiAgZmxhZ3Mgd2hpY2ggY2FuIGluY2x1ZGUgdGhlIGZvbGxvd2luZzoKPiAKPiAtICAt
+IEtWTV9HVUVTVERCR19VU0VfU1dfQlA6ICAgICB1c2luZyBzb2Z0d2FyZSBicmVha3BvaW50cyBb
+eDg2XQo+ICsgIC0gS1ZNX0dVRVNUREJHX1VTRV9TV19CUDogICAgIHVzaW5nIHNvZnR3YXJlIGJy
+ZWFrcG9pbnRzIFt4ODYsIGFybTY0XQo+ICAgIC0gS1ZNX0dVRVNUREJHX1VTRV9IV19CUDogICAg
+IHVzaW5nIGhhcmR3YXJlIGJyZWFrcG9pbnRzIFt4ODYsIHMzOTBdCj4gICAgLSBLVk1fR1VFU1RE
+QkdfSU5KRUNUX0RCOiAgICAgaW5qZWN0IERCIHR5cGUgZXhjZXB0aW9uIFt4ODZdCj4gICAgLSBL
+Vk1fR1VFU1REQkdfSU5KRUNUX0JQOiAgICAgaW5qZWN0IEJQIHR5cGUgZXhjZXB0aW9uIFt4ODZd
+Cj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtL2t2bS9hcm0uYyBiL2FyY2gvYXJtL2t2bS9hcm0uYwo+
+IGluZGV4IDdlYThiMGUuLmQzYmM4ZGMgMTAwNjQ0Cj4gLS0tIGEvYXJjaC9hcm0va3ZtL2FybS5j
+Cj4gKysrIGIvYXJjaC9hcm0va3ZtL2FybS5jCj4gQEAgLTMwNCw3ICszMDQsNyBAQCB2b2lkIGt2
+bV9hcmNoX3ZjcHVfcHV0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPiAgCWt2bV9hcm1fc2V0X3J1
+bm5pbmdfdmNwdShOVUxMKTsKPiAgfQo+IAo+IC0jZGVmaW5lIEtWTV9HVUVTVERCR19WQUxJRCAo
+S1ZNX0dVRVNUREJHX0VOQUJMRSkKPiArI2RlZmluZSBLVk1fR1VFU1REQkdfVkFMSUQgKEtWTV9H
+VUVTVERCR19FTkFCTEV8S1ZNX0dVRVNUREJHX1VTRV9TV19CUCkKPiAKPiAgaW50IGt2bV9hcmNo
+X3ZjcHVfaW9jdGxfc2V0X2d1ZXN0X2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiAgCQkJ
+CQlzdHJ1Y3Qga3ZtX2d1ZXN0X2RlYnVnICpkYmcpCj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQv
+a3ZtL2RlYnVnLmMgYi9hcmNoL2FybTY0L2t2bS9kZWJ1Zy5jCj4gaW5kZXggOGEyOWQwYi4uY2Zm
+MDQ3NSAxMDA2NDQKPiAtLS0gYS9hcmNoL2FybTY0L2t2bS9kZWJ1Zy5jCj4gKysrIGIvYXJjaC9h
+cm02NC9rdm0vZGVidWcuYwo+IEBAIC00NSwxMSArNDUsMTggQEAgdm9pZCBrdm1fYXJjaF9zZXR1
+cF9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4gIAl2Y3B1LT5hcmNoLm1kY3JfZWwyIHw9
+IChNRENSX0VMMl9UUE0gfCBNRENSX0VMMl9UUE1DUik7Cj4gIAl2Y3B1LT5hcmNoLm1kY3JfZWwy
+IHw9IChNRENSX0VMMl9URFJBIHwgTURDUl9FTDJfVERPU0EpOwo+IAo+ICsJLyogVHJhcCBkZWJ1
+ZyByZWdpc3RlciBhY2Nlc3M/ICovCgpUaGlzIHNob3VsZCBwcm9iYWJseSBnbyB0byB0aGUgZWFy
+bGllciBwYXRjaC4KCj4gIAlpZiAoIXZjcHUtPmFyY2guZGVidWdfZmxhZ3MgJiBLVk1fQVJNNjRf
+REVCVUdfRElSVFkpCj4gIAkJdmNwdS0+YXJjaC5tZGNyX2VsMiB8PSBNRENSX0VMMl9UREE7Cj4g
+IAllbHNlCj4gIAkJdmNwdS0+YXJjaC5tZGNyX2VsMiAmPSB+TURDUl9FTDJfVERBOwo+IAo+ICsJ
+LyogVHJhcCBicmVha3BvaW50cz8gKi8KPiArCWlmICh2Y3B1LT5ndWVzdF9kZWJ1ZyAmIEtWTV9H
+VUVTVERCR19VU0VfU1dfQlApCj4gKwkJdmNwdS0+YXJjaC5tZGNyX2VsMiB8PSBNRENSX0VMMl9U
+REU7Cj4gKwllbHNlCj4gKwkJdmNwdS0+YXJjaC5tZGNyX2VsMiAmPSB+TURDUl9FTDJfVERFOwoK
+QWdhaW4sIGEgY2FuZGlkYXRlIGZvciBjbGVhcl9kZWJ1Zz8KCj4gKwo+ICB9Cj4gCj4gIHZvaWQg
+a3ZtX2FyY2hfY2xlYXJfZGVidWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+IGRpZmYgLS1naXQg
+YS9hcmNoL2FybTY0L2t2bS9oYW5kbGVfZXhpdC5jIGIvYXJjaC9hcm02NC9rdm0vaGFuZGxlX2V4
+aXQuYwo+IGluZGV4IDUyNGZhMjUuLmVkMWJiYjQgMTAwNjQ0Cj4gLS0tIGEvYXJjaC9hcm02NC9r
+dm0vaGFuZGxlX2V4aXQuYwo+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMKPiBA
+QCAtODIsNiArODIsMzcgQEAgc3RhdGljIGludCBrdm1faGFuZGxlX3dmeChzdHJ1Y3Qga3ZtX3Zj
+cHUgKnZjcHUsIHN0cnVjdCBrdm1fcnVuICpydW4pCj4gIAlyZXR1cm4gMTsKPiAgfQo+IAo+ICsv
+KioKPiArICoga3ZtX2hhbmRsZV9kZWJ1Z19leGNlcHRpb24gLSBoYW5kbGUgYSBkZWJ1ZyBleGNl
+cHRpb24gaW5zdHJ1Y3Rpb24KCiJrdm1faGFuZGxlX2d1ZXN0X2RlYnVnIgoKPiArICoKPiArICog
+QHZjcHU6CXRoZSB2Y3B1IHBvaW50ZXIKPiArICogQHJ1bjoJYWNjZXNzIHRvIHRoZSBrdm1fcnVu
+IHN0cnVjdHVyZSBmb3IgcmVzdWx0cwo+ICsgKgo+ICsgKiBXZSByb3V0ZSBhbGwgZGVidWcgZXhj
+ZXB0aW9ucyB0aHJvdWdoIHRoZSBzYW1lIGhhbmRsZXIgYXMgd2UKPiArICoganVzdCBuZWVkIHRv
+IHJlcG9ydCB0aGUgUEMgYW5kIHRoZSBIU1IgdmFsdWVzIHRvIHVzZXJzcGFjZS4KPiArICogVXNl
+cnNwYWNlIG1heSBkZWNpZGUgdG8gcmUtaW5qZWN0IHRoZSBleGNlcHRpb24gYW5kIGRlbGl2ZXIg
+aXQgdG8KPiArICogdGhlIGd1ZXN0IGlmIGl0IHdhc24ndCBmb3IgdGhlIGhvc3QgdG8gZGVhbCB3
+aXRoLgo+ICsgKi8KPiArc3RhdGljIGludCBrdm1faGFuZGxlX2d1ZXN0X2RlYnVnKHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSwgc3RydWN0IGt2bV9ydW4gKnJ1bikKPiArewo+ICsJdTMyIGhzciA9IGt2
+bV92Y3B1X2dldF9oc3IodmNwdSk7Cj4gKwo+ICsJcnVuLT5leGl0X3JlYXNvbiA9IEtWTV9FWElU
+X0RFQlVHOwo+ICsJcnVuLT5kZWJ1Zy5hcmNoLmhzciA9IGhzcjsKPiArCj4gKwlzd2l0Y2ggKGhz
+ciA+PiBFU1JfRUx4X0VDX1NISUZUKSB7Cj4gKwljYXNlIEVTUl9FTHhfRUNfQktQVDMyOgo+ICsJ
+Y2FzZSBFU1JfRUx4X0VDX0JSSzY0Ogo+ICsJCXJ1bi0+ZGVidWcuYXJjaC5wYyA9ICp2Y3B1X3Bj
+KHZjcHUpOwo+ICsJCWJyZWFrOwo+ICsJZGVmYXVsdDoKPiArCQlrdm1fZXJyKCIlczogdW4taGFu
+ZGxlZCBjYXNlIGhzcjogJSMwOHhcbiIsCj4gKwkJCV9fZnVuY19fLCAodW5zaWduZWQgaW50KSBo
+c3IpOwoKRG9uJ3QgeW91IHdhbnQgdG8gZmFpbCBoYXJkIGluIHRoaXMgY2FzZT8gVGhpcyBtaWdo
+dCByZXN1bHQgaW4gbWFueSBtZXNzYWdlcy4KcmV0dXJuaW5nIDAgZmVlbHMgd3JvbmcuCgo+ICsJ
+CWJyZWFrOwo+ICsJfQo+ICsJcmV0dXJuIDA7Cj4gK30KPiArCj4gIHN0YXRpYyBleGl0X2hhbmRs
+ZV9mbiBhcm1fZXhpdF9oYW5kbGVyc1tdID0gewo+ICAJW0VTUl9FTHhfRUNfV0Z4XQk9IGt2bV9o
+YW5kbGVfd2Z4LAo+ICAJW0VTUl9FTHhfRUNfQ1AxNV8zMl0JPSBrdm1faGFuZGxlX2NwMTVfMzIs
+Cj4gQEAgLTk2LDYgKzEyNyw4IEBAIHN0YXRpYyBleGl0X2hhbmRsZV9mbiBhcm1fZXhpdF9oYW5k
+bGVyc1tdID0gewo+ICAJW0VTUl9FTHhfRUNfU1lTNjRdCT0ga3ZtX2hhbmRsZV9zeXNfcmVnLAo+
+ICAJW0VTUl9FTHhfRUNfSUFCVF9MT1ddCT0ga3ZtX2hhbmRsZV9ndWVzdF9hYm9ydCwKPiAgCVtF
+U1JfRUx4X0VDX0RBQlRfTE9XXQk9IGt2bV9oYW5kbGVfZ3Vlc3RfYWJvcnQsCj4gKwlbRVNSX0VM
+eF9FQ19CS1BUMzJdCT0ga3ZtX2hhbmRsZV9ndWVzdF9kZWJ1ZywKPiArCVtFU1JfRUx4X0VDX0JS
+SzY0XQk9IGt2bV9oYW5kbGVfZ3Vlc3RfZGVidWcsCj4gIH07Cj4gCj4gIHN0YXRpYyBleGl0X2hh
+bmRsZV9mbiBrdm1fZ2V0X2V4aXRfaGFuZGxlcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCgoKRGF2
+aWQKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFy
+bSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3Rz
+LmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
