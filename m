@@ -1,22 +1,24 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [GIT PULL] KVM/ARM updates for v4.1
-Date: Thu,  2 Apr 2015 11:05:04 +0100
-Message-ID: <1427969131-8445-1-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 02/27] KVM: arm/arm64: prefer IS_ENABLED to a static variable
+Date: Thu,  2 Apr 2015 11:05:06 +0100
+Message-ID: <1427969131-8445-3-git-send-email-marc.zyngier@arm.com>
+References: <1427969131-8445-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ECB794AD13
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 05:57:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9885C4AD13
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 05:57:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lHXsk99pmso3 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Apr 2015 05:57:46 -0400 (EDT)
+ with ESMTP id KL3yqeJ2snVP for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Apr 2015 05:57:47 -0400 (EDT)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5794F4AD0D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 05:57:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 91B0C4AD12
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 05:57:47 -0400 (EDT)
+In-Reply-To: <1427969131-8445-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,97 +32,76 @@ To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
 Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-UGFvbG8sIE1hcmNlbG8sCgpUaGlzIGlzIHRoZSBwdWxsIHJlcXVlc3QgZm9yIHRoZSBLVk0vQVJN
-IHVwZGF0ZXMgdGFyZ2V0aW5nIHY0LjEuIEl0CmNvbnRhaW5zIGEgbnVtYmVyIG9mIGltcG9ydGFu
-dCB1cGRhdGVzIGJyaW5naW5nIHRoZSBwb3J0IG11Y2ggY2xvc2VyCnRvIGZlYXR1cmUgY29tcGxl
-dGVuZXNzLgoKTm90ZSB0aGF0IG1lcmdpbmcgdGhpcyB3aWxsIGdlbmVyYXRlIGEgc21hbGwgY29u
-ZmxpY3QgaW4KdmlydC9rdm0vYXJtL3ZnaWMuYywgd2hpY2ggc2hvdWxkIGJlIHJlc29sdmVkIGFz
-IHBlciBsaW51eC1uZXh0LgoKVGhhbmtzLAoKCU0uCgpUaGUgZm9sbG93aW5nIGNoYW5nZXMgc2lu
-Y2UgY29tbWl0IDRmZjZmOGU2MWViN2Y5NmQzY2E1MzVjNmQyNDBmODYzY2NkNmZiN2Q6CgogIEtW
-TTogZW11bGF0ZTogZml4IENNUFhDSEc4QiBvbiAzMi1iaXQgaG9zdHMgKDIwMTUtMDItMjMgMjI6
-Mjg6NDggKzAxMDApCgphcmUgYXZhaWxhYmxlIGluIHRoZSBnaXQgcmVwb3NpdG9yeSBhdDoKCiAg
-Z2l0Oi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3NjbS9saW51eC9rZXJuZWwvZ2l0L2t2bWFybS9rdm1h
-cm0uZ2l0IHRhZ3Mva3ZtLWFybS1mb3ItNC4xCgpmb3IgeW91IHRvIGZldGNoIGNoYW5nZXMgdXAg
-dG8gZDQ0NzU4YzBkZmM1OTkzYTRiOTk1MjkzNWE3ZWFlNGM5MWViYjZiNDoKCiAgS1ZNOiBhcm0v
-YXJtNjQ6IGVuYWJsZSBLVk1fQ0FQX0lPRVZFTlRGRCAoMjAxNS0wMy0zMCAxNzowNzoyNCArMDEw
-MCkKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0KS1ZNL0FSTSBjaGFuZ2VzIGZvciB2NC4xOgoKLSBmaXhlcyBmb3IgbGl2ZSBt
-aWdyYXRpb24KLSBpcnFmZCBzdXBwb3J0Ci0ga3ZtLWlvLWJ1cyAmIHZnaWMgcmV3b3JrIHRvIGVu
-YWJsZSBpb2V2ZW50ZmQKLSBwYWdlIGFnZWluZyBmb3Igc3RhZ2UtMiB0cmFuc2xhdGlvbgotIHZh
-cmlvdXMgY2xlYW51cHMKCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KQWxleCBCZW5uw6llICgyKToKICAgICAgYXJtL2FybTY0
-OiBLVk06IGV4cG9ydCBWQ1BVIHBvd2VyIHN0YXRlIHZpYSBNUF9TVEFURSBpb2N0bAogICAgICBh
-cm0vYXJtNjQ6IEtWTTogYWRkIGEgY29tbW9uIHZnaWNfcXVldWVfaXJxX3RvX2xyIGZuCgpBbmRy
-ZSBQcnp5d2FyYSAoMTApOgogICAgICBLVk06IG1vdmUgaW9kZXYuaCBmcm9tIHZpcnQva3ZtLyB0
-byBpbmNsdWRlL2t2bQogICAgICBLVk06IGFybS9hcm02NDogcmVtb3ZlIG5vdyB1bm5lZWRlZCBp
-bmNsdWRlIGRpcmVjdG9yeSBmcm9tIE1ha2VmaWxlCiAgICAgIEtWTTogeDg2OiByZW1vdmUgbm93
-IHVubmVlZGVkIGluY2x1ZGUgZGlyZWN0b3J5IGZyb20gTWFrZWZpbGUKICAgICAgS1ZNOiBhcm0v
-YXJtNjQ6IHJlbmFtZSBzdHJ1Y3Qga3ZtX21taW9fcmFuZ2UgdG8gdmdpY19pb19yYW5nZQogICAg
-ICBLVk06IGFybS9hcm02NDogc2ltcGxpZnkgdmdpY19maW5kX3JhbmdlKCkgYW5kIGNhbGxlcnMK
-ICAgICAgS1ZNOiBhcm0vYXJtNjQ6IGltcGxlbWVudCBrdm1faW9fYnVzIE1NSU8gaGFuZGxpbmcg
-Zm9yIHRoZSBWR0lDCiAgICAgIEtWTTogYXJtL2FybTY0OiBwcmVwYXJlIEdJQ3YyIGVtdWxhdGlv
-biB0byBiZSBoYW5kbGVkIGJ5IGt2bV9pb19idXMKICAgICAgS1ZNOiBhcm0vYXJtNjQ6IG1lcmdl
-IEdJQ3YzIFJEX2Jhc2UgYW5kIFNHSV9iYXNlIHJlZ2lzdGVyIGZyYW1lcwogICAgICBLVk06IGFy
-bS9hcm02NDogcHJlcGFyZSBHSUN2MyBlbXVsYXRpb24gdG8gdXNlIGt2bV9pb19idXMgTU1JTyBo
-YW5kbGluZwogICAgICBLVk06IGFybS9hcm02NDogcmV3b3JrIE1NSU8gYWJvcnQgaGFuZGxpbmcg
-dG8gdXNlIEtWTSBNTUlPIGJ1cwoKQ2hyaXN0b2ZmZXIgRGFsbCAoMyk6CiAgICAgIGFybS9hcm02
-NDogS1ZNOiBLaWxsIENPTkZJR19LVk1fQVJNX3tWR0lDLFRJTUVSfQogICAgICBhcm0vYXJtNjQ6
-IEtWTTogc3VwcG9ydCBmb3IgdW4tcXVldWluZyBhY3RpdmUgSVJRcwogICAgICBhcm0vYXJtNjQ6
-IEtWTTogRml4IG1pZ3JhdGlvbiByYWNlIGluIHRoZSBhcmNoIHRpbWVyCgpFcmljIEF1Z2VyICg1
-KToKICAgICAgS1ZNOiBhcm0vYXJtNjQ6IHVuc2V0IENPTkZJR19IQVZFX0tWTV9JUlFDSElQCiAg
-ICAgIEtWTTogaW50cm9kdWNlIGt2bV9hcmNoX2ludGNfaW5pdGlhbGl6ZWQgYW5kIHVzZSBpdCBp
-biBpcnFmZAogICAgICBLVk06IGFybS9hcm02NDogaW1wbGVtZW50IGt2bV9hcmNoX2ludGNfaW5p
-dGlhbGl6ZWQKICAgICAgS1ZNOiBhcm0vYXJtNjQ6IHJlbW92ZSBjb2Fyc2UgZ3JhaW4gZGlzdCBs
-b2NraW5nIGF0IGt2bV92Z2ljX3N5bmNfaHdzdGF0ZQogICAgICBLVk06IGFybS9hcm02NDogYWRk
-IGlycWZkIHN1cHBvcnQKCk1hcmMgWnluZ2llciAoMyk6CiAgICAgIGFybS9hcm02NDogS1ZNOiBB
-bGxvdyBoYW5kbGVfaHZhX3RvX2dwYSB0byByZXR1cm4gYSB2YWx1ZQogICAgICBhcm0vYXJtNjQ6
-IEtWTTogSW1wbGVtZW50IFN0YWdlLTIgcGFnZSBhZ2luZwogICAgICBhcm0vYXJtNjQ6IEtWTTog
-T3B0aW1pemUgaGFuZGxpbmcgb2YgQWNjZXNzIEZsYWcgZmF1bHRzCgpNYXJrIFJ1dGxhbmQgKDEp
-OgogICAgICBLVk06IHZnaWM6IGFkZCB2aXJ0LWNhcGFibGUgY29tcGF0aWJsZSBzdHJpbmdzCgpO
-aWtvbGF5IE5pa29sYWV2ICgyKToKICAgICAgS1ZNOiBSZWRlc2lnbiBrdm1faW9fYnVzXyBBUEkg
-dG8gcGFzcyBWQ1BVIHN0cnVjdHVyZSB0byB0aGUgY2FsbGJhY2tzLgogICAgICBLVk06IGFybS9h
-cm02NDogZW5hYmxlIEtWTV9DQVBfSU9FVkVOVEZECgpQYW9sbyBCb256aW5pICgxKToKICAgICAg
-S1ZNOiBhcm0vYXJtNjQ6IHByZWZlciBJU19FTkFCTEVEIHRvIGEgc3RhdGljIHZhcmlhYmxlCgog
-RG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGkudHh0IHwgIDIyICstCiBhcmNoL2FybS9pbmNs
-dWRlL2FzbS9rdm1fYXJtLmggICAgfCAgIDEgKwogYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hv
-c3QuaCAgIHwgIDE1ICstCiBhcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1fbW1pby5oICAgfCAgMjIg
-LS0KIGFyY2gvYXJtL2luY2x1ZGUvdWFwaS9hc20va3ZtLmggICB8ICAgMyArCiBhcmNoL2FybS9r
-ZXJuZWwvYXNtLW9mZnNldHMuYyAgICAgfCAgIDQgLQogYXJjaC9hcm0va3ZtL0tjb25maWcgICAg
-ICAgICAgICAgIHwgIDMwICstLQogYXJjaC9hcm0va3ZtL01ha2VmaWxlICAgICAgICAgICAgIHwg
-IDEyICstCiBhcmNoL2FybS9rdm0vYXJtLmMgICAgICAgICAgICAgICAgfCAgNDUgKystLQogYXJj
-aC9hcm0va3ZtL2d1ZXN0LmMgICAgICAgICAgICAgIHwgIDE4IC0tCiBhcmNoL2FybS9rdm0vaW50
-ZXJydXB0c19oZWFkLlMgICAgfCAgIDggLQogYXJjaC9hcm0va3ZtL21taW8uYyAgICAgICAgICAg
-ICAgIHwgIDY0ICsrLS0tCiBhcmNoL2FybS9rdm0vbW11LmMgICAgICAgICAgICAgICAgfCAxMzQg
-KysrKysrKysrKy0KIGFyY2gvYXJtL2t2bS90cmFjZS5oICAgICAgICAgICAgICB8ICA0OCArKysr
-CiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2Vzci5oICAgICAgfCAgIDEgKwogYXJjaC9hcm02NC9p
-bmNsdWRlL2FzbS9rdm1fYXJtLmggIHwgICAxICsKIGFyY2gvYXJtNjQvaW5jbHVkZS9hc20va3Zt
-X2hvc3QuaCB8ICAxNSArLQogYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1fbW1pby5oIHwgIDIy
-IC0tCiBhcmNoL2FybTY0L2luY2x1ZGUvdWFwaS9hc20va3ZtLmggfCAgIDMgKwogYXJjaC9hcm02
-NC9rdm0vS2NvbmZpZyAgICAgICAgICAgIHwgIDE4ICstCiBhcmNoL2FybTY0L2t2bS9NYWtlZmls
-ZSAgICAgICAgICAgfCAgMjAgKy0KIGFyY2gvcG93ZXJwYy9rdm0vbXBpYy5jICAgICAgICAgICB8
-ICAxMiArLQogYXJjaC9wb3dlcnBjL2t2bS9wb3dlcnBjLmMgICAgICAgIHwgICA0ICstCiBhcmNo
-L3MzOTAva3ZtL2RpYWcuYyAgICAgICAgICAgICAgfCAgIDIgKy0KIGFyY2gveDg2L2t2bS9NYWtl
-ZmlsZSAgICAgICAgICAgICB8ICAgMiArLQogYXJjaC94ODYva3ZtL2k4MjU0LmMgICAgICAgICAg
-ICAgIHwgIDE0ICstCiBhcmNoL3g4Ni9rdm0vaTgyNTQuaCAgICAgICAgICAgICAgfCAgIDIgKy0K
-IGFyY2gveDg2L2t2bS9pODI1OS5jICAgICAgICAgICAgICB8ICAxMiArLQogYXJjaC94ODYva3Zt
-L2lvYXBpYy5jICAgICAgICAgICAgIHwgICA4ICstCiBhcmNoL3g4Ni9rdm0vaW9hcGljLmggICAg
-ICAgICAgICAgfCAgIDIgKy0KIGFyY2gveDg2L2t2bS9pcnEuaCAgICAgICAgICAgICAgICB8ICAg
-MiArLQogYXJjaC94ODYva3ZtL2xhcGljLmMgICAgICAgICAgICAgIHwgICA0ICstCiBhcmNoL3g4
-Ni9rdm0vbGFwaWMuaCAgICAgICAgICAgICAgfCAgIDIgKy0KIGFyY2gveDg2L2t2bS92bXguYyAg
-ICAgICAgICAgICAgICB8ICAgMiArLQogYXJjaC94ODYva3ZtL3g4Ni5jICAgICAgICAgICAgICAg
-IHwgIDEzICstCiBpbmNsdWRlL2t2bS9hcm1fYXJjaF90aW1lci5oICAgICAgfCAgMzEgKy0tCiBp
-bmNsdWRlL2t2bS9hcm1fdmdpYy5oICAgICAgICAgICAgfCAxMTcgKystLS0tLS0tLQoge3ZpcnQg
-PT4gaW5jbHVkZX0va3ZtL2lvZGV2LmggICAgIHwgIDI4ICsrLQogaW5jbHVkZS9saW51eC9rdm1f
-aG9zdC5oICAgICAgICAgIHwgIDI0ICstCiB2aXJ0L2t2bS9hcm0vYXJjaF90aW1lci5jICAgICAg
-ICAgfCAgNDUgKysrLQogdmlydC9rdm0vYXJtL3ZnaWMtdjItZW11bC5jICAgICAgIHwgIDcxICsr
-Ky0tLQogdmlydC9rdm0vYXJtL3ZnaWMtdjMtZW11bC5jICAgICAgIHwgMjQ2ICsrKysrKysrKyst
-LS0tLS0tLS0tCiB2aXJ0L2t2bS9hcm0vdmdpYy5jICAgICAgICAgICAgICAgfCA0NzYgKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0KIHZpcnQva3ZtL2FybS92Z2ljLmggICAg
-ICAgICAgICAgICB8ICAzNyArKy0KIHZpcnQva3ZtL2NvYWxlc2NlZF9tbWlvLmMgICAgICAgICB8
-ICAgNyArLQogdmlydC9rdm0vZXZlbnRmZC5jICAgICAgICAgICAgICAgIHwgICA5ICstCiB2aXJ0
-L2t2bS9rdm1fbWFpbi5jICAgICAgICAgICAgICAgfCAgMzQgKy0tCiA0NyBmaWxlcyBjaGFuZ2Vk
-LCAxMDExIGluc2VydGlvbnMoKyksIDcwMSBkZWxldGlvbnMoLSkKIHJlbmFtZSB7dmlydCA9PiBp
-bmNsdWRlfS9rdm0vaW9kZXYuaCAoNjYlKQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1
-bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9r
-dm1hcm0K
+From: Paolo Bonzini <pbonzini@redhat.com>
+
+IS_ENABLED gives compile-time checking and keeps the code clearer.
+
+The one exception is inside kvm_vm_ioctl_check_extension, where
+the established idiom is to wrap the case labels with an #ifdef.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/arm/kvm/arm.c | 17 +++++------------
+ 1 file changed, 5 insertions(+), 12 deletions(-)
+
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 5560f74..e0e9434 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -61,8 +61,6 @@ static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
+ static u8 kvm_next_vmid;
+ static DEFINE_SPINLOCK(kvm_vmid_lock);
+ 
+-static bool vgic_present;
+-
+ static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
+ {
+ 	BUG_ON(preemptible());
+@@ -172,9 +170,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ {
+ 	int r;
+ 	switch (ext) {
++#ifdef CONFIG_KVM_ARM_VGIC
+ 	case KVM_CAP_IRQCHIP:
+-		r = vgic_present;
+-		break;
++#endif
+ 	case KVM_CAP_DEVICE_CTRL:
+ 	case KVM_CAP_USER_MEMORY:
+ 	case KVM_CAP_SYNC_MMU:
+@@ -831,7 +829,7 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+ 
+ 	switch (dev_id) {
+ 	case KVM_ARM_DEVICE_VGIC_V2:
+-		if (!vgic_present)
++		if (!IS_ENABLED(CONFIG_KVM_ARM_VGIC))
+ 			return -ENXIO;
+ 		return kvm_vgic_addr(kvm, type, &dev_addr->addr, true);
+ 	default:
+@@ -847,10 +845,9 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 
+ 	switch (ioctl) {
+ 	case KVM_CREATE_IRQCHIP: {
+-		if (vgic_present)
+-			return kvm_vgic_create(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
+-		else
++		if (!IS_ENABLED(CONFIG_KVM_ARM_VGIC))
+ 			return -ENXIO;
++		return kvm_vgic_create(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
+ 	}
+ 	case KVM_ARM_SET_DEVICE_ADDR: {
+ 		struct kvm_arm_device_addr dev_addr;
+@@ -1035,10 +1032,6 @@ static int init_hyp_mode(void)
+ 	if (err)
+ 		goto out_free_context;
+ 
+-#ifdef CONFIG_KVM_ARM_VGIC
+-		vgic_present = true;
+-#endif
+-
+ 	/*
+ 	 * Init HYP architected timer support
+ 	 */
+-- 
+2.1.4
