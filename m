@@ -1,24 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 26/27] KVM: arm/arm64: rework MMIO abort handling to use KVM
- MMIO bus
-Date: Thu,  2 Apr 2015 11:05:30 +0100
-Message-ID: <1427969131-8445-27-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 14/27] arm/arm64: KVM: support for un-queuing active IRQs
+Date: Thu,  2 Apr 2015 11:05:18 +0100
+Message-ID: <1427969131-8445-15-git-send-email-marc.zyngier@arm.com>
 References: <1427969131-8445-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC8904AD54
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 06:12:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 78E9A4AD69
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 06:12:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6w7NV1QQeA2d for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Apr 2015 06:12:16 -0400 (EDT)
+ with ESMTP id z9MsGZhxoS3D for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Apr 2015 06:12:46 -0400 (EDT)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DB40E4AD53
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 06:12:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E530A4AD68
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 06:12:45 -0400 (EDT)
 In-Reply-To: <1427969131-8445-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,536 +32,297 @@ To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
 Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Andre Przywara <andre.przywara@arm.com>
-
-Currently we have struct kvm_exit_mmio for encapsulating MMIO abort
-data to be passed on from syndrome decoding all the way down to the
-VGIC register handlers. Now as we switch the MMIO handling to be
-routed through the KVM MMIO bus, it does not make sense anymore to
-use that structure already from the beginning. So we keep the data in
-local variables until we put them into the kvm_io_bus framework.
-Then we fill kvm_exit_mmio in the VGIC only, making it a VGIC private
-structure. On that way we replace the data buffer in that structure
-with a pointer pointing to a single location in a local variable, so
-we get rid of some copying on the way.
-With all of the virtual GIC emulation code now being registered with
-the kvm_io_bus, we can remove all of the old MMIO handling code and
-its dispatching functionality.
-
-I didn't bother to rename kvm_exit_mmio (to vgic_mmio or something),
-because that touches a lot of code lines without any good reason.
-
-This is based on an original patch by Nikolay.
-
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Cc: Nikolay Nikolaev <n.nikolaev@virtualopensystems.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm/include/asm/kvm_mmio.h   | 22 ---------
- arch/arm/kvm/mmio.c               | 64 +++++++++++++++------------
- arch/arm64/include/asm/kvm_mmio.h | 22 ---------
- include/kvm/arm_vgic.h            |  6 ---
- virt/kvm/arm/vgic-v2-emul.c       | 21 +--------
- virt/kvm/arm/vgic-v3-emul.c       | 35 ---------------
- virt/kvm/arm/vgic.c               | 93 ++++-----------------------------------
- virt/kvm/arm/vgic.h               | 13 +++---
- 8 files changed, 55 insertions(+), 221 deletions(-)
-
-diff --git a/arch/arm/include/asm/kvm_mmio.h b/arch/arm/include/asm/kvm_mmio.h
-index 3f83db2..d8e90c8 100644
---- a/arch/arm/include/asm/kvm_mmio.h
-+++ b/arch/arm/include/asm/kvm_mmio.h
-@@ -28,28 +28,6 @@ struct kvm_decode {
- 	bool sign_extend;
- };
- 
--/*
-- * The in-kernel MMIO emulation code wants to use a copy of run->mmio,
-- * which is an anonymous type. Use our own type instead.
-- */
--struct kvm_exit_mmio {
--	phys_addr_t	phys_addr;
--	u8		data[8];
--	u32		len;
--	bool		is_write;
--	void		*private;
--};
--
--static inline void kvm_prepare_mmio(struct kvm_run *run,
--				    struct kvm_exit_mmio *mmio)
--{
--	run->mmio.phys_addr	= mmio->phys_addr;
--	run->mmio.len		= mmio->len;
--	run->mmio.is_write	= mmio->is_write;
--	memcpy(run->mmio.data, mmio->data, mmio->len);
--	run->exit_reason	= KVM_EXIT_MMIO;
--}
--
- int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
- int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		 phys_addr_t fault_ipa);
-diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-index 5d3bfc0..974b1c6 100644
---- a/arch/arm/kvm/mmio.c
-+++ b/arch/arm/kvm/mmio.c
-@@ -121,12 +121,11 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	return 0;
- }
- 
--static int decode_hsr(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
--		      struct kvm_exit_mmio *mmio)
-+static int decode_hsr(struct kvm_vcpu *vcpu, bool *is_write, int *len)
- {
- 	unsigned long rt;
--	int len;
--	bool is_write, sign_extend;
-+	int access_size;
-+	bool sign_extend;
- 
- 	if (kvm_vcpu_dabt_isextabt(vcpu)) {
- 		/* cache operation on I/O addr, tell guest unsupported */
-@@ -140,17 +139,15 @@ static int decode_hsr(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 		return 1;
- 	}
- 
--	len = kvm_vcpu_dabt_get_as(vcpu);
--	if (unlikely(len < 0))
--		return len;
-+	access_size = kvm_vcpu_dabt_get_as(vcpu);
-+	if (unlikely(access_size < 0))
-+		return access_size;
- 
--	is_write = kvm_vcpu_dabt_iswrite(vcpu);
-+	*is_write = kvm_vcpu_dabt_iswrite(vcpu);
- 	sign_extend = kvm_vcpu_dabt_issext(vcpu);
- 	rt = kvm_vcpu_dabt_get_rd(vcpu);
- 
--	mmio->is_write = is_write;
--	mmio->phys_addr = fault_ipa;
--	mmio->len = len;
-+	*len = access_size;
- 	vcpu->arch.mmio_decode.sign_extend = sign_extend;
- 	vcpu->arch.mmio_decode.rt = rt;
- 
-@@ -165,20 +162,20 @@ static int decode_hsr(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		 phys_addr_t fault_ipa)
- {
--	struct kvm_exit_mmio mmio;
- 	unsigned long data;
- 	unsigned long rt;
- 	int ret;
-+	bool is_write;
-+	int len;
-+	u8 data_buf[8];
- 
- 	/*
--	 * Prepare MMIO operation. First stash it in a private
--	 * structure that we can use for in-kernel emulation. If the
--	 * kernel can't handle it, copy it into run->mmio and let user
--	 * space do its magic.
-+	 * Prepare MMIO operation. First decode the syndrome data we get
-+	 * from the CPU. Then try if some in-kernel emulation feels
-+	 * responsible, otherwise let user space do its magic.
- 	 */
--
- 	if (kvm_vcpu_dabt_isvalid(vcpu)) {
--		ret = decode_hsr(vcpu, fault_ipa, &mmio);
-+		ret = decode_hsr(vcpu, &is_write, &len);
- 		if (ret)
- 			return ret;
- 	} else {
-@@ -188,21 +185,34 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 
- 	rt = vcpu->arch.mmio_decode.rt;
- 
--	if (mmio.is_write) {
--		data = vcpu_data_guest_to_host(vcpu, *vcpu_reg(vcpu, rt),
--					       mmio.len);
-+	if (is_write) {
-+		data = vcpu_data_guest_to_host(vcpu, *vcpu_reg(vcpu, rt), len);
-+
-+		trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, len, fault_ipa, data);
-+		mmio_write_buf(data_buf, len, data);
- 
--		trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, mmio.len,
--			       fault_ipa, data);
--		mmio_write_buf(mmio.data, mmio.len, data);
-+		ret = kvm_io_bus_write(vcpu, KVM_MMIO_BUS, fault_ipa, len,
-+				       data_buf);
- 	} else {
--		trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, mmio.len,
-+		trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, len,
- 			       fault_ipa, 0);
-+
-+		ret = kvm_io_bus_read(vcpu, KVM_MMIO_BUS, fault_ipa, len,
-+				      data_buf);
- 	}
- 
--	if (vgic_handle_mmio(vcpu, run, &mmio))
-+	/* Now prepare kvm_run for the potential return to userland. */
-+	run->mmio.is_write	= is_write;
-+	run->mmio.phys_addr	= fault_ipa;
-+	run->mmio.len		= len;
-+	memcpy(run->mmio.data, data_buf, len);
-+
-+	if (!ret) {
-+		/* We handled the access successfully in the kernel. */
-+		kvm_handle_mmio_return(vcpu, run);
- 		return 1;
-+	}
- 
--	kvm_prepare_mmio(run, &mmio);
-+	run->exit_reason	= KVM_EXIT_MMIO;
- 	return 0;
- }
-diff --git a/arch/arm64/include/asm/kvm_mmio.h b/arch/arm64/include/asm/kvm_mmio.h
-index 9f52beb..889c908 100644
---- a/arch/arm64/include/asm/kvm_mmio.h
-+++ b/arch/arm64/include/asm/kvm_mmio.h
-@@ -31,28 +31,6 @@ struct kvm_decode {
- 	bool sign_extend;
- };
- 
--/*
-- * The in-kernel MMIO emulation code wants to use a copy of run->mmio,
-- * which is an anonymous type. Use our own type instead.
-- */
--struct kvm_exit_mmio {
--	phys_addr_t	phys_addr;
--	u8		data[8];
--	u32		len;
--	bool		is_write;
--	void		*private;
--};
--
--static inline void kvm_prepare_mmio(struct kvm_run *run,
--				    struct kvm_exit_mmio *mmio)
--{
--	run->mmio.phys_addr	= mmio->phys_addr;
--	run->mmio.len		= mmio->len;
--	run->mmio.is_write	= mmio->is_write;
--	memcpy(run->mmio.data, mmio->data, mmio->len);
--	run->exit_reason	= KVM_EXIT_MMIO;
--}
--
- int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
- int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		 phys_addr_t fault_ipa);
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index d6705f4..16ec2c8 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -140,8 +140,6 @@ struct vgic_params {
- };
- 
- struct vgic_vm_ops {
--	bool	(*handle_mmio)(struct kvm_vcpu *, struct kvm_run *,
--			       struct kvm_exit_mmio *);
- 	bool	(*queue_sgi)(struct kvm_vcpu *, int irq);
- 	void	(*add_sgi_source)(struct kvm_vcpu *, int irq, int source);
- 	int	(*init_model)(struct kvm *);
-@@ -313,8 +311,6 @@ struct vgic_cpu {
- 
- struct kvm;
- struct kvm_vcpu;
--struct kvm_run;
--struct kvm_exit_mmio;
- 
- int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
- int kvm_vgic_hyp_init(void);
-@@ -330,8 +326,6 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
- void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
- int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
- int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
--bool vgic_handle_mmio(struct kvm_vcpu *vcpu, struct kvm_run *run,
--		      struct kvm_exit_mmio *mmio);
- 
- #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
- #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
-diff --git a/virt/kvm/arm/vgic-v2-emul.c b/virt/kvm/arm/vgic-v2-emul.c
-index 7460b37..1390797 100644
---- a/virt/kvm/arm/vgic-v2-emul.c
-+++ b/virt/kvm/arm/vgic-v2-emul.c
-@@ -404,24 +404,6 @@ static const struct vgic_io_range vgic_dist_ranges[] = {
- 	{}
- };
- 
--static bool vgic_v2_handle_mmio(struct kvm_vcpu *vcpu, struct kvm_run *run,
--				struct kvm_exit_mmio *mmio)
--{
--	unsigned long base = vcpu->kvm->arch.vgic.vgic_dist_base;
--
--	if (!is_in_range(mmio->phys_addr, mmio->len, base,
--			 KVM_VGIC_V2_DIST_SIZE))
--		return false;
--
--	/* GICv2 does not support accesses wider than 32 bits */
--	if (mmio->len > 4) {
--		kvm_inject_dabt(vcpu, mmio->phys_addr);
--		return true;
--	}
--
--	return vgic_handle_mmio_range(vcpu, run, mmio, vgic_dist_ranges, base);
--}
--
- static void vgic_dispatch_sgi(struct kvm_vcpu *vcpu, u32 reg)
- {
- 	struct kvm *kvm = vcpu->kvm;
-@@ -580,7 +562,6 @@ void vgic_v2_init_emulation(struct kvm *kvm)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
- 
--	dist->vm_ops.handle_mmio = vgic_v2_handle_mmio;
- 	dist->vm_ops.queue_sgi = vgic_v2_queue_sgi;
- 	dist->vm_ops.add_sgi_source = vgic_v2_add_sgi_source;
- 	dist->vm_ops.init_model = vgic_v2_init_model;
-@@ -690,6 +671,7 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
- 	struct kvm_vcpu *vcpu, *tmp_vcpu;
- 	struct vgic_dist *vgic;
- 	struct kvm_exit_mmio mmio;
-+	u32 data;
- 
- 	offset = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
- 	cpuid = (attr->attr & KVM_DEV_ARM_VGIC_CPUID_MASK) >>
-@@ -711,6 +693,7 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
- 
- 	mmio.len = 4;
- 	mmio.is_write = is_write;
-+	mmio.data = &data;
- 	if (is_write)
- 		mmio_data_write(&mmio, ~0, *reg);
- 	switch (attr->group) {
-diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
-index eb1a797..e9c3a7a 100644
---- a/virt/kvm/arm/vgic-v3-emul.c
-+++ b/virt/kvm/arm/vgic-v3-emul.c
-@@ -708,40 +708,6 @@ static const struct vgic_io_range vgic_redist_ranges[] = {
- 	{},
- };
- 
--/*
-- * This function splits accesses between the distributor and the two
-- * redistributor parts (private/SPI). As each redistributor is accessible
-- * from any CPU, we have to determine the affected VCPU by taking the faulting
-- * address into account. We then pass this VCPU to the handler function via
-- * the private parameter.
-- */
--#define SGI_BASE_OFFSET SZ_64K
--static bool vgic_v3_handle_mmio(struct kvm_vcpu *vcpu, struct kvm_run *run,
--				struct kvm_exit_mmio *mmio)
--{
--	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
--	unsigned long dbase = dist->vgic_dist_base;
--	unsigned long rdbase = dist->vgic_redist_base;
--	int nrcpus = atomic_read(&vcpu->kvm->online_vcpus);
--	int vcpu_id;
--
--	if (is_in_range(mmio->phys_addr, mmio->len, dbase, GIC_V3_DIST_SIZE)) {
--		return vgic_handle_mmio_range(vcpu, run, mmio,
--					      vgic_v3_dist_ranges, dbase);
--	}
--
--	if (!is_in_range(mmio->phys_addr, mmio->len, rdbase,
--	    GIC_V3_REDIST_SIZE * nrcpus))
--		return false;
--
--	vcpu_id = (mmio->phys_addr - rdbase) / GIC_V3_REDIST_SIZE;
--	rdbase += (vcpu_id * GIC_V3_REDIST_SIZE);
--	mmio->private = kvm_get_vcpu(vcpu->kvm, vcpu_id);
--
--	return vgic_handle_mmio_range(vcpu, run, mmio, vgic_redist_ranges,
--				      rdbase);
--}
--
- static bool vgic_v3_queue_sgi(struct kvm_vcpu *vcpu, int irq)
- {
- 	if (vgic_queue_irq(vcpu, 0, irq)) {
-@@ -861,7 +827,6 @@ void vgic_v3_init_emulation(struct kvm *kvm)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
- 
--	dist->vm_ops.handle_mmio = vgic_v3_handle_mmio;
- 	dist->vm_ops.queue_sgi = vgic_v3_queue_sgi;
- 	dist->vm_ops.add_sgi_source = vgic_v3_add_sgi_source;
- 	dist->vm_ops.init_model = vgic_v3_init_model;
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index e968179..b70174e 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -758,7 +758,6 @@ static bool call_range_handler(struct kvm_vcpu *vcpu,
- 			       unsigned long offset,
- 			       const struct vgic_io_range *range)
- {
--	u32 *data32 = (void *)mmio->data;
- 	struct kvm_exit_mmio mmio32;
- 	bool ret;
- 
-@@ -775,70 +774,17 @@ static bool call_range_handler(struct kvm_vcpu *vcpu,
- 	mmio32.private = mmio->private;
- 
- 	mmio32.phys_addr = mmio->phys_addr + 4;
--	if (mmio->is_write)
--		*(u32 *)mmio32.data = data32[1];
-+	mmio32.data = &((u32 *)mmio->data)[1];
- 	ret = range->handle_mmio(vcpu, &mmio32, offset + 4);
--	if (!mmio->is_write)
--		data32[1] = *(u32 *)mmio32.data;
- 
- 	mmio32.phys_addr = mmio->phys_addr;
--	if (mmio->is_write)
--		*(u32 *)mmio32.data = data32[0];
-+	mmio32.data = &((u32 *)mmio->data)[0];
- 	ret |= range->handle_mmio(vcpu, &mmio32, offset);
--	if (!mmio->is_write)
--		data32[0] = *(u32 *)mmio32.data;
- 
- 	return ret;
- }
- 
- /**
-- * vgic_handle_mmio_range - handle an in-kernel MMIO access
-- * @vcpu:	pointer to the vcpu performing the access
-- * @run:	pointer to the kvm_run structure
-- * @mmio:	pointer to the data describing the access
-- * @ranges:	array of MMIO ranges in a given region
-- * @mmio_base:	base address of that region
-- *
-- * returns true if the MMIO access could be performed
-- */
--bool vgic_handle_mmio_range(struct kvm_vcpu *vcpu, struct kvm_run *run,
--			    struct kvm_exit_mmio *mmio,
--			    const struct vgic_io_range *ranges,
--			    unsigned long mmio_base)
--{
--	const struct vgic_io_range *range;
--	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
--	bool updated_state;
--	unsigned long offset;
--
--	offset = mmio->phys_addr - mmio_base;
--	range = vgic_find_range(ranges, mmio->len, offset);
--	if (unlikely(!range || !range->handle_mmio)) {
--		pr_warn("Unhandled access %d %08llx %d\n",
--			mmio->is_write, mmio->phys_addr, mmio->len);
--		return false;
--	}
--
--	spin_lock(&vcpu->kvm->arch.vgic.lock);
--	offset -= range->base;
--	if (vgic_validate_access(dist, range, offset)) {
--		updated_state = call_range_handler(vcpu, mmio, offset, range);
--	} else {
--		if (!mmio->is_write)
--			memset(mmio->data, 0, mmio->len);
--		updated_state = false;
--	}
--	spin_unlock(&vcpu->kvm->arch.vgic.lock);
--	kvm_prepare_mmio(run, mmio);
--	kvm_handle_mmio_return(vcpu, run);
--
--	if (updated_state)
--		vgic_kick_vcpus(vcpu->kvm);
--
--	return true;
--}
--
--/**
-  * vgic_handle_mmio_access - handle an in-kernel MMIO access
-  * This is called by the read/write KVM IO device wrappers below.
-  * @vcpu:	pointer to the vcpu performing the access
-@@ -873,23 +819,24 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
- 	mmio.phys_addr = addr;
- 	mmio.len = len;
- 	mmio.is_write = is_write;
--	if (is_write)
--		memcpy(mmio.data, val, len);
-+	mmio.data = val;
- 	mmio.private = iodev->redist_vcpu;
- 
- 	spin_lock(&dist->lock);
- 	offset -= range->base;
- 	if (vgic_validate_access(dist, range, offset)) {
- 		updated_state = call_range_handler(vcpu, &mmio, offset, range);
--		if (!is_write)
--			memcpy(val, mmio.data, len);
- 	} else {
- 		if (!is_write)
- 			memset(val, 0, len);
- 		updated_state = false;
- 	}
- 	spin_unlock(&dist->lock);
--	kvm_prepare_mmio(run, &mmio);
-+	run->mmio.is_write	= is_write;
-+	run->mmio.len		= len;
-+	run->mmio.phys_addr	= addr;
-+	memcpy(run->mmio.data, val, len);
-+
- 	kvm_handle_mmio_return(vcpu, run);
- 
- 	if (updated_state)
-@@ -898,30 +845,6 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
- 	return 0;
- }
- 
--/**
-- * vgic_handle_mmio - handle an in-kernel MMIO access for the GIC emulation
-- * @vcpu:      pointer to the vcpu performing the access
-- * @run:       pointer to the kvm_run structure
-- * @mmio:      pointer to the data describing the access
-- *
-- * returns true if the MMIO access has been performed in kernel space,
-- * and false if it needs to be emulated in user space.
-- * Calls the actual handling routine for the selected VGIC model.
-- */
--bool vgic_handle_mmio(struct kvm_vcpu *vcpu, struct kvm_run *run,
--		      struct kvm_exit_mmio *mmio)
--{
--	if (!irqchip_in_kernel(vcpu->kvm))
--		return false;
--
--	/*
--	 * This will currently call either vgic_v2_handle_mmio() or
--	 * vgic_v3_handle_mmio(), which in turn will call
--	 * vgic_handle_mmio_range() defined above.
--	 */
--	return vcpu->kvm->arch.vgic.vm_ops.handle_mmio(vcpu, run, mmio);
--}
--
- static int vgic_handle_mmio_read(struct kvm_vcpu *vcpu,
- 				 struct kvm_io_device *this,
- 				 gpa_t addr, int len, void *val)
-diff --git a/virt/kvm/arm/vgic.h b/virt/kvm/arm/vgic.h
-index 28fa3aa..0df74cb 100644
---- a/virt/kvm/arm/vgic.h
-+++ b/virt/kvm/arm/vgic.h
-@@ -59,6 +59,14 @@ void vgic_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
- bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq);
- void vgic_unqueue_irqs(struct kvm_vcpu *vcpu);
- 
-+struct kvm_exit_mmio {
-+	phys_addr_t	phys_addr;
-+	void		*data;
-+	u32		len;
-+	bool		is_write;
-+	void		*private;
-+};
-+
- void vgic_reg_access(struct kvm_exit_mmio *mmio, u32 *reg,
- 		     phys_addr_t offset, int mode);
- bool handle_mmio_raz_wi(struct kvm_vcpu *vcpu, struct kvm_exit_mmio *mmio,
-@@ -99,11 +107,6 @@ const
- struct vgic_io_range *vgic_find_range(const struct vgic_io_range *ranges,
- 				      int len, gpa_t offset);
- 
--bool vgic_handle_mmio_range(struct kvm_vcpu *vcpu, struct kvm_run *run,
--			    struct kvm_exit_mmio *mmio,
--			    const struct vgic_io_range *ranges,
--			    unsigned long mmio_base);
--
- bool vgic_handle_enable_reg(struct kvm *kvm, struct kvm_exit_mmio *mmio,
- 			    phys_addr_t offset, int vcpu_id, int access);
- 
--- 
-2.1.4
+RnJvbTogQ2hyaXN0b2ZmZXIgRGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPgoKTWln
+cmF0aW5nIGFjdGl2ZSBpbnRlcnJ1cHRzIGNhdXNlcyB0aGUgYWN0aXZlIHN0YXRlIHRvIGJlIGxv
+c3QKY29tcGxldGVseS4gVGhpcyBpbXBsZW1lbnRzIHNvbWUgYWRkaXRpb25hbCBiaXRtYXBzIHRv
+IHRyYWNrIHRoZSBhY3RpdmUKc3RhdGUgb24gdGhlIGRpc3RyaWJ1dG9yIGFuZCBleHBvcnQgdGhp
+cyB0byB1c2VyIHNwYWNlLgoKU2lnbmVkLW9mZi1ieTogQ2hyaXN0b2ZmZXIgRGFsbCA8Y2hyaXN0
+b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPgpTaWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXgu
+YmVubmVlQGxpbmFyby5vcmc+ClNpZ25lZC1vZmYtYnk6IENocmlzdG9mZmVyIERhbGwgPGNocmlz
+dG9mZmVyLmRhbGxAbGluYXJvLm9yZz4KLS0tCiBpbmNsdWRlL2t2bS9hcm1fdmdpYy5oICAgICAg
+fCAgMTUgKysrLQogdmlydC9rdm0vYXJtL3ZnaWMtdjItZW11bC5jIHwgIDIwICsrKystCiB2aXJ0
+L2t2bS9hcm0vdmdpYy5jICAgICAgICAgfCAyMDcgKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrLS0tLS0tLS0KIHZpcnQva3ZtL2FybS92Z2ljLmggICAgICAgICB8ICAgOCArKwog
+NCBmaWxlcyBjaGFuZ2VkLCAyMTIgaW5zZXJ0aW9ucygrKSwgMzggZGVsZXRpb25zKC0pCgpkaWZm
+IC0tZ2l0IGEvaW5jbHVkZS9rdm0vYXJtX3ZnaWMuaCBiL2luY2x1ZGUva3ZtL2FybV92Z2ljLmgK
+aW5kZXggYjgxNjMwYi4uOTA5MmZhZCAxMDA2NDQKLS0tIGEvaW5jbHVkZS9rdm0vYXJtX3ZnaWMu
+aAorKysgYi9pbmNsdWRlL2t2bS9hcm1fdmdpYy5oCkBAIC0xOTUsNiArMTk1LDkgQEAgc3RydWN0
+IHZnaWNfZGlzdCB7CiAJLyogTGV2ZWwtdHJpZ2dlcmVkIGludGVycnVwdCBxdWV1ZWQgb24gVkNQ
+VSBpbnRlcmZhY2UgKi8KIAlzdHJ1Y3QgdmdpY19iaXRtYXAJaXJxX3F1ZXVlZDsKIAorCS8qIElu
+dGVycnVwdCB3YXMgYWN0aXZlIHdoZW4gdW5xdWV1ZSBmcm9tIFZDUFUgaW50ZXJmYWNlICovCisJ
+c3RydWN0IHZnaWNfYml0bWFwCWlycV9hY3RpdmU7CisKIAkvKiBJbnRlcnJ1cHQgcHJpb3JpdHku
+IE5vdCB1c2VkIHlldC4gKi8KIAlzdHJ1Y3QgdmdpY19ieXRlbWFwCWlycV9wcmlvcml0eTsKIApA
+QCAtMjM1LDYgKzIzOCw5IEBAIHN0cnVjdCB2Z2ljX2Rpc3QgewogCS8qIEJpdG1hcCBpbmRpY2F0
+aW5nIHdoaWNoIENQVSBoYXMgc29tZXRoaW5nIHBlbmRpbmcgKi8KIAl1bnNpZ25lZCBsb25nCQkq
+aXJxX3BlbmRpbmdfb25fY3B1OwogCisJLyogQml0bWFwIGluZGljYXRpbmcgd2hpY2ggQ1BVIGhh
+cyBhY3RpdmUgSVJRcyAqLworCXVuc2lnbmVkIGxvbmcJCSppcnFfYWN0aXZlX29uX2NwdTsKKwog
+CXN0cnVjdCB2Z2ljX3ZtX29wcwl2bV9vcHM7CiB9OwogCkBAIC0yNjYsOSArMjcyLDE1IEBAIHN0
+cnVjdCB2Z2ljX2NwdSB7CiAJLyogcGVyIElSUSB0byBMUiBtYXBwaW5nICovCiAJdTgJCSp2Z2lj
+X2lycV9scl9tYXA7CiAKLQkvKiBQZW5kaW5nIGludGVycnVwdHMgb24gdGhpcyBWQ1BVICovCisJ
+LyogUGVuZGluZy9hY3RpdmUvYm90aCBpbnRlcnJ1cHRzIG9uIHRoaXMgVkNQVSAqLwogCURFQ0xB
+UkVfQklUTUFQKAlwZW5kaW5nX3BlcmNwdSwgVkdJQ19OUl9QUklWQVRFX0lSUVMpOworCURFQ0xB
+UkVfQklUTUFQKAlhY3RpdmVfcGVyY3B1LCBWR0lDX05SX1BSSVZBVEVfSVJRUyk7CisJREVDTEFS
+RV9CSVRNQVAoCXBlbmRfYWN0X3BlcmNwdSwgVkdJQ19OUl9QUklWQVRFX0lSUVMpOworCisJLyog
+UGVuZGluZy9hY3RpdmUvYm90aCBzaGFyZWQgaW50ZXJydXB0cywgZHluYW1pY2FsbHkgc2l6ZWQg
+Ki8KIAl1bnNpZ25lZCBsb25nCSpwZW5kaW5nX3NoYXJlZDsKKwl1bnNpZ25lZCBsb25nICAgKmFj
+dGl2ZV9zaGFyZWQ7CisJdW5zaWduZWQgbG9uZyAgICpwZW5kX2FjdF9zaGFyZWQ7CiAKIAkvKiBC
+aXRtYXAgb2YgdXNlZC9mcmVlIGxpc3QgcmVnaXN0ZXJzICovCiAJREVDTEFSRV9CSVRNQVAoCWxy
+X3VzZWQsIFZHSUNfVjJfTUFYX0xSUyk7CkBAIC0zMDYsNiArMzE4LDcgQEAgaW50IGt2bV92Z2lj
+X2luamVjdF9pcnEoc3RydWN0IGt2bSAqa3ZtLCBpbnQgY3B1aWQsIHVuc2lnbmVkIGludCBpcnFf
+bnVtLAogCQkJYm9vbCBsZXZlbCk7CiB2b2lkIHZnaWNfdjNfZGlzcGF0Y2hfc2dpKHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSwgdTY0IHJlZyk7CiBpbnQga3ZtX3ZnaWNfdmNwdV9wZW5kaW5nX2lycShz
+dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpOworaW50IGt2bV92Z2ljX3ZjcHVfYWN0aXZlX2lycShzdHJ1
+Y3Qga3ZtX3ZjcHUgKnZjcHUpOwogYm9vbCB2Z2ljX2hhbmRsZV9tbWlvKHN0cnVjdCBrdm1fdmNw
+dSAqdmNwdSwgc3RydWN0IGt2bV9ydW4gKnJ1biwKIAkJICAgICAgc3RydWN0IGt2bV9leGl0X21t
+aW8gKm1taW8pOwogCmRpZmYgLS1naXQgYS92aXJ0L2t2bS9hcm0vdmdpYy12Mi1lbXVsLmMgYi92
+aXJ0L2t2bS9hcm0vdmdpYy12Mi1lbXVsLmMKaW5kZXggMTljNjIxMC4uYzgxODY2MiAxMDA2NDQK
+LS0tIGEvdmlydC9rdm0vYXJtL3ZnaWMtdjItZW11bC5jCisrKyBiL3ZpcnQva3ZtL2FybS92Z2lj
+LXYyLWVtdWwuYwpAQCAtMTA3LDYgKzEwNywyMiBAQCBzdGF0aWMgYm9vbCBoYW5kbGVfbW1pb19j
+bGVhcl9wZW5kaW5nX3JlZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCiAJCQkJCSAgICAgdmNwdS0+
+dmNwdV9pZCk7CiB9CiAKK3N0YXRpYyBib29sIGhhbmRsZV9tbWlvX3NldF9hY3RpdmVfcmVnKHN0
+cnVjdCBrdm1fdmNwdSAqdmNwdSwKKwkJCQkgICAgICAgc3RydWN0IGt2bV9leGl0X21taW8gKm1t
+aW8sCisJCQkJICAgICAgIHBoeXNfYWRkcl90IG9mZnNldCkKK3sKKwlyZXR1cm4gdmdpY19oYW5k
+bGVfc2V0X2FjdGl2ZV9yZWcodmNwdS0+a3ZtLCBtbWlvLCBvZmZzZXQsCisJCQkJCSAgdmNwdS0+
+dmNwdV9pZCk7Cit9CisKK3N0YXRpYyBib29sIGhhbmRsZV9tbWlvX2NsZWFyX2FjdGl2ZV9yZWco
+c3RydWN0IGt2bV92Y3B1ICp2Y3B1LAorCQkJCQkgc3RydWN0IGt2bV9leGl0X21taW8gKm1taW8s
+CisJCQkJCSBwaHlzX2FkZHJfdCBvZmZzZXQpCit7CisJcmV0dXJuIHZnaWNfaGFuZGxlX2NsZWFy
+X2FjdGl2ZV9yZWcodmNwdS0+a3ZtLCBtbWlvLCBvZmZzZXQsCisJCQkJCSAgICB2Y3B1LT52Y3B1
+X2lkKTsKK30KKwogc3RhdGljIGJvb2wgaGFuZGxlX21taW9fcHJpb3JpdHlfcmVnKHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSwKIAkJCQkgICAgIHN0cnVjdCBrdm1fZXhpdF9tbWlvICptbWlvLAogCQkJ
+CSAgICAgcGh5c19hZGRyX3Qgb2Zmc2V0KQpAQCAtMzQ0LDEzICszNjAsMTMgQEAgc3RhdGljIGNv
+bnN0IHN0cnVjdCBrdm1fbW1pb19yYW5nZSB2Z2ljX2Rpc3RfcmFuZ2VzW10gPSB7CiAJCS5iYXNl
+CQk9IEdJQ19ESVNUX0FDVElWRV9TRVQsCiAJCS5sZW4JCT0gVkdJQ19NQVhfSVJRUyAvIDgsCiAJ
+CS5iaXRzX3Blcl9pcnEJPSAxLAotCQkuaGFuZGxlX21taW8JPSBoYW5kbGVfbW1pb19yYXpfd2ks
+CisJCS5oYW5kbGVfbW1pbwk9IGhhbmRsZV9tbWlvX3NldF9hY3RpdmVfcmVnLAogCX0sCiAJewog
+CQkuYmFzZQkJPSBHSUNfRElTVF9BQ1RJVkVfQ0xFQVIsCiAJCS5sZW4JCT0gVkdJQ19NQVhfSVJR
+UyAvIDgsCiAJCS5iaXRzX3Blcl9pcnEJPSAxLAotCQkuaGFuZGxlX21taW8JPSBoYW5kbGVfbW1p
+b19yYXpfd2ksCisJCS5oYW5kbGVfbW1pbwk9IGhhbmRsZV9tbWlvX2NsZWFyX2FjdGl2ZV9yZWcs
+CiAJfSwKIAl7CiAJCS5iYXNlCQk9IEdJQ19ESVNUX1BSSSwKZGlmZiAtLWdpdCBhL3ZpcnQva3Zt
+L2FybS92Z2ljLmMgYi92aXJ0L2t2bS9hcm0vdmdpYy5jCmluZGV4IDY5N2NlMTcuLmZmZDkzN2Mg
+MTAwNjQ0Ci0tLSBhL3ZpcnQva3ZtL2FybS92Z2ljLmMKKysrIGIvdmlydC9rdm0vYXJtL3ZnaWMu
+YwpAQCAtMjY0LDYgKzI2NCwxMyBAQCBzdGF0aWMgaW50IHZnaWNfaXJxX2lzX3F1ZXVlZChzdHJ1
+Y3Qga3ZtX3ZjcHUgKnZjcHUsIGludCBpcnEpCiAJcmV0dXJuIHZnaWNfYml0bWFwX2dldF9pcnFf
+dmFsKCZkaXN0LT5pcnFfcXVldWVkLCB2Y3B1LT52Y3B1X2lkLCBpcnEpOwogfQogCitzdGF0aWMg
+aW50IHZnaWNfaXJxX2lzX2FjdGl2ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGludCBpcnEpCit7
+CisJc3RydWN0IHZnaWNfZGlzdCAqZGlzdCA9ICZ2Y3B1LT5rdm0tPmFyY2gudmdpYzsKKworCXJl
+dHVybiB2Z2ljX2JpdG1hcF9nZXRfaXJxX3ZhbCgmZGlzdC0+aXJxX2FjdGl2ZSwgdmNwdS0+dmNw
+dV9pZCwgaXJxKTsKK30KKwogc3RhdGljIHZvaWQgdmdpY19pcnFfc2V0X3F1ZXVlZChzdHJ1Y3Qg
+a3ZtX3ZjcHUgKnZjcHUsIGludCBpcnEpCiB7CiAJc3RydWN0IHZnaWNfZGlzdCAqZGlzdCA9ICZ2
+Y3B1LT5rdm0tPmFyY2gudmdpYzsKQEAgLTI3OCw2ICsyODUsMjAgQEAgc3RhdGljIHZvaWQgdmdp
+Y19pcnFfY2xlYXJfcXVldWVkKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgaW50IGlycSkKIAl2Z2lj
+X2JpdG1hcF9zZXRfaXJxX3ZhbCgmZGlzdC0+aXJxX3F1ZXVlZCwgdmNwdS0+dmNwdV9pZCwgaXJx
+LCAwKTsKIH0KIAorc3RhdGljIHZvaWQgdmdpY19pcnFfc2V0X2FjdGl2ZShzdHJ1Y3Qga3ZtX3Zj
+cHUgKnZjcHUsIGludCBpcnEpCit7CisJc3RydWN0IHZnaWNfZGlzdCAqZGlzdCA9ICZ2Y3B1LT5r
+dm0tPmFyY2gudmdpYzsKKworCXZnaWNfYml0bWFwX3NldF9pcnFfdmFsKCZkaXN0LT5pcnFfYWN0
+aXZlLCB2Y3B1LT52Y3B1X2lkLCBpcnEsIDEpOworfQorCitzdGF0aWMgdm9pZCB2Z2ljX2lycV9j
+bGVhcl9hY3RpdmUoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBpbnQgaXJxKQoreworCXN0cnVjdCB2
+Z2ljX2Rpc3QgKmRpc3QgPSAmdmNwdS0+a3ZtLT5hcmNoLnZnaWM7CisKKwl2Z2ljX2JpdG1hcF9z
+ZXRfaXJxX3ZhbCgmZGlzdC0+aXJxX2FjdGl2ZSwgdmNwdS0+dmNwdV9pZCwgaXJxLCAwKTsKK30K
+Kwogc3RhdGljIGludCB2Z2ljX2Rpc3RfaXJxX2dldF9sZXZlbChzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
+cHUsIGludCBpcnEpCiB7CiAJc3RydWN0IHZnaWNfZGlzdCAqZGlzdCA9ICZ2Y3B1LT5rdm0tPmFy
+Y2gudmdpYzsKQEAgLTUyMSw2ICs1NDIsNDQgQEAgYm9vbCB2Z2ljX2hhbmRsZV9jbGVhcl9wZW5k
+aW5nX3JlZyhzdHJ1Y3Qga3ZtICprdm0sCiAJcmV0dXJuIGZhbHNlOwogfQogCitib29sIHZnaWNf
+aGFuZGxlX3NldF9hY3RpdmVfcmVnKHN0cnVjdCBrdm0gKmt2bSwKKwkJCQlzdHJ1Y3Qga3ZtX2V4
+aXRfbW1pbyAqbW1pbywKKwkJCQlwaHlzX2FkZHJfdCBvZmZzZXQsIGludCB2Y3B1X2lkKQorewor
+CXUzMiAqcmVnOworCXN0cnVjdCB2Z2ljX2Rpc3QgKmRpc3QgPSAma3ZtLT5hcmNoLnZnaWM7CisK
+KwlyZWcgPSB2Z2ljX2JpdG1hcF9nZXRfcmVnKCZkaXN0LT5pcnFfYWN0aXZlLCB2Y3B1X2lkLCBv
+ZmZzZXQpOworCXZnaWNfcmVnX2FjY2VzcyhtbWlvLCByZWcsIG9mZnNldCwKKwkJCUFDQ0VTU19S
+RUFEX1ZBTFVFIHwgQUNDRVNTX1dSSVRFX1NFVEJJVCk7CisKKwlpZiAobW1pby0+aXNfd3JpdGUp
+IHsKKwkJdmdpY191cGRhdGVfc3RhdGUoa3ZtKTsKKwkJcmV0dXJuIHRydWU7CisJfQorCisJcmV0
+dXJuIGZhbHNlOworfQorCitib29sIHZnaWNfaGFuZGxlX2NsZWFyX2FjdGl2ZV9yZWcoc3RydWN0
+IGt2bSAqa3ZtLAorCQkJCSAgc3RydWN0IGt2bV9leGl0X21taW8gKm1taW8sCisJCQkJICBwaHlz
+X2FkZHJfdCBvZmZzZXQsIGludCB2Y3B1X2lkKQoreworCXUzMiAqcmVnOworCXN0cnVjdCB2Z2lj
+X2Rpc3QgKmRpc3QgPSAma3ZtLT5hcmNoLnZnaWM7CisKKwlyZWcgPSB2Z2ljX2JpdG1hcF9nZXRf
+cmVnKCZkaXN0LT5pcnFfYWN0aXZlLCB2Y3B1X2lkLCBvZmZzZXQpOworCXZnaWNfcmVnX2FjY2Vz
+cyhtbWlvLCByZWcsIG9mZnNldCwKKwkJCUFDQ0VTU19SRUFEX1ZBTFVFIHwgQUNDRVNTX1dSSVRF
+X0NMRUFSQklUKTsKKworCWlmIChtbWlvLT5pc193cml0ZSkgeworCQl2Z2ljX3VwZGF0ZV9zdGF0
+ZShrdm0pOworCQlyZXR1cm4gdHJ1ZTsKKwl9CisKKwlyZXR1cm4gZmFsc2U7Cit9CisKIHN0YXRp
+YyB1MzIgdmdpY19jZmdfZXhwYW5kKHUxNiB2YWwpCiB7CiAJdTMyIHJlcyA9IDA7CkBAIC01ODks
+MTYgKzY0OCwxMiBAQCBib29sIHZnaWNfaGFuZGxlX2NmZ19yZWcodTMyICpyZWcsIHN0cnVjdCBr
+dm1fZXhpdF9tbWlvICptbWlvLAogfQogCiAvKioKLSAqIHZnaWNfdW5xdWV1ZV9pcnFzIC0gbW92
+ZSBwZW5kaW5nIElSUXMgZnJvbSBMUnMgdG8gdGhlIGRpc3RyaWJ1dG9yCisgKiB2Z2ljX3VucXVl
+dWVfaXJxcyAtIG1vdmUgcGVuZGluZy9hY3RpdmUgSVJRcyBmcm9tIExScyB0byB0aGUgZGlzdHJp
+YnV0b3IKICAqIEB2Z2ljX2NwdTogUG9pbnRlciB0byB0aGUgdmdpY19jcHUgc3RydWN0IGhvbGRp
+bmcgdGhlIExScwogICoKLSAqIE1vdmUgYW55IHBlbmRpbmcgSVJRcyB0aGF0IGhhdmUgYWxyZWFk
+eSBiZWVuIGFzc2lnbmVkIHRvIExScyBiYWNrIHRvIHRoZQorICogTW92ZSBhbnkgSVJRcyB0aGF0
+IGhhdmUgYWxyZWFkeSBiZWVuIGFzc2lnbmVkIHRvIExScyBiYWNrIHRvIHRoZQogICogZW11bGF0
+ZWQgZGlzdHJpYnV0b3Igc3RhdGUgc28gdGhhdCB0aGUgY29tcGxldGUgZW11bGF0ZWQgc3RhdGUg
+Y2FuIGJlIHJlYWQKICAqIGZyb20gdGhlIG1haW4gZW11bGF0aW9uIHN0cnVjdHVyZXMgd2l0aG91
+dCBpbnZlc3RpZ2F0aW5nIHRoZSBMUnMuCi0gKgotICogTm90ZSB0aGF0IElSUXMgaW4gdGhlIGFj
+dGl2ZSBzdGF0ZSBpbiB0aGUgTFJzIGdldCB0aGVpciBwZW5kaW5nIHN0YXRlIG1vdmVkCi0gKiB0
+byB0aGUgZGlzdHJpYnV0b3IgYnV0IHRoZSBhY3RpdmUgc3RhdGUgc3RheXMgaW4gdGhlIExScywg
+YmVjYXVzZSB3ZSBkb24ndAotICogdHJhY2sgdGhlIGFjdGl2ZSBzdGF0ZSBvbiB0aGUgZGlzdHJp
+YnV0b3Igc2lkZS4KICAqLwogdm9pZCB2Z2ljX3VucXVldWVfaXJxcyhzdHJ1Y3Qga3ZtX3ZjcHUg
+KnZjcHUpCiB7CkBAIC02MTQsMTIgKzY2OSwyMiBAQCB2b2lkIHZnaWNfdW5xdWV1ZV9pcnFzKHN0
+cnVjdCBrdm1fdmNwdSAqdmNwdSkKIAkJICogMDE6IHBlbmRpbmcKIAkJICogMTA6IGFjdGl2ZQog
+CQkgKiAxMTogcGVuZGluZyBhbmQgYWN0aXZlCi0JCSAqCi0JCSAqIElmIHRoZSBMUiBob2xkcyBv
+bmx5IGFuIGFjdGl2ZSBpbnRlcnJ1cHQgKG5vdCBwZW5kaW5nKSB0aGVuCi0JCSAqIGp1c3QgbGVh
+dmUgaXQgYWxvbmUuCiAJCSAqLwotCQlpZiAoKGxyLnN0YXRlICYgTFJfU1RBVEVfTUFTSykgPT0g
+TFJfU1RBVEVfQUNUSVZFKQotCQkJY29udGludWU7CisJCUJVR19PTighKGxyLnN0YXRlICYgTFJf
+U1RBVEVfTUFTSykpOworCisJCS8qIFJlZXN0YWJsaXNoIFNHSSBzb3VyY2UgZm9yIHBlbmRpbmcg
+YW5kIGFjdGl2ZSBJUlFzICovCisJCWlmIChsci5pcnEgPCBWR0lDX05SX1NHSVMpCisJCQlhZGRf
+c2dpX3NvdXJjZSh2Y3B1LCBsci5pcnEsIGxyLnNvdXJjZSk7CisKKwkJLyoKKwkJICogSWYgdGhl
+IExSIGhvbGRzIGFuIGFjdGl2ZSAoMTApIG9yIGEgcGVuZGluZyBhbmQgYWN0aXZlICgxMSkKKwkJ
+ICogaW50ZXJydXB0IHRoZW4gbW92ZSB0aGUgYWN0aXZlIHN0YXRlIHRvIHRoZQorCQkgKiBkaXN0
+cmlidXRvciB0cmFja2luZyBiaXQuCisJCSAqLworCQlpZiAobHIuc3RhdGUgJiBMUl9TVEFURV9B
+Q1RJVkUpIHsKKwkJCXZnaWNfaXJxX3NldF9hY3RpdmUodmNwdSwgbHIuaXJxKTsKKwkJCWxyLnN0
+YXRlICY9IH5MUl9TVEFURV9BQ1RJVkU7CisJCX0KIAogCQkvKgogCQkgKiBSZWVzdGFibGlzaCB0
+aGUgcGVuZGluZyBzdGF0ZSBvbiB0aGUgZGlzdHJpYnV0b3IgYW5kIHRoZQpAQCAtNjI3LDIxICs2
+OTIsMTkgQEAgdm9pZCB2Z2ljX3VucXVldWVfaXJxcyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiAJ
+CSAqIGlzIGZpbmUsIHRoZW4gd2UgYXJlIG9ubHkgc2V0dGluZyBhIGZldyBiaXRzIHRoYXQgd2Vy
+ZQogCQkgKiBhbHJlYWR5IHNldC4KIAkJICovCi0JCXZnaWNfZGlzdF9pcnFfc2V0X3BlbmRpbmco
+dmNwdSwgbHIuaXJxKTsKLQkJaWYgKGxyLmlycSA8IFZHSUNfTlJfU0dJUykKLQkJCWFkZF9zZ2lf
+c291cmNlKHZjcHUsIGxyLmlycSwgbHIuc291cmNlKTsKLQkJbHIuc3RhdGUgJj0gfkxSX1NUQVRF
+X1BFTkRJTkc7CisJCWlmIChsci5zdGF0ZSAmIExSX1NUQVRFX1BFTkRJTkcpIHsKKwkJCXZnaWNf
+ZGlzdF9pcnFfc2V0X3BlbmRpbmcodmNwdSwgbHIuaXJxKTsKKwkJCWxyLnN0YXRlICY9IH5MUl9T
+VEFURV9QRU5ESU5HOworCQl9CisKIAkJdmdpY19zZXRfbHIodmNwdSwgaSwgbHIpOwogCiAJCS8q
+Ci0JCSAqIElmIHRoZXJlJ3Mgbm8gc3RhdGUgbGVmdCBvbiB0aGUgTFIgKGl0IGNvdWxkIHN0aWxs
+IGJlCi0JCSAqIGFjdGl2ZSksIHRoZW4gdGhlIExSIGRvZXMgbm90IGhvbGQgYW55IHVzZWZ1bCBp
+bmZvIGFuZCBjYW4KLQkJICogYmUgbWFya2VkIGFzIGZyZWUgZm9yIG90aGVyIHVzZS4KKwkJICog
+TWFyayB0aGUgTFIgYXMgZnJlZSBmb3Igb3RoZXIgdXNlLgogCQkgKi8KLQkJaWYgKCEobHIuc3Rh
+dGUgJiBMUl9TVEFURV9NQVNLKSkgewotCQkJdmdpY19yZXRpcmVfbHIoaSwgbHIuaXJxLCB2Y3B1
+KTsKLQkJCXZnaWNfaXJxX2NsZWFyX3F1ZXVlZCh2Y3B1LCBsci5pcnEpOwotCQl9CisJCUJVR19P
+Tihsci5zdGF0ZSAmIExSX1NUQVRFX01BU0spOworCQl2Z2ljX3JldGlyZV9scihpLCBsci5pcnEs
+IHZjcHUpOworCQl2Z2ljX2lycV9jbGVhcl9xdWV1ZWQodmNwdSwgbHIuaXJxKTsKIAogCQkvKiBG
+aW5hbGx5IHVwZGF0ZSB0aGUgVkdJQyBzdGF0ZS4gKi8KIAkJdmdpY191cGRhdGVfc3RhdGUodmNw
+dS0+a3ZtKTsKQEAgLTgwNSw2ICs4NjgsMzYgQEAgc3RhdGljIGludCB2Z2ljX25yX3NoYXJlZF9p
+cnFzKHN0cnVjdCB2Z2ljX2Rpc3QgKmRpc3QpCiAJcmV0dXJuIGRpc3QtPm5yX2lycXMgLSBWR0lD
+X05SX1BSSVZBVEVfSVJRUzsKIH0KIAorc3RhdGljIGludCBjb21wdXRlX2FjdGl2ZV9mb3JfY3B1
+KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKK3sKKwlzdHJ1Y3QgdmdpY19kaXN0ICpkaXN0ID0gJnZj
+cHUtPmt2bS0+YXJjaC52Z2ljOworCXVuc2lnbmVkIGxvbmcgKmFjdGl2ZSwgKmVuYWJsZWQsICph
+Y3RfcGVyY3B1LCAqYWN0X3NoYXJlZDsKKwl1bnNpZ25lZCBsb25nIGFjdGl2ZV9wcml2YXRlLCBh
+Y3RpdmVfc2hhcmVkOworCWludCBucl9zaGFyZWQgPSB2Z2ljX25yX3NoYXJlZF9pcnFzKGRpc3Qp
+OworCWludCB2Y3B1X2lkOworCisJdmNwdV9pZCA9IHZjcHUtPnZjcHVfaWQ7CisJYWN0X3BlcmNw
+dSA9IHZjcHUtPmFyY2gudmdpY19jcHUuYWN0aXZlX3BlcmNwdTsKKwlhY3Rfc2hhcmVkID0gdmNw
+dS0+YXJjaC52Z2ljX2NwdS5hY3RpdmVfc2hhcmVkOworCisJYWN0aXZlID0gdmdpY19iaXRtYXBf
+Z2V0X2NwdV9tYXAoJmRpc3QtPmlycV9hY3RpdmUsIHZjcHVfaWQpOworCWVuYWJsZWQgPSB2Z2lj
+X2JpdG1hcF9nZXRfY3B1X21hcCgmZGlzdC0+aXJxX2VuYWJsZWQsIHZjcHVfaWQpOworCWJpdG1h
+cF9hbmQoYWN0X3BlcmNwdSwgYWN0aXZlLCBlbmFibGVkLCBWR0lDX05SX1BSSVZBVEVfSVJRUyk7
+CisKKwlhY3RpdmUgPSB2Z2ljX2JpdG1hcF9nZXRfc2hhcmVkX21hcCgmZGlzdC0+aXJxX2FjdGl2
+ZSk7CisJZW5hYmxlZCA9IHZnaWNfYml0bWFwX2dldF9zaGFyZWRfbWFwKCZkaXN0LT5pcnFfZW5h
+YmxlZCk7CisJYml0bWFwX2FuZChhY3Rfc2hhcmVkLCBhY3RpdmUsIGVuYWJsZWQsIG5yX3NoYXJl
+ZCk7CisJYml0bWFwX2FuZChhY3Rfc2hhcmVkLCBhY3Rfc2hhcmVkLAorCQkgICB2Z2ljX2JpdG1h
+cF9nZXRfc2hhcmVkX21hcCgmZGlzdC0+aXJxX3NwaV90YXJnZXRbdmNwdV9pZF0pLAorCQkgICBu
+cl9zaGFyZWQpOworCisJYWN0aXZlX3ByaXZhdGUgPSBmaW5kX2ZpcnN0X2JpdChhY3RfcGVyY3B1
+LCBWR0lDX05SX1BSSVZBVEVfSVJRUyk7CisJYWN0aXZlX3NoYXJlZCA9IGZpbmRfZmlyc3RfYml0
+KGFjdF9zaGFyZWQsIG5yX3NoYXJlZCk7CisKKwlyZXR1cm4gKGFjdGl2ZV9wcml2YXRlIDwgVkdJ
+Q19OUl9QUklWQVRFX0lSUVMgfHwKKwkJYWN0aXZlX3NoYXJlZCA8IG5yX3NoYXJlZCk7Cit9CisK
+IHN0YXRpYyBpbnQgY29tcHV0ZV9wZW5kaW5nX2Zvcl9jcHUoc3RydWN0IGt2bV92Y3B1ICp2Y3B1
+KQogewogCXN0cnVjdCB2Z2ljX2Rpc3QgKmRpc3QgPSAmdmNwdS0+a3ZtLT5hcmNoLnZnaWM7CkBA
+IC04MzYsNyArOTI5LDcgQEAgc3RhdGljIGludCBjb21wdXRlX3BlbmRpbmdfZm9yX2NwdShzdHJ1
+Y3Qga3ZtX3ZjcHUgKnZjcHUpCiAKIC8qCiAgKiBVcGRhdGUgdGhlIGludGVycnVwdCBzdGF0ZSBh
+bmQgZGV0ZXJtaW5lIHdoaWNoIENQVXMgaGF2ZSBwZW5kaW5nCi0gKiBpbnRlcnJ1cHRzLiBNdXN0
+IGJlIGNhbGxlZCB3aXRoIGRpc3RyaWJ1dG9yIGxvY2sgaGVsZC4KKyAqIG9yIGFjdGl2ZSBpbnRl
+cnJ1cHRzLiBNdXN0IGJlIGNhbGxlZCB3aXRoIGRpc3RyaWJ1dG9yIGxvY2sgaGVsZC4KICAqLwog
+dm9pZCB2Z2ljX3VwZGF0ZV9zdGF0ZShzdHJ1Y3Qga3ZtICprdm0pCiB7CkBAIC04NTAsMTAgKzk0
+MywxMyBAQCB2b2lkIHZnaWNfdXBkYXRlX3N0YXRlKHN0cnVjdCBrdm0gKmt2bSkKIAl9CiAKIAlr
+dm1fZm9yX2VhY2hfdmNwdShjLCB2Y3B1LCBrdm0pIHsKLQkJaWYgKGNvbXB1dGVfcGVuZGluZ19m
+b3JfY3B1KHZjcHUpKSB7Ci0JCQlwcl9kZWJ1ZygiQ1BVJWQgaGFzIHBlbmRpbmcgaW50ZXJydXB0
+c1xuIiwgYyk7CisJCWlmIChjb21wdXRlX3BlbmRpbmdfZm9yX2NwdSh2Y3B1KSkKIAkJCXNldF9i
+aXQoYywgZGlzdC0+aXJxX3BlbmRpbmdfb25fY3B1KTsKLQkJfQorCisJCWlmIChjb21wdXRlX2Fj
+dGl2ZV9mb3JfY3B1KHZjcHUpKQorCQkJc2V0X2JpdChjLCBkaXN0LT5pcnFfYWN0aXZlX29uX2Nw
+dSk7CisJCWVsc2UKKwkJCWNsZWFyX2JpdChjLCBkaXN0LT5pcnFfYWN0aXZlX29uX2NwdSk7CiAJ
+fQogfQogCkBAIC05NTMsNyArMTA0OSwxMiBAQCBzdGF0aWMgdm9pZCB2Z2ljX3JldGlyZV9kaXNh
+YmxlZF9pcnFzKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIHN0YXRpYyB2b2lkIHZnaWNfcXVldWVf
+aXJxX3RvX2xyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgaW50IGlycSwKIAkJCQkgaW50IGxyX25y
+LCBzdHJ1Y3QgdmdpY19sciB2bHIpCiB7Ci0JaWYgKHZnaWNfZGlzdF9pcnFfaXNfcGVuZGluZyh2
+Y3B1LCBpcnEpKSB7CisJaWYgKHZnaWNfaXJxX2lzX2FjdGl2ZSh2Y3B1LCBpcnEpKSB7CisJCXZs
+ci5zdGF0ZSB8PSBMUl9TVEFURV9BQ1RJVkU7CisJCWt2bV9kZWJ1ZygiU2V0IGFjdGl2ZSwgY2xl
+YXIgZGlzdHJpYnV0b3I6IDB4JXhcbiIsIHZsci5zdGF0ZSk7CisJCXZnaWNfaXJxX2NsZWFyX2Fj
+dGl2ZSh2Y3B1LCBpcnEpOworCQl2Z2ljX3VwZGF0ZV9zdGF0ZSh2Y3B1LT5rdm0pOworCX0gZWxz
+ZSBpZiAodmdpY19kaXN0X2lycV9pc19wZW5kaW5nKHZjcHUsIGlycSkpIHsKIAkJdmxyLnN0YXRl
+IHw9IExSX1NUQVRFX1BFTkRJTkc7CiAJCWt2bV9kZWJ1ZygiU2V0IHBlbmRpbmc6IDB4JXhcbiIs
+IHZsci5zdGF0ZSk7CiAJfQpAQCAtMTA0MSwzOSArMTE0Miw0OSBAQCBzdGF0aWMgdm9pZCBfX2t2
+bV92Z2ljX2ZsdXNoX2h3c3RhdGUoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQogewogCXN0cnVjdCB2
+Z2ljX2NwdSAqdmdpY19jcHUgPSAmdmNwdS0+YXJjaC52Z2ljX2NwdTsKIAlzdHJ1Y3QgdmdpY19k
+aXN0ICpkaXN0ID0gJnZjcHUtPmt2bS0+YXJjaC52Z2ljOworCXVuc2lnbmVkIGxvbmcgKnBhX3Bl
+cmNwdSwgKnBhX3NoYXJlZDsKIAlpbnQgaSwgdmNwdV9pZDsKIAlpbnQgb3ZlcmZsb3cgPSAwOwor
+CWludCBucl9zaGFyZWQgPSB2Z2ljX25yX3NoYXJlZF9pcnFzKGRpc3QpOwogCiAJdmNwdV9pZCA9
+IHZjcHUtPnZjcHVfaWQ7CiAKKwlwYV9wZXJjcHUgPSB2Y3B1LT5hcmNoLnZnaWNfY3B1LnBlbmRf
+YWN0X3BlcmNwdTsKKwlwYV9zaGFyZWQgPSB2Y3B1LT5hcmNoLnZnaWNfY3B1LnBlbmRfYWN0X3No
+YXJlZDsKKworCWJpdG1hcF9vcihwYV9wZXJjcHUsIHZnaWNfY3B1LT5wZW5kaW5nX3BlcmNwdSwg
+dmdpY19jcHUtPmFjdGl2ZV9wZXJjcHUsCisJCSAgVkdJQ19OUl9QUklWQVRFX0lSUVMpOworCWJp
+dG1hcF9vcihwYV9zaGFyZWQsIHZnaWNfY3B1LT5wZW5kaW5nX3NoYXJlZCwgdmdpY19jcHUtPmFj
+dGl2ZV9zaGFyZWQsCisJCSAgbnJfc2hhcmVkKTsKIAkvKgogCSAqIFdlIG1heSBub3QgaGF2ZSBh
+bnkgcGVuZGluZyBpbnRlcnJ1cHQsIG9yIHRoZSBpbnRlcnJ1cHRzCiAJICogbWF5IGhhdmUgYmVl
+biBzZXJ2aWNlZCBmcm9tIGFub3RoZXIgdmNwdS4gSW4gYWxsIGNhc2VzLAogCSAqIG1vdmUgYWxv
+bmcuCiAJICovCi0JaWYgKCFrdm1fdmdpY192Y3B1X3BlbmRpbmdfaXJxKHZjcHUpKSB7Ci0JCXBy
+X2RlYnVnKCJDUFUlZCBoYXMgbm8gcGVuZGluZyBpbnRlcnJ1cHRcbiIsIHZjcHVfaWQpOworCWlm
+ICgha3ZtX3ZnaWNfdmNwdV9wZW5kaW5nX2lycSh2Y3B1KSAmJiAha3ZtX3ZnaWNfdmNwdV9hY3Rp
+dmVfaXJxKHZjcHUpKQogCQlnb3RvIGVwaWxvZzsKLQl9CiAKIAkvKiBTR0lzICovCi0JZm9yX2Vh
+Y2hfc2V0X2JpdChpLCB2Z2ljX2NwdS0+cGVuZGluZ19wZXJjcHUsIFZHSUNfTlJfU0dJUykgewor
+CWZvcl9lYWNoX3NldF9iaXQoaSwgcGFfcGVyY3B1LCBWR0lDX05SX1NHSVMpIHsKIAkJaWYgKCFx
+dWV1ZV9zZ2kodmNwdSwgaSkpCiAJCQlvdmVyZmxvdyA9IDE7CiAJfQogCiAJLyogUFBJcyAqLwot
+CWZvcl9lYWNoX3NldF9iaXRfZnJvbShpLCB2Z2ljX2NwdS0+cGVuZGluZ19wZXJjcHUsIFZHSUNf
+TlJfUFJJVkFURV9JUlFTKSB7CisJZm9yX2VhY2hfc2V0X2JpdF9mcm9tKGksIHBhX3BlcmNwdSwg
+VkdJQ19OUl9QUklWQVRFX0lSUVMpIHsKIAkJaWYgKCF2Z2ljX3F1ZXVlX2h3aXJxKHZjcHUsIGkp
+KQogCQkJb3ZlcmZsb3cgPSAxOwogCX0KIAogCS8qIFNQSXMgKi8KLQlmb3JfZWFjaF9zZXRfYml0
+KGksIHZnaWNfY3B1LT5wZW5kaW5nX3NoYXJlZCwgdmdpY19ucl9zaGFyZWRfaXJxcyhkaXN0KSkg
+eworCWZvcl9lYWNoX3NldF9iaXQoaSwgcGFfc2hhcmVkLCBucl9zaGFyZWQpIHsKIAkJaWYgKCF2
+Z2ljX3F1ZXVlX2h3aXJxKHZjcHUsIGkgKyBWR0lDX05SX1BSSVZBVEVfSVJRUykpCiAJCQlvdmVy
+ZmxvdyA9IDE7CiAJfQogCisKKworCiBlcGlsb2c6CiAJaWYgKG92ZXJmbG93KSB7CiAJCXZnaWNf
+ZW5hYmxlX3VuZGVyZmxvdyh2Y3B1KTsKQEAgLTEyMjksNiArMTM0MCwxNyBAQCBpbnQga3ZtX3Zn
+aWNfdmNwdV9wZW5kaW5nX2lycShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiAJcmV0dXJuIHRlc3Rf
+Yml0KHZjcHUtPnZjcHVfaWQsIGRpc3QtPmlycV9wZW5kaW5nX29uX2NwdSk7CiB9CiAKK2ludCBr
+dm1fdmdpY192Y3B1X2FjdGl2ZV9pcnEoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQoreworCXN0cnVj
+dCB2Z2ljX2Rpc3QgKmRpc3QgPSAmdmNwdS0+a3ZtLT5hcmNoLnZnaWM7CisKKwlpZiAoIWlycWNo
+aXBfaW5fa2VybmVsKHZjcHUtPmt2bSkpCisJCXJldHVybiAwOworCisJcmV0dXJuIHRlc3RfYml0
+KHZjcHUtPnZjcHVfaWQsIGRpc3QtPmlycV9hY3RpdmVfb25fY3B1KTsKK30KKworCiB2b2lkIHZn
+aWNfa2lja192Y3B1cyhzdHJ1Y3Qga3ZtICprdm0pCiB7CiAJc3RydWN0IGt2bV92Y3B1ICp2Y3B1
+OwpAQCAtMTQwMSw4ICsxNTIzLDEyIEBAIHZvaWQga3ZtX3ZnaWNfdmNwdV9kZXN0cm95KHN0cnVj
+dCBrdm1fdmNwdSAqdmNwdSkKIAlzdHJ1Y3QgdmdpY19jcHUgKnZnaWNfY3B1ID0gJnZjcHUtPmFy
+Y2gudmdpY19jcHU7CiAKIAlrZnJlZSh2Z2ljX2NwdS0+cGVuZGluZ19zaGFyZWQpOworCWtmcmVl
+KHZnaWNfY3B1LT5hY3RpdmVfc2hhcmVkKTsKKwlrZnJlZSh2Z2ljX2NwdS0+cGVuZF9hY3Rfc2hh
+cmVkKTsKIAlrZnJlZSh2Z2ljX2NwdS0+dmdpY19pcnFfbHJfbWFwKTsKIAl2Z2ljX2NwdS0+cGVu
+ZGluZ19zaGFyZWQgPSBOVUxMOworCXZnaWNfY3B1LT5hY3RpdmVfc2hhcmVkID0gTlVMTDsKKwl2
+Z2ljX2NwdS0+cGVuZF9hY3Rfc2hhcmVkID0gTlVMTDsKIAl2Z2ljX2NwdS0+dmdpY19pcnFfbHJf
+bWFwID0gTlVMTDsKIH0KIApAQCAtMTQxMiw5ICsxNTM4LDE0IEBAIHN0YXRpYyBpbnQgdmdpY192
+Y3B1X2luaXRfbWFwcyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGludCBucl9pcnFzKQogCiAJaW50
+IHN6ID0gKG5yX2lycXMgLSBWR0lDX05SX1BSSVZBVEVfSVJRUykgLyA4OwogCXZnaWNfY3B1LT5w
+ZW5kaW5nX3NoYXJlZCA9IGt6YWxsb2Moc3osIEdGUF9LRVJORUwpOworCXZnaWNfY3B1LT5hY3Rp
+dmVfc2hhcmVkID0ga3phbGxvYyhzeiwgR0ZQX0tFUk5FTCk7CisJdmdpY19jcHUtPnBlbmRfYWN0
+X3NoYXJlZCA9IGt6YWxsb2Moc3osIEdGUF9LRVJORUwpOwogCXZnaWNfY3B1LT52Z2ljX2lycV9s
+cl9tYXAgPSBrbWFsbG9jKG5yX2lycXMsIEdGUF9LRVJORUwpOwogCi0JaWYgKCF2Z2ljX2NwdS0+
+cGVuZGluZ19zaGFyZWQgfHwgIXZnaWNfY3B1LT52Z2ljX2lycV9scl9tYXApIHsKKwlpZiAoIXZn
+aWNfY3B1LT5wZW5kaW5nX3NoYXJlZAorCQl8fCAhdmdpY19jcHUtPmFjdGl2ZV9zaGFyZWQKKwkJ
+fHwgIXZnaWNfY3B1LT5wZW5kX2FjdF9zaGFyZWQKKwkJfHwgIXZnaWNfY3B1LT52Z2ljX2lycV9s
+cl9tYXApIHsKIAkJa3ZtX3ZnaWNfdmNwdV9kZXN0cm95KHZjcHUpOwogCQlyZXR1cm4gLUVOT01F
+TTsKIAl9CkBAIC0xNDY3LDEwICsxNTk4LDEyIEBAIHZvaWQga3ZtX3ZnaWNfZGVzdHJveShzdHJ1
+Y3Qga3ZtICprdm0pCiAJa2ZyZWUoZGlzdC0+aXJxX3NwaV9tcGlkcik7CiAJa2ZyZWUoZGlzdC0+
+aXJxX3NwaV90YXJnZXQpOwogCWtmcmVlKGRpc3QtPmlycV9wZW5kaW5nX29uX2NwdSk7CisJa2Zy
+ZWUoZGlzdC0+aXJxX2FjdGl2ZV9vbl9jcHUpOwogCWRpc3QtPmlycV9zZ2lfc291cmNlcyA9IE5V
+TEw7CiAJZGlzdC0+aXJxX3NwaV9jcHUgPSBOVUxMOwogCWRpc3QtPmlycV9zcGlfdGFyZ2V0ID0g
+TlVMTDsKIAlkaXN0LT5pcnFfcGVuZGluZ19vbl9jcHUgPSBOVUxMOworCWRpc3QtPmlycV9hY3Rp
+dmVfb25fY3B1ID0gTlVMTDsKIAlkaXN0LT5ucl9jcHVzID0gMDsKIH0KIApAQCAtMTUwNiw2ICsx
+NjM5LDcgQEAgaW50IHZnaWNfaW5pdChzdHJ1Y3Qga3ZtICprdm0pCiAJcmV0IHw9IHZnaWNfaW5p
+dF9iaXRtYXAoJmRpc3QtPmlycV9wZW5kaW5nLCBucl9jcHVzLCBucl9pcnFzKTsKIAlyZXQgfD0g
+dmdpY19pbml0X2JpdG1hcCgmZGlzdC0+aXJxX3NvZnRfcGVuZCwgbnJfY3B1cywgbnJfaXJxcyk7
+CiAJcmV0IHw9IHZnaWNfaW5pdF9iaXRtYXAoJmRpc3QtPmlycV9xdWV1ZWQsIG5yX2NwdXMsIG5y
+X2lycXMpOworCXJldCB8PSB2Z2ljX2luaXRfYml0bWFwKCZkaXN0LT5pcnFfYWN0aXZlLCBucl9j
+cHVzLCBucl9pcnFzKTsKIAlyZXQgfD0gdmdpY19pbml0X2JpdG1hcCgmZGlzdC0+aXJxX2NmZywg
+bnJfY3B1cywgbnJfaXJxcyk7CiAJcmV0IHw9IHZnaWNfaW5pdF9ieXRlbWFwKCZkaXN0LT5pcnFf
+cHJpb3JpdHksIG5yX2NwdXMsIG5yX2lycXMpOwogCkBAIC0xNTE4LDEwICsxNjUyLDEzIEBAIGlu
+dCB2Z2ljX2luaXQoc3RydWN0IGt2bSAqa3ZtKQogCQkJCSAgICAgICBHRlBfS0VSTkVMKTsKIAlk
+aXN0LT5pcnFfcGVuZGluZ19vbl9jcHUgPSBremFsbG9jKEJJVFNfVE9fTE9OR1MobnJfY3B1cykg
+KiBzaXplb2YobG9uZyksCiAJCQkJCSAgIEdGUF9LRVJORUwpOworCWRpc3QtPmlycV9hY3RpdmVf
+b25fY3B1ID0ga3phbGxvYyhCSVRTX1RPX0xPTkdTKG5yX2NwdXMpICogc2l6ZW9mKGxvbmcpLAor
+CQkJCQkgICBHRlBfS0VSTkVMKTsKIAlpZiAoIWRpc3QtPmlycV9zZ2lfc291cmNlcyB8fAogCSAg
+ICAhZGlzdC0+aXJxX3NwaV9jcHUgfHwKIAkgICAgIWRpc3QtPmlycV9zcGlfdGFyZ2V0IHx8Ci0J
+ICAgICFkaXN0LT5pcnFfcGVuZGluZ19vbl9jcHUpIHsKKwkgICAgIWRpc3QtPmlycV9wZW5kaW5n
+X29uX2NwdSB8fAorCSAgICAhZGlzdC0+aXJxX2FjdGl2ZV9vbl9jcHUpIHsKIAkJcmV0ID0gLUVO
+T01FTTsKIAkJZ290byBvdXQ7CiAJfQpkaWZmIC0tZ2l0IGEvdmlydC9rdm0vYXJtL3ZnaWMuaCBi
+L3ZpcnQva3ZtL2FybS92Z2ljLmgKaW5kZXggMWU4M2JkZi4uMWU1YTM4MSAxMDA2NDQKLS0tIGEv
+dmlydC9rdm0vYXJtL3ZnaWMuaAorKysgYi92aXJ0L2t2bS9hcm0vdmdpYy5oCkBAIC0xMDcsNiAr
+MTA3LDE0IEBAIGJvb2wgdmdpY19oYW5kbGVfc2V0X3BlbmRpbmdfcmVnKHN0cnVjdCBrdm0gKmt2
+bSwgc3RydWN0IGt2bV9leGl0X21taW8gKm1taW8sCiBib29sIHZnaWNfaGFuZGxlX2NsZWFyX3Bl
+bmRpbmdfcmVnKHN0cnVjdCBrdm0gKmt2bSwgc3RydWN0IGt2bV9leGl0X21taW8gKm1taW8sCiAJ
+CQkJICAgcGh5c19hZGRyX3Qgb2Zmc2V0LCBpbnQgdmNwdV9pZCk7CiAKK2Jvb2wgdmdpY19oYW5k
+bGVfc2V0X2FjdGl2ZV9yZWcoc3RydWN0IGt2bSAqa3ZtLAorCQkJCXN0cnVjdCBrdm1fZXhpdF9t
+bWlvICptbWlvLAorCQkJCXBoeXNfYWRkcl90IG9mZnNldCwgaW50IHZjcHVfaWQpOworCitib29s
+IHZnaWNfaGFuZGxlX2NsZWFyX2FjdGl2ZV9yZWcoc3RydWN0IGt2bSAqa3ZtLAorCQkJCSAgc3Ry
+dWN0IGt2bV9leGl0X21taW8gKm1taW8sCisJCQkJICBwaHlzX2FkZHJfdCBvZmZzZXQsIGludCB2
+Y3B1X2lkKTsKKwogYm9vbCB2Z2ljX2hhbmRsZV9jZmdfcmVnKHUzMiAqcmVnLCBzdHJ1Y3Qga3Zt
+X2V4aXRfbW1pbyAqbW1pbywKIAkJCSBwaHlzX2FkZHJfdCBvZmZzZXQpOwogCi0tIAoyLjEuNAoK
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1h
+aWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3Mu
+Y29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
