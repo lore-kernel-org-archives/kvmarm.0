@@ -1,24 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 05/27] KVM: introduce kvm_arch_intc_initialized and use it in
- irqfd
-Date: Thu,  2 Apr 2015 11:05:09 +0100
-Message-ID: <1427969131-8445-6-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 06/27] KVM: arm/arm64: implement kvm_arch_intc_initialized
+Date: Thu,  2 Apr 2015 11:05:10 +0100
+Message-ID: <1427969131-8445-7-git-send-email-marc.zyngier@arm.com>
 References: <1427969131-8445-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 52D4A4AD25
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 05:57:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F1D2E4AD80
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 05:58:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SozsAhWtMTxm for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Apr 2015 05:57:53 -0400 (EDT)
+ with ESMTP id DHzbRtGvCa40 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Apr 2015 05:57:58 -0400 (EDT)
 Received: from inca-roads.misterjones.org (inca-roads.misterjones.org
  [213.251.177.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 11F794AD16
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 05:57:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B9F724AD33
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Apr 2015 05:57:54 -0400 (EDT)
 In-Reply-To: <1427969131-8445-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,16 +34,11 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Eric Auger <eric.auger@linaro.org>
 
-Introduce __KVM_HAVE_ARCH_INTC_INITIALIZED define and
-associated kvm_arch_intc_initialized function. This latter
-allows to test whether the virtual interrupt controller is initialized
-and ready to accept virtual IRQ injection. On some architectures,
-the virtual interrupt controller is dynamically instantiated, justifying
-that kind of check.
+On arm/arm64 the VGIC is dynamically instantiated and it is useful
+to expose its state, especially for irqfd setup.
 
-The new function can now be used by irqfd to check whether the
-virtual interrupt controller is ready on KVM_IRQFD request. If not,
-KVM_IRQFD returns -EAGAIN.
+This patch defines __KVM_HAVE_ARCH_INTC_INITIALIZED and
+implements kvm_arch_intc_initialized.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
@@ -52,48 +46,52 @@ Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- include/linux/kvm_host.h | 14 ++++++++++++++
- virt/kvm/eventfd.c       |  3 +++
- 2 files changed, 17 insertions(+)
+ arch/arm/include/asm/kvm_host.h   | 2 ++
+ arch/arm/kvm/arm.c                | 5 +++++
+ arch/arm64/include/asm/kvm_host.h | 2 ++
+ 3 files changed, 9 insertions(+)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index d12b210..ae9c720 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -700,6 +700,20 @@ static inline wait_queue_head_t *kvm_arch_vcpu_wq(struct kvm_vcpu *vcpu)
- #endif
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 41008cd..902a7d1 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -27,6 +27,8 @@
+ #include <asm/fpstate.h>
+ #include <kvm/arm_arch_timer.h>
+ 
++#define __KVM_HAVE_ARCH_INTC_INITIALIZED
++
+ #if defined(CONFIG_KVM_ARM_MAX_VCPUS)
+ #define KVM_MAX_VCPUS CONFIG_KVM_ARM_MAX_VCPUS
+ #else
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 37b46c5..5e893eb 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -448,6 +448,11 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+ 	return 0;
  }
  
-+#ifdef __KVM_HAVE_ARCH_INTC_INITIALIZED
-+/*
-+ * returns true if the virtual interrupt controller is initialized and
-+ * ready to accept virtual IRQ. On some architectures the virtual interrupt
-+ * controller is dynamically instantiated and this is not always true.
-+ */
-+bool kvm_arch_intc_initialized(struct kvm *kvm);
-+#else
-+static inline bool kvm_arch_intc_initialized(struct kvm *kvm)
++bool kvm_arch_intc_initialized(struct kvm *kvm)
 +{
-+	return true;
++	return vgic_initialized(kvm);
 +}
-+#endif
 +
- int kvm_arch_init_vm(struct kvm *kvm, unsigned long type);
- void kvm_arch_destroy_vm(struct kvm *kvm);
- void kvm_arch_sync_events(struct kvm *kvm);
-diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-index 148b239..fc5f43e 100644
---- a/virt/kvm/eventfd.c
-+++ b/virt/kvm/eventfd.c
-@@ -311,6 +311,9 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
- 	unsigned int events;
- 	int idx;
+ static void vcpu_pause(struct kvm_vcpu *vcpu)
+ {
+ 	wait_queue_head_t *wq = kvm_arch_vcpu_wq(vcpu);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 8ac3c70..967fb1c 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -28,6 +28,8 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_mmio.h>
  
-+	if (!kvm_arch_intc_initialized(kvm))
-+		return -EAGAIN;
++#define __KVM_HAVE_ARCH_INTC_INITIALIZED
 +
- 	irqfd = kzalloc(sizeof(*irqfd), GFP_KERNEL);
- 	if (!irqfd)
- 		return -ENOMEM;
+ #if defined(CONFIG_KVM_ARM_MAX_VCPUS)
+ #define KVM_MAX_VCPUS CONFIG_KVM_ARM_MAX_VCPUS
+ #else
 -- 
 2.1.4
