@@ -1,70 +1,139 @@
 From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [GIT PULL 0/5] arm/arm64: KVM: Fixes for KVM for 4.0-rc5
-Date: Tue, 07 Apr 2015 18:14:50 +0200
-Message-ID: <5524027A.3090507@redhat.com>
-References: <1426510503-27995-1-git-send-email-christoffer.dall@linaro.org>
+Subject: Re: linux-next: manual merge of the kvm-arm tree with Linus' tree
+Date: Tue, 07 Apr 2015 18:20:15 +0200
+Message-ID: <552403BF.8090008@redhat.com>
+References: <20150318144111.1e56c6d9@canb.auug.org.au> <20150318075537.GC23225@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1426510503-27995-1-git-send-email-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, Marcelo Tosatti <mtosatti@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>
+Return-path: <linux-next-owner@vger.kernel.org>
+In-Reply-To: <20150318075537.GC23225@cbox>
+Sender: linux-next-owner@vger.kernel.org
+To: Christoffer Dall <cdall@cs.columbia.edu>, Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, =?windows-1252?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
 
-On 16/03/2015 13:54, Christoffer Dall wrote:
-> Hi Marcelo and Paolo,
+On 18/03/2015 08:55, Christoffer Dall wrote:
+> Hi Stephen,
 > 
-> Please pull the following fixes for KVM/ARM for 4.0-rc5.
+> On Wed, Mar 18, 2015 at 02:41:11PM +1100, Stephen Rothwell wrote:
+>> Hi all,
+>>
+>> Today's linux-next merge of the kvm-arm tree got a conflict in
+>> virt/kvm/arm/vgic.c between commit ae705930fca6 ("arm/arm64: KVM: Keep
+>> elrsr/aisr in sync with software model") from Linus' tree and commit
+>> 71760950bf3d ("arm/arm64: KVM: add a common vgic_queue_irq_to_lr fn")
+>> from the kvm-arm tree.
+>>
+>> I fixed it up (I think - see below) and can carry the fix as necessary
+>> (no action is required).
+>>
+>> -- 
+>> Cheers,
+>> Stephen Rothwell                    sfr@canb.auug.org.au
+>>
+>> diff --cc virt/kvm/arm/vgic.c
+>> index c9f60f524588,ffd937ca5141..000000000000
+>> --- a/virt/kvm/arm/vgic.c
+>> +++ b/virt/kvm/arm/vgic.c
+>> @@@ -982,9 -1092,7 +1098,8 @@@ bool vgic_queue_irq(struct kvm_vcpu *vc
+>>   		if (vlr.source == sgi_source_id) {
+>>   			kvm_debug("LR%d piggyback for IRQ%d\n", lr, vlr.irq);
+>>   			BUG_ON(!test_bit(lr, vgic_cpu->lr_used));
+>> - 			vlr.state |= LR_STATE_PENDING;
+>> - 			vgic_set_lr(vcpu, lr, vlr);
+>> + 			vgic_queue_irq_to_lr(vcpu, irq, lr, vlr);
+>>  +			vgic_sync_lr_elrsr(vcpu, lr, vlr);
+>>   			return true;
+>>   		}
+>>   	}
+>> @@@ -1001,12 -1109,8 +1116,9 @@@
+>>   
+>>   	vlr.irq = irq;
+>>   	vlr.source = sgi_source_id;
+>> - 	vlr.state = LR_STATE_PENDING;
+>> - 	if (!vgic_irq_is_edge(vcpu, irq))
+>> - 		vlr.state |= LR_EOI_INT;
+>> - 
+>> - 	vgic_set_lr(vcpu, lr, vlr);
+>> + 	vlr.state = 0;
+>> + 	vgic_queue_irq_to_lr(vcpu, irq, lr, vlr);
+>>  +	vgic_sync_lr_elrsr(vcpu, lr, vlr);
+>>   
+>>   	return true;
+>>   }
 > 
-> They fix page refcounting issues in our Stage-2 page table management code, a
-> missing unlock in a gicv3 error path, and a race that can cause lost interrupts
-> if signals are pending just prior to entering the guest.
-> 
-> The following changes since commit bfb8fb4775d3397908ae3a7ff65807097d81d713:
-> 
->   Merge tag 'kvm-s390-master-20150303' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux (2015-03-05 14:42:48 -0300)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git kvm-arm-fixes-4.0-rc5
-> 
-> for you to fetch changes up to ae705930fca6322600690df9dc1c7d0516145a93:
-> 
->   arm/arm64: KVM: Keep elrsr/aisr in sync with software model (2015-03-14 13:42:07 +0100)
-> 
-> 
-> Thanks,
+> Looks great, thanks!
 > -Christoffer
-> 
-> ---
-> 
-> Christoffer Dall (1):
->   arm/arm64: KVM: Keep elrsr/aisr in sync with software model
-> 
-> Marc Zyngier (3):
->   arm64: KVM: Fix stage-2 PGD allocation to have per-page refcounting
->   arm64: KVM: Do not use pgd_index to index stage-2 pgd
->   arm64: KVM: Fix outdated comment about VTCR_EL2.PS
-> 
-> Wei Yongjun (1):
->   arm/arm64: KVM: fix missing unlock on error in kvm_vgic_create()
-> 
->  arch/arm/include/asm/kvm_mmu.h   | 13 ++++---
->  arch/arm/kvm/mmu.c               | 75 ++++++++++++++++++++++++++++------------
->  arch/arm64/include/asm/kvm_arm.h |  5 +--
->  arch/arm64/include/asm/kvm_mmu.h | 48 ++++---------------------
->  include/kvm/arm_vgic.h           |  1 +
->  virt/kvm/arm/vgic-v2.c           |  8 +++++
->  virt/kvm/arm/vgic-v3.c           |  8 +++++
->  virt/kvm/arm/vgic.c              | 22 ++++++++++--
->  8 files changed, 105 insertions(+), 75 deletions(-)
-> 
 
-I pulled this into kvm/next now.  The conflict in virt/kvm/arm/vgic-v3.c
-is internal to the KVM tree, so I'll take care of the resolution myself.
+Got the same conflict when pulling from the kvm-arm tree, I used
+a different resolution though:
+
+diff --cc virt/kvm/arm/vgic.c
+index c9f60f524588,b70174e74868..8d550ff14700
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@@ -955,6 -1095,25 +1101,26 @@@ static void vgic_retire_disabled_irqs(s
+  	}
+  }
+  
++ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
++ 				 int lr_nr, struct vgic_lr vlr)
++ {
++ 	if (vgic_irq_is_active(vcpu, irq)) {
++ 		vlr.state |= LR_STATE_ACTIVE;
++ 		kvm_debug("Set active, clear distributor: 0x%x\n", vlr.state);
++ 		vgic_irq_clear_active(vcpu, irq);
++ 		vgic_update_state(vcpu->kvm);
++ 	} else if (vgic_dist_irq_is_pending(vcpu, irq)) {
++ 		vlr.state |= LR_STATE_PENDING;
++ 		kvm_debug("Set pending: 0x%x\n", vlr.state);
++ 	}
++ 
++ 	if (!vgic_irq_is_edge(vcpu, irq))
++ 		vlr.state |= LR_EOI_INT;
++ 
++ 	vgic_set_lr(vcpu, lr_nr, vlr);
+++	vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
++ }
++ 
+  /*
+   * Queue an interrupt to a CPU virtual interface. Return true on success,
+   * or false if it wasn't possible to queue it.
+@@@ -982,9 -1141,7 +1148,7 @@@ bool vgic_queue_irq(struct kvm_vcpu *vc
+                if (vlr.source == sgi_source_id) {
+                        kvm_debug("LR%d piggyback for IRQ%d\n", lr, vlr.irq);
+                        BUG_ON(!test_bit(lr, vgic_cpu->lr_used));
+-                       vlr.state |= LR_STATE_PENDING;
+-                       vgic_set_lr(vcpu, lr, vlr);
+-                       vgic_sync_lr_elrsr(vcpu, lr, vlr);
++                       vgic_queue_irq_to_lr(vcpu, irq, lr, vlr);
+                        return true;
+                }
+        }
+@@@ -1001,12 -1158,8 +1165,8 @@@
+  
+        vlr.irq = irq;
+        vlr.source = sgi_source_id;
+-       vlr.state = LR_STATE_PENDING;
+-       if (!vgic_irq_is_edge(vcpu, irq))
+-               vlr.state |= LR_EOI_INT;
+- 
+-       vgic_set_lr(vcpu, lr, vlr);
+-       vgic_sync_lr_elrsr(vcpu, lr, vlr);
++       vlr.state = 0;
++       vgic_queue_irq_to_lr(vcpu, irq, lr, vlr);
+  
+        return true;
+  }
+
+
+Christoffer, this is the same logic as Stephen's resolution, but
+can you confirm that it makes sense "semantically" as well?
+
+(Stephen, you'll still get the conflicts in linux-next for a
+couple of days as I finish local testing of KVM changes for 4.1).
 
 Paolo
