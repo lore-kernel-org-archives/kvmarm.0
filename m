@@ -1,26 +1,25 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: Advice on HYP interface for AsyncPF
-Date: Thu, 9 Apr 2015 13:48:52 +0100
-Message-ID: <20150409124852.GE18488@leverpostej>
-References: <5525DA0E.2010103@samsung.com>
- <20150409085723.0a201cb9@why.wild-wind.fr.eu.org>
- <20150409120646.GA3212@hawk.usersys.redhat.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v2 05/10] KVM: arm: introduce kvm_arch_setup/clear_debug()
+Date: Thu, 9 Apr 2015 14:55:12 +0200
+Message-ID: <20150409125511.GC3212@hawk.usersys.redhat.com>
+References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
+ <1427814488-28467-6-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C1B04BE33
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 08:41:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 51A204BE41
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 08:48:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1qHuNmwi5agI for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Apr 2015 08:41:20 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 92AE94BE2A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 08:41:20 -0400 (EDT)
+ with ESMTP id 4UwwtyqGwef3 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Apr 2015 08:48:02 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CD3D04BE40
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 08:48:02 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20150409120646.GA3212@hawk.usersys.redhat.com>
+In-Reply-To: <1427814488-28467-6-git-send-email-alex.bennee@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,110 +29,227 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, marc.zyngier@arm.com, jan.kiszka@siemens.com, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, zhichao.huang@linaro.org, r65777@freescale.com, pbonzini@redhat.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 09, 2015 at 01:06:47PM +0100, Andrew Jones wrote:
-> On Thu, Apr 09, 2015 at 08:57:23AM +0100, Marc Zyngier wrote:
-> > On Thu, 9 Apr 2015 02:46:54 +0100
-> > Mario Smarduch <m.smarduch@samsung.com> wrote:
-> > 
-> > Hi Mario,
-> > 
-> > > I'm working with AsyncPF, and currently using
-> > > hyp call to communicate guest GFN for host to inject
-> > > virtual abort - page not available/page available.
-> > > 
-> > > Currently only PSCI makes use of that interface,
-> > > (handle_hvc()) can we overload interface with additional
-> > > hyp calls in this case pass guest gfn? Set arg0
-> > > to some range outside of PSCI use.
-> > 
-> > I can't see a reason why we wouldn't open handle_hvc() to other
-> > paravirtualized services. But this has to be done with extreme caution:
-> > 
-> > - This becomes an ABI between host and guest
-> 
-> To expand on that, if the benefits don't out weight the maintenance
-> required for that ABI, for life, then it turns into a life-time burden.
-> Any guest-host speedups that can be conceived, which require hypercalls,
-> should probably be bounced of the hardware people first. Waiting for
-> improvements in the virt extensions may be a better choice than
-> committing to a PV solution.
-> 
-> > - We need a discovery protocol
-> 
-> Hopefully all users of the PSCI hypcall have been using function #0,
-> because handle_hvc unfortunately hasn't been checking it. In any case,
-> I'm not sure we have much choice but to start enforcing it now. Once we
-> do, with something like
-> 
-> switch(hypcall_nr) {
-> case 0: /* handle psci call */
-> default: return -KVM_ENOSYS;
-> }
-> 
-> then, I think the guest's discovery protocol can simply be
-> 
-> if (do_hypercall() == -ENOSYS) {
->    /* PV path not supported, fall back to whatever... */
-> }
+On Tue, Mar 31, 2015 at 04:08:03PM +0100, Alex Benn=E9e wrote:
+> This is a precursor for later patches which will need to do more to
+> setup debug state before entering the hyp.S switch code. The existing
+> functionality for setting mdcr_el2 has been moved out of hyp.S and now
+> uses the value kept in vcpu->arch.mdcr_el2.
+> =
 
-That only tells you the code at EL2/Hyp did something, and only if it
-actually returns. Call this on a different hypervisor (or in the absence
-of one, there's no mechanism for querying) and you might bring down that
-CPU or the entire system.
+> This also moves the conditional setting of the TDA bit from the hyp code
+> into the C code.
+> =
 
-We need to be able to detect that some hypercall interface is present
-_before_ issuing the relevant hypercalls. As Marc mentioned, we could
-have a DT node and/or ACPI entry for this, and it only needs to tell us
-enough to bootstrap querying the hypervisor for more info (as is the
-case with Xen, I believe).
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> =
 
-> 
-> > - We need to make sure other hypervisors don't reuse the same function
-> >   number for other purposes
+>  create mode 100644 arch/arm64/kvm/debug.c
+> =
 
-I don't think this is a problem so long as there's a mechanism for
-detecting the hyp interfaces provided. Xen and KVM could use the same
-numbers for different things and that's fine because you'll only use the
-Xen functions when you see the Xen node, and the KVM functions when you
-are aware you're under KVM. You can't have both simultaneously.
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_h=
+ost.h
+> index 41008cd..8c01c97 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -242,5 +242,7 @@ static inline void kvm_arch_hardware_unsetup(void) {}
+>  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+>  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+> +static inline void kvm_arch_setup_debug(struct kvm_vcpu *vcpu) {}
+> +static inline void kvm_arch_clear_debug(struct kvm_vcpu *vcpu) {}
+>  =
 
-However, these numbers must be chosen so as not to clash with SMC/HVC
-Calling Convention IDs. We can't risk clashing with PSCI or other
-standard interfaces we may want to expose to a guest in future.
+>  #endif /* __ARM_KVM_HOST_H__ */
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index 445933d..7ea8b0e 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -523,6 +523,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, st=
+ruct kvm_run *run)
+>  =
 
-> I'm not sure what this means. Xen already has several hypercalls defined
-> for ARM, the same that they have for x86, which don't match any of the
-> KVM hypercalls. Now, KVM for other arches (which is maybe what you meant)
-> does define a handful, which we should integrate with, as KVM mixes
-> architectures within it's hypercall number allocation, see
-> include/uapi/linux/kvm_para.h. Just using the common code should make it
-> easy to avoid problems. We don't have a problem with the PSCI hypcall, as
-> zero isn't allocated. Ideally we would define PSCI properly though,
-> e.g. KVM_HC_ARM_PSCI, and still reserve zero in the common header. To do
-> that maybe we'll need to keep #0 as an ARM-only alias for the new number
-> for compatibility now?
+>  		kvm_vgic_flush_hwstate(vcpu);
+>  		kvm_timer_flush_hwstate(vcpu);
+> +		kvm_arch_setup_debug(vcpu);
+>  =
 
-While the HVC immediate could be used to distinguish different types of
-calls, the guest still needs to first determine that issuing a HVC is
-not going to bring down the system, which requires it to know that a
-suitable hypervisor is present.
+>  		local_irq_disable();
+>  =
 
-> > Maybe we should adopt Xen's idea of a hypervisor node in DT where we
-> > would describe the various services? How will that work with ACPI?
-> 
-> I don't think we'll ever have a "virt guest" ACPI table that we can
-> use for this stuff, so this won't work for ACPI. But I think the ENOSYS
-> probing should be sufficient for this anyway.
+> @@ -569,6 +570,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, st=
+ruct kvm_run *run)
+>  		 * Back from guest
+>  		 *************************************************************/
+>  =
 
-As mentioned above, I don't think that probing is safe.
+> +		kvm_arch_clear_debug(vcpu);
+>  		kvm_timer_sync_hwstate(vcpu);
+>  		kvm_vgic_sync_hwstate(vcpu);
+>  =
 
-What prevents us from creating a trivial "KVM guest" table that we can
-use to determine that we can query more advanced info from KVM itself?
-Given the point is to expose KVM-specific functionality, I don't see why
-we need a more generic "virt guest" ACPI table.
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/k=
+vm_host.h
+> index 8ac3c70..0631840 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -101,6 +101,7 @@ struct kvm_vcpu_arch {
+>  =
 
-Mark.
+>  	/* HYP configuration */
+>  	u64 hcr_el2;
+> +	u32 mdcr_el2;
+>  =
+
+>  	/* Exception Information */
+>  	struct kvm_vcpu_fault_info fault;
+> @@ -257,4 +258,7 @@ static inline void kvm_arch_sync_events(struct kvm *k=
+vm) {}
+>  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+>  =
+
+> +void kvm_arch_setup_debug(struct kvm_vcpu *vcpu);
+> +void kvm_arch_clear_debug(struct kvm_vcpu *vcpu);
+> +
+>  #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offs=
+ets.c
+> index f7fa65d..cd06209 100644
+> --- a/arch/arm64/kernel/asm-offsets.c
+> +++ b/arch/arm64/kernel/asm-offsets.c
+> @@ -122,6 +122,7 @@ int main(void)
+>    DEFINE(VCPU_HPFAR_EL2,	offsetof(struct kvm_vcpu, arch.fault.hpfar_el2)=
+);
+>    DEFINE(VCPU_DEBUG_FLAGS,	offsetof(struct kvm_vcpu, arch.debug_flags));
+>    DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
+> +  DEFINE(VCPU_MDCR_EL2,	offsetof(struct kvm_vcpu, arch.mdcr_el2));
+>    DEFINE(VCPU_IRQ_LINES,	offsetof(struct kvm_vcpu, arch.irq_lines));
+>    DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_cont=
+ext));
+>    DEFINE(VCPU_TIMER_CNTV_CTL,	offsetof(struct kvm_vcpu, arch.timer_cpu.c=
+ntv_ctl));
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 4e6e09e..6796d4a 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -17,7 +17,7 @@ kvm-$(CONFIG_KVM_ARM_HOST) +=3D $(ARM)/psci.o $(ARM)/pe=
+rf.o
+>  =
+
+>  kvm-$(CONFIG_KVM_ARM_HOST) +=3D emulate.o inject_fault.o regmap.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) +=3D hyp.o hyp-init.o handle_exit.o
+> -kvm-$(CONFIG_KVM_ARM_HOST) +=3D guest.o reset.o sys_regs.o sys_regs_gene=
+ric_v8.o
+> +kvm-$(CONFIG_KVM_ARM_HOST) +=3D guest.o debug.o reset.o sys_regs.o sys_r=
+egs_generic_v8.o
+>  =
+
+>  kvm-$(CONFIG_KVM_ARM_VGIC) +=3D $(KVM)/arm/vgic.o
+>  kvm-$(CONFIG_KVM_ARM_VGIC) +=3D $(KVM)/arm/vgic-v2.o
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> new file mode 100644
+> index 0000000..8a29d0b
+> --- /dev/null
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -0,0 +1,58 @@
+> +/*
+> + * Debug and Guest Debug support
+> + *
+> + * Copyright (C) 2015 - Linaro Ltd
+> + * Author: Alex Benn=E9e <alex.bennee@linaro.org>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/kvm_arm.h>
+> +#include <asm/kvm_host.h>
+
+linux/kvm_host.h added above includes this asm/kvm_host already
+
+> +
+> +/**
+> + * kvm_arch_setup_debug - set-up debug related stuff
+> + *
+> + * @vcpu:	the vcpu pointer
+> + *
+> + * This is called before each entry in to the hypervisor to setup any
+
+into
+
+> + * debug related registers. Currently this just ensures we will trap
+> + * access to:
+> + *  - Performance monitors (MDCR_EL2_TPM/MDCR_EL2_TPMCR)
+> + *  - Debug ROM Address (MDCR_EL2_TDRA)
+> + *  - Power down debug registers (MDCR_EL2_TDOSA)
+> + *
+> + * Additionally the hypervisor lazily saves/restores the debug
+> + * register state. If it is not currently doing so (arch.debug_flags)
+> + * then we also need to ensure we trap if the guest messes with them
+> + * so we know we need to save them.
+> + */
+> +
+> +void kvm_arch_setup_debug(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.mdcr_el2 |=3D (MDCR_EL2_TPM | MDCR_EL2_TPMCR);
+> +	vcpu->arch.mdcr_el2 |=3D (MDCR_EL2_TDRA | MDCR_EL2_TDOSA);
+> +
+> +	if (!vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
+
+missing () in the if (!(x & y)) condition
+
+> +		vcpu->arch.mdcr_el2 |=3D MDCR_EL2_TDA;
+> +	else
+> +		vcpu->arch.mdcr_el2 &=3D ~MDCR_EL2_TDA;
+> +
+> +}
+> +
+> +void kvm_arch_clear_debug(struct kvm_vcpu *vcpu)
+> +{
+> +	/* Nothing to do yet */
+> +}
+> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+> index 5befd01..be92bfe1 100644
+> --- a/arch/arm64/kvm/hyp.S
+> +++ b/arch/arm64/kvm/hyp.S
+> @@ -768,17 +768,8 @@
+>  	mov	x2, #(1 << 15)	// Trap CP15 Cr=3D15
+>  	msr	hstr_el2, x2
+>  =
+
+> -	mrs	x2, mdcr_el2
+> -	and	x2, x2, #MDCR_EL2_HPMN_MASK
+> -	orr	x2, x2, #(MDCR_EL2_TPM | MDCR_EL2_TPMCR)
+> -	orr	x2, x2, #(MDCR_EL2_TDRA | MDCR_EL2_TDOSA)
+> -
+> -	// Check for KVM_ARM64_DEBUG_DIRTY, and set debug to trap
+> -	// if not dirty.
+> -	ldr	x3, [x0, #VCPU_DEBUG_FLAGS]
+> -	tbnz	x3, #KVM_ARM64_DEBUG_DIRTY_SHIFT, 1f
+> -	orr	x2, x2,  #MDCR_EL2_TDA
+> -1:
+> +	// Monitor Debug Config - see kvm_arch_setup_debug()
+> +	ldr	x2, [x0, #VCPU_MDCR_EL2]
+>  	msr	mdcr_el2, x2
+>  .endm
+
+We lose the preservation of HPMN, as I see David points out as well.
+Based on the ARM ARM setting it to zero is most likely wrong, as
+that results in constrained unpredictable behavior.
+
+drew
