@@ -1,28 +1,27 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] arm: KVM: force execution of HCPTR access on VM exit
-Date: Thu, 9 Apr 2015 15:35:40 +0200
-Message-ID: <20150409133540.GO4715@cbox>
-References: <1426503583-8958-1-git-send-email-marc.zyngier@arm.com>
- <20150408114033.GH4715@cbox> <55256282.40606@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: Advice on HYP interface for AsyncPF
+Date: Thu, 9 Apr 2015 15:43:27 +0200
+Message-ID: <20150409134326.GF3212@hawk.usersys.redhat.com>
+References: <5525DA0E.2010103@samsung.com>
+ <20150409085723.0a201cb9@why.wild-wind.fr.eu.org>
+ <20150409120646.GA3212@hawk.usersys.redhat.com>
+ <20150409124852.GE18488@leverpostej>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DFA674BD8D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 09:28:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 768D64BE77
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 09:36:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5+6djNCdSJqf for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Apr 2015 09:28:05 -0400 (EDT)
-Received: from mail-la0-f53.google.com (mail-la0-f53.google.com
- [209.85.215.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 102884BE73
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 09:28:04 -0400 (EDT)
-Received: by lagv1 with SMTP id v1so89669235lag.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Apr 2015 06:35:40 -0700 (PDT)
+ with ESMTP id wk3xxnTlt+xN for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Apr 2015 09:35:58 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 48E534BE74
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 09:35:57 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <55256282.40606@arm.com>
+In-Reply-To: <20150409124852.GE18488@leverpostej>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,66 +31,131 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Apr 08, 2015 at 06:16:50PM +0100, Marc Zyngier wrote:
-> On 08/04/15 12:40, Christoffer Dall wrote:
-> > On Mon, Mar 16, 2015 at 10:59:43AM +0000, Marc Zyngier wrote:
-> >> On VM entry, we disable access to the VFP registers in order to
-> >> perform a lazy save/restore of these registers.
-> >>
-> >> On VM exit, we restore access, test if we did enable them before,
-> >> and save/restore the guest/host registers if necessary. In this
-> >> sequence, the FPEXC register is always accessed, irrespective
-> >> of the trapping configuration.
-> >>
-> >> If the guest didn't touch the VFP registers, then the HCPTR access
-> >> has now enabled such access, but we're missing a barrier to ensure
-> >> architectural execution of the new HCPTR configuration. If the HCPTR
-> >> access has been delayed/reordered, the subsequent access to FPEXC
-> >> will cause a trap, which we aren't prepared to handle at all.
-> >>
-> >> The fix is to introduce a barrier that only takes place if the
-> >> guest hasn't accessed its view of the VFP registers, making
-> >> the access to FPEXC safe.
-> >>
-> >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> >> ---
-> >>  arch/arm/kvm/interrupts.S | 7 +++++--
-> >>  1 file changed, 5 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
-> >> index 79caf79..3ac7aca 100644
-> >> --- a/arch/arm/kvm/interrupts.S
-> >> +++ b/arch/arm/kvm/interrupts.S
-> >> @@ -175,10 +175,13 @@ __kvm_vcpu_return:
-> >>  #ifdef CONFIG_VFPv3
-> >>  	@ Save floating point registers we if let guest use them.
-> >>  	tst	r2, #(HCPTR_TCP(10) | HCPTR_TCP(11))
-> >> -	bne	after_vfp_restore
-> >> +	beq	1f
-> >> +
-> >> +	isb	@ Force execution of HCPTR if we've just reenabled VFP access
-> >> +	b	after_vfp_restore
-> >>  
-> >>  	@ Switch VFP/NEON hardware state to the host's
-> >> -	add	r7, vcpu, #VCPU_VFP_GUEST
-> >> +1:	add	r7, vcpu, #VCPU_VFP_GUEST
-> >>  	store_vfp_state r7
-> >>  	add	r7, vcpu, #VCPU_VFP_HOST
-> >>  	ldr	r7, [r7]
-> >> -- 
-> >> 2.1.4
-> >>
+On Thu, Apr 09, 2015 at 01:48:52PM +0100, Mark Rutland wrote:
+> On Thu, Apr 09, 2015 at 01:06:47PM +0100, Andrew Jones wrote:
+> > On Thu, Apr 09, 2015 at 08:57:23AM +0100, Marc Zyngier wrote:
+> > > On Thu, 9 Apr 2015 02:46:54 +0100
+> > > Mario Smarduch <m.smarduch@samsung.com> wrote:
+> > > 
+> > > Hi Mario,
+> > > 
+> > > > I'm working with AsyncPF, and currently using
+> > > > hyp call to communicate guest GFN for host to inject
+> > > > virtual abort - page not available/page available.
+> > > > 
+> > > > Currently only PSCI makes use of that interface,
+> > > > (handle_hvc()) can we overload interface with additional
+> > > > hyp calls in this case pass guest gfn? Set arg0
+> > > > to some range outside of PSCI use.
+> > > 
+> > > I can't see a reason why we wouldn't open handle_hvc() to other
+> > > paravirtualized services. But this has to be done with extreme caution:
+> > > 
+> > > - This becomes an ABI between host and guest
 > > 
-> > Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > To expand on that, if the benefits don't out weight the maintenance
+> > required for that ABI, for life, then it turns into a life-time burden.
+> > Any guest-host speedups that can be conceived, which require hypercalls,
+> > should probably be bounced of the hardware people first. Waiting for
+> > improvements in the virt extensions may be a better choice than
+> > committing to a PV solution.
+> > 
+> > > - We need a discovery protocol
+> > 
+> > Hopefully all users of the PSCI hypcall have been using function #0,
+> > because handle_hvc unfortunately hasn't been checking it. In any case,
+> > I'm not sure we have much choice but to start enforcing it now. Once we
+> > do, with something like
+> > 
+> > switch(hypcall_nr) {
+> > case 0: /* handle psci call */
+> > default: return -KVM_ENOSYS;
+> > }
+> > 
+> > then, I think the guest's discovery protocol can simply be
+> > 
+> > if (do_hypercall() == -ENOSYS) {
+> >    /* PV path not supported, fall back to whatever... */
+> > }
 > 
-> Thanks (I must admit I completely forgot the existence of this patch...).
+> That only tells you the code at EL2/Hyp did something, and only if it
+> actually returns. Call this on a different hypervisor (or in the absence
+> of one, there's no mechanism for querying) and you might bring down that
+> CPU or the entire system.
 > 
-> I guess we can queue that for -rc1, with a Cc to stable...
+> We need to be able to detect that some hypercall interface is present
+> _before_ issuing the relevant hypercalls. As Marc mentioned, we could
+> have a DT node and/or ACPI entry for this, and it only needs to tell us
+> enough to bootstrap querying the hypervisor for more info (as is the
+> case with Xen, I believe).
 > 
-yes, I tested it on TC2 (both A15 and A7) and it works like a charm.
+> > 
+> > > - We need to make sure other hypervisors don't reuse the same function
+> > >   number for other purposes
+> 
+> I don't think this is a problem so long as there's a mechanism for
+> detecting the hyp interfaces provided. Xen and KVM could use the same
+> numbers for different things and that's fine because you'll only use the
+> Xen functions when you see the Xen node, and the KVM functions when you
+> are aware you're under KVM. You can't have both simultaneously.
+> 
+> However, these numbers must be chosen so as not to clash with SMC/HVC
+> Calling Convention IDs. We can't risk clashing with PSCI or other
+> standard interfaces we may want to expose to a guest in future.
+> 
+> > I'm not sure what this means. Xen already has several hypercalls defined
+> > for ARM, the same that they have for x86, which don't match any of the
+> > KVM hypercalls. Now, KVM for other arches (which is maybe what you meant)
+> > does define a handful, which we should integrate with, as KVM mixes
+> > architectures within it's hypercall number allocation, see
+> > include/uapi/linux/kvm_para.h. Just using the common code should make it
+> > easy to avoid problems. We don't have a problem with the PSCI hypcall, as
+> > zero isn't allocated. Ideally we would define PSCI properly though,
+> > e.g. KVM_HC_ARM_PSCI, and still reserve zero in the common header. To do
+> > that maybe we'll need to keep #0 as an ARM-only alias for the new number
+> > for compatibility now?
+> 
+> While the HVC immediate could be used to distinguish different types of
+> calls, the guest still needs to first determine that issuing a HVC is
+> not going to bring down the system, which requires it to know that a
+> suitable hypervisor is present.
 
--Christoffer
+Right. I forgot we don't have anything for this in the kvmarm world. I
+should have remembered, having just crossed this path for a different
+issue (virt-what). In the x86 world we have a cpuid that allows guests
+to see that they are a) a guest and b) of what type. The hypervisor can
+fake the type if it wishes. For example KVM can emulate HyperV, allowing
+Windows guests to use their "native" PV ops.
+
+In the ARM world the hypervisor DT node does seem to be the closet
+equivalent that currently exists. Both Xen and ppc KVM use it already.
+Using this for DT guests means we'll need the ACPI solution though.
+
+> 
+> > > Maybe we should adopt Xen's idea of a hypervisor node in DT where we
+> > > would describe the various services? How will that work with ACPI?
+> > 
+> > I don't think we'll ever have a "virt guest" ACPI table that we can
+> > use for this stuff, so this won't work for ACPI. But I think the ENOSYS
+> > probing should be sufficient for this anyway.
+> 
+> As mentioned above, I don't think that probing is safe.
+> 
+> What prevents us from creating a trivial "KVM guest" table that we can
+> use to determine that we can query more advanced info from KVM itself?
+> Given the point is to expose KVM-specific functionality, I don't see why
+> we need a more generic "virt guest" ACPI table.
+>
+
+Just as the hypervisor node is more attractive with the consideration
+that it's being adopted by other parties (xen and kvmppc), any ACPI
+tables will be more likely to be accepted if they have buy-in from
+a greater audience. kvmarm would be the only consumer for the time
+being, but it'd be good if it was more general from the start,
+particularly if general kernel code would need to know about it.
+
+drew
