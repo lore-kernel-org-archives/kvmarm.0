@@ -1,26 +1,26 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH 1/2] kvm: introduce kvm_arch_msi_data_to_gsi
-Date: Thu,  9 Apr 2015 16:20:07 +0100
-Message-ID: <1428592808-4424-2-git-send-email-eric.auger@linaro.org>
-References: <1428592808-4424-1-git-send-email-eric.auger@linaro.org>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: avoid using kvm_run for in-kernel
+ emulation
+Date: Thu, 09 Apr 2015 16:55:45 +0100
+Message-ID: <5526A101.1040301@arm.com>
+References: <1427507300-19200-1-git-send-email-andre.przywara@arm.com>
+ <20150409133042.GM4715@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C83C4BF0B
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 11:12:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E5864BF14
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 11:48:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iWKfEOSd8OvK for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Apr 2015 11:12:44 -0400 (EDT)
-Received: from mail-wi0-f182.google.com (mail-wi0-f182.google.com
- [209.85.212.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C745B4BF01
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 11:12:43 -0400 (EDT)
-Received: by wiaa2 with SMTP id a2so102716432wia.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Apr 2015 08:20:19 -0700 (PDT)
-In-Reply-To: <1428592808-4424-1-git-send-email-eric.auger@linaro.org>
+ with ESMTP id DbPcTPyGXyw6 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Apr 2015 11:48:12 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C10C4BF04
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 11:48:11 -0400 (EDT)
+In-Reply-To: <20150409133042.GM4715@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,115 +30,215 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, pbonzini@redhat.com, peter.maydell@linaro.org, cornelia.huck@de.ibm.com, borntraeger@de.ibm.com, agraf@suse.de, james.hogan@imgtec.com
-Cc: aik@ozlabs.ru, kvmarm@lists.cs.columbia.edu, patches@linaro.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On ARM the MSI data corresponds to the shared peripheral interrupt (SPI)
-ID. This latter equals to the SPI index + 32. to retrieve the SPI index,
-matching the gsi, an architecture specific function is introduced.
+Hej Christoffer,
 
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
----
- include/sysemu/kvm.h | 2 ++
- kvm-all.c            | 2 +-
- target-arm/kvm.c     | 5 +++++
- target-i386/kvm.c    | 5 +++++
- target-mips/kvm.c    | 5 +++++
- target-ppc/kvm.c     | 5 +++++
- target-s390x/kvm.c   | 5 +++++
- 7 files changed, 28 insertions(+), 1 deletion(-)
+On 09/04/15 14:30, Christoffer Dall wrote:
+> On Sat, Mar 28, 2015 at 01:48:20AM +0000, Andre Przywara wrote:
+>> Our in-kernel VGIC emulation still uses struct kvm_run briefly before
+>> writing back the emulation result into the guest register. Using a
+>> userspace mapped data structure within the kernel sounds dodgy, also
+>> we do some extra copying at the moment at the end of the VGIC
+>> emulation code.
+>> Replace the usage of struct kvm_run in favour of passing separate
+>> parameters into kvm_handle_mmio_return (and rename the function on
+>> the way) to optimise the VGIC emulation. The real userland MMIO code
+>> path does not change much.
+>>
+>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> ---
+>> Hi,
+>>
+>> this is an optimization of the VGIC code totally removing struct
+>> kvm_run from the VGIC emulation. In my eyes it provides a nice
+>> cleanup and is a logical consequence of the kvm_io_bus patches (on
+>> which it goes on top). On the other hand it is optional and I didn't
+>> want to merge it with the already quite large last patch 11.
+>> Marc, I leave it up to you whether you take this as part of the
+>> kvm_io_bus series or not.
+>>
+>> Cheers,
+>> Andre.
+>>
+>>  arch/arm/include/asm/kvm_mmio.h   |    3 +-
+>>  arch/arm/kvm/arm.c                |    6 ++--
+>>  arch/arm/kvm/mmio.c               |   55 ++++++++++++++++++-------------------
+>>  arch/arm64/include/asm/kvm_mmio.h |    3 +-
+>>  virt/kvm/arm/vgic.c               |    8 ++----
+>>  5 files changed, 37 insertions(+), 38 deletions(-)
+>>
+>> diff --git a/arch/arm/include/asm/kvm_mmio.h b/arch/arm/include/asm/kvm_mmio.h
+>> index d8e90c8..53461a6 100644
+>> --- a/arch/arm/include/asm/kvm_mmio.h
+>> +++ b/arch/arm/include/asm/kvm_mmio.h
+>> @@ -28,7 +28,8 @@ struct kvm_decode {
+>>  	bool sign_extend;
+>>  };
+>>  
+>> -int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>> +int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, unsigned int len,
+>> +			    void *val, gpa_t phys_addr);
+>>  int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>>  		 phys_addr_t fault_ipa);
+>>  
+>> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+>> index e98370c..b837aef 100644
+>> --- a/arch/arm/kvm/arm.c
+>> +++ b/arch/arm/kvm/arm.c
+>> @@ -506,8 +506,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>>  	if (ret)
+>>  		return ret;
+>>  
+>> -	if (run->exit_reason == KVM_EXIT_MMIO) {
+>> -		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
+>> +	if (run->exit_reason == KVM_EXIT_MMIO && !run->mmio.is_write) {
+>> +		ret = kvm_writeback_mmio_data(vcpu, run->mmio.len,
+>> +					      run->mmio.data,
+>> +					      run->mmio.phys_addr);
+>>  		if (ret)
+>>  			return ret;
+>>  	}
+>> diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
+>> index 974b1c6..3c57f96 100644
+>> --- a/arch/arm/kvm/mmio.c
+>> +++ b/arch/arm/kvm/mmio.c
+>> @@ -86,38 +86,36 @@ static unsigned long mmio_read_buf(char *buf, unsigned int len)
+>>  }
+>>  
+>>  /**
+>> - * kvm_handle_mmio_return -- Handle MMIO loads after user space emulation
+>> - * @vcpu: The VCPU pointer
+>> - * @run:  The VCPU run struct containing the mmio data
+>> + * kvm_writeback_mmio_data -- Handle MMIO loads after user space emulation
+>> + * @vcpu:	The VCPU pointer
+>> + * @len:	The length in Bytes of the MMIO access
+>> + * @data_ptr:	Pointer to the data to be written back into the guest
+>> + * @phys_addr:	Physical address of the originating MMIO access
+>>   *
+>>   * This should only be called after returning from userspace for MMIO load
+>> - * emulation.
+>> + * emulation. phys_addr is only used for the tracepoint output.
+>>   */
+>> -int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>> +int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, unsigned int len,
+>> +			    void *data_ptr, gpa_t phys_addr)
+>>  {
+>>  	unsigned long data;
+>> -	unsigned int len;
+>>  	int mask;
+>>  
+>> -	if (!run->mmio.is_write) {
+>> -		len = run->mmio.len;
+>> -		if (len > sizeof(unsigned long))
+>> -			return -EINVAL;
+>> +	if (len > sizeof(unsigned long))
+>> +		return -EINVAL;
+>>  
+>> -		data = mmio_read_buf(run->mmio.data, len);
+>> +	data = mmio_read_buf(data_ptr, len);
+>>  
+>> -		if (vcpu->arch.mmio_decode.sign_extend &&
+>> -		    len < sizeof(unsigned long)) {
+>> -			mask = 1U << ((len * 8) - 1);
+>> -			data = (data ^ mask) - mask;
+>> -		}
+>> -
+>> -		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
+>> -			       data);
+>> -		data = vcpu_data_host_to_guest(vcpu, data, len);
+>> -		*vcpu_reg(vcpu, vcpu->arch.mmio_decode.rt) = data;
+>> +	if (vcpu->arch.mmio_decode.sign_extend &&
+>> +	    len < sizeof(unsigned long)) {
+>> +		mask = 1U << ((len * 8) - 1);
+>> +		data = (data ^ mask) - mask;
+>>  	}
+>>  
+>> +	trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, phys_addr, data);
+>> +	data = vcpu_data_host_to_guest(vcpu, data, len);
+>> +	*vcpu_reg(vcpu, vcpu->arch.mmio_decode.rt) = data;
+>> +
+>>  	return 0;
+>>  }
+>>  
+>> @@ -201,18 +199,19 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>>  				      data_buf);
+>>  	}
+>>  
+>> -	/* Now prepare kvm_run for the potential return to userland. */
+>> -	run->mmio.is_write	= is_write;
+>> -	run->mmio.phys_addr	= fault_ipa;
+>> -	run->mmio.len		= len;
+>> -	memcpy(run->mmio.data, data_buf, len);
+>> -
+>>  	if (!ret) {
+>>  		/* We handled the access successfully in the kernel. */
+>> -		kvm_handle_mmio_return(vcpu, run);
+>> +		if (!is_write)
+>> +			kvm_writeback_mmio_data(vcpu, len, data_buf, fault_ipa);
+>>  		return 1;
+>>  	}
+>>  
+>> +	/* Now prepare the kvm_run structure for the return to userland. */
+>> +	run->mmio.phys_addr	= fault_ipa;
+>> +	run->mmio.len		= len;
+>> +	run->mmio.is_write	= is_write;
+>> +	memcpy(run->mmio.data, data_buf, len);
+>>  	run->exit_reason	= KVM_EXIT_MMIO;
+>> +
+>>  	return 0;
+>>  }
+>> diff --git a/arch/arm64/include/asm/kvm_mmio.h b/arch/arm64/include/asm/kvm_mmio.h
+>> index 889c908..3b83475 100644
+>> --- a/arch/arm64/include/asm/kvm_mmio.h
+>> +++ b/arch/arm64/include/asm/kvm_mmio.h
+>> @@ -31,7 +31,8 @@ struct kvm_decode {
+>>  	bool sign_extend;
+>>  };
+>>  
+>> -int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>> +int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, unsigned int len,
+>> +			    void *val, gpa_t phys_addr);
+>>  int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>>  		 phys_addr_t fault_ipa);
+>>  
+>> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+>> index b70174e..4047fc0 100644
+>> --- a/virt/kvm/arm/vgic.c
+>> +++ b/virt/kvm/arm/vgic.c
+>> @@ -803,7 +803,6 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
+>>  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+>>  	struct vgic_io_device *iodev = container_of(this,
+>>  						    struct vgic_io_device, dev);
+>> -	struct kvm_run *run = vcpu->run;
+>>  	const struct vgic_io_range *range;
+>>  	struct kvm_exit_mmio mmio;
+>>  	bool updated_state;
+>> @@ -832,12 +831,9 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
+>>  		updated_state = false;
+>>  	}
+>>  	spin_unlock(&dist->lock);
+>> -	run->mmio.is_write	= is_write;
+>> -	run->mmio.len		= len;
+>> -	run->mmio.phys_addr	= addr;
+>> -	memcpy(run->mmio.data, val, len);
+>>  
+>> -	kvm_handle_mmio_return(vcpu, run);
+>> +	if (!is_write)
+>> +		kvm_writeback_mmio_data(vcpu, len, val, addr);
+> 
+> why do we do a kvm_writeback_mmio_data() call here in addition to
+> io_mem_abort() ?  Are we not doing this twice?  What am I missing?
 
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 197e6c0..ebd8b17 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -286,6 +286,8 @@ void kvm_arch_init_irq_routing(KVMState *s);
- int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
-                              uint64_t address, uint32_t data);
- 
-+int kvm_arch_msi_data_to_gsi(uint32_t data);
-+
- int kvm_set_irq(KVMState *s, int irq, int level);
- int kvm_irqchip_send_msi(KVMState *s, MSIMessage msg);
- 
-diff --git a/kvm-all.c b/kvm-all.c
-index dd44f8c..3e9675e 100644
---- a/kvm-all.c
-+++ b/kvm-all.c
-@@ -1228,7 +1228,7 @@ int kvm_irqchip_add_msi_route(KVMState *s, MSIMessage msg)
-     int virq;
- 
-     if (kvm_gsi_direct_mapping()) {
--        return msg.data & 0xffff;
-+        return kvm_arch_msi_data_to_gsi(msg.data);
-     }
- 
-     if (!kvm_gsi_routing_enabled()) {
-diff --git a/target-arm/kvm.c b/target-arm/kvm.c
-index fdd9ba3..05d5634 100644
---- a/target-arm/kvm.c
-+++ b/target-arm/kvm.c
-@@ -598,3 +598,8 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
- {
-     return 0;
- }
-+
-+int kvm_arch_msi_data_to_gsi(uint32_t data)
-+{
-+    return (data - 32) & 0xffff;
-+}
-diff --git a/target-i386/kvm.c b/target-i386/kvm.c
-index 41d09e5..7c648e7 100644
---- a/target-i386/kvm.c
-+++ b/target-i386/kvm.c
-@@ -2764,3 +2764,8 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
- {
-     return 0;
- }
-+
-+int kvm_arch_msi_data_to_gsi(uint32_t data)
-+{
-+    return data & 0xffff;
-+}
-diff --git a/target-mips/kvm.c b/target-mips/kvm.c
-index 4d1f7ea..e53e059 100644
---- a/target-mips/kvm.c
-+++ b/target-mips/kvm.c
-@@ -694,3 +694,8 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
- {
-     return 0;
- }
-+
-+int kvm_arch_msi_data_to_gsi(uint32_t data)
-+{
-+    return data & 0xffff;
-+}
-diff --git a/target-ppc/kvm.c b/target-ppc/kvm.c
-index 12328a4..53569f6 100644
---- a/target-ppc/kvm.c
-+++ b/target-ppc/kvm.c
-@@ -2408,3 +2408,8 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
- {
-     return 0;
- }
-+
-+int kvm_arch_msi_data_to_gsi(uint32_t data)
-+{
-+    return data & 0xffff;
-+}
-diff --git a/target-s390x/kvm.c b/target-s390x/kvm.c
-index b48c643..6509aff 100644
---- a/target-s390x/kvm.c
-+++ b/target-s390x/kvm.c
-@@ -1940,3 +1940,8 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
-     route->u.adapter.adapter_id = pbdev->routes.adapter.adapter_id;
-     return 0;
- }
-+
-+int kvm_arch_msi_data_to_gsi(uint32_t data)
-+{
-+    return data & 0xffff;
-+}
--- 
-1.8.3.2
+You are missing: ... nothing, we are indeed doing it twice. This looks
+like an oversight when converting from using a data buffer to a pointer.
+
+So we can drop this here, and io_mem_abort() takes care (tested
+quickly). Shall I add a comment or just remove those two lines?
+
+Are you OK with the rest of the patch?
+
+Cheers,
+Andre.
