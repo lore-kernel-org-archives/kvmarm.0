@@ -1,27 +1,26 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v2 04/10] KVM: arm: guest debug, add stub
- KVM_SET_GUEST_DEBUG ioctl
-Date: Thu, 9 Apr 2015 14:28:07 +0200
-Message-ID: <20150409122806.GB3212@hawk.usersys.redhat.com>
-References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
- <1427814488-28467-5-git-send-email-alex.bennee@linaro.org>
- <20150401175529.642f64af@thinkpad-w530>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: Advice on HYP interface for AsyncPF
+Date: Thu, 9 Apr 2015 13:48:52 +0100
+Message-ID: <20150409124852.GE18488@leverpostej>
+References: <5525DA0E.2010103@samsung.com>
+ <20150409085723.0a201cb9@why.wild-wind.fr.eu.org>
+ <20150409120646.GA3212@hawk.usersys.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A127E4BE23
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 08:21:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C1B04BE33
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 08:41:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IZQQBdi3xDWA for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Apr 2015 08:21:04 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C457F4BE21
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 08:21:03 -0400 (EDT)
+ with ESMTP id 1qHuNmwi5agI for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Apr 2015 08:41:20 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92AE94BE2A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 08:41:20 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20150401175529.642f64af@thinkpad-w530>
+In-Reply-To: <20150409120646.GA3212@hawk.usersys.redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,110 +30,110 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: David Hildenbrand <dahi@linux.vnet.ibm.com>
-Cc: Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, marc.zyngier@arm.com, jan.kiszka@siemens.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, Gleb Natapov <gleb@kernel.org>, linux-arm-kernel@lists.infradead.org, zhichao.huang@linaro.org, r65777@freescale.com, pbonzini@redhat.com, bp@suse.de, kvmarm@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Apr 01, 2015 at 05:55:29PM +0200, David Hildenbrand wrote:
-> > This commit adds a stub function to support the KVM_SET_GUEST_DEBUG
-> > ioctl. Currently any operation flag will return EINVAL. Actual
-> =
+On Thu, Apr 09, 2015 at 01:06:47PM +0100, Andrew Jones wrote:
+> On Thu, Apr 09, 2015 at 08:57:23AM +0100, Marc Zyngier wrote:
+> > On Thu, 9 Apr 2015 02:46:54 +0100
+> > Mario Smarduch <m.smarduch@samsung.com> wrote:
+> > 
+> > Hi Mario,
+> > 
+> > > I'm working with AsyncPF, and currently using
+> > > hyp call to communicate guest GFN for host to inject
+> > > virtual abort - page not available/page available.
+> > > 
+> > > Currently only PSCI makes use of that interface,
+> > > (handle_hvc()) can we overload interface with additional
+> > > hyp calls in this case pass guest gfn? Set arg0
+> > > to some range outside of PSCI use.
+> > 
+> > I can't see a reason why we wouldn't open handle_hvc() to other
+> > paravirtualized services. But this has to be done with extreme caution:
+> > 
+> > - This becomes an ABI between host and guest
+> 
+> To expand on that, if the benefits don't out weight the maintenance
+> required for that ABI, for life, then it turns into a life-time burden.
+> Any guest-host speedups that can be conceived, which require hypercalls,
+> should probably be bounced of the hardware people first. Waiting for
+> improvements in the virt extensions may be a better choice than
+> committing to a PV solution.
+> 
+> > - We need a discovery protocol
+> 
+> Hopefully all users of the PSCI hypcall have been using function #0,
+> because handle_hvc unfortunately hasn't been checking it. In any case,
+> I'm not sure we have much choice but to start enforcing it now. Once we
+> do, with something like
+> 
+> switch(hypcall_nr) {
+> case 0: /* handle psci call */
+> default: return -KVM_ENOSYS;
+> }
+> 
+> then, I think the guest's discovery protocol can simply be
+> 
+> if (do_hypercall() == -ENOSYS) {
+>    /* PV path not supported, fall back to whatever... */
+> }
 
-> Well it won't return -EINVAL if you push in KVM_GUESTDBG_ENABLE or 0.
-> =
+That only tells you the code at EL2/Hyp did something, and only if it
+actually returns. Call this on a different hypervisor (or in the absence
+of one, there's no mechanism for querying) and you might bring down that
+CPU or the entire system.
 
-> "Any unsupported flag will return -EINVAL. For now, only KVM_GUESTDBG_ENA=
-BLE is
-> supported, although it won't have any effects."
-> =
+We need to be able to detect that some hypercall interface is present
+_before_ issuing the relevant hypercalls. As Marc mentioned, we could
+have a DT node and/or ACPI entry for this, and it only needs to tell us
+enough to bootstrap querying the hypervisor for more info (as is the
+case with Xen, I believe).
 
-> > functionality will be added with further patches.
-> > =
+> 
+> > - We need to make sure other hypervisors don't reuse the same function
+> >   number for other purposes
 
-> > Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>.
-> > =
+I don't think this is a problem so long as there's a mechanism for
+detecting the hyp interfaces provided. Xen and KVM could use the same
+numbers for different things and that's fine because you'll only use the
+Xen functions when you see the Xen node, and the KVM functions when you
+are aware you're under KVM. You can't have both simultaneously.
 
-> > ---
-> > v2
-> >   - simplified form of the ioctl (stuff will go into setup_debug)
-> > =
+However, these numbers must be chosen so as not to clash with SMC/HVC
+Calling Convention IDs. We can't risk clashing with PSCI or other
+standard interfaces we may want to expose to a guest in future.
 
-> > diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/=
-kvm/api.txt
-> > index b112efc..06c5064 100644
-> > --- a/Documentation/virtual/kvm/api.txt
-> > +++ b/Documentation/virtual/kvm/api.txt
-> > @@ -2604,7 +2604,7 @@ handled.
-> >  4.87 KVM_SET_GUEST_DEBUG
-> > =
+> I'm not sure what this means. Xen already has several hypercalls defined
+> for ARM, the same that they have for x86, which don't match any of the
+> KVM hypercalls. Now, KVM for other arches (which is maybe what you meant)
+> does define a handful, which we should integrate with, as KVM mixes
+> architectures within it's hypercall number allocation, see
+> include/uapi/linux/kvm_para.h. Just using the common code should make it
+> easy to avoid problems. We don't have a problem with the PSCI hypcall, as
+> zero isn't allocated. Ideally we would define PSCI properly though,
+> e.g. KVM_HC_ARM_PSCI, and still reserve zero in the common header. To do
+> that maybe we'll need to keep #0 as an ARM-only alias for the new number
+> for compatibility now?
 
-> >  Capability: KVM_CAP_SET_GUEST_DEBUG
-> > -Architectures: x86, s390, ppc
-> > +Architectures: x86, s390, ppc, arm64
-> >  Type: vcpu ioctl
-> >  Parameters: struct kvm_guest_debug (in)
-> >  Returns: 0 on success; -1 on error
-> > diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> > index 5560f74..445933d 100644
-> > --- a/arch/arm/kvm/arm.c
-> > +++ b/arch/arm/kvm/arm.c
-> > @@ -183,6 +183,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, l=
-ong ext)
-> >  	case KVM_CAP_ARM_PSCI:
-> >  	case KVM_CAP_ARM_PSCI_0_2:
-> >  	case KVM_CAP_READONLY_MEM:
-> > +	case KVM_CAP_SET_GUEST_DEBUG:
-> >  		r =3D 1;
-> >  		break;
-> >  	case KVM_CAP_COALESCED_MMIO:
-> > @@ -303,10 +304,21 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-> >  	kvm_arm_set_running_vcpu(NULL);
-> >  }
-> > =
+While the HVC immediate could be used to distinguish different types of
+calls, the guest still needs to first determine that issuing a HVC is
+not going to bring down the system, which requires it to know that a
+suitable hypervisor is present.
 
-> > +#define KVM_GUESTDBG_VALID (KVM_GUESTDBG_ENABLE)
-> =
+> > Maybe we should adopt Xen's idea of a hypervisor node in DT where we
+> > would describe the various services? How will that work with ACPI?
+> 
+> I don't think we'll ever have a "virt guest" ACPI table that we can
+> use for this stuff, so this won't work for ACPI. But I think the ENOSYS
+> probing should be sufficient for this anyway.
 
-> That makes me rather think that it is another flag.
-> =
+As mentioned above, I don't think that probing is safe.
 
-> We(s390x) use VALID_GUESTDBG_FLAGS, what about that or KVM_GUESTDBG_VALID=
-_MASK?
-> =
+What prevents us from creating a trivial "KVM guest" table that we can
+use to determine that we can query more advanced info from KVM itself?
+Given the point is to expose KVM-specific functionality, I don't see why
+we need a more generic "virt guest" ACPI table.
 
-> > +
-> >  int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
-> >  					struct kvm_guest_debug *dbg)
-> >  {
-> > -	return -EINVAL;
-> > +	if (dbg->control & KVM_GUESTDBG_ENABLE) {
-> > +		if (dbg->control & ~KVM_GUESTDBG_VALID)
-> > +			return -EINVAL;
-> =
-
-> I'd move that check directly to the start of the function and bail out on=
- any
-> unsupported flag.
-> =
-
-> > +
-> > +		vcpu->guest_debug =3D dbg->control;
-> > +	} else {
-> > +		/* If not enabled clear all flags */
-> > +		vcpu->guest_debug =3D 0;
-> > +	}
-> > +	return 0;
-> >  }
-> > =
-
-> > =
-
-> =
-
-> David
->
-
-I don't see any follow-up from Alex on this, so I feel the need to
-"+1" all David's comments here.
-
-drew
+Mark.
