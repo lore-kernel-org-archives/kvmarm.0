@@ -1,217 +1,116 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: avoid using kvm_run for in-kernel
- emulation
-Date: Thu, 9 Apr 2015 15:30:42 +0200
-Message-ID: <20150409133042.GM4715@cbox>
-References: <1427507300-19200-1-git-send-email-andre.przywara@arm.com>
+Subject: Re: Advice on HYP interface for AsyncPF
+Date: Thu, 9 Apr 2015 15:35:06 +0200
+Message-ID: <20150409133506.GN4715@cbox>
+References: <5525DA0E.2010103@samsung.com>
+ <20150409085723.0a201cb9@why.wild-wind.fr.eu.org>
+ <20150409120646.GA3212@hawk.usersys.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C92064BE62
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 09:27:33 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id kHWuhOBpkLS9 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Apr 2015 09:27:31 -0400 (EDT)
+Received: from mail-la0-f44.google.com (mail-la0-f44.google.com
+ [209.85.215.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A61E94BE57
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 09:27:30 -0400 (EDT)
+Received: by laat2 with SMTP id t2so82535384laa.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Apr 2015 06:35:05 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1427507300-19200-1-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <20150409120646.GA3212@hawk.usersys.redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, Mar 28, 2015 at 01:48:20AM +0000, Andre Przywara wrote:
-> Our in-kernel VGIC emulation still uses struct kvm_run briefly before
-> writing back the emulation result into the guest register. Using a
-> userspace mapped data structure within the kernel sounds dodgy, also
-> we do some extra copying at the moment at the end of the VGIC
-> emulation code.
-> Replace the usage of struct kvm_run in favour of passing separate
-> parameters into kvm_handle_mmio_return (and rename the function on
-> the way) to optimise the VGIC emulation. The real userland MMIO code
-> path does not change much.
+On Thu, Apr 09, 2015 at 02:06:47PM +0200, Andrew Jones wrote:
+> On Thu, Apr 09, 2015 at 08:57:23AM +0100, Marc Zyngier wrote:
+> > On Thu, 9 Apr 2015 02:46:54 +0100
+> > Mario Smarduch <m.smarduch@samsung.com> wrote:
+> > 
+> > Hi Mario,
+> > 
+> > > I'm working with AsyncPF, and currently using
+> > > hyp call to communicate guest GFN for host to inject
+> > > virtual abort - page not available/page available.
+> > > 
+> > > Currently only PSCI makes use of that interface,
+> > > (handle_hvc()) can we overload interface with additional
+> > > hyp calls in this case pass guest gfn? Set arg0
+> > > to some range outside of PSCI use.
+> > 
+> > I can't see a reason why we wouldn't open handle_hvc() to other
+> > paravirtualized services. But this has to be done with extreme caution:
+> > 
+> > - This becomes an ABI between host and guest
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
-> Hi,
+> To expand on that, if the benefits don't out weight the maintenance
+> required for that ABI, for life, then it turns into a life-time burden.
+> Any guest-host speedups that can be conceived, which require hypercalls,
+> should probably be bounced of the hardware people first. Waiting for
+> improvements in the virt extensions may be a better choice than
+> committing to a PV solution.
 > 
-> this is an optimization of the VGIC code totally removing struct
-> kvm_run from the VGIC emulation. In my eyes it provides a nice
-> cleanup and is a logical consequence of the kvm_io_bus patches (on
-> which it goes on top). On the other hand it is optional and I didn't
-> want to merge it with the already quite large last patch 11.
-> Marc, I leave it up to you whether you take this as part of the
-> kvm_io_bus series or not.
+> > - We need a discovery protocol
 > 
-> Cheers,
-> Andre.
-> 
->  arch/arm/include/asm/kvm_mmio.h   |    3 +-
->  arch/arm/kvm/arm.c                |    6 ++--
->  arch/arm/kvm/mmio.c               |   55 ++++++++++++++++++-------------------
->  arch/arm64/include/asm/kvm_mmio.h |    3 +-
->  virt/kvm/arm/vgic.c               |    8 ++----
->  5 files changed, 37 insertions(+), 38 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_mmio.h b/arch/arm/include/asm/kvm_mmio.h
-> index d8e90c8..53461a6 100644
-> --- a/arch/arm/include/asm/kvm_mmio.h
-> +++ b/arch/arm/include/asm/kvm_mmio.h
-> @@ -28,7 +28,8 @@ struct kvm_decode {
->  	bool sign_extend;
->  };
->  
-> -int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
-> +int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, unsigned int len,
-> +			    void *val, gpa_t phys_addr);
->  int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  		 phys_addr_t fault_ipa);
->  
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index e98370c..b837aef 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -506,8 +506,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  	if (ret)
->  		return ret;
->  
-> -	if (run->exit_reason == KVM_EXIT_MMIO) {
-> -		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
-> +	if (run->exit_reason == KVM_EXIT_MMIO && !run->mmio.is_write) {
-> +		ret = kvm_writeback_mmio_data(vcpu, run->mmio.len,
-> +					      run->mmio.data,
-> +					      run->mmio.phys_addr);
->  		if (ret)
->  			return ret;
->  	}
-> diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-> index 974b1c6..3c57f96 100644
-> --- a/arch/arm/kvm/mmio.c
-> +++ b/arch/arm/kvm/mmio.c
-> @@ -86,38 +86,36 @@ static unsigned long mmio_read_buf(char *buf, unsigned int len)
->  }
->  
->  /**
-> - * kvm_handle_mmio_return -- Handle MMIO loads after user space emulation
-> - * @vcpu: The VCPU pointer
-> - * @run:  The VCPU run struct containing the mmio data
-> + * kvm_writeback_mmio_data -- Handle MMIO loads after user space emulation
-> + * @vcpu:	The VCPU pointer
-> + * @len:	The length in Bytes of the MMIO access
-> + * @data_ptr:	Pointer to the data to be written back into the guest
-> + * @phys_addr:	Physical address of the originating MMIO access
->   *
->   * This should only be called after returning from userspace for MMIO load
-> - * emulation.
-> + * emulation. phys_addr is only used for the tracepoint output.
->   */
-> -int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, unsigned int len,
-> +			    void *data_ptr, gpa_t phys_addr)
->  {
->  	unsigned long data;
-> -	unsigned int len;
->  	int mask;
->  
-> -	if (!run->mmio.is_write) {
-> -		len = run->mmio.len;
-> -		if (len > sizeof(unsigned long))
-> -			return -EINVAL;
-> +	if (len > sizeof(unsigned long))
-> +		return -EINVAL;
->  
-> -		data = mmio_read_buf(run->mmio.data, len);
-> +	data = mmio_read_buf(data_ptr, len);
->  
-> -		if (vcpu->arch.mmio_decode.sign_extend &&
-> -		    len < sizeof(unsigned long)) {
-> -			mask = 1U << ((len * 8) - 1);
-> -			data = (data ^ mask) - mask;
-> -		}
-> -
-> -		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
-> -			       data);
-> -		data = vcpu_data_host_to_guest(vcpu, data, len);
-> -		*vcpu_reg(vcpu, vcpu->arch.mmio_decode.rt) = data;
-> +	if (vcpu->arch.mmio_decode.sign_extend &&
-> +	    len < sizeof(unsigned long)) {
-> +		mask = 1U << ((len * 8) - 1);
-> +		data = (data ^ mask) - mask;
->  	}
->  
-> +	trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, phys_addr, data);
-> +	data = vcpu_data_host_to_guest(vcpu, data, len);
-> +	*vcpu_reg(vcpu, vcpu->arch.mmio_decode.rt) = data;
-> +
->  	return 0;
->  }
->  
-> @@ -201,18 +199,19 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  				      data_buf);
->  	}
->  
-> -	/* Now prepare kvm_run for the potential return to userland. */
-> -	run->mmio.is_write	= is_write;
-> -	run->mmio.phys_addr	= fault_ipa;
-> -	run->mmio.len		= len;
-> -	memcpy(run->mmio.data, data_buf, len);
-> -
->  	if (!ret) {
->  		/* We handled the access successfully in the kernel. */
-> -		kvm_handle_mmio_return(vcpu, run);
-> +		if (!is_write)
-> +			kvm_writeback_mmio_data(vcpu, len, data_buf, fault_ipa);
->  		return 1;
->  	}
->  
-> +	/* Now prepare the kvm_run structure for the return to userland. */
-> +	run->mmio.phys_addr	= fault_ipa;
-> +	run->mmio.len		= len;
-> +	run->mmio.is_write	= is_write;
-> +	memcpy(run->mmio.data, data_buf, len);
->  	run->exit_reason	= KVM_EXIT_MMIO;
-> +
->  	return 0;
->  }
-> diff --git a/arch/arm64/include/asm/kvm_mmio.h b/arch/arm64/include/asm/kvm_mmio.h
-> index 889c908..3b83475 100644
-> --- a/arch/arm64/include/asm/kvm_mmio.h
-> +++ b/arch/arm64/include/asm/kvm_mmio.h
-> @@ -31,7 +31,8 @@ struct kvm_decode {
->  	bool sign_extend;
->  };
->  
-> -int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
-> +int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, unsigned int len,
-> +			    void *val, gpa_t phys_addr);
->  int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  		 phys_addr_t fault_ipa);
->  
-> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> index b70174e..4047fc0 100644
-> --- a/virt/kvm/arm/vgic.c
-> +++ b/virt/kvm/arm/vgic.c
-> @@ -803,7 +803,6 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
->  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->  	struct vgic_io_device *iodev = container_of(this,
->  						    struct vgic_io_device, dev);
-> -	struct kvm_run *run = vcpu->run;
->  	const struct vgic_io_range *range;
->  	struct kvm_exit_mmio mmio;
->  	bool updated_state;
-> @@ -832,12 +831,9 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
->  		updated_state = false;
->  	}
->  	spin_unlock(&dist->lock);
-> -	run->mmio.is_write	= is_write;
-> -	run->mmio.len		= len;
-> -	run->mmio.phys_addr	= addr;
-> -	memcpy(run->mmio.data, val, len);
->  
-> -	kvm_handle_mmio_return(vcpu, run);
-> +	if (!is_write)
-> +		kvm_writeback_mmio_data(vcpu, len, val, addr);
+> Hopefully all users of the PSCI hypcall have been using function #0,
+> because handle_hvc unfortunately hasn't been checking it.
 
-why do we do a kvm_writeback_mmio_data() call here in addition to
-io_mem_abort() ?  Are we not doing this twice?  What am I missing?
+huh?  I don't understand this, sorry.
 
->  
->  	if (updated_state)
->  		vgic_kick_vcpus(vcpu->kvm);
-> -- 
-> 1.7.9.5
+> In any case,
+> I'm not sure we have much choice but to start enforcing it now. Once we
+> do, with something like
 > 
+> switch(hypcall_nr) {
+> case 0: /* handle psci call */
+> default: return -KVM_ENOSYS;
+> }
+> 
+> then, I think the guest's discovery protocol can simply be
+> 
+> if (do_hypercall() == -ENOSYS) {
+>    /* PV path not supported, fall back to whatever... */
+> }
+> 
+> > - We need to make sure other hypervisors don't reuse the same function
+> >   number for other purposes
+> 
+> I'm not sure what this means. Xen already has several hypercalls defined
+> for ARM, the same that they have for x86, which don't match any of the
+> KVM hypercalls. Now, KVM for other arches (which is maybe what you meant)
+> does define a handful, which we should integrate with, as KVM mixes
+> architectures within it's hypercall number allocation, see
+> include/uapi/linux/kvm_para.h. Just using the common code should make it
+> easy to avoid problems. We don't have a problem with the PSCI hypcall, as
+> zero isn't allocated. Ideally we would define PSCI properly though,
+> e.g. KVM_HC_ARM_PSCI, and still reserve zero in the common header. To do
+> that maybe we'll need to keep #0 as an ARM-only alias for the new number
+> for compatibility now?
+> 
+> > 
+> > Maybe we should adopt Xen's idea of a hypervisor node in DT where we
+> > would describe the various services? How will that work with ACPI?
+> 
+> I don't think we'll ever have a "virt guest" ACPI table that we can
+> use for this stuff, so this won't work for ACPI. But I think the ENOSYS
+> probing should be sufficient for this anyway.
+> 
+We've reserved a Xen table on ACPI, not sure why we can't do the same
+for KVM or a generic ARM PV table for that matter... ?
+
+-Christoffer
