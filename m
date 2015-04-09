@@ -1,31 +1,29 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
+From: Andrew Jones <drjones@redhat.com>
 Subject: Re: Advice on HYP interface for AsyncPF
-Date: Thu, 9 Apr 2015 16:22:33 +0200
-Message-ID: <20150409142233.GP4715@cbox>
+Date: Thu, 9 Apr 2015 16:22:59 +0200
+Message-ID: <20150409142258.GH3212@hawk.usersys.redhat.com>
 References: <5525DA0E.2010103@samsung.com>
  <20150409085723.0a201cb9@why.wild-wind.fr.eu.org>
  <20150409120646.GA3212@hawk.usersys.redhat.com>
- <20150409133506.GN4715@cbox>
- <20150409135945.GG3212@hawk.usersys.redhat.com>
+ <20150409124852.GE18488@leverpostej>
+ <20150409134326.GF3212@hawk.usersys.redhat.com>
+ <20150409140027.GB9648@leverpostej>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FD3F4BEB9
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 10:14:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EE1D84BEC1
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 10:15:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0L07UjKnFOXX for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Apr 2015 10:14:57 -0400 (EDT)
-Received: from mail-la0-f46.google.com (mail-la0-f46.google.com
- [209.85.215.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D1814BEAE
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 10:14:57 -0400 (EDT)
-Received: by labbd9 with SMTP id bd9so79326021lab.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Apr 2015 07:22:32 -0700 (PDT)
+ with ESMTP id dzQQjT46jUtk for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Apr 2015 10:15:36 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EBC044BEBD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Apr 2015 10:15:35 -0400 (EDT)
 Content-Disposition: inline
-In-Reply-To: <20150409135945.GG3212@hawk.usersys.redhat.com>
+In-Reply-To: <20150409140027.GB9648@leverpostej>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,130 +33,85 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 09, 2015 at 03:59:46PM +0200, Andrew Jones wrote:
-> On Thu, Apr 09, 2015 at 03:35:06PM +0200, Christoffer Dall wrote:
-> > On Thu, Apr 09, 2015 at 02:06:47PM +0200, Andrew Jones wrote:
-> > > On Thu, Apr 09, 2015 at 08:57:23AM +0100, Marc Zyngier wrote:
-> > > > On Thu, 9 Apr 2015 02:46:54 +0100
-> > > > Mario Smarduch <m.smarduch@samsung.com> wrote:
-> > > > 
-> > > > Hi Mario,
-> > > > 
-> > > > > I'm working with AsyncPF, and currently using
-> > > > > hyp call to communicate guest GFN for host to inject
-> > > > > virtual abort - page not available/page available.
-> > > > > 
-> > > > > Currently only PSCI makes use of that interface,
-> > > > > (handle_hvc()) can we overload interface with additional
-> > > > > hyp calls in this case pass guest gfn? Set arg0
-> > > > > to some range outside of PSCI use.
-> > > > 
-> > > > I can't see a reason why we wouldn't open handle_hvc() to other
-> > > > paravirtualized services. But this has to be done with extreme caution:
-> > > > 
-> > > > - This becomes an ABI between host and guest
-> > > 
-> > > To expand on that, if the benefits don't out weight the maintenance
-> > > required for that ABI, for life, then it turns into a life-time burden.
-> > > Any guest-host speedups that can be conceived, which require hypercalls,
-> > > should probably be bounced of the hardware people first. Waiting for
-> > > improvements in the virt extensions may be a better choice than
-> > > committing to a PV solution.
-> > > 
-> > > > - We need a discovery protocol
-> > > 
-> > > Hopefully all users of the PSCI hypcall have been using function #0,
-> > > because handle_hvc unfortunately hasn't been checking it.
+On Thu, Apr 09, 2015 at 03:00:27PM +0100, Mark Rutland wrote:
+> > > While the HVC immediate could be used to distinguish different types of
+> > > calls, the guest still needs to first determine that issuing a HVC is
+> > > not going to bring down the system, which requires it to know that a
+> > > suitable hypervisor is present.
 > > 
-> > huh?  I don't understand this, sorry.
-> 
-> The hvc immediate used for psci is 0, and that's fine because there's
-> only a single hvc function currently defined. If we want to define
-> additional functions then we could assign each additional function a
-> new immediate. However, as we've never enforced the immediate to be
-> zero, then there's no guarantee we won't mess up a guest that expects
-> any immediate to work.
-
-you're refering to an implicit definition of an "hvc function"
-differentiated by the immediate field - this is what threw me off.
-
-> 
-> Of course we can continue allowing any immediate to work too, by
-> passing the function number in some register. Xen uses x16? We could
-> use reg0 too, and just integrate with the PSCI function space as well.
-> 
-
-I think you have to allow any immediate value, since I don't think PSCI
-differentiates on that, and we want to implement that spec.  So if you
-can't rely on re-using the PSCI function numbers within a different
-immediate number space, you might as well use the register that PSCI
-uses for differentiating between 'functions'.
-
+> > Right. I forgot we don't have anything for this in the kvmarm world. I
+> > should have remembered, having just crossed this path for a different
+> > issue (virt-what). In the x86 world we have a cpuid that allows guests
+> > to see that they are a) a guest and b) of what type. The hypervisor can
+> > fake the type if it wishes. For example KVM can emulate HyperV, allowing
+> > Windows guests to use their "native" PV ops.
 > > 
-> > > In any case,
-> > > I'm not sure we have much choice but to start enforcing it now. Once we
-> > > do, with something like
-> > > 
-> > > switch(hypcall_nr) {
-> > > case 0: /* handle psci call */
-> > > default: return -KVM_ENOSYS;
-> > > }
-> > > 
-> > > then, I think the guest's discovery protocol can simply be
-> > > 
-> > > if (do_hypercall() == -ENOSYS) {
-> > >    /* PV path not supported, fall back to whatever... */
-> > > }
-> > > 
-> > > > - We need to make sure other hypervisors don't reuse the same function
-> > > >   number for other purposes
-> > > 
-> > > I'm not sure what this means. Xen already has several hypercalls defined
-> > > for ARM, the same that they have for x86, which don't match any of the
-> > > KVM hypercalls. Now, KVM for other arches (which is maybe what you meant)
-> > > does define a handful, which we should integrate with, as KVM mixes
-> > > architectures within it's hypercall number allocation, see
-> > > include/uapi/linux/kvm_para.h. Just using the common code should make it
-> > > easy to avoid problems. We don't have a problem with the PSCI hypcall, as
-> > > zero isn't allocated. Ideally we would define PSCI properly though,
-> > > e.g. KVM_HC_ARM_PSCI, and still reserve zero in the common header. To do
-> > > that maybe we'll need to keep #0 as an ARM-only alias for the new number
-> > > for compatibility now?
-> > > 
+> > In the ARM world the hypervisor DT node does seem to be the closet
+> > equivalent that currently exists. Both Xen and ppc KVM use it already.
+> > Using this for DT guests means we'll need the ACPI solution though.
+> 
+> Sure.
+> 
+> > > > > Maybe we should adopt Xen's idea of a hypervisor node in DT where we
+> > > > > would describe the various services? How will that work with ACPI?
 > > > > 
-> > > > Maybe we should adopt Xen's idea of a hypervisor node in DT where we
-> > > > would describe the various services? How will that work with ACPI?
+> > > > I don't think we'll ever have a "virt guest" ACPI table that we can
+> > > > use for this stuff, so this won't work for ACPI. But I think the ENOSYS
+> > > > probing should be sufficient for this anyway.
 > > > 
-> > > I don't think we'll ever have a "virt guest" ACPI table that we can
-> > > use for this stuff, so this won't work for ACPI. But I think the ENOSYS
-> > > probing should be sufficient for this anyway.
+> > > As mentioned above, I don't think that probing is safe.
 > > > 
-> > We've reserved a Xen table on ACPI, not sure why we can't do the same
-> > for KVM or a generic ARM PV table for that matter... ?
+> > > What prevents us from creating a trivial "KVM guest" table that we can
+> > > use to determine that we can query more advanced info from KVM itself?
+> > > Given the point is to expose KVM-specific functionality, I don't see why
+> > > we need a more generic "virt guest" ACPI table.
+> > >
+> > 
+> > Just as the hypervisor node is more attractive with the consideration
+> > that it's being adopted by other parties (xen and kvmppc), any ACPI
+> > tables will be more likely to be accepted if they have buy-in from
+> > a greater audience. kvmarm would be the only consumer for the time
+> > being, but it'd be good if it was more general from the start,
+> > particularly if general kernel code would need to know about it.
 > 
-> OK. Does that table require the Linux kernel (outside dom0 specific
-> code) to know about it? Would a more generic table require that? I'm
-> always wary of virt creep.
+> I'm not sure I follow, given that there's no generic hypervisor node in
+> DT at the moment.
 > 
+> In the case of Xen there's a node with a "xen,xen" compatible string.
+> 
+> In the case of PPC KVM, there's a node with a "linux,kvm" compatible
+> string.
 
-Not sure what your distinction between dom0 specific code and Linux is,
-but it's very similar to the Xen node in the DT.  If it's present and
-contain valid entries, the table tells an OS that it's running on the
-Xen hypervisor and provides the necessary info to run on Xen, such as
-the grant table addresses etc.
+DT nodes documented in Documentation/devicetree/bindings are about as
+good as DT node formalism gets, right? Currently the hypervisor node
+is only documented separately in the arm/ and powerpc/ dirs, so maybe
+a Documentation/devicetree/bindings/hypervisor.txt file would be a good
+addition in order to make the common node official.
 
-See the spec here:
-http://wiki.xenproject.org/mediawiki/images/c/c4/Xen-environment-table.pdf
+> 
+> These don't have any overlap. I'm not sure what a generic node would buy
+> you short of detecting (some cases) when you're begin virtualised, given
+> you'd have to know about the particular hypervisor and/or services
+> anyway.
 
-Note that this table spec is not part of the ACPI spec but is just a
-reserved name, which is significantly easier than including something in
-the ACPI spec itself.  For the purposes of Linux on KVM/ARM this is
-completely fine too, and if anything else wants to run on KVM/ARM they
-most likely will refer to the same table and/or advocate including the
-table spec within the ACPI spec itself.
+As I pointed out, it's possible to fake one hypervisor with another,
+but only if the guest knows just one (standard) place too look. For
+example, if Windows guests were taught to look for a particular ACPI
+table to learn about their HyperV features, then KVM could fake that
+table and also emulate the hypercalls. Besides, tools like virt-what
+would benefit from knowing where to look, etc.
 
--Christoffer
+So, if we go the ACPI table route, then I think it should be a
+hypervisor and architecture agnostic table. Just as the "hypervisor"
+node is super generically named, and it's up to the compatible strings
+to sort it out.
+
+(btw, the hypervisor node already supports faking other hypervisors with
+ its compatible string. You could specify "linux,kvm" first, and
+ "xen,xen" second, if you had the capability to emulate the later.)
+
+drew
