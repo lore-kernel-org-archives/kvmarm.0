@@ -1,22 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v2] KVM: arm/arm64: avoid using kvm_run for in-kernel emulation
-Date: Fri, 10 Apr 2015 15:59:47 +0100
-Message-ID: <1428677987-15494-1-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH] KVM: arm/arm64: check IRQ number on userland injection
+Date: Fri, 10 Apr 2015 16:17:59 +0100
+Message-ID: <1428679079-16499-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D1704C143
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2015 10:52:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AFC454C15D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2015 11:10:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SHDsZsnunS3G for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Apr 2015 10:52:10 -0400 (EDT)
+ with ESMTP id tjBSKlKWnvoB for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Apr 2015 11:10:22 -0400 (EDT)
 Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
  [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BBBD64C13C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2015 10:52:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 65EA44C15E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2015 11:10:21 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,142 +30,106 @@ To: christoffer.dall@linaro.org, marc.zyngier@arm.com
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Our in-kernel VGIC emulation still uses struct kvm_run briefly before
-writing back the emulation result into the guest register.
-Although this particular case looks safe from an exploitation
-perspective, we can save some unneeded copying at the end of the VGIC
-emulation code.
-Replace the usage of struct kvm_run in favour of passing separate
-parameters in io_mem_abort(). Since the write back is now handled
-for all kvm_io_bus users, we can get rid of it in the VGIC.
+When userland injects a SPI via the KVM_IRQ_LINE ioctl we currently
+only check it against a fixed limit, which historically is set
+to 127. With the new dynamic IRQ allocation the effective limit may
+actually be smaller (64).
+So when now a malicious or buggy userland injects a SPI in that
+range, we spill over on our VGIC bitmaps and bytemaps memory.
+I could trigger a host kernel NULL pointer dereference with current
+mainline by injecting some bogus IRQ number from a hacked kvmtool:
+-----------------
+....
+DEBUG: kvm_vgic_inject_irq(kvm, cpu=0, irq=114, level=1)
+DEBUG: vgic_update_irq_pending(kvm, cpu=0, irq=114, level=1)
+DEBUG: IRQ #114 still in the game, writing to bytemap now...
+Unable to handle kernel NULL pointer dereference at virtual address 00000000
+pgd = ffffffc07652e000
+[00000000] *pgd=00000000f658b003, *pud=00000000f658b003, *pmd=0000000000000000
+Internal error: Oops: 96000006 [#1] PREEMPT SMP
+Modules linked in:
+CPU: 1 PID: 1053 Comm: lkvm-msi-irqinj Not tainted 4.0.0-rc7+ #3027
+Hardware name: FVP Base (DT)
+task: ffffffc0774e9680 ti: ffffffc0765a8000 task.ti: ffffffc0765a8000
+PC is at kvm_vgic_inject_irq+0x234/0x310
+LR is at kvm_vgic_inject_irq+0x30c/0x310
+pc : [<ffffffc0000ae0a8>] lr : [<ffffffc0000ae180>] pstate: 80000145
+.....
+
+So this patch fixes this by checking the SPI number against the
+actual limit. Also we remove the former legacy hard limit of
+127 in the ioctl code.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+CC: <stable@vger.kernel.org> # 4.0, 3.19, 3.18
 ---
-This one applies on top of kvmarm/queue.
+ arch/arm/include/uapi/asm/kvm.h   |    6 +++++-
+ arch/arm/kvm/arm.c                |    3 +--
+ arch/arm64/include/uapi/asm/kvm.h |    6 +++++-
+ virt/kvm/arm/vgic.c               |    3 +++
+ 4 files changed, 14 insertions(+), 4 deletions(-)
 
- arch/arm/kvm/mmio.c |   65 ++++++++++++++++++++++++++++-----------------------
- virt/kvm/arm/vgic.c |    7 ------
- 2 files changed, 36 insertions(+), 36 deletions(-)
-
-diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-index 974b1c6..42004cb 100644
---- a/arch/arm/kvm/mmio.c
-+++ b/arch/arm/kvm/mmio.c
-@@ -85,6 +85,30 @@ static unsigned long mmio_read_buf(char *buf, unsigned int len)
- 	return data;
- }
+diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+index 0db25bc..9d5ed83 100644
+--- a/arch/arm/include/uapi/asm/kvm.h
++++ b/arch/arm/include/uapi/asm/kvm.h
+@@ -195,7 +195,11 @@ struct kvm_arch_memory_slot {
+ #define KVM_ARM_IRQ_CPU_IRQ		0
+ #define KVM_ARM_IRQ_CPU_FIQ		1
  
-+static int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, unsigned int len,
-+				   void *data_ptr, gpa_t phys_addr)
-+{
-+	unsigned long data;
-+
-+	if (len > sizeof(unsigned long))
-+		return -EINVAL;
-+
-+	data = mmio_read_buf(data_ptr, len);
-+
-+	if (vcpu->arch.mmio_decode.sign_extend &&
-+	    len < sizeof(unsigned long)) {
-+		int mask = 1U << ((len * 8) - 1);
-+
-+		data = (data ^ mask) - mask;
-+	}
-+
-+	trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, phys_addr, data);
-+	data = vcpu_data_host_to_guest(vcpu, data, len);
-+	*vcpu_reg(vcpu, vcpu->arch.mmio_decode.rt) = data;
-+
-+	return 0;
-+}
-+
- /**
-  * kvm_handle_mmio_return -- Handle MMIO loads after user space emulation
-  * @vcpu: The VCPU pointer
-@@ -95,28 +119,10 @@ static unsigned long mmio_read_buf(char *buf, unsigned int len)
-  */
- int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
--	unsigned long data;
--	unsigned int len;
--	int mask;
--
--	if (!run->mmio.is_write) {
--		len = run->mmio.len;
--		if (len > sizeof(unsigned long))
--			return -EINVAL;
--
--		data = mmio_read_buf(run->mmio.data, len);
--
--		if (vcpu->arch.mmio_decode.sign_extend &&
--		    len < sizeof(unsigned long)) {
--			mask = 1U << ((len * 8) - 1);
--			data = (data ^ mask) - mask;
--		}
--
--		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
--			       data);
--		data = vcpu_data_host_to_guest(vcpu, data, len);
--		*vcpu_reg(vcpu, vcpu->arch.mmio_decode.rt) = data;
--	}
-+	if (!run->mmio.is_write)
-+		return kvm_writeback_mmio_data(vcpu, run->mmio.len,
-+					       run->mmio.data,
-+					       run->mmio.phys_addr);
+-/* Highest supported SPI, from VGIC_NR_IRQS */
++/*
++ * This used to hold the highest supported SPI, but it is now obsolete
++ * and only here to provide source code level compatibility with older
++ * userland. The highest SPI number can be set via KVM_DEV_ARM_VGIC_GRP_NR_IRQS.
++ */
+ #define KVM_ARM_IRQ_GIC_MAX		127
  
- 	return 0;
- }
-@@ -201,18 +207,19 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 				      data_buf);
- 	}
+ /* PSCI interface */
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 4f0afeb..0bbc0aa 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -653,8 +653,7 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *irq_level,
+ 		if (!irqchip_in_kernel(kvm))
+ 			return -ENXIO;
  
--	/* Now prepare kvm_run for the potential return to userland. */
--	run->mmio.is_write	= is_write;
--	run->mmio.phys_addr	= fault_ipa;
--	run->mmio.len		= len;
--	memcpy(run->mmio.data, data_buf, len);
--
- 	if (!ret) {
- 		/* We handled the access successfully in the kernel. */
--		kvm_handle_mmio_return(vcpu, run);
-+		if (!is_write)
-+			kvm_writeback_mmio_data(vcpu, len, data_buf, fault_ipa);
- 		return 1;
- 	}
+-		if (irq_num < VGIC_NR_PRIVATE_IRQS ||
+-		    irq_num > KVM_ARM_IRQ_GIC_MAX)
++		if (irq_num < VGIC_NR_PRIVATE_IRQS)
+ 			return -EINVAL;
  
-+	/* Now prepare the kvm_run structure for the return to userland. */
-+	run->mmio.is_write	= is_write;
-+	run->mmio.phys_addr	= fault_ipa;
-+	run->mmio.len		= len;
-+	memcpy(run->mmio.data, data_buf, len);
- 	run->exit_reason	= KVM_EXIT_MMIO;
-+
- 	return 0;
- }
+ 		return kvm_vgic_inject_irq(kvm, 0, irq_num, level);
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 3ef77a4..cc4affe 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -188,7 +188,11 @@ struct kvm_arch_memory_slot {
+ #define KVM_ARM_IRQ_CPU_IRQ		0
+ #define KVM_ARM_IRQ_CPU_FIQ		1
+ 
+-/* Highest supported SPI, from VGIC_NR_IRQS */
++/*
++ * This used to hold the highest supported SPI, but it is now obsolete
++ * and only here to provide source code level compatibility with older
++ * userland. The highest SPI number can be set via KVM_DEV_ARM_VGIC_GRP_NR_IRQS.
++ */
+ #define KVM_ARM_IRQ_GIC_MAX		127
+ 
+ /* PSCI interface */
 diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index b70174e..e23f50d 100644
+index 1b4c344..b0dd2d9 100644
 --- a/virt/kvm/arm/vgic.c
 +++ b/virt/kvm/arm/vgic.c
-@@ -803,7 +803,6 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
- 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
- 	struct vgic_io_device *iodev = container_of(this,
- 						    struct vgic_io_device, dev);
--	struct kvm_run *run = vcpu->run;
- 	const struct vgic_io_range *range;
- 	struct kvm_exit_mmio mmio;
- 	bool updated_state;
-@@ -832,12 +831,6 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
- 		updated_state = false;
+@@ -1372,6 +1372,9 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
+ 			goto out;
  	}
- 	spin_unlock(&dist->lock);
--	run->mmio.is_write	= is_write;
--	run->mmio.len		= len;
--	run->mmio.phys_addr	= addr;
--	memcpy(run->mmio.data, val, len);
--
--	kvm_handle_mmio_return(vcpu, run);
  
- 	if (updated_state)
- 		vgic_kick_vcpus(vcpu->kvm);
++	if (irq_num >= kvm->arch.vgic.nr_irqs)
++		return -EINVAL;
++
+ 	vcpu_id = vgic_update_irq_pending(kvm, cpuid, irq_num, level);
+ 	if (vcpu_id >= 0) {
+ 		/* kick the specified vcpu */
 -- 
 1.7.9.5
