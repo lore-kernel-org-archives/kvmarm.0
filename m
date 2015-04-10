@@ -1,29 +1,25 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: avoid using kvm_run for in-kernel
- emulation
-Date: Fri, 10 Apr 2015 11:15:49 +0200
-Message-ID: <20150410091549.GD6186@cbox>
-References: <1427507300-19200-1-git-send-email-andre.przywara@arm.com>
- <20150409133042.GM4715@cbox> <5526A101.1040301@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [RFC PATCH] arm64: KVM: remove fpsimd save/restore from the world
+ switch
+Date: Fri, 10 Apr 2015 10:36:40 +0100
+Message-ID: <552799A8.1020307@arm.com>
+References: <1428598439-5217-1-git-send-email-marc.zyngier@arm.com>
+ <20150410091215.GC6186@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CB8584C037
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2015 05:08:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 634C24C047
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2015 05:29:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QntW9DFruq7A for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Apr 2015 05:08:11 -0400 (EDT)
-Received: from mail-lb0-f170.google.com (mail-lb0-f170.google.com
- [209.85.217.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1202D4C02D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2015 05:08:10 -0400 (EDT)
-Received: by lbcga7 with SMTP id ga7so9116040lbc.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2015 02:15:48 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <5526A101.1040301@arm.com>
+ with ESMTP id qEk7F2SgMHPT for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Apr 2015 05:29:05 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3564F4C037
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2015 05:29:04 -0400 (EDT)
+In-Reply-To: <20150410091215.GC6186@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,224 +29,40 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 09, 2015 at 04:55:45PM +0100, Andre Przywara wrote:
-> Hej Christoffer,
-> 
-> On 09/04/15 14:30, Christoffer Dall wrote:
-> > On Sat, Mar 28, 2015 at 01:48:20AM +0000, Andre Przywara wrote:
-> >> Our in-kernel VGIC emulation still uses struct kvm_run briefly before
-> >> writing back the emulation result into the guest register. Using a
-> >> userspace mapped data structure within the kernel sounds dodgy, also
-> >> we do some extra copying at the moment at the end of the VGIC
-> >> emulation code.
-> >> Replace the usage of struct kvm_run in favour of passing separate
-> >> parameters into kvm_handle_mmio_return (and rename the function on
-> >> the way) to optimise the VGIC emulation. The real userland MMIO code
-> >> path does not change much.
-> >>
-> >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> >> ---
-> >> Hi,
-> >>
-> >> this is an optimization of the VGIC code totally removing struct
-> >> kvm_run from the VGIC emulation. In my eyes it provides a nice
-> >> cleanup and is a logical consequence of the kvm_io_bus patches (on
-> >> which it goes on top). On the other hand it is optional and I didn't
-> >> want to merge it with the already quite large last patch 11.
-> >> Marc, I leave it up to you whether you take this as part of the
-> >> kvm_io_bus series or not.
-> >>
-> >> Cheers,
-> >> Andre.
-> >>
-> >>  arch/arm/include/asm/kvm_mmio.h   |    3 +-
-> >>  arch/arm/kvm/arm.c                |    6 ++--
-> >>  arch/arm/kvm/mmio.c               |   55 ++++++++++++++++++-------------------
-> >>  arch/arm64/include/asm/kvm_mmio.h |    3 +-
-> >>  virt/kvm/arm/vgic.c               |    8 ++----
-> >>  5 files changed, 37 insertions(+), 38 deletions(-)
-> >>
-> >> diff --git a/arch/arm/include/asm/kvm_mmio.h b/arch/arm/include/asm/kvm_mmio.h
-> >> index d8e90c8..53461a6 100644
-> >> --- a/arch/arm/include/asm/kvm_mmio.h
-> >> +++ b/arch/arm/include/asm/kvm_mmio.h
-> >> @@ -28,7 +28,8 @@ struct kvm_decode {
-> >>  	bool sign_extend;
-> >>  };
-> >>  
-> >> -int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
-> >> +int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, unsigned int len,
-> >> +			    void *val, gpa_t phys_addr);
-> >>  int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> >>  		 phys_addr_t fault_ipa);
-> >>  
-> >> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> >> index e98370c..b837aef 100644
-> >> --- a/arch/arm/kvm/arm.c
-> >> +++ b/arch/arm/kvm/arm.c
-> >> @@ -506,8 +506,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> >>  	if (ret)
-> >>  		return ret;
-> >>  
-> >> -	if (run->exit_reason == KVM_EXIT_MMIO) {
-> >> -		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
-> >> +	if (run->exit_reason == KVM_EXIT_MMIO && !run->mmio.is_write) {
-> >> +		ret = kvm_writeback_mmio_data(vcpu, run->mmio.len,
-> >> +					      run->mmio.data,
-> >> +					      run->mmio.phys_addr);
-> >>  		if (ret)
-> >>  			return ret;
-> >>  	}
-> >> diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-> >> index 974b1c6..3c57f96 100644
-> >> --- a/arch/arm/kvm/mmio.c
-> >> +++ b/arch/arm/kvm/mmio.c
-> >> @@ -86,38 +86,36 @@ static unsigned long mmio_read_buf(char *buf, unsigned int len)
-> >>  }
-> >>  
-> >>  /**
-> >> - * kvm_handle_mmio_return -- Handle MMIO loads after user space emulation
-> >> - * @vcpu: The VCPU pointer
-> >> - * @run:  The VCPU run struct containing the mmio data
-> >> + * kvm_writeback_mmio_data -- Handle MMIO loads after user space emulation
-> >> + * @vcpu:	The VCPU pointer
-> >> + * @len:	The length in Bytes of the MMIO access
-> >> + * @data_ptr:	Pointer to the data to be written back into the guest
-> >> + * @phys_addr:	Physical address of the originating MMIO access
-> >>   *
-> >>   * This should only be called after returning from userspace for MMIO load
-> >> - * emulation.
-> >> + * emulation. phys_addr is only used for the tracepoint output.
-> >>   */
-> >> -int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> >> +int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, unsigned int len,
-> >> +			    void *data_ptr, gpa_t phys_addr)
-> >>  {
-> >>  	unsigned long data;
-> >> -	unsigned int len;
-> >>  	int mask;
-> >>  
-> >> -	if (!run->mmio.is_write) {
-> >> -		len = run->mmio.len;
-> >> -		if (len > sizeof(unsigned long))
-> >> -			return -EINVAL;
-> >> +	if (len > sizeof(unsigned long))
-> >> +		return -EINVAL;
-> >>  
-> >> -		data = mmio_read_buf(run->mmio.data, len);
-> >> +	data = mmio_read_buf(data_ptr, len);
-> >>  
-> >> -		if (vcpu->arch.mmio_decode.sign_extend &&
-> >> -		    len < sizeof(unsigned long)) {
-> >> -			mask = 1U << ((len * 8) - 1);
-> >> -			data = (data ^ mask) - mask;
-> >> -		}
-> >> -
-> >> -		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
-> >> -			       data);
-> >> -		data = vcpu_data_host_to_guest(vcpu, data, len);
-> >> -		*vcpu_reg(vcpu, vcpu->arch.mmio_decode.rt) = data;
-> >> +	if (vcpu->arch.mmio_decode.sign_extend &&
-> >> +	    len < sizeof(unsigned long)) {
-> >> +		mask = 1U << ((len * 8) - 1);
-> >> +		data = (data ^ mask) - mask;
-> >>  	}
-> >>  
-> >> +	trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, phys_addr, data);
-> >> +	data = vcpu_data_host_to_guest(vcpu, data, len);
-> >> +	*vcpu_reg(vcpu, vcpu->arch.mmio_decode.rt) = data;
-> >> +
-> >>  	return 0;
-> >>  }
-> >>  
-> >> @@ -201,18 +199,19 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> >>  				      data_buf);
-> >>  	}
-> >>  
-> >> -	/* Now prepare kvm_run for the potential return to userland. */
-> >> -	run->mmio.is_write	= is_write;
-> >> -	run->mmio.phys_addr	= fault_ipa;
-> >> -	run->mmio.len		= len;
-> >> -	memcpy(run->mmio.data, data_buf, len);
-> >> -
-> >>  	if (!ret) {
-> >>  		/* We handled the access successfully in the kernel. */
-> >> -		kvm_handle_mmio_return(vcpu, run);
-> >> +		if (!is_write)
-> >> +			kvm_writeback_mmio_data(vcpu, len, data_buf, fault_ipa);
-> >>  		return 1;
-> >>  	}
-> >>  
-> >> +	/* Now prepare the kvm_run structure for the return to userland. */
-> >> +	run->mmio.phys_addr	= fault_ipa;
-> >> +	run->mmio.len		= len;
-> >> +	run->mmio.is_write	= is_write;
-> >> +	memcpy(run->mmio.data, data_buf, len);
-> >>  	run->exit_reason	= KVM_EXIT_MMIO;
-> >> +
-> >>  	return 0;
-> >>  }
-> >> diff --git a/arch/arm64/include/asm/kvm_mmio.h b/arch/arm64/include/asm/kvm_mmio.h
-> >> index 889c908..3b83475 100644
-> >> --- a/arch/arm64/include/asm/kvm_mmio.h
-> >> +++ b/arch/arm64/include/asm/kvm_mmio.h
-> >> @@ -31,7 +31,8 @@ struct kvm_decode {
-> >>  	bool sign_extend;
-> >>  };
-> >>  
-> >> -int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
-> >> +int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, unsigned int len,
-> >> +			    void *val, gpa_t phys_addr);
-> >>  int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> >>  		 phys_addr_t fault_ipa);
-> >>  
-> >> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> >> index b70174e..4047fc0 100644
-> >> --- a/virt/kvm/arm/vgic.c
-> >> +++ b/virt/kvm/arm/vgic.c
-> >> @@ -803,7 +803,6 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
-> >>  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> >>  	struct vgic_io_device *iodev = container_of(this,
-> >>  						    struct vgic_io_device, dev);
-> >> -	struct kvm_run *run = vcpu->run;
-> >>  	const struct vgic_io_range *range;
-> >>  	struct kvm_exit_mmio mmio;
-> >>  	bool updated_state;
-> >> @@ -832,12 +831,9 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
-> >>  		updated_state = false;
-> >>  	}
-> >>  	spin_unlock(&dist->lock);
-> >> -	run->mmio.is_write	= is_write;
-> >> -	run->mmio.len		= len;
-> >> -	run->mmio.phys_addr	= addr;
-> >> -	memcpy(run->mmio.data, val, len);
-> >>  
-> >> -	kvm_handle_mmio_return(vcpu, run);
-> >> +	if (!is_write)
-> >> +		kvm_writeback_mmio_data(vcpu, len, val, addr);
-> > 
-> > why do we do a kvm_writeback_mmio_data() call here in addition to
-> > io_mem_abort() ?  Are we not doing this twice?  What am I missing?
-> 
-> You are missing: ... nothing, we are indeed doing it twice. This looks
-> like an oversight when converting from using a data buffer to a pointer.
-> 
-> So we can drop this here, and io_mem_abort() takes care (tested
-> quickly). Shall I add a comment or just remove those two lines?
-> 
-> Are you OK with the rest of the patch?
-> 
-Roughly ok, I think it would be nicer to not rename
-kvm_handle_mmio_return() but call that as is, and then introduce
-kvm_writeback_mmio_data() as a static function called only within mmio.c
-and do the check for !run->mmio.is_write in the kvm_handle_mmio_return()
-function before calling kvm_writeback_mmio_data().
+On 10/04/15 10:12, Christoffer Dall wrote:
+> On Thu, Apr 09, 2015 at 05:53:59PM +0100, Marc Zyngier wrote:
+>> The world switch spends quite some time dealing with the FP/SIMD
+>> registers, as the state is quite sizeable (32 128bit registers,
+>> plus some crumbs on the side). We save/restore them on each
+>> entry/exit, so that both the host and the guest always see
+>> the state they expect.
+>>
+>> But let's face it: the host kernel doesn't care. It is the host
+>> userspace that actually cares about FP. An obvious improvement is
+>> to remove the save/restore from the world switch, and only perform
+>> it when we're about to enter/exit the guest (by plugging it into
+>> vcpu_load/vcpu_put). The effect is pretty spectacular when running
+>> hackbench (which is the only benchmark worth looking at):
+>>
+> so the kernel never uses fp/simd registers for stuff like memcopies
+> etc.?
 
-That would reduce the impact of this patch and keep the run-loop code
-slightly less cluttered.
+It can, but wraps it with kernel_neon_begin/kernel_neon_end, which does
+its own save-restore. And when we perform our own save/restore, we do it
+with interrupts disabled so that the kernel cannot change the state
+during that time.
 
--Christoffer
+> Can we also make a similar change for ARM on the 32-bit side?
+
+We could, but it is worth evaluating how much better this is compared to
+what we have already.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
