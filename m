@@ -1,130 +1,105 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 02/10] KVM: define common __KVM_GUESTDBG_USE_SW/HW_BP
- values
-Date: Mon, 13 Apr 2015 13:55:35 +0200
-Message-ID: <20150413115535.GM6186@cbox>
+Subject: Re: [PATCH v2 03/10] KVM: arm: guest debug, define API headers
+Date: Mon, 13 Apr 2015 14:08:13 +0200
+Message-ID: <20150413120813.GN6186@cbox>
 References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
- <1427814488-28467-3-git-send-email-alex.bennee@linaro.org>
+ <1427814488-28467-4-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E725C4C397
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 07:47:45 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eUogx5WLP7fQ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Apr 2015 07:47:44 -0400 (EDT)
-Received: from mail-la0-f50.google.com (mail-la0-f50.google.com
- [209.85.215.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A78164C395
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 07:47:44 -0400 (EDT)
-Received: by laat2 with SMTP id t2so55095534laa.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 04:55:30 -0700 (PDT)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1427814488-28467-3-git-send-email-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <1427814488-28467-4-git-send-email-alex.bennee@linaro.org>
+Sender: kvm-owner@vger.kernel.org
 To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, "H. Peter Anvin" <hpa@zytor.com>, kvmarm@lists.cs.columbia.edu, Nadav Amit <namit@cs.technion.ac.il>, Michael Ellerman <mpe@ellerman.id.au>, "maintainer:X86 ARCHITECTURE..." <x86@kernel.org>, Gleb Natapov <gleb@kernel.org>, Ingo Molnar <mingo@redhat.com>, zhichao.huang@linaro.org, jan.kiszka@siemens.com, bp@suse.de, marc.zyngier@arm.com, r65777@freescale.com, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org, "open list:ABI/API" <linux-api@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, pbonzini@redhat.com, "open list:LINUX FOR POWERPC..." <linuxppc-dev@lists.ozlabs.org>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org, jan.kiszka@siemens.com, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 31, 2015 at 04:08:00PM +0100, Alex Benn=E9e wrote:
-> Currently x86, powerpc and soon arm64 use the same two architecture
-> specific bits for guest debug support for software and hardware
-> breakpoints. This makes the shared values explicit while leaving the
-> gate open for another architecture to use some other value if they
-> really really want to.
-> =
-
+On Tue, Mar 31, 2015 at 04:08:01PM +0100, Alex Benn=E9e wrote:
+> This commit defines the API headers for guest debugging. There are tw=
+o
+> architecture specific debug structures:
+>=20
+>   - kvm_guest_debug_arch, allows us to pass in HW debug registers
+>   - kvm_debug_exit_arch, signals the exact debug exit and pc
+>=20
+> The type of debugging being used is control by the architecture speci=
+fic
+> control bits of the kvm_guest_debug->control flags in the ioctl
+> structure.
+>=20
 > Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> =
-
-> diff --git a/arch/powerpc/include/uapi/asm/kvm.h b/arch/powerpc/include/u=
+>=20
+> ---
+> v2
+>    - expose hsr and pc directly to user-space
+>=20
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/u=
 api/asm/kvm.h
-> index ab4d473..1731569 100644
-> --- a/arch/powerpc/include/uapi/asm/kvm.h
-> +++ b/arch/powerpc/include/uapi/asm/kvm.h
-> @@ -310,8 +310,8 @@ struct kvm_guest_debug_arch {
->   * and upper 16 bits are architecture specific. Architecture specific de=
-fines
->   * that ioctl is for setting hardware breakpoint or software breakpoint.
->   */
-> -#define KVM_GUESTDBG_USE_SW_BP		0x00010000
-> -#define KVM_GUESTDBG_USE_HW_BP		0x00020000
-> +#define KVM_GUESTDBG_USE_SW_BP		__KVM_GUESTDBG_USE_SW_BP
-> +#define KVM_GUESTDBG_USE_HW_BP		__KVM_GUESTDBG_USE_HW_BP
->  =
-
->  /* definition of registers in kvm_run */
->  struct kvm_sync_regs {
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/=
-kvm.h
-> index d7dcef5..1438202 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -250,8 +250,8 @@ struct kvm_debug_exit_arch {
->  	__u64 dr7;
+> index 3ef77a4..6ee70a0 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -100,10 +100,24 @@ struct kvm_sregs {
+>  struct kvm_fpu {
 >  };
->  =
-
-> -#define KVM_GUESTDBG_USE_SW_BP		0x00010000
-> -#define KVM_GUESTDBG_USE_HW_BP		0x00020000
-> +#define KVM_GUESTDBG_USE_SW_BP		__KVM_GUESTDBG_USE_SW_BP
-> +#define KVM_GUESTDBG_USE_HW_BP		__KVM_GUESTDBG_USE_HW_BP
->  #define KVM_GUESTDBG_INJECT_DB		0x00040000
->  #define KVM_GUESTDBG_INJECT_BP		0x00080000
->  =
-
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 5eedf84..ce2db14 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -525,8 +525,16 @@ struct kvm_s390_irq {
->  =
-
->  /* for KVM_SET_GUEST_DEBUG */
->  =
-
-> -#define KVM_GUESTDBG_ENABLE		0x00000001
-> -#define KVM_GUESTDBG_SINGLESTEP		0x00000002
-> +#define KVM_GUESTDBG_ENABLE		(1 << 0)
-> +#define KVM_GUESTDBG_SINGLESTEP	(1 << 1)
-> +
+> =20
 > +/*
-> + * Architecture specific stuff uses the top 16 bits of the field,
+> + * See ARM ARM D7.3: Debug Registers
 
-can you be more specific than 'stuff' here?  features?
+see the ARM ARM for ??
 
-> + * however there is some shared commonality for the common cases
+> + *
+> + * The control registers are architecturally defined as 32 bits but =
+are
+> + * stored as 64 bit values along side the value registers and aligne=
+d
 
-I don't like this sentence; shared commonality is a pleonasm and the use
-of however makes it sounds like there's some caveat here.
+do you mean alongside?
 
-If the top 16 bits are indeed arhictecture specific, then I think they
-should just be defined in their architecture specific headers.  Unless
-the idea here is that there's a fixed set of of flags that architectures
-can choose to support, in which case it should simply be defined in the
-common header.
+> + * with the rest 64 bit registers in the normal CPU context.
 
+rest of the 64 bit
 
 > + */
-> +#define __KVM_GUESTDBG_USE_SW_BP	(1 << 16)
-> +#define __KVM_GUESTDBG_USE_HW_BP	(1 << 17)
+
+why do we store them as 64 bit values?  There's nothing prevented us
+from defining them as __u32 is there?  Is this to make the ONE_REG
+interface accessers more convenient?
+
+> +#define KVM_ARM_NDBG_REGS 16
+
+nit: is NDBG short for something I don't know about or is it
+the number of debug registers we are noting here, in which case I think
+KVM_ARM_NUM_DBG_REGS is more clear.
+
+>  struct kvm_guest_debug_arch {
+> +	__u64 dbg_bcr[KVM_ARM_NDBG_REGS];
+> +	__u64 dbg_bvr[KVM_ARM_NDBG_REGS];
+> +	__u64 dbg_wcr[KVM_ARM_NDBG_REGS];
+> +	__u64 dbg_wvr[KVM_ARM_NDBG_REGS];
+>  };
+> =20
+>  struct kvm_debug_exit_arch {
+> +	__u64 pc;
+> +	__u32 hsr;
+>  };
+> =20
+>  struct kvm_sync_regs {
+> @@ -207,4 +221,11 @@ struct kvm_arch_memory_slot {
+> =20
+>  #endif
+> =20
+> +/*
+> + * Architecture related debug defines - upper 16 bits of
+> + * kvm_guest_debug->control
+> + */
+> +#define KVM_GUESTDBG_USE_SW_BP	        __KVM_GUESTDBG_USE_SW_BP
+> +#define KVM_GUESTDBG_USE_HW_BP		__KVM_GUESTDBG_USE_HW_BP
 > +
->  =
-
->  struct kvm_guest_debug {
->  	__u32 control;
-> -- =
-
+>  #endif /* __ARM_KVM_H__ */
+> --=20
 > 2.3.4
-> =
+>=20
+
+Thanks,
+-Christoffer
