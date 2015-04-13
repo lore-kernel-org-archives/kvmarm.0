@@ -1,125 +1,308 @@
-From: Mario Smarduch <m.smarduch@samsung.com>
-Subject: Re: Advice on HYP interface for AsyncPF
-Date: Fri, 10 Apr 2015 16:45:10 -0700
-Message-ID: <55286086.3040007@samsung.com>
-References: <5525DA0E.2010103@samsung.com>
- <20150409085723.0a201cb9@why.wild-wind.fr.eu.org>
- <55273728.6090806@samsung.com> <55278FA1.8040502@arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v2 10/10] KVM: arm64: add trace points for guest_debug debug
+Date: Mon, 13 Apr 2015 08:57:16 +0100
+Message-ID: <878udwlaub.fsf@linaro.org>
+References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org> <1427814488-28467-11-git-send-email-alex.bennee@linaro.org> <20150410125415.GC3227@hawk.usersys.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC12A4C1E8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2015 19:37:39 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gKzjRnvUSumz for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Apr 2015 19:37:37 -0400 (EDT)
-Received: from usmailout1.samsung.com (mailout1.w2.samsung.com
- [211.189.100.11])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 31B4A4C1E7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Apr 2015 19:37:36 -0400 (EDT)
-Received: from uscpsbgex2.samsung.com
- (u123.gpu85.samsung.co.kr [203.254.195.123]) by mailout1.w2.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NMM00FAC7BGPA10@mailout1.w2.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Fri, 10 Apr 2015 19:45:16 -0400 (EDT)
-In-reply-to: <55278FA1.8040502@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <20150410125415.GC3227@hawk.usersys.redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, pbonzini@redhat.com, zhichao.huang@linaro.org, jan.kiszka@siemens.com, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 04/10/2015 01:53 AM, Marc Zyngier wrote:
-> On 10/04/15 03:36, Mario Smarduch wrote:
->> On 04/09/2015 12:57 AM, Marc Zyngier wrote:
->>> On Thu, 9 Apr 2015 02:46:54 +0100
->>> Mario Smarduch <m.smarduch@samsung.com> wrote:
->>>
->>> Hi Mario,
->>>
->>>> I'm working with AsyncPF, and currently using
->>>> hyp call to communicate guest GFN for host to inject
->>>> virtual abort - page not available/page available.
->>>>
->>>> Currently only PSCI makes use of that interface,
->>>> (handle_hvc()) can we overload interface with additional
->>>> hyp calls in this case pass guest gfn? Set arg0
->>>> to some range outside of PSCI use.
->>>
->>> I can't see a reason why we wouldn't open handle_hvc() to other
->>> paravirtualized services. But this has to be done with extreme caution:
->>>
->>> - This becomes an ABI between host and guest
->>> - We need a discovery protocol
->>> - We need to make sure other hypervisors don't reuse the same function
->>>   number for other purposes
->>>
->>> Maybe we should adopt Xen's idea of a hypervisor node in DT where we
->>> would describe the various services? How will that work with ACPI?
->>>
->>> Coming back to AsyncPF, and purely out of curiosity: why do you need a
->>> HYP entry point? From what I remember, AsyncPF works by injecting a
->>> fault in the guest when the page is found not present or made
->>> available, with the GFN being stored in a per-vcpu memory location.
->>>
->>> Am I missing something obvious? Or have I just displayed my ignorance on
->>> this subject? ;-)
->> Hi Marc,
->>
->> Or it might be me :)
->>
->> But I'm thinking Guest and host need to agree on some per-vcpu
->> guest memory for KVM to write PV-fault type, and Guest to read
->> the PV-fault type, ack it, i.e. Having the guest allocate the per-cpu
->> PV-fault memory and inform KVM with its GPA via hyp call is one
->> approach I was thinking off.
-> 
-> Ah, I see what you mean. I was only looking at the runtime aspect of
-> things, and didn't consider the (all important) setup stage.
-> 
->> I was looking through x86 that's based on CPUID extended with
->> PV feature support. In the guest if the ASYNC PF feature is enabled
->> it writes GPA to ASYNC PF MSR that's resolved in KVM (x86 folks
->> can correct if I'm off here).
->>
->> I'm wondering if we could build on this concept maybe PV ID_* registers,
->> to discover existence of ASYNC PF feature?
-> 
-> I suppose we could do something similar with the ImpDef encoding space
-> (i.e. what is trapped using HCR_EL2.TIDCP). The main issue with that is
-> to be able to safely carve out a range that will never be used by any HW
-> implementation, ever. I can't really see how we enforce this.
 
-I was thinking of a virtual ID register, populated with PV
-features when vcpu is initialized. PV Guest would discover
-PV features via MMIO read of PV ID reg. This probably could
-have it's own range of features, independent of HW.
+Andrew Jones <drjones@redhat.com> writes:
 
-> 
-> Also, it will have the exact same cost as a hypercall, so maybe it is
-> bit of a moot point. Anyway, this is "just" a matter of being able to
-> describe the feature to the guest (and it seems like this is the real
-> controversial aspect)...
+> $SUBJECT | sed s/guest_debug debug/guest debug/ ?
+>
+> On Tue, Mar 31, 2015 at 04:08:08PM +0100, Alex Benn=C3=A9e wrote:
+>> This includes trace points for:
+>>   kvm_arch_setup_guest_debug
+>>   kvm_arch_clear_guest_debug
+>>   kvm_handle_guest_debug
+>>=20
+>> I've also added some generic register setting trace events so I can
+>> watch the register values being built up over time. The local
+>> dump_dbg_regs() function dumps all the HW BKPT and WPT registers.
+>>=20
+>> I've also added a #define trace_dreg to shorten some lines.
+>>=20
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>=20
+>> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+>> index 638c111..7c96288 100644
+>> --- a/arch/arm64/kvm/debug.c
+>> +++ b/arch/arm64/kvm/debug.c
+>> @@ -25,12 +25,37 @@
+>>  #include <asm/kvm_host.h>
+>>  #include <asm/kvm_emulate.h>
+>> =20
+>> +#include "trace.h"
+>> +
+>> +#define trace_dreg(name, value) trace_kvm_arch_setup_debug_reg32(na=
+me, value)
+>
+> I don't think this name shortener should be necessary
 
-Yes I don't quite see the dividing line between
-hyp call and CPU ID scheme. Need lot more thinking.
+Yeah it was just a quick hack as lower down the trace_ statements kept
+wrapping and it looked ugly. I guess it would be less of an issue if I
+shorten the setup/clear names.
 
-Thanks,
-  Mario
+>
+>> +
+>>  /* These are the bits of MDSCR_EL1 we may mess with */
+>>  #define MDSCR_EL1_DEBUG_BITS	(DBG_MDSCR_SS | \
+>>  				DBG_MDSCR_KDE | \
+>>  				DBG_MDSCR_MDE)
+>> =20
+>>  /**
+>> + * dump_dbg_regs - simple debug helper
+>> + *
+>> + * This provides a simple helper to dump the HW debug registers
+>> + */
+>> +static void dump_dbg_regs(struct kvm_vcpu *vcpu, int nb, int nw)
+>> +{
+>> +	int i;
+>> +
+>> +	for (i =3D 0; i < nb; i++) {
+>> +		trace_printk("bkpt%d: 0x%08x:0x%llx\n", i,
+>> +			(u32) vcpu_sys_reg(vcpu, DBGBCR0_EL1 + i),
+>> +			vcpu_sys_reg(vcpu, DBGBVR0_EL1 + i));
+>> +	}
+>> +	for (i =3D 0; i < nb; i++) {
+>> +		trace_printk("wtpt%d: 0x%08x:0x%llx\n", i,
+>> +			(u32) vcpu_sys_reg(vcpu, DBGWCR0_EL1 + i),
+>> +			vcpu_sys_reg(vcpu, DBGWVR0_EL1 + i));
+>> +	}
+>> +}
+>> +
+>> +/**
+>>   * kvm_arch_setup_debug - set-up debug related stuff
+>>   *
+>>   * @vcpu:	the vcpu pointer
+>> @@ -52,9 +77,13 @@ void kvm_arch_setup_debug(struct kvm_vcpu *vcpu)
+>>  {
+>>  	bool trap_debug =3D false;
+>> =20
+>> +	trace_kvm_arch_setup_debug(vcpu->guest_debug);
+>> +
+>>  	vcpu->arch.mdcr_el2 |=3D (MDCR_EL2_TPM | MDCR_EL2_TPMCR);
+>>  	vcpu->arch.mdcr_el2 |=3D (MDCR_EL2_TDRA | MDCR_EL2_TDOSA);
+>> =20
+>> +	trace_kvm_arch_setup_debug_reg32("MDCR_EL2", vcpu->arch.mdcr_el2);
+>
+> Not using your trace_dreg here? I guess you didn't think it was
+> necessary either.
+>
+>> +
+>>  	/*
+>>  	 * If we are not treating debug registers are dirty we need
+>>  	 * to trap if the guest starts accessing them.
+>> @@ -66,6 +95,8 @@ void kvm_arch_setup_debug(struct kvm_vcpu *vcpu)
+>>  	if (vcpu->guest_debug) {
+>>  		vcpu->arch.mdcr_el2 |=3D MDCR_EL2_TDE;
+>> =20
+>> +		trace_dreg("MDCR_EL2", vcpu->arch.mdcr_el2);
+>> +
+>>  		/* Save pstate/mdscr */
+>>  		vcpu_debug_saved_reg(vcpu, pstate_ss_bit) =3D
+>>  			*vcpu_cpsr(vcpu) & DBG_SPSR_SS;
+>> @@ -73,6 +104,11 @@ void kvm_arch_setup_debug(struct kvm_vcpu *vcpu)
+>>  		vcpu_debug_saved_reg(vcpu, mdscr_el1) =3D
+>>  			vcpu_sys_reg(vcpu, MDSCR_EL1);
+>> =20
+>> +		trace_dreg("Save: PSTATE.SS",
+>> +			vcpu_debug_saved_reg(vcpu, pstate_ss_bit));
+>> +		trace_dreg("Save: MDSCR",
+>> +			vcpu_debug_saved_reg(vcpu, mdscr_el1));
+>> +
+>>  		/*
+>>  		 * Single Step (ARM ARM D2.12.3 The software step state
+>>  		 * machine)
+>> @@ -88,6 +124,8 @@ void kvm_arch_setup_debug(struct kvm_vcpu *vcpu)
+>>  			*vcpu_cpsr(vcpu) &=3D ~DBG_SPSR_SS;
+>>  			vcpu_sys_reg(vcpu, MDSCR_EL1) &=3D ~DBG_MDSCR_SS;
+>>  		}
+>> +		trace_dreg("SPSR_EL2", *vcpu_cpsr(vcpu));
+>> +		trace_dreg("MDSCR_EL1", vcpu_sys_reg(vcpu, MDSCR_EL1));
+>> =20
+>>  		/*
+>>  		 * HW Break/Watch points
+>> @@ -136,6 +174,9 @@ void kvm_arch_setup_debug(struct kvm_vcpu *vcpu)
+>>  			       &host->dbg_wvr,
+>>  			       sizeof(__u64)*nw);
+>> =20
+>> +			if (trace_kvm_arch_setup_debug_reg32_enabled())
+>> +				dump_dbg_regs(vcpu, nb, nw);
+>> +
+>>  			/* Make sure hyp.S copies them in/out */
+>>  			vcpu->arch.debug_flags |=3D KVM_ARM64_DEBUG_DIRTY;
+>>  			/* Also track guest changes */
+>> @@ -147,15 +188,24 @@ void kvm_arch_setup_debug(struct kvm_vcpu *vcp=
+u)
+>>  		vcpu->arch.mdcr_el2 &=3D ~MDCR_EL2_TDE;
+>>  	}
+>> =20
+>> +	trace_kvm_arch_setup_debug_reg32("MDCR_EL2", vcpu->arch.mdcr_el2);
+>> +	trace_kvm_arch_setup_debug_reg32("MDSCR_EL1",
+>> +					vcpu_sys_reg(vcpu, MDSCR_EL1));
+>> +
+>> +
+>>  	/* Trap debug register access? */
+>>  	if (trap_debug)
+>>  		vcpu->arch.mdcr_el2 |=3D MDCR_EL2_TDA;
+>>  	else
+>>  		vcpu->arch.mdcr_el2 &=3D ~MDCR_EL2_TDA;
+>> +
+>> +	trace_kvm_arch_setup_debug_reg32("MDCR_EL2", vcpu->arch.mdcr_el2);
+>>  }
+>> =20
+>>  void kvm_arch_clear_debug(struct kvm_vcpu *vcpu)
+>>  {
+>> +	trace_kvm_arch_clear_debug(vcpu->guest_debug);
+>> +
+>>  	if (vcpu->guest_debug) {
+>>  		/* Restore pstate/mdscr bits we may have messed with */
+>>  		*vcpu_cpsr(vcpu) &=3D ~DBG_SPSR_SS;
+>> @@ -164,6 +214,8 @@ void kvm_arch_clear_debug(struct kvm_vcpu *vcpu)
+>>  		vcpu_sys_reg(vcpu, MDSCR_EL1) =3D
+>>  			vcpu_debug_saved_reg(vcpu, mdscr_el1);
+>> =20
+>> +		trace_dreg("SPSR_EL2", *vcpu_cpsr(vcpu));
+>> +		trace_dreg("MDSCR_EL1", vcpu_sys_reg(vcpu, MDSCR_EL1));
+>>  		/*
+>>  		 * If we were using HW debug we need to restore the
+>>  		 * values the guest had set them up with
+>> @@ -188,6 +240,10 @@ void kvm_arch_clear_debug(struct kvm_vcpu *vcpu=
+)
+>>  			memcpy(&vcpu_sys_reg(vcpu, DBGWVR0_EL1),
+>>  			       &regs->dbg_wvr,
+>>  			       sizeof(__u64)*nw);
+>> +
+>> +			if (trace_kvm_arch_setup_debug_reg32_enabled())
+>> +				dump_dbg_regs(vcpu, nb, nw);
+>> +
+>>  		}
+>>  	}
+>>  }
+>> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_ex=
+it.c
+>> index 460a1aa..c6cc69a 100644
+>> --- a/arch/arm64/kvm/handle_exit.c
+>> +++ b/arch/arm64/kvm/handle_exit.c
+>> @@ -97,6 +97,8 @@ static int kvm_handle_guest_debug(struct kvm_vcpu =
+*vcpu, struct kvm_run *run)
+>>  {
+>>  	u32 hsr =3D kvm_vcpu_get_hsr(vcpu);
+>> =20
+>> +	trace_kvm_handle_guest_debug(*vcpu_pc(vcpu), hsr);
+>> +
+>>  	run->exit_reason =3D KVM_EXIT_DEBUG;
+>>  	run->debug.arch.hsr =3D hsr;
+>> =20
+>> diff --git a/arch/arm64/kvm/trace.h b/arch/arm64/kvm/trace.h
+>> index 157416e9..dffdb49 100644
+>> --- a/arch/arm64/kvm/trace.h
+>> +++ b/arch/arm64/kvm/trace.h
+>> @@ -44,6 +44,72 @@ TRACE_EVENT(kvm_hvc_arm64,
+>>  		  __entry->vcpu_pc, __entry->r0, __entry->imm)
+>>  );
+>> =20
+>> +TRACE_EVENT(kvm_handle_guest_debug,
+>> +	TP_PROTO(unsigned long vcpu_pc, u32 hsr),
+>> +	TP_ARGS(vcpu_pc, hsr),
+>> +
+>> +	TP_STRUCT__entry(
+>> +		__field(unsigned long,	vcpu_pc)
+>> +		__field(u32,		hsr)
+>> +	),
+>> +
+>> +	TP_fast_assign(
+>> +		__entry->vcpu_pc =3D vcpu_pc;
+>> +		__entry->hsr =3D hsr;
+>> +	),
+>> +
+>> +	TP_printk("debug exception at 0x%08lx (HSR: 0x%08x)",
+>> +		__entry->vcpu_pc, __entry->hsr)
+>> +);
+>> +
+>> +
+>> +TRACE_EVENT(kvm_arch_setup_debug,
+>> +	TP_PROTO(__u32 guest_debug),
+>> +	TP_ARGS(guest_debug),
+>> +
+>> +	TP_STRUCT__entry(
+>> +		__field(__u32, guest_debug)
+>> +	),
+>> +
+>> +	TP_fast_assign(
+>> +		__entry->guest_debug =3D guest_debug;
+>> +	),
+>> +
+>> +	TP_printk("flags: 0x%08x", __entry->guest_debug)
+>> +);
+>> +
+>> +TRACE_EVENT(kvm_arch_clear_debug,
+>> +	TP_PROTO(__u32 guest_debug),
+>> +	TP_ARGS(guest_debug),
+>> +
+>> +	TP_STRUCT__entry(
+>> +		__field(__u32, guest_debug)
+>> +	),
+>> +
+>> +	TP_fast_assign(
+>> +		__entry->guest_debug =3D guest_debug;
+>> +	),
+>> +
+>> +	TP_printk("flags: 0x%08x", __entry->guest_debug)
+>> +);
+>> +
+>> +TRACE_EVENT(kvm_arch_setup_debug_reg32,
+>> +	TP_PROTO(const char *name, __u32 value),
+>> +	TP_ARGS(name, value),
+>> +
+>> +	TP_STRUCT__entry(
+>> +		__field(const char *, name)
+>> +		__field(__u32, value)
+>> +	),
+>> +
+>> +	TP_fast_assign(
+>> +		__entry->name =3D name;
+>> +		__entry->value =3D value;
+>> +	),
+>> +
+>> +	TP_printk("%s now 0x%08x", __entry->name, __entry->value)
+>> +);
+>> +
+>>  #endif /* _TRACE_ARM64_KVM_H */
+>> =20
+>>  #undef TRACE_INCLUDE_PATH
+>> --=20
+>> 2.3.4
+>>=20
+>
+> This looks like it would be super noisy. I'm sure that's nice for
+> developing/debugging, but can't we reduce the, now debugged, version
+> down to just one trace point per unique, and interesting, path? If yo=
+u
+> have several variables you want to see, then maybe they can all be
+> on the same line.
 
+Sure - I kept the multiple register references for debugging but your
+right it can be compressed down now it's working.
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
+>
+> Also, I'm not sure about the necessity of the dump_dbg_regs function,
+> but I think you should be able to embed it in the trace event code
+> using __print_array
+
+Thanks, I'll look at that.
+
+>
+> drew
+
+--=20
+Alex Benn=C3=A9e
