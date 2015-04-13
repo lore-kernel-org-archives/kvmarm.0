@@ -1,308 +1,155 @@
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v2 10/10] KVM: arm64: add trace points for guest_debug debug
-Date: Mon, 13 Apr 2015 08:57:16 +0100
-Message-ID: <878udwlaub.fsf@linaro.org>
-References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org> <1427814488-28467-11-git-send-email-alex.bennee@linaro.org> <20150410125415.GC3227@hawk.usersys.redhat.com>
+Subject: Re: [PATCH v2 09/10] KVM: arm64: trap nested debug register access
+Date: Mon, 13 Apr 2015 08:59:21 +0100
+Message-ID: <877ftglaqu.fsf@linaro.org>
+References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
+ <1427814488-28467-10-git-send-email-alex.bennee@linaro.org>
+ <20150410123830.GB3227@hawk.usersys.redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <20150410125415.GC3227@hawk.usersys.redhat.com>
-Sender: kvm-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C539B4C358
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 03:51:25 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id WLoEy+-PQ8df for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Apr 2015 03:51:24 -0400 (EDT)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 903B34C356
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 03:51:24 -0400 (EDT)
+In-reply-to: <20150410123830.GB3227@hawk.usersys.redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Andrew Jones <drjones@redhat.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, pbonzini@redhat.com, zhichao.huang@linaro.org, jan.kiszka@siemens.com, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org, marc.zyngier@arm.com, jan.kiszka@siemens.com, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, linux-arm-kernel@lists.infradead.org, zhichao.huang@linaro.org, r65777@freescale.com, pbonzini@redhat.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-Andrew Jones <drjones@redhat.com> writes:
-
-> $SUBJECT | sed s/guest_debug debug/guest debug/ ?
->
-> On Tue, Mar 31, 2015 at 04:08:08PM +0100, Alex Benn=C3=A9e wrote:
->> This includes trace points for:
->>   kvm_arch_setup_guest_debug
->>   kvm_arch_clear_guest_debug
->>   kvm_handle_guest_debug
->>=20
->> I've also added some generic register setting trace events so I can
->> watch the register values being built up over time. The local
->> dump_dbg_regs() function dumps all the HW BKPT and WPT registers.
->>=20
->> I've also added a #define trace_dreg to shorten some lines.
->>=20
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>=20
->> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
->> index 638c111..7c96288 100644
->> --- a/arch/arm64/kvm/debug.c
->> +++ b/arch/arm64/kvm/debug.c
->> @@ -25,12 +25,37 @@
->>  #include <asm/kvm_host.h>
->>  #include <asm/kvm_emulate.h>
->> =20
->> +#include "trace.h"
->> +
->> +#define trace_dreg(name, value) trace_kvm_arch_setup_debug_reg32(na=
-me, value)
->
-> I don't think this name shortener should be necessary
-
-Yeah it was just a quick hack as lower down the trace_ statements kept
-wrapping and it looked ugly. I guess it would be less of an issue if I
-shorten the setup/clear names.
-
->
->> +
->>  /* These are the bits of MDSCR_EL1 we may mess with */
->>  #define MDSCR_EL1_DEBUG_BITS	(DBG_MDSCR_SS | \
->>  				DBG_MDSCR_KDE | \
->>  				DBG_MDSCR_MDE)
->> =20
->>  /**
->> + * dump_dbg_regs - simple debug helper
->> + *
->> + * This provides a simple helper to dump the HW debug registers
->> + */
->> +static void dump_dbg_regs(struct kvm_vcpu *vcpu, int nb, int nw)
->> +{
->> +	int i;
->> +
->> +	for (i =3D 0; i < nb; i++) {
->> +		trace_printk("bkpt%d: 0x%08x:0x%llx\n", i,
->> +			(u32) vcpu_sys_reg(vcpu, DBGBCR0_EL1 + i),
->> +			vcpu_sys_reg(vcpu, DBGBVR0_EL1 + i));
->> +	}
->> +	for (i =3D 0; i < nb; i++) {
->> +		trace_printk("wtpt%d: 0x%08x:0x%llx\n", i,
->> +			(u32) vcpu_sys_reg(vcpu, DBGWCR0_EL1 + i),
->> +			vcpu_sys_reg(vcpu, DBGWVR0_EL1 + i));
->> +	}
->> +}
->> +
->> +/**
->>   * kvm_arch_setup_debug - set-up debug related stuff
->>   *
->>   * @vcpu:	the vcpu pointer
->> @@ -52,9 +77,13 @@ void kvm_arch_setup_debug(struct kvm_vcpu *vcpu)
->>  {
->>  	bool trap_debug =3D false;
->> =20
->> +	trace_kvm_arch_setup_debug(vcpu->guest_debug);
->> +
->>  	vcpu->arch.mdcr_el2 |=3D (MDCR_EL2_TPM | MDCR_EL2_TPMCR);
->>  	vcpu->arch.mdcr_el2 |=3D (MDCR_EL2_TDRA | MDCR_EL2_TDOSA);
->> =20
->> +	trace_kvm_arch_setup_debug_reg32("MDCR_EL2", vcpu->arch.mdcr_el2);
->
-> Not using your trace_dreg here? I guess you didn't think it was
-> necessary either.
->
->> +
->>  	/*
->>  	 * If we are not treating debug registers are dirty we need
->>  	 * to trap if the guest starts accessing them.
->> @@ -66,6 +95,8 @@ void kvm_arch_setup_debug(struct kvm_vcpu *vcpu)
->>  	if (vcpu->guest_debug) {
->>  		vcpu->arch.mdcr_el2 |=3D MDCR_EL2_TDE;
->> =20
->> +		trace_dreg("MDCR_EL2", vcpu->arch.mdcr_el2);
->> +
->>  		/* Save pstate/mdscr */
->>  		vcpu_debug_saved_reg(vcpu, pstate_ss_bit) =3D
->>  			*vcpu_cpsr(vcpu) & DBG_SPSR_SS;
->> @@ -73,6 +104,11 @@ void kvm_arch_setup_debug(struct kvm_vcpu *vcpu)
->>  		vcpu_debug_saved_reg(vcpu, mdscr_el1) =3D
->>  			vcpu_sys_reg(vcpu, MDSCR_EL1);
->> =20
->> +		trace_dreg("Save: PSTATE.SS",
->> +			vcpu_debug_saved_reg(vcpu, pstate_ss_bit));
->> +		trace_dreg("Save: MDSCR",
->> +			vcpu_debug_saved_reg(vcpu, mdscr_el1));
->> +
->>  		/*
->>  		 * Single Step (ARM ARM D2.12.3 The software step state
->>  		 * machine)
->> @@ -88,6 +124,8 @@ void kvm_arch_setup_debug(struct kvm_vcpu *vcpu)
->>  			*vcpu_cpsr(vcpu) &=3D ~DBG_SPSR_SS;
->>  			vcpu_sys_reg(vcpu, MDSCR_EL1) &=3D ~DBG_MDSCR_SS;
->>  		}
->> +		trace_dreg("SPSR_EL2", *vcpu_cpsr(vcpu));
->> +		trace_dreg("MDSCR_EL1", vcpu_sys_reg(vcpu, MDSCR_EL1));
->> =20
->>  		/*
->>  		 * HW Break/Watch points
->> @@ -136,6 +174,9 @@ void kvm_arch_setup_debug(struct kvm_vcpu *vcpu)
->>  			       &host->dbg_wvr,
->>  			       sizeof(__u64)*nw);
->> =20
->> +			if (trace_kvm_arch_setup_debug_reg32_enabled())
->> +				dump_dbg_regs(vcpu, nb, nw);
->> +
->>  			/* Make sure hyp.S copies them in/out */
->>  			vcpu->arch.debug_flags |=3D KVM_ARM64_DEBUG_DIRTY;
->>  			/* Also track guest changes */
->> @@ -147,15 +188,24 @@ void kvm_arch_setup_debug(struct kvm_vcpu *vcp=
-u)
->>  		vcpu->arch.mdcr_el2 &=3D ~MDCR_EL2_TDE;
->>  	}
->> =20
->> +	trace_kvm_arch_setup_debug_reg32("MDCR_EL2", vcpu->arch.mdcr_el2);
->> +	trace_kvm_arch_setup_debug_reg32("MDSCR_EL1",
->> +					vcpu_sys_reg(vcpu, MDSCR_EL1));
->> +
->> +
->>  	/* Trap debug register access? */
->>  	if (trap_debug)
->>  		vcpu->arch.mdcr_el2 |=3D MDCR_EL2_TDA;
->>  	else
->>  		vcpu->arch.mdcr_el2 &=3D ~MDCR_EL2_TDA;
->> +
->> +	trace_kvm_arch_setup_debug_reg32("MDCR_EL2", vcpu->arch.mdcr_el2);
->>  }
->> =20
->>  void kvm_arch_clear_debug(struct kvm_vcpu *vcpu)
->>  {
->> +	trace_kvm_arch_clear_debug(vcpu->guest_debug);
->> +
->>  	if (vcpu->guest_debug) {
->>  		/* Restore pstate/mdscr bits we may have messed with */
->>  		*vcpu_cpsr(vcpu) &=3D ~DBG_SPSR_SS;
->> @@ -164,6 +214,8 @@ void kvm_arch_clear_debug(struct kvm_vcpu *vcpu)
->>  		vcpu_sys_reg(vcpu, MDSCR_EL1) =3D
->>  			vcpu_debug_saved_reg(vcpu, mdscr_el1);
->> =20
->> +		trace_dreg("SPSR_EL2", *vcpu_cpsr(vcpu));
->> +		trace_dreg("MDSCR_EL1", vcpu_sys_reg(vcpu, MDSCR_EL1));
->>  		/*
->>  		 * If we were using HW debug we need to restore the
->>  		 * values the guest had set them up with
->> @@ -188,6 +240,10 @@ void kvm_arch_clear_debug(struct kvm_vcpu *vcpu=
-)
->>  			memcpy(&vcpu_sys_reg(vcpu, DBGWVR0_EL1),
->>  			       &regs->dbg_wvr,
->>  			       sizeof(__u64)*nw);
->> +
->> +			if (trace_kvm_arch_setup_debug_reg32_enabled())
->> +				dump_dbg_regs(vcpu, nb, nw);
->> +
->>  		}
->>  	}
->>  }
->> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_ex=
-it.c
->> index 460a1aa..c6cc69a 100644
->> --- a/arch/arm64/kvm/handle_exit.c
->> +++ b/arch/arm64/kvm/handle_exit.c
->> @@ -97,6 +97,8 @@ static int kvm_handle_guest_debug(struct kvm_vcpu =
-*vcpu, struct kvm_run *run)
->>  {
->>  	u32 hsr =3D kvm_vcpu_get_hsr(vcpu);
->> =20
->> +	trace_kvm_handle_guest_debug(*vcpu_pc(vcpu), hsr);
->> +
->>  	run->exit_reason =3D KVM_EXIT_DEBUG;
->>  	run->debug.arch.hsr =3D hsr;
->> =20
->> diff --git a/arch/arm64/kvm/trace.h b/arch/arm64/kvm/trace.h
->> index 157416e9..dffdb49 100644
->> --- a/arch/arm64/kvm/trace.h
->> +++ b/arch/arm64/kvm/trace.h
->> @@ -44,6 +44,72 @@ TRACE_EVENT(kvm_hvc_arm64,
->>  		  __entry->vcpu_pc, __entry->r0, __entry->imm)
->>  );
->> =20
->> +TRACE_EVENT(kvm_handle_guest_debug,
->> +	TP_PROTO(unsigned long vcpu_pc, u32 hsr),
->> +	TP_ARGS(vcpu_pc, hsr),
->> +
->> +	TP_STRUCT__entry(
->> +		__field(unsigned long,	vcpu_pc)
->> +		__field(u32,		hsr)
->> +	),
->> +
->> +	TP_fast_assign(
->> +		__entry->vcpu_pc =3D vcpu_pc;
->> +		__entry->hsr =3D hsr;
->> +	),
->> +
->> +	TP_printk("debug exception at 0x%08lx (HSR: 0x%08x)",
->> +		__entry->vcpu_pc, __entry->hsr)
->> +);
->> +
->> +
->> +TRACE_EVENT(kvm_arch_setup_debug,
->> +	TP_PROTO(__u32 guest_debug),
->> +	TP_ARGS(guest_debug),
->> +
->> +	TP_STRUCT__entry(
->> +		__field(__u32, guest_debug)
->> +	),
->> +
->> +	TP_fast_assign(
->> +		__entry->guest_debug =3D guest_debug;
->> +	),
->> +
->> +	TP_printk("flags: 0x%08x", __entry->guest_debug)
->> +);
->> +
->> +TRACE_EVENT(kvm_arch_clear_debug,
->> +	TP_PROTO(__u32 guest_debug),
->> +	TP_ARGS(guest_debug),
->> +
->> +	TP_STRUCT__entry(
->> +		__field(__u32, guest_debug)
->> +	),
->> +
->> +	TP_fast_assign(
->> +		__entry->guest_debug =3D guest_debug;
->> +	),
->> +
->> +	TP_printk("flags: 0x%08x", __entry->guest_debug)
->> +);
->> +
->> +TRACE_EVENT(kvm_arch_setup_debug_reg32,
->> +	TP_PROTO(const char *name, __u32 value),
->> +	TP_ARGS(name, value),
->> +
->> +	TP_STRUCT__entry(
->> +		__field(const char *, name)
->> +		__field(__u32, value)
->> +	),
->> +
->> +	TP_fast_assign(
->> +		__entry->name =3D name;
->> +		__entry->value =3D value;
->> +	),
->> +
->> +	TP_printk("%s now 0x%08x", __entry->name, __entry->value)
->> +);
->> +
->>  #endif /* _TRACE_ARM64_KVM_H */
->> =20
->>  #undef TRACE_INCLUDE_PATH
->> --=20
->> 2.3.4
->>=20
->
-> This looks like it would be super noisy. I'm sure that's nice for
-> developing/debugging, but can't we reduce the, now debugged, version
-> down to just one trace point per unique, and interesting, path? If yo=
-u
-> have several variables you want to see, then maybe they can all be
-> on the same line.
-
-Sure - I kept the multiple register references for debugging but your
-right it can be compressed down now it's working.
-
->
-> Also, I'm not sure about the necessity of the dump_dbg_regs function,
-> but I think you should be able to embed it in the trace event code
-> using __print_array
-
-Thanks, I'll look at that.
-
->
-> drew
-
---=20
-Alex Benn=C3=A9e
+CkFuZHJldyBKb25lcyA8ZHJqb25lc0ByZWRoYXQuY29tPiB3cml0ZXM6Cgo+IE9uIFR1ZSwgTWFy
+IDMxLCAyMDE1IGF0IDA0OjA4OjA3UE0gKzAxMDAsIEFsZXggQmVubsOpZSB3cm90ZToKPj4gV2hl
+biB3ZSBhcmUgdXNpbmcgdGhlIGhhcmR3YXJlIHJlZ2lzdGVycyBmb3IgZ3Vlc3QgZGVidWcgd2Ug
+bmVlZCB0byBkZWFsCj4+IHdpdGggdGhlIGd1ZXN0cyBhY2Nlc3MgdG8gdGhlbS4gVGhlcmUgaXMg
+YWxyZWFkeSBhIG1lY2hhbmlzbSBmb3IgZGVhbGluZwo+PiB3aXRoIHRoZXNlIGFjY2Vzc2VzIHNv
+IHdlIGJ1aWxkIG9uIHRvcCBvZiB0aGF0Lgo+PiAKPj4gICAtIG1kc2NyX2VsMV9iaXRzIGlzIHJl
+bmFtZWQgYXMgd2Ugc2F2ZSB0aGUgd2hvbGUgcmVnaXN0ZXIKPj4gICAtIGFueSBhY2Nlc3MgdG8g
+bWRzY3JfZWwxIGlzIG5vdyBzdG9yZWQgaW4gdGhlIG1pcnJvciBsb2NhdGlvbgo+PiAgIC0gaWYg
+d2UgYXJlIHVzaW5nIEhXIGFzc2lzdGVkIGRlYnVnIHdlIGRvIHRoZSBzYW1lIHdpdGggREJHW1dC
+XVtDVl1SCj4+IAo+PiBUaGVyZSBpcyBvbmUgcmVnaXN0ZXIgKE1EQ0NJTlRfRUwxKSB3aGljaCBn
+dWVzdCBkZWJ1ZyBkb2Vzbid0IGNhcmUgYWJvdXQKPj4gc28gdGhpcyBiZWhhdmVzIGFzIGJlZm9y
+ZS4KPj4gCj4+IFNpZ25lZC1vZmYtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJv
+Lm9yZz4KPj4gCj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0
+LmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPj4gaW5kZXggMmMzNTljOS4u
+M2QzMmQ0NSAxMDA2NDQKPj4gLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5o
+Cj4+ICsrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+PiBAQCAtMTIyLDEw
+ICsxMjIsMTMgQEAgc3RydWN0IGt2bV92Y3B1X2FyY2ggewo+PiAgCSAqIGhlcmUuCj4+ICAJICov
+Cj4+ICAKPj4gLQkvKiBSZWdpc3RlcnMgcHJlIGFueSBndWVzdCBkZWJ1ZyBtYW5pcHVsYXRpb25z
+ICovCj4+ICsJLyogUmVnaXN0ZXJzIGJlZm9yZSBhbnkgZ3Vlc3QgZGVidWcgbWFuaXB1bGF0aW9u
+cy4gVGhlc2UKPgo+IHN0YXJ0aW5nIGNvbW1lbnQgLyogb24gb3duIGxpbmUKPgo+PiArCSAqIHNo
+YWRvdyByZWdpc3RlcnMgYXJlIHVwZGF0ZWQgYnkgdGhlIGt2bV9oYW5kbGVfc3lzX3JlZwo+PiAr
+CSAqIHRyYXAgaGFuZGxlciBpZiB0aGUgZ3Vlc3QgYWNjZXNzZXMgb3IgdXBkYXRlcyB0aGVtCj4+
+ICsJICovCj4+ICAJc3RydWN0IHsKPj4gIAkJdTMyCXBzdGF0ZV9zc19iaXQ7Cj4+IC0JCXUzMglt
+ZHNjcl9lbDFfYml0czsKPj4gKwkJdTMyCW1kc2NyX2VsMTsKPj4gIAo+PiAgCQlzdHJ1Y3Qga3Zt
+X2d1ZXN0X2RlYnVnX2FyY2ggZGVidWdfcmVnczsKPj4gIAl9IGRlYnVnX3NhdmVkX3JlZ3M7Cj4+
+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9kZWJ1Zy5jIGIvYXJjaC9hcm02NC9rdm0vZGVi
+dWcuYwo+PiBpbmRleCAzYjM2OGYzLi42MzhjMTExIDEwMDY0NAo+PiAtLS0gYS9hcmNoL2FybTY0
+L2t2bS9kZWJ1Zy5jCj4+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL2RlYnVnLmMKPj4gQEAgLTU1LDgg
+KzU1LDYgQEAgdm9pZCBrdm1fYXJjaF9zZXR1cF9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUp
+Cj4+ICAJdmNwdS0+YXJjaC5tZGNyX2VsMiB8PSAoTURDUl9FTDJfVFBNIHwgTURDUl9FTDJfVFBN
+Q1IpOwo+PiAgCXZjcHUtPmFyY2gubWRjcl9lbDIgfD0gKE1EQ1JfRUwyX1REUkEgfCBNRENSX0VM
+Ml9URE9TQSk7Cj4+ICAKPj4gLQl0cmFjZV9rdm1fYXJjaF9zZXR1cF9kZWJ1Z19yZWczMigiTURD
+Ul9FTDIiLCB2Y3B1LT5hcmNoLm1kY3JfZWwyKTsKPj4gLQo+Cj4gSSBndWVzcyBJJ2xsIHNlZSB0
+aGlzIGNvbWUgYmFjayBpbiB0aGUgbmV4dCBwYXRjaC4gWW91IG11c3QgYmUgcGxheWluZwo+ICdu
+b3cgeW91IHNlZSBtZSwgbm93IHlvdSBkb24ndCcKCk9vcHMsIG1pc3NlZCB0aGF0IG9uIHRoZSBy
+ZWJhc2UuCgo+Cj4+ICAJLyoKPj4gIAkgKiBJZiB3ZSBhcmUgbm90IHRyZWF0aW5nIGRlYnVnIHJl
+Z2lzdGVycyBhcmUgZGlydHkgd2UgbmVlZAo+PiAgCSAqIHRvIHRyYXAgaWYgdGhlIGd1ZXN0IHN0
+YXJ0cyBhY2Nlc3NpbmcgdGhlbS4KPj4gQEAgLTcxLDggKzY5LDEwIEBAIHZvaWQga3ZtX2FyY2hf
+c2V0dXBfZGVidWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+PiAgCQkvKiBTYXZlIHBzdGF0ZS9t
+ZHNjciAqLwo+PiAgCQl2Y3B1X2RlYnVnX3NhdmVkX3JlZyh2Y3B1LCBwc3RhdGVfc3NfYml0KSA9
+Cj4+ICAJCQkqdmNwdV9jcHNyKHZjcHUpICYgREJHX1NQU1JfU1M7Cj4+IC0JCXZjcHVfZGVidWdf
+c2F2ZWRfcmVnKHZjcHUsIG1kc2NyX2VsMV9iaXRzKSA9Cj4+IC0JCQl2Y3B1X3N5c19yZWcodmNw
+dSwgTURTQ1JfRUwxKSAmIE1EU0NSX0VMMV9ERUJVR19CSVRTOwo+PiArCj4+ICsJCXZjcHVfZGVi
+dWdfc2F2ZWRfcmVnKHZjcHUsIG1kc2NyX2VsMSkgPQo+PiArCQkJdmNwdV9zeXNfcmVnKHZjcHUs
+IE1EU0NSX0VMMSk7Cj4+ICsKPj4gIAkJLyoKPj4gIAkJICogU2luZ2xlIFN0ZXAgKEFSTSBBUk0g
+RDIuMTIuMyBUaGUgc29mdHdhcmUgc3RlcCBzdGF0ZQo+PiAgCQkgKiBtYWNoaW5lKQo+PiBAQCAt
+MTYxLDkgKzE2MSw4IEBAIHZvaWQga3ZtX2FyY2hfY2xlYXJfZGVidWcoc3RydWN0IGt2bV92Y3B1
+ICp2Y3B1KQo+PiAgCQkqdmNwdV9jcHNyKHZjcHUpICY9IH5EQkdfU1BTUl9TUzsKPj4gIAkJKnZj
+cHVfY3Bzcih2Y3B1KSB8PSB2Y3B1X2RlYnVnX3NhdmVkX3JlZyh2Y3B1LCBwc3RhdGVfc3NfYml0
+KTsKPj4gIAo+PiAtCQl2Y3B1X3N5c19yZWcodmNwdSwgTURTQ1JfRUwxKSAmPSB+TURTQ1JfRUwx
+X0RFQlVHX0JJVFM7Cj4+IC0JCXZjcHVfc3lzX3JlZyh2Y3B1LCBNRFNDUl9FTDEpIHw9Cj4+IC0J
+CQl2Y3B1X2RlYnVnX3NhdmVkX3JlZyh2Y3B1LCBtZHNjcl9lbDFfYml0cyk7Cj4+ICsJCXZjcHVf
+c3lzX3JlZyh2Y3B1LCBNRFNDUl9FTDEpID0KPj4gKwkJCXZjcHVfZGVidWdfc2F2ZWRfcmVnKHZj
+cHUsIG1kc2NyX2VsMSk7Cj4+ICAKPj4gIAkJLyoKPj4gIAkJICogSWYgd2Ugd2VyZSB1c2luZyBI
+VyBkZWJ1ZyB3ZSBuZWVkIHRvIHJlc3RvcmUgdGhlCj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0
+L2t2bS9zeXNfcmVncy5jIGIvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYwo+PiBpbmRleCBiZTli
+MTg4Li5kNDNkN2QxIDEwMDY0NAo+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jCj4+
+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMKPj4gQEAgLTIwOCwzOSArMjA4LDYxIEBA
+IHN0YXRpYyBib29sIHRyYXBfZGVidWdfcmVncyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4+ICAJ
+CQkgICAgY29uc3Qgc3RydWN0IHN5c19yZWdfcGFyYW1zICpwLAo+PiAgCQkJICAgIGNvbnN0IHN0
+cnVjdCBzeXNfcmVnX2Rlc2MgKnIpCj4+ICB7Cj4+IC0JaWYgKHZjcHUtPmd1ZXN0X2RlYnVnICYg
+S1ZNX0dVRVNUREJHX1VTRV9IV19CUCkgewo+PiAtCQlzdHJ1Y3Qga3ZtX2d1ZXN0X2RlYnVnX2Fy
+Y2ggKnNhdmVkOwo+PiAtCQlfX3U2NCAqdmFsOwo+PiAtCj4+IC0JCXNhdmVkID0gJnZjcHVfZGVi
+dWdfc2F2ZWRfcmVnKHZjcHUsIGRlYnVnX3JlZ3MpOwo+PiAtCj4+IC0JCWlmIChyLT5yZWcgPj0g
+REJHQkNSMF9FTDEgJiYgci0+cmVnIDw9IERCR0JDUjE1X0VMMSkKPj4gLQkJCXZhbCA9ICZzYXZl
+ZC0+ZGJnX2JjcltyLT5yZWcgLSBEQkdCQ1IwX0VMMV07Cj4+IC0JCWVsc2UgaWYgKHItPnJlZyA+
+PSBEQkdCVlIwX0VMMSAmJiByLT5yZWcgPD0gREJHQlZSMTVfRUwxKQo+PiAtCQkJdmFsID0gJnNh
+dmVkLT5kYmdfYnZyW3ItPnJlZyAtIERCR0JWUjBfRUwxXTsKPj4gLQkJZWxzZSBpZiAoci0+cmVn
+ID49IERCR1dDUjBfRUwxICYmIHItPnJlZyA8PSBEQkdXQ1IxNV9FTDEpCj4+IC0JCQl2YWwgPSAm
+c2F2ZWQtPmRiZ193Y3Jbci0+cmVnIC0gREJHV0NSMF9FTDFdOwo+PiAtCQllbHNlIGlmIChyLT5y
+ZWcgPj0gREJHV1ZSMF9FTDEgJiYgci0+cmVnIDw9IERCR1dWUjE1X0VMMSkKPj4gLQkJCXZhbCA9
+ICZzYXZlZC0+ZGJnX3d2cltyLT5yZWcgLSBEQkdXVlIwX0VMMV07Cj4+IC0JCWVsc2Ugewo+PiAt
+CQkJa3ZtX2VycigiQmFkIHJlZ2lzdGVyIGluZGV4ICVkXG4iLCByLT5yZWcpOwo+PiAtCQkJcmV0
+dXJuIGZhbHNlOwo+PiArCWlmICh2Y3B1LT5ndWVzdF9kZWJ1Zykgewo+PiArCj4+ICsJCS8qIE1E
+U0NSX0VMMSAqLwo+PiArCQlpZiAoci0+cmVnID09IE1EU0NSX0VMMSkgewo+PiArCQkJaWYgKHAt
+PmlzX3dyaXRlKQo+PiArCQkJCXZjcHVfZGVidWdfc2F2ZWRfcmVnKHZjcHUsIG1kc2NyX2VsMSkg
+PQo+PiArCQkJCQkqdmNwdV9yZWcodmNwdSwgcC0+UnQpOwo+PiArCQkJZWxzZQo+PiArCQkJCSp2
+Y3B1X3JlZyh2Y3B1LCBwLT5SdCkgPQo+PiArCQkJCQl2Y3B1X2RlYnVnX3NhdmVkX3JlZyh2Y3B1
+LCBtZHNjcl9lbDEpOwo+Cj4gV2l0aCB0aGlzIGxpbmVzIHdyYXBwaW5nLCB7fSdzIG1pZ2h0IGJl
+IG5pY2UuCgpNeSBuYXR1cmFsIGluY2xpbmF0aW9uIGlzIHRvIHdyYXAgaW4ge30ncyBidXQgSSBr
+bm93IHRoZSBrZXJuZWwgaXMgYSBmYW4Kb2YgdGhlIHNpbmdsZS1zdGF0ZW1lbnQgaWYgZm9ybXMu
+Cgo+Cj4+ICsKPj4gKwkJCXJldHVybiB0cnVlOwo+PiAgCQl9Cj4+ICAKPj4gLQkJaWYgKHAtPmlz
+X3dyaXRlKQo+PiAtCQkJKnZhbCA9ICp2Y3B1X3JlZyh2Y3B1LCBwLT5SdCk7Cj4+IC0JCWVsc2UK
+Pj4gLQkJCSp2Y3B1X3JlZyh2Y3B1LCBwLT5SdCkgPSAqdmFsOwo+PiArCQkvKiBNRENDSU5UX0VM
+MSAqLwo+PiArCQlpZiAoci0+cmVnID09IE1EQ0NJTlRfRUwxKQo+PiArCQkJZ290byBvbGQ7Cj4K
+PiAib2xkIj8gQXMgaW4gdGhlIG9sZCB3YXkgdGhpcyB3b3JrZWQ/IFNvbWVkYXkgKHNvb24pIGFs
+bCB0aGlzIGNvZGUgd2lsbAo+IGJlICJvbGQiLiBIb3cgYWJvdXQganVzdCAnb3V0Jz8gT3IgdXNl
+IHNvbWUgb3RoZXIgd2F5IHRvIGdldCB0aGUgZmxvdwo+IHN1Y2ggdGhhdCB3ZSBhdm9pZCBjb2Rl
+IGR1cGxpY2F0aW9uLCBidXQgZG9lc24ndCByZXF1aXJlIGEgZ290bz8KCkknbGwgc2VlIGlmIEkg
+Y2FuIHN0cnVjdHVyZSB0aGlzIGJldHRlci4KCj4KPj4gKwo+PiArCQkvKiBXZSBvbmx5IHNoYWRv
+dyBEQkcqIGlmIGd1ZXN0IGJlaW5nIGRlYnVnZ2VkICovCj4+ICsJCWlmICh2Y3B1LT5ndWVzdF9k
+ZWJ1ZyAmIEtWTV9HVUVTVERCR19VU0VfSFdfQlApIHsKPj4gKwkJCXN0cnVjdCBrdm1fZ3Vlc3Rf
+ZGVidWdfYXJjaCAqc2F2ZWQ7Cj4+ICsJCQlfX3U2NCAqdmFsOwo+PiArCj4+ICsJCQlzYXZlZCA9
+ICZ2Y3B1X2RlYnVnX3NhdmVkX3JlZyh2Y3B1LCBkZWJ1Z19yZWdzKTsKPj4gKwo+PiArCQkJaWYg
+KHItPnJlZyA+PSBEQkdCQ1IwX0VMMSAmJiByLT5yZWcgPD0gREJHQkNSMTVfRUwxKQo+PiArCQkJ
+CXZhbCA9ICZzYXZlZC0+ZGJnX2JjcltyLT5yZWcgLSBEQkdCQ1IwX0VMMV07Cj4+ICsJCQllbHNl
+IGlmIChyLT5yZWcgPj0gREJHQlZSMF9FTDEgJiYgci0+cmVnIDw9IERCR0JWUjE1X0VMMSkKPj4g
+KwkJCQl2YWwgPSAmc2F2ZWQtPmRiZ19idnJbci0+cmVnIC0gREJHQlZSMF9FTDFdOwo+PiArCQkJ
+ZWxzZSBpZiAoci0+cmVnID49IERCR1dDUjBfRUwxICYmIHItPnJlZyA8PSBEQkdXQ1IxNV9FTDEp
+Cj4+ICsJCQkJdmFsID0gJnNhdmVkLT5kYmdfd2NyW3ItPnJlZyAtIERCR1dDUjBfRUwxXTsKPj4g
+KwkJCWVsc2UgaWYgKHItPnJlZyA+PSBEQkdXVlIwX0VMMSAmJiByLT5yZWcgPD0gREJHV1ZSMTVf
+RUwxKQo+PiArCQkJCXZhbCA9ICZzYXZlZC0+ZGJnX3d2cltyLT5yZWcgLSBEQkdXVlIwX0VMMV07
+Cj4+ICsJCQllbHNlIHsKPj4gKwkJCQlrdm1fZXJyKCJCYWQgcmVnaXN0ZXIgaW5kZXggJWRcbiIs
+IHItPnJlZyk7Cj4+ICsJCQkJcmV0dXJuIGZhbHNlOwo+PiArCQkJfQo+PiAgCj4+IC0JfSBlbHNl
+IHsKPj4gLQkJaWYgKHAtPmlzX3dyaXRlKSB7Cj4+IC0JCQl2Y3B1X3N5c19yZWcodmNwdSwgci0+
+cmVnKSA9ICp2Y3B1X3JlZyh2Y3B1LCBwLT5SdCk7Cj4+IC0JCQl2Y3B1LT5hcmNoLmRlYnVnX2Zs
+YWdzIHw9IEtWTV9BUk02NF9ERUJVR19ESVJUWTsKPj4gLQkJfSBlbHNlIHsKPj4gLQkJCSp2Y3B1
+X3JlZyh2Y3B1LCBwLT5SdCkgPSB2Y3B1X3N5c19yZWcodmNwdSwgci0+cmVnKTsKPj4gKwkJCWlm
+IChwLT5pc193cml0ZSkKPj4gKwkJCQkqdmFsID0gKnZjcHVfcmVnKHZjcHUsIHAtPlJ0KTsKPj4g
+KwkJCWVsc2UKPj4gKwkJCQkqdmNwdV9yZWcodmNwdSwgcC0+UnQpID0gKnZhbDsKPj4gKwo+PiAr
+CQkJcmV0dXJuIHRydWU7Cj4+ICAJCX0KPj4gIAl9Cj4+ICAKPj4gK29sZDoKPj4gKwlpZiAocC0+
+aXNfd3JpdGUpIHsKPj4gKwkJdmNwdV9zeXNfcmVnKHZjcHUsIHItPnJlZykgPSAqdmNwdV9yZWco
+dmNwdSwgcC0+UnQpOwo+PiArCQl2Y3B1LT5hcmNoLmRlYnVnX2ZsYWdzIHw9IEtWTV9BUk02NF9E
+RUJVR19ESVJUWTsKPj4gKwl9IGVsc2Ugewo+PiArCQkqdmNwdV9yZWcodmNwdSwgcC0+UnQpID0g
+dmNwdV9zeXNfcmVnKHZjcHUsIHItPnJlZyk7Cj4+ICsJfQo+PiArCj4+ICAJcmV0dXJuIHRydWU7
+Cj4+ICB9Cj4+ICAKPj4gLS0gCj4+IDIuMy40Cj4+IAoKLS0gCkFsZXggQmVubsOpZQpfX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBs
+aXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJp
+YS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
