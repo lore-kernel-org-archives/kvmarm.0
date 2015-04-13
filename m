@@ -1,24 +1,26 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC v6 06/16] VFIO: Introduce vfio_device_external_ops
-Date: Mon, 13 Apr 2015 14:29:21 +0200
-Message-ID: <1428928171-18884-7-git-send-email-eric.auger@linaro.org>
+Subject: [RFC v6 11/16] KVM: kvm-vfio: wrappers for
+ vfio_external_{mask|is_active|set_automasked}
+Date: Mon, 13 Apr 2015 14:29:26 +0200
+Message-ID: <1428928171-18884-12-git-send-email-eric.auger@linaro.org>
 References: <1428928171-18884-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF7554C411
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 08:24:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D7A84C44B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 08:25:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yYcwhjvI8sCB for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Apr 2015 08:24:57 -0400 (EDT)
-Received: from mail-wg0-f50.google.com (mail-wg0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 845284C3D5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 08:24:55 -0400 (EDT)
-Received: by wgso17 with SMTP id o17so79115289wgs.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 05:32:42 -0700 (PDT)
+ with ESMTP id J3AgMP68ZJY2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Apr 2015 08:25:04 -0400 (EDT)
+Received: from mail-wi0-f171.google.com (mail-wi0-f171.google.com
+ [209.85.212.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B47994C443
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 08:25:04 -0400 (EDT)
+Received: by widdi4 with SMTP id di4so49678939wid.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 05:32:51 -0700 (PDT)
 In-Reply-To: <1428928171-18884-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,54 +35,86 @@ To: eric.auger@st.com, eric.auger@linaro.org, christoffer.dall@linaro.org, marc.
 Cc: feng.wu@intel.com, linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-New bus callbacks are introduced. They correspond to external
-functions. To avoid messing up the main vfio_device_ops
-struct, a new vfio_device_external_ops struct is introduced.
+Those 3 new wrapper functions call the respective VFIO external
+functions.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
 ---
 
-v6: creation
+- v4: creation
+- v5 -> v6:
+  x vfio.h modifications duly moved in "VFIO: platform: add
+    vfio_external_{mask|is_active|set_automasked}"
+  x all external functions use vfio_device handle
+  x change proto of above function (unsigned index, unsigned start,
+    unsigned count); also return int.
 ---
- include/linux/vfio.h | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ virt/kvm/vfio.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index b18c38f..b0ec474 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -19,6 +19,23 @@
- #include <uapi/linux/vfio.h>
+diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
+index 80a45e4..f4e86d3 100644
+--- a/virt/kvm/vfio.c
++++ b/virt/kvm/vfio.c
+@@ -134,6 +134,58 @@ static void kvm_vfio_put_vfio_device(struct vfio_device *vdev)
+ 	kvm_vfio_device_put_external_user(vdev);
+ }
  
- /**
-+ * struct vfio_device_external_ops - VFIO bus driver device callbacks
-+ * used as external API
-+ * @mask: mask any IRQ defined by triplet
-+ * @is_active: returns whether any IRQ defined by triplet is active
-+ * @set_automasked: sets the automasked flag of triplet's IRQ
-+ */
-+struct vfio_device_external_ops  {
-+	int (*mask)(void *device_data, unsigned index, unsigned start,
-+		    unsigned count);
-+	int (*is_active)(void *device_data, unsigned index, unsigned start,
-+			 unsigned count);
-+	int (*set_automasked)(void *device_data, unsigned index,
-+			      unsigned start, unsigned count,
-+			       bool automasked);
-+};
++int kvm_vfio_external_is_active(struct vfio_device *vdev,
++				unsigned index, unsigned start, unsigned count)
++{
++	int (*fn)(struct vfio_device *, unsigned index, unsigned start,
++			   unsigned count);
++	bool active;
 +
-+/**
-  * struct vfio_device_ops - VFIO bus driver device callbacks
-  *
-  * @open: Called when userspace creates new file descriptor for device
-@@ -42,6 +59,7 @@ struct vfio_device_ops {
- 			 unsigned long arg);
- 	int	(*mmap)(void *device_data, struct vm_area_struct *vma);
- 	void	(*request)(void *device_data, unsigned int count);
-+	struct vfio_device_external_ops *external_ops;
- };
- 
- extern int vfio_add_group_dev(struct device *dev,
++	fn = symbol_get(vfio_external_is_active);
++	if (!fn)
++		return -ENXIO;
++
++	active = fn(vdev, index, start, count);
++
++	symbol_put(vfio_external_is_active);
++	return active;
++}
++
++int kvm_vfio_external_mask(struct vfio_device *vdev, unsigned index,
++			   unsigned start, unsigned count)
++{
++	int ret;
++	int (*fn)(struct vfio_device *, unsigned index, unsigned start,
++		  unsigned count);
++
++	fn = symbol_get(vfio_external_mask);
++	if (!fn)
++		return -ENXIO;
++
++	ret = fn(vdev, index, start, count);
++
++	symbol_put(vfio_external_mask);
++	return ret;
++}
++
++int kvm_vfio_external_set_automasked(struct vfio_device *vdev,
++				      unsigned index, unsigned start,
++				      unsigned count, bool automasked)
++{
++	int ret;
++	int (*fn)(struct vfio_device *, unsigned index, unsigned start,
++		  unsigned count, bool automasked);
++
++	fn = symbol_get(vfio_external_set_automasked);
++	if (!fn)
++		return -ENXIO;
++
++	ret = fn(vdev, index, start, count, automasked);
++
++	symbol_put(vfio_external_set_automasked);
++	return ret;
++}
++
+ static bool kvm_vfio_group_is_coherent(struct vfio_group *vfio_group)
+ {
+ 	long (*fn)(struct vfio_group *, unsigned long);
 -- 
 1.9.1
