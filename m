@@ -1,105 +1,87 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 03/10] KVM: arm: guest debug, define API headers
-Date: Mon, 13 Apr 2015 14:08:13 +0200
-Message-ID: <20150413120813.GN6186@cbox>
+Subject: Re: [PATCH v2 04/10] KVM: arm: guest debug, add stub
+ KVM_SET_GUEST_DEBUG ioctl
+Date: Mon, 13 Apr 2015 14:12:31 +0200
+Message-ID: <20150413121231.GO6186@cbox>
 References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
- <1427814488-28467-4-git-send-email-alex.bennee@linaro.org>
+ <1427814488-28467-5-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 68FE04C3CB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 08:04:41 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id gtqnAxuzPkFi for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Apr 2015 08:04:40 -0400 (EDT)
+Received: from mail-lb0-f173.google.com (mail-lb0-f173.google.com
+ [209.85.217.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 277CB4C3C6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 08:04:39 -0400 (EDT)
+Received: by lbcga7 with SMTP id ga7so56916316lbc.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 05:12:25 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1427814488-28467-4-git-send-email-alex.bennee@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+In-Reply-To: <1427814488-28467-5-git-send-email-alex.bennee@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org, jan.kiszka@siemens.com, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
+Cc: Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, marc.zyngier@arm.com, jan.kiszka@siemens.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, zhichao.huang@linaro.org, r65777@freescale.com, pbonzini@redhat.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 31, 2015 at 04:08:01PM +0100, Alex Benn=E9e wrote:
-> This commit defines the API headers for guest debugging. There are tw=
-o
-> architecture specific debug structures:
->=20
->   - kvm_guest_debug_arch, allows us to pass in HW debug registers
->   - kvm_debug_exit_arch, signals the exact debug exit and pc
->=20
-> The type of debugging being used is control by the architecture speci=
-fic
-> control bits of the kvm_guest_debug->control flags in the ioctl
-> structure.
->=20
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
->=20
+On Tue, Mar 31, 2015 at 04:08:02PM +0100, Alex Benn=E9e wrote:
+> This commit adds a stub function to support the KVM_SET_GUEST_DEBUG
+> ioctl. Currently any operation flag will return EINVAL. Actual
+> functionality will be added with further patches.
+> =
+
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>.
+> =
+
 > ---
 > v2
->    - expose hsr and pc directly to user-space
->=20
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/u=
-api/asm/kvm.h
-> index 3ef77a4..6ee70a0 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -100,10 +100,24 @@ struct kvm_sregs {
->  struct kvm_fpu {
->  };
-> =20
-> +/*
-> + * See ARM ARM D7.3: Debug Registers
+>   - simplified form of the ioctl (stuff will go into setup_debug)
+> =
 
-see the ARM ARM for ??
+> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kv=
+m/api.txt
+> index b112efc..06c5064 100644
+> --- a/Documentation/virtual/kvm/api.txt
+> +++ b/Documentation/virtual/kvm/api.txt
+> @@ -2604,7 +2604,7 @@ handled.
+>  4.87 KVM_SET_GUEST_DEBUG
+>  =
 
-> + *
-> + * The control registers are architecturally defined as 32 bits but =
-are
-> + * stored as 64 bit values along side the value registers and aligne=
-d
+>  Capability: KVM_CAP_SET_GUEST_DEBUG
+> -Architectures: x86, s390, ppc
+> +Architectures: x86, s390, ppc, arm64
+>  Type: vcpu ioctl
+>  Parameters: struct kvm_guest_debug (in)
+>  Returns: 0 on success; -1 on error
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index 5560f74..445933d 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -183,6 +183,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, lon=
+g ext)
+>  	case KVM_CAP_ARM_PSCI:
+>  	case KVM_CAP_ARM_PSCI_0_2:
+>  	case KVM_CAP_READONLY_MEM:
+> +	case KVM_CAP_SET_GUEST_DEBUG:
+>  		r =3D 1;
+>  		break;
 
-do you mean alongside?
+shouldn't you wait with advertising this capability until you've
+implemented support for it?
 
-> + * with the rest 64 bit registers in the normal CPU context.
-
-rest of the 64 bit
-
-> + */
-
-why do we store them as 64 bit values?  There's nothing prevented us
-from defining them as __u32 is there?  Is this to make the ONE_REG
-interface accessers more convenient?
-
-> +#define KVM_ARM_NDBG_REGS 16
-
-nit: is NDBG short for something I don't know about or is it
-the number of debug registers we are noting here, in which case I think
-KVM_ARM_NUM_DBG_REGS is more clear.
-
->  struct kvm_guest_debug_arch {
-> +	__u64 dbg_bcr[KVM_ARM_NDBG_REGS];
-> +	__u64 dbg_bvr[KVM_ARM_NDBG_REGS];
-> +	__u64 dbg_wcr[KVM_ARM_NDBG_REGS];
-> +	__u64 dbg_wvr[KVM_ARM_NDBG_REGS];
->  };
-> =20
->  struct kvm_debug_exit_arch {
-> +	__u64 pc;
-> +	__u32 hsr;
->  };
-> =20
->  struct kvm_sync_regs {
-> @@ -207,4 +221,11 @@ struct kvm_arch_memory_slot {
-> =20
->  #endif
-> =20
-> +/*
-> + * Architecture related debug defines - upper 16 bits of
-> + * kvm_guest_debug->control
-> + */
-> +#define KVM_GUESTDBG_USE_SW_BP	        __KVM_GUESTDBG_USE_SW_BP
-> +#define KVM_GUESTDBG_USE_HW_BP		__KVM_GUESTDBG_USE_HW_BP
-> +
->  #endif /* __ARM_KVM_H__ */
-> --=20
-> 2.3.4
->=20
 
 Thanks,
 -Christoffer
