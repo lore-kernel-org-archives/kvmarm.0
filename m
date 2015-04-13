@@ -1,26 +1,33 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC v6 16/16] KVM: arm/arm64: vgic: forwarding control
-Date: Mon, 13 Apr 2015 14:29:31 +0200
-Message-ID: <1428928171-18884-17-git-send-email-eric.auger@linaro.org>
-References: <1428928171-18884-1-git-send-email-eric.auger@linaro.org>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: Advice on HYP interface for AsyncPF
+Date: Mon, 13 Apr 2015 14:52:46 +0200
+Message-ID: <20150413125245.GA4023@hawk.usersys.redhat.com>
+References: <20150409120646.GA3212@hawk.usersys.redhat.com>
+ <20150409124852.GE18488@leverpostej>
+ <20150409134326.GF3212@hawk.usersys.redhat.com>
+ <20150409140027.GB9648@leverpostej>
+ <20150409142258.GH3212@hawk.usersys.redhat.com>
+ <20150409143714.GD9648@leverpostej>
+ <20150409145414.GJ3212@hawk.usersys.redhat.com>
+ <20150409152009.GH9648@leverpostej>
+ <20150409190122.GK3212@hawk.usersys.redhat.com>
+ <20150413104635.GC4076@leverpostej>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41F3B4C47B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 08:25:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FE9A4C441
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 08:45:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QoyozueP32Cd for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Apr 2015 08:25:17 -0400 (EDT)
-Received: from mail-wi0-f171.google.com (mail-wi0-f171.google.com
- [209.85.212.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 024014C483
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 08:25:17 -0400 (EDT)
-Received: by widdi4 with SMTP id di4so49685696wid.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 05:33:03 -0700 (PDT)
-In-Reply-To: <1428928171-18884-1-git-send-email-eric.auger@linaro.org>
+ with ESMTP id Vgq++qa-WAk6 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Apr 2015 08:45:08 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B99BD4C437
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 08:45:08 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20150413104635.GC4076@leverpostej>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,274 +37,190 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@st.com, eric.auger@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, alex.williamson@redhat.com, pbonzini@redhat.com
-Cc: feng.wu@intel.com, linux-kernel@vger.kernel.org, patches@linaro.org
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch sets __KVM_HAVE_ARCH_KVM_VFIO_FORWARD and implements
-kvm_arch_set_forward for ARM/ARM64.
+On Mon, Apr 13, 2015 at 11:46:36AM +0100, Mark Rutland wrote:
+> Hi,
+> 
+> > > > Otherwise the "is_guest()" function would be many if-else statements
+> > > > trying to determine the type of guest it is before it even knows that
+> > > > it is a guest.
+> > > 
+> > > It's worth noting that to some extent this may always be the case (e.g.
+> > > is Dom0 a guest?), and it won't always be possible to determine if any
+> > > (particular) hypervisor is present. For example, kvmtool does not place
+> > > any special information in the DT regarding itself, and uses common
+> > > peripherals (so you can't use these to fingerprint it reliably).
+> > 
+> > Right, but if we need kvm to advertise hypervisor features in some way,
+> > (which, btw, x86 does do as well, by using a bitmap in another cpuid
+> > leaf), then we'll need this DT node and ACPI table, or some other idea.
+> 
+> That presumes you already know the hypervisor, in order to parse those
+> bitmaps. So I'm not sure I follow. We will need some mechanism to expose
+> features, but this is orthogonal to detecting the presence of a
+> hypervisor, no?
 
-As a result the KVM-VFIO device now allows to forward/unforward a
-VFIO device IRQ on ARM.
+Yes, orthogonal. But, depending on the method of detection for the
+hypervisor used, then hypervisor-feature detection will either be a
+straight-forward extension of that, or we'll be revisiting the 'how'
+discussion for it as well (although for that discussion we would only
+need to consider kvmarm). Anyway, I think it's worth considering both
+at the same time, at least for now.
 
-kvm_arch_set_forward and kvm_arch_unset_forward mostly take care of
-VGIC programming: physical IRQ/guest IRQ mapping, list register cleanup,
-VGIC state machine.
+> 
+> > Anyway, it wouldn't hurt to have something now, just for the virt-what
+> > type of case.
+> 
+> We can add a KVM node (or a "hypervisor services" node), but we should
+> first figure out what we actually need to expose. It can hurt if
+> whatever we come up with now clashes with what we want later.
 
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
+atm, just 'this is a KVM guest', and maybe even which userspace; qemu
+vs. kvmtool vs. ??. I think a feature bitmap and/or the address of
+some hypervisor shared page could be some likely additions though.
 
----
+> 
+> [...]
+> 
+> > > The only thing you gain by assuming that the hypervisor has a node
+> > > called /hypervisor is the ability to (sometimes) detect that a
+> > > hypervisor you know nothing about is probably present.
+> > 
+> > You also gain a common location for the documentation of those
+> > well-known strings, and the ability to share a bit of code in the
+> > parsing.
+> 
+> Sorry if I sound like a broken record here, but I don't see why the node
+> needs to be called /hypervisor for either of those to be true. We can
+> (and should) place the documentation together in a common location
+> regardless, and we don't need a common DT path for code to be shared,
+> especially given...
+> 
+> > > As I understand it on x86 if KVM masquerades as HyperV it's not also
+> > > visible as KVM. Is that correct?
+> > 
+> > Actually you can supply more than one hypervisor signature in the cpuids.
+> > There's cpuid space allocated for up to 256. A guest can then search
+> > the space in preference order for the hypervisor type it wants. QEMU/KVM
+> > for x86 does this. It sets things up such that hyperv is in the first
+> > location, which is the lowest preferred location for Linux, and likely
+> > the only place Windows checks. It still puts KVM in the second location,
+> > which is a higher preference location for Linux, and relies on Linux
+> > finding it there. Linux finds it with
+> > arch/x86/kernel/cpu/hypervisor.c:detect_hypervisor_vendor
+> 
+> ... that the x86 code here just iterates over a set of callbacks, with
+> the detection logic living in each callback.
 
-v4 -> v5:
-- fix arm64 compilation issues, ie. also defines
-  __KVM_HAVE_ARCH_HALT_GUEST for arm64
+Yes, at the top level it's just callbacks, thus it reserves the right to
+do anything it wants, but each detect() callback actually does the same
+thing today, which is to look at the same cpuid leaf for a signature. See
+arch/x86/include/asm/processor.h:hypervisor_cpuid_base, which is also
+common x86 code, and is used by both kvm and xen. vmware and hyeprv
+detection do the same thing too, but just don't use the common helper.
 
-v3 -> v4:
-- code originally located in kvm_vfio_arm.c
-- kvm_arch_vfio_{set|unset}_forward renamed into
-  kvm_arch_{set|unset}_forward
-- split into 2 functions (set/unset) since unset does not fail anymore
-- unset can be invoked at whatever time. Extra care is taken to handle
-  transition in VGIC state machine, LR cleanup, ...
+> 
+> It would be interesting to know which hypervisors pretend to be each
+> other and why. I can see that KVM masquerading as HyperV is useful for
+> some existing systems, but does KVM masquerade as Xen (or vice versa)?
 
-v2 -> v3:
-- renaming of kvm_arch_set_fwd_state into kvm_arch_vfio_set_forward
-- takes a bool arg instead of kvm_fwd_irq_action enum
-- removal of KVM_VFIO_IRQ_CLEANUP
-- platform device check now happens here
-- more precise errors returned
-- irq_eoi handled externally to this patch (VGIC)
-- correct enable_irq bug done twice
-- reword the commit message
-- correct check of platform_bus_type
-- use raw_spin_lock_irqsave and check the validity of the handler
----
- arch/arm/include/asm/kvm_host.h   |   1 +
- arch/arm64/include/asm/kvm_host.h |   1 +
- virt/kvm/arm/vgic.c               | 190 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 192 insertions(+)
+Not that I know of. The only reason one would do that is if a KVM host
+expected to be given xen-only enlightened images, i.e. the image knows
+how to deal with xen paravirt, but not kvm. This is pretty unlikely for
+Linux distros, which are generally compiled to be enlightened for both.
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index b829f93..8e3fd7f 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -29,6 +29,7 @@
- 
- #define __KVM_HAVE_ARCH_INTC_INITIALIZED
- #define __KVM_HAVE_ARCH_HALT_GUEST
-+#define __KVM_HAVE_ARCH_KVM_VFIO_FORWARD
- 
- #if defined(CONFIG_KVM_ARM_MAX_VCPUS)
- #define KVM_MAX_VCPUS CONFIG_KVM_ARM_MAX_VCPUS
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index ffcc698..9be392a 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -30,6 +30,7 @@
- 
- #define __KVM_HAVE_ARCH_INTC_INITIALIZED
- #define __KVM_HAVE_ARCH_HALT_GUEST
-+#define __KVM_HAVE_ARCH_KVM_VFIO_FORWARD
- 
- #if defined(CONFIG_KVM_ARM_MAX_VCPUS)
- #define KVM_MAX_VCPUS CONFIG_KVM_ARM_MAX_VCPUS
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index f345c41..c0ac151 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -2133,3 +2133,193 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
- {
- 	return 0;
- }
-+
-+/**
-+ * kvm_arch_set_forward - Set forwarding for a given IRQ
-+ *
-+ * @kvm: handle to the VM
-+ * @host_irq: physical IRQ number
-+ * @guest_irq: virtual IRQ number
-+ *
-+ * This function is supposed to be called only if the IRQ
-+ * is not in progress: ie. not active at VGIC level and not
-+ * currently under injection in the KVM.
-+ */
-+int kvm_arch_set_forward(struct kvm *kvm, unsigned int host_irq,
-+			 unsigned int guest_irq)
-+{
-+	irq_hw_number_t gic_irq;
-+	struct irq_desc *desc = irq_to_desc(host_irq);
-+	struct irq_data *d;
-+	unsigned long flags;
-+	struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, 0);
-+	int ret = 0;
-+	int spi_id = guest_irq + VGIC_NR_PRIVATE_IRQS;
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+
-+	if (!vcpu)
-+		return 0;
-+
-+	spin_lock(&dist->lock);
-+
-+	raw_spin_lock_irqsave(&desc->lock, flags);
-+	d = &desc->irq_data;
-+	gic_irq = irqd_to_hwirq(d);
-+	irqd_set_irq_forwarded(d);
-+	/*
-+	 * next physical IRQ will be be handled as forwarded
-+	 * by the host (priority drop only)
-+	 */
-+
-+	raw_spin_unlock_irqrestore(&desc->lock, flags);
-+
-+	/*
-+	 * need to release the dist spin_lock here since
-+	 * vgic_map_phys_irq can sleep
-+	 */
-+	spin_unlock(&dist->lock);
-+	ret = vgic_map_phys_irq(vcpu, spi_id, (int)gic_irq);
-+	/*
-+	 * next guest_irq injection will be considered as
-+	 * forwarded and next flush will program LR
-+	 * without maintenance IRQ but with HW bit set
-+	 */
-+	return ret;
-+}
-+
-+/**
-+ * kvm_arch_unset_forward - Unset forwarding for a given IRQ
-+ *
-+ * @kvm: handle to the VM
-+ * @host_irq: physical IRQ number
-+ * @guest_irq: virtual IRQ number
-+ * @active: returns whether the physical IRQ is active
-+ *
-+ * This function must be called when the host_irq is disabled
-+ * and guest has been exited and prevented from being re-entered.
-+ *
-+ */
-+void kvm_arch_unset_forward(struct kvm *kvm,
-+			    unsigned int host_irq,
-+			    unsigned int guest_irq,
-+			    bool *active)
-+{
-+	struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, 0);
-+	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+	int ret, lr;
-+	struct vgic_lr vlr;
-+	struct irq_desc *desc = irq_to_desc(host_irq);
-+	struct irq_data *d;
-+	unsigned long flags;
-+	irq_hw_number_t gic_irq;
-+	int spi_id = guest_irq + VGIC_NR_PRIVATE_IRQS;
-+	struct irq_chip *chip;
-+	bool queued, needs_deactivate = true;
-+
-+	spin_lock(&dist->lock);
-+
-+	irq_get_irqchip_state(host_irq, IRQCHIP_STATE_ACTIVE, active);
-+
-+	if (!vcpu)
-+		goto out;
-+
-+	raw_spin_lock_irqsave(&desc->lock, flags);
-+	d = irq_desc_get_irq_data(desc);
-+	gic_irq = irqd_to_hwirq(d);
-+	raw_spin_unlock_irqrestore(&desc->lock, flags);
-+
-+	ret = vgic_unmap_phys_irq(vcpu, spi_id, gic_irq);
-+	/*
-+	 * subsequent update_irq_pending or flush will handle this
-+	 * irq as forwarded
-+	 */
-+
-+	if (likely(!(*active))) {
-+		/*
-+		 * the IRQ was not active. It may happen the handle_fasteoi_irq
-+		 * is entered afterwards due to lazy disable_irq. If this
-+		 * happens the IRQ will be deactivated and never be injected.
-+		 * let's simply prepare the states for subsequent non forwarded
-+		 * injection
-+		 */
-+		vgic_dist_irq_clear_level(vcpu, spi_id);
-+		vgic_dist_irq_clear_pending(vcpu, spi_id);
-+		vgic_irq_clear_queued(vcpu, spi_id);
-+		needs_deactivate = false;
-+		goto out;
-+	}
-+
-+	/* is there any list register with valid state? */
-+	lr = vgic_cpu->vgic_irq_lr_map[spi_id];
-+	queued = false;
-+	if (lr != LR_EMPTY) {
-+		vlr = vgic_get_lr(vcpu, lr);
-+		if (vlr.state & LR_STATE_MASK)
-+			queued = true;
-+	}
-+
-+	if (!queued) {
-+		vgic_irq_clear_queued(vcpu, spi_id);
-+		if (vgic_dist_irq_is_pending(vcpu, spi_id)) {
-+			/*
-+			 * IRQ is injected but not yet queued. LR will be
-+			 * written with EOI_INT and process_maintenance will
-+			 * reset the states: queued, level(resampler). Pending
-+			 * will be reset on flush.
-+			 */
-+			vgic_dist_irq_set_level(vcpu, spi_id);
-+		} else {
-+			/*
-+			 * We are before the injection (update_irq_pending).
-+			 * This is the most tricky window. Due to the usage of
-+			 * disable_irq in generic unforward part (mandated by
-+			 * resamplefd unmask VFIO integration), there is a risk
-+			 * the fasteoi handler returns without calling the VFIO
-+			 * handler and deactivates the physical IRQ (lazy
-+			 * disable). Hence we cannot know whether the IRQ will
-+			 * ever be injected. The only solution found is to do as
-+			 * if the IRQ were not active. The active parameter
-+			 * typically is used by the caller to know whether
-+			 * it needs to mask * the IRQ. If not duly masked,
-+			 * another physical IRQ may hit again while the previous
-+			 * virtual IRQ is in progress. Update_irq_pending
-+			 * validate_injection will prevent this injection.
-+			 */
-+			vgic_dist_irq_clear_level(vcpu, spi_id);
-+			*active = false;
-+		}
-+		goto out;
-+	}
-+
-+	/*
-+	 * the virtual IRQ is queued and a valid LR exists, let's patch it for
-+	 * EOI maintenance
-+	 */
-+	vlr.state |= LR_EOI_INT;
-+	vgic_set_lr(vcpu, lr, vlr);
-+	/*
-+	 * we expect a maintenance IRQ which will reset the
-+	 * queued, pending and level states
-+	 */
-+	vgic_dist_irq_set_level(vcpu, spi_id);
-+	vgic_dist_irq_set_pending(vcpu, spi_id);
-+	vgic_irq_set_queued(vcpu, spi_id);
-+
-+out:
-+
-+	raw_spin_lock_irqsave(&desc->lock, flags);
-+	d = irq_desc_get_irq_data(desc);
-+	if (needs_deactivate) {
-+		chip = irq_data_get_irq_chip(d);
-+		chip->irq_eoi(d);
-+	}
-+	irqd_clr_irq_forwarded(d);
-+	/* next occurrence will be deactivated by the host */
-+	raw_spin_unlock_irqrestore(&desc->lock, flags);
-+
-+	*active = *active && vcpu;
-+
-+	spin_unlock(&dist->lock);
-+}
-+
--- 
-1.9.1
+> 
+> If this is simply to share common services, then those services could be
+> described independently of the hypervisor-specific node(s).
+
+The services this would be for are specific to hypervisors. We already have
+independence from paravirt I/O support, e.g. virtio. However, once you know
+what hypervisor you're on, then you can start probing for hypervisor-
+specific features. I'm suggesting that it'd be nice if the determination of
+hypervisors was done in a common way. The determination of features may
+optionally be done the same way.
+
+> 
+> [side note: Are any Xen (or other hypervisor) developers on this list?
+> We need to involve them when determining standards]
+
+We should copy xen-devel at some point, if we get that far, but I don't
+think we've actually gotten to a determining standards point with this
+discussion yet. If you're starting to see some value in a standard, then
+maybe we're getting closer ;-)
+
+> 
+> > Note how the hypervisor detection is common for all x86 hypervisors that
+> > Linux knows about. A specified /hypervisor node could be the DT
+> > equivalent.
+> 
+> Note how this is just a list of callbacks, and there's no actual sharing
+> of the hypervisor-specific detection mechanism. ;)
+> 
+> We could do likewise, but this doesn't require trying to share a
+> /hypervisor node.
+> 
+> > > There's also a huge grey area regarding what the guest should do if it
+> > > thinks it recognises both HyperV and KVM (or any other combination)
+> > > simultaneously.
+> > 
+> > I don't think so. If the guest searches in preference-order, or the list
+> > order tells the guest which one it should prefer, as is done for x86,
+> > then it just uses the most preferred, and supported, one it finds.
+> 
+> Those both assume that the guest only decides to use a single
+> hypervisor's interfaces, rather than trying to use portions of both,
+> which I can imagine being a possibility unless the OS has policies to
+> prevent that (e.g. stopping detection once _some_ hypervisor has been
+> detected). That's a horrible grey area.
+
+Well, a guest can try anything it wants, and that idea actually points
+to an area that we should look at for potential host bugs, as behavior
+like this could expose something, but I don't think it makes sense to
+actually support this behavior.
+
+> 
+> Preference order would depend on the guest's preferences rather than the
+> user's, but perhaps that's not really a problem.
+
+I wouldn't think so.
+
+> 
+> > > Is there any reason for a hypervisor to try to both masquerade as a
+> > > different hypervisor and advertise itself natively? The whole sharing a
+> > > node / table thing may be irrelevant.
+> > >
+> > 
+> > Yes. When you don't know the guest type you're booting, then you need
+> > to expose all that you can handle, and then rely on the guest to pick
+> > the right one.
+> 
+> I can see that masquerading is useful for providing services to guest
+> which only understand some proprietary hypervisor. However, we haven't
+> seen proprietary hypervisors (nor proprietary clients) thus far.
+> 
+> Is masquerading relevant currently?
+
+No, not for ARM, and wrt to a DT node, I doubt it will ever matter. If
+we're going to need masquerading for ARM virt, then I'm guessing the
+hypervisor type and features will also need to be exposed in a different
+way. ACPI? I don't think it hurts to try and work out issues we can foresee
+on the DT side first though.
+
+> 
+> Which services would we want to share?
+
+Primarily 'am I guest? And, if so, what type?' Maybe also 'at what
+address can I find hypervisor-specific data?'
+
+> 
+> Can we come up with common standards for those services instead?
+
+I'm not sure what types of services you have in mind that deserve
+standards. Is hypervisor type detection not worthy?
+
+Thanks,
+drew
