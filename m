@@ -1,162 +1,68 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: Advice on HYP interface for AsyncPF
-Date: Mon, 13 Apr 2015 11:46:36 +0100
-Message-ID: <20150413104635.GC4076@leverpostej>
-References: <20150409085723.0a201cb9@why.wild-wind.fr.eu.org>
- <20150409120646.GA3212@hawk.usersys.redhat.com>
- <20150409124852.GE18488@leverpostej>
- <20150409134326.GF3212@hawk.usersys.redhat.com>
- <20150409140027.GB9648@leverpostej>
- <20150409142258.GH3212@hawk.usersys.redhat.com>
- <20150409143714.GD9648@leverpostej>
- <20150409145414.GJ3212@hawk.usersys.redhat.com>
- <20150409152009.GH9648@leverpostej>
- <20150409190122.GK3212@hawk.usersys.redhat.com>
+From: Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH v2 01/10] KVM: add commentary for kvm_debug_exit_arch
+ struct
+Date: Mon, 13 Apr 2015 12:57:44 +0200
+Message-ID: <20150413105744.GL6186@cbox>
+References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
+ <1427814488-28467-2-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DD424C3A4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 06:38:59 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gjdey5TkbpPJ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Apr 2015 06:38:53 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 32AA54C3A0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 06:38:52 -0400 (EDT)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <20150409190122.GK3212@hawk.usersys.redhat.com>
-Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+In-Reply-To: <1427814488-28467-2-git-send-email-alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Cc: kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, agraf-l3A5Bk7waGM@public.gmane.org, drjones-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, zhichao.huang-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, jan.kiszka-kv7WeFo6aLtBDgjK7y7TUQ@public.gmane.org, dahi-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org, r65777-KZfg59tc24xl57MIdRCFDg@public.gmane.org, bp-l3A5Bk7waGM@public.gmane.org, Gleb Natapov <gleb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, "open list:ABI/API" <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, open list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+On Tue, Mar 31, 2015 at 04:07:59PM +0100, Alex Benn=E9e wrote:
+> Bring into line with the commentary for the other structures and thei=
+r
+> KVM_EXIT_* cases.
+>=20
+> Signed-off-by: Alex Benn=E9e <alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+>=20
+> ---
+>=20
+> v2
+>   - add comments for other exit types
+>=20
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 8055706..5eedf84 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -226,6 +226,7 @@ struct kvm_run {
+>  			__u32 count;
+>  			__u64 data_offset; /* relative to kvm_run start */
+>  		} io;
+> +		/* KVM_EXIT_DEBUG */
+>  		struct {
+>  			struct kvm_debug_exit_arch arch;
+>  		} debug;
+> @@ -274,6 +275,7 @@ struct kvm_run {
+>  			__u32 data;
+>  			__u8  is_write;
+>  		} dcr;
+> +		/* KVM_EXIT_INTERNAL_ERROR */
+>  		struct {
+>  			__u32 suberror;
+>  			/* Available with KVM_CAP_INTERNAL_ERROR_DATA: */
+> @@ -284,6 +286,7 @@ struct kvm_run {
+>  		struct {
+>  			__u64 gprs[32];
+>  		} osi;
+> +		/* KVM_EXIT_PAPR_HCALL */
+>  		struct {
+>  			__u64 nr;
+>  			__u64 ret;
+> --=20
+> 2.3.4
+>=20
 
-> > > Otherwise the "is_guest()" function would be many if-else statements
-> > > trying to determine the type of guest it is before it even knows that
-> > > it is a guest.
-> > 
-> > It's worth noting that to some extent this may always be the case (e.g.
-> > is Dom0 a guest?), and it won't always be possible to determine if any
-> > (particular) hypervisor is present. For example, kvmtool does not place
-> > any special information in the DT regarding itself, and uses common
-> > peripherals (so you can't use these to fingerprint it reliably).
-> 
-> Right, but if we need kvm to advertise hypervisor features in some way,
-> (which, btw, x86 does do as well, by using a bitmap in another cpuid
-> leaf), then we'll need this DT node and ACPI table, or some other idea.
+I'm fine with this change as it is, but I think it should update the
+documenation of the kvm_run structure along with it, and in there it
+seems the debug struct is listed as 'unused'; this should be addressed
+in this patch set somewhere if we start using this struct?
 
-That presumes you already know the hypervisor, in order to parse those
-bitmaps. So I'm not sure I follow. We will need some mechanism to expose
-features, but this is orthogonal to detecting the presence of a
-hypervisor, no?
-
-> Anyway, it wouldn't hurt to have something now, just for the virt-what
-> type of case.
-
-We can add a KVM node (or a "hypervisor services" node), but we should
-first figure out what we actually need to expose. It can hurt if
-whatever we come up with now clashes with what we want later.
-
-[...]
-
-> > The only thing you gain by assuming that the hypervisor has a node
-> > called /hypervisor is the ability to (sometimes) detect that a
-> > hypervisor you know nothing about is probably present.
-> 
-> You also gain a common location for the documentation of those
-> well-known strings, and the ability to share a bit of code in the
-> parsing.
-
-Sorry if I sound like a broken record here, but I don't see why the node
-needs to be called /hypervisor for either of those to be true. We can
-(and should) place the documentation together in a common location
-regardless, and we don't need a common DT path for code to be shared,
-especially given...
-
-> > As I understand it on x86 if KVM masquerades as HyperV it's not also
-> > visible as KVM. Is that correct?
-> 
-> Actually you can supply more than one hypervisor signature in the cpuids.
-> There's cpuid space allocated for up to 256. A guest can then search
-> the space in preference order for the hypervisor type it wants. QEMU/KVM
-> for x86 does this. It sets things up such that hyperv is in the first
-> location, which is the lowest preferred location for Linux, and likely
-> the only place Windows checks. It still puts KVM in the second location,
-> which is a higher preference location for Linux, and relies on Linux
-> finding it there. Linux finds it with
-> arch/x86/kernel/cpu/hypervisor.c:detect_hypervisor_vendor
-
-... that the x86 code here just iterates over a set of callbacks, with
-the detection logic living in each callback.
-
-It would be interesting to know which hypervisors pretend to be each
-other and why. I can see that KVM masquerading as HyperV is useful for
-some existing systems, but does KVM masquerade as Xen (or vice versa)?
-
-If this is simply to share common services, then those services could be
-described independently of the hypervisor-specific node(s).
-
-[side note: Are any Xen (or other hypervisor) developers on this list?
-We need to involve them when determining standards]
-
-> Note how the hypervisor detection is common for all x86 hypervisors that
-> Linux knows about. A specified /hypervisor node could be the DT
-> equivalent.
-
-Note how this is just a list of callbacks, and there's no actual sharing
-of the hypervisor-specific detection mechanism. ;)
-
-We could do likewise, but this doesn't require trying to share a
-/hypervisor node.
-
-> > There's also a huge grey area regarding what the guest should do if it
-> > thinks it recognises both HyperV and KVM (or any other combination)
-> > simultaneously.
-> 
-> I don't think so. If the guest searches in preference-order, or the list
-> order tells the guest which one it should prefer, as is done for x86,
-> then it just uses the most preferred, and supported, one it finds.
-
-Those both assume that the guest only decides to use a single
-hypervisor's interfaces, rather than trying to use portions of both,
-which I can imagine being a possibility unless the OS has policies to
-prevent that (e.g. stopping detection once _some_ hypervisor has been
-detected). That's a horrible grey area.
-
-Preference order would depend on the guest's preferences rather than the
-user's, but perhaps that's not really a problem.
-
-> > Is there any reason for a hypervisor to try to both masquerade as a
-> > different hypervisor and advertise itself natively? The whole sharing a
-> > node / table thing may be irrelevant.
-> >
-> 
-> Yes. When you don't know the guest type you're booting, then you need
-> to expose all that you can handle, and then rely on the guest to pick
-> the right one.
-
-I can see that masquerading is useful for providing services to guest
-which only understand some proprietary hypervisor. However, we haven't
-seen proprietary hypervisors (nor proprietary clients) thus far.
-
-Is masquerading relevant currently?
-
-Which services would we want to share?
-
-Can we come up with common standards for those services instead?
-
-Thanks,
-Mark.
+-Christoffer
