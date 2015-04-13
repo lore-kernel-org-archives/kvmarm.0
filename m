@@ -1,87 +1,89 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 05/10] KVM: arm: introduce kvm_arch_setup/clear_debug()
-Date: Mon, 13 Apr 2015 16:48:43 +0200
-Message-ID: <20150413144843.GQ6186@cbox>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v2 02/10] KVM: define common __KVM_GUESTDBG_USE_SW/HW_BP
+ values
+Date: Mon, 13 Apr 2015 15:51:33 +0100
+Message-ID: <871tjokrnu.fsf@linaro.org>
 References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
- <1427814488-28467-6-git-send-email-alex.bennee@linaro.org>
- <20150413143623.GP6186@cbox>
+ <1427814488-28467-3-git-send-email-alex.bennee@linaro.org>
+ <20150413115535.GM6186@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AC764C4B2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 10:40:53 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kq9aszZeB8Be for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Apr 2015 10:40:51 -0400 (EDT)
-Received: from mail-la0-f48.google.com (mail-la0-f48.google.com
- [209.85.215.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 613FF4C4B0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 10:40:50 -0400 (EDT)
-Received: by labbd9 with SMTP id bd9so59263533lab.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 07:48:37 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20150413143623.GP6186@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, marc.zyngier@arm.com, jan.kiszka@siemens.com, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, Andre Przywara <andre.przywara@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, zhichao.huang@linaro.org, r65777@freescale.com, pbonzini@redhat.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+In-reply-to: <20150413115535.GM6186@cbox>
+List-Unsubscribe: <https://lists.ozlabs.org/options/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=unsubscribe>
+List-Archive: <http://lists.ozlabs.org/pipermail/linuxppc-dev/>
+List-Post: <mailto:linuxppc-dev@lists.ozlabs.org>
+List-Help: <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=help>
+List-Subscribe: <https://lists.ozlabs.org/listinfo/linuxppc-dev>,
+ <mailto:linuxppc-dev-request@lists.ozlabs.org?subject=subscribe>
+Errors-To: linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org
+Sender: "Linuxppc-dev"
+ <linuxppc-dev-bounces+glppe-linuxppc-embedded-2=m.gmane.org@lists.ozlabs.org>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: peter.maydell@linaro.org, kvm@vger.kernel.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Bharat Bhushan <Bharat.Bhushan@freescale.com>, Paul Mackerras <paulus@samba.org>, "H. Peter Anvin" <hpa@zytor.com>, kvmarm@lists.cs.columbia.edu, Nadav Amit <namit@cs.technion.ac.il>, "maintainer:X86 ARCHITECTURE..." <x86@kernel.org>, agraf@suse.de, Gleb Natapov <gleb@kernel.org>, Ingo Molnar <mingo@redhat.com>, zhichao.huang@linaro.org, jan.kiszka@siemens.com, Mihai Caraman <mihai.caraman@freescale.com>, bp@suse.de, drjones@redhat.com, marc.zyngier@arm.com, r65777@freescale.com, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org, "open list:ABI/API" <linux-api@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, pbonzini@redhat.com, "open list:LINUX FOR POWERPC..." <linuxppc-dev@lists.ozlabs.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Apr 13, 2015 at 04:36:23PM +0200, Christoffer Dall wrote:
-
-[...]
-
-> > +
-> > +/**
-> > + * kvm_arch_setup_debug - set-up debug related stuff
-> 
-> nit: I think you want "set up" when it's a verb.
-> 
-> > + *
-> > + * @vcpu:	the vcpu pointer
-> > + *
-> > + * This is called before each entry in to the hypervisor to setup any
-> 
-> s/in to/into/
-> s/setup/set up/
-> 
-> > + * debug related registers. Currently this just ensures we will trap
-> > + * access to:
-> 
-> guest accesses to:
-> 
-> > + *  - Performance monitors (MDCR_EL2_TPM/MDCR_EL2_TPMCR)
-> > + *  - Debug ROM Address (MDCR_EL2_TDRA)
-> > + *  - Power down debug registers (MDCR_EL2_TDOSA)
-> > + *
-> > + * Additionally the hypervisor lazily saves/restores the debug
-> > + * register state. If it is not currently doing so (arch.debug_flags)
-> > + * then we also need to ensure we trap if the guest messes with them
-> > + * so we know we need to save them.
-> 
-> This paragraph is a little hard to make sense of.  If I understand it
-> correctly, the point is that when debugging the guest we need to make
-> sure guest accesses to the debug registers traps?  If so, I would
-> suggest something like:
-> 
->   Additionally, KVM only traps guest accesses to the debug registers if
->   the guest is not actively using them (see the KVM_ARM64_DEBUG_DIRTY
->   flag on vcpu->arch.debug_flags).  Since the guest must not interfere
->   with the hardware state when debugging the guest, we must ensure that
->   trapping is enabled whenever we are debugging the guest.
-> 
-
-thinking about this, I don't think we're enforcing this yet, but maybe
-that will come in the later patches or I misread the original paragraph.
-
--Christoffer
+CkNocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4gd3JpdGVzOgoK
+PiBPbiBUdWUsIE1hciAzMSwgMjAxNSBhdCAwNDowODowMFBNICswMTAwLCBBbGV4IEJlbm7DqWUg
+d3JvdGU6Cj4+IEN1cnJlbnRseSB4ODYsIHBvd2VycGMgYW5kIHNvb24gYXJtNjQgdXNlIHRoZSBz
+YW1lIHR3byBhcmNoaXRlY3R1cmUKPj4gc3BlY2lmaWMgYml0cyBmb3IgZ3Vlc3QgZGVidWcgc3Vw
+cG9ydCBmb3Igc29mdHdhcmUgYW5kIGhhcmR3YXJlCj4+IGJyZWFrcG9pbnRzLiBUaGlzIG1ha2Vz
+IHRoZSBzaGFyZWQgdmFsdWVzIGV4cGxpY2l0IHdoaWxlIGxlYXZpbmcgdGhlCj4+IGdhdGUgb3Bl
+biBmb3IgYW5vdGhlciBhcmNoaXRlY3R1cmUgdG8gdXNlIHNvbWUgb3RoZXIgdmFsdWUgaWYgdGhl
+eQo+PiByZWFsbHkgcmVhbGx5IHdhbnQgdG8uCj4+IAo+PiBTaWduZWQtb2ZmLWJ5OiBBbGV4IEJl
+bm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+Cj4+IAo+PiBkaWZmIC0tZ2l0IGEvYXJjaC9w
+b3dlcnBjL2luY2x1ZGUvdWFwaS9hc20va3ZtLmggYi9hcmNoL3Bvd2VycGMvaW5jbHVkZS91YXBp
+L2FzbS9rdm0uaAo+PiBpbmRleCBhYjRkNDczLi4xNzMxNTY5IDEwMDY0NAo+PiAtLS0gYS9hcmNo
+L3Bvd2VycGMvaW5jbHVkZS91YXBpL2FzbS9rdm0uaAo+PiArKysgYi9hcmNoL3Bvd2VycGMvaW5j
+bHVkZS91YXBpL2FzbS9rdm0uaAo+PiBAQCAtMzEwLDggKzMxMCw4IEBAIHN0cnVjdCBrdm1fZ3Vl
+c3RfZGVidWdfYXJjaCB7Cj4+ICAgKiBhbmQgdXBwZXIgMTYgYml0cyBhcmUgYXJjaGl0ZWN0dXJl
+IHNwZWNpZmljLiBBcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcwo+PiAgICogdGhhdCBpb2N0
+bCBpcyBmb3Igc2V0dGluZyBoYXJkd2FyZSBicmVha3BvaW50IG9yIHNvZnR3YXJlIGJyZWFrcG9p
+bnQuCj4+ICAgKi8KPj4gLSNkZWZpbmUgS1ZNX0dVRVNUREJHX1VTRV9TV19CUAkJMHgwMDAxMDAw
+MAo+PiAtI2RlZmluZSBLVk1fR1VFU1REQkdfVVNFX0hXX0JQCQkweDAwMDIwMDAwCj4+ICsjZGVm
+aW5lIEtWTV9HVUVTVERCR19VU0VfU1dfQlAJCV9fS1ZNX0dVRVNUREJHX1VTRV9TV19CUAo+PiAr
+I2RlZmluZSBLVk1fR1VFU1REQkdfVVNFX0hXX0JQCQlfX0tWTV9HVUVTVERCR19VU0VfSFdfQlAK
+Pj4gIAo+PiAgLyogZGVmaW5pdGlvbiBvZiByZWdpc3RlcnMgaW4ga3ZtX3J1biAqLwo+PiAgc3Ry
+dWN0IGt2bV9zeW5jX3JlZ3Mgewo+PiBkaWZmIC0tZ2l0IGEvYXJjaC94ODYvaW5jbHVkZS91YXBp
+L2FzbS9rdm0uaCBiL2FyY2gveDg2L2luY2x1ZGUvdWFwaS9hc20va3ZtLmgKPj4gaW5kZXggZDdk
+Y2VmNS4uMTQzODIwMiAxMDA2NDQKPj4gLS0tIGEvYXJjaC94ODYvaW5jbHVkZS91YXBpL2FzbS9r
+dm0uaAo+PiArKysgYi9hcmNoL3g4Ni9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oCj4+IEBAIC0yNTAs
+OCArMjUwLDggQEAgc3RydWN0IGt2bV9kZWJ1Z19leGl0X2FyY2ggewo+PiAgCV9fdTY0IGRyNzsK
+Pj4gIH07Cj4+ICAKPj4gLSNkZWZpbmUgS1ZNX0dVRVNUREJHX1VTRV9TV19CUAkJMHgwMDAxMDAw
+MAo+PiAtI2RlZmluZSBLVk1fR1VFU1REQkdfVVNFX0hXX0JQCQkweDAwMDIwMDAwCj4+ICsjZGVm
+aW5lIEtWTV9HVUVTVERCR19VU0VfU1dfQlAJCV9fS1ZNX0dVRVNUREJHX1VTRV9TV19CUAo+PiAr
+I2RlZmluZSBLVk1fR1VFU1REQkdfVVNFX0hXX0JQCQlfX0tWTV9HVUVTVERCR19VU0VfSFdfQlAK
+Pj4gICNkZWZpbmUgS1ZNX0dVRVNUREJHX0lOSkVDVF9EQgkJMHgwMDA0MDAwMAo+PiAgI2RlZmlu
+ZSBLVk1fR1VFU1REQkdfSU5KRUNUX0JQCQkweDAwMDgwMDAwCj4+ICAKPj4gZGlmZiAtLWdpdCBh
+L2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaCBiL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaAo+PiBp
+bmRleCA1ZWVkZjg0Li5jZTJkYjE0IDEwMDY0NAo+PiAtLS0gYS9pbmNsdWRlL3VhcGkvbGludXgv
+a3ZtLmgKPj4gKysrIGIvaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oCj4+IEBAIC01MjUsOCArNTI1
+LDE2IEBAIHN0cnVjdCBrdm1fczM5MF9pcnEgewo+PiAgCj4+ICAvKiBmb3IgS1ZNX1NFVF9HVUVT
+VF9ERUJVRyAqLwo+PiAgCj4+IC0jZGVmaW5lIEtWTV9HVUVTVERCR19FTkFCTEUJCTB4MDAwMDAw
+MDEKPj4gLSNkZWZpbmUgS1ZNX0dVRVNUREJHX1NJTkdMRVNURVAJCTB4MDAwMDAwMDIKPj4gKyNk
+ZWZpbmUgS1ZNX0dVRVNUREJHX0VOQUJMRQkJKDEgPDwgMCkKPj4gKyNkZWZpbmUgS1ZNX0dVRVNU
+REJHX1NJTkdMRVNURVAJKDEgPDwgMSkKPj4gKwo+PiArLyoKPj4gKyAqIEFyY2hpdGVjdHVyZSBz
+cGVjaWZpYyBzdHVmZiB1c2VzIHRoZSB0b3AgMTYgYml0cyBvZiB0aGUgZmllbGQsCj4KPiBjYW4g
+eW91IGJlIG1vcmUgc3BlY2lmaWMgdGhhbiAnc3R1ZmYnIGhlcmU/ICBmZWF0dXJlcz8KPgo+PiAr
+ICogaG93ZXZlciB0aGVyZSBpcyBzb21lIHNoYXJlZCBjb21tb25hbGl0eSBmb3IgdGhlIGNvbW1v
+biBjYXNlcwo+Cj4gSSBkb24ndCBsaWtlIHRoaXMgc2VudGVuY2U7IHNoYXJlZCBjb21tb25hbGl0
+eSBpcyBhIHBsZW9uYXNtIGFuZCB0aGUgdXNlCj4gb2YgaG93ZXZlciBtYWtlcyBpdCBzb3VuZHMg
+bGlrZSB0aGVyZSdzIHNvbWUgY2F2ZWF0IGhlcmUuCgpPSyBJIGNhbiBzZWUgdGhhdCAtIGFmdGVy
+IEkgbG9va2VkIGl0IHVwIDstKQoKPiBJZiB0aGUgdG9wIDE2IGJpdHMgYXJlIGluZGVlZCBhcmhp
+Y3RlY3R1cmUgc3BlY2lmaWMsIHRoZW4gSSB0aGluayB0aGV5Cj4gc2hvdWxkIGp1c3QgYmUgZGVm
+aW5lZCBpbiB0aGVpciBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgaGVhZGVycy4gIFVubGVzcwo+IHRo
+ZSBpZGVhIGhlcmUgaXMgdGhhdCB0aGVyZSdzIGEgZml4ZWQgc2V0IG9mIG9mIGZsYWdzIHRoYXQg
+YXJjaGl0ZWN0dXJlcwo+IGNhbiBjaG9vc2UgdG8gc3VwcG9ydCwgaW4gd2hpY2ggY2FzZSBpdCBz
+aG91bGQgc2ltcGx5IGJlIGRlZmluZWQgaW4gdGhlCj4gY29tbW9uIGhlYWRlci4KCldlbGwgYW4g
+YXJjaGl0ZWN0dXJlIG1pZ2h0IG5vdCBzdXBwb3J0IHNvbWUgZmVhdHVyZXMgYW5kIHdhbnQgdG8g
+dXNlCnRob3NlIGJpdHMgZm9yIHNvbWV0aGluZyBlbHNlPyBJIGRpZG4ndCB3YW50IHRvIGZvcmNl
+IHRoZSBib3R0b20gdHdvCm9mIHRoZSBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgYml0cyB0byB3YXN0
+ZWQgaWYgdGhlIGZlYXR1cmVzIGRvbid0IGV4aXN0LgoKPgo+Cj4+ICsgKi8KPj4gKyNkZWZpbmUg
+X19LVk1fR1VFU1REQkdfVVNFX1NXX0JQCSgxIDw8IDE2KQo+PiArI2RlZmluZSBfX0tWTV9HVUVT
+VERCR19VU0VfSFdfQlAJKDEgPDwgMTcpCj4+ICsKPj4gIAo+PiAgc3RydWN0IGt2bV9ndWVzdF9k
+ZWJ1ZyB7Cj4+ICAJX191MzIgY29udHJvbDsKPj4gLS0gCj4+IDIuMy40Cj4+IAoKLS0gCkFsZXgg
+QmVubsOpZQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpM
+aW51eHBwYy1kZXYgbWFpbGluZyBsaXN0CkxpbnV4cHBjLWRldkBsaXN0cy5vemxhYnMub3JnCmh0
+dHBzOi8vbGlzdHMub3psYWJzLm9yZy9saXN0aW5mby9saW51eHBwYy1kZXY=
