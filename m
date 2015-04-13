@@ -1,29 +1,26 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 04/10] KVM: arm: guest debug, add stub
- KVM_SET_GUEST_DEBUG ioctl
-Date: Mon, 13 Apr 2015 14:12:31 +0200
-Message-ID: <20150413121231.GO6186@cbox>
-References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
- <1427814488-28467-5-git-send-email-alex.bennee@linaro.org>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [RFC v6 03/16] VFIO: platform: single handler using function pointer
+Date: Mon, 13 Apr 2015 14:29:18 +0200
+Message-ID: <1428928171-18884-4-git-send-email-eric.auger@linaro.org>
+References: <1428928171-18884-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 68FE04C3CB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 08:04:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D14814C3DE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 08:24:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gtqnAxuzPkFi for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Apr 2015 08:04:40 -0400 (EDT)
-Received: from mail-lb0-f173.google.com (mail-lb0-f173.google.com
- [209.85.217.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 277CB4C3C6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 08:04:39 -0400 (EDT)
-Received: by lbcga7 with SMTP id ga7so56916316lbc.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 05:12:25 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <1427814488-28467-5-git-send-email-alex.bennee@linaro.org>
+ with ESMTP id PhKjP0UcmEuK for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Apr 2015 08:24:52 -0400 (EDT)
+Received: from mail-wi0-f170.google.com (mail-wi0-f170.google.com
+ [209.85.212.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C60EC4C3E3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 08:24:50 -0400 (EDT)
+Received: by wizk4 with SMTP id k4so70362103wiz.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Apr 2015 05:32:37 -0700 (PDT)
+In-Reply-To: <1428928171-18884-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,55 +30,95 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, marc.zyngier@arm.com, jan.kiszka@siemens.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, zhichao.huang@linaro.org, r65777@freescale.com, pbonzini@redhat.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: eric.auger@st.com, eric.auger@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, alex.williamson@redhat.com, pbonzini@redhat.com
+Cc: feng.wu@intel.com, linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 31, 2015 at 04:08:02PM +0100, Alex Benn=E9e wrote:
-> This commit adds a stub function to support the KVM_SET_GUEST_DEBUG
-> ioctl. Currently any operation flag will return EINVAL. Actual
-> functionality will be added with further patches.
-> =
+A single handler now is registered whatever the use case: automasked
+or not. A function pointer is set according to the wished behavior
+and the handler calls this function.
 
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>.
-> =
+The irq lock is taken/released in the root handler. eventfd_signal can
+be called in regions not allowed to sleep.
 
-> ---
-> v2
->   - simplified form of the ioctl (stuff will go into setup_debug)
-> =
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
-> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kv=
-m/api.txt
-> index b112efc..06c5064 100644
-> --- a/Documentation/virtual/kvm/api.txt
-> +++ b/Documentation/virtual/kvm/api.txt
-> @@ -2604,7 +2604,7 @@ handled.
->  4.87 KVM_SET_GUEST_DEBUG
->  =
+---
 
->  Capability: KVM_CAP_SET_GUEST_DEBUG
-> -Architectures: x86, s390, ppc
-> +Architectures: x86, s390, ppc, arm64
->  Type: vcpu ioctl
->  Parameters: struct kvm_guest_debug (in)
->  Returns: 0 on success; -1 on error
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index 5560f74..445933d 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -183,6 +183,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, lon=
-g ext)
->  	case KVM_CAP_ARM_PSCI:
->  	case KVM_CAP_ARM_PSCI_0_2:
->  	case KVM_CAP_READONLY_MEM:
-> +	case KVM_CAP_SET_GUEST_DEBUG:
->  		r =3D 1;
->  		break;
+v4: creation
+---
+ drivers/vfio/platform/vfio_platform_irq.c     | 21 +++++++++++++++------
+ drivers/vfio/platform/vfio_platform_private.h |  1 +
+ 2 files changed, 16 insertions(+), 6 deletions(-)
 
-shouldn't you wait with advertising this capability until you've
-implemented support for it?
-
-
-Thanks,
--Christoffer
+diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
+index 132bb3f..8eb65c1 100644
+--- a/drivers/vfio/platform/vfio_platform_irq.c
++++ b/drivers/vfio/platform/vfio_platform_irq.c
+@@ -147,11 +147,8 @@ static int vfio_platform_set_irq_unmask(struct vfio_platform_device *vdev,
+ static irqreturn_t vfio_automasked_irq_handler(int irq, void *dev_id)
+ {
+ 	struct vfio_platform_irq *irq_ctx = dev_id;
+-	unsigned long flags;
+ 	int ret = IRQ_NONE;
+ 
+-	spin_lock_irqsave(&irq_ctx->lock, flags);
+-
+ 	if (!irq_ctx->masked) {
+ 		ret = IRQ_HANDLED;
+ 
+@@ -160,8 +157,6 @@ static irqreturn_t vfio_automasked_irq_handler(int irq, void *dev_id)
+ 		irq_ctx->masked = true;
+ 	}
+ 
+-	spin_unlock_irqrestore(&irq_ctx->lock, flags);
+-
+ 	if (ret == IRQ_HANDLED)
+ 		eventfd_signal(irq_ctx->trigger, 1);
+ 
+@@ -177,6 +172,19 @@ static irqreturn_t vfio_irq_handler(int irq, void *dev_id)
+ 	return IRQ_HANDLED;
+ }
+ 
++static irqreturn_t vfio_handler(int irq, void *dev_id)
++{
++	struct vfio_platform_irq *irq_ctx = dev_id;
++	unsigned long flags;
++	irqreturn_t ret;
++
++	spin_lock_irqsave(&irq_ctx->lock, flags);
++	ret = irq_ctx->handler(irq, dev_id);
++	spin_unlock_irqrestore(&irq_ctx->lock, flags);
++
++	return ret;
++}
++
+ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+ 			    int fd, irq_handler_t handler)
+ {
+@@ -206,9 +214,10 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+ 	}
+ 
+ 	irq->trigger = trigger;
++	irq->handler = handler;
+ 
+ 	irq_set_status_flags(irq->hwirq, IRQ_NOAUTOEN);
+-	ret = request_irq(irq->hwirq, handler, 0, irq->name, irq);
++	ret = request_irq(irq->hwirq, vfio_handler, 0, irq->name, irq);
+ 	if (ret) {
+ 		kfree(irq->name);
+ 		eventfd_ctx_put(trigger);
+diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
+index 5d31e04..eb91deb 100644
+--- a/drivers/vfio/platform/vfio_platform_private.h
++++ b/drivers/vfio/platform/vfio_platform_private.h
+@@ -37,6 +37,7 @@ struct vfio_platform_irq {
+ 	spinlock_t		lock;
+ 	struct virqfd		*unmask;
+ 	struct virqfd		*mask;
++	irqreturn_t (*handler)(int irq, void *dev_id);
+ };
+ 
+ struct vfio_platform_region {
+-- 
+1.9.1
