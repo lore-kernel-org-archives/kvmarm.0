@@ -1,39 +1,64 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 08/10] KVM: arm64: guest debug, HW assisted debug
- support
-Date: Tue, 14 Apr 2015 12:23:45 +0200
-Message-ID: <20150414102345.GV6186@cbox>
+Subject: Re: [PATCH v2 09/10] KVM: arm64: trap nested debug register access
+Date: Tue, 14 Apr 2015 12:27:03 +0200
+Message-ID: <20150414102703.GW6186@cbox>
 References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
- <1427814488-28467-9-git-send-email-alex.bennee@linaro.org>
- <20150410122520.GA3227@hawk.usersys.redhat.com>
+ <1427814488-28467-10-git-send-email-alex.bennee@linaro.org>
+ <20150410123830.GB3227@hawk.usersys.redhat.com>
+ <877ftglaqu.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-doc-owner@vger.kernel.org>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C17E34D009
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2015 06:19:09 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id G2jP0uYr+sDs for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Apr 2015 06:19:08 -0400 (EDT)
+Received: from mail-lb0-f180.google.com (mail-lb0-f180.google.com
+ [209.85.217.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7B0654CF59
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2015 06:19:08 -0400 (EDT)
+Received: by lbcga7 with SMTP id ga7so4396709lbc.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Apr 2015 03:26:56 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <20150410122520.GA3227@hawk.usersys.redhat.com>
-Sender: linux-doc-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, pbonzini@redhat.com, zhichao.huang@linaro.org, jan.kiszka@siemens.com, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, AKASHI Takahiro <takahiro.akashi@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, "open list:ABI/API" <linux-api@vger.kernel.org>
+In-Reply-To: <877ftglaqu.fsf@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org, marc.zyngier@arm.com, jan.kiszka@siemens.com, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, zhichao.huang@linaro.org, r65777@freescale.com, pbonzini@redhat.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 10, 2015 at 02:25:21PM +0200, Andrew Jones wrote:
+On Mon, Apr 13, 2015 at 08:59:21AM +0100, Alex Benn=E9e wrote:
 
 [...]
 
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -196,16 +196,49 @@ static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
-> >   * - If the dirty bit is set, save guest registers, restore host
-> >   *   registers and clear the dirty bit. This ensure that the host can
-> >   *   now use the debug registers.
-> > + *
-> > + * We also use this mechanism to set-up the debug registers for guest
-> setup
+> >> +		/* MDSCR_EL1 */
+> >> +		if (r->reg =3D=3D MDSCR_EL1) {
+> >> +			if (p->is_write)
+> >> +				vcpu_debug_saved_reg(vcpu, mdscr_el1) =3D
+> >> +					*vcpu_reg(vcpu, p->Rt);
+> >> +			else
+> >> +				*vcpu_reg(vcpu, p->Rt) =3D
+> >> +					vcpu_debug_saved_reg(vcpu, mdscr_el1);
+> >
+> > With this lines wrapping, {}'s might be nice.
+> =
 
-since I'm in this mood:
+> My natural inclination is to wrap in {}'s but I know the kernel is a fan
+> of the single-statement if forms.
+> =
 
-setup: noun or adjective
-set-up: noun derived from the phrasal verb, example "Run! It's a set-up."
-set up: verb
+It's accepted to use braces for multi-line single statements - and I
+prefer it too :)
 
 -Christoffer
