@@ -1,33 +1,24 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [Linaro-uefi] UEFI on KVM fails to start on juno on cortex-a57
- cluster
-Date: Wed, 15 Apr 2015 19:17:09 +0200
-Message-ID: <CAKv+Gu8j=U6CdowvVV96LPqHSfqG+LDeEZWmwHMw8PfuQ7j48w@mail.gmail.com>
-References: <CAAqcGHmFGO8DaU-G0A6geOzDZDmWAtjHN6wOmJQVBjyi6_WVzQ@mail.gmail.com>
- <CAKv+Gu_W0sk6vR+frYYNBoMjWs6mBcxPwXjwzaHv1D0Sh7GtAw@mail.gmail.com>
- <CAKv+Gu8j0zWQcxiasCy2eozcLCJuT=FPY0rLeYG0z3Hjwf40=A@mail.gmail.com>
- <CAKv+Gu9VE8kdq2chs=QKHvyhOoSwBPy2CmJp-ra5kYLiiifVQg@mail.gmail.com>
- <CAAqcGHnNrnOLxfoTuGGMN4nwDupaaLK5sJ8TATTw33r1NMi0Dg@mail.gmail.com>
- <CAKv+Gu9djvNecwDGqyCNzdQG6-g=ivavfCGg-jqxrrZ+tnYDOQ@mail.gmail.com>
- <CAKv+Gu9BJ_+4ioE1SOp=ui6a8UQ_+HEGdcYgWdiyZACKr9Q+Nw@mail.gmail.com>
+From: =?UTF-8?B?SsOpcsOpbXkgRmFuZ3XDqGRl?= <j.fanguede@virtualopensystems.com>
+Subject: ARM: PCI devices emulation broken with KVM due to cache issue
+Date: Thu, 16 Apr 2015 17:54:51 +0200
+Message-ID: <CAGE1QJoXVDP_O0W9dRCsN+FBW3BEYn5gqiCvGh07CfadNp2kHw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D9744D11C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2015 13:09:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BBC5D4DCFE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Apr 2015 11:47:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lOXLKPFtDASW for <kvmarm@lists.cs.columbia.edu>;
- Wed, 15 Apr 2015 13:09:18 -0400 (EDT)
-Received: from mail-ob0-f171.google.com (mail-ob0-f171.google.com
- [209.85.214.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F13714CEDF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2015 13:09:16 -0400 (EDT)
-Received: by obbeb7 with SMTP id eb7so29024383obb.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 15 Apr 2015 10:17:09 -0700 (PDT)
-In-Reply-To: <CAKv+Gu9BJ_+4ioE1SOp=ui6a8UQ_+HEGdcYgWdiyZACKr9Q+Nw@mail.gmail.com>
+ with ESMTP id XPhYgdxdefrl for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 16 Apr 2015 11:47:18 -0400 (EDT)
+Received: from mail-wi0-f182.google.com (mail-wi0-f182.google.com
+ [209.85.212.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6943E4DCFD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Apr 2015 11:47:17 -0400 (EDT)
+Received: by widdi4 with SMTP id di4so102918326wid.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Apr 2015 08:55:12 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,57 +28,64 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Riku Voipio <riku.voipio@linaro.org>, Leif Lindholm <leif.lindholm@linaro.org>
-Cc: Virtualization Team <virtualization@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Linaro UEFI Mailman List <linaro-uefi@lists.linaro.org>
+To: QEMU Developers <qemu-devel@nongnu.org>
+Cc: VirtualOpenSystems Technical Team <tech@virtualopensystems.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 13 April 2015 at 11:04, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> On 27 March 2015 at 01:02, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->> On 26 March 2015 at 09:09, Riku Voipio <riku.voipio@linaro.org> wrote:
->>> On 25 March 2015 at 21:32, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->>>> On 25 March 2015 at 17:14, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->>>>> On 25 March 2015 at 17:14, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->>>>>> On 25 March 2015 at 07:59, Riku Voipio <riku.voipio@linaro.org> wrote:
->>>>>>> Hi,
->>>>>>>
->>>>>>> It appears on juno, I can start kvm with UEFI only on cortex-a53 cores:
->>>>>>>
->>>>>>>
->>>>>>> taskset -c 0 qemu-system-aarch64 -m 1024 -cpu host -M virt -bios
->>>>>>> QEMU_EFI.fd -enable-kvm -nographic
->>>>>>> -> works:
->>>>>>> UEFI Interactive Shell v2.0
->>>>>>> taskset -c 1 qemu-system-aarch64 -m 1024 -cpu host -M virt -bios
->>>>>>> QEMU_EFI.fd -enable-kvm -nographic
->>>>>>> -> hangs at cpu spinning 100%
->>>>>>> ...
->>>>>>>
->>>>>>
->>>>>> I can reproduce the hang, both with your UEFI binary and my own release build.
->>>>>> The debug build works fine, unfortunately...
->>>>>>
->>>>>
->>>>> Tianocore built from master as of today, that is.
->>>>>
->>>>
->>>> OK, it appears that we were missing some cache maintenance. It is not
->>>> obvious how that should affect A57 only, but with these patches, I can
->>>> now reliably run the release version on my Seattle A57
->>>
->>>> https://git.linaro.org/people/ard.biesheuvel/uefi-next.git/shortlog/refs/heads/qemu-xen-cache-maintenance
->>>
->>> Thanks. Do you know when there would be a new build on releases or snapshots?
->>>
->>
->> Let me check with Leif. We have another candidate patch now that he
->> could perhaps apply and kick off a build?
->>
->
-> I now have independent confirmation (from Laszlo Ersek) that the cache
-> maintenance patches I am proposing fix the issue on Seattle.
-> Hopefully this means Juno is fixed as well.
->
-> I am trying to get a snapshot out asap, today or tomorrow perhaps?
-
-New snapshot here
-https://snapshots.linaro.org/components/kernel/linaro-edk2-prep/70/release/qemu64-intelbds/QEMU_EFI.fd
+SGVsbG8sCgpBdHRhY2hpbmcgUENJIGRldmljZXMgdG8gdGhlIHZpcnQgbW9kZWwgd29ya3MgZmlu
+ZSB3aXRoIFRDRywgYnV0CmZhaWxzIG9uY2UgS1ZNIGlzIGVuYWJsZWQuIEZvciBpbnN0YW5jZSwg
+d2l0aCB0aGlzIGNvbW1hbmQgbGluZToKCi4vcWVtdS1zeXN0ZW0tYXJtIC1tIDUxMiAtbWFjaGlu
+ZSB0eXBlPXZpcnQgXAogICAgLWVuYWJsZS1rdm0gLWNwdSBob3N0IFwKICAgIC1ub2dyYXBoaWMg
+XAogICAgLWtlcm5lbCB6SW1hZ2UgXAogICAgLWRyaXZlIGlmPW5vbmUsZmlsZT11YnVudHUuaW1n
+LGlkPWZzLGZvcm1hdD1yYXcgXAogICAgLWRldmljZSB2aXJ0aW8tYmxrLWRldmljZSxkcml2ZT1m
+cyBcCiAgICAtbmV0ZGV2IHR5cGU9dXNlcixpZD1uZXQwIC1kZXZpY2UgZTEwMDAsbmV0ZGV2PW5l
+dDAgXAogICAgLWRyaXZlIGlmPXNjc2ksZmlsZT1kaXNrLmltZyxmb3JtYXQ9cmF3IFwKICAgIC1k
+ZXZpY2UgbHNpNTNjODk1YSBcCiAgICAtdXNiIC1kZXZpY2UgdXNiLWVoY2ksaWQ9ZWhjaSBcCiAg
+ICAtZGV2aWNlIHVzYi10YWJsZXQsYnVzPWVoY2kuMCBcCiAgICAtZGV2aWNlIHVzYi1ob3N0LGhv
+c3RidXM9Myxob3N0cG9ydD0xLGJ1cz1laGNpLjAgIFwKICAgIC1hcHBlbmQgImNvbnNvbGU9dHR5
+QU1BMCByb290PS9kZXYvdmRhIHJ3IgoKVGhlIGUxMDAwIG9uY2UgdXAgaXMgZmFpbGluZywgd2hl
+biBpc3N1aW5nIGEgcGluZyBjb21tYW5kLCB3aXRoIHRoZQpmb2xsb3dpbmcga2VybmVsIG1lc3Nh
+Z2VzOgpbLi4uXQplMTAwMCAwMDAwOjAwOjAyLjAgZXRoMDogRGV0ZWN0ZWQgVHggVW5pdCBIYW5n
+CiAgVHggUXVldWUgICAgICAgICAgICAgPDA+CiAgVERIICAgICAgICAgICAgICAgICAgPDM+CiAg
+VERUICAgICAgICAgICAgICAgICAgPDM+CiAgbmV4dF90b191c2UgICAgICAgICAgPDM+CiAgbmV4
+dF90b19jbGVhbiAgICAgICAgPDI+CmJ1ZmZlcl9pbmZvW25leHRfdG9fY2xlYW5dCiAgdGltZV9z
+dGFtcCAgICAgICAgICAgPGZmZmY5NGRiPgogIG5leHRfdG9fd2F0Y2ggICAgICAgIDwyPgogIGpp
+ZmZpZXMgICAgICAgICAgICAgIDxmZmZmOTU2OD4KICBuZXh0X3RvX3dhdGNoLnN0YXR1cyA8MD4K
+Wy4uLl0KClRoZSBndWVzdCBrZXJuZWwgZHJpdmVyIG9mIHRoZSBsc2kgZGV2aWNlIGZhaWxzIHRv
+IGVuYWJsZSBpdCBjb3JyZWN0bHkKd2l0aCBhIGNhY2hlIGVycm9yOgpbLi4uXQpzeW01M2M4eHgg
+MDAwMDowMDowMS4wOiBlbmFibGluZyBkZXZpY2UgKDAxMDAgLT4gMDEwMykKc3ltMDogPDg5NWE+
+IHJldiAweDAgYXQgcGNpIDAwMDA6MDA6MDEuMCBpcnEgNTQKc3ltMDogTm8gTlZSQU0sIElEIDcs
+IEZhc3QtNDAsIExWRCwgcGFyaXR5IGNoZWNraW5nCkNBQ0hFIFRFU1QgRkFJTEVEOiBjaGlwIHdy
+b3RlIDIsIGhvc3QgcmVhZCAxLgpzeW0wOiBDQUNIRSBJTkNPUlJFQ1RMWSBDT05GSUdVUkVELgpz
+eW0wOiBnaXZpbmcgdXAgLi4uClsuLi5dCgpBbmQgZmluYWxseSB0aGUgVVNCIGNvbnRyb2xsZXIg
+ZmFpbHMgdG8gYXNzaWduIGFkZHJlc3NlcyB0byB0aGUgZGV2aWNlcwooZW11bGF0ZWQgb3IgaG9z
+dCBwYXNzdGhyb3VnaCk6ClsuLi5dCnVzYiAxLTE6IG5ldyBoaWdoLXNwZWVkIFVTQiBkZXZpY2Ug
+bnVtYmVyIDIgdXNpbmcgZWhjaS1wY2kKdXNiIDEtMTogZGV2aWNlIG5vdCBhY2NlcHRpbmcgYWRk
+cmVzcyAyLCBlcnJvciAtMTEwCnVzYiAxLTE6IG5ldyBoaWdoLXNwZWVkIFVTQiBkZXZpY2UgbnVt
+YmVyIDMgdXNpbmcgZWhjaS1wY2kKdXNiIDEtMTogZGV2aWNlIG5vdCBhY2NlcHRpbmcgYWRkcmVz
+cyAzLCBlcnJvciAtMTEwClsuLi5dCgpUZXN0ZWQgd2l0aCBsYXN0IFFFTVUgdmVyc2lvbiAodjIu
+My4wLXJjMyksIExpbnV4IGtlcm5lbCB2NC4wIChmb3IgYm90aApndWVzdCBhbmQgaG9zdCkgb24g
+U2Ftc3VuZyBDaHJvbWVib29rLCBWZXhwcmVzcyBUQzIgYW5kIE9NQVA1LVVFVk0uCgoKQWZ0ZXIg
+aW52ZXN0aWdhdGlvbiwgaXQgdHVybnMgb3V0IHRoYXQgc29tZSBtZW1vcnkgd3JpdGVzIHBlcmZv
+cm1lZCBieQpxZW11IGVtdWxhdGVkIGRldmljZXMgYXJlIG5vdCBzZWVuIGJ5IHRoZSBndWVzdCBr
+ZXJuZWwsIGJlY2F1c2UgdGhlCmNhY2hlIGFuZCB0aGUgc3lzdGVtIG1lbW9yeSBhcmUgaW5jb25z
+aXN0ZW50IGFuZCB0aGUgY2FjaGUgaXMgbmV2ZXIKZmx1c2hlZC4KCkkgbWFuYWdlZCB0byBzb2x2
+ZSB0aGVzZSBpc3N1ZXMgYnkgZmx1c2hpbmcgdGhlIGNhY2hlIGluIHRoZSBob3N0Cmtlcm5lbCBl
+YWNoIHRpbWUgd2UgZW50ZXIgaW50byB0aGUgZ3Vlc3QsIG9ubHkgaWYgdGhlcmUgaXMgYSBtbWlv
+CndyaXRlIChzZWUgYmVsb3cpLCBidXQgbWF5YmUgdGhpcyBpcyBub3QgYW4gYWNjZXB0YWJsZS9l
+ZmZpY2llbnQKc29sdXRpb24uCgpBbnkgc3VnZ2VzdGlvbnMvYWR2aWNlIHRvIHRhY2tsZSB0aGlz
+IHByb2JsZW0/CgoKZGlmZiAtLWdpdCBhL2FyY2gvYXJtL2t2bS9tbWlvLmMgYi9hcmNoL2FybS9r
+dm0vbW1pby5jCmluZGV4IDVkM2JmYzAuLjRjNTEwOTkgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtL2t2
+bS9tbWlvLmMKKysrIGIvYXJjaC9hcm0va3ZtL21taW8uYwpAQCAtMjAsNiArMjAsNyBAQAogI2lu
+Y2x1ZGUgPGFzbS9rdm1fbW1pby5oPgogI2luY2x1ZGUgPGFzbS9rdm1fZW11bGF0ZS5oPgogI2lu
+Y2x1ZGUgPHRyYWNlL2V2ZW50cy9rdm0uaD4KKyNpbmNsdWRlIDxhc20vY2FjaGVmbHVzaC5oPgoK
+ICNpbmNsdWRlICJ0cmFjZS5oIgoKQEAgLTExNiw2ICsxMTcsOCBAQCBpbnQga3ZtX2hhbmRsZV9t
+bWlvX3JldHVybihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCnN0cnVjdCBrdm1fcnVuICpydW4pCiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBkYXRhKTsKICAgICAgICAgICAgICAgIGRhdGEg
+PSB2Y3B1X2RhdGFfaG9zdF90b19ndWVzdCh2Y3B1LCBkYXRhLCBsZW4pOwogICAgICAgICAgICAg
+ICAgKnZjcHVfcmVnKHZjcHUsIHZjcHUtPmFyY2gubW1pb19kZWNvZGUucnQpID0gZGF0YTsKKyAg
+ICAgICB9IGVsc2UgeworICAgICAgICAgICAgICAgZmx1c2hfY2FjaGVfYWxsKCk7CiAgICAgICAg
+fQoKICAgICAgICByZXR1cm4gMDsKCgpSZWdhcmRzLApKw6lyw6lteQpfX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFy
+bUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFp
+bG1hbi9saXN0aW5mby9rdm1hcm0K
