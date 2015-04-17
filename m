@@ -1,25 +1,28 @@
-From: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v12 4/9] hw/vfio/platform: add capability to start IRQ
- propagation
-Date: Thu, 16 Apr 2015 16:04:44 -0600
-Message-ID: <1429221884.10086.38.camel@redhat.com>
-References: <1426785402-2091-1-git-send-email-eric.auger@linaro.org>
- <1426785402-2091-5-git-send-email-eric.auger@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: ARM: PCI devices emulation broken with KVM due to cache issue
+Date: Fri, 17 Apr 2015 11:29:10 +0200
+Message-ID: <20150417092910.GI6186@cbox>
+References: <CAGE1QJoXVDP_O0W9dRCsN+FBW3BEYn5gqiCvGh07CfadNp2kHw@mail.gmail.com>
+ <552FDD13.4090006@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 13A864DD5E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Apr 2015 18:51:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9386E4DE40
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2015 05:21:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Kx4Nl+9Wafpl for <kvmarm@lists.cs.columbia.edu>;
- Thu, 16 Apr 2015 18:51:12 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 239104DD5C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 16 Apr 2015 18:51:10 -0400 (EDT)
-In-Reply-To: <1426785402-2091-5-git-send-email-eric.auger@linaro.org>
+ with ESMTP id cAbhtZq-LFsO for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Apr 2015 05:21:05 -0400 (EDT)
+Received: from mail-lb0-f170.google.com (mail-lb0-f170.google.com
+ [209.85.217.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B84694DE3F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2015 05:21:02 -0400 (EDT)
+Received: by lbbqq2 with SMTP id qq2so78066935lbb.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Apr 2015 02:28:58 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <552FDD13.4090006@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,131 +32,40 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>
-Cc: eric.auger@st.com, patches@linaro.org, qemu-devel@nongnu.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: VirtualOpenSystems Technical Team <tech@virtualopensystems.com>, QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, 2015-03-19 at 17:16 +0000, Eric Auger wrote:
-> Add a reset notify function that enables to start the propagation of
-> interrupts to the guest.
-> 
-> Signed-off-by: Eric Auger <eric.auger@linaro.org>
-> 
-> ---
-> v10 -> v11:
-> - comment reword
-> 
-> v8 -> v9:
-> - handle failure in vfio_irq_starter
-> ---
->  hw/vfio/platform.c              | 64 +++++++++++++++++++++++++++++++++++++++++
->  include/hw/vfio/vfio-platform.h |  8 ++++++
->  2 files changed, 72 insertions(+)
-> 
-> diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-> index 31c2701..361e01b 100644
-> --- a/hw/vfio/platform.c
-> +++ b/hw/vfio/platform.c
-> @@ -572,6 +572,70 @@ static void vfio_platform_realize(DeviceState *dev, Error **errp)
->      }
->  }
->  
-> +/**
-> + * vfio_irq_starter: Start IRQ forwarding for a specific VFIO device
-> + * @sbdev: Sysbus device handle
-> + * @opaque: DeviceState handle of the interrupt controller the device
-> + *          is attached to
-> + *
-> + * The function retrieves the absolute GSI number each VFIO IRQ
-> + * corresponds to and start forwarding.
-> + */
+On Thu, Apr 16, 2015 at 06:02:27PM +0200, Paolo Bonzini wrote:
+> =
 
-Using "forwarding" here is really making me look for your platform's EOI
-trick (IRQ Forwarding), which isn't here.
+> =
 
-> +static int vfio_irq_starter(SysBusDevice *sbdev, void *opaque)
-> +{
-> +    DeviceState *intc = (DeviceState *)opaque;
-> +    VFIOPlatformDevice *vdev;
-> +    VFIOINTp *intp;
-> +    qemu_irq irq;
-> +    int gsi, ret;
-> +
-> +    if (object_dynamic_cast(OBJECT(sbdev), TYPE_VFIO_PLATFORM)) {
-> +        vdev = VFIO_PLATFORM_DEVICE(sbdev);
-> +
-> +        QLIST_FOREACH(intp, &vdev->intp_list, next) {
-> +            gsi = 0;
-> +            while (1) {
-> +                irq = qdev_get_gpio_in(intc, gsi);
-> +                if (irq == intp->qemuirq) {
-> +                    break;
-> +                }
-> +                gsi++;
-> +            }
+> On 16/04/2015 17:54, J=E9r=E9my Fangu=E8de wrote:
+> > The guest kernel driver of the lsi device fails to enable it correctly
+> > with a cache error:
+> > [...]
+> > sym53c8xx 0000:00:01.0: enabling device (0100 -> 0103)
+> > sym0: <895a> rev 0x0 at pci 0000:00:01.0 irq 54
+> > sym0: No NVRAM, ID 7, Fast-40, LVD, parity checking
+> > CACHE TEST FAILED: chip wrote 2, host read 1.
+> > sym0: CACHE INCORRECTLY CONFIGURED.
+> > sym0: giving up ...
+> > [...]
+> =
 
-A for() loop would be more compact here, but is there some other exit
-condition we can add?  gsi < INT_MAX?
+> Note that this is just a failure in the driver self-test.  It has
+> nothing to do with the processor cache (though there are other problems
+> with PCI and the processor cache in KVM mode).
+> =
 
-> +            intp->virtualID = gsi;
-> +            ret = vdev->start_irq_fn(intp);
-> +            if (ret) {
-> +                error_report("%s unable to start propagation of IRQ index %d",
-> +                             vdev->vbasedev.name, intp->pin);
-> +                exit(1);
-> +            }
-> +        }
-> +    }
-> +    return 0;
-> +}
-> +
-> +/**
-> + * vfio_kick_irqs: start IRQ forwarding for all the VFIO devices
-> + * attached to the platform bus
-> + * @data: Device state handle of the interrupt controller the VFIO IRQs
-> + *        must be bound to
-> + *
-> + * Binding to the platform bus IRQs happens on a machine init done
-> + * notifier registered by the platform bus. Only at that time the
-> + * absolute virtual IRQ = GSI is known and allows to setup IRQFD.
-> + * This function typically can be called in a reset notifier registered
-> + * by the machine file.
-> + */
+> Do not use this QEMU device.  The emulation is incomplete and it's slow.
+>  Use virtio-scsi or megasas instead.  Still, I'm not sure that would
+> work with KVM; as far as I know, most work on the ARM PCI host bridge
+> was done using UEFI firmware.
+> =
 
-So there's not actually an irqfd setup done here yet and what is
-currently done by the above starter function doesn't depend at all on
-the GSI.  Do you perhaps want to setup the vfio->eventfd signaling
-during your initfn and then only connect the eventfd->irqfd to KVM in
-the reset function?  Sort of how vfio-pci does the routing update.
+I've been running a number of tests lately using virtio-net-pci and
+virtio-blk-pci on XGene at it works like a charm.
 
-> +void vfio_kick_irqs(void *data)
-> +{
-> +    DeviceState *intc = (DeviceState *)data;
-> +    DeviceState *dev =
-> +        qdev_find_recursive(sysbus_get_default(), TYPE_PLATFORM_BUS_DEVICE);
-> +    PlatformBusDevice *pbus = PLATFORM_BUS_DEVICE(dev);
-> +
-> +    assert(pbus->done_gathering);
-> +    foreach_dynamic_sysbus_device(vfio_irq_starter, intc);
-> +}
-> +
->  static const VMStateDescription vfio_platform_vmstate = {
->      .name = TYPE_VFIO_PLATFORM,
->      .unmigratable = 1,
-> diff --git a/include/hw/vfio/vfio-platform.h b/include/hw/vfio/vfio-platform.h
-> index 31893a3..c9ee898 100644
-> --- a/include/hw/vfio/vfio-platform.h
-> +++ b/include/hw/vfio/vfio-platform.h
-> @@ -77,4 +77,12 @@ typedef struct VFIOPlatformDeviceClass {
->  #define VFIO_PLATFORM_DEVICE_GET_CLASS(obj) \
->       OBJECT_GET_CLASS(VFIOPlatformDeviceClass, (obj), TYPE_VFIO_PLATFORM)
->  
-> +/**
-> + * vfio_kick_irqs - reset notifier that starts IRQ injection
-> + * for all VFIO dynamic sysbus devices attached to the platform bus.
-> + *
-> + * @opaque: handle to the interrupt controller DeviceState
-> + */
-> +void vfio_kick_irqs(void *opaque);
-> +
->  #endif /*HW_VFIO_VFIO_PLATFORM_H*/
+-Christoffer
