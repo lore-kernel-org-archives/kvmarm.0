@@ -1,29 +1,27 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH 1/3] KVM: promote KVM_MEMSLOT_INCOHERENT to uapi
-Date: Mon, 20 Apr 2015 17:26:32 +0200
-Message-ID: <20150420152632.GK6186@cbox>
-References: <1426705700-2564-1-git-send-email-drjones@redhat.com>
- <1426705833-2679-1-git-send-email-drjones@redhat.com>
- <1426705833-2679-2-git-send-email-drjones@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 2/4] target-arm: kvm - implement software breakpoints
+Date: Mon, 20 Apr 2015 20:44:14 +0100
+Message-ID: <CAFEAcA9Tgv6jXnVhiNbbm_2aAdPQSvxDV2J5xTGzLLOMHLsvEw@mail.gmail.com>
+References: <1427816446-31586-1-git-send-email-alex.bennee@linaro.org>
+ <1427816446-31586-3-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E8E54DFCC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2015 11:18:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E3E874E22A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2015 15:36:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UYFvFmA0jiri for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Apr 2015 11:18:11 -0400 (EDT)
-Received: from mail-la0-f50.google.com (mail-la0-f50.google.com
- [209.85.215.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2EE704CC88
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2015 11:18:10 -0400 (EDT)
-Received: by laat2 with SMTP id t2so129619750laa.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2015 08:26:15 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <1426705833-2679-2-git-send-email-drjones@redhat.com>
+ with ESMTP id kpFMvFJH6cea for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Apr 2015 15:36:28 -0400 (EDT)
+Received: from mail-ig0-f175.google.com (mail-ig0-f175.google.com
+ [209.85.213.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6A9994E21E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2015 15:36:28 -0400 (EDT)
+Received: by igblo3 with SMTP id lo3so68686720igb.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2015 12:44:34 -0700 (PDT)
+In-Reply-To: <1427816446-31586-3-git-send-email-alex.bennee@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,63 +31,104 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: ard.biesheuvel@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, qemu-devel@nongnu.org, pbonzini@redhat.com, lersek@redhat.com, kvmarm@lists.cs.columbia.edu
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Zhichao Huang <zhichao.huang@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Mar 18, 2015 at 03:10:31PM -0400, Andrew Jones wrote:
-> Also rename to KVM_MEM_UNCACHED.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  Documentation/virtual/kvm/api.txt | 16 ++++++++++------
->  arch/arm/include/uapi/asm/kvm.h   |  1 +
->  arch/arm/kvm/arm.c                |  1 +
->  arch/arm/kvm/mmu.c                |  4 ++--
->  arch/arm64/include/uapi/asm/kvm.h |  1 +
->  include/linux/kvm_host.h          |  1 -
->  include/uapi/linux/kvm.h          |  2 ++
->  virt/kvm/kvm_main.c               |  7 ++++++-
->  8 files changed, 23 insertions(+), 10 deletions(-)
-> 
-> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-> index 0007fef4ed814..a5a51403a7937 100644
-> --- a/Documentation/virtual/kvm/api.txt
-> +++ b/Documentation/virtual/kvm/api.txt
-> @@ -902,6 +902,7 @@ struct kvm_userspace_memory_region {
->  /* for kvm_memory_region::flags */
->  #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
->  #define KVM_MEM_READONLY	(1UL << 1)
-> +#define KVM_MEM_UNCACHED	(1UL << 2)
->  
->  This ioctl allows the user to create or modify a guest physical memory
->  slot.  When changing an existing slot, it may be moved in the guest
-> @@ -917,12 +918,15 @@ It is recommended that the lower 21 bits of guest_phys_addr and userspace_addr
->  be identical.  This allows large pages in the guest to be backed by large
->  pages in the host.
->  
-> -The flags field supports two flags: KVM_MEM_LOG_DIRTY_PAGES and
-> -KVM_MEM_READONLY.  The former can be set to instruct KVM to keep track of
-> -writes to memory within the slot.  See KVM_GET_DIRTY_LOG ioctl to know how to
-> -use it.  The latter can be set, if KVM_CAP_READONLY_MEM capability allows it,
-> -to make a new slot read-only.  In this case, writes to this memory will be
-> -posted to userspace as KVM_EXIT_MMIO exits.
-> +The flags field supports three flags: KVM_MEM_LOG_DIRTY_PAGES,
-> +KVM_MEM_READONLY, and KVM_MEM_UNCACHED.  The first can be set to instruct
-> +KVM to keep track of writes to memory within the slot.  See KVM_GET_DIRTY_LOG
-> +ioctl to know how to use it.  The second can be set, if KVM_CAP_READONLY_MEM
-> +capability allows it, to make a new slot read-only.  In this case, writes to
-> +this memory will be posted to userspace as KVM_EXIT_MMIO exits. The third can
-> +be set, if the KVM_CAP_UNCACHED_MEM capability allows it. This remaps the
-> +memory as uncached, i.e. userspace will always directly read/write RAM for
-> +this memory region.
-
-I would repeat the definition of the flag in the text here instead of
-referring to the 'first', 'second', and 'third' here; it's too hard to
-follow.
-
-Also, which combination of these flags are allowed?  Can they all be set
-in combination or are they mutually exclusive or a bit of everything?
-
-Thanks,
--Christoffer
+T24gMzEgTWFyY2ggMjAxNSBhdCAxNjo0MCwgQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5h
+cm8ub3JnPiB3cm90ZToKPiBUaGVzZSBkb24ndCBpbnZvbHZlIG1lc3NpbmcgYXJvdW5kIHdpdGgg
+ZGVidWcgcmVnaXN0ZXJzLCBqdXN0IHNldHRpbmcKPiB0aGUgYnJlYWtwb2ludCBpbnN0cnVjdGlv
+biBpbiBtZW1vcnkuIEdEQiB3aWxsIG5vdCB1c2UgdGhpcyBtZWNoYW5pc20gaWYKPiBpdCBjYW4n
+dCBhY2Nlc3MgdGhlIG1lbW9yeSB0byB3cml0ZSB0aGUgYnJlYWtwb2ludC4KPgo+IEFsbCB0aGUg
+a2VybmVsIGhhcyB0byBkbyBpcyBlbnN1cmUgdGhlIGh5cGVydmlzb3IgdHJhcHMgdGhlIGJyZWFr
+cG9pbnQKPiBleGNlcHRpb25zIGFuZCByZXR1cm5zIHRvIHVzZXJzcGFjZS4KPgo+IFNpZ25lZC1v
+ZmYtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KPgo+IC0tCj4gdjIK
+PiAgIC0gaGFuZGxlIGRlYnVnIGV4aXQgd2l0aCBuZXcgaHNyIGV4Y2VwdGlvbiBpbmZvCj4gICAt
+IGFkZCB2ZXJib3NpdHkgdG8gVU5JTVAgbWVzc2FnZQo+Cj4gZGlmZiAtLWdpdCBhL3RhcmdldC1h
+cm0va3ZtLmMgYi90YXJnZXQtYXJtL2t2bS5jCj4gaW5kZXggNzJjMWZhMS4uMjkwYzFmZSAxMDA2
+NDQKPiAtLS0gYS90YXJnZXQtYXJtL2t2bS5jCj4gKysrIGIvdGFyZ2V0LWFybS9rdm0uYwo+IEBA
+IC0yNSw2ICsyNSw3IEBACj4gICNpbmNsdWRlICJody9hcm0vYXJtLmgiCj4KPiAgY29uc3QgS1ZN
+Q2FwYWJpbGl0eUluZm8ga3ZtX2FyY2hfcmVxdWlyZWRfY2FwYWJpbGl0aWVzW10gPSB7Cj4gKyAg
+ICBLVk1fQ0FQX0lORk8oU0VUX0dVRVNUX0RFQlVHKSwKPiAgICAgIEtWTV9DQVBfTEFTVF9JTkZP
+Cj4gIH07CgpEb2Vzbid0IHRoaXMgbWVhbiB3ZSdsbCBzdWRkZW5seSBzdG9wIHdvcmtpbmcgb24g
+b2xkZXIKa2VybmVscyB0aGF0IGRpZG4ndCBpbXBsZW1lbnQgdGhpcyBjYXBhYmlsaXR5PyBJdCB3
+b3VsZCBiZQpuaWNlciB0byBtZXJlbHkgZGlzYWJsZSB0aGUgYnJlYWtwb2ludC9kZWJ1ZyBzdXBw
+b3J0LCByYXRoZXIKdGhhbiByZWZ1c2UgdG8gcnVuIGF0IGFsbC4uLgoKPiBAQCAtNDY2LDkgKzQ2
+Nyw1NyBAQCB2b2lkIGt2bV9hcmNoX3Bvc3RfcnVuKENQVVN0YXRlICpjcywgc3RydWN0IGt2bV9y
+dW4gKnJ1bikKPiAgewo+ICB9Cj4KPiArLyogU2VlIEFSTSBBUk0gRDcuMi4yNyBFU1JfRUx4LCBF
+eGNlcHRpb24gU3luZHJvbWUgUmVnaXN0ZXIKCllvdSBzaG91bGQgcHJvYmFibHkgc2F5ICd2OCBB
+Uk0gQVJNJy4KCj4gKyoqCj4gKyoqIFRvIG1pbmltaXNlIHRyYW5zbGF0aW5nIGJldHdlZW4ga2Vy
+bmVsIGFuZCB1c2VyLXNwYWNlIHRoZSBrZXJuZWwKPiArKiogQUJJIGp1c3QgcHJvdmlkZXMgdXNl
+ci1zcGFjZSB3aXRoIHRoZSBmdWxsIGV4Y2VwdGlvbiBzeW5kcm9tZQo+ICsqKiByZWdpc3RlciB2
+YWx1ZSB0byBiZSBkZWNvZGVkIGluIFFFTVUuCgpXaGF0J3Mgd2l0aCB0aGUgd2VpcmQgJyoqJyBj
+b21tZW50IGZvcm1hdD8KCj4gKyovCj4gKwo+ICsjZGVmaW5lIEhTUl9FQ19TSElGVCAgICAgICAg
+ICAgIDI2Cj4gKyNkZWZpbmUgSFNSX0VDX1NXX0JLUFQgICAgICAgICAgMHgzYwo+ICsKPiArc3Rh
+dGljIGludCBrdm1faGFuZGxlX2RlYnVnKENQVVN0YXRlICpjcywgc3RydWN0IGt2bV9ydW4gKnJ1
+bikKPiArewo+ICsgICAgc3RydWN0IGt2bV9kZWJ1Z19leGl0X2FyY2ggKmFyY2hfaW5mbyA9ICZy
+dW4tPmRlYnVnLmFyY2g7Cj4gKyAgICBpbnQgaHNyX2VjID0gYXJjaF9pbmZvLT5oc3IgPj4gSFNS
+X0VDX1NISUZUOwo+ICsKPiArICAgIHN3aXRjaCAoaHNyX2VjKSB7Cj4gKyAgICBjYXNlIEhTUl9F
+Q19TV19CS1BUOgo+ICsgICAgICAgIGlmIChrdm1fZmluZF9zd19icmVha3BvaW50KGNzLCBhcmNo
+X2luZm8tPnBjKSkgewo+ICsgICAgICAgICAgICByZXR1cm4gdHJ1ZTsKPiArICAgICAgICB9Cj4g
+KyAgICAgICAgYnJlYWs7Cj4gKyAgICBkZWZhdWx0Ogo+ICsgICAgICAgIGVycm9yX3JlcG9ydCgi
+JXM6IHVuaGFuZGxlZCBkZWJ1ZyBleGl0ICgleCwgJWxseClcbiIsCj4gKyAgICAgICAgICAgICAg
+ICAgICAgIF9fZnVuY19fLCBhcmNoX2luZm8tPmhzciwgYXJjaF9pbmZvLT5wYyk7CgpJcyB0aGlz
+IGludGVuZGVkIHRvIGJlIGEgImNhbid0IGhhcHBlbiIgY2FzZSwgb3IgaXMgaXQgc29tZXRoaW5n
+CmEgZ3Vlc3QgY2FuIHRyaWdnZXI/Cgo+ICsgICAgfQo+ICsKPiArICAgIC8qIElmIHdlIGRvbid0
+IGhhbmRsZSB0aGlzIGl0IGNvdWxkIGJlIGl0IHJlYWxseSBpcyBmb3IgdGhlCj4gKyAgICAgICBn
+dWVzdCB0byBoYW5kbGUgKi8KCihzdWJvcHRpbWFsIG11bHRpbGluZSBjb21tZW50IGZvcm1hdCkK
+Cj4gKyAgICBxZW11X2xvZ19tYXNrKExPR19VTklNUCwKPiArICAgICAgICAgICAgICAgICAgIiVz
+OiByZS1pbmplY3RpbmcgZXhjZXB0aW9uIG5vdCB5ZXQgaW1wbGVtZW50ZWQgKDB4JXgsICVsbHgp
+XG4iLAo+ICsgICAgICAgICAgICAgICAgICBfX2Z1bmNfXywgaHNyX2VjLCBhcmNoX2luZm8tPnBj
+KTsKCldoZW4gZG9lcyB0aGlzIGhhcHBlbj8gR3Vlc3QgdXNlcnNwYWNlIHByb2dyYW0gaGl0cyBh
+IGhhcmRjb2RlZApicmVha3BvaW50IGluc24gd2hpbGUgd2UncmUgdHJ5aW5nIHRvIGRlYnVnIHRo
+ZSBWTT8KCklmIHdlIGp1c3QgcmV0dXJuIHRvIHRoZSBndWVzdCBpbiB0aGF0IHNpdHVhdGlvbiB3
+aWxsIHdlCnRyeSB0byByZS1leGVjdXRlIHRoZSBia3B0IGluc24gYW5kIGxvb3Agcm91bmQgdGFr
+aW5nCmV4Y2VwdGlvbnMgZm9yZXZlcj8KCj4gKwo+ICsgICAgcmV0dXJuIGZhbHNlOwo+ICt9Cj4g
+Kwo+ICBpbnQga3ZtX2FyY2hfaGFuZGxlX2V4aXQoQ1BVU3RhdGUgKmNzLCBzdHJ1Y3Qga3ZtX3J1
+biAqcnVuKQo+ICB7Cj4gLSAgICByZXR1cm4gMDsKPiArICAgIGludCByZXQgPSAwOwo+ICsKPiAr
+ICAgIHN3aXRjaCAocnVuLT5leGl0X3JlYXNvbikgewo+ICsgICAgY2FzZSBLVk1fRVhJVF9ERUJV
+RzoKPiArICAgICAgICBpZiAoa3ZtX2hhbmRsZV9kZWJ1ZyhjcywgcnVuKSkgewo+ICsgICAgICAg
+ICAgICByZXQgPSBFWENQX0RFQlVHOwo+ICsgICAgICAgIH0gLyogb3RoZXJ3aXNlIHJldHVybiB0
+byBndWVzdCAqLwo+ICsgICAgICAgIGJyZWFrOwo+ICsgICAgZGVmYXVsdDoKPiArICAgICAgICBx
+ZW11X2xvZ19tYXNrKExPR19VTklNUCwgIiVzOiB1bi1oYW5kbGVkIGV4aXQgcmVhc29uICVkXG4i
+LAo+ICsgICAgICAgICAgICAgICAgICAgICAgX19mdW5jX18sIHJ1bi0+ZXhpdF9yZWFzb24pOwo+
+ICsgICAgICAgIGJyZWFrOwo+ICsgICAgfQo+ICsgICAgcmV0dXJuIHJldDsKPiAgfQo+Cj4gIGJv
+b2wga3ZtX2FyY2hfc3RvcF9vbl9lbXVsYXRpb25fZXJyb3IoQ1BVU3RhdGUgKmNzKQo+IEBAIC00
+OTMsMTQgKzU0MiwzMyBAQCBpbnQga3ZtX2FyY2hfb25fc2lnYnVzKGludCBjb2RlLCB2b2lkICph
+ZGRyKQo+Cj4gIHZvaWQga3ZtX2FyY2hfdXBkYXRlX2d1ZXN0X2RlYnVnKENQVVN0YXRlICpjcywg
+c3RydWN0IGt2bV9ndWVzdF9kZWJ1ZyAqZGJnKQo+ICB7Cj4gLSAgICBxZW11X2xvZ19tYXNrKExP
+R19VTklNUCwgIiVzOiBub3QgaW1wbGVtZW50ZWRcbiIsIF9fZnVuY19fKTsKPiArICAgIGlmIChr
+dm1fc3dfYnJlYWtwb2ludHNfYWN0aXZlKGNzKSkgewo+ICsgICAgICAgIGRiZy0+Y29udHJvbCB8
+PSBLVk1fR1VFU1REQkdfRU5BQkxFIHwgS1ZNX0dVRVNUREJHX1VTRV9TV19CUDsKPiArICAgIH0K
+PiAgfQo+Cj4gLWludCBrdm1fYXJjaF9pbnNlcnRfc3dfYnJlYWtwb2ludChDUFVTdGF0ZSAqY3Ms
+Cj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3Qga3ZtX3N3X2JyZWFr
+cG9pbnQgKmJwKQo+ICsvKiBDNi42LjI5IEJSSyBpbnN0cnVjdGlvbiAqLwoKVGhpcyBjb21tZW50
+IHdvdWxkIGJlIGJldHRlciBwbGFjZWQgbmV4dCB0byB0aGUgbWFnaWMgbnVtYmVyIGl0J3MKZXhw
+bGFpbmluZy4KCj4gK2ludCBrdm1fYXJjaF9pbnNlcnRfc3dfYnJlYWtwb2ludChDUFVTdGF0ZSAq
+Y3MsIHN0cnVjdCBrdm1fc3dfYnJlYWtwb2ludCAqYnApCj4gIHsKPiAtICAgIHFlbXVfbG9nX21h
+c2soTE9HX1VOSU1QLCAiJXM6IG5vdCBpbXBsZW1lbnRlZFxuIiwgX19mdW5jX18pOwo+IC0gICAg
+cmV0dXJuIC1FSU5WQUw7Cj4gKyAgICBzdGF0aWMgY29uc3QgdWludDMyX3QgYnJrID0gMHhkNDIw
+MDAwMDsKPiArCj4gKyAgICBpZiAoY3B1X21lbW9yeV9yd19kZWJ1ZyhjcywgYnAtPnBjLCAodWlu
+dDhfdCAqKSZicC0+c2F2ZWRfaW5zbiwgNCwgMCkgfHwKPiArICAgICAgICBjcHVfbWVtb3J5X3J3
+X2RlYnVnKGNzLCBicC0+cGMsICh1aW50OF90ICopJmJyaywgNCwgMSkpIHsKCkRvZXMgdGhpcyB3
+b3JrIGNvcnJlY3RseSBmb3IgYmlnLWVuZGlhbiBob3N0cz8KCj4gKyAgICAgICAgcmV0dXJuIC1F
+SU5WQUw7Cj4gKyAgICB9Cj4gKyAgICByZXR1cm4gMDsKPiArfQo+ICsKPiAraW50IGt2bV9hcmNo
+X3JlbW92ZV9zd19icmVha3BvaW50KENQVVN0YXRlICpjcywgc3RydWN0IGt2bV9zd19icmVha3Bv
+aW50ICpicCkKPiArewo+ICsgICAgc3RhdGljIHVpbnQzMl90IGJyazsKPiArCj4gKyAgICBpZiAo
+Y3B1X21lbW9yeV9yd19kZWJ1ZyhjcywgYnAtPnBjLCAodWludDhfdCAqKSZicmssIDQsIDApIHx8
+Cj4gKyAgICAgICAgYnJrICE9IDB4ZDQyMDAwMDAgfHwKCklmIHlvdSdyZSBnb2luZyB0byB1c2Ug
+dGhpcyBtYWdpYyBudW1iZXIgdHdpY2UgcGxlYXNlIG5hbWUgaXQuLi4KCj4gKyAgICAgICAgY3B1
+X21lbW9yeV9yd19kZWJ1ZyhjcywgYnAtPnBjLCAodWludDhfdCAqKSZicC0+c2F2ZWRfaW5zbiwg
+NCwgMSkpIHsKPiArICAgICAgICByZXR1cm4gLUVJTlZBTDsKPiArICAgIH0KPiArICAgIHJldHVy
+biAwOwo+ICB9Cj4KPiAgaW50IGt2bV9hcmNoX2luc2VydF9od19icmVha3BvaW50KHRhcmdldF91
+bG9uZyBhZGRyLAo+IEBAIC01MTcsMTIgKzU4NSw2IEBAIGludCBrdm1fYXJjaF9yZW1vdmVfaHdf
+YnJlYWtwb2ludCh0YXJnZXRfdWxvbmcgYWRkciwKPiAgICAgIHJldHVybiAtRUlOVkFMOwo+ICB9
+Cj4KPiAtaW50IGt2bV9hcmNoX3JlbW92ZV9zd19icmVha3BvaW50KENQVVN0YXRlICpjcywKPiAt
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cnVjdCBrdm1fc3dfYnJlYWtwb2lu
+dCAqYnApCj4gLXsKPiAtICAgIHFlbXVfbG9nX21hc2soTE9HX1VOSU1QLCAiJXM6IG5vdCBpbXBs
+ZW1lbnRlZFxuIiwgX19mdW5jX18pOwo+IC0gICAgcmV0dXJuIC1FSU5WQUw7Cj4gLX0KPgo+ICB2
+b2lkIGt2bV9hcmNoX3JlbW92ZV9hbGxfaHdfYnJlYWtwb2ludHModm9pZCkKPiAgewo+IC0tCj4g
+Mi4zLjQKPgoKdGhhbmtzCi0tIFBNTQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
+YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
+cm0K
