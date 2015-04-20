@@ -1,134 +1,84 @@
 From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2 2/4] target-arm: kvm - implement software breakpoints
-Date: Mon, 20 Apr 2015 20:44:14 +0100
-Message-ID: <CAFEAcA9Tgv6jXnVhiNbbm_2aAdPQSvxDV2J5xTGzLLOMHLsvEw@mail.gmail.com>
-References: <1427816446-31586-1-git-send-email-alex.bennee@linaro.org>
- <1427816446-31586-3-git-send-email-alex.bennee@linaro.org>
+Subject: Re: [PATCH v2 3/4] target-arm: kvm - support for single step
+Date: Mon, 20 Apr 2015 20:49:02 +0100
+Message-ID: <CAFEAcA_dqx-78AoGiHViv_tMCDkSd7Uf2GpUz+uBm5QbgX0nvg@mail.gmail.com>
+References: <1427816446-31586-1-git-send-email-alex.bennee@linaro.org> <1427816446-31586-4-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E3E874E22A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2015 15:36:29 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kpFMvFJH6cea for <kvmarm@lists.cs.columbia.edu>;
- Mon, 20 Apr 2015 15:36:28 -0400 (EDT)
-Received: from mail-ig0-f175.google.com (mail-ig0-f175.google.com
- [209.85.213.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6A9994E21E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2015 15:36:28 -0400 (EDT)
-Received: by igblo3 with SMTP id lo3so68686720igb.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Apr 2015 12:44:34 -0700 (PDT)
-In-Reply-To: <1427816446-31586-3-git-send-email-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1427816446-31586-4-git-send-email-alex.bennee@linaro.org>
+Sender: kvm-owner@vger.kernel.org
 To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Zhichao Huang <zhichao.huang@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, Zhichao Huang <zhichao.huang@linaro.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMzEgTWFyY2ggMjAxNSBhdCAxNjo0MCwgQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5h
-cm8ub3JnPiB3cm90ZToKPiBUaGVzZSBkb24ndCBpbnZvbHZlIG1lc3NpbmcgYXJvdW5kIHdpdGgg
-ZGVidWcgcmVnaXN0ZXJzLCBqdXN0IHNldHRpbmcKPiB0aGUgYnJlYWtwb2ludCBpbnN0cnVjdGlv
-biBpbiBtZW1vcnkuIEdEQiB3aWxsIG5vdCB1c2UgdGhpcyBtZWNoYW5pc20gaWYKPiBpdCBjYW4n
-dCBhY2Nlc3MgdGhlIG1lbW9yeSB0byB3cml0ZSB0aGUgYnJlYWtwb2ludC4KPgo+IEFsbCB0aGUg
-a2VybmVsIGhhcyB0byBkbyBpcyBlbnN1cmUgdGhlIGh5cGVydmlzb3IgdHJhcHMgdGhlIGJyZWFr
-cG9pbnQKPiBleGNlcHRpb25zIGFuZCByZXR1cm5zIHRvIHVzZXJzcGFjZS4KPgo+IFNpZ25lZC1v
-ZmYtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KPgo+IC0tCj4gdjIK
-PiAgIC0gaGFuZGxlIGRlYnVnIGV4aXQgd2l0aCBuZXcgaHNyIGV4Y2VwdGlvbiBpbmZvCj4gICAt
-IGFkZCB2ZXJib3NpdHkgdG8gVU5JTVAgbWVzc2FnZQo+Cj4gZGlmZiAtLWdpdCBhL3RhcmdldC1h
-cm0va3ZtLmMgYi90YXJnZXQtYXJtL2t2bS5jCj4gaW5kZXggNzJjMWZhMS4uMjkwYzFmZSAxMDA2
-NDQKPiAtLS0gYS90YXJnZXQtYXJtL2t2bS5jCj4gKysrIGIvdGFyZ2V0LWFybS9rdm0uYwo+IEBA
-IC0yNSw2ICsyNSw3IEBACj4gICNpbmNsdWRlICJody9hcm0vYXJtLmgiCj4KPiAgY29uc3QgS1ZN
-Q2FwYWJpbGl0eUluZm8ga3ZtX2FyY2hfcmVxdWlyZWRfY2FwYWJpbGl0aWVzW10gPSB7Cj4gKyAg
-ICBLVk1fQ0FQX0lORk8oU0VUX0dVRVNUX0RFQlVHKSwKPiAgICAgIEtWTV9DQVBfTEFTVF9JTkZP
-Cj4gIH07CgpEb2Vzbid0IHRoaXMgbWVhbiB3ZSdsbCBzdWRkZW5seSBzdG9wIHdvcmtpbmcgb24g
-b2xkZXIKa2VybmVscyB0aGF0IGRpZG4ndCBpbXBsZW1lbnQgdGhpcyBjYXBhYmlsaXR5PyBJdCB3
-b3VsZCBiZQpuaWNlciB0byBtZXJlbHkgZGlzYWJsZSB0aGUgYnJlYWtwb2ludC9kZWJ1ZyBzdXBw
-b3J0LCByYXRoZXIKdGhhbiByZWZ1c2UgdG8gcnVuIGF0IGFsbC4uLgoKPiBAQCAtNDY2LDkgKzQ2
-Nyw1NyBAQCB2b2lkIGt2bV9hcmNoX3Bvc3RfcnVuKENQVVN0YXRlICpjcywgc3RydWN0IGt2bV9y
-dW4gKnJ1bikKPiAgewo+ICB9Cj4KPiArLyogU2VlIEFSTSBBUk0gRDcuMi4yNyBFU1JfRUx4LCBF
-eGNlcHRpb24gU3luZHJvbWUgUmVnaXN0ZXIKCllvdSBzaG91bGQgcHJvYmFibHkgc2F5ICd2OCBB
-Uk0gQVJNJy4KCj4gKyoqCj4gKyoqIFRvIG1pbmltaXNlIHRyYW5zbGF0aW5nIGJldHdlZW4ga2Vy
-bmVsIGFuZCB1c2VyLXNwYWNlIHRoZSBrZXJuZWwKPiArKiogQUJJIGp1c3QgcHJvdmlkZXMgdXNl
-ci1zcGFjZSB3aXRoIHRoZSBmdWxsIGV4Y2VwdGlvbiBzeW5kcm9tZQo+ICsqKiByZWdpc3RlciB2
-YWx1ZSB0byBiZSBkZWNvZGVkIGluIFFFTVUuCgpXaGF0J3Mgd2l0aCB0aGUgd2VpcmQgJyoqJyBj
-b21tZW50IGZvcm1hdD8KCj4gKyovCj4gKwo+ICsjZGVmaW5lIEhTUl9FQ19TSElGVCAgICAgICAg
-ICAgIDI2Cj4gKyNkZWZpbmUgSFNSX0VDX1NXX0JLUFQgICAgICAgICAgMHgzYwo+ICsKPiArc3Rh
-dGljIGludCBrdm1faGFuZGxlX2RlYnVnKENQVVN0YXRlICpjcywgc3RydWN0IGt2bV9ydW4gKnJ1
-bikKPiArewo+ICsgICAgc3RydWN0IGt2bV9kZWJ1Z19leGl0X2FyY2ggKmFyY2hfaW5mbyA9ICZy
-dW4tPmRlYnVnLmFyY2g7Cj4gKyAgICBpbnQgaHNyX2VjID0gYXJjaF9pbmZvLT5oc3IgPj4gSFNS
-X0VDX1NISUZUOwo+ICsKPiArICAgIHN3aXRjaCAoaHNyX2VjKSB7Cj4gKyAgICBjYXNlIEhTUl9F
-Q19TV19CS1BUOgo+ICsgICAgICAgIGlmIChrdm1fZmluZF9zd19icmVha3BvaW50KGNzLCBhcmNo
-X2luZm8tPnBjKSkgewo+ICsgICAgICAgICAgICByZXR1cm4gdHJ1ZTsKPiArICAgICAgICB9Cj4g
-KyAgICAgICAgYnJlYWs7Cj4gKyAgICBkZWZhdWx0Ogo+ICsgICAgICAgIGVycm9yX3JlcG9ydCgi
-JXM6IHVuaGFuZGxlZCBkZWJ1ZyBleGl0ICgleCwgJWxseClcbiIsCj4gKyAgICAgICAgICAgICAg
-ICAgICAgIF9fZnVuY19fLCBhcmNoX2luZm8tPmhzciwgYXJjaF9pbmZvLT5wYyk7CgpJcyB0aGlz
-IGludGVuZGVkIHRvIGJlIGEgImNhbid0IGhhcHBlbiIgY2FzZSwgb3IgaXMgaXQgc29tZXRoaW5n
-CmEgZ3Vlc3QgY2FuIHRyaWdnZXI/Cgo+ICsgICAgfQo+ICsKPiArICAgIC8qIElmIHdlIGRvbid0
-IGhhbmRsZSB0aGlzIGl0IGNvdWxkIGJlIGl0IHJlYWxseSBpcyBmb3IgdGhlCj4gKyAgICAgICBn
-dWVzdCB0byBoYW5kbGUgKi8KCihzdWJvcHRpbWFsIG11bHRpbGluZSBjb21tZW50IGZvcm1hdCkK
-Cj4gKyAgICBxZW11X2xvZ19tYXNrKExPR19VTklNUCwKPiArICAgICAgICAgICAgICAgICAgIiVz
-OiByZS1pbmplY3RpbmcgZXhjZXB0aW9uIG5vdCB5ZXQgaW1wbGVtZW50ZWQgKDB4JXgsICVsbHgp
-XG4iLAo+ICsgICAgICAgICAgICAgICAgICBfX2Z1bmNfXywgaHNyX2VjLCBhcmNoX2luZm8tPnBj
-KTsKCldoZW4gZG9lcyB0aGlzIGhhcHBlbj8gR3Vlc3QgdXNlcnNwYWNlIHByb2dyYW0gaGl0cyBh
-IGhhcmRjb2RlZApicmVha3BvaW50IGluc24gd2hpbGUgd2UncmUgdHJ5aW5nIHRvIGRlYnVnIHRo
-ZSBWTT8KCklmIHdlIGp1c3QgcmV0dXJuIHRvIHRoZSBndWVzdCBpbiB0aGF0IHNpdHVhdGlvbiB3
-aWxsIHdlCnRyeSB0byByZS1leGVjdXRlIHRoZSBia3B0IGluc24gYW5kIGxvb3Agcm91bmQgdGFr
-aW5nCmV4Y2VwdGlvbnMgZm9yZXZlcj8KCj4gKwo+ICsgICAgcmV0dXJuIGZhbHNlOwo+ICt9Cj4g
-Kwo+ICBpbnQga3ZtX2FyY2hfaGFuZGxlX2V4aXQoQ1BVU3RhdGUgKmNzLCBzdHJ1Y3Qga3ZtX3J1
-biAqcnVuKQo+ICB7Cj4gLSAgICByZXR1cm4gMDsKPiArICAgIGludCByZXQgPSAwOwo+ICsKPiAr
-ICAgIHN3aXRjaCAocnVuLT5leGl0X3JlYXNvbikgewo+ICsgICAgY2FzZSBLVk1fRVhJVF9ERUJV
-RzoKPiArICAgICAgICBpZiAoa3ZtX2hhbmRsZV9kZWJ1ZyhjcywgcnVuKSkgewo+ICsgICAgICAg
-ICAgICByZXQgPSBFWENQX0RFQlVHOwo+ICsgICAgICAgIH0gLyogb3RoZXJ3aXNlIHJldHVybiB0
-byBndWVzdCAqLwo+ICsgICAgICAgIGJyZWFrOwo+ICsgICAgZGVmYXVsdDoKPiArICAgICAgICBx
-ZW11X2xvZ19tYXNrKExPR19VTklNUCwgIiVzOiB1bi1oYW5kbGVkIGV4aXQgcmVhc29uICVkXG4i
-LAo+ICsgICAgICAgICAgICAgICAgICAgICAgX19mdW5jX18sIHJ1bi0+ZXhpdF9yZWFzb24pOwo+
-ICsgICAgICAgIGJyZWFrOwo+ICsgICAgfQo+ICsgICAgcmV0dXJuIHJldDsKPiAgfQo+Cj4gIGJv
-b2wga3ZtX2FyY2hfc3RvcF9vbl9lbXVsYXRpb25fZXJyb3IoQ1BVU3RhdGUgKmNzKQo+IEBAIC00
-OTMsMTQgKzU0MiwzMyBAQCBpbnQga3ZtX2FyY2hfb25fc2lnYnVzKGludCBjb2RlLCB2b2lkICph
-ZGRyKQo+Cj4gIHZvaWQga3ZtX2FyY2hfdXBkYXRlX2d1ZXN0X2RlYnVnKENQVVN0YXRlICpjcywg
-c3RydWN0IGt2bV9ndWVzdF9kZWJ1ZyAqZGJnKQo+ICB7Cj4gLSAgICBxZW11X2xvZ19tYXNrKExP
-R19VTklNUCwgIiVzOiBub3QgaW1wbGVtZW50ZWRcbiIsIF9fZnVuY19fKTsKPiArICAgIGlmIChr
-dm1fc3dfYnJlYWtwb2ludHNfYWN0aXZlKGNzKSkgewo+ICsgICAgICAgIGRiZy0+Y29udHJvbCB8
-PSBLVk1fR1VFU1REQkdfRU5BQkxFIHwgS1ZNX0dVRVNUREJHX1VTRV9TV19CUDsKPiArICAgIH0K
-PiAgfQo+Cj4gLWludCBrdm1fYXJjaF9pbnNlcnRfc3dfYnJlYWtwb2ludChDUFVTdGF0ZSAqY3Ms
-Cj4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3Qga3ZtX3N3X2JyZWFr
-cG9pbnQgKmJwKQo+ICsvKiBDNi42LjI5IEJSSyBpbnN0cnVjdGlvbiAqLwoKVGhpcyBjb21tZW50
-IHdvdWxkIGJlIGJldHRlciBwbGFjZWQgbmV4dCB0byB0aGUgbWFnaWMgbnVtYmVyIGl0J3MKZXhw
-bGFpbmluZy4KCj4gK2ludCBrdm1fYXJjaF9pbnNlcnRfc3dfYnJlYWtwb2ludChDUFVTdGF0ZSAq
-Y3MsIHN0cnVjdCBrdm1fc3dfYnJlYWtwb2ludCAqYnApCj4gIHsKPiAtICAgIHFlbXVfbG9nX21h
-c2soTE9HX1VOSU1QLCAiJXM6IG5vdCBpbXBsZW1lbnRlZFxuIiwgX19mdW5jX18pOwo+IC0gICAg
-cmV0dXJuIC1FSU5WQUw7Cj4gKyAgICBzdGF0aWMgY29uc3QgdWludDMyX3QgYnJrID0gMHhkNDIw
-MDAwMDsKPiArCj4gKyAgICBpZiAoY3B1X21lbW9yeV9yd19kZWJ1ZyhjcywgYnAtPnBjLCAodWlu
-dDhfdCAqKSZicC0+c2F2ZWRfaW5zbiwgNCwgMCkgfHwKPiArICAgICAgICBjcHVfbWVtb3J5X3J3
-X2RlYnVnKGNzLCBicC0+cGMsICh1aW50OF90ICopJmJyaywgNCwgMSkpIHsKCkRvZXMgdGhpcyB3
-b3JrIGNvcnJlY3RseSBmb3IgYmlnLWVuZGlhbiBob3N0cz8KCj4gKyAgICAgICAgcmV0dXJuIC1F
-SU5WQUw7Cj4gKyAgICB9Cj4gKyAgICByZXR1cm4gMDsKPiArfQo+ICsKPiAraW50IGt2bV9hcmNo
-X3JlbW92ZV9zd19icmVha3BvaW50KENQVVN0YXRlICpjcywgc3RydWN0IGt2bV9zd19icmVha3Bv
-aW50ICpicCkKPiArewo+ICsgICAgc3RhdGljIHVpbnQzMl90IGJyazsKPiArCj4gKyAgICBpZiAo
-Y3B1X21lbW9yeV9yd19kZWJ1ZyhjcywgYnAtPnBjLCAodWludDhfdCAqKSZicmssIDQsIDApIHx8
-Cj4gKyAgICAgICAgYnJrICE9IDB4ZDQyMDAwMDAgfHwKCklmIHlvdSdyZSBnb2luZyB0byB1c2Ug
-dGhpcyBtYWdpYyBudW1iZXIgdHdpY2UgcGxlYXNlIG5hbWUgaXQuLi4KCj4gKyAgICAgICAgY3B1
-X21lbW9yeV9yd19kZWJ1ZyhjcywgYnAtPnBjLCAodWludDhfdCAqKSZicC0+c2F2ZWRfaW5zbiwg
-NCwgMSkpIHsKPiArICAgICAgICByZXR1cm4gLUVJTlZBTDsKPiArICAgIH0KPiArICAgIHJldHVy
-biAwOwo+ICB9Cj4KPiAgaW50IGt2bV9hcmNoX2luc2VydF9od19icmVha3BvaW50KHRhcmdldF91
-bG9uZyBhZGRyLAo+IEBAIC01MTcsMTIgKzU4NSw2IEBAIGludCBrdm1fYXJjaF9yZW1vdmVfaHdf
-YnJlYWtwb2ludCh0YXJnZXRfdWxvbmcgYWRkciwKPiAgICAgIHJldHVybiAtRUlOVkFMOwo+ICB9
-Cj4KPiAtaW50IGt2bV9hcmNoX3JlbW92ZV9zd19icmVha3BvaW50KENQVVN0YXRlICpjcywKPiAt
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0cnVjdCBrdm1fc3dfYnJlYWtwb2lu
-dCAqYnApCj4gLXsKPiAtICAgIHFlbXVfbG9nX21hc2soTE9HX1VOSU1QLCAiJXM6IG5vdCBpbXBs
-ZW1lbnRlZFxuIiwgX19mdW5jX18pOwo+IC0gICAgcmV0dXJuIC1FSU5WQUw7Cj4gLX0KPgo+ICB2
-b2lkIGt2bV9hcmNoX3JlbW92ZV9hbGxfaHdfYnJlYWtwb2ludHModm9pZCkKPiAgewo+IC0tCj4g
-Mi4zLjQKPgoKdGhhbmtzCi0tIFBNTQpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
-YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
-cm0K
+On 31 March 2015 at 16:40, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
+ote:
+> This adds support for single-step. There isn't much to do on the QEMU
+> side as after we set-up the request for single step via the debug ioc=
+tl
+> it is all handled within the kernel.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> ---
+> v2
+>   - convert to using HSR_EC
+>
+> diff --git a/target-arm/kvm.c b/target-arm/kvm.c
+> index 290c1fe..ae0f8b2 100644
+> --- a/target-arm/kvm.c
+> +++ b/target-arm/kvm.c
+> @@ -475,6 +475,7 @@ void kvm_arch_post_run(CPUState *cs, struct kvm_r=
+un *run)
+>  */
+>
+>  #define HSR_EC_SHIFT            26
+> +#define HSR_EC_SOFT_STEP        0x32
+>  #define HSR_EC_SW_BKPT          0x3c
+
+We already include internals.h in this file, so can you just use
+the EC_* constants and ARM_EL_EC_SHIFT rather than defining
+new ones? (Applies for patch 1 as well.)
+
+>  static int kvm_handle_debug(CPUState *cs, struct kvm_run *run)
+> @@ -483,6 +484,13 @@ static int kvm_handle_debug(CPUState *cs, struct=
+ kvm_run *run)
+>      int hsr_ec =3D arch_info->hsr >> HSR_EC_SHIFT;
+>
+>      switch (hsr_ec) {
+> +    case HSR_EC_SOFT_STEP:
+> +        if (cs->singlestep_enabled) {
+> +            return true;
+> +        } else {
+> +            error_report("Came out of SINGLE STEP when not enabled")=
+;
+
+This can only happen if there's a kernel bug, right?
+
+> +        }
+> +        break;
+>      case HSR_EC_SW_BKPT:
+>          if (kvm_find_sw_breakpoint(cs, arch_info->pc)) {
+>              return true;
+> @@ -542,6 +550,9 @@ int kvm_arch_on_sigbus(int code, void *addr)
+>
+>  void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debu=
+g *dbg)
+>  {
+> +    if (cs->singlestep_enabled) {
+> +        dbg->control |=3D KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_SINGLES=
+TEP;
+> +    }
+>      if (kvm_sw_breakpoints_active(cs)) {
+>          dbg->control |=3D KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_=
+BP;
+>      }
+> --
+> 2.3.4
+>
+
+
+thanks
+-- PMM
