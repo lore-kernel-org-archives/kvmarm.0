@@ -1,24 +1,24 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH 1/2] irq: add get_gsi callback
-Date: Thu, 23 Apr 2015 09:49:36 +0100
-Message-ID: <1429778977-1632-2-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH 2/2] intc: arm_gic_kvm: set the get_gsi callback
+Date: Thu, 23 Apr 2015 09:49:37 +0100
+Message-ID: <1429778977-1632-3-git-send-email-eric.auger@linaro.org>
 References: <1429778977-1632-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 869EC4E4CF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2015 04:41:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 426584E4CE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2015 04:41:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oJBieynLWY1p for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Apr 2015 04:41:33 -0400 (EDT)
-Received: from mail-wg0-f50.google.com (mail-wg0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 91B244E4CE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2015 04:41:33 -0400 (EDT)
-Received: by wgso17 with SMTP id o17so10940248wgs.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2015 01:49:45 -0700 (PDT)
+ with ESMTP id 25Ar8jr23SoS for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Apr 2015 04:41:34 -0400 (EDT)
+Received: from mail-wg0-f49.google.com (mail-wg0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 531C74E4D0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2015 04:41:34 -0400 (EDT)
+Received: by wgyo15 with SMTP id o15so10885548wgy.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2015 01:49:46 -0700 (PDT)
 In-Reply-To: <1429778977-1632-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,80 +33,42 @@ To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, alex.willia
 Cc: kvmarm@lists.cs.columbia.edu, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a new IRQState get_gsi_cb field, corresponding to a callback
-that transforms the interrupt controller pin number into a global
-system interrupt number.
-
-A setter is introduced for the interrupt controller to populate the
-callback. Also add a public function that calls this callback.
+The arm_gic_kvm now sets the get_gsi_cb callback so that the
+global system interrupt of a qemu_irq can be retrieved. This enables
+VFIO platform signaling to be setup.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 ---
- hw/core/irq.c    | 20 ++++++++++++++++++++
- include/hw/irq.h |  8 ++++++++
- 2 files changed, 28 insertions(+)
+ hw/intc/arm_gic_kvm.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/hw/core/irq.c b/hw/core/irq.c
-index 8a62a36..7eeb742 100644
---- a/hw/core/irq.c
-+++ b/hw/core/irq.c
-@@ -31,6 +31,7 @@ struct IRQState {
-     Object parent_obj;
- 
-     qemu_irq_handler handler;
-+    qemu_irq_get_gsi_t get_gsi_cb;
-     void *opaque;
-     int n;
- };
-@@ -144,6 +145,25 @@ void qemu_irq_intercept_in(qemu_irq *gpio_in, qemu_irq_handler handler, int n)
-     }
+diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
+index e1952ad..8a97a5b 100644
+--- a/hw/intc/arm_gic_kvm.c
++++ b/hw/intc/arm_gic_kvm.c
+@@ -87,6 +87,11 @@ static void kvm_arm_gic_set_irq(void *opaque, int irq, int level)
+     kvm_set_irq(kvm_state, kvm_irq, !!level);
  }
  
-+int qemu_irq_set_get_gsi_cb(qemu_irq irq, qemu_irq_get_gsi_t cb)
++static int kvm_gic_get_gsi(int pin)
 +{
-+    if (!irq) {
-+        return -ENXIO;
-+    }
-+
-+    irq->get_gsi_cb = cb;
-+    return 0;
++    return pin;
 +}
 +
-+int qemu_irq_get_gsi(qemu_irq irq)
-+{
-+    if (!irq) {
-+        return -ENXIO;
+ static bool kvm_arm_gic_can_save_restore(GICState *s)
+ {
+     return s->dev_fd >= 0;
+@@ -554,6 +559,11 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
+      */
+     i += (GIC_INTERNAL * s->num_cpu);
+     qdev_init_gpio_in(dev, kvm_arm_gic_set_irq, i);
++
++    for (i = 0; i < s->num_irq - GIC_INTERNAL; i++) {
++        qemu_irq irq = qdev_get_gpio_in(dev, i);
++        qemu_irq_set_get_gsi_cb(irq, kvm_gic_get_gsi);
 +    }
-+
-+    return irq->get_gsi_cb(irq->n);
-+}
-+
- static const TypeInfo irq_type_info = {
-    .name = TYPE_IRQ,
-    .parent = TYPE_OBJECT,
-diff --git a/include/hw/irq.h b/include/hw/irq.h
-index 4c4c2ea..658b8f2 100644
---- a/include/hw/irq.h
-+++ b/include/hw/irq.h
-@@ -8,6 +8,7 @@
- typedef struct IRQState *qemu_irq;
- 
- typedef void (*qemu_irq_handler)(void *opaque, int n, int level);
-+typedef int (*qemu_irq_get_gsi_t)(int pin);
- 
- void qemu_set_irq(qemu_irq irq, int level);
- 
-@@ -62,4 +63,11 @@ qemu_irq *qemu_irq_proxy(qemu_irq **target, int n);
-    on an existing vector of qemu_irq.  */
- void qemu_irq_intercept_in(qemu_irq *gpio_in, qemu_irq_handler handler, int n);
- 
-+/* sets the get_gsi callback (function that converts the interrupt
-+   controller pin into a global system interrupt number */
-+int qemu_irq_set_get_gsi_cb(qemu_irq irq,  qemu_irq_get_gsi_t cb);
-+
-+/* returns the gsi associated to a qemu_irq handle */
-+int qemu_irq_get_gsi(qemu_irq irq);
-+
- #endif
+     /* We never use our outbound IRQ lines but provide them so that
+      * we maintain the same interface as the non-KVM GIC.
+      */
 -- 
 1.8.3.2
