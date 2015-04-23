@@ -1,219 +1,49 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v11 0/4] machvirt dynamic sysbus device instantiation
-Date: Thu, 23 Apr 2015 17:17:41 +0200
-Message-ID: <55390D15.2060909@linaro.org>
-References: <1425485909-5091-1-git-send-email-eric.auger@linaro.org>
- <CAN9JPjHCMPeY=zouEd=aP_mGQriLfv7q4gTK0Y+DW2K76c9qyA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v2 1/2] kvm-all.c: add qemu_irq/gsi hash
+ table and utility routines
+Date: Thu, 23 Apr 2015 17:22:40 +0200
+Message-ID: <55390E40.5000503@redhat.com>
+References: <1429801716-8027-1-git-send-email-eric.auger@linaro.org>
+	<1429801716-8027-2-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A7F14E59D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2015 11:12:06 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tV3tmia5fg5C for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Apr 2015 11:12:05 -0400 (EDT)
-Received: from mail-wi0-f177.google.com (mail-wi0-f177.google.com
- [209.85.212.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 33BF94E59C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2015 11:12:04 -0400 (EDT)
-Received: by wizk4 with SMTP id k4so220191394wiz.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2015 08:20:17 -0700 (PDT)
-In-Reply-To: <CAN9JPjHCMPeY=zouEd=aP_mGQriLfv7q4gTK0Y+DW2K76c9qyA@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Baptiste Reynal <b.reynal@virtualopensystems.com>
-Cc: eric.auger@st.com, patches@linaro.org, qemu-devel@nongnu.org, pbonzini@redhat.com, kvm-arm <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
+Return-path: <qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org>
+In-Reply-To: <1429801716-8027-2-git-send-email-eric.auger@linaro.org>
+List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
+	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
+List-Archive: <http://lists.nongnu.org/archive/html/qemu-devel>
+List-Post: <mailto:qemu-devel@nongnu.org>
+List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
+List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
+	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Errors-To: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
+Sender: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
+To: Eric Auger <eric.auger@linaro.org>, eric.auger@st.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, agraf@suse.de
+Cc: alex.williamson@redhat.com, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Baptiste,
-
-Well I need to increase the size of the platform bus mmio and number of
-IRQs according to Alex' advice and hence move it after VIRTIO_MMIO for
-alignment reason. This is a small change I can carry out by tomorrow.
-
-Then Alex proposed to bind VIRT_MMIO to the platform bus. This sounds a
-bigger job and this requires me to better understand VIRTIO mechanics. I
-am afraid I cannot achieve this as quickly.
-
-Can't we envision to introduce that latter? I know the preferred way
-through would have been to freeze the platform bus base address but this
-introduces yet another dependency and overall acceptance is not guaranteed.
-
-Best Regards
-
-Eric
 
 
-On 04/23/2015 05:05 PM, Baptiste Reynal wrote:
-> Hi Eric,
-> 
-> Is there anything still blocking this patch ? Can I get the status ?
-> 
-> Thanks,
-> Baptiste
-> 
-> On Wed, Mar 4, 2015 at 5:18 PM, Eric Auger <eric.auger@linaro.org
-> <mailto:eric.auger@linaro.org>> wrote:
-> 
->     This patch series enables machvirt to dynamically instantiate sysbus
->     devices from command line (using -device option).
-> 
->     All those sysbus devices are plugged onto a platform bus. This latter
->     device is instantiated in machvirt and takes care of the binding of
->     children sysbus devices on a machine init done notifier. The device
->     tree node generation for children dynamic sysbus device also happens
->     on a subsequent notifier that must be executed after the above one.
->     machvirt registers that notifier before the platform bus creation to
->     make sure notifiers are executed in the right order: dt generation after
->     actual QOM binding.
-> 
->     Very few sysbus devices are supposed to be instantiated that
->     way. VFIO devices belong to them.
-> 
->     Node creation really is architecture specific. On ARM the dynamic
->     sysbus device node creation is implemented in a new C module,
->     hw/arm/sysbus-fdt.c and not in the machine file.
-> 
->     Machvirt transformations and sysbus-fdt are largely inspired from
->     Alex work.
-> 
->     The patch series can be found at:
->     http://git.linaro.org/people/eric.auger/qemu.git,
->     branch official_dynsysbus_v11
-> 
->     Best Regards
-> 
->     Eric
-> 
->     v10 -> v11:
->     - rebase on v2.2.0 and especially Alex'
->       "arm: Add PCIe host bridge in virt machine"
-> 
->     v9 -> v10:
->     - add assert and fix return value in add_fdt_node
-> 
->     v8 -> v9:
->     Take into account Peter's comments:
->     hw/arm/sysbus-fdt:
->     - s/Fdt/FDT in struct type names
->     - reorder fields in PlatformBusFdtNotifierParams and use DO_UPCAST
->     - use assert() when relevant (board model issue)
->     - g_free the ARMPlatformBusFDTParams and PlatformBusFDTNotifierParams
->       pointers in platform_bus_fdt_notify
->     hw/arm/boot.c
->     - fix compilation with arm-linux-user
->     - reorder fields in ArmLoadKernelNotifier
->     hw/arm/virt.c
->     - PLATFORM_BUS_NUM_IRQS set to 32 instead of 20
->     - platform bus irq now start at 64 instead of 48
->     - remove change of indentation in  a15memmap
->     - correct misc style issues
-> 
->     add a separate patch file for re-indentation in virt a15memmap
-> 
->     v7 -> v8:
->     - rebase on 2.2.0 (boot.c and virt.c)
->     - in virt.c machvirt_init, create_platform_bus simply is added
->       after the arm_load_kernel call instead of moving this latter.
->       should ease the review.
->     - Add Alex & Shannon Reviewed-by
-> 
->     v6 -> v7:
->     Take into account Shannon's comments:
->     - hw/arm/sysbus-fdt.c: revert indentation in add_fdt_node_functions
->     - hw/arm/virt.c:
->       - add an additional comment in a15irqmap related to
->     PLATFORM_BUS_NUM_IRQS
->       - correct platform bus size to 0x400000
->       - remove PLATFORM_BUS_FIRST_IRQ macro
-> 
->     v5 -> v6:
->     Take into account Peter's comments:
->     - dtb overload mechanism rewritten: arm_load_kernel code is moved into a
->       machine init done notifier notify instead. arm_load_kernel only
->     registers
->       that notifier. As a consequence the dtb is loaded once.
->     - v5 1-4 patch files are removed and replaced by a single patch file
->     moving
->       arm_load_kernel in the notifier (2).
->     - as a consequence arm_load_kernel must be called before sysbus-fdt
->       arm_register_platform_bus_fdt_creator.
->     - In virt, platform_bus_params not a const anymore since its fields are
->       initialized from vbi->memmap and vbi->irqmap. Hence
->     create_platform_bus
->       proto can be simplified.
->     - In sysbus-fdt add_all_platform_bus_fdt_nodes now takes a handle to
->       an ARMPlatformBusFdtParams. This is not a modify_dtb function anymore
->       fdt pointer is checked in case the callback is called after the
->     load_dtb
->       (this latter deallocated fdt pointer). Check of fdt_filename moved
->     in here.
->       upgrade_dtb is removed. copyright aligned between .h and .c.
-> 
->     v4 -> v5:
->     - in virt.c: platform_bus_params becomes static const
->     - sysbus-fdt: change indentation in add_fdt_node_functions array init
->     - s/load_dtb/arm_load_dtb in one boot.c comment
-> 
->     v3 -> v4:
->     - dyn_sysbus_binding removed since binding stuff now are implemented by
->       the platform bus device
->     - due to a change in ARM load_dtb implementation using
->     rom_add_blob_fixed,
->       the dt no more is generated in a reset notifier but is generated on a
->       machine init done notifier
->     - the augmented device tree is not generated from scratch anymore but is
->       added using a modify_dtb function. This required some small change in
->       boot.c
->     - the case where the user provides a dtb file now is handled
->     - some cleanup in virt additions
->     - implement a list of dyanmically instantiable devices in sysbus-fdt
-> 
->     v2 -> v3:
->     - patch now applies on top of Alex full patchset
->     - dyn_sysbus_devtree: add arm_prefix to emphasize the fact those
->       functions are arm specific; arm_sysbus_device_create_devtree
->       becomes static
->     - load_dtb renamed into arm_load_dtb
->     - add copyright in hw/arm/dyn_sysbus_devtree.c
-> 
->     v1 -> v2:
->     - device node generation no more in sysbus device but in
->       dyn_sysbus_devtree
->     - VFIO region shrinked to 4MB and relocated in machvirt to avoid PCI
->       shrink (dynamic vfio-mmio support might come latter)
->     - platform_bus_base removed from PlatformDevtreeData
-> 
-> 
->     Eric Auger (4):
->       hw/arm/sysbus-fdt: helpers for platform bus nodes addition
->       hw/arm/boot: arm_load_kernel implemented as a machine init done
->         notifier
->       hw/arm/virt: add dynamic sysbus device support
->       hw/arm/virt: change indentation in a15memmap
-> 
->      hw/arm/Makefile.objs        |   1 +
->      hw/arm/boot.c               |  14 +++-
->      hw/arm/sysbus-fdt.c         | 174
->     ++++++++++++++++++++++++++++++++++++++++++++
->      hw/arm/virt.c               |  85 ++++++++++++++++++----
->      include/hw/arm/arm.h        |  28 +++++++
->      include/hw/arm/sysbus-fdt.h |  60 +++++++++++++++
->      6 files changed, 348 insertions(+), 14 deletions(-)
->      create mode 100644 hw/arm/sysbus-fdt.c
->      create mode 100644 include/hw/arm/sysbus-fdt.h
-> 
->     --
->     1.8.3.2
-> 
-> 
+On 23/04/2015 17:08, Eric Auger wrote:
+>  int kvm_irqchip_add_irqfd_notifier(KVMState *s, EventNotifier *n,
+>                                     EventNotifier *rn, int virq);
+>  int kvm_irqchip_remove_irqfd_notifier(KVMState *s, EventNotifier *n, int virq);
+> +int kvm_irqchip_add_qemuirq_irqfd_notifier(KVMState *s, EventNotifier *n,
+> +                                           EventNotifier *rn, qemu_irq irq);
+> +int kvm_irqchip_remove_qemuirq_irqfd_notifier(KVMState *s, EventNotifier *n,
+> +                                              qemu_irq irq);
+
+
+Perhaps rename the existing ones to
+
+kvm_irqchip_add_irqfd_notifier_gsi
+kvm_irqchip_remove_irqfd_notifier_gsi
+
+and change the new ones to kvm_irqchip_add_irqfd_notifier and
+kvm_irqchip_remove_irqfd_notifier?
+
+Okay with that change; include it in the vfio-platform series and I'll
+ack it.
+
+Paolo
