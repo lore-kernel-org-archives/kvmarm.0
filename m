@@ -1,27 +1,26 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH 0/2] irq: add get_gsi callback
-Date: Thu, 23 Apr 2015 11:40:41 +0200
-Message-ID: <5538BE19.6030009@linaro.org>
-References: <1429778977-1632-1-git-send-email-eric.auger@linaro.org>
- <5538BBD3.9040404@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v2 03/10] KVM: arm: guest debug, define API headers
+Date: Thu, 23 Apr 2015 10:54:26 +0100
+Message-ID: <87zj5z5fvx.fsf@linaro.org>
+References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
+ <1427814488-28467-4-git-send-email-alex.bennee@linaro.org>
+ <20150413120813.GN6186@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AC6C4E4F9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2015 05:35:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D59334E50A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2015 05:45:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DlYa4w+7p6Sf for <kvmarm@lists.cs.columbia.edu>;
- Thu, 23 Apr 2015 05:35:06 -0400 (EDT)
-Received: from mail-wi0-f175.google.com (mail-wi0-f175.google.com
- [209.85.212.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D2324E4F6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2015 05:35:05 -0400 (EDT)
-Received: by widdi4 with SMTP id di4so208848310wid.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2015 02:43:18 -0700 (PDT)
-In-Reply-To: <5538BBD3.9040404@redhat.com>
+ with ESMTP id uTS9oEgGBuOH for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 23 Apr 2015 05:45:51 -0400 (EDT)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6FF624E509
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 23 Apr 2015 05:45:51 -0400 (EDT)
+In-reply-to: <20150413120813.GN6186@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,53 +30,60 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>, eric.auger@st.com, qemu-devel@nongnu.org, alex.williamson@redhat.com, peter.maydell@linaro.org, agraf@suse.de
-Cc: kvmarm@lists.cs.columbia.edu, patches@linaro.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org, marc.zyngier@arm.com, jan.kiszka@siemens.com, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, zhichao.huang@linaro.org, r65777@freescale.com, pbonzini@redhat.com, bp@suse.de, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Paolo,
-On 04/23/2015 11:30 AM, Paolo Bonzini wrote:
-> 
-> 
-> On 23/04/2015 10:49, Eric Auger wrote:
->> This series introduces a new callback function in IRQState, named
->> get_gsi_cb. It is supposed to be populated by the interrupt controller
->> and its role is to convert the interrupt controller pin number into
->> the global system interrupt (gsi) number. The gsi is used when setting
->> irqfd up.
->>
->> With PCI there is a PCIINTxRoute bus lookup mechanism that enables to
->> retrieve the gsi from the PCI host controller/bridge pin. The conversion
->> is implemented by the PCI host controller. With platform devices, this
->> conversion function is implemented by the interrupt controller.
->>
->> Besides the callback member, a setter is introduced. First user is
->> arm_gic_kvm. A public function wraps the callback, qemu_irq_get_gsi.
->>
->> The first user of qemu_irq_get_gsi might be the VFIO platform device.
->> This will come in the "KVM platform device passthrough" series.
-> 
-> I'm sorry, I cannot understand the point of this without seeing a user.
-no problem, I intend to send the KVM platform device passthrough v13
-today which will illustrate the usage.
-> 
-> Why can't you just use a GHashTable?
-
-You mean implementing this hash table in the interrupt controller?
-
-The problem is my VFIO device currently has no link to the interrupt
-controller object. Besides it has a platform bus in between. Previously
-I devised a reset notifier called in the machine file to pass this link
-but Alex was not keen about this method. So the idea here is when the
-VFIO sysbus device qemuirq is getting connected, a notifier is called,
-VFIO device can retrieve the gsi of this qemu_irq and call KVM_IRQFD
-with that gsi.
-
-Best Regards
-
-Eric
-  This mustn't be a hot path, since
-> VFIO does all the signalling in the kernel via irqfds.
-> 
-> Paolo
-> 
+CkNocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4gd3JpdGVzOgoK
+PiBPbiBUdWUsIE1hciAzMSwgMjAxNSBhdCAwNDowODowMVBNICswMTAwLCBBbGV4IEJlbm7DqWUg
+d3JvdGU6Cj4+IFRoaXMgY29tbWl0IGRlZmluZXMgdGhlIEFQSSBoZWFkZXJzIGZvciBndWVzdCBk
+ZWJ1Z2dpbmcuIFRoZXJlIGFyZSB0d28KPj4gYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlYnVnIHN0
+cnVjdHVyZXM6Cj4+IAo+PiAgIC0ga3ZtX2d1ZXN0X2RlYnVnX2FyY2gsIGFsbG93cyB1cyB0byBw
+YXNzIGluIEhXIGRlYnVnIHJlZ2lzdGVycwo+PiAgIC0ga3ZtX2RlYnVnX2V4aXRfYXJjaCwgc2ln
+bmFscyB0aGUgZXhhY3QgZGVidWcgZXhpdCBhbmQgcGMKPj4gCj4+IFRoZSB0eXBlIG9mIGRlYnVn
+Z2luZyBiZWluZyB1c2VkIGlzIGNvbnRyb2wgYnkgdGhlIGFyY2hpdGVjdHVyZSBzcGVjaWZpYwo+
+PiBjb250cm9sIGJpdHMgb2YgdGhlIGt2bV9ndWVzdF9kZWJ1Zy0+Y29udHJvbCBmbGFncyBpbiB0
+aGUgaW9jdGwKPj4gc3RydWN0dXJlLgo+PiAKPj4gU2lnbmVkLW9mZi1ieTogQWxleCBCZW5uw6ll
+IDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgo+PiAKPj4gLS0tCj4+IHYyCj4+ICAgIC0gZXhwb3Nl
+IGhzciBhbmQgcGMgZGlyZWN0bHkgdG8gdXNlci1zcGFjZQo+PiAKPj4gZGlmZiAtLWdpdCBhL2Fy
+Y2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS91YXBp
+L2FzbS9rdm0uaAo+PiBpbmRleCAzZWY3N2E0Li42ZWU3MGEwIDEwMDY0NAo+PiAtLS0gYS9hcmNo
+L2FybTY0L2luY2x1ZGUvdWFwaS9hc20va3ZtLmgKPj4gKysrIGIvYXJjaC9hcm02NC9pbmNsdWRl
+L3VhcGkvYXNtL2t2bS5oCj4+IEBAIC0xMDAsMTAgKzEwMCwyNCBAQCBzdHJ1Y3Qga3ZtX3NyZWdz
+IHsKPj4gIHN0cnVjdCBrdm1fZnB1IHsKPj4gIH07Cj4+ICAKPj4gKy8qCj4+ICsgKiBTZWUgQVJN
+IEFSTSBENy4zOiBEZWJ1ZyBSZWdpc3RlcnMKPgo+IHNlZSB0aGUgQVJNIEFSTSBmb3IgPz8KPgo+
+PiArICoKPj4gKyAqIFRoZSBjb250cm9sIHJlZ2lzdGVycyBhcmUgYXJjaGl0ZWN0dXJhbGx5IGRl
+ZmluZWQgYXMgMzIgYml0cyBidXQgYXJlCj4+ICsgKiBzdG9yZWQgYXMgNjQgYml0IHZhbHVlcyBh
+bG9uZyBzaWRlIHRoZSB2YWx1ZSByZWdpc3RlcnMgYW5kIGFsaWduZWQKPgo+IGRvIHlvdSBtZWFu
+IGFsb25nc2lkZT8KCnN1cmUuCgo+Cj4+ICsgKiB3aXRoIHRoZSByZXN0IDY0IGJpdCByZWdpc3Rl
+cnMgaW4gdGhlIG5vcm1hbCBDUFUgY29udGV4dC4KPgo+IHJlc3Qgb2YgdGhlIDY0IGJpdAo+Cj4+
+ICsgKi8KPgo+IHdoeSBkbyB3ZSBzdG9yZSB0aGVtIGFzIDY0IGJpdCB2YWx1ZXM/ICBUaGVyZSdz
+IG5vdGhpbmcgcHJldmVudGVkIHVzCj4gZnJvbSBkZWZpbmluZyB0aGVtIGFzIF9fdTMyIGlzIHRo
+ZXJlPyAgSXMgdGhpcyB0byBtYWtlIHRoZSBPTkVfUkVHCj4gaW50ZXJmYWNlIGFjY2Vzc2VycyBt
+b3JlIGNvbnZlbmllbnQ/CgpObyBidXQgaXQgd2lsbCBpbnZvbHZlIG1vcmUgZmlkZGxpbmcgd2hl
+biB3ZSBjb3B5IHRoZW0gaW50byB0aGUgQ1BVCmNvbnRleHQgd2hpY2gga2VlcHMgZXZlcnl0aGlu
+ZyBhcyA2NCBiaXQgYWxpZ25lZC4gT2YgY291cnNlIGlmIHdlIHdhbnQKdG8gcmVtb3ZlIHRoZSBk
+ZWJ1ZyByZWdpc3RlcnMgZnJvbSB0aGUgY29udGV4dCBhbmQgcHV0IGEgcG9pbnRlciBpbgpwbGFj
+ZSB0aGVuIHRoaXMgaXMgZmFpcmx5IG1vb3QgYXMgd2Ugd2lsbCBuZWVkIHRvIGNoYW5nZSB0aGUg
+aHlwLlMgY29kZQp0aGF0IGNvcGllcyB0aGUgcmVnaXN0ZXJzIGR1cmluZyB0aGUgd29ybGQgc3dp
+dGNoLiBJIHdhcyB0cnlpbmcgdG8KbWluaW1pc2UgdGhlIGFtb3VudCBvZiBjaGFuZ2UgdG8gdGhl
+IGFzc2VtYmxlciBpbiB0aGlzIHNlcmllcy4KCj4KPj4gKyNkZWZpbmUgS1ZNX0FSTV9OREJHX1JF
+R1MgMTYKPgo+IG5pdDogaXMgTkRCRyBzaG9ydCBmb3Igc29tZXRoaW5nIEkgZG9uJ3Qga25vdyBh
+Ym91dCBvciBpcyBpdAo+IHRoZSBudW1iZXIgb2YgZGVidWcgcmVnaXN0ZXJzIHdlIGFyZSBub3Rp
+bmcgaGVyZSwgaW4gd2hpY2ggY2FzZSBJIHRoaW5rCj4gS1ZNX0FSTV9OVU1fREJHX1JFR1MgaXMg
+bW9yZSBjbGVhci4KCk9LLgoKPgo+PiAgc3RydWN0IGt2bV9ndWVzdF9kZWJ1Z19hcmNoIHsKPj4g
+KwlfX3U2NCBkYmdfYmNyW0tWTV9BUk1fTkRCR19SRUdTXTsKPj4gKwlfX3U2NCBkYmdfYnZyW0tW
+TV9BUk1fTkRCR19SRUdTXTsKPj4gKwlfX3U2NCBkYmdfd2NyW0tWTV9BUk1fTkRCR19SRUdTXTsK
+Pj4gKwlfX3U2NCBkYmdfd3ZyW0tWTV9BUk1fTkRCR19SRUdTXTsKPj4gIH07Cj4+ICAKPj4gIHN0
+cnVjdCBrdm1fZGVidWdfZXhpdF9hcmNoIHsKPj4gKwlfX3U2NCBwYzsKPj4gKwlfX3UzMiBoc3I7
+Cj4+ICB9Owo+PiAgCj4+ICBzdHJ1Y3Qga3ZtX3N5bmNfcmVncyB7Cj4+IEBAIC0yMDcsNCArMjIx
+LDExIEBAIHN0cnVjdCBrdm1fYXJjaF9tZW1vcnlfc2xvdCB7Cj4+ICAKPj4gICNlbmRpZgo+PiAg
+Cj4+ICsvKgo+PiArICogQXJjaGl0ZWN0dXJlIHJlbGF0ZWQgZGVidWcgZGVmaW5lcyAtIHVwcGVy
+IDE2IGJpdHMgb2YKPj4gKyAqIGt2bV9ndWVzdF9kZWJ1Zy0+Y29udHJvbAo+PiArICovCj4+ICsj
+ZGVmaW5lIEtWTV9HVUVTVERCR19VU0VfU1dfQlAJICAgICAgICBfX0tWTV9HVUVTVERCR19VU0Vf
+U1dfQlAKPj4gKyNkZWZpbmUgS1ZNX0dVRVNUREJHX1VTRV9IV19CUAkJX19LVk1fR1VFU1REQkdf
+VVNFX0hXX0JQCj4+ICsKPj4gICNlbmRpZiAvKiBfX0FSTV9LVk1fSF9fICovCj4+IC0tIAo+PiAy
+LjMuNAo+PiAKPgo+IFRoYW5rcywKPiAtQ2hyaXN0b2ZmZXIKCi0tIApBbGV4IEJlbm7DqWUKX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxp
+bmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29s
+dW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
