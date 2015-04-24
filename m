@@ -1,24 +1,24 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v2] sysbus: add irq_routing_notifier
-Date: Fri, 24 Apr 2015 13:39:13 +0100
-Message-ID: <1429879153-23476-1-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v12 0/4] machvirt dynamic sysbus device instantiation
+Date: Fri, 24 Apr 2015 16:19:29 +0100
+Message-ID: <1429888773-11730-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 197754E685
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 08:31:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 077514E74B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 11:11:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Wv3iQvVIyn7A for <kvmarm@lists.cs.columbia.edu>;
- Fri, 24 Apr 2015 08:31:05 -0400 (EDT)
-Received: from mail-wi0-f181.google.com (mail-wi0-f181.google.com
- [209.85.212.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9413A4E684
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 08:31:05 -0400 (EDT)
-Received: by widdi4 with SMTP id di4so18700951wid.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 05:39:20 -0700 (PDT)
+ with ESMTP id L7WGZJK5Oxvd for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Apr 2015 11:11:24 -0400 (EDT)
+Received: from mail-wi0-f172.google.com (mail-wi0-f172.google.com
+ [209.85.212.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 81FB74E74A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 11:11:24 -0400 (EDT)
+Received: by wiun10 with SMTP id n10so24072532wiu.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 08:19:40 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,56 +29,113 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, agraf@suse.de, pbonzini@redhat.com
-Cc: alex.williamson@redhat.com, kvmarm@lists.cs.columbia.edu, patches@linaro.org
+Cc: patches@linaro.org, alex.williamson@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a new irq_routing_notifier notifier in the SysBusDeviceClass. This
-notifier, if populated, is called after sysbus_connect_irq.
-
-This mechanism is used to setup VFIO signaling once VFIO platform
-devices get attached to their platform bus, on a machine init done
-notifier.
-
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
-
----
-
-v1 -> v2:
-- duly put the notifier in the class and not in the device
----
- hw/core/sysbus.c    | 6 ++++++
- include/hw/sysbus.h | 1 +
- 2 files changed, 7 insertions(+)
-
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index b53c351..8553a6f 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -109,7 +109,13 @@ qemu_irq sysbus_get_connected_irq(SysBusDevice *dev, int n)
- 
- void sysbus_connect_irq(SysBusDevice *dev, int n, qemu_irq irq)
- {
-+    SysBusDeviceClass *sbd = SYS_BUS_DEVICE_GET_CLASS(dev);
-+
-     qdev_connect_gpio_out_named(DEVICE(dev), SYSBUS_DEVICE_GPIO_IRQ, n, irq);
-+
-+    if (sbd->irq_routing_notifier) {
-+        sbd->irq_routing_notifier(dev, irq);
-+    }
- }
- 
- /* Check whether an MMIO region exists */
-diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
-index d1f3f00..dbf3f0f 100644
---- a/include/hw/sysbus.h
-+++ b/include/hw/sysbus.h
-@@ -41,6 +41,7 @@ typedef struct SysBusDeviceClass {
-     /*< public >*/
- 
-     int (*init)(SysBusDevice *dev);
-+    void (*irq_routing_notifier)(SysBusDevice *dev, qemu_irq irq);
- } SysBusDeviceClass;
- 
- struct SysBusDevice {
--- 
-1.8.3.2
+VGhpcyBwYXRjaCBzZXJpZXMgZW5hYmxlcyBtYWNodmlydCB0byBkeW5hbWljYWxseSBpbnN0YW50
+aWF0ZSBzeXNidXMKZGV2aWNlcyBmcm9tIGNvbW1hbmQgbGluZSAodXNpbmcgLWRldmljZSBvcHRp
+b24pLgoKQWxsIHRob3NlIHN5c2J1cyBkZXZpY2VzIGFyZSBwbHVnZ2VkIG9udG8gYSBwbGF0Zm9y
+bSBidXMuIFRoaXMgbGF0dGVyCmRldmljZSBpcyBpbnN0YW50aWF0ZWQgaW4gbWFjaHZpcnQgYW5k
+IHRha2VzIGNhcmUgb2YgdGhlIGJpbmRpbmcgb2YKY2hpbGRyZW4gc3lzYnVzIGRldmljZXMgb24g
+YSBtYWNoaW5lIGluaXQgZG9uZSBub3RpZmllci4gVGhlIGRldmljZQp0cmVlIG5vZGUgZ2VuZXJh
+dGlvbiBmb3IgY2hpbGRyZW4gZHluYW1pYyBzeXNidXMgZGV2aWNlIGFsc28gaGFwcGVucwpvbiBh
+IHN1YnNlcXVlbnQgbm90aWZpZXIgdGhhdCBtdXN0IGJlIGV4ZWN1dGVkIGFmdGVyIHRoZSBhYm92
+ZSBvbmUuCm1hY2h2aXJ0IHJlZ2lzdGVycyB0aGF0IG5vdGlmaWVyIGJlZm9yZSB0aGUgcGxhdGZv
+cm0gYnVzIGNyZWF0aW9uIHRvCm1ha2Ugc3VyZSBub3RpZmllcnMgYXJlIGV4ZWN1dGVkIGluIHRo
+ZSByaWdodCBvcmRlcjogZHQgZ2VuZXJhdGlvbiBhZnRlcgphY3R1YWwgUU9NIGJpbmRpbmcuCgpW
+ZXJ5IGZldyBzeXNidXMgZGV2aWNlcyBhcmUgc3VwcG9zZWQgdG8gYmUgaW5zdGFudGlhdGVkIHRo
+YXQKd2F5LiBWRklPIGRldmljZXMgYmVsb25nIHRvIHRoZW0uCgpOb2RlIGNyZWF0aW9uIHJlYWxs
+eSBpcyBhcmNoaXRlY3R1cmUgc3BlY2lmaWMuIE9uIEFSTSB0aGUgZHluYW1pYwpzeXNidXMgZGV2
+aWNlIG5vZGUgY3JlYXRpb24gaXMgaW1wbGVtZW50ZWQgaW4gYSBuZXcgQyBtb2R1bGUsCmh3L2Fy
+bS9zeXNidXMtZmR0LmMgYW5kIG5vdCBpbiB0aGUgbWFjaGluZSBmaWxlLgoKTWFjaHZpcnQgdHJh
+bnNmb3JtYXRpb25zIGFuZCBzeXNidXMtZmR0IGFyZSBsYXJnZWx5IGluc3BpcmVkIGZyb20gQWxl
+eCB3b3JrLgoKVGhlIHBhdGNoIHNlcmllcyBjYW4gYmUgZm91bmQgYXQ6Cmh0dHA6Ly9naXQubGlu
+YXJvLm9yZy9wZW9wbGUvZXJpYy5hdWdlci9xZW11LmdpdCwKYnJhbmNoIHYyLjMuMC1keW4tc3lz
+YnVzLXYxMgoKQmVzdCBSZWdhcmRzCgpFcmljCgp2MTEgLT4gdjEyOgotIHJlYmFzZSBvbiAyLjMu
+MAotIGFkZCBBbGV4IEJlbm7DqWUgUi1iIGFzc3VtaW5nIGZvbGxvd2luZyBjaGFuZ2VzIGRvIG5v
+dCBhbHRlciBoaXMgcmV2aWV3Ci0gdGFrZSBpbnRvIGFjY291bnQgQWxleCBHcmFmIGNvbW1lbnRz
+CiAgLSByZXNpemUgUExBVEZPUk1fQlVTX05VTV9JUlFTIHRvIDY0IGluc3RlYWQgb2YgMzIKICAt
+IG92ZXJhbGwgTlVNX0lSUVMgY2hhbmdlZCB0byAyNTYgc2luY2UgdGhlcmUgd2FzIG5vIHJvb20g
+bGVmdCBmb3Igb3RoZXIKICAgIGFkZGl0aW9ucwogIC0gVklSVF9QTEFURk9STV9CVVMgc2l6ZSBj
+aGFuZ2VkIGZyb20gNE1CIHRvIDMyTUIgYW5kIGJhc2Ugc2V0IGF0CiAgICAweGMwMDAwMDAKCnYx
+MCAtPiB2MTE6Ci0gcmViYXNlIG9uIHYyLjIuMCBhbmQgZXNwZWNpYWxseSBBbGV4JwogICJhcm06
+IEFkZCBQQ0llIGhvc3QgYnJpZGdlIGluIHZpcnQgbWFjaGluZSIKCnY5IC0+IHYxMDoKLSBhZGQg
+YXNzZXJ0IGFuZCBmaXggcmV0dXJuIHZhbHVlIGluIGFkZF9mZHRfbm9kZQoKdjggLT4gdjk6ClRh
+a2UgaW50byBhY2NvdW50IFBldGVyJ3MgY29tbWVudHM6Cmh3L2FybS9zeXNidXMtZmR0OgotIHMv
+RmR0L0ZEVCBpbiBzdHJ1Y3QgdHlwZSBuYW1lcwotIHJlb3JkZXIgZmllbGRzIGluIFBsYXRmb3Jt
+QnVzRmR0Tm90aWZpZXJQYXJhbXMgYW5kIHVzZSBET19VUENBU1QKLSB1c2UgYXNzZXJ0KCkgd2hl
+biByZWxldmFudCAoYm9hcmQgbW9kZWwgaXNzdWUpCi0gZ19mcmVlIHRoZSBBUk1QbGF0Zm9ybUJ1
+c0ZEVFBhcmFtcyBhbmQgUGxhdGZvcm1CdXNGRFROb3RpZmllclBhcmFtcwogIHBvaW50ZXJzIGlu
+IHBsYXRmb3JtX2J1c19mZHRfbm90aWZ5Cmh3L2FybS9ib290LmMKLSBmaXggY29tcGlsYXRpb24g
+d2l0aCBhcm0tbGludXgtdXNlcgotIHJlb3JkZXIgZmllbGRzIGluIEFybUxvYWRLZXJuZWxOb3Rp
+Zmllcgpody9hcm0vdmlydC5jCi0gUExBVEZPUk1fQlVTX05VTV9JUlFTIHNldCB0byAzMiBpbnN0
+ZWFkIG9mIDIwCi0gcGxhdGZvcm0gYnVzIGlycSBub3cgc3RhcnQgYXQgNjQgaW5zdGVhZCBvZiA0
+OAotIHJlbW92ZSBjaGFuZ2Ugb2YgaW5kZW50YXRpb24gaW4gIGExNW1lbW1hcAotIGNvcnJlY3Qg
+bWlzYyBzdHlsZSBpc3N1ZXMKCmFkZCBhIHNlcGFyYXRlIHBhdGNoIGZpbGUgZm9yIHJlLWluZGVu
+dGF0aW9uIGluIHZpcnQgYTE1bWVtbWFwCgp2NyAtPiB2ODoKLSByZWJhc2Ugb24gMi4yLjAgKGJv
+b3QuYyBhbmQgdmlydC5jKQotIGluIHZpcnQuYyBtYWNodmlydF9pbml0LCBjcmVhdGVfcGxhdGZv
+cm1fYnVzIHNpbXBseSBpcyBhZGRlZAogIGFmdGVyIHRoZSBhcm1fbG9hZF9rZXJuZWwgY2FsbCBp
+bnN0ZWFkIG9mIG1vdmluZyB0aGlzIGxhdHRlci4KICBzaG91bGQgZWFzZSB0aGUgcmV2aWV3Lgot
+IEFkZCBBbGV4ICYgU2hhbm5vbiBSZXZpZXdlZC1ieQoKdjYgLT4gdjc6ClRha2UgaW50byBhY2Nv
+dW50IFNoYW5ub24ncyBjb21tZW50czoKLSBody9hcm0vc3lzYnVzLWZkdC5jOiByZXZlcnQgaW5k
+ZW50YXRpb24gaW4gYWRkX2ZkdF9ub2RlX2Z1bmN0aW9ucwotIGh3L2FybS92aXJ0LmM6CiAgLSBh
+ZGQgYW4gYWRkaXRpb25hbCBjb21tZW50IGluIGExNWlycW1hcCByZWxhdGVkIHRvIFBMQVRGT1JN
+X0JVU19OVU1fSVJRUwogIC0gY29ycmVjdCBwbGF0Zm9ybSBidXMgc2l6ZSB0byAweDQwMDAwMAog
+IC0gcmVtb3ZlIFBMQVRGT1JNX0JVU19GSVJTVF9JUlEgbWFjcm8KCnY1IC0+IHY2OgpUYWtlIGlu
+dG8gYWNjb3VudCBQZXRlcidzIGNvbW1lbnRzOgotIGR0YiBvdmVybG9hZCBtZWNoYW5pc20gcmV3
+cml0dGVuOiBhcm1fbG9hZF9rZXJuZWwgY29kZSBpcyBtb3ZlZCBpbnRvIGEKICBtYWNoaW5lIGlu
+aXQgZG9uZSBub3RpZmllciBub3RpZnkgaW5zdGVhZC4gYXJtX2xvYWRfa2VybmVsIG9ubHkgcmVn
+aXN0ZXJzCiAgdGhhdCBub3RpZmllci4gQXMgYSBjb25zZXF1ZW5jZSB0aGUgZHRiIGlzIGxvYWRl
+ZCBvbmNlLgotIHY1IDEtNCBwYXRjaCBmaWxlcyBhcmUgcmVtb3ZlZCBhbmQgcmVwbGFjZWQgYnkg
+YSBzaW5nbGUgcGF0Y2ggZmlsZSBtb3ZpbmcKICBhcm1fbG9hZF9rZXJuZWwgaW4gdGhlIG5vdGlm
+aWVyICgyKS4KLSBhcyBhIGNvbnNlcXVlbmNlIGFybV9sb2FkX2tlcm5lbCBtdXN0IGJlIGNhbGxl
+ZCBiZWZvcmUgc3lzYnVzLWZkdAogIGFybV9yZWdpc3Rlcl9wbGF0Zm9ybV9idXNfZmR0X2NyZWF0
+b3IuCi0gSW4gdmlydCwgcGxhdGZvcm1fYnVzX3BhcmFtcyBub3QgYSBjb25zdCBhbnltb3JlIHNp
+bmNlIGl0cyBmaWVsZHMgYXJlCiAgaW5pdGlhbGl6ZWQgZnJvbSB2YmktPm1lbW1hcCBhbmQgdmJp
+LT5pcnFtYXAuIEhlbmNlIGNyZWF0ZV9wbGF0Zm9ybV9idXMKICBwcm90byBjYW4gYmUgc2ltcGxp
+ZmllZC4KLSBJbiBzeXNidXMtZmR0IGFkZF9hbGxfcGxhdGZvcm1fYnVzX2ZkdF9ub2RlcyBub3cg
+dGFrZXMgYSBoYW5kbGUgdG8KICBhbiBBUk1QbGF0Zm9ybUJ1c0ZkdFBhcmFtcy4gVGhpcyBpcyBu
+b3QgYSBtb2RpZnlfZHRiIGZ1bmN0aW9uIGFueW1vcmUKICBmZHQgcG9pbnRlciBpcyBjaGVja2Vk
+IGluIGNhc2UgdGhlIGNhbGxiYWNrIGlzIGNhbGxlZCBhZnRlciB0aGUgbG9hZF9kdGIKICAodGhp
+cyBsYXR0ZXIgZGVhbGxvY2F0ZWQgZmR0IHBvaW50ZXIpLiBDaGVjayBvZiBmZHRfZmlsZW5hbWUg
+bW92ZWQgaW4gaGVyZS4KICB1cGdyYWRlX2R0YiBpcyByZW1vdmVkLiBjb3B5cmlnaHQgYWxpZ25l
+ZCBiZXR3ZWVuIC5oIGFuZCAuYy4KCnY0IC0+IHY1OgotIGluIHZpcnQuYzogcGxhdGZvcm1fYnVz
+X3BhcmFtcyBiZWNvbWVzIHN0YXRpYyBjb25zdAotIHN5c2J1cy1mZHQ6IGNoYW5nZSBpbmRlbnRh
+dGlvbiBpbiBhZGRfZmR0X25vZGVfZnVuY3Rpb25zIGFycmF5IGluaXQKLSBzL2xvYWRfZHRiL2Fy
+bV9sb2FkX2R0YiBpbiBvbmUgYm9vdC5jIGNvbW1lbnQKCnYzIC0+IHY0OgotIGR5bl9zeXNidXNf
+YmluZGluZyByZW1vdmVkIHNpbmNlIGJpbmRpbmcgc3R1ZmYgbm93IGFyZSBpbXBsZW1lbnRlZCBi
+eQogIHRoZSBwbGF0Zm9ybSBidXMgZGV2aWNlCi0gZHVlIHRvIGEgY2hhbmdlIGluIEFSTSBsb2Fk
+X2R0YiBpbXBsZW1lbnRhdGlvbiB1c2luZyByb21fYWRkX2Jsb2JfZml4ZWQsCiAgdGhlIGR0IG5v
+IG1vcmUgaXMgZ2VuZXJhdGVkIGluIGEgcmVzZXQgbm90aWZpZXIgYnV0IGlzIGdlbmVyYXRlZCBv
+biBhCiAgbWFjaGluZSBpbml0IGRvbmUgbm90aWZpZXIKLSB0aGUgYXVnbWVudGVkIGRldmljZSB0
+cmVlIGlzIG5vdCBnZW5lcmF0ZWQgZnJvbSBzY3JhdGNoIGFueW1vcmUgYnV0IGlzCiAgYWRkZWQg
+dXNpbmcgYSBtb2RpZnlfZHRiIGZ1bmN0aW9uLiBUaGlzIHJlcXVpcmVkIHNvbWUgc21hbGwgY2hh
+bmdlIGluCiAgYm9vdC5jCi0gdGhlIGNhc2Ugd2hlcmUgdGhlIHVzZXIgcHJvdmlkZXMgYSBkdGIg
+ZmlsZSBub3cgaXMgaGFuZGxlZAotIHNvbWUgY2xlYW51cCBpbiB2aXJ0IGFkZGl0aW9ucwotIGlt
+cGxlbWVudCBhIGxpc3Qgb2YgZHlhbm1pY2FsbHkgaW5zdGFudGlhYmxlIGRldmljZXMgaW4gc3lz
+YnVzLWZkdAoKdjIgLT4gdjM6Ci0gcGF0Y2ggbm93IGFwcGxpZXMgb24gdG9wIG9mIEFsZXggZnVs
+bCBwYXRjaHNldAotIGR5bl9zeXNidXNfZGV2dHJlZTogYWRkIGFybV9wcmVmaXggdG8gZW1waGFz
+aXplIHRoZSBmYWN0IHRob3NlCiAgZnVuY3Rpb25zIGFyZSBhcm0gc3BlY2lmaWM7IGFybV9zeXNi
+dXNfZGV2aWNlX2NyZWF0ZV9kZXZ0cmVlCiAgYmVjb21lcyBzdGF0aWMKLSBsb2FkX2R0YiByZW5h
+bWVkIGludG8gYXJtX2xvYWRfZHRiCi0gYWRkIGNvcHlyaWdodCBpbiBody9hcm0vZHluX3N5c2J1
+c19kZXZ0cmVlLmMKCnYxIC0+IHYyOgotIGRldmljZSBub2RlIGdlbmVyYXRpb24gbm8gbW9yZSBp
+biBzeXNidXMgZGV2aWNlIGJ1dCBpbgogIGR5bl9zeXNidXNfZGV2dHJlZQotIFZGSU8gcmVnaW9u
+IHNocmlua2VkIHRvIDRNQiBhbmQgcmVsb2NhdGVkIGluIG1hY2h2aXJ0IHRvIGF2b2lkIFBDSQog
+IHNocmluayAoZHluYW1pYyB2ZmlvLW1taW8gc3VwcG9ydCBtaWdodCBjb21lIGxhdHRlcikKLSBw
+bGF0Zm9ybV9idXNfYmFzZSByZW1vdmVkIGZyb20gUGxhdGZvcm1EZXZ0cmVlRGF0YQoKCkVyaWMg
+QXVnZXIgKDQpOgogIGh3L2FybS9zeXNidXMtZmR0OiBoZWxwZXJzIGZvciBwbGF0Zm9ybSBidXMg
+bm9kZXMgYWRkaXRpb24KICBody9hcm0vYm9vdDogYXJtX2xvYWRfa2VybmVsIGltcGxlbWVudGVk
+IGFzIGEgbWFjaGluZSBpbml0IGRvbmUKICAgIG5vdGlmaWVyCiAgaHcvYXJtL3ZpcnQ6IGFkZCBk
+eW5hbWljIHN5c2J1cyBkZXZpY2Ugc3VwcG9ydAogIGh3L2FybS92aXJ0OiBjaGFuZ2UgaW5kZW50
+YXRpb24gaW4gYTE1bWVtbWFwCgogaHcvYXJtL01ha2VmaWxlLm9ianMgICAgICAgIHwgICAxICsK
+IGh3L2FybS9ib290LmMgICAgICAgICAgICAgICB8ICAxNCArKystCiBody9hcm0vc3lzYnVzLWZk
+dC5jICAgICAgICAgfCAxNzQgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysKIGh3L2FybS92aXJ0LmMgICAgICAgICAgICAgICB8ICA4NyArKysrKysrKysrKysrKysr
+KystLS0tCiBpbmNsdWRlL2h3L2FybS9hcm0uaCAgICAgICAgfCAgMjggKysrKysrKwogaW5jbHVk
+ZS9ody9hcm0vc3lzYnVzLWZkdC5oIHwgIDYwICsrKysrKysrKysrKysrKwogNiBmaWxlcyBjaGFu
+Z2VkLCAzNDkgaW5zZXJ0aW9ucygrKSwgMTUgZGVsZXRpb25zKC0pCiBjcmVhdGUgbW9kZSAxMDA2
+NDQgaHcvYXJtL3N5c2J1cy1mZHQuYwogY3JlYXRlIG1vZGUgMTAwNjQ0IGluY2x1ZGUvaHcvYXJt
+L3N5c2J1cy1mZHQuaAoKLS0gCjEuOC4zLjIKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNv
+bHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZv
+L2t2bWFybQo=
