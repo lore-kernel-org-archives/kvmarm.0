@@ -1,26 +1,24 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v12 3/4] hw/arm/virt: add dynamic sysbus device support
-Date: Fri, 24 Apr 2015 16:19:32 +0100
-Message-ID: <1429888773-11730-4-git-send-email-eric.auger@linaro.org>
-References: <1429888773-11730-1-git-send-email-eric.auger@linaro.org>
+From: Vikram Sethi <vikrams@codeaurora.org>
+Subject: Re: [PATCH v12 7/9] hw/arm/sysbus-fdt: enable vfio-calxeda-xgmac
+ dynamic instantiation
+Date: Fri, 24 Apr 2015 17:35:21 -0500
+Message-ID: <553AC529.7040009@codeaurora.org>
+References: <1426785402-2091-1-git-send-email-eric.auger@linaro.org>
+ <1426785402-2091-8-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: multipart/mixed; boundary="===============3708407363346619728=="
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 747474E75C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 11:11:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A844A4E870
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 18:27:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8lCA+Cu799SQ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 24 Apr 2015 11:11:29 -0400 (EDT)
-Received: from mail-wi0-f177.google.com (mail-wi0-f177.google.com
- [209.85.212.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1C6874E758
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 11:11:28 -0400 (EDT)
-Received: by wicmx19 with SMTP id mx19so37395068wic.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 08:19:44 -0700 (PDT)
-In-Reply-To: <1429888773-11730-1-git-send-email-eric.auger@linaro.org>
+ with ESMTP id Zj9MENyJpdlE for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Apr 2015 18:27:08 -0400 (EDT)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B04694E85C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 18:27:08 -0400 (EDT)
+In-Reply-To: <1426785402-2091-8-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,153 +28,353 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, peter.maydell@linaro.org, agraf@suse.de, pbonzini@redhat.com
-Cc: patches@linaro.org, alex.williamson@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Eric Auger <eric.auger@linaro.org>
+Cc: eric.auger@st.com, patches@linaro.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-QWxsb3dzIHN5c2J1cyBkZXZpY2VzIHRvIGJlIGluc3RhbnRpYXRlZCBmcm9tIGNvbW1hbmQgbGlu
-ZSBieQp1c2luZyAtZGV2aWNlIG9wdGlvbi4gTWFjaHZpcnQgY3JlYXRlcyBhIHBsYXRmb3JtIGJ1
-cyBhdCBpbml0LgpUaGUgZHluYW1pYyBzeXNidXMgZGV2aWNlcyBhcmUgYXR0YWNoZWQgdG8gdGhp
-cyBwbGF0Zm9ybSBidXMgZGV2aWNlLgoKVGhlIHBsYXRmb3JtIGJ1cyBkZXZpY2UgcmVnaXN0ZXJz
-IGEgbWFjaGluZSBpbml0IGRvbmUgbm90aWZpZXIKd2hvc2Ugcm9sZSB3aWxsIGJlIHRvIGJpbmQg
-dGhlIGR5bmFtaWMgc3lzYnVzIGRldmljZXMuIEluZGVlZApkeW5hbWljIHN5c2J1cyBkZXZpY2Vz
-IGFyZSBjcmVhdGVkIGFmdGVyIG1hY2hpbmUgaW5pdC4KCm1hY2h2aXJ0IGFsc28gcmVnaXN0ZXJz
-IGEgbm90aWZpZXIgdGhhdCB3aWxsIGJ1aWxkIHRoZSBkZXZpY2UKdHJlZSBub2RlcyBmb3IgdGhl
-IHBsYXRmb3JtIGJ1cyBhbmQgaXRzIGNoaWxkcmVuIGR5bmFtaWMgc3lzYnVzCmRldmljZXMuCgpT
-aWduZWQtb2ZmLWJ5OiBBbGV4YW5kZXIgR3JhZiA8YWdyYWZAc3VzZS5kZT4KU2lnbmVkLW9mZi1i
-eTogRXJpYyBBdWdlciA8ZXJpYy5hdWdlckBsaW5hcm8ub3JnPgpSZXZpZXdlZC1ieTogQWxleCBC
-ZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgoKLS0tCnYxMSAtPiB2MTI6Ci0gcmVzaXpl
-IFBMQVRGT1JNX0JVU19OVU1fSVJRUyB0byA2NCBpbnN0ZWFkIG9mIDMyCi0gb3ZlcmFsbCBOVU1f
-SVJRUyBjaGFuZ2VkIHRvIDI1Ni4gVGhpcyBsZWF2ZXMgc3BhY2UgZm9yIE1TSQogIGxvb21pbmcg
-YWRkaXRpb24KLSBWSVJUX1BMQVRGT1JNX0JVUyBzaXplIGNoYW5nZWQgZnJvbSA0TUIgdG8gMzJN
-QiBhbmQgYmFzZSBzZXQgYXQKICAweGMwMDAwMDAKLSBBZGQgQWxleCBSLWIKCnY4IC0+IHY5Ogot
-IFBMQVRGT1JNX0JVU19OVU1fSVJRUyBzZXQgdG8gMzIgaW5zdGVhZCBvZiAyMAotIHBsYXRmb3Jt
-IGJ1cyBpcnEgbm93IHN0YXJ0IGF0IDY0IGluc3RlYWQgb2YgNDgKLSByZW1vdmUgY2hhbmdlIG9m
-IGluZGVudGF0aW9uIGluIGExNW1lbW1hcAotIGNvcnJlY3QgbWlzYyBzdHlsZSBpc3N1ZXMKCnY3
-IC0+IHY4OgotIHJlYmFzZSBvbiAyLjIuMAotIGluIG1hY2h2aXJ0X2luaXQsIGNyZWF0ZV9wbGF0
-Zm9ybV9idXMgc2ltcGx5IGlzIGFkZGVkCiAgYWZ0ZXIgdGhlIGFybV9sb2FkX2tlcm5lbCBjYWxs
-IGluc3RlYWQgb2YgbW92aW5nIHRoaXMgbGF0dGVyLgogIFJlbGF0ZWQgY29tbWVudCBzbGlnaGx5
-IHJld29yZGVkLgotIER1ZSB0byB0aG9zZSBjaGFuZ2VzIEkgZHJvcHBlZCBBbGV4IGFuZCBTaGFu
-bm9uJ3MgUmV2aWV3ZWQtYnkKCnY2IC0+IHY3OgpUYWtlIGludG8gYWNjb3VudCBTaGFubm9uIGNv
-bW1lbnRzOgotIHJlbW92ZSBQTEFURk9STV9CVVNfRklSU1RfSVJRIG1hY3JvCi0gY29ycmVjdCBw
-bGF0Zm9ybSBidXMgc2l6ZSB0byAweDQwMDAwMAotIGFkZCBhbiBhZGRpdGlvbmFsIGNvbW1lbnQg
-aW4gYTE1aXJxbWFwIHJlbGF0ZWQgdG8KICBQTEFURk9STV9CVVNfTlVNX0lSUVMKCnY1IC0+IHY2
-OgotIFRha2UgaW50byBhY2NvdW50IFBldGVyJ3MgY29tbWVudHM6CiAgLSBwbGF0Zm9ybV9idXNf
-cGFyYW1zIGluaXRpYWxpemVkIGZyb20gdmJpLT5tZW1tYXAgYW5kIHZiaS0+aXJxbWFwLgogICAg
-QXMgYSBjb25zZXF1ZW5jZSwgY29uc3QgaXMgcmVtb3ZlZC4gQWxzbyBhbGlnbm1lbnQgaW4gYTE1
-bWVtbWFwCiAgICBpcyBzbGlnaHRseSBjaGFuZ2VkLgogIC0gQVJNUGxhdGZvcm1CdXNTeXN0ZW1Q
-YXJhbXMgaGFuZGxlIHJlbW92ZWQgZnJvbSBjcmVhdGVfcGxhdGZvcm1fYnVzCiAgICBwcm90b3R5
-cGUKLSBhcm1fbG9hZF9rZXJuZWwgaGFzIGJlY29tZSBhIG1hY2hpbmUgaW5pdCBkb25lIG5vdGlm
-aWVyIHJlZ2lzdHJhdGlvbi4KICBJdCBtdXN0IGJlIGNhbGxlZCBiZWZvcmUgcGxhdGZvcm1fYnVz
-X2NyZWF0ZSB0byBndWFyYW50ZWUgdGhlIGNvcnJlY3QKICBub3RpZmllciBleGVjdXRpb24gc2Vx
-dWVuY2UKCnY0IC0+IHY1OgotIHBsYXRmb3JtX2J1c19wYXJhbXMgYmVjb21lcyBzdGF0aWMgY29u
-c3QKLSByZXdvcmQgY29tbWVudCBpbiBjcmVhdGVfcGxhdGZvcm1fYnVzCi0gcmV3b3JkIHRoZSBj
-b21taXQgbWVzc2FnZQoKdjMgLT4gdjQ6Ci0gdXNlIHBsYXRmb3JtIGJ1cyBvYmplY3QsIGluc3Rh
-bnRpYXRlZCBpbiBjcmVhdGVfcGxhdGZvcm1fYnVzCi0gZGV2aWNlIHRyZWUgZ2VuZXJhdGlvbiBm
-b3IgcGxhdGZvcm0gYnVzIGFuZCBjaGlsZHJlbiBkeW5hbWljCiAgc3lzYnVzIGRldmljZXMgaXMg
-bm8gbW9yZSBoYW5kbGVkIGF0IHJlc2V0IGJ1dCBpbiBhCiAgbWFjaGluZV9pbml0X2RvbmVfbm90
-aWZpZXIgKGR1ZSB0byB0aGUgY2hhbmdlIGluIGltcGxlbWVudGFpb24KICBvZiBBUk0gbG9hZCBk
-dGIgdXNpbmcgcm9tX2FkZF9ibG9iX2ZpeGVkKS4KLSBkZXZpY2UgdHJlZSBlbmhhbmNlbWVudCBu
-b3cgdGFrZXMgaW50byBhY2NvdW50IHRoZSBjYXNlIG9mCiAgdXNlciBwcm92aWRlZCBkdGIuIEJl
-Zm9yZSB0aGUgdXNlciBkdGIgd2FzIG92ZXJ3cml0dGVuIHdoaWNoCiAgd2FzIHdyb25nLiBIb3dl
-dmVyIGluIGNhc2UgdGhlIGR0YiBpcyBwcm92aWRlZCBieSB0aGUgdXNlciwKICBkeW5hbWljIHN5
-c2J1cyBub2RlcyBhcmUgbm90IGFkZGVkIHRoZXJlLgotIHJlbmFtaW5nIG9mIE1BQ0hWSVJUX1BM
-QVRGT1JNIGRlZmluZXMKLSBNQUNIVklSVF9QTEFURk9STV9QQUdFX1NISUZUIGFuZCBTSVpFX1BB
-R0VTIG5vdCBuZWVkZWQgYW55bW9yZSwKICBoZW5jZSByZW1vdmVkLgotIER5blN5c2J1c1BhcmFt
-cyBzdHJ1Y3QgcmVuYW1lZCBpbnRvIEFSTVBsYXRmb3JtQnVzU3lzdGVtUGFyYW1zCiAgYW5kIGFi
-b3ZlIHBhcmFtcyByZW1vdmVkLgotIHNlcGFyYXRpb24gb2YgZHQgY3JlYXRpb24gYW5kIFFFTVUg
-YmluZGluZyBpcyBub3QgbWFuZGF0ZWQgYW55bW9yZQogIHNpbmNlIHRoZSBkZXZpY2UgdHJlZSBp
-cyBub3QgY3JlYXRlZCBmcm9tIHNjcmF0Y2ggYW55bW9yZS4gSW5zdGVhZAogIHRoZSBtb2RpZnlf
-ZHRiIGZ1bmN0aW9uIGlzIHVzZWQuCi0gY3JlYXRlX3BsYXRmb3JtX2J1cyByZWdpc3RlcnMgYW5v
-dGhlciBtYWNoaW5lIGluaXQgZG9uZSBub3RpZmllcgogIHRvIHN0YXJ0IFZGSU8gSVJRIGhhbmRs
-aW5nLiBUaGlzIGxhdHRlciBleGVjdXRlcyBhZnRlciB0aGUKICBkeW5hbWljIHN5c2J1cyBkZXZp
-Y2UgYmluZGluZy4KCnYyIC0+IHYzOgotIHJlbmFtaW5nIG9mIGFybV9wbGF0Zm9ybV9idXNfY3Jl
-YXRlX2RldnRyZWUgYW5kIGFybV9sb2FkX2R0YgotIGFkZCBjb3B5cmlnaHQgaW4gaHcvYXJtL2R5
-bl9zeXNidXNfZGV2dHJlZS5jCgp2MSAtPiB2MjoKLSByZW1vdmUgdXNlbGVzcyB2ZmlvLXBsYXRm
-b3JtLmggaW5jbHVkZSBmaWxlCi0gcy9NQUNIVklSVF9QTEFURk9STV9IT0xFL01BQ0hWSVJUX1BM
-QVRGT1JNX1NJWkUKLSB1c2UgZHluX3N5c2J1c19iaW5kaW5nIGFuZCBkeW5fc3lzYnVzX2RldnRy
-ZWUKLSBkeW5hbWljIHN5c2J1cyBwbGF0Zm9ybSBidXNlIHNpemUgc2hyaW5rZWQgdG8gNE1CIGFu
-ZAogIG1vdmVkIGJldHdlZW4gUlRDIGFuZCBNTUlPCgp2MToKCkluc3BpcmVkIGZyb20gd2hhdCBB
-bGV4IEdyYWYgZGlkIGluIHBwYyBlNTAwCmh0dHBzOi8vbGlzdHMuZ251Lm9yZy9hcmNoaXZlL2h0
-bWwvcWVtdS1wcGMvMjAxNC0wNy9tc2cwMDAxMi5odG1sCi0tLQogaHcvYXJtL3ZpcnQuYyB8IDYx
-ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KystCiAxIGZpbGUgY2hhbmdlZCwgNjAgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQoKZGlm
-ZiAtLWdpdCBhL2h3L2FybS92aXJ0LmMgYi9ody9hcm0vdmlydC5jCmluZGV4IDU2NWY1NzMuLmVm
-YTMyMTYgMTAwNjQ0Ci0tLSBhL2h3L2FybS92aXJ0LmMKKysrIGIvaHcvYXJtL3ZpcnQuYwpAQCAt
-NDMsMTEgKzQzLDEzIEBACiAjaW5jbHVkZSAicWVtdS9iaXRvcHMuaCIKICNpbmNsdWRlICJxZW11
-L2Vycm9yLXJlcG9ydC5oIgogI2luY2x1ZGUgImh3L3BjaS1ob3N0L2dwZXguaCIKKyNpbmNsdWRl
-ICJody9hcm0vc3lzYnVzLWZkdC5oIgorI2luY2x1ZGUgImh3L3BsYXRmb3JtLWJ1cy5oIgogCiAj
-ZGVmaW5lIE5VTV9WSVJUSU9fVFJBTlNQT1JUUyAzMgogCiAvKiBOdW1iZXIgb2YgZXh0ZXJuYWwg
-aW50ZXJydXB0IGxpbmVzIHRvIGNvbmZpZ3VyZSB0aGUgR0lDIHdpdGggKi8KLSNkZWZpbmUgTlVN
-X0lSUVMgMTI4CisjZGVmaW5lIE5VTV9JUlFTIDI1NgogCiAjZGVmaW5lIEdJQ19GRFRfSVJRX1RZ
-UEVfU1BJIDAKICNkZWZpbmUgR0lDX0ZEVF9JUlFfVFlQRV9QUEkgMQpAQCAtNjAsNiArNjIsOCBA
-QAogI2RlZmluZSBHSUNfRkRUX0lSUV9QUElfQ1BVX1NUQVJUIDgKICNkZWZpbmUgR0lDX0ZEVF9J
-UlFfUFBJX0NQVV9XSURUSCA4CiAKKyNkZWZpbmUgUExBVEZPUk1fQlVTX05VTV9JUlFTIDY0CisK
-IGVudW0gewogICAgIFZJUlRfRkxBU0gsCiAgICAgVklSVF9NRU0sCkBAIC03MSw4ICs3NSwxMSBA
-QCBlbnVtIHsKICAgICBWSVJUX1JUQywKICAgICBWSVJUX0ZXX0NGRywKICAgICBWSVJUX1BDSUUs
-CisgICAgVklSVF9QTEFURk9STV9CVVMsCiB9OwogCitzdGF0aWMgQVJNUGxhdGZvcm1CdXNTeXN0
-ZW1QYXJhbXMgcGxhdGZvcm1fYnVzX3BhcmFtczsKKwogdHlwZWRlZiBzdHJ1Y3QgTWVtTWFwRW50
-cnkgewogICAgIGh3YWRkciBiYXNlOwogICAgIGh3YWRkciBzaXplOwpAQCAtMTMxLDYgKzEzOCw3
-IEBAIHN0YXRpYyBjb25zdCBNZW1NYXBFbnRyeSBhMTVtZW1tYXBbXSA9IHsKICAgICBbVklSVF9G
-V19DRkddID0gICAgIHsgMHgwOTAyMDAwMCwgMHgwMDAwMDAwYSB9LAogICAgIFtWSVJUX01NSU9d
-ID0gICAgICAgeyAweDBhMDAwMDAwLCAweDAwMDAwMjAwIH0sCiAgICAgLyogLi4ucmVwZWF0aW5n
-IGZvciBhIHRvdGFsIG9mIE5VTV9WSVJUSU9fVFJBTlNQT1JUUywgZWFjaCBvZiB0aGF0IHNpemUg
-Ki8KKyAgICBbVklSVF9QTEFURk9STV9CVVNdID0gICB7IDB4MGMwMDAwMDAsIDB4MDIwMDAwMDAg
-fSwKICAgICAvKgogICAgICAqIFBDSUUgdmVyYm9zZSBtYXA6CiAgICAgICoKQEAgLTE0Nyw2ICsx
-NTUsNyBAQCBzdGF0aWMgY29uc3QgaW50IGExNWlycW1hcFtdID0gewogICAgIFtWSVJUX1JUQ10g
-PSAyLAogICAgIFtWSVJUX1BDSUVdID0gMywgLyogLi4uIHRvIDYgKi8KICAgICBbVklSVF9NTUlP
-XSA9IDE2LCAvKiAuLi50byAxNiArIE5VTV9WSVJUSU9fVFJBTlNQT1JUUyAtIDEgKi8KKyAgICBb
-VklSVF9QTEFURk9STV9CVVNdID0gNjQsIC8qIC4uLiB0byA2NCArIFBMQVRGT1JNX0JVU19OVU1f
-SVJRUyAtMSAqLwogfTsKIAogc3RhdGljIFZpcnRCb2FyZEluZm8gbWFjaGluZXNbXSA9IHsKQEAg
-LTcxNyw2ICs3MjYsNDcgQEAgc3RhdGljIHZvaWQgY3JlYXRlX3BjaWUoY29uc3QgVmlydEJvYXJk
-SW5mbyAqdmJpLCBxZW11X2lycSAqcGljLAogICAgIGdfZnJlZShub2RlbmFtZSk7CiB9CiAKK3N0
-YXRpYyB2b2lkIGNyZWF0ZV9wbGF0Zm9ybV9idXMoVmlydEJvYXJkSW5mbyAqdmJpLCBxZW11X2ly
-cSAqcGljKQoreworICAgIERldmljZVN0YXRlICpkZXY7CisgICAgU3lzQnVzRGV2aWNlICpzOwor
-ICAgIGludCBpOworICAgIEFSTVBsYXRmb3JtQnVzRkRUUGFyYW1zICpmZHRfcGFyYW1zID0gZ19u
-ZXcoQVJNUGxhdGZvcm1CdXNGRFRQYXJhbXMsIDEpOworICAgIE1lbW9yeVJlZ2lvbiAqc3lzbWVt
-ID0gZ2V0X3N5c3RlbV9tZW1vcnkoKTsKKworICAgIHBsYXRmb3JtX2J1c19wYXJhbXMucGxhdGZv
-cm1fYnVzX2Jhc2UgPSB2YmktPm1lbW1hcFtWSVJUX1BMQVRGT1JNX0JVU10uYmFzZTsKKyAgICBw
-bGF0Zm9ybV9idXNfcGFyYW1zLnBsYXRmb3JtX2J1c19zaXplID0gdmJpLT5tZW1tYXBbVklSVF9Q
-TEFURk9STV9CVVNdLnNpemU7CisgICAgcGxhdGZvcm1fYnVzX3BhcmFtcy5wbGF0Zm9ybV9idXNf
-Zmlyc3RfaXJxID0gdmJpLT5pcnFtYXBbVklSVF9QTEFURk9STV9CVVNdOworICAgIHBsYXRmb3Jt
-X2J1c19wYXJhbXMucGxhdGZvcm1fYnVzX251bV9pcnFzID0gUExBVEZPUk1fQlVTX05VTV9JUlFT
-OworCisgICAgZmR0X3BhcmFtcy0+c3lzdGVtX3BhcmFtcyA9ICZwbGF0Zm9ybV9idXNfcGFyYW1z
-OworICAgIGZkdF9wYXJhbXMtPmJpbmZvID0gJnZiaS0+Ym9vdGluZm87CisgICAgZmR0X3BhcmFt
-cy0+aW50YyA9ICIvaW50YyI7CisgICAgLyoKKyAgICAgKiByZWdpc3RlciBhIG1hY2hpbmUgaW5p
-dCBkb25lIG5vdGlmaWVyIHRoYXQgY3JlYXRlcyB0aGUgZGV2aWNlIHRyZWUKKyAgICAgKiBub2Rl
-cyBvZiB0aGUgcGxhdGZvcm0gYnVzIGFuZCBpdHMgY2hpbGRyZW4gZHluYW1pYyBzeXNidXMgZGV2
-aWNlcworICAgICAqLworICAgIGFybV9yZWdpc3Rlcl9wbGF0Zm9ybV9idXNfZmR0X2NyZWF0b3Io
-ZmR0X3BhcmFtcyk7CisKKyAgICBkZXYgPSBxZGV2X2NyZWF0ZShOVUxMLCBUWVBFX1BMQVRGT1JN
-X0JVU19ERVZJQ0UpOworICAgIGRldi0+aWQgPSBUWVBFX1BMQVRGT1JNX0JVU19ERVZJQ0U7Cisg
-ICAgcWRldl9wcm9wX3NldF91aW50MzIoZGV2LCAibnVtX2lycXMiLAorICAgICAgICBwbGF0Zm9y
-bV9idXNfcGFyYW1zLnBsYXRmb3JtX2J1c19udW1faXJxcyk7CisgICAgcWRldl9wcm9wX3NldF91
-aW50MzIoZGV2LCAibW1pb19zaXplIiwKKyAgICAgICAgcGxhdGZvcm1fYnVzX3BhcmFtcy5wbGF0
-Zm9ybV9idXNfc2l6ZSk7CisgICAgcWRldl9pbml0X25vZmFpbChkZXYpOworICAgIHMgPSBTWVNf
-QlVTX0RFVklDRShkZXYpOworCisgICAgZm9yIChpID0gMDsgaSA8IHBsYXRmb3JtX2J1c19wYXJh
-bXMucGxhdGZvcm1fYnVzX251bV9pcnFzOyBpKyspIHsKKyAgICAgICAgaW50IGlycW4gPSBwbGF0
-Zm9ybV9idXNfcGFyYW1zLnBsYXRmb3JtX2J1c19maXJzdF9pcnEgKyBpOworICAgICAgICBzeXNi
-dXNfY29ubmVjdF9pcnEocywgaSwgcGljW2lycW5dKTsKKyAgICB9CisKKyAgICBtZW1vcnlfcmVn
-aW9uX2FkZF9zdWJyZWdpb24oc3lzbWVtLAorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBwbGF0Zm9ybV9idXNfcGFyYW1zLnBsYXRmb3JtX2J1c19iYXNlLAorICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBzeXNidXNfbW1pb19nZXRfcmVnaW9uKHMsIDApKTsKK30KKwogc3Rh
-dGljIHZvaWQgKm1hY2h2aXJ0X2R0Yihjb25zdCBzdHJ1Y3QgYXJtX2Jvb3RfaW5mbyAqYmluZm8s
-IGludCAqZmR0X3NpemUpCiB7CiAgICAgY29uc3QgVmlydEJvYXJkSW5mbyAqYm9hcmQgPSAoY29u
-c3QgVmlydEJvYXJkSW5mbyAqKWJpbmZvOwpAQCAtODM3LDYgKzg4NywxNCBAQCBzdGF0aWMgdm9p
-ZCBtYWNodmlydF9pbml0KE1hY2hpbmVTdGF0ZSAqbWFjaGluZSkKICAgICB2YmktPmJvb3RpbmZv
-LmdldF9kdGIgPSBtYWNodmlydF9kdGI7CiAgICAgdmJpLT5ib290aW5mby5maXJtd2FyZV9sb2Fk
-ZWQgPSBiaW9zX25hbWUgfHwgZHJpdmVfZ2V0KElGX1BGTEFTSCwgMCwgMCk7CiAgICAgYXJtX2xv
-YWRfa2VybmVsKEFSTV9DUFUoZmlyc3RfY3B1KSwgJnZiaS0+Ym9vdGluZm8pOworCisgICAgLyoK
-KyAgICAgKiBhcm1fbG9hZF9rZXJuZWwgbWFjaGluZSBpbml0IGRvbmUgbm90aWZpZXIgcmVnaXN0
-cmF0aW9uIG11c3QKKyAgICAgKiBoYXBwZW4gYmVmb3JlIHRoZSBwbGF0Zm9ybV9idXNfY3JlYXRl
-IGNhbGwuIEluIHRoaXMgbGF0dGVyLAorICAgICAqIGFub3RoZXIgbm90aWZpZXIgaXMgcmVnaXN0
-ZXJlZCB3aGljaCBhZGRzIHBsYXRmb3JtIGJ1cyBub2Rlcy4KKyAgICAgKiBOb3RpZmllcnMgYXJl
-IGV4ZWN1dGVkIGluIHJlZ2lzdHJhdGlvbiByZXZlcnNlIG9yZGVyLgorICAgICAqLworICAgIGNy
-ZWF0ZV9wbGF0Zm9ybV9idXModmJpLCBwaWMpOwogfQogCiBzdGF0aWMgYm9vbCB2aXJ0X2dldF9z
-ZWN1cmUoT2JqZWN0ICpvYmosIEVycm9yICoqZXJycCkKQEAgLTg3NSw2ICs5MzMsNyBAQCBzdGF0
-aWMgdm9pZCB2aXJ0X2NsYXNzX2luaXQoT2JqZWN0Q2xhc3MgKm9jLCB2b2lkICpkYXRhKQogICAg
-IG1jLT5kZXNjID0gIkFSTSBWaXJ0dWFsIE1hY2hpbmUiLAogICAgIG1jLT5pbml0ID0gbWFjaHZp
-cnRfaW5pdDsKICAgICBtYy0+bWF4X2NwdXMgPSA4OworICAgIG1jLT5oYXNfZHluYW1pY19zeXNi
-dXMgPSB0cnVlOwogfQogCiBzdGF0aWMgY29uc3QgVHlwZUluZm8gbWFjaHZpcnRfaW5mbyA9IHsK
-LS0gCjEuOC4zLjIKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRw
-czovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+This is a multi-part message in MIME format.
+--===============3708407363346619728==
+Content-Type: multipart/alternative;
+ boundary="------------040408060507010508030503"
+
+This is a multi-part message in MIME format.
+--------------040408060507010508030503
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+Hi Eric,
+
+On 03/19/15 12:16, Eric Auger wrote:
+> This patch allows the instantiation of the vfio-calxeda-xgmac device
+> from the QEMU command line (-device vfio-calxeda-xgmac,host="<device>").
+>
+> A specialized device tree node is created for the guest, containing
+> compat, dma-coherent, reg and interrupts properties.
+>
+> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+>
+> ---
+> v10 -> v11:
+> - add dma-coherent property to calxeda midway xgmac node (fix)
+> - use qemu_fdt_setprop to add reg property instead of
+>   qemu_fdt_setprop_sized_cells_from_array
+> - commit message rewording
+>
+> v8 -> v9:
+> - properly free resources in case of errors in
+>   add_calxeda_midway_xgmac_fdt_node
+>
+> v7 -> v8:
+> - move the add_fdt_node_functions array declaration between the device
+>   specific code and the generic code to avoid forward declarations of
+>   decice specific functions
+> - rename add_basic_vfio_fdt_node into
+>   add_calxeda_midway_xgmac_fdt_node
+>
+> v6 -> v7:
+> - compat string re-formatting removed since compat string is not exposed
+>   anymore as a user option
+> - VFIO IRQ kick-off removed from sysbus-fdt and moved to VFIO platform
+>   device
+> ---
+>  hw/arm/sysbus-fdt.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 72 insertions(+)
+>
+> diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
+> index 3038b94..6e465b2 100644
+> --- a/hw/arm/sysbus-fdt.c
+> +++ b/hw/arm/sysbus-fdt.c
+> @@ -26,6 +26,8 @@
+>  #include "sysemu/device_tree.h"
+>  #include "hw/platform-bus.h"
+>  #include "sysemu/sysemu.h"
+> +#include "hw/vfio/vfio-platform.h"
+> +#include "hw/vfio/vfio-calxeda-xgmac.h"
+>  
+>  /*
+>   * internal struct that contains the information to create dynamic
+> @@ -53,11 +55,81 @@ typedef struct NodeCreationPair {
+>      int (*add_fdt_node_fn)(SysBusDevice *sbdev, void *opaque);
+>  } NodeCreationPair;
+>  
+> +/* Device Specific Code */
+> +
+> +/**
+> + * add_calxeda_midway_xgmac_fdt_node
+> + *
+> + * Generates a simple node with following properties:
+> + * compatible string, regs, interrupts, dma-coherent
+> + */
+Since this function is applicable to any dma-coherent device with
+only mmio and irq properties to be exposed, should it be named
+something more generic so that it can be reused for other devices?
+> +static int add_calxeda_midway_xgmac_fdt_node(SysBusDevice *sbdev, void *opaque)
+> +{
+> +    PlatformBusFDTData *data = opaque;
+> +    PlatformBusDevice *pbus = data->pbus;
+> +    void *fdt = data->fdt;
+> +    const char *parent_node = data->pbus_node_name;
+> +    int compat_str_len, i, ret = -1;
+> +    char *nodename;
+> +    uint32_t *irq_attr, *reg_attr;
+> +    uint64_t mmio_base, irq_number;
+> +    VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(sbdev);
+> +    VFIODevice *vbasedev = &vdev->vbasedev;
+> +    Object *obj = OBJECT(sbdev);
+> +
+> +    mmio_base = object_property_get_int(obj, "mmio[0]", NULL);
+> +    nodename = g_strdup_printf("%s/%s@%" PRIx64, parent_node,
+> +                               vbasedev->name, mmio_base);
+> +    qemu_fdt_add_subnode(fdt, nodename);
+> +
+> +    compat_str_len = strlen(vdev->compat) + 1;
+> +    qemu_fdt_setprop(fdt, nodename, "compatible",
+> +                          vdev->compat, compat_str_len);
+> +
+> +    qemu_fdt_setprop(fdt, nodename, "dma-coherent", "", 0);
+> +
+> +    reg_attr = g_new(uint32_t, vbasedev->num_regions*2);
+> +    for (i = 0; i < vbasedev->num_regions; i++) {
+> +        mmio_base = platform_bus_get_mmio_addr(pbus, sbdev, i);
+You are missing the cpu_to_be32 for mmio_base and size.
+As a result, a 0x1000 size really gets encoded as 0x100000.
+If you have a device with 2 MMIO regions, this results
+in the second region getting a wrong starting address in
+the guest kernel, which also doesn't match the 2nd stage
+mapping done by KVM. With that fix, able to test this function
+with a device with 2 regions as well.
+> +        reg_attr[2*i] = (uint32_t)mmio_base;
+> +        reg_attr[2*i+1] = (uint32_t)memory_region_size(&vdev->regions[i]->mem);
+> +    }
+> +    ret = qemu_fdt_setprop(fdt, nodename, "reg", reg_attr,
+> +                           vbasedev->num_regions*2*sizeof(uint32_t));
+> +    if (ret) {
+> +        error_report("could not set reg property of node %s", nodename);
+> +        goto fail_reg;
+> +    }
+> +
+> +    irq_attr = g_new(uint32_t, vbasedev->num_irqs*3);
+> +    for (i = 0; i < vbasedev->num_irqs; i++) {
+> +        irq_number = platform_bus_get_irqn(pbus, sbdev , i)
+> +                         + data->irq_start;
+> +        irq_attr[3*i] = cpu_to_be32(0);
+> +        irq_attr[3*i+1] = cpu_to_be32(irq_number);
+> +        irq_attr[3*i+2] = cpu_to_be32(0x4);
+> +    }
+> +   ret = qemu_fdt_setprop(fdt, nodename, "interrupts",
+> +                     irq_attr, vbasedev->num_irqs*3*sizeof(uint32_t));
+> +    if (ret) {
+> +        error_report("could not set interrupts property of node %s",
+> +                     nodename);
+> +    }
+> +    g_free(irq_attr);
+> +fail_reg:
+> +    g_free(reg_attr);
+> +    g_free(nodename);
+> +    return ret;
+> +}
+> +
+>  /* list of supported dynamic sysbus devices */
+>  static const NodeCreationPair add_fdt_node_functions[] = {
+> +    {TYPE_VFIO_CALXEDA_XGMAC, add_calxeda_midway_xgmac_fdt_node},
+>      {"", NULL}, /* last element */
+>  };
+>  
+> +/* Generic Code */
+> +
+>  /**
+>   * add_fdt_node - add the device tree node of a dynamic sysbus device
+>   *
+
+
+--------------040408060507010508030503
+Content-Type: text/html; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+<html>
+  <head>
+    <meta content="text/html; charset=ISO-8859-1"
+      http-equiv="Content-Type">
+  </head>
+  <body bgcolor="#FFFFFF" text="#000000">
+    <div class="moz-cite-prefix"><font face="Courier New, Courier,
+        monospace">Hi Eric,<br>
+      </font><br>
+      On 03/19/15 12:16, Eric Auger wrote:<br>
+    </div>
+    <blockquote
+      cite="mid:1426785402-2091-8-git-send-email-eric.auger@linaro.org"
+      type="cite">
+      <pre wrap="">This patch allows the instantiation of the vfio-calxeda-xgmac device
+from the QEMU command line (-device vfio-calxeda-xgmac,host="&lt;device&gt;").
+
+A specialized device tree node is created for the guest, containing
+compat, dma-coherent, reg and interrupts properties.
+
+Signed-off-by: Eric Auger <a class="moz-txt-link-rfc2396E" href="mailto:eric.auger@linaro.org">&lt;eric.auger@linaro.org&gt;</a>
+
+---
+v10 -&gt; v11:
+- add dma-coherent property to calxeda midway xgmac node (fix)
+- use qemu_fdt_setprop to add reg property instead of
+  qemu_fdt_setprop_sized_cells_from_array
+- commit message rewording
+
+v8 -&gt; v9:
+- properly free resources in case of errors in
+  add_calxeda_midway_xgmac_fdt_node
+
+v7 -&gt; v8:
+- move the add_fdt_node_functions array declaration between the device
+  specific code and the generic code to avoid forward declarations of
+  decice specific functions
+- rename add_basic_vfio_fdt_node into
+  add_calxeda_midway_xgmac_fdt_node
+
+v6 -&gt; v7:
+- compat string re-formatting removed since compat string is not exposed
+  anymore as a user option
+- VFIO IRQ kick-off removed from sysbus-fdt and moved to VFIO platform
+  device
+---
+ hw/arm/sysbus-fdt.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 72 insertions(+)
+
+diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
+index 3038b94..6e465b2 100644
+--- a/hw/arm/sysbus-fdt.c
++++ b/hw/arm/sysbus-fdt.c
+@@ -26,6 +26,8 @@
+ #include "sysemu/device_tree.h"
+ #include "hw/platform-bus.h"
+ #include "sysemu/sysemu.h"
++#include "hw/vfio/vfio-platform.h"
++#include "hw/vfio/vfio-calxeda-xgmac.h"
+ 
+ /*
+  * internal struct that contains the information to create dynamic
+@@ -53,11 +55,81 @@ typedef struct NodeCreationPair {
+     int (*add_fdt_node_fn)(SysBusDevice *sbdev, void *opaque);
+ } NodeCreationPair;
+ 
++/* Device Specific Code */
++
++/**
++ * add_calxeda_midway_xgmac_fdt_node
++ *
++ * Generates a simple node with following properties:
++ * compatible string, regs, interrupts, dma-coherent
++ */</pre>
+    </blockquote>
+    <font face="Courier New, Courier, monospace">Since this function is
+      applicable to any dma-coherent device with <br>
+      only mmio and irq properties to be exposed, should it be named<br>
+      something more generic so that it can be reused for other devices?</font><br>
+    <blockquote
+      cite="mid:1426785402-2091-8-git-send-email-eric.auger@linaro.org"
+      type="cite">
+      <pre wrap="">
++static int add_calxeda_midway_xgmac_fdt_node(SysBusDevice *sbdev, void *opaque)
++{
++    PlatformBusFDTData *data = opaque;
++    PlatformBusDevice *pbus = data-&gt;pbus;
++    void *fdt = data-&gt;fdt;
++    const char *parent_node = data-&gt;pbus_node_name;
++    int compat_str_len, i, ret = -1;
++    char *nodename;
++    uint32_t *irq_attr, *reg_attr;
++    uint64_t mmio_base, irq_number;
++    VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(sbdev);
++    VFIODevice *vbasedev = &amp;vdev-&gt;vbasedev;
++    Object *obj = OBJECT(sbdev);
++
++    mmio_base = object_property_get_int(obj, "mmio[0]", NULL);
++    nodename = g_strdup_printf("%s/%s@%" PRIx64, parent_node,
++                               vbasedev-&gt;name, mmio_base);
++    qemu_fdt_add_subnode(fdt, nodename);
++
++    compat_str_len = strlen(vdev-&gt;compat) + 1;
++    qemu_fdt_setprop(fdt, nodename, "compatible",
++                          vdev-&gt;compat, compat_str_len);
++
++    qemu_fdt_setprop(fdt, nodename, "dma-coherent", "", 0);
++
++    reg_attr = g_new(uint32_t, vbasedev-&gt;num_regions*2);
++    for (i = 0; i &lt; vbasedev-&gt;num_regions; i++) {
++        mmio_base = platform_bus_get_mmio_addr(pbus, sbdev, i);</pre>
+    </blockquote>
+    <font face="Courier New, Courier, monospace">You are missing the
+      cpu_to_be32 for mmio_base and size. <br>
+      As a result, a 0x1000 size really gets encoded as 0x100000. <br>
+      If you have a device with 2 MMIO regions, this results <br>
+      in the second region getting a wrong starting address in <br>
+      the guest kernel, which also doesn't match the 2nd stage<br>
+      mapping done by KVM</font>. <font face="Courier New, Courier,
+      monospace">With that fix, able to test this function <br>
+      with a device with 2 regions as well.</font><br>
+    <blockquote
+      cite="mid:1426785402-2091-8-git-send-email-eric.auger@linaro.org"
+      type="cite">
+      <pre wrap="">
++        reg_attr[2*i] = (uint32_t)mmio_base;
++        reg_attr[2*i+1] = (uint32_t)memory_region_size(&amp;vdev-&gt;regions[i]-&gt;mem);
++    }
++    ret = qemu_fdt_setprop(fdt, nodename, "reg", reg_attr,
++                           vbasedev-&gt;num_regions*2*sizeof(uint32_t));
++    if (ret) {
++        error_report("could not set reg property of node %s", nodename);
++        goto fail_reg;
++    }
++
++    irq_attr = g_new(uint32_t, vbasedev-&gt;num_irqs*3);
++    for (i = 0; i &lt; vbasedev-&gt;num_irqs; i++) {
++        irq_number = platform_bus_get_irqn(pbus, sbdev , i)
++                         + data-&gt;irq_start;
++        irq_attr[3*i] = cpu_to_be32(0);
++        irq_attr[3*i+1] = cpu_to_be32(irq_number);
++        irq_attr[3*i+2] = cpu_to_be32(0x4);
++    }
++   ret = qemu_fdt_setprop(fdt, nodename, "interrupts",
++                     irq_attr, vbasedev-&gt;num_irqs*3*sizeof(uint32_t));
++    if (ret) {
++        error_report("could not set interrupts property of node %s",
++                     nodename);
++    }
++    g_free(irq_attr);
++fail_reg:
++    g_free(reg_attr);
++    g_free(nodename);
++    return ret;
++}
++
+ /* list of supported dynamic sysbus devices */
+ static const NodeCreationPair add_fdt_node_functions[] = {
++    {TYPE_VFIO_CALXEDA_XGMAC, add_calxeda_midway_xgmac_fdt_node},
+     {"", NULL}, /* last element */
+ };
+ 
++/* Generic Code */
++
+ /**
+  * add_fdt_node - add the device tree node of a dynamic sysbus device
+  *
+</pre>
+    </blockquote>
+    <br>
+  </body>
+</html>
+
+--------------040408060507010508030503--
+
+--===============3708407363346619728==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============3708407363346619728==--
