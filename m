@@ -1,28 +1,28 @@
-From: Baptiste Reynal <b.reynal@virtualopensystems.com>
-Subject: Re: [PATCH v11 0/4] machvirt dynamic sysbus device instantiation
-Date: Fri, 24 Apr 2015 09:36:26 +0200
-Message-ID: <CAN9JPjEZ6RwHT2rSei_toOBGUB7Dipne_hxek1QO4LkWceirHg@mail.gmail.com>
-References: <1425485909-5091-1-git-send-email-eric.auger@linaro.org>
- <CAN9JPjHCMPeY=zouEd=aP_mGQriLfv7q4gTK0Y+DW2K76c9qyA@mail.gmail.com>
- <55390D15.2060909@linaro.org>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH 0/2] irq: add get_gsi callback
+Date: Fri, 24 Apr 2015 11:01:11 +0200
+Message-ID: <553A0657.6050100@linaro.org>
+References: <1429778977-1632-1-git-send-email-eric.auger@linaro.org>
+ <5538BBD3.9040404@redhat.com> <5538BE19.6030009@linaro.org>
+ <5538C246.20304@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E234D4E627
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 03:28:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 624CA4E638
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 04:55:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1C-U8i1zYZEV for <kvmarm@lists.cs.columbia.edu>;
- Fri, 24 Apr 2015 03:28:11 -0400 (EDT)
-Received: from mail-qg0-f47.google.com (mail-qg0-f47.google.com
- [209.85.192.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 71C354E620
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 03:28:10 -0400 (EDT)
-Received: by qgej70 with SMTP id j70so19198166qge.2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 00:36:26 -0700 (PDT)
-In-Reply-To: <55390D15.2060909@linaro.org>
+ with ESMTP id EC5P1RWEjiM0 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Apr 2015 04:55:34 -0400 (EDT)
+Received: from mail-wi0-f182.google.com (mail-wi0-f182.google.com
+ [209.85.212.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2D86E4E634
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 04:55:33 -0400 (EDT)
+Received: by wiun10 with SMTP id n10so12784737wiu.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Apr 2015 02:03:48 -0700 (PDT)
+In-Reply-To: <5538C246.20304@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,199 +32,94 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>
-Cc: eric.auger@st.com, patches@linaro.org, qemu-devel@nongnu.org, pbonzini@redhat.com, kvm-arm <kvmarm@lists.cs.columbia.edu>
+To: Paolo Bonzini <pbonzini@redhat.com>, eric.auger@st.com, qemu-devel@nongnu.org, alex.williamson@redhat.com, peter.maydell@linaro.org, agraf@suse.de
+Cc: kvmarm@lists.cs.columbia.edu, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-I think it will be a pity to postpone VFIO support on QEMU and would
-rather introduce the support for VIRT_MMIO later.
+On 04/23/2015 11:58 AM, Paolo Bonzini wrote:
+> 
+> 
+> On 23/04/2015 11:40, Eric Auger wrote:
+>>>> Why can't you just use a GHashTable?
+>> You mean implementing this hash table in the interrupt controller?
+> 
+> No, in KVM.  Basically the kvm-vgic interrupt controller registers its 
+> qemu_irqs with kvm-all.c, passing the gsi number for KVM_IRQFD along 
+> the way.  Then VFIO device can pass the qemu_irq and ask for an irqfd 
+> for that qemu_irq, instead of having to know the gsi number.  kvm-all.c
+> acts as a mediator.
+> 
+> The notifier actually is not even necessary, because we already have
+> a very similar concept in QOM.  But qdev_init_gpio_out_named always
+> passes a dummy "notifier":
+> 
+> void qdev_init_gpio_out_named(DeviceState *dev, qemu_irq *pins,
+>                               const char *name, int n)
+> {
+>     int i;
+>     NamedGPIOList *gpio_list = qdev_get_named_gpio_list(dev, name);
+>     char *propname = g_strdup_printf("%s[*]", name ? name : "unnamed-gpio-out");
+> 
+>     assert(gpio_list->num_in == 0 || !name);
+>     gpio_list->num_out += n;
+> 
+>     for (i = 0; i < n; ++i) {
+>         memset(&pins[i], 0, sizeof(*pins));
+>         object_property_add_link(OBJECT(dev), propname, TYPE_IRQ,
+>                                  (Object **)&pins[i],
+>                                  object_property_allow_set_link,
+>                                  OBJ_PROP_LINK_UNREF_ON_RELEASE,
+>                                  &error_abort);
+>     } 
+>     g_free(propname);
+> }
+> 
+> So you need to add a method to DeviceClass, with the same prototype
+> as object_property_allow_set_link, and set the default value to
+> object_property_allow_set_link in device_class_init.  Then
+> qdev_init_gpio_out_named can do
+> 
+>     DeviceClass *dc = DEVICE_GET_CLASS(dev);
+>     ...
+>         object_property_add_link(OBJECT(dev), propname, TYPE_IRQ,
+>                                  (Object **)&pins[i],
+>                                  dc->gpio_set_hook,
+>                                  OBJ_PROP_LINK_UNREF_ON_RELEASE,
+>                                  &error_abort);
+> 
+> or something like that.
+> 
+> Alternatively, and probably better, add the argument to
+> qdev_init_gpio_out_named; there aren't many calls.  Then
+> you can add the method only to SysbusDeviceClass rather than
+> to all devices, and you can change sysbus_init_irq like this:
+> 
+> void sysbus_init_irq(SysBusDevice *dev, qemu_irq *p)
+> {
+>     SysBusDeviceClass *sdc = SYSBUS_DEVICE_GET_CLASS(dev);
+>     qdev_init_gpio_out_named(DEVICE(dev), p, SYSBUS_DEVICE_GPIO_IRQ, 1,
+>                              sdc->irq_set_hook);
+> }
 
-Alex, what is your position on it ?
+Hi Paolo
 
-Best regards,
-Baptiste
+I implemented this alternative but my concern is the check method is
+called before the qemu_irq setting. So on this callback I cannot
+retrieve the qemu_irq VFIOINTp struct container object needed to setup
+irqfd hence does not work for me. I would need a post_check cb. Do you
+think it it sensible to add another cb?
 
-On Thu, Apr 23, 2015 at 5:17 PM, Eric Auger <eric.auger@linaro.org> wrote:
-> Hi Baptiste,
->
-> Well I need to increase the size of the platform bus mmio and number of
-> IRQs according to Alex' advice and hence move it after VIRTIO_MMIO for
-> alignment reason. This is a small change I can carry out by tomorrow.
->
-> Then Alex proposed to bind VIRT_MMIO to the platform bus. This sounds a
-> bigger job and this requires me to better understand VIRTIO mechanics. I
-> am afraid I cannot achieve this as quickly.
->
-> Can't we envision to introduce that latter? I know the preferred way
-> through would have been to freeze the platform bus base address but this
-> introduces yet another dependency and overall acceptance is not guaranteed.
->
-> Best Regards
->
-> Eric
->
->
-> On 04/23/2015 05:05 PM, Baptiste Reynal wrote:
->> Hi Eric,
->>
->> Is there anything still blocking this patch ? Can I get the status ?
->>
->> Thanks,
->> Baptiste
->>
->> On Wed, Mar 4, 2015 at 5:18 PM, Eric Auger <eric.auger@linaro.org
->> <mailto:eric.auger@linaro.org>> wrote:
->>
->>     This patch series enables machvirt to dynamically instantiate sysbus
->>     devices from command line (using -device option).
->>
->>     All those sysbus devices are plugged onto a platform bus. This latter
->>     device is instantiated in machvirt and takes care of the binding of
->>     children sysbus devices on a machine init done notifier. The device
->>     tree node generation for children dynamic sysbus device also happens
->>     on a subsequent notifier that must be executed after the above one.
->>     machvirt registers that notifier before the platform bus creation to
->>     make sure notifiers are executed in the right order: dt generation after
->>     actual QOM binding.
->>
->>     Very few sysbus devices are supposed to be instantiated that
->>     way. VFIO devices belong to them.
->>
->>     Node creation really is architecture specific. On ARM the dynamic
->>     sysbus device node creation is implemented in a new C module,
->>     hw/arm/sysbus-fdt.c and not in the machine file.
->>
->>     Machvirt transformations and sysbus-fdt are largely inspired from
->>     Alex work.
->>
->>     The patch series can be found at:
->>     http://git.linaro.org/people/eric.auger/qemu.git,
->>     branch official_dynsysbus_v11
->>
->>     Best Regards
->>
->>     Eric
->>
->>     v10 -> v11:
->>     - rebase on v2.2.0 and especially Alex'
->>       "arm: Add PCIe host bridge in virt machine"
->>
->>     v9 -> v10:
->>     - add assert and fix return value in add_fdt_node
->>
->>     v8 -> v9:
->>     Take into account Peter's comments:
->>     hw/arm/sysbus-fdt:
->>     - s/Fdt/FDT in struct type names
->>     - reorder fields in PlatformBusFdtNotifierParams and use DO_UPCAST
->>     - use assert() when relevant (board model issue)
->>     - g_free the ARMPlatformBusFDTParams and PlatformBusFDTNotifierParams
->>       pointers in platform_bus_fdt_notify
->>     hw/arm/boot.c
->>     - fix compilation with arm-linux-user
->>     - reorder fields in ArmLoadKernelNotifier
->>     hw/arm/virt.c
->>     - PLATFORM_BUS_NUM_IRQS set to 32 instead of 20
->>     - platform bus irq now start at 64 instead of 48
->>     - remove change of indentation in  a15memmap
->>     - correct misc style issues
->>
->>     add a separate patch file for re-indentation in virt a15memmap
->>
->>     v7 -> v8:
->>     - rebase on 2.2.0 (boot.c and virt.c)
->>     - in virt.c machvirt_init, create_platform_bus simply is added
->>       after the arm_load_kernel call instead of moving this latter.
->>       should ease the review.
->>     - Add Alex & Shannon Reviewed-by
->>
->>     v6 -> v7:
->>     Take into account Shannon's comments:
->>     - hw/arm/sysbus-fdt.c: revert indentation in add_fdt_node_functions
->>     - hw/arm/virt.c:
->>       - add an additional comment in a15irqmap related to
->>     PLATFORM_BUS_NUM_IRQS
->>       - correct platform bus size to 0x400000
->>       - remove PLATFORM_BUS_FIRST_IRQ macro
->>
->>     v5 -> v6:
->>     Take into account Peter's comments:
->>     - dtb overload mechanism rewritten: arm_load_kernel code is moved into a
->>       machine init done notifier notify instead. arm_load_kernel only
->>     registers
->>       that notifier. As a consequence the dtb is loaded once.
->>     - v5 1-4 patch files are removed and replaced by a single patch file
->>     moving
->>       arm_load_kernel in the notifier (2).
->>     - as a consequence arm_load_kernel must be called before sysbus-fdt
->>       arm_register_platform_bus_fdt_creator.
->>     - In virt, platform_bus_params not a const anymore since its fields are
->>       initialized from vbi->memmap and vbi->irqmap. Hence
->>     create_platform_bus
->>       proto can be simplified.
->>     - In sysbus-fdt add_all_platform_bus_fdt_nodes now takes a handle to
->>       an ARMPlatformBusFdtParams. This is not a modify_dtb function anymore
->>       fdt pointer is checked in case the callback is called after the
->>     load_dtb
->>       (this latter deallocated fdt pointer). Check of fdt_filename moved
->>     in here.
->>       upgrade_dtb is removed. copyright aligned between .h and .c.
->>
->>     v4 -> v5:
->>     - in virt.c: platform_bus_params becomes static const
->>     - sysbus-fdt: change indentation in add_fdt_node_functions array init
->>     - s/load_dtb/arm_load_dtb in one boot.c comment
->>
->>     v3 -> v4:
->>     - dyn_sysbus_binding removed since binding stuff now are implemented by
->>       the platform bus device
->>     - due to a change in ARM load_dtb implementation using
->>     rom_add_blob_fixed,
->>       the dt no more is generated in a reset notifier but is generated on a
->>       machine init done notifier
->>     - the augmented device tree is not generated from scratch anymore but is
->>       added using a modify_dtb function. This required some small change in
->>       boot.c
->>     - the case where the user provides a dtb file now is handled
->>     - some cleanup in virt additions
->>     - implement a list of dyanmically instantiable devices in sysbus-fdt
->>
->>     v2 -> v3:
->>     - patch now applies on top of Alex full patchset
->>     - dyn_sysbus_devtree: add arm_prefix to emphasize the fact those
->>       functions are arm specific; arm_sysbus_device_create_devtree
->>       becomes static
->>     - load_dtb renamed into arm_load_dtb
->>     - add copyright in hw/arm/dyn_sysbus_devtree.c
->>
->>     v1 -> v2:
->>     - device node generation no more in sysbus device but in
->>       dyn_sysbus_devtree
->>     - VFIO region shrinked to 4MB and relocated in machvirt to avoid PCI
->>       shrink (dynamic vfio-mmio support might come latter)
->>     - platform_bus_base removed from PlatformDevtreeData
->>
->>
->>     Eric Auger (4):
->>       hw/arm/sysbus-fdt: helpers for platform bus nodes addition
->>       hw/arm/boot: arm_load_kernel implemented as a machine init done
->>         notifier
->>       hw/arm/virt: add dynamic sysbus device support
->>       hw/arm/virt: change indentation in a15memmap
->>
->>      hw/arm/Makefile.objs        |   1 +
->>      hw/arm/boot.c               |  14 +++-
->>      hw/arm/sysbus-fdt.c         | 174
->>     ++++++++++++++++++++++++++++++++++++++++++++
->>      hw/arm/virt.c               |  85 ++++++++++++++++++----
->>      include/hw/arm/arm.h        |  28 +++++++
->>      include/hw/arm/sysbus-fdt.h |  60 +++++++++++++++
->>      6 files changed, 348 insertions(+), 14 deletions(-)
->>      create mode 100644 hw/arm/sysbus-fdt.c
->>      create mode 100644 include/hw/arm/sysbus-fdt.h
->>
->>     --
->>     1.8.3.2
->>
->>
->
+Thanks
+
+Eric
+> 
+> 
+> Paolo
+> 
+>> The problem is my VFIO device currently has no link to the interrupt
+>> controller object. Besides it has a platform bus in between. Previously
+>> I devised a reset notifier called in the machine file to pass this link
+>> but Alex was not keen about this method. So the idea here is when the
+>> VFIO sysbus device qemuirq is getting connected, a notifier is called,
+>> VFIO device can retrieve the gsi of this qemu_irq and call KVM_IRQFD
+>> with that gsi.
