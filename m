@@ -1,159 +1,64 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 06/10] KVM: arm64: guest debug, add SW break point
- support
-Date: Mon, 27 Apr 2015 22:04:07 +0200
-Message-ID: <20150427200407.GG23335@cbox>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 06/10] KVM: arm64: guest debug, add SW break point support
+Date: Mon, 27 Apr 2015 22:57:34 +0100
+Message-ID: <CAFEAcA-Kh7Tn+kw9psL=gqme9ogAn+mM8Uco_HcJy=cqg72hbw@mail.gmail.com>
 References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
  <1427814488-28467-7-git-send-email-alex.bennee@linaro.org>
- <20150414082558.GS6186@cbox>
- <87y4li6hua.fsf@linaro.org>
+ <20150414082558.GS6186@cbox> <87y4li6hua.fsf@linaro.org> <20150427200407.GG23335@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <87y4li6hua.fsf@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org, jan.kiszka@siemens.com, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Return-path: <linux-doc-owner@vger.kernel.org>
+In-Reply-To: <20150427200407.GG23335@cbox>
+Sender: linux-doc-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>, Alexander Graf <agraf@suse.de>, Andrew Jones <drjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhichao Huang <zhichao.huang@linaro.org>, "J. Kiszka" <jan.kiszka@siemens.com>, David Hildenbrand <dahi@linux.vnet.ibm.com>, Bharat Bhushan <r65777@freescale.com>, bp@suse.de, Gleb Natapov <gleb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 23, 2015 at 03:26:53PM +0100, Alex Benn=E9e wrote:
->=20
-> Christoffer Dall <christoffer.dall@linaro.org> writes:
->=20
-> > On Tue, Mar 31, 2015 at 04:08:04PM +0100, Alex Benn=E9e wrote:
-> >> This adds support for SW breakpoints inserted by userspace.
-> >>=20
-> >> We do this by trapping all BKPT exceptions in the
-> >> hypervisor (MDCR_EL2_TDE).
-> >
-> > you mean trapping all exceptions in the guest to the hypervisor?
-> >
-> >> The kvm_debug_exit_arch carries the address
-> >> of the exception.
-> >
-> > why?  can userspace not simply read out the PC using GET_ONE_REG?
->=20
-> Yes, I have re-worded and removed PC from the debug information.
->=20
-> <snip>
-> >> =20
-> >> +	/* Trap breakpoints? */
-> >> +	if (vcpu->guest_debug & KVM_GUESTDBG_USE_SW_BP)
-> >> +		vcpu->arch.mdcr_el2 |=3D MDCR_EL2_TDE;
-> >> +	else
-> >> +		vcpu->arch.mdcr_el2 &=3D ~MDCR_EL2_TDE;
-> >
-> > so now you're trapping all debug exceptions, right?
-> >
-> > what happens if the guest is using the hardware to debug debug stuf=
-f and
-> > generates other kinds of debug exceptions, like a hardware breakpoi=
-nt,
-> > will we not see an unhandled exception and the guest being forceful=
-ly
-> > killed?
->=20
-> Yes until the later patches which stop the guest using HW debug
-> registers while we are using them.
->=20
-> >
-> >> +
-> >>  }
-> >> =20
-> >>  void kvm_arch_clear_debug(struct kvm_vcpu *vcpu)
-> >> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_=
-exit.c
-> >> index 524fa25..ed1bbb4 100644
-> >> --- a/arch/arm64/kvm/handle_exit.c
-> >> +++ b/arch/arm64/kvm/handle_exit.c
-> >> @@ -82,6 +82,37 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu=
-, struct kvm_run *run)
-> >>  	return 1;
-> >>  }
-> >> =20
-> >> +/**
-> >> + * kvm_handle_debug_exception - handle a debug exception instruct=
+On 27 April 2015 at 21:04, Christoffer Dall <christoffer.dall@linaro.or=
+g> wrote:
+> On Thu, Apr 23, 2015 at 03:26:53PM +0100, Alex Benn=C3=A9e wrote:
+>>
+>> Christoffer Dall <christoffer.dall@linaro.org> writes:
+>>
+>> > On Tue, Mar 31, 2015 at 04:08:04PM +0100, Alex Benn=C3=A9e wrote:
+>> >> + * just need to report the PC and the HSR values to userspace.
+>> >> + * Userspace may decide to re-inject the exception and deliver i=
+t to
+>> >> + * the guest if it wasn't for the host to deal with.
+>> >
+>> > now I'm confused - does userspace setup the guest to receive an
+>> > exception or does it tell KVM to emulate an exception for the gues=
+t or
+>> > do we execute the breakpoint without trapping the debug exception?
+>>
+>> I've made it all go through userspace as we may have to translate th=
+e
+>> hypervisor visible exception code to what the guest was expecting to=
+ see.
+>>
+>
+> ok, so I think you should re-phrase something like:
+>
+> "Userspace may decide that this exception is caused by the guest usin=
+g
+> debugging itself, and may in that case emulate the guest debug except=
 ion
-> >
-> > handle a software breadkpoint exception
-> >
-> >> + *
-> >> + * @vcpu:	the vcpu pointer
-> >> + * @run:	access to the kvm_run structure for results
-> >> + *
-> >> + * We route all debug exceptions through the same handler as we
-> >
-> > all debug exceptions?  software breakpoints and all?  then why the =
-above
-> > shot text?
-> >
+> in userspace before resuming KVM."
+>
+> But does that really work?  Given that we don't support KVM-TCG
+> migration, this sounds a little strange.  Did we test it?
 
-I think the issue here was "debug exception instruction" making me thin=
-k
-this is just for software breakpoints...
+The QEMU patches have a TODO note at the point where you'd want
+to do this... Design-wise you can do the reinjection in the
+kernel or in userspace (ppc QEMU does this in userspace, for
+instance) because it's pretty much just setting registers to fake
+up the exception-entry into EL1. Code-wise QEMU's ARM code isn't
+set up to do it right now, but it shouldn't be too difficult to
+persuade the TCG exception-entry code to work for this case too.
 
-Not sure what I meant by 'shot text' - probably 'short text'
+Does the kernel already have a conveniently implemented "inject
+exception into guest" lump of code? If so it might be less effort
+to do it that way round, maybe.
 
-> >> + * just need to report the PC and the HSR values to userspace.
-> >> + * Userspace may decide to re-inject the exception and deliver it=
- to
-> >> + * the guest if it wasn't for the host to deal with.
-> >
-> > now I'm confused - does userspace setup the guest to receive an
-> > exception or does it tell KVM to emulate an exception for the guest=
- or
-> > do we execute the breakpoint without trapping the debug exception?
->=20
-> I've made it all go through userspace as we may have to translate the
-> hypervisor visible exception code to what the guest was expecting to =
-see.
->=20
-
-ok, so I think you should re-phrase something like:
-
-"Userspace may decide that this exception is caused by the guest using
-debugging itself, and may in that case emulate the guest debug exceptio=
-n
-in userspace before resuming KVM."
-
-But does that really work?  Given that we don't support KVM-TCG
-migration, this sounds a little strange.  Did we test it?
-
-> >
-> >> + */
-> >> +static int kvm_handle_guest_debug(struct kvm_vcpu *vcpu, struct k=
-vm_run *run)
-> >> +{
-> >> +	u32 hsr =3D kvm_vcpu_get_hsr(vcpu);
-> >> +
-> >> +	run->exit_reason =3D KVM_EXIT_DEBUG;
-> >> +	run->debug.arch.hsr =3D hsr;
-> >> +
-> >> +	switch (hsr >> ESR_ELx_EC_SHIFT) {
-> >> +	case ESR_ELx_EC_BKPT32:
-> >> +	case ESR_ELx_EC_BRK64:
-> >> +		run->debug.arch.pc =3D *vcpu_pc(vcpu);
-> >> +		break;
-> >> +	default:
-> >> +		kvm_err("%s: un-handled case hsr: %#08x\n",
-> >> +			__func__, (unsigned int) hsr);
-> >
-> > this should never happen right?
->=20
-> At the moment it could, at the end of the patch series we should cove=
-r
-> all the cases so it would indicate a bug. I've made it return an erro=
-r
-> code so it fails hard as suggested by David.
->=20
-hmm, ok, so I'm not so worried about that kind of bisectability
-(although it would be nice to keep that working too), but reading
-patches that way is a bit annoying for reviewers, so I recommend you
-deal with the patch ordering in some way that makes it more obvious wha=
-t
-happens as reviewers read the patches, one at a time.
-
-Thanks,
--Christoffer
+-- PMM
