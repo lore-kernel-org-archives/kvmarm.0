@@ -1,27 +1,27 @@
-From: Eric Auger <eric.auger@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
 Subject: Re: [PATCH v12 3/4] hw/arm/virt: add dynamic sysbus device support
-Date: Mon, 27 Apr 2015 15:54:34 +0200
-Message-ID: <553E3F9A.6070104@linaro.org>
+Date: Mon, 27 Apr 2015 14:56:57 +0100
+Message-ID: <CAFEAcA_2FYR3A6Y5oSACEQG6+W7CBJfFpxoDzLyxiqM-KQv6hg@mail.gmail.com>
 References: <1429888773-11730-1-git-send-email-eric.auger@linaro.org>
  <1429888773-11730-4-git-send-email-eric.auger@linaro.org>
  <553E3C71.1040001@suse.de>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 60FB44E7B7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2015 09:48:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9679F4E985
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2015 09:48:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2wCJ58GPKS+m for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Apr 2015 09:48:50 -0400 (EDT)
-Received: from mail-wi0-f173.google.com (mail-wi0-f173.google.com
- [209.85.212.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D56FC4E716
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2015 09:48:49 -0400 (EDT)
-Received: by wicmx19 with SMTP id mx19so84827778wic.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2015 06:57:13 -0700 (PDT)
+ with ESMTP id vvvNG1nD2sj9 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Apr 2015 09:48:54 -0400 (EDT)
+Received: from mail-ig0-f176.google.com (mail-ig0-f176.google.com
+ [209.85.213.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C25D34E980
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2015 09:48:53 -0400 (EDT)
+Received: by iget9 with SMTP id t9so69097212ige.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2015 06:57:17 -0700 (PDT)
 In-Reply-To: <553E3C71.1040001@suse.de>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,121 +32,18 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alexander Graf <agraf@suse.de>, eric.auger@st.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com
-Cc: patches@linaro.org, alex.williamson@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Alexander Graf <agraf@suse.de>
+Cc: eric.auger@st.com, Patch Tracking <patches@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgQWxleApPbiAwNC8yNy8yMDE1IDAzOjQxIFBNLCBBbGV4YW5kZXIgR3JhZiB3cm90ZToKPiBP
-biAwNC8yNC8yMDE1IDA1OjE5IFBNLCBFcmljIEF1Z2VyIHdyb3RlOgo+PiBBbGxvd3Mgc3lzYnVz
-IGRldmljZXMgdG8gYmUgaW5zdGFudGlhdGVkIGZyb20gY29tbWFuZCBsaW5lIGJ5Cj4+IHVzaW5n
-IC1kZXZpY2Ugb3B0aW9uLiBNYWNodmlydCBjcmVhdGVzIGEgcGxhdGZvcm0gYnVzIGF0IGluaXQu
-Cj4+IFRoZSBkeW5hbWljIHN5c2J1cyBkZXZpY2VzIGFyZSBhdHRhY2hlZCB0byB0aGlzIHBsYXRm
-b3JtIGJ1cyBkZXZpY2UuCj4+Cj4+IFRoZSBwbGF0Zm9ybSBidXMgZGV2aWNlIHJlZ2lzdGVycyBh
-IG1hY2hpbmUgaW5pdCBkb25lIG5vdGlmaWVyCj4+IHdob3NlIHJvbGUgd2lsbCBiZSB0byBiaW5k
-IHRoZSBkeW5hbWljIHN5c2J1cyBkZXZpY2VzLiBJbmRlZWQKPj4gZHluYW1pYyBzeXNidXMgZGV2
-aWNlcyBhcmUgY3JlYXRlZCBhZnRlciBtYWNoaW5lIGluaXQuCj4+Cj4+IG1hY2h2aXJ0IGFsc28g
-cmVnaXN0ZXJzIGEgbm90aWZpZXIgdGhhdCB3aWxsIGJ1aWxkIHRoZSBkZXZpY2UKPj4gdHJlZSBu
-b2RlcyBmb3IgdGhlIHBsYXRmb3JtIGJ1cyBhbmQgaXRzIGNoaWxkcmVuIGR5bmFtaWMgc3lzYnVz
-Cj4+IGRldmljZXMuCj4+Cj4+IFNpZ25lZC1vZmYtYnk6IEFsZXhhbmRlciBHcmFmIDxhZ3JhZkBz
-dXNlLmRlPgo+IAo+IEhybSwgYXJlIHlvdSBzdXJlIHRoaXMgY29kZSBpcyBmcm9tIG1lPyA6KQoK
-V2VsbCBJIGp1c3Qgd2FudGVkIHRvIGVtcGhhc2l6ZSB0aGlzIG9yaWdpbmF0ZXMgZnJvbSB5b3Vy
-IGU1MDAuYyBldHNlYwppbnRlZ3JhdGlvbi4gdGhyb3VnaCB0aGlzIGlzIHRydWUgbW9zdCBvZiBp
-dCBub3cgaXMgaW4gc3lzYnVzLWZkdC5jLiBJCndpbGwgcmVtb3ZlIHlvdXIgU2lnbmVkLW9mZi1i
-eSBpZiB0aGlzIGlzIHlvdXIgd2lsbCA7LSkKCkJlc3QgUmVnYXJkcwoKRXJpYwo+IAo+PiBTaWdu
-ZWQtb2ZmLWJ5OiBFcmljIEF1Z2VyIDxlcmljLmF1Z2VyQGxpbmFyby5vcmc+Cj4+IFJldmlld2Vk
-LWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+Cj4+Cj4+IC0tLQo+PiB2
-MTEgLT4gdjEyOgo+PiAtIHJlc2l6ZSBQTEFURk9STV9CVVNfTlVNX0lSUVMgdG8gNjQgaW5zdGVh
-ZCBvZiAzMgo+PiAtIG92ZXJhbGwgTlVNX0lSUVMgY2hhbmdlZCB0byAyNTYuIFRoaXMgbGVhdmVz
-IHNwYWNlIGZvciBNU0kKPj4gICAgbG9vbWluZyBhZGRpdGlvbgo+PiAtIFZJUlRfUExBVEZPUk1f
-QlVTIHNpemUgY2hhbmdlZCBmcm9tIDRNQiB0byAzMk1CIGFuZCBiYXNlIHNldCBhdAo+PiAgICAw
-eGMwMDAwMDAKPj4gLSBBZGQgQWxleCBSLWIKPj4KPj4gdjggLT4gdjk6Cj4+IC0gUExBVEZPUk1f
-QlVTX05VTV9JUlFTIHNldCB0byAzMiBpbnN0ZWFkIG9mIDIwCj4+IC0gcGxhdGZvcm0gYnVzIGly
-cSBub3cgc3RhcnQgYXQgNjQgaW5zdGVhZCBvZiA0OAo+PiAtIHJlbW92ZSBjaGFuZ2Ugb2YgaW5k
-ZW50YXRpb24gaW4gYTE1bWVtbWFwCj4+IC0gY29ycmVjdCBtaXNjIHN0eWxlIGlzc3Vlcwo+Pgo+
-PiB2NyAtPiB2ODoKPj4gLSByZWJhc2Ugb24gMi4yLjAKPj4gLSBpbiBtYWNodmlydF9pbml0LCBj
-cmVhdGVfcGxhdGZvcm1fYnVzIHNpbXBseSBpcyBhZGRlZAo+PiAgICBhZnRlciB0aGUgYXJtX2xv
-YWRfa2VybmVsIGNhbGwgaW5zdGVhZCBvZiBtb3ZpbmcgdGhpcyBsYXR0ZXIuCj4+ICAgIFJlbGF0
-ZWQgY29tbWVudCBzbGlnaGx5IHJld29yZGVkLgo+PiAtIER1ZSB0byB0aG9zZSBjaGFuZ2VzIEkg
-ZHJvcHBlZCBBbGV4IGFuZCBTaGFubm9uJ3MgUmV2aWV3ZWQtYnkKPj4KPj4gdjYgLT4gdjc6Cj4+
-IFRha2UgaW50byBhY2NvdW50IFNoYW5ub24gY29tbWVudHM6Cj4+IC0gcmVtb3ZlIFBMQVRGT1JN
-X0JVU19GSVJTVF9JUlEgbWFjcm8KPj4gLSBjb3JyZWN0IHBsYXRmb3JtIGJ1cyBzaXplIHRvIDB4
-NDAwMDAwCj4+IC0gYWRkIGFuIGFkZGl0aW9uYWwgY29tbWVudCBpbiBhMTVpcnFtYXAgcmVsYXRl
-ZCB0bwo+PiAgICBQTEFURk9STV9CVVNfTlVNX0lSUVMKPj4KPj4gdjUgLT4gdjY6Cj4+IC0gVGFr
-ZSBpbnRvIGFjY291bnQgUGV0ZXIncyBjb21tZW50czoKPj4gICAgLSBwbGF0Zm9ybV9idXNfcGFy
-YW1zIGluaXRpYWxpemVkIGZyb20gdmJpLT5tZW1tYXAgYW5kIHZiaS0+aXJxbWFwLgo+PiAgICAg
-IEFzIGEgY29uc2VxdWVuY2UsIGNvbnN0IGlzIHJlbW92ZWQuIEFsc28gYWxpZ25tZW50IGluIGEx
-NW1lbW1hcAo+PiAgICAgIGlzIHNsaWdodGx5IGNoYW5nZWQuCj4+ICAgIC0gQVJNUGxhdGZvcm1C
-dXNTeXN0ZW1QYXJhbXMgaGFuZGxlIHJlbW92ZWQgZnJvbSBjcmVhdGVfcGxhdGZvcm1fYnVzCj4+
-ICAgICAgcHJvdG90eXBlCj4+IC0gYXJtX2xvYWRfa2VybmVsIGhhcyBiZWNvbWUgYSBtYWNoaW5l
-IGluaXQgZG9uZSBub3RpZmllciByZWdpc3RyYXRpb24uCj4+ICAgIEl0IG11c3QgYmUgY2FsbGVk
-IGJlZm9yZSBwbGF0Zm9ybV9idXNfY3JlYXRlIHRvIGd1YXJhbnRlZSB0aGUgY29ycmVjdAo+PiAg
-ICBub3RpZmllciBleGVjdXRpb24gc2VxdWVuY2UKPj4KPj4gdjQgLT4gdjU6Cj4+IC0gcGxhdGZv
-cm1fYnVzX3BhcmFtcyBiZWNvbWVzIHN0YXRpYyBjb25zdAo+PiAtIHJld29yZCBjb21tZW50IGlu
-IGNyZWF0ZV9wbGF0Zm9ybV9idXMKPj4gLSByZXdvcmQgdGhlIGNvbW1pdCBtZXNzYWdlCj4+Cj4+
-IHYzIC0+IHY0Ogo+PiAtIHVzZSBwbGF0Zm9ybSBidXMgb2JqZWN0LCBpbnN0YW50aWF0ZWQgaW4g
-Y3JlYXRlX3BsYXRmb3JtX2J1cwo+PiAtIGRldmljZSB0cmVlIGdlbmVyYXRpb24gZm9yIHBsYXRm
-b3JtIGJ1cyBhbmQgY2hpbGRyZW4gZHluYW1pYwo+PiAgICBzeXNidXMgZGV2aWNlcyBpcyBubyBt
-b3JlIGhhbmRsZWQgYXQgcmVzZXQgYnV0IGluIGEKPj4gICAgbWFjaGluZV9pbml0X2RvbmVfbm90
-aWZpZXIgKGR1ZSB0byB0aGUgY2hhbmdlIGluIGltcGxlbWVudGFpb24KPj4gICAgb2YgQVJNIGxv
-YWQgZHRiIHVzaW5nIHJvbV9hZGRfYmxvYl9maXhlZCkuCj4+IC0gZGV2aWNlIHRyZWUgZW5oYW5j
-ZW1lbnQgbm93IHRha2VzIGludG8gYWNjb3VudCB0aGUgY2FzZSBvZgo+PiAgICB1c2VyIHByb3Zp
-ZGVkIGR0Yi4gQmVmb3JlIHRoZSB1c2VyIGR0YiB3YXMgb3ZlcndyaXR0ZW4gd2hpY2gKPj4gICAg
-d2FzIHdyb25nLiBIb3dldmVyIGluIGNhc2UgdGhlIGR0YiBpcyBwcm92aWRlZCBieSB0aGUgdXNl
-ciwKPj4gICAgZHluYW1pYyBzeXNidXMgbm9kZXMgYXJlIG5vdCBhZGRlZCB0aGVyZS4KPj4gLSBy
-ZW5hbWluZyBvZiBNQUNIVklSVF9QTEFURk9STSBkZWZpbmVzCj4+IC0gTUFDSFZJUlRfUExBVEZP
-Uk1fUEFHRV9TSElGVCBhbmQgU0laRV9QQUdFUyBub3QgbmVlZGVkIGFueW1vcmUsCj4+ICAgIGhl
-bmNlIHJlbW92ZWQuCj4+IC0gRHluU3lzYnVzUGFyYW1zIHN0cnVjdCByZW5hbWVkIGludG8gQVJN
-UGxhdGZvcm1CdXNTeXN0ZW1QYXJhbXMKPj4gICAgYW5kIGFib3ZlIHBhcmFtcyByZW1vdmVkLgo+
-PiAtIHNlcGFyYXRpb24gb2YgZHQgY3JlYXRpb24gYW5kIFFFTVUgYmluZGluZyBpcyBub3QgbWFu
-ZGF0ZWQgYW55bW9yZQo+PiAgICBzaW5jZSB0aGUgZGV2aWNlIHRyZWUgaXMgbm90IGNyZWF0ZWQg
-ZnJvbSBzY3JhdGNoIGFueW1vcmUuIEluc3RlYWQKPj4gICAgdGhlIG1vZGlmeV9kdGIgZnVuY3Rp
-b24gaXMgdXNlZC4KPj4gLSBjcmVhdGVfcGxhdGZvcm1fYnVzIHJlZ2lzdGVycyBhbm90aGVyIG1h
-Y2hpbmUgaW5pdCBkb25lIG5vdGlmaWVyCj4+ICAgIHRvIHN0YXJ0IFZGSU8gSVJRIGhhbmRsaW5n
-LiBUaGlzIGxhdHRlciBleGVjdXRlcyBhZnRlciB0aGUKPj4gICAgZHluYW1pYyBzeXNidXMgZGV2
-aWNlIGJpbmRpbmcuCj4+Cj4+IHYyIC0+IHYzOgo+PiAtIHJlbmFtaW5nIG9mIGFybV9wbGF0Zm9y
-bV9idXNfY3JlYXRlX2RldnRyZWUgYW5kIGFybV9sb2FkX2R0Ygo+PiAtIGFkZCBjb3B5cmlnaHQg
-aW4gaHcvYXJtL2R5bl9zeXNidXNfZGV2dHJlZS5jCj4+Cj4+IHYxIC0+IHYyOgo+PiAtIHJlbW92
-ZSB1c2VsZXNzIHZmaW8tcGxhdGZvcm0uaCBpbmNsdWRlIGZpbGUKPj4gLSBzL01BQ0hWSVJUX1BM
-QVRGT1JNX0hPTEUvTUFDSFZJUlRfUExBVEZPUk1fU0laRQo+PiAtIHVzZSBkeW5fc3lzYnVzX2Jp
-bmRpbmcgYW5kIGR5bl9zeXNidXNfZGV2dHJlZQo+PiAtIGR5bmFtaWMgc3lzYnVzIHBsYXRmb3Jt
-IGJ1c2Ugc2l6ZSBzaHJpbmtlZCB0byA0TUIgYW5kCj4+ICAgIG1vdmVkIGJldHdlZW4gUlRDIGFu
-ZCBNTUlPCj4+Cj4+IHYxOgo+Pgo+PiBJbnNwaXJlZCBmcm9tIHdoYXQgQWxleCBHcmFmIGRpZCBp
-biBwcGMgZTUwMAo+PiBodHRwczovL2xpc3RzLmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUtcHBj
-LzIwMTQtMDcvbXNnMDAwMTIuaHRtbAo+PiAtLS0KPj4gICBody9hcm0vdmlydC5jIHwgNjEKPj4g
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-Ky0KPj4gICAxIGZpbGUgY2hhbmdlZCwgNjAgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQo+
-Pgo+PiBkaWZmIC0tZ2l0IGEvaHcvYXJtL3ZpcnQuYyBiL2h3L2FybS92aXJ0LmMKPj4gaW5kZXgg
-NTY1ZjU3My4uZWZhMzIxNiAxMDA2NDQKPj4gLS0tIGEvaHcvYXJtL3ZpcnQuYwo+PiArKysgYi9o
-dy9hcm0vdmlydC5jCj4+IEBAIC00MywxMSArNDMsMTMgQEAKPj4gICAjaW5jbHVkZSAicWVtdS9i
-aXRvcHMuaCIKPj4gICAjaW5jbHVkZSAicWVtdS9lcnJvci1yZXBvcnQuaCIKPj4gICAjaW5jbHVk
-ZSAiaHcvcGNpLWhvc3QvZ3BleC5oIgo+PiArI2luY2x1ZGUgImh3L2FybS9zeXNidXMtZmR0Lmgi
-Cj4+ICsjaW5jbHVkZSAiaHcvcGxhdGZvcm0tYnVzLmgiCj4+ICAgICAjZGVmaW5lIE5VTV9WSVJU
-SU9fVFJBTlNQT1JUUyAzMgo+PiAgICAgLyogTnVtYmVyIG9mIGV4dGVybmFsIGludGVycnVwdCBs
-aW5lcyB0byBjb25maWd1cmUgdGhlIEdJQyB3aXRoICovCj4+IC0jZGVmaW5lIE5VTV9JUlFTIDEy
-OAo+PiArI2RlZmluZSBOVU1fSVJRUyAyNTYKPj4gICAgICNkZWZpbmUgR0lDX0ZEVF9JUlFfVFlQ
-RV9TUEkgMAo+PiAgICNkZWZpbmUgR0lDX0ZEVF9JUlFfVFlQRV9QUEkgMQo+PiBAQCAtNjAsNiAr
-NjIsOCBAQAo+PiAgICNkZWZpbmUgR0lDX0ZEVF9JUlFfUFBJX0NQVV9TVEFSVCA4Cj4+ICAgI2Rl
-ZmluZSBHSUNfRkRUX0lSUV9QUElfQ1BVX1dJRFRIIDgKPj4gICArI2RlZmluZSBQTEFURk9STV9C
-VVNfTlVNX0lSUVMgNjQKPj4gKwo+PiAgIGVudW0gewo+PiAgICAgICBWSVJUX0ZMQVNILAo+PiAg
-ICAgICBWSVJUX01FTSwKPj4gQEAgLTcxLDggKzc1LDExIEBAIGVudW0gewo+PiAgICAgICBWSVJU
-X1JUQywKPj4gICAgICAgVklSVF9GV19DRkcsCj4+ICAgICAgIFZJUlRfUENJRSwKPj4gKyAgICBW
-SVJUX1BMQVRGT1JNX0JVUywKPj4gICB9Owo+PiAgICtzdGF0aWMgQVJNUGxhdGZvcm1CdXNTeXN0
-ZW1QYXJhbXMgcGxhdGZvcm1fYnVzX3BhcmFtczsKPj4gKwo+PiAgIHR5cGVkZWYgc3RydWN0IE1l
-bU1hcEVudHJ5IHsKPj4gICAgICAgaHdhZGRyIGJhc2U7Cj4+ICAgICAgIGh3YWRkciBzaXplOwo+
-PiBAQCAtMTMxLDYgKzEzOCw3IEBAIHN0YXRpYyBjb25zdCBNZW1NYXBFbnRyeSBhMTVtZW1tYXBb
-XSA9IHsKPj4gICAgICAgW1ZJUlRfRldfQ0ZHXSA9ICAgICB7IDB4MDkwMjAwMDAsIDB4MDAwMDAw
-MGEgfSwKPj4gICAgICAgW1ZJUlRfTU1JT10gPSAgICAgICB7IDB4MGEwMDAwMDAsIDB4MDAwMDAy
-MDAgfSwKPj4gICAgICAgLyogLi4ucmVwZWF0aW5nIGZvciBhIHRvdGFsIG9mIE5VTV9WSVJUSU9f
-VFJBTlNQT1JUUywgZWFjaCBvZgo+PiB0aGF0IHNpemUgKi8KPj4gKyAgICBbVklSVF9QTEFURk9S
-TV9CVVNdID0gICB7IDB4MGMwMDAwMDAsIDB4MDIwMDAwMDAgfSwKPiAKPiBQZXRlciwgd291bGQg
-eW91IGhhdmUgYSBoYXJkIHRpbWUgaWYgd2UganVzdCBnZXQgcmlkIG9mIFZJUlRfTU1JTwo+IGNv
-bXBsZXRlbHkgYW5kIGFsbG93IHVzZXJzIHRvIGNyZWF0ZSB0aGUgbW1pby12aXJ0aW8gYnJpZGdl
-cyB1c2luZwo+IC1kZXZpY2UgZm9yIC1NIHZpcnQtMi40IGFuZCBhYm92ZT8KPiAKPiBBdCB0aGUg
-ZW5kIG9mIHRoZSBkYXksIEknbSBmYWlybHkgc3VyZSBwZW9wbGUgd2lsbCBlbmQgdXAgdmlydGlv
-LXBjaQo+IGFueXdheSBhbmQgaXQncyBqdXN0IGEgYmlnIHdhc3RlIG9mIGFkZHJlc3Mgc3BhY2Ug
-dG8ga2VlcCBWSVJUX01NSU8KPiBhcm91bmQsIG5vPwo+IAo+IFRoYXQgc2FpZCwgaWYgeW91IHdh
-bnQgdG8ga2VlcCB2aXJ0aW8tbW1pbyBzdXBwb3J0IGluIHRoZSB3YXkgaXQgaXMKPiB0b2RheSwg
-SSB3b24ndCBvYmplY3QuIFRoZSByZXN0IG9mIHRoZSBwYXRjaCBsb29rcyBnb29kIHRvIG1lLgo+
-IAo+IAo+IEFsZXgKPiAKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpo
-dHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On 27 April 2015 at 14:41, Alexander Graf <agraf@suse.de> wrote:
+> Peter, would you have a hard time if we just get rid of VIRT_MMIO completely
+> and allow users to create the mmio-virtio bridges using -device for -M
+> virt-2.4 and above?
+
+I would strongly prefer not -- it breaks existing working command
+lines. I agree that we are going to want to move to virtio-pci
+and virtio-mmio is just legacy, but retaining legacy is what makes
+QEMU not kvmtool, right? :-)
+
+-- PMM
