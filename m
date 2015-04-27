@@ -1,25 +1,25 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] sysbus: add irq_routing_notifier
-Date: Mon, 27 Apr 2015 17:01:01 +0200
-Message-ID: <553E4F2D.7060808@redhat.com>
-References: <1429879153-23476-1-git-send-email-eric.auger@linaro.org>	<CAEgOgz5rBLZD1U0iodZvytb_RYjH7a04attgZxZ-WbuFOkPxpA@mail.gmail.com>	<553DF2AA.2070102@linaro.org>	<553E11E7.7070704@redhat.com>	<553E297F.4020706@linaro.org>	<553E3B7E.9080009@redhat.com>
- <CAEgOgz6eFLhkwm7qto=j=p3L5+cz5s_McUyZUcqeN265CgXSdg@mail.gmail.com>
- <553E4E05.1010405@linaro.org>
+From: Christopher Covington <cov@codeaurora.org>
+Subject: Re: [PATCH v12 3/4] hw/arm/virt: add dynamic sysbus device support
+Date: Mon, 27 Apr 2015 12:58:35 -0400
+Message-ID: <553E6ABB.1070703@codeaurora.org>
+References: <1429888773-11730-1-git-send-email-eric.auger@linaro.org>
+ <1429888773-11730-4-git-send-email-eric.auger@linaro.org>
+ <553E3C71.1040001@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B95EA4E9C6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2015 10:52:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 85A7B4E928
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2015 12:50:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A36l+HKpgPFc for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Apr 2015 10:52:46 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 049D44E9C4
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2015 10:52:45 -0400 (EDT)
-In-Reply-To: <553E4E05.1010405@linaro.org>
+ with ESMTP id 6m+hFT9wyVYz for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Apr 2015 12:50:16 -0400 (EDT)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15CE64E8AC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2015 12:50:15 -0400 (EDT)
+In-Reply-To: <553E3C71.1040001@suse.de>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,24 +29,39 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>, Peter Crosthwaite <peter.crosthwaite@xilinx.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, Patch Tracking <patches@linaro.org>, eric.auger@st.com, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: Alexander Graf <agraf@suse.de>, Eric Auger <eric.auger@linaro.org>, eric.auger@st.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com
+Cc: alex.williamson@redhat.com, kvmarm@lists.cs.columbia.edu, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi Alex,
 
+On 04/27/2015 09:41 AM, Alexander Graf wrote:
 
-On 27/04/2015 16:56, Eric Auger wrote:
-> Peter, Paolo,
+>> --- a/hw/arm/virt.c
+>> +++ b/hw/arm/virt.c
+
+>> @@ -131,6 +138,7 @@ static const MemMapEntry a15memmap[] = {
+>>       [VIRT_FW_CFG] =     { 0x09020000, 0x0000000a },
+>>       [VIRT_MMIO] =       { 0x0a000000, 0x00000200 },
+>>       /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that
+>> size */
+>> +    [VIRT_PLATFORM_BUS] =   { 0x0c000000, 0x02000000 },
 > 
-> After your feedbacks, I feel I need to spend some more time on the
-> original check() track. I would prefer not to introduce any patch that
-> will make issue in the future.
+> Peter, would you have a hard time if we just get rid of VIRT_MMIO completely
+> and allow users to create the mmio-virtio bridges using -device for -M
+> virt-2.4 and above?
+> 
+> At the end of the day, I'm fairly sure people will end up virtio-pci anyway
+> and it's just a big waste of address space to keep VIRT_MMIO around, no?
 
-Peter, see the other threads between me and Eric.  See in particular
-http://lists.gnu.org/archive/html/qemu-devel/2015-04/msg02749.html
-starting at "The notifier actually is not even necessary" and the
-replies from there.
+I'm not sure I have an opinion one way or the other, but I would like to
+understand the "big waste" argument. Is there something that users are eager
+to reuse this address space for, like more RAM?
 
-If you have any idea, please help.
+Thanks,
+Chris
 
-Paolo
+-- 
+Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
