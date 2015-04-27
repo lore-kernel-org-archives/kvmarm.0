@@ -1,26 +1,24 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2] sysbus: add irq_routing_notifier
-Date: Mon, 27 Apr 2015 15:37:02 +0200
-Message-ID: <553E3B7E.9080009@redhat.com>
-References: <1429879153-23476-1-git-send-email-eric.auger@linaro.org>
- <CAEgOgz5rBLZD1U0iodZvytb_RYjH7a04attgZxZ-WbuFOkPxpA@mail.gmail.com>
- <553DF2AA.2070102@linaro.org> <553E11E7.7070704@redhat.com>
- <553E297F.4020706@linaro.org>
+From: Alexander Graf <agraf@suse.de>
+Subject: Re: [PATCH v12 3/4] hw/arm/virt: add dynamic sysbus device support
+Date: Mon, 27 Apr 2015 15:41:05 +0200
+Message-ID: <553E3C71.1040001@suse.de>
+References: <1429888773-11730-1-git-send-email-eric.auger@linaro.org>
+ <1429888773-11730-4-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E49D24E90C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2015 09:28:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D6C4D4E939
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2015 09:34:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3bPZITe9JOmA for <kvmarm@lists.cs.columbia.edu>;
- Mon, 27 Apr 2015 09:28:45 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF8BD4E79A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2015 09:28:45 -0400 (EDT)
-In-Reply-To: <553E297F.4020706@linaro.org>
+ with ESMTP id Wie3FMy3Y02r for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 27 Apr 2015 09:34:51 -0400 (EDT)
+Received: from mx2.suse.de (cantor2.suse.de [195.135.220.15])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 940F84E938
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2015 09:34:50 -0400 (EDT)
+In-Reply-To: <1429888773-11730-4-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,49 +28,114 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>, Peter Crosthwaite <peter.crosthwaite@xilinx.com>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Alex Williamson <alex.williamson@redhat.com>, eric.auger@st.com, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
+To: Eric Auger <eric.auger@linaro.org>, eric.auger@st.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, pbonzini@redhat.com
+Cc: patches@linaro.org, alex.williamson@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 27/04/2015 14:20, Eric Auger wrote:
-> On 04/27/2015 12:39 PM, Paolo Bonzini wrote:
->>
->>
->> On 27/04/2015 10:26, Eric Auger wrote:
->>>>> One of my long term goals is to try and get rid of sysbus IRQ
->>>>> abstraction completely in favor of just qdev gpios. This means
->>>>> features that apply to GPIOs automatically apply to IRQs and vice
->>>>> versa. Can your notifier hook be pushed up to the qdev GPIO level to
->>>>> make it more globally usable and avoid a new feature to sysbus IRQs?
->>> Yes sure, I am going to put the notifier in DeviceClass then.
->>
->> I've thought too about this, and I'm not sure about it.
->>
->> It would mean you have to pass the gpio name (e.g.
->> SYSBUS_DEVICE_GPIO_IRQ) to the hook, and in the case of sysbus IRQs this
->> would leak the SYSBUS_DEVICE_GPIO_IRQ abstraction to the implementors of
->> the hook.
-> Hi Paolo,
-> 
-> Currently my notifier has the following proto:
->     void (*connect_gpio_out_notifier)(DeviceState *dev, qemu_irq irq);
-> 
-> It is sufficient for my need.
-> 
-> is it really mandated to pass other qdev_connect_gpio_out_named args,
-> ie. name & n?
-
-It's an ugly situation.  If you look at qdev_connect_gpio_out_named, it
-is really a thin wrapper around object_property_set_link.  Just like
-Peter wasn't too happy with changing sysbus_connect_irq, the same
-objection would apply here.  Callers of object_property_set_link should
-call the notifiers, not just those that use qdev_connect_gpio_out_named.
-
-This is why I originally asked you to look into using the check callback
-instead.
-
-This is why I think it's better to keep the sysbus patch.
-
-Paolo
+T24gMDQvMjQvMjAxNSAwNToxOSBQTSwgRXJpYyBBdWdlciB3cm90ZToKPiBBbGxvd3Mgc3lzYnVz
+IGRldmljZXMgdG8gYmUgaW5zdGFudGlhdGVkIGZyb20gY29tbWFuZCBsaW5lIGJ5Cj4gdXNpbmcg
+LWRldmljZSBvcHRpb24uIE1hY2h2aXJ0IGNyZWF0ZXMgYSBwbGF0Zm9ybSBidXMgYXQgaW5pdC4K
+PiBUaGUgZHluYW1pYyBzeXNidXMgZGV2aWNlcyBhcmUgYXR0YWNoZWQgdG8gdGhpcyBwbGF0Zm9y
+bSBidXMgZGV2aWNlLgo+Cj4gVGhlIHBsYXRmb3JtIGJ1cyBkZXZpY2UgcmVnaXN0ZXJzIGEgbWFj
+aGluZSBpbml0IGRvbmUgbm90aWZpZXIKPiB3aG9zZSByb2xlIHdpbGwgYmUgdG8gYmluZCB0aGUg
+ZHluYW1pYyBzeXNidXMgZGV2aWNlcy4gSW5kZWVkCj4gZHluYW1pYyBzeXNidXMgZGV2aWNlcyBh
+cmUgY3JlYXRlZCBhZnRlciBtYWNoaW5lIGluaXQuCj4KPiBtYWNodmlydCBhbHNvIHJlZ2lzdGVy
+cyBhIG5vdGlmaWVyIHRoYXQgd2lsbCBidWlsZCB0aGUgZGV2aWNlCj4gdHJlZSBub2RlcyBmb3Ig
+dGhlIHBsYXRmb3JtIGJ1cyBhbmQgaXRzIGNoaWxkcmVuIGR5bmFtaWMgc3lzYnVzCj4gZGV2aWNl
+cy4KPgo+IFNpZ25lZC1vZmYtYnk6IEFsZXhhbmRlciBHcmFmIDxhZ3JhZkBzdXNlLmRlPgoKSHJt
+LCBhcmUgeW91IHN1cmUgdGhpcyBjb2RlIGlzIGZyb20gbWU/IDopCgo+IFNpZ25lZC1vZmYtYnk6
+IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAbGluYXJvLm9yZz4KPiBSZXZpZXdlZC1ieTogQWxleCBC
+ZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgo+Cj4gLS0tCj4gdjExIC0+IHYxMjoKPiAt
+IHJlc2l6ZSBQTEFURk9STV9CVVNfTlVNX0lSUVMgdG8gNjQgaW5zdGVhZCBvZiAzMgo+IC0gb3Zl
+cmFsbCBOVU1fSVJRUyBjaGFuZ2VkIHRvIDI1Ni4gVGhpcyBsZWF2ZXMgc3BhY2UgZm9yIE1TSQo+
+ICAgIGxvb21pbmcgYWRkaXRpb24KPiAtIFZJUlRfUExBVEZPUk1fQlVTIHNpemUgY2hhbmdlZCBm
+cm9tIDRNQiB0byAzMk1CIGFuZCBiYXNlIHNldCBhdAo+ICAgIDB4YzAwMDAwMAo+IC0gQWRkIEFs
+ZXggUi1iCj4KPiB2OCAtPiB2OToKPiAtIFBMQVRGT1JNX0JVU19OVU1fSVJRUyBzZXQgdG8gMzIg
+aW5zdGVhZCBvZiAyMAo+IC0gcGxhdGZvcm0gYnVzIGlycSBub3cgc3RhcnQgYXQgNjQgaW5zdGVh
+ZCBvZiA0OAo+IC0gcmVtb3ZlIGNoYW5nZSBvZiBpbmRlbnRhdGlvbiBpbiBhMTVtZW1tYXAKPiAt
+IGNvcnJlY3QgbWlzYyBzdHlsZSBpc3N1ZXMKPgo+IHY3IC0+IHY4Ogo+IC0gcmViYXNlIG9uIDIu
+Mi4wCj4gLSBpbiBtYWNodmlydF9pbml0LCBjcmVhdGVfcGxhdGZvcm1fYnVzIHNpbXBseSBpcyBh
+ZGRlZAo+ICAgIGFmdGVyIHRoZSBhcm1fbG9hZF9rZXJuZWwgY2FsbCBpbnN0ZWFkIG9mIG1vdmlu
+ZyB0aGlzIGxhdHRlci4KPiAgICBSZWxhdGVkIGNvbW1lbnQgc2xpZ2hseSByZXdvcmRlZC4KPiAt
+IER1ZSB0byB0aG9zZSBjaGFuZ2VzIEkgZHJvcHBlZCBBbGV4IGFuZCBTaGFubm9uJ3MgUmV2aWV3
+ZWQtYnkKPgo+IHY2IC0+IHY3Ogo+IFRha2UgaW50byBhY2NvdW50IFNoYW5ub24gY29tbWVudHM6
+Cj4gLSByZW1vdmUgUExBVEZPUk1fQlVTX0ZJUlNUX0lSUSBtYWNybwo+IC0gY29ycmVjdCBwbGF0
+Zm9ybSBidXMgc2l6ZSB0byAweDQwMDAwMAo+IC0gYWRkIGFuIGFkZGl0aW9uYWwgY29tbWVudCBp
+biBhMTVpcnFtYXAgcmVsYXRlZCB0bwo+ICAgIFBMQVRGT1JNX0JVU19OVU1fSVJRUwo+Cj4gdjUg
+LT4gdjY6Cj4gLSBUYWtlIGludG8gYWNjb3VudCBQZXRlcidzIGNvbW1lbnRzOgo+ICAgIC0gcGxh
+dGZvcm1fYnVzX3BhcmFtcyBpbml0aWFsaXplZCBmcm9tIHZiaS0+bWVtbWFwIGFuZCB2YmktPmly
+cW1hcC4KPiAgICAgIEFzIGEgY29uc2VxdWVuY2UsIGNvbnN0IGlzIHJlbW92ZWQuIEFsc28gYWxp
+Z25tZW50IGluIGExNW1lbW1hcAo+ICAgICAgaXMgc2xpZ2h0bHkgY2hhbmdlZC4KPiAgICAtIEFS
+TVBsYXRmb3JtQnVzU3lzdGVtUGFyYW1zIGhhbmRsZSByZW1vdmVkIGZyb20gY3JlYXRlX3BsYXRm
+b3JtX2J1cwo+ICAgICAgcHJvdG90eXBlCj4gLSBhcm1fbG9hZF9rZXJuZWwgaGFzIGJlY29tZSBh
+IG1hY2hpbmUgaW5pdCBkb25lIG5vdGlmaWVyIHJlZ2lzdHJhdGlvbi4KPiAgICBJdCBtdXN0IGJl
+IGNhbGxlZCBiZWZvcmUgcGxhdGZvcm1fYnVzX2NyZWF0ZSB0byBndWFyYW50ZWUgdGhlIGNvcnJl
+Y3QKPiAgICBub3RpZmllciBleGVjdXRpb24gc2VxdWVuY2UKPgo+IHY0IC0+IHY1Ogo+IC0gcGxh
+dGZvcm1fYnVzX3BhcmFtcyBiZWNvbWVzIHN0YXRpYyBjb25zdAo+IC0gcmV3b3JkIGNvbW1lbnQg
+aW4gY3JlYXRlX3BsYXRmb3JtX2J1cwo+IC0gcmV3b3JkIHRoZSBjb21taXQgbWVzc2FnZQo+Cj4g
+djMgLT4gdjQ6Cj4gLSB1c2UgcGxhdGZvcm0gYnVzIG9iamVjdCwgaW5zdGFudGlhdGVkIGluIGNy
+ZWF0ZV9wbGF0Zm9ybV9idXMKPiAtIGRldmljZSB0cmVlIGdlbmVyYXRpb24gZm9yIHBsYXRmb3Jt
+IGJ1cyBhbmQgY2hpbGRyZW4gZHluYW1pYwo+ICAgIHN5c2J1cyBkZXZpY2VzIGlzIG5vIG1vcmUg
+aGFuZGxlZCBhdCByZXNldCBidXQgaW4gYQo+ICAgIG1hY2hpbmVfaW5pdF9kb25lX25vdGlmaWVy
+IChkdWUgdG8gdGhlIGNoYW5nZSBpbiBpbXBsZW1lbnRhaW9uCj4gICAgb2YgQVJNIGxvYWQgZHRi
+IHVzaW5nIHJvbV9hZGRfYmxvYl9maXhlZCkuCj4gLSBkZXZpY2UgdHJlZSBlbmhhbmNlbWVudCBu
+b3cgdGFrZXMgaW50byBhY2NvdW50IHRoZSBjYXNlIG9mCj4gICAgdXNlciBwcm92aWRlZCBkdGIu
+IEJlZm9yZSB0aGUgdXNlciBkdGIgd2FzIG92ZXJ3cml0dGVuIHdoaWNoCj4gICAgd2FzIHdyb25n
+LiBIb3dldmVyIGluIGNhc2UgdGhlIGR0YiBpcyBwcm92aWRlZCBieSB0aGUgdXNlciwKPiAgICBk
+eW5hbWljIHN5c2J1cyBub2RlcyBhcmUgbm90IGFkZGVkIHRoZXJlLgo+IC0gcmVuYW1pbmcgb2Yg
+TUFDSFZJUlRfUExBVEZPUk0gZGVmaW5lcwo+IC0gTUFDSFZJUlRfUExBVEZPUk1fUEFHRV9TSElG
+VCBhbmQgU0laRV9QQUdFUyBub3QgbmVlZGVkIGFueW1vcmUsCj4gICAgaGVuY2UgcmVtb3ZlZC4K
+PiAtIER5blN5c2J1c1BhcmFtcyBzdHJ1Y3QgcmVuYW1lZCBpbnRvIEFSTVBsYXRmb3JtQnVzU3lz
+dGVtUGFyYW1zCj4gICAgYW5kIGFib3ZlIHBhcmFtcyByZW1vdmVkLgo+IC0gc2VwYXJhdGlvbiBv
+ZiBkdCBjcmVhdGlvbiBhbmQgUUVNVSBiaW5kaW5nIGlzIG5vdCBtYW5kYXRlZCBhbnltb3JlCj4g
+ICAgc2luY2UgdGhlIGRldmljZSB0cmVlIGlzIG5vdCBjcmVhdGVkIGZyb20gc2NyYXRjaCBhbnlt
+b3JlLiBJbnN0ZWFkCj4gICAgdGhlIG1vZGlmeV9kdGIgZnVuY3Rpb24gaXMgdXNlZC4KPiAtIGNy
+ZWF0ZV9wbGF0Zm9ybV9idXMgcmVnaXN0ZXJzIGFub3RoZXIgbWFjaGluZSBpbml0IGRvbmUgbm90
+aWZpZXIKPiAgICB0byBzdGFydCBWRklPIElSUSBoYW5kbGluZy4gVGhpcyBsYXR0ZXIgZXhlY3V0
+ZXMgYWZ0ZXIgdGhlCj4gICAgZHluYW1pYyBzeXNidXMgZGV2aWNlIGJpbmRpbmcuCj4KPiB2MiAt
+PiB2MzoKPiAtIHJlbmFtaW5nIG9mIGFybV9wbGF0Zm9ybV9idXNfY3JlYXRlX2RldnRyZWUgYW5k
+IGFybV9sb2FkX2R0Ygo+IC0gYWRkIGNvcHlyaWdodCBpbiBody9hcm0vZHluX3N5c2J1c19kZXZ0
+cmVlLmMKPgo+IHYxIC0+IHYyOgo+IC0gcmVtb3ZlIHVzZWxlc3MgdmZpby1wbGF0Zm9ybS5oIGlu
+Y2x1ZGUgZmlsZQo+IC0gcy9NQUNIVklSVF9QTEFURk9STV9IT0xFL01BQ0hWSVJUX1BMQVRGT1JN
+X1NJWkUKPiAtIHVzZSBkeW5fc3lzYnVzX2JpbmRpbmcgYW5kIGR5bl9zeXNidXNfZGV2dHJlZQo+
+IC0gZHluYW1pYyBzeXNidXMgcGxhdGZvcm0gYnVzZSBzaXplIHNocmlua2VkIHRvIDRNQiBhbmQK
+PiAgICBtb3ZlZCBiZXR3ZWVuIFJUQyBhbmQgTU1JTwo+Cj4gdjE6Cj4KPiBJbnNwaXJlZCBmcm9t
+IHdoYXQgQWxleCBHcmFmIGRpZCBpbiBwcGMgZTUwMAo+IGh0dHBzOi8vbGlzdHMuZ251Lm9yZy9h
+cmNoaXZlL2h0bWwvcWVtdS1wcGMvMjAxNC0wNy9tc2cwMDAxMi5odG1sCj4gLS0tCj4gICBody9h
+cm0vdmlydC5jIHwgNjEgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKy0KPiAgIDEgZmlsZSBjaGFuZ2VkLCA2MCBpbnNlcnRpb25zKCspLCAx
+IGRlbGV0aW9uKC0pCj4KPiBkaWZmIC0tZ2l0IGEvaHcvYXJtL3ZpcnQuYyBiL2h3L2FybS92aXJ0
+LmMKPiBpbmRleCA1NjVmNTczLi5lZmEzMjE2IDEwMDY0NAo+IC0tLSBhL2h3L2FybS92aXJ0LmMK
+PiArKysgYi9ody9hcm0vdmlydC5jCj4gQEAgLTQzLDExICs0MywxMyBAQAo+ICAgI2luY2x1ZGUg
+InFlbXUvYml0b3BzLmgiCj4gICAjaW5jbHVkZSAicWVtdS9lcnJvci1yZXBvcnQuaCIKPiAgICNp
+bmNsdWRlICJody9wY2ktaG9zdC9ncGV4LmgiCj4gKyNpbmNsdWRlICJody9hcm0vc3lzYnVzLWZk
+dC5oIgo+ICsjaW5jbHVkZSAiaHcvcGxhdGZvcm0tYnVzLmgiCj4gICAKPiAgICNkZWZpbmUgTlVN
+X1ZJUlRJT19UUkFOU1BPUlRTIDMyCj4gICAKPiAgIC8qIE51bWJlciBvZiBleHRlcm5hbCBpbnRl
+cnJ1cHQgbGluZXMgdG8gY29uZmlndXJlIHRoZSBHSUMgd2l0aCAqLwo+IC0jZGVmaW5lIE5VTV9J
+UlFTIDEyOAo+ICsjZGVmaW5lIE5VTV9JUlFTIDI1Ngo+ICAgCj4gICAjZGVmaW5lIEdJQ19GRFRf
+SVJRX1RZUEVfU1BJIDAKPiAgICNkZWZpbmUgR0lDX0ZEVF9JUlFfVFlQRV9QUEkgMQo+IEBAIC02
+MCw2ICs2Miw4IEBACj4gICAjZGVmaW5lIEdJQ19GRFRfSVJRX1BQSV9DUFVfU1RBUlQgOAo+ICAg
+I2RlZmluZSBHSUNfRkRUX0lSUV9QUElfQ1BVX1dJRFRIIDgKPiAgIAo+ICsjZGVmaW5lIFBMQVRG
+T1JNX0JVU19OVU1fSVJRUyA2NAo+ICsKPiAgIGVudW0gewo+ICAgICAgIFZJUlRfRkxBU0gsCj4g
+ICAgICAgVklSVF9NRU0sCj4gQEAgLTcxLDggKzc1LDExIEBAIGVudW0gewo+ICAgICAgIFZJUlRf
+UlRDLAo+ICAgICAgIFZJUlRfRldfQ0ZHLAo+ICAgICAgIFZJUlRfUENJRSwKPiArICAgIFZJUlRf
+UExBVEZPUk1fQlVTLAo+ICAgfTsKPiAgIAo+ICtzdGF0aWMgQVJNUGxhdGZvcm1CdXNTeXN0ZW1Q
+YXJhbXMgcGxhdGZvcm1fYnVzX3BhcmFtczsKPiArCj4gICB0eXBlZGVmIHN0cnVjdCBNZW1NYXBF
+bnRyeSB7Cj4gICAgICAgaHdhZGRyIGJhc2U7Cj4gICAgICAgaHdhZGRyIHNpemU7Cj4gQEAgLTEz
+MSw2ICsxMzgsNyBAQCBzdGF0aWMgY29uc3QgTWVtTWFwRW50cnkgYTE1bWVtbWFwW10gPSB7Cj4g
+ICAgICAgW1ZJUlRfRldfQ0ZHXSA9ICAgICB7IDB4MDkwMjAwMDAsIDB4MDAwMDAwMGEgfSwKPiAg
+ICAgICBbVklSVF9NTUlPXSA9ICAgICAgIHsgMHgwYTAwMDAwMCwgMHgwMDAwMDIwMCB9LAo+ICAg
+ICAgIC8qIC4uLnJlcGVhdGluZyBmb3IgYSB0b3RhbCBvZiBOVU1fVklSVElPX1RSQU5TUE9SVFMs
+IGVhY2ggb2YgdGhhdCBzaXplICovCj4gKyAgICBbVklSVF9QTEFURk9STV9CVVNdID0gICB7IDB4
+MGMwMDAwMDAsIDB4MDIwMDAwMDAgfSwKClBldGVyLCB3b3VsZCB5b3UgaGF2ZSBhIGhhcmQgdGlt
+ZSBpZiB3ZSBqdXN0IGdldCByaWQgb2YgVklSVF9NTUlPIApjb21wbGV0ZWx5IGFuZCBhbGxvdyB1
+c2VycyB0byBjcmVhdGUgdGhlIG1taW8tdmlydGlvIGJyaWRnZXMgdXNpbmcgCi1kZXZpY2UgZm9y
+IC1NIHZpcnQtMi40IGFuZCBhYm92ZT8KCkF0IHRoZSBlbmQgb2YgdGhlIGRheSwgSSdtIGZhaXJs
+eSBzdXJlIHBlb3BsZSB3aWxsIGVuZCB1cCB2aXJ0aW8tcGNpIAphbnl3YXkgYW5kIGl0J3MganVz
+dCBhIGJpZyB3YXN0ZSBvZiBhZGRyZXNzIHNwYWNlIHRvIGtlZXAgVklSVF9NTUlPIAphcm91bmQs
+IG5vPwoKVGhhdCBzYWlkLCBpZiB5b3Ugd2FudCB0byBrZWVwIHZpcnRpby1tbWlvIHN1cHBvcnQg
+aW4gdGhlIHdheSBpdCBpcyAKdG9kYXksIEkgd29uJ3Qgb2JqZWN0LiBUaGUgcmVzdCBvZiB0aGUg
+cGF0Y2ggbG9va3MgZ29vZCB0byBtZS4KCgpBbGV4CgpfX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5j
+cy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0
+aW5mby9rdm1hcm0K
