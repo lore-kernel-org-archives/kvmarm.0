@@ -1,26 +1,29 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v2] sysbus: add irq_routing_notifier
-Date: Tue, 28 Apr 2015 09:01:10 +0200
-Message-ID: <553F3036.9080903@linaro.org>
-References: <1429879153-23476-1-git-send-email-eric.auger@linaro.org>	<CAEgOgz5rBLZD1U0iodZvytb_RYjH7a04attgZxZ-WbuFOkPxpA@mail.gmail.com>	<553DF2AA.2070102@linaro.org>	<553E11E7.7070704@redhat.com>	<553E297F.4020706@linaro.org>	<553E3B7E.9080009@redhat.com>	<CAEgOgz6eFLhkwm7qto=j=p3L5+cz5s_McUyZUcqeN265CgXSdg@mail.gmail.com>	<553E4E05.1010405@linaro.org>	<553E4F2D.7060808@redhat.com>	<CAEgOgz61=-jvDGg7BWWAJSVCceaCJ21t_7jjqF_H_B5BuhVdXg@mail.gmail.com>	<553F2CA9.90303@linaro.org>
- <CAEgOgz6rbVnFiSYeyCt0yABCtqFWu8w7kPYcTM4_Bmt35uodbg@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v2 06/10] KVM: arm64: guest debug,
+ add SW break point support
+Date: Tue, 28 Apr 2015 09:42:38 +0100
+Message-ID: <87wq0wr6dd.fsf@linaro.org>
+References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
+ <1427814488-28467-7-git-send-email-alex.bennee@linaro.org>
+ <20150414082558.GS6186@cbox> <87y4li6hua.fsf@linaro.org>
+ <20150427200407.GG23335@cbox>
+ <CAFEAcA-Kh7Tn+kw9psL=gqme9ogAn+mM8Uco_HcJy=cqg72hbw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 024A44EC85
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 02:55:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E8664EC92
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 04:33:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FwxJajmHA53Y for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Apr 2015 02:55:24 -0400 (EDT)
-Received: from mail-wg0-f41.google.com (mail-wg0-f41.google.com [74.125.82.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 35C7C4EC84
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 02:55:23 -0400 (EDT)
-Received: by wgso17 with SMTP id o17so140484144wgs.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 00:03:49 -0700 (PDT)
-In-Reply-To: <CAEgOgz6rbVnFiSYeyCt0yABCtqFWu8w7kPYcTM4_Bmt35uodbg@mail.gmail.com>
+ with ESMTP id aiDs6mqG0snd for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Apr 2015 04:33:53 -0400 (EDT)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 43D054EC85
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 04:33:53 -0400 (EDT)
+In-reply-to: <CAFEAcA-Kh7Tn+kw9psL=gqme9ogAn+mM8Uco_HcJy=cqg72hbw@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,169 +33,51 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
-Cc: eric.auger@st.com, Patch Tracking <patches@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Russell King <linux@arm.linux.org.uk>, kvm-devel <kvm@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <marc.zyngier@arm.com>, "J. Kiszka" <jan.kiszka@siemens.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, David Hildenbrand <dahi@linux.vnet.ibm.com>, Zhichao Huang <zhichao.huang@linaro.org>, Bharat Bhushan <r65777@freescale.com>, Paolo Bonzini <pbonzini@redhat.com>, bp@suse.de, Gleb Natapov <gleb@kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 04/28/2015 08:57 AM, Peter Crosthwaite wrote:
-> On Mon, Apr 27, 2015 at 11:46 PM, Eric Auger <eric.auger@linaro.org> wrote:
->> Hi Peter,
->>
->> On 04/27/2015 07:43 PM, Peter Crosthwaite wrote:
->>> On Mon, Apr 27, 2015 at 8:01 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>>>
->>>>
->>>> On 27/04/2015 16:56, Eric Auger wrote:
->>>>> Peter, Paolo,
->>>>>
->>>>> After your feedbacks, I feel I need to spend some more time on the
->>>>> original check() track. I would prefer not to introduce any patch that
->>>>> will make issue in the future.
->>>>
->>>> Peter, see the other threads between me and Eric.  See in particular
->>>> http://lists.gnu.org/archive/html/qemu-devel/2015-04/msg02749.html
->>>> starting at "The notifier actually is not even necessary" and the
->>>> replies from there.
->>>>
->>>
->>> Thanks,
->>>
->>> I see the problem with check. In this reply
->>>
->>> http://lists.gnu.org/archive/html/qemu-devel/2015-04/msg02956.html
->>>
->>> Eric says that the problem with the check hook is it happens before
->>> the setting. I think this can be solved with a RYO link setter for
->>> GPIOs. We almost have an in-tree precedent with MemoryRegion and the
->>> container property (memory.c):
->>>
->>>  960     op = object_property_add(OBJECT(mr), "container",
->>>  961                              "link<" TYPE_MEMORY_REGION ">",
->>>  962                              memory_region_get_container,
->>>  963                              NULL, /* memory_region_set_container */
->>>  964                              NULL, NULL, &error_abort);
->>>
->>> Now in reality we could have done this link normal style as it is only
->>> a trivial getter, but the reason the link was done this way in the
->>> first place, is because I have a follow up patch to memory.c that adds
->>> a customer Link setter:
->>>
->>> +static void memory_region_set_container(Object *obj, Visitor *v, void *opaque,
->>> +                                        const char *name, Error **errp)
->>> +{
->>> +    MemoryRegion *mr = MEMORY_REGION(obj);
->>> +    Error *local_err = NULL;
->>> +    MemoryRegion *old_container = mr->container;
->>> +    MemoryRegion *new_container = NULL;
->>> +    char *path = NULL;
->>> +
->>> +    visit_type_str(v, &path, name, &local_err);
->>> +
->>> +    if (!local_err && strcmp(path, "") != 0) {
->>> +        new_container = MEMORY_REGION(object_resolve_link(obj, name, path,
->>> +                                      &local_err));
->>> +        while (new_container->alias) {
->>> +            new_container = new_container->alias;
->>> +        }
->>> +    }
->>> +
->>> +    if (local_err) {
->>> +        error_propagate(errp, local_err);
->>> +        return;
->>> +    }
->>> +
->>> +    object_ref(OBJECT(new_container));
->>> +
->>> +    memory_region_transaction_begin();
->>> +    memory_region_ref(mr);
->>> +    if (old_container) {
->>> +        memory_region_del_subregion(old_container, mr);
->>> +    }
->>> +    mr->container = new_container;
->>> +    if (new_container) {
->>> +        memory_region_update_container_subregions(mr);
->>> +    }
->>> +    memory_region_unref(mr);
->>> +    memory_region_transaction_commit();
->>> +
->>> +    object_unref(OBJECT(old_container));
->>> +}
->>> +
->>>
->>>      op = object_property_add(OBJECT(mr), "container",
->>>                               "link<" TYPE_MEMORY_REGION ">",
->>>                               memory_region_get_container,
->>> -                             NULL, /* memory_region_set_container */
->>> +                             memory_region_set_container,
->>>                               NULL, NULL, &error_abort);
->>>
->>>
->>> The function does the normal link setting - similar to
->>> object_set_link_property (not to be confused with
->>> object_property_set_link!) but is surrounded by class specific side
->>> effects. Specifically in this case, it does
->>> memory_region_transaction_begin/ref/unref/commit etc for the MR.
->>>
->>> For this GPIO case, you could create a custom setter that does the
->>> normal set, then calls the DeviceClass installed hook (or you can
->>> install the hook to the object and init it at qdev_init_gpio_out_named
->>> time as suggested in the eariler thread). The callback will happen
->>> after the link is populated.
->>>
->>> To reduce verbosity, I suggest making object_set_link_property() a
->>> visible API, then RYO link setters can call it surrounded by custom
->>> behavior e.g:
->>>
->>> foo_object_set_bar_property(...)
->>> {
->>>     pre_set_link_side_effects();
->>>     object_set_link_property();
->>>     post_set_link_side_effects();
->>> }
->>>
->>> object_set_link_property() would need to be coreified and wrapped to
->>> remove it's awareness of LinkProperty type (as that doesn't exist in
->>> RYO properties) in this case.
->>
->> Thank you Peter for detailing this.
->>
->> Yesterday I re-worked on the solution based on the check() method where
->> - check would take a Object **child as a 3d parameter
->> - we would assign *child before the call and in case the check fails set
->> the *child back to NULL in object_set_link_property.
->>
-> 
-> I think this is starting to reach outside the design intent of the
-> check, letting it be an API that takes over the responsibility of
-> ->set. Ideally check should be boolean and side-effectless.
-I acknowledge ;-)
-> 
->> I need to do some more testing.
->>
->> I don't know if this solution would be acceptable too. If not I will
->> implement according to your guidelines.
->>
-> 
-> Lets see what Paolo says before another rework.
-sure
-
-Thanks
-
-Eric
-> 
-> Regards,
-> Peter
-> 
->> Best Regards
->>
->> Eric
->>>
->>> Regards,
->>> Peter
->>>
->>>> If you have any idea, please help.
->>>>
->>>> Paolo
->>>>
->>
->>
+ClBldGVyIE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJvLm9yZz4gd3JpdGVzOgoKPiBPbiAy
+NyBBcHJpbCAyMDE1IGF0IDIxOjA0LCBDaHJpc3RvZmZlciBEYWxsIDxjaHJpc3RvZmZlci5kYWxs
+QGxpbmFyby5vcmc+IHdyb3RlOgo+PiBPbiBUaHUsIEFwciAyMywgMjAxNSBhdCAwMzoyNjo1M1BN
+ICswMTAwLCBBbGV4IEJlbm7DqWUgd3JvdGU6Cj4+Pgo+Pj4gQ2hyaXN0b2ZmZXIgRGFsbCA8Y2hy
+aXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPiB3cml0ZXM6Cj4+Pgo+Pj4gPiBPbiBUdWUsIE1hciAz
+MSwgMjAxNSBhdCAwNDowODowNFBNICswMTAwLCBBbGV4IEJlbm7DqWUgd3JvdGU6Cj4+PiA+PiAr
+ICoganVzdCBuZWVkIHRvIHJlcG9ydCB0aGUgUEMgYW5kIHRoZSBIU1IgdmFsdWVzIHRvIHVzZXJz
+cGFjZS4KPj4+ID4+ICsgKiBVc2Vyc3BhY2UgbWF5IGRlY2lkZSB0byByZS1pbmplY3QgdGhlIGV4
+Y2VwdGlvbiBhbmQgZGVsaXZlciBpdCB0bwo+Pj4gPj4gKyAqIHRoZSBndWVzdCBpZiBpdCB3YXNu
+J3QgZm9yIHRoZSBob3N0IHRvIGRlYWwgd2l0aC4KPj4+ID4KPj4+ID4gbm93IEknbSBjb25mdXNl
+ZCAtIGRvZXMgdXNlcnNwYWNlIHNldHVwIHRoZSBndWVzdCB0byByZWNlaXZlIGFuCj4+PiA+IGV4
+Y2VwdGlvbiBvciBkb2VzIGl0IHRlbGwgS1ZNIHRvIGVtdWxhdGUgYW4gZXhjZXB0aW9uIGZvciB0
+aGUgZ3Vlc3Qgb3IKPj4+ID4gZG8gd2UgZXhlY3V0ZSB0aGUgYnJlYWtwb2ludCB3aXRob3V0IHRy
+YXBwaW5nIHRoZSBkZWJ1ZyBleGNlcHRpb24/Cj4+Pgo+Pj4gSSd2ZSBtYWRlIGl0IGFsbCBnbyB0
+aHJvdWdoIHVzZXJzcGFjZSBhcyB3ZSBtYXkgaGF2ZSB0byB0cmFuc2xhdGUgdGhlCj4+PiBoeXBl
+cnZpc29yIHZpc2libGUgZXhjZXB0aW9uIGNvZGUgdG8gd2hhdCB0aGUgZ3Vlc3Qgd2FzIGV4cGVj
+dGluZyB0byBzZWUuCj4+Pgo+Pgo+PiBvaywgc28gSSB0aGluayB5b3Ugc2hvdWxkIHJlLXBocmFz
+ZSBzb21ldGhpbmcgbGlrZToKPj4KPj4gIlVzZXJzcGFjZSBtYXkgZGVjaWRlIHRoYXQgdGhpcyBl
+eGNlcHRpb24gaXMgY2F1c2VkIGJ5IHRoZSBndWVzdCB1c2luZwo+PiBkZWJ1Z2dpbmcgaXRzZWxm
+LCBhbmQgbWF5IGluIHRoYXQgY2FzZSBlbXVsYXRlIHRoZSBndWVzdCBkZWJ1ZyBleGNlcHRpb24K
+Pj4gaW4gdXNlcnNwYWNlIGJlZm9yZSByZXN1bWluZyBLVk0uIgo+Pgo+PiBCdXQgZG9lcyB0aGF0
+IHJlYWxseSB3b3JrPyAgR2l2ZW4gdGhhdCB3ZSBkb24ndCBzdXBwb3J0IEtWTS1UQ0cKPj4gbWln
+cmF0aW9uLCB0aGlzIHNvdW5kcyBhIGxpdHRsZSBzdHJhbmdlLiAgRGlkIHdlIHRlc3QgaXQ/Cj4K
+PiBUaGUgUUVNVSBwYXRjaGVzIGhhdmUgYSBUT0RPIG5vdGUgYXQgdGhlIHBvaW50IHdoZXJlIHlv
+dSdkIHdhbnQKPiB0byBkbyB0aGlzLi4uIERlc2lnbi13aXNlIHlvdSBjYW4gZG8gdGhlIHJlaW5q
+ZWN0aW9uIGluIHRoZQo+IGtlcm5lbCBvciBpbiB1c2Vyc3BhY2UgKHBwYyBRRU1VIGRvZXMgdGhp
+cyBpbiB1c2Vyc3BhY2UsIGZvcgo+IGluc3RhbmNlKSBiZWNhdXNlIGl0J3MgcHJldHR5IG11Y2gg
+anVzdCBzZXR0aW5nIHJlZ2lzdGVycyB0byBmYWtlCj4gdXAgdGhlIGV4Y2VwdGlvbi1lbnRyeSBp
+bnRvIEVMMS4gQ29kZS13aXNlIFFFTVUncyBBUk0gY29kZSBpc24ndAo+IHNldCB1cCB0byBkbyBp
+dCByaWdodCBub3csIGJ1dCBpdCBzaG91bGRuJ3QgYmUgdG9vIGRpZmZpY3VsdCB0bwo+IHBlcnN1
+YWRlIHRoZSBUQ0cgZXhjZXB0aW9uLWVudHJ5IGNvZGUgdG8gd29yayBmb3IgdGhpcyBjYXNlIHRv
+by4KPgo+IERvZXMgdGhlIGtlcm5lbCBhbHJlYWR5IGhhdmUgYSBjb252ZW5pZW50bHkgaW1wbGVt
+ZW50ZWQgImluamVjdAo+IGV4Y2VwdGlvbiBpbnRvIGd1ZXN0IiBsdW1wIG9mIGNvZGU/IElmIHNv
+IGl0IG1pZ2h0IGJlIGxlc3MgZWZmb3J0Cj4gdG8gZG8gaXQgdGhhdCB3YXkgcm91bmQsIG1heWJl
+LgoKU28geW91IHBvaW50ZWQgb3V0IHdlIGNhbid0IGp1c3QgcmUtaW5qZWN0IHRoZSBleGNlcHRp
+b25zIHdlIGdldCBhcyB3ZQpuZWVkIHRvIG1hcCBmcm9tIHRoaW5ncyBsaWtlIEVTUl9FTHhfRUNf
+V0FUQ0hQVF9MT1cgdG8KRVNSX0VMeF9FQ19XQVRDSFBUX0NVUiBiZWZvcmUgcmUtaW5qZWN0aW9u
+LgoKT2YgY291cnNlIGlmIGl0IGlzIGFzIHNpbXBsZSBhcyBtb2RpZnlpbmcgdGhlIEVTUl9FTDEg
+cmVnaXN0ZXIgYW5kCnJldHVybmluZyArdmUgaW4gdGhlIGhhbmRsZV9leGl0IHBhdGggdGhlbiBJ
+IGNhbiBkbyB0aGF0IGJ1dCBJIGFzc3VtZWQKaWYgYW55IG90aGVyIHdyYW5nbGluZyBuZWVkcyBk
+b2luZyBpdCBzaG91bGQgYmUgZG9uZSBpbiB1c2Vyc3BhY2UuCgo+Cj4gLS0gUE1NCgotLSAKQWxl
+eCBCZW5uw6llCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+Cmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczov
+L2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
