@@ -1,41 +1,35 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2 06/10] KVM: arm64: guest debug, add SW break point support
-Date: Tue, 28 Apr 2015 10:34:12 +0100
-Message-ID: <CAFEAcA85i_1JybEFBg91NA3-LpAzYh4RSDnqryOd=rZN7gZP5A@mail.gmail.com>
-References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
- <1427814488-28467-7-git-send-email-alex.bennee@linaro.org>
- <20150414082558.GS6186@cbox> <87y4li6hua.fsf@linaro.org> <20150427200407.GG23335@cbox>
- <CAFEAcA-Kh7Tn+kw9psL=gqme9ogAn+mM8Uco_HcJy=cqg72hbw@mail.gmail.com> <87wq0wr6dd.fsf@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <87wq0wr6dd.fsf@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>, Alexander Graf <agraf@suse.de>, Andrew Jones <drjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhichao Huang <zhichao.huang@linaro.org>, "J. Kiszka" <jan.kiszka@siemens.com>, David Hildenbrand <dahi@linux.vnet.ibm.com>, Bharat Bhushan <r65777@freescale.com>, bp@suse.de, Gleb Natapov <gleb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: [PATCH/RFC 0/2] KVM: micro-optimization and interrupt disabling
+Date: Tue, 28 Apr 2015 12:32:46 +0200
+Message-ID: <1430217168-25504-1-git-send-email-borntraeger@de.ibm.com>
+Return-path: <kvm-ppc-owner@vger.kernel.org>
+Sender: kvm-ppc-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: KVM <kvm@vger.kernel.org>, kvm-ppc@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-mips@linux-mips.org, Cornelia Huck <cornelia.huck@de.ibm.com>, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 28 April 2015 at 09:42, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
-ote:
-> Peter Maydell <peter.maydell@linaro.org> writes:
->> Does the kernel already have a conveniently implemented "inject
->> exception into guest" lump of code? If so it might be less effort
->> to do it that way round, maybe.
->
-> So you pointed out we can't just re-inject the exceptions we get as w=
-e
-> need to map from things like ESR_ELx_EC_WATCHPT_LOW to
-> ESR_ELx_EC_WATCHPT_CUR before re-injection.
->
-> Of course if it is as simple as modifying the ESR_EL1 register and
-> returning +ve in the handle_exit path then I can do that but I assume=
-d
-> if any other wrangling needs doing it should be done in userspace.
+I was able to get rid of some nanoseconds for a guest exit loop
+on s390. I did my best to not break other architectures but
+review and comments on the general approach is welcome.
+Downside is that the existing irq_save things will just work
+no matter what the callers have done, the new code must do
+the right thing in the callers.
 
-Well, somebody's got to do it, and it's the same amount of work
-either way (fiddling with ESR, making sure we direct the guest
-to the right exception vector entry point, maybe a few other
-things).
+Is that approach acceptible? Does anybody else see some measurable
+difference for guest exits?
 
--- PMM
+
+Christian Borntraeger (2):
+  KVM: Push down irq_save to architectures before kvm_guest_enter
+  KVM: push down irq_save from kvm_guest_exit
+
+ arch/powerpc/kvm/book3s_hv.c |  4 ++++
+ arch/powerpc/kvm/book3s_pr.c |  2 ++
+ arch/powerpc/kvm/booke.c     |  4 ++--
+ arch/s390/kvm/kvm-s390.c     |  6 ++++--
+ arch/x86/kvm/x86.c           |  2 ++
+ include/linux/kvm_host.h     | 18 ++++++++----------
+ 6 files changed, 22 insertions(+), 14 deletions(-)
+
+-- 
+2.3.0
