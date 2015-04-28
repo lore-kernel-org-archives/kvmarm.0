@@ -1,141 +1,148 @@
 From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH/RFC 2/2] KVM: push down irq_save from kvm_guest_exit
-Date: Tue, 28 Apr 2015 13:37:13 +0200
-Message-ID: <553F70E9.50907@redhat.com>
-References: <1430217168-25504-1-git-send-email-borntraeger@de.ibm.com> <1430217168-25504-3-git-send-email-borntraeger@de.ibm.com>
+Subject: Re: [PATCH 2/3] qdev: check callback takes Object **target as third
+ argument
+Date: Tue, 28 Apr 2015 13:47:33 +0200
+Message-ID: <553F7355.2080300@redhat.com>
+References: <1430212683-10984-1-git-send-email-eric.auger@linaro.org>
+ <1430212683-10984-3-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Return-path: <kvm-ppc-owner@vger.kernel.org>
-In-Reply-To: <1430217168-25504-3-git-send-email-borntraeger@de.ibm.com>
-Sender: kvm-ppc-owner@vger.kernel.org
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: KVM <kvm@vger.kernel.org>, kvm-ppc@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-mips@linux-mips.org, Cornelia Huck <cornelia.huck@de.ibm.com>, Alexander Graf <agraf@suse.de>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C9FC74ECE7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 07:39:23 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id KM13MNK18-Qx for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Apr 2015 07:39:22 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 479AA4ECE1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 07:39:21 -0400 (EDT)
+In-Reply-To: <1430212683-10984-3-git-send-email-eric.auger@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Eric Auger <eric.auger@linaro.org>, eric.auger@st.com, qemu-devel@nongnu.org, peter.crosthwaite@xilinx.com
+Cc: alex.williamson@redhat.com, kvmarm@lists.cs.columbia.edu, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
 
-On 28/04/2015 12:32, Christian Borntraeger wrote:
-> Some architectures already have irq disabled when calling
-> kvm_guest_exit. Push down the disabling into the architectures
-> to avoid double disabling. This also allows to replace
-> irq_save with irq_disable which might be cheaper.
-> arm and mips already have interrupts disabled. s390/power/x86
-> need adoptions.
+On 28/04/2015 11:18, Eric Auger wrote:
+> Check callback now takes as third argument an Object **. In
+> object_set_link_property, we pass the property child as argument.
+> We also assign the *child before the check call so that enhanced
+> check can be performed in the callback. In case the check fails,
+> the old value is restored and ref count is left unchanged.
 > 
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> ---
->  arch/powerpc/kvm/book3s_hv.c | 2 ++
->  arch/powerpc/kvm/book3s_pr.c | 2 ++
->  arch/powerpc/kvm/booke.c     | 4 ++--
->  arch/s390/kvm/kvm-s390.c     | 2 ++
->  arch/x86/kvm/x86.c           | 2 ++
->  include/linux/kvm_host.h     | 4 ----
->  6 files changed, 10 insertions(+), 6 deletions(-)
+> This typically makes possible to do checks both on the *child
+> content (for instance a qemu_irq) and also perform some actions/
+> checks on its container, which was not possible before.
 > 
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index a5f392d..63b35b1 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -1811,7 +1811,9 @@ static void kvmppc_run_core(struct kvmppc_vcore *vc)
->  
->  	/* make sure updates to secondary vcpu structs are visible now */
->  	smp_mb();
-> +	local_irq_disable();
->  	kvm_guest_exit();
-> +	local_irq_enable();
->  
->  	preempt_enable();
->  	cond_resched();
-> diff --git a/arch/powerpc/kvm/book3s_pr.c b/arch/powerpc/kvm/book3s_pr.c
-> index f573839..eafcb8c 100644
-> --- a/arch/powerpc/kvm/book3s_pr.c
-> +++ b/arch/powerpc/kvm/book3s_pr.c
-> @@ -891,7 +891,9 @@ int kvmppc_handle_exit_pr(struct kvm_run *run, struct kvm_vcpu *vcpu,
->  
->  	/* We get here with MSR.EE=1 */
->  
-> +	local_irq_disable();
->  	trace_kvm_exit(exit_nr, vcpu);
-> +	local_irq_enable();
->  	kvm_guest_exit();
+> This is typically useful for starting irqfd setup in vfio platform
+> use case.
 
-This looks wrong.
+s/typically/for example/
 
->  
->  	switch (exit_nr) {
-> diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
-> index 6c1316a..f1d6af3 100644
-> --- a/arch/powerpc/kvm/booke.c
-> +++ b/arch/powerpc/kvm/booke.c
-> @@ -1004,11 +1004,11 @@ int kvmppc_handle_exit(struct kvm_run *run, struct kvm_vcpu *vcpu,
->  		break;
->  	}
->  
-> -	local_irq_enable();
-> -
->  	trace_kvm_exit(exit_nr, vcpu);
->  	kvm_guest_exit();
->  
-> +	local_irq_enable();
-> +
->  	run->exit_reason = KVM_EXIT_UNKNOWN;
->  	run->ready_for_interrupt_injection = 1;
->  
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 9f4c954..0aa2534 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -2015,7 +2015,9 @@ static int __vcpu_run(struct kvm_vcpu *vcpu)
->  		local_irq_enable();
->  		exit_reason = sie64a(vcpu->arch.sie_block,
->  				     vcpu->run->s.regs.gprs);
-> +		local_irq_disable();
->  		kvm_guest_exit();
-> +		local_irq_enable();
->  		vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
->  
->  		rc = vcpu_post_run(vcpu, exit_reason);
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 32bf19e..a5fbd45 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -6351,7 +6351,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  	 */
->  	barrier();
->  
-> +	local_irq_disable();
->  	kvm_guest_exit();
-> +	local_irq_enable();
->  
->  	preempt_enable();
->  
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index a34bf6ed..fe699fb 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -773,11 +773,7 @@ static inline void kvm_guest_enter(void)
->  
->  static inline void kvm_guest_exit(void)
->  {
-> -	unsigned long flags;
-> -
-> -	local_irq_save(flags);
+I can't say that "starting irqfd setup in vfio platform" is typical. :)
 
-Why no WARN_ON here?
+> diff --git a/include/qom/object.h b/include/qom/object.h
+> index 4687fa1..0a7daff 100644
+> --- a/include/qom/object.h
+> +++ b/include/qom/object.h
+> @@ -34,7 +34,7 @@ typedef struct InterfaceClass InterfaceClass;
+>  typedef struct InterfaceInfo InterfaceInfo;
+>  
+>  typedef void (*object_property_set_link_t)(Object *, const char *,
+> -                                           Object *, Error **);
+> +                                           Object **, Error **);
 
-I think the patches are sensible, especially since you can add warnings.
- This kind of code definitely knows if it has interrupts disabled or enabled
+Let's make the new argument "Object * const*", and rename the typedef to
+LinkPropertySetter.
 
-Alternatively, the irq-disabled versions could be called
-__kvm_guest_{enter,exit}.  Then you can use those directly when it makes
-sense.
+Ok with that change.
 
 Paolo
 
->  	guest_exit();
-> -	local_irq_restore(flags);
+
+>  
+>  #define TYPE_OBJECT "object"
+>  
+> @@ -1136,7 +1136,7 @@ typedef enum {
+>   * an error.
+>   */
+>  void object_property_allow_set_link(Object *, const char *,
+> -                                    Object *, Error **);
+> +                                    Object **, Error **);
+>  
+>  /**
+>   * object_property_add_link:
+> @@ -1168,8 +1168,7 @@ void object_property_allow_set_link(Object *, const char *,
+>   */
+>  void object_property_add_link(Object *obj, const char *name,
+>                                const char *type, Object **child,
+> -                              void (*check)(Object *obj, const char *name,
+> -                                            Object *val, Error **errp),
+> +                              object_property_set_link_t check,
+>                                ObjectPropertyLinkFlags flags,
+>                                Error **errp);
+>  
+> diff --git a/qom/object.c b/qom/object.c
+> index b8dff43..cc9ed87 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -1112,14 +1112,14 @@ out:
 >  }
 >  
->  /*
+>  void object_property_allow_set_link(Object *obj, const char *name,
+> -                                    Object *val, Error **errp)
+> +                                    Object **target, Error **errp)
+>  {
+>      /* Allow the link to be set, always */
+>  }
+>  
+>  typedef struct {
+>      Object **child;
+> -    void (*check)(Object *, const char *, Object *, Error **);
+> +    void (*check)(Object *, const char *, Object **, Error **);
+>      ObjectPropertyLinkFlags flags;
+>  } LinkProperty;
+>  
+> @@ -1201,14 +1201,17 @@ static void object_set_link_property(Object *obj, Visitor *v, void *opaque,
+>          return;
+>      }
+>  
+> -    prop->check(obj, name, new_target, &local_err);
+> +    object_ref(new_target);
+> +    *child = new_target;
+> +
+> +    prop->check(obj, name, child, &local_err);
+>      if (local_err) {
+>          error_propagate(errp, local_err);
+> +        *child = old_target;
+> +        object_ref(new_target);
+>          return;
+>      }
+>  
+> -    object_ref(new_target);
+> -    *child = new_target;
+>      object_unref(old_target);
+>  }
+>  
+> @@ -1233,7 +1236,7 @@ static void object_release_link_property(Object *obj, const char *name,
+>  void object_property_add_link(Object *obj, const char *name,
+>                                const char *type, Object **child,
+>                                void (*check)(Object *, const char *,
+> -                                            Object *, Error **),
+> +                                            Object **, Error **),
+>                                ObjectPropertyLinkFlags flags,
+>                                Error **errp)
+>  {
 > 
