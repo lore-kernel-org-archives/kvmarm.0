@@ -1,64 +1,178 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2 06/10] KVM: arm64: guest debug, add SW break point support
-Date: Mon, 27 Apr 2015 22:57:34 +0100
-Message-ID: <CAFEAcA-Kh7Tn+kw9psL=gqme9ogAn+mM8Uco_HcJy=cqg72hbw@mail.gmail.com>
-References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
- <1427814488-28467-7-git-send-email-alex.bennee@linaro.org>
- <20150414082558.GS6186@cbox> <87y4li6hua.fsf@linaro.org> <20150427200407.GG23335@cbox>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [Qemu-devel] [PATCH v2] sysbus: add irq_routing_notifier
+Date: Tue, 28 Apr 2015 08:46:01 +0200
+Message-ID: <553F2CA9.90303@linaro.org>
+References: <1429879153-23476-1-git-send-email-eric.auger@linaro.org>	<CAEgOgz5rBLZD1U0iodZvytb_RYjH7a04attgZxZ-WbuFOkPxpA@mail.gmail.com>	<553DF2AA.2070102@linaro.org>	<553E11E7.7070704@redhat.com>	<553E297F.4020706@linaro.org>	<553E3B7E.9080009@redhat.com>	<CAEgOgz6eFLhkwm7qto=j=p3L5+cz5s_McUyZUcqeN265CgXSdg@mail.gmail.com>	<553E4E05.1010405@linaro.org>	<553E4F2D.7060808@redhat.com>
+ <CAEgOgz61=-jvDGg7BWWAJSVCceaCJ21t_7jjqF_H_B5BuhVdXg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <linux-doc-owner@vger.kernel.org>
-In-Reply-To: <20150427200407.GG23335@cbox>
-Sender: linux-doc-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>, Alexander Graf <agraf@suse.de>, Andrew Jones <drjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhichao Huang <zhichao.huang@linaro.org>, "J. Kiszka" <jan.kiszka@siemens.com>, David Hildenbrand <dahi@linux.vnet.ibm.com>, Bharat Bhushan <r65777@freescale.com>, bp@suse.de, Gleb Natapov <gleb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 52F3F4EBE7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 02:40:16 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 5z23opoayM8R for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Apr 2015 02:40:15 -0400 (EDT)
+Received: from mail-wi0-f180.google.com (mail-wi0-f180.google.com
+ [209.85.212.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 364114EBDE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 02:40:14 -0400 (EDT)
+Received: by wizk4 with SMTP id k4so127282923wiz.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 27 Apr 2015 23:48:40 -0700 (PDT)
+In-Reply-To: <CAEgOgz61=-jvDGg7BWWAJSVCceaCJ21t_7jjqF_H_B5BuhVdXg@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Peter Crosthwaite <peter.crosthwaite@xilinx.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, eric.auger@st.com, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Patch Tracking <patches@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 27 April 2015 at 21:04, Christoffer Dall <christoffer.dall@linaro.or=
-g> wrote:
-> On Thu, Apr 23, 2015 at 03:26:53PM +0100, Alex Benn=C3=A9e wrote:
->>
->> Christoffer Dall <christoffer.dall@linaro.org> writes:
->>
->> > On Tue, Mar 31, 2015 at 04:08:04PM +0100, Alex Benn=C3=A9e wrote:
->> >> + * just need to report the PC and the HSR values to userspace.
->> >> + * Userspace may decide to re-inject the exception and deliver i=
-t to
->> >> + * the guest if it wasn't for the host to deal with.
->> >
->> > now I'm confused - does userspace setup the guest to receive an
->> > exception or does it tell KVM to emulate an exception for the gues=
-t or
->> > do we execute the breakpoint without trapping the debug exception?
->>
->> I've made it all go through userspace as we may have to translate th=
-e
->> hypervisor visible exception code to what the guest was expecting to=
- see.
->>
->
-> ok, so I think you should re-phrase something like:
->
-> "Userspace may decide that this exception is caused by the guest usin=
-g
-> debugging itself, and may in that case emulate the guest debug except=
-ion
-> in userspace before resuming KVM."
->
-> But does that really work?  Given that we don't support KVM-TCG
-> migration, this sounds a little strange.  Did we test it?
+Hi Peter,
 
-The QEMU patches have a TODO note at the point where you'd want
-to do this... Design-wise you can do the reinjection in the
-kernel or in userspace (ppc QEMU does this in userspace, for
-instance) because it's pretty much just setting registers to fake
-up the exception-entry into EL1. Code-wise QEMU's ARM code isn't
-set up to do it right now, but it shouldn't be too difficult to
-persuade the TCG exception-entry code to work for this case too.
+On 04/27/2015 07:43 PM, Peter Crosthwaite wrote:
+> On Mon, Apr 27, 2015 at 8:01 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>>
+>> On 27/04/2015 16:56, Eric Auger wrote:
+>>> Peter, Paolo,
+>>>
+>>> After your feedbacks, I feel I need to spend some more time on the
+>>> original check() track. I would prefer not to introduce any patch that
+>>> will make issue in the future.
+>>
+>> Peter, see the other threads between me and Eric.  See in particular
+>> http://lists.gnu.org/archive/html/qemu-devel/2015-04/msg02749.html
+>> starting at "The notifier actually is not even necessary" and the
+>> replies from there.
+>>
+> 
+> Thanks,
+> 
+> I see the problem with check. In this reply
+> 
+> http://lists.gnu.org/archive/html/qemu-devel/2015-04/msg02956.html
+> 
+> Eric says that the problem with the check hook is it happens before
+> the setting. I think this can be solved with a RYO link setter for
+> GPIOs. We almost have an in-tree precedent with MemoryRegion and the
+> container property (memory.c):
+> 
+>  960     op = object_property_add(OBJECT(mr), "container",
+>  961                              "link<" TYPE_MEMORY_REGION ">",
+>  962                              memory_region_get_container,
+>  963                              NULL, /* memory_region_set_container */
+>  964                              NULL, NULL, &error_abort);
+> 
+> Now in reality we could have done this link normal style as it is only
+> a trivial getter, but the reason the link was done this way in the
+> first place, is because I have a follow up patch to memory.c that adds
+> a customer Link setter:
+> 
+> +static void memory_region_set_container(Object *obj, Visitor *v, void *opaque,
+> +                                        const char *name, Error **errp)
+> +{
+> +    MemoryRegion *mr = MEMORY_REGION(obj);
+> +    Error *local_err = NULL;
+> +    MemoryRegion *old_container = mr->container;
+> +    MemoryRegion *new_container = NULL;
+> +    char *path = NULL;
+> +
+> +    visit_type_str(v, &path, name, &local_err);
+> +
+> +    if (!local_err && strcmp(path, "") != 0) {
+> +        new_container = MEMORY_REGION(object_resolve_link(obj, name, path,
+> +                                      &local_err));
+> +        while (new_container->alias) {
+> +            new_container = new_container->alias;
+> +        }
+> +    }
+> +
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        return;
+> +    }
+> +
+> +    object_ref(OBJECT(new_container));
+> +
+> +    memory_region_transaction_begin();
+> +    memory_region_ref(mr);
+> +    if (old_container) {
+> +        memory_region_del_subregion(old_container, mr);
+> +    }
+> +    mr->container = new_container;
+> +    if (new_container) {
+> +        memory_region_update_container_subregions(mr);
+> +    }
+> +    memory_region_unref(mr);
+> +    memory_region_transaction_commit();
+> +
+> +    object_unref(OBJECT(old_container));
+> +}
+> +
+> 
+>      op = object_property_add(OBJECT(mr), "container",
+>                               "link<" TYPE_MEMORY_REGION ">",
+>                               memory_region_get_container,
+> -                             NULL, /* memory_region_set_container */
+> +                             memory_region_set_container,
+>                               NULL, NULL, &error_abort);
+> 
+> 
+> The function does the normal link setting - similar to
+> object_set_link_property (not to be confused with
+> object_property_set_link!) but is surrounded by class specific side
+> effects. Specifically in this case, it does
+> memory_region_transaction_begin/ref/unref/commit etc for the MR.
+> 
+> For this GPIO case, you could create a custom setter that does the
+> normal set, then calls the DeviceClass installed hook (or you can
+> install the hook to the object and init it at qdev_init_gpio_out_named
+> time as suggested in the eariler thread). The callback will happen
+> after the link is populated.
+> 
+> To reduce verbosity, I suggest making object_set_link_property() a
+> visible API, then RYO link setters can call it surrounded by custom
+> behavior e.g:
+> 
+> foo_object_set_bar_property(...)
+> {
+>     pre_set_link_side_effects();
+>     object_set_link_property();
+>     post_set_link_side_effects();
+> }
+> 
+> object_set_link_property() would need to be coreified and wrapped to
+> remove it's awareness of LinkProperty type (as that doesn't exist in
+> RYO properties) in this case.
 
-Does the kernel already have a conveniently implemented "inject
-exception into guest" lump of code? If so it might be less effort
-to do it that way round, maybe.
+Thank you Peter for detailing this.
 
--- PMM
+Yesterday I re-worked on the solution based on the check() method where
+- check would take a Object **child as a 3d parameter
+- we would assign *child before the call and in case the check fails set
+the *child back to NULL in object_set_link_property.
+
+I need to do some more testing.
+
+I don't know if this solution would be acceptable too. If not I will
+implement according to your guidelines.
+
+Best Regards
+
+Eric
+> 
+> Regards,
+> Peter
+> 
+>> If you have any idea, please help.
+>>
+>> Paolo
+>>
