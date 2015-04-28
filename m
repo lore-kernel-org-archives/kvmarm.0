@@ -1,88 +1,41 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH 3/3] sysbus: add irq_set_hook
-Date: Tue, 28 Apr 2015 10:18:03 +0100
-Message-ID: <1430212683-10984-4-git-send-email-eric.auger@linaro.org>
-References: <1430212683-10984-1-git-send-email-eric.auger@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 06/10] KVM: arm64: guest debug, add SW break point support
+Date: Tue, 28 Apr 2015 10:34:12 +0100
+Message-ID: <CAFEAcA85i_1JybEFBg91NA3-LpAzYh4RSDnqryOd=rZN7gZP5A@mail.gmail.com>
+References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
+ <1427814488-28467-7-git-send-email-alex.bennee@linaro.org>
+ <20150414082558.GS6186@cbox> <87y4li6hua.fsf@linaro.org> <20150427200407.GG23335@cbox>
+ <CAFEAcA-Kh7Tn+kw9psL=gqme9ogAn+mM8Uco_HcJy=cqg72hbw@mail.gmail.com> <87wq0wr6dd.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 86EC94ECBC
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 05:09:48 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5LM42Hdrop22 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Apr 2015 05:09:47 -0400 (EDT)
-Received: from mail-wi0-f169.google.com (mail-wi0-f169.google.com
- [209.85.212.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 992C34ECAA
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 05:09:46 -0400 (EDT)
-Received: by widdi4 with SMTP id di4so131750785wid.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 02:18:12 -0700 (PDT)
-In-Reply-To: <1430212683-10984-1-git-send-email-eric.auger@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, pbonzini@redhat.com, peter.crosthwaite@xilinx.com
-Cc: alex.williamson@redhat.com, kvmarm@lists.cs.columbia.edu, patches@linaro.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <87wq0wr6dd.fsf@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>, Alexander Graf <agraf@suse.de>, Andrew Jones <drjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhichao Huang <zhichao.huang@linaro.org>, "J. Kiszka" <jan.kiszka@siemens.com>, David Hildenbrand <dahi@linux.vnet.ibm.com>, Bharat Bhushan <r65777@freescale.com>, bp@suse.de, Gleb Natapov <gleb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a new callback in the SysBusDeviceClass. This callback now can
-be overriden by devices inheriting from sysbus. By default the callback
-is set to the dummy object_property_allow_set_link callback.
+On 28 April 2015 at 09:42, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
+ote:
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>> Does the kernel already have a conveniently implemented "inject
+>> exception into guest" lump of code? If so it might be less effort
+>> to do it that way round, maybe.
+>
+> So you pointed out we can't just re-inject the exceptions we get as w=
+e
+> need to map from things like ESR_ELx_EC_WATCHPT_LOW to
+> ESR_ELx_EC_WATCHPT_CUR before re-injection.
+>
+> Of course if it is as simple as modifying the ESR_EL1 register and
+> returning +ve in the handle_exit path then I can do that but I assume=
+d
+> if any other wrangling needs doing it should be done in userspace.
 
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
----
- hw/core/sysbus.c    | 8 +++++++-
- include/hw/sysbus.h | 1 +
- 2 files changed, 8 insertions(+), 1 deletion(-)
+Well, somebody's got to do it, and it's the same amount of work
+either way (fiddling with ESR, making sure we direct the guest
+to the right exception vector entry point, maybe a few other
+things).
 
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index 8553a6f..e2c4899 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -165,7 +165,10 @@ void sysbus_mmio_map_overlap(SysBusDevice *dev, int n, hwaddr addr,
- /* Request an IRQ source.  The actual IRQ object may be populated later.  */
- void sysbus_init_irq(SysBusDevice *dev, qemu_irq *p)
- {
--    qdev_init_gpio_out_named(DEVICE(dev), p, SYSBUS_DEVICE_GPIO_IRQ, 1);
-+    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_GET_CLASS(dev);
-+
-+    qdev_init_gpio_out_named(DEVICE(dev), p, SYSBUS_DEVICE_GPIO_IRQ, 1,
-+                             sbc->irq_set_hook);
- }
- 
- /* Pass IRQs from a target device.  */
-@@ -316,8 +319,11 @@ MemoryRegion *sysbus_address_space(SysBusDevice *dev)
- static void sysbus_device_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *k = DEVICE_CLASS(klass);
-+    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_CLASS(klass);
-+
-     k->init = sysbus_device_init;
-     k->bus_type = TYPE_SYSTEM_BUS;
-+    sbc->irq_set_hook = object_property_allow_set_link;
- }
- 
- static const TypeInfo sysbus_device_type_info = {
-diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
-index dbf3f0f..26ffb2e 100644
---- a/include/hw/sysbus.h
-+++ b/include/hw/sysbus.h
-@@ -42,6 +42,7 @@ typedef struct SysBusDeviceClass {
- 
-     int (*init)(SysBusDevice *dev);
-     void (*irq_routing_notifier)(SysBusDevice *dev, qemu_irq irq);
-+    object_property_set_link_t irq_set_hook;
- } SysBusDeviceClass;
- 
- struct SysBusDevice {
--- 
-1.8.3.2
+-- PMM
