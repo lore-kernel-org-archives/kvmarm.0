@@ -1,26 +1,23 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v13 01/12] linux-headers: update headers according to 4.1-rc0
-Date: Tue, 28 Apr 2015 17:51:02 +0100
-Message-ID: <1430239873-31950-2-git-send-email-eric.auger@linaro.org>
-References: <1430239873-31950-1-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v13 00/12] KVM platform device passthrough
+Date: Tue, 28 Apr 2015 17:51:01 +0100
+Message-ID: <1430239873-31950-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="===============5592820994107185772=="
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DADB4ED87
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 449204ED8B
  for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 12:42:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OKpTjByhAQEh for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Apr 2015 12:42:56 -0400 (EDT)
-Received: from mail-wi0-f181.google.com (mail-wi0-f181.google.com
- [209.85.212.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 117FF4ED89
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 12:42:55 -0400 (EDT)
-Received: by wiun10 with SMTP id n10so36392179wiu.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 09:51:22 -0700 (PDT)
-In-Reply-To: <1430239873-31950-1-git-send-email-eric.auger@linaro.org>
+ with ESMTP id BxKQ85OKPNUc for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 28 Apr 2015 12:42:55 -0400 (EDT)
+Received: from mail-wi0-f177.google.com (mail-wi0-f177.google.com
+ [209.85.212.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 13C7D4ED87
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 12:42:54 -0400 (EDT)
+Received: by widdi4 with SMTP id di4so36435544wid.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 09:51:21 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,451 +31,279 @@ To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, alex.willia
 Cc: patches@linaro.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This includes, among other things, VFIO platform driver and
-irqfd/arm.
+--===============5592820994107185772==
+Content-Type: text/plain; charset=y
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
+This series aims at enabling KVM platform device passthrough.
 
----
+Kernel dependencies were pulled for 4.1-rc0. This series now only
+relies on the following QEMU series
+
+[1] [PATCH v12 0/4] machvirt dynamic sysbus device instantiation
+http://comments.gmane.org/gmane.comp.emulators.kvm.arm.devel/886
+
+Both series are candidate for QEMU 2.4 and available at
+
+http://git.linaro.org/people/eric.auger/qemu.git
+(branch vfio_integ_v13)
+
+The series was tested on Calxeda Midway (ARMv7) where one xgmac
+is assigned to KVM host while the second one is assigned to the guest.
+
+Wiki for Calxeda Midway setup:
+https://wiki.linaro.org/LEG/Engineering/Virtualization/Platform_Device_Pa=
+ssthrough_on_Midway
+
+History:
 
 v12 -> v13:
-- update for 4.1-rc0 headers
+- header update but same update was already sent by Cornelia
+- Rework VFIO signaling & irqfd setup: restored 2-step setup featuring
+  eventfd setup on realize and then irqfd setup on irq binding.
+- irqfd setup now uses kvm_irqchip_add_irqfd_notifier and
+  sysbus irq_set_hook override. This leads to the introduction of 6 patch
+  files enabling those 2 features. Paolo advised to introduce
+  kvm_irqchip_add_irqfd_notifier series in the VFIO one. I did the
+  same for irq_set_hook series but if it is better I can submit it aside.
+- above changes made possible to remove
+  x hw/vfio/platform: add capability to start IRQ propagation"
+  x hw/arm/virt: start VFIO IRQ propagation
+- in sysbus-fdt.c, use platform_bus_get_mmio_addr instead of deprecated
+  mmio[0] property. Thanks to Bharat who pointed this issue out. also
+  cpu_to_be32 was used for size and base (Vikram input) .
+- in skeleton misc corrections following Alex review.
 
-v10 -> v11:
-- only includes header modifications related to vfio platform
-  driver v14 and not those related to
-  "vfio: type1: support for ARM SMMUS with VFIO_IOMMU_TYPE1"
----
+v11->v12:
+- add x-mmap property definition, without which the default value of
+  vbasedev.allow_mmap is false, hence preventing the reg space from
+  being mmapped.
+
+v10->v11:
+- rebase onto v2.3.0-rc0 (mainly related to PCIe support in virt)
+- add dma-coherent property for calxeda midway (fix revealed by removal
+  of kernel-side "vfio: type1: support for ARM SMMUS with VFIO_IOMMU_TYPE=
+1")
+- virt modifications to start VFIO IRQ forwarding are now in a separate
+  patch
+- rearrange linux header exports (those are still partial exports
+  waiting for definitive 4.1-rc0)
+- take into account Alex Benn=C3=83=C2=A9e comments:
+  - use g_malloc0_n instead of g_malloc0
+  - use block declarations when possible
+  - rework readlink returned value treatment
+  - use g_strlcat in place strncat
+  - re-arrange mutex locking for multiple IRQ support (user-side handled
+    eventfds)
+- use g_snprintf instead of snprintf
+- change the order of functions to avoid pre-declaration in platform.c
+- add flags in VFIOINTp struct to detect whether the IRQ is automasked
+- some comment rewriting
+
+v9->v10:
+- rebase on "vfio: cleanup vfio_get_device error path, remove
+  vfio_populate_device": vfio_populate_device no more called in
+  vfio_get_device but in vfio_base_device_init
+- update VFIO header according to vfio platform driver v13 (no AMBA)
+
+v8->v9:
+- rebase on 2.2.0 and machvirt dynamic sysbus instantiation v10
+- v8 1-11 were pulled
+- patch files related to forwarding are moved in a seperate series since
+  it depends on kernel series still in RFC.
+- introduction of basic VFIO platform device split into 3 patch files to
+  ease the review (hope it will help).
+- add an author in platform.c
+- add deallocation in vfio_populate_device error case
+- add patch file doing the VFIO header sync
+- use VFIO_DEVICE_FLAGS_PLATFORM in vfio_populate_device
+- rename calxeda_xgmac.c into calxeda-xgmac.c
+- sysbus-fdt: add_calxeda_midway_xgmac_fdt_node g_free in case of errors
+- reword of linux-headers patch files
+
+v7->v8:
+- rebase on v2.2.0-rc3 and integrate
+  "Add skip_dump flag to ignore memory region during dump"
+- KVM header evolution with subindex addition in kvm_arch_forwarded_irq
+- split [PATCH v7 03/16] hw/vfio/pci: introduce VFIODevice into 4 patches
+- vfio_compute_needs_reset does not return bool anymore
+- add some comments about exposed MMIO region and IRQ in calxeda xgmac
+  device
+- vfio_[un]mask_irqindex renamed into vfio_[un]mask_single_irqindex
+- rework IRQ startup: former machine init done notifier is replaced by a
+  reset notifier. machine file passes the interrupt controller
+  DeviceState handle (not the platform bus first irq parameter).
+- sysbus-fdt:
+  - move the add_fdt_node_functions array declaration between the device
+    specific code and the generic code to avoid forward declarations of
+    decice specific functions
+  - rename add_basic_vfio_fdt_node into add_calxeda_midway_xgmac_fdt_node
+    emphasizing the fact it is xgmac specific
+
+v6->v7:
+- fake injection test modality removed
+- VFIO_DEVICE_TYPE_PLATFORM only introduced with VFIO platform
+- new helper functions to start VFIO IRQ on machine init done notifier
+  (introduced in hw/vfio/platform: add vfio-platform support and notifier
+  registration invoked in hw/arm/virt: add support for VFIO devices).
+  vfio_start_irq_injection is replaced by vfio_register_irq_starter.
+
+v5->v6:
+- rebase on 2.1rc5 PCI code
+- forwarded IRQ first integraton
+- vfio_device property renamed into host property
+- split IRQ setup in different functions that match the 3 supported
+  injection techniques (user handled eventfd, irqfd, forwarded IRQ):
+  removes dynamic switch between injection methods
+- introduce fake interrupts as a test modality:
+  x makes possible to test multiple IRQ user-side handling.
+  x this is a test feature only: enable to trigger a fd as if the
+    real physical IRQ hit. No virtual IRQ is injected into the guest
+    but handling is simulated so that the state machine can be tested
+- user handled eventfd:
+  x add mutex to protect IRQ state & list manipulation,
+  x correct misleading comment in vfio_intp_interrupt.
+  x Fix bugs using fake interrupt modality
+- irqfd no more advertised in this patchset (handled in [3])
+- VFIOPlatformDeviceClass becomes abstract and Calxeda xgmac device
+  and class is re-introduced (as per v4)
+- all DPRINTF removed in platform and replaced by trace-points
+- corrects compilation with configure --disable-kvm
+- simplifies the split for vfio_get_device and introduce a unique
+  specialized function named vfio_populate_device
+- group_list renamed into vfio_group_list
+- hw/arm/dyn_sysbus_devtree.c currently only support vfio-calxeda-xgmac
+  instantiation. Needs to be specialized for other VFIO devices
+- fix 2 bugs in dyn_sysbus_devtree(reg_attr index and compat)
+
+v4->v5:
+- rebase on v2.1.0 PCI code
+- take into account Alex Williamson comments on PCI code rework
+  - trace updates in vfio_region_write/read
+  - remove fd from VFIORegion
+  - get/put ckeanup
+- bug fix: bar region's vbasedev field duly initialization
+- misc cleanups in platform device
+- device tree node generation removed from device and handled in
+  hw/arm/dyn_sysbus_devtree.c
+- remove "hw/vfio: add an example calxeda_xgmac": with removal of
+  device tree node generation we do not have so many things to
+  implement in that derived device yet. May be re-introduced later
+  on if needed typically for reset/migration.
+- no GSI routing table anymore
+
+v3->v4 changes (Eric Auger, Alvise Rigo)
+- rebase on last VFIO PCI code (v2.1.0-rc0)
+- full git history rework to ease PCI code change review
+- mv include files in hw/vfio
+- DPRINTF reformatting temporarily moved out
+- support of VFIO virq (removal of resamplefd handler on user-side)
+- integration with sysbus dynamic instantiation framwork
+- removal of unrealize and cleanup routines until it is better
+  understood what is really needed
+- Support of VFIO for Amba devices should be handled in an inherited
+  device to specialize the device tree generation (clock handle currently
+  missing in framework however)
+- "Always use eventfd as notifying mechanism" temporarily moved out
+- static instantiation is not mainstream (although it remains possible)
+  note if static instantiation is used, irqfd must be setup in machine fi=
+le
+  when virtual IRQ is known
+- create the GSI routing table on qemu side
+
+v2->v3 changes (Alvise Rigo, Eric Auger):
+- Following Alex W recommandations, further efforts to factorize the
+  code between PCI:introduction of VFIODevice and VFIORegion
+  as base classes
+- unique reset handler for platform and PCI
+- cleanup following Kim's comments
+- multiple IRQ support mechanics should be in place although not
+  tested
+- Better handling of MMIO multiple regions
+- New features and fixes by Alvise (multiple compat string, exec
+  flag, force eventfd usage, amba device tree support)
+- irqfd support
+
+v1->v2 changes (Kim Phillips, Eric Auger):
+- IRQ initial support (legacy mode where eventfds are handled on
+  user side)
+- hacked dynamic instantiation
+
+v1 (Kim Phillips):
+- initial split between PCI and platform
+- MMIO support only
+- static instantiation
+
+Best Regards
+
+Eric
+
+
+
+Eric Auger (12):
+  linux-headers: update headers according to 4.1-rc0
+  hw/vfio/platform: vfio-platform skeleton
+  hw/vfio/platform: add irq assignment
+  hw/vfio/platform: calxeda xgmac device
+  hw/arm/sysbus-fdt: enable vfio-calxeda-xgmac dynamic instantiation
+  kvm: rename kvm_irqchip_[add,remove]_irqfd_notifier with gsi suffix
+  kvm-all.c: add qemu_irq/gsi hash table and utility routines
+  intc: arm_gic_kvm: set the qemu_irq/gsi mapping
+  qdev: pass the check callback to qdev_init_gpio_out_named
+  qdev: check callback takes the property child as third argument
+  sysbus: add irq_set_hook
+  hw/vfio/platform: add irqfd support
+
+ hw/arm/sysbus-fdt.c                         |  72 +++
+ hw/core/qdev-properties.c                   |   3 +-
+ hw/core/qdev.c                              |   8 +-
+ hw/core/sysbus.c                            |   8 +-
+ hw/intc/arm_gic_kvm.c                       |   5 +
+ hw/s390x/virtio-ccw.c                       |   8 +-
+ hw/vfio/Makefile.objs                       |   2 +
+ hw/vfio/calxeda-xgmac.c                     |  54 +++
+ hw/vfio/pci.c                               |   6 +-
+ hw/vfio/platform.c                          | 724 ++++++++++++++++++++++=
+++++++
+ hw/virtio/virtio-pci.c                      |   4 +-
+ include/hw/qdev-core.h                      |   3 +-
+ include/hw/qdev-properties.h                |   3 +-
+ include/hw/sysbus.h                         |   1 +
+ include/hw/vfio/vfio-calxeda-xgmac.h        |  46 ++
+ include/hw/vfio/vfio-common.h               |   1 +
+ include/hw/vfio/vfio-platform.h             |  77 +++
+ include/qom/object.h                        |   8 +-
  include/standard-headers/linux/virtio_blk.h |   8 +-
+ include/sysemu/kvm.h                        |  11 +-
+ kvm-all.c                                   |  42 +-
+ kvm-stub.c                                  |   7 +-
  linux-headers/asm-arm/kvm.h                 |   3 +
  linux-headers/asm-arm64/kvm.h               |   3 +
- linux-headers/asm-mips/kvm.h                | 164 +++++++++++++++++-----------
+ linux-headers/asm-mips/kvm.h                | 164 ++++---
  linux-headers/asm-s390/kvm.h                |   4 +
- linux-headers/linux/kvm.h                   |  65 ++++++++++-
+ linux-headers/linux/kvm.h                   |  65 ++-
  linux-headers/linux/vfio.h                  |   2 +
- 7 files changed, 183 insertions(+), 66 deletions(-)
+ qom/object.c                                |  16 +-
+ trace-events                                |  14 +
+ 30 files changed, 1272 insertions(+), 100 deletions(-)
+ create mode 100644 hw/vfio/calxeda-xgmac.c
+ create mode 100644 hw/vfio/platform.c
+ create mode 100644 include/hw/vfio/vfio-calxeda-xgmac.h
+ create mode 100644 include/hw/vfio/vfio-platform.h
 
-diff --git a/include/standard-headers/linux/virtio_blk.h b/include/standard-headers/linux/virtio_blk.h
-index 12016b4..cd601f4 100644
---- a/include/standard-headers/linux/virtio_blk.h
-+++ b/include/standard-headers/linux/virtio_blk.h
-@@ -58,7 +58,7 @@ struct virtio_blk_config {
- 	uint32_t size_max;
- 	/* The maximum number of segments (if VIRTIO_BLK_F_SEG_MAX) */
- 	uint32_t seg_max;
--	/* geometry the device (if VIRTIO_BLK_F_GEOMETRY) */
-+	/* geometry of the device (if VIRTIO_BLK_F_GEOMETRY) */
- 	struct virtio_blk_geometry {
- 		uint16_t cylinders;
- 		uint8_t heads;
-@@ -117,7 +117,11 @@ struct virtio_blk_config {
- #define VIRTIO_BLK_T_BARRIER	0x80000000
- #endif /* !VIRTIO_BLK_NO_LEGACY */
- 
--/* This is the first element of the read scatter-gather list. */
-+/*
-+ * This comes first in the read scatter-gather list.
-+ * For legacy virtio, if VIRTIO_F_ANY_LAYOUT is not negotiated,
-+ * this is the first element of the read scatter-gather list.
-+ */
- struct virtio_blk_outhdr {
- 	/* VIRTIO_BLK_T* */
- 	__virtio32 type;
-diff --git a/linux-headers/asm-arm/kvm.h b/linux-headers/asm-arm/kvm.h
-index 0db25bc..2499867 100644
---- a/linux-headers/asm-arm/kvm.h
-+++ b/linux-headers/asm-arm/kvm.h
-@@ -198,6 +198,9 @@ struct kvm_arch_memory_slot {
- /* Highest supported SPI, from VGIC_NR_IRQS */
- #define KVM_ARM_IRQ_GIC_MAX		127
- 
-+/* One single KVM irqchip, ie. the VGIC */
-+#define KVM_NR_IRQCHIPS          1
-+
- /* PSCI interface */
- #define KVM_PSCI_FN_BASE		0x95c1ba5e
- #define KVM_PSCI_FN(n)			(KVM_PSCI_FN_BASE + (n))
-diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
-index 3ef77a4..c154c0b 100644
---- a/linux-headers/asm-arm64/kvm.h
-+++ b/linux-headers/asm-arm64/kvm.h
-@@ -191,6 +191,9 @@ struct kvm_arch_memory_slot {
- /* Highest supported SPI, from VGIC_NR_IRQS */
- #define KVM_ARM_IRQ_GIC_MAX		127
- 
-+/* One single KVM irqchip, ie. the VGIC */
-+#define KVM_NR_IRQCHIPS          1
-+
- /* PSCI interface */
- #define KVM_PSCI_FN_BASE		0x95c1ba5e
- #define KVM_PSCI_FN(n)			(KVM_PSCI_FN_BASE + (n))
-diff --git a/linux-headers/asm-mips/kvm.h b/linux-headers/asm-mips/kvm.h
-index 2c04b6d..6985eb5 100644
---- a/linux-headers/asm-mips/kvm.h
-+++ b/linux-headers/asm-mips/kvm.h
-@@ -36,77 +36,85 @@ struct kvm_regs {
- 
- /*
-  * for KVM_GET_FPU and KVM_SET_FPU
-- *
-- * If Status[FR] is zero (32-bit FPU), the upper 32-bits of the FPRs
-- * are zero filled.
-  */
- struct kvm_fpu {
--	__u64 fpr[32];
--	__u32 fir;
--	__u32 fccr;
--	__u32 fexr;
--	__u32 fenr;
--	__u32 fcsr;
--	__u32 pad;
- };
- 
- 
- /*
-- * For MIPS, we use KVM_SET_ONE_REG and KVM_GET_ONE_REG to access CP0
-+ * For MIPS, we use KVM_SET_ONE_REG and KVM_GET_ONE_REG to access various
-  * registers.  The id field is broken down as follows:
-  *
-- *  bits[2..0]   - Register 'sel' index.
-- *  bits[7..3]   - Register 'rd'  index.
-- *  bits[15..8]  - Must be zero.
-- *  bits[31..16] - 1 -> CP0 registers.
-- *  bits[51..32] - Must be zero.
-  *  bits[63..52] - As per linux/kvm.h
-+ *  bits[51..32] - Must be zero.
-+ *  bits[31..16] - Register set.
-+ *
-+ * Register set = 0: GP registers from kvm_regs (see definitions below).
-+ *
-+ * Register set = 1: CP0 registers.
-+ *  bits[15..8]  - Must be zero.
-+ *  bits[7..3]   - Register 'rd'  index.
-+ *  bits[2..0]   - Register 'sel' index.
-+ *
-+ * Register set = 2: KVM specific registers (see definitions below).
-+ *
-+ * Register set = 3: FPU / MSA registers (see definitions below).
-  *
-  * Other sets registers may be added in the future.  Each set would
-  * have its own identifier in bits[31..16].
-- *
-- * The registers defined in struct kvm_regs are also accessible, the
-- * id values for these are below.
-  */
- 
--#define KVM_REG_MIPS_R0 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 0)
--#define KVM_REG_MIPS_R1 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 1)
--#define KVM_REG_MIPS_R2 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 2)
--#define KVM_REG_MIPS_R3 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 3)
--#define KVM_REG_MIPS_R4 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 4)
--#define KVM_REG_MIPS_R5 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 5)
--#define KVM_REG_MIPS_R6 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 6)
--#define KVM_REG_MIPS_R7 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 7)
--#define KVM_REG_MIPS_R8 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 8)
--#define KVM_REG_MIPS_R9 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 9)
--#define KVM_REG_MIPS_R10 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 10)
--#define KVM_REG_MIPS_R11 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 11)
--#define KVM_REG_MIPS_R12 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 12)
--#define KVM_REG_MIPS_R13 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 13)
--#define KVM_REG_MIPS_R14 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 14)
--#define KVM_REG_MIPS_R15 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 15)
--#define KVM_REG_MIPS_R16 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 16)
--#define KVM_REG_MIPS_R17 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 17)
--#define KVM_REG_MIPS_R18 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 18)
--#define KVM_REG_MIPS_R19 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 19)
--#define KVM_REG_MIPS_R20 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 20)
--#define KVM_REG_MIPS_R21 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 21)
--#define KVM_REG_MIPS_R22 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 22)
--#define KVM_REG_MIPS_R23 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 23)
--#define KVM_REG_MIPS_R24 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 24)
--#define KVM_REG_MIPS_R25 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 25)
--#define KVM_REG_MIPS_R26 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 26)
--#define KVM_REG_MIPS_R27 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 27)
--#define KVM_REG_MIPS_R28 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 28)
--#define KVM_REG_MIPS_R29 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 29)
--#define KVM_REG_MIPS_R30 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 30)
--#define KVM_REG_MIPS_R31 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 31)
--
--#define KVM_REG_MIPS_HI (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 32)
--#define KVM_REG_MIPS_LO (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 33)
--#define KVM_REG_MIPS_PC (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 34)
--
--/* KVM specific control registers */
-+#define KVM_REG_MIPS_GP		(KVM_REG_MIPS | 0x0000000000000000ULL)
-+#define KVM_REG_MIPS_CP0	(KVM_REG_MIPS | 0x0000000000010000ULL)
-+#define KVM_REG_MIPS_KVM	(KVM_REG_MIPS | 0x0000000000020000ULL)
-+#define KVM_REG_MIPS_FPU	(KVM_REG_MIPS | 0x0000000000030000ULL)
-+
-+
-+/*
-+ * KVM_REG_MIPS_GP - General purpose registers from kvm_regs.
-+ */
-+
-+#define KVM_REG_MIPS_R0		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  0)
-+#define KVM_REG_MIPS_R1		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  1)
-+#define KVM_REG_MIPS_R2		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  2)
-+#define KVM_REG_MIPS_R3		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  3)
-+#define KVM_REG_MIPS_R4		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  4)
-+#define KVM_REG_MIPS_R5		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  5)
-+#define KVM_REG_MIPS_R6		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  6)
-+#define KVM_REG_MIPS_R7		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  7)
-+#define KVM_REG_MIPS_R8		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  8)
-+#define KVM_REG_MIPS_R9		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  9)
-+#define KVM_REG_MIPS_R10	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 10)
-+#define KVM_REG_MIPS_R11	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 11)
-+#define KVM_REG_MIPS_R12	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 12)
-+#define KVM_REG_MIPS_R13	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 13)
-+#define KVM_REG_MIPS_R14	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 14)
-+#define KVM_REG_MIPS_R15	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 15)
-+#define KVM_REG_MIPS_R16	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 16)
-+#define KVM_REG_MIPS_R17	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 17)
-+#define KVM_REG_MIPS_R18	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 18)
-+#define KVM_REG_MIPS_R19	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 19)
-+#define KVM_REG_MIPS_R20	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 20)
-+#define KVM_REG_MIPS_R21	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 21)
-+#define KVM_REG_MIPS_R22	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 22)
-+#define KVM_REG_MIPS_R23	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 23)
-+#define KVM_REG_MIPS_R24	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 24)
-+#define KVM_REG_MIPS_R25	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 25)
-+#define KVM_REG_MIPS_R26	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 26)
-+#define KVM_REG_MIPS_R27	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 27)
-+#define KVM_REG_MIPS_R28	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 28)
-+#define KVM_REG_MIPS_R29	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 29)
-+#define KVM_REG_MIPS_R30	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 30)
-+#define KVM_REG_MIPS_R31	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 31)
-+
-+#define KVM_REG_MIPS_HI		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 32)
-+#define KVM_REG_MIPS_LO		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 33)
-+#define KVM_REG_MIPS_PC		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 34)
-+
-+
-+/*
-+ * KVM_REG_MIPS_KVM - KVM specific control registers.
-+ */
- 
- /*
-  * CP0_Count control
-@@ -118,8 +126,7 @@ struct kvm_fpu {
-  *        safely without losing time or guest timer interrupts.
-  * Other: Reserved, do not change.
-  */
--#define KVM_REG_MIPS_COUNT_CTL		(KVM_REG_MIPS | KVM_REG_SIZE_U64 | \
--					 0x20000 | 0)
-+#define KVM_REG_MIPS_COUNT_CTL	    (KVM_REG_MIPS_KVM | KVM_REG_SIZE_U64 | 0)
- #define KVM_REG_MIPS_COUNT_CTL_DC	0x00000001
- 
- /*
-@@ -131,15 +138,46 @@ struct kvm_fpu {
-  * emulated.
-  * Modifications to times in the future are rejected.
-  */
--#define KVM_REG_MIPS_COUNT_RESUME	(KVM_REG_MIPS | KVM_REG_SIZE_U64 | \
--					 0x20000 | 1)
-+#define KVM_REG_MIPS_COUNT_RESUME   (KVM_REG_MIPS_KVM | KVM_REG_SIZE_U64 | 1)
- /*
-  * CP0_Count rate in Hz
-  * Specifies the rate of the CP0_Count timer in Hz. Modifications occur without
-  * discontinuities in CP0_Count.
-  */
--#define KVM_REG_MIPS_COUNT_HZ		(KVM_REG_MIPS | KVM_REG_SIZE_U64 | \
--					 0x20000 | 2)
-+#define KVM_REG_MIPS_COUNT_HZ	    (KVM_REG_MIPS_KVM | KVM_REG_SIZE_U64 | 2)
-+
-+
-+/*
-+ * KVM_REG_MIPS_FPU - Floating Point and MIPS SIMD Architecture (MSA) registers.
-+ *
-+ *  bits[15..8]  - Register subset (see definitions below).
-+ *  bits[7..5]   - Must be zero.
-+ *  bits[4..0]   - Register number within register subset.
-+ */
-+
-+#define KVM_REG_MIPS_FPR	(KVM_REG_MIPS_FPU | 0x0000000000000000ULL)
-+#define KVM_REG_MIPS_FCR	(KVM_REG_MIPS_FPU | 0x0000000000000100ULL)
-+#define KVM_REG_MIPS_MSACR	(KVM_REG_MIPS_FPU | 0x0000000000000200ULL)
-+
-+/*
-+ * KVM_REG_MIPS_FPR - Floating point / Vector registers.
-+ */
-+#define KVM_REG_MIPS_FPR_32(n)	(KVM_REG_MIPS_FPR | KVM_REG_SIZE_U32  | (n))
-+#define KVM_REG_MIPS_FPR_64(n)	(KVM_REG_MIPS_FPR | KVM_REG_SIZE_U64  | (n))
-+#define KVM_REG_MIPS_VEC_128(n)	(KVM_REG_MIPS_FPR | KVM_REG_SIZE_U128 | (n))
-+
-+/*
-+ * KVM_REG_MIPS_FCR - Floating point control registers.
-+ */
-+#define KVM_REG_MIPS_FCR_IR	(KVM_REG_MIPS_FCR | KVM_REG_SIZE_U32 |  0)
-+#define KVM_REG_MIPS_FCR_CSR	(KVM_REG_MIPS_FCR | KVM_REG_SIZE_U32 | 31)
-+
-+/*
-+ * KVM_REG_MIPS_MSACR - MIPS SIMD Architecture (MSA) control registers.
-+ */
-+#define KVM_REG_MIPS_MSA_IR	 (KVM_REG_MIPS_MSACR | KVM_REG_SIZE_U32 |  0)
-+#define KVM_REG_MIPS_MSA_CSR	 (KVM_REG_MIPS_MSACR | KVM_REG_SIZE_U32 |  1)
-+
- 
- /*
-  * KVM MIPS specific structures and definitions
-diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
-index c5a93eb..512d8f1 100644
---- a/linux-headers/asm-s390/kvm.h
-+++ b/linux-headers/asm-s390/kvm.h
-@@ -150,6 +150,7 @@ struct kvm_guest_debug_arch {
- #define KVM_SYNC_CRS    (1UL << 3)
- #define KVM_SYNC_ARCH0  (1UL << 4)
- #define KVM_SYNC_PFAULT (1UL << 5)
-+#define KVM_SYNC_VRS    (1UL << 6)
- /* definition of registers in kvm_run */
- struct kvm_sync_regs {
- 	__u64 prefix;	/* prefix register */
-@@ -164,6 +165,9 @@ struct kvm_sync_regs {
- 	__u64 pft;	/* pfault token [PFAULT] */
- 	__u64 pfs;	/* pfault select [PFAULT] */
- 	__u64 pfc;	/* pfault compare [PFAULT] */
-+	__u64 vrs[32][2];	/* vector registers */
-+	__u8  reserved[512];	/* for future vector expansion */
-+	__u32 fpc;	/* only valid with vector registers */
- };
- 
- #define KVM_REG_S390_TODPR	(KVM_REG_S390 | KVM_REG_SIZE_U32 | 0x1)
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 60a54c8..7039166 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -147,6 +147,16 @@ struct kvm_pit_config {
- 
- #define KVM_PIT_SPEAKER_DUMMY     1
- 
-+struct kvm_s390_skeys {
-+	__u64 start_gfn;
-+	__u64 count;
-+	__u64 skeydata_addr;
-+	__u32 flags;
-+	__u32 reserved[9];
-+};
-+#define KVM_S390_GET_SKEYS_NONE   1
-+#define KVM_S390_SKEYS_MAX        1048576
-+
- #define KVM_EXIT_UNKNOWN          0
- #define KVM_EXIT_EXCEPTION        1
- #define KVM_EXIT_IO               2
-@@ -172,6 +182,7 @@ struct kvm_pit_config {
- #define KVM_EXIT_S390_TSCH        22
- #define KVM_EXIT_EPR              23
- #define KVM_EXIT_SYSTEM_EVENT     24
-+#define KVM_EXIT_S390_STSI        25
- 
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -309,6 +320,15 @@ struct kvm_run {
- 			__u32 type;
- 			__u64 flags;
- 		} system_event;
-+		/* KVM_EXIT_S390_STSI */
-+		struct {
-+			__u64 addr;
-+			__u8 ar;
-+			__u8 reserved;
-+			__u8 fc;
-+			__u8 sel1;
-+			__u16 sel2;
-+		} s390_stsi;
- 		/* Fix the size of the union. */
- 		char padding[256];
- 	};
-@@ -324,7 +344,7 @@ struct kvm_run {
- 	__u64 kvm_dirty_regs;
- 	union {
- 		struct kvm_sync_regs regs;
--		char padding[1024];
-+		char padding[2048];
- 	} s;
- };
- 
-@@ -365,6 +385,24 @@ struct kvm_translation {
- 	__u8  pad[5];
- };
- 
-+/* for KVM_S390_MEM_OP */
-+struct kvm_s390_mem_op {
-+	/* in */
-+	__u64 gaddr;		/* the guest address */
-+	__u64 flags;		/* flags */
-+	__u32 size;		/* amount of bytes */
-+	__u32 op;		/* type of operation */
-+	__u64 buf;		/* buffer in userspace */
-+	__u8 ar;		/* the access register number */
-+	__u8 reserved[31];	/* should be set to 0 */
-+};
-+/* types for kvm_s390_mem_op->op */
-+#define KVM_S390_MEMOP_LOGICAL_READ	0
-+#define KVM_S390_MEMOP_LOGICAL_WRITE	1
-+/* flags for kvm_s390_mem_op->flags */
-+#define KVM_S390_MEMOP_F_CHECK_ONLY		(1ULL << 0)
-+#define KVM_S390_MEMOP_F_INJECT_EXCEPTION	(1ULL << 1)
-+
- /* for KVM_INTERRUPT */
- struct kvm_interrupt {
- 	/* in */
-@@ -520,6 +558,13 @@ struct kvm_s390_irq {
- 	} u;
- };
- 
-+struct kvm_s390_irq_state {
-+	__u64 buf;
-+	__u32 flags;
-+	__u32 len;
-+	__u32 reserved[4];
-+};
-+
- /* for KVM_SET_GUEST_DEBUG */
- 
- #define KVM_GUESTDBG_ENABLE		0x00000001
-@@ -760,6 +805,14 @@ struct kvm_ppc_smmu_info {
- #define KVM_CAP_PPC_ENABLE_HCALL 104
- #define KVM_CAP_CHECK_EXTENSION_VM 105
- #define KVM_CAP_S390_USER_SIGP 106
-+#define KVM_CAP_S390_VECTOR_REGISTERS 107
-+#define KVM_CAP_S390_MEM_OP 108
-+#define KVM_CAP_S390_USER_STSI 109
-+#define KVM_CAP_S390_SKEYS 110
-+#define KVM_CAP_MIPS_FPU 111
-+#define KVM_CAP_MIPS_MSA 112
-+#define KVM_CAP_S390_INJECT_IRQ 113
-+#define KVM_CAP_S390_IRQ_STATE 114
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1135,6 +1188,16 @@ struct kvm_s390_ucas_mapping {
- #define KVM_ARM_VCPU_INIT	  _IOW(KVMIO,  0xae, struct kvm_vcpu_init)
- #define KVM_ARM_PREFERRED_TARGET  _IOR(KVMIO,  0xaf, struct kvm_vcpu_init)
- #define KVM_GET_REG_LIST	  _IOWR(KVMIO, 0xb0, struct kvm_reg_list)
-+/* Available with KVM_CAP_S390_MEM_OP */
-+#define KVM_S390_MEM_OP		  _IOW(KVMIO,  0xb1, struct kvm_s390_mem_op)
-+/* Available with KVM_CAP_S390_SKEYS */
-+#define KVM_S390_GET_SKEYS      _IOW(KVMIO, 0xb2, struct kvm_s390_skeys)
-+#define KVM_S390_SET_SKEYS      _IOW(KVMIO, 0xb3, struct kvm_s390_skeys)
-+/* Available with KVM_CAP_S390_INJECT_IRQ */
-+#define KVM_S390_IRQ              _IOW(KVMIO,  0xb4, struct kvm_s390_irq)
-+/* Available with KVM_CAP_S390_IRQ_STATE */
-+#define KVM_S390_SET_IRQ_STATE	  _IOW(KVMIO, 0xb5, struct kvm_s390_irq_state)
-+#define KVM_S390_GET_IRQ_STATE	  _IOW(KVMIO, 0xb6, struct kvm_s390_irq_state)
- 
- #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
- #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index 95ba870..0508d0b 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -160,6 +160,8 @@ struct vfio_device_info {
- 	__u32	flags;
- #define VFIO_DEVICE_FLAGS_RESET	(1 << 0)	/* Device supports reset */
- #define VFIO_DEVICE_FLAGS_PCI	(1 << 1)	/* vfio-pci device */
-+#define VFIO_DEVICE_FLAGS_PLATFORM (1 << 2)	/* vfio-platform device */
-+#define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
- 	__u32	num_regions;	/* Max region index + 1 */
- 	__u32	num_irqs;	/* Max IRQ index + 1 */
- };
--- 
+--=20
 1.8.3.2
+
+
+--===============5592820994107185772==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============5592820994107185772==--
