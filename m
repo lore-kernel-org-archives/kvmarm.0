@@ -1,92 +1,83 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v13 11/12] sysbus: add irq_set_hook
-Date: Tue, 28 Apr 2015 17:51:12 +0100
-Message-ID: <1430239873-31950-12-git-send-email-eric.auger@linaro.org>
-References: <1430239873-31950-1-git-send-email-eric.auger@linaro.org>
+From: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
+Subject: Re: [PATCH 0/3] Extend check callback usability for
+ irq connect notifier
+Date: Tue, 28 Apr 2015 11:21:45 -0700
+Message-ID: <CAEgOgz7TE7Chb+ZT2OnN6cwCsA6j_BS1E1_=7v5bL7KA27iyAw@mail.gmail.com>
+References: <1430212683-10984-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 927884ED97
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 12:43:10 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JGa6wlqI+wsx for <kvmarm@lists.cs.columbia.edu>;
- Tue, 28 Apr 2015 12:43:09 -0400 (EDT)
-Received: from mail-wg0-f41.google.com (mail-wg0-f41.google.com [74.125.82.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 93B7A4ED89
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 12:43:09 -0400 (EDT)
-Received: by wgin8 with SMTP id n8so902916wgi.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 28 Apr 2015 09:51:35 -0700 (PDT)
-In-Reply-To: <1430239873-31950-1-git-send-email-eric.auger@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, agraf@suse.de, pbonzini@redhat.com, peter.crosthwaite@xilinx.com
-Cc: patches@linaro.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Return-path: <qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org>
+In-Reply-To: <1430212683-10984-1-git-send-email-eric.auger@linaro.org>
+List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
+	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
+List-Archive: <http://lists.nongnu.org/archive/html/qemu-devel>
+List-Post: <mailto:qemu-devel@nongnu.org>
+List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
+List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
+	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Errors-To: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
+Sender: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
+To: Eric Auger <eric.auger@linaro.org>
+Cc: eric.auger@st.com, Patch Tracking <patches@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a new callback in the SysBusDeviceClass. This callback now can
-be overriden by devices inheriting from sysbus. By default the callback
-is set to the dummy object_property_allow_set_link callback.
+On Tue, Apr 28, 2015 at 2:18 AM, Eric Auger <eric.auger@linaro.org> wrote:
+> The VFIO platform device gets connected to the platform bus
+> on a machine init done notifier. Only at that point irqfd can be
+> setup. An irq connect notifier would be helpful to do that job.
+> Instead of adding a new callback at sysbus or qdev level, this
+> series proposes to use the property check() callback (credit to
+> Paolo).
+>
+> - the callback is passed to qdev_init_gpio_out_named
+> - sysbus class now holds a irq_set_hook method usable as check
+>   callback
+> - sysbus_init_irq initializes the callback to the class method
+> - object_set_link_property is modified so that
+>   * the target object is populated before the check
+>   * check takes an Object ** enabling to access the object
+>     container.
+>
+> Then The VFIO platform device would override the irq_set_hook
+> method in a separate patch.
+>
+> Please let me know if those modifications are acceptable. Else
+> I will follow Peter's proposal.
+>
+> Best Regards
+>
+> Eric
+>
+> Eric Auger (3):
+>   qdev: pass the check callback to qdev_init_gpio_out_named
+>   qdev: check callback takes Object **target as third argument
+>   sysbus: add irq_set_hook
+>
+>  hw/core/qdev-properties.c    |  2 +-
+>  hw/core/qdev.c               |  8 +++++---
+>  hw/core/sysbus.c             |  8 +++++++-
+>  include/hw/qdev-core.h       |  3 ++-
+>  include/hw/qdev-properties.h |  2 +-
+>  include/hw/sysbus.h          |  1 +
+>  include/qom/object.h         |  8 +++++---
+>  qom/object.c                 | 15 +++++++++------
 
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
+I think following the latest reply, Paolo is ok for my proposal but it
+is higher effort and to be done as follow up work. This means we
+should just merge the sysbus variant of your patch and fix it all
+later.
 
----
+This avoids these temporary changes to the QOM core.
 
-v1 -> v2:
-- use new LinkPropertySetter type
----
- hw/core/sysbus.c    | 7 ++++++-
- include/hw/sysbus.h | 1 +
- 2 files changed, 7 insertions(+), 1 deletion(-)
+Sorry for the back and forth. Ill have a look at the RYO link approach
+later this week.
 
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index 1bcb64d..ee573b4 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -159,8 +159,10 @@ void sysbus_mmio_map_overlap(SysBusDevice *dev, int n, hwaddr addr,
- /* Request an IRQ source.  The actual IRQ object may be populated later.  */
- void sysbus_init_irq(SysBusDevice *dev, qemu_irq *p)
- {
-+    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_GET_CLASS(dev);
-+
-     qdev_init_gpio_out_named(DEVICE(dev), p, SYSBUS_DEVICE_GPIO_IRQ, 1,
--                             object_property_allow_set_link);
-+                             sbc->irq_set_hook);
- }
- 
- /* Pass IRQs from a target device.  */
-@@ -311,8 +313,11 @@ MemoryRegion *sysbus_address_space(SysBusDevice *dev)
- static void sysbus_device_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *k = DEVICE_CLASS(klass);
-+    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_CLASS(klass);
-+
-     k->init = sysbus_device_init;
-     k->bus_type = TYPE_SYSTEM_BUS;
-+    sbc->irq_set_hook = object_property_allow_set_link;
- }
- 
- static const TypeInfo sysbus_device_type_info = {
-diff --git a/include/hw/sysbus.h b/include/hw/sysbus.h
-index d1f3f00..b8dde79 100644
---- a/include/hw/sysbus.h
-+++ b/include/hw/sysbus.h
-@@ -41,6 +41,7 @@ typedef struct SysBusDeviceClass {
-     /*< public >*/
- 
-     int (*init)(SysBusDevice *dev);
-+    LinkPropertySetter irq_set_hook;
- } SysBusDeviceClass;
- 
- struct SysBusDevice {
--- 
-1.8.3.2
+Regards,
+Peter
+
+>  8 files changed, 31 insertions(+), 16 deletions(-)
+>
+> --
+> 1.8.3.2
+>
+>
