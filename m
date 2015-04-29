@@ -1,122 +1,86 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH 0/3] Extend check callback usability for
- irq connect notifier
-Date: Wed, 29 Apr 2015 09:43:47 +0200
-Message-ID: <55408BB3.5030203@linaro.org>
-References: <1430212683-10984-1-git-send-email-eric.auger@linaro.org>
- <CAEgOgz7TE7Chb+ZT2OnN6cwCsA6j_BS1E1_=7v5bL7KA27iyAw@mail.gmail.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v2 06/10] KVM: arm64: guest debug, add SW break point
+ support
+Date: Wed, 29 Apr 2015 10:10:47 +0200
+Message-ID: <20150429081047.GB4137@cbox>
+References: <1427814488-28467-1-git-send-email-alex.bennee@linaro.org>
+ <1427814488-28467-7-git-send-email-alex.bennee@linaro.org>
+ <20150414082558.GS6186@cbox>
+ <87y4li6hua.fsf@linaro.org>
+ <20150427200407.GG23335@cbox>
+ <CAFEAcA-Kh7Tn+kw9psL=gqme9ogAn+mM8Uco_HcJy=cqg72hbw@mail.gmail.com>
+ <87wq0wr6dd.fsf@linaro.org>
+ <CAFEAcA85i_1JybEFBg91NA3-LpAzYh4RSDnqryOd=rZN7gZP5A@mail.gmail.com>
+ <20150428125645.GA4137@cbox>
+ <87tww0qqh9.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 12CF94EE18
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 03:38:00 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R9yCFOSHrIiX for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Apr 2015 03:37:59 -0400 (EDT)
-Received: from mail-wi0-f175.google.com (mail-wi0-f175.google.com
- [209.85.212.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D78E64EDE3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 03:37:58 -0400 (EDT)
-Received: by wizk4 with SMTP id k4so169292501wiz.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 00:46:26 -0700 (PDT)
-In-Reply-To: <CAEgOgz7TE7Chb+ZT2OnN6cwCsA6j_BS1E1_=7v5bL7KA27iyAw@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Crosthwaite <peter.crosthwaite@xilinx.com>
-Cc: eric.auger@st.com, Patch Tracking <patches@linaro.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <linux-doc-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <87tww0qqh9.fsf@linaro.org>
+Sender: linux-doc-owner@vger.kernel.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>, Alexander Graf <agraf@suse.de>, Andrew Jones <drjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhichao Huang <zhichao.huang@linaro.org>, "J. Kiszka" <jan.kiszka@siemens.com>, David Hildenbrand <dahi@linux.vnet.ibm.com>, Bharat Bhushan <r65777@freescale.com>, bp@suse.de, Gleb Natapov <gleb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Peter,
-On 04/28/2015 08:21 PM, Peter Crosthwaite wrote:
-> On Tue, Apr 28, 2015 at 2:18 AM, Eric Auger <eric.auger@linaro.org> wrote:
->> The VFIO platform device gets connected to the platform bus
->> on a machine init done notifier. Only at that point irqfd can be
->> setup. An irq connect notifier would be helpful to do that job.
->> Instead of adding a new callback at sysbus or qdev level, this
->> series proposes to use the property check() callback (credit to
->> Paolo).
->>
->> - the callback is passed to qdev_init_gpio_out_named
->> - sysbus class now holds a irq_set_hook method usable as check
->>   callback
->> - sysbus_init_irq initializes the callback to the class method
->> - object_set_link_property is modified so that
->>   * the target object is populated before the check
->>   * check takes an Object ** enabling to access the object
->>     container.
->>
->> Then The VFIO platform device would override the irq_set_hook
->> method in a separate patch.
->>
->> Please let me know if those modifications are acceptable. Else
->> I will follow Peter's proposal.
->>
->> Best Regards
->>
->> Eric
->>
->> Eric Auger (3):
->>   qdev: pass the check callback to qdev_init_gpio_out_named
->>   qdev: check callback takes Object **target as third argument
->>   sysbus: add irq_set_hook
->>
->>  hw/core/qdev-properties.c    |  2 +-
->>  hw/core/qdev.c               |  8 +++++---
->>  hw/core/sysbus.c             |  8 +++++++-
->>  include/hw/qdev-core.h       |  3 ++-
->>  include/hw/qdev-properties.h |  2 +-
->>  include/hw/sysbus.h          |  1 +
->>  include/qom/object.h         |  8 +++++---
->>  qom/object.c                 | 15 +++++++++------
-> 
-> I think following the latest reply, Paolo is ok for my proposal but it
-> is higher effort and to be done as follow up work. This means we
-> should just merge the sysbus variant of your patch and fix it all
-> later.
+On Tue, Apr 28, 2015 at 03:37:01PM +0100, Alex Benn=E9e wrote:
+>=20
+> Christoffer Dall <christoffer.dall@linaro.org> writes:
+>=20
+> > On Tue, Apr 28, 2015 at 10:34:12AM +0100, Peter Maydell wrote:
+> >> On 28 April 2015 at 09:42, Alex Benn=E9e <alex.bennee@linaro.org> =
+wrote:
+> >> > Peter Maydell <peter.maydell@linaro.org> writes:
+> >> >> Does the kernel already have a conveniently implemented "inject
+> >> >> exception into guest" lump of code? If so it might be less effo=
+rt
+> >> >> to do it that way round, maybe.
+> >> >
+> >> > So you pointed out we can't just re-inject the exceptions we get=
+ as we
+> >> > need to map from things like ESR_ELx_EC_WATCHPT_LOW to
+> >> > ESR_ELx_EC_WATCHPT_CUR before re-injection.
+> >> >
+> >> > Of course if it is as simple as modifying the ESR_EL1 register a=
+nd
+> >> > returning +ve in the handle_exit path then I can do that but I a=
+ssumed
+> >> > if any other wrangling needs doing it should be done in userspac=
+e.
+> >>=20
+> >> Well, somebody's got to do it, and it's the same amount of work
+> >> either way (fiddling with ESR, making sure we direct the guest
+> >> to the right exception vector entry point, maybe a few other
+> >> things).
+> >>=20
+> > We already have code in the kernel to inject data/instruction abort=
+s,
+> > but not sure how much benefit there is in re-using that.  It's up t=
+o you
+> > really, but I think the kernel code should be clear about what the
+> > intention is so that we don't end up in a situation where: (1) The
+> > intended behavior is unclear/vague, and (2) it doesn't actually wor=
+k in
+> > practice so nobody can follow the code.
+>=20
+> Certainly there are some cases where the kernel doesn't have all the
+> information. For example it doesn't know if the soft break was insert=
+ed
+> by the guest or the host. That to me favours the "let userspace deal
+> with the ugly" approach.
+>=20
+Not sure I follow.
 
-Well Paolo did a 2d reply to this series saying he was OK with the
-change with few modifications
-(https://lists.gnu.org/archive/html/qemu-devel/2015-04/msg03783.html)
-which I posted yesterday included in my VFIO series v13
-(https://lists.gnu.org/archive/html/qemu-devel/2015-04/msg03943.html). I
-thought it was OK, sorry.
+If it's an exception for the guest, then that must be because the guest
+put in the breakpoint instruction, right?
 
-Now I would not insist on pushing that series. Was is important for me
-is to unlock my VFIO platform series for 2.4 application.
+However, that's a separate discussion from that of *how* userspace or
+the kernel then injects an exception to the guest.
 
-So if both of you say, let's use the temporary sysbus irq connect
-notifier, I will repost the VFIO series with that single patch file.
+By using some QEMU TCG functionality or by QEMU calling back into KVM
+and asking it to inject an exception for it.
 
-Anyway for the VFIO platform device code this is not a big change.
+What am I missing?
 
-Waiting for your confirmation.
-
-Best Regards
-
-Eric
-
-> 
-> This avoids these temporary changes to the QOM core.
-> 
-> Sorry for the back and forth. Ill have a look at the RYO link approach
-> later this week.
-> 
-> Regards,
-> Peter
-> 
->>  8 files changed, 31 insertions(+), 16 deletions(-)
->>
->> --
->> 1.8.3.2
->>
->>
+-Christoffer
