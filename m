@@ -1,82 +1,113 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v14 01/10] linux-headers: update headers according to
- 4.1-rc1
-Date: Wed, 29 Apr 2015 17:28:25 +0200
-Message-ID: <5540F899.6050700@linaro.org>
-References: <1430319127-25907-1-git-send-email-eric.auger@linaro.org>	<1430319127-25907-2-git-send-email-eric.auger@linaro.org>
- <20150429171920.5cbfb7c7.cornelia.huck@de.ibm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v2 06/10] KVM: arm64: guest debug, add SW break point support
+Date: Wed, 29 Apr 2015 21:20:12 +0200
+Message-ID: <CAMJs5B-qs9euMo4yW1-prnakBHo37qvhcDvtVPVXqPoyA_J1Ng@mail.gmail.com>
+References: <20150414082558.GS6186@cbox>
+	<87y4li6hua.fsf@linaro.org>
+	<20150427200407.GG23335@cbox>
+	<CAFEAcA-Kh7Tn+kw9psL=gqme9ogAn+mM8Uco_HcJy=cqg72hbw@mail.gmail.com>
+	<87wq0wr6dd.fsf@linaro.org>
+	<CAFEAcA85i_1JybEFBg91NA3-LpAzYh4RSDnqryOd=rZN7gZP5A@mail.gmail.com>
+	<20150428125645.GA4137@cbox>
+	<87tww0qqh9.fsf@linaro.org>
+	<20150429081047.GB4137@cbox>
+	<87r3r31eed.fsf@linaro.org>
+	<20150429103814.GC4137@cbox>
+	<87oam70y64.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B58F4EF52
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 11:22:38 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DYrmr2yLd4tk for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Apr 2015 11:22:36 -0400 (EDT)
-Received: from mail-wi0-f175.google.com (mail-wi0-f175.google.com
- [209.85.212.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 616EE4EF51
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 11:22:35 -0400 (EDT)
-Received: by widdi4 with SMTP id di4so70395675wid.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 08:31:04 -0700 (PDT)
-In-Reply-To: <20150429171920.5cbfb7c7.cornelia.huck@de.ibm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Cornelia Huck <cornelia.huck@de.ibm.com>
-Cc: peter.crosthwaite@xilinx.com, eric.auger@st.com, patches@linaro.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, alex.williamson@redhat.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <87oam70y64.fsf@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>, Alexander Graf <agraf@suse.de>, Andrew Jones <drjones@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Zhichao Huang <zhichao.huang@linaro.org>, "J. Kiszka" <jan.kiszka@siemens.com>, David Hildenbrand <dahi@linux.vnet.ibm.com>, Bharat Bhushan <r65777@freescale.com>, bp@suse.de, Gleb Natapov <gleb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 04/29/2015 05:19 PM, Cornelia Huck wrote:
-> On Wed, 29 Apr 2015 15:51:58 +0100
-> Eric Auger <eric.auger@linaro.org> wrote:
-> 
->> This updates linux-headers against master 4.1-rc1 (commit
->> b787f68c36d49bb1d9236f403813641efa74a031).
+On Wed, Apr 29, 2015 at 5:08 PM, Alex Benn=C3=A9e <alex.bennee@linaro.o=
+rg> wrote:
+>
+> Christoffer Dall <christoffer.dall@linaro.org> writes:
+>
+>> On Wed, Apr 29, 2015 at 10:18:18AM +0100, Alex Benn=C3=A9e wrote:
+>>>
+>>> Christoffer Dall <christoffer.dall@linaro.org> writes:
+>>>
+>>> > On Tue, Apr 28, 2015 at 03:37:01PM +0100, Alex Benn=C3=A9e wrote:
+>>> >>
+>>> >> Christoffer Dall <christoffer.dall@linaro.org> writes:
+>>> >>
+>>> >> > On Tue, Apr 28, 2015 at 10:34:12AM +0100, Peter Maydell wrote:
+>>> >> >> On 28 April 2015 at 09:42, Alex Benn=C3=A9e <alex.bennee@lina=
+ro.org> wrote:
+>>> >> >> > Peter Maydell <peter.maydell@linaro.org> writes:
+>>> >> >> >> Does the kernel already have a conveniently implemented "i=
+nject
+>>> >> >> >> exception into guest" lump of code? If so it might be less=
+ effort
+>>> >> >> >> to do it that way round, maybe.
+>>> >> >> >
+> <snip>
+>>> >>
+>>> >> Certainly there are some cases where the kernel doesn't have all=
+ the
+>>> >> information. For example it doesn't know if the soft break was i=
+nserted
+>>> >> by the guest or the host. That to me favours the "let userspace =
+deal
+>>> >> with the ugly" approach.
+>>> >>
+>>> > Not sure I follow.
+>>> >
+>>> > If it's an exception for the guest, then that must be because the=
+ guest
+>>> > put in the breakpoint instruction, right?
+>>>
+>>> No the host can add breakpoint instructions as well. They both gene=
+rate
+>>> the same (redirected) exception to the hypervisor which then has to
+>>> figure out who planted the breakpoint and where the eventual except=
+ion
+>>> will be handled.
 >>
->> This includes, among other things, VFIO platform driver and
->> irqfd/arm.
+>> I understand this; let's just rewind here.
 >>
->> Signed-off-by: Eric Auger <eric.auger@linaro.org>
->>
->> ---
->> v13 -> v14:
->> - update to precise 4.1-rc1, precise the commit and change the title
->>
->> v12 -> v13:
->> - update for 4.1-rc0 headers
->>
->> v10 -> v11:
->> - only includes header modifications related to vfio platform
->>   driver v14 and not those related to
->>   "vfio: type1: support for ARM SMMUS with VFIO_IOMMU_TYPE1"
->>
->> Signed-off-by: Eric Auger <eric.auger@linaro.org>
->> ---
->>  include/standard-headers/linux/virtio_balloon.h |  28 +++-
->>  include/standard-headers/linux/virtio_blk.h     |   8 +-
->>  include/standard-headers/linux/virtio_ids.h     |   1 +
->>  linux-headers/asm-arm/kvm.h                     |   9 +-
->>  linux-headers/asm-arm64/kvm.h                   |   9 +-
->>  linux-headers/asm-mips/kvm.h                    | 164 +++++++++++++++---------
->>  linux-headers/asm-s390/kvm.h                    |   4 +
->>  linux-headers/asm-x86/hyperv.h                  |   2 +
->>  linux-headers/linux/kvm.h                       |  66 +++++++++-
->>  linux-headers/linux/vfio.h                      |   2 +
->>  10 files changed, 223 insertions(+), 70 deletions(-)
-> 
-> Not trying to be a pain, but have you figured out why the virtio-input
-> header is missing for you?
-Yep sorry I need to clean my untracked files in my git :-(
+>> If you've concluded that the exception is for the guest, then the gu=
+est
+>> must have placed the breakpoint instruction there, correct?  Otherwi=
+se,
+>> the exception is for the hypervisor and the discussion about how to
+>> inject an exception for the guest is invalid.
+>
+> But only userspace has enough information to make that conclusion (af=
+ter
+> searching the list of breakpoints it added to the code). So from
+> userspace we can:
+>
+>   - re-enter KVM telling it to re-route the exception it just deliver=
+ed
+>     to userspace somehow
+>
+>   or
+>
+>   - make the changes to deliver the exception in userspace and re-ent=
+er
+>     KVM as normal.
+>
 
-Eric
-> 
+ok, we agree and are talking about the same thing.  good.
+
+> It seems to me if we have already exited into userspace it may as wel=
+l
+> clean up if it has all the information it needs?
+>
+
+depends on the complexity and size of the code really, imho.
+
+>> Or are you talking about the corner case where the host uses a soft
+>> breakpoint to get a breakpoint on an instruction which is also a
+>> breakpoint in the guest?
+>
+> I think in this case host debugging just wins.
+>
+ok
