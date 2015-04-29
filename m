@@ -1,25 +1,26 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v14 02/10] hw/vfio/platform: vfio-platform skeleton
-Date: Wed, 29 Apr 2015 15:51:59 +0100
-Message-ID: <1430319127-25907-3-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v14 05/10] hw/arm/sysbus-fdt: enable vfio-calxeda-xgmac
+ dynamic instantiation
+Date: Wed, 29 Apr 2015 15:52:02 +0100
+Message-ID: <1430319127-25907-6-git-send-email-eric.auger@linaro.org>
 References: <1430319127-25907-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 60B604EEF6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 10:43:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 076D64EEF7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 10:43:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qe174TXm6G0M for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Apr 2015 10:43:48 -0400 (EDT)
-Received: from mail-wi0-f178.google.com (mail-wi0-f178.google.com
- [209.85.212.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D65B94EEE4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 10:43:47 -0400 (EDT)
-Received: by wizk4 with SMTP id k4so183435002wiz.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 07:52:16 -0700 (PDT)
+ with ESMTP id 77rAgoVI68FQ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Apr 2015 10:43:55 -0400 (EDT)
+Received: from mail-wi0-f172.google.com (mail-wi0-f172.google.com
+ [209.85.212.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 16BDD4EF00
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 10:43:51 -0400 (EDT)
+Received: by wizk4 with SMTP id k4so183437925wiz.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 07:52:21 -0700 (PDT)
 In-Reply-To: <1430319127-25907-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,518 +35,140 @@ To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, alex.willia
 Cc: patches@linaro.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Minimal VFIO platform implementation supporting register space
-user mapping but not IRQ assignment.
+This patch allows the instantiation of the vfio-calxeda-xgmac device
+from the QEMU command line (-device vfio-calxeda-xgmac,host="<device>").
 
-Signed-off-by: Kim Phillips <kim.phillips@linaro.org>
+A specialized device tree node is created for the guest, containing
+compat, dma-coherent, reg and interrupts properties.
+
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
 ---
-v13 -> v14:
-- fix ENAMETOOLONG error path sign
-
 v12 -> v13:
-- check device name does not contain any /
-- handle case where readlink fully fills the buffer
-- in vfio_map_region declare size as uint64_t
-
-v11 -> v12:
-- add x-mmap property definition, without which the default value of
-  vbasedev.allow_mmap is false, hence preventing the reg space from
-  being mapped.
+- use platform_bus_get_mmio_addr instead of deprecated mmio[0] property.
+  Thanks to Bharat who pointed this issue out.
+- use cpu_to_be32 to mmio_base & size (Vikram report)
 
 v10 -> v11:
-x Take into account Alex Bennee's comments:
-- use g_malloc0_n instead of g_malloc0
-- use block declarations when possible
-- rework readlink returned value treatment
-- use g_strlcat in place of strncat
-x use g_snprintf in place of snprintf
-x correct error handling in vfio_populate_device,
-  in case of flag not corresponding to platform device
-x various cosmetic changes
-
-v9 -> v10:
-- vfio_populate_device no more called in common vfio_get_device
-  but in vfio_base_device_init
+- add dma-coherent property to calxeda midway xgmac node (fix)
+- use qemu_fdt_setprop to add reg property instead of
+  qemu_fdt_setprop_sized_cells_from_array
+- commit message rewording
 
 v8 -> v9:
-- irq management is moved into a separate patch to ease the review
-- VFIO_DEVICE_FLAGS_PLATFORM is checked in vfio_populate_device
-- g_free of regions added in vfio_populate_device error label
-- virtualID becomes 32b
+- properly free resources in case of errors in
+  add_calxeda_midway_xgmac_fdt_node
 
 v7 -> v8:
-- change proto of vfio_platform_compute_needs_reset and sets
-  vbasedev->needs_reset to false there
-- vfio_[un]mask_irqindex renamed into vfio_[un]mask_single_irqindex
-- vfio_register_irq_starter renamed into vfio_kick_irqs
-  we now use a reset notifier instead of a machine init done notifier.
-  Enables to get rid of the VfioIrqStarterNotifierParams dangling
-  pointer. Previously we use pbus first_irq. This is no more possible
-  since the reset notifier takes a void * and first_irq is a field of
-  a const struct. So now we pass the DeviceState handle of the
-  interrupt controller. I tried to keep the code generic, reason why
-  I did not rely on an architecture specific accessor to retrieve
-  the gsi number (gic accessor as proposed by Alex). I would like to
-  avoid creating an ARM VFIO device model. I hope this model
-  model can work on other archs than arm (no multiple intc?);
-  wouldn't it be simpler to keep the previous first_irq parameter and
-  relax the const constraint.
+- move the add_fdt_node_functions array declaration between the device
+  specific code and the generic code to avoid forward declarations of
+  decice specific functions
+- rename add_basic_vfio_fdt_node into
+  add_calxeda_midway_xgmac_fdt_node
 
 v6 -> v7:
-- compat is not exposed anymore as a user option. Rationale is
-  the vfio device became abstract and a specialization is needed
-  anyway. The derived device must set the compat string.
-- in v6 vfio_start_irq_injection was exposed in vfio-platform.h.
-  A new function dubbed vfio_register_irq_starter replaces it. It
-  registers a machine init done notifier that programs & starts
-  all dynamic VFIO device IRQs. This function is supposed to be
-  called by the machine file. A set of static helper routines are
-  added too. It must be called before the creation of the platform
-  bus device.
-
-v5 -> v6:
-- vfio_device property renamed into host property
-- correct error handling of VFIO_DEVICE_GET_IRQ_INFO ioctl
-  and remove PCI related comment
-- remove declaration of vfio_setup_irqfd and irqfd_allowed
-  property.Both belong to next patch (irqfd)
-- remove declaration of vfio_intp_interrupt in vfio-platform.h
-- functions that can be static get this characteristic
-- remove declarations of vfio_region_ops, vfio_memory_listener,
-  group_list, vfio_address_spaces. All are moved to vfio-common.h
-- remove vfio_put_device declaration and definition
-- print_regions removed. code moved into vfio_populate_regions
-- replace DPRINTF by trace events
-- new helper routine to set the trigger eventfd
-- dissociate intp init from the injection enablement:
-  vfio_enable_intp renamed into vfio_init_intp and new function
-  named vfio_start_eventfd_injection
-- injection start moved to vfio_start_irq_injection (not anymore
-  in vfio_populate_interrupt)
-- new start_irq_fn field in VFIOPlatformDevice corresponding to
-  the function that will be used for starting injection
-- user handled eventfd:
-  x add mutex to protect IRQ state & list manipulation,
-  x correct misleading comment in vfio_intp_interrupt.
-  x Fix bugs thanks to fake interrupt modality
-- VFIOPlatformDeviceClass becomes abstract
-- add error_setg in vfio_platform_realize
-
-v4 -> v5:
-- vfio-plaform.h included first
-- cleanup error handling in *populate*, vfio_get_device,
-  vfio_enable_intp
-- vfio_put_device not called anymore
-- add some includes to follow vfio policy
-
-v3 -> v4:
-[Eric Auger]
-- merge of "vfio: Add initial IRQ support in platform device"
-  to get a full functional patch although perfs are limited.
-- removal of unrealize function since I currently understand
-  it is only used with device hot-plug feature.
-
-v2 -> v3:
-[Eric Auger]
-- further factorization between PCI and platform (VFIORegion,
-  VFIODevice). same level of functionality.
-
-<= v2:
-[Kim Philipps]
-- Initial Creation of the device supporting register space mapping
+- compat string re-formatting removed since compat string is not exposed
+  anymore as a user option
+- VFIO IRQ kick-off removed from sysbus-fdt and moved to VFIO platform
+  device
 ---
- hw/vfio/Makefile.objs           |   1 +
- hw/vfio/platform.c              | 288 ++++++++++++++++++++++++++++++++++++++++
- include/hw/vfio/vfio-common.h   |   1 +
- include/hw/vfio/vfio-platform.h |  44 ++++++
- trace-events                    |   5 +
- 5 files changed, 339 insertions(+)
- create mode 100644 hw/vfio/platform.c
- create mode 100644 include/hw/vfio/vfio-platform.h
+ hw/arm/sysbus-fdt.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 72 insertions(+)
 
-diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
-index e31f30e..c5c76fe 100644
---- a/hw/vfio/Makefile.objs
-+++ b/hw/vfio/Makefile.objs
-@@ -1,4 +1,5 @@
- ifeq ($(CONFIG_LINUX), y)
- obj-$(CONFIG_SOFTMMU) += common.o
- obj-$(CONFIG_PCI) += pci.o
-+obj-$(CONFIG_SOFTMMU) += platform.o
- endif
-diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
-new file mode 100644
-index 0000000..7bc7629
---- /dev/null
-+++ b/hw/vfio/platform.c
-@@ -0,0 +1,288 @@
-+/*
-+ * vfio based device assignment support - platform devices
-+ *
-+ * Copyright Linaro Limited, 2014
-+ *
-+ * Authors:
-+ *  Kim Phillips <kim.phillips@linaro.org>
-+ *  Eric Auger <eric.auger@linaro.org>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ * Based on vfio based PCI device assignment support:
-+ *  Copyright Red Hat, Inc. 2012
-+ */
-+
-+#include <linux/vfio.h>
-+#include <sys/ioctl.h>
-+
+diff --git a/hw/arm/sysbus-fdt.c b/hw/arm/sysbus-fdt.c
+index 3038b94..3d67acf 100644
+--- a/hw/arm/sysbus-fdt.c
++++ b/hw/arm/sysbus-fdt.c
+@@ -26,6 +26,8 @@
+ #include "sysemu/device_tree.h"
+ #include "hw/platform-bus.h"
+ #include "sysemu/sysemu.h"
 +#include "hw/vfio/vfio-platform.h"
-+#include "qemu/error-report.h"
-+#include "qemu/range.h"
-+#include "sysemu/sysemu.h"
-+#include "exec/memory.h"
-+#include "hw/sysbus.h"
-+#include "trace.h"
-+#include "hw/platform-bus.h"
-+
-+/* VFIO skeleton */
-+
-+/* not implemented yet */
-+static void vfio_platform_compute_needs_reset(VFIODevice *vbasedev)
-+{
-+    vbasedev->needs_reset = false;
-+}
-+
-+/* not implemented yet */
-+static int vfio_platform_hot_reset_multi(VFIODevice *vbasedev)
-+{
-+    return 0;
-+}
-+
-+/**
-+ * vfio_populate_device - Allocate and populate MMIO region
-+ * structs according to driver returned information
-+ * @vbasedev: the VFIO device handle
-+ *
-+ */
-+static int vfio_populate_device(VFIODevice *vbasedev)
-+{
-+    int i, ret = -1;
-+    VFIOPlatformDevice *vdev =
-+        container_of(vbasedev, VFIOPlatformDevice, vbasedev);
-+
-+    if (!(vbasedev->flags & VFIO_DEVICE_FLAGS_PLATFORM)) {
-+        error_report("vfio: Um, this isn't a platform device");
-+        return ret;
-+    }
-+
-+    vdev->regions = g_malloc0_n(1,
-+                                sizeof(VFIORegion *) * vbasedev->num_regions);
-+
-+    for (i = 0; i < vbasedev->num_regions; i++) {
-+        struct vfio_region_info reg_info = { .argsz = sizeof(reg_info) };
-+        VFIORegion *ptr;
-+
-+        vdev->regions[i] = g_malloc0_n(1, sizeof(VFIORegion));
-+        ptr = vdev->regions[i];
-+        reg_info.index = i;
-+        ret = ioctl(vbasedev->fd, VFIO_DEVICE_GET_REGION_INFO, &reg_info);
-+        if (ret) {
-+            error_report("vfio: Error getting region %d info: %m", i);
-+            goto reg_error;
-+        }
-+        ptr->flags = reg_info.flags;
-+        ptr->size = reg_info.size;
-+        ptr->fd_offset = reg_info.offset;
-+        ptr->nr = i;
-+        ptr->vbasedev = vbasedev;
-+
-+        trace_vfio_platform_populate_regions(ptr->nr,
-+                            (unsigned long)ptr->flags,
-+                            (unsigned long)ptr->size,
-+                            ptr->vbasedev->fd,
-+                            (unsigned long)ptr->fd_offset);
-+    }
-+
-+    return 0;
-+reg_error:
-+    for (i = 0; i < vbasedev->num_regions; i++) {
-+        g_free(vdev->regions[i]);
-+    }
-+    g_free(vdev->regions);
-+    return ret;
-+}
-+
-+/* specialized functions for VFIO Platform devices */
-+static VFIODeviceOps vfio_platform_ops = {
-+    .vfio_compute_needs_reset = vfio_platform_compute_needs_reset,
-+    .vfio_hot_reset_multi = vfio_platform_hot_reset_multi,
-+};
-+
-+/**
-+ * vfio_base_device_init - perform preliminary VFIO setup
-+ * @vbasedev: the VFIO device handle
-+ *
-+ * Implement the VFIO command sequence that allows to discover
-+ * assigned device resources: group extraction, device
-+ * fd retrieval, resource query.
-+ * Precondition: the device name must be initialized
-+ */
-+static int vfio_base_device_init(VFIODevice *vbasedev)
-+{
-+    VFIOGroup *group;
-+    VFIODevice *vbasedev_iter;
-+    char path[PATH_MAX], iommu_group_path[PATH_MAX], *group_name;
-+    ssize_t len;
-+    struct stat st;
-+    int groupid;
-+    int ret;
-+
-+    /* name must be set prior to the call */
-+    if (!vbasedev->name || strchr(vbasedev->name, '/')) {
-+        return -EINVAL;
-+    }
-+
-+    /* Check that the host device exists */
-+    g_snprintf(path, sizeof(path), "/sys/bus/platform/devices/%s/",
-+               vbasedev->name);
-+
-+    if (stat(path, &st) < 0) {
-+        error_report("vfio: error: no such host device: %s", path);
-+        return -errno;
-+    }
-+
-+    g_strlcat(path, "iommu_group", sizeof(path));
-+    len = readlink(path, iommu_group_path, sizeof(iommu_group_path));
-+    if (len < 0 || len >= sizeof(iommu_group_path)) {
-+        error_report("vfio: error no iommu_group for device");
-+        return len < 0 ? -errno : -ENAMETOOLONG;
-+    }
-+
-+    iommu_group_path[len] = 0;
-+    group_name = basename(iommu_group_path);
-+
-+    if (sscanf(group_name, "%d", &groupid) != 1) {
-+        error_report("vfio: error reading %s: %m", path);
-+        return -errno;
-+    }
-+
-+    trace_vfio_platform_base_device_init(vbasedev->name, groupid);
-+
-+    group = vfio_get_group(groupid, &address_space_memory);
-+    if (!group) {
-+        error_report("vfio: failed to get group %d", groupid);
-+        return -ENOENT;
-+    }
-+
-+    g_snprintf(path, sizeof(path), "%s", vbasedev->name);
-+
-+    QLIST_FOREACH(vbasedev_iter, &group->device_list, next) {
-+        if (strcmp(vbasedev_iter->name, vbasedev->name) == 0) {
-+            error_report("vfio: error: device %s is already attached", path);
-+            vfio_put_group(group);
-+            return -EBUSY;
-+        }
-+    }
-+    ret = vfio_get_device(group, path, vbasedev);
-+    if (ret) {
-+        error_report("vfio: failed to get device %s", path);
-+        vfio_put_group(group);
-+        return ret;
-+    }
-+
-+    ret = vfio_populate_device(vbasedev);
-+    if (ret) {
-+        error_report("vfio: failed to populate device %s", path);
-+        vfio_put_group(group);
-+    }
-+
-+    return ret;
-+}
-+
-+/**
-+ * vfio_map_region - initialize the 2 memory regions for a given
-+ * MMIO region index
-+ * @vdev: the VFIO platform device handle
-+ * @nr: the index of the region
-+ *
-+ * Init the top memory region and the mmapped memory region beneath
-+ * VFIOPlatformDevice is used since VFIODevice is not a QOM Object
-+ * and could not be passed to memory region functions
-+*/
-+static void vfio_map_region(VFIOPlatformDevice *vdev, int nr)
-+{
-+    VFIORegion *region = vdev->regions[nr];
-+    uint64_t size = region->size;
-+    char name[64];
-+
-+    if (!size) {
-+        return;
-+    }
-+
-+    g_snprintf(name, sizeof(name), "VFIO %s region %d",
-+               vdev->vbasedev.name, nr);
-+
-+    /* A "slow" read/write mapping underlies all regions */
-+    memory_region_init_io(&region->mem, OBJECT(vdev), &vfio_region_ops,
-+                          region, name, size);
-+
-+    g_strlcat(name, " mmap", sizeof(name));
-+
-+    if (vfio_mmap_region(OBJECT(vdev), region, &region->mem,
-+                         &region->mmap_mem, &region->mmap, size, 0, name)) {
-+        error_report("%s unsupported. Performance may be slow", name);
-+    }
-+}
-+
-+/**
-+ * vfio_platform_realize  - the device realize function
-+ * @dev: device state pointer
-+ * @errp: error
-+ *
-+ * initialize the device, its memory regions and IRQ structures
-+ * IRQ are started separately
-+ */
-+static void vfio_platform_realize(DeviceState *dev, Error **errp)
-+{
-+    VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(dev);
-+    SysBusDevice *sbdev = SYS_BUS_DEVICE(dev);
-+    VFIODevice *vbasedev = &vdev->vbasedev;
-+    int i, ret;
-+
-+    vbasedev->type = VFIO_DEVICE_TYPE_PLATFORM;
-+    vbasedev->ops = &vfio_platform_ops;
-+
-+    trace_vfio_platform_realize(vbasedev->name, vdev->compat);
-+
-+    ret = vfio_base_device_init(vbasedev);
-+    if (ret) {
-+        error_setg(errp, "vfio: vfio_base_device_init failed for %s",
-+                   vbasedev->name);
-+        return;
-+    }
-+
-+    for (i = 0; i < vbasedev->num_regions; i++) {
-+        vfio_map_region(vdev, i);
-+        sysbus_init_mmio(sbdev, &vdev->regions[i]->mem);
-+    }
-+}
-+
-+static const VMStateDescription vfio_platform_vmstate = {
-+    .name = TYPE_VFIO_PLATFORM,
-+    .unmigratable = 1,
-+};
-+
-+static Property vfio_platform_dev_properties[] = {
-+    DEFINE_PROP_STRING("host", VFIOPlatformDevice, vbasedev.name),
-+    DEFINE_PROP_BOOL("x-mmap", VFIOPlatformDevice, vbasedev.allow_mmap, true),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void vfio_platform_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->realize = vfio_platform_realize;
-+    dc->props = vfio_platform_dev_properties;
-+    dc->vmsd = &vfio_platform_vmstate;
-+    dc->desc = "VFIO-based platform device assignment";
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+}
-+
-+static const TypeInfo vfio_platform_dev_info = {
-+    .name = TYPE_VFIO_PLATFORM,
-+    .parent = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(VFIOPlatformDevice),
-+    .class_init = vfio_platform_class_init,
-+    .class_size = sizeof(VFIOPlatformDeviceClass),
-+    .abstract   = true,
-+};
-+
-+static void register_vfio_platform_dev_type(void)
-+{
-+    type_register_static(&vfio_platform_dev_info);
-+}
-+
-+type_init(register_vfio_platform_dev_type)
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 0d1fb80..59a321d 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -42,6 +42,7 @@
++#include "hw/vfio/vfio-calxeda-xgmac.h"
  
- enum {
-     VFIO_DEVICE_TYPE_PCI = 0,
-+    VFIO_DEVICE_TYPE_PLATFORM = 1,
+ /*
+  * internal struct that contains the information to create dynamic
+@@ -53,11 +55,81 @@ typedef struct NodeCreationPair {
+     int (*add_fdt_node_fn)(SysBusDevice *sbdev, void *opaque);
+ } NodeCreationPair;
+ 
++/* Device Specific Code */
++
++/**
++ * add_calxeda_midway_xgmac_fdt_node
++ *
++ * Generates a simple node with following properties:
++ * compatible string, regs, interrupts, dma-coherent
++ */
++static int add_calxeda_midway_xgmac_fdt_node(SysBusDevice *sbdev, void *opaque)
++{
++    PlatformBusFDTData *data = opaque;
++    PlatformBusDevice *pbus = data->pbus;
++    void *fdt = data->fdt;
++    const char *parent_node = data->pbus_node_name;
++    int compat_str_len, i, ret = -1;
++    char *nodename;
++    uint32_t *irq_attr, *reg_attr;
++    uint64_t mmio_base, irq_number;
++    VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(sbdev);
++    VFIODevice *vbasedev = &vdev->vbasedev;
++
++    mmio_base = platform_bus_get_mmio_addr(pbus, sbdev, 0);
++    nodename = g_strdup_printf("%s/%s@%" PRIx64, parent_node,
++                               vbasedev->name, mmio_base);
++    qemu_fdt_add_subnode(fdt, nodename);
++
++    compat_str_len = strlen(vdev->compat) + 1;
++    qemu_fdt_setprop(fdt, nodename, "compatible",
++                          vdev->compat, compat_str_len);
++
++    qemu_fdt_setprop(fdt, nodename, "dma-coherent", "", 0);
++
++    reg_attr = g_new(uint32_t, vbasedev->num_regions*2);
++    for (i = 0; i < vbasedev->num_regions; i++) {
++        mmio_base = platform_bus_get_mmio_addr(pbus, sbdev, i);
++        reg_attr[2*i] = cpu_to_be32(mmio_base);
++        reg_attr[2*i+1] = cpu_to_be32(
++                                memory_region_size(&vdev->regions[i]->mem));
++    }
++    ret = qemu_fdt_setprop(fdt, nodename, "reg", reg_attr,
++                           vbasedev->num_regions*2*sizeof(uint32_t));
++    if (ret) {
++        error_report("could not set reg property of node %s", nodename);
++        goto fail_reg;
++    }
++
++    irq_attr = g_new(uint32_t, vbasedev->num_irqs*3);
++    for (i = 0; i < vbasedev->num_irqs; i++) {
++        irq_number = platform_bus_get_irqn(pbus, sbdev , i)
++                         + data->irq_start;
++        irq_attr[3*i] = cpu_to_be32(0);
++        irq_attr[3*i+1] = cpu_to_be32(irq_number);
++        irq_attr[3*i+2] = cpu_to_be32(0x4);
++    }
++   ret = qemu_fdt_setprop(fdt, nodename, "interrupts",
++                     irq_attr, vbasedev->num_irqs*3*sizeof(uint32_t));
++    if (ret) {
++        error_report("could not set interrupts property of node %s",
++                     nodename);
++    }
++    g_free(irq_attr);
++fail_reg:
++    g_free(reg_attr);
++    g_free(nodename);
++    return ret;
++}
++
+ /* list of supported dynamic sysbus devices */
+ static const NodeCreationPair add_fdt_node_functions[] = {
++    {TYPE_VFIO_CALXEDA_XGMAC, add_calxeda_midway_xgmac_fdt_node},
+     {"", NULL}, /* last element */
  };
  
- typedef struct VFIORegion {
-diff --git a/include/hw/vfio/vfio-platform.h b/include/hw/vfio/vfio-platform.h
-new file mode 100644
-index 0000000..338f0c6
---- /dev/null
-+++ b/include/hw/vfio/vfio-platform.h
-@@ -0,0 +1,44 @@
-+/*
-+ * vfio based device assignment support - platform devices
-+ *
-+ * Copyright Linaro Limited, 2014
-+ *
-+ * Authors:
-+ *  Kim Phillips <kim.phillips@linaro.org>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ * Based on vfio based PCI device assignment support:
-+ *  Copyright Red Hat, Inc. 2012
-+ */
++/* Generic Code */
 +
-+#ifndef HW_VFIO_VFIO_PLATFORM_H
-+#define HW_VFIO_VFIO_PLATFORM_H
-+
-+#include "hw/sysbus.h"
-+#include "hw/vfio/vfio-common.h"
-+
-+#define TYPE_VFIO_PLATFORM "vfio-platform"
-+
-+typedef struct VFIOPlatformDevice {
-+    SysBusDevice sbdev;
-+    VFIODevice vbasedev; /* not a QOM object */
-+    VFIORegion **regions;
-+    char *compat; /* compatibility string */
-+} VFIOPlatformDevice;
-+
-+typedef struct VFIOPlatformDeviceClass {
-+    /*< private >*/
-+    SysBusDeviceClass parent_class;
-+    /*< public >*/
-+} VFIOPlatformDeviceClass;
-+
-+#define VFIO_PLATFORM_DEVICE(obj) \
-+     OBJECT_CHECK(VFIOPlatformDevice, (obj), TYPE_VFIO_PLATFORM)
-+#define VFIO_PLATFORM_DEVICE_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(VFIOPlatformDeviceClass, (klass), TYPE_VFIO_PLATFORM)
-+#define VFIO_PLATFORM_DEVICE_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(VFIOPlatformDeviceClass, (obj), TYPE_VFIO_PLATFORM)
-+
-+#endif /*HW_VFIO_VFIO_PLATFORM_H*/
-diff --git a/trace-events b/trace-events
-index 30eba92..2ccc822 100644
---- a/trace-events
-+++ b/trace-events
-@@ -1560,6 +1560,11 @@ vfio_put_group(int fd) "close group->fd=%d"
- vfio_get_device(const char * name, unsigned int flags, unsigned int num_regions, unsigned int num_irqs) "Device %s flags: %u, regions: %u, irqs: %u"
- vfio_put_base_device(int fd) "close vdev->fd=%d"
- 
-+# hw/vfio/platform.c
-+vfio_platform_populate_regions(int region_index, unsigned long flag, unsigned long size, int fd, unsigned long offset) "- region %d flags = 0x%lx, size = 0x%lx, fd= %d, offset = 0x%lx"
-+vfio_platform_base_device_init(char *name, int groupid) "%s belongs to group #%d"
-+vfio_platform_realize(char *name, char *compat) "vfio device %s, compat = %s"
-+
- #hw/acpi/memory_hotplug.c
- mhp_acpi_invalid_slot_selected(uint32_t slot) "0x%"PRIx32
- mhp_acpi_read_addr_lo(uint32_t slot, uint32_t addr) "slot[0x%"PRIx32"] addr lo: 0x%"PRIx32
+ /**
+  * add_fdt_node - add the device tree node of a dynamic sysbus device
+  *
 -- 
 1.8.3.2
