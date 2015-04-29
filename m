@@ -1,27 +1,32 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v14 07/10] kvm-all.c: add qemu_irq/gsi hash table and utility
- routines
-Date: Wed, 29 Apr 2015 15:52:04 +0100
-Message-ID: <1430319127-25907-8-git-send-email-eric.auger@linaro.org>
-References: <1430319127-25907-1-git-send-email-eric.auger@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v2 06/10] KVM: arm64: guest debug,
+ add SW break point support
+Date: Wed, 29 Apr 2015 16:08:51 +0100
+Message-ID: <87oam70y64.fsf@linaro.org>
+References: <20150414082558.GS6186@cbox> <87y4li6hua.fsf@linaro.org>
+ <20150427200407.GG23335@cbox>
+ <CAFEAcA-Kh7Tn+kw9psL=gqme9ogAn+mM8Uco_HcJy=cqg72hbw@mail.gmail.com>
+ <87wq0wr6dd.fsf@linaro.org>
+ <CAFEAcA85i_1JybEFBg91NA3-LpAzYh4RSDnqryOd=rZN7gZP5A@mail.gmail.com>
+ <20150428125645.GA4137@cbox> <87tww0qqh9.fsf@linaro.org>
+ <20150429081047.GB4137@cbox> <87r3r31eed.fsf@linaro.org>
+ <20150429103814.GC4137@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E82E4EF1D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 10:43:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D44B64EF2B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 11:00:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XYb1AHKiR7bq for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Apr 2015 10:43:56 -0400 (EDT)
-Received: from mail-wi0-f182.google.com (mail-wi0-f182.google.com
- [209.85.212.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B8D5B4EEF9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 10:43:54 -0400 (EDT)
-Received: by wicmx19 with SMTP id mx19so133063010wic.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 07:52:23 -0700 (PDT)
-In-Reply-To: <1430319127-25907-1-git-send-email-eric.auger@linaro.org>
+ with ESMTP id MO8n-tr6Cu1t for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Apr 2015 11:00:05 -0400 (EDT)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 612A34EF29
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 11:00:05 -0400 (EDT)
+In-reply-to: <20150429103814.GC4137@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,131 +36,75 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, alex.williamson@redhat.com, agraf@suse.de, pbonzini@redhat.com, peter.crosthwaite@xilinx.com
-Cc: patches@linaro.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Russell King <linux@arm.linux.org.uk>, kvm-devel <kvm@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <marc.zyngier@arm.com>, "J. Kiszka" <jan.kiszka@siemens.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, David Hildenbrand <dahi@linux.vnet.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, Zhichao Huang <zhichao.huang@linaro.org>, Bharat Bhushan <r65777@freescale.com>, Paolo Bonzini <pbonzini@redhat.com>, bp@suse.de, Gleb Natapov <gleb@kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VFIO platform device needs to setup irqfd but it does not know the
-gsi corresponding to the device qemu_irq. This series proposes to
-store a hash table in kvm_state using the qemu_irq as key and the gsi
-as a value.
-
-kvm_irqchip_set_qemuirq_gsi allows to insert such a pair. The interrupt
-controller is supposed to use it.
-
-kvm_irqchip_[add, remove]_irqfd_notifier allows to setup/tear down
-irqfd directly from the qemu_irq.
-
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
-
----
-v13 -> v14:
-- correct checkpatch warning
-
-v2 -> v3 (integration into VFIO series v13):
-- rename kvm_irqchip_[add, remove]_qemuirq_irqfd_notifier into
-  kvm_irqchip_[add, remove]_irqfd_notifier. Possible since legacy
-  functions were also renamed with _gsi suffix.
-
-V1 -> v2:
-- qemu_irq get_gsi callback replaced by hash table stored in kvm
----
- include/sysemu/kvm.h |  6 ++++++
- kvm-all.c            | 37 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 43 insertions(+)
-
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 0f28d6f..bc3f230 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -18,6 +18,7 @@
- #include "config-host.h"
- #include "qemu/queue.h"
- #include "qom/cpu.h"
-+#include "hw/irq.h"
- 
- #ifdef CONFIG_KVM
- #include <linux/kvm.h>
-@@ -417,6 +418,11 @@ int kvm_irqchip_add_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
-                                        EventNotifier *rn, int virq);
- int kvm_irqchip_remove_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
-                                           int virq);
-+int kvm_irqchip_add_irqfd_notifier(KVMState *s, EventNotifier *n,
-+                                   EventNotifier *rn, qemu_irq irq);
-+int kvm_irqchip_remove_irqfd_notifier(KVMState *s, EventNotifier *n,
-+                                      qemu_irq irq);
-+void kvm_irqchip_set_qemuirq_gsi(KVMState *s, qemu_irq irq, int gsi);
- void kvm_pc_gsi_handler(void *opaque, int n, int level);
- void kvm_pc_setup_irq_routing(bool pci_enabled);
- void kvm_init_irq_routing(KVMState *s);
-diff --git a/kvm-all.c b/kvm-all.c
-index 42bb923..d2cb7ed 100644
---- a/kvm-all.c
-+++ b/kvm-all.c
-@@ -37,6 +37,7 @@
- #include "exec/address-spaces.h"
- #include "qemu/event_notifier.h"
- #include "trace.h"
-+#include "hw/irq.h"
- 
- #include "hw/boards.h"
- 
-@@ -99,6 +100,7 @@ struct KVMState
-      * unsigned, and treating them as signed here can break things */
-     unsigned irq_set_ioctl;
-     unsigned int sigmask_len;
-+    GHashTable *gsimap;
- #ifdef KVM_CAP_IRQ_ROUTING
-     struct kvm_irq_routing *irq_routes;
-     int nr_allocated_irq_routes;
-@@ -1382,6 +1384,39 @@ int kvm_irqchip_remove_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
-            false);
- }
- 
-+int kvm_irqchip_add_irqfd_notifier(KVMState *s, EventNotifier *n,
-+                                   EventNotifier *rn, qemu_irq irq)
-+{
-+    gpointer key, gsi;
-+    gboolean found = g_hash_table_lookup_extended(s->gsimap, irq, &key, &gsi);
-+
-+    if (!found) {
-+        return -ENXIO;
-+    } else {
-+        return kvm_irqchip_add_irqfd_notifier_gsi(s, n, rn,
-+                                                  GPOINTER_TO_UINT(gsi));
-+    }
-+}
-+
-+int kvm_irqchip_remove_irqfd_notifier(KVMState *s, EventNotifier *n,
-+                                      qemu_irq irq)
-+{
-+    gpointer key, gsi;
-+    gboolean found = g_hash_table_lookup_extended(s->gsimap, irq, &key, &gsi);
-+
-+    if (!found) {
-+        return -ENXIO;
-+    } else {
-+        return kvm_irqchip_remove_irqfd_notifier_gsi(s, n,
-+                                                     GPOINTER_TO_INT(gsi));
-+    }
-+}
-+
-+void kvm_irqchip_set_qemuirq_gsi(KVMState *s, qemu_irq irq, int gsi)
-+{
-+    g_hash_table_insert(s->gsimap, irq, GINT_TO_POINTER(gsi));
-+}
-+
- static int kvm_irqchip_create(MachineState *machine, KVMState *s)
- {
-     int ret;
-@@ -1414,6 +1449,8 @@ static int kvm_irqchip_create(MachineState *machine, KVMState *s)
- 
-     kvm_init_irq_routing(s);
- 
-+    s->gsimap = g_hash_table_new(g_direct_hash, g_direct_equal);
-+
-     return 0;
- }
- 
--- 
-1.8.3.2
+CkNocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4gd3JpdGVzOgoK
+PiBPbiBXZWQsIEFwciAyOSwgMjAxNSBhdCAxMDoxODoxOEFNICswMTAwLCBBbGV4IEJlbm7DqWUg
+d3JvdGU6Cj4+IAo+PiBDaHJpc3RvZmZlciBEYWxsIDxjaHJpc3RvZmZlci5kYWxsQGxpbmFyby5v
+cmc+IHdyaXRlczoKPj4gCj4+ID4gT24gVHVlLCBBcHIgMjgsIDIwMTUgYXQgMDM6Mzc6MDFQTSAr
+MDEwMCwgQWxleCBCZW5uw6llIHdyb3RlOgo+PiA+PiAKPj4gPj4gQ2hyaXN0b2ZmZXIgRGFsbCA8
+Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPiB3cml0ZXM6Cj4+ID4+IAo+PiA+PiA+IE9uIFR1
+ZSwgQXByIDI4LCAyMDE1IGF0IDEwOjM0OjEyQU0gKzAxMDAsIFBldGVyIE1heWRlbGwgd3JvdGU6
+Cj4+ID4+ID4+IE9uIDI4IEFwcmlsIDIwMTUgYXQgMDk6NDIsIEFsZXggQmVubsOpZSA8YWxleC5i
+ZW5uZWVAbGluYXJvLm9yZz4gd3JvdGU6Cj4+ID4+ID4+ID4gUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIu
+bWF5ZGVsbEBsaW5hcm8ub3JnPiB3cml0ZXM6Cj4+ID4+ID4+ID4+IERvZXMgdGhlIGtlcm5lbCBh
+bHJlYWR5IGhhdmUgYSBjb252ZW5pZW50bHkgaW1wbGVtZW50ZWQgImluamVjdAo+PiA+PiA+PiA+
+PiBleGNlcHRpb24gaW50byBndWVzdCIgbHVtcCBvZiBjb2RlPyBJZiBzbyBpdCBtaWdodCBiZSBs
+ZXNzIGVmZm9ydAo+PiA+PiA+PiA+PiB0byBkbyBpdCB0aGF0IHdheSByb3VuZCwgbWF5YmUuCj4+
+ID4+ID4+ID4KPHNuaXA+Cj4+ID4+IAo+PiA+PiBDZXJ0YWlubHkgdGhlcmUgYXJlIHNvbWUgY2Fz
+ZXMgd2hlcmUgdGhlIGtlcm5lbCBkb2Vzbid0IGhhdmUgYWxsIHRoZQo+PiA+PiBpbmZvcm1hdGlv
+bi4gRm9yIGV4YW1wbGUgaXQgZG9lc24ndCBrbm93IGlmIHRoZSBzb2Z0IGJyZWFrIHdhcyBpbnNl
+cnRlZAo+PiA+PiBieSB0aGUgZ3Vlc3Qgb3IgdGhlIGhvc3QuIFRoYXQgdG8gbWUgZmF2b3VycyB0
+aGUgImxldCB1c2Vyc3BhY2UgZGVhbAo+PiA+PiB3aXRoIHRoZSB1Z2x5IiBhcHByb2FjaC4KPj4g
+Pj4gCj4+ID4gTm90IHN1cmUgSSBmb2xsb3cuCj4+ID4KPj4gPiBJZiBpdCdzIGFuIGV4Y2VwdGlv
+biBmb3IgdGhlIGd1ZXN0LCB0aGVuIHRoYXQgbXVzdCBiZSBiZWNhdXNlIHRoZSBndWVzdAo+PiA+
+IHB1dCBpbiB0aGUgYnJlYWtwb2ludCBpbnN0cnVjdGlvbiwgcmlnaHQ/Cj4+IAo+PiBObyB0aGUg
+aG9zdCBjYW4gYWRkIGJyZWFrcG9pbnQgaW5zdHJ1Y3Rpb25zIGFzIHdlbGwuIFRoZXkgYm90aCBn
+ZW5lcmF0ZQo+PiB0aGUgc2FtZSAocmVkaXJlY3RlZCkgZXhjZXB0aW9uIHRvIHRoZSBoeXBlcnZp
+c29yIHdoaWNoIHRoZW4gaGFzIHRvCj4+IGZpZ3VyZSBvdXQgd2hvIHBsYW50ZWQgdGhlIGJyZWFr
+cG9pbnQgYW5kIHdoZXJlIHRoZSBldmVudHVhbCBleGNlcHRpb24KPj4gd2lsbCBiZSBoYW5kbGVk
+Lgo+Cj4gSSB1bmRlcnN0YW5kIHRoaXM7IGxldCdzIGp1c3QgcmV3aW5kIGhlcmUuCj4KPiBJZiB5
+b3UndmUgY29uY2x1ZGVkIHRoYXQgdGhlIGV4Y2VwdGlvbiBpcyBmb3IgdGhlIGd1ZXN0LCB0aGVu
+IHRoZSBndWVzdAo+IG11c3QgaGF2ZSBwbGFjZWQgdGhlIGJyZWFrcG9pbnQgaW5zdHJ1Y3Rpb24g
+dGhlcmUsIGNvcnJlY3Q/ICBPdGhlcndpc2UsCj4gdGhlIGV4Y2VwdGlvbiBpcyBmb3IgdGhlIGh5
+cGVydmlzb3IgYW5kIHRoZSBkaXNjdXNzaW9uIGFib3V0IGhvdyB0bwo+IGluamVjdCBhbiBleGNl
+cHRpb24gZm9yIHRoZSBndWVzdCBpcyBpbnZhbGlkLgoKQnV0IG9ubHkgdXNlcnNwYWNlIGhhcyBl
+bm91Z2ggaW5mb3JtYXRpb24gdG8gbWFrZSB0aGF0IGNvbmNsdXNpb24gKGFmdGVyCnNlYXJjaGlu
+ZyB0aGUgbGlzdCBvZiBicmVha3BvaW50cyBpdCBhZGRlZCB0byB0aGUgY29kZSkuIFNvIGZyb20K
+dXNlcnNwYWNlIHdlIGNhbjoKCiAgLSByZS1lbnRlciBLVk0gdGVsbGluZyBpdCB0byByZS1yb3V0
+ZSB0aGUgZXhjZXB0aW9uIGl0IGp1c3QgZGVsaXZlcmVkCiAgICB0byB1c2Vyc3BhY2Ugc29tZWhv
+dwoKICBvcgoKICAtIG1ha2UgdGhlIGNoYW5nZXMgdG8gZGVsaXZlciB0aGUgZXhjZXB0aW9uIGlu
+IHVzZXJzcGFjZSBhbmQgcmUtZW50ZXIKICAgIEtWTSBhcyBub3JtYWwuCgpJdCBzZWVtcyB0byBt
+ZSBpZiB3ZSBoYXZlIGFscmVhZHkgZXhpdGVkIGludG8gdXNlcnNwYWNlIGl0IG1heSBhcyB3ZWxs
+CmNsZWFuIHVwIGlmIGl0IGhhcyBhbGwgdGhlIGluZm9ybWF0aW9uIGl0IG5lZWRzPwoKPiBPciBh
+cmUgeW91IHRhbGtpbmcgYWJvdXQgdGhlIGNvcm5lciBjYXNlIHdoZXJlIHRoZSBob3N0IHVzZXMg
+YSBzb2Z0Cj4gYnJlYWtwb2ludCB0byBnZXQgYSBicmVha3BvaW50IG9uIGFuIGluc3RydWN0aW9u
+IHdoaWNoIGlzIGFsc28gYQo+IGJyZWFrcG9pbnQgaW4gdGhlIGd1ZXN0PwoKSSB0aGluayBpbiB0
+aGlzIGNhc2UgaG9zdCBkZWJ1Z2dpbmcganVzdCB3aW5zLgoKPgo+PiAKPj4gPiBIb3dldmVyLCB0
+aGF0J3MgYSBzZXBhcmF0ZSBkaXNjdXNzaW9uIGZyb20gdGhhdCBvZiAqaG93KiB1c2Vyc3BhY2Ug
+b3IKPj4gPiB0aGUga2VybmVsIHRoZW4gaW5qZWN0cyBhbiBleGNlcHRpb24gdG8gdGhlIGd1ZXN0
+Lgo+PiA+Cj4+ID4gQnkgdXNpbmcgc29tZSBRRU1VIFRDRyBmdW5jdGlvbmFsaXR5IG9yIGJ5IFFF
+TVUgY2FsbGluZyBiYWNrIGludG8gS1ZNCj4+ID4gYW5kIGFza2luZyBpdCB0byBpbmplY3QgYW4g
+ZXhjZXB0aW9uIGZvciBpdC4KPj4gCj4+IEkgZG9uJ3Qga25vdyBpZiB0aGVyZSBpcyBleHBsaWNp
+dCBUQ0cgZnVuY3Rpb25hbGl0eSB0byB1c2UgYnV0IFFFTVUgY2FuCj4+IHNldCB0aGUgcmVnaXN0
+ZXJzIGFuZCBQQyB1cCBmb3IgZXhjZXB0aW9uIGVudHJ5IGFuZCByZS1lbnRlciBLVk0uCj4+IAo+
+Cj4gSSBhbHNvIHVuZGVyc3RhbmQgdGhpcy4gIEkgdGhpbmsgUGV0ZXIncyBwb2ludCB3YXMgZXhh
+Y3RseSB0aGF0IGlmIHdlCj4gaGF2ZSBleGlzdGluZyBjb2RlIHNvbWV3aGVyZSB3aGljaCB3ZSBj
+YW4gcmV1c2UsIHRoZW4gd2Ugc2hvdWxkIGNvbnNpZGVyCj4gcmV1c2luZyBpdC4KCkknbSBub3Qg
+c3VyZSBzdWNoIGNvZGUgZXhpc3RzLiBUaGUgb25seSBpbmplY3Rpb24gY29kZSBJIGtub3cgb2Yg
+aW4gS1ZNcwpoYW5kbGVfZXhpdCBjb2RlIHdoZXJlIGEgK3ZlIHJldHVybiB2YWx1ZSBzaWduYWxz
+IEtWTSB0byBkZWxpdmVyIHRoZQpleGNlcHRpb24gdG8gdGhlIGd1ZXN0LiBUaGlzIGlzIHVzZWQg
+YnkgdGhlIGh2YyBhbmQgc3ZjIGhhbmRsZXJzIGFmdGVyCmNhbGxpbmcga3ZtX2luamVjdF91bmRl
+ZmluZWQoKSBhbmQgdGhlIHdmeCBoYW5kbGVyIHdoaWNoIGFkdmFuY2VzIHRoZSBQQwpmaXJzdC4K
+Cj4gQWdhaW4sIEkgZG9uJ3QgY2FyZSBwYXJ0aWN1bGFybHkgd2hpY2ggd2F5LCBJIGp1c3Qgd2Fu
+dCB0aGUgZXhwZWN0ZWQKPiB3b3JraW5nIGJlaGF2aW9yIHRvIGJlIGNsZWFybHkgZGVmaW5lZC4K
+CkkgdGhpbmsgaXQgbWFrZXMgc2Vuc2UgdG8gZG8gaXQgaW4gdXNlcnNwYWNlLiBJIGhhdmUgdGhl
+IGtlcm5lbHMKaW5qZWN0X2ZhdWx0IGNvZGUgZm9yIHJlZmVyZW5jZSBmb3Igd2hhdCBuZWVkcyBz
+ZXR0aW5nIHVwIGJ1dCBJJ2xsIHNlZQppZiBJIGNhbiBmaW5kIGFueXRoaW5nIGluIFFFTVUgdGhh
+dCBhbHJlYWR5IGhhbmRsZXMgdGhpcyBmb3Igc29tZSBvdGhlcgp0aGluZyAoYWx0aG91Z2ggSSBk
+b24ndCB0aGluayBpdCBkb2VzIGF0IGZpcnN0IGdsYW5jZSkuCgotLSAKQWxleCBCZW5uw6llCl9f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWls
+aW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNv
+bHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
