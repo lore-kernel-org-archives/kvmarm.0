@@ -1,24 +1,24 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v14 04/10] hw/vfio/platform: calxeda xgmac device
-Date: Wed, 29 Apr 2015 15:52:01 +0100
-Message-ID: <1430319127-25907-5-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v14 10/10] hw/vfio/platform: add irqfd support
+Date: Wed, 29 Apr 2015 15:52:07 +0100
+Message-ID: <1430319127-25907-11-git-send-email-eric.auger@linaro.org>
 References: <1430319127-25907-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A77584EEF0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 10:43:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 937954EF47
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 10:44:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XrbR9Ujh9LFP for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Apr 2015 10:43:53 -0400 (EDT)
-Received: from mail-wg0-f47.google.com (mail-wg0-f47.google.com [74.125.82.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9E3EC4EEF9
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 10:43:50 -0400 (EDT)
-Received: by wgso17 with SMTP id o17so31192862wgs.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 07:52:19 -0700 (PDT)
+ with ESMTP id SvVHNWbu5l+n for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Apr 2015 10:44:03 -0400 (EDT)
+Received: from mail-wg0-f42.google.com (mail-wg0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B00A4EF07
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 10:43:58 -0400 (EDT)
+Received: by wgin8 with SMTP id n8so31210557wgi.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 07:52:27 -0700 (PDT)
 In-Reply-To: <1430319127-25907-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,164 +33,252 @@ To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, alex.willia
 Cc: patches@linaro.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The platform device class has become abstract. This patch introduces
-a calxeda xgmac device that derives from it.
+This patch aims at optimizing IRQ handling using irqfd framework.
 
+Instead of handling the eventfds on user-side they are handled on
+kernel side using
+- the KVM irqfd framework,
+- the VFIO driver virqfd framework.
+
+the virtual IRQ completion is trapped at interrupt controller
+This removes the need for fast/slow path swap.
+
+Overall this brings significant performance improvements.
+
+Signed-off-by: Alvise Rigo <a.rigo@virtualopensystems.com>
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Reviewed-by: Alex Bennee<alex.bennee@linaro.org>
 
 ---
+v13 -> v14:
+- use connect_irq_notifier
+- remove trace_vfio_platform_start_eventfd
+
+v12 -> v13:
+- setup the new mechanism for starting irqfd, based on
+  LinkPropertySetter override
+- use kvm_irqchip_[add,remove]_irqfd_notifier new functions: no need
+  to bother about gsi (hence virtualID could be removed with small
+  change in trace-events)
+
 v10 -> v11:
-- add Alex Reviewed-by
-- move virt modifications in a separate patch
-
-v8 -> v9:
-- renamed calxeda_xgmac.c into calxeda-xgmac.c
-
-v7 -> v8:
-- add a comment in the header about the MMIO regions and IRQ which
-  are exposed by the device
+- Add Alex' Reviewed-by
+- introduce kvm_accel in this patch and initialize it
 
 v5 -> v6
-- back again following Alex Graf advises
-- fix a bug related to compat override
+- rely on kvm_irqfds_enabled() and kvm_resamplefds_enabled()
+- guard KVM code with #ifdef CONFIG_KVM
 
-v4 -> v5:
-removed since device tree was moved to hw/arm/dyn_sysbus_devtree.c
+v3 -> v4:
+[Alvise Rigo]
+Use of VFIO Platform driver v6 unmask/virqfd feature and removal
+of resamplefd handler. Physical IRQ unmasking is now done in
+VFIO driver.
 
-v4: creation for device tree specialization
+v3:
+[Eric Auger]
+initial support with resamplefd handled on QEMU side since the
+unmask was not supported on VFIO platform driver v5.
 
 Conflicts:
-	hw/arm/virt.c
+	hw/vfio/platform.c
 ---
- hw/vfio/Makefile.objs                |  1 +
- hw/vfio/calxeda-xgmac.c              | 54 ++++++++++++++++++++++++++++++++++++
- include/hw/vfio/vfio-calxeda-xgmac.h | 46 ++++++++++++++++++++++++++++++
- 3 files changed, 101 insertions(+)
- create mode 100644 hw/vfio/calxeda-xgmac.c
- create mode 100644 include/hw/vfio/vfio-calxeda-xgmac.h
+ hw/vfio/platform.c              | 107 ++++++++++++++++++++++++++++++++++++++++
+ include/hw/vfio/vfio-platform.h |   2 +
+ trace-events                    |   1 +
+ 3 files changed, 110 insertions(+)
 
-diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
-index c5c76fe..d540c9d 100644
---- a/hw/vfio/Makefile.objs
-+++ b/hw/vfio/Makefile.objs
-@@ -2,4 +2,5 @@ ifeq ($(CONFIG_LINUX), y)
- obj-$(CONFIG_SOFTMMU) += common.o
- obj-$(CONFIG_PCI) += pci.o
- obj-$(CONFIG_SOFTMMU) += platform.o
-+obj-$(CONFIG_SOFTMMU) += calxeda-xgmac.o
- endif
-diff --git a/hw/vfio/calxeda-xgmac.c b/hw/vfio/calxeda-xgmac.c
-new file mode 100644
-index 0000000..c4b8fef
---- /dev/null
-+++ b/hw/vfio/calxeda-xgmac.c
-@@ -0,0 +1,54 @@
+diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
+index 51b9391..a5246ab 100644
+--- a/hw/vfio/platform.c
++++ b/hw/vfio/platform.c
+@@ -26,6 +26,7 @@
+ #include "hw/sysbus.h"
+ #include "trace.h"
+ #include "hw/platform-bus.h"
++#include "sysemu/kvm.h"
+ 
+ /*
+  * Functions used whatever the injection method
+@@ -51,6 +52,7 @@ static VFIOINTp *vfio_init_intp(VFIODevice *vbasedev,
+     intp->pin = info.index;
+     intp->flags = info.flags;
+     intp->state = VFIO_IRQ_INACTIVE;
++    intp->kvm_accel = false;
+ 
+     sysbus_init_irq(sbdev, &intp->qemuirq);
+ 
+@@ -61,6 +63,13 @@ static VFIOINTp *vfio_init_intp(VFIODevice *vbasedev,
+         error_report("vfio: Error: trigger event_notifier_init failed ");
+         return NULL;
+     }
++    /* Get an eventfd for resample/unmask */
++    ret = event_notifier_init(&intp->unmask, 0);
++    if (ret) {
++        g_free(intp);
++        error_report("vfio: Error: resample event_notifier_init failed eoi");
++        return NULL;
++    }
+ 
+     QLIST_INSERT_HEAD(&vdev->intp_list, intp, next);
+     return intp;
+@@ -315,6 +324,95 @@ static int vfio_start_eventfd_injection(VFIOINTp *intp)
+     return ret;
+ }
+ 
 +/*
-+ * calxeda xgmac VFIO device
-+ *
-+ * Copyright Linaro Limited, 2014
-+ *
-+ * Authors:
-+ *  Eric Auger <eric.auger@linaro.org>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
++ * Functions used for irqfd
 + */
 +
-+#include "hw/vfio/vfio-calxeda-xgmac.h"
-+
-+static void calxeda_xgmac_realize(DeviceState *dev, Error **errp)
-+{
-+    VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(dev);
-+    VFIOCalxedaXgmacDeviceClass *k = VFIO_CALXEDA_XGMAC_DEVICE_GET_CLASS(dev);
-+
-+    vdev->compat = g_strdup("calxeda,hb-xgmac");
-+
-+    k->parent_realize(dev, errp);
-+}
-+
-+static const VMStateDescription vfio_platform_vmstate = {
-+    .name = TYPE_VFIO_CALXEDA_XGMAC,
-+    .unmigratable = 1,
-+};
-+
-+static void vfio_calxeda_xgmac_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VFIOCalxedaXgmacDeviceClass *vcxc =
-+        VFIO_CALXEDA_XGMAC_DEVICE_CLASS(klass);
-+    vcxc->parent_realize = dc->realize;
-+    dc->realize = calxeda_xgmac_realize;
-+    dc->desc = "VFIO Calxeda XGMAC";
-+}
-+
-+static const TypeInfo vfio_calxeda_xgmac_dev_info = {
-+    .name = TYPE_VFIO_CALXEDA_XGMAC,
-+    .parent = TYPE_VFIO_PLATFORM,
-+    .instance_size = sizeof(VFIOCalxedaXgmacDevice),
-+    .class_init = vfio_calxeda_xgmac_class_init,
-+    .class_size = sizeof(VFIOCalxedaXgmacDeviceClass),
-+};
-+
-+static void register_calxeda_xgmac_dev_type(void)
-+{
-+    type_register_static(&vfio_calxeda_xgmac_dev_info);
-+}
-+
-+type_init(register_calxeda_xgmac_dev_type)
-diff --git a/include/hw/vfio/vfio-calxeda-xgmac.h b/include/hw/vfio/vfio-calxeda-xgmac.h
-new file mode 100644
-index 0000000..f994775
---- /dev/null
-+++ b/include/hw/vfio/vfio-calxeda-xgmac.h
-@@ -0,0 +1,46 @@
-+/*
-+ * VFIO calxeda xgmac device
-+ *
-+ * Copyright Linaro Limited, 2014
-+ *
-+ * Authors:
-+ *  Eric Auger <eric.auger@linaro.org>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef HW_VFIO_VFIO_CALXEDA_XGMAC_H
-+#define HW_VFIO_VFIO_CALXEDA_XGMAC_H
-+
-+#include "hw/vfio/vfio-platform.h"
-+
-+#define TYPE_VFIO_CALXEDA_XGMAC "vfio-calxeda-xgmac"
++#ifdef CONFIG_KVM
 +
 +/**
-+ * This device exposes:
-+ * - a single MMIO region corresponding to its register space
-+ * - 3 IRQS (main and 2 power related IRQs)
++ * vfio_set_resample_eventfd - sets the resamplefd for an IRQ
++ * @intp: the IRQ struct handle
++ * programs the VFIO driver to unmask this IRQ when the
++ * intp->unmask eventfd is triggered
 + */
-+typedef struct VFIOCalxedaXgmacDevice {
-+    VFIOPlatformDevice vdev;
-+} VFIOCalxedaXgmacDevice;
++static int vfio_set_resample_eventfd(VFIOINTp *intp)
++{
++    VFIODevice *vbasedev = &intp->vdev->vbasedev;
++    struct vfio_irq_set *irq_set;
++    int argsz, ret;
++    int32_t *pfd;
 +
-+typedef struct VFIOCalxedaXgmacDeviceClass {
-+    /*< private >*/
-+    VFIOPlatformDeviceClass parent_class;
-+    /*< public >*/
-+    DeviceRealize parent_realize;
-+} VFIOCalxedaXgmacDeviceClass;
++    argsz = sizeof(*irq_set) + sizeof(*pfd);
++    irq_set = g_malloc0(argsz);
++    irq_set->argsz = argsz;
++    irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_UNMASK;
++    irq_set->index = intp->pin;
++    irq_set->start = 0;
++    irq_set->count = 1;
++    pfd = (int32_t *)&irq_set->data;
++    *pfd = event_notifier_get_fd(&intp->unmask);
++    qemu_set_fd_handler(*pfd, NULL, NULL, NULL);
++    ret = ioctl(vbasedev->fd, VFIO_DEVICE_SET_IRQS, irq_set);
++    g_free(irq_set);
++    if (ret < 0) {
++        error_report("vfio: Failed to set resample eventfd: %m");
++    }
++    return ret;
++}
 +
-+#define VFIO_CALXEDA_XGMAC_DEVICE(obj) \
-+     OBJECT_CHECK(VFIOCalxedaXgmacDevice, (obj), TYPE_VFIO_CALXEDA_XGMAC)
-+#define VFIO_CALXEDA_XGMAC_DEVICE_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(VFIOCalxedaXgmacDeviceClass, (klass), \
-+                        TYPE_VFIO_CALXEDA_XGMAC)
-+#define VFIO_CALXEDA_XGMAC_DEVICE_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(VFIOCalxedaXgmacDeviceClass, (obj), \
-+                      TYPE_VFIO_CALXEDA_XGMAC)
++static void vfio_start_irqfd_injection(SysBusDevice *sbdev, qemu_irq irq)
++{
++    VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(sbdev);
++    VFIOINTp *intp;
++    bool found = false;
 +
++    QLIST_FOREACH(intp, &vdev->intp_list, next) {
++        if (intp->qemuirq == irq) {
++            found  = true;
++            break;
++        }
++    }
++    assert(found);
++
++    /* Get to a known interrupt state */
++    qemu_set_fd_handler(event_notifier_get_fd(&intp->interrupt),
++                        NULL, NULL, vdev);
++
++    vfio_mask_single_irqindex(&vdev->vbasedev, intp->pin);
++    qemu_set_irq(intp->qemuirq, 0);
++
++    if (kvm_irqchip_add_irqfd_notifier(kvm_state, &intp->interrupt,
++                                   &intp->unmask, irq) < 0) {
++        goto fail_irqfd;
++    }
++
++    if (vfio_set_trigger_eventfd(intp, NULL) < 0) {
++        goto fail_vfio;
++    }
++    if (vfio_set_resample_eventfd(intp) < 0) {
++        goto fail_vfio;
++    }
++
++    /* Let'em rip */
++    vfio_unmask_single_irqindex(&vdev->vbasedev, intp->pin);
++
++    intp->kvm_accel = true;
++
++    trace_vfio_platform_start_irqfd_injection(intp->pin,
++                                     event_notifier_get_fd(&intp->interrupt),
++                                     event_notifier_get_fd(&intp->unmask));
++    return;
++fail_vfio:
++    kvm_irqchip_remove_irqfd_notifier(kvm_state, &intp->interrupt, irq);
++fail_irqfd:
++    vfio_start_eventfd_injection(intp);
++    vfio_unmask_single_irqindex(&vdev->vbasedev, intp->pin);
++    return;
++}
++
++#endif /* CONFIG_KVM */
++
+ /* VFIO skeleton */
+ 
+ /* not implemented yet */
+@@ -550,6 +648,7 @@ static void vfio_platform_realize(DeviceState *dev, Error **errp)
+ {
+     VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(dev);
+     SysBusDevice *sbdev = SYS_BUS_DEVICE(dev);
++    SysBusDeviceClass *sbc = SYS_BUS_DEVICE_GET_CLASS(dev);
+     VFIODevice *vbasedev = &vdev->vbasedev;
+     VFIOINTp *intp;
+     int i, ret;
+@@ -557,6 +656,13 @@ static void vfio_platform_realize(DeviceState *dev, Error **errp)
+     vbasedev->type = VFIO_DEVICE_TYPE_PLATFORM;
+     vbasedev->ops = &vfio_platform_ops;
+ 
++#ifdef CONFIG_KVM
++    if (kvm_irqfds_enabled() && kvm_resamplefds_enabled() &&
++        vdev->irqfd_allowed) {
++        sbc->connect_irq_notifier = vfio_start_irqfd_injection;
++    }
 +#endif
++
+     trace_vfio_platform_realize(vbasedev->name, vdev->compat);
+ 
+     ret = vfio_base_device_init(vbasedev);
+@@ -586,6 +692,7 @@ static Property vfio_platform_dev_properties[] = {
+     DEFINE_PROP_BOOL("x-mmap", VFIOPlatformDevice, vbasedev.allow_mmap, true),
+     DEFINE_PROP_UINT32("mmap-timeout-ms", VFIOPlatformDevice,
+                        mmap_timeout, 1100),
++    DEFINE_PROP_BOOL("x-irqfd", VFIOPlatformDevice, irqfd_allowed, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/include/hw/vfio/vfio-platform.h b/include/hw/vfio/vfio-platform.h
+index 26b2ad6..c5cf1d7 100644
+--- a/include/hw/vfio/vfio-platform.h
++++ b/include/hw/vfio/vfio-platform.h
+@@ -41,6 +41,7 @@ typedef struct VFIOINTp {
+     int state; /* inactive, pending, active */
+     uint8_t pin; /* index */
+     uint32_t flags; /* IRQ info flags */
++    bool kvm_accel; /* set when QEMU bypass through KVM enabled */
+ } VFIOINTp;
+ 
+ /* function type for user side eventfd handler */
+@@ -57,6 +58,7 @@ typedef struct VFIOPlatformDevice {
+     uint32_t mmap_timeout; /* delay to re-enable mmaps after interrupt */
+     QEMUTimer *mmap_timer; /* allows fast-path resume after IRQ hit */
+     QemuMutex intp_mutex; /* protect the intp_list IRQ state */
++    bool irqfd_allowed; /* debug option to force irqfd on/off */
+ } VFIOPlatformDevice;
+ 
+ typedef struct VFIOPlatformDeviceClass {
+diff --git a/trace-events b/trace-events
+index ed8ed90..cb6381a 100644
+--- a/trace-events
++++ b/trace-events
+@@ -1571,6 +1571,7 @@ vfio_platform_intp_interrupt(int pin, int fd) "Inject IRQ #%d (fd = %d)"
+ vfio_platform_intp_inject_pending_lockheld(int pin, int fd) "Inject pending IRQ #%d (fd = %d)"
+ vfio_platform_populate_interrupts(int pin, int count, int flags) "- IRQ index %d: count %d, flags=0x%x"
+ vfio_intp_interrupt_set_pending(int index) "irq %d is set PENDING"
++vfio_platform_start_irqfd_injection(int index, int fd, int resamplefd) "IRQ index=%d, fd = %d, resamplefd = %d"
+ 
+ #hw/acpi/memory_hotplug.c
+ mhp_acpi_invalid_slot_selected(uint32_t slot) "0x%"PRIx32
 -- 
 1.8.3.2
