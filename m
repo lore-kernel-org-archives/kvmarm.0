@@ -1,32 +1,43 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v2 06/10] KVM: arm64: guest debug,
- add SW break point support
-Date: Wed, 29 Apr 2015 16:08:51 +0100
-Message-ID: <87oam70y64.fsf@linaro.org>
-References: <20150414082558.GS6186@cbox> <87y4li6hua.fsf@linaro.org>
- <20150427200407.GG23335@cbox>
- <CAFEAcA-Kh7Tn+kw9psL=gqme9ogAn+mM8Uco_HcJy=cqg72hbw@mail.gmail.com>
- <87wq0wr6dd.fsf@linaro.org>
- <CAFEAcA85i_1JybEFBg91NA3-LpAzYh4RSDnqryOd=rZN7gZP5A@mail.gmail.com>
- <20150428125645.GA4137@cbox> <87tww0qqh9.fsf@linaro.org>
- <20150429081047.GB4137@cbox> <87r3r31eed.fsf@linaro.org>
- <20150429103814.GC4137@cbox>
+From: Cornelia Huck <cornelia.huck@de.ibm.com>
+Subject: Re: [PATCH v14 01/10] linux-headers: update headers according to
+ 4.1-rc1
+Date: Wed, 29 Apr 2015 17:19:20 +0200
+Message-ID: <20150429171920.5cbfb7c7.cornelia.huck@de.ibm.com>
+References: <1430319127-25907-1-git-send-email-eric.auger@linaro.org>
+ <1430319127-25907-2-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D44B64EF2B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 11:00:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 502934EF41
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 11:11:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MO8n-tr6Cu1t for <kvmarm@lists.cs.columbia.edu>;
- Wed, 29 Apr 2015 11:00:05 -0400 (EDT)
-Received: from socrates.bennee.com
- (static.88-198-71-155.clients.your-server.de [88.198.71.155])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 612A34EF29
- for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 11:00:05 -0400 (EDT)
-In-reply-to: <20150429103814.GC4137@cbox>
+ with ESMTP id 7ZtFEUVFdDv7 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 29 Apr 2015 11:11:00 -0400 (EDT)
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 09BA74EF35
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 11:10:59 -0400 (EDT)
+Received: from /spool/local
+ by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <kvmarm@lists.cs.columbia.edu> from <cornelia.huck@de.ibm.com>;
+ Wed, 29 Apr 2015 16:19:26 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com
+ (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+ by d06dlp01.portsmouth.uk.ibm.com (Postfix) with ESMTP id 0220717D805D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 16:20:05 +0100 (BST)
+Received: from d06av09.portsmouth.uk.ibm.com (d06av09.portsmouth.uk.ibm.com
+ [9.149.37.250])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ t3TFJNGe9372086
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 15:19:23 GMT
+Received: from d06av09.portsmouth.uk.ibm.com (localhost [127.0.0.1])
+ by d06av09.portsmouth.uk.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+ t3TFJM4J023591
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 29 Apr 2015 09:19:23 -0600
+In-Reply-To: <1430319127-25907-2-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,75 +47,46 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Russell King <linux@arm.linux.org.uk>, kvm-devel <kvm@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <marc.zyngier@arm.com>, "J. Kiszka" <jan.kiszka@siemens.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, David Hildenbrand <dahi@linux.vnet.ibm.com>, Catalin Marinas <catalin.marinas@arm.com>, Zhichao Huang <zhichao.huang@linaro.org>, Bharat Bhushan <r65777@freescale.com>, Paolo Bonzini <pbonzini@redhat.com>, bp@suse.de, Gleb Natapov <gleb@kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+To: Eric Auger <eric.auger@linaro.org>
+Cc: peter.crosthwaite@xilinx.com, eric.auger@st.com, patches@linaro.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, alex.williamson@redhat.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkNocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4gd3JpdGVzOgoK
-PiBPbiBXZWQsIEFwciAyOSwgMjAxNSBhdCAxMDoxODoxOEFNICswMTAwLCBBbGV4IEJlbm7DqWUg
-d3JvdGU6Cj4+IAo+PiBDaHJpc3RvZmZlciBEYWxsIDxjaHJpc3RvZmZlci5kYWxsQGxpbmFyby5v
-cmc+IHdyaXRlczoKPj4gCj4+ID4gT24gVHVlLCBBcHIgMjgsIDIwMTUgYXQgMDM6Mzc6MDFQTSAr
-MDEwMCwgQWxleCBCZW5uw6llIHdyb3RlOgo+PiA+PiAKPj4gPj4gQ2hyaXN0b2ZmZXIgRGFsbCA8
-Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPiB3cml0ZXM6Cj4+ID4+IAo+PiA+PiA+IE9uIFR1
-ZSwgQXByIDI4LCAyMDE1IGF0IDEwOjM0OjEyQU0gKzAxMDAsIFBldGVyIE1heWRlbGwgd3JvdGU6
-Cj4+ID4+ID4+IE9uIDI4IEFwcmlsIDIwMTUgYXQgMDk6NDIsIEFsZXggQmVubsOpZSA8YWxleC5i
-ZW5uZWVAbGluYXJvLm9yZz4gd3JvdGU6Cj4+ID4+ID4+ID4gUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIu
-bWF5ZGVsbEBsaW5hcm8ub3JnPiB3cml0ZXM6Cj4+ID4+ID4+ID4+IERvZXMgdGhlIGtlcm5lbCBh
-bHJlYWR5IGhhdmUgYSBjb252ZW5pZW50bHkgaW1wbGVtZW50ZWQgImluamVjdAo+PiA+PiA+PiA+
-PiBleGNlcHRpb24gaW50byBndWVzdCIgbHVtcCBvZiBjb2RlPyBJZiBzbyBpdCBtaWdodCBiZSBs
-ZXNzIGVmZm9ydAo+PiA+PiA+PiA+PiB0byBkbyBpdCB0aGF0IHdheSByb3VuZCwgbWF5YmUuCj4+
-ID4+ID4+ID4KPHNuaXA+Cj4+ID4+IAo+PiA+PiBDZXJ0YWlubHkgdGhlcmUgYXJlIHNvbWUgY2Fz
-ZXMgd2hlcmUgdGhlIGtlcm5lbCBkb2Vzbid0IGhhdmUgYWxsIHRoZQo+PiA+PiBpbmZvcm1hdGlv
-bi4gRm9yIGV4YW1wbGUgaXQgZG9lc24ndCBrbm93IGlmIHRoZSBzb2Z0IGJyZWFrIHdhcyBpbnNl
-cnRlZAo+PiA+PiBieSB0aGUgZ3Vlc3Qgb3IgdGhlIGhvc3QuIFRoYXQgdG8gbWUgZmF2b3VycyB0
-aGUgImxldCB1c2Vyc3BhY2UgZGVhbAo+PiA+PiB3aXRoIHRoZSB1Z2x5IiBhcHByb2FjaC4KPj4g
-Pj4gCj4+ID4gTm90IHN1cmUgSSBmb2xsb3cuCj4+ID4KPj4gPiBJZiBpdCdzIGFuIGV4Y2VwdGlv
-biBmb3IgdGhlIGd1ZXN0LCB0aGVuIHRoYXQgbXVzdCBiZSBiZWNhdXNlIHRoZSBndWVzdAo+PiA+
-IHB1dCBpbiB0aGUgYnJlYWtwb2ludCBpbnN0cnVjdGlvbiwgcmlnaHQ/Cj4+IAo+PiBObyB0aGUg
-aG9zdCBjYW4gYWRkIGJyZWFrcG9pbnQgaW5zdHJ1Y3Rpb25zIGFzIHdlbGwuIFRoZXkgYm90aCBn
-ZW5lcmF0ZQo+PiB0aGUgc2FtZSAocmVkaXJlY3RlZCkgZXhjZXB0aW9uIHRvIHRoZSBoeXBlcnZp
-c29yIHdoaWNoIHRoZW4gaGFzIHRvCj4+IGZpZ3VyZSBvdXQgd2hvIHBsYW50ZWQgdGhlIGJyZWFr
-cG9pbnQgYW5kIHdoZXJlIHRoZSBldmVudHVhbCBleGNlcHRpb24KPj4gd2lsbCBiZSBoYW5kbGVk
-Lgo+Cj4gSSB1bmRlcnN0YW5kIHRoaXM7IGxldCdzIGp1c3QgcmV3aW5kIGhlcmUuCj4KPiBJZiB5
-b3UndmUgY29uY2x1ZGVkIHRoYXQgdGhlIGV4Y2VwdGlvbiBpcyBmb3IgdGhlIGd1ZXN0LCB0aGVu
-IHRoZSBndWVzdAo+IG11c3QgaGF2ZSBwbGFjZWQgdGhlIGJyZWFrcG9pbnQgaW5zdHJ1Y3Rpb24g
-dGhlcmUsIGNvcnJlY3Q/ICBPdGhlcndpc2UsCj4gdGhlIGV4Y2VwdGlvbiBpcyBmb3IgdGhlIGh5
-cGVydmlzb3IgYW5kIHRoZSBkaXNjdXNzaW9uIGFib3V0IGhvdyB0bwo+IGluamVjdCBhbiBleGNl
-cHRpb24gZm9yIHRoZSBndWVzdCBpcyBpbnZhbGlkLgoKQnV0IG9ubHkgdXNlcnNwYWNlIGhhcyBl
-bm91Z2ggaW5mb3JtYXRpb24gdG8gbWFrZSB0aGF0IGNvbmNsdXNpb24gKGFmdGVyCnNlYXJjaGlu
-ZyB0aGUgbGlzdCBvZiBicmVha3BvaW50cyBpdCBhZGRlZCB0byB0aGUgY29kZSkuIFNvIGZyb20K
-dXNlcnNwYWNlIHdlIGNhbjoKCiAgLSByZS1lbnRlciBLVk0gdGVsbGluZyBpdCB0byByZS1yb3V0
-ZSB0aGUgZXhjZXB0aW9uIGl0IGp1c3QgZGVsaXZlcmVkCiAgICB0byB1c2Vyc3BhY2Ugc29tZWhv
-dwoKICBvcgoKICAtIG1ha2UgdGhlIGNoYW5nZXMgdG8gZGVsaXZlciB0aGUgZXhjZXB0aW9uIGlu
-IHVzZXJzcGFjZSBhbmQgcmUtZW50ZXIKICAgIEtWTSBhcyBub3JtYWwuCgpJdCBzZWVtcyB0byBt
-ZSBpZiB3ZSBoYXZlIGFscmVhZHkgZXhpdGVkIGludG8gdXNlcnNwYWNlIGl0IG1heSBhcyB3ZWxs
-CmNsZWFuIHVwIGlmIGl0IGhhcyBhbGwgdGhlIGluZm9ybWF0aW9uIGl0IG5lZWRzPwoKPiBPciBh
-cmUgeW91IHRhbGtpbmcgYWJvdXQgdGhlIGNvcm5lciBjYXNlIHdoZXJlIHRoZSBob3N0IHVzZXMg
-YSBzb2Z0Cj4gYnJlYWtwb2ludCB0byBnZXQgYSBicmVha3BvaW50IG9uIGFuIGluc3RydWN0aW9u
-IHdoaWNoIGlzIGFsc28gYQo+IGJyZWFrcG9pbnQgaW4gdGhlIGd1ZXN0PwoKSSB0aGluayBpbiB0
-aGlzIGNhc2UgaG9zdCBkZWJ1Z2dpbmcganVzdCB3aW5zLgoKPgo+PiAKPj4gPiBIb3dldmVyLCB0
-aGF0J3MgYSBzZXBhcmF0ZSBkaXNjdXNzaW9uIGZyb20gdGhhdCBvZiAqaG93KiB1c2Vyc3BhY2Ug
-b3IKPj4gPiB0aGUga2VybmVsIHRoZW4gaW5qZWN0cyBhbiBleGNlcHRpb24gdG8gdGhlIGd1ZXN0
-Lgo+PiA+Cj4+ID4gQnkgdXNpbmcgc29tZSBRRU1VIFRDRyBmdW5jdGlvbmFsaXR5IG9yIGJ5IFFF
-TVUgY2FsbGluZyBiYWNrIGludG8gS1ZNCj4+ID4gYW5kIGFza2luZyBpdCB0byBpbmplY3QgYW4g
-ZXhjZXB0aW9uIGZvciBpdC4KPj4gCj4+IEkgZG9uJ3Qga25vdyBpZiB0aGVyZSBpcyBleHBsaWNp
-dCBUQ0cgZnVuY3Rpb25hbGl0eSB0byB1c2UgYnV0IFFFTVUgY2FuCj4+IHNldCB0aGUgcmVnaXN0
-ZXJzIGFuZCBQQyB1cCBmb3IgZXhjZXB0aW9uIGVudHJ5IGFuZCByZS1lbnRlciBLVk0uCj4+IAo+
-Cj4gSSBhbHNvIHVuZGVyc3RhbmQgdGhpcy4gIEkgdGhpbmsgUGV0ZXIncyBwb2ludCB3YXMgZXhh
-Y3RseSB0aGF0IGlmIHdlCj4gaGF2ZSBleGlzdGluZyBjb2RlIHNvbWV3aGVyZSB3aGljaCB3ZSBj
-YW4gcmV1c2UsIHRoZW4gd2Ugc2hvdWxkIGNvbnNpZGVyCj4gcmV1c2luZyBpdC4KCkknbSBub3Qg
-c3VyZSBzdWNoIGNvZGUgZXhpc3RzLiBUaGUgb25seSBpbmplY3Rpb24gY29kZSBJIGtub3cgb2Yg
-aW4gS1ZNcwpoYW5kbGVfZXhpdCBjb2RlIHdoZXJlIGEgK3ZlIHJldHVybiB2YWx1ZSBzaWduYWxz
-IEtWTSB0byBkZWxpdmVyIHRoZQpleGNlcHRpb24gdG8gdGhlIGd1ZXN0LiBUaGlzIGlzIHVzZWQg
-YnkgdGhlIGh2YyBhbmQgc3ZjIGhhbmRsZXJzIGFmdGVyCmNhbGxpbmcga3ZtX2luamVjdF91bmRl
-ZmluZWQoKSBhbmQgdGhlIHdmeCBoYW5kbGVyIHdoaWNoIGFkdmFuY2VzIHRoZSBQQwpmaXJzdC4K
-Cj4gQWdhaW4sIEkgZG9uJ3QgY2FyZSBwYXJ0aWN1bGFybHkgd2hpY2ggd2F5LCBJIGp1c3Qgd2Fu
-dCB0aGUgZXhwZWN0ZWQKPiB3b3JraW5nIGJlaGF2aW9yIHRvIGJlIGNsZWFybHkgZGVmaW5lZC4K
-CkkgdGhpbmsgaXQgbWFrZXMgc2Vuc2UgdG8gZG8gaXQgaW4gdXNlcnNwYWNlLiBJIGhhdmUgdGhl
-IGtlcm5lbHMKaW5qZWN0X2ZhdWx0IGNvZGUgZm9yIHJlZmVyZW5jZSBmb3Igd2hhdCBuZWVkcyBz
-ZXR0aW5nIHVwIGJ1dCBJJ2xsIHNlZQppZiBJIGNhbiBmaW5kIGFueXRoaW5nIGluIFFFTVUgdGhh
-dCBhbHJlYWR5IGhhbmRsZXMgdGhpcyBmb3Igc29tZSBvdGhlcgp0aGluZyAoYWx0aG91Z2ggSSBk
-b24ndCB0aGluayBpdCBkb2VzIGF0IGZpcnN0IGdsYW5jZSkuCgotLSAKQWxleCBCZW5uw6llCl9f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWls
-aW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNv
-bHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Wed, 29 Apr 2015 15:51:58 +0100
+Eric Auger <eric.auger@linaro.org> wrote:
+
+> This updates linux-headers against master 4.1-rc1 (commit
+> b787f68c36d49bb1d9236f403813641efa74a031).
+> 
+> This includes, among other things, VFIO platform driver and
+> irqfd/arm.
+> 
+> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+> 
+> ---
+> v13 -> v14:
+> - update to precise 4.1-rc1, precise the commit and change the title
+> 
+> v12 -> v13:
+> - update for 4.1-rc0 headers
+> 
+> v10 -> v11:
+> - only includes header modifications related to vfio platform
+>   driver v14 and not those related to
+>   "vfio: type1: support for ARM SMMUS with VFIO_IOMMU_TYPE1"
+> 
+> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+> ---
+>  include/standard-headers/linux/virtio_balloon.h |  28 +++-
+>  include/standard-headers/linux/virtio_blk.h     |   8 +-
+>  include/standard-headers/linux/virtio_ids.h     |   1 +
+>  linux-headers/asm-arm/kvm.h                     |   9 +-
+>  linux-headers/asm-arm64/kvm.h                   |   9 +-
+>  linux-headers/asm-mips/kvm.h                    | 164 +++++++++++++++---------
+>  linux-headers/asm-s390/kvm.h                    |   4 +
+>  linux-headers/asm-x86/hyperv.h                  |   2 +
+>  linux-headers/linux/kvm.h                       |  66 +++++++++-
+>  linux-headers/linux/vfio.h                      |   2 +
+>  10 files changed, 223 insertions(+), 70 deletions(-)
+
+Not trying to be a pain, but have you figured out why the virtio-input
+header is missing for you?
