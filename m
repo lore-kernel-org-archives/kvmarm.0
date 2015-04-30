@@ -1,25 +1,26 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v15 01/10] linux-headers: update
-Date: Thu, 30 Apr 2015 13:49:06 +0100
-Message-ID: <1430398155-11214-2-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v15 06/10] kvm: rename kvm_irqchip_[add,
+ remove]_irqfd_notifier with gsi suffix
+Date: Thu, 30 Apr 2015 13:49:11 +0100
+Message-ID: <1430398155-11214-7-git-send-email-eric.auger@linaro.org>
 References: <1430398155-11214-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E68D4F021
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2015 08:40:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 575334F03C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2015 08:41:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id k8rsylU0nkNO for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Apr 2015 08:40:53 -0400 (EDT)
-Received: from mail-wi0-f173.google.com (mail-wi0-f173.google.com
- [209.85.212.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C64DC4F022
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2015 08:40:52 -0400 (EDT)
-Received: by wiun10 with SMTP id n10so16532582wiu.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2015 05:49:23 -0700 (PDT)
+ with ESMTP id J94wijH6Mhjz for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Apr 2015 08:41:01 -0400 (EDT)
+Received: from mail-wi0-f177.google.com (mail-wi0-f177.google.com
+ [209.85.212.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 23B104F04A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2015 08:41:00 -0400 (EDT)
+Received: by widdi4 with SMTP id di4so16576636wid.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2015 05:49:31 -0700 (PDT)
 In-Reply-To: <1430398155-11214-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,618 +35,153 @@ To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, alex.willia
 Cc: kvmarm@lists.cs.columbia.edu, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Cornelia Huck <cornelia.huck@de.ibm.com>
+Anticipating for the introduction of new add/remove functions taking
+a qemu_irq parameter, let's rename existing ones with a gsi suffix.
 
-This updates linux-headers against master 4.1-rc1 (commit
-b787f68c36d49bb1d9236f403813641efa74a031).
-
-Signed-off-by: Cornelia Huck <cornelia.huck@de.ibm.com>
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 ---
- include/standard-headers/linux/virtio_balloon.h |  28 +++-
- include/standard-headers/linux/virtio_blk.h     |   8 +-
- include/standard-headers/linux/virtio_ids.h     |   1 +
- include/standard-headers/linux/virtio_input.h   |  76 +++++++++++
- linux-headers/asm-arm/kvm.h                     |   9 +-
- linux-headers/asm-arm64/kvm.h                   |   9 +-
- linux-headers/asm-mips/kvm.h                    | 164 +++++++++++++++---------
- linux-headers/asm-s390/kvm.h                    |   4 +
- linux-headers/asm-x86/hyperv.h                  |   2 +
- linux-headers/linux/kvm.h                       |  66 +++++++++-
- linux-headers/linux/vfio.h                      |   2 +
- 11 files changed, 299 insertions(+), 70 deletions(-)
- create mode 100644 include/standard-headers/linux/virtio_input.h
+ hw/s390x/virtio-ccw.c  | 8 ++++----
+ hw/vfio/pci.c          | 6 +++---
+ hw/virtio/virtio-pci.c | 4 ++--
+ include/sysemu/kvm.h   | 7 ++++---
+ kvm-all.c              | 7 ++++---
+ kvm-stub.c             | 7 ++++---
+ 6 files changed, 21 insertions(+), 18 deletions(-)
 
-diff --git a/include/standard-headers/linux/virtio_balloon.h b/include/standard-headers/linux/virtio_balloon.h
-index 799376d..88ada1d 100644
---- a/include/standard-headers/linux/virtio_balloon.h
-+++ b/include/standard-headers/linux/virtio_balloon.h
-@@ -25,6 +25,7 @@
-  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-  * SUCH DAMAGE. */
-+#include "standard-headers/linux/types.h"
- #include "standard-headers/linux/virtio_ids.h"
- #include "standard-headers/linux/virtio_config.h"
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index ed75c63..55a74fa 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -1238,8 +1238,8 @@ static int virtio_ccw_add_irqfd(VirtioCcwDevice *dev, int n)
+     VirtQueue *vq = virtio_get_queue(vdev, n);
+     EventNotifier *notifier = virtio_queue_get_guest_notifier(vq);
  
-@@ -51,9 +52,32 @@ struct virtio_balloon_config {
- #define VIRTIO_BALLOON_S_MEMTOT   5   /* Total amount of memory */
- #define VIRTIO_BALLOON_S_NR       6
+-    return kvm_irqchip_add_irqfd_notifier(kvm_state, notifier, NULL,
+-                                          dev->routes.gsi[n]);
++    return kvm_irqchip_add_irqfd_notifier_gsi(kvm_state, notifier, NULL,
++                                              dev->routes.gsi[n]);
+ }
  
-+/*
-+ * Memory statistics structure.
-+ * Driver fills an array of these structures and passes to device.
-+ *
-+ * NOTE: fields are laid out in a way that would make compiler add padding
-+ * between and after fields, so we have to use compiler-specific attributes to
-+ * pack it, to disable this padding. This also often causes compiler to
-+ * generate suboptimal code.
-+ *
-+ * We maintain this statistics structure format for backwards compatibility,
-+ * but don't follow this example.
-+ *
-+ * If implementing a similar structure, do something like the below instead:
-+ *     struct virtio_balloon_stat {
-+ *         __virtio16 tag;
-+ *         uint8_t reserved[6];
-+ *         __virtio64 val;
-+ *     };
-+ *
-+ * In other words, add explicit reserved fields to align field and
-+ * structure boundaries at field size, avoiding compiler padding
-+ * without the packed attribute.
-+ */
- struct virtio_balloon_stat {
--	uint16_t tag;
--	uint64_t val;
-+	__virtio16 tag;
-+	__virtio64 val;
- } QEMU_PACKED;
+ static void virtio_ccw_remove_irqfd(VirtioCcwDevice *dev, int n)
+@@ -1249,8 +1249,8 @@ static void virtio_ccw_remove_irqfd(VirtioCcwDevice *dev, int n)
+     EventNotifier *notifier = virtio_queue_get_guest_notifier(vq);
+     int ret;
  
- #endif /* _LINUX_VIRTIO_BALLOON_H */
-diff --git a/include/standard-headers/linux/virtio_blk.h b/include/standard-headers/linux/virtio_blk.h
-index 12016b4..cd601f4 100644
---- a/include/standard-headers/linux/virtio_blk.h
-+++ b/include/standard-headers/linux/virtio_blk.h
-@@ -58,7 +58,7 @@ struct virtio_blk_config {
- 	uint32_t size_max;
- 	/* The maximum number of segments (if VIRTIO_BLK_F_SEG_MAX) */
- 	uint32_t seg_max;
--	/* geometry the device (if VIRTIO_BLK_F_GEOMETRY) */
-+	/* geometry of the device (if VIRTIO_BLK_F_GEOMETRY) */
- 	struct virtio_blk_geometry {
- 		uint16_t cylinders;
- 		uint8_t heads;
-@@ -117,7 +117,11 @@ struct virtio_blk_config {
- #define VIRTIO_BLK_T_BARRIER	0x80000000
- #endif /* !VIRTIO_BLK_NO_LEGACY */
+-    ret = kvm_irqchip_remove_irqfd_notifier(kvm_state, notifier,
+-                                            dev->routes.gsi[n]);
++    ret = kvm_irqchip_remove_irqfd_notifier_gsi(kvm_state, notifier,
++                                                dev->routes.gsi[n]);
+     assert(ret == 0);
+ }
  
--/* This is the first element of the read scatter-gather list. */
-+/*
-+ * This comes first in the read scatter-gather list.
-+ * For legacy virtio, if VIRTIO_F_ANY_LAYOUT is not negotiated,
-+ * this is the first element of the read scatter-gather list.
-+ */
- struct virtio_blk_outhdr {
- 	/* VIRTIO_BLK_T* */
- 	__virtio32 type;
-diff --git a/include/standard-headers/linux/virtio_ids.h b/include/standard-headers/linux/virtio_ids.h
-index 284fc3a..5f60aa4 100644
---- a/include/standard-headers/linux/virtio_ids.h
-+++ b/include/standard-headers/linux/virtio_ids.h
-@@ -39,5 +39,6 @@
- #define VIRTIO_ID_9P		9 /* 9p virtio console */
- #define VIRTIO_ID_RPROC_SERIAL 11 /* virtio remoteproc serial link */
- #define VIRTIO_ID_CAIF	       12 /* Virtio caif */
-+#define VIRTIO_ID_INPUT        18 /* virtio input */
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index cd15b20..938f584 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -596,7 +596,7 @@ static void vfio_add_kvm_msi_virq(VFIOMSIVector *vector, MSIMessage *msg,
+         return;
+     }
  
- #endif /* _LINUX_VIRTIO_IDS_H */
-diff --git a/include/standard-headers/linux/virtio_input.h b/include/standard-headers/linux/virtio_input.h
-new file mode 100644
-index 0000000..a98a797
---- /dev/null
-+++ b/include/standard-headers/linux/virtio_input.h
-@@ -0,0 +1,76 @@
-+#ifndef _LINUX_VIRTIO_INPUT_H
-+#define _LINUX_VIRTIO_INPUT_H
-+/* This header is BSD licensed so anyone can use the definitions to implement
-+ * compatible drivers/servers.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions and the following disclaimer.
-+ * 2. Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in the
-+ *    documentation and/or other materials provided with the distribution.
-+ * 3. Neither the name of IBM nor the names of its contributors
-+ *    may be used to endorse or promote products derived from this software
-+ *    without specific prior written permission.
-+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL IBM OR
-+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
-+ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
-+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-+ * SUCH DAMAGE. */
-+
-+#include "standard-headers/linux/types.h"
-+
-+enum virtio_input_config_select {
-+	VIRTIO_INPUT_CFG_UNSET      = 0x00,
-+	VIRTIO_INPUT_CFG_ID_NAME    = 0x01,
-+	VIRTIO_INPUT_CFG_ID_SERIAL  = 0x02,
-+	VIRTIO_INPUT_CFG_ID_DEVIDS  = 0x03,
-+	VIRTIO_INPUT_CFG_PROP_BITS  = 0x10,
-+	VIRTIO_INPUT_CFG_EV_BITS    = 0x11,
-+	VIRTIO_INPUT_CFG_ABS_INFO   = 0x12,
-+};
-+
-+struct virtio_input_absinfo {
-+	uint32_t min;
-+	uint32_t max;
-+	uint32_t fuzz;
-+	uint32_t flat;
-+	uint32_t res;
-+};
-+
-+struct virtio_input_devids {
-+	uint16_t bustype;
-+	uint16_t vendor;
-+	uint16_t product;
-+	uint16_t version;
-+};
-+
-+struct virtio_input_config {
-+	uint8_t    select;
-+	uint8_t    subsel;
-+	uint8_t    size;
-+	uint8_t    reserved[5];
-+	union {
-+		char string[128];
-+		uint8_t bitmap[128];
-+		struct virtio_input_absinfo abs;
-+		struct virtio_input_devids ids;
-+	} u;
-+};
-+
-+struct virtio_input_event {
-+	uint16_t type;
-+	uint16_t code;
-+	uint32_t value;
-+};
-+
-+#endif /* _LINUX_VIRTIO_INPUT_H */
-diff --git a/linux-headers/asm-arm/kvm.h b/linux-headers/asm-arm/kvm.h
-index 0db25bc..c98e4dc 100644
---- a/linux-headers/asm-arm/kvm.h
-+++ b/linux-headers/asm-arm/kvm.h
-@@ -195,9 +195,16 @@ struct kvm_arch_memory_slot {
- #define KVM_ARM_IRQ_CPU_IRQ		0
- #define KVM_ARM_IRQ_CPU_FIQ		1
+-    if (kvm_irqchip_add_irqfd_notifier(kvm_state, &vector->kvm_interrupt,
++    if (kvm_irqchip_add_irqfd_notifier_gsi(kvm_state, &vector->kvm_interrupt,
+                                        NULL, virq) < 0) {
+         kvm_irqchip_release_virq(kvm_state, virq);
+         event_notifier_cleanup(&vector->kvm_interrupt);
+@@ -608,8 +608,8 @@ static void vfio_add_kvm_msi_virq(VFIOMSIVector *vector, MSIMessage *msg,
  
--/* Highest supported SPI, from VGIC_NR_IRQS */
-+/*
-+ * This used to hold the highest supported SPI, but it is now obsolete
-+ * and only here to provide source code level compatibility with older
-+ * userland. The highest SPI number can be set via KVM_DEV_ARM_VGIC_GRP_NR_IRQS.
-+ */
- #define KVM_ARM_IRQ_GIC_MAX		127
+ static void vfio_remove_kvm_msi_virq(VFIOMSIVector *vector)
+ {
+-    kvm_irqchip_remove_irqfd_notifier(kvm_state, &vector->kvm_interrupt,
+-                                      vector->virq);
++    kvm_irqchip_remove_irqfd_notifier_gsi(kvm_state, &vector->kvm_interrupt,
++                                          vector->virq);
+     kvm_irqchip_release_virq(kvm_state, vector->virq);
+     vector->virq = -1;
+     event_notifier_cleanup(&vector->kvm_interrupt);
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index c7c3f72..3be7fad 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -477,7 +477,7 @@ static int kvm_virtio_pci_irqfd_use(VirtIOPCIProxy *proxy,
+     VirtQueue *vq = virtio_get_queue(vdev, queue_no);
+     EventNotifier *n = virtio_queue_get_guest_notifier(vq);
+     int ret;
+-    ret = kvm_irqchip_add_irqfd_notifier(kvm_state, n, NULL, irqfd->virq);
++    ret = kvm_irqchip_add_irqfd_notifier_gsi(kvm_state, n, NULL, irqfd->virq);
+     return ret;
+ }
  
-+/* One single KVM irqchip, ie. the VGIC */
-+#define KVM_NR_IRQCHIPS          1
-+
- /* PSCI interface */
- #define KVM_PSCI_FN_BASE		0x95c1ba5e
- #define KVM_PSCI_FN(n)			(KVM_PSCI_FN_BASE + (n))
-diff --git a/linux-headers/asm-arm64/kvm.h b/linux-headers/asm-arm64/kvm.h
-index 3ef77a4..c8abf25 100644
---- a/linux-headers/asm-arm64/kvm.h
-+++ b/linux-headers/asm-arm64/kvm.h
-@@ -188,9 +188,16 @@ struct kvm_arch_memory_slot {
- #define KVM_ARM_IRQ_CPU_IRQ		0
- #define KVM_ARM_IRQ_CPU_FIQ		1
+@@ -491,7 +491,7 @@ static void kvm_virtio_pci_irqfd_release(VirtIOPCIProxy *proxy,
+     VirtIOIRQFD *irqfd = &proxy->vector_irqfd[vector];
+     int ret;
  
--/* Highest supported SPI, from VGIC_NR_IRQS */
-+/*
-+ * This used to hold the highest supported SPI, but it is now obsolete
-+ * and only here to provide source code level compatibility with older
-+ * userland. The highest SPI number can be set via KVM_DEV_ARM_VGIC_GRP_NR_IRQS.
-+ */
- #define KVM_ARM_IRQ_GIC_MAX		127
+-    ret = kvm_irqchip_remove_irqfd_notifier(kvm_state, n, irqfd->virq);
++    ret = kvm_irqchip_remove_irqfd_notifier_gsi(kvm_state, n, irqfd->virq);
+     assert(ret == 0);
+ }
  
-+/* One single KVM irqchip, ie. the VGIC */
-+#define KVM_NR_IRQCHIPS          1
-+
- /* PSCI interface */
- #define KVM_PSCI_FN_BASE		0x95c1ba5e
- #define KVM_PSCI_FN(n)			(KVM_PSCI_FN_BASE + (n))
-diff --git a/linux-headers/asm-mips/kvm.h b/linux-headers/asm-mips/kvm.h
-index 2c04b6d..6985eb5 100644
---- a/linux-headers/asm-mips/kvm.h
-+++ b/linux-headers/asm-mips/kvm.h
-@@ -36,77 +36,85 @@ struct kvm_regs {
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 197e6c0..0f28d6f 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -413,9 +413,10 @@ void kvm_irqchip_release_virq(KVMState *s, int virq);
  
- /*
-  * for KVM_GET_FPU and KVM_SET_FPU
-- *
-- * If Status[FR] is zero (32-bit FPU), the upper 32-bits of the FPRs
-- * are zero filled.
-  */
- struct kvm_fpu {
--	__u64 fpr[32];
--	__u32 fir;
--	__u32 fccr;
--	__u32 fexr;
--	__u32 fenr;
--	__u32 fcsr;
--	__u32 pad;
- };
+ int kvm_irqchip_add_adapter_route(KVMState *s, AdapterInfo *adapter);
  
+-int kvm_irqchip_add_irqfd_notifier(KVMState *s, EventNotifier *n,
+-                                   EventNotifier *rn, int virq);
+-int kvm_irqchip_remove_irqfd_notifier(KVMState *s, EventNotifier *n, int virq);
++int kvm_irqchip_add_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
++                                       EventNotifier *rn, int virq);
++int kvm_irqchip_remove_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
++                                          int virq);
+ void kvm_pc_gsi_handler(void *opaque, int n, int level);
+ void kvm_pc_setup_irq_routing(bool pci_enabled);
+ void kvm_init_irq_routing(KVMState *s);
+diff --git a/kvm-all.c b/kvm-all.c
+index 4ec153d..42bb923 100644
+--- a/kvm-all.c
++++ b/kvm-all.c
+@@ -1368,14 +1368,15 @@ int kvm_irqchip_update_msi_route(KVMState *s, int virq, MSIMessage msg)
+ }
+ #endif /* !KVM_CAP_IRQ_ROUTING */
  
- /*
-- * For MIPS, we use KVM_SET_ONE_REG and KVM_GET_ONE_REG to access CP0
-+ * For MIPS, we use KVM_SET_ONE_REG and KVM_GET_ONE_REG to access various
-  * registers.  The id field is broken down as follows:
-  *
-- *  bits[2..0]   - Register 'sel' index.
-- *  bits[7..3]   - Register 'rd'  index.
-- *  bits[15..8]  - Must be zero.
-- *  bits[31..16] - 1 -> CP0 registers.
-- *  bits[51..32] - Must be zero.
-  *  bits[63..52] - As per linux/kvm.h
-+ *  bits[51..32] - Must be zero.
-+ *  bits[31..16] - Register set.
-+ *
-+ * Register set = 0: GP registers from kvm_regs (see definitions below).
-+ *
-+ * Register set = 1: CP0 registers.
-+ *  bits[15..8]  - Must be zero.
-+ *  bits[7..3]   - Register 'rd'  index.
-+ *  bits[2..0]   - Register 'sel' index.
-+ *
-+ * Register set = 2: KVM specific registers (see definitions below).
-+ *
-+ * Register set = 3: FPU / MSA registers (see definitions below).
-  *
-  * Other sets registers may be added in the future.  Each set would
-  * have its own identifier in bits[31..16].
-- *
-- * The registers defined in struct kvm_regs are also accessible, the
-- * id values for these are below.
-  */
+-int kvm_irqchip_add_irqfd_notifier(KVMState *s, EventNotifier *n,
+-                                   EventNotifier *rn, int virq)
++int kvm_irqchip_add_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
++                                       EventNotifier *rn, int virq)
+ {
+     return kvm_irqchip_assign_irqfd(s, event_notifier_get_fd(n),
+            rn ? event_notifier_get_fd(rn) : -1, virq, true);
+ }
  
--#define KVM_REG_MIPS_R0 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 0)
--#define KVM_REG_MIPS_R1 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 1)
--#define KVM_REG_MIPS_R2 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 2)
--#define KVM_REG_MIPS_R3 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 3)
--#define KVM_REG_MIPS_R4 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 4)
--#define KVM_REG_MIPS_R5 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 5)
--#define KVM_REG_MIPS_R6 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 6)
--#define KVM_REG_MIPS_R7 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 7)
--#define KVM_REG_MIPS_R8 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 8)
--#define KVM_REG_MIPS_R9 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 9)
--#define KVM_REG_MIPS_R10 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 10)
--#define KVM_REG_MIPS_R11 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 11)
--#define KVM_REG_MIPS_R12 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 12)
--#define KVM_REG_MIPS_R13 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 13)
--#define KVM_REG_MIPS_R14 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 14)
--#define KVM_REG_MIPS_R15 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 15)
--#define KVM_REG_MIPS_R16 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 16)
--#define KVM_REG_MIPS_R17 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 17)
--#define KVM_REG_MIPS_R18 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 18)
--#define KVM_REG_MIPS_R19 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 19)
--#define KVM_REG_MIPS_R20 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 20)
--#define KVM_REG_MIPS_R21 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 21)
--#define KVM_REG_MIPS_R22 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 22)
--#define KVM_REG_MIPS_R23 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 23)
--#define KVM_REG_MIPS_R24 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 24)
--#define KVM_REG_MIPS_R25 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 25)
--#define KVM_REG_MIPS_R26 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 26)
--#define KVM_REG_MIPS_R27 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 27)
--#define KVM_REG_MIPS_R28 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 28)
--#define KVM_REG_MIPS_R29 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 29)
--#define KVM_REG_MIPS_R30 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 30)
--#define KVM_REG_MIPS_R31 (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 31)
--
--#define KVM_REG_MIPS_HI (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 32)
--#define KVM_REG_MIPS_LO (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 33)
--#define KVM_REG_MIPS_PC (KVM_REG_MIPS | KVM_REG_SIZE_U64 | 34)
--
--/* KVM specific control registers */
-+#define KVM_REG_MIPS_GP		(KVM_REG_MIPS | 0x0000000000000000ULL)
-+#define KVM_REG_MIPS_CP0	(KVM_REG_MIPS | 0x0000000000010000ULL)
-+#define KVM_REG_MIPS_KVM	(KVM_REG_MIPS | 0x0000000000020000ULL)
-+#define KVM_REG_MIPS_FPU	(KVM_REG_MIPS | 0x0000000000030000ULL)
-+
-+
-+/*
-+ * KVM_REG_MIPS_GP - General purpose registers from kvm_regs.
-+ */
-+
-+#define KVM_REG_MIPS_R0		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  0)
-+#define KVM_REG_MIPS_R1		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  1)
-+#define KVM_REG_MIPS_R2		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  2)
-+#define KVM_REG_MIPS_R3		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  3)
-+#define KVM_REG_MIPS_R4		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  4)
-+#define KVM_REG_MIPS_R5		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  5)
-+#define KVM_REG_MIPS_R6		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  6)
-+#define KVM_REG_MIPS_R7		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  7)
-+#define KVM_REG_MIPS_R8		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  8)
-+#define KVM_REG_MIPS_R9		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 |  9)
-+#define KVM_REG_MIPS_R10	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 10)
-+#define KVM_REG_MIPS_R11	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 11)
-+#define KVM_REG_MIPS_R12	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 12)
-+#define KVM_REG_MIPS_R13	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 13)
-+#define KVM_REG_MIPS_R14	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 14)
-+#define KVM_REG_MIPS_R15	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 15)
-+#define KVM_REG_MIPS_R16	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 16)
-+#define KVM_REG_MIPS_R17	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 17)
-+#define KVM_REG_MIPS_R18	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 18)
-+#define KVM_REG_MIPS_R19	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 19)
-+#define KVM_REG_MIPS_R20	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 20)
-+#define KVM_REG_MIPS_R21	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 21)
-+#define KVM_REG_MIPS_R22	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 22)
-+#define KVM_REG_MIPS_R23	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 23)
-+#define KVM_REG_MIPS_R24	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 24)
-+#define KVM_REG_MIPS_R25	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 25)
-+#define KVM_REG_MIPS_R26	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 26)
-+#define KVM_REG_MIPS_R27	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 27)
-+#define KVM_REG_MIPS_R28	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 28)
-+#define KVM_REG_MIPS_R29	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 29)
-+#define KVM_REG_MIPS_R30	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 30)
-+#define KVM_REG_MIPS_R31	(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 31)
-+
-+#define KVM_REG_MIPS_HI		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 32)
-+#define KVM_REG_MIPS_LO		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 33)
-+#define KVM_REG_MIPS_PC		(KVM_REG_MIPS_GP | KVM_REG_SIZE_U64 | 34)
-+
-+
-+/*
-+ * KVM_REG_MIPS_KVM - KVM specific control registers.
-+ */
+-int kvm_irqchip_remove_irqfd_notifier(KVMState *s, EventNotifier *n, int virq)
++int kvm_irqchip_remove_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
++                                          int virq)
+ {
+     return kvm_irqchip_assign_irqfd(s, event_notifier_get_fd(n), -1, virq,
+            false);
+diff --git a/kvm-stub.c b/kvm-stub.c
+index 7ba90c5..977de21 100644
+--- a/kvm-stub.c
++++ b/kvm-stub.c
+@@ -137,13 +137,14 @@ int kvm_irqchip_add_adapter_route(KVMState *s, AdapterInfo *adapter)
+     return -ENOSYS;
+ }
  
- /*
-  * CP0_Count control
-@@ -118,8 +126,7 @@ struct kvm_fpu {
-  *        safely without losing time or guest timer interrupts.
-  * Other: Reserved, do not change.
-  */
--#define KVM_REG_MIPS_COUNT_CTL		(KVM_REG_MIPS | KVM_REG_SIZE_U64 | \
--					 0x20000 | 0)
-+#define KVM_REG_MIPS_COUNT_CTL	    (KVM_REG_MIPS_KVM | KVM_REG_SIZE_U64 | 0)
- #define KVM_REG_MIPS_COUNT_CTL_DC	0x00000001
+-int kvm_irqchip_add_irqfd_notifier(KVMState *s, EventNotifier *n,
+-                                   EventNotifier *rn, int virq)
++int kvm_irqchip_add_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
++                                       EventNotifier *rn, int virq)
+ {
+     return -ENOSYS;
+ }
  
- /*
-@@ -131,15 +138,46 @@ struct kvm_fpu {
-  * emulated.
-  * Modifications to times in the future are rejected.
-  */
--#define KVM_REG_MIPS_COUNT_RESUME	(KVM_REG_MIPS | KVM_REG_SIZE_U64 | \
--					 0x20000 | 1)
-+#define KVM_REG_MIPS_COUNT_RESUME   (KVM_REG_MIPS_KVM | KVM_REG_SIZE_U64 | 1)
- /*
-  * CP0_Count rate in Hz
-  * Specifies the rate of the CP0_Count timer in Hz. Modifications occur without
-  * discontinuities in CP0_Count.
-  */
--#define KVM_REG_MIPS_COUNT_HZ		(KVM_REG_MIPS | KVM_REG_SIZE_U64 | \
--					 0x20000 | 2)
-+#define KVM_REG_MIPS_COUNT_HZ	    (KVM_REG_MIPS_KVM | KVM_REG_SIZE_U64 | 2)
-+
-+
-+/*
-+ * KVM_REG_MIPS_FPU - Floating Point and MIPS SIMD Architecture (MSA) registers.
-+ *
-+ *  bits[15..8]  - Register subset (see definitions below).
-+ *  bits[7..5]   - Must be zero.
-+ *  bits[4..0]   - Register number within register subset.
-+ */
-+
-+#define KVM_REG_MIPS_FPR	(KVM_REG_MIPS_FPU | 0x0000000000000000ULL)
-+#define KVM_REG_MIPS_FCR	(KVM_REG_MIPS_FPU | 0x0000000000000100ULL)
-+#define KVM_REG_MIPS_MSACR	(KVM_REG_MIPS_FPU | 0x0000000000000200ULL)
-+
-+/*
-+ * KVM_REG_MIPS_FPR - Floating point / Vector registers.
-+ */
-+#define KVM_REG_MIPS_FPR_32(n)	(KVM_REG_MIPS_FPR | KVM_REG_SIZE_U32  | (n))
-+#define KVM_REG_MIPS_FPR_64(n)	(KVM_REG_MIPS_FPR | KVM_REG_SIZE_U64  | (n))
-+#define KVM_REG_MIPS_VEC_128(n)	(KVM_REG_MIPS_FPR | KVM_REG_SIZE_U128 | (n))
-+
-+/*
-+ * KVM_REG_MIPS_FCR - Floating point control registers.
-+ */
-+#define KVM_REG_MIPS_FCR_IR	(KVM_REG_MIPS_FCR | KVM_REG_SIZE_U32 |  0)
-+#define KVM_REG_MIPS_FCR_CSR	(KVM_REG_MIPS_FCR | KVM_REG_SIZE_U32 | 31)
-+
-+/*
-+ * KVM_REG_MIPS_MSACR - MIPS SIMD Architecture (MSA) control registers.
-+ */
-+#define KVM_REG_MIPS_MSA_IR	 (KVM_REG_MIPS_MSACR | KVM_REG_SIZE_U32 |  0)
-+#define KVM_REG_MIPS_MSA_CSR	 (KVM_REG_MIPS_MSACR | KVM_REG_SIZE_U32 |  1)
-+
- 
- /*
-  * KVM MIPS specific structures and definitions
-diff --git a/linux-headers/asm-s390/kvm.h b/linux-headers/asm-s390/kvm.h
-index c5a93eb..512d8f1 100644
---- a/linux-headers/asm-s390/kvm.h
-+++ b/linux-headers/asm-s390/kvm.h
-@@ -150,6 +150,7 @@ struct kvm_guest_debug_arch {
- #define KVM_SYNC_CRS    (1UL << 3)
- #define KVM_SYNC_ARCH0  (1UL << 4)
- #define KVM_SYNC_PFAULT (1UL << 5)
-+#define KVM_SYNC_VRS    (1UL << 6)
- /* definition of registers in kvm_run */
- struct kvm_sync_regs {
- 	__u64 prefix;	/* prefix register */
-@@ -164,6 +165,9 @@ struct kvm_sync_regs {
- 	__u64 pft;	/* pfault token [PFAULT] */
- 	__u64 pfs;	/* pfault select [PFAULT] */
- 	__u64 pfc;	/* pfault compare [PFAULT] */
-+	__u64 vrs[32][2];	/* vector registers */
-+	__u8  reserved[512];	/* for future vector expansion */
-+	__u32 fpc;	/* only valid with vector registers */
- };
- 
- #define KVM_REG_S390_TODPR	(KVM_REG_S390 | KVM_REG_SIZE_U32 | 0x1)
-diff --git a/linux-headers/asm-x86/hyperv.h b/linux-headers/asm-x86/hyperv.h
-index 90c458e..ce6068d 100644
---- a/linux-headers/asm-x86/hyperv.h
-+++ b/linux-headers/asm-x86/hyperv.h
-@@ -225,6 +225,8 @@
- #define HV_STATUS_INVALID_HYPERCALL_CODE	2
- #define HV_STATUS_INVALID_HYPERCALL_INPUT	3
- #define HV_STATUS_INVALID_ALIGNMENT		4
-+#define HV_STATUS_INSUFFICIENT_MEMORY		11
-+#define HV_STATUS_INVALID_CONNECTION_ID		18
- #define HV_STATUS_INSUFFICIENT_BUFFERS		19
- 
- typedef struct _HV_REFERENCE_TSC_PAGE {
-diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
-index 60a54c8..b96d978 100644
---- a/linux-headers/linux/kvm.h
-+++ b/linux-headers/linux/kvm.h
-@@ -147,6 +147,16 @@ struct kvm_pit_config {
- 
- #define KVM_PIT_SPEAKER_DUMMY     1
- 
-+struct kvm_s390_skeys {
-+	__u64 start_gfn;
-+	__u64 count;
-+	__u64 skeydata_addr;
-+	__u32 flags;
-+	__u32 reserved[9];
-+};
-+#define KVM_S390_GET_SKEYS_NONE   1
-+#define KVM_S390_SKEYS_MAX        1048576
-+
- #define KVM_EXIT_UNKNOWN          0
- #define KVM_EXIT_EXCEPTION        1
- #define KVM_EXIT_IO               2
-@@ -172,6 +182,7 @@ struct kvm_pit_config {
- #define KVM_EXIT_S390_TSCH        22
- #define KVM_EXIT_EPR              23
- #define KVM_EXIT_SYSTEM_EVENT     24
-+#define KVM_EXIT_S390_STSI        25
- 
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -309,6 +320,15 @@ struct kvm_run {
- 			__u32 type;
- 			__u64 flags;
- 		} system_event;
-+		/* KVM_EXIT_S390_STSI */
-+		struct {
-+			__u64 addr;
-+			__u8 ar;
-+			__u8 reserved;
-+			__u8 fc;
-+			__u8 sel1;
-+			__u16 sel2;
-+		} s390_stsi;
- 		/* Fix the size of the union. */
- 		char padding[256];
- 	};
-@@ -324,7 +344,7 @@ struct kvm_run {
- 	__u64 kvm_dirty_regs;
- 	union {
- 		struct kvm_sync_regs regs;
--		char padding[1024];
-+		char padding[2048];
- 	} s;
- };
- 
-@@ -365,6 +385,24 @@ struct kvm_translation {
- 	__u8  pad[5];
- };
- 
-+/* for KVM_S390_MEM_OP */
-+struct kvm_s390_mem_op {
-+	/* in */
-+	__u64 gaddr;		/* the guest address */
-+	__u64 flags;		/* flags */
-+	__u32 size;		/* amount of bytes */
-+	__u32 op;		/* type of operation */
-+	__u64 buf;		/* buffer in userspace */
-+	__u8 ar;		/* the access register number */
-+	__u8 reserved[31];	/* should be set to 0 */
-+};
-+/* types for kvm_s390_mem_op->op */
-+#define KVM_S390_MEMOP_LOGICAL_READ	0
-+#define KVM_S390_MEMOP_LOGICAL_WRITE	1
-+/* flags for kvm_s390_mem_op->flags */
-+#define KVM_S390_MEMOP_F_CHECK_ONLY		(1ULL << 0)
-+#define KVM_S390_MEMOP_F_INJECT_EXCEPTION	(1ULL << 1)
-+
- /* for KVM_INTERRUPT */
- struct kvm_interrupt {
- 	/* in */
-@@ -520,6 +558,13 @@ struct kvm_s390_irq {
- 	} u;
- };
- 
-+struct kvm_s390_irq_state {
-+	__u64 buf;
-+	__u32 flags;
-+	__u32 len;
-+	__u32 reserved[4];
-+};
-+
- /* for KVM_SET_GUEST_DEBUG */
- 
- #define KVM_GUESTDBG_ENABLE		0x00000001
-@@ -760,6 +805,15 @@ struct kvm_ppc_smmu_info {
- #define KVM_CAP_PPC_ENABLE_HCALL 104
- #define KVM_CAP_CHECK_EXTENSION_VM 105
- #define KVM_CAP_S390_USER_SIGP 106
-+#define KVM_CAP_S390_VECTOR_REGISTERS 107
-+#define KVM_CAP_S390_MEM_OP 108
-+#define KVM_CAP_S390_USER_STSI 109
-+#define KVM_CAP_S390_SKEYS 110
-+#define KVM_CAP_MIPS_FPU 111
-+#define KVM_CAP_MIPS_MSA 112
-+#define KVM_CAP_S390_INJECT_IRQ 113
-+#define KVM_CAP_S390_IRQ_STATE 114
-+#define KVM_CAP_PPC_HWRNG 115
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1135,6 +1189,16 @@ struct kvm_s390_ucas_mapping {
- #define KVM_ARM_VCPU_INIT	  _IOW(KVMIO,  0xae, struct kvm_vcpu_init)
- #define KVM_ARM_PREFERRED_TARGET  _IOR(KVMIO,  0xaf, struct kvm_vcpu_init)
- #define KVM_GET_REG_LIST	  _IOWR(KVMIO, 0xb0, struct kvm_reg_list)
-+/* Available with KVM_CAP_S390_MEM_OP */
-+#define KVM_S390_MEM_OP		  _IOW(KVMIO,  0xb1, struct kvm_s390_mem_op)
-+/* Available with KVM_CAP_S390_SKEYS */
-+#define KVM_S390_GET_SKEYS      _IOW(KVMIO, 0xb2, struct kvm_s390_skeys)
-+#define KVM_S390_SET_SKEYS      _IOW(KVMIO, 0xb3, struct kvm_s390_skeys)
-+/* Available with KVM_CAP_S390_INJECT_IRQ */
-+#define KVM_S390_IRQ              _IOW(KVMIO,  0xb4, struct kvm_s390_irq)
-+/* Available with KVM_CAP_S390_IRQ_STATE */
-+#define KVM_S390_SET_IRQ_STATE	  _IOW(KVMIO, 0xb5, struct kvm_s390_irq_state)
-+#define KVM_S390_GET_IRQ_STATE	  _IOW(KVMIO, 0xb6, struct kvm_s390_irq_state)
- 
- #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
- #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
-diff --git a/linux-headers/linux/vfio.h b/linux-headers/linux/vfio.h
-index 95ba870..0508d0b 100644
---- a/linux-headers/linux/vfio.h
-+++ b/linux-headers/linux/vfio.h
-@@ -160,6 +160,8 @@ struct vfio_device_info {
- 	__u32	flags;
- #define VFIO_DEVICE_FLAGS_RESET	(1 << 0)	/* Device supports reset */
- #define VFIO_DEVICE_FLAGS_PCI	(1 << 1)	/* vfio-pci device */
-+#define VFIO_DEVICE_FLAGS_PLATFORM (1 << 2)	/* vfio-platform device */
-+#define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
- 	__u32	num_regions;	/* Max region index + 1 */
- 	__u32	num_irqs;	/* Max IRQ index + 1 */
- };
+-int kvm_irqchip_remove_irqfd_notifier(KVMState *s, EventNotifier *n, int virq)
++int kvm_irqchip_remove_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
++                                          int virq)
+ {
+     return -ENOSYS;
+ }
 -- 
 1.8.3.2
