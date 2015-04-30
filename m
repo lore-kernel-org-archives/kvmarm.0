@@ -1,25 +1,25 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v15 04/10] hw/vfio/platform: calxeda xgmac device
-Date: Thu, 30 Apr 2015 13:49:09 +0100
-Message-ID: <1430398155-11214-5-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v15 08/10] intc: arm_gic_kvm: set the qemu_irq/gsi mapping
+Date: Thu, 30 Apr 2015 13:49:13 +0100
+Message-ID: <1430398155-11214-9-git-send-email-eric.auger@linaro.org>
 References: <1430398155-11214-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0005C4F036
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2015 08:41:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 07FE14F05B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2015 08:41:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1YY24ME2gArO for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Apr 2015 08:41:00 -0400 (EDT)
-Received: from mail-wi0-f179.google.com (mail-wi0-f179.google.com
- [209.85.212.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2E804F028
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2015 08:40:57 -0400 (EDT)
-Received: by widdi4 with SMTP id di4so18091022wid.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2015 05:49:29 -0700 (PDT)
+ with ESMTP id ddnF14Fg-y-K for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Apr 2015 08:41:04 -0400 (EDT)
+Received: from mail-wi0-f182.google.com (mail-wi0-f182.google.com
+ [209.85.212.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7A6144F021
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2015 08:41:03 -0400 (EDT)
+Received: by wiun10 with SMTP id n10so16538469wiu.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Apr 2015 05:49:35 -0700 (PDT)
 In-Reply-To: <1430398155-11214-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,164 +34,37 @@ To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, alex.willia
 Cc: kvmarm@lists.cs.columbia.edu, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The platform device class has become abstract. This patch introduces
-a calxeda xgmac device that derives from it.
+The arm_gic_kvm now calls kvm_irqchip_set_qemuirq_gsi to build
+the hash table storing qemu_irq/gsi mappings. From that point on
+irqfd can be setup directly from the qemu_irq using
+kvm_irqchip_add_irqfd_notifier.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
-Reviewed-by: Alex Bennee<alex.bennee@linaro.org>
 
 ---
-v10 -> v11:
-- add Alex Reviewed-by
-- move virt modifications in a separate patch
 
-v8 -> v9:
-- renamed calxeda_xgmac.c into calxeda-xgmac.c
-
-v7 -> v8:
-- add a comment in the header about the MMIO regions and IRQ which
-  are exposed by the device
-
-v5 -> v6
-- back again following Alex Graf advises
-- fix a bug related to compat override
-
-v4 -> v5:
-removed since device tree was moved to hw/arm/dyn_sysbus_devtree.c
-
-v4: creation for device tree specialization
-
-Conflicts:
-	hw/arm/virt.c
+v2 -> v3:
+- kvm_irqchip_add_qemuirq_irqfd_notifier renamed into
+  kvm_irqchip_add_irqfd_notifier
 ---
- hw/vfio/Makefile.objs                |  1 +
- hw/vfio/calxeda-xgmac.c              | 54 ++++++++++++++++++++++++++++++++++++
- include/hw/vfio/vfio-calxeda-xgmac.h | 46 ++++++++++++++++++++++++++++++
- 3 files changed, 101 insertions(+)
- create mode 100644 hw/vfio/calxeda-xgmac.c
- create mode 100644 include/hw/vfio/vfio-calxeda-xgmac.h
+ hw/intc/arm_gic_kvm.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/hw/vfio/Makefile.objs b/hw/vfio/Makefile.objs
-index c5c76fe..d540c9d 100644
---- a/hw/vfio/Makefile.objs
-+++ b/hw/vfio/Makefile.objs
-@@ -2,4 +2,5 @@ ifeq ($(CONFIG_LINUX), y)
- obj-$(CONFIG_SOFTMMU) += common.o
- obj-$(CONFIG_PCI) += pci.o
- obj-$(CONFIG_SOFTMMU) += platform.o
-+obj-$(CONFIG_SOFTMMU) += calxeda-xgmac.o
- endif
-diff --git a/hw/vfio/calxeda-xgmac.c b/hw/vfio/calxeda-xgmac.c
-new file mode 100644
-index 0000000..c4b8fef
---- /dev/null
-+++ b/hw/vfio/calxeda-xgmac.c
-@@ -0,0 +1,54 @@
-+/*
-+ * calxeda xgmac VFIO device
-+ *
-+ * Copyright Linaro Limited, 2014
-+ *
-+ * Authors:
-+ *  Eric Auger <eric.auger@linaro.org>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ */
+diff --git a/hw/intc/arm_gic_kvm.c b/hw/intc/arm_gic_kvm.c
+index e1952ad..28506e3 100644
+--- a/hw/intc/arm_gic_kvm.c
++++ b/hw/intc/arm_gic_kvm.c
+@@ -554,6 +554,11 @@ static void kvm_arm_gic_realize(DeviceState *dev, Error **errp)
+      */
+     i += (GIC_INTERNAL * s->num_cpu);
+     qdev_init_gpio_in(dev, kvm_arm_gic_set_irq, i);
 +
-+#include "hw/vfio/vfio-calxeda-xgmac.h"
-+
-+static void calxeda_xgmac_realize(DeviceState *dev, Error **errp)
-+{
-+    VFIOPlatformDevice *vdev = VFIO_PLATFORM_DEVICE(dev);
-+    VFIOCalxedaXgmacDeviceClass *k = VFIO_CALXEDA_XGMAC_DEVICE_GET_CLASS(dev);
-+
-+    vdev->compat = g_strdup("calxeda,hb-xgmac");
-+
-+    k->parent_realize(dev, errp);
-+}
-+
-+static const VMStateDescription vfio_platform_vmstate = {
-+    .name = TYPE_VFIO_CALXEDA_XGMAC,
-+    .unmigratable = 1,
-+};
-+
-+static void vfio_calxeda_xgmac_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    VFIOCalxedaXgmacDeviceClass *vcxc =
-+        VFIO_CALXEDA_XGMAC_DEVICE_CLASS(klass);
-+    vcxc->parent_realize = dc->realize;
-+    dc->realize = calxeda_xgmac_realize;
-+    dc->desc = "VFIO Calxeda XGMAC";
-+}
-+
-+static const TypeInfo vfio_calxeda_xgmac_dev_info = {
-+    .name = TYPE_VFIO_CALXEDA_XGMAC,
-+    .parent = TYPE_VFIO_PLATFORM,
-+    .instance_size = sizeof(VFIOCalxedaXgmacDevice),
-+    .class_init = vfio_calxeda_xgmac_class_init,
-+    .class_size = sizeof(VFIOCalxedaXgmacDeviceClass),
-+};
-+
-+static void register_calxeda_xgmac_dev_type(void)
-+{
-+    type_register_static(&vfio_calxeda_xgmac_dev_info);
-+}
-+
-+type_init(register_calxeda_xgmac_dev_type)
-diff --git a/include/hw/vfio/vfio-calxeda-xgmac.h b/include/hw/vfio/vfio-calxeda-xgmac.h
-new file mode 100644
-index 0000000..f994775
---- /dev/null
-+++ b/include/hw/vfio/vfio-calxeda-xgmac.h
-@@ -0,0 +1,46 @@
-+/*
-+ * VFIO calxeda xgmac device
-+ *
-+ * Copyright Linaro Limited, 2014
-+ *
-+ * Authors:
-+ *  Eric Auger <eric.auger@linaro.org>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#ifndef HW_VFIO_VFIO_CALXEDA_XGMAC_H
-+#define HW_VFIO_VFIO_CALXEDA_XGMAC_H
-+
-+#include "hw/vfio/vfio-platform.h"
-+
-+#define TYPE_VFIO_CALXEDA_XGMAC "vfio-calxeda-xgmac"
-+
-+/**
-+ * This device exposes:
-+ * - a single MMIO region corresponding to its register space
-+ * - 3 IRQS (main and 2 power related IRQs)
-+ */
-+typedef struct VFIOCalxedaXgmacDevice {
-+    VFIOPlatformDevice vdev;
-+} VFIOCalxedaXgmacDevice;
-+
-+typedef struct VFIOCalxedaXgmacDeviceClass {
-+    /*< private >*/
-+    VFIOPlatformDeviceClass parent_class;
-+    /*< public >*/
-+    DeviceRealize parent_realize;
-+} VFIOCalxedaXgmacDeviceClass;
-+
-+#define VFIO_CALXEDA_XGMAC_DEVICE(obj) \
-+     OBJECT_CHECK(VFIOCalxedaXgmacDevice, (obj), TYPE_VFIO_CALXEDA_XGMAC)
-+#define VFIO_CALXEDA_XGMAC_DEVICE_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(VFIOCalxedaXgmacDeviceClass, (klass), \
-+                        TYPE_VFIO_CALXEDA_XGMAC)
-+#define VFIO_CALXEDA_XGMAC_DEVICE_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(VFIOCalxedaXgmacDeviceClass, (obj), \
-+                      TYPE_VFIO_CALXEDA_XGMAC)
-+
-+#endif
++    for (i = 0; i < s->num_irq - GIC_INTERNAL; i++) {
++        qemu_irq irq = qdev_get_gpio_in(dev, i);
++        kvm_irqchip_set_qemuirq_gsi(kvm_state, irq, i);
++    }
+     /* We never use our outbound IRQ lines but provide them so that
+      * we maintain the same interface as the non-KVM GIC.
+      */
 -- 
 1.8.3.2
