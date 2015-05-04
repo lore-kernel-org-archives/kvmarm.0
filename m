@@ -1,76 +1,94 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] kvm: remove one useless check extension
-Date: Mon, 04 May 2015 11:24:22 +0200
-Message-ID: <55473AC6.6020206@redhat.com>
-References: <1430707729-8175-1-git-send-email-tiejun.chen@intel.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [RFC v2 0/4] VFIO Platform device featuring IRQ forwarding
+Date: Mon,  4 May 2015 13:49:54 +0100
+Message-ID: <1430743798-8839-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1430707729-8175-1-git-send-email-tiejun.chen@intel.com>
-Sender: kvm-owner@vger.kernel.org
-To: Tiejun Chen <tiejun.chen@intel.com>
-Cc: kvm@vger.kernel.org, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <Marc.Zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 467B24F789
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 May 2015 08:41:26 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id aZF4oagtdQRS for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 May 2015 08:41:24 -0400 (EDT)
+Received: from mail-wi0-f170.google.com (mail-wi0-f170.google.com
+ [209.85.212.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 460FF4F781
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 May 2015 08:41:23 -0400 (EDT)
+Received: by wief7 with SMTP id f7so76796662wie.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 May 2015 05:50:05 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, alex.williamson@redhat.com
+Cc: kvmarm@lists.cs.columbia.edu, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+This series adds IRQ forwarding support in the VFIO platform device.
+
+The VFIO platform device uses the KVM-VFIO device to enable IRQ forwarding.
+
+Dependency List:
+- QEMU KVM platform device passthrough and its dependencies
+  see https://lists.gnu.org/archive/html/qemu-devel/2015-04/msg04379.html
+- kernel forwarding series:
+  see (https://www.mail-archive.com/kvm@vger.kernel.org/msg115253.html)
+
+Repos:
+- QEMU pieces can be found at:
+  http://git.linaro.org/people/eric.auger/qemu.git
+  (branch vfio_integ_v15_fwd)
+- kernel pieces can be found at:
+  http://git.linaro.org/people/eric.auger/linux.git
+  (branch 4.1-rc1_forward)
+
+The patch series was tested on Calxeda Midway (ARMv7) where one xgmac
+is assigned to KVM host while the second one is assigned to the guest.
+Reworked PCI device is not tested.
+
+Wiki for Calxeda Midway setup:
+https://wiki.linaro.org/LEG/Engineering/Virtualization/Platform_Device_Passthrough_on_Midway
+
+History:
+
+v1 -> v2:
+- update following
+  x introduction of kvm qemu_irq/gsi hash table
+  x new irq connect notifier
+  x 2 stage eventfd/irqfd setup which complexifies irq forwarding setup
+
+v1:
+- that code originally was in KVM platform device passthrough series (v8),
+  now moved in a separate RFC since dependent on many RFCs.
+
+Best Regards
+
+Eric
 
 
-On 04/05/2015 04:48, Tiejun Chen wrote:
-> We already check KVM_CAP_IRQFD in generic once enable CONFIG_HAVE_KVM_IRQFD,
-> 
-> kvm_vm_ioctl_check_extension_generic()
->     |
->     + switch (arg) {
->     +   ...
->     +   #ifdef CONFIG_HAVE_KVM_IRQFD
->     +       case KVM_CAP_IRQFD:
->     +   #endif
->     +   ...
->     +   return 1;
->     +   ...
->     + }
->     |
->     + kvm_vm_ioctl_check_extension()
-> 
-> So its not necessary to check this in arch again, and also fix one typo,
-> s/emlation/emulation.
-> 
-> Signed-off-by: Tiejun Chen <tiejun.chen@intel.com>
-> ---
->  arch/arm/kvm/arm.c       | 1 -
->  include/uapi/linux/kvm.h | 2 +-
->  2 files changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index d9631ec..483b5d1 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -171,7 +171,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	int r;
->  	switch (ext) {
->  	case KVM_CAP_IRQCHIP:
-> -	case KVM_CAP_IRQFD:
->  	case KVM_CAP_IOEVENTFD:
->  	case KVM_CAP_DEVICE_CTRL:
->  	case KVM_CAP_USER_MEMORY:
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 4b60056..2fa7302 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -894,7 +894,7 @@ struct kvm_xen_hvm_config {
->   *
->   * KVM_IRQFD_FLAG_RESAMPLE indicates resamplefd is valid and specifies
->   * the irqfd to operate in resampling mode for level triggered interrupt
-> - * emlation.  See Documentation/virtual/kvm/api.txt.
-> + * emulation.  See Documentation/virtual/kvm/api.txt.
->   */
->  #define KVM_IRQFD_FLAG_RESAMPLE (1 << 1)
->  
-> 
+Eric Auger (4):
+  linux-headers: Update KVM header for KVM-VFIO FORWARD/UNFORWARD
+  hw/vfio/common: vfio_kvm_device_fd moved in the common header
+  kvm: add kvm_vfio_get_device_irq
+  hw/vfio/platform: add forwarded irq support
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+ hw/vfio/common.c                |   2 +-
+ hw/vfio/platform.c              | 103 +++++++++++++++++++++++++++++++++++++---
+ include/hw/vfio/vfio-common.h   |   4 ++
+ include/hw/vfio/vfio-platform.h |   3 ++
+ include/sysemu/kvm.h            |   5 ++
+ kvm-all.c                       |  32 +++++++++++++
+ linux-headers/linux/kvm.h       |  12 +++++
+ trace-events                    |   1 +
+ 8 files changed, 154 insertions(+), 8 deletions(-)
 
-Christoffer/Marc, please apply to the ARM tree in order to avoid
-pointless conflicts in kvm_vm_ioctl_check_extension.
-
-Paolo
+-- 
+1.8.3.2
