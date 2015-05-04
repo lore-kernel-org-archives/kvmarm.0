@@ -1,24 +1,27 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC v2 0/4] VFIO Platform device featuring IRQ forwarding
-Date: Mon,  4 May 2015 13:49:54 +0100
-Message-ID: <1430743798-8839-1-git-send-email-eric.auger@linaro.org>
+Subject: [RFC v2 1/4] linux-headers: Update KVM header for KVM-VFIO
+ FORWARD/UNFORWARD
+Date: Mon,  4 May 2015 13:49:55 +0100
+Message-ID: <1430743798-8839-2-git-send-email-eric.auger@linaro.org>
+References: <1430743798-8839-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 467B24F789
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 449CD4F787
  for <kvmarm@lists.cs.columbia.edu>; Mon,  4 May 2015 08:41:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aZF4oagtdQRS for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 May 2015 08:41:24 -0400 (EDT)
-Received: from mail-wi0-f170.google.com (mail-wi0-f170.google.com
- [209.85.212.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 460FF4F781
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 May 2015 08:41:23 -0400 (EDT)
-Received: by wief7 with SMTP id f7so76796662wie.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 May 2015 05:50:05 -0700 (PDT)
+ with ESMTP id YtUqqcfgaMH4 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 May 2015 08:41:25 -0400 (EDT)
+Received: from mail-wi0-f180.google.com (mail-wi0-f180.google.com
+ [209.85.212.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 184DC4F786
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 May 2015 08:41:24 -0400 (EDT)
+Received: by widdi4 with SMTP id di4so120155418wid.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 May 2015 05:50:06 -0700 (PDT)
+In-Reply-To: <1430743798-8839-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,63 +35,46 @@ To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, alex.willia
 Cc: kvmarm@lists.cs.columbia.edu, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series adds IRQ forwarding support in the VFIO platform device.
+Integrate updated KVM-VFIO API related to forwarded IRQ
 
-The VFIO platform device uses the KVM-VFIO device to enable IRQ forwarding.
+Update the kvm header according to the header found in
+http://git.linaro.org/people/eric.auger/linux.git
+branch 4.1-rc1_forward
 
-Dependency List:
-- QEMU KVM platform device passthrough and its dependencies
-  see https://lists.gnu.org/archive/html/qemu-devel/2015-04/msg04379.html
-- kernel forwarding series:
-  see (https://www.mail-archive.com/kvm@vger.kernel.org/msg115253.html)
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
+---
+ linux-headers/linux/kvm.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Repos:
-- QEMU pieces can be found at:
-  http://git.linaro.org/people/eric.auger/qemu.git
-  (branch vfio_integ_v15_fwd)
-- kernel pieces can be found at:
-  http://git.linaro.org/people/eric.auger/linux.git
-  (branch 4.1-rc1_forward)
-
-The patch series was tested on Calxeda Midway (ARMv7) where one xgmac
-is assigned to KVM host while the second one is assigned to the guest.
-Reworked PCI device is not tested.
-
-Wiki for Calxeda Midway setup:
-https://wiki.linaro.org/LEG/Engineering/Virtualization/Platform_Device_Passthrough_on_Midway
-
-History:
-
-v1 -> v2:
-- update following
-  x introduction of kvm qemu_irq/gsi hash table
-  x new irq connect notifier
-  x 2 stage eventfd/irqfd setup which complexifies irq forwarding setup
-
-v1:
-- that code originally was in KVM platform device passthrough series (v8),
-  now moved in a separate RFC since dependent on many RFCs.
-
-Best Regards
-
-Eric
-
-
-Eric Auger (4):
-  linux-headers: Update KVM header for KVM-VFIO FORWARD/UNFORWARD
-  hw/vfio/common: vfio_kvm_device_fd moved in the common header
-  kvm: add kvm_vfio_get_device_irq
-  hw/vfio/platform: add forwarded irq support
-
- hw/vfio/common.c                |   2 +-
- hw/vfio/platform.c              | 103 +++++++++++++++++++++++++++++++++++++---
- include/hw/vfio/vfio-common.h   |   4 ++
- include/hw/vfio/vfio-platform.h |   3 ++
- include/sysemu/kvm.h            |   5 ++
- kvm-all.c                       |  32 +++++++++++++
- linux-headers/linux/kvm.h       |  12 +++++
- trace-events                    |   1 +
- 8 files changed, 154 insertions(+), 8 deletions(-)
-
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index b96d978..95fea92 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -999,6 +999,9 @@ struct kvm_device_attr {
+ #define  KVM_DEV_VFIO_GROUP			1
+ #define   KVM_DEV_VFIO_GROUP_ADD			1
+ #define   KVM_DEV_VFIO_GROUP_DEL			2
++#define  KVM_DEV_VFIO_DEVICE			2
++#define   KVM_DEV_VFIO_DEVICE_FORWARD_IRQ			1
++#define   KVM_DEV_VFIO_DEVICE_UNFORWARD_IRQ			2
+ 
+ enum kvm_device_type {
+ 	KVM_DEV_TYPE_FSL_MPIC_20	= 1,
+@@ -1018,6 +1021,15 @@ enum kvm_device_type {
+ 	KVM_DEV_TYPE_MAX,
+ };
+ 
++struct kvm_vfio_dev_irq {
++	__u32	argsz;		/* structure length */
++	__u32	fd;		/* file descriptor of the VFIO device */
++	__u32	index;		/* VFIO device IRQ index */
++	__u32	start;		/* start of subindex range */
++	__u32	count;		/* size of subindex range */
++	__u32	gsi[];		/* gsi, ie. virtual IRQ number */
++};
++
+ /*
+  * ioctls for VM fds
+  */
 -- 
 1.8.3.2
