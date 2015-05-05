@@ -1,63 +1,126 @@
 From: =?UTF-8?q?J=C3=A9r=C3=A9my=20Fangu=C3=A8de?=
- <j.fanguede@virtualopensystems.com>
-Subject: [RFC 0/4] arm/arm64: KVM: Get around cache incoherency
-Date: Tue,  5 May 2015 11:13:43 +0200
-Message-ID: <1430817227-6278-1-git-send-email-j.fanguede@virtualopensystems.com>
+	<j.fanguede@virtualopensystems.com>
+Subject: [RFC 2/4] target-arm/kvm: Flush data cache support
+Date: Tue,  5 May 2015 11:13:45 +0200
+Message-ID: <1430817227-6278-3-git-send-email-j.fanguede@virtualopensystems.com>
+References: <1430817227-6278-1-git-send-email-j.fanguede@virtualopensystems.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 37FE14F8E8
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2015 05:05:10 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zIq9NCkzFQRa for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 May 2015 05:05:09 -0400 (EDT)
-Received: from mail-wi0-f178.google.com (mail-wi0-f178.google.com
- [209.85.212.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 32CBE4F8B7
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2015 05:05:09 -0400 (EDT)
-Received: by wizk4 with SMTP id k4so152033839wiz.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 05 May 2015 02:13:53 -0700 (PDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1430817227-6278-1-git-send-email-j.fanguede@virtualopensystems.com>
+Sender: kvm-owner@vger.kernel.org
 To: qemu-devel@nongnu.org
-Cc: tech@virtualopensystems.com, kvmarm@lists.cs.columbia.edu
+Cc: kvmarm@lists.cs.columbia.edu, tech@virtualopensystems.com, =?UTF-8?q?J=C3=A9r=C3=A9my=20Fangu=C3=A8de?= <j.fanguede@virtualopensystems.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, "open list:Overall" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhpcyBSRkMgc2VyaWVzIHNob3dzIGhvdyB3ZSBjYW4gc29sdmUgY2FjaGUgaW5jb2hlbnJlbmN5
-IGlzc3VlcyBvbgpBUk0vQVJNNjQuIFRoaXMgaW1wbGVtZW50YXRpb24gdXNlcyBhbiBpb2N0bCB0
-aGF0IGZsdXNoZXMgdGhlIGRhdGEKY2FjaGUgZm9yIGEgZ2l2ZW4gcmFuZ2Ugb2YgdGhlIGd1ZXN0
-IHBoeXNpY2FsIG1lbW9yeSwgdGhpcyBwb3NzaWJsZQpzb2x1dGlvbiB3YXMgYWxyZWFkeSBicm9h
-Y2hlZCBpbiB0aGUgcHJldmlvdXMgZGlzY3Vzc2lvbiBbMV1bMl0uCgpFYWNoIGFjY2VzcyAocmVh
-ZCBvciB3cml0ZSkgdG8gdGhlIGd1ZXN0IG1lbW9yeSB0aGF0IGNvdWxkIGxlYWQgdG8KaW5jb25z
-aXN0ZW5jeSBpcyBmbHVzaGVkIGlmIG5lZWRlZC4gQSBsaWdodCBvcHRpbWl6YXRpb24gaXMgZG9u
-ZSB0bwptaW5pbWl6ZSB0aGUgaW9jdGwgY2FsbC4KCkN1cnJlbnRseSB0ZXN0ZWQgd2l0aCB0aGUg
-Zm9sbG93aW5nIGRldmljZXM6IGUxMDAwLCBtZWdhc2FzLApsc2k1M2M4OTVhLCBuZWMtdXNiLXho
-Y2ksIHVzYi1laGNpICh3aXRoIHVzYi1ob3N0LCB1c2ItdGFibGV0LCB1c2Ita2JkCmFuZCB1c2It
-bW91c2UpLCB3aGljaCB3ZXJlIGZhaWxsaW5nIHdpdGggS1ZNIGFuZCBub3cgd29yayBmaW5lIHdp
-dGgKdGhpcyBwYXRjaC4KClRoZSBrZXJuZWwgbmVlZHMgdGhpcyBwYXRjaDogCltSRkNdIEFSTS9B
-Uk02NDogS1ZNOiBJbXBsZW1lbnQgS1ZNX0ZMVVNIX0RDQUNIRV9HUEEgaW9jdGwKClsxXSBodHRw
-czovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9waXBlcm1haWwva3ZtYXJtLzIwMTUtRmVicnVhcnkv
-MDEzNTkzLmh0bWwKWzJdIGh0dHBzOi8vbGlzdHMubm9uZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVt
-dS1kZXZlbC8yMDE1LTAzL21zZzAxMjU0Lmh0bWwKCkrDqXLDqW15IEZhbmd1w6hkZSAoNCk6CiAg
-bGludXgtaGVhZGVycyB1cGRhdGUKICB0YXJnZXQtYXJtL2t2bTogRmx1c2ggZGF0YSBjYWNoZSBz
-dXBwb3J0CiAga3ZtLWFsbDogUHJlLXJ1biBjYWNoZSBjb2hlcmVuY3kgbWFpbnRlbmFuY2UKICBl
-eGVjOiBGbHVzaCBkYXRhIGNhY2hlIHdoZW4gbmVlZGVkCgogZXhlYy5jICAgICAgICAgICAgICAg
-ICAgICB8IDE5ICsrKysrKysrKysrKysrKysrKwogaW5jbHVkZS9zeXNlbXUva3ZtLmggICAgICB8
-ICAzICsrKwoga3ZtLWFsbC5jICAgICAgICAgICAgICAgICB8ICAxICsKIGxpbnV4LWhlYWRlcnMv
-bGludXgva3ZtLmggfCAgNiArKysrKysKIHN0dWJzL2t2bS5jICAgICAgICAgICAgICAgfCAgOSAr
-KysrKysrKysKIHRhcmdldC1hcm0va3ZtLmMgICAgICAgICAgfCA1MSArKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwogNiBmaWxlcyBjaGFuZ2VkLCA4OSBpbnNl
-cnRpb25zKCspCgotLSAKMS45LjEKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlh
-LmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFy
-bQo=
+Implement data cache maintenance coherency functions, by using
+=46LUSH_DCACHE_GPA ioctl. Introduce kvm_arm_maintain_cache_coherency()
+for flushing the data cache if necessary, a very simple logic is
+implemented to reduce number of flushes due to reads. Two wrapping
+functions are exposed, for easier usage.
+
+Signed-off-by: J=C3=A9r=C3=A9my Fangu=C3=A8de <j.fanguede@virtualopensy=
+stems.com>
+---
+ include/sysemu/kvm.h |  3 +++
+ stubs/kvm.c          |  9 +++++++++
+ target-arm/kvm.c     | 51 ++++++++++++++++++++++++++++++++++++++++++++=
++++++++
+ 3 files changed, 63 insertions(+)
+
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 197e6c0..986f365 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -451,4 +451,7 @@ int kvm_set_one_reg(CPUState *cs, uint64_t id, void=
+ *source);
+  * Returns: 0 on success, or a negative errno on failure.
+  */
+ int kvm_get_one_reg(CPUState *cs, uint64_t id, void *target);
++
++void kvm_arch_cache_flush_needed(hwaddr addr, int len, bool is_write);
++void kvm_arch_cache_coherency_pre_run(void);
+ #endif
+diff --git a/stubs/kvm.c b/stubs/kvm.c
+index e7c60b6..8ed5380 100644
+--- a/stubs/kvm.c
++++ b/stubs/kvm.c
+@@ -5,3 +5,12 @@ int kvm_arch_irqchip_create(KVMState *s)
+ {
+     return 0;
+ }
++
++
++void kvm_arch_cache_flush_needed(hwaddr addr, int len, bool is_write)
++{
++}
++
++void kvm_arch_cache_coherency_pre_run(void)
++{
++}
+diff --git a/target-arm/kvm.c b/target-arm/kvm.c
+index fdd9ba3..548dae2 100644
+--- a/target-arm/kvm.c
++++ b/target-arm/kvm.c
+@@ -598,3 +598,54 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routin=
+g_entry *route,
+ {
+     return 0;
+ }
++
++static void kvm_arm_flush_cache_addr(hwaddr addr, int len)
++{
++    int ret;
++    struct kvm_mem_addr mem_addr;
++    mem_addr.addr =3D addr;
++    mem_addr.len =3D len;
++    ret =3D kvm_vm_ioctl(kvm_state, KVM_FLUSH_DCACHE_GPA, &mem_addr);
++    if (ret) {
++        fprintf(stderr, "error: Failed to flush CPU caches %d\n", ret)=
+;
++    }
++}
++
++static void kvm_arm_maintain_cache_coherency(hwaddr addr, int len,
++                                             bool enter_guest, bool is=
+_write)
++{
++    static hwaddr prev_addr;
++    static int prev_len;
++    hwaddr end_line, prev_end_line;
++
++    if (enter_guest) {
++        /* We will return to the guest after that, restore the default
++           configuration */
++        prev_addr =3D 0x0;
++        return;
++    }
++
++    /* Assume the minimal CPU cache line is 32 B */
++    end_line =3D (addr + len) & ~0x1f;
++    prev_end_line =3D (prev_addr + prev_len) & ~0x1f;
++
++    /* Don't flush two times in a row the same line"
++       Always flush on a write */
++    if ((prev_addr & ~0x1f) !=3D (addr & ~0x1f)
++        || (prev_end_line < end_line)
++        || is_write) {
++        kvm_arm_flush_cache_addr(addr, len);
++        prev_addr =3D addr;
++        prev_len =3D len;
++    }
++}
++
++void kvm_arch_cache_flush_needed(hwaddr addr, int len, bool is_write)
++{
++    kvm_arm_maintain_cache_coherency(addr, len, false, is_write);
++}
++
++void kvm_arch_cache_coherency_pre_run(void)
++{
++    kvm_arm_maintain_cache_coherency(0, 0, true, false);
++}
+--=20
+1.9.1
+
