@@ -1,83 +1,63 @@
 From: =?UTF-8?q?J=C3=A9r=C3=A9my=20Fangu=C3=A8de?=
-	<j.fanguede@virtualopensystems.com>
-Subject: [RFC] ARM/ARM64: KVM: Implement KVM_FLUSH_DCACHE_GPA ioctl
-Date: Tue,  5 May 2015 11:13:11 +0200
-Message-ID: <1430817191-6231-1-git-send-email-j.fanguede@virtualopensystems.com>
+ <j.fanguede@virtualopensystems.com>
+Subject: [RFC 0/4] arm/arm64: KVM: Get around cache incoherency
+Date: Tue,  5 May 2015 11:13:43 +0200
+Message-ID: <1430817227-6278-1-git-send-email-j.fanguede@virtualopensystems.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, qemu-devel@nongnu.org, tech@virtualopensystems.com, =?UTF-8?q?J=C3=A9r=C3=A9my=20Fangu=C3=A8de?= <j.fanguede@virtualopensystems.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 37FE14F8E8
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2015 05:05:10 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id zIq9NCkzFQRa for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 May 2015 05:05:09 -0400 (EDT)
+Received: from mail-wi0-f178.google.com (mail-wi0-f178.google.com
+ [209.85.212.178])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 32CBE4F8B7
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2015 05:05:09 -0400 (EDT)
+Received: by wizk4 with SMTP id k4so152033839wiz.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 May 2015 02:13:53 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: qemu-devel@nongnu.org
+Cc: tech@virtualopensystems.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To maintain cache coherency on ARM, we may need a mechanism to flush
-the data cache.
-
-This patch implements KVM_FLUSH_DCACHE_GPA vm ioctl which flushes the
-data cache at a specified address range. The input argument is a
-struct kvm_mem_addr containing the guest physical address and the
-length.
-
-Signed-off-by: J=C3=A9r=C3=A9my Fangu=C3=A8de <j.fanguede@virtualopensy=
-stems.com>
----
- arch/arm/kvm/arm.c       | 13 +++++++++++++
- include/uapi/linux/kvm.h |  6 ++++++
- 2 files changed, 19 insertions(+)
-
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index d9631ec..8638fd2 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -886,6 +886,19 @@ long kvm_arch_vm_ioctl(struct file *filp,
-=20
- 		return 0;
- 	}
-+	case KVM_FLUSH_DCACHE_GPA: {
-+		struct kvm_mem_addr mem_addr;
-+		hva_t hva;
-+		gpa_t gpa;
-+
-+		if (copy_from_user(&mem_addr, argp, sizeof(mem_addr)))
-+			return -EFAULT;
-+
-+		gpa =3D mem_addr.addr;
-+		hva =3D gfn_to_hva(kvm, gpa_to_gfn(gpa)) | (gpa & ~PAGE_MASK);
-+		kvm_flush_dcache_to_poc((void *)hva, mem_addr.len);
-+		return 0;
-+	}
- 	default:
- 		return -EINVAL;
- 	}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 4b60056..3bc599e 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -978,6 +978,11 @@ struct kvm_arm_device_addr {
- 	__u64 addr;
- };
-=20
-+struct kvm_mem_addr {
-+	__u64 addr;
-+	__u32 len;
-+};
-+
- /*
-  * Device control API, available with KVM_CAP_DEVICE_CTRL
-  */
-@@ -1199,6 +1204,7 @@ struct kvm_s390_ucas_mapping {
- /* Available with KVM_CAP_S390_IRQ_STATE */
- #define KVM_S390_SET_IRQ_STATE	  _IOW(KVMIO, 0xb5, struct kvm_s390_irq=
-_state)
- #define KVM_S390_GET_IRQ_STATE	  _IOW(KVMIO, 0xb6, struct kvm_s390_irq=
-_state)
-+#define KVM_FLUSH_DCACHE_GPA     _IOW(KVMIO,  0xb7, struct kvm_mem_add=
-r)
-=20
- #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
- #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
---=20
-1.9.1
-
+VGhpcyBSRkMgc2VyaWVzIHNob3dzIGhvdyB3ZSBjYW4gc29sdmUgY2FjaGUgaW5jb2hlbnJlbmN5
+IGlzc3VlcyBvbgpBUk0vQVJNNjQuIFRoaXMgaW1wbGVtZW50YXRpb24gdXNlcyBhbiBpb2N0bCB0
+aGF0IGZsdXNoZXMgdGhlIGRhdGEKY2FjaGUgZm9yIGEgZ2l2ZW4gcmFuZ2Ugb2YgdGhlIGd1ZXN0
+IHBoeXNpY2FsIG1lbW9yeSwgdGhpcyBwb3NzaWJsZQpzb2x1dGlvbiB3YXMgYWxyZWFkeSBicm9h
+Y2hlZCBpbiB0aGUgcHJldmlvdXMgZGlzY3Vzc2lvbiBbMV1bMl0uCgpFYWNoIGFjY2VzcyAocmVh
+ZCBvciB3cml0ZSkgdG8gdGhlIGd1ZXN0IG1lbW9yeSB0aGF0IGNvdWxkIGxlYWQgdG8KaW5jb25z
+aXN0ZW5jeSBpcyBmbHVzaGVkIGlmIG5lZWRlZC4gQSBsaWdodCBvcHRpbWl6YXRpb24gaXMgZG9u
+ZSB0bwptaW5pbWl6ZSB0aGUgaW9jdGwgY2FsbC4KCkN1cnJlbnRseSB0ZXN0ZWQgd2l0aCB0aGUg
+Zm9sbG93aW5nIGRldmljZXM6IGUxMDAwLCBtZWdhc2FzLApsc2k1M2M4OTVhLCBuZWMtdXNiLXho
+Y2ksIHVzYi1laGNpICh3aXRoIHVzYi1ob3N0LCB1c2ItdGFibGV0LCB1c2Ita2JkCmFuZCB1c2It
+bW91c2UpLCB3aGljaCB3ZXJlIGZhaWxsaW5nIHdpdGggS1ZNIGFuZCBub3cgd29yayBmaW5lIHdp
+dGgKdGhpcyBwYXRjaC4KClRoZSBrZXJuZWwgbmVlZHMgdGhpcyBwYXRjaDogCltSRkNdIEFSTS9B
+Uk02NDogS1ZNOiBJbXBsZW1lbnQgS1ZNX0ZMVVNIX0RDQUNIRV9HUEEgaW9jdGwKClsxXSBodHRw
+czovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9waXBlcm1haWwva3ZtYXJtLzIwMTUtRmVicnVhcnkv
+MDEzNTkzLmh0bWwKWzJdIGh0dHBzOi8vbGlzdHMubm9uZ251Lm9yZy9hcmNoaXZlL2h0bWwvcWVt
+dS1kZXZlbC8yMDE1LTAzL21zZzAxMjU0Lmh0bWwKCkrDqXLDqW15IEZhbmd1w6hkZSAoNCk6CiAg
+bGludXgtaGVhZGVycyB1cGRhdGUKICB0YXJnZXQtYXJtL2t2bTogRmx1c2ggZGF0YSBjYWNoZSBz
+dXBwb3J0CiAga3ZtLWFsbDogUHJlLXJ1biBjYWNoZSBjb2hlcmVuY3kgbWFpbnRlbmFuY2UKICBl
+eGVjOiBGbHVzaCBkYXRhIGNhY2hlIHdoZW4gbmVlZGVkCgogZXhlYy5jICAgICAgICAgICAgICAg
+ICAgICB8IDE5ICsrKysrKysrKysrKysrKysrKwogaW5jbHVkZS9zeXNlbXUva3ZtLmggICAgICB8
+ICAzICsrKwoga3ZtLWFsbC5jICAgICAgICAgICAgICAgICB8ICAxICsKIGxpbnV4LWhlYWRlcnMv
+bGludXgva3ZtLmggfCAgNiArKysrKysKIHN0dWJzL2t2bS5jICAgICAgICAgICAgICAgfCAgOSAr
+KysrKysrKysKIHRhcmdldC1hcm0va3ZtLmMgICAgICAgICAgfCA1MSArKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwogNiBmaWxlcyBjaGFuZ2VkLCA4OSBpbnNl
+cnRpb25zKCspCgotLSAKMS45LjEKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlh
+LmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFy
+bQo=
