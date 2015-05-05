@@ -1,39 +1,81 @@
 From: =?UTF-8?q?J=C3=A9r=C3=A9my=20Fangu=C3=A8de?=
-	<j.fanguede@virtualopensystems.com>
-Subject: [RFC 3/4] kvm-all: Pre-run cache coherency maintenance
-Date: Tue,  5 May 2015 11:13:46 +0200
-Message-ID: <1430817227-6278-4-git-send-email-j.fanguede@virtualopensystems.com>
+ <j.fanguede@virtualopensystems.com>
+Subject: [RFC 4/4] exec: Flush data cache when needed
+Date: Tue,  5 May 2015 11:13:47 +0200
+Message-ID: <1430817227-6278-5-git-send-email-j.fanguede@virtualopensystems.com>
 References: <1430817227-6278-1-git-send-email-j.fanguede@virtualopensystems.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BC4644F91E
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2015 05:05:27 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id EzIcgvfL0hWO for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 May 2015 05:05:27 -0400 (EDT)
+Received: from mail-wg0-f46.google.com (mail-wg0-f46.google.com [74.125.82.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4104D4F923
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2015 05:05:24 -0400 (EDT)
+Received: by wgiu9 with SMTP id u9so12306544wgi.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 May 2015 02:14:08 -0700 (PDT)
 In-Reply-To: <1430817227-6278-1-git-send-email-j.fanguede@virtualopensystems.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: qemu-devel@nongnu.org
-Cc: kvmarm@lists.cs.columbia.edu, tech@virtualopensystems.com, =?UTF-8?q?J=C3=A9r=C3=A9my=20Fangu=C3=A8de?= <j.fanguede@virtualopensystems.com>, Paolo Bonzini <pbonzini@redhat.com>, "open list:Overall" <kvm@vger.kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, tech@virtualopensystems.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Inform the cache coherency maintenance of an exit from userspace.
-
-Signed-off-by: J=C3=A9r=C3=A9my Fangu=C3=A8de <j.fanguede@virtualopensy=
-stems.com>
----
- kvm-all.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/kvm-all.c b/kvm-all.c
-index 28f4589..c4b15b0 100644
---- a/kvm-all.c
-+++ b/kvm-all.c
-@@ -1802,6 +1802,7 @@ int kvm_cpu_exec(CPUState *cpu)
-         }
-=20
-         kvm_arch_pre_run(cpu, run);
-+        kvm_arch_cache_coherency_pre_run();
-         if (cpu->exit_request) {
-             DPRINTF("interrupt exit requested\n");
-             /*
---=20
-1.9.1
-
+Rmx1c2ggdGhlIGRhdGEgY2FjaGUgd2hlbiBhY2Nlc3NlcyBvY2N1ciBpbiB0aGUgZ3Vlc3QgcmFt
+IG1lbW9yeS4KClNpZ25lZC1vZmYtYnk6IErDqXLDqW15IEZhbmd1w6hkZSA8ai5mYW5ndWVkZUB2
+aXJ0dWFsb3BlbnN5c3RlbXMuY29tPgotLS0KIGV4ZWMuYyB8IDE5ICsrKysrKysrKysrKysrKysr
+KysKIDEgZmlsZSBjaGFuZ2VkLCAxOSBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvZXhlYy5j
+IGIvZXhlYy5jCmluZGV4IGFlMzdiOTguLjBmODU5YTMgMTAwNjQ0Ci0tLSBhL2V4ZWMuYworKysg
+Yi9leGVjLmMKQEAgLTIzNzIsNiArMjM3Miw5IEBAIE1lbVR4UmVzdWx0IGFkZHJlc3Nfc3BhY2Vf
+cncoQWRkcmVzc1NwYWNlICphcywgaHdhZGRyIGFkZHIsIE1lbVR4QXR0cnMgYXR0cnMsCiAgICAg
+ICAgICAgICAgICAgcHRyID0gcWVtdV9nZXRfcmFtX3B0cihhZGRyMSk7CiAgICAgICAgICAgICAg
+ICAgbWVtY3B5KHB0ciwgYnVmLCBsKTsKICAgICAgICAgICAgICAgICBpbnZhbGlkYXRlX2FuZF9z
+ZXRfZGlydHkoYWRkcjEsIGwpOworICAgICAgICAgICAgICAgIGlmIChrdm1fZW5hYmxlZCgpKSB7
+CisgICAgICAgICAgICAgICAgICAgIGt2bV9hcmNoX2NhY2hlX2ZsdXNoX25lZWRlZChhZGRyLCBs
+LCBpc193cml0ZSk7CisgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgfQogICAgICAgICB9
+IGVsc2UgewogICAgICAgICAgICAgaWYgKCFtZW1vcnlfYWNjZXNzX2lzX2RpcmVjdChtciwgaXNf
+d3JpdGUpKSB7CkBAIC0yNDA4LDYgKzI0MTEsOSBAQCBNZW1UeFJlc3VsdCBhZGRyZXNzX3NwYWNl
+X3J3KEFkZHJlc3NTcGFjZSAqYXMsIGh3YWRkciBhZGRyLCBNZW1UeEF0dHJzIGF0dHJzLAogICAg
+ICAgICAgICAgfSBlbHNlIHsKICAgICAgICAgICAgICAgICAvKiBSQU0gY2FzZSAqLwogICAgICAg
+ICAgICAgICAgIHB0ciA9IHFlbXVfZ2V0X3JhbV9wdHIobXItPnJhbV9hZGRyICsgYWRkcjEpOwor
+ICAgICAgICAgICAgICAgIGlmIChrdm1fZW5hYmxlZCgpKSB7CisgICAgICAgICAgICAgICAgICAg
+IGt2bV9hcmNoX2NhY2hlX2ZsdXNoX25lZWRlZChhZGRyLCBsLCBpc193cml0ZSk7CisgICAgICAg
+ICAgICAgICAgfQogICAgICAgICAgICAgICAgIG1lbWNweShidWYsIHB0ciwgbCk7CiAgICAgICAg
+ICAgICB9CiAgICAgICAgIH0KQEAgLTI2NDYsNiArMjY1MiwxNCBAQCB2b2lkICphZGRyZXNzX3Nw
+YWNlX21hcChBZGRyZXNzU3BhY2UgKmFzLAogICAgICAgICByZXR1cm4gYm91bmNlLmJ1ZmZlcjsK
+ICAgICB9CiAKKyAgICAvKiBOZWVkIHRvIGJlIGZsdXNoZWQgb25seSBpZiB3ZSBhcmUgcmVhZGlu
+ZyAqLworICAgIGlmICghaXNfd3JpdGUpIHsKKyAgICAgICAgLyogRG9uJ3QgZmx1c2ggaWYgaXQn
+cyBhIGNwdV9waHlzaWNhbF9tZW1vcnlfbWFwIGNhbGwgKi8KKyAgICAgICAgaWYgKGt2bV9lbmFi
+bGVkKCkgJiYgYXMgIT0gJmFkZHJlc3Nfc3BhY2VfbWVtb3J5KSB7CisgICAgICAgICAgICBrdm1f
+YXJjaF9jYWNoZV9mbHVzaF9uZWVkZWQoYWRkciwgbCwgaXNfd3JpdGUpOworICAgICAgICB9Cisg
+ICAgfQorCiAgICAgYmFzZSA9IHhsYXQ7CiAgICAgcmFkZHIgPSBtZW1vcnlfcmVnaW9uX2dldF9y
+YW1fYWRkcihtcik7CiAKQEAgLTI2NzksNiArMjY5Myw3IEBAIHZvaWQgYWRkcmVzc19zcGFjZV91
+bm1hcChBZGRyZXNzU3BhY2UgKmFzLCB2b2lkICpidWZmZXIsIGh3YWRkciBsZW4sCiAgICAgaWYg
+KGJ1ZmZlciAhPSBib3VuY2UuYnVmZmVyKSB7CiAgICAgICAgIE1lbW9yeVJlZ2lvbiAqbXI7CiAg
+ICAgICAgIHJhbV9hZGRyX3QgYWRkcjE7CisgICAgICAgIGh3YWRkciBiYXNlOwogCiAgICAgICAg
+IG1yID0gcWVtdV9yYW1fYWRkcl9mcm9tX2hvc3QoYnVmZmVyLCAmYWRkcjEpOwogICAgICAgICBh
+c3NlcnQobXIgIT0gTlVMTCk7CkBAIC0yNjg4LDYgKzI3MDMsMTAgQEAgdm9pZCBhZGRyZXNzX3Nw
+YWNlX3VubWFwKEFkZHJlc3NTcGFjZSAqYXMsIHZvaWQgKmJ1ZmZlciwgaHdhZGRyIGxlbiwKICAg
+ICAgICAgaWYgKHhlbl9lbmFibGVkKCkpIHsKICAgICAgICAgICAgIHhlbl9pbnZhbGlkYXRlX21h
+cF9jYWNoZV9lbnRyeShidWZmZXIpOwogICAgICAgICB9CisgICAgICAgIGlmIChrdm1fZW5hYmxl
+ZCgpICYmIGFzICE9ICZhZGRyZXNzX3NwYWNlX21lbW9yeSkgeworICAgICAgICAgICAgYmFzZSA9
+IG9iamVjdF9wcm9wZXJ0eV9nZXRfaW50KE9CSkVDVChtciksICJhZGRyIiwgTlVMTCk7CisgICAg
+ICAgICAgICBrdm1fYXJjaF9jYWNoZV9mbHVzaF9uZWVkZWQoYWRkcjEgKyBiYXNlLCBhY2Nlc3Nf
+bGVuLCBpc193cml0ZSk7CisgICAgICAgIH0KICAgICAgICAgbWVtb3J5X3JlZ2lvbl91bnJlZiht
+cik7CiAgICAgICAgIHJldHVybjsKICAgICB9Ci0tIAoxLjkuMQoKX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1A
+bGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxt
+YW4vbGlzdGluZm8va3ZtYXJtCg==
