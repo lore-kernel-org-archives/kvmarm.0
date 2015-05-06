@@ -1,23 +1,27 @@
-From: Manu Khanna <manuk@google.com>
-Subject: EULA Request: KVM # 16274535
-Date: Tue, 5 May 2015 18:50:57 -0700
-Message-ID: <CAAbUGYZJBOCFz+QBKOiPiA8Xv=Jx7=3ejhSXNmyiaUfqH0oX8w@mail.gmail.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [RFC] ARM/ARM64: KVM: Implement KVM_FLUSH_DCACHE_GPA ioctl
+Date: Wed, 6 May 2015 16:12:49 +0200
+Message-ID: <20150506141249.GA6796@cbox>
+References: <1430817191-6231-1-git-send-email-j.fanguede@virtualopensystems.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============3587150144356557814=="
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 47907507DD
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2015 21:42:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 221685073C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 May 2015 10:04:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dEh17WFazQAo for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 May 2015 21:42:41 -0400 (EDT)
-Received: from mail-qg0-f41.google.com (mail-qg0-f41.google.com
- [209.85.192.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 81871507DA
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 May 2015 21:42:41 -0400 (EDT)
-Received: by qgdy78 with SMTP id y78so91160238qgd.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 05 May 2015 18:51:27 -0700 (PDT)
+ with ESMTP id P9+pUYz-RXPn for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 May 2015 10:04:02 -0400 (EDT)
+Received: from mail-lb0-f170.google.com (mail-lb0-f170.google.com
+ [209.85.217.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7ED65506A0
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 May 2015 10:04:02 -0400 (EDT)
+Received: by lbbuc2 with SMTP id uc2so8536000lbb.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 06 May 2015 07:12:48 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1430817191-6231-1-git-send-email-j.fanguede@virtualopensystems.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,68 +31,89 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: =?iso-8859-1?B?Suly6W15IEZhbmd16GRl?= <j.fanguede@virtualopensystems.com>
+Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, tech@virtualopensystems.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============3587150144356557814==
-Content-Type: multipart/alternative; boundary=001a11c1243288de00051560089f
+Hi J=E9r=E9my,
 
---001a11c1243288de00051560089f
-Content-Type: text/plain; charset=UTF-8
+On Tue, May 05, 2015 at 11:13:11AM +0200, J=E9r=E9my Fangu=E8de wrote:
+> To maintain cache coherency on ARM, we may need a mechanism to flush
+> the data cache.
 
-Hi there,
+In addition to generally just making this functionality available (see
+below), do you have an actual use case in mind for this?  To solve the
+VGA issue, for example, we already have a patch series from Drew trying
+to address this.  Does that not work for you?
 
-Google is interested in obtaining a license for KVM.
+There was a long discussion about this here:
+https://lists.cs.columbia.edu/pipermail/kvmarm/2015-February/013593.html
 
-Is it possible to get a copy of the EULA so we can review it?
+Drew then created a patch set, here:
+https://lists.nongnu.org/archive/html/qemu-devel/2015-03/msg01254.html
 
-Thanks,
+and replied to himself, here:
+https://www.marc.info/?l=3Dandroid-virt&m=3D142670523929132&w=3D3
 
-Manu
+Which basically says that he doesn't like having to do flushes all over
+QEMU (IIUC), so he sent this version instead:
+https://lists.cs.columbia.edu/pipermail/kvmarm/2015-March/014027.html
 
+Which he now said he'd respin.
 
-Manu Khanna | Software Procurement Specialist, US-SVL | manuk@google.com
+Meanwhile there was also the idea of simply convincing the guest to
+access devices as coherent through added DT properties etc., but I'm not
+sure where that landed.
 
---001a11c1243288de00051560089f
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+I think it would be better to agree to the overall approach before
+sending out further patches.
 
-<div dir=3D"ltr"><div class=3D"gmail_quote"><div dir=3D"ltr"><div style=3D"=
-font-size:12.8000001907349px">Hi there,</div><div style=3D"font-size:12.800=
-0001907349px"><br></div><div style=3D"font-size:12.8000001907349px">Google =
-is interested in obtaining a license for KVM.</div><div style=3D"font-size:=
-12.8000001907349px"><br></div><div style=3D"font-size:12.8000001907349px">I=
-s it possible to get a copy of the=C2=A0<span>EULA</span>=C2=A0so we can re=
-view it?</div><span class=3D""><div style=3D"font-size:12.8000001907349px">=
-<br></div><div><div><div dir=3D"ltr"><div><div dir=3D"ltr"><div dir=3D"ltr"=
-><span><p style=3D"line-height:1;margin-top:0pt;margin-bottom:0pt">Thanks,<=
-/p><p style=3D"line-height:1;margin-top:0pt;margin-bottom:0pt">Manu</p><p s=
-tyle=3D"line-height:1;margin-top:0pt;margin-bottom:0pt"><br></p><p dir=3D"l=
-tr" style=3D"line-height:1;margin-top:0pt;margin-bottom:0pt"><span style=3D=
-"color:rgb(85,85,85);font-family:sans-serif;font-size:small;line-height:19.=
-5px;border-width:2px 0px 0px;border-style:solid;border-color:rgb(213,15,37)=
-;padding-top:2px;margin-top:2px">Manu Khanna=C2=A0|</span><span style=3D"co=
-lor:rgb(85,85,85);font-family:sans-serif;font-size:small;line-height:19.5px=
-;border-width:2px 0px 0px;border-style:solid;border-color:rgb(51,105,232);p=
-adding-top:2px;margin-top:2px">=C2=A0Software Procurement Specialist, US-SV=
-L=C2=A0|</span><span style=3D"color:rgb(85,85,85);font-family:sans-serif;fo=
-nt-size:small;line-height:19.5px;border-width:2px 0px 0px;border-style:soli=
-d;border-color:rgb(0,153,57);padding-top:2px;margin-top:2px">=C2=A0<a href=
-=3D"mailto:manuk@google.com" target=3D"_blank">manuk@google.com</a></span><=
-br></p></span></div></div></div></div></div></div>
-</span></div>
-</div><br></div>
+On this particular patch, it does feel like sidestepping general kernel
+functionality for arm64 through KVM, which I think is a bit weird.  I'd
+like to hear Will and Catalin's thoughts on this before we'd go ahead
+with something like this.
 
---001a11c1243288de00051560089f--
+> =
 
---===============3587150144356557814==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+> This patch implements KVM_FLUSH_DCACHE_GPA vm ioctl which flushes the
+> data cache at a specified address range. The input argument is a
+> struct kvm_mem_addr containing the guest physical address and the
+> length.
+> =
 
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> Signed-off-by: J=E9r=E9my Fangu=E8de <j.fanguede@virtualopensystems.com>
+> ---
+>  arch/arm/kvm/arm.c       | 13 +++++++++++++
+>  include/uapi/linux/kvm.h |  6 ++++++
+>  2 files changed, 19 insertions(+)
+> =
 
---===============3587150144356557814==--
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index d9631ec..8638fd2 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -886,6 +886,19 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>  =
+
+>  		return 0;
+>  	}
+> +	case KVM_FLUSH_DCACHE_GPA: {
+> +		struct kvm_mem_addr mem_addr;
+> +		hva_t hva;
+> +		gpa_t gpa;
+> +
+> +		if (copy_from_user(&mem_addr, argp, sizeof(mem_addr)))
+> +			return -EFAULT;
+> +
+> +		gpa =3D mem_addr.addr;
+> +		hva =3D gfn_to_hva(kvm, gpa_to_gfn(gpa)) | (gpa & ~PAGE_MASK);
+> +		kvm_flush_dcache_to_poc((void *)hva, mem_addr.len);
+
+In case you end up moving further with this, see the following commit:
+
+0d3e4d4 (arm/arm64: KVM: Use kernel mapping to perform invalidation on
+page fault, 2015-01-05)
+
+I think you end up with the same problem here.
+
+-Christoffer
