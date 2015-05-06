@@ -1,27 +1,24 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [RFC v2 0/4] chip/vgic adaptations for forwarded irq
-Date: Wed, 06 May 2015 17:32:53 +0200
-Message-ID: <554A3425.7070909@linaro.org>
-References: <1423642857-24240-1-git-send-email-eric.auger@linaro.org>
- <20150506142748.GC6796@cbox>
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH v3 07/12] KVM: arm64: guest debug, add support for single-step
+Date: Wed,  6 May 2015 17:23:22 +0100
+Message-ID: <1430929407-3487-8-git-send-email-alex.bennee@linaro.org>
+References: <1430929407-3487-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EDFB509BA
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 May 2015 11:26:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C4A750A2E
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 May 2015 12:14:16 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HvgX-W1+lo-f for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 May 2015 11:26:46 -0400 (EDT)
-Received: from mail-wi0-f182.google.com (mail-wi0-f182.google.com
- [209.85.212.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 639CD50943
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 May 2015 11:26:45 -0400 (EDT)
-Received: by widdi4 with SMTP id di4so27186537wid.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 06 May 2015 08:35:33 -0700 (PDT)
-In-Reply-To: <20150506142748.GC6796@cbox>
+ with ESMTP id g+kZEu9xT0Qy for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 May 2015 12:14:15 -0400 (EDT)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 12A0C50A46
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 May 2015 12:14:15 -0400 (EDT)
+In-Reply-To: <1430929407-3487-1-git-send-email-alex.bennee@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,46 +28,103 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: eric.auger@st.com, kvm@vger.kernel.org, patches@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, alex.williamson@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org
+Cc: Russell King <linux@arm.linux.org.uk>, Gleb Natapov <gleb@kernel.org>, jan.kiszka@siemens.com, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, Catalin Marinas <catalin.marinas@arm.com>, r65777@freescale.com, bp@suse.de
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/06/2015 04:27 PM, Christoffer Dall wrote:
-> Hi Eric,
-> 
-> On Wed, Feb 11, 2015 at 09:20:53AM +0100, Eric Auger wrote:
->> This series proposes some fixes that appeared to be necessary
->> to integrate IRQ forwarding in KVM/VFIO.
->>
->> - deactivation of the forwarded IRQ in irq_disabled case
->> - a specific handling of forwarded IRQ into the VGIC state machine.
->> - deactivation of physical IRQ and unforwarding on vgic destruction
->> - rb_tree lock in vgic.c
->>
->> Integrated pieces can be found at
->> ssh://git.linaro.org/people/eric.auger/linux.git
->> on branch irqfd_integ_v9
->>
-> What are the dependencies for this at this point?
-> 
-> I assume it relies at least on the split EOI/priority drop changes?
-
-Yes it now only depends on split EOI/priority drop changes since
-"genirq: Saving/restoring the irqchip state of an irq line" now is
-upstreamed.
-
-> 
-> Are you going to respin this when there are newer versions of the
-> dependencies out, or what are the plans?
-
-Yes I will respin according to new versions. I am currently using a
-rebased version of Marc's original RFC "ARM: Forwarding physical
-interrupts to a guest VM" (http://lwn.net/Articles/603514/) which is a
-superset of [PATCH] genirq: Add support for priority-drop/deactivate
-interrupt controllers.
-
-- Eric
-> 
-> Thanks,
-> -Christoffer
-> 
+VGhpcyBhZGRzIHN1cHBvcnQgZm9yIHNpbmdsZS1zdGVwcGluZyB0aGUgZ3Vlc3QuIFRvIGRvIHRo
+aXMgd2UgbmVlZCB0bwptYW5pcHVsYXRlIHRoZSBndWVzdHMgUFNUQVRFLlNTIGFuZCBNRFNDUl9F
+TDEuU1MgYml0cyB3aGljaCB3ZSBkbyBpbiB0aGUKa3ZtX2FybV9zZXR1cC9jbGVhcl9kZWJ1Zygp
+IHNvIHdlIGRvbid0IGFmZmVjdCB0aGUgYXBwYXJlbnQgc3RhdGUgb2YgdGhlCmd1ZXN0LiBBZGRp
+dGlvbmFsbHkgd2hpbGUgdGhlIGhvc3QgaXMgZGVidWdnaW5nIHRoZSBndWVzdCB3ZSBzdXBwcmVz
+cwp0aGUgYWJpbGl0eSBvZiB0aGUgZ3Vlc3QgdG8gc2luZ2xlLXN0ZXAgaXRzZWxmLgoKU2lnbmVk
+LW9mZi1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgoKLS0tCnYyCiAg
+LSBNb3ZlIHBzdGF0ZS9tZHNjciBtYW5pcHVsYXRpb24gaW50byBDCiAgLSBkb24ndCBleHBvcnQg
+Z3Vlc3RfZGVidWcgdG8gYXNzZW1ibHkKICAtIGFkZCBhY2Nlc3NvciBmb3Igc2F2ZWRfZGVidWcg
+cmVncwogIC0gdHdlYWsgc2F2ZS9yZXN0b3JlIG9mIG1kc2NyX2VsMQp2MwogIC0gZG9uJ3Qgc2F2
+ZSBQQyBpbiBkZWJ1ZyBpbmZvcm1hdGlvbiBzdHJ1Y3QKICAtIHJlbmFtZSBkZWJ1Z19zYXZlZF9y
+ZWdzLT5ndWVzdF9kZWJ1Z19zdGF0ZQogIC0gc2F2ZSB3aG9sZSB2YWx1ZSwgb25seSB1c2UgYml0
+cyBpbiByZXN0b3JlCiAgLSBhZGQgc2F2ZS9yZXN0b3JlX2d1ZXN0LWRlYnVnX3JlZ3MgaGVscGVy
+IGZ1bmN0aW9ucwogIC0gc2ltcGxpZnkgY29tbWl0IG1lc3NhZ2UgZm9yIGNsYXJpdHkKICAtIHJt
+IHZjcHVfZGVidWdfc2F2ZWRfcmVnIGFjY2VzcyBmbgoKZGlmZiAtLWdpdCBhL2FyY2gvYXJtL2t2
+bS9hcm0uYyBiL2FyY2gvYXJtL2t2bS9hcm0uYwppbmRleCAwNjRjMTA1Li45YjNlZDZkIDEwMDY0
+NAotLS0gYS9hcmNoL2FybS9rdm0vYXJtLmMKKysrIGIvYXJjaC9hcm0va3ZtL2FybS5jCkBAIC0z
+MDIsNyArMzAyLDkgQEAgdm9pZCBrdm1fYXJjaF92Y3B1X3B1dChzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
+cHUpCiAJa3ZtX2FybV9zZXRfcnVubmluZ192Y3B1KE5VTEwpOwogfQogCi0jZGVmaW5lIEtWTV9H
+VUVTVERCR19WQUxJRF9NQVNLIChLVk1fR1VFU1REQkdfRU5BQkxFIHwgS1ZNX0dVRVNUREJHX1VT
+RV9TV19CUCkKKyNkZWZpbmUgS1ZNX0dVRVNUREJHX1ZBTElEX01BU0sgKEtWTV9HVUVTVERCR19F
+TkFCTEUgfCAgICBcCisJCQkgICAgS1ZNX0dVRVNUREJHX1VTRV9TV19CUCB8IFwKKwkJCSAgICBL
+Vk1fR1VFU1REQkdfU0lOR0xFU1RFUCkKIAogLyoqCiAgKiBrdm1fYXJjaF92Y3B1X2lvY3RsX3Nl
+dF9ndWVzdF9kZWJ1ZyAtIHNldCB1cCBndWVzdCBkZWJ1Z2dpbmcKZGlmZiAtLWdpdCBhL2FyY2gv
+YXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3Zt
+X2hvc3QuaAppbmRleCA3Y2I5OWI1Li5iNjBmYTdhIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2lu
+Y2x1ZGUvYXNtL2t2bV9ob3N0LmgKKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9z
+dC5oCkBAIC0xMjMsNiArMTIzLDEyIEBAIHN0cnVjdCBrdm1fdmNwdV9hcmNoIHsKIAkgKiBoZXJl
+LgogCSAqLwogCisJLyogR3Vlc3QgcmVnaXN0ZXJzIHdlIHByZXNlcnZlIGR1cmluZyBndWVzdCBk
+ZWJ1Z2dpbmcgKi8KKwlzdHJ1Y3QgeworCQl1MzIJcHN0YXRlOworCQl1MzIJbWRzY3JfZWwxOwor
+CX0gZ3Vlc3RfZGVidWdfc3RhdGU7CisKIAkvKiBEb24ndCBydW4gdGhlIGd1ZXN0ICovCiAJYm9v
+bCBwYXVzZTsKIApkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vZGVidWcuYyBiL2FyY2gvYXJt
+NjQva3ZtL2RlYnVnLmMKaW5kZXggNWJlZTY3Ni4uMTkzNDZlOCAxMDA2NDQKLS0tIGEvYXJjaC9h
+cm02NC9rdm0vZGVidWcuYworKysgYi9hcmNoL2FybTY0L2t2bS9kZWJ1Zy5jCkBAIC0xOSwxMSAr
+MTksNDIgQEAKIAogI2luY2x1ZGUgPGxpbnV4L2t2bV9ob3N0Lmg+CiAKKyNpbmNsdWRlIDxhc20v
+ZGVidWctbW9uaXRvcnMuaD4KKyNpbmNsdWRlIDxhc20va3ZtX2FzbS5oPgogI2luY2x1ZGUgPGFz
+bS9rdm1fYXJtLmg+CisjaW5jbHVkZSA8YXNtL2t2bV9lbXVsYXRlLmg+CisKKy8qIFRoZXNlIGFy
+ZSB0aGUgYml0cyBvZiBNRFNDUl9FTDEgd2UgbWF5IG1hbmlwdWxhdGUgKi8KKyNkZWZpbmUgTURT
+Q1JfRUwxX0RFQlVHX01BU0sJKERCR19NRFNDUl9TUyB8IFwKKwkJCQlEQkdfTURTQ1JfS0RFIHwg
+XAorCQkJCURCR19NRFNDUl9NREUpCisKKyNkZWZpbmUgU1BTUl9ERUJVR19NQVNLIERCR19TUFNS
+X1NTCiAKIHN0YXRpYyBERUZJTkVfUEVSX0NQVSh1MzIsIG1kY3JfZWwyKTsKIAogLyoqCisgKiBz
+YXZlL3Jlc3RvcmVfZ3Vlc3RfZGVidWdfcmVncworICoKKyAqIEZvciBzb21lIGRlYnVnIG9wZXJh
+dGlvbnMgd2UgbmVlZCB0byB0d2VhayBzb21lIGd1ZXN0IHJlZ2lzdGVycy4gQXMKKyAqIGEgcmVz
+dWx0IHdlIG5lZWQgdG8gc2F2ZSB0aGUgc3RhdGUgb2YgdGhvc2UgcmVnaXN0ZXJzIGJlZm9yZSB3
+ZQorICogbWFrZSB0aG9zZSBtb2RpZmljYXRpb25zLgorICovCitzdGF0aWMgdm9pZCBzYXZlX2d1
+ZXN0X2RlYnVnX3JlZ3Moc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQoreworCXZjcHUtPmFyY2guZ3Vl
+c3RfZGVidWdfc3RhdGUucHN0YXRlID0gKnZjcHVfY3Bzcih2Y3B1KTsKKwl2Y3B1LT5hcmNoLmd1
+ZXN0X2RlYnVnX3N0YXRlLm1kc2NyX2VsMSA9IHZjcHVfc3lzX3JlZyh2Y3B1LCBNRFNDUl9FTDEp
+OworfQorCitzdGF0aWMgdm9pZCByZXN0b3JlX2d1ZXN0X2RlYnVnX3JlZ3Moc3RydWN0IGt2bV92
+Y3B1ICp2Y3B1KQoreworCSp2Y3B1X2Nwc3IodmNwdSkgfD0KKwkJKHZjcHUtPmFyY2guZ3Vlc3Rf
+ZGVidWdfc3RhdGUucHN0YXRlICYgU1BTUl9ERUJVR19NQVNLKTsKKwl2Y3B1X3N5c19yZWcodmNw
+dSwgTURTQ1JfRUwxKSB8PQorCQkodmNwdS0+YXJjaC5ndWVzdF9kZWJ1Z19zdGF0ZS5tZHNjcl9l
+bDEgJiBNRFNDUl9FTDFfREVCVUdfTUFTSyk7Cit9CisKKy8qKgogICoga3ZtX2FybV9pbml0X2Rl
+YnVnIC0gZ3JhYiB3aGF0IHdlIG5lZWQgZm9yIGRlYnVnCiAgKgogICogQ3VycmVudGx5IHRoZSBz
+b2xlIHRhc2sgb2YgdGhpcyBmdW5jdGlvbiBpcyB0byByZXRyaWV2ZSB0aGUgaW5pdGlhbApAQCAt
+MzgsNyArNjksNiBAQCB2b2lkIGt2bV9hcm1faW5pdF9kZWJ1Zyh2b2lkKQogCV9fdGhpc19jcHVf
+d3JpdGUobWRjcl9lbDIsIGt2bV9jYWxsX2h5cChfX2t2bV9nZXRfbWRjcl9lbDIpKTsKIH0KIAot
+CiAvKioKICAqIGt2bV9hcm1fc2V0dXBfZGVidWcgLSBzZXQgdXAgZGVidWcgcmVsYXRlZCBzdHVm
+ZgogICoKQEAgLTc1LDE1ICsxMDUsMzcgQEAgdm9pZCBrdm1fYXJtX3NldHVwX2RlYnVnKHN0cnVj
+dCBrdm1fdmNwdSAqdmNwdSkKIAllbHNlCiAJCXZjcHUtPmFyY2gubWRjcl9lbDIgJj0gfk1EQ1Jf
+RUwyX1REQTsKIAotCS8qIFRyYXAgYnJlYWtwb2ludHM/ICovCi0JaWYgKHZjcHUtPmd1ZXN0X2Rl
+YnVnICYgS1ZNX0dVRVNUREJHX1VTRV9TV19CUCkKKwkvKiBJcyBHdWVzdCBkZWJ1Z2dpbmcgaW4g
+ZWZmZWN0PyAqLworCWlmICh2Y3B1LT5ndWVzdF9kZWJ1ZykgewogCQl2Y3B1LT5hcmNoLm1kY3Jf
+ZWwyIHw9IE1EQ1JfRUwyX1RERTsKLQllbHNlCi0JCXZjcHUtPmFyY2gubWRjcl9lbDIgJj0gfk1E
+Q1JfRUwyX1RERTsKIAorCQkvKiBTYXZlIGd1ZXN0IGRlYnVnIHN0YXRlICovCisJCXNhdmVfZ3Vl
+c3RfZGVidWdfcmVncyh2Y3B1KTsKKworCQkvKgorCQkgKiBTaW5nbGUgU3RlcCAoQVJNIEFSTSBE
+Mi4xMi4zIFRoZSBzb2Z0d2FyZSBzdGVwIHN0YXRlCisJCSAqIG1hY2hpbmUpCisJCSAqCisJCSAq
+IElmIHdlIGFyZSBkb2luZyBTaW5nbGUgU3RlcCB3ZSBuZWVkIHRvIG1hbmlwdWxhdGUKKwkJICog
+TURTQ1JfRUwxLlNTIGFuZCBQU1RBVEUuU1MuIElmIG5vdCB3ZSBuZWVkIHRvCisJCSAqIHN1cHBy
+ZXNzIHRoZSBndWVzdHMgYWJpbGl0eSB0byB0cmlnZ2VyIHNpbmdsZSBzdGVwIGl0c2VsZi4KKwkJ
+ICovCisJCWlmICh2Y3B1LT5ndWVzdF9kZWJ1ZyAmIEtWTV9HVUVTVERCR19TSU5HTEVTVEVQKSB7
+CisJCQkqdmNwdV9jcHNyKHZjcHUpIHw9ICBEQkdfU1BTUl9TUzsKKwkJCXZjcHVfc3lzX3JlZyh2
+Y3B1LCBNRFNDUl9FTDEpIHw9IERCR19NRFNDUl9TUzsKKwkJfSBlbHNlIHsKKwkJCSp2Y3B1X2Nw
+c3IodmNwdSkgJj0gfkRCR19TUFNSX1NTOworCQkJdmNwdV9zeXNfcmVnKHZjcHUsIE1EU0NSX0VM
+MSkgJj0gfkRCR19NRFNDUl9TUzsKKwkJfQorCisJfSBlbHNlIHsKKwkJLyogRGVidWcgb3BlcmF0
+aW9ucyBjYW4gZ28gc3RyYWlnaHQgdG8gdGhlIGd1ZXN0ICovCisJCXZjcHUtPmFyY2gubWRjcl9l
+bDIgJj0gfk1EQ1JfRUwyX1RERTsKKwl9CiB9CiAKIHZvaWQga3ZtX2FybV9jbGVhcl9kZWJ1Zyhz
+dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiB7Ci0JLyogTm90aGluZyB0byBkbyB5ZXQgKi8KKwlpZiAo
+dmNwdS0+Z3Vlc3RfZGVidWcpCisJCXJlc3RvcmVfZ3Vlc3RfZGVidWdfcmVncyh2Y3B1KTsKIH0K
+ZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMgYi9hcmNoL2FybTY0L2t2
+bS9oYW5kbGVfZXhpdC5jCmluZGV4IDI3ZjM4YTkuLmU5ZGUxM2UgMTAwNjQ0Ci0tLSBhL2FyY2gv
+YXJtNjQva3ZtL2hhbmRsZV9leGl0LmMKKysrIGIvYXJjaC9hcm02NC9rdm0vaGFuZGxlX2V4aXQu
+YwpAQCAtMTAzLDYgKzEwMyw3IEBAIHN0YXRpYyBpbnQga3ZtX2hhbmRsZV9ndWVzdF9kZWJ1Zyhz
+dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1fcnVuICpydW4pCiAJcnVuLT5kZWJ1Zy5h
+cmNoLmhzciA9IGhzcjsKIAogCXN3aXRjaCAoaHNyID4+IEVTUl9FTHhfRUNfU0hJRlQpIHsKKwlj
+YXNlIEVTUl9FTHhfRUNfU09GVFNUUF9MT1c6CiAJY2FzZSBFU1JfRUx4X0VDX0JLUFQzMjoKIAlj
+YXNlIEVTUl9FTHhfRUNfQlJLNjQ6CiAJCWJyZWFrOwpAQCAtMTMwLDYgKzEzMSw3IEBAIHN0YXRp
+YyBleGl0X2hhbmRsZV9mbiBhcm1fZXhpdF9oYW5kbGVyc1tdID0gewogCVtFU1JfRUx4X0VDX1NZ
+UzY0XQk9IGt2bV9oYW5kbGVfc3lzX3JlZywKIAlbRVNSX0VMeF9FQ19JQUJUX0xPV10JPSBrdm1f
+aGFuZGxlX2d1ZXN0X2Fib3J0LAogCVtFU1JfRUx4X0VDX0RBQlRfTE9XXQk9IGt2bV9oYW5kbGVf
+Z3Vlc3RfYWJvcnQsCisJW0VTUl9FTHhfRUNfU09GVFNUUF9MT1ddPSBrdm1faGFuZGxlX2d1ZXN0
+X2RlYnVnLAogCVtFU1JfRUx4X0VDX0JLUFQzMl0JPSBrdm1faGFuZGxlX2d1ZXN0X2RlYnVnLAog
+CVtFU1JfRUx4X0VDX0JSSzY0XQk9IGt2bV9oYW5kbGVfZ3Vlc3RfZGVidWcsCiB9OwotLSAKMi4z
+LjUKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFy
+bSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3Rz
+LmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
