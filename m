@@ -1,93 +1,231 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH 2/5] VFIO: platform: add get_device callback
-Date: Thu,  7 May 2015 16:27:20 +0200
-Message-ID: <1431008843-28411-3-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH 5/5] VFIO: platform: VFIO platform Calxeda xgmac reset module
+Date: Thu,  7 May 2015 16:27:23 +0200
+Message-ID: <1431008843-28411-6-git-send-email-eric.auger@linaro.org>
 References: <1431008843-28411-1-git-send-email-eric.auger@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C7EE50C08
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2015 10:21:41 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 5i2mTd9sp1Xb for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 May 2015 10:21:35 -0400 (EDT)
+Received: from mail-wi0-f172.google.com (mail-wi0-f172.google.com
+ [209.85.212.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9937550C14
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2015 10:21:33 -0400 (EDT)
+Received: by widdi4 with SMTP id di4so244796292wid.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 07 May 2015 07:30:23 -0700 (PDT)
 In-Reply-To: <1431008843-28411-1-git-send-email-eric.auger@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger@st.com, eric.auger@linaro.org, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, alex.williamson@redhat.com, b.reynal@virtualopensystems.com
-Cc: linux-kernel@vger.kernel.org, patches@linaro.org, agraf@suse.de, Bharat.Bhushan@freescale.com
+Cc: linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-It is needed to introduce a new callback enabling to retrieve the
-struct device* from the vfio_platform_device. Implementation depends
-on the underlying device, platform or amba. This will be used to retrieve
-the compatibility string of the device.
+This patch introduces a module that registers and implements a basic
+reset function for the Calxeda xgmac device. This latter basically disables
+interrupts and stops DMA transfers.
+
+The reset function code is inherited from the native calxeda xgmac driver.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 ---
- drivers/vfio/platform/vfio_amba.c             |  9 +++++++++
- drivers/vfio/platform/vfio_platform.c         | 10 ++++++++++
- drivers/vfio/platform/vfio_platform_private.h |  1 +
- 3 files changed, 20 insertions(+)
+ drivers/vfio/platform/Kconfig                      |   2 +
+ drivers/vfio/platform/Makefile                     |   2 +
+ drivers/vfio/platform/reset/Kconfig                |   7 ++
+ drivers/vfio/platform/reset/Makefile               |   5 +
+ .../platform/reset/vfio_platform_calxedaxgmac.c    | 121 +++++++++++++++++++++
+ 5 files changed, 137 insertions(+)
+ create mode 100644 drivers/vfio/platform/reset/Kconfig
+ create mode 100644 drivers/vfio/platform/reset/Makefile
+ create mode 100644 drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
 
-diff --git a/drivers/vfio/platform/vfio_amba.c b/drivers/vfio/platform/vfio_amba.c
-index ff0331f..fd68115 100644
---- a/drivers/vfio/platform/vfio_amba.c
-+++ b/drivers/vfio/platform/vfio_amba.c
-@@ -48,6 +48,14 @@ static int get_amba_irq(struct vfio_platform_device *vdev, int i)
- 	return ret ? ret : -ENXIO;
- }
+diff --git a/drivers/vfio/platform/Kconfig b/drivers/vfio/platform/Kconfig
+index 9a4403e..1df7477 100644
+--- a/drivers/vfio/platform/Kconfig
++++ b/drivers/vfio/platform/Kconfig
+@@ -18,3 +18,5 @@ config VFIO_AMBA
+ 	  framework.
  
-+static struct device *vfio_amba_get_device(struct vfio_platform_device *vdev)
-+{
-+	struct amba_device *pdev = (struct amba_device *) vdev->opaque;
-+	struct device *dev = &pdev->dev;
+ 	  If you don't know what to do here, say N.
 +
-+	return dev;
++source "drivers/vfio/platform/reset/Kconfig"
+diff --git a/drivers/vfio/platform/Makefile b/drivers/vfio/platform/Makefile
+index 81de144..9ce8afe 100644
+--- a/drivers/vfio/platform/Makefile
++++ b/drivers/vfio/platform/Makefile
+@@ -2,7 +2,9 @@
+ vfio-platform-y := vfio_platform.o vfio_platform_common.o vfio_platform_irq.o
+ 
+ obj-$(CONFIG_VFIO_PLATFORM) += vfio-platform.o
++obj-$(CONFIG_VFIO_PLATFORM) += reset/
+ 
+ vfio-amba-y := vfio_amba.o
+ 
+ obj-$(CONFIG_VFIO_AMBA) += vfio-amba.o
++obj-$(CONFIG_VFIO_AMBA) += reset/
+diff --git a/drivers/vfio/platform/reset/Kconfig b/drivers/vfio/platform/reset/Kconfig
+new file mode 100644
+index 0000000..746b96b
+--- /dev/null
++++ b/drivers/vfio/platform/reset/Kconfig
+@@ -0,0 +1,7 @@
++config VFIO_PLATFORM_CALXEDAXGMAC_RESET
++	tristate "VFIO support for calxeda xgmac reset"
++	depends on VFIO_PLATFORM
++	help
++	  Enables the VFIO platform driver to handle reset for Calxeda xgmac
++
++	  If you don't know what to do here, say N.
+diff --git a/drivers/vfio/platform/reset/Makefile b/drivers/vfio/platform/reset/Makefile
+new file mode 100644
+index 0000000..2a486af
+--- /dev/null
++++ b/drivers/vfio/platform/reset/Makefile
+@@ -0,0 +1,5 @@
++vfio-platform-calxedaxgmac-y := vfio_platform_calxedaxgmac.o
++
++ccflags-y += -Idrivers/vfio/platform
++
++obj-$(CONFIG_VFIO_PLATFORM_CALXEDAXGMAC_RESET) += vfio-platform-calxedaxgmac.o
+diff --git a/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
+new file mode 100644
+index 0000000..3c6e428
+--- /dev/null
++++ b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
+@@ -0,0 +1,121 @@
++/*
++ * VFIO platform driver specialized for Calxeda xgmac reset
++ * reset code is inherited from calxeda xgmac native driver
++ *
++ * Copyright 2010-2011 Calxeda, Inc.
++ * Copyright (c) 2015 Linaro Ltd.
++ *              www.linaro.org
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/init.h>
++#include <linux/io.h>
++
++#include "vfio_platform_private.h"
++
++#define DRIVER_VERSION  "0.1"
++#define DRIVER_AUTHOR   "Eric Auger <eric.auger@linaro.org>"
++#define DRIVER_DESC     "Reset support for Calxeda xgmac vfio platform device"
++
++#define CALXEDAXGMAC_COMPAT "calxeda,hb-xgmac"
++
++/* XGMAC Register definitions */
++#define XGMAC_CONTROL           0x00000000      /* MAC Configuration */
++
++/* DMA Control and Status Registers */
++#define XGMAC_DMA_CONTROL       0x00000f18      /* Ctrl (Operational Mode) */
++#define XGMAC_DMA_INTR_ENA      0x00000f1c      /* Interrupt Enable */
++
++/* DMA Control registe defines */
++#define DMA_CONTROL_ST          0x00002000      /* Start/Stop Transmission */
++#define DMA_CONTROL_SR          0x00000002      /* Start/Stop Receive */
++
++/* Common MAC defines */
++#define MAC_ENABLE_TX           0x00000008      /* Transmitter Enable */
++#define MAC_ENABLE_RX           0x00000004      /* Receiver Enable */
++
++static inline void xgmac_mac_disable(void __iomem *ioaddr)
++{
++	u32 value = readl(ioaddr + XGMAC_DMA_CONTROL);
++
++	value &= ~(DMA_CONTROL_ST | DMA_CONTROL_SR);
++	writel(value, ioaddr + XGMAC_DMA_CONTROL);
++
++	value = readl(ioaddr + XGMAC_CONTROL);
++	value &= ~(MAC_ENABLE_TX | MAC_ENABLE_RX);
++	writel(value, ioaddr + XGMAC_CONTROL);
 +}
 +
- static int vfio_amba_probe(struct amba_device *adev, const struct amba_id *id)
- {
- 	struct vfio_platform_device *vdev;
-@@ -67,6 +75,7 @@ static int vfio_amba_probe(struct amba_device *adev, const struct amba_id *id)
- 	vdev->flags = VFIO_DEVICE_FLAGS_AMBA;
- 	vdev->get_resource = get_amba_resource;
- 	vdev->get_irq = get_amba_irq;
-+	vdev->get_device = vfio_amba_get_device;
- 
- 	ret = vfio_platform_probe_common(vdev, &adev->dev);
- 	if (ret) {
-diff --git a/drivers/vfio/platform/vfio_platform.c b/drivers/vfio/platform/vfio_platform.c
-index cef645c..c025d76 100644
---- a/drivers/vfio/platform/vfio_platform.c
-+++ b/drivers/vfio/platform/vfio_platform.c
-@@ -51,6 +51,15 @@ static int get_platform_irq(struct vfio_platform_device *vdev, int i)
- 	return platform_get_irq(pdev, i);
- }
- 
-+static struct device *vfio_platform_get_device(
-+				struct vfio_platform_device *vdev)
++int vfio_platform_calxedaxgmac_reset(struct vfio_platform_device *vdev)
 +{
-+	struct platform_device *pdev = (struct platform_device *) vdev->opaque;
-+	struct device *dev = &pdev->dev;
++	struct vfio_platform_region reg = vdev->regions[0];
 +
-+	return dev;
++	if (!reg.ioaddr) {
++		reg.ioaddr =
++			ioremap_nocache(reg.addr, reg.size);
++		if (!reg.ioaddr)
++			return -ENOMEM;
++	}
++
++	/* disable IRQ */
++	writel(0, reg.ioaddr + XGMAC_DMA_INTR_ENA);
++
++	/* Disable the MAC core */
++	xgmac_mac_disable(reg.ioaddr);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(vfio_platform_calxedaxgmac_reset);
++
++static int __init vfio_platform_calxedaxgmac_init(void)
++{
++	int (*register_reset)(char *, struct module *,
++				vfio_platform_reset_fn_t);
++	int ret;
++
++	register_reset = symbol_get(vfio_platform_register_reset);
++	if (!register_reset)
++		return -EINVAL;
++
++	ret = register_reset(CALXEDAXGMAC_COMPAT, THIS_MODULE,
++			     vfio_platform_calxedaxgmac_reset);
++
++	symbol_put(vfio_platform_register_reset);
++
++	return ret;
 +}
 +
- static int vfio_platform_probe(struct platform_device *pdev)
- {
- 	struct vfio_platform_device *vdev;
-@@ -65,6 +74,7 @@ static int vfio_platform_probe(struct platform_device *pdev)
- 	vdev->flags = VFIO_DEVICE_FLAGS_PLATFORM;
- 	vdev->get_resource = get_platform_resource;
- 	vdev->get_irq = get_platform_irq;
-+	vdev->get_device = vfio_platform_get_device;
- 
- 	ret = vfio_platform_probe_common(vdev, &pdev->dev);
- 	if (ret)
-diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
-index da2d60b..68909a4 100644
---- a/drivers/vfio/platform/vfio_platform_private.h
-+++ b/drivers/vfio/platform/vfio_platform_private.h
-@@ -67,6 +67,7 @@ struct vfio_platform_device {
- 	struct resource*
- 		(*get_resource)(struct vfio_platform_device *vdev, int i);
- 	int	(*get_irq)(struct vfio_platform_device *vdev, int i);
-+	struct device *(*get_device)(struct vfio_platform_device *vdev);
- };
- 
- typedef int (*vfio_platform_reset_fn_t)(struct vfio_platform_device *vdev);
++static void __exit vfio_platform_calxedaxgmac_exit(void)
++{
++	int (*unregister_reset)(char *);
++	int ret;
++
++	unregister_reset = symbol_get(vfio_platform_unregister_reset);
++	if (!unregister_reset)
++		return;
++
++	ret = unregister_reset(CALXEDAXGMAC_COMPAT);
++
++	symbol_put(vfio_platform_unregister_reset);
++}
++
++module_init(vfio_platform_calxedaxgmac_init);
++module_exit(vfio_platform_calxedaxgmac_exit);
++
++MODULE_VERSION(DRIVER_VERSION);
++MODULE_LICENSE("GPL v2");
++MODULE_AUTHOR(DRIVER_AUTHOR);
++MODULE_DESCRIPTION(DRIVER_DESC);
 -- 
 1.9.1
