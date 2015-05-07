@@ -1,27 +1,28 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH 4/5] VFIO: platform: populate reset function according to
- compat
-Date: Thu,  7 May 2015 16:27:22 +0200
-Message-ID: <1431008843-28411-5-git-send-email-eric.auger@linaro.org>
-References: <1431008843-28411-1-git-send-email-eric.auger@linaro.org>
+From: =?UTF-8?B?SsOpcsOpbXkgRmFuZ3XDqGRl?= <j.fanguede@virtualopensystems.com>
+Subject: Re: [RFC] ARM/ARM64: KVM: Implement KVM_FLUSH_DCACHE_GPA ioctl
+Date: Thu, 7 May 2015 16:50:24 +0200
+Message-ID: <CAGE1QJoyaGpuf=6Msa=xpm0pPGRkYWctcXGf=rwnha5o9Gm4bw@mail.gmail.com>
+References: <1430817191-6231-1-git-send-email-j.fanguede@virtualopensystems.com>
+ <20150506141249.GA6796@cbox>
+ <CAGE1QJrabWWs0O1V-MpOxT_=1472TXb5rvJzJAJNfWH70x9pcg@mail.gmail.com>
+ <20150507112027.GC25885@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 407A450BF2
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2015 10:21:34 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 71FC250C3E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2015 10:41:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id k6atSICezheJ for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 May 2015 10:21:32 -0400 (EDT)
-Received: from mail-wi0-f180.google.com (mail-wi0-f180.google.com
- [209.85.212.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4915550BFD
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2015 10:21:32 -0400 (EDT)
-Received: by wicmx19 with SMTP id mx19so15273692wic.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 07 May 2015 07:30:21 -0700 (PDT)
-In-Reply-To: <1431008843-28411-1-git-send-email-eric.auger@linaro.org>
+ with ESMTP id ePB5EITwPu-N for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  7 May 2015 10:41:56 -0400 (EDT)
+Received: from mail-wg0-f49.google.com (mail-wg0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 068DF50C3C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2015 10:41:55 -0400 (EDT)
+Received: by wgic8 with SMTP id c8so19574909wgi.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 07 May 2015 07:50:45 -0700 (PDT)
+In-Reply-To: <20150507112027.GC25885@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,110 +32,57 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@st.com, eric.auger@linaro.org, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, alex.williamson@redhat.com, b.reynal@virtualopensystems.com
-Cc: linux-kernel@vger.kernel.org, patches@linaro.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: "open list:Overall" <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add the reset function lookup according to the device compat
-string. This lookup is added at different places:
-- on VFIO_DEVICE_GET_INFO
-- on VFIO_DEVICE_RESET
-- on device release
-
-A reference to the module implementing the reset function is taken
-on first reset function lookup and released on vfio platform device
-release.
-
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
----
- drivers/vfio/platform/vfio_platform_common.c | 50 ++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
-
-diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-index 0d10018..bd7e44c 100644
---- a/drivers/vfio/platform/vfio_platform_common.c
-+++ b/drivers/vfio/platform/vfio_platform_common.c
-@@ -28,6 +28,52 @@ LIST_HEAD(reset_list);
- 
- static DEFINE_MUTEX(driver_lock);
- 
-+static vfio_platform_reset_fn_t vfio_platform_lookup_reset(const char *compat)
-+{
-+	struct vfio_platform_reset_node *iter;
-+
-+	list_for_each_entry(iter, &reset_list, link) {
-+		if (!strcmp(iter->compat, compat) &&
-+			try_module_get(iter->owner))
-+			return iter->reset;
-+	}
-+
-+	return ERR_PTR(-ENODEV);
-+}
-+
-+static vfio_platform_reset_fn_t vfio_platform_get_reset(
-+					struct vfio_platform_device *vdev)
-+{
-+	struct device *dev = vdev->get_device(vdev);
-+	const char *compat_str_array[2];
-+	vfio_platform_reset_fn_t reset;
-+	int ret;
-+
-+	if (!IS_ERR_OR_NULL(vdev->reset))
-+		return vdev->reset;
-+
-+	ret = device_property_read_string_array(dev, "compatible",
-+						compat_str_array, 2);
-+	if (!ret)
-+		return ERR_PTR(ret);
-+
-+	reset = vfio_platform_lookup_reset(compat_str_array[0]);
-+	return reset;
-+}
-+
-+static void vfio_platform_put_reset(struct vfio_platform_device *vdev)
-+{
-+	struct vfio_platform_reset_node *iter;
-+
-+	list_for_each_entry(iter, &reset_list, link) {
-+		if (iter->reset == vdev->reset) {
-+			module_put(iter->owner);
-+			vdev->reset = NULL;
-+			return;
-+		}
-+	}
-+}
-+
- static int vfio_platform_regions_init(struct vfio_platform_device *vdev)
- {
- 	int cnt = 0, i;
-@@ -103,10 +149,12 @@ static void vfio_platform_release(void *device_data)
- 	mutex_lock(&driver_lock);
- 
- 	if (!(--vdev->refcnt)) {
-+		vdev->reset = vfio_platform_get_reset(vdev);
- 		if (!IS_ERR_OR_NULL(vdev->reset))
- 			vdev->reset(vdev);
- 		vfio_platform_regions_cleanup(vdev);
- 		vfio_platform_irq_cleanup(vdev);
-+		vfio_platform_put_reset(vdev);
- 	}
- 
- 	mutex_unlock(&driver_lock);
-@@ -164,6 +212,7 @@ static long vfio_platform_ioctl(void *device_data,
- 		if (info.argsz < minsz)
- 			return -EINVAL;
- 
-+		vdev->reset = vfio_platform_get_reset(vdev);
- 		if (!IS_ERR_OR_NULL(vdev->reset))
- 			vdev->flags |= VFIO_DEVICE_FLAGS_RESET;
- 		info.flags = vdev->flags;
-@@ -260,6 +309,7 @@ static long vfio_platform_ioctl(void *device_data,
- 		return ret;
- 
- 	} else if (cmd == VFIO_DEVICE_RESET) {
-+		vdev->reset = vfio_platform_get_reset(vdev);
- 		if (!IS_ERR_OR_NULL(vdev->reset))
- 			return vdev->reset(vdev);
- 		else
--- 
-1.9.1
+T24gVGh1LCBNYXkgNywgMjAxNSBhdCAxOjIwIFBNLCBDaHJpc3RvZmZlciBEYWxsCjxjaHJpc3Rv
+ZmZlci5kYWxsQGxpbmFyby5vcmc+IHdyb3RlOgo+IE9uIFRodSwgTWF5IDA3LCAyMDE1IGF0IDEy
+OjUwOjUwUE0gKzAyMDAsIErDqXLDqW15IEZhbmd1w6hkZSB3cm90ZToKPj4gT24gV2VkLCBNYXkg
+NiwgMjAxNSBhdCA0OjEyIFBNLCBDaHJpc3RvZmZlciBEYWxsCj4+IDxjaHJpc3RvZmZlci5kYWxs
+QGxpbmFyby5vcmc+IHdyb3RlOgo+PiA+IEhpIErDqXLDqW15LAo+PiA+Cj4+ID4gT24gVHVlLCBN
+YXkgMDUsIDIwMTUgYXQgMTE6MTM6MTFBTSArMDIwMCwgSsOpcsOpbXkgRmFuZ3XDqGRlIHdyb3Rl
+Ogo+PiA+PiBUbyBtYWludGFpbiBjYWNoZSBjb2hlcmVuY3kgb24gQVJNLCB3ZSBtYXkgbmVlZCBh
+IG1lY2hhbmlzbSB0byBmbHVzaAo+PiA+PiB0aGUgZGF0YSBjYWNoZS4KPj4gPgo+PiA+IEluIGFk
+ZGl0aW9uIHRvIGdlbmVyYWxseSBqdXN0IG1ha2luZyB0aGlzIGZ1bmN0aW9uYWxpdHkgYXZhaWxh
+YmxlIChzZWUKPj4gPiBiZWxvdyksIGRvIHlvdSBoYXZlIGFuIGFjdHVhbCB1c2UgY2FzZSBpbiBt
+aW5kIGZvciB0aGlzPyAgVG8gc29sdmUgdGhlCj4+ID4gVkdBIGlzc3VlLCBmb3IgZXhhbXBsZSwg
+d2UgYWxyZWFkeSBoYXZlIGEgcGF0Y2ggc2VyaWVzIGZyb20gRHJldyB0cnlpbmcKPj4gPiB0byBh
+ZGRyZXNzIHRoaXMuICBEb2VzIHRoYXQgbm90IHdvcmsgZm9yIHlvdT8KPj4gPgo+PiA+IFRoZXJl
+IHdhcyBhIGxvbmcgZGlzY3Vzc2lvbiBhYm91dCB0aGlzIGhlcmU6Cj4+ID4gaHR0cHM6Ly9saXN0
+cy5jcy5jb2x1bWJpYS5lZHUvcGlwZXJtYWlsL2t2bWFybS8yMDE1LUZlYnJ1YXJ5LzAxMzU5My5o
+dG1sCj4+ID4KPj4gPiBEcmV3IHRoZW4gY3JlYXRlZCBhIHBhdGNoIHNldCwgaGVyZToKPj4gPiBo
+dHRwczovL2xpc3RzLm5vbmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAxNS0wMy9t
+c2cwMTI1NC5odG1sCj4+ID4KPj4gPiBhbmQgcmVwbGllZCB0byBoaW1zZWxmLCBoZXJlOgo+PiA+
+IGh0dHBzOi8vd3d3Lm1hcmMuaW5mby8/bD1hbmRyb2lkLXZpcnQmbT0xNDI2NzA1MjM5MjkxMzIm
+dz0zCj4+ID4KPj4gPiBXaGljaCBiYXNpY2FsbHkgc2F5cyB0aGF0IGhlIGRvZXNuJ3QgbGlrZSBo
+YXZpbmcgdG8gZG8gZmx1c2hlcyBhbGwgb3Zlcgo+PiA+IFFFTVUgKElJVUMpLCBzbyBoZSBzZW50
+IHRoaXMgdmVyc2lvbiBpbnN0ZWFkOgo+PiA+IGh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1
+L3BpcGVybWFpbC9rdm1hcm0vMjAxNS1NYXJjaC8wMTQwMjcuaHRtbAo+PiA+Cj4+ID4gV2hpY2gg
+aGUgbm93IHNhaWQgaGUnZCByZXNwaW4uCj4+Cj4+IEluIGZhY3QsIEkgdXNlZCB0aGlzIGlvY3Rs
+IGluIHBhaXJzIHdpdGggdGhpcyBRRU1VIHBhdGNoIHNlcmllczoKPj4gaHR0cHM6Ly9saXN0cy5u
+b25nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTUtMDUvbXNnMDA0MDcuaHRtbAo+
+PiBNeSBjdXJyZW50IHdvcmsgZG9lc24ndCBkbyBhbnl0aGluZyBhYm91dCB2Z2EgcmFtLCBzbyB2
+Z2EgaXNzdWUKPj4gcHJvYmFibHkgc3RpbGwgcGVyc2lzdHMsIGJ1dCBpdCBzb2x2ZXMgb3RoZXJz
+IGlzc3VlcyB3aXRoIHNvbWUKPj4gZW11bGF0ZWQgZGV2aWNlcyAobWFpbmx5IFBDSSkgd2hpY2gg
+d2VyZSBmYWlsaW5nIGJlZm9yZSBhbmQgbm93IHdvcmsKPj4gZmluZSB3aXRoIHRoaXMgcGF0Y2gu
+Cj4KPiBXaHkgZG9lcyBEcmV3J3MgYXBwcm9hY2ggbm90IHdvcmsgYW5kIHlvdXIgYXBwcm9hY2gg
+d29ya3MgaGVyZT8gIFdoYXQgaXMKPiB0aGUgY2FzZSB0aGF0IHdlIGhhdmVuJ3QgdGhvdWdoIGFi
+b3V0IHlldD8KClRoZSBmaXJzdCBwYXRjaCBmcm9tIEFuZHJldywgKHdoaWNoIGlzIGZvciBhcm02
+NCBvbmx5KSBkb2Vzbid0IHBlcm1pdAptZSB0byBtYWtlIHNvbWUgZW11bGF0ZWQgUENJIGRldmlj
+ZXMgd29ya2luZyB3aXRoIHZpcnQsIHByb2JhYmx5CmJlY2F1c2Ugc29tZSBmbHVzaGVzL2NsZWFu
+cyBhcmUgbWlzc2luZy4KQXMgZm9yIHRoZSBzZWNvbmQgcGF0Y2gsIGl0IGZvY3VzZXMsIGZvciBu
+b3csIG9ubHkgb24gVkdBIHJhbS4gSQpxdWlja2x5IHRyaWVkIHRvIGV4dGVuZCB0aGUgS1ZNX01F
+TV9VTkNBQ0hFRCBmbGFnIHRvIHRoZSB3aG9sZSBndWVzdAptZW1vcnksIGJ1dCB0aGVuIHRoZSBn
+dWVzdCBmYWlscyB0byBib290OyBidXQgZXZlbiBpZiBpdCB3YXMgd29ya2luZywKZG9lcyBpdCBt
+YWtlIHNlbnNlIHRvIG1hcCBhcyB1bmNhY2hlZCBhbGwgdGhlIHJhbSBvZiB0aGUgZ3Vlc3Q/IFNp
+bmNlCndlIGNhbiBub3QgZ3Vlc3Mgd2hpY2ggcmVnaW9uIG9mIHRoZSBndWVzdCBtZW1vcnkgd2ls
+bCBiZSBhY2Nlc3NlZC4KClNpbXBsZSBQQ0kgZGV2aWNlcyBsaWtlIGUxMDAwIG9yIHVzYi1laGNp
+ICh3aXRoIHVzYi1rYmQgZm9yIGluc3RhbmNlKQphcmUgbm90IHVzYWJsZSwgd2l0aCBvciB3aXRo
+b3V0IHRoZXNlIHBhdGNoZXMsIGJ1dCBpZiBJIGZsdXNoIGEKcHJlY2lzZSBtZW1vcnkgcmFuZ2Us
+IG9uIHJlYWRzIGFuZCB3cml0ZXMgcGVyZm9ybWVkIGJ5IGVtdWxhdGVkCmRldmljZXMgb24gZ3Vl
+c3QgcmFtLCAoSXQncyBleGFjdGx5IHdoYXQgdGhlIFFFTVUgcGF0Y2ggc2VyaWVzIHRoYXQgSQpz
+ZW50IGRvZXMsIHdpdGggdGhpcyBpb2N0bCksIGVtdWxhdGVkIFBDSSBkZXZpY2VzIGFyZSBub3cg
+d29ya2luZy4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
+a3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8v
+bGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
