@@ -1,82 +1,145 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2 0/3] Add support for for GICv2m and MSIs to arm-virt
-Date: Wed, 6 May 2015 17:39:28 +0100
-Message-ID: <CAFEAcA84kB2iq-fwW6950rVtjuh5Li5b=edkSxooo9bDMgDuPw@mail.gmail.com>
-References: <1430155872-27030-1-git-send-email-christoffer.dall@linaro.org>
- <CAFEAcA8WecTOiAKYxOOOrsJPyaQxpNskjE799kS8kipg4q3KMQ@mail.gmail.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [RFC v2 2/4] KVM: arm: vgic: fix state machine for forwarded
+ IRQ
+Date: Thu, 07 May 2015 09:48:25 +0200
+Message-ID: <554B18C9.7020903@linaro.org>
+References: <1423642857-24240-1-git-send-email-eric.auger@linaro.org> <1423642857-24240-3-git-send-email-eric.auger@linaro.org> <20150506142649.GB6796@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 06D4350AD3
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 May 2015 12:31:02 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YI1Ve63LYxc9 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 May 2015 12:31:01 -0400 (EDT)
-Received: from mail-ie0-f173.google.com (mail-ie0-f173.google.com
- [209.85.223.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EF3B950ACC
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 May 2015 12:31:00 -0400 (EDT)
-Received: by iedfl3 with SMTP id fl3so20690362ied.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 06 May 2015 09:39:48 -0700 (PDT)
-In-Reply-To: <CAFEAcA8WecTOiAKYxOOOrsJPyaQxpNskjE799kS8kipg4q3KMQ@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20150506142649.GB6796@cbox>
+Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Cc: eric.auger@st.com, marc.zyngier@arm.com, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, alex.williamson@redhat.com, patches@linaro.org, a.motakis@virtualopensystems.com, a.rigo@virtualopensystems.com, b.reynal@virtualopensystems.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 6 May 2015 at 17:33, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 27 April 2015 at 18:31, Christoffer Dall <christoffer.dall@linaro.org> wrote:
->> Now when we have a host generic PCIe controller in the virt board, it
->> would be nice to be able to use MSIs so that we can eventually enable
->> VHOST with KVM.
+Hi Christoffer,
+
+On 05/06/2015 04:26 PM, Christoffer Dall wrote:
+> On Wed, Feb 11, 2015 at 09:20:55AM +0100, Eric Auger wrote:
+>> Fix multiple injection of level sensitive forwarded IRQs.
+>> With current code, the second injection fails since the state bitmaps
+>> are not reset (process_maintenance is not called anymore).
 >>
->> With these patches you can use MSIs with TCG and with KVM, but you still
->> need some fixes for the mapping of the IRQ index to the GSI number for
->> IRQFD to work.  A separate series that enables IRQFD and vhost
->> is available: "ARM adaptations for vhost irqfd setup"
->> https://lists.gnu.org/archive/html/qemu-devel/2015-04/msg01054.html)
+>> New implementation follows those principles:
+>> - A forwarded IRQ only can be sampled when it is pending
+> 
+> why?
+For forwarded IRQ there is no modeled queued state (same as edge). The
+pending state is reset as soon as the vIRQ gets queued, in
+vgic_queue_hwirq (also same as edge). This modeling makes sure the vIRQ
+is injected once. I did not model the pending state since the above
+modeling looks simple and modeling the queued state did not work
+properly: I observed new forwarded IRQ could hit before the LR was seen
+cleaned. So overall, to me, current model looks closer to edge sensitive
+IRQs and looks simple & reliable compared to attempting to model any
+queued state.
+
+> 
+>> - when queueing the IRQ (programming the LR), the pending state is removed
+>>   as for edge sensitive IRQs
+>> - an injection of a forwarded IRQ is considered always valid since
+>>   coming from the HW and level always is 1.
 >>
->> Tested with KVM on XGene and with TCG by configuring a virtio-pci
->> network adapter for the guest and verifying MSIs going through as
->> expected.
->
-> You forgot to change the QOM device name to 'arm-gicv2m', but
-> I'll fix that up as I apply this to target-arm.next.
+>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+>>
+>> ---
+>>
+>> v1 -> v2:
+>> - integration in new vgic_can_sample_irq
+>> - remove the pending state when programming the LR
+>> ---
+>>  virt/kvm/arm/vgic.c | 16 ++++++++++++----
+>>  1 file changed, 12 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+>> index cd00cf2..433ecba 100644
+>> --- a/virt/kvm/arm/vgic.c
+>> +++ b/virt/kvm/arm/vgic.c
+>> @@ -361,7 +361,10 @@ static void vgic_cpu_irq_clear(struct kvm_vcpu *vcpu, int irq)
+>>  
+>>  static bool vgic_can_sample_irq(struct kvm_vcpu *vcpu, int irq)
+>>  {
+>> -	return vgic_irq_is_edge(vcpu, irq) || !vgic_irq_is_queued(vcpu, irq);
+>> +	bool is_forwarded =  (vgic_get_phys_irq(vcpu, irq) >= 0);
+> 
+> can you create a wrapper function for is_forwarded?
+yes sure
+> 
+>> +
+>> +	return vgic_irq_is_edge(vcpu, irq) || !vgic_irq_is_queued(vcpu, irq) ||
+>> +		(is_forwarded && vgic_dist_irq_is_pending(vcpu, irq));
+>>  }
+>>  
+>>  static u32 mmio_data_read(struct kvm_exit_mmio *mmio, u32 mask)
+>> @@ -1296,6 +1299,7 @@ static bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq)
+>>  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+>>  	struct vgic_lr vlr;
+>>  	int lr;
+>> +	bool is_forwarded =  (vgic_get_phys_irq(vcpu, irq) >= 0);
+>>  
+>>  	/* Sanitize the input... */
+>>  	BUG_ON(sgi_source_id & ~7);
+>> @@ -1331,7 +1335,7 @@ static bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq)
+>>  	vlr.irq = irq;
+>>  	vlr.source = sgi_source_id;
+>>  	vlr.state = LR_STATE_PENDING;
+>> -	if (!vgic_irq_is_edge(vcpu, irq))
+>> +	if (!vgic_irq_is_edge(vcpu, irq) && !is_forwarded)
+>>  		vlr.state |= LR_EOI_INT;
+>>  
+>>  	vgic_set_lr(vcpu, lr, vlr);
+>> @@ -1372,11 +1376,12 @@ static bool vgic_queue_sgi(struct kvm_vcpu *vcpu, int irq)
+>>  
+>>  static bool vgic_queue_hwirq(struct kvm_vcpu *vcpu, int irq)
+>>  {
+>> +	bool is_forwarded = (vgic_get_phys_irq(vcpu, irq) >= 0);
+>>  	if (!vgic_can_sample_irq(vcpu, irq))
+>>  		return true; /* level interrupt, already queued */
+>>  
+>>  	if (vgic_queue_irq(vcpu, 0, irq)) {
+>> -		if (vgic_irq_is_edge(vcpu, irq)) {
+>> +		if (vgic_irq_is_edge(vcpu, irq) || is_forwarded) {
+>>  			vgic_dist_irq_clear_pending(vcpu, irq);
+>>  			vgic_cpu_irq_clear(vcpu, irq);
+>>  		} else {
+>> @@ -1626,14 +1631,17 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
+>>  	int edge_triggered, level_triggered;
+>>  	int enabled;
+>>  	bool ret = true;
+>> +	bool is_forwarded;
+>>  
+>>  	spin_lock(&dist->lock);
+>>  
+>>  	vcpu = kvm_get_vcpu(kvm, cpuid);
+>> +	is_forwarded = (vgic_get_phys_irq(vcpu, irq_num) >= 0);
+>> +
+>>  	edge_triggered = vgic_irq_is_edge(vcpu, irq_num);
+>>  	level_triggered = !edge_triggered;
+>>  
+>> -	if (!vgic_validate_injection(vcpu, irq_num, level)) {
+>> +	if (!vgic_validate_injection(vcpu, irq_num, level) && !is_forwarded) {
+> 
+> why is it again that we don't trust validate for forwarded irqs?
+forwarded IRQs are directly linked to HW IRQs. If the forwarded IRQ is
+received this means the guest completed last HW IRQ occurence and it is
+valid to inject the new one so following the discussions we had with
+Marc I skipped that check.
 
-...except this series breaks booting of a linux guest using PCI
-on the virt board with aarch32:
+  Should
+> it not be checked inside validate?  Otherwise, this seems to deserve a
+> comment.
+It is equal to me. Let me know what is your preference according to
+above comment.
 
-PCI host bridge /pcie@10000000 ranges:
-   IO 0x3eff0000..0x3effffff -> 0x00000000
-  MEM 0x10000000..0x3efeffff -> 0x10000000
-pci-host-generic 3f000000.pcie: PCI host bridge to bus 0000:00
-pci_bus 0000:00: root bus resource [bus 00-0f]
-pci_bus 0000:00: root bus resource [io  0x0000-0xffff]
-pci_bus 0000:00: root bus resource [mem 0x10000000-0x3efeffff]
-PCI: bus0: Fast back to back transfers disabled
-pci 0000:00:01.0: of_irq_parse_pci() failed with rc=-22
-pci 0000:00:02.0: of_irq_parse_pci() failed with rc=-22
-pci 0000:00:02.0: BAR 6: assigned [mem 0x10000000-0x1003ffff pref]
-pci 0000:00:01.0: BAR 1: assigned [mem 0x10040000-0x10040fff]
-pci 0000:00:02.0: BAR 1: assigned [mem 0x10041000-0x10041fff]
-pci 0000:00:01.0: BAR 0: assigned [io  0x1000-0x103f]
-pci 0000:00:02.0: BAR 0: assigned [io  0x1040-0x105f]
-virtio-pci 0000:00:01.0: enabling device (0100 -> 0103)
-virtio-pci 0000:00:02.0: enabling device (0100 -> 0103)
-virtio_blk: probe of virtio32 failed with error -22
-virtio_net: probe of virtio33 failed with error -22
+- Eric
+> 
+>>  		ret = false;
+>>  		goto out;
+>>  	}
+> 
+> Thanks,
+> -Christoffer
+> 
 
-(and without virtio-blk we don't mount our rootfs).
-
--- PMM
