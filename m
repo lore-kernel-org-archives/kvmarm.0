@@ -1,88 +1,104 @@
-From: =?UTF-8?B?SsOpcsOpbXkgRmFuZ3XDqGRl?= <j.fanguede@virtualopensystems.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 Subject: Re: [RFC] ARM/ARM64: KVM: Implement KVM_FLUSH_DCACHE_GPA ioctl
-Date: Thu, 7 May 2015 16:50:24 +0200
-Message-ID: <CAGE1QJoyaGpuf=6Msa=xpm0pPGRkYWctcXGf=rwnha5o9Gm4bw@mail.gmail.com>
+Date: Thu, 7 May 2015 17:34:53 +0200
+Message-ID: <CAMJs5B9i9q8gJU93B09-uLMF6w1bTft-40DWPFUP6ky=SketSQ@mail.gmail.com>
 References: <1430817191-6231-1-git-send-email-j.fanguede@virtualopensystems.com>
- <20150506141249.GA6796@cbox>
- <CAGE1QJrabWWs0O1V-MpOxT_=1472TXb5rvJzJAJNfWH70x9pcg@mail.gmail.com>
- <20150507112027.GC25885@cbox>
+	<20150506141249.GA6796@cbox>
+	<CAGE1QJrabWWs0O1V-MpOxT_=1472TXb5rvJzJAJNfWH70x9pcg@mail.gmail.com>
+	<20150507112027.GC25885@cbox>
+	<CAGE1QJoyaGpuf=6Msa=xpm0pPGRkYWctcXGf=rwnha5o9Gm4bw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 71FC250C3E
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2015 10:41:57 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ePB5EITwPu-N for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 May 2015 10:41:56 -0400 (EDT)
-Received: from mail-wg0-f49.google.com (mail-wg0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 068DF50C3C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2015 10:41:55 -0400 (EDT)
-Received: by wgic8 with SMTP id c8so19574909wgi.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 07 May 2015 07:50:45 -0700 (PDT)
-In-Reply-To: <20150507112027.GC25885@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: "open list:Overall" <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <CAGE1QJoyaGpuf=6Msa=xpm0pPGRkYWctcXGf=rwnha5o9Gm4bw@mail.gmail.com>
+Sender: kvm-owner@vger.kernel.org
+To: =?UTF-8?B?SsOpcsOpbXkgRmFuZ3XDqGRl?= <j.fanguede@virtualopensystems.com>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Paolo Bonzini <pbonzini@redhat.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "open list:Overall" <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gVGh1LCBNYXkgNywgMjAxNSBhdCAxOjIwIFBNLCBDaHJpc3RvZmZlciBEYWxsCjxjaHJpc3Rv
-ZmZlci5kYWxsQGxpbmFyby5vcmc+IHdyb3RlOgo+IE9uIFRodSwgTWF5IDA3LCAyMDE1IGF0IDEy
-OjUwOjUwUE0gKzAyMDAsIErDqXLDqW15IEZhbmd1w6hkZSB3cm90ZToKPj4gT24gV2VkLCBNYXkg
-NiwgMjAxNSBhdCA0OjEyIFBNLCBDaHJpc3RvZmZlciBEYWxsCj4+IDxjaHJpc3RvZmZlci5kYWxs
-QGxpbmFyby5vcmc+IHdyb3RlOgo+PiA+IEhpIErDqXLDqW15LAo+PiA+Cj4+ID4gT24gVHVlLCBN
-YXkgMDUsIDIwMTUgYXQgMTE6MTM6MTFBTSArMDIwMCwgSsOpcsOpbXkgRmFuZ3XDqGRlIHdyb3Rl
-Ogo+PiA+PiBUbyBtYWludGFpbiBjYWNoZSBjb2hlcmVuY3kgb24gQVJNLCB3ZSBtYXkgbmVlZCBh
-IG1lY2hhbmlzbSB0byBmbHVzaAo+PiA+PiB0aGUgZGF0YSBjYWNoZS4KPj4gPgo+PiA+IEluIGFk
-ZGl0aW9uIHRvIGdlbmVyYWxseSBqdXN0IG1ha2luZyB0aGlzIGZ1bmN0aW9uYWxpdHkgYXZhaWxh
-YmxlIChzZWUKPj4gPiBiZWxvdyksIGRvIHlvdSBoYXZlIGFuIGFjdHVhbCB1c2UgY2FzZSBpbiBt
-aW5kIGZvciB0aGlzPyAgVG8gc29sdmUgdGhlCj4+ID4gVkdBIGlzc3VlLCBmb3IgZXhhbXBsZSwg
-d2UgYWxyZWFkeSBoYXZlIGEgcGF0Y2ggc2VyaWVzIGZyb20gRHJldyB0cnlpbmcKPj4gPiB0byBh
-ZGRyZXNzIHRoaXMuICBEb2VzIHRoYXQgbm90IHdvcmsgZm9yIHlvdT8KPj4gPgo+PiA+IFRoZXJl
-IHdhcyBhIGxvbmcgZGlzY3Vzc2lvbiBhYm91dCB0aGlzIGhlcmU6Cj4+ID4gaHR0cHM6Ly9saXN0
-cy5jcy5jb2x1bWJpYS5lZHUvcGlwZXJtYWlsL2t2bWFybS8yMDE1LUZlYnJ1YXJ5LzAxMzU5My5o
-dG1sCj4+ID4KPj4gPiBEcmV3IHRoZW4gY3JlYXRlZCBhIHBhdGNoIHNldCwgaGVyZToKPj4gPiBo
-dHRwczovL2xpc3RzLm5vbmdudS5vcmcvYXJjaGl2ZS9odG1sL3FlbXUtZGV2ZWwvMjAxNS0wMy9t
-c2cwMTI1NC5odG1sCj4+ID4KPj4gPiBhbmQgcmVwbGllZCB0byBoaW1zZWxmLCBoZXJlOgo+PiA+
-IGh0dHBzOi8vd3d3Lm1hcmMuaW5mby8/bD1hbmRyb2lkLXZpcnQmbT0xNDI2NzA1MjM5MjkxMzIm
-dz0zCj4+ID4KPj4gPiBXaGljaCBiYXNpY2FsbHkgc2F5cyB0aGF0IGhlIGRvZXNuJ3QgbGlrZSBo
-YXZpbmcgdG8gZG8gZmx1c2hlcyBhbGwgb3Zlcgo+PiA+IFFFTVUgKElJVUMpLCBzbyBoZSBzZW50
-IHRoaXMgdmVyc2lvbiBpbnN0ZWFkOgo+PiA+IGh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1
-L3BpcGVybWFpbC9rdm1hcm0vMjAxNS1NYXJjaC8wMTQwMjcuaHRtbAo+PiA+Cj4+ID4gV2hpY2gg
-aGUgbm93IHNhaWQgaGUnZCByZXNwaW4uCj4+Cj4+IEluIGZhY3QsIEkgdXNlZCB0aGlzIGlvY3Rs
-IGluIHBhaXJzIHdpdGggdGhpcyBRRU1VIHBhdGNoIHNlcmllczoKPj4gaHR0cHM6Ly9saXN0cy5u
-b25nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTUtMDUvbXNnMDA0MDcuaHRtbAo+
-PiBNeSBjdXJyZW50IHdvcmsgZG9lc24ndCBkbyBhbnl0aGluZyBhYm91dCB2Z2EgcmFtLCBzbyB2
-Z2EgaXNzdWUKPj4gcHJvYmFibHkgc3RpbGwgcGVyc2lzdHMsIGJ1dCBpdCBzb2x2ZXMgb3RoZXJz
-IGlzc3VlcyB3aXRoIHNvbWUKPj4gZW11bGF0ZWQgZGV2aWNlcyAobWFpbmx5IFBDSSkgd2hpY2gg
-d2VyZSBmYWlsaW5nIGJlZm9yZSBhbmQgbm93IHdvcmsKPj4gZmluZSB3aXRoIHRoaXMgcGF0Y2gu
-Cj4KPiBXaHkgZG9lcyBEcmV3J3MgYXBwcm9hY2ggbm90IHdvcmsgYW5kIHlvdXIgYXBwcm9hY2gg
-d29ya3MgaGVyZT8gIFdoYXQgaXMKPiB0aGUgY2FzZSB0aGF0IHdlIGhhdmVuJ3QgdGhvdWdoIGFi
-b3V0IHlldD8KClRoZSBmaXJzdCBwYXRjaCBmcm9tIEFuZHJldywgKHdoaWNoIGlzIGZvciBhcm02
-NCBvbmx5KSBkb2Vzbid0IHBlcm1pdAptZSB0byBtYWtlIHNvbWUgZW11bGF0ZWQgUENJIGRldmlj
-ZXMgd29ya2luZyB3aXRoIHZpcnQsIHByb2JhYmx5CmJlY2F1c2Ugc29tZSBmbHVzaGVzL2NsZWFu
-cyBhcmUgbWlzc2luZy4KQXMgZm9yIHRoZSBzZWNvbmQgcGF0Y2gsIGl0IGZvY3VzZXMsIGZvciBu
-b3csIG9ubHkgb24gVkdBIHJhbS4gSQpxdWlja2x5IHRyaWVkIHRvIGV4dGVuZCB0aGUgS1ZNX01F
-TV9VTkNBQ0hFRCBmbGFnIHRvIHRoZSB3aG9sZSBndWVzdAptZW1vcnksIGJ1dCB0aGVuIHRoZSBn
-dWVzdCBmYWlscyB0byBib290OyBidXQgZXZlbiBpZiBpdCB3YXMgd29ya2luZywKZG9lcyBpdCBt
-YWtlIHNlbnNlIHRvIG1hcCBhcyB1bmNhY2hlZCBhbGwgdGhlIHJhbSBvZiB0aGUgZ3Vlc3Q/IFNp
-bmNlCndlIGNhbiBub3QgZ3Vlc3Mgd2hpY2ggcmVnaW9uIG9mIHRoZSBndWVzdCBtZW1vcnkgd2ls
-bCBiZSBhY2Nlc3NlZC4KClNpbXBsZSBQQ0kgZGV2aWNlcyBsaWtlIGUxMDAwIG9yIHVzYi1laGNp
-ICh3aXRoIHVzYi1rYmQgZm9yIGluc3RhbmNlKQphcmUgbm90IHVzYWJsZSwgd2l0aCBvciB3aXRo
-b3V0IHRoZXNlIHBhdGNoZXMsIGJ1dCBpZiBJIGZsdXNoIGEKcHJlY2lzZSBtZW1vcnkgcmFuZ2Us
-IG9uIHJlYWRzIGFuZCB3cml0ZXMgcGVyZm9ybWVkIGJ5IGVtdWxhdGVkCmRldmljZXMgb24gZ3Vl
-c3QgcmFtLCAoSXQncyBleGFjdGx5IHdoYXQgdGhlIFFFTVUgcGF0Y2ggc2VyaWVzIHRoYXQgSQpz
-ZW50IGRvZXMsIHdpdGggdGhpcyBpb2N0bCksIGVtdWxhdGVkIFBDSSBkZXZpY2VzIGFyZSBub3cg
-d29ya2luZy4KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
-a3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8v
-bGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Thu, May 7, 2015 at 4:50 PM, J=C3=A9r=C3=A9my Fangu=C3=A8de
+<j.fanguede@virtualopensystems.com> wrote:
+> On Thu, May 7, 2015 at 1:20 PM, Christoffer Dall
+> <christoffer.dall@linaro.org> wrote:
+>> On Thu, May 07, 2015 at 12:50:50PM +0200, J=C3=A9r=C3=A9my Fangu=C3=A8=
+de wrote:
+>>> On Wed, May 6, 2015 at 4:12 PM, Christoffer Dall
+>>> <christoffer.dall@linaro.org> wrote:
+>>> > Hi J=C3=A9r=C3=A9my,
+>>> >
+>>> > On Tue, May 05, 2015 at 11:13:11AM +0200, J=C3=A9r=C3=A9my Fangu=C3=
+=A8de wrote:
+>>> >> To maintain cache coherency on ARM, we may need a mechanism to f=
+lush
+>>> >> the data cache.
+>>> >
+>>> > In addition to generally just making this functionality available=
+ (see
+>>> > below), do you have an actual use case in mind for this?  To solv=
+e the
+>>> > VGA issue, for example, we already have a patch series from Drew =
+trying
+>>> > to address this.  Does that not work for you?
+>>> >
+>>> > There was a long discussion about this here:
+>>> > https://lists.cs.columbia.edu/pipermail/kvmarm/2015-February/0135=
+93.html
+>>> >
+>>> > Drew then created a patch set, here:
+>>> > https://lists.nongnu.org/archive/html/qemu-devel/2015-03/msg01254=
+=2Ehtml
+>>> >
+>>> > and replied to himself, here:
+>>> > https://www.marc.info/?l=3Dandroid-virt&m=3D142670523929132&w=3D3
+>>> >
+>>> > Which basically says that he doesn't like having to do flushes al=
+l over
+>>> > QEMU (IIUC), so he sent this version instead:
+>>> > https://lists.cs.columbia.edu/pipermail/kvmarm/2015-March/014027.=
+html
+>>> >
+>>> > Which he now said he'd respin.
+>>>
+>>> In fact, I used this ioctl in pairs with this QEMU patch series:
+>>> https://lists.nongnu.org/archive/html/qemu-devel/2015-05/msg00407.h=
+tml
+>>> My current work doesn't do anything about vga ram, so vga issue
+>>> probably still persists, but it solves others issues with some
+>>> emulated devices (mainly PCI) which were failing before and now wor=
+k
+>>> fine with this patch.
+>>
+>> Why does Drew's approach not work and your approach works here?  Wha=
+t is
+>> the case that we haven't though about yet?
+>
+> The first patch from Andrew, (which is for arm64 only) doesn't permit
+> me to make some emulated PCI devices working with virt, probably
+> because some flushes/cleans are missing.
+> As for the second patch, it focuses, for now, only on VGA ram. I
+> quickly tried to extend the KVM_MEM_UNCACHED flag to the whole guest
+> memory, but then the guest fails to boot; but even if it was working,
+> does it make sense to map as uncached all the ram of the guest? Since
+> we can not guess which region of the guest memory will be accessed.
+>
+> Simple PCI devices like e1000 or usb-ehci (with usb-kbd for instance)
+> are not usable, with or without these patches, but if I flush a
+> precise memory range, on reads and writes performed by emulated
+> devices on guest ram, (It's exactly what the QEMU patch series that I
+> sent does, with this ioctl), emulated PCI devices are now working.
+
+I understand all this.  What I'd like for us to find out is why we are
+having coherency issues.  We knew that for the VGA adapter, the guest
+maps the memory as uncached (because that's how the real hardware
+works), and QEMU maps the memory as cached (because it's just normal
+memory), and unsurprisingly the two views of that memory is not
+coherent.
+
+What are the cases you are seeing with e1000 or usb-ehci?
+
+Hint: We can make a lot of things work by just sticking cache flushes
+all over, but it's not a good engineering approach.
+
+Thanks,
+-Christoffer
