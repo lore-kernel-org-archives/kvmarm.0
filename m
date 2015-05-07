@@ -1,69 +1,139 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC] ARM/ARM64: KVM: Implement KVM_FLUSH_DCACHE_GPA ioctl
-Date: Thu, 7 May 2015 13:20:27 +0200
-Message-ID: <20150507112027.GC25885@cbox>
-References: <1430817191-6231-1-git-send-email-j.fanguede@virtualopensystems.com>
- <20150506141249.GA6796@cbox>
- <CAGE1QJrabWWs0O1V-MpOxT_=1472TXb5rvJzJAJNfWH70x9pcg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [PATCH 1/5] VFIO: platform: add reset_list and register/unregister functions
+Date: Thu,  7 May 2015 16:27:19 +0200
+Message-ID: <1431008843-28411-2-git-send-email-eric.auger@linaro.org>
+References: <1431008843-28411-1-git-send-email-eric.auger@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAGE1QJrabWWs0O1V-MpOxT_=1472TXb5rvJzJAJNfWH70x9pcg@mail.gmail.com>
+In-Reply-To: <1431008843-28411-1-git-send-email-eric.auger@linaro.org>
 Sender: kvm-owner@vger.kernel.org
-To: =?iso-8859-1?B?Suly6W15IEZhbmd16GRl?= <j.fanguede@virtualopensystems.com>
-Cc: kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, "open list:Overall" <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>
+To: eric.auger@st.com, eric.auger@linaro.org, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, alex.williamson@redhat.com, b.reynal@virtualopensystems.com
+Cc: linux-kernel@vger.kernel.org, patches@linaro.org, agraf@suse.de, Bharat.Bhushan@freescale.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 07, 2015 at 12:50:50PM +0200, J=E9r=E9my Fangu=E8de wrote:
-> On Wed, May 6, 2015 at 4:12 PM, Christoffer Dall
-> <christoffer.dall@linaro.org> wrote:
-> > Hi J=E9r=E9my,
-> >
-> > On Tue, May 05, 2015 at 11:13:11AM +0200, J=E9r=E9my Fangu=E8de wro=
-te:
-> >> To maintain cache coherency on ARM, we may need a mechanism to flu=
-sh
-> >> the data cache.
-> >
-> > In addition to generally just making this functionality available (=
-see
-> > below), do you have an actual use case in mind for this?  To solve =
-the
-> > VGA issue, for example, we already have a patch series from Drew tr=
-ying
-> > to address this.  Does that not work for you?
-> >
-> > There was a long discussion about this here:
-> > https://lists.cs.columbia.edu/pipermail/kvmarm/2015-February/013593=
-=2Ehtml
-> >
-> > Drew then created a patch set, here:
-> > https://lists.nongnu.org/archive/html/qemu-devel/2015-03/msg01254.h=
-tml
-> >
-> > and replied to himself, here:
-> > https://www.marc.info/?l=3Dandroid-virt&m=3D142670523929132&w=3D3
-> >
-> > Which basically says that he doesn't like having to do flushes all =
-over
-> > QEMU (IIUC), so he sent this version instead:
-> > https://lists.cs.columbia.edu/pipermail/kvmarm/2015-March/014027.ht=
-ml
-> >
-> > Which he now said he'd respin.
->=20
-> In fact, I used this ioctl in pairs with this QEMU patch series:
-> https://lists.nongnu.org/archive/html/qemu-devel/2015-05/msg00407.htm=
-l
-> My current work doesn't do anything about vga ram, so vga issue
-> probably still persists, but it solves others issues with some
-> emulated devices (mainly PCI) which were failing before and now work
-> fine with this patch.
+vfio_platform_common now stores a lists of available reset functions.
+Two functions are exposed to register/unregister a reset function. A
+reset function is paired with a compat string.
 
-Why does Drew's approach not work and your approach works here?  What i=
-s
-the case that we haven't though about yet?
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
+---
+ drivers/vfio/platform/vfio_platform_common.c  | 63 +++++++++++++++++++++++++++
+ drivers/vfio/platform/vfio_platform_private.h | 13 ++++++
+ 2 files changed, 76 insertions(+)
 
--Christoffer
+diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
+index abcff7a..edbf24c 100644
+--- a/drivers/vfio/platform/vfio_platform_common.c
++++ b/drivers/vfio/platform/vfio_platform_common.c
+@@ -23,6 +23,9 @@
+ 
+ #include "vfio_platform_private.h"
+ 
++struct list_head reset_list;
++LIST_HEAD(reset_list);
++
+ static DEFINE_MUTEX(driver_lock);
+ 
+ static int vfio_platform_regions_init(struct vfio_platform_device *vdev)
+@@ -511,6 +514,13 @@ EXPORT_SYMBOL_GPL(vfio_platform_probe_common);
+ struct vfio_platform_device *vfio_platform_remove_common(struct device *dev)
+ {
+ 	struct vfio_platform_device *vdev;
++	struct vfio_platform_reset_node *iter, *tmp;
++
++	list_for_each_entry_safe(iter, tmp, &reset_list, link) {
++		list_del(&iter->link);
++		kfree(iter->compat);
++		kfree(iter);
++	}
+ 
+ 	vdev = vfio_del_group_dev(dev);
+ 	if (vdev)
+@@ -519,3 +529,56 @@ struct vfio_platform_device *vfio_platform_remove_common(struct device *dev)
+ 	return vdev;
+ }
+ EXPORT_SYMBOL_GPL(vfio_platform_remove_common);
++
++int vfio_platform_register_reset(char *compat, struct module *reset_owner,
++				 vfio_platform_reset_fn_t reset)
++{
++	struct vfio_platform_reset_node *node, *iter;
++	bool found = false;
++
++	list_for_each_entry(iter, &reset_list, link) {
++		if (!strcmp(iter->compat, compat)) {
++			found = true;
++			break;
++		}
++	}
++	if (found)
++		return -EINVAL;
++
++	node = kmalloc(sizeof(*node), GFP_KERNEL);
++	if (!node)
++		return -ENOMEM;
++
++	node->compat = kstrdup(compat, GFP_KERNEL);
++	if (!node->compat)
++		return -ENOMEM;
++
++	node->owner = reset_owner;
++	node->reset = reset;
++
++	list_add(&node->link, &reset_list);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(vfio_platform_register_reset);
++
++int vfio_platform_unregister_reset(char *compat)
++{
++	struct vfio_platform_reset_node *iter;
++	bool found = false;
++
++	list_for_each_entry(iter, &reset_list, link) {
++		if (!strcmp(iter->compat, compat)) {
++			found = true;
++			break;
++		}
++	}
++	if (!found)
++		return -EINVAL;
++
++	list_del(&iter->link);
++	kfree(iter->compat);
++	kfree(iter);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(vfio_platform_unregister_reset);
++
+diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
+index 5d31e04..da2d60b 100644
+--- a/drivers/vfio/platform/vfio_platform_private.h
++++ b/drivers/vfio/platform/vfio_platform_private.h
+@@ -69,6 +69,15 @@ struct vfio_platform_device {
+ 	int	(*get_irq)(struct vfio_platform_device *vdev, int i);
+ };
+ 
++typedef int (*vfio_platform_reset_fn_t)(struct vfio_platform_device *vdev);
++
++struct vfio_platform_reset_node {
++	struct list_head link;
++	char *compat;
++	struct module *owner;
++	vfio_platform_reset_fn_t reset;
++};
++
+ extern int vfio_platform_probe_common(struct vfio_platform_device *vdev,
+ 				      struct device *dev);
+ extern struct vfio_platform_device *vfio_platform_remove_common
+@@ -82,4 +91,8 @@ extern int vfio_platform_set_irqs_ioctl(struct vfio_platform_device *vdev,
+ 					unsigned start, unsigned count,
+ 					void *data);
+ 
++extern int vfio_platform_register_reset(char *compat, struct module *owner,
++					vfio_platform_reset_fn_t reset);
++extern int vfio_platform_unregister_reset(char *compat);
++
+ #endif /* VFIO_PLATFORM_PRIVATE_H */
+-- 
+1.9.1
+
