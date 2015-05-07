@@ -1,66 +1,69 @@
-From: =?UTF-8?B?SsOpcsOpbXkgRmFuZ3XDqGRl?= <j.fanguede@virtualopensystems.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 Subject: Re: [RFC] ARM/ARM64: KVM: Implement KVM_FLUSH_DCACHE_GPA ioctl
-Date: Thu, 7 May 2015 12:50:50 +0200
-Message-ID: <CAGE1QJrabWWs0O1V-MpOxT_=1472TXb5rvJzJAJNfWH70x9pcg@mail.gmail.com>
+Date: Thu, 7 May 2015 13:20:27 +0200
+Message-ID: <20150507112027.GC25885@cbox>
 References: <1430817191-6231-1-git-send-email-j.fanguede@virtualopensystems.com>
  <20150506141249.GA6796@cbox>
+ <CAGE1QJrabWWs0O1V-MpOxT_=1472TXb5rvJzJAJNfWH70x9pcg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F18D450BC8
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2015 06:42:23 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tTbHrv1pGsZT for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 May 2015 06:42:22 -0400 (EDT)
-Received: from mail-wi0-f171.google.com (mail-wi0-f171.google.com
- [209.85.212.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 26A6250B99
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 May 2015 06:42:21 -0400 (EDT)
-Received: by wicmx19 with SMTP id mx19so10762454wic.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 07 May 2015 03:51:10 -0700 (PDT)
-In-Reply-To: <20150506141249.GA6796@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: "open list:Overall" <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAGE1QJrabWWs0O1V-MpOxT_=1472TXb5rvJzJAJNfWH70x9pcg@mail.gmail.com>
+Sender: kvm-owner@vger.kernel.org
+To: =?iso-8859-1?B?Suly6W15IEZhbmd16GRl?= <j.fanguede@virtualopensystems.com>
+Cc: kvmarm@lists.cs.columbia.edu, Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, "open list:Overall" <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gV2VkLCBNYXkgNiwgMjAxNSBhdCA0OjEyIFBNLCBDaHJpc3RvZmZlciBEYWxsCjxjaHJpc3Rv
-ZmZlci5kYWxsQGxpbmFyby5vcmc+IHdyb3RlOgo+IEhpIErDqXLDqW15LAo+Cj4gT24gVHVlLCBN
-YXkgMDUsIDIwMTUgYXQgMTE6MTM6MTFBTSArMDIwMCwgSsOpcsOpbXkgRmFuZ3XDqGRlIHdyb3Rl
-Ogo+PiBUbyBtYWludGFpbiBjYWNoZSBjb2hlcmVuY3kgb24gQVJNLCB3ZSBtYXkgbmVlZCBhIG1l
-Y2hhbmlzbSB0byBmbHVzaAo+PiB0aGUgZGF0YSBjYWNoZS4KPgo+IEluIGFkZGl0aW9uIHRvIGdl
-bmVyYWxseSBqdXN0IG1ha2luZyB0aGlzIGZ1bmN0aW9uYWxpdHkgYXZhaWxhYmxlIChzZWUKPiBi
-ZWxvdyksIGRvIHlvdSBoYXZlIGFuIGFjdHVhbCB1c2UgY2FzZSBpbiBtaW5kIGZvciB0aGlzPyAg
-VG8gc29sdmUgdGhlCj4gVkdBIGlzc3VlLCBmb3IgZXhhbXBsZSwgd2UgYWxyZWFkeSBoYXZlIGEg
-cGF0Y2ggc2VyaWVzIGZyb20gRHJldyB0cnlpbmcKPiB0byBhZGRyZXNzIHRoaXMuICBEb2VzIHRo
-YXQgbm90IHdvcmsgZm9yIHlvdT8KPgo+IFRoZXJlIHdhcyBhIGxvbmcgZGlzY3Vzc2lvbiBhYm91
-dCB0aGlzIGhlcmU6Cj4gaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvcGlwZXJtYWlsL2t2
-bWFybS8yMDE1LUZlYnJ1YXJ5LzAxMzU5My5odG1sCj4KPiBEcmV3IHRoZW4gY3JlYXRlZCBhIHBh
-dGNoIHNldCwgaGVyZToKPiBodHRwczovL2xpc3RzLm5vbmdudS5vcmcvYXJjaGl2ZS9odG1sL3Fl
-bXUtZGV2ZWwvMjAxNS0wMy9tc2cwMTI1NC5odG1sCj4KPiBhbmQgcmVwbGllZCB0byBoaW1zZWxm
-LCBoZXJlOgo+IGh0dHBzOi8vd3d3Lm1hcmMuaW5mby8/bD1hbmRyb2lkLXZpcnQmbT0xNDI2NzA1
-MjM5MjkxMzImdz0zCj4KPiBXaGljaCBiYXNpY2FsbHkgc2F5cyB0aGF0IGhlIGRvZXNuJ3QgbGlr
-ZSBoYXZpbmcgdG8gZG8gZmx1c2hlcyBhbGwgb3Zlcgo+IFFFTVUgKElJVUMpLCBzbyBoZSBzZW50
-IHRoaXMgdmVyc2lvbiBpbnN0ZWFkOgo+IGh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L3Bp
-cGVybWFpbC9rdm1hcm0vMjAxNS1NYXJjaC8wMTQwMjcuaHRtbAo+Cj4gV2hpY2ggaGUgbm93IHNh
-aWQgaGUnZCByZXNwaW4uCgpJbiBmYWN0LCBJIHVzZWQgdGhpcyBpb2N0bCBpbiBwYWlycyB3aXRo
-IHRoaXMgUUVNVSBwYXRjaCBzZXJpZXM6Cmh0dHBzOi8vbGlzdHMubm9uZ251Lm9yZy9hcmNoaXZl
-L2h0bWwvcWVtdS1kZXZlbC8yMDE1LTA1L21zZzAwNDA3Lmh0bWwKTXkgY3VycmVudCB3b3JrIGRv
-ZXNuJ3QgZG8gYW55dGhpbmcgYWJvdXQgdmdhIHJhbSwgc28gdmdhIGlzc3VlCnByb2JhYmx5IHN0
-aWxsIHBlcnNpc3RzLCBidXQgaXQgc29sdmVzIG90aGVycyBpc3N1ZXMgd2l0aCBzb21lCmVtdWxh
-dGVkIGRldmljZXMgKG1haW5seSBQQ0kpIHdoaWNoIHdlcmUgZmFpbGluZyBiZWZvcmUgYW5kIG5v
-dyB3b3JrCmZpbmUgd2l0aCB0aGlzIHBhdGNoLgpfX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5j
-b2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5m
-by9rdm1hcm0K
+On Thu, May 07, 2015 at 12:50:50PM +0200, J=E9r=E9my Fangu=E8de wrote:
+> On Wed, May 6, 2015 at 4:12 PM, Christoffer Dall
+> <christoffer.dall@linaro.org> wrote:
+> > Hi J=E9r=E9my,
+> >
+> > On Tue, May 05, 2015 at 11:13:11AM +0200, J=E9r=E9my Fangu=E8de wro=
+te:
+> >> To maintain cache coherency on ARM, we may need a mechanism to flu=
+sh
+> >> the data cache.
+> >
+> > In addition to generally just making this functionality available (=
+see
+> > below), do you have an actual use case in mind for this?  To solve =
+the
+> > VGA issue, for example, we already have a patch series from Drew tr=
+ying
+> > to address this.  Does that not work for you?
+> >
+> > There was a long discussion about this here:
+> > https://lists.cs.columbia.edu/pipermail/kvmarm/2015-February/013593=
+=2Ehtml
+> >
+> > Drew then created a patch set, here:
+> > https://lists.nongnu.org/archive/html/qemu-devel/2015-03/msg01254.h=
+tml
+> >
+> > and replied to himself, here:
+> > https://www.marc.info/?l=3Dandroid-virt&m=3D142670523929132&w=3D3
+> >
+> > Which basically says that he doesn't like having to do flushes all =
+over
+> > QEMU (IIUC), so he sent this version instead:
+> > https://lists.cs.columbia.edu/pipermail/kvmarm/2015-March/014027.ht=
+ml
+> >
+> > Which he now said he'd respin.
+>=20
+> In fact, I used this ioctl in pairs with this QEMU patch series:
+> https://lists.nongnu.org/archive/html/qemu-devel/2015-05/msg00407.htm=
+l
+> My current work doesn't do anything about vga ram, so vga issue
+> probably still persists, but it solves others issues with some
+> emulated devices (mainly PCI) which were failing before and now work
+> fine with this patch.
+
+Why does Drew's approach not work and your approach works here?  What i=
+s
+the case that we haven't though about yet?
+
+-Christoffer
