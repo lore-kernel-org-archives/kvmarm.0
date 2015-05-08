@@ -1,19 +1,20 @@
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
+From: Dave P Martin <Dave.Martin@arm.com>
 Subject: Re: [PATCH 1/2] ARM: kvm: fix a bad BSYM() usage
-Date: Fri, 8 May 2015 12:21:00 -0400 (EDT)
-Message-ID: <alpine.LFD.2.11.1505081220280.7750@knanqh.ubzr>
+Date: Fri, 8 May 2015 17:31:08 +0100
+Message-ID: <20150508163107.GB17900@e103592.cambridge.arm.com>
 References: <E1YqkpO-0006zB-QJ@rmk-PC.arm.linux.org.uk>
 Mime-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: 8BIT
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <E1YqkpO-0006zB-QJ@rmk-PC.arm.linux.org.uk>
+Content-Disposition: inline
 Sender: kvm-owner@vger.kernel.org
 To: Russell King <rmk+kernel@arm.linux.org.uk>
-Cc: Dave P Martin <Dave.Martin@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Gleb Natapov <gleb@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Nicolas Pitre <nico@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Gleb Natapov <gleb@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 8 May 2015, Russell King wrote:
-
+On Fri, May 08, 2015 at 05:08:42PM +0100, Russell King wrote:
 > BSYM() should only be used when refering to local symbols in the same
 > assembly file which are resolved by the assembler, and not for
 > linker-fixed up symbols.  The use of BSYM() with panic is incorrect as
@@ -22,7 +23,7 @@ On Fri, 8 May 2015, Russell King wrote:
 > 
 > Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
 
-Acked-by: Nicolas Pitre <nico@linaro.org>
+Acked-by: Dave Martin <Dave.Martin@arm.com>
 
 > ---
 >  arch/arm/kvm/interrupts.S | 2 +-
@@ -44,4 +45,4 @@ Acked-by: Nicolas Pitre <nico@linaro.org>
 > -- 
 > 1.8.3.1
 > 
-> 
+
