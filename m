@@ -1,22 +1,21 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: [RFC/RFT PATCH v2 3/3] arm/arm64: KVM: implement 'uncached' mem
- coherency
-Date: Wed, 13 May 2015 13:31:54 +0200
-Message-ID: <1431516714-25816-4-git-send-email-drjones@redhat.com>
+Subject: [RFC/RFT PATCH v2 2/3] KVM: promote KVM_MEMSLOT_INCOHERENT to uapi
+Date: Wed, 13 May 2015 13:31:53 +0200
+Message-ID: <1431516714-25816-3-git-send-email-drjones@redhat.com>
 References: <1431516714-25816-1-git-send-email-drjones@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41075512F4
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 May 2015 07:23:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CBE9512F8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 May 2015 07:23:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VbPi4NWD6ZS5 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 May 2015 07:23:15 -0400 (EDT)
+ with ESMTP id 7hVOzjdgvX4H for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 May 2015 07:23:14 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0B520512F2
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 715A6512F4
  for <kvmarm@lists.cs.columbia.edu>; Wed, 13 May 2015 07:23:14 -0400 (EDT)
 In-Reply-To: <1431516714-25816-1-git-send-email-drjones@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -32,234 +31,176 @@ To: kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, ard.biesheuvel@linaro.o
 Cc: catalin.marinas@arm.com, lersek@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When S1 and S2 memory attributes combine wrt to caching policy,
-non-cacheable types take precedence. If a guest maps a region as
-device memory, which KVM userspace is using to emulate the device
-using normal, cacheable memory, then we lose coherency. With
-KVM_MEM_UNCACHED, KVM userspace can now hint to KVM which memory
-regions are likely to be problematic. With this patch, as pages
-of these types of regions are faulted into the guest, not only do
-we flush the page's dcache, but we also change userspace's
-mapping to NC in order to maintain coherency.
-
-What if the guest doesn't do what we expect? While we can't
-force a guest to use cacheable memory, we can take advantage of
-the non-cacheable precedence, and force it to use non-cacheable.
-So, this patch also introduces PAGE_S2_NORMAL_NC, and uses it on
-KVM_MEM_UNCACHED regions to force them to NC.
-
-We now have both guest and userspace on the same page (pun intended)
+Commit 1050dcda30529 introduced KVM_MEMSLOT_INCOHERENT to flag memory
+regions that may have coherency issues due to mapping host system RAM
+as non-cacheable. This was introduced as a KVM internal flag, but now
+give KVM userspace access to it so that it may use it for hinting
+likely problematic regions. Also rename to KVM_MEM_UNCACHED.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- arch/arm/include/asm/kvm_mmu.h        |  5 ++++-
- arch/arm/include/asm/pgtable-3level.h |  1 +
- arch/arm/include/asm/pgtable.h        |  1 +
- arch/arm/kvm/mmu.c                    | 37 +++++++++++++++++++++++------------
- arch/arm64/include/asm/kvm_mmu.h      |  5 ++++-
- arch/arm64/include/asm/memory.h       |  1 +
- arch/arm64/include/asm/pgtable.h      |  1 +
- 7 files changed, 36 insertions(+), 15 deletions(-)
+ Documentation/virtual/kvm/api.txt | 20 ++++++++++++++------
+ arch/arm/include/uapi/asm/kvm.h   |  1 +
+ arch/arm/kvm/arm.c                |  1 +
+ arch/arm/kvm/mmu.c                |  4 ++--
+ arch/arm64/include/uapi/asm/kvm.h |  1 +
+ include/linux/kvm_host.h          |  1 -
+ include/uapi/linux/kvm.h          |  2 ++
+ virt/kvm/kvm_main.c               |  7 ++++++-
+ 8 files changed, 27 insertions(+), 10 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 405aa18833073..e8034a80b12e5 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -214,8 +214,11 @@ static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu, pfn_t pfn,
- 	while (size) {
- 		void *va = kmap_atomic_pfn(pfn);
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index 9fa2bf8c3f6f1..04ffd9f5db5f2 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -905,6 +905,7 @@ struct kvm_userspace_memory_region {
+ /* for kvm_memory_region::flags */
+ #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
+ #define KVM_MEM_READONLY	(1UL << 1)
++#define KVM_MEM_UNCACHED	(1UL << 2)
  
--		if (need_flush)
-+		if (need_flush) {
- 			kvm_flush_dcache_to_poc(va, PAGE_SIZE);
-+			if (ipa_uncached)
-+				set_memory_nc((unsigned long)va, 1);
-+		}
+ This ioctl allows the user to create or modify a guest physical memory
+ slot.  When changing an existing slot, it may be moved in the guest
+@@ -920,12 +921,19 @@ It is recommended that the lower 21 bits of guest_phys_addr and userspace_addr
+ be identical.  This allows large pages in the guest to be backed by large
+ pages in the host.
  
- 		if (icache_is_pipt())
- 			__cpuc_coherent_user_range((unsigned long)va,
-diff --git a/arch/arm/include/asm/pgtable-3level.h b/arch/arm/include/asm/pgtable-3level.h
-index a745a2a53853c..39b3f7a40e663 100644
---- a/arch/arm/include/asm/pgtable-3level.h
-+++ b/arch/arm/include/asm/pgtable-3level.h
-@@ -121,6 +121,7 @@
-  * 2nd stage PTE definitions for LPAE.
-  */
- #define L_PTE_S2_MT_UNCACHED		(_AT(pteval_t, 0x0) << 2) /* strongly ordered */
-+#define L_PTE_S2_MT_NORMAL_NC		(_AT(pteval_t, 0x5) << 2) /* normal non-cacheable */
- #define L_PTE_S2_MT_WRITETHROUGH	(_AT(pteval_t, 0xa) << 2) /* normal inner write-through */
- #define L_PTE_S2_MT_WRITEBACK		(_AT(pteval_t, 0xf) << 2) /* normal inner write-back */
- #define L_PTE_S2_MT_DEV_SHARED		(_AT(pteval_t, 0x1) << 2) /* device */
-diff --git a/arch/arm/include/asm/pgtable.h b/arch/arm/include/asm/pgtable.h
-index f40354198bad4..ae13ca8b0a23d 100644
---- a/arch/arm/include/asm/pgtable.h
-+++ b/arch/arm/include/asm/pgtable.h
-@@ -100,6 +100,7 @@ extern pgprot_t		pgprot_s2_device;
- #define PAGE_HYP		_MOD_PROT(pgprot_kernel, L_PTE_HYP)
- #define PAGE_HYP_DEVICE		_MOD_PROT(pgprot_hyp_device, L_PTE_HYP)
- #define PAGE_S2			_MOD_PROT(pgprot_s2, L_PTE_S2_RDONLY)
-+#define PAGE_S2_NORMAL_NC	__pgprot((pgprot_val(PAGE_S2) & ~L_PTE_S2_MT_MASK) | L_PTE_S2_MT_NORMAL_NC)
- #define PAGE_S2_DEVICE		_MOD_PROT(pgprot_s2_device, L_PTE_S2_RDONLY)
+-The flags field supports two flags: KVM_MEM_LOG_DIRTY_PAGES and
+-KVM_MEM_READONLY.  The former can be set to instruct KVM to keep track of
+-writes to memory within the slot.  See KVM_GET_DIRTY_LOG ioctl to know how to
+-use it.  The latter can be set, if KVM_CAP_READONLY_MEM capability allows it,
+-to make a new slot read-only.  In this case, writes to this memory will be
+-posted to userspace as KVM_EXIT_MMIO exits.
++The flags field supports the following flags. All flags may be used in
++combination.
++  - KVM_MEM_LOG_DIRTY_PAGES: no capability required
++      Set this to instruct KVM to keep track of writes to memory within
++      the slot. (See the KVM_GET_DIRTY_LOG ioctl)
++  - KVM_MEM_READONLY: depends on capability KVM_CAP_READONLY_MEM
++      Set this to make a new slot read-only. In this case, writes to
++      this memory will be posted to userspace as KVM_EXIT_MMIO exits.
++      EINVAL will be returned if the slot is not new.
++  - KVM_MEM_UNCACHED: depends on capability KVM_CAP_UNCACHED_MEM
++      Set this to make a new slot uncached, i.e. userspace will always
++      directly read/write RAM for this memory region. EINVAL will be
++      returned if the slot is not new.
  
- #define __PAGE_NONE		__pgprot(_L_PTE_DEFAULT | L_PTE_RDONLY | L_PTE_XN | L_PTE_NONE)
+ When the KVM_CAP_SYNC_MMU capability is available, changes in the backing of
+ the memory region are automatically reflected into the guest.  For example, an
+diff --git a/arch/arm/include/uapi/asm/kvm.h b/arch/arm/include/uapi/asm/kvm.h
+index df3f60cb1168a..893a331655115 100644
+--- a/arch/arm/include/uapi/asm/kvm.h
++++ b/arch/arm/include/uapi/asm/kvm.h
+@@ -26,6 +26,7 @@
+ #define __KVM_HAVE_GUEST_DEBUG
+ #define __KVM_HAVE_IRQ_LINE
+ #define __KVM_HAVE_READONLY_MEM
++#define __KVM_HAVE_UNCACHED_MEM
+ 
+ #define KVM_REG_SIZE(id)						\
+ 	(1U << (((id) & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT))
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index d9631ecddd56e..cbb532de9c8b5 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -182,6 +182,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_PSCI_0_2:
+ 	case KVM_CAP_READONLY_MEM:
+ 	case KVM_CAP_MP_STATE:
++	case KVM_CAP_UNCACHED_MEM:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_COALESCED_MMIO:
 diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index bc1665acd73e7..6b3bd8061bd2a 100644
+index 1d5accbd3dcf2..bc1665acd73e7 100644
 --- a/arch/arm/kvm/mmu.c
 +++ b/arch/arm/kvm/mmu.c
-@@ -1220,7 +1220,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	struct vm_area_struct *vma;
- 	pfn_t pfn;
- 	pgprot_t mem_type = PAGE_S2;
--	bool fault_ipa_uncached;
-+	bool fault_ipa_uncached = false;
- 	bool logging_active = memslot_is_logging(memslot);
- 	unsigned long flags = 0;
- 
-@@ -1300,6 +1300,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 			writable = false;
- 	}
- 
-+	if (memslot->flags & KVM_MEM_UNCACHED) {
-+		mem_type = PAGE_S2_NORMAL_NC;
-+		fault_ipa_uncached = true;
-+	}
-+
- 	spin_lock(&kvm->mmu_lock);
- 	if (mmu_notifier_retry(kvm, mmu_seq))
- 		goto out_unlock;
-@@ -1307,8 +1312,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+@@ -1307,7 +1307,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
  	if (!hugetlb && !force_pte)
  		hugetlb = transparent_hugepage_adjust(&pfn, &fault_ipa);
  
--	fault_ipa_uncached = memslot->flags & KVM_MEM_UNCACHED;
--
+-	fault_ipa_uncached = memslot->flags & KVM_MEMSLOT_INCOHERENT;
++	fault_ipa_uncached = memslot->flags & KVM_MEM_UNCACHED;
+ 
  	if (hugetlb) {
  		pmd_t new_pmd = pfn_pmd(pfn, mem_type);
- 		new_pmd = pmd_mkhuge(new_pmd);
-@@ -1462,6 +1465,7 @@ static int handle_hva_to_gpa(struct kvm *kvm,
- 			     unsigned long start,
- 			     unsigned long end,
- 			     int (*handler)(struct kvm *kvm,
-+					    struct kvm_memory_slot *slot,
- 					    gpa_t gpa, void *data),
- 			     void *data)
- {
-@@ -1491,14 +1495,15 @@ static int handle_hva_to_gpa(struct kvm *kvm,
- 
- 		for (; gfn < gfn_end; ++gfn) {
- 			gpa_t gpa = gfn << PAGE_SHIFT;
--			ret |= handler(kvm, gpa, data);
-+			ret |= handler(kvm, memslot, gpa, data);
- 		}
- 	}
- 
- 	return ret;
- }
- 
--static int kvm_unmap_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
-+static int kvm_unmap_hva_handler(struct kvm *kvm, struct kvm_memory_slot *slot,
-+				 gpa_t gpa, void *data)
- {
- 	unmap_stage2_range(kvm, gpa, PAGE_SIZE);
- 	return 0;
-@@ -1527,9 +1532,15 @@ int kvm_unmap_hva_range(struct kvm *kvm,
- 	return 0;
- }
- 
--static int kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, void *data)
-+static int kvm_set_spte_handler(struct kvm *kvm, struct kvm_memory_slot *slot,
-+				gpa_t gpa, void *data)
- {
--	pte_t *pte = (pte_t *)data;
-+	pte_t pte = *((pte_t *)data);
-+
-+	if (slot->flags & KVM_MEM_UNCACHED)
-+		pte = pfn_pte(pte_pfn(pte), PAGE_S2_NORMAL_NC);
-+	else
-+		pte = pfn_pte(pte_pfn(pte), PAGE_S2);
- 
- 	/*
- 	 * We can always call stage2_set_pte with KVM_S2PTE_FLAG_LOGGING_ACTIVE
-@@ -1538,7 +1549,7 @@ static int kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, void *data)
- 	 * therefore stage2_set_pte() never needs to clear out a huge PMD
- 	 * through this calling path.
+@@ -1834,7 +1834,7 @@ int kvm_arch_create_memslot(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 	 * regions as incoherent.
  	 */
--	stage2_set_pte(kvm, NULL, gpa, pte, 0);
-+	stage2_set_pte(kvm, NULL, gpa, &pte, 0);
+ 	if (slot->flags & KVM_MEM_READONLY)
+-		slot->flags |= KVM_MEMSLOT_INCOHERENT;
++		slot->flags |= KVM_MEM_UNCACHED;
  	return 0;
  }
  
-@@ -1546,17 +1557,16 @@ static int kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, void *data)
- void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
- {
- 	unsigned long end = hva + PAGE_SIZE;
--	pte_t stage2_pte;
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index d26832022127e..be46855ca01b7 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -38,6 +38,7 @@
+ #define __KVM_HAVE_GUEST_DEBUG
+ #define __KVM_HAVE_IRQ_LINE
+ #define __KVM_HAVE_READONLY_MEM
++#define __KVM_HAVE_UNCACHED_MEM
  
- 	if (!kvm->arch.pgd)
- 		return;
- 
- 	trace_kvm_set_spte_hva(hva);
--	stage2_pte = pfn_pte(pte_pfn(pte), PAGE_S2);
--	handle_hva_to_gpa(kvm, hva, end, &kvm_set_spte_handler, &stage2_pte);
-+	handle_hva_to_gpa(kvm, hva, end, &kvm_set_spte_handler, &pte);
- }
- 
--static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
-+static int kvm_age_hva_handler(struct kvm *kvm, struct kvm_memory_slot *slot,
-+			       gpa_t gpa, void *data)
- {
- 	pmd_t *pmd;
- 	pte_t *pte;
-@@ -1586,7 +1596,8 @@ static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
- 	return 0;
- }
- 
--static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
-+static int kvm_test_age_hva_handler(struct kvm *kvm, struct kvm_memory_slot *slot,
-+				    gpa_t gpa, void *data)
- {
- 	pmd_t *pmd;
- 	pte_t *pte;
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 61505676d0853..af5f0f0eccef9 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -236,8 +236,11 @@ static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu, pfn_t pfn,
- {
- 	void *va = page_address(pfn_to_page(pfn));
- 
--	if (!vcpu_has_cache_enabled(vcpu) || ipa_uncached)
-+	if (!vcpu_has_cache_enabled(vcpu) || ipa_uncached) {
- 		kvm_flush_dcache_to_poc(va, size);
-+		if (ipa_uncached)
-+			set_memory_nc((unsigned long)va, size/PAGE_SIZE);
-+	}
- 
- 	if (!icache_is_aliasing()) {		/* PIPT */
- 		flush_icache_range((unsigned long)va,
-diff --git a/arch/arm64/include/asm/memory.h b/arch/arm64/include/asm/memory.h
-index f800d45ea2265..800730f7aa7d9 100644
---- a/arch/arm64/include/asm/memory.h
-+++ b/arch/arm64/include/asm/memory.h
-@@ -105,6 +105,7 @@
-  * Memory types for Stage-2 translation
+ #define KVM_REG_SIZE(id)						\
+ 	(1U << (((id) & KVM_REG_SIZE_MASK) >> KVM_REG_SIZE_SHIFT))
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index ad45054309a0f..74d6a14529f53 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -39,7 +39,6 @@
+  * include/linux/kvm_h.
   */
- #define MT_S2_NORMAL		0xf
-+#define MT_S2_NORMAL_NC		0x5
- #define MT_S2_DEVICE_nGnRE	0x1
+ #define KVM_MEMSLOT_INVALID	(1UL << 16)
+-#define KVM_MEMSLOT_INCOHERENT	(1UL << 17)
  
- #ifndef __ASSEMBLY__
-diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-index 56283f8a675c5..a254925ce1b6b 100644
---- a/arch/arm64/include/asm/pgtable.h
-+++ b/arch/arm64/include/asm/pgtable.h
-@@ -78,6 +78,7 @@ extern void __pgd_error(const char *file, int line, unsigned long val);
- #define PAGE_HYP_DEVICE		__pgprot(PROT_DEVICE_nGnRE | PTE_HYP)
+ /* Two fragments for cross MMIO pages. */
+ #define KVM_MAX_MMIO_FRAGMENTS	2
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 4b60056776d14..ceb6e805e5f77 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -108,6 +108,7 @@ struct kvm_userspace_memory_region {
+  */
+ #define KVM_MEM_LOG_DIRTY_PAGES	(1UL << 0)
+ #define KVM_MEM_READONLY	(1UL << 1)
++#define KVM_MEM_UNCACHED	(1UL << 2)
  
- #define PAGE_S2			__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_NORMAL) | PTE_S2_RDONLY)
-+#define PAGE_S2_NORMAL_NC	__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_NORMAL_NC) | PTE_S2_RDONLY)
- #define PAGE_S2_DEVICE		__pgprot(PROT_DEFAULT | PTE_S2_MEMATTR(MT_S2_DEVICE_nGnRE) | PTE_S2_RDONLY | PTE_UXN)
+ /* for KVM_IRQ_LINE */
+ struct kvm_irq_level {
+@@ -814,6 +815,7 @@ struct kvm_ppc_smmu_info {
+ #define KVM_CAP_S390_INJECT_IRQ 113
+ #define KVM_CAP_S390_IRQ_STATE 114
+ #define KVM_CAP_PPC_HWRNG 115
++#define KVM_CAP_UNCACHED_MEM 116
  
- #define PAGE_NONE		__pgprot(((_PAGE_DEFAULT) & ~PTE_TYPE_MASK) | PTE_PROT_NONE | PTE_PXN | PTE_UXN)
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 90977418aeb6e..d1d535d80a075 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -719,6 +719,10 @@ static int check_memory_region_flags(struct kvm_userspace_memory_region *mem)
+ 	valid_flags |= KVM_MEM_READONLY;
+ #endif
+ 
++#ifdef __KVM_HAVE_UNCACHED_MEM
++	valid_flags |= KVM_MEM_UNCACHED;
++#endif
++
+ 	if (mem->flags & ~valid_flags)
+ 		return -EINVAL;
+ 
+@@ -816,7 +820,8 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 		else { /* Modify an existing slot. */
+ 			if ((mem->userspace_addr != old.userspace_addr) ||
+ 			    (npages != old.npages) ||
+-			    ((new.flags ^ old.flags) & KVM_MEM_READONLY))
++			    ((new.flags ^ old.flags) &
++			     (KVM_MEM_READONLY | KVM_MEM_UNCACHED)))
+ 				goto out;
+ 
+ 			if (base_gfn != old.base_gfn)
 -- 
 2.1.0
