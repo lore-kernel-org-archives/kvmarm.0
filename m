@@ -1,25 +1,29 @@
-From: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH 4/5] VFIO: platform: populate reset function according
- to compat
-Date: Wed, 13 May 2015 12:33:16 -0600
-Message-ID: <1431541996.3625.55.camel@redhat.com>
-References: <1431008843-28411-1-git-send-email-eric.auger@linaro.org>
- <1431008843-28411-5-git-send-email-eric.auger@linaro.org>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH 1/5] VFIO: platform: add reset_list and register/unregister
+ functions
+Date: Thu, 14 May 2015 10:25:24 +0200
+Message-ID: <55545BF4.805@linaro.org>
+References: <1431008843-28411-1-git-send-email-eric.auger@linaro.org>	
+ <1431008843-28411-2-git-send-email-eric.auger@linaro.org>
+ <1431541925.3625.52.camel@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA06851366
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 May 2015 15:36:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0896A513C1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2015 04:16:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IrLVpyFbdEtB for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 May 2015 15:36:19 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A115A51363
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 May 2015 15:36:18 -0400 (EDT)
-In-Reply-To: <1431008843-28411-5-git-send-email-eric.auger@linaro.org>
+ with ESMTP id HTSPEQFVh6+J for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 May 2015 04:16:23 -0400 (EDT)
+Received: from mail-wi0-f175.google.com (mail-wi0-f175.google.com
+ [209.85.212.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D43D1513AA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2015 04:16:22 -0400 (EDT)
+Received: by wicmx19 with SMTP id mx19so6626233wic.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2015 01:25:29 -0700 (PDT)
+In-Reply-To: <1431541925.3625.52.camel@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,128 +33,178 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>
+To: Alex Williamson <alex.williamson@redhat.com>
 Cc: kvm@vger.kernel.org, patches@linaro.org, linux-kernel@vger.kernel.org, eric.auger@st.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, 2015-05-07 at 16:27 +0200, Eric Auger wrote:
-> Add the reset function lookup according to the device compat
-> string. This lookup is added at different places:
-> - on VFIO_DEVICE_GET_INFO
-> - on VFIO_DEVICE_RESET
-> - on device release
+Hi Alex,
+On 05/13/2015 08:32 PM, Alex Williamson wrote:
+> On Thu, 2015-05-07 at 16:27 +0200, Eric Auger wrote:
+>> vfio_platform_common now stores a lists of available reset functions.
+>> Two functions are exposed to register/unregister a reset function. A
+>> reset function is paired with a compat string.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+>> ---
+>>  drivers/vfio/platform/vfio_platform_common.c  | 63 +++++++++++++++++++++++++++
+>>  drivers/vfio/platform/vfio_platform_private.h | 13 ++++++
+>>  2 files changed, 76 insertions(+)
+>>
+>> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
+>> index abcff7a..edbf24c 100644
+>> --- a/drivers/vfio/platform/vfio_platform_common.c
+>> +++ b/drivers/vfio/platform/vfio_platform_common.c
+>> @@ -23,6 +23,9 @@
+>>  
+>>  #include "vfio_platform_private.h"
+>>  
+>> +struct list_head reset_list;
+>> +LIST_HEAD(reset_list);
+>> +
 > 
-> A reference to the module implementing the reset function is taken
-> on first reset function lookup and released on vfio platform device
-> release.
+> Redundant?  Static?
+static, yes
 > 
-> Signed-off-by: Eric Auger <eric.auger@linaro.org>
-> ---
->  drivers/vfio/platform/vfio_platform_common.c | 50 ++++++++++++++++++++++++++++
->  1 file changed, 50 insertions(+)
+>>  static DEFINE_MUTEX(driver_lock);
+>>  
+>>  static int vfio_platform_regions_init(struct vfio_platform_device *vdev)
+>> @@ -511,6 +514,13 @@ EXPORT_SYMBOL_GPL(vfio_platform_probe_common);
+>>  struct vfio_platform_device *vfio_platform_remove_common(struct device *dev)
+>>  {
+>>  	struct vfio_platform_device *vdev;
+>> +	struct vfio_platform_reset_node *iter, *tmp;
+>> +
+>> +	list_for_each_entry_safe(iter, tmp, &reset_list, link) {
+>> +		list_del(&iter->link);
+>> +		kfree(iter->compat);
+>> +		kfree(iter);
+>> +	}
 > 
-> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-> index 0d10018..bd7e44c 100644
-> --- a/drivers/vfio/platform/vfio_platform_common.c
-> +++ b/drivers/vfio/platform/vfio_platform_common.c
-> @@ -28,6 +28,52 @@ LIST_HEAD(reset_list);
->  
->  static DEFINE_MUTEX(driver_lock);
->  
-> +static vfio_platform_reset_fn_t vfio_platform_lookup_reset(const char *compat)
-> +{
-> +	struct vfio_platform_reset_node *iter;
-> +
-> +	list_for_each_entry(iter, &reset_list, link) {
+> 
+> This doesn't make sense.  We allow reset functions to be registered and
+> unregistered, but we forget them all when any device is released?!
+I acknowledge indeed. Can I rely on the reset module exit and associated
+unregister_reset or shall I take this action in the vfio driver itself,
+core?
+> 
+>>  
+>>  	vdev = vfio_del_group_dev(dev);
+>>  	if (vdev)
+>> @@ -519,3 +529,56 @@ struct vfio_platform_device *vfio_platform_remove_common(struct device *dev)
+>>  	return vdev;
+>>  }
+>>  EXPORT_SYMBOL_GPL(vfio_platform_remove_common);
+>> +
+>> +int vfio_platform_register_reset(char *compat, struct module *reset_owner,
+>> +				 vfio_platform_reset_fn_t reset)
+>> +{
+>> +	struct vfio_platform_reset_node *node, *iter;
+>> +	bool found = false;
+>> +
+>> +	list_for_each_entry(iter, &reset_list, link) {
+>> +		if (!strcmp(iter->compat, compat)) {
+>> +			found = true;
+> 
+> Just return errno here
+ok
+> 
+>> +			break;
+>> +		}
+>> +	}
+>> +	if (found)
+>> +		return -EINVAL;
+>> +
+>> +	node = kmalloc(sizeof(*node), GFP_KERNEL);
+>> +	if (!node)
+>> +		return -ENOMEM;
+>> +
+>> +	node->compat = kstrdup(compat, GFP_KERNEL);
+>> +	if (!node->compat)
+> 
+> Leaking node
+ok
+> 
+>> +		return -ENOMEM;
+>> +
+>> +	node->owner = reset_owner;
+>> +	node->reset = reset;
+>> +
+>> +	list_add(&node->link, &reset_list);
+> 
+> Isn't this racy?  Don't we need some locks around the list?
+I will add a lock to protect access to the list.
+> 
+>> +	return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(vfio_platform_register_reset);
+>> +
+>> +int vfio_platform_unregister_reset(char *compat)
+>> +{
+>> +	struct vfio_platform_reset_node *iter;
+>> +	bool found = false;
+>> +
+>> +	list_for_each_entry(iter, &reset_list, link) {
+>> +		if (!strcmp(iter->compat, compat)) {
+> 
+> Return errno here
+ok
+> 
+>> +			found = true;
+>> +			break;
+>> +		}
+>> +	}
+>> +	if (!found)
+>> +		return -EINVAL;
+>> +
+>> +	list_del(&iter->link);
+> 
+> Racy
+> 
+>> +	kfree(iter->compat);
+>> +	kfree(iter);
+>> +	return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(vfio_platform_unregister_reset);
+>> +
+>> diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
+>> index 5d31e04..da2d60b 100644
+>> --- a/drivers/vfio/platform/vfio_platform_private.h
+>> +++ b/drivers/vfio/platform/vfio_platform_private.h
+>> @@ -69,6 +69,15 @@ struct vfio_platform_device {
+>>  	int	(*get_irq)(struct vfio_platform_device *vdev, int i);
+>>  };
+>>  
+>> +typedef int (*vfio_platform_reset_fn_t)(struct vfio_platform_device *vdev);
+> 
+> Seems like this ought to be in a non-private header if we're exporting
+> the [un]register functions.
+I considered the vfio reset modules were internal to the vfio subsystem
+but if you prefer I can expose that in vfio.h. I guess
+register/unregister should become an external API then?
 
-Racy
+Thanks
 
-> +		if (!strcmp(iter->compat, compat) &&
-> +			try_module_get(iter->owner))
-> +			return iter->reset;
-> +	}
-> +
-> +	return ERR_PTR(-ENODEV);
-
-return NULL imo
-
-> +}
-> +
-> +static vfio_platform_reset_fn_t vfio_platform_get_reset(
-> +					struct vfio_platform_device *vdev)
-> +{
-> +	struct device *dev = vdev->get_device(vdev);
-> +	const char *compat_str_array[2];
-> +	vfio_platform_reset_fn_t reset;
-> +	int ret;
-> +
-> +	if (!IS_ERR_OR_NULL(vdev->reset))
-> +		return vdev->reset;
-> +
-> +	ret = device_property_read_string_array(dev, "compatible",
-> +						compat_str_array, 2);
-> +	if (!ret)
-> +		return ERR_PTR(ret);
-> +
-> +	reset = vfio_platform_lookup_reset(compat_str_array[0]);
-> +	return reset;
-
-Something got allocated into compat_str_array and gets leaked here.
-
-> +}
-> +
-> +static void vfio_platform_put_reset(struct vfio_platform_device *vdev)
-> +{
-> +	struct vfio_platform_reset_node *iter;
-> +
-> +	list_for_each_entry(iter, &reset_list, link) {
-
-Racy
-
-> +		if (iter->reset == vdev->reset) {
-> +			module_put(iter->owner);
-> +			vdev->reset = NULL;
-> +			return;
-> +		}
-> +	}
-> +}
-> +
->  static int vfio_platform_regions_init(struct vfio_platform_device *vdev)
->  {
->  	int cnt = 0, i;
-> @@ -103,10 +149,12 @@ static void vfio_platform_release(void *device_data)
->  	mutex_lock(&driver_lock);
->  
->  	if (!(--vdev->refcnt)) {
-> +		vdev->reset = vfio_platform_get_reset(vdev);
->  		if (!IS_ERR_OR_NULL(vdev->reset))
->  			vdev->reset(vdev);
->  		vfio_platform_regions_cleanup(vdev);
->  		vfio_platform_irq_cleanup(vdev);
-> +		vfio_platform_put_reset(vdev);
->  	}
->  
->  	mutex_unlock(&driver_lock);
-> @@ -164,6 +212,7 @@ static long vfio_platform_ioctl(void *device_data,
->  		if (info.argsz < minsz)
->  			return -EINVAL;
->  
-> +		vdev->reset = vfio_platform_get_reset(vdev);
->  		if (!IS_ERR_OR_NULL(vdev->reset))
->  			vdev->flags |= VFIO_DEVICE_FLAGS_RESET;
->  		info.flags = vdev->flags;
-> @@ -260,6 +309,7 @@ static long vfio_platform_ioctl(void *device_data,
->  		return ret;
->  
->  	} else if (cmd == VFIO_DEVICE_RESET) {
-> +		vdev->reset = vfio_platform_get_reset(vdev);
->  		if (!IS_ERR_OR_NULL(vdev->reset))
->  			return vdev->reset(vdev);
->  		else
-
-I count 3 gets and 1 put, isn't the module reference count increase
-showing that?  This looks like it hasn't been tested.  Why would we do a
-get every time we want to do a reset?  Do one get when the device is
-registered or opened and one put when the device is unregistered or
-closed.  We don't want erratic userspace behavior that the reset
-property of a device can come and go.
+Eric
+>> +
+>> +struct vfio_platform_reset_node {
+>> +	struct list_head link;
+>> +	char *compat;
+>> +	struct module *owner;
+>> +	vfio_platform_reset_fn_t reset;
+>> +};
+>> +
+>>  extern int vfio_platform_probe_common(struct vfio_platform_device *vdev,
+>>  				      struct device *dev);
+>>  extern struct vfio_platform_device *vfio_platform_remove_common
+>> @@ -82,4 +91,8 @@ extern int vfio_platform_set_irqs_ioctl(struct vfio_platform_device *vdev,
+>>  					unsigned start, unsigned count,
+>>  					void *data);
+>>  
+>> +extern int vfio_platform_register_reset(char *compat, struct module *owner,
+>> +					vfio_platform_reset_fn_t reset);
+>> +extern int vfio_platform_unregister_reset(char *compat);
+>> +
+>>  #endif /* VFIO_PLATFORM_PRIVATE_H */
+> 
+> 
+> 
