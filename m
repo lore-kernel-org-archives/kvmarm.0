@@ -1,254 +1,172 @@
 From: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH 5/5] VFIO: platform: VFIO platform Calxeda xgmac reset
- module
-Date: Thu, 14 May 2015 09:14:12 -0600
-Message-ID: <1431616452.3625.107.camel@redhat.com>
+Subject: Re: [PATCH 4/5] VFIO: platform: populate reset function according
+ to compat
+Date: Thu, 14 May 2015 09:30:18 -0600
+Message-ID: <1431617418.3625.121.camel@redhat.com>
 References: <1431008843-28411-1-git-send-email-eric.auger@linaro.org>
-		 <1431008843-28411-6-git-send-email-eric.auger@linaro.org>
-	 <1431542017.3625.56.camel@redhat.com> <5554659E.3010205@linaro.org>
+		 <1431008843-28411-5-git-send-email-eric.auger@linaro.org>
+	 <1431541996.3625.55.camel@redhat.com> <55546374.7000208@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <5554659E.3010205@linaro.org>
+In-Reply-To: <55546374.7000208@linaro.org>
 Sender: linux-kernel-owner@vger.kernel.org
 To: Eric Auger <eric.auger@linaro.org>
 Cc: eric.auger@st.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, b.reynal@virtualopensystems.com, linux-kernel@vger.kernel.org, patches@linaro.org, agraf@suse.de, Bharat.Bhushan@freescale.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, 2015-05-14 at 11:06 +0200, Eric Auger wrote:
-> Alex,
+On Thu, 2015-05-14 at 10:57 +0200, Eric Auger wrote:
 > On 05/13/2015 08:33 PM, Alex Williamson wrote:
 > > On Thu, 2015-05-07 at 16:27 +0200, Eric Auger wrote:
-> >> This patch introduces a module that registers and implements a basic
-> >> reset function for the Calxeda xgmac device. This latter basically disables
-> >> interrupts and stops DMA transfers.
+> >> Add the reset function lookup according to the device compat
+> >> string. This lookup is added at different places:
+> >> - on VFIO_DEVICE_GET_INFO
+> >> - on VFIO_DEVICE_RESET
+> >> - on device release
 > >>
-> >> The reset function code is inherited from the native calxeda xgmac driver.
+> >> A reference to the module implementing the reset function is taken
+> >> on first reset function lookup and released on vfio platform device
+> >> release.
 > >>
 > >> Signed-off-by: Eric Auger <eric.auger@linaro.org>
 > >> ---
-> >>  drivers/vfio/platform/Kconfig                      |   2 +
-> >>  drivers/vfio/platform/Makefile                     |   2 +
-> >>  drivers/vfio/platform/reset/Kconfig                |   7 ++
-> >>  drivers/vfio/platform/reset/Makefile               |   5 +
-> >>  .../platform/reset/vfio_platform_calxedaxgmac.c    | 121 +++++++++++++++++++++
-> >>  5 files changed, 137 insertions(+)
-> >>  create mode 100644 drivers/vfio/platform/reset/Kconfig
-> >>  create mode 100644 drivers/vfio/platform/reset/Makefile
-> >>  create mode 100644 drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
+> >>  drivers/vfio/platform/vfio_platform_common.c | 50 ++++++++++++++++++++++++++++
+> >>  1 file changed, 50 insertions(+)
 > >>
-> >> diff --git a/drivers/vfio/platform/Kconfig b/drivers/vfio/platform/Kconfig
-> >> index 9a4403e..1df7477 100644
-> >> --- a/drivers/vfio/platform/Kconfig
-> >> +++ b/drivers/vfio/platform/Kconfig
-> >> @@ -18,3 +18,5 @@ config VFIO_AMBA
-> >>  	  framework.
+> >> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
+> >> index 0d10018..bd7e44c 100644
+> >> --- a/drivers/vfio/platform/vfio_platform_common.c
+> >> +++ b/drivers/vfio/platform/vfio_platform_common.c
+> >> @@ -28,6 +28,52 @@ LIST_HEAD(reset_list);
 > >>  
-> >>  	  If you don't know what to do here, say N.
-> >> +
-> >> +source "drivers/vfio/platform/reset/Kconfig"
-> >> diff --git a/drivers/vfio/platform/Makefile b/drivers/vfio/platform/Makefile
-> >> index 81de144..9ce8afe 100644
-> >> --- a/drivers/vfio/platform/Makefile
-> >> +++ b/drivers/vfio/platform/Makefile
-> >> @@ -2,7 +2,9 @@
-> >>  vfio-platform-y := vfio_platform.o vfio_platform_common.o vfio_platform_irq.o
+> >>  static DEFINE_MUTEX(driver_lock);
 > >>  
-> >>  obj-$(CONFIG_VFIO_PLATFORM) += vfio-platform.o
-> >> +obj-$(CONFIG_VFIO_PLATFORM) += reset/
-> >>  
-> >>  vfio-amba-y := vfio_amba.o
-> >>  
-> >>  obj-$(CONFIG_VFIO_AMBA) += vfio-amba.o
-> >> +obj-$(CONFIG_VFIO_AMBA) += reset/
-> >> diff --git a/drivers/vfio/platform/reset/Kconfig b/drivers/vfio/platform/reset/Kconfig
-> >> new file mode 100644
-> >> index 0000000..746b96b
-> >> --- /dev/null
-> >> +++ b/drivers/vfio/platform/reset/Kconfig
-> >> @@ -0,0 +1,7 @@
-> >> +config VFIO_PLATFORM_CALXEDAXGMAC_RESET
-> >> +	tristate "VFIO support for calxeda xgmac reset"
-> >> +	depends on VFIO_PLATFORM
-> >> +	help
-> >> +	  Enables the VFIO platform driver to handle reset for Calxeda xgmac
-> >> +
-> >> +	  If you don't know what to do here, say N.
-> >> diff --git a/drivers/vfio/platform/reset/Makefile b/drivers/vfio/platform/reset/Makefile
-> >> new file mode 100644
-> >> index 0000000..2a486af
-> >> --- /dev/null
-> >> +++ b/drivers/vfio/platform/reset/Makefile
-> >> @@ -0,0 +1,5 @@
-> >> +vfio-platform-calxedaxgmac-y := vfio_platform_calxedaxgmac.o
-> >> +
-> >> +ccflags-y += -Idrivers/vfio/platform
-> >> +
-> >> +obj-$(CONFIG_VFIO_PLATFORM_CALXEDAXGMAC_RESET) += vfio-platform-calxedaxgmac.o
-> >> diff --git a/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
-> >> new file mode 100644
-> >> index 0000000..3c6e428
-> >> --- /dev/null
-> >> +++ b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
-> >> @@ -0,0 +1,121 @@
-> >> +/*
-> >> + * VFIO platform driver specialized for Calxeda xgmac reset
-> >> + * reset code is inherited from calxeda xgmac native driver
-> >> + *
-> >> + * Copyright 2010-2011 Calxeda, Inc.
-> >> + * Copyright (c) 2015 Linaro Ltd.
-> >> + *              www.linaro.org
-> >> + *
-> >> + * This program is free software; you can redistribute it and/or modify it
-> >> + * under the terms and conditions of the GNU General Public License,
-> >> + * version 2, as published by the Free Software Foundation.
-> >> + *
-> >> + * This program is distributed in the hope it will be useful, but WITHOUT
-> >> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> >> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> >> + * more details.
-> >> + *
-> >> + * You should have received a copy of the GNU General Public License along with
-> >> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> >> + */
-> >> +
-> >> +#include <linux/module.h>
-> >> +#include <linux/kernel.h>
-> >> +#include <linux/init.h>
-> >> +#include <linux/io.h>
-> >> +
-> >> +#include "vfio_platform_private.h"
-> >> +
-> >> +#define DRIVER_VERSION  "0.1"
-> >> +#define DRIVER_AUTHOR   "Eric Auger <eric.auger@linaro.org>"
-> >> +#define DRIVER_DESC     "Reset support for Calxeda xgmac vfio platform device"
-> >> +
-> >> +#define CALXEDAXGMAC_COMPAT "calxeda,hb-xgmac"
-> >> +
-> >> +/* XGMAC Register definitions */
-> >> +#define XGMAC_CONTROL           0x00000000      /* MAC Configuration */
-> >> +
-> >> +/* DMA Control and Status Registers */
-> >> +#define XGMAC_DMA_CONTROL       0x00000f18      /* Ctrl (Operational Mode) */
-> >> +#define XGMAC_DMA_INTR_ENA      0x00000f1c      /* Interrupt Enable */
-> >> +
-> >> +/* DMA Control registe defines */
-> >> +#define DMA_CONTROL_ST          0x00002000      /* Start/Stop Transmission */
-> >> +#define DMA_CONTROL_SR          0x00000002      /* Start/Stop Receive */
-> >> +
-> >> +/* Common MAC defines */
-> >> +#define MAC_ENABLE_TX           0x00000008      /* Transmitter Enable */
-> >> +#define MAC_ENABLE_RX           0x00000004      /* Receiver Enable */
-> >> +
-> >> +static inline void xgmac_mac_disable(void __iomem *ioaddr)
+> >> +static vfio_platform_reset_fn_t vfio_platform_lookup_reset(const char *compat)
 > >> +{
-> >> +	u32 value = readl(ioaddr + XGMAC_DMA_CONTROL);
+> >> +	struct vfio_platform_reset_node *iter;
 > >> +
-> >> +	value &= ~(DMA_CONTROL_ST | DMA_CONTROL_SR);
-> >> +	writel(value, ioaddr + XGMAC_DMA_CONTROL);
-> >> +
-> >> +	value = readl(ioaddr + XGMAC_CONTROL);
-> >> +	value &= ~(MAC_ENABLE_TX | MAC_ENABLE_RX);
-> >> +	writel(value, ioaddr + XGMAC_CONTROL);
-> >> +}
-> >> +
-> >> +int vfio_platform_calxedaxgmac_reset(struct vfio_platform_device *vdev)
-> >> +{
-> >> +	struct vfio_platform_region reg = vdev->regions[0];
-> >> +
-> >> +	if (!reg.ioaddr) {
-> >> +		reg.ioaddr =
-> >> +			ioremap_nocache(reg.addr, reg.size);
-> >> +		if (!reg.ioaddr)
-> >> +			return -ENOMEM;
-> >> +	}
-> >> +
-> >> +	/* disable IRQ */
-> >> +	writel(0, reg.ioaddr + XGMAC_DMA_INTR_ENA);
-> >> +
-> >> +	/* Disable the MAC core */
-> >> +	xgmac_mac_disable(reg.ioaddr);
-> >> +
-> >> +	return 0;
-> >> +}
-> >> +EXPORT_SYMBOL_GPL(vfio_platform_calxedaxgmac_reset);
-> >> +
-> >> +static int __init vfio_platform_calxedaxgmac_init(void)
-> >> +{
-> >> +	int (*register_reset)(char *, struct module *,
-> >> +				vfio_platform_reset_fn_t);
-> >> +	int ret;
-> >> +
-> >> +	register_reset = symbol_get(vfio_platform_register_reset);
-> >> +	if (!register_reset)
-> >> +		return -EINVAL;
-> >> +
-> >> +	ret = register_reset(CALXEDAXGMAC_COMPAT, THIS_MODULE,
-> >> +			     vfio_platform_calxedaxgmac_reset);
-> >> +
-> >> +	symbol_put(vfio_platform_register_reset);
-> >> +
-> >> +	return ret;
-> >> +}
-> >> +
-> >> +static void __exit vfio_platform_calxedaxgmac_exit(void)
-> >> +{
-> >> +	int (*unregister_reset)(char *);
-> >> +	int ret;
-> >> +
-> >> +	unregister_reset = symbol_get(vfio_platform_unregister_reset);
+> >> +	list_for_each_entry(iter, &reset_list, link) {
 > > 
-> > Shouldn't we have gotten the symbol during the module init so that this
-> > cannot fail?
-> yes makes sense
-> > 
-> >> +	if (!unregister_reset)
-> >> +		return;
-> >> +
-> >> +	ret = unregister_reset(CALXEDAXGMAC_COMPAT);
-> > 
-> > unregister_reset() should just return void
+> > Racy
 > ok
 > > 
+> >> +		if (!strcmp(iter->compat, compat) &&
+> >> +			try_module_get(iter->owner))
+> >> +			return iter->reset;
+> >> +	}
 > >> +
-> >> +	symbol_put(vfio_platform_unregister_reset);
+> >> +	return ERR_PTR(-ENODEV);
+> > 
+> > return NULL imo
+> ok
+> > 
 > >> +}
 > >> +
-> >> +module_init(vfio_platform_calxedaxgmac_init);
-> >> +module_exit(vfio_platform_calxedaxgmac_exit);
+> >> +static vfio_platform_reset_fn_t vfio_platform_get_reset(
+> >> +					struct vfio_platform_device *vdev)
+> >> +{
+> >> +	struct device *dev = vdev->get_device(vdev);
+> >> +	const char *compat_str_array[2];
+> >> +	vfio_platform_reset_fn_t reset;
+> >> +	int ret;
 > >> +
-> >> +MODULE_VERSION(DRIVER_VERSION);
-> >> +MODULE_LICENSE("GPL v2");
-> >> +MODULE_AUTHOR(DRIVER_AUTHOR);
-> >> +MODULE_DESCRIPTION(DRIVER_DESC);
+> >> +	if (!IS_ERR_OR_NULL(vdev->reset))
+> >> +		return vdev->reset;
+> >> +
+> >> +	ret = device_property_read_string_array(dev, "compatible",
+> >> +						compat_str_array, 2);
+> >> +	if (!ret)
+> >> +		return ERR_PTR(ret);
+> >> +
+> >> +	reset = vfio_platform_lookup_reset(compat_str_array[0]);
+> >> +	return reset;
 > > 
+> > Something got allocated into compat_str_array and gets leaked here.
+> is there any allocation? device_property_read_string_array does not
+> return -ENOMEM.
+
+Yeah, since they're const I guess maybe it's just setting a pointer.  It
+troubles me a little bit that nobody else seems to be using this
+device_property_read_string_array() interface.
+ 
+> >> +}
+> >> +
+> >> +static void vfio_platform_put_reset(struct vfio_platform_device *vdev)
+> >> +{
+> >> +	struct vfio_platform_reset_node *iter;
+> >> +
+> >> +	list_for_each_entry(iter, &reset_list, link) {
 > > 
-> > So a user needs to manually load this module to get a working reset for
-> > this device?  That's never going to happen.
-> The reset module is devised to be in-kernel or external. There is always
-> the choice to include all reset modules as soon as vfio-platform /amba
-> is chosen. What would be your preferred approach then? Do you consider
-> this approach using separate reset modules is not sensible? Do you think
-> we should put everything in the vfio-platform driver?
+> > Racy
+> ok
+> > 
+> >> +		if (iter->reset == vdev->reset) {
+> >> +			module_put(iter->owner);
+> >> +			vdev->reset = NULL;
+> >> +			return;
+> >> +		}
+> >> +	}
+> >> +}
+> >> +
+> >>  static int vfio_platform_regions_init(struct vfio_platform_device *vdev)
+> >>  {
+> >>  	int cnt = 0, i;
+> >> @@ -103,10 +149,12 @@ static void vfio_platform_release(void *device_data)
+> >>  	mutex_lock(&driver_lock);
+> >>  
+> >>  	if (!(--vdev->refcnt)) {
+> >> +		vdev->reset = vfio_platform_get_reset(vdev);
+> >>  		if (!IS_ERR_OR_NULL(vdev->reset))
+> >>  			vdev->reset(vdev);
+> >>  		vfio_platform_regions_cleanup(vdev);
+> >>  		vfio_platform_irq_cleanup(vdev);
+> >> +		vfio_platform_put_reset(vdev);
+> >>  	}
+> >>  
+> >>  	mutex_unlock(&driver_lock);
+> >> @@ -164,6 +212,7 @@ static long vfio_platform_ioctl(void *device_data,
+> >>  		if (info.argsz < minsz)
+> >>  			return -EINVAL;
+> >>  
+> >> +		vdev->reset = vfio_platform_get_reset(vdev);
+> >>  		if (!IS_ERR_OR_NULL(vdev->reset))
+> >>  			vdev->flags |= VFIO_DEVICE_FLAGS_RESET;
+> >>  		info.flags = vdev->flags;
+> >> @@ -260,6 +309,7 @@ static long vfio_platform_ioctl(void *device_data,
+> >>  		return ret;
+> >>  
+> >>  	} else if (cmd == VFIO_DEVICE_RESET) {
+> >> +		vdev->reset = vfio_platform_get_reset(vdev);
+> >>  		if (!IS_ERR_OR_NULL(vdev->reset))
+> >>  			return vdev->reset(vdev);
+> >>  		else
+> > 
+> > I count 3 gets and 1 put, isn't the module reference count increase
+> > showing that?
+> 
+> vfio_platform_get_reset simply returns if the function pointer already
+> is populated so there is no systematic ref increment.
 
-I respect your attempt to keep the code slim and modular by making the
-reset functionality loadable, but we can't expect users to figure out
-what module they need to load to make their device work.  It needs to be
-automatic.  One way we could achieve that and still keep your premise of
-loadable reset modules would be a lookup table in vfio-platform to
-translate a device compatibility ID to a reset module name.  We could
-then do a request_module() to auto-load the reset module if one exists.
-Maybe the ID table could even live in the reset driver, much like PCI
-IDs live in those drivers.  We also have the complication that there's
-no direct module dependency for the reset module(s), so they would need
-to be explicitly listed to install them into an initramfs.
+Ah, so it does.
 
-If we take that approach, we're quickly building infrastructure that
-gets more bloated than a few reset functions buried directly into
-vfio-platform.  Then we may wonder how many reset functions are we
-reasonably going to get.  If you don't have more than a couple in mind,
-maybe we should just embed them into vfio-platform and worry about
-creating something more dynamic when the need presents itself.  Thanks,
+> 
+>   This looks like it hasn't been tested.
+> 
+> It did testing with external and in-kernel modules through
+>   Why would we do a
+> > get every time we want to do a reset?
+> 
+> My doubt were about the order of probing between the
+> vfio-platform_driver and the vfio reset module? This question was the
+> rationale of this implementation choice. But again the actual ref count
+> increment is devised to be done once on the first entry point (iotcl or
+> internal release)
+
+I think we need to enforce the ordering; the reset function should be
+set on device open via request_module() and try_module_get() to make
+sure it is present and can't go away (or make it all a static part of
+vfio-platform).  A user doesn't expect the reset capability advertised
+in the vfio device info struct to change over time.  Thanks,
 
 Alex
