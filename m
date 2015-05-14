@@ -1,28 +1,28 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH 4/5] VFIO: platform: populate reset function according
- to compat
-Date: Thu, 14 May 2015 10:57:24 +0200
-Message-ID: <55546374.7000208@linaro.org>
+Subject: Re: [PATCH 5/5] VFIO: platform: VFIO platform Calxeda xgmac reset
+ module
+Date: Thu, 14 May 2015 11:06:38 +0200
+Message-ID: <5554659E.3010205@linaro.org>
 References: <1431008843-28411-1-git-send-email-eric.auger@linaro.org>	
- <1431008843-28411-5-git-send-email-eric.auger@linaro.org>
- <1431541996.3625.55.camel@redhat.com>
+ <1431008843-28411-6-git-send-email-eric.auger@linaro.org>
+ <1431542017.3625.56.camel@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 887775140F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2015 04:48:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2273351417
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2015 04:57:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qfWVoOKvmbkj for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 May 2015 04:48:21 -0400 (EDT)
+ with ESMTP id d9kP3Zuzm4CW for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 May 2015 04:57:36 -0400 (EDT)
 Received: from mail-wg0-f43.google.com (mail-wg0-f43.google.com [74.125.82.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6D1165140A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2015 04:48:21 -0400 (EDT)
-Received: by wguv19 with SMTP id v19so5998023wgu.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2015 01:57:28 -0700 (PDT)
-In-Reply-To: <1431541996.3625.55.camel@redhat.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C83451415
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2015 04:57:35 -0400 (EDT)
+Received: by wgnd10 with SMTP id d10so65931635wgn.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2015 02:06:43 -0700 (PDT)
+In-Reply-To: <1431542017.3625.56.camel@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,149 +36,224 @@ To: Alex Williamson <alex.williamson@redhat.com>
 Cc: kvm@vger.kernel.org, patches@linaro.org, linux-kernel@vger.kernel.org, eric.auger@st.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Alex,
 On 05/13/2015 08:33 PM, Alex Williamson wrote:
 > On Thu, 2015-05-07 at 16:27 +0200, Eric Auger wrote:
->> Add the reset function lookup according to the device compat
->> string. This lookup is added at different places:
->> - on VFIO_DEVICE_GET_INFO
->> - on VFIO_DEVICE_RESET
->> - on device release
+>> This patch introduces a module that registers and implements a basic
+>> reset function for the Calxeda xgmac device. This latter basically disables
+>> interrupts and stops DMA transfers.
 >>
->> A reference to the module implementing the reset function is taken
->> on first reset function lookup and released on vfio platform device
->> release.
+>> The reset function code is inherited from the native calxeda xgmac driver.
 >>
 >> Signed-off-by: Eric Auger <eric.auger@linaro.org>
 >> ---
->>  drivers/vfio/platform/vfio_platform_common.c | 50 ++++++++++++++++++++++++++++
->>  1 file changed, 50 insertions(+)
+>>  drivers/vfio/platform/Kconfig                      |   2 +
+>>  drivers/vfio/platform/Makefile                     |   2 +
+>>  drivers/vfio/platform/reset/Kconfig                |   7 ++
+>>  drivers/vfio/platform/reset/Makefile               |   5 +
+>>  .../platform/reset/vfio_platform_calxedaxgmac.c    | 121 +++++++++++++++++++++
+>>  5 files changed, 137 insertions(+)
+>>  create mode 100644 drivers/vfio/platform/reset/Kconfig
+>>  create mode 100644 drivers/vfio/platform/reset/Makefile
+>>  create mode 100644 drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
 >>
->> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
->> index 0d10018..bd7e44c 100644
->> --- a/drivers/vfio/platform/vfio_platform_common.c
->> +++ b/drivers/vfio/platform/vfio_platform_common.c
->> @@ -28,6 +28,52 @@ LIST_HEAD(reset_list);
+>> diff --git a/drivers/vfio/platform/Kconfig b/drivers/vfio/platform/Kconfig
+>> index 9a4403e..1df7477 100644
+>> --- a/drivers/vfio/platform/Kconfig
+>> +++ b/drivers/vfio/platform/Kconfig
+>> @@ -18,3 +18,5 @@ config VFIO_AMBA
+>>  	  framework.
 >>  
->>  static DEFINE_MUTEX(driver_lock);
+>>  	  If you don't know what to do here, say N.
+>> +
+>> +source "drivers/vfio/platform/reset/Kconfig"
+>> diff --git a/drivers/vfio/platform/Makefile b/drivers/vfio/platform/Makefile
+>> index 81de144..9ce8afe 100644
+>> --- a/drivers/vfio/platform/Makefile
+>> +++ b/drivers/vfio/platform/Makefile
+>> @@ -2,7 +2,9 @@
+>>  vfio-platform-y := vfio_platform.o vfio_platform_common.o vfio_platform_irq.o
 >>  
->> +static vfio_platform_reset_fn_t vfio_platform_lookup_reset(const char *compat)
+>>  obj-$(CONFIG_VFIO_PLATFORM) += vfio-platform.o
+>> +obj-$(CONFIG_VFIO_PLATFORM) += reset/
+>>  
+>>  vfio-amba-y := vfio_amba.o
+>>  
+>>  obj-$(CONFIG_VFIO_AMBA) += vfio-amba.o
+>> +obj-$(CONFIG_VFIO_AMBA) += reset/
+>> diff --git a/drivers/vfio/platform/reset/Kconfig b/drivers/vfio/platform/reset/Kconfig
+>> new file mode 100644
+>> index 0000000..746b96b
+>> --- /dev/null
+>> +++ b/drivers/vfio/platform/reset/Kconfig
+>> @@ -0,0 +1,7 @@
+>> +config VFIO_PLATFORM_CALXEDAXGMAC_RESET
+>> +	tristate "VFIO support for calxeda xgmac reset"
+>> +	depends on VFIO_PLATFORM
+>> +	help
+>> +	  Enables the VFIO platform driver to handle reset for Calxeda xgmac
+>> +
+>> +	  If you don't know what to do here, say N.
+>> diff --git a/drivers/vfio/platform/reset/Makefile b/drivers/vfio/platform/reset/Makefile
+>> new file mode 100644
+>> index 0000000..2a486af
+>> --- /dev/null
+>> +++ b/drivers/vfio/platform/reset/Makefile
+>> @@ -0,0 +1,5 @@
+>> +vfio-platform-calxedaxgmac-y := vfio_platform_calxedaxgmac.o
+>> +
+>> +ccflags-y += -Idrivers/vfio/platform
+>> +
+>> +obj-$(CONFIG_VFIO_PLATFORM_CALXEDAXGMAC_RESET) += vfio-platform-calxedaxgmac.o
+>> diff --git a/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
+>> new file mode 100644
+>> index 0000000..3c6e428
+>> --- /dev/null
+>> +++ b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
+>> @@ -0,0 +1,121 @@
+>> +/*
+>> + * VFIO platform driver specialized for Calxeda xgmac reset
+>> + * reset code is inherited from calxeda xgmac native driver
+>> + *
+>> + * Copyright 2010-2011 Calxeda, Inc.
+>> + * Copyright (c) 2015 Linaro Ltd.
+>> + *              www.linaro.org
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify it
+>> + * under the terms and conditions of the GNU General Public License,
+>> + * version 2, as published by the Free Software Foundation.
+>> + *
+>> + * This program is distributed in the hope it will be useful, but WITHOUT
+>> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+>> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+>> + * more details.
+>> + *
+>> + * You should have received a copy of the GNU General Public License along with
+>> + * this program.  If not, see <http://www.gnu.org/licenses/>.
+>> + */
+>> +
+>> +#include <linux/module.h>
+>> +#include <linux/kernel.h>
+>> +#include <linux/init.h>
+>> +#include <linux/io.h>
+>> +
+>> +#include "vfio_platform_private.h"
+>> +
+>> +#define DRIVER_VERSION  "0.1"
+>> +#define DRIVER_AUTHOR   "Eric Auger <eric.auger@linaro.org>"
+>> +#define DRIVER_DESC     "Reset support for Calxeda xgmac vfio platform device"
+>> +
+>> +#define CALXEDAXGMAC_COMPAT "calxeda,hb-xgmac"
+>> +
+>> +/* XGMAC Register definitions */
+>> +#define XGMAC_CONTROL           0x00000000      /* MAC Configuration */
+>> +
+>> +/* DMA Control and Status Registers */
+>> +#define XGMAC_DMA_CONTROL       0x00000f18      /* Ctrl (Operational Mode) */
+>> +#define XGMAC_DMA_INTR_ENA      0x00000f1c      /* Interrupt Enable */
+>> +
+>> +/* DMA Control registe defines */
+>> +#define DMA_CONTROL_ST          0x00002000      /* Start/Stop Transmission */
+>> +#define DMA_CONTROL_SR          0x00000002      /* Start/Stop Receive */
+>> +
+>> +/* Common MAC defines */
+>> +#define MAC_ENABLE_TX           0x00000008      /* Transmitter Enable */
+>> +#define MAC_ENABLE_RX           0x00000004      /* Receiver Enable */
+>> +
+>> +static inline void xgmac_mac_disable(void __iomem *ioaddr)
 >> +{
->> +	struct vfio_platform_reset_node *iter;
+>> +	u32 value = readl(ioaddr + XGMAC_DMA_CONTROL);
 >> +
->> +	list_for_each_entry(iter, &reset_list, link) {
-> 
-> Racy
-ok
-> 
->> +		if (!strcmp(iter->compat, compat) &&
->> +			try_module_get(iter->owner))
->> +			return iter->reset;
->> +	}
+>> +	value &= ~(DMA_CONTROL_ST | DMA_CONTROL_SR);
+>> +	writel(value, ioaddr + XGMAC_DMA_CONTROL);
 >> +
->> +	return ERR_PTR(-ENODEV);
-> 
-> return NULL imo
-ok
-> 
+>> +	value = readl(ioaddr + XGMAC_CONTROL);
+>> +	value &= ~(MAC_ENABLE_TX | MAC_ENABLE_RX);
+>> +	writel(value, ioaddr + XGMAC_CONTROL);
 >> +}
 >> +
->> +static vfio_platform_reset_fn_t vfio_platform_get_reset(
->> +					struct vfio_platform_device *vdev)
+>> +int vfio_platform_calxedaxgmac_reset(struct vfio_platform_device *vdev)
 >> +{
->> +	struct device *dev = vdev->get_device(vdev);
->> +	const char *compat_str_array[2];
->> +	vfio_platform_reset_fn_t reset;
+>> +	struct vfio_platform_region reg = vdev->regions[0];
+>> +
+>> +	if (!reg.ioaddr) {
+>> +		reg.ioaddr =
+>> +			ioremap_nocache(reg.addr, reg.size);
+>> +		if (!reg.ioaddr)
+>> +			return -ENOMEM;
+>> +	}
+>> +
+>> +	/* disable IRQ */
+>> +	writel(0, reg.ioaddr + XGMAC_DMA_INTR_ENA);
+>> +
+>> +	/* Disable the MAC core */
+>> +	xgmac_mac_disable(reg.ioaddr);
+>> +
+>> +	return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(vfio_platform_calxedaxgmac_reset);
+>> +
+>> +static int __init vfio_platform_calxedaxgmac_init(void)
+>> +{
+>> +	int (*register_reset)(char *, struct module *,
+>> +				vfio_platform_reset_fn_t);
 >> +	int ret;
 >> +
->> +	if (!IS_ERR_OR_NULL(vdev->reset))
->> +		return vdev->reset;
+>> +	register_reset = symbol_get(vfio_platform_register_reset);
+>> +	if (!register_reset)
+>> +		return -EINVAL;
 >> +
->> +	ret = device_property_read_string_array(dev, "compatible",
->> +						compat_str_array, 2);
->> +	if (!ret)
->> +		return ERR_PTR(ret);
+>> +	ret = register_reset(CALXEDAXGMAC_COMPAT, THIS_MODULE,
+>> +			     vfio_platform_calxedaxgmac_reset);
 >> +
->> +	reset = vfio_platform_lookup_reset(compat_str_array[0]);
->> +	return reset;
-> 
-> Something got allocated into compat_str_array and gets leaked here.
-is there any allocation? device_property_read_string_array does not
-return -ENOMEM.
-
-> 
+>> +	symbol_put(vfio_platform_register_reset);
+>> +
+>> +	return ret;
 >> +}
 >> +
->> +static void vfio_platform_put_reset(struct vfio_platform_device *vdev)
+>> +static void __exit vfio_platform_calxedaxgmac_exit(void)
 >> +{
->> +	struct vfio_platform_reset_node *iter;
+>> +	int (*unregister_reset)(char *);
+>> +	int ret;
 >> +
->> +	list_for_each_entry(iter, &reset_list, link) {
+>> +	unregister_reset = symbol_get(vfio_platform_unregister_reset);
 > 
-> Racy
+> Shouldn't we have gotten the symbol during the module init so that this
+> cannot fail?
+yes makes sense
+> 
+>> +	if (!unregister_reset)
+>> +		return;
+>> +
+>> +	ret = unregister_reset(CALXEDAXGMAC_COMPAT);
+> 
+> unregister_reset() should just return void
 ok
 > 
->> +		if (iter->reset == vdev->reset) {
->> +			module_put(iter->owner);
->> +			vdev->reset = NULL;
->> +			return;
->> +		}
->> +	}
+>> +
+>> +	symbol_put(vfio_platform_unregister_reset);
 >> +}
 >> +
->>  static int vfio_platform_regions_init(struct vfio_platform_device *vdev)
->>  {
->>  	int cnt = 0, i;
->> @@ -103,10 +149,12 @@ static void vfio_platform_release(void *device_data)
->>  	mutex_lock(&driver_lock);
->>  
->>  	if (!(--vdev->refcnt)) {
->> +		vdev->reset = vfio_platform_get_reset(vdev);
->>  		if (!IS_ERR_OR_NULL(vdev->reset))
->>  			vdev->reset(vdev);
->>  		vfio_platform_regions_cleanup(vdev);
->>  		vfio_platform_irq_cleanup(vdev);
->> +		vfio_platform_put_reset(vdev);
->>  	}
->>  
->>  	mutex_unlock(&driver_lock);
->> @@ -164,6 +212,7 @@ static long vfio_platform_ioctl(void *device_data,
->>  		if (info.argsz < minsz)
->>  			return -EINVAL;
->>  
->> +		vdev->reset = vfio_platform_get_reset(vdev);
->>  		if (!IS_ERR_OR_NULL(vdev->reset))
->>  			vdev->flags |= VFIO_DEVICE_FLAGS_RESET;
->>  		info.flags = vdev->flags;
->> @@ -260,6 +309,7 @@ static long vfio_platform_ioctl(void *device_data,
->>  		return ret;
->>  
->>  	} else if (cmd == VFIO_DEVICE_RESET) {
->> +		vdev->reset = vfio_platform_get_reset(vdev);
->>  		if (!IS_ERR_OR_NULL(vdev->reset))
->>  			return vdev->reset(vdev);
->>  		else
+>> +module_init(vfio_platform_calxedaxgmac_init);
+>> +module_exit(vfio_platform_calxedaxgmac_exit);
+>> +
+>> +MODULE_VERSION(DRIVER_VERSION);
+>> +MODULE_LICENSE("GPL v2");
+>> +MODULE_AUTHOR(DRIVER_AUTHOR);
+>> +MODULE_DESCRIPTION(DRIVER_DESC);
 > 
-> I count 3 gets and 1 put, isn't the module reference count increase
-> showing that?
+> 
+> So a user needs to manually load this module to get a working reset for
+> this device?  That's never going to happen.
+The reset module is devised to be in-kernel or external. There is always
+the choice to include all reset modules as soon as vfio-platform /amba
+is chosen. What would be your preferred approach then? Do you consider
+this approach using separate reset modules is not sensible? Do you think
+we should put everything in the vfio-platform driver?
 
-vfio_platform_get_reset simply returns if the function pointer already
-is populated so there is no systematic ref increment.
+Thanks for the whole review.
 
-  This looks like it hasn't been tested.
+Best Regards
 
-It did testing with external and in-kernel modules through
-  Why would we do a
-> get every time we want to do a reset?
-
-My doubt were about the order of probing between the
-vfio-platform_driver and the vfio reset module? This question was the
-rationale of this implementation choice. But again the actual ref count
-increment is devised to be done once on the first entry point (iotcl or
-internal release)
-
-  Do one get when the device is
-> registered or opened and one put when the device is unregistered or
-> closed.  We don't want erratic userspace behavior that the reset
-> property of a device can come and go.
-
+Eric
 > 
