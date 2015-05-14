@@ -1,28 +1,27 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC/RFT PATCH v2 2/3] KVM: promote KVM_MEMSLOT_INCOHERENT to uapi
-Date: Thu, 14 May 2015 12:34:33 +0200
-Message-ID: <20150514103433.GN32765@cbox>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [RFC/RFT PATCH v2 0/3] KVM: Introduce KVM_MEM_UNCACHED
+Date: Thu, 14 May 2015 11:37:46 +0100
+Message-ID: <CAFEAcA_EEA=TZ1jxL_rptAx5_sGa8NLMffePAw3eb-3pBgdg5w@mail.gmail.com>
 References: <1431516714-25816-1-git-send-email-drjones@redhat.com>
- <1431516714-25816-3-git-send-email-drjones@redhat.com>
+ <20150514103150.GA12812@localhost.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C757651437
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2015 06:25:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 269C651440
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2015 06:29:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LK-i9kJtsB2p for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 May 2015 06:25:15 -0400 (EDT)
-Received: from mail-la0-f53.google.com (mail-la0-f53.google.com
- [209.85.215.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F0D15142E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2015 06:25:15 -0400 (EDT)
-Received: by layy10 with SMTP id y10so61192055lay.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2015 03:34:22 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <1431516714-25816-3-git-send-email-drjones@redhat.com>
+ with ESMTP id isB1dffGqS1D for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 May 2015 06:28:59 -0400 (EDT)
+Received: from mail-ig0-f170.google.com (mail-ig0-f170.google.com
+ [209.85.213.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 51C515143F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2015 06:28:59 -0400 (EDT)
+Received: by igbhj9 with SMTP id hj9so69144173igb.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 May 2015 03:38:07 -0700 (PDT)
+In-Reply-To: <20150514103150.GA12812@localhost.localdomain>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,16 +32,16 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Andrew Jones <drjones@redhat.com>
-Cc: ard.biesheuvel@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, qemu-devel@nongnu.org, pbonzini@redhat.com, lersek@redhat.com, kvmarm@lists.cs.columbia.edu
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 13, 2015 at 01:31:53PM +0200, Andrew Jones wrote:
-> Commit 1050dcda30529 introduced KVM_MEMSLOT_INCOHERENT to flag memory
-> regions that may have coherency issues due to mapping host system RAM
-> as non-cacheable. This was introduced as a KVM internal flag, but now
-> give KVM userspace access to it so that it may use it for hinting
-> likely problematic regions. Also rename to KVM_MEM_UNCACHED.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
+On 14 May 2015 at 11:31, Andrew Jones <drjones@redhat.com> wrote:
+> Forgot to (4): switch from setting userspace's mapping to
+> device memory to normal, non-cacheable. Using device memory
+> caused a problem that Alex Graf found, and Peter Maydell suggested
+> using normal, non-cacheable instead.
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Did you check that non-cacheable is definitely the correct
+kind of Normal memory attribute we want? (ie not write-through).
+
+-- PMM
