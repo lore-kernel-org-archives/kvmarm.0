@@ -1,93 +1,72 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v4 00/12] KVM Guest Debug support for arm64
-Date: Fri, 15 May 2015 15:27:03 +0100
-Message-ID: <1431700035-23479-1-git-send-email-alex.bennee@linaro.org>
+Subject: [PATCH v4 01/12] KVM: add comments for kvm_debug_exit_arch struct
+Date: Fri, 15 May 2015 15:27:04 +0100
+Message-ID: <1431700035-23479-2-git-send-email-alex.bennee@linaro.org>
+References: <1431700035-23479-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FF5551683
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 10:17:19 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id S4NoDBKmy+-3 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 May 2015 10:17:17 -0400 (EDT)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F3C3E51681
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 10:17:16 -0400 (EDT)
+In-Reply-To: <1431700035-23479-1-git-send-email-alex.bennee@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org
-Cc: jan.kiszka@siemens.com, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Gleb Natapov <gleb@kernel.org>, jan.kiszka@siemens.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, "open list:ABI/API" <linux-api@vger.kernel.org>, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-Here is V4 of the KVM Guest Debug support for arm64.
-
-The changes are all due to Christoffer's review of v3 and sees a few
-tweaks. The main change to the debug register code means we no longer
-overlay the registers in sys_reg[] context but have specific areas for
-the vcpu_debug_state and external_debug_state. As a result the need to
-__u64 align the registers has been removed and we now have:
-
-#define KVM_ARM_MAX_DBG_REGS 16
-struct kvm_guest_debug_arch {
-        __u32 dbg_bcr[KVM_ARM_MAX_DBG_REGS];
-        __u64 dbg_bvr[KVM_ARM_MAX_DBG_REGS];
-        __u32 dbg_wcr[KVM_ARM_MAX_DBG_REGS];
-        __u64 dbg_wvr[KVM_ARM_MAX_DBG_REGS];
-};
-
-There are additional comments to clarify how we handle trapping and
-preserving registers.
-
-=46or full details see the changelog on each of the patches.
-
-GIT Repos:
-
-The patches for this series are based off v4.1-rc3 and can be found
-at:
-
-https://git.linaro.org/people/alex.bennee/linux.git
-branch: guest-debug/4.1-rc3-v4
-
-I'm still in the process of going through the QEMU comments and adding
-the re-injection support. However the current working state can be
-seen at:
-
-https://github.com/stsquad/qemu
-branch: kvm/guest-debug-v4
-
-Alex Benn=C3=A9e (12):
-  KVM: add comments for kvm_debug_exit_arch struct
-  KVM: define common KVM_GUESTDBG_USE_SW/HW_BP bits
-  KVM: arm64: guest debug, define API headers
-  KVM: arm: guest debug, add stub KVM_SET_GUEST_DEBUG ioctl
-  KVM: arm: introduce kvm_arm_init/setup/clear_debug
-  KVM: arm64: guest debug, add SW break point support
-  KVM: arm64: guest debug, add support for single-step
-  KVM: arm64: re-factor hyp.S debug register code
-  KVM: arm64: introduce vcpu->arch.debug_ptr
-  KVM: arm64: guest debug, HW assisted debug support
-  KVM: arm64: enable KVM_CAP_SET_GUEST_DEBUG
-  KVM: arm64: add trace points for guest_debug debug
-
- Documentation/virtual/kvm/api.txt      |  15 +-
- arch/arm/include/asm/kvm_host.h        |   4 +
- arch/arm/kvm/arm.c                     |  46 ++-
- arch/arm/kvm/trace.h                   |  17 +
- arch/arm64/include/asm/hw_breakpoint.h |  12 +
- arch/arm64/include/asm/kvm_asm.h       |  26 +-
- arch/arm64/include/asm/kvm_host.h      |  30 +-
- arch/arm64/include/uapi/asm/kvm.h      |  18 ++
- arch/arm64/kernel/asm-offsets.c        |   7 +
- arch/arm64/kernel/hw_breakpoint.c      |  12 -
- arch/arm64/kvm/Makefile                |   2 +-
- arch/arm64/kvm/debug.c                 | 203 ++++++++++++
- arch/arm64/kvm/handle_exit.c           |  44 +++
- arch/arm64/kvm/hyp.S                   | 545 ++++++++++---------------=
---------
- arch/arm64/kvm/reset.c                 |  15 +
- arch/arm64/kvm/sys_regs.c              | 136 ++++++--
- arch/arm64/kvm/trace.h                 | 105 +++++++
- arch/powerpc/include/uapi/asm/kvm.h    |   4 +-
- arch/s390/include/uapi/asm/kvm.h       |   2 -
- arch/x86/include/uapi/asm/kvm.h        |   2 -
- include/uapi/linux/kvm.h               |  11 +-
- 21 files changed, 798 insertions(+), 458 deletions(-)
- create mode 100644 arch/arm64/kvm/debug.c
-
---=20
-2.3.5
-
+QnJpbmcgaW50byBsaW5lIHdpdGggdGhlIGNvbW1lbnRzIGZvciB0aGUgb3RoZXIgc3RydWN0dXJl
+cyBhbmQgdGhlaXIKS1ZNX0VYSVRfKiBjYXNlcy4gQWxzbyB1cGRhdGUgYXBpLnR4dCB0byByZWZs
+ZWN0IHVzZSBpbiBrdm1fcnVuCmRvY3VtZW50YXRpb24uCgpTaWduZWQtb2ZmLWJ5OiBBbGV4IEJl
+bm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+ClJldmlld2VkLWJ5OiBEYXZpZCBIaWxkZW5i
+cmFuZCA8ZGFoaUBsaW51eC52bmV0LmlibS5jb20+ClJldmlld2VkLWJ5OiBBbmRyZXcgSm9uZXMg
+PGRyam9uZXNAcmVkaGF0LmNvbT4KQWNrZWQtYnk6IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9m
+ZmVyLmRhbGxAbGluYXJvLm9yZz4KCi0tLQoKdjIKICAtIGFkZCBjb21tZW50cyBmb3Igb3RoZXIg
+ZXhpdCB0eXBlcwp2MwogIC0gcy9jb21tZW50YXJ5L2NvbW1lbnRzLwogIC0gYWRkIHJiIHRhZ3MK
+ICAtIHVwZGF0ZSBhcGkudHh0IGt2bV9ydW4gdG8gaW5jbHVkZSBLVk1fRVhJVF9ERUJVRyBkZXNj
+CnY0CiAgLSBzcCBmaXhlcwogIC0gYWRkIGEtYgoKZGlmZiAtLWdpdCBhL0RvY3VtZW50YXRpb24v
+dmlydHVhbC9rdm0vYXBpLnR4dCBiL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4dApp
+bmRleCA5ZmEyYmY4Li5jMzRjMzJkIDEwMDY0NAotLS0gYS9Eb2N1bWVudGF0aW9uL3ZpcnR1YWwv
+a3ZtL2FwaS50eHQKKysrIGIvRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGkudHh0CkBAIC0z
+MDcwLDExICszMDcwLDEzIEBAIGRhdGFfb2Zmc2V0IGRlc2NyaWJlcyB3aGVyZSB0aGUgZGF0YSBp
+cyBsb2NhdGVkIChLVk1fRVhJVF9JT19PVVQpIG9yCiB3aGVyZSBrdm0gZXhwZWN0cyBhcHBsaWNh
+dGlvbiBjb2RlIHRvIHBsYWNlIHRoZSBkYXRhIGZvciB0aGUgbmV4dAogS1ZNX1JVTiBpbnZvY2F0
+aW9uIChLVk1fRVhJVF9JT19JTikuICBEYXRhIGZvcm1hdCBpcyBhIHBhY2tlZCBhcnJheS4KIAor
+CQkvKiBLVk1fRVhJVF9ERUJVRyAqLwogCQlzdHJ1Y3QgewogCQkJc3RydWN0IGt2bV9kZWJ1Z19l
+eGl0X2FyY2ggYXJjaDsKIAkJfSBkZWJ1ZzsKIAotVW51c2VkLgorSWYgdGhlIGV4aXRfcmVhc29u
+IGlzIEtWTV9FWElUX0RFQlVHLCB0aGVuIGEgdmNwdSBpcyBwcm9jZXNzaW5nIGEgZGVidWcgZXZl
+bnQKK2ZvciB3aGljaCBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgaW5mb3JtYXRpb24gaXMgcmV0dXJu
+ZWQuCiAKIAkJLyogS1ZNX0VYSVRfTU1JTyAqLwogCQlzdHJ1Y3QgewpkaWZmIC0tZ2l0IGEvaW5j
+bHVkZS91YXBpL2xpbnV4L2t2bS5oIGIvaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oCmluZGV4IDRi
+NjAwNTYuLjcwYWM2NDEgMTAwNjQ0Ci0tLSBhL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaAorKysg
+Yi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgKQEAgLTIzNyw2ICsyMzcsNyBAQCBzdHJ1Y3Qga3Zt
+X3J1biB7CiAJCQlfX3UzMiBjb3VudDsKIAkJCV9fdTY0IGRhdGFfb2Zmc2V0OyAvKiByZWxhdGl2
+ZSB0byBrdm1fcnVuIHN0YXJ0ICovCiAJCX0gaW87CisJCS8qIEtWTV9FWElUX0RFQlVHICovCiAJ
+CXN0cnVjdCB7CiAJCQlzdHJ1Y3Qga3ZtX2RlYnVnX2V4aXRfYXJjaCBhcmNoOwogCQl9IGRlYnVn
+OwpAQCAtMjg1LDYgKzI4Niw3IEBAIHN0cnVjdCBrdm1fcnVuIHsKIAkJCV9fdTMyIGRhdGE7CiAJ
+CQlfX3U4ICBpc193cml0ZTsKIAkJfSBkY3I7CisJCS8qIEtWTV9FWElUX0lOVEVSTkFMX0VSUk9S
+ICovCiAJCXN0cnVjdCB7CiAJCQlfX3UzMiBzdWJlcnJvcjsKIAkJCS8qIEF2YWlsYWJsZSB3aXRo
+IEtWTV9DQVBfSU5URVJOQUxfRVJST1JfREFUQTogKi8KQEAgLTI5NSw2ICsyOTcsNyBAQCBzdHJ1
+Y3Qga3ZtX3J1biB7CiAJCXN0cnVjdCB7CiAJCQlfX3U2NCBncHJzWzMyXTsKIAkJfSBvc2k7CisJ
+CS8qIEtWTV9FWElUX1BBUFJfSENBTEwgKi8KIAkJc3RydWN0IHsKIAkJCV9fdTY0IG5yOwogCQkJ
+X191NjQgcmV0OwotLSAKMi4zLjUKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlh
+LmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFy
+bQo=
