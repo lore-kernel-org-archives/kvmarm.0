@@ -1,24 +1,31 @@
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v4 10/12] KVM: arm64: guest debug, HW assisted debug support
-Date: Fri, 15 May 2015 15:27:13 +0100
-Message-ID: <1431700035-23479-11-git-send-email-alex.bennee@linaro.org>
-References: <1431700035-23479-1-git-send-email-alex.bennee@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [Qemu-devel] [RFC/RFT PATCH v2 3/3] arm/arm64: KVM: implement
+ 'uncached' mem coherency
+Date: Fri, 15 May 2015 08:02:59 -0700
+Message-ID: <20150515145921.GB14144@lvm>
+References: <1431516714-25816-1-git-send-email-drjones@redhat.com>
+ <1431516714-25816-4-git-send-email-drjones@redhat.com>
+ <20150514105549.GO32765@cbox>
+ <20150514133213.GD12812@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 15E1751722
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 10:44:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EAC2851724
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 10:53:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DOAuFK6Q0o2W for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 May 2015 10:44:00 -0400 (EDT)
-Received: from socrates.bennee.com
- (static.88-198-71-155.clients.your-server.de [88.198.71.155])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BFBEB51720
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 10:44:00 -0400 (EDT)
-In-Reply-To: <1431700035-23479-1-git-send-email-alex.bennee@linaro.org>
+ with ESMTP id lO-W6hNSYH1j for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 May 2015 10:53:54 -0400 (EDT)
+Received: from mail-la0-f52.google.com (mail-la0-f52.google.com
+ [209.85.215.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E236D516F9
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 10:53:53 -0400 (EDT)
+Received: by lagv1 with SMTP id v1so123679056lag.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 08:03:03 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <20150514133213.GD12812@localhost.localdomain>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,185 +35,318 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, Jonathan Corbet <corbet@lwn.net>, Gleb Natapov <gleb@kernel.org>, jan.kiszka@siemens.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, "open list:ABI/API" <linux-api@vger.kernel.org>, dahi@linux.vnet.ibm.com, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, r65777@freescale.com, bp@suse.de, Ingo Molnar <mingo@kernel.org>
+To: Andrew Jones <drjones@redhat.com>
+Cc: ard.biesheuvel@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, qemu-devel@nongnu.org, pbonzini@redhat.com, lersek@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhpcyBhZGRzIHN1cHBvcnQgZm9yIHVzZXJzcGFjZSB0byBjb250cm9sIHRoZSBIVyBkZWJ1ZyBy
-ZWdpc3RlcnMgZm9yCmd1ZXN0IGRlYnVnLiBJbiB0aGUgZGVidWcgaW9jdGwgd2UgY29weSB0aGUg
-SU1QREVGIGRlZmluZWQgbnVtYmVyIG9mCnJlZ2lzdGVycyBpbnRvIGEgbmV3IHJlZ2lzdGVyIHNl
-dCBjYWxsZWQgaG9zdF9kZWJ1Z19zdGF0ZS4gVGhlcmUgaXMgbm93CmEgbmV3IHZjcHUgcGFyYW1l
-dGVyIGNhbGxlZCBkZWJ1Z19wdHIgd2hpY2ggc2VsZWN0cyB3aGljaCByZWdpc3RlciBzZXQKaXMg
-dG8gY29waWVkIGludG8gdGhlIHJlYWwgcmVnaXN0ZXJzIHdoZW4gd29ybGQgc3dpdGNoIG9jY3Vy
-cy4KCkkndmUgbW92ZWQgc29tZSBoZWxwZXIgZnVuY3Rpb25zIGludG8gdGhlIGh3X2JyZWFrcG9p
-bnQuaCBoZWFkZXIgZm9yCnJlLXVzZS4KCkFzIHdpdGggc2luZ2xlIHN0ZXAgd2UgbmVlZCB0byB0
-d2VhayB0aGUgZ3Vlc3QgcmVnaXN0ZXJzIHRvIGVuYWJsZSB0aGUKZXhjZXB0aW9ucyBzbyB3ZSBu
-ZWVkIHRvIHNhdmUgYW5kIHJlc3RvcmUgdGhvc2UgYml0cy4KClR3byBuZXcgY2FwYWJpbGl0aWVz
-IGhhdmUgYmVlbiBhZGRlZCB0byB0aGUgS1ZNX0VYVEVOU0lPTiBpb2N0bCB0byBhbGxvdwp1c2Vy
-c3BhY2UgdG8gcXVlcnkgdGhlIG51bWJlciBvZiBoYXJkd2FyZSBicmVhayBhbmQgd2F0Y2ggcG9p
-bnRzCmF2YWlsYWJsZSBvbiB0aGUgaG9zdCBoYXJkd2FyZS4KClNpZ25lZC1vZmYtYnk6IEFsZXgg
-QmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KCi0tLQp2MgogICAtIHN3aXRjaGVkIHRv
-IEMgc2V0dXAKICAgLSByZXBsYWNlIGhvc3QgZGVidWcgcmVnaXN0ZXJzIGRpcmVjdGx5IGludG8g
-Y29udGV4dAogICAtIG1pbm9yIHR3ZWFrIHRvIGFwaSBkb2NzCiAgIC0gc2V0dXAgcmlnaHQgcmVn
-aXN0ZXIgZm9yIGRlYnVnCiAgIC0gYWRkIEZBUl9FTDIgdG8gZGVidWcgZXhpdCBzdHJ1Y3R1cmUK
-ICAgLSBhZGQgc3VwcG9ydCBmb3IgdHJhcHBpbmcgZGVidWcgcmVnaXN0ZXIgYWNjZXNzCnYzCiAg
-IC0gcmVtb3ZlIHN0cmF5IHRyYWNlIHN0YXRlbWVudAogICAtIGZpeCBzcGFjaW5nIGFyb3VuZCBv
-cGVyYXRvcnMgKHZhcmlvdXMpCiAgIC0gY2xlYW4tdXAgdXNhZ2Ugb2YgdHJhcF9kZWJ1ZwogICAt
-IGludHJvZHVjZSBkZWJ1Z19wdHIsIHJlcGxhY2UgZXhjZXNzaXZlIG1lbWNweSBzdHVmZgogICAt
-IGRvbid0IHVzZSBtZW1jcHkgaW4gaW9jdGwsIGp1c3QgYXNzaWduCiAgIC0gdXBkYXRlIGNhcCBp
-b2N0bCBkb2N1bWVudGF0aW9uCiAgIC0gcmV3b3JkIGEgbnVtYmVyIGNvbW1lbnRzCiAgIC0gcmVu
-YW1lIGhvc3RfZGVidWdfc3RhdGUtPmV4dGVybmFsX2RlYnVnX3N0YXRlCnY0CiAgIC0gdXNlIHRo
-ZSBuZXcgdTMyL3U2NCBzcGxpdCBkZWJ1Z19wdHIgYXBwcm9hY2gKICAgLSBmaXggc29tZSB3b3Jk
-aW5nL2NvbW1lbnRzCgpkaWZmIC0tZ2l0IGEvRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGku
-dHh0IGIvRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGkudHh0CmluZGV4IDMzYzgxNDMuLmFk
-YTU3ZGYgMTAwNjQ0Ci0tLSBhL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4dAorKysg
-Yi9Eb2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL2FwaS50eHQKQEAgLTI2NjgsNyArMjY2OCw3IEBA
-IFRoZSB0b3AgMTYgYml0cyBvZiB0aGUgY29udHJvbCBmaWVsZCBhcmUgYXJjaGl0ZWN0dXJlIHNw
-ZWNpZmljIGNvbnRyb2wKIGZsYWdzIHdoaWNoIGNhbiBpbmNsdWRlIHRoZSBmb2xsb3dpbmc6CiAK
-ICAgLSBLVk1fR1VFU1REQkdfVVNFX1NXX0JQOiAgICAgdXNpbmcgc29mdHdhcmUgYnJlYWtwb2lu
-dHMgW3g4NiwgYXJtNjRdCi0gIC0gS1ZNX0dVRVNUREJHX1VTRV9IV19CUDogICAgIHVzaW5nIGhh
-cmR3YXJlIGJyZWFrcG9pbnRzIFt4ODYsIHMzOTBdCisgIC0gS1ZNX0dVRVNUREJHX1VTRV9IV19C
-UDogICAgIHVzaW5nIGhhcmR3YXJlIGJyZWFrcG9pbnRzIFt4ODYsIHMzOTAsIGFybTY0XQogICAt
-IEtWTV9HVUVTVERCR19JTkpFQ1RfREI6ICAgICBpbmplY3QgREIgdHlwZSBleGNlcHRpb24gW3g4
-Nl0KICAgLSBLVk1fR1VFU1REQkdfSU5KRUNUX0JQOiAgICAgaW5qZWN0IEJQIHR5cGUgZXhjZXB0
-aW9uIFt4ODZdCiAgIC0gS1ZNX0dVRVNUREJHX0VYSVRfUEVORElORzogIHRyaWdnZXIgYW4gaW1t
-ZWRpYXRlIGd1ZXN0IGV4aXQgW3MzOTBdCkBAIC0yNjgzLDYgKzI2ODMsMTEgQEAgdXBkYXRlZCB0
-byB0aGUgY29ycmVjdCAoc3VwcGxpZWQpIHZhbHVlcy4KIFRoZSBzZWNvbmQgcGFydCBvZiB0aGUg
-c3RydWN0dXJlIGlzIGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBhbmQKIHR5cGljYWxseSBjb250YWlu
-cyBhIHNldCBvZiBkZWJ1ZyByZWdpc3RlcnMuCiAKK0ZvciBhcm02NCB0aGUgbnVtYmVyIG9mIGRl
-YnVnIHJlZ2lzdGVycyBpcyBpbXBsZW1lbnRhdGlvbiBkZWZpbmVkIGFuZAorY2FuIGJlIGRldGVy
-bWluZWQgYnkgcXVlcnlpbmcgdGhlIEtWTV9DQVBfR1VFU1RfREVCVUdfSFdfQlBTIGFuZAorS1ZN
-X0NBUF9HVUVTVF9ERUJVR19IV19XUFMgY2FwYWJpbGl0aWVzIHdoaWNoIHJldHVybiBhIHBvc2l0
-aXZlIG51bWJlcgoraW5kaWNhdGluZyB0aGUgbnVtYmVyIG9mIHN1cHBvcnRlZCByZWdpc3RlcnMu
-CisKIFdoZW4gZGVidWcgZXZlbnRzIGV4aXQgdGhlIG1haW4gcnVuIGxvb3Agd2l0aCB0aGUgcmVh
-c29uCiBLVk1fRVhJVF9ERUJVRyB3aXRoIHRoZSBrdm1fZGVidWdfZXhpdF9hcmNoIHBhcnQgb2Yg
-dGhlIGt2bV9ydW4KIHN0cnVjdHVyZSBjb250YWluaW5nIGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBk
-ZWJ1ZyBpbmZvcm1hdGlvbi4KZGlmZiAtLWdpdCBhL2FyY2gvYXJtL2t2bS9hcm0uYyBiL2FyY2gv
-YXJtL2t2bS9hcm0uYwppbmRleCAwZDE3YzdiLi42ZGY0N2MxIDEwMDY0NAotLS0gYS9hcmNoL2Fy
-bS9rdm0vYXJtLmMKKysrIGIvYXJjaC9hcm0va3ZtL2FybS5jCkBAIC0zMDcsNiArMzA3LDcgQEAg
-dm9pZCBrdm1fYXJjaF92Y3B1X3B1dChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiAKICNkZWZpbmUg
-S1ZNX0dVRVNUREJHX1ZBTElEX01BU0sgKEtWTV9HVUVTVERCR19FTkFCTEUgfCAgICBcCiAJCQkg
-ICAgS1ZNX0dVRVNUREJHX1VTRV9TV19CUCB8IFwKKwkJCSAgICBLVk1fR1VFU1REQkdfVVNFX0hX
-X0JQIHwgXAogCQkJICAgIEtWTV9HVUVTVERCR19TSU5HTEVTVEVQKQogCiAvKioKQEAgLTMyNyw2
-ICszMjgsMTIgQEAgaW50IGt2bV9hcmNoX3ZjcHVfaW9jdGxfc2V0X2d1ZXN0X2RlYnVnKHN0cnVj
-dCBrdm1fdmNwdSAqdmNwdSwKIAogCWlmIChkYmctPmNvbnRyb2wgJiBLVk1fR1VFU1REQkdfRU5B
-QkxFKSB7CiAJCXZjcHUtPmd1ZXN0X2RlYnVnID0gZGJnLT5jb250cm9sOworCisJCS8qIEhhcmR3
-YXJlIGFzc2lzdGVkIEJyZWFrIGFuZCBXYXRjaCBwb2ludHMgKi8KKwkJaWYgKHZjcHUtPmd1ZXN0
-X2RlYnVnICYgS1ZNX0dVRVNUREJHX1VTRV9IV19CUCkgeworCQkJdmNwdS0+YXJjaC5leHRlcm5h
-bF9kZWJ1Z19zdGF0ZSA9IGRiZy0+YXJjaDsKKwkJfQorCiAJfSBlbHNlIHsKIAkJLyogSWYgbm90
-IGVuYWJsZWQgY2xlYXIgYWxsIGZsYWdzICovCiAJCXZjcHUtPmd1ZXN0X2RlYnVnID0gMDsKZGlm
-ZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vaHdfYnJlYWtwb2ludC5oIGIvYXJjaC9h
-cm02NC9pbmNsdWRlL2FzbS9od19icmVha3BvaW50LmgKaW5kZXggNTJiNDg0Yi4uYzQ1MDU1MiAx
-MDA2NDQKLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9od19icmVha3BvaW50LmgKKysrIGIv
-YXJjaC9hcm02NC9pbmNsdWRlL2FzbS9od19icmVha3BvaW50LmgKQEAgLTEzMCw2ICsxMzAsMTgg
-QEAgc3RhdGljIGlubGluZSB2b2lkIHB0cmFjZV9od19jb3B5X3RocmVhZChzdHJ1Y3QgdGFza19z
-dHJ1Y3QgKnRhc2spCiB9CiAjZW5kaWYKIAorLyogRGV0ZXJtaW5lIG51bWJlciBvZiBCUlAgcmVn
-aXN0ZXJzIGF2YWlsYWJsZS4gKi8KK3N0YXRpYyBpbmxpbmUgaW50IGdldF9udW1fYnJwcyh2b2lk
-KQoreworCXJldHVybiAoKHJlYWRfY3B1aWQoSURfQUE2NERGUjBfRUwxKSA+PiAxMikgJiAweGYp
-ICsgMTsKK30KKworLyogRGV0ZXJtaW5lIG51bWJlciBvZiBXUlAgcmVnaXN0ZXJzIGF2YWlsYWJs
-ZS4gKi8KK3N0YXRpYyBpbmxpbmUgaW50IGdldF9udW1fd3Jwcyh2b2lkKQoreworCXJldHVybiAo
-KHJlYWRfY3B1aWQoSURfQUE2NERGUjBfRUwxKSA+PiAyMCkgJiAweGYpICsgMTsKK30KKwogZXh0
-ZXJuIHN0cnVjdCBwbXUgcGVyZl9vcHNfYnA7CiAKICNlbmRpZgkvKiBfX0tFUk5FTF9fICovCmRp
-ZmYgLS1naXQgYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggYi9hcmNoL2FybTY0
-L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKaW5kZXggYWQ3OTJjYi4uYmEzYTFjNSAxMDA2NDQKLS0t
-IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCisrKyBiL2FyY2gvYXJtNjQvaW5j
-bHVkZS9hc20va3ZtX2hvc3QuaApAQCAtMTEzLDEyICsxMTMsMTMgQEAgc3RydWN0IGt2bV92Y3B1
-X2FyY2ggewogCiAJLyoKIAkgKiBGb3IgZGVidWdnaW5nIHRoZSBndWVzdCB3ZSBuZWVkIHRvIGtl
-ZXAgYSBzZXQgb2YgZGVidWcKLQkgKiByZWdpc3RlcnMgd2hpY2ggY2FuIG92ZXJyaWRlIHRoZSBn
-dWVzdHMgb3duIGRlYnVnIHN0YXRlCisJICogcmVnaXN0ZXJzIHdoaWNoIGNhbiBvdmVycmlkZSB0
-aGUgZ3Vlc3QncyBvd24gZGVidWcgc3RhdGUKIAkgKiB3aGlsZSBiZWluZyB1c2VkLiBUaGVzZSBh
-cmUgc2V0IHZpYSB0aGUgS1ZNX1NFVF9HVUVTVF9ERUJVRwogCSAqIGlvY3RsLgogCSAqLwogCXN0
-cnVjdCBrdm1fZ3Vlc3RfZGVidWdfYXJjaCAqZGVidWdfcHRyOwogCXN0cnVjdCBrdm1fZ3Vlc3Rf
-ZGVidWdfYXJjaCB2Y3B1X2RlYnVnX3N0YXRlOworCXN0cnVjdCBrdm1fZ3Vlc3RfZGVidWdfYXJj
-aCBleHRlcm5hbF9kZWJ1Z19zdGF0ZTsKIAogCS8qIFBvaW50ZXIgdG8gaG9zdCBDUFUgY29udGV4
-dCAqLwogCWt2bV9jcHVfY29udGV4dF90ICpob3N0X2NwdV9jb250ZXh0OwpkaWZmIC0tZ2l0IGEv
-YXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL3Vh
-cGkvYXNtL2t2bS5oCmluZGV4IDg3OTY2MTAuLjE0NGVkZWUgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJt
-NjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaAorKysgYi9hcmNoL2FybTY0L2luY2x1ZGUvdWFwaS9h
-c20va3ZtLmgKQEAgLTEyMSw3ICsxMjEsNyBAQCBzdHJ1Y3Qga3ZtX2d1ZXN0X2RlYnVnX2FyY2gg
-ewogCiBzdHJ1Y3Qga3ZtX2RlYnVnX2V4aXRfYXJjaCB7CiAJX191MzIgaHNyOwotCV9fdTY0IGZh
-cjsKKwlfX3U2NCBmYXI7CS8qIHVzZWQgZm9yIHdhdGNocG9pbnRzICovCiB9OwogCiBzdHJ1Y3Qg
-a3ZtX3N5bmNfcmVncyB7CmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2tlcm5lbC9od19icmVha3Bv
-aW50LmMgYi9hcmNoL2FybTY0L2tlcm5lbC9od19icmVha3BvaW50LmMKaW5kZXggZTdkOTM0ZC4u
-M2E0MWJiZiAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9rZXJuZWwvaHdfYnJlYWtwb2ludC5jCisr
-KyBiL2FyY2gvYXJtNjQva2VybmVsL2h3X2JyZWFrcG9pbnQuYwpAQCAtNDksMTggKzQ5LDYgQEAg
-c3RhdGljIERFRklORV9QRVJfQ1BVKGludCwgc3RlcHBpbmdfa2VybmVsX2JwKTsKIHN0YXRpYyBp
-bnQgY29yZV9udW1fYnJwczsKIHN0YXRpYyBpbnQgY29yZV9udW1fd3JwczsKIAotLyogRGV0ZXJt
-aW5lIG51bWJlciBvZiBCUlAgcmVnaXN0ZXJzIGF2YWlsYWJsZS4gKi8KLXN0YXRpYyBpbnQgZ2V0
-X251bV9icnBzKHZvaWQpCi17Ci0JcmV0dXJuICgocmVhZF9jcHVpZChJRF9BQTY0REZSMF9FTDEp
-ID4+IDEyKSAmIDB4ZikgKyAxOwotfQotCi0vKiBEZXRlcm1pbmUgbnVtYmVyIG9mIFdSUCByZWdp
-c3RlcnMgYXZhaWxhYmxlLiAqLwotc3RhdGljIGludCBnZXRfbnVtX3dycHModm9pZCkKLXsKLQly
-ZXR1cm4gKChyZWFkX2NwdWlkKElEX0FBNjRERlIwX0VMMSkgPj4gMjApICYgMHhmKSArIDE7Ci19
-Ci0KIGludCBod19icmVha3BvaW50X3Nsb3RzKGludCB0eXBlKQogewogCS8qCmRpZmYgLS1naXQg
-YS9hcmNoL2FybTY0L2t2bS9kZWJ1Zy5jIGIvYXJjaC9hcm02NC9rdm0vZGVidWcuYwppbmRleCBm
-NjMwZjRkLi43Y2ZjYjUzIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2t2bS9kZWJ1Zy5jCisrKyBi
-L2FyY2gvYXJtNjQva3ZtL2RlYnVnLmMKQEAgLTEwMywxMCArMTAzLDYgQEAgdm9pZCBrdm1fYXJt
-X3NldHVwX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIAkJCQlNRENSX0VMMl9URFJBIHwK
-IAkJCQlNRENSX0VMMl9URE9TQSk7CiAKLQkvKiBUcmFwIG9uIGFjY2VzcyB0byBkZWJ1ZyByZWdp
-c3RlcnM/ICovCi0JaWYgKHRyYXBfZGVidWcpCi0JCXZjcHUtPmFyY2gubWRjcl9lbDIgfD0gTURD
-Ul9FTDJfVERBOwotCiAJLyogSXMgR3Vlc3QgZGVidWdnaW5nIGluIGVmZmVjdD8gKi8KIAlpZiAo
-dmNwdS0+Z3Vlc3RfZGVidWcpIHsKIAkJdmNwdS0+YXJjaC5tZGNyX2VsMiB8PSBNRENSX0VMMl9U
-REU7CkBAIC0xMjksMTEgKzEyNSw0MyBAQCB2b2lkIGt2bV9hcm1fc2V0dXBfZGVidWcoc3RydWN0
-IGt2bV92Y3B1ICp2Y3B1KQogCQkJKnZjcHVfY3Bzcih2Y3B1KSAmPSB+REJHX1NQU1JfU1M7CiAJ
-CQl2Y3B1X3N5c19yZWcodmNwdSwgTURTQ1JfRUwxKSAmPSB+REJHX01EU0NSX1NTOwogCQl9CisK
-KwkJLyoKKwkJICogSFcgQnJlYWsvV2F0Y2ggcG9pbnRzCisJCSAqCisJCSAqIFdlIHNpbXBseSBz
-d2l0Y2ggdGhlIGRlYnVnX3B0ciB0byBwb2ludCB0byBvdXIgbmV3CisJCSAqIGV4dGVybmFsX2Rl
-YnVnX3N0YXRlIHdoaWNoIGhhcyBiZWVuIHBvcHVsYXRlZCBieSB0aGUKKwkJICogZGVidWcgaW9j
-dGwuIFRoZSBleGlzdGluZyBLVk1fQVJNNjRfREVCVUdfRElSVFkKKwkJICogbWVjaGFuaXNtIGVu
-c3VyZXMgdGhlIHJlZ2lzdGVycyBhcmUgdXBkYXRlZCBvbiB0aGUKKwkJICogd29ybGQgc3dpdGNo
-LgorCQkgKi8KKwkJaWYgKHZjcHUtPmd1ZXN0X2RlYnVnICYgS1ZNX0dVRVNUREJHX1VTRV9IV19C
-UCkgeworCQkJLyogRW5hYmxlIGRlYnVnIGV4Y2VwdGlvbnMgZm9yIGFsbCBFTDAvRUwxICovCisJ
-CQl2Y3B1X3N5c19yZWcodmNwdSwgTURTQ1JfRUwxKSB8PQorCQkJCShEQkdfTURTQ1JfS0RFIHwg
-REJHX01EU0NSX01ERSk7CisKKwkJCXZjcHUtPmFyY2guZGVidWdfcHRyID0gJnZjcHUtPmFyY2gu
-ZXh0ZXJuYWxfZGVidWdfc3RhdGU7CisJCQl2Y3B1LT5hcmNoLmRlYnVnX2ZsYWdzIHw9IEtWTV9B
-Uk02NF9ERUJVR19ESVJUWTsKKwkJCXRyYXBfZGVidWcgPSB0cnVlOworCQl9CiAJfQorCisJLyog
-VHJhcCBkZWJ1ZyByZWdpc3RlciBhY2Nlc3MgKi8KKwlpZiAodHJhcF9kZWJ1ZykKKwkJdmNwdS0+
-YXJjaC5tZGNyX2VsMiB8PSBNRENSX0VMMl9UREE7CiB9CiAKIHZvaWQga3ZtX2FybV9jbGVhcl9k
-ZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiB7Ci0JaWYgKHZjcHUtPmd1ZXN0X2RlYnVnKQor
-CWlmICh2Y3B1LT5ndWVzdF9kZWJ1ZykgewogCQlyZXN0b3JlX2d1ZXN0X2RlYnVnX3JlZ3ModmNw
-dSk7CisKKwkJLyoKKwkJICogSWYgd2Ugd2VyZSB1c2luZyBIVyBkZWJ1ZyB3ZSBuZWVkIHRvIHJl
-c3RvcmUgdGhlCisJCSAqIGRlYnVnX3B0ciB0byB0aGUgZ3Vlc3QgZGVidWcgc3RhdGUuCisJCSAq
-LworCQlpZiAodmNwdS0+Z3Vlc3RfZGVidWcgJiBLVk1fR1VFU1REQkdfVVNFX0hXX0JQKQorCQkJ
-dmNwdS0+YXJjaC5kZWJ1Z19wdHIgPSAmdmNwdS0+YXJjaC52Y3B1X2RlYnVnX3N0YXRlOworCisJ
-fQogfQpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vaGFuZGxlX2V4aXQuYyBiL2FyY2gvYXJt
-NjQva3ZtL2hhbmRsZV9leGl0LmMKaW5kZXggZTlkZTEzZS4uNjhhMDc1OSAxMDA2NDQKLS0tIGEv
-YXJjaC9hcm02NC9rdm0vaGFuZGxlX2V4aXQuYworKysgYi9hcmNoL2FybTY0L2t2bS9oYW5kbGVf
-ZXhpdC5jCkBAIC0xMDMsNyArMTAzLDExIEBAIHN0YXRpYyBpbnQga3ZtX2hhbmRsZV9ndWVzdF9k
-ZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1fcnVuICpydW4pCiAJcnVuLT5k
-ZWJ1Zy5hcmNoLmhzciA9IGhzcjsKIAogCXN3aXRjaCAoaHNyID4+IEVTUl9FTHhfRUNfU0hJRlQp
-IHsKKwljYXNlIEVTUl9FTHhfRUNfV0FUQ0hQVF9MT1c6CisJCXJ1bi0+ZGVidWcuYXJjaC5mYXIg
-PSB2Y3B1LT5hcmNoLmZhdWx0LmZhcl9lbDI7CisJCS8qIGZhbGwgdGhyb3VnaCAqLwogCWNhc2Ug
-RVNSX0VMeF9FQ19TT0ZUU1RQX0xPVzoKKwljYXNlIEVTUl9FTHhfRUNfQlJFQUtQVF9MT1c6CiAJ
-Y2FzZSBFU1JfRUx4X0VDX0JLUFQzMjoKIAljYXNlIEVTUl9FTHhfRUNfQlJLNjQ6CiAJCWJyZWFr
-OwpAQCAtMTMyLDYgKzEzNiw4IEBAIHN0YXRpYyBleGl0X2hhbmRsZV9mbiBhcm1fZXhpdF9oYW5k
-bGVyc1tdID0gewogCVtFU1JfRUx4X0VDX0lBQlRfTE9XXQk9IGt2bV9oYW5kbGVfZ3Vlc3RfYWJv
-cnQsCiAJW0VTUl9FTHhfRUNfREFCVF9MT1ddCT0ga3ZtX2hhbmRsZV9ndWVzdF9hYm9ydCwKIAlb
-RVNSX0VMeF9FQ19TT0ZUU1RQX0xPV109IGt2bV9oYW5kbGVfZ3Vlc3RfZGVidWcsCisJW0VTUl9F
-THhfRUNfV0FUQ0hQVF9MT1ddPSBrdm1faGFuZGxlX2d1ZXN0X2RlYnVnLAorCVtFU1JfRUx4X0VD
-X0JSRUFLUFRfTE9XXT0ga3ZtX2hhbmRsZV9ndWVzdF9kZWJ1ZywKIAlbRVNSX0VMeF9FQ19CS1BU
-MzJdCT0ga3ZtX2hhbmRsZV9ndWVzdF9kZWJ1ZywKIAlbRVNSX0VMeF9FQ19CUks2NF0JPSBrdm1f
-aGFuZGxlX2d1ZXN0X2RlYnVnLAogfTsKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3Jlc2V0
-LmMgYi9hcmNoL2FybTY0L2t2bS9yZXNldC5jCmluZGV4IDBiNDMyNjUuLjIxZDVhNjIgMTAwNjQ0
-Ci0tLSBhL2FyY2gvYXJtNjQva3ZtL3Jlc2V0LmMKKysrIGIvYXJjaC9hcm02NC9rdm0vcmVzZXQu
-YwpAQCAtNTYsNiArNTYsMTIgQEAgc3RhdGljIGJvb2wgY3B1X2hhc18zMmJpdF9lbDEodm9pZCkK
-IAlyZXR1cm4gISEocGZyMCAmIDB4MjApOwogfQogCisvKioKKyAqIGt2bV9hcmNoX2Rldl9pb2N0
-bF9jaGVja19leHRlbnNpb24KKyAqCisgKiBXZSBjdXJyZW50bHkgYXNzdW1lIHRoYXQgdGhlIG51
-bWJlciBvZiBIVyByZWdpc3RlcnMgaXMgdW5pZm9ybQorICogYWNyb3NzIGFsbCBDUFVzIChzZWUg
-Y3B1aW5mb19zYW5pdHlfY2hlY2spLgorICovCiBpbnQga3ZtX2FyY2hfZGV2X2lvY3RsX2NoZWNr
-X2V4dGVuc2lvbihsb25nIGV4dCkKIHsKIAlpbnQgcjsKQEAgLTY0LDYgKzcwLDEyIEBAIGludCBr
-dm1fYXJjaF9kZXZfaW9jdGxfY2hlY2tfZXh0ZW5zaW9uKGxvbmcgZXh0KQogCWNhc2UgS1ZNX0NB
-UF9BUk1fRUwxXzMyQklUOgogCQlyID0gY3B1X2hhc18zMmJpdF9lbDEoKTsKIAkJYnJlYWs7CisJ
-Y2FzZSBLVk1fQ0FQX0dVRVNUX0RFQlVHX0hXX0JQUzoKKwkJciA9IGdldF9udW1fYnJwcygpOwor
-CQlicmVhazsKKwljYXNlIEtWTV9DQVBfR1VFU1RfREVCVUdfSFdfV1BTOgorCQlyICA9IGdldF9u
-dW1fd3JwcygpOworCQlicmVhazsKIAlkZWZhdWx0OgogCQlyID0gMDsKIAl9CmRpZmYgLS1naXQg
-YS9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmggYi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgKaW5k
-ZXggN2M1ZGQxMS4uZDNlNjYxZCAxMDA2NDQKLS0tIGEvaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5o
-CisrKyBiL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaApAQCAtODE5LDYgKzgxOSw4IEBAIHN0cnVj
-dCBrdm1fcHBjX3NtbXVfaW5mbyB7CiAjZGVmaW5lIEtWTV9DQVBfUzM5MF9JTkpFQ1RfSVJRIDEx
-MwogI2RlZmluZSBLVk1fQ0FQX1MzOTBfSVJRX1NUQVRFIDExNAogI2RlZmluZSBLVk1fQ0FQX1BQ
-Q19IV1JORyAxMTUKKyNkZWZpbmUgS1ZNX0NBUF9HVUVTVF9ERUJVR19IV19CUFMgMTE2CisjZGVm
-aW5lIEtWTV9DQVBfR1VFU1RfREVCVUdfSFdfV1BTIDExNwogCiAjaWZkZWYgS1ZNX0NBUF9JUlFf
-Uk9VVElORwogCi0tIAoyLjMuNQoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEu
-ZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJt
-Cg==
+On Thu, May 14, 2015 at 03:32:13PM +0200, Andrew Jones wrote:
+> On Thu, May 14, 2015 at 12:55:49PM +0200, Christoffer Dall wrote:
+> > On Wed, May 13, 2015 at 01:31:54PM +0200, Andrew Jones wrote:
+> > > When S1 and S2 memory attributes combine wrt to caching policy,
+> > > non-cacheable types take precedence. If a guest maps a region as
+> > > device memory, which KVM userspace is using to emulate the device
+> > > using normal, cacheable memory, then we lose coherency. With
+> > > KVM_MEM_UNCACHED, KVM userspace can now hint to KVM which memory
+> > > regions are likely to be problematic. With this patch, as pages
+> > > of these types of regions are faulted into the guest, not only do
+> > > we flush the page's dcache, but we also change userspace's
+> > > mapping to NC in order to maintain coherency.
+> > > 
+> > > What if the guest doesn't do what we expect? While we can't
+> > > force a guest to use cacheable memory, we can take advantage of
+> > > the non-cacheable precedence, and force it to use non-cacheable.
+> > > So, this patch also introduces PAGE_S2_NORMAL_NC, and uses it on
+> > > KVM_MEM_UNCACHED regions to force them to NC.
+> > > 
+> > > We now have both guest and userspace on the same page (pun intended)
+> > 
+> > I'd like to revisit the overall approach here.  Is doing non-cached
+> > accesses in both the guest and host really the right thing to do here?
+> 
+> I think so, but all ideas/approaches are still on the table. This is
+> still an RFC.
+> 
+> > 
+> > The semantics of the device becomes that it is cache coherent (because
+> > QEMU is), and I think Marc argued that Linux/UEFI should simply be
+> > adapted to handle whatever emulated devices we have as coherent.  I also
+> > remember someone arguing that would be wrong (Peter?).
+> 
+> I'm not really for quirking all devices in all guest types (AAVMF, Linux,
+> other bootloaders, other OSes). Windows is unlikely to apply any quirks.
+> 
+
+Well my point was that if we're emulating a platform with coherent IO
+memory for PCI devices that is something that the guest should work with
+as such, but as Paolo explained it should always be safe for a guest to
+assume non-coherent, so that doesn't work.
+
+> > 
+> > Finally, does this address all cache coherency issues with emulated
+> > devices?  Some VOS guys had seen things still not working with this
+> > approach, unsure why...  I'd like to avoid us merging this only to merge
+> > a more complete solution in a few weeks which reverts this solution...
+> 
+> I'm not sure (this is still an RFT too :-) We definitely would need to
+> scatter some more memory_region_set_uncached() calls around QEMU first.
+> 
+
+It would be good if you could sync with the VOS guys and make sure your
+patch set addresses their issues with the appropriate
+memory_region_set_uncached() added to QEMU, and if it does not, some
+vague idea why that falls outside of the scope of this patch set.  After
+all, adding a USB controller to a VM is not that an esoteric use case,
+is it?
+
+> > 
+> > More comments/questions below:
+> > 
+> > > 
+> > > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > > ---
+> > >  arch/arm/include/asm/kvm_mmu.h        |  5 ++++-
+> > >  arch/arm/include/asm/pgtable-3level.h |  1 +
+> > >  arch/arm/include/asm/pgtable.h        |  1 +
+> > >  arch/arm/kvm/mmu.c                    | 37 +++++++++++++++++++++++------------
+> > >  arch/arm64/include/asm/kvm_mmu.h      |  5 ++++-
+> > >  arch/arm64/include/asm/memory.h       |  1 +
+> > >  arch/arm64/include/asm/pgtable.h      |  1 +
+> > >  7 files changed, 36 insertions(+), 15 deletions(-)
+> > > 
+> > > diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> > > index 405aa18833073..e8034a80b12e5 100644
+> > > --- a/arch/arm/include/asm/kvm_mmu.h
+> > > +++ b/arch/arm/include/asm/kvm_mmu.h
+> > > @@ -214,8 +214,11 @@ static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu, pfn_t pfn,
+> > >  	while (size) {
+> > >  		void *va = kmap_atomic_pfn(pfn);
+> > >  
+> > > -		if (need_flush)
+> > > +		if (need_flush) {
+> > >  			kvm_flush_dcache_to_poc(va, PAGE_SIZE);
+> > > +			if (ipa_uncached)
+> > > +				set_memory_nc((unsigned long)va, 1);
+> > 
+> > nit: consider moving this outside the need_flush
+> > 
+> > > +		}
+> > >  
+> > >  		if (icache_is_pipt())
+> > >  			__cpuc_coherent_user_range((unsigned long)va,
+> > > diff --git a/arch/arm/include/asm/pgtable-3level.h b/arch/arm/include/asm/pgtable-3level.h
+> > > index a745a2a53853c..39b3f7a40e663 100644
+> > > --- a/arch/arm/include/asm/pgtable-3level.h
+> > > +++ b/arch/arm/include/asm/pgtable-3level.h
+> > > @@ -121,6 +121,7 @@
+> > >   * 2nd stage PTE definitions for LPAE.
+> > >   */
+> > >  #define L_PTE_S2_MT_UNCACHED		(_AT(pteval_t, 0x0) << 2) /* strongly ordered */
+> > > +#define L_PTE_S2_MT_NORMAL_NC		(_AT(pteval_t, 0x5) << 2) /* normal non-cacheable */
+> > >  #define L_PTE_S2_MT_WRITETHROUGH	(_AT(pteval_t, 0xa) << 2) /* normal inner write-through */
+> > >  #define L_PTE_S2_MT_WRITEBACK		(_AT(pteval_t, 0xf) << 2) /* normal inner write-back */
+> > >  #define L_PTE_S2_MT_DEV_SHARED		(_AT(pteval_t, 0x1) << 2) /* device */
+> > > diff --git a/arch/arm/include/asm/pgtable.h b/arch/arm/include/asm/pgtable.h
+> > > index f40354198bad4..ae13ca8b0a23d 100644
+> > > --- a/arch/arm/include/asm/pgtable.h
+> > > +++ b/arch/arm/include/asm/pgtable.h
+> > > @@ -100,6 +100,7 @@ extern pgprot_t		pgprot_s2_device;
+> > >  #define PAGE_HYP		_MOD_PROT(pgprot_kernel, L_PTE_HYP)
+> > >  #define PAGE_HYP_DEVICE		_MOD_PROT(pgprot_hyp_device, L_PTE_HYP)
+> > >  #define PAGE_S2			_MOD_PROT(pgprot_s2, L_PTE_S2_RDONLY)
+> > > +#define PAGE_S2_NORMAL_NC	__pgprot((pgprot_val(PAGE_S2) & ~L_PTE_S2_MT_MASK) | L_PTE_S2_MT_NORMAL_NC)
+> > >  #define PAGE_S2_DEVICE		_MOD_PROT(pgprot_s2_device, L_PTE_S2_RDONLY)
+> > >  
+> > >  #define __PAGE_NONE		__pgprot(_L_PTE_DEFAULT | L_PTE_RDONLY | L_PTE_XN | L_PTE_NONE)
+> > > diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+> > > index bc1665acd73e7..6b3bd8061bd2a 100644
+> > > --- a/arch/arm/kvm/mmu.c
+> > > +++ b/arch/arm/kvm/mmu.c
+> > > @@ -1220,7 +1220,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> > >  	struct vm_area_struct *vma;
+> > >  	pfn_t pfn;
+> > >  	pgprot_t mem_type = PAGE_S2;
+> > > -	bool fault_ipa_uncached;
+> > > +	bool fault_ipa_uncached = false;
+> > >  	bool logging_active = memslot_is_logging(memslot);
+> > >  	unsigned long flags = 0;
+> > >  
+> > > @@ -1300,6 +1300,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> > >  			writable = false;
+> > >  	}
+> > >  
+> > > +	if (memslot->flags & KVM_MEM_UNCACHED) {
+> > > +		mem_type = PAGE_S2_NORMAL_NC;
+> > > +		fault_ipa_uncached = true;
+> > > +	}
+> > > +
+> > >  	spin_lock(&kvm->mmu_lock);
+> > >  	if (mmu_notifier_retry(kvm, mmu_seq))
+> > >  		goto out_unlock;
+> > > @@ -1307,8 +1312,6 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> > >  	if (!hugetlb && !force_pte)
+> > >  		hugetlb = transparent_hugepage_adjust(&pfn, &fault_ipa);
+> > >  
+> > > -	fault_ipa_uncached = memslot->flags & KVM_MEM_UNCACHED;
+> > > -
+> > >  	if (hugetlb) {
+> > >  		pmd_t new_pmd = pfn_pmd(pfn, mem_type);
+> > >  		new_pmd = pmd_mkhuge(new_pmd);
+> > > @@ -1462,6 +1465,7 @@ static int handle_hva_to_gpa(struct kvm *kvm,
+> > >  			     unsigned long start,
+> > >  			     unsigned long end,
+> > >  			     int (*handler)(struct kvm *kvm,
+> > > +					    struct kvm_memory_slot *slot,
+> > >  					    gpa_t gpa, void *data),
+> > >  			     void *data)
+> > >  {
+> > > @@ -1491,14 +1495,15 @@ static int handle_hva_to_gpa(struct kvm *kvm,
+> > >  
+> > >  		for (; gfn < gfn_end; ++gfn) {
+> > >  			gpa_t gpa = gfn << PAGE_SHIFT;
+> > > -			ret |= handler(kvm, gpa, data);
+> > > +			ret |= handler(kvm, memslot, gpa, data);
+> > >  		}
+> > >  	}
+> > >  
+> > >  	return ret;
+> > >  }
+> > >  
+> > > -static int kvm_unmap_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
+> > > +static int kvm_unmap_hva_handler(struct kvm *kvm, struct kvm_memory_slot *slot,
+> > > +				 gpa_t gpa, void *data)
+> > 
+> > Maybe we should consider a pointer to a struct with the relevant data to
+> > pass around to the handler by now, which would allow us to get rid of
+> > the void * cast as well.  Not sure if it's worth it.
+> > 
+> > >  {
+> > >  	unmap_stage2_range(kvm, gpa, PAGE_SIZE);
+> > >  	return 0;
+> > > @@ -1527,9 +1532,15 @@ int kvm_unmap_hva_range(struct kvm *kvm,
+> > >  	return 0;
+> > >  }
+> > >  
+> > > -static int kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, void *data)
+> > > +static int kvm_set_spte_handler(struct kvm *kvm, struct kvm_memory_slot *slot,
+> > > +				gpa_t gpa, void *data)
+> > >  {
+> > > -	pte_t *pte = (pte_t *)data;
+> > > +	pte_t pte = *((pte_t *)data);
+> > > +
+> > > +	if (slot->flags & KVM_MEM_UNCACHED)
+> > > +		pte = pfn_pte(pte_pfn(pte), PAGE_S2_NORMAL_NC);
+> > > +	else
+> > > +		pte = pfn_pte(pte_pfn(pte), PAGE_S2);
+> > >  
+> > >  	/*
+> > >  	 * We can always call stage2_set_pte with KVM_S2PTE_FLAG_LOGGING_ACTIVE
+> > > @@ -1538,7 +1549,7 @@ static int kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, void *data)
+> > >  	 * therefore stage2_set_pte() never needs to clear out a huge PMD
+> > >  	 * through this calling path.
+> > >  	 */
+> > > -	stage2_set_pte(kvm, NULL, gpa, pte, 0);
+> > > +	stage2_set_pte(kvm, NULL, gpa, &pte, 0);
+> > 
+> > this is making me feel like we should have a separate patch that changes
+> > stage2_set_pte from taking a pointer to just taking a value for the new
+> > pte.
+> > 
+> > >  	return 0;
+> > >  }
+> > >  
+> > > @@ -1546,17 +1557,16 @@ static int kvm_set_spte_handler(struct kvm *kvm, gpa_t gpa, void *data)
+> > >  void kvm_set_spte_hva(struct kvm *kvm, unsigned long hva, pte_t pte)
+> > >  {
+> > >  	unsigned long end = hva + PAGE_SIZE;
+> > > -	pte_t stage2_pte;
+> > >  
+> > >  	if (!kvm->arch.pgd)
+> > >  		return;
+> > >  
+> > >  	trace_kvm_set_spte_hva(hva);
+> > > -	stage2_pte = pfn_pte(pte_pfn(pte), PAGE_S2);
+> > > -	handle_hva_to_gpa(kvm, hva, end, &kvm_set_spte_handler, &stage2_pte);
+> > > +	handle_hva_to_gpa(kvm, hva, end, &kvm_set_spte_handler, &pte);
+> > 
+> > hooking in here will make sure you catch changes to the page used for
+> > the mapping, but wouldn't that also mean that the userspace mapping
+> > would have been change, and where are you updating this?
+> > 
+> > Also, is this called if the userspace mapping is zapped without doing
+> > anything about the underlying page?  (how do we then catch when the
+> > userspace pte is populated again, and is this even possible?)
+> 
+> I was hoping that I only needed to worry about getting the S2 attributes
+> right here, and then, since the page will need to be refaulted into
+> the guest anyway, that the userspace part would get taken care of at
+> that point (in user_mem_abort).
+
+user_mem_abort handles stage-2 page table faults, which has (almost)
+nothing to do with the user space page tables.
+
+I think it's entirely possible to have a stage-2 mapping to a page,
+which is no longer mapped to userspace at all.  Or do we pin the
+userspace PTEs (not just keep a reference on the physical page) during
+fault handling?
+
+> But, to be honest, I forgot to dig into
+> this deep enough to know if my hope will work or not.
+> 
+
+You really need to work this out so you feel confident with the overall
+scheme here, then I can try to see if I can break it under review, but I
+think the author of this patch must know how it is *supposed* to work ;)
+
+> > 
+> > >  }
+> > >  
+> > > -static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
+> > > +static int kvm_age_hva_handler(struct kvm *kvm, struct kvm_memory_slot *slot,
+> > > +			       gpa_t gpa, void *data)
+> > >  {
+> > >  	pmd_t *pmd;
+> > >  	pte_t *pte;
+> > > @@ -1586,7 +1596,8 @@ static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
+> > >  	return 0;
+> > >  }
+> > >  
+> > > -static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
+> > > +static int kvm_test_age_hva_handler(struct kvm *kvm, struct kvm_memory_slot *slot,
+> > > +				    gpa_t gpa, void *data)
+> > >  {
+> > >  	pmd_t *pmd;
+> > >  	pte_t *pte;
+> > > diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> > > index 61505676d0853..af5f0f0eccef9 100644
+> > > --- a/arch/arm64/include/asm/kvm_mmu.h
+> > > +++ b/arch/arm64/include/asm/kvm_mmu.h
+> > > @@ -236,8 +236,11 @@ static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu, pfn_t pfn,
+> > >  {
+> > >  	void *va = page_address(pfn_to_page(pfn));
+> > >  
+> > > -	if (!vcpu_has_cache_enabled(vcpu) || ipa_uncached)
+> > > +	if (!vcpu_has_cache_enabled(vcpu) || ipa_uncached) {
+> > >  		kvm_flush_dcache_to_poc(va, size);
+> > > +		if (ipa_uncached)
+> > > +			set_memory_nc((unsigned long)va, size/PAGE_SIZE);
+> > 
+> > are you not setting the kernel mapping of the page to non-cached here,
+> > which doesn't affect your userspace mappings at all?
+> 
+> Oh crap. I shouldn't have tried to use change_memory_common... I
+> completely overlooked the fact I'm now using the wrong mm...
+> 
+
+and the wrong va...
+
+> > 
+> > (this would explain why things still break with this series).
+> 
+> yeah, I wonder why it works so well?
+> 
+
+luck/slowed things down/reordered operations to make things less likely
+would be my guess.
+
+Thanks,
+-Christoffer
