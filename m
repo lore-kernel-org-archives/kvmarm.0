@@ -1,62 +1,61 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC] ARM/ARM64: KVM: Implement KVM_FLUSH_DCACHE_GPA ioctl
-Date: Fri, 15 May 2015 17:24:55 +0200
-Message-ID: <55560FC7.30108@redhat.com>
-References: <1430817191-6231-1-git-send-email-j.fanguede@virtualopensystems.com>
- <20150506141249.GA6796@cbox>
- <CAGE1QJrabWWs0O1V-MpOxT_=1472TXb5rvJzJAJNfWH70x9pcg@mail.gmail.com>
- <20150507112027.GC25885@cbox>
- <CAGE1QJoyaGpuf=6Msa=xpm0pPGRkYWctcXGf=rwnha5o9Gm4bw@mail.gmail.com>
- <CAMJs5B9i9q8gJU93B09-uLMF6w1bTft-40DWPFUP6ky=SketSQ@mail.gmail.com>
- <CAGE1QJoEAg9tAM63MEbpLuqvY_ZwGrHPU1sqo=L_iByKrERUow@mail.gmail.com>
- <554B9A70.6020309@redhat.com> <5555DBFD.4080503@redhat.com>
- <20150515151235.GD14144@lvm>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v4 03/12] KVM: arm64: guest debug, define API headers
+Date: Fri, 15 May 2015 16:43:01 +0100
+Message-ID: <871tihlud6.fsf@linaro.org>
+References: <1431700035-23479-1-git-send-email-alex.bennee@linaro.org> <1431700035-23479-4-git-send-email-alex.bennee@linaro.org> <20150515144423.GA23652@leverpostej> <874mndlvny.fsf@linaro.org> <CAFEAcA8ZpndRyT84ta2r4bPTE1uGTN1XTfMpUn8qW022ben3BQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-In-Reply-To: <20150515151235.GD14144@lvm>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, Laszlo Ersek <lersek@redhat.com>
-Cc: list@lists.cs.columbia.edu, Overall <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, open@lists.cs.columbia.edu, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-reply-to: <CAFEAcA8ZpndRyT84ta2r4bPTE1uGTN1XTfMpUn8qW022ben3BQ@mail.gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Mark Rutland <mark.rutland@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "agraf@suse.de" <agraf@suse.de>, "drjones@redhat.com" <drjones@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "zhichao.huang@linaro.org" <zhichao.huang@linaro.org>, Catalin Marinas <Catalin.Marinas@arm.com>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, Will Deacon <Will.Deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, "dahi@linux.vnet.ibm.com" <dahi@linux.vnet.ibm.com>, "r65777@freescale.com" <r65777@freescale.com>, "bp@suse.de" <bp@suse.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-On 15/05/2015 17:12, Christoffer Dall wrote:
->>> > > Can you find out what memory attributes the guest is using for the
->>> > > memory---and if it's uncached, why?
->> > 
->> > For USB, see "drivers/usb/core/hcd-pci.c", function usb_hcd_pci_probe():
->> > it uses ioremap_nocache().
->> > 
->> > On the "why", that ioremap_nocache() call can be tracked to
->> > 
->> > http://git.kernel.org/cgit/linux/kernel/git/tglx/history.git/commit/?id=a914dd8b
->> > 
->> > (Feb 2002), which predates the kernel's move to git. I guess
->> > ioremap_nocache() is used simply because USB host controllers are
->> > supposed to programmed like that.
->> > 
->> > And, from "arch/arm64/include/asm/io.h":
->> > 
->> > #define ioremap_nocache(addr, size)     __ioremap((addr), (size),
->> > __pgprot(PROT_DEVICE_nGnRE))
->> > 
-> So this just means that these devices should be mapped as device memory
-> (like the VGA case before) right?  And therefore should work with Drew's
-> patches (assuming they are actually correct and you add the right QEMU
-> annotations to set the memory regions and non-cacheable), correct?
+> On 15 May 2015 at 16:14, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
+ote:
+>>
+>> Mark Rutland <mark.rutland@arm.com> writes:
+>>
+>>> On Fri, May 15, 2015 at 03:27:06PM +0100, Alex Benn=C3=A9e wrote:
+>>>> +/*
+>>>> + * See v8 ARM ARM D7.3: Debug Registers
+>>>> + *
+>>>> + * The control registers are architecturally defined as 32 bits b=
+ut are
+>>>> + * stored as 64 bit values alongside the value registers. This is=
+ done
+>>>
+>>> Stale comment? They're stored as __u32 below.
+>>
+>> Gah yes it is.
+>>
+>>> It's possible that the registers could grow in future as happened i=
+n the
+>>> case of CLIDR_EL1, so it might be worth treating system registers
+>>> generally as u64 values.
+>>
+>> Really? I mean the existing debug *control* registers have reserved =
+bits
+>> 24-31 so there is space for expansion.
+>
+> Other places in the userspace ABI which deal with sysregs (notably
+> ONE_REG) consistently define them all as 64-bit (which makes sense
+> anyway since the ISA only provides 64-bit accessors to them).
+> "Architecturally 32 bits" only means "top 32 bits reserved".
 
-As far as I understand ioremap_nocache() is used on a MMIO BAR.  QEMU
-does not back those with RAM at all, each access causes a userspace exit.
+=46air enough, I can switch it back. The main reason I had them as all =
+64
+bit before was because of the mapping onto the sys_regs context. If
+everyone is happy bloating the ABI a little I'm OK with that. It will
+make the hyp.S macro a little less ugly for one.
 
-Paolo
+>
+> -- PMM
+
+--=20
+Alex Benn=C3=A9e
