@@ -1,24 +1,30 @@
-From: Jan Kiszka <jan.kiszka@siemens.com>
-Subject: Re: [PATCH v4 02/12] KVM: define common KVM_GUESTDBG_USE_SW/HW_BP bits
-Date: Fri, 15 May 2015 19:46:08 +0200
-Message-ID: <555630E0.8060305@siemens.com>
-References: <1431700035-23479-1-git-send-email-alex.bennee@linaro.org>	<1431700035-23479-3-git-send-email-alex.bennee@linaro.org>	<555613F2.9060204@de.ibm.com>
- <20150515193315.6d3e82d2@thinkpad-w530>
+From: =?UTF-8?B?SsOpcsOpbXkgRmFuZ3XDqGRl?= <j.fanguede@virtualopensystems.com>
+Subject: Re: [Qemu-devel] [RFC/RFT PATCH v2 3/3] arm/arm64: KVM: implement
+ 'uncached' mem coherency
+Date: Fri, 15 May 2015 22:16:50 +0200
+Message-ID: <CAGE1QJoQwXyGsD2_SEDUBdu4EkpsMgEE6Erdu5CEYQdzWpR=SQ@mail.gmail.com>
+References: <1431516714-25816-1-git-send-email-drjones@redhat.com>
+ <1431516714-25816-4-git-send-email-drjones@redhat.com>
+ <20150514105549.GO32765@cbox>
+ <20150514133213.GD12812@localhost.localdomain> <20150515145921.GB14144@lvm>
+ <20150515170437.GA2951@localhost.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E3223517BB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 13:37:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C4FB3517B0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 16:08:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 55zdNPLx4N20 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 May 2015 13:37:37 -0400 (EDT)
-Received: from goliath.siemens.de (goliath.siemens.de [192.35.17.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 854F8517BA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 13:37:37 -0400 (EDT)
-In-Reply-To: <20150515193315.6d3e82d2@thinkpad-w530>
+ with ESMTP id j1XT9bSLt0bB for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 May 2015 16:08:00 -0400 (EDT)
+Received: from mail-wg0-f41.google.com (mail-wg0-f41.google.com [74.125.82.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 51C28517AD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 16:07:59 -0400 (EDT)
+Received: by wgin8 with SMTP id n8so126117809wgi.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 13:17:11 -0700 (PDT)
+In-Reply-To: <20150515170437.GA2951@localhost.localdomain>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,40 +34,100 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: David Hildenbrand <dahi@linux.vnet.ibm.com>, Christian Borntraeger <borntraeger@de.ibm.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, kvm@vger.kernel.org, supporter@lists.cs.columbia.edu, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Heiko Carstens <heiko.carstens@de.ibm.com>, Paul Mackerras <paulus@samba.org>, "H. Peter Anvin" <hpa@zytor.com>, kvmarm@lists.cs.columbia.edu, S390 <linux-s390@vger.kernel.org>, Michael Mueller <mimu@linux.vnet.ibm.com>, Nadav Amit <namit@cs.technion.ac.il>, Michael Ellerman <mpe@ellerman.id.au>, "maintainer:X86 ARCHITECTURE..." <x86@kernel.org>, Gleb Natapov <gleb@kernel.org>, Ingo Molnar <mingo@redhat.com>, zhichao.huang@linaro.org, r65777@freescale.com, bp@suse.de, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, marc.zyngier@arm.com, pbonzini@redhat.com, Cornelia Huck <cornelia.huck@de.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org, Eric Farman <farman@linux.vnet.ibm.com>, list@lists.c
+To: Andrew Jones <drjones@redhat.com>
+Cc: ard.biesheuvel@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, lersek@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMjAxNS0wNS0xNSAxOTozMywgRGF2aWQgSGlsZGVuYnJhbmQgd3JvdGU6Cj4+IEFtIDE1LjA1
-LjIwMTUgdW0gMTY6Mjcgc2NocmllYiBBbGV4IEJlbm7DqWU6Cj4+PiArKysgYi9hcmNoL3MzOTAv
-aW5jbHVkZS91YXBpL2FzbS9rdm0uaAo+Pj4gQEAgLTExNCw4ICsxMTQsNiBAQCBzdHJ1Y3Qga3Zt
-X2ZwdSB7Cj4+PiAgCV9fdTY0IGZwcnNbMTZdOwo+Pj4gIH07Cj4+Pgo+Pj4gLSNkZWZpbmUgS1ZN
-X0dVRVNUREJHX1VTRV9IV19CUAkJMHgwMDAxMDAwMAo+PiBbLi4uXQo+Pj4gKysrIGIvaW5jbHVk
-ZS91YXBpL2xpbnV4L2t2bS5oCj4+IFsuLi5dCj4+PiArI2RlZmluZSBLVk1fR1VFU1REQkdfVVNF
-X1NXX0JQCQkoMSA8PCAxNikKPj4+ICsjZGVmaW5lIEtWTV9HVUVTVERCR19VU0VfSFdfQlAJCSgx
-IDw8IDE3KQo+Pgo+PiBUaGlzIGlzIGFuIEFCSSBicmVhayBmb3IgczM5MCwgbm8/Cj4+Cj4+IERh
-dmlkLCBkbyB5b3UgcmVtZW1iZXIgd2h5IHdlIGRvIG5vdCB1c2UgS1ZNX0dVRVNUREJHX1VTRV9T
-V19CUD8KPj4KPiAKPiBXZSBuZXZlciBoYWQgdG8gdGVsbCB0aGUga2VybmVsIGFib3V0IHNvZnR3
-YXJlIGJyZWFrcG9pbnRzIGFzIHRoaXMgaXMgYWxsCj4gaGFuZGxlZCB2aWEgNCBieXRlIERJQUcg
-aW5zdHJ1Y3Rpb25zIHVudGlsIG5vdy4gV2UgZG9uJ3QgaGF2ZSB0byB0dXJuIHRoaXMKPiBtZWNo
-YW5pc20gb24uIFFFTVUgY2FuIGRpcmVjdGx5IGluc2VydCB0aGUgZGVzaXJlZCBESUFHIGluc3Ry
-dWN0aW9ucyBhbmQgZ2V0cwo+IG5vdGlmaWVkIHdoZW4gdGhleSBhcmUgYWJvdXQgdG8gZ2V0IGV4
-ZWN1dGVkLgo+IAo+IChCdXQgd2Ugc3RpbGwgaGF2ZSAyIGJ5dGUgYnJlYWtwb2ludCBzdXBwb3J0
-IHRvZG8gLSBzdGlsbCB0YmQgaG93IGV4YWN0bHkgdGhpcwo+IHdpbGwgYmUgcmVhbGl6ZWQgLSBj
-b3VsZCBiZSB0dXJuZWQgb24gdmlhIHN1Y2ggYSBtZWNoYW5pc20pCj4gCj4gVGhlIHByb2JsZW0g
-aXMsIHRoYXQgdGhlc2UgYml0cyBhcmUgYXJjaCBzcGVjaWZpYywgbm93IEFsZXggd2FudHMgdG8g
-dW5pZnkKPiB0aGVtIGZvciBhbGwgYXJjaHMuCj4gCj4gU28geWVzLCB0aGlzIGlzIGFuIEFCSSBi
-cmVhayBmb3IgdXMgYW5kIGJyZWFrcyBoYXJkd2FyZSBicmVha3BvaW50cy4oSSB0aGluawo+IHRo
-ZSBmaXJzdCB2ZXJzaW9uIG9mIHRoaXMgcGF0Y2ggZGlkbid0IGNvbnRhaW4gdGhpcyBBQkkgYnJl
-YWsgd2hlbiBJIGhhZCBhIGxvb2spCj4gCj4gSSB3b25kZXIgaWYgaXQgd291bGRuJ3QgbWFrZSBt
-b3JlIHNlbnNlIHRvCj4gCj4gLSBpbnRyb2R1Y2UgbmV3IGJpdHMgaW4gdGhlIGFyY2gtdW5zcGVj
-aWZpYyBzZWN0aW9uCj4gLSByZXdvcmsgdGhlIGV4aXN0aW5nIGltcGxlbWVudGVycyB0byBhY2Nl
-cHQgYm90aCBiaXRzCj4gCj4gT3IgdG8gc2ltcGx5IGxlYXZlIHN0dWZmIGFzIGl0IGlzIGFuZCBo
-YW5kbGUgaXQgdmlhIGFyY2ggc3BlY2lmaWMgYml0cy4KCldpdGggb25lIGFyY2ggcHJvdmluZyB0
-aGUgImFsbCBuZWVkIHRoaXMiIHRoZW9yeSB3cm9uZywganVzdCBkcm9wIHRoaXMKcGF0Y2guIEV2
-ZW4gcXVpY2tlciB3aGVuIGl0IGJyZWFrcyBhbiBBQkkuCgpKYW4KCi0tIApTaWVtZW5zIEFHLCBD
-b3Jwb3JhdGUgVGVjaG5vbG9neSwgQ1QgUlRDIElUUCBTRVMtREUKQ29ycG9yYXRlIENvbXBldGVu
-Y2UgQ2VudGVyIEVtYmVkZGVkIExpbnV4Cl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVt
-YmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2
-bWFybQo=
+On Fri, May 15, 2015 at 7:04 PM, Andrew Jones <drjones@redhat.com> wrote:
+> On Fri, May 15, 2015 at 08:02:59AM -0700, Christoffer Dall wrote:
+>> On Thu, May 14, 2015 at 03:32:13PM +0200, Andrew Jones wrote:
+>> > On Thu, May 14, 2015 at 12:55:49PM +0200, Christoffer Dall wrote:
+>> > > On Wed, May 13, 2015 at 01:31:54PM +0200, Andrew Jones wrote:
+>> > > > When S1 and S2 memory attributes combine wrt to caching policy,
+>> > > > non-cacheable types take precedence. If a guest maps a region as
+>> > > > device memory, which KVM userspace is using to emulate the device
+>> > > > using normal, cacheable memory, then we lose coherency. With
+>> > > > KVM_MEM_UNCACHED, KVM userspace can now hint to KVM which memory
+>> > > > regions are likely to be problematic. With this patch, as pages
+>> > > > of these types of regions are faulted into the guest, not only do
+>> > > > we flush the page's dcache, but we also change userspace's
+>> > > > mapping to NC in order to maintain coherency.
+>> > > >
+>> > > > What if the guest doesn't do what we expect? While we can't
+>> > > > force a guest to use cacheable memory, we can take advantage of
+>> > > > the non-cacheable precedence, and force it to use non-cacheable.
+>> > > > So, this patch also introduces PAGE_S2_NORMAL_NC, and uses it on
+>> > > > KVM_MEM_UNCACHED regions to force them to NC.
+>> > > >
+>> > > > We now have both guest and userspace on the same page (pun intended)
+>> > >
+>> > > I'd like to revisit the overall approach here.  Is doing non-cached
+>> > > accesses in both the guest and host really the right thing to do here?
+>> >
+>> > I think so, but all ideas/approaches are still on the table. This is
+>> > still an RFC.
+>> >
+>> > >
+>> > > The semantics of the device becomes that it is cache coherent (because
+>> > > QEMU is), and I think Marc argued that Linux/UEFI should simply be
+>> > > adapted to handle whatever emulated devices we have as coherent.  I also
+>> > > remember someone arguing that would be wrong (Peter?).
+>> >
+>> > I'm not really for quirking all devices in all guest types (AAVMF, Linux,
+>> > other bootloaders, other OSes). Windows is unlikely to apply any quirks.
+>> >
+>>
+>> Well my point was that if we're emulating a platform with coherent IO
+>> memory for PCI devices that is something that the guest should work with
+>> as such, but as Paolo explained it should always be safe for a guest to
+>> assume non-coherent, so that doesn't work.
+>>
+>> > >
+>> > > Finally, does this address all cache coherency issues with emulated
+>> > > devices?  Some VOS guys had seen things still not working with this
+>> > > approach, unsure why...  I'd like to avoid us merging this only to merge
+>> > > a more complete solution in a few weeks which reverts this solution...
+>> >
+>> > I'm not sure (this is still an RFT too :-) We definitely would need to
+>> > scatter some more memory_region_set_uncached() calls around QEMU first.
+>> >
+>>
+>> It would be good if you could sync with the VOS guys and make sure your
+>> patch set addresses their issues with the appropriate
+>> memory_region_set_uncached() added to QEMU, and if it does not, some
+>> vague idea why that falls outside of the scope of this patch set.  After
+>> all, adding a USB controller to a VM is not that an esoteric use case,
+>> is it?
+>
+> I'll pull together a new version addressing all your comments, and also
+> put some more time into making sure it'll work...
+>
+> Jeremy, can you give me the qemu command line you're using for your tests?
+> I'll do some experimenting with it.
+
+Hi Andrew,
+
+Here is the command line that I used:
+
+./qemu-system-arm -m 512 -machine type=virt \
+    -enable-kvm -cpu host \
+    -nographic \
+    -kernel zImage \
+    -drive if=none,file=ubuntu.img,id=fs,format=raw \
+    -device virtio-blk-device,drive=fs \
+    -usb -device usb-ehci \
+    -device usb-tablet \
+    -append "console=ttyAMA0 root=/dev/vda rw"
+
+I encountered also troubles with other devices, so the test can be
+extended with some devices:
+    -netdev type=user,id=net0 -device e1000,netdev=net0 \
+    -device nec-usb-xhci,id=xhci \
+    -device usb-kbd,bus=xhci.0 \
+    -drive if=scsi,file=disk.img,format=raw \
+    -device lsi53c895a \
+
+I tried it with some arm32 boards, but also on arm64 (Juno board).
+
+
+Jeremy
