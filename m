@@ -1,29 +1,29 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [RFC/RFT PATCH v2 3/3] arm/arm64: KVM: implement
- 'uncached' mem coherency
-Date: Fri, 15 May 2015 19:04:37 +0200
-Message-ID: <20150515170437.GA2951@localhost.localdomain>
-References: <1431516714-25816-1-git-send-email-drjones@redhat.com>
- <1431516714-25816-4-git-send-email-drjones@redhat.com>
- <20150514105549.GO32765@cbox>
- <20150514133213.GD12812@localhost.localdomain>
- <20150515145921.GB14144@lvm>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v4 10/12] KVM: arm64: guest debug,
+ HW assisted debug support
+Date: Fri, 15 May 2015 18:09:03 +0100
+Message-ID: <CAFEAcA8Z1Na9LY3m-DvGXpjUtCkc_H3+uAKWVRB4EBZWP6enJg@mail.gmail.com>
+References: <1431700035-23479-1-git-send-email-alex.bennee@linaro.org>
+ <1431700035-23479-11-git-send-email-alex.bennee@linaro.org>
+ <20150515152346.GB23652@leverpostej> <87y4kpke91.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 782855179A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 12:55:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B201E517A6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 13:00:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X4Ul7XAmAr41 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 May 2015 12:55:42 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 61EE85176E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 12:55:41 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20150515145921.GB14144@lvm>
+ with ESMTP id rQnsQV92VNDG for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 May 2015 13:00:12 -0400 (EDT)
+Received: from mail-ig0-f176.google.com (mail-ig0-f176.google.com
+ [209.85.213.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96E6851782
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 13:00:11 -0400 (EDT)
+Received: by igbpi8 with SMTP id pi8so43672123igb.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 10:09:23 -0700 (PDT)
+In-Reply-To: <87y4kpke91.fsf@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,75 +33,20 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: ard.biesheuvel@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, qemu-devel@nongnu.org, pbonzini@redhat.com, lersek@redhat.com, kvmarm@lists.cs.columbia.edu
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Peter Zijlstra <peterz@infradead.org>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, Will Deacon <Will.Deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Lorenzo Pieralisi <Lorenzo.Pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, Jonathan Corbet <corbet@lwn.net>, Ingo Molnar <mingo@kernel.org>, Gleb Natapov <gleb@kernel.org>, "zhichao.huang@linaro.org" <zhichao.huang@linaro.org>, Catalin Marinas <Catalin.Marinas@arm.com>, "bp@suse.de" <bp@suse.de>, Marc Zyngier <Marc.Zyngier@arm.com>, "r65777@freescale.com" <r65777@freescale.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "open list:ABI/API" <linux-api@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, "dahi@linux.vnet.ibm.com" <da>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, May 15, 2015 at 08:02:59AM -0700, Christoffer Dall wrote:
-> On Thu, May 14, 2015 at 03:32:13PM +0200, Andrew Jones wrote:
-> > On Thu, May 14, 2015 at 12:55:49PM +0200, Christoffer Dall wrote:
-> > > On Wed, May 13, 2015 at 01:31:54PM +0200, Andrew Jones wrote:
-> > > > When S1 and S2 memory attributes combine wrt to caching policy,
-> > > > non-cacheable types take precedence. If a guest maps a region as
-> > > > device memory, which KVM userspace is using to emulate the device
-> > > > using normal, cacheable memory, then we lose coherency. With
-> > > > KVM_MEM_UNCACHED, KVM userspace can now hint to KVM which memory
-> > > > regions are likely to be problematic. With this patch, as pages
-> > > > of these types of regions are faulted into the guest, not only do
-> > > > we flush the page's dcache, but we also change userspace's
-> > > > mapping to NC in order to maintain coherency.
-> > > > 
-> > > > What if the guest doesn't do what we expect? While we can't
-> > > > force a guest to use cacheable memory, we can take advantage of
-> > > > the non-cacheable precedence, and force it to use non-cacheable.
-> > > > So, this patch also introduces PAGE_S2_NORMAL_NC, and uses it on
-> > > > KVM_MEM_UNCACHED regions to force them to NC.
-> > > > 
-> > > > We now have both guest and userspace on the same page (pun intended)
-> > > 
-> > > I'd like to revisit the overall approach here.  Is doing non-cached
-> > > accesses in both the guest and host really the right thing to do here?
-> > 
-> > I think so, but all ideas/approaches are still on the table. This is
-> > still an RFC.
-> > 
-> > > 
-> > > The semantics of the device becomes that it is cache coherent (because
-> > > QEMU is), and I think Marc argued that Linux/UEFI should simply be
-> > > adapted to handle whatever emulated devices we have as coherent.  I also
-> > > remember someone arguing that would be wrong (Peter?).
-> > 
-> > I'm not really for quirking all devices in all guest types (AAVMF, Linux,
-> > other bootloaders, other OSes). Windows is unlikely to apply any quirks.
-> > 
-> 
-> Well my point was that if we're emulating a platform with coherent IO
-> memory for PCI devices that is something that the guest should work with
-> as such, but as Paolo explained it should always be safe for a guest to
-> assume non-coherent, so that doesn't work.
-> 
-> > > 
-> > > Finally, does this address all cache coherency issues with emulated
-> > > devices?  Some VOS guys had seen things still not working with this
-> > > approach, unsure why...  I'd like to avoid us merging this only to merge
-> > > a more complete solution in a few weeks which reverts this solution...
-> > 
-> > I'm not sure (this is still an RFT too :-) We definitely would need to
-> > scatter some more memory_region_set_uncached() calls around QEMU first.
-> > 
-> 
-> It would be good if you could sync with the VOS guys and make sure your
-> patch set addresses their issues with the appropriate
-> memory_region_set_uncached() added to QEMU, and if it does not, some
-> vague idea why that falls outside of the scope of this patch set.  After
-> all, adding a USB controller to a VM is not that an esoteric use case,
-> is it?
-
-I'll pull together a new version addressing all your comments, and also
-put some more time into making sure it'll work...
-
-Jeremy, can you give me the qemu command line you're using for your tests?
-I'll do some experimenting with it.
-
-Thanks,
-drew
+T24gMTUgTWF5IDIwMTUgYXQgMTc6MTYsIEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJv
+Lm9yZz4gd3JvdGU6Cj4gTWFyayBSdXRsYW5kIDxtYXJrLnJ1dGxhbmRAYXJtLmNvbT4gd3JpdGVz
+Ogo+PiBUaGlzIGdldHMgbW9yZSBmdW4gd2hlbiB5b3UgY29uc2lkZXIgdGhlIGNvbnRleHQtYXdh
+cmUgYnJlYWtwb2ludHMgYXJlCj4+IHRoZSBoaWdoZXN0IG51bWJlcmVkLiBTbyB0aGUgc2V0IG9m
+IChjb250ZXh0LWF3YXJlKSBicmVha3BvaW50cyBtaWdodAo+PiBub3QgaW50ZXJzZWN0IGFjcm9z
+cyBhbGwgQ1BVcy4KPgo+IEkgZGlkbid0IHNlZSBhIHJlZmVyZW5jZSB0byB0aGF0IGluIHRoZSBB
+Uk0gQVJNLiBJdCBzZWVtZWQgdG8gaW1wbHkgYW55Cj4gYnJlYWtwb2ludCBjb3VsZCBiZSBjb250
+ZXh0IGF3YXJlIGlzIC5CVCB3YXMgYXBwcm9wcmlhdGVseSBzZXQgYW5kCj4gbGlua2VkIHRvIHRo
+ZSBWUi4KCk5vOyBzZWUgRDIuOS4yOyB0aGVyZSBtdXN0IGJlIGF0IGxlYXN0IG9uZSBjb250ZXh0
+LWF3YXJlCmJyZWFrcG9pbnQsIGJ1dCBubyByZXF1aXJlbWVudCBmb3IgbW9yZSB0aGFuIHRoYXQu
+CgotLSBQTU0KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18K
+a3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8v
+bGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
