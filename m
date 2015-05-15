@@ -1,89 +1,80 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [Qemu-devel] [RFC/RFT PATCH v2 0/3] KVM: Introduce
- KVM_MEM_UNCACHED
-Date: Fri, 15 May 2015 08:09:49 -0700
-Message-ID: <20150515150949.GC14144@lvm>
-References: <1431516714-25816-1-git-send-email-drjones@redhat.com>
- <20150514103150.GA12812@localhost.localdomain>
- <CAFEAcA_EEA=TZ1jxL_rptAx5_sGa8NLMffePAw3eb-3pBgdg5w@mail.gmail.com>
- <20150514130318.GC12812@localhost.localdomain>
- <CAFEAcA99J_Yq_6CyawSutD6DYB3mP-v=GtxiMvayqdUPC2cNrQ@mail.gmail.com>
- <20150514133637.GE12812@localhost.localdomain>
+Subject: Re: [RFC] ARM/ARM64: KVM: Implement KVM_FLUSH_DCACHE_GPA ioctl
+Date: Fri, 15 May 2015 08:12:35 -0700
+Message-ID: <20150515151235.GD14144@lvm>
+References: <1430817191-6231-1-git-send-email-j.fanguede@virtualopensystems.com>
+ <20150506141249.GA6796@cbox>
+ <CAGE1QJrabWWs0O1V-MpOxT_=1472TXb5rvJzJAJNfWH70x9pcg@mail.gmail.com>
+ <20150507112027.GC25885@cbox>
+ <CAGE1QJoyaGpuf=6Msa=xpm0pPGRkYWctcXGf=rwnha5o9Gm4bw@mail.gmail.com>
+ <CAMJs5B9i9q8gJU93B09-uLMF6w1bTft-40DWPFUP6ky=SketSQ@mail.gmail.com>
+ <CAGE1QJoEAg9tAM63MEbpLuqvY_ZwGrHPU1sqo=L_iByKrERUow@mail.gmail.com>
+ <554B9A70.6020309@redhat.com>
+ <5555DBFD.4080503@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83C1E51730
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 11:00:48 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xt2S0aENoYrD for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 May 2015 11:00:42 -0400 (EDT)
-Received: from mail-la0-f42.google.com (mail-la0-f42.google.com
- [209.85.215.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6F1BD5172D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 11:00:42 -0400 (EDT)
-Received: by lagr1 with SMTP id r1so42464434lag.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 08:09:52 -0700 (PDT)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20150514133637.GE12812@localhost.localdomain>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+In-Reply-To: <5555DBFD.4080503@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Laszlo Ersek <lersek@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?iso-8859-1?B?Suly6W15IEZhbmd16GRl?= <j.fanguede@virtualopensystems.com>, list@lists.cs.columbia.edu, Overall <kvm@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, open@lists.cs.columbia.edu, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 14, 2015 at 03:36:37PM +0200, Andrew Jones wrote:
-> On Thu, May 14, 2015 at 02:11:59PM +0100, Peter Maydell wrote:
-> > On 14 May 2015 at 14:03, Andrew Jones <drjones@redhat.com> wrote:
-> > > On Thu, May 14, 2015 at 11:37:46AM +0100, Peter Maydell wrote:
-> > >> On 14 May 2015 at 11:31, Andrew Jones <drjones@redhat.com> wrote:
-> > >> > Forgot to (4): switch from setting userspace's mapping to
-> > >> > device memory to normal, non-cacheable. Using device memory
-> > >> > caused a problem that Alex Graf found, and Peter Maydell suggested
-> > >> > using normal, non-cacheable instead.
-> > >>
-> > >> Did you check that non-cacheable is definitely the correct
-> > >> kind of Normal memory attribute we want? (ie not write-through).
-> > >
-> > > I was concerned that write-through wouldn't be sufficient. If the
-> > > guest writes to its non-cached memory, and QEMU needs to see what
-> > > it wrote, then won't write-through fail to work? Unless we some
-> > > how invalidate the cache first?
-> > 
-> > Well, I meant more that the correct mapping for userspace is
-> > the same as the guest, whatever that is, and so somebody needs
-> > to look at what the guest actually does rather than merely
-> > hoping NormalNC is OK. (For instance, do we need to provide
-> > support for QEMU to map both NC and writethrough?)
-> >
-> 
-> Ah, we assume the guest is mapping it as device memory, and in
-> this version of the series, I ensure that it is at least NC with
-> the S2 attributes. I don't think we can look at what some guests
-> do with some devices to come up with anything beyond (poor?)
-> heuristics. I prefer that we force both the guest and QEMU to NC
-> (or guest chooses Device and QEMU is forced to NC) to make sure
-> we get it right.
-> 
-But picking up on Peter's feedback I think it would be good if the
-series clearly states something like:
+On Fri, May 15, 2015 at 01:43:57PM +0200, Laszlo Ersek wrote:
+> On 05/07/15 19:01, Paolo Bonzini wrote:
+> >=20
+> >=20
+> > On 07/05/2015 18:56, J=E9r=E9my Fangu=E8de wrote:
+> >> USB devices fail with a timeout error, as if the communication bet=
+ween
+> >> the kernel and the devices fail at a certain point:
+> >> usb 1-1: device not accepting address 5, error -110
+> >> usb usb1-port1: unable to enumerate USB device
+>=20
+> This is consistent with what I saw in my earlier testing.
+>=20
+> >> e1000 fails when the userspace tries to use it, with these type of
+> >> kernel messages:
+> >> e1000 0000:00:02.0 eth0: Detected Tx Unit Hang
+> >>   Tx Queue             <0>
+> >>   TDH                  <d>
+> >>   TDT                  <d>
+> >>   next_to_use          <d>
+> >>   next_to_clean        <9>
+> >> buffer_info[next_to_clean]
+> >>   time_stamp           <ffff9311>
+> >>   next_to_watch        <a>
+> >>   jiffies              <ffff956a>
+> >>   next_to_watch.status <0>
+> >=20
+> > Can you find out what memory attributes the guest is using for the
+> > memory---and if it's uncached, why?
+>=20
+> For USB, see "drivers/usb/core/hcd-pci.c", function usb_hcd_pci_probe=
+():
+> it uses ioremap_nocache().
+>=20
+> On the "why", that ioremap_nocache() call can be tracked to
+>=20
+> http://git.kernel.org/cgit/linux/kernel/git/tglx/history.git/commit/?=
+id=3Da914dd8b
+>=20
+> (Feb 2002), which predates the kernel's move to git. I guess
+> ioremap_nocache() is used simply because USB host controllers are
+> supposed to programmed like that.
+>=20
+> And, from "arch/arm64/include/asm/io.h":
+>=20
+> #define ioremap_nocache(addr, size)     __ioremap((addr), (size),
+> __pgprot(PROT_DEVICE_nGnRE))
+>=20
+So this just means that these devices should be mapped as device memory
+(like the VGA case before) right?  And therefore should work with Drew'=
+s
+patches (assuming they are actually correct and you add the right QEMU
+annotations to set the memory regions and non-cacheable), correct?
 
-1) We assume that the guest may use device type memory for the accesses
-2) we cannot use device memory for the userspace mapping because
-userspace may be doing unaligned accesses to it 3) normal non-cacheable
-bridges these worlds becauase of x, y, and z.
-
-I assume x, y, and z would include a fairly involved discussion of the
-interesting aspects of how you can configure memory accesses on ARM ...
-:)
-
+Thanks,
 -Christoffer
