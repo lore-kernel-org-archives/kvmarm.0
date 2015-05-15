@@ -1,30 +1,24 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC/RFT PATCH v2 1/3] arm/arm64: pageattr: add set_memory_nc
-Date: Fri, 15 May 2015 07:51:01 -0700
-Message-ID: <20150515145101.GA14144@lvm>
-References: <1431516714-25816-1-git-send-email-drjones@redhat.com>
- <1431516714-25816-2-git-send-email-drjones@redhat.com>
- <20150514110509.GP32765@cbox>
- <20150514134644.GF12812@localhost.localdomain>
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH v4 11/12] KVM: arm64: enable KVM_CAP_SET_GUEST_DEBUG
+Date: Fri, 15 May 2015 15:27:14 +0100
+Message-ID: <1431700035-23479-12-git-send-email-alex.bennee@linaro.org>
+References: <1431700035-23479-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 700E251708
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 10:42:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CEF335170D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 10:42:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id b0XPY0CjUisE for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 May 2015 10:42:01 -0400 (EDT)
-Received: from mail-la0-f41.google.com (mail-la0-f41.google.com
- [209.85.215.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F17C151705
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 10:42:00 -0400 (EDT)
-Received: by lagv1 with SMTP id v1so123138671lag.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 07:51:10 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20150514134644.GF12812@localhost.localdomain>
+ with ESMTP id scFujM+mu2q8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 May 2015 10:42:29 -0400 (EDT)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BB37751705
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 10:42:29 -0400 (EDT)
+In-Reply-To: <1431700035-23479-1-git-send-email-alex.bennee@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,30 +28,24 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: ard.biesheuvel@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, qemu-devel@nongnu.org, pbonzini@redhat.com, lersek@redhat.com, kvmarm@lists.cs.columbia.edu
+To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Gleb Natapov <gleb@kernel.org>, jan.kiszka@siemens.com, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, May 14, 2015 at 03:46:44PM +0200, Andrew Jones wrote:
-> On Thu, May 14, 2015 at 01:05:09PM +0200, Christoffer Dall wrote:
-> > On Wed, May 13, 2015 at 01:31:52PM +0200, Andrew Jones wrote:
-> > > Provide a method to change normal, cacheable memory to non-cacheable.
-> > > KVM will make use of this to keep emulated device memory regions
-> > > coherent with the guest.
-> > > 
-> > > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > 
-> > Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > 
-> > But you obviously need Russell and Will/Catalin to ack/merge this.
-> 
-> I guess this patch is going to go away in the next round. You've
-> pointed out that I screwed stuff up royally with my over eagerness
-> to reuse code. I need to reimplement change_memory_common, but a
-> version that takes an mm, which is more or less what I did in the
-> last version of this series, back when I was pinning pages.
-> 
-Yeah, I just read this one before looking at the others because it was a
-simple one...
-
--Christoffer
+RmluYWxseSBhZHZlcnRpc2UgdGhlIEtWTSBjYXBhYmlsaXR5IGZvciBTRVRfR1VFU1RfREVCVUcu
+IE9uY2UgYXJtCnN1cHBvcnQgaXMgYWRkZWQgdGhpcyBjaGVjayBjYW4gYmUgbW92ZWQgdG8gdGhl
+IGNvbW1vbgprdm1fdm1faW9jdGxfY2hlY2tfZXh0ZW5zaW9uKCkgY29kZS4KClNpZ25lZC1vZmYt
+Ynk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KQWNrZWQtYnk6IENocmlz
+dG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4KCi0tLQoKdjM6CiAtIHNl
+cGFyYXRlZCBjYXBhYmlsaXR5IGNoZWNrIGZyb20gcHJldmlvdXMgcGF0Y2hlcwogLSBtb3ZlZCBp
+bnRvIGFybTY0IHNwZWNpZmljIGlvY3RsIGhhbmRsZXIuCnY0OgogLSBhZGQgYS1iLXRhZwoKZGlm
+ZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3Jlc2V0LmMgYi9hcmNoL2FybTY0L2t2bS9yZXNldC5j
+CmluZGV4IDIxZDVhNjIuLjg4ZTUzMzEgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQva3ZtL3Jlc2V0
+LmMKKysrIGIvYXJjaC9hcm02NC9rdm0vcmVzZXQuYwpAQCAtNzYsNiArNzYsOSBAQCBpbnQga3Zt
+X2FyY2hfZGV2X2lvY3RsX2NoZWNrX2V4dGVuc2lvbihsb25nIGV4dCkKIAljYXNlIEtWTV9DQVBf
+R1VFU1RfREVCVUdfSFdfV1BTOgogCQlyICA9IGdldF9udW1fd3JwcygpOwogCQlicmVhazsKKwlj
+YXNlIEtWTV9DQVBfU0VUX0dVRVNUX0RFQlVHOgorCQlyID0gMTsKKwkJYnJlYWs7CiAJZGVmYXVs
+dDoKIAkJciA9IDA7CiAJfQotLSAKMi4zLjUKCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNv
+bHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZv
+L2t2bWFybQo=
