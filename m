@@ -1,42 +1,27 @@
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [PATCH v4 02/12] KVM: define common KVM_GUESTDBG_USE_SW/HW_BP bits
-Date: Fri, 15 May 2015 17:42:42 +0200
-Message-ID: <555613F2.9060204@de.ibm.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v4 03/12] KVM: arm64: guest debug, define API headers
+Date: Fri, 15 May 2015 16:43:24 +0100
+Message-ID: <20150515154324.GC23652@leverpostej>
 References: <1431700035-23479-1-git-send-email-alex.bennee@linaro.org>
- <1431700035-23479-3-git-send-email-alex.bennee@linaro.org>
+ <1431700035-23479-4-git-send-email-alex.bennee@linaro.org>
+ <20150515144423.GA23652@leverpostej> <874mndlvny.fsf@linaro.org>
+ <CAFEAcA8ZpndRyT84ta2r4bPTE1uGTN1XTfMpUn8qW022ben3BQ@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41E835176D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 11:33:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B99C25176F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 11:34:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id h12J0EJ1sxa4 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 May 2015 11:33:41 -0400 (EDT)
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1746B51768
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 11:33:40 -0400 (EDT)
-Received: from /spool/local
- by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <kvmarm@lists.cs.columbia.edu> from <borntraeger@de.ibm.com>;
- Fri, 15 May 2015 16:42:49 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com
- (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
- by d06dlp02.portsmouth.uk.ibm.com (Postfix) with ESMTP id CCDCA219005C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 16:42:27 +0100 (BST)
-Received: from d06av08.portsmouth.uk.ibm.com (d06av08.portsmouth.uk.ibm.com
- [9.149.37.249])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- t4FFgk2P10944958
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 15:42:46 GMT
-Received: from d06av08.portsmouth.uk.ibm.com (localhost [127.0.0.1])
- by d06av08.portsmouth.uk.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
- t4FFgiMT021877
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 09:42:46 -0600
-In-Reply-To: <1431700035-23479-3-git-send-email-alex.bennee@linaro.org>
+ with ESMTP id BKJN7YHB6+hg for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 May 2015 11:34:20 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D25D5174A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 11:34:20 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8ZpndRyT84ta2r4bPTE1uGTN1XTfMpUn8qW022ben3BQ@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -46,18 +31,33 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org
-Cc: Tony Krowiak <akrowiak@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Heiko Carstens <heiko.carstens@de.ibm.com>, Paul Mackerras <paulus@samba.org>, "H. Peter Anvin" <hpa@zytor.com>, S390 <linux-s390@vger.kernel.org>, Michael Mueller <mimu@linux.vnet.ibm.com>, Nadav Amit <namit@cs.technion.ac.il>, Michael Ellerman <mpe@ellerman.id.au>, "maintainer:X86 ARCHITECTURE..." <x86@kernel.org>, supporter@lists.cs.columbia.edu, Ingo Molnar <mingo@redhat.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, jan.kiszka@siemens.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, r65777@freescale.com, Cornelia Huck <cornelia.huck@de.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Eric Farman <farman@linux.vnet.ibm.com>, list@lists.cs.columbia.edu, ABI/API <linux-api@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Catalin Marinas <Catalin.Marinas@arm.com>, "r65777@freescale.com" <r65777@freescale.com>, Will Deacon <Will.Deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, "dahi@linux.vnet.ibm.com" <dahi@linux.vnet.ibm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "zhichao.huang@linaro.org" <zhichao.huang@linaro.org>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "bp@suse.de" <bp@suse.de>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-QW0gMTUuMDUuMjAxNSB1bSAxNjoyNyBzY2hyaWViIEFsZXggQmVubsOpZToKPiArKysgYi9hcmNo
-L3MzOTAvaW5jbHVkZS91YXBpL2FzbS9rdm0uaAo+IEBAIC0xMTQsOCArMTE0LDYgQEAgc3RydWN0
-IGt2bV9mcHUgewo+ICAJX191NjQgZnByc1sxNl07Cj4gIH07Cj4gCj4gLSNkZWZpbmUgS1ZNX0dV
-RVNUREJHX1VTRV9IV19CUAkJMHgwMDAxMDAwMApbLi4uXQo+ICsrKyBiL2luY2x1ZGUvdWFwaS9s
-aW51eC9rdm0uaApbLi4uXQo+ICsjZGVmaW5lIEtWTV9HVUVTVERCR19VU0VfU1dfQlAJCSgxIDw8
-IDE2KQo+ICsjZGVmaW5lIEtWTV9HVUVTVERCR19VU0VfSFdfQlAJCSgxIDw8IDE3KQoKVGhpcyBp
-cyBhbiBBQkkgYnJlYWsgZm9yIHMzOTAsIG5vPwoKRGF2aWQsIGRvIHlvdSByZW1lbWJlciB3aHkg
-d2UgZG8gbm90IHVzZSBLVk1fR1VFU1REQkdfVVNFX1NXX0JQPwoKX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1A
-bGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxt
-YW4vbGlzdGluZm8va3ZtYXJtCg==
+T24gRnJpLCBNYXkgMTUsIDIwMTUgYXQgMDQ6MTc6NDZQTSArMDEwMCwgUGV0ZXIgTWF5ZGVsbCB3
+cm90ZToKPiBPbiAxNSBNYXkgMjAxNSBhdCAxNjoxNCwgQWxleCBCZW5uw6llIDxhbGV4LmJlbm5l
+ZUBsaW5hcm8ub3JnPiB3cm90ZToKPiA+Cj4gPiBNYXJrIFJ1dGxhbmQgPG1hcmsucnV0bGFuZEBh
+cm0uY29tPiB3cml0ZXM6Cj4gPgo+ID4+IE9uIEZyaSwgTWF5IDE1LCAyMDE1IGF0IDAzOjI3OjA2
+UE0gKzAxMDAsIEFsZXggQmVubsOpZSB3cm90ZToKPiA+Pj4gKy8qCj4gPj4+ICsgKiBTZWUgdjgg
+QVJNIEFSTSBENy4zOiBEZWJ1ZyBSZWdpc3RlcnMKPiA+Pj4gKyAqCj4gPj4+ICsgKiBUaGUgY29u
+dHJvbCByZWdpc3RlcnMgYXJlIGFyY2hpdGVjdHVyYWxseSBkZWZpbmVkIGFzIDMyIGJpdHMgYnV0
+IGFyZQo+ID4+PiArICogc3RvcmVkIGFzIDY0IGJpdCB2YWx1ZXMgYWxvbmdzaWRlIHRoZSB2YWx1
+ZSByZWdpc3RlcnMuIFRoaXMgaXMgZG9uZQo+ID4+Cj4gPj4gU3RhbGUgY29tbWVudD8gVGhleSdy
+ZSBzdG9yZWQgYXMgX191MzIgYmVsb3cuCj4gPgo+ID4gR2FoIHllcyBpdCBpcy4KPiA+Cj4gPj4g
+SXQncyBwb3NzaWJsZSB0aGF0IHRoZSByZWdpc3RlcnMgY291bGQgZ3JvdyBpbiBmdXR1cmUgYXMg
+aGFwcGVuZWQgaW4gdGhlCj4gPj4gY2FzZSBvZiBDTElEUl9FTDEsIHNvIGl0IG1pZ2h0IGJlIHdv
+cnRoIHRyZWF0aW5nIHN5c3RlbSByZWdpc3RlcnMKPiA+PiBnZW5lcmFsbHkgYXMgdTY0IHZhbHVl
+cy4KPiA+Cj4gPiBSZWFsbHk/IEkgbWVhbiB0aGUgZXhpc3RpbmcgZGVidWcgKmNvbnRyb2wqIHJl
+Z2lzdGVycyBoYXZlIHJlc2VydmVkIGJpdHMKPiA+IDI0LTMxIHNvIHRoZXJlIGlzIHNwYWNlIGZv
+ciBleHBhbnNpb24uCj4gCj4gT3RoZXIgcGxhY2VzIGluIHRoZSB1c2Vyc3BhY2UgQUJJIHdoaWNo
+IGRlYWwgd2l0aCBzeXNyZWdzIChub3RhYmx5Cj4gT05FX1JFRykgY29uc2lzdGVudGx5IGRlZmlu
+ZSB0aGVtIGFsbCBhcyA2NC1iaXQKCkFsc28gZm9yIHB0X3JlZ3MucHN0YXRlLgoKSSBqdXN0IHNw
+b3R0ZWQgdGhhdCBpbiB1c2VyX2h3ZGVidWdfc3RhdGUgaW4gcHRyYWNlLmggd2Ugc2VlbSB0byBl
+eHBvc2UKdGhlIGRlYnVnIGNvbnRyb2wgcmVnc2l0ZXJzIGFzIF9fdTMyIGFscmVhZHksIGFhbG9u
+ZyB3aXRoIHNvbWUgb3RoZXIKcmVnaXN0ZXJzLgoKU28gd2UncmUgYWxyZWFkeSBpbmNvbnNpc3Rl
+bnQgdy5yLnQuIGhvdyB3ZSBleHBvc2UgdGhvc2UgcmVnaXN0ZXJzLCBhbmQKSSdtIG5vdCBzdXJl
+IHdoYXQgd2UnZCBkbyBlbHNld2hlcmUgaWYgYW55IHJlZ2lzdGVycyBnb3QgZXhwYW5kZWQuIDov
+CgpNYXJrLgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwpr
+dm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9s
+aXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
