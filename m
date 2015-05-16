@@ -1,7 +1,7 @@
 From: Zhichao Huang <zhichao.huang@linaro.org>
-Subject: [PATCH 02/10] KVM: arm: rename pm_fake handler to trap_raz_wi
-Date: Sat, 16 May 2015 12:45:43 +0800
-Message-ID: <1431751551-4788-3-git-send-email-zhichao.huang@linaro.org>
+Subject: [PATCH 03/10] KVM: arm: enable to use the ARM_DSCR_MDBGEN macro from KVM assembly code
+Date: Sat, 16 May 2015 12:45:44 +0800
+Message-ID: <1431751551-4788-4-git-send-email-zhichao.huang@linaro.org>
 References: <1431751551-4788-1-git-send-email-zhichao.huang@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1431751551-4788-1-git-send-email-zhichao.huang@linaro.org>
@@ -10,83 +10,92 @@ To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.c
 Cc: huangzhichao@huawei.com, Zhichao Huang <zhichao.huang@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-pm_fake doesn't quite describe what the handler does (ignoring writes
-and returning 0 for reads).
-
-As we're about to use it (a lot) in a different context, rename it
-with a (admitedly cryptic) name that make sense for all users.
+Add #ifndef __ASSEMBLY__ in hw_breakpoint.h, in order to use
+the ARM_DSCR_MDBGEN macro from KVM assembly code.
 
 Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
 ---
- arch/arm/kvm/coproc.c | 34 ++++++++++++++++------------------
- 1 file changed, 16 insertions(+), 18 deletions(-)
+ arch/arm/include/asm/hw_breakpoint.h | 54 +++++++++++++++++++-----------------
+ 1 file changed, 29 insertions(+), 25 deletions(-)
 
-diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-index 2e12760..9d283d9 100644
---- a/arch/arm/kvm/coproc.c
-+++ b/arch/arm/kvm/coproc.c
-@@ -229,7 +229,7 @@ bool access_vm_reg(struct kvm_vcpu *vcpu,
-  * must always support PMCCNTR (the cycle counter): we just RAZ/WI for
-  * all PM registers, which doesn't crash the guest kernel at least.
-  */
--static bool pm_fake(struct kvm_vcpu *vcpu,
-+static bool trap_raz_wi(struct kvm_vcpu *vcpu,
- 		    const struct coproc_params *p,
- 		    const struct coproc_reg *r)
- {
-@@ -239,19 +239,19 @@ static bool pm_fake(struct kvm_vcpu *vcpu,
- 		return read_zero(vcpu, p);
+diff --git a/arch/arm/include/asm/hw_breakpoint.h b/arch/arm/include/asm/hw_breakpoint.h
+index 8e427c7..f2f4c61 100644
+--- a/arch/arm/include/asm/hw_breakpoint.h
++++ b/arch/arm/include/asm/hw_breakpoint.h
+@@ -3,6 +3,8 @@
+ 
+ #ifdef __KERNEL__
+ 
++#ifndef __ASSEMBLY__
++
+ struct task_struct;
+ 
+ #ifdef CONFIG_HAVE_HW_BREAKPOINT
+@@ -44,6 +46,33 @@ static inline void decode_ctrl_reg(u32 reg,
+ 	ctrl->mismatch	= reg & 0x1;
  }
  
--#define access_pmcr pm_fake
--#define access_pmcntenset pm_fake
--#define access_pmcntenclr pm_fake
--#define access_pmovsr pm_fake
--#define access_pmselr pm_fake
--#define access_pmceid0 pm_fake
--#define access_pmceid1 pm_fake
--#define access_pmccntr pm_fake
--#define access_pmxevtyper pm_fake
--#define access_pmxevcntr pm_fake
--#define access_pmuserenr pm_fake
--#define access_pmintenset pm_fake
--#define access_pmintenclr pm_fake
-+#define access_pmcr trap_raz_wi
-+#define access_pmcntenset trap_raz_wi
-+#define access_pmcntenclr trap_raz_wi
-+#define access_pmovsr trap_raz_wi
-+#define access_pmselr trap_raz_wi
-+#define access_pmceid0 trap_raz_wi
-+#define access_pmceid1 trap_raz_wi
-+#define access_pmccntr trap_raz_wi
-+#define access_pmxevtyper trap_raz_wi
-+#define access_pmxevcntr trap_raz_wi
-+#define access_pmuserenr trap_raz_wi
-+#define access_pmintenset trap_raz_wi
-+#define access_pmintenclr trap_raz_wi
++struct notifier_block;
++struct perf_event;
++struct pmu;
++
++extern struct pmu perf_ops_bp;
++extern int arch_bp_generic_fields(struct arch_hw_breakpoint_ctrl ctrl,
++				  int *gen_len, int *gen_type);
++extern int arch_check_bp_in_kernelspace(struct perf_event *bp);
++extern int arch_validate_hwbkpt_settings(struct perf_event *bp);
++extern int hw_breakpoint_exceptions_notify(struct notifier_block *unused,
++					   unsigned long val, void *data);
++
++extern u8 arch_get_debug_arch(void);
++extern u8 arch_get_max_wp_len(void);
++extern void clear_ptrace_hw_breakpoint(struct task_struct *tsk);
++
++int arch_install_hw_breakpoint(struct perf_event *bp);
++void arch_uninstall_hw_breakpoint(struct perf_event *bp);
++void hw_breakpoint_pmu_read(struct perf_event *bp);
++int hw_breakpoint_slots(int type);
++
++#else
++static inline void clear_ptrace_hw_breakpoint(struct task_struct *tsk) {}
++
++#endif	/* CONFIG_HAVE_HW_BREAKPOINT */
++#endif  /* __ASSEMBLY */
++
+ /* Debug architecture numbers. */
+ #define ARM_DEBUG_ARCH_RESERVED	0	/* In case of ptrace ABI updates. */
+ #define ARM_DEBUG_ARCH_V6	1
+@@ -110,30 +139,5 @@ static inline void decode_ctrl_reg(u32 reg,
+ 	asm volatile("mcr p14, 0, %0, " #N "," #M ", " #OP2 : : "r" (VAL));\
+ } while (0)
  
- /* Architected CP15 registers.
-  * CRn denotes the primary register number, but is copied to the CRm in the
-@@ -532,8 +532,7 @@ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	params.Rt2 = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
- 	params.CRm = 0;
- 
--	/* raz_wi */
--	(void)pm_fake(vcpu, &params, NULL);
-+	(void)trap_raz_wi(vcpu, &params, NULL);
- 
- 	/* handled */
- 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-@@ -559,8 +558,7 @@ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	params.Op2 = (kvm_vcpu_get_hsr(vcpu) >> 17) & 0x7;
- 	params.Rt2 = 0;
- 
--	/* raz_wi */
--	(void)pm_fake(vcpu, &params, NULL);
-+	(void)trap_raz_wi(vcpu, &params, NULL);
- 
- 	/* handled */
- 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+-struct notifier_block;
+-struct perf_event;
+-struct pmu;
+-
+-extern struct pmu perf_ops_bp;
+-extern int arch_bp_generic_fields(struct arch_hw_breakpoint_ctrl ctrl,
+-				  int *gen_len, int *gen_type);
+-extern int arch_check_bp_in_kernelspace(struct perf_event *bp);
+-extern int arch_validate_hwbkpt_settings(struct perf_event *bp);
+-extern int hw_breakpoint_exceptions_notify(struct notifier_block *unused,
+-					   unsigned long val, void *data);
+-
+-extern u8 arch_get_debug_arch(void);
+-extern u8 arch_get_max_wp_len(void);
+-extern void clear_ptrace_hw_breakpoint(struct task_struct *tsk);
+-
+-int arch_install_hw_breakpoint(struct perf_event *bp);
+-void arch_uninstall_hw_breakpoint(struct perf_event *bp);
+-void hw_breakpoint_pmu_read(struct perf_event *bp);
+-int hw_breakpoint_slots(int type);
+-
+-#else
+-static inline void clear_ptrace_hw_breakpoint(struct task_struct *tsk) {}
+-
+-#endif	/* CONFIG_HAVE_HW_BREAKPOINT */
+ #endif	/* __KERNEL__ */
+ #endif	/* _ARM_HW_BREAKPOINT_H */
 -- 
 1.7.12.4
 
