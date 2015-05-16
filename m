@@ -1,101 +1,311 @@
 From: Zhichao Huang <zhichao.huang@linaro.org>
-Subject: [PATCH 03/10] KVM: arm: enable to use the ARM_DSCR_MDBGEN macro from KVM assembly code
-Date: Sat, 16 May 2015 12:45:44 +0800
-Message-ID: <1431751551-4788-4-git-send-email-zhichao.huang@linaro.org>
+Subject: [PATCH 04/10] KVM: arm: common infrastructure for handling AArch32
+ CP14/CP15
+Date: Sat, 16 May 2015 12:45:45 +0800
+Message-ID: <1431751551-4788-5-git-send-email-zhichao.huang@linaro.org>
 References: <1431751551-4788-1-git-send-email-zhichao.huang@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8920F51803
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 16 May 2015 00:37:16 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id MNTX-+kyRkOR for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 16 May 2015 00:37:15 -0400 (EDT)
+Received: from mail-pa0-f52.google.com (mail-pa0-f52.google.com
+ [209.85.220.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 556FB517F9
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 16 May 2015 00:37:15 -0400 (EDT)
+Received: by padbw4 with SMTP id bw4so47565791pad.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 May 2015 21:46:27 -0700 (PDT)
 In-Reply-To: <1431751551-4788-1-git-send-email-zhichao.huang@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.bennee@linaro.org
 Cc: huangzhichao@huawei.com, Zhichao Huang <zhichao.huang@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add #ifndef __ASSEMBLY__ in hw_breakpoint.h, in order to use
-the ARM_DSCR_MDBGEN macro from KVM assembly code.
+As we're about to trap a bunch of CP14 registers, let's rework
+the CP15 handling so it can be generalized and work with multiple
+tables.
 
 Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
 ---
- arch/arm/include/asm/hw_breakpoint.h | 54 +++++++++++++++++++-----------------
- 1 file changed, 29 insertions(+), 25 deletions(-)
+ arch/arm/kvm/coproc.c          | 176 ++++++++++++++++++++++++++---------------
+ arch/arm/kvm/interrupts_head.S |   2 +-
+ 2 files changed, 112 insertions(+), 66 deletions(-)
 
-diff --git a/arch/arm/include/asm/hw_breakpoint.h b/arch/arm/include/asm/hw_breakpoint.h
-index 8e427c7..f2f4c61 100644
---- a/arch/arm/include/asm/hw_breakpoint.h
-+++ b/arch/arm/include/asm/hw_breakpoint.h
-@@ -3,6 +3,8 @@
+diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+index 9d283d9..d23395b 100644
+--- a/arch/arm/kvm/coproc.c
++++ b/arch/arm/kvm/coproc.c
+@@ -375,6 +375,9 @@ static const struct coproc_reg cp15_regs[] = {
+ 	{ CRn(15), CRm( 0), Op1( 4), Op2( 0), is32, access_cbar},
+ };
  
- #ifdef __KERNEL__
- 
-+#ifndef __ASSEMBLY__
++static const struct coproc_reg cp14_regs[] = {
++};
 +
- struct task_struct;
+ /* Target specific emulation tables */
+ static struct kvm_coproc_target_table *target_tables[KVM_ARM_NUM_TARGETS];
  
- #ifdef CONFIG_HAVE_HW_BREAKPOINT
-@@ -44,6 +46,33 @@ static inline void decode_ctrl_reg(u32 reg,
- 	ctrl->mismatch	= reg & 0x1;
+@@ -424,47 +427,75 @@ static const struct coproc_reg *find_reg(const struct coproc_params *params,
+ 	return NULL;
  }
  
-+struct notifier_block;
-+struct perf_event;
-+struct pmu;
-+
-+extern struct pmu perf_ops_bp;
-+extern int arch_bp_generic_fields(struct arch_hw_breakpoint_ctrl ctrl,
-+				  int *gen_len, int *gen_type);
-+extern int arch_check_bp_in_kernelspace(struct perf_event *bp);
-+extern int arch_validate_hwbkpt_settings(struct perf_event *bp);
-+extern int hw_breakpoint_exceptions_notify(struct notifier_block *unused,
-+					   unsigned long val, void *data);
-+
-+extern u8 arch_get_debug_arch(void);
-+extern u8 arch_get_max_wp_len(void);
-+extern void clear_ptrace_hw_breakpoint(struct task_struct *tsk);
-+
-+int arch_install_hw_breakpoint(struct perf_event *bp);
-+void arch_uninstall_hw_breakpoint(struct perf_event *bp);
-+void hw_breakpoint_pmu_read(struct perf_event *bp);
-+int hw_breakpoint_slots(int type);
-+
-+#else
-+static inline void clear_ptrace_hw_breakpoint(struct task_struct *tsk) {}
-+
-+#endif	/* CONFIG_HAVE_HW_BREAKPOINT */
-+#endif  /* __ASSEMBLY */
-+
- /* Debug architecture numbers. */
- #define ARM_DEBUG_ARCH_RESERVED	0	/* In case of ptrace ABI updates. */
- #define ARM_DEBUG_ARCH_V6	1
-@@ -110,30 +139,5 @@ static inline void decode_ctrl_reg(u32 reg,
- 	asm volatile("mcr p14, 0, %0, " #N "," #M ", " #OP2 : : "r" (VAL));\
- } while (0)
+-static int emulate_cp15(struct kvm_vcpu *vcpu,
+-			const struct coproc_params *params)
++/*
++ * emulate_cp --  tries to match a cp14/cp15 access in a handling table,
++ *                and call the corresponding trap handler.
++ *
++ * @params: pointer to the descriptor of the access
++ * @table: array of trap descriptors
++ * @num: size of the trap descriptor array
++ *
++ * Return 0 if the access has been handled, and -1 if not.
++ */
++static int emulate_cp(struct kvm_vcpu *vcpu,
++			const struct coproc_params *params,
++			const struct coproc_reg *table,
++			size_t num)
+ {
+-	size_t num;
+-	const struct coproc_reg *table, *r;
+-
+-	trace_kvm_emulate_cp15_imp(params->Op1, params->Rt1, params->CRn,
+-				   params->CRm, params->Op2, params->is_write);
++	const struct coproc_reg *r;
  
--struct notifier_block;
--struct perf_event;
--struct pmu;
+-	table = get_target_table(vcpu->arch.target, &num);
++	if (!table)
++		return -1;	/* Not handled */
+ 
+-	/* Search target-specific then generic table. */
+ 	r = find_reg(params, table, num);
+-	if (!r)
+-		r = find_reg(params, cp15_regs, ARRAY_SIZE(cp15_regs));
+ 
+-	if (likely(r)) {
++	if (r) {
+ 		/* If we don't have an accessor, we should never get here! */
+ 		BUG_ON(!r->access);
+ 
+ 		if (likely(r->access(vcpu, params, r))) {
+ 			/* Skip instruction, since it was emulated */
+ 			kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+-			return 1;
+ 		}
+-		/* If access function fails, it should complain. */
+-	} else {
+-		kvm_err("Unsupported guest CP15 access at: %08lx\n",
+-			*vcpu_pc(vcpu));
+-		print_cp_instr(params);
++
++		/* Handled */
++		return 0;
+ 	}
++
++	/* Not handled */
++	return -1;
++}
++
++static void unhandled_cp_access(struct kvm_vcpu *vcpu,
++				const struct coproc_params *params)
++{
++	u8 hsr_ec = kvm_vcpu_trap_get_class(vcpu);
++	int cp;
++
++	switch (hsr_ec) {
++	case HSR_EC_CP15_32:
++	case HSR_EC_CP15_64:
++		cp = 15;
++		break;
++	case HSR_EC_CP14_MR:
++	case HSR_EC_CP14_64:
++		cp = 14;
++		break;
++	default:
++		WARN_ON((cp = -1));
++	}
++
++	kvm_err("Unsupported guest CP%d access at: %08lx\n",
++		cp, *vcpu_pc(vcpu));
++	print_cp_instr(params);
+ 	kvm_inject_undefined(vcpu);
+-	return 1;
+ }
+ 
+-/**
+- * kvm_handle_cp15_64 -- handles a mrrc/mcrr trap on a guest CP15 access
+- * @vcpu: The VCPU pointer
+- * @run:  The kvm_run struct
+- */
+-int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
++int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
++			const struct coproc_reg *global,
++			size_t nr_global,
++			const struct coproc_reg *target_specific,
++			size_t nr_specific)
+ {
+ 	struct coproc_params params;
+ 
+@@ -478,7 +509,13 @@ int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	params.Rt2 = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
+ 	params.CRm = 0;
+ 
+-	return emulate_cp15(vcpu, &params);
++	if (!emulate_cp(vcpu, &params, target_specific, nr_specific))
++		return 1;
++	if (!emulate_cp(vcpu, &params, global, nr_global))
++		return 1;
++
++	unhandled_cp_access(vcpu, &params);
++	return 1;
+ }
+ 
+ static void reset_coproc_regs(struct kvm_vcpu *vcpu,
+@@ -491,12 +528,11 @@ static void reset_coproc_regs(struct kvm_vcpu *vcpu,
+ 			table[i].reset(vcpu, &table[i]);
+ }
+ 
+-/**
+- * kvm_handle_cp15_32 -- handles a mrc/mcr trap on a guest CP15 access
+- * @vcpu: The VCPU pointer
+- * @run:  The kvm_run struct
+- */
+-int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
++int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
++			const struct coproc_reg *global,
++			size_t nr_global,
++			const struct coproc_reg *target_specific,
++			size_t nr_specific)
+ {
+ 	struct coproc_params params;
+ 
+@@ -510,33 +546,57 @@ int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	params.Op2 = (kvm_vcpu_get_hsr(vcpu) >> 17) & 0x7;
+ 	params.Rt2 = 0;
+ 
+-	return emulate_cp15(vcpu, &params);
++	if (!emulate_cp(vcpu, &params, target_specific, nr_specific))
++		return 1;
++	if (!emulate_cp(vcpu, &params, global, nr_global))
++		return 1;
++
++	unhandled_cp_access(vcpu, &params);
++	return 1;
+ }
+ 
+ /**
+- * kvm_handle_cp14_64 -- handles a mrrc/mcrr trap on a guest CP14 access
++ * kvm_handle_cp15_64 -- handles a mrrc/mcrr trap on a guest CP15 access
+  * @vcpu: The VCPU pointer
+  * @run:  The kvm_run struct
+  */
+-int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
++int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ {
+-	struct coproc_params params;
++	const struct coproc_reg *target_specific;
++	size_t num;
+ 
+-	params.CRn = (kvm_vcpu_get_hsr(vcpu) >> 1) & 0xf;
+-	params.Rt1 = (kvm_vcpu_get_hsr(vcpu) >> 5) & 0xf;
+-	params.is_write = ((kvm_vcpu_get_hsr(vcpu) & 1) == 0);
+-	params.is_64bit = true;
++	target_specific = get_target_table(vcpu->arch.target, &num);
++	return kvm_handle_cp_64(vcpu,
++				cp15_regs, ARRAY_SIZE(cp15_regs),
++				target_specific, num);
++}
+ 
+-	params.Op1 = (kvm_vcpu_get_hsr(vcpu) >> 16) & 0xf;
+-	params.Op2 = 0;
+-	params.Rt2 = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
+-	params.CRm = 0;
++/**
++ * kvm_handle_cp15_32 -- handles a mrc/mcr trap on a guest CP15 access
++ * @vcpu: The VCPU pointer
++ * @run:  The kvm_run struct
++ */
++int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++	const struct coproc_reg *target_specific;
++	size_t num;
+ 
+-	(void)trap_raz_wi(vcpu, &params, NULL);
++	target_specific = get_target_table(vcpu->arch.target, &num);
++	return kvm_handle_cp_32(vcpu,
++				cp15_regs, ARRAY_SIZE(cp15_regs),
++				target_specific, num);
++}
+ 
+-	/* handled */
+-	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+-	return 1;
++/**
++ * kvm_handle_cp14_64 -- handles a mrrc/mcrr trap on a guest CP14 access
++ * @vcpu: The VCPU pointer
++ * @run:  The kvm_run struct
++ */
++int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++	return kvm_handle_cp_64(vcpu,
++				cp14_regs, ARRAY_SIZE(cp14_regs),
++				NULL, 0);
+ }
+ 
+ /**
+@@ -546,23 +606,9 @@ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
+  */
+ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ {
+-	struct coproc_params params;
 -
--extern struct pmu perf_ops_bp;
--extern int arch_bp_generic_fields(struct arch_hw_breakpoint_ctrl ctrl,
--				  int *gen_len, int *gen_type);
--extern int arch_check_bp_in_kernelspace(struct perf_event *bp);
--extern int arch_validate_hwbkpt_settings(struct perf_event *bp);
--extern int hw_breakpoint_exceptions_notify(struct notifier_block *unused,
--					   unsigned long val, void *data);
+-	params.CRm = (kvm_vcpu_get_hsr(vcpu) >> 1) & 0xf;
+-	params.Rt1 = (kvm_vcpu_get_hsr(vcpu) >> 5) & 0xf;
+-	params.is_write = ((kvm_vcpu_get_hsr(vcpu) & 1) == 0);
+-	params.is_64bit = false;
 -
--extern u8 arch_get_debug_arch(void);
--extern u8 arch_get_max_wp_len(void);
--extern void clear_ptrace_hw_breakpoint(struct task_struct *tsk);
+-	params.CRn = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
+-	params.Op1 = (kvm_vcpu_get_hsr(vcpu) >> 14) & 0x7;
+-	params.Op2 = (kvm_vcpu_get_hsr(vcpu) >> 17) & 0x7;
+-	params.Rt2 = 0;
 -
--int arch_install_hw_breakpoint(struct perf_event *bp);
--void arch_uninstall_hw_breakpoint(struct perf_event *bp);
--void hw_breakpoint_pmu_read(struct perf_event *bp);
--int hw_breakpoint_slots(int type);
+-	(void)trap_raz_wi(vcpu, &params, NULL);
 -
--#else
--static inline void clear_ptrace_hw_breakpoint(struct task_struct *tsk) {}
--
--#endif	/* CONFIG_HAVE_HW_BREAKPOINT */
- #endif	/* __KERNEL__ */
- #endif	/* _ARM_HW_BREAKPOINT_H */
+-	/* handled */
+-	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+-	return 1;
++	return kvm_handle_cp_32(vcpu,
++				cp14_regs, ARRAY_SIZE(cp14_regs),
++				NULL, 0);
+ }
+ 
+ /******************************************************************************
+diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
+index a9f3a56..35e4a3a 100644
+--- a/arch/arm/kvm/interrupts_head.S
++++ b/arch/arm/kvm/interrupts_head.S
+@@ -607,7 +607,7 @@ ARM_BE8(rev	r6, r6  )
+  * (hardware reset value is 0) */
+ .macro set_hdcr operation
+ 	mrc	p15, 4, r2, c1, c1, 1
+-	ldr	r3, =(HDCR_TPM|HDCR_TPMCR|HDCR_TDRA|HDCR_TDOSA|HDCR_TDA)
++	ldr	r3, =(HDCR_TPM|HDCR_TPMCR)
+ 	.if \operation == vmentry
+ 	orr	r2, r2, r3		@ Trap some perfmon accesses
+ 	.else
 -- 
 1.7.12.4
-
