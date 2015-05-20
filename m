@@ -1,69 +1,123 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v4 06/12] KVM: arm64: guest debug, add SW break point
- support
-Date: Wed, 20 May 2015 10:17:35 +0100
-Message-ID: <20150520091735.GB8986@arm.com>
-References: <1431700035-23479-1-git-send-email-alex.bennee@linaro.org>
- <1431700035-23479-7-git-send-email-alex.bennee@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [RFC/RFT PATCH v2 1/3] arm/arm64: pageattr: add set_memory_nc
+Date: Wed, 20 May 2015 12:01:27 +0200
+Message-ID: <20150520100127.GX32765@cbox>
+References: <1431516714-25816-1-git-send-email-drjones@redhat.com>
+ <1431516714-25816-2-git-send-email-drjones@redhat.com>
+ <20150514110509.GP32765@cbox>
+ <20150514134644.GF12812@localhost.localdomain>
+ <20150518155303.GF21251@e104818-lin.cambridge.arm.com>
+ <20150519100322.GC2815@localhost.localdomain>
+ <20150519111854.GA14109@localhost>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <linux-doc-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 75A1D51C18
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 May 2015 05:51:47 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 2klNON4NmDCv for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 May 2015 05:51:45 -0400 (EDT)
+Received: from mail-la0-f50.google.com (mail-la0-f50.google.com
+ [209.85.215.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 321F851C15
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 May 2015 05:51:44 -0400 (EDT)
+Received: by laat2 with SMTP id t2so65515000laa.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 May 2015 03:01:07 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1431700035-23479-7-git-send-email-alex.bennee@linaro.org>
-Sender: linux-doc-owner@vger.kernel.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "agraf@suse.de" <agraf@suse.de>, "drjones@redhat.com" <drjones@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "zhichao.huang@linaro.org" <zhichao.huang@linaro.org>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "dahi@linux.vnet.ibm.com" <dahi@linux.vnet.ibm.com>, "r65777@freescale.com" <r65777@freescale.com>, "bp@suse.de" <bp@suse.de>, Gleb Natapov <gleb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <Catalin.Marinas@arm.com>, "open list:DOCUMENTATION" <linux-do>
+In-Reply-To: <20150519111854.GA14109@localhost>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "lersek@redhat.com" <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Alex,
+On Tue, May 19, 2015 at 12:18:54PM +0100, Catalin Marinas wrote:
+> On Tue, May 19, 2015 at 11:03:22AM +0100, Andrew Jones wrote:
+> > On Mon, May 18, 2015 at 04:53:03PM +0100, Catalin Marinas wrote:
+> > > Another way would be to split the vma containing the non-cacheable
+> > > memory so that you get a single vma with the vm_page_prot as
+> > > Non-cacheable.
+> > 
+> > This sounds interesting. Actually, it even crossed my mind once when I
+> > first saw that the vma would overwrite the attributes, but then, sigh,
+> > I let my brain take a stupidity bath.
+> > 
+> > > 
+> > > Yet another approach could be for KVM to mmap the necessary memory for
+> > > Qemu via a file_operations.mmap call (but that's only for ranges outside
+> > > the guest "RAM").
+> > 
+> > I guess I prefer the vma splitting, rather than this (the vma creating
+> > with mmap), as it keeps the KVM interface from changing (as you point out
+> > below). Well, unless there are other advantages to this that are worth
+> > considering?
+> 
+> The advantage is that you don't need to deal with the mm internals in
+> the KVM code.
+> 
+> But you can probably add such code directly to mm/ and reuse some of the
+> existing code in there already as part of change_protection(),
+> mprotect_fixup(), sys_mprotect(). Actually, once you split the vma and
+> set the new protection (something similar to mprotect_fixup), it looks
+> to me like you can just call change_protection(vma->vm_page_prot).
+> 
+> > > I didn't have time to follow these threads in details, but just to
+> > > recap my understanding, we have two main use-cases:
+> > > 
+> > > 1. Qemu handling guest I/O to device (e.g. PCIe BARs)
+> > > 2. Qemu emulating device DMA
+> > > 
+> > > For (1), I guess Qemu uses an anonymous mmap() and then tells KVM about
+> > > this memory slot. The memory attributes in this case could be Device
+> > > because that's how the guest would normally map it. The
+> > > file_operations.mmap trick would work in this case but this means
+> > > expanding the KVM ABI beyond just an ioctl().
+> > > 
+> > > For (2), since Qemu is writing to the guest "RAM" (e.g. video
+> > > framebuffer allocated by the guest), I still think the simplest is to
+> > > tell the guest (via DT) that such device is cache coherent rather than
+> > > trying to remap the Qemu mapping as non-cacheable.
+> > 
+> > If we need a solution for (1), then I'd prefer that it work and be
+> > applied to (2) as well. Anyway, I'm still not 100% sure we can count on
+> > all guest types (booloaders, different OSes) to listen to us. They may
+> > assume non-cacheable is typical and safe, and thus just do that always.
+> > We can certainly change some of those bootloaders and OSes, but probably
+> > not all of them.
+> 
+> That's fine by me. Once you get the vma splitting and attributes
+> changing done, I think you get the second one for free.
+> 
+> Do we want to differentiate between Device and Normal Non-cacheable
+> memory? Something like KVM_MEMSLOT_DEVICE?
+> 
+> Nitpick: I'm not sure whether "uncached" is clear enough. In Linux,
+> pgprot_noncached() returns Strongly Ordered memory. For Normal
+> Non-cachable we used pgprot_writecombine (e.g. a video framebuffer).
+> 
+> Maybe something like KVM_MEMSLOT_COHERENT meaning a request to KVM to
+> ensure that guest and host access it coherently (which would mean
+> writecombine for ARM). That's similar naming to functions like
+> dma_alloc_coherent() that return cacheable or non-cacheable memory based
+> on what the device supports. Anyway, I'm not to bothered with the
+> naming.
+> 
+One thing to keep in mind for (2) is that QEMU is likely to do things
+like calling regular memcpy() on the memory region, so mapping it as
+device memory which would fault on unaligned accesses may be a problem,
+so ideally there is a memory type for the user space mapping which
+allows such behavior where we at the same time can guarantee the that
+the mapping is coherent with the guest mapping through the S2
+attributes.
 
-On Fri, May 15, 2015 at 03:27:09PM +0100, Alex Benn=E9e wrote:
-> This adds support for SW breakpoints inserted by userspace.
->=20
-> We do this by trapping all guest software debug exceptions to the
-> hypervisor (MDCR_EL2.TDE). The exit handler sets an exit reason of
-> KVM_EXIT_DEBUG with the kvm_debug_exit_arch structure holding the
-> exception syndrome information.
->=20
-> It will be up to userspace to extract the PC (via GET_ONE_REG) and
-> determine if the debug event was for a breakpoint it inserted. If not
-> userspace will need to re-inject the correct exception restart the
-> hypervisor to deliver the debug exception to the guest.
->=20
-> Any other guest software debug exception (e.g. single step or HW
-> assisted breakpoints) will cause an error and the VM to be killed. Th=
-is
-> is addressed by later patches which add support for the other debug
-> types.
->=20
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
->=20
-> ---
-> v2
->   - update to use new exit struct
->   - tweak for C setup
->   - do our setup in debug_setup/clear code
->   - fixed up comments
-> v3:
->   - fix spacing in KVM_GUESTDBG_VALID_MASK
->   - fix and clarify wording on kvm_handle_guest_debug
->   - handle error case in kvm_handle_guest_debug
->   - re-word the commit message
-> v4
->   - rm else leg
->   - add r-b-tag
->=20
-> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtua=
-l/kvm/api.txt
-> index ba635c7..33c8143 100644
-> --- a/Documentation/virtual/kvm/api.txt
-> +++ b/Documentation/virtual/kvm/api.txt
-
-Not sure why, but your patches seem to drop the diffstat which makes it
-slightly more onerous for reviewers trying to figure out which bits tou=
-ch
-their trees. Are you removing it manually?
-
-Will
+-Christoffer
