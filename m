@@ -1,31 +1,23 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [RFC/RFT PATCH v2 3/3] arm/arm64: KVM: implement
- 'uncached' mem coherency
-Date: Thu, 21 May 2015 18:50:02 +0200
-Message-ID: <20150521165002.GD2898@localhost.localdomain>
-References: <1431516714-25816-1-git-send-email-drjones@redhat.com>
- <1431516714-25816-4-git-send-email-drjones@redhat.com>
- <20150514105549.GO32765@cbox>
- <20150514133213.GD12812@localhost.localdomain>
- <20150515145921.GB14144@lvm>
- <20150515170437.GA2951@localhost.localdomain>
- <555D4308.3030504@samsung.com>
+From: Vikram Sethi <vikrams@codeaurora.org>
+Subject: Re: [Qemu-devel] [PATCH v15 00/10] KVM platform device passthrough
+Date: Fri, 22 May 2015 12:37:56 -0500
+Message-ID: <555F6974.8000805@codeaurora.org>
+References: <5549B3A0.3090205@linaro.org> <5549B69B.2050702@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5348851E1D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 May 2015 12:40:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DF1A51F24
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 May 2015 13:28:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Mg19H6X+ZEEr for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 May 2015 12:40:46 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 87D1151E1C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 May 2015 12:40:46 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <555D4308.3030504@samsung.com>
+ with ESMTP id WJrsaa88hkin for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 22 May 2015 13:28:33 -0400 (EDT)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5734551F20
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 22 May 2015 13:28:32 -0400 (EDT)
+In-Reply-To: <5549B69B.2050702@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,94 +27,327 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mario Smarduch <m.smarduch@samsung.com>
-Cc: ard.biesheuvel@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, qemu-devel@nongnu.org, pbonzini@redhat.com, lersek@redhat.com, kvmarm@lists.cs.columbia.edu
+To: Eric Auger <eric.auger@linaro.org>
+Cc: Peter Crosthwaite <peter.crosthwaite@xilinx.com>, "patches@linaro.org" <patches@linaro.org>, qemu list <qemu-devel@nongnu.org>, "eric.auger@st.com" <eric.auger@st.com>, Alex Williamson <alex.williamson@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 20, 2015 at 07:29:28PM -0700, Mario Smarduch wrote:
-> On 05/15/2015 10:04 AM, Andrew Jones wrote:
-> > On Fri, May 15, 2015 at 08:02:59AM -0700, Christoffer Dall wrote:
-> >> On Thu, May 14, 2015 at 03:32:13PM +0200, Andrew Jones wrote:
-> >>> On Thu, May 14, 2015 at 12:55:49PM +0200, Christoffer Dall wrote:
-> >>>> On Wed, May 13, 2015 at 01:31:54PM +0200, Andrew Jones wrote:
-> >>>>> When S1 and S2 memory attributes combine wrt to caching policy,
-> >>>>> non-cacheable types take precedence. If a guest maps a region as
-> >>>>> device memory, which KVM userspace is using to emulate the device
-> >>>>> using normal, cacheable memory, then we lose coherency. With
-> >>>>> KVM_MEM_UNCACHED, KVM userspace can now hint to KVM which memory
-> >>>>> regions are likely to be problematic. With this patch, as pages
-> >>>>> of these types of regions are faulted into the guest, not only do
-> >>>>> we flush the page's dcache, but we also change userspace's
-> >>>>> mapping to NC in order to maintain coherency.
-> >>>>>
-> >>>>> What if the guest doesn't do what we expect? While we can't
-> >>>>> force a guest to use cacheable memory, we can take advantage of
-> >>>>> the non-cacheable precedence, and force it to use non-cacheable.
-> >>>>> So, this patch also introduces PAGE_S2_NORMAL_NC, and uses it on
-> >>>>> KVM_MEM_UNCACHED regions to force them to NC.
-> >>>>>
-> >>>>> We now have both guest and userspace on the same page (pun intended)
-> >>>>
-> >>>> I'd like to revisit the overall approach here.  Is doing non-cached
-> >>>> accesses in both the guest and host really the right thing to do here?
-> >>>
-> >>> I think so, but all ideas/approaches are still on the table. This is
-> >>> still an RFC.
-> >>>
-> >>>>
-> >>>> The semantics of the device becomes that it is cache coherent (because
-> >>>> QEMU is), and I think Marc argued that Linux/UEFI should simply be
-> >>>> adapted to handle whatever emulated devices we have as coherent.  I also
-> >>>> remember someone arguing that would be wrong (Peter?).
-> >>>
-> >>> I'm not really for quirking all devices in all guest types (AAVMF, Linux,
-> >>> other bootloaders, other OSes). Windows is unlikely to apply any quirks.
-> >>>
-> >>
-> >> Well my point was that if we're emulating a platform with coherent IO
-> >> memory for PCI devices that is something that the guest should work with
-> >> as such, but as Paolo explained it should always be safe for a guest to
-> >> assume non-coherent, so that doesn't work.
-> >>
-> >>>>
-> >>>> Finally, does this address all cache coherency issues with emulated
-> >>>> devices?  Some VOS guys had seen things still not working with this
-> >>>> approach, unsure why...  I'd like to avoid us merging this only to merge
-> >>>> a more complete solution in a few weeks which reverts this solution...
-> >>>
-> >>> I'm not sure (this is still an RFT too :-) We definitely would need to
-> >>> scatter some more memory_region_set_uncached() calls around QEMU first.
-> >>>
-> >>
-> >> It would be good if you could sync with the VOS guys and make sure your
-> >> patch set addresses their issues with the appropriate
-> >> memory_region_set_uncached() added to QEMU, and if it does not, some
-> >> vague idea why that falls outside of the scope of this patch set.  After
-> >> all, adding a USB controller to a VM is not that an esoteric use case,
-> >> is it?
-> > 
-> > I'll pull together a new version addressing all your comments, and also
-> > put some more time into making sure it'll work...
-> > 
-> > Jeremy, can you give me the qemu command line you're using for your tests?
-> > I'll do some experimenting with it.
-> > 
-> > Thanks,
-> > drew
-> > 
-> 
-> Hi Drew,
-> 
-> I just recently looked at these patches and little confused.
-> 
-> Where or how are the QEMU page tables changed to
-> non-cacheable?
-> 
-> I noticed the logical pfn is changed to non-cacheable.
+Hi Eric,
+Tested the latest patchset from your vfio_integ_v15 branch on a platform de=
+vice with 2 mmio regions. Works fine.
 
-Right, this series is broken. Please stay tuned, I'll fix it the
-next time around.
+Tested-by: Vikram Sethi <vikrams@codeaurora.org>
 
-Thanks for reviewing.
+Thanks,
+Vikram
+On 05/06/15 01:37, Eric Auger wrote:
+> Dear All,
+>
+> Please ignore the previous void message. For unknown reason the reply
+> systematically ignores the content of the message? Retrying breaking the
+> history... Content was:
+>
+> I am looking for "Tested-by" for this series and related Machvirt
+> dynamic sysbus device instantiation. Did anyone try the last versions?
+>
+> I know those series are not plug & play since additions are needed for
+> your device:
+> - device tree node addition in sysbus device
+> - creation of a specialized QEMU VFIO platform device since base class
+> is abstract
+>
+> For those willing to try and assess that code, please do not hesitate to
+> contact me. I can and I am willing to help. If you already did, with
+> success or facing issues, please send your Tested-by or report any issue
+> for quick fix. This will definitively help in the upstream of this code.
+>
+> Thanks
+>
+> Best Regards
+>
+> Eric
+>
+>
+>
+> This series aims at enabling KVM platform device passthrough.
+>
+> On kernel side, the vfio platform driver is needed, available from
+> 4.1-rc1 onwards.
+>
+> This series now only relies on the following QEMU series, for
+> dynamic instantiation of the VFIO platform device from qemu command
+> line:
+>
+> [1] [PATCH v12 0/4] machvirt dynamic sysbus device instantiation
+> http://comments.gmane.org/gmane.comp.emulators.kvm.arm.devel/886
+>
+> Both series are candidate for QEMU 2.4 and available at
+>
+> http://git.linaro.org/people/eric.auger/qemu.git
+> (branch vfio_integ_v15)
+>
+> The series was tested on Calxeda Midway (ARMv7) where one xgmac
+> is assigned to KVM host while the second one is assigned to the guest.
+>
+> Wiki for Calxeda Midway setup:
+> https://wiki.linaro.org/LEG/Engineering/Virtualization/Platform_Device_Pa=
+ssthrough_on_Midway
+>
+> History:
+>
+> v14 -> v15:
+> - add Peter R-b on sysbus: add irq_routing_notifier
+> - correct g_malloc0_n usage in skeleton
+> - correct return values of reset related functions
+> - include Cornelia's patch for header update
+>
+> v13 -> v14:
+> - remove v13 9, 10, 11 patch files and replace them by a single patch file
+>   "sysbus: add irq_routing_notifier".
+> - in skeleton, fix ENAMETOOLONG sign
+> - remove VFIOINTp virtualID in "add irq assignment" patch file
+> - removed trace_vfio_platform_start_eventfd
+>
+> v12 -> v13:
+> - header update but same update was already sent by Cornelia
+> - Rework VFIO signaling & irqfd setup: restored 2-step setup featuring
+>   eventfd setup on realize and then irqfd setup on irq binding.
+> - irqfd setup now uses kvm_irqchip_add_irqfd_notifier and
+>   sysbus irq_set_hook override. This leads to the introduction of 6 patch
+>   files enabling those 2 features. Paolo advised to introduce
+>   kvm_irqchip_add_irqfd_notifier series in the VFIO one. I did the
+>   same for irq_set_hook series but if it is better I can submit it aside.
+> - above changes made possible to remove
+>   x hw/vfio/platform: add capability to start IRQ propagation"
+>   x hw/arm/virt: start VFIO IRQ propagation
+> - in sysbus-fdt.c, use platform_bus_get_mmio_addr instead of deprecated
+>   mmio[0] property. Thanks to Bharat who pointed this issue out. also
+>   cpu_to_be32 was used for size and base (Vikram input) .
+> - in skeleton misc corrections following Alex review.
+>
+> v11->v12:
+> - add x-mmap property definition, without which the default value of
+>   vbasedev.allow_mmap is false, hence preventing the reg space from
+>   being mmapped.
+>
+> v10->v11:
+> - rebase onto v2.3.0-rc0 (mainly related to PCIe support in virt)
+> - add dma-coherent property for calxeda midway (fix revealed by removal
+>   of kernel-side "vfio: type1: support for ARM SMMUS with VFIO_IOMMU_TYPE=
+1")
+> - virt modifications to start VFIO IRQ forwarding are now in a separate
+>   patch
+> - rearrange linux header exports (those are still partial exports
+>   waiting for definitive 4.1-rc0)
+> - take into account Alex Benn=E9e comments:
+>   - use g_malloc0_n instead of g_malloc0
+>   - use block declarations when possible
+>   - rework readlink returned value treatment
+>   - use g_strlcat in place strncat
+>   - re-arrange mutex locking for multiple IRQ support (user-side handled
+>     eventfds)
+> - use g_snprintf instead of snprintf
+> - change the order of functions to avoid pre-declaration in platform.c
+> - add flags in VFIOINTp struct to detect whether the IRQ is automasked
+> - some comment rewriting
+>
+> v9->v10:
+> - rebase on "vfio: cleanup vfio_get_device error path, remove
+>   vfio_populate_device": vfio_populate_device no more called in
+>   vfio_get_device but in vfio_base_device_init
+> - update VFIO header according to vfio platform driver v13 (no AMBA)
+>
+> v8->v9:
+> - rebase on 2.2.0 and machvirt dynamic sysbus instantiation v10
+> - v8 1-11 were pulled
+> - patch files related to forwarding are moved in a seperate series since
+>   it depends on kernel series still in RFC.
+> - introduction of basic VFIO platform device split into 3 patch files to
+>   ease the review (hope it will help).
+> - add an author in platform.c
+> - add deallocation in vfio_populate_device error case
+> - add patch file doing the VFIO header sync
+> - use VFIO_DEVICE_FLAGS_PLATFORM in vfio_populate_device
+> - rename calxeda_xgmac.c into calxeda-xgmac.c
+> - sysbus-fdt: add_calxeda_midway_xgmac_fdt_node g_free in case of errors
+> - reword of linux-headers patch files
+>
+> v7->v8:
+> - rebase on v2.2.0-rc3 and integrate
+>   "Add skip_dump flag to ignore memory region during dump"
+> - KVM header evolution with subindex addition in kvm_arch_forwarded_irq
+> - split [PATCH v7 03/16] hw/vfio/pci: introduce VFIODevice into 4 patches
+> - vfio_compute_needs_reset does not return bool anymore
+> - add some comments about exposed MMIO region and IRQ in calxeda xgmac
+>   device
+> - vfio_[un]mask_irqindex renamed into vfio_[un]mask_single_irqindex
+> - rework IRQ startup: former machine init done notifier is replaced by a
+>   reset notifier. machine file passes the interrupt controller
+>   DeviceState handle (not the platform bus first irq parameter).
+> - sysbus-fdt:
+>   - move the add_fdt_node_functions array declaration between the device
+>     specific code and the generic code to avoid forward declarations of
+>     decice specific functions
+>   - rename add_basic_vfio_fdt_node into add_calxeda_midway_xgmac_fdt_node
+>     emphasizing the fact it is xgmac specific
+>
+> v6->v7:
+> - fake injection test modality removed
+> - VFIO_DEVICE_TYPE_PLATFORM only introduced with VFIO platform
+> - new helper functions to start VFIO IRQ on machine init done notifier
+>   (introduced in hw/vfio/platform: add vfio-platform support and notifier
+>   registration invoked in hw/arm/virt: add support for VFIO devices).
+>   vfio_start_irq_injection is replaced by vfio_register_irq_starter.
+>
+> v5->v6:
+> - rebase on 2.1rc5 PCI code
+> - forwarded IRQ first integraton
+> - vfio_device property renamed into host property
+> - split IRQ setup in different functions that match the 3 supported
+>   injection techniques (user handled eventfd, irqfd, forwarded IRQ):
+>   removes dynamic switch between injection methods
+> - introduce fake interrupts as a test modality:
+>   x makes possible to test multiple IRQ user-side handling.
+>   x this is a test feature only: enable to trigger a fd as if the
+>     real physical IRQ hit. No virtual IRQ is injected into the guest
+>     but handling is simulated so that the state machine can be tested
+> - user handled eventfd:
+>   x add mutex to protect IRQ state & list manipulation,
+>   x correct misleading comment in vfio_intp_interrupt.
+>   x Fix bugs using fake interrupt modality
+> - irqfd no more advertised in this patchset (handled in [3])
+> - VFIOPlatformDeviceClass becomes abstract and Calxeda xgmac device
+>   and class is re-introduced (as per v4)
+> - all DPRINTF removed in platform and replaced by trace-points
+> - corrects compilation with configure --disable-kvm
+> - simplifies the split for vfio_get_device and introduce a unique
+>   specialized function named vfio_populate_device
+> - group_list renamed into vfio_group_list
+> - hw/arm/dyn_sysbus_devtree.c currently only support vfio-calxeda-xgmac
+>   instantiation. Needs to be specialized for other VFIO devices
+> - fix 2 bugs in dyn_sysbus_devtree(reg_attr index and compat)
+>
+> v4->v5:
+> - rebase on v2.1.0 PCI code
+> - take into account Alex Williamson comments on PCI code rework
+>   - trace updates in vfio_region_write/read
+>   - remove fd from VFIORegion
+>   - get/put ckeanup
+> - bug fix: bar region's vbasedev field duly initialization
+> - misc cleanups in platform device
+> - device tree node generation removed from device and handled in
+>   hw/arm/dyn_sysbus_devtree.c
+> - remove "hw/vfio: add an example calxeda_xgmac": with removal of
+>   device tree node generation we do not have so many things to
+>   implement in that derived device yet. May be re-introduced later
+>   on if needed typically for reset/migration.
+> - no GSI routing table anymore
+>
+> v3->v4 changes (Eric Auger, Alvise Rigo)
+> - rebase on last VFIO PCI code (v2.1.0-rc0)
+> - full git history rework to ease PCI code change review
+> - mv include files in hw/vfio
+> - DPRINTF reformatting temporarily moved out
+> - support of VFIO virq (removal of resamplefd handler on user-side)
+> - integration with sysbus dynamic instantiation framwork
+> - removal of unrealize and cleanup routines until it is better
+>   understood what is really needed
+> - Support of VFIO for Amba devices should be handled in an inherited
+>   device to specialize the device tree generation (clock handle currently
+>   missing in framework however)
+> - "Always use eventfd as notifying mechanism" temporarily moved out
+> - static instantiation is not mainstream (although it remains possible)
+>   note if static instantiation is used, irqfd must be setup in machine fi=
+le
+>   when virtual IRQ is known
+> - create the GSI routing table on qemu side
+>
+> v2->v3 changes (Alvise Rigo, Eric Auger):
+> - Following Alex W recommandations, further efforts to factorize the
+>   code between PCI:introduction of VFIODevice and VFIORegion
+>   as base classes
+> - unique reset handler for platform and PCI
+> - cleanup following Kim's comments
+> - multiple IRQ support mechanics should be in place although not
+>   tested
+> - Better handling of MMIO multiple regions
+> - New features and fixes by Alvise (multiple compat string, exec
+>   flag, force eventfd usage, amba device tree support)
+> - irqfd support
+>
+> v1->v2 changes (Kim Phillips, Eric Auger):
+> - IRQ initial support (legacy mode where eventfds are handled on
+>   user side)
+> - hacked dynamic instantiation
+>
+> v1 (Kim Phillips):
+> - initial split between PCI and platform
+> - MMIO support only
+> - static instantiation
+>
+> Best Regards
+>
+> Eric
+>
+>
+> Cornelia Huck (1):
+>   linux-headers: update
+>
+> Eric Auger (9):
+>   hw/vfio/platform: vfio-platform skeleton
+>   hw/vfio/platform: add irq assignment
+>   hw/vfio/platform: calxeda xgmac device
+>   hw/arm/sysbus-fdt: enable vfio-calxeda-xgmac dynamic instantiation
+>   kvm: rename kvm_irqchip_[add,remove]_irqfd_notifier with gsi suffix
+>   kvm-all.c: add qemu_irq/gsi hash table and utility routines
+>   intc: arm_gic_kvm: set the qemu_irq/gsi mapping
+>   sysbus: add irq_routing_notifier
+>   hw/vfio/platform: add irqfd support
+>
+>  hw/arm/sysbus-fdt.c                             |  72 +++
+>  hw/core/sysbus.c                                |   6 +
+>  hw/intc/arm_gic_kvm.c                           |   5 +
+>  hw/s390x/virtio-ccw.c                           |   8 +-
+>  hw/vfio/Makefile.objs                           |   2 +
+>  hw/vfio/calxeda-xgmac.c                         |  54 ++
+>  hw/vfio/pci.c                                   |   6 +-
+>  hw/vfio/platform.c                              | 723
+> ++++++++++++++++++++++++
+>  hw/virtio/virtio-pci.c                          |   4 +-
+>  include/hw/sysbus.h                             |   1 +
+>  include/hw/vfio/vfio-calxeda-xgmac.h            |  46 ++
+>  include/hw/vfio/vfio-common.h                   |   1 +
+>  include/hw/vfio/vfio-platform.h                 |  77 +++
+>  include/standard-headers/linux/virtio_balloon.h |  28 +-
+>  include/standard-headers/linux/virtio_blk.h     |   8 +-
+>  include/standard-headers/linux/virtio_ids.h     |   1 +
+>  include/standard-headers/linux/virtio_input.h   |  76 +++
+>  include/sysemu/kvm.h                            |  11 +-
+>  kvm-all.c                                       |  44 +-
+>  kvm-stub.c                                      |   7 +-
+>  linux-headers/asm-arm/kvm.h                     |   9 +-
+>  linux-headers/asm-arm64/kvm.h                   |   9 +-
+>  linux-headers/asm-mips/kvm.h                    | 164 +++---
+>  linux-headers/asm-s390/kvm.h                    |   4 +
+>  linux-headers/asm-x86/hyperv.h                  |   2 +
+>  linux-headers/linux/kvm.h                       |  66 ++-
+>  linux-headers/linux/vfio.h                      |   2 +
+>  trace-events                                    |  13 +
+>  28 files changed, 1362 insertions(+), 87 deletions(-)
+>  create mode 100644 hw/vfio/calxeda-xgmac.c
+>  create mode 100644 hw/vfio/platform.c
+>  create mode 100644 include/hw/vfio/vfio-calxeda-xgmac.h
+>  create mode 100644 include/hw/vfio/vfio-platform.h
+>  create mode 100644 include/standard-headers/linux/virtio_input.h
+>
+> -- 1.8.3.2
+>
+>
+>
 
-drew
+
+-- =
+
+Vikram Sethi
+Qualcomm Technologies Inc, on behalf of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, a Linux =
+Foundation Collaborative Project
