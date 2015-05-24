@@ -1,32 +1,29 @@
-From: Mario Smarduch <m.smarduch@samsung.com>
-Subject: Re: [RFC/RFT PATCH v2 1/3] arm/arm64: pageattr: add set_memory_nc
-Date: Fri, 22 May 2015 18:08:30 -0700
-Message-ID: <555FD30E.6050507@samsung.com>
-References: <1431516714-25816-1-git-send-email-drjones@redhat.com>
- <1431516714-25816-2-git-send-email-drjones@redhat.com>
- <20150514110509.GP32765@cbox> <20150514134644.GF12812@localhost.localdomain>
- <20150518155303.GF21251@e104818-lin.cambridge.arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v2 0/3] Add support for for GICv2m and MSIs to arm-virt
+Date: Sun, 24 May 2015 12:38:51 +0200
+Message-ID: <20150524103851.GA19095@cbox>
+References: <1430155872-27030-1-git-send-email-christoffer.dall@linaro.org>
+ <CAFEAcA8WecTOiAKYxOOOrsJPyaQxpNskjE799kS8kipg4q3KMQ@mail.gmail.com>
+ <CAFEAcA84kB2iq-fwW6950rVtjuh5Li5b=edkSxooo9bDMgDuPw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 767E451E84
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 May 2015 20:59:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 223E451F42
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 24 May 2015 06:28:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zA1hV+k27r7T for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 May 2015 20:59:17 -0400 (EDT)
-Received: from usmailout4.samsung.com (mailout4.w2.samsung.com
- [211.189.100.14])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 97C0F51E76
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 May 2015 20:59:16 -0400 (EDT)
-Received: from uscpsbgex2.samsung.com
- (u123.gpu85.samsung.co.kr [203.254.195.123]) by usmailout4.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NOS00J0J36M7V80@usmailout4.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Fri, 22 May 2015 21:08:47 -0400 (EDT)
-In-reply-to: <20150518155303.GF21251@e104818-lin.cambridge.arm.com>
+ with ESMTP id ZkNMv1SEU0AP for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 24 May 2015 06:28:53 -0400 (EDT)
+Received: from mail-lb0-f171.google.com (mail-lb0-f171.google.com
+ [209.85.217.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DB5DC51F37
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 24 May 2015 06:28:52 -0400 (EDT)
+Received: by lbcmx3 with SMTP id mx3so36963695lbc.1
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 24 May 2015 03:38:26 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA84kB2iq-fwW6950rVtjuh5Li5b=edkSxooo9bDMgDuPw@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,76 +33,60 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "lersek@redhat.com" <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/18/2015 08:53 AM, Catalin Marinas wrote:
-> On Thu, May 14, 2015 at 02:46:44PM +0100, Andrew Jones wrote:
->> On Thu, May 14, 2015 at 01:05:09PM +0200, Christoffer Dall wrote:
->>> On Wed, May 13, 2015 at 01:31:52PM +0200, Andrew Jones wrote:
->>>> Provide a method to change normal, cacheable memory to non-cacheable.
->>>> KVM will make use of this to keep emulated device memory regions
->>>> coherent with the guest.
->>>>
->>>> Signed-off-by: Andrew Jones <drjones@redhat.com>
->>>
->>> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
->>>
->>> But you obviously need Russell and Will/Catalin to ack/merge this.
->>
->> I guess this patch is going to go away in the next round. You've
->> pointed out that I screwed stuff up royally with my over eagerness
->> to reuse code. I need to reimplement change_memory_common, but a
->> version that takes an mm, which is more or less what I did in the
->> last version of this series, back when I was pinning pages.
+On Wed, May 06, 2015 at 05:39:28PM +0100, Peter Maydell wrote:
+> On 6 May 2015 at 17:33, Peter Maydell <peter.maydell@linaro.org> wrote:
+> > On 27 April 2015 at 18:31, Christoffer Dall <christoffer.dall@linaro.org> wrote:
+> >> Now when we have a host generic PCIe controller in the virt board, it
+> >> would be nice to be able to use MSIs so that we can eventually enable
+> >> VHOST with KVM.
+> >>
+> >> With these patches you can use MSIs with TCG and with KVM, but you still
+> >> need some fixes for the mapping of the IRQ index to the GSI number for
+> >> IRQFD to work.  A separate series that enables IRQFD and vhost
+> >> is available: "ARM adaptations for vhost irqfd setup"
+> >> https://lists.gnu.org/archive/html/qemu-devel/2015-04/msg01054.html)
+> >>
+> >> Tested with KVM on XGene and with TCG by configuring a virtio-pci
+> >> network adapter for the guest and verifying MSIs going through as
+> >> expected.
+> >
+> > You forgot to change the QOM device name to 'arm-gicv2m', but
+> > I'll fix that up as I apply this to target-arm.next.
 > 
-> I kept wondering what this patch and the next one are doing with
-> set_memory_nc(). Basically you were trying to set the cache attributes
-> for the kernel linear mapping or kmap address (in the 32-bit arm case,
-> which is removed anyway on kunmap).
+> ...except this series breaks booting of a linux guest using PCI
+> on the virt board with aarch32:
 > 
-> What you need is changing the attributes of the user mapping as accessed
-> by Qemu but I don't think simply re-implementing change_memory_common()
-> would work, you probably need to pin the pages in memory as well.
-> Otherwise, the kernel may remove such pages and, when bringing them
-> back, would set the default cacheability attributes.
+> PCI host bridge /pcie@10000000 ranges:
+>    IO 0x3eff0000..0x3effffff -> 0x00000000
+>   MEM 0x10000000..0x3efeffff -> 0x10000000
+> pci-host-generic 3f000000.pcie: PCI host bridge to bus 0000:00
+> pci_bus 0000:00: root bus resource [bus 00-0f]
+> pci_bus 0000:00: root bus resource [io  0x0000-0xffff]
+> pci_bus 0000:00: root bus resource [mem 0x10000000-0x3efeffff]
+> PCI: bus0: Fast back to back transfers disabled
+> pci 0000:00:01.0: of_irq_parse_pci() failed with rc=-22
+> pci 0000:00:02.0: of_irq_parse_pci() failed with rc=-22
+> pci 0000:00:02.0: BAR 6: assigned [mem 0x10000000-0x1003ffff pref]
+> pci 0000:00:01.0: BAR 1: assigned [mem 0x10040000-0x10040fff]
+> pci 0000:00:02.0: BAR 1: assigned [mem 0x10041000-0x10041fff]
+> pci 0000:00:01.0: BAR 0: assigned [io  0x1000-0x103f]
+> pci 0000:00:02.0: BAR 0: assigned [io  0x1040-0x105f]
+> virtio-pci 0000:00:01.0: enabling device (0100 -> 0103)
+> virtio-pci 0000:00:02.0: enabling device (0100 -> 0103)
+> virtio_blk: probe of virtio32 failed with error -22
+> virtio_net: probe of virtio33 failed with error -22
 > 
-> Another way would be to split the vma containing the non-cacheable
-> memory so that you get a single vma with the vm_page_prot as
-> Non-cacheable.
+> (and without virtio-blk we don't mount our rootfs).
 > 
-> Yet another approach could be for KVM to mmap the necessary memory for
-> Qemu via a file_operations.mmap call (but that's only for ranges outside
-> the guest "RAM").
+Shanker figured out that this was due to me changing address-cells and
+size-cells in the gic node and breaking the irq-map in the DT and
+provided a fix.
 
-I think this option with a basic loadable driver
-that allocates non-cachable/pinned pages for QEMU to mmap()
-may provide a reference point to build on. If that covers
-all the cases then perhaps move to more generic solution. This
-should be quicker to implement and test.
+I will send a new series.
 
-I wonder if kernel mm will ever have a reason
-to create a cacheable mapping even if the pages are pinned?
-Like reading /dev/mem although that's not a likely case here.
-
-- Mario
-
-> 
-> I didn't have time to follow these threads in details, but just to
-> recap my understanding, we have two main use-cases:
-> 
-> 1. Qemu handling guest I/O to device (e.g. PCIe BARs)
-> 2. Qemu emulating device DMA
-> 
-> For (1), I guess Qemu uses an anonymous mmap() and then tells KVM about
-> this memory slot. The memory attributes in this case could be Device
-> because that's how the guest would normally map it. The
-> file_operations.mmap trick would work in this case but this means
-> expanding the KVM ABI beyond just an ioctl().
-> 
-> For (2), since Qemu is writing to the guest "RAM" (e.g. video
-> framebuffer allocated by the guest), I still think the simplest is to
-> tell the guest (via DT) that such device is cache coherent rather than
-> trying to remap the Qemu mapping as non-cacheable.
-> 
+Thanks,
+-Christoffer
