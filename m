@@ -1,29 +1,26 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 0/3] Add support for for GICv2m and MSIs to arm-virt
-Date: Sun, 24 May 2015 12:38:51 +0200
-Message-ID: <20150524103851.GA19095@cbox>
-References: <1430155872-27030-1-git-send-email-christoffer.dall@linaro.org>
- <CAFEAcA8WecTOiAKYxOOOrsJPyaQxpNskjE799kS8kipg4q3KMQ@mail.gmail.com>
- <CAFEAcA84kB2iq-fwW6950rVtjuh5Li5b=edkSxooo9bDMgDuPw@mail.gmail.com>
+Subject: [PATCH v3 1/4] target-arm: Add GIC phandle to VirtBoardInfo
+Date: Sun, 24 May 2015 12:51:03 +0200
+Message-ID: <1432464666-4825-2-git-send-email-christoffer.dall@linaro.org>
+References: <1432464666-4825-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 223E451F42
- for <kvmarm@lists.cs.columbia.edu>; Sun, 24 May 2015 06:28:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 46C5C51F4D
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 24 May 2015 06:41:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZkNMv1SEU0AP for <kvmarm@lists.cs.columbia.edu>;
- Sun, 24 May 2015 06:28:53 -0400 (EDT)
-Received: from mail-lb0-f171.google.com (mail-lb0-f171.google.com
- [209.85.217.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DB5DC51F37
- for <kvmarm@lists.cs.columbia.edu>; Sun, 24 May 2015 06:28:52 -0400 (EDT)
-Received: by lbcmx3 with SMTP id mx3so36963695lbc.1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 24 May 2015 03:38:26 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA84kB2iq-fwW6950rVtjuh5Li5b=edkSxooo9bDMgDuPw@mail.gmail.com>
+ with ESMTP id 5gVAXoREORLb for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 24 May 2015 06:41:13 -0400 (EDT)
+Received: from mail-la0-f48.google.com (mail-la0-f48.google.com
+ [209.85.215.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 10D0051F4C
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 24 May 2015 06:41:12 -0400 (EDT)
+Received: by lagv1 with SMTP id v1so35054204lag.3
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 24 May 2015 03:50:46 -0700 (PDT)
+In-Reply-To: <1432464666-4825-1-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,60 +30,120 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: qemu-devel@nongnu.org
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, May 06, 2015 at 05:39:28PM +0100, Peter Maydell wrote:
-> On 6 May 2015 at 17:33, Peter Maydell <peter.maydell@linaro.org> wrote:
-> > On 27 April 2015 at 18:31, Christoffer Dall <christoffer.dall@linaro.org> wrote:
-> >> Now when we have a host generic PCIe controller in the virt board, it
-> >> would be nice to be able to use MSIs so that we can eventually enable
-> >> VHOST with KVM.
-> >>
-> >> With these patches you can use MSIs with TCG and with KVM, but you still
-> >> need some fixes for the mapping of the IRQ index to the GSI number for
-> >> IRQFD to work.  A separate series that enables IRQFD and vhost
-> >> is available: "ARM adaptations for vhost irqfd setup"
-> >> https://lists.gnu.org/archive/html/qemu-devel/2015-04/msg01054.html)
-> >>
-> >> Tested with KVM on XGene and with TCG by configuring a virtio-pci
-> >> network adapter for the guest and verifying MSIs going through as
-> >> expected.
-> >
-> > You forgot to change the QOM device name to 'arm-gicv2m', but
-> > I'll fix that up as I apply this to target-arm.next.
-> 
-> ...except this series breaks booting of a linux guest using PCI
-> on the virt board with aarch32:
-> 
-> PCI host bridge /pcie@10000000 ranges:
->    IO 0x3eff0000..0x3effffff -> 0x00000000
->   MEM 0x10000000..0x3efeffff -> 0x10000000
-> pci-host-generic 3f000000.pcie: PCI host bridge to bus 0000:00
-> pci_bus 0000:00: root bus resource [bus 00-0f]
-> pci_bus 0000:00: root bus resource [io  0x0000-0xffff]
-> pci_bus 0000:00: root bus resource [mem 0x10000000-0x3efeffff]
-> PCI: bus0: Fast back to back transfers disabled
-> pci 0000:00:01.0: of_irq_parse_pci() failed with rc=-22
-> pci 0000:00:02.0: of_irq_parse_pci() failed with rc=-22
-> pci 0000:00:02.0: BAR 6: assigned [mem 0x10000000-0x1003ffff pref]
-> pci 0000:00:01.0: BAR 1: assigned [mem 0x10040000-0x10040fff]
-> pci 0000:00:02.0: BAR 1: assigned [mem 0x10041000-0x10041fff]
-> pci 0000:00:01.0: BAR 0: assigned [io  0x1000-0x103f]
-> pci 0000:00:02.0: BAR 0: assigned [io  0x1040-0x105f]
-> virtio-pci 0000:00:01.0: enabling device (0100 -> 0103)
-> virtio-pci 0000:00:02.0: enabling device (0100 -> 0103)
-> virtio_blk: probe of virtio32 failed with error -22
-> virtio_net: probe of virtio33 failed with error -22
-> 
-> (and without virtio-blk we don't mount our rootfs).
-> 
-Shanker figured out that this was due to me changing address-cells and
-size-cells in the gic node and breaking the irq-map in the DT and
-provided a fix.
+Instead of passing the GIC phandle around between functions, add it to
+the VirtBoardInfo just like we do for the clock_phandle.  We are about
+to add the v2m phandle as well, and it's easier not having to pass
+around a bunch of phandles, return multiple values from functions, etc.
 
-I will send a new series.
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+Changes since v2:
+ - None
+Changes since v1:
+ - Added reviewed-by tag
 
-Thanks,
--Christoffer
+ hw/arm/virt.c | 26 +++++++++++---------------
+ 1 file changed, 11 insertions(+), 15 deletions(-)
+
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index a7f9a10..f9f7482 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -87,6 +87,7 @@ typedef struct VirtBoardInfo {
+     void *fdt;
+     int fdt_size;
+     uint32_t clock_phandle;
++    uint32_t gic_phandle;
+ } VirtBoardInfo;
+ 
+ typedef struct {
+@@ -322,12 +323,11 @@ static void fdt_add_cpu_nodes(const VirtBoardInfo *vbi)
+     }
+ }
+ 
+-static uint32_t fdt_add_gic_node(const VirtBoardInfo *vbi)
++static void fdt_add_gic_node(VirtBoardInfo *vbi)
+ {
+-    uint32_t gic_phandle;
+ 
+-    gic_phandle = qemu_fdt_alloc_phandle(vbi->fdt);
+-    qemu_fdt_setprop_cell(vbi->fdt, "/", "interrupt-parent", gic_phandle);
++    vbi->gic_phandle = qemu_fdt_alloc_phandle(vbi->fdt);
++    qemu_fdt_setprop_cell(vbi->fdt, "/", "interrupt-parent", vbi->gic_phandle);
+ 
+     qemu_fdt_add_subnode(vbi->fdt, "/intc");
+     /* 'cortex-a15-gic' means 'GIC v2' */
+@@ -340,12 +340,10 @@ static uint32_t fdt_add_gic_node(const VirtBoardInfo *vbi)
+                                      2, vbi->memmap[VIRT_GIC_DIST].size,
+                                      2, vbi->memmap[VIRT_GIC_CPU].base,
+                                      2, vbi->memmap[VIRT_GIC_CPU].size);
+-    qemu_fdt_setprop_cell(vbi->fdt, "/intc", "phandle", gic_phandle);
+-
+-    return gic_phandle;
++    qemu_fdt_setprop_cell(vbi->fdt, "/intc", "phandle", vbi->gic_phandle);
+ }
+ 
+-static uint32_t create_gic(const VirtBoardInfo *vbi, qemu_irq *pic)
++static void create_gic(VirtBoardInfo *vbi, qemu_irq *pic)
+ {
+     /* We create a standalone GIC v2 */
+     DeviceState *gicdev;
+@@ -394,7 +392,7 @@ static uint32_t create_gic(const VirtBoardInfo *vbi, qemu_irq *pic)
+         pic[i] = qdev_get_gpio_in(gicdev, i);
+     }
+ 
+-    return fdt_add_gic_node(vbi);
++    fdt_add_gic_node(vbi);
+ }
+ 
+ static void create_uart(const VirtBoardInfo *vbi, qemu_irq *pic)
+@@ -641,8 +639,7 @@ static void create_pcie_irq_map(const VirtBoardInfo *vbi, uint32_t gic_phandle,
+                            0x7           /* PCI irq */);
+ }
+ 
+-static void create_pcie(const VirtBoardInfo *vbi, qemu_irq *pic,
+-                        uint32_t gic_phandle)
++static void create_pcie(const VirtBoardInfo *vbi, qemu_irq *pic)
+ {
+     hwaddr base = vbi->memmap[VIRT_PCIE].base;
+     hwaddr size = vbi->memmap[VIRT_PCIE].size;
+@@ -714,7 +711,7 @@ static void create_pcie(const VirtBoardInfo *vbi, qemu_irq *pic,
+                                  2, base_mmio, 2, size_mmio);
+ 
+     qemu_fdt_setprop_cell(vbi->fdt, nodename, "#interrupt-cells", 1);
+-    create_pcie_irq_map(vbi, gic_phandle, irq, nodename);
++    create_pcie_irq_map(vbi, vbi->gic_phandle, irq, nodename);
+ 
+     g_free(nodename);
+ }
+@@ -736,7 +733,6 @@ static void machvirt_init(MachineState *machine)
+     MemoryRegion *ram = g_new(MemoryRegion, 1);
+     const char *cpu_model = machine->cpu_model;
+     VirtBoardInfo *vbi;
+-    uint32_t gic_phandle;
+     char **cpustr;
+ 
+     if (!cpu_model) {
+@@ -813,13 +809,13 @@ static void machvirt_init(MachineState *machine)
+ 
+     create_flash(vbi);
+ 
+-    gic_phandle = create_gic(vbi, pic);
++    create_gic(vbi, pic);
+ 
+     create_uart(vbi, pic);
+ 
+     create_rtc(vbi, pic);
+ 
+-    create_pcie(vbi, pic, gic_phandle);
++    create_pcie(vbi, pic);
+ 
+     /* Create mmio transports, so the user can create virtio backends
+      * (which will be automatically plugged in to the transports). If
+-- 
+2.1.2.330.g565301e.dirty
