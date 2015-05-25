@@ -1,29 +1,30 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v3 4/4] target-arm: Add the GICv2m to the
- virt board
-Date: Mon, 25 May 2015 18:25:49 +0200
-Message-ID: <55634D0D.3010103@linaro.org>
-References: <1432464666-4825-1-git-send-email-christoffer.dall@linaro.org>
- <1432464666-4825-5-git-send-email-christoffer.dall@linaro.org>
- <011b01d096ec$1a395e80$4eac1b80$@samsung.com>
- <CAFEAcA9QWKuh3zjXg_n3HiABEgoXaiRJ8sHMnj=uOzdMGF6yDQ@mail.gmail.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [Qemu-devel] [RFC/RFT PATCH v2 1/3] arm/arm64: pageattr: add
+ set_memory_nc
+Date: Mon, 25 May 2015 19:11:25 +0200
+Message-ID: <20150525171125.GA2996@localhost.localdomain>
+References: <1431516714-25816-1-git-send-email-drjones@redhat.com>
+ <1431516714-25816-2-git-send-email-drjones@redhat.com>
+ <20150514110509.GP32765@cbox>
+ <20150514134644.GF12812@localhost.localdomain>
+ <20150518155303.GF21251@e104818-lin.cambridge.arm.com>
+ <555FD30E.6050507@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A211951FCF
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 May 2015 12:16:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D83E51FEE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 May 2015 13:02:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6th7DbicnRSA for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 May 2015 12:16:22 -0400 (EDT)
-Received: from mail-wg0-f49.google.com (mail-wg0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F18951FC0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 May 2015 12:16:22 -0400 (EDT)
-Received: by wgbgq6 with SMTP id gq6so76623907wgb.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 May 2015 09:25:59 -0700 (PDT)
-In-Reply-To: <CAFEAcA9QWKuh3zjXg_n3HiABEgoXaiRJ8sHMnj=uOzdMGF6yDQ@mail.gmail.com>
+ with ESMTP id jw-SQYXvT2LT for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 May 2015 13:01:59 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A0F9E51FE8
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 May 2015 13:01:59 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <555FD30E.6050507@samsung.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,33 +34,87 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>, Pavel Fedin <p.fedin@samsung.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Mario Smarduch <m.smarduch@samsung.com>
+Cc: "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "lersek@redhat.com" <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/25/2015 05:01 PM, Peter Maydell wrote:
-> On 25 May 2015 at 14:09, Pavel Fedin <p.fedin@samsung.com> wrote:
->>  Hello!
->>
->>>  typedef struct MemMapEntry {
->>> @@ -88,6 +90,7 @@ typedef struct VirtBoardInfo {
->>>      int fdt_size;
->>>      uint32_t clock_phandle;
->>>      uint32_t gic_phandle;
->>> +    uint32_t v2m_phandle;
->>>  } VirtBoardInfo;
->>
->>  Could you rename v2m_phandle to something more neutral like msi_phandle ? It will also be
->> used by GICv3 ITS implementation.
+On Fri, May 22, 2015 at 06:08:30PM -0700, Mario Smarduch wrote:
+> On 05/18/2015 08:53 AM, Catalin Marinas wrote:
+> > On Thu, May 14, 2015 at 02:46:44PM +0100, Andrew Jones wrote:
+> >> On Thu, May 14, 2015 at 01:05:09PM +0200, Christoffer Dall wrote:
+> >>> On Wed, May 13, 2015 at 01:31:52PM +0200, Andrew Jones wrote:
+> >>>> Provide a method to change normal, cacheable memory to non-cacheable.
+> >>>> KVM will make use of this to keep emulated device memory regions
+> >>>> coherent with the guest.
+> >>>>
+> >>>> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> >>>
+> >>> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> >>>
+> >>> But you obviously need Russell and Will/Catalin to ack/merge this.
+> >>
+> >> I guess this patch is going to go away in the next round. You've
+> >> pointed out that I screwed stuff up royally with my over eagerness
+> >> to reuse code. I need to reimplement change_memory_common, but a
+> >> version that takes an mm, which is more or less what I did in the
+> >> last version of this series, back when I was pinning pages.
+> > 
+> > I kept wondering what this patch and the next one are doing with
+> > set_memory_nc(). Basically you were trying to set the cache attributes
+> > for the kernel linear mapping or kmap address (in the 32-bit arm case,
+> > which is removed anyway on kunmap).
+> > 
+> > What you need is changing the attributes of the user mapping as accessed
+> > by Qemu but I don't think simply re-implementing change_memory_common()
+> > would work, you probably need to pin the pages in memory as well.
+> > Otherwise, the kernel may remove such pages and, when bringing them
+> > back, would set the default cacheability attributes.
+> > 
+> > Another way would be to split the vma containing the non-cacheable
+> > memory so that you get a single vma with the vm_page_prot as
+> > Non-cacheable.
+> > 
+> > Yet another approach could be for KVM to mmap the necessary memory for
+> > Qemu via a file_operations.mmap call (but that's only for ranges outside
+> > the guest "RAM").
 > 
-> Why? The v2m device isn't really related to the GICv3...
-In the future this handle could point to GICv2m or GICv3 ITS or GICv3
-(if I understand it correctly, when it supports message base interrupts
-and no ITS). They all would play the same role of msi-controller.
+> I think this option with a basic loadable driver
+> that allocates non-cachable/pinned pages for QEMU to mmap()
+> may provide a reference point to build on. If that covers
+> all the cases then perhaps move to more generic solution. This
+> should be quicker to implement and test.
 
-Best Regards
+I've pulled together a different approach for experimentation. I added a
+new mmap/mprotect prot flag, like what was done for the powerpc SAO bit
+(see commit b845f313d78e4e "mm: Allow architectures to define additional
+protection bits" and commit ef3d3246a0d06 " powerpc/mm: Add Strong Access
+Ordering support"). So far I've only tested with a simple test program that
+forks and messes around with mapping shared memory in different ways. With
+some cache flushing added to set_pte_at on memattr changes, then it seems
+to work pretty well.
 
-Eric
+Now I'll start experimenting with QEMU again to see if the "map QEMU's
+memory as noncacheable" approach makes any sense at all. If it does,
+then I'm not sure we want to do it with mprotect, but I could clean up
+the patches and post them for discussion. The main problems I see with it
+are the need to define a new PROT_ flag, and the fact that it might not
+be a good idea for userspace to have this capability in the first place,
+at least not for MAP_SHARED regions.
+
 > 
-> -- PMM
-> 
+> I wonder if kernel mm will ever have a reason
+> to create a cacheable mapping even if the pages are pinned?
+> Like reading /dev/mem although that's not a likely case here.
+
+Actually for a version with pinned pages, then I think this one
+http://www.spinics.net/lists/kvm-arm/msg14021.html
+is a good start. There are some problems with it, but I can fix
+them in order for it to be useful for experimenting with QEMU. It
+suffers from the Device-nGnRnE issue Peter and Alex pointed out, and
+I also see that I'm using the wrong address in there as well for the
+dcache flush, because I'm using kvm_flush_dcache_pte(*ptep) in
+set_page_uncached, which ends up using page_address(page). I should
+just do __flush_dcache_area(addr, PAGE_SIZE), instead.
+
+Thanks,
+drew
