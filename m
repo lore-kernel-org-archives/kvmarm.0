@@ -1,34 +1,24 @@
-From: Mario Smarduch <m.smarduch@samsung.com>
-Subject: Re: [Qemu-devel] [RFC/RFT PATCH v2 1/3] arm/arm64: pageattr: add
- set_memory_nc
-Date: Tue, 26 May 2015 18:08:00 -0700
-Message-ID: <556518F0.5040602@samsung.com>
-References: <1431516714-25816-1-git-send-email-drjones@redhat.com>
- <1431516714-25816-2-git-send-email-drjones@redhat.com>
- <20150514110509.GP32765@cbox> <20150514134644.GF12812@localhost.localdomain>
- <20150518155303.GF21251@e104818-lin.cambridge.arm.com>
- <555FD30E.6050507@samsung.com> <20150525171125.GA2996@localhost.localdomain>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [RESEND PATCH v12 0/4] machvirt dynamic sysbus device instantiation
+Date: Wed, 27 May 2015 09:47:46 +0100
+Message-ID: <1432716470-2096-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BF5652045
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 May 2015 20:59:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B3745218E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2015 04:38:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tpyDLgQRuQ23 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 May 2015 20:59:02 -0400 (EDT)
-Received: from usmailout2.samsung.com (mailout2.w2.samsung.com
- [211.189.100.12])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5BB3052169
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 May 2015 20:59:01 -0400 (EDT)
-Received: from uscpsbgex1.samsung.com
- (u122.gpu85.samsung.co.kr [203.254.195.122]) by mailout2.w2.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NOZ00FN1HUI1250@mailout2.w2.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Tue, 26 May 2015 21:08:42 -0400 (EDT)
-In-reply-to: <20150525171125.GA2996@localhost.localdomain>
+ with ESMTP id 6dtv94kyErrq for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 May 2015 04:38:31 -0400 (EDT)
+Received: from mail-wi0-f179.google.com (mail-wi0-f179.google.com
+ [209.85.212.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 069EA520FE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2015 04:38:30 -0400 (EDT)
+Received: by wicmx19 with SMTP id mx19so86703021wic.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2015 01:48:12 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -38,111 +28,114 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "lersek@redhat.com" <lersek@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: patches@linaro.org, alex.williamson@redhat.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/25/2015 10:11 AM, Andrew Jones wrote:
-> On Fri, May 22, 2015 at 06:08:30PM -0700, Mario Smarduch wrote:
->> On 05/18/2015 08:53 AM, Catalin Marinas wrote:
->>> On Thu, May 14, 2015 at 02:46:44PM +0100, Andrew Jones wrote:
->>>> On Thu, May 14, 2015 at 01:05:09PM +0200, Christoffer Dall wrote:
->>>>> On Wed, May 13, 2015 at 01:31:52PM +0200, Andrew Jones wrote:
->>>>>> Provide a method to change normal, cacheable memory to non-cacheable.
->>>>>> KVM will make use of this to keep emulated device memory regions
->>>>>> coherent with the guest.
->>>>>>
->>>>>> Signed-off-by: Andrew Jones <drjones@redhat.com>
->>>>>
->>>>> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
->>>>>
->>>>> But you obviously need Russell and Will/Catalin to ack/merge this.
->>>>
->>>> I guess this patch is going to go away in the next round. You've
->>>> pointed out that I screwed stuff up royally with my over eagerness
->>>> to reuse code. I need to reimplement change_memory_common, but a
->>>> version that takes an mm, which is more or less what I did in the
->>>> last version of this series, back when I was pinning pages.
->>>
->>> I kept wondering what this patch and the next one are doing with
->>> set_memory_nc(). Basically you were trying to set the cache attributes
->>> for the kernel linear mapping or kmap address (in the 32-bit arm case,
->>> which is removed anyway on kunmap).
->>>
->>> What you need is changing the attributes of the user mapping as accessed
->>> by Qemu but I don't think simply re-implementing change_memory_common()
->>> would work, you probably need to pin the pages in memory as well.
->>> Otherwise, the kernel may remove such pages and, when bringing them
->>> back, would set the default cacheability attributes.
->>>
->>> Another way would be to split the vma containing the non-cacheable
->>> memory so that you get a single vma with the vm_page_prot as
->>> Non-cacheable.
->>>
->>> Yet another approach could be for KVM to mmap the necessary memory for
->>> Qemu via a file_operations.mmap call (but that's only for ranges outside
->>> the guest "RAM").
->>
->> I think this option with a basic loadable driver
->> that allocates non-cachable/pinned pages for QEMU to mmap()
->> may provide a reference point to build on. If that covers
->> all the cases then perhaps move to more generic solution. This
->> should be quicker to implement and test.
-> 
-> I've pulled together a different approach for experimentation. I added a
-> new mmap/mprotect prot flag, like what was done for the powerpc SAO bit
-> (see commit b845f313d78e4e "mm: Allow architectures to define additional
-> protection bits" and commit ef3d3246a0d06 " powerpc/mm: Add Strong Access
-> Ordering support"). So far I've only tested with a simple test program that
-> forks and messes around with mapping shared memory in different ways. With
-> some cache flushing added to set_pte_at on memattr changes, then it seems
-> to work pretty well.
-
-Thanks for the pointer, it's pretty deep into generic mmap_region()
-code. Does SAO apply to regular memory or MMIO regions?
-
-> 
-> Now I'll start experimenting with QEMU again to see if the "map QEMU's
-> memory as noncacheable" approach makes any sense at all. If it does,
-> then I'm not sure we want to do it with mprotect, but I could clean up
-> the patches and post them for discussion. The main problems I see with it
-> are the need to define a new PROT_ flag, and the fact that it might not
-> be a good idea for userspace to have this capability in the first place,
-> at least not for MAP_SHARED regions.
-
-Seem like pretty significant incisions to generic kernel.
-Appears like below patches do same thing without adding
-arch specific vma protection extensions. You would need
-to lock the region pages, right? Also flush the TLBs
-after locking. Appears to make a general mmap() interface
-unique for this case.
-
-> 
->>
->> I wonder if kernel mm will ever have a reason
->> to create a cacheable mapping even if the pages are pinned?
->> Like reading /dev/mem although that's not a likely case here.
-> 
-> Actually for a version with pinned pages, then I think this one
-> http://www.spinics.net/lists/kvm-arm/msg14021.html
-> is a good start. There are some problems with it, but I can fix
-> them in order for it to be useful for experimenting with QEMU. It
-> suffers from the Device-nGnRnE issue Peter and Alex pointed out, and
-> I also see that I'm using the wrong address in there as well for the
-> dcache flush, because I'm using kvm_flush_dcache_pte(*ptep) in
-> set_page_uncached, which ends up using page_address(page). I should
-> just do __flush_dcache_area(addr, PAGE_SIZE), instead.
-
-Sorry I missed this series it appears clean, with no excessive flushing,
-and the few additional modifications you pointed out. Instead of
-flush_tlb_kernel_range(), maybe use flush_tlb_all(),
-I'm not sure vaae1is flushes any other alias mappings to
-same pfn.
-
-Thanks,
-- Mario
-
-> 
-> Thanks,
-> drew
-> 
+VGhpcyBwYXRjaCBzZXJpZXMgZW5hYmxlcyBtYWNodmlydCB0byBkeW5hbWljYWxseSBpbnN0YW50
+aWF0ZSBzeXNidXMKZGV2aWNlcyBmcm9tIGNvbW1hbmQgbGluZSAodXNpbmcgLWRldmljZSBvcHRp
+b24pLgoKQWxsIHRob3NlIHN5c2J1cyBkZXZpY2VzIGFyZSBwbHVnZ2VkIG9udG8gYSBwbGF0Zm9y
+bSBidXMuIFRoaXMgbGF0dGVyCmRldmljZSBpcyBpbnN0YW50aWF0ZWQgaW4gbWFjaHZpcnQgYW5k
+IHRha2VzIGNhcmUgb2YgdGhlIGJpbmRpbmcgb2YKY2hpbGRyZW4gc3lzYnVzIGRldmljZXMgb24g
+YSBtYWNoaW5lIGluaXQgZG9uZSBub3RpZmllci4gVGhlIGRldmljZQp0cmVlIG5vZGUgZ2VuZXJh
+dGlvbiBmb3IgY2hpbGRyZW4gZHluYW1pYyBzeXNidXMgZGV2aWNlIGFsc28gaGFwcGVucwpvbiBh
+IHN1YnNlcXVlbnQgbm90aWZpZXIgdGhhdCBtdXN0IGJlIGV4ZWN1dGVkIGFmdGVyIHRoZSBhYm92
+ZSBvbmUuCm1hY2h2aXJ0IHJlZ2lzdGVycyB0aGF0IG5vdGlmaWVyIGJlZm9yZSB0aGUgcGxhdGZv
+cm0gYnVzIGNyZWF0aW9uIHRvCm1ha2Ugc3VyZSBub3RpZmllcnMgYXJlIGV4ZWN1dGVkIGluIHRo
+ZSByaWdodCBvcmRlcjogZHQgZ2VuZXJhdGlvbiBhZnRlcgphY3R1YWwgUU9NIGJpbmRpbmcuCgpW
+ZXJ5IGZldyBzeXNidXMgZGV2aWNlcyBhcmUgc3VwcG9zZWQgdG8gYmUgaW5zdGFudGlhdGVkIHRo
+YXQKd2F5LiBWRklPIGRldmljZXMgYmVsb25nIHRvIHRoZW0uCgpOb2RlIGNyZWF0aW9uIHJlYWxs
+eSBpcyBhcmNoaXRlY3R1cmUgc3BlY2lmaWMuIE9uIEFSTSB0aGUgZHluYW1pYwpzeXNidXMgZGV2
+aWNlIG5vZGUgY3JlYXRpb24gaXMgaW1wbGVtZW50ZWQgaW4gYSBuZXcgQyBtb2R1bGUsCmh3L2Fy
+bS9zeXNidXMtZmR0LmMgYW5kIG5vdCBpbiB0aGUgbWFjaGluZSBmaWxlLgoKTWFjaHZpcnQgdHJh
+bnNmb3JtYXRpb25zIGFuZCBzeXNidXMtZmR0IGFyZSBsYXJnZWx5IGluc3BpcmVkIGZyb20gQWxl
+eCB3b3JrLgoKVGhlIHBhdGNoIHNlcmllcyBjYW4gYmUgZm91bmQgYXQ6Cmh0dHA6Ly9naXQubGlu
+YXJvLm9yZy9wZW9wbGUvZXJpYy5hdWdlci9xZW11LmdpdCwKYnJhbmNoIHZmaW9faW50ZWdfdjE2
+CgpCZXN0IFJlZ2FyZHMKCkVyaWMKCnYxMSAtPiB2MTI6Ci0gcmViYXNlIG9uIDIuMy4wCi0gYWRk
+IEFsZXggQmVubsODwqllIFItYiBhc3N1bWluZyBmb2xsb3dpbmcgY2hhbmdlcyBkbyBub3QgYWx0
+ZXIgaGlzIHJldmlldwotIHRha2UgaW50byBhY2NvdW50IEFsZXggR3JhZiBjb21tZW50cwogIC0g
+cmVzaXplIFBMQVRGT1JNX0JVU19OVU1fSVJRUyB0byA2NCBpbnN0ZWFkIG9mIDMyCiAgLSBvdmVy
+YWxsIE5VTV9JUlFTIGNoYW5nZWQgdG8gMjU2IHNpbmNlIHRoZXJlIHdhcyBubyByb29tIGxlZnQg
+Zm9yIG90aGVyCiAgICBhZGRpdGlvbnMKICAtIFZJUlRfUExBVEZPUk1fQlVTIHNpemUgY2hhbmdl
+ZCBmcm9tIDRNQiB0byAzMk1CIGFuZCBiYXNlIHNldCBhdAogICAgMHhjMDAwMDAwCgp2MTAgLT4g
+djExOgotIHJlYmFzZSBvbiB2Mi4yLjAgYW5kIGVzcGVjaWFsbHkgQWxleCcKICAiYXJtOiBBZGQg
+UENJZSBob3N0IGJyaWRnZSBpbiB2aXJ0IG1hY2hpbmUiCgp2OSAtPiB2MTA6Ci0gYWRkIGFzc2Vy
+dCBhbmQgZml4IHJldHVybiB2YWx1ZSBpbiBhZGRfZmR0X25vZGUKCnY4IC0+IHY5OgpUYWtlIGlu
+dG8gYWNjb3VudCBQZXRlcidzIGNvbW1lbnRzOgpody9hcm0vc3lzYnVzLWZkdDoKLSBzL0ZkdC9G
+RFQgaW4gc3RydWN0IHR5cGUgbmFtZXMKLSByZW9yZGVyIGZpZWxkcyBpbiBQbGF0Zm9ybUJ1c0Zk
+dE5vdGlmaWVyUGFyYW1zIGFuZCB1c2UgRE9fVVBDQVNUCi0gdXNlIGFzc2VydCgpIHdoZW4gcmVs
+ZXZhbnQgKGJvYXJkIG1vZGVsIGlzc3VlKQotIGdfZnJlZSB0aGUgQVJNUGxhdGZvcm1CdXNGRFRQ
+YXJhbXMgYW5kIFBsYXRmb3JtQnVzRkRUTm90aWZpZXJQYXJhbXMKICBwb2ludGVycyBpbiBwbGF0
+Zm9ybV9idXNfZmR0X25vdGlmeQpody9hcm0vYm9vdC5jCi0gZml4IGNvbXBpbGF0aW9uIHdpdGgg
+YXJtLWxpbnV4LXVzZXIKLSByZW9yZGVyIGZpZWxkcyBpbiBBcm1Mb2FkS2VybmVsTm90aWZpZXIK
+aHcvYXJtL3ZpcnQuYwotIFBMQVRGT1JNX0JVU19OVU1fSVJRUyBzZXQgdG8gMzIgaW5zdGVhZCBv
+ZiAyMAotIHBsYXRmb3JtIGJ1cyBpcnEgbm93IHN0YXJ0IGF0IDY0IGluc3RlYWQgb2YgNDgKLSBy
+ZW1vdmUgY2hhbmdlIG9mIGluZGVudGF0aW9uIGluICBhMTVtZW1tYXAKLSBjb3JyZWN0IG1pc2Mg
+c3R5bGUgaXNzdWVzCgphZGQgYSBzZXBhcmF0ZSBwYXRjaCBmaWxlIGZvciByZS1pbmRlbnRhdGlv
+biBpbiB2aXJ0IGExNW1lbW1hcAoKdjcgLT4gdjg6Ci0gcmViYXNlIG9uIDIuMi4wIChib290LmMg
+YW5kIHZpcnQuYykKLSBpbiB2aXJ0LmMgbWFjaHZpcnRfaW5pdCwgY3JlYXRlX3BsYXRmb3JtX2J1
+cyBzaW1wbHkgaXMgYWRkZWQKICBhZnRlciB0aGUgYXJtX2xvYWRfa2VybmVsIGNhbGwgaW5zdGVh
+ZCBvZiBtb3ZpbmcgdGhpcyBsYXR0ZXIuCiAgc2hvdWxkIGVhc2UgdGhlIHJldmlldy4KLSBBZGQg
+QWxleCAmIFNoYW5ub24gUmV2aWV3ZWQtYnkKCnY2IC0+IHY3OgpUYWtlIGludG8gYWNjb3VudCBT
+aGFubm9uJ3MgY29tbWVudHM6Ci0gaHcvYXJtL3N5c2J1cy1mZHQuYzogcmV2ZXJ0IGluZGVudGF0
+aW9uIGluIGFkZF9mZHRfbm9kZV9mdW5jdGlvbnMKLSBody9hcm0vdmlydC5jOgogIC0gYWRkIGFu
+IGFkZGl0aW9uYWwgY29tbWVudCBpbiBhMTVpcnFtYXAgcmVsYXRlZCB0byBQTEFURk9STV9CVVNf
+TlVNX0lSUVMKICAtIGNvcnJlY3QgcGxhdGZvcm0gYnVzIHNpemUgdG8gMHg0MDAwMDAKICAtIHJl
+bW92ZSBQTEFURk9STV9CVVNfRklSU1RfSVJRIG1hY3JvCgp2NSAtPiB2NjoKVGFrZSBpbnRvIGFj
+Y291bnQgUGV0ZXIncyBjb21tZW50czoKLSBkdGIgb3ZlcmxvYWQgbWVjaGFuaXNtIHJld3JpdHRl
+bjogYXJtX2xvYWRfa2VybmVsIGNvZGUgaXMgbW92ZWQgaW50byBhCiAgbWFjaGluZSBpbml0IGRv
+bmUgbm90aWZpZXIgbm90aWZ5IGluc3RlYWQuIGFybV9sb2FkX2tlcm5lbCBvbmx5IHJlZ2lzdGVy
+cwogIHRoYXQgbm90aWZpZXIuIEFzIGEgY29uc2VxdWVuY2UgdGhlIGR0YiBpcyBsb2FkZWQgb25j
+ZS4KLSB2NSAxLTQgcGF0Y2ggZmlsZXMgYXJlIHJlbW92ZWQgYW5kIHJlcGxhY2VkIGJ5IGEgc2lu
+Z2xlIHBhdGNoIGZpbGUgbW92aW5nCiAgYXJtX2xvYWRfa2VybmVsIGluIHRoZSBub3RpZmllciAo
+MikuCi0gYXMgYSBjb25zZXF1ZW5jZSBhcm1fbG9hZF9rZXJuZWwgbXVzdCBiZSBjYWxsZWQgYmVm
+b3JlIHN5c2J1cy1mZHQKICBhcm1fcmVnaXN0ZXJfcGxhdGZvcm1fYnVzX2ZkdF9jcmVhdG9yLgot
+IEluIHZpcnQsIHBsYXRmb3JtX2J1c19wYXJhbXMgbm90IGEgY29uc3QgYW55bW9yZSBzaW5jZSBp
+dHMgZmllbGRzIGFyZQogIGluaXRpYWxpemVkIGZyb20gdmJpLT5tZW1tYXAgYW5kIHZiaS0+aXJx
+bWFwLiBIZW5jZSBjcmVhdGVfcGxhdGZvcm1fYnVzCiAgcHJvdG8gY2FuIGJlIHNpbXBsaWZpZWQu
+Ci0gSW4gc3lzYnVzLWZkdCBhZGRfYWxsX3BsYXRmb3JtX2J1c19mZHRfbm9kZXMgbm93IHRha2Vz
+IGEgaGFuZGxlIHRvCiAgYW4gQVJNUGxhdGZvcm1CdXNGZHRQYXJhbXMuIFRoaXMgaXMgbm90IGEg
+bW9kaWZ5X2R0YiBmdW5jdGlvbiBhbnltb3JlCiAgZmR0IHBvaW50ZXIgaXMgY2hlY2tlZCBpbiBj
+YXNlIHRoZSBjYWxsYmFjayBpcyBjYWxsZWQgYWZ0ZXIgdGhlIGxvYWRfZHRiCiAgKHRoaXMgbGF0
+dGVyIGRlYWxsb2NhdGVkIGZkdCBwb2ludGVyKS4gQ2hlY2sgb2YgZmR0X2ZpbGVuYW1lIG1vdmVk
+IGluIGhlcmUuCiAgdXBncmFkZV9kdGIgaXMgcmVtb3ZlZC4gY29weXJpZ2h0IGFsaWduZWQgYmV0
+d2VlbiAuaCBhbmQgLmMuCgp2NCAtPiB2NToKLSBpbiB2aXJ0LmM6IHBsYXRmb3JtX2J1c19wYXJh
+bXMgYmVjb21lcyBzdGF0aWMgY29uc3QKLSBzeXNidXMtZmR0OiBjaGFuZ2UgaW5kZW50YXRpb24g
+aW4gYWRkX2ZkdF9ub2RlX2Z1bmN0aW9ucyBhcnJheSBpbml0Ci0gcy9sb2FkX2R0Yi9hcm1fbG9h
+ZF9kdGIgaW4gb25lIGJvb3QuYyBjb21tZW50Cgp2MyAtPiB2NDoKLSBkeW5fc3lzYnVzX2JpbmRp
+bmcgcmVtb3ZlZCBzaW5jZSBiaW5kaW5nIHN0dWZmIG5vdyBhcmUgaW1wbGVtZW50ZWQgYnkKICB0
+aGUgcGxhdGZvcm0gYnVzIGRldmljZQotIGR1ZSB0byBhIGNoYW5nZSBpbiBBUk0gbG9hZF9kdGIg
+aW1wbGVtZW50YXRpb24gdXNpbmcgcm9tX2FkZF9ibG9iX2ZpeGVkLAogIHRoZSBkdCBubyBtb3Jl
+IGlzIGdlbmVyYXRlZCBpbiBhIHJlc2V0IG5vdGlmaWVyIGJ1dCBpcyBnZW5lcmF0ZWQgb24gYQog
+IG1hY2hpbmUgaW5pdCBkb25lIG5vdGlmaWVyCi0gdGhlIGF1Z21lbnRlZCBkZXZpY2UgdHJlZSBp
+cyBub3QgZ2VuZXJhdGVkIGZyb20gc2NyYXRjaCBhbnltb3JlIGJ1dCBpcwogIGFkZGVkIHVzaW5n
+IGEgbW9kaWZ5X2R0YiBmdW5jdGlvbi4gVGhpcyByZXF1aXJlZCBzb21lIHNtYWxsIGNoYW5nZSBp
+bgogIGJvb3QuYwotIHRoZSBjYXNlIHdoZXJlIHRoZSB1c2VyIHByb3ZpZGVzIGEgZHRiIGZpbGUg
+bm93IGlzIGhhbmRsZWQKLSBzb21lIGNsZWFudXAgaW4gdmlydCBhZGRpdGlvbnMKLSBpbXBsZW1l
+bnQgYSBsaXN0IG9mIGR5YW5taWNhbGx5IGluc3RhbnRpYWJsZSBkZXZpY2VzIGluIHN5c2J1cy1m
+ZHQKCnYyIC0+IHYzOgotIHBhdGNoIG5vdyBhcHBsaWVzIG9uIHRvcCBvZiBBbGV4IGZ1bGwgcGF0
+Y2hzZXQKLSBkeW5fc3lzYnVzX2RldnRyZWU6IGFkZCBhcm1fcHJlZml4IHRvIGVtcGhhc2l6ZSB0
+aGUgZmFjdCB0aG9zZQogIGZ1bmN0aW9ucyBhcmUgYXJtIHNwZWNpZmljOyBhcm1fc3lzYnVzX2Rl
+dmljZV9jcmVhdGVfZGV2dHJlZQogIGJlY29tZXMgc3RhdGljCi0gbG9hZF9kdGIgcmVuYW1lZCBp
+bnRvIGFybV9sb2FkX2R0YgotIGFkZCBjb3B5cmlnaHQgaW4gaHcvYXJtL2R5bl9zeXNidXNfZGV2
+dHJlZS5jCgp2MSAtPiB2MjoKLSBkZXZpY2Ugbm9kZSBnZW5lcmF0aW9uIG5vIG1vcmUgaW4gc3lz
+YnVzIGRldmljZSBidXQgaW4KICBkeW5fc3lzYnVzX2RldnRyZWUKLSBWRklPIHJlZ2lvbiBzaHJp
+bmtlZCB0byA0TUIgYW5kIHJlbG9jYXRlZCBpbiBtYWNodmlydCB0byBhdm9pZCBQQ0kKICBzaHJp
+bmsgKGR5bmFtaWMgdmZpby1tbWlvIHN1cHBvcnQgbWlnaHQgY29tZSBsYXR0ZXIpCi0gcGxhdGZv
+cm1fYnVzX2Jhc2UgcmVtb3ZlZCBmcm9tIFBsYXRmb3JtRGV2dHJlZURhdGEKCgpFcmljIEF1Z2Vy
+ICg0KToKICBody9hcm0vc3lzYnVzLWZkdDogaGVscGVycyBmb3IgcGxhdGZvcm0gYnVzIG5vZGVz
+IGFkZGl0aW9uCiAgaHcvYXJtL2Jvb3Q6IGFybV9sb2FkX2tlcm5lbCBpbXBsZW1lbnRlZCBhcyBh
+IG1hY2hpbmUgaW5pdCBkb25lCiAgICBub3RpZmllcgogIGh3L2FybS92aXJ0OiBhZGQgZHluYW1p
+YyBzeXNidXMgZGV2aWNlIHN1cHBvcnQKICBody9hcm0vdmlydDogY2hhbmdlIGluZGVudGF0aW9u
+IGluIGExNW1lbW1hcAoKIGh3L2FybS9NYWtlZmlsZS5vYmpzICAgICAgICB8ICAgMSArCiBody9h
+cm0vYm9vdC5jICAgICAgICAgICAgICAgfCAgMTQgKysrLQogaHcvYXJtL3N5c2J1cy1mZHQuYyAg
+ICAgICAgIHwgMTc0ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+CiBody9hcm0vdmlydC5jICAgICAgICAgICAgICAgfCAgODcgKysrKysrKysrKysrKysrKysrLS0t
+LQogaW5jbHVkZS9ody9hcm0vYXJtLmggICAgICAgIHwgIDI4ICsrKysrKysKIGluY2x1ZGUvaHcv
+YXJtL3N5c2J1cy1mZHQuaCB8ICA2MCArKysrKysrKysrKysrKysKIDYgZmlsZXMgY2hhbmdlZCwg
+MzQ5IGluc2VydGlvbnMoKyksIDE1IGRlbGV0aW9ucygtKQogY3JlYXRlIG1vZGUgMTAwNjQ0IGh3
+L2FybS9zeXNidXMtZmR0LmMKIGNyZWF0ZSBtb2RlIDEwMDY0NCBpbmNsdWRlL2h3L2FybS9zeXNi
+dXMtZmR0LmgKCi0tIAoxLjguMy4yCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
+YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
+cm0K
