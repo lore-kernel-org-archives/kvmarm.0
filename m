@@ -1,25 +1,26 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v16 3/9] hw/vfio/platform: calxeda xgmac device
-Date: Wed, 27 May 2015 10:11:05 +0100
-Message-ID: <1432717871-2393-4-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v16 5/9] kvm: rename kvm_irqchip_[add,
+ remove]_irqfd_notifier with gsi suffix
+Date: Wed, 27 May 2015 10:11:07 +0100
+Message-ID: <1432717871-2393-6-git-send-email-eric.auger@linaro.org>
 References: <1432717871-2393-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B58E2521C1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2015 05:01:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3406D521CB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2015 05:01:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id doI9G5QFCmjv for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 May 2015 05:01:48 -0400 (EDT)
-Received: from mail-wi0-f182.google.com (mail-wi0-f182.google.com
- [209.85.212.182])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B8235521AB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2015 05:01:48 -0400 (EDT)
-Received: by wizo1 with SMTP id o1so13992910wiz.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2015 02:11:30 -0700 (PDT)
+ with ESMTP id ZMtQsM9PxkZC for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 27 May 2015 05:01:53 -0400 (EDT)
+Received: from mail-wi0-f171.google.com (mail-wi0-f171.google.com
+ [209.85.212.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0AE78521D4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2015 05:01:50 -0400 (EDT)
+Received: by wicmx19 with SMTP id mx19so103882925wic.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 27 May 2015 02:11:32 -0700 (PDT)
 In-Reply-To: <1432717871-2393-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,88 +35,160 @@ To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, alex.willia
 Cc: patches@linaro.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhlIHBsYXRmb3JtIGRldmljZSBjbGFzcyBoYXMgYmVjb21lIGFic3RyYWN0LiBUaGlzIHBhdGNo
-IGludHJvZHVjZXMKYSBjYWx4ZWRhIHhnbWFjIGRldmljZSB0aGF0IGRlcml2ZXMgZnJvbSBpdC4K
-ClNpZ25lZC1vZmYtYnk6IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAbGluYXJvLm9yZz4KUmV2aWV3
-ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KCi0tLQp2MTUgLT4g
-djE2OgotIGFkZGVkIFZpa3JhbSdzIFQtYgoKdjEwIC0+IHYxMToKLSBhZGQgQWxleCBSZXZpZXdl
-ZC1ieQotIG1vdmUgdmlydCBtb2RpZmljYXRpb25zIGluIGEgc2VwYXJhdGUgcGF0Y2gKCnY4IC0+
-IHY5OgotIHJlbmFtZWQgY2FseGVkYV94Z21hYy5jIGludG8gY2FseGVkYS14Z21hYy5jCgp2NyAt
-PiB2ODoKLSBhZGQgYSBjb21tZW50IGluIHRoZSBoZWFkZXIgYWJvdXQgdGhlIE1NSU8gcmVnaW9u
-cyBhbmQgSVJRIHdoaWNoCiAgYXJlIGV4cG9zZWQgYnkgdGhlIGRldmljZQoKdjUgLT4gdjYKLSBi
-YWNrIGFnYWluIGZvbGxvd2luZyBBbGV4IEdyYWYgYWR2aXNlcwotIGZpeCBhIGJ1ZyByZWxhdGVk
-IHRvIGNvbXBhdCBvdmVycmlkZQoKdjQgLT4gdjU6CnJlbW92ZWQgc2luY2UgZGV2aWNlIHRyZWUg
-d2FzIG1vdmVkIHRvIGh3L2FybS9keW5fc3lzYnVzX2RldnRyZWUuYwoKdjQ6IGNyZWF0aW9uIGZv
-ciBkZXZpY2UgdHJlZSBzcGVjaWFsaXphdGlvbgotLS0KIGh3L3ZmaW8vTWFrZWZpbGUub2JqcyAg
-ICAgICAgICAgICAgICB8ICAxICsKIGh3L3ZmaW8vY2FseGVkYS14Z21hYy5jICAgICAgICAgICAg
-ICB8IDU0ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwogaW5jbHVkZS9ody92
-ZmlvL3ZmaW8tY2FseGVkYS14Z21hYy5oIHwgNDYgKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrCiAzIGZpbGVzIGNoYW5nZWQsIDEwMSBpbnNlcnRpb25zKCspCiBjcmVhdGUgbW9kZSAxMDA2
-NDQgaHcvdmZpby9jYWx4ZWRhLXhnbWFjLmMKIGNyZWF0ZSBtb2RlIDEwMDY0NCBpbmNsdWRlL2h3
-L3ZmaW8vdmZpby1jYWx4ZWRhLXhnbWFjLmgKCmRpZmYgLS1naXQgYS9ody92ZmlvL01ha2VmaWxl
-Lm9ianMgYi9ody92ZmlvL01ha2VmaWxlLm9ianMKaW5kZXggYzVjNzZmZS4uZDU0MGM5ZCAxMDA2
-NDQKLS0tIGEvaHcvdmZpby9NYWtlZmlsZS5vYmpzCisrKyBiL2h3L3ZmaW8vTWFrZWZpbGUub2Jq
-cwpAQCAtMiw0ICsyLDUgQEAgaWZlcSAoJChDT05GSUdfTElOVVgpLCB5KQogb2JqLSQoQ09ORklH
-X1NPRlRNTVUpICs9IGNvbW1vbi5vCiBvYmotJChDT05GSUdfUENJKSArPSBwY2kubwogb2JqLSQo
-Q09ORklHX1NPRlRNTVUpICs9IHBsYXRmb3JtLm8KK29iai0kKENPTkZJR19TT0ZUTU1VKSArPSBj
-YWx4ZWRhLXhnbWFjLm8KIGVuZGlmCmRpZmYgLS1naXQgYS9ody92ZmlvL2NhbHhlZGEteGdtYWMu
-YyBiL2h3L3ZmaW8vY2FseGVkYS14Z21hYy5jCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CmluZGV4IDAw
-MDAwMDAuLmM0YjhmZWYKLS0tIC9kZXYvbnVsbAorKysgYi9ody92ZmlvL2NhbHhlZGEteGdtYWMu
-YwpAQCAtMCwwICsxLDU0IEBACisvKgorICogY2FseGVkYSB4Z21hYyBWRklPIGRldmljZQorICoK
-KyAqIENvcHlyaWdodCBMaW5hcm8gTGltaXRlZCwgMjAxNAorICoKKyAqIEF1dGhvcnM6CisgKiAg
-RXJpYyBBdWdlciA8ZXJpYy5hdWdlckBsaW5hcm8ub3JnPgorICoKKyAqIFRoaXMgd29yayBpcyBs
-aWNlbnNlZCB1bmRlciB0aGUgdGVybXMgb2YgdGhlIEdOVSBHUEwsIHZlcnNpb24gMi4gIFNlZQor
-ICogdGhlIENPUFlJTkcgZmlsZSBpbiB0aGUgdG9wLWxldmVsIGRpcmVjdG9yeS4KKyAqCisgKi8K
-KworI2luY2x1ZGUgImh3L3ZmaW8vdmZpby1jYWx4ZWRhLXhnbWFjLmgiCisKK3N0YXRpYyB2b2lk
-IGNhbHhlZGFfeGdtYWNfcmVhbGl6ZShEZXZpY2VTdGF0ZSAqZGV2LCBFcnJvciAqKmVycnApCit7
-CisgICAgVkZJT1BsYXRmb3JtRGV2aWNlICp2ZGV2ID0gVkZJT19QTEFURk9STV9ERVZJQ0UoZGV2
-KTsKKyAgICBWRklPQ2FseGVkYVhnbWFjRGV2aWNlQ2xhc3MgKmsgPSBWRklPX0NBTFhFREFfWEdN
-QUNfREVWSUNFX0dFVF9DTEFTUyhkZXYpOworCisgICAgdmRldi0+Y29tcGF0ID0gZ19zdHJkdXAo
-ImNhbHhlZGEsaGIteGdtYWMiKTsKKworICAgIGstPnBhcmVudF9yZWFsaXplKGRldiwgZXJycCk7
-Cit9CisKK3N0YXRpYyBjb25zdCBWTVN0YXRlRGVzY3JpcHRpb24gdmZpb19wbGF0Zm9ybV92bXN0
-YXRlID0geworICAgIC5uYW1lID0gVFlQRV9WRklPX0NBTFhFREFfWEdNQUMsCisgICAgLnVubWln
-cmF0YWJsZSA9IDEsCit9OworCitzdGF0aWMgdm9pZCB2ZmlvX2NhbHhlZGFfeGdtYWNfY2xhc3Nf
-aW5pdChPYmplY3RDbGFzcyAqa2xhc3MsIHZvaWQgKmRhdGEpCit7CisgICAgRGV2aWNlQ2xhc3Mg
-KmRjID0gREVWSUNFX0NMQVNTKGtsYXNzKTsKKyAgICBWRklPQ2FseGVkYVhnbWFjRGV2aWNlQ2xh
-c3MgKnZjeGMgPQorICAgICAgICBWRklPX0NBTFhFREFfWEdNQUNfREVWSUNFX0NMQVNTKGtsYXNz
-KTsKKyAgICB2Y3hjLT5wYXJlbnRfcmVhbGl6ZSA9IGRjLT5yZWFsaXplOworICAgIGRjLT5yZWFs
-aXplID0gY2FseGVkYV94Z21hY19yZWFsaXplOworICAgIGRjLT5kZXNjID0gIlZGSU8gQ2FseGVk
-YSBYR01BQyI7Cit9CisKK3N0YXRpYyBjb25zdCBUeXBlSW5mbyB2ZmlvX2NhbHhlZGFfeGdtYWNf
-ZGV2X2luZm8gPSB7CisgICAgLm5hbWUgPSBUWVBFX1ZGSU9fQ0FMWEVEQV9YR01BQywKKyAgICAu
-cGFyZW50ID0gVFlQRV9WRklPX1BMQVRGT1JNLAorICAgIC5pbnN0YW5jZV9zaXplID0gc2l6ZW9m
-KFZGSU9DYWx4ZWRhWGdtYWNEZXZpY2UpLAorICAgIC5jbGFzc19pbml0ID0gdmZpb19jYWx4ZWRh
-X3hnbWFjX2NsYXNzX2luaXQsCisgICAgLmNsYXNzX3NpemUgPSBzaXplb2YoVkZJT0NhbHhlZGFY
-Z21hY0RldmljZUNsYXNzKSwKK307CisKK3N0YXRpYyB2b2lkIHJlZ2lzdGVyX2NhbHhlZGFfeGdt
-YWNfZGV2X3R5cGUodm9pZCkKK3sKKyAgICB0eXBlX3JlZ2lzdGVyX3N0YXRpYygmdmZpb19jYWx4
-ZWRhX3hnbWFjX2Rldl9pbmZvKTsKK30KKwordHlwZV9pbml0KHJlZ2lzdGVyX2NhbHhlZGFfeGdt
-YWNfZGV2X3R5cGUpCmRpZmYgLS1naXQgYS9pbmNsdWRlL2h3L3ZmaW8vdmZpby1jYWx4ZWRhLXhn
-bWFjLmggYi9pbmNsdWRlL2h3L3ZmaW8vdmZpby1jYWx4ZWRhLXhnbWFjLmgKbmV3IGZpbGUgbW9k
-ZSAxMDA2NDQKaW5kZXggMDAwMDAwMC4uZjk5NDc3NQotLS0gL2Rldi9udWxsCisrKyBiL2luY2x1
-ZGUvaHcvdmZpby92ZmlvLWNhbHhlZGEteGdtYWMuaApAQCAtMCwwICsxLDQ2IEBACisvKgorICog
-VkZJTyBjYWx4ZWRhIHhnbWFjIGRldmljZQorICoKKyAqIENvcHlyaWdodCBMaW5hcm8gTGltaXRl
-ZCwgMjAxNAorICoKKyAqIEF1dGhvcnM6CisgKiAgRXJpYyBBdWdlciA8ZXJpYy5hdWdlckBsaW5h
-cm8ub3JnPgorICoKKyAqIFRoaXMgd29yayBpcyBsaWNlbnNlZCB1bmRlciB0aGUgdGVybXMgb2Yg
-dGhlIEdOVSBHUEwsIHZlcnNpb24gMi4gIFNlZQorICogdGhlIENPUFlJTkcgZmlsZSBpbiB0aGUg
-dG9wLWxldmVsIGRpcmVjdG9yeS4KKyAqCisgKi8KKworI2lmbmRlZiBIV19WRklPX1ZGSU9fQ0FM
-WEVEQV9YR01BQ19ICisjZGVmaW5lIEhXX1ZGSU9fVkZJT19DQUxYRURBX1hHTUFDX0gKKworI2lu
-Y2x1ZGUgImh3L3ZmaW8vdmZpby1wbGF0Zm9ybS5oIgorCisjZGVmaW5lIFRZUEVfVkZJT19DQUxY
-RURBX1hHTUFDICJ2ZmlvLWNhbHhlZGEteGdtYWMiCisKKy8qKgorICogVGhpcyBkZXZpY2UgZXhw
-b3NlczoKKyAqIC0gYSBzaW5nbGUgTU1JTyByZWdpb24gY29ycmVzcG9uZGluZyB0byBpdHMgcmVn
-aXN0ZXIgc3BhY2UKKyAqIC0gMyBJUlFTIChtYWluIGFuZCAyIHBvd2VyIHJlbGF0ZWQgSVJRcykK
-KyAqLwordHlwZWRlZiBzdHJ1Y3QgVkZJT0NhbHhlZGFYZ21hY0RldmljZSB7CisgICAgVkZJT1Bs
-YXRmb3JtRGV2aWNlIHZkZXY7Cit9IFZGSU9DYWx4ZWRhWGdtYWNEZXZpY2U7CisKK3R5cGVkZWYg
-c3RydWN0IFZGSU9DYWx4ZWRhWGdtYWNEZXZpY2VDbGFzcyB7CisgICAgLyo8IHByaXZhdGUgPiov
-CisgICAgVkZJT1BsYXRmb3JtRGV2aWNlQ2xhc3MgcGFyZW50X2NsYXNzOworICAgIC8qPCBwdWJs
-aWMgPiovCisgICAgRGV2aWNlUmVhbGl6ZSBwYXJlbnRfcmVhbGl6ZTsKK30gVkZJT0NhbHhlZGFY
-Z21hY0RldmljZUNsYXNzOworCisjZGVmaW5lIFZGSU9fQ0FMWEVEQV9YR01BQ19ERVZJQ0Uob2Jq
-KSBcCisgICAgIE9CSkVDVF9DSEVDSyhWRklPQ2FseGVkYVhnbWFjRGV2aWNlLCAob2JqKSwgVFlQ
-RV9WRklPX0NBTFhFREFfWEdNQUMpCisjZGVmaW5lIFZGSU9fQ0FMWEVEQV9YR01BQ19ERVZJQ0Vf
-Q0xBU1Moa2xhc3MpIFwKKyAgICAgT0JKRUNUX0NMQVNTX0NIRUNLKFZGSU9DYWx4ZWRhWGdtYWNE
-ZXZpY2VDbGFzcywgKGtsYXNzKSwgXAorICAgICAgICAgICAgICAgICAgICAgICAgVFlQRV9WRklP
-X0NBTFhFREFfWEdNQUMpCisjZGVmaW5lIFZGSU9fQ0FMWEVEQV9YR01BQ19ERVZJQ0VfR0VUX0NM
-QVNTKG9iaikgXAorICAgICBPQkpFQ1RfR0VUX0NMQVNTKFZGSU9DYWx4ZWRhWGdtYWNEZXZpY2VD
-bGFzcywgKG9iaiksIFwKKyAgICAgICAgICAgICAgICAgICAgICBUWVBFX1ZGSU9fQ0FMWEVEQV9Y
-R01BQykKKworI2VuZGlmCi0tIAoxLjguMy4yCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5j
-b2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5m
-by9rdm1hcm0K
+Anticipating for the introduction of new add/remove functions taking
+a qemu_irq parameter, let's rename existing ones with a gsi suffix.
+
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
+Tested-by: Vikram Sethi <vikrams@codeaurora.org>
+
+---
+
+v15 -> v16:
+- added Vikram's T-b
+- resolve rebase conflict in kvm.h
+---
+ hw/s390x/virtio-ccw.c  | 8 ++++----
+ hw/vfio/pci.c          | 6 +++---
+ hw/virtio/virtio-pci.c | 4 ++--
+ include/sysemu/kvm.h   | 7 ++++---
+ kvm-all.c              | 7 ++++---
+ kvm-stub.c             | 7 ++++---
+ 6 files changed, 21 insertions(+), 18 deletions(-)
+
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index c96101a..17707c7 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -1216,8 +1216,8 @@ static int virtio_ccw_add_irqfd(VirtioCcwDevice *dev, int n)
+     VirtQueue *vq = virtio_get_queue(vdev, n);
+     EventNotifier *notifier = virtio_queue_get_guest_notifier(vq);
+ 
+-    return kvm_irqchip_add_irqfd_notifier(kvm_state, notifier, NULL,
+-                                          dev->routes.gsi[n]);
++    return kvm_irqchip_add_irqfd_notifier_gsi(kvm_state, notifier, NULL,
++                                              dev->routes.gsi[n]);
+ }
+ 
+ static void virtio_ccw_remove_irqfd(VirtioCcwDevice *dev, int n)
+@@ -1227,8 +1227,8 @@ static void virtio_ccw_remove_irqfd(VirtioCcwDevice *dev, int n)
+     EventNotifier *notifier = virtio_queue_get_guest_notifier(vq);
+     int ret;
+ 
+-    ret = kvm_irqchip_remove_irqfd_notifier(kvm_state, notifier,
+-                                            dev->routes.gsi[n]);
++    ret = kvm_irqchip_remove_irqfd_notifier_gsi(kvm_state, notifier,
++                                                dev->routes.gsi[n]);
+     assert(ret == 0);
+ }
+ 
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index e0e339a..ac85624 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -597,7 +597,7 @@ static void vfio_add_kvm_msi_virq(VFIOMSIVector *vector, MSIMessage *msg,
+         return;
+     }
+ 
+-    if (kvm_irqchip_add_irqfd_notifier(kvm_state, &vector->kvm_interrupt,
++    if (kvm_irqchip_add_irqfd_notifier_gsi(kvm_state, &vector->kvm_interrupt,
+                                        NULL, virq) < 0) {
+         kvm_irqchip_release_virq(kvm_state, virq);
+         event_notifier_cleanup(&vector->kvm_interrupt);
+@@ -609,8 +609,8 @@ static void vfio_add_kvm_msi_virq(VFIOMSIVector *vector, MSIMessage *msg,
+ 
+ static void vfio_remove_kvm_msi_virq(VFIOMSIVector *vector)
+ {
+-    kvm_irqchip_remove_irqfd_notifier(kvm_state, &vector->kvm_interrupt,
+-                                      vector->virq);
++    kvm_irqchip_remove_irqfd_notifier_gsi(kvm_state, &vector->kvm_interrupt,
++                                          vector->virq);
+     kvm_irqchip_release_virq(kvm_state, vector->virq);
+     vector->virq = -1;
+     event_notifier_cleanup(&vector->kvm_interrupt);
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 867c9d1..21871e6 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -477,7 +477,7 @@ static int kvm_virtio_pci_irqfd_use(VirtIOPCIProxy *proxy,
+     VirtQueue *vq = virtio_get_queue(vdev, queue_no);
+     EventNotifier *n = virtio_queue_get_guest_notifier(vq);
+     int ret;
+-    ret = kvm_irqchip_add_irqfd_notifier(kvm_state, n, NULL, irqfd->virq);
++    ret = kvm_irqchip_add_irqfd_notifier_gsi(kvm_state, n, NULL, irqfd->virq);
+     return ret;
+ }
+ 
+@@ -491,7 +491,7 @@ static void kvm_virtio_pci_irqfd_release(VirtIOPCIProxy *proxy,
+     VirtIOIRQFD *irqfd = &proxy->vector_irqfd[vector];
+     int ret;
+ 
+-    ret = kvm_irqchip_remove_irqfd_notifier(kvm_state, n, irqfd->virq);
++    ret = kvm_irqchip_remove_irqfd_notifier_gsi(kvm_state, n, irqfd->virq);
+     assert(ret == 0);
+ }
+ 
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 4878959..d0aa224 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -414,9 +414,10 @@ void kvm_irqchip_release_virq(KVMState *s, int virq);
+ 
+ int kvm_irqchip_add_adapter_route(KVMState *s, AdapterInfo *adapter);
+ 
+-int kvm_irqchip_add_irqfd_notifier(KVMState *s, EventNotifier *n,
+-                                   EventNotifier *rn, int virq);
+-int kvm_irqchip_remove_irqfd_notifier(KVMState *s, EventNotifier *n, int virq);
++int kvm_irqchip_add_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
++                                       EventNotifier *rn, int virq);
++int kvm_irqchip_remove_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
++                                          int virq);
+ void kvm_pc_gsi_handler(void *opaque, int n, int level);
+ void kvm_pc_setup_irq_routing(bool pci_enabled);
+ void kvm_init_irq_routing(KVMState *s);
+diff --git a/kvm-all.c b/kvm-all.c
+index 17a3771..2d58eb8 100644
+--- a/kvm-all.c
++++ b/kvm-all.c
+@@ -1368,14 +1368,15 @@ int kvm_irqchip_update_msi_route(KVMState *s, int virq, MSIMessage msg)
+ }
+ #endif /* !KVM_CAP_IRQ_ROUTING */
+ 
+-int kvm_irqchip_add_irqfd_notifier(KVMState *s, EventNotifier *n,
+-                                   EventNotifier *rn, int virq)
++int kvm_irqchip_add_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
++                                       EventNotifier *rn, int virq)
+ {
+     return kvm_irqchip_assign_irqfd(s, event_notifier_get_fd(n),
+            rn ? event_notifier_get_fd(rn) : -1, virq, true);
+ }
+ 
+-int kvm_irqchip_remove_irqfd_notifier(KVMState *s, EventNotifier *n, int virq)
++int kvm_irqchip_remove_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
++                                          int virq)
+ {
+     return kvm_irqchip_assign_irqfd(s, event_notifier_get_fd(n), -1, virq,
+            false);
+diff --git a/kvm-stub.c b/kvm-stub.c
+index 7ba90c5..977de21 100644
+--- a/kvm-stub.c
++++ b/kvm-stub.c
+@@ -137,13 +137,14 @@ int kvm_irqchip_add_adapter_route(KVMState *s, AdapterInfo *adapter)
+     return -ENOSYS;
+ }
+ 
+-int kvm_irqchip_add_irqfd_notifier(KVMState *s, EventNotifier *n,
+-                                   EventNotifier *rn, int virq)
++int kvm_irqchip_add_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
++                                       EventNotifier *rn, int virq)
+ {
+     return -ENOSYS;
+ }
+ 
+-int kvm_irqchip_remove_irqfd_notifier(KVMState *s, EventNotifier *n, int virq)
++int kvm_irqchip_remove_irqfd_notifier_gsi(KVMState *s, EventNotifier *n,
++                                          int virq)
+ {
+     return -ENOSYS;
+ }
+-- 
+1.8.3.2
