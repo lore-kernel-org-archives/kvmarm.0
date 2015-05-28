@@ -1,121 +1,51 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 4/5] arm64: alternative: Introduce feature for GICv3
- CPU interface
-Date: Thu, 28 May 2015 10:27:14 +0100
-Message-ID: <5566DF72.4050507@arm.com>
-References: <1427461765-14462-1-git-send-email-marc.zyngier@arm.com>
- <1427461765-14462-5-git-send-email-marc.zyngier@arm.com>
- <20150514112523.GQ32765@cbox>
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH] KVM: arm64: fix misleading comments in save/restore
+Date: Thu, 28 May 2015 10:43:06 +0100
+Message-ID: <1432806186-27993-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9EC91522C5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 May 2015 05:17:35 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6BlrSTGQY2o4 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 May 2015 05:17:34 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 30119522C2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 May 2015 05:17:33 -0400 (EDT)
-In-Reply-To: <20150514112523.GQ32765@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: "Jon Medhurst (Tixy)" <tixy@linaro.org>, Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, Dave P Martin <Dave.Martin@arm.com>, Andre Przywara <Andre.Przywara@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: marc.zyngier@arm.com
+Cc: christoffer.dall@linaro.org, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Gleb Natapov <gleb@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 14/05/15 12:25, Christoffer Dall wrote:
-> On Fri, Mar 27, 2015 at 01:09:24PM +0000, Marc Zyngier wrote:
->> Add a new item to the feature set (ARM64_HAS_SYSREG_GIC_CPUIF)
->> to indicate that we have a system register GIC CPU interface
->>
->> This will help KVM switching to alternative instruction patching.
->>
->> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
->> Acked-by: Will Deacon <will.deacon@arm.com>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm64/include/asm/cpufeature.h |  8 +++++++-
->>  arch/arm64/kernel/cpufeature.c      | 16 ++++++++++++++++
->>  2 files changed, 23 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
->> index 6ae35d1..d9e57b5 100644
->> --- a/arch/arm64/include/asm/cpufeature.h
->> +++ b/arch/arm64/include/asm/cpufeature.h
->> @@ -23,8 +23,9 @@
->>  
->>  #define ARM64_WORKAROUND_CLEAN_CACHE		0
->>  #define ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE	1
->> +#define ARM64_HAS_SYSREG_GIC_CPUIF		2
->>  
->> -#define ARM64_NCAPS				2
->> +#define ARM64_NCAPS				3
->>  
->>  #ifndef __ASSEMBLY__
->>  
->> @@ -37,6 +38,11 @@ struct arm64_cpu_capabilities {
->>  			u32 midr_model;
->>  			u32 midr_range_min, midr_range_max;
->>  		};
->> +
->> +		struct {	/* Feature register checking */
->> +			u64 register_mask;
->> +			u64 register_value;
->> +		};
->>  	};
->>  };
->>  
->> diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
->> index 3d9967e..b0bea2b3 100644
->> --- a/arch/arm64/kernel/cpufeature.c
->> +++ b/arch/arm64/kernel/cpufeature.c
->> @@ -22,7 +22,23 @@
->>  #include <asm/cpu.h>
->>  #include <asm/cpufeature.h>
->>  
->> +static bool
->> +has_id_aa64pfr0_feature(const struct arm64_cpu_capabilities *entry)
->> +{
->> +	u64 val;
->> +
->> +	val = read_cpuid(id_aa64pfr0_el1);
-> 
-> is this preferred compared to fishing it out of cpuinfo ?
+The elr_el2 and spsr_el2 registers in fact contain the processor state
+before entry into the hypervisor code. In the case of guest state it
+could be in either el0 or el1.
 
-Probably for the moment, yes. At some point, we should be able to have a
-consolidated set of features, consistent across all CPUs in the system.
-Once we have that, we should revisit this detection mecanism.
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+---
+ arch/arm64/kvm/hyp.S | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
->> +	return (val & entry->register_mask) == entry->register_value;
->> +}
->> +
->>  static const struct arm64_cpu_capabilities arm64_features[] = {
->> +	{
->> +		.desc = "system register GIC CPU interface",
->> +		.capability = ARM64_HAS_SYSREG_GIC_CPUIF,
->> +		.matches = has_id_aa64pfr0_feature,
->> +		.register_mask = (0xf << 24),
->> +		.register_value = (1 << 24),
-> 
-> I don't know if it's worth defining these masks in some header file.
-> The only other place I could see them used was in head.S.
+diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+index d755922..1940a4c 100644
+--- a/arch/arm64/kvm/hyp.S
++++ b/arch/arm64/kvm/hyp.S
+@@ -50,8 +50,8 @@
+ 	stp	x29, lr, [x3, #80]
+=20
+ 	mrs	x19, sp_el0
+-	mrs	x20, elr_el2		// EL1 PC
+-	mrs	x21, spsr_el2		// EL1 pstate
++	mrs	x20, elr_el2		// PC before hyp entry
++	mrs	x21, spsr_el2		// pstate before hyp entry
+=20
+ 	stp	x19, x20, [x3, #96]
+ 	str	x21, [x3, #112]
+@@ -82,8 +82,8 @@
+ 	ldr	x21, [x3, #16]
+=20
+ 	msr	sp_el0, x19
+-	msr	elr_el2, x20 				// EL1 PC
+-	msr	spsr_el2, x21 				// EL1 pstate
++	msr	elr_el2, x20 		// PC to restore
++	msr	spsr_el2, x21 		// pstate to restore
+=20
+ 	add	x3, x2, #CPU_XREG_OFFSET(19)
+ 	ldp	x19, x20, [x3]
+--=20
+2.4.1
 
-Mark was looking at this a while ago. Maybe a task for a sleepless
-night? ;-)
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
