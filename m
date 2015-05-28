@@ -1,55 +1,34 @@
 From: Wei Huang <wei@redhat.com>
-Subject: [PATCH V1 4/5] kvm: arm64: Implement ACPI probing code for GICv2
-Date: Thu, 28 May 2015 01:34:33 -0400
-Message-ID: <1432791274-15242-5-git-send-email-wei@redhat.com>
+Subject: [PATCH V1 5/5] kvm: arm64: Implement ACPI probing code for GICv3
+Date: Thu, 28 May 2015 01:34:34 -0400
+Message-ID: <1432791274-15242-6-git-send-email-wei@redhat.com>
 References: <1432791274-15242-1-git-send-email-wei@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87398521D0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 May 2015 01:24:56 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4Cnw1J-n7Bk3 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 May 2015 01:24:55 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AAD2252294
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 May 2015 01:24:55 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1432791274-15242-1-git-send-email-wei@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, hanjun.guo@linaro.org, a.spyridakis@virtualopensystems.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patches enables ACPI support for KVM virtual GICv2. KVM parses
+This patches enables ACPI support for KVM virtual GICv3. KVM parses
 ACPI table for virt GIC related information and initializes resources.
 
-Signed-off-by: Alexander Spyridaki <a.spyridakis@virtualopensystems.com>
 Signed-off-by: Wei Huang <wei@redhat.com>
 ---
- virt/kvm/arm/vgic-v2.c | 49 ++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 48 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic-v3.c | 40 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 39 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
-index 711de82..01ce8a3 100644
---- a/virt/kvm/arm/vgic-v2.c
-+++ b/virt/kvm/arm/vgic-v2.c
-@@ -264,6 +264,53 @@ int vgic_v2_acpi_probe(struct acpi_madt_generic_interrupt *vgic_acpi,
+diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
+index 99d0f9f..2e4df78 100644
+--- a/virt/kvm/arm/vgic-v3.c
++++ b/virt/kvm/arm/vgic-v3.c
+@@ -292,6 +292,44 @@ int vgic_v3_acpi_probe(struct acpi_madt_generic_interrupt *vgic_acpi,
  		       const struct vgic_ops **ops,
  		       const struct vgic_params **params)
  {
 -	return -EINVAL;
-+	struct vgic_params *vgic = &vgic_v2_params;
-+	int irq_mode, ret;
++	int ret = 0;
++	struct vgic_params *vgic = &vgic_v3_params;
++	int irq_mode;
 +
 +	/* IRQ trigger mode */
 +	irq_mode = (vgic_acpi->flags & ACPI_MADT_VGIC_IRQ_MODE) ?
@@ -62,41 +41,32 @@ index 711de82..01ce8a3 100644
 +		goto out;
 +	}
 +
-+	/* GICH resource */
-+	vgic->vctrl_base = ioremap(vgic_acpi->gich_base_address, SZ_8K);
-+	if (!vgic->vctrl_base) {
-+		kvm_err("cannot ioremap GICH memory\n");
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+
-+	vgic->nr_lr = readl_relaxed(vgic->vctrl_base + GICH_VTR);
-+	vgic->nr_lr = (vgic->nr_lr & 0x3f) + 1;
-+
-+	ret = create_hyp_io_mappings(vgic->vctrl_base,
-+				     vgic->vctrl_base + SZ_8K,
-+				     vgic_acpi->gich_base_address);
-+	if (ret) {
-+		kvm_err("Cannot map GICH into hyp\n");
-+		goto out;
-+	}
++	ich_vtr_el2 = kvm_call_hyp(__vgic_v3_get_ich_vtr_el2);
++	vgic->nr_lr = (ich_vtr_el2 & 0xf) + 1;
++	vgic->can_emulate_gicv2 = false;
 +
 +	vgic->vcpu_base = vgic_acpi->gicv_base_address;
-+	vgic->can_emulate_gicv2 = true;
-+	kvm_register_device_ops(&kvm_arm_vgic_v2_ops, KVM_DEV_TYPE_ARM_VGIC_V2);
 +
-+	kvm_info("GICH base=0x%llx, GICV base=0x%llx, IRQ=%d\n",
-+		 (unsigned long long)vgic_acpi->gich_base_address,
-+		 (unsigned long long)vgic_acpi->gicv_base_address,
-+		 vgic->maint_irq);
++	if (vgic->vcpu_base == 0)
++		kvm_info("disabling GICv2 emulation\n");
++	else {
++		vgic->can_emulate_gicv2 = true;
++		kvm_register_device_ops(&kvm_arm_vgic_v2_ops,
++					KVM_DEV_TYPE_ARM_VGIC_V2);
++	}
 +
-+	vgic->type = VGIC_V2;
-+	*ops = &vgic_v2_ops;
++	kvm_register_device_ops(&kvm_arm_vgic_v3_ops, KVM_DEV_TYPE_ARM_VGIC_V3);
++
++	vgic->vctrl_base = NULL;
++	vgic->type = VGIC_V3;
++	vgic->max_gic_vcpus = KVM_MAX_VCPUS;
++
++	*ops = &vgic_v3_ops;
 +	*params = vgic;
-+
 +out:
 +	return ret;
  }
  #endif /* CONFIG_ACPI */
 -- 
 1.8.3.1
+
