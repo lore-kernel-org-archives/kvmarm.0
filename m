@@ -1,7 +1,7 @@
 From: Wei Huang <wei@redhat.com>
-Subject: [PATCH V1 2/5] kvm: arm64: Dispatch virt GIC probing to device tree and ACPI
-Date: Thu, 28 May 2015 01:34:31 -0400
-Message-ID: <1432791274-15242-3-git-send-email-wei@redhat.com>
+Subject: [PATCH V1 3/5] kvm: arm64: Detect GIC version for proper ACPI vGIC probing
+Date: Thu, 28 May 2015 01:34:32 -0400
+Message-ID: <1432791274-15242-4-git-send-email-wei@redhat.com>
 References: <1432791274-15242-1-git-send-email-wei@redhat.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1432791274-15242-1-git-send-email-wei@redhat.com>
@@ -9,176 +9,242 @@ Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, hanjun.guo@linaro.org, a.spyridakis@virtualopensystems.com, wei@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch creates a dispatch function to support virt GIC probing
-in both device tree (DT) and ACPI environment. kvm_vgic_hyp_init()
-will probe DT first. If failed, it will try ACPI.
+There are two GICs (GICv2 and GICv3) supported by KVM. So it is necessary
+to find out GIC version before calling ACPI probing functions defined
+in vgic-v2.c and vgic-v3.c.
 
+This patch detects GIC version by checking gic_version field of GIC
+distributor, which was defined  since ACPI 6.0. In case of ACPI 5.1,
+we use manual hardware discovery to find out GIC version.
+
+NOTE: This patch is based on a recent patch by Hanjun Guo.
+
+Signed-off-by: Hanjun Guo <hanjun.guo@linaro.org>
 Signed-off-by: Wei Huang <wei@redhat.com>
 ---
- include/kvm/arm_vgic.h | 18 +++++++++---------
- virt/kvm/arm/vgic-v2.c |  8 ++++----
- virt/kvm/arm/vgic-v3.c |  8 ++++----
- virt/kvm/arm/vgic.c    | 42 +++++++++++++++++++++++++++++++-----------
- 4 files changed, 48 insertions(+), 28 deletions(-)
+ include/kvm/arm_vgic.h |  18 +++++++++
+ virt/kvm/arm/vgic-v2.c |  10 +++++
+ virt/kvm/arm/vgic-v3.c |  10 +++++
+ virt/kvm/arm/vgic.c    | 100 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 4 files changed, 137 insertions(+), 1 deletion(-)
 
 diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 133ea00..3ee732a 100644
+index 3ee732a..7a44b08 100644
 --- a/include/kvm/arm_vgic.h
 +++ b/include/kvm/arm_vgic.h
-@@ -332,17 +332,17 @@ int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
- #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
- #define vgic_ready(k)		((k)->arch.vgic.ready)
+@@ -24,6 +24,7 @@
+ #include <linux/irqreturn.h>
+ #include <linux/spinlock.h>
+ #include <linux/types.h>
++#include <linux/acpi.h>
+ #include <kvm/iodev.h>
  
--int vgic_v2_probe(struct device_node *vgic_node,
--		  const struct vgic_ops **ops,
--		  const struct vgic_params **params);
-+int vgic_v2_dt_probe(struct device_node *vgic_node,
-+		     const struct vgic_ops **ops,
-+		     const struct vgic_params **params);
+ #define VGIC_NR_IRQS_LEGACY	256
+@@ -335,10 +336,18 @@ int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
+ int vgic_v2_dt_probe(struct device_node *vgic_node,
+ 		     const struct vgic_ops **ops,
+ 		     const struct vgic_params **params);
++#ifdef CONFIG_ACPI
++int vgic_v2_acpi_probe(struct acpi_madt_generic_interrupt *,
++		       const struct vgic_ops **ops,
++		       const struct vgic_params **params);
++#endif /* CONFIG_ACPI */
  #ifdef CONFIG_ARM_GIC_V3
--int vgic_v3_probe(struct device_node *vgic_node,
--		  const struct vgic_ops **ops,
--		  const struct vgic_params **params);
-+int vgic_v3_dt_probe(struct device_node *vgic_node,
-+		     const struct vgic_ops **ops,
-+		     const struct vgic_params **params);
+ int vgic_v3_dt_probe(struct device_node *vgic_node,
+ 		     const struct vgic_ops **ops,
+ 		     const struct vgic_params **params);
++int vgic_v3_acpi_probe(struct acpi_madt_generic_interrupt *,
++		       const struct vgic_ops **ops,
++		       const struct vgic_params **params);
  #else
--static inline int vgic_v3_probe(struct device_node *vgic_node,
--				const struct vgic_ops **ops,
--				const struct vgic_params **params)
-+static inline int vgic_v3_dt_probe(struct device_node *vgic_node,
-+				   const struct vgic_ops **ops,
-+				   const struct vgic_params **params)
+ static inline int vgic_v3_dt_probe(struct device_node *vgic_node,
+ 				   const struct vgic_ops **ops,
+@@ -346,6 +355,15 @@ static inline int vgic_v3_dt_probe(struct device_node *vgic_node,
  {
  	return -ENODEV;
  }
++
++#ifdef CONFIG_ACPI
++int vgic_v3_acpi_probe(struct acpi_madt_generic_interrupt *,
++		       const struct vgic_ops **ops,
++		       const struct vgic_params **params)
++{
++	return -ENODEV;
++}
++#endif /* CONFIG_ACPI */
+ #endif
+ 
+ #endif
 diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
-index f9b9c7c..295996f 100644
+index 295996f..711de82 100644
 --- a/virt/kvm/arm/vgic-v2.c
 +++ b/virt/kvm/arm/vgic-v2.c
-@@ -167,7 +167,7 @@ static const struct vgic_ops vgic_v2_ops = {
- static struct vgic_params vgic_v2_params;
- 
- /**
-- * vgic_v2_probe - probe for a GICv2 compatible interrupt controller in DT
-+ * vgic_v2_dt_probe - probe for a GICv2 compatible interrupt controller in DT
-  * @node:	pointer to the DT node
-  * @ops: 	address of a pointer to the GICv2 operations
-  * @params:	address of a pointer to HW-specific parameters
-@@ -176,9 +176,9 @@ static struct vgic_params vgic_v2_params;
-  * in *ops and the HW parameters in *params. Returns an error code
-  * otherwise.
-  */
--int vgic_v2_probe(struct device_node *vgic_node,
--		  const struct vgic_ops **ops,
--		  const struct vgic_params **params)
-+int vgic_v2_dt_probe(struct device_node *vgic_node,
-+		     const struct vgic_ops **ops,
-+		     const struct vgic_params **params)
- {
- 	int ret;
- 	struct resource vctrl_res;
-diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
-index dff0602..91814e2 100644
---- a/virt/kvm/arm/vgic-v3.c
-+++ b/virt/kvm/arm/vgic-v3.c
-@@ -211,7 +211,7 @@ static const struct vgic_ops vgic_v3_ops = {
- static struct vgic_params vgic_v3_params;
- 
- /**
-- * vgic_v3_probe - probe for a GICv3 compatible interrupt controller in DT
-+ * vgic_v3_dt_probe - probe for a GICv3 compatible interrupt controller in DT
-  * @node:	pointer to the DT node
-  * @ops: 	address of a pointer to the GICv3 operations
-  * @params:	address of a pointer to HW-specific parameters
-@@ -220,9 +220,9 @@ static struct vgic_params vgic_v3_params;
-  * in *ops and the HW parameters in *params. Returns an error code
-  * otherwise.
-  */
--int vgic_v3_probe(struct device_node *vgic_node,
--		  const struct vgic_ops **ops,
--		  const struct vgic_params **params)
-+int vgic_v3_dt_probe(struct device_node *vgic_node,
-+		     const struct vgic_ops **ops,
-+		     const struct vgic_params **params)
- {
- 	int ret = 0;
- 	u32 gicv_idx;
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 78fb820..b4010f0 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -25,6 +25,7 @@
+@@ -23,6 +23,7 @@
+ #include <linux/of.h>
  #include <linux/of_address.h>
  #include <linux/of_irq.h>
- #include <linux/uaccess.h>
 +#include <linux/acpi.h>
  
  #include <linux/irqchip/arm-gic.h>
  
-@@ -2088,32 +2089,51 @@ static struct notifier_block vgic_cpu_nb = {
- };
- 
- static const struct of_device_id vgic_ids[] = {
--	{ .compatible = "arm,cortex-a15-gic",	.data = vgic_v2_probe, },
--	{ .compatible = "arm,cortex-a7-gic",	.data = vgic_v2_probe, },
--	{ .compatible = "arm,gic-400",		.data = vgic_v2_probe, },
--	{ .compatible = "arm,gic-v3",		.data = vgic_v3_probe, },
-+	{ .compatible = "arm,cortex-a15-gic",	.data = vgic_v2_dt_probe, },
-+	{ .compatible = "arm,cortex-a7-gic",	.data = vgic_v2_dt_probe, },
-+	{ .compatible = "arm,gic-400",		.data = vgic_v2_dt_probe, },
-+	{ .compatible = "arm,gic-v3",		.data = vgic_v3_dt_probe, },
- 	{},
- };
- 
--int kvm_vgic_hyp_init(void)
-+static int kvm_vgic_dt_probe(void)
- {
- 	const struct of_device_id *matched_id;
- 	const int (*vgic_probe)(struct device_node *,const struct vgic_ops **,
- 				const struct vgic_params **);
- 	struct device_node *vgic_node;
--	int ret;
- 
- 	vgic_node = of_find_matching_node_and_match(NULL,
- 						    vgic_ids, &matched_id);
--	if (!vgic_node) {
--		kvm_err("error: no compatible GIC node found\n");
-+	if (!vgic_node)
- 		return -ENODEV;
--	}
- 
- 	vgic_probe = matched_id->data;
--	ret = vgic_probe(vgic_node, &vgic_ops, &vgic);
--	if (ret)
-+
-+	return vgic_probe(vgic_node, &vgic_ops, &vgic);
-+}
+@@ -257,3 +258,12 @@ out:
+ 	of_node_put(vgic_node);
+ 	return ret;
+ }
 +
 +#ifdef CONFIG_ACPI
-+static int kvm_vgic_acpi_probe(void)
++int vgic_v2_acpi_probe(struct acpi_madt_generic_interrupt *vgic_acpi,
++		       const struct vgic_ops **ops,
++		       const struct vgic_params **params)
 +{
 +	return -EINVAL;
 +}
 +#endif /* CONFIG_ACPI */
+diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
+index 91814e2..99d0f9f 100644
+--- a/virt/kvm/arm/vgic-v3.c
++++ b/virt/kvm/arm/vgic-v3.c
+@@ -23,6 +23,7 @@
+ #include <linux/of.h>
+ #include <linux/of_address.h>
+ #include <linux/of_irq.h>
++#include <linux/acpi.h>
+ 
+ #include <linux/irqchip/arm-gic-v3.h>
+ 
+@@ -285,3 +286,12 @@ out:
+ 	of_node_put(vgic_node);
+ 	return ret;
+ }
 +
-+int kvm_vgic_hyp_init(void)
++#ifdef CONFIG_ACPI
++int vgic_v3_acpi_probe(struct acpi_madt_generic_interrupt *vgic_acpi,
++		       const struct vgic_ops **ops,
++		       const struct vgic_params **params)
 +{
++	return -EINVAL;
++}
++#endif /* CONFIG_ACPI */
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index b4010f0..cd09877 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -28,6 +28,7 @@
+ #include <linux/acpi.h>
+ 
+ #include <linux/irqchip/arm-gic.h>
++#include <linux/irqchip/arm-gic-v3.h>
+ 
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_arm.h>
+@@ -2114,9 +2115,106 @@ static int kvm_vgic_dt_probe(void)
+ }
+ 
+ #ifdef CONFIG_ACPI
++u8 gic_version = ACPI_MADT_GIC_VER_UNKNOWN;
++phys_addr_t dist_phy_base;
++static struct acpi_madt_generic_interrupt *vgic_acpi;
++
++static void gic_get_acpi_header(struct acpi_subtable_header *header)
++{
++	vgic_acpi = (struct acpi_madt_generic_interrupt *)header;
++}
++
++static int gic_parse_distributor(struct acpi_subtable_header *header,
++				 const unsigned long end)
++{
++	struct acpi_madt_generic_distributor *dist;
++
++	dist = (struct acpi_madt_generic_distributor *)header;
++
++	if (BAD_MADT_ENTRY(dist, end))
++		return -EINVAL;
++
++	gic_version = dist->gic_version;
++	dist_phy_base = dist->base_address;
++
++	return 0;
++}
++
++static int gic_match_redist(struct acpi_subtable_header *header,
++			    const unsigned long end)
++{
++	return 0;
++}
++
++static bool gic_redist_is_present(void)
++{
++	int count;
++
++	/* scan MADT table to find if we have redistributor entries */
++	count = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_REDISTRIBUTOR,
++				      gic_match_redist, 0);
++
++	return (count > 0) ? true : false;
++}
++
+ static int kvm_vgic_acpi_probe(void)
+ {
+-	return -EINVAL;
++	u32 reg;
++	int count;
++	void __iomem *dist_base;
 +	int ret;
 +
-+	ret = kvm_vgic_dt_probe();
-+#ifdef CONFIG_ACPI
-+	if (ret && !acpi_disabled)
-+		ret = kvm_vgic_acpi_probe();
-+#endif
-+
-+	if (ret) {
-+		kvm_err("error: KVM vGIC probing failed\n");
- 		return ret;
++	/* MADT table */
++	ret = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_INTERRUPT,
++			(acpi_tbl_entry_handler)gic_get_acpi_header, 0);
++	if (!ret) {
++		pr_err("Failed to get MADT VGIC CPU entry\n");
++		return -ENODEV;
 +	}
++
++	/* detect GIC version */
++	count = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_DISTRIBUTOR,
++				      gic_parse_distributor, 0);
++	if (count <= 0) {
++		pr_err("No valid GIC distributor entry exists\n");
++		return -ENODEV;
++	}
++	if (gic_version >= ACPI_MADT_GIC_VER_RESERVED) {
++		pr_err("Invalid GIC version %d in MADT\n", gic_version);
++		return -EINVAL;
++	}
++
++	/* falls back to manual hardware discovery under ACPI 5.1 */
++	if (gic_version == ACPI_MADT_GIC_VER_UNKNOWN) {
++		if (gic_redist_is_present()) {
++			dist_base = ioremap(dist_phy_base, SZ_64K);
++			if (!dist_base)
++				return -ENOMEM;
++
++			reg = readl_relaxed(dist_base + GICD_PIDR2) & GIC_PIDR2_ARCH_MASK;
++			if (reg == GIC_PIDR2_ARCH_GICv3)
++				gic_version = ACPI_MADT_GIC_VER_V3;
++			else
++				gic_version = ACPI_MADT_GIC_VER_V4;
++
++			iounmap(dist_base);
++		} else {
++			gic_version = ACPI_MADT_GIC_VER_V2;
++		}
++	}
++
++	switch (gic_version) {
++	case ACPI_MADT_GIC_VER_V2:
++		ret = vgic_v2_acpi_probe(vgic_acpi, &vgic_ops, &vgic);
++		break;
++	case ACPI_MADT_GIC_VER_V3:
++		ret = vgic_v3_acpi_probe(vgic_acpi, &vgic_ops, &vgic);
++		break;
++	default:
++		ret = -ENODEV;
++	}
++
++	return ret;
+ }
+ #endif /* CONFIG_ACPI */
  
- 	ret = request_percpu_irq(vgic->maint_irq, vgic_maintenance_handler,
- 				 "vgic", kvm_get_running_vcpus());
 -- 
 1.8.3.1
 
