@@ -1,77 +1,61 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v5 0/6] QEMU support for KVM Guest Debug on arm64
-Date: Fri, 29 May 2015 16:19:18 +0100
-Message-ID: <1432912764-7073-1-git-send-email-alex.bennee@linaro.org>
+Subject: [PATCH v5 4/6] target-arm: kvm - support for single step
+Date: Fri, 29 May 2015 16:19:22 +0100
+Message-ID: <1432912764-7073-5-git-send-email-alex.bennee@linaro.org>
+References: <1432912764-7073-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D25352579
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 11:09:34 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id vKruSAlA22wr for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 May 2015 11:09:33 -0400 (EDT)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 91F0552576
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 11:09:33 -0400 (EDT)
+In-Reply-To: <1432912764-7073-1-git-send-email-alex.bennee@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: qemu-devel@nongnu.org, peter.maydell@linaro.org, christoffer.dall@linaro.org, zhichao.huang@linaro.org
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-You may be wondering what happened to v3 and v4. They do exist but
-they didn't change much from the the original patches as I've been
-mostly looking the kernel side of the equation. So in summary the
-changes are:
-
-  - updates to the kernel ABI
-  - don't fall over on kernels without debug support
-  - better logging, syncing and use of internals.h
-  - debug exception re-injection for guest events*
-
-More detailed changelogs are attached to each patch.
-
-* see
-  https://lists.cs.columbia.edu/pipermail/kvmarm/2015-May/014807.html
-
-GIT Repos:
-
-The patch series is based off a recent master and can be found at:
-
-https://github.com/stsquad/qemu
-branch: kvm/guest-debug-v5
-
-The kernel patches for this series are based off a v4.1-rc5-v5 and can =
-be
-found at:
-
-https://git.linaro.org/people/alex.bennee/linux.git
-branch: guest-debug/4.1-rc5-v5
-
-Alex Benn=C3=A9e (6):
-  linux-headers: sync from my kernel tree (DEV)
-  target-arm: kvm64: introduce kvm_arm_init_debug()
-  target-arm: kvm - implement software breakpoints
-  target-arm: kvm - support for single step
-  target-arm: kvm - add support for HW assisted debug
-  target-arm: kvm - re-inject guest debug exceptions
-
- include/standard-headers/linux/virtio_balloon.h |  28 ++-
- include/standard-headers/linux/virtio_blk.h     |   8 +-
- include/standard-headers/linux/virtio_ids.h     |   1 +
- include/standard-headers/linux/virtio_input.h   |  76 ++++++
- include/standard-headers/linux/virtio_ring.h    |   2 +-
- linux-headers/asm-arm/kvm.h                     |   9 +-
- linux-headers/asm-arm64/kvm.h                   |  29 ++-
- linux-headers/asm-mips/kvm.h                    | 164 +++++++-----
- linux-headers/asm-s390/kvm.h                    |   4 +
- linux-headers/asm-x86/hyperv.h                  |   2 +
- linux-headers/linux/kvm.h                       |  71 +++++-
- linux-headers/linux/vfio.h                      |   2 +
- target-arm/cpu.h                                |   1 +
- target-arm/helper-a64.c                         |  17 +-
- target-arm/internals.h                          |   1 +
- target-arm/kvm.c                                | 137 ++++++++--
- target-arm/kvm64.c                              | 318 ++++++++++++++++=
-++++++++
- target-arm/kvm_arm.h                            |  21 ++
- 18 files changed, 790 insertions(+), 101 deletions(-)
- create mode 100644 include/standard-headers/linux/virtio_input.h
-
---=20
-2.4.1
-
+VGhpcyBhZGRzIHN1cHBvcnQgZm9yIHNpbmdsZS1zdGVwLiBUaGVyZSBpc24ndCBtdWNoIHRvIGRv
+IG9uIHRoZSBRRU1VCnNpZGUgYXMgYWZ0ZXIgd2Ugc2V0LXVwIHRoZSByZXF1ZXN0IGZvciBzaW5n
+bGUgc3RlcCB2aWEgdGhlIGRlYnVnIGlvY3RsCml0IGlzIGFsbCBoYW5kbGVkIHdpdGhpbiB0aGUg
+a2VybmVsLgoKU2lnbmVkLW9mZi1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8u
+b3JnPgoKLS0tCnYyCiAgLSBjb252ZXJ0IHRvIHVzaW5nIEhTUl9FQwp2MwogIC0gdXNlIGludGVy
+bmFscy5oIGRlZmluaXRpb25zCi0tLQogdGFyZ2V0LWFybS9rdm0uYyB8IDEwICsrKysrKysrKysK
+IDEgZmlsZSBjaGFuZ2VkLCAxMCBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvdGFyZ2V0LWFy
+bS9rdm0uYyBiL3RhcmdldC1hcm0va3ZtLmMKaW5kZXggYzNiYWQ2Zi4uZGUyODY1YSAxMDA2NDQK
+LS0tIGEvdGFyZ2V0LWFybS9rdm0uYworKysgYi90YXJnZXQtYXJtL2t2bS5jCkBAIC01MjgsNiAr
+NTI4LDEzIEBAIHN0YXRpYyBpbnQga3ZtX2hhbmRsZV9kZWJ1ZyhDUFVTdGF0ZSAqY3MsIHN0cnVj
+dCBrdm1fcnVuICpydW4pCiAgICAga3ZtX2NwdV9zeW5jaHJvbml6ZV9zdGF0ZShjcyk7CiAKICAg
+ICBzd2l0Y2ggKGhzcl9lYykgeworICAgIGNhc2UgRUNfU09GVFdBUkVTVEVQOgorICAgICAgICBp
+ZiAoY3MtPnNpbmdsZXN0ZXBfZW5hYmxlZCkgeworICAgICAgICAgICAgcmV0dXJuIHRydWU7Cisg
+ICAgICAgIH0gZWxzZSB7CisgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIkNhbWUgb3V0IG9mIFNJ
+TkdMRSBTVEVQIHdoZW4gbm90IGVuYWJsZWQiKTsKKyAgICAgICAgfQorICAgICAgICBicmVhazsK
+ICAgICBjYXNlIEVDX0FBNjRfQktQVDoKICAgICAgICAgaWYgKGt2bV9maW5kX3N3X2JyZWFrcG9p
+bnQoY3MsIGVudi0+cGMpKSB7CiAgICAgICAgICAgICByZXR1cm4gdHJ1ZTsKQEAgLTU4OCw2ICs1
+OTUsOSBAQCBpbnQga3ZtX2FyY2hfb25fc2lnYnVzKGludCBjb2RlLCB2b2lkICphZGRyKQogCiB2
+b2lkIGt2bV9hcmNoX3VwZGF0ZV9ndWVzdF9kZWJ1ZyhDUFVTdGF0ZSAqY3MsIHN0cnVjdCBrdm1f
+Z3Vlc3RfZGVidWcgKmRiZykKIHsKKyAgICBpZiAoY3MtPnNpbmdsZXN0ZXBfZW5hYmxlZCkgewor
+ICAgICAgICBkYmctPmNvbnRyb2wgfD0gS1ZNX0dVRVNUREJHX0VOQUJMRSB8IEtWTV9HVUVTVERC
+R19TSU5HTEVTVEVQOworICAgIH0KICAgICBpZiAoa3ZtX3N3X2JyZWFrcG9pbnRzX2FjdGl2ZShj
+cykpIHsKICAgICAgICAgZGJnLT5jb250cm9sIHw9IEtWTV9HVUVTVERCR19FTkFCTEUgfCBLVk1f
+R1VFU1REQkdfVVNFX1NXX0JQOwogICAgIH0KLS0gCjIuNC4xCgpfX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBs
+aXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1h
+bi9saXN0aW5mby9rdm1hcm0K
