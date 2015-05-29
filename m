@@ -1,26 +1,24 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v4 3/4] target-arm: Extend the gic node properties
-Date: Fri, 29 May 2015 13:01:09 +0200
-Message-ID: <1432897270-7780-4-git-send-email-christoffer.dall@linaro.org>
-References: <1432897270-7780-1-git-send-email-christoffer.dall@linaro.org>
+Subject: [PATCH v4 0/4] Add support for for GICv2m and MSIs to arm-virt
+Date: Fri, 29 May 2015 13:01:06 +0200
+Message-ID: <1432897270-7780-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F7E352485
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 06:51:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 633555247E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 06:50:57 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XPq4ZuDu7Bcb for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 May 2015 06:51:00 -0400 (EDT)
-Received: from mail-lb0-f175.google.com (mail-lb0-f175.google.com
- [209.85.217.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 109CE5247E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 06:50:59 -0400 (EDT)
-Received: by lbbqq2 with SMTP id qq2so45983609lbb.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 04:00:47 -0700 (PDT)
-In-Reply-To: <1432897270-7780-1-git-send-email-christoffer.dall@linaro.org>
+ with ESMTP id XyUxOSEDBDk4 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 May 2015 06:50:56 -0400 (EDT)
+Received: from mail-lb0-f177.google.com (mail-lb0-f177.google.com
+ [209.85.217.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1EDD95236A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 06:50:55 -0400 (EDT)
+Received: by lbcmx3 with SMTP id mx3so46021396lbc.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 04:00:42 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,69 +32,35 @@ To: qemu-devel@nongnu.org
 Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In preparation for adding the GICv2m which requires address specifiers
-and is a subnode of the gic, we extend the gic DT definition to specify
-the #address-cells and #size-cells properties and add an empty ranges
-property properties of the DT node, since this is required to add the
-v2m node as a child of the gic node.
+Now when we have a host generic PCIe controller in the virt board, it
+would be nice to be able to use MSIs so that we can eventually enable
+VHOST with KVM.
 
-Note that we must also expand the irq-map to reference the gic with the
-right address-cells as a consequence of this change.
+With these patches you can use MSIs with TCG and with KVM, but you still
+need some fixes for the mapping of the IRQ index to the GSI number for
+IRQFD to work.  A separate series that enables IRQFD and vhost
+is available: "ARM adaptations for vhost irqfd setup"
+https://lists.gnu.org/archive/html/qemu-devel/2015-04/msg01054.html)
 
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
-Suggested-by: Shanker Donthineni <shankerd@codeaurora.org>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
-Changes since v3:
- - Rewrote patch and changed authorship and tags accordingly
- - Fixed spelling in commit message
-Changes since v2:
- - New separate patch factoring out changes to existing code for eased
-   bisectability in case we broke something
- - The above fixes the issue with non-MSI compatible guests.
+Tested with KVM on XGene and with TCG by configuring a virtio-pci
+network adapter for the guest and verifying MSIs going through as
+expected.
 
- hw/arm/virt.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+Rebased on target-arm.next, see the individual patches for detailed
+changelogs.
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index e5235ef..387dac8 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -317,6 +317,9 @@ static void fdt_add_gic_node(VirtBoardInfo *vbi)
-                                      2, vbi->memmap[VIRT_GIC_DIST].size,
-                                      2, vbi->memmap[VIRT_GIC_CPU].base,
-                                      2, vbi->memmap[VIRT_GIC_CPU].size);
-+    qemu_fdt_setprop_cell(vbi->fdt, "/intc", "#address-cells", 0x2);
-+    qemu_fdt_setprop_cell(vbi->fdt, "/intc", "#size-cells", 0x2);
-+    qemu_fdt_setprop(vbi->fdt, "/intc", "ranges", NULL, 0);
-     qemu_fdt_setprop_cell(vbi->fdt, "/intc", "phandle", vbi->gic_phandle);
- }
- 
-@@ -585,7 +588,7 @@ static void create_pcie_irq_map(const VirtBoardInfo *vbi, uint32_t gic_phandle,
-                                 int first_irq, const char *nodename)
- {
-     int devfn, pin;
--    uint32_t full_irq_map[4 * 4 * 8] = { 0 };
-+    uint32_t full_irq_map[4 * 4 * 10] = { 0 };
-     uint32_t *irq_map = full_irq_map;
- 
-     for (devfn = 0; devfn <= 0x18; devfn += 0x8) {
-@@ -598,13 +601,13 @@ static void create_pcie_irq_map(const VirtBoardInfo *vbi, uint32_t gic_phandle,
-             uint32_t map[] = {
-                 devfn << 8, 0, 0,                           /* devfn */
-                 pin + 1,                                    /* PCI pin */
--                gic_phandle, irq_type, irq_nr, irq_level }; /* GIC irq */
-+                gic_phandle, 0, 0, irq_type, irq_nr, irq_level }; /* GIC irq */
- 
-             /* Convert map to big endian */
--            for (i = 0; i < 8; i++) {
-+            for (i = 0; i < 10; i++) {
-                 irq_map[i] = cpu_to_be32(map[i]);
-             }
--            irq_map += 8;
-+            irq_map += 10;
-         }
-     }
- 
+Christoffer Dall (4):
+  target-arm: Add GIC phandle to VirtBoardInfo
+  arm_gicv2m: Add GICv2m widget to support MSIs
+  target-arm: Extend the gic node properties
+  target-arm: Add the GICv2m to the virt board
+
+ hw/arm/virt.c         |  73 ++++++++++++++-----
+ hw/intc/Makefile.objs |   1 +
+ hw/intc/arm_gicv2m.c  | 190 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/arm/virt.h |   2 +
+ 4 files changed, 248 insertions(+), 18 deletions(-)
+ create mode 100644 hw/intc/arm_gicv2m.c
+
 -- 
 2.1.2.330.g565301e.dirty
