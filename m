@@ -1,283 +1,97 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v4 2/4] arm_gicv2m: Add GICv2m widget to support MSIs
-Date: Fri, 29 May 2015 13:01:08 +0200
-Message-ID: <1432897270-7780-3-git-send-email-christoffer.dall@linaro.org>
-References: <1432897270-7780-1-git-send-email-christoffer.dall@linaro.org>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH V1 4/5] kvm: arm64: Implement ACPI probing code for GICv2
+Date: Fri, 29 May 2015 16:06:58 +0200
+Message-ID: <20150529140658.GC2749@localhost.localdomain>
+References: <1432791274-15242-1-git-send-email-wei@redhat.com>
+ <1432791274-15242-5-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F356752485
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 06:51:00 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6VoLPqlIDZlb for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 May 2015 06:50:59 -0400 (EDT)
-Received: from mail-la0-f44.google.com (mail-la0-f44.google.com
- [209.85.215.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5C96A52493
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 06:50:58 -0400 (EDT)
-Received: by labpy14 with SMTP id py14so41141714lab.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 04:00:45 -0700 (PDT)
-In-Reply-To: <1432897270-7780-1-git-send-email-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: qemu-devel@nongnu.org
-Cc: kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1432791274-15242-5-git-send-email-wei@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Wei Huang <wei@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, hanjun.guo@linaro.org, a.spyridakis@virtualopensystems.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The ARM GICv2m widget is a little device that handles MSI interrupt
-writes to a trigger register and ties them to a range of interrupt lines
-wires to the GIC.  It has a few status/id registers and the interrupt wires,
-and that's about it.
+On Thu, May 28, 2015 at 01:34:33AM -0400, Wei Huang wrote:
+> This patches enables ACPI support for KVM virtual GICv2. KVM parses
+> ACPI table for virt GIC related information and initializes resources.
+> 
+> Signed-off-by: Alexander Spyridaki <a.spyridakis@virtualopensystems.com>
+> Signed-off-by: Wei Huang <wei@redhat.com>
+> ---
+>  virt/kvm/arm/vgic-v2.c | 49 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 48 insertions(+), 1 deletion(-)
+> 
+> diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
+> index 711de82..01ce8a3 100644
+> --- a/virt/kvm/arm/vgic-v2.c
+> +++ b/virt/kvm/arm/vgic-v2.c
+> @@ -264,6 +264,53 @@ int vgic_v2_acpi_probe(struct acpi_madt_generic_interrupt *vgic_acpi,
+>  		       const struct vgic_ops **ops,
+>  		       const struct vgic_params **params)
+>  {
+> -	return -EINVAL;
+> +	struct vgic_params *vgic = &vgic_v2_params;
+> +	int irq_mode, ret;
+> +
+> +	/* IRQ trigger mode */
+> +	irq_mode = (vgic_acpi->flags & ACPI_MADT_VGIC_IRQ_MODE) ?
+> +		ACPI_EDGE_SENSITIVE : ACPI_LEVEL_SENSITIVE;
+> +	vgic->maint_irq = acpi_register_gsi(NULL, vgic_acpi->vgic_interrupt,
+> +					    irq_mode, ACPI_ACTIVE_HIGH);
+> +	if (!vgic->maint_irq) {
+> +		kvm_err("Cannot register VGIC ACPI maintenance irq\n");
+> +		ret = -ENXIO;
+> +		goto out;
+> +	}
+> +
+> +	/* GICH resource */
+> +	vgic->vctrl_base = ioremap(vgic_acpi->gich_base_address, SZ_8K);
+> +	if (!vgic->vctrl_base) {
+> +		kvm_err("cannot ioremap GICH memory\n");
+> +		ret = -ENOMEM;
+> +		goto out;
+> +	}
+> +
+> +	vgic->nr_lr = readl_relaxed(vgic->vctrl_base + GICH_VTR);
+> +	vgic->nr_lr = (vgic->nr_lr & 0x3f) + 1;
+> +
+> +	ret = create_hyp_io_mappings(vgic->vctrl_base,
+> +				     vgic->vctrl_base + SZ_8K,
+> +				     vgic_acpi->gich_base_address);
+> +	if (ret) {
+> +		kvm_err("Cannot map GICH into hyp\n");
+> +		goto out;
+> +	}
+> +
+> +	vgic->vcpu_base = vgic_acpi->gicv_base_address;
+> +	vgic->can_emulate_gicv2 = true;
+> +	kvm_register_device_ops(&kvm_arm_vgic_v2_ops, KVM_DEV_TYPE_ARM_VGIC_V2);
+> +
+> +	kvm_info("GICH base=0x%llx, GICV base=0x%llx, IRQ=%d\n",
+> +		 (unsigned long long)vgic_acpi->gich_base_address,
+> +		 (unsigned long long)vgic_acpi->gicv_base_address,
+> +		 vgic->maint_irq);
+> +
+> +	vgic->type = VGIC_V2;
 
-A board instantiates the device by setting the base SPI number and
-number SPIs for the frame.  The base-spi parameter is indexed in the SPI
-number space only, so base-spi == 0, means IRQ number 32.  When a device
-(the PCI host controller) writes to the trigger register, the payload is
-the GIC IRQ number, so we have to subtract 32 from that and then index
-into our frame of SPIs.
+we're missing max_gic_vcpus here
 
-When instantiating a GICv2m device, tell PCI that we have instantiated
-something that can deal with MSIs.  We rely on the board actually wiring
-up the GICv2m to the PCI host controller.
+	vgic->max_gic_vcpus = VGIC_V2_MAX_CPUS;
 
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
-Changes since v3:
- - Added reviewed-by tag
-Changes since v2:
- - Renamed QOM type to "arm-gicv2m"
-Changes since v1:
- - Check that writes to MSI_SETSPI are within the lower boundary as well
- - Move gicv2m to common-obj in Makefile
- - Separate switch case and comment for impdef regs
- - Clearly document what is emulated
- - Allow 16 bit lower accesses to MSI_SETSPI regs
- - Fix commit grammar error
- - Remove stray pixman commit
-
- hw/intc/Makefile.objs |   1 +
- hw/intc/arm_gicv2m.c  | 190 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 191 insertions(+)
- create mode 100644 hw/intc/arm_gicv2m.c
-
-diff --git a/hw/intc/Makefile.objs b/hw/intc/Makefile.objs
-index 843864a..092d8a8 100644
---- a/hw/intc/Makefile.objs
-+++ b/hw/intc/Makefile.objs
-@@ -11,6 +11,7 @@ common-obj-$(CONFIG_SLAVIO) += slavio_intctl.o
- common-obj-$(CONFIG_IOAPIC) += ioapic_common.o
- common-obj-$(CONFIG_ARM_GIC) += arm_gic_common.o
- common-obj-$(CONFIG_ARM_GIC) += arm_gic.o
-+common-obj-$(CONFIG_ARM_GIC) += arm_gicv2m.o
- common-obj-$(CONFIG_OPENPIC) += openpic.o
- 
- obj-$(CONFIG_APIC) += apic.o apic_common.o
-diff --git a/hw/intc/arm_gicv2m.c b/hw/intc/arm_gicv2m.c
-new file mode 100644
-index 0000000..9f84f72
---- /dev/null
-+++ b/hw/intc/arm_gicv2m.c
-@@ -0,0 +1,190 @@
-+/*
-+ *  GICv2m extension for MSI/MSI-x support with a GICv2-based system
-+ *
-+ * Copyright (C) 2015 Linaro, All rights reserved.
-+ *
-+ * Author: Christoffer Dall <christoffer.dall@linaro.org>
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+/* This file implements an emulated GICv2m widget as described in the ARM
-+ * Server Base System Architecture (SBSA) specification Version 2.2
-+ * (ARM-DEN-0029 v2.2) pages 35-39 without any optional implementation defined
-+ * identification registers and with a single non-secure MSI register frame.
-+ */
-+
-+#include "hw/sysbus.h"
-+#include "hw/pci/msi.h"
-+
-+#define TYPE_ARM_GICV2M "arm-gicv2m"
-+#define ARM_GICV2M(obj) OBJECT_CHECK(ARMGICv2mState, (obj), TYPE_ARM_GICV2M)
-+
-+#define GICV2M_NUM_SPI_MAX 128
-+
-+#define V2M_MSI_TYPER           0x008
-+#define V2M_MSI_SETSPI_NS       0x040
-+#define V2M_MSI_IIDR            0xFCC
-+#define V2M_IIDR0               0xFD0
-+#define V2M_IIDR11              0xFFC
-+
-+#define PRODUCT_ID_QEMU         0x51 /* ASCII code Q */
-+
-+typedef struct ARMGICv2mState {
-+    SysBusDevice parent_obj;
-+
-+    MemoryRegion iomem;
-+    qemu_irq spi[GICV2M_NUM_SPI_MAX];
-+
-+    uint32_t base_spi;
-+    uint32_t num_spi;
-+} ARMGICv2mState;
-+
-+static void gicv2m_set_irq(void *opaque, int irq)
-+{
-+    ARMGICv2mState *s = (ARMGICv2mState *)opaque;
-+
-+    qemu_irq_pulse(s->spi[irq]);
-+}
-+
-+static uint64_t gicv2m_read(void *opaque, hwaddr offset,
-+                            unsigned size)
-+{
-+    ARMGICv2mState *s = (ARMGICv2mState *)opaque;
-+    uint32_t val;
-+
-+    if (size != 4) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "gicv2m_read: bad size %u\n", size);
-+        return 0;
-+    }
-+
-+    switch (offset) {
-+    case V2M_MSI_TYPER:
-+        val = (s->base_spi + 32) << 16;
-+        val |= s->num_spi;
-+        return val;
-+    case V2M_MSI_IIDR:
-+        /* We don't have any valid implementor so we leave that field as zero
-+         * and we return 0 in the arch revision as per the spec.
-+         */
-+        return (PRODUCT_ID_QEMU << 20);
-+    case V2M_IIDR0 ... V2M_IIDR11:
-+        /* We do not implement any optional identification registers and the
-+         * mandatory MSI_PIDR2 register reads as 0x0, so we capture all
-+         * implementation defined registers here.
-+         */
-+        return 0;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "gicv2m_read: Bad offset %x\n", (int)offset);
-+        return 0;
-+    }
-+}
-+
-+static void gicv2m_write(void *opaque, hwaddr offset,
-+                        uint64_t value, unsigned size)
-+{
-+    ARMGICv2mState *s = (ARMGICv2mState *)opaque;
-+
-+    if (size != 2 && size != 4) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "gicv2m_write: bad size %u\n", size);
-+        return;
-+    }
-+
-+    switch (offset) {
-+    case V2M_MSI_SETSPI_NS: {
-+        int spi;
-+
-+        spi = (value & 0x3ff) - (s->base_spi + 32);
-+        if (spi >= 0 && spi < s->num_spi) {
-+            gicv2m_set_irq(s, spi);
-+        }
-+        return;
-+    }
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "gicv2m_write: Bad offset %x\n", (int)offset);
-+    }
-+}
-+
-+static const MemoryRegionOps gicv2m_ops = {
-+    .read = gicv2m_read,
-+    .write = gicv2m_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static void gicv2m_realize(DeviceState *dev, Error **errp)
-+{
-+    ARMGICv2mState *s = ARM_GICV2M(dev);
-+    int i;
-+
-+    if (s->num_spi > GICV2M_NUM_SPI_MAX) {
-+        error_setg(errp,
-+                   "requested %u SPIs exceeds GICv2m frame maximum %d",
-+                   s->num_spi, GICV2M_NUM_SPI_MAX);
-+        return;
-+    }
-+
-+    if (s->base_spi + 32 > 1020 - s->num_spi) {
-+        error_setg(errp,
-+                   "requested base SPI %u+%u exceeds max. number 1020",
-+                   s->base_spi + 32, s->num_spi);
-+        return;
-+    }
-+
-+    for (i = 0; i < s->num_spi; i++) {
-+        sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->spi[i]);
-+    }
-+
-+    msi_supported = true;
-+}
-+
-+static void gicv2m_init(Object *obj)
-+{
-+    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-+    ARMGICv2mState *s = ARM_GICV2M(obj);
-+
-+    memory_region_init_io(&s->iomem, OBJECT(s), &gicv2m_ops, s,
-+                          "gicv2m", 0x1000);
-+    sysbus_init_mmio(sbd, &s->iomem);
-+}
-+
-+static Property gicv2m_properties[] = {
-+    DEFINE_PROP_UINT32("base-spi", ARMGICv2mState, base_spi, 0),
-+    DEFINE_PROP_UINT32("num-spi", ARMGICv2mState, num_spi, 64),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void gicv2m_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->props = gicv2m_properties;
-+    dc->realize = gicv2m_realize;
-+}
-+
-+static const TypeInfo gicv2m_info = {
-+    .name          = TYPE_ARM_GICV2M,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(ARMGICv2mState),
-+    .instance_init = gicv2m_init,
-+    .class_init    = gicv2m_class_init,
-+};
-+
-+static void gicv2m_register_types(void)
-+{
-+    type_register_static(&gicv2m_info);
-+}
-+
-+type_init(gicv2m_register_types)
--- 
-2.1.2.330.g565301e.dirty
+> +	*ops = &vgic_v2_ops;
+> +	*params = vgic;
+> +
+> +out:
+> +	return ret;
+>  }
+>  #endif /* CONFIG_ACPI */
+> -- 
+> 1.8.3.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe kvm" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
