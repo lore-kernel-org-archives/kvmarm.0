@@ -1,24 +1,26 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 08/13] KVM: arm64: add data structures to model ITS interrupt
- translation
-Date: Fri, 29 May 2015 10:53:24 +0100
-Message-ID: <1432893209-27313-9-git-send-email-andre.przywara@arm.com>
-References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PATCH v4 3/4] target-arm: Extend the gic node properties
+Date: Fri, 29 May 2015 13:01:09 +0200
+Message-ID: <1432897270-7780-4-git-send-email-christoffer.dall@linaro.org>
+References: <1432897270-7780-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F09A45243E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 05:43:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F7E352485
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 06:51:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cVy6c0k9huTB for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 May 2015 05:43:54 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 29E2152462
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 05:43:54 -0400 (EDT)
-In-Reply-To: <1432893209-27313-1-git-send-email-andre.przywara@arm.com>
+ with ESMTP id XPq4ZuDu7Bcb for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 May 2015 06:51:00 -0400 (EDT)
+Received: from mail-lb0-f175.google.com (mail-lb0-f175.google.com
+ [209.85.217.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 109CE5247E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 06:50:59 -0400 (EDT)
+Received: by lbbqq2 with SMTP id qq2so45983609lbb.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 04:00:47 -0700 (PDT)
+In-Reply-To: <1432897270-7780-1-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,131 +30,73 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+To: qemu-devel@nongnu.org
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The GICv3 Interrupt Translation Service (ITS) uses tables in memory
-to allow a sophisticated interrupt routing. It features device tables,
-an interrupt table per device and a table connecting "collections" to
-actual CPUs (aka. redistributors in the GICv3 lingo).
-Since the interrupt numbers for the LPIs are allocated quite sparsely
-and the range can be quite huge (8192 LPIs being the minimum), using
-bitmaps or arrays for storing information is a waste of memory.
-We use linked lists instead, which we iterate linearily. This works
-very well with the actual number of LPIs/MSIs in the guest being
-quite low. Should the number of LPIs exceed the number where iterating
-the lists becomes painful, we can later revisit this and use more
-efficient data structures.
+In preparation for adding the GICv2m which requires address specifiers
+and is a subnode of the gic, we extend the gic DT definition to specify
+the #address-cells and #size-cells properties and add an empty ranges
+property properties of the DT node, since this is required to add the
+v2m node as a child of the gic node.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Note that we must also expand the irq-map to reference the gic with the
+right address-cells as a consequence of this change.
+
+Reviewed-by: Eric Auger <eric.auger@linaro.org>
+Suggested-by: Shanker Donthineni <shankerd@codeaurora.org>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- include/kvm/arm_vgic.h  |  3 +++
- virt/kvm/arm/its-emul.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 48 insertions(+)
+Changes since v3:
+ - Rewrote patch and changed authorship and tags accordingly
+ - Fixed spelling in commit message
+Changes since v2:
+ - New separate patch factoring out changes to existing code for eased
+   bisectability in case we broke something
+ - The above fixes the issue with non-MSI compatible guests.
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 3b8e3a1..fa17df6 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -25,6 +25,7 @@
- #include <linux/spinlock.h>
- #include <linux/types.h>
- #include <kvm/iodev.h>
-+#include <linux/list.h>
- 
- #define VGIC_NR_IRQS_LEGACY	256
- #define VGIC_NR_SGIS		16
-@@ -162,6 +163,8 @@ struct vgic_its {
- 	u64			cbaser;
- 	int			creadr;
- 	int			cwriter;
-+	struct list_head	device_list;
-+	struct list_head	collection_list;
- };
- 
- struct vgic_dist {
-diff --git a/virt/kvm/arm/its-emul.c b/virt/kvm/arm/its-emul.c
-index 82bc34a..f0f4a9c 100644
---- a/virt/kvm/arm/its-emul.c
-+++ b/virt/kvm/arm/its-emul.c
-@@ -21,6 +21,7 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- #include <linux/interrupt.h>
-+#include <linux/list.h>
- 
- #include <linux/irqchip/arm-gic-v3.h>
- #include <kvm/arm_vgic.h>
-@@ -32,6 +33,25 @@
- #include "vgic.h"
- #include "its-emul.h"
- 
-+struct its_device {
-+	struct list_head dev_list;
-+	struct list_head itt;
-+	u32 device_id;
-+};
-+
-+struct its_collection {
-+	struct list_head coll_list;
-+	u32 collection_id;
-+	u32 target_addr;
-+};
-+
-+struct its_itte {
-+	struct list_head itte_list;
-+	struct its_collection *collection;
-+	u32 lpi;
-+	u32 event_id;
-+};
-+
- #define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
- 
- /* distributor lock is hold by the VGIC MMIO handler */
-@@ -280,6 +300,9 @@ int vits_init(struct kvm *kvm)
- 
- 	spin_lock_init(&its->lock);
- 
-+	INIT_LIST_HEAD(&its->device_list);
-+	INIT_LIST_HEAD(&its->collection_list);
-+
- 	its->enabled = false;
- 
- 	return -ENXIO;
-@@ -289,11 +312,33 @@ void vits_destroy(struct kvm *kvm)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
- 	struct vgic_its *its = &dist->its;
-+	struct its_device *dev;
-+	struct its_itte *itte;
-+	struct list_head *dev_cur, *dev_temp;
-+	struct list_head *cur, *temp;
- 
- 	if (!vgic_has_its(kvm))
- 		return;
- 
-+	spin_lock(&its->lock);
-+	list_for_each_safe(dev_cur, dev_temp, &its->device_list) {
-+		dev = container_of(dev_cur, struct its_device, dev_list);
-+		list_for_each_safe(cur, temp, &dev->itt) {
-+			itte = (container_of(cur, struct its_itte, itte_list));
-+			list_del(cur);
-+			kfree(itte);
-+		}
-+		list_del(dev_cur);
-+		kfree(dev);
-+	}
-+
-+	list_for_each_safe(cur, temp, &its->collection_list) {
-+		list_del(cur);
-+		kfree(container_of(cur, struct its_collection, coll_list));
-+	}
-+
- 	kfree(dist->pendbaser);
- 
- 	its->enabled = false;
-+	spin_unlock(&its->lock);
+ hw/arm/virt.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index e5235ef..387dac8 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -317,6 +317,9 @@ static void fdt_add_gic_node(VirtBoardInfo *vbi)
+                                      2, vbi->memmap[VIRT_GIC_DIST].size,
+                                      2, vbi->memmap[VIRT_GIC_CPU].base,
+                                      2, vbi->memmap[VIRT_GIC_CPU].size);
++    qemu_fdt_setprop_cell(vbi->fdt, "/intc", "#address-cells", 0x2);
++    qemu_fdt_setprop_cell(vbi->fdt, "/intc", "#size-cells", 0x2);
++    qemu_fdt_setprop(vbi->fdt, "/intc", "ranges", NULL, 0);
+     qemu_fdt_setprop_cell(vbi->fdt, "/intc", "phandle", vbi->gic_phandle);
  }
+ 
+@@ -585,7 +588,7 @@ static void create_pcie_irq_map(const VirtBoardInfo *vbi, uint32_t gic_phandle,
+                                 int first_irq, const char *nodename)
+ {
+     int devfn, pin;
+-    uint32_t full_irq_map[4 * 4 * 8] = { 0 };
++    uint32_t full_irq_map[4 * 4 * 10] = { 0 };
+     uint32_t *irq_map = full_irq_map;
+ 
+     for (devfn = 0; devfn <= 0x18; devfn += 0x8) {
+@@ -598,13 +601,13 @@ static void create_pcie_irq_map(const VirtBoardInfo *vbi, uint32_t gic_phandle,
+             uint32_t map[] = {
+                 devfn << 8, 0, 0,                           /* devfn */
+                 pin + 1,                                    /* PCI pin */
+-                gic_phandle, irq_type, irq_nr, irq_level }; /* GIC irq */
++                gic_phandle, 0, 0, irq_type, irq_nr, irq_level }; /* GIC irq */
+ 
+             /* Convert map to big endian */
+-            for (i = 0; i < 8; i++) {
++            for (i = 0; i < 10; i++) {
+                 irq_map[i] = cpu_to_be32(map[i]);
+             }
+-            irq_map += 8;
++            irq_map += 10;
+         }
+     }
+ 
 -- 
-2.3.5
+2.1.2.330.g565301e.dirty
