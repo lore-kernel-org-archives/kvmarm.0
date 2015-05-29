@@ -1,222 +1,372 @@
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v5 10/12] KVM: arm64: guest debug, HW assisted debug support
-Date: Fri, 29 May 2015 10:30:26 +0100
-Message-ID: <1432891828-4816-11-git-send-email-alex.bennee@linaro.org>
-References: <1432891828-4816-1-git-send-email-alex.bennee@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1439B52426
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 05:40:01 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BZNwZ-eRMnnC for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 May 2015 05:39:59 -0400 (EDT)
-Received: from socrates.bennee.com
- (static.88-198-71-155.clients.your-server.de [88.198.71.155])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CD29052422
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 05:39:59 -0400 (EDT)
-In-Reply-To: <1432891828-4816-1-git-send-email-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, Jonathan Corbet <corbet@lwn.net>, Gleb Natapov <gleb@kernel.org>, jan.kiszka@siemens.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, "open list:ABI/API" <linux-api@vger.kernel.org>, dahi@linux.vnet.ibm.com, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, r65777@freescale.com, bp@suse.de, Ingo Molnar <mingo@kernel.org>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH 01/13] KVM: arm/arm64: VGIC: don't track used LRs in the distributor
+Date: Fri, 29 May 2015 10:53:17 +0100
+Message-ID: <1432893209-27313-2-git-send-email-andre.przywara@arm.com>
+References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1432893209-27313-1-git-send-email-andre.przywara@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhpcyBhZGRzIHN1cHBvcnQgZm9yIHVzZXJzcGFjZSB0byBjb250cm9sIHRoZSBIVyBkZWJ1ZyBy
-ZWdpc3RlcnMgZm9yCmd1ZXN0IGRlYnVnLiBJbiB0aGUgZGVidWcgaW9jdGwgd2UgY29weSB0aGUg
-SU1QREVGIGRlZmluZWQgbnVtYmVyIG9mCnJlZ2lzdGVycyBpbnRvIGEgbmV3IHJlZ2lzdGVyIHNl
-dCBjYWxsZWQgaG9zdF9kZWJ1Z19zdGF0ZS4gVGhlcmUgaXMgbm93CmEgbmV3IHZjcHUgcGFyYW1l
-dGVyIGNhbGxlZCBkZWJ1Z19wdHIgd2hpY2ggc2VsZWN0cyB3aGljaCByZWdpc3RlciBzZXQKaXMg
-dG8gY29waWVkIGludG8gdGhlIHJlYWwgcmVnaXN0ZXJzIHdoZW4gd29ybGQgc3dpdGNoIG9jY3Vy
-cy4KCkkndmUgbW92ZWQgc29tZSBoZWxwZXIgZnVuY3Rpb25zIGludG8gdGhlIGh3X2JyZWFrcG9p
-bnQuaCBoZWFkZXIgZm9yCnJlLXVzZS4KCkFzIHdpdGggc2luZ2xlIHN0ZXAgd2UgbmVlZCB0byB0
-d2VhayB0aGUgZ3Vlc3QgcmVnaXN0ZXJzIHRvIGVuYWJsZSB0aGUKZXhjZXB0aW9ucyBzbyB3ZSBu
-ZWVkIHRvIHNhdmUgYW5kIHJlc3RvcmUgdGhvc2UgYml0cy4KClR3byBuZXcgY2FwYWJpbGl0aWVz
-IGhhdmUgYmVlbiBhZGRlZCB0byB0aGUgS1ZNX0VYVEVOU0lPTiBpb2N0bCB0byBhbGxvdwp1c2Vy
-c3BhY2UgdG8gcXVlcnkgdGhlIG51bWJlciBvZiBoYXJkd2FyZSBicmVhayBhbmQgd2F0Y2ggcG9p
-bnRzCmF2YWlsYWJsZSBvbiB0aGUgaG9zdCBoYXJkd2FyZS4KClNpZ25lZC1vZmYtYnk6IEFsZXgg
-QmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KCi0tLQp2MgogICAtIHN3aXRjaGVkIHRv
-IEMgc2V0dXAKICAgLSByZXBsYWNlIGhvc3QgZGVidWcgcmVnaXN0ZXJzIGRpcmVjdGx5IGludG8g
-Y29udGV4dAogICAtIG1pbm9yIHR3ZWFrIHRvIGFwaSBkb2NzCiAgIC0gc2V0dXAgcmlnaHQgcmVn
-aXN0ZXIgZm9yIGRlYnVnCiAgIC0gYWRkIEZBUl9FTDIgdG8gZGVidWcgZXhpdCBzdHJ1Y3R1cmUK
-ICAgLSBhZGQgc3VwcG9ydCBmb3IgdHJhcHBpbmcgZGVidWcgcmVnaXN0ZXIgYWNjZXNzCnYzCiAg
-IC0gcmVtb3ZlIHN0cmF5IHRyYWNlIHN0YXRlbWVudAogICAtIGZpeCBzcGFjaW5nIGFyb3VuZCBv
-cGVyYXRvcnMgKHZhcmlvdXMpCiAgIC0gY2xlYW4tdXAgdXNhZ2Ugb2YgdHJhcF9kZWJ1ZwogICAt
-IGludHJvZHVjZSBkZWJ1Z19wdHIsIHJlcGxhY2UgZXhjZXNzaXZlIG1lbWNweSBzdHVmZgogICAt
-IGRvbid0IHVzZSBtZW1jcHkgaW4gaW9jdGwsIGp1c3QgYXNzaWduCiAgIC0gdXBkYXRlIGNhcCBp
-b2N0bCBkb2N1bWVudGF0aW9uCiAgIC0gcmV3b3JkIGEgbnVtYmVyIGNvbW1lbnRzCiAgIC0gcmVu
-YW1lIGhvc3RfZGVidWdfc3RhdGUtPmV4dGVybmFsX2RlYnVnX3N0YXRlCnY0CiAgIC0gdXNlIHRo
-ZSBuZXcgdTMyL3U2NCBzcGxpdCBkZWJ1Z19wdHIgYXBwcm9hY2gKICAgLSBmaXggc29tZSB3b3Jk
-aW5nL2NvbW1lbnRzCnY1CiAgIC0gZG9uJ3Qgc2V0IE1EU0NSX0VMMS5LREUgKG5vdCBuZWVkZWQp
-Ci0tLQogRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGkudHh0ICAgICAgfCAgNyArKysrKyst
-CiBhcmNoL2FybS9rdm0vYXJtLmMgICAgICAgICAgICAgICAgICAgICB8ICA3ICsrKysrKysKIGFy
-Y2gvYXJtNjQvaW5jbHVkZS9hc20vaHdfYnJlYWtwb2ludC5oIHwgMTIgKysrKysrKysrKysKIGFy
-Y2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCAgICAgIHwgIDMgKystCiBhcmNoL2FybTY0
-L2luY2x1ZGUvdWFwaS9hc20va3ZtLmggICAgICB8ICAyICstCiBhcmNoL2FybTY0L2tlcm5lbC9o
-d19icmVha3BvaW50LmMgICAgICB8IDEyIC0tLS0tLS0tLS0tCiBhcmNoL2FybTY0L2t2bS9kZWJ1
-Zy5jICAgICAgICAgICAgICAgICB8IDM3ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0t
-LS0KIGFyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMgICAgICAgICAgIHwgIDYgKysrKysrCiBh
-cmNoL2FybTY0L2t2bS9yZXNldC5jICAgICAgICAgICAgICAgICB8IDEyICsrKysrKysrKysrCiBp
-bmNsdWRlL3VhcGkvbGludXgva3ZtLmggICAgICAgICAgICAgICB8ICAyICsrCiAxMCBmaWxlcyBj
-aGFuZ2VkLCA4MCBpbnNlcnRpb25zKCspLCAyMCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9E
-b2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL2FwaS50eHQgYi9Eb2N1bWVudGF0aW9uL3ZpcnR1YWwv
-a3ZtL2FwaS50eHQKaW5kZXggMzNjODE0My4uYWRhNTdkZiAxMDA2NDQKLS0tIGEvRG9jdW1lbnRh
-dGlvbi92aXJ0dWFsL2t2bS9hcGkudHh0CisrKyBiL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0v
-YXBpLnR4dApAQCAtMjY2OCw3ICsyNjY4LDcgQEAgVGhlIHRvcCAxNiBiaXRzIG9mIHRoZSBjb250
-cm9sIGZpZWxkIGFyZSBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgY29udHJvbAogZmxhZ3Mgd2hpY2gg
-Y2FuIGluY2x1ZGUgdGhlIGZvbGxvd2luZzoKIAogICAtIEtWTV9HVUVTVERCR19VU0VfU1dfQlA6
-ICAgICB1c2luZyBzb2Z0d2FyZSBicmVha3BvaW50cyBbeDg2LCBhcm02NF0KLSAgLSBLVk1fR1VF
-U1REQkdfVVNFX0hXX0JQOiAgICAgdXNpbmcgaGFyZHdhcmUgYnJlYWtwb2ludHMgW3g4NiwgczM5
-MF0KKyAgLSBLVk1fR1VFU1REQkdfVVNFX0hXX0JQOiAgICAgdXNpbmcgaGFyZHdhcmUgYnJlYWtw
-b2ludHMgW3g4NiwgczM5MCwgYXJtNjRdCiAgIC0gS1ZNX0dVRVNUREJHX0lOSkVDVF9EQjogICAg
-IGluamVjdCBEQiB0eXBlIGV4Y2VwdGlvbiBbeDg2XQogICAtIEtWTV9HVUVTVERCR19JTkpFQ1Rf
-QlA6ICAgICBpbmplY3QgQlAgdHlwZSBleGNlcHRpb24gW3g4Nl0KICAgLSBLVk1fR1VFU1REQkdf
-RVhJVF9QRU5ESU5HOiAgdHJpZ2dlciBhbiBpbW1lZGlhdGUgZ3Vlc3QgZXhpdCBbczM5MF0KQEAg
-LTI2ODMsNiArMjY4MywxMSBAQCB1cGRhdGVkIHRvIHRoZSBjb3JyZWN0IChzdXBwbGllZCkgdmFs
-dWVzLgogVGhlIHNlY29uZCBwYXJ0IG9mIHRoZSBzdHJ1Y3R1cmUgaXMgYXJjaGl0ZWN0dXJlIHNw
-ZWNpZmljIGFuZAogdHlwaWNhbGx5IGNvbnRhaW5zIGEgc2V0IG9mIGRlYnVnIHJlZ2lzdGVycy4K
-IAorRm9yIGFybTY0IHRoZSBudW1iZXIgb2YgZGVidWcgcmVnaXN0ZXJzIGlzIGltcGxlbWVudGF0
-aW9uIGRlZmluZWQgYW5kCitjYW4gYmUgZGV0ZXJtaW5lZCBieSBxdWVyeWluZyB0aGUgS1ZNX0NB
-UF9HVUVTVF9ERUJVR19IV19CUFMgYW5kCitLVk1fQ0FQX0dVRVNUX0RFQlVHX0hXX1dQUyBjYXBh
-YmlsaXRpZXMgd2hpY2ggcmV0dXJuIGEgcG9zaXRpdmUgbnVtYmVyCitpbmRpY2F0aW5nIHRoZSBu
-dW1iZXIgb2Ygc3VwcG9ydGVkIHJlZ2lzdGVycy4KKwogV2hlbiBkZWJ1ZyBldmVudHMgZXhpdCB0
-aGUgbWFpbiBydW4gbG9vcCB3aXRoIHRoZSByZWFzb24KIEtWTV9FWElUX0RFQlVHIHdpdGggdGhl
-IGt2bV9kZWJ1Z19leGl0X2FyY2ggcGFydCBvZiB0aGUga3ZtX3J1bgogc3RydWN0dXJlIGNvbnRh
-aW5pbmcgYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlYnVnIGluZm9ybWF0aW9uLgpkaWZmIC0tZ2l0
-IGEvYXJjaC9hcm0va3ZtL2FybS5jIGIvYXJjaC9hcm0va3ZtL2FybS5jCmluZGV4IDBkMTdjN2Iu
-LjZkZjQ3YzEgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtL2t2bS9hcm0uYworKysgYi9hcmNoL2FybS9r
-dm0vYXJtLmMKQEAgLTMwNyw2ICszMDcsNyBAQCB2b2lkIGt2bV9hcmNoX3ZjcHVfcHV0KHN0cnVj
-dCBrdm1fdmNwdSAqdmNwdSkKIAogI2RlZmluZSBLVk1fR1VFU1REQkdfVkFMSURfTUFTSyAoS1ZN
-X0dVRVNUREJHX0VOQUJMRSB8ICAgIFwKIAkJCSAgICBLVk1fR1VFU1REQkdfVVNFX1NXX0JQIHwg
-XAorCQkJICAgIEtWTV9HVUVTVERCR19VU0VfSFdfQlAgfCBcCiAJCQkgICAgS1ZNX0dVRVNUREJH
-X1NJTkdMRVNURVApCiAKIC8qKgpAQCAtMzI3LDYgKzMyOCwxMiBAQCBpbnQga3ZtX2FyY2hfdmNw
-dV9pb2N0bF9zZXRfZ3Vlc3RfZGVidWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAogCiAJaWYgKGRi
-Zy0+Y29udHJvbCAmIEtWTV9HVUVTVERCR19FTkFCTEUpIHsKIAkJdmNwdS0+Z3Vlc3RfZGVidWcg
-PSBkYmctPmNvbnRyb2w7CisKKwkJLyogSGFyZHdhcmUgYXNzaXN0ZWQgQnJlYWsgYW5kIFdhdGNo
-IHBvaW50cyAqLworCQlpZiAodmNwdS0+Z3Vlc3RfZGVidWcgJiBLVk1fR1VFU1REQkdfVVNFX0hX
-X0JQKSB7CisJCQl2Y3B1LT5hcmNoLmV4dGVybmFsX2RlYnVnX3N0YXRlID0gZGJnLT5hcmNoOwor
-CQl9CisKIAl9IGVsc2UgewogCQkvKiBJZiBub3QgZW5hYmxlZCBjbGVhciBhbGwgZmxhZ3MgKi8K
-IAkJdmNwdS0+Z3Vlc3RfZGVidWcgPSAwOwpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRl
-L2FzbS9od19icmVha3BvaW50LmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2h3X2JyZWFrcG9p
-bnQuaAppbmRleCA1MmI0ODRiLi5jNDUwNTUyIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2luY2x1
-ZGUvYXNtL2h3X2JyZWFrcG9pbnQuaAorKysgYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2h3X2Jy
-ZWFrcG9pbnQuaApAQCAtMTMwLDYgKzEzMCwxOCBAQCBzdGF0aWMgaW5saW5lIHZvaWQgcHRyYWNl
-X2h3X2NvcHlfdGhyZWFkKHN0cnVjdCB0YXNrX3N0cnVjdCAqdGFzaykKIH0KICNlbmRpZgogCisv
-KiBEZXRlcm1pbmUgbnVtYmVyIG9mIEJSUCByZWdpc3RlcnMgYXZhaWxhYmxlLiAqLworc3RhdGlj
-IGlubGluZSBpbnQgZ2V0X251bV9icnBzKHZvaWQpCit7CisJcmV0dXJuICgocmVhZF9jcHVpZChJ
-RF9BQTY0REZSMF9FTDEpID4+IDEyKSAmIDB4ZikgKyAxOworfQorCisvKiBEZXRlcm1pbmUgbnVt
-YmVyIG9mIFdSUCByZWdpc3RlcnMgYXZhaWxhYmxlLiAqLworc3RhdGljIGlubGluZSBpbnQgZ2V0
-X251bV93cnBzKHZvaWQpCit7CisJcmV0dXJuICgocmVhZF9jcHVpZChJRF9BQTY0REZSMF9FTDEp
-ID4+IDIwKSAmIDB4ZikgKyAxOworfQorCiBleHRlcm4gc3RydWN0IHBtdSBwZXJmX29wc19icDsK
-IAogI2VuZGlmCS8qIF9fS0VSTkVMX18gKi8KZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVk
-ZS9hc20va3ZtX2hvc3QuaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAppbmRl
-eCBlNTA0MGI2Li40OThkNGY3IDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2
-bV9ob3N0LmgKKysrIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCkBAIC0xMTMs
-MTIgKzExMywxMyBAQCBzdHJ1Y3Qga3ZtX3ZjcHVfYXJjaCB7CiAKIAkvKgogCSAqIEZvciBkZWJ1
-Z2dpbmcgdGhlIGd1ZXN0IHdlIG5lZWQgdG8ga2VlcCBhIHNldCBvZiBkZWJ1ZwotCSAqIHJlZ2lz
-dGVycyB3aGljaCBjYW4gb3ZlcnJpZGUgdGhlIGd1ZXN0cyBvd24gZGVidWcgc3RhdGUKKwkgKiBy
-ZWdpc3RlcnMgd2hpY2ggY2FuIG92ZXJyaWRlIHRoZSBndWVzdCdzIG93biBkZWJ1ZyBzdGF0ZQog
-CSAqIHdoaWxlIGJlaW5nIHVzZWQuIFRoZXNlIGFyZSBzZXQgdmlhIHRoZSBLVk1fU0VUX0dVRVNU
-X0RFQlVHCiAJICogaW9jdGwuCiAJICovCiAJc3RydWN0IGt2bV9ndWVzdF9kZWJ1Z19hcmNoICpk
-ZWJ1Z19wdHI7CiAJc3RydWN0IGt2bV9ndWVzdF9kZWJ1Z19hcmNoIHZjcHVfZGVidWdfc3RhdGU7
-CisJc3RydWN0IGt2bV9ndWVzdF9kZWJ1Z19hcmNoIGV4dGVybmFsX2RlYnVnX3N0YXRlOwogCiAJ
-LyogUG9pbnRlciB0byBob3N0IENQVSBjb250ZXh0ICovCiAJa3ZtX2NwdV9jb250ZXh0X3QgKmhv
-c3RfY3B1X2NvbnRleHQ7CmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2luY2x1ZGUvdWFwaS9hc20v
-a3ZtLmggYi9hcmNoL2FybTY0L2luY2x1ZGUvdWFwaS9hc20va3ZtLmgKaW5kZXggNDM3NThlNy4u
-OTUxNjhjMiAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oCisr
-KyBiL2FyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaApAQCAtMTE2LDcgKzExNiw3IEBA
-IHN0cnVjdCBrdm1fZ3Vlc3RfZGVidWdfYXJjaCB7CiAKIHN0cnVjdCBrdm1fZGVidWdfZXhpdF9h
-cmNoIHsKIAlfX3UzMiBoc3I7Ci0JX191NjQgZmFyOworCV9fdTY0IGZhcjsJLyogdXNlZCBmb3Ig
-d2F0Y2hwb2ludHMgKi8KIH07CiAKIC8qCmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2tlcm5lbC9o
-d19icmVha3BvaW50LmMgYi9hcmNoL2FybTY0L2tlcm5lbC9od19icmVha3BvaW50LmMKaW5kZXgg
-ZTdkOTM0ZC4uM2E0MWJiZiAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9rZXJuZWwvaHdfYnJlYWtw
-b2ludC5jCisrKyBiL2FyY2gvYXJtNjQva2VybmVsL2h3X2JyZWFrcG9pbnQuYwpAQCAtNDksMTgg
-KzQ5LDYgQEAgc3RhdGljIERFRklORV9QRVJfQ1BVKGludCwgc3RlcHBpbmdfa2VybmVsX2JwKTsK
-IHN0YXRpYyBpbnQgY29yZV9udW1fYnJwczsKIHN0YXRpYyBpbnQgY29yZV9udW1fd3JwczsKIAot
-LyogRGV0ZXJtaW5lIG51bWJlciBvZiBCUlAgcmVnaXN0ZXJzIGF2YWlsYWJsZS4gKi8KLXN0YXRp
-YyBpbnQgZ2V0X251bV9icnBzKHZvaWQpCi17Ci0JcmV0dXJuICgocmVhZF9jcHVpZChJRF9BQTY0
-REZSMF9FTDEpID4+IDEyKSAmIDB4ZikgKyAxOwotfQotCi0vKiBEZXRlcm1pbmUgbnVtYmVyIG9m
-IFdSUCByZWdpc3RlcnMgYXZhaWxhYmxlLiAqLwotc3RhdGljIGludCBnZXRfbnVtX3dycHModm9p
-ZCkKLXsKLQlyZXR1cm4gKChyZWFkX2NwdWlkKElEX0FBNjRERlIwX0VMMSkgPj4gMjApICYgMHhm
-KSArIDE7Ci19Ci0KIGludCBod19icmVha3BvaW50X3Nsb3RzKGludCB0eXBlKQogewogCS8qCmRp
-ZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9kZWJ1Zy5jIGIvYXJjaC9hcm02NC9rdm0vZGVidWcu
-YwppbmRleCAxMGE2YmFhLi4zYzBkYWFlIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2t2bS9kZWJ1
-Zy5jCisrKyBiL2FyY2gvYXJtNjQva3ZtL2RlYnVnLmMKQEAgLTk4LDEwICs5OCw2IEBAIHZvaWQg
-a3ZtX2FybV9zZXR1cF9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiAJCQkJTURDUl9FTDJf
-VERSQSB8CiAJCQkJTURDUl9FTDJfVERPU0EpOwogCi0JLyogVHJhcCBvbiBhY2Nlc3MgdG8gZGVi
-dWcgcmVnaXN0ZXJzPyAqLwotCWlmICh0cmFwX2RlYnVnKQotCQl2Y3B1LT5hcmNoLm1kY3JfZWwy
-IHw9IE1EQ1JfRUwyX1REQTsKLQogCS8qIElzIEd1ZXN0IGRlYnVnZ2luZyBpbiBlZmZlY3Q/ICov
-CiAJaWYgKHZjcHUtPmd1ZXN0X2RlYnVnKSB7CiAJCXZjcHUtPmFyY2gubWRjcl9lbDIgfD0gTURD
-Ul9FTDJfVERFOwpAQCAtMTI0LDExICsxMjAsNDIgQEAgdm9pZCBrdm1fYXJtX3NldHVwX2RlYnVn
-KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIAkJfSBlbHNlIHsKIAkJCXZjcHVfc3lzX3JlZyh2Y3B1
-LCBNRFNDUl9FTDEpICY9IH5EQkdfTURTQ1JfU1M7CiAJCX0KKworCQkvKgorCQkgKiBIVyBCcmVh
-ay9XYXRjaCBwb2ludHMKKwkJICoKKwkJICogV2Ugc2ltcGx5IHN3aXRjaCB0aGUgZGVidWdfcHRy
-IHRvIHBvaW50IHRvIG91ciBuZXcKKwkJICogZXh0ZXJuYWxfZGVidWdfc3RhdGUgd2hpY2ggaGFz
-IGJlZW4gcG9wdWxhdGVkIGJ5IHRoZQorCQkgKiBkZWJ1ZyBpb2N0bC4gVGhlIGV4aXN0aW5nIEtW
-TV9BUk02NF9ERUJVR19ESVJUWQorCQkgKiBtZWNoYW5pc20gZW5zdXJlcyB0aGUgcmVnaXN0ZXJz
-IGFyZSB1cGRhdGVkIG9uIHRoZQorCQkgKiB3b3JsZCBzd2l0Y2guCisJCSAqLworCQlpZiAodmNw
-dS0+Z3Vlc3RfZGVidWcgJiBLVk1fR1VFU1REQkdfVVNFX0hXX0JQKSB7CisJCQkvKiBFbmFibGUg
-YnJlYWtwb2ludHMvd2F0Y2hwb2ludHMgKi8KKwkJCXZjcHVfc3lzX3JlZyh2Y3B1LCBNRFNDUl9F
-TDEpIHw9IERCR19NRFNDUl9NREU7CisKKwkJCXZjcHUtPmFyY2guZGVidWdfcHRyID0gJnZjcHUt
-PmFyY2guZXh0ZXJuYWxfZGVidWdfc3RhdGU7CisJCQl2Y3B1LT5hcmNoLmRlYnVnX2ZsYWdzIHw9
-IEtWTV9BUk02NF9ERUJVR19ESVJUWTsKKwkJCXRyYXBfZGVidWcgPSB0cnVlOworCQl9CiAJfQor
-CisJLyogVHJhcCBkZWJ1ZyByZWdpc3RlciBhY2Nlc3MgKi8KKwlpZiAodHJhcF9kZWJ1ZykKKwkJ
-dmNwdS0+YXJjaC5tZGNyX2VsMiB8PSBNRENSX0VMMl9UREE7CiB9CiAKIHZvaWQga3ZtX2FybV9j
-bGVhcl9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCiB7Ci0JaWYgKHZjcHUtPmd1ZXN0X2Rl
-YnVnKQorCWlmICh2Y3B1LT5ndWVzdF9kZWJ1ZykgewogCQlyZXN0b3JlX2d1ZXN0X2RlYnVnX3Jl
-Z3ModmNwdSk7CisKKwkJLyoKKwkJICogSWYgd2Ugd2VyZSB1c2luZyBIVyBkZWJ1ZyB3ZSBuZWVk
-IHRvIHJlc3RvcmUgdGhlCisJCSAqIGRlYnVnX3B0ciB0byB0aGUgZ3Vlc3QgZGVidWcgc3RhdGUu
-CisJCSAqLworCQlpZiAodmNwdS0+Z3Vlc3RfZGVidWcgJiBLVk1fR1VFU1REQkdfVVNFX0hXX0JQ
-KQorCQkJdmNwdS0+YXJjaC5kZWJ1Z19wdHIgPSAmdmNwdS0+YXJjaC52Y3B1X2RlYnVnX3N0YXRl
-OworCisJfQogfQpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vaGFuZGxlX2V4aXQuYyBiL2Fy
-Y2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMKaW5kZXggZTlkZTEzZS4uNjhhMDc1OSAxMDA2NDQK
-LS0tIGEvYXJjaC9hcm02NC9rdm0vaGFuZGxlX2V4aXQuYworKysgYi9hcmNoL2FybTY0L2t2bS9o
-YW5kbGVfZXhpdC5jCkBAIC0xMDMsNyArMTAzLDExIEBAIHN0YXRpYyBpbnQga3ZtX2hhbmRsZV9n
-dWVzdF9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1fcnVuICpydW4pCiAJ
-cnVuLT5kZWJ1Zy5hcmNoLmhzciA9IGhzcjsKIAogCXN3aXRjaCAoaHNyID4+IEVTUl9FTHhfRUNf
-U0hJRlQpIHsKKwljYXNlIEVTUl9FTHhfRUNfV0FUQ0hQVF9MT1c6CisJCXJ1bi0+ZGVidWcuYXJj
-aC5mYXIgPSB2Y3B1LT5hcmNoLmZhdWx0LmZhcl9lbDI7CisJCS8qIGZhbGwgdGhyb3VnaCAqLwog
-CWNhc2UgRVNSX0VMeF9FQ19TT0ZUU1RQX0xPVzoKKwljYXNlIEVTUl9FTHhfRUNfQlJFQUtQVF9M
-T1c6CiAJY2FzZSBFU1JfRUx4X0VDX0JLUFQzMjoKIAljYXNlIEVTUl9FTHhfRUNfQlJLNjQ6CiAJ
-CWJyZWFrOwpAQCAtMTMyLDYgKzEzNiw4IEBAIHN0YXRpYyBleGl0X2hhbmRsZV9mbiBhcm1fZXhp
-dF9oYW5kbGVyc1tdID0gewogCVtFU1JfRUx4X0VDX0lBQlRfTE9XXQk9IGt2bV9oYW5kbGVfZ3Vl
-c3RfYWJvcnQsCiAJW0VTUl9FTHhfRUNfREFCVF9MT1ddCT0ga3ZtX2hhbmRsZV9ndWVzdF9hYm9y
-dCwKIAlbRVNSX0VMeF9FQ19TT0ZUU1RQX0xPV109IGt2bV9oYW5kbGVfZ3Vlc3RfZGVidWcsCisJ
-W0VTUl9FTHhfRUNfV0FUQ0hQVF9MT1ddPSBrdm1faGFuZGxlX2d1ZXN0X2RlYnVnLAorCVtFU1Jf
-RUx4X0VDX0JSRUFLUFRfTE9XXT0ga3ZtX2hhbmRsZV9ndWVzdF9kZWJ1ZywKIAlbRVNSX0VMeF9F
-Q19CS1BUMzJdCT0ga3ZtX2hhbmRsZV9ndWVzdF9kZWJ1ZywKIAlbRVNSX0VMeF9FQ19CUks2NF0J
-PSBrdm1faGFuZGxlX2d1ZXN0X2RlYnVnLAogfTsKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3Zt
-L3Jlc2V0LmMgYi9hcmNoL2FybTY0L2t2bS9yZXNldC5jCmluZGV4IDBiNDMyNjUuLjIxZDVhNjIg
-MTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQva3ZtL3Jlc2V0LmMKKysrIGIvYXJjaC9hcm02NC9rdm0v
-cmVzZXQuYwpAQCAtNTYsNiArNTYsMTIgQEAgc3RhdGljIGJvb2wgY3B1X2hhc18zMmJpdF9lbDEo
-dm9pZCkKIAlyZXR1cm4gISEocGZyMCAmIDB4MjApOwogfQogCisvKioKKyAqIGt2bV9hcmNoX2Rl
-dl9pb2N0bF9jaGVja19leHRlbnNpb24KKyAqCisgKiBXZSBjdXJyZW50bHkgYXNzdW1lIHRoYXQg
-dGhlIG51bWJlciBvZiBIVyByZWdpc3RlcnMgaXMgdW5pZm9ybQorICogYWNyb3NzIGFsbCBDUFVz
-IChzZWUgY3B1aW5mb19zYW5pdHlfY2hlY2spLgorICovCiBpbnQga3ZtX2FyY2hfZGV2X2lvY3Rs
-X2NoZWNrX2V4dGVuc2lvbihsb25nIGV4dCkKIHsKIAlpbnQgcjsKQEAgLTY0LDYgKzcwLDEyIEBA
-IGludCBrdm1fYXJjaF9kZXZfaW9jdGxfY2hlY2tfZXh0ZW5zaW9uKGxvbmcgZXh0KQogCWNhc2Ug
-S1ZNX0NBUF9BUk1fRUwxXzMyQklUOgogCQlyID0gY3B1X2hhc18zMmJpdF9lbDEoKTsKIAkJYnJl
-YWs7CisJY2FzZSBLVk1fQ0FQX0dVRVNUX0RFQlVHX0hXX0JQUzoKKwkJciA9IGdldF9udW1fYnJw
-cygpOworCQlicmVhazsKKwljYXNlIEtWTV9DQVBfR1VFU1RfREVCVUdfSFdfV1BTOgorCQlyICA9
-IGdldF9udW1fd3JwcygpOworCQlicmVhazsKIAlkZWZhdWx0OgogCQlyID0gMDsKIAl9CmRpZmYg
-LS1naXQgYS9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmggYi9pbmNsdWRlL3VhcGkvbGludXgva3Zt
-LmgKaW5kZXggNzBhYzY0MS4uZjAyMGRkMCAxMDA2NDQKLS0tIGEvaW5jbHVkZS91YXBpL2xpbnV4
-L2t2bS5oCisrKyBiL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaApAQCAtODE3LDYgKzgxNyw4IEBA
-IHN0cnVjdCBrdm1fcHBjX3NtbXVfaW5mbyB7CiAjZGVmaW5lIEtWTV9DQVBfUzM5MF9JTkpFQ1Rf
-SVJRIDExMwogI2RlZmluZSBLVk1fQ0FQX1MzOTBfSVJRX1NUQVRFIDExNAogI2RlZmluZSBLVk1f
-Q0FQX1BQQ19IV1JORyAxMTUKKyNkZWZpbmUgS1ZNX0NBUF9HVUVTVF9ERUJVR19IV19CUFMgMTE2
-CisjZGVmaW5lIEtWTV9DQVBfR1VFU1RfREVCVUdfSFdfV1BTIDExNwogCiAjaWZkZWYgS1ZNX0NB
-UF9JUlFfUk9VVElORwogCi0tIAoyLjQuMQoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29s
-dW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8v
-a3ZtYXJtCg==
+Currently we track which IRQ has been mapped to which VGIC list
+register and also have to synchronize both. We used to do this
+to hold some extra state (for instance the active bit).
+It turns out that this extra state in the LRs is no longer needed and
+this extra tracking causes some pain later.
+Remove the tracking feature (lr_map and lr_used) and get rid of
+quite some code on the way.
+On a guest exit we pick up all still pending IRQs from the LRs and put
+them back in the distributor. We don't care about active-only IRQs,
+so we keep them in the LRs. They will be retired either by our
+vgic_process_maintenance() routine or by the GIC hardware in case of
+edge triggered interrupts.
+In places where we scan LRs we now use our shadow copy of the ELRSR
+register directly.
+This code change means we lose the "piggy-back" optimization, which
+would re-use an active-only LR to inject the pending state on top of
+it. Tracing with various workloads shows that this actually occurred
+very rarely, the ballpark figure is about once every 10,000 exits
+in a disk I/O heavy workload. Also the list registers don't seem to
+as scarce as assumed, with all 4 LRs on the popular implementations
+used less than once every 100,000 exits.
+
+This has been briefly tested on Midway, Juno and the model (the latter
+both with GICv2 and GICv3 guests).
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ include/kvm/arm_vgic.h |   6 ---
+ virt/kvm/arm/vgic-v2.c |   1 +
+ virt/kvm/arm/vgic-v3.c |   1 +
+ virt/kvm/arm/vgic.c    | 143 ++++++++++++++++++++++---------------------------
+ 4 files changed, 66 insertions(+), 85 deletions(-)
+
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 133ea00..2ccfa9a 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -279,9 +279,6 @@ struct vgic_v3_cpu_if {
+ };
+ 
+ struct vgic_cpu {
+-	/* per IRQ to LR mapping */
+-	u8		*vgic_irq_lr_map;
+-
+ 	/* Pending/active/both interrupts on this VCPU */
+ 	DECLARE_BITMAP(	pending_percpu, VGIC_NR_PRIVATE_IRQS);
+ 	DECLARE_BITMAP(	active_percpu, VGIC_NR_PRIVATE_IRQS);
+@@ -292,9 +289,6 @@ struct vgic_cpu {
+ 	unsigned long   *active_shared;
+ 	unsigned long   *pend_act_shared;
+ 
+-	/* Bitmap of used/free list registers */
+-	DECLARE_BITMAP(	lr_used, VGIC_V2_MAX_LRS);
+-
+ 	/* Number of list registers on this CPU */
+ 	int		nr_lr;
+ 
+diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
+index f9b9c7c..f723710 100644
+--- a/virt/kvm/arm/vgic-v2.c
++++ b/virt/kvm/arm/vgic-v2.c
+@@ -144,6 +144,7 @@ static void vgic_v2_enable(struct kvm_vcpu *vcpu)
+ 	 * anyway.
+ 	 */
+ 	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = 0;
++	vcpu->arch.vgic_cpu.vgic_v2.vgic_elrsr = ~0;
+ 
+ 	/* Get the show on the road... */
+ 	vcpu->arch.vgic_cpu.vgic_v2.vgic_hcr = GICH_HCR_EN;
+diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
+index dff0602..21e5d28 100644
+--- a/virt/kvm/arm/vgic-v3.c
++++ b/virt/kvm/arm/vgic-v3.c
+@@ -178,6 +178,7 @@ static void vgic_v3_enable(struct kvm_vcpu *vcpu)
+ 	 * anyway.
+ 	 */
+ 	vgic_v3->vgic_vmcr = 0;
++	vgic_v3->vgic_elrsr = ~0;
+ 
+ 	/*
+ 	 * If we are emulating a GICv3, we do it in an non-GICv2-compatible
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 78fb820..037b723 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -81,7 +81,6 @@
+ #include "vgic.h"
+ 
+ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu);
+-static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu);
+ static struct vgic_lr vgic_get_lr(const struct kvm_vcpu *vcpu, int lr);
+ static void vgic_set_lr(struct kvm_vcpu *vcpu, int lr, struct vgic_lr lr_desc);
+ 
+@@ -649,6 +648,17 @@ bool vgic_handle_cfg_reg(u32 *reg, struct kvm_exit_mmio *mmio,
+ 	return false;
+ }
+ 
++static void vgic_sync_lr_elrsr(struct kvm_vcpu *vcpu, int lr,
++			       struct vgic_lr vlr)
++{
++	vgic_ops->sync_lr_elrsr(vcpu, lr, vlr);
++}
++
++static inline u64 vgic_get_elrsr(struct kvm_vcpu *vcpu)
++{
++	return vgic_ops->get_elrsr(vcpu);
++}
++
+ /**
+  * vgic_unqueue_irqs - move pending/active IRQs from LRs to the distributor
+  * @vgic_cpu: Pointer to the vgic_cpu struct holding the LRs
+@@ -660,9 +670,11 @@ bool vgic_handle_cfg_reg(u32 *reg, struct kvm_exit_mmio *mmio,
+ void vgic_unqueue_irqs(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	u64 elrsr = vgic_get_elrsr(vcpu);
++	unsigned long *elrsr_ptr = u64_to_bitmask(&elrsr);
+ 	int i;
+ 
+-	for_each_set_bit(i, vgic_cpu->lr_used, vgic_cpu->nr_lr) {
++	for_each_clear_bit(i, elrsr_ptr, vgic_cpu->nr_lr) {
+ 		struct vgic_lr lr = vgic_get_lr(vcpu, i);
+ 
+ 		/*
+@@ -705,7 +717,7 @@ void vgic_unqueue_irqs(struct kvm_vcpu *vcpu)
+ 		 * Mark the LR as free for other use.
+ 		 */
+ 		BUG_ON(lr.state & LR_STATE_MASK);
+-		vgic_retire_lr(i, lr.irq, vcpu);
++		vgic_sync_lr_elrsr(vcpu, i, lr);
+ 		vgic_irq_clear_queued(vcpu, lr.irq);
+ 
+ 		/* Finally update the VGIC state. */
+@@ -1013,17 +1025,6 @@ static void vgic_set_lr(struct kvm_vcpu *vcpu, int lr,
+ 	vgic_ops->set_lr(vcpu, lr, vlr);
+ }
+ 
+-static void vgic_sync_lr_elrsr(struct kvm_vcpu *vcpu, int lr,
+-			       struct vgic_lr vlr)
+-{
+-	vgic_ops->sync_lr_elrsr(vcpu, lr, vlr);
+-}
+-
+-static inline u64 vgic_get_elrsr(struct kvm_vcpu *vcpu)
+-{
+-	return vgic_ops->get_elrsr(vcpu);
+-}
+-
+ static inline u64 vgic_get_eisr(struct kvm_vcpu *vcpu)
+ {
+ 	return vgic_ops->get_eisr(vcpu);
+@@ -1064,18 +1065,6 @@ static inline void vgic_enable(struct kvm_vcpu *vcpu)
+ 	vgic_ops->enable(vcpu);
+ }
+ 
+-static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu)
+-{
+-	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+-	struct vgic_lr vlr = vgic_get_lr(vcpu, lr_nr);
+-
+-	vlr.state = 0;
+-	vgic_set_lr(vcpu, lr_nr, vlr);
+-	clear_bit(lr_nr, vgic_cpu->lr_used);
+-	vgic_cpu->vgic_irq_lr_map[irq] = LR_EMPTY;
+-	vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
+-}
+-
+ /*
+  * An interrupt may have been disabled after being made pending on the
+  * CPU interface (the classic case is a timer running while we're
+@@ -1087,23 +1076,32 @@ static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu)
+  */
+ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu)
+ {
+-	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	u64 elrsr = vgic_get_elrsr(vcpu);
++	unsigned long *elrsr_ptr = u64_to_bitmask(&elrsr);
+ 	int lr;
++	struct vgic_lr vlr;
+ 
+-	for_each_set_bit(lr, vgic_cpu->lr_used, vgic->nr_lr) {
+-		struct vgic_lr vlr = vgic_get_lr(vcpu, lr);
++	for_each_clear_bit(lr, elrsr_ptr, vgic->nr_lr) {
++		vlr = vgic_get_lr(vcpu, lr);
+ 
+ 		if (!vgic_irq_is_enabled(vcpu, vlr.irq)) {
+-			vgic_retire_lr(lr, vlr.irq, vcpu);
+-			if (vgic_irq_is_queued(vcpu, vlr.irq))
+-				vgic_irq_clear_queued(vcpu, vlr.irq);
++			vlr.state = 0;
++			vgic_set_lr(vcpu, lr, vlr);
++			vgic_sync_lr_elrsr(vcpu, lr, vlr);
++			vgic_irq_clear_queued(vcpu, vlr.irq);
+ 		}
+ 	}
+ }
+ 
+ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
+-				 int lr_nr, struct vgic_lr vlr)
++				 int lr_nr, int sgi_source_id)
+ {
++	struct vgic_lr vlr;
++
++	vlr.state = 0;
++	vlr.irq = irq;
++	vlr.source = sgi_source_id;
++
+ 	if (vgic_irq_is_active(vcpu, irq)) {
+ 		vlr.state |= LR_STATE_ACTIVE;
+ 		kvm_debug("Set active, clear distributor: 0x%x\n", vlr.state);
+@@ -1128,9 +1126,9 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
+  */
+ bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq)
+ {
+-	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+ 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+-	struct vgic_lr vlr;
++	u64 elrsr = vgic_get_elrsr(vcpu);
++	unsigned long *elrsr_ptr = u64_to_bitmask(&elrsr);
+ 	int lr;
+ 
+ 	/* Sanitize the input... */
+@@ -1140,42 +1138,20 @@ bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq)
+ 
+ 	kvm_debug("Queue IRQ%d\n", irq);
+ 
+-	lr = vgic_cpu->vgic_irq_lr_map[irq];
+-
+-	/* Do we have an active interrupt for the same CPUID? */
+-	if (lr != LR_EMPTY) {
+-		vlr = vgic_get_lr(vcpu, lr);
+-		if (vlr.source == sgi_source_id) {
+-			kvm_debug("LR%d piggyback for IRQ%d\n", lr, vlr.irq);
+-			BUG_ON(!test_bit(lr, vgic_cpu->lr_used));
+-			vgic_queue_irq_to_lr(vcpu, irq, lr, vlr);
+-			return true;
+-		}
+-	}
++	lr = find_first_bit(elrsr_ptr, vgic->nr_lr);
+ 
+-	/* Try to use another LR for this interrupt */
+-	lr = find_first_zero_bit((unsigned long *)vgic_cpu->lr_used,
+-			       vgic->nr_lr);
+ 	if (lr >= vgic->nr_lr)
+ 		return false;
+ 
+ 	kvm_debug("LR%d allocated for IRQ%d %x\n", lr, irq, sgi_source_id);
+-	vgic_cpu->vgic_irq_lr_map[irq] = lr;
+-	set_bit(lr, vgic_cpu->lr_used);
+ 
+-	vlr.irq = irq;
+-	vlr.source = sgi_source_id;
+-	vlr.state = 0;
+-	vgic_queue_irq_to_lr(vcpu, irq, lr, vlr);
++	vgic_queue_irq_to_lr(vcpu, irq, lr, sgi_source_id);
+ 
+ 	return true;
+ }
+ 
+ static bool vgic_queue_hwirq(struct kvm_vcpu *vcpu, int irq)
+ {
+-	if (!vgic_can_sample_irq(vcpu, irq))
+-		return true; /* level interrupt, already queued */
+-
+ 	if (vgic_queue_irq(vcpu, 0, irq)) {
+ 		if (vgic_irq_is_edge(vcpu, irq)) {
+ 			vgic_dist_irq_clear_pending(vcpu, irq);
+@@ -1348,29 +1324,44 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+ 	u64 elrsr;
+ 	unsigned long *elrsr_ptr;
+-	int lr, pending;
+-	bool level_pending;
++	struct vgic_lr vlr;
++	int lr_nr;
++	bool pending;
++
++	pending = vgic_process_maintenance(vcpu);
+ 
+-	level_pending = vgic_process_maintenance(vcpu);
+ 	elrsr = vgic_get_elrsr(vcpu);
+ 	elrsr_ptr = u64_to_bitmask(&elrsr);
+ 
+-	/* Clear mappings for empty LRs */
+-	for_each_set_bit(lr, elrsr_ptr, vgic->nr_lr) {
+-		struct vgic_lr vlr;
++	for_each_clear_bit(lr_nr, elrsr_ptr, vgic_cpu->nr_lr) {
++		vlr = vgic_get_lr(vcpu, lr_nr);
++
++		BUG_ON(!(vlr.state & LR_STATE_MASK));
++		pending = true;
+ 
+-		if (!test_and_clear_bit(lr, vgic_cpu->lr_used))
++		/* Reestablish SGI source for pending and active SGIs */
++		if (vlr.irq < VGIC_NR_SGIS)
++			add_sgi_source(vcpu, vlr.irq, vlr.source);
++
++		/*
++		 * If the LR holds a pure active (10) interrupt then keep it
++		 * in the LR without mirroring this status in the emulation.
++		 */
++		if (vlr.state == LR_STATE_ACTIVE)
+ 			continue;
+ 
+-		vlr = vgic_get_lr(vcpu, lr);
++		if (vlr.state & LR_STATE_PENDING)
++			vgic_dist_irq_set_pending(vcpu, vlr.irq);
+ 
+-		BUG_ON(vlr.irq >= dist->nr_irqs);
+-		vgic_cpu->vgic_irq_lr_map[vlr.irq] = LR_EMPTY;
++		/* Mark this LR as empty now. */
++		vlr.state = 0;
++		vgic_set_lr(vcpu, lr_nr, vlr);
++		vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
+ 	}
++	vgic_update_state(vcpu->kvm);
+ 
+-	/* Check if we still have something up our sleeve... */
+-	pending = find_first_zero_bit(elrsr_ptr, vgic->nr_lr);
+-	if (level_pending || pending < vgic->nr_lr)
++	/* vgic_update_state would not cover only-active IRQs */
++	if (pending)
+ 		set_bit(vcpu->vcpu_id, dist->irq_pending_on_cpu);
+ }
+ 
+@@ -1592,11 +1583,9 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 	kfree(vgic_cpu->pending_shared);
+ 	kfree(vgic_cpu->active_shared);
+ 	kfree(vgic_cpu->pend_act_shared);
+-	kfree(vgic_cpu->vgic_irq_lr_map);
+ 	vgic_cpu->pending_shared = NULL;
+ 	vgic_cpu->active_shared = NULL;
+ 	vgic_cpu->pend_act_shared = NULL;
+-	vgic_cpu->vgic_irq_lr_map = NULL;
+ }
+ 
+ static int vgic_vcpu_init_maps(struct kvm_vcpu *vcpu, int nr_irqs)
+@@ -1607,18 +1596,14 @@ static int vgic_vcpu_init_maps(struct kvm_vcpu *vcpu, int nr_irqs)
+ 	vgic_cpu->pending_shared = kzalloc(sz, GFP_KERNEL);
+ 	vgic_cpu->active_shared = kzalloc(sz, GFP_KERNEL);
+ 	vgic_cpu->pend_act_shared = kzalloc(sz, GFP_KERNEL);
+-	vgic_cpu->vgic_irq_lr_map = kmalloc(nr_irqs, GFP_KERNEL);
+ 
+ 	if (!vgic_cpu->pending_shared
+ 		|| !vgic_cpu->active_shared
+-		|| !vgic_cpu->pend_act_shared
+-		|| !vgic_cpu->vgic_irq_lr_map) {
++		|| !vgic_cpu->pend_act_shared) {
+ 		kvm_vgic_vcpu_destroy(vcpu);
+ 		return -ENOMEM;
+ 	}
+ 
+-	memset(vgic_cpu->vgic_irq_lr_map, LR_EMPTY, nr_irqs);
+-
+ 	/*
+ 	 * Store the number of LRs per vcpu, so we don't have to go
+ 	 * all the way to the distributor structure to find out. Only
+-- 
+2.3.5
+
