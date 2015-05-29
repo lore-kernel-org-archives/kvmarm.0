@@ -1,25 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v4 1/4] target-arm: Add GIC phandle to VirtBoardInfo
-Date: Fri, 29 May 2015 13:01:07 +0200
-Message-ID: <1432897270-7780-2-git-send-email-christoffer.dall@linaro.org>
+Subject: [PATCH v4 4/4] target-arm: Add the GICv2m to the virt board
+Date: Fri, 29 May 2015 13:01:10 +0200
+Message-ID: <1432897270-7780-5-git-send-email-christoffer.dall@linaro.org>
 References: <1432897270-7780-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 985F6524AF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 06:51:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 60E195249F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 06:51:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EhRgZd0Acbdg for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 May 2015 06:50:58 -0400 (EDT)
-Received: from mail-la0-f50.google.com (mail-la0-f50.google.com
- [209.85.215.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D80D95236A
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 06:50:57 -0400 (EDT)
-Received: by lagv1 with SMTP id v1so52814938lag.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 04:00:43 -0700 (PDT)
+ with ESMTP id lVuVwSdbYOjo for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 May 2015 06:51:02 -0400 (EDT)
+Received: from mail-la0-f43.google.com (mail-la0-f43.google.com
+ [209.85.215.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8ECF5247E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 06:51:01 -0400 (EDT)
+Received: by labpy14 with SMTP id py14so41142740lab.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 04:00:48 -0700 (PDT)
 In-Reply-To: <1432897270-7780-1-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,119 +34,142 @@ To: qemu-devel@nongnu.org
 Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Instead of passing the GIC phandle around between functions, add it to
-the VirtBoardInfo just like we do for the clock_phandle.  We are about
-to add the v2m phandle as well, and it's easier not having to pass
-around a bunch of phandles, return multiple values from functions, etc.
+Add a GICv2m device to the virt board to enable MSIs on the generic PCI
+host controller.  We allocate 64 SPIs in the IRQ space for now (this can
+be increased/decreased later) and map the GICv2m right after the GIC in
+the memory map.
 
 Reviewed-by: Eric Auger <eric.auger@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
 Changes since v3:
+ - Rebased on target-arm.next, so moved some definitions to virt.h
  - Added reviewed-by tag
 Changes since v2:
- - None
+ - Factored out changes to GIC DT node to previous patch.
+ - Renamed QOM type name to "arm-gicv2m"
 Changes since v1:
- - Added reviewed-by tag
+ - Remove stray merge conflict line
+ - Reworded commmit message.
 
- hw/arm/virt.c | 26 +++++++++++---------------
- 1 file changed, 11 insertions(+), 15 deletions(-)
+ hw/arm/virt.c         | 40 +++++++++++++++++++++++++++++++++++++++-
+ include/hw/arm/virt.h |  2 ++
+ 2 files changed, 41 insertions(+), 1 deletion(-)
 
 diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index 05db8cb..e5235ef 100644
+index 387dac8..4bb7175 100644
 --- a/hw/arm/virt.c
 +++ b/hw/arm/virt.c
-@@ -69,6 +69,7 @@ typedef struct VirtBoardInfo {
-     void *fdt;
+@@ -70,6 +70,7 @@ typedef struct VirtBoardInfo {
      int fdt_size;
      uint32_t clock_phandle;
-+    uint32_t gic_phandle;
+     uint32_t gic_phandle;
++    uint32_t v2m_phandle;
  } VirtBoardInfo;
  
  typedef struct {
-@@ -299,12 +300,11 @@ static void fdt_add_cpu_nodes(const VirtBoardInfo *vbi)
+@@ -109,6 +110,7 @@ static const MemMapEntry a15memmap[] = {
+     /* GIC distributor and CPU interfaces sit inside the CPU peripheral space */
+     [VIRT_GIC_DIST] =   { 0x08000000, 0x00010000 },
+     [VIRT_GIC_CPU] =    { 0x08010000, 0x00010000 },
++    [VIRT_GIC_V2M] =    { 0x08020000, 0x00001000 },
+     [VIRT_UART] =       { 0x09000000, 0x00001000 },
+     [VIRT_RTC] =        { 0x09010000, 0x00001000 },
+     [VIRT_FW_CFG] =     { 0x09020000, 0x0000000a },
+@@ -125,6 +127,7 @@ static const int a15irqmap[] = {
+     [VIRT_RTC] = 2,
+     [VIRT_PCIE] = 3, /* ... to 6 */
+     [VIRT_MMIO] = 16, /* ...to 16 + NUM_VIRTIO_TRANSPORTS - 1 */
++    [VIRT_GIC_V2M] = 48, /* ...to 48 + NUM_GICV2M_SPIS - 1 */
+ };
+ 
+ static VirtBoardInfo machines[] = {
+@@ -300,9 +303,21 @@ static void fdt_add_cpu_nodes(const VirtBoardInfo *vbi)
      }
  }
  
--static uint32_t fdt_add_gic_node(const VirtBoardInfo *vbi)
-+static void fdt_add_gic_node(VirtBoardInfo *vbi)
+-static void fdt_add_gic_node(VirtBoardInfo *vbi)
++static void fdt_add_v2m_gic_node(VirtBoardInfo *vbi)
  {
--    uint32_t gic_phandle;
++    vbi->v2m_phandle = qemu_fdt_alloc_phandle(vbi->fdt);
++    qemu_fdt_add_subnode(vbi->fdt, "/intc/v2m");
++    qemu_fdt_setprop_string(vbi->fdt, "/intc/v2m", "compatible",
++                            "arm,gic-v2m-frame");
++    qemu_fdt_setprop(vbi->fdt, "/intc/v2m", "msi-controller", NULL, 0);
++    qemu_fdt_setprop_sized_cells(vbi->fdt, "/intc/v2m", "reg",
++                                 2, vbi->memmap[VIRT_GIC_V2M].base,
++                                 2, vbi->memmap[VIRT_GIC_V2M].size);
++    qemu_fdt_setprop_cell(vbi->fdt, "/intc/v2m", "phandle", vbi->v2m_phandle);
++}
  
--    gic_phandle = qemu_fdt_alloc_phandle(vbi->fdt);
--    qemu_fdt_setprop_cell(vbi->fdt, "/", "interrupt-parent", gic_phandle);
-+    vbi->gic_phandle = qemu_fdt_alloc_phandle(vbi->fdt);
-+    qemu_fdt_setprop_cell(vbi->fdt, "/", "interrupt-parent", vbi->gic_phandle);
++static void fdt_add_gic_node(VirtBoardInfo *vbi)
++{
+     vbi->gic_phandle = qemu_fdt_alloc_phandle(vbi->fdt);
+     qemu_fdt_setprop_cell(vbi->fdt, "/", "interrupt-parent", vbi->gic_phandle);
  
-     qemu_fdt_add_subnode(vbi->fdt, "/intc");
-     /* 'cortex-a15-gic' means 'GIC v2' */
-@@ -317,12 +317,10 @@ static uint32_t fdt_add_gic_node(const VirtBoardInfo *vbi)
-                                      2, vbi->memmap[VIRT_GIC_DIST].size,
-                                      2, vbi->memmap[VIRT_GIC_CPU].base,
-                                      2, vbi->memmap[VIRT_GIC_CPU].size);
--    qemu_fdt_setprop_cell(vbi->fdt, "/intc", "phandle", gic_phandle);
--
--    return gic_phandle;
-+    qemu_fdt_setprop_cell(vbi->fdt, "/intc", "phandle", vbi->gic_phandle);
+@@ -323,6 +338,25 @@ static void fdt_add_gic_node(VirtBoardInfo *vbi)
+     qemu_fdt_setprop_cell(vbi->fdt, "/intc", "phandle", vbi->gic_phandle);
  }
  
--static uint32_t create_gic(const VirtBoardInfo *vbi, qemu_irq *pic)
-+static void create_gic(VirtBoardInfo *vbi, qemu_irq *pic)
++static void create_v2m(VirtBoardInfo *vbi, qemu_irq *pic)
++{
++    int i;
++    int irq = vbi->irqmap[VIRT_GIC_V2M];
++    DeviceState *dev;
++
++    dev = qdev_create(NULL, "arm-gicv2m");
++    sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, vbi->memmap[VIRT_GIC_V2M].base);
++    qdev_prop_set_uint32(dev, "base-spi", irq);
++    qdev_prop_set_uint32(dev, "num-spi", NUM_GICV2M_SPIS);
++    qdev_init_nofail(dev);
++
++    for (i = 0; i < NUM_GICV2M_SPIS; i++) {
++        sysbus_connect_irq(SYS_BUS_DEVICE(dev), i, pic[irq + i]);
++    }
++
++    fdt_add_v2m_gic_node(vbi);
++}
++
+ static void create_gic(VirtBoardInfo *vbi, qemu_irq *pic)
  {
      /* We create a standalone GIC v2 */
-     DeviceState *gicdev;
-@@ -371,7 +369,7 @@ static uint32_t create_gic(const VirtBoardInfo *vbi, qemu_irq *pic)
-         pic[i] = qdev_get_gpio_in(gicdev, i);
+@@ -373,6 +407,8 @@ static void create_gic(VirtBoardInfo *vbi, qemu_irq *pic)
      }
  
--    return fdt_add_gic_node(vbi);
-+    fdt_add_gic_node(vbi);
+     fdt_add_gic_node(vbi);
++
++    create_v2m(vbi, pic);
  }
  
  static void create_uart(const VirtBoardInfo *vbi, qemu_irq *pic)
-@@ -618,8 +616,7 @@ static void create_pcie_irq_map(const VirtBoardInfo *vbi, uint32_t gic_phandle,
-                            0x7           /* PCI irq */);
- }
+@@ -676,6 +712,8 @@ static void create_pcie(const VirtBoardInfo *vbi, qemu_irq *pic)
+     qemu_fdt_setprop_cells(vbi->fdt, nodename, "bus-range", 0,
+                            nr_pcie_buses - 1);
  
--static void create_pcie(const VirtBoardInfo *vbi, qemu_irq *pic,
--                        uint32_t gic_phandle)
-+static void create_pcie(const VirtBoardInfo *vbi, qemu_irq *pic)
- {
-     hwaddr base_mmio = vbi->memmap[VIRT_PCIE_MMIO].base;
-     hwaddr size_mmio = vbi->memmap[VIRT_PCIE_MMIO].size;
-@@ -685,7 +682,7 @@ static void create_pcie(const VirtBoardInfo *vbi, qemu_irq *pic,
-                                  2, base_mmio, 2, size_mmio);
++    qemu_fdt_setprop_cells(vbi->fdt, nodename, "msi-parent", vbi->v2m_phandle);
++
+     qemu_fdt_setprop_sized_cells(vbi->fdt, nodename, "reg",
+                                  2, base_ecam, 2, size_ecam);
+     qemu_fdt_setprop_sized_cells(vbi->fdt, nodename, "ranges",
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index ceec8b3..003ef29 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -32,6 +32,7 @@
  
-     qemu_fdt_setprop_cell(vbi->fdt, nodename, "#interrupt-cells", 1);
--    create_pcie_irq_map(vbi, gic_phandle, irq, nodename);
-+    create_pcie_irq_map(vbi, vbi->gic_phandle, irq, nodename);
+ #include "qemu-common.h"
  
-     g_free(nodename);
- }
-@@ -717,7 +714,6 @@ static void machvirt_init(MachineState *machine)
-     VirtBoardInfo *vbi;
-     VirtGuestInfoState *guest_info_state = g_malloc0(sizeof *guest_info_state);
-     VirtGuestInfo *guest_info = &guest_info_state->info;
--    uint32_t gic_phandle;
-     char **cpustr;
++#define NUM_GICV2M_SPIS       64
+ #define NUM_VIRTIO_TRANSPORTS 32
  
-     if (!cpu_model) {
-@@ -794,13 +790,13 @@ static void machvirt_init(MachineState *machine)
+ #define ARCH_TIMER_VIRT_IRQ   11
+@@ -53,6 +54,7 @@ enum {
+     VIRT_PCIE_MMIO,
+     VIRT_PCIE_PIO,
+     VIRT_PCIE_ECAM,
++    VIRT_GIC_V2M,
+ };
  
-     create_flash(vbi);
- 
--    gic_phandle = create_gic(vbi, pic);
-+    create_gic(vbi, pic);
- 
-     create_uart(vbi, pic);
- 
-     create_rtc(vbi, pic);
- 
--    create_pcie(vbi, pic, gic_phandle);
-+    create_pcie(vbi, pic);
- 
-     /* Create mmio transports, so the user can create virtio backends
-      * (which will be automatically plugged in to the transports). If
+ typedef struct MemMapEntry {
 -- 
 2.1.2.330.g565301e.dirty
