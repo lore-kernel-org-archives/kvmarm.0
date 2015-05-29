@@ -1,105 +1,88 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v2] arm/arm64: KVM: Properly account for guest CPU time
-Date: Thu, 28 May 2015 20:49:10 +0200
-Message-ID: <1432838950-28774-1-git-send-email-christoffer.dall@linaro.org>
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH v5 00/12] KVM Guest Debug support for arm64
+Date: Fri, 29 May 2015 10:30:16 +0100
+Message-ID: <1432891828-4816-1-git-send-email-alex.bennee@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
 Sender: kvm-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, borntraeger@de.ibm.com, Paolo Bonzini <pbonzini@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>
+To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org
+Cc: jan.kiszka@siemens.com, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Until now we have been calling kvm_guest_exit after re-enabling
-interrupts when we come back from the guest, but this has the
-unfortunate effect that CPU time accounting done in the context of timer
-interrupts occurring while the guest is running doesn't properly notice
-that the time since the last tick was spent in the guest.
+Here is V5 of the KVM Guest Debug support for arm64.
 
-Inspired by the comment in the x86 code, move the kvm_guest_exit() call
-below the local_irq_enable() call and change __kvm_guest_exit() to
-kvm_guest_exit(), because we are now calling this function with
-interrupts enabled.  We have to now explicitly disable preemption and
-not enable preemption before we've called kvm_guest_exit(), since
-otherwise we could be preempted and everything happening before we
-eventually get scheduled again would be accounted for as guest time.
+The changes are fairly minimal from the last round:
 
-At the same time, move the trace_kvm_exit() call outside of the atomic
-section, since there is no reason for us to do that with interrupts
-disabled.
+  - dropped KVM_GUESTDBG_USE_SW/HW_BP unifying patch (ABI break)
+  - new comment patch to fix comments in hyp.S (also sent separately)
+  - simplified singlestep code (no longer needs to preserve pstate)
+  - don't set MDSCR_EL1.KDE (not needed)
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
-This patch is based on kvm/queue, because it has the kvm_guest_enter/exit
-rework recently posted by Christian Borntraeger.  I hope I got the logic
-of this right, there were 2 slightly worrying facts about this:
+=46or full details see the changelog on each of the patches.
 
-First, we now enable and disable and enable interrupts on each exit
-path, but I couldn't see any performance overhead on hackbench - yes the
-only benchmark we care about.
+GIT Repos:
 
-Second, looking at the ppc and mips code, they seem to also call
-kvm_guest_exit() before enabling interrupts, so I don't understand how
-guest CPU time accounting works on those architectures.
+The patches for this series are based off v4.1-rc5 and can be found
+at:
 
-Changes since v1:
- - Tweak comment and commit text based on Marc's feedback.
- - Explicitly disable preemption and enable it only after kvm_guest_exit().
+https://git.linaro.org/people/alex.bennee/linux.git
+branch: guest-debug/4.1-rc5-v5
 
- arch/arm/kvm/arm.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
+While adding debug exception injection support into QEMU I ran into
+problem with GDB in the guest which relies on working single step
+support. So while guest SW BKPTs get delivered (and HW BKPTs if the
+host is not using them) GDB tends to get confused as it tries to
+single step. If the host isn't doing any debugging of the guest then
+everything works as normal.
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index e41cb11..fe8028d 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -532,6 +532,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		kvm_vgic_flush_hwstate(vcpu);
- 		kvm_timer_flush_hwstate(vcpu);
- 
-+		preempt_disable();
- 		local_irq_disable();
- 
- 		/*
-@@ -544,6 +545,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 
- 		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm)) {
- 			local_irq_enable();
-+			preempt_enable();
- 			kvm_timer_sync_hwstate(vcpu);
- 			kvm_vgic_sync_hwstate(vcpu);
- 			continue;
-@@ -559,8 +561,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
- 
- 		vcpu->mode = OUTSIDE_GUEST_MODE;
--		__kvm_guest_exit();
--		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
-+		/*
-+		 * Back from guest
-+		 *************************************************************/
-+
- 		/*
- 		 * We may have taken a host interrupt in HYP mode (ie
- 		 * while executing the guest). This interrupt is still
-@@ -574,8 +578,17 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		local_irq_enable();
- 
- 		/*
--		 * Back from guest
--		 *************************************************************/
-+		 * We do local_irq_enable() before calling kvm_guest_exit() so
-+		 * that if a timer interrupt hits while running the guest we
-+		 * account that tick as being spent in the guest.  We enable
-+		 * preemption after calling kvm_guest_exit() so that if we get
-+		 * preempted we make sure ticks after that is not counted as
-+		 * guest time.
-+		 */
-+		kvm_guest_exit();
-+		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
-+		preempt_enable();
-+
- 
- 		kvm_timer_sync_hwstate(vcpu);
- 		kvm_vgic_sync_hwstate(vcpu);
--- 
-2.1.2.330.g565301e.dirty
+The actual solution would be to fully emulate single step in QEMU by
+creating a new debug event when the guest sets MDSCR_EL1.SS. QEMU
+would then need to ensure the correct position is reached while
+honouring the guests setting of MDSCR_EL1.KDE. However this would be a
+bunch of potentially hairy new code so I've left this as an exercise
+for a future patch series.
+
+https://github.com/stsquad/qemu
+branch: kvm/guest-debug-v5
+
+Alex Benn=C3=A9e (12):
+  KVM: add comments for kvm_debug_exit_arch struct
+  KVM: arm64: fix misleading comments in save/restore
+  KVM: arm64: guest debug, define API headers
+  KVM: arm: guest debug, add stub KVM_SET_GUEST_DEBUG ioctl
+  KVM: arm: introduce kvm_arm_init/setup/clear_debug
+  KVM: arm64: guest debug, add SW break point support
+  KVM: arm64: guest debug, add support for single-step
+  KVM: arm64: re-factor hyp.S debug register code
+  KVM: arm64: introduce vcpu->arch.debug_ptr
+  KVM: arm64: guest debug, HW assisted debug support
+  KVM: arm64: enable KVM_CAP_SET_GUEST_DEBUG
+  KVM: arm64: add trace points for guest_debug debug
+
+ Documentation/virtual/kvm/api.txt      |  15 +-
+ arch/arm/include/asm/kvm_host.h        |   4 +
+ arch/arm/kvm/arm.c                     |  46 ++-
+ arch/arm/kvm/trace.h                   |  17 +
+ arch/arm64/include/asm/hw_breakpoint.h |  12 +
+ arch/arm64/include/asm/kvm_asm.h       |  26 +-
+ arch/arm64/include/asm/kvm_host.h      |  29 +-
+ arch/arm64/include/uapi/asm/kvm.h      |  20 ++
+ arch/arm64/kernel/asm-offsets.c        |   7 +
+ arch/arm64/kernel/hw_breakpoint.c      |  12 -
+ arch/arm64/kvm/Makefile                |   2 +-
+ arch/arm64/kvm/debug.c                 | 194 ++++++++++++
+ arch/arm64/kvm/handle_exit.c           |  44 +++
+ arch/arm64/kvm/hyp.S                   | 551 ++++++++++---------------=
+--------
+ arch/arm64/kvm/reset.c                 |  15 +
+ arch/arm64/kvm/sys_regs.c              | 136 ++++++--
+ arch/arm64/kvm/trace.h                 | 105 +++++++
+ include/uapi/linux/kvm.h               |   5 +
+ 18 files changed, 788 insertions(+), 452 deletions(-)
+ create mode 100644 arch/arm64/kvm/debug.c
+
+--=20
+2.4.1
 
