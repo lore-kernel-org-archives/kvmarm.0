@@ -1,29 +1,24 @@
-From: Mario Smarduch <m.smarduch@samsung.com>
-Subject: Re: [PATCH v2] arm/arm64: KVM: Properly account for guest CPU time
-Date: Fri, 29 May 2015 15:34:47 -0700
-Message-ID: <5568E987.5010702@samsung.com>
-References: <1432838950-28774-1-git-send-email-christoffer.dall@linaro.org>
+From: Zhichao Huang <zhichao.huang@linaro.org>
+Subject: [PATCH v2 00/11] KVM: arm: debug infrastructure support
+Date: Sun, 31 May 2015 12:27:01 +0800
+Message-ID: <1433046432-1824-1-git-send-email-zhichao.huang@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C81F526A1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 18:29:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 48CE45261C
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 31 May 2015 00:17:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2s-nnc3mN4gJ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 29 May 2015 18:29:10 -0400 (EDT)
-Received: from usmailout4.samsung.com (mailout4.w2.samsung.com
- [211.189.100.14])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 59A9752673
- for <kvmarm@lists.cs.columbia.edu>; Fri, 29 May 2015 18:29:09 -0400 (EDT)
-Received: from uscpsbgex1.samsung.com
- (u122.gpu85.samsung.co.kr [203.254.195.122]) by usmailout4.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NP400G4PUWY6A10@usmailout4.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Fri, 29 May 2015 18:38:58 -0400 (EDT)
-In-reply-to: <1432838950-28774-1-git-send-email-christoffer.dall@linaro.org>
+ with ESMTP id TcCayPFd8Jbv for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 31 May 2015 00:17:31 -0400 (EDT)
+Received: from mail-pd0-f175.google.com (mail-pd0-f175.google.com
+ [209.85.192.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 90699525CF
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 31 May 2015 00:17:31 -0400 (EDT)
+Received: by pdjm12 with SMTP id m12so126051pdj.3
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 30 May 2015 21:27:22 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,113 +28,68 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, borntraeger@de.ibm.com, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com
+Cc: huangzhichao@huawei.com, Zhichao Huang <zhichao.huang@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/28/2015 11:49 AM, Christoffer Dall wrote:
-> Until now we have been calling kvm_guest_exit after re-enabling
-> interrupts when we come back from the guest, but this has the
-> unfortunate effect that CPU time accounting done in the context of timer
-> interrupts occurring while the guest is running doesn't properly notice
-> that the time since the last tick was spent in the guest.
-> 
-> Inspired by the comment in the x86 code, move the kvm_guest_exit() call
-> below the local_irq_enable() call and change __kvm_guest_exit() to
-> kvm_guest_exit(), because we are now calling this function with
-> interrupts enabled.  We have to now explicitly disable preemption and
-> not enable preemption before we've called kvm_guest_exit(), since
-> otherwise we could be preempted and everything happening before we
-> eventually get scheduled again would be accounted for as guest time.
-> 
-> At the same time, move the trace_kvm_exit() call outside of the atomic
-> section, since there is no reason for us to do that with interrupts
-> disabled.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
-> This patch is based on kvm/queue, because it has the kvm_guest_enter/exit
-> rework recently posted by Christian Borntraeger.  I hope I got the logic
-> of this right, there were 2 slightly worrying facts about this:
-> 
-> First, we now enable and disable and enable interrupts on each exit
-> path, but I couldn't see any performance overhead on hackbench - yes the
-> only benchmark we care about.
-> 
-> Second, looking at the ppc and mips code, they seem to also call
-> kvm_guest_exit() before enabling interrupts, so I don't understand how
-> guest CPU time accounting works on those architectures.
-> 
-> Changes since v1:
->  - Tweak comment and commit text based on Marc's feedback.
->  - Explicitly disable preemption and enable it only after kvm_guest_exit().
-> 
->  arch/arm/kvm/arm.c | 21 +++++++++++++++++----
->  1 file changed, 17 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index e41cb11..fe8028d 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -532,6 +532,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		kvm_vgic_flush_hwstate(vcpu);
->  		kvm_timer_flush_hwstate(vcpu);
->  
-> +		preempt_disable();
->  		local_irq_disable();
->  
->  		/*
-> @@ -544,6 +545,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  
->  		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm)) {
->  			local_irq_enable();
-> +			preempt_enable();
->  			kvm_timer_sync_hwstate(vcpu);
->  			kvm_vgic_sync_hwstate(vcpu);
->  			continue;
-> @@ -559,8 +561,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
->  
->  		vcpu->mode = OUTSIDE_GUEST_MODE;
-> -		__kvm_guest_exit();
-> -		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
-> +		/*
-> +		 * Back from guest
-> +		 *************************************************************/
-> +
->  		/*
->  		 * We may have taken a host interrupt in HYP mode (ie
->  		 * while executing the guest). This interrupt is still
-> @@ -574,8 +578,17 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		local_irq_enable();
->  
->  		/*
-> -		 * Back from guest
-> -		 *************************************************************/
-> +		 * We do local_irq_enable() before calling kvm_guest_exit() so
-> +		 * that if a timer interrupt hits while running the guest we
-> +		 * account that tick as being spent in the guest.  We enable
-> +		 * preemption after calling kvm_guest_exit() so that if we get
-> +		 * preempted we make sure ticks after that is not counted as
-> +		 * guest time.
-> +		 */
-> +		kvm_guest_exit();
-> +		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
-> +		preempt_enable();
-> +
->  
->  		kvm_timer_sync_hwstate(vcpu);
->  		kvm_vgic_sync_hwstate(vcpu);
-> 
+This patch series adds debug support, a key feature missing from the
+KVM/armv7 port.
 
-Hi Christoffer,
- so currently we take a snap shot when we enter the guest
-(tsk->vtime_snap) and upon exit add the time we spent in
-the guest and update accrued time, which appears correct.
+The main idea is borrowed from armv8, which is to keep track of whether 
+the debug registers are "dirty" (changed by the guest) or not. In this 
+case, perform the usual save/restore dance, for one run only. It means 
+we only have a penalty if a guest is actively using the debug registers.
 
-With this patch it appears that interrupts running
-in host mode are accrued to Guest time, and additional preemption
-latency is added.
+The amount of registers is properly frightening, but CPUs actually
+only implement a subset of them. Also, there is a number of registers
+we don't bother emulating (things having to do with external debug and
+OSlock).
 
-Thanks,
-- Mario
+External debug is when you actually plug a physical JTAG into the CPU.
+OSlock is a way to prevent "other software" to play with the debug
+registers. My understanding is that it is only useful in combination
+with the external debug. In both case, implementing support for this
+is probably not worth the effort, at least for the time being.
+
+This has been tested on a Cortex-A15 platform, running 32bit guests.
+
+The patches for this series are based off v4.1-rc5 and can be found
+at:
+
+https://git.linaro.org/people/zhichao.huang/linux.git
+branch: guest-debug/4.1-rc5-v2
+
+>From v1 [1]:
+- Added missing cp14 reset functions
+- Disable debug mode if we don't need it to reduce unnecessary switch
+
+[1]: https://lists.cs.columbia.edu/pipermail/kvmarm/2015-May/014729.html
+
+Zhichao Huang (11):
+  KVM: arm: plug guest debug exploit
+  KVM: arm: rename pm_fake handler to trap_raz_wi
+  KVM: arm: enable to use the ARM_DSCR_MDBGEN macro from KVM assembly
+    code
+  KVM: arm: common infrastructure for handling AArch32 CP14/CP15
+  KVM: arm: check ordering of all system register tables
+  KVM: arm: add trap handlers for 32-bit debug registers
+  KVM: arm: add trap handlers for 64-bit debug registers
+  KVM: arm: implement dirty bit mechanism for debug registers
+  KVM: arm: disable debug mode if we don't actually need it.
+  KVM: arm: implement lazy world switch for debug registers
+  KVM: arm: enable trapping of all debug registers
+
+ arch/arm/include/asm/hw_breakpoint.h |  54 ++---
+ arch/arm/include/asm/kvm_asm.h       |  15 ++
+ arch/arm/include/asm/kvm_coproc.h    |   3 +-
+ arch/arm/include/asm/kvm_host.h      |   6 +
+ arch/arm/kernel/asm-offsets.c        |   2 +
+ arch/arm/kernel/hw_breakpoint.c      |  55 ++++-
+ arch/arm/kvm/coproc.c                | 386 +++++++++++++++++++++++++++++------
+ arch/arm/kvm/handle_exit.c           |   4 +-
+ arch/arm/kvm/interrupts.S            |  16 ++
+ arch/arm/kvm/interrupts_head.S       | 313 +++++++++++++++++++++++++++-
+ 10 files changed, 757 insertions(+), 97 deletions(-)
+
+-- 
+1.7.12.4
