@@ -1,95 +1,155 @@
 From: Zhichao Huang <zhichao.huang@linaro.org>
-Subject: [PATCH v2 00/11] KVM: arm: debug infrastructure support
-Date: Sun, 31 May 2015 12:27:01 +0800
-Message-ID: <1433046432-1824-1-git-send-email-zhichao.huang@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 48CE45261C
- for <kvmarm@lists.cs.columbia.edu>; Sun, 31 May 2015 00:17:33 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TcCayPFd8Jbv for <kvmarm@lists.cs.columbia.edu>;
- Sun, 31 May 2015 00:17:31 -0400 (EDT)
-Received: from mail-pd0-f175.google.com (mail-pd0-f175.google.com
- [209.85.192.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 90699525CF
- for <kvmarm@lists.cs.columbia.edu>; Sun, 31 May 2015 00:17:31 -0400 (EDT)
-Received: by pdjm12 with SMTP id m12so126051pdj.3
- for <kvmarm@lists.cs.columbia.edu>; Sat, 30 May 2015 21:27:22 -0700 (PDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Subject: [PATCH v2 01/11] KVM: arm: plug guest debug exploit
+Date: Sun, 31 May 2015 12:27:02 +0800
+Message-ID: <1433046432-1824-2-git-send-email-zhichao.huang@linaro.org>
+References: <1433046432-1824-1-git-send-email-zhichao.huang@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1433046432-1824-1-git-send-email-zhichao.huang@linaro.org>
+Sender: kvm-owner@vger.kernel.org
 To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com
-Cc: huangzhichao@huawei.com, Zhichao Huang <zhichao.huang@linaro.org>
+Cc: huangzhichao@huawei.com, Zhichao Huang <zhichao.huang@linaro.org>, stable@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch series adds debug support, a key feature missing from the
-KVM/armv7 port.
+Hardware debugging in guests is not intercepted currently, it means
+that a malicious guest can bring down the entire machine by writing
+to the debug registers.
 
-The main idea is borrowed from armv8, which is to keep track of whether 
-the debug registers are "dirty" (changed by the guest) or not. In this 
-case, perform the usual save/restore dance, for one run only. It means 
-we only have a penalty if a guest is actively using the debug registers.
+This patch enable trapping of all debug registers, preventing the guests
+to mess with the host state.
 
-The amount of registers is properly frightening, but CPUs actually
-only implement a subset of them. Also, there is a number of registers
-we don't bother emulating (things having to do with external debug and
-OSlock).
+However, it is a precursor for later patches which will need to do
+more to world switch debug states while necessary.
 
-External debug is when you actually plug a physical JTAG into the CPU.
-OSlock is a way to prevent "other software" to play with the debug
-registers. My understanding is that it is only useful in combination
-with the external debug. In both case, implementing support for this
-is probably not worth the effort, at least for the time being.
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
+---
+ arch/arm/include/asm/kvm_coproc.h |  3 +-
+ arch/arm/kvm/coproc.c             | 60 +++++++++++++++++++++++++++++++++++----
+ arch/arm/kvm/handle_exit.c        |  4 +--
+ arch/arm/kvm/interrupts_head.S    |  2 +-
+ 4 files changed, 59 insertions(+), 10 deletions(-)
 
-This has been tested on a Cortex-A15 platform, running 32bit guests.
-
-The patches for this series are based off v4.1-rc5 and can be found
-at:
-
-https://git.linaro.org/people/zhichao.huang/linux.git
-branch: guest-debug/4.1-rc5-v2
-
->From v1 [1]:
-- Added missing cp14 reset functions
-- Disable debug mode if we don't need it to reduce unnecessary switch
-
-[1]: https://lists.cs.columbia.edu/pipermail/kvmarm/2015-May/014729.html
-
-Zhichao Huang (11):
-  KVM: arm: plug guest debug exploit
-  KVM: arm: rename pm_fake handler to trap_raz_wi
-  KVM: arm: enable to use the ARM_DSCR_MDBGEN macro from KVM assembly
-    code
-  KVM: arm: common infrastructure for handling AArch32 CP14/CP15
-  KVM: arm: check ordering of all system register tables
-  KVM: arm: add trap handlers for 32-bit debug registers
-  KVM: arm: add trap handlers for 64-bit debug registers
-  KVM: arm: implement dirty bit mechanism for debug registers
-  KVM: arm: disable debug mode if we don't actually need it.
-  KVM: arm: implement lazy world switch for debug registers
-  KVM: arm: enable trapping of all debug registers
-
- arch/arm/include/asm/hw_breakpoint.h |  54 ++---
- arch/arm/include/asm/kvm_asm.h       |  15 ++
- arch/arm/include/asm/kvm_coproc.h    |   3 +-
- arch/arm/include/asm/kvm_host.h      |   6 +
- arch/arm/kernel/asm-offsets.c        |   2 +
- arch/arm/kernel/hw_breakpoint.c      |  55 ++++-
- arch/arm/kvm/coproc.c                | 386 +++++++++++++++++++++++++++++------
- arch/arm/kvm/handle_exit.c           |   4 +-
- arch/arm/kvm/interrupts.S            |  16 ++
- arch/arm/kvm/interrupts_head.S       | 313 +++++++++++++++++++++++++++-
- 10 files changed, 757 insertions(+), 97 deletions(-)
-
+diff --git a/arch/arm/include/asm/kvm_coproc.h b/arch/arm/include/asm/kvm_coproc.h
+index 4917c2f..e74ab0f 100644
+--- a/arch/arm/include/asm/kvm_coproc.h
++++ b/arch/arm/include/asm/kvm_coproc.h
+@@ -31,7 +31,8 @@ void kvm_register_target_coproc_table(struct kvm_coproc_target_table *table);
+ int kvm_handle_cp10_id(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int kvm_handle_cp_0_13_access(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu, struct kvm_run *run);
+-int kvm_handle_cp14_access(struct kvm_vcpu *vcpu, struct kvm_run *run);
++int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run);
++int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ 
+diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+index f3d88dc..2e12760 100644
+--- a/arch/arm/kvm/coproc.c
++++ b/arch/arm/kvm/coproc.c
+@@ -91,12 +91,6 @@ int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	return 1;
+ }
+ 
+-int kvm_handle_cp14_access(struct kvm_vcpu *vcpu, struct kvm_run *run)
+-{
+-	kvm_inject_undefined(vcpu);
+-	return 1;
+-}
+-
+ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct coproc_reg *r)
+ {
+ 	/*
+@@ -519,6 +513,60 @@ int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	return emulate_cp15(vcpu, &params);
+ }
+ 
++/**
++ * kvm_handle_cp14_64 -- handles a mrrc/mcrr trap on a guest CP14 access
++ * @vcpu: The VCPU pointer
++ * @run:  The kvm_run struct
++ */
++int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++	struct coproc_params params;
++
++	params.CRn = (kvm_vcpu_get_hsr(vcpu) >> 1) & 0xf;
++	params.Rt1 = (kvm_vcpu_get_hsr(vcpu) >> 5) & 0xf;
++	params.is_write = ((kvm_vcpu_get_hsr(vcpu) & 1) == 0);
++	params.is_64bit = true;
++
++	params.Op1 = (kvm_vcpu_get_hsr(vcpu) >> 16) & 0xf;
++	params.Op2 = 0;
++	params.Rt2 = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
++	params.CRm = 0;
++
++	/* raz_wi */
++	(void)pm_fake(vcpu, &params, NULL);
++
++	/* handled */
++	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
++	return 1;
++}
++
++/**
++ * kvm_handle_cp14_32 -- handles a mrc/mcr trap on a guest CP14 access
++ * @vcpu: The VCPU pointer
++ * @run:  The kvm_run struct
++ */
++int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++	struct coproc_params params;
++
++	params.CRm = (kvm_vcpu_get_hsr(vcpu) >> 1) & 0xf;
++	params.Rt1 = (kvm_vcpu_get_hsr(vcpu) >> 5) & 0xf;
++	params.is_write = ((kvm_vcpu_get_hsr(vcpu) & 1) == 0);
++	params.is_64bit = false;
++
++	params.CRn = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
++	params.Op1 = (kvm_vcpu_get_hsr(vcpu) >> 14) & 0x7;
++	params.Op2 = (kvm_vcpu_get_hsr(vcpu) >> 17) & 0x7;
++	params.Rt2 = 0;
++
++	/* raz_wi */
++	(void)pm_fake(vcpu, &params, NULL);
++
++	/* handled */
++	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
++	return 1;
++}
++
+ /******************************************************************************
+  * Userspace API
+  *****************************************************************************/
+diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
+index 95f12b2..357ad1b 100644
+--- a/arch/arm/kvm/handle_exit.c
++++ b/arch/arm/kvm/handle_exit.c
+@@ -104,9 +104,9 @@ static exit_handle_fn arm_exit_handlers[] = {
+ 	[HSR_EC_WFI]		= kvm_handle_wfx,
+ 	[HSR_EC_CP15_32]	= kvm_handle_cp15_32,
+ 	[HSR_EC_CP15_64]	= kvm_handle_cp15_64,
+-	[HSR_EC_CP14_MR]	= kvm_handle_cp14_access,
++	[HSR_EC_CP14_MR]	= kvm_handle_cp14_32,
+ 	[HSR_EC_CP14_LS]	= kvm_handle_cp14_load_store,
+-	[HSR_EC_CP14_64]	= kvm_handle_cp14_access,
++	[HSR_EC_CP14_64]	= kvm_handle_cp14_64,
+ 	[HSR_EC_CP_0_13]	= kvm_handle_cp_0_13_access,
+ 	[HSR_EC_CP10_ID]	= kvm_handle_cp10_id,
+ 	[HSR_EC_SVC_HYP]	= handle_svc_hyp,
+diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
+index 35e4a3a..a9f3a56 100644
+--- a/arch/arm/kvm/interrupts_head.S
++++ b/arch/arm/kvm/interrupts_head.S
+@@ -607,7 +607,7 @@ ARM_BE8(rev	r6, r6  )
+  * (hardware reset value is 0) */
+ .macro set_hdcr operation
+ 	mrc	p15, 4, r2, c1, c1, 1
+-	ldr	r3, =(HDCR_TPM|HDCR_TPMCR)
++	ldr	r3, =(HDCR_TPM|HDCR_TPMCR|HDCR_TDRA|HDCR_TDOSA|HDCR_TDA)
+ 	.if \operation == vmentry
+ 	orr	r2, r2, r3		@ Trap some perfmon accesses
+ 	.else
 -- 
 1.7.12.4
+
