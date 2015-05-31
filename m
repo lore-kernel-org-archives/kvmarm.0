@@ -1,25 +1,26 @@
 From: Zhichao Huang <zhichao.huang@linaro.org>
-Subject: [PATCH v2 02/11] KVM: arm: rename pm_fake handler to trap_raz_wi
-Date: Sun, 31 May 2015 12:27:03 +0800
-Message-ID: <1433046432-1824-3-git-send-email-zhichao.huang@linaro.org>
+Subject: [PATCH v2 03/11] KVM: arm: enable to use the ARM_DSCR_MDBGEN macro
+ from KVM assembly code
+Date: Sun, 31 May 2015 12:27:04 +0800
+Message-ID: <1433046432-1824-4-git-send-email-zhichao.huang@linaro.org>
 References: <1433046432-1824-1-git-send-email-zhichao.huang@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 04F6B526DC
- for <kvmarm@lists.cs.columbia.edu>; Sun, 31 May 2015 00:18:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B8F75526E7
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 31 May 2015 00:18:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3vXBejk6IG8N for <kvmarm@lists.cs.columbia.edu>;
- Sun, 31 May 2015 00:18:07 -0400 (EDT)
-Received: from mail-pd0-f173.google.com (mail-pd0-f173.google.com
- [209.85.192.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CA96A526D3
- for <kvmarm@lists.cs.columbia.edu>; Sun, 31 May 2015 00:18:06 -0400 (EDT)
-Received: by pdbnf5 with SMTP id nf5so21869942pdb.2
- for <kvmarm@lists.cs.columbia.edu>; Sat, 30 May 2015 21:27:58 -0700 (PDT)
+ with ESMTP id OsdVh+fYL3pH for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 31 May 2015 00:18:16 -0400 (EDT)
+Received: from mail-pd0-f177.google.com (mail-pd0-f177.google.com
+ [209.85.192.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96CE7526E4
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 31 May 2015 00:18:16 -0400 (EDT)
+Received: by pdjm12 with SMTP id m12so134496pdj.3
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 30 May 2015 21:28:08 -0700 (PDT)
 In-Reply-To: <1433046432-1824-1-git-send-email-zhichao.huang@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,82 +35,91 @@ To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.c
 Cc: huangzhichao@huawei.com, Zhichao Huang <zhichao.huang@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-pm_fake doesn't quite describe what the handler does (ignoring writes
-and returning 0 for reads).
-
-As we're about to use it (a lot) in a different context, rename it
-with a (admitedly cryptic) name that make sense for all users.
+Add #ifndef __ASSEMBLY__ in hw_breakpoint.h, in order to use
+the ARM_DSCR_MDBGEN macro from KVM assembly code.
 
 Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
 ---
- arch/arm/kvm/coproc.c | 34 ++++++++++++++++------------------
- 1 file changed, 16 insertions(+), 18 deletions(-)
+ arch/arm/include/asm/hw_breakpoint.h | 54 +++++++++++++++++++-----------------
+ 1 file changed, 29 insertions(+), 25 deletions(-)
 
-diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-index 2e12760..9d283d9 100644
---- a/arch/arm/kvm/coproc.c
-+++ b/arch/arm/kvm/coproc.c
-@@ -229,7 +229,7 @@ bool access_vm_reg(struct kvm_vcpu *vcpu,
-  * must always support PMCCNTR (the cycle counter): we just RAZ/WI for
-  * all PM registers, which doesn't crash the guest kernel at least.
-  */
--static bool pm_fake(struct kvm_vcpu *vcpu,
-+static bool trap_raz_wi(struct kvm_vcpu *vcpu,
- 		    const struct coproc_params *p,
- 		    const struct coproc_reg *r)
- {
-@@ -239,19 +239,19 @@ static bool pm_fake(struct kvm_vcpu *vcpu,
- 		return read_zero(vcpu, p);
+diff --git a/arch/arm/include/asm/hw_breakpoint.h b/arch/arm/include/asm/hw_breakpoint.h
+index 8e427c7..f2f4c61 100644
+--- a/arch/arm/include/asm/hw_breakpoint.h
++++ b/arch/arm/include/asm/hw_breakpoint.h
+@@ -3,6 +3,8 @@
+ 
+ #ifdef __KERNEL__
+ 
++#ifndef __ASSEMBLY__
++
+ struct task_struct;
+ 
+ #ifdef CONFIG_HAVE_HW_BREAKPOINT
+@@ -44,6 +46,33 @@ static inline void decode_ctrl_reg(u32 reg,
+ 	ctrl->mismatch	= reg & 0x1;
  }
  
--#define access_pmcr pm_fake
--#define access_pmcntenset pm_fake
--#define access_pmcntenclr pm_fake
--#define access_pmovsr pm_fake
--#define access_pmselr pm_fake
--#define access_pmceid0 pm_fake
--#define access_pmceid1 pm_fake
--#define access_pmccntr pm_fake
--#define access_pmxevtyper pm_fake
--#define access_pmxevcntr pm_fake
--#define access_pmuserenr pm_fake
--#define access_pmintenset pm_fake
--#define access_pmintenclr pm_fake
-+#define access_pmcr trap_raz_wi
-+#define access_pmcntenset trap_raz_wi
-+#define access_pmcntenclr trap_raz_wi
-+#define access_pmovsr trap_raz_wi
-+#define access_pmselr trap_raz_wi
-+#define access_pmceid0 trap_raz_wi
-+#define access_pmceid1 trap_raz_wi
-+#define access_pmccntr trap_raz_wi
-+#define access_pmxevtyper trap_raz_wi
-+#define access_pmxevcntr trap_raz_wi
-+#define access_pmuserenr trap_raz_wi
-+#define access_pmintenset trap_raz_wi
-+#define access_pmintenclr trap_raz_wi
++struct notifier_block;
++struct perf_event;
++struct pmu;
++
++extern struct pmu perf_ops_bp;
++extern int arch_bp_generic_fields(struct arch_hw_breakpoint_ctrl ctrl,
++				  int *gen_len, int *gen_type);
++extern int arch_check_bp_in_kernelspace(struct perf_event *bp);
++extern int arch_validate_hwbkpt_settings(struct perf_event *bp);
++extern int hw_breakpoint_exceptions_notify(struct notifier_block *unused,
++					   unsigned long val, void *data);
++
++extern u8 arch_get_debug_arch(void);
++extern u8 arch_get_max_wp_len(void);
++extern void clear_ptrace_hw_breakpoint(struct task_struct *tsk);
++
++int arch_install_hw_breakpoint(struct perf_event *bp);
++void arch_uninstall_hw_breakpoint(struct perf_event *bp);
++void hw_breakpoint_pmu_read(struct perf_event *bp);
++int hw_breakpoint_slots(int type);
++
++#else
++static inline void clear_ptrace_hw_breakpoint(struct task_struct *tsk) {}
++
++#endif	/* CONFIG_HAVE_HW_BREAKPOINT */
++#endif  /* __ASSEMBLY */
++
+ /* Debug architecture numbers. */
+ #define ARM_DEBUG_ARCH_RESERVED	0	/* In case of ptrace ABI updates. */
+ #define ARM_DEBUG_ARCH_V6	1
+@@ -110,30 +139,5 @@ static inline void decode_ctrl_reg(u32 reg,
+ 	asm volatile("mcr p14, 0, %0, " #N "," #M ", " #OP2 : : "r" (VAL));\
+ } while (0)
  
- /* Architected CP15 registers.
-  * CRn denotes the primary register number, but is copied to the CRm in the
-@@ -532,8 +532,7 @@ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	params.Rt2 = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
- 	params.CRm = 0;
- 
--	/* raz_wi */
--	(void)pm_fake(vcpu, &params, NULL);
-+	(void)trap_raz_wi(vcpu, &params, NULL);
- 
- 	/* handled */
- 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-@@ -559,8 +558,7 @@ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	params.Op2 = (kvm_vcpu_get_hsr(vcpu) >> 17) & 0x7;
- 	params.Rt2 = 0;
- 
--	/* raz_wi */
--	(void)pm_fake(vcpu, &params, NULL);
-+	(void)trap_raz_wi(vcpu, &params, NULL);
- 
- 	/* handled */
- 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+-struct notifier_block;
+-struct perf_event;
+-struct pmu;
+-
+-extern struct pmu perf_ops_bp;
+-extern int arch_bp_generic_fields(struct arch_hw_breakpoint_ctrl ctrl,
+-				  int *gen_len, int *gen_type);
+-extern int arch_check_bp_in_kernelspace(struct perf_event *bp);
+-extern int arch_validate_hwbkpt_settings(struct perf_event *bp);
+-extern int hw_breakpoint_exceptions_notify(struct notifier_block *unused,
+-					   unsigned long val, void *data);
+-
+-extern u8 arch_get_debug_arch(void);
+-extern u8 arch_get_max_wp_len(void);
+-extern void clear_ptrace_hw_breakpoint(struct task_struct *tsk);
+-
+-int arch_install_hw_breakpoint(struct perf_event *bp);
+-void arch_uninstall_hw_breakpoint(struct perf_event *bp);
+-void hw_breakpoint_pmu_read(struct perf_event *bp);
+-int hw_breakpoint_slots(int type);
+-
+-#else
+-static inline void clear_ptrace_hw_breakpoint(struct task_struct *tsk) {}
+-
+-#endif	/* CONFIG_HAVE_HW_BREAKPOINT */
+ #endif	/* __KERNEL__ */
+ #endif	/* _ARM_HW_BREAKPOINT_H */
 -- 
 1.7.12.4
