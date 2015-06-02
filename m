@@ -1,28 +1,29 @@
-From: Shannon Zhao <shannon.zhao@linaro.org>
-Subject: Re: [Qemu-devel] [PATCH v13 4/4] hw/arm/virt: change indentation
- in a15memmap
-Date: Tue, 02 Jun 2015 19:48:34 +0800
-Message-ID: <556D9812.3040003@linaro.org>
-References: <1433244554-12898-1-git-send-email-eric.auger@linaro.org>
- <1433244554-12898-5-git-send-email-eric.auger@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v2] arm/arm64: KVM: Properly account for guest CPU time
+Date: Tue, 2 Jun 2015 13:55:37 +0200
+Message-ID: <20150602115537.GA12347@cbox>
+References: <1432838950-28774-1-git-send-email-christoffer.dall@linaro.org>
+ <5568E987.5010702@samsung.com> <20150531065923.GB763@cbox>
+ <556C7EC6.3010105@samsung.com> <20150602092759.GA7783@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C30F52C9E
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jun 2015 07:38:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 24DB652CA4
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jun 2015 07:45:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fe+BYXeKjflp for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Jun 2015 07:38:49 -0400 (EDT)
-Received: from mail-ob0-f173.google.com (mail-ob0-f173.google.com
- [209.85.214.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4900F52C9B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jun 2015 07:38:48 -0400 (EDT)
-Received: by obew15 with SMTP id w15so125963114obe.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Jun 2015 04:48:47 -0700 (PDT)
-In-Reply-To: <1433244554-12898-5-git-send-email-eric.auger@linaro.org>
+ with ESMTP id BL56wxagFZeW for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Jun 2015 07:45:02 -0400 (EDT)
+Received: from mail-la0-f54.google.com (mail-la0-f54.google.com
+ [209.85.215.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0794052BE9
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jun 2015 07:45:01 -0400 (EDT)
+Received: by labpy14 with SMTP id py14so111622890lab.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Jun 2015 04:54:58 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <20150602092759.GA7783@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,56 +33,51 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>, eric.auger@st.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
-Cc: kvmarm@lists.cs.columbia.edu, patches@linaro.org
+To: Mario Smarduch <m.smarduch@samsung.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, borntraeger@de.ibm.com, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CgpPbiAyMDE1LzYvMiAxOToyOSwgRXJpYyBBdWdlciB3cm90ZToKPiBSZS1pbmRlbnQgaW4gYTE1
-bWVtbWFwIGFmdGVyIFZJUlRfUExBVEZPUk1fQlVTIGludHJvZHVjdGlvbgo+IAo+IFNpZ25lZC1v
-ZmYtYnk6IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAbGluYXJvLm9yZz4KPiBSZXZpZXdlZC1ieTog
-QWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgo+IApSZXZpZXdlZC1ieTogU2hh
-bm5vbiBaaGFvIDxzaGFubm9uLnpoYW9AbGluYXJvLm9yZz4KCj4gLS0tCj4gCj4gdjExIC0+IHYx
-MjoKPiAtIEFkZCBBbGV4IFItYgo+IC0tLQo+ICBody9hcm0vdmlydC5jIHwgMjggKysrKysrKysr
-KysrKystLS0tLS0tLS0tLS0tLQo+ICAxIGZpbGUgY2hhbmdlZCwgMTQgaW5zZXJ0aW9ucygrKSwg
-MTQgZGVsZXRpb25zKC0pCj4gCj4gZGlmZiAtLWdpdCBhL2h3L2FybS92aXJ0LmMgYi9ody9hcm0v
-dmlydC5jCj4gaW5kZXggMDJiOTFiYS4uMGE3NWNjOCAxMDA2NDQKPiAtLS0gYS9ody9hcm0vdmly
-dC5jCj4gKysrIGIvaHcvYXJtL3ZpcnQuYwo+IEBAIC0xMTEsMjIgKzExMSwyMiBAQCB0eXBlZGVm
-IHN0cnVjdCB7Cj4gICAqLwo+ICBzdGF0aWMgY29uc3QgTWVtTWFwRW50cnkgYTE1bWVtbWFwW10g
-PSB7Cj4gICAgICAvKiBTcGFjZSB1cCB0byAweDgwMDAwMDAgaXMgcmVzZXJ2ZWQgZm9yIGEgYm9v
-dCBST00gKi8KPiAtICAgIFtWSVJUX0ZMQVNIXSA9ICAgICAgeyAgICAgICAgICAwLCAweDA4MDAw
-MDAwIH0sCj4gLSAgICBbVklSVF9DUFVQRVJJUEhTXSA9IHsgMHgwODAwMDAwMCwgMHgwMDAyMDAw
-MCB9LAo+ICsgICAgW1ZJUlRfRkxBU0hdID0gICAgICAgICAgICAgIHsgICAgICAgICAgMCwgMHgw
-ODAwMDAwMCB9LAo+ICsgICAgW1ZJUlRfQ1BVUEVSSVBIU10gPSAgICAgICAgIHsgMHgwODAwMDAw
-MCwgMHgwMDAyMDAwMCB9LAo+ICAgICAgLyogR0lDIGRpc3RyaWJ1dG9yIGFuZCBDUFUgaW50ZXJm
-YWNlcyBzaXQgaW5zaWRlIHRoZSBDUFUgcGVyaXBoZXJhbCBzcGFjZSAqLwo+IC0gICAgW1ZJUlRf
-R0lDX0RJU1RdID0gICB7IDB4MDgwMDAwMDAsIDB4MDAwMTAwMDAgfSwKPiAtICAgIFtWSVJUX0dJ
-Q19DUFVdID0gICAgeyAweDA4MDEwMDAwLCAweDAwMDEwMDAwIH0sCj4gLSAgICBbVklSVF9HSUNf
-VjJNXSA9ICAgIHsgMHgwODAyMDAwMCwgMHgwMDAwMTAwMCB9LAo+IC0gICAgW1ZJUlRfVUFSVF0g
-PSAgICAgICB7IDB4MDkwMDAwMDAsIDB4MDAwMDEwMDAgfSwKPiAtICAgIFtWSVJUX1JUQ10gPSAg
-ICAgICAgeyAweDA5MDEwMDAwLCAweDAwMDAxMDAwIH0sCj4gLSAgICBbVklSVF9GV19DRkddID0g
-ICAgIHsgMHgwOTAyMDAwMCwgMHgwMDAwMDAwYSB9LAo+IC0gICAgW1ZJUlRfTU1JT10gPSAgICAg
-ICB7IDB4MGEwMDAwMDAsIDB4MDAwMDAyMDAgfSwKPiArICAgIFtWSVJUX0dJQ19ESVNUXSA9ICAg
-ICAgICAgICB7IDB4MDgwMDAwMDAsIDB4MDAwMTAwMDAgfSwKPiArICAgIFtWSVJUX0dJQ19DUFVd
-ID0gICAgICAgICAgICB7IDB4MDgwMTAwMDAsIDB4MDAwMTAwMDAgfSwKPiArICAgIFtWSVJUX0dJ
-Q19WMk1dID0gICAgICAgICAgICB7IDB4MDgwMjAwMDAsIDB4MDAwMDEwMDAgfSwKPiArICAgIFtW
-SVJUX1VBUlRdID0gICAgICAgICAgICAgICB7IDB4MDkwMDAwMDAsIDB4MDAwMDEwMDAgfSwKPiAr
-ICAgIFtWSVJUX1JUQ10gPSAgICAgICAgICAgICAgICB7IDB4MDkwMTAwMDAsIDB4MDAwMDEwMDAg
-fSwKPiArICAgIFtWSVJUX0ZXX0NGR10gPSAgICAgICAgICAgICB7IDB4MDkwMjAwMDAsIDB4MDAw
-MDAwMGEgfSwKPiArICAgIFtWSVJUX01NSU9dID0gICAgICAgICAgICAgICB7IDB4MGEwMDAwMDAs
-IDB4MDAwMDAyMDAgfSwKPiAgICAgIC8qIC4uLnJlcGVhdGluZyBmb3IgYSB0b3RhbCBvZiBOVU1f
-VklSVElPX1RSQU5TUE9SVFMsIGVhY2ggb2YgdGhhdCBzaXplICovCj4gLSAgICBbVklSVF9QTEFU
-Rk9STV9CVVNdID0gICB7IDB4MGMwMDAwMDAsIDB4MDIwMDAwMDAgfSwKPiAtICAgIFtWSVJUX1BD
-SUVfTU1JT10gPSAgeyAweDEwMDAwMDAwLCAweDJlZmYwMDAwIH0sCj4gLSAgICBbVklSVF9QQ0lF
-X1BJT10gPSAgIHsgMHgzZWZmMDAwMCwgMHgwMDAxMDAwMCB9LAo+IC0gICAgW1ZJUlRfUENJRV9F
-Q0FNXSA9ICB7IDB4M2YwMDAwMDAsIDB4MDEwMDAwMDAgfSwKPiAtICAgIFtWSVJUX01FTV0gPSAg
-ICAgICAgeyAweDQwMDAwMDAwLCAzMFVMTCAqIDEwMjQgKiAxMDI0ICogMTAyNCB9LAo+ICsgICAg
-W1ZJUlRfUExBVEZPUk1fQlVTXSA9ICAgICAgIHsgMHgwYzAwMDAwMCwgMHgwMjAwMDAwMCB9LAo+
-ICsgICAgW1ZJUlRfUENJRV9NTUlPXSA9ICAgICAgICAgIHsgMHgxMDAwMDAwMCwgMHgyZWZmMDAw
-MCB9LAo+ICsgICAgW1ZJUlRfUENJRV9QSU9dID0gICAgICAgICAgIHsgMHgzZWZmMDAwMCwgMHgw
-MDAxMDAwMCB9LAo+ICsgICAgW1ZJUlRfUENJRV9FQ0FNXSA9ICAgICAgICAgIHsgMHgzZjAwMDAw
-MCwgMHgwMTAwMDAwMCB9LAo+ICsgICAgW1ZJUlRfTUVNXSA9ICAgICAgICAgICAgICAgIHsgMHg0
-MDAwMDAwMCwgMzBVTEwgKiAxMDI0ICogMTAyNCAqIDEwMjQgfSwKPiAgfTsKPiAgCj4gIHN0YXRp
-YyBjb25zdCBpbnQgYTE1aXJxbWFwW10gPSB7Cj4gCgotLSAKU2hhbm5vbgpfX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2
-bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUv
-bWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+[replying to myself]
+
+On Tue, Jun 02, 2015 at 11:27:59AM +0200, Christoffer Dall wrote:
+
+[..]
+
+> > > 
+> > > If this patch is incorrect, then how does it work on x86, where
+> > > handle_external_intr() is called (with a barrier in between) before
+> > > kvm_guest_exit(), and where handle_external_intr() is simply
+> > > local_irq_enable() on SVM and something more complicated on VMX ?
+> > > 
+> > > Finally, how exactly is preemption latency added here?   Won't IRQ
+> > > processing run with higher priority than any task on your system, so the
+> > > order of (1) process pending IRQs (2) call schedule if needed is still
+> > > preserved here, but we call kvm_guest_exit() between (1) and (2) instead
+> > > of before (1).
+> > 
+> > I may be missing something, but on return from interrupt with preempt
+> > disabled we can't take the need resched path. And need to return
+> > to KVM no?
+> 
+> preempt_enable() will call __preempt_schedule() and cause preemption
+> there, so you're talking about adding these lines of latency:
+> 
+> 	kvm_guest_exit();
+> 	trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
+> 
+> And these were called with interrupts disabled before, so I don't see
+> the issue??
+> 
+> However, your question is making me think whether we have a race in the
+> current code on fully preemptible kernels, if we get preempted before
+> calling kvm_timer_sync_hwstate() and kvm_vgic_sync_hwstate(), then we
+> could potentially schedule another vcpu on this core and loose/corrupt
+> state, can we not?  We probably need to check for this in
+> kvm_vcpu_load/kvm_vcpu_put.  I need to think more about if this is a
+> real issue or if I'm seeing ghosts.
+> 
+I've thought about it and I don't think there's a race because those
+functions don't access the hardware directly, but only manipulate
+per-vcpu data structures.
+
+-Christoffer
