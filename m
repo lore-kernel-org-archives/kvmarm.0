@@ -1,30 +1,23 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2] arm/arm64: KVM: Properly account for guest CPU time
-Date: Tue, 2 Jun 2015 11:28:56 +0200
-Message-ID: <20150602092856.GB7783@cbox>
-References: <1432838950-28774-1-git-send-email-christoffer.dall@linaro.org>
- <556C0E22.9090401@de.ibm.com> <20150601090817.GA18722@cbox>
- <556C240F.5070501@de.ibm.com> <20150601133558.GA20286@cbox>
- <556C601C.4000501@de.ibm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [PATCH v13 0/4] machvirt dynamic sysbus device instantiation
+Date: Tue,  2 Jun 2015 12:29:10 +0100
+Message-ID: <1433244554-12898-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1397952C57
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jun 2015 05:18:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DA1A52B9B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jun 2015 07:19:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hQwixzOiAi20 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Jun 2015 05:18:20 -0400 (EDT)
-Received: from mail-la0-f50.google.com (mail-la0-f50.google.com
- [209.85.215.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9E0BA52C51
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jun 2015 05:18:19 -0400 (EDT)
-Received: by laei3 with SMTP id i3so33006187lae.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Jun 2015 02:28:17 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <556C601C.4000501@de.ibm.com>
+ with ESMTP id jX4lvMqyFCTV for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Jun 2015 07:19:38 -0400 (EDT)
+Received: from mail-wg0-f51.google.com (mail-wg0-f51.google.com [74.125.82.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9BDE052B8F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jun 2015 07:19:38 -0400 (EDT)
+Received: by wgv5 with SMTP id 5so137406472wgv.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Jun 2015 04:29:35 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,49 +27,118 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+To: eric.auger@st.com, eric.auger@linaro.org, qemu-devel@nongnu.org, peter.maydell@linaro.org
+Cc: kvmarm@lists.cs.columbia.edu, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jun 01, 2015 at 03:37:32PM +0200, Christian Borntraeger wrote:
-> Am 01.06.2015 um 15:35 schrieb Christoffer Dall:
-> > On Mon, Jun 01, 2015 at 11:21:19AM +0200, Christian Borntraeger wrote:
-> >> Am 01.06.2015 um 11:08 schrieb Christoffer Dall:
-> >>
-> >>>>>
-> >>>>> Second, looking at the ppc and mips code, they seem to also call
-> >>>>> kvm_guest_exit() before enabling interrupts, so I don't understand how
-> >>>>> guest CPU time accounting works on those architectures.
-> >>>>
-> >>>> Not an expert here, but I assume mips has the same logic as arm so if your
-> >>>> patch is right for arm its probably also for mips.
-> >>>>
-> >>>> powerpc looks similar to what s390 does (not using the tick, instead it uses
-> >>>> a hw-timer) so this should be fine.
-> >>>>
-> >>> I wonder if we can simply enable HAVE_VIRT_CPU_ACCOUNTING_GEN and get
-> >>> this for free which would avoid the need for this patch?
-> >>
-> >> Asssuming that HAVE_VIRT_CPU_ACCOUNTING_GEN behaves similar to 
-> >> HAVE_VIRT_CPU_ACCOUNTING on s390/power in respect to not rely on ticks
-> >> - yes it might work out. Can you give it a try?
-> >>
-> > Adding HAVE_VIRT_CPU_ACCOUNTING_GEN to arch/arm64/Kconfig works, but has
-> > no effect unless you also enable CONFIG_NO_HZ_FULL, so that hardly feels
-> > like a fix since it would be a shame to force users to use this config
-> > option to report CPU usage correctly.
-> > 
-> > I'm not entirely sure what the history and meaning behind these configs
-> > are, so maybe there is an entirely different rework needed here.  It
-> > seems logical that you could simply sample the counter at entry/exit of
-> > the guest, but if there is nowhere to store this data without
-> > NO_HZ_FULL+VIRT_CPU_ACCOUNTING_GEN then I guess that would be why?
-> 
-> Given Paolos response that irq_disable/enable is faster than save/restore
-> at least on x86 your v2 patch might actually be the right thing to do.
-> 
-Thanks, I think so too, but we should enable
-HAVE_VIRT_CPU_ACCOUNTING_GEN for arm64 as well, assuming there are no
-mysterious side affects of doing so.
-
--Christoffer
+VGhpcyBzZXJpZXMgZW5hYmxlcyBtYWNodmlydCB0byBkeW5hbWljYWxseSBpbnN0YW50aWF0ZSBz
+eXNidXMKZGV2aWNlcyBmcm9tIGNvbW1hbmQgbGluZSAodXNpbmcgLWRldmljZSBvcHRpb24pLgoK
+QWxsIHRob3NlIHN5c2J1cyBkZXZpY2VzIGFyZSBwbHVnZ2VkIG9udG8gYSBwbGF0Zm9ybSBidXMu
+IFRoaXMgbGF0dGVyCmRldmljZSBpcyBpbnN0YW50aWF0ZWQgaW4gbWFjaHZpcnQgYW5kIHRha2Vz
+IGNhcmUgb2YgdGhlIGJpbmRpbmcgb2YKY2hpbGRyZW4gc3lzYnVzIGRldmljZXMgb24gYSBtYWNo
+aW5lIGluaXQgZG9uZSBub3RpZmllci4gVGhlIGRldmljZQp0cmVlIG5vZGUgZ2VuZXJhdGlvbiBm
+b3IgY2hpbGRyZW4gZHluYW1pYyBzeXNidXMgZGV2aWNlIGFsc28gaGFwcGVucwpvbiBhIHN1YnNl
+cXVlbnQgbm90aWZpZXIgdGhhdCBtdXN0IGJlIGV4ZWN1dGVkIGFmdGVyIHRoZSBhYm92ZSBvbmUu
+Cm1hY2h2aXJ0IHJlZ2lzdGVycyB0aGF0IG5vdGlmaWVyIGJlZm9yZSB0aGUgcGxhdGZvcm0gYnVz
+IGNyZWF0aW9uIHRvCm1ha2Ugc3VyZSBub3RpZmllcnMgYXJlIGV4ZWN1dGVkIGluIHRoZSByaWdo
+dCBvcmRlcjogZHQgZ2VuZXJhdGlvbgphZnRlciBhY3R1YWwgUU9NIGJpbmRpbmcuCgpGZXcgc3lz
+YnVzIGRldmljZXMgYXJlIHN1cHBvc2VkIHRvIGJlIGluc3RhbnRpYXRlZCB0aGF0IHdheS4gVkZJ
+TwpkZXZpY2VzIGJlbG9uZyB0byB0aGVtLgoKTm9kZSBjcmVhdGlvbiByZWFsbHkgaXMgYXJjaGl0
+ZWN0dXJlIHNwZWNpZmljLiBPbiBBUk0gdGhlIGR5bmFtaWMKc3lzYnVzIGRldmljZSBub2RlIGNy
+ZWF0aW9uIGlzIGltcGxlbWVudGVkIGluIGEgbmV3IEMgbW9kdWxlLApody9hcm0vc3lzYnVzLWZk
+dC5jIGFuZCBub3QgaW4gdGhlIG1hY2hpbmUgZmlsZS4KCk1hY2h2aXJ0IHRyYW5zZm9ybWF0aW9u
+cyBhbmQgc3lzYnVzLWZkdCBhcmUgbGFyZ2VseSBpbnNwaXJlZCBmcm9tIEFsZXggd29yay4KClRo
+ZSBwYXRjaCBzZXJpZXMgY2FuIGJlIGZvdW5kIGF0OgpodHRwOi8vZ2l0LmxpbmFyby5vcmcvcGVv
+cGxlL2VyaWMuYXVnZXIvcWVtdS5naXQsCmJyYW5jaCBvZmZpY2lhbF9keW5zeXNidXNfdjEzLXRh
+cmdldC1hcm0ubmV4dAoKQmVzdCBSZWdhcmRzCgpFcmljCgp2MTIgLT4gdjEzOgotIHJlYmFzZSBv
+biB0YXJnZXQtYXJtLm5leHQKLSBmaXJzdCBwbGF0Zm9ybSBidXMgSVJRIG1vdmVkIGF0IDExMiBh
+ZnRlciBHSUN2Mm0gYWRkaXRpb24uCi0gdGFrZSBpbnRvIGFjY291bnQgU2hhbm5vbidzIGFkdmlj
+ZSBhYm91dCBpbmNyZWFzaW5nIGluZGVudGF0aW9uIGluCiAgYTE1bWVtbWFwCgp2MTEgLT4gdjEy
+OgotIHJlYmFzZSBvbiAyLjMuMAotIGFkZCBBbGV4IEJlbm7DqVItYiBhc3N1bWluZyBmb2xsb3dp
+bmcgY2hhbmdlcyBkbyBub3QgYWx0ZXIgaGlzIHJldmlldwotIHRha2UgaW50byBhY2NvdW50IEFs
+ZXggR3JhZiBjb21tZW50cwogIC0gcmVzaXplIFBMQVRGT1JNX0JVU19OVU1fSVJRUyB0byA2NCBp
+bnN0ZWFkIG9mIDMyCiAgLSBvdmVyYWxsIE5VTV9JUlFTIGNoYW5nZWQgdG8gMjU2IHNpbmNlIHRo
+ZXJlIHdhcyBubyByb29tIGxlZnQgZm9yIG90aGVyCiAgICBhZGRpdGlvbnMKICAtIFZJUlRfUExB
+VEZPUk1fQlVTIHNpemUgY2hhbmdlZCBmcm9tIDRNQiB0byAzMk1CIGFuZCBiYXNlIHNldCBhdAog
+ICAgMHhjMDAwMDAwCgp2MTAgLT4gdjExOgotIHJlYmFzZSBvbiB2Mi4yLjAgYW5kIGVzcGVjaWFs
+bHkgQWxleCcKICAiYXJtOiBBZGQgUENJZSBob3N0IGJyaWRnZSBpbiB2aXJ0IG1hY2hpbmUiCgp2
+OSAtPiB2MTA6Ci0gYWRkIGFzc2VydCBhbmQgZml4IHJldHVybiB2YWx1ZSBpbiBhZGRfZmR0X25v
+ZGUKCnY4IC0+IHY5OgpUYWtlIGludG8gYWNjb3VudCBQZXRlcidzIGNvbW1lbnRzOgpody9hcm0v
+c3lzYnVzLWZkdDoKLSBzL0ZkdC9GRFQgaW4gc3RydWN0IHR5cGUgbmFtZXMKLSByZW9yZGVyIGZp
+ZWxkcyBpbiBQbGF0Zm9ybUJ1c0ZkdE5vdGlmaWVyUGFyYW1zIGFuZCB1c2UgRE9fVVBDQVNUCi0g
+dXNlIGFzc2VydCgpIHdoZW4gcmVsZXZhbnQgKGJvYXJkIG1vZGVsIGlzc3VlKQotIGdfZnJlZSB0
+aGUgQVJNUGxhdGZvcm1CdXNGRFRQYXJhbXMgYW5kIFBsYXRmb3JtQnVzRkRUTm90aWZpZXJQYXJh
+bXMKICBwb2ludGVycyBpbiBwbGF0Zm9ybV9idXNfZmR0X25vdGlmeQpody9hcm0vYm9vdC5jCi0g
+Zml4IGNvbXBpbGF0aW9uIHdpdGggYXJtLWxpbnV4LXVzZXIKLSByZW9yZGVyIGZpZWxkcyBpbiBB
+cm1Mb2FkS2VybmVsTm90aWZpZXIKaHcvYXJtL3ZpcnQuYwotIFBMQVRGT1JNX0JVU19OVU1fSVJR
+UyBzZXQgdG8gMzIgaW5zdGVhZCBvZiAyMAotIHBsYXRmb3JtIGJ1cyBpcnEgbm93IHN0YXJ0IGF0
+IDY0IGluc3RlYWQgb2YgNDgKLSByZW1vdmUgY2hhbmdlIG9mIGluZGVudGF0aW9uIGluICBhMTVt
+ZW1tYXAKLSBjb3JyZWN0IG1pc2Mgc3R5bGUgaXNzdWVzCgphZGQgYSBzZXBhcmF0ZSBwYXRjaCBm
+aWxlIGZvciByZS1pbmRlbnRhdGlvbiBpbiB2aXJ0IGExNW1lbW1hcAoKdjcgLT4gdjg6Ci0gcmVi
+YXNlIG9uIDIuMi4wIChib290LmMgYW5kIHZpcnQuYykKLSBpbiB2aXJ0LmMgbWFjaHZpcnRfaW5p
+dCwgY3JlYXRlX3BsYXRmb3JtX2J1cyBzaW1wbHkgaXMgYWRkZWQKICBhZnRlciB0aGUgYXJtX2xv
+YWRfa2VybmVsIGNhbGwgaW5zdGVhZCBvZiBtb3ZpbmcgdGhpcyBsYXR0ZXIuCiAgc2hvdWxkIGVh
+c2UgdGhlIHJldmlldy4KLSBBZGQgQWxleCAmIFNoYW5ub24gUmV2aWV3ZWQtYnkKCnY2IC0+IHY3
+OgpUYWtlIGludG8gYWNjb3VudCBTaGFubm9uJ3MgY29tbWVudHM6Ci0gaHcvYXJtL3N5c2J1cy1m
+ZHQuYzogcmV2ZXJ0IGluZGVudGF0aW9uIGluIGFkZF9mZHRfbm9kZV9mdW5jdGlvbnMKLSBody9h
+cm0vdmlydC5jOgogIC0gYWRkIGFuIGFkZGl0aW9uYWwgY29tbWVudCBpbiBhMTVpcnFtYXAgcmVs
+YXRlZCB0byBQTEFURk9STV9CVVNfTlVNX0lSUVMKICAtIGNvcnJlY3QgcGxhdGZvcm0gYnVzIHNp
+emUgdG8gMHg0MDAwMDAKICAtIHJlbW92ZSBQTEFURk9STV9CVVNfRklSU1RfSVJRIG1hY3JvCgp2
+NSAtPiB2NjoKVGFrZSBpbnRvIGFjY291bnQgUGV0ZXIncyBjb21tZW50czoKLSBkdGIgb3Zlcmxv
+YWQgbWVjaGFuaXNtIHJld3JpdHRlbjogYXJtX2xvYWRfa2VybmVsIGNvZGUgaXMgbW92ZWQgaW50
+byBhCiAgbWFjaGluZSBpbml0IGRvbmUgbm90aWZpZXIgbm90aWZ5IGluc3RlYWQuIGFybV9sb2Fk
+X2tlcm5lbCBvbmx5IHJlZ2lzdGVycwogIHRoYXQgbm90aWZpZXIuIEFzIGEgY29uc2VxdWVuY2Ug
+dGhlIGR0YiBpcyBsb2FkZWQgb25jZS4KLSB2NSAxLTQgcGF0Y2ggZmlsZXMgYXJlIHJlbW92ZWQg
+YW5kIHJlcGxhY2VkIGJ5IGEgc2luZ2xlIHBhdGNoIGZpbGUgbW92aW5nCiAgYXJtX2xvYWRfa2Vy
+bmVsIGluIHRoZSBub3RpZmllciAoMikuCi0gYXMgYSBjb25zZXF1ZW5jZSBhcm1fbG9hZF9rZXJu
+ZWwgbXVzdCBiZSBjYWxsZWQgYmVmb3JlIHN5c2J1cy1mZHQKICBhcm1fcmVnaXN0ZXJfcGxhdGZv
+cm1fYnVzX2ZkdF9jcmVhdG9yLgotIEluIHZpcnQsIHBsYXRmb3JtX2J1c19wYXJhbXMgbm90IGEg
+Y29uc3QgYW55bW9yZSBzaW5jZSBpdHMgZmllbGRzIGFyZQogIGluaXRpYWxpemVkIGZyb20gdmJp
+LT5tZW1tYXAgYW5kIHZiaS0+aXJxbWFwLiBIZW5jZSBjcmVhdGVfcGxhdGZvcm1fYnVzCiAgcHJv
+dG8gY2FuIGJlIHNpbXBsaWZpZWQuCi0gSW4gc3lzYnVzLWZkdCBhZGRfYWxsX3BsYXRmb3JtX2J1
+c19mZHRfbm9kZXMgbm93IHRha2VzIGEgaGFuZGxlIHRvCiAgYW4gQVJNUGxhdGZvcm1CdXNGZHRQ
+YXJhbXMuIFRoaXMgaXMgbm90IGEgbW9kaWZ5X2R0YiBmdW5jdGlvbiBhbnltb3JlCiAgZmR0IHBv
+aW50ZXIgaXMgY2hlY2tlZCBpbiBjYXNlIHRoZSBjYWxsYmFjayBpcyBjYWxsZWQgYWZ0ZXIgdGhl
+IGxvYWRfZHRiCiAgKHRoaXMgbGF0dGVyIGRlYWxsb2NhdGVkIGZkdCBwb2ludGVyKS4gQ2hlY2sg
+b2YgZmR0X2ZpbGVuYW1lIG1vdmVkIGluIGhlcmUuCiAgdXBncmFkZV9kdGIgaXMgcmVtb3ZlZC4g
+Y29weXJpZ2h0IGFsaWduZWQgYmV0d2VlbiAuaCBhbmQgLmMuCgp2NCAtPiB2NToKLSBpbiB2aXJ0
+LmM6IHBsYXRmb3JtX2J1c19wYXJhbXMgYmVjb21lcyBzdGF0aWMgY29uc3QKLSBzeXNidXMtZmR0
+OiBjaGFuZ2UgaW5kZW50YXRpb24gaW4gYWRkX2ZkdF9ub2RlX2Z1bmN0aW9ucyBhcnJheSBpbml0
+Ci0gcy9sb2FkX2R0Yi9hcm1fbG9hZF9kdGIgaW4gb25lIGJvb3QuYyBjb21tZW50Cgp2MyAtPiB2
+NDoKLSBkeW5fc3lzYnVzX2JpbmRpbmcgcmVtb3ZlZCBzaW5jZSBiaW5kaW5nIHN0dWZmIG5vdyBh
+cmUgaW1wbGVtZW50ZWQgYnkKICB0aGUgcGxhdGZvcm0gYnVzIGRldmljZQotIGR1ZSB0byBhIGNo
+YW5nZSBpbiBBUk0gbG9hZF9kdGIgaW1wbGVtZW50YXRpb24gdXNpbmcgcm9tX2FkZF9ibG9iX2Zp
+eGVkLAogIHRoZSBkdCBubyBtb3JlIGlzIGdlbmVyYXRlZCBpbiBhIHJlc2V0IG5vdGlmaWVyIGJ1
+dCBpcyBnZW5lcmF0ZWQgb24gYQogIG1hY2hpbmUgaW5pdCBkb25lIG5vdGlmaWVyCi0gdGhlIGF1
+Z21lbnRlZCBkZXZpY2UgdHJlZSBpcyBub3QgZ2VuZXJhdGVkIGZyb20gc2NyYXRjaCBhbnltb3Jl
+IGJ1dCBpcwogIGFkZGVkIHVzaW5nIGEgbW9kaWZ5X2R0YiBmdW5jdGlvbi4gVGhpcyByZXF1aXJl
+ZCBzb21lIHNtYWxsIGNoYW5nZSBpbgogIGJvb3QuYwotIHRoZSBjYXNlIHdoZXJlIHRoZSB1c2Vy
+IHByb3ZpZGVzIGEgZHRiIGZpbGUgbm93IGlzIGhhbmRsZWQKLSBzb21lIGNsZWFudXAgaW4gdmly
+dCBhZGRpdGlvbnMKLSBpbXBsZW1lbnQgYSBsaXN0IG9mIGR5YW5taWNhbGx5IGluc3RhbnRpYWJs
+ZSBkZXZpY2VzIGluIHN5c2J1cy1mZHQKCnYyIC0+IHYzOgotIHBhdGNoIG5vdyBhcHBsaWVzIG9u
+IHRvcCBvZiBBbGV4IGZ1bGwgcGF0Y2hzZXQKLSBkeW5fc3lzYnVzX2RldnRyZWU6IGFkZCBhcm1f
+cHJlZml4IHRvIGVtcGhhc2l6ZSB0aGUgZmFjdCB0aG9zZQogIGZ1bmN0aW9ucyBhcmUgYXJtIHNw
+ZWNpZmljOyBhcm1fc3lzYnVzX2RldmljZV9jcmVhdGVfZGV2dHJlZQogIGJlY29tZXMgc3RhdGlj
+Ci0gbG9hZF9kdGIgcmVuYW1lZCBpbnRvIGFybV9sb2FkX2R0YgotIGFkZCBjb3B5cmlnaHQgaW4g
+aHcvYXJtL2R5bl9zeXNidXNfZGV2dHJlZS5jCgp2MSAtPiB2MjoKLSBkZXZpY2Ugbm9kZSBnZW5l
+cmF0aW9uIG5vIG1vcmUgaW4gc3lzYnVzIGRldmljZSBidXQgaW4KICBkeW5fc3lzYnVzX2RldnRy
+ZWUKLSBWRklPIHJlZ2lvbiBzaHJpbmtlZCB0byA0TUIgYW5kIHJlbG9jYXRlZCBpbiBtYWNodmly
+dCB0byBhdm9pZCBQQ0kKICBzaHJpbmsgKGR5bmFtaWMgdmZpby1tbWlvIHN1cHBvcnQgbWlnaHQg
+Y29tZSBsYXR0ZXIpCi0gcGxhdGZvcm1fYnVzX2Jhc2UgcmVtb3ZlZCBmcm9tIFBsYXRmb3JtRGV2
+dHJlZURhdGEKCgpFcmljIEF1Z2VyICg0KToKICBody9hcm0vc3lzYnVzLWZkdDogaGVscGVycyBm
+b3IgcGxhdGZvcm0gYnVzIG5vZGVzIGFkZGl0aW9uCiAgaHcvYXJtL2Jvb3Q6IGFybV9sb2FkX2tl
+cm5lbCBpbXBsZW1lbnRlZCBhcyBhIG1hY2hpbmUgaW5pdCBkb25lCiAgICBub3RpZmllcgogIGh3
+L2FybS92aXJ0OiBhZGQgZHluYW1pYyBzeXNidXMgZGV2aWNlIHN1cHBvcnQKICBody9hcm0vdmly
+dDogY2hhbmdlIGluZGVudGF0aW9uIGluIGExNW1lbW1hcAoKIGh3L2FybS9NYWtlZmlsZS5vYmpz
+ICAgICAgICB8ICAgMSArCiBody9hcm0vYm9vdC5jICAgICAgICAgICAgICAgfCAgMTQgKysrLQog
+aHcvYXJtL3N5c2J1cy1mZHQuYyAgICAgICAgIHwgMTc0ICsrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKysrCiBody9hcm0vdmlydC5jICAgICAgICAgICAgICAgfCAgODYg
+KysrKysrKysrKysrKysrKysrLS0tLQogaW5jbHVkZS9ody9hcm0vYXJtLmggICAgICAgIHwgIDI4
+ICsrKysrKysKIGluY2x1ZGUvaHcvYXJtL3N5c2J1cy1mZHQuaCB8ICA2MCArKysrKysrKysrKysr
+KysKIGluY2x1ZGUvaHcvYXJtL3ZpcnQuaCAgICAgICB8ICAgMSArCiA3IGZpbGVzIGNoYW5nZWQs
+IDM0OSBpbnNlcnRpb25zKCspLCAxNSBkZWxldGlvbnMoLSkKIGNyZWF0ZSBtb2RlIDEwMDY0NCBo
+dy9hcm0vc3lzYnVzLWZkdC5jCiBjcmVhdGUgbW9kZSAxMDA2NDQgaW5jbHVkZS9ody9hcm0vc3lz
+YnVzLWZkdC5oCgotLSAKMS44LjMuMgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1i
+aWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3Zt
+YXJtCg==
