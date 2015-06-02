@@ -1,29 +1,26 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2] arm/arm64: KVM: Properly account for guest CPU time
-Date: Tue, 2 Jun 2015 13:55:37 +0200
-Message-ID: <20150602115537.GA12347@cbox>
-References: <1432838950-28774-1-git-send-email-christoffer.dall@linaro.org>
- <5568E987.5010702@samsung.com> <20150531065923.GB763@cbox>
- <556C7EC6.3010105@samsung.com> <20150602092759.GA7783@cbox>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v13 0/4] machvirt dynamic sysbus device instantiation
+Date: Tue, 2 Jun 2015 16:40:55 +0100
+Message-ID: <CAFEAcA9kZu-OXF9bnEaiYJVH1arZpqL7F=6pALoHhYk9-cJxTg@mail.gmail.com>
+References: <1433244554-12898-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 24DB652CA4
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jun 2015 07:45:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DFDD52C90
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jun 2015 11:31:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BL56wxagFZeW for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Jun 2015 07:45:02 -0400 (EDT)
-Received: from mail-la0-f54.google.com (mail-la0-f54.google.com
- [209.85.215.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0794052BE9
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jun 2015 07:45:01 -0400 (EDT)
-Received: by labpy14 with SMTP id py14so111622890lab.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Jun 2015 04:54:58 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <20150602092759.GA7783@cbox>
+ with ESMTP id Qy8PR2P7tqHG for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Jun 2015 11:31:22 -0400 (EDT)
+Received: from mail-ig0-f174.google.com (mail-ig0-f174.google.com
+ [209.85.213.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96BE852BE4
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Jun 2015 11:31:21 -0400 (EDT)
+Received: by igbyr2 with SMTP id yr2so89991290igb.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 02 Jun 2015 08:41:15 -0700 (PDT)
+In-Reply-To: <1433244554-12898-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,51 +30,43 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mario Smarduch <m.smarduch@samsung.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, borntraeger@de.ibm.com, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Eric Auger <eric.auger@linaro.org>
+Cc: Patch Tracking <patches@linaro.org>, eric.auger@st.com, QEMU Developers <qemu-devel@nongnu.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-[replying to myself]
+On 2 June 2015 at 12:29, Eric Auger <eric.auger@linaro.org> wrote:
+> This series enables machvirt to dynamically instantiate sysbus
+> devices from command line (using -device option).
+>
+> All those sysbus devices are plugged onto a platform bus. This latter
+> device is instantiated in machvirt and takes care of the binding of
+> children sysbus devices on a machine init done notifier. The device
+> tree node generation for children dynamic sysbus device also happens
+> on a subsequent notifier that must be executed after the above one.
+> machvirt registers that notifier before the platform bus creation to
+> make sure notifiers are executed in the right order: dt generation
+> after actual QOM binding.
+>
+> Few sysbus devices are supposed to be instantiated that way. VFIO
+> devices belong to them.
+>
+> Node creation really is architecture specific. On ARM the dynamic
+> sysbus device node creation is implemented in a new C module,
+> hw/arm/sysbus-fdt.c and not in the machine file.
+>
+> Machvirt transformations and sysbus-fdt are largely inspired from Alex work.
+>
+> The patch series can be found at:
+> http://git.linaro.org/people/eric.auger/qemu.git,
+> branch official_dynsysbus_v13-target-arm.next
+>
+> Best Regards
 
-On Tue, Jun 02, 2015 at 11:27:59AM +0200, Christoffer Dall wrote:
+This has been on list a fair while and got plenty of review
+(thanks to everybody who helped with that). I'm not really
+very happy about the whole concept of mmio passthrough, but
+some people need it, so we're stuck with it.
 
-[..]
+Applied to target-arm.next, thanks.
 
-> > > 
-> > > If this patch is incorrect, then how does it work on x86, where
-> > > handle_external_intr() is called (with a barrier in between) before
-> > > kvm_guest_exit(), and where handle_external_intr() is simply
-> > > local_irq_enable() on SVM and something more complicated on VMX ?
-> > > 
-> > > Finally, how exactly is preemption latency added here?   Won't IRQ
-> > > processing run with higher priority than any task on your system, so the
-> > > order of (1) process pending IRQs (2) call schedule if needed is still
-> > > preserved here, but we call kvm_guest_exit() between (1) and (2) instead
-> > > of before (1).
-> > 
-> > I may be missing something, but on return from interrupt with preempt
-> > disabled we can't take the need resched path. And need to return
-> > to KVM no?
-> 
-> preempt_enable() will call __preempt_schedule() and cause preemption
-> there, so you're talking about adding these lines of latency:
-> 
-> 	kvm_guest_exit();
-> 	trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
-> 
-> And these were called with interrupts disabled before, so I don't see
-> the issue??
-> 
-> However, your question is making me think whether we have a race in the
-> current code on fully preemptible kernels, if we get preempted before
-> calling kvm_timer_sync_hwstate() and kvm_vgic_sync_hwstate(), then we
-> could potentially schedule another vcpu on this core and loose/corrupt
-> state, can we not?  We probably need to check for this in
-> kvm_vcpu_load/kvm_vcpu_put.  I need to think more about if this is a
-> real issue or if I'm seeing ghosts.
-> 
-I've thought about it and I don't think there's a race because those
-functions don't access the hardware directly, but only manipulate
-per-vcpu data structures.
-
--Christoffer
+-- PMM
