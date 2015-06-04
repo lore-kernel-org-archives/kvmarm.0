@@ -1,47 +1,74 @@
 From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v5 2/6] target-arm: kvm64: introduce kvm_arm_init_debug()
-Date: Thu, 4 Jun 2015 11:56:54 +0100
-Message-ID: <CAFEAcA8GBDF1=ju9N6uuOK+pFxZ5sJxm0mwBV+OrY3R8YUhJkg@mail.gmail.com>
-References: <1432912764-7073-1-git-send-email-alex.bennee@linaro.org>
- <1432912764-7073-3-git-send-email-alex.bennee@linaro.org>
+Subject: Re: [PATCH v5 4/6] target-arm: kvm - support for single step
+Date: Thu, 4 Jun 2015 11:59:17 +0100
+Message-ID: <CAFEAcA9nTR_UfNyZB4h5VhnFFZKQGDG=rrw-M-=aPUcmmGr4Ug@mail.gmail.com>
+References: <1432912764-7073-1-git-send-email-alex.bennee@linaro.org> <1432912764-7073-5-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0997052EFC
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jun 2015 06:47:18 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EkzgEGsk5FM9 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Jun 2015 06:47:12 -0400 (EDT)
-Received: from mail-ig0-f170.google.com (mail-ig0-f170.google.com
- [209.85.213.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 05B7652F15
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jun 2015 06:47:11 -0400 (EDT)
-Received: by igbsb11 with SMTP id sb11so36490857igb.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Jun 2015 03:57:14 -0700 (PDT)
-In-Reply-To: <1432912764-7073-3-git-send-email-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1432912764-7073-5-git-send-email-alex.bennee@linaro.org>
+Sender: kvm-owner@vger.kernel.org
 To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, Zhichao Huang <zhichao.huang@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, Zhichao Huang <zhichao.huang@linaro.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMjkgTWF5IDIwMTUgYXQgMTY6MTksIEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJv
-Lm9yZz4gd3JvdGU6Cj4gQXMgd2UgaGF2ZW4ndCBhbHdheXMgaGFkIGd1ZXN0IGRlYnVnIHN1cHBv
-cnQgd2UgbmVlZCB0byBwcm9iZSBmb3IgaXQuCj4gQWRkaXRpb25hbGx5IHdlIGRvbid0IGRvIHRo
-aXMgaW4gdGhlIHN0YXJ0LXVwIGNhcGFiaWxpdHkgY29kZSBzbyB3ZQo+IGRvbid0IGZhbGwgb3Zl
-ciBvbiBvbGQga2VybmVscy4KPgo+IFNpZ25lZC1vZmYtYnk6IEFsZXggQmVubsOpZSA8YWxleC5i
-ZW5uZWVAbGluYXJvLm9yZz4KPiAtLS0KClJldmlld2VkLWJ5OiBQZXRlciBNYXlkZWxsIDxwZXRl
-ci5tYXlkZWxsQGxpbmFyby5vcmc+Cgp0aGFua3MKLS0gUE1NCl9fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxp
-c3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFu
-L2xpc3RpbmZvL2t2bWFybQo=
+On 29 May 2015 at 16:19, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
+e:
+> This adds support for single-step. There isn't much to do on the QEMU
+> side as after we set-up the request for single step via the debug ioc=
+tl
+> it is all handled within the kernel.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> ---
+> v2
+>   - convert to using HSR_EC
+> v3
+>   - use internals.h definitions
+> ---
+>  target-arm/kvm.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+>
+> diff --git a/target-arm/kvm.c b/target-arm/kvm.c
+> index c3bad6f..de2865a 100644
+> --- a/target-arm/kvm.c
+> +++ b/target-arm/kvm.c
+> @@ -528,6 +528,13 @@ static int kvm_handle_debug(CPUState *cs, struct=
+ kvm_run *run)
+>      kvm_cpu_synchronize_state(cs);
+>
+>      switch (hsr_ec) {
+> +    case EC_SOFTWARESTEP:
+> +        if (cs->singlestep_enabled) {
+> +            return true;
+> +        } else {
+> +            error_report("Came out of SINGLE STEP when not enabled")=
+;
+
+All-caps there is a bit odd.
+
+> +        }
+> +        break;
+>      case EC_AA64_BKPT:
+>          if (kvm_find_sw_breakpoint(cs, env->pc)) {
+>              return true;
+> @@ -588,6 +595,9 @@ int kvm_arch_on_sigbus(int code, void *addr)
+>
+>  void kvm_arch_update_guest_debug(CPUState *cs, struct kvm_guest_debu=
+g *dbg)
+>  {
+> +    if (cs->singlestep_enabled) {
+> +        dbg->control |=3D KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_SINGLES=
+TEP;
+> +    }
+>      if (kvm_sw_breakpoints_active(cs)) {
+>          dbg->control |=3D KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_=
+BP;
+>      }
+
+Again, is there a guard somewhere to prevent us trying to enable
+singlestep if the kernel doesn't support it?
+
+-- PMM
