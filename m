@@ -1,162 +1,91 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v5 08/12] KVM: arm64: re-factor hyp.S debug register code
-Date: Thu, 4 Jun 2015 12:23:08 +0200
-Message-ID: <20150604102308.GD7657@cbox>
-References: <1432891828-4816-1-git-send-email-alex.bennee@linaro.org>
- <1432891828-4816-9-git-send-email-alex.bennee@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] KVM: arm64: fix misleading comments in save/restore
+Date: Thu, 04 Jun 2015 11:34:17 +0100
+Message-ID: <557029A9.1010303@arm.com>
+References: <1432806186-27993-1-git-send-email-alex.bennee@linaro.org>
+ <20150604093436.GC7657@cbox> <55702205.7000908@arm.com>
+ <87eglrbwr2.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1432891828-4816-9-git-send-email-alex.bennee@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org, jan.kiszka@siemens.com, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A27C52ED3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jun 2015 06:24:21 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id fh+uyoOtwjVu for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Jun 2015 06:24:19 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D62952D18
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jun 2015 06:24:18 -0400 (EDT)
+In-Reply-To: <87eglrbwr2.fsf@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, May 29, 2015 at 10:30:24AM +0100, Alex Benn=E9e wrote:
-> This is a pre-cursor to sharing the code with the guest debug support=
-=2E
-> This replaces the big macro that fishes data out of a fixed location
-> with a more general helper macro to restore a set of debug registers.=
- It
-> uses macro substitution so it can be re-used for debug control and va=
-lue
-> registers. It does however rely on the debug registers being 64 bit
-> aligned (as they happen to be in the hyp ABI).
->=20
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
->=20
-> ---
-> v3:
->   - return to the patch series
->   - add save and restore targets
->   - change register use and document
-> v4:
->   - keep original setup/restore names
->   - don't use split u32/u64 structure yet
-> ---
->  arch/arm64/kvm/hyp.S | 519 ++++++++++++++---------------------------=
-----------
->  1 file changed, 140 insertions(+), 379 deletions(-)
->=20
-> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-> index 74e63d8..9c4897d 100644
-> --- a/arch/arm64/kvm/hyp.S
-> +++ b/arch/arm64/kvm/hyp.S
-
-
-[...]
-
-> @@ -465,195 +318,52 @@
->  	msr	mdscr_el1,	x25
->  .endm
-> =20
-> -.macro restore_debug
-> -	// x2: base address for cpu context
-> -	// x3: tmp register
-> -
-> -	mrs	x26, id_aa64dfr0_el1
-> -	ubfx	x24, x26, #12, #4	// Extract BRPs
-> -	ubfx	x25, x26, #20, #4	// Extract WRPs
-> -	mov	w26, #15
-> -	sub	w24, w26, w24		// How many BPs to skip
-> -	sub	w25, w26, w25		// How many WPs to skip
-> -
-> -	add	x3, x2, #CPU_SYSREG_OFFSET(DBGBCR0_EL1)
-> +.macro restore_debug type
-> +        // x4: pointer to register set
-> +        // x5: number of registers to skip
-
-nit: use tabs instead of spaces here...
-
-> +	// x6..x22 trashed
-> =20
-
-[...]
-
-> @@ -887,12 +597,63 @@ __restore_sysregs:
->  	restore_sysregs
->  	ret
-> =20
-> +/* Save debug state */
->  __save_debug:
-> -	save_debug
-> +	// x0: base address for vcpu context
-> +	// x2: ptr to current CPU context
-> +	// x4/x5: trashed
-
-I had a bunch of questions here which I think you missed last time
-around:
- 1. why do we need the vcpu context?
- 2. what does 'current' mean here?
- 3. you're also trashing everything that save_debug trashes, so x4/5,
-    x6-x22 trashed would be more correct
-
-> +
-> +	mrs	x26, id_aa64dfr0_el1
-> +	ubfx	x24, x26, #12, #4	// Extract BRPs
-> +	ubfx	x25, x26, #20, #4	// Extract WRPs
-> +	mov	w26, #15
-> +	sub	w24, w26, w24		// How many BPs to skip
-> +	sub	w25, w26, w25		// How many WPs to skip
-> +
-> +	mov     x5, x24
-> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGBCR0_EL1)
-> +	save_debug dbgbcr
-> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGBVR0_EL1)
-> +	save_debug dbgbvr
-> +
-> +	mov     x5, x25
-> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGWCR0_EL1)
-> +	save_debug dbgwcr
-> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGWVR0_EL1)
-> +	save_debug dbgwvr
-> +
-> +	mrs	x21, mdccint_el1
-> +	str	x21, [x2, #CPU_SYSREG_OFFSET(MDCCINT_EL1)]
->  	ret
-> =20
-> +/* Restore debug state */
->  __restore_debug:
-> -	restore_debug
-> +	// x0: base address for cpu context
-> +	// x2: ptr to current CPU context
-> +	// x4/x5: trashed
-
-and you missed these comments too, basically same stuff, but why was it
-'cpu' here and not 'vcpu' like above?
-
-note again, that you're explicitly touching x24, xx25, and x26 here as
-well, so shouldn't they be listed as trashed?
-
-> +
-> +	mrs	x26, id_aa64dfr0_el1
-> +	ubfx	x24, x26, #12, #4	// Extract BRPs
-> +	ubfx	x25, x26, #20, #4	// Extract WRPs
-> +	mov	w26, #15
-> +	sub	w24, w26, w24		// How many BPs to skip
-> +	sub	w25, w26, w25		// How many WPs to skip
-> +
-> +	mov     x5, x24
-> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGBCR0_EL1)
-> +	restore_debug dbgbcr
-> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGBVR0_EL1)
-> +	restore_debug dbgbvr
-> +
-> +	mov     x5, x25
-> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGWCR0_EL1)
-> +	restore_debug dbgwcr
-> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGWVR0_EL1)
-> +	restore_debug dbgwvr
-> +
-> +	ldr	x21, [x2, #CPU_SYSREG_OFFSET(MDCCINT_EL1)]
-> +	msr	mdccint_el1, x21
-> +
->  	ret
-> =20
->  __save_fpsimd:
-
-Thanks,
--Christoffer
+T24gMDQvMDYvMTUgMTE6MjAsIEFsZXggQmVubsOpZSB3cm90ZToKPiAKPiBNYXJjIFp5bmdpZXIg
+PG1hcmMuenluZ2llckBhcm0uY29tPiB3cml0ZXM6Cj4gCj4+IE9uIDA0LzA2LzE1IDEwOjM0LCBD
+aHJpc3RvZmZlciBEYWxsIHdyb3RlOgo+Pj4gT24gVGh1LCBNYXkgMjgsIDIwMTUgYXQgMTA6NDM6
+MDZBTSArMDEwMCwgQWxleCBCZW5uw6llIHdyb3RlOgo+Pj4+IFRoZSBlbHJfZWwyIGFuZCBzcHNy
+X2VsMiByZWdpc3RlcnMgaW4gZmFjdCBjb250YWluIHRoZSBwcm9jZXNzb3Igc3RhdGUKPj4+PiBi
+ZWZvcmUgZW50cnkgaW50byB0aGUgaHlwZXJ2aXNvciBjb2RlLgo+Pj4KPj4+IGJlIGNhcmVmdWwg
+d2l0aCB5b3VyIHVzZSBvZiB0aGUgaHlwZXJ2aXNvciwgaW4gdGhlIEtWTSBkZXNpZ24gdGhlCj4+
+PiBoeXBlcnZpc29yIGlzIHNwbGl0IGFjcm9zcyBFTDEgYW5kIEVMMi4KPiAKPiAiYmVmb3JlIGVu
+dHJ5IGludG8gRUwyLiIKPiAKPj4+Cj4+Pj4gSW4gdGhlIGNhc2Ugb2YgZ3Vlc3Qgc3RhdGUgaXQK
+Pj4+PiBjb3VsZCBiZSBpbiBlaXRoZXIgZWwwIG9yIGVsMS4KPj4+Cj4+PiB0cnVlCj4+Pgo+Pj4+
+Cj4+Pj4gU2lnbmVkLW9mZi1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3Jn
+Pgo+Pj4+IC0tLQo+Pj4+ICBhcmNoL2FybTY0L2t2bS9oeXAuUyB8IDggKysrKy0tLS0KPj4+PiAg
+MSBmaWxlIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkKPj4+Pgo+Pj4+
+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9oeXAuUyBiL2FyY2gvYXJtNjQva3ZtL2h5cC5T
+Cj4+Pj4gaW5kZXggZDc1NTkyMi4uMTk0MGE0YyAxMDA2NDQKPj4+PiAtLS0gYS9hcmNoL2FybTY0
+L2t2bS9oeXAuUwo+Pj4+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL2h5cC5TCj4+Pj4gQEAgLTUwLDgg
+KzUwLDggQEAKPj4+PiAgCXN0cAl4MjksIGxyLCBbeDMsICM4MF0KPj4+PiAgCj4+Pj4gIAltcnMJ
+eDE5LCBzcF9lbDAKPj4+PiAtCW1ycwl4MjAsIGVscl9lbDIJCS8vIEVMMSBQQwo+Pj4+IC0JbXJz
+CXgyMSwgc3Bzcl9lbDIJCS8vIEVMMSBwc3RhdGUKPj4+PiArCW1ycwl4MjAsIGVscl9lbDIJCS8v
+IFBDIGJlZm9yZSBoeXAgZW50cnkKPj4+PiArCW1ycwl4MjEsIHNwc3JfZWwyCQkvLyBwc3RhdGUg
+YmVmb3JlIGh5cCBlbnRyeQo+Pj4+ICAKPj4+PiAgCXN0cAl4MTksIHgyMCwgW3gzLCAjOTZdCj4+
+Pj4gIAlzdHIJeDIxLCBbeDMsICMxMTJdCj4+Pj4gQEAgLTgyLDggKzgyLDggQEAKPj4+PiAgCWxk
+cgl4MjEsIFt4MywgIzE2XQo+Pj4+ICAKPj4+PiAgCW1zcglzcF9lbDAsIHgxOQo+Pj4+IC0JbXNy
+CWVscl9lbDIsIHgyMCAJCQkJLy8gRUwxIFBDCj4+Pj4gLQltc3IJc3Bzcl9lbDIsIHgyMSAJCQkJ
+Ly8gRUwxIHBzdGF0ZQo+Pj4+ICsJbXNyCWVscl9lbDIsIHgyMCAJCS8vIFBDIHRvIHJlc3RvcmUK
+Pj4+PiArCW1zcglzcHNyX2VsMiwgeDIxIAkJLy8gcHN0YXRlIHRvIHJlc3RvcmUKPj4+Cj4+PiBJ
+IGRvbid0IGZlZWwgbGlrZSAndG8gcmVzdG9yZScgaXMgbXVjaCBtb3JlIG1lYW5pbmdmdWwgaGVy
+ZS4KPj4+Cj4+PiBJIHdvdWxkIGFjdHVhbGx5IHZvdGUgZm9yIHJlbW92aW4gdGhlIGNvbW1lbnRz
+IGFsbCB0b2dldGhlciwgc2luY2Ugb25lCj4+PiBzaG91bGQgcmVhbGx5IHVuZGVyc3RhbmQgdGhl
+IGNvZGUgYXMgb3Bwb3NlZCB0byB0aGUgY29tbWVudHMgd2hlbgo+Pj4gcmVhZGluZyB0aGlzIGtp
+bmQgb2Ygc3R1ZmYuCj4+Pgo+Pj4gTWVoLCBJJ20gbm90IHN1cmUuICBZb3VyIHBhdGNoIGlzIGRl
+ZmluaXRlbHkgYmV0dGVyIHRoYW4gZG9pbmcgbm90aGluZy4KPj4+Cj4+PiBNYXJjPwo+Pgo+PiBX
+aGlsZSBJIGRlZmluaXRlbHkgYWdyZWUgdGhhdCBwZW9wbGUgc2hvdWxkIHBheSBtb3JlIGF0dGVu
+dGlvbiB0byB0aGUKPj4gY29kZSByYXRoZXIgdGhhbiBibGluZGx5IHRydXN0aW5nIGNvbW1lbnRz
+LCBJIHN0aWxsIHRoaW5rIHRoZXJlIGlzIHNvbWUKPj4gdmFsdWUgaW4gZGlzYW1iaWd1YXRpbmcg
+dGhlIGV4Y2VwdGlvbiBlbnRyeS9yZXR1cm4sIGJlY2F1c2UgdGhpcyBiaXQgb2YKPj4gY29kZSBh
+c3N1bWVzIHNvbWUgaW50aW1hdGUga25vd2xlZGdlIG9mIHRoZSBBUk12OCBleGNlcHRpb24gbW9k
+ZWwuCj4+Cj4+IEFzIGZvciB0aGUgY29tbWVudHMgdGhlbXNlbHZlcywgSSdkIHJhdGhlciBoYXZl
+IHNvbWUgd29yZGluZyB0aGF0Cj4+IGNsZWFybHkgaW5kaWNhdGUgdGhhdCB3ZSdyZSBkZWFsaW5n
+IHdpdGggZ3Vlc3QgaW5mb3JtYXRpb24sIGkuZToKPj4KPj4gCW1ycwl4MjAsIGVscl9lbDIJCS8v
+IEd1ZXN0IFBDCj4+IAltcnMJeDIxLCBzcHNyX2VsMgkJLy8gR3Vlc3QgcHN0YXRlCj4+Cj4+IChh
+bmQgdGhlIHNhbWUgZm9yIHRoZSBleGNlcHRpb24gcmV0dXJuKS4gVGhlICJiZWZvcmUgaHlwIGVu
+dHJ5IiBhbmQgInRvCj4+IHJlc3RvcmUiIGFyZSBub3QgcmVhbGx5IHVzZWZ1bCAoYWxsIHRoZSBy
+ZWdpc3RlcnMgd2UgYXJlCj4+IHNhdmluZy9yZXN0b3JpbmcgZmFsbCBpbnRvIHRoZXNlIGNhdGVn
+b3JpZXMpLiBXaGF0IEkgd2FudGVkIHRvIGNvbnZleQo+PiBoZXJlIHdhcyB0aGF0IGRlc3BpdGUg
+dXNpbmcgYW4gRUwyIHJlZ2lzdGVyLCB3ZSBhcmUgZGVhbGluZyB3aXRoIGd1ZXN0Cj4+IHJlZ2lz
+dGVycy4KPiAKPiBXaGljaCB3b3VsZCBiZSBncmVhdCBpdCB3ZSB3ZXJlLiBIb3dldmVyIHRoZSBj
+b2RlIGlzIHVzZWQgdG8KPiBzYXZlL3Jlc3RvcmUgdGhlIGhvc3QgY29udGV4dCBhcyB3ZWxsIGFz
+IHRoZSBndWVzdCBjb250ZXh0IGhlbmNlIG15Cj4gd2Vhc2VseSB3b3Jkcy4gCgpHYWhoaC4gWW91
+J3JlIHJpZ2h0LiBJJ20gc3BlbmRpbmcgdG9vIG11Y2ggdGltZSBvbiB0aGUgVkhFIGNvZGUgdGhl
+c2UKZGF5cy4gR3Vlc3MgSSdsbCBzdGljayB0byB0aGUgd2Vhc2VsIHdvcmRzIHRoZW4uIENhbiB5
+b3UgcmVzcGluIGl0IHdpdGgKQ2hyaXN0b2ZmZXIncyBjb21tZW50IGFkZHJlc3NlZD8KClRoYW5r
+cywKCglNLgotLSAKSmF6eiBpcyBub3QgZGVhZC4gSXQganVzdCBzbWVsbHMgZnVubnkuLi4KX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxp
+bmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29s
+dW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
