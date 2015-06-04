@@ -1,28 +1,29 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v5 03/12] KVM: arm64: guest debug, define API headers
-Date: Thu, 4 Jun 2015 13:07:32 +0200
-Message-ID: <20150604110732.GG7657@cbox>
+Subject: Re: [PATCH v5 07/12] KVM: arm64: guest debug, add support for
+ single-step
+Date: Thu, 4 Jun 2015 13:07:52 +0200
+Message-ID: <20150604110752.GI7657@cbox>
 References: <1432891828-4816-1-git-send-email-alex.bennee@linaro.org>
- <1432891828-4816-4-git-send-email-alex.bennee@linaro.org>
+ <1432891828-4816-8-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 280ED52F30
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jun 2015 06:56:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8817752F4C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jun 2015 06:57:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cYw-q2tIRcCu for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Jun 2015 06:56:48 -0400 (EDT)
-Received: from mail-lb0-f173.google.com (mail-lb0-f173.google.com
- [209.85.217.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A2C5E52F2D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jun 2015 06:56:48 -0400 (EDT)
-Received: by lbbtu8 with SMTP id tu8so8879913lbb.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Jun 2015 04:06:50 -0700 (PDT)
+ with ESMTP id 8ZaijZhhqi6B for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Jun 2015 06:57:09 -0400 (EDT)
+Received: from mail-la0-f50.google.com (mail-la0-f50.google.com
+ [209.85.215.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D56B52F47
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jun 2015 06:57:09 -0400 (EDT)
+Received: by labpy14 with SMTP id py14so29223055lab.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Jun 2015 04:07:12 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1432891828-4816-4-git-send-email-alex.bennee@linaro.org>
+In-Reply-To: <1432891828-4816-8-git-send-email-alex.bennee@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,101 +34,242 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org, marc.zyngier@arm.com, jan.kiszka@siemens.com, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, zhichao.huang@linaro.org, r65777@freescale.com, pbonzini@redhat.com, bp@suse.de, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Russell King <linux@arm.linux.org.uk>, kvm@vger.kernel.org, marc.zyngier@arm.com, jan.kiszka@siemens.com, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, Catalin Marinas <catalin.marinas@arm.com>, zhichao.huang@linaro.org, r65777@freescale.com, pbonzini@redhat.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, May 29, 2015 at 10:30:19AM +0100, Alex Benn=E9e wrote:
-> This commit defines the API headers for guest debugging. There are two
-> architecture specific debug structures:
-> =
+On Fri, May 29, 2015 at 10:30:23AM +0100, Alex Benn=E9e wrote:
+> This adds support for single-stepping the guest. To do this we need to
+> manipulate the guests PSTATE.SS and MDSCR_EL1.SS bits which we do in the
+> kvm_arm_setup/clear_debug() so we don't affect the apparent state of the
+> guest. Additionally while the host is debugging the guest we suppress
+> the ability of the guest to single-step itself.
 
->   - kvm_guest_debug_arch, allows us to pass in HW debug registers
->   - kvm_debug_exit_arch, signals exception and possible faulting address
-> =
+I feel like there should be a slightly more elaborate explanation of
+exactly what works and what doesn't work when the guest is single
+stepping something and which choices we've made for supporting or not
+supporting this.
 
-> The type of debugging being used is controlled by the architecture
-> specific control bits of the kvm_guest_debug->control flags in the ioctl
-> structure.
 > =
 
 > Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> Reviewed-by: David Hildenbrand <dahi@linux.vnet.ibm.com>
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-
-I can re-confirm my ack despite the changes in v4, but this really is
-borderline to keep exiting r-b and a-b tags around from previous patches
-I would think, but ok.
-
--Christoffer
-
 > =
 
 > ---
 > v2
->    - expose hsr and pc directly to user-space
+>   - Move pstate/mdscr manipulation into C
+>   - don't export guest_debug to assembly
+>   - add accessor for saved_debug regs
+>   - tweak save/restore of mdscr_el1
 > v3
->    - s/control/controlled/ in commit message
->    - add v8 to ARM ARM comment (ARM Architecture Reference Manual)
->    - add rb tag
->    - rm pc, add far
->    - re-word comments on alignment
->    - rename KVM_ARM_NDBG_REGS -> KVM_ARM_MAX_DBG_REGS
+>   - don't save PC in debug information struct
+>   - rename debug_saved_regs->guest_debug_state
+>   - save whole value, only use bits in restore
+>   - add save/restore_guest-debug_regs helper functions
+>   - simplify commit message for clarity
+>   - rm vcpu_debug_saved_reg access fn
 > v4
->    - now uses common HW/SW BP define
->    - add a-b-tag
->    - use u32 for control regs
+>   - added more comments based on suggestions
+>   - guest_debug_state->guest_debug_preserved
+>   - no point masking restore, we will trap out
 > v5
->    - revert to have arch specific KVM_GUESTDBG_USE_SW/HW_BP
->    - rm stale comments dbgctrl was stored as u64
+>   - more comments
+>   - don't bother preserving pstate.ss
+
+it would have been good if there was some comment explaining the reason
+for this change.
+
 > ---
->  arch/arm64/include/uapi/asm/kvm.h | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
+>  arch/arm/kvm/arm.c                |  4 ++-
+>  arch/arm64/include/asm/kvm_host.h | 11 ++++++++
+>  arch/arm64/kvm/debug.c            | 58 +++++++++++++++++++++++++++++++++=
++++---
+>  arch/arm64/kvm/handle_exit.c      |  2 ++
+>  4 files changed, 70 insertions(+), 5 deletions(-)
 > =
 
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/=
-asm/kvm.h
-> index d268320..43758e7 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -100,12 +100,32 @@ struct kvm_sregs {
->  struct kvm_fpu {
->  };
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index 064c105..9b3ed6d 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -302,7 +302,9 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  	kvm_arm_set_running_vcpu(NULL);
+>  }
 >  =
 
-> +/*
-> + * See v8 ARM ARM D7.3: Debug Registers
+> -#define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_=
+SW_BP)
+> +#define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE |    \
+> +			    KVM_GUESTDBG_USE_SW_BP | \
+> +			    KVM_GUESTDBG_SINGLESTEP)
+>  =
+
+>  /**
+>   * kvm_arch_vcpu_ioctl_set_guest_debug - set up guest debugging
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/k=
+vm_host.h
+> index 7cb99b5..e2db6a6 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -123,6 +123,17 @@ struct kvm_vcpu_arch {
+>  	 * here.
+>  	 */
+>  =
+
+> +	/*
+> +	 * Guest registers we preserve during guest debugging.
+> +	 *
+> +	 * These shadow registers are updated by the kvm_handle_sys_reg
+> +	 * trap handler if the guest accesses or updates them while we
+> +	 * are using guest debug.
+> +	 */
+> +	struct {
+> +		u32	mdscr_el1;
+> +	} guest_debug_preserved;
+> +
+>  	/* Don't run the guest */
+>  	bool pause;
+>  =
+
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index 8d1bfa4..10a6baa 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -19,11 +19,41 @@
+>  =
+
+>  #include <linux/kvm_host.h>
+>  =
+
+> +#include <asm/debug-monitors.h>
+> +#include <asm/kvm_asm.h>
+>  #include <asm/kvm_arm.h>
+> +#include <asm/kvm_emulate.h>
+> +
+> +/* These are the bits of MDSCR_EL1 we may manipulate */
+> +#define MDSCR_EL1_DEBUG_MASK	(DBG_MDSCR_SS | \
+> +				DBG_MDSCR_KDE | \
+> +				DBG_MDSCR_MDE)
+>  =
+
+>  static DEFINE_PER_CPU(u32, mdcr_el2);
+>  =
+
+>  /**
+> + * save/restore_guest_debug_regs
 > + *
-> + * The architectural limit is 16 debug registers of each type although
-> + * in practice there are usually less (see ID_AA64DFR0_EL1).
+> + * For some debug operations we need to tweak some guest registers. As
+> + * a result we need to save the state of those registers before we
+> + * make those modifications. This does get confused if the guest
+> + * attempts to control single step while being debugged. It will start
+> + * working again once it is no longer being debugged by the host.
+
+What gets confused and what starts working?
+
+> + *
+> + * Guest access to MDSCR_EL1 is trapped by the hypervisor and handled
+> + * after we have restored the preserved value to the main context.
 > + */
-> +#define KVM_ARM_MAX_DBG_REGS 16
->  struct kvm_guest_debug_arch {
-> +	__u32 dbg_bcr[KVM_ARM_MAX_DBG_REGS];
-> +	__u64 dbg_bvr[KVM_ARM_MAX_DBG_REGS];
-> +	__u32 dbg_wcr[KVM_ARM_MAX_DBG_REGS];
-> +	__u64 dbg_wvr[KVM_ARM_MAX_DBG_REGS];
->  };
->  =
-
->  struct kvm_debug_exit_arch {
-> +	__u32 hsr;
-> +	__u64 far;
->  };
->  =
-
-> +/*
-> + * Architecture specific defines for kvm_guest_debug->control
-> + */
+> +static void save_guest_debug_regs(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.guest_debug_preserved.mdscr_el1 =3D vcpu_sys_reg(vcpu, MDSCR=
+_EL1);
+> +}
 > +
-> +#define KVM_GUESTDBG_USE_SW_BP		(1 << 16)
-> +#define KVM_GUESTDBG_USE_HW_BP		(1 << 17)
+> +static void restore_guest_debug_regs(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu_sys_reg(vcpu, MDSCR_EL1) =3D vcpu->arch.guest_debug_preserved.mdsc=
+r_el1;
+> +}
 > +
->  struct kvm_sync_regs {
->  };
+> +/**
+>   * kvm_arm_init_debug - grab what we need for debug
+>   *
+>   * Currently the sole task of this function is to retrieve the initial
+> @@ -38,7 +68,6 @@ void kvm_arm_init_debug(void)
+>  	__this_cpu_write(mdcr_el2, kvm_call_hyp(__kvm_get_mdcr_el2));
+>  }
 >  =
 
+> -
+>  /**
+>   * kvm_arm_setup_debug - set up debug related stuff
+>   *
+> @@ -73,12 +102,33 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  	if (trap_debug)
+>  		vcpu->arch.mdcr_el2 |=3D MDCR_EL2_TDA;
+>  =
+
+> -	/* Trap breakpoints? */
+> -	if (vcpu->guest_debug & KVM_GUESTDBG_USE_SW_BP)
+> +	/* Is Guest debugging in effect? */
+> +	if (vcpu->guest_debug) {
+>  		vcpu->arch.mdcr_el2 |=3D MDCR_EL2_TDE;
+> +
+> +		/* Save guest debug state */
+> +		save_guest_debug_regs(vcpu);
+> +
+> +		/*
+> +		 * Single Step (ARM ARM D2.12.3 The software step state
+> +		 * machine)
+> +		 *
+> +		 * If we are doing Single Step we need to manipulate
+> +		 * MDSCR_EL1.SS and PSTATE.SS. If not we need to
+> +		 * suppress the guests ability to trigger single step
+> +		 * exceptions as otherwise the host will deal with them.
+
+is this because if you are doing any kind of guest debugging, we trap
+all debug exceptions to EL2 and therefore single-stepping in the guest
+won't work anyway and the host doesn't know what to do with such
+exceptions?
+
+I would feel slightly better if the comment assured me this doesn't
+outright break something, but ok...
+
+> +		 */
+> +		if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP) {
+> +			*vcpu_cpsr(vcpu) |=3D  DBG_SPSR_SS;
+> +			vcpu_sys_reg(vcpu, MDSCR_EL1) |=3D DBG_MDSCR_SS;
+> +		} else {
+> +			vcpu_sys_reg(vcpu, MDSCR_EL1) &=3D ~DBG_MDSCR_SS;
+> +		}
+> +	}
+>  }
+>  =
+
+>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
+>  {
+> -	/* Nothing to do yet */
+> +	if (vcpu->guest_debug)
+> +		restore_guest_debug_regs(vcpu);
+>  }
+> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+> index 27f38a9..e9de13e 100644
+> --- a/arch/arm64/kvm/handle_exit.c
+> +++ b/arch/arm64/kvm/handle_exit.c
+> @@ -103,6 +103,7 @@ static int kvm_handle_guest_debug(struct kvm_vcpu *vc=
+pu, struct kvm_run *run)
+>  	run->debug.arch.hsr =3D hsr;
+>  =
+
+>  	switch (hsr >> ESR_ELx_EC_SHIFT) {
+> +	case ESR_ELx_EC_SOFTSTP_LOW:
+>  	case ESR_ELx_EC_BKPT32:
+>  	case ESR_ELx_EC_BRK64:
+>  		break;
+> @@ -130,6 +131,7 @@ static exit_handle_fn arm_exit_handlers[] =3D {
+>  	[ESR_ELx_EC_SYS64]	=3D kvm_handle_sys_reg,
+>  	[ESR_ELx_EC_IABT_LOW]	=3D kvm_handle_guest_abort,
+>  	[ESR_ELx_EC_DABT_LOW]	=3D kvm_handle_guest_abort,
+> +	[ESR_ELx_EC_SOFTSTP_LOW]=3D kvm_handle_guest_debug,
+>  	[ESR_ELx_EC_BKPT32]	=3D kvm_handle_guest_debug,
+>  	[ESR_ELx_EC_BRK64]	=3D kvm_handle_guest_debug,
+>  };
 > -- =
 
 > 2.4.1
 > =
+
+
+As for the code of this patch:
+
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
