@@ -1,116 +1,123 @@
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v5 08/12] KVM: arm64: re-factor hyp.S debug register code
-Date: Thu, 04 Jun 2015 11:34:46 +0100
-Message-ID: <87d21bbw3d.fsf@linaro.org>
-References: <1432891828-4816-1-git-send-email-alex.bennee@linaro.org>
- <1432891828-4816-9-git-send-email-alex.bennee@linaro.org>
- <20150604102308.GD7657@cbox>
+Subject: Re: [PATCH] KVM: arm64: fix misleading comments in save/restore
+Date: Thu, 04 Jun 2015 11:46:28 +0100
+Message-ID: <87bngvbvjv.fsf@linaro.org>
+References: <1432806186-27993-1-git-send-email-alex.bennee@linaro.org> <20150604093436.GC7657@cbox> <55702205.7000908@arm.com> <87eglrbwr2.fsf@linaro.org> <557029A9.1010303@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E5AA52EDB
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jun 2015 06:24:36 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LB9oN2qAmVxa for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Jun 2015 06:24:34 -0400 (EDT)
-Received: from socrates.bennee.com
- (static.88-198-71-155.clients.your-server.de [88.198.71.155])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A2DAB52ED4
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jun 2015 06:24:34 -0400 (EDT)
-In-reply-to: <20150604102308.GD7657@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org, marc.zyngier@arm.com, jan.kiszka@siemens.com, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, zhichao.huang@linaro.org, r65777@freescale.com, pbonzini@redhat.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-reply-to: <557029A9.1010303@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Gleb Natapov <gleb@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkNocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4gd3JpdGVzOgoK
-PiBPbiBGcmksIE1heSAyOSwgMjAxNSBhdCAxMDozMDoyNEFNICswMTAwLCBBbGV4IEJlbm7DqWUg
-d3JvdGU6Cj4+IFRoaXMgaXMgYSBwcmUtY3Vyc29yIHRvIHNoYXJpbmcgdGhlIGNvZGUgd2l0aCB0
-aGUgZ3Vlc3QgZGVidWcgc3VwcG9ydC4KPj4gVGhpcyByZXBsYWNlcyB0aGUgYmlnIG1hY3JvIHRo
-YXQgZmlzaGVzIGRhdGEgb3V0IG9mIGEgZml4ZWQgbG9jYXRpb24KPj4gd2l0aCBhIG1vcmUgZ2Vu
-ZXJhbCBoZWxwZXIgbWFjcm8gdG8gcmVzdG9yZSBhIHNldCBvZiBkZWJ1ZyByZWdpc3RlcnMuIEl0
-Cj4+IHVzZXMgbWFjcm8gc3Vic3RpdHV0aW9uIHNvIGl0IGNhbiBiZSByZS11c2VkIGZvciBkZWJ1
-ZyBjb250cm9sIGFuZCB2YWx1ZQo+PiByZWdpc3RlcnMuIEl0IGRvZXMgaG93ZXZlciByZWx5IG9u
-IHRoZSBkZWJ1ZyByZWdpc3RlcnMgYmVpbmcgNjQgYml0Cj4+IGFsaWduZWQgKGFzIHRoZXkgaGFw
-cGVuIHRvIGJlIGluIHRoZSBoeXAgQUJJKS4KCk9vcHMgSSdkIGJldHRlciBmaXggdGhhdCBjb21t
-aXQgY29tbWVudC4KCj4+IAo+PiBTaWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVu
-bmVlQGxpbmFyby5vcmc+Cj4+IAo+PiAtLS0KPj4gdjM6Cj4+ICAgLSByZXR1cm4gdG8gdGhlIHBh
-dGNoIHNlcmllcwo+PiAgIC0gYWRkIHNhdmUgYW5kIHJlc3RvcmUgdGFyZ2V0cwo+PiAgIC0gY2hh
-bmdlIHJlZ2lzdGVyIHVzZSBhbmQgZG9jdW1lbnQKPj4gdjQ6Cj4+ICAgLSBrZWVwIG9yaWdpbmFs
-IHNldHVwL3Jlc3RvcmUgbmFtZXMKPj4gICAtIGRvbid0IHVzZSBzcGxpdCB1MzIvdTY0IHN0cnVj
-dHVyZSB5ZXQKPj4gLS0tCj4+ICBhcmNoL2FybTY0L2t2bS9oeXAuUyB8IDUxOSArKysrKysrKysr
-KysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPj4gIDEgZmlsZSBjaGFu
-Z2VkLCAxNDAgaW5zZXJ0aW9ucygrKSwgMzc5IGRlbGV0aW9ucygtKQo+PiAKPj4gZGlmZiAtLWdp
-dCBhL2FyY2gvYXJtNjQva3ZtL2h5cC5TIGIvYXJjaC9hcm02NC9rdm0vaHlwLlMKPj4gaW5kZXgg
-NzRlNjNkOC4uOWM0ODk3ZCAxMDA2NDQKPj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vaHlwLlMKPj4g
-KysrIGIvYXJjaC9hcm02NC9rdm0vaHlwLlMKPgo+Cj4gWy4uLl0KPgo+PiBAQCAtNDY1LDE5NSAr
-MzE4LDUyIEBACj4+ICAJbXNyCW1kc2NyX2VsMSwJeDI1Cj4+ICAuZW5kbQo+PiAgCj4+IC0ubWFj
-cm8gcmVzdG9yZV9kZWJ1Zwo+PiAtCS8vIHgyOiBiYXNlIGFkZHJlc3MgZm9yIGNwdSBjb250ZXh0
-Cj4+IC0JLy8geDM6IHRtcCByZWdpc3Rlcgo+PiAtCj4+IC0JbXJzCXgyNiwgaWRfYWE2NGRmcjBf
-ZWwxCj4+IC0JdWJmeAl4MjQsIHgyNiwgIzEyLCAjNAkvLyBFeHRyYWN0IEJSUHMKPj4gLQl1YmZ4
-CXgyNSwgeDI2LCAjMjAsICM0CS8vIEV4dHJhY3QgV1JQcwo+PiAtCW1vdgl3MjYsICMxNQo+PiAt
-CXN1Ygl3MjQsIHcyNiwgdzI0CQkvLyBIb3cgbWFueSBCUHMgdG8gc2tpcAo+PiAtCXN1Ygl3MjUs
-IHcyNiwgdzI1CQkvLyBIb3cgbWFueSBXUHMgdG8gc2tpcAo+PiAtCj4+IC0JYWRkCXgzLCB4Miwg
-I0NQVV9TWVNSRUdfT0ZGU0VUKERCR0JDUjBfRUwxKQo+PiArLm1hY3JvIHJlc3RvcmVfZGVidWcg
-dHlwZQo+PiArICAgICAgICAvLyB4NDogcG9pbnRlciB0byByZWdpc3RlciBzZXQKPj4gKyAgICAg
-ICAgLy8geDU6IG51bWJlciBvZiByZWdpc3RlcnMgdG8gc2tpcAo+Cj4gbml0OiB1c2UgdGFicyBp
-bnN0ZWFkIG9mIHNwYWNlcyBoZXJlLi4uCj4KPj4gKwkvLyB4Ni4ueDIyIHRyYXNoZWQKPj4gIAo+
-Cj4gWy4uLl0KPgo+PiBAQCAtODg3LDEyICs1OTcsNjMgQEAgX19yZXN0b3JlX3N5c3JlZ3M6Cj4+
-ICAJcmVzdG9yZV9zeXNyZWdzCj4+ICAJcmV0Cj4+ICAKPj4gKy8qIFNhdmUgZGVidWcgc3RhdGUg
-Ki8KPj4gIF9fc2F2ZV9kZWJ1ZzoKPj4gLQlzYXZlX2RlYnVnCj4+ICsJLy8geDA6IGJhc2UgYWRk
-cmVzcyBmb3IgdmNwdSBjb250ZXh0Cj4+ICsJLy8geDI6IHB0ciB0byBjdXJyZW50IENQVSBjb250
-ZXh0Cj4+ICsJLy8geDQveDU6IHRyYXNoZWQKPgo+IEkgaGFkIGEgYnVuY2ggb2YgcXVlc3Rpb25z
-IGhlcmUgd2hpY2ggSSB0aGluayB5b3UgbWlzc2VkIGxhc3QgdGltZQo+IGFyb3VuZDoKPiAgMS4g
-d2h5IGRvIHdlIG5lZWQgdGhlIHZjcHUgY29udGV4dD8KCldlIGRvbid0LCBJJ2xsIGRyb3AgdGhh
-dAoKPiAgMi4gd2hhdCBkb2VzICdjdXJyZW50JyBtZWFuIGhlcmU/CgpFaXRoZXIgdGhlIGhvc3Qg
-b3IgdmNwdSBjb250ZXh0IGRlcGVuZGluZyB3aGljaCB3YXkgd2UgYXJlIGN1cnJlbnRseSBnb2lu
-Zy4KCj4gIDMuIHlvdSdyZSBhbHNvIHRyYXNoaW5nIGV2ZXJ5dGhpbmcgdGhhdCBzYXZlX2RlYnVn
-IHRyYXNoZXMsIHNvIHg0LzUsCj4gICAgIHg2LXgyMiB0cmFzaGVkIHdvdWxkIGJlIG1vcmUgY29y
-cmVjdAoKT0sKCj4KPj4gKwo+PiArCW1ycwl4MjYsIGlkX2FhNjRkZnIwX2VsMQo+PiArCXViZngJ
-eDI0LCB4MjYsICMxMiwgIzQJLy8gRXh0cmFjdCBCUlBzCj4+ICsJdWJmeAl4MjUsIHgyNiwgIzIw
-LCAjNAkvLyBFeHRyYWN0IFdSUHMKPj4gKwltb3YJdzI2LCAjMTUKPj4gKwlzdWIJdzI0LCB3MjYs
-IHcyNAkJLy8gSG93IG1hbnkgQlBzIHRvIHNraXAKPj4gKwlzdWIJdzI1LCB3MjYsIHcyNQkJLy8g
-SG93IG1hbnkgV1BzIHRvIHNraXAKPj4gKwo+PiArCW1vdiAgICAgeDUsIHgyNAo+PiArCWFkZAl4
-NCwgeDIsICNDUFVfU1lTUkVHX09GRlNFVChEQkdCQ1IwX0VMMSkKPj4gKwlzYXZlX2RlYnVnIGRi
-Z2Jjcgo+PiArCWFkZAl4NCwgeDIsICNDUFVfU1lTUkVHX09GRlNFVChEQkdCVlIwX0VMMSkKPj4g
-KwlzYXZlX2RlYnVnIGRiZ2J2cgo+PiArCj4+ICsJbW92ICAgICB4NSwgeDI1Cj4+ICsJYWRkCXg0
-LCB4MiwgI0NQVV9TWVNSRUdfT0ZGU0VUKERCR1dDUjBfRUwxKQo+PiArCXNhdmVfZGVidWcgZGJn
-d2NyCj4+ICsJYWRkCXg0LCB4MiwgI0NQVV9TWVNSRUdfT0ZGU0VUKERCR1dWUjBfRUwxKQo+PiAr
-CXNhdmVfZGVidWcgZGJnd3ZyCj4+ICsKPj4gKwltcnMJeDIxLCBtZGNjaW50X2VsMQo+PiArCXN0
-cgl4MjEsIFt4MiwgI0NQVV9TWVNSRUdfT0ZGU0VUKE1EQ0NJTlRfRUwxKV0KPj4gIAlyZXQKPj4g
-IAo+PiArLyogUmVzdG9yZSBkZWJ1ZyBzdGF0ZSAqLwo+PiAgX19yZXN0b3JlX2RlYnVnOgo+PiAt
-CXJlc3RvcmVfZGVidWcKPj4gKwkvLyB4MDogYmFzZSBhZGRyZXNzIGZvciBjcHUgY29udGV4dAo+
-PiArCS8vIHgyOiBwdHIgdG8gY3VycmVudCBDUFUgY29udGV4dAo+PiArCS8vIHg0L3g1OiB0cmFz
-aGVkCj4KPiBhbmQgeW91IG1pc3NlZCB0aGVzZSBjb21tZW50cyB0b28sIGJhc2ljYWxseSBzYW1l
-IHN0dWZmLCBidXQgd2h5IHdhcyBpdAo+ICdjcHUnIGhlcmUgYW5kIG5vdCAndmNwdScgbGlrZSBh
-Ym92ZT8KCkFnYWluIHdlIHVzZSB0aGUgZnVuY3Rpb25zIGJvdGggZm9yIHJlc3RvcmluZyBob3N0
-IGFuZCB2Y3B1IGRlYnVnIGNvbnRleHQuCgo+Cj4gbm90ZSBhZ2FpbiwgdGhhdCB5b3UncmUgZXhw
-bGljaXRseSB0b3VjaGluZyB4MjQsIHh4MjUsIGFuZCB4MjYgaGVyZSBhcwo+IHdlbGwsIHNvIHNo
-b3VsZG4ndCB0aGV5IGJlIGxpc3RlZCBhcyB0cmFzaGVkPwo+Cj4+ICsKPj4gKwltcnMJeDI2LCBp
-ZF9hYTY0ZGZyMF9lbDEKPj4gKwl1YmZ4CXgyNCwgeDI2LCAjMTIsICM0CS8vIEV4dHJhY3QgQlJQ
-cwo+PiArCXViZngJeDI1LCB4MjYsICMyMCwgIzQJLy8gRXh0cmFjdCBXUlBzCj4+ICsJbW92CXcy
-NiwgIzE1Cj4+ICsJc3ViCXcyNCwgdzI2LCB3MjQJCS8vIEhvdyBtYW55IEJQcyB0byBza2lwCj4+
-ICsJc3ViCXcyNSwgdzI2LCB3MjUJCS8vIEhvdyBtYW55IFdQcyB0byBza2lwCj4+ICsKPj4gKwlt
-b3YgICAgIHg1LCB4MjQKPj4gKwlhZGQJeDQsIHgyLCAjQ1BVX1NZU1JFR19PRkZTRVQoREJHQkNS
-MF9FTDEpCj4+ICsJcmVzdG9yZV9kZWJ1ZyBkYmdiY3IKPj4gKwlhZGQJeDQsIHgyLCAjQ1BVX1NZ
-U1JFR19PRkZTRVQoREJHQlZSMF9FTDEpCj4+ICsJcmVzdG9yZV9kZWJ1ZyBkYmdidnIKPj4gKwo+
-PiArCW1vdiAgICAgeDUsIHgyNQo+PiArCWFkZAl4NCwgeDIsICNDUFVfU1lTUkVHX09GRlNFVChE
-QkdXQ1IwX0VMMSkKPj4gKwlyZXN0b3JlX2RlYnVnIGRiZ3djcgo+PiArCWFkZAl4NCwgeDIsICND
-UFVfU1lTUkVHX09GRlNFVChEQkdXVlIwX0VMMSkKPj4gKwlyZXN0b3JlX2RlYnVnIGRiZ3d2cgo+
-PiArCj4+ICsJbGRyCXgyMSwgW3gyLCAjQ1BVX1NZU1JFR19PRkZTRVQoTURDQ0lOVF9FTDEpXQo+
-PiArCW1zcgltZGNjaW50X2VsMSwgeDIxCj4+ICsKPj4gIAlyZXQKPj4gIAo+PiAgX19zYXZlX2Zw
-c2ltZDoKPgo+IFRoYW5rcywKPiAtQ2hyaXN0b2ZmZXIKCi0tIApBbGV4IEJlbm7DqWUKX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcg
-bGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1i
-aWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+
+Marc Zyngier <marc.zyngier@arm.com> writes:
+
+> On 04/06/15 11:20, Alex Benn=C3=A9e wrote:
+>>=20
+>> Marc Zyngier <marc.zyngier@arm.com> writes:
+>>=20
+>>> On 04/06/15 10:34, Christoffer Dall wrote:
+>>>> On Thu, May 28, 2015 at 10:43:06AM +0100, Alex Benn=C3=A9e wrote:
+>>>>> The elr_el2 and spsr_el2 registers in fact contain the processor =
+state
+>>>>> before entry into the hypervisor code.
+>>>>
+>>>> be careful with your use of the hypervisor, in the KVM design the
+>>>> hypervisor is split across EL1 and EL2.
+>>=20
+>> "before entry into EL2."
+>>=20
+>>>>
+>>>>> In the case of guest state it
+>>>>> could be in either el0 or el1.
+>>>>
+>>>> true
+>>>>
+>>>>>
+>>>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>>>> ---
+>>>>>  arch/arm64/kvm/hyp.S | 8 ++++----
+>>>>>  1 file changed, 4 insertions(+), 4 deletions(-)
+>>>>>
+>>>>> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+>>>>> index d755922..1940a4c 100644
+>>>>> --- a/arch/arm64/kvm/hyp.S
+>>>>> +++ b/arch/arm64/kvm/hyp.S
+>>>>> @@ -50,8 +50,8 @@
+>>>>>  	stp	x29, lr, [x3, #80]
+>>>>> =20
+>>>>>  	mrs	x19, sp_el0
+>>>>> -	mrs	x20, elr_el2		// EL1 PC
+>>>>> -	mrs	x21, spsr_el2		// EL1 pstate
+>>>>> +	mrs	x20, elr_el2		// PC before hyp entry
+>>>>> +	mrs	x21, spsr_el2		// pstate before hyp entry
+>>>>> =20
+>>>>>  	stp	x19, x20, [x3, #96]
+>>>>>  	str	x21, [x3, #112]
+>>>>> @@ -82,8 +82,8 @@
+>>>>>  	ldr	x21, [x3, #16]
+>>>>> =20
+>>>>>  	msr	sp_el0, x19
+>>>>> -	msr	elr_el2, x20 				// EL1 PC
+>>>>> -	msr	spsr_el2, x21 				// EL1 pstate
+>>>>> +	msr	elr_el2, x20 		// PC to restore
+>>>>> +	msr	spsr_el2, x21 		// pstate to restore
+>>>>
+>>>> I don't feel like 'to restore' is much more meaningful here.
+>>>>
+>>>> I would actually vote for removin the comments all together, since=
+ one
+>>>> should really understand the code as opposed to the comments when
+>>>> reading this kind of stuff.
+>>>>
+>>>> Meh, I'm not sure.  Your patch is definitely better than doing not=
+hing.
+>>>>
+>>>> Marc?
+>>>
+>>> While I definitely agree that people should pay more attention to t=
+he
+>>> code rather than blindly trusting comments, I still think there is =
+some
+>>> value in disambiguating the exception entry/return, because this bi=
+t of
+>>> code assumes some intimate knowledge of the ARMv8 exception model.
+>>>
+>>> As for the comments themselves, I'd rather have some wording that
+>>> clearly indicate that we're dealing with guest information, i.e:
+>>>
+>>> 	mrs	x20, elr_el2		// Guest PC
+>>> 	mrs	x21, spsr_el2		// Guest pstate
+>>>
+>>> (and the same for the exception return). The "before hyp entry" and=
+ "to
+>>> restore" are not really useful (all the registers we are
+>>> saving/restoring fall into these categories). What I wanted to conv=
+ey
+>>> here was that despite using an EL2 register, we are dealing with gu=
+est
+>>> registers.
+>>=20
+>> Which would be great it we were. However the code is used to
+>> save/restore the host context as well as the guest context hence my
+>> weasely words.=20
+>
+> Gahhh. You're right. I'm spending too much time on the VHE code these
+> days. Guess I'll stick to the weasel words then. Can you respin it wi=
+th
+> Christoffer's comment addressed?
+
+Sure. Do you want it separated from the guest debug series or will you
+be happy to take it with it when ready?
+
+>
+> Thanks,
+>
+> 	M.
+
+--=20
+Alex Benn=C3=A9e
