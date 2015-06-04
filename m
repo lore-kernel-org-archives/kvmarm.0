@@ -1,43 +1,54 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v5 0/6] QEMU support for KVM Guest Debug on arm64
-Date: Thu, 4 Jun 2015 12:35:31 +0100
-Message-ID: <CAFEAcA_prABrrwx5LQ6T0A1cG-jvfuJYeZE6kTqKO+5jWrqn1A@mail.gmail.com>
-References: <1432912764-7073-1-git-send-email-alex.bennee@linaro.org>
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH v2] KVM: arm64: fix misleading comments in save/restore
+Date: Thu,  4 Jun 2015 14:28:37 +0100
+Message-ID: <1433424517-31816-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1432912764-7073-1-git-send-email-alex.bennee@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Christoffer Dall <christoffer.dall@linaro.org>, Zhichao Huang <zhichao.huang@linaro.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AD1B752F78
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jun 2015 09:18:23 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id UtthaLuwUJP0 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Jun 2015 09:18:21 -0400 (EDT)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D88C552F24
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Jun 2015 09:18:21 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: marc.zyngier@arm.com
+Cc: kvm@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 29 May 2015 at 16:19, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
-> You may be wondering what happened to v3 and v4. They do exist but
-> they didn't change much from the the original patches as I've been
-> mostly looking the kernel side of the equation. So in summary the
-> changes are:
->
->   - updates to the kernel ABI
->   - don't fall over on kernels without debug support
->   - better logging, syncing and use of internals.h
->   - debug exception re-injection for guest events*
-
-Some generic remarks (which we've talked about in irc):
-
- * does this correctly handle single step over emulated MMIO insns?
-   how about single step over insns emulated in the kernel
-   without trapping out to userspace? (eg some of the sysregs)
-   kvm_skip_instr() doesn't seem to update PSTATE.SS...
- * the kernel currently does kvm_skip_instr() before the
-   emulated MMIO exit, not afterwards. That feels conceptually
-   the wrong way round -- are there any interesting corner cases
-   we would get wrong currently but that naturally fall out in
-   the wash if it's done afterwards?
- * what about debugging a 32-bit guest which uses the 32-bit
-   ARM/Thumb bkpt insns?
-
-thanks
--- PMM
+VGhlIGVscl9lbDIgYW5kIHNwc3JfZWwyIHJlZ2lzdGVycyBpbiBmYWN0IGNvbnRhaW4gdGhlIHBy
+b2Nlc3NvciBzdGF0ZQpiZWZvcmUgZW50cnkgaW50byBFTDIuIEluIHRoZSBjYXNlIG9mIGd1ZXN0
+IHN0YXRlIGl0IGNvdWxkIGJlIGluIGVpdGhlcgplbDAgb3IgZWwxLgoKU2lnbmVkLW9mZi1ieTog
+QWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgoKLS0tCnYyCiAgLSBzL2h5cGVy
+dmlzb3IgY29kZS9FTDIvCiAgLSBjb21tZW50OiBwYy9wc3RhdGUgYmVmb3JlIGVudGVyaW5nL29u
+IHJldHVybiBmcm9tIGVsMgotLS0KIGFyY2gvYXJtNjQva3ZtL2h5cC5TIHwgOCArKysrLS0tLQog
+MSBmaWxlIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkKCmRpZmYgLS1n
+aXQgYS9hcmNoL2FybTY0L2t2bS9oeXAuUyBiL2FyY2gvYXJtNjQva3ZtL2h5cC5TCmluZGV4IDVi
+ZWZkMDEuLjUxOTgwNWYgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQva3ZtL2h5cC5TCisrKyBiL2Fy
+Y2gvYXJtNjQva3ZtL2h5cC5TCkBAIC01MCw4ICs1MCw4IEBACiAJc3RwCXgyOSwgbHIsIFt4Mywg
+IzgwXQogCiAJbXJzCXgxOSwgc3BfZWwwCi0JbXJzCXgyMCwgZWxyX2VsMgkJLy8gRUwxIFBDCi0J
+bXJzCXgyMSwgc3Bzcl9lbDIJCS8vIEVMMSBwc3RhdGUKKwltcnMJeDIwLCBlbHJfZWwyCQkvLyBw
+YyBiZWZvcmUgZW50ZXJpbmcgZWwyCisJbXJzCXgyMSwgc3Bzcl9lbDIJCS8vIHBzdGF0ZSBiZWZv
+cmUgZW50ZXJpbmcgZWwyCiAKIAlzdHAJeDE5LCB4MjAsIFt4MywgIzk2XQogCXN0cgl4MjEsIFt4
+MywgIzExMl0KQEAgLTgyLDggKzgyLDggQEAKIAlsZHIJeDIxLCBbeDMsICMxNl0KIAogCW1zcglz
+cF9lbDAsIHgxOQotCW1zcgllbHJfZWwyLCB4MjAgCQkJCS8vIEVMMSBQQwotCW1zcglzcHNyX2Vs
+MiwgeDIxIAkJCQkvLyBFTDEgcHN0YXRlCisJbXNyCWVscl9lbDIsIHgyMCAJCS8vIHBjIG9uIHJl
+dHVybiBmcm9tIGVsMgorCW1zcglzcHNyX2VsMiwgeDIxIAkJLy8gcHN0YXRlIG9uIHJldHVybiBm
+cm9tIGVsMgogCiAJYWRkCXgzLCB4MiwgI0NQVV9YUkVHX09GRlNFVCgxOSkKIAlsZHAJeDE5LCB4
+MjAsIFt4M10KLS0gCjIuNC4yCgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5l
+ZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
