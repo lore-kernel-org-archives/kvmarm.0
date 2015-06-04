@@ -1,111 +1,162 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH] KVM: arm64: fix misleading comments in save/restore
-Date: Thu, 04 Jun 2015 11:20:33 +0100
-Message-ID: <87eglrbwr2.fsf@linaro.org>
-References: <1432806186-27993-1-git-send-email-alex.bennee@linaro.org> <20150604093436.GC7657@cbox> <55702205.7000908@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v5 08/12] KVM: arm64: re-factor hyp.S debug register code
+Date: Thu, 4 Jun 2015 12:23:08 +0200
+Message-ID: <20150604102308.GD7657@cbox>
+References: <1432891828-4816-1-git-send-email-alex.bennee@linaro.org>
+ <1432891828-4816-9-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <55702205.7000908@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Gleb Natapov <gleb@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1432891828-4816-9-git-send-email-alex.bennee@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org, jan.kiszka@siemens.com, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On Fri, May 29, 2015 at 10:30:24AM +0100, Alex Benn=E9e wrote:
+> This is a pre-cursor to sharing the code with the guest debug support=
+=2E
+> This replaces the big macro that fishes data out of a fixed location
+> with a more general helper macro to restore a set of debug registers.=
+ It
+> uses macro substitution so it can be re-used for debug control and va=
+lue
+> registers. It does however rely on the debug registers being 64 bit
+> aligned (as they happen to be in the hyp ABI).
+>=20
+> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+>=20
+> ---
+> v3:
+>   - return to the patch series
+>   - add save and restore targets
+>   - change register use and document
+> v4:
+>   - keep original setup/restore names
+>   - don't use split u32/u64 structure yet
+> ---
+>  arch/arm64/kvm/hyp.S | 519 ++++++++++++++---------------------------=
+----------
+>  1 file changed, 140 insertions(+), 379 deletions(-)
+>=20
+> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+> index 74e63d8..9c4897d 100644
+> --- a/arch/arm64/kvm/hyp.S
+> +++ b/arch/arm64/kvm/hyp.S
 
-Marc Zyngier <marc.zyngier@arm.com> writes:
 
-> On 04/06/15 10:34, Christoffer Dall wrote:
->> On Thu, May 28, 2015 at 10:43:06AM +0100, Alex Benn=C3=A9e wrote:
->>> The elr_el2 and spsr_el2 registers in fact contain the processor st=
-ate
->>> before entry into the hypervisor code.
->>=20
->> be careful with your use of the hypervisor, in the KVM design the
->> hypervisor is split across EL1 and EL2.
+[...]
 
-"before entry into EL2."
+> @@ -465,195 +318,52 @@
+>  	msr	mdscr_el1,	x25
+>  .endm
+> =20
+> -.macro restore_debug
+> -	// x2: base address for cpu context
+> -	// x3: tmp register
+> -
+> -	mrs	x26, id_aa64dfr0_el1
+> -	ubfx	x24, x26, #12, #4	// Extract BRPs
+> -	ubfx	x25, x26, #20, #4	// Extract WRPs
+> -	mov	w26, #15
+> -	sub	w24, w26, w24		// How many BPs to skip
+> -	sub	w25, w26, w25		// How many WPs to skip
+> -
+> -	add	x3, x2, #CPU_SYSREG_OFFSET(DBGBCR0_EL1)
+> +.macro restore_debug type
+> +        // x4: pointer to register set
+> +        // x5: number of registers to skip
 
->>=20
->>> In the case of guest state it
->>> could be in either el0 or el1.
->>=20
->> true
->>=20
->>>
->>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->>> ---
->>>  arch/arm64/kvm/hyp.S | 8 ++++----
->>>  1 file changed, 4 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
->>> index d755922..1940a4c 100644
->>> --- a/arch/arm64/kvm/hyp.S
->>> +++ b/arch/arm64/kvm/hyp.S
->>> @@ -50,8 +50,8 @@
->>>  	stp	x29, lr, [x3, #80]
->>> =20
->>>  	mrs	x19, sp_el0
->>> -	mrs	x20, elr_el2		// EL1 PC
->>> -	mrs	x21, spsr_el2		// EL1 pstate
->>> +	mrs	x20, elr_el2		// PC before hyp entry
->>> +	mrs	x21, spsr_el2		// pstate before hyp entry
->>> =20
->>>  	stp	x19, x20, [x3, #96]
->>>  	str	x21, [x3, #112]
->>> @@ -82,8 +82,8 @@
->>>  	ldr	x21, [x3, #16]
->>> =20
->>>  	msr	sp_el0, x19
->>> -	msr	elr_el2, x20 				// EL1 PC
->>> -	msr	spsr_el2, x21 				// EL1 pstate
->>> +	msr	elr_el2, x20 		// PC to restore
->>> +	msr	spsr_el2, x21 		// pstate to restore
->>=20
->> I don't feel like 'to restore' is much more meaningful here.
->>=20
->> I would actually vote for removin the comments all together, since o=
-ne
->> should really understand the code as opposed to the comments when
->> reading this kind of stuff.
->>=20
->> Meh, I'm not sure.  Your patch is definitely better than doing nothi=
-ng.
->>=20
->> Marc?
->
-> While I definitely agree that people should pay more attention to the
-> code rather than blindly trusting comments, I still think there is so=
-me
-> value in disambiguating the exception entry/return, because this bit =
-of
-> code assumes some intimate knowledge of the ARMv8 exception model.
->
-> As for the comments themselves, I'd rather have some wording that
-> clearly indicate that we're dealing with guest information, i.e:
->
-> 	mrs	x20, elr_el2		// Guest PC
-> 	mrs	x21, spsr_el2		// Guest pstate
->
-> (and the same for the exception return). The "before hyp entry" and "=
-to
-> restore" are not really useful (all the registers we are
-> saving/restoring fall into these categories). What I wanted to convey
-> here was that despite using an EL2 register, we are dealing with gues=
-t
-> registers.
+nit: use tabs instead of spaces here...
 
-Which would be great it we were. However the code is used to
-save/restore the host context as well as the guest context hence my
-weasely words.=20
+> +	// x6..x22 trashed
+> =20
 
->
-> Would this address your concerns?
->
-> Thanks,
->
-> 	M.
+[...]
 
---=20
-Alex Benn=C3=A9e
+> @@ -887,12 +597,63 @@ __restore_sysregs:
+>  	restore_sysregs
+>  	ret
+> =20
+> +/* Save debug state */
+>  __save_debug:
+> -	save_debug
+> +	// x0: base address for vcpu context
+> +	// x2: ptr to current CPU context
+> +	// x4/x5: trashed
+
+I had a bunch of questions here which I think you missed last time
+around:
+ 1. why do we need the vcpu context?
+ 2. what does 'current' mean here?
+ 3. you're also trashing everything that save_debug trashes, so x4/5,
+    x6-x22 trashed would be more correct
+
+> +
+> +	mrs	x26, id_aa64dfr0_el1
+> +	ubfx	x24, x26, #12, #4	// Extract BRPs
+> +	ubfx	x25, x26, #20, #4	// Extract WRPs
+> +	mov	w26, #15
+> +	sub	w24, w26, w24		// How many BPs to skip
+> +	sub	w25, w26, w25		// How many WPs to skip
+> +
+> +	mov     x5, x24
+> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGBCR0_EL1)
+> +	save_debug dbgbcr
+> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGBVR0_EL1)
+> +	save_debug dbgbvr
+> +
+> +	mov     x5, x25
+> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGWCR0_EL1)
+> +	save_debug dbgwcr
+> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGWVR0_EL1)
+> +	save_debug dbgwvr
+> +
+> +	mrs	x21, mdccint_el1
+> +	str	x21, [x2, #CPU_SYSREG_OFFSET(MDCCINT_EL1)]
+>  	ret
+> =20
+> +/* Restore debug state */
+>  __restore_debug:
+> -	restore_debug
+> +	// x0: base address for cpu context
+> +	// x2: ptr to current CPU context
+> +	// x4/x5: trashed
+
+and you missed these comments too, basically same stuff, but why was it
+'cpu' here and not 'vcpu' like above?
+
+note again, that you're explicitly touching x24, xx25, and x26 here as
+well, so shouldn't they be listed as trashed?
+
+> +
+> +	mrs	x26, id_aa64dfr0_el1
+> +	ubfx	x24, x26, #12, #4	// Extract BRPs
+> +	ubfx	x25, x26, #20, #4	// Extract WRPs
+> +	mov	w26, #15
+> +	sub	w24, w26, w24		// How many BPs to skip
+> +	sub	w25, w26, w25		// How many WPs to skip
+> +
+> +	mov     x5, x24
+> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGBCR0_EL1)
+> +	restore_debug dbgbcr
+> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGBVR0_EL1)
+> +	restore_debug dbgbvr
+> +
+> +	mov     x5, x25
+> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGWCR0_EL1)
+> +	restore_debug dbgwcr
+> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGWVR0_EL1)
+> +	restore_debug dbgwvr
+> +
+> +	ldr	x21, [x2, #CPU_SYSREG_OFFSET(MDCCINT_EL1)]
+> +	msr	mdccint_el1, x21
+> +
+>  	ret
+> =20
+>  __save_fpsimd:
+
+Thanks,
+-Christoffer
