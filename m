@@ -1,86 +1,97 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH] KVM: arm/arm64: Enable the KVM-VFIO device
-Date: Fri,  5 Jun 2015 17:21:49 +0200
-Message-ID: <1433517709-6872-1-git-send-email-eric.auger@linaro.org>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH] kvmtool: don't use PCI config space IRQ line field
+Date: Fri, 5 Jun 2015 17:41:58 +0100
+Message-ID: <20150605164158.GL7420@arm.com>
+References: <1433431245-23227-1-git-send-email-andre.przywara@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1433431245-23227-1-git-send-email-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: eric.auger@st.com, eric.auger@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, patches@linaro.org, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, Kim Phillips <kim.phillips@linaro.org>
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: "penberg@kernel.org" <penberg@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Kim Phillips <kim.phillips@linaro.org>
+On Thu, Jun 04, 2015 at 04:20:45PM +0100, Andre Przywara wrote:
+> In PCI config space there is an interrupt line field (offset 0x3f),
+> which is used to initially communicate the IRQ line number from
+> firmware to the OS. _Hardware_ should never use this information,
+> as the OS is free to write any information in there.
+> But kvmtool uses this number when it triggers IRQs in the guest,
+> which fails starting with Linux 3.19-rc1, where the PCI layer starts
+> writing the virtual IRQ number in there.
+> 
+> Fix that by storing the IRQ number in a separate field in
+> struct virtio_pci, which is independent from the PCI config space
+> and cannot be influenced by the guest.
+> This fixes ARM/ARM64 guests using PCI with newer kernels.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  include/kvm/virtio-pci.h | 8 ++++++++
+>  virtio/pci.c             | 9 ++++++---
+>  2 files changed, 14 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/kvm/virtio-pci.h b/include/kvm/virtio-pci.h
+> index c795ce7..b70cadd 100644
+> --- a/include/kvm/virtio-pci.h
+> +++ b/include/kvm/virtio-pci.h
+> @@ -30,6 +30,14 @@ struct virtio_pci {
+>  	u8			isr;
+>  	u32			features;
+>  
+> +	/*
+> +	 * We cannot rely on the INTERRUPT_LINE byte in the config space once
+> +	 * we have run guest code, as the OS is allowed to use that field
+> +	 * as a scratch pad to communicate between driver and PCI layer.
+> +	 * So store our legacy interrupt line number in here for internal use.
+> +	 */
+> +	u8			legacy_irq_line;
+> +
+>  	/* MSI-X */
+>  	u16			config_vector;
+>  	u32			config_gsi;
+> diff --git a/virtio/pci.c b/virtio/pci.c
+> index 7556239..e17e5a9 100644
+> --- a/virtio/pci.c
+> +++ b/virtio/pci.c
+> @@ -141,7 +141,7 @@ static bool virtio_pci__io_in(struct ioport *ioport, struct kvm_cpu *vcpu, u16 p
+>  		break;
+>  	case VIRTIO_PCI_ISR:
+>  		ioport__write8(data, vpci->isr);
+> -		kvm__irq_line(kvm, vpci->pci_hdr.irq_line, VIRTIO_IRQ_LOW);
+> +		kvm__irq_line(kvm, vpci->legacy_irq_line, VIRTIO_IRQ_LOW);
+>  		vpci->isr = VIRTIO_IRQ_LOW;
+>  		break;
+>  	default:
+> @@ -299,7 +299,7 @@ int virtio_pci__signal_vq(struct kvm *kvm, struct virtio_device *vdev, u32 vq)
+>  			kvm__irq_trigger(kvm, vpci->gsis[vq]);
+>  	} else {
+>  		vpci->isr = VIRTIO_IRQ_HIGH;
+> -		kvm__irq_trigger(kvm, vpci->pci_hdr.irq_line);
+> +		kvm__irq_trigger(kvm, vpci->legacy_irq_line);
+>  	}
+>  	return 0;
+>  }
+> @@ -323,7 +323,7 @@ int virtio_pci__signal_config(struct kvm *kvm, struct virtio_device *vdev)
+>  			kvm__irq_trigger(kvm, vpci->config_gsi);
+>  	} else {
+>  		vpci->isr = VIRTIO_PCI_ISR_CONFIG;
+> -		kvm__irq_trigger(kvm, vpci->pci_hdr.irq_line);
+> +		kvm__irq_trigger(kvm, vpci->legacy_irq_line);
+>  	}
+>  
+>  	return 0;
+> @@ -422,6 +422,9 @@ int virtio_pci__init(struct kvm *kvm, void *dev, struct virtio_device *vdev,
+>  	if (r < 0)
+>  		goto free_msix_mmio;
+>  
+> +	/* save the IRQ that device__register() has allocated */
+> +	vpci->legacy_irq_line = vpci->pci_hdr.irq_line;
 
-The KVM-VFIO device is used by the QEMU VFIO device. It is used to
-record the list of in-use VFIO groups so that KVM can manipulate
-them.
+I'd rather we used the container_of trick that we do for virtio-mmio
+devices when assigning the irq in device__register. Then we can avoid
+this line completely.
 
-Signed-off-by: Kim Phillips <kim.phillips@linaro.org>
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
-
----
-
-- previously included in KVM-VFIO IRQ forward control v6 series.
-  Rationale to put it aside is the unavailability of the kvm-vfio device
-  causes produces a warning when launching the QEMU VFIO platform device
-  that can puzzle some users (although not blocking):
-  "Failed to create KVM VFIO device: No such device"
----
- arch/arm/kvm/Kconfig    | 1 +
- arch/arm/kvm/Makefile   | 2 +-
- arch/arm64/kvm/Kconfig  | 1 +
- arch/arm64/kvm/Makefile | 2 +-
- 4 files changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
-index f1f79d1..bfb915d 100644
---- a/arch/arm/kvm/Kconfig
-+++ b/arch/arm/kvm/Kconfig
-@@ -28,6 +28,7 @@ config KVM
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select SRCU
- 	select MMU_NOTIFIER
-+	select KVM_VFIO
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
- 	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
-diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
-index 139e46c..c5eef02c 100644
---- a/arch/arm/kvm/Makefile
-+++ b/arch/arm/kvm/Makefile
-@@ -15,7 +15,7 @@ AFLAGS_init.o := -Wa,-march=armv7-a$(plus_virt)
- AFLAGS_interrupts.o := -Wa,-march=armv7-a$(plus_virt)
- 
- KVM := ../../../virt/kvm
--kvm-arm-y = $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o
-+kvm-arm-y = $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
- 
- obj-y += kvm-arm.o init.o interrupts.o
- obj-y += arm.o handle_exit.o guest.o mmu.o emulate.o reset.o
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 5105e29..bfffe8f 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -28,6 +28,7 @@ config KVM
- 	select KVM_ARM_HOST
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select SRCU
-+	select KVM_VFIO
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
- 	---help---
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index d5904f8..f90f4aa 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -11,7 +11,7 @@ ARM=../../../arch/arm/kvm
- 
- obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
- 
--kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o
-+kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/arm.o $(ARM)/mmu.o $(ARM)/mmio.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/psci.o $(ARM)/perf.o
- 
--- 
-1.9.1
-
+Will
