@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 02/10] arm/arm64: KVM: Move vgic handling to a non-preemptible section
-Date: Mon,  8 Jun 2015 18:03:57 +0100
-Message-ID: <1433783045-8002-3-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 03/10] KVM: arm/arm64: vgic: Convert struct vgic_lr to use bitfields
+Date: Mon,  8 Jun 2015 18:03:58 +0100
+Message-ID: <1433783045-8002-4-git-send-email-marc.zyngier@arm.com>
 References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com>
@@ -10,59 +10,43 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.in
 Cc: Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we're about to introduce some serious GIC-poking to the vgic code,
-it is important to make sure that we're going to poke the part of
-the GIC that belongs to the CPU we're about to run on (otherwise,
-we'd end up with some unexpected interrupts firing)...
+As we're about to cram more information in the vgic_lr structure
+(HW interrupt number and additional state information), we switch
+to a layout similar to the HW's:
 
-Introducing a non-preemptible section in kvm_arch_vcpu_ioctl_run
-prevents the problem from occuring.
+- use bitfields to save space (we don't need more than 10 bits
+  to represent the irq numbers)
+- source CPU and HW interrupt can share the same field, as
+  a SGI doesn't have a physical line.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/arm.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ include/kvm/arm_vgic.h | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 46db690..4986300 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -529,8 +529,18 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		if (vcpu->arch.pause)
- 			vcpu_pause(vcpu);
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 133ea00..4f9fa1d 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -95,11 +95,15 @@ enum vgic_type {
+ #define LR_STATE_ACTIVE		(1 << 1)
+ #define LR_STATE_MASK		(3 << 0)
+ #define LR_EOI_INT		(1 << 2)
++#define LR_HW			(1 << 3)
  
-+		/*
-+		 * Disarming the timer must be done with in a
-+		 * preemptible context, as this call may sleep.
-+		 */
- 		kvm_timer_flush_hwstate(vcpu);
+ struct vgic_lr {
+-	u16	irq;
+-	u8	source;
+-	u8	state;
++	unsigned irq:10;
++	union {
++		unsigned hwirq:10;
++		unsigned source:8;
++	};
++	unsigned state:4;
+ };
  
-+		/*
-+		 * Preparing the interrupts to be injected also
-+		 * involves poking the GIC, which must be done in a
-+		 * non-preemptible context.
-+		 */
-+		preempt_disable();
- 		kvm_vgic_flush_hwstate(vcpu);
- 
- 		local_irq_disable();
-@@ -546,6 +556,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm)) {
- 			local_irq_enable();
- 			kvm_vgic_sync_hwstate(vcpu);
-+			preempt_enable();
- 			kvm_timer_sync_hwstate(vcpu);
- 			continue;
- 		}
-@@ -580,6 +591,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 
- 		kvm_vgic_sync_hwstate(vcpu);
- 
-+		preempt_enable();
-+
- 		kvm_timer_sync_hwstate(vcpu);
- 
- 		ret = handle_exit(vcpu, run, ret);
+ struct vgic_vmcr {
 -- 
 2.1.4
 
