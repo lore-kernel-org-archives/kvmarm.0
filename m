@@ -1,85 +1,86 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 00/10] arm/arm64: KVM: Active interrupt state switching for shared devices
-Date: Mon,  8 Jun 2015 18:03:55 +0100
-Message-ID: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
+Subject: [PATCH 01/10] arm/arm64: KVM: Fix ordering of timer/GIC on guest entry
+Date: Mon,  8 Jun 2015 18:03:56 +0100
+Message-ID: <1433783045-8002-2-git-send-email-marc.zyngier@arm.com>
+References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B3E2753E7A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jun 2015 12:54:13 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id GYFV6yQy-2a8 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Jun 2015 12:54:12 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 98F1753E79
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jun 2015 12:54:12 -0400 (EDT)
+In-Reply-To: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Andre Przywara <andre.przywara@arm.com>
+Cc: Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
->From day 1, our timer code has been using a terrible hack: whenever
-the guest is scheduled with a timer interrupt pending (i.e. the HW
-timer has expired), we restore the timer state with the MASK bit set,
-in order to avoid the physical interrupt to fire again. And again. And
-again...
+As we now inject the timer interrupt when we're about to enter
+the guest, it makes a lot more sense to make sure this happens
+before the vgic code queues the pending interrupts.
 
-This is absolutely silly, for at least two reasons:
+Otherwise, we get the interrupt on the following exit, which is
+not great for latency (and leads to all kind of bizarre issues
+when using with active interrupts at the HW level).
 
-- This relies on the device (the timer) having a mask bit that we can
-  play with. Not all devices are built like this.
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/kvm/arm.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-- This expects some behaviour of the guest that only works because the
-  both the kernel timer code and the KVM counterpart have been written
-  by the same idiot (the idiot being me).
-
-The One True Way is to set the GIC active bit when injecting the
-interrupt, and to context-switch across the world switch. This is what
-this series implements.
-
-We introduce a relatively simple infrastructure enabling the mapping
-of a virtual interrupt with its physical counterpart:
-
-- Whenever an virtual interrupt is injected, we look it up in an
-  rbtree. If we have a match, the interrupt is injected with the HW
-  bit set in the LR, together with the physical interrupt.
-
-- Across the world switch, we save/restore the active state for these
-  interrupts using the irqchip_state API.
-
-- On guest EOI, the HW interrupt is automagically deactivated by the
-  GIC, allowing the interrupt to be resampled.
-
-The timer code is slightly modified to set the active state at the
-same time as the injection.
-
-The last patch also allows non-shared devices to have their interrupt
-deactivated the same way (in this case we do not context-switch the
-active state). This is the first step in the long overdue direction of
-the mythical IRQ forwarding thing...
-
-This series is based on v4.1-rc7, and has been tested on Juno (GICv2)
-and the FVP Base model (GICv3 host, both GICv2 and GICv3 guests). I'd
-appreciate any form of testing, specially in the context of guest
-migration (there is obviously some interesting stuff there...).
-
-The code is otherwise available at
-git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/active-timer
-
-Marc Zyngier (10):
-  arm/arm64: KVM: Fix ordering of timer/GIC on guest entry
-  arm/arm64: KVM: Move vgic handling to a non-preemptible section
-  KVM: arm/arm64: vgic: Convert struct vgic_lr to use bitfields
-  KVM: arm/arm64: vgic: Allow HW irq to be encoded in LR
-  KVM: arm/arm64: vgic: Relax vgic_can_sample_irq for edge IRQs
-  KVM: arm/arm64: vgic: Allow dynamic mapping of physical/virtual
-    interrupts
-  KVM: arm/arm64: vgic: Allow HW interrupts to be queued to a guest
-  KVM: arm/arm64: vgic: Add vgic_{get,set}_phys_irq_active
-  KVM: arm/arm64: timer: Allow the timer to control the active state
-  KVM: arm/arm64: vgic: Allow non-shared device HW interrupts
-
- arch/arm/kvm/arm.c                 |  21 +++-
- include/kvm/arm_arch_timer.h       |   3 +
- include/kvm/arm_vgic.h             |  31 +++++-
- include/linux/irqchip/arm-gic-v3.h |   3 +
- include/linux/irqchip/arm-gic.h    |   3 +-
- virt/kvm/arm/arch_timer.c          |  13 ++-
- virt/kvm/arm/vgic-v2.c             |  16 ++-
- virt/kvm/arm/vgic-v3.c             |  21 +++-
- virt/kvm/arm/vgic.c                | 206 ++++++++++++++++++++++++++++++++++++-
- 9 files changed, 300 insertions(+), 17 deletions(-)
-
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index d9631ec..46db690 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -529,9 +529,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		if (vcpu->arch.pause)
+ 			vcpu_pause(vcpu);
+ 
+-		kvm_vgic_flush_hwstate(vcpu);
+ 		kvm_timer_flush_hwstate(vcpu);
+ 
++		kvm_vgic_flush_hwstate(vcpu);
++
+ 		local_irq_disable();
+ 
+ 		/*
+@@ -544,8 +545,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 
+ 		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm)) {
+ 			local_irq_enable();
+-			kvm_timer_sync_hwstate(vcpu);
+ 			kvm_vgic_sync_hwstate(vcpu);
++			kvm_timer_sync_hwstate(vcpu);
+ 			continue;
+ 		}
+ 
+@@ -577,9 +578,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		 * Back from guest
+ 		 *************************************************************/
+ 
+-		kvm_timer_sync_hwstate(vcpu);
+ 		kvm_vgic_sync_hwstate(vcpu);
+ 
++		kvm_timer_sync_hwstate(vcpu);
++
+ 		ret = handle_exit(vcpu, run, ret);
+ 	}
+ 
 -- 
 2.1.4
-
