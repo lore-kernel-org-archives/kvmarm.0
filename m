@@ -1,71 +1,40 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 00/13] arm64: KVM: GICv3 ITS emulation
-Date: Mon, 08 Jun 2015 09:23:12 +0100
-Message-ID: <557550F0.5070106@arm.com>
-References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com> <01ad01d0a1b7$d4d4fe40$7e7efac0$@samsung.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: should KVM or userspace be the one which decides what
+ MIPIDR/affinity values to assign to vcpus?
+Date: Mon, 8 Jun 2015 11:52:50 +0100
+Message-ID: <CAFEAcA-AY7rqcWmd13mpBuBWugbqwjzMdWfWt2N2rV0=7LT3KA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <01ad01d0a1b7$d4d4fe40$7e7efac0$@samsung.com>
-Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>, Andre Przywara <Andre.Przywara@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Return-path: <qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org>
+List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
+	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
+List-Archive: <http://lists.nongnu.org/archive/html/qemu-devel>
+List-Post: <mailto:qemu-devel@nongnu.org>
+List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
+List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
+	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Errors-To: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
+Sender: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Eric Auger <eric.auger@linaro.org>, Shlomo Pongratz <shlomo.pongratz@huawei.com>, Shlomo Pongratz <shlomopongratz@gmail.com>, Pavel Fedin <p.fedin@samsung.com>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhao@linaro.org>, Ashok Kumar <ashoks@broadcom.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Pavel,
+On 8 June 2015 at 11:32, Igor Mammedov <imammedo@redhat.com> wrote:
+> On Thu, 4 Jun 2015 18:17:39 +0100
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 4 June 2015 at 17:40, Shlomo Pongratz <shlomopongratz@gmail.com> wrote:
+>>  In order for it to work correctly we must use MPIDR values in
+>>  the device tree which match the MPIDR values the kernel has picked
+>>  for the vcpus, so ask KVM what those values are.
 
-On 08/06/15 07:53, Pavel Fedin wrote:
->  Hello everybody!
-> 
->> The GICv3 ITS (Interrupt Translation Service) is a part of the
->> ARM GICv3 interrupt controller used for implementing MSIs.
->> It specifies a new kind of interrupts (LPIs), which are mapped to
->> establish a connection between a device, its MSI payload value and
->> the target processor the IRQ is eventually delivered to.
->> In order to allow using MSIs in an ARM64 KVM guest, we emulate this
->> ITS widget in the kernel.
-> 
->  I have tested the patch and got some more ideas for future extension...
-> 
->  First of all, it would be nice to have a possibility to directly inject LPIs by number.
-> This will be useful for irqfd support in qemu.
+> Could we set QEMU's generated mpidr in kernel instead of pulling it from kernel,
+> like we do with APIC ID in x86 and fix kernel not to reset it its own value
+> (i.e. untie mpidr from vcpuid)?
+>
+> Then later we could move setting mpidr from kvm_arch_init_vcpu() into
+> board code which should be setting it, since it knows/defines what topology it has.
 
-Well, that poses the question of what we emulate. We expose the
-emulation of an ITS, hence no direct access to the LPI space. What we
-could do would be allow LPI injection if not ITS is instantiated in the
-kernel. But a mix of the two is likely to in contradiction with the
-architecture.
+This is a question better asked on the kvmarm list (which I have cc'd),
+because that is where the kernel folks hang out...
 
->  Next, irqfd support currently poses a problem. We need to somehow know IRQ number from
-> MSI-X data (device ID plus event ID). ITS has all this information, so it would be nice to
-> be able to query for the translation from within userspace. The question is - how to do
-> it? Should we add some ioctl for this purpose? Currently i am experimenting with extra
-> KVM_TRANSLATE_MSI ioctl which, given MSI data, would return LPI number.
-
-I'm afraid this is not enough. A write to GICR_TRANSLATER (DID+EID)
-results in a (LPI,CPU) pair. Can you easily express the CPU part in
-irqfd (this is a genuine question, I'm not familiar enough with that
-part of the core)?
-
->  Actually before your patch came out i have almost done the same thing. But instead i
-> decided to implement ITS in qemu while leaving LPI handling to kernel. In this case my
-> qemu would have everything needed.
->  By the way, why did you decide to put everything into kernel? Yes, in-kernel emulation is
-> faster, but ITS is not accessed frequently.
-
-It may be interesting to find out what would be the implications if we
-were to put it in userspace.
-
-The obvious one would be that we'd have to duplicate the code in both
-QEMU and kvmtool, and I don't think anyone fancies that. Another concern
-would be the support of GICv4, which relies on the command queue
-handling to be handled in the kernel (the GICv4 handling is basically a
-command translation system, and I'm not prepared to let userspace inject
-commands in the host ITS).
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+-- PMM
