@@ -1,29 +1,30 @@
-From: zichao <zhichao.huang@linaro.org>
-Subject: Re: [PATCH v2 09/11] KVM: arm: disable debug mode if we don't actually
- need it.
-Date: Sun, 07 Jun 2015 22:08:38 +0800
-Message-ID: <55745066.7070807@linaro.org>
-References: <1433046432-1824-1-git-send-email-zhichao.huang@linaro.org>
- <1433046432-1824-10-git-send-email-zhichao.huang@linaro.org>
- <20150601101636.GF1641@arm.com>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH 00/13] arm64: KVM: GICv3 ITS emulation
+Date: Mon, 08 Jun 2015 09:53:30 +0300
+Message-ID: <01ad01d0a1b7$d4d4fe40$7e7efac0$@samsung.com>
+References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A6F1E53AD7
- for <kvmarm@lists.cs.columbia.edu>; Sun,  7 Jun 2015 09:58:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CF87953B46
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jun 2015 02:43:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A2Baqks4izMK for <kvmarm@lists.cs.columbia.edu>;
- Sun,  7 Jun 2015 09:58:40 -0400 (EDT)
-Received: from mail-pd0-f171.google.com (mail-pd0-f171.google.com
- [209.85.192.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9644C53952
- for <kvmarm@lists.cs.columbia.edu>; Sun,  7 Jun 2015 09:58:39 -0400 (EDT)
-Received: by pdjn11 with SMTP id n11so45886423pdj.0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 07 Jun 2015 07:08:51 -0700 (PDT)
-In-Reply-To: <20150601101636.GF1641@arm.com>
+ with ESMTP id aqr7OLLinaXB for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Jun 2015 02:43:21 -0400 (EDT)
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com
+ [210.118.77.11])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 098F6538D2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jun 2015 02:43:20 -0400 (EDT)
+Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
+ by mailout1.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NPM000LY5T74Z30@mailout1.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Mon, 08 Jun 2015 07:53:31 +0100 (BST)
+In-reply-to: <1432893209-27313-1-git-send-email-andre.przywara@arm.com>
+Content-language: ru
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,129 +34,36 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "huangzhichao@huawei.com" <huangzhichao@huawei.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: 'Andre Przywara' <andre.przywara@arm.com>, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi, Will,
+ Hello everybody!
 
-On 2015/6/1 18:16, Will Deacon wrote:
-> On Sun, May 31, 2015 at 05:27:10AM +0100, Zhichao Huang wrote:
->> Until now we enable debug mode all the time even if we don't
->> actually need it.
->>
->> Inspired by the implementation in arm64, disable debug mode if
->> we don't need it. And then we are able to reduce unnecessary
->> registers saving/restoring when the debug mode is disabled.
-> 
-> I'm terrified about this patch. Enabling monitor mode has proven to be
-> *extremely* fragile in practice on 32-bit ARM SoCs, so trying to do this
-> morei often makes me very nervous.
-> 
->> Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
->> ---
->>  arch/arm/kernel/hw_breakpoint.c | 55 ++++++++++++++++++++++++++++++++++-------
->>  1 file changed, 46 insertions(+), 9 deletions(-)
->>
->> diff --git a/arch/arm/kernel/hw_breakpoint.c b/arch/arm/kernel/hw_breakpoint.c
->> index dc7d0a9..1d27563 100644
->> --- a/arch/arm/kernel/hw_breakpoint.c
->> +++ b/arch/arm/kernel/hw_breakpoint.c
->> @@ -266,8 +266,7 @@ static int enable_monitor_mode(void)
->>  	}
->>  
->>  	/* Check that the write made it through. */
->> -	ARM_DBG_READ(c0, c1, 0, dscr);
->> -	if (!(dscr & ARM_DSCR_MDBGEN)) {
->> +	if (!monitor_mode_enabled()) {
->>  		pr_warn_once("Failed to enable monitor mode on CPU %d.\n",
->>  				smp_processor_id());
->>  		return -EPERM;
-> 
-> Ok, this hunk is harmless :)
-> 
->> @@ -277,6 +276,43 @@ out:
->>  	return 0;
->>  }
->>  
->> +static int disable_monitor_mode(void)
->> +{
->> +	u32 dscr;
->> +
->> +	ARM_DBG_READ(c0, c1, 0, dscr);
->> +
->> +	/* If monitor mode is already disabled, just return. */
->> +	if (!(dscr & ARM_DSCR_MDBGEN))
->> +		goto out;
->> +
->> +	/* Write to the corresponding DSCR. */
->> +	switch (get_debug_arch()) {
->> +	case ARM_DEBUG_ARCH_V6:
->> +	case ARM_DEBUG_ARCH_V6_1:
->> +		ARM_DBG_WRITE(c0, c1, 0, (dscr & ~ARM_DSCR_MDBGEN));
->> +		break;
->> +	case ARM_DEBUG_ARCH_V7_ECP14:
->> +	case ARM_DEBUG_ARCH_V7_1:
->> +	case ARM_DEBUG_ARCH_V8:
->> +		ARM_DBG_WRITE(c0, c2, 2, (dscr & ~ARM_DSCR_MDBGEN));
->> +		isb();
->> +		break;
->> +	default:
->> +		return -ENODEV;
->> +	}
->> +
->> +	/* Check that the write made it through. */
->> +	if (monitor_mode_enabled()) {
->> +		pr_warn_once("Failed to disable monitor mode on CPU %d.\n",
->> +				smp_processor_id());
->> +		return -EPERM;
->> +	}
->> +
->> +out:
->> +	return 0;
->> +}
-> 
-> I'm not comfortable with this. enable_monitor_mode has precisly one caller
-> [reset_ctrl_regs] which goes to some lengths to get the system into a
-> well-defined state. On top of that, the whole thing is run with an undef
-> hook registered because there isn't an architected way to discover whether
-> or not DBGSWENABLE is driven low.
-> 
-> Why exactly do you need this? Can you not trap guest debug accesses some
-> other way?
+> The GICv3 ITS (Interrupt Translation Service) is a part of the
+> ARM GICv3 interrupt controller used for implementing MSIs.
+> It specifies a new kind of interrupts (LPIs), which are mapped to
+> establish a connection between a device, its MSI payload value and
+> the target processor the IRQ is eventually delivered to.
+> In order to allow using MSIs in an ARM64 KVM guest, we emulate this
+> ITS widget in the kernel.
 
-OK, I shall look for some other ways to reduce the overhead of world switch.
+ I have tested the patch and got some more ideas for future extension...
 
-And another problem might be that, when we start an ARMv7 vm (specify CPU to
-be Cortex-A57) on the ARMv8 platform, debug registers will always be saving/loading
-because it is always detected that the debug mode is enabled even though we
-didn't acutally use it.
+ First of all, it would be nice to have a possibility to directly inject LPIs by number.
+This will be useful for irqfd support in qemu.
+ Next, irqfd support currently poses a problem. We need to somehow know IRQ number from
+MSI-X data (device ID plus event ID). ITS has all this information, so it would be nice to
+be able to query for the translation from within userspace. The question is - how to do
+it? Should we add some ioctl for this purpose? Currently i am experimenting with extra
+KVM_TRANSLATE_MSI ioctl which, given MSI data, would return LPI number.
+ Actually before your patch came out i have almost done the same thing. But instead i
+decided to implement ITS in qemu while leaving LPI handling to kernel. In this case my
+qemu would have everything needed.
+ By the way, why did you decide to put everything into kernel? Yes, in-kernel emulation is
+faster, but ITS is not accessed frequently.
 
-> 
->>  int hw_breakpoint_slots(int type)
->>  {
->>  	if (!debug_arch_supported())
->> @@ -338,6 +374,8 @@ int arch_install_hw_breakpoint(struct perf_event *bp)
->>  	int i, max_slots, ctrl_base, val_base;
->>  	u32 addr, ctrl;
->>  
->> +	enable_monitor_mode();
->> +
->>  	addr = info->address;
->>  	ctrl = encode_ctrl_reg(info->ctrl) | 0x1;
->>  
->> @@ -430,6 +468,8 @@ void arch_uninstall_hw_breakpoint(struct perf_event *bp)
->>  
->>  	/* Reset the control register. */
->>  	write_wb_reg(base + i, 0);
->> +
->> +	disable_monitor_mode();
-> 
-> My previous concerns notwithstanding, shouldn't this be refcounted?
-
-Maybe shouldn't in my opinion, because we install/uninstall breakpoints only when
-we does context switch, and then we always install/uninstall all the breakpoints.
-
-> 
-> Will
-> 
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
