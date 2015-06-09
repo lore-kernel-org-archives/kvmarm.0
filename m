@@ -1,150 +1,73 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2] arm/arm64: KVM: Properly account for guest CPU time
-Date: Mon, 08 Jun 2015 18:50:08 +0100
-Message-ID: <5575D5D0.3090701@arm.com>
-References: <1432838950-28774-1-git-send-email-christoffer.dall@linaro.org>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH 00/13] arm64: KVM: GICv3 ITS emulation
+Date: Tue, 09 Jun 2015 10:12:30 +0200
+Message-ID: <55769FEE.70607@linaro.org>
+References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com> <01ad01d0a1b7$d4d4fe40$7e7efac0$@samsung.com> <557550F0.5070106@arm.com> <02ae01d0a1d9$732d2ce0$598786a0$@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F245A53E18
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jun 2015 13:39:58 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jNPp63KstuvO for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Jun 2015 13:39:57 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2363E53E17
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Jun 2015 13:39:56 -0400 (EDT)
-In-Reply-To: <1432838950-28774-1-git-send-email-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Cc: "borntraeger@de.ibm.com" <borntraeger@de.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <02ae01d0a1d9$732d2ce0$598786a0$@samsung.com>
+Sender: kvm-owner@vger.kernel.org
+To: Pavel Fedin <p.fedin@samsung.com>, 'Marc Zyngier' <marc.zyngier@arm.com>, 'Andre Przywara' <Andre.Przywara@arm.com>, christoffer.dall@linaro.org
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+On 06/08/2015 12:54 PM, Pavel Fedin wrote:
+>  Hi!
+> 
+>> I'm afraid this is not enough. A write to GICR_TRANSLATER (DID+EID)
+>> results in a (LPI,CPU) pair. Can you easily express the CPU part in
+>> irqfd (this is a genuine question, I'm not familiar enough with that
+>> part of the core)?
 
-On 28/05/15 19:49, Christoffer Dall wrote:
-> Until now we have been calling kvm_guest_exit after re-enabling
-> interrupts when we come back from the guest, but this has the
-> unfortunate effect that CPU time accounting done in the context of timer
-> interrupts occurring while the guest is running doesn't properly notice
-> that the time since the last tick was spent in the guest.
+Currently on ARM, irqfd supports routing an host eventfd towards a
+virtual SPI:
+eventfd -> vSPI = gsi+32
+parameters of irqfd are the eventfd and the gsi.
+
+We do not implement KVM IRQ routing yet. This IRQ routing supports 2 modes:
+1) irqchip routing: eventfd -> virtual gsi -> virtual irqchip.input pin
+2) msi routing: eventfd -> virtual gsi -> virtual msi (@, data)
+
+1) up to now we had a single virtual irqchip, vgicv2 or vgicv3 (no apic
+as in x86, ...) so irqchip routing did not sound to be helpful
+2) now we have virtual msi injection, we could use msi routing to inject
+virtual LPI's. But is it what you need for your qemu integration?
+
+Currently on QEMU side for VIRTIO-PCI with vhost back-end + GICv2m +
+irqfd, so called kvm_gsi_direct_mapping is used:
+the MSI data is extracted from the PCI virtio device MSI vector, the
+virtual gsi = MSI data - 32 and eventually irqfd is programmed with the
+eventfd and the gsi. That way MSI injection on guest is bypassed in
+irqfd mode.
+
+Please let us know
+
+Best Regards
+
+Eric
 > 
-> Inspired by the comment in the x86 code, move the kvm_guest_exit() call
-> below the local_irq_enable() call and change __kvm_guest_exit() to
-> kvm_guest_exit(), because we are now calling this function with
-> interrupts enabled.  We have to now explicitly disable preemption and
-> not enable preemption before we've called kvm_guest_exit(), since
-> otherwise we could be preempted and everything happening before we
-> eventually get scheduled again would be accounted for as guest time.
+>  But... As far as i could understand, LPI is added to a collection as a part of setup. And
+> collection actually represents a destination CPU, doesn't it? And we can't have multiple
+> LPIs sharing the same number and going to different CPUs. Or am i wrong? Unfortunately i
+> don't have GICv3 arch reference manual.
 > 
-> At the same time, move the trace_kvm_exit() call outside of the atomic
-> section, since there is no reason for us to do that with interrupts
-> disabled.
+>> Another concern
+>> would be the support of GICv4, which relies on the command queue
+>> handling to be handled in the kernel
 > 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
-> This patch is based on kvm/queue, because it has the kvm_guest_enter/exit
-> rework recently posted by Christian Borntraeger.  I hope I got the logic
-> of this right, there were 2 slightly worrying facts about this:
+>  Wow, i didn't know about GICv4.
 > 
-> First, we now enable and disable and enable interrupts on each exit
-> path, but I couldn't see any performance overhead on hackbench - yes the
-> only benchmark we care about.
+> Kind regards,
+> Pavel Fedin
+> Expert Engineer
+> Samsung Electronics Research center Russia
 > 
-> Second, looking at the ppc and mips code, they seem to also call
-> kvm_guest_exit() before enabling interrupts, so I don't understand how
-> guest CPU time accounting works on those architectures.
 > 
-> Changes since v1:
->  - Tweak comment and commit text based on Marc's feedback.
->  - Explicitly disable preemption and enable it only after kvm_guest_exit().
-> 
->  arch/arm/kvm/arm.c | 21 +++++++++++++++++----
->  1 file changed, 17 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index e41cb11..fe8028d 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -532,6 +532,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		kvm_vgic_flush_hwstate(vcpu);
->  		kvm_timer_flush_hwstate(vcpu);
->  
-> +		preempt_disable();
->  		local_irq_disable();
->  
->  		/*
-> @@ -544,6 +545,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  
->  		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm)) {
->  			local_irq_enable();
-> +			preempt_enable();
->  			kvm_timer_sync_hwstate(vcpu);
->  			kvm_vgic_sync_hwstate(vcpu);
->  			continue;
-> @@ -559,8 +561,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
->  
->  		vcpu->mode = OUTSIDE_GUEST_MODE;
-> -		__kvm_guest_exit();
-> -		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
-> +		/*
-> +		 * Back from guest
-> +		 *************************************************************/
-> +
->  		/*
->  		 * We may have taken a host interrupt in HYP mode (ie
->  		 * while executing the guest). This interrupt is still
-> @@ -574,8 +578,17 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		local_irq_enable();
->  
->  		/*
-> -		 * Back from guest
-> -		 *************************************************************/
-> +		 * We do local_irq_enable() before calling kvm_guest_exit() so
-> +		 * that if a timer interrupt hits while running the guest we
-> +		 * account that tick as being spent in the guest.  We enable
-> +		 * preemption after calling kvm_guest_exit() so that if we get
-> +		 * preempted we make sure ticks after that is not counted as
-> +		 * guest time.
-> +		 */
-> +		kvm_guest_exit();
-> +		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
-> +		preempt_enable();
-> +
->  
->  		kvm_timer_sync_hwstate(vcpu);
->  		kvm_vgic_sync_hwstate(vcpu);
+> --
+> To unsubscribe from this list: send the line "unsubscribe kvm" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 > 
 
-I've been thinking about this a bit more, and I wonder if we can
-simplify it a bit. At the moment, we disable the interrupts around the
-HYP entry. But now that you have introduced preempt_disable, it looks
-like we move the local_irq_disable call to be just after
-__kvm_guest_enter, and not bother with having such a long critical section.
-
-This is possible because entering HYP mode automatically masks
-interrupts, and we restore PSTATE on exception return.
-
-I think this would slightly reduce the amount of code we run on the host
-that gets accounted to the guest.
-
-Thoughts?
-
-Thanks,
-
-	M.
-
--- 
-Jazz is not dead. It just smells funny...
