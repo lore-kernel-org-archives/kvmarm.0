@@ -1,348 +1,120 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH 07/13] KVM: arm64: implement basic ITS register handlers
-Date: Tue, 09 Jun 2015 15:34:47 +0200
-Message-ID: <5576EB77.3000506@linaro.org>
-References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com>
- <1432893209-27313-8-git-send-email-andre.przywara@arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v2 03/11] KVM: arm: enable to use the ARM_DSCR_MDBGEN macro from KVM assembly code
+Date: Tue, 09 Jun 2015 14:42:24 +0100
+Message-ID: <87r3pl6lrz.fsf@linaro.org>
+References: <1433046432-1824-1-git-send-email-zhichao.huang@linaro.org> <1433046432-1824-4-git-send-email-zhichao.huang@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A22A253D3A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jun 2015 09:24:50 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3uuhw-MC+C6m for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Jun 2015 09:24:48 -0400 (EDT)
-Received: from mail-wi0-f178.google.com (mail-wi0-f178.google.com
- [209.85.212.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 33D9953313
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jun 2015 09:24:47 -0400 (EDT)
-Received: by wiga1 with SMTP id a1so17422036wig.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 09 Jun 2015 06:35:03 -0700 (PDT)
-In-Reply-To: <1432893209-27313-8-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <1433046432-1824-4-git-send-email-zhichao.huang@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Zhichao Huang <zhichao.huang@linaro.org>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, will.deacon@arm.com, huangzhichao@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
-On 05/29/2015 11:53 AM, Andre Przywara wrote:
-> Add emulation for some basic MMIO registers used in the ITS emulation.
-> This includes:
-> - GITS_{CTLR,TYPER,IIDR}
-> - ID registers
-> - GITS_{CBASER,CREAD,CWRITER}
-CREADR
->   those implement the ITS command buffer handling
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+
+Zhichao Huang <zhichao.huang@linaro.org> writes:
+
+> Add #ifndef __ASSEMBLY__ in hw_breakpoint.h, in order to use
+> the ARM_DSCR_MDBGEN macro from KVM assembly code.
+>
+> Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  include/kvm/arm_vgic.h             |   3 +
->  include/linux/irqchip/arm-gic-v3.h |   8 ++
->  virt/kvm/arm/its-emul.c            | 172 +++++++++++++++++++++++++++++++++++++
->  virt/kvm/arm/its-emul.h            |   1 +
->  virt/kvm/arm/vgic-v3-emul.c        |   2 +
->  5 files changed, 186 insertions(+)
-> 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index d76c2d9..3b8e3a1 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -159,6 +159,9 @@ struct vgic_io_device {
->  struct vgic_its {
->  	bool			enabled;
->  	spinlock_t		lock;
-> +	u64			cbaser;
-> +	int			creadr;
-> +	int			cwriter;
->  };
->  
->  struct vgic_dist {
-> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> index df4e527..0b450c7 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -179,15 +179,23 @@
->  #define GITS_BASER			0x0100
->  #define GITS_IDREGS_BASE		0xffd0
->  #define GITS_PIDR2			GICR_PIDR2
-> +#define GITS_PIDR4			0xffd0
-> +#define GITS_CIDR0			0xfff0
-> +#define GITS_CIDR1			0xfff4
-> +#define GITS_CIDR2			0xfff8
-> +#define GITS_CIDR3			0xfffc
->  
->  #define GITS_TRANSLATER			0x10040
->  
->  #define GITS_CTLR_ENABLE		(1U << 0)
->  #define GITS_CTLR_QUIESCENT		(1U << 31)
->  
-> +#define GITS_TYPER_PLPIS		(1UL << 0)
-> +#define GITS_TYPER_IDBITS_SHIFT		8
->  #define GITS_TYPER_DEVBITS_SHIFT	13
->  #define GITS_TYPER_DEVBITS(r)		((((r) >> GITS_TYPER_DEVBITS_SHIFT) & 0x1f) + 1)
->  #define GITS_TYPER_PTA			(1UL << 19)
-> +#define GITS_TYPER_HWCOLLCNT_SHIFT	24
->  
->  #define GITS_CBASER_VALID		(1UL << 63)
->  #define GITS_CBASER_nCnB		(0UL << 59)
-> diff --git a/virt/kvm/arm/its-emul.c b/virt/kvm/arm/its-emul.c
-> index 7b283ce..82bc34a 100644
-> --- a/virt/kvm/arm/its-emul.c
-> +++ b/virt/kvm/arm/its-emul.c
-> @@ -32,10 +32,62 @@
->  #include "vgic.h"
->  #include "its-emul.h"
->  
-> +#define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
+>  arch/arm/include/asm/hw_breakpoint.h | 54 +++++++++++++++++++-------=
+----------
+>  1 file changed, 29 insertions(+), 25 deletions(-)
+>
+> diff --git a/arch/arm/include/asm/hw_breakpoint.h b/arch/arm/include/=
+asm/hw_breakpoint.h
+> index 8e427c7..f2f4c61 100644
+> --- a/arch/arm/include/asm/hw_breakpoint.h
+> +++ b/arch/arm/include/asm/hw_breakpoint.h
+> @@ -3,6 +3,8 @@
+> =20
+>  #ifdef __KERNEL__
+> =20
+> +#ifndef __ASSEMBLY__
 > +
-> +/* distributor lock is hold by the VGIC MMIO handler */
->  static bool handle_mmio_misc_gits(struct kvm_vcpu *vcpu,
->  				  struct kvm_exit_mmio *mmio,
->  				  phys_addr_t offset)
->  {
-> +	struct vgic_its *its = &vcpu->kvm->arch.vgic.its;
-> +	u32 reg;
-> +	bool was_enabled;
-> +
-> +	switch (offset & ~3) {
-> +	case 0x00:		/* GITS_CTLR */
-> +		/* We never defer any command execution. */
-> +		reg = GITS_CTLR_QUIESCENT;
-> +		if (its->enabled)
-> +			reg |= GITS_CTLR_ENABLE;
-> +		was_enabled = its->enabled;
-> +		vgic_reg_access(mmio, &reg, offset & 3,
-> +				ACCESS_READ_VALUE | ACCESS_WRITE_VALUE);
-> +		its->enabled = !!(reg & GITS_CTLR_ENABLE);
-> +		return !was_enabled && its->enabled;
-> +	case 0x04:		/* GITS_IIDR */
-> +		reg = (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
-> +		vgic_reg_access(mmio, &reg, offset & 3,
-> +				ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
-> +		break;
-> +	case 0x08:		/* GITS_TYPER */
-> +		/*
-> +		 * We use linear CPU numbers for redistributor addressing,
-> +		 * so GITS_TYPER.PTA is 0.
-> +		 * To avoid memory waste on the guest side, we keep the
-> +		 * number of IDBits and DevBits low for the time being.
-> +		 * This could later be made configurable by userland.
-> +		 * Since we have all collections in linked list, we claim
-> +		 * that we can hold all of the collection tables in our
-> +		 * own memory and that the ITT entry size is 1 byte (the
-> +		 * smallest possible one).
-> +		 */
-> +		reg = GITS_TYPER_PLPIS;
-> +		reg |= 0xff << GITS_TYPER_HWCOLLCNT_SHIFT;
-> +		reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
-> +		reg |= 0x0f << GITS_TYPER_IDBITS_SHIFT;
-> +		vgic_reg_access(mmio, &reg, offset & 3,
-> +				ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
-> +		break;
-> +	case 0x0c:
-> +		/* The upper 32bits of TYPER are all 0 for the time being.
-> +		 * Should we need more than 256 collections, we can enable
-> +		 * some bits in here.
-> +		 */
-> +		vgic_reg_access(mmio, NULL, offset & 3,
-> +				ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
-> +		break;
-> +	}
-> +
->  	return false;
+>  struct task_struct;
+> =20
+>  #ifdef CONFIG_HAVE_HW_BREAKPOINT
+> @@ -44,6 +46,33 @@ static inline void decode_ctrl_reg(u32 reg,
+>  	ctrl->mismatch	=3D reg & 0x1;
 >  }
->  
-> @@ -43,20 +95,107 @@ static bool handle_mmio_gits_idregs(struct kvm_vcpu *vcpu,
->  				    struct kvm_exit_mmio *mmio,
->  				    phys_addr_t offset)
->  {
-> +	u32 reg = 0;
-> +	int idreg = (offset & ~3) + GITS_IDREGS_BASE;
+> =20
+> +struct notifier_block;
+> +struct perf_event;
+> +struct pmu;
 > +
-> +	switch (idreg) {
-> +	case GITS_PIDR2:
-> +		reg = GIC_PIDR2_ARCH_GICv3;
-> +		break;
-> +	case GITS_PIDR4:
-> +		/* This is a 64K software visible page */
-> +		reg = 0x40;
-> +		break;
-> +	/* Those are the ID registers for (any) GIC. */
-> +	case GITS_CIDR0:
-> +		reg = 0x0d;
-> +		break;
-> +	case GITS_CIDR1:
-> +		reg = 0xf0;
-> +		break;
-> +	case GITS_CIDR2:
-> +		reg = 0x05;
-> +		break;
-> +	case GITS_CIDR3:
-> +		reg = 0xb1;
-> +		break;
-> +	}
-> +	vgic_reg_access(mmio, &reg, offset & 3,
-> +			ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
->  	return false;
->  }
->  
-> +static int vits_handle_command(struct kvm_vcpu *vcpu, u64 *its_cmd)
-> +{
-> +	return -ENODEV;
-> +}
+> +extern struct pmu perf_ops_bp;
+> +extern int arch_bp_generic_fields(struct arch_hw_breakpoint_ctrl ctr=
+l,
+> +				  int *gen_len, int *gen_type);
+> +extern int arch_check_bp_in_kernelspace(struct perf_event *bp);
+> +extern int arch_validate_hwbkpt_settings(struct perf_event *bp);
+> +extern int hw_breakpoint_exceptions_notify(struct notifier_block *un=
+used,
+> +					   unsigned long val, void *data);
 > +
->  static bool handle_mmio_gits_cbaser(struct kvm_vcpu *vcpu,
->  				    struct kvm_exit_mmio *mmio,
->  				    phys_addr_t offset)
->  {
-> +	struct vgic_its *its = &vcpu->kvm->arch.vgic.its;
-> +	int mode = ACCESS_READ_VALUE;
+> +extern u8 arch_get_debug_arch(void);
+> +extern u8 arch_get_max_wp_len(void);
+> +extern void clear_ptrace_hw_breakpoint(struct task_struct *tsk);
 > +
-> +	mode |= its->enabled ? ACCESS_WRITE_IGNORED : ACCESS_WRITE_VALUE;
+> +int arch_install_hw_breakpoint(struct perf_event *bp);
+> +void arch_uninstall_hw_breakpoint(struct perf_event *bp);
+> +void hw_breakpoint_pmu_read(struct perf_event *bp);
+> +int hw_breakpoint_slots(int type);
 > +
-> +	vgic_handle_base_register(vcpu, mmio, offset, &its->cbaser, mode);
-> +	if (mmio->is_write)
-> +		its->creadr = 0;
->  	return false;
->  }
->  
-> +static int its_cmd_buffer_size(struct kvm *kvm)
-> +{
-> +	struct vgic_its *its = &kvm->arch.vgic.its;
+> +#else
+> +static inline void clear_ptrace_hw_breakpoint(struct task_struct *ts=
+k) {}
 > +
-> +	return ((its->cbaser & 0xff) + 1) << 12;
-> +}
+> +#endif	/* CONFIG_HAVE_HW_BREAKPOINT */
+> +#endif  /* __ASSEMBLY */
 > +
-> +static gpa_t its_cmd_buffer_base(struct kvm *kvm)
-> +{
-> +	struct vgic_its *its = &kvm->arch.vgic.its;
-> +
-> +	return BASER_BASE_ADDRESS(its->cbaser);
-> +}
-> +
->  static bool handle_mmio_gits_cwriter(struct kvm_vcpu *vcpu,
->  				     struct kvm_exit_mmio *mmio,
->  				     phys_addr_t offset)
->  {
-> +	struct vgic_its *its = &vcpu->kvm->arch.vgic.its;
-> +	u64 cmd_buf[4];
-> +	gpa_t cbaser = its_cmd_buffer_base(vcpu->kvm);
-> +	u32 reg;
-> +	int ret;
-> +
-> +	spin_lock(&its->lock);
-> +	switch (offset & ~3) {
-> +	case 0x00:
-> +		reg = its->cwriter & 0xfffe0;
-> +		vgic_reg_access(mmio, &reg, offset & 3,
-> +				ACCESS_READ_VALUE | ACCESS_WRITE_VALUE);
-> +		reg &= 0xfffe0;
-> +		if (reg > its_cmd_buffer_size(vcpu->kvm))
-> +			break;
-> +		while (its->creadr != reg) {
-> +			ret = kvm_read_guest(vcpu->kvm, cbaser + its->creadr,
-> +					     cmd_buf, 32);
-> +			if (ret)
-> +				break;
-> +			vits_handle_command(vcpu, cmd_buf);
-> +			its->creadr += 32;
-> +			if (its->creadr == its_cmd_buffer_size(vcpu->kvm))
-> +				its->creadr = 0;
-> +		}
-> +		its->cwriter = reg;
-> +		break;
-> +	case 0x04:
-> +		vgic_reg_access(mmio, &reg, offset & 3,
-> +				ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
-> +		break;
-> +	}
-> +	spin_unlock(&its->lock);
->  	return false;
->  }
->  
-> @@ -64,6 +203,22 @@ static bool handle_mmio_gits_creadr(struct kvm_vcpu *vcpu,
->  				    struct kvm_exit_mmio *mmio,
->  				    phys_addr_t offset)
->  {
-> +	struct vgic_its *its = &vcpu->kvm->arch.vgic.its;
-> +	u32 reg;
-> +
-> +	spin_lock(&its->lock);
-> +	switch (offset & ~3) {
-> +	case 0x00:
-> +		reg = its->creadr & 0xfffe0;
-> +		vgic_reg_access(mmio, &reg, offset & 3,
-> +				ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
-> +		break;
-> +	case 0x04:
-> +		vgic_reg_access(mmio, &reg, offset & 3,
-> +				ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
-> +		break;
-> +	}
-> +	spin_unlock(&its->lock);
->  	return false;
->  }
->  
-> @@ -119,9 +274,26 @@ int vits_init(struct kvm *kvm)
->  	if (IS_VGIC_ADDR_UNDEF(dist->vgic_its_base))
->  		return -ENXIO;
->  
-> +	dist->pendbaser = kmalloc(sizeof(u64) * dist->nr_cpus, GFP_KERNEL);
-> +	if (!dist->pendbaser)
-> +		return -ENOMEM;
-> +
->  	spin_lock_init(&its->lock);
->  
->  	its->enabled = false;
->  
->  	return -ENXIO;
->  }
-> +
-> +void vits_destroy(struct kvm *kvm)
-> +{
-> +	struct vgic_dist *dist = &kvm->arch.vgic;
-> +	struct vgic_its *its = &dist->its;
-> +
-> +	if (!vgic_has_its(kvm))
-> +		return;
-> +
-> +	kfree(dist->pendbaser);
-> +
-> +	its->enabled = false;
-> +}
-> diff --git a/virt/kvm/arm/its-emul.h b/virt/kvm/arm/its-emul.h
-> index 5dc8e2f..472a6d0 100644
-> --- a/virt/kvm/arm/its-emul.h
-> +++ b/virt/kvm/arm/its-emul.h
-> @@ -31,5 +31,6 @@
->  
->  void vgic_enable_lpis(struct kvm_vcpu *vcpu);
->  int vits_init(struct kvm *kvm);
-> +void vits_destroy(struct kvm *kvm);
->  
->  #endif
-> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
-> index 4e40684..fa81c4b 100644
-> --- a/virt/kvm/arm/vgic-v3-emul.c
-> +++ b/virt/kvm/arm/vgic-v3-emul.c
-> @@ -881,6 +881,8 @@ static void vgic_v3_destroy_model(struct kvm *kvm)
->  {
->  	struct vgic_dist *dist = &kvm->arch.vgic;
->  
-> +	vits_destroy(kvm);
-> +
->  	kfree(dist->irq_spi_mpidr);
->  	dist->irq_spi_mpidr = NULL;
->  }
-> 
+>  /* Debug architecture numbers. */
+>  #define ARM_DEBUG_ARCH_RESERVED	0	/* In case of ptrace ABI updates. =
+*/
+>  #define ARM_DEBUG_ARCH_V6	1
+> @@ -110,30 +139,5 @@ static inline void decode_ctrl_reg(u32 reg,
+>  	asm volatile("mcr p14, 0, %0, " #N "," #M ", " #OP2 : : "r" (VAL));=
+\
+>  } while (0)
+> =20
+> -struct notifier_block;
+> -struct perf_event;
+> -struct pmu;
+> -
+> -extern struct pmu perf_ops_bp;
+> -extern int arch_bp_generic_fields(struct arch_hw_breakpoint_ctrl ctr=
+l,
+> -				  int *gen_len, int *gen_type);
+> -extern int arch_check_bp_in_kernelspace(struct perf_event *bp);
+> -extern int arch_validate_hwbkpt_settings(struct perf_event *bp);
+> -extern int hw_breakpoint_exceptions_notify(struct notifier_block *un=
+used,
+> -					   unsigned long val, void *data);
+> -
+> -extern u8 arch_get_debug_arch(void);
+> -extern u8 arch_get_max_wp_len(void);
+> -extern void clear_ptrace_hw_breakpoint(struct task_struct *tsk);
+> -
+> -int arch_install_hw_breakpoint(struct perf_event *bp);
+> -void arch_uninstall_hw_breakpoint(struct perf_event *bp);
+> -void hw_breakpoint_pmu_read(struct perf_event *bp);
+> -int hw_breakpoint_slots(int type);
+> -
+> -#else
+> -static inline void clear_ptrace_hw_breakpoint(struct task_struct *ts=
+k) {}
+> -
+> -#endif	/* CONFIG_HAVE_HW_BREAKPOINT */
+>  #endif	/* __KERNEL__ */
+>  #endif	/* _ARM_HW_BREAKPOINT_H */
+
+--=20
+Alex Benn=C3=A9e
