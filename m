@@ -1,158 +1,181 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH 04/13] KVM: arm64: Introduce new MMIO region for the ITS
- base address
-Date: Tue, 09 Jun 2015 10:52:00 +0200
-Message-ID: <5576A930.6050100@linaro.org>
-References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com> <1432893209-27313-5-git-send-email-andre.przywara@arm.com>
+Subject: Re: [PATCH 05/13] KVM: arm64: handle ITS related GICv3 redistributor
+ registers
+Date: Tue, 09 Jun 2015 10:52:19 +0200
+Message-ID: <5576A943.80803@linaro.org>
+References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com> <1432893209-27313-6-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1432893209-27313-5-git-send-email-andre.przywara@arm.com>
+In-Reply-To: <1432893209-27313-6-git-send-email-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Andre Przywara <andre.przywara@arm.com>, christoffer.dall@linaro.org, marc.zyngier@arm.com
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 05/29/2015 11:53 AM, Andre Przywara wrote:
-> The ARM GICv3 ITS controller requires a separate register frame to
-> cover ITS specific registers. Add a new VGIC address type and store
-> the address in a field in the vgic_dist structure.
-> Provide a function to check whether userland has provided the address,
-> so ITS functionality can be guarded by that check.
+> In the GICv3 redistributor there are the PENDBASER and PROPBASER
+> registers which we did not emulate so far, as they only make sense
+> when having an ITS. In preparation for that emulate those MMIO
+> accesses by storing the 64-bit data written into it into a variable
+> which we later read in the ITS emulation.
 > 
 > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
->  Documentation/virtual/kvm/devices/arm-vgic.txt |  7 +++++++
->  arch/arm64/include/uapi/asm/kvm.h              |  3 +++
->  include/kvm/arm_vgic.h                         |  3 +++
->  virt/kvm/arm/vgic-v3-emul.c                    |  1 +
->  virt/kvm/arm/vgic.c                            | 17 +++++++++++++++++
->  virt/kvm/arm/vgic.h                            |  1 +
->  6 files changed, 32 insertions(+)
+>  include/kvm/arm_vgic.h      |  4 ++++
+>  virt/kvm/arm/vgic-v3-emul.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic.c         | 35 +++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic.h         |  4 ++++
+>  4 files changed, 86 insertions(+)
 > 
-> diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
-> index 3fb9054..1f89001 100644
-> --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
-> +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
-> @@ -39,6 +39,13 @@ Groups:
->        Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
->        This address needs to be 64K aligned.
->  
-> +    KVM_VGIC_V3_ADDR_TYPE_ITS (rw, 64-bit)
-> +      Base address in the guest physical address space of the GICv3 ITS
-> +      register frame. The ITS allows MSI(-X) interrupts to be injected
-> +      into guests. This extension is optional, if the kernel does not
-> +      support the ITS, the call returns -ENODEV.
-> +      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
-> +      This address needs to be 64K aligned and the region covers 64 KByte.
-I would emphasize this is the control registers (ITS_Base) hence a
-single page, not comprising the ITS translation register page.
->  
->    KVM_DEV_ARM_VGIC_GRP_DIST_REGS
->    Attributes:
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index d268320..e42435c 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -82,8 +82,11 @@ struct kvm_regs {
->  #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
->  #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
->  
-extra white line?
-> +#define KVM_VGIC_V3_ADDR_TYPE_ITS	4
-> +
->  #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
->  #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
-> +#define KVM_VGIC_V3_ITS_SIZE		SZ_64K
->  
->  #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
->  #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
 > diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index b18e2c5..37725bb 100644
+> index 37725bb..9ea0b3b 100644
 > --- a/include/kvm/arm_vgic.h
 > +++ b/include/kvm/arm_vgic.h
-> @@ -178,6 +178,9 @@ struct vgic_dist {
->  		phys_addr_t		vgic_redist_base;
->  	};
->  
-> +	/* The base address for the MSI control block (V2M/ITS) */
-why V2M here? It's it the GITS_TRANSLATER page that has a fellow page in
-case of V2M?
-> +	phys_addr_t		vgic_its_base;
+> @@ -256,6 +256,10 @@ struct vgic_dist {
+>  	struct vgic_vm_ops	vm_ops;
+>  	struct vgic_io_device	dist_iodev;
+>  	struct vgic_io_device	*redist_iodevs;
 > +
->  	/* Distributor enabled */
->  	u32			enabled;
+add some comments?
+/* LPI config table shared by all distributors */
+> +	u64			propbaser;
+/* LPI pending table per distributors */
+> +	u64			*pendbaser;
+> +	bool			lpis_enabled;
+>  };
 >  
+>  struct vgic_v2_cpu_if {
 > diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
-> index fbfdd6f..16c6d8a 100644
+> index 16c6d8a..04f3aed 100644
 > --- a/virt/kvm/arm/vgic-v3-emul.c
 > +++ b/virt/kvm/arm/vgic-v3-emul.c
-> @@ -1012,6 +1012,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
->  			return -ENXIO;
->  		case KVM_VGIC_V3_ADDR_TYPE_DIST:
->  		case KVM_VGIC_V3_ADDR_TYPE_REDIST:
-> +		case KVM_VGIC_V3_ADDR_TYPE_ITS:
->  			return 0;
->  		}
->  		break;
-> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> index 6ea30e0..2e9723aa 100644
-> --- a/virt/kvm/arm/vgic.c
-> +++ b/virt/kvm/arm/vgic.c
-> @@ -932,6 +932,16 @@ int vgic_register_kvm_io_dev(struct kvm *kvm, gpa_t base, int len,
->  	return ret;
+> @@ -607,6 +607,37 @@ static bool handle_mmio_cfg_reg_redist(struct kvm_vcpu *vcpu,
+>  	return vgic_handle_cfg_reg(reg, mmio, offset);
 >  }
 >  
-> +bool vgic_has_its(struct kvm *kvm)
+> +/* We don't trigger any actions here, just store the register value */
+> +static bool handle_mmio_propbaser_redist(struct kvm_vcpu *vcpu,
+> +					 struct kvm_exit_mmio *mmio,
+> +					 phys_addr_t offset)
 > +{
-> +	struct vgic_dist *dist = &kvm->arch.vgic;
+> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +	int mode = ACCESS_READ_VALUE;
 > +
-> +	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
-> +		return false;
+you may add the same comment as below?
+> +	mode |= dist->lpis_enabled ? ACCESS_WRITE_IGNORED : ACCESS_WRITE_VALUE;
+> +	vgic_handle_base_register(vcpu, mmio, offset, &dist->propbaser, mode);
+having the PROPBASER programmed to different values on different redist
+with EnableLPIs==1 also is unpredictable. Do we plan to check that
+somewhere? Allow a single write?
 > +
-> +	return !IS_VGIC_ADDR_UNDEF(dist->vgic_its_base);
+> +	return false;
 > +}
 > +
->  static int vgic_nr_shared_irqs(struct vgic_dist *dist)
->  {
->  	return dist->nr_irqs - VGIC_NR_PRIVATE_IRQS;
-> @@ -1835,6 +1845,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
->  	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
->  	kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
->  	kvm->arch.vgic.vgic_redist_base = VGIC_ADDR_UNDEF;
-> +	kvm->arch.vgic.vgic_its_base = VGIC_ADDR_UNDEF;
-minor: given the fact we have specialized
-init_vgic_model/vgic_vx_init_emulation wouldn't it make sense to move
-those VGIC v3 specific assignment there? also CPU base is specific to v2?
+> +/* We don't trigger any actions here, just store the register value */
+> +static bool handle_mmio_pendbaser_redist(struct kvm_vcpu *vcpu,
+> +					 struct kvm_exit_mmio *mmio,
+> +					 phys_addr_t offset)
+> +{
+> +	struct kvm_vcpu *rdvcpu = mmio->private;
+> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +	int mode = ACCESS_READ_VALUE;
+> +
+> +	/* Storing a value with LPIs already enabled is undefined */
+> +	mode |= dist->lpis_enabled ? ACCESS_WRITE_IGNORED : ACCESS_WRITE_VALUE;
+> +	vgic_handle_base_register(vcpu, mmio, offset,
+> +				  &dist->pendbaser[rdvcpu->vcpu_id], mode);
+pendbaser is not yet allocated. Wouldn't it make sense to introduce that
+patch later on?
 
 Eric
+> +
+> +	return false;
+> +}
+> +
+>  #define SGI_base(x) ((x) + SZ_64K)
 >  
->  out_unlock:
->  	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
-> @@ -1932,6 +1943,12 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
->  		block_size = KVM_VGIC_V3_REDIST_SIZE;
->  		alignment = SZ_64K;
->  		break;
-> +	case KVM_VGIC_V3_ADDR_TYPE_ITS:
-> +		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
-> +		addr_ptr = &vgic->vgic_its_base;
-> +		block_size = KVM_VGIC_V3_ITS_SIZE;
-> +		alignment = SZ_64K;
+>  static const struct vgic_io_range vgic_redist_ranges[] = {
+> @@ -635,6 +666,18 @@ static const struct vgic_io_range vgic_redist_ranges[] = {
+>  		.handle_mmio    = handle_mmio_raz_wi,
+>  	},
+>  	{
+> +		.base		= GICR_PENDBASER,
+> +		.len		= 0x08,
+> +		.bits_per_irq	= 0,
+> +		.handle_mmio	= handle_mmio_pendbaser_redist,
+> +	},
+> +	{
+> +		.base		= GICR_PROPBASER,
+> +		.len		= 0x08,
+> +		.bits_per_irq	= 0,
+> +		.handle_mmio	= handle_mmio_propbaser_redist,
+> +	},
+> +	{
+>  		.base           = GICR_IDREGS,
+>  		.len            = 0x30,
+>  		.bits_per_irq   = 0,
+> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+> index 2e9723aa..0a9236d 100644
+> --- a/virt/kvm/arm/vgic.c
+> +++ b/virt/kvm/arm/vgic.c
+> @@ -448,6 +448,41 @@ void vgic_reg_access(struct kvm_exit_mmio *mmio, u32 *reg,
+>  	}
+>  }
+>  
+> +/* handle a 64-bit register access */
+> +void vgic_handle_base_register(struct kvm_vcpu *vcpu,
+> +			       struct kvm_exit_mmio *mmio,
+> +			       phys_addr_t offset, u64 *basereg,
+> +			       int mode)
+> +{
+> +	u32 reg;
+> +	u64 breg;
+> +
+> +	switch (offset & ~3) {
+> +	case 0x00:
+> +		breg = *basereg;
+> +		reg = lower_32_bits(breg);
+> +		vgic_reg_access(mmio, &reg, offset & 3, mode);
+> +		if (mmio->is_write && (mode & ACCESS_WRITE_VALUE)) {
+> +			breg &= GENMASK_ULL(63, 32);
+> +			breg |= reg;
+> +			*basereg = breg;
+> +		}
 > +		break;
->  #endif
->  	default:
->  		r = -ENODEV;
+> +	case 0x04:
+> +		breg = *basereg;
+> +		reg = upper_32_bits(breg);
+> +		vgic_reg_access(mmio, &reg, offset & 3, mode);
+> +		if (mmio->is_write && (mode & ACCESS_WRITE_VALUE)) {
+> +			breg  = lower_32_bits(breg);
+> +			breg |= (u64)reg << 32;
+> +			*basereg = breg;
+> +		}
+> +		break;
+> +	}
+> +}
+> +
+> +
+> +
+>  bool handle_mmio_raz_wi(struct kvm_vcpu *vcpu, struct kvm_exit_mmio *mmio,
+>  			phys_addr_t offset)
+>  {
 > diff --git a/virt/kvm/arm/vgic.h b/virt/kvm/arm/vgic.h
-> index 0df74cb..a093f5c 100644
+> index a093f5c..b2d791c 100644
 > --- a/virt/kvm/arm/vgic.h
 > +++ b/virt/kvm/arm/vgic.h
-> @@ -136,5 +136,6 @@ int vgic_get_common_attr(struct kvm_device *dev, struct kvm_device_attr *attr);
->  int vgic_init(struct kvm *kvm);
->  void vgic_v2_init_emulation(struct kvm *kvm);
->  void vgic_v3_init_emulation(struct kvm *kvm);
-> +bool vgic_has_its(struct kvm *kvm);
+> @@ -71,6 +71,10 @@ void vgic_reg_access(struct kvm_exit_mmio *mmio, u32 *reg,
+>  		     phys_addr_t offset, int mode);
+>  bool handle_mmio_raz_wi(struct kvm_vcpu *vcpu, struct kvm_exit_mmio *mmio,
+>  			phys_addr_t offset);
+> +void vgic_handle_base_register(struct kvm_vcpu *vcpu,
+> +			       struct kvm_exit_mmio *mmio,
+> +			       phys_addr_t offset, u64 *basereg,
+> +			       int mode);
 >  
->  #endif
+>  static inline
+>  u32 mmio_data_read(struct kvm_exit_mmio *mmio, u32 mask)
 > 
 
