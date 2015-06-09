@@ -1,53 +1,83 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: should KVM or userspace be the one which decides what
- MIPIDR/affinity values to assign to vcpus?
-Date: Tue, 9 Jun 2015 15:01:08 +0100
-Message-ID: <CAFEAcA-GAsd7vWsmmZm6ikw+rRK2p7S3uNWBwYzTUGum12pyNA@mail.gmail.com>
-References: <CAFEAcA-AY7rqcWmd13mpBuBWugbqwjzMdWfWt2N2rV0=7LT3KA@mail.gmail.com>
- <5576C559.2000902@arm.com>
- <CAFEAcA8x6BbHZPLj_U9HuZJs8i3n777vL=Gxs5V8pdmO+bsEcA@mail.gmail.com>
- <5576DBB5.3010100@arm.com>
- <CAFEAcA_y9DNLJTe+4kMBYObuKD82y0a05gsx6gOYZ8=Oo5LBGA@mail.gmail.com>
- <5576F177.3090903@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 04/10] KVM: arm/arm64: vgic: Allow HW irq to be encoded
+ in LR
+Date: Tue, 09 Jun 2015 15:03:43 +0100
+Message-ID: <5576F23F.8010805@arm.com>
+References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com> <1433783045-8002-5-git-send-email-marc.zyngier@arm.com> <87sia16mr3.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1EB3954008
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jun 2015 09:51:29 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Yl22j2b9eWix for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Jun 2015 09:51:12 -0400 (EDT)
-Received: from mail-vn0-f42.google.com (mail-vn0-f42.google.com
- [209.85.216.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2FCEB54006
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jun 2015 09:51:11 -0400 (EDT)
-Received: by vnbf7 with SMTP id f7so2901005vnb.7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 09 Jun 2015 07:01:29 -0700 (PDT)
-In-Reply-To: <5576F177.3090903@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Shlomo Pongratz <shlomo.pongratz@huawei.com>, Shlomo Pongratz <shlomopongratz@gmail.com>, Pavel Fedin <p.fedin@samsung.com>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhao@linaro.org>, Ashok Kumar <ashoks@broadcom.com>, Igor Mammedov <imammedo@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <87sia16mr3.fsf@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 9 June 2015 at 15:00, Marc Zyngier <marc.zyngier@arm.com> wrote:
->
-> Yeah, what I had in mind was something along the lines of:
-> - kernel computes its "default MPDIR"
-> - kernel exposes a new capability "KVM_ARM_ALLOW_MPIDR_OVERRIDE" (or
-> something along those lines)
-> - userspace does the right thing.
+On 09/06/15 14:21, Alex Benn=C3=A9e wrote:
+>=20
+> Marc Zyngier <marc.zyngier@arm.com> writes:
+>=20
+>> Now that struct vgic_lr supports the LR_HW bit and carries a hwirq
+>> field, we can encode that information into the list registers.
+>>
+>> This patch provides implementations for both GICv2 and GICv3.
+>>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  include/linux/irqchip/arm-gic-v3.h |  3 +++
+>>  include/linux/irqchip/arm-gic.h    |  3 ++-
+>>  virt/kvm/arm/vgic-v2.c             | 16 +++++++++++++++-
+>>  virt/kvm/arm/vgic-v3.c             | 21 ++++++++++++++++++---
+>>  4 files changed, 38 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqc=
+hip/arm-gic-v3.h
+>> index ffbc034..cf637d6 100644
+> <snip>
+>> @@ -84,10 +88,17 @@ static void vgic_v3_set_lr(struct kvm_vcpu *vcpu=
+, int lr,
+>>  	 * Eventually we want to make this configurable, so we may revisit
+>>  	 * this in the future.
+>>  	 */
+>> -	if (vcpu->kvm->arch.vgic.vgic_model =3D=3D KVM_DEV_TYPE_ARM_VGIC_V=
+3)
+>> +	switch (vcpu->kvm->arch.vgic.vgic_model) {
+>> +	case KVM_DEV_TYPE_ARM_VGIC_V3:
+>>  		lr_val |=3D ICH_LR_GROUP;
+>> -	else
+>> -		lr_val |=3D (u32)lr_desc.source << GICH_LR_PHYSID_CPUID_SHIFT;
+>> +		break;
+>> +	case  KVM_DEV_TYPE_ARM_VGIC_V2:
+>> +		if (lr_desc.irq < VGIC_NR_SGIS)
+>> +			lr_val |=3D (u32)lr_desc.source << GICH_LR_PHYSID_CPUID_SHIFT;
+>> +		break;
+>> +	default:
+>> +		BUG();
+>> +	}
+>> =20
+>>  	if (lr_desc.state & LR_STATE_PENDING)
+>>  		lr_val |=3D ICH_LR_PENDING_BIT;
+>> @@ -95,6 +106,10 @@ static void vgic_v3_set_lr(struct kvm_vcpu *vcpu=
+, int lr,
+>>  		lr_val |=3D ICH_LR_ACTIVE_BIT;
+>>  	if (lr_desc.state & LR_EOI_INT)
+>>  		lr_val |=3D ICH_LR_EOI;
+>> +	if (lr_desc.state & LR_HW) {
+>> +		lr_val |=3D ICH_LR_HW;
+>> +		lr_val |=3D ((u64)lr_desc.hwirq) << ICH_LR_PHYS_ID_SHIFT;
+>> +	}
+>>
+>=20
+> Why is the bracketing different for the casting of lr_desc.hwirq
+> compared to lr_desc.source. Surely the precedence of up-casting befor=
+e
+> the shift is the same in both cases?
 
-You forgot the "???" step :-)
+Probably a leftover from a previous refactor...
 
--- PMM
+Thanks,
+
+	M.
+--=20
+Jazz is not dead. It just smells funny...
