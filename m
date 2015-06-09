@@ -1,76 +1,59 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH 01/10] arm/arm64: KVM: Fix ordering of timer/GIC on guest entry
-Date: Tue, 09 Jun 2015 12:29:35 +0100
-Message-ID: <87wpzd6rxc.fsf@linaro.org>
-References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com> <1433783045-8002-2-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v2 6/8] arm: prepare for instantiating different IRQ chip devices
+Date: Tue,  9 Jun 2015 12:31:33 +0100
+Message-ID: <1433849493-27463-1-git-send-email-andre.przywara@arm.com>
+References: <1433493473-4002-7-git-send-email-andre.przywara@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <1433783045-8002-2-git-send-email-marc.zyngier@arm.com>
+In-Reply-To: <1433493473-4002-7-git-send-email-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>, Andre Przywara <andre.przywara@arm.com>
+To: will.deacon@arm.com, marc.zyngier@arm.com
+Cc: penberg@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi, contrary to my boasting in the cover letter I managed to
+accidentially drop the fix for the GIC device initialization error
+handling Will requested from this series.
+If we fail the GIC initialization sequence at some point, we should
+make sure to not let the gic_fd initialized, so that subsequent
+accesses to the GIC device fail appropriately.
+So the fix below should be merged in, actually a part of it already
+in patch 2/8.
+If there are no further comments, I will re-spin this series with
+those fixes contained in the proper patches later this week.
 
-Marc Zyngier <marc.zyngier@arm.com> writes:
+Cheers,
+Andre.
 
-> As we now inject the timer interrupt when we're about to enter
-> the guest, it makes a lot more sense to make sure this happens
-> before the vgic code queues the pending interrupts.
->
-> Otherwise, we get the interrupt on the following exit, which is
-> not great for latency (and leads to all kind of bizarre issues
-> when using with active interrupts at the HW level).
->
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm/kvm/arm.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index d9631ec..46db690 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -529,9 +529,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcp=
-u, struct kvm_run *run)
->  		if (vcpu->arch.pause)
->  			vcpu_pause(vcpu);
-> =20
-> -		kvm_vgic_flush_hwstate(vcpu);
->  		kvm_timer_flush_hwstate(vcpu);
-> =20
-> +		kvm_vgic_flush_hwstate(vcpu);
-> +
->  		local_irq_disable();
-> =20
->  		/*
-> @@ -544,8 +545,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu=
-, struct kvm_run *run)
-> =20
->  		if (ret <=3D 0 || need_new_vmid_gen(vcpu->kvm)) {
->  			local_irq_enable();
-> -			kvm_timer_sync_hwstate(vcpu);
->  			kvm_vgic_sync_hwstate(vcpu);
-> +			kvm_timer_sync_hwstate(vcpu);
->  			continue;
->  		}
-> =20
-> @@ -577,9 +578,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcp=
-u, struct kvm_run *run)
->  		 * Back from guest
->  		 *************************************************************/
-> =20
-> -		kvm_timer_sync_hwstate(vcpu);
->  		kvm_vgic_sync_hwstate(vcpu);
-> =20
-> +		kvm_timer_sync_hwstate(vcpu);
-> +
->  		ret =3D handle_exit(vcpu, run, ret);
->  	}
+---
+diff --git a/arm/gic.c b/arm/gic.c
+index ab0f594..5fb94c1 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -89,15 +89,21 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+ 		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &redist_attr);
+ 		break;
+ 	default:
+-		return -ENODEV;
++		err = -ENODEV;
++		break;
+ 	}
+ 	if (err)
+-		return err;
++		goto out_err;
+ 
+ 	err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &dist_attr);
+ 	if (err)
+-		return err;
++		goto out_err;
++
++	return err;
+ 
++out_err:
++	close(gic_fd);
++	gic_fd = -1;
+ 	return err;
+ }
+ 
+-- 
+2.3.5
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---=20
-Alex Benn=C3=A9e
