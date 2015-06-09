@@ -1,107 +1,158 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH 03/13] KVM: arm/arm64: add emulation model specific destroy
- function
-Date: Tue, 09 Jun 2015 10:51:30 +0200
-Message-ID: <5576A912.8020005@linaro.org>
-References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com> <1432893209-27313-4-git-send-email-andre.przywara@arm.com>
+Subject: Re: [PATCH 04/13] KVM: arm64: Introduce new MMIO region for the ITS
+ base address
+Date: Tue, 09 Jun 2015 10:52:00 +0200
+Message-ID: <5576A930.6050100@linaro.org>
+References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com> <1432893209-27313-5-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1432893209-27313-4-git-send-email-andre.przywara@arm.com>
+In-Reply-To: <1432893209-27313-5-git-send-email-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Andre Przywara <andre.przywara@arm.com>, christoffer.dall@linaro.org, marc.zyngier@arm.com
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
 On 05/29/2015 11:53 AM, Andre Przywara wrote:
-> Currently we destroy the VGIC emulation in one function that cares for
-> all emulated models. The ITS emulation will require some
-> differentiation, so introduce a per-emulation-model destroy method.
-> Use it for a tiny GICv3 specific code already.
+> The ARM GICv3 ITS controller requires a separate register frame to
+> cover ITS specific registers. Add a new VGIC address type and store
+> the address in a field in the vgic_dist structure.
+> Provide a function to check whether userland has provided the address,
+> so ITS functionality can be guarded by that check.
 > 
 > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
->  include/kvm/arm_vgic.h      |  1 +
->  virt/kvm/arm/vgic-v3-emul.c |  9 +++++++++
->  virt/kvm/arm/vgic.c         | 11 ++++++++++-
->  3 files changed, 20 insertions(+), 1 deletion(-)
+>  Documentation/virtual/kvm/devices/arm-vgic.txt |  7 +++++++
+>  arch/arm64/include/uapi/asm/kvm.h              |  3 +++
+>  include/kvm/arm_vgic.h                         |  3 +++
+>  virt/kvm/arm/vgic-v3-emul.c                    |  1 +
+>  virt/kvm/arm/vgic.c                            | 17 +++++++++++++++++
+>  virt/kvm/arm/vgic.h                            |  1 +
+>  6 files changed, 32 insertions(+)
 > 
+> diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
+> index 3fb9054..1f89001 100644
+> --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
+> +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
+> @@ -39,6 +39,13 @@ Groups:
+>        Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+>        This address needs to be 64K aligned.
+>  
+> +    KVM_VGIC_V3_ADDR_TYPE_ITS (rw, 64-bit)
+> +      Base address in the guest physical address space of the GICv3 ITS
+> +      register frame. The ITS allows MSI(-X) interrupts to be injected
+> +      into guests. This extension is optional, if the kernel does not
+> +      support the ITS, the call returns -ENODEV.
+> +      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+> +      This address needs to be 64K aligned and the region covers 64 KByte.
+I would emphasize this is the control registers (ITS_Base) hence a
+single page, not comprising the ITS translation register page.
+>  
+>    KVM_DEV_ARM_VGIC_GRP_DIST_REGS
+>    Attributes:
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index d268320..e42435c 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -82,8 +82,11 @@ struct kvm_regs {
+>  #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
+>  #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
+>  
+extra white line?
+> +#define KVM_VGIC_V3_ADDR_TYPE_ITS	4
+> +
+>  #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
+>  #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
+> +#define KVM_VGIC_V3_ITS_SIZE		SZ_64K
+>  
+>  #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
+>  #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
 > diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 2ccfa9a..b18e2c5 100644
+> index b18e2c5..37725bb 100644
 > --- a/include/kvm/arm_vgic.h
 > +++ b/include/kvm/arm_vgic.h
-> @@ -144,6 +144,7 @@ struct vgic_vm_ops {
->  	bool	(*queue_sgi)(struct kvm_vcpu *, int irq);
->  	void	(*add_sgi_source)(struct kvm_vcpu *, int irq, int source);
->  	int	(*init_model)(struct kvm *);
-> +	void	(*destroy_model)(struct kvm *);
->  	int	(*map_resources)(struct kvm *, const struct vgic_params *);
->  };
+> @@ -178,6 +178,9 @@ struct vgic_dist {
+>  		phys_addr_t		vgic_redist_base;
+>  	};
+>  
+> +	/* The base address for the MSI control block (V2M/ITS) */
+why V2M here? It's it the GITS_TRANSLATER page that has a fellow page in
+case of V2M?
+> +	phys_addr_t		vgic_its_base;
+> +
+>  	/* Distributor enabled */
+>  	u32			enabled;
 >  
 > diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
-> index e9c3a7a..fbfdd6f 100644
+> index fbfdd6f..16c6d8a 100644
 > --- a/virt/kvm/arm/vgic-v3-emul.c
 > +++ b/virt/kvm/arm/vgic-v3-emul.c
-> @@ -818,6 +818,14 @@ static int vgic_v3_init_model(struct kvm *kvm)
->  	return 0;
+> @@ -1012,6 +1012,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+>  			return -ENXIO;
+>  		case KVM_VGIC_V3_ADDR_TYPE_DIST:
+>  		case KVM_VGIC_V3_ADDR_TYPE_REDIST:
+> +		case KVM_VGIC_V3_ADDR_TYPE_ITS:
+>  			return 0;
+>  		}
+>  		break;
+> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+> index 6ea30e0..2e9723aa 100644
+> --- a/virt/kvm/arm/vgic.c
+> +++ b/virt/kvm/arm/vgic.c
+> @@ -932,6 +932,16 @@ int vgic_register_kvm_io_dev(struct kvm *kvm, gpa_t base, int len,
+>  	return ret;
 >  }
 >  
-> +static void vgic_v3_destroy_model(struct kvm *kvm)
+> +bool vgic_has_its(struct kvm *kvm)
 > +{
 > +	struct vgic_dist *dist = &kvm->arch.vgic;
 > +
-> +	kfree(dist->irq_spi_mpidr);
-> +	dist->irq_spi_mpidr = NULL;
+> +	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
+> +		return false;
+> +
+> +	return !IS_VGIC_ADDR_UNDEF(dist->vgic_its_base);
 > +}
 > +
->  /* GICv3 does not keep track of SGI sources anymore. */
->  static void vgic_v3_add_sgi_source(struct kvm_vcpu *vcpu, int irq, int source)
+>  static int vgic_nr_shared_irqs(struct vgic_dist *dist)
 >  {
-> @@ -830,6 +838,7 @@ void vgic_v3_init_emulation(struct kvm *kvm)
->  	dist->vm_ops.queue_sgi = vgic_v3_queue_sgi;
->  	dist->vm_ops.add_sgi_source = vgic_v3_add_sgi_source;
->  	dist->vm_ops.init_model = vgic_v3_init_model;
-> +	dist->vm_ops.destroy_model = vgic_v3_destroy_model;
->  	dist->vm_ops.map_resources = vgic_v3_map_resources;
+>  	return dist->nr_irqs - VGIC_NR_PRIVATE_IRQS;
+> @@ -1835,6 +1845,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>  	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
+>  	kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+>  	kvm->arch.vgic.vgic_redist_base = VGIC_ADDR_UNDEF;
+> +	kvm->arch.vgic.vgic_its_base = VGIC_ADDR_UNDEF;
+minor: given the fact we have specialized
+init_vgic_model/vgic_vx_init_emulation wouldn't it make sense to move
+those VGIC v3 specific assignment there? also CPU base is specific to v2?
+
+Eric
 >  
->  	kvm->arch.max_vcpus = KVM_MAX_VCPUS;
-> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> index 037b723..6ea30e0 100644
-> --- a/virt/kvm/arm/vgic.c
-> +++ b/virt/kvm/arm/vgic.c
-> @@ -102,6 +102,14 @@ int kvm_vgic_map_resources(struct kvm *kvm)
->  	return kvm->arch.vgic.vm_ops.map_resources(kvm, vgic);
->  }
+>  out_unlock:
+>  	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
+> @@ -1932,6 +1943,12 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
+>  		block_size = KVM_VGIC_V3_REDIST_SIZE;
+>  		alignment = SZ_64K;
+>  		break;
+> +	case KVM_VGIC_V3_ADDR_TYPE_ITS:
+> +		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
+> +		addr_ptr = &vgic->vgic_its_base;
+> +		block_size = KVM_VGIC_V3_ITS_SIZE;
+> +		alignment = SZ_64K;
+> +		break;
+>  #endif
+>  	default:
+>  		r = -ENODEV;
+> diff --git a/virt/kvm/arm/vgic.h b/virt/kvm/arm/vgic.h
+> index 0df74cb..a093f5c 100644
+> --- a/virt/kvm/arm/vgic.h
+> +++ b/virt/kvm/arm/vgic.h
+> @@ -136,5 +136,6 @@ int vgic_get_common_attr(struct kvm_device *dev, struct kvm_device_attr *attr);
+>  int vgic_init(struct kvm *kvm);
+>  void vgic_v2_init_emulation(struct kvm *kvm);
+>  void vgic_v3_init_emulation(struct kvm *kvm);
+> +bool vgic_has_its(struct kvm *kvm);
 >  
-> +static void vgic_destroy_model(struct kvm *kvm)
-> +{
-> +	struct vgic_vm_ops *vm_ops = &kvm->arch.vgic.vm_ops;
-> +
-> +	if (vm_ops->destroy_model)
-> +		vm_ops->destroy_model(kvm);
-> +}
-> +
->  /*
->   * struct vgic_bitmap contains a bitmap made of unsigned longs, but
->   * extracts u32s out of them.
-> @@ -1631,6 +1639,8 @@ void kvm_vgic_destroy(struct kvm *kvm)
->  	struct kvm_vcpu *vcpu;
->  	int i;
->  
-> +	vgic_destroy_model(kvm);
-> +
->  	kvm_for_each_vcpu(i, vcpu, kvm)
->  		kvm_vgic_vcpu_destroy(vcpu);
->  
-> @@ -1647,7 +1657,6 @@ void kvm_vgic_destroy(struct kvm *kvm)
->  	}
->  	kfree(dist->irq_sgi_sources);
->  	kfree(dist->irq_spi_cpu);
-> -	kfree(dist->irq_spi_mpidr);
->  	kfree(dist->irq_spi_target);
->  	kfree(dist->irq_pending_on_cpu);
->  	kfree(dist->irq_active_on_cpu);
+>  #endif
 > 
 
