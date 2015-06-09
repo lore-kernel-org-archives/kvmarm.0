@@ -1,314 +1,60 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v2 04/11] KVM: arm: common infrastructure for handling AArch32 CP14/CP15
-Date: Tue, 09 Jun 2015 11:45:27 +0100
-Message-ID: <87y4jt6tyw.fsf@linaro.org>
-References: <1433046432-1824-1-git-send-email-zhichao.huang@linaro.org> <1433046432-1824-5-git-send-email-zhichao.huang@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: should KVM or userspace be the one which decides what
+ MIPIDR/affinity values to assign to vcpus?
+Date: Tue, 09 Jun 2015 11:52:09 +0100
+Message-ID: <5576C559.2000902@arm.com>
+References: <CAFEAcA-AY7rqcWmd13mpBuBWugbqwjzMdWfWt2N2rV0=7LT3KA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <1433046432-1824-5-git-send-email-zhichao.huang@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: Zhichao Huang <zhichao.huang@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, will.deacon@arm.com, huangzhichao@huawei.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0439D53F7D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jun 2015 06:41:58 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id pXMi7Gs67Kyx for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Jun 2015 06:41:56 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A0E7353F78
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jun 2015 06:41:56 -0400 (EDT)
+In-Reply-To: <CAFEAcA-AY7rqcWmd13mpBuBWugbqwjzMdWfWt2N2rV0=7LT3KA@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Peter Maydell <peter.maydell@linaro.org>, Igor Mammedov <imammedo@redhat.com>
+Cc: Shlomo Pongratz <shlomo.pongratz@huawei.com>, Shlomo Pongratz <shlomopongratz@gmail.com>, Pavel Fedin <p.fedin@samsung.com>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhao@linaro.org>, Ashok Kumar <ashoks@broadcom.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 08/06/15 11:52, Peter Maydell wrote:
+> On 8 June 2015 at 11:32, Igor Mammedov <imammedo@redhat.com> wrote:
+>> On Thu, 4 Jun 2015 18:17:39 +0100
+>> Peter Maydell <peter.maydell@linaro.org> wrote:
+>>> On 4 June 2015 at 17:40, Shlomo Pongratz <shlomopongratz@gmail.com> wrote:
+>>>  In order for it to work correctly we must use MPIDR values in
+>>>  the device tree which match the MPIDR values the kernel has picked
+>>>  for the vcpus, so ask KVM what those values are.
+> 
+>> Could we set QEMU's generated mpidr in kernel instead of pulling it from kernel,
+>> like we do with APIC ID in x86 and fix kernel not to reset it its own value
+>> (i.e. untie mpidr from vcpuid)?
+>>
+>> Then later we could move setting mpidr from kvm_arch_init_vcpu() into
+>> board code which should be setting it, since it knows/defines what topology it has.
+> 
+> This is a question better asked on the kvmarm list (which I have cc'd),
+> because that is where the kernel folks hang out...
 
-Zhichao Huang <zhichao.huang@linaro.org> writes:
+Care to provide some context? Why is this required?
 
-> As we're about to trap a bunch of CP14 registers, let's rework
-> the CP15 handling so it can be generalized and work with multiple
-> tables.
->
-> Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
-> ---
->  arch/arm/kvm/coproc.c          | 176 ++++++++++++++++++++++++++-----=
-----------
->  arch/arm/kvm/interrupts_head.S |   2 +-
->  2 files changed, 112 insertions(+), 66 deletions(-)
->
-> diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-> index 9d283d9..d23395b 100644
-> --- a/arch/arm/kvm/coproc.c
-> +++ b/arch/arm/kvm/coproc.c
-> @@ -375,6 +375,9 @@ static const struct coproc_reg cp15_regs[] =3D {
->  	{ CRn(15), CRm( 0), Op1( 4), Op2( 0), is32, access_cbar},
->  };
-> =20
-> +static const struct coproc_reg cp14_regs[] =3D {
-> +};
-> +
->  /* Target specific emulation tables */
->  static struct kvm_coproc_target_table *target_tables[KVM_ARM_NUM_TAR=
-GETS];
-> =20
-> @@ -424,47 +427,75 @@ static const struct coproc_reg *find_reg(const =
-struct coproc_params *params,
->  	return NULL;
->  }
-> =20
-> -static int emulate_cp15(struct kvm_vcpu *vcpu,
-> -			const struct coproc_params *params)
-> +/*
-> + * emulate_cp --  tries to match a cp14/cp15 access in a handling ta=
-ble,
-> + *                and call the corresponding trap handler.
-> + *
-> + * @params: pointer to the descriptor of the access
-> + * @table: array of trap descriptors
-> + * @num: size of the trap descriptor array
-> + *
-> + * Return 0 if the access has been handled, and -1 if not.
-> + */
-> +static int emulate_cp(struct kvm_vcpu *vcpu,
-> +			const struct coproc_params *params,
-> +			const struct coproc_reg *table,
-> +			size_t num)
->  {
-> -	size_t num;
-> -	const struct coproc_reg *table, *r;
-> -
-> -	trace_kvm_emulate_cp15_imp(params->Op1, params->Rt1, params->CRn,
-> -				   params->CRm, params->Op2,
-> params->is_write);
+Thanks,
 
-Where has this trace gone? We still want to be able to view register
-traps when debugging.
-
-> +	const struct coproc_reg *r;
-> =20
-> -	table =3D get_target_table(vcpu->arch.target, &num);
-> +	if (!table)
-> +		return -1;	/* Not handled */
-> =20
-> -	/* Search target-specific then generic table. */
->  	r =3D find_reg(params, table, num);
-> -	if (!r)
-> -		r =3D find_reg(params, cp15_regs, ARRAY_SIZE(cp15_regs));
-> =20
-> -	if (likely(r)) {
-> +	if (r) {
->  		/* If we don't have an accessor, we should never get here! */
->  		BUG_ON(!r->access);
-> =20
->  		if (likely(r->access(vcpu, params, r))) {
->  			/* Skip instruction, since it was emulated */
->  			kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-> -			return 1;
->  		}
-> -		/* If access function fails, it should complain. */
-> -	} else {
-> -		kvm_err("Unsupported guest CP15 access at: %08lx\n",
-> -			*vcpu_pc(vcpu));
-> -		print_cp_instr(params);
-> +
-> +		/* Handled */
-> +		return 0;
->  	}
-> +
-> +	/* Not handled */
-> +	return -1;
-> +}
-> +
-> +static void unhandled_cp_access(struct kvm_vcpu *vcpu,
-> +				const struct coproc_params *params)
-> +{
-> +	u8 hsr_ec =3D kvm_vcpu_trap_get_class(vcpu);
-> +	int cp;
-> +
-> +	switch (hsr_ec) {
-> +	case HSR_EC_CP15_32:
-> +	case HSR_EC_CP15_64:
-> +		cp =3D 15;
-> +		break;
-> +	case HSR_EC_CP14_MR:
-> +	case HSR_EC_CP14_64:
-> +		cp =3D 14;
-> +		break;
-> +	default:
-> +		WARN_ON((cp =3D -1));
-> +	}
-> +
-> +	kvm_err("Unsupported guest CP%d access at: %08lx\n",
-> +		cp, *vcpu_pc(vcpu));
-> +	print_cp_instr(params);
->  	kvm_inject_undefined(vcpu);
-> -	return 1;
->  }
-> =20
-> -/**
-> - * kvm_handle_cp15_64 -- handles a mrrc/mcrr trap on a guest CP15 ac=
-cess
-> - * @vcpu: The VCPU pointer
-> - * @run:  The kvm_run struct
-> - */
-> -int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
-> +			const struct coproc_reg *global,
-> +			size_t nr_global,
-> +			const struct coproc_reg *target_specific,
-> +			size_t nr_specific)
->  {
->  	struct coproc_params params;
-> =20
-> @@ -478,7 +509,13 @@ int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, st=
-ruct kvm_run *run)
->  	params.Rt2 =3D (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
->  	params.CRm =3D 0;
-> =20
-> -	return emulate_cp15(vcpu, &params);
-> +	if (!emulate_cp(vcpu, &params, target_specific, nr_specific))
-> +		return 1;
-> +	if (!emulate_cp(vcpu, &params, global, nr_global))
-> +		return 1;
-> +
-> +	unhandled_cp_access(vcpu, &params);
-> +	return 1;
->  }
-> =20
->  static void reset_coproc_regs(struct kvm_vcpu *vcpu,
-> @@ -491,12 +528,11 @@ static void reset_coproc_regs(struct kvm_vcpu *=
-vcpu,
->  			table[i].reset(vcpu, &table[i]);
->  }
-> =20
-> -/**
-> - * kvm_handle_cp15_32 -- handles a mrc/mcr trap on a guest CP15 acce=
-ss
-> - * @vcpu: The VCPU pointer
-> - * @run:  The kvm_run struct
-> - */
-> -int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
-> +			const struct coproc_reg *global,
-> +			size_t nr_global,
-> +			const struct coproc_reg *target_specific,
-> +			size_t nr_specific)
->  {
->  	struct coproc_params params;
-> =20
-> @@ -510,33 +546,57 @@ int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, s=
-truct kvm_run *run)
->  	params.Op2 =3D (kvm_vcpu_get_hsr(vcpu) >> 17) & 0x7;
->  	params.Rt2 =3D 0;
-> =20
-> -	return emulate_cp15(vcpu, &params);
-> +	if (!emulate_cp(vcpu, &params, target_specific, nr_specific))
-> +		return 1;
-> +	if (!emulate_cp(vcpu, &params, global, nr_global))
-> +		return 1;
-> +
-> +	unhandled_cp_access(vcpu, &params);
-> +	return 1;
->  }
-> =20
->  /**
-> - * kvm_handle_cp14_64 -- handles a mrrc/mcrr trap on a guest CP14 ac=
-cess
-> + * kvm_handle_cp15_64 -- handles a mrrc/mcrr trap on a guest CP15 ac=
-cess
->   * @vcpu: The VCPU pointer
->   * @run:  The kvm_run struct
->   */
-> -int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  {
-> -	struct coproc_params params;
-> +	const struct coproc_reg *target_specific;
-> +	size_t num;
-> =20
-> -	params.CRn =3D (kvm_vcpu_get_hsr(vcpu) >> 1) & 0xf;
-> -	params.Rt1 =3D (kvm_vcpu_get_hsr(vcpu) >> 5) & 0xf;
-> -	params.is_write =3D ((kvm_vcpu_get_hsr(vcpu) & 1) =3D=3D 0);
-> -	params.is_64bit =3D true;
-> +	target_specific =3D get_target_table(vcpu->arch.target, &num);
-> +	return kvm_handle_cp_64(vcpu,
-> +				cp15_regs, ARRAY_SIZE(cp15_regs),
-> +				target_specific, num);
-> +}
-> =20
-> -	params.Op1 =3D (kvm_vcpu_get_hsr(vcpu) >> 16) & 0xf;
-> -	params.Op2 =3D 0;
-> -	params.Rt2 =3D (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
-> -	params.CRm =3D 0;
-> +/**
-> + * kvm_handle_cp15_32 -- handles a mrc/mcr trap on a guest CP15 acce=
-ss
-> + * @vcpu: The VCPU pointer
-> + * @run:  The kvm_run struct
-> + */
-> +int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +{
-> +	const struct coproc_reg *target_specific;
-> +	size_t num;
-> =20
-> -	(void)trap_raz_wi(vcpu, &params, NULL);
-> +	target_specific =3D get_target_table(vcpu->arch.target, &num);
-> +	return kvm_handle_cp_32(vcpu,
-> +				cp15_regs, ARRAY_SIZE(cp15_regs),
-> +				target_specific, num);
-> +}
-> =20
-> -	/* handled */
-> -	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-> -	return 1;
-> +/**
-> + * kvm_handle_cp14_64 -- handles a mrrc/mcrr trap on a guest CP14 ac=
-cess
-> + * @vcpu: The VCPU pointer
-> + * @run:  The kvm_run struct
-> + */
-> +int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +{
-> +	return kvm_handle_cp_64(vcpu,
-> +				cp14_regs, ARRAY_SIZE(cp14_regs),
-> +				NULL, 0);
->  }
-> =20
->  /**
-> @@ -546,23 +606,9 @@ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, st=
-ruct kvm_run *run)
->   */
->  int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  {
-> -	struct coproc_params params;
-> -
-> -	params.CRm =3D (kvm_vcpu_get_hsr(vcpu) >> 1) & 0xf;
-> -	params.Rt1 =3D (kvm_vcpu_get_hsr(vcpu) >> 5) & 0xf;
-> -	params.is_write =3D ((kvm_vcpu_get_hsr(vcpu) & 1) =3D=3D 0);
-> -	params.is_64bit =3D false;
-> -
-> -	params.CRn =3D (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
-> -	params.Op1 =3D (kvm_vcpu_get_hsr(vcpu) >> 14) & 0x7;
-> -	params.Op2 =3D (kvm_vcpu_get_hsr(vcpu) >> 17) & 0x7;
-> -	params.Rt2 =3D 0;
-> -
-> -	(void)trap_raz_wi(vcpu, &params, NULL);
-> -
-> -	/* handled */
-> -	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-> -	return 1;
-> +	return kvm_handle_cp_32(vcpu,
-> +				cp14_regs, ARRAY_SIZE(cp14_regs),
-> +				NULL, 0);
->  }
-> =20
->  /*******************************************************************=
-***********
-> diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts=
-_head.S
-> index a9f3a56..35e4a3a 100644
-> --- a/arch/arm/kvm/interrupts_head.S
-> +++ b/arch/arm/kvm/interrupts_head.S
-> @@ -607,7 +607,7 @@ ARM_BE8(rev	r6, r6  )
->   * (hardware reset value is 0) */
->  .macro set_hdcr operation
->  	mrc	p15, 4, r2, c1, c1, 1
-> -	ldr	r3, =3D(HDCR_TPM|HDCR_TPMCR|HDCR_TDRA|HDCR_TDOSA|HDCR_TDA)
-> +	ldr	r3, =3D(HDCR_TPM|HDCR_TPMCR)
->  	.if \operation =3D=3D vmentry
->  	orr	r2, r2, r3		@ Trap some perfmon accesses
->  	.else
-
---=20
-Alex Benn=C3=A9e
+	M.
+-- 
+Jazz is not dead. It just smells funny...
