@@ -1,120 +1,71 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v2 03/11] KVM: arm: enable to use the ARM_DSCR_MDBGEN macro from KVM assembly code
-Date: Tue, 09 Jun 2015 14:42:24 +0100
-Message-ID: <87r3pl6lrz.fsf@linaro.org>
-References: <1433046432-1824-1-git-send-email-zhichao.huang@linaro.org> <1433046432-1824-4-git-send-email-zhichao.huang@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: should KVM or userspace be the one which decides what
+ MIPIDR/affinity values to assign to vcpus?
+Date: Tue, 09 Jun 2015 15:00:23 +0100
+Message-ID: <5576F177.3090903@arm.com>
+References: <CAFEAcA-AY7rqcWmd13mpBuBWugbqwjzMdWfWt2N2rV0=7LT3KA@mail.gmail.com>
+ <5576C559.2000902@arm.com>
+ <CAFEAcA8x6BbHZPLj_U9HuZJs8i3n777vL=Gxs5V8pdmO+bsEcA@mail.gmail.com>
+ <5576DBB5.3010100@arm.com>
+ <CAFEAcA_y9DNLJTe+4kMBYObuKD82y0a05gsx6gOYZ8=Oo5LBGA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <1433046432-1824-4-git-send-email-zhichao.huang@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: Zhichao Huang <zhichao.huang@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, will.deacon@arm.com, huangzhichao@huawei.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F2B6B53F88
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jun 2015 09:50:13 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 9YNStgHtguiN for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Jun 2015 09:50:11 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7901353F2C
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Jun 2015 09:50:10 -0400 (EDT)
+In-Reply-To: <CAFEAcA_y9DNLJTe+4kMBYObuKD82y0a05gsx6gOYZ8=Oo5LBGA@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Shlomo Pongratz <shlomo.pongratz@huawei.com>, Shlomo Pongratz <shlomopongratz@gmail.com>, Pavel Fedin <p.fedin@samsung.com>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhao@linaro.org>, Ashok Kumar <ashoks@broadcom.com>, Igor Mammedov <imammedo@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 09/06/15 14:16, Peter Maydell wrote:
+> On 9 June 2015 at 13:27, Marc Zyngier <marc.zyngier@arm.com> wrote:
+>> On 09/06/15 12:24, Peter Maydell wrote:
+>>> So either:
+>>>  * QEMU needs to tell the kernel the MPIDR for each vCPU
+>>>  * QEMU needs to ask the kernel the MPIDR for each vCPU
+>>>
+>>> Which is better? The latter is simpler and will work with
+>>> existing kernels. The former would let us (for instance)
+>>> use KVM when we're modelling (real world) boards which have
+>>> particular cluster configurations (which might not match the
+>>> kernel's current simplistic "always 16 CPUs at Aff0" setup).
+>>
+>> Given that it is userspace that provides the description of the
+>> platform, it feels natural to let userspace set MPIDR accordingly.
+>>
+>> This will require some interesting rework in the kernel, but this
+>> doesn't feel too bad.
+> 
+> On the other hand QEMU needs to keep working with current kernels,
+> so we need the "ask the kernel" code at least for the moment.
+> Probably needs a capability for "kernel allows userspace to
+> set MPIDR" so we can adapt.
 
-Zhichao Huang <zhichao.huang@linaro.org> writes:
+Yeah, what I had in mind was something along the lines of:
+- kernel computes its "default MPDIR"
+- kernel exposes a new capability "KVM_ARM_ALLOW_MPIDR_OVERRIDE" (or
+something along those lines)
+- userspace does the right thing.
 
-> Add #ifndef __ASSEMBLY__ in hw_breakpoint.h, in order to use
-> the ARM_DSCR_MDBGEN macro from KVM assembly code.
->
-> Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  arch/arm/include/asm/hw_breakpoint.h | 54 +++++++++++++++++++-------=
-----------
->  1 file changed, 29 insertions(+), 25 deletions(-)
->
-> diff --git a/arch/arm/include/asm/hw_breakpoint.h b/arch/arm/include/=
-asm/hw_breakpoint.h
-> index 8e427c7..f2f4c61 100644
-> --- a/arch/arm/include/asm/hw_breakpoint.h
-> +++ b/arch/arm/include/asm/hw_breakpoint.h
-> @@ -3,6 +3,8 @@
-> =20
->  #ifdef __KERNEL__
-> =20
-> +#ifndef __ASSEMBLY__
-> +
->  struct task_struct;
-> =20
->  #ifdef CONFIG_HAVE_HW_BREAKPOINT
-> @@ -44,6 +46,33 @@ static inline void decode_ctrl_reg(u32 reg,
->  	ctrl->mismatch	=3D reg & 0x1;
->  }
-> =20
-> +struct notifier_block;
-> +struct perf_event;
-> +struct pmu;
-> +
-> +extern struct pmu perf_ops_bp;
-> +extern int arch_bp_generic_fields(struct arch_hw_breakpoint_ctrl ctr=
-l,
-> +				  int *gen_len, int *gen_type);
-> +extern int arch_check_bp_in_kernelspace(struct perf_event *bp);
-> +extern int arch_validate_hwbkpt_settings(struct perf_event *bp);
-> +extern int hw_breakpoint_exceptions_notify(struct notifier_block *un=
-used,
-> +					   unsigned long val, void *data);
-> +
-> +extern u8 arch_get_debug_arch(void);
-> +extern u8 arch_get_max_wp_len(void);
-> +extern void clear_ptrace_hw_breakpoint(struct task_struct *tsk);
-> +
-> +int arch_install_hw_breakpoint(struct perf_event *bp);
-> +void arch_uninstall_hw_breakpoint(struct perf_event *bp);
-> +void hw_breakpoint_pmu_read(struct perf_event *bp);
-> +int hw_breakpoint_slots(int type);
-> +
-> +#else
-> +static inline void clear_ptrace_hw_breakpoint(struct task_struct *ts=
-k) {}
-> +
-> +#endif	/* CONFIG_HAVE_HW_BREAKPOINT */
-> +#endif  /* __ASSEMBLY */
-> +
->  /* Debug architecture numbers. */
->  #define ARM_DEBUG_ARCH_RESERVED	0	/* In case of ptrace ABI updates. =
-*/
->  #define ARM_DEBUG_ARCH_V6	1
-> @@ -110,30 +139,5 @@ static inline void decode_ctrl_reg(u32 reg,
->  	asm volatile("mcr p14, 0, %0, " #N "," #M ", " #OP2 : : "r" (VAL));=
-\
->  } while (0)
-> =20
-> -struct notifier_block;
-> -struct perf_event;
-> -struct pmu;
-> -
-> -extern struct pmu perf_ops_bp;
-> -extern int arch_bp_generic_fields(struct arch_hw_breakpoint_ctrl ctr=
-l,
-> -				  int *gen_len, int *gen_type);
-> -extern int arch_check_bp_in_kernelspace(struct perf_event *bp);
-> -extern int arch_validate_hwbkpt_settings(struct perf_event *bp);
-> -extern int hw_breakpoint_exceptions_notify(struct notifier_block *un=
-used,
-> -					   unsigned long val, void *data);
-> -
-> -extern u8 arch_get_debug_arch(void);
-> -extern u8 arch_get_max_wp_len(void);
-> -extern void clear_ptrace_hw_breakpoint(struct task_struct *tsk);
-> -
-> -int arch_install_hw_breakpoint(struct perf_event *bp);
-> -void arch_uninstall_hw_breakpoint(struct perf_event *bp);
-> -void hw_breakpoint_pmu_read(struct perf_event *bp);
-> -int hw_breakpoint_slots(int type);
-> -
-> -#else
-> -static inline void clear_ptrace_hw_breakpoint(struct task_struct *ts=
-k) {}
-> -
-> -#endif	/* CONFIG_HAVE_HW_BREAKPOINT */
->  #endif	/* __KERNEL__ */
->  #endif	/* _ARM_HW_BREAKPOINT_H */
-
---=20
-Alex Benn=C3=A9e
+	M.
+-- 
+Jazz is not dead. It just smells funny...
