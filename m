@@ -1,168 +1,263 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH V2 1/5] kvm: arm64: Enable ACPI support for virt arch timer
-Date: Wed, 10 Jun 2015 14:51:11 +0200
-Message-ID: <20150610125111.GA4307@hawk.localdomain>
+Subject: Re: [PATCH V2 3/5] kvm: arm64: Detect GIC version for proper ACPI
+ vGIC probing
+Date: Wed, 10 Jun 2015 14:53:19 +0200
+Message-ID: <20150610125319.GB4307@hawk.localdomain>
 References: <1433909767-12189-1-git-send-email-wei@redhat.com>
- <1433909767-12189-2-git-send-email-wei@redhat.com>
+ <1433909767-12189-4-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 073CE540EA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jun 2015 08:40:59 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UA+VkdVDtpbA for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Jun 2015 08:40:57 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA8F9540E8
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jun 2015 08:40:57 -0400 (EDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1433909767-12189-2-git-send-email-wei@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <1433909767-12189-4-git-send-email-wei@redhat.com>
+Sender: kvm-owner@vger.kernel.org
 To: Wei Huang <wei@redhat.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, hanjun.guo@linaro.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, pbonzini@redhat.com, a.spyridakis@virtualopensystems.com, hanjun.guo@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jun 10, 2015 at 12:16:03AM -0400, Wei Huang wrote:
-> This patches enables ACPI support for KVM virtual arch timer. It allows
-> KVM to parse ACPI table for arch timer PPI when DT table is not present.
+On Wed, Jun 10, 2015 at 12:16:05AM -0400, Wei Huang wrote:
+> There are two GICs (GICv2 and GICv3) supported by KVM. So it is necessary
+> to find out GIC version before calling ACPI probing functions defined
+> in vgic-v2.c and vgic-v3.c.
 > 
-> Signed-off-by: Alexander Spyridaki <a.spyridakis@virtualopensystems.com>
+> This patch detects GIC version by checking gic_version field of GIC
+> distributor, which was defined  since ACPI 6.0. In case of ACPI 5.1,
+> we use manual hardware discovery to find out GIC version.
+> 
+> NOTE: This patch is based on a recent patch by Hanjun Guo.
+> 
+> Signed-off-by: Hanjun Guo <hanjun.guo@linaro.org>
 > Signed-off-by: Wei Huang <wei@redhat.com>
 > ---
->  virt/kvm/arm/arch_timer.c | 75 +++++++++++++++++++++++++++++++++++++++--------
->  1 file changed, 62 insertions(+), 13 deletions(-)
+>  include/kvm/arm_vgic.h |  18 +++++++++
+>  virt/kvm/arm/vgic-v2.c |  10 +++++
+>  virt/kvm/arm/vgic-v3.c |  10 +++++
+>  virt/kvm/arm/vgic.c    | 100 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>  4 files changed, 137 insertions(+), 1 deletion(-)
 > 
-> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> index 98c95f2..a9da75a 100644
-> --- a/virt/kvm/arm/arch_timer.c
-> +++ b/virt/kvm/arm/arch_timer.c
-> @@ -21,6 +21,7 @@
->  #include <linux/kvm.h>
->  #include <linux/kvm_host.h>
->  #include <linux/interrupt.h>
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 3ee732a..7a44b08 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -24,6 +24,7 @@
+>  #include <linux/irqreturn.h>
+>  #include <linux/spinlock.h>
+>  #include <linux/types.h>
+> +#include <linux/acpi.h>
+>  #include <kvm/iodev.h>
+>  
+>  #define VGIC_NR_IRQS_LEGACY	256
+> @@ -335,10 +336,18 @@ int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
+>  int vgic_v2_dt_probe(struct device_node *vgic_node,
+>  		     const struct vgic_ops **ops,
+>  		     const struct vgic_params **params);
+> +#ifdef CONFIG_ACPI
+> +int vgic_v2_acpi_probe(struct acpi_madt_generic_interrupt *,
+> +		       const struct vgic_ops **ops,
+> +		       const struct vgic_params **params);
+> +#endif /* CONFIG_ACPI */
+>  #ifdef CONFIG_ARM_GIC_V3
+>  int vgic_v3_dt_probe(struct device_node *vgic_node,
+>  		     const struct vgic_ops **ops,
+>  		     const struct vgic_params **params);
+> +int vgic_v3_acpi_probe(struct acpi_madt_generic_interrupt *,
+> +		       const struct vgic_ops **ops,
+> +		       const struct vgic_params **params);
+>  #else
+>  static inline int vgic_v3_dt_probe(struct device_node *vgic_node,
+>  				   const struct vgic_ops **ops,
+> @@ -346,6 +355,15 @@ static inline int vgic_v3_dt_probe(struct device_node *vgic_node,
+>  {
+>  	return -ENODEV;
+>  }
+> +
+> +#ifdef CONFIG_ACPI
+> +int vgic_v3_acpi_probe(struct acpi_madt_generic_interrupt *,
+> +		       const struct vgic_ops **ops,
+> +		       const struct vgic_params **params)
+> +{
+> +	return -ENODEV;
+> +}
+> +#endif /* CONFIG_ACPI */
+>  #endif
+>  
+>  #endif
+> diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
+> index 295996f..711de82 100644
+> --- a/virt/kvm/arm/vgic-v2.c
+> +++ b/virt/kvm/arm/vgic-v2.c
+> @@ -23,6 +23,7 @@
+>  #include <linux/of.h>
+>  #include <linux/of_address.h>
+>  #include <linux/of_irq.h>
 > +#include <linux/acpi.h>
 >  
->  #include <clocksource/arm_arch_timer.h>
->  #include <asm/arch_timer.h>
-> @@ -274,9 +275,57 @@ static const struct of_device_id arch_timer_of_match[] = {
->  	{},
->  };
+>  #include <linux/irqchip/arm-gic.h>
 >  
-> -int kvm_timer_hyp_init(void)
-> +static int kvm_timer_ppi_dt_parse(unsigned int *ppi)
+> @@ -257,3 +258,12 @@ out:
+>  	of_node_put(vgic_node);
+>  	return ret;
+>  }
+> +
+> +#ifdef CONFIG_ACPI
+> +int vgic_v2_acpi_probe(struct acpi_madt_generic_interrupt *vgic_acpi,
+> +		       const struct vgic_ops **ops,
+> +		       const struct vgic_params **params)
+> +{
+> +	return -EINVAL;
+> +}
+> +#endif /* CONFIG_ACPI */
+> diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
+> index 91814e2..99d0f9f 100644
+> --- a/virt/kvm/arm/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic-v3.c
+> @@ -23,6 +23,7 @@
+>  #include <linux/of.h>
+>  #include <linux/of_address.h>
+>  #include <linux/of_irq.h>
+> +#include <linux/acpi.h>
+>  
+>  #include <linux/irqchip/arm-gic-v3.h>
+>  
+> @@ -285,3 +286,12 @@ out:
+>  	of_node_put(vgic_node);
+>  	return ret;
+>  }
+> +
+> +#ifdef CONFIG_ACPI
+> +int vgic_v3_acpi_probe(struct acpi_madt_generic_interrupt *vgic_acpi,
+> +		       const struct vgic_ops **ops,
+> +		       const struct vgic_params **params)
+> +{
+> +	return -EINVAL;
+> +}
+> +#endif /* CONFIG_ACPI */
+> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+> index b4010f0..cd09877 100644
+> --- a/virt/kvm/arm/vgic.c
+> +++ b/virt/kvm/arm/vgic.c
+> @@ -28,6 +28,7 @@
+>  #include <linux/acpi.h>
+>  
+>  #include <linux/irqchip/arm-gic.h>
+> +#include <linux/irqchip/arm-gic-v3.h>
+>  
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/kvm_arm.h>
+> @@ -2114,9 +2115,106 @@ static int kvm_vgic_dt_probe(void)
+>  }
+>  
+>  #ifdef CONFIG_ACPI
+> +u8 gic_version = ACPI_MADT_GIC_VER_UNKNOWN;
+> +phys_addr_t dist_phy_base;
+
+I think these can/should be static, and adding acpi to the name
+might be nice.
+
+> +static struct acpi_madt_generic_interrupt *vgic_acpi;
+> +
+> +static void gic_get_acpi_header(struct acpi_subtable_header *header)
+> +{
+> +	vgic_acpi = (struct acpi_madt_generic_interrupt *)header;
+> +}
+> +
+> +static int gic_parse_distributor(struct acpi_subtable_header *header,
+> +				 const unsigned long end)
+> +{
+> +	struct acpi_madt_generic_distributor *dist;
+> +
+> +	dist = (struct acpi_madt_generic_distributor *)header;
+> +
+> +	if (BAD_MADT_ENTRY(dist, end))
+> +		return -EINVAL;
+> +
+> +	gic_version = dist->gic_version;
+> +	dist_phy_base = dist->base_address;
+> +
+> +	return 0;
+> +}
+> +
+> +static int gic_match_redist(struct acpi_subtable_header *header,
+> +			    const unsigned long end)
+> +{
+> +	return 0;
+> +}
+> +
+> +static bool gic_redist_is_present(void)
+> +{
+> +	int count;
+> +
+> +	/* scan MADT table to find if we have redistributor entries */
+> +	count = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_REDISTRIBUTOR,
+> +				      gic_match_redist, 0);
+> +
+> +	return (count > 0) ? true : false;
+
+nit: no need for the '? true : false'
+
+> +}
+> +
+>  static int kvm_vgic_acpi_probe(void)
 >  {
->  	struct device_node *np;
+> -	return -EINVAL;
+> +	u32 reg;
+> +	int count;
+> +	void __iomem *dist_base;
+> +	int ret;
 > +
-> +	np = of_find_matching_node(NULL, arch_timer_of_match);
-> +	if (!np)
+> +	/* MADT table */
+> +	ret = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_INTERRUPT,
+> +			(acpi_tbl_entry_handler)gic_get_acpi_header, 0);
+> +	if (!ret) {
+> +		pr_err("Failed to get MADT VGIC CPU entry\n");
 > +		return -ENODEV;
+> +	}
 > +
-> +	*ppi = irq_of_parse_and_map(np, 2);
-> +	if (*ppi == 0) {
-> +		of_node_put(np);
+> +	/* detect GIC version */
+> +	count = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_DISTRIBUTOR,
+> +				      gic_parse_distributor, 0);
+> +	if (count <= 0) {
+> +		pr_err("No valid GIC distributor entry exists\n");
+> +		return -ENODEV;
+> +	}
+> +	if (gic_version >= ACPI_MADT_GIC_VER_RESERVED) {
+> +		pr_err("Invalid GIC version %d in MADT\n", gic_version);
 > +		return -EINVAL;
 > +	}
 > +
-> +	return 0;
-> +}
+> +	/* falls back to manual hardware discovery under ACPI 5.1 */
+> +	if (gic_version == ACPI_MADT_GIC_VER_UNKNOWN) {
+> +		if (gic_redist_is_present()) {
+> +			dist_base = ioremap(dist_phy_base, SZ_64K);
+> +			if (!dist_base)
+> +				return -ENOMEM;
 > +
-> +#ifdef CONFIG_ACPI
-> +struct acpi_table_gtdt *gtdt_acpi;
-
-I think gtdt_acpi can/should be static.
-
-> +static void arch_timer_acpi_parse(struct acpi_table_header *table)
-> +{
-> +	gtdt_acpi = container_of(table, struct acpi_table_gtdt, header);
-> +}
+> +			reg = readl_relaxed(dist_base + GICD_PIDR2) & GIC_PIDR2_ARCH_MASK;
+> +			if (reg == GIC_PIDR2_ARCH_GICv3)
+> +				gic_version = ACPI_MADT_GIC_VER_V3;
+> +			else
+> +				gic_version = ACPI_MADT_GIC_VER_V4;
 > +
-> +static int kvm_timer_ppi_acpi_parse(unsigned int *ppi)
-> +{
-> +	u32 flags;
-> +	int trigger, polarity;
+> +			iounmap(dist_base);
+> +		} else {
+> +			gic_version = ACPI_MADT_GIC_VER_V2;
+> +		}
+> +	}
 > +
-> +	/*Get the interrupt number from the GTDT table */
-> +	acpi_table_parse(ACPI_SIG_GTDT,
-> +			 (acpi_tbl_table_handler)arch_timer_acpi_parse);
+> +	switch (gic_version) {
+> +	case ACPI_MADT_GIC_VER_V2:
+> +		ret = vgic_v2_acpi_probe(vgic_acpi, &vgic_ops, &vgic);
+> +		break;
+> +	case ACPI_MADT_GIC_VER_V3:
+> +		ret = vgic_v3_acpi_probe(vgic_acpi, &vgic_ops, &vgic);
+> +		break;
+> +	default:
+> +		ret = -ENODEV;
+> +	}
 > +
-> +	if (!gtdt_acpi->virtual_timer_interrupt)
-> +		return -EINVAL;
-> +
-> +	flags = gtdt_acpi->virtual_timer_flags;
-> +	trigger = (flags & ACPI_GTDT_INTERRUPT_MODE) ? ACPI_EDGE_SENSITIVE
-> +		: ACPI_LEVEL_SENSITIVE;
-> +	polarity = (flags & ACPI_GTDT_INTERRUPT_POLARITY) ? ACPI_ACTIVE_LOW
-> +		: ACPI_ACTIVE_HIGH;
-> +
-> +	*ppi = acpi_register_gsi(NULL, gtdt_acpi->virtual_timer_interrupt,
-> +				 trigger, polarity);
-> +
-> +	return 0;
-> +}
-> +#endif
-> +
-> +int kvm_timer_hyp_init(void)
-> +{
->  	unsigned int ppi;
->  	int err;
->  
-> @@ -284,19 +333,20 @@ int kvm_timer_hyp_init(void)
->  	if (!timecounter)
->  		return -ENODEV;
->  
-> -	np = of_find_matching_node(NULL, arch_timer_of_match);
-> -	if (!np) {
-> -		kvm_err("kvm_arch_timer: can't find DT node\n");
-> -		return -ENODEV;
-> -	}
-> +	/* PPI parsing: try DT first, then ACPI */
-> +	err = kvm_timer_ppi_dt_parse(&ppi);
-> +#ifdef CONFIG_ACPI
-> +	if (err && !acpi_disabled)
-> +		err = kvm_timer_ppi_acpi_parse(&ppi);
-> +#endif
->  
-> -	ppi = irq_of_parse_and_map(np, 2);
-> -	if (!ppi) {
-> -		kvm_err("kvm_arch_timer: no virtual timer interrupt\n");
-> -		err = -EINVAL;
-> -		goto out;
-> +	if (err) {
-> +		kvm_err("kvm_arch_timer: can't find virtual timer info or "
-> +			"config virtual timer interrupt\n");
-> +		return err;
->  	}
->  
-> +	/* configure IRQ handler */
->  	err = request_percpu_irq(ppi, kvm_arch_timer_handler,
->  				 "kvm guest timer", kvm_get_running_vcpus());
->  	if (err) {
-> @@ -319,14 +369,13 @@ int kvm_timer_hyp_init(void)
->  		goto out_free;
->  	}
->  
-> -	kvm_info("%s IRQ%d\n", np->name, ppi);
-> +	kvm_info("timer IRQ%d\n", ppi);
->  	on_each_cpu(kvm_timer_init_interrupt, NULL, 1);
->  
->  	goto out;
->  out_free:
->  	free_percpu_irq(ppi, kvm_get_running_vcpus());
->  out:
-> -	of_node_put(np);
->  	return err;
+> +	return ret;
 >  }
+>  #endif /* CONFIG_ACPI */
 >  
 > -- 
 > 1.8.3.1
