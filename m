@@ -1,178 +1,69 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 8/8] arm: use new irqchip parameter to create different
- vGIC types
-Date: Wed, 10 Jun 2015 18:48:48 +0100
-Message-ID: <55787880.3030504@arm.com>
-References: <1433493473-4002-1-git-send-email-andre.przywara@arm.com>
- <1433493473-4002-9-git-send-email-andre.przywara@arm.com>
+Subject: Re: [PATCH 03/10] KVM: arm/arm64: vgic: Convert struct vgic_lr to
+ use bitfields
+Date: Wed, 10 Jun 2015 19:04:16 +0100
+Message-ID: <55787C20.9070404@arm.com>
+References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com> <1433783045-8002-4-git-send-email-marc.zyngier@arm.com> <557872A3.8070302@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 22BEB5364B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jun 2015 13:38:33 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BlveIY7SUH5v for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Jun 2015 13:38:31 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A927053621
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jun 2015 13:38:31 -0400 (EDT)
-In-Reply-To: <1433493473-4002-9-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <Will.Deacon@arm.com>, "penberg@kernel.org" <penberg@kernel.org>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <557872A3.8070302@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>, =?windows-1252?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/06/15 09:37, Andre Przywara wrote:
-> Currently we unconditionally create a virtual GICv2 in the guest.
-> Add a --irqchip= parameter to let the user specify a different GIC
-> type for the guest.
-> For now we the only other supported type is GICv3.
+On 10/06/15 18:23, Andre Przywara wrote:
+> Hi Marc,
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  arm/aarch64/arm-cpu.c                    |  2 +-
->  arm/gic.c                                | 21 +++++++++++++++++++++
->  arm/include/arm-common/kvm-config-arch.h |  9 ++++++++-
->  arm/kvm-cpu.c                            |  6 ++++++
->  arm/kvm.c                                |  4 +++-
->  5 files changed, 39 insertions(+), 3 deletions(-)
+> On 06/08/2015 06:03 PM, Marc Zyngier wrote:
+>> As we're about to cram more information in the vgic_lr structure
+>> (HW interrupt number and additional state information), we switch
+>> to a layout similar to the HW's:
+>>
+>> - use bitfields to save space (we don't need more than 10 bits
+>>   to represent the irq numbers)
 > 
-> diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-> index f702b9e..3dc8ea3 100644
-> --- a/arm/aarch64/arm-cpu.c
-> +++ b/arm/aarch64/arm-cpu.c
-> @@ -12,7 +12,7 @@
->  static void generate_fdt_nodes(void *fdt, struct kvm *kvm, u32 gic_phandle)
->  {
->  	int timer_interrupts[4] = {13, 14, 11, 10};
-> -	gic__generate_fdt_nodes(fdt, gic_phandle, IRQCHIP_GICV2);
-> +	gic__generate_fdt_nodes(fdt, gic_phandle, kvm->cfg.arch.irqchip);
->  	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
->  }
->  
-> diff --git a/arm/gic.c b/arm/gic.c
-> index c50d662..ab0f594 100644
-> --- a/arm/gic.c
-> +++ b/arm/gic.c
-> @@ -21,6 +21,23 @@
->  static int gic_fd = -1;
->  static int nr_redists;
->  
-> +int irqchip_parser(const struct option *opt, const char *arg, int unset)
-> +{
-> +	enum irqchip_type *type = opt->value;
-> +
-> +	*type = IRQCHIP_DEFAULT;
-> +	if (!strcmp(arg, "gicv2")) {
-> +		*type = IRQCHIP_GICV2;
-> +	} else if (!strcmp(arg, "gicv3")) {
-> +		*type = IRQCHIP_GICV3;
-> +	} else if (strcmp(arg, "default")) {
-> +		fprintf(stderr, "irqchip: unknown type \"%s\"\n", arg);
-> +		return -1;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
->  {
->  	int err;
-> @@ -121,6 +138,10 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
->  	case IRQCHIP_GICV2:
->  		max_cpus = GIC_MAX_CPUS;
->  		break;
-> +	case IRQCHIP_GICV3:
-> +		nr_redists = kvm->cfg.nrcpus;
-> +		max_cpus = 255;
+> But that will not be true for LPIs later, right? Before that I was lucky
+> with the irq field being 16 bits wide ;-)
+> So can we increase that to be at least 14 bits (8192 LPI offset + 8192
+> LPIs) here? The structure would still fit in 32 bits, then.
 
-Having a #define for this would be nice. But more importantly, the
-actual limit is the one KVM imposes, and the code should probably
-reflect this.
+Yes, that's true. An oversight on my part.
 
-> +		break;
->  	default:
->  		return -ENODEV;
->  	}
-> diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-> index a8ebd94..ae4e89b 100644
-> --- a/arm/include/arm-common/kvm-config-arch.h
-> +++ b/arm/include/arm-common/kvm-config-arch.h
-> @@ -8,8 +8,11 @@ struct kvm_config_arch {
->  	unsigned int	force_cntfrq;
->  	bool		virtio_trans_pci;
->  	bool		aarch32_guest;
-> +	int		irqchip;
->  };
->  
-> +int irqchip_parser(const struct option *opt, const char *arg, int unset);
-> +
->  #define OPT_ARCH_RUN(pfx, cfg)							\
->  	pfx,									\
->  	ARM_OPT_ARCH_RUN(cfg)							\
-> @@ -21,6 +24,10 @@ struct kvm_config_arch {
->  		     "updated to program CNTFRQ correctly*"),			\
->  	OPT_BOOLEAN('\0', "force-pci", &(cfg)->virtio_trans_pci,		\
->  		    "Force virtio devices to use PCI as their default "		\
-> -		    "transport"),
-> +		    "transport"),						\
-> +        OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
-> +		     "[gicv2|gicv3]",					\
-> +		     "type of interrupt controller to emulate in the guest",	\
-> +		     irqchip_parser, NULL),
->  
->  #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
-> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-> index a3344fa..aacc172 100644
-> --- a/arm/kvm-cpu.c
-> +++ b/arm/kvm-cpu.c
-> @@ -144,6 +144,12 @@ bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data,
->  {
->  	int nr_redists = 0;
->  
-> +	switch (vcpu->kvm->cfg.arch.irqchip) {
-> +	case IRQCHIP_GICV3:
-> +		nr_redists = vcpu->kvm->nrcpus;
-> +		break;
-> +	}
-> +
->  	if (arm_addr_in_virtio_mmio_region(nr_redists, phys_addr)) {
->  		return kvm__emulate_mmio(vcpu, phys_addr, data, len, is_write);
->  	} else if (arm_addr_in_ioport_region(phys_addr)) {
-> diff --git a/arm/kvm.c b/arm/kvm.c
-> index f9685c2..2628d31 100644
-> --- a/arm/kvm.c
-> +++ b/arm/kvm.c
-> @@ -82,6 +82,8 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
->  		MADV_MERGEABLE | MADV_HUGEPAGE);
->  
->  	/* Create the virtual GIC. */
-> -	if (gic__create(kvm, IRQCHIP_GICV2))
-> +	if (kvm->cfg.arch.irqchip == IRQCHIP_DEFAULT)
-> +		kvm->cfg.arch.irqchip = IRQCHIP_GICV2;
-> +	if (gic__create(kvm, kvm->cfg.arch.irqchip))
->  		die("Failed to create virtual GIC");
->  }
-> 
+> I guess guests should get away with only supporting 8K of LPIs, but if
+> we map hardware LPIs to guest IRQs I guess we may exceed 14 bits here.
+> Not sure if we could extend this further for ARM64 only, as we have more
+> room there and also need it only here.
 
-I think you really need to revisit this the way you propagate the GIC
-stuff outside of the GIC code. IRQCHIP_DEFAULT should be IRQCHIP_GICV2,
-there is no reason for it to be otherwise. Same goes for the nr_redists
-thing. Keep it localized as much as possible, and only export synthetic
-information to the rest of kvmtool.
+Mapping LPIs to IRQs is not a problem, as LPIs don't have an active
+state, so you never have to deactivate it, and you never put them in an
+LR. Problem solved! ;-)
 
-Thanks,
+Alternative layout proposal for the ITS emulation case:
+
+#define LR_IS_LPI	(1 << 4)
+
+struct vgic_lr {
+	union {
+		unsigned lpi:24;
+		unsigned spi:10;
+		union {
+			unsigned hwirq:10;
+			unsigned source:8;
+		};
+	};
+	unsigned state:5;
+};
+
+That gives you even more space than you had before.
+
+Now, this is absolutely disgusting, of course. This whole intermediate
+structure crap is completely getting out of control, and we should get
+rid of it before we merge the ITS.
+
+/me goes looking for a chainsaw...
 
 	M.
 -- 
