@@ -1,96 +1,105 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: IRQFD support with GICv3 ITS (WAS: RE: [PATCH 00/13] arm64: KVM: GICv3
- ITS emulation)
-Date: Wed, 10 Jun 2015 11:31:19 +0300
-Message-ID: <042601d0a357$d3cec4d0$7b6c4e70$@samsung.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH 00/10] arm/arm64: KVM: Active interrupt state switching
+ for shared devices
+Date: Wed, 10 Jun 2015 10:33:00 +0200
+Message-ID: <5577F63C.5040806@linaro.org>
+References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 19A2C54091
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jun 2015 04:21:07 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rgjckgU2jECs for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Jun 2015 04:21:04 -0400 (EDT)
-Received: from mailout3.w1.samsung.com (mailout3.w1.samsung.com
- [210.118.77.13])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B28B15407A
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jun 2015 04:21:03 -0400 (EDT)
-Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
- by mailout3.w1.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NPP001D6ZO8YV20@mailout3.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Wed, 10 Jun 2015 09:31:20 +0100 (BST)
-Content-language: ru
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: 'Eric Auger' <eric.auger@linaro.org>, 'Marc Zyngier' <marc.zyngier@arm.com>, 'Andre Przywara' <Andre.Przywara@arm.com>, christoffer.dall@linaro.org
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, =?windows-1252?Q?Alex?= =?windows-1252?Q?_Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello guys!
+Hi Marc,
+On 06/08/2015 07:03 PM, Marc Zyngier wrote:
+> From day 1, our timer code has been using a terrible hack: whenever
+> the guest is scheduled with a timer interrupt pending (i.e. the HW
+> timer has expired), we restore the timer state with the MASK bit set,
+> in order to avoid the physical interrupt to fire again. And again. And
+> again...
+> 
+> This is absolutely silly, for at least two reasons:
+> 
+> - This relies on the device (the timer) having a mask bit that we can
+>   play with. Not all devices are built like this.
+> 
+> - This expects some behaviour of the guest that only works because the
+>   both the kernel timer code and the KVM counterpart have been written
+>   by the same idiot (the idiot being me).
+> 
+> The One True Way is to set the GIC active bit when injecting the
+> interrupt, and to context-switch across the world switch. This is what
+> this series implements.
+> 
+> We introduce a relatively simple infrastructure enabling the mapping
+> of a virtual interrupt with its physical counterpart:
+> 
+> - Whenever an virtual interrupt is injected, we look it up in an
+>   rbtree. If we have a match, the interrupt is injected with the HW
+>   bit set in the LR, together with the physical interrupt.
+> 
+> - Across the world switch, we save/restore the active state for these
+>   interrupts using the irqchip_state API.
+> 
+> - On guest EOI, the HW interrupt is automagically deactivated by the
+>   GIC, allowing the interrupt to be resampled.
 
-> Currently on ARM, irqfd supports routing an host eventfd towards a
-> virtual SPI:
-> eventfd -> vSPI = gsi+32
-> parameters of irqfd are the eventfd and the gsi.
+I am lost about the status of the irqchip part, allowing EOImode=1 and
+only dropping the prio for physical forwarded IRQs:
+http://lkml.iu.edu/hypermail/linux/kernel/1410.3/00913.html
+Doesn't this series also depend on those patches or did I miss something
+on the ML?
 
- Yes, but this works only with GICv2m, because it actually turns MSI data into SPI number.
-ITS works in a completely different way.
+Best Regards
 
-> 2) now we have virtual msi injection, we could use msi routing to inject
-> virtual LPI's. But is it what you need for your qemu integration?
+Eric
 
- Actually this is what i wanted to discuss here...
- I have studied a little bit IRQ routing mechanism... And it comes to a question what is
-'GSI'. As far as i could understand, on x86 GSI is a completely virtual entity, which can
-be tied either to irqchip's pin (physical IRQ) or MSI event. There is totally no
-correspondence between GSI numbers and guest IRQ numbers. GSIs are just allocated by the
-userspace starting from 0 and on. Is my understanding correct?
- On ARM, i see, completely different approach is used. For KVM_IRQ_LINE ioctl GSI is
-actually a raw GIC IRQ number plus some extra bits for target and type. For KVM_IRQFD with
-GICv2m GSI is actually SPI number (starting from zero, so that IRQ = GSI + 32).
- First of all, i would say that we already have an inconsistence in ARM API. The same
-thing called GSI has two different meanings for different functions.
- I think it would be a bad idea to introduce a third, separate meaning for MSIs. However,
-this is what we could do:
+> 
+> The timer code is slightly modified to set the active state at the
+> same time as the injection.
+> 
+> The last patch also allows non-shared devices to have their interrupt
+> deactivated the same way (in this case we do not context-switch the
+> active state). This is the first step in the long overdue direction of
+> the mythical IRQ forwarding thing...
+> 
+> This series is based on v4.1-rc7, and has been tested on Juno (GICv2)
+> and the FVP Base model (GICv3 host, both GICv2 and GICv3 guests). I'd
+> appreciate any form of testing, specially in the context of guest
+> migration (there is obviously some interesting stuff there...).
 
- Approach 1: GICv2m way.
- We could add one more IOCTL which would decode MSI data into IRQ (in our case it's LPI)
-number. What it would return is LPI - 32, to keep in line with existing convention.
- Pros: does not bring any more inconsistence into KVM API.
- Cons: requires adding one more IOCTL and one more MSI handling mechanism. Isn't there too
-many of them already?
 
- Approach 2: IRQ routing.
- We could implement MSI routing using virtual GSI numbers. In order to stay compatible
-with what we have, we could say that GSI numbers below 8192 are SPI GSIs, and everything
-starting from 8192 is MSI. Then we could use KVM_SET_GSI_ROUTING ioctl to assign these
-GSIs to actual MSIs which then will go full-cycle through ITS.
- Pros: Does not introduce any new APIs.
- Cons:
-    - Introduces third meaning for GSI on ARM.
-    - Slower than approach 1 because in that case every interrupt is pre-translated while
-here we engage ITS every time.
 
- Personally i have already tried approach 1 and i can say that it works. There is no
-problem with target specification because current ITS code stores everything in a single
-bunch so that i anyway have to locate a particular ITTE corresponding to an LPI and get
-collection ID from there. However, yes, i agree, this approach has the same performance
-drawback as my suggested approach 2.
+> 
+> The code is otherwise available at
+> git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/active-timer
+> 
+> Marc Zyngier (10):
+>   arm/arm64: KVM: Fix ordering of timer/GIC on guest entry
+>   arm/arm64: KVM: Move vgic handling to a non-preemptible section
+>   KVM: arm/arm64: vgic: Convert struct vgic_lr to use bitfields
+>   KVM: arm/arm64: vgic: Allow HW irq to be encoded in LR
+>   KVM: arm/arm64: vgic: Relax vgic_can_sample_irq for edge IRQs
+>   KVM: arm/arm64: vgic: Allow dynamic mapping of physical/virtual
+>     interrupts
+>   KVM: arm/arm64: vgic: Allow HW interrupts to be queued to a guest
+>   KVM: arm/arm64: vgic: Add vgic_{get,set}_phys_irq_active
+>   KVM: arm/arm64: timer: Allow the timer to control the active state
+>   KVM: arm/arm64: vgic: Allow non-shared device HW interrupts
+> 
+>  arch/arm/kvm/arm.c                 |  21 +++-
+>  include/kvm/arm_arch_timer.h       |   3 +
+>  include/kvm/arm_vgic.h             |  31 +++++-
+>  include/linux/irqchip/arm-gic-v3.h |   3 +
+>  include/linux/irqchip/arm-gic.h    |   3 +-
+>  virt/kvm/arm/arch_timer.c          |  13 ++-
+>  virt/kvm/arm/vgic-v2.c             |  16 ++-
+>  virt/kvm/arm/vgic-v3.c             |  21 +++-
+>  virt/kvm/arm/vgic.c                | 206 ++++++++++++++++++++++++++++++++++++-
+>  9 files changed, 300 insertions(+), 17 deletions(-)
+> 
 
- Any thoughts / ideas ?
-
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
