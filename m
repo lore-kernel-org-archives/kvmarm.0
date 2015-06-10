@@ -1,61 +1,86 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH V2 0/5]  Enable ACPI support for KVM ARM
-Date: Wed, 10 Jun 2015 15:23:25 +0200
-Message-ID: <20150610132325.GD4307@hawk.localdomain>
-References: <1433909767-12189-1-git-send-email-wei@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v2 05/11] KVM: arm: check ordering of all system register
+ tables
+Date: Wed, 10 Jun 2015 14:52:50 +0100
+Message-ID: <87fv5z7jrh.fsf@linaro.org>
+References: <1433046432-1824-1-git-send-email-zhichao.huang@linaro.org>
+ <1433046432-1824-6-git-send-email-zhichao.huang@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1433909767-12189-1-git-send-email-wei@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Wei Huang <wei@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, pbonzini@redhat.com, a.spyridakis@virtualopensystems.com, hanjun.guo@linaro.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9AE07531C8
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jun 2015 09:42:09 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id xp3em+SOH3-m for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Jun 2015 09:42:08 -0400 (EDT)
+Received: from socrates.bennee.com
+ (static.88-198-71-155.clients.your-server.de [88.198.71.155])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 701DF531AF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Jun 2015 09:42:08 -0400 (EDT)
+In-reply-to: <1433046432-1824-6-git-send-email-zhichao.huang@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Zhichao Huang <zhichao.huang@linaro.org>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, will.deacon@arm.com, huangzhichao@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jun 10, 2015 at 12:16:02AM -0400, Wei Huang wrote:
-> Initial ACPI support for ARM64 has been accepted into Linux kernel recently.
-> Now it is a good time to re-visit ACPI support for KVM. This patchset
-> enables ACPI for both arch_timer and vGIC by probing related ACPI tables
-> and does necessary initialization.
-> 
-> Note that Alexander Spyridaki submitted similar patches before. Some of
-> his ideas were borrowed in this patchset, but with substancial changes.
-> In addition we extend support for both GICv2 and GICv3.
-> 
-> This patchset would work better on top of recent GIC/IRQCHIP patches by
-> Hanjun Guo, who added support for gic_version in ACPI struct of GIC
-> distributor (search "ACPICA: Introduce GIC version for arm based system").
-> 
-> This patchset can be applied cleanly on top of kvmarm.git queue branch.
-> 
-> -Wei
-> 
-> V1->V2:
-> * Initialize vgic->max_gic_vcpus field in GICv2 code (found by Andrew Jones)
-> * Rewrite arch_timer ACPI PPI parsing code
-> * Verified patches on APM Mustang machine, which has arch_timer & GICv2
-> 
-> V1:
-> * Initial patchset
-> 
-> Wei Huang (5):
->   kvm: arm64: Enable ACPI support for virt arch timer
->   kvm: arm64: Dispatch virt GIC probing to device tree and ACPI
->   kvm: arm64: Detect GIC version for proper ACPI vGIC probing
->   kvm: arm64: Implement ACPI probing code for GICv2
->   kvm: arm64: Implement ACPI probing code for GICv3
-> 
->  include/kvm/arm_vgic.h    |  36 +++++++++---
->  virt/kvm/arm/arch_timer.c |  75 ++++++++++++++++++++-----
->  virt/kvm/arm/vgic-v2.c    |  66 ++++++++++++++++++++--
->  virt/kvm/arm/vgic-v3.c    |  56 +++++++++++++++++--
->  virt/kvm/arm/vgic.c       | 140 ++++++++++++++++++++++++++++++++++++++++++----
->  5 files changed, 332 insertions(+), 41 deletions(-)
-
-I've looked over the series and made a couple nits. I think we need to
-wait until "ACPICA: Introduce GIC version for arm based system" is
-accepted, as it may still change, and this series duplicates parts of it.
-
-Thanks,
-drew
+ClpoaWNoYW8gSHVhbmcgPHpoaWNoYW8uaHVhbmdAbGluYXJvLm9yZz4gd3JpdGVzOgoKPiBXZSBu
+b3cgaGF2ZSBtdWx0aXBsZSB0YWJsZXMgZm9yIHRoZSB2YXJpb3VzIHN5c3RlbSByZWdpc3RlcnMK
+PiB3ZSB0cmFwLiBNYWtlIHN1cmUgd2UgY2hlY2sgdGhlIG9yZGVyIG9mIGFsbCBvZiB0aGVtLCBh
+cyBpdCBpcwo+IGNyaXRpY2FsIHRoYXQgd2UgZ2V0IHRoZSBvcmRlciByaWdodCAoYmVlbiB0aGVy
+ZSwgZG9uZSB0aGF0Li4uKS4KPgo+IFNpZ25lZC1vZmYtYnk6IFpoaWNoYW8gSHVhbmcgPHpoaWNo
+YW8uaHVhbmdAbGluYXJvLm9yZz4KPiAtLS0KPiAgYXJjaC9hcm0va3ZtL2NvcHJvYy5jIHwgMjYg
+KysrKysrKysrKysrKysrKysrKysrLS0tLS0KPiAgMSBmaWxlIGNoYW5nZWQsIDIxIGluc2VydGlv
+bnMoKyksIDUgZGVsZXRpb25zKC0pCj4KPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm0va3ZtL2NvcHJv
+Yy5jIGIvYXJjaC9hcm0va3ZtL2NvcHJvYy5jCj4gaW5kZXggZDIzMzk1Yi4uMTZkNWY2OSAxMDA2
+NDQKPiAtLS0gYS9hcmNoL2FybS9rdm0vY29wcm9jLmMKPiArKysgYi9hcmNoL2FybS9rdm0vY29w
+cm9jLmMKPiBAQCAtNzM3LDYgKzczNyw5IEBAIHN0YXRpYyBzdHJ1Y3QgY29wcm9jX3JlZyBpbnZh
+cmlhbnRfY3AxNVtdID0gewo+ICAJeyBDUm4oIDApLCBDUm0oIDApLCBPcDEoIDApLCBPcDIoIDMp
+LCBpczMyLCBOVUxMLCBnZXRfVExCVFIgfSwKPiAgCXsgQ1JuKCAwKSwgQ1JtKCAwKSwgT3AxKCAw
+KSwgT3AyKCA2KSwgaXMzMiwgTlVMTCwgZ2V0X1JFVklEUiB9LAo+ICAKPiArCXsgQ1JuKCAwKSwg
+Q1JtKCAwKSwgT3AxKCAxKSwgT3AyKCAxKSwgaXMzMiwgTlVMTCwgZ2V0X0NMSURSIH0sCj4gKwl7
+IENSbiggMCksIENSbSggMCksIE9wMSggMSksIE9wMiggNyksIGlzMzIsIE5VTEwsIGdldF9BSURS
+IH0sCj4gKwo+ICAJeyBDUm4oIDApLCBDUm0oIDEpLCBPcDEoIDApLCBPcDIoIDApLCBpczMyLCBO
+VUxMLCBnZXRfSURfUEZSMCB9LAo+ICAJeyBDUm4oIDApLCBDUm0oIDEpLCBPcDEoIDApLCBPcDIo
+IDEpLCBpczMyLCBOVUxMLCBnZXRfSURfUEZSMSB9LAo+ICAJeyBDUm4oIDApLCBDUm0oIDEpLCBP
+cDEoIDApLCBPcDIoIDIpLCBpczMyLCBOVUxMLCBnZXRfSURfREZSMCB9LAo+IEBAIC03NTIsOSAr
+NzU1LDYgQEAgc3RhdGljIHN0cnVjdCBjb3Byb2NfcmVnIGludmFyaWFudF9jcDE1W10gPSB7Cj4g
+IAl7IENSbiggMCksIENSbSggMiksIE9wMSggMCksIE9wMiggMyksIGlzMzIsIE5VTEwsIGdldF9J
+RF9JU0FSMyB9LAo+ICAJeyBDUm4oIDApLCBDUm0oIDIpLCBPcDEoIDApLCBPcDIoIDQpLCBpczMy
+LCBOVUxMLCBnZXRfSURfSVNBUjQgfSwKPiAgCXsgQ1JuKCAwKSwgQ1JtKCAyKSwgT3AxKCAwKSwg
+T3AyKCA1KSwgaXMzMiwgTlVMTCwgZ2V0X0lEX0lTQVI1IH0sCj4gLQo+IC0JeyBDUm4oIDApLCBD
+Um0oIDApLCBPcDEoIDEpLCBPcDIoIDEpLCBpczMyLCBOVUxMLCBnZXRfQ0xJRFIgfSwKPiAtCXsg
+Q1JuKCAwKSwgQ1JtKCAwKSwgT3AxKCAxKSwgT3AyKCA3KSwgaXMzMiwgTlVMTCwgZ2V0X0FJRFIg
+fSwKPiAgfTsKPiAgCj4gIC8qCj4gQEAgLTEyOTcsMTMgKzEyOTcsMjkgQEAgaW50IGt2bV9hcm1f
+Y29weV9jb3Byb2NfaW5kaWNlcyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHU2NCBfX3VzZXIgKnVp
+bmRpY2VzKQo+ICAJcmV0dXJuIHdyaXRlX2RlbXV4X3JlZ2lkcyh1aW5kaWNlcyk7Cj4gIH0KPiAg
+Cj4gK3N0YXRpYyBpbnQgY2hlY2tfc3lzcmVnX3RhYmxlKGNvbnN0IHN0cnVjdCBjb3Byb2NfcmVn
+ICp0YWJsZSwgdW5zaWduZWQgaW50IG4pCj4gK3sKPiArCXVuc2lnbmVkIGludCBpOwo+ICsKPiAr
+CWZvciAoaSA9IDE7IGkgPCBuOyBpKyspIHsKPiArCQlpZiAoY21wX3JlZygmdGFibGVbaS0xXSwg
+JnRhYmxlW2ldKSA+PSAwKSB7Cj4gKwkJCWt2bV9lcnIoInN5c19yZWcgdGFibGUgJXAgb3V0IG9m
+IG9yZGVyICglZClcbiIsCj4gKwkJCQkJdGFibGUsIGkgLSAxKTsKCklzbid0IGEgQlVHX09OICph
+bmQqIGEga3ZtX2VycigpIG92ZXJraWxsPwoKPiArCQkJcmV0dXJuIDE7Cj4gKwkJfQo+ICsJfQo+
+ICsKPiArCXJldHVybiAwOwo+ICt9Cj4gKwo+ICB2b2lkIGt2bV9jb3Byb2NfdGFibGVfaW5pdCh2
+b2lkKQo+ICB7Cj4gIAl1bnNpZ25lZCBpbnQgaTsKPiAgCj4gIAkvKiBNYWtlIHN1cmUgdGFibGVz
+IGFyZSB1bmlxdWUgYW5kIGluIG9yZGVyLiAqLwo+IC0JZm9yIChpID0gMTsgaSA8IEFSUkFZX1NJ
+WkUoY3AxNV9yZWdzKTsgaSsrKQo+IC0JCUJVR19PTihjbXBfcmVnKCZjcDE1X3JlZ3NbaS0xXSwg
+JmNwMTVfcmVnc1tpXSkgPj0gMCk7Cj4gKwlCVUdfT04oY2hlY2tfc3lzcmVnX3RhYmxlKGNwMTRf
+cmVncywgQVJSQVlfU0laRShjcDE0X3JlZ3MpKSk7Cj4gKwlCVUdfT04oY2hlY2tfc3lzcmVnX3Rh
+YmxlKGNwMTVfcmVncywgQVJSQVlfU0laRShjcDE1X3JlZ3MpKSk7Cj4gKwlCVUdfT04oY2hlY2tf
+c3lzcmVnX3RhYmxlKGludmFyaWFudF9jcDE1LCBBUlJBWV9TSVpFKGludmFyaWFudF9jcDE1KSkp
+Owo+ICAKPiAgCS8qIFdlIGFidXNlIHRoZSByZXNldCBmdW5jdGlvbiB0byBvdmVyd3JpdGUgdGhl
+IHRhYmxlIGl0c2VsZi4gKi8KPiAgCWZvciAoaSA9IDA7IGkgPCBBUlJBWV9TSVpFKGludmFyaWFu
+dF9jcDE1KTsgaSsrKQoKLS0gCkFsZXggQmVubsOpZQpfX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5j
+cy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0
+aW5mby9rdm1hcm0K
