@@ -1,92 +1,199 @@
-From: Hanjun Guo <hanjun.guo@linaro.org>
-Subject: Re: [PATCH V2 0/5]  Enable ACPI support for KVM ARM
-Date: Thu, 11 Jun 2015 19:47:23 +0800
-Message-ID: <5579754B.1040105@linaro.org>
-References: <1433909767-12189-1-git-send-email-wei@redhat.com> <20150610132325.GD4307@hawk.localdomain>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH 04/13] KVM: arm64: Introduce new MMIO region for the ITS
+ base address
+Date: Thu, 11 Jun 2015 16:12:34 +0100
+Message-ID: <5579A562.3000108@arm.com>
+References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com>
+ <1432893209-27313-5-git-send-email-andre.przywara@arm.com>
+ <5576A930.6050100@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20150610132325.GD4307@hawk.localdomain>
-Sender: kvm-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, pbonzini@redhat.com, a.spyridakis@virtualopensystems.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7276254320
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2015 11:02:00 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id IlLlSFfNXHsm for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Jun 2015 11:01:59 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E881F542F6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Jun 2015 11:01:58 -0400 (EDT)
+In-Reply-To: <5576A930.6050100@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Eric Auger <eric.auger@linaro.org>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/10/2015 09:23 PM, Andrew Jones wrote:
-> On Wed, Jun 10, 2015 at 12:16:02AM -0400, Wei Huang wrote:
->> Initial ACPI support for ARM64 has been accepted into Linux kernel recently.
->> Now it is a good time to re-visit ACPI support for KVM. This patchset
->> enables ACPI for both arch_timer and vGIC by probing related ACPI tables
->> and does necessary initialization.
->>
->> Note that Alexander Spyridaki submitted similar patches before. Some of
->> his ideas were borrowed in this patchset, but with substancial changes.
->> In addition we extend support for both GICv2 and GICv3.
->>
->> This patchset would work better on top of recent GIC/IRQCHIP patches by
->> Hanjun Guo, who added support for gic_version in ACPI struct of GIC
->> distributor (search "ACPICA: Introduce GIC version for arm based system").
->>
->> This patchset can be applied cleanly on top of kvmarm.git queue branch.
->>
->> -Wei
->>
->> V1->V2:
->> * Initialize vgic->max_gic_vcpus field in GICv2 code (found by Andrew Jones)
->> * Rewrite arch_timer ACPI PPI parsing code
->> * Verified patches on APM Mustang machine, which has arch_timer & GICv2
->>
->> V1:
->> * Initial patchset
->>
->> Wei Huang (5):
->>    kvm: arm64: Enable ACPI support for virt arch timer
->>    kvm: arm64: Dispatch virt GIC probing to device tree and ACPI
->>    kvm: arm64: Detect GIC version for proper ACPI vGIC probing
->>    kvm: arm64: Implement ACPI probing code for GICv2
->>    kvm: arm64: Implement ACPI probing code for GICv3
->>
->>   include/kvm/arm_vgic.h    |  36 +++++++++---
->>   virt/kvm/arm/arch_timer.c |  75 ++++++++++++++++++++-----
->>   virt/kvm/arm/vgic-v2.c    |  66 ++++++++++++++++++++--
->>   virt/kvm/arm/vgic-v3.c    |  56 +++++++++++++++++--
->>   virt/kvm/arm/vgic.c       | 140 ++++++++++++++++++++++++++++++++++++++++++----
->>   5 files changed, 332 insertions(+), 41 deletions(-)
->
-> I've looked over the series and made a couple nits. I think we need to
-> wait until "ACPICA: Introduce GIC version for arm based system" is
-> accepted, as it may still change, and this series duplicates parts of it.
+Hi Eric,
 
-Yes, it was changed. Part of them is accepted by ACPICA core, but the
-new release of ACPICA 20150515 missed some code below,
+thanks for the review!
 
-  include/acpi/actbl1.h | 11 +++++++++++
-  1 file changed, 11 insertions(+)
+On 06/09/2015 09:52 AM, Eric Auger wrote:
+> On 05/29/2015 11:53 AM, Andre Przywara wrote:
+>> The ARM GICv3 ITS controller requires a separate register frame to
+>> cover ITS specific registers. Add a new VGIC address type and store
+>> the address in a field in the vgic_dist structure.
+>> Provide a function to check whether userland has provided the address,
+>> so ITS functionality can be guarded by that check.
+>>
+>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> ---
+>>  Documentation/virtual/kvm/devices/arm-vgic.txt |  7 +++++++
+>>  arch/arm64/include/uapi/asm/kvm.h              |  3 +++
+>>  include/kvm/arm_vgic.h                         |  3 +++
+>>  virt/kvm/arm/vgic-v3-emul.c                    |  1 +
+>>  virt/kvm/arm/vgic.c                            | 17 +++++++++++++++++
+>>  virt/kvm/arm/vgic.h                            |  1 +
+>>  6 files changed, 32 insertions(+)
+>>
+>> diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
+>> index 3fb9054..1f89001 100644
+>> --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
+>> +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
+>> @@ -39,6 +39,13 @@ Groups:
+>>        Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+>>        This address needs to be 64K aligned.
+>>  
+>> +    KVM_VGIC_V3_ADDR_TYPE_ITS (rw, 64-bit)
+>> +      Base address in the guest physical address space of the GICv3 ITS
+>> +      register frame. The ITS allows MSI(-X) interrupts to be injected
+>> +      into guests. This extension is optional, if the kernel does not
+>> +      support the ITS, the call returns -ENODEV.
+>> +      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+>> +      This address needs to be 64K aligned and the region covers 64 KByte.
+> I would emphasize this is the control registers (ITS_Base) hence a
+> single page, not comprising the ITS translation register page.
 
-diff --git a/include/acpi/actbl1.h b/include/acpi/actbl1.h
-index cadf21c..d382de8 100644
---- a/include/acpi/actbl1.h
-+++ b/include/acpi/actbl1.h
-@@ -834,6 +834,17 @@ struct acpi_madt_generic_distributor {
-         u8 reserved2[3];        /* reserved - must be zero */
-  };
+Good point, will do.
 
-+/* Values for Version field above */
-+
-+enum acpi_madt_gic_version {
-+       ACPI_MADT_GIC_VERSION_NONE      = 0,
-+       ACPI_MADT_GIC_VERSION_V1        = 1,
-+       ACPI_MADT_GIC_VERSION_V2        = 2,
-+       ACPI_MADT_GIC_VERSION_V3        = 3,
-+       ACPI_MADT_GIC_VERSION_V4        = 4,
-+       ACPI_MADT_GIC_VERSION_RESERVED  = 5     /* 5 and greater are 
-reserved */
-+};
-+
+>>  
+>>    KVM_DEV_ARM_VGIC_GRP_DIST_REGS
+>>    Attributes:
+>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+>> index d268320..e42435c 100644
+>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>> @@ -82,8 +82,11 @@ struct kvm_regs {
+>>  #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
+>>  #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
+>>  
+> extra white line?
+>> +#define KVM_VGIC_V3_ADDR_TYPE_ITS	4
+>> +
+>>  #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
+>>  #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
+>> +#define KVM_VGIC_V3_ITS_SIZE		SZ_64K
+>>  
+>>  #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
+>>  #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
+>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>> index b18e2c5..37725bb 100644
+>> --- a/include/kvm/arm_vgic.h
+>> +++ b/include/kvm/arm_vgic.h
+>> @@ -178,6 +178,9 @@ struct vgic_dist {
+>>  		phys_addr_t		vgic_redist_base;
+>>  	};
+>>  
+>> +	/* The base address for the MSI control block (V2M/ITS) */
+> why V2M here? It's it the GITS_TRANSLATER page that has a fellow page in
+> case of V2M?
 
-it was accepted by ACPICA tools but not ACPICA for linux, I already
-send them to Lv and Rafael, hope it can be merged for 4.2.
+Ah yes, this was a leftover from a previous version of the series. I had
+V2M in-kernel emulation implemented at some time, but later dropped that.
+Thanks for spotting.
 
-Thanks
-Hanjun
+>> +	phys_addr_t		vgic_its_base;
+>> +
+>>  	/* Distributor enabled */
+>>  	u32			enabled;
+>>  
+>> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+>> index fbfdd6f..16c6d8a 100644
+>> --- a/virt/kvm/arm/vgic-v3-emul.c
+>> +++ b/virt/kvm/arm/vgic-v3-emul.c
+>> @@ -1012,6 +1012,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+>>  			return -ENXIO;
+>>  		case KVM_VGIC_V3_ADDR_TYPE_DIST:
+>>  		case KVM_VGIC_V3_ADDR_TYPE_REDIST:
+>> +		case KVM_VGIC_V3_ADDR_TYPE_ITS:
+>>  			return 0;
+>>  		}
+>>  		break;
+>> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+>> index 6ea30e0..2e9723aa 100644
+>> --- a/virt/kvm/arm/vgic.c
+>> +++ b/virt/kvm/arm/vgic.c
+>> @@ -932,6 +932,16 @@ int vgic_register_kvm_io_dev(struct kvm *kvm, gpa_t base, int len,
+>>  	return ret;
+>>  }
+>>  
+>> +bool vgic_has_its(struct kvm *kvm)
+>> +{
+>> +	struct vgic_dist *dist = &kvm->arch.vgic;
+>> +
+>> +	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
+>> +		return false;
+>> +
+>> +	return !IS_VGIC_ADDR_UNDEF(dist->vgic_its_base);
+>> +}
+>> +
+>>  static int vgic_nr_shared_irqs(struct vgic_dist *dist)
+>>  {
+>>  	return dist->nr_irqs - VGIC_NR_PRIVATE_IRQS;
+>> @@ -1835,6 +1845,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>>  	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
+>>  	kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+>>  	kvm->arch.vgic.vgic_redist_base = VGIC_ADDR_UNDEF;
+>> +	kvm->arch.vgic.vgic_its_base = VGIC_ADDR_UNDEF;
+> minor: given the fact we have specialized
+> init_vgic_model/vgic_vx_init_emulation wouldn't it make sense to move
+> those VGIC v3 specific assignment there? also CPU base is specific to v2?
+
+Yes, that seems to make some sense. The original idea was to make sure
+that all of those addresses are properly initialized regardless of the
+chosen guest model, but I see that this gets messy and would probably be
+better solved by moving those assignments.
+
+Thanks,
+Andre.
+
+>>  
+>>  out_unlock:
+>>  	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
+>> @@ -1932,6 +1943,12 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
+>>  		block_size = KVM_VGIC_V3_REDIST_SIZE;
+>>  		alignment = SZ_64K;
+>>  		break;
+>> +	case KVM_VGIC_V3_ADDR_TYPE_ITS:
+>> +		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
+>> +		addr_ptr = &vgic->vgic_its_base;
+>> +		block_size = KVM_VGIC_V3_ITS_SIZE;
+>> +		alignment = SZ_64K;
+>> +		break;
+>>  #endif
+>>  	default:
+>>  		r = -ENODEV;
+>> diff --git a/virt/kvm/arm/vgic.h b/virt/kvm/arm/vgic.h
+>> index 0df74cb..a093f5c 100644
+>> --- a/virt/kvm/arm/vgic.h
+>> +++ b/virt/kvm/arm/vgic.h
+>> @@ -136,5 +136,6 @@ int vgic_get_common_attr(struct kvm_device *dev, struct kvm_device_attr *attr);
+>>  int vgic_init(struct kvm *kvm);
+>>  void vgic_v2_init_emulation(struct kvm *kvm);
+>>  void vgic_v3_init_emulation(struct kvm *kvm);
+>> +bool vgic_has_its(struct kvm *kvm);
+>>  
+>>  #endif
+>>
+> 
