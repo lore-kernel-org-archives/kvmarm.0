@@ -1,282 +1,65 @@
-From: Wei Huang <wei@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: [PATCH V2 3/5] kvm: arm64: Detect GIC version for proper ACPI
  vGIC probing
-Date: Wed, 10 Jun 2015 23:51:08 -0500
-Message-ID: <557913BC.1090201@redhat.com>
-References: <1433909767-12189-1-git-send-email-wei@redhat.com> <1433909767-12189-4-git-send-email-wei@redhat.com> <5578694A.9070905@arm.com>
+Date: Thu, 11 Jun 2015 08:54:05 +0100
+Message-ID: <55793E9D.7090506@arm.com>
+References: <1433909767-12189-1-git-send-email-wei@redhat.com> <1433909767-12189-4-git-send-email-wei@redhat.com> <5578694A.9070905@arm.com> <557913BC.1090201@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <5578694A.9070905@arm.com>
+In-Reply-To: <557913BC.1090201@redhat.com>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Wei Huang <wei@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "drjones@redhat.com" <drjones@redhat.com>, "a.spyridakis@virtualopensystems.com" <a.spyridakis@virtualopensystems.com>, "hanjun.guo@linaro.org" <hanjun.guo@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi Wei,
 
-
-On 06/10/2015 11:43 AM, Marc Zyngier wrote:
-> On 10/06/15 05:16, Wei Huang wrote:
->> There are two GICs (GICv2 and GICv3) supported by KVM. So it is necessary
->> to find out GIC version before calling ACPI probing functions defined
->> in vgic-v2.c and vgic-v3.c.
+On 11/06/15 05:51, Wei Huang wrote:
+> 
+> 
+> On 06/10/2015 11:43 AM, Marc Zyngier wrote:
+>> On 10/06/15 05:16, Wei Huang wrote:
+>>> There are two GICs (GICv2 and GICv3) supported by KVM. So it is necessary
+>>> to find out GIC version before calling ACPI probing functions defined
+>>> in vgic-v2.c and vgic-v3.c.
+>>>
+>>> This patch detects GIC version by checking gic_version field of GIC
+>>> distributor, which was defined  since ACPI 6.0. In case of ACPI 5.1,
+>>> we use manual hardware discovery to find out GIC version.
+>>>
+>>> NOTE: This patch is based on a recent patch by Hanjun Guo.
 >>
->> This patch detects GIC version by checking gic_version field of GIC
->> distributor, which was defined  since ACPI 6.0. In case of ACPI 5.1,
->> we use manual hardware discovery to find out GIC version.
+>> Well, this is really a duplicate of Hanjun's patch, and I'd rather have
+>> some common infrastructure.
 >>
->> NOTE: This patch is based on a recent patch by Hanjun Guo.
+>> Surely it should be possible for the ACPI GIC code to export the
+>> necessary entry points, or even to provide the required information?
+>>
 > 
-> Well, this is really a duplicate of Hanjun's patch, and I'd rather have
-> some common infrastructure.
-> 
-> Surely it should be possible for the ACPI GIC code to export the
-> necessary entry points, or even to provide the required information?
-> 
+> I agreed that this is a duplication and should be avoided if possible.
+> One easy solution is to export from GIC driver to KVM (using
+> EXPORT_SYMBOL or something similar). Is this acceptable?
 
-I agreed that this is a duplication and should be avoided if possible.
-One easy solution is to export from GIC driver to KVM (using
-EXPORT_SYMBOL or something similar). Is this acceptable?
+I don't think EXPORT_SYMBOL is required, as we currently don't support
+having KVM as a module.
 
-Anyway the difficulty is to find a common place to store and share info
-between other modules & KVM.
+Simply making available a global structure containing the base addresses
+and interrupt should be enough, and could be shared with both DT and
+ACPI. You could start your series by letting both GIC drivers expose
+that information obtained through DT, convert KVM to use this structure,
+and later on let ACPI fill in this structure too.
+
+> Anyway the difficulty is to find a common place to store and share info
+> between other modules & KVM.
+
+Indeed. As a rule of thumb, I want to minimize the amount of gratuitous
+divergence between DT and ACPI. So the sooner we extract the required
+information from whatever firmware we have, the better.
 
 Thanks,
--Wei
 
-
-> Thanks,
-> 
-> 	M.
-> 
->>
->> Signed-off-by: Hanjun Guo <hanjun.guo@linaro.org>
->> Signed-off-by: Wei Huang <wei@redhat.com>
->> ---
->>  include/kvm/arm_vgic.h |  18 +++++++++
->>  virt/kvm/arm/vgic-v2.c |  10 +++++
->>  virt/kvm/arm/vgic-v3.c |  10 +++++
->>  virt/kvm/arm/vgic.c    | 100 ++++++++++++++++++++++++++++++++++++++++++++++++-
->>  4 files changed, 137 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->> index 3ee732a..7a44b08 100644
->> --- a/include/kvm/arm_vgic.h
->> +++ b/include/kvm/arm_vgic.h
->> @@ -24,6 +24,7 @@
->>  #include <linux/irqreturn.h>
->>  #include <linux/spinlock.h>
->>  #include <linux/types.h>
->> +#include <linux/acpi.h>
->>  #include <kvm/iodev.h>
->>  
->>  #define VGIC_NR_IRQS_LEGACY	256
->> @@ -335,10 +336,18 @@ int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
->>  int vgic_v2_dt_probe(struct device_node *vgic_node,
->>  		     const struct vgic_ops **ops,
->>  		     const struct vgic_params **params);
->> +#ifdef CONFIG_ACPI
->> +int vgic_v2_acpi_probe(struct acpi_madt_generic_interrupt *,
->> +		       const struct vgic_ops **ops,
->> +		       const struct vgic_params **params);
->> +#endif /* CONFIG_ACPI */
->>  #ifdef CONFIG_ARM_GIC_V3
->>  int vgic_v3_dt_probe(struct device_node *vgic_node,
->>  		     const struct vgic_ops **ops,
->>  		     const struct vgic_params **params);
->> +int vgic_v3_acpi_probe(struct acpi_madt_generic_interrupt *,
->> +		       const struct vgic_ops **ops,
->> +		       const struct vgic_params **params);
->>  #else
->>  static inline int vgic_v3_dt_probe(struct device_node *vgic_node,
->>  				   const struct vgic_ops **ops,
->> @@ -346,6 +355,15 @@ static inline int vgic_v3_dt_probe(struct device_node *vgic_node,
->>  {
->>  	return -ENODEV;
->>  }
->> +
->> +#ifdef CONFIG_ACPI
->> +int vgic_v3_acpi_probe(struct acpi_madt_generic_interrupt *,
->> +		       const struct vgic_ops **ops,
->> +		       const struct vgic_params **params)
->> +{
->> +	return -ENODEV;
->> +}
->> +#endif /* CONFIG_ACPI */
->>  #endif
->>  
->>  #endif
->> diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
->> index 295996f..711de82 100644
->> --- a/virt/kvm/arm/vgic-v2.c
->> +++ b/virt/kvm/arm/vgic-v2.c
->> @@ -23,6 +23,7 @@
->>  #include <linux/of.h>
->>  #include <linux/of_address.h>
->>  #include <linux/of_irq.h>
->> +#include <linux/acpi.h>
->>  
->>  #include <linux/irqchip/arm-gic.h>
->>  
->> @@ -257,3 +258,12 @@ out:
->>  	of_node_put(vgic_node);
->>  	return ret;
->>  }
->> +
->> +#ifdef CONFIG_ACPI
->> +int vgic_v2_acpi_probe(struct acpi_madt_generic_interrupt *vgic_acpi,
->> +		       const struct vgic_ops **ops,
->> +		       const struct vgic_params **params)
->> +{
->> +	return -EINVAL;
->> +}
->> +#endif /* CONFIG_ACPI */
->> diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
->> index 91814e2..99d0f9f 100644
->> --- a/virt/kvm/arm/vgic-v3.c
->> +++ b/virt/kvm/arm/vgic-v3.c
->> @@ -23,6 +23,7 @@
->>  #include <linux/of.h>
->>  #include <linux/of_address.h>
->>  #include <linux/of_irq.h>
->> +#include <linux/acpi.h>
->>  
->>  #include <linux/irqchip/arm-gic-v3.h>
->>  
->> @@ -285,3 +286,12 @@ out:
->>  	of_node_put(vgic_node);
->>  	return ret;
->>  }
->> +
->> +#ifdef CONFIG_ACPI
->> +int vgic_v3_acpi_probe(struct acpi_madt_generic_interrupt *vgic_acpi,
->> +		       const struct vgic_ops **ops,
->> +		       const struct vgic_params **params)
->> +{
->> +	return -EINVAL;
->> +}
->> +#endif /* CONFIG_ACPI */
->> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
->> index b4010f0..cd09877 100644
->> --- a/virt/kvm/arm/vgic.c
->> +++ b/virt/kvm/arm/vgic.c
->> @@ -28,6 +28,7 @@
->>  #include <linux/acpi.h>
->>  
->>  #include <linux/irqchip/arm-gic.h>
->> +#include <linux/irqchip/arm-gic-v3.h>
->>  
->>  #include <asm/kvm_emulate.h>
->>  #include <asm/kvm_arm.h>
->> @@ -2114,9 +2115,106 @@ static int kvm_vgic_dt_probe(void)
->>  }
->>  
->>  #ifdef CONFIG_ACPI
->> +u8 gic_version = ACPI_MADT_GIC_VER_UNKNOWN;
->> +phys_addr_t dist_phy_base;
->> +static struct acpi_madt_generic_interrupt *vgic_acpi;
->> +
->> +static void gic_get_acpi_header(struct acpi_subtable_header *header)
->> +{
->> +	vgic_acpi = (struct acpi_madt_generic_interrupt *)header;
->> +}
->> +
->> +static int gic_parse_distributor(struct acpi_subtable_header *header,
->> +				 const unsigned long end)
->> +{
->> +	struct acpi_madt_generic_distributor *dist;
->> +
->> +	dist = (struct acpi_madt_generic_distributor *)header;
->> +
->> +	if (BAD_MADT_ENTRY(dist, end))
->> +		return -EINVAL;
->> +
->> +	gic_version = dist->gic_version;
->> +	dist_phy_base = dist->base_address;
->> +
->> +	return 0;
->> +}
->> +
->> +static int gic_match_redist(struct acpi_subtable_header *header,
->> +			    const unsigned long end)
->> +{
->> +	return 0;
->> +}
->> +
->> +static bool gic_redist_is_present(void)
->> +{
->> +	int count;
->> +
->> +	/* scan MADT table to find if we have redistributor entries */
->> +	count = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_REDISTRIBUTOR,
->> +				      gic_match_redist, 0);
->> +
->> +	return (count > 0) ? true : false;
->> +}
->> +
->>  static int kvm_vgic_acpi_probe(void)
->>  {
->> -	return -EINVAL;
->> +	u32 reg;
->> +	int count;
->> +	void __iomem *dist_base;
->> +	int ret;
->> +
->> +	/* MADT table */
->> +	ret = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_INTERRUPT,
->> +			(acpi_tbl_entry_handler)gic_get_acpi_header, 0);
->> +	if (!ret) {
->> +		pr_err("Failed to get MADT VGIC CPU entry\n");
->> +		return -ENODEV;
->> +	}
->> +
->> +	/* detect GIC version */
->> +	count = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_DISTRIBUTOR,
->> +				      gic_parse_distributor, 0);
->> +	if (count <= 0) {
->> +		pr_err("No valid GIC distributor entry exists\n");
->> +		return -ENODEV;
->> +	}
->> +	if (gic_version >= ACPI_MADT_GIC_VER_RESERVED) {
->> +		pr_err("Invalid GIC version %d in MADT\n", gic_version);
->> +		return -EINVAL;
->> +	}
->> +
->> +	/* falls back to manual hardware discovery under ACPI 5.1 */
->> +	if (gic_version == ACPI_MADT_GIC_VER_UNKNOWN) {
->> +		if (gic_redist_is_present()) {
->> +			dist_base = ioremap(dist_phy_base, SZ_64K);
->> +			if (!dist_base)
->> +				return -ENOMEM;
->> +
->> +			reg = readl_relaxed(dist_base + GICD_PIDR2) & GIC_PIDR2_ARCH_MASK;
->> +			if (reg == GIC_PIDR2_ARCH_GICv3)
->> +				gic_version = ACPI_MADT_GIC_VER_V3;
->> +			else
->> +				gic_version = ACPI_MADT_GIC_VER_V4;
->> +
->> +			iounmap(dist_base);
->> +		} else {
->> +			gic_version = ACPI_MADT_GIC_VER_V2;
->> +		}
->> +	}
->> +
->> +	switch (gic_version) {
->> +	case ACPI_MADT_GIC_VER_V2:
->> +		ret = vgic_v2_acpi_probe(vgic_acpi, &vgic_ops, &vgic);
->> +		break;
->> +	case ACPI_MADT_GIC_VER_V3:
->> +		ret = vgic_v3_acpi_probe(vgic_acpi, &vgic_ops, &vgic);
->> +		break;
->> +	default:
->> +		ret = -ENODEV;
->> +	}
->> +
->> +	return ret;
->>  }
->>  #endif /* CONFIG_ACPI */
->>  
->>
-> 
-> 
+	M.
+-- 
+Jazz is not dead. It just smells funny...
