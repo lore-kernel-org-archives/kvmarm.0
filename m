@@ -1,21 +1,24 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 0/2] arm64: KVM: Use instruction patching for GIC world switch
-Date: Fri, 12 Jun 2015 12:06:35 +0100
-Message-ID: <1434107197-4919-1-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 1/2] arm64: alternative: Introduce feature for GICv3 CPU
+ interface
+Date: Fri, 12 Jun 2015 12:06:36 +0100
+Message-ID: <1434107197-4919-2-git-send-email-marc.zyngier@arm.com>
+References: <1434107197-4919-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 823C854E8C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jun 2015 06:56:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F01F54E8D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jun 2015 06:56:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wpPWQvH0Ki8J for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id q4wZHC61pvpx for <kvmarm@lists.cs.columbia.edu>;
  Fri, 12 Jun 2015 06:56:26 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF43154E8A
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE06454E89
  for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jun 2015 06:56:25 -0400 (EDT)
+In-Reply-To: <1434107197-4919-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,38 +32,74 @@ To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 Cc: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The current way we deal with the GIC world switch on arm64 is a bit
-convoluted. As we have two possible backends, we rely on a couple of
-indirections set at boot time. These indirection never change, so it
-would make more sense to directly patch in a branch to the right
-function.
+Add a new item to the feature set (ARM64_HAS_SYSREG_GIC_CPUIF)
+to indicate that we have a system register GIC CPU interface
 
-To do this, we introduce a new CPU feature that detect the presence of
-a GICv3 CPU interface. When detected, we patch branches to the GICv3
-save/restore functions that otherwise point to the GICv2 backend.
+This will help KVM switching to alternative instruction patching.
 
-Tested on both GICv2 (Juno, Seattle) and GICv3 (FVP Base model).
-
-These patches have been on the various lists for quite a while as part
-of a series dealing with instruction patching. Now that the
-prerequisite are queued for 4.2, it would make sense for these to be
-merged alongside.
-
-Catalin, would you mind taking them through the arm64 tree?
-
-Marc Zyngier (2):
-  arm64: alternative: Introduce feature for GICv3 CPU interface
-  arm64: KVM: Switch vgic save/restore to alternative_insn
-
- arch/arm/include/asm/kvm_host.h     |  5 -----
+Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Acked-by: Will Deacon <will.deacon@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
  arch/arm64/include/asm/cpufeature.h |  8 +++++++-
- arch/arm64/include/asm/kvm_asm.h    |  5 -----
- arch/arm64/include/asm/kvm_host.h   | 23 -----------------------
- arch/arm64/kernel/asm-offsets.c     |  1 -
  arch/arm64/kernel/cpufeature.c      | 16 ++++++++++++++++
- arch/arm64/kvm/hyp.S                | 18 ++++--------------
- virt/kvm/arm/vgic.c                 |  3 ---
- 8 files changed, 27 insertions(+), 52 deletions(-)
+ 2 files changed, 23 insertions(+), 1 deletion(-)
 
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 82cb9f9..c104421 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -24,8 +24,9 @@
+ #define ARM64_WORKAROUND_CLEAN_CACHE		0
+ #define ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE	1
+ #define ARM64_WORKAROUND_845719			2
++#define ARM64_HAS_SYSREG_GIC_CPUIF		3
+ 
+-#define ARM64_NCAPS				3
++#define ARM64_NCAPS				4
+ 
+ #ifndef __ASSEMBLY__
+ 
+@@ -38,6 +39,11 @@ struct arm64_cpu_capabilities {
+ 			u32 midr_model;
+ 			u32 midr_range_min, midr_range_max;
+ 		};
++
++		struct {	/* Feature register checking */
++			u64 register_mask;
++			u64 register_value;
++		};
+ 	};
+ };
+ 
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 3d9967e..5ad86ce 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -22,7 +22,23 @@
+ #include <asm/cpu.h>
+ #include <asm/cpufeature.h>
+ 
++static bool
++has_id_aa64pfr0_feature(const struct arm64_cpu_capabilities *entry)
++{
++	u64 val;
++
++	val = read_cpuid(id_aa64pfr0_el1);
++	return (val & entry->register_mask) == entry->register_value;
++}
++
+ static const struct arm64_cpu_capabilities arm64_features[] = {
++	{
++		.desc = "GIC system register CPU interface",
++		.capability = ARM64_HAS_SYSREG_GIC_CPUIF,
++		.matches = has_id_aa64pfr0_feature,
++		.register_mask = (0xf << 24),
++		.register_value = (1 << 24),
++	},
+ 	{},
+ };
+ 
 -- 
 2.1.4
