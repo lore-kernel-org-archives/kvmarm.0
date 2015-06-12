@@ -1,101 +1,200 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH 09/13] KVM: arm64: handle pending bit for LPIs in ITS
- emulation
-Date: Thu, 11 Jun 2015 20:24:14 +0200
-Message-ID: <5579D24E.50208@linaro.org>
-References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com> <1432893209-27313-10-git-send-email-andre.przywara@arm.com> <55770D4A.9090801@linaro.org> <5579AD43.6070407@arm.com> <5579B0EA.1090701@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH 2/2] arm64: KVM: Switch vgic save/restore to alternative_insn
+Date: Fri, 12 Jun 2015 12:06:37 +0100
+Message-ID: <1434107197-4919-3-git-send-email-marc.zyngier@arm.com>
+References: <1434107197-4919-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <5579B0EA.1090701@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
-Cc: "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5194554E8A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jun 2015 06:56:28 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id BYgAtpfPOpN0 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 12 Jun 2015 06:56:26 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AB5CB54E8B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jun 2015 06:56:26 -0400 (EDT)
+In-Reply-To: <1434107197-4919-1-git-send-email-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/11/2015 06:01 PM, Marc Zyngier wrote:
-> On 11/06/15 16:46, Andre Przywara wrote:
->> Salut Eric,
->>
->> On 06/09/2015 04:59 PM, Eric Auger wrote:
->>> On 05/29/2015 11:53 AM, Andre Przywara wrote:
->>>> As the actual LPI number in a guest can be quite high, but is mostly
->>>> assigned using a very sparse allocation scheme, bitmaps and arrays
->>>> for storing the virtual interrupt status are a waste of memory.
->>>> We use our equivalent of the "Interrupt Translation Table Entry"
->>>> (ITTE) to hold this extra status information for a virtual LPI.
->>>> As the normal VGIC code cannot use it's fancy bitmaps to manage
->>>> pending interrupts, we provide a hook in the VGIC code to let the
->>>> ITS emulation handle the list register queueing itself.
->>>> LPIs are located in a separate number range (>=8192), so
->>>> distinguishing them is easy. With LPIs being only edge-triggered, we
->>>> get away with a less complex IRQ handling.
->>>>
->>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>>> ---
->>>>  include/kvm/arm_vgic.h      |  2 ++
->>>>  virt/kvm/arm/its-emul.c     | 66 +++++++++++++++++++++++++++++++++++++++++++
->>>>  virt/kvm/arm/its-emul.h     |  3 ++
->>>>  virt/kvm/arm/vgic-v3-emul.c |  2 ++
->>>>  virt/kvm/arm/vgic.c         | 68 +++++++++++++++++++++++++++++++++------------
->>>>  5 files changed, 124 insertions(+), 17 deletions(-)
->>>>
->>>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->>>> index fa17df6..de19c34 100644
->>>> --- a/include/kvm/arm_vgic.h
->>>> +++ b/include/kvm/arm_vgic.h
->>>> @@ -147,6 +147,8 @@ struct vgic_vm_ops {
->>>>  	int	(*init_model)(struct kvm *);
->>>>  	void	(*destroy_model)(struct kvm *);
->>>>  	int	(*map_resources)(struct kvm *, const struct vgic_params *);
->>>> +	bool	(*queue_lpis)(struct kvm_vcpu *);
->>>> +	void	(*unqueue_lpi)(struct kvm_vcpu *, int irq);
->>>>  };
->>>>  
->>>>  struct vgic_io_device {
->>>> diff --git a/virt/kvm/arm/its-emul.c b/virt/kvm/arm/its-emul.c
->>>> index f0f4a9c..f75fb9e 100644
->>>> --- a/virt/kvm/arm/its-emul.c
->>>> +++ b/virt/kvm/arm/its-emul.c
->>>> @@ -50,8 +50,26 @@ struct its_itte {
->>>>  	struct its_collection *collection;
->>>>  	u32 lpi;
->>>>  	u32 event_id;
->>>> +	bool enabled;
->>>> +	unsigned long *pending;
->>> allocated in later patch. does not ease the review of the life cycle but
->>> I guess it is accepted/acceptable.
->>
->> I tried to move some bits around a bit and ran into several issues, so I
->> guess we have to live with that.
->>
->>> Isn't it somehow redundant to have a bitmap here where the collection
->>> already indicates the target cpu id on which the LPI is pending?
->>
->> Unfortunately only "somewhat", as Marc taught me the other day ;-)
->> First, the spec shows that the pending bitmap is allocated _per CPU_, so
->> we have to model this here appropriately.
->> Second, you could have an LPI pending on one distributor, then change
->> the associated collection to another distributor and trigger that
->> interrupt again. This would make it pending on two VCPUs.
->> Admittedly not the most prominent use case, but possible.
-> 
-> The exact scenario is related to the MOVI command, which changes the
-> affinity of the interrupt and also move any pending state from another
-> CPU. There is no guarantee that these two actions are completed
-> atomically w.r.t the delivery of interrupts to CPUs.
-> 
-> We *could* make it atomic, but that would be quite heavy handed.
+So far, we configured the world-switch by having a small array
+of pointers to the save and restore functions, depending on the
+GIC used on the platform.
 
-OK thanks,
+Loading these values each time is a bit silly (they never change),
+and it makes sense to rely on the instruction patching instead.
 
-The ITS command chapter is my next one ;-)
+This leads to a nice cleanup of the code.
 
-Best Regards
+Acked-by: Will Deacon <will.deacon@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/include/asm/kvm_host.h   |  5 -----
+ arch/arm64/include/asm/kvm_asm.h  |  5 -----
+ arch/arm64/include/asm/kvm_host.h | 23 -----------------------
+ arch/arm64/kernel/asm-offsets.c   |  1 -
+ arch/arm64/kvm/hyp.S              | 18 ++++--------------
+ virt/kvm/arm/vgic.c               |  3 ---
+ 6 files changed, 4 insertions(+), 51 deletions(-)
 
-Eric
-> 
-> 	M.
-> 
-
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index d71607c..e896d2c 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -218,11 +218,6 @@ static inline int kvm_arch_dev_ioctl_check_extension(long ext)
+ 	return 0;
+ }
+ 
+-static inline void vgic_arch_setup(const struct vgic_params *vgic)
+-{
+-	BUG_ON(vgic->type != VGIC_V2);
+-}
+-
+ int kvm_perf_init(void);
+ int kvm_perf_teardown(void);
+ 
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 4f7310f..d13bc5e 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -132,11 +132,6 @@ extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+ 
+ extern u64 __vgic_v3_get_ich_vtr_el2(void);
+ 
+-extern char __save_vgic_v2_state[];
+-extern char __restore_vgic_v2_state[];
+-extern char __save_vgic_v3_state[];
+-extern char __restore_vgic_v3_state[];
+-
+ #endif
+ 
+ #endif /* __ARM_KVM_ASM_H__ */
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index f0f58c9..2709db2 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -221,29 +221,6 @@ struct vgic_sr_vectors {
+ 	void	*restore_vgic;
+ };
+ 
+-static inline void vgic_arch_setup(const struct vgic_params *vgic)
+-{
+-	extern struct vgic_sr_vectors __vgic_sr_vectors;
+-
+-	switch(vgic->type)
+-	{
+-	case VGIC_V2:
+-		__vgic_sr_vectors.save_vgic	= __save_vgic_v2_state;
+-		__vgic_sr_vectors.restore_vgic	= __restore_vgic_v2_state;
+-		break;
+-
+-#ifdef CONFIG_ARM_GIC_V3
+-	case VGIC_V3:
+-		__vgic_sr_vectors.save_vgic	= __save_vgic_v3_state;
+-		__vgic_sr_vectors.restore_vgic	= __restore_vgic_v3_state;
+-		break;
+-#endif
+-
+-	default:
+-		BUG();
+-	}
+-}
+-
+ static inline void kvm_arch_hardware_disable(void) {}
+ static inline void kvm_arch_hardware_unsetup(void) {}
+ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+index da675cc..c99701a 100644
+--- a/arch/arm64/kernel/asm-offsets.c
++++ b/arch/arm64/kernel/asm-offsets.c
+@@ -127,7 +127,6 @@ int main(void)
+   DEFINE(VCPU_VGIC_CPU,		offsetof(struct kvm_vcpu, arch.vgic_cpu));
+   DEFINE(VGIC_SAVE_FN,		offsetof(struct vgic_sr_vectors, save_vgic));
+   DEFINE(VGIC_RESTORE_FN,	offsetof(struct vgic_sr_vectors, restore_vgic));
+-  DEFINE(VGIC_SR_VECTOR_SZ,	sizeof(struct vgic_sr_vectors));
+   DEFINE(VGIC_V2_CPU_HCR,	offsetof(struct vgic_cpu, vgic_v2.vgic_hcr));
+   DEFINE(VGIC_V2_CPU_VMCR,	offsetof(struct vgic_cpu, vgic_v2.vgic_vmcr));
+   DEFINE(VGIC_V2_CPU_MISR,	offsetof(struct vgic_cpu, vgic_v2.vgic_misr));
+diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+index 5befd01..f1f6d90 100644
+--- a/arch/arm64/kvm/hyp.S
++++ b/arch/arm64/kvm/hyp.S
+@@ -17,8 +17,10 @@
+ 
+ #include <linux/linkage.h>
+ 
++#include <asm/alternative.h>
+ #include <asm/asm-offsets.h>
+ #include <asm/assembler.h>
++#include <asm/cpufeature.h>
+ #include <asm/debug-monitors.h>
+ #include <asm/esr.h>
+ #include <asm/fpsimdmacros.h>
+@@ -808,10 +810,7 @@
+  * Call into the vgic backend for state saving
+  */
+ .macro save_vgic_state
+-	adr	x24, __vgic_sr_vectors
+-	ldr	x24, [x24, VGIC_SAVE_FN]
+-	kern_hyp_va	x24
+-	blr	x24
++	alternative_insn "bl __save_vgic_v2_state", "bl __save_vgic_v3_state", ARM64_HAS_SYSREG_GIC_CPUIF
+ 	mrs	x24, hcr_el2
+ 	mov	x25, #HCR_INT_OVERRIDE
+ 	neg	x25, x25
+@@ -828,10 +827,7 @@
+ 	orr	x24, x24, #HCR_INT_OVERRIDE
+ 	orr	x24, x24, x25
+ 	msr	hcr_el2, x24
+-	adr	x24, __vgic_sr_vectors
+-	ldr	x24, [x24, #VGIC_RESTORE_FN]
+-	kern_hyp_va	x24
+-	blr	x24
++	alternative_insn "bl __restore_vgic_v2_state", "bl __restore_vgic_v3_state", ARM64_HAS_SYSREG_GIC_CPUIF
+ .endm
+ 
+ .macro save_timer_state
+@@ -1062,12 +1058,6 @@ ENTRY(__kvm_flush_vm_context)
+ 	ret
+ ENDPROC(__kvm_flush_vm_context)
+ 
+-	// struct vgic_sr_vectors __vgi_sr_vectors;
+-	.align 3
+-ENTRY(__vgic_sr_vectors)
+-	.skip	VGIC_SR_VECTOR_SZ
+-ENDPROC(__vgic_sr_vectors)
+-
+ __kvm_hyp_panic:
+ 	// Guess the context by looking at VTTBR:
+ 	// If zero, then we're already a host.
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 78fb820..003ba74 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -2128,9 +2128,6 @@ int kvm_vgic_hyp_init(void)
+ 		goto out_free_irq;
+ 	}
+ 
+-	/* Callback into for arch code for setup */
+-	vgic_arch_setup(vgic);
+-
+ 	on_each_cpu(vgic_init_maintenance_interrupt, NULL, 1);
+ 
+ 	return 0;
+-- 
+2.1.4
