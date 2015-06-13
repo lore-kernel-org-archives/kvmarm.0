@@ -1,34 +1,28 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH 01/13] KVM: arm/arm64: VGIC: don't track used LRs in the
- distributor
-Date: Fri, 12 Jun 2015 19:23:34 +0200
-Message-ID: <557B1596.4060901@linaro.org>
-References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com>
- <1432893209-27313-2-git-send-email-andre.przywara@arm.com>
+From: Mario Smarduch <m.smarduch@samsung.com>
+Subject: [PATCH] arm64: KVM: Optimize arm64 guest exit VFP/SIMD register
+ save/restore
+Date: Sat, 13 Jun 2015 15:20:52 -0700
+Message-ID: <557CACC4.8040405@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F9C854F25
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jun 2015 13:13:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E42B454F07
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 13 Jun 2015 18:10:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5sMQiOP6xk1E for <kvmarm@lists.cs.columbia.edu>;
- Fri, 12 Jun 2015 13:13:23 -0400 (EDT)
-Received: from mail-wi0-f178.google.com (mail-wi0-f178.google.com
- [209.85.212.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8A3FD54F24
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jun 2015 13:13:23 -0400 (EDT)
-Received: by wibdq8 with SMTP id dq8so23092394wib.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 12 Jun 2015 10:23:48 -0700 (PDT)
-Received: from [192.168.2.12] (LCaen-156-56-7-90.w80-11.abo.wanadoo.fr.
- [80.11.198.90])
- by mx.google.com with ESMTPSA id lu5sm6733700wjb.9.2015.06.12.10.23.46
- for <kvmarm@lists.cs.columbia.edu>
- (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 12 Jun 2015 10:23:47 -0700 (PDT)
-In-Reply-To: <1432893209-27313-2-git-send-email-andre.przywara@arm.com>
+ with ESMTP id tJ5GWsCDWXyy for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 13 Jun 2015 18:10:41 -0400 (EDT)
+Received: from usmailout2.samsung.com (mailout2.w2.samsung.com
+ [211.189.100.12])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D5C3354EED
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 13 Jun 2015 18:10:41 -0400 (EDT)
+Received: from uscpsbgex1.samsung.com
+ (u122.gpu85.samsung.co.kr [203.254.195.122]) by mailout2.w2.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NPW00DTCM39CL20@mailout2.w2.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Sat, 13 Jun 2015 18:21:09 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -38,391 +32,178 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
+To: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
-On 05/29/2015 11:53 AM, Andre Przywara wrote:
-> Currently we track which IRQ has been mapped to which VGIC list
-> register and also have to synchronize both. We used to do this
-> to hold some extra state (for instance the active bit).
-> It turns out that this extra state in the LRs is no longer needed and
-> this extra tracking causes some pain later.
-> Remove the tracking feature (lr_map and lr_used) and get rid of
-> quite some code on the way.
-> On a guest exit we pick up all still pending IRQs from the LRs and put
-> them back in the distributor. We don't care about active-only IRQs,
-> so we keep them in the LRs. They will be retired either by our
-> vgic_process_maintenance() routine or by the GIC hardware in case of
-> edge triggered interrupts.
-> In places where we scan LRs we now use our shadow copy of the ELRSR
-> register directly.
-> This code change means we lose the "piggy-back" optimization, which
-> would re-use an active-only LR to inject the pending state on top of
-> it. Tracing with various workloads shows that this actually occurred
-> very rarely, the ballpark figure is about once every 10,000 exits
-> in a disk I/O heavy workload. Also the list registers don't seem to
-> as scarce as assumed,
-needs rewording
- with all 4 LRs on the popular implementations
-> used less than once every 100,000 exits.
-> 
-> This has been briefly tested on Midway, Juno and the model (the latter
-> both with GICv2 and GICv3 guests).
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  include/kvm/arm_vgic.h |   6 ---
->  virt/kvm/arm/vgic-v2.c |   1 +
->  virt/kvm/arm/vgic-v3.c |   1 +
->  virt/kvm/arm/vgic.c    | 143 ++++++++++++++++++++++---------------------------
->  4 files changed, 66 insertions(+), 85 deletions(-)
-> 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 133ea00..2ccfa9a 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -279,9 +279,6 @@ struct vgic_v3_cpu_if {
->  };
->  
->  struct vgic_cpu {
-> -	/* per IRQ to LR mapping */
-> -	u8		*vgic_irq_lr_map;
-> -
->  	/* Pending/active/both interrupts on this VCPU */
->  	DECLARE_BITMAP(	pending_percpu, VGIC_NR_PRIVATE_IRQS);
->  	DECLARE_BITMAP(	active_percpu, VGIC_NR_PRIVATE_IRQS);
-> @@ -292,9 +289,6 @@ struct vgic_cpu {
->  	unsigned long   *active_shared;
->  	unsigned long   *pend_act_shared;
->  
-> -	/* Bitmap of used/free list registers */
-> -	DECLARE_BITMAP(	lr_used, VGIC_V2_MAX_LRS);
-> -
->  	/* Number of list registers on this CPU */
->  	int		nr_lr;
->  
-> diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
-> index f9b9c7c..f723710 100644
-> --- a/virt/kvm/arm/vgic-v2.c
-> +++ b/virt/kvm/arm/vgic-v2.c
-> @@ -144,6 +144,7 @@ static void vgic_v2_enable(struct kvm_vcpu *vcpu)
->  	 * anyway.
->  	 */
->  	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = 0;
-> +	vcpu->arch.vgic_cpu.vgic_v2.vgic_elrsr = ~0;
->  
->  	/* Get the show on the road... */
->  	vcpu->arch.vgic_cpu.vgic_v2.vgic_hcr = GICH_HCR_EN;
-> diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
-> index dff0602..21e5d28 100644
-> --- a/virt/kvm/arm/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic-v3.c
-> @@ -178,6 +178,7 @@ static void vgic_v3_enable(struct kvm_vcpu *vcpu)
->  	 * anyway.
->  	 */
->  	vgic_v3->vgic_vmcr = 0;
-> +	vgic_v3->vgic_elrsr = ~0;
->  
->  	/*
->  	 * If we are emulating a GICv3, we do it in an non-GICv2-compatible
-> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> index 78fb820..037b723 100644
-> --- a/virt/kvm/arm/vgic.c
-> +++ b/virt/kvm/arm/vgic.c
-> @@ -81,7 +81,6 @@
->  #include "vgic.h"
->  
->  static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu);
-> -static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu);
->  static struct vgic_lr vgic_get_lr(const struct kvm_vcpu *vcpu, int lr);
->  static void vgic_set_lr(struct kvm_vcpu *vcpu, int lr, struct vgic_lr lr_desc);
->  
-> @@ -649,6 +648,17 @@ bool vgic_handle_cfg_reg(u32 *reg, struct kvm_exit_mmio *mmio,
->  	return false;
->  }
->  
-> +static void vgic_sync_lr_elrsr(struct kvm_vcpu *vcpu, int lr,
-> +			       struct vgic_lr vlr)
-> +{
-> +	vgic_ops->sync_lr_elrsr(vcpu, lr, vlr);
-> +}
-> +
-> +static inline u64 vgic_get_elrsr(struct kvm_vcpu *vcpu)
-> +{
-> +	return vgic_ops->get_elrsr(vcpu);
-> +}
-> +
->  /**
->   * vgic_unqueue_irqs - move pending/active IRQs from LRs to the distributor
->   * @vgic_cpu: Pointer to the vgic_cpu struct holding the LRs
-> @@ -660,9 +670,11 @@ bool vgic_handle_cfg_reg(u32 *reg, struct kvm_exit_mmio *mmio,
->  void vgic_unqueue_irqs(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> +	u64 elrsr = vgic_get_elrsr(vcpu);
-> +	unsigned long *elrsr_ptr = u64_to_bitmask(&elrsr);
->  	int i;
->  
-> -	for_each_set_bit(i, vgic_cpu->lr_used, vgic_cpu->nr_lr) {
-> +	for_each_clear_bit(i, elrsr_ptr, vgic_cpu->nr_lr) {
->  		struct vgic_lr lr = vgic_get_lr(vcpu, i);
->  
-can't we remove
-			lr.state &= ~LR_STATE_PENDING;
-			lr.state &= ~LR_STATE_ACTIVE;
-			BUG_ON(lr.state & LR_STATE_MASK);
-and simply replace by lr.state = 0
+Currently VFP/SIMD registers are always saved and restored
+on Guest entry and exit.
+
+This patch only saves and restores VFP/SIMD registers on
+Guest access. To do this cptr_el2 VFP/SIMD trap is set
+on Guest entry and later checked on exit. This follows
+the ARMv7 VFPv3 implementation. Running an informal test
+there are high number of exits that don't access VFP/SIMD
+registers.
+
+Tested on FVP Model, executed threads on host and
+Guest accessing VFP/SIMD registers resulting in consistent
+results.
 
 
->  		/*
-> @@ -705,7 +717,7 @@ void vgic_unqueue_irqs(struct kvm_vcpu *vcpu)
->  		 * Mark the LR as free for other use.
->  		 */
->  		BUG_ON(lr.state & LR_STATE_MASK);
-> -		vgic_retire_lr(i, lr.irq, vcpu);
-> +		vgic_sync_lr_elrsr(vcpu, i, lr);
->  		vgic_irq_clear_queued(vcpu, lr.irq);
->  
->  		/* Finally update the VGIC state. */
-> @@ -1013,17 +1025,6 @@ static void vgic_set_lr(struct kvm_vcpu *vcpu, int lr,
->  	vgic_ops->set_lr(vcpu, lr, vlr);
->  }
->  
-> -static void vgic_sync_lr_elrsr(struct kvm_vcpu *vcpu, int lr,
-> -			       struct vgic_lr vlr)
-> -{
-> -	vgic_ops->sync_lr_elrsr(vcpu, lr, vlr);
-> -}
-> -
-> -static inline u64 vgic_get_elrsr(struct kvm_vcpu *vcpu)
-> -{
-> -	return vgic_ops->get_elrsr(vcpu);
-> -}
-> -
->  static inline u64 vgic_get_eisr(struct kvm_vcpu *vcpu)
->  {
->  	return vgic_ops->get_eisr(vcpu);
-> @@ -1064,18 +1065,6 @@ static inline void vgic_enable(struct kvm_vcpu *vcpu)
->  	vgic_ops->enable(vcpu);
->  }
->  
-> -static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu)
-> -{
-> -	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> -	struct vgic_lr vlr = vgic_get_lr(vcpu, lr_nr);
-> -
-> -	vlr.state = 0;
-> -	vgic_set_lr(vcpu, lr_nr, vlr);
-> -	clear_bit(lr_nr, vgic_cpu->lr_used);
-> -	vgic_cpu->vgic_irq_lr_map[irq] = LR_EMPTY;
-> -	vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
-> -}
-> -
->  /*
->   * An interrupt may have been disabled after being made pending on the
->   * CPU interface (the classic case is a timer running while we're
-> @@ -1087,23 +1076,32 @@ static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu)
->   */
->  static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu)
->  {
-> -	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> +	u64 elrsr = vgic_get_elrsr(vcpu);
-> +	unsigned long *elrsr_ptr = u64_to_bitmask(&elrsr);
->  	int lr;
-> +	struct vgic_lr vlr;
->  
-> -	for_each_set_bit(lr, vgic_cpu->lr_used, vgic->nr_lr) {
-> -		struct vgic_lr vlr = vgic_get_lr(vcpu, lr);
-> +	for_each_clear_bit(lr, elrsr_ptr, vgic->nr_lr) {
-> +		vlr = vgic_get_lr(vcpu, lr);
->  
->  		if (!vgic_irq_is_enabled(vcpu, vlr.irq)) {
-> -			vgic_retire_lr(lr, vlr.irq, vcpu);
-> -			if (vgic_irq_is_queued(vcpu, vlr.irq))
-> -				vgic_irq_clear_queued(vcpu, vlr.irq);
-> +			vlr.state = 0;
-> +			vgic_set_lr(vcpu, lr, vlr);
-> +			vgic_sync_lr_elrsr(vcpu, lr, vlr);
-> +			vgic_irq_clear_queued(vcpu, vlr.irq);
->  		}
->  	}
->  }
->  
->  static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
-> -				 int lr_nr, struct vgic_lr vlr)
-> +				 int lr_nr, int sgi_source_id)
->  {
-> +	struct vgic_lr vlr;
-> +
-> +	vlr.state = 0;
-> +	vlr.irq = irq;
-> +	vlr.source = sgi_source_id;
-> +
->  	if (vgic_irq_is_active(vcpu, irq)) {
->  		vlr.state |= LR_STATE_ACTIVE;
->  		kvm_debug("Set active, clear distributor: 0x%x\n", vlr.state);
-> @@ -1128,9 +1126,9 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
->   */
->  bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq)
->  {
-> -	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> -	struct vgic_lr vlr;
-> +	u64 elrsr = vgic_get_elrsr(vcpu);
-> +	unsigned long *elrsr_ptr = u64_to_bitmask(&elrsr);
->  	int lr;
->  
->  	/* Sanitize the input... */
-> @@ -1140,42 +1138,20 @@ bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq)
->  
->  	kvm_debug("Queue IRQ%d\n", irq);
->  
-> -	lr = vgic_cpu->vgic_irq_lr_map[irq];
-> -
-> -	/* Do we have an active interrupt for the same CPUID? */
-> -	if (lr != LR_EMPTY) {
-> -		vlr = vgic_get_lr(vcpu, lr);
-> -		if (vlr.source == sgi_source_id) {
-> -			kvm_debug("LR%d piggyback for IRQ%d\n", lr, vlr.irq);
-> -			BUG_ON(!test_bit(lr, vgic_cpu->lr_used));
-> -			vgic_queue_irq_to_lr(vcpu, irq, lr, vlr);
-> -			return true;
-> -		}
-> -	}
-> +	lr = find_first_bit(elrsr_ptr, vgic->nr_lr);
->  
-> -	/* Try to use another LR for this interrupt */
-> -	lr = find_first_zero_bit((unsigned long *)vgic_cpu->lr_used,
-> -			       vgic->nr_lr);
->  	if (lr >= vgic->nr_lr)
->  		return false;
->  
->  	kvm_debug("LR%d allocated for IRQ%d %x\n", lr, irq, sgi_source_id);
-> -	vgic_cpu->vgic_irq_lr_map[irq] = lr;
-> -	set_bit(lr, vgic_cpu->lr_used);
->  
-> -	vlr.irq = irq;
-> -	vlr.source = sgi_source_id;
-> -	vlr.state = 0;
-> -	vgic_queue_irq_to_lr(vcpu, irq, lr, vlr);
-> +	vgic_queue_irq_to_lr(vcpu, irq, lr, sgi_source_id);
->  
->  	return true;
->  }
->  
->  static bool vgic_queue_hwirq(struct kvm_vcpu *vcpu, int irq)
->  {
-> -	if (!vgic_can_sample_irq(vcpu, irq))
-> -		return true; /* level interrupt, already queued */
-> -
-hum. Why is it part of this patch? how do you justify that change
-related to the state machine?
->  	if (vgic_queue_irq(vcpu, 0, irq)) {
->  		if (vgic_irq_is_edge(vcpu, irq)) {
->  			vgic_dist_irq_clear_pending(vcpu, irq);
-> @@ -1348,29 +1324,44 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
->  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->  	u64 elrsr;
->  	unsigned long *elrsr_ptr;
-> -	int lr, pending;
-> -	bool level_pending;
-why removing level_. Reminds that maintenance IRQ are attached to level
-sensitive IRQs?
-> +	struct vgic_lr vlr;
-> +	int lr_nr;
-> +	bool pending;
-> +
-> +	pending = vgic_process_maintenance(vcpu);
->  
-> -	level_pending = vgic_process_maintenance(vcpu);
->  	elrsr = vgic_get_elrsr(vcpu);
->  	elrsr_ptr = u64_to_bitmask(&elrsr);
->  
-> -	/* Clear mappings for empty LRs */
-> -	for_each_set_bit(lr, elrsr_ptr, vgic->nr_lr) {
-> -		struct vgic_lr vlr;
-> +	for_each_clear_bit(lr_nr, elrsr_ptr, vgic_cpu->nr_lr) {
-> +		vlr = vgic_get_lr(vcpu, lr_nr);
-> +
-> +		BUG_ON(!(vlr.state & LR_STATE_MASK));
-> +		pending = true;
->  
-> -		if (!test_and_clear_bit(lr, vgic_cpu->lr_used))
-> +		/* Reestablish SGI source for pending and active SGIs */
-> +		if (vlr.irq < VGIC_NR_SGIS)
-> +			add_sgi_source(vcpu, vlr.irq, vlr.source);
-don't get this
-> +
-> +		/*
-> +		 * If the LR holds a pure active (10) interrupt then keep it
-> +		 * in the LR without mirroring this status in the emulation.
-> +		 */
-> +		if (vlr.state == LR_STATE_ACTIVE)
->  			continue;
-I am lost here. Aren't we looking at an empty LR? We have a
-BUG_ON(!(vlr.state & LR_STATE_MASK)); above
->  
-> -		vlr = vgic_get_lr(vcpu, lr);
-> +		if (vlr.state & LR_STATE_PENDING)
-> +			vgic_dist_irq_set_pending(vcpu, vlr.irq);
-same
->  
-> -		BUG_ON(vlr.irq >= dist->nr_irqs);
-> -		vgic_cpu->vgic_irq_lr_map[vlr.irq] = LR_EMPTY;
-> +		/* Mark this LR as empty now. */
-> +		vlr.state = 0;
-> +		vgic_set_lr(vcpu, lr_nr, vlr);
-> +		vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
->  	}
-> +	vgic_update_state(vcpu->kvm);
->  
-> -	/* Check if we still have something up our sleeve... */
-> -	pending = find_first_zero_bit(elrsr_ptr, vgic->nr_lr);
-> -	if (level_pending || pending < vgic->nr_lr)
-> +	/* vgic_update_state would not cover only-active IRQs */
-> +	if (pending)
->  		set_bit(vcpu->vcpu_id, dist->irq_pending_on_cpu);
-Well overall I am too tired to understand the above changes but maybe
-this is the right time to say "bon week end" to you ;-)
+Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+---
+ arch/arm64/include/asm/kvm_arm.h |  5 +++-
+ arch/arm64/kvm/hyp.S             | 57
++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 57 insertions(+), 5 deletions(-)
 
-Overall impressed by the series nethertheless!
+diff --git a/arch/arm64/include/asm/kvm_arm.h
+b/arch/arm64/include/asm/kvm_arm.h
+index ac6fafb..7605e09 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -171,10 +171,13 @@
+ #define HSTR_EL2_TTEE	(1 << 16)
+ #define HSTR_EL2_T(x)	(1 << x)
 
-Best Regards
++/* Hyp Coproccessor Trap Register Shifts */
++#define CPTR_EL2_TFP_SHIFT 10
++
+ /* Hyp Coprocessor Trap Register */
+ #define CPTR_EL2_TCPAC	(1 << 31)
+ #define CPTR_EL2_TTA	(1 << 20)
+-#define CPTR_EL2_TFP	(1 << 10)
++#define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
 
-Eric
->  }
->  
-> @@ -1592,11 +1583,9 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
->  	kfree(vgic_cpu->pending_shared);
->  	kfree(vgic_cpu->active_shared);
->  	kfree(vgic_cpu->pend_act_shared);
-> -	kfree(vgic_cpu->vgic_irq_lr_map);
->  	vgic_cpu->pending_shared = NULL;
->  	vgic_cpu->active_shared = NULL;
->  	vgic_cpu->pend_act_shared = NULL;
-> -	vgic_cpu->vgic_irq_lr_map = NULL;
->  }
->  
->  static int vgic_vcpu_init_maps(struct kvm_vcpu *vcpu, int nr_irqs)
-> @@ -1607,18 +1596,14 @@ static int vgic_vcpu_init_maps(struct kvm_vcpu *vcpu, int nr_irqs)
->  	vgic_cpu->pending_shared = kzalloc(sz, GFP_KERNEL);
->  	vgic_cpu->active_shared = kzalloc(sz, GFP_KERNEL);
->  	vgic_cpu->pend_act_shared = kzalloc(sz, GFP_KERNEL);
-> -	vgic_cpu->vgic_irq_lr_map = kmalloc(nr_irqs, GFP_KERNEL);
->  
->  	if (!vgic_cpu->pending_shared
->  		|| !vgic_cpu->active_shared
-> -		|| !vgic_cpu->pend_act_shared
-> -		|| !vgic_cpu->vgic_irq_lr_map) {
-> +		|| !vgic_cpu->pend_act_shared) {
->  		kvm_vgic_vcpu_destroy(vcpu);
->  		return -ENOMEM;
->  	}
->  
-> -	memset(vgic_cpu->vgic_irq_lr_map, LR_EMPTY, nr_irqs);
-> -
->  	/*
->  	 * Store the number of LRs per vcpu, so we don't have to go
->  	 * all the way to the distributor structure to find out. Only
-> 
+ /* Hyp Debug Configuration Register bits */
+ #define MDCR_EL2_TDRA		(1 << 11)
+diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+index 5befd01..b3044b4 100644
+--- a/arch/arm64/kvm/hyp.S
++++ b/arch/arm64/kvm/hyp.S
+@@ -673,6 +673,24 @@
+ 	tbz	\tmp, #KVM_ARM64_DEBUG_DIRTY_SHIFT, \target
+ .endm
+
++/*
++ * Check cptr VFP/SIMD accessed bit, if set VFP/SIMD not accessed by guest.
++ */
++.macro skip_fpsimd_state tmp, target
++	mrs	\tmp, cptr_el2
++	tbnz	\tmp, #CPTR_EL2_TFP_SHIFT, \target
++.endm
++
++/*
++ * Check cptr VFP/SIMD accessed bit if set, VFP/SIMD not accessed by guest.
++ * Also disable all cptr traps on return to host.
++ */
++.macro skip_fpsimd_state_reset tmp, target
++	mrs	\tmp, cptr_el2
++	msr	cptr_el2, xzr
++	tbnz	\tmp, #CPTR_EL2_TFP_SHIFT, \target
++.endm
++
+ .macro compute_debug_state target
+ 	// Compute debug state: If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY
+ 	// is set, we do a full save/restore cycle and disable trapping.
+@@ -763,6 +781,7 @@
+ 	ldr     x2, [x0, #VCPU_HCR_EL2]
+ 	msr     hcr_el2, x2
+ 	mov	x2, #CPTR_EL2_TTA
++	orr	x2, x2, #CPTR_EL2_TFP
+ 	msr	cptr_el2, x2
+
+ 	mov	x2, #(1 << 15)	// Trap CP15 Cr=15
+@@ -785,7 +804,6 @@
+ .macro deactivate_traps
+ 	mov	x2, #HCR_RW
+ 	msr	hcr_el2, x2
+-	msr	cptr_el2, xzr
+ 	msr	hstr_el2, xzr
+
+ 	mrs	x2, mdcr_el2
+@@ -911,6 +929,30 @@ __save_fpsimd:
+ __restore_fpsimd:
+ 	restore_fpsimd
+ 	ret
++/*
++ * On Guest VFP/SIMD access, switch Guest/Host registers and reset cptr
+access
++ * bit to disable trapping.
++ */
++switch_to_guest_vfp:
++	ldr	x2, =(CPTR_EL2_TTA)
++	msr	cptr_el2, x2
++
++	mrs	x0, tpidr_el2
++
++	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
++	kern_hyp_va x2
++
++	add	x3, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
++	fpsimd_save x3, 1
++
++	add	x2, x0, #VCPU_CONTEXT
++	add	x3, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
++	fpsimd_restore x3, 1
++
++	pop	x2, x3
++	pop	x0, x1
++
++	eret
+
+ /*
+  * u64 __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+@@ -932,7 +974,6 @@ ENTRY(__kvm_vcpu_run)
+ 	kern_hyp_va x2
+
+ 	save_host_regs
+-	bl __save_fpsimd
+ 	bl __save_sysregs
+
+ 	compute_debug_state 1f
+@@ -948,7 +989,6 @@ ENTRY(__kvm_vcpu_run)
+ 	add	x2, x0, #VCPU_CONTEXT
+
+ 	bl __restore_sysregs
+-	bl __restore_fpsimd
+
+ 	skip_debug_state x3, 1f
+ 	bl	__restore_debug
+@@ -967,7 +1007,9 @@ __kvm_vcpu_return:
+ 	add	x2, x0, #VCPU_CONTEXT
+
+ 	save_guest_regs
++	skip_fpsimd_state x3, 1f
+ 	bl __save_fpsimd
++1:
+ 	bl __save_sysregs
+
+ 	skip_debug_state x3, 1f
+@@ -986,8 +1028,11 @@ __kvm_vcpu_return:
+ 	kern_hyp_va x2
+
+ 	bl __restore_sysregs
+-	bl __restore_fpsimd
+
++	/* Disable cptr VFP/SIMD access bit, skip restore if VFP not accessed */
++	skip_fpsimd_state_reset x3, 1f
++	bl __restore_fpsimd
++1:
+ 	skip_debug_state x3, 1f
+ 	// Clear the dirty flag for the next run, as all the state has
+ 	// already been saved. Note that we nuke the whole 64bit word.
+@@ -1166,6 +1211,10 @@ el1_sync:					// Guest trapped into EL2
+ 	mrs	x1, esr_el2
+ 	lsr	x2, x1, #ESR_ELx_EC_SHIFT
+
++	/* Guest accessed VFP/SIMD registers, save host, restore Guest */
++	cmp	x2, #ESR_ELx_EC_FP_ASIMD
++	b.eq	switch_to_guest_vfp
++
+ 	cmp	x2, #ESR_ELx_EC_HVC64
+ 	b.ne	el1_trap
+
+-- 
+1.9.1
