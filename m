@@ -1,115 +1,79 @@
 From: zichao <zhichao.huang@linaro.org>
-Subject: Re: [PATCH v2 01/11] KVM: arm: plug guest debug exploit
-Date: Mon, 15 Jun 2015 00:13:05 +0800
-Message-ID: <557DA811.8090705@linaro.org>
-References: <1433046432-1824-1-git-send-email-zhichao.huang@linaro.org> <1433046432-1824-2-git-send-email-zhichao.huang@linaro.org> <556C3A68.8050903@arm.com> <557449EA.7040003@linaro.org> <5576BFF7.3070706@arm.com> <557DA6E4.7090609@linaro.org>
+Subject: Re: [PATCH v2 04/11] KVM: arm: common infrastructure for handling
+ AArch32 CP14/CP15
+Date: Mon, 15 Jun 2015 00:17:23 +0800
+Message-ID: <557DA913.5030205@linaro.org>
+References: <1433046432-1824-1-git-send-email-zhichao.huang@linaro.org>
+ <1433046432-1824-5-git-send-email-zhichao.huang@linaro.org>
+ <87y4jt6tyw.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <557DA6E4.7090609@linaro.org>
-Sender: stable-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>, Will Deacon <Will.Deacon@arm.com>
-Cc: "huangzhichao@huawei.com" <huangzhichao@huawei.com>, "stable@vger.kernel.org" <stable@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A870A54F72
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 14 Jun 2015 12:07:01 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 7Bnia7tO-qIY for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 14 Jun 2015 12:07:00 -0400 (EDT)
+Received: from mail-pa0-f51.google.com (mail-pa0-f51.google.com
+ [209.85.220.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B3B0C54F53
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 14 Jun 2015 12:07:00 -0400 (EDT)
+Received: by padev16 with SMTP id ev16so50312962pad.0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 14 Jun 2015 09:17:30 -0700 (PDT)
+In-Reply-To: <87y4jt6tyw.fsf@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, will.deacon@arm.com, huangzhichao@huawei.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi, Will,
-
-I and marc are talking about how to plug the guest debug exploit in an easier way.
-
-I remembered that you mentioned disabling monitor mode had proven to be extremely fragile
-in practice on 32-bit ARM SoCs, what if I save/restore the debug monitor mode on each
-switch between the guest and the host, would it be acceptable?
-
-
-On 2015/6/15 0:08, zichao wrote:
-> Hi, Marc,
-> 
-> On 2015/6/9 18:29, Marc Zyngier wrote:
->> On 07/06/15 14:40, zichao wrote:
->>> Hi, Marc,
->>>
->>> On 2015/6/1 18:56, Marc Zyngier wrote:
->>>> Hi Zhichao,
->>>>
->>>> On 31/05/15 05:27, Zhichao Huang wrote:
->>>>> Hardware debugging in guests is not intercepted currently, it means
->>>>> that a malicious guest can bring down the entire machine by writing
->>>>> to the debug registers.
->>>>>
->>>>> This patch enable trapping of all debug registers, preventing the guests
->>>>> to mess with the host state.
->>>>>
->>>>> However, it is a precursor for later patches which will need to do
->>>>> more to world switch debug states while necessary.
->>>>>
->>>>> Cc: <stable@vger.kernel.org>
->>>>> Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
->>>>> ---
->>>>>  arch/arm/include/asm/kvm_coproc.h |  3 +-
->>>>>  arch/arm/kvm/coproc.c             | 60 +++++++++++++++++++++++++++++++++++----
->>>>>  arch/arm/kvm/handle_exit.c        |  4 +--
->>>>>  arch/arm/kvm/interrupts_head.S    |  2 +-
->>>>>  4 files changed, 59 insertions(+), 10 deletions(-)
->>>>>
-> ......
->>>>
->>>> There is a small problem here. Imagine the host has programmed a
->>>> watchpoint on some VA. We switch to the guest, and then access the same
->>>> VA. At that stage, the guest will take the debug exception. That's
->>>> really not pretty.
->>>>
->>>
->>> I've thought about it and I think there maybe OK, because when we switch from the
->>> host to the guest, the context_switch() in host must be called first, and then
->>> the host will switch debug registers, and the guest will not see the watchpoint
->>> the host programmed before.
->>>
->>> Or am I missing some circumstances here?
->>
->> I don't see anything in this patch that reprograms the debug registers.
->> You are simply trapping the guest access to these registers, but
->> whatever content the host has put there is still active.
->>
->> So, assuming that the guest does not touch any debug register (and
->> legitimately assumes that they are inactive), a debug exception may fire
->> at PL1.
->>
-> 
-> I have had a test on the problem you mentioned. I programmed a watchpoint in the host,
-> and then observe the value of debug registers in the guest.
-> 
-> The result is that in most cases, the guest would not be able to see the watchpoint because
-> when we switch from the host to the guest, the process schedule function(__schedule) would
-> be called, and it will uninstall debug registers the host just programed.
-> 
-> __schedule  ->  __perf_event_task_sched_out -> event_sched_out -> arch_uninstall_hw_breakpoint
-> 
-> However, there is one exception, if we programed a watchpoint based on the Qemu process in
-> the host, there would be no process schedule between the Qemu process and the guest, and then,
-> the problem you mentioned appear, the guest will see the value of debug registers.
-> 
->>>> I think using HDCR_TDE as well should sort it, effectively preventing
->>>> the exception from being delivered to the guest, but you will need to
->>>> handle this on the HYP side. Performance wise, this is also really horrible.
->>>>
->>>> A better way would be to disable the host's BPs/WPs if any is enabled.
->>
->> I still think you either need to fixup the host's registers if they are
->> active when you enter the guest.
-> 
-> Compared to disable the whole debug feature in the host, I think there may be a slighter way to
-> plug the exploit.
-> 
-> We can only save/restore DBGDSCR on each switch between the guest and the host. It means that
-> the debug monitor in guest would be disabled forever(because the guest could not be able to enable
-> the debug monitor without the following patches), and then the guest would not be able to take
-> any debug exceptions.
-> 
-> What's your opinion?
-> 
->>
->> Thanks,
->>
->> 	M.
->>
+CgpPbiAyMDE1LzYvOSAxODo0NSwgQWxleCBCZW5uw6llIHdyb3RlOgo+IAo+IFpoaWNoYW8gSHVh
+bmcgPHpoaWNoYW8uaHVhbmdAbGluYXJvLm9yZz4gd3JpdGVzOgo+IAo+PiBBcyB3ZSdyZSBhYm91
+dCB0byB0cmFwIGEgYnVuY2ggb2YgQ1AxNCByZWdpc3RlcnMsIGxldCdzIHJld29yawo+PiB0aGUg
+Q1AxNSBoYW5kbGluZyBzbyBpdCBjYW4gYmUgZ2VuZXJhbGl6ZWQgYW5kIHdvcmsgd2l0aCBtdWx0
+aXBsZQo+PiB0YWJsZXMuCj4+Cj4+IFNpZ25lZC1vZmYtYnk6IFpoaWNoYW8gSHVhbmcgPHpoaWNo
+YW8uaHVhbmdAbGluYXJvLm9yZz4KPj4gLS0tCj4+ICBhcmNoL2FybS9rdm0vY29wcm9jLmMgICAg
+ICAgICAgfCAxNzYgKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0KPj4g
+IGFyY2gvYXJtL2t2bS9pbnRlcnJ1cHRzX2hlYWQuUyB8ICAgMiArLQo+PiAgMiBmaWxlcyBjaGFu
+Z2VkLCAxMTIgaW5zZXJ0aW9ucygrKSwgNjYgZGVsZXRpb25zKC0pCj4+Cj4+IGRpZmYgLS1naXQg
+YS9hcmNoL2FybS9rdm0vY29wcm9jLmMgYi9hcmNoL2FybS9rdm0vY29wcm9jLmMKPj4gaW5kZXgg
+OWQyODNkOS4uZDIzMzk1YiAxMDA2NDQKPj4gLS0tIGEvYXJjaC9hcm0va3ZtL2NvcHJvYy5jCj4+
+ICsrKyBiL2FyY2gvYXJtL2t2bS9jb3Byb2MuYwo+PiBAQCAtMzc1LDYgKzM3NSw5IEBAIHN0YXRp
+YyBjb25zdCBzdHJ1Y3QgY29wcm9jX3JlZyBjcDE1X3JlZ3NbXSA9IHsKPj4gIAl7IENSbigxNSks
+IENSbSggMCksIE9wMSggNCksIE9wMiggMCksIGlzMzIsIGFjY2Vzc19jYmFyfSwKPj4gIH07Cj4+
+ICAKPj4gK3N0YXRpYyBjb25zdCBzdHJ1Y3QgY29wcm9jX3JlZyBjcDE0X3JlZ3NbXSA9IHsKPj4g
+K307Cj4+ICsKPj4gIC8qIFRhcmdldCBzcGVjaWZpYyBlbXVsYXRpb24gdGFibGVzICovCj4+ICBz
+dGF0aWMgc3RydWN0IGt2bV9jb3Byb2NfdGFyZ2V0X3RhYmxlICp0YXJnZXRfdGFibGVzW0tWTV9B
+Uk1fTlVNX1RBUkdFVFNdOwo+PiAgCj4+IEBAIC00MjQsNDcgKzQyNyw3NSBAQCBzdGF0aWMgY29u
+c3Qgc3RydWN0IGNvcHJvY19yZWcgKmZpbmRfcmVnKGNvbnN0IHN0cnVjdCBjb3Byb2NfcGFyYW1z
+ICpwYXJhbXMsCj4+ICAJcmV0dXJuIE5VTEw7Cj4+ICB9Cj4+ICAKPj4gLXN0YXRpYyBpbnQgZW11
+bGF0ZV9jcDE1KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPj4gLQkJCWNvbnN0IHN0cnVjdCBjb3By
+b2NfcGFyYW1zICpwYXJhbXMpCj4+ICsvKgo+PiArICogZW11bGF0ZV9jcCAtLSAgdHJpZXMgdG8g
+bWF0Y2ggYSBjcDE0L2NwMTUgYWNjZXNzIGluIGEgaGFuZGxpbmcgdGFibGUsCj4+ICsgKiAgICAg
+ICAgICAgICAgICBhbmQgY2FsbCB0aGUgY29ycmVzcG9uZGluZyB0cmFwIGhhbmRsZXIuCj4+ICsg
+Kgo+PiArICogQHBhcmFtczogcG9pbnRlciB0byB0aGUgZGVzY3JpcHRvciBvZiB0aGUgYWNjZXNz
+Cj4+ICsgKiBAdGFibGU6IGFycmF5IG9mIHRyYXAgZGVzY3JpcHRvcnMKPj4gKyAqIEBudW06IHNp
+emUgb2YgdGhlIHRyYXAgZGVzY3JpcHRvciBhcnJheQo+PiArICoKPj4gKyAqIFJldHVybiAwIGlm
+IHRoZSBhY2Nlc3MgaGFzIGJlZW4gaGFuZGxlZCwgYW5kIC0xIGlmIG5vdC4KPj4gKyAqLwo+PiAr
+c3RhdGljIGludCBlbXVsYXRlX2NwKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPj4gKwkJCWNvbnN0
+IHN0cnVjdCBjb3Byb2NfcGFyYW1zICpwYXJhbXMsCj4+ICsJCQljb25zdCBzdHJ1Y3QgY29wcm9j
+X3JlZyAqdGFibGUsCj4+ICsJCQlzaXplX3QgbnVtKQo+PiAgewo+PiAtCXNpemVfdCBudW07Cj4+
+IC0JY29uc3Qgc3RydWN0IGNvcHJvY19yZWcgKnRhYmxlLCAqcjsKPj4gLQo+PiAtCXRyYWNlX2t2
+bV9lbXVsYXRlX2NwMTVfaW1wKHBhcmFtcy0+T3AxLCBwYXJhbXMtPlJ0MSwgcGFyYW1zLT5DUm4s
+Cj4+IC0JCQkJICAgcGFyYW1zLT5DUm0sIHBhcmFtcy0+T3AyLAo+PiBwYXJhbXMtPmlzX3dyaXRl
+KTsKPiAKPiBXaGVyZSBoYXMgdGhpcyB0cmFjZSBnb25lPyBXZSBzdGlsbCB3YW50IHRvIGJlIGFi
+bGUgdG8gdmlldyByZWdpc3Rlcgo+IHRyYXBzIHdoZW4gZGVidWdnaW5nLgo+IAoKT0ssIEkgd2ls
+bCBhZGQgaXQgaW4gdjMgcGF0Y2hlcy4KCj4gCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNv
+bHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZv
+L2t2bWFybQo=
