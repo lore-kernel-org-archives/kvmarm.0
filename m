@@ -1,103 +1,233 @@
-From: zichao <zhichao.huang@linaro.org>
-Subject: Re: [PATCH v2 05/11] KVM: arm: check ordering of all system register
- tables
-Date: Mon, 15 Jun 2015 00:18:55 +0800
-Message-ID: <557DA96F.3000705@linaro.org>
-References: <1433046432-1824-1-git-send-email-zhichao.huang@linaro.org> <1433046432-1824-6-git-send-email-zhichao.huang@linaro.org> <87fv5z7jrh.fsf@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] arm64: KVM: Optimize arm64 guest exit VFP/SIMD register
+ save/restore
+Date: Mon, 15 Jun 2015 11:00:29 +0100
+Message-ID: <557EA23D.4090200@arm.com>
+References: <557CACC4.8040405@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <87fv5z7jrh.fsf@linaro.org>
+In-Reply-To: <557CACC4.8040405@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, will.deacon@arm.com, huangzhichao@huawei.com
+To: Mario Smarduch <m.smarduch@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Cc: "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi Mario,
 
+I was working on a more ambitious patch series, but we probably ought to
+start small, and this looks fairly sensible to me.
 
-On 2015/6/10 21:52, Alex Benn=C3=A9e wrote:
->=20
-> Zhichao Huang <zhichao.huang@linaro.org> writes:
->=20
->> We now have multiple tables for the various system registers
->> we trap. Make sure we check the order of all of them, as it is
->> critical that we get the order right (been there, done that...).
->>
->> Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
->> ---
->>  arch/arm/kvm/coproc.c | 26 +++++++++++++++++++++-----
->>  1 file changed, 21 insertions(+), 5 deletions(-)
->>
->> diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
->> index d23395b..16d5f69 100644
->> --- a/arch/arm/kvm/coproc.c
->> +++ b/arch/arm/kvm/coproc.c
->> @@ -737,6 +737,9 @@ static struct coproc_reg invariant_cp15[] =3D {
->>  	{ CRn( 0), CRm( 0), Op1( 0), Op2( 3), is32, NULL, get_TLBTR },
->>  	{ CRn( 0), CRm( 0), Op1( 0), Op2( 6), is32, NULL, get_REVIDR },
->> =20
->> +	{ CRn( 0), CRm( 0), Op1( 1), Op2( 1), is32, NULL, get_CLIDR },
->> +	{ CRn( 0), CRm( 0), Op1( 1), Op2( 7), is32, NULL, get_AIDR },
->> +
->>  	{ CRn( 0), CRm( 1), Op1( 0), Op2( 0), is32, NULL, get_ID_PFR0 },
->>  	{ CRn( 0), CRm( 1), Op1( 0), Op2( 1), is32, NULL, get_ID_PFR1 },
->>  	{ CRn( 0), CRm( 1), Op1( 0), Op2( 2), is32, NULL, get_ID_DFR0 },
->> @@ -752,9 +755,6 @@ static struct coproc_reg invariant_cp15[] =3D {
->>  	{ CRn( 0), CRm( 2), Op1( 0), Op2( 3), is32, NULL, get_ID_ISAR3 },
->>  	{ CRn( 0), CRm( 2), Op1( 0), Op2( 4), is32, NULL, get_ID_ISAR4 },
->>  	{ CRn( 0), CRm( 2), Op1( 0), Op2( 5), is32, NULL, get_ID_ISAR5 },
->> -
->> -	{ CRn( 0), CRm( 0), Op1( 1), Op2( 1), is32, NULL, get_CLIDR },
->> -	{ CRn( 0), CRm( 0), Op1( 1), Op2( 7), is32, NULL, get_AIDR },
->>  };
->> =20
->>  /*
->> @@ -1297,13 +1297,29 @@ int kvm_arm_copy_coproc_indices(struct kvm_v=
-cpu *vcpu, u64 __user *uindices)
->>  	return write_demux_regids(uindices);
->>  }
->> =20
->> +static int check_sysreg_table(const struct coproc_reg *table, unsig=
-ned int n)
->> +{
->> +	unsigned int i;
->> +
->> +	for (i =3D 1; i < n; i++) {
->> +		if (cmp_reg(&table[i-1], &table[i]) >=3D 0) {
->> +			kvm_err("sys_reg table %p out of order (%d)\n",
->> +					table, i - 1);
->=20
-> Isn't a BUG_ON *and* a kvm_err() overkill?
->=20
+A few minor comments below.
 
-In deed, it would not be able to happened, because all the cp14_regs/cp=
-15_regs are static codes.
+On 13/06/15 23:20, Mario Smarduch wrote:
+> Currently VFP/SIMD registers are always saved and restored
+> on Guest entry and exit.
+> 
+> This patch only saves and restores VFP/SIMD registers on
+> Guest access. To do this cptr_el2 VFP/SIMD trap is set
+> on Guest entry and later checked on exit. This follows
+> the ARMv7 VFPv3 implementation. Running an informal test
+> there are high number of exits that don't access VFP/SIMD
+> registers.
 
-I think the BUG_ON will make the developers to notice whether they get =
-the order right.
+It would be good to add some numbers here. How often do we exit without
+having touched the FPSIMD regs? For which workload?
 
-And another reason may be to keep the same way with the ARM64.
+> Tested on FVP Model, executed threads on host and
+> Guest accessing VFP/SIMD registers resulting in consistent
+> results.
+> 
+> 
+> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h |  5 +++-
+>  arch/arm64/kvm/hyp.S             | 57
+> +++++++++++++++++++++++++++++++++++++---
+>  2 files changed, 57 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_arm.h
+> b/arch/arm64/include/asm/kvm_arm.h
+> index ac6fafb..7605e09 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -171,10 +171,13 @@
+>  #define HSTR_EL2_TTEE	(1 << 16)
+>  #define HSTR_EL2_T(x)	(1 << x)
+> 
+> +/* Hyp Coproccessor Trap Register Shifts */
+> +#define CPTR_EL2_TFP_SHIFT 10
+> +
+>  /* Hyp Coprocessor Trap Register */
+>  #define CPTR_EL2_TCPAC	(1 << 31)
+>  #define CPTR_EL2_TTA	(1 << 20)
+> -#define CPTR_EL2_TFP	(1 << 10)
+> +#define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
+> 
+>  /* Hyp Debug Configuration Register bits */
+>  #define MDCR_EL2_TDRA		(1 << 11)
+> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+> index 5befd01..b3044b4 100644
+> --- a/arch/arm64/kvm/hyp.S
+> +++ b/arch/arm64/kvm/hyp.S
+> @@ -673,6 +673,24 @@
+>  	tbz	\tmp, #KVM_ARM64_DEBUG_DIRTY_SHIFT, \target
+>  .endm
+> 
+> +/*
+> + * Check cptr VFP/SIMD accessed bit, if set VFP/SIMD not accessed by guest.
+> + */
+> +.macro skip_fpsimd_state tmp, target
+> +	mrs	\tmp, cptr_el2
+> +	tbnz	\tmp, #CPTR_EL2_TFP_SHIFT, \target
+> +.endm
+> +
+> +/*
+> + * Check cptr VFP/SIMD accessed bit if set, VFP/SIMD not accessed by guest.
+> + * Also disable all cptr traps on return to host.
+> + */
+> +.macro skip_fpsimd_state_reset tmp, target
+> +	mrs	\tmp, cptr_el2
+> +	msr	cptr_el2, xzr
+> +	tbnz	\tmp, #CPTR_EL2_TFP_SHIFT, \target
+> +.endm
+> +
+>  .macro compute_debug_state target
+>  	// Compute debug state: If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY
+>  	// is set, we do a full save/restore cycle and disable trapping.
+> @@ -763,6 +781,7 @@
+>  	ldr     x2, [x0, #VCPU_HCR_EL2]
+>  	msr     hcr_el2, x2
+>  	mov	x2, #CPTR_EL2_TTA
+> +	orr	x2, x2, #CPTR_EL2_TFP
+>  	msr	cptr_el2, x2
+> 
+>  	mov	x2, #(1 << 15)	// Trap CP15 Cr=15
+> @@ -785,7 +804,6 @@
+>  .macro deactivate_traps
+>  	mov	x2, #HCR_RW
+>  	msr	hcr_el2, x2
+> -	msr	cptr_el2, xzr
+>  	msr	hstr_el2, xzr
+> 
+>  	mrs	x2, mdcr_el2
+> @@ -911,6 +929,30 @@ __save_fpsimd:
+>  __restore_fpsimd:
+>  	restore_fpsimd
+>  	ret
+> +/*
+> + * On Guest VFP/SIMD access, switch Guest/Host registers and reset cptr
+> access
+> + * bit to disable trapping.
+> + */
+> +switch_to_guest_vfp:
 
->> +			return 1;
->> +		}
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->>  void kvm_coproc_table_init(void)
->>  {
->>  	unsigned int i;
->> =20
->>  	/* Make sure tables are unique and in order. */
->> -	for (i =3D 1; i < ARRAY_SIZE(cp15_regs); i++)
->> -		BUG_ON(cmp_reg(&cp15_regs[i-1], &cp15_regs[i]) >=3D 0);
->> +	BUG_ON(check_sysreg_table(cp14_regs, ARRAY_SIZE(cp14_regs)));
->> +	BUG_ON(check_sysreg_table(cp15_regs, ARRAY_SIZE(cp15_regs)));
->> +	BUG_ON(check_sysreg_table(invariant_cp15, ARRAY_SIZE(invariant_cp1=
-5)));
->> =20
->>  	/* We abuse the reset function to overwrite the table itself. */
->>  	for (i =3D 0; i < ARRAY_SIZE(invariant_cp15); i++)
->=20
+Consider renaming this to "switch_to_guest_fpsimd" for consistency.
+
+> +	ldr	x2, =(CPTR_EL2_TTA)
+> +	msr	cptr_el2, x2
+
+I'd feel more comfortable if you read cptr_el2, cleared the TFP bit, and
+wrote the result back. Loading an arbitrary value is likely to cause
+bugs in the long run.
+
+> +
+> +	mrs	x0, tpidr_el2
+> +
+> +	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
+> +	kern_hyp_va x2
+> +
+> +	add	x3, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
+> +	fpsimd_save x3, 1
+> +
+> +	add	x2, x0, #VCPU_CONTEXT
+> +	add	x3, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
+> +	fpsimd_restore x3, 1
+
+That's quite a lot of code expansion (fpsimd_{save,restore} are macros).
+
+How about saving x4 and lr on the stack, and doing a a bl in each case?
+That would be consistent with the rest of the code (well, what's left of
+it).
+
+> +
+> +	pop	x2, x3
+> +	pop	x0, x1
+> +
+> +	eret
+> 
+>  /*
+>   * u64 __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+> @@ -932,7 +974,6 @@ ENTRY(__kvm_vcpu_run)
+>  	kern_hyp_va x2
+> 
+>  	save_host_regs
+> -	bl __save_fpsimd
+>  	bl __save_sysregs
+> 
+>  	compute_debug_state 1f
+> @@ -948,7 +989,6 @@ ENTRY(__kvm_vcpu_run)
+>  	add	x2, x0, #VCPU_CONTEXT
+> 
+>  	bl __restore_sysregs
+> -	bl __restore_fpsimd
+> 
+>  	skip_debug_state x3, 1f
+>  	bl	__restore_debug
+> @@ -967,7 +1007,9 @@ __kvm_vcpu_return:
+>  	add	x2, x0, #VCPU_CONTEXT
+> 
+>  	save_guest_regs
+> +	skip_fpsimd_state x3, 1f
+>  	bl __save_fpsimd
+> +1:
+>  	bl __save_sysregs
+> 
+>  	skip_debug_state x3, 1f
+> @@ -986,8 +1028,11 @@ __kvm_vcpu_return:
+>  	kern_hyp_va x2
+> 
+>  	bl __restore_sysregs
+> -	bl __restore_fpsimd
+> 
+> +	/* Disable cptr VFP/SIMD access bit, skip restore if VFP not accessed */
+> +	skip_fpsimd_state_reset x3, 1f
+> +	bl __restore_fpsimd
+> +1:
+
+Neither the macro name (skip_fpsimd_state_reset) nor the comment make it
+clear that it is also re-enabling access to the trace registers.
+
+I'd rather see:
+
+	skip_fpsimd_state x3, 1f
+	bl __restore_fpsimd
+1:
+	/* Clear FPSIMD and Trace trapping */
+	msr	cptr_el2, xzr
+
+>  	skip_debug_state x3, 1f
+>  	// Clear the dirty flag for the next run, as all the state has
+>  	// already been saved. Note that we nuke the whole 64bit word.
+> @@ -1166,6 +1211,10 @@ el1_sync:					// Guest trapped into EL2
+>  	mrs	x1, esr_el2
+>  	lsr	x2, x1, #ESR_ELx_EC_SHIFT
+> 
+> +	/* Guest accessed VFP/SIMD registers, save host, restore Guest */
+> +	cmp	x2, #ESR_ELx_EC_FP_ASIMD
+> +	b.eq	switch_to_guest_vfp
+> +
+
+I'd prefer you moved that hunk to el1_trap, where we handle all the
+traps coming from the guest.
+
+>  	cmp	x2, #ESR_ELx_EC_HVC64
+>  	b.ne	el1_trap
+> 
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
