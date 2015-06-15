@@ -1,243 +1,231 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 7/8] arm: add support for supplying GICv3 redistributor
- addresses
-Date: Mon, 15 Jun 2015 12:56:13 +0100
-Message-ID: <557EBD5D.8030401@arm.com>
-References: <1433493473-4002-1-git-send-email-andre.przywara@arm.com> <1433493473-4002-8-git-send-email-andre.przywara@arm.com> <5578767F.3030600@arm.com> <557EB330.8050409@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH 06/10] KVM: arm/arm64: vgic: Allow dynamic mapping of
+ physical/virtual interrupts
+Date: Mon, 15 Jun 2015 17:44:43 +0200
+Message-ID: <557EF2EB.7090604@linaro.org>
+References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com> <1433783045-8002-7-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <557EB330.8050409@arm.com>
+In-Reply-To: <1433783045-8002-7-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <Will.Deacon@arm.com>
-Cc: "penberg@kernel.org" <penberg@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, =?windows-1252?Q?Alex?= =?windows-1252?Q?_Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 15/06/15 12:12, Andre Przywara wrote:
-> On 06/10/2015 06:40 PM, Marc Zyngier wrote:
->> On 05/06/15 09:37, Andre Przywara wrote:
->>> The code currently is assuming fixed sized memory regions for the
->>> distributor and CPU interface. GICv3 needs a dynamic allocation of
->>> its redistributor region, since its size depends on the number of
->>> vCPUs.
->>> Also add the necessary code to create a GICv3 IRQ chip instance.
->>> This contains some defines which are not (yet) in the (32 bit) header
->>> files to allow compilation for ARM.
->>>
->>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>> ---
->>>  arm/gic.c                         | 37 +++++++++++++++++++++++++++++++++++--
->>>  arm/include/arm-common/gic.h      |  2 +-
->>>  arm/include/arm-common/kvm-arch.h | 18 ++++++++++++++----
->>>  arm/kvm-cpu.c                     |  4 +++-
->>>  4 files changed, 53 insertions(+), 8 deletions(-)
->>>
->>> diff --git a/arm/gic.c b/arm/gic.c
->>> index 0ce40e4..c50d662 100644
->>> --- a/arm/gic.c
->>> +++ b/arm/gic.c
->>> @@ -9,13 +9,24 @@
->>>  #include <linux/kernel.h>
->>>  #include <linux/kvm.h>
->>>  
->>> +/* Those names are not defined for ARM (yet) */
->>> +#ifndef KVM_VGIC_V3_ADDR_TYPE_DIST
->>> +#define KVM_VGIC_V3_ADDR_TYPE_DIST 2
->>> +#endif
->>> +
->>> +#ifndef KVM_VGIC_V3_ADDR_TYPE_REDIST
->>> +#define KVM_VGIC_V3_ADDR_TYPE_REDIST 3
->>> +#endif
->>> +
->>>  static int gic_fd = -1;
->>> +static int nr_redists;
->>
->> Who sets this variable?
->>>  
->>>  static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
->>>  {
->>>  	int err;
->>>  	u64 cpu_if_addr = ARM_GIC_CPUI_BASE;
->>>  	u64 dist_addr = ARM_GIC_DIST_BASE;
->>> +	u64 redist_addr = dist_addr - nr_redists * ARM_GIC_REDIST_SIZE;
->>
->> You are doing a similar offsetting further down. Consider having a macro
->> that computes the redist base from the dist base.
->>
->>>  	struct kvm_create_device gic_device = {
->>>  		.flags	= 0,
->>>  	};
->>> @@ -28,11 +39,19 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
->>>  		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
->>>  		.addr	= (u64)(unsigned long)&dist_addr,
->>>  	};
->>> +	struct kvm_device_attr redist_attr = {
->>> +		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
->>> +		.attr	= KVM_VGIC_V3_ADDR_TYPE_REDIST,
->>> +		.addr	= (u64)(unsigned long)&redist_addr,
->>> +	};
->>>  
->>>  	switch (type) {
->>>  	case IRQCHIP_GICV2:
->>>  		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V2;
->>>  		break;
->>> +	case IRQCHIP_GICV3:
->>> +		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V3;
->>> +		break;
->>>  	default:
->>>  		return -ENODEV;
->>>  	}
->>> @@ -48,6 +67,10 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
->>>  		dist_attr.attr = KVM_VGIC_V2_ADDR_TYPE_DIST;
->>>  		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &cpu_if_attr);
->>>  		break;
->>> +	case IRQCHIP_GICV3:
->>> +		dist_attr.attr = KVM_VGIC_V3_ADDR_TYPE_DIST;
->>> +		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &redist_attr);
->>> +		break;
->>>  	default:
->>>  		return -ENODEV;
->>>  	}
->>> @@ -55,6 +78,8 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
->>>  		return err;
->>>  
->>>  	err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &dist_attr);
->>> +	if (err)
->>> +		return err;
->>
->> Looks like a fairly useless statement...
+Hi Marc,
+On 06/08/2015 07:04 PM, Marc Zyngier wrote:
+> In order to be able to feed physical interrupts to a guest, we need
+> to be able to establish the virtual-physical mapping between the two
+> worlds.
 > 
-> Sorry, rebasing artefact, this gets amended in the next patch. I have
-> fixed it now in here.
+> The mapping is kept in a rbtree, indexed by virtual interrupts.
 > 
->>>  
->>>  	return err;
->>>  }
->>> @@ -162,17 +187,25 @@ void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type)
->>>  	u64 reg_prop[] = {
->>>  		cpu_to_fdt64(ARM_GIC_DIST_BASE),
->>>  		cpu_to_fdt64(ARM_GIC_DIST_SIZE),
->>> -		cpu_to_fdt64(ARM_GIC_CPUI_BASE),
->>> -		cpu_to_fdt64(ARM_GIC_CPUI_SIZE),
->>> +		0, 0,				/* to be filled */
->>>  	};
->>>  
->>>  	switch (type) {
->>>  	case IRQCHIP_GICV2:
->>>  		compatible = "arm,cortex-a15-gic";
->>> +		reg_prop[2] = ARM_GIC_CPUI_BASE;
->>> +		reg_prop[3] = ARM_GIC_CPUI_SIZE;
->>> +		break;
->>> +	case IRQCHIP_GICV3:
->>> +		compatible = "arm,gic-v3";
->>> +		reg_prop[2] = ARM_GIC_DIST_BASE - nr_redists * ARM_GIC_REDIST_SIZE;
->>> +		reg_prop[3] = ARM_GIC_REDIST_SIZE * nr_redists;
->>>  		break;
->>>  	default:
->>>  		return;
->>>  	}
->>> +	reg_prop[2] = cpu_to_fdt64(reg_prop[2]);
->>> +	reg_prop[3] = cpu_to_fdt64(reg_prop[3]);
->>
->> I'd find it more readable if you did the cpu_to_fdt64() as part of the
->> initial assignment.
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  include/kvm/arm_vgic.h |  18 ++++++++
+>  virt/kvm/arm/vgic.c    | 110 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 128 insertions(+)
 > 
-> Agreed, that looks much nicer now that I use a separate variable for the
-> GIC redist base address (instead of nr_redist).
-> 
->>>  
->>>  	_FDT(fdt_begin_node(fdt, "intc"));
->>>  	_FDT(fdt_property_string(fdt, "compatible", compatible));
->>> diff --git a/arm/include/arm-common/gic.h b/arm/include/arm-common/gic.h
->>> index f5f6707..8d6ab01 100644
->>> --- a/arm/include/arm-common/gic.h
->>> +++ b/arm/include/arm-common/gic.h
->>> @@ -21,7 +21,7 @@
->>>  #define GIC_MAX_CPUS			8
->>>  #define GIC_MAX_IRQ			255
->>>  
->>> -enum irqchip_type {IRQCHIP_DEFAULT, IRQCHIP_GICV2};
->>> +enum irqchip_type {IRQCHIP_DEFAULT, IRQCHIP_GICV2, IRQCHIP_GICV3};
->>>  
->>>  struct kvm;
->>>  
->>> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
->>> index 082131d..be66a76 100644
->>> --- a/arm/include/arm-common/kvm-arch.h
->>> +++ b/arm/include/arm-common/kvm-arch.h
->>> @@ -17,10 +17,8 @@
->>>  
->>>  #define ARM_GIC_DIST_BASE	(ARM_AXI_AREA - ARM_GIC_DIST_SIZE)
->>>  #define ARM_GIC_CPUI_BASE	(ARM_GIC_DIST_BASE - ARM_GIC_CPUI_SIZE)
->>> -#define ARM_GIC_SIZE		(ARM_GIC_DIST_SIZE + ARM_GIC_CPUI_SIZE)
->>>  
->>>  #define ARM_IOPORT_SIZE		(ARM_MMIO_AREA - ARM_IOPORT_AREA)
->>> -#define ARM_VIRTIO_MMIO_SIZE	(ARM_AXI_AREA - (ARM_MMIO_AREA + ARM_GIC_SIZE))
->>>  #define ARM_PCI_CFG_SIZE	(1ULL << 24)
->>>  #define ARM_PCI_MMIO_SIZE	(ARM_MEMORY_AREA - \
->>>  				(ARM_AXI_AREA + ARM_PCI_CFG_SIZE))
->>> @@ -30,6 +28,13 @@
->>>  #define KVM_PCI_MMIO_AREA	(KVM_PCI_CFG_AREA + ARM_PCI_CFG_SIZE)
->>>  #define KVM_VIRTIO_MMIO_AREA	ARM_MMIO_AREA
->>>  
->>> +/*
->>> + * On a GICv3 there must be one redistributor per vCPU.
->>> + * The value here is the size for one, we multiply this at runtime with
->>> + * the number of requested vCPUs to get the actual size.
->>> + */
->>> +#define ARM_GIC_REDIST_SIZE	0x20000
->>> +
->>>  #define KVM_IRQ_OFFSET		GIC_SPI_IRQ_BASE
->>>  
->>>  #define KVM_VM_TYPE		0
->>> @@ -45,9 +50,14 @@ static inline bool arm_addr_in_ioport_region(u64 phys_addr)
->>>  	return phys_addr >= KVM_IOPORT_AREA && phys_addr < limit;
->>>  }
->>>  
->>> -static inline bool arm_addr_in_virtio_mmio_region(u64 phys_addr)
->>> +static inline bool arm_addr_in_virtio_mmio_region(int nr_redists, u64 phys_addr)
->>>  {
->>> -	u64 limit = KVM_VIRTIO_MMIO_AREA + ARM_VIRTIO_MMIO_SIZE;
->>> +	u64 limit = ARM_AXI_AREA - ARM_GIC_DIST_SIZE;
->>> +
->>> +	if (nr_redists)
->>> +		limit -= ARM_GIC_REDIST_SIZE * nr_redists;
->>> +	else
->>> +		limit -= ARM_GIC_CPUI_SIZE;
->>>  	return phys_addr >= KVM_VIRTIO_MMIO_AREA && phys_addr < limit;
->>>  }
->>>  
->>> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
->>> index ab08815..a3344fa 100644
->>> --- a/arm/kvm-cpu.c
->>> +++ b/arm/kvm-cpu.c
->>> @@ -142,7 +142,9 @@ bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
->>>  bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data,
->>>  			   u32 len, u8 is_write)
->>>  {
->>> -	if (arm_addr_in_virtio_mmio_region(phys_addr)) {
->>> +	int nr_redists = 0;
->>> +
->>> +	if (arm_addr_in_virtio_mmio_region(nr_redists, phys_addr)) {
->>>  		return kvm__emulate_mmio(vcpu, phys_addr, data, len, is_write);
->>>  	} else if (arm_addr_in_ioport_region(phys_addr)) {
->>>  		int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
->>>
->>
->> Ouch. This feels really ugly. Why don't you have the GIC code export a
->> structure that contains the boundaries of the GIC (irrespective of its
->> type), and use that to compute the limit? I don't think we want this
->> nr_redists to propagate beyond the GIC code at all.
-> 
-> Looking more closely at the code I wonder why we differentiate beyond
-> the IO port region anyway. I rewrote this now without actually checking
-> for the GIC region at all. This simplified a lot and allows us to get
-> rid of nr_redists completely.
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 4f9fa1d..33d121a 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -159,6 +159,14 @@ struct vgic_io_device {
+>  	struct kvm_io_device dev;
+>  };
+>  
+> +struct irq_phys_map {
+> +	struct rb_node		node;
+> +	u32			virt_irq;
+> +	u32			phys_irq;
+> +	u32			irq;
+> +	bool			active;
+> +};
+> +
+>  struct vgic_dist {
+>  	spinlock_t		lock;
+>  	bool			in_kernel;
+> @@ -256,6 +264,10 @@ struct vgic_dist {
+>  	struct vgic_vm_ops	vm_ops;
+>  	struct vgic_io_device	dist_iodev;
+>  	struct vgic_io_device	*redist_iodevs;
+> +
+> +	/* Virtual irq to hwirq mapping */
+> +	spinlock_t		irq_phys_map_lock;
+> +	struct rb_root		irq_phys_map;
+>  };
+>  
+>  struct vgic_v2_cpu_if {
+> @@ -307,6 +319,9 @@ struct vgic_cpu {
+>  		struct vgic_v2_cpu_if	vgic_v2;
+>  		struct vgic_v3_cpu_if	vgic_v3;
+>  	};
+> +
+> +	/* Protected by the distributor's irq_phys_map_lock */
+> +	struct rb_root	irq_phys_map;
+>  };
+>  
+>  #define LR_EMPTY	0xff
+> @@ -331,6 +346,9 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
+>  void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
+>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+>  int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
+> +struct irq_phys_map *vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+> +				       int virt_irq, int irq);
+> +int vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
+>  
+>  #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+>  #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
+> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+> index 59ed7a3..c6604f2 100644
+> --- a/virt/kvm/arm/vgic.c
+> +++ b/virt/kvm/arm/vgic.c
+> @@ -24,6 +24,7 @@
+>  #include <linux/of.h>
+>  #include <linux/of_address.h>
+>  #include <linux/of_irq.h>
+> +#include <linux/rbtree.h>
+>  #include <linux/uaccess.h>
+>  
+>  #include <linux/irqchip/arm-gic.h>
+> @@ -84,6 +85,8 @@ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu);
+>  static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu);
+>  static struct vgic_lr vgic_get_lr(const struct kvm_vcpu *vcpu, int lr);
+>  static void vgic_set_lr(struct kvm_vcpu *vcpu, int lr, struct vgic_lr lr_desc);
+> +static struct irq_phys_map *vgic_irq_map_search(struct kvm_vcpu *vcpu,
+> +						int virt_irq);
+>  
+>  static const struct vgic_ops *vgic_ops;
+>  static const struct vgic_params *vgic;
+> @@ -1585,6 +1588,112 @@ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
+>  	return IRQ_HANDLED;
+>  }
+>  
+> +static struct rb_root *vgic_get_irq_phys_map(struct kvm_vcpu *vcpu,
+> +					     int virt_irq)
+> +{
+> +	if (virt_irq < VGIC_NR_PRIVATE_IRQS)
+> +		return &vcpu->arch.vgic_cpu.irq_phys_map;
+> +	else
+> +		return &vcpu->kvm->arch.vgic.irq_phys_map;
+> +}
+> +
+> +struct irq_phys_map *vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+> +				       int virt_irq, int irq)
+> +{
+> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +	struct rb_root *root = vgic_get_irq_phys_map(vcpu, virt_irq);
+> +	struct rb_node **new = &root->rb_node, *parent = NULL;
+> +	struct irq_phys_map *new_map;
+> +	struct irq_desc *desc;
+> +	struct irq_data *data;
+> +	int phys_irq;
+> +
+> +	desc = irq_to_desc(irq);
+> +	if (!desc) {
+> +		kvm_err("kvm_arch_timer: can't obtain interrupt descriptor\n");
+> +		return NULL;
+> +	}
+> +
+> +	data = irq_desc_get_irq_data(desc);
+> +	while (data->parent_data)
+> +		data = data->parent_data;
+> +
+> +	phys_irq = data->hwirq;
+> +
+> +	spin_lock(&dist->irq_phys_map_lock);
+> +
+> +	/* Boilerplate rb_tree code */
+> +	while (*new) {
+> +		struct irq_phys_map *this;
+> +
+> +		this = container_of(*new, struct irq_phys_map, node);
+> +		parent = *new;
+> +		if (this->virt_irq < virt_irq)
+> +			new = &(*new)->rb_left;
+> +		else if (this->virt_irq > virt_irq)
+> +			new = &(*new)->rb_right;
+> +		else {
+> +			new_map = this;
+in case the mapping already exists you don't update the mappping or
+return an error. Is it what you want here?
 
-Not sure about that. Returning to userspace on access to the vgic region
-is a good indication that something went wrong (no GIC instantiated?).
+> +			goto out;
+> +		}
+> +	}
+> +
+> +	new_map = kzalloc(sizeof(*new_map), GFP_KERNEL);
+> +	if (!new_map)
+> +		goto out;
+> +
+> +	new_map->virt_irq = virt_irq;
+> +	new_map->phys_irq = phys_irq;
+> +	new_map->irq = irq;
+> +
+> +	rb_link_node(&new_map->node, parent, new);
+> +	rb_insert_color(&new_map->node, root);
+> +
+> +out:
+> +	spin_unlock(&dist->irq_phys_map_lock);
+> +	return new_map;
+> +}
+> +
+> +static struct irq_phys_map *vgic_irq_map_search(struct kvm_vcpu *vcpu,
+> +						int virt_irq)
+> +{
+> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +	struct rb_root *root = vgic_get_irq_phys_map(vcpu, virt_irq);
+> +	struct rb_node *node = root->rb_node;
+> +	struct irq_phys_map *this = NULL;
+> +
+> +	spin_lock(&dist->irq_phys_map_lock);
+> +
+> +	while (node) {
+> +		this = container_of(node, struct irq_phys_map, node);
+> +
+> +		if (this->virt_irq < virt_irq)
+> +			node = node->rb_left;
+> +		else if (this->virt_irq > virt_irq)
+> +			node = node->rb_right;
+> +		else
+> +			break;
+> +	}
+> +
+> +	spin_unlock(&dist->irq_phys_map_lock);
+> +	return this;
+> +}
+> +
+> +int vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map)
+> +{
+> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +
+> +	if (!map)
+> +		return -EINVAL;
+> +
+> +	spin_lock(&dist->irq_phys_map_lock);
+> +	rb_erase(&map->node, vgic_get_irq_phys_map(vcpu, map->virt_irq));
+> +	spin_unlock(&dist->irq_phys_map_lock);
+> +
+> +	kfree(map);
+> +	return 0;
+> +}
+> +
+>  void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> @@ -1835,6 +1944,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>  		goto out_unlock;
+>  
+>  	spin_lock_init(&kvm->arch.vgic.lock);
+Don't you deallocate the rbtree nodes here? Also in the future with EOI
+mode == 1 we will need to complete the physical IRQ in place of the guest.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+- Eric
+> +	spin_lock_init(&kvm->arch.vgic.irq_phys_map_lock);
+>  	kvm->arch.vgic.in_kernel = true;
+>  	kvm->arch.vgic.vgic_model = type;
+>  	kvm->arch.vgic.vctrl_base = vgic->vctrl_base;
+> 
+
