@@ -1,231 +1,115 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH 06/10] KVM: arm/arm64: vgic: Allow dynamic mapping of
- physical/virtual interrupts
-Date: Mon, 15 Jun 2015 17:44:43 +0200
-Message-ID: <557EF2EB.7090604@linaro.org>
-References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com> <1433783045-8002-7-git-send-email-marc.zyngier@arm.com>
+Subject: Re: [PATCH 07/10] KVM: arm/arm64: vgic: Allow HW interrupts to be
+ queued to a guest
+Date: Mon, 15 Jun 2015 18:11:06 +0200
+Message-ID: <557EF91A.7020002@linaro.org>
+References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com> <1433783045-8002-8-git-send-email-marc.zyngier@arm.com> <55794A7A.2080306@arm.com> <557951C6.2090408@arm.com> <55795862.1050407@arm.com> <55795CD0.9050106@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1433783045-8002-7-git-send-email-marc.zyngier@arm.com>
+In-Reply-To: <55795CD0.9050106@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, =?windows-1252?Q?Alex?= =?windows-1252?Q?_Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <andre.przywara@arm.com>
+To: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>, =?windows-1252?Q?Alex_?= =?windows-1252?Q?Benn=E9e?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-On 06/08/2015 07:04 PM, Marc Zyngier wrote:
-> In order to be able to feed physical interrupts to a guest, we need
-> to be able to establish the virtual-physical mapping between the two
-> worlds.
+On 06/11/2015 12:02 PM, Marc Zyngier wrote:
+> On 11/06/15 10:44, Andre Przywara wrote:
+>> On 06/11/2015 10:15 AM, Marc Zyngier wrote:
+>>> On 11/06/15 09:44, Andre Przywara wrote:
+>>>> On 06/08/2015 06:04 PM, Marc Zyngier wrote:
+>> ...
+>>>>> @@ -1344,6 +1364,35 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+>>>>>  	return level_pending;
+>>>>>  }
+>>>>>  
+>>>>> +/* Return 1 if HW interrupt went from active to inactive, and 0 otherwise */
+>>>>> +static int vgic_sync_hwirq(struct kvm_vcpu *vcpu, struct vgic_lr vlr)
+>>>>> +{
+>>>>> +	struct irq_phys_map *map;
+>>>>> +	int ret;
+>>>>> +
+>>>>> +	if (!(vlr.state & LR_HW))
+>>>>> +		return 0;
+>>>>> +
+>>>>> +	map = vgic_irq_map_search(vcpu, vlr.irq);
+>>>>
+>>>> I wonder if it's safe to rely on that mapping here. Are we sure that
+>>>> this hasn't changed while the VCPU was running? If I got this correctly,
+>>>> currently only vcpu_reset will actually add a map entry, but I guess in
+>>>> the future there will be more users.
+>>>
+>>> How can the guest interrupt change? This is HW, as far as the guest is
+>>> concerned. An actual interrupt line. We don't reconfigure the HW live.
+>>
+>> I was thinking about the rbtree mapping we introduced. There we map a
+>> guest interrupt to a hardware interrupt. Are we sure that no one tears
+>> down that mapping while we have an LR populated with this pair?
+>> I am not talking about the timer here, but more about future users.
+>>
+>>>> Also we rely on the irqdomain mapping to be still the same, but that is
+>>>> probably a safe assumption.
+>>>
+>>> Like I said before, this *cannot* change.
+>>
+>> OK, got it.
+>>
+>>>
+>>>> But I'd still find it more natural to use the hwirq number from the LR
+>>>> at this point. Can't we use irq_find_mapping() here to learn Linux'
+>>>> (current) irq number from that?
+>>>
+>>> I think you're confused.
+>>>
+>>> - The guest irq (vlr.irq) is entirely made up, and has no connection
+>>> with reality. it is stable, and cannot change during the lifetime of the
+>>> guest (think of it as a HW irq line).
+>>>
+>>> - The host hwirq (vlr.hwirq) is stable as well, for the same reason.
+>>>
+>>> - The Linux IRQ cannot change because we've been given it by the kernel,
+>>> and that's what we use for *everything* as far as the kernel is
+>>> concerned. Its mapping to hwirq is stable as well because this is how we
+>>> talk to the HW.
+>>
+>> Not disputing any of them, but:
+>>
+>>> - irq_find_mapping gives you the *reverse* mapping (from hwirq to Linux
+>>> irq), and for that to work, you need the domain on which you want to
+>>> apply the translation. This is only useful when actually taking the
+>>> interrupt (i.e. in an interrupt controller driver). I can't see how that
+>>> could make sense here.
+>>
+>> So if the guest has acked/EOIed it's IRQ, the GIC at the same time
+>> acked/EOIed the hardware IRQ it found in the LR. Now we assume that this
+>> is the very same as the HW IRQ we found doing our rbtree traversal.
+>> I just wanted to be sure that this is always true and that this mapping
+>> didn't change while the VCPU was running.
+>> If you are sure of this, fine, I was just concerned that someone breaks
+>> this assumption in the future by more dynamically mapping/unmapping
+>> entries (say some irq forwarding user) and we will not notice.
 > 
-> The mapping is kept in a rbtree, indexed by virtual interrupts.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  include/kvm/arm_vgic.h |  18 ++++++++
->  virt/kvm/arm/vgic.c    | 110 +++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 128 insertions(+)
-> 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 4f9fa1d..33d121a 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -159,6 +159,14 @@ struct vgic_io_device {
->  	struct kvm_io_device dev;
->  };
->  
-> +struct irq_phys_map {
-> +	struct rb_node		node;
-> +	u32			virt_irq;
-> +	u32			phys_irq;
-> +	u32			irq;
-> +	bool			active;
-> +};
-> +
->  struct vgic_dist {
->  	spinlock_t		lock;
->  	bool			in_kernel;
-> @@ -256,6 +264,10 @@ struct vgic_dist {
->  	struct vgic_vm_ops	vm_ops;
->  	struct vgic_io_device	dist_iodev;
->  	struct vgic_io_device	*redist_iodevs;
-> +
-> +	/* Virtual irq to hwirq mapping */
-> +	spinlock_t		irq_phys_map_lock;
-> +	struct rb_root		irq_phys_map;
->  };
->  
->  struct vgic_v2_cpu_if {
-> @@ -307,6 +319,9 @@ struct vgic_cpu {
->  		struct vgic_v2_cpu_if	vgic_v2;
->  		struct vgic_v3_cpu_if	vgic_v3;
->  	};
-> +
-> +	/* Protected by the distributor's irq_phys_map_lock */
-> +	struct rb_root	irq_phys_map;
->  };
->  
->  #define LR_EMPTY	0xff
-> @@ -331,6 +346,9 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
->  void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
->  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
->  int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
-> +struct irq_phys_map *vgic_map_phys_irq(struct kvm_vcpu *vcpu,
-> +				       int virt_irq, int irq);
-> +int vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
->  
->  #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
->  #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
-> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> index 59ed7a3..c6604f2 100644
-> --- a/virt/kvm/arm/vgic.c
-> +++ b/virt/kvm/arm/vgic.c
-> @@ -24,6 +24,7 @@
->  #include <linux/of.h>
->  #include <linux/of_address.h>
->  #include <linux/of_irq.h>
-> +#include <linux/rbtree.h>
->  #include <linux/uaccess.h>
->  
->  #include <linux/irqchip/arm-gic.h>
-> @@ -84,6 +85,8 @@ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu);
->  static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu);
->  static struct vgic_lr vgic_get_lr(const struct kvm_vcpu *vcpu, int lr);
->  static void vgic_set_lr(struct kvm_vcpu *vcpu, int lr, struct vgic_lr lr_desc);
-> +static struct irq_phys_map *vgic_irq_map_search(struct kvm_vcpu *vcpu,
-> +						int virt_irq);
->  
->  static const struct vgic_ops *vgic_ops;
->  static const struct vgic_params *vgic;
-> @@ -1585,6 +1588,112 @@ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
->  	return IRQ_HANDLED;
->  }
->  
-> +static struct rb_root *vgic_get_irq_phys_map(struct kvm_vcpu *vcpu,
-> +					     int virt_irq)
-> +{
-> +	if (virt_irq < VGIC_NR_PRIVATE_IRQS)
-> +		return &vcpu->arch.vgic_cpu.irq_phys_map;
-> +	else
-> +		return &vcpu->kvm->arch.vgic.irq_phys_map;
-> +}
-> +
-> +struct irq_phys_map *vgic_map_phys_irq(struct kvm_vcpu *vcpu,
-> +				       int virt_irq, int irq)
-> +{
-> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> +	struct rb_root *root = vgic_get_irq_phys_map(vcpu, virt_irq);
-> +	struct rb_node **new = &root->rb_node, *parent = NULL;
-> +	struct irq_phys_map *new_map;
-> +	struct irq_desc *desc;
-> +	struct irq_data *data;
-> +	int phys_irq;
-> +
-> +	desc = irq_to_desc(irq);
-> +	if (!desc) {
-> +		kvm_err("kvm_arch_timer: can't obtain interrupt descriptor\n");
-> +		return NULL;
-> +	}
-> +
-> +	data = irq_desc_get_irq_data(desc);
-> +	while (data->parent_data)
-> +		data = data->parent_data;
-> +
-> +	phys_irq = data->hwirq;
-> +
-> +	spin_lock(&dist->irq_phys_map_lock);
-> +
-> +	/* Boilerplate rb_tree code */
-> +	while (*new) {
-> +		struct irq_phys_map *this;
-> +
-> +		this = container_of(*new, struct irq_phys_map, node);
-> +		parent = *new;
-> +		if (this->virt_irq < virt_irq)
-> +			new = &(*new)->rb_left;
-> +		else if (this->virt_irq > virt_irq)
-> +			new = &(*new)->rb_right;
-> +		else {
-> +			new_map = this;
-in case the mapping already exists you don't update the mappping or
-return an error. Is it what you want here?
+> How can the mapping change? Are you thinking of an unmap/map operation
+> being done while the guest is running, replacing a HW device with
+> another? That's not an option, and not only for the interrupts.
 
-> +			goto out;
-> +		}
-> +	}
-> +
-> +	new_map = kzalloc(sizeof(*new_map), GFP_KERNEL);
-> +	if (!new_map)
-> +		goto out;
-> +
-> +	new_map->virt_irq = virt_irq;
-> +	new_map->phys_irq = phys_irq;
-> +	new_map->irq = irq;
-> +
-> +	rb_link_node(&new_map->node, parent, new);
-> +	rb_insert_color(&new_map->node, root);
-> +
-> +out:
-> +	spin_unlock(&dist->irq_phys_map_lock);
-> +	return new_map;
-> +}
-> +
-> +static struct irq_phys_map *vgic_irq_map_search(struct kvm_vcpu *vcpu,
-> +						int virt_irq)
-> +{
-> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> +	struct rb_root *root = vgic_get_irq_phys_map(vcpu, virt_irq);
-> +	struct rb_node *node = root->rb_node;
-> +	struct irq_phys_map *this = NULL;
-> +
-> +	spin_lock(&dist->irq_phys_map_lock);
-> +
-> +	while (node) {
-> +		this = container_of(node, struct irq_phys_map, node);
-> +
-> +		if (this->virt_irq < virt_irq)
-> +			node = node->rb_left;
-> +		else if (this->virt_irq > virt_irq)
-> +			node = node->rb_right;
-> +		else
-> +			break;
-> +	}
-> +
-> +	spin_unlock(&dist->irq_phys_map_lock);
-> +	return this;
-> +}
-> +
-> +int vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map)
-> +{
-> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> +
-> +	if (!map)
-> +		return -EINVAL;
-> +
-> +	spin_lock(&dist->irq_phys_map_lock);
-> +	rb_erase(&map->node, vgic_get_irq_phys_map(vcpu, map->virt_irq));
-> +	spin_unlock(&dist->irq_phys_map_lock);
-> +
-> +	kfree(map);
-> +	return 0;
-> +}
-> +
->  void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> @@ -1835,6 +1944,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
->  		goto out_unlock;
->  
->  	spin_lock_init(&kvm->arch.vgic.lock);
-Don't you deallocate the rbtree nodes here? Also in the future with EOI
-mode == 1 we will need to complete the physical IRQ in place of the guest.
+Well that's what we achieved I think with the kvm-vfio integration. The
+requirement was: since we allow the user-space to turn forwarding on,
+through the kvm-vfio device, we should offer the inverse operation and
+this was should never fail. This was achieved by forcing the guest exit,
+check the HW state of the IRQ, and quite a lot of pain ...
 
-- Eric
-> +	spin_lock_init(&kvm->arch.vgic.irq_phys_map_lock);
->  	kvm->arch.vgic.in_kernel = true;
->  	kvm->arch.vgic.vgic_model = type;
->  	kvm->arch.vgic.vctrl_base = vgic->vctrl_base;
+At that time the kvm-vfio integration seemed to be the most appropriate
+approach. Now it seems this is put into question again with Intel posted
+IRQ API series review (https://lkml.org/lkml/2015/6/12/595). I think you
+will happy. not sure I can say the same ;-)
+
+Best Regards
+
+Eric
+
+> 
+> 	M.
 > 
 
