@@ -1,90 +1,38 @@
-From: Vikram Sethi <vikrams@codeaurora.org>
-Subject: Re: HCPTR cp15 writes need isb?
-Date: Tue, 16 Jun 2015 12:51:51 -0500
-Message-ID: <55806237.7060405@codeaurora.org>
-References: <557F7D1F.1070308@codeaurora.org>
- <20150616074624.64b7d71c@why.wild-wind.fr.eu.org>
- <558016CE.2050103@codeaurora.org> <55801AF3.3010705@arm.com>
+From: Mario Smarduch <m.smarduch@samsung.com>
+Subject: [PATCH v2 0/2] arm/arm64: KVM: Optimize arm64 fp/simd,
+ saves 30-50% on exits
+Date: Tue, 16 Jun 2015 14:50:50 -0700
+Message-ID: <1434491452-19177-1-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F295555748
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jun 2015 13:41:20 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id r3lXq6kiFvDP for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Jun 2015 13:41:19 -0400 (EDT)
-Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 40E4A5573A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jun 2015 13:41:18 -0400 (EDT)
-In-Reply-To: <55801AF3.3010705@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, "mmcilvai@qti.qualcomm.com" <mmcilvai@qti.qualcomm.com>, "vikrams@qti.qualcomm.com" <vikrams@qti.qualcomm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, Mario Smarduch <m.smarduch@samsung.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/16/15 07:47, Marc Zyngier wrote:
-> On 16/06/15 13:30, Vikram Sethi wrote:
->> On 06/16/15 01:46, Marc Zyngier wrote:
->>> On Tue, 16 Jun 2015 02:34:23 +0100
->>> Vikram Sethi <vikrams@codeaurora.org> wrote:
->>>
->>> Hi Vikram,
->>>
->>>> Hi Marc, Christoffer, Catalin, Will,
->>>>
->>>> I'm seeing an issue with KVM HCPTR (cp15) writes on guest entry/exit
->>>> on one of Qualcomm's CPU cores in AArch32 host and AArch32 guest
->>>> mode. Our CPU architects believe that HCPTR cp15 writes are context
->>>> changing and require an isb. With an isb in set_hcptr macro in
->>>> arch/arm/kvm/interrupts_head.S I am able to boot the Aarch32 guest,
->>>> but without it, I see strange crashes to hyp_undef or hyp_pabt.
->>> [...]
->>>
->>> Can you look at the following patch (queued for 4.2)?
->>>
->>> http://lists.infradead.org/pipermail/linux-arm-kernel/2015-March/330955.html
->>>
->>> Please let me know if this solves the issue you are seeing.
->> Don't we have the same issue the first time guest touches FP and
->> traps i.e in switch_to_guest_vfp where we turn on floating point
->> access in HCPTR and immediately access FPEXC in store_vfp_state
->> without a isb?
-> Good point, looks like my initial fix is incomplete. I'll repost a more
-> complete fix but in the meantime, does adding the following work for you?
-Yes, the additional isb in switch_to_guest_vfp along with your original patch works for me.
-When you refactor the original patch will it be cleaner to handle the isb in the set_hcptr macro whenever it is changed to not trap VFP access?
+Currently we save/restore fp/simd on each exit. Fist  patch optimizes arm64 
+save/restore, we only do so on Guest access. hackbench and
+several lmbench tests show anywhere from 30% to above 50% optimzation
+achieved.
 
->
-> diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
-> index 3ac7aca..5b30047 100644
-> --- a/arch/arm/kvm/interrupts.S
-> +++ b/arch/arm/kvm/interrupts.S
-> @@ -487,6 +487,7 @@ switch_to_guest_vfp:
->
->  	@ NEON/VFP used.  Turn on VFP access.
->  	set_hcptr vmexit, (HCPTR_TCP(10) | HCPTR_TCP(11))
-> +	isb	@ Force execution of HCPTR as we've just reenabled VFP access
->
->  	@ Switch VFP/NEON hardware state to the guest's
->  	add	r7, r0, #VCPU_VFP_HOST
->
-> Thanks,
->
-> 	M.
+In second patch 32-bit handler is updated to keep exit handling consistent 
+with 64-bit code.
 
+Changes since v1:
+- Addressed Marcs comments
+- Verified optimization improvements with lmbench and hackbench, updated 
+  commit message
+
+Mario Smarduch (2):
+  Optimize arm64 skip 30-50% vfp/simd save/restore on exits
+  keep arm vfp/simd exit handling in sync with arm64
+
+ arch/arm/kvm/interrupts.S        |   12 +++++-----
+ arch/arm64/include/asm/kvm_arm.h |    5 ++++-
+ arch/arm64/kvm/hyp.S             |   46 +++++++++++++++++++++++++++++++++++---
+ 3 files changed, 54 insertions(+), 9 deletions(-)
 
 -- 
-Vikram Sethi
-Qualcomm Technologies Inc, on behalf of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, a Linux Foundation Collaborative Project
+1.7.9.5
+
