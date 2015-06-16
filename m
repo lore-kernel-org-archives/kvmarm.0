@@ -1,162 +1,88 @@
 From: Mario Smarduch <m.smarduch@samsung.com>
-Subject: [PATCH v2 1/2] arm64: KVM: Optimize arm64 fp/simd save/restore
-Date: Tue, 16 Jun 2015 14:50:51 -0700
-Message-ID: <1434491452-19177-2-git-send-email-m.smarduch@samsung.com>
+Subject: [PATCH v2 2/2] arm: KVM: keep arm vfp/simd exit handling consistent
+ with arm64
+Date: Tue, 16 Jun 2015 14:50:52 -0700
+Message-ID: <1434491452-19177-3-git-send-email-m.smarduch@samsung.com>
 References: <1434491452-19177-1-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9573855C47
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jun 2015 17:41:27 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 4ortxHAj4U+n for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 16 Jun 2015 17:41:26 -0400 (EDT)
+Received: from usmailout1.samsung.com (mailout1.w2.samsung.com
+ [211.189.100.11])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E377755C44
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jun 2015 17:41:26 -0400 (EDT)
+Received: from uscpsbgex2.samsung.com
+ (u123.gpu85.samsung.co.kr [203.254.195.123]) by mailout1.w2.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NQ200HUC4QRKL30@mailout1.w2.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Tue, 16 Jun 2015 17:52:03 -0400 (EDT)
 In-reply-to: <1434491452-19177-1-git-send-email-m.smarduch@samsung.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, Mario Smarduch <m.smarduch@samsung.com>
+Cc: catalin.marinas@arm.com, will.deacon@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch only saves and restores FP/SIMD registers on Guest access. To do
-this cptr_el2 FP/SIMD trap is set on Guest entry and later checked on exit.
-lmbench, hackbench show significant improvements, for 30-50% exits FP/SIMD
-context is not saved/restored
+After enhancing arm64 FP/SIMD exit handling, FP/SIMD exit branch is moved
+to guest trap handling. This keeps exiting handling flow between both
+architectures consistent.
 
 Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
 ---
- arch/arm64/include/asm/kvm_arm.h |    5 ++++-
- arch/arm64/kvm/hyp.S             |   46 +++++++++++++++++++++++++++++++++++---
- 2 files changed, 47 insertions(+), 4 deletions(-)
+ arch/arm/kvm/interrupts.S |   12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index ac6fafb..7605e09 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -171,10 +171,13 @@
- #define HSTR_EL2_TTEE	(1 << 16)
- #define HSTR_EL2_T(x)	(1 << x)
+diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
+index 79caf79..fca2c56 100644
+--- a/arch/arm/kvm/interrupts.S
++++ b/arch/arm/kvm/interrupts.S
+@@ -363,10 +363,6 @@ hyp_hvc:
+ 	@ Check syndrome register
+ 	mrc	p15, 4, r1, c5, c2, 0	@ HSR
+ 	lsr	r0, r1, #HSR_EC_SHIFT
+-#ifdef CONFIG_VFPv3
+-	cmp	r0, #HSR_EC_CP_0_13
+-	beq	switch_to_guest_vfp
+-#endif
+ 	cmp	r0, #HSR_EC_HVC
+ 	bne	guest_trap		@ Not HVC instr.
  
-+/* Hyp Coproccessor Trap Register Shifts */
-+#define CPTR_EL2_TFP_SHIFT 10
-+
- /* Hyp Coprocessor Trap Register */
- #define CPTR_EL2_TCPAC	(1 << 31)
- #define CPTR_EL2_TTA	(1 << 20)
--#define CPTR_EL2_TFP	(1 << 10)
-+#define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
+@@ -406,6 +402,12 @@ THUMB(	orr	lr, #1)
+ 1:	eret
  
- /* Hyp Debug Configuration Register bits */
- #define MDCR_EL2_TDRA		(1 << 11)
-diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-index 5befd01..de0788f 100644
---- a/arch/arm64/kvm/hyp.S
-+++ b/arch/arm64/kvm/hyp.S
-@@ -673,6 +673,15 @@
- 	tbz	\tmp, #KVM_ARM64_DEBUG_DIRTY_SHIFT, \target
- .endm
- 
-+/*
-+ * Check cptr VFP/SIMD accessed bit, if set VFP/SIMD not accessed by guest.
-+ */
-+.macro skip_fpsimd_state tmp, target
-+	mrs	\tmp, cptr_el2
-+	tbnz	\tmp, #CPTR_EL2_TFP_SHIFT, \target
-+.endm
-+
-+
- .macro compute_debug_state target
- 	// Compute debug state: If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY
- 	// is set, we do a full save/restore cycle and disable trapping.
-@@ -763,6 +772,7 @@
- 	ldr     x2, [x0, #VCPU_HCR_EL2]
- 	msr     hcr_el2, x2
- 	mov	x2, #CPTR_EL2_TTA
-+	orr     x2, x2, #CPTR_EL2_TFP
- 	msr	cptr_el2, x2
- 
- 	mov	x2, #(1 << 15)	// Trap CP15 Cr=15
-@@ -785,7 +795,6 @@
- .macro deactivate_traps
- 	mov	x2, #HCR_RW
- 	msr	hcr_el2, x2
--	msr	cptr_el2, xzr
- 	msr	hstr_el2, xzr
- 
- 	mrs	x2, mdcr_el2
-@@ -912,6 +921,28 @@ __restore_fpsimd:
- 	restore_fpsimd
- 	ret
- 
-+switch_to_guest_fpsimd:
-+	push	x4, lr
-+
-+	mrs	x2, cptr_el2
-+	bic	x2, x2, #CPTR_EL2_TFP
-+	msr	cptr_el2, x2
-+
-+	mrs	x0, tpidr_el2
-+
-+	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
-+	kern_hyp_va x2
-+	bl __save_fpsimd
-+
-+	add	x2, x0, #VCPU_CONTEXT
-+	bl __restore_fpsimd
-+
-+	pop	x4, lr
-+	pop	x2, x3
-+	pop	x0, x1
-+
-+	eret
-+
- /*
-  * u64 __kvm_vcpu_run(struct kvm_vcpu *vcpu);
-  *
-@@ -932,7 +963,6 @@ ENTRY(__kvm_vcpu_run)
- 	kern_hyp_va x2
- 
- 	save_host_regs
--	bl __save_fpsimd
- 	bl __save_sysregs
- 
- 	compute_debug_state 1f
-@@ -948,7 +978,6 @@ ENTRY(__kvm_vcpu_run)
- 	add	x2, x0, #VCPU_CONTEXT
- 
- 	bl __restore_sysregs
--	bl __restore_fpsimd
- 
- 	skip_debug_state x3, 1f
- 	bl	__restore_debug
-@@ -967,7 +996,9 @@ __kvm_vcpu_return:
- 	add	x2, x0, #VCPU_CONTEXT
- 
- 	save_guest_regs
-+	skip_fpsimd_state x3, 1f
- 	bl __save_fpsimd
-+1:
- 	bl __save_sysregs
- 
- 	skip_debug_state x3, 1f
-@@ -986,7 +1017,11 @@ __kvm_vcpu_return:
- 	kern_hyp_va x2
- 
- 	bl __restore_sysregs
-+	skip_fpsimd_state x3, 1f
- 	bl __restore_fpsimd
-+1:
-+	/* Clear FPSIMD and Trace trapping */
-+	msr     cptr_el2, xzr
- 
- 	skip_debug_state x3, 1f
- 	// Clear the dirty flag for the next run, as all the state has
-@@ -1201,6 +1236,11 @@ el1_trap:
- 	 * x1: ESR
- 	 * x2: ESR_EC
- 	 */
-+
+ guest_trap:
++#ifdef CONFIG_VFPv3
 +	/* Guest accessed VFP/SIMD registers, save host, restore Guest */
-+	cmp	x2, #ESR_ELx_EC_FP_ASIMD
-+	b.eq	switch_to_guest_fpsimd
++	cmp	r0, #HSR_EC_CP_0_13
++	beq	switch_to_guest_fpsimd
++#endif
 +
- 	cmp	x2, #ESR_ELx_EC_DABT_LOW
- 	mov	x0, #ESR_ELx_EC_IABT_LOW
- 	ccmp	x2, x0, #4, ne
+ 	load_vcpu			@ Load VCPU pointer to r0
+ 	str	r1, [vcpu, #VCPU_HSR]
+ 
+@@ -478,7 +480,7 @@ guest_trap:
+  * inject an undefined exception to the guest.
+  */
+ #ifdef CONFIG_VFPv3
+-switch_to_guest_vfp:
++switch_to_guest_fpsimd:
+ 	load_vcpu			@ Load VCPU pointer to r0
+ 	push	{r3-r7}
+ 
 -- 
 1.7.9.5
-
