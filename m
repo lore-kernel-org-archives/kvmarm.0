@@ -1,80 +1,95 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: HCPTR cp15 writes need isb?
-Date: Tue, 16 Jun 2015 13:47:47 +0100
-Message-ID: <55801AF3.3010705@arm.com>
-References: <557F7D1F.1070308@codeaurora.org>
- <20150616074624.64b7d71c@why.wild-wind.fr.eu.org>
- <558016CE.2050103@codeaurora.org>
+Subject: Re: [PATCH 2/2] arm64: KVM: Add VCPU support for Qualcomm Technologies
+ Kryo ARMv8 CPU
+Date: Tue, 16 Jun 2015 14:32:03 +0100
+Message-ID: <55802553.4020600@arm.com>
+References: <1434146263-30972-1-git-send-email-timur@codeaurora.org> <1434146263-30972-2-git-send-email-timur@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FB195520E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jun 2015 08:37:26 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id idvPpFJ395qP for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Jun 2015 08:37:16 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 52FB65520D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Jun 2015 08:37:15 -0400 (EDT)
-In-Reply-To: <558016CE.2050103@codeaurora.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vikram Sethi <vikrams@codeaurora.org>
-Cc: Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, "mmcilvai@qti.qualcomm.com" <mmcilvai@qti.qualcomm.com>, "vikrams@qti.qualcomm.com" <vikrams@qti.qualcomm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Return-path: <linux-arm-msm-owner@vger.kernel.org>
+In-Reply-To: <1434146263-30972-2-git-send-email-timur@codeaurora.org>
+Sender: linux-arm-msm-owner@vger.kernel.org
+To: Timur Tabi <timur@codeaurora.org>, Vipul Gandhi <vgandhi@codeaurora.org>, Shanker Donthineni <shankerd@codeaurora.org>, linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org, kvm@vger.kernel.org, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Cc: Suzuki Poulose <Suzuki.Poulose@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 16/06/15 13:30, Vikram Sethi wrote:
-> On 06/16/15 01:46, Marc Zyngier wrote:
->> On Tue, 16 Jun 2015 02:34:23 +0100
->> Vikram Sethi <vikrams@codeaurora.org> wrote:
->>
->> Hi Vikram,
->>
->>> Hi Marc, Christoffer, Catalin, Will,
->>>
->>> I'm seeing an issue with KVM HCPTR (cp15) writes on guest entry/exit
->>> on one of Qualcomm's CPU cores in AArch32 host and AArch32 guest
->>> mode. Our CPU architects believe that HCPTR cp15 writes are context
->>> changing and require an isb. With an isb in set_hcptr macro in
->>> arch/arm/kvm/interrupts_head.S I am able to boot the Aarch32 guest,
->>> but without it, I see strange crashes to hyp_undef or hyp_pabt.
->> [...]
->>
->> Can you look at the following patch (queued for 4.2)?
->>
->> http://lists.infradead.org/pipermail/linux-arm-kernel/2015-March/330955.html
->>
->> Please let me know if this solves the issue you are seeing.
-> Don't we have the same issue the first time guest touches FP and
-> traps i.e in switch_to_guest_vfp where we turn on floating point
-> access in HCPTR and immediately access FPEXC in store_vfp_state
-> without a isb?
+In the future, please add the KVM/ARM maintainers on Cc.
 
-Good point, looks like my initial fix is incomplete. I'll repost a more
-complete fix but in the meantime, does adding the following work for you?
+On 12/06/15 22:57, Timur Tabi wrote:
+> From: Shanker Donthineni <shankerd@codeaurora.org>
+> 
+> This patch enables assignment of 32/64bit guest VCPU to
+> Qualcomm Technologies ARMv8 CPU. Added KVM_ARM_TARGET_QCOM_KRYO
+> to the KVM target list and modified vm_target_cpu() to return
+> KVM_ARM_TARGET_QCOM_KRYO when CPU running in AArch64 mode.
+> 
+> Signed-off-by: Shanker Donthineni <shankerd@codeaurora.org>
+> Signed-off-by: Timur Tabi <timur@codeaurora.org>
+> ---
+>  arch/arm64/include/uapi/asm/kvm.h    | 3 ++-
+>  arch/arm64/kvm/guest.c               | 6 ++++++
+>  arch/arm64/kvm/sys_regs_generic_v8.c | 2 ++
+>  3 files changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index d268320..426933e 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -59,8 +59,9 @@ struct kvm_regs {
+>  #define KVM_ARM_TARGET_CORTEX_A57	2
+>  #define KVM_ARM_TARGET_XGENE_POTENZA	3
+>  #define KVM_ARM_TARGET_CORTEX_A53	4
+> +#define KVM_ARM_TARGET_QCOM_KRYO	5
+>  
+> -#define KVM_ARM_NUM_TARGETS		5
+> +#define KVM_ARM_NUM_TARGETS		6
+>  
+>  /* KVM_ARM_SET_DEVICE_ADDR ioctl id encoding */
+>  #define KVM_ARM_DEVICE_TYPE_SHIFT	0
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 9535bd5..836cf16 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -291,6 +291,12 @@ int __attribute_const__ kvm_target_cpu(void)
+>  			return KVM_ARM_TARGET_XGENE_POTENZA;
+>  		};
+>  		break;
+> +	case ARM_CPU_IMP_QCOM:
+> +		switch (part_number & QCOM_CPU_PART_MASK) {
+> +		case QCOM_CPU_PART_KRYO:
+> +			return KVM_ARM_TARGET_QCOM_KRYO;
+> +		}
+> +		break;
+>  	};
+>  
+>  	return -EINVAL;
+> diff --git a/arch/arm64/kvm/sys_regs_generic_v8.c b/arch/arm64/kvm/sys_regs_generic_v8.c
+> index 475fd29..3712ea8 100644
+> --- a/arch/arm64/kvm/sys_regs_generic_v8.c
+> +++ b/arch/arm64/kvm/sys_regs_generic_v8.c
+> @@ -94,6 +94,8 @@ static int __init sys_reg_genericv8_init(void)
+>  					  &genericv8_target_table);
+>  	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_XGENE_POTENZA,
+>  					  &genericv8_target_table);
+> +	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_QCOM_KRYO,
+> +					  &genericv8_target_table);
+>  
+>  	return 0;
+>  }
+> 
 
-diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
-index 3ac7aca..5b30047 100644
---- a/arch/arm/kvm/interrupts.S
-+++ b/arch/arm/kvm/interrupts.S
-@@ -487,6 +487,7 @@ switch_to_guest_vfp:
+That's getting slightly out of hand and I think we need to stop being
+paranoid.
 
- 	@ NEON/VFP used.  Turn on VFP access.
- 	set_hcptr vmexit, (HCPTR_TCP(10) | HCPTR_TCP(11))
-+	isb	@ Force execution of HCPTR as we've just reenabled VFP access
+All our target CPUs are using the generic tables, and this looks like an
+unnecessary complexity as long as we choose to ignore
+cross-microarchitecture migration (things like big-little or live
+migration from one CPU type to another).
 
- 	@ Switch VFP/NEON hardware state to the guest's
- 	add	r7, r0, #VCPU_VFP_HOST
+Let's just implement a default target that works for everything. Should
+we support some CPUs in a more specific manner, it will then be worth
+adding to that list. I believe Suzuki (cc-ed) has something brewing.
 
 Thanks,
 
