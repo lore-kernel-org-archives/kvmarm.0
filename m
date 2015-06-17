@@ -1,80 +1,87 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: HCPTR cp15 writes need isb?
-Date: Wed, 17 Jun 2015 09:38:50 +0100
-Message-ID: <5581321A.2060300@arm.com>
-References: <557F7D1F.1070308@codeaurora.org>
- <20150616074624.64b7d71c@why.wild-wind.fr.eu.org>
- <558016CE.2050103@codeaurora.org> <55801AF3.3010705@arm.com>
- <55806237.7060405@codeaurora.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 88E8555CC1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2015 04:28:18 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bpm4OfM5RU+0 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Jun 2015 04:28:17 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A00255CA2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2015 04:28:16 -0400 (EDT)
-In-Reply-To: <55806237.7060405@codeaurora.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vikram Sethi <vikrams@codeaurora.org>
-Cc: Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, "mmcilvai@qti.qualcomm.com" <mmcilvai@qti.qualcomm.com>, "vikrams@qti.qualcomm.com" <vikrams@qti.qualcomm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
+Subject: [PATCH] arm64/kvm: Add generic v8 KVM target
+Date: Wed, 17 Jun 2015 10:00:46 +0100
+Message-ID: <1434531646-4873-1-git-send-email-suzuki.poulose@arm.com>
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: christoffer.dall@linaro.org, Marc.Zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, timur@codeaurora.org, shankerd@codeaurora.org, vgandhi@codeaurora.org, "Suzuki K. Poulose" <suzuki.poulose@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 16/06/15 18:51, Vikram Sethi wrote:
-> On 06/16/15 07:47, Marc Zyngier wrote:
->> On 16/06/15 13:30, Vikram Sethi wrote:
->>> On 06/16/15 01:46, Marc Zyngier wrote:
->>>> On Tue, 16 Jun 2015 02:34:23 +0100
->>>> Vikram Sethi <vikrams@codeaurora.org> wrote:
->>>>
->>>> Hi Vikram,
->>>>
->>>>> Hi Marc, Christoffer, Catalin, Will,
->>>>>
->>>>> I'm seeing an issue with KVM HCPTR (cp15) writes on guest entry/exit
->>>>> on one of Qualcomm's CPU cores in AArch32 host and AArch32 guest
->>>>> mode. Our CPU architects believe that HCPTR cp15 writes are context
->>>>> changing and require an isb. With an isb in set_hcptr macro in
->>>>> arch/arm/kvm/interrupts_head.S I am able to boot the Aarch32 guest,
->>>>> but without it, I see strange crashes to hyp_undef or hyp_pabt.
->>>> [...]
->>>>
->>>> Can you look at the following patch (queued for 4.2)?
->>>>
->>>> http://lists.infradead.org/pipermail/linux-arm-kernel/2015-March/330955.html
->>>>
->>>> Please let me know if this solves the issue you are seeing.
->>> Don't we have the same issue the first time guest touches FP and
->>> traps i.e in switch_to_guest_vfp where we turn on floating point
->>> access in HCPTR and immediately access FPEXC in store_vfp_state
->>> without a isb?
->> Good point, looks like my initial fix is incomplete. I'll repost a more
->> complete fix but in the meantime, does adding the following work for you?
-> Yes, the additional isb in switch_to_guest_vfp along with your original patch works for me.
-> When you refactor the original patch will it be cleaner to handle the
-> isb in the set_hcptr macro whenever it is changed to not trap VFP
-> access?
+From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
 
-That's what I have done, but the result is a bit awkward, so I'm in two
-minds about it. I'll post it in a minute, please check that it still
-works for you (though I've checked that the generated code is the same).
+This patch adds a generic ARM v8 KVM target cpu type for use
+by the new CPUs which eventualy ends up using the common sys_reg
+table. For backward compatibility the existing targets have been
+preserved. Any new target CPU that can be covered by generic v8
+sys_reg tables should make use of the new generic target.
 
-Thanks,
+Signed-off-by: Suzuki K. Poulose <suzuki.poulose@arm.com>
+Acked-by: Marc Zyngier <Marc.Zyngier@arm.com>
+---
+ arch/arm64/include/uapi/asm/kvm.h    |   10 ++++++++--
+ arch/arm64/kvm/guest.c               |    3 ++-
+ arch/arm64/kvm/sys_regs_generic_v8.c |    2 ++
+ 3 files changed, 12 insertions(+), 3 deletions(-)
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/as=
+m/kvm.h
+index d268320..f5de418 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -53,14 +53,20 @@ struct kvm_regs {
+ =09struct user_fpsimd_state fp_regs;
+ };
+=20
+-/* Supported Processor Types */
++/*
++ * Supported CPU Targets - Adding a new target type is not recommended,
++ * unless there are some special registers not supported by the
++ * genericv8 syreg table.
++ */
+ #define KVM_ARM_TARGET_AEM_V8=09=090
+ #define KVM_ARM_TARGET_FOUNDATION_V8=091
+ #define KVM_ARM_TARGET_CORTEX_A57=092
+ #define KVM_ARM_TARGET_XGENE_POTENZA=093
+ #define KVM_ARM_TARGET_CORTEX_A53=094
++/* Generic ARM v8 target */
++#define KVM_ARM_TARGET_GENERIC_V8=095
+=20
+-#define KVM_ARM_NUM_TARGETS=09=095
++#define KVM_ARM_NUM_TARGETS=09=096
+=20
+ /* KVM_ARM_SET_DEVICE_ADDR ioctl id encoding */
+ #define KVM_ARM_DEVICE_TYPE_SHIFT=090
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 9535bd5..124aa57 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -293,7 +293,8 @@ int __attribute_const__ kvm_target_cpu(void)
+ =09=09break;
+ =09};
+=20
+-=09return -EINVAL;
++=09/* Return a default generic target */
++=09return KVM_ARM_TARGET_GENERIC_V8;
+ }
+=20
+ int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init)
+diff --git a/arch/arm64/kvm/sys_regs_generic_v8.c b/arch/arm64/kvm/sys_regs=
+_generic_v8.c
+index 475fd29..1e45768 100644
+--- a/arch/arm64/kvm/sys_regs_generic_v8.c
++++ b/arch/arm64/kvm/sys_regs_generic_v8.c
+@@ -94,6 +94,8 @@ static int __init sys_reg_genericv8_init(void)
+ =09=09=09=09=09  &genericv8_target_table);
+ =09kvm_register_target_sys_reg_table(KVM_ARM_TARGET_XGENE_POTENZA,
+ =09=09=09=09=09  &genericv8_target_table);
++=09kvm_register_target_sys_reg_table(KVM_ARM_TARGET_GENERIC_V8,
++=09=09=09=09=09  &genericv8_target_table);
+=20
+ =09return 0;
+ }
+--=20
+1.7.9.5
+
