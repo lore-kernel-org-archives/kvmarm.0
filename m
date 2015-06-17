@@ -1,200 +1,158 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 08/10] arm: prepare for instantiating different IRQ
- chip devices
-Date: Wed, 17 Jun 2015 14:06:36 +0100
-Message-ID: <558170DC.2010206@arm.com>
-References: <1434540121-21283-1-git-send-email-andre.przywara@arm.com> <1434540121-21283-9-git-send-email-andre.przywara@arm.com>
+Subject: Re: [PATCH v3 09/10] arm: add support for supplying GICv3 redistributor
+ addresses
+Date: Wed, 17 Jun 2015 14:09:51 +0100
+Message-ID: <5581719F.6090405@arm.com>
+References: <1434540121-21283-1-git-send-email-andre.przywara@arm.com> <1434540121-21283-10-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1434540121-21283-9-git-send-email-andre.przywara@arm.com>
+In-Reply-To: <1434540121-21283-10-git-send-email-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <Will.Deacon@arm.com>
 Cc: "penberg@kernel.org" <penberg@kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17/06/15 12:21, Andre Przywara wrote:
-> Extend the vGIC handling code to potentially deal with different IRQ
-> chip devices instead of hard-coding the GICv2 in.
-> We extend most vGIC functions to take a type parameter, but still put
-> GICv2 in at the top for the time being.
+On 17/06/15 12:22, Andre Przywara wrote:
+> Instead of the GIC virtual CPU interface an emulated GICv3 needs to
+> have accesses to its emulated redistributors trapped in the guest.
+> Add code to tell the kernel about the mapping if a GICv3 emulation was
+> requested by the user.
+> 
+> This contains some defines which are not (yet) in the (32 bit) header
+> files to allow compilation for ARM.
 > 
 > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
->  arm/aarch32/arm-cpu.c        |  2 +-
->  arm/aarch64/arm-cpu.c        |  2 +-
->  arm/gic.c                    | 44 +++++++++++++++++++++++++++++++++++---------
->  arm/include/arm-common/gic.h |  8 ++++++--
->  arm/kvm.c                    |  2 +-
->  5 files changed, 44 insertions(+), 14 deletions(-)
+>  arm/gic.c                         | 36 +++++++++++++++++++++++++++++++++++-
+>  arm/include/arm-common/gic.h      |  3 ++-
+>  arm/include/arm-common/kvm-arch.h |  7 +++++++
+>  3 files changed, 44 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arm/aarch32/arm-cpu.c b/arm/aarch32/arm-cpu.c
-> index 946e443..d8d6293 100644
-> --- a/arm/aarch32/arm-cpu.c
-> +++ b/arm/aarch32/arm-cpu.c
-> @@ -12,7 +12,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm, u32 gic_phandle)
->  {
->  	int timer_interrupts[4] = {13, 14, 11, 10};
->  
-> -	gic__generate_fdt_nodes(fdt, gic_phandle);
-> +	gic__generate_fdt_nodes(fdt, gic_phandle, IRQCHIP_GICV2);
->  	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
->  }
->  
-> diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-> index 8efe877..f702b9e 100644
-> --- a/arm/aarch64/arm-cpu.c
-> +++ b/arm/aarch64/arm-cpu.c
-> @@ -12,7 +12,7 @@
->  static void generate_fdt_nodes(void *fdt, struct kvm *kvm, u32 gic_phandle)
->  {
->  	int timer_interrupts[4] = {13, 14, 11, 10};
-> -	gic__generate_fdt_nodes(fdt, gic_phandle);
-> +	gic__generate_fdt_nodes(fdt, gic_phandle, IRQCHIP_GICV2);
->  	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
->  }
->  
 > diff --git a/arm/gic.c b/arm/gic.c
-> index 05f85a2..b6c5868 100644
+> index b6c5868..efe4b42 100644
 > --- a/arm/gic.c
 > +++ b/arm/gic.c
-> @@ -11,13 +11,13 @@
+> @@ -9,7 +9,18 @@
+>  #include <linux/kernel.h>
+>  #include <linux/kvm.h>
 >  
+> +/* Those names are not defined for ARM (yet) */
+> +#ifndef KVM_VGIC_V3_ADDR_TYPE_DIST
+> +#define KVM_VGIC_V3_ADDR_TYPE_DIST 2
+> +#endif
+> +
+> +#ifndef KVM_VGIC_V3_ADDR_TYPE_REDIST
+> +#define KVM_VGIC_V3_ADDR_TYPE_REDIST 3
+> +#endif
+> +
 >  static int gic_fd = -1;
+> +static u64 gic_redists_base;
+> +static u64 gic_redists_size;
 >  
-> -static int gic__create_device(struct kvm *kvm)
-> +static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+>  static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
 >  {
->  	int err;
->  	u64 cpu_if_addr = ARM_GIC_CPUI_BASE;
->  	u64 dist_addr = ARM_GIC_DIST_BASE;
->  	struct kvm_create_device gic_device = {
-> -		.type	= KVM_DEV_TYPE_ARM_VGIC_V2,
-> +		.flags	= 0,
->  	};
->  	struct kvm_device_attr cpu_if_attr = {
+> @@ -28,12 +39,21 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
 >  		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
-> @@ -26,17 +26,27 @@ static int gic__create_device(struct kvm *kvm)
->  	};
->  	struct kvm_device_attr dist_attr = {
->  		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
-> -		.attr	= KVM_VGIC_V2_ADDR_TYPE_DIST,
 >  		.addr	= (u64)(unsigned long)&dist_addr,
 >  	};
+> +	struct kvm_device_attr redist_attr = {
+> +		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
+> +		.attr	= KVM_VGIC_V3_ADDR_TYPE_REDIST,
+> +		.addr	= (u64)(unsigned long)&gic_redists_base,
+> +	};
 >  
-> +	switch (type) {
-> +	case IRQCHIP_GICV2:
-> +		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V2;
-> +		dist_attr.attr  = KVM_VGIC_V2_ADDR_TYPE_DIST;
+>  	switch (type) {
+>  	case IRQCHIP_GICV2:
+>  		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V2;
+>  		dist_attr.attr  = KVM_VGIC_V2_ADDR_TYPE_DIST;
+>  		break;
+> +	case IRQCHIP_GICV3:
+> +		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V3;
+> +		dist_attr.attr  = KVM_VGIC_V3_ADDR_TYPE_DIST;
 > +		break;
-> +	}
-> +
+>  	}
+>  
 >  	err = ioctl(kvm->vm_fd, KVM_CREATE_DEVICE, &gic_device);
->  	if (err)
->  		return err;
->  
->  	gic_fd = gic_device.fd;
->  
-> -	err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &cpu_if_attr);
-> +	switch (type) {
-> +	case IRQCHIP_GICV2:
-> +		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &cpu_if_attr);
+> @@ -46,6 +66,9 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+>  	case IRQCHIP_GICV2:
+>  		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &cpu_if_attr);
+>  		break;
+> +	case IRQCHIP_GICV3:
+> +		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &redist_attr);
 > +		break;
-> +	}
+>  	}
 >  	if (err)
 >  		goto out_err;
->  
-> @@ -80,13 +90,20 @@ static int gic__create_irqchip(struct kvm *kvm)
->  	return err;
->  }
->  
-> -int gic__create(struct kvm *kvm)
-> +int gic__create(struct kvm *kvm, enum irqchip_type type)
->  {
->  	int err;
->  
-> +	switch (type) {
-> +	case IRQCHIP_GICV2:
+> @@ -97,6 +120,10 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
+>  	switch (type) {
+>  	case IRQCHIP_GICV2:
+>  		break;
+> +	case IRQCHIP_GICV3:
+> +		gic_redists_size = kvm->cfg.nrcpus * ARM_GIC_REDIST_SIZE;
+> +		gic_redists_base = ARM_GIC_DIST_BASE - gic_redists_size;
 > +		break;
-> +	default:
-> +		return -ENODEV;
-> +	}
-> +
->  	/* Try the new way first, and fallback on legacy method otherwise */
-> -	err = gic__create_device(kvm);
-> -	if (err)
-> +	err = gic__create_device(kvm, type);
-> +	if (err && type == IRQCHIP_GICV2)
->  		err = gic__create_irqchip(kvm);
->  
->  	return err;
-> @@ -134,15 +151,24 @@ static int gic__init_gic(struct kvm *kvm)
->  }
->  late_init(gic__init_gic)
->  
-> -void gic__generate_fdt_nodes(void *fdt, u32 phandle)
-> +void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type)
->  {
-> +	const char *compatible;
+>  	default:
+>  		return -ENODEV;
+>  	}
+> @@ -156,12 +183,19 @@ void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type)
+>  	const char *compatible;
 >  	u64 reg_prop[] = {
 >  		cpu_to_fdt64(ARM_GIC_DIST_BASE), cpu_to_fdt64(ARM_GIC_DIST_SIZE),
->  		cpu_to_fdt64(ARM_GIC_CPUI_BASE), cpu_to_fdt64(ARM_GIC_CPUI_SIZE),
+> -		cpu_to_fdt64(ARM_GIC_CPUI_BASE), cpu_to_fdt64(ARM_GIC_CPUI_SIZE),
+> +		0, 0,				/* to be filled */
 >  	};
 >  
-> +	switch (type) {
-> +	case IRQCHIP_GICV2:
-> +		compatible = "arm,cortex-a15-gic";
+>  	switch (type) {
+>  	case IRQCHIP_GICV2:
+>  		compatible = "arm,cortex-a15-gic";
+> +		reg_prop[2] = cpu_to_fdt64(ARM_GIC_CPUI_BASE);
+> +		reg_prop[3] = cpu_to_fdt64(ARM_GIC_CPUI_SIZE);
 > +		break;
-> +	default:
-> +		return;
-> +	}
-> +
->  	_FDT(fdt_begin_node(fdt, "intc"));
-> -	_FDT(fdt_property_string(fdt, "compatible", "arm,cortex-a15-gic"));
-> +	_FDT(fdt_property_string(fdt, "compatible", compatible));
->  	_FDT(fdt_property_cell(fdt, "#interrupt-cells", GIC_FDT_IRQ_NUM_CELLS));
->  	_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
->  	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
+> +	case IRQCHIP_GICV3:
+> +		compatible = "arm,gic-v3";
+> +		reg_prop[2] = cpu_to_fdt64(gic_redists_base);
+> +		reg_prop[3] = cpu_to_fdt64(gic_redists_size);
+>  		break;
+>  	default:
+>  		return;
 > diff --git a/arm/include/arm-common/gic.h b/arm/include/arm-common/gic.h
-> index 44859f7..2ed76fa 100644
+> index 2ed76fa..403d93b 100644
 > --- a/arm/include/arm-common/gic.h
 > +++ b/arm/include/arm-common/gic.h
-> @@ -21,10 +21,14 @@
->  #define GIC_MAX_CPUS			8
+> @@ -22,7 +22,8 @@
 >  #define GIC_MAX_IRQ			255
 >  
-> +enum irqchip_type {
-> +	IRQCHIP_GICV2
+>  enum irqchip_type {
+> -	IRQCHIP_GICV2
+> +	IRQCHIP_GICV2,
+> +	IRQCHIP_GICV3
 
-Nit: comma after each member of enum/struct.
+Same remark as for the previous patch.
 
-> +};
-> +
+>  };
+>  
 >  struct kvm;
+> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+> index 90d6733..0f5fb7f 100644
+> --- a/arm/include/arm-common/kvm-arch.h
+> +++ b/arm/include/arm-common/kvm-arch.h
+> @@ -30,6 +30,13 @@
+>  #define KVM_PCI_MMIO_AREA	(KVM_PCI_CFG_AREA + ARM_PCI_CFG_SIZE)
+>  #define KVM_VIRTIO_MMIO_AREA	ARM_MMIO_AREA
 >  
->  int gic__alloc_irqnum(void);
-> -int gic__create(struct kvm *kvm);
-> -void gic__generate_fdt_nodes(void *fdt, u32 phandle);
-> +int gic__create(struct kvm *kvm, enum irqchip_type type);
-> +void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type);
+> +/*
+> + * On a GICv3 there must be one redistributor per vCPU.
+> + * The value here is the size for one, we multiply this at runtime with
+> + * the number of requested vCPUs to get the actual size.
+> + */
+> +#define ARM_GIC_REDIST_SIZE	0x20000
+> +
+>  #define KVM_IRQ_OFFSET		GIC_SPI_IRQ_BASE
 >  
->  #endif /* ARM_COMMON__GIC_H */
-> diff --git a/arm/kvm.c b/arm/kvm.c
-> index bcd2533..f9685c2 100644
-> --- a/arm/kvm.c
-> +++ b/arm/kvm.c
-> @@ -82,6 +82,6 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
->  		MADV_MERGEABLE | MADV_HUGEPAGE);
->  
->  	/* Create the virtual GIC. */
-> -	if (gic__create(kvm))
-> +	if (gic__create(kvm, IRQCHIP_GICV2))
->  		die("Failed to create virtual GIC");
->  }
+>  #define KVM_VM_TYPE		0
 > 
-
-Otherwise,
 
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
