@@ -1,145 +1,205 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 06/10] arm: simplify MMIO dispatching
-Date: Wed, 17 Jun 2015 15:06:34 +0100
-Message-ID: <55817EEA.9060402@arm.com>
-References: <1434540121-21283-1-git-send-email-andre.przywara@arm.com> <1434540121-21283-7-git-send-email-andre.przywara@arm.com> <55816C9F.1090500@arm.com> <55817B07.8010502@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH 10/10] KVM: arm/arm64: vgic: Allow non-shared device HW
+ interrupts
+Date: Wed, 17 Jun 2015 17:11:02 +0200
+Message-ID: <55818E06.8010400@linaro.org>
+References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com>
+ <1433783045-8002-11-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <55817B07.8010502@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <Will.Deacon@arm.com>
-Cc: "penberg@kernel.org" <penberg@kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A183555E0A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2015 11:00:46 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id TiNAOYMDo1n0 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Jun 2015 11:00:42 -0400 (EDT)
+Received: from mail-wg0-f53.google.com (mail-wg0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5A4F455E08
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2015 11:00:42 -0400 (EDT)
+Received: by wgbhy7 with SMTP id hy7so39715806wgb.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Jun 2015 08:11:20 -0700 (PDT)
+In-Reply-To: <1433783045-8002-11-git-send-email-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17/06/15 14:49, Andre Przywara wrote:
-> Hi Marc,
+Hi Marc,
+On 06/08/2015 07:04 PM, Marc Zyngier wrote:
+> So far, the only use of the HW interrupt facility is the timer,
+> implying that the active state is context-switched for each vcpu,
+> as the device is is shared across all vcpus.
+s/is//
 > 
-> On 06/17/2015 01:48 PM, Marc Zyngier wrote:
->> On 17/06/15 12:21, Andre Przywara wrote:
->>> Currently we separate any incoming MMIO request into one of the ARM
->>> memory map regions and take care to spare the GIC.
->>> It turns out that this is unnecessary, as we only have one special
->>> region (the IO port area in the first 64 KByte). The MMIO rbtree
->>> takes care about unhandled MMIO ranges, so we can simply drop all the
->>> special range checking (except that for the IO range) in
->>> kvm_cpu__emulate_mmio().
->>> As the GIC is handled in the kernel, a GIC MMIO access should never
->>> reach userland (and we don't know what to do with it anyway).
->>> This lets us delete some more code and simplifies future extensions
->>> (like expanding the GIC regions).
->>> To be in line with the other architectures, move the now simpler
->>> code into a header file.
->>>
->>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>> ---
->>>  arm/include/arm-common/kvm-arch.h     | 12 ------------
->>>  arm/include/arm-common/kvm-cpu-arch.h | 14 ++++++++++++--
->>>  arm/kvm-cpu.c                         | 16 ----------------
->>>  3 files changed, 12 insertions(+), 30 deletions(-)
->>>
->>> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
->>> index 082131d..90d6733 100644
->>> --- a/arm/include/arm-common/kvm-arch.h
->>> +++ b/arm/include/arm-common/kvm-arch.h
->>> @@ -45,18 +45,6 @@ static inline bool arm_addr_in_ioport_region(u64 phys_addr)
->>>  	return phys_addr >= KVM_IOPORT_AREA && phys_addr < limit;
->>>  }
->>>  
->>> -static inline bool arm_addr_in_virtio_mmio_region(u64 phys_addr)
->>> -{
->>> -	u64 limit = KVM_VIRTIO_MMIO_AREA + ARM_VIRTIO_MMIO_SIZE;
->>> -	return phys_addr >= KVM_VIRTIO_MMIO_AREA && phys_addr < limit;
->>> -}
->>> -
->>> -static inline bool arm_addr_in_pci_region(u64 phys_addr)
->>> -{
->>> -	u64 limit = KVM_PCI_CFG_AREA + ARM_PCI_CFG_SIZE + ARM_PCI_MMIO_SIZE;
->>> -	return phys_addr >= KVM_PCI_CFG_AREA && phys_addr < limit;
->>> -}
->>> -
->>>  struct kvm_arch {
->>>  	/*
->>>  	 * We may have to align the guest memory for virtio, so keep the
->>> diff --git a/arm/include/arm-common/kvm-cpu-arch.h b/arm/include/arm-common/kvm-cpu-arch.h
->>> index 36c7872..329979a 100644
->>> --- a/arm/include/arm-common/kvm-cpu-arch.h
->>> +++ b/arm/include/arm-common/kvm-cpu-arch.h
->>> @@ -44,8 +44,18 @@ static inline bool kvm_cpu__emulate_io(struct kvm_cpu *vcpu, u16 port, void *dat
->>>  	return false;
->>>  }
->>>  
->>> -bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data,
->>> -			   u32 len, u8 is_write);
->>> +static inline bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr,
->>> +					 u8 *data, u32 len, u8 is_write)
->>> +{
->>> +	if (arm_addr_in_ioport_region(phys_addr)) {
->>> +		int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
->>> +		u16 port = (phys_addr - KVM_IOPORT_AREA) & USHRT_MAX;
->>> +
->>> +		return kvm__emulate_io(vcpu, port, data, direction, len, 1);
->>> +	}
->>> +
->>> +	return kvm__emulate_mmio(vcpu, phys_addr, data, len, is_write);
->>> +}
->>>  
->>>  unsigned long kvm_cpu__get_vcpu_mpidr(struct kvm_cpu *vcpu);
->>>  
->>> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
->>> index ab08815..7780251 100644
->>> --- a/arm/kvm-cpu.c
->>> +++ b/arm/kvm-cpu.c
->>> @@ -139,22 +139,6 @@ bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
->>>  	return false;
->>>  }
->>>  
->>> -bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data,
->>> -			   u32 len, u8 is_write)
->>> -{
->>> -	if (arm_addr_in_virtio_mmio_region(phys_addr)) {
->>> -		return kvm__emulate_mmio(vcpu, phys_addr, data, len, is_write);
->>> -	} else if (arm_addr_in_ioport_region(phys_addr)) {
->>> -		int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
->>> -		u16 port = (phys_addr - KVM_IOPORT_AREA) & USHRT_MAX;
->>> -		return kvm__emulate_io(vcpu, port, data, direction, len, 1);
->>> -	} else if (arm_addr_in_pci_region(phys_addr)) {
->>> -		return kvm__emulate_mmio(vcpu, phys_addr, data, len, is_write);
->>> -	}
->>
->> Can you explain why this arm_addr_in_pci_region(phys_addr) check has
->> disappeared in your updated version on this function? It may be a non
->> issue, but I'd very much like to understand.
+> This does not work for a device that has been assigned to a VM,
+> as the guest is entierely in control of that device (the HW is
+entirely?
+> not shared). In that case, it makes sense to bypass the whole
+> active state srtwitchint, and only track the deactivation of the
+switching
+> interrupt.
 > 
-> If you look above the calls to kvm__emulate_mmio() are exactly the same
-> for the PCI and the virtio_mmio region, also as the areas are
-> non-overlapping the if branches can be reordered.
-> arm_addr_in_virtio_mmio_region() is true between 64k and (1GB - GIC),
-> while arm_addr_in_pci_region() gives true between 1GB and 2GB.
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  include/kvm/arm_vgic.h    |  5 +++--
+>  virt/kvm/arm/arch_timer.c |  2 +-
+>  virt/kvm/arm/vgic.c       | 37 ++++++++++++++++++++++++-------------
+>  3 files changed, 28 insertions(+), 16 deletions(-)
 > 
-> So this translates into: do kvm__emulate_io() for anything below 64K and
-> kvm__emulate_mmio() for everything else except for the GIC area,
-> admittedly in a quite convoluted way.
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 1c653c1..5d47d60 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -164,7 +164,8 @@ struct irq_phys_map {
+>  	u32			virt_irq;
+>  	u32			phys_irq;
+>  	u32			irq;
+> -	bool			active;
+> +	bool			shared;
+> +	bool			active; /* Only valid if shared */
+>  };
+>  
+>  struct vgic_dist {
+> @@ -347,7 +348,7 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
+>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+>  int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
+>  struct irq_phys_map *vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+> -				       int virt_irq, int irq);
+> +				       int virt_irq, int irq, bool shared);
+>  int vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
+>  bool vgic_get_phys_irq_active(struct irq_phys_map *map);
+>  void vgic_set_phys_irq_active(struct irq_phys_map *map, bool active);
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index b9fff78..9544d79 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -202,7 +202,7 @@ void kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+>  	 * Tell the VGIC that the virtual interrupt is tied to a
+>  	 * physical interrupt. We do that once per VCPU.
+>  	 */
+> -	timer->map = vgic_map_phys_irq(vcpu, irq->irq, host_vtimer_irq);
+> +	timer->map = vgic_map_phys_irq(vcpu, irq->irq, host_vtimer_irq, true);
+>  	WARN_ON(!timer->map);
+>  }
+>  
+> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+> index f376b56..4223166 100644
+> --- a/virt/kvm/arm/vgic.c
+> +++ b/virt/kvm/arm/vgic.c
+> @@ -1125,18 +1125,21 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
+>  		map = vgic_irq_map_search(vcpu, irq);
+>  
+>  		if (map) {
+> -			int ret;
+> -
+> -			BUG_ON(!map->active);
+>  			vlr.hwirq = map->phys_irq;
+>  			vlr.state |= LR_HW;
+>  			vlr.state &= ~LR_EOI_INT;
+>  
+> -			ret = irq_set_irqchip_state(map->irq,
+> -						    IRQCHIP_STATE_ACTIVE,
+> -						    true);
+>  			vgic_irq_set_queued(vcpu, irq);
+the queued state is set again in vgic_queue_hwirq for level_sensitive
+IRQs although not harmful.
+> -			WARN_ON(ret);
+> +
+> +			if (map->shared) {
+> +				int ret;
+> +
+> +				BUG_ON(!map->active);
+> +				ret = irq_set_irqchip_state(map->irq,
+> +							    IRQCHIP_STATE_ACTIVE,
+> +							    true);
+> +				WARN_ON(ret);
+> +			}
+>  		}
+>  	}
+>  
+> @@ -1368,21 +1371,28 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+>  static int vgic_sync_hwirq(struct kvm_vcpu *vcpu, struct vgic_lr vlr)
+>  {
+>  	struct irq_phys_map *map;
+> +	bool active;
+>  	int ret;
+>  
+>  	if (!(vlr.state & LR_HW))
+>  		return 0;
+>  
+>  	map = vgic_irq_map_search(vcpu, vlr.irq);
+> -	BUG_ON(!map || !map->active);
+> +	BUG_ON(!map);
+> +	BUG_ON(map->shared && !map->active);
+>  
+>  	ret = irq_get_irqchip_state(map->irq,
+>  				    IRQCHIP_STATE_ACTIVE,
+> -				    &map->active);
+> +				    &active);
+>  
+In case of non shared and EOIMode = 1 - I know this is not your current
+interest here though ;-) - , once the guest EOIs its virtual IRQ and GIC
+deactivates the physical one, a new phys IRQ can hit immediatly, the
+physical handler can be entered and the state is seen as active here.
+The queued state is never reset in such a case and the system gets stuck
+since the can_sample fails I think. What I mean here is sounds the state
+machine as is does not work for my VFIO case. So some adaptations still
+are needed I think. Do you share my diagnosis?
+
+Eric
+>  
+> -	if (map->active) {
+> +	if (!map->shared)
+> +		return !active;
+> +
+> +	map->active = active;
+> +
+> +	if (active) {
+>  		ret = irq_set_irqchip_state(map->irq,
+>  					    IRQCHIP_STATE_ACTIVE,
+>  					    false);
+> @@ -1663,7 +1673,7 @@ static struct rb_root *vgic_get_irq_phys_map(struct kvm_vcpu *vcpu,
+>  }
+>  
+>  struct irq_phys_map *vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+> -				       int virt_irq, int irq)
+> +				       int virt_irq, int irq, bool shared)
+>  {
+>  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+>  	struct rb_root *root = vgic_get_irq_phys_map(vcpu, virt_irq);
+> @@ -1710,6 +1720,7 @@ struct irq_phys_map *vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+>  	new_map->virt_irq = virt_irq;
+>  	new_map->phys_irq = phys_irq;
+>  	new_map->irq = irq;
+> +	new_map->shared = shared;
+>  
+>  	rb_link_node(&new_map->node, parent, new);
+>  	rb_insert_color(&new_map->node, root);
+> @@ -1746,13 +1757,13 @@ static struct irq_phys_map *vgic_irq_map_search(struct kvm_vcpu *vcpu,
+>  
+>  bool vgic_get_phys_irq_active(struct irq_phys_map *map)
+>  {
+> -	BUG_ON(!map);
+> +	BUG_ON(!map || !map->shared);
+>  	return map->active;
+>  }
+>  
+>  void vgic_set_phys_irq_active(struct irq_phys_map *map, bool active)
+>  {
+> -	BUG_ON(!map);
+> +	BUG_ON(!map || !map->shared);
+>  	map->active = active;
+>  }
+>  
 > 
-> So my patch just removes the check for the GIC region and rewrites it to
-> match that description in the last sentence, with the rationale given in
-> the commit message.
-> Does that make sense?
-> If you desperately want some extra barfing for misguided GIC requests,
-> I'd rather introduce that to the "no match" code path in
-> kvm__emulate_mmio or register some dummy MMIO regions for the GIC with
-> panic() handlers.
-
-No, that's fine.
-
-I just wondered what was the rational behind having the
-arm_addr_in_pci_region() call there. It might have guarded something,
-but if you're absolutely positive that this doesn't cause a regression,
-that's OK with me.
-
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
