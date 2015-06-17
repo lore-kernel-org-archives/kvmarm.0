@@ -1,185 +1,120 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 07/10] KVM: arm/arm64: vgic: Allow HW interrupts to be
- queued to a guest
-Date: Wed, 17 Jun 2015 13:23:04 +0100
-Message-ID: <558166A8.3070901@arm.com>
-References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com> <1433783045-8002-8-git-send-email-marc.zyngier@arm.com> <55815F4C.2090602@linaro.org>
+Subject: Re: [PATCH 04/10] KVM: arm/arm64: vgic: Allow HW irq to be encoded
+ in LR
+Date: Wed, 17 Jun 2015 13:39:39 +0100
+Message-ID: <55816A8B.3070803@arm.com>
+References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com> <1433783045-8002-5-git-send-email-marc.zyngier@arm.com> <55815FA5.4010203@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <55815F4C.2090602@linaro.org>
+In-Reply-To: <55815FA5.4010203@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Eric Auger <eric.auger@linaro.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 Cc: Christoffer Dall <christoffer.dall@linaro.org>, =?windows-1252?Q?Alex?= =?windows-1252?Q?_Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
-
-On 17/06/15 12:51, Eric Auger wrote:
-> Hi Marc,
-> On 06/08/2015 07:04 PM, Marc Zyngier wrote:
->> To allow a HW interrupt to be injected into a guest, we lookup the
->> guest virtual interrupt in the irq_phys_map rbtree, and if we have
->> a match, encode both interrupts in the LR.
+On 17/06/15 12:53, Eric Auger wrote:
+> On 06/08/2015 07:03 PM, Marc Zyngier wrote:
+>> Now that struct vgic_lr supports the LR_HW bit and carries a hwirq
+>> field, we can encode that information into the list registers.
 >>
->> We also mark the interrupt as "active" at the host distributor level.
->>
->> On guest EOI on the virtual interrupt, the host interrupt will be
->> deactivated.
->
-> a "standard" physical IRQ would be first handled by the host handler
-> which would ack and deactivate it a first time. Here, if my
-> understanding is correct, the virtual counter PPI never hits. Instead we
-> "emulate" it on world-switch by directly setting the dist state. Is that
-> correct? If yes it is quite a specific handling of an "HW" IRQ.
-
-This is (mostly) correct. Because we deal with HW that is shared between
-guests, we absolutely need to make that HW quiescent before getting back
-to the host. Setting the active bit in the distributor allows us to
-restore the HW in a state that shows a pending interrupt at the guest
-level, but ensure that the interrupt doesn't fire at the host level.
-
-As for the "specificity", this is how the architecture has been
-designed, and the way we're expected to deal with this kind of shared
-HW. Rest assured I didn't come up with that on my own! ;-)
-
-> 
+>> This patch provides implementations for both GICv2 and GICv3.
 >>
 >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 >> ---
->>  virt/kvm/arm/vgic.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++---
->>  1 file changed, 68 insertions(+), 3 deletions(-)
+>>  include/linux/irqchip/arm-gic-v3.h |  3 +++
+>>  include/linux/irqchip/arm-gic.h    |  3 ++-
+>>  virt/kvm/arm/vgic-v2.c             | 16 +++++++++++++++-
+>>  virt/kvm/arm/vgic-v3.c             | 21 ++++++++++++++++++---
+>>  4 files changed, 38 insertions(+), 5 deletions(-)
 >>
->> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
->> index c6604f2..495ac7d 100644
->> --- a/virt/kvm/arm/vgic.c
->> +++ b/virt/kvm/arm/vgic.c
->> @@ -1120,6 +1120,26 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
->>  	if (!vgic_irq_is_edge(vcpu, irq))
->>  		vlr.state |= LR_EOI_INT;
+>> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+>> index ffbc034..cf637d6 100644
+>> --- a/include/linux/irqchip/arm-gic-v3.h
+>> +++ b/include/linux/irqchip/arm-gic-v3.h
+>> @@ -268,9 +268,12 @@
 >>  
->> +	if (vlr.irq >= VGIC_NR_SGIS) {
->> +		struct irq_phys_map *map;
->> +		map = vgic_irq_map_search(vcpu, irq);
->> +
->> +		if (map) {
->> +			int ret;
->> +
->> +			BUG_ON(!map->active);
->> +			vlr.hwirq = map->phys_irq;
->> +			vlr.state |= LR_HW;
->> +			vlr.state &= ~LR_EOI_INT;
->> +
->> +			ret = irq_set_irqchip_state(map->irq,
->> +						    IRQCHIP_STATE_ACTIVE,
->> +						    true);
->> +			vgic_irq_set_queued(vcpu, irq);
->
-> queued state was used for level sensitive IRQs only. Forwarded or "HW"
-> IRQs theoretically can be edge or sensitive, right? If yes may be worth
-> to justify the usage of queued state for forwarded IRQ? Also
-
-That's because it is illegal to set a HW interrupt to be PENDING+ACTIVE,
-which means we have to prevent the interrupt to be injected multiple
-times. The behaviour is sufficiently close to what we do for a level
-interrupt that we use the same state.
-
-> vgic_irq_set_queued rather was called in parent vgic_queue_hwirq today.
-
-I tried to keep the HW bit madness as localized as possible. Letting it
-spread further away seems to make the code more difficult to read IMHO.
-
-> 
->> +			WARN_ON(ret);
->> +		}
->> +	}
->> +
->>  	vgic_set_lr(vcpu, lr_nr, vlr);
->>  	vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
->>  }
->> @@ -1344,6 +1364,35 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
->>  	return level_pending;
->>  }
+>>  #define ICH_LR_EOI			(1UL << 41)
+>>  #define ICH_LR_GROUP			(1UL << 60)
+>> +#define ICH_LR_HW			(1UL << 61)
+>>  #define ICH_LR_STATE			(3UL << 62)
+>>  #define ICH_LR_PENDING_BIT		(1UL << 62)
+>>  #define ICH_LR_ACTIVE_BIT		(1UL << 63)
+>> +#define ICH_LR_PHYS_ID_SHIFT		32
+>> +#define ICH_LR_PHYS_ID_MASK		(0x3ffUL << ICH_LR_PHYS_ID_SHIFT)
 >>  
->> +/* Return 1 if HW interrupt went from active to inactive, and 0 otherwise */
->> +static int vgic_sync_hwirq(struct kvm_vcpu *vcpu, struct vgic_lr vlr)
->> +{
->> +	struct irq_phys_map *map;
->> +	int ret;
->> +
->> +	if (!(vlr.state & LR_HW))
->> +		return 0;
->> +
->> +	map = vgic_irq_map_search(vcpu, vlr.irq);
->> +	BUG_ON(!map || !map->active);
->> +
->> +	ret = irq_get_irqchip_state(map->irq,
->> +				    IRQCHIP_STATE_ACTIVE,
->> +				    &map->active);
->
-> Doesn't it work because the virtual timer was disabled during the world
-> switch. Does it characterize all "shared" devices? Difficult for me to
-> understand how much this is specific to arch timer integration?
-
-Shared devices cannot be left running when the guest is not running
-because (a) we have lost the context (the guest), and (b) we need to
-give it to another guest. This is a fundamental property of this kind of
-resource.
-
-This is by no mean specific to the timer, BTW. The VGIC itself is a
-shared resource, and we nuke it on each exit, for the same reason. The
-only difference is that we don't propagate the VGIC interrupt to a guest.
-
->> +
->> +	WARN_ON(ret);
->> +
->> +	if (map->active) {
->> +		ret = irq_set_irqchip_state(map->irq,
->> +					    IRQCHIP_STATE_ACTIVE,
->> +					    false);
->> +		WARN_ON(ret);
->> +		return 0;
+>>  #define ICH_MISR_EOI			(1 << 0)
+>>  #define ICH_MISR_U			(1 << 1)
+>> diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
+>> index 9de976b..ca88dad 100644
+>> --- a/include/linux/irqchip/arm-gic.h
+>> +++ b/include/linux/irqchip/arm-gic.h
+>> @@ -71,11 +71,12 @@
+>>  
+>>  #define GICH_LR_VIRTUALID		(0x3ff << 0)
+>>  #define GICH_LR_PHYSID_CPUID_SHIFT	(10)
+>> -#define GICH_LR_PHYSID_CPUID		(7 << GICH_LR_PHYSID_CPUID_SHIFT)
+>> +#define GICH_LR_PHYSID_CPUID		(0x3ff << GICH_LR_PHYSID_CPUID_SHIFT)
+>>  #define GICH_LR_STATE			(3 << 28)
+>>  #define GICH_LR_PENDING_BIT		(1 << 28)
+>>  #define GICH_LR_ACTIVE_BIT		(1 << 29)
+>>  #define GICH_LR_EOI			(1 << 19)
+>> +#define GICH_LR_HW			(1 << 31)
+>>  
+>>  #define GICH_VMCR_CTRL_SHIFT		0
+>>  #define GICH_VMCR_CTRL_MASK		(0x21f << GICH_VMCR_CTRL_SHIFT)
+>> diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
+>> index f9b9c7c..8d7b04d 100644
+>> --- a/virt/kvm/arm/vgic-v2.c
+>> +++ b/virt/kvm/arm/vgic-v2.c
+>> @@ -48,6 +48,10 @@ static struct vgic_lr vgic_v2_get_lr(const struct kvm_vcpu *vcpu, int lr)
+>>  		lr_desc.state |= LR_STATE_ACTIVE;
+>>  	if (val & GICH_LR_EOI)
+>>  		lr_desc.state |= LR_EOI_INT;
+>> +	if (val & GICH_LR_HW) {
+>> +		lr_desc.state |= LR_HW;
+>> +		lr_desc.hwirq = (val & GICH_LR_PHYSID_CPUID) >> GICH_LR_PHYSID_CPUID_SHIFT;
 >> +	}
->> +
->> +	return 1;
->> +}
->> +
->>  /* Sync back the VGIC state after a guest run */
->>  static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>>  
+>>  	return lr_desc;
+>>  }
+>> @@ -55,7 +59,9 @@ static struct vgic_lr vgic_v2_get_lr(const struct kvm_vcpu *vcpu, int lr)
+>>  static void vgic_v2_set_lr(struct kvm_vcpu *vcpu, int lr,
+>>  			   struct vgic_lr lr_desc)
 >>  {
->> @@ -1358,14 +1407,30 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
->>  	elrsr = vgic_get_elrsr(vcpu);
->>  	elrsr_ptr = u64_to_bitmask(&elrsr);
+>> -	u32 lr_val = (lr_desc.source << GICH_LR_PHYSID_CPUID_SHIFT) | lr_desc.irq;
+>> +	u32 lr_val;
+>> +
+>> +	lr_val = lr_desc.irq;
 >>  
->> -	/* Clear mappings for empty LRs */
->> -	for_each_set_bit(lr, elrsr_ptr, vgic->nr_lr) {
->> +	/* Deal with HW interrupts, and clear mappings for empty LRs */
->> +	for (lr = 0; lr < vgic->nr_lr; lr++) {
->>  		struct vgic_lr vlr;
+>>  	if (lr_desc.state & LR_STATE_PENDING)
+>>  		lr_val |= GICH_LR_PENDING_BIT;
+>> @@ -64,6 +70,14 @@ static void vgic_v2_set_lr(struct kvm_vcpu *vcpu, int lr,
+>>  	if (lr_desc.state & LR_EOI_INT)
+>>  		lr_val |= GICH_LR_EOI;
 >>  
->> -		if (!test_and_clear_bit(lr, vgic_cpu->lr_used))
->> +		if (!test_bit(lr, vgic_cpu->lr_used))
->>  			continue;
->>  
->>  		vlr = vgic_get_lr(vcpu, lr);
->> +		if (vgic_sync_hwirq(vcpu, vlr)) {
->> +			/*
->> +			 * So this is a HW interrupt that the guest
->> +			 * EOI-ed. Clean the LR state and allow the
->> +			 * interrupt to be queued again.
->> +			 */
->> +			vlr.state &= ~LR_HW;
->> +			vlr.hwirq = 0;
->> +			vgic_set_lr(vcpu, lr, vlr);
->> +			vgic_irq_clear_queued(vcpu, vlr.irq)
+>> +	if (lr_desc.state & LR_HW) {
+>> +		lr_val |= GICH_LR_HW;
+>> +		lr_val |= (u32)lr_desc.hwirq << GICH_LR_PHYSID_CPUID_SHIFT;
 >
-> not necessarily a level sensitive IRQ?
+> shouldn't we test somewhere that the hwirq is between 16 and 1019. Else
+> behavior is unpredictable according to v2 spec. when queuing into the LR
+> we currently check the linux irq vlr.irq >= VGIC_NR_SGIS if I am not wrong.
 
-As explained above, we have the same requirements when an interrupt is
-forwarded to a guest.
+This is actually implicit. vgic_map_phys_irq() takes a parameter (irq)
+that is the Linux view of the hwirq we're dealing with (we fetch this
+hwirq by traversing the irq_data list associated with irq).
 
-Thanks,
+SGIs are not part of the set of interrupts that can be mapped to a Linux
+irq (their usage is completely private to the two GIC drivers).
+
+Note that GICv3 allows SGIs to be set as a physical interrupt in an LR
+though, but this is not a feature we use so far.
+
+> besides Reviewed-by: Eric Auger <eric.auger@linaro.org>
+
+Thanks!
 
 	M.
 -- 
