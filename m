@@ -1,120 +1,114 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 04/10] KVM: arm/arm64: vgic: Allow HW irq to be encoded
- in LR
-Date: Wed, 17 Jun 2015 13:39:39 +0100
-Message-ID: <55816A8B.3070803@arm.com>
-References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com> <1433783045-8002-5-git-send-email-marc.zyngier@arm.com> <55815FA5.4010203@linaro.org>
+Subject: Re: [PATCH v3 06/10] arm: simplify MMIO dispatching
+Date: Wed, 17 Jun 2015 13:48:31 +0100
+Message-ID: <55816C9F.1090500@arm.com>
+References: <1434540121-21283-1-git-send-email-andre.przywara@arm.com> <1434540121-21283-7-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <55815FA5.4010203@linaro.org>
+In-Reply-To: <1434540121-21283-7-git-send-email-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Eric Auger <eric.auger@linaro.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, =?windows-1252?Q?Alex?= =?windows-1252?Q?_Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
+To: Andre Przywara <andre.przywara@arm.com>, Will Deacon <Will.Deacon@arm.com>
+Cc: "penberg@kernel.org" <penberg@kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17/06/15 12:53, Eric Auger wrote:
-> On 06/08/2015 07:03 PM, Marc Zyngier wrote:
->> Now that struct vgic_lr supports the LR_HW bit and carries a hwirq
->> field, we can encode that information into the list registers.
->>
->> This patch provides implementations for both GICv2 and GICv3.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  include/linux/irqchip/arm-gic-v3.h |  3 +++
->>  include/linux/irqchip/arm-gic.h    |  3 ++-
->>  virt/kvm/arm/vgic-v2.c             | 16 +++++++++++++++-
->>  virt/kvm/arm/vgic-v3.c             | 21 ++++++++++++++++++---
->>  4 files changed, 38 insertions(+), 5 deletions(-)
->>
->> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
->> index ffbc034..cf637d6 100644
->> --- a/include/linux/irqchip/arm-gic-v3.h
->> +++ b/include/linux/irqchip/arm-gic-v3.h
->> @@ -268,9 +268,12 @@
->>  
->>  #define ICH_LR_EOI			(1UL << 41)
->>  #define ICH_LR_GROUP			(1UL << 60)
->> +#define ICH_LR_HW			(1UL << 61)
->>  #define ICH_LR_STATE			(3UL << 62)
->>  #define ICH_LR_PENDING_BIT		(1UL << 62)
->>  #define ICH_LR_ACTIVE_BIT		(1UL << 63)
->> +#define ICH_LR_PHYS_ID_SHIFT		32
->> +#define ICH_LR_PHYS_ID_MASK		(0x3ffUL << ICH_LR_PHYS_ID_SHIFT)
->>  
->>  #define ICH_MISR_EOI			(1 << 0)
->>  #define ICH_MISR_U			(1 << 1)
->> diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
->> index 9de976b..ca88dad 100644
->> --- a/include/linux/irqchip/arm-gic.h
->> +++ b/include/linux/irqchip/arm-gic.h
->> @@ -71,11 +71,12 @@
->>  
->>  #define GICH_LR_VIRTUALID		(0x3ff << 0)
->>  #define GICH_LR_PHYSID_CPUID_SHIFT	(10)
->> -#define GICH_LR_PHYSID_CPUID		(7 << GICH_LR_PHYSID_CPUID_SHIFT)
->> +#define GICH_LR_PHYSID_CPUID		(0x3ff << GICH_LR_PHYSID_CPUID_SHIFT)
->>  #define GICH_LR_STATE			(3 << 28)
->>  #define GICH_LR_PENDING_BIT		(1 << 28)
->>  #define GICH_LR_ACTIVE_BIT		(1 << 29)
->>  #define GICH_LR_EOI			(1 << 19)
->> +#define GICH_LR_HW			(1 << 31)
->>  
->>  #define GICH_VMCR_CTRL_SHIFT		0
->>  #define GICH_VMCR_CTRL_MASK		(0x21f << GICH_VMCR_CTRL_SHIFT)
->> diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
->> index f9b9c7c..8d7b04d 100644
->> --- a/virt/kvm/arm/vgic-v2.c
->> +++ b/virt/kvm/arm/vgic-v2.c
->> @@ -48,6 +48,10 @@ static struct vgic_lr vgic_v2_get_lr(const struct kvm_vcpu *vcpu, int lr)
->>  		lr_desc.state |= LR_STATE_ACTIVE;
->>  	if (val & GICH_LR_EOI)
->>  		lr_desc.state |= LR_EOI_INT;
->> +	if (val & GICH_LR_HW) {
->> +		lr_desc.state |= LR_HW;
->> +		lr_desc.hwirq = (val & GICH_LR_PHYSID_CPUID) >> GICH_LR_PHYSID_CPUID_SHIFT;
->> +	}
->>  
->>  	return lr_desc;
->>  }
->> @@ -55,7 +59,9 @@ static struct vgic_lr vgic_v2_get_lr(const struct kvm_vcpu *vcpu, int lr)
->>  static void vgic_v2_set_lr(struct kvm_vcpu *vcpu, int lr,
->>  			   struct vgic_lr lr_desc)
->>  {
->> -	u32 lr_val = (lr_desc.source << GICH_LR_PHYSID_CPUID_SHIFT) | lr_desc.irq;
->> +	u32 lr_val;
->> +
->> +	lr_val = lr_desc.irq;
->>  
->>  	if (lr_desc.state & LR_STATE_PENDING)
->>  		lr_val |= GICH_LR_PENDING_BIT;
->> @@ -64,6 +70,14 @@ static void vgic_v2_set_lr(struct kvm_vcpu *vcpu, int lr,
->>  	if (lr_desc.state & LR_EOI_INT)
->>  		lr_val |= GICH_LR_EOI;
->>  
->> +	if (lr_desc.state & LR_HW) {
->> +		lr_val |= GICH_LR_HW;
->> +		lr_val |= (u32)lr_desc.hwirq << GICH_LR_PHYSID_CPUID_SHIFT;
->
-> shouldn't we test somewhere that the hwirq is between 16 and 1019. Else
-> behavior is unpredictable according to v2 spec. when queuing into the LR
-> we currently check the linux irq vlr.irq >= VGIC_NR_SGIS if I am not wrong.
+On 17/06/15 12:21, Andre Przywara wrote:
+> Currently we separate any incoming MMIO request into one of the ARM
+> memory map regions and take care to spare the GIC.
+> It turns out that this is unnecessary, as we only have one special
+> region (the IO port area in the first 64 KByte). The MMIO rbtree
+> takes care about unhandled MMIO ranges, so we can simply drop all the
+> special range checking (except that for the IO range) in
+> kvm_cpu__emulate_mmio().
+> As the GIC is handled in the kernel, a GIC MMIO access should never
+> reach userland (and we don't know what to do with it anyway).
+> This lets us delete some more code and simplifies future extensions
+> (like expanding the GIC regions).
+> To be in line with the other architectures, move the now simpler
+> code into a header file.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  arm/include/arm-common/kvm-arch.h     | 12 ------------
+>  arm/include/arm-common/kvm-cpu-arch.h | 14 ++++++++++++--
+>  arm/kvm-cpu.c                         | 16 ----------------
+>  3 files changed, 12 insertions(+), 30 deletions(-)
+> 
+> diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+> index 082131d..90d6733 100644
+> --- a/arm/include/arm-common/kvm-arch.h
+> +++ b/arm/include/arm-common/kvm-arch.h
+> @@ -45,18 +45,6 @@ static inline bool arm_addr_in_ioport_region(u64 phys_addr)
+>  	return phys_addr >= KVM_IOPORT_AREA && phys_addr < limit;
+>  }
+>  
+> -static inline bool arm_addr_in_virtio_mmio_region(u64 phys_addr)
+> -{
+> -	u64 limit = KVM_VIRTIO_MMIO_AREA + ARM_VIRTIO_MMIO_SIZE;
+> -	return phys_addr >= KVM_VIRTIO_MMIO_AREA && phys_addr < limit;
+> -}
+> -
+> -static inline bool arm_addr_in_pci_region(u64 phys_addr)
+> -{
+> -	u64 limit = KVM_PCI_CFG_AREA + ARM_PCI_CFG_SIZE + ARM_PCI_MMIO_SIZE;
+> -	return phys_addr >= KVM_PCI_CFG_AREA && phys_addr < limit;
+> -}
+> -
+>  struct kvm_arch {
+>  	/*
+>  	 * We may have to align the guest memory for virtio, so keep the
+> diff --git a/arm/include/arm-common/kvm-cpu-arch.h b/arm/include/arm-common/kvm-cpu-arch.h
+> index 36c7872..329979a 100644
+> --- a/arm/include/arm-common/kvm-cpu-arch.h
+> +++ b/arm/include/arm-common/kvm-cpu-arch.h
+> @@ -44,8 +44,18 @@ static inline bool kvm_cpu__emulate_io(struct kvm_cpu *vcpu, u16 port, void *dat
+>  	return false;
+>  }
+>  
+> -bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data,
+> -			   u32 len, u8 is_write);
+> +static inline bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr,
+> +					 u8 *data, u32 len, u8 is_write)
+> +{
+> +	if (arm_addr_in_ioport_region(phys_addr)) {
+> +		int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
+> +		u16 port = (phys_addr - KVM_IOPORT_AREA) & USHRT_MAX;
+> +
+> +		return kvm__emulate_io(vcpu, port, data, direction, len, 1);
+> +	}
+> +
+> +	return kvm__emulate_mmio(vcpu, phys_addr, data, len, is_write);
+> +}
+>  
+>  unsigned long kvm_cpu__get_vcpu_mpidr(struct kvm_cpu *vcpu);
+>  
+> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+> index ab08815..7780251 100644
+> --- a/arm/kvm-cpu.c
+> +++ b/arm/kvm-cpu.c
+> @@ -139,22 +139,6 @@ bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
+>  	return false;
+>  }
+>  
+> -bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data,
+> -			   u32 len, u8 is_write)
+> -{
+> -	if (arm_addr_in_virtio_mmio_region(phys_addr)) {
+> -		return kvm__emulate_mmio(vcpu, phys_addr, data, len, is_write);
+> -	} else if (arm_addr_in_ioport_region(phys_addr)) {
+> -		int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
+> -		u16 port = (phys_addr - KVM_IOPORT_AREA) & USHRT_MAX;
+> -		return kvm__emulate_io(vcpu, port, data, direction, len, 1);
+> -	} else if (arm_addr_in_pci_region(phys_addr)) {
+> -		return kvm__emulate_mmio(vcpu, phys_addr, data, len, is_write);
+> -	}
 
-This is actually implicit. vgic_map_phys_irq() takes a parameter (irq)
-that is the Linux view of the hwirq we're dealing with (we fetch this
-hwirq by traversing the irq_data list associated with irq).
+Can you explain why this arm_addr_in_pci_region(phys_addr) check has
+disappeared in your updated version on this function? It may be a non
+issue, but I'd very much like to understand.
 
-SGIs are not part of the set of interrupts that can be mapped to a Linux
-irq (their usage is completely private to the two GIC drivers).
-
-Note that GICv3 allows SGIs to be set as a physical interrupt in an LR
-though, but this is not a feature we use so far.
-
-> besides Reviewed-by: Eric Auger <eric.auger@linaro.org>
-
-Thanks!
+Thanks,
 
 	M.
 -- 
