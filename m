@@ -1,59 +1,32 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH] kvmtool: Makefile: allow overriding CC and LD
-Date: Thu, 18 Jun 2015 16:50:47 +0100
-Message-ID: <1434642647-3127-1-git-send-email-andre.przywara@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 1/2] arm64: KVM: Optimize arm64 fp/simd save/restore
+Date: Thu, 18 Jun 2015 18:04:14 +0100
+Message-ID: <5582FA0E.6030409@arm.com>
+References: <1434491452-19177-1-git-send-email-m.smarduch@samsung.com> <1434491452-19177-2-git-send-email-m.smarduch@samsung.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1434491452-19177-2-git-send-email-m.smarduch@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: will.deacon@arm.com
-Cc: Michael Ellerman <mpe@ellerman.id.au>, Matt Evans <matt@ozlabs.org>, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: Mario Smarduch <m.smarduch@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Currently we set CC unconditionally to ${CROSS_COMPILE}gcc, the same
-for LD.
-Allow people to override the compiler name by specifying it explicitly
-on the command line or via the environment.
-Beside calling a certain compiler binary this allows to pass in
-options to the compiler, which lets us get rid of the PowerPC
-overrides in the Makefile. Possible uses:
-$ make CC="gcc -m64" LD="ld -melf64ppc"
-(build kvmtool on a PowerPC toolchain defaulting to 32-bit)
-$ make CC="gcc -m32" LD="ld -melf_i386"
-(build a 32-bit binary on a multilib-enabled x86-64 compiler)
+On 16/06/15 22:50, Mario Smarduch wrote:
+> This patch only saves and restores FP/SIMD registers on Guest access. To do
+> this cptr_el2 FP/SIMD trap is set on Guest entry and later checked on exit.
+> lmbench, hackbench show significant improvements, for 30-50% exits FP/SIMD
+> context is not saved/restored
+> 
+> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- Makefile | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Looks nice and clean.
 
-diff --git a/Makefile b/Makefile
-index 6110b8e..888bee5 100644
---- a/Makefile
-+++ b/Makefile
-@@ -14,9 +14,13 @@ export E Q
- include config/utilities.mak
- include config/feature-tests.mak
- 
--CC	:= $(CROSS_COMPILE)gcc
-+ifeq ($(origin CC), default)
-+	CC	:= $(CROSS_COMPILE)gcc
-+endif
- CFLAGS	:=
--LD	:= $(CROSS_COMPILE)ld
-+ifeq ($(origin LD), default)
-+	LD	:= $(CROSS_COMPILE)ld
-+endif
- LDFLAGS	:=
- 
- FIND	:= find
-@@ -148,8 +152,6 @@ ifeq ($(ARCH), powerpc)
- 	OBJS	+= powerpc/spapr_pci.o
- 	OBJS	+= powerpc/xics.o
- 	ARCH_INCLUDE := powerpc/include
--	CFLAGS 	+= -m64
--	LDFLAGS += -m elf64ppc
- 
- 	ARCH_WANT_LIBFDT := y
- endif
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+
+Thanks,
+
+	M.
 -- 
-2.3.5
-
+Jazz is not dead. It just smells funny...
