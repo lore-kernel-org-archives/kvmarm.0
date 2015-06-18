@@ -1,25 +1,28 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC 4/6] KVM: arm/arm64: enable irqchip routing
-Date: Thu, 18 Jun 2015 19:07:30 +0100
-Message-ID: <558308E2.8010505@arm.com>
-References: <1434649258-27065-1-git-send-email-eric.auger@linaro.org>
- <1434649258-27065-5-git-send-email-eric.auger@linaro.org>
- <558305A2.8020206@arm.com> <55830747.7070101@linaro.org>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH 13/13] KVM: arm64: enable ITS emulation as a virtual MSI
+ controller
+Date: Thu, 18 Jun 2015 20:20:31 +0100
+Message-ID: <558319FF.4090809@arm.com>
+References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com>
+ <1432893209-27313-14-git-send-email-andre.przywara@arm.com>
+ <558284B4.104@linaro.org> <5582D410.60708@arm.com>
+ <01a401d0a9d7$e87997d0$b96cc770$@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD54356046
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2015 13:56:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A8DC55CE6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2015 15:09:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KgHJcvsEMfIV for <kvmarm@lists.cs.columbia.edu>;
- Thu, 18 Jun 2015 13:56:53 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 768CF56045
- for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2015 13:56:52 -0400 (EDT)
-In-Reply-To: <55830747.7070101@linaro.org>
+ with ESMTP id ykGqpazfBhc8 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 18 Jun 2015 15:09:33 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 134E355CDE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 18 Jun 2015 15:09:32 -0400 (EDT)
+In-Reply-To: <01a401d0a9d7$e87997d0$b96cc770$@samsung.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,98 +32,29 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>, "eric.auger@st.com" <eric.auger@st.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>, "p.fedin@samsung.com" <p.fedin@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: "patches@linaro.org" <patches@linaro.org>
+To: Pavel Fedin <p.fedin@samsung.com>, 'Eric Auger' <eric.auger@linaro.org>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 18/06/15 19:00, Eric Auger wrote:
-> Hi Marc,
-> On 06/18/2015 07:53 PM, Marc Zyngier wrote:
->> Hi Eric,
->>
->> On 18/06/15 18:40, Eric Auger wrote:
->>> This patch adds compilation and link against irqchip.
->>>
->>> On ARM, irqchip routing is not really useful since there is
->>> a single irqchip. However main motivation behind using irqchip
->>> code is to enable MSI routing code. With the support of in-kernel
->>> GICv3 ITS emulation, it now seems to be a MUST HAVE requirement.
->>>
->>> Functions previously implemented in vgic.c and substitute
->>> to more complex irqchip implementation are removed:
->>>
->>> - kvm_send_userspace_msi
->>> - kvm_irq_map_chip_pin
->>> - kvm_set_irq
->>> - kvm_irq_map_gsi.
->>>
->>> They implemented a kernel default identity GSI routing. This is now
->>> replaced by user-side provided routing.
->>>
->>> Routing standard hooks are now implemented in vgic:
->>> - kvm_set_routing_entry
->>> - kvm_set_irq
->>> - kvm_set_msi
->>>
->>> Both HAVE_KVM_IRQCHIP and HAVE_KVM_IRQ_ROUTING are defined.
->>> KVM_CAP_IRQ_ROUTING is advertised and KVM_SET_GSI_ROUTING is allowed.
->>>
->>> MSI routing is not yet allowed.
->>>
->>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
->>> ---
->>>  Documentation/virtual/kvm/api.txt | 11 ++++--
->>>  arch/arm/include/asm/kvm_host.h   |  2 +
->>>  arch/arm/kvm/Kconfig              |  2 +
->>>  arch/arm/kvm/Makefile             |  2 +-
->>>  arch/arm64/include/asm/kvm_host.h |  1 +
->>>  arch/arm64/kvm/Kconfig            |  2 +
->>>  arch/arm64/kvm/Makefile           |  2 +-
->>>  include/kvm/arm_vgic.h            |  9 -----
->>>  virt/kvm/arm/vgic.c               | 78 ++++++++++++++++++++++++---------------
->>>  virt/kvm/irqchip.c                |  2 +
->>>  10 files changed, 67 insertions(+), 44 deletions(-)
->>>
->>> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
->>> index bcec91e..2bc96e1 100644
->>> --- a/Documentation/virtual/kvm/api.txt
->>> +++ b/Documentation/virtual/kvm/api.txt
->>> @@ -1395,7 +1395,7 @@ KVM_ASSIGN_DEV_IRQ. Partial deassignment of host or guest IRQ is allowed.
->>>  4.52 KVM_SET_GSI_ROUTING
->>>  
->>>  Capability: KVM_CAP_IRQ_ROUTING
->>> -Architectures: x86 s390
->>> +Architectures: x86 s390 arm arm64
->>>  Type: vm ioctl
->>>  Parameters: struct kvm_irq_routing (in)
->>>  Returns: 0 on success, -1 on error
->>> @@ -2310,9 +2310,12 @@ Note that closing the resamplefd is not sufficient to disable the
->>>  irqfd.  The KVM_IRQFD_FLAG_RESAMPLE is only necessary on assignment
->>>  and need not be specified with KVM_IRQFD_FLAG_DEASSIGN.
->>>  
->>> -On ARM/ARM64, the gsi field in the kvm_irqfd struct specifies the Shared
->>> -Peripheral Interrupt (SPI) index, such that the GIC interrupt ID is
->>> -given by gsi + 32.
->>> +On ARM/ARM64, when GSI routing is not used, the gsi field in the
->>> +kvm_irqfd struct specifies the Shared Peripheral Interrupt (SPI) index,
->>> +such that the GIC interrupt ID is given by gsi + 32. When GSI routing is
->>> +setup:
->>> +- if irqchip routing: irqchip.pin + 32 is the SPI ID that is injected
->>> +- if MSI routing: the MSI data is used as interrupt ID (SPI or LPI).
->>
->> This feels just wrong. With GICv3, the MSI data is not the LPI at all.
->> It is an opaque value that gets translated into an LPI when combined
->> with the DeviceID.
-> I agree with you. I need to rephrase that. In practice this is what
-> should happen in the code since I use Andre's MSI injection routine
-> which does the translation; except for GICv2 where last patch attempts
-> to do direct gsi mapping from msi msg data!
+On 06/18/2015 04:03 PM, Pavel Fedin wrote:
+>  Hello!
+> 
+>> But that fails compilation on ARM (which uses this file as well),
+>> because we have a dummy fail function in the header if
+>> CONFIG_HAVE_KVM_MSI is not defined.
+> 
+>  May be then remove that fail function too? Too many #ifdef's are not good...
 
-Agreed. The code seems to do the right thing, only the documentation is
-misleading.
+Yes, that seems to work - now. I think I had more code in there before
+that prevented exposure without #ifdef guarding.
 
-Thanks,
+Cheers,
+Andre.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> 
+> Kind regards,
+> Pavel Fedin
+> Expert Engineer
+> Samsung Electronics Research center Russia
+> 
+> 
