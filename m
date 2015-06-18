@@ -1,238 +1,193 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 10/10] KVM: arm/arm64: vgic: Allow non-shared device HW
- interrupts
-Date: Thu, 18 Jun 2015 09:37:23 +0100
-Message-ID: <55828343.30408@arm.com>
-References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com> <1433783045-8002-11-git-send-email-marc.zyngier@arm.com> <55818E06.8010400@linaro.org> <55819445.4090309@arm.com> <5581975A.8070509@linaro.org>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH 13/13] KVM: arm64: enable ITS emulation as a virtual MSI
+ controller
+Date: Thu, 18 Jun 2015 10:43:32 +0200
+Message-ID: <558284B4.104@linaro.org>
+References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com> <1432893209-27313-14-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <5581975A.8070509@linaro.org>
+In-Reply-To: <1432893209-27313-14-git-send-email-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Eric Auger <eric.auger@linaro.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, =?windows-1252?Q?Alex?= =?windows-1252?Q?_Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
+To: Andre Przywara <andre.przywara@arm.com>, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17/06/15 16:50, Eric Auger wrote:
-> On 06/17/2015 05:37 PM, Marc Zyngier wrote:
->> On 17/06/15 16:11, Eric Auger wrote:
->>> Hi Marc,
->>> On 06/08/2015 07:04 PM, Marc Zyngier wrote:
->>>> So far, the only use of the HW interrupt facility is the timer,
->>>> implying that the active state is context-switched for each vcpu,
->>>> as the device is is shared across all vcpus.
->>> s/is//
->>>>
->>>> This does not work for a device that has been assigned to a VM,
->>>> as the guest is entierely in control of that device (the HW is
->>> entirely?
->>>> not shared). In that case, it makes sense to bypass the whole
->>>> active state srtwitchint, and only track the deactivation of the
->>> switching
->>
->> Congratulations, I think you're now ready to try deciphering my
->> handwriting... ;-)
-> good to see you're not a machine or maybe you do it on purpose some
-> times ;-)
->>
->>>> interrupt.
->>>>
->>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>>> ---
->>>>  include/kvm/arm_vgic.h    |  5 +++--
->>>>  virt/kvm/arm/arch_timer.c |  2 +-
->>>>  virt/kvm/arm/vgic.c       | 37 ++++++++++++++++++++++++-------------
->>>>  3 files changed, 28 insertions(+), 16 deletions(-)
->>>>
->>>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->>>> index 1c653c1..5d47d60 100644
->>>> --- a/include/kvm/arm_vgic.h
->>>> +++ b/include/kvm/arm_vgic.h
->>>> @@ -164,7 +164,8 @@ struct irq_phys_map {
->>>>  	u32			virt_irq;
->>>>  	u32			phys_irq;
->>>>  	u32			irq;
->>>> -	bool			active;
->>>> +	bool			shared;
->>>> +	bool			active; /* Only valid if shared */
->>>>  };
->>>>  
->>>>  struct vgic_dist {
->>>> @@ -347,7 +348,7 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
->>>>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
->>>>  int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
->>>>  struct irq_phys_map *vgic_map_phys_irq(struct kvm_vcpu *vcpu,
->>>> -				       int virt_irq, int irq);
->>>> +				       int virt_irq, int irq, bool shared);
->>>>  int vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
->>>>  bool vgic_get_phys_irq_active(struct irq_phys_map *map);
->>>>  void vgic_set_phys_irq_active(struct irq_phys_map *map, bool active);
->>>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
->>>> index b9fff78..9544d79 100644
->>>> --- a/virt/kvm/arm/arch_timer.c
->>>> +++ b/virt/kvm/arm/arch_timer.c
->>>> @@ -202,7 +202,7 @@ void kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
->>>>  	 * Tell the VGIC that the virtual interrupt is tied to a
->>>>  	 * physical interrupt. We do that once per VCPU.
->>>>  	 */
->>>> -	timer->map = vgic_map_phys_irq(vcpu, irq->irq, host_vtimer_irq);
->>>> +	timer->map = vgic_map_phys_irq(vcpu, irq->irq, host_vtimer_irq, true);
->>>>  	WARN_ON(!timer->map);
->>>>  }
->>>>  
->>>> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
->>>> index f376b56..4223166 100644
->>>> --- a/virt/kvm/arm/vgic.c
->>>> +++ b/virt/kvm/arm/vgic.c
->>>> @@ -1125,18 +1125,21 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
->>>>  		map = vgic_irq_map_search(vcpu, irq);
->>>>  
->>>>  		if (map) {
->>>> -			int ret;
->>>> -
->>>> -			BUG_ON(!map->active);
->>>>  			vlr.hwirq = map->phys_irq;
->>>>  			vlr.state |= LR_HW;
->>>>  			vlr.state &= ~LR_EOI_INT;
->>>>  
->>>> -			ret = irq_set_irqchip_state(map->irq,
->>>> -						    IRQCHIP_STATE_ACTIVE,
->>>> -						    true);
->>>>  			vgic_irq_set_queued(vcpu, irq);
->>>
->>> the queued state is set again in vgic_queue_hwirq for level_sensitive
->>> IRQs although not harmful.
->>
->> Indeed. We still need it for edge interrupts though. I'll try to find a
->> nicer way...
->>
->>>> -			WARN_ON(ret);
->>>> +
->>>> +			if (map->shared) {
->>>> +				int ret;
->>>> +
->>>> +				BUG_ON(!map->active);
->>>> +				ret = irq_set_irqchip_state(map->irq,
->>>> +							    IRQCHIP_STATE_ACTIVE,
->>>> +							    true);
->>>> +				WARN_ON(ret);
->>>> +			}
->>>>  		}
->>>>  	}
->>>>  
->>>> @@ -1368,21 +1371,28 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
->>>>  static int vgic_sync_hwirq(struct kvm_vcpu *vcpu, struct vgic_lr vlr)
->>>>  {
->>>>  	struct irq_phys_map *map;
->>>> +	bool active;
->>>>  	int ret;
->>>>  
->>>>  	if (!(vlr.state & LR_HW))
->>>>  		return 0;
->>>>  
->>>>  	map = vgic_irq_map_search(vcpu, vlr.irq);
->>>> -	BUG_ON(!map || !map->active);
->>>> +	BUG_ON(!map);
->>>> +	BUG_ON(map->shared && !map->active);
->>>>  
->>>>  	ret = irq_get_irqchip_state(map->irq,
->>>>  				    IRQCHIP_STATE_ACTIVE,
->>>> -				    &map->active);
->>>> +				    &active);
->>>>  
->>> In case of non shared and EOIMode = 1 - I know this is not your current
->>> interest here though ;-) - , once the guest EOIs its virtual IRQ and GIC
->>> deactivates the physical one, a new phys IRQ can hit immediatly, the
->>> physical handler can be entered and the state is seen as active here.
->>> The queued state is never reset in such a case and the system gets stuck
->>> since the can_sample fails I think. What I mean here is sounds the state
->>> machine as is does not work for my VFIO case. So some adaptations still
->>> are needed I think. Do you share my diagnosis?
->>
->> Yup, there is something that doesn't quite work here.
->>
->> I think the mistake is to sample the distributor active state. I wonder
->> if I can simply rely on the LR state. If it is neither pending nor
->> active, it means that we have done the deactivation, and we can then
->> reset the queued state.
+On 05/29/2015 11:53 AM, Andre Przywara wrote:
+> If userspace has provided a base address for the ITS register frame,
+> we enable the bits that advertise LPIs in the GICv3.
+> When the guest has enabled LPIs and the ITS, we enable the emulation
+> part by initializing the ITS data structures and trapping on ITS
+> register frame accesses by the guest.
+> Also we enable the KVM_SIGNAL_MSI feature to allow userland to inject
+> MSIs into the guest. Not having enabled the ITS emulation will lead
+> to a -ENODEV when trying to inject a MSI.
 > 
-> I tried to use the LR in the past - it was also Christoffer's will - but
-> it was not working. I observed injection before seeing the LR voided.
-> This is why I resorted to using the pending state instead and treated
-> forwarded IRQ as edge in vgic_queue_hwirq.  sampling could be done only
-> if the IRQ was pending.
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  Documentation/virtual/kvm/api.txt |  2 +-
+>  arch/arm64/kvm/Kconfig            |  1 +
+>  include/kvm/arm_vgic.h            | 10 ++++++++++
+>  virt/kvm/arm/its-emul.c           |  9 ++++++++-
+>  virt/kvm/arm/vgic-v3-emul.c       | 20 +++++++++++++++-----
+>  virt/kvm/arm/vgic.c               | 10 ++++++++++
+>  6 files changed, 45 insertions(+), 7 deletions(-)
+> 
+> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+> index 891d64a..d20fd94 100644
+> --- a/Documentation/virtual/kvm/api.txt
+> +++ b/Documentation/virtual/kvm/api.txt
+> @@ -2108,7 +2108,7 @@ after pausing the vcpu, but before it is resumed.
+>  4.71 KVM_SIGNAL_MSI
+>  
+>  Capability: KVM_CAP_SIGNAL_MSI
+> -Architectures: x86
+> +Architectures: x86 arm64
+>  Type: vm ioctl
+>  Parameters: struct kvm_msi (in)
+>  Returns: >0 on delivery, 0 if guest blocked the MSI, and -1 on error
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 5105e29..6c432c0 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -30,6 +30,7 @@ config KVM
+>  	select SRCU
+>  	select HAVE_KVM_EVENTFD
+>  	select HAVE_KVM_IRQFD
+> +	select HAVE_KVM_MSI
+>  	---help---
+>  	  Support hosting virtualized guest machines.
+>  
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 6bb138d..8f1be6a 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -162,6 +162,7 @@ struct vgic_io_device {
+>  
+>  struct vgic_its {
+>  	bool			enabled;
+> +	struct vgic_io_device	iodev;
+>  	spinlock_t		lock;
+>  	u64			cbaser;
+>  	int			creadr;
+> @@ -365,4 +366,13 @@ static inline int vgic_v3_probe(struct device_node *vgic_node,
+>  }
+>  #endif
+>  
+> +#ifdef CONFIG_HAVE_KVM_MSI
+> +int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
+> +#else
+> +static inline int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi)
+> +{
+> +	return -ENODEV;
+> +}
+> +#endif
+> +
+>  #endif
+> diff --git a/virt/kvm/arm/its-emul.c b/virt/kvm/arm/its-emul.c
+> index 35e886c..864de19 100644
+> --- a/virt/kvm/arm/its-emul.c
+> +++ b/virt/kvm/arm/its-emul.c
+> @@ -964,6 +964,7 @@ int vits_init(struct kvm *kvm)
+>  {
+>  	struct vgic_dist *dist = &kvm->arch.vgic;
+>  	struct vgic_its *its = &dist->its;
+> +	int ret;
+>  
+>  	if (IS_VGIC_ADDR_UNDEF(dist->vgic_its_base))
+>  		return -ENXIO;
+> @@ -977,9 +978,15 @@ int vits_init(struct kvm *kvm)
+>  	INIT_LIST_HEAD(&its->device_list);
+>  	INIT_LIST_HEAD(&its->collection_list);
+>  
+> +	ret = vgic_register_kvm_io_dev(kvm, dist->vgic_its_base,
+> +				       KVM_VGIC_V3_ITS_SIZE, vgicv3_its_ranges,
+> +				       -1, &its->iodev);
+> +	if (ret)
+> +		return ret;
+> +
+>  	its->enabled = false;
+>  
+> -	return -ENXIO;
+> +	return 0;
+>  }
+>  
+>  void vits_destroy(struct kvm *kvm)
+> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+> index 4513551..71d0bcf 100644
+> --- a/virt/kvm/arm/vgic-v3-emul.c
+> +++ b/virt/kvm/arm/vgic-v3-emul.c
+> @@ -89,10 +89,11 @@ static bool handle_mmio_ctlr(struct kvm_vcpu *vcpu,
+>  /*
+>   * As this implementation does not provide compatibility
+>   * with GICv2 (ARE==1), we report zero CPUs in bits [5..7].
+> - * Also LPIs and MBIs are not supported, so we set the respective bits to 0.
+> - * Also we report at most 2**10=1024 interrupt IDs (to match 1024 SPIs).
+> + * Also we report at most 2**10=1024 interrupt IDs (to match 1024 SPIs)
+> + * and provide 16 bits worth of LPI number space (to give 8192 LPIs).
+>   */
+> -#define INTERRUPT_ID_BITS 10
+> +#define INTERRUPT_ID_BITS_SPIS 10
+> +#define INTERRUPT_ID_BITS_ITS 16
+>  static bool handle_mmio_typer(struct kvm_vcpu *vcpu,
+>  			      struct kvm_exit_mmio *mmio, phys_addr_t offset)
+>  {
+> @@ -100,7 +101,12 @@ static bool handle_mmio_typer(struct kvm_vcpu *vcpu,
+>  
+>  	reg = (min(vcpu->kvm->arch.vgic.nr_irqs, 1024) >> 5) - 1;
+>  
+> -	reg |= (INTERRUPT_ID_BITS - 1) << 19;
+> +	if (vgic_has_its(vcpu->kvm)) {
+> +		reg |= GICD_TYPER_LPIS;
+> +		reg |= (INTERRUPT_ID_BITS_ITS - 1) << 19;
+> +	} else {
+> +		reg |= (INTERRUPT_ID_BITS_SPIS - 1) << 19;
+> +	}
+>  
+>  	vgic_reg_access(mmio, &reg, offset,
+>  			ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
+> @@ -519,7 +525,9 @@ static bool handle_mmio_ctlr_redist(struct kvm_vcpu *vcpu,
+>  	vgic_reg_access(mmio, &reg, offset,
+>  			ACCESS_READ_VALUE | ACCESS_WRITE_VALUE);
+>  	if (!dist->lpis_enabled && (reg & GICR_CTLR_ENABLE_LPIS)) {
+> -		/* Eventually do something */
+> +		dist->lpis_enabled = true;
+> +		vgic_enable_lpis(vcpu);
+> +		return true;
+>  	}
+>  	return false;
+>  }
+> @@ -546,6 +554,8 @@ static bool handle_mmio_typer_redist(struct kvm_vcpu *vcpu,
+>  	reg = redist_vcpu->vcpu_id << 8;
+>  	if (target_vcpu_id == atomic_read(&vcpu->kvm->online_vcpus) - 1)
+>  		reg |= GICR_TYPER_LAST;
+> +	if (vgic_has_its(vcpu->kvm))
+> +		reg |= GICR_TYPER_PLPIS;
+>  	vgic_reg_access(mmio, &reg, offset,
+>  			ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
+>  	return false;
+> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+> index 9f7b05f..09b1f46 100644
+> --- a/virt/kvm/arm/vgic.c
+> +++ b/virt/kvm/arm/vgic.c
+> @@ -2254,3 +2254,13 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+>  {
+>  	return 0;
+>  }
+> +
+> +#ifdef CONFIG_HAVE_KVM_MSI
+I don't think the if#def is requested since the entry is already
+prevented in kvm_main.c in, case KVM_SIGNAL_MSI.
 
-Of course, you're right. The LR state is not used at all for a physical
-interrupt (the HW bit really says "use the distributor").
+Eric
+> +int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi)
+> +{
+> +	if (kvm->arch.vgic.vm_ops.inject_msi)
+> +		return kvm->arch.vgic.vm_ops.inject_msi(kvm, msi);
+> +	else
+> +		return -ENODEV;
+> +}
+> +#endif
+> 
 
-I've given it more thoughts last night, and I think we can solve this is
-a fairly simple way. In the scenario you outline, we do not observe the
-ACTIVE to INACTIVE transition because the interrupt has fired again,
-leaving the interrupt flagged as queued.
-
-I think we can clear the "queued" bit on injection, as we're guaranteed
-that seeing a new interrupt is the proof that the previous one has been
-deactivated (how could we see it otherwise?).
-
-How about the following (untested) patch:
-
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 6687ac4..a01f821 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -1387,8 +1387,17 @@ static int vgic_sync_hwirq(struct kvm_vcpu *vcpu,
-struct vgic_lr vlr)
-
- 	WARN_ON(ret);
-
-+	/*
-+	 * For a non-shared interrupt, we have to cater for two
-+	 * possible deactivation conditions
-+	 *
-+	 * - the interrupt is now inactive
-+	 * - the interrupt is still active, but is flagged as not
-+	 *   queued, indicating another interrupt has fired before we
-+	 *   could observe the deactivate.
-+	 */
- 	if (!map->shared)
--		return !active;
-+		return !active || !vgic_irq_is_queued(vcpu, vlr.irq);
-
- 	map->active = active;
-
-@@ -1534,6 +1543,7 @@ static int vgic_update_irq_pending(struct kvm
-*kvm, int cpuid,
- 	int edge_triggered, level_triggered;
- 	int enabled;
- 	bool ret = true, can_inject = true;
-+	struct irq_phys_map *map;
-
- 	spin_lock(&dist->lock);
-
-@@ -1580,6 +1590,18 @@ static int vgic_update_irq_pending(struct kvm
-*kvm, int cpuid,
- 		goto out;
- 	}
-
-+	map = vgic_irq_map_search(vcpu, irq_num);
-+	if (map && !map->shared) {
-+		/*
-+		 * We are told to inject a HW irq, so we have to trust
-+		 * the caller that the previous one has been EOIed,
-+		 * and that a new one is now active. Clearing the
-+		 * queued state will have the effect of making it
-+		 * sample-able again.
-+		 */
-+		vgic_irq_clear_queued(vcpu, irq_num);
-+	}
-+
- 	if (!vgic_can_sample_irq(vcpu, irq_num)) {
- 		/*
- 		 * Level interrupt in progress, will be picked up
-
-Thoughts?
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
