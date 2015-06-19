@@ -1,109 +1,114 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 10/12] arm/arm64: KVM: vgic: Do not save GICH_HCR / ICH_HCR_EL2
-Date: Fri, 19 Jun 2015 13:53:14 +0100
-Message-ID: <1434718396-13110-11-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 05/12] arm/arm64: KVM: Properly account for guest CPU time
+Date: Fri, 19 Jun 2015 13:53:09 +0100
+Message-ID: <1434718396-13110-6-git-send-email-marc.zyngier@arm.com>
 References: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 73E22561C3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2015 08:43:05 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Qk07XZTc8XDe for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Jun 2015 08:43:04 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 36FF9561D4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2015 08:43:04 -0400 (EDT)
 In-Reply-To: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Gleb Natapov <gleb@kernel.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Firo Yang <firogm@gmail.com>, Tiejun Chen <tiejun.chen@intel.com>, Eric Auger <eric.auger@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, Firo Yang <firogm@gmail.com>, Tiejun Chen <tiejun.chen@intel.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The GIC Hypervisor Configuration Register is used to enable
-the delivery of virtual interupts to a guest, as well as to
-define in which conditions maintenance interrupts are delivered
-to the host.
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-This register doesn't contain any information that we need to
-read back (the EOIcount is utterly useless for us).
+Until now we have been calling kvm_guest_exit after re-enabling
+interrupts when we come back from the guest, but this has the
+unfortunate effect that CPU time accounting done in the context of timer
+interrupts occurring while the guest is running doesn't properly notice
+that the time since the last tick was spent in the guest.
 
-So let's save ourselves some cycles, and not save it before
-writing zero to it.
+Inspired by the comment in the x86 code, move the kvm_guest_exit() call
+below the local_irq_enable() call and change __kvm_guest_exit() to
+kvm_guest_exit(), because we are now calling this function with
+interrupts enabled.  We have to now explicitly disable preemption and
+not enable preemption before we've called kvm_guest_exit(), since
+otherwise we could be preempted and everything happening before we
+eventually get scheduled again would be accounted for as guest time.
 
+At the same time, move the trace_kvm_exit() call outside of the atomic
+section, since there is no reason for us to do that with interrupts
+disabled.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/interrupts_head.S  | 3 ---
- arch/arm64/kvm/vgic-v2-switch.S | 3 ---
- arch/arm64/kvm/vgic-v3-switch.S | 2 --
- 3 files changed, 8 deletions(-)
+ arch/arm/kvm/arm.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
-index 48efe2e..702740d 100644
---- a/arch/arm/kvm/interrupts_head.S
-+++ b/arch/arm/kvm/interrupts_head.S
-@@ -412,7 +412,6 @@ vcpu	.req	r0		@ vcpu pointer always in r0
- 	add	r11, vcpu, #VCPU_VGIC_CPU
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 7e82330..bc738d2 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -531,6 +531,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		kvm_vgic_flush_hwstate(vcpu);
+ 		kvm_timer_flush_hwstate(vcpu);
  
- 	/* Save all interesting registers */
--	ldr	r3, [r2, #GICH_HCR]
- 	ldr	r4, [r2, #GICH_VMCR]
- 	ldr	r5, [r2, #GICH_MISR]
- 	ldr	r6, [r2, #GICH_EISR0]
-@@ -420,7 +419,6 @@ vcpu	.req	r0		@ vcpu pointer always in r0
- 	ldr	r8, [r2, #GICH_ELRSR0]
- 	ldr	r9, [r2, #GICH_ELRSR1]
- 	ldr	r10, [r2, #GICH_APR]
--ARM_BE8(rev	r3, r3	)
- ARM_BE8(rev	r4, r4	)
- ARM_BE8(rev	r5, r5	)
- ARM_BE8(rev	r6, r6	)
-@@ -429,7 +427,6 @@ ARM_BE8(rev	r8, r8	)
- ARM_BE8(rev	r9, r9	)
- ARM_BE8(rev	r10, r10	)
++		preempt_disable();
+ 		local_irq_disable();
  
--	str	r3, [r11, #VGIC_V2_CPU_HCR]
- 	str	r4, [r11, #VGIC_V2_CPU_VMCR]
- 	str	r5, [r11, #VGIC_V2_CPU_MISR]
- #ifdef CONFIG_CPU_ENDIAN_BE8
-diff --git a/arch/arm64/kvm/vgic-v2-switch.S b/arch/arm64/kvm/vgic-v2-switch.S
-index f002fe1..3f00071 100644
---- a/arch/arm64/kvm/vgic-v2-switch.S
-+++ b/arch/arm64/kvm/vgic-v2-switch.S
-@@ -47,7 +47,6 @@ __save_vgic_v2_state:
- 	add	x3, x0, #VCPU_VGIC_CPU
+ 		/*
+@@ -543,6 +544,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
  
- 	/* Save all interesting registers */
--	ldr	w4, [x2, #GICH_HCR]
- 	ldr	w5, [x2, #GICH_VMCR]
- 	ldr	w6, [x2, #GICH_MISR]
- 	ldr	w7, [x2, #GICH_EISR0]
-@@ -55,7 +54,6 @@ __save_vgic_v2_state:
- 	ldr	w9, [x2, #GICH_ELRSR0]
- 	ldr	w10, [x2, #GICH_ELRSR1]
- 	ldr	w11, [x2, #GICH_APR]
--CPU_BE(	rev	w4,  w4  )
- CPU_BE(	rev	w5,  w5  )
- CPU_BE(	rev	w6,  w6  )
- CPU_BE(	rev	w7,  w7  )
-@@ -64,7 +62,6 @@ CPU_BE(	rev	w9,  w9  )
- CPU_BE(	rev	w10, w10 )
- CPU_BE(	rev	w11, w11 )
+ 		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm)) {
+ 			local_irq_enable();
++			preempt_enable();
+ 			kvm_timer_sync_hwstate(vcpu);
+ 			kvm_vgic_sync_hwstate(vcpu);
+ 			continue;
+@@ -558,8 +560,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
  
--	str	w4, [x3, #VGIC_V2_CPU_HCR]
- 	str	w5, [x3, #VGIC_V2_CPU_VMCR]
- 	str	w6, [x3, #VGIC_V2_CPU_MISR]
- CPU_LE(	str	w7, [x3, #VGIC_V2_CPU_EISR] )
-diff --git a/arch/arm64/kvm/vgic-v3-switch.S b/arch/arm64/kvm/vgic-v3-switch.S
-index 617a012..3c20730 100644
---- a/arch/arm64/kvm/vgic-v3-switch.S
-+++ b/arch/arm64/kvm/vgic-v3-switch.S
-@@ -48,13 +48,11 @@
- 	dsb	st
+ 		vcpu->mode = OUTSIDE_GUEST_MODE;
+-		__kvm_guest_exit();
+-		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
++		/*
++		 * Back from guest
++		 *************************************************************/
++
+ 		/*
+ 		 * We may have taken a host interrupt in HYP mode (ie
+ 		 * while executing the guest). This interrupt is still
+@@ -573,8 +577,17 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		local_irq_enable();
  
- 	// Save all interesting registers
--	mrs_s	x4, ICH_HCR_EL2
- 	mrs_s	x5, ICH_VMCR_EL2
- 	mrs_s	x6, ICH_MISR_EL2
- 	mrs_s	x7, ICH_EISR_EL2
- 	mrs_s	x8, ICH_ELSR_EL2
+ 		/*
+-		 * Back from guest
+-		 *************************************************************/
++		 * We do local_irq_enable() before calling kvm_guest_exit() so
++		 * that if a timer interrupt hits while running the guest we
++		 * account that tick as being spent in the guest.  We enable
++		 * preemption after calling kvm_guest_exit() so that if we get
++		 * preempted we make sure ticks after that is not counted as
++		 * guest time.
++		 */
++		kvm_guest_exit();
++		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
++		preempt_enable();
++
  
--	str	w4, [x3, #VGIC_V3_CPU_HCR]
- 	str	w5, [x3, #VGIC_V3_CPU_VMCR]
- 	str	w6, [x3, #VGIC_V3_CPU_MISR]
- 	str	w7, [x3, #VGIC_V3_CPU_EISR]
+ 		kvm_timer_sync_hwstate(vcpu);
+ 		kvm_vgic_sync_hwstate(vcpu);
 -- 
 2.1.4
-
---
-To unsubscribe from this list: send the line "unsubscribe kvm" in
