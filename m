@@ -1,42 +1,127 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 01/12] ARM: KVM: Remove pointless void pointer cast
-Date: Fri, 19 Jun 2015 13:53:05 +0100
-Message-ID: <1434718396-13110-2-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 02/12] KVM: arm64: add active register handling to GICv3 emulation as well
+Date: Fri, 19 Jun 2015 13:53:06 +0100
+Message-ID: <1434718396-13110-3-git-send-email-marc.zyngier@arm.com>
 References: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Gleb Natapov <gleb@kernel.org>
-Cc: Firo Yang <firogm@gmail.com>, Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Tiejun Chen <tiejun.chen@intel.com>, Eric Auger <eric.auger@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Firo Yang <firogm@gmail.com>, Tiejun Chen <tiejun.chen@intel.com>, Eric Auger <eric.auger@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Firo Yang <firogm@gmail.com>
+From: Andre Przywara <andre.przywara@arm.com>
 
-No need to cast the void pointer returned by kmalloc() in
-arch/arm/kvm/mmu.c::kvm_alloc_stage2_pgd().
+Commit 47a98b15ba7c ("arm/arm64: KVM: support for un-queuing active
+IRQs") introduced handling of the GICD_I[SC]ACTIVER registers,
+but only for the GICv2 emulation. For the sake of completeness and
+as this is a pre-requisite for save/restore of the GICv3 distributor
+state, we should also emulate their handling in the distributor and
+redistributor frames of an emulated GICv3.
 
-Signed-off-by: Firo Yang <firogm@gmail.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/mmu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ virt/kvm/arm/vgic-v3-emul.c | 54 +++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 50 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 1d5accb..ce0bce4 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -691,8 +691,8 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
- 		 * work.  This is not used by the hardware and we have no
- 		 * alignment requirement for this allocation.
- 		 */
--		pgd = (pgd_t *)kmalloc(PTRS_PER_S2_PGD * sizeof(pgd_t),
--				       GFP_KERNEL | __GFP_ZERO);
-+		pgd = kmalloc(PTRS_PER_S2_PGD * sizeof(pgd_t),
-+				GFP_KERNEL | __GFP_ZERO);
+diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+index e9c3a7a..2b369de 100644
+--- a/virt/kvm/arm/vgic-v3-emul.c
++++ b/virt/kvm/arm/vgic-v3-emul.c
+@@ -173,6 +173,32 @@ static bool handle_mmio_clear_pending_reg_dist(struct kvm_vcpu *vcpu,
+ 	return false;
+ }
  
- 		if (!pgd) {
- 			kvm_free_hwpgd(hwpgd);
++static bool handle_mmio_set_active_reg_dist(struct kvm_vcpu *vcpu,
++					    struct kvm_exit_mmio *mmio,
++					    phys_addr_t offset)
++{
++	if (likely(offset >= VGIC_NR_PRIVATE_IRQS / 8))
++		return vgic_handle_set_active_reg(vcpu->kvm, mmio, offset,
++						   vcpu->vcpu_id);
++
++	vgic_reg_access(mmio, NULL, offset,
++			ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
++	return false;
++}
++
++static bool handle_mmio_clear_active_reg_dist(struct kvm_vcpu *vcpu,
++					      struct kvm_exit_mmio *mmio,
++					      phys_addr_t offset)
++{
++	if (likely(offset >= VGIC_NR_PRIVATE_IRQS / 8))
++		return vgic_handle_clear_active_reg(vcpu->kvm, mmio, offset,
++						    vcpu->vcpu_id);
++
++	vgic_reg_access(mmio, NULL, offset,
++			ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
++	return false;
++}
++
+ static bool handle_mmio_priority_reg_dist(struct kvm_vcpu *vcpu,
+ 					  struct kvm_exit_mmio *mmio,
+ 					  phys_addr_t offset)
+@@ -428,13 +454,13 @@ static const struct vgic_io_range vgic_v3_dist_ranges[] = {
+ 		.base		= GICD_ISACTIVER,
+ 		.len		= 0x80,
+ 		.bits_per_irq	= 1,
+-		.handle_mmio	= handle_mmio_raz_wi,
++		.handle_mmio	= handle_mmio_set_active_reg_dist,
+ 	},
+ 	{
+ 		.base		= GICD_ICACTIVER,
+ 		.len		= 0x80,
+ 		.bits_per_irq	= 1,
+-		.handle_mmio	= handle_mmio_raz_wi,
++		.handle_mmio	= handle_mmio_clear_active_reg_dist,
+ 	},
+ 	{
+ 		.base		= GICD_IPRIORITYR,
+@@ -561,6 +587,26 @@ static bool handle_mmio_clear_enable_reg_redist(struct kvm_vcpu *vcpu,
+ 				      ACCESS_WRITE_CLEARBIT);
+ }
+ 
++static bool handle_mmio_set_active_reg_redist(struct kvm_vcpu *vcpu,
++					      struct kvm_exit_mmio *mmio,
++					      phys_addr_t offset)
++{
++	struct kvm_vcpu *redist_vcpu = mmio->private;
++
++	return vgic_handle_set_active_reg(vcpu->kvm, mmio, offset,
++					  redist_vcpu->vcpu_id);
++}
++
++static bool handle_mmio_clear_active_reg_redist(struct kvm_vcpu *vcpu,
++						struct kvm_exit_mmio *mmio,
++						phys_addr_t offset)
++{
++	struct kvm_vcpu *redist_vcpu = mmio->private;
++
++	return vgic_handle_clear_active_reg(vcpu->kvm, mmio, offset,
++					     redist_vcpu->vcpu_id);
++}
++
+ static bool handle_mmio_set_pending_reg_redist(struct kvm_vcpu *vcpu,
+ 					       struct kvm_exit_mmio *mmio,
+ 					       phys_addr_t offset)
+@@ -674,13 +720,13 @@ static const struct vgic_io_range vgic_redist_ranges[] = {
+ 		.base		= SGI_base(GICR_ISACTIVER0),
+ 		.len		= 0x04,
+ 		.bits_per_irq	= 1,
+-		.handle_mmio	= handle_mmio_raz_wi,
++		.handle_mmio	= handle_mmio_set_active_reg_redist,
+ 	},
+ 	{
+ 		.base		= SGI_base(GICR_ICACTIVER0),
+ 		.len		= 0x04,
+ 		.bits_per_irq	= 1,
+-		.handle_mmio	= handle_mmio_raz_wi,
++		.handle_mmio	= handle_mmio_clear_active_reg_redist,
+ 	},
+ 	{
+ 		.base		= SGI_base(GICR_IPRIORITYR0),
 -- 
 2.1.4
 
