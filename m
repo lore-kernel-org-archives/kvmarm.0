@@ -1,223 +1,124 @@
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v6 10/12] KVM: arm64: guest debug, HW assisted debug support
-Date: Fri, 19 Jun 2015 13:23:48 +0100
-Message-ID: <1434716630-18260-11-git-send-email-alex.bennee@linaro.org>
-References: <1434716630-18260-1-git-send-email-alex.bennee@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D2AC5617D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2015 08:42:44 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ro3yeqyB53mJ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Jun 2015 08:42:42 -0400 (EDT)
-Received: from socrates.bennee.com
- (static.88-198-71-155.clients.your-server.de [88.198.71.155])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8F3F55617B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2015 08:42:42 -0400 (EDT)
-In-Reply-To: <1434716630-18260-1-git-send-email-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, Jonathan Corbet <corbet@lwn.net>, Gleb Natapov <gleb@kernel.org>, jan.kiszka@siemens.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, "open list:ABI/API" <linux-api@vger.kernel.org>, dahi@linux.vnet.ibm.com, Peter Zijlstra <peterz@infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, r65777@freescale.com, bp@suse.de, Ingo Molnar <mingo@kernel.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH 03/12] arm: KVM: force execution of HCPTR access on VM exit
+Date: Fri, 19 Jun 2015 13:53:07 +0100
+Message-ID: <1434718396-13110-4-git-send-email-marc.zyngier@arm.com>
+References: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Gleb Natapov <gleb@kernel.org>
+Cc: Vikram Sethi <vikrams@codeaurora.org>, Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Firo Yang <firogm@gmail.com>, Tiejun Chen <tiejun.chen@intel.com>, Eric Auger <eric.auger@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhpcyBhZGRzIHN1cHBvcnQgZm9yIHVzZXJzcGFjZSB0byBjb250cm9sIHRoZSBIVyBkZWJ1ZyBy
-ZWdpc3RlcnMgZm9yCmd1ZXN0IGRlYnVnLiBJbiB0aGUgZGVidWcgaW9jdGwgd2UgY29weSB0aGUg
-SU1QREVGIGRlZmluZWQgbnVtYmVyIG9mCnJlZ2lzdGVycyBpbnRvIGEgbmV3IHJlZ2lzdGVyIHNl
-dCBjYWxsZWQgaG9zdF9kZWJ1Z19zdGF0ZS4gVGhlcmUgaXMgbm93CmEgbmV3IHZjcHUgcGFyYW1l
-dGVyIGNhbGxlZCBkZWJ1Z19wdHIgd2hpY2ggc2VsZWN0cyB3aGljaCByZWdpc3RlciBzZXQKaXMg
-dG8gY29waWVkIGludG8gdGhlIHJlYWwgcmVnaXN0ZXJzIHdoZW4gd29ybGQgc3dpdGNoIG9jY3Vy
-cy4KCkkndmUgbW92ZWQgc29tZSBoZWxwZXIgZnVuY3Rpb25zIGludG8gdGhlIGh3X2JyZWFrcG9p
-bnQuaCBoZWFkZXIgZm9yCnJlLXVzZS4KCkFzIHdpdGggc2luZ2xlIHN0ZXAgd2UgbmVlZCB0byB0
-d2VhayB0aGUgZ3Vlc3QgcmVnaXN0ZXJzIHRvIGVuYWJsZSB0aGUKZXhjZXB0aW9ucyBzbyB3ZSBu
-ZWVkIHRvIHNhdmUgYW5kIHJlc3RvcmUgdGhvc2UgYml0cy4KClR3byBuZXcgY2FwYWJpbGl0aWVz
-IGhhdmUgYmVlbiBhZGRlZCB0byB0aGUgS1ZNX0VYVEVOU0lPTiBpb2N0bCB0byBhbGxvdwp1c2Vy
-c3BhY2UgdG8gcXVlcnkgdGhlIG51bWJlciBvZiBoYXJkd2FyZSBicmVhayBhbmQgd2F0Y2ggcG9p
-bnRzCmF2YWlsYWJsZSBvbiB0aGUgaG9zdCBoYXJkd2FyZS4KClNpZ25lZC1vZmYtYnk6IEFsZXgg
-QmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KCi0tLQp2MgogICAtIHN3aXRjaGVkIHRv
-IEMgc2V0dXAKICAgLSByZXBsYWNlIGhvc3QgZGVidWcgcmVnaXN0ZXJzIGRpcmVjdGx5IGludG8g
-Y29udGV4dAogICAtIG1pbm9yIHR3ZWFrIHRvIGFwaSBkb2NzCiAgIC0gc2V0dXAgcmlnaHQgcmVn
-aXN0ZXIgZm9yIGRlYnVnCiAgIC0gYWRkIEZBUl9FTDIgdG8gZGVidWcgZXhpdCBzdHJ1Y3R1cmUK
-ICAgLSBhZGQgc3VwcG9ydCBmb3IgdHJhcHBpbmcgZGVidWcgcmVnaXN0ZXIgYWNjZXNzCnYzCiAg
-IC0gcmVtb3ZlIHN0cmF5IHRyYWNlIHN0YXRlbWVudAogICAtIGZpeCBzcGFjaW5nIGFyb3VuZCBv
-cGVyYXRvcnMgKHZhcmlvdXMpCiAgIC0gY2xlYW4tdXAgdXNhZ2Ugb2YgdHJhcF9kZWJ1ZwogICAt
-IGludHJvZHVjZSBkZWJ1Z19wdHIsIHJlcGxhY2UgZXhjZXNzaXZlIG1lbWNweSBzdHVmZgogICAt
-IGRvbid0IHVzZSBtZW1jcHkgaW4gaW9jdGwsIGp1c3QgYXNzaWduCiAgIC0gdXBkYXRlIGNhcCBp
-b2N0bCBkb2N1bWVudGF0aW9uCiAgIC0gcmV3b3JkIGEgbnVtYmVyIGNvbW1lbnRzCiAgIC0gcmVu
-YW1lIGhvc3RfZGVidWdfc3RhdGUtPmV4dGVybmFsX2RlYnVnX3N0YXRlCnY0CiAgIC0gdXNlIHRo
-ZSBuZXcgdTMyL3U2NCBzcGxpdCBkZWJ1Z19wdHIgYXBwcm9hY2gKICAgLSBmaXggc29tZSB3b3Jk
-aW5nL2NvbW1lbnRzCnY1CiAgIC0gZG9uJ3Qgc2V0IE1EU0NSX0VMMS5LREUgKG5vdCBuZWVkZWQp
-CnY2CiAgIC0gdXBkYXRlIHdvcmRpbmcgZ2l2ZW4gY2hhbmdlIGluIGNvbW1lbnRhcnkKICAgLSBL
-Vk1fR1VFU1REQkdfVVNFX0hXX0JQLT5LVk1fR1VFU1REQkdfVVNFX0hXCi0tLQogRG9jdW1lbnRh
-dGlvbi92aXJ0dWFsL2t2bS9hcGkudHh0ICAgICAgfCAgNyArKysrKystCiBhcmNoL2FybS9rdm0v
-YXJtLmMgICAgICAgICAgICAgICAgICAgICB8ICA3ICsrKysrKysKIGFyY2gvYXJtNjQvaW5jbHVk
-ZS9hc20vaHdfYnJlYWtwb2ludC5oIHwgMTIgKysrKysrKysrKysKIGFyY2gvYXJtNjQvaW5jbHVk
-ZS9hc20va3ZtX2hvc3QuaCAgICAgIHwgIDYgKysrKystCiBhcmNoL2FybTY0L2tlcm5lbC9od19i
-cmVha3BvaW50LmMgICAgICB8IDEyIC0tLS0tLS0tLS0tCiBhcmNoL2FybTY0L2t2bS9kZWJ1Zy5j
-ICAgICAgICAgICAgICAgICB8IDM3ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0K
-IGFyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMgICAgICAgICAgIHwgIDYgKysrKysrCiBhcmNo
-L2FybTY0L2t2bS9yZXNldC5jICAgICAgICAgICAgICAgICB8IDEyICsrKysrKysrKysrCiBpbmNs
-dWRlL3VhcGkvbGludXgva3ZtLmggICAgICAgICAgICAgICB8ICAyICsrCiA5IGZpbGVzIGNoYW5n
-ZWQsIDgyIGluc2VydGlvbnMoKyksIDE5IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL0RvY3Vt
-ZW50YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4dCBiL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0v
-YXBpLnR4dAppbmRleCAzM2M4MTQzLi5hZGE1N2RmIDEwMDY0NAotLS0gYS9Eb2N1bWVudGF0aW9u
-L3ZpcnR1YWwva3ZtL2FwaS50eHQKKysrIGIvRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGku
-dHh0CkBAIC0yNjY4LDcgKzI2NjgsNyBAQCBUaGUgdG9wIDE2IGJpdHMgb2YgdGhlIGNvbnRyb2wg
-ZmllbGQgYXJlIGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBjb250cm9sCiBmbGFncyB3aGljaCBjYW4g
-aW5jbHVkZSB0aGUgZm9sbG93aW5nOgogCiAgIC0gS1ZNX0dVRVNUREJHX1VTRV9TV19CUDogICAg
-IHVzaW5nIHNvZnR3YXJlIGJyZWFrcG9pbnRzIFt4ODYsIGFybTY0XQotICAtIEtWTV9HVUVTVERC
-R19VU0VfSFdfQlA6ICAgICB1c2luZyBoYXJkd2FyZSBicmVha3BvaW50cyBbeDg2LCBzMzkwXQor
-ICAtIEtWTV9HVUVTVERCR19VU0VfSFdfQlA6ICAgICB1c2luZyBoYXJkd2FyZSBicmVha3BvaW50
-cyBbeDg2LCBzMzkwLCBhcm02NF0KICAgLSBLVk1fR1VFU1REQkdfSU5KRUNUX0RCOiAgICAgaW5q
-ZWN0IERCIHR5cGUgZXhjZXB0aW9uIFt4ODZdCiAgIC0gS1ZNX0dVRVNUREJHX0lOSkVDVF9CUDog
-ICAgIGluamVjdCBCUCB0eXBlIGV4Y2VwdGlvbiBbeDg2XQogICAtIEtWTV9HVUVTVERCR19FWElU
-X1BFTkRJTkc6ICB0cmlnZ2VyIGFuIGltbWVkaWF0ZSBndWVzdCBleGl0IFtzMzkwXQpAQCAtMjY4
-Myw2ICsyNjgzLDExIEBAIHVwZGF0ZWQgdG8gdGhlIGNvcnJlY3QgKHN1cHBsaWVkKSB2YWx1ZXMu
-CiBUaGUgc2Vjb25kIHBhcnQgb2YgdGhlIHN0cnVjdHVyZSBpcyBhcmNoaXRlY3R1cmUgc3BlY2lm
-aWMgYW5kCiB0eXBpY2FsbHkgY29udGFpbnMgYSBzZXQgb2YgZGVidWcgcmVnaXN0ZXJzLgogCitG
-b3IgYXJtNjQgdGhlIG51bWJlciBvZiBkZWJ1ZyByZWdpc3RlcnMgaXMgaW1wbGVtZW50YXRpb24g
-ZGVmaW5lZCBhbmQKK2NhbiBiZSBkZXRlcm1pbmVkIGJ5IHF1ZXJ5aW5nIHRoZSBLVk1fQ0FQX0dV
-RVNUX0RFQlVHX0hXX0JQUyBhbmQKK0tWTV9DQVBfR1VFU1RfREVCVUdfSFdfV1BTIGNhcGFiaWxp
-dGllcyB3aGljaCByZXR1cm4gYSBwb3NpdGl2ZSBudW1iZXIKK2luZGljYXRpbmcgdGhlIG51bWJl
-ciBvZiBzdXBwb3J0ZWQgcmVnaXN0ZXJzLgorCiBXaGVuIGRlYnVnIGV2ZW50cyBleGl0IHRoZSBt
-YWluIHJ1biBsb29wIHdpdGggdGhlIHJlYXNvbgogS1ZNX0VYSVRfREVCVUcgd2l0aCB0aGUga3Zt
-X2RlYnVnX2V4aXRfYXJjaCBwYXJ0IG9mIHRoZSBrdm1fcnVuCiBzdHJ1Y3R1cmUgY29udGFpbmlu
-ZyBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVidWcgaW5mb3JtYXRpb24uCmRpZmYgLS1naXQgYS9h
-cmNoL2FybS9rdm0vYXJtLmMgYi9hcmNoL2FybS9rdm0vYXJtLmMKaW5kZXggMGQxN2M3Yi4uNjBj
-NDA0NSAxMDA2NDQKLS0tIGEvYXJjaC9hcm0va3ZtL2FybS5jCisrKyBiL2FyY2gvYXJtL2t2bS9h
-cm0uYwpAQCAtMzA3LDYgKzMwNyw3IEBAIHZvaWQga3ZtX2FyY2hfdmNwdV9wdXQoc3RydWN0IGt2
-bV92Y3B1ICp2Y3B1KQogCiAjZGVmaW5lIEtWTV9HVUVTVERCR19WQUxJRF9NQVNLIChLVk1fR1VF
-U1REQkdfRU5BQkxFIHwgICAgXAogCQkJICAgIEtWTV9HVUVTVERCR19VU0VfU1dfQlAgfCBcCisJ
-CQkgICAgS1ZNX0dVRVNUREJHX1VTRV9IVyB8IFwKIAkJCSAgICBLVk1fR1VFU1REQkdfU0lOR0xF
-U1RFUCkKIAogLyoqCkBAIC0zMjcsNiArMzI4LDEyIEBAIGludCBrdm1fYXJjaF92Y3B1X2lvY3Rs
-X3NldF9ndWVzdF9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCiAKIAlpZiAoZGJnLT5jb250
-cm9sICYgS1ZNX0dVRVNUREJHX0VOQUJMRSkgewogCQl2Y3B1LT5ndWVzdF9kZWJ1ZyA9IGRiZy0+
-Y29udHJvbDsKKworCQkvKiBIYXJkd2FyZSBhc3Npc3RlZCBCcmVhayBhbmQgV2F0Y2ggcG9pbnRz
-ICovCisJCWlmICh2Y3B1LT5ndWVzdF9kZWJ1ZyAmIEtWTV9HVUVTVERCR19VU0VfSFcpIHsKKwkJ
-CXZjcHUtPmFyY2guZXh0ZXJuYWxfZGVidWdfc3RhdGUgPSBkYmctPmFyY2g7CisJCX0KKwogCX0g
-ZWxzZSB7CiAJCS8qIElmIG5vdCBlbmFibGVkIGNsZWFyIGFsbCBmbGFncyAqLwogCQl2Y3B1LT5n
-dWVzdF9kZWJ1ZyA9IDA7CmRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2h3X2Jy
-ZWFrcG9pbnQuaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vaHdfYnJlYWtwb2ludC5oCmluZGV4
-IDUyYjQ4NGIuLmM0NTA1NTIgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vaHdf
-YnJlYWtwb2ludC5oCisrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vaHdfYnJlYWtwb2ludC5o
-CkBAIC0xMzAsNiArMTMwLDE4IEBAIHN0YXRpYyBpbmxpbmUgdm9pZCBwdHJhY2VfaHdfY29weV90
-aHJlYWQoc3RydWN0IHRhc2tfc3RydWN0ICp0YXNrKQogfQogI2VuZGlmCiAKKy8qIERldGVybWlu
-ZSBudW1iZXIgb2YgQlJQIHJlZ2lzdGVycyBhdmFpbGFibGUuICovCitzdGF0aWMgaW5saW5lIGlu
-dCBnZXRfbnVtX2JycHModm9pZCkKK3sKKwlyZXR1cm4gKChyZWFkX2NwdWlkKElEX0FBNjRERlIw
-X0VMMSkgPj4gMTIpICYgMHhmKSArIDE7Cit9CisKKy8qIERldGVybWluZSBudW1iZXIgb2YgV1JQ
-IHJlZ2lzdGVycyBhdmFpbGFibGUuICovCitzdGF0aWMgaW5saW5lIGludCBnZXRfbnVtX3dycHMo
-dm9pZCkKK3sKKwlyZXR1cm4gKChyZWFkX2NwdWlkKElEX0FBNjRERlIwX0VMMSkgPj4gMjApICYg
-MHhmKSArIDE7Cit9CisKIGV4dGVybiBzdHJ1Y3QgcG11IHBlcmZfb3BzX2JwOwogCiAjZW5kaWYJ
-LyogX19LRVJORUxfXyAqLwpkaWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1f
-aG9zdC5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCmluZGV4IDk2OTdkYWYu
-LjBhM2VlN2IgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAor
-KysgYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKQEAgLTExNiwxMyArMTE2LDE3
-IEBAIHN0cnVjdCBrdm1fdmNwdV9hcmNoIHsKIAkgKiBkZWJ1Z2dpbmcgdGhlIGd1ZXN0IGZyb20g
-dGhlIGhvc3QgYW5kIHRvIG1haW50YWluIHNlcGFyYXRlIGhvc3QgYW5kCiAJICogZ3Vlc3Qgc3Rh
-dGUgZHVyaW5nIHdvcmxkIHN3aXRjaGVzLiB2Y3B1X2RlYnVnX3N0YXRlIGFyZSB0aGUgZGVidWcK
-IAkgKiByZWdpc3RlcnMgb2YgdGhlIHZjcHUgYXMgdGhlIGd1ZXN0IHNlZXMgdGhlbS4gIGhvc3Rf
-ZGVidWdfc3RhdGUgYXJlCi0JICogdGhlIGhvc3QgcmVnaXN0ZXJzIHdoaWNoIGFyZSBzYXZlZCBh
-bmQgcmVzdG9yZWQgZHVyaW5nIHdvcmxkIHN3aXRjaGVzLgorCSAqIHRoZSBob3N0IHJlZ2lzdGVy
-cyB3aGljaCBhcmUgc2F2ZWQgYW5kIHJlc3RvcmVkIGR1cmluZworCSAqIHdvcmxkIHN3aXRjaGVz
-LiBleHRlcm5hbF9kZWJ1Z19zdGF0ZSBjb250YWlucyB0aGUgZGVidWcKKwkgKiB2YWx1ZXMgd2Ug
-d2FudCB0byBkZWJ1Z2dpbmcgdGhlIGd1ZXN0LiBUaGlzIGlzIHNldCB2aWEgdGhlCisJICogS1ZN
-X1NFVF9HVUVTVF9ERUJVRyBpb2N0bC4KIAkgKgogCSAqIGRlYnVnX3B0ciBwb2ludHMgdG8gdGhl
-IHNldCBvZiBkZWJ1ZyByZWdpc3RlcnMgdGhhdCBzaG91bGQgYmUgbG9hZGVkCiAJICogb250byB0
-aGUgaGFyZHdhcmUgd2hlbiBydW5uaW5nIHRoZSBndWVzdC4KIAkgKi8KIAlzdHJ1Y3Qga3ZtX2d1
-ZXN0X2RlYnVnX2FyY2ggKmRlYnVnX3B0cjsKIAlzdHJ1Y3Qga3ZtX2d1ZXN0X2RlYnVnX2FyY2gg
-dmNwdV9kZWJ1Z19zdGF0ZTsKKwlzdHJ1Y3Qga3ZtX2d1ZXN0X2RlYnVnX2FyY2ggZXh0ZXJuYWxf
-ZGVidWdfc3RhdGU7CiAKIAkvKiBQb2ludGVyIHRvIGhvc3QgQ1BVIGNvbnRleHQgKi8KIAlrdm1f
-Y3B1X2NvbnRleHRfdCAqaG9zdF9jcHVfY29udGV4dDsKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQv
-a2VybmVsL2h3X2JyZWFrcG9pbnQuYyBiL2FyY2gvYXJtNjQva2VybmVsL2h3X2JyZWFrcG9pbnQu
-YwppbmRleCBlN2Q5MzRkLi4zYTQxYmJmIDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2tlcm5lbC9o
-d19icmVha3BvaW50LmMKKysrIGIvYXJjaC9hcm02NC9rZXJuZWwvaHdfYnJlYWtwb2ludC5jCkBA
-IC00OSwxOCArNDksNiBAQCBzdGF0aWMgREVGSU5FX1BFUl9DUFUoaW50LCBzdGVwcGluZ19rZXJu
-ZWxfYnApOwogc3RhdGljIGludCBjb3JlX251bV9icnBzOwogc3RhdGljIGludCBjb3JlX251bV93
-cnBzOwogCi0vKiBEZXRlcm1pbmUgbnVtYmVyIG9mIEJSUCByZWdpc3RlcnMgYXZhaWxhYmxlLiAq
-Lwotc3RhdGljIGludCBnZXRfbnVtX2JycHModm9pZCkKLXsKLQlyZXR1cm4gKChyZWFkX2NwdWlk
-KElEX0FBNjRERlIwX0VMMSkgPj4gMTIpICYgMHhmKSArIDE7Ci19Ci0KLS8qIERldGVybWluZSBu
-dW1iZXIgb2YgV1JQIHJlZ2lzdGVycyBhdmFpbGFibGUuICovCi1zdGF0aWMgaW50IGdldF9udW1f
-d3Jwcyh2b2lkKQotewotCXJldHVybiAoKHJlYWRfY3B1aWQoSURfQUE2NERGUjBfRUwxKSA+PiAy
-MCkgJiAweGYpICsgMTsKLX0KLQogaW50IGh3X2JyZWFrcG9pbnRfc2xvdHMoaW50IHR5cGUpCiB7
-CiAJLyoKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2RlYnVnLmMgYi9hcmNoL2FybTY0L2t2
-bS9kZWJ1Zy5jCmluZGV4IGQ0MzllYjguLmIyODdiYmMgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQv
-a3ZtL2RlYnVnLmMKKysrIGIvYXJjaC9hcm02NC9rdm0vZGVidWcuYwpAQCAtOTYsMTAgKzk2LDYg
-QEAgdm9pZCBrdm1fYXJtX3NldHVwX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIAkJCQlN
-RENSX0VMMl9URFJBIHwKIAkJCQlNRENSX0VMMl9URE9TQSk7CiAKLQkvKiBUcmFwIG9uIGFjY2Vz
-cyB0byBkZWJ1ZyByZWdpc3RlcnM/ICovCi0JaWYgKHRyYXBfZGVidWcpCi0JCXZjcHUtPmFyY2gu
-bWRjcl9lbDIgfD0gTURDUl9FTDJfVERBOwotCiAJLyogSXMgR3Vlc3QgZGVidWdnaW5nIGluIGVm
-ZmVjdD8gKi8KIAlpZiAodmNwdS0+Z3Vlc3RfZGVidWcpIHsKIAkJLyogUm91dGUgYWxsIHNvZnR3
-YXJlIGRlYnVnIGV4Y2VwdGlvbnMgdG8gRUwyICovCkBAIC0xMzQsMTEgKzEzMCw0MiBAQCB2b2lk
-IGt2bV9hcm1fc2V0dXBfZGVidWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQogCQl9IGVsc2Ugewog
-CQkJdmNwdV9zeXNfcmVnKHZjcHUsIE1EU0NSX0VMMSkgJj0gfkRCR19NRFNDUl9TUzsKIAkJfQor
-CisJCS8qCisJCSAqIEhXIEJyZWFrcG9pbnRzIGFuZCB3YXRjaHBvaW50cworCQkgKgorCQkgKiBX
-ZSBzaW1wbHkgc3dpdGNoIHRoZSBkZWJ1Z19wdHIgdG8gcG9pbnQgdG8gb3VyIG5ldworCQkgKiBl
-eHRlcm5hbF9kZWJ1Z19zdGF0ZSB3aGljaCBoYXMgYmVlbiBwb3B1bGF0ZWQgYnkgdGhlCisJCSAq
-IGRlYnVnIGlvY3RsLiBUaGUgZXhpc3RpbmcgS1ZNX0FSTTY0X0RFQlVHX0RJUlRZCisJCSAqIG1l
-Y2hhbmlzbSBlbnN1cmVzIHRoZSByZWdpc3RlcnMgYXJlIHVwZGF0ZWQgb24gdGhlCisJCSAqIHdv
-cmxkIHN3aXRjaC4KKwkJICovCisJCWlmICh2Y3B1LT5ndWVzdF9kZWJ1ZyAmIEtWTV9HVUVTVERC
-R19VU0VfSFcpIHsKKwkJCS8qIEVuYWJsZSBicmVha3BvaW50cy93YXRjaHBvaW50cyAqLworCQkJ
-dmNwdV9zeXNfcmVnKHZjcHUsIE1EU0NSX0VMMSkgfD0gREJHX01EU0NSX01ERTsKKworCQkJdmNw
-dS0+YXJjaC5kZWJ1Z19wdHIgPSAmdmNwdS0+YXJjaC5leHRlcm5hbF9kZWJ1Z19zdGF0ZTsKKwkJ
-CXZjcHUtPmFyY2guZGVidWdfZmxhZ3MgfD0gS1ZNX0FSTTY0X0RFQlVHX0RJUlRZOworCQkJdHJh
-cF9kZWJ1ZyA9IHRydWU7CisJCX0KIAl9CisKKwkvKiBUcmFwIGRlYnVnIHJlZ2lzdGVyIGFjY2Vz
-cyAqLworCWlmICh0cmFwX2RlYnVnKQorCQl2Y3B1LT5hcmNoLm1kY3JfZWwyIHw9IE1EQ1JfRUwy
-X1REQTsKIH0KIAogdm9pZCBrdm1fYXJtX2NsZWFyX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNw
-dSkKIHsKLQlpZiAodmNwdS0+Z3Vlc3RfZGVidWcpCisJaWYgKHZjcHUtPmd1ZXN0X2RlYnVnKSB7
-CiAJCXJlc3RvcmVfZ3Vlc3RfZGVidWdfcmVncyh2Y3B1KTsKKworCQkvKgorCQkgKiBJZiB3ZSB3
-ZXJlIHVzaW5nIEhXIGRlYnVnIHdlIG5lZWQgdG8gcmVzdG9yZSB0aGUKKwkJICogZGVidWdfcHRy
-IHRvIHRoZSBndWVzdCBkZWJ1ZyBzdGF0ZS4KKwkJICovCisJCWlmICh2Y3B1LT5ndWVzdF9kZWJ1
-ZyAmIEtWTV9HVUVTVERCR19VU0VfSFcpCisJCQl2Y3B1LT5hcmNoLmRlYnVnX3B0ciA9ICZ2Y3B1
-LT5hcmNoLnZjcHVfZGVidWdfc3RhdGU7CisKKwl9CiB9CmRpZmYgLS1naXQgYS9hcmNoL2FybTY0
-L2t2bS9oYW5kbGVfZXhpdC5jIGIvYXJjaC9hcm02NC9rdm0vaGFuZGxlX2V4aXQuYwppbmRleCBl
-OWRlMTNlLi42OGEwNzU5IDEwMDY0NAotLS0gYS9hcmNoL2FybTY0L2t2bS9oYW5kbGVfZXhpdC5j
-CisrKyBiL2FyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMKQEAgLTEwMyw3ICsxMDMsMTEgQEAg
-c3RhdGljIGludCBrdm1faGFuZGxlX2d1ZXN0X2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwg
-c3RydWN0IGt2bV9ydW4gKnJ1bikKIAlydW4tPmRlYnVnLmFyY2guaHNyID0gaHNyOwogCiAJc3dp
-dGNoIChoc3IgPj4gRVNSX0VMeF9FQ19TSElGVCkgeworCWNhc2UgRVNSX0VMeF9FQ19XQVRDSFBU
-X0xPVzoKKwkJcnVuLT5kZWJ1Zy5hcmNoLmZhciA9IHZjcHUtPmFyY2guZmF1bHQuZmFyX2VsMjsK
-KwkJLyogZmFsbCB0aHJvdWdoICovCiAJY2FzZSBFU1JfRUx4X0VDX1NPRlRTVFBfTE9XOgorCWNh
-c2UgRVNSX0VMeF9FQ19CUkVBS1BUX0xPVzoKIAljYXNlIEVTUl9FTHhfRUNfQktQVDMyOgogCWNh
-c2UgRVNSX0VMeF9FQ19CUks2NDoKIAkJYnJlYWs7CkBAIC0xMzIsNiArMTM2LDggQEAgc3RhdGlj
-IGV4aXRfaGFuZGxlX2ZuIGFybV9leGl0X2hhbmRsZXJzW10gPSB7CiAJW0VTUl9FTHhfRUNfSUFC
-VF9MT1ddCT0ga3ZtX2hhbmRsZV9ndWVzdF9hYm9ydCwKIAlbRVNSX0VMeF9FQ19EQUJUX0xPV10J
-PSBrdm1faGFuZGxlX2d1ZXN0X2Fib3J0LAogCVtFU1JfRUx4X0VDX1NPRlRTVFBfTE9XXT0ga3Zt
-X2hhbmRsZV9ndWVzdF9kZWJ1ZywKKwlbRVNSX0VMeF9FQ19XQVRDSFBUX0xPV109IGt2bV9oYW5k
-bGVfZ3Vlc3RfZGVidWcsCisJW0VTUl9FTHhfRUNfQlJFQUtQVF9MT1ddPSBrdm1faGFuZGxlX2d1
-ZXN0X2RlYnVnLAogCVtFU1JfRUx4X0VDX0JLUFQzMl0JPSBrdm1faGFuZGxlX2d1ZXN0X2RlYnVn
-LAogCVtFU1JfRUx4X0VDX0JSSzY0XQk9IGt2bV9oYW5kbGVfZ3Vlc3RfZGVidWcsCiB9OwpkaWZm
-IC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vcmVzZXQuYyBiL2FyY2gvYXJtNjQva3ZtL3Jlc2V0LmMK
-aW5kZXggMGI0MzI2NS4uMjFkNWE2MiAxMDA2NDQKLS0tIGEvYXJjaC9hcm02NC9rdm0vcmVzZXQu
-YworKysgYi9hcmNoL2FybTY0L2t2bS9yZXNldC5jCkBAIC01Niw2ICs1NiwxMiBAQCBzdGF0aWMg
-Ym9vbCBjcHVfaGFzXzMyYml0X2VsMSh2b2lkKQogCXJldHVybiAhIShwZnIwICYgMHgyMCk7CiB9
-CiAKKy8qKgorICoga3ZtX2FyY2hfZGV2X2lvY3RsX2NoZWNrX2V4dGVuc2lvbgorICoKKyAqIFdl
-IGN1cnJlbnRseSBhc3N1bWUgdGhhdCB0aGUgbnVtYmVyIG9mIEhXIHJlZ2lzdGVycyBpcyB1bmlm
-b3JtCisgKiBhY3Jvc3MgYWxsIENQVXMgKHNlZSBjcHVpbmZvX3Nhbml0eV9jaGVjaykuCisgKi8K
-IGludCBrdm1fYXJjaF9kZXZfaW9jdGxfY2hlY2tfZXh0ZW5zaW9uKGxvbmcgZXh0KQogewogCWlu
-dCByOwpAQCAtNjQsNiArNzAsMTIgQEAgaW50IGt2bV9hcmNoX2Rldl9pb2N0bF9jaGVja19leHRl
-bnNpb24obG9uZyBleHQpCiAJY2FzZSBLVk1fQ0FQX0FSTV9FTDFfMzJCSVQ6CiAJCXIgPSBjcHVf
-aGFzXzMyYml0X2VsMSgpOwogCQlicmVhazsKKwljYXNlIEtWTV9DQVBfR1VFU1RfREVCVUdfSFdf
-QlBTOgorCQlyID0gZ2V0X251bV9icnBzKCk7CisJCWJyZWFrOworCWNhc2UgS1ZNX0NBUF9HVUVT
-VF9ERUJVR19IV19XUFM6CisJCXIgID0gZ2V0X251bV93cnBzKCk7CisJCWJyZWFrOwogCWRlZmF1
-bHQ6CiAJCXIgPSAwOwogCX0KZGlmZiAtLWdpdCBhL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaCBi
-L2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaAppbmRleCA3MGFjNjQxLi5mMDIwZGQwIDEwMDY0NAot
-LS0gYS9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgKKysrIGIvaW5jbHVkZS91YXBpL2xpbnV4L2t2
-bS5oCkBAIC04MTcsNiArODE3LDggQEAgc3RydWN0IGt2bV9wcGNfc21tdV9pbmZvIHsKICNkZWZp
-bmUgS1ZNX0NBUF9TMzkwX0lOSkVDVF9JUlEgMTEzCiAjZGVmaW5lIEtWTV9DQVBfUzM5MF9JUlFf
-U1RBVEUgMTE0CiAjZGVmaW5lIEtWTV9DQVBfUFBDX0hXUk5HIDExNQorI2RlZmluZSBLVk1fQ0FQ
-X0dVRVNUX0RFQlVHX0hXX0JQUyAxMTYKKyNkZWZpbmUgS1ZNX0NBUF9HVUVTVF9ERUJVR19IV19X
-UFMgMTE3CiAKICNpZmRlZiBLVk1fQ0FQX0lSUV9ST1VUSU5HCiAKLS0gCjIuNC4zCgpfX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBs
-aXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJp
-YS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On VM entry, we disable access to the VFP registers in order to
+perform a lazy save/restore of these registers.
+
+On VM exit, we restore access, test if we did enable them before,
+and save/restore the guest/host registers if necessary. In this
+sequence, the FPEXC register is always accessed, irrespective
+of the trapping configuration.
+
+If the guest didn't touch the VFP registers, then the HCPTR access
+has now enabled such access, but we're missing a barrier to ensure
+architectural execution of the new HCPTR configuration. If the HCPTR
+access has been delayed/reordered, the subsequent access to FPEXC
+will cause a trap, which we aren't prepared to handle at all.
+
+The same condition exists when trapping to enable VFP for the guest.
+
+The fix is to introduce a barrier after enabling VFP access. In the
+vmexit case, it can be relaxed to only takes place if the guest hasn't
+accessed its view of the VFP registers, making the access to FPEXC safe.
+
+The set_hcptr macro is modified to deal with both vmenter/vmexit and
+vmtrap operations, and now takes an optional label that is branched to
+when the guest hasn't touched the VFP registers.
+
+Reported-by: Vikram Sethi <vikrams@codeaurora.org>
+Cc: stable@kernel.org	# v3.9+
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/kvm/interrupts.S      | 10 ++++------
+ arch/arm/kvm/interrupts_head.S | 20 ++++++++++++++++++--
+ 2 files changed, 22 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
+index 79caf79..f7db3a5 100644
+--- a/arch/arm/kvm/interrupts.S
++++ b/arch/arm/kvm/interrupts.S
+@@ -170,13 +170,9 @@ __kvm_vcpu_return:
+ 	@ Don't trap coprocessor accesses for host kernel
+ 	set_hstr vmexit
+ 	set_hdcr vmexit
+-	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
++	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11)), after_vfp_restore
+ 
+ #ifdef CONFIG_VFPv3
+-	@ Save floating point registers we if let guest use them.
+-	tst	r2, #(HCPTR_TCP(10) | HCPTR_TCP(11))
+-	bne	after_vfp_restore
+-
+ 	@ Switch VFP/NEON hardware state to the host's
+ 	add	r7, vcpu, #VCPU_VFP_GUEST
+ 	store_vfp_state r7
+@@ -188,6 +184,8 @@ after_vfp_restore:
+ 	@ Restore FPEXC_EN which we clobbered on entry
+ 	pop	{r2}
+ 	VFPFMXR FPEXC, r2
++#else
++after_vfp_restore:
+ #endif
+ 
+ 	@ Reset Hyp-role
+@@ -483,7 +481,7 @@ switch_to_guest_vfp:
+ 	push	{r3-r7}
+ 
+ 	@ NEON/VFP used.  Turn on VFP access.
+-	set_hcptr vmexit, (HCPTR_TCP(10) | HCPTR_TCP(11))
++	set_hcptr vmtrap, (HCPTR_TCP(10) | HCPTR_TCP(11))
+ 
+ 	@ Switch VFP/NEON hardware state to the guest's
+ 	add	r7, r0, #VCPU_VFP_HOST
+diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
+index 35e4a3a..48efe2e 100644
+--- a/arch/arm/kvm/interrupts_head.S
++++ b/arch/arm/kvm/interrupts_head.S
+@@ -591,8 +591,13 @@ ARM_BE8(rev	r6, r6  )
+ .endm
+ 
+ /* Configures the HCPTR (Hyp Coprocessor Trap Register) on entry/return
+- * (hardware reset value is 0). Keep previous value in r2. */
+-.macro set_hcptr operation, mask
++ * (hardware reset value is 0). Keep previous value in r2.
++ * An ISB is emited on vmexit/vmtrap, but executed on vmexit only if
++ * VFP wasn't already enabled (always executed on vmtrap).
++ * If a label is specified with vmexit, it is branched to if VFP wasn't
++ * enabled.
++ */
++.macro set_hcptr operation, mask, label = none
+ 	mrc	p15, 4, r2, c1, c1, 2
+ 	ldr	r3, =\mask
+ 	.if \operation == vmentry
+@@ -601,6 +606,17 @@ ARM_BE8(rev	r6, r6  )
+ 	bic	r3, r2, r3		@ Don't trap defined coproc-accesses
+ 	.endif
+ 	mcr	p15, 4, r3, c1, c1, 2
++	.if \operation != vmentry
++	.if \operation == vmexit
++	tst	r2, #(HCPTR_TCP(10) | HCPTR_TCP(11))
++	beq	1f
++	.endif
++	isb
++	.if \label != none
++	b	\label
++	.endif
++1:
++	.endif
+ .endm
+ 
+ /* Configures the HDCR (Hyp Debug Configuration Register) on entry/return
+-- 
+2.1.4
+
+--
+To unsubscribe from this list: send the line "unsubscribe kvm" in
