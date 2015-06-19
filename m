@@ -1,89 +1,83 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 04/12] kvm: remove one useless check extension
-Date: Fri, 19 Jun 2015 13:53:08 +0100
-Message-ID: <1434718396-13110-5-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 06/12] KVM: arm/arm64: Enable the KVM-VFIO device
+Date: Fri, 19 Jun 2015 13:53:10 +0100
+Message-ID: <1434718396-13110-7-git-send-email-marc.zyngier@arm.com>
 References: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 35383561D0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2015 08:43:04 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ArMXyyPHDbE4 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Jun 2015 08:43:03 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E1E4E5617D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2015 08:43:01 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Gleb Natapov <gleb@kernel.org>
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kvm@vger.kernel.org, Firo Yang <firogm@gmail.com>, linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>, Tiejun Chen <tiejun.chen@intel.com>, kvmarm@lists.cs.columbia.edu
+Cc: Kim Phillips <kim.phillips@linaro.org>, Eric Auger <eric.auger@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Firo Yang <firogm@gmail.com>, Tiejun Chen <tiejun.chen@intel.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Tiejun Chen <tiejun.chen@intel.com>
+From: Kim Phillips <kim.phillips@linaro.org>
 
-We already check KVM_CAP_IRQFD in generic once enable CONFIG_HAVE_KVM_IRQFD,
+The KVM-VFIO device is used by the QEMU VFIO device. It is used to
+record the list of in-use VFIO groups so that KVM can manipulate
+them.
 
-kvm_vm_ioctl_check_extension_generic()
-    |
-    + switch (arg) {
-    +   ...
-    +   #ifdef CONFIG_HAVE_KVM_IRQFD
-    +       case KVM_CAP_IRQFD:
-    +   #endif
-    +   ...
-    +   return 1;
-    +   ...
-    + }
-    |
-    + kvm_vm_ioctl_check_extension()
-
-So its not necessary to check this in arch again, and also fix one typo,
-s/emlation/emulation.
-
-Signed-off-by: Tiejun Chen <tiejun.chen@intel.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Kim Phillips <kim.phillips@linaro.org>
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/arm.c       | 1 -
- include/uapi/linux/kvm.h | 2 +-
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ arch/arm/kvm/Kconfig    | 1 +
+ arch/arm/kvm/Makefile   | 2 +-
+ arch/arm64/kvm/Kconfig  | 1 +
+ arch/arm64/kvm/Makefile | 2 +-
+ 4 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index e41cb11..7e82330 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -171,7 +171,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	int r;
- 	switch (ext) {
- 	case KVM_CAP_IRQCHIP:
--	case KVM_CAP_IRQFD:
- 	case KVM_CAP_IOEVENTFD:
- 	case KVM_CAP_DEVICE_CTRL:
- 	case KVM_CAP_USER_MEMORY:
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 75bd9f7..cbfd1ac 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -895,7 +895,7 @@ struct kvm_xen_hvm_config {
-  *
-  * KVM_IRQFD_FLAG_RESAMPLE indicates resamplefd is valid and specifies
-  * the irqfd to operate in resampling mode for level triggered interrupt
-- * emlation.  See Documentation/virtual/kvm/api.txt.
-+ * emulation.  See Documentation/virtual/kvm/api.txt.
-  */
- #define KVM_IRQFD_FLAG_RESAMPLE (1 << 1)
+diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+index f1f79d1..bfb915d 100644
+--- a/arch/arm/kvm/Kconfig
++++ b/arch/arm/kvm/Kconfig
+@@ -28,6 +28,7 @@ config KVM
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ 	select SRCU
+ 	select MMU_NOTIFIER
++	select KVM_VFIO
+ 	select HAVE_KVM_EVENTFD
+ 	select HAVE_KVM_IRQFD
+ 	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
+diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+index 139e46c..c5eef02c 100644
+--- a/arch/arm/kvm/Makefile
++++ b/arch/arm/kvm/Makefile
+@@ -15,7 +15,7 @@ AFLAGS_init.o := -Wa,-march=armv7-a$(plus_virt)
+ AFLAGS_interrupts.o := -Wa,-march=armv7-a$(plus_virt)
+ 
+ KVM := ../../../virt/kvm
+-kvm-arm-y = $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o
++kvm-arm-y = $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
+ 
+ obj-y += kvm-arm.o init.o interrupts.o
+ obj-y += arm.o handle_exit.o guest.o mmu.o emulate.o reset.o
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index 5105e29..bfffe8f 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -28,6 +28,7 @@ config KVM
+ 	select KVM_ARM_HOST
+ 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ 	select SRCU
++	select KVM_VFIO
+ 	select HAVE_KVM_EVENTFD
+ 	select HAVE_KVM_IRQFD
+ 	---help---
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index d5904f8..f90f4aa 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -11,7 +11,7 @@ ARM=../../../arch/arm/kvm
+ 
+ obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
+ 
+-kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/arm.o $(ARM)/mmu.o $(ARM)/mmio.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/psci.o $(ARM)/perf.o
  
 -- 
 2.1.4
+
+--
+To unsubscribe from this list: send the line "unsubscribe kvm" in
