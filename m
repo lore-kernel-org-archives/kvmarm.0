@@ -1,60 +1,60 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 11/12] KVM: arm/arm64: vgic: Avoid injecting reserved IRQ numbers
-Date: Fri, 19 Jun 2015 13:53:15 +0100
-Message-ID: <1434718396-13110-12-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 09/12] KVM: arm: vgic: Drop useless Group0 warning
+Date: Fri, 19 Jun 2015 13:53:13 +0100
+Message-ID: <1434718396-13110-10-git-send-email-marc.zyngier@arm.com>
 References: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 43A4556186
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2015 08:43:16 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id MnGExuYGQ1sz for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Jun 2015 08:43:15 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 16840561A0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2015 08:43:15 -0400 (EDT)
 In-Reply-To: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Gleb Natapov <gleb@kernel.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Firo Yang <firogm@gmail.com>, Tiejun Chen <tiejun.chen@intel.com>, Eric Auger <eric.auger@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, Firo Yang <firogm@gmail.com>, Tiejun Chen <tiejun.chen@intel.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Commit fd1d0ddf2ae9 (KVM: arm/arm64: check IRQ number on userland
-injection) rightly limited the range of interrupts userspace can
-inject in a guest, but failed to consider the (unlikely) case where
-a guest is configured with 1024 interrupts.
+If a GICv3-enabled guest tries to configure Group0, we print a
+warning on the console (because we don't support Group0 interrupts).
 
-In this case, interrupts ranging from 1020 to 1023 are unuseable,
-as they have a special meaning for the GIC CPU interface.
+This is fairly pointless, and would allow a guest to spam the
+console. Let's just drop the warning.
 
-Make sure that these number cannot be used as an IRQ. Also delete
-a redundant (and similarily buggy) check in kvm_set_irq.
-
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Cc: Andre Przywara <andre.przywara@arm.com>
-Cc: <stable@vger.kernel.org> # 4.1, 4.0, 3.19, 3.18
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- virt/kvm/arm/vgic.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ virt/kvm/arm/vgic-v3-emul.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 78fb820..950064a 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -1561,7 +1561,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
- 			goto out;
- 	}
- 
--	if (irq_num >= kvm->arch.vgic.nr_irqs)
-+	if (irq_num >= min(kvm->arch.vgic.nr_irqs, 1020))
- 		return -EINVAL;
- 
- 	vcpu_id = vgic_update_irq_pending(kvm, cpuid, irq_num, level);
-@@ -2161,10 +2161,7 @@ int kvm_set_irq(struct kvm *kvm, int irq_source_id,
- 
- 	BUG_ON(!vgic_initialized(kvm));
- 
--	if (spi > kvm->arch.vgic.nr_irqs)
--		return -EINVAL;
- 	return kvm_vgic_inject_irq(kvm, 0, spi, level);
--
- }
- 
- /* MSI not implemented yet */
+diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+index 2b369de..e661e7f 100644
+--- a/virt/kvm/arm/vgic-v3-emul.c
++++ b/virt/kvm/arm/vgic-v3-emul.c
+@@ -76,8 +76,6 @@ static bool handle_mmio_ctlr(struct kvm_vcpu *vcpu,
+ 	vgic_reg_access(mmio, &reg, offset,
+ 			ACCESS_READ_VALUE | ACCESS_WRITE_VALUE);
+ 	if (mmio->is_write) {
+-		if (reg & GICD_CTLR_ENABLE_SS_G0)
+-			kvm_info("guest tried to enable unsupported Group0 interrupts\n");
+ 		vcpu->kvm->arch.vgic.enabled = !!(reg & GICD_CTLR_ENABLE_SS_G1);
+ 		vgic_update_state(vcpu->kvm);
+ 		return true;
 -- 
 2.1.4
-
---
-To unsubscribe from this list: send the line "unsubscribe kvm" in
