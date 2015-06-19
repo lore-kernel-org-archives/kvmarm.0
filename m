@@ -1,83 +1,111 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 06/12] KVM: arm/arm64: Enable the KVM-VFIO device
-Date: Fri, 19 Jun 2015 13:53:10 +0100
-Message-ID: <1434718396-13110-7-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 08/12] ARM: kvm: psci: fix handling of unimplemented functions
+Date: Fri, 19 Jun 2015 13:53:12 +0100
+Message-ID: <1434718396-13110-9-git-send-email-marc.zyngier@arm.com>
 References: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CB67C561E7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2015 08:43:13 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id q-JZ6y8RENYk for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 19 Jun 2015 08:43:12 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A1353561D7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2015 08:43:12 -0400 (EDT)
 In-Reply-To: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Gleb Natapov <gleb@kernel.org>
-Cc: Kim Phillips <kim.phillips@linaro.org>, Eric Auger <eric.auger@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Firo Yang <firogm@gmail.com>, Tiejun Chen <tiejun.chen@intel.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kvm@vger.kernel.org, Firo Yang <firogm@gmail.com>, Sudeep Holla <sudeep.holla@arm.com>, linux-arm-kernel@lists.infradead.org, Andre Przywara <andre.przywara@arm.com>, Tiejun Chen <tiejun.chen@intel.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Kim Phillips <kim.phillips@linaro.org>
+From: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
 
-The KVM-VFIO device is used by the QEMU VFIO device. It is used to
-record the list of in-use VFIO groups so that KVM can manipulate
-them.
+According to the PSCI specification and the SMC/HVC calling
+convention, PSCI function_ids that are not implemented must
+return NOT_SUPPORTED as return value.
 
-Signed-off-by: Kim Phillips <kim.phillips@linaro.org>
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
+Current KVM implementation takes an unhandled PSCI function_id
+as an error and injects an undefined instruction into the guest
+if PSCI implementation is called with a function_id that is not
+handled by the resident PSCI version (ie it is not implemented),
+which is not the behaviour expected by a guest when calling a
+PSCI function_id that is not implemented.
+
+This patch fixes this issue by returning NOT_SUPPORTED whenever
+the kvm PSCI call is executed for a function_id that is not
+implemented by the PSCI kvm layer.
+
+Cc: <stable@vger.kernel.org> # 3.18+
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Acked-by: Sudeep Holla <sudeep.holla@arm.com>
+Signed-off-by: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/Kconfig    | 1 +
- arch/arm/kvm/Makefile   | 2 +-
- arch/arm64/kvm/Kconfig  | 1 +
- arch/arm64/kvm/Makefile | 2 +-
- 4 files changed, 4 insertions(+), 2 deletions(-)
+ arch/arm/kvm/psci.c | 16 +++-------------
+ 1 file changed, 3 insertions(+), 13 deletions(-)
 
-diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
-index f1f79d1..bfb915d 100644
---- a/arch/arm/kvm/Kconfig
-+++ b/arch/arm/kvm/Kconfig
-@@ -28,6 +28,7 @@ config KVM
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select SRCU
- 	select MMU_NOTIFIER
-+	select KVM_VFIO
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
- 	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
-diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
-index 139e46c..c5eef02c 100644
---- a/arch/arm/kvm/Makefile
-+++ b/arch/arm/kvm/Makefile
-@@ -15,7 +15,7 @@ AFLAGS_init.o := -Wa,-march=armv7-a$(plus_virt)
- AFLAGS_interrupts.o := -Wa,-march=armv7-a$(plus_virt)
+diff --git a/arch/arm/kvm/psci.c b/arch/arm/kvm/psci.c
+index 02fa8ef..531e922 100644
+--- a/arch/arm/kvm/psci.c
++++ b/arch/arm/kvm/psci.c
+@@ -230,10 +230,6 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+ 	case PSCI_0_2_FN64_AFFINITY_INFO:
+ 		val = kvm_psci_vcpu_affinity_info(vcpu);
+ 		break;
+-	case PSCI_0_2_FN_MIGRATE:
+-	case PSCI_0_2_FN64_MIGRATE:
+-		val = PSCI_RET_NOT_SUPPORTED;
+-		break;
+ 	case PSCI_0_2_FN_MIGRATE_INFO_TYPE:
+ 		/*
+ 		 * Trusted OS is MP hence does not require migration
+@@ -242,10 +238,6 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+ 		 */
+ 		val = PSCI_0_2_TOS_MP;
+ 		break;
+-	case PSCI_0_2_FN_MIGRATE_INFO_UP_CPU:
+-	case PSCI_0_2_FN64_MIGRATE_INFO_UP_CPU:
+-		val = PSCI_RET_NOT_SUPPORTED;
+-		break;
+ 	case PSCI_0_2_FN_SYSTEM_OFF:
+ 		kvm_psci_system_off(vcpu);
+ 		/*
+@@ -271,7 +263,8 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+ 		ret = 0;
+ 		break;
+ 	default:
+-		return -EINVAL;
++		val = PSCI_RET_NOT_SUPPORTED;
++		break;
+ 	}
  
- KVM := ../../../virt/kvm
--kvm-arm-y = $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o
-+kvm-arm-y = $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
+ 	*vcpu_reg(vcpu, 0) = val;
+@@ -291,12 +284,9 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+ 	case KVM_PSCI_FN_CPU_ON:
+ 		val = kvm_psci_vcpu_on(vcpu);
+ 		break;
+-	case KVM_PSCI_FN_CPU_SUSPEND:
+-	case KVM_PSCI_FN_MIGRATE:
++	default:
+ 		val = PSCI_RET_NOT_SUPPORTED;
+ 		break;
+-	default:
+-		return -EINVAL;
+ 	}
  
- obj-y += kvm-arm.o init.o interrupts.o
- obj-y += arm.o handle_exit.o guest.o mmu.o emulate.o reset.o
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 5105e29..bfffe8f 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -28,6 +28,7 @@ config KVM
- 	select KVM_ARM_HOST
- 	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
- 	select SRCU
-+	select KVM_VFIO
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
- 	---help---
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index d5904f8..f90f4aa 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -11,7 +11,7 @@ ARM=../../../arch/arm/kvm
- 
- obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
- 
--kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o
-+kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/arm.o $(ARM)/mmu.o $(ARM)/mmio.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/psci.o $(ARM)/perf.o
- 
+ 	*vcpu_reg(vcpu, 0) = val;
 -- 
 2.1.4
-
---
-To unsubscribe from this list: send the line "unsubscribe kvm" in
