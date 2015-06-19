@@ -1,114 +1,60 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 05/12] arm/arm64: KVM: Properly account for guest CPU time
-Date: Fri, 19 Jun 2015 13:53:09 +0100
-Message-ID: <1434718396-13110-6-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 11/12] KVM: arm/arm64: vgic: Avoid injecting reserved IRQ numbers
+Date: Fri, 19 Jun 2015 13:53:15 +0100
+Message-ID: <1434718396-13110-12-git-send-email-marc.zyngier@arm.com>
 References: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 73E22561C3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2015 08:43:05 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Qk07XZTc8XDe for <kvmarm@lists.cs.columbia.edu>;
- Fri, 19 Jun 2015 08:43:04 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 36FF9561D4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 19 Jun 2015 08:43:04 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Gleb Natapov <gleb@kernel.org>
-Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org, Firo Yang <firogm@gmail.com>, Tiejun Chen <tiejun.chen@intel.com>, kvmarm@lists.cs.columbia.edu
+Cc: Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Firo Yang <firogm@gmail.com>, Tiejun Chen <tiejun.chen@intel.com>, Eric Auger <eric.auger@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+Commit fd1d0ddf2ae9 (KVM: arm/arm64: check IRQ number on userland
+injection) rightly limited the range of interrupts userspace can
+inject in a guest, but failed to consider the (unlikely) case where
+a guest is configured with 1024 interrupts.
 
-Until now we have been calling kvm_guest_exit after re-enabling
-interrupts when we come back from the guest, but this has the
-unfortunate effect that CPU time accounting done in the context of timer
-interrupts occurring while the guest is running doesn't properly notice
-that the time since the last tick was spent in the guest.
+In this case, interrupts ranging from 1020 to 1023 are unuseable,
+as they have a special meaning for the GIC CPU interface.
 
-Inspired by the comment in the x86 code, move the kvm_guest_exit() call
-below the local_irq_enable() call and change __kvm_guest_exit() to
-kvm_guest_exit(), because we are now calling this function with
-interrupts enabled.  We have to now explicitly disable preemption and
-not enable preemption before we've called kvm_guest_exit(), since
-otherwise we could be preempted and everything happening before we
-eventually get scheduled again would be accounted for as guest time.
+Make sure that these number cannot be used as an IRQ. Also delete
+a redundant (and similarily buggy) check in kvm_set_irq.
 
-At the same time, move the trace_kvm_exit() call outside of the atomic
-section, since there is no reason for us to do that with interrupts
-disabled.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Cc: Andre Przywara <andre.przywara@arm.com>
+Cc: <stable@vger.kernel.org> # 4.1, 4.0, 3.19, 3.18
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/arm.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
+ virt/kvm/arm/vgic.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 7e82330..bc738d2 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -531,6 +531,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		kvm_vgic_flush_hwstate(vcpu);
- 		kvm_timer_flush_hwstate(vcpu);
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 78fb820..950064a 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -1561,7 +1561,7 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
+ 			goto out;
+ 	}
  
-+		preempt_disable();
- 		local_irq_disable();
+-	if (irq_num >= kvm->arch.vgic.nr_irqs)
++	if (irq_num >= min(kvm->arch.vgic.nr_irqs, 1020))
+ 		return -EINVAL;
  
- 		/*
-@@ -543,6 +544,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	vcpu_id = vgic_update_irq_pending(kvm, cpuid, irq_num, level);
+@@ -2161,10 +2161,7 @@ int kvm_set_irq(struct kvm *kvm, int irq_source_id,
  
- 		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm)) {
- 			local_irq_enable();
-+			preempt_enable();
- 			kvm_timer_sync_hwstate(vcpu);
- 			kvm_vgic_sync_hwstate(vcpu);
- 			continue;
-@@ -558,8 +560,10 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
+ 	BUG_ON(!vgic_initialized(kvm));
  
- 		vcpu->mode = OUTSIDE_GUEST_MODE;
--		__kvm_guest_exit();
--		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
-+		/*
-+		 * Back from guest
-+		 *************************************************************/
-+
- 		/*
- 		 * We may have taken a host interrupt in HYP mode (ie
- 		 * while executing the guest). This interrupt is still
-@@ -573,8 +577,17 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		local_irq_enable();
+-	if (spi > kvm->arch.vgic.nr_irqs)
+-		return -EINVAL;
+ 	return kvm_vgic_inject_irq(kvm, 0, spi, level);
+-
+ }
  
- 		/*
--		 * Back from guest
--		 *************************************************************/
-+		 * We do local_irq_enable() before calling kvm_guest_exit() so
-+		 * that if a timer interrupt hits while running the guest we
-+		 * account that tick as being spent in the guest.  We enable
-+		 * preemption after calling kvm_guest_exit() so that if we get
-+		 * preempted we make sure ticks after that is not counted as
-+		 * guest time.
-+		 */
-+		kvm_guest_exit();
-+		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
-+		preempt_enable();
-+
- 
- 		kvm_timer_sync_hwstate(vcpu);
- 		kvm_vgic_sync_hwstate(vcpu);
+ /* MSI not implemented yet */
 -- 
 2.1.4
+
+--
+To unsubscribe from this list: send the line "unsubscribe kvm" in
