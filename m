@@ -1,122 +1,42 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 03/12] arm: KVM: force execution of HCPTR access on VM exit
-Date: Fri, 19 Jun 2015 13:53:07 +0100
-Message-ID: <1434718396-13110-4-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 01/12] ARM: KVM: Remove pointless void pointer cast
+Date: Fri, 19 Jun 2015 13:53:05 +0100
+Message-ID: <1434718396-13110-2-git-send-email-marc.zyngier@arm.com>
 References: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, Gleb Natapov <gleb@kernel.org>
-Cc: Vikram Sethi <vikrams@codeaurora.org>, Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Firo Yang <firogm@gmail.com>, Tiejun Chen <tiejun.chen@intel.com>, Eric Auger <eric.auger@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Firo Yang <firogm@gmail.com>, Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Tiejun Chen <tiejun.chen@intel.com>, Eric Auger <eric.auger@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On VM entry, we disable access to the VFP registers in order to
-perform a lazy save/restore of these registers.
+From: Firo Yang <firogm@gmail.com>
 
-On VM exit, we restore access, test if we did enable them before,
-and save/restore the guest/host registers if necessary. In this
-sequence, the FPEXC register is always accessed, irrespective
-of the trapping configuration.
+No need to cast the void pointer returned by kmalloc() in
+arch/arm/kvm/mmu.c::kvm_alloc_stage2_pgd().
 
-If the guest didn't touch the VFP registers, then the HCPTR access
-has now enabled such access, but we're missing a barrier to ensure
-architectural execution of the new HCPTR configuration. If the HCPTR
-access has been delayed/reordered, the subsequent access to FPEXC
-will cause a trap, which we aren't prepared to handle at all.
-
-The same condition exists when trapping to enable VFP for the guest.
-
-The fix is to introduce a barrier after enabling VFP access. In the
-vmexit case, it can be relaxed to only takes place if the guest hasn't
-accessed its view of the VFP registers, making the access to FPEXC safe.
-
-The set_hcptr macro is modified to deal with both vmenter/vmexit and
-vmtrap operations, and now takes an optional label that is branched to
-when the guest hasn't touched the VFP registers.
-
-Reported-by: Vikram Sethi <vikrams@codeaurora.org>
-Cc: stable@kernel.org	# v3.9+
+Signed-off-by: Firo Yang <firogm@gmail.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/interrupts.S      | 10 ++++------
- arch/arm/kvm/interrupts_head.S | 20 ++++++++++++++++++--
- 2 files changed, 22 insertions(+), 8 deletions(-)
+ arch/arm/kvm/mmu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
-index 79caf79..f7db3a5 100644
---- a/arch/arm/kvm/interrupts.S
-+++ b/arch/arm/kvm/interrupts.S
-@@ -170,13 +170,9 @@ __kvm_vcpu_return:
- 	@ Don't trap coprocessor accesses for host kernel
- 	set_hstr vmexit
- 	set_hdcr vmexit
--	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
-+	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11)), after_vfp_restore
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index 1d5accb..ce0bce4 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -691,8 +691,8 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
+ 		 * work.  This is not used by the hardware and we have no
+ 		 * alignment requirement for this allocation.
+ 		 */
+-		pgd = (pgd_t *)kmalloc(PTRS_PER_S2_PGD * sizeof(pgd_t),
+-				       GFP_KERNEL | __GFP_ZERO);
++		pgd = kmalloc(PTRS_PER_S2_PGD * sizeof(pgd_t),
++				GFP_KERNEL | __GFP_ZERO);
  
- #ifdef CONFIG_VFPv3
--	@ Save floating point registers we if let guest use them.
--	tst	r2, #(HCPTR_TCP(10) | HCPTR_TCP(11))
--	bne	after_vfp_restore
--
- 	@ Switch VFP/NEON hardware state to the host's
- 	add	r7, vcpu, #VCPU_VFP_GUEST
- 	store_vfp_state r7
-@@ -188,6 +184,8 @@ after_vfp_restore:
- 	@ Restore FPEXC_EN which we clobbered on entry
- 	pop	{r2}
- 	VFPFMXR FPEXC, r2
-+#else
-+after_vfp_restore:
- #endif
- 
- 	@ Reset Hyp-role
-@@ -483,7 +481,7 @@ switch_to_guest_vfp:
- 	push	{r3-r7}
- 
- 	@ NEON/VFP used.  Turn on VFP access.
--	set_hcptr vmexit, (HCPTR_TCP(10) | HCPTR_TCP(11))
-+	set_hcptr vmtrap, (HCPTR_TCP(10) | HCPTR_TCP(11))
- 
- 	@ Switch VFP/NEON hardware state to the guest's
- 	add	r7, r0, #VCPU_VFP_HOST
-diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
-index 35e4a3a..48efe2e 100644
---- a/arch/arm/kvm/interrupts_head.S
-+++ b/arch/arm/kvm/interrupts_head.S
-@@ -591,8 +591,13 @@ ARM_BE8(rev	r6, r6  )
- .endm
- 
- /* Configures the HCPTR (Hyp Coprocessor Trap Register) on entry/return
-- * (hardware reset value is 0). Keep previous value in r2. */
--.macro set_hcptr operation, mask
-+ * (hardware reset value is 0). Keep previous value in r2.
-+ * An ISB is emited on vmexit/vmtrap, but executed on vmexit only if
-+ * VFP wasn't already enabled (always executed on vmtrap).
-+ * If a label is specified with vmexit, it is branched to if VFP wasn't
-+ * enabled.
-+ */
-+.macro set_hcptr operation, mask, label = none
- 	mrc	p15, 4, r2, c1, c1, 2
- 	ldr	r3, =\mask
- 	.if \operation == vmentry
-@@ -601,6 +606,17 @@ ARM_BE8(rev	r6, r6  )
- 	bic	r3, r2, r3		@ Don't trap defined coproc-accesses
- 	.endif
- 	mcr	p15, 4, r3, c1, c1, 2
-+	.if \operation != vmentry
-+	.if \operation == vmexit
-+	tst	r2, #(HCPTR_TCP(10) | HCPTR_TCP(11))
-+	beq	1f
-+	.endif
-+	isb
-+	.if \label != none
-+	b	\label
-+	.endif
-+1:
-+	.endif
- .endm
- 
- /* Configures the HDCR (Hyp Debug Configuration Register) on entry/return
+ 		if (!pgd) {
+ 			kvm_free_hwpgd(hwpgd);
 -- 
 2.1.4
 
