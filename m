@@ -1,52 +1,72 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] arm64/kvm: Add generic v8 KVM target
-Date: Mon, 22 Jun 2015 07:47:59 +0100
-Message-ID: <20150622074759.01d677a3@arm.com>
-References: <1434531646-4873-1-git-send-email-suzuki.poulose@arm.com>
-	<55847C1F.1090606@codeaurora.org>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [RFC 0/6] KVM: arm/arm64: gsi routing support
+Date: Mon, 22 Jun 2015 10:31:16 +0200
+Message-ID: <5587C7D4.2010408@linaro.org>
+References: <1434649258-27065-1-git-send-email-eric.auger@linaro.org>
+ <011e01d0aa5a$6b14fae0$413ef0a0$@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <55847C1F.1090606@codeaurora.org>
-Sender: kvm-owner@vger.kernel.org
-To: Timur Tabi <timur@codeaurora.org>
-Cc: Suzuki Poulose <Suzuki.Poulose@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "shankerd@codeaurora.org" <shankerd@codeaurora.org>, "vgandhi@codeaurora.org" <vgandhi@codeaurora.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF94655DA1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2015 04:20:49 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id f8Ym1P+bc7K9 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Jun 2015 04:20:48 -0400 (EDT)
+Received: from mail-wg0-f45.google.com (mail-wg0-f45.google.com [74.125.82.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7736455C7F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2015 04:20:48 -0400 (EDT)
+Received: by wgck11 with SMTP id k11so7345227wgc.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2015 01:31:38 -0700 (PDT)
+In-Reply-To: <011e01d0aa5a$6b14fae0$413ef0a0$@samsung.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Pavel Fedin <p.fedin@samsung.com>, eric.auger@st.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 19 Jun 2015 21:31:27 +0100
-Timur Tabi <timur@codeaurora.org> wrote:
-
-> On 06/17/2015 04:00 AM, Suzuki K. Poulose wrote:
-> >   					  &genericv8_target_table);
-> >   	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_XGENE_POTENZA,
-> >   					  &genericv8_target_table);
-> > +
-> > kvm_register_target_sys_reg_table(KVM_ARM_TARGET_GENERIC_V8,
-> > +					  &genericv8_target_table);
-> >
+Hi Pavel,
+On 06/19/2015 08:37 AM, Pavel Fedin wrote:
+>  Hello!
 > 
-> Shouldn't you also remove all of the previous lines that return 
-> &genericv8_target_table?
+>> The series therefore allows and mandates the usage of KVM_SET_GSI_ROUTING
+>> ioctl along with KVM_IRQFD. If the userspace does not define any routing
+>> table, no irqfd injection can happen. The user-space can use
+>> KVM_CAP_IRQ_ROUTING to detect whether a routing table is needed.
+> 
+>  Yesterday, half-sleeping in the train back home, i've got a simple idea how to resolve
+> conflicts with existing static GSI->SPI routing without bringing in any more
+> inconsistencies.
+>  So far, in current implementation GSI is an SPI index (let alone KVM_IRQ_LINE, because
+> it's already another story on ARM). In order to maintain this convention we could simply
+> implement default routing which sets all GSIs to corresponding SPI pins. So, if the
+> userland never cares about KVM_SET_GSI_ROUTING, everything works as before. But it will be
+> possible to re-route GSIs to MSI. It will perfectly work because SPI signaling is used
+> with GICv2m, and MSI with GICv3(+), which cannot be used at the same time.
+I agree with you and I suggested the same approach in my cover letter.
+Since applying GSI routing to KVM_IRQ_LINE is quite problematic, I would
+be also in favour to forbid userspace GSI routing setting and implement
+it kernel-side. Userspace would only be allowed to define MSI routing
+entries.
 
-No. KVM_ARM_TARGET_* are part of the uapi, and existing userspace knows
-about them. You can't just drop them.
+I will respin accordingly and validate it further with qemu.
 
-What you *could* do would be to map the existing targets to the generic
-one in a way that leaves userspace blissfully unaware of the underlying
-change (for example, KVM_ARM_PREFERRED_TARGET should still return
-KVM_ARM_TARGET_XGENE_POTENZA on an XGene platform, and
-KVM_ARM_VCPU_INIT should still be accept it).
+Best Regards
 
-What would be the gain of such a mapping? Added complexity, hardly
-anything else. We're much better off considering the generic target as
-a new one, both inside the kernel and in the view we export to
-userspace.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny.
---
-To unsubscribe from this list: send the line "unsubscribe kvm" in
+Eric
+> 
+> Kind regards,
+> Pavel Fedin
+> Expert Engineer
+> Samsung Electronics Research center Russia
+> 
+> 
