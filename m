@@ -1,95 +1,213 @@
 From: Zhichao Huang <zhichao.huang@linaro.org>
-Subject: [PATCH v3 02/11] KVM: arm: rename pm_fake handler to trap_raz_wi
-Date: Mon, 22 Jun 2015 18:41:25 +0800
-Message-ID: <1434969694-7432-3-git-send-email-zhichao.huang@linaro.org>
+Subject: [PATCH v3 01/11] KVM: arm: plug guest debug exploit
+Date: Mon, 22 Jun 2015 18:41:24 +0800
+Message-ID: <1434969694-7432-2-git-send-email-zhichao.huang@linaro.org>
 References: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E8455626C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2015 06:30:58 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id oxyFdfN8Epfu for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Jun 2015 06:30:57 -0400 (EDT)
+Received: from mail-pa0-f51.google.com (mail-pa0-f51.google.com
+ [209.85.220.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 283FF5625F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2015 06:30:56 -0400 (EDT)
+Received: by pabvl15 with SMTP id vl15so85455594pab.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2015 03:41:47 -0700 (PDT)
 In-Reply-To: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com
-Cc: huangzhichao@huawei.com, Zhichao Huang <zhichao.huang@linaro.org>
+Cc: huangzhichao@huawei.com, stable@vger.kernel.org, Zhichao Huang <zhichao.huang@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-pm_fake doesn't quite describe what the handler does (ignoring writes
-and returning 0 for reads).
+Hardware debugging in guests is not intercepted currently, it means
+that a malicious guest can bring down the entire machine by writing
+to the debug registers.
 
-As we're about to use it (a lot) in a different context, rename it
-with a (admitedly cryptic) name that make sense for all users.
+This patch enable trapping of all debug registers, preventing the guests
+to access the debug registers.
 
+This patch also disable the debug mode(DBGDSCR) in the guest world all
+the time, preventing the guests to mess with the host state.
+
+However, it is a precursor for later patches which will need to do
+more to world switch debug states while necessary.
+
+Cc: <stable@vger.kernel.org>
 Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
-Reviewed-by: Alex Bennee <alex.bennee@linaro.org>
 ---
- arch/arm/kvm/coproc.c | 34 ++++++++++++++++------------------
- 1 file changed, 16 insertions(+), 18 deletions(-)
+ arch/arm/include/asm/kvm_coproc.h |  3 +-
+ arch/arm/kvm/coproc.c             | 60 +++++++++++++++++++++++++++++++++++----
+ arch/arm/kvm/handle_exit.c        |  4 +--
+ arch/arm/kvm/interrupts_head.S    | 13 ++++++++-
+ 4 files changed, 70 insertions(+), 10 deletions(-)
 
+diff --git a/arch/arm/include/asm/kvm_coproc.h b/arch/arm/include/asm/kvm_coproc.h
+index 4917c2f..e74ab0f 100644
+--- a/arch/arm/include/asm/kvm_coproc.h
++++ b/arch/arm/include/asm/kvm_coproc.h
+@@ -31,7 +31,8 @@ void kvm_register_target_coproc_table(struct kvm_coproc_target_table *table);
+ int kvm_handle_cp10_id(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int kvm_handle_cp_0_13_access(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu, struct kvm_run *run);
+-int kvm_handle_cp14_access(struct kvm_vcpu *vcpu, struct kvm_run *run);
++int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run);
++int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ 
 diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-index 2e12760..9d283d9 100644
+index f3d88dc..2e12760 100644
 --- a/arch/arm/kvm/coproc.c
 +++ b/arch/arm/kvm/coproc.c
-@@ -229,7 +229,7 @@ bool access_vm_reg(struct kvm_vcpu *vcpu,
-  * must always support PMCCNTR (the cycle counter): we just RAZ/WI for
-  * all PM registers, which doesn't crash the guest kernel at least.
-  */
--static bool pm_fake(struct kvm_vcpu *vcpu,
-+static bool trap_raz_wi(struct kvm_vcpu *vcpu,
- 		    const struct coproc_params *p,
- 		    const struct coproc_reg *r)
- {
-@@ -239,19 +239,19 @@ static bool pm_fake(struct kvm_vcpu *vcpu,
- 		return read_zero(vcpu, p);
+@@ -91,12 +91,6 @@ int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	return 1;
  }
  
--#define access_pmcr pm_fake
--#define access_pmcntenset pm_fake
--#define access_pmcntenclr pm_fake
--#define access_pmovsr pm_fake
--#define access_pmselr pm_fake
--#define access_pmceid0 pm_fake
--#define access_pmceid1 pm_fake
--#define access_pmccntr pm_fake
--#define access_pmxevtyper pm_fake
--#define access_pmxevcntr pm_fake
--#define access_pmuserenr pm_fake
--#define access_pmintenset pm_fake
--#define access_pmintenclr pm_fake
-+#define access_pmcr trap_raz_wi
-+#define access_pmcntenset trap_raz_wi
-+#define access_pmcntenclr trap_raz_wi
-+#define access_pmovsr trap_raz_wi
-+#define access_pmselr trap_raz_wi
-+#define access_pmceid0 trap_raz_wi
-+#define access_pmceid1 trap_raz_wi
-+#define access_pmccntr trap_raz_wi
-+#define access_pmxevtyper trap_raz_wi
-+#define access_pmxevcntr trap_raz_wi
-+#define access_pmuserenr trap_raz_wi
-+#define access_pmintenset trap_raz_wi
-+#define access_pmintenclr trap_raz_wi
+-int kvm_handle_cp14_access(struct kvm_vcpu *vcpu, struct kvm_run *run)
+-{
+-	kvm_inject_undefined(vcpu);
+-	return 1;
+-}
+-
+ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct coproc_reg *r)
+ {
+ 	/*
+@@ -519,6 +513,60 @@ int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	return emulate_cp15(vcpu, &params);
+ }
  
- /* Architected CP15 registers.
-  * CRn denotes the primary register number, but is copied to the CRm in the
-@@ -532,8 +532,7 @@ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	params.Rt2 = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
- 	params.CRm = 0;
++/**
++ * kvm_handle_cp14_64 -- handles a mrrc/mcrr trap on a guest CP14 access
++ * @vcpu: The VCPU pointer
++ * @run:  The kvm_run struct
++ */
++int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++	struct coproc_params params;
++
++	params.CRn = (kvm_vcpu_get_hsr(vcpu) >> 1) & 0xf;
++	params.Rt1 = (kvm_vcpu_get_hsr(vcpu) >> 5) & 0xf;
++	params.is_write = ((kvm_vcpu_get_hsr(vcpu) & 1) == 0);
++	params.is_64bit = true;
++
++	params.Op1 = (kvm_vcpu_get_hsr(vcpu) >> 16) & 0xf;
++	params.Op2 = 0;
++	params.Rt2 = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
++	params.CRm = 0;
++
++	/* raz_wi */
++	(void)pm_fake(vcpu, &params, NULL);
++
++	/* handled */
++	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
++	return 1;
++}
++
++/**
++ * kvm_handle_cp14_32 -- handles a mrc/mcr trap on a guest CP14 access
++ * @vcpu: The VCPU pointer
++ * @run:  The kvm_run struct
++ */
++int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
++{
++	struct coproc_params params;
++
++	params.CRm = (kvm_vcpu_get_hsr(vcpu) >> 1) & 0xf;
++	params.Rt1 = (kvm_vcpu_get_hsr(vcpu) >> 5) & 0xf;
++	params.is_write = ((kvm_vcpu_get_hsr(vcpu) & 1) == 0);
++	params.is_64bit = false;
++
++	params.CRn = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
++	params.Op1 = (kvm_vcpu_get_hsr(vcpu) >> 14) & 0x7;
++	params.Op2 = (kvm_vcpu_get_hsr(vcpu) >> 17) & 0x7;
++	params.Rt2 = 0;
++
++	/* raz_wi */
++	(void)pm_fake(vcpu, &params, NULL);
++
++	/* handled */
++	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
++	return 1;
++}
++
+ /******************************************************************************
+  * Userspace API
+  *****************************************************************************/
+diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
+index 95f12b2..357ad1b 100644
+--- a/arch/arm/kvm/handle_exit.c
++++ b/arch/arm/kvm/handle_exit.c
+@@ -104,9 +104,9 @@ static exit_handle_fn arm_exit_handlers[] = {
+ 	[HSR_EC_WFI]		= kvm_handle_wfx,
+ 	[HSR_EC_CP15_32]	= kvm_handle_cp15_32,
+ 	[HSR_EC_CP15_64]	= kvm_handle_cp15_64,
+-	[HSR_EC_CP14_MR]	= kvm_handle_cp14_access,
++	[HSR_EC_CP14_MR]	= kvm_handle_cp14_32,
+ 	[HSR_EC_CP14_LS]	= kvm_handle_cp14_load_store,
+-	[HSR_EC_CP14_64]	= kvm_handle_cp14_access,
++	[HSR_EC_CP14_64]	= kvm_handle_cp14_64,
+ 	[HSR_EC_CP_0_13]	= kvm_handle_cp_0_13_access,
+ 	[HSR_EC_CP10_ID]	= kvm_handle_cp10_id,
+ 	[HSR_EC_SVC_HYP]	= handle_svc_hyp,
+diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
+index 35e4a3a..f85c447 100644
+--- a/arch/arm/kvm/interrupts_head.S
++++ b/arch/arm/kvm/interrupts_head.S
+@@ -97,6 +97,10 @@ vcpu	.req	r0		@ vcpu pointer always in r0
+ 	mrs	r8, LR_fiq
+ 	mrs	r9, SPSR_fiq
+ 	push	{r2-r9}
++
++	/* DBGDSCR reg */
++	mrc	p14, 0, r2, c0, c1, 0
++	push	{r2}
+ .endm
  
--	/* raz_wi */
--	(void)pm_fake(vcpu, &params, NULL);
-+	(void)trap_raz_wi(vcpu, &params, NULL);
- 
- 	/* handled */
- 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-@@ -559,8 +558,7 @@ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	params.Op2 = (kvm_vcpu_get_hsr(vcpu) >> 17) & 0x7;
- 	params.Rt2 = 0;
- 
--	/* raz_wi */
--	(void)pm_fake(vcpu, &params, NULL);
-+	(void)trap_raz_wi(vcpu, &params, NULL);
- 
- 	/* handled */
- 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+ .macro pop_host_regs_mode mode
+@@ -111,6 +115,9 @@ vcpu	.req	r0		@ vcpu pointer always in r0
+  * Clobbers all registers, in all modes, except r0 and r1.
+  */
+ .macro restore_host_regs
++	pop	{r2}
++	mcr	p14, 0, r2, c0, c2, 2
++
+ 	pop	{r2-r9}
+ 	msr	r8_fiq, r2
+ 	msr	r9_fiq, r3
+@@ -159,6 +166,10 @@ vcpu	.req	r0		@ vcpu pointer always in r0
+  * Clobbers *all* registers.
+  */
+ .macro restore_guest_regs
++	/* reset DBGDSCR to disable debug mode */
++	mov	r2, #0
++	mcr	p14, 0, r2, c0, c2, 2
++
+ 	restore_guest_regs_mode svc, #VCPU_SVC_REGS
+ 	restore_guest_regs_mode abt, #VCPU_ABT_REGS
+ 	restore_guest_regs_mode und, #VCPU_UND_REGS
+@@ -607,7 +618,7 @@ ARM_BE8(rev	r6, r6  )
+  * (hardware reset value is 0) */
+ .macro set_hdcr operation
+ 	mrc	p15, 4, r2, c1, c1, 1
+-	ldr	r3, =(HDCR_TPM|HDCR_TPMCR)
++	ldr	r3, =(HDCR_TPM|HDCR_TPMCR|HDCR_TDRA|HDCR_TDOSA|HDCR_TDA)
+ 	.if \operation == vmentry
+ 	orr	r2, r2, r3		@ Trap some perfmon accesses
+ 	.else
 -- 
 1.7.12.4
-
---
-To unsubscribe from this list: send the line "unsubscribe kvm" in
