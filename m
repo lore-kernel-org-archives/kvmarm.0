@@ -1,100 +1,95 @@
 From: Zhichao Huang <zhichao.huang@linaro.org>
-Subject: [PATCH v3 00/11] KVM: arm: debug infrastructure support
-Date: Mon, 22 Jun 2015 18:41:23 +0800
-Message-ID: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F52256261
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2015 06:30:53 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id y+oIydPTc5TE for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Jun 2015 06:30:52 -0400 (EDT)
-Received: from mail-pa0-f49.google.com (mail-pa0-f49.google.com
- [209.85.220.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D94215625F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2015 06:30:51 -0400 (EDT)
-Received: by paceq1 with SMTP id eq1so107067436pac.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2015 03:41:41 -0700 (PDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Subject: [PATCH v3 02/11] KVM: arm: rename pm_fake handler to trap_raz_wi
+Date: Mon, 22 Jun 2015 18:41:25 +0800
+Message-ID: <1434969694-7432-3-git-send-email-zhichao.huang@linaro.org>
+References: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org>
+Sender: kvm-owner@vger.kernel.org
 To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com
 Cc: huangzhichao@huawei.com, Zhichao Huang <zhichao.huang@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch series adds debug support, a key feature missing from the
-KVM/armv7 port.
+pm_fake doesn't quite describe what the handler does (ignoring writes
+and returning 0 for reads).
 
-The main idea is borrowed from ARM64, which is to keep track of whether 
-the debug registers are "dirty" (changed by the guest) or not. In this 
-case, perform the usual save/restore dance, for one run only. It means 
-we only have a penalty if a guest is actively using the debug registers.
+As we're about to use it (a lot) in a different context, rename it
+with a (admitedly cryptic) name that make sense for all users.
 
-The amount of registers is properly frightening, but CPUs actually
-only implement a subset of them. Also, there is a number of registers
-we don't bother emulating (things having to do with external debug and
-OSlock).
+Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
+Reviewed-by: Alex Bennee <alex.bennee@linaro.org>
+---
+ arch/arm/kvm/coproc.c | 34 ++++++++++++++++------------------
+ 1 file changed, 16 insertions(+), 18 deletions(-)
 
-External debug is when you actually plug a physical JTAG into the CPU.
-OSlock is a way to prevent "other software" to play with the debug
-registers. My understanding is that it is only useful in combination
-with the external debug. In both case, implementing support for this
-is probably not worth the effort, at least for the time being.
-
-This has been tested on a Cortex-A15 platform, running 32bit guests.
-
-The patches for this series are based off v4.1-rc8 and can be found
-at:
-
-https://git.linaro.org/people/zhichao.huang/linux.git
-branch: guest-debug/4.1-rc8-v3
-
->From v2 [2]:
-- Delete the debug mode enabling/disabling strategy
-- Add missing cp14/cp15 trace events
-
->From v1 [1]:
-- Added missing cp14 reset functions
-- Disable debug mode if we don't need it to reduce unnecessary switch
-
-[1]: https://lists.cs.columbia.edu/pipermail/kvmarm/2015-May/014729.html
-[2]: https://lists.cs.columbia.edu/pipermail/kvmarm/2015-May/014847.html
-
-Zhichao Huang (11):
-  KVM: arm: plug guest debug exploit
-  KVM: arm: rename pm_fake handler to trap_raz_wi
-  KVM: arm: enable to use the ARM_DSCR_MDBGEN macro from KVM assembly
-    code
-  KVM: arm: common infrastructure for handling AArch32 CP14/CP15
-  KVM: arm: check ordering of all system register tables
-  KVM: arm: add trap handlers for 32-bit debug registers
-  KVM: arm: add trap handlers for 64-bit debug registers
-  KVM: arm: implement dirty bit mechanism for debug registers
-  KVM: arm: implement lazy world switch for debug registers
-  KVM: arm: add a trace event for cp14 traps
-  KVM: arm: enable trapping of all debug registers
-
- arch/arm/include/asm/hw_breakpoint.h |  54 ++---
- arch/arm/include/asm/kvm_asm.h       |  15 ++
- arch/arm/include/asm/kvm_coproc.h    |   3 +-
- arch/arm/include/asm/kvm_host.h      |   6 +
- arch/arm/kernel/asm-offsets.c        |   2 +
- arch/arm/kvm/coproc.c                | 407 ++++++++++++++++++++++++++++++-----
- arch/arm/kvm/handle_exit.c           |   4 +-
- arch/arm/kvm/interrupts.S            |  16 ++
- arch/arm/kvm/interrupts_head.S       | 313 ++++++++++++++++++++++++++-
- arch/arm/kvm/trace.h                 |  30 +++
- 10 files changed, 762 insertions(+), 88 deletions(-)
-
+diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+index 2e12760..9d283d9 100644
+--- a/arch/arm/kvm/coproc.c
++++ b/arch/arm/kvm/coproc.c
+@@ -229,7 +229,7 @@ bool access_vm_reg(struct kvm_vcpu *vcpu,
+  * must always support PMCCNTR (the cycle counter): we just RAZ/WI for
+  * all PM registers, which doesn't crash the guest kernel at least.
+  */
+-static bool pm_fake(struct kvm_vcpu *vcpu,
++static bool trap_raz_wi(struct kvm_vcpu *vcpu,
+ 		    const struct coproc_params *p,
+ 		    const struct coproc_reg *r)
+ {
+@@ -239,19 +239,19 @@ static bool pm_fake(struct kvm_vcpu *vcpu,
+ 		return read_zero(vcpu, p);
+ }
+ 
+-#define access_pmcr pm_fake
+-#define access_pmcntenset pm_fake
+-#define access_pmcntenclr pm_fake
+-#define access_pmovsr pm_fake
+-#define access_pmselr pm_fake
+-#define access_pmceid0 pm_fake
+-#define access_pmceid1 pm_fake
+-#define access_pmccntr pm_fake
+-#define access_pmxevtyper pm_fake
+-#define access_pmxevcntr pm_fake
+-#define access_pmuserenr pm_fake
+-#define access_pmintenset pm_fake
+-#define access_pmintenclr pm_fake
++#define access_pmcr trap_raz_wi
++#define access_pmcntenset trap_raz_wi
++#define access_pmcntenclr trap_raz_wi
++#define access_pmovsr trap_raz_wi
++#define access_pmselr trap_raz_wi
++#define access_pmceid0 trap_raz_wi
++#define access_pmceid1 trap_raz_wi
++#define access_pmccntr trap_raz_wi
++#define access_pmxevtyper trap_raz_wi
++#define access_pmxevcntr trap_raz_wi
++#define access_pmuserenr trap_raz_wi
++#define access_pmintenset trap_raz_wi
++#define access_pmintenclr trap_raz_wi
+ 
+ /* Architected CP15 registers.
+  * CRn denotes the primary register number, but is copied to the CRm in the
+@@ -532,8 +532,7 @@ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	params.Rt2 = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
+ 	params.CRm = 0;
+ 
+-	/* raz_wi */
+-	(void)pm_fake(vcpu, &params, NULL);
++	(void)trap_raz_wi(vcpu, &params, NULL);
+ 
+ 	/* handled */
+ 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+@@ -559,8 +558,7 @@ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	params.Op2 = (kvm_vcpu_get_hsr(vcpu) >> 17) & 0x7;
+ 	params.Rt2 = 0;
+ 
+-	/* raz_wi */
+-	(void)pm_fake(vcpu, &params, NULL);
++	(void)trap_raz_wi(vcpu, &params, NULL);
+ 
+ 	/* handled */
+ 	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
 -- 
 1.7.12.4
+
+--
+To unsubscribe from this list: send the line "unsubscribe kvm" in
