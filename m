@@ -1,53 +1,123 @@
-From: Zhichao Huang <zhichao.huang@linaro.org>
-Subject: [PATCH v3 11/11] KVM: arm: enable trapping of all debug registers
-Date: Mon, 22 Jun 2015 18:41:34 +0800
-Message-ID: <1434969694-7432-12-git-send-email-zhichao.huang@linaro.org>
-References: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [RFC 1/6] KVM: api: add kvm_irq_routing_extended_msi
+Date: Mon, 22 Jun 2015 17:32:59 +0100
+Message-ID: <558838BB.9090908@arm.com>
+References: <1434649258-27065-1-git-send-email-eric.auger@linaro.org>
+ <1434649258-27065-2-git-send-email-eric.auger@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org>
+In-Reply-To: <1434649258-27065-2-git-send-email-eric.auger@linaro.org>
 Sender: kvm-owner@vger.kernel.org
-To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com
-Cc: huangzhichao@huawei.com, Zhichao Huang <zhichao.huang@linaro.org>
+To: Eric Auger <eric.auger@linaro.org>, "eric.auger@st.com" <eric.auger@st.com>
+Cc: "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "p.fedin@samsung.com" <p.fedin@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Enable trapping of the debug registers, allowing guests to use
-the debug infrastructure.
+Hi Eric,
 
-Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
----
- arch/arm/kvm/interrupts_head.S | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+On 18/06/15 18:40, Eric Auger wrote:
+> On ARM, the MSI msg (address and data) comes along with
+> out-of-band device ID information. The device ID encodes the device
+> that composes the MSI msg. Let's create a new routing entry structure
+> that enables to encode that information on top of standard MSI
+> message
+> 
+> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+> ---
+>  Documentation/virtual/kvm/api.txt | 9 +++++++++
+>  include/uapi/linux/kvm.h          | 9 +++++++++
+>  2 files changed, 18 insertions(+)
+> 
+> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+> index d20fd94..bcec91e 100644
+> --- a/Documentation/virtual/kvm/api.txt
+> +++ b/Documentation/virtual/kvm/api.txt
+> @@ -1419,6 +1419,7 @@ struct kvm_irq_routing_entry {
+>  		struct kvm_irq_routing_irqchip irqchip;
+>  		struct kvm_irq_routing_msi msi;
+>  		struct kvm_irq_routing_s390_adapter adapter;
+> +		struct kvm_irq_routing_extended_msi ext_msi;
+>  		__u32 pad[8];
+>  	} u;
+>  };
+> @@ -1427,6 +1428,7 @@ struct kvm_irq_routing_entry {
+>  #define KVM_IRQ_ROUTING_IRQCHIP 1
+>  #define KVM_IRQ_ROUTING_MSI 2
+>  #define KVM_IRQ_ROUTING_S390_ADAPTER 3
+> +#define KVM_IRQ_ROUTING_EXTENDED_MSI 4
+>  
+>  No flags are specified so far, the corresponding field must be set to zero.
+>  
+> @@ -1442,6 +1444,13 @@ struct kvm_irq_routing_msi {
+>  	__u32 pad;
+>  };
+>  
+> +struct kvm_irq_routing_extended_msi {
+> +	__u32 address_lo;
+> +	__u32 address_hi;
+> +	__u32 data;
+> +	__u32 devid;
+> +};
+> +
 
-diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
-index ed406be..107bda4 100644
---- a/arch/arm/kvm/interrupts_head.S
-+++ b/arch/arm/kvm/interrupts_head.S
-@@ -886,10 +886,21 @@ ARM_BE8(rev	r6, r6  )
- .endm
- 
- /* Configures the HDCR (Hyp Debug Configuration Register) on entry/return
-- * (hardware reset value is 0) */
-+ * (hardware reset value is 0)
-+ *
-+ * Clobbers r2-r4
-+ */
- .macro set_hdcr operation
- 	mrc	p15, 4, r2, c1, c1, 1
--	ldr	r3, =(HDCR_TPM|HDCR_TPMCR)
-+	ldr	r3, =(HDCR_TPM|HDCR_TPMCR|HDCR_TDRA|HDCR_TDOSA)
-+
-+	// Check for KVM_ARM_DEBUG_DIRTY, and set debug to trap
-+	// if not dirty.
-+	ldr	r4, [vcpu, #VCPU_DEBUG_FLAGS]
-+	cmp	r4, #KVM_ARM_DEBUG_DIRTY
-+	beq	1f
-+	orr	r3, r3,  #HDCR_TDA
-+1:
- 	.if \operation == vmentry
- 	orr	r2, r2, r3		@ Trap some perfmon accesses
- 	.else
--- 
-1.7.12.4
+I wonder if we could re-use the existing struct kvm_irq_routing_msi,
+which has an u32 pad field already. Since we use a different type
+number, this should not break. Admittedly not the nicest thing, but
+reduces interface bloat:
 
+struct kvm_irq_routing_msi {
+	__u32 address_lo;
+	__u32 address_hi;
+	__u32 data;
+	union {
+		__u32 pad;
+		__u32 devid;
+	};
+};
+
+to maintain backward compatibility on the userland source level.
+
+Cheers,
+Andre.
+
+>  struct kvm_irq_routing_s390_adapter {
+>  	__u64 ind_addr;
+>  	__u64 summary_addr;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 2a23705..e3f65a0 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -829,6 +829,13 @@ struct kvm_irq_routing_msi {
+>  	__u32 pad;
+>  };
+>  
+> +struct kvm_irq_routing_extended_msi {
+> +	__u32 address_lo;
+> +	__u32 address_hi;
+> +	__u32 data;
+> +	__u32 devid;
+> +};
+> +
+>  struct kvm_irq_routing_s390_adapter {
+>  	__u64 ind_addr;
+>  	__u64 summary_addr;
+> @@ -841,6 +848,7 @@ struct kvm_irq_routing_s390_adapter {
+>  #define KVM_IRQ_ROUTING_IRQCHIP 1
+>  #define KVM_IRQ_ROUTING_MSI 2
+>  #define KVM_IRQ_ROUTING_S390_ADAPTER 3
+> +#define KVM_IRQ_ROUTING_EXTENDED_MSI 4
+>  
+>  struct kvm_irq_routing_entry {
+>  	__u32 gsi;
+> @@ -851,6 +859,7 @@ struct kvm_irq_routing_entry {
+>  		struct kvm_irq_routing_irqchip irqchip;
+>  		struct kvm_irq_routing_msi msi;
+>  		struct kvm_irq_routing_s390_adapter adapter;
+> +		struct kvm_irq_routing_extended_msi ext_msi;
+>  		__u32 pad[8];
+>  	} u;
+>  };
+> 
 --
 To unsubscribe from this list: send the line "unsubscribe kvm" in
