@@ -1,148 +1,100 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [RFC 0/6] KVM: arm/arm64: gsi routing support
-Date: Mon, 22 Jun 2015 11:21:28 +0200
-Message-ID: <5587D398.8040002@linaro.org>
-References: <1434649258-27065-1-git-send-email-eric.auger@linaro.org> <5587CA18.6050101@arm.com>
+From: Zhichao Huang <zhichao.huang@linaro.org>
+Subject: [PATCH v3 00/11] KVM: arm: debug infrastructure support
+Date: Mon, 22 Jun 2015 18:41:23 +0800
+Message-ID: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <5587CA18.6050101@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, "eric.auger@st.com" <eric.auger@st.com>, "p.fedin@samsung.com" <p.fedin@samsung.com>
-Cc: "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F52256261
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2015 06:30:53 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id y+oIydPTc5TE for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Jun 2015 06:30:52 -0400 (EDT)
+Received: from mail-pa0-f49.google.com (mail-pa0-f49.google.com
+ [209.85.220.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D94215625F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2015 06:30:51 -0400 (EDT)
+Received: by paceq1 with SMTP id eq1so107067436pac.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Jun 2015 03:41:41 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com
+Cc: huangzhichao@huawei.com, Zhichao Huang <zhichao.huang@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/22/2015 10:40 AM, Andre Przywara wrote:
-> Hi Eric,
-> 
-> I briefly looked over the series, the patches itself look good overall.
-> I have one or two comments on the actual code, but want to discuss the
-> general approach first (more a dump of some first thoughts):
-> 
-> On 18/06/15 18:40, Eric Auger wrote:
->> With the advent of GICv3 ITS in-kernel emulation, KVM GSI routing
->> appears to be requested. More specifically MSI routing is needed.
->> irqchip routing does not sound to be really useful on arm but usage of
->> MSI routing also mandates to integrate irqchip routing. The initial
->> implementation of irqfd on arm must be upgraded with the integration
->> of kvm irqchip.c code and the implementation of its standard hooks
->> in the architecture specific part.
->>
->> The series therefore allows and mandates the usage of KVM_SET_GSI_ROUTING
->> ioctl along with KVM_IRQFD. If the userspace does not define any routing
->> table, no irqfd injection can happen. The user-space can use
->> KVM_CAP_IRQ_ROUTING to detect whether a routing table is needed.
->>
->> for irqchip routing, the convention is, only SPI can be injected and the
->> SPI ID corresponds to irqchip.pin + 32. For MSI routing the interrupt ID
->> matches the MSI msg data. API evolve to support associating a device ID
->> to a routine entry.
-> 
-> So if I get this right, in a guest ITS case we have now three different
-> IRQ name spaces:
-> a) the LPI number, which is guest internal. The ITS driver in the guest
-> maintains it. We can track assignments and changes when handling the
-> MAPVI command in the host kernel, but this would stay in the kernel, as
-> I don't see an efficient way of propagating this to userland.
-> b) the GSI number, which is used in communication between userland and
-> the host kernel. The guest kernel does not know about this at all. Also
-> the ioctl requires us to set the routing for _all_ GSIs, and I read it
-> that it assumes starting at GSI 0.
-all injected GSI must effectively have a routing entry in KVM. Starting
-at 0 that's not requested. At qemu level there's just the constaint gsi
-fits between [0, max route number].
- So we cannot even pretend to have
-> LPIs here, because we would need at least 8192 empty entries then, not
-> to speak of the possibly sparse allocation above. So we have a
-> completely distinct name space here.
-What is done currently at qemu level for other archs -  if I understand
-it correctly -  is there is static GSI routing for standard IRQ. For MSI
-irqfd setup they use spare gsi number not yet used for GSI routing < max
-route number. So this is sparse for MSI but not for standard IRQs.
-Effectively we do not plan to have GSI routing for LPIs but only MSI
-routing.
-> c) The DevID:EvID pair, which actually identifies an IRQ in all the
-> three regimes and is the only authoritative ID.
-> 
-> So that means we need to maintain the connection between all the three,
-> somehow duplicating the whole ITS mapping again to map GSIs to DevID:EvID.
-Currently the KVM routing table indeed stores GSI/DevID:EvID mapping.
-> 
-> So I wonder if we could use DevID:EvID directly.
-> The KVM_IRQFD ioctl struct has some space, so we could put the DevID
-> into the pad area.
-> Also (more forward-looking) KVM_CAP_ASSIGN_DEV_IRQ identifies guest IRQs
-> by an u32, but again there is quite some padding area available.
-ASSIGN_DEV_IRQ is a deprecated feature. We should not use that API I think.
+This patch series adds debug support, a key feature missing from the
+KVM/armv7 port.
 
-Eric
-> 
-> In general I am a bit reluctant to introduce just another level of
-> complexity to the already quite convoluted way of doing IRQs and MSIs on
-> ARM(64), that's why I will investigate if we can use DevID:EvID to refer
-> to an interrupt.
-> 
-> So far,
-> Andre.
-> 
->>
->> Known Issues of this RFC:
->>
->> - One of the biggest is the API inconsistencies on ARM. Blame me.
->>   Routing should apply to KVM_IRQ_LINE ioctl which is not the case yet
->>   in this series. It only applies to irqfd.
->>   on x86 typically this KVM_IRQ_LINE is plugged onto irqchip.c kvm_set_irq
->>   whereas on ARM we inject directly through kvm_vgic_inject_irq
->>   x on arm/arm64 gsi has a specific structure:
->>     bits:  | 31 ... 24 | 23  ... 16 | 15    ...    0 |
->>     field: | irq_type  | vcpu_index |     irq_id     |
->>     where irq_id matches the Interrupt ID
->> - for KVM_IRQFD without routing (current implementation) the gsi field
->>   corresponds to an SPI index = irq_id (above) -32.
->> - as far as understand qemu integration, gsi is supposed to be within
->>   [0, KVM_MAX_IRQ_ROUTES]. Difficult to use KVM_IRQ_LINE gsi.
->> - to be defined what we choose as a convention with irqchip routing is
->>   applied: gsi -> irqchip input pin.
->> - Or shouldn't we simply rule out any userspace irqchip routing and stick
->>   to MSI routing? we could define a fixed identity in-kernel irqchip mapping
->>   and only offer MSI routing.
->> - static allocation of chip[KVM_NR_IRQCHIPS][KVM_IRQCHIP_NUM_PINS];
->>   arbitrary put KVM_IRQCHIP_NUM_PINS = 1020 - 32 (SPI count). On s390
->>   this is even bigger.
->>
->> Currently tested on irqchip routing only (Calxeda midway only),
->> ie NOT TESTED on MSI routing yet.
->>
->> This is a very preliminary RFC to ease the discussion.
->>
->> Code can be found at https://git.linaro.org/people/eric.auger/linux.git/shortlog/refs/heads/v4.1-rc8-gsi-routing-rfc
->>
->> It applies on Andre's [PATCH 00/13] arm64: KVM: GICv3 ITS emulation
->> (http://www.spinics.net/lists/kvm/msg117402.html)
->>
->> Eric Auger (6):
->>   KVM: api: add kvm_irq_routing_extended_msi
->>   KVM: kvm_host: add kvm_extended_msi
->>   KVM: irqchip: convey devid to kvm_set_msi
->>   KVM: arm/arm64: enable irqchip routing
->>   KVM: arm/arm64: enable MSI routing
->>   KVM: arm: implement kvm_set_msi by gsi direct mapping
->>
->>  Documentation/virtual/kvm/api.txt | 20 ++++++--
->>  arch/arm/include/asm/kvm_host.h   |  2 +
->>  arch/arm/kvm/Kconfig              |  3 ++
->>  arch/arm/kvm/Makefile             |  2 +-
->>  arch/arm64/include/asm/kvm_host.h |  1 +
->>  arch/arm64/kvm/Kconfig            |  2 +
->>  arch/arm64/kvm/Makefile           |  2 +-
->>  include/kvm/arm_vgic.h            |  9 ----
->>  include/linux/kvm_host.h          | 10 ++++
->>  include/uapi/linux/kvm.h          |  9 ++++
->>  virt/kvm/arm/vgic.c               | 96 +++++++++++++++++++++++++++------------
->>  virt/kvm/irqchip.c                | 20 ++++++--
->>  12 files changed, 128 insertions(+), 48 deletions(-)
->>
+The main idea is borrowed from ARM64, which is to keep track of whether 
+the debug registers are "dirty" (changed by the guest) or not. In this 
+case, perform the usual save/restore dance, for one run only. It means 
+we only have a penalty if a guest is actively using the debug registers.
 
---
-To unsubscribe from this list: send the line "unsubscribe kvm" in
+The amount of registers is properly frightening, but CPUs actually
+only implement a subset of them. Also, there is a number of registers
+we don't bother emulating (things having to do with external debug and
+OSlock).
+
+External debug is when you actually plug a physical JTAG into the CPU.
+OSlock is a way to prevent "other software" to play with the debug
+registers. My understanding is that it is only useful in combination
+with the external debug. In both case, implementing support for this
+is probably not worth the effort, at least for the time being.
+
+This has been tested on a Cortex-A15 platform, running 32bit guests.
+
+The patches for this series are based off v4.1-rc8 and can be found
+at:
+
+https://git.linaro.org/people/zhichao.huang/linux.git
+branch: guest-debug/4.1-rc8-v3
+
+>From v2 [2]:
+- Delete the debug mode enabling/disabling strategy
+- Add missing cp14/cp15 trace events
+
+>From v1 [1]:
+- Added missing cp14 reset functions
+- Disable debug mode if we don't need it to reduce unnecessary switch
+
+[1]: https://lists.cs.columbia.edu/pipermail/kvmarm/2015-May/014729.html
+[2]: https://lists.cs.columbia.edu/pipermail/kvmarm/2015-May/014847.html
+
+Zhichao Huang (11):
+  KVM: arm: plug guest debug exploit
+  KVM: arm: rename pm_fake handler to trap_raz_wi
+  KVM: arm: enable to use the ARM_DSCR_MDBGEN macro from KVM assembly
+    code
+  KVM: arm: common infrastructure for handling AArch32 CP14/CP15
+  KVM: arm: check ordering of all system register tables
+  KVM: arm: add trap handlers for 32-bit debug registers
+  KVM: arm: add trap handlers for 64-bit debug registers
+  KVM: arm: implement dirty bit mechanism for debug registers
+  KVM: arm: implement lazy world switch for debug registers
+  KVM: arm: add a trace event for cp14 traps
+  KVM: arm: enable trapping of all debug registers
+
+ arch/arm/include/asm/hw_breakpoint.h |  54 ++---
+ arch/arm/include/asm/kvm_asm.h       |  15 ++
+ arch/arm/include/asm/kvm_coproc.h    |   3 +-
+ arch/arm/include/asm/kvm_host.h      |   6 +
+ arch/arm/kernel/asm-offsets.c        |   2 +
+ arch/arm/kvm/coproc.c                | 407 ++++++++++++++++++++++++++++++-----
+ arch/arm/kvm/handle_exit.c           |   4 +-
+ arch/arm/kvm/interrupts.S            |  16 ++
+ arch/arm/kvm/interrupts_head.S       | 313 ++++++++++++++++++++++++++-
+ arch/arm/kvm/trace.h                 |  30 +++
+ 10 files changed, 762 insertions(+), 88 deletions(-)
+
+-- 
+1.7.12.4
