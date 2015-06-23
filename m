@@ -1,29 +1,28 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [RFC 0/6] KVM: arm/arm64: gsi routing support
-Date: Tue, 23 Jun 2015 11:44:44 +0200
-Message-ID: <55892A8C.6050600@linaro.org>
-References: <1434649258-27065-1-git-send-email-eric.auger@linaro.org>
- <5587CA18.6050101@arm.com> <5587D398.8040002@linaro.org>
- <052d01d0ad87$8a2a90e0$9e7fb2a0$@samsung.com> <55890FB2.2090609@linaro.org>
- <001701d0ad91$ad985850$08c908f0$@samsung.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH] arm64/kvm: Add generic v8 KVM target
+Date: Tue, 23 Jun 2015 14:39:59 +0200
+Message-ID: <20150623123959.GF4035@cbox>
+References: <1434531646-4873-1-git-send-email-suzuki.poulose@arm.com>
+ <CAFEAcA92uymQ3LjPQnuFiwvjSgc+jY54VrfK_Sh4v1DJ+=OPpw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E94625644B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Jun 2015 05:34:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 497ED564EF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Jun 2015 08:29:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JPy6gMk3urYP for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Jun 2015 05:34:11 -0400 (EDT)
-Received: from mail-wi0-f176.google.com (mail-wi0-f176.google.com
- [209.85.212.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F7FE5639B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Jun 2015 05:34:11 -0400 (EDT)
-Received: by wicgi11 with SMTP id gi11so10981773wic.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Jun 2015 02:45:04 -0700 (PDT)
-In-Reply-To: <001701d0ad91$ad985850$08c908f0$@samsung.com>
+ with ESMTP id 00hA31hpZZ32 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Jun 2015 08:29:08 -0400 (EDT)
+Received: from mail-lb0-f172.google.com (mail-lb0-f172.google.com
+ [209.85.217.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 45AC2564E6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Jun 2015 08:29:07 -0400 (EDT)
+Received: by lbbvz5 with SMTP id vz5so5796030lbb.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Jun 2015 05:40:00 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA92uymQ3LjPQnuFiwvjSgc+jY54VrfK_Sh4v1DJ+=OPpw@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,44 +32,38 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Pavel Fedin <p.fedin@samsung.com>, 'Andre Przywara' <andre.przywara@arm.com>, eric.auger@st.com
-Cc: 'Marc Zyngier' <Marc.Zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, timur@codeaurora.org, vgandhi@codeaurora.org, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Favel,
-On 06/23/2015 10:50 AM, Pavel Fedin wrote:
->  Hello!
+On Mon, Jun 22, 2015 at 09:44:48AM +0100, Peter Maydell wrote:
+> On 17 June 2015 at 10:00, Suzuki K. Poulose <suzuki.poulose@arm.com> wrote:
+> > From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
+> >
+> > This patch adds a generic ARM v8 KVM target cpu type for use
+> > by the new CPUs which eventualy ends up using the common sys_reg
+> > table. For backward compatibility the existing targets have been
+> > preserved. Any new target CPU that can be covered by generic v8
+> > sys_reg tables should make use of the new generic target.
 > 
->> I was talking about what
->> is done without this "gsi direct mapping" feature. In that case the low
->> GSI numbers are used by irqchip routing entries. So kvm_irqchip_get_virq
->> returns a gsi beyond the irqchip routed gsi's.
+> How do you intend this to work for cross-host migration?
+> Is the idea that the kernel guarantees that "generic" looks
+> 100% the same to the guest regardless of host hardware? I'm
+> not sure that can be made to work, given impdef differences
+> in ID register values, bp/wp registers, and so on.
 > 
->  But aren't these low numbers just routed by the qemu too? I don't see qemu getting any predefined
-> routing from the kernel. 
-
-(some) iqrchip routing is set through kvm_irqchip_add_irq_route.
-hw/i386/kvm/ioapic.c
-hw/intc/openpic_kvm.c
-
-kvm_irqchip_add_irq_route uses kvm_add_routing_entry and this is this
-latter that uses set_gsis which books gsi's.
-
-there is also a default gsi routing table set in kvm archi specific code.
-
-Best Regards
-
-Eric
-
-kvm_init_irq_routing() allocates used_gsi_bitmap as all zeros, and
-> kvm_irqchip_get_virq() just starts to give those free numbers, starting from zero. I believe during
-> machine init we allocate virq's and route them to irqchip explicitly, don't we ?
->  Sorry for being perhaps ignorant, i haven't studied x86 qemu code too much.
-
+> Given that, it seems to me that we still need to provide
+> KVM_ARM_TARGET_$THISCPU defines so userspace can request
+> a specific guest CPU flavour; so what does this patch
+> provide that isn't already provided by just having userspace
+> query for the "preferred" CPU type as it does already?
 > 
-> Kind regards,
-> Pavel Fedin
-> Expert Engineer
-> Samsung Electronics Research center Russia
-> 
-> 
+I'm guessing the intention is to avoid having to add code in the kernel
+to support KVM on a new CPU where nothing else needs to be done to
+support KVM on that system.
+
+Wrt. migration, I was also wondering about this.  Would the differences
+in the CPU architecture be detected when feeding back the invariant
+sysregs from userspace on VM restore?
+
+-Christoffer
