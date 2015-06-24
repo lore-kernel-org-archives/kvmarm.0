@@ -1,637 +1,288 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v6 08/12] KVM: arm64: re-factor hyp.S debug register code
-Date: Wed, 24 Jun 2015 22:19:29 +0200
-Message-ID: <20150624201929.GD22785@cbox>
+From: Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH v6 10/12] KVM: arm64: guest debug, HW assisted debug
+ support
+Date: Wed, 24 Jun 2015 22:22:16 +0200
+Message-ID: <20150624202216.GE22785@cbox>
 References: <1434716630-18260-1-git-send-email-alex.bennee@linaro.org>
- <1434716630-18260-9-git-send-email-alex.bennee@linaro.org>
+ <1434716630-18260-11-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A2C3E56EEE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jun 2015 16:08:33 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tWh1rOVyscBT for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Jun 2015 16:08:32 -0400 (EDT)
-Received: from mail-la0-f48.google.com (mail-la0-f48.google.com
- [209.85.215.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D6B4B56EF1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jun 2015 16:08:31 -0400 (EDT)
-Received: by lagx9 with SMTP id x9so32897628lag.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jun 2015 13:19:28 -0700 (PDT)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <1434716630-18260-9-git-send-email-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org, marc.zyngier@arm.com, jan.kiszka@siemens.com, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, zhichao.huang@linaro.org, r65777@freescale.com, pbonzini@redhat.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <1434716630-18260-11-git-send-email-alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Cc: kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, agraf-l3A5Bk7waGM@public.gmane.org, drjones-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, zhichao.huang-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, jan.kiszka-kv7WeFo6aLtBDgjK7y7TUQ@public.gmane.org, dahi-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org, r65777-KZfg59tc24xl57MIdRCFDg@public.gmane.org, bp-l3A5Bk7waGM@public.gmane.org, Gleb Natapov <gleb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>, Russell King <linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Peter Zijlstra <peterz-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Ingo Molnar <mingo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, "open list:DOCUMENTATION" <linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, open list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "open list:ABI/API" <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jun 19, 2015 at 01:23:46PM +0100, Alex Benn=E9e wrote:
-> This is a pre-cursor to sharing the code with the guest debug support.
-> This replaces the big macro that fishes data out of a fixed location
-> with a more general helper macro to restore a set of debug registers. It
-> uses macro substitution so it can be re-used for debug control and value
-> registers. It does however rely on the debug registers being 64 bit
-> aligned (as they happen to be in the hyp ABI).
-> =
+On Fri, Jun 19, 2015 at 01:23:48PM +0100, Alex Benn=E9e wrote:
+> This adds support for userspace to control the HW debug registers for
+> guest debug. In the debug ioctl we copy the IMPDEF defined number of
 
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> =
+s/defined//
 
+> registers into a new register set called host_debug_state. There is n=
+ow
+> a new vcpu parameter called debug_ptr which selects which register se=
+t
+> is to copied into the real registers when world switch occurs.
+
+But this patch doesn't seem to add the debug_ptr field?
+
+s/to//
+
+>=20
+> I've moved some helper functions into the hw_breakpoint.h header for
+> re-use.
+>=20
+> As with single step we need to tweak the guest registers to enable th=
+e
+> exceptions so we need to save and restore those bits.
+>=20
+> Two new capabilities have been added to the KVM_EXTENSION ioctl to al=
+low
+> userspace to query the number of hardware break and watch points
+> available on the host hardware.
+>=20
+> Signed-off-by: Alex Benn=E9e <alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+>=20
 > ---
-> v3:
->   - return to the patch series
->   - add save and restore targets
->   - change register use and document
-> v4:
->   - keep original setup/restore names
->   - don't use split u32/u64 structure yet
-> v6:
->   - fix ws and clobber info in hyp.S
+> v2
+>    - switched to C setup
+>    - replace host debug registers directly into context
+>    - minor tweak to api docs
+>    - setup right register for debug
+>    - add FAR_EL2 to debug exit structure
+>    - add support for trapping debug register access
+> v3
+>    - remove stray trace statement
+>    - fix spacing around operators (various)
+>    - clean-up usage of trap_debug
+>    - introduce debug_ptr, replace excessive memcpy stuff
+>    - don't use memcpy in ioctl, just assign
+>    - update cap ioctl documentation
+>    - reword a number comments
+>    - rename host_debug_state->external_debug_state
+> v4
+>    - use the new u32/u64 split debug_ptr approach
+>    - fix some wording/comments
+> v5
+>    - don't set MDSCR_EL1.KDE (not needed)
+> v6
+>    - update wording given change in commentary
+>    - KVM_GUESTDBG_USE_HW_BP->KVM_GUESTDBG_USE_HW
 > ---
->  arch/arm64/kvm/hyp.S | 517 ++++++++++++++-------------------------------=
-------
->  1 file changed, 138 insertions(+), 379 deletions(-)
-> =
-
-> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-> index 74e63d8..ee7f649 100644
-> --- a/arch/arm64/kvm/hyp.S
-> +++ b/arch/arm64/kvm/hyp.S
-> @@ -228,199 +228,52 @@
->  	stp	x24, x25, [x3, #160]
->  .endm
->  =
-
-> -.macro save_debug
-> -	// x2: base address for cpu context
-> -	// x3: tmp register
-> -
-> -	mrs	x26, id_aa64dfr0_el1
-> -	ubfx	x24, x26, #12, #4	// Extract BRPs
-> -	ubfx	x25, x26, #20, #4	// Extract WRPs
-> -	mov	w26, #15
-> -	sub	w24, w26, w24		// How many BPs to skip
-> -	sub	w25, w26, w25		// How many WPs to skip
-> -
-> -	add	x3, x2, #CPU_SYSREG_OFFSET(DBGBCR0_EL1)
-> -
-> -	adr	x26, 1f
-> -	add	x26, x26, x24, lsl #2
-> -	br	x26
-> -1:
-> -	mrs	x20, dbgbcr15_el1
-> -	mrs	x19, dbgbcr14_el1
-> -	mrs	x18, dbgbcr13_el1
-> -	mrs	x17, dbgbcr12_el1
-> -	mrs	x16, dbgbcr11_el1
-> -	mrs	x15, dbgbcr10_el1
-> -	mrs	x14, dbgbcr9_el1
-> -	mrs	x13, dbgbcr8_el1
-> -	mrs	x12, dbgbcr7_el1
-> -	mrs	x11, dbgbcr6_el1
-> -	mrs	x10, dbgbcr5_el1
-> -	mrs	x9, dbgbcr4_el1
-> -	mrs	x8, dbgbcr3_el1
-> -	mrs	x7, dbgbcr2_el1
-> -	mrs	x6, dbgbcr1_el1
-> -	mrs	x5, dbgbcr0_el1
-> -
-> -	adr	x26, 1f
-> -	add	x26, x26, x24, lsl #2
-> -	br	x26
-> -
-> -1:
-> -	str	x20, [x3, #(15 * 8)]
-> -	str	x19, [x3, #(14 * 8)]
-> -	str	x18, [x3, #(13 * 8)]
-> -	str	x17, [x3, #(12 * 8)]
-> -	str	x16, [x3, #(11 * 8)]
-> -	str	x15, [x3, #(10 * 8)]
-> -	str	x14, [x3, #(9 * 8)]
-> -	str	x13, [x3, #(8 * 8)]
-> -	str	x12, [x3, #(7 * 8)]
-> -	str	x11, [x3, #(6 * 8)]
-> -	str	x10, [x3, #(5 * 8)]
-> -	str	x9, [x3, #(4 * 8)]
-> -	str	x8, [x3, #(3 * 8)]
-> -	str	x7, [x3, #(2 * 8)]
-> -	str	x6, [x3, #(1 * 8)]
-> -	str	x5, [x3, #(0 * 8)]
-> -
-> -	add	x3, x2, #CPU_SYSREG_OFFSET(DBGBVR0_EL1)
-> -
-> -	adr	x26, 1f
-> -	add	x26, x26, x24, lsl #2
-> -	br	x26
-> -1:
-> -	mrs	x20, dbgbvr15_el1
-> -	mrs	x19, dbgbvr14_el1
-> -	mrs	x18, dbgbvr13_el1
-> -	mrs	x17, dbgbvr12_el1
-> -	mrs	x16, dbgbvr11_el1
-> -	mrs	x15, dbgbvr10_el1
-> -	mrs	x14, dbgbvr9_el1
-> -	mrs	x13, dbgbvr8_el1
-> -	mrs	x12, dbgbvr7_el1
-> -	mrs	x11, dbgbvr6_el1
-> -	mrs	x10, dbgbvr5_el1
-> -	mrs	x9, dbgbvr4_el1
-> -	mrs	x8, dbgbvr3_el1
-> -	mrs	x7, dbgbvr2_el1
-> -	mrs	x6, dbgbvr1_el1
-> -	mrs	x5, dbgbvr0_el1
-> -
-> -	adr	x26, 1f
-> -	add	x26, x26, x24, lsl #2
-> -	br	x26
-> -
-> -1:
-> -	str	x20, [x3, #(15 * 8)]
-> -	str	x19, [x3, #(14 * 8)]
-> -	str	x18, [x3, #(13 * 8)]
-> -	str	x17, [x3, #(12 * 8)]
-> -	str	x16, [x3, #(11 * 8)]
-> -	str	x15, [x3, #(10 * 8)]
-> -	str	x14, [x3, #(9 * 8)]
-> -	str	x13, [x3, #(8 * 8)]
-> -	str	x12, [x3, #(7 * 8)]
-> -	str	x11, [x3, #(6 * 8)]
-> -	str	x10, [x3, #(5 * 8)]
-> -	str	x9, [x3, #(4 * 8)]
-> -	str	x8, [x3, #(3 * 8)]
-> -	str	x7, [x3, #(2 * 8)]
-> -	str	x6, [x3, #(1 * 8)]
-> -	str	x5, [x3, #(0 * 8)]
-> -
-> -	add	x3, x2, #CPU_SYSREG_OFFSET(DBGWCR0_EL1)
-> -
-> -	adr	x26, 1f
-> -	add	x26, x26, x25, lsl #2
-> -	br	x26
-> +.macro save_debug type
-> +	// x4: pointer to register set
-> +	// x5: number of registers to skip
-> +	// x6..x22 trashed
+>  Documentation/virtual/kvm/api.txt      |  7 ++++++-
+>  arch/arm/kvm/arm.c                     |  7 +++++++
+>  arch/arm64/include/asm/hw_breakpoint.h | 12 +++++++++++
+>  arch/arm64/include/asm/kvm_host.h      |  6 +++++-
+>  arch/arm64/kernel/hw_breakpoint.c      | 12 -----------
+>  arch/arm64/kvm/debug.c                 | 37 ++++++++++++++++++++++++=
++++++-----
+>  arch/arm64/kvm/handle_exit.c           |  6 ++++++
+>  arch/arm64/kvm/reset.c                 | 12 +++++++++++
+>  include/uapi/linux/kvm.h               |  2 ++
+>  9 files changed, 82 insertions(+), 19 deletions(-)
+>=20
+> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtua=
+l/kvm/api.txt
+> index 33c8143..ada57df 100644
+> --- a/Documentation/virtual/kvm/api.txt
+> +++ b/Documentation/virtual/kvm/api.txt
+> @@ -2668,7 +2668,7 @@ The top 16 bits of the control field are archit=
+ecture specific control
+>  flags which can include the following:
+> =20
+>    - KVM_GUESTDBG_USE_SW_BP:     using software breakpoints [x86, arm=
+64]
+> -  - KVM_GUESTDBG_USE_HW_BP:     using hardware breakpoints [x86, s39=
+0]
+> +  - KVM_GUESTDBG_USE_HW_BP:     using hardware breakpoints [x86, s39=
+0, arm64]
+>    - KVM_GUESTDBG_INJECT_DB:     inject DB type exception [x86]
+>    - KVM_GUESTDBG_INJECT_BP:     inject BP type exception [x86]
+>    - KVM_GUESTDBG_EXIT_PENDING:  trigger an immediate guest exit [s39=
+0]
+> @@ -2683,6 +2683,11 @@ updated to the correct (supplied) values.
+>  The second part of the structure is architecture specific and
+>  typically contains a set of debug registers.
+> =20
+> +For arm64 the number of debug registers is implementation defined an=
+d
+> +can be determined by querying the KVM_CAP_GUEST_DEBUG_HW_BPS and
+> +KVM_CAP_GUEST_DEBUG_HW_WPS capabilities which return a positive numb=
+er
+> +indicating the number of supported registers.
 > +
-> +	adr	x22, 1f
-> +	add	x22, x22, x5, lsl #2
-> +	br	x22
->  1:
-> -	mrs	x20, dbgwcr15_el1
-> -	mrs	x19, dbgwcr14_el1
-> -	mrs	x18, dbgwcr13_el1
-> -	mrs	x17, dbgwcr12_el1
-> -	mrs	x16, dbgwcr11_el1
-> -	mrs	x15, dbgwcr10_el1
-> -	mrs	x14, dbgwcr9_el1
-> -	mrs	x13, dbgwcr8_el1
-> -	mrs	x12, dbgwcr7_el1
-> -	mrs	x11, dbgwcr6_el1
-> -	mrs	x10, dbgwcr5_el1
-> -	mrs	x9, dbgwcr4_el1
-> -	mrs	x8, dbgwcr3_el1
-> -	mrs	x7, dbgwcr2_el1
-> -	mrs	x6, dbgwcr1_el1
-> -	mrs	x5, dbgwcr0_el1
-> -
-> -	adr	x26, 1f
-> -	add	x26, x26, x25, lsl #2
-> -	br	x26
-> -
-> -1:
-> -	str	x20, [x3, #(15 * 8)]
-> -	str	x19, [x3, #(14 * 8)]
-> -	str	x18, [x3, #(13 * 8)]
-> -	str	x17, [x3, #(12 * 8)]
-> -	str	x16, [x3, #(11 * 8)]
-> -	str	x15, [x3, #(10 * 8)]
-> -	str	x14, [x3, #(9 * 8)]
-> -	str	x13, [x3, #(8 * 8)]
-> -	str	x12, [x3, #(7 * 8)]
-> -	str	x11, [x3, #(6 * 8)]
-> -	str	x10, [x3, #(5 * 8)]
-> -	str	x9, [x3, #(4 * 8)]
-> -	str	x8, [x3, #(3 * 8)]
-> -	str	x7, [x3, #(2 * 8)]
-> -	str	x6, [x3, #(1 * 8)]
-> -	str	x5, [x3, #(0 * 8)]
-> -
-> -	add	x3, x2, #CPU_SYSREG_OFFSET(DBGWVR0_EL1)
-> -
-> -	adr	x26, 1f
-> -	add	x26, x26, x25, lsl #2
-> -	br	x26
-> +	mrs	x21, \type\()15_el1
-> +	mrs	x20, \type\()14_el1
-> +	mrs	x19, \type\()13_el1
-> +	mrs	x18, \type\()12_el1
-> +	mrs	x17, \type\()11_el1
-> +	mrs	x16, \type\()10_el1
-> +	mrs	x15, \type\()9_el1
-> +	mrs	x14, \type\()8_el1
-> +	mrs	x13, \type\()7_el1
-> +	mrs	x12, \type\()6_el1
-> +	mrs	x11, \type\()5_el1
-> +	mrs	x10, \type\()4_el1
-> +	mrs	x9, \type\()3_el1
-> +	mrs	x8, \type\()2_el1
-> +	mrs	x7, \type\()1_el1
-> +	mrs	x6, \type\()0_el1
+>  When debug events exit the main run loop with the reason
+>  KVM_EXIT_DEBUG with the kvm_debug_exit_arch part of the kvm_run
+>  structure containing architecture specific debug information.
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index 0d17c7b..60c4045 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -307,6 +307,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+> =20
+>  #define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE |    \
+>  			    KVM_GUESTDBG_USE_SW_BP | \
+> +			    KVM_GUESTDBG_USE_HW | \
+>  			    KVM_GUESTDBG_SINGLESTEP)
+> =20
+>  /**
+> @@ -327,6 +328,12 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct k=
+vm_vcpu *vcpu,
+> =20
+>  	if (dbg->control & KVM_GUESTDBG_ENABLE) {
+>  		vcpu->guest_debug =3D dbg->control;
 > +
-> +	adr	x22, 1f
-> +	add	x22, x22, x5, lsl #2
-> +	br	x22
->  1:
-> -	mrs	x20, dbgwvr15_el1
-> -	mrs	x19, dbgwvr14_el1
-> -	mrs	x18, dbgwvr13_el1
-> -	mrs	x17, dbgwvr12_el1
-> -	mrs	x16, dbgwvr11_el1
-> -	mrs	x15, dbgwvr10_el1
-> -	mrs	x14, dbgwvr9_el1
-> -	mrs	x13, dbgwvr8_el1
-> -	mrs	x12, dbgwvr7_el1
-> -	mrs	x11, dbgwvr6_el1
-> -	mrs	x10, dbgwvr5_el1
-> -	mrs	x9, dbgwvr4_el1
-> -	mrs	x8, dbgwvr3_el1
-> -	mrs	x7, dbgwvr2_el1
-> -	mrs	x6, dbgwvr1_el1
-> -	mrs	x5, dbgwvr0_el1
-> -
-> -	adr	x26, 1f
-> -	add	x26, x26, x25, lsl #2
-> -	br	x26
-> -
-> -1:
-> -	str	x20, [x3, #(15 * 8)]
-> -	str	x19, [x3, #(14 * 8)]
-> -	str	x18, [x3, #(13 * 8)]
-> -	str	x17, [x3, #(12 * 8)]
-> -	str	x16, [x3, #(11 * 8)]
-> -	str	x15, [x3, #(10 * 8)]
-> -	str	x14, [x3, #(9 * 8)]
-> -	str	x13, [x3, #(8 * 8)]
-> -	str	x12, [x3, #(7 * 8)]
-> -	str	x11, [x3, #(6 * 8)]
-> -	str	x10, [x3, #(5 * 8)]
-> -	str	x9, [x3, #(4 * 8)]
-> -	str	x8, [x3, #(3 * 8)]
-> -	str	x7, [x3, #(2 * 8)]
-> -	str	x6, [x3, #(1 * 8)]
-> -	str	x5, [x3, #(0 * 8)]
-> -
-> -	mrs	x21, mdccint_el1
-> -	str	x21, [x2, #CPU_SYSREG_OFFSET(MDCCINT_EL1)]
-> +	str	x21, [x4, #(15 * 8)]
-> +	str	x20, [x4, #(14 * 8)]
-> +	str	x19, [x4, #(13 * 8)]
-> +	str	x18, [x4, #(12 * 8)]
-> +	str	x17, [x4, #(11 * 8)]
-> +	str	x16, [x4, #(10 * 8)]
-> +	str	x15, [x4, #(9 * 8)]
-> +	str	x14, [x4, #(8 * 8)]
-> +	str	x13, [x4, #(7 * 8)]
-> +	str	x12, [x4, #(6 * 8)]
-> +	str	x11, [x4, #(5 * 8)]
-> +	str	x10, [x4, #(4 * 8)]
-> +	str	x9, [x4, #(3 * 8)]
-> +	str	x8, [x4, #(2 * 8)]
-> +	str	x7, [x4, #(1 * 8)]
-> +	str	x6, [x4, #(0 * 8)]
->  .endm
->  =
-
->  .macro restore_sysregs
-> @@ -465,195 +318,52 @@
->  	msr	mdscr_el1,	x25
->  .endm
->  =
-
-> -.macro restore_debug
-> -	// x2: base address for cpu context
-> -	// x3: tmp register
-> -
-> -	mrs	x26, id_aa64dfr0_el1
-> -	ubfx	x24, x26, #12, #4	// Extract BRPs
-> -	ubfx	x25, x26, #20, #4	// Extract WRPs
-> -	mov	w26, #15
-> -	sub	w24, w26, w24		// How many BPs to skip
-> -	sub	w25, w26, w25		// How many WPs to skip
-> -
-> -	add	x3, x2, #CPU_SYSREG_OFFSET(DBGBCR0_EL1)
-> +.macro restore_debug type
-> +        // x4: pointer to register set
-> +        // x5: number of registers to skip
-
-there's a white space issue here, should be tabs instead of spaces.  We
-can probably fix while applying, if there's no need to respin.
-
-> +	// x6..x22 trashed
->  =
-
-> -	adr	x26, 1f
-> -	add	x26, x26, x24, lsl #2
-> -	br	x26
-> +	adr	x22, 1f
-> +	add	x22, x22, x5, lsl #2
-> +	br	x22
->  1:
-> -	ldr	x20, [x3, #(15 * 8)]
-> -	ldr	x19, [x3, #(14 * 8)]
-> -	ldr	x18, [x3, #(13 * 8)]
-> -	ldr	x17, [x3, #(12 * 8)]
-> -	ldr	x16, [x3, #(11 * 8)]
-> -	ldr	x15, [x3, #(10 * 8)]
-> -	ldr	x14, [x3, #(9 * 8)]
-> -	ldr	x13, [x3, #(8 * 8)]
-> -	ldr	x12, [x3, #(7 * 8)]
-> -	ldr	x11, [x3, #(6 * 8)]
-> -	ldr	x10, [x3, #(5 * 8)]
-> -	ldr	x9, [x3, #(4 * 8)]
-> -	ldr	x8, [x3, #(3 * 8)]
-> -	ldr	x7, [x3, #(2 * 8)]
-> -	ldr	x6, [x3, #(1 * 8)]
-> -	ldr	x5, [x3, #(0 * 8)]
-> -
-> -	adr	x26, 1f
-> -	add	x26, x26, x24, lsl #2
-> -	br	x26
-> +	ldr	x21, [x4, #(15 * 8)]
-> +	ldr	x20, [x4, #(14 * 8)]
-> +	ldr	x19, [x4, #(13 * 8)]
-> +	ldr	x18, [x4, #(12 * 8)]
-> +	ldr	x17, [x4, #(11 * 8)]
-> +	ldr	x16, [x4, #(10 * 8)]
-> +	ldr	x15, [x4, #(9 * 8)]
-> +	ldr	x14, [x4, #(8 * 8)]
-> +	ldr	x13, [x4, #(7 * 8)]
-> +	ldr	x12, [x4, #(6 * 8)]
-> +	ldr	x11, [x4, #(5 * 8)]
-> +	ldr	x10, [x4, #(4 * 8)]
-> +	ldr	x9, [x4, #(3 * 8)]
-> +	ldr	x8, [x4, #(2 * 8)]
-> +	ldr	x7, [x4, #(1 * 8)]
-> +	ldr	x6, [x4, #(0 * 8)]
+> +		/* Hardware assisted Break and Watch points */
+> +		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW) {
+> +			vcpu->arch.external_debug_state =3D dbg->arch;
+> +		}
 > +
-> +	adr	x22, 1f
-> +	add	x22, x22, x5, lsl #2
-> +	br	x22
->  1:
-> -	msr	dbgbcr15_el1, x20
-> -	msr	dbgbcr14_el1, x19
-> -	msr	dbgbcr13_el1, x18
-> -	msr	dbgbcr12_el1, x17
-> -	msr	dbgbcr11_el1, x16
-> -	msr	dbgbcr10_el1, x15
-> -	msr	dbgbcr9_el1, x14
-> -	msr	dbgbcr8_el1, x13
-> -	msr	dbgbcr7_el1, x12
-> -	msr	dbgbcr6_el1, x11
-> -	msr	dbgbcr5_el1, x10
-> -	msr	dbgbcr4_el1, x9
-> -	msr	dbgbcr3_el1, x8
-> -	msr	dbgbcr2_el1, x7
-> -	msr	dbgbcr1_el1, x6
-> -	msr	dbgbcr0_el1, x5
-> -
-> -	add	x3, x2, #CPU_SYSREG_OFFSET(DBGBVR0_EL1)
-> -
-> -	adr	x26, 1f
-> -	add	x26, x26, x24, lsl #2
-> -	br	x26
-> -1:
-> -	ldr	x20, [x3, #(15 * 8)]
-> -	ldr	x19, [x3, #(14 * 8)]
-> -	ldr	x18, [x3, #(13 * 8)]
-> -	ldr	x17, [x3, #(12 * 8)]
-> -	ldr	x16, [x3, #(11 * 8)]
-> -	ldr	x15, [x3, #(10 * 8)]
-> -	ldr	x14, [x3, #(9 * 8)]
-> -	ldr	x13, [x3, #(8 * 8)]
-> -	ldr	x12, [x3, #(7 * 8)]
-> -	ldr	x11, [x3, #(6 * 8)]
-> -	ldr	x10, [x3, #(5 * 8)]
-> -	ldr	x9, [x3, #(4 * 8)]
-> -	ldr	x8, [x3, #(3 * 8)]
-> -	ldr	x7, [x3, #(2 * 8)]
-> -	ldr	x6, [x3, #(1 * 8)]
-> -	ldr	x5, [x3, #(0 * 8)]
-> -
-> -	adr	x26, 1f
-> -	add	x26, x26, x24, lsl #2
-> -	br	x26
-> -1:
-> -	msr	dbgbvr15_el1, x20
-> -	msr	dbgbvr14_el1, x19
-> -	msr	dbgbvr13_el1, x18
-> -	msr	dbgbvr12_el1, x17
-> -	msr	dbgbvr11_el1, x16
-> -	msr	dbgbvr10_el1, x15
-> -	msr	dbgbvr9_el1, x14
-> -	msr	dbgbvr8_el1, x13
-> -	msr	dbgbvr7_el1, x12
-> -	msr	dbgbvr6_el1, x11
-> -	msr	dbgbvr5_el1, x10
-> -	msr	dbgbvr4_el1, x9
-> -	msr	dbgbvr3_el1, x8
-> -	msr	dbgbvr2_el1, x7
-> -	msr	dbgbvr1_el1, x6
-> -	msr	dbgbvr0_el1, x5
-> -
-> -	add	x3, x2, #CPU_SYSREG_OFFSET(DBGWCR0_EL1)
-> -
-> -	adr	x26, 1f
-> -	add	x26, x26, x25, lsl #2
-> -	br	x26
-> -1:
-> -	ldr	x20, [x3, #(15 * 8)]
-> -	ldr	x19, [x3, #(14 * 8)]
-> -	ldr	x18, [x3, #(13 * 8)]
-> -	ldr	x17, [x3, #(12 * 8)]
-> -	ldr	x16, [x3, #(11 * 8)]
-> -	ldr	x15, [x3, #(10 * 8)]
-> -	ldr	x14, [x3, #(9 * 8)]
-> -	ldr	x13, [x3, #(8 * 8)]
-> -	ldr	x12, [x3, #(7 * 8)]
-> -	ldr	x11, [x3, #(6 * 8)]
-> -	ldr	x10, [x3, #(5 * 8)]
-> -	ldr	x9, [x3, #(4 * 8)]
-> -	ldr	x8, [x3, #(3 * 8)]
-> -	ldr	x7, [x3, #(2 * 8)]
-> -	ldr	x6, [x3, #(1 * 8)]
-> -	ldr	x5, [x3, #(0 * 8)]
-> -
-> -	adr	x26, 1f
-> -	add	x26, x26, x25, lsl #2
-> -	br	x26
-> -1:
-> -	msr	dbgwcr15_el1, x20
-> -	msr	dbgwcr14_el1, x19
-> -	msr	dbgwcr13_el1, x18
-> -	msr	dbgwcr12_el1, x17
-> -	msr	dbgwcr11_el1, x16
-> -	msr	dbgwcr10_el1, x15
-> -	msr	dbgwcr9_el1, x14
-> -	msr	dbgwcr8_el1, x13
-> -	msr	dbgwcr7_el1, x12
-> -	msr	dbgwcr6_el1, x11
-> -	msr	dbgwcr5_el1, x10
-> -	msr	dbgwcr4_el1, x9
-> -	msr	dbgwcr3_el1, x8
-> -	msr	dbgwcr2_el1, x7
-> -	msr	dbgwcr1_el1, x6
-> -	msr	dbgwcr0_el1, x5
-> -
-> -	add	x3, x2, #CPU_SYSREG_OFFSET(DBGWVR0_EL1)
-> -
-> -	adr	x26, 1f
-> -	add	x26, x26, x25, lsl #2
-> -	br	x26
-> -1:
-> -	ldr	x20, [x3, #(15 * 8)]
-> -	ldr	x19, [x3, #(14 * 8)]
-> -	ldr	x18, [x3, #(13 * 8)]
-> -	ldr	x17, [x3, #(12 * 8)]
-> -	ldr	x16, [x3, #(11 * 8)]
-> -	ldr	x15, [x3, #(10 * 8)]
-> -	ldr	x14, [x3, #(9 * 8)]
-> -	ldr	x13, [x3, #(8 * 8)]
-> -	ldr	x12, [x3, #(7 * 8)]
-> -	ldr	x11, [x3, #(6 * 8)]
-> -	ldr	x10, [x3, #(5 * 8)]
-> -	ldr	x9, [x3, #(4 * 8)]
-> -	ldr	x8, [x3, #(3 * 8)]
-> -	ldr	x7, [x3, #(2 * 8)]
-> -	ldr	x6, [x3, #(1 * 8)]
-> -	ldr	x5, [x3, #(0 * 8)]
-> -
-> -	adr	x26, 1f
-> -	add	x26, x26, x25, lsl #2
-> -	br	x26
-> -1:
-> -	msr	dbgwvr15_el1, x20
-> -	msr	dbgwvr14_el1, x19
-> -	msr	dbgwvr13_el1, x18
-> -	msr	dbgwvr12_el1, x17
-> -	msr	dbgwvr11_el1, x16
-> -	msr	dbgwvr10_el1, x15
-> -	msr	dbgwvr9_el1, x14
-> -	msr	dbgwvr8_el1, x13
-> -	msr	dbgwvr7_el1, x12
-> -	msr	dbgwvr6_el1, x11
-> -	msr	dbgwvr5_el1, x10
-> -	msr	dbgwvr4_el1, x9
-> -	msr	dbgwvr3_el1, x8
-> -	msr	dbgwvr2_el1, x7
-> -	msr	dbgwvr1_el1, x6
-> -	msr	dbgwvr0_el1, x5
-> -
-> -	ldr	x21, [x2, #CPU_SYSREG_OFFSET(MDCCINT_EL1)]
-> -	msr	mdccint_el1, x21
-> +	msr	\type\()15_el1, x21
-> +	msr	\type\()14_el1, x20
-> +	msr	\type\()13_el1, x19
-> +	msr	\type\()12_el1, x18
-> +	msr	\type\()11_el1, x17
-> +	msr	\type\()10_el1, x16
-> +	msr	\type\()9_el1, x15
-> +	msr	\type\()8_el1, x14
-> +	msr	\type\()7_el1, x13
-> +	msr	\type\()6_el1, x12
-> +	msr	\type\()5_el1, x11
-> +	msr	\type\()4_el1, x10
-> +	msr	\type\()3_el1, x9
-> +	msr	\type\()2_el1, x8
-> +	msr	\type\()1_el1, x7
-> +	msr	\type\()0_el1, x6
->  .endm
->  =
+>  	} else {
+>  		/* If not enabled clear all flags */
+>  		vcpu->guest_debug =3D 0;
+> diff --git a/arch/arm64/include/asm/hw_breakpoint.h b/arch/arm64/incl=
+ude/asm/hw_breakpoint.h
+> index 52b484b..c450552 100644
+> --- a/arch/arm64/include/asm/hw_breakpoint.h
+> +++ b/arch/arm64/include/asm/hw_breakpoint.h
+> @@ -130,6 +130,18 @@ static inline void ptrace_hw_copy_thread(struct =
+task_struct *task)
+>  }
+>  #endif
+> =20
+> +/* Determine number of BRP registers available. */
+> +static inline int get_num_brps(void)
+> +{
+> +	return ((read_cpuid(ID_AA64DFR0_EL1) >> 12) & 0xf) + 1;
+> +}
+> +
+> +/* Determine number of WRP registers available. */
+> +static inline int get_num_wrps(void)
+> +{
+> +	return ((read_cpuid(ID_AA64DFR0_EL1) >> 20) & 0xf) + 1;
+> +}
+> +
+>  extern struct pmu perf_ops_bp;
+> =20
+>  #endif	/* __KERNEL__ */
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/a=
+sm/kvm_host.h
+> index 9697daf..0a3ee7b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -116,13 +116,17 @@ struct kvm_vcpu_arch {
+>  	 * debugging the guest from the host and to maintain separate host =
+and
+>  	 * guest state during world switches. vcpu_debug_state are the debu=
+g
+>  	 * registers of the vcpu as the guest sees them.  host_debug_state =
+are
+> -	 * the host registers which are saved and restored during world swi=
+tches.
+> +	 * the host registers which are saved and restored during
+> +	 * world switches. external_debug_state contains the debug
+> +	 * values we want to debugging the guest. This is set via the
 
->  .macro skip_32bit_state tmp, target
-> @@ -887,12 +597,61 @@ __restore_sysregs:
->  	restore_sysregs
->  	ret
->  =
+nit: s/debugging/debug/
 
-> +/* Save debug state */
->  __save_debug:
-> -	save_debug
-> +	// x2: ptr to CPU context
-> +	// x4/x5/x6-22/x24-26: trashed
+> +	 * KVM_SET_GUEST_DEBUG ioctl.
+>  	 *
+>  	 * debug_ptr points to the set of debug registers that should be lo=
+aded
+>  	 * onto the hardware when running the guest.
+>  	 */
+>  	struct kvm_guest_debug_arch *debug_ptr;
+>  	struct kvm_guest_debug_arch vcpu_debug_state;
+> +	struct kvm_guest_debug_arch external_debug_state;
+> =20
+>  	/* Pointer to host CPU context */
+>  	kvm_cpu_context_t *host_cpu_context;
+> diff --git a/arch/arm64/kernel/hw_breakpoint.c b/arch/arm64/kernel/hw=
+_breakpoint.c
+> index e7d934d..3a41bbf 100644
+> --- a/arch/arm64/kernel/hw_breakpoint.c
+> +++ b/arch/arm64/kernel/hw_breakpoint.c
+> @@ -49,18 +49,6 @@ static DEFINE_PER_CPU(int, stepping_kernel_bp);
+>  static int core_num_brps;
+>  static int core_num_wrps;
+> =20
+> -/* Determine number of BRP registers available. */
+> -static int get_num_brps(void)
+> -{
+> -	return ((read_cpuid(ID_AA64DFR0_EL1) >> 12) & 0xf) + 1;
+> -}
+> -
+> -/* Determine number of WRP registers available. */
+> -static int get_num_wrps(void)
+> -{
+> -	return ((read_cpuid(ID_AA64DFR0_EL1) >> 20) & 0xf) + 1;
+> -}
+> -
+>  int hw_breakpoint_slots(int type)
+>  {
+>  	/*
+> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> index d439eb8..b287bbc 100644
+> --- a/arch/arm64/kvm/debug.c
+> +++ b/arch/arm64/kvm/debug.c
+> @@ -96,10 +96,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  				MDCR_EL2_TDRA |
+>  				MDCR_EL2_TDOSA);
+> =20
+> -	/* Trap on access to debug registers? */
+> -	if (trap_debug)
+> -		vcpu->arch.mdcr_el2 |=3D MDCR_EL2_TDA;
+> -
+>  	/* Is Guest debugging in effect? */
+>  	if (vcpu->guest_debug) {
+>  		/* Route all software debug exceptions to EL2 */
+> @@ -134,11 +130,42 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+>  		} else {
+>  			vcpu_sys_reg(vcpu, MDSCR_EL1) &=3D ~DBG_MDSCR_SS;
+>  		}
 > +
-> +	mrs	x26, id_aa64dfr0_el1
-> +	ubfx	x24, x26, #12, #4	// Extract BRPs
-> +	ubfx	x25, x26, #20, #4	// Extract WRPs
-> +	mov	w26, #15
-> +	sub	w24, w26, w24		// How many BPs to skip
-> +	sub	w25, w26, w25		// How many WPs to skip
+> +		/*
+> +		 * HW Breakpoints and watchpoints
+> +		 *
+> +		 * We simply switch the debug_ptr to point to our new
+> +		 * external_debug_state which has been populated by the
+> +		 * debug ioctl. The existing KVM_ARM64_DEBUG_DIRTY
+> +		 * mechanism ensures the registers are updated on the
+> +		 * world switch.
+> +		 */
+> +		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW) {
+> +			/* Enable breakpoints/watchpoints */
+> +			vcpu_sys_reg(vcpu, MDSCR_EL1) |=3D DBG_MDSCR_MDE;
 > +
-> +	mov	x5, x24
-> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGBCR0_EL1)
-> +	save_debug dbgbcr
-> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGBVR0_EL1)
-> +	save_debug dbgbvr
+> +			vcpu->arch.debug_ptr =3D &vcpu->arch.external_debug_state;
+> +			vcpu->arch.debug_flags |=3D KVM_ARM64_DEBUG_DIRTY;
+> +			trap_debug =3D true;
+> +		}
+>  	}
 > +
-> +	mov	x5, x25
-> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGWCR0_EL1)
-> +	save_debug dbgwcr
-> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGWVR0_EL1)
-> +	save_debug dbgwvr
+> +	/* Trap debug register access */
+> +	if (trap_debug)
+> +		vcpu->arch.mdcr_el2 |=3D MDCR_EL2_TDA;
+>  }
+> =20
+>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
+>  {
+> -	if (vcpu->guest_debug)
+> +	if (vcpu->guest_debug) {
+>  		restore_guest_debug_regs(vcpu);
 > +
-> +	mrs	x21, mdccint_el1
-> +	str	x21, [x2, #CPU_SYSREG_OFFSET(MDCCINT_EL1)]
->  	ret
->  =
+> +		/*
+> +		 * If we were using HW debug we need to restore the
+> +		 * debug_ptr to the guest debug state.
+> +		 */
+> +		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW)
+> +			vcpu->arch.debug_ptr =3D &vcpu->arch.vcpu_debug_state;
 
-> +/* Restore debug state */
->  __restore_debug:
-> -	restore_debug
-> +	// x2: ptr to CPU context
-> +	// x4/x5/x6-22/x24-26: trashed
-> +
-> +	mrs	x26, id_aa64dfr0_el1
-> +	ubfx	x24, x26, #12, #4	// Extract BRPs
-> +	ubfx	x25, x26, #20, #4	// Extract WRPs
-> +	mov	w26, #15
-> +	sub	w24, w26, w24		// How many BPs to skip
-> +	sub	w25, w26, w25		// How many WPs to skip
-> +
-> +	mov	x5, x24
-> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGBCR0_EL1)
-> +	restore_debug dbgbcr
-> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGBVR0_EL1)
-> +	restore_debug dbgbvr
-> +
-> +	mov	x5, x25
-> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGWCR0_EL1)
-> +	restore_debug dbgwcr
-> +	add	x4, x2, #CPU_SYSREG_OFFSET(DBGWVR0_EL1)
-> +	restore_debug dbgwvr
-> +
-> +	ldr	x21, [x2, #CPU_SYSREG_OFFSET(MDCCINT_EL1)]
-> +	msr	mdccint_el1, x21
-> +
->  	ret
->  =
+I still think this would be more cleanly done in the setup_debug
+function, but ok:
 
->  __save_fpsimd:
-> -- =
-
-> 2.4.3
-> =
-
-
-Besides the whitespace nit:
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Reviewed-by: Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
