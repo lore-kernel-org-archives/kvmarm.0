@@ -1,61 +1,64 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v3 06/10] arm: simplify MMIO dispatching
-Date: Wed, 24 Jun 2015 14:30:05 +0100
-Message-ID: <558AB0DD.1070704@arm.com>
-References: <1434540121-21283-1-git-send-email-andre.przywara@arm.com>
- <1434540121-21283-7-git-send-email-andre.przywara@arm.com>
- <55816C9F.1090500@arm.com> <55817B07.8010502@arm.com>
- <55817EEA.9060402@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 434D056DF1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jun 2015 09:18:53 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HGkOP4sxgRE7 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Jun 2015 09:18:52 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DCC2B56DF3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jun 2015 09:18:51 -0400 (EDT)
-In-Reply-To: <55817EEA.9060402@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <Will.Deacon@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, "penberg@kernel.org" <penberg@kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [RFC PATCH] KVM: arm/arm64: Don't let userspace update CNTVOFF once guest is running
+Date: Wed, 24 Jun 2015 15:54:57 +0100
+Message-ID: <1435157697-28579-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Will,
+Userspace is allowed to set the guest's view of CNTVCT, which turns
+into setting CNTVOFF for the whole VM. One thing userspace is not supposed
+to do is to update that register while the guest is running. Time will
+either move forward (best case) or backward (really bad idea). Either way,
+this shouldn't happen.
 
-do you want me to respin the whole series to address the remaining minor
-comments in the last four patches or do you want to take patch 01-06
-already (which I think Marc has already agreed upon)?
-Then I would just send an updated version of the remaining patches.
+This patch prevents userspace from touching CNTVOFF as soon as a vcpu
+has been started. This ensures that time will keep monotonically increase.
 
-Cheers,
-Andre.
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
 
+QEMU seems to trigger this at boot time, and I have no idea why it does so.
+It would be good to find out, hence the RFC tag.
 
-....
+ virt/kvm/arm/arch_timer.c | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
-> No, that's fine.
-> 
-> I just wondered what was the rational behind having the
-> arm_addr_in_pci_region() call there. It might have guarded something,
-> but if you're absolutely positive that this doesn't cause a regression,
-> that's OK with me.
-> 
-> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> 
-> 	M.
-> 
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 98c95f2..660f348 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -220,9 +220,26 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
+ 	case KVM_REG_ARM_TIMER_CTL:
+ 		timer->cntv_ctl = value;
+ 		break;
+-	case KVM_REG_ARM_TIMER_CNT:
+-		vcpu->kvm->arch.timer.cntvoff = kvm_phys_timer_read() - value;
++	case KVM_REG_ARM_TIMER_CNT: {
++		struct kvm_vcpu *tmp;
++		int i;
++		u64 cntvoff = kvm_phys_timer_read() - value;
++
++		/*
++		 * If any of the vcpus has started, don't update
++		 * CNTVOFF. Userspace is severely brain damaged.
++		 */
++		kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
++			if (tmp->arch.has_run_once) {
++				kvm_debug("Won't set CNTVOFF to %llx (%llx)\n",
++					  cntvoff,
++					  vcpu->kvm->arch.timer.cntvoff);
++				return -1;
++			}
++		}
++		vcpu->kvm->arch.timer.cntvoff = cntvoff;
+ 		break;
++	}
+ 	case KVM_REG_ARM_TIMER_CVAL:
+ 		timer->cntv_cval = value;
+ 		break;
+-- 
+2.1.4
+
