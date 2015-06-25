@@ -1,33 +1,31 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] arm64/kvm: Add generic v8 KVM target
-Date: Thu, 25 Jun 2015 14:49:08 +0100
-Message-ID: <CAFEAcA_ULz=ugQW=NmthzqYRtvcfwteQTh0DonHRN6U5NykEtQ@mail.gmail.com>
-References: <1434531646-4873-1-git-send-email-suzuki.poulose@arm.com>
- <CAFEAcA92uymQ3LjPQnuFiwvjSgc+jY54VrfK_Sh4v1DJ+=OPpw@mail.gmail.com>
- <558A6A84.5020603@arm.com> <20150624085128.GA22785@cbox> <558A7936.7020109@arm.com>
- <20150625123034.GE28244@cbox> <558BF6C9.3000009@arm.com> <558C05A9.8080201@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+From: Andrew Jones <drjones@redhat.com>
+Subject: [PATCH 0/3] arm/arm64: tcg_baremetal_tests inspired patches
+Date: Thu, 25 Jun 2015 18:12:16 +0200
+Message-ID: <1435248739-25425-1-git-send-email-drjones@redhat.com>
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <558C05A9.8080201@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Suzuki Poulose <Suzuki.Poulose@arm.com>, "timur@codeaurora.org" <timur@codeaurora.org>, "vgandhi@codeaurora.org" <vgandhi@codeaurora.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: christoffer.dall@linaro.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 25 June 2015 at 14:44, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> It should always be possible to emulate a "known" CPU on a generic host,
-> and it should be able to migrate. The case we can't migrate is when we
-> let the guest be generic (which I guess should really be unknown, and
-> not generic).
->
-> So if the user specify "-cpu cortex-a57" on the command line, the guest
-> should be able to migrate from an A72 to an A53. if the user specified
-> "-cpu host", the resulting guest won't be able to migrate.
->
-> Does it make sense?
+While porting the test in virtualopensystems' tcg_baremetal_tests
+to kvm-unit-tests, I found a couple places to improve the spinlock
+implementation. I also added a way to build a single test that
+doesn't necessary have an entry in the makefile, which should be handy
+for experimental tests.
 
-Yes. We've always said "-cpu host" won't be cross-host migratable
-from a QEMU point of view.
+Andrew Jones (3):
+  arm/arm64: spinlocks: fix memory barriers
+  arm/arm64: allow building a single test
+  arm/arm64: speed up spinlocks and atomic ops
 
--- PMM
+ config/config-arm-common.mak | 6 ++++++
+ lib/arm/asm/mmu-api.h        | 4 ++++
+ lib/arm/mmu.c                | 3 +++
+ lib/arm/spinlock.c           | 8 ++++----
+ lib/arm64/spinlock.c         | 5 ++---
+ 5 files changed, 19 insertions(+), 7 deletions(-)
+
+-- 
+2.4.3
+
