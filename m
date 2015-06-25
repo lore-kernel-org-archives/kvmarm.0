@@ -1,323 +1,114 @@
-From: Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH v6 10/12] KVM: arm64: guest debug, HW assisted debug
- support
-Date: Thu, 25 Jun 2015 09:49:34 +0200
-Message-ID: <20150625074934.GB28244@cbox>
-References: <1434716630-18260-1-git-send-email-alex.bennee@linaro.org>
- <1434716630-18260-11-git-send-email-alex.bennee@linaro.org>
- <20150624202216.GE22785@cbox>
- <87mvzoxpg6.fsf@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: should KVM or userspace be the one which decides what
+ MIPIDR/affinity values to assign to vcpus?
+Date: Thu, 25 Jun 2015 10:00:14 +0200
+Message-ID: <20150625080014.GC28244@cbox>
+References: <CAFEAcA-AY7rqcWmd13mpBuBWugbqwjzMdWfWt2N2rV0=7LT3KA@mail.gmail.com>
+ <5576C559.2000902@arm.com>
+ <CAFEAcA8x6BbHZPLj_U9HuZJs8i3n777vL=Gxs5V8pdmO+bsEcA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E636056F76
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2015 03:49:16 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id S3jGYQhEmr2D for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Jun 2015 03:49:15 -0400 (EDT)
+Received: from mail-la0-f45.google.com (mail-la0-f45.google.com
+ [209.85.215.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BD90256F65
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2015 03:49:15 -0400 (EDT)
+Received: by lacny3 with SMTP id ny3so39810998lac.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2015 01:00:13 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <87mvzoxpg6.fsf-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Cc: kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, agraf-l3A5Bk7waGM@public.gmane.org, drjones-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, zhichao.huang-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, jan.kiszka-kv7WeFo6aLtBDgjK7y7TUQ@public.gmane.org, dahi-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org, r65777-KZfg59tc24xl57MIdRCFDg@public.gmane.org, bp-l3A5Bk7waGM@public.gmane.org, Gleb Natapov <gleb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>, Russell King <linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Peter Zijlstra <peterz-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Ingo Molnar <mingo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, "open list:DOCUMENTATION" <linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, open list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "open list:ABI/API" <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <CAFEAcA8x6BbHZPLj_U9HuZJs8i3n777vL=Gxs5V8pdmO+bsEcA@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Shlomo Pongratz <shlomo.pongratz@huawei.com>, Shlomo Pongratz <shlomopongratz@gmail.com>, Pavel Fedin <p.fedin@samsung.com>, QEMU Developers <qemu-devel@nongnu.org>, Shannon Zhao <shannon.zhao@linaro.org>, Ashok Kumar <ashoks@broadcom.com>, Igor Mammedov <imammedo@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jun 25, 2015 at 07:38:33AM +0100, Alex Benn=E9e wrote:
->=20
-> Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> writes:
->=20
-> > On Fri, Jun 19, 2015 at 01:23:48PM +0100, Alex Benn=E9e wrote:
-> >> This adds support for userspace to control the HW debug registers =
-for
-> >> guest debug. In the debug ioctl we copy the IMPDEF defined number =
-of
-> >
-> > s/defined//
-> >
-> >> registers into a new register set called host_debug_state. There i=
-s now
-> >> a new vcpu parameter called debug_ptr which selects which register=
- set
-> >> is to copied into the real registers when world switch occurs.
-> >
-> > But this patch doesn't seem to add the debug_ptr field?
->=20
-> Oops, yes the comment belongs to the previous patch.
->=20
-> >
-> > s/to//
-> >
-> >>=20
-> >> I've moved some helper functions into the hw_breakpoint.h header f=
-or
-> >> re-use.
-> >>=20
-> >> As with single step we need to tweak the guest registers to enable=
- the
-> >> exceptions so we need to save and restore those bits.
-> >>=20
-> >> Two new capabilities have been added to the KVM_EXTENSION ioctl to=
- allow
-> >> userspace to query the number of hardware break and watch points
-> >> available on the host hardware.
-> >>=20
-> >> Signed-off-by: Alex Benn=E9e <alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-> >>=20
-> >> ---
-> >> v2
-> >>    - switched to C setup
-> >>    - replace host debug registers directly into context
-> >>    - minor tweak to api docs
-> >>    - setup right register for debug
-> >>    - add FAR_EL2 to debug exit structure
-> >>    - add support for trapping debug register access
-> >> v3
-> >>    - remove stray trace statement
-> >>    - fix spacing around operators (various)
-> >>    - clean-up usage of trap_debug
-> >>    - introduce debug_ptr, replace excessive memcpy stuff
-> >>    - don't use memcpy in ioctl, just assign
-> >>    - update cap ioctl documentation
-> >>    - reword a number comments
-> >>    - rename host_debug_state->external_debug_state
-> >> v4
-> >>    - use the new u32/u64 split debug_ptr approach
-> >>    - fix some wording/comments
-> >> v5
-> >>    - don't set MDSCR_EL1.KDE (not needed)
-> >> v6
-> >>    - update wording given change in commentary
-> >>    - KVM_GUESTDBG_USE_HW_BP->KVM_GUESTDBG_USE_HW
-> >> ---
-> >>  Documentation/virtual/kvm/api.txt      |  7 ++++++-
-> >>  arch/arm/kvm/arm.c                     |  7 +++++++
-> >>  arch/arm64/include/asm/hw_breakpoint.h | 12 +++++++++++
-> >>  arch/arm64/include/asm/kvm_host.h      |  6 +++++-
-> >>  arch/arm64/kernel/hw_breakpoint.c      | 12 -----------
-> >>  arch/arm64/kvm/debug.c                 | 37 +++++++++++++++++++++=
-++++++++-----
-> >>  arch/arm64/kvm/handle_exit.c           |  6 ++++++
-> >>  arch/arm64/kvm/reset.c                 | 12 +++++++++++
-> >>  include/uapi/linux/kvm.h               |  2 ++
-> >>  9 files changed, 82 insertions(+), 19 deletions(-)
-> >>=20
-> >> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/vir=
-tual/kvm/api.txt
-> >> index 33c8143..ada57df 100644
-> >> --- a/Documentation/virtual/kvm/api.txt
-> >> +++ b/Documentation/virtual/kvm/api.txt
-> >> @@ -2668,7 +2668,7 @@ The top 16 bits of the control field are arc=
-hitecture specific control
-> >>  flags which can include the following:
-> >> =20
-> >>    - KVM_GUESTDBG_USE_SW_BP:     using software breakpoints [x86, =
-arm64]
-> >> -  - KVM_GUESTDBG_USE_HW_BP:     using hardware breakpoints [x86, =
-s390]
-> >> +  - KVM_GUESTDBG_USE_HW_BP:     using hardware breakpoints [x86, =
-s390, arm64]
-> >>    - KVM_GUESTDBG_INJECT_DB:     inject DB type exception [x86]
-> >>    - KVM_GUESTDBG_INJECT_BP:     inject BP type exception [x86]
-> >>    - KVM_GUESTDBG_EXIT_PENDING:  trigger an immediate guest exit [=
-s390]
-> >> @@ -2683,6 +2683,11 @@ updated to the correct (supplied) values.
-> >>  The second part of the structure is architecture specific and
-> >>  typically contains a set of debug registers.
-> >> =20
-> >> +For arm64 the number of debug registers is implementation defined=
- and
-> >> +can be determined by querying the KVM_CAP_GUEST_DEBUG_HW_BPS and
-> >> +KVM_CAP_GUEST_DEBUG_HW_WPS capabilities which return a positive n=
-umber
-> >> +indicating the number of supported registers.
-> >> +
-> >>  When debug events exit the main run loop with the reason
-> >>  KVM_EXIT_DEBUG with the kvm_debug_exit_arch part of the kvm_run
-> >>  structure containing architecture specific debug information.
-> >> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> >> index 0d17c7b..60c4045 100644
-> >> --- a/arch/arm/kvm/arm.c
-> >> +++ b/arch/arm/kvm/arm.c
-> >> @@ -307,6 +307,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-> >> =20
-> >>  #define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE |    \
-> >>  			    KVM_GUESTDBG_USE_SW_BP | \
-> >> +			    KVM_GUESTDBG_USE_HW | \
-> >>  			    KVM_GUESTDBG_SINGLESTEP)
-> >> =20
-> >>  /**
-> >> @@ -327,6 +328,12 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struc=
-t kvm_vcpu *vcpu,
-> >> =20
-> >>  	if (dbg->control & KVM_GUESTDBG_ENABLE) {
-> >>  		vcpu->guest_debug =3D dbg->control;
-> >> +
-> >> +		/* Hardware assisted Break and Watch points */
-> >> +		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW) {
-> >> +			vcpu->arch.external_debug_state =3D dbg->arch;
-> >> +		}
-> >> +
-> >>  	} else {
-> >>  		/* If not enabled clear all flags */
-> >>  		vcpu->guest_debug =3D 0;
-> >> diff --git a/arch/arm64/include/asm/hw_breakpoint.h b/arch/arm64/i=
-nclude/asm/hw_breakpoint.h
-> >> index 52b484b..c450552 100644
-> >> --- a/arch/arm64/include/asm/hw_breakpoint.h
-> >> +++ b/arch/arm64/include/asm/hw_breakpoint.h
-> >> @@ -130,6 +130,18 @@ static inline void ptrace_hw_copy_thread(stru=
-ct task_struct *task)
-> >>  }
-> >>  #endif
-> >> =20
-> >> +/* Determine number of BRP registers available. */
-> >> +static inline int get_num_brps(void)
-> >> +{
-> >> +	return ((read_cpuid(ID_AA64DFR0_EL1) >> 12) & 0xf) + 1;
-> >> +}
-> >> +
-> >> +/* Determine number of WRP registers available. */
-> >> +static inline int get_num_wrps(void)
-> >> +{
-> >> +	return ((read_cpuid(ID_AA64DFR0_EL1) >> 20) & 0xf) + 1;
-> >> +}
-> >> +
-> >>  extern struct pmu perf_ops_bp;
-> >> =20
-> >>  #endif	/* __KERNEL__ */
-> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/includ=
-e/asm/kvm_host.h
-> >> index 9697daf..0a3ee7b 100644
-> >> --- a/arch/arm64/include/asm/kvm_host.h
-> >> +++ b/arch/arm64/include/asm/kvm_host.h
-> >> @@ -116,13 +116,17 @@ struct kvm_vcpu_arch {
-> >>  	 * debugging the guest from the host and to maintain separate ho=
-st and
-> >>  	 * guest state during world switches. vcpu_debug_state are the d=
-ebug
-> >>  	 * registers of the vcpu as the guest sees them.  host_debug_sta=
-te are
-> >> -	 * the host registers which are saved and restored during world =
-switches.
-> >> +	 * the host registers which are saved and restored during
-> >> +	 * world switches. external_debug_state contains the debug
-> >> +	 * values we want to debugging the guest. This is set via the
-> >
-> > nit: s/debugging/debug/
-> >
-> >> +	 * KVM_SET_GUEST_DEBUG ioctl.
-> >>  	 *
-> >>  	 * debug_ptr points to the set of debug registers that should be=
- loaded
-> >>  	 * onto the hardware when running the guest.
-> >>  	 */
-> >>  	struct kvm_guest_debug_arch *debug_ptr;
-> >>  	struct kvm_guest_debug_arch vcpu_debug_state;
-> >> +	struct kvm_guest_debug_arch external_debug_state;
-> >> =20
-> >>  	/* Pointer to host CPU context */
-> >>  	kvm_cpu_context_t *host_cpu_context;
-> >> diff --git a/arch/arm64/kernel/hw_breakpoint.c b/arch/arm64/kernel=
-/hw_breakpoint.c
-> >> index e7d934d..3a41bbf 100644
-> >> --- a/arch/arm64/kernel/hw_breakpoint.c
-> >> +++ b/arch/arm64/kernel/hw_breakpoint.c
-> >> @@ -49,18 +49,6 @@ static DEFINE_PER_CPU(int, stepping_kernel_bp);
-> >>  static int core_num_brps;
-> >>  static int core_num_wrps;
-> >> =20
-> >> -/* Determine number of BRP registers available. */
-> >> -static int get_num_brps(void)
-> >> -{
-> >> -	return ((read_cpuid(ID_AA64DFR0_EL1) >> 12) & 0xf) + 1;
-> >> -}
-> >> -
-> >> -/* Determine number of WRP registers available. */
-> >> -static int get_num_wrps(void)
-> >> -{
-> >> -	return ((read_cpuid(ID_AA64DFR0_EL1) >> 20) & 0xf) + 1;
-> >> -}
-> >> -
-> >>  int hw_breakpoint_slots(int type)
-> >>  {
-> >>  	/*
-> >> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> >> index d439eb8..b287bbc 100644
-> >> --- a/arch/arm64/kvm/debug.c
-> >> +++ b/arch/arm64/kvm/debug.c
-> >> @@ -96,10 +96,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
-> >>  				MDCR_EL2_TDRA |
-> >>  				MDCR_EL2_TDOSA);
-> >> =20
-> >> -	/* Trap on access to debug registers? */
-> >> -	if (trap_debug)
-> >> -		vcpu->arch.mdcr_el2 |=3D MDCR_EL2_TDA;
-> >> -
-> >>  	/* Is Guest debugging in effect? */
-> >>  	if (vcpu->guest_debug) {
-> >>  		/* Route all software debug exceptions to EL2 */
-> >> @@ -134,11 +130,42 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vc=
-pu)
-> >>  		} else {
-> >>  			vcpu_sys_reg(vcpu, MDSCR_EL1) &=3D ~DBG_MDSCR_SS;
-> >>  		}
-> >> +
-> >> +		/*
-> >> +		 * HW Breakpoints and watchpoints
-> >> +		 *
-> >> +		 * We simply switch the debug_ptr to point to our new
-> >> +		 * external_debug_state which has been populated by the
-> >> +		 * debug ioctl. The existing KVM_ARM64_DEBUG_DIRTY
-> >> +		 * mechanism ensures the registers are updated on the
-> >> +		 * world switch.
-> >> +		 */
-> >> +		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW) {
-> >> +			/* Enable breakpoints/watchpoints */
-> >> +			vcpu_sys_reg(vcpu, MDSCR_EL1) |=3D DBG_MDSCR_MDE;
-> >> +
-> >> +			vcpu->arch.debug_ptr =3D &vcpu->arch.external_debug_state;
-> >> +			vcpu->arch.debug_flags |=3D KVM_ARM64_DEBUG_DIRTY;
-> >> +			trap_debug =3D true;
-> >> +		}
-> >>  	}
-> >> +
-> >> +	/* Trap debug register access */
-> >> +	if (trap_debug)
-> >> +		vcpu->arch.mdcr_el2 |=3D MDCR_EL2_TDA;
-> >>  }
-> >> =20
-> >>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
-> >>  {
-> >> -	if (vcpu->guest_debug)
-> >> +	if (vcpu->guest_debug) {
-> >>  		restore_guest_debug_regs(vcpu);
-> >> +
-> >> +		/*
-> >> +		 * If we were using HW debug we need to restore the
-> >> +		 * debug_ptr to the guest debug state.
-> >> +		 */
-> >> +		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW)
-> >> +			vcpu->arch.debug_ptr =3D &vcpu->arch.vcpu_debug_state;
-> >
-> > I still think this would be more cleanly done in the setup_debug
-> > function, but ok:
->=20
-> I don't follow, setup_debug is called before we enter KVM. It's prett=
-y
-> light when no debugging is being done so this ensure we leave state h=
-ow
-> we would like it when we stop debugging.
->=20
-> I can move it to an else leg in setup if you really want.
->=20
-I just feel like whenever you enter the guest you setup the state you
-want for your guest and then when reading the code you never have to
-worry about "did I set the pointer back correctly last time it exited",
-but thinking about your response, I guess that's an extra store on each
-world-switch, so theoretically that may be a bit more overhead (on top
-of the hundreds other stores and spinlocks we take and stuff).
+Hi,
 
-If you prefer, leave it like this, but consider adding a
-BUG_ON(!guest_debugging && debug_ptr !=3D &vcpu->arch.vcpu_debug_state)=
- in
-the setup function...
+[sorry for reviving this thread late]
 
-I'm probably being paranoid.
+On Tue, Jun 09, 2015 at 12:24:13PM +0100, Peter Maydell wrote:
+> On 9 June 2015 at 11:52, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> > On 08/06/15 11:52, Peter Maydell wrote:
+> >> On 8 June 2015 at 11:32, Igor Mammedov <imammedo@redhat.com> wrote:
+> >>> On Thu, 4 Jun 2015 18:17:39 +0100
+> >>> Peter Maydell <peter.maydell@linaro.org> wrote:
+> >>>> On 4 June 2015 at 17:40, Shlomo Pongratz <shlomopongratz@gmail.com> wrote:
+> >>>>  In order for it to work correctly we must use MPIDR values in
+> >>>>  the device tree which match the MPIDR values the kernel has picked
+> >>>>  for the vcpus, so ask KVM what those values are.
+> >>
+> >>> Could we set QEMU's generated mpidr in kernel instead of pulling it from kernel,
+> >>> like we do with APIC ID in x86 and fix kernel not to reset it its own value
+> >>> (i.e. untie mpidr from vcpuid)?
+> >>>
+> >>> Then later we could move setting mpidr from kvm_arch_init_vcpu() into
+> >>> board code which should be setting it, since it knows/defines what topology it has.
+> >>
+> >> This is a question better asked on the kvmarm list (which I have cc'd),
+> >> because that is where the kernel folks hang out...
+> >
+> > Care to provide some context? Why is this required?
+> 
+> The device tree spec says we have to tell the guest kernel the
+> affinity information for each CPU, in the reg field of the CPU node.
+> This device tree blob is created by userspace; the MPIDR the guest
+> actually reads is currently created by the kernel. The kernel's
+> vgic v3 code may also make assumptions about vcpu_id => affinity
+> mappings, I'm not sure.
+> 
+> In current code:
+>  * the kernel has an opinion about vcpu_id => MPIDR mappings
+>  * QEMU does too, but it's not the same!
+>    (luckily for 8 or fewer CPUs they agree, but this will not
+>    do for GICv3 support)
+> 
+> So either:
+>  * QEMU needs to tell the kernel the MPIDR for each vCPU
 
+Does this option work for all configurations?  What if you're running on
+a hardware with two clusters [8, 8] and QEMU asks KVM for a [12, 2]
+configuration, for example.  Will it not be impossible for KVM to
+maintain correct semantics for coherency guarantees across what seems to
+the guest to be the same cluster, but really is two different clusters?
+
+Of course, KVM can deny an unsupported configuration, but I am wondering
+if we really think anybody will care about the 'model such specific
+hardware' aspect with KVM, or if we should only consider the 'I want a
+VM with x VCPUs' scenario, in which case the second option below seems
+simpler to me.
+
+Are there any concerns to think about wrt. migration here as well?
+
+Thanks,
 -Christoffer
+
+>  * QEMU needs to ask the kernel the MPIDR for each vCPU
+> 
+> Which is better? The latter is simpler and will work with
+> existing kernels. The former would let us (for instance)
+> use KVM when we're modelling (real world) boards which have
+> particular cluster configurations (which might not match the
+> kernel's current simplistic "always 16 CPUs at Aff0" setup).
+> 
+> thanks
+> -- PMM
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
