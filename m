@@ -1,28 +1,29 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v6 10/12] KVM: arm64: guest debug,
- HW assisted debug support
-Date: Thu, 25 Jun 2015 07:38:33 +0100
-Message-ID: <87mvzoxpg6.fsf@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v6 09/12] KVM: arm64: introduce vcpu->arch.debug_ptr
+Date: Thu, 25 Jun 2015 09:46:16 +0200
+Message-ID: <20150625074616.GA28244@cbox>
 References: <1434716630-18260-1-git-send-email-alex.bennee@linaro.org>
- <1434716630-18260-11-git-send-email-alex.bennee@linaro.org>
- <20150624202216.GE22785@cbox>
+ <1434716630-18260-10-git-send-email-alex.bennee@linaro.org>
+ <20150624114236.GB22785@cbox> <87r3p0xpqc.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C29E756F59
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2015 02:26:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4952456F6B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2015 03:35:20 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vg7Sd3AWuhyn for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Jun 2015 02:26:56 -0400 (EDT)
-Received: from mail-wg0-f47.google.com (mail-wg0-f47.google.com [74.125.82.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6578F56F52
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2015 02:26:56 -0400 (EDT)
-Received: by wgbhy7 with SMTP id hy7so53699033wgb.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jun 2015 23:37:54 -0700 (PDT)
-In-reply-to: <20150624202216.GE22785@cbox>
+ with ESMTP id HN-d070GxceZ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Jun 2015 03:35:19 -0400 (EDT)
+Received: from mail-lb0-f170.google.com (mail-lb0-f170.google.com
+ [209.85.217.170])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D835E56F6A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2015 03:35:18 -0400 (EDT)
+Received: by lbbpo10 with SMTP id po10so40173425lbb.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2015 00:46:16 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <87r3p0xpqc.fsf@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,182 +33,245 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Peter Zijlstra <peterz@infradead.org>, jan.kiszka@siemens.com, Will Deacon <will.deacon@arm.com>, Ingo Molnar <mingo@kernel.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, Jonathan Corbet <corbet@lwn.net>, kvmarm@lists.cs.columbia.edu, Gleb Natapov <gleb@kernel.org>, zhichao.huang@linaro.org, Catalin Marinas <catalin.marinas@arm.com>, bp@suse.de, marc.zyngier@arm.com, r65777@freescale.com, linux-arm-kernel@lists.infradead.org, "open list:ABI/API" <linux-api@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, pbonzini@redhat.com
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: kvm@vger.kernel.org, jan.kiszka@siemens.com, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, Richard Weinberger <richard@nod.at>, Gleb Natapov <gleb@kernel.org>, zhichao.huang@linaro.org, Catalin Marinas <catalin.marinas@arm.com>, bp@suse.de, marc.zyngier@arm.com, Andre Przywara <andre.przywara@arm.com>, r65777@freescale.com, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CkNocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4gd3JpdGVzOgoK
-PiBPbiBGcmksIEp1biAxOSwgMjAxNSBhdCAwMToyMzo0OFBNICswMTAwLCBBbGV4IEJlbm7DqWUg
-d3JvdGU6Cj4+IFRoaXMgYWRkcyBzdXBwb3J0IGZvciB1c2Vyc3BhY2UgdG8gY29udHJvbCB0aGUg
-SFcgZGVidWcgcmVnaXN0ZXJzIGZvcgo+PiBndWVzdCBkZWJ1Zy4gSW4gdGhlIGRlYnVnIGlvY3Rs
-IHdlIGNvcHkgdGhlIElNUERFRiBkZWZpbmVkIG51bWJlciBvZgo+Cj4gcy9kZWZpbmVkLy8KPgo+
-PiByZWdpc3RlcnMgaW50byBhIG5ldyByZWdpc3RlciBzZXQgY2FsbGVkIGhvc3RfZGVidWdfc3Rh
-dGUuIFRoZXJlIGlzIG5vdwo+PiBhIG5ldyB2Y3B1IHBhcmFtZXRlciBjYWxsZWQgZGVidWdfcHRy
-IHdoaWNoIHNlbGVjdHMgd2hpY2ggcmVnaXN0ZXIgc2V0Cj4+IGlzIHRvIGNvcGllZCBpbnRvIHRo
-ZSByZWFsIHJlZ2lzdGVycyB3aGVuIHdvcmxkIHN3aXRjaCBvY2N1cnMuCj4KPiBCdXQgdGhpcyBw
-YXRjaCBkb2Vzbid0IHNlZW0gdG8gYWRkIHRoZSBkZWJ1Z19wdHIgZmllbGQ/CgpPb3BzLCB5ZXMg
-dGhlIGNvbW1lbnQgYmVsb25ncyB0byB0aGUgcHJldmlvdXMgcGF0Y2guCgo+Cj4gcy90by8vCj4K
-Pj4gCj4+IEkndmUgbW92ZWQgc29tZSBoZWxwZXIgZnVuY3Rpb25zIGludG8gdGhlIGh3X2JyZWFr
-cG9pbnQuaCBoZWFkZXIgZm9yCj4+IHJlLXVzZS4KPj4gCj4+IEFzIHdpdGggc2luZ2xlIHN0ZXAg
-d2UgbmVlZCB0byB0d2VhayB0aGUgZ3Vlc3QgcmVnaXN0ZXJzIHRvIGVuYWJsZSB0aGUKPj4gZXhj
-ZXB0aW9ucyBzbyB3ZSBuZWVkIHRvIHNhdmUgYW5kIHJlc3RvcmUgdGhvc2UgYml0cy4KPj4gCj4+
-IFR3byBuZXcgY2FwYWJpbGl0aWVzIGhhdmUgYmVlbiBhZGRlZCB0byB0aGUgS1ZNX0VYVEVOU0lP
-TiBpb2N0bCB0byBhbGxvdwo+PiB1c2Vyc3BhY2UgdG8gcXVlcnkgdGhlIG51bWJlciBvZiBoYXJk
-d2FyZSBicmVhayBhbmQgd2F0Y2ggcG9pbnRzCj4+IGF2YWlsYWJsZSBvbiB0aGUgaG9zdCBoYXJk
-d2FyZS4KPj4gCj4+IFNpZ25lZC1vZmYtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGlu
-YXJvLm9yZz4KPj4gCj4+IC0tLQo+PiB2Mgo+PiAgICAtIHN3aXRjaGVkIHRvIEMgc2V0dXAKPj4g
-ICAgLSByZXBsYWNlIGhvc3QgZGVidWcgcmVnaXN0ZXJzIGRpcmVjdGx5IGludG8gY29udGV4dAo+
-PiAgICAtIG1pbm9yIHR3ZWFrIHRvIGFwaSBkb2NzCj4+ICAgIC0gc2V0dXAgcmlnaHQgcmVnaXN0
-ZXIgZm9yIGRlYnVnCj4+ICAgIC0gYWRkIEZBUl9FTDIgdG8gZGVidWcgZXhpdCBzdHJ1Y3R1cmUK
-Pj4gICAgLSBhZGQgc3VwcG9ydCBmb3IgdHJhcHBpbmcgZGVidWcgcmVnaXN0ZXIgYWNjZXNzCj4+
-IHYzCj4+ICAgIC0gcmVtb3ZlIHN0cmF5IHRyYWNlIHN0YXRlbWVudAo+PiAgICAtIGZpeCBzcGFj
-aW5nIGFyb3VuZCBvcGVyYXRvcnMgKHZhcmlvdXMpCj4+ICAgIC0gY2xlYW4tdXAgdXNhZ2Ugb2Yg
-dHJhcF9kZWJ1Zwo+PiAgICAtIGludHJvZHVjZSBkZWJ1Z19wdHIsIHJlcGxhY2UgZXhjZXNzaXZl
-IG1lbWNweSBzdHVmZgo+PiAgICAtIGRvbid0IHVzZSBtZW1jcHkgaW4gaW9jdGwsIGp1c3QgYXNz
-aWduCj4+ICAgIC0gdXBkYXRlIGNhcCBpb2N0bCBkb2N1bWVudGF0aW9uCj4+ICAgIC0gcmV3b3Jk
-IGEgbnVtYmVyIGNvbW1lbnRzCj4+ICAgIC0gcmVuYW1lIGhvc3RfZGVidWdfc3RhdGUtPmV4dGVy
-bmFsX2RlYnVnX3N0YXRlCj4+IHY0Cj4+ICAgIC0gdXNlIHRoZSBuZXcgdTMyL3U2NCBzcGxpdCBk
-ZWJ1Z19wdHIgYXBwcm9hY2gKPj4gICAgLSBmaXggc29tZSB3b3JkaW5nL2NvbW1lbnRzCj4+IHY1
-Cj4+ICAgIC0gZG9uJ3Qgc2V0IE1EU0NSX0VMMS5LREUgKG5vdCBuZWVkZWQpCj4+IHY2Cj4+ICAg
-IC0gdXBkYXRlIHdvcmRpbmcgZ2l2ZW4gY2hhbmdlIGluIGNvbW1lbnRhcnkKPj4gICAgLSBLVk1f
-R1VFU1REQkdfVVNFX0hXX0JQLT5LVk1fR1VFU1REQkdfVVNFX0hXCj4+IC0tLQo+PiAgRG9jdW1l
-bnRhdGlvbi92aXJ0dWFsL2t2bS9hcGkudHh0ICAgICAgfCAgNyArKysrKystCj4+ICBhcmNoL2Fy
-bS9rdm0vYXJtLmMgICAgICAgICAgICAgICAgICAgICB8ICA3ICsrKysrKysKPj4gIGFyY2gvYXJt
-NjQvaW5jbHVkZS9hc20vaHdfYnJlYWtwb2ludC5oIHwgMTIgKysrKysrKysrKysKPj4gIGFyY2gv
-YXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCAgICAgIHwgIDYgKysrKystCj4+ICBhcmNoL2Fy
-bTY0L2tlcm5lbC9od19icmVha3BvaW50LmMgICAgICB8IDEyIC0tLS0tLS0tLS0tCj4+ICBhcmNo
-L2FybTY0L2t2bS9kZWJ1Zy5jICAgICAgICAgICAgICAgICB8IDM3ICsrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrLS0tLS0KPj4gIGFyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMgICAgICAg
-ICAgIHwgIDYgKysrKysrCj4+ICBhcmNoL2FybTY0L2t2bS9yZXNldC5jICAgICAgICAgICAgICAg
-ICB8IDEyICsrKysrKysrKysrCj4+ICBpbmNsdWRlL3VhcGkvbGludXgva3ZtLmggICAgICAgICAg
-ICAgICB8ICAyICsrCj4+ICA5IGZpbGVzIGNoYW5nZWQsIDgyIGluc2VydGlvbnMoKyksIDE5IGRl
-bGV0aW9ucygtKQo+PiAKPj4gZGlmZiAtLWdpdCBhL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0v
-YXBpLnR4dCBiL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4dAo+PiBpbmRleCAzM2M4
-MTQzLi5hZGE1N2RmIDEwMDY0NAo+PiAtLS0gYS9Eb2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL2Fw
-aS50eHQKPj4gKysrIGIvRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2bS9hcGkudHh0Cj4+IEBAIC0y
-NjY4LDcgKzI2NjgsNyBAQCBUaGUgdG9wIDE2IGJpdHMgb2YgdGhlIGNvbnRyb2wgZmllbGQgYXJl
-IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBjb250cm9sCj4+ICBmbGFncyB3aGljaCBjYW4gaW5jbHVk
-ZSB0aGUgZm9sbG93aW5nOgo+PiAgCj4+ICAgIC0gS1ZNX0dVRVNUREJHX1VTRV9TV19CUDogICAg
-IHVzaW5nIHNvZnR3YXJlIGJyZWFrcG9pbnRzIFt4ODYsIGFybTY0XQo+PiAtICAtIEtWTV9HVUVT
-VERCR19VU0VfSFdfQlA6ICAgICB1c2luZyBoYXJkd2FyZSBicmVha3BvaW50cyBbeDg2LCBzMzkw
-XQo+PiArICAtIEtWTV9HVUVTVERCR19VU0VfSFdfQlA6ICAgICB1c2luZyBoYXJkd2FyZSBicmVh
-a3BvaW50cyBbeDg2LCBzMzkwLCBhcm02NF0KPj4gICAgLSBLVk1fR1VFU1REQkdfSU5KRUNUX0RC
-OiAgICAgaW5qZWN0IERCIHR5cGUgZXhjZXB0aW9uIFt4ODZdCj4+ICAgIC0gS1ZNX0dVRVNUREJH
-X0lOSkVDVF9CUDogICAgIGluamVjdCBCUCB0eXBlIGV4Y2VwdGlvbiBbeDg2XQo+PiAgICAtIEtW
-TV9HVUVTVERCR19FWElUX1BFTkRJTkc6ICB0cmlnZ2VyIGFuIGltbWVkaWF0ZSBndWVzdCBleGl0
-IFtzMzkwXQo+PiBAQCAtMjY4Myw2ICsyNjgzLDExIEBAIHVwZGF0ZWQgdG8gdGhlIGNvcnJlY3Qg
-KHN1cHBsaWVkKSB2YWx1ZXMuCj4+ICBUaGUgc2Vjb25kIHBhcnQgb2YgdGhlIHN0cnVjdHVyZSBp
-cyBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgYW5kCj4+ICB0eXBpY2FsbHkgY29udGFpbnMgYSBzZXQg
-b2YgZGVidWcgcmVnaXN0ZXJzLgo+PiAgCj4+ICtGb3IgYXJtNjQgdGhlIG51bWJlciBvZiBkZWJ1
-ZyByZWdpc3RlcnMgaXMgaW1wbGVtZW50YXRpb24gZGVmaW5lZCBhbmQKPj4gK2NhbiBiZSBkZXRl
-cm1pbmVkIGJ5IHF1ZXJ5aW5nIHRoZSBLVk1fQ0FQX0dVRVNUX0RFQlVHX0hXX0JQUyBhbmQKPj4g
-K0tWTV9DQVBfR1VFU1RfREVCVUdfSFdfV1BTIGNhcGFiaWxpdGllcyB3aGljaCByZXR1cm4gYSBw
-b3NpdGl2ZSBudW1iZXIKPj4gK2luZGljYXRpbmcgdGhlIG51bWJlciBvZiBzdXBwb3J0ZWQgcmVn
-aXN0ZXJzLgo+PiArCj4+ICBXaGVuIGRlYnVnIGV2ZW50cyBleGl0IHRoZSBtYWluIHJ1biBsb29w
-IHdpdGggdGhlIHJlYXNvbgo+PiAgS1ZNX0VYSVRfREVCVUcgd2l0aCB0aGUga3ZtX2RlYnVnX2V4
-aXRfYXJjaCBwYXJ0IG9mIHRoZSBrdm1fcnVuCj4+ICBzdHJ1Y3R1cmUgY29udGFpbmluZyBhcmNo
-aXRlY3R1cmUgc3BlY2lmaWMgZGVidWcgaW5mb3JtYXRpb24uCj4+IGRpZmYgLS1naXQgYS9hcmNo
-L2FybS9rdm0vYXJtLmMgYi9hcmNoL2FybS9rdm0vYXJtLmMKPj4gaW5kZXggMGQxN2M3Yi4uNjBj
-NDA0NSAxMDA2NDQKPj4gLS0tIGEvYXJjaC9hcm0va3ZtL2FybS5jCj4+ICsrKyBiL2FyY2gvYXJt
-L2t2bS9hcm0uYwo+PiBAQCAtMzA3LDYgKzMwNyw3IEBAIHZvaWQga3ZtX2FyY2hfdmNwdV9wdXQo
-c3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+PiAgCj4+ICAjZGVmaW5lIEtWTV9HVUVTVERCR19WQUxJ
-RF9NQVNLIChLVk1fR1VFU1REQkdfRU5BQkxFIHwgICAgXAo+PiAgCQkJICAgIEtWTV9HVUVTVERC
-R19VU0VfU1dfQlAgfCBcCj4+ICsJCQkgICAgS1ZNX0dVRVNUREJHX1VTRV9IVyB8IFwKPj4gIAkJ
-CSAgICBLVk1fR1VFU1REQkdfU0lOR0xFU1RFUCkKPj4gIAo+PiAgLyoqCj4+IEBAIC0zMjcsNiAr
-MzI4LDEyIEBAIGludCBrdm1fYXJjaF92Y3B1X2lvY3RsX3NldF9ndWVzdF9kZWJ1ZyhzdHJ1Y3Qg
-a3ZtX3ZjcHUgKnZjcHUsCj4+ICAKPj4gIAlpZiAoZGJnLT5jb250cm9sICYgS1ZNX0dVRVNUREJH
-X0VOQUJMRSkgewo+PiAgCQl2Y3B1LT5ndWVzdF9kZWJ1ZyA9IGRiZy0+Y29udHJvbDsKPj4gKwo+
-PiArCQkvKiBIYXJkd2FyZSBhc3Npc3RlZCBCcmVhayBhbmQgV2F0Y2ggcG9pbnRzICovCj4+ICsJ
-CWlmICh2Y3B1LT5ndWVzdF9kZWJ1ZyAmIEtWTV9HVUVTVERCR19VU0VfSFcpIHsKPj4gKwkJCXZj
-cHUtPmFyY2guZXh0ZXJuYWxfZGVidWdfc3RhdGUgPSBkYmctPmFyY2g7Cj4+ICsJCX0KPj4gKwo+
-PiAgCX0gZWxzZSB7Cj4+ICAJCS8qIElmIG5vdCBlbmFibGVkIGNsZWFyIGFsbCBmbGFncyAqLwo+
-PiAgCQl2Y3B1LT5ndWVzdF9kZWJ1ZyA9IDA7Cj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2lu
-Y2x1ZGUvYXNtL2h3X2JyZWFrcG9pbnQuaCBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20vaHdfYnJl
-YWtwb2ludC5oCj4+IGluZGV4IDUyYjQ4NGIuLmM0NTA1NTIgMTAwNjQ0Cj4+IC0tLSBhL2FyY2gv
-YXJtNjQvaW5jbHVkZS9hc20vaHdfYnJlYWtwb2ludC5oCj4+ICsrKyBiL2FyY2gvYXJtNjQvaW5j
-bHVkZS9hc20vaHdfYnJlYWtwb2ludC5oCj4+IEBAIC0xMzAsNiArMTMwLDE4IEBAIHN0YXRpYyBp
-bmxpbmUgdm9pZCBwdHJhY2VfaHdfY29weV90aHJlYWQoc3RydWN0IHRhc2tfc3RydWN0ICp0YXNr
-KQo+PiAgfQo+PiAgI2VuZGlmCj4+ICAKPj4gKy8qIERldGVybWluZSBudW1iZXIgb2YgQlJQIHJl
-Z2lzdGVycyBhdmFpbGFibGUuICovCj4+ICtzdGF0aWMgaW5saW5lIGludCBnZXRfbnVtX2JycHMo
-dm9pZCkKPj4gK3sKPj4gKwlyZXR1cm4gKChyZWFkX2NwdWlkKElEX0FBNjRERlIwX0VMMSkgPj4g
-MTIpICYgMHhmKSArIDE7Cj4+ICt9Cj4+ICsKPj4gKy8qIERldGVybWluZSBudW1iZXIgb2YgV1JQ
-IHJlZ2lzdGVycyBhdmFpbGFibGUuICovCj4+ICtzdGF0aWMgaW5saW5lIGludCBnZXRfbnVtX3dy
-cHModm9pZCkKPj4gK3sKPj4gKwlyZXR1cm4gKChyZWFkX2NwdWlkKElEX0FBNjRERlIwX0VMMSkg
-Pj4gMjApICYgMHhmKSArIDE7Cj4+ICt9Cj4+ICsKPj4gIGV4dGVybiBzdHJ1Y3QgcG11IHBlcmZf
-b3BzX2JwOwo+PiAgCj4+ICAjZW5kaWYJLyogX19LRVJORUxfXyAqLwo+PiBkaWZmIC0tZ2l0IGEv
-YXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIGIvYXJjaC9hcm02NC9pbmNsdWRlL2Fz
-bS9rdm1faG9zdC5oCj4+IGluZGV4IDk2OTdkYWYuLjBhM2VlN2IgMTAwNjQ0Cj4+IC0tLSBhL2Fy
-Y2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+PiArKysgYi9hcmNoL2FybTY0L2luY2x1
-ZGUvYXNtL2t2bV9ob3N0LmgKPj4gQEAgLTExNiwxMyArMTE2LDE3IEBAIHN0cnVjdCBrdm1fdmNw
-dV9hcmNoIHsKPj4gIAkgKiBkZWJ1Z2dpbmcgdGhlIGd1ZXN0IGZyb20gdGhlIGhvc3QgYW5kIHRv
-IG1haW50YWluIHNlcGFyYXRlIGhvc3QgYW5kCj4+ICAJICogZ3Vlc3Qgc3RhdGUgZHVyaW5nIHdv
-cmxkIHN3aXRjaGVzLiB2Y3B1X2RlYnVnX3N0YXRlIGFyZSB0aGUgZGVidWcKPj4gIAkgKiByZWdp
-c3RlcnMgb2YgdGhlIHZjcHUgYXMgdGhlIGd1ZXN0IHNlZXMgdGhlbS4gIGhvc3RfZGVidWdfc3Rh
-dGUgYXJlCj4+IC0JICogdGhlIGhvc3QgcmVnaXN0ZXJzIHdoaWNoIGFyZSBzYXZlZCBhbmQgcmVz
-dG9yZWQgZHVyaW5nIHdvcmxkIHN3aXRjaGVzLgo+PiArCSAqIHRoZSBob3N0IHJlZ2lzdGVycyB3
-aGljaCBhcmUgc2F2ZWQgYW5kIHJlc3RvcmVkIGR1cmluZwo+PiArCSAqIHdvcmxkIHN3aXRjaGVz
-LiBleHRlcm5hbF9kZWJ1Z19zdGF0ZSBjb250YWlucyB0aGUgZGVidWcKPj4gKwkgKiB2YWx1ZXMg
-d2Ugd2FudCB0byBkZWJ1Z2dpbmcgdGhlIGd1ZXN0LiBUaGlzIGlzIHNldCB2aWEgdGhlCj4KPiBu
-aXQ6IHMvZGVidWdnaW5nL2RlYnVnLwo+Cj4+ICsJICogS1ZNX1NFVF9HVUVTVF9ERUJVRyBpb2N0
-bC4KPj4gIAkgKgo+PiAgCSAqIGRlYnVnX3B0ciBwb2ludHMgdG8gdGhlIHNldCBvZiBkZWJ1ZyBy
-ZWdpc3RlcnMgdGhhdCBzaG91bGQgYmUgbG9hZGVkCj4+ICAJICogb250byB0aGUgaGFyZHdhcmUg
-d2hlbiBydW5uaW5nIHRoZSBndWVzdC4KPj4gIAkgKi8KPj4gIAlzdHJ1Y3Qga3ZtX2d1ZXN0X2Rl
-YnVnX2FyY2ggKmRlYnVnX3B0cjsKPj4gIAlzdHJ1Y3Qga3ZtX2d1ZXN0X2RlYnVnX2FyY2ggdmNw
-dV9kZWJ1Z19zdGF0ZTsKPj4gKwlzdHJ1Y3Qga3ZtX2d1ZXN0X2RlYnVnX2FyY2ggZXh0ZXJuYWxf
-ZGVidWdfc3RhdGU7Cj4+ICAKPj4gIAkvKiBQb2ludGVyIHRvIGhvc3QgQ1BVIGNvbnRleHQgKi8K
-Pj4gIAlrdm1fY3B1X2NvbnRleHRfdCAqaG9zdF9jcHVfY29udGV4dDsKPj4gZGlmZiAtLWdpdCBh
-L2FyY2gvYXJtNjQva2VybmVsL2h3X2JyZWFrcG9pbnQuYyBiL2FyY2gvYXJtNjQva2VybmVsL2h3
-X2JyZWFrcG9pbnQuYwo+PiBpbmRleCBlN2Q5MzRkLi4zYTQxYmJmIDEwMDY0NAo+PiAtLS0gYS9h
-cmNoL2FybTY0L2tlcm5lbC9od19icmVha3BvaW50LmMKPj4gKysrIGIvYXJjaC9hcm02NC9rZXJu
-ZWwvaHdfYnJlYWtwb2ludC5jCj4+IEBAIC00OSwxOCArNDksNiBAQCBzdGF0aWMgREVGSU5FX1BF
-Ul9DUFUoaW50LCBzdGVwcGluZ19rZXJuZWxfYnApOwo+PiAgc3RhdGljIGludCBjb3JlX251bV9i
-cnBzOwo+PiAgc3RhdGljIGludCBjb3JlX251bV93cnBzOwo+PiAgCj4+IC0vKiBEZXRlcm1pbmUg
-bnVtYmVyIG9mIEJSUCByZWdpc3RlcnMgYXZhaWxhYmxlLiAqLwo+PiAtc3RhdGljIGludCBnZXRf
-bnVtX2JycHModm9pZCkKPj4gLXsKPj4gLQlyZXR1cm4gKChyZWFkX2NwdWlkKElEX0FBNjRERlIw
-X0VMMSkgPj4gMTIpICYgMHhmKSArIDE7Cj4+IC19Cj4+IC0KPj4gLS8qIERldGVybWluZSBudW1i
-ZXIgb2YgV1JQIHJlZ2lzdGVycyBhdmFpbGFibGUuICovCj4+IC1zdGF0aWMgaW50IGdldF9udW1f
-d3Jwcyh2b2lkKQo+PiAtewo+PiAtCXJldHVybiAoKHJlYWRfY3B1aWQoSURfQUE2NERGUjBfRUwx
-KSA+PiAyMCkgJiAweGYpICsgMTsKPj4gLX0KPj4gLQo+PiAgaW50IGh3X2JyZWFrcG9pbnRfc2xv
-dHMoaW50IHR5cGUpCj4+ICB7Cj4+ICAJLyoKPj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3Zt
-L2RlYnVnLmMgYi9hcmNoL2FybTY0L2t2bS9kZWJ1Zy5jCj4+IGluZGV4IGQ0MzllYjguLmIyODdi
-YmMgMTAwNjQ0Cj4+IC0tLSBhL2FyY2gvYXJtNjQva3ZtL2RlYnVnLmMKPj4gKysrIGIvYXJjaC9h
-cm02NC9rdm0vZGVidWcuYwo+PiBAQCAtOTYsMTAgKzk2LDYgQEAgdm9pZCBrdm1fYXJtX3NldHVw
-X2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPj4gIAkJCQlNRENSX0VMMl9URFJBIHwKPj4g
-IAkJCQlNRENSX0VMMl9URE9TQSk7Cj4+ICAKPj4gLQkvKiBUcmFwIG9uIGFjY2VzcyB0byBkZWJ1
-ZyByZWdpc3RlcnM/ICovCj4+IC0JaWYgKHRyYXBfZGVidWcpCj4+IC0JCXZjcHUtPmFyY2gubWRj
-cl9lbDIgfD0gTURDUl9FTDJfVERBOwo+PiAtCj4+ICAJLyogSXMgR3Vlc3QgZGVidWdnaW5nIGlu
-IGVmZmVjdD8gKi8KPj4gIAlpZiAodmNwdS0+Z3Vlc3RfZGVidWcpIHsKPj4gIAkJLyogUm91dGUg
-YWxsIHNvZnR3YXJlIGRlYnVnIGV4Y2VwdGlvbnMgdG8gRUwyICovCj4+IEBAIC0xMzQsMTEgKzEz
-MCw0MiBAQCB2b2lkIGt2bV9hcm1fc2V0dXBfZGVidWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQo+
-PiAgCQl9IGVsc2Ugewo+PiAgCQkJdmNwdV9zeXNfcmVnKHZjcHUsIE1EU0NSX0VMMSkgJj0gfkRC
-R19NRFNDUl9TUzsKPj4gIAkJfQo+PiArCj4+ICsJCS8qCj4+ICsJCSAqIEhXIEJyZWFrcG9pbnRz
-IGFuZCB3YXRjaHBvaW50cwo+PiArCQkgKgo+PiArCQkgKiBXZSBzaW1wbHkgc3dpdGNoIHRoZSBk
-ZWJ1Z19wdHIgdG8gcG9pbnQgdG8gb3VyIG5ldwo+PiArCQkgKiBleHRlcm5hbF9kZWJ1Z19zdGF0
-ZSB3aGljaCBoYXMgYmVlbiBwb3B1bGF0ZWQgYnkgdGhlCj4+ICsJCSAqIGRlYnVnIGlvY3RsLiBU
-aGUgZXhpc3RpbmcgS1ZNX0FSTTY0X0RFQlVHX0RJUlRZCj4+ICsJCSAqIG1lY2hhbmlzbSBlbnN1
-cmVzIHRoZSByZWdpc3RlcnMgYXJlIHVwZGF0ZWQgb24gdGhlCj4+ICsJCSAqIHdvcmxkIHN3aXRj
-aC4KPj4gKwkJICovCj4+ICsJCWlmICh2Y3B1LT5ndWVzdF9kZWJ1ZyAmIEtWTV9HVUVTVERCR19V
-U0VfSFcpIHsKPj4gKwkJCS8qIEVuYWJsZSBicmVha3BvaW50cy93YXRjaHBvaW50cyAqLwo+PiAr
-CQkJdmNwdV9zeXNfcmVnKHZjcHUsIE1EU0NSX0VMMSkgfD0gREJHX01EU0NSX01ERTsKPj4gKwo+
-PiArCQkJdmNwdS0+YXJjaC5kZWJ1Z19wdHIgPSAmdmNwdS0+YXJjaC5leHRlcm5hbF9kZWJ1Z19z
-dGF0ZTsKPj4gKwkJCXZjcHUtPmFyY2guZGVidWdfZmxhZ3MgfD0gS1ZNX0FSTTY0X0RFQlVHX0RJ
-UlRZOwo+PiArCQkJdHJhcF9kZWJ1ZyA9IHRydWU7Cj4+ICsJCX0KPj4gIAl9Cj4+ICsKPj4gKwkv
-KiBUcmFwIGRlYnVnIHJlZ2lzdGVyIGFjY2VzcyAqLwo+PiArCWlmICh0cmFwX2RlYnVnKQo+PiAr
-CQl2Y3B1LT5hcmNoLm1kY3JfZWwyIHw9IE1EQ1JfRUwyX1REQTsKPj4gIH0KPj4gIAo+PiAgdm9p
-ZCBrdm1fYXJtX2NsZWFyX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPj4gIHsKPj4gLQlp
-ZiAodmNwdS0+Z3Vlc3RfZGVidWcpCj4+ICsJaWYgKHZjcHUtPmd1ZXN0X2RlYnVnKSB7Cj4+ICAJ
-CXJlc3RvcmVfZ3Vlc3RfZGVidWdfcmVncyh2Y3B1KTsKPj4gKwo+PiArCQkvKgo+PiArCQkgKiBJ
-ZiB3ZSB3ZXJlIHVzaW5nIEhXIGRlYnVnIHdlIG5lZWQgdG8gcmVzdG9yZSB0aGUKPj4gKwkJICog
-ZGVidWdfcHRyIHRvIHRoZSBndWVzdCBkZWJ1ZyBzdGF0ZS4KPj4gKwkJICovCj4+ICsJCWlmICh2
-Y3B1LT5ndWVzdF9kZWJ1ZyAmIEtWTV9HVUVTVERCR19VU0VfSFcpCj4+ICsJCQl2Y3B1LT5hcmNo
-LmRlYnVnX3B0ciA9ICZ2Y3B1LT5hcmNoLnZjcHVfZGVidWdfc3RhdGU7Cj4KPiBJIHN0aWxsIHRo
-aW5rIHRoaXMgd291bGQgYmUgbW9yZSBjbGVhbmx5IGRvbmUgaW4gdGhlIHNldHVwX2RlYnVnCj4g
-ZnVuY3Rpb24sIGJ1dCBvazoKCkkgZG9uJ3QgZm9sbG93LCBzZXR1cF9kZWJ1ZyBpcyBjYWxsZWQg
-YmVmb3JlIHdlIGVudGVyIEtWTS4gSXQncyBwcmV0dHkKbGlnaHQgd2hlbiBubyBkZWJ1Z2dpbmcg
-aXMgYmVpbmcgZG9uZSBzbyB0aGlzIGVuc3VyZSB3ZSBsZWF2ZSBzdGF0ZSBob3cKd2Ugd291bGQg
-bGlrZSBpdCB3aGVuIHdlIHN0b3AgZGVidWdnaW5nLgoKSSBjYW4gbW92ZSBpdCB0byBhbiBlbHNl
-IGxlZyBpbiBzZXR1cCBpZiB5b3UgcmVhbGx5IHdhbnQuCgo+Cj4gUmV2aWV3ZWQtYnk6IENocmlz
-dG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4KCi0tIApBbGV4IEJlbm7D
-qWUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJt
-IG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMu
-Y3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On Thu, Jun 25, 2015 at 07:32:27AM +0100, Alex Benn=E9e wrote:
+> =
+
+> Christoffer Dall <christoffer.dall@linaro.org> writes:
+> =
+
+> > On Fri, Jun 19, 2015 at 01:23:47PM +0100, Alex Benn=E9e wrote:
+> >> This introduces a level of indirection for the debug registers. Instead
+> >> of using the sys_regs[] directly we store registers in a structure in
+> >> the vcpu. As we are no longer tied to the layout of the sys_regs[] we
+> >> can make the copies size appropriate for control and value registers.
+> >> =
+
+> >> This also entails updating the sys_regs code to access this new
+> >> structure. Instead of passing a register index we now pass an offset
+> >> into the kvm_guest_debug_arch structure.
+> >> =
+
+> >> We also need to ensure the GET/SET_ONE_REG ioctl operations store the
+> >> registers in their correct location.
+> >> =
+
+> >> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
+> >> =
+
+> >> ---
+> >> v6:
+> >>   - fix up some ws issues
+> >>   - correct clobber info
+> >>   - re-word commentary in kvm_host.h
+> >>   - fix endian access issues for aarch32 fields
+> >>   - revert all KVM_GET/SET_ONE_REG to 64bit (also see ABI update)
+> >> ---
+> <snip>
+> >>  =
+
+> >> +/* Used when AArch32 kernels trap to mapped debug registers */
+> >> +static inline bool trap_debug32(struct kvm_vcpu *vcpu,
+> >> +				const struct sys_reg_params *p,
+> >> +				const struct sys_reg_desc *rd)
+> >> +{
+> >> +	__u32 *r =3D (__u32 *) ((void * )&vcpu->arch.vcpu_debug_state + rd->=
+reg);
+> >
+> > This still looks like something that's asking for BE trouble.  Why not
+> > access the register as a __u64 as it is and then only special-case it
+> > somehow for the XVR thingy...  Perhaps a separate function, see below.
+> >
+> >> +	if (p->is_write) {
+> >> +		*r =3D *vcpu_reg(vcpu, p->Rt);
+> >> +		vcpu->arch.debug_flags |=3D KVM_ARM64_DEBUG_DIRTY;
+> >> +	} else {
+> >> +		*vcpu_reg(vcpu, p->Rt) =3D *r;
+> >> +	}
+> >> +
+> >> +	return true;
+> >> +}
+> >> +
+> >> +static inline bool trap_debug64(struct kvm_vcpu *vcpu,
+> >> +				const struct sys_reg_params *p,
+> >> +				const struct sys_reg_desc *rd)
+> >> +{
+> >> +	__u64 *r =3D (__u64 *) ((void * )&vcpu->arch.vcpu_debug_state + rd->=
+reg);
+> >> +	if (p->is_write) {
+> >> +		*r =3D *vcpu_reg(vcpu, p->Rt);
+> >> +		vcpu->arch.debug_flags |=3D KVM_ARM64_DEBUG_DIRTY;
+> >> +	} else {
+> >> +		*vcpu_reg(vcpu, p->Rt) =3D *r;
+> >> +	}
+> >> +
+> >> +	return true;
+> >> +}
+> >> +
+> >> +static inline void reset_debug64(struct kvm_vcpu *vcpu, const struct =
+sys_reg_desc *rd)
+> >> +{
+> >> +	__u64 *r =3D (__u64 *) ((void * )&vcpu->arch.vcpu_debug_state + rd->=
+reg);
+> >> +	*r =3D rd->val;
+> >> +}
+> >> +
+> >>  static void reset_amair_el1(struct kvm_vcpu *vcpu, const struct sys_r=
+eg_desc *r)
+> >>  {
+> >>  	u64 amair;
+> >> @@ -240,16 +277,20 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, c=
+onst struct sys_reg_desc *r)
+> >>  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+> >>  	/* DBGBVRn_EL1 */						\
+> >>  	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b100),	\
+> >> -	  trap_debug_regs, reset_val, (DBGBVR0_EL1 + (n)), 0 },		\
+> >> +	  trap_debug64, reset_debug64,					\
+> >> +	  offsetof(struct kvm_guest_debug_arch, dbg_bvr[(n)]), 0 },	\
+> >>  	/* DBGBCRn_EL1 */						\
+> >>  	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b101),	\
+> >> -	  trap_debug_regs, reset_val, (DBGBCR0_EL1 + (n)), 0 },		\
+> >> +	  trap_debug64, reset_debug64,					\
+> >> +	  offsetof(struct kvm_guest_debug_arch, dbg_bcr[(n)]), 0},	\
+> >>  	/* DBGWVRn_EL1 */						\
+> >>  	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b110),	\
+> >> -	  trap_debug_regs, reset_val, (DBGWVR0_EL1 + (n)), 0 },		\
+> >> +	  trap_debug64, reset_debug64,					\
+> >> +	  offsetof(struct kvm_guest_debug_arch, dbg_wvr[(n)]), 0 },	\
+> >>  	/* DBGWCRn_EL1 */						\
+> >>  	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b111),	\
+> >> -	  trap_debug_regs, reset_val, (DBGWCR0_EL1 + (n)), 0 }
+> >> +	  trap_debug64, reset_debug64,					\
+> >> +	  offsetof(struct kvm_guest_debug_arch, dbg_wcr[(n)]), 0}
+> >>  =
+
+> >>  /*
+> >>   * Architected system registers.
+> >> @@ -502,42 +543,51 @@ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
+> >>  	}
+> >>  }
+> >>  =
+
+> >> -static bool trap_debug32(struct kvm_vcpu *vcpu,
+> >> -			 const struct sys_reg_params *p,
+> >> -			 const struct sys_reg_desc *r)
+> >> -{
+> >> -	if (p->is_write) {
+> >> -		vcpu_cp14(vcpu, r->reg) =3D *vcpu_reg(vcpu, p->Rt);
+> >> -		vcpu->arch.debug_flags |=3D KVM_ARM64_DEBUG_DIRTY;
+> >> -	} else {
+> >> -		*vcpu_reg(vcpu, p->Rt) =3D vcpu_cp14(vcpu, r->reg);
+> >> -	}
+> >> -
+> >> -	return true;
+> >> -}
+> >> +/* AArch32 debug register mappings
+> >> + *
+> >> + * AArch32 DBGBVRn is mapped to DBGBVRn_EL1[31:0]
+> >> + * AArch32 DBGBXVRn is mapped to DBGBVRn_EL1[63:32]
+> >> + *
+> >> + * All control registers and watchpoint value registers are mapped to
+> >> + * the lower 32 bits of their AArch64 equivalents.
+> >> + *
+> >> + * We also need to ensure we deal with endian differences when
+> >> + * mapping a partial AArch64 register.
+> >> + */
+> >>  =
+
+> >> -#define DBG_BCR_BVR_WCR_WVR(n)					\
+> >> -	/* DBGBVRn */						\
+> >> -	{ Op1( 0), CRn( 0), CRm((n)), Op2( 4), trap_debug32,	\
+> >> -	  NULL, (cp14_DBGBVR0 + (n) * 2) },			\
+> >> -	/* DBGBCRn */						\
+> >> -	{ Op1( 0), CRn( 0), CRm((n)), Op2( 5), trap_debug32,	\
+> >> -	  NULL, (cp14_DBGBCR0 + (n) * 2) },			\
+> >> -	/* DBGWVRn */						\
+> >> -	{ Op1( 0), CRn( 0), CRm((n)), Op2( 6), trap_debug32,	\
+> >> -	  NULL, (cp14_DBGWVR0 + (n) * 2) },			\
+> >> -	/* DBGWCRn */						\
+> >> -	{ Op1( 0), CRn( 0), CRm((n)), Op2( 7), trap_debug32,	\
+> >> -	  NULL, (cp14_DBGWCR0 + (n) * 2) }
+> >> -
+> >> -#define DBGBXVR(n)						\
+> >> -	{ Op1( 0), CRn( 1), CRm((n)), Op2( 1), trap_debug32,	\
+> >> -	  NULL, cp14_DBGBXVR0 + n * 2 }
+> >> +#ifdef CONFIG_CPU_BIG_ENDIAN
+> >> +#define DBG_AA32_LOW_OFFSET	sizeof(__u32)
+> >> +#define DBG_AA32_HIGH_OFFSET	0
+> >> +#else
+> >> +#define DBG_AA32_LOW_OFFSET	0
+> >> +#define DBG_AA32_HIGH_OFFSET	sizeof(__u32)
+> >> +#endif
+> >> +
+> >> +#define DBG_BCR_BVR_WCR_WVR(n)						\
+> >> +	/* DBGBVRn */							\
+> >> +	{ Op1( 0), CRn( 0), CRm((n)), Op2( 4), trap_debug32,		\
+> >> +	  NULL, offsetof(struct kvm_guest_debug_arch, dbg_bvr[(n)])	\
+> >> +	  + DBG_AA32_LOW_OFFSET },					\
+> >> +	/* DBGBCRn */							\
+> >> +	{ Op1( 0), CRn( 0), CRm((n)), Op2( 5), trap_debug32,		\
+> >> +	  NULL, offsetof(struct kvm_guest_debug_arch, dbg_bcr[(n)]) },	\
+> >
+> > why doesn't this need + DBG_AA32_LOW_OFFSET?
+> =
+
+> It didn't before as it was a 32bit register, but of course last version
+> I moved it back to 64 bit and failed to catch that. Thanks!
+> =
+
+> >
+> >> +	/* DBGWVRn */							\
+> >> +	{ Op1( 0), CRn( 0), CRm((n)), Op2( 6), trap_debug32,		\
+> >> +	  NULL, offsetof(struct kvm_guest_debug_arch, dbg_wvr[(n)])	\
+> >> +	  + DBG_AA32_LOW_OFFSET },					\
+> >> +	/* DBGWCRn */							\
+> >> +	{ Op1( 0), CRn( 0), CRm((n)), Op2( 7), trap_debug32,		\
+> >> +	  NULL, offsetof(struct kvm_guest_debug_arch, dbg_wcr[(n)]) }
+> >
+> > ditto ?
+> >
+> > I find this quite hard to read and adding this offset on the separate
+> > line doesn't seem to help.
+> >
+> > Perhaps you should just bite the bullet and have separate accessor
+> > functions for the wvr/wcr/bcr/bvr arrays and just pass the register
+> > number.
+> =
+
+> I suspect it would be cleaner reading for the cost of more boilerplate
+> code. Should I share the access functions between Aarch64/Aarch32 modes
+> as well?
+> =
+
+Not sure I understand the question.
+
+My concern with this code is that a lot of logic happens in these array
+initialization macro lines, and you have to follow through the type of
+the struct and go look in a different place in the file to understand
+how this is really used.  So yes, better to add a bit more boilerplate
+code but have it be clear how things work and keep the BE stuff in the
+function.
+
+You will see when you write it up, but you may be able to do something
+like:
+
+static bool trap_debug32(...)
+{
+}
+
+static bool trap_dbg_wvr(...)
+{
+	... do special stuff ...
+	trap_debug32(with_special_stuff);
+}
+
+but not sure if there's a benefit or not, at least that way the related
+functionality will be more closely associated, but again, you'll see
+when you write it up.
+
+-Christoffer
+
+-Christoffer
