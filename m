@@ -1,277 +1,323 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v6 09/12] KVM: arm64: introduce vcpu->arch.debug_ptr
-Date: Thu, 25 Jun 2015 09:46:16 +0200
-Message-ID: <20150625074616.GA28244@cbox>
+From: Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH v6 10/12] KVM: arm64: guest debug, HW assisted debug
+ support
+Date: Thu, 25 Jun 2015 09:49:34 +0200
+Message-ID: <20150625074934.GB28244@cbox>
 References: <1434716630-18260-1-git-send-email-alex.bennee@linaro.org>
- <1434716630-18260-10-git-send-email-alex.bennee@linaro.org>
- <20150624114236.GB22785@cbox> <87r3p0xpqc.fsf@linaro.org>
+ <1434716630-18260-11-git-send-email-alex.bennee@linaro.org>
+ <20150624202216.GE22785@cbox>
+ <87mvzoxpg6.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4952456F6B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2015 03:35:20 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HN-d070GxceZ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Jun 2015 03:35:19 -0400 (EDT)
-Received: from mail-lb0-f170.google.com (mail-lb0-f170.google.com
- [209.85.217.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D835E56F6A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2015 03:35:18 -0400 (EDT)
-Received: by lbbpo10 with SMTP id po10so40173425lbb.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Jun 2015 00:46:16 -0700 (PDT)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 Content-Disposition: inline
-In-Reply-To: <87r3p0xpqc.fsf@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, jan.kiszka@siemens.com, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, Richard Weinberger <richard@nod.at>, Gleb Natapov <gleb@kernel.org>, zhichao.huang@linaro.org, Catalin Marinas <catalin.marinas@arm.com>, bp@suse.de, marc.zyngier@arm.com, Andre Przywara <andre.przywara@arm.com>, r65777@freescale.com, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, pbonzini@redhat.com
+In-Reply-To: <87mvzoxpg6.fsf-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Cc: kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, agraf-l3A5Bk7waGM@public.gmane.org, drjones-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, zhichao.huang-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, jan.kiszka-kv7WeFo6aLtBDgjK7y7TUQ@public.gmane.org, dahi-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org, r65777-KZfg59tc24xl57MIdRCFDg@public.gmane.org, bp-l3A5Bk7waGM@public.gmane.org, Gleb Natapov <gleb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>, Russell King <linux-lFZ/pmaqli7XmaaqVzeoHQ@public.gmane.org>, Catalin Marinas <catalin.marinas-5wv7dgnIgG8@public.gmane.org>, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, Peter Zijlstra <peterz-wEGCiKHe2LqWVfeAwA7xHQ@public.gmane.org>, Lorenzo Pieralisi <lorenzo.pieralisi-5wv7dgnIgG8@public.gmane.org>, Ingo Molnar <mingo-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, "open list:DOCUMENTATION" <linux-doc-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, open list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "open list:ABI/API" <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jun 25, 2015 at 07:32:27AM +0100, Alex Benn=E9e wrote:
-> =
-
-> Christoffer Dall <christoffer.dall@linaro.org> writes:
-> =
-
-> > On Fri, Jun 19, 2015 at 01:23:47PM +0100, Alex Benn=E9e wrote:
-> >> This introduces a level of indirection for the debug registers. Instead
-> >> of using the sys_regs[] directly we store registers in a structure in
-> >> the vcpu. As we are no longer tied to the layout of the sys_regs[] we
-> >> can make the copies size appropriate for control and value registers.
-> >> =
-
-> >> This also entails updating the sys_regs code to access this new
-> >> structure. Instead of passing a register index we now pass an offset
-> >> into the kvm_guest_debug_arch structure.
-> >> =
-
-> >> We also need to ensure the GET/SET_ONE_REG ioctl operations store the
-> >> registers in their correct location.
-> >> =
-
-> >> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> >> =
-
-> >> ---
-> >> v6:
-> >>   - fix up some ws issues
-> >>   - correct clobber info
-> >>   - re-word commentary in kvm_host.h
-> >>   - fix endian access issues for aarch32 fields
-> >>   - revert all KVM_GET/SET_ONE_REG to 64bit (also see ABI update)
-> >> ---
-> <snip>
-> >>  =
-
-> >> +/* Used when AArch32 kernels trap to mapped debug registers */
-> >> +static inline bool trap_debug32(struct kvm_vcpu *vcpu,
-> >> +				const struct sys_reg_params *p,
-> >> +				const struct sys_reg_desc *rd)
-> >> +{
-> >> +	__u32 *r =3D (__u32 *) ((void * )&vcpu->arch.vcpu_debug_state + rd->=
-reg);
+On Thu, Jun 25, 2015 at 07:38:33AM +0100, Alex Benn=E9e wrote:
+>=20
+> Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> writes:
+>=20
+> > On Fri, Jun 19, 2015 at 01:23:48PM +0100, Alex Benn=E9e wrote:
+> >> This adds support for userspace to control the HW debug registers =
+for
+> >> guest debug. In the debug ioctl we copy the IMPDEF defined number =
+of
 > >
-> > This still looks like something that's asking for BE trouble.  Why not
-> > access the register as a __u64 as it is and then only special-case it
-> > somehow for the XVR thingy...  Perhaps a separate function, see below.
+> > s/defined//
 > >
-> >> +	if (p->is_write) {
-> >> +		*r =3D *vcpu_reg(vcpu, p->Rt);
-> >> +		vcpu->arch.debug_flags |=3D KVM_ARM64_DEBUG_DIRTY;
-> >> +	} else {
-> >> +		*vcpu_reg(vcpu, p->Rt) =3D *r;
-> >> +	}
+> >> registers into a new register set called host_debug_state. There i=
+s now
+> >> a new vcpu parameter called debug_ptr which selects which register=
+ set
+> >> is to copied into the real registers when world switch occurs.
+> >
+> > But this patch doesn't seem to add the debug_ptr field?
+>=20
+> Oops, yes the comment belongs to the previous patch.
+>=20
+> >
+> > s/to//
+> >
+> >>=20
+> >> I've moved some helper functions into the hw_breakpoint.h header f=
+or
+> >> re-use.
+> >>=20
+> >> As with single step we need to tweak the guest registers to enable=
+ the
+> >> exceptions so we need to save and restore those bits.
+> >>=20
+> >> Two new capabilities have been added to the KVM_EXTENSION ioctl to=
+ allow
+> >> userspace to query the number of hardware break and watch points
+> >> available on the host hardware.
+> >>=20
+> >> Signed-off-by: Alex Benn=E9e <alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+> >>=20
+> >> ---
+> >> v2
+> >>    - switched to C setup
+> >>    - replace host debug registers directly into context
+> >>    - minor tweak to api docs
+> >>    - setup right register for debug
+> >>    - add FAR_EL2 to debug exit structure
+> >>    - add support for trapping debug register access
+> >> v3
+> >>    - remove stray trace statement
+> >>    - fix spacing around operators (various)
+> >>    - clean-up usage of trap_debug
+> >>    - introduce debug_ptr, replace excessive memcpy stuff
+> >>    - don't use memcpy in ioctl, just assign
+> >>    - update cap ioctl documentation
+> >>    - reword a number comments
+> >>    - rename host_debug_state->external_debug_state
+> >> v4
+> >>    - use the new u32/u64 split debug_ptr approach
+> >>    - fix some wording/comments
+> >> v5
+> >>    - don't set MDSCR_EL1.KDE (not needed)
+> >> v6
+> >>    - update wording given change in commentary
+> >>    - KVM_GUESTDBG_USE_HW_BP->KVM_GUESTDBG_USE_HW
+> >> ---
+> >>  Documentation/virtual/kvm/api.txt      |  7 ++++++-
+> >>  arch/arm/kvm/arm.c                     |  7 +++++++
+> >>  arch/arm64/include/asm/hw_breakpoint.h | 12 +++++++++++
+> >>  arch/arm64/include/asm/kvm_host.h      |  6 +++++-
+> >>  arch/arm64/kernel/hw_breakpoint.c      | 12 -----------
+> >>  arch/arm64/kvm/debug.c                 | 37 +++++++++++++++++++++=
+++++++++-----
+> >>  arch/arm64/kvm/handle_exit.c           |  6 ++++++
+> >>  arch/arm64/kvm/reset.c                 | 12 +++++++++++
+> >>  include/uapi/linux/kvm.h               |  2 ++
+> >>  9 files changed, 82 insertions(+), 19 deletions(-)
+> >>=20
+> >> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/vir=
+tual/kvm/api.txt
+> >> index 33c8143..ada57df 100644
+> >> --- a/Documentation/virtual/kvm/api.txt
+> >> +++ b/Documentation/virtual/kvm/api.txt
+> >> @@ -2668,7 +2668,7 @@ The top 16 bits of the control field are arc=
+hitecture specific control
+> >>  flags which can include the following:
+> >> =20
+> >>    - KVM_GUESTDBG_USE_SW_BP:     using software breakpoints [x86, =
+arm64]
+> >> -  - KVM_GUESTDBG_USE_HW_BP:     using hardware breakpoints [x86, =
+s390]
+> >> +  - KVM_GUESTDBG_USE_HW_BP:     using hardware breakpoints [x86, =
+s390, arm64]
+> >>    - KVM_GUESTDBG_INJECT_DB:     inject DB type exception [x86]
+> >>    - KVM_GUESTDBG_INJECT_BP:     inject BP type exception [x86]
+> >>    - KVM_GUESTDBG_EXIT_PENDING:  trigger an immediate guest exit [=
+s390]
+> >> @@ -2683,6 +2683,11 @@ updated to the correct (supplied) values.
+> >>  The second part of the structure is architecture specific and
+> >>  typically contains a set of debug registers.
+> >> =20
+> >> +For arm64 the number of debug registers is implementation defined=
+ and
+> >> +can be determined by querying the KVM_CAP_GUEST_DEBUG_HW_BPS and
+> >> +KVM_CAP_GUEST_DEBUG_HW_WPS capabilities which return a positive n=
+umber
+> >> +indicating the number of supported registers.
 > >> +
-> >> +	return true;
-> >> +}
+> >>  When debug events exit the main run loop with the reason
+> >>  KVM_EXIT_DEBUG with the kvm_debug_exit_arch part of the kvm_run
+> >>  structure containing architecture specific debug information.
+> >> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> >> index 0d17c7b..60c4045 100644
+> >> --- a/arch/arm/kvm/arm.c
+> >> +++ b/arch/arm/kvm/arm.c
+> >> @@ -307,6 +307,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+> >> =20
+> >>  #define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE |    \
+> >>  			    KVM_GUESTDBG_USE_SW_BP | \
+> >> +			    KVM_GUESTDBG_USE_HW | \
+> >>  			    KVM_GUESTDBG_SINGLESTEP)
+> >> =20
+> >>  /**
+> >> @@ -327,6 +328,12 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struc=
+t kvm_vcpu *vcpu,
+> >> =20
+> >>  	if (dbg->control & KVM_GUESTDBG_ENABLE) {
+> >>  		vcpu->guest_debug =3D dbg->control;
 > >> +
-> >> +static inline bool trap_debug64(struct kvm_vcpu *vcpu,
-> >> +				const struct sys_reg_params *p,
-> >> +				const struct sys_reg_desc *rd)
-> >> +{
-> >> +	__u64 *r =3D (__u64 *) ((void * )&vcpu->arch.vcpu_debug_state + rd->=
-reg);
-> >> +	if (p->is_write) {
-> >> +		*r =3D *vcpu_reg(vcpu, p->Rt);
-> >> +		vcpu->arch.debug_flags |=3D KVM_ARM64_DEBUG_DIRTY;
-> >> +	} else {
-> >> +		*vcpu_reg(vcpu, p->Rt) =3D *r;
-> >> +	}
+> >> +		/* Hardware assisted Break and Watch points */
+> >> +		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW) {
+> >> +			vcpu->arch.external_debug_state =3D dbg->arch;
+> >> +		}
 > >> +
-> >> +	return true;
-> >> +}
-> >> +
-> >> +static inline void reset_debug64(struct kvm_vcpu *vcpu, const struct =
-sys_reg_desc *rd)
-> >> +{
-> >> +	__u64 *r =3D (__u64 *) ((void * )&vcpu->arch.vcpu_debug_state + rd->=
-reg);
-> >> +	*r =3D rd->val;
-> >> +}
-> >> +
-> >>  static void reset_amair_el1(struct kvm_vcpu *vcpu, const struct sys_r=
-eg_desc *r)
-> >>  {
-> >>  	u64 amair;
-> >> @@ -240,16 +277,20 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, c=
-onst struct sys_reg_desc *r)
-> >>  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
-> >>  	/* DBGBVRn_EL1 */						\
-> >>  	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b100),	\
-> >> -	  trap_debug_regs, reset_val, (DBGBVR0_EL1 + (n)), 0 },		\
-> >> +	  trap_debug64, reset_debug64,					\
-> >> +	  offsetof(struct kvm_guest_debug_arch, dbg_bvr[(n)]), 0 },	\
-> >>  	/* DBGBCRn_EL1 */						\
-> >>  	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b101),	\
-> >> -	  trap_debug_regs, reset_val, (DBGBCR0_EL1 + (n)), 0 },		\
-> >> +	  trap_debug64, reset_debug64,					\
-> >> +	  offsetof(struct kvm_guest_debug_arch, dbg_bcr[(n)]), 0},	\
-> >>  	/* DBGWVRn_EL1 */						\
-> >>  	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b110),	\
-> >> -	  trap_debug_regs, reset_val, (DBGWVR0_EL1 + (n)), 0 },		\
-> >> +	  trap_debug64, reset_debug64,					\
-> >> +	  offsetof(struct kvm_guest_debug_arch, dbg_wvr[(n)]), 0 },	\
-> >>  	/* DBGWCRn_EL1 */						\
-> >>  	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b111),	\
-> >> -	  trap_debug_regs, reset_val, (DBGWCR0_EL1 + (n)), 0 }
-> >> +	  trap_debug64, reset_debug64,					\
-> >> +	  offsetof(struct kvm_guest_debug_arch, dbg_wcr[(n)]), 0}
-> >>  =
-
-> >>  /*
-> >>   * Architected system registers.
-> >> @@ -502,42 +543,51 @@ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
-> >>  	}
+> >>  	} else {
+> >>  		/* If not enabled clear all flags */
+> >>  		vcpu->guest_debug =3D 0;
+> >> diff --git a/arch/arm64/include/asm/hw_breakpoint.h b/arch/arm64/i=
+nclude/asm/hw_breakpoint.h
+> >> index 52b484b..c450552 100644
+> >> --- a/arch/arm64/include/asm/hw_breakpoint.h
+> >> +++ b/arch/arm64/include/asm/hw_breakpoint.h
+> >> @@ -130,6 +130,18 @@ static inline void ptrace_hw_copy_thread(stru=
+ct task_struct *task)
 > >>  }
-> >>  =
-
-> >> -static bool trap_debug32(struct kvm_vcpu *vcpu,
-> >> -			 const struct sys_reg_params *p,
-> >> -			 const struct sys_reg_desc *r)
-> >> -{
-> >> -	if (p->is_write) {
-> >> -		vcpu_cp14(vcpu, r->reg) =3D *vcpu_reg(vcpu, p->Rt);
-> >> -		vcpu->arch.debug_flags |=3D KVM_ARM64_DEBUG_DIRTY;
-> >> -	} else {
-> >> -		*vcpu_reg(vcpu, p->Rt) =3D vcpu_cp14(vcpu, r->reg);
-> >> -	}
-> >> -
-> >> -	return true;
-> >> -}
-> >> +/* AArch32 debug register mappings
-> >> + *
-> >> + * AArch32 DBGBVRn is mapped to DBGBVRn_EL1[31:0]
-> >> + * AArch32 DBGBXVRn is mapped to DBGBVRn_EL1[63:32]
-> >> + *
-> >> + * All control registers and watchpoint value registers are mapped to
-> >> + * the lower 32 bits of their AArch64 equivalents.
-> >> + *
-> >> + * We also need to ensure we deal with endian differences when
-> >> + * mapping a partial AArch64 register.
-> >> + */
-> >>  =
-
-> >> -#define DBG_BCR_BVR_WCR_WVR(n)					\
-> >> -	/* DBGBVRn */						\
-> >> -	{ Op1( 0), CRn( 0), CRm((n)), Op2( 4), trap_debug32,	\
-> >> -	  NULL, (cp14_DBGBVR0 + (n) * 2) },			\
-> >> -	/* DBGBCRn */						\
-> >> -	{ Op1( 0), CRn( 0), CRm((n)), Op2( 5), trap_debug32,	\
-> >> -	  NULL, (cp14_DBGBCR0 + (n) * 2) },			\
-> >> -	/* DBGWVRn */						\
-> >> -	{ Op1( 0), CRn( 0), CRm((n)), Op2( 6), trap_debug32,	\
-> >> -	  NULL, (cp14_DBGWVR0 + (n) * 2) },			\
-> >> -	/* DBGWCRn */						\
-> >> -	{ Op1( 0), CRn( 0), CRm((n)), Op2( 7), trap_debug32,	\
-> >> -	  NULL, (cp14_DBGWCR0 + (n) * 2) }
-> >> -
-> >> -#define DBGBXVR(n)						\
-> >> -	{ Op1( 0), CRn( 1), CRm((n)), Op2( 1), trap_debug32,	\
-> >> -	  NULL, cp14_DBGBXVR0 + n * 2 }
-> >> +#ifdef CONFIG_CPU_BIG_ENDIAN
-> >> +#define DBG_AA32_LOW_OFFSET	sizeof(__u32)
-> >> +#define DBG_AA32_HIGH_OFFSET	0
-> >> +#else
-> >> +#define DBG_AA32_LOW_OFFSET	0
-> >> +#define DBG_AA32_HIGH_OFFSET	sizeof(__u32)
-> >> +#endif
+> >>  #endif
+> >> =20
+> >> +/* Determine number of BRP registers available. */
+> >> +static inline int get_num_brps(void)
+> >> +{
+> >> +	return ((read_cpuid(ID_AA64DFR0_EL1) >> 12) & 0xf) + 1;
+> >> +}
 > >> +
-> >> +#define DBG_BCR_BVR_WCR_WVR(n)						\
-> >> +	/* DBGBVRn */							\
-> >> +	{ Op1( 0), CRn( 0), CRm((n)), Op2( 4), trap_debug32,		\
-> >> +	  NULL, offsetof(struct kvm_guest_debug_arch, dbg_bvr[(n)])	\
-> >> +	  + DBG_AA32_LOW_OFFSET },					\
-> >> +	/* DBGBCRn */							\
-> >> +	{ Op1( 0), CRn( 0), CRm((n)), Op2( 5), trap_debug32,		\
-> >> +	  NULL, offsetof(struct kvm_guest_debug_arch, dbg_bcr[(n)]) },	\
+> >> +/* Determine number of WRP registers available. */
+> >> +static inline int get_num_wrps(void)
+> >> +{
+> >> +	return ((read_cpuid(ID_AA64DFR0_EL1) >> 20) & 0xf) + 1;
+> >> +}
+> >> +
+> >>  extern struct pmu perf_ops_bp;
+> >> =20
+> >>  #endif	/* __KERNEL__ */
+> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/includ=
+e/asm/kvm_host.h
+> >> index 9697daf..0a3ee7b 100644
+> >> --- a/arch/arm64/include/asm/kvm_host.h
+> >> +++ b/arch/arm64/include/asm/kvm_host.h
+> >> @@ -116,13 +116,17 @@ struct kvm_vcpu_arch {
+> >>  	 * debugging the guest from the host and to maintain separate ho=
+st and
+> >>  	 * guest state during world switches. vcpu_debug_state are the d=
+ebug
+> >>  	 * registers of the vcpu as the guest sees them.  host_debug_sta=
+te are
+> >> -	 * the host registers which are saved and restored during world =
+switches.
+> >> +	 * the host registers which are saved and restored during
+> >> +	 * world switches. external_debug_state contains the debug
+> >> +	 * values we want to debugging the guest. This is set via the
 > >
-> > why doesn't this need + DBG_AA32_LOW_OFFSET?
-> =
-
-> It didn't before as it was a 32bit register, but of course last version
-> I moved it back to 64 bit and failed to catch that. Thanks!
-> =
-
+> > nit: s/debugging/debug/
 > >
-> >> +	/* DBGWVRn */							\
-> >> +	{ Op1( 0), CRn( 0), CRm((n)), Op2( 6), trap_debug32,		\
-> >> +	  NULL, offsetof(struct kvm_guest_debug_arch, dbg_wvr[(n)])	\
-> >> +	  + DBG_AA32_LOW_OFFSET },					\
-> >> +	/* DBGWCRn */							\
-> >> +	{ Op1( 0), CRn( 0), CRm((n)), Op2( 7), trap_debug32,		\
-> >> +	  NULL, offsetof(struct kvm_guest_debug_arch, dbg_wcr[(n)]) }
+> >> +	 * KVM_SET_GUEST_DEBUG ioctl.
+> >>  	 *
+> >>  	 * debug_ptr points to the set of debug registers that should be=
+ loaded
+> >>  	 * onto the hardware when running the guest.
+> >>  	 */
+> >>  	struct kvm_guest_debug_arch *debug_ptr;
+> >>  	struct kvm_guest_debug_arch vcpu_debug_state;
+> >> +	struct kvm_guest_debug_arch external_debug_state;
+> >> =20
+> >>  	/* Pointer to host CPU context */
+> >>  	kvm_cpu_context_t *host_cpu_context;
+> >> diff --git a/arch/arm64/kernel/hw_breakpoint.c b/arch/arm64/kernel=
+/hw_breakpoint.c
+> >> index e7d934d..3a41bbf 100644
+> >> --- a/arch/arm64/kernel/hw_breakpoint.c
+> >> +++ b/arch/arm64/kernel/hw_breakpoint.c
+> >> @@ -49,18 +49,6 @@ static DEFINE_PER_CPU(int, stepping_kernel_bp);
+> >>  static int core_num_brps;
+> >>  static int core_num_wrps;
+> >> =20
+> >> -/* Determine number of BRP registers available. */
+> >> -static int get_num_brps(void)
+> >> -{
+> >> -	return ((read_cpuid(ID_AA64DFR0_EL1) >> 12) & 0xf) + 1;
+> >> -}
+> >> -
+> >> -/* Determine number of WRP registers available. */
+> >> -static int get_num_wrps(void)
+> >> -{
+> >> -	return ((read_cpuid(ID_AA64DFR0_EL1) >> 20) & 0xf) + 1;
+> >> -}
+> >> -
+> >>  int hw_breakpoint_slots(int type)
+> >>  {
+> >>  	/*
+> >> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> >> index d439eb8..b287bbc 100644
+> >> --- a/arch/arm64/kvm/debug.c
+> >> +++ b/arch/arm64/kvm/debug.c
+> >> @@ -96,10 +96,6 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
+> >>  				MDCR_EL2_TDRA |
+> >>  				MDCR_EL2_TDOSA);
+> >> =20
+> >> -	/* Trap on access to debug registers? */
+> >> -	if (trap_debug)
+> >> -		vcpu->arch.mdcr_el2 |=3D MDCR_EL2_TDA;
+> >> -
+> >>  	/* Is Guest debugging in effect? */
+> >>  	if (vcpu->guest_debug) {
+> >>  		/* Route all software debug exceptions to EL2 */
+> >> @@ -134,11 +130,42 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vc=
+pu)
+> >>  		} else {
+> >>  			vcpu_sys_reg(vcpu, MDSCR_EL1) &=3D ~DBG_MDSCR_SS;
+> >>  		}
+> >> +
+> >> +		/*
+> >> +		 * HW Breakpoints and watchpoints
+> >> +		 *
+> >> +		 * We simply switch the debug_ptr to point to our new
+> >> +		 * external_debug_state which has been populated by the
+> >> +		 * debug ioctl. The existing KVM_ARM64_DEBUG_DIRTY
+> >> +		 * mechanism ensures the registers are updated on the
+> >> +		 * world switch.
+> >> +		 */
+> >> +		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW) {
+> >> +			/* Enable breakpoints/watchpoints */
+> >> +			vcpu_sys_reg(vcpu, MDSCR_EL1) |=3D DBG_MDSCR_MDE;
+> >> +
+> >> +			vcpu->arch.debug_ptr =3D &vcpu->arch.external_debug_state;
+> >> +			vcpu->arch.debug_flags |=3D KVM_ARM64_DEBUG_DIRTY;
+> >> +			trap_debug =3D true;
+> >> +		}
+> >>  	}
+> >> +
+> >> +	/* Trap debug register access */
+> >> +	if (trap_debug)
+> >> +		vcpu->arch.mdcr_el2 |=3D MDCR_EL2_TDA;
+> >>  }
+> >> =20
+> >>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu)
+> >>  {
+> >> -	if (vcpu->guest_debug)
+> >> +	if (vcpu->guest_debug) {
+> >>  		restore_guest_debug_regs(vcpu);
+> >> +
+> >> +		/*
+> >> +		 * If we were using HW debug we need to restore the
+> >> +		 * debug_ptr to the guest debug state.
+> >> +		 */
+> >> +		if (vcpu->guest_debug & KVM_GUESTDBG_USE_HW)
+> >> +			vcpu->arch.debug_ptr =3D &vcpu->arch.vcpu_debug_state;
 > >
-> > ditto ?
-> >
-> > I find this quite hard to read and adding this offset on the separate
-> > line doesn't seem to help.
-> >
-> > Perhaps you should just bite the bullet and have separate accessor
-> > functions for the wvr/wcr/bcr/bvr arrays and just pass the register
-> > number.
-> =
+> > I still think this would be more cleanly done in the setup_debug
+> > function, but ok:
+>=20
+> I don't follow, setup_debug is called before we enter KVM. It's prett=
+y
+> light when no debugging is being done so this ensure we leave state h=
+ow
+> we would like it when we stop debugging.
+>=20
+> I can move it to an else leg in setup if you really want.
+>=20
+I just feel like whenever you enter the guest you setup the state you
+want for your guest and then when reading the code you never have to
+worry about "did I set the pointer back correctly last time it exited",
+but thinking about your response, I guess that's an extra store on each
+world-switch, so theoretically that may be a bit more overhead (on top
+of the hundreds other stores and spinlocks we take and stuff).
 
-> I suspect it would be cleaner reading for the cost of more boilerplate
-> code. Should I share the access functions between Aarch64/Aarch32 modes
-> as well?
-> =
+If you prefer, leave it like this, but consider adding a
+BUG_ON(!guest_debugging && debug_ptr !=3D &vcpu->arch.vcpu_debug_state)=
+ in
+the setup function...
 
-Not sure I understand the question.
-
-My concern with this code is that a lot of logic happens in these array
-initialization macro lines, and you have to follow through the type of
-the struct and go look in a different place in the file to understand
-how this is really used.  So yes, better to add a bit more boilerplate
-code but have it be clear how things work and keep the BE stuff in the
-function.
-
-You will see when you write it up, but you may be able to do something
-like:
-
-static bool trap_debug32(...)
-{
-}
-
-static bool trap_dbg_wvr(...)
-{
-	... do special stuff ...
-	trap_debug32(with_special_stuff);
-}
-
-but not sure if there's a benefit or not, at least that way the related
-functionality will be more closely associated, but again, you'll see
-when you write it up.
-
--Christoffer
+I'm probably being paranoid.
 
 -Christoffer
