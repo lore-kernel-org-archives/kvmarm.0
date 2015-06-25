@@ -1,28 +1,28 @@
 From: Mario Smarduch <m.smarduch@samsung.com>
-Subject: [PATCH 2/3] arm: KVM: Implement lazy VFP switching outside of Hyp Mode
-Date: Wed, 24 Jun 2015 20:30:27 -0700
-Message-ID: <1435203028-23142-3-git-send-email-m.smarduch@samsung.com>
+Subject: [PATCH 3/3] arm: KVM: Add VFP lazy switch hooks in Host KVM
+Date: Wed, 24 Jun 2015 20:30:28 -0700
+Message-ID: <1435203028-23142-4-git-send-email-m.smarduch@samsung.com>
 References: <1435203028-23142-1-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 66C6256F37
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jun 2015 23:19:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 93A1956F3C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jun 2015 23:20:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4anZ8bjUSmOe for <kvmarm@lists.cs.columbia.edu>;
- Wed, 24 Jun 2015 23:19:57 -0400 (EDT)
+ with ESMTP id FVdFG10DZjJW for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 24 Jun 2015 23:20:06 -0400 (EDT)
 Received: from usmailout4.samsung.com (mailout4.w2.samsung.com
  [211.189.100.14])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2880D56F28
- for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jun 2015 23:19:57 -0400 (EDT)
-Received: from uscpsbgex4.samsung.com
- (u125.gpu85.samsung.co.kr [203.254.195.125]) by usmailout4.samsung.com
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DEA7D56F42
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 24 Jun 2015 23:20:06 -0400 (EDT)
+Received: from uscpsbgex1.samsung.com
+ (u122.gpu85.samsung.co.kr [203.254.195.122]) by usmailout4.samsung.com
  (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NQH00HS8DRJXS40@usmailout4.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Wed, 24 Jun 2015 23:30:55 -0400 (EDT)
+ with ESMTP id <0NQH00HXJDRTDW40@usmailout4.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Wed, 24 Jun 2015 23:31:05 -0400 (EDT)
 In-reply-to: <1435203028-23142-1-git-send-email-m.smarduch@samsung.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -37,123 +37,46 @@ To: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.
 Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch implements the VFP context switch code called from vcpu_put in
-Host KVM. In addition it implements the logic to skip setting a VFP trap if one
-is not needed. Also resets the flag if Host KVM switched registers to trap new
-guest vfp accesses.
-
+This patch implements host KVM interface to Hyp mode VFP function to 
+switch out guest and switch in host.
 
 Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
 ---
- arch/arm/kvm/interrupts.S |   49 ++++++++++++++++++++++++++++-----------------
- 1 file changed, 31 insertions(+), 18 deletions(-)
+ arch/arm/kvm/arm.c |   15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
-index 79caf79..0912edd 100644
---- a/arch/arm/kvm/interrupts.S
-+++ b/arch/arm/kvm/interrupts.S
-@@ -96,6 +96,21 @@ ENTRY(__kvm_flush_vm_context)
- 	bx	lr
- ENDPROC(__kvm_flush_vm_context)
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index d9631ec..77b41f5 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -105,6 +105,17 @@ void kvm_arch_check_processor_compat(void *rtn)
+ 	*(int *)rtn = 0;
+ }
  
-+ENTRY(__kvm_restore_host_vfp_state)
-+	push    {r3-r7}
++/**
++ * kvm_switch_vp_regs() - switch guest/host VFP registers
++ * @vcpu:	pointer to vcpu structure.
++ *
++ * HYP interface functions to save guest and restore host VFP registers
++ */
++static void kvm_switch_fp_regs(struct kvm_vcpu *vcpu)
++{
++	if (vcpu->arch.vfp_guest_saved == 1)
++		kvm_call_hyp(__kvm_restore_host_vfp_state, vcpu);
++}
+ 
+ /**
+  * kvm_arch_init_vm - initializes a VM data structure
+@@ -292,6 +303,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 
+ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ {
 +
-+	mov     r1, #0
-+	str     r1, [r0, #VCPU_VFP_SAVED]
++	/* Check if Guest accessed VFP registers */
++	kvm_switch_fp_regs(vcpu);
 +
-+	add     r7, r0, #VCPU_VFP_GUEST
-+	store_vfp_state r7
-+	add     r7, r0, #VCPU_VFP_HOST
-+	ldr     r7, [r7]
-+	restore_vfp_state r7
-+
-+	pop     {r3-r7}
-+	bx      lr
-+ENDPROC(__kvm_restore_host_vfp_state)
- 
- /********************************************************************
-  *  Hypervisor world-switch code
-@@ -131,7 +146,13 @@ ENTRY(__kvm_vcpu_run)
- 
- 	@ Trap coprocessor CRx accesses
- 	set_hstr vmentry
-+
-+	ldr	r1, [vcpu, #VCPU_VFP_SAVED]
-+	cmp	r1, #1
-+	beq     skip_guest_vfp_trap
- 	set_hcptr vmentry, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
-+skip_guest_vfp_trap:
-+
- 	set_hdcr vmentry
- 
- 	@ Write configured ID register into MIDR alias
-@@ -173,18 +194,6 @@ __kvm_vcpu_return:
- 	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
- 
- #ifdef CONFIG_VFPv3
--	@ Save floating point registers we if let guest use them.
--	tst	r2, #(HCPTR_TCP(10) | HCPTR_TCP(11))
--	bne	after_vfp_restore
--
--	@ Switch VFP/NEON hardware state to the host's
--	add	r7, vcpu, #VCPU_VFP_GUEST
--	store_vfp_state r7
--	add	r7, vcpu, #VCPU_VFP_HOST
--	ldr	r7, [r7]
--	restore_vfp_state r7
--
--after_vfp_restore:
- 	@ Restore FPEXC_EN which we clobbered on entry
- 	pop	{r2}
- 	VFPFMXR FPEXC, r2
-@@ -363,10 +372,6 @@ hyp_hvc:
- 	@ Check syndrome register
- 	mrc	p15, 4, r1, c5, c2, 0	@ HSR
- 	lsr	r0, r1, #HSR_EC_SHIFT
--#ifdef CONFIG_VFPv3
--	cmp	r0, #HSR_EC_CP_0_13
--	beq	switch_to_guest_vfp
--#endif
- 	cmp	r0, #HSR_EC_HVC
- 	bne	guest_trap		@ Not HVC instr.
- 
-@@ -380,7 +385,10 @@ hyp_hvc:
- 	cmp     r2, #0
- 	bne	guest_trap		@ Guest called HVC
- 
--host_switch_to_hyp:
-+	/*
-+	 * Getting here means host called HVC, we shift parameters and branch
-+	 * to Hyp function.
-+	 */
- 	pop	{r0, r1, r2}
- 
- 	/* Check for __hyp_get_vectors */
-@@ -411,6 +419,10 @@ guest_trap:
- 
- 	@ Check if we need the fault information
- 	lsr	r1, r1, #HSR_EC_SHIFT
-+#ifdef CONFIG_VFPv3
-+	cmp	r1, #HSR_EC_CP_0_13
-+	beq	switch_to_guest_vfp
-+#endif
- 	cmp	r1, #HSR_EC_IABT
- 	mrceq	p15, 4, r2, c6, c0, 2	@ HIFAR
- 	beq	2f
-@@ -479,11 +491,12 @@ guest_trap:
-  */
- #ifdef CONFIG_VFPv3
- switch_to_guest_vfp:
--	load_vcpu			@ Load VCPU pointer to r0
- 	push	{r3-r7}
- 
- 	@ NEON/VFP used.  Turn on VFP access.
- 	set_hcptr vmexit, (HCPTR_TCP(10) | HCPTR_TCP(11))
-+	mov	r1, #1
-+	str	r1, [vcpu, #VCPU_VFP_SAVED]
- 
- 	@ Switch VFP/NEON hardware state to the guest's
- 	add	r7, r0, #VCPU_VFP_HOST
+ 	/*
+ 	 * The arch-generic KVM code expects the cpu field of a vcpu to be -1
+ 	 * if the vcpu is no longer assigned to a cpu.  This is used for the
 -- 
 1.7.9.5
