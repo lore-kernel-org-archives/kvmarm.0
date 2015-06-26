@@ -1,176 +1,112 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 02/10] AArch{32,
- 64}: use KVM_CREATE_DEVICE & co to instanciate the GIC
-Date: Fri, 26 Jun 2015 14:16:10 +0100
-Message-ID: <1435324578-21832-3-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 06/10] arm: simplify MMIO dispatching
+Date: Fri, 26 Jun 2015 14:16:14 +0100
+Message-ID: <1435324578-21832-7-git-send-email-andre.przywara@arm.com>
 References: <1435324578-21832-1-git-send-email-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC895570F8
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2015 09:05:32 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Rb3eTmHtmz9Q for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Jun 2015 09:05:31 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 93D00570EF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2015 09:05:31 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1435324578-21832-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: will.deacon@arm.com, marc.zyngier@arm.com
 Cc: penberg@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
+Currently we separate any incoming MMIO request into one of the ARM
+memory map regions and take care to spare the GIC.
+It turns out that this is unnecessary, as we only have one special
+region (the IO port area in the first 64 KByte). The MMIO rbtree
+takes care about unhandled MMIO ranges, so we can simply drop all the
+special range checking (except that for the IO range) in
+kvm_cpu__emulate_mmio().
+As the GIC is handled in the kernel, a GIC MMIO access should never
+reach userland (and we don't know what to do with it anyway).
+This lets us delete some more code and simplifies future extensions
+(like expanding the GIC regions).
+To be in line with the other architectures, move the now simpler
+code into a header file.
 
-As of 3.14, KVM/arm supports the creation/configuration of the GIC through
-a more generic device API, which is now the preferred way to do so.
-
-Plumb the new API in, and allow the old code to be used as a fallback.
-
-[Andre: Rename some functions on the way to differentiate between
-creation and initialisation more clearly and fix error path.]
-
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arm/gic.c                    | 69 +++++++++++++++++++++++++++++++++++++++-----
- arm/include/arm-common/gic.h |  2 +-
- arm/kvm.c                    |  6 ++--
- 3 files changed, 66 insertions(+), 11 deletions(-)
+ arm/include/arm-common/kvm-arch.h     | 12 ------------
+ arm/include/arm-common/kvm-cpu-arch.h | 14 ++++++++++++--
+ arm/kvm-cpu.c                         | 16 ----------------
+ 3 files changed, 12 insertions(+), 30 deletions(-)
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 5d8cbe6..1ff3663 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -7,7 +7,50 @@
- #include <linux/byteorder.h>
- #include <linux/kvm.h>
- 
--int gic__init_irqchip(struct kvm *kvm)
-+static int gic_fd = -1;
-+
-+static int gic__create_device(struct kvm *kvm)
-+{
-+	int err;
-+	u64 cpu_if_addr = ARM_GIC_CPUI_BASE;
-+	u64 dist_addr = ARM_GIC_DIST_BASE;
-+	struct kvm_create_device gic_device = {
-+		.type	= KVM_DEV_TYPE_ARM_VGIC_V2,
-+	};
-+	struct kvm_device_attr cpu_if_attr = {
-+		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
-+		.attr	= KVM_VGIC_V2_ADDR_TYPE_CPU,
-+		.addr	= (u64)(unsigned long)&cpu_if_addr,
-+	};
-+	struct kvm_device_attr dist_attr = {
-+		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
-+		.attr	= KVM_VGIC_V2_ADDR_TYPE_DIST,
-+		.addr	= (u64)(unsigned long)&dist_addr,
-+	};
-+
-+	err = ioctl(kvm->vm_fd, KVM_CREATE_DEVICE, &gic_device);
-+	if (err)
-+		return err;
-+
-+	gic_fd = gic_device.fd;
-+
-+	err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &cpu_if_attr);
-+	if (err)
-+		goto out_err;
-+
-+	err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &dist_attr);
-+	if (err)
-+		goto out_err;
-+
-+	return 0;
-+
-+out_err:
-+	close(gic_fd);
-+	gic_fd = -1;
-+	return err;
-+}
-+
-+static int gic__create_irqchip(struct kvm *kvm)
- {
- 	int err;
- 	struct kvm_arm_device_addr gic_addr[] = {
-@@ -23,12 +66,6 @@ int gic__init_irqchip(struct kvm *kvm)
- 		}
- 	};
- 
--	if (kvm->nrcpus > GIC_MAX_CPUS) {
--		pr_warning("%d CPUS greater than maximum of %d -- truncating\n",
--				kvm->nrcpus, GIC_MAX_CPUS);
--		kvm->nrcpus = GIC_MAX_CPUS;
--	}
--
- 	err = ioctl(kvm->vm_fd, KVM_CREATE_IRQCHIP);
- 	if (err)
- 		return err;
-@@ -41,6 +78,24 @@ int gic__init_irqchip(struct kvm *kvm)
- 	return err;
+diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+index 082131d..90d6733 100644
+--- a/arm/include/arm-common/kvm-arch.h
++++ b/arm/include/arm-common/kvm-arch.h
+@@ -45,18 +45,6 @@ static inline bool arm_addr_in_ioport_region(u64 phys_addr)
+ 	return phys_addr >= KVM_IOPORT_AREA && phys_addr < limit;
  }
  
-+int gic__create(struct kvm *kvm)
+-static inline bool arm_addr_in_virtio_mmio_region(u64 phys_addr)
+-{
+-	u64 limit = KVM_VIRTIO_MMIO_AREA + ARM_VIRTIO_MMIO_SIZE;
+-	return phys_addr >= KVM_VIRTIO_MMIO_AREA && phys_addr < limit;
+-}
+-
+-static inline bool arm_addr_in_pci_region(u64 phys_addr)
+-{
+-	u64 limit = KVM_PCI_CFG_AREA + ARM_PCI_CFG_SIZE + ARM_PCI_MMIO_SIZE;
+-	return phys_addr >= KVM_PCI_CFG_AREA && phys_addr < limit;
+-}
+-
+ struct kvm_arch {
+ 	/*
+ 	 * We may have to align the guest memory for virtio, so keep the
+diff --git a/arm/include/arm-common/kvm-cpu-arch.h b/arm/include/arm-common/kvm-cpu-arch.h
+index 36c7872..329979a 100644
+--- a/arm/include/arm-common/kvm-cpu-arch.h
++++ b/arm/include/arm-common/kvm-cpu-arch.h
+@@ -44,8 +44,18 @@ static inline bool kvm_cpu__emulate_io(struct kvm_cpu *vcpu, u16 port, void *dat
+ 	return false;
+ }
+ 
+-bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data,
+-			   u32 len, u8 is_write);
++static inline bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr,
++					 u8 *data, u32 len, u8 is_write)
 +{
-+	int err;
++	if (arm_addr_in_ioport_region(phys_addr)) {
++		int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
++		u16 port = (phys_addr - KVM_IOPORT_AREA) & USHRT_MAX;
 +
-+	if (kvm->nrcpus > GIC_MAX_CPUS) {
-+		pr_warning("%d CPUS greater than maximum of %d -- truncating\n",
-+				kvm->nrcpus, GIC_MAX_CPUS);
-+		kvm->nrcpus = GIC_MAX_CPUS;
++		return kvm__emulate_io(vcpu, port, data, direction, len, 1);
 +	}
 +
-+	/* Try the new way first, and fallback on legacy method otherwise */
-+	err = gic__create_device(kvm);
-+	if (err)
-+		err = gic__create_irqchip(kvm);
-+
-+	return err;
++	return kvm__emulate_mmio(vcpu, phys_addr, data, len, is_write);
 +}
-+
- void gic__generate_fdt_nodes(void *fdt, u32 phandle)
+ 
+ unsigned long kvm_cpu__get_vcpu_mpidr(struct kvm_cpu *vcpu);
+ 
+diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+index ab08815..7780251 100644
+--- a/arm/kvm-cpu.c
++++ b/arm/kvm-cpu.c
+@@ -139,22 +139,6 @@ bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
+ 	return false;
+ }
+ 
+-bool kvm_cpu__emulate_mmio(struct kvm_cpu *vcpu, u64 phys_addr, u8 *data,
+-			   u32 len, u8 is_write)
+-{
+-	if (arm_addr_in_virtio_mmio_region(phys_addr)) {
+-		return kvm__emulate_mmio(vcpu, phys_addr, data, len, is_write);
+-	} else if (arm_addr_in_ioport_region(phys_addr)) {
+-		int direction = is_write ? KVM_EXIT_IO_OUT : KVM_EXIT_IO_IN;
+-		u16 port = (phys_addr - KVM_IOPORT_AREA) & USHRT_MAX;
+-		return kvm__emulate_io(vcpu, port, data, direction, len, 1);
+-	} else if (arm_addr_in_pci_region(phys_addr)) {
+-		return kvm__emulate_mmio(vcpu, phys_addr, data, len, is_write);
+-	}
+-
+-	return false;
+-}
+-
+ void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu)
  {
- 	u64 reg_prop[] = {
-diff --git a/arm/include/arm-common/gic.h b/arm/include/arm-common/gic.h
-index 5a36f2c..44859f7 100644
---- a/arm/include/arm-common/gic.h
-+++ b/arm/include/arm-common/gic.h
-@@ -24,7 +24,7 @@
- struct kvm;
- 
- int gic__alloc_irqnum(void);
--int gic__init_irqchip(struct kvm *kvm);
-+int gic__create(struct kvm *kvm);
- void gic__generate_fdt_nodes(void *fdt, u32 phandle);
- 
- #endif /* ARM_COMMON__GIC_H */
-diff --git a/arm/kvm.c b/arm/kvm.c
-index 58ad9fa..bcd2533 100644
---- a/arm/kvm.c
-+++ b/arm/kvm.c
-@@ -81,7 +81,7 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
- 	madvise(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size,
- 		MADV_MERGEABLE | MADV_HUGEPAGE);
- 
--	/* Initialise the virtual GIC. */
--	if (gic__init_irqchip(kvm))
--		die("Failed to initialise virtual GIC");
-+	/* Create the virtual GIC. */
-+	if (gic__create(kvm))
-+		die("Failed to create virtual GIC");
  }
 -- 
 2.3.5
+
