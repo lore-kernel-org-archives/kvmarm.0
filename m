@@ -1,23 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 10/10] arm: use new irqchip parameter to create different
- vGIC types
-Date: Fri, 26 Jun 2015 14:16:18 +0100
-Message-ID: <1435324578-21832-11-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 09/10] arm: add support for supplying GICv3 redistributor
+ addresses
+Date: Fri, 26 Jun 2015 14:16:17 +0100
+Message-ID: <1435324578-21832-10-git-send-email-andre.przywara@arm.com>
 References: <1435324578-21832-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A8EE57147
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2015 09:05:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 75E8357113
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2015 09:05:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id n2SV4vz2OBHb for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Jun 2015 09:05:45 -0400 (EDT)
+ with ESMTP id 0XOGIqyivyIN for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Jun 2015 09:05:43 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 21E175717F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2015 09:05:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C611757151
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2015 09:05:42 -0400 (EDT)
 In-Reply-To: <1435324578-21832-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,100 +32,138 @@ To: will.deacon@arm.com, marc.zyngier@arm.com
 Cc: penberg@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Currently we unconditionally create a virtual GICv2 in the guest.
-Add a --irqchip= parameter to let the user specify a different GIC
-type for the guest, when omitting this parameter it still defaults to
---irqchip=gicv2.
-For now the only other supported type is --irqchip=gicv3
+Instead of the GIC virtual CPU interface an emulated GICv3 needs to
+have accesses to its emulated redistributors trapped in the guest.
+Add code to tell the kernel about the mapping if a GICv3 emulation was
+requested by the user.
+
+This contains some defines which are not (yet) in the (32 bit) header
+files to allow compilation for ARM.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arm/aarch64/arm-cpu.c                    |  2 +-
- arm/gic.c                                | 17 +++++++++++++++++
- arm/include/arm-common/kvm-config-arch.h |  9 ++++++++-
- arm/kvm.c                                |  2 +-
- 4 files changed, 27 insertions(+), 3 deletions(-)
+ arm/gic.c                         | 36 +++++++++++++++++++++++++++++++++++-
+ arm/include/arm-common/gic.h      |  1 +
+ arm/include/arm-common/kvm-arch.h |  7 +++++++
+ 3 files changed, 43 insertions(+), 1 deletion(-)
 
-diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-index f702b9e..3dc8ea3 100644
---- a/arm/aarch64/arm-cpu.c
-+++ b/arm/aarch64/arm-cpu.c
-@@ -12,7 +12,7 @@
- static void generate_fdt_nodes(void *fdt, struct kvm *kvm, u32 gic_phandle)
- {
- 	int timer_interrupts[4] = {13, 14, 11, 10};
--	gic__generate_fdt_nodes(fdt, gic_phandle, IRQCHIP_GICV2);
-+	gic__generate_fdt_nodes(fdt, gic_phandle, kvm->cfg.arch.irqchip);
- 	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
- }
- 
 diff --git a/arm/gic.c b/arm/gic.c
-index efe4b42..ff56de7 100644
+index b6c5868..efe4b42 100644
 --- a/arm/gic.c
 +++ b/arm/gic.c
-@@ -22,6 +22,23 @@ static int gic_fd = -1;
- static u64 gic_redists_base;
- static u64 gic_redists_size;
+@@ -9,7 +9,18 @@
+ #include <linux/kernel.h>
+ #include <linux/kvm.h>
  
-+int irqchip_parser(const struct option *opt, const char *arg, int unset)
-+{
-+	enum irqchip_type *type = opt->value;
++/* Those names are not defined for ARM (yet) */
++#ifndef KVM_VGIC_V3_ADDR_TYPE_DIST
++#define KVM_VGIC_V3_ADDR_TYPE_DIST 2
++#endif
 +
-+	*type = IRQCHIP_GICV2;
-+	if (!strcmp(arg, "gicv2")) {
-+		*type = IRQCHIP_GICV2;
-+	} else if (!strcmp(arg, "gicv3")) {
-+		*type = IRQCHIP_GICV3;
-+	} else {
-+		fprintf(stderr, "irqchip: unknown type \"%s\"\n", arg);
-+		return -1;
-+	}
++#ifndef KVM_VGIC_V3_ADDR_TYPE_REDIST
++#define KVM_VGIC_V3_ADDR_TYPE_REDIST 3
++#endif
 +
-+	return 0;
-+}
-+
+ static int gic_fd = -1;
++static u64 gic_redists_base;
++static u64 gic_redists_size;
+ 
  static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
  {
- 	int err;
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index a8ebd94..9529881 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -8,8 +8,11 @@ struct kvm_config_arch {
- 	unsigned int	force_cntfrq;
- 	bool		virtio_trans_pci;
- 	bool		aarch32_guest;
-+	enum irqchip_type irqchip;
+@@ -28,12 +39,21 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+ 		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
+ 		.addr	= (u64)(unsigned long)&dist_addr,
+ 	};
++	struct kvm_device_attr redist_attr = {
++		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
++		.attr	= KVM_VGIC_V3_ADDR_TYPE_REDIST,
++		.addr	= (u64)(unsigned long)&gic_redists_base,
++	};
+ 
+ 	switch (type) {
+ 	case IRQCHIP_GICV2:
+ 		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V2;
+ 		dist_attr.attr  = KVM_VGIC_V2_ADDR_TYPE_DIST;
+ 		break;
++	case IRQCHIP_GICV3:
++		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V3;
++		dist_attr.attr  = KVM_VGIC_V3_ADDR_TYPE_DIST;
++		break;
+ 	}
+ 
+ 	err = ioctl(kvm->vm_fd, KVM_CREATE_DEVICE, &gic_device);
+@@ -46,6 +66,9 @@ static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
+ 	case IRQCHIP_GICV2:
+ 		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &cpu_if_attr);
+ 		break;
++	case IRQCHIP_GICV3:
++		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &redist_attr);
++		break;
+ 	}
+ 	if (err)
+ 		goto out_err;
+@@ -97,6 +120,10 @@ int gic__create(struct kvm *kvm, enum irqchip_type type)
+ 	switch (type) {
+ 	case IRQCHIP_GICV2:
+ 		break;
++	case IRQCHIP_GICV3:
++		gic_redists_size = kvm->cfg.nrcpus * ARM_GIC_REDIST_SIZE;
++		gic_redists_base = ARM_GIC_DIST_BASE - gic_redists_size;
++		break;
+ 	default:
+ 		return -ENODEV;
+ 	}
+@@ -156,12 +183,19 @@ void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type)
+ 	const char *compatible;
+ 	u64 reg_prop[] = {
+ 		cpu_to_fdt64(ARM_GIC_DIST_BASE), cpu_to_fdt64(ARM_GIC_DIST_SIZE),
+-		cpu_to_fdt64(ARM_GIC_CPUI_BASE), cpu_to_fdt64(ARM_GIC_CPUI_SIZE),
++		0, 0,				/* to be filled */
+ 	};
+ 
+ 	switch (type) {
+ 	case IRQCHIP_GICV2:
+ 		compatible = "arm,cortex-a15-gic";
++		reg_prop[2] = cpu_to_fdt64(ARM_GIC_CPUI_BASE);
++		reg_prop[3] = cpu_to_fdt64(ARM_GIC_CPUI_SIZE);
++		break;
++	case IRQCHIP_GICV3:
++		compatible = "arm,gic-v3";
++		reg_prop[2] = cpu_to_fdt64(gic_redists_base);
++		reg_prop[3] = cpu_to_fdt64(gic_redists_size);
+ 		break;
+ 	default:
+ 		return;
+diff --git a/arm/include/arm-common/gic.h b/arm/include/arm-common/gic.h
+index d524f55..4fde5ac 100644
+--- a/arm/include/arm-common/gic.h
++++ b/arm/include/arm-common/gic.h
+@@ -23,6 +23,7 @@
+ 
+ enum irqchip_type {
+ 	IRQCHIP_GICV2,
++	IRQCHIP_GICV3,
  };
  
-+int irqchip_parser(const struct option *opt, const char *arg, int unset);
+ struct kvm;
+diff --git a/arm/include/arm-common/kvm-arch.h b/arm/include/arm-common/kvm-arch.h
+index 90d6733..0f5fb7f 100644
+--- a/arm/include/arm-common/kvm-arch.h
++++ b/arm/include/arm-common/kvm-arch.h
+@@ -30,6 +30,13 @@
+ #define KVM_PCI_MMIO_AREA	(KVM_PCI_CFG_AREA + ARM_PCI_CFG_SIZE)
+ #define KVM_VIRTIO_MMIO_AREA	ARM_MMIO_AREA
+ 
++/*
++ * On a GICv3 there must be one redistributor per vCPU.
++ * The value here is the size for one, we multiply this at runtime with
++ * the number of requested vCPUs to get the actual size.
++ */
++#define ARM_GIC_REDIST_SIZE	0x20000
 +
- #define OPT_ARCH_RUN(pfx, cfg)							\
- 	pfx,									\
- 	ARM_OPT_ARCH_RUN(cfg)							\
-@@ -21,6 +24,10 @@ struct kvm_config_arch {
- 		     "updated to program CNTFRQ correctly*"),			\
- 	OPT_BOOLEAN('\0', "force-pci", &(cfg)->virtio_trans_pci,		\
- 		    "Force virtio devices to use PCI as their default "		\
--		    "transport"),
-+		    "transport"),						\
-+        OPT_CALLBACK('\0', "irqchip", &(cfg)->irqchip,				\
-+		     "[gicv2|gicv3]",					\
-+		     "type of interrupt controller to emulate in the guest",	\
-+		     irqchip_parser, NULL),
+ #define KVM_IRQ_OFFSET		GIC_SPI_IRQ_BASE
  
- #endif /* ARM_COMMON__KVM_CONFIG_ARCH_H */
-diff --git a/arm/kvm.c b/arm/kvm.c
-index f9685c2..d0e4a20 100644
---- a/arm/kvm.c
-+++ b/arm/kvm.c
-@@ -82,6 +82,6 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
- 		MADV_MERGEABLE | MADV_HUGEPAGE);
- 
- 	/* Create the virtual GIC. */
--	if (gic__create(kvm, IRQCHIP_GICV2))
-+	if (gic__create(kvm, kvm->cfg.arch.irqchip))
- 		die("Failed to create virtual GIC");
- }
+ #define KVM_VM_TYPE		0
 -- 
 2.3.5
