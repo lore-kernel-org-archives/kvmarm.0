@@ -1,98 +1,89 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 05/10] arm: finish VGIC initialisation explicitly
-Date: Fri, 26 Jun 2015 14:16:13 +0100
-Message-ID: <1435324578-21832-6-git-send-email-andre.przywara@arm.com>
-References: <1435324578-21832-1-git-send-email-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A20B75714D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2015 09:05:38 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oyZrVGeqN7P8 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Jun 2015 09:05:36 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 808735714B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2015 09:05:36 -0400 (EDT)
-In-Reply-To: <1435324578-21832-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Subject: [PATCH v4 00/10] kvmtool: arm64: GICv3 guest support
+Date: Fri, 26 Jun 2015 14:16:08 +0100
+Message-ID: <1435324578-21832-1-git-send-email-andre.przywara@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
 To: will.deacon@arm.com, marc.zyngier@arm.com
 Cc: penberg@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Since Linux 3.19-rc1 there is a new API to explicitly initialise
-the in-kernel GIC emulation by a userland KVM device call.
-Use that to tell the kernel we are finished with the GIC
-initialisation, since the automatic GIC init will only be provided
-as a legacy functionality in the future.
+Hi,
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arm/gic.c | 25 ++++++++++++++++++++++---
- 1 file changed, 22 insertions(+), 3 deletions(-)
+hopefully the final version of the GICv3 support series for kvmtool.
+I addressed the remaining comments Marc had on the last four patches
+(the first six were left untouched).
+The undocumented --irqchip=default is now gone.
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 8560c9b..99f0d2b 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -98,24 +98,43 @@ int gic__create(struct kvm *kvm)
- 	return err;
- }
- 
-+/*
-+ * Sets the number of used interrupts and finalizes the GIC init explicitly.
-+ */
- static int gic__init_gic(struct kvm *kvm)
- {
-+	int ret;
-+
- 	int lines = irq__get_nr_allocated_lines();
- 	u32 nr_irqs = ALIGN(lines, 32) + GIC_SPI_IRQ_BASE;
- 	struct kvm_device_attr nr_irqs_attr = {
- 		.group	= KVM_DEV_ARM_VGIC_GRP_NR_IRQS,
- 		.addr	= (u64)(unsigned long)&nr_irqs,
- 	};
-+	struct kvm_device_attr vgic_init_attr = {
-+		.group	= KVM_DEV_ARM_VGIC_GRP_CTRL,
-+		.attr	= KVM_DEV_ARM_VGIC_CTRL_INIT,
-+	};
- 
- 	/*
- 	 * If we didn't use the KVM_CREATE_DEVICE method, KVM will
--	 * give us some default number of interrupts.
-+	 * give us some default number of interrupts. The GIC initialization
-+	 * will be done automatically in this case.
- 	 */
- 	if (gic_fd < 0)
- 		return 0;
- 
--	if (!ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &nr_irqs_attr))
--		return ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &nr_irqs_attr);
-+	if (!ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &nr_irqs_attr)) {
-+		ret = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &nr_irqs_attr);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	if (!ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &vgic_init_attr)) {
-+		ret = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &vgic_init_attr);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	return 0;
- }
+Cheers,
+Andre.
+
+-----
+Since Linux 3.19 the kernel can emulate a GICv3 for KVM guests.
+This allows more than 8 VCPUs in a guest and enables in-kernel irqchip
+for non-backwards-compatible GICv3 implementations.
+
+This series updates kvmtool to support this feature.
+The first half of the series is mostly from Marc and supports some
+newer features of the virtual GIC which we later depend on. The second
+part enables support for a guest GICv3 by adding a new command line
+parameter (--irqchip=).
+
+We now use the KVM_CREATE_DEVICE interface to create a virtual GIC
+and only fall back to the now legacy KVM_CREATE_IRQCHIP call if the
+former is not supported by the kernel.
+Also we use two new features the KVM_CREATE_DEVICE interface
+introduces:
+* We now set the number of actually used interrupts to avoid
+  allocating too many of them without ever using them.
+* We tell the kernel explicitly that we are finished with the GIC
+  initialisation. This is a requirement for future VGIC versions.
+
+The final three patches introduce virtual GICv3 support, so on
+supported hardware (and given kernel support) the user can ask KVM to
+emulate a GICv3, lifting the 8 VCPU limit of KVM. This is done by
+specifying "--irqchip=gicv3" on the command line.
+For the time being the kernel only supports a virtual GICv3 on ARM64,
+but as the GIC is shared in kvmtool, I had to add the macro
+definitions to not break the build on ARM.
+
+This series goes on top of the new official stand-alone repo hosted
+on Will's kernel.org git [1].
+Find a branch with those patches included at my repo [2].
+
+[1] git://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git
+[2] git://linux-arm.org/kvmtool.git (branch gicv3/v4)
+    http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/gicv3/v4
+
+Andre Przywara (6):
+  arm: finish VGIC initialisation explicitly
+  arm: simplify MMIO dispatching
+  limit number of VCPUs on demand
+  arm: prepare for instantiating different IRQ chip devices
+  arm: add support for supplying GICv3 redistributor addresses
+  arm: use new irqchip parameter to create different vGIC types
+
+Marc Zyngier (4):
+  AArch64: Reserve two 64k pages for GIC CPU interface
+  AArch{32,64}: use KVM_CREATE_DEVICE & co to instanciate the GIC
+  irq: add irq__get_nr_allocated_lines
+  AArch{32,64}: dynamically configure the number of GIC interrupts
+
+ arm/aarch32/arm-cpu.c                    |   2 +-
+ arm/aarch64/arm-cpu.c                    |   2 +-
+ arm/aarch64/include/kvm/kvm-arch.h       |   2 +-
+ arm/gic.c                                | 190 +++++++++++++++++++++++++++++--
+ arm/include/arm-common/gic.h             |   9 +-
+ arm/include/arm-common/kvm-arch.h        |  19 ++--
+ arm/include/arm-common/kvm-config-arch.h |   9 +-
+ arm/include/arm-common/kvm-cpu-arch.h    |  14 ++-
+ arm/kvm-cpu.c                            |  23 +---
+ arm/kvm.c                                |   6 +-
+ include/kvm/irq.h                        |   1 +
+ irq.c                                    |   5 +
+ kvm-cpu.c                                |   7 ++
+ 13 files changed, 239 insertions(+), 50 deletions(-)
+
 -- 
 2.3.5
+
