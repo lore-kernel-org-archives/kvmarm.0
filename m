@@ -1,99 +1,131 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: [PATCH 2/3] arm/arm64: drop mmu_set_enabled
-Date: Thu, 25 Jun 2015 20:45:10 +0200
-Message-ID: <1435257911-9715-3-git-send-email-drjones@redhat.com>
-References: <1435257911-9715-1-git-send-email-drjones@redhat.com>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1435257911-9715-1-git-send-email-drjones@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: christoffer.dall@linaro.org, pbonzini@redhat.com
+From: Jan Kiszka <jan.kiszka@web.de>
+Subject: Re: [RFC PATCH] KVM: arm/arm64: Don't let userspace update CNTVOFF
+ once guest is running
+Date: Fri, 26 Jun 2015 06:49:34 +0200
+Message-ID: <558CD9DE.3010609@web.de>
+References: <1435157697-28579-1-git-send-email-marc.zyngier@arm.com>
+ <20150625080457.GD28244@cbox> <558BC2F5.9010303@huawei.com>
+ <CAFEAcA_RzWSppaYA9vuAaL-MO6sQV1SgpXf3w-LScUdaarpOEQ@mail.gmail.com>
+ <558BC90B.4060806@huawei.com>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============3165891192140073184=="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DDC3257075
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2015 00:38:52 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id pcMmlB02p-Bq for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Jun 2015 00:38:51 -0400 (EDT)
+Received: from mout.web.de (mout.web.de [212.227.17.11])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7EB4757063
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2015 00:38:51 -0400 (EDT)
+In-Reply-To: <558BC90B.4060806@huawei.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Claudio Fontana <claudio.fontana@huawei.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm-devel <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The mmu is enabled automatically for all cpus, they must disable it
-themselves if they don't want it on. Switch from managing a cpumask
-of enabled cpus to one of disabled cpus. This allows us to remove
-the mmu_set_enabled call from secondary_cinit, and the function all
-together.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--===============3165891192140073184==
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="Da8MlNVDgHVbb9w4EDdPNlhxaBmlodcUa"
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- lib/arm/asm/mmu-api.h |  1 -
- lib/arm/mmu.c         | 21 ++++++++++-----------
- lib/arm/smp.c         |  1 -
- 3 files changed, 10 insertions(+), 13 deletions(-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Da8MlNVDgHVbb9w4EDdPNlhxaBmlodcUa
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/lib/arm/asm/mmu-api.h b/lib/arm/asm/mmu-api.h
-index c46c4b08b14cc..12fdc57918c27 100644
---- a/lib/arm/asm/mmu-api.h
-+++ b/lib/arm/asm/mmu-api.h
-@@ -2,7 +2,6 @@
- #define __ASMARM_MMU_API_H_
- extern pgd_t *mmu_idmap;
- extern bool mmu_enabled(void);
--extern void mmu_set_enabled(void);
- extern void mmu_enable(pgd_t *pgtable);
- extern void mmu_disable(void);
- extern void mmu_enable_idmap(void);
-diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
-index 5966b408cb455..ad558e177dd1c 100644
---- a/lib/arm/mmu.c
-+++ b/lib/arm/mmu.c
-@@ -14,32 +14,31 @@ extern unsigned long etext;
- 
- pgd_t *mmu_idmap;
- 
--static cpumask_t mmu_enabled_cpumask;
-+static cpumask_t mmu_disabled_cpumask;
-+
- bool mmu_enabled(void)
- {
--	struct thread_info *ti = current_thread_info();
--	return cpumask_test_cpu(ti->cpu, &mmu_enabled_cpumask);
--}
-+	int cpu = current_thread_info()->cpu;
- 
--void mmu_set_enabled(void)
--{
--	struct thread_info *ti = current_thread_info();
--	cpumask_set_cpu(ti->cpu, &mmu_enabled_cpumask);
-+	return !cpumask_test_cpu(cpu, &mmu_disabled_cpumask);
- }
- 
- extern void asm_mmu_enable(phys_addr_t pgtable);
- void mmu_enable(pgd_t *pgtable)
- {
-+	int cpu = current_thread_info()->cpu;
-+
- 	asm_mmu_enable(__pa(pgtable));
- 	flush_tlb_all();
--	mmu_set_enabled();
-+	cpumask_clear_cpu(cpu, &mmu_disabled_cpumask);
- }
- 
- extern void asm_mmu_disable(void);
- void mmu_disable(void)
- {
--	struct thread_info *ti = current_thread_info();
--	cpumask_clear_cpu(ti->cpu, &mmu_enabled_cpumask);
-+	int cpu = current_thread_info()->cpu;
-+
-+	cpumask_set_cpu(cpu, &mmu_disabled_cpumask);
- 	asm_mmu_disable();
- }
- 
-diff --git a/lib/arm/smp.c b/lib/arm/smp.c
-index f389ba6598faa..ca435dcd5f4a2 100644
---- a/lib/arm/smp.c
-+++ b/lib/arm/smp.c
-@@ -23,7 +23,6 @@ secondary_entry_fn secondary_cinit(void)
- 	secondary_entry_fn entry;
- 
- 	thread_info_init(ti, 0);
--	mmu_set_enabled();
- 
- 	/*
- 	 * Save secondary_data.entry locally to avoid opening a race
--- 
-2.4.3
+On 2015-06-25 11:25, Claudio Fontana wrote:
+> On 25.06.2015 11:10, Peter Maydell wrote:
+>> On 25 June 2015 at 09:59, Claudio Fontana <claudio.fontana@huawei.com>=
+ wrote:
+>>> Once the VM is created, I think QEMU should not request kvm to
+>>> change the virtual offset of the VM anymore: maybe an unexpected
+>>> consequence of QEMU's target-arm/kvm64.c::kvm_arch_put_registers ?
+>>
+>> Hmm. In general we assume that we can:
+>>  * stop the VM
+>>  * read all the guest system registers
+>>  * write those values back again
+>>  * restart the VM
+>>
+>> if we need to. Is that what's happening here, or are we doing
+>> something odder?
+>>
+>> -- PMM
+>>
+>=20
+> What I guess could be happening by looking at the code in linux
+>=20
+> virt/kvm/arm/arch_timer.c::kvm_arm_timer_set_reg
+>=20
+> is that QEMU tries to set the KVM_REG_ARM_TIMER_CNT register from exact=
+ly the previous value,
+> but just because of the fact that the set function is called, cntvoff i=
+s updated,
+> since the value provided by the user is apparently assumed to be _relat=
+ive_ to the physical timer.
+>=20
+> This is apparent to me in the code in that function which says:
+>=20
+> case KVM_REG_ARM_TIMER_CNT: {
+> /* ... */
+>     u64 cntvoff =3D kvm_phys_timer_read() - value;
+> /* ... */
+> }
+>=20
+> And this is matched by the corresponding get function kvm_arm_timer_get=
+_reg where it says:
+>=20
+> case KVM_REG_ARM_TIMER_CNT:
+>    return kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
+>=20
+> The time difference between when the GET is issued by QEMU and when the=
+ PUT is issued then would account for the difference.
 
+QEMU has the concept of write-back levels: KVM_PUT_RUNTIME_STATE,
+KVM_PUT_RESET_STATE and KVM_PUT_FULL_STATE. I suspect this registers is
+just sorted into the wrong category, thus written as part of the
+RUNTIME_STATE. We had such bug patterns during the x86 maturing phase as
+well.
+
+Jan
+
+
+--Da8MlNVDgHVbb9w4EDdPNlhxaBmlodcUa
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iEYEARECAAYFAlWM2d4ACgkQitSsb3rl5xSlJwCbBFoArdKM2lJM16nQdrvtqueL
+ly4AoMMbn4JWrRuEgwqeeQYA527TgvK/
+=LsYZ
+-----END PGP SIGNATURE-----
+
+--Da8MlNVDgHVbb9w4EDdPNlhxaBmlodcUa--
+
+--===============3165891192140073184==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============3165891192140073184==--
