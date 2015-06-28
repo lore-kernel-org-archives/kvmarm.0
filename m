@@ -1,89 +1,87 @@
-From: Mario Smarduch <m.smarduch@samsung.com>
-Subject: Re: [PATCH 0/3] arm: KVM: VFP lazy switch in KVM Host Mode may save
- upto 98%
-Date: Sun, 28 Jun 2015 10:57:09 -0700
-Message-ID: <55903575.8060702@samsung.com>
-References: <1435203028-23142-1-git-send-email-m.smarduch@samsung.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH 02/13] KVM: extend struct kvm_msi to hold a 32-bit device
+ ID
+Date: Sun, 28 Jun 2015 21:12:34 +0200
+Message-ID: <20150628191234.GI28244@cbox>
+References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com>
+ <1432893209-27313-3-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A12C756BB5
- for <kvmarm@lists.cs.columbia.edu>; Sun, 28 Jun 2015 13:46:22 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id i8esVDSJXRY6 for <kvmarm@lists.cs.columbia.edu>;
- Sun, 28 Jun 2015 13:46:20 -0400 (EDT)
-Received: from usmailout4.samsung.com (mailout4.w2.samsung.com
- [211.189.100.14])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C6B0C56BA8
- for <kvmarm@lists.cs.columbia.edu>; Sun, 28 Jun 2015 13:46:20 -0400 (EDT)
-Received: from uscpsbgex3.samsung.com
- (u124.gpu85.samsung.co.kr [203.254.195.124]) by usmailout4.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NQO00GY11VR1A10@usmailout4.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Sun, 28 Jun 2015 13:57:27 -0400 (EDT)
-In-reply-to: <1435203028-23142-1-git-send-email-m.smarduch@samsung.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: pbonzini@redhat.com, will.deacon@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1432893209-27313-3-git-send-email-andre.przywara@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc, Christoffer -
+On Fri, May 29, 2015 at 10:53:18AM +0100, Andre Przywara wrote:
+> The ARM GICv3 ITS MSI controller requires a device ID to be able to
+> assign the proper interrupt vector. On real hardware, this ID is
+> sampled from the bus. To be able to emulate an ITS controller, extend
+> the KVM MSI interface to let userspace provide such a device ID. For
+> PCI devices, the device ID is simply the 16-bit bus-device-function
+> triplet, which should be easily available to the userland tool.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  Documentation/virtual/kvm/api.txt | 8 ++++++--
+>  include/uapi/linux/kvm.h          | 4 +++-
+>  2 files changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+> index 9fa2bf8..891d64a 100644
+> --- a/Documentation/virtual/kvm/api.txt
+> +++ b/Documentation/virtual/kvm/api.txt
+> @@ -2121,10 +2121,14 @@ struct kvm_msi {
+>  	__u32 address_hi;
+>  	__u32 data;
+>  	__u32 flags;
+> -	__u8  pad[16];
+> +	__u32 devid;
+> +	__u8  pad[12];
+>  };
+>  
+> -No flags are defined so far. The corresponding field must be 0.
+> +flags: KVM_MSI_VALID_DEVID: devid is valid, otherwise ignored.
 
-to clarify - this series may be causing a conflict with the arm64
-basic approach, and arm32 exit code touch ups.
+I don't see what the 'otherwise ignored' part of the sentence here is
+meant to say, that the flags field is otherwise ignored for other value?
+That's not what the current API doc specifies, it specifies that the
+remainder of the field must be 0.
 
-The intent for this series  is more of an RFC or preview, to get some
-feedback - if this approach is sensible (I guess later applied to
-arm64 as well if it is).
+> +devid: If KVM_MSI_VALID_DEVID is set, contains a value to identify the device
+> +       that wrote the MSI message. For PCI, this is usually a BFD
+> +       identifier in the lower 16 bits.
 
-Thanks,
-- Mario
+I assume plus something else that uniquely identifies the PCI
+controller?
 
+-Christoffer
 
-On 06/24/2015 08:30 PM, Mario Smarduch wrote:
-> Currently we do a lazy VFP switch in Hyp mode, but once we exit and re-enter hyp
-> mode we trap again on VFP access. This mode has shown around 30-50% improvement
-> running hackbench and lmbench.
-> 
-> This patch series extends lazy VFP switch beyond Hyp mode to KVM host mode.
-> 
-> 1 - On guest access we switch from host to guest and set a flag accessible to 
->     host
-> 2 - On exit to KVM host, VFP state is restored on vcpu_put if flag is marked (1)
-> 3 - Otherwise guest is resumed and continues to use its VFP registers. 
-> 4 - In case of 2 on VM entry we set VFP trap flag to repeat 1.
-> 
-> If guest does not access VFP registers them implemenation remains the same.
-> 
-> Executing hackbench on Fast Models and Exynos arm32 board shows good
-> results. Considering all exits 2% of the time KVM host lazy vfp switch is 
-> invoked.
-> 
-> Howeverr this patch set requires more burn in time and testing under various 
-> loads.
-> 
-> Currently ARM32 is addressed later ARM64.
-> 
-> Mario Smarduch (3):
->   define headers and offsets to mange VFP state
->   Implement lazy VFP switching outside of Hyp Mode
->   Add VFP lazy switch hooks in Host KVM
-> 
->  arch/arm/include/asm/kvm_asm.h  |    1 +
->  arch/arm/include/asm/kvm_host.h |    3 +++
->  arch/arm/kernel/asm-offsets.c   |    1 +
->  arch/arm/kvm/arm.c              |   15 ++++++++++++
->  arch/arm/kvm/interrupts.S       |   49 +++++++++++++++++++++++++--------------
->  5 files changed, 51 insertions(+), 18 deletions(-)
+>  
+>  
+>  4.71 KVM_CREATE_PIT2
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 4b60056..2a23705 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -965,12 +965,14 @@ struct kvm_one_reg {
+>  	__u64 addr;
+>  };
+>  
+> +#define KVM_MSI_VALID_DEVID	(1U << 0)
+>  struct kvm_msi {
+>  	__u32 address_lo;
+>  	__u32 address_hi;
+>  	__u32 data;
+>  	__u32 flags;
+> -	__u8  pad[16];
+> +	__u32 devid;
+> +	__u8  pad[12];
+>  };
+>  
+>  struct kvm_arm_device_addr {
+> -- 
+> 2.3.5
 > 
