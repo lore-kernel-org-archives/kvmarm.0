@@ -1,22 +1,30 @@
-From: Tirumalesh Chalamarla <tchalamarla@caviumnetworks.com>
-Subject: [PATCH] arm64: KVM: Enable minimalistic support for Thunder
-Date: Fri, 26 Jun 2015 12:51:24 -0700
-Message-ID: <1435348284-32132-1-git-send-email-tchalamarla@caviumnetworks.com>
+From: Mario Smarduch <m.smarduch@samsung.com>
+Subject: Re: [PATCH 0/3] arm: KVM: VFP lazy switch in KVM Host Mode may save
+ upto 98%
+Date: Sun, 28 Jun 2015 10:57:09 -0700
+Message-ID: <55903575.8060702@samsung.com>
+References: <1435203028-23142-1-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F23365715C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2015 15:40:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A12C756BB5
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 28 Jun 2015 13:46:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cQvveFdStmuJ for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Jun 2015 15:40:42 -0400 (EDT)
-Received: from na01-bl2-obe.outbound.protection.outlook.com
- (mail-bl2on0093.outbound.protection.outlook.com [65.55.169.93])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C58215715B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Jun 2015 15:40:42 -0400 (EDT)
+ with ESMTP id i8esVDSJXRY6 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 28 Jun 2015 13:46:20 -0400 (EDT)
+Received: from usmailout4.samsung.com (mailout4.w2.samsung.com
+ [211.189.100.14])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C6B0C56BA8
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 28 Jun 2015 13:46:20 -0400 (EDT)
+Received: from uscpsbgex3.samsung.com
+ (u124.gpu85.samsung.co.kr [203.254.195.124]) by usmailout4.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NQO00GY11VR1A10@usmailout4.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Sun, 28 Jun 2015 13:57:27 -0400 (EDT)
+In-reply-to: <1435203028-23142-1-git-send-email-m.smarduch@samsung.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -26,86 +34,56 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: andre.przywara@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, rrichter@cavium.com, linux-arm-kernel@lists.infradead.org
+To: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org
+Cc: pbonzini@redhat.com, will.deacon@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, catalin.marinas@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to allow KVM to run on Thunder implementations, add the
-minimal support required.
+Hi Marc, Christoffer -
 
-Signed-off-by: Tirumalesh Chalamarla <tchalamarla@caviumnetworks.com>
----
- arch/arm64/include/asm/cputype.h     | 3 +++
- arch/arm64/include/uapi/asm/kvm.h    | 3 ++-
- arch/arm64/kvm/guest.c               | 6 ++++++
- arch/arm64/kvm/sys_regs_generic_v8.c | 2 ++
- 4 files changed, 13 insertions(+), 1 deletion(-)
+to clarify - this series may be causing a conflict with the arm64
+basic approach, and arm32 exit code touch ups.
 
-diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
-index a84ec60..f603dcd 100644
---- a/arch/arm64/include/asm/cputype.h
-+++ b/arch/arm64/include/asm/cputype.h
-@@ -63,6 +63,7 @@
- 	((partnum)		<< MIDR_PARTNUM_SHIFT))
- 
- #define ARM_CPU_IMP_ARM		0x41
-+#define ARM_CPU_IMP_CAVIUM		0x43
- #define ARM_CPU_IMP_APM		0x50
- 
- #define ARM_CPU_PART_AEM_V8	0xD0F
-@@ -72,6 +73,8 @@
- 
- #define APM_CPU_PART_POTENZA	0x000
- 
-+#define ARM_CPU_PART_THUNDER	0x0A1
-+
- #define ID_AA64MMFR0_BIGENDEL0_SHIFT	16
- #define ID_AA64MMFR0_BIGENDEL0_MASK	(0xf << ID_AA64MMFR0_BIGENDEL0_SHIFT)
- #define ID_AA64MMFR0_BIGENDEL0(mmfr0)	\
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index d268320..6c4c556 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -59,8 +59,9 @@ struct kvm_regs {
- #define KVM_ARM_TARGET_CORTEX_A57	2
- #define KVM_ARM_TARGET_XGENE_POTENZA	3
- #define KVM_ARM_TARGET_CORTEX_A53	4
-+#define KVM_ARM_TARGET_CAVIUM_THUNDER	5
- 
--#define KVM_ARM_NUM_TARGETS		5
-+#define KVM_ARM_NUM_TARGETS		6
- 
- /* KVM_ARM_SET_DEVICE_ADDR ioctl id encoding */
- #define KVM_ARM_DEVICE_TYPE_SHIFT	0
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 9535bd5..3751f37 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -291,6 +291,12 @@ int __attribute_const__ kvm_target_cpu(void)
- 			return KVM_ARM_TARGET_XGENE_POTENZA;
- 		};
- 		break;
-+	case ARM_CPU_IMP_CAVIUM:
-+		switch (part_number) {
-+		case ARM_CPU_PART_THUNDER:
-+			return KVM_ARM_TARGET_CAVIUM_THUNDER;
-+		};
-+		break;
- 	};
- 
- 	return -EINVAL;
-diff --git a/arch/arm64/kvm/sys_regs_generic_v8.c b/arch/arm64/kvm/sys_regs_generic_v8.c
-index 475fd29..0e48ee8 100644
---- a/arch/arm64/kvm/sys_regs_generic_v8.c
-+++ b/arch/arm64/kvm/sys_regs_generic_v8.c
-@@ -94,6 +94,8 @@ static int __init sys_reg_genericv8_init(void)
- 					  &genericv8_target_table);
- 	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_XGENE_POTENZA,
- 					  &genericv8_target_table);
-+	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_CAVIUM_THUNDER,
-+					  &genericv8_target_table);
- 
- 	return 0;
- }
--- 
-2.1.0
+The intent for this series  is more of an RFC or preview, to get some
+feedback - if this approach is sensible (I guess later applied to
+arm64 as well if it is).
+
+Thanks,
+- Mario
+
+
+On 06/24/2015 08:30 PM, Mario Smarduch wrote:
+> Currently we do a lazy VFP switch in Hyp mode, but once we exit and re-enter hyp
+> mode we trap again on VFP access. This mode has shown around 30-50% improvement
+> running hackbench and lmbench.
+> 
+> This patch series extends lazy VFP switch beyond Hyp mode to KVM host mode.
+> 
+> 1 - On guest access we switch from host to guest and set a flag accessible to 
+>     host
+> 2 - On exit to KVM host, VFP state is restored on vcpu_put if flag is marked (1)
+> 3 - Otherwise guest is resumed and continues to use its VFP registers. 
+> 4 - In case of 2 on VM entry we set VFP trap flag to repeat 1.
+> 
+> If guest does not access VFP registers them implemenation remains the same.
+> 
+> Executing hackbench on Fast Models and Exynos arm32 board shows good
+> results. Considering all exits 2% of the time KVM host lazy vfp switch is 
+> invoked.
+> 
+> Howeverr this patch set requires more burn in time and testing under various 
+> loads.
+> 
+> Currently ARM32 is addressed later ARM64.
+> 
+> Mario Smarduch (3):
+>   define headers and offsets to mange VFP state
+>   Implement lazy VFP switching outside of Hyp Mode
+>   Add VFP lazy switch hooks in Host KVM
+> 
+>  arch/arm/include/asm/kvm_asm.h  |    1 +
+>  arch/arm/include/asm/kvm_host.h |    3 +++
+>  arch/arm/kernel/asm-offsets.c   |    1 +
+>  arch/arm/kvm/arm.c              |   15 ++++++++++++
+>  arch/arm/kvm/interrupts.S       |   49 +++++++++++++++++++++++++--------------
+>  5 files changed, 51 insertions(+), 18 deletions(-)
+> 
