@@ -1,72 +1,104 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 0/3] KVM: arm: Implement software vGICv2 emulation
-Date: Mon, 29 Jun 2015 16:29:38 +0100
-Message-ID: <55916462.5080901@arm.com>
-References: <cover.1435567226.git.p.fedin@samsung.com> <20150629125213.GK11332@cbox> <559151FE.8020701@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [PATCH 1/7] KVM: api: add kvm_irq_routing_extended_msi
+Date: Mon, 29 Jun 2015 17:37:11 +0200
+Message-ID: <1435592237-17924-2-git-send-email-eric.auger@linaro.org>
+References: <1435592237-17924-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <559151FE.8020701@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Pavel Fedin <p.fedin@samsung.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AB0D569D6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2015 11:26:40 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id gVuxP-w3wvtz for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Jun 2015 11:26:39 -0400 (EDT)
+Received: from mail-wi0-f181.google.com (mail-wi0-f181.google.com
+ [209.85.212.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6509E569D2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2015 11:26:39 -0400 (EDT)
+Received: by wicgi11 with SMTP id gi11so75971152wic.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2015 08:37:48 -0700 (PDT)
+In-Reply-To: <1435592237-17924-1-git-send-email-eric.auger@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: eric.auger@st.com, eric.auger@linaro.org, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, p.fedin@samsung.com, linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 29/06/15 15:11, Andre Przywara wrote:
-> Hi,
-> 
-> On 29/06/15 13:52, Christoffer Dall wrote:
->> Hi Pavel,
->>
->> [Please cc the kvm/arm list for such patches according to the
->> MAINTAINERS file in the future]
->>
->> On Mon, Jun 29, 2015 at 12:53:46PM +0300, Pavel Fedin wrote:
->>> Some hardware (like Raspberry Pi 2) is capable of running KVM, however lacks
->>> functional vGIC registers. This series introduces software vGIC emulation for
->>> such machines, allowing to fully use virtualization capabilities
->>
->> Is this rather esoteric use case really worth the extra code in the
->> kernel? 
-> 
-> I wonder if these patches would pave the way to support running GICv2
-> guests on GICv3s without compat support? Admittedly not a really
-> compelling use case either, but at least worth discussing, I think.
+On ARM, the MSI msg (address and data) comes along with
+out-of-band device ID information. The device ID encodes the device
+that composes the MSI msg. Let's create a new routing entry type,
+dubbed KVM_IRQ_ROUTING_EXTENDED_MSI and use the __u32 pad space
+to convey the device ID.
 
-Let's face it: arm64 has no legacy to support. So if you're on a pure
-GICv3 system, you run a GICv3 guest (oddly enough, pure GICv3 systems
-are also pure AArch64 systems - see a pattern?). We've made sure the
-software was available in a timely manner.
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
-> Also if this will make the hack needed to enable KVM on RPi2 smaller,
-> I'd rather embrace this one than letting any random hacks appear on that
-> RPi kernel tree (patches which I have seen already on some other repo).
-> If I get this correctly, there are some efforts currently to get closer
-> to mainline with the RPi tree.
+---
 
-Whatever the RPi people do in their tree is their problem. I don't care.
-I'm interested in supporting *compliant hardware*, and not doing a quick
-hack on the side.
+RFC -> PATCH
+- remove kvm_irq_routing_extended_msi and use union instead
+---
+ Documentation/virtual/kvm/api.txt | 9 ++++++++-
+ include/uapi/linux/kvm.h          | 6 +++++-
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
-Even if RPi-2 was fully supported in mainline, this code would actively
-prevent us from supporting proper timer deactivation, for example.
-
-> Pavel, is this "broken" GIC you are talking about going to appear in a
-> publicly available SoC? If yes, you could either state this right now or
-> send it later once you can talk publicly.
-> 
-> Marc, Christoffer:
-> So is this GICv2 CPU interface emulation totally out of question for us
-> or is it worth at least commenting on the patches?
-
-As long as this code is there to support a platform that doesn't exist
-in a mainline tree, I'm not interested. We have much bigger fish to fry,
-and supporting what is effectively a broken platform is not exactly high
-on the agenda.
-
-Thanks,
-
-	M.
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index d20fd94..6426ae9 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -1414,7 +1414,10 @@ struct kvm_irq_routing_entry {
+ 	__u32 gsi;
+ 	__u32 type;
+ 	__u32 flags;
+-	__u32 pad;
++	union {
++		__u32 pad;
++		__u32 devid;
++	};
+ 	union {
+ 		struct kvm_irq_routing_irqchip irqchip;
+ 		struct kvm_irq_routing_msi msi;
+@@ -1427,6 +1430,10 @@ struct kvm_irq_routing_entry {
+ #define KVM_IRQ_ROUTING_IRQCHIP 1
+ #define KVM_IRQ_ROUTING_MSI 2
+ #define KVM_IRQ_ROUTING_S390_ADAPTER 3
++#define KVM_IRQ_ROUTING_EXTENDED_MSI 4
++
++In case of KVM_IRQ_ROUTING_EXTENDED_MSI routing type, devid is used to convey
++the device ID.
+ 
+ No flags are specified so far, the corresponding field must be set to zero.
+ 
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 2a23705..8484681 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -841,12 +841,16 @@ struct kvm_irq_routing_s390_adapter {
+ #define KVM_IRQ_ROUTING_IRQCHIP 1
+ #define KVM_IRQ_ROUTING_MSI 2
+ #define KVM_IRQ_ROUTING_S390_ADAPTER 3
++#define KVM_IRQ_ROUTING_EXTENDED_MSI 4
+ 
+ struct kvm_irq_routing_entry {
+ 	__u32 gsi;
+ 	__u32 type;
+ 	__u32 flags;
+-	__u32 pad;
++	union {
++		__u32 pad;
++		__u32 devid;
++	};
+ 	union {
+ 		struct kvm_irq_routing_irqchip irqchip;
+ 		struct kvm_irq_routing_msi msi;
 -- 
-Jazz is not dead. It just smells funny...
+1.9.1
