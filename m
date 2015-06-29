@@ -1,53 +1,41 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] arm64: KVM: Enable minimalistic support for Thunder
-Date: Mon, 29 Jun 2015 09:53:40 +0100
-Message-ID: <55910794.6000107@arm.com>
-References: <1435348284-32132-1-git-send-email-tchalamarla@caviumnetworks.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH] kvmtool: don't use PCI config space IRQ line field
+Date: Mon, 29 Jun 2015 11:10:05 +0100
+Message-ID: <20150629101004.GB17474@arm.com>
+References: <1433431245-23227-1-git-send-email-andre.przywara@arm.com>
+ <20150605164158.GL7420@arm.com>
+ <557EACD2.1030500@arm.com>
+ <20150616170657.GO30522@arm.com>
+ <5582FDB9.3020700@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 716DC5697B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2015 04:42:36 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TA5AG58HNXIT for <kvmarm@lists.cs.columbia.edu>;
- Mon, 29 Jun 2015 04:42:35 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 08F225697A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2015 04:42:34 -0400 (EDT)
-In-Reply-To: <1435348284-32132-1-git-send-email-tchalamarla@caviumnetworks.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Tirumalesh Chalamarla <tchalamarla@caviumnetworks.com>, kvmarm@lists.cs.columbia.edu
-Cc: andre.przywara@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, rrichter@cavium.com, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <5582FDB9.3020700@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: "penberg@kernel.org" <penberg@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 26/06/15 20:51, Tirumalesh Chalamarla wrote:
-> In order to allow KVM to run on Thunder implementations, add the
-> minimal support required.
-> 
-> Signed-off-by: Tirumalesh Chalamarla <tchalamarla@caviumnetworks.com>
+Hi Andre,
 
-CCing the KVM/ARM maintainers should be the first course of action.
+On Thu, Jun 18, 2015 at 06:19:53PM +0100, Andre Przywara wrote:
+> I am tempted to remove shmem, since it's broken:
+> a) there is no upstream driver, only some out-of-tree uio driver module
+> in some Github repo
 
-Also, you may want to try Suzuki's patch instead:
+Right, but that's the same for qemu and we've already made the jump of
+merging the driver, so I don't think that's a good argument for throwing
+it out of the tree.
 
-http://www.spinics.net/lists/kvm/msg117703.html
+> b) the PCI device BARs do not match what QEMU implements and what the
+> uio driver expects (IO BAR vs. MMIO BAR)
 
-Constantly adding new CPUs without providing any insight as to how they
-should be emulated only brings churn, and not much benefit.
+In what way? A quick look suggests that kvmtool is at least aligned with
+said github repo.
 
-Thanks,
+> c) there is (at least one) bug in kvmtool (easily fixed, though)
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Care to elaborate?
+
+Will
