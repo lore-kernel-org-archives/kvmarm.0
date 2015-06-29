@@ -1,24 +1,25 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH 7/7] KVM: arm: implement kvm_set_msi by gsi direct mapping
-Date: Mon, 29 Jun 2015 17:37:17 +0200
-Message-ID: <1435592237-17924-8-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH 6/7] KVM: arm/arm64: enable MSI routing
+Date: Mon, 29 Jun 2015 17:37:16 +0200
+Message-ID: <1435592237-17924-7-git-send-email-eric.auger@linaro.org>
 References: <1435592237-17924-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 17F2756A17
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2015 11:26:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 37FBF56A00
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2015 11:26:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aYehNkEMs0vG for <kvmarm@lists.cs.columbia.edu>;
- Mon, 29 Jun 2015 11:26:50 -0400 (EDT)
-Received: from mail-wg0-f45.google.com (mail-wg0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E48AD569EA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2015 11:26:48 -0400 (EDT)
-Received: by wguu7 with SMTP id u7so144740545wgu.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2015 08:37:58 -0700 (PDT)
+ with ESMTP id uY2-eZZbnHUl for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 29 Jun 2015 11:26:47 -0400 (EDT)
+Received: from mail-wi0-f172.google.com (mail-wi0-f172.google.com
+ [209.85.212.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D9A2569FB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2015 11:26:47 -0400 (EDT)
+Received: by wibdq8 with SMTP id dq8so75973668wib.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Jun 2015 08:37:56 -0700 (PDT)
 In-Reply-To: <1435592237-17924-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,44 +34,89 @@ To: eric.auger@st.com, eric.auger@linaro.org, linux-arm-kernel@lists.infradead.o
 Cc: pbonzini@redhat.com, p.fedin@samsung.com, linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-If the ITS modality is not available, let's simply support MSI
-injection by transforming the MSI.data into an SPI ID.
-
-This becomes possible to use KVM_SIGNAL_MSI ioctl for arm too.
+Up to now, only irqchip routing entries could be set. This patch
+adds the capability to insert MSI routing entries, extended or
+standard ones. Although standard MSI entries can be set, their
+injection still is not supported. For ARM64, let's also increase
+KVM_MAX_IRQ_ROUTES to 4096: include SPI irqchip flat routes plus
+MSI routes. In the future this might be extended.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
----
- arch/arm/kvm/Kconfig | 1 +
- virt/kvm/arm/vgic.c  | 5 +++++
- 2 files changed, 6 insertions(+)
 
-diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
-index 151e710..0f58baf 100644
---- a/arch/arm/kvm/Kconfig
-+++ b/arch/arm/kvm/Kconfig
-@@ -31,6 +31,7 @@ config KVM
- 	select KVM_VFIO
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
-+	select HAVE_KVM_MSI
- 	select HAVE_KVM_IRQCHIP
- 	select HAVE_KVM_IRQ_ROUTING
- 	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
+---
+
+RFC -> PATCH:
+- move api MSI routing updates into that patch file
+- use new devid field of user api struct
+---
+ Documentation/virtual/kvm/api.txt |  9 +++++++++
+ include/linux/kvm_host.h          |  2 ++
+ virt/kvm/arm/vgic.c               | 13 +++++++++++++
+ 3 files changed, 24 insertions(+)
+
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index 1e0d5f5..b411232 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -1405,6 +1405,10 @@ Sets the GSI routing table entries, overwriting any previously set entries.
+ On arm/arm64, GSI routing has the following limitation:
+ - GSI routing does not apply to KVM_IRQ_LINE but only to KVM_IRQFD.
+ 
++On arm/arm64, MSI routing through in-kernel GICv3 ITS must use
++KVM_IRQ_ROUTING_EXTENDED_MSI routing type to specify additionnal device ID.
++Otherwise, KVM_IRQ_ROUTING_MSI must be used.
++
+ struct kvm_irq_routing {
+ 	__u32 nr;
+ 	__u32 flags;
+@@ -2315,6 +2319,11 @@ On arm/arm64, gsi routing being supported, the following can happen:
+ - in case no routing entry is associated to this gsi, injection fails
+ - in case the gsi is associated to an irqchip routing entry,
+   irqchip.pin + 32 corresponds to the injected SPI ID.
++- in case the gsi is associated to an MSI routing entry,
++  * without GICv3 ITS in-kernel emulation, MSI data patches the SPI ID
++    of the injected SPI
++  * with GICv3 ITS in-kernel emulation, the MSI message and device ID
++    are translated into an LPI.
+ 
+ 4.76 KVM_PPC_ALLOCATE_HTAB
+ 
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index e1c1c0d..4ca8f8e 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -927,6 +927,8 @@ static inline int mmu_notifier_retry(struct kvm *kvm, unsigned long mmu_seq)
+ 
+ #ifdef CONFIG_S390
+ #define KVM_MAX_IRQ_ROUTES 4096 //FIXME: we can have more than that...
++#elif defined(CONFIG_ARM64)
++#define KVM_MAX_IRQ_ROUTES 4096
+ #else
+ #define KVM_MAX_IRQ_ROUTES 1024
+ #endif
 diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 0b4c48c..b3c10dc 100644
+index 410fee1..0b4c48c 100644
 --- a/virt/kvm/arm/vgic.c
 +++ b/virt/kvm/arm/vgic.c
-@@ -2314,6 +2314,11 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
- 			return kvm->arch.vgic.vm_ops.inject_msi(kvm, &msi);
- 		else
- 			return -ENODEV;
+@@ -2258,6 +2258,19 @@ int kvm_set_routing_entry(struct kvm_kernel_irq_routing_entry *e,
+ 		    (e->irqchip.irqchip >= KVM_NR_IRQCHIPS))
+ 			goto out;
+ 		break;
 +	case KVM_IRQ_ROUTING_MSI:
-+		if (kvm->arch.vgic.vm_ops.inject_msi)
-+			return -EINVAL;
-+		else
-+			return kvm_vgic_inject_irq(kvm, 0, e->msi.data, level);
++		e->set = kvm_set_msi;
++		e->msi.address_lo = ue->u.msi.address_lo;
++		e->msi.address_hi = ue->u.msi.address_hi;
++		e->msi.data = ue->u.msi.data;
++		break;
++	case KVM_IRQ_ROUTING_EXTENDED_MSI:
++		e->set = kvm_set_msi;
++		e->ext_msi.address_lo = ue->u.msi.address_lo;
++		e->ext_msi.address_hi = ue->u.msi.address_hi;
++		e->ext_msi.data = ue->u.msi.data;
++		e->ext_msi.devid = ue->devid;
++		break;
  	default:
- 		return -EINVAL;
+ 		goto out;
  	}
 -- 
 1.9.1
