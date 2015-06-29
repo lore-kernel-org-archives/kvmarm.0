@@ -1,298 +1,229 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 04/11] KVM: arm: common infrastructure for handling
- AArch32 CP14/CP15
-Date: Mon, 29 Jun 2015 21:43:34 +0200
-Message-ID: <20150629194334.GN11332@cbox>
+Subject: Re: [PATCH v3 06/11] KVM: arm: add trap handlers for 32-bit debug
+ registers
+Date: Mon, 29 Jun 2015 23:16:41 +0200
+Message-ID: <20150629211641.GO11332@cbox>
 References: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org>
- <1434969694-7432-5-git-send-email-zhichao.huang@linaro.org>
+ <1434969694-7432-7-git-send-email-zhichao.huang@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1434969694-7432-5-git-send-email-zhichao.huang@linaro.org>
+In-Reply-To: <1434969694-7432-7-git-send-email-zhichao.huang@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Zhichao Huang <zhichao.huang@linaro.org>
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com, huangzhichao@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jun 22, 2015 at 06:41:27PM +0800, Zhichao Huang wrote:
-> As we're about to trap a bunch of CP14 registers, let's rework
-> the CP15 handling so it can be generalized and work with multiple
-> tables.
+On Mon, Jun 22, 2015 at 06:41:29PM +0800, Zhichao Huang wrote:
+> Add handlers for all the 32-bit debug registers.
 > 
 > Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
 > ---
->  arch/arm/kvm/coproc.c          | 176 ++++++++++++++++++++++++++---------------
->  arch/arm/kvm/interrupts_head.S |   2 +-
->  2 files changed, 112 insertions(+), 66 deletions(-)
+>  arch/arm/include/asm/kvm_asm.h  |  12 ++++
+>  arch/arm/include/asm/kvm_host.h |   3 +
+>  arch/arm/kernel/asm-offsets.c   |   1 +
+>  arch/arm/kvm/coproc.c           | 122 ++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 138 insertions(+)
 > 
+> diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+> index 25410b2..ba65e05 100644
+> --- a/arch/arm/include/asm/kvm_asm.h
+> +++ b/arch/arm/include/asm/kvm_asm.h
+> @@ -52,6 +52,18 @@
+>  #define c10_AMAIR1	30	/* Auxilary Memory Attribute Indirection Reg1 */
+>  #define NR_CP15_REGS	31	/* Number of regs (incl. invalid) */
+>  
+> +/* 0 is reserved as an invalid value. */
+> +#define cp14_DBGBVR0	1	/* Debug Breakpoint Control Registers (0-15) */
+> +#define cp14_DBGBVR15	16
+> +#define cp14_DBGBCR0	17	/* Debug Breakpoint Value Registers (0-15) */
+> +#define cp14_DBGBCR15	32
+> +#define cp14_DBGWVR0	33	/* Debug Watchpoint Control Registers (0-15) */
+> +#define cp14_DBGWVR15	48
+> +#define cp14_DBGWCR0	49	/* Debug Watchpoint Value Registers (0-15) */
+> +#define cp14_DBGWCR15	64
+> +#define cp14_DBGDSCRext	65	/* Debug Status and Control external */
+> +#define NR_CP14_REGS	66	/* Number of regs (incl. invalid) */
+> +
+>  #define ARM_EXCEPTION_RESET	  0
+>  #define ARM_EXCEPTION_UNDEFINED   1
+>  #define ARM_EXCEPTION_SOFTWARE    2
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index d71607c..3d16820 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -124,6 +124,9 @@ struct kvm_vcpu_arch {
+>  	struct vgic_cpu vgic_cpu;
+>  	struct arch_timer_cpu timer_cpu;
+>  
+> +	/* System control coprocessor (cp14) */
+> +	u32 cp14[NR_CP14_REGS];
+> +
+>  	/*
+>  	 * Anything that is not used directly from assembly code goes
+>  	 * here.
+> diff --git a/arch/arm/kernel/asm-offsets.c b/arch/arm/kernel/asm-offsets.c
+> index 871b826..9158de0 100644
+> --- a/arch/arm/kernel/asm-offsets.c
+> +++ b/arch/arm/kernel/asm-offsets.c
+> @@ -172,6 +172,7 @@ int main(void)
+>  #ifdef CONFIG_KVM_ARM_HOST
+>    DEFINE(VCPU_KVM,		offsetof(struct kvm_vcpu, kvm));
+>    DEFINE(VCPU_MIDR,		offsetof(struct kvm_vcpu, arch.midr));
+> +  DEFINE(VCPU_CP14,		offsetof(struct kvm_vcpu, arch.cp14));
+>    DEFINE(VCPU_CP15,		offsetof(struct kvm_vcpu, arch.cp15));
+>    DEFINE(VCPU_VFP_GUEST,	offsetof(struct kvm_vcpu, arch.vfp_guest));
+>    DEFINE(VCPU_VFP_HOST,		offsetof(struct kvm_vcpu, arch.host_cpu_context));
 > diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-> index 9d283d9..d23395b 100644
+> index 16d5f69..59b65b7 100644
 > --- a/arch/arm/kvm/coproc.c
 > +++ b/arch/arm/kvm/coproc.c
-> @@ -375,6 +375,9 @@ static const struct coproc_reg cp15_regs[] = {
+> @@ -220,6 +220,47 @@ bool access_vm_reg(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> +static bool trap_debug32(struct kvm_vcpu *vcpu,
+> +			const struct coproc_params *p,
+> +			const struct coproc_reg *r)
+> +{
+> +	if (p->is_write)
+> +		vcpu->arch.cp14[r->reg] = *vcpu_reg(vcpu, p->Rt1);
+> +	else
+> +		*vcpu_reg(vcpu, p->Rt1) = vcpu->arch.cp14[r->reg];
+> +
+> +	return true;
+> +}
+> +
+> +/* DBGIDR (RO) Debug ID */
+> +static bool trap_dbgidr(struct kvm_vcpu *vcpu,
+> +			const struct coproc_params *p,
+> +			const struct coproc_reg *r)
+> +{
+> +	u32 val;
+> +
+> +	if (p->is_write)
+> +		return ignore_write(vcpu, p);
+> +
+> +	ARM_DBG_READ(c0, c0, 0, val);
+> +	*vcpu_reg(vcpu, p->Rt1) = val;
+> +
+> +	return true;
+> +}
+> +
+> +/* DBGDSCRint (RO) Debug Status and Control Register */
+> +static bool trap_dbgdscr(struct kvm_vcpu *vcpu,
+> +			const struct coproc_params *p,
+> +			const struct coproc_reg *r)
+> +{
+> +	if (p->is_write)
+> +		return ignore_write(vcpu, p);
+> +
+> +	*vcpu_reg(vcpu, p->Rt1) = vcpu->arch.cp14[r->reg];
+> +
+> +	return true;
+> +}
+> +
+>  /*
+>   * We could trap ID_DFR0 and tell the guest we don't support performance
+>   * monitoring.  Unfortunately the patch to make the kernel check ID_DFR0 was
+> @@ -375,7 +416,88 @@ static const struct coproc_reg cp15_regs[] = {
 >  	{ CRn(15), CRm( 0), Op1( 4), Op2( 0), is32, access_cbar},
 >  };
 >  
-> +static const struct coproc_reg cp14_regs[] = {
-> +};
+> +#define DBG_BCR_BVR_WCR_WVR(n)					\
+> +	/* DBGBVRn */						\
+> +	{ CRn( 0), CRm((n)), Op1( 0), Op2( 4), is32,		\
+> +	  trap_debug32,	reset_val, (cp14_DBGBVR0 + (n)), 0 },	\
+> +	/* DBGBCRn */						\
+> +	{ CRn( 0), CRm((n)), Op1( 0), Op2( 5), is32,		\
+> +	  trap_debug32,	reset_val, (cp14_DBGBCR0 + (n)), 0 },	\
+> +	/* DBGWVRn */						\
+> +	{ CRn( 0), CRm((n)), Op1( 0), Op2( 6), is32,		\
+> +	  trap_debug32,	reset_val, (cp14_DBGWVR0 + (n)), 0 },	\
+> +	/* DBGWCRn */						\
+> +	{ CRn( 0), CRm((n)), Op1( 0), Op2( 7), is32,		\
+> +	  trap_debug32,	reset_val, (cp14_DBGWCR0 + (n)), 0 }
 > +
->  /* Target specific emulation tables */
->  static struct kvm_coproc_target_table *target_tables[KVM_ARM_NUM_TARGETS];
->  
-> @@ -424,47 +427,75 @@ static const struct coproc_reg *find_reg(const struct coproc_params *params,
->  	return NULL;
->  }
->  
-> -static int emulate_cp15(struct kvm_vcpu *vcpu,
-> -			const struct coproc_params *params)
+> +/* No OS DBGBXVR machanism implemented. */
+> +#define DBGBXVR(n)						\
+> +	{ CRn( 1), CRm((n)), Op1( 0), Op2( 1), is32, trap_raz_wi }
+> +
 > +/*
-> + * emulate_cp --  tries to match a cp14/cp15 access in a handling table,
-> + *                and call the corresponding trap handler.
-> + *
-> + * @params: pointer to the descriptor of the access
-> + * @table: array of trap descriptors
-> + * @num: size of the trap descriptor array
-> + *
-> + * Return 0 if the access has been handled, and -1 if not.
-> + */
-> +static int emulate_cp(struct kvm_vcpu *vcpu,
-> +			const struct coproc_params *params,
-> +			const struct coproc_reg *table,
-> +			size_t num)
->  {
-> -	size_t num;
-> -	const struct coproc_reg *table, *r;
-> -
-> -	trace_kvm_emulate_cp15_imp(params->Op1, params->Rt1, params->CRn,
-> -				   params->CRm, params->Op2, params->is_write);
-> +	const struct coproc_reg *r;
->  
-> -	table = get_target_table(vcpu->arch.target, &num);
-> +	if (!table)
-> +		return -1;	/* Not handled */
->  
-> -	/* Search target-specific then generic table. */
->  	r = find_reg(params, table, num);
-> -	if (!r)
-> -		r = find_reg(params, cp15_regs, ARRAY_SIZE(cp15_regs));
->  
-> -	if (likely(r)) {
-> +	if (r) {
->  		/* If we don't have an accessor, we should never get here! */
->  		BUG_ON(!r->access);
->  
->  		if (likely(r->access(vcpu, params, r))) {
->  			/* Skip instruction, since it was emulated */
->  			kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-> -			return 1;
->  		}
-> -		/* If access function fails, it should complain. */
-> -	} else {
-> -		kvm_err("Unsupported guest CP15 access at: %08lx\n",
-> -			*vcpu_pc(vcpu));
-> -		print_cp_instr(params);
-> +
-> +		/* Handled */
-> +		return 0;
->  	}
-> +
-> +	/* Not handled */
-> +	return -1;
-> +}
-> +
-> +static void unhandled_cp_access(struct kvm_vcpu *vcpu,
-> +				const struct coproc_params *params)
-> +{
-> +	u8 hsr_ec = kvm_vcpu_trap_get_class(vcpu);
-> +	int cp;
-> +
-> +	switch (hsr_ec) {
-> +	case HSR_EC_CP15_32:
-> +	case HSR_EC_CP15_64:
-> +		cp = 15;
-> +		break;
-> +	case HSR_EC_CP14_MR:
-> +	case HSR_EC_CP14_64:
-> +		cp = 14;
-> +		break;
-> +	default:
-> +		WARN_ON((cp = -1));
-> +	}
-> +
-> +	kvm_err("Unsupported guest CP%d access at: %08lx\n",
-> +		cp, *vcpu_pc(vcpu));
-> +	print_cp_instr(params);
->  	kvm_inject_undefined(vcpu);
-> -	return 1;
->  }
->  
-> -/**
-> - * kvm_handle_cp15_64 -- handles a mrrc/mcrr trap on a guest CP15 access
-> - * @vcpu: The VCPU pointer
-> - * @run:  The kvm_run struct
-> - */
-> -int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
-> +			const struct coproc_reg *global,
-> +			size_t nr_global,
-> +			const struct coproc_reg *target_specific,
-> +			size_t nr_specific)
->  {
->  	struct coproc_params params;
->  
-> @@ -478,7 +509,13 @@ int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  	params.Rt2 = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
->  	params.CRm = 0;
->  
-> -	return emulate_cp15(vcpu, &params);
-> +	if (!emulate_cp(vcpu, &params, target_specific, nr_specific))
-> +		return 1;
-> +	if (!emulate_cp(vcpu, &params, global, nr_global))
-> +		return 1;
-> +
-> +	unhandled_cp_access(vcpu, &params);
-> +	return 1;
->  }
->  
->  static void reset_coproc_regs(struct kvm_vcpu *vcpu,
-> @@ -491,12 +528,11 @@ static void reset_coproc_regs(struct kvm_vcpu *vcpu,
->  			table[i].reset(vcpu, &table[i]);
->  }
->  
-> -/**
-> - * kvm_handle_cp15_32 -- handles a mrc/mcr trap on a guest CP15 access
-> - * @vcpu: The VCPU pointer
-> - * @run:  The kvm_run struct
-> - */
-> -int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
-> +			const struct coproc_reg *global,
-> +			size_t nr_global,
-> +			const struct coproc_reg *target_specific,
-> +			size_t nr_specific)
->  {
->  	struct coproc_params params;
->  
-> @@ -510,33 +546,57 @@ int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  	params.Op2 = (kvm_vcpu_get_hsr(vcpu) >> 17) & 0x7;
->  	params.Rt2 = 0;
->  
-> -	return emulate_cp15(vcpu, &params);
-> +	if (!emulate_cp(vcpu, &params, target_specific, nr_specific))
-> +		return 1;
-> +	if (!emulate_cp(vcpu, &params, global, nr_global))
-> +		return 1;
-> +
-> +	unhandled_cp_access(vcpu, &params);
-> +	return 1;
->  }
->  
->  /**
-> - * kvm_handle_cp14_64 -- handles a mrrc/mcrr trap on a guest CP14 access
-> + * kvm_handle_cp15_64 -- handles a mrrc/mcrr trap on a guest CP15 access
->   * @vcpu: The VCPU pointer
->   * @run:  The kvm_run struct
->   */
-> -int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  {
-> -	struct coproc_params params;
-> +	const struct coproc_reg *target_specific;
-> +	size_t num;
->  
-> -	params.CRn = (kvm_vcpu_get_hsr(vcpu) >> 1) & 0xf;
-> -	params.Rt1 = (kvm_vcpu_get_hsr(vcpu) >> 5) & 0xf;
-> -	params.is_write = ((kvm_vcpu_get_hsr(vcpu) & 1) == 0);
-> -	params.is_64bit = true;
-> +	target_specific = get_target_table(vcpu->arch.target, &num);
-> +	return kvm_handle_cp_64(vcpu,
-> +				cp15_regs, ARRAY_SIZE(cp15_regs),
-> +				target_specific, num);
-> +}
->  
-> -	params.Op1 = (kvm_vcpu_get_hsr(vcpu) >> 16) & 0xf;
-> -	params.Op2 = 0;
-> -	params.Rt2 = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
-> -	params.CRm = 0;
-> +/**
-> + * kvm_handle_cp15_32 -- handles a mrc/mcr trap on a guest CP15 access
-> + * @vcpu: The VCPU pointer
-> + * @run:  The kvm_run struct
-> + */
-> +int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +{
-> +	const struct coproc_reg *target_specific;
-> +	size_t num;
->  
-> -	(void)trap_raz_wi(vcpu, &params, NULL);
-> +	target_specific = get_target_table(vcpu->arch.target, &num);
-> +	return kvm_handle_cp_32(vcpu,
-> +				cp15_regs, ARRAY_SIZE(cp15_regs),
-> +				target_specific, num);
-> +}
->  
-> -	/* handled */
-> -	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-> -	return 1;
-> +/**
-> + * kvm_handle_cp14_64 -- handles a mrrc/mcrr trap on a guest CP14 access
-> + * @vcpu: The VCPU pointer
-> + * @run:  The kvm_run struct
-> + */
-> +int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +{
-> +	return kvm_handle_cp_64(vcpu,
-> +				cp14_regs, ARRAY_SIZE(cp14_regs),
-> +				NULL, 0);
->  }
->  
->  /**
-> @@ -546,23 +606,9 @@ int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
->   */
->  int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  {
-> -	struct coproc_params params;
-> -
-> -	params.CRm = (kvm_vcpu_get_hsr(vcpu) >> 1) & 0xf;
-> -	params.Rt1 = (kvm_vcpu_get_hsr(vcpu) >> 5) & 0xf;
-> -	params.is_write = ((kvm_vcpu_get_hsr(vcpu) & 1) == 0);
-> -	params.is_64bit = false;
-> -
-> -	params.CRn = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
-> -	params.Op1 = (kvm_vcpu_get_hsr(vcpu) >> 14) & 0x7;
-> -	params.Op2 = (kvm_vcpu_get_hsr(vcpu) >> 17) & 0x7;
-> -	params.Rt2 = 0;
-> -
-> -	(void)trap_raz_wi(vcpu, &params, NULL);
-> -
-> -	/* handled */
-> -	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-> -	return 1;
-> +	return kvm_handle_cp_32(vcpu,
-> +				cp14_regs, ARRAY_SIZE(cp14_regs),
-> +				NULL, 0);
->  }
->  
->  /******************************************************************************
-> diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
-> index f85c447..a20b9ad 100644
-> --- a/arch/arm/kvm/interrupts_head.S
-> +++ b/arch/arm/kvm/interrupts_head.S
-> @@ -618,7 +618,7 @@ ARM_BE8(rev	r6, r6  )
->   * (hardware reset value is 0) */
->  .macro set_hdcr operation
->  	mrc	p15, 4, r2, c1, c1, 1
-> -	ldr	r3, =(HDCR_TPM|HDCR_TPMCR|HDCR_TDRA|HDCR_TDOSA|HDCR_TDA)
-> +	ldr	r3, =(HDCR_TPM|HDCR_TPMCR)
+> + * Trapped cp14 registers. We generally ignore most of the external
+> + * debug, on the principle that they don't really make sense to a
+> + * guest. Revisit this one day, whould this principle change.
 
-why do we stop trapping accesses here?
+s/whould/should/
 
--Christoffer
+> + */
+>  static const struct coproc_reg cp14_regs[] = {
+> +	/* DBGIDR */
+> +	{ CRn( 0), CRm( 0), Op1( 0), Op2( 0), is32, trap_dbgidr},
+> +	/* DBGDTRRXext */
+> +	{ CRn( 0), CRm( 0), Op1( 0), Op2( 2), is32, trap_raz_wi },
+> +	DBG_BCR_BVR_WCR_WVR(0),
+> +	/* DBGDSCRint */
+> +	{ CRn( 0), CRm( 1), Op1( 0), Op2( 0), is32, trap_dbgdscr,
+> +				NULL, cp14_DBGDSCRext },
+> +	DBG_BCR_BVR_WCR_WVR(1),
+> +	/* DBGDSCRext */
+> +	{ CRn( 0), CRm( 2), Op1( 0), Op2( 2), is32, trap_debug32,
+> +				reset_val, cp14_DBGDSCRext, 0 },
+> +	DBG_BCR_BVR_WCR_WVR(2),
+> +	/* DBGDTRRXext */
+> +	{ CRn( 0), CRm( 3), Op1( 0), Op2( 2), is32, trap_raz_wi },
 
->  	.if \operation == vmentry
->  	orr	r2, r2, r3		@ Trap some perfmon accesses
->  	.else
+isn't this the DBGDTRTXext register?
+
+> +	DBG_BCR_BVR_WCR_WVR(3),
+> +	DBG_BCR_BVR_WCR_WVR(4),
+> +	/* DBGDTR[RT]Xint */
+> +	{ CRn( 0), CRm( 5), Op1( 0), Op2( 0), is32, trap_raz_wi },
+> +	DBG_BCR_BVR_WCR_WVR(5),
+> +	DBG_BCR_BVR_WCR_WVR(6),
+> +	/* DBGVCR */
+> +	{ CRn( 0), CRm( 7), Op1( 0), Op2( 0), is32, trap_debug32 },
+> +	DBG_BCR_BVR_WCR_WVR(7),
+> +	DBG_BCR_BVR_WCR_WVR(8),
+> +	DBG_BCR_BVR_WCR_WVR(9),
+> +	DBG_BCR_BVR_WCR_WVR(10),
+> +	DBG_BCR_BVR_WCR_WVR(11),
+> +	DBG_BCR_BVR_WCR_WVR(12),
+> +	DBG_BCR_BVR_WCR_WVR(13),
+> +	DBG_BCR_BVR_WCR_WVR(14),
+> +	DBG_BCR_BVR_WCR_WVR(15),
+> +
+> +	DBGBXVR(0),
+> +	/* DBGOSLAR */
+> +	{ CRn( 1), CRm( 0), Op1( 0), Op2( 4), is32, trap_raz_wi },
+> +	DBGBXVR(1),
+> +	/* DBGOSLSR */
+> +	{ CRn( 1), CRm( 1), Op1( 0), Op2( 4), is32, trap_raz_wi },
+> +	DBGBXVR(2),
+> +	DBGBXVR(3),
+> +	/* DBGOSDLRd */
+> +	{ CRn( 1), CRm( 3), Op1( 0), Op2( 4), is32, trap_raz_wi },
+> +	DBGBXVR(4),
+> +	DBGBXVR(5),
+> +	/* DBGPRSRa */
+> +	{ CRn( 1), CRm( 5), Op1( 0), Op2( 4), is32, trap_raz_wi },
+> +
+> +	DBGBXVR(6),
+> +	DBGBXVR(7),
+> +	DBGBXVR(8),
+> +	DBGBXVR(9),
+> +	DBGBXVR(10),
+> +	DBGBXVR(11),
+> +	DBGBXVR(12),
+> +	DBGBXVR(13),
+> +	DBGBXVR(14),
+> +	DBGBXVR(15),
+>  };
+>  
+>  /* Target specific emulation tables */
 > -- 
 > 1.7.12.4
 > 
+Otherwise this looks ok,
+-Christoffer
