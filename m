@@ -1,27 +1,25 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 2/2] arm/arm64: KVM: fix two build failured under
- STRICT_MM_TYPECHECKS
-Date: Tue, 30 Jun 2015 18:04:50 +0200
-Message-ID: <1435680290-13945-2-git-send-email-ard.biesheuvel@linaro.org>
-References: <1435680290-13945-1-git-send-email-ard.biesheuvel@linaro.org>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v4 07/10] limit number of VCPUs on demand
+Date: Tue, 30 Jun 2015 17:09:53 +0100
+Message-ID: <20150630160949.GR27725@arm.com>
+References: <1435324578-21832-1-git-send-email-andre.przywara@arm.com>
+ <1435324578-21832-8-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EFA856B14
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Jun 2015 11:53:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F1E8556B32
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Jun 2015 11:58:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MGrgE9Bh48Y9 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 30 Jun 2015 11:53:48 -0400 (EDT)
-Received: from mail-wi0-f181.google.com (mail-wi0-f181.google.com
- [209.85.212.181])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5B34E56B0E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Jun 2015 11:53:48 -0400 (EDT)
-Received: by widjy10 with SMTP id jy10so34670734wid.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Jun 2015 09:05:00 -0700 (PDT)
-In-Reply-To: <1435680290-13945-1-git-send-email-ard.biesheuvel@linaro.org>
+ with ESMTP id Ei0NFcP2jVFN for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 30 Jun 2015 11:58:44 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A622F54493
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Jun 2015 11:58:44 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <1435324578-21832-8-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,44 +29,60 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, catalin.marinas@arm.com
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, kvmarm@lists.cs.columbia.edu
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "penberg@kernel.org" <penberg@kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This fixes two instances where a pgprot_t is used as the operand
-of a bitwise & operation. In order to comply with STRICT_MM_TYPECHECKS,
-bitwise arithmetic on a pgprot_t should go via the pgprot_val()
-accessor.
+On Fri, Jun 26, 2015 at 02:16:15PM +0100, Andre Przywara wrote:
+> Currently the ARM GIC checks the number of VCPUs against a fixed
+> limit, which is GICv2 specific. Don't pretend we know better than the
+> kernel and let's get rid of that explicit check.
+> Instead be more relaxed about KVM_CREATE_VCPU failing with EINVAL,
+> which is the way the kernel communicates having reached a VCPU limit.
+> If we see this and have at least brought up one VCPU already
+> successfully, then don't panic, but limit the number of VCPUs instead.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  arm/gic.c     | 6 ------
+>  arm/kvm-cpu.c | 7 ++++++-
+>  kvm-cpu.c     | 7 +++++++
+>  3 files changed, 13 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arm/gic.c b/arm/gic.c
+> index 99f0d2b..05f85a2 100644
+> --- a/arm/gic.c
+> +++ b/arm/gic.c
+> @@ -84,12 +84,6 @@ int gic__create(struct kvm *kvm)
+>  {
+>  	int err;
+>  
+> -	if (kvm->nrcpus > GIC_MAX_CPUS) {
+> -		pr_warning("%d CPUS greater than maximum of %d -- truncating\n",
+> -				kvm->nrcpus, GIC_MAX_CPUS);
+> -		kvm->nrcpus = GIC_MAX_CPUS;
+> -	}
+> -
+>  	/* Try the new way first, and fallback on legacy method otherwise */
+>  	err = gic__create_device(kvm);
+>  	if (err)
+> diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
+> index 7780251..b2fd6ed 100644
+> --- a/arm/kvm-cpu.c
+> +++ b/arm/kvm-cpu.c
+> @@ -51,8 +51,13 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
+>  		return NULL;
+>  
+>  	vcpu->vcpu_fd = ioctl(kvm->vm_fd, KVM_CREATE_VCPU, cpu_id);
+> -	if (vcpu->vcpu_fd < 0)
+> +	if (vcpu->vcpu_fd < 0) {
+> +		if (errno == EINVAL) {
+> +			free(vcpu);
+> +			return NULL;
+> +		}
 
-Cc: kvmarm@lists.cs.columbia.edu
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm/kvm/mmu.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Hmm, but EINVAL can mean all sorts of other failures too, surely? I'm
+not against removing the nrcpus check, but I think we should die if ioctls
+start failing rather than silently ignore them.
 
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 1d5accbd3dcf..a255c7dd534b 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -213,7 +213,8 @@ static void unmap_ptes(struct kvm *kvm, pmd_t *pmd,
- 			kvm_tlb_flush_vmid_ipa(kvm, addr);
- 
- 			/* No need to invalidate the cache for device mappings */
--			if ((pte_val(old_pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
-+			if ((pte_val(old_pte) & pgprot_val(PAGE_S2_DEVICE)) !=
-+			    pgprot_val(PAGE_S2_DEVICE))
- 				kvm_flush_dcache_pte(old_pte);
- 
- 			put_page(virt_to_page(pte));
-@@ -306,7 +307,8 @@ static void stage2_flush_ptes(struct kvm *kvm, pmd_t *pmd,
- 	pte = pte_offset_kernel(pmd, addr);
- 	do {
- 		if (!pte_none(*pte) &&
--		    (pte_val(*pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
-+		    (pte_val(*pte) & pgprot_val(PAGE_S2_DEVICE)) !=
-+		    pgprot_val(PAGE_S2_DEVICE))
- 			kvm_flush_dcache_pte(*pte);
- 	} while (pte++, addr += PAGE_SIZE, addr != end);
- }
--- 
-1.9.1
+Will
