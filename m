@@ -1,47 +1,25 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 03/11] KVM: arm: enable to use the ARM_DSCR_MDBGEN
- macro from KVM assembly code
-Date: Tue, 30 Jun 2015 15:20:13 +0200
-Message-ID: <20150630132013.GT11332@cbox>
+Subject: Re: [PATCH v3 05/11] KVM: arm: check ordering of all system register
+ tables
+Date: Tue, 30 Jun 2015 15:20:22 +0200
+Message-ID: <20150630132022.GU11332@cbox>
 References: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org>
- <1434969694-7432-4-git-send-email-zhichao.huang@linaro.org>
+ <1434969694-7432-6-git-send-email-zhichao.huang@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9336256AD8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Jun 2015 09:09:03 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HKrZ50XhGDDZ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 30 Jun 2015 09:09:01 -0400 (EDT)
-Received: from mail-la0-f49.google.com (mail-la0-f49.google.com
- [209.85.215.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AE59D56AD5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Jun 2015 09:09:01 -0400 (EDT)
-Received: by lagh6 with SMTP id h6so13087148lag.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Jun 2015 06:20:13 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1434969694-7432-4-git-send-email-zhichao.huang@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <1434969694-7432-6-git-send-email-zhichao.huang@linaro.org>
+Sender: kvm-owner@vger.kernel.org
 To: Zhichao Huang <zhichao.huang@linaro.org>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, will.deacon@arm.com, huangzhichao@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com, huangzhichao@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jun 22, 2015 at 06:41:26PM +0800, Zhichao Huang wrote:
-> Add #ifndef __ASSEMBLY__ in hw_breakpoint.h, in order to use
-> the ARM_DSCR_MDBGEN macro from KVM assembly code.
+On Mon, Jun 22, 2015 at 06:41:28PM +0800, Zhichao Huang wrote:
+> We now have multiple tables for the various system registers
+> we trap. Make sure we check the order of all of them, as it is
+> critical that we get the order right (been there, done that...).
 > 
 > Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
-> Reviewed-by: Alex Bennee <alex.bennee@linaro.org>
 
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
