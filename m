@@ -1,57 +1,74 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 06/10] KVM: arm/arm64: vgic: Allow dynamic mapping of
- physical/virtual interrupts
-Date: Wed, 1 Jul 2015 13:45:19 +0200
-Message-ID: <20150701114519.GB17890@cbox>
+Subject: Re: [PATCH 05/10] KVM: arm/arm64: vgic: Relax vgic_can_sample_irq
+ for edge IRQs
+Date: Wed, 1 Jul 2015 13:58:20 +0200
+Message-ID: <20150701115820.GC17890@cbox>
 References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com>
- <1433783045-8002-7-git-send-email-marc.zyngier@arm.com>
- <20150630201942.GB11332@cbox>
- <5593BEFD.4030608@arm.com>
+ <1433783045-8002-6-git-send-email-marc.zyngier@arm.com>
+ <20150630201933.GA11332@cbox>
+ <5593B040.6050208@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <5593BEFD.4030608@arm.com>
+In-Reply-To: <5593B040.6050208@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Eric Auger <eric.auger@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jul 01, 2015 at 11:20:45AM +0100, Marc Zyngier wrote:
+On Wed, Jul 01, 2015 at 10:17:52AM +0100, Marc Zyngier wrote:
 > On 30/06/15 21:19, Christoffer Dall wrote:
-> > On Mon, Jun 08, 2015 at 06:04:01PM +0100, Marc Zyngier wrote:
-> >> In order to be able to feed physical interrupts to a guest, we need
-> >> to be able to establish the virtual-physical mapping between the two
-> >> worlds.
+> > On Mon, Jun 08, 2015 at 06:04:00PM +0100, Marc Zyngier wrote:
+> >> We only set the irq_queued flag for level interrupts, meaning
+> >> that "!vgic_irq_is_queued(vcpu, irq)" is a good enough predicate
+> >> for all interrupts.
 > >>
-> >> The mapping is kept in a rbtree, indexed by virtual interrupts.
+> >> This will allow us to inject edge HW interrupts, for which the
+> >> state ACTIVE+PENDING is not allowed.
 > > 
-> > how many of these do you expect there will be?  Is the extra code and
-> > complexity of an rbtree really warranted?
+> > I don't understand this; ACTIVE+PENDING is allowed for edge interrupts.
+> > Do you mean that if we set the HW bit in the LR, then we are linking to
+> > an HW interrupt where we don't allow that to be ACTIVE+PENDING on the HW
+> > GIC side?
 > > 
-> > I would assume that you'll have one PPI for each CPU in the default case
-> > plus potentially a few more for an assigned network adapter, let's say a
-> > couple of handfulls.  Am I missing something obvious or is this
-> > optimization of traversing a list of 10-12 mappings in the typical case
-> > not likely to be measurable?
-> > 
-> > I would actually be more concerned about the additional locking and
-> > would look at RCU for protecting a list instead.  Can you protect an
-> > rbtree with RCU easily?
+> > Why is this relevant here?  I feel like I'm missing context.
 > 
-> Not very easily. There was some work done a while ago for the dentry
-> cache IIRC, but I doubt that's reusable directly, and probably overkill.
+> I've probably taken a shortcut here - bear with me while I'm trying to
+> explain the issue.
 > 
-> RCU protected lists are, on the other hand, readily available. Bah. I'll
-> switch to this. By the time it becomes the bottleneck, the world will
-> have moved on. Or so I hope.
+> For HW interrupts, we shouldn't even try to use the state bits in the
+> LR, because that state is contained in the physical distributor. Setting
+> the HW bit really means "there is something going on at the distributor
+> level, just go there".
+
+ok, so by "HW interrupts" you mean virtual interrupts with the HW bit in
+the LR set, correct?
+
 > 
-We can also move to RB trees if we have some data to show us it's worth
-the hassle later on, but I assume that since these structs are fairly
-small and overhead like this is mostly to show up on a hot path, a
-better optimization would be to allocate a bunch of these structures
-contiguously for cache locality, but again, I feel like this is all
-premature and we should measure the beast first.
+> If we were to inject a ACTIVE+PENDING interrupt at the LR level, we'd
+> basically loose the second interrupt because that state is simply not
+> considered.
+
+Huh?  Which second interrupt.  I looked at the spec and it says don't
+use the state bits for HW interrupts, so isn't it simply not supported
+to set these bits at all and that's it?
+
+> 
+> So the trick we're using is to only inject the active interrupt, and
+> prevent anything else from being injected until we can confirm that the
+> active state has been cleared at the physical level.
+> 
+> Does it make any sense?
+> 
+Sort of, but what I don't understand now is how the guest ever sees the
+interrupt then.  If we always inject the virtual interrupt by setting
+the active state on the physical distributor, and we can't inject this
+as active+pending, and the guest doesn't see the state in the LR, then
+how does this ever raise a virtual interrupt and how does the guest see
+an interrupt which is only PENDING so that it can ack it etc. etc.?
+
+Maybe I don't fully understand how the HW bit works after all...
 
 Thanks,
 -Christoffer
