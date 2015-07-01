@@ -1,81 +1,38 @@
-From: Zhichao Huang <zhichao.huang@linaro.org>
-Subject: Re: [PATCH v3 07/11] KVM: arm: add trap handlers for 64-bit debug registers
-Date: Wed, 01 Jul 2015 15:43:53 +0800
-Message-ID: <D99B53D5-38B0-4448-A97A-D96F4C01104C@linaro.org>
-References: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org> <1434969694-7432-8-git-send-email-zhichao.huang@linaro.org> <20150630132029.GV11332@cbox>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 10/10] KVM: arm/arm64: vgic: Allow non-shared device HW
+ interrupts
+Date: Wed, 01 Jul 2015 09:26:59 +0100
+Message-ID: <5593A453.4090903@arm.com>
+References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com> <1433783045-8002-11-git-send-email-marc.zyngier@arm.com> <20150630201903.GX11332@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20150630132029.GV11332@cbox>
+In-Reply-To: <20150630201903.GX11332@cbox>
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com, huangzhichao@huawei.com
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Eric Auger <eric.auger@linaro.org>, =?windows-1252?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 30/06/15 21:19, Christoffer Dall wrote:
+> On Mon, Jun 08, 2015 at 06:04:05PM +0100, Marc Zyngier wrote:
+>> So far, the only use of the HW interrupt facility is the timer,
+>> implying that the active state is context-switched for each vcpu,
+>> as the device is is shared across all vcpus.
+>>
+>> This does not work for a device that has been assigned to a VM,
+>> as the guest is entierely in control of that device (the HW is
+>> not shared). In that case, it makes sense to bypass the whole
+>> active state switchint, and only track the deactivation of the
+>> interrupt.
+>>
+> The discinction here between shared and non-shared feels a bit arbitrary
+> (it may not be, but just feel that way) and I can't easily convince
+> myself that this is the logical/correct/all-encompassing word to
+> describe the nature of the two devices.
 
+Does the idea of global vs private resource feel more correct?
 
-On June 30, 2015 9:20:29 PM GMT+08:00, Christoffer Dall <christoffer.dall@linaro.org> wrote:
->On Mon, Jun 22, 2015 at 06:41:30PM +0800, Zhichao Huang wrote:
->> Add handlers for all the 64-bit debug registers.
->> 
->> There is an overlap between 32 and 64bit registers. Make sure that
->> 64-bit registers preceding 32-bit ones.
->> 
->> Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
->> ---
->>  arch/arm/kvm/coproc.c | 12 ++++++++++++
->>  1 file changed, 12 insertions(+)
->> 
->> diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
->> index 59b65b7..eeee648 100644
->> --- a/arch/arm/kvm/coproc.c
->> +++ b/arch/arm/kvm/coproc.c
->> @@ -435,9 +435,17 @@ static const struct coproc_reg cp15_regs[] = {
->>  	{ CRn( 1), CRm((n)), Op1( 0), Op2( 1), is32, trap_raz_wi }
->>  
->>  /*
->> + * Architected CP14 registers.
->> + *
->
->belongs in other patch?
-
-OK, I will move it to the patch [06/11].
->
->>   * Trapped cp14 registers. We generally ignore most of the external
->>   * debug, on the principle that they don't really make sense to a
->>   * guest. Revisit this one day, whould this principle change.
->> + *
->> + * CRn denotes the primary register number, but is copied to the CRm in the
->> + * user space API for 64-bit register access in line with the terminology used
->> + * in the ARM ARM.
->> + * Important: Must be sorted ascending by CRn, CRM, Op1, Op2 and
->with 64-bit
->> + *            registers preceding 32-bit ones.
->>   */
->>  static const struct coproc_reg cp14_regs[] = {
->>  	/* DBGIDR */
->> @@ -445,10 +453,14 @@ static const struct coproc_reg cp14_regs[] = {
->>  	/* DBGDTRRXext */
->>  	{ CRn( 0), CRm( 0), Op1( 0), Op2( 2), is32, trap_raz_wi },
->>  	DBG_BCR_BVR_WCR_WVR(0),
->> +	/* DBGDRAR (64bit) */
->> +	{ CRn( 0), CRm( 1), Op1( 0), Op2( 0), is64, trap_raz_wi},
->>  	/* DBGDSCRint */
->>  	{ CRn( 0), CRm( 1), Op1( 0), Op2( 0), is32, trap_dbgdscr,
->>  				NULL, cp14_DBGDSCRext },
->>  	DBG_BCR_BVR_WCR_WVR(1),
->> +	/* DBGDSAR (64bit) */
->> +	{ CRn( 0), CRm( 2), Op1( 0), Op2( 0), is64, trap_raz_wi},
->>  	/* DBGDSCRext */
->>  	{ CRn( 0), CRm( 2), Op1( 0), Op2( 2), is32, trap_debug32,
->>  				reset_val, cp14_DBGDSCRext, 0 },
->> -- 
->> 1.7.12.4
->> 
->Otherwise:
->Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-
+	M.
 -- 
-Zhichao Huang
+Jazz is not dead. It just smells funny...
