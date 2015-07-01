@@ -1,105 +1,85 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 05/10] KVM: arm/arm64: vgic: Relax vgic_can_sample_irq
- for edge IRQs
-Date: Wed, 01 Jul 2015 19:18:40 +0100
-Message-ID: <55942F00.6000306@arm.com>
-References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com> <1433783045-8002-6-git-send-email-marc.zyngier@arm.com> <20150630201933.GA11332@cbox> <5593B040.6050208@arm.com> <20150701115820.GC17890@cbox>
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH v7 02/11] KVM: arm64: guest debug, define API headers
+Date: Wed,  1 Jul 2015 19:28:54 +0100
+Message-ID: <1435775343-20034-3-git-send-email-alex.bennee@linaro.org>
+References: <1435775343-20034-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20150701115820.GC17890@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Eric Auger <eric.auger@linaro.org>, =?windows-1252?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 274A6574EA
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jul 2015 14:18:06 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 6dT7tEeEp2ew for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Jul 2015 14:18:05 -0400 (EDT)
+Received: from mail-wg0-f52.google.com (mail-wg0-f52.google.com [74.125.82.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E5B2574D2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jul 2015 14:18:04 -0400 (EDT)
+Received: by wguu7 with SMTP id u7so43941410wgu.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Jul 2015 11:29:18 -0700 (PDT)
+In-Reply-To: <1435775343-20034-1-git-send-email-alex.bennee@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, jan.kiszka@siemens.com, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01/07/15 12:58, Christoffer Dall wrote:
-> On Wed, Jul 01, 2015 at 10:17:52AM +0100, Marc Zyngier wrote:
->> On 30/06/15 21:19, Christoffer Dall wrote:
->>> On Mon, Jun 08, 2015 at 06:04:00PM +0100, Marc Zyngier wrote:
->>>> We only set the irq_queued flag for level interrupts, meaning
->>>> that "!vgic_irq_is_queued(vcpu, irq)" is a good enough predicate
->>>> for all interrupts.
->>>>
->>>> This will allow us to inject edge HW interrupts, for which the
->>>> state ACTIVE+PENDING is not allowed.
->>>
->>> I don't understand this; ACTIVE+PENDING is allowed for edge interrupts.
->>> Do you mean that if we set the HW bit in the LR, then we are linking to
->>> an HW interrupt where we don't allow that to be ACTIVE+PENDING on the HW
->>> GIC side?
->>>
->>> Why is this relevant here?  I feel like I'm missing context.
->>
->> I've probably taken a shortcut here - bear with me while I'm trying to
->> explain the issue.
->>
->> For HW interrupts, we shouldn't even try to use the state bits in the
->> LR, because that state is contained in the physical distributor. Setting
->> the HW bit really means "there is something going on at the distributor
->> level, just go there".
-> 
-> ok, so by "HW interrupts" you mean virtual interrupts with the HW bit in
-> the LR set, correct?
-
-Yes, sorry.
-
->>
->> If we were to inject a ACTIVE+PENDING interrupt at the LR level, we'd
->> basically loose the second interrupt because that state is simply not
->> considered.
-> 
-> Huh?  Which second interrupt.  I looked at the spec and it says don't
-> use the state bits for HW interrupts, so isn't it simply not supported
-> to set these bits at all and that's it?
-
-I managed to confuse myself reading the same bit. It says (GICv3 spec):
-
-"A hypervisor must only use the pending and active state for software
-originated interrupts, which are typically associated with virtual
-devices, or SGIs."
-
-That's the PENDING+ACTIVE state, and not the pending and active bits
-like I read it initially.
-
-Now consider the following scenario:
-
-- We inject a virtual edge interrupt
-- We mark the corresponding physical interrupt as active.
-- Queue interrupt in an LR
-- Resume vcpu
-
-Now, we inject another edge interrupt, the vcpu exits for whatever
-reason, and the previously injected interrupt is still active.
-
-The normal vGIC flow would be to mark the interrupt as ACTIVE+PENDING in
-the LR, and resume the vcpu. But the above states that this is invalid
-for HW generated interrupts.
-
->>
->> So the trick we're using is to only inject the active interrupt, and
->> prevent anything else from being injected until we can confirm that the
->> active state has been cleared at the physical level.
->>
->> Does it make any sense?
->>
-> Sort of, but what I don't understand now is how the guest ever sees the
-> interrupt then.  If we always inject the virtual interrupt by setting
-> the active state on the physical distributor, and we can't inject this
-> as active+pending, and the guest doesn't see the state in the LR, then
-> how does this ever raise a virtual interrupt and how does the guest see
-> an interrupt which is only PENDING so that it can ack it etc. etc.?
-> 
-> Maybe I don't fully understand how the HW bit works after all...
-
-The way the spec is written is slightly misleading. But the gist of it
-is that we still signal the guest using the PENDING bit in the LR, and
-switch the LR as usual. it is just that we can't use the PENDING+ACTIVE
-state (apparently, this can lead to a double deactivation).
-
-Not sure the above makes sense. Beer time, I suppose.
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+VGhpcyBjb21taXQgZGVmaW5lcyB0aGUgQVBJIGhlYWRlcnMgZm9yIGd1ZXN0IGRlYnVnZ2luZy4g
+VGhlcmUgYXJlIHR3bwphcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVidWcgc3RydWN0dXJlczoKCiAg
+LSBrdm1fZ3Vlc3RfZGVidWdfYXJjaCwgYWxsb3dzIHVzIHRvIHBhc3MgaW4gSFcgZGVidWcgcmVn
+aXN0ZXJzCiAgLSBrdm1fZGVidWdfZXhpdF9hcmNoLCBzaWduYWxzIGV4Y2VwdGlvbiBhbmQgcG9z
+c2libGUgZmF1bHRpbmcgYWRkcmVzcwoKVGhlIHR5cGUgb2YgZGVidWdnaW5nIGJlaW5nIHVzZWQg
+aXMgY29udHJvbGxlZCBieSB0aGUgYXJjaGl0ZWN0dXJlCnNwZWNpZmljIGNvbnRyb2wgYml0cyBv
+ZiB0aGUga3ZtX2d1ZXN0X2RlYnVnLT5jb250cm9sIGZsYWdzIGluIHRoZSBpb2N0bApzdHJ1Y3R1
+cmUuCgpTaWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+
+ClJldmlld2VkLWJ5OiBEYXZpZCBIaWxkZW5icmFuZCA8ZGFoaUBsaW51eC52bmV0LmlibS5jb20+
+ClJldmlld2VkLWJ5OiBBbmRyZXcgSm9uZXMgPGRyam9uZXNAcmVkaGF0LmNvbT4KQWNrZWQtYnk6
+IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4KCi0tLQp2Mgog
+ICAtIGV4cG9zZSBoc3IgYW5kIHBjIGRpcmVjdGx5IHRvIHVzZXItc3BhY2UKdjMKICAgLSBzL2Nv
+bnRyb2wvY29udHJvbGxlZC8gaW4gY29tbWl0IG1lc3NhZ2UKICAgLSBhZGQgdjggdG8gQVJNIEFS
+TSBjb21tZW50IChBUk0gQXJjaGl0ZWN0dXJlIFJlZmVyZW5jZSBNYW51YWwpCiAgIC0gYWRkIHJi
+IHRhZwogICAtIHJtIHBjLCBhZGQgZmFyCiAgIC0gcmUtd29yZCBjb21tZW50cyBvbiBhbGlnbm1l
+bnQKICAgLSByZW5hbWUgS1ZNX0FSTV9OREJHX1JFR1MgLT4gS1ZNX0FSTV9NQVhfREJHX1JFR1MK
+djQKICAgLSBub3cgdXNlcyBjb21tb24gSFcvU1cgQlAgZGVmaW5lCiAgIC0gYWRkIGEtYi10YWcK
+ICAgLSB1c2UgdTMyIGZvciBjb250cm9sIHJlZ3MKdjUKICAgLSByZXZlcnQgdG8gaGF2ZSBhcmNo
+IHNwZWNpZmljIEtWTV9HVUVTVERCR19VU0VfU1cvSFdfQlAKICAgLSBybSBzdGFsZSBjb21tZW50
+cyBkYmdjdHJsIHdhcyBzdG9yZWQgYXMgdTY0CnY2CiAgIC0gbXYgZmFyIGNvbW1lbnQgZnJvbSBs
+YXRlciBwYXRjaAogICAtIEtWTV9HVUVTVERCR19VU0VfSFdfQlAgLT4gS1ZNX0dVRVNUREJHX1VT
+RV9IVwogICAtIHJldmVydCBjb250cm9sIHJlZ3MgdG8gdTY0IChwYXJpdHkgd2l0aCBHRVQvU0VU
+X09ORV9SRUcpCi0tLQogYXJjaC9hcm02NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oIHwgMjcgKysr
+KysrKysrKysrKysrKysrKysrKysrKysrCiAxIGZpbGUgY2hhbmdlZCwgMjcgaW5zZXJ0aW9ucygr
+KQoKZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaCBiL2FyY2gv
+YXJtNjQvaW5jbHVkZS91YXBpL2FzbS9rdm0uaAppbmRleCBkMjY4MzIwLi5kODJmM2YzIDEwMDY0
+NAotLS0gYS9hcmNoL2FybTY0L2luY2x1ZGUvdWFwaS9hc20va3ZtLmgKKysrIGIvYXJjaC9hcm02
+NC9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oCkBAIC0xMDAsMTIgKzEwMCwzOSBAQCBzdHJ1Y3Qga3Zt
+X3NyZWdzIHsKIHN0cnVjdCBrdm1fZnB1IHsKIH07CiAKKy8qCisgKiBTZWUgdjggQVJNIEFSTSBE
+Ny4zOiBEZWJ1ZyBSZWdpc3RlcnMKKyAqCisgKiBUaGUgYXJjaGl0ZWN0dXJhbCBsaW1pdCBpcyAx
+NiBkZWJ1ZyByZWdpc3RlcnMgb2YgZWFjaCB0eXBlIGFsdGhvdWdoCisgKiBpbiBwcmFjdGljZSB0
+aGVyZSBhcmUgdXN1YWxseSBsZXNzIChzZWUgSURfQUE2NERGUjBfRUwxKS4KKyAqCisgKiBBbHRo
+b3VnaCB0aGUgY29udHJvbCByZWdpc3RlcnMgYXJlIGFyY2hpdGVjdHVyYWxseSBkZWZpbmVkIGFz
+IDMyCisgKiBiaXRzIHdpZGUgd2UgdXNlIGEgNjQgYml0IHN0cnVjdHVyZSBoZXJlIHRvIGtlZXAg
+cGFyaXR5IHdpdGgKKyAqIEtWTV9HRVQvU0VUX09ORV9SRUcgYmVoYXZpb3VyIHdoaWNoIHRyZWF0
+cyBhbGwgc3lzdGVtIHJlZ2lzdGVycyBhcworICogNjQgYml0IHZhbHVlcy4gSXQgYWxzbyBhbGxv
+d3MgZm9yIHRoZSBwb3NzaWJpbGl0eSBvZiB0aGUKKyAqIGFyY2hpdGVjdHVyZSBleHBhbmRpbmcg
+dGhlIGNvbnRyb2wgcmVnaXN0ZXJzIHdpdGhvdXQgaGF2aW5nIHRvCisgKiBjaGFuZ2UgdGhlIHVz
+ZXJzcGFjZSBBQkkuCisgKi8KKyNkZWZpbmUgS1ZNX0FSTV9NQVhfREJHX1JFR1MgMTYKIHN0cnVj
+dCBrdm1fZ3Vlc3RfZGVidWdfYXJjaCB7CisJX191NjQgZGJnX2JjcltLVk1fQVJNX01BWF9EQkdf
+UkVHU107CisJX191NjQgZGJnX2J2cltLVk1fQVJNX01BWF9EQkdfUkVHU107CisJX191NjQgZGJn
+X3djcltLVk1fQVJNX01BWF9EQkdfUkVHU107CisJX191NjQgZGJnX3d2cltLVk1fQVJNX01BWF9E
+QkdfUkVHU107CiB9OwogCiBzdHJ1Y3Qga3ZtX2RlYnVnX2V4aXRfYXJjaCB7CisJX191MzIgaHNy
+OworCV9fdTY0IGZhcjsJLyogdXNlZCBmb3Igd2F0Y2hwb2ludHMgKi8KIH07CiAKKy8qCisgKiBB
+cmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBmb3Iga3ZtX2d1ZXN0X2RlYnVnLT5jb250cm9s
+CisgKi8KKworI2RlZmluZSBLVk1fR1VFU1REQkdfVVNFX1NXX0JQCQkoMSA8PCAxNikKKyNkZWZp
+bmUgS1ZNX0dVRVNUREJHX1VTRV9IVwkJKDEgPDwgMTcpCisKIHN0cnVjdCBrdm1fc3luY19yZWdz
+IHsKIH07CiAKLS0gCjIuNC41CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5l
+ZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
