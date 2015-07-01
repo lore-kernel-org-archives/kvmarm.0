@@ -1,57 +1,57 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 2/2] arm/arm64: KVM: fix two build failured under
- STRICT_MM_TYPECHECKS
-Date: Wed, 01 Jul 2015 11:56:34 +0100
-Message-ID: <5593C762.1050309@arm.com>
-References: <1435680290-13945-1-git-send-email-ard.biesheuvel@linaro.org>
- <1435680290-13945-2-git-send-email-ard.biesheuvel@linaro.org>
- <20150630170315.GL7445@e104818-lin.cambridge.arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH 06/10] KVM: arm/arm64: vgic: Allow dynamic mapping of
+ physical/virtual interrupts
+Date: Wed, 1 Jul 2015 13:45:19 +0200
+Message-ID: <20150701114519.GB17890@cbox>
+References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com>
+ <1433783045-8002-7-git-send-email-marc.zyngier@arm.com>
+ <20150630201942.GB11332@cbox>
+ <5593BEFD.4030608@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4512557417
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jul 2015 06:45:25 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rszAKnTQMFNp for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Jul 2015 06:45:24 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 14A6E57415
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jul 2015 06:45:23 -0400 (EDT)
-In-Reply-To: <20150630170315.GL7445@e104818-lin.cambridge.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Catalin Marinas <catalin.marinas@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <5593BEFD.4030608@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Eric Auger <eric.auger@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 30/06/15 18:03, Catalin Marinas wrote:
-> On Tue, Jun 30, 2015 at 06:04:50PM +0200, Ard Biesheuvel wrote:
->> This fixes two instances where a pgprot_t is used as the operand
->> of a bitwise & operation. In order to comply with STRICT_MM_TYPECHECKS,
->> bitwise arithmetic on a pgprot_t should go via the pgprot_val()
->> accessor.
->>
->> Cc: kvmarm@lists.cs.columbia.edu
->> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+On Wed, Jul 01, 2015 at 11:20:45AM +0100, Marc Zyngier wrote:
+> On 30/06/15 21:19, Christoffer Dall wrote:
+> > On Mon, Jun 08, 2015 at 06:04:01PM +0100, Marc Zyngier wrote:
+> >> In order to be able to feed physical interrupts to a guest, we need
+> >> to be able to establish the virtual-physical mapping between the two
+> >> worlds.
+> >>
+> >> The mapping is kept in a rbtree, indexed by virtual interrupts.
+> > 
+> > how many of these do you expect there will be?  Is the extra code and
+> > complexity of an rbtree really warranted?
+> > 
+> > I would assume that you'll have one PPI for each CPU in the default case
+> > plus potentially a few more for an assigned network adapter, let's say a
+> > couple of handfulls.  Am I missing something obvious or is this
+> > optimization of traversing a list of 10-12 mappings in the typical case
+> > not likely to be measurable?
+> > 
+> > I would actually be more concerned about the additional locking and
+> > would look at RCU for protecting a list instead.  Can you protect an
+> > rbtree with RCU easily?
 > 
-> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> Not very easily. There was some work done a while ago for the dentry
+> cache IIRC, but I doubt that's reusable directly, and probably overkill.
 > 
-> (I guess it will go via the kvm tree)
-
-Yes, I'll queue it.
+> RCU protected lists are, on the other hand, readily available. Bah. I'll
+> switch to this. By the time it becomes the bottleneck, the world will
+> have moved on. Or so I hope.
+> 
+We can also move to RB trees if we have some data to show us it's worth
+the hassle later on, but I assume that since these structs are fairly
+small and overhead like this is mostly to show up on a hot path, a
+better optimization would be to allocate a bunch of these structures
+contiguously for cache locality, but again, I feel like this is all
+premature and we should measure the beast first.
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+-Christoffer
