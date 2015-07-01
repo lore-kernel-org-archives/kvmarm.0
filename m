@@ -1,98 +1,93 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v7 03/11] KVM: arm: guest debug,
- add stub KVM_SET_GUEST_DEBUG ioctl
-Date: Wed,  1 Jul 2015 19:28:55 +0100
-Message-ID: <1435775343-20034-4-git-send-email-alex.bennee@linaro.org>
+Subject: [PATCH v7 01/11] KVM: add comments for kvm_debug_exit_arch struct
+Date: Wed,  1 Jul 2015 19:28:53 +0100
+Message-ID: <1435775343-20034-2-git-send-email-alex.bennee@linaro.org>
 References: <1435775343-20034-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9435457523
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jul 2015 14:18:08 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1DIqQiO911xT for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Jul 2015 14:18:07 -0400 (EDT)
-Received: from mail-wi0-f172.google.com (mail-wi0-f172.google.com
- [209.85.212.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 29781574FB
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jul 2015 14:18:06 -0400 (EDT)
-Received: by wicgi11 with SMTP id gi11so53393826wic.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Jul 2015 11:29:21 -0700 (PDT)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <linux-doc-owner@vger.kernel.org>
 In-Reply-To: <1435775343-20034-1-git-send-email-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-doc-owner@vger.kernel.org
 To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org
-Cc: Russell King <linux@arm.linux.org.uk>, Jonathan Corbet <corbet@lwn.net>, Gleb Natapov <gleb@kernel.org>, jan.kiszka@siemens.com, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Will Deacon <will.deacon@arm.com>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, Catalin Marinas <catalin.marinas@arm.com>, r65777@freescale.com, bp@suse.de
+Cc: jan.kiszka@siemens.com, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Gleb Natapov <gleb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, "open list:ABI/API" <linux-api@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhpcyBjb21taXQgYWRkcyBhIHN0dWIgZnVuY3Rpb24gdG8gc3VwcG9ydCB0aGUgS1ZNX1NFVF9H
-VUVTVF9ERUJVRwppb2N0bC4gQW55IHVuc3VwcG9ydGVkIGZsYWcgd2lsbCByZXR1cm4gLUVJTlZB
-TC4gRm9yIG5vdywgb25seQpLVk1fR1VFU1REQkdfRU5BQkxFIGlzIHN1cHBvcnRlZCwgYWx0aG91
-Z2ggaXQgd29uJ3QgaGF2ZSBhbnkgZWZmZWN0cy4KClNpZ25lZC1vZmYtYnk6IEFsZXggQmVubsOp
-ZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4uClJldmlld2VkLWJ5OiBDaHJpc3RvZmZlciBEYWxs
-IDxjaHJpc3RvZmZlci5kYWxsQGxpbmFyby5vcmc+CgotLS0KdjIKICAtIHNpbXBsaWZpZWQgZm9y
-bSBvZiB0aGUgaW9jdGwgKHN0dWZmIHdpbGwgZ28gaW50byBzZXR1cF9kZWJ1ZykKdjMKIC0gS1ZN
-X0dVRVNUREJHX1ZBTElELT5LVk1fR1VFU1REQkdfVkFMSURfTUFTSwogLSBtb3ZlIG1hc2sgY2hl
-Y2sgdG8gdGhlIHRvcCBvZiBmdW5jdGlvbgogLSBhZGQgaW9jdGwgZG9jIGhlYWRlcgogLSBzcGxp
-dCBjYXBhYmlsaXR5IGludG8gc2VwYXJhdGUgcGF0Y2gKIC0gdHdlYWtlZCBjb21taXQgd29yZGlu
-ZyB3LnIudCByZXR1cm4gb2YgLUVJTlZBTAp2NAogLSBhZGQgci1iLXRhZwp2NwogLSBtb3ZlZCBp
-b2N0bCB0byBhcm02NC9rdm0vZ3Vlc3QuYywgc3R1YmJlZCBhcm0va3ZtL2d1ZXN0LmMKLS0tCiBE
-b2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL2FwaS50eHQgfCAgMiArLQogYXJjaC9hcm0va3ZtL2Fy
-bS5jICAgICAgICAgICAgICAgIHwgIDcgLS0tLS0tLQogYXJjaC9hcm0va3ZtL2d1ZXN0LmMgICAg
-ICAgICAgICAgIHwgIDYgKysrKysrCiBhcmNoL2FybTY0L2t2bS9ndWVzdC5jICAgICAgICAgICAg
-fCAyNyArKysrKysrKysrKysrKysrKysrKysrKysrKysKIDQgZmlsZXMgY2hhbmdlZCwgMzQgaW5z
-ZXJ0aW9ucygrKSwgOCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9Eb2N1bWVudGF0aW9uL3Zp
-cnR1YWwva3ZtL2FwaS50eHQgYi9Eb2N1bWVudGF0aW9uL3ZpcnR1YWwva3ZtL2FwaS50eHQKaW5k
-ZXggYzM0YzMyZC4uYmE2MzVjNyAxMDA2NDQKLS0tIGEvRG9jdW1lbnRhdGlvbi92aXJ0dWFsL2t2
-bS9hcGkudHh0CisrKyBiL0RvY3VtZW50YXRpb24vdmlydHVhbC9rdm0vYXBpLnR4dApAQCAtMjY0
-NSw3ICsyNjQ1LDcgQEAgaGFuZGxlZC4KIDQuODcgS1ZNX1NFVF9HVUVTVF9ERUJVRwogCiBDYXBh
-YmlsaXR5OiBLVk1fQ0FQX1NFVF9HVUVTVF9ERUJVRwotQXJjaGl0ZWN0dXJlczogeDg2LCBzMzkw
-LCBwcGMKK0FyY2hpdGVjdHVyZXM6IHg4NiwgczM5MCwgcHBjLCBhcm02NAogVHlwZTogdmNwdSBp
-b2N0bAogUGFyYW1ldGVyczogc3RydWN0IGt2bV9ndWVzdF9kZWJ1ZyAoaW4pCiBSZXR1cm5zOiAw
-IG9uIHN1Y2Nlc3M7IC0xIG9uIGVycm9yCmRpZmYgLS1naXQgYS9hcmNoL2FybS9rdm0vYXJtLmMg
-Yi9hcmNoL2FybS9rdm0vYXJtLmMKaW5kZXggZDk2MzFlYy4uOTJiODBiYyAxMDA2NDQKLS0tIGEv
-YXJjaC9hcm0va3ZtL2FybS5jCisrKyBiL2FyY2gvYXJtL2t2bS9hcm0uYwpAQCAtMzAyLDEzICsz
-MDIsNiBAQCB2b2lkIGt2bV9hcmNoX3ZjcHVfcHV0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKIAlr
-dm1fYXJtX3NldF9ydW5uaW5nX3ZjcHUoTlVMTCk7CiB9CiAKLWludCBrdm1fYXJjaF92Y3B1X2lv
-Y3RsX3NldF9ndWVzdF9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCi0JCQkJCXN0cnVjdCBr
-dm1fZ3Vlc3RfZGVidWcgKmRiZykKLXsKLQlyZXR1cm4gLUVJTlZBTDsKLX0KLQotCiBpbnQga3Zt
-X2FyY2hfdmNwdV9pb2N0bF9nZXRfbXBzdGF0ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCiAJCQkJ
-ICAgIHN0cnVjdCBrdm1fbXBfc3RhdGUgKm1wX3N0YXRlKQogewpkaWZmIC0tZ2l0IGEvYXJjaC9h
-cm0va3ZtL2d1ZXN0LmMgYi9hcmNoL2FybS9rdm0vZ3Vlc3QuYwppbmRleCBkNTAzZmJiLi45NmU5
-MzViIDEwMDY0NAotLS0gYS9hcmNoL2FybS9rdm0vZ3Vlc3QuYworKysgYi9hcmNoL2FybS9rdm0v
-Z3Vlc3QuYwpAQCAtMjkwLDMgKzI5MCw5IEBAIGludCBrdm1fYXJjaF92Y3B1X2lvY3RsX3RyYW5z
-bGF0ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCiB7CiAJcmV0dXJuIC1FSU5WQUw7CiB9CisKK2lu
-dCBrdm1fYXJjaF92Y3B1X2lvY3RsX3NldF9ndWVzdF9kZWJ1ZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
-cHUsCisJCQkJCXN0cnVjdCBrdm1fZ3Vlc3RfZGVidWcgKmRiZykKK3sKKwlyZXR1cm4gLUVJTlZB
-TDsKK30KZGlmZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL2d1ZXN0LmMgYi9hcmNoL2FybTY0L2t2
-bS9ndWVzdC5jCmluZGV4IDk1MzViZDUuLjBiYTg2NzcgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQv
-a3ZtL2d1ZXN0LmMKKysrIGIvYXJjaC9hcm02NC9rdm0vZ3Vlc3QuYwpAQCAtMzMxLDMgKzMzMSwz
-MCBAQCBpbnQga3ZtX2FyY2hfdmNwdV9pb2N0bF90cmFuc2xhdGUoc3RydWN0IGt2bV92Y3B1ICp2
-Y3B1LAogewogCXJldHVybiAtRUlOVkFMOwogfQorCisjZGVmaW5lIEtWTV9HVUVTVERCR19WQUxJ
-RF9NQVNLIChLVk1fR1VFU1REQkdfRU5BQkxFKQorCisvKioKKyAqIGt2bV9hcmNoX3ZjcHVfaW9j
-dGxfc2V0X2d1ZXN0X2RlYnVnIC0gc2V0IHVwIGd1ZXN0IGRlYnVnZ2luZworICogQGt2bToJcG9p
-bnRlciB0byB0aGUgS1ZNIHN0cnVjdAorICogQGt2bV9ndWVzdF9kZWJ1ZzogdGhlIGlvY3RsIGRh
-dGEgYnVmZmVyCisgKgorICogVGhpcyBzZXRzIHVwIGFuZCBlbmFibGVzIHRoZSBWTSBmb3IgZ3Vl
-c3QgZGVidWdnaW5nLiBVc2Vyc3BhY2UKKyAqIHBhc3NlcyBpbiBhIGNvbnRyb2wgZmxhZyB0byBl
-bmFibGUgZGlmZmVyZW50IGRlYnVnIHR5cGVzIGFuZAorICogcG90ZW50aWFsbHkgb3RoZXIgYXJj
-aGl0ZWN0dXJlIHNwZWNpZmljIGluZm9ybWF0aW9uIGluIHRoZSByZXN0IG9mCisgKiB0aGUgc3Ry
-dWN0dXJlLgorICovCitpbnQga3ZtX2FyY2hfdmNwdV9pb2N0bF9zZXRfZ3Vlc3RfZGVidWcoc3Ry
-dWN0IGt2bV92Y3B1ICp2Y3B1LAorCQkJCQlzdHJ1Y3Qga3ZtX2d1ZXN0X2RlYnVnICpkYmcpCit7
-CisJaWYgKGRiZy0+Y29udHJvbCAmIH5LVk1fR1VFU1REQkdfVkFMSURfTUFTSykKKwkJcmV0dXJu
-IC1FSU5WQUw7CisKKwlpZiAoZGJnLT5jb250cm9sICYgS1ZNX0dVRVNUREJHX0VOQUJMRSkgewor
-CQl2Y3B1LT5ndWVzdF9kZWJ1ZyA9IGRiZy0+Y29udHJvbDsKKwl9IGVsc2UgeworCQkvKiBJZiBu
-b3QgZW5hYmxlZCBjbGVhciBhbGwgZmxhZ3MgKi8KKwkJdmNwdS0+Z3Vlc3RfZGVidWcgPSAwOwor
-CX0KKwlyZXR1cm4gMDsKK30KLS0gCjIuNC41CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5j
-b2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5m
-by9rdm1hcm0K
+Bring into line with the comments for the other structures and their
+KVM_EXIT_* cases. Also update api.txt to reflect use in kvm_run
+documentation.
+
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: David Hildenbrand <dahi@linux.vnet.ibm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+
+---
+
+v2
+  - add comments for other exit types
+v3
+  - s/commentary/comments/
+  - add rb tags
+  - update api.txt kvm_run to include KVM_EXIT_DEBUG desc
+v4
+  - sp fixes
+  - add a-b
+---
+ Documentation/virtual/kvm/api.txt | 4 +++-
+ include/uapi/linux/kvm.h          | 3 +++
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/=
+kvm/api.txt
+index 9fa2bf8..c34c32d 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -3070,11 +3070,13 @@ data_offset describes where the data is located=
+ (KVM_EXIT_IO_OUT) or
+ where kvm expects application code to place the data for the next
+ KVM_RUN invocation (KVM_EXIT_IO_IN).  Data format is a packed array.
+=20
++		/* KVM_EXIT_DEBUG */
+ 		struct {
+ 			struct kvm_debug_exit_arch arch;
+ 		} debug;
+=20
+-Unused.
++If the exit_reason is KVM_EXIT_DEBUG, then a vcpu is processing a debu=
+g event
++for which architecture specific information is returned.
+=20
+ 		/* KVM_EXIT_MMIO */
+ 		struct {
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 4b60056..70ac641 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -237,6 +237,7 @@ struct kvm_run {
+ 			__u32 count;
+ 			__u64 data_offset; /* relative to kvm_run start */
+ 		} io;
++		/* KVM_EXIT_DEBUG */
+ 		struct {
+ 			struct kvm_debug_exit_arch arch;
+ 		} debug;
+@@ -285,6 +286,7 @@ struct kvm_run {
+ 			__u32 data;
+ 			__u8  is_write;
+ 		} dcr;
++		/* KVM_EXIT_INTERNAL_ERROR */
+ 		struct {
+ 			__u32 suberror;
+ 			/* Available with KVM_CAP_INTERNAL_ERROR_DATA: */
+@@ -295,6 +297,7 @@ struct kvm_run {
+ 		struct {
+ 			__u64 gprs[32];
+ 		} osi;
++		/* KVM_EXIT_PAPR_HCALL */
+ 		struct {
+ 			__u64 nr;
+ 			__u64 ret;
+--=20
+2.4.5
+
