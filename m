@@ -1,93 +1,81 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v7 01/11] KVM: add comments for kvm_debug_exit_arch struct
-Date: Wed,  1 Jul 2015 19:28:53 +0100
-Message-ID: <1435775343-20034-2-git-send-email-alex.bennee@linaro.org>
-References: <1435775343-20034-1-git-send-email-alex.bennee@linaro.org>
+Subject: [PATCH v7 00/11] KVM Guest Debug support for arm64
+Date: Wed,  1 Jul 2015 19:28:52 +0100
+Message-ID: <1435775343-20034-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <linux-doc-owner@vger.kernel.org>
-In-Reply-To: <1435775343-20034-1-git-send-email-alex.bennee@linaro.org>
-Sender: linux-doc-owner@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C87E5751D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jul 2015 14:18:07 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id TQ2WWWoEjySB for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Jul 2015 14:18:06 -0400 (EDT)
+Received: from mail-wg0-f46.google.com (mail-wg0-f46.google.com [74.125.82.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5B03B574EA
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jul 2015 14:18:05 -0400 (EDT)
+Received: by wgck11 with SMTP id k11so44059829wgc.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Jul 2015 11:29:20 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org
-Cc: jan.kiszka@siemens.com, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Gleb Natapov <gleb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, "open list:ABI/API" <linux-api@vger.kernel.org>
+Cc: jan.kiszka@siemens.com, r65777@freescale.com, bp@suse.de, dahi@linux.vnet.ibm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Bring into line with the comments for the other structures and their
-KVM_EXIT_* cases. Also update api.txt to reflect use in kvm_run
-documentation.
-
-Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: David Hildenbrand <dahi@linux.vnet.ibm.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-
----
-
-v2
-  - add comments for other exit types
-v3
-  - s/commentary/comments/
-  - add rb tags
-  - update api.txt kvm_run to include KVM_EXIT_DEBUG desc
-v4
-  - sp fixes
-  - add a-b
----
- Documentation/virtual/kvm/api.txt | 4 +++-
- include/uapi/linux/kvm.h          | 3 +++
- 2 files changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/=
-kvm/api.txt
-index 9fa2bf8..c34c32d 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -3070,11 +3070,13 @@ data_offset describes where the data is located=
- (KVM_EXIT_IO_OUT) or
- where kvm expects application code to place the data for the next
- KVM_RUN invocation (KVM_EXIT_IO_IN).  Data format is a packed array.
-=20
-+		/* KVM_EXIT_DEBUG */
- 		struct {
- 			struct kvm_debug_exit_arch arch;
- 		} debug;
-=20
--Unused.
-+If the exit_reason is KVM_EXIT_DEBUG, then a vcpu is processing a debu=
-g event
-+for which architecture specific information is returned.
-=20
- 		/* KVM_EXIT_MMIO */
- 		struct {
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 4b60056..70ac641 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -237,6 +237,7 @@ struct kvm_run {
- 			__u32 count;
- 			__u64 data_offset; /* relative to kvm_run start */
- 		} io;
-+		/* KVM_EXIT_DEBUG */
- 		struct {
- 			struct kvm_debug_exit_arch arch;
- 		} debug;
-@@ -285,6 +286,7 @@ struct kvm_run {
- 			__u32 data;
- 			__u8  is_write;
- 		} dcr;
-+		/* KVM_EXIT_INTERNAL_ERROR */
- 		struct {
- 			__u32 suberror;
- 			/* Available with KVM_CAP_INTERNAL_ERROR_DATA: */
-@@ -295,6 +297,7 @@ struct kvm_run {
- 		struct {
- 			__u64 gprs[32];
- 		} osi;
-+		/* KVM_EXIT_PAPR_HCALL */
- 		struct {
- 			__u64 nr;
- 			__u64 ret;
---=20
-2.4.5
-
+SGVyZSBpcyBWNyBvZiB0aGUgS1ZNIEd1ZXN0IERlYnVnIHN1cHBvcnQgZm9yIGFybTY0LgoKVGhl
+IGZpeGVzIGFyZSBmYWlybHkgbWlub3IgYXNpZGUgZnJvbSB0aGUgcmUtZmFjdG9yaW5nIG9mIHN5
+c19yZWdzLmMKdG8gaGF2ZSBpbmRpdmlkdWFsIHRyYXAgZnVuY3Rpb25zIGZvciBlYWNoIGRlYnVn
+IHJlZ2lzdGVyLiBUaGVyZSBpcyBhCmxvdCBvZiBib2lsZXIgcGxhdGUgYnV0IGl0IGRvZXMgbWFr
+ZSB0aGUgdWdsaW5lc3Mgb2YgdGhlIHByZXZpb3VzCm9mZnNldCBoYWNrcyBnbyBhd2F5LgoKT24g
+dG9wIG9mIHRoYXQgSSd2ZSBmaXhlZCBzb21lIGJ1aWxkIGZhaWx1cmVzIG9uIHY3IHdoaWNoIHdl
+cmUgbm90CmFwcGFyZW50IG9uIG15IGRlZmNvbmZpZyBidWlsZC4gSSd2ZSBhbHNvIGJlZW4gaGVs
+cGVkIHdpdGgKa2VybmVsY2kub3JnIGRvaW5nIHRoZSBoZWF2eSBsaWZ0aW5nIGZvciBtZToKCiAg
+ICBodHRwOi8va2VybmVsY2kub3JnL2Jvb3QvYWxsL2pvYi9hbGV4LwoKRm9yIGZ1bGwgZGV0YWls
+cyBzZWUgdGhlIGNoYW5nZWxvZyBvbiBlYWNoIG9mIHRoZSBwYXRjaGVzLgoKR0lUIFJlcG9zOgoK
+VGhlIHBhdGNoZXMgZm9yIHRoaXMgc2VyaWVzIGFyZSBiYXNlZCBvZmYgdjQuMSBhbmQgY2FuIGJl
+IGZvdW5kCmF0OgoKS2VybmVsOgpodHRwczovL2dpdC5saW5hcm8ub3JnL3Blb3BsZS9hbGV4LmJl
+bm5lZS9saW51eC5naXQKYnJhbmNoOiBndWVzdC1kZWJ1Zy80LjEtdjcKZGVzY3JpYmU6IHY0LjEt
+MTEtZzJhMTA0MzgKClFFTVU6Cmh0dHBzOi8vZ2l0aHViLmNvbS9zdHNxdWFkL3FlbXUKYnJhbmNo
+OiBrdm0vZ3Vlc3QtZGVidWctdjYKCgpBbGV4IEJlbm7DqWUgKDExKToKICBLVk06IGFkZCBjb21t
+ZW50cyBmb3Iga3ZtX2RlYnVnX2V4aXRfYXJjaCBzdHJ1Y3QKICBLVk06IGFybTY0OiBndWVzdCBk
+ZWJ1ZywgZGVmaW5lIEFQSSBoZWFkZXJzCiAgS1ZNOiBhcm06IGd1ZXN0IGRlYnVnLCBhZGQgc3R1
+YiBLVk1fU0VUX0dVRVNUX0RFQlVHIGlvY3RsCiAgS1ZNOiBhcm06IGludHJvZHVjZSBrdm1fYXJt
+X2luaXQvc2V0dXAvY2xlYXJfZGVidWcKICBLVk06IGFybTY0OiBndWVzdCBkZWJ1ZywgYWRkIFNX
+IGJyZWFrIHBvaW50IHN1cHBvcnQKICBLVk06IGFybTY0OiBndWVzdCBkZWJ1ZywgYWRkIHN1cHBv
+cnQgZm9yIHNpbmdsZS1zdGVwCiAgS1ZNOiBhcm02NDogcmUtZmFjdG9yIGh5cC5TIGRlYnVnIHJl
+Z2lzdGVyIGNvZGUKICBLVk06IGFybTY0OiBpbnRyb2R1Y2UgdmNwdS0+YXJjaC5kZWJ1Z19wdHIK
+ICBLVk06IGFybTY0OiBndWVzdCBkZWJ1ZywgSFcgYXNzaXN0ZWQgZGVidWcgc3VwcG9ydAogIEtW
+TTogYXJtNjQ6IGVuYWJsZSBLVk1fQ0FQX1NFVF9HVUVTVF9ERUJVRwogIEtWTTogYXJtNjQ6IGFk
+ZCB0cmFjZSBwb2ludHMgZm9yIGd1ZXN0X2RlYnVnIGRlYnVnCgogRG9jdW1lbnRhdGlvbi92aXJ0
+dWFsL2t2bS9hcGkudHh0ICAgICAgfCAgMTUgKy0KIGFyY2gvYXJtL2luY2x1ZGUvYXNtL2t2bV9o
+b3N0LmggICAgICAgIHwgICA0ICsKIGFyY2gvYXJtL2t2bS9hcm0uYyAgICAgICAgICAgICAgICAg
+ICAgIHwgIDE4ICstCiBhcmNoL2FybS9rdm0vZ3Vlc3QuYyAgICAgICAgICAgICAgICAgICB8ICAg
+NiArCiBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2h3X2JyZWFrcG9pbnQuaCB8ICAgNCArCiBhcmNo
+L2FybTY0L2luY2x1ZGUvYXNtL2t2bV9hc20uaCAgICAgICB8ICAyNiArLQogYXJjaC9hcm02NC9p
+bmNsdWRlL2FzbS9rdm1faG9zdC5oICAgICAgfCAgMzcgKystCiBhcmNoL2FybTY0L2luY2x1ZGUv
+dWFwaS9hc20va3ZtLmggICAgICB8ICAyNyArKwogYXJjaC9hcm02NC9rZXJuZWwvYXNtLW9mZnNl
+dHMuYyAgICAgICAgfCAgIDcgKwogYXJjaC9hcm02NC9rZXJuZWwvaHdfYnJlYWtwb2ludC5jICAg
+ICAgfCAgIDQgKy0KIGFyY2gvYXJtNjQva3ZtL01ha2VmaWxlICAgICAgICAgICAgICAgIHwgICAy
+ICstCiBhcmNoL2FybTY0L2t2bS9kZWJ1Zy5jICAgICAgICAgICAgICAgICB8IDIxNiArKysrKysr
+KysrKysrCiBhcmNoL2FybTY0L2t2bS9ndWVzdC5jICAgICAgICAgICAgICAgICB8ICA0MCArKysK
+IGFyY2gvYXJtNjQva3ZtL2hhbmRsZV9leGl0LmMgICAgICAgICAgIHwgIDQ0ICsrKwogYXJjaC9h
+cm02NC9rdm0vaHlwLlMgICAgICAgICAgICAgICAgICAgfCA1NDQgKysrKysrKysrKy0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tCiBhcmNoL2FybTY0L2t2bS9yZXNldC5jICAgICAgICAgICAgICAgICB8
+ICAxNSArCiBhcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jICAgICAgICAgICAgICB8IDI5OSArKysr
+KysrKysrKysrKysrLS0KIGFyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmggICAgICAgICAgICAgIHwg
+ICA2ICsKIGFyY2gvYXJtNjQva3ZtL3RyYWNlLmggICAgICAgICAgICAgICAgIHwgMTIzICsrKysr
+KysrCiBpbmNsdWRlL3VhcGkvbGludXgva3ZtLmggICAgICAgICAgICAgICB8ICAgNSArCiAyMCBm
+aWxlcyBjaGFuZ2VkLCA5OTYgaW5zZXJ0aW9ucygrKSwgNDQ2IGRlbGV0aW9ucygtKQogY3JlYXRl
+IG1vZGUgMTAwNjQ0IGFyY2gvYXJtNjQva3ZtL2RlYnVnLmMKCi0tIAoyLjQuNQoKX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlz
+dAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEu
+ZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
