@@ -1,53 +1,55 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 05/10] KVM: arm/arm64: vgic: Relax vgic_can_sample_irq
- for edge IRQs
-Date: Wed, 01 Jul 2015 10:17:52 +0100
-Message-ID: <5593B040.6050208@arm.com>
-References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com> <1433783045-8002-6-git-send-email-marc.zyngier@arm.com> <20150630201933.GA11332@cbox>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v3 0/2] arm/arm64: KVM: Optimize arm64 fp/simd, saves
+ 30-50% on exits
+Date: Wed, 1 Jul 2015 11:49:10 +0200
+Message-ID: <20150701094910.GF11332@cbox>
+References: <1435190652-5831-1-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20150630201933.GA11332@cbox>
+Content-Disposition: inline
+In-Reply-To: <1435190652-5831-1-git-send-email-m.smarduch@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Eric Auger <eric.auger@linaro.org>, =?windows-1252?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
+To: Mario Smarduch <m.smarduch@samsung.com>
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 30/06/15 21:19, Christoffer Dall wrote:
-> On Mon, Jun 08, 2015 at 06:04:00PM +0100, Marc Zyngier wrote:
->> We only set the irq_queued flag for level interrupts, meaning
->> that "!vgic_irq_is_queued(vcpu, irq)" is a good enough predicate
->> for all interrupts.
->>
->> This will allow us to inject edge HW interrupts, for which the
->> state ACTIVE+PENDING is not allowed.
+On Wed, Jun 24, 2015 at 05:04:10PM -0700, Mario Smarduch wrote:
+> Currently we save/restore fp/simd on each exit. Fist  patch optimizes arm64
+> save/restore, we only do so on Guest access. hackbench and
+> several lmbench tests show anywhere from 30% to above 50% optimzation
+> achieved.
 > 
-> I don't understand this; ACTIVE+PENDING is allowed for edge interrupts.
-> Do you mean that if we set the HW bit in the LR, then we are linking to
-> an HW interrupt where we don't allow that to be ACTIVE+PENDING on the HW
-> GIC side?
+> In second patch 32-bit handler is updated to keep exit handling consistent
+> with 64-bit code.
+
+30-50% of what?  The overhead or overall performance?
+
 > 
-> Why is this relevant here?  I feel like I'm missing context.
-
-I've probably taken a shortcut here - bear with me while I'm trying to
-explain the issue.
-
-For HW interrupts, we shouldn't even try to use the state bits in the
-LR, because that state is contained in the physical distributor. Setting
-the HW bit really means "there is something going on at the distributor
-level, just go there".
-
-If we were to inject a ACTIVE+PENDING interrupt at the LR level, we'd
-basically loose the second interrupt because that state is simply not
-considered.
-
-So the trick we're using is to only inject the active interrupt, and
-prevent anything else from being injected until we can confirm that the
-active state has been cleared at the physical level.
-
-Does it make any sense?
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> Changes since v1:
+> - Addressed Marcs comments
+> - Verified optimization improvements with lmbench and hackbench, updated 
+>   commit message
+> 
+> Changes since v2:
+> - only for patch 2/2
+>   - Reworked trapping to vfp access handler
+> 
+> Changes since v3:
+> - Only for patch 2/2
+>   - Removed load_vcpu in switch_to_guest_vfp per Marcs comment
+>   - Got another chance to replace an unreferenced label with a comment
+> 
+> 
+> Mario Smarduch (2):
+>   Optimize arm64 skip 30-50% vfp/simd save/restore on exits
+>   keep arm vfp/simd exit handling consistent with arm64
+> 
+>  arch/arm/kvm/interrupts.S        |   14 +++++++-----
+>  arch/arm64/include/asm/kvm_arm.h |    5 ++++-
+>  arch/arm64/kvm/hyp.S             |   46 +++++++++++++++++++++++++++++++++++---
+>  3 files changed, 55 insertions(+), 10 deletions(-)
+> 
+> -- 
+> 1.7.9.5
+> 
