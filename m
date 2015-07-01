@@ -1,74 +1,48 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 05/10] KVM: arm/arm64: vgic: Relax vgic_can_sample_irq
- for edge IRQs
-Date: Wed, 1 Jul 2015 13:58:20 +0200
-Message-ID: <20150701115820.GC17890@cbox>
-References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com>
- <1433783045-8002-6-git-send-email-marc.zyngier@arm.com>
- <20150630201933.GA11332@cbox>
- <5593B040.6050208@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <5593B040.6050208@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Eric Auger <eric.auger@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
+Subject: [PATCH] arm64: Don't report clear pmds and puds as huge
+Date: Wed,  1 Jul 2015 14:08:31 +0200
+Message-ID: <1435752511-7079-1-git-send-email-christoffer.dall@linaro.org>
+Return-path: <stable-owner@vger.kernel.org>
+Sender: stable-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: Steve Capper <steve.capper@linaro.org>, Alexander Graf <agraf@suse.de>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, dirk@dmllr.de, Christoffer Dall <christoffer.dall@linaro.org>, stable@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jul 01, 2015 at 10:17:52AM +0100, Marc Zyngier wrote:
-> On 30/06/15 21:19, Christoffer Dall wrote:
-> > On Mon, Jun 08, 2015 at 06:04:00PM +0100, Marc Zyngier wrote:
-> >> We only set the irq_queued flag for level interrupts, meaning
-> >> that "!vgic_irq_is_queued(vcpu, irq)" is a good enough predicate
-> >> for all interrupts.
-> >>
-> >> This will allow us to inject edge HW interrupts, for which the
-> >> state ACTIVE+PENDING is not allowed.
-> > 
-> > I don't understand this; ACTIVE+PENDING is allowed for edge interrupts.
-> > Do you mean that if we set the HW bit in the LR, then we are linking to
-> > an HW interrupt where we don't allow that to be ACTIVE+PENDING on the HW
-> > GIC side?
-> > 
-> > Why is this relevant here?  I feel like I'm missing context.
-> 
-> I've probably taken a shortcut here - bear with me while I'm trying to
-> explain the issue.
-> 
-> For HW interrupts, we shouldn't even try to use the state bits in the
-> LR, because that state is contained in the physical distributor. Setting
-> the HW bit really means "there is something going on at the distributor
-> level, just go there".
+The current pmd_huge() and pud_huge() functions simply check if the table
+bit is not set and reports the entries as huge in that case.  This is
+counter-intuitive as a clear pmd/pud cannot also be a huge pmd/pud, and
+it is inconsistent with at least arm and x86.
 
-ok, so by "HW interrupts" you mean virtual interrupts with the HW bit in
-the LR set, correct?
+To prevent others from making the same mistake as me in looking at code
+that calls these functions and to fix an issue with KVM on arm64 that
+causes memory corruption due to incorrect page reference counting
+resulting from this mistake, let's change the behavior.
 
-> 
-> If we were to inject a ACTIVE+PENDING interrupt at the LR level, we'd
-> basically loose the second interrupt because that state is simply not
-> considered.
+Cc: stable@vger.kernel.org
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ arch/arm64/mm/hugetlbpage.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Huh?  Which second interrupt.  I looked at the spec and it says don't
-use the state bits for HW interrupts, so isn't it simply not supported
-to set these bits at all and that's it?
-
-> 
-> So the trick we're using is to only inject the active interrupt, and
-> prevent anything else from being injected until we can confirm that the
-> active state has been cleared at the physical level.
-> 
-> Does it make any sense?
-> 
-Sort of, but what I don't understand now is how the guest ever sees the
-interrupt then.  If we always inject the virtual interrupt by setting
-the active state on the physical distributor, and we can't inject this
-as active+pending, and the guest doesn't see the state in the LR, then
-how does this ever raise a virtual interrupt and how does the guest see
-an interrupt which is only PENDING so that it can ack it etc. etc.?
-
-Maybe I don't fully understand how the HW bit works after all...
-
-Thanks,
--Christoffer
+diff --git a/arch/arm64/mm/hugetlbpage.c b/arch/arm64/mm/hugetlbpage.c
+index 2de9d2e..0eeb4f09 100644
+--- a/arch/arm64/mm/hugetlbpage.c
++++ b/arch/arm64/mm/hugetlbpage.c
+@@ -40,13 +40,13 @@ int huge_pmd_unshare(struct mm_struct *mm, unsigned long *addr, pte_t *ptep)
+ 
+ int pmd_huge(pmd_t pmd)
+ {
+-	return !(pmd_val(pmd) & PMD_TABLE_BIT);
++	return pmd_val(pmd) && !(pmd_val(pmd) & PMD_TABLE_BIT);
+ }
+ 
+ int pud_huge(pud_t pud)
+ {
+ #ifndef __PAGETABLE_PMD_FOLDED
+-	return !(pud_val(pud) & PUD_TABLE_BIT);
++	return pud_val(pud) && !(pud_val(pud) & PUD_TABLE_BIT);
+ #else
+ 	return 0;
+ #endif
+-- 
+2.1.2.330.g565301e.dirty
