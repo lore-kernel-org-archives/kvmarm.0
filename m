@@ -1,267 +1,263 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 06/10] KVM: arm/arm64: vgic: Allow dynamic mapping of
- physical/virtual interrupts
-Date: Tue, 30 Jun 2015 22:19:42 +0200
-Message-ID: <20150630201942.GB11332@cbox>
-References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com>
- <1433783045-8002-7-git-send-email-marc.zyngier@arm.com>
+From: zichao <zhichao.huang@linaro.org>
+Subject: Re: [PATCH v3 01/11] KVM: arm: plug guest debug exploit
+Date: Wed, 01 Jul 2015 15:04:00 +0800
+Message-ID: <0DE86164-5740-4894-A41C-DBCD930196AC@linaro.org>
+References: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org> <1434969694-7432-2-git-send-email-zhichao.huang@linaro.org> <20150629154953.GM11332@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D8CA656B9D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Jun 2015 16:08:31 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 064bnxpOT3sM for <kvmarm@lists.cs.columbia.edu>;
- Tue, 30 Jun 2015 16:08:29 -0400 (EDT)
-Received: from mail-la0-f41.google.com (mail-la0-f41.google.com
- [209.85.215.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9D3A756B76
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Jun 2015 16:08:29 -0400 (EDT)
-Received: by lagx9 with SMTP id x9so27399356lag.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 30 Jun 2015 13:19:41 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <1433783045-8002-7-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20150629154953.GM11332@cbox>
+Sender: stable-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com, huangzhichao@huawei.com, stable@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jun 08, 2015 at 06:04:01PM +0100, Marc Zyngier wrote:
-> In order to be able to feed physical interrupts to a guest, we need
-> to be able to establish the virtual-physical mapping between the two
-> worlds.
-> 
-> The mapping is kept in a rbtree, indexed by virtual interrupts.
 
-how many of these do you expect there will be?  Is the extra code and
-complexity of an rbtree really warranted?
 
-I would assume that you'll have one PPI for each CPU in the default case
-plus potentially a few more for an assigned network adapter, let's say a
-couple of handfulls.  Am I missing something obvious or is this
-optimization of traversing a list of 10-12 mappings in the typical case
-not likely to be measurable?
+On June 29, 2015 11:49:53 PM GMT+08:00, Christoffer Dall <christoffer.dall@linaro.org> wrote:
+>On Mon, Jun 22, 2015 at 06:41:24PM +0800, Zhichao Huang wrote:
+>> Hardware debugging in guests is not intercepted currently, it means
+>> that a malicious guest can bring down the entire machine by writing
+>> to the debug registers.
+>> 
+>> This patch enable trapping of all debug registers, preventing the
+>guests
+>> to access the debug registers.
+>> 
+>> This patch also disable the debug mode(DBGDSCR) in the guest world
+>all
+>> the time, preventing the guests to mess with the host state.
+>> 
+>> However, it is a precursor for later patches which will need to do
+>> more to world switch debug states while necessary.
+>> 
+>> Cc: <stable@vger.kernel.org>
+>> Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
+>> ---
+>>  arch/arm/include/asm/kvm_coproc.h |  3 +-
+>>  arch/arm/kvm/coproc.c             | 60
+>+++++++++++++++++++++++++++++++++++----
+>>  arch/arm/kvm/handle_exit.c        |  4 +--
+>>  arch/arm/kvm/interrupts_head.S    | 13 ++++++++-
+>>  4 files changed, 70 insertions(+), 10 deletions(-)
+>> 
+>> diff --git a/arch/arm/include/asm/kvm_coproc.h
+>b/arch/arm/include/asm/kvm_coproc.h
+>> index 4917c2f..e74ab0f 100644
+>> --- a/arch/arm/include/asm/kvm_coproc.h
+>> +++ b/arch/arm/include/asm/kvm_coproc.h
+>> @@ -31,7 +31,8 @@ void kvm_register_target_coproc_table(struct
+>kvm_coproc_target_table *table);
+>>  int kvm_handle_cp10_id(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>>  int kvm_handle_cp_0_13_access(struct kvm_vcpu *vcpu, struct kvm_run
+>*run);
+>>  int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu, struct kvm_run
+>*run);
+>> -int kvm_handle_cp14_access(struct kvm_vcpu *vcpu, struct kvm_run
+>*run);
+>> +int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>> +int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>>  int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>>  int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>>  
+>> diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+>> index f3d88dc..2e12760 100644
+>> --- a/arch/arm/kvm/coproc.c
+>> +++ b/arch/arm/kvm/coproc.c
+>> @@ -91,12 +91,6 @@ int kvm_handle_cp14_load_store(struct kvm_vcpu
+>*vcpu, struct kvm_run *run)
+>>  	return 1;
+>>  }
+>>  
+>> -int kvm_handle_cp14_access(struct kvm_vcpu *vcpu, struct kvm_run
+>*run)
+>> -{
+>> -	kvm_inject_undefined(vcpu);
+>> -	return 1;
+>> -}
+>> -
+>>  static void reset_mpidr(struct kvm_vcpu *vcpu, const struct
+>coproc_reg *r)
+>>  {
+>>  	/*
+>> @@ -519,6 +513,60 @@ int kvm_handle_cp15_32(struct kvm_vcpu *vcpu,
+>struct kvm_run *run)
+>>  	return emulate_cp15(vcpu, &params);
+>>  }
+>>  
+>> +/**
+>> + * kvm_handle_cp14_64 -- handles a mrrc/mcrr trap on a guest CP14
+>access
+>> + * @vcpu: The VCPU pointer
+>> + * @run:  The kvm_run struct
+>> + */
+>> +int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>> +{
+>> +	struct coproc_params params;
+>> +
+>> +	params.CRn = (kvm_vcpu_get_hsr(vcpu) >> 1) & 0xf;
+>> +	params.Rt1 = (kvm_vcpu_get_hsr(vcpu) >> 5) & 0xf;
+>> +	params.is_write = ((kvm_vcpu_get_hsr(vcpu) & 1) == 0);
+>> +	params.is_64bit = true;
+>> +
+>> +	params.Op1 = (kvm_vcpu_get_hsr(vcpu) >> 16) & 0xf;
+>> +	params.Op2 = 0;
+>> +	params.Rt2 = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
+>> +	params.CRm = 0;
+>
+>this is a complete duplicate of kvm_handle_cp15_64, can you share this
+>code somehow?
+>
 
-I would actually be more concerned about the additional locking and
-would look at RCU for protecting a list instead.  Can you protect an
-rbtree with RCU easily?
+This patch just want to plug the exploit in the simplest way, and I shared the cp14/cp15 handlers in later patches [PATCH v3 04/11].
 
-Thanks,
--Christoffer
+Should I take the patch [04/11] ahead of current patch [01/11] ?
 
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  include/kvm/arm_vgic.h |  18 ++++++++
->  virt/kvm/arm/vgic.c    | 110 +++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 128 insertions(+)
-> 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 4f9fa1d..33d121a 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -159,6 +159,14 @@ struct vgic_io_device {
->  	struct kvm_io_device dev;
->  };
->  
-> +struct irq_phys_map {
-> +	struct rb_node		node;
-> +	u32			virt_irq;
-> +	u32			phys_irq;
-> +	u32			irq;
-> +	bool			active;
-> +};
-> +
->  struct vgic_dist {
->  	spinlock_t		lock;
->  	bool			in_kernel;
-> @@ -256,6 +264,10 @@ struct vgic_dist {
->  	struct vgic_vm_ops	vm_ops;
->  	struct vgic_io_device	dist_iodev;
->  	struct vgic_io_device	*redist_iodevs;
-> +
-> +	/* Virtual irq to hwirq mapping */
-> +	spinlock_t		irq_phys_map_lock;
+>> +
+>> +	/* raz_wi */
+>> +	(void)pm_fake(vcpu, &params, NULL);
+>> +
+>> +	/* handled */
+>> +	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+>> +	return 1;
+>> +}
+>> +
+>> +/**
+>> + * kvm_handle_cp14_32 -- handles a mrc/mcr trap on a guest CP14
+>access
+>> + * @vcpu: The VCPU pointer
+>> + * @run:  The kvm_run struct
+>> + */
+>> +int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>> +{
+>> +	struct coproc_params params;
+>> +
+>> +	params.CRm = (kvm_vcpu_get_hsr(vcpu) >> 1) & 0xf;
+>> +	params.Rt1 = (kvm_vcpu_get_hsr(vcpu) >> 5) & 0xf;
+>> +	params.is_write = ((kvm_vcpu_get_hsr(vcpu) & 1) == 0);
+>> +	params.is_64bit = false;
+>> +
+>> +	params.CRn = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
+>> +	params.Op1 = (kvm_vcpu_get_hsr(vcpu) >> 14) & 0x7;
+>> +	params.Op2 = (kvm_vcpu_get_hsr(vcpu) >> 17) & 0x7;
+>> +	params.Rt2 = 0;
+>
+>this is a complete duplicate of kvm_handle_cp15_32, can you share this
+>code somehow?
+>
+>> +
+>> +	/* raz_wi */
+>> +	(void)pm_fake(vcpu, &params, NULL);
+>> +
+>> +	/* handled */
+>> +	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
+>> +	return 1;
+>> +}
+>> +
+>> 
+>/******************************************************************************
+>>   * Userspace API
+>>  
+>*****************************************************************************/
+>> diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
+>> index 95f12b2..357ad1b 100644
+>> --- a/arch/arm/kvm/handle_exit.c
+>> +++ b/arch/arm/kvm/handle_exit.c
+>> @@ -104,9 +104,9 @@ static exit_handle_fn arm_exit_handlers[] = {
+>>  	[HSR_EC_WFI]		= kvm_handle_wfx,
+>>  	[HSR_EC_CP15_32]	= kvm_handle_cp15_32,
+>>  	[HSR_EC_CP15_64]	= kvm_handle_cp15_64,
+>> -	[HSR_EC_CP14_MR]	= kvm_handle_cp14_access,
+>> +	[HSR_EC_CP14_MR]	= kvm_handle_cp14_32,
+>>  	[HSR_EC_CP14_LS]	= kvm_handle_cp14_load_store,
+>> -	[HSR_EC_CP14_64]	= kvm_handle_cp14_access,
+>> +	[HSR_EC_CP14_64]	= kvm_handle_cp14_64,
+>>  	[HSR_EC_CP_0_13]	= kvm_handle_cp_0_13_access,
+>>  	[HSR_EC_CP10_ID]	= kvm_handle_cp10_id,
+>>  	[HSR_EC_SVC_HYP]	= handle_svc_hyp,
+>> diff --git a/arch/arm/kvm/interrupts_head.S
+>b/arch/arm/kvm/interrupts_head.S
+>> index 35e4a3a..f85c447 100644
+>> --- a/arch/arm/kvm/interrupts_head.S
+>> +++ b/arch/arm/kvm/interrupts_head.S
+>> @@ -97,6 +97,10 @@ vcpu	.req	r0		@ vcpu pointer always in r0
+>>  	mrs	r8, LR_fiq
+>>  	mrs	r9, SPSR_fiq
+>>  	push	{r2-r9}
+>> +
+>> +	/* DBGDSCR reg */
+>> +	mrc	p14, 0, r2, c0, c1, 0
+>> +	push	{r2}
+>
+>this feels like it should belong in read_cp15_state and not the gp regs
+>portion ?
+>
 
-why do we need a separate lock here?
+Happy to move it. But moving the cp14 regs to read/write_cp15_state still seems no very appropriate. Should I move it to __kvm_vcpu_return and __kvm_vcpu_run?
 
-> +	struct rb_root		irq_phys_map;
->  };
->  
->  struct vgic_v2_cpu_if {
-> @@ -307,6 +319,9 @@ struct vgic_cpu {
->  		struct vgic_v2_cpu_if	vgic_v2;
->  		struct vgic_v3_cpu_if	vgic_v3;
->  	};
-> +
-> +	/* Protected by the distributor's irq_phys_map_lock */
-> +	struct rb_root	irq_phys_map;
->  };
->  
->  #define LR_EMPTY	0xff
-> @@ -331,6 +346,9 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
->  void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
->  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
->  int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
-> +struct irq_phys_map *vgic_map_phys_irq(struct kvm_vcpu *vcpu,
-> +				       int virt_irq, int irq);
-> +int vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
->  
->  #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
->  #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
-> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> index 59ed7a3..c6604f2 100644
-> --- a/virt/kvm/arm/vgic.c
-> +++ b/virt/kvm/arm/vgic.c
-> @@ -24,6 +24,7 @@
->  #include <linux/of.h>
->  #include <linux/of_address.h>
->  #include <linux/of_irq.h>
-> +#include <linux/rbtree.h>
->  #include <linux/uaccess.h>
->  
->  #include <linux/irqchip/arm-gic.h>
-> @@ -84,6 +85,8 @@ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu);
->  static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu);
->  static struct vgic_lr vgic_get_lr(const struct kvm_vcpu *vcpu, int lr);
->  static void vgic_set_lr(struct kvm_vcpu *vcpu, int lr, struct vgic_lr lr_desc);
-> +static struct irq_phys_map *vgic_irq_map_search(struct kvm_vcpu *vcpu,
-> +						int virt_irq);
->  
->  static const struct vgic_ops *vgic_ops;
->  static const struct vgic_params *vgic;
-> @@ -1585,6 +1588,112 @@ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
->  	return IRQ_HANDLED;
->  }
->  
-> +static struct rb_root *vgic_get_irq_phys_map(struct kvm_vcpu *vcpu,
-> +					     int virt_irq)
-> +{
-> +	if (virt_irq < VGIC_NR_PRIVATE_IRQS)
-> +		return &vcpu->arch.vgic_cpu.irq_phys_map;
-> +	else
-> +		return &vcpu->kvm->arch.vgic.irq_phys_map;
-> +}
-> +
-> +struct irq_phys_map *vgic_map_phys_irq(struct kvm_vcpu *vcpu,
-> +				       int virt_irq, int irq)
-> +{
-> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> +	struct rb_root *root = vgic_get_irq_phys_map(vcpu, virt_irq);
-> +	struct rb_node **new = &root->rb_node, *parent = NULL;
-> +	struct irq_phys_map *new_map;
-> +	struct irq_desc *desc;
-> +	struct irq_data *data;
-> +	int phys_irq;
-> +
-> +	desc = irq_to_desc(irq);
-> +	if (!desc) {
-> +		kvm_err("kvm_arch_timer: can't obtain interrupt descriptor\n");
-> +		return NULL;
-> +	}
-> +
-> +	data = irq_desc_get_irq_data(desc);
-> +	while (data->parent_data)
-> +		data = data->parent_data;
-> +
-> +	phys_irq = data->hwirq;
-> +
-> +	spin_lock(&dist->irq_phys_map_lock);
-> +
-> +	/* Boilerplate rb_tree code */
-> +	while (*new) {
-> +		struct irq_phys_map *this;
-> +
-> +		this = container_of(*new, struct irq_phys_map, node);
-> +		parent = *new;
-> +		if (this->virt_irq < virt_irq)
-> +			new = &(*new)->rb_left;
-> +		else if (this->virt_irq > virt_irq)
-> +			new = &(*new)->rb_right;
-> +		else {
-> +			new_map = this;
-> +			goto out;
-> +		}
-> +	}
-> +
-> +	new_map = kzalloc(sizeof(*new_map), GFP_KERNEL);
-> +	if (!new_map)
-> +		goto out;
-> +
-> +	new_map->virt_irq = virt_irq;
-> +	new_map->phys_irq = phys_irq;
-> +	new_map->irq = irq;
-> +
-> +	rb_link_node(&new_map->node, parent, new);
-> +	rb_insert_color(&new_map->node, root);
-> +
-> +out:
-> +	spin_unlock(&dist->irq_phys_map_lock);
-> +	return new_map;
-> +}
-> +
-> +static struct irq_phys_map *vgic_irq_map_search(struct kvm_vcpu *vcpu,
-> +						int virt_irq)
-> +{
-> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> +	struct rb_root *root = vgic_get_irq_phys_map(vcpu, virt_irq);
-> +	struct rb_node *node = root->rb_node;
-> +	struct irq_phys_map *this = NULL;
-> +
-> +	spin_lock(&dist->irq_phys_map_lock);
-> +
-> +	while (node) {
-> +		this = container_of(node, struct irq_phys_map, node);
-> +
-> +		if (this->virt_irq < virt_irq)
-> +			node = node->rb_left;
-> +		else if (this->virt_irq > virt_irq)
-> +			node = node->rb_right;
-> +		else
-> +			break;
-> +	}
-> +
-> +	spin_unlock(&dist->irq_phys_map_lock);
-> +	return this;
-> +}
-> +
-> +int vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map)
-> +{
-> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> +
-> +	if (!map)
-> +		return -EINVAL;
-> +
-> +	spin_lock(&dist->irq_phys_map_lock);
-> +	rb_erase(&map->node, vgic_get_irq_phys_map(vcpu, map->virt_irq));
-> +	spin_unlock(&dist->irq_phys_map_lock);
-> +
-> +	kfree(map);
-> +	return 0;
-> +}
-> +
->  void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> @@ -1835,6 +1944,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
->  		goto out_unlock;
->  
->  	spin_lock_init(&kvm->arch.vgic.lock);
-> +	spin_lock_init(&kvm->arch.vgic.irq_phys_map_lock);
->  	kvm->arch.vgic.in_kernel = true;
->  	kvm->arch.vgic.vgic_model = type;
->  	kvm->arch.vgic.vctrl_base = vgic->vctrl_base;
-> -- 
-> 2.1.4
-> 
+Another reason might be that, I want to disable debug mode (DBGDSCR) as early as possible.
+
+>
+>>  .endm
+>>  
+>>  .macro pop_host_regs_mode mode
+>> @@ -111,6 +115,9 @@ vcpu	.req	r0		@ vcpu pointer always in r0
+>>   * Clobbers all registers, in all modes, except r0 and r1.
+>>   */
+>>  .macro restore_host_regs
+>> +	pop	{r2}
+>> +	mcr	p14, 0, r2, c0, c2, 2
+>> +
+>
+>Why are we reading the DBGDSCRint and writing the DBGDSCRext ?
+
+Because the DBGDSCRint is read-only, and I borrowed the operation from kernel.
+
+arch/arm/kernel/hw_breakpoint.c:
+ARM_DBG_READ(c0, c1, 0, dscr)
+ARM_DBG_WRITE(c0, c2, 2, dscr)
+>
+>>  	pop	{r2-r9}
+>>  	msr	r8_fiq, r2
+>>  	msr	r9_fiq, r3
+>> @@ -159,6 +166,10 @@ vcpu	.req	r0		@ vcpu pointer always in r0
+>>   * Clobbers *all* registers.
+>>   */
+>>  .macro restore_guest_regs
+>> +	/* reset DBGDSCR to disable debug mode */
+>> +	mov	r2, #0
+>> +	mcr	p14, 0, r2, c0, c2, 2
+>
+>Is it valid to write 0 in all all fields of this register?
+
+I'm afraid of it too, although it tests ok. Does Will have any suggestions?
+>
+>I thought Will expressed concern about accessing this register?  Why is
+>it safe in this context and not before?  It seems from the spec that
+>this can still raise an undefined exception if an external debugger
+>lowers the software debug enable signal.
+>
+>> +
+>>  	restore_guest_regs_mode svc, #VCPU_SVC_REGS
+>>  	restore_guest_regs_mode abt, #VCPU_ABT_REGS
+>>  	restore_guest_regs_mode und, #VCPU_UND_REGS
+>> @@ -607,7 +618,7 @@ ARM_BE8(rev	r6, r6  )
+>>   * (hardware reset value is 0) */
+>>  .macro set_hdcr operation
+>>  	mrc	p15, 4, r2, c1, c1, 1
+>> -	ldr	r3, =(HDCR_TPM|HDCR_TPMCR)
+>> +	ldr	r3, =(HDCR_TPM|HDCR_TPMCR|HDCR_TDRA|HDCR_TDOSA|HDCR_TDA)
+>>  	.if \operation == vmentry
+>>  	orr	r2, r2, r3		@ Trap some perfmon accesses
+>>  	.else
+>> -- 
+>> 1.7.12.4
+>> 
+>
+>Thanks,
+>-Christoffer
+
+-- 
+zhichao.huang
