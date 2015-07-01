@@ -1,61 +1,105 @@
-From: Steve Capper <steve.capper@linaro.org>
-Subject: Re: [PATCH] arm64: Don't report clear pmds and puds as huge
-Date: Wed, 1 Jul 2015 14:56:36 +0100
-Message-ID: <CAPvkgC3y0jEbQBOYdB1xztiFq3b6+6QrWJKF=3rHjr7fP38gDg@mail.gmail.com>
-References: <1435752511-7079-1-git-send-email-christoffer.dall@linaro.org>
-	<20150701131831.GD21981@e104818-lin.cambridge.arm.com>
-	<20150701132838.GE21981@e104818-lin.cambridge.arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 05/10] KVM: arm/arm64: vgic: Relax vgic_can_sample_irq
+ for edge IRQs
+Date: Wed, 01 Jul 2015 19:18:40 +0100
+Message-ID: <55942F00.6000306@arm.com>
+References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com> <1433783045-8002-6-git-send-email-marc.zyngier@arm.com> <20150630201933.GA11332@cbox> <5593B040.6050208@arm.com> <20150701115820.GC17890@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20150701132838.GE21981@e104818-lin.cambridge.arm.com>
-Sender: stable-owner@vger.kernel.org
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, =?UTF-8?B?RGlyayBNw7xsbGVy?= <dirk@dmllr.de>, Marc Zyngier <marc.zyngier@arm.com>, Alexander Graf <agraf@suse.de>, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20150701115820.GC17890@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Eric Auger <eric.auger@linaro.org>, =?windows-1252?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 1 July 2015 at 14:28, Catalin Marinas <catalin.marinas@arm.com> wrote:
-> On Wed, Jul 01, 2015 at 02:18:31PM +0100, Catalin Marinas wrote:
->> On Wed, Jul 01, 2015 at 02:08:31PM +0200, Christoffer Dall wrote:
->> > diff --git a/arch/arm64/mm/hugetlbpage.c b/arch/arm64/mm/hugetlbpage.c
->> > index 2de9d2e..0eeb4f09 100644
->> > --- a/arch/arm64/mm/hugetlbpage.c
->> > +++ b/arch/arm64/mm/hugetlbpage.c
->> > @@ -40,13 +40,13 @@ int huge_pmd_unshare(struct mm_struct *mm, unsigned long *addr, pte_t *ptep)
->> >
->> >  int pmd_huge(pmd_t pmd)
->> >  {
->> > -   return !(pmd_val(pmd) & PMD_TABLE_BIT);
->> > +   return pmd_val(pmd) && !(pmd_val(pmd) & PMD_TABLE_BIT);
->> >  }
->> >
->> >  int pud_huge(pud_t pud)
->> >  {
->> >  #ifndef __PAGETABLE_PMD_FOLDED
->> > -   return !(pud_val(pud) & PUD_TABLE_BIT);
->> > +   return pud_val(pud) && !(pud_val(pud) & PUD_TABLE_BIT);
->> >  #else
->> >     return 0;
->> >  #endif
+On 01/07/15 12:58, Christoffer Dall wrote:
+> On Wed, Jul 01, 2015 at 10:17:52AM +0100, Marc Zyngier wrote:
+>> On 30/06/15 21:19, Christoffer Dall wrote:
+>>> On Mon, Jun 08, 2015 at 06:04:00PM +0100, Marc Zyngier wrote:
+>>>> We only set the irq_queued flag for level interrupts, meaning
+>>>> that "!vgic_irq_is_queued(vcpu, irq)" is a good enough predicate
+>>>> for all interrupts.
+>>>>
+>>>> This will allow us to inject edge HW interrupts, for which the
+>>>> state ACTIVE+PENDING is not allowed.
+>>>
+>>> I don't understand this; ACTIVE+PENDING is allowed for edge interrupts.
+>>> Do you mean that if we set the HW bit in the LR, then we are linking to
+>>> an HW interrupt where we don't allow that to be ACTIVE+PENDING on the HW
+>>> GIC side?
+>>>
+>>> Why is this relevant here?  I feel like I'm missing context.
 >>
->> Thanks for the patch, I'll add the acks/reviews and Fixes: tags.
+>> I've probably taken a shortcut here - bear with me while I'm trying to
+>> explain the issue.
 >>
->> (and I think I'll change pmd_val to pmd_present, same for pud; no
->> functional difference)
->
-> A related question - can we ever have PROT_NONE on a huge pmd? I'll
-> leave this patch with pmd_val for now, it matches pmd_trans_huge().
+>> For HW interrupts, we shouldn't even try to use the state bits in the
+>> LR, because that state is contained in the physical distributor. Setting
+>> the HW bit really means "there is something going on at the distributor
+>> level, just go there".
+> 
+> ok, so by "HW interrupts" you mean virtual interrupts with the HW bit in
+> the LR set, correct?
 
-Yes PROT_NONE can be used. I have a test case for it in libhugetlbfs
-(for HugeTLB) and for THP at:
-https://git.linaro.org/people/steve.capper/memory-tests.git
+Yes, sorry.
 
-They worked last time I touched them ;-).
+>>
+>> If we were to inject a ACTIVE+PENDING interrupt at the LR level, we'd
+>> basically loose the second interrupt because that state is simply not
+>> considered.
+> 
+> Huh?  Which second interrupt.  I looked at the spec and it says don't
+> use the state bits for HW interrupts, so isn't it simply not supported
+> to set these bits at all and that's it?
 
-Cheers,
---
-Steve
+I managed to confuse myself reading the same bit. It says (GICv3 spec):
 
->
-> --
-> Catalin
+"A hypervisor must only use the pending and active state for software
+originated interrupts, which are typically associated with virtual
+devices, or SGIs."
+
+That's the PENDING+ACTIVE state, and not the pending and active bits
+like I read it initially.
+
+Now consider the following scenario:
+
+- We inject a virtual edge interrupt
+- We mark the corresponding physical interrupt as active.
+- Queue interrupt in an LR
+- Resume vcpu
+
+Now, we inject another edge interrupt, the vcpu exits for whatever
+reason, and the previously injected interrupt is still active.
+
+The normal vGIC flow would be to mark the interrupt as ACTIVE+PENDING in
+the LR, and resume the vcpu. But the above states that this is invalid
+for HW generated interrupts.
+
+>>
+>> So the trick we're using is to only inject the active interrupt, and
+>> prevent anything else from being injected until we can confirm that the
+>> active state has been cleared at the physical level.
+>>
+>> Does it make any sense?
+>>
+> Sort of, but what I don't understand now is how the guest ever sees the
+> interrupt then.  If we always inject the virtual interrupt by setting
+> the active state on the physical distributor, and we can't inject this
+> as active+pending, and the guest doesn't see the state in the LR, then
+> how does this ever raise a virtual interrupt and how does the guest see
+> an interrupt which is only PENDING so that it can ack it etc. etc.?
+> 
+> Maybe I don't fully understand how the HW bit works after all...
+
+The way the spec is written is slightly misleading. But the gist of it
+is that we still signal the guest using the PENDING bit in the LR, and
+switch the LR as usual. it is just that we can't use the PENDING+ACTIVE
+state (apparently, this can lead to a double deactivation).
+
+Not sure the above makes sense. Beer time, I suppose.
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
