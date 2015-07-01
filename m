@@ -1,100 +1,61 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 2/2] arm: KVM: keep arm vfp/simd exit handling
- consistent with arm64
-Date: Wed, 1 Jul 2015 15:50:41 +0200
-Message-ID: <20150701135041.GH11332@cbox>
-References: <1435190652-5831-1-git-send-email-m.smarduch@samsung.com>
- <1435190652-5831-3-git-send-email-m.smarduch@samsung.com>
+From: Steve Capper <steve.capper@linaro.org>
+Subject: Re: [PATCH] arm64: Don't report clear pmds and puds as huge
+Date: Wed, 1 Jul 2015 14:56:36 +0100
+Message-ID: <CAPvkgC3y0jEbQBOYdB1xztiFq3b6+6QrWJKF=3rHjr7fP38gDg@mail.gmail.com>
+References: <1435752511-7079-1-git-send-email-christoffer.dall@linaro.org>
+	<20150701131831.GD21981@e104818-lin.cambridge.arm.com>
+	<20150701132838.GE21981@e104818-lin.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EA1005748A
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jul 2015 09:39:26 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SNk4LTVg-dvZ for <kvmarm@lists.cs.columbia.edu>;
- Wed,  1 Jul 2015 09:39:26 -0400 (EDT)
-Received: from mail-la0-f41.google.com (mail-la0-f41.google.com
- [209.85.215.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F0F4057489
- for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jul 2015 09:39:25 -0400 (EDT)
-Received: by lagx9 with SMTP id x9so41112577lag.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Jul 2015 06:50:39 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <1435190652-5831-3-git-send-email-m.smarduch@samsung.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mario Smarduch <m.smarduch@samsung.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=UTF-8
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <20150701132838.GE21981@e104818-lin.cambridge.arm.com>
+Sender: stable-owner@vger.kernel.org
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, =?UTF-8?B?RGlyayBNw7xsbGVy?= <dirk@dmllr.de>, Marc Zyngier <marc.zyngier@arm.com>, Alexander Graf <agraf@suse.de>, stable@vger.kernel.org, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jun 24, 2015 at 05:04:12PM -0700, Mario Smarduch wrote:
-> After enhancing arm64 FP/SIMD exit handling, ARMv7 VFP exit branch is moved
-> to guest trap handling. This allows us to keep exit handling flow between both
-> architectures consistent.
-> 
-> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
-> ---
->  arch/arm/kvm/interrupts.S |   14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
-> index 79caf79..b245b4e 100644
-> --- a/arch/arm/kvm/interrupts.S
-> +++ b/arch/arm/kvm/interrupts.S
-> @@ -363,10 +363,6 @@ hyp_hvc:
->  	@ Check syndrome register
->  	mrc	p15, 4, r1, c5, c2, 0	@ HSR
->  	lsr	r0, r1, #HSR_EC_SHIFT
-> -#ifdef CONFIG_VFPv3
-> -	cmp	r0, #HSR_EC_CP_0_13
-> -	beq	switch_to_guest_vfp
-> -#endif
->  	cmp	r0, #HSR_EC_HVC
->  	bne	guest_trap		@ Not HVC instr.
->  
-> @@ -380,7 +376,10 @@ hyp_hvc:
->  	cmp     r2, #0
->  	bne	guest_trap		@ Guest called HVC
->  
-> -host_switch_to_hyp:
-> +	/*
-> +	 * Getting here means host called HVC, we shift parameters and branch
-> +	 * to Hyp function.
-> +	 */
->  	pop	{r0, r1, r2}
->  
->  	/* Check for __hyp_get_vectors */
-> @@ -411,6 +410,10 @@ guest_trap:
->  
->  	@ Check if we need the fault information
->  	lsr	r1, r1, #HSR_EC_SHIFT
-> +#ifdef CONFIG_VFPv3
-> +	cmp	r1, #HSR_EC_CP_0_13
-> +	beq	switch_to_guest_vfp
-> +#endif
->  	cmp	r1, #HSR_EC_IABT
->  	mrceq	p15, 4, r2, c6, c0, 2	@ HIFAR
->  	beq	2f
-> @@ -479,7 +482,6 @@ guest_trap:
->   */
->  #ifdef CONFIG_VFPv3
->  switch_to_guest_vfp:
-> -	load_vcpu			@ Load VCPU pointer to r0
->  	push	{r3-r7}
->  
->  	@ NEON/VFP used.  Turn on VFP access.
-> -- 
-> 1.7.9.5
-> 
+On 1 July 2015 at 14:28, Catalin Marinas <catalin.marinas@arm.com> wrote:
+> On Wed, Jul 01, 2015 at 02:18:31PM +0100, Catalin Marinas wrote:
+>> On Wed, Jul 01, 2015 at 02:08:31PM +0200, Christoffer Dall wrote:
+>> > diff --git a/arch/arm64/mm/hugetlbpage.c b/arch/arm64/mm/hugetlbpage.c
+>> > index 2de9d2e..0eeb4f09 100644
+>> > --- a/arch/arm64/mm/hugetlbpage.c
+>> > +++ b/arch/arm64/mm/hugetlbpage.c
+>> > @@ -40,13 +40,13 @@ int huge_pmd_unshare(struct mm_struct *mm, unsigned long *addr, pte_t *ptep)
+>> >
+>> >  int pmd_huge(pmd_t pmd)
+>> >  {
+>> > -   return !(pmd_val(pmd) & PMD_TABLE_BIT);
+>> > +   return pmd_val(pmd) && !(pmd_val(pmd) & PMD_TABLE_BIT);
+>> >  }
+>> >
+>> >  int pud_huge(pud_t pud)
+>> >  {
+>> >  #ifndef __PAGETABLE_PMD_FOLDED
+>> > -   return !(pud_val(pud) & PUD_TABLE_BIT);
+>> > +   return pud_val(pud) && !(pud_val(pud) & PUD_TABLE_BIT);
+>> >  #else
+>> >     return 0;
+>> >  #endif
+>>
+>> Thanks for the patch, I'll add the acks/reviews and Fixes: tags.
+>>
+>> (and I think I'll change pmd_val to pmd_present, same for pud; no
+>> functional difference)
+>
+> A related question - can we ever have PROT_NONE on a huge pmd? I'll
+> leave this patch with pmd_val for now, it matches pmd_trans_huge().
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Yes PROT_NONE can be used. I have a test case for it in libhugetlbfs
+(for HugeTLB) and for THP at:
+https://git.linaro.org/people/steve.capper/memory-tests.git
+
+They worked last time I touched them ;-).
+
+Cheers,
+--
+Steve
+
+>
+> --
+> Catalin
