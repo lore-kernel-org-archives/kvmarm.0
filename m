@@ -1,262 +1,273 @@
 From: zichao <zhichao.huang@linaro.org>
-Subject: Re: [PATCH v3 01/11] KVM: arm: plug guest debug exploit
-Date: Wed, 01 Jul 2015 15:04:00 +0800
-Message-ID: <0DE86164-5740-4894-A41C-DBCD930196AC@linaro.org>
-References: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org> <1434969694-7432-2-git-send-email-zhichao.huang@linaro.org> <20150629154953.GM11332@cbox>
+Subject: Re: [PATCH v3 06/11] KVM: arm: add trap handlers for 32-bit debug
+ registers
+Date: Wed, 01 Jul 2015 15:14:52 +0800
+Message-ID: <13199A81-93CC-4830-92AE-ED5EEBABA912@linaro.org>
+References: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org>
+ <1434969694-7432-7-git-send-email-zhichao.huang@linaro.org>
+ <20150629211641.GO11332@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <20150629154953.GM11332@cbox>
-Sender: stable-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C968F56BB6
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jul 2015 03:04:46 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 4XVTZRo+Hsf1 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  1 Jul 2015 03:04:45 -0400 (EDT)
+Received: from mail-pa0-f48.google.com (mail-pa0-f48.google.com
+ [209.85.220.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8654B56BB1
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  1 Jul 2015 03:04:45 -0400 (EDT)
+Received: by pabvl15 with SMTP id vl15so18623743pab.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 01 Jul 2015 00:15:58 -0700 (PDT)
+In-Reply-To: <20150629211641.GO11332@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com, huangzhichao@huawei.com, stable@vger.kernel.org
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, will.deacon@arm.com, huangzhichao@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
 
-On June 29, 2015 11:49:53 PM GMT+08:00, Christoffer Dall <christoffer.dall@linaro.org> wrote:
->On Mon, Jun 22, 2015 at 06:41:24PM +0800, Zhichao Huang wrote:
->> Hardware debugging in guests is not intercepted currently, it means
->> that a malicious guest can bring down the entire machine by writing
->> to the debug registers.
+On June 30, 2015 5:16:41 AM GMT+08:00, Christoffer Dall <christoffer.dall@linaro.org> wrote:
+>On Mon, Jun 22, 2015 at 06:41:29PM +0800, Zhichao Huang wrote:
+>> Add handlers for all the 32-bit debug registers.
 >> 
->> This patch enable trapping of all debug registers, preventing the
->guests
->> to access the debug registers.
->> 
->> This patch also disable the debug mode(DBGDSCR) in the guest world
->all
->> the time, preventing the guests to mess with the host state.
->> 
->> However, it is a precursor for later patches which will need to do
->> more to world switch debug states while necessary.
->> 
->> Cc: <stable@vger.kernel.org>
 >> Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
 >> ---
->>  arch/arm/include/asm/kvm_coproc.h |  3 +-
->>  arch/arm/kvm/coproc.c             | 60
->+++++++++++++++++++++++++++++++++++----
->>  arch/arm/kvm/handle_exit.c        |  4 +--
->>  arch/arm/kvm/interrupts_head.S    | 13 ++++++++-
->>  4 files changed, 70 insertions(+), 10 deletions(-)
+>>  arch/arm/include/asm/kvm_asm.h  |  12 ++++
+>>  arch/arm/include/asm/kvm_host.h |   3 +
+>>  arch/arm/kernel/asm-offsets.c   |   1 +
+>>  arch/arm/kvm/coproc.c           | 122
+>++++++++++++++++++++++++++++++++++++++++
+>>  4 files changed, 138 insertions(+)
 >> 
->> diff --git a/arch/arm/include/asm/kvm_coproc.h
->b/arch/arm/include/asm/kvm_coproc.h
->> index 4917c2f..e74ab0f 100644
->> --- a/arch/arm/include/asm/kvm_coproc.h
->> +++ b/arch/arm/include/asm/kvm_coproc.h
->> @@ -31,7 +31,8 @@ void kvm_register_target_coproc_table(struct
->kvm_coproc_target_table *table);
->>  int kvm_handle_cp10_id(struct kvm_vcpu *vcpu, struct kvm_run *run);
->>  int kvm_handle_cp_0_13_access(struct kvm_vcpu *vcpu, struct kvm_run
->*run);
->>  int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu, struct kvm_run
->*run);
->> -int kvm_handle_cp14_access(struct kvm_vcpu *vcpu, struct kvm_run
->*run);
->> +int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run);
->> +int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run);
->>  int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run);
->>  int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run);
+>> diff --git a/arch/arm/include/asm/kvm_asm.h
+>b/arch/arm/include/asm/kvm_asm.h
+>> index 25410b2..ba65e05 100644
+>> --- a/arch/arm/include/asm/kvm_asm.h
+>> +++ b/arch/arm/include/asm/kvm_asm.h
+>> @@ -52,6 +52,18 @@
+>>  #define c10_AMAIR1	30	/* Auxilary Memory Attribute Indirection Reg1
+>*/
+>>  #define NR_CP15_REGS	31	/* Number of regs (incl. invalid) */
 >>  
+>> +/* 0 is reserved as an invalid value. */
+>> +#define cp14_DBGBVR0	1	/* Debug Breakpoint Control Registers (0-15)
+>*/
+>> +#define cp14_DBGBVR15	16
+>> +#define cp14_DBGBCR0	17	/* Debug Breakpoint Value Registers (0-15)
+>*/
+>> +#define cp14_DBGBCR15	32
+>> +#define cp14_DBGWVR0	33	/* Debug Watchpoint Control Registers (0-15)
+>*/
+>> +#define cp14_DBGWVR15	48
+>> +#define cp14_DBGWCR0	49	/* Debug Watchpoint Value Registers (0-15)
+>*/
+>> +#define cp14_DBGWCR15	64
+>> +#define cp14_DBGDSCRext	65	/* Debug Status and Control external */
+>> +#define NR_CP14_REGS	66	/* Number of regs (incl. invalid) */
+>> +
+>>  #define ARM_EXCEPTION_RESET	  0
+>>  #define ARM_EXCEPTION_UNDEFINED   1
+>>  #define ARM_EXCEPTION_SOFTWARE    2
+>> diff --git a/arch/arm/include/asm/kvm_host.h
+>b/arch/arm/include/asm/kvm_host.h
+>> index d71607c..3d16820 100644
+>> --- a/arch/arm/include/asm/kvm_host.h
+>> +++ b/arch/arm/include/asm/kvm_host.h
+>> @@ -124,6 +124,9 @@ struct kvm_vcpu_arch {
+>>  	struct vgic_cpu vgic_cpu;
+>>  	struct arch_timer_cpu timer_cpu;
+>>  
+>> +	/* System control coprocessor (cp14) */
+>> +	u32 cp14[NR_CP14_REGS];
+>> +
+>>  	/*
+>>  	 * Anything that is not used directly from assembly code goes
+>>  	 * here.
+>> diff --git a/arch/arm/kernel/asm-offsets.c
+>b/arch/arm/kernel/asm-offsets.c
+>> index 871b826..9158de0 100644
+>> --- a/arch/arm/kernel/asm-offsets.c
+>> +++ b/arch/arm/kernel/asm-offsets.c
+>> @@ -172,6 +172,7 @@ int main(void)
+>>  #ifdef CONFIG_KVM_ARM_HOST
+>>    DEFINE(VCPU_KVM,		offsetof(struct kvm_vcpu, kvm));
+>>    DEFINE(VCPU_MIDR,		offsetof(struct kvm_vcpu, arch.midr));
+>> +  DEFINE(VCPU_CP14,		offsetof(struct kvm_vcpu, arch.cp14));
+>>    DEFINE(VCPU_CP15,		offsetof(struct kvm_vcpu, arch.cp15));
+>>    DEFINE(VCPU_VFP_GUEST,	offsetof(struct kvm_vcpu, arch.vfp_guest));
+>>    DEFINE(VCPU_VFP_HOST,		offsetof(struct kvm_vcpu,
+>arch.host_cpu_context));
 >> diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
->> index f3d88dc..2e12760 100644
+>> index 16d5f69..59b65b7 100644
 >> --- a/arch/arm/kvm/coproc.c
 >> +++ b/arch/arm/kvm/coproc.c
->> @@ -91,12 +91,6 @@ int kvm_handle_cp14_load_store(struct kvm_vcpu
->*vcpu, struct kvm_run *run)
->>  	return 1;
+>> @@ -220,6 +220,47 @@ bool access_vm_reg(struct kvm_vcpu *vcpu,
+>>  	return true;
 >>  }
 >>  
->> -int kvm_handle_cp14_access(struct kvm_vcpu *vcpu, struct kvm_run
->*run)
->> -{
->> -	kvm_inject_undefined(vcpu);
->> -	return 1;
->> -}
->> -
->>  static void reset_mpidr(struct kvm_vcpu *vcpu, const struct
->coproc_reg *r)
->>  {
->>  	/*
->> @@ -519,6 +513,60 @@ int kvm_handle_cp15_32(struct kvm_vcpu *vcpu,
->struct kvm_run *run)
->>  	return emulate_cp15(vcpu, &params);
->>  }
->>  
->> +/**
->> + * kvm_handle_cp14_64 -- handles a mrrc/mcrr trap on a guest CP14
->access
->> + * @vcpu: The VCPU pointer
->> + * @run:  The kvm_run struct
->> + */
->> +int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>> +static bool trap_debug32(struct kvm_vcpu *vcpu,
+>> +			const struct coproc_params *p,
+>> +			const struct coproc_reg *r)
 >> +{
->> +	struct coproc_params params;
+>> +	if (p->is_write)
+>> +		vcpu->arch.cp14[r->reg] = *vcpu_reg(vcpu, p->Rt1);
+>> +	else
+>> +		*vcpu_reg(vcpu, p->Rt1) = vcpu->arch.cp14[r->reg];
 >> +
->> +	params.CRn = (kvm_vcpu_get_hsr(vcpu) >> 1) & 0xf;
->> +	params.Rt1 = (kvm_vcpu_get_hsr(vcpu) >> 5) & 0xf;
->> +	params.is_write = ((kvm_vcpu_get_hsr(vcpu) & 1) == 0);
->> +	params.is_64bit = true;
->> +
->> +	params.Op1 = (kvm_vcpu_get_hsr(vcpu) >> 16) & 0xf;
->> +	params.Op2 = 0;
->> +	params.Rt2 = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
->> +	params.CRm = 0;
->
->this is a complete duplicate of kvm_handle_cp15_64, can you share this
->code somehow?
->
-
-This patch just want to plug the exploit in the simplest way, and I shared the cp14/cp15 handlers in later patches [PATCH v3 04/11].
-
-Should I take the patch [04/11] ahead of current patch [01/11] ?
-
->> +
->> +	/* raz_wi */
->> +	(void)pm_fake(vcpu, &params, NULL);
->> +
->> +	/* handled */
->> +	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
->> +	return 1;
+>> +	return true;
 >> +}
 >> +
->> +/**
->> + * kvm_handle_cp14_32 -- handles a mrc/mcr trap on a guest CP14
->access
->> + * @vcpu: The VCPU pointer
->> + * @run:  The kvm_run struct
->> + */
->> +int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>> +/* DBGIDR (RO) Debug ID */
+>> +static bool trap_dbgidr(struct kvm_vcpu *vcpu,
+>> +			const struct coproc_params *p,
+>> +			const struct coproc_reg *r)
 >> +{
->> +	struct coproc_params params;
+>> +	u32 val;
 >> +
->> +	params.CRm = (kvm_vcpu_get_hsr(vcpu) >> 1) & 0xf;
->> +	params.Rt1 = (kvm_vcpu_get_hsr(vcpu) >> 5) & 0xf;
->> +	params.is_write = ((kvm_vcpu_get_hsr(vcpu) & 1) == 0);
->> +	params.is_64bit = false;
+>> +	if (p->is_write)
+>> +		return ignore_write(vcpu, p);
 >> +
->> +	params.CRn = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
->> +	params.Op1 = (kvm_vcpu_get_hsr(vcpu) >> 14) & 0x7;
->> +	params.Op2 = (kvm_vcpu_get_hsr(vcpu) >> 17) & 0x7;
->> +	params.Rt2 = 0;
->
->this is a complete duplicate of kvm_handle_cp15_32, can you share this
->code somehow?
->
+>> +	ARM_DBG_READ(c0, c0, 0, val);
+>> +	*vcpu_reg(vcpu, p->Rt1) = val;
 >> +
->> +	/* raz_wi */
->> +	(void)pm_fake(vcpu, &params, NULL);
->> +
->> +	/* handled */
->> +	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
->> +	return 1;
+>> +	return true;
 >> +}
 >> +
->> 
->/******************************************************************************
->>   * Userspace API
+>> +/* DBGDSCRint (RO) Debug Status and Control Register */
+>> +static bool trap_dbgdscr(struct kvm_vcpu *vcpu,
+>> +			const struct coproc_params *p,
+>> +			const struct coproc_reg *r)
+>> +{
+>> +	if (p->is_write)
+>> +		return ignore_write(vcpu, p);
+>> +
+>> +	*vcpu_reg(vcpu, p->Rt1) = vcpu->arch.cp14[r->reg];
+>> +
+>> +	return true;
+>> +}
+>> +
+>>  /*
+>>   * We could trap ID_DFR0 and tell the guest we don't support
+>performance
+>>   * monitoring.  Unfortunately the patch to make the kernel check
+>ID_DFR0 was
+>> @@ -375,7 +416,88 @@ static const struct coproc_reg cp15_regs[] = {
+>>  	{ CRn(15), CRm( 0), Op1( 4), Op2( 0), is32, access_cbar},
+>>  };
 >>  
->*****************************************************************************/
->> diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
->> index 95f12b2..357ad1b 100644
->> --- a/arch/arm/kvm/handle_exit.c
->> +++ b/arch/arm/kvm/handle_exit.c
->> @@ -104,9 +104,9 @@ static exit_handle_fn arm_exit_handlers[] = {
->>  	[HSR_EC_WFI]		= kvm_handle_wfx,
->>  	[HSR_EC_CP15_32]	= kvm_handle_cp15_32,
->>  	[HSR_EC_CP15_64]	= kvm_handle_cp15_64,
->> -	[HSR_EC_CP14_MR]	= kvm_handle_cp14_access,
->> +	[HSR_EC_CP14_MR]	= kvm_handle_cp14_32,
->>  	[HSR_EC_CP14_LS]	= kvm_handle_cp14_load_store,
->> -	[HSR_EC_CP14_64]	= kvm_handle_cp14_access,
->> +	[HSR_EC_CP14_64]	= kvm_handle_cp14_64,
->>  	[HSR_EC_CP_0_13]	= kvm_handle_cp_0_13_access,
->>  	[HSR_EC_CP10_ID]	= kvm_handle_cp10_id,
->>  	[HSR_EC_SVC_HYP]	= handle_svc_hyp,
->> diff --git a/arch/arm/kvm/interrupts_head.S
->b/arch/arm/kvm/interrupts_head.S
->> index 35e4a3a..f85c447 100644
->> --- a/arch/arm/kvm/interrupts_head.S
->> +++ b/arch/arm/kvm/interrupts_head.S
->> @@ -97,6 +97,10 @@ vcpu	.req	r0		@ vcpu pointer always in r0
->>  	mrs	r8, LR_fiq
->>  	mrs	r9, SPSR_fiq
->>  	push	{r2-r9}
+>> +#define DBG_BCR_BVR_WCR_WVR(n)					\
+>> +	/* DBGBVRn */						\
+>> +	{ CRn( 0), CRm((n)), Op1( 0), Op2( 4), is32,		\
+>> +	  trap_debug32,	reset_val, (cp14_DBGBVR0 + (n)), 0 },	\
+>> +	/* DBGBCRn */						\
+>> +	{ CRn( 0), CRm((n)), Op1( 0), Op2( 5), is32,		\
+>> +	  trap_debug32,	reset_val, (cp14_DBGBCR0 + (n)), 0 },	\
+>> +	/* DBGWVRn */						\
+>> +	{ CRn( 0), CRm((n)), Op1( 0), Op2( 6), is32,		\
+>> +	  trap_debug32,	reset_val, (cp14_DBGWVR0 + (n)), 0 },	\
+>> +	/* DBGWCRn */						\
+>> +	{ CRn( 0), CRm((n)), Op1( 0), Op2( 7), is32,		\
+>> +	  trap_debug32,	reset_val, (cp14_DBGWCR0 + (n)), 0 }
 >> +
->> +	/* DBGDSCR reg */
->> +	mrc	p14, 0, r2, c0, c1, 0
->> +	push	{r2}
+>> +/* No OS DBGBXVR machanism implemented. */
+>> +#define DBGBXVR(n)						\
+>> +	{ CRn( 1), CRm((n)), Op1( 0), Op2( 1), is32, trap_raz_wi }
+>> +
+>> +/*
+>> + * Trapped cp14 registers. We generally ignore most of the external
+>> + * debug, on the principle that they don't really make sense to a
+>> + * guest. Revisit this one day, whould this principle change.
 >
->this feels like it should belong in read_cp15_state and not the gp regs
->portion ?
+>s/whould/should/
 >
 
-Happy to move it. But moving the cp14 regs to read/write_cp15_state still seems no very appropriate. Should I move it to __kvm_vcpu_return and __kvm_vcpu_run?
+ok.
 
-Another reason might be that, I want to disable debug mode (DBGDSCR) as early as possible.
-
+>> + */
+>>  static const struct coproc_reg cp14_regs[] = {
+>> +	/* DBGIDR */
+>> +	{ CRn( 0), CRm( 0), Op1( 0), Op2( 0), is32, trap_dbgidr},
+>> +	/* DBGDTRRXext */
+>> +	{ CRn( 0), CRm( 0), Op1( 0), Op2( 2), is32, trap_raz_wi },
+>> +	DBG_BCR_BVR_WCR_WVR(0),
+>> +	/* DBGDSCRint */
+>> +	{ CRn( 0), CRm( 1), Op1( 0), Op2( 0), is32, trap_dbgdscr,
+>> +				NULL, cp14_DBGDSCRext },
+>> +	DBG_BCR_BVR_WCR_WVR(1),
+>> +	/* DBGDSCRext */
+>> +	{ CRn( 0), CRm( 2), Op1( 0), Op2( 2), is32, trap_debug32,
+>> +				reset_val, cp14_DBGDSCRext, 0 },
+>> +	DBG_BCR_BVR_WCR_WVR(2),
+>> +	/* DBGDTRRXext */
+>> +	{ CRn( 0), CRm( 3), Op1( 0), Op2( 2), is32, trap_raz_wi },
 >
->>  .endm
+>isn't this the DBGDTRTXext register?
+
+Thanks for pointing out.
+>
+>> +	DBG_BCR_BVR_WCR_WVR(3),
+>> +	DBG_BCR_BVR_WCR_WVR(4),
+>> +	/* DBGDTR[RT]Xint */
+>> +	{ CRn( 0), CRm( 5), Op1( 0), Op2( 0), is32, trap_raz_wi },
+>> +	DBG_BCR_BVR_WCR_WVR(5),
+>> +	DBG_BCR_BVR_WCR_WVR(6),
+>> +	/* DBGVCR */
+>> +	{ CRn( 0), CRm( 7), Op1( 0), Op2( 0), is32, trap_debug32 },
+>> +	DBG_BCR_BVR_WCR_WVR(7),
+>> +	DBG_BCR_BVR_WCR_WVR(8),
+>> +	DBG_BCR_BVR_WCR_WVR(9),
+>> +	DBG_BCR_BVR_WCR_WVR(10),
+>> +	DBG_BCR_BVR_WCR_WVR(11),
+>> +	DBG_BCR_BVR_WCR_WVR(12),
+>> +	DBG_BCR_BVR_WCR_WVR(13),
+>> +	DBG_BCR_BVR_WCR_WVR(14),
+>> +	DBG_BCR_BVR_WCR_WVR(15),
+>> +
+>> +	DBGBXVR(0),
+>> +	/* DBGOSLAR */
+>> +	{ CRn( 1), CRm( 0), Op1( 0), Op2( 4), is32, trap_raz_wi },
+>> +	DBGBXVR(1),
+>> +	/* DBGOSLSR */
+>> +	{ CRn( 1), CRm( 1), Op1( 0), Op2( 4), is32, trap_raz_wi },
+>> +	DBGBXVR(2),
+>> +	DBGBXVR(3),
+>> +	/* DBGOSDLRd */
+>> +	{ CRn( 1), CRm( 3), Op1( 0), Op2( 4), is32, trap_raz_wi },
+>> +	DBGBXVR(4),
+>> +	DBGBXVR(5),
+>> +	/* DBGPRSRa */
+>> +	{ CRn( 1), CRm( 5), Op1( 0), Op2( 4), is32, trap_raz_wi },
+>> +
+>> +	DBGBXVR(6),
+>> +	DBGBXVR(7),
+>> +	DBGBXVR(8),
+>> +	DBGBXVR(9),
+>> +	DBGBXVR(10),
+>> +	DBGBXVR(11),
+>> +	DBGBXVR(12),
+>> +	DBGBXVR(13),
+>> +	DBGBXVR(14),
+>> +	DBGBXVR(15),
+>>  };
 >>  
->>  .macro pop_host_regs_mode mode
->> @@ -111,6 +115,9 @@ vcpu	.req	r0		@ vcpu pointer always in r0
->>   * Clobbers all registers, in all modes, except r0 and r1.
->>   */
->>  .macro restore_host_regs
->> +	pop	{r2}
->> +	mcr	p14, 0, r2, c0, c2, 2
->> +
->
->Why are we reading the DBGDSCRint and writing the DBGDSCRext ?
-
-Because the DBGDSCRint is read-only, and I borrowed the operation from kernel.
-
-arch/arm/kernel/hw_breakpoint.c:
-ARM_DBG_READ(c0, c1, 0, dscr)
-ARM_DBG_WRITE(c0, c2, 2, dscr)
->
->>  	pop	{r2-r9}
->>  	msr	r8_fiq, r2
->>  	msr	r9_fiq, r3
->> @@ -159,6 +166,10 @@ vcpu	.req	r0		@ vcpu pointer always in r0
->>   * Clobbers *all* registers.
->>   */
->>  .macro restore_guest_regs
->> +	/* reset DBGDSCR to disable debug mode */
->> +	mov	r2, #0
->> +	mcr	p14, 0, r2, c0, c2, 2
->
->Is it valid to write 0 in all all fields of this register?
-
-I'm afraid of it too, although it tests ok. Does Will have any suggestions?
->
->I thought Will expressed concern about accessing this register?  Why is
->it safe in this context and not before?  It seems from the spec that
->this can still raise an undefined exception if an external debugger
->lowers the software debug enable signal.
->
->> +
->>  	restore_guest_regs_mode svc, #VCPU_SVC_REGS
->>  	restore_guest_regs_mode abt, #VCPU_ABT_REGS
->>  	restore_guest_regs_mode und, #VCPU_UND_REGS
->> @@ -607,7 +618,7 @@ ARM_BE8(rev	r6, r6  )
->>   * (hardware reset value is 0) */
->>  .macro set_hdcr operation
->>  	mrc	p15, 4, r2, c1, c1, 1
->> -	ldr	r3, =(HDCR_TPM|HDCR_TPMCR)
->> +	ldr	r3, =(HDCR_TPM|HDCR_TPMCR|HDCR_TDRA|HDCR_TDOSA|HDCR_TDA)
->>  	.if \operation == vmentry
->>  	orr	r2, r2, r3		@ Trap some perfmon accesses
->>  	.else
+>>  /* Target specific emulation tables */
 >> -- 
 >> 1.7.12.4
 >> 
->
->Thanks,
+>Otherwise this looks ok,
 >-Christoffer
 
 -- 
