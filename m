@@ -1,25 +1,25 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH 2/7] KVM: kvm_host: add kvm_extended_msi
-Date: Thu, 2 Jul 2015 18:03:26 +0100
-Message-ID: <55956EDE.6030300@arm.com>
+Subject: Re: [PATCH 7/7] KVM: arm: implement kvm_set_msi by gsi direct mapping
+Date: Thu, 2 Jul 2015 18:10:04 +0100
+Message-ID: <5595706C.9010108@arm.com>
 References: <1435592237-17924-1-git-send-email-eric.auger@linaro.org>
- <1435592237-17924-3-git-send-email-eric.auger@linaro.org>
+ <1435592237-17924-8-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 49D1C577E7
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2015 12:52:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 03363577F2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2015 12:58:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cw1VXZdPnWzG for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Jul 2015 12:52:12 -0400 (EDT)
+ with ESMTP id 03qzsgWWxvfo for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Jul 2015 12:58:49 -0400 (EDT)
 Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
  [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F08CF577E0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2015 12:52:11 -0400 (EDT)
-In-Reply-To: <1435592237-17924-3-git-send-email-eric.auger@linaro.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F10A0577E7
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2015 12:58:48 -0400 (EDT)
+In-Reply-To: <1435592237-17924-8-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,64 +35,56 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Eric,
 
-just played a bit with the code and I could make things easier by the
-following change:
-
 On 29/06/15 16:37, Eric Auger wrote:
-> Add a new kvm_extended_msi struct to store the additional device ID
-> specific to ARM. kvm_kernel_irq_routing_entry union now encompasses
-> this new struct.
-> =
-
+> If the ITS modality is not available, let's simply support MSI
+> injection by transforming the MSI.data into an SPI ID.
+> 
+> This becomes possible to use KVM_SIGNAL_MSI ioctl for arm too.
+> 
 > Signed-off-by: Eric Auger <eric.auger@linaro.org>
-> =
-
 > ---
-> =
+>  arch/arm/kvm/Kconfig | 1 +
+>  virt/kvm/arm/vgic.c  | 5 +++++
+>  2 files changed, 6 insertions(+)
+> 
+> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+> index 151e710..0f58baf 100644
+> --- a/arch/arm/kvm/Kconfig
+> +++ b/arch/arm/kvm/Kconfig
+> @@ -31,6 +31,7 @@ config KVM
+>  	select KVM_VFIO
+>  	select HAVE_KVM_EVENTFD
+>  	select HAVE_KVM_IRQFD
+> +	select HAVE_KVM_MSI
+>  	select HAVE_KVM_IRQCHIP
+>  	select HAVE_KVM_IRQ_ROUTING
+>  	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
+> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+> index 0b4c48c..b3c10dc 100644
+> --- a/virt/kvm/arm/vgic.c
+> +++ b/virt/kvm/arm/vgic.c
+> @@ -2314,6 +2314,11 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+>  			return kvm->arch.vgic.vm_ops.inject_msi(kvm, &msi);
+>  		else
+>  			return -ENODEV;
+> +	case KVM_IRQ_ROUTING_MSI:
+> +		if (kvm->arch.vgic.vm_ops.inject_msi)
+> +			return -EINVAL;
+> +		else
+> +			return kvm_vgic_inject_irq(kvm, 0, e->msi.data, level);
 
-> RFC -> PATCH:
-> - reword the commit message after change in first patch (uapi)
-> ---
->  include/linux/kvm_host.h | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> =
+If you add:
 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index ad45054..e1c1c0d 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -304,6 +304,13 @@ struct kvm_s390_adapter_int {
->  	u32 adapter_id;
->  };
->  =
+static int vgic_v2m_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
+{
+	return kvm_vgic_inject_irq(kvm, 0, msi->data, 1);
+}
 
-> +struct kvm_extended_msi {
-> +	u32     address_lo;     /* low 32 bits of msi message address */
-> +	u32     address_hi;     /* high 32 bits of msi message address */
-> +	u32     data;           /* 16 bits of msi message data */
-> +	u32	devid;		/* out-of-band device ID */
-> +};
-> +
+to vgic-v2-emul.c and wire it up accordingly, you can simplify the above
+kvm_set_msi, getting rid of all those extra case handling.
+This also helps merging KVM_IRQ_ROUTING_MSI and the extended case.
 
-I got rid of this structure at all, instead using:
-
- @@ -317,6 +324,7 @@ struct kvm_kernel_irq_routing_entry {
-  		} irqchip;
--		struct msi_msg msi;
-+		struct {
-+			struct msi_msg msi;
-+			u32 devid;
-+		};
-  		struct kvm_s390_adapter_int adapter;
-  	};
-  	struct hlist_node link;
-  };
-
-This re-uses the existing MSI fields in struct msi_msg, so all the extra
-code you added in the next patches to set address and data could be
-skipped. If needed we can add a flags field here as well to avoid that
-extra type.
-That simplified a lot for me.
+I have hacked this up and it seems to work for me.
 
 Cheers,
-Andr=E9
+Andre.
