@@ -1,75 +1,86 @@
-From: Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH v7 09/11] KVM: arm64: guest debug, HW assisted debug
- support
-Date: Thu, 2 Jul 2015 09:48:47 +0100
-Message-ID: <20150702084847.GB3418@arm.com>
-References: <1435775343-20034-1-git-send-email-alex.bennee@linaro.org>
- <1435775343-20034-10-git-send-email-alex.bennee@linaro.org>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [RFC 03/17] VFIO: Introduce vfio_device_external_ops
+Date: Thu,  2 Jul 2015 15:17:13 +0200
+Message-ID: <1435843047-6327-4-git-send-email-eric.auger@linaro.org>
+References: <1435843047-6327-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1435775343-20034-10-git-send-email-alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Cc: "kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org" <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, "christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org" <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Marc Zyngier <Marc.Zyngier-5wv7dgnIgG8@public.gmane.org>, "peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org" <peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, "agraf-l3A5Bk7waGM@public.gmane.org" <agraf-l3A5Bk7waGM@public.gmane.org>, "drjones-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <drjones-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <pbonzini-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "zhichao.huang-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org" <zhichao.huang-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, "jan.kiszka-kv7WeFo6aLtBDgjK7y7TUQ@public.gmane.org" <jan.kiszka-kv7WeFo6aLtBDgjK7y7TUQ@public.gmane.org>, "dahi-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org" <dahi-23VcF4HTsmIX0ybBhKVfKdBPR1lH4CV8@public.gmane.org>, "r65777-KZfg59tc24xl57MIdRCFDg@public.gmane.org" <r65777-KZfg59tc24xl57MIdRCFDg@public.gmane.org>, "bp-l3A5Bk7waGM@public.gmane.org" <bp-l3A5Bk7waGM@public.gmane.org>, Gleb Natapov <gleb-DgEjT+Ai2ygdnm+yROfE0A@public.gmane.org>, Jonathan Corbet <corbet-T1hC0tSOHrs@public.gmane.org>, Catalin Marinas <Catalin.Marinas-5wv7dgnIgG8@public.gmane.org>, Lorenzo Pieralisi <Lorenzo.Pieralisi-5wv7dgnIgG8@public.gmane.org>, Ingo Molnar <mingo@kernel.o>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 12526576D0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2015 09:06:47 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id CXJLyp9yk-ma for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Jul 2015 09:06:45 -0400 (EDT)
+Received: from mail-wg0-f54.google.com (mail-wg0-f54.google.com [74.125.82.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1B4DF576CE
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2015 09:06:45 -0400 (EDT)
+Received: by wgjx7 with SMTP id x7so62916295wgj.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Jul 2015 06:18:01 -0700 (PDT)
+In-Reply-To: <1435843047-6327-1-git-send-email-eric.auger@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: eric.auger@st.com, eric.auger@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.williamson@redhat.com, pbonzini@redhat.com, avi.kivity@gmail.com, mtosatti@redhat.com, feng.wu@intel.com, joro@8bytes.org, b.reynal@virtualopensystems.com
+Cc: linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Alex,
+New bus callbacks are introduced. They correspond to external
+functions. To avoid messing up the main vfio_device_ops
+struct, a new vfio_device_external_ops struct is introduced.
 
-On Wed, Jul 01, 2015 at 07:29:01PM +0100, Alex Benn=E9e wrote:
-> This adds support for userspace to control the HW debug registers for
-> guest debug. In the debug ioctl we copy an IMPDEF registers into a ne=
-w
-> register set called host_debug_state.
->=20
-> We use the recently introduced vcpu parameter debug_ptr to select whi=
-ch
-> register set is copied into the real registers when world switch occu=
-rs.
->=20
-> I've made some helper functions from hw_breakpoint.c more widely
-> available for re-use.
->=20
-> As with single step we need to tweak the guest registers to enable th=
-e
-> exceptions so we need to save and restore those bits.
->=20
-> Two new capabilities have been added to the KVM_EXTENSION ioctl to al=
-low
-> userspace to query the number of hardware break and watch points
-> available on the host hardware.
->=20
-> Signed-off-by: Alex Benn=E9e <alex.bennee-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-> Reviewed-by: Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
-[...]
+---
 
-> diff --git a/arch/arm64/kernel/hw_breakpoint.c b/arch/arm64/kernel/hw=
-_breakpoint.c
-> index e7d934d..ac07f2a 100644
-> --- a/arch/arm64/kernel/hw_breakpoint.c
-> +++ b/arch/arm64/kernel/hw_breakpoint.c
-> @@ -50,13 +50,13 @@ static int core_num_brps;
->  static int core_num_wrps;
->=20
->  /* Determine number of BRP registers available. */
-> -static int get_num_brps(void)
-> +int get_num_brps(void)
->  {
->         return ((read_cpuid(ID_AA64DFR0_EL1) >> 12) & 0xf) + 1;
->  }
->=20
->  /* Determine number of WRP registers available. */
-> -static int get_num_wrps(void)
-> +int get_num_wrps(void)
->  {
->         return ((read_cpuid(ID_AA64DFR0_EL1) >> 20) & 0xf) + 1;
->  }
+v6: creation
+---
+ include/linux/vfio.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-Sorry, just noticed this, but we already have a public interface for
-figuring these numbers out as required by perf. Can't you use
-hw_breakpoint_slots(...) instead of exposing these internal helpers?
-
-Will
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index ddb4409..d79e8a9 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -19,6 +19,23 @@
+ #include <uapi/linux/vfio.h>
+ 
+ /**
++ * struct vfio_device_external_ops - VFIO bus driver device callbacks
++ * used as external API
++ * @mask: mask any IRQ defined by triplet
++ * @is_active: returns whether any IRQ defined by triplet is active
++ * @set_automasked: sets the automasked flag of triplet's IRQ
++ */
++struct vfio_device_external_ops  {
++	int (*mask)(void *device_data, unsigned index, unsigned start,
++		    unsigned count);
++	int (*is_active)(void *device_data, unsigned index, unsigned start,
++			 unsigned count);
++	int (*set_automasked)(void *device_data, unsigned index,
++			      unsigned start, unsigned count,
++			       bool automasked);
++};
++
++/**
+  * struct vfio_device_ops - VFIO bus driver device callbacks
+  *
+  * @open: Called when userspace creates new file descriptor for device
+@@ -42,6 +59,7 @@ struct vfio_device_ops {
+ 			 unsigned long arg);
+ 	int	(*mmap)(void *device_data, struct vm_area_struct *vma);
+ 	void	(*request)(void *device_data, unsigned int count);
++	struct vfio_device_external_ops *external_ops;
+ };
+ 
+ extern int vfio_add_group_dev(struct device *dev,
+-- 
+1.9.1
