@@ -1,90 +1,63 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH 7/7] KVM: arm: implement kvm_set_msi by gsi direct mapping
-Date: Thu, 2 Jul 2015 18:10:04 +0100
-Message-ID: <5595706C.9010108@arm.com>
-References: <1435592237-17924-1-git-send-email-eric.auger@linaro.org>
- <1435592237-17924-8-git-send-email-eric.auger@linaro.org>
+From: Mario Smarduch <m.smarduch@samsung.com>
+Subject: Re: [PATCH v3 0/2] arm/arm64: KVM: Optimize arm64 fp/simd,
+ saves 30-50% on exits
+Date: Thu, 02 Jul 2015 10:49:03 -0700
+Message-ID: <5595798F.5060307@samsung.com>
+References: <1435190652-5831-1-git-send-email-m.smarduch@samsung.com>
+ <20150701094910.GF11332@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 03363577F2
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2015 12:58:54 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 03qzsgWWxvfo for <kvmarm@lists.cs.columbia.edu>;
- Thu,  2 Jul 2015 12:58:49 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F10A0577E7
- for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2015 12:58:48 -0400 (EDT)
-In-Reply-To: <1435592237-17924-8-git-send-email-eric.auger@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>, "eric.auger@st.com" <eric.auger@st.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "p.fedin@samsung.com" <p.fedin@samsung.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <20150701094910.GF11332@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
-
-On 29/06/15 16:37, Eric Auger wrote:
-> If the ITS modality is not available, let's simply support MSI
-> injection by transforming the MSI.data into an SPI ID.
+On 07/01/2015 02:49 AM, Christoffer Dall wrote:
+> On Wed, Jun 24, 2015 at 05:04:10PM -0700, Mario Smarduch wrote:
+>> Currently we save/restore fp/simd on each exit. Fist  patch optimizes arm64
+>> save/restore, we only do so on Guest access. hackbench and
+>> several lmbench tests show anywhere from 30% to above 50% optimzation
+>> achieved.
+>>
+>> In second patch 32-bit handler is updated to keep exit handling consistent
+>> with 64-bit code.
 > 
-> This becomes possible to use KVM_SIGNAL_MSI ioctl for arm too.
+> 30-50% of what?  The overhead or overall performance?
+
+Yes, so considering all exits to Host KVM anywhere from 30 to 50%
+didn't require an fp/simd switch.
+
+Anything else you like to see added here?
 > 
-> Signed-off-by: Eric Auger <eric.auger@linaro.org>
-> ---
->  arch/arm/kvm/Kconfig | 1 +
->  virt/kvm/arm/vgic.c  | 5 +++++
->  2 files changed, 6 insertions(+)
-> 
-> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
-> index 151e710..0f58baf 100644
-> --- a/arch/arm/kvm/Kconfig
-> +++ b/arch/arm/kvm/Kconfig
-> @@ -31,6 +31,7 @@ config KVM
->  	select KVM_VFIO
->  	select HAVE_KVM_EVENTFD
->  	select HAVE_KVM_IRQFD
-> +	select HAVE_KVM_MSI
->  	select HAVE_KVM_IRQCHIP
->  	select HAVE_KVM_IRQ_ROUTING
->  	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
-> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> index 0b4c48c..b3c10dc 100644
-> --- a/virt/kvm/arm/vgic.c
-> +++ b/virt/kvm/arm/vgic.c
-> @@ -2314,6 +2314,11 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
->  			return kvm->arch.vgic.vm_ops.inject_msi(kvm, &msi);
->  		else
->  			return -ENODEV;
-> +	case KVM_IRQ_ROUTING_MSI:
-> +		if (kvm->arch.vgic.vm_ops.inject_msi)
-> +			return -EINVAL;
-> +		else
-> +			return kvm_vgic_inject_irq(kvm, 0, e->msi.data, level);
+>>
+>> Changes since v1:
+>> - Addressed Marcs comments
+>> - Verified optimization improvements with lmbench and hackbench, updated 
+>>   commit message
+>>
+>> Changes since v2:
+>> - only for patch 2/2
+>>   - Reworked trapping to vfp access handler
+>>
+>> Changes since v3:
+>> - Only for patch 2/2
+>>   - Removed load_vcpu in switch_to_guest_vfp per Marcs comment
+>>   - Got another chance to replace an unreferenced label with a comment
+>>
+>>
+>> Mario Smarduch (2):
+>>   Optimize arm64 skip 30-50% vfp/simd save/restore on exits
+>>   keep arm vfp/simd exit handling consistent with arm64
+>>
+>>  arch/arm/kvm/interrupts.S        |   14 +++++++-----
+>>  arch/arm64/include/asm/kvm_arm.h |    5 ++++-
+>>  arch/arm64/kvm/hyp.S             |   46 +++++++++++++++++++++++++++++++++++---
+>>  3 files changed, 55 insertions(+), 10 deletions(-)
+>>
+>> -- 
+>> 1.7.9.5
+>>
 
-If you add:
-
-static int vgic_v2m_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
-{
-	return kvm_vgic_inject_irq(kvm, 0, msi->data, 1);
-}
-
-to vgic-v2-emul.c and wire it up accordingly, you can simplify the above
-kvm_set_msi, getting rid of all those extra case handling.
-This also helps merging KVM_IRQ_ROUTING_MSI and the extended case.
-
-I have hacked this up and it seems to work for me.
-
-Cheers,
-Andre.
