@@ -1,738 +1,260 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v7 08/11] KVM: arm64: introduce vcpu->arch.debug_ptr
-Date: Thu, 2 Jul 2015 20:34:40 +0200
-Message-ID: <20150702183440.GK11332@cbox>
-References: <1435775343-20034-1-git-send-email-alex.bennee@linaro.org>
- <1435775343-20034-9-git-send-email-alex.bennee@linaro.org>
+From: "Chalamarla, Tirumalesh" <Tirumalesh.Chalamarla@caviumnetworks.com>
+Subject: Re: [PATCH] arm64/kvm: Add generic v8 KVM target
+Date: Thu, 2 Jul 2015 20:29:18 +0000
+Message-ID: <D805D093-CCFE-4835-853A-B2654DAA10A1@caviumnetworks.com>
+References: <1434531646-4873-1-git-send-email-suzuki.poulose@arm.com>
+ <CAFEAcA92uymQ3LjPQnuFiwvjSgc+jY54VrfK_Sh4v1DJ+=OPpw@mail.gmail.com>
+ <558A6A84.5020603@arm.com> <20150624085128.GA22785@cbox>
+ <558A7936.7020109@arm.com> <20150625123034.GE28244@cbox>
+ <558BF6C9.3000009@arm.com> <558C05A9.8080201@arm.com>
+ <CAFEAcA_ULz=ugQW=NmthzqYRtvcfwteQTh0DonHRN6U5NykEtQ@mail.gmail.com>
+ <20150626095318.GG28244@cbox>
+ <F37C68A5-E48F-462C-AD18-0F3C096348C7@caviumnetworks.com>
+ <559180CA.3050905@arm.com>
+ <CAFEAcA-E+KdiL4suQ0DoEvB-zGpNZ7-dq46FegC_iXYRPvo9jA@mail.gmail.com>
+ <559185D4.7060308@arm.com>
+ <85D36B67-643B-407F-944F-D18D54FF9909@caviumnetworks.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1435775343-20034-9-git-send-email-alex.bennee@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org, jan.kiszka@siemens.com, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Richard Weinberger <richard@nod.at>, Andre Przywara <andre.przywara@arm.com>, open list <linux-kernel@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="===============7874397720138170642=="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7777E5782D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2015 16:18:05 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id au3ohRgSEewf for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Jul 2015 16:18:03 -0400 (EDT)
+Received: from na01-bl2-obe.outbound.protection.outlook.com
+ (mail-bl2on0098.outbound.protection.outlook.com [65.55.169.98])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 59A065782C
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2015 16:18:03 -0400 (EDT)
+In-Reply-To: <85D36B67-643B-407F-944F-D18D54FF9909@caviumnetworks.com>
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: "Chalamarla, Tirumalesh" <Tirumalesh.Chalamarla@caviumnetworks.com>
+Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, "timur@codeaurora.org" <timur@codeaurora.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "vgandhi@codeaurora.org" <vgandhi@codeaurora.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jul 01, 2015 at 07:29:00PM +0100, Alex Benn=E9e wrote:
-> This introduces a level of indirection for the debug registers. Inste=
-ad
-> of using the sys_regs[] directly we store registers in a structure in
-> the vcpu. The new kvm_arm_reset_debug_ptr() sets the debug ptr to the
-> guest context.
->=20
-> This also entails updating the sys_regs code to access this new
-> structure. New access function have been added for each set of debug
-> registers. The generic functions are still used for the few registers
-> stored in the main context.
->=20
-> New access function pointers have been added to the sys_reg_desc
-> structure to support the GET/SET_ONE_REG ioctl operations.
+--===============7874397720138170642==
+Content-Language: en-US
+Content-Type: multipart/alternative;
+	boundary="_000_D805D093CCFE4835853AB2654DAA10A1caviumnetworkscom_"
 
-Why is this needed?
+--_000_D805D093CCFE4835853AB2654DAA10A1caviumnetworkscom_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
->=20
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
->=20
-> ---
-> v6:
->   - fix up some ws issues
->   - correct clobber info
->   - re-word commentary in kvm_host.h
->   - fix endian access issues for aarch32 fields
->   - revert all KVM_GET/SET_ONE_REG to 64bit (also see ABI update)
-> v7
->   - new fn kvm_arm_reset_debug_ptr(), stubbed for arm
->   - split trap fns into bcr,bvr,bcr,wvr and wxvr
->   - add set/get fns to sys_regs_desc
->   - reg_to_dbg/dbg_to_reg helpers for 32bit support
-> ---
->  arch/arm/include/asm/kvm_host.h   |   2 +-
->  arch/arm/kvm/arm.c                |   2 +
->  arch/arm64/include/asm/kvm_asm.h  |  24 ++--
->  arch/arm64/include/asm/kvm_host.h |  17 ++-
->  arch/arm64/kernel/asm-offsets.c   |   6 +
->  arch/arm64/kvm/debug.c            |   9 ++
->  arch/arm64/kvm/hyp.S              |  24 ++--
->  arch/arm64/kvm/sys_regs.c         | 281 ++++++++++++++++++++++++++++=
-++++++----
->  arch/arm64/kvm/sys_regs.h         |   6 +
->  9 files changed, 321 insertions(+), 50 deletions(-)
->=20
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/k=
-vm_host.h
-> index 746c0c69..f42759b 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -239,5 +239,5 @@ static inline void kvm_arch_sched_in(struct kvm_v=
-cpu *vcpu, int cpu) {}
->  static inline void kvm_arm_init_debug(void) {}
->  static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
->  static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
-> -
-> +static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
+is there a chance that this get merged in to 4.2? if not is it possible to =
+accept the other patches like adding implementations explicitly(like Thunde=
+r).
 
-seems like a strange decision to nuke the whitespace for adding this
-function ;)
+Thanks,
+Tirumalesh.
+On Jun 29, 2015, at 11:39 AM, Chalamarla, Tirumalesh <Tirumalesh.Chalamarla=
+@caviumnetworks.com<mailto:Tirumalesh.Chalamarla@caviumnetworks.com>> wrote=
+:
 
->  #endif /* __ARM_KVM_HOST_H__ */
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index af60e6f..525473f 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -279,6 +279,8 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
->  	/* Set up the timer */
->  	kvm_timer_vcpu_init(vcpu);
-> =20
-> +	kvm_arm_reset_debug_ptr(vcpu);
-> +
->  	return 0;
->  }
-> =20
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/as=
-m/kvm_asm.h
-> index d6b507e..e997404 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -46,24 +46,16 @@
->  #define	CNTKCTL_EL1	20	/* Timer Control Register (EL1) */
->  #define	PAR_EL1		21	/* Physical Address Register */
->  #define MDSCR_EL1	22	/* Monitor Debug System Control Register */
-> -#define DBGBCR0_EL1	23	/* Debug Breakpoint Control Registers (0-15) =
-*/
-> -#define DBGBCR15_EL1	38
-> -#define DBGBVR0_EL1	39	/* Debug Breakpoint Value Registers (0-15) */
-> -#define DBGBVR15_EL1	54
-> -#define DBGWCR0_EL1	55	/* Debug Watchpoint Control Registers (0-15) =
-*/
-> -#define DBGWCR15_EL1	70
-> -#define DBGWVR0_EL1	71	/* Debug Watchpoint Value Registers (0-15) */
-> -#define DBGWVR15_EL1	86
-> -#define MDCCINT_EL1	87	/* Monitor Debug Comms Channel Interrupt Enab=
-le Reg */
-> +#define MDCCINT_EL1	23	/* Monitor Debug Comms Channel Interrupt Enab=
-le Reg */
-> =20
->  /* 32bit specific registers. Keep them at the end of the range */
-> -#define	DACR32_EL2	88	/* Domain Access Control Register */
-> -#define	IFSR32_EL2	89	/* Instruction Fault Status Register */
-> -#define	FPEXC32_EL2	90	/* Floating-Point Exception Control Register =
-*/
-> -#define	DBGVCR32_EL2	91	/* Debug Vector Catch Register */
-> -#define	TEECR32_EL1	92	/* ThumbEE Configuration Register */
-> -#define	TEEHBR32_EL1	93	/* ThumbEE Handler Base Register */
-> -#define	NR_SYS_REGS	94
-> +#define	DACR32_EL2	24	/* Domain Access Control Register */
-> +#define	IFSR32_EL2	25	/* Instruction Fault Status Register */
-> +#define	FPEXC32_EL2	26	/* Floating-Point Exception Control Register =
-*/
-> +#define	DBGVCR32_EL2	27	/* Debug Vector Catch Register */
-> +#define	TEECR32_EL1	28	/* ThumbEE Configuration Register */
-> +#define	TEEHBR32_EL1	29	/* ThumbEE Handler Base Register */
-> +#define	NR_SYS_REGS	30
-> =20
->  /* 32bit mapping */
->  #define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/a=
-sm/kvm_host.h
-> index e2db6a6..461d288 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -108,11 +108,25 @@ struct kvm_vcpu_arch {
->  	/* Exception Information */
->  	struct kvm_vcpu_fault_info fault;
-> =20
-> -	/* Debug state */
-> +	/* Guest debug state */
->  	u64 debug_flags;
-> =20
-> +	/*
-> +	 * We maintain more than a single set of debug registers to support
-> +	 * debugging the guest from the host and to maintain separate host =
-and
-> +	 * guest state during world switches. vcpu_debug_state are the debu=
-g
-> +	 * registers of the vcpu as the guest sees them.  host_debug_state =
-are
-> +	 * the host registers which are saved and restored during world swi=
-tches.
-> +	 *
-> +	 * debug_ptr points to the set of debug registers that should be lo=
-aded
-> +	 * onto the hardware when running the guest.
-> +	 */
-> +	struct kvm_guest_debug_arch *debug_ptr;
-> +	struct kvm_guest_debug_arch vcpu_debug_state;
-> +
->  	/* Pointer to host CPU context */
->  	kvm_cpu_context_t *host_cpu_context;
-> +	struct kvm_guest_debug_arch host_debug_state;
-> =20
->  	/* VGIC state */
->  	struct vgic_cpu vgic_cpu;
-> @@ -265,5 +279,6 @@ static inline void kvm_arch_sched_in(struct kvm_v=
-cpu *vcpu, int cpu) {}
->  void kvm_arm_init_debug(void);
->  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
->  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
-> +void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
-> =20
->  #endif /* __ARM64_KVM_HOST_H__ */
-> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-=
-offsets.c
-> index dfb25a2..1a8e97c 100644
-> --- a/arch/arm64/kernel/asm-offsets.c
-> +++ b/arch/arm64/kernel/asm-offsets.c
-> @@ -116,10 +116,16 @@ int main(void)
->    DEFINE(VCPU_FAR_EL2,		offsetof(struct kvm_vcpu, arch.fault.far_el2=
-));
->    DEFINE(VCPU_HPFAR_EL2,	offsetof(struct kvm_vcpu, arch.fault.hpfar_=
-el2));
->    DEFINE(VCPU_DEBUG_FLAGS,	offsetof(struct kvm_vcpu, arch.debug_flag=
-s));
-> +  DEFINE(VCPU_DEBUG_PTR,	offsetof(struct kvm_vcpu, arch.debug_ptr));
-> +  DEFINE(DEBUG_BCR, 		offsetof(struct kvm_guest_debug_arch, dbg_bcr)=
-);
-> +  DEFINE(DEBUG_BVR, 		offsetof(struct kvm_guest_debug_arch, dbg_bvr)=
-);
-> +  DEFINE(DEBUG_WCR, 		offsetof(struct kvm_guest_debug_arch, dbg_wcr)=
-);
-> +  DEFINE(DEBUG_WVR, 		offsetof(struct kvm_guest_debug_arch, dbg_wvr)=
-);
->    DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
->    DEFINE(VCPU_MDCR_EL2,	offsetof(struct kvm_vcpu, arch.mdcr_el2));
->    DEFINE(VCPU_IRQ_LINES,	offsetof(struct kvm_vcpu, arch.irq_lines));
->    DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_=
-context));
-> +  DEFINE(VCPU_HOST_DEBUG_STATE, offsetof(struct kvm_vcpu, arch.host_=
-debug_state));
->    DEFINE(VCPU_TIMER_CNTV_CTL,	offsetof(struct kvm_vcpu, arch.timer_c=
-pu.cntv_ctl));
->    DEFINE(VCPU_TIMER_CNTV_CVAL,	offsetof(struct kvm_vcpu, arch.timer_=
-cpu.cntv_cval));
->    DEFINE(KVM_TIMER_CNTVOFF,	offsetof(struct kvm, arch.timer.cntvoff)=
-);
-> diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
-> index d439eb8..ffefb97 100644
-> --- a/arch/arm64/kvm/debug.c
-> +++ b/arch/arm64/kvm/debug.c
-> @@ -67,6 +67,15 @@ void kvm_arm_init_debug(void)
->  }
-> =20
->  /**
-> + * kvm_arm_reset_debug_ptr - set the debug registers to be the guest=
-s
 
-nit: guest's, but I actually prefer:
+On Jun 29, 2015, at 10:52 AM, Marc Zyngier <marc.zyngier@arm.com<mailto:mar=
+c.zyngier@arm.com>> wrote:
 
- kvm_arm_reset_debug_ptr - reset the debug ptr to point to the vcpu sta=
-te
+On 29/06/15 18:38, Peter Maydell wrote:
+On 29 June 2015 at 18:30, Marc Zyngier <marc.zyngier@arm.com<mailto:marc.zy=
+ngier@arm.com>> wrote:
+On 29/06/15 18:13, Chalamarla, Tirumalesh wrote:
+Will this also prevents migrating between same implementations,
+if no how is this identified.
 
-> + */
-> +
-> +void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu)
-> +{
-> +	vcpu->arch.debug_ptr =3D &vcpu->arch.vcpu_debug_state;
-> +}
-> +
-> +/**
->   * kvm_arm_setup_debug - set up debug related stuff
->   *
->   * @vcpu:	the vcpu pointer
-> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-> index 77c08df..f56e93f 100644
-> --- a/arch/arm64/kvm/hyp.S
-> +++ b/arch/arm64/kvm/hyp.S
-> @@ -600,6 +600,7 @@ __restore_sysregs:
->  /* Save debug state */
->  __save_debug:
->  	// x2: ptr to CPU context
-> +	// x3: ptr to debug reg struct
->  	// x4/x5/x6-22/x24-26: trashed
-> =20
->  	mrs	x26, id_aa64dfr0_el1
-> @@ -610,15 +611,15 @@ __save_debug:
->  	sub	w25, w26, w25		// How many WPs to skip
-> =20
->  	mov	x5, x24
-> -	add	x4, x2, #CPU_SYSREG_OFFSET(DBGBCR0_EL1)
-> +	add	x4, x3, #DEBUG_BCR
->  	save_debug dbgbcr
-> -	add	x4, x2, #CPU_SYSREG_OFFSET(DBGBVR0_EL1)
-> +	add	x4, x3, #DEBUG_BVR
->  	save_debug dbgbvr
-> =20
->  	mov	x5, x25
-> -	add	x4, x2, #CPU_SYSREG_OFFSET(DBGWCR0_EL1)
-> +	add	x4, x3, #DEBUG_WCR
->  	save_debug dbgwcr
-> -	add	x4, x2, #CPU_SYSREG_OFFSET(DBGWVR0_EL1)
-> +	add	x4, x3, #DEBUG_WVR
->  	save_debug dbgwvr
-> =20
->  	mrs	x21, mdccint_el1
-> @@ -628,6 +629,7 @@ __save_debug:
->  /* Restore debug state */
->  __restore_debug:
->  	// x2: ptr to CPU context
-> +	// x3: ptr to debug reg struct
->  	// x4/x5/x6-22/x24-26: trashed
-> =20
->  	mrs	x26, id_aa64dfr0_el1
-> @@ -638,15 +640,15 @@ __restore_debug:
->  	sub	w25, w26, w25		// How many WPs to skip
-> =20
->  	mov	x5, x24
-> -	add	x4, x2, #CPU_SYSREG_OFFSET(DBGBCR0_EL1)
-> +	add	x4, x3, #DEBUG_BCR
->  	restore_debug dbgbcr
-> -	add	x4, x2, #CPU_SYSREG_OFFSET(DBGBVR0_EL1)
-> +	add	x4, x3, #DEBUG_BVR
->  	restore_debug dbgbvr
-> =20
->  	mov	x5, x25
-> -	add	x4, x2, #CPU_SYSREG_OFFSET(DBGWCR0_EL1)
-> +	add	x4, x3, #DEBUG_WCR
->  	restore_debug dbgwcr
-> -	add	x4, x2, #CPU_SYSREG_OFFSET(DBGWVR0_EL1)
-> +	add	x4, x3, #DEBUG_WVR
->  	restore_debug dbgwvr
-> =20
->  	ldr	x21, [x2, #CPU_SYSREG_OFFSET(MDCCINT_EL1)]
-> @@ -686,6 +688,7 @@ ENTRY(__kvm_vcpu_run)
->  	bl __save_sysregs
-> =20
->  	compute_debug_state 1f
-> +	add	x3, x0, #VCPU_HOST_DEBUG_STATE
->  	bl	__save_debug
->  1:
->  	activate_traps
-> @@ -701,6 +704,8 @@ ENTRY(__kvm_vcpu_run)
->  	bl __restore_fpsimd
-> =20
->  	skip_debug_state x3, 1f
-> +	ldr	x3, [x0, #VCPU_DEBUG_PTR]
-> +	kern_hyp_va x3
->  	bl	__restore_debug
->  1:
->  	restore_guest_32bit_state
-> @@ -721,6 +726,8 @@ __kvm_vcpu_return:
->  	bl __save_sysregs
-> =20
->  	skip_debug_state x3, 1f
-> +	ldr	x3, [x0, #VCPU_DEBUG_PTR]
-> +	kern_hyp_va x3
->  	bl	__save_debug
->  1:
->  	save_guest_32bit_state
-> @@ -743,6 +750,7 @@ __kvm_vcpu_return:
->  	// already been saved. Note that we nuke the whole 64bit word.
->  	// If we ever add more flags, we'll have to be more careful...
->  	str	xzr, [x0, #VCPU_DEBUG_FLAGS]
-> +	add	x3, x0, #VCPU_HOST_DEBUG_STATE
->  	bl	__restore_debug
->  1:
->  	restore_host_regs
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index c370b40..3267b96 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -173,14 +173,14 @@ static bool trap_dbgauthstatus_el1(struct kvm_v=
-cpu *vcpu,
->  /*
->   * We want to avoid world-switching all the DBG registers all the
->   * time:
-> - *=20
-> + *
->   * - If we've touched any debug register, it is likely that we're
->   *   going to touch more of them. It then makes sense to disable the
->   *   traps and start doing the save/restore dance
->   * - If debug is active (DBG_MDSCR_KDE or DBG_MDSCR_MDE set), it is
->   *   then mandatory to save/restore the registers, as the guest
->   *   depends on them.
-> - *=20
-> + *
+This shouldn't. It is pretty easy to look at the incoming guest's MIDR,
+and verify that it matches the default MIDR on the receiving system. Any
+difference, and the migration should abort.
 
-stray whitespace changes?
+Do you really want to forbid migration between (say)
+Cortex-A57 r3p0 and Cortex-A57 r3p1 ?
 
->   * For this, we use a DIRTY bit, indicating the guest has modified t=
-he
->   * debug registers, used as follow:
->   *
-> @@ -211,6 +211,187 @@ static bool trap_debug_regs(struct kvm_vcpu *vc=
-pu,
->  	return true;
->  }
-> =20
-> +/*
-> + * reg_to_dbg/dbg_to_reg - simple masking for 32bit access
-> + */
-> +static inline unsigned long reg_to_dbg(struct kvm_vcpu *vcpu,
-> +				       const struct sys_reg_params *p)
-> +{
-> +	unsigned long val =3D *vcpu_reg(vcpu, p->Rt);
-> +	vcpu->arch.debug_flags |=3D KVM_ARM64_DEBUG_DIRTY;
-> +	if (p->is_32bit)
-> +		val &=3D 0xffffffffUL;
-> +
-> +	return val;
-> +}
-> +
-> +static inline void dbg_to_reg(struct kvm_vcpu *vcpu,
-> +			      const struct sys_reg_params *p, unsigned long val)
-> +{
-> +	if (p->is_32bit)
-> +		val &=3D 0xffffffffUL;
-> +	*vcpu_reg(vcpu, p->Rt) =3D val;
-> +}
-> +
-> +static inline bool trap_bvr(struct kvm_vcpu *vcpu,
-> +			    const struct sys_reg_params *p,
-> +			    const struct sys_reg_desc *rd)
-> +{
-> +	if (p->is_write) {
-> +		vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg] =3D
-> +			reg_to_dbg(vcpu, p);
-> +	} else {
-> +		dbg_to_reg(vcpu, p,
-> +			vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg]);
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static int set_bvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc =
-*rd,
-> +		const struct kvm_one_reg *reg, void __user *uaddr)
-> +{
-> +	__u64 *r =3D &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
-> +	if (copy_from_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-> +		return -EFAULT;
-> +	return 0;
-> +}
-> +
-> +static int get_bvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc =
-*rd,
-> +	const struct kvm_one_reg *reg, void __user *uaddr)
-> +{
-> +	__u64 *r =3D &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
-> +	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-> +		return -EFAULT;
-> +	return 0;
-> +}
-> +
-> +static inline void reset_bvr(struct kvm_vcpu *vcpu,
-> +			     const struct sys_reg_desc *rd)
-> +{
-> +	vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg] =3D rd->val;
-> +}
-> +
-> +static inline bool trap_bcr(struct kvm_vcpu *vcpu,
-> +			    const struct sys_reg_params *p,
-> +			    const struct sys_reg_desc *rd)
-> +{
-> +	if (p->is_write) {
-> +		vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg] =3D
-> +			reg_to_dbg(vcpu, p);
-> +	} else {
-> +		dbg_to_reg(vcpu, p,
-> +			vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg]);
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static int set_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc =
-*rd,
-> +		const struct kvm_one_reg *reg, void __user *uaddr)
-> +{
-> +	__u64 *r =3D &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg];
-> +	if (copy_from_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-> +		return -EFAULT;
-> +	return 0;
-> +}
-> +
-> +static int get_bcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc =
-*rd,
-> +	const struct kvm_one_reg *reg, void __user *uaddr)
-> +{
-> +	__u64 *r =3D &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg];
-> +	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-> +		return -EFAULT;
-> +	return 0;
-> +}
-> +
-> +static inline void reset_bcr(struct kvm_vcpu *vcpu,
-> +			     const struct sys_reg_desc *rd)
-> +{
-> +	vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg] =3D rd->val;
-> +}
-> +
-> +static inline bool trap_wvr(struct kvm_vcpu *vcpu,
-> +			    const struct sys_reg_params *p,
-> +			    const struct sys_reg_desc *rd)
-> +{
-> +	if (p->is_write) {
-> +		vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg] =3D
-> +			reg_to_dbg(vcpu, p);
-> +	} else {
-> +		dbg_to_reg(vcpu, p,
-> +			vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg]);
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static int set_wvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc =
-*rd,
-> +		const struct kvm_one_reg *reg, void __user *uaddr)
-> +{
-> +	__u64 *r =3D &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg];
-> +	if (copy_from_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-> +		return -EFAULT;
-> +	return 0;
-> +}
-> +
-> +static int get_wvr(struct kvm_vcpu *vcpu, const struct sys_reg_desc =
-*rd,
-> +	const struct kvm_one_reg *reg, void __user *uaddr)
-> +{
-> +	__u64 *r =3D &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg];
-> +	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-> +		return -EFAULT;
-> +	return 0;
-> +}
-> +
-> +static inline void reset_wvr(struct kvm_vcpu *vcpu,
-> +			     const struct sys_reg_desc *rd)
-> +{
-> +	vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg] =3D rd->val;
-> +}
-> +
-> +static inline bool trap_wcr(struct kvm_vcpu *vcpu,
-> +			    const struct sys_reg_params *p,
-> +			    const struct sys_reg_desc *rd)
-> +{
-> +	if (p->is_write) {
-> +		vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg] =3D
-> +			reg_to_dbg(vcpu, p);
-> +	} else {
-> +		dbg_to_reg(vcpu, p,
-> +			vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg]);
-> +	}
-> +
-> +	trace_trap_reg(__func__, rd->reg, p->is_write,
-> +		vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg]);
-> +
-> +	return true;
-> +}
-> +
-> +static int set_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc =
-*rd,
-> +		const struct kvm_one_reg *reg, void __user *uaddr)
-> +{
-> +	__u64 *r =3D &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg];
-> +	if (copy_from_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-> +		return -EFAULT;
-> +	return 0;
-> +}
-> +
-> +static int get_wcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc =
-*rd,
-> +	const struct kvm_one_reg *reg, void __user *uaddr)
-> +{
-> +	__u64 *r =3D &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg];
-> +	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-> +		return -EFAULT;
-> +	return 0;
-> +}
-> +
-> +static inline void reset_wcr(struct kvm_vcpu *vcpu,
-> +			     const struct sys_reg_desc *rd)
-> +{
-> +	vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg] =3D rd->val;
-> +}
-> +
->  static void reset_amair_el1(struct kvm_vcpu *vcpu, const struct sys_=
-reg_desc *r)
->  {
->  	u64 amair;
-> @@ -240,16 +421,16 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, =
-const struct sys_reg_desc *r)
->  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
->  	/* DBGBVRn_EL1 */						\
->  	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b100),	\
-> -	  trap_debug_regs, reset_val, (DBGBVR0_EL1 + (n)), 0 },		\
-> +	  trap_bvr, reset_bvr, n, 0, get_bvr, set_bvr },		\
->  	/* DBGBCRn_EL1 */						\
->  	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b101),	\
-> -	  trap_debug_regs, reset_val, (DBGBCR0_EL1 + (n)), 0 },		\
-> +	  trap_bcr, reset_bcr, n, 0, get_bcr, set_bcr },		\
->  	/* DBGWVRn_EL1 */						\
->  	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b110),	\
-> -	  trap_debug_regs, reset_val, (DBGWVR0_EL1 + (n)), 0 },		\
-> +	  trap_wvr, reset_wvr, n, 0,  get_wvr, set_wvr },		\
->  	/* DBGWCRn_EL1 */						\
->  	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b111),	\
-> -	  trap_debug_regs, reset_val, (DBGWCR0_EL1 + (n)), 0 }
-> +	  trap_wcr, reset_wcr, n, 0,  get_wcr, set_wcr }
-> =20
->  /*
->   * Architected system registers.
-> @@ -516,28 +697,51 @@ static bool trap_debug32(struct kvm_vcpu *vcpu,
->  	return true;
->  }
-> =20
-> -#define DBG_BCR_BVR_WCR_WVR(n)					\
-> -	/* DBGBVRn */						\
-> -	{ Op1( 0), CRn( 0), CRm((n)), Op2( 4), trap_debug32,	\
-> -	  NULL, (cp14_DBGBVR0 + (n) * 2) },			\
-> -	/* DBGBCRn */						\
-> -	{ Op1( 0), CRn( 0), CRm((n)), Op2( 5), trap_debug32,	\
-> -	  NULL, (cp14_DBGBCR0 + (n) * 2) },			\
-> -	/* DBGWVRn */						\
-> -	{ Op1( 0), CRn( 0), CRm((n)), Op2( 6), trap_debug32,	\
-> -	  NULL, (cp14_DBGWVR0 + (n) * 2) },			\
-> -	/* DBGWCRn */						\
-> -	{ Op1( 0), CRn( 0), CRm((n)), Op2( 7), trap_debug32,	\
-> -	  NULL, (cp14_DBGWCR0 + (n) * 2) }
-> -
-> -#define DBGBXVR(n)						\
-> -	{ Op1( 0), CRn( 1), CRm((n)), Op2( 1), trap_debug32,	\
-> -	  NULL, cp14_DBGBXVR0 + n * 2 }
-> +/* AArch32 debug register mappings
-> + *
-> + * AArch32 DBGBVRn is mapped to DBGBVRn_EL1[31:0]
-> + * AArch32 DBGBXVRn is mapped to DBGBVRn_EL1[63:32]
-> + *
-> + * All control registers and watchpoint value registers are mapped t=
-o
-> + * the lower 32 bits of their AArch64 equivalents. We share the trap
-> + * handlers with the above AArch64 code which checks what mode the
-> + * system is in.
-> + */
-> +
-> +static inline bool trap_xvr(struct kvm_vcpu *vcpu,
-> +			    const struct sys_reg_params *p,
-> +			    const struct sys_reg_desc *rd)
-> +{
-> +	if (p->is_write) {
-> +		u64 val =3D vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
-> +		val &=3D 0xffffffffUL;
-> +		val |=3D reg_to_dbg(vcpu, p) << 32;
-> +		vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg] =3D val;
-> +	} else {
-> +		dbg_to_reg(vcpu, p,
-> +			vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg] >> 32);
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +#define DBG_BCR_BVR_WCR_WVR(n)						\
-> +	/* DBGBVRn */							\
-> +	{ Op1( 0), CRn( 0), CRm((n)), Op2( 4), trap_bvr, NULL, n }, 	\
-> +	/* DBGBCRn */							\
-> +	{ Op1( 0), CRn( 0), CRm((n)), Op2( 5), trap_bcr, NULL, n },	\
-> +	/* DBGWVRn */							\
-> +	{ Op1( 0), CRn( 0), CRm((n)), Op2( 6), trap_wvr, NULL, n },	\
-> +	/* DBGWCRn */							\
-> +	{ Op1( 0), CRn( 0), CRm((n)), Op2( 7), trap_wcr, NULL, n }
-> +
-> +#define DBGBXVR(n)							\
-> +	{ Op1( 0), CRn( 1), CRm((n)), Op2( 1), trap_xvr, NULL, n }
-> =20
->  /*
->   * Trapped cp14 registers. We generally ignore most of the external
->   * debug, on the principle that they don't really make sense to a
-> - * guest. Revisit this one day, whould this principle change.
-> + * guest. Revisit this one day, would this principle change.
->   */
->  static const struct sys_reg_desc cp14_regs[] =3D {
->  	/* DBGIDR */
-> @@ -1288,6 +1492,29 @@ static int demux_c15_set(u64 id, void __user *=
-uaddr)
->  	}
->  }
-> =20
-> +/*
-> + * Access functions for vcpu_debug_state.
-> + */
-> +#if 0
-> +static int debug_set64(struct kvm_vcpu *vcpu, const struct sys_reg_d=
-esc *rd,
-> +		const struct kvm_one_reg *reg, void __user *uaddr)
-> +{
-> +	__u64 *r =3D (__u64 *) ((void * )&vcpu->arch.vcpu_debug_state + rd-=
->reg);
-> +	if (copy_from_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-> +		return -EFAULT;
-> +	return 0;
-> +}
-> +
-> +static int debug_get64(struct kvm_vcpu *vcpu, const struct sys_reg_d=
-esc *rd,
-> +	const struct kvm_one_reg *reg, void __user *uaddr)
-> +{
-> +	__u64 *r =3D (__u64 *) ((void * )&vcpu->arch.vcpu_debug_state + rd-=
->reg);
-> +	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-> +		return -EFAULT;
-> +	return 0;
-> +}
-> +#endif
-> +
+That seems pretty harsh.
 
-what is this ifdef'ed block of code doing here?
+I think we may need to allow for some flexibility (same major version
+only, or +/- 1 minor version...). The idea I'm trying to convey is that
+with "generic CPI", migration is not guaranteed unless we're on
+extremely similar hardware.
 
->  int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct kvm_=
-one_reg *reg)
->  {
->  	const struct sys_reg_desc *r;
-> @@ -1303,6 +1530,9 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vc=
-pu, const struct kvm_one_reg *reg
->  	if (!r)
->  		return get_invariant_sys_reg(reg->id, uaddr);
-> =20
-> +	if (r->get)
-> +		return (r->get)(vcpu, r, reg, uaddr);
-> +
->  	return reg_to_user(uaddr, &vcpu_sys_reg(vcpu, r->reg), reg->id);
->  }
-> =20
-> @@ -1321,6 +1551,9 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu *vc=
-pu, const struct kvm_one_reg *reg
->  	if (!r)
->  		return set_invariant_sys_reg(reg->id, uaddr);
-> =20
-> +	if (r->set)
-> +		return (r->set)(vcpu, r, reg, uaddr);
-> +
->  	return reg_from_user(&vcpu_sys_reg(vcpu, r->reg), uaddr, reg->id);
->  }
-> =20
-> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> index d411e25..9265e7d 100644
-> --- a/arch/arm64/kvm/sys_regs.h
-> +++ b/arch/arm64/kvm/sys_regs.h
-> @@ -55,6 +55,12 @@ struct sys_reg_desc {
-> =20
->  	/* Value (usually reset value) */
->  	u64 val;
-> +
-> +	/* Get/Set functions, fallback if NULL */
+yes, this is the point i am trying to make, we need some flexibility. so th=
+at it works with same chips with different passes may be.
+if we are allowing this, then we are not putting emulation as a requirement=
+.
 
-Is this only meant for usersapce access or when should one use these?
+Thanks,
+Tirumalesh.
 
-> +	int (*get)(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> +		   const struct kvm_one_reg *reg, void __user *uaddr);
-> +	int (*set)(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> +		   const struct kvm_one_reg *reg, void __user *uaddr);
->  };
-> =20
->  static inline void print_sys_reg_instr(const struct sys_reg_params *=
-p)
-> --=20
-> 2.4.5
->=20
+M.
+--
+Jazz is not dead. It just smells funny...
+
+
+--_000_D805D093CCFE4835853AB2654DAA10A1caviumnetworkscom_
+Content-Type: text/html; charset="us-ascii"
+Content-ID: <346857972F79D046956B307E0A39AEEB@namprd07.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
+>
+</head>
+<body style=3D"word-wrap: break-word; -webkit-nbsp-mode: space; -webkit-lin=
+e-break: after-white-space;" class=3D"">
+is there a chance that this get merged in to 4.2? if not is it possible to =
+accept the other patches like adding implementations explicitly(like Thunde=
+r).
+<div class=3D""><br class=3D"">
+</div>
+<div class=3D"">Thanks,</div>
+<div class=3D"">Tirumalesh.&nbsp;<br class=3D"">
+<div class=3D"">
+<div>
+<blockquote type=3D"cite" class=3D"">
+<div class=3D"">On Jun 29, 2015, at 11:39 AM, Chalamarla, Tirumalesh &lt;<a=
+ href=3D"mailto:Tirumalesh.Chalamarla@caviumnetworks.com" class=3D"">Tiruma=
+lesh.Chalamarla@caviumnetworks.com</a>&gt; wrote:</div>
+<br class=3D"Apple-interchange-newline">
+<div class=3D"">
+<blockquote type=3D"cite" style=3D"font-family: Helvetica; font-size: 12px;=
+ font-style: normal; font-variant: normal; font-weight: normal; letter-spac=
+ing: normal; line-height: normal; orphans: auto; text-align: start; text-in=
+dent: 0px; text-transform: none; white-space: normal; widows: auto; word-sp=
+acing: 0px; -webkit-text-stroke-width: 0px;" class=3D"">
+<br class=3D"Apple-interchange-newline">
+On Jun 29, 2015, at 10:52 AM, Marc Zyngier &lt;<a href=3D"mailto:marc.zyngi=
+er@arm.com" class=3D"">marc.zyngier@arm.com</a>&gt; wrote:<br class=3D"">
+<br class=3D"">
+On 29/06/15 18:38, Peter Maydell wrote:<br class=3D"">
+<blockquote type=3D"cite" class=3D"">On 29 June 2015 at 18:30, Marc Zyngier=
+ &lt;<a href=3D"mailto:marc.zyngier@arm.com" class=3D"">marc.zyngier@arm.co=
+m</a>&gt; wrote:<br class=3D"">
+<blockquote type=3D"cite" class=3D"">On 29/06/15 18:13, Chalamarla, Tirumal=
+esh wrote:<br class=3D"">
+<blockquote type=3D"cite" class=3D"">Will this also prevents migrating betw=
+een same implementations,<br class=3D"">
+if no how is this identified.<br class=3D"">
+</blockquote>
+<br class=3D"">
+This shouldn't. It is pretty easy to look at the incoming guest's MIDR,<br =
+class=3D"">
+and verify that it matches the default MIDR on the receiving system. Any<br=
+ class=3D"">
+difference, and the migration should abort.<br class=3D"">
+</blockquote>
+<br class=3D"">
+Do you really want to forbid migration between (say)<br class=3D"">
+Cortex-A57 r3p0 and Cortex-A57 r3p1 ?<br class=3D"">
+<br class=3D"">
+That seems pretty harsh.<br class=3D"">
+</blockquote>
+<br class=3D"">
+I think we may need to allow for some flexibility (same major version<br cl=
+ass=3D"">
+only, or &#43;/- 1 minor version...). The idea I'm trying to convey is that=
+<br class=3D"">
+with &quot;generic CPI&quot;, migration is not guaranteed unless we're on<b=
+r class=3D"">
+extremely similar hardware.<br class=3D"">
+<br class=3D"">
+</blockquote>
+<span style=3D"font-family: Helvetica; font-size: 12px; font-style: normal;=
+ font-variant: normal; font-weight: normal; letter-spacing: normal; line-he=
+ight: normal; orphans: auto; text-align: start; text-indent: 0px; text-tran=
+sform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-=
+text-stroke-width: 0px; float: none; display: inline !important;" class=3D"=
+">yes,
+ this is the point i am trying to make, we need some flexibility. so that i=
+t works with same chips with different passes may be.<span class=3D"Apple-c=
+onverted-space">&nbsp;</span></span><br style=3D"font-family: Helvetica; fo=
+nt-size: 12px; font-style: normal; font-variant: normal; font-weight: norma=
+l; letter-spacing: normal; line-height: normal; orphans: auto; text-align: =
+start; text-indent: 0px; text-transform: none; white-space: normal; widows:=
+ auto; word-spacing: 0px; -webkit-text-stroke-width: 0px;" class=3D"">
+<span style=3D"font-family: Helvetica; font-size: 12px; font-style: normal;=
+ font-variant: normal; font-weight: normal; letter-spacing: normal; line-he=
+ight: normal; orphans: auto; text-align: start; text-indent: 0px; text-tran=
+sform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-=
+text-stroke-width: 0px; float: none; display: inline !important;" class=3D"=
+">if
+ we are allowing this, then we are not putting emulation as a requirement.<=
+span class=3D"Apple-converted-space">&nbsp;</span></span><br style=3D"font-=
+family: Helvetica; font-size: 12px; font-style: normal; font-variant: norma=
+l; font-weight: normal; letter-spacing: normal; line-height: normal; orphan=
+s: auto; text-align: start; text-indent: 0px; text-transform: none; white-s=
+pace: normal; widows: auto; word-spacing: 0px; -webkit-text-stroke-width: 0=
+px;" class=3D"">
+<br style=3D"font-family: Helvetica; font-size: 12px; font-style: normal; f=
+ont-variant: normal; font-weight: normal; letter-spacing: normal; line-heig=
+ht: normal; orphans: auto; text-align: start; text-indent: 0px; text-transf=
+orm: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-te=
+xt-stroke-width: 0px;" class=3D"">
+<span style=3D"font-family: Helvetica; font-size: 12px; font-style: normal;=
+ font-variant: normal; font-weight: normal; letter-spacing: normal; line-he=
+ight: normal; orphans: auto; text-align: start; text-indent: 0px; text-tran=
+sform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-=
+text-stroke-width: 0px; float: none; display: inline !important;" class=3D"=
+">Thanks,</span><br style=3D"font-family: Helvetica; font-size: 12px; font-=
+style: normal; font-variant: normal; font-weight: normal; letter-spacing: n=
+ormal; line-height: normal; orphans: auto; text-align: start; text-indent: =
+0px; text-transform: none; white-space: normal; widows: auto; word-spacing:=
+ 0px; -webkit-text-stroke-width: 0px;" class=3D"">
+<span style=3D"font-family: Helvetica; font-size: 12px; font-style: normal;=
+ font-variant: normal; font-weight: normal; letter-spacing: normal; line-he=
+ight: normal; orphans: auto; text-align: start; text-indent: 0px; text-tran=
+sform: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-=
+text-stroke-width: 0px; float: none; display: inline !important;" class=3D"=
+">Tirumalesh.<span class=3D"Apple-converted-space">&nbsp;</span></span><br =
+style=3D"font-family: Helvetica; font-size: 12px; font-style: normal; font-=
+variant: normal; font-weight: normal; letter-spacing: normal; line-height: =
+normal; orphans: auto; text-align: start; text-indent: 0px; text-transform:=
+ none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-text-s=
+troke-width: 0px;" class=3D"">
+<br style=3D"font-family: Helvetica; font-size: 12px; font-style: normal; f=
+ont-variant: normal; font-weight: normal; letter-spacing: normal; line-heig=
+ht: normal; orphans: auto; text-align: start; text-indent: 0px; text-transf=
+orm: none; white-space: normal; widows: auto; word-spacing: 0px; -webkit-te=
+xt-stroke-width: 0px;" class=3D"">
+<blockquote type=3D"cite" style=3D"font-family: Helvetica; font-size: 12px;=
+ font-style: normal; font-variant: normal; font-weight: normal; letter-spac=
+ing: normal; line-height: normal; orphans: auto; text-align: start; text-in=
+dent: 0px; text-transform: none; white-space: normal; widows: auto; word-sp=
+acing: 0px; -webkit-text-stroke-width: 0px;" class=3D"">
+<span class=3D"Apple-tab-span" style=3D"white-space: pre;"></span>M.<br cla=
+ss=3D"">
+--<span class=3D"Apple-converted-space">&nbsp;</span><br class=3D"">
+Jazz is not dead. It just smells funny...</blockquote>
+</div>
+</blockquote>
+</div>
+<br class=3D"">
+</div>
+</div>
+</body>
+</html>
+
+--_000_D805D093CCFE4835853AB2654DAA10A1caviumnetworkscom_--
+
+--===============7874397720138170642==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============7874397720138170642==--
