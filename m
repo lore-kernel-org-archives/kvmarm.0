@@ -1,41 +1,195 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 0/2] arm/arm64: KVM: Optimize arm64 fp/simd, saves
- 30-50% on exits
-Date: Thu, 2 Jul 2015 22:58:43 +0200
-Message-ID: <20150702205843.GA29818@cbox>
+From: Mario Smarduch <m.smarduch@samsung.com>
+Subject: Re: [PATCH v3 1/2] arm64: KVM: Optimize arm64 skip 30-50% vfp/simd
+ save/restore on exits
+Date: Thu, 02 Jul 2015 14:51:57 -0700
+Message-ID: <5595B27D.90201@samsung.com>
 References: <1435190652-5831-1-git-send-email-m.smarduch@samsung.com>
- <20150701094910.GF11332@cbox>
- <5595798F.5060307@samsung.com>
+ <1435190652-5831-2-git-send-email-m.smarduch@samsung.com>
+ <20150701134649.GG11332@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <5595798F.5060307@samsung.com>
+In-reply-to: <20150701134649.GG11332@cbox>
 Sender: kvm-owner@vger.kernel.org
-To: Mario Smarduch <m.smarduch@samsung.com>
+To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jul 02, 2015 at 10:49:03AM -0700, Mario Smarduch wrote:
-> On 07/01/2015 02:49 AM, Christoffer Dall wrote:
-> > On Wed, Jun 24, 2015 at 05:04:10PM -0700, Mario Smarduch wrote:
-> >> Currently we save/restore fp/simd on each exit. Fist  patch optimizes arm64
-> >> save/restore, we only do so on Guest access. hackbench and
-> >> several lmbench tests show anywhere from 30% to above 50% optimzation
-> >> achieved.
-> >>
-> >> In second patch 32-bit handler is updated to keep exit handling consistent
-> >> with 64-bit code.
-> > 
-> > 30-50% of what?  The overhead or overall performance?
+On 07/01/2015 06:46 AM, Christoffer Dall wrote:
+> On Wed, Jun 24, 2015 at 05:04:11PM -0700, Mario Smarduch wrote:
+>> This patch only saves and restores FP/SIMD registers on Guest access. To do
+>> this cptr_el2 FP/SIMD trap is set on Guest entry and later checked on exit.
+>> lmbench, hackbench show significant improvements, for 30-50% exits FP/SIMD
+>> context is not saved/restored
+>>
+>> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+>> ---
+>>  arch/arm64/include/asm/kvm_arm.h |    5 ++++-
+>>  arch/arm64/kvm/hyp.S             |   46 +++++++++++++++++++++++++++++++++++---
+>>  2 files changed, 47 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+>> index ac6fafb..7605e09 100644
+>> --- a/arch/arm64/include/asm/kvm_arm.h
+>> +++ b/arch/arm64/include/asm/kvm_arm.h
+>> @@ -171,10 +171,13 @@
+>>  #define HSTR_EL2_TTEE	(1 << 16)
+>>  #define HSTR_EL2_T(x)	(1 << x)
+>>  
+>> +/* Hyp Coproccessor Trap Register Shifts */
+>> +#define CPTR_EL2_TFP_SHIFT 10
+>> +
+>>  /* Hyp Coprocessor Trap Register */
+>>  #define CPTR_EL2_TCPAC	(1 << 31)
+>>  #define CPTR_EL2_TTA	(1 << 20)
+>> -#define CPTR_EL2_TFP	(1 << 10)
+>> +#define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
+>>  
+>>  /* Hyp Debug Configuration Register bits */
+>>  #define MDCR_EL2_TDRA		(1 << 11)
+>> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+>> index 5befd01..de0788f 100644
+>> --- a/arch/arm64/kvm/hyp.S
+>> +++ b/arch/arm64/kvm/hyp.S
+>> @@ -673,6 +673,15 @@
+>>  	tbz	\tmp, #KVM_ARM64_DEBUG_DIRTY_SHIFT, \target
+>>  .endm
+>>  
+>> +/*
+>> + * Check cptr VFP/SIMD accessed bit, if set VFP/SIMD not accessed by guest.
 > 
-> Yes, so considering all exits to Host KVM anywhere from 30 to 50%
-> didn't require an fp/simd switch.
+> This comment doesn't really help me understand the function, may I
+> suggest:
 > 
-> Anything else you like to see added here?
+> Branch to target if CPTR_EL2.TFP bit is set (VFP/SIMD trapping enabled)
 
-No, I'm good with them.  Marc is handling the tree these days so I'll
-leave it up to him if we want to adjust patch 1 or what to do.
+Yes actually describes what it does.
 
-Thanks!
--Christoffer
+> 
+>> + */
+>> +.macro skip_fpsimd_state tmp, target
+>> +	mrs	\tmp, cptr_el2
+>> +	tbnz	\tmp, #CPTR_EL2_TFP_SHIFT, \target
+>> +.endm
+>> +
+>> +
+>>  .macro compute_debug_state target
+>>  	// Compute debug state: If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY
+>>  	// is set, we do a full save/restore cycle and disable trapping.
+>> @@ -763,6 +772,7 @@
+>>  	ldr     x2, [x0, #VCPU_HCR_EL2]
+>>  	msr     hcr_el2, x2
+>>  	mov	x2, #CPTR_EL2_TTA
+>> +	orr     x2, x2, #CPTR_EL2_TFP
+>>  	msr	cptr_el2, x2
+>>  
+>>  	mov	x2, #(1 << 15)	// Trap CP15 Cr=15
+>> @@ -785,7 +795,6 @@
+>>  .macro deactivate_traps
+>>  	mov	x2, #HCR_RW
+>>  	msr	hcr_el2, x2
+>> -	msr	cptr_el2, xzr
+>>  	msr	hstr_el2, xzr
+>>  
+>>  	mrs	x2, mdcr_el2
+>> @@ -912,6 +921,28 @@ __restore_fpsimd:
+>>  	restore_fpsimd
+>>  	ret
+>>  
+>> +switch_to_guest_fpsimd:
+>> +	push	x4, lr
+>> +
+>> +	mrs	x2, cptr_el2
+>> +	bic	x2, x2, #CPTR_EL2_TFP
+>> +	msr	cptr_el2, x2
+>> +
+>> +	mrs	x0, tpidr_el2
+>> +
+>> +	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
+>> +	kern_hyp_va x2
+>> +	bl __save_fpsimd
+>> +
+>> +	add	x2, x0, #VCPU_CONTEXT
+>> +	bl __restore_fpsimd
+>> +
+>> +	pop	x4, lr
+>> +	pop	x2, x3
+>> +	pop	x0, x1
+>> +
+>> +	eret
+>> +
+>>  /*
+>>   * u64 __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>>   *
+>> @@ -932,7 +963,6 @@ ENTRY(__kvm_vcpu_run)
+>>  	kern_hyp_va x2
+>>  
+>>  	save_host_regs
+>> -	bl __save_fpsimd
+>>  	bl __save_sysregs
+>>  
+>>  	compute_debug_state 1f
+>> @@ -948,7 +978,6 @@ ENTRY(__kvm_vcpu_run)
+>>  	add	x2, x0, #VCPU_CONTEXT
+>>  
+>>  	bl __restore_sysregs
+>> -	bl __restore_fpsimd
+>>  
+>>  	skip_debug_state x3, 1f
+>>  	bl	__restore_debug
+>> @@ -967,7 +996,9 @@ __kvm_vcpu_return:
+>>  	add	x2, x0, #VCPU_CONTEXT
+>>  
+>>  	save_guest_regs
+>> +	skip_fpsimd_state x3, 1f
+>>  	bl __save_fpsimd
+>> +1:
+>>  	bl __save_sysregs
+>>  
+>>  	skip_debug_state x3, 1f
+>> @@ -986,7 +1017,11 @@ __kvm_vcpu_return:
+>>  	kern_hyp_va x2
+>>  
+>>  	bl __restore_sysregs
+>> +	skip_fpsimd_state x3, 1f
+>>  	bl __restore_fpsimd
+>> +1:
+>> +	/* Clear FPSIMD and Trace trapping */
+>> +	msr     cptr_el2, xzr
+> 
+> why not simply move the deactivate_traps down here instead?
+
+Putting deactivate_traps there  trashes x2, setup earlier
+to restore debug, host registers from host context
+
+Do we want deactivate_traps to use another register and
+move the macro there? Or leave as is?
+
+- Mario
+
+
+> 
+>>  
+>>  	skip_debug_state x3, 1f
+>>  	// Clear the dirty flag for the next run, as all the state has
+>> @@ -1201,6 +1236,11 @@ el1_trap:
+>>  	 * x1: ESR
+>>  	 * x2: ESR_EC
+>>  	 */
+>> +
+>> +	/* Guest accessed VFP/SIMD registers, save host, restore Guest */
+>> +	cmp	x2, #ESR_ELx_EC_FP_ASIMD
+>> +	b.eq	switch_to_guest_fpsimd
+>> +
+>>  	cmp	x2, #ESR_ELx_EC_DABT_LOW
+>>  	mov	x0, #ESR_ELx_EC_IABT_LOW
+>>  	ccmp	x2, x0, #4, ne
+>> -- 
+>> 1.7.9.5
+>>
+> 
+> Otherwise looks good,
+> -Christoffer
+> 
+
