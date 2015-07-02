@@ -1,59 +1,59 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC 01/17] VFIO: platform: test forwarded state when selecting IRQ handler
-Date: Thu,  2 Jul 2015 15:17:11 +0200
-Message-ID: <1435843047-6327-2-git-send-email-eric.auger@linaro.org>
+Subject: [RFC 04/17] VFIO: pci: initialize vfio_device_external_ops
+Date: Thu,  2 Jul 2015 15:17:14 +0200
+Message-ID: <1435843047-6327-5-git-send-email-eric.auger@linaro.org>
 References: <1435843047-6327-1-git-send-email-eric.auger@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 52BD4576D5
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2015 09:06:53 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 9Fm5H4Y-Qw5q for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  2 Jul 2015 09:06:47 -0400 (EDT)
+Received: from mail-wi0-f181.google.com (mail-wi0-f181.google.com
+ [209.85.212.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 54374576D0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  2 Jul 2015 09:06:47 -0400 (EDT)
+Received: by widjy10 with SMTP id jy10so84727000wid.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Jul 2015 06:18:03 -0700 (PDT)
 In-Reply-To: <1435843047-6327-1-git-send-email-eric.auger@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger@st.com, eric.auger@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.williamson@redhat.com, pbonzini@redhat.com, avi.kivity@gmail.com, mtosatti@redhat.com, feng.wu@intel.com, joro@8bytes.org, b.reynal@virtualopensystems.com
 Cc: linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
-
-In case the IRQ is forwarded, the VFIO platform IRQ handler does not
-need to disable the IRQ anymore.
-
-When setting the IRQ handler we now also test the forwarded state. In
-case the IRQ is forwarded we select the vfio_irq_handler.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
 ---
 
-v3 -> v4:
-- change title
-
-v2 -> v3:
-- forwarded state was tested in the handler. Now the forwarded state
-  is tested before setting the handler. This definitively limits
-  the dynamics of forwarded state changes but I don't think there is
-  a use case where we need to be able to change the state at any time.
-
-Conflicts:
-	drivers/vfio/platform/vfio_platform_irq.c
+v6: creation
 ---
- drivers/vfio/platform/vfio_platform_irq.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ drivers/vfio/pci/vfio_pci.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
-index 88bba57..132bb3f 100644
---- a/drivers/vfio/platform/vfio_platform_irq.c
-+++ b/drivers/vfio/platform/vfio_platform_irq.c
-@@ -229,8 +229,13 @@ static int vfio_platform_set_irq_trigger(struct vfio_platform_device *vdev,
- {
- 	struct vfio_platform_irq *irq = &vdev->irqs[index];
- 	irq_handler_t handler;
-+	struct irq_data *d;
-+	bool is_forwarded;
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index 964ad57..1e48125 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -929,6 +929,7 @@ static const struct vfio_device_ops vfio_pci_ops = {
+ 	.write		= vfio_pci_write,
+ 	.mmap		= vfio_pci_mmap,
+ 	.request	= vfio_pci_request,
++	.external_ops	= NULL,
+ };
  
--	if (vdev->irqs[index].flags & VFIO_IRQ_INFO_AUTOMASKED)
-+	d = irq_get_irq_data(irq->hwirq);
-+	is_forwarded = irqd_irq_forwarded(d);
-+
-+	if (vdev->irqs[index].flags & VFIO_IRQ_INFO_AUTOMASKED && !is_forwarded)
- 		handler = vfio_automasked_irq_handler;
- 	else
- 		handler = vfio_irq_handler;
+ static int vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 -- 
 1.9.1
-
