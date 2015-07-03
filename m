@@ -1,72 +1,64 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 05/10] KVM: arm/arm64: vgic: Relax vgic_can_sample_irq for
- edge IRQs
-Date: Fri, 3 Jul 2015 10:57:59 +0100
-Message-ID: <CAFEAcA_TrNQvR-fooGXSg=04CNAULEpNr54iwXjqA=qvqYuLZw@mail.gmail.com>
-References: <1433783045-8002-1-git-send-email-marc.zyngier@arm.com>
- <1433783045-8002-6-git-send-email-marc.zyngier@arm.com>
- <20150630201933.GA11332@cbox>
- <5593B040.6050208@arm.com> <20150701115820.GC17890@cbox>
- <55942F00.6000306@arm.com>
- <20150702162359.GJ11332@cbox> <55965AFF.30509@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] arm64/kvm: Add generic v8 KVM target
+Date: Fri, 03 Jul 2015 11:10:09 +0100
+Message-ID: <55965F81.5050609@arm.com>
+References: <1434531646-4873-1-git-send-email-suzuki.poulose@arm.com> <CAFEAcA92uymQ3LjPQnuFiwvjSgc+jY54VrfK_Sh4v1DJ+=OPpw@mail.gmail.com> <558A6A84.5020603@arm.com> <20150624085128.GA22785@cbox> <558A7936.7020109@arm.com> <20150625123034.GE28244@cbox> <558BF6C9.3000009@arm.com> <558C05A9.8080201@arm.com> <CAFEAcA_ULz=ugQW=NmthzqYRtvcfwteQTh0DonHRN6U5NykEtQ@mail.gmail.com> <20150626095318.GG28244@cbox> <F37C68A5-E48F-462C-AD18-0F3C096348C7@caviumnetworks.com> <559180CA.3050905@arm.com> <CAFEAcA-E+KdiL4suQ0DoEvB-zGpNZ7-dq46FegC_iXYRPvo9jA@mail.gmail.com> <559185D4.7060308@arm.com> <85D36B67-643B-407F-944F-D18D54FF9909@caviumnetworks.com> <D805D093-CCFE-4835-853A-B2654DAA10A1@caviumnetworks.com> <559642EE.1050605@arm.com> <CAFEAcA8nt7yr0K4QesJjWqEwBgziWOt2DViY70E=z2wjt=X7XA@mail.gmail.com> <
+ 559647A7.7010309@arm.com> <CAFEAcA-XyGRLSdQSye5OP6vRQKLZtMY4Erg7jfcpr-oo-HqJ7A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C8EB9578EE
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2015 05:47:00 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id P+2foVYYLVnQ for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Jul 2015 05:46:59 -0400 (EDT)
-Received: from mail-vn0-f49.google.com (mail-vn0-f49.google.com
- [209.85.216.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C7016578EB
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2015 05:46:59 -0400 (EDT)
-Received: by vnbg190 with SMTP id g190so14769545vnb.13
- for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Jul 2015 02:58:18 -0700 (PDT)
-In-Reply-To: <55965AFF.30509@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Andre Przywara <Andre.Przywara@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <CAFEAcA-XyGRLSdQSye5OP6vRQKLZtMY4Erg7jfcpr-oo-HqJ7A@mail.gmail.com>
+Sender: kvm-owner@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Chalamarla, Tirumalesh" <Tirumalesh.Chalamarla@caviumnetworks.com>, Christoffer Dall <christoffer.dall@linaro.org>, kvm-devel <kvm@vger.kernel.org>, "timur@codeaurora.org" <timur@codeaurora.org>, "vgandhi@codeaurora.org" <vgandhi@codeaurora.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 3 July 2015 at 10:50, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> On 02/07/15 17:23, Christoffer Dall wrote:
->> If we had a different *shared* device than the timer which is
->> edge-triggered, don't we then also need to capture the physical
->> distributor's pending state along with the state of the device unless we
->> assume that upon restoring the state for the device count on the device
->> to have another rising/falling edge to trigger the interrupt again? (I
->> assume the line would always go high for a level-triggered interrupt in
->> this case).
->
-> I'd definitely assume that restoring the state of the device would make
-> it generate an interrupt. This has to be a property of the device,
-> otherwise it is not really shareable between vcpus.
+On 03/07/15 10:34, Peter Maydell wrote:
+> On 3 July 2015 at 09:28, Marc Zyngier <marc.zyngier@arm.com> wrote:
+>> On 03/07/15 09:12, Peter Maydell wrote:
+>>> I would still like to see the proponents of this patch say
+>>> what their model is for userspace support of cross-host migration,
+>>> if we're abandoning the model the current API envisages.
+>>
+>> I thought we had discussed this above, and don't really see this as a
+>> departure from the current model:
+>>
+>> - "-cpu host" results in "GENERIC" being used: VM can only be migrated
+>> to the exact same HW (no cross-host migration). MIDR should probably
+>> become RO.
+>> - "-cpu host" results in "A57" (for example): VM can be migrated to a
+>> variety of A57 platforms, and allow for some fuzzing on the revision (or
+>> accept any revision).
+>> - "-cpu a57" forces an A57 model to be emulated, always. It is always
+>> possible to migrate such a VM on any host.
+>>
+>> I think only the first point is new, but the last two are what we have
+>> (or what we should have).
+> 
+> Right, but the implicit idea of this GENERIC patch seems to
+> be that new host CPU types don't get their own KVM_ARM_TARGET_*
+> constant, and are thus forever unable to do cross-host migration.
+> It's not clear to me why we'd want to have new CPUs be second
+> class citizens like that.
 
-FWIW, QEMU's modelling approach to this is to say that devices
-do *not* generate interrupts on restore. If the device had
-previously generated an interrupt then this should be captured
-by the state of the interrupt controller (or whatever else
-it is connected to) and dealt with when the GIC state is restored.
+I certainly don't want to see *any* CPU be a second class citizen. But
+let's face it, we're adding more and more targets that don't implement
+anything new, and just satisfy themselves with the generic implementation.
 
-If you say that restoring the device state is supposed to
-generate an interrupt, you introduce an ordering requirement
-that the state of the interrupt controller is restored
-first and the device second (otherwise the incoming GIC
-state will overwrite the interrupt that the device just
-generated), which isn't ideal (especially since QEMU
-makes no guarantees about restore order between devices).
+I see it as an incentive to provide something useful (tables of all the
+registers with default values?) so that cross-host migration becomes a
+reality instead of the figment of our imagination (as it is now). If it
+wasn't already ABI, I'd have removed the existing targets until we have
+something meaningful to put there.
 
-thanks
--- PMM
+Now, I also have my own doubts about cross-host migration (timers
+anyone?). But I don't see the above as a change in policy. More as a way
+to outline the fact that we currently don't have the right level of
+information/infrastructure to support it at all.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
