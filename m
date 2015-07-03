@@ -1,80 +1,77 @@
-From: "Wu, Feng" <feng.wu@intel.com>
-Subject: RE: [RFC 12/17] irq: bypass: Extend skeleton for ARM forwarding
- control
-Date: Fri, 3 Jul 2015 07:16:17 +0000
-Message-ID: <E959C4978C3B6342920538CF579893F0025E7167@SHSMSX104.ccr.corp.intel.com>
-References: <1435843047-6327-1-git-send-email-eric.auger@linaro.org>
- <1435843047-6327-13-git-send-email-eric.auger@linaro.org>
- <E959C4978C3B6342920538CF579893F0025E6C89@SHSMSX104.ccr.corp.intel.com>
- <5596311A.3010703@redhat.com>
- <E959C4978C3B6342920538CF579893F0025E70BF@SHSMSX104.ccr.corp.intel.com>
- <55963469.9030805@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] arm64/kvm: Add generic v8 KVM target
+Date: Fri, 03 Jul 2015 09:08:14 +0100
+Message-ID: <559642EE.1050605@arm.com>
+References: <1434531646-4873-1-git-send-email-suzuki.poulose@arm.com> <CAFEAcA92uymQ3LjPQnuFiwvjSgc+jY54VrfK_Sh4v1DJ+=OPpw@mail.gmail.com> <558A6A84.5020603@arm.com> <20150624085128.GA22785@cbox> <558A7936.7020109@arm.com> <20150625123034.GE28244@cbox> <558BF6C9.3000009@arm.com> <558C05A9.8080201@arm.com> <CAFEAcA_ULz=ugQW=NmthzqYRtvcfwteQTh0DonHRN6U5NykEtQ@mail.gmail.com> <20150626095318.GG28244@cbox> <F37C68A5-E48F-462C-AD18-0F3C096348C7@caviumnetworks.com> <559180CA.3050905@arm.com> <CAFEAcA-E+KdiL4suQ0DoEvB-zGpNZ7-dq46FegC_iXYRPvo9jA@mail.gmail.com> <559185D4.7060308@arm.com> <85D36B67-643B-407F-944F-D18D54FF9909@caviumnetworks.com> <D805D093-CCFE-4835-853A-B2654DAA10A1@caviumnetworks.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <55963469.9030805@redhat.com>
-Content-Language: en-US
+In-Reply-To: <D805D093-CCFE-4835-853A-B2654DAA10A1@caviumnetworks.com>
 Sender: kvm-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@linaro.org>, "eric.auger@st.com" <eric.auger@st.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "avi.kivity@gmail.com" <avi.kivity@gmail.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "joro@8bytes.org" <joro@8bytes.org>, "b.reynal@virtualopensystems.com" <b.reynal@virtualopensystems.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "patches@linaro.org" <patches@linaro.org>, "Wu, Feng" <feng.wu@intel.com>
+To: "Chalamarla, Tirumalesh" <Tirumalesh.Chalamarla@caviumnetworks.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, kvm-devel <kvm@vger.kernel.org>, "timur@codeaurora.org" <timur@codeaurora.org>, "vgandhi@codeaurora.org" <vgandhi@codeaurora.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 02/07/15 21:29, Chalamarla, Tirumalesh wrote:
+> is there a chance that this get merged in to 4.2? if not is it possible
+> to accept the other patches like adding implementations explicitly(like
+> Thunder).
 
-
-> -----Original Message-----
-> From: Paolo Bonzini [mailto:pbonzini@redhat.com]
-> Sent: Friday, July 03, 2015 3:06 PM
-> To: Wu, Feng; Eric Auger; eric.auger@st.com;
-> linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
-> kvm@vger.kernel.org; christoffer.dall@linaro.org; marc.zyngier@arm.com;
-> alex.williamson@redhat.com; avi.kivity@gmail.com; mtosatti@redhat.com;
-> joro@8bytes.org; b.reynal@virtualopensystems.com
-> Cc: linux-kernel@vger.kernel.org; patches@linaro.org
-> Subject: Re: [RFC 12/17] irq: bypass: Extend skeleton for ARM forwarding
-> control
-> 
-> 
-> 
-> On 03/07/2015 09:00, Wu, Feng wrote:
-> >>> > > struct irq_bypass_consumer {
-> >>> > >        struct list_head node;
-> >>> > >        void *token;
-> >>> > > +      unsigned irq;	/*got from producer when registered*/
-> >>> > >        void (*add_producer)(struct irq_bypass_producer *,
-> >>> > >                             struct irq_bypass_consumer *);
-> >>> > >        void (*del_producer)(struct irq_bypass_producer *,
-> >>> > >                             struct irq_bypass_consumer *);
-> >>> > > +      void (*update)(struct irq_bypass_consumer *);
-> >>> > > };
-> >>> > >
-> >>> > > 'update' is used to update the IRTE, while irq is initialized when
-> >>> > > registered, which is used to find the right IRTE.
-> >> >
-> >> > Feel free to add "update" in your PI patches.  I am not sure if "irq"
-> >> > belongs here or in the containing struct.  You can play with both and
-> >> > submit the version that looks better to you.
-> > Thanks for your review, Paolo. In my understanding, irq comes from
-> > the producer side, while gsi belongs to the consumer, so we need
-> > to get the irq from the producer somewhere. I am not sure adding
-> > irq here is the good way, but what I need is in the 'update' function,
-> > I have irq, gsi in hand. :)
-> 
-> It's difficult to say without seeing the patches...  The IRQ is stored
-> in the producer already with Eric's changes.  If you need to store the
-> old IRQ value, because "update" needs to do something with it, then I
-> think "irq" belongs in the container struct.
-> 
-> Perhaps "update" needs to have a producer argument as well?
-
-I also consider this method, basically, I will call 'update' in irqfd_update(),
-but seems I need do extra things to get the producer structure (such as,
-iterate the producer list to find the one with the same 'token') before
-calling 'update' from consumer side. I am not sure it is worth doing
-that way.
+We first need to reach a conclusion on this. Until then, I don't plan to
+get anything in. As for 4.2, it feels way too late (the merge window is
+almost closed now).
 
 Thanks,
-Feng
+
+	M.
 
 > 
-> Paolo
+> Thanks,
+> Tirumalesh. 
+>> On Jun 29, 2015, at 11:39 AM, Chalamarla, Tirumalesh
+>> <Tirumalesh.Chalamarla@caviumnetworks.com
+>> <mailto:Tirumalesh.Chalamarla@caviumnetworks.com>> wrote:
+>>
+>>>
+>>> On Jun 29, 2015, at 10:52 AM, Marc Zyngier <marc.zyngier@arm.com
+>>> <mailto:marc.zyngier@arm.com>> wrote:
+>>>
+>>> On 29/06/15 18:38, Peter Maydell wrote:
+>>>> On 29 June 2015 at 18:30, Marc Zyngier <marc.zyngier@arm.com
+>>>> <mailto:marc.zyngier@arm.com>> wrote:
+>>>>> On 29/06/15 18:13, Chalamarla, Tirumalesh wrote:
+>>>>>> Will this also prevents migrating between same implementations,
+>>>>>> if no how is this identified.
+>>>>>
+>>>>> This shouldn't. It is pretty easy to look at the incoming guest's MIDR,
+>>>>> and verify that it matches the default MIDR on the receiving
+>>>>> system. Any
+>>>>> difference, and the migration should abort.
+>>>>
+>>>> Do you really want to forbid migration between (say)
+>>>> Cortex-A57 r3p0 and Cortex-A57 r3p1 ?
+>>>>
+>>>> That seems pretty harsh.
+>>>
+>>> I think we may need to allow for some flexibility (same major version
+>>> only, or +/- 1 minor version...). The idea I'm trying to convey is that
+>>> with "generic CPI", migration is not guaranteed unless we're on
+>>> extremely similar hardware.
+>>>
+>> yes, this is the point i am trying to make, we need some flexibility.
+>> so that it works with same chips with different passes may be. 
+>> if we are allowing this, then we are not putting emulation as a
+>> requirement. 
+>>
+>> Thanks,
+>> Tirumalesh. 
+>>
+>>> M.
+>>> -- 
+>>> Jazz is not dead. It just smells funny...
+> 
+
+
+-- 
+Jazz is not dead. It just smells funny...
