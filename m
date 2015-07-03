@@ -1,110 +1,185 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 3/3] arm/arm64: speed up spinlocks and atomic ops
-Date: Fri, 3 Jul 2015 19:43:07 +0200
-Message-ID: <5596C9AB.3030404@redhat.com>
-References: <1435257911-9715-1-git-send-email-drjones@redhat.com>
- <1435257911-9715-4-git-send-email-drjones@redhat.com>
+From: Mario Smarduch <m.smarduch@samsung.com>
+Subject: Re: [PATCH v3 1/2] arm64: KVM: Optimize arm64 skip 30-50% vfp/simd
+ save/restore on exits
+Date: Fri, 03 Jul 2015 11:56:36 -0700
+Message-ID: <5596DAE4.1070701@samsung.com>
+References: <1435190652-5831-1-git-send-email-m.smarduch@samsung.com>
+ <1435190652-5831-2-git-send-email-m.smarduch@samsung.com>
+ <20150701134649.GG11332@cbox> <5595B27D.90201@samsung.com>
+ <20150703115320.GA14220@lvm>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 62E24579F4
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2015 13:31:50 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yipJSo+TkzMj for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Jul 2015 13:31:49 -0400 (EDT)
-Received: from mail-wg0-f47.google.com (mail-wg0-f47.google.com [74.125.82.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6A3FB579F2
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2015 13:31:49 -0400 (EDT)
-Received: by wgck11 with SMTP id k11so93594547wgc.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Jul 2015 10:43:09 -0700 (PDT)
-In-Reply-To: <1435257911-9715-4-git-send-email-drjones@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <20150703115320.GA14220@lvm>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 07/03/2015 04:53 AM, Christoffer Dall wrote:
+> On Thu, Jul 02, 2015 at 02:51:57PM -0700, Mario Smarduch wrote:
+>> On 07/01/2015 06:46 AM, Christoffer Dall wrote:
+>>> On Wed, Jun 24, 2015 at 05:04:11PM -0700, Mario Smarduch wrote:
+>>>> This patch only saves and restores FP/SIMD registers on Guest access. To do
+>>>> this cptr_el2 FP/SIMD trap is set on Guest entry and later checked on exit.
+>>>> lmbench, hackbench show significant improvements, for 30-50% exits FP/SIMD
+>>>> context is not saved/restored
+>>>>
+>>>> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+>>>> ---
+>>>>  arch/arm64/include/asm/kvm_arm.h |    5 ++++-
+>>>>  arch/arm64/kvm/hyp.S             |   46 +++++++++++++++++++++++++++++++++++---
+>>>>  2 files changed, 47 insertions(+), 4 deletions(-)
+>>>>
+>>>> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+>>>> index ac6fafb..7605e09 100644
+>>>> --- a/arch/arm64/include/asm/kvm_arm.h
+>>>> +++ b/arch/arm64/include/asm/kvm_arm.h
+>>>> @@ -171,10 +171,13 @@
+>>>>  #define HSTR_EL2_TTEE	(1 << 16)
+>>>>  #define HSTR_EL2_T(x)	(1 << x)
+>>>>  
+>>>> +/* Hyp Coproccessor Trap Register Shifts */
+>>>> +#define CPTR_EL2_TFP_SHIFT 10
+>>>> +
+>>>>  /* Hyp Coprocessor Trap Register */
+>>>>  #define CPTR_EL2_TCPAC	(1 << 31)
+>>>>  #define CPTR_EL2_TTA	(1 << 20)
+>>>> -#define CPTR_EL2_TFP	(1 << 10)
+>>>> +#define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
+>>>>  
+>>>>  /* Hyp Debug Configuration Register bits */
+>>>>  #define MDCR_EL2_TDRA		(1 << 11)
+>>>> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+>>>> index 5befd01..de0788f 100644
+>>>> --- a/arch/arm64/kvm/hyp.S
+>>>> +++ b/arch/arm64/kvm/hyp.S
+>>>> @@ -673,6 +673,15 @@
+>>>>  	tbz	\tmp, #KVM_ARM64_DEBUG_DIRTY_SHIFT, \target
+>>>>  .endm
+>>>>  
+>>>> +/*
+>>>> + * Check cptr VFP/SIMD accessed bit, if set VFP/SIMD not accessed by guest.
+>>>
+>>> This comment doesn't really help me understand the function, may I
+>>> suggest:
+>>>
+>>> Branch to target if CPTR_EL2.TFP bit is set (VFP/SIMD trapping enabled)
+>>
+>> Yes actually describes what it does.
+>>
+>>>
+>>>> + */
+>>>> +.macro skip_fpsimd_state tmp, target
+>>>> +	mrs	\tmp, cptr_el2
+>>>> +	tbnz	\tmp, #CPTR_EL2_TFP_SHIFT, \target
+>>>> +.endm
+>>>> +
+>>>> +
+>>>>  .macro compute_debug_state target
+>>>>  	// Compute debug state: If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY
+>>>>  	// is set, we do a full save/restore cycle and disable trapping.
+>>>> @@ -763,6 +772,7 @@
+>>>>  	ldr     x2, [x0, #VCPU_HCR_EL2]
+>>>>  	msr     hcr_el2, x2
+>>>>  	mov	x2, #CPTR_EL2_TTA
+>>>> +	orr     x2, x2, #CPTR_EL2_TFP
+>>>>  	msr	cptr_el2, x2
+>>>>  
+>>>>  	mov	x2, #(1 << 15)	// Trap CP15 Cr=15
+>>>> @@ -785,7 +795,6 @@
+>>>>  .macro deactivate_traps
+>>>>  	mov	x2, #HCR_RW
+>>>>  	msr	hcr_el2, x2
+>>>> -	msr	cptr_el2, xzr
+>>>>  	msr	hstr_el2, xzr
+>>>>  
+>>>>  	mrs	x2, mdcr_el2
+>>>> @@ -912,6 +921,28 @@ __restore_fpsimd:
+>>>>  	restore_fpsimd
+>>>>  	ret
+>>>>  
+>>>> +switch_to_guest_fpsimd:
+>>>> +	push	x4, lr
+>>>> +
+>>>> +	mrs	x2, cptr_el2
+>>>> +	bic	x2, x2, #CPTR_EL2_TFP
+>>>> +	msr	cptr_el2, x2
+>>>> +
+>>>> +	mrs	x0, tpidr_el2
+>>>> +
+>>>> +	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
+>>>> +	kern_hyp_va x2
+>>>> +	bl __save_fpsimd
+>>>> +
+>>>> +	add	x2, x0, #VCPU_CONTEXT
+>>>> +	bl __restore_fpsimd
+>>>> +
+>>>> +	pop	x4, lr
+>>>> +	pop	x2, x3
+>>>> +	pop	x0, x1
+>>>> +
+>>>> +	eret
+>>>> +
+>>>>  /*
+>>>>   * u64 __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>>>>   *
+>>>> @@ -932,7 +963,6 @@ ENTRY(__kvm_vcpu_run)
+>>>>  	kern_hyp_va x2
+>>>>  
+>>>>  	save_host_regs
+>>>> -	bl __save_fpsimd
+>>>>  	bl __save_sysregs
+>>>>  
+>>>>  	compute_debug_state 1f
+>>>> @@ -948,7 +978,6 @@ ENTRY(__kvm_vcpu_run)
+>>>>  	add	x2, x0, #VCPU_CONTEXT
+>>>>  
+>>>>  	bl __restore_sysregs
+>>>> -	bl __restore_fpsimd
+>>>>  
+>>>>  	skip_debug_state x3, 1f
+>>>>  	bl	__restore_debug
+>>>> @@ -967,7 +996,9 @@ __kvm_vcpu_return:
+>>>>  	add	x2, x0, #VCPU_CONTEXT
+>>>>  
+>>>>  	save_guest_regs
+>>>> +	skip_fpsimd_state x3, 1f
+>>>>  	bl __save_fpsimd
+>>>> +1:
+>>>>  	bl __save_sysregs
+>>>>  
+>>>>  	skip_debug_state x3, 1f
+>>>> @@ -986,7 +1017,11 @@ __kvm_vcpu_return:
+>>>>  	kern_hyp_va x2
+>>>>  
+>>>>  	bl __restore_sysregs
+>>>> +	skip_fpsimd_state x3, 1f
+>>>>  	bl __restore_fpsimd
+>>>> +1:
+>>>> +	/* Clear FPSIMD and Trace trapping */
+>>>> +	msr     cptr_el2, xzr
+>>>
+>>> why not simply move the deactivate_traps down here instead?
+>>
+>> Putting deactivate_traps there  trashes x2, setup earlier
+>> to restore debug, host registers from host context
+>>
+>> Do we want deactivate_traps to use another register and
+>> move the macro there? Or leave as is?
+>>
+> There was some clean symmetry in the code by using deactivate traps, but
+> given this, I don't care strongly which way we end up doing it.
 
+I agree. Also it probably makes more sense to keep the trap disable
+code together to match the trap enables, without objection from
+Marc I'll rework the patch, repost it after Monday.
 
-On 25/06/2015 20:45, Andrew Jones wrote:
-> spinlock torture tests made it clear that checking mmu_enabled()
-> every time we call spin_lock is a bad idea. As most tests will
-> want the MMU enabled the entire time, then we can inline a light
-> weight "nobody disabled the mmu" check, and bail out early.
+Thanks,
+- Mario
 > 
-> Adding a light weight inlined check vs. a compile-time flag
-> suggested by Paolo.
-> 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
-> ---
->  lib/arm/asm/mmu-api.h | 7 ++++++-
->  lib/arm/mmu.c         | 9 +++++++--
->  2 files changed, 13 insertions(+), 3 deletions(-)
-> 
-> diff --git a/lib/arm/asm/mmu-api.h b/lib/arm/asm/mmu-api.h
-> index 12fdc57918c27..b2fc900a30add 100644
-> --- a/lib/arm/asm/mmu-api.h
-> +++ b/lib/arm/asm/mmu-api.h
-> @@ -1,7 +1,12 @@
->  #ifndef __ASMARM_MMU_API_H_
->  #define __ASMARM_MMU_API_H_
->  extern pgd_t *mmu_idmap;
-> -extern bool mmu_enabled(void);
-> +extern unsigned int mmu_disabled_cpu_count;
-> +extern bool __mmu_enabled(void);
-> +static inline bool mmu_enabled(void)
-> +{
-> +	return mmu_disabled_cpu_count == 0 || __mmu_enabled();
-> +}
->  extern void mmu_enable(pgd_t *pgtable);
->  extern void mmu_disable(void);
->  extern void mmu_enable_idmap(void);
-> diff --git a/lib/arm/mmu.c b/lib/arm/mmu.c
-> index ad558e177dd1c..e661d4f26e4b7 100644
-> --- a/lib/arm/mmu.c
-> +++ b/lib/arm/mmu.c
-> @@ -15,8 +15,9 @@ extern unsigned long etext;
->  pgd_t *mmu_idmap;
->  
->  static cpumask_t mmu_disabled_cpumask;
-> +unsigned int mmu_disabled_cpu_count;
->  
-> -bool mmu_enabled(void)
-> +bool __mmu_enabled(void)
->  {
->  	int cpu = current_thread_info()->cpu;
->  
-> @@ -30,7 +31,9 @@ void mmu_enable(pgd_t *pgtable)
->  
->  	asm_mmu_enable(__pa(pgtable));
->  	flush_tlb_all();
-> -	cpumask_clear_cpu(cpu, &mmu_disabled_cpumask);
-> +
-> +	if (cpumask_test_and_clear_cpu(cpu, &mmu_disabled_cpumask))
-> +		--mmu_disabled_cpu_count;
->  }
->  
->  extern void asm_mmu_disable(void);
-> @@ -39,6 +42,8 @@ void mmu_disable(void)
->  	int cpu = current_thread_info()->cpu;
->  
->  	cpumask_set_cpu(cpu, &mmu_disabled_cpumask);
-> +	++mmu_disabled_cpu_count;
-> +
->  	asm_mmu_disable();
->  }
->  
+> Thanks,
+> -Christoffer
 > 
 
-Applied, thanks.
-
-Paolo
