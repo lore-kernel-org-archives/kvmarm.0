@@ -1,27 +1,27 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC 12/17] irq: bypass: Extend skeleton for ARM forwarding
- control
-Date: Fri, 3 Jul 2015 09:08:54 +0200
-Message-ID: <55963506.8020200@redhat.com>
-References: <1435843047-6327-1-git-send-email-eric.auger@linaro.org>
- <1435843047-6327-13-git-send-email-eric.auger@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v7 08/11] KVM: arm64: introduce vcpu->arch.debug_ptr
+Date: Fri, 03 Jul 2015 08:14:52 +0100
+Message-ID: <87mvzdsoer.fsf@linaro.org>
+References: <1435775343-20034-1-git-send-email-alex.bennee@linaro.org>
+ <1435775343-20034-9-git-send-email-alex.bennee@linaro.org>
+ <20150702183440.GK11332@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B0B4657897
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2015 02:57:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BEAF55789A
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2015 03:03:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id N0JU-qzmRc+1 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Jul 2015 02:57:41 -0400 (EDT)
-Received: from mail-wg0-f45.google.com (mail-wg0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 33BE657896
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2015 02:57:40 -0400 (EDT)
-Received: by wgqq4 with SMTP id q4so80701743wgq.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Jul 2015 00:08:59 -0700 (PDT)
-In-Reply-To: <1435843047-6327-13-git-send-email-eric.auger@linaro.org>
+ with ESMTP id 7-Clh3kfhspc for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 Jul 2015 03:03:37 -0400 (EDT)
+Received: from mail-wg0-f43.google.com (mail-wg0-f43.google.com [74.125.82.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6BC2F57895
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2015 03:03:37 -0400 (EDT)
+Received: by wgck11 with SMTP id k11so80855198wgc.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 03 Jul 2015 00:14:55 -0700 (PDT)
+In-reply-to: <20150702183440.GK11332@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,39 +31,74 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>, eric.auger@st.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.williamson@redhat.com, avi.kivity@gmail.com, mtosatti@redhat.com, feng.wu@intel.com, joro@8bytes.org, b.reynal@virtualopensystems.com
-Cc: linux-kernel@vger.kernel.org, patches@linaro.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, jan.kiszka@siemens.com, Will Deacon <will.deacon@arm.com>, kvmarm@lists.cs.columbia.edu, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, Richard Weinberger <richard@nod.at>, Gleb Natapov <gleb@kernel.org>, zhichao.huang@linaro.org, Catalin Marinas <catalin.marinas@arm.com>, bp@suse.de, marc.zyngier@arm.com, Andre Przywara <andre.przywara@arm.com>, r65777@freescale.com, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, open list <linux-kernel@vger.kernel.org>, dahi@linux.vnet.ibm.com, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 02/07/2015 15:17, Eric Auger wrote:
-> +	void (*stop_producer)(struct irq_bypass_producer *);
-> +	void (*resume_producer)(struct irq_bypass_producer *);
-
-Also, can you call these just "stop"/"resume" ...
-
-> +	void (*add_consumer)(struct irq_bypass_producer *,
-> +			     struct irq_bypass_consumer *);
-> +	void (*del_consumer)(struct irq_bypass_producer *,
-> +			     struct irq_bypass_consumer *);
->  };
->  
->  struct irq_bypass_consumer {
->  	struct list_head node;
->  	void *token;
-> -	void (*add_producer)(struct irq_bypass_producer *);
-> -	void (*del_producer)(struct irq_bypass_producer *);
-> +	unsigned int gsi;		/* the guest gsi */
-> +	struct kvm *kvm;
-> +	void (*stop_consumer)(struct irq_bypass_consumer *);
-> +	void (*resume_consumer)(struct irq_bypass_consumer *);
-
-... and same here?  The KVM functions could be named
-
-- kvm_arch_irq_bypass_add_producer
-- kvm_arch_irq_bypass_del_producer
-- kvm_arch_irq_bypass_stop
-- kvm_arch_irq_bypass_resume
-
-Paolo
+CkNocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZz4gd3JpdGVzOgoK
+PiBPbiBXZWQsIEp1bCAwMSwgMjAxNSBhdCAwNzoyOTowMFBNICswMTAwLCBBbGV4IEJlbm7DqWUg
+d3JvdGU6Cj4+IFRoaXMgaW50cm9kdWNlcyBhIGxldmVsIG9mIGluZGlyZWN0aW9uIGZvciB0aGUg
+ZGVidWcgcmVnaXN0ZXJzLiBJbnN0ZWFkCj4+IG9mIHVzaW5nIHRoZSBzeXNfcmVnc1tdIGRpcmVj
+dGx5IHdlIHN0b3JlIHJlZ2lzdGVycyBpbiBhIHN0cnVjdHVyZSBpbgo+PiB0aGUgdmNwdS4gVGhl
+IG5ldyBrdm1fYXJtX3Jlc2V0X2RlYnVnX3B0cigpIHNldHMgdGhlIGRlYnVnIHB0ciB0byB0aGUK
+Pj4gZ3Vlc3QgY29udGV4dC4KPj4gCj4+IFRoaXMgYWxzbyBlbnRhaWxzIHVwZGF0aW5nIHRoZSBz
+eXNfcmVncyBjb2RlIHRvIGFjY2VzcyB0aGlzIG5ldwo+PiBzdHJ1Y3R1cmUuIE5ldyBhY2Nlc3Mg
+ZnVuY3Rpb24gaGF2ZSBiZWVuIGFkZGVkIGZvciBlYWNoIHNldCBvZiBkZWJ1Zwo+PiByZWdpc3Rl
+cnMuIFRoZSBnZW5lcmljIGZ1bmN0aW9ucyBhcmUgc3RpbGwgdXNlZCBmb3IgdGhlIGZldyByZWdp
+c3RlcnMKPj4gc3RvcmVkIGluIHRoZSBtYWluIGNvbnRleHQuCj4+IAo+PiBOZXcgYWNjZXNzIGZ1
+bmN0aW9uIHBvaW50ZXJzIGhhdmUgYmVlbiBhZGRlZCB0byB0aGUgc3lzX3JlZ19kZXNjCj4+IHN0
+cnVjdHVyZSB0byBzdXBwb3J0IHRoZSBHRVQvU0VUX09ORV9SRUcgaW9jdGwgb3BlcmF0aW9ucy4K
+Pgo+IFdoeSBpcyB0aGlzIG5lZWRlZD8KClByZXZpb3VzbHkgSSBoYWQgYSBoYWNreToKCglpZiAo
+ci0+YWNjZXNzID09IHRyYXBfZGVidWc2NCkKCQlyZXR1cm4gZGVidWdfZ2V0NjQodmNwdSwgciwg
+cmVnLCB1YWRkcik7CgpXaGljaCB1c2VkIHRoZSBzYW1lIG9mZnNldCBpbmZvcm1hdGlvbi4gTm93
+IHdlIGhhdmUgYSBjbGVhbmVyOgoKCWlmIChyLT5zZXQpCgkJcmV0dXJuIChyLT5zZXQpKHZjcHUs
+IHIsIHJlZywgdWFkZHIpOwoKV2hpY2ggYWNjZXNzZXMgdGhlIHN0cnVjdHVyZSBkaXJlY3RseSwg
+YXMgdGhlIHRyYXAgZnVuY3Rpb25zIGRvOgoKCV9fdTY0ICpyID0gJnZjcHUtPmFyY2gudmNwdV9k
+ZWJ1Z19zdGF0ZS5kYmdfYnZyW3JkLT5yZWddOwoJaWYgKGNvcHlfZnJvbV91c2VyKHVhZGRyLCBy
+LCBLVk1fUkVHX1NJWkUocmVnLT5pZCkpICE9IDApCgkJcmV0dXJuIC1FRkFVTFQ7CglyZXR1cm4g
+MDsKCjxzbmlwPgo+PiArI2lmIDAKPj4gK3N0YXRpYyBpbnQgZGVidWdfc2V0NjQoc3RydWN0IGt2
+bV92Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCwKPj4gKwkJY29uc3Qg
+c3RydWN0IGt2bV9vbmVfcmVnICpyZWcsIHZvaWQgX191c2VyICp1YWRkcikKPj4gK3sKPj4gKwlf
+X3U2NCAqciA9IChfX3U2NCAqKSAoKHZvaWQgKiApJnZjcHUtPmFyY2gudmNwdV9kZWJ1Z19zdGF0
+ZSArIHJkLT5yZWcpOwo+PiArCWlmIChjb3B5X2Zyb21fdXNlcih1YWRkciwgciwgS1ZNX1JFR19T
+SVpFKHJlZy0+aWQpKSAhPSAwKQo+PiArCQlyZXR1cm4gLUVGQVVMVDsKPj4gKwlyZXR1cm4gMDsK
+Pj4gK30KPj4gKwo+PiArc3RhdGljIGludCBkZWJ1Z19nZXQ2NChzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
+cHUsIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkLAo+PiArCWNvbnN0IHN0cnVjdCBrdm1f
+b25lX3JlZyAqcmVnLCB2b2lkIF9fdXNlciAqdWFkZHIpCj4+ICt7Cj4+ICsJX191NjQgKnIgPSAo
+X191NjQgKikgKCh2b2lkICogKSZ2Y3B1LT5hcmNoLnZjcHVfZGVidWdfc3RhdGUgKyByZC0+cmVn
+KTsKPj4gKwlpZiAoY29weV90b191c2VyKHVhZGRyLCByLCBLVk1fUkVHX1NJWkUocmVnLT5pZCkp
+ICE9IDApCj4+ICsJCXJldHVybiAtRUZBVUxUOwo+PiArCXJldHVybiAwOwo+PiArfQo+PiArI2Vu
+ZGlmCj4+ICsKPgo+IHdoYXQgaXMgdGhpcyBpZmRlZidlZCBibG9jayBvZiBjb2RlIGRvaW5nIGhl
+cmU/CgpPb3BzLiBZZWFoIGxvb2tzIGxpa2UgSSBtaXNzZWQgcmVtb3ZpbmcgdGhhdCBhZnRlciBJ
+IGZpbmlzaGVkIHRoZQpyZS1mYWN0b3IuIFRoZXNlIHdoZXJlIHRoZSBvbGQgZ2V0L3NldCBmdW5j
+dGlvbnMgSSB1c2VkLgoKPgo+PiAgaW50IGt2bV9hcm1fc3lzX3JlZ19nZXRfcmVnKHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSwgY29uc3Qgc3RydWN0IGt2bV9vbmVfcmVnICpyZWcpCj4+ICB7Cj4+ICAJ
+Y29uc3Qgc3RydWN0IHN5c19yZWdfZGVzYyAqcjsKPj4gQEAgLTEzMDMsNiArMTUzMCw5IEBAIGlu
+dCBrdm1fYXJtX3N5c19yZWdfZ2V0X3JlZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNvbnN0IHN0
+cnVjdCBrdm1fb25lX3JlZyAqcmVnCj4+ICAJaWYgKCFyKQo+PiAgCQlyZXR1cm4gZ2V0X2ludmFy
+aWFudF9zeXNfcmVnKHJlZy0+aWQsIHVhZGRyKTsKPj4gIAo+PiArCWlmIChyLT5nZXQpCj4+ICsJ
+CXJldHVybiAoci0+Z2V0KSh2Y3B1LCByLCByZWcsIHVhZGRyKTsKPj4gKwo+PiAgCXJldHVybiBy
+ZWdfdG9fdXNlcih1YWRkciwgJnZjcHVfc3lzX3JlZyh2Y3B1LCByLT5yZWcpLCByZWctPmlkKTsK
+Pj4gIH0KPj4gIAo+PiBAQCAtMTMyMSw2ICsxNTUxLDkgQEAgaW50IGt2bV9hcm1fc3lzX3JlZ19z
+ZXRfcmVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgY29uc3Qgc3RydWN0IGt2bV9vbmVfcmVnICpy
+ZWcKPj4gIAlpZiAoIXIpCj4+ICAJCXJldHVybiBzZXRfaW52YXJpYW50X3N5c19yZWcocmVnLT5p
+ZCwgdWFkZHIpOwo+PiAgCj4+ICsJaWYgKHItPnNldCkKPj4gKwkJcmV0dXJuIChyLT5zZXQpKHZj
+cHUsIHIsIHJlZywgdWFkZHIpOwo+PiArCj4+ICAJcmV0dXJuIHJlZ19mcm9tX3VzZXIoJnZjcHVf
+c3lzX3JlZyh2Y3B1LCByLT5yZWcpLCB1YWRkciwgcmVnLT5pZCk7Cj4+ICB9Cj4+ICAKPj4gZGlm
+ZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmggYi9hcmNoL2FybTY0L2t2bS9zeXNf
+cmVncy5oCj4+IGluZGV4IGQ0MTFlMjUuLjkyNjVlN2QgMTAwNjQ0Cj4+IC0tLSBhL2FyY2gvYXJt
+NjQva3ZtL3N5c19yZWdzLmgKPj4gKysrIGIvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuaAo+PiBA
+QCAtNTUsNiArNTUsMTIgQEAgc3RydWN0IHN5c19yZWdfZGVzYyB7Cj4+ICAKPj4gIAkvKiBWYWx1
+ZSAodXN1YWxseSByZXNldCB2YWx1ZSkgKi8KPj4gIAl1NjQgdmFsOwo+PiArCj4+ICsJLyogR2V0
+L1NldCBmdW5jdGlvbnMsIGZhbGxiYWNrIGlmIE5VTEwgKi8KPgo+IElzIHRoaXMgb25seSBtZWFu
+dCBmb3IgdXNlcnNhcGNlIGFjY2VzcyBvciB3aGVuIHNob3VsZCBvbmUgdXNlIHRoZXNlPwoKWWVz
+IGZvciBHRVQvU0VUCgo+Cj4+ICsJaW50ICgqZ2V0KShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNv
+bnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkLAo+PiArCQkgICBjb25zdCBzdHJ1Y3Qga3ZtX29u
+ZV9yZWcgKnJlZywgdm9pZCBfX3VzZXIgKnVhZGRyKTsKPj4gKwlpbnQgKCpzZXQpKHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSwgY29uc3Qgc3RydWN0IHN5c19yZWdfZGVzYyAqcmQsCj4+ICsJCSAgIGNv
+bnN0IHN0cnVjdCBrdm1fb25lX3JlZyAqcmVnLCB2b2lkIF9fdXNlciAqdWFkZHIpOwo+PiAgfTsK
+Pj4gIAo+PiAgc3RhdGljIGlubGluZSB2b2lkIHByaW50X3N5c19yZWdfaW5zdHIoY29uc3Qgc3Ry
+dWN0IHN5c19yZWdfcGFyYW1zICpwKQo+PiAtLSAKPj4gMi40LjUKPj4gCgotLSAKQWxleCBCZW5u
+w6llCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFy
+bSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3Rz
+LmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
