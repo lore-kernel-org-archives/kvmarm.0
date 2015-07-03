@@ -1,51 +1,70 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC 08/17] kvm: arm/arm64: implement kvm_arm_[halt,resume]_guest
-Date: Fri, 03 Jul 2015 13:14:15 +0100
-Message-ID: <55967C97.5010502@arm.com>
-References: <1435843047-6327-1-git-send-email-eric.auger@linaro.org> <1435843047-6327-9-git-send-email-eric.auger@linaro.org> <55967848.5050204@linaro.org>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [RFC 12/17] irq: bypass: Extend skeleton for ARM forwarding control
+Date: Fri, 03 Jul 2015 15:12:20 +0200
+Message-ID: <55968A34.5010409@linaro.org>
+References: <1435843047-6327-1-git-send-email-eric.auger@linaro.org> <1435843047-6327-13-git-send-email-eric.auger@linaro.org> <55953F5F.9090203@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <55967848.5050204@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@linaro.org>, "eric.auger@st.com" <eric.auger@st.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "avi.kivity@gmail.com" <avi.kivity@gmail.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "feng.wu@intel.com" <feng.wu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>, "b.reynal@virtualopensystems.com" <b.reynal@virtualopensystems.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "patches@linaro.org" <patches@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <55953F5F.9090203@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>, eric.auger@st.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.williamson@redhat.com, avi.kivity@gmail.com, mtosatti@redhat.com, feng.wu@intel.com, joro@8bytes.org, b.reynal@virtualopensystems.com
+Cc: linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/07/15 12:55, Eric Auger wrote:
-> Christoffer, Marc,
-> On 07/02/2015 03:17 PM, Eric Auger wrote:
->> On halt, the guest is forced to exit and prevented from being
->> re-entered. This is synchronous.
->>
->> Those two operations will be needed for IRQ forwarding setting.
->>
->> Signed-off-by: Eric Auger <eric.auger@linaro.org>
-> would you agree to handle this ARM functionality separately from the
-> forwarding series?
+Hi Paolo,
+On 07/02/2015 03:40 PM, Paolo Bonzini wrote:
 > 
-> This includes 2 patch files, that one +
-> https://lkml.org/lkml/2015/7/2/288. This functionality is needed for
-> forwarding control since when changing the forwarding state we need to
-> "freeze" the state of the physical/virtual IRQ to undertake proper
-> actions. Stopping the guest makes sure it won't deactivate the virtual
-> IRQ while we are doing state change actions.
 > 
-> The forwarding series is quite heterogeneous (VFIO platform driver,
-> vgic, irq bypass manager) and I think it would simplify the review process.
+> On 02/07/2015 15:17, Eric Auger wrote:
+>> - new fields are added on producer side: linux irq, vfio_device handle,
+>>   active which reflects whether the source is active (at interrupt
+>>   controller level or at VFIO level - automasked -) and finally an
+>>   opaque pointer which will be used to point to the vfio_platform_device
+>>   in this series.
 > 
-> Please let me know if you agree. If yes, I will post a separate series.
+> Linux IRQ and active should be okay.  As to the vfio_device handle, you
+> should link it from the vfio_platform_device instead.  And for the
+> vfio_platform_device, you can link it from the vfio_platform_irq instead.
+For this last one, I don't think this is achievable since if I store the
+vfio_platform_irq in the opaque, it matches irqs[i] of
+vfio_platform_device and I don't have any mean to retrieve "i" when
+calling container_of.
 
-I don't mind, I trust you to do what's best for these series to be
-easily reviewed (if that is at all possible).
 
-The only thing is that this patch implements a feature that will
-otherwise be unused, so annotating the functions with __maybe_unused
-would avoid warnings.
+	struct vfio_platform_irq *irq =
+		container_of(prod, struct vfio_platform_irq, producer);
+	struct vfio_platform_device *vpdev =
+		container_of(irq, struct vfio_platform_device,  irqs[i?]);
 
-Thanks,
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+struct vfio_platform_device {
+../..
+        struct vfio_platform_irq        *irqs;
+../..
+}
+So I think I still need to pass vfio_platform_device in the opaque and
+look on irqs array to identify the right vfio_platform_irq *.
+
+Do I miss sthg?
+
+- Eric
+
+
+> 
+> Once you've done this, embed the irq_bypass_producer struct in the
+> vfio_platform_irq struct; in the new kvm_arch_* functions, go back to
+> the vfio_platform_irq struct via container_of.  From there you can
+> retrieve pointers to the vfio_platform_device and the vfio_device.
+> 
+>> - new fields on consumer side: the kvm handle, the gsi
+> 
+> You do not need to add these.  Instead, add the kvm handle to irqfd
+> only.  Like above, embed the irq_bypass_consumer struct in the irqfd
+> struct; in the new kvm_arch_* functions, go back to the
+> vfio_platform_irq struct via container_of.
+> 
+> Paolo
+> 
+
