@@ -1,190 +1,175 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v5 08/10] arm: prepare for instantiating different IRQ chip devices
-Date: Fri,  3 Jul 2015 12:26:36 +0100
-Message-ID: <1435922798-14375-9-git-send-email-andre.przywara@arm.com>
-References: <1435922798-14375-1-git-send-email-andre.przywara@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v3 1/2] arm64: KVM: Optimize arm64 skip 30-50% vfp/simd
+ save/restore on exits
+Date: Fri, 3 Jul 2015 04:53:20 -0700
+Message-ID: <20150703115320.GA14220@lvm>
+References: <1435190652-5831-1-git-send-email-m.smarduch@samsung.com>
+ <1435190652-5831-2-git-send-email-m.smarduch@samsung.com>
+ <20150701134649.GG11332@cbox>
+ <5595B27D.90201@samsung.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1435922798-14375-1-git-send-email-andre.przywara@arm.com>
+Content-Disposition: inline
+In-Reply-To: <5595B27D.90201@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: will.deacon@arm.com, marc.zyngier@arm.com
-Cc: penberg@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Mario Smarduch <m.smarduch@samsung.com>
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Extend the vGIC handling code to potentially deal with different IRQ
-chip devices instead of hard-coding the GICv2 in.
-We extend most vGIC functions to take a type parameter, but still put
-GICv2 in at the top for the time being.
+On Thu, Jul 02, 2015 at 02:51:57PM -0700, Mario Smarduch wrote:
+> On 07/01/2015 06:46 AM, Christoffer Dall wrote:
+> > On Wed, Jun 24, 2015 at 05:04:11PM -0700, Mario Smarduch wrote:
+> >> This patch only saves and restores FP/SIMD registers on Guest access. To do
+> >> this cptr_el2 FP/SIMD trap is set on Guest entry and later checked on exit.
+> >> lmbench, hackbench show significant improvements, for 30-50% exits FP/SIMD
+> >> context is not saved/restored
+> >>
+> >> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+> >> ---
+> >>  arch/arm64/include/asm/kvm_arm.h |    5 ++++-
+> >>  arch/arm64/kvm/hyp.S             |   46 +++++++++++++++++++++++++++++++++++---
+> >>  2 files changed, 47 insertions(+), 4 deletions(-)
+> >>
+> >> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> >> index ac6fafb..7605e09 100644
+> >> --- a/arch/arm64/include/asm/kvm_arm.h
+> >> +++ b/arch/arm64/include/asm/kvm_arm.h
+> >> @@ -171,10 +171,13 @@
+> >>  #define HSTR_EL2_TTEE	(1 << 16)
+> >>  #define HSTR_EL2_T(x)	(1 << x)
+> >>  
+> >> +/* Hyp Coproccessor Trap Register Shifts */
+> >> +#define CPTR_EL2_TFP_SHIFT 10
+> >> +
+> >>  /* Hyp Coprocessor Trap Register */
+> >>  #define CPTR_EL2_TCPAC	(1 << 31)
+> >>  #define CPTR_EL2_TTA	(1 << 20)
+> >> -#define CPTR_EL2_TFP	(1 << 10)
+> >> +#define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
+> >>  
+> >>  /* Hyp Debug Configuration Register bits */
+> >>  #define MDCR_EL2_TDRA		(1 << 11)
+> >> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+> >> index 5befd01..de0788f 100644
+> >> --- a/arch/arm64/kvm/hyp.S
+> >> +++ b/arch/arm64/kvm/hyp.S
+> >> @@ -673,6 +673,15 @@
+> >>  	tbz	\tmp, #KVM_ARM64_DEBUG_DIRTY_SHIFT, \target
+> >>  .endm
+> >>  
+> >> +/*
+> >> + * Check cptr VFP/SIMD accessed bit, if set VFP/SIMD not accessed by guest.
+> > 
+> > This comment doesn't really help me understand the function, may I
+> > suggest:
+> > 
+> > Branch to target if CPTR_EL2.TFP bit is set (VFP/SIMD trapping enabled)
+> 
+> Yes actually describes what it does.
+> 
+> > 
+> >> + */
+> >> +.macro skip_fpsimd_state tmp, target
+> >> +	mrs	\tmp, cptr_el2
+> >> +	tbnz	\tmp, #CPTR_EL2_TFP_SHIFT, \target
+> >> +.endm
+> >> +
+> >> +
+> >>  .macro compute_debug_state target
+> >>  	// Compute debug state: If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY
+> >>  	// is set, we do a full save/restore cycle and disable trapping.
+> >> @@ -763,6 +772,7 @@
+> >>  	ldr     x2, [x0, #VCPU_HCR_EL2]
+> >>  	msr     hcr_el2, x2
+> >>  	mov	x2, #CPTR_EL2_TTA
+> >> +	orr     x2, x2, #CPTR_EL2_TFP
+> >>  	msr	cptr_el2, x2
+> >>  
+> >>  	mov	x2, #(1 << 15)	// Trap CP15 Cr=15
+> >> @@ -785,7 +795,6 @@
+> >>  .macro deactivate_traps
+> >>  	mov	x2, #HCR_RW
+> >>  	msr	hcr_el2, x2
+> >> -	msr	cptr_el2, xzr
+> >>  	msr	hstr_el2, xzr
+> >>  
+> >>  	mrs	x2, mdcr_el2
+> >> @@ -912,6 +921,28 @@ __restore_fpsimd:
+> >>  	restore_fpsimd
+> >>  	ret
+> >>  
+> >> +switch_to_guest_fpsimd:
+> >> +	push	x4, lr
+> >> +
+> >> +	mrs	x2, cptr_el2
+> >> +	bic	x2, x2, #CPTR_EL2_TFP
+> >> +	msr	cptr_el2, x2
+> >> +
+> >> +	mrs	x0, tpidr_el2
+> >> +
+> >> +	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
+> >> +	kern_hyp_va x2
+> >> +	bl __save_fpsimd
+> >> +
+> >> +	add	x2, x0, #VCPU_CONTEXT
+> >> +	bl __restore_fpsimd
+> >> +
+> >> +	pop	x4, lr
+> >> +	pop	x2, x3
+> >> +	pop	x0, x1
+> >> +
+> >> +	eret
+> >> +
+> >>  /*
+> >>   * u64 __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+> >>   *
+> >> @@ -932,7 +963,6 @@ ENTRY(__kvm_vcpu_run)
+> >>  	kern_hyp_va x2
+> >>  
+> >>  	save_host_regs
+> >> -	bl __save_fpsimd
+> >>  	bl __save_sysregs
+> >>  
+> >>  	compute_debug_state 1f
+> >> @@ -948,7 +978,6 @@ ENTRY(__kvm_vcpu_run)
+> >>  	add	x2, x0, #VCPU_CONTEXT
+> >>  
+> >>  	bl __restore_sysregs
+> >> -	bl __restore_fpsimd
+> >>  
+> >>  	skip_debug_state x3, 1f
+> >>  	bl	__restore_debug
+> >> @@ -967,7 +996,9 @@ __kvm_vcpu_return:
+> >>  	add	x2, x0, #VCPU_CONTEXT
+> >>  
+> >>  	save_guest_regs
+> >> +	skip_fpsimd_state x3, 1f
+> >>  	bl __save_fpsimd
+> >> +1:
+> >>  	bl __save_sysregs
+> >>  
+> >>  	skip_debug_state x3, 1f
+> >> @@ -986,7 +1017,11 @@ __kvm_vcpu_return:
+> >>  	kern_hyp_va x2
+> >>  
+> >>  	bl __restore_sysregs
+> >> +	skip_fpsimd_state x3, 1f
+> >>  	bl __restore_fpsimd
+> >> +1:
+> >> +	/* Clear FPSIMD and Trace trapping */
+> >> +	msr     cptr_el2, xzr
+> > 
+> > why not simply move the deactivate_traps down here instead?
+> 
+> Putting deactivate_traps there  trashes x2, setup earlier
+> to restore debug, host registers from host context
+> 
+> Do we want deactivate_traps to use another register and
+> move the macro there? Or leave as is?
+> 
+There was some clean symmetry in the code by using deactivate traps, but
+given this, I don't care strongly which way we end up doing it.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arm/aarch32/arm-cpu.c        |  2 +-
- arm/aarch64/arm-cpu.c        |  2 +-
- arm/gic.c                    | 44 +++++++++++++++++++++++++++++++++++---------
- arm/include/arm-common/gic.h |  8 ++++++--
- arm/kvm.c                    |  2 +-
- 5 files changed, 44 insertions(+), 14 deletions(-)
-
-diff --git a/arm/aarch32/arm-cpu.c b/arm/aarch32/arm-cpu.c
-index 946e443..d8d6293 100644
---- a/arm/aarch32/arm-cpu.c
-+++ b/arm/aarch32/arm-cpu.c
-@@ -12,7 +12,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm, u32 gic_phandle)
- {
- 	int timer_interrupts[4] = {13, 14, 11, 10};
- 
--	gic__generate_fdt_nodes(fdt, gic_phandle);
-+	gic__generate_fdt_nodes(fdt, gic_phandle, IRQCHIP_GICV2);
- 	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
- }
- 
-diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-index 8efe877..f702b9e 100644
---- a/arm/aarch64/arm-cpu.c
-+++ b/arm/aarch64/arm-cpu.c
-@@ -12,7 +12,7 @@
- static void generate_fdt_nodes(void *fdt, struct kvm *kvm, u32 gic_phandle)
- {
- 	int timer_interrupts[4] = {13, 14, 11, 10};
--	gic__generate_fdt_nodes(fdt, gic_phandle);
-+	gic__generate_fdt_nodes(fdt, gic_phandle, IRQCHIP_GICV2);
- 	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
- }
- 
-diff --git a/arm/gic.c b/arm/gic.c
-index 05f85a2..b6c5868 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -11,13 +11,13 @@
- 
- static int gic_fd = -1;
- 
--static int gic__create_device(struct kvm *kvm)
-+static int gic__create_device(struct kvm *kvm, enum irqchip_type type)
- {
- 	int err;
- 	u64 cpu_if_addr = ARM_GIC_CPUI_BASE;
- 	u64 dist_addr = ARM_GIC_DIST_BASE;
- 	struct kvm_create_device gic_device = {
--		.type	= KVM_DEV_TYPE_ARM_VGIC_V2,
-+		.flags	= 0,
- 	};
- 	struct kvm_device_attr cpu_if_attr = {
- 		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
-@@ -26,17 +26,27 @@ static int gic__create_device(struct kvm *kvm)
- 	};
- 	struct kvm_device_attr dist_attr = {
- 		.group	= KVM_DEV_ARM_VGIC_GRP_ADDR,
--		.attr	= KVM_VGIC_V2_ADDR_TYPE_DIST,
- 		.addr	= (u64)(unsigned long)&dist_addr,
- 	};
- 
-+	switch (type) {
-+	case IRQCHIP_GICV2:
-+		gic_device.type = KVM_DEV_TYPE_ARM_VGIC_V2;
-+		dist_attr.attr  = KVM_VGIC_V2_ADDR_TYPE_DIST;
-+		break;
-+	}
-+
- 	err = ioctl(kvm->vm_fd, KVM_CREATE_DEVICE, &gic_device);
- 	if (err)
- 		return err;
- 
- 	gic_fd = gic_device.fd;
- 
--	err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &cpu_if_attr);
-+	switch (type) {
-+	case IRQCHIP_GICV2:
-+		err = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &cpu_if_attr);
-+		break;
-+	}
- 	if (err)
- 		goto out_err;
- 
-@@ -80,13 +90,20 @@ static int gic__create_irqchip(struct kvm *kvm)
- 	return err;
- }
- 
--int gic__create(struct kvm *kvm)
-+int gic__create(struct kvm *kvm, enum irqchip_type type)
- {
- 	int err;
- 
-+	switch (type) {
-+	case IRQCHIP_GICV2:
-+		break;
-+	default:
-+		return -ENODEV;
-+	}
-+
- 	/* Try the new way first, and fallback on legacy method otherwise */
--	err = gic__create_device(kvm);
--	if (err)
-+	err = gic__create_device(kvm, type);
-+	if (err && type == IRQCHIP_GICV2)
- 		err = gic__create_irqchip(kvm);
- 
- 	return err;
-@@ -134,15 +151,24 @@ static int gic__init_gic(struct kvm *kvm)
- }
- late_init(gic__init_gic)
- 
--void gic__generate_fdt_nodes(void *fdt, u32 phandle)
-+void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type)
- {
-+	const char *compatible;
- 	u64 reg_prop[] = {
- 		cpu_to_fdt64(ARM_GIC_DIST_BASE), cpu_to_fdt64(ARM_GIC_DIST_SIZE),
- 		cpu_to_fdt64(ARM_GIC_CPUI_BASE), cpu_to_fdt64(ARM_GIC_CPUI_SIZE),
- 	};
- 
-+	switch (type) {
-+	case IRQCHIP_GICV2:
-+		compatible = "arm,cortex-a15-gic";
-+		break;
-+	default:
-+		return;
-+	}
-+
- 	_FDT(fdt_begin_node(fdt, "intc"));
--	_FDT(fdt_property_string(fdt, "compatible", "arm,cortex-a15-gic"));
-+	_FDT(fdt_property_string(fdt, "compatible", compatible));
- 	_FDT(fdt_property_cell(fdt, "#interrupt-cells", GIC_FDT_IRQ_NUM_CELLS));
- 	_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
- 	_FDT(fdt_property(fdt, "reg", reg_prop, sizeof(reg_prop)));
-diff --git a/arm/include/arm-common/gic.h b/arm/include/arm-common/gic.h
-index 44859f7..d524f55 100644
---- a/arm/include/arm-common/gic.h
-+++ b/arm/include/arm-common/gic.h
-@@ -21,10 +21,14 @@
- #define GIC_MAX_CPUS			8
- #define GIC_MAX_IRQ			255
- 
-+enum irqchip_type {
-+	IRQCHIP_GICV2,
-+};
-+
- struct kvm;
- 
- int gic__alloc_irqnum(void);
--int gic__create(struct kvm *kvm);
--void gic__generate_fdt_nodes(void *fdt, u32 phandle);
-+int gic__create(struct kvm *kvm, enum irqchip_type type);
-+void gic__generate_fdt_nodes(void *fdt, u32 phandle, enum irqchip_type type);
- 
- #endif /* ARM_COMMON__GIC_H */
-diff --git a/arm/kvm.c b/arm/kvm.c
-index bcd2533..f9685c2 100644
---- a/arm/kvm.c
-+++ b/arm/kvm.c
-@@ -82,6 +82,6 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
- 		MADV_MERGEABLE | MADV_HUGEPAGE);
- 
- 	/* Create the virtual GIC. */
--	if (gic__create(kvm))
-+	if (gic__create(kvm, IRQCHIP_GICV2))
- 		die("Failed to create virtual GIC");
- }
--- 
-2.3.5
-
+Thanks,
+-Christoffer
