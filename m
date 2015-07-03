@@ -1,37 +1,26 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] arm64/kvm: Add generic v8 KVM target
-Date: Fri, 03 Jul 2015 09:28:23 +0100
-Message-ID: <559647A7.7010309@arm.com>
-References: <1434531646-4873-1-git-send-email-suzuki.poulose@arm.com>
- <CAFEAcA92uymQ3LjPQnuFiwvjSgc+jY54VrfK_Sh4v1DJ+=OPpw@mail.gmail.com>
- <558A6A84.5020603@arm.com> <20150624085128.GA22785@cbox>
- <558A7936.7020109@arm.com> <20150625123034.GE28244@cbox>
- <558BF6C9.3000009@arm.com> <558C05A9.8080201@arm.com>
- <CAFEAcA_ULz=ugQW=NmthzqYRtvcfwteQTh0DonHRN6U5NykEtQ@mail.gmail.com>
- <20150626095318.GG28244@cbox>
- <F37C68A5-E48F-462C-AD18-0F3C096348C7@caviumnetworks.com>
- <559180CA.3050905@arm.com>
- <CAFEAcA-E+KdiL4suQ0DoEvB-zGpNZ7-dq46FegC_iXYRPvo9jA@mail.gmail.com>
- <559185D4.7060308@arm.com>
- <85D36B67-643B-407F-944F-D18D54FF9909@caviumnetworks.com>
- <D805D093-CCFE-4835-853A-B2654DAA10A1@caviumnetworks.com>
- <559642EE.1050605@arm.com>
- <CAFEAcA8nt7yr0K4QesJjWqEwBgziWOt2DViY70E=z2wjt=X7XA@mail.gmail.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH 1/7] KVM: api: add kvm_irq_routing_extended_msi
+Date: Fri, 3 Jul 2015 10:05:02 +0100
+Message-ID: <5596503E.6040902@arm.com>
+References: <1435592237-17924-1-git-send-email-eric.auger@linaro.org>
+ <1435592237-17924-2-git-send-email-eric.auger@linaro.org>
+ <011f01d0b498$6a17aeb0$3e470c10$@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AD3D578BA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2015 04:17:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B506F578C5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2015 04:53:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id L4Ctju3Tqkbt for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Jul 2015 04:17:08 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 208C6578AE
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2015 04:17:07 -0400 (EDT)
-In-Reply-To: <CAFEAcA8nt7yr0K4QesJjWqEwBgziWOt2DViY70E=z2wjt=X7XA@mail.gmail.com>
+ with ESMTP id z+peDrBAf86W for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 Jul 2015 04:53:48 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 77781578BE
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2015 04:53:47 -0400 (EDT)
+In-Reply-To: <011f01d0b498$6a17aeb0$3e470c10$@samsung.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -41,43 +30,123 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: kvm-devel <kvm@vger.kernel.org>, "timur@codeaurora.org" <timur@codeaurora.org>, "Chalamarla,
- Tirumalesh" <Tirumalesh.Chalamarla@caviumnetworks.com>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "vgandhi@codeaurora.org" <vgandhi@codeaurora.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Pavel Fedin <p.fedin@samsung.com>, 'Eric Auger' <eric.auger@linaro.org>, "eric.auger@st.com" <eric.auger@st.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/07/15 09:12, Peter Maydell wrote:
-> On 3 July 2015 at 09:08, Marc Zyngier <marc.zyngier@arm.com> wrote:
->> On 02/07/15 21:29, Chalamarla, Tirumalesh wrote:
->>> is there a chance that this get merged in to 4.2? if not is it possible
->>> to accept the other patches like adding implementations explicitly(like
->>> Thunder).
->>
->> We first need to reach a conclusion on this. Until then, I don't plan to
->> get anything in. As for 4.2, it feels way too late (the merge window is
->> almost closed now).
+Hi Pavel,
+
+On 02/07/15 08:26, Pavel Fedin wrote:
+>  Hello!
 > 
-> I would still like to see the proponents of this patch say
-> what their model is for userspace support of cross-host migration,
-> if we're abandoning the model the current API envisages.
+>> -----Original Message-----
+>> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Behalf Of Eric Auger
+>> Sent: Monday, June 29, 2015 6:37 PM
+>> To: eric.auger@st.com; eric.auger@linaro.org; linux-arm-kernel@lists.infradead.org;
+>> marc.zyngier@arm.com; christoffer.dall@linaro.org; andre.przywara@arm.com;
+>> kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org
+>> Cc: linux-kernel@vger.kernel.org; patches@linaro.org; p.fedin@samsung.com; pbonzini@redhat.com
+>> Subject: [PATCH 1/7] KVM: api: add kvm_irq_routing_extended_msi
+>>
+>> On ARM, the MSI msg (address and data) comes along with
+>> out-of-band device ID information. The device ID encodes the device
+>> that composes the MSI msg. Let's create a new routing entry type,
+>> dubbed KVM_IRQ_ROUTING_EXTENDED_MSI and use the __u32 pad space
+>> to convey the device ID.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+>>
+>> ---
+>>
+>> RFC -> PATCH
+>> - remove kvm_irq_routing_extended_msi and use union instead
+>> ---
+>>  Documentation/virtual/kvm/api.txt | 9 ++++++++-
+>>  include/uapi/linux/kvm.h          | 6 +++++-
+>>  2 files changed, 13 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+>> index d20fd94..6426ae9 100644
+>> --- a/Documentation/virtual/kvm/api.txt
+>> +++ b/Documentation/virtual/kvm/api.txt
+>> @@ -1414,7 +1414,10 @@ struct kvm_irq_routing_entry {
+>>  	__u32 gsi;
+>>  	__u32 type;
+>>  	__u32 flags;
+>> -	__u32 pad;
+>> +	union {
+>> +		__u32 pad;
+>> +		__u32 devid;
+>> +	};
+>>  	union {
+>>  		struct kvm_irq_routing_irqchip irqchip;
+>>  		struct kvm_irq_routing_msi msi;
+> 
+>  devid is actually a part of MSI bunch. Shouldn't it be a part of struct kvm_irq_routing_msi then?
+> It also has reserved pad.
+> 
+>> @@ -1427,6 +1430,10 @@ struct kvm_irq_routing_entry {
+>>  #define KVM_IRQ_ROUTING_IRQCHIP 1
+>>  #define KVM_IRQ_ROUTING_MSI 2
+>>  #define KVM_IRQ_ROUTING_S390_ADAPTER 3
+>> +#define KVM_IRQ_ROUTING_EXTENDED_MSI 4
+>> +
+>> +In case of KVM_IRQ_ROUTING_EXTENDED_MSI routing type, devid is used to convey
+>> +the device ID.
+>>
+>>  No flags are specified so far, the corresponding field must be set to zero.
+> 
+> What if we use KVM_MSI_VALID_DEVID flag instead of new KVM_IRQ_ROUTING_EXTENDED_MSI definition? I
+> believe this would make an API more consistent and introduce less new definitions.
 
-I thought we had discussed this above, and don't really see this as a
-departure from the current model:
+I like this approach, but it runs into problems:
+As you read above the current documentation says that the flags field
+must be zero and the current KVM_SET_GSI_ROUTING handler bails out if it
+isn't. So userland would need to know whether it's safe to set that
+field. Introducing a new KVM_CAP_... value seems overkill if we could
+just have a new routing entry type. So we could still reuse the existing
+struct kvm_irq_routing_msi (and extend that with the devid field), but
+we would have to add a new routing type number.
+Maybe we could collapse this into the existing MSI type + flag when
+handing it further down the kernel?
 
-- "-cpu host" results in "GENERIC" being used: VM can only be migrated
-to the exact same HW (no cross-host migration). MIDR should probably
-become RO.
-- "-cpu host" results in "A57" (for example): VM can be migrated to a
-variety of A57 platforms, and allow for some fuzzing on the revision (or
-accept any revision).
-- "-cpu a57" forces an A57 model to be emulated, always. It is always
-possible to migrate such a VM on any host.
+Cheers,
+Andre.
 
-I think only the first point is new, but the last two are what we have
-(or what we should have).
-
-Does it answer your concerns, or did you have something else in mind?
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> 
+>>
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index 2a23705..8484681 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -841,12 +841,16 @@ struct kvm_irq_routing_s390_adapter {
+>>  #define KVM_IRQ_ROUTING_IRQCHIP 1
+>>  #define KVM_IRQ_ROUTING_MSI 2
+>>  #define KVM_IRQ_ROUTING_S390_ADAPTER 3
+>> +#define KVM_IRQ_ROUTING_EXTENDED_MSI 4
+>>
+>>  struct kvm_irq_routing_entry {
+>>  	__u32 gsi;
+>>  	__u32 type;
+>>  	__u32 flags;
+>> -	__u32 pad;
+>> +	union {
+>> +		__u32 pad;
+>> +		__u32 devid;
+>> +	};
+>>  	union {
+>>  		struct kvm_irq_routing_irqchip irqchip;
+>>  		struct kvm_irq_routing_msi msi;
+>> --
+>> 1.9.1
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe kvm" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> Kind regards,
+> Pavel Fedin
+> Expert Engineer
+> Samsung Electronics Research center Russia
+> 
