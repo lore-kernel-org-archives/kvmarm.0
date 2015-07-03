@@ -1,28 +1,29 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH 7/7] KVM: arm: implement kvm_set_msi by gsi direct mapping
-Date: Fri, 03 Jul 2015 07:34:07 +0200
-Message-ID: <55961ECF.4090208@linaro.org>
-References: <1435592237-17924-1-git-send-email-eric.auger@linaro.org>
- <1435592237-17924-8-git-send-email-eric.auger@linaro.org>
- <5595706C.9010108@arm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC 12/17] irq: bypass: Extend skeleton for ARM forwarding
+ control
+Date: Fri, 3 Jul 2015 08:52:10 +0200
+Message-ID: <5596311A.3010703@redhat.com>
+References: <1435843047-6327-1-git-send-email-eric.auger@linaro.org>
+ <1435843047-6327-13-git-send-email-eric.auger@linaro.org>
+ <E959C4978C3B6342920538CF579893F0025E6C89@SHSMSX104.ccr.corp.intel.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 22AC657817
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2015 01:23:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 34CDD576EC
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2015 02:40:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9FRXqnpJmHfr for <kvmarm@lists.cs.columbia.edu>;
- Fri,  3 Jul 2015 01:23:07 -0400 (EDT)
-Received: from mail-wi0-f173.google.com (mail-wi0-f173.google.com
- [209.85.212.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E9B557816
- for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2015 01:23:06 -0400 (EDT)
-Received: by wicgi11 with SMTP id gi11so90545296wic.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Jul 2015 22:34:25 -0700 (PDT)
-In-Reply-To: <5595706C.9010108@arm.com>
+ with ESMTP id 6Z5JBZVh8CoM for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  3 Jul 2015 02:40:57 -0400 (EDT)
+Received: from mail-wi0-f177.google.com (mail-wi0-f177.google.com
+ [209.85.212.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2A93B576EA
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  3 Jul 2015 02:40:56 -0400 (EDT)
+Received: by widjy10 with SMTP id jy10so101971435wid.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 02 Jul 2015 23:52:14 -0700 (PDT)
+In-Reply-To: <E959C4978C3B6342920538CF579893F0025E6C89@SHSMSX104.ccr.corp.intel.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,71 +33,30 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, "eric.auger@st.com" <eric.auger@st.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "p.fedin@samsung.com" <p.fedin@samsung.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: "Wu, Feng" <feng.wu@intel.com>, Eric Auger <eric.auger@linaro.org>, "eric.auger@st.com" <eric.auger@st.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "avi.kivity@gmail.com" <avi.kivity@gmail.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "joro@8bytes.org" <joro@8bytes.org>, "b.reynal@virtualopensystems.com" <b.reynal@virtualopensystems.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "patches@linaro.org" <patches@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
-On 07/02/2015 07:10 PM, Andre Przywara wrote:
-> Hi Eric,
-> 
-> On 29/06/15 16:37, Eric Auger wrote:
->> If the ITS modality is not available, let's simply support MSI
->> injection by transforming the MSI.data into an SPI ID.
->>
->> This becomes possible to use KVM_SIGNAL_MSI ioctl for arm too.
->>
->> Signed-off-by: Eric Auger <eric.auger@linaro.org>
->> ---
->>  arch/arm/kvm/Kconfig | 1 +
->>  virt/kvm/arm/vgic.c  | 5 +++++
->>  2 files changed, 6 insertions(+)
->>
->> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
->> index 151e710..0f58baf 100644
->> --- a/arch/arm/kvm/Kconfig
->> +++ b/arch/arm/kvm/Kconfig
->> @@ -31,6 +31,7 @@ config KVM
->>  	select KVM_VFIO
->>  	select HAVE_KVM_EVENTFD
->>  	select HAVE_KVM_IRQFD
->> +	select HAVE_KVM_MSI
->>  	select HAVE_KVM_IRQCHIP
->>  	select HAVE_KVM_IRQ_ROUTING
->>  	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
->> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
->> index 0b4c48c..b3c10dc 100644
->> --- a/virt/kvm/arm/vgic.c
->> +++ b/virt/kvm/arm/vgic.c
->> @@ -2314,6 +2314,11 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
->>  			return kvm->arch.vgic.vm_ops.inject_msi(kvm, &msi);
->>  		else
->>  			return -ENODEV;
->> +	case KVM_IRQ_ROUTING_MSI:
->> +		if (kvm->arch.vgic.vm_ops.inject_msi)
->> +			return -EINVAL;
->> +		else
->> +			return kvm_vgic_inject_irq(kvm, 0, e->msi.data, level);
-> 
-> If you add:
-> 
-> static int vgic_v2m_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
-> {
-> 	return kvm_vgic_inject_irq(kvm, 0, msi->data, 1);
-> }
-> 
-> to vgic-v2-emul.c and wire it up accordingly, you can simplify the above
-> kvm_set_msi, getting rid of all those extra case handling.
-> This also helps merging KVM_IRQ_ROUTING_MSI and the extended case.
-> 
-> I have hacked this up and it seems to work for me.
 
-OK thanks I will respin either today or on monday.
 
-Best Regards
+On 03/07/2015 04:43, Wu, Feng wrote:
+> 
+> struct irq_bypass_consumer {
+>        struct list_head node;
+>        void *token;
+> +      unsigned irq;	/*got from producer when registered*/
+>        void (*add_producer)(struct irq_bypass_producer *,
+>                             struct irq_bypass_consumer *);
+>        void (*del_producer)(struct irq_bypass_producer *,
+>                             struct irq_bypass_consumer *);
+> +      void (*update)(struct irq_bypass_consumer *);
+> };
+> 
+> 'update' is used to update the IRTE, while irq is initialized when
+> registered, which is used to find the right IRTE.
 
-Eric
-> 
-> Cheers,
-> Andre.
-> 
+Feel free to add "update" in your PI patches.  I am not sure if "irq"
+belongs here or in the containing struct.  You can play with both and
+submit the version that looks better to you.
+
+Paolo
