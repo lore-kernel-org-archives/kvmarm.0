@@ -1,154 +1,106 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v7 08/11] KVM: arm64: introduce vcpu->arch.debug_ptr
-Date: Fri, 3 Jul 2015 23:46:47 +0200
-Message-ID: <20150703214647.GD10878@cbox>
-References: <1435775343-20034-1-git-send-email-alex.bennee@linaro.org>
- <1435775343-20034-9-git-send-email-alex.bennee@linaro.org>
- <20150702183440.GK11332@cbox>
- <87mvzdsoer.fsf@linaro.org>
+Subject: Re: [PATCH 1/3] arm: KVM: define headers and offsets to mange VFP
+ state
+Date: Sun, 5 Jul 2015 21:27:59 +0200
+Message-ID: <20150705192759.GA3869@cbox>
+References: <1435203028-23142-1-git-send-email-m.smarduch@samsung.com>
+ <1435203028-23142-2-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C1F157A12
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2015 15:16:37 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 27WKBAFCkfH5 for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  5 Jul 2015 15:16:36 -0400 (EDT)
+Received: from mail-la0-f53.google.com (mail-la0-f53.google.com
+ [209.85.215.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C1B0A57A11
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2015 15:16:35 -0400 (EDT)
+Received: by lagc2 with SMTP id c2so132051854lag.3
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 05 Jul 2015 12:28:00 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <87mvzdsoer.fsf@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org, jan.kiszka@siemens.com, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de, Gleb Natapov <gleb@kernel.org>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Richard Weinberger <richard@nod.at>, Andre Przywara <andre.przywara@arm.com>, open list <linux-kernel@vger.kernel.org>
+In-Reply-To: <1435203028-23142-2-git-send-email-m.smarduch@samsung.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Mario Smarduch <m.smarduch@samsung.com>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jul 03, 2015 at 08:14:52AM +0100, Alex Benn=E9e wrote:
->=20
-> Christoffer Dall <christoffer.dall@linaro.org> writes:
->=20
-> > On Wed, Jul 01, 2015 at 07:29:00PM +0100, Alex Benn=E9e wrote:
-> >> This introduces a level of indirection for the debug registers. In=
-stead
-> >> of using the sys_regs[] directly we store registers in a structure=
- in
-> >> the vcpu. The new kvm_arm_reset_debug_ptr() sets the debug ptr to =
-the
-> >> guest context.
-> >>=20
-> >> This also entails updating the sys_regs code to access this new
-> >> structure. New access function have been added for each set of deb=
-ug
-> >> registers. The generic functions are still used for the few regist=
-ers
-> >> stored in the main context.
-> >>=20
-> >> New access function pointers have been added to the sys_reg_desc
-> >> structure to support the GET/SET_ONE_REG ioctl operations.
-> >
-> > Why is this needed?
->=20
-> Previously I had a hacky:
->=20
-> 	if (r->access =3D=3D trap_debug64)
-> 		return debug_get64(vcpu, r, reg, uaddr);
->=20
-> Which used the same offset information. Now we have a cleaner:
->=20
-> 	if (r->set)
-> 		return (r->set)(vcpu, r, reg, uaddr);
->=20
-> Which accesses the structure directly, as the trap functions do:
->=20
-> 	__u64 *r =3D &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
-> 	if (copy_from_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-> 		return -EFAULT;
-> 	return 0;
+On Wed, Jun 24, 2015 at 08:30:26PM -0700, Mario Smarduch wrote:
+> Define the required kvm_vcpu_arch fields, and offsets to manage VFP state. And
+> declary Hyp interface function to switch VFP registers.
+> 
+> 
+> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+> ---
+>  arch/arm/include/asm/kvm_asm.h  |    1 +
+>  arch/arm/include/asm/kvm_host.h |    3 +++
+>  arch/arm/kernel/asm-offsets.c   |    1 +
+>  3 files changed, 5 insertions(+)
+> 
+> diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+> index 25410b2..08dda8c 100644
+> --- a/arch/arm/include/asm/kvm_asm.h
+> +++ b/arch/arm/include/asm/kvm_asm.h
+> @@ -97,6 +97,7 @@ extern char __kvm_hyp_code_end[];
+>  extern void __kvm_flush_vm_context(void);
+>  extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
+>  extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
+> +extern void __kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu);
+>  
+>  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>  #endif
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index d71607c..22cea72 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -111,6 +111,9 @@ struct kvm_vcpu_arch {
+>  	/* Interrupt related fields */
+>  	u32 irq_lines;		/* IRQ and FIQ levels */
+>  
+> +	/* Track if VFP registers are occupied by Guest while in KVM host mode*/
 
-I get it now, had to take another look at sys_regs.c.
+why capitalize guest?
 
-I think this commit message needs a littel tweaking saying "Because we
-no longer give the sys_regs offset for the sys_reg_desc->reg field, but
-instead the index into a debug-specific struct, the generic user-space
-access code no longer works, and we are therefore forced to add specifi=
-c
-user_set/get functions for these registers."
+missing space at the end of the line.
 
-At least it was hard for me to understand the rationale without this,
-and I think it would be good to have for someone doing git blame later.
+I don't really understand what the semantics of this field is by just
+lookint at this patch.  I would probably define a u32 flags field in
+stead and define a patch akin to what we do for the debug registers and
+call it 'vfp_dirty', and in a comment for the flag offset define say
+something like:
 
->=20
-> <snip>
-> >> +#if 0
-> >> +static int debug_set64(struct kvm_vcpu *vcpu, const struct sys_re=
-g_desc *rd,
-> >> +		const struct kvm_one_reg *reg, void __user *uaddr)
-> >> +{
-> >> +	__u64 *r =3D (__u64 *) ((void * )&vcpu->arch.vcpu_debug_state + =
-rd->reg);
-> >> +	if (copy_from_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-> >> +		return -EFAULT;
-> >> +	return 0;
-> >> +}
-> >> +
-> >> +static int debug_get64(struct kvm_vcpu *vcpu, const struct sys_re=
-g_desc *rd,
-> >> +	const struct kvm_one_reg *reg, void __user *uaddr)
-> >> +{
-> >> +	__u64 *r =3D (__u64 *) ((void * )&vcpu->arch.vcpu_debug_state + =
-rd->reg);
-> >> +	if (copy_to_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-> >> +		return -EFAULT;
-> >> +	return 0;
-> >> +}
-> >> +#endif
-> >> +
-> >
-> > what is this ifdef'ed block of code doing here?
->=20
-> Oops. Yeah looks like I missed removing that after I finished the
-> re-factor. These where the old get/set functions I used.
->=20
-> >
-> >>  int kvm_arm_sys_reg_get_reg(struct kvm_vcpu *vcpu, const struct k=
-vm_one_reg *reg)
-> >>  {
-> >>  	const struct sys_reg_desc *r;
-> >> @@ -1303,6 +1530,9 @@ int kvm_arm_sys_reg_get_reg(struct kvm_vcpu =
-*vcpu, const struct kvm_one_reg *reg
-> >>  	if (!r)
-> >>  		return get_invariant_sys_reg(reg->id, uaddr);
-> >> =20
-> >> +	if (r->get)
-> >> +		return (r->get)(vcpu, r, reg, uaddr);
-> >> +
-> >>  	return reg_to_user(uaddr, &vcpu_sys_reg(vcpu, r->reg), reg->id);
-> >>  }
-> >> =20
-> >> @@ -1321,6 +1551,9 @@ int kvm_arm_sys_reg_set_reg(struct kvm_vcpu =
-*vcpu, const struct kvm_one_reg *reg
-> >>  	if (!r)
-> >>  		return set_invariant_sys_reg(reg->id, uaddr);
-> >> =20
-> >> +	if (r->set)
-> >> +		return (r->set)(vcpu, r, reg, uaddr);
-> >> +
-> >>  	return reg_from_user(&vcpu_sys_reg(vcpu, r->reg), uaddr, reg->id=
-);
-> >>  }
-> >> =20
-> >> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> >> index d411e25..9265e7d 100644
-> >> --- a/arch/arm64/kvm/sys_regs.h
-> >> +++ b/arch/arm64/kvm/sys_regs.h
-> >> @@ -55,6 +55,12 @@ struct sys_reg_desc {
-> >> =20
-> >>  	/* Value (usually reset value) */
-> >>  	u64 val;
-> >> +
-> >> +	/* Get/Set functions, fallback if NULL */
-> >
-> > Is this only meant for usersapce access or when should one use thes=
-e?
->=20
-> Yes for GET/SET
->=20
-ok, see other mail for potential rename to get_user / set_user if you
-like the idea.
+The vfp_dirty flag must be set if the host VFP register state is
+modified.
 
-Thanks,
--Christoffer
+> +	u32 vfp_guest_saved;
+> +
+>  	/* Exception Information */
+>  	struct kvm_vcpu_fault_info fault;
+>  
+> diff --git a/arch/arm/kernel/asm-offsets.c b/arch/arm/kernel/asm-offsets.c
+> index 871b826..35093d0 100644
+> --- a/arch/arm/kernel/asm-offsets.c
+> +++ b/arch/arm/kernel/asm-offsets.c
+> @@ -191,6 +191,7 @@ int main(void)
+>    DEFINE(VCPU_HPFAR,		offsetof(struct kvm_vcpu, arch.fault.hpfar));
+>    DEFINE(VCPU_HYP_PC,		offsetof(struct kvm_vcpu, arch.fault.hyp_pc));
+>    DEFINE(VCPU_VGIC_CPU,		offsetof(struct kvm_vcpu, arch.vgic_cpu));
+> +  DEFINE(VCPU_VFP_SAVED,	offsetof(struct kvm_vcpu, arch.vfp_guest_saved));
+>    DEFINE(VGIC_V2_CPU_HCR,	offsetof(struct vgic_cpu, vgic_v2.vgic_hcr));
+>    DEFINE(VGIC_V2_CPU_VMCR,	offsetof(struct vgic_cpu, vgic_v2.vgic_vmcr));
+>    DEFINE(VGIC_V2_CPU_MISR,	offsetof(struct vgic_cpu, vgic_v2.vgic_misr));
+> -- 
+> 1.7.9.5
+> 
