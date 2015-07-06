@@ -1,37 +1,115 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC v2 3/6] irq: bypass: Extend skeleton for ARM forwarding
- control
-Date: Mon, 6 Jul 2015 19:41:25 +0200
-Message-ID: <559ABDC5.3060200@redhat.com>
-References: <1436184692-20927-1-git-send-email-eric.auger@linaro.org>
- <1436184692-20927-4-git-send-email-eric.auger@linaro.org>
- <559A7425.4050506@redhat.com> <559AA02A.6060703@linaro.org>
- <559AA552.3010400@redhat.com> <559AB62C.9000503@linaro.org>
+From: Mario Smarduch <m.smarduch@samsung.com>
+Subject: Re: [PATCH 1/3] arm: KVM: define headers and offsets to mange VFP
+ state
+Date: Mon, 06 Jul 2015 10:50:26 -0700
+Message-ID: <559ABFE2.5090303@samsung.com>
+References: <1435203028-23142-1-git-send-email-m.smarduch@samsung.com>
+ <1435203028-23142-2-git-send-email-m.smarduch@samsung.com>
+ <20150705192759.GA3869@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <559AB62C.9000503@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@linaro.org>, eric.auger@st.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.williamson@redhat.com, avi.kivity@gmail.com, mtosatti@redhat.com, feng.wu@intel.com, joro@8bytes.org, b.reynal@virtualopensystems.com
-Cc: linux-kernel@vger.kernel.org, patches@linaro.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D518F57D02
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 13:39:07 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id XZn9Lb6-bKtq for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Jul 2015 13:39:05 -0400 (EDT)
+Received: from usmailout2.samsung.com (mailout2.w2.samsung.com
+ [211.189.100.12])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DD43457CF8
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 13:39:05 -0400 (EDT)
+Received: from uscpsbgex2.samsung.com
+ (u123.gpu85.samsung.co.kr [203.254.195.123]) by mailout2.w2.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NR200A6VUW95L50@mailout2.w2.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Mon, 06 Jul 2015 13:50:33 -0400 (EDT)
+In-reply-to: <20150705192759.GA3869@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 07/05/2015 12:27 PM, Christoffer Dall wrote:
+> On Wed, Jun 24, 2015 at 08:30:26PM -0700, Mario Smarduch wrote:
+>> Define the required kvm_vcpu_arch fields, and offsets to manage VFP state. And
+>> declary Hyp interface function to switch VFP registers.
+>>
+>>
+>> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+>> ---
+>>  arch/arm/include/asm/kvm_asm.h  |    1 +
+>>  arch/arm/include/asm/kvm_host.h |    3 +++
+>>  arch/arm/kernel/asm-offsets.c   |    1 +
+>>  3 files changed, 5 insertions(+)
+>>
+>> diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+>> index 25410b2..08dda8c 100644
+>> --- a/arch/arm/include/asm/kvm_asm.h
+>> +++ b/arch/arm/include/asm/kvm_asm.h
+>> @@ -97,6 +97,7 @@ extern char __kvm_hyp_code_end[];
+>>  extern void __kvm_flush_vm_context(void);
+>>  extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
+>>  extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
+>> +extern void __kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu);
+>>  
+>>  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>>  #endif
+>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+>> index d71607c..22cea72 100644
+>> --- a/arch/arm/include/asm/kvm_host.h
+>> +++ b/arch/arm/include/asm/kvm_host.h
+>> @@ -111,6 +111,9 @@ struct kvm_vcpu_arch {
+>>  	/* Interrupt related fields */
+>>  	u32 irq_lines;		/* IRQ and FIQ levels */
+>>  
+>> +	/* Track if VFP registers are occupied by Guest while in KVM host mode*/
+> 
+> why capitalize guest?
+I guess just highlight we're holding guest state outside of hyp mode
+no issues can change.
 
+> 
+> missing space at the end of the line.
+> 
+> I don't really understand what the semantics of this field is by just
+> lookint at this patch.  I would probably define a u32 flags field in
+> stead and define a patch akin to what we do for the debug registers and
+> call it 'vfp_dirty', and in a comment for the flag offset define say
+> something like:
+> 
+> The vfp_dirty flag must be set if the host VFP register state is
+> modified.
 
-On 06/07/2015 19:09, Eric Auger wrote:
->> > The good thing is that this helps a bit forming a lock hierarchy across
->> > the subsystems, for example irq bypass mutex outside vfio_platform_irq
->> > spinlock, because you cannot have a spinlock inside the mutex.  I think
->> > that all of your six callbacks are fine.
-> arghh, no that's wrong then. I have plenty of them in the KVM/arm vgic
-> part :-(
-
-I checked and it's right...
-
-/me rereads
-
-AAAARGH.  You cannot have a mutex inside a spinlock.  What you're doing
-is fine.
-
-Paolo
+Yes agree, this was put together quickly to get comments.
+> 
+>> +	u32 vfp_guest_saved;
+>> +
+>>  	/* Exception Information */
+>>  	struct kvm_vcpu_fault_info fault;
+>>  
+>> diff --git a/arch/arm/kernel/asm-offsets.c b/arch/arm/kernel/asm-offsets.c
+>> index 871b826..35093d0 100644
+>> --- a/arch/arm/kernel/asm-offsets.c
+>> +++ b/arch/arm/kernel/asm-offsets.c
+>> @@ -191,6 +191,7 @@ int main(void)
+>>    DEFINE(VCPU_HPFAR,		offsetof(struct kvm_vcpu, arch.fault.hpfar));
+>>    DEFINE(VCPU_HYP_PC,		offsetof(struct kvm_vcpu, arch.fault.hyp_pc));
+>>    DEFINE(VCPU_VGIC_CPU,		offsetof(struct kvm_vcpu, arch.vgic_cpu));
+>> +  DEFINE(VCPU_VFP_SAVED,	offsetof(struct kvm_vcpu, arch.vfp_guest_saved));
+>>    DEFINE(VGIC_V2_CPU_HCR,	offsetof(struct vgic_cpu, vgic_v2.vgic_hcr));
+>>    DEFINE(VGIC_V2_CPU_VMCR,	offsetof(struct vgic_cpu, vgic_v2.vgic_vmcr));
+>>    DEFINE(VGIC_V2_CPU_MISR,	offsetof(struct vgic_cpu, vgic_v2.vgic_misr));
+>> -- 
+>> 1.7.9.5
+>>
