@@ -1,48 +1,66 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC v2 3/6] irq: bypass: Extend skeleton for ARM forwarding
- control
-Date: Mon, 6 Jul 2015 17:57:06 +0200
-Message-ID: <559AA552.3010400@redhat.com>
-References: <1436184692-20927-1-git-send-email-eric.auger@linaro.org>
- <1436184692-20927-4-git-send-email-eric.auger@linaro.org>
- <559A7425.4050506@redhat.com> <559AA02A.6060703@linaro.org>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH 1/7] KVM: api: add kvm_irq_routing_extended_msi
+Date: Mon, 6 Jul 2015 17:08:26 +0100
+Message-ID: <559AA7FA.5010804@arm.com>
+References: <1435592237-17924-1-git-send-email-eric.auger@linaro.org>
+ <1435592237-17924-2-git-send-email-eric.auger@linaro.org>
+ <011f01d0b498$6a17aeb0$3e470c10$@samsung.com> <5596503E.6040902@arm.com>
+ <00fd01d0b7b6$f6cf3550$e46d9ff0$@samsung.com> <559A3C9C.6050302@arm.com>
+ <20150706093026.GA11590@cbox> <559A52E6.5050402@arm.com>
+ <20150706103755.GC11590@cbox> <559A6164.1000401@redhat.com>
+ <559A6527.1040107@arm.com> <559A6BBC.2040901@redhat.com>
+ <024301d0b7f0$2b13b410$813b1c30$@samsung.com> <559AA0D6.7070703@arm.com>
+ <559AA4CF.7060300@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <559AA02A.6060703@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@linaro.org>, eric.auger@st.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.williamson@redhat.com, avi.kivity@gmail.com, mtosatti@redhat.com, feng.wu@intel.com, joro@8bytes.org, b.reynal@virtualopensystems.com
-Cc: linux-kernel@vger.kernel.org, patches@linaro.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2306857CDA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 11:57:02 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id kedTzXQ7AiA5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Jul 2015 11:57:00 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D00AA57CD9
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 11:56:58 -0400 (EDT)
+In-Reply-To: <559AA4CF.7060300@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Paolo Bonzini <pbonzini@redhat.com>, Pavel Fedin <p.fedin@samsung.com>, 'Christoffer Dall' <christoffer.dall@linaro.org>
+Cc: "eric.auger@st.com" <eric.auger@st.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 06/07/15 16:54, Paolo Bonzini wrote:
+> 
+> 
+> On 06/07/2015 17:37, Andre Przywara wrote:
+>> Wouldn't:
+>>     if (kvm_vm_check_extension(s, KVM_CAP_MSI_DEVID)) {
+>>         kroute.flags = KVM_MSI_VALID_DEVID;
+>>         kroute.u.msi.devid = (pci_bus_num(dev->bus) << 8) | dev->devfn;
+>>     }
+>>
+>> be saner (without a global variable)?
+>> That would make the interface more consistent, with a new flag being
+>> protected by a new capability.
+> 
+> I agree that your version is niceer, but you still need to cache the
+> kvm_vm_check_extension result... in a global variable. :)
 
+I used a static variable in a wrapper function in kvmtool ;-)
+TBH my argument wasn't so much about global variables (just saw that
+QEMU seems to use them already), but more about a consistent and
+architecture agnostic interface.
 
-On 06/07/2015 17:35, Eric Auger wrote:
->>> diff --git a/kernel/irq/bypass.c b/kernel/irq/bypass.c
->>> >> index 5d0f92b..efadbe5 100644
->>> >> --- a/kernel/irq/bypass.c
->>> >> +++ b/kernel/irq/bypass.c
->>> >> @@ -19,6 +19,42 @@ static LIST_HEAD(producers);
->>> >>  static LIST_HEAD(consumers);
->>> >>  static DEFINE_MUTEX(lock);
->>> >>  
->>> >> +/* lock must be hold when calling connect */
->> > 
->> > If a lock must be held while callbacks are called, you have to document
->> > that producers and consumers must _not_ call back into the IRQ bypass
->> > manager.  (If they have to, you have to document explicitly "This
->> > function can be called from producer and consumer callbacks" whenever
->> > relevant).
-> OK Thanks
-
-Also, please document on functions that take the irq bypass mutex that
-they can sleep.  In fact irq_bypass_{,un}register_{producer,consumer}
-need kerneldoc comments.
-
-The good thing is that this helps a bit forming a lock hierarchy across
-the subsystems, for example irq bypass mutex outside vfio_platform_irq
-spinlock, because you cannot have a spinlock inside the mutex.  I think
-that all of your six callbacks are fine.
-
-Paolo
+Ciao!
+Andre.
