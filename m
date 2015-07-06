@@ -1,116 +1,70 @@
-From: "Wu, Feng" <feng.wu@intel.com>
-Subject: RE: [RFC 16/17] KVM: eventfd: add irq bypass consumer management
-Date: Mon, 6 Jul 2015 07:55:35 +0000
-Message-ID: <E959C4978C3B6342920538CF579893F0025EB7C5@SHSMSX104.ccr.corp.intel.com>
-References: <1435843047-6327-1-git-send-email-eric.auger@linaro.org>
- <1435843047-6327-17-git-send-email-eric.auger@linaro.org>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH 1/7] KVM: api: add kvm_irq_routing_extended_msi
+Date: Mon, 6 Jul 2015 09:30:20 +0100
+Message-ID: <559A3C9C.6050302@arm.com>
+References: <1435592237-17924-1-git-send-email-eric.auger@linaro.org>
+ <1435592237-17924-2-git-send-email-eric.auger@linaro.org>
+ <011f01d0b498$6a17aeb0$3e470c10$@samsung.com> <5596503E.6040902@arm.com>
+ <00fd01d0b7b6$f6cf3550$e46d9ff0$@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1435843047-6327-17-git-send-email-eric.auger@linaro.org>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@linaro.org>, "eric.auger@st.com" <eric.auger@st.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "avi.kivity@gmail.com" <avi.kivity@gmail.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "joro@8bytes.org" <joro@8bytes.org>, "b.reynal@virtualopensystems.com" <b.reynal@virtualopensystems.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "patches@linaro.org" <patches@linaro.org>, "Wu, Feng" <feng.wu@intel.com>
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E89F657B41
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 04:19:02 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3iyaGaTpUwTj for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Jul 2015 04:19:01 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8931E576E2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 04:19:00 -0400 (EDT)
+In-Reply-To: <00fd01d0b7b6$f6cf3550$e46d9ff0$@samsung.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Pavel Fedin <p.fedin@samsung.com>, 'Eric Auger' <eric.auger@linaro.org>, "eric.auger@st.com" <eric.auger@st.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi Pavel,
 
+On 06/07/15 07:42, Pavel Fedin wrote:
+>  Hello!
+> 
+>> I like this approach, but it runs into problems:
+>> As you read above the current documentation says that the flags field
+>> must be zero and the current KVM_SET_GSI_ROUTING handler bails out if it
+>> isn't. So userland would need to know whether it's safe to set that
+>> field.
+> 
+>  This problem does not exist because:
+> a) Older platforms do not need this flag, so they expect to get zero.
+> b) ARM64 + GICv3 platform cannot work without this flag.
+> 
+>  This is perfectly OK combination IMO. Userland just knows, whether it needs to supply device ID or
+> not. For example, my modified qemu now has kvm_msi_flags global variable which defaults to 0. ITS
+> code, then, if activated, changes it to KVM_MSI_VALID_DEVID, and qemu starts supplying device IDs to
+> the related calls.
 
-> -----Original Message-----
-> From: Eric Auger [mailto:eric.auger@linaro.org]
-> Sent: Thursday, July 02, 2015 9:17 PM
-> To: eric.auger@st.com; eric.auger@linaro.org;
-> linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
-> kvm@vger.kernel.org; christoffer.dall@linaro.org; marc.zyngier@arm.com;
-> alex.williamson@redhat.com; pbonzini@redhat.com; avi.kivity@gmail.com;
-> mtosatti@redhat.com; Wu, Feng; joro@8bytes.org;
-> b.reynal@virtualopensystems.com
-> Cc: linux-kernel@vger.kernel.org; patches@linaro.org
-> Subject: [RFC 16/17] KVM: eventfd: add irq bypass consumer management
-> 
-> This patch adds the registration/unregistration of an
-> irq_bypass_consumer on irqfd assignment/deassignment.
-> 
-> Signed-off-by: Eric Auger <eric.auger@linaro.org>
-> ---
->  virt/kvm/eventfd.c | 22 +++++++++++++++++++---
->  1 file changed, 19 insertions(+), 3 deletions(-)
-> 
-> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-> index f3da161..425a47b 100644
-> --- a/virt/kvm/eventfd.c
-> +++ b/virt/kvm/eventfd.c
-> @@ -34,6 +34,7 @@
->  #include <linux/srcu.h>
->  #include <linux/slab.h>
->  #include <linux/seqlock.h>
-> +#include <linux/irqbypass.h>
->  #include <trace/events/kvm.h>
-> 
->  #include <kvm/iodev.h>
-> @@ -93,6 +94,7 @@ struct _irqfd {
->  	struct list_head list;
->  	poll_table pt;
->  	struct work_struct shutdown;
-> +	struct irq_bypass_consumer *cons;
->  };
-> 
->  static struct workqueue_struct *irqfd_cleanup_wq;
-> @@ -429,7 +431,21 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd
-> *args)
->  	 */
->  	fdput(f);
-> 
-> -	/* irq_bypass_register_consumer(); */
-> +	irqfd->cons = kzalloc(sizeof(struct irq_bypass_consumer),
-> +			      GFP_KERNEL);
-> +	if (!irqfd->cons) {
-> +		ret = -ENOMEM;
-> +		goto fail;
-> +	}
-> +	irqfd->cons->token = (void *)irqfd->eventfd;
-> +	irqfd->cons->gsi = irqfd->gsi;
-> +	irqfd->cons->kvm = kvm;
-> +	irqfd->cons->add_producer = kvm_arch_add_producer;
-> +	irqfd->cons->del_producer = kvm_arch_del_producer;
-> +	irqfd->cons->stop_consumer = kvm_arch_stop_consumer;
-> +	irqfd->cons->resume_consumer = kvm_arch_resume_consumer;
-> +	ret = irq_bypass_register_consumer(irqfd->cons);
-> +	WARN_ON(ret);
-> 
->  	return 0;
-> 
-> @@ -530,8 +546,6 @@ kvm_irqfd_deassign(struct kvm *kvm, struct kvm_irqfd
-> *args)
->  	struct _irqfd *irqfd, *tmp;
->  	struct eventfd_ctx *eventfd;
-> 
-> -	/* irq_bypass_unregister_consumer() */
-> -
->  	eventfd = eventfd_ctx_fdget(args->fd);
->  	if (IS_ERR(eventfd))
->  		return PTR_ERR(eventfd);
-> @@ -550,6 +564,8 @@ kvm_irqfd_deassign(struct kvm *kvm, struct kvm_irqfd
-> *args)
->  			irqfd->irq_entry.type = 0;
->  			write_seqcount_end(&irqfd->irq_entry_sc);
->  			irqfd_deactivate(irqfd);
-> +			irq_bypass_unregister_consumer(irqfd->cons);
-> +			kfree(irqfd->cons);
+Well, I had this solution before in kvmtool: If ARM && ITS then set the
+flag. But I wasn't really happy with this, as the IRQ routing, setup and
+injection code is rather architecture agnostic (implementing the generic
+KVM interface), so spraying in some architecture hacks sounded not very
+elegant.
+Also as the flag describes a rather generic feature (provide an unique
+device ID), I'd rather avoid to make this an ARM hack.
 
-There may be an issue here. 'irqfd' is freed in irqfd_deactivate() --> ... --.>irqfd_shutdown(),
-and irqfd_deactivate() can be called in the other two places below:
-	- irqfd_wakeup()
-	- kvm_irqfd_release()
-I think we also need to call irq_bypass_unregister_consumer() there, right?
+That being said this is not a show stopper for me, so if the others are
+happy with this, I will go down your road.
 
-Thanks,
-Feng
-
-
->  		}
->  	}
-> 
-> --
-> 1.9.1
+Cheers,
+Andre.
