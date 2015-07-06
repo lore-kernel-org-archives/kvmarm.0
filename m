@@ -1,24 +1,25 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC v2 2/6] VFIO: platform: select IRQ_BYPASS_MANAGER
-Date: Mon,  6 Jul 2015 14:11:28 +0200
-Message-ID: <1436184692-20927-3-git-send-email-eric.auger@linaro.org>
+Subject: [RFC v2 5/6] KVM: introduce kvm_arch functions for IRQ bypass
+Date: Mon,  6 Jul 2015 14:11:31 +0200
+Message-ID: <1436184692-20927-6-git-send-email-eric.auger@linaro.org>
 References: <1436184692-20927-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 51C78578C7
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 08:00:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AEDCE57A80
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 08:00:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8dpJhzyoWti4 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Jul 2015 08:00:34 -0400 (EDT)
-Received: from mail-wg0-f44.google.com (mail-wg0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8201957951
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 08:00:34 -0400 (EDT)
-Received: by wguu7 with SMTP id u7so138625916wgu.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Jul 2015 05:12:01 -0700 (PDT)
+ with ESMTP id AwYlF7l9hSB2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Jul 2015 08:00:40 -0400 (EDT)
+Received: from mail-wi0-f179.google.com (mail-wi0-f179.google.com
+ [209.85.212.179])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9572D57951
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 08:00:40 -0400 (EDT)
+Received: by wifm2 with SMTP id m2so27764948wif.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Jul 2015 05:12:07 -0700 (PDT)
 In-Reply-To: <1436184692-20927-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,24 +34,93 @@ To: eric.auger@st.com, eric.auger@linaro.org, linux-arm-kernel@lists.infradead.o
 Cc: linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Select IRQ_BYPASS_MANAGER when CONFIG_VFIO_PLATFORM is set
+This patch introduces
+- kvm_arch_irq_bypass_add_producer
+- kvm_arch_irq_bypass_del_producer
+- kvm_arch_irq_bypass_stop
+- kvm_arch_irq_bypass_resume
+- kvm_arch_irq_bypass_update
+
+They make possible to specialize the KVM IRQ bypass consumer in
+case CONFIG_KVM_HAVE_IRQ_BYPASS is set.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
----
- drivers/vfio/platform/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/vfio/platform/Kconfig b/drivers/vfio/platform/Kconfig
-index bb30128..c2f3dce 100644
---- a/drivers/vfio/platform/Kconfig
-+++ b/drivers/vfio/platform/Kconfig
-@@ -2,6 +2,7 @@ config VFIO_PLATFORM
- 	tristate "VFIO support for platform devices"
- 	depends on VFIO && EVENTFD && (ARM || ARM64)
- 	select VFIO_VIRQFD
-+	select IRQ_BYPASS_MANAGER
- 	help
- 	  Support for platform devices with VFIO. This is required to make
- 	  use of platform devices present on the system using the VFIO
+---
+
+v1 -> v2:
+- use CONFIG_KVM_HAVE_IRQ_BYPASS instead CONFIG_IRQ_BYPASS_MANAGER
+- rename all functions according to Paolo's proposal
+- add kvm_arch_irq_bypass_update according to Feng's need
+---
+ include/linux/kvm_host.h | 37 +++++++++++++++++++++++++++++++++++++
+ virt/kvm/Kconfig         |  3 +++
+ 2 files changed, 40 insertions(+)
+
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 9564fd7..91a5734 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -24,6 +24,7 @@
+ #include <linux/err.h>
+ #include <linux/irqflags.h>
+ #include <linux/context_tracking.h>
++#include <linux/irqbypass.h>
+ #include <asm/signal.h>
+ 
+ #include <linux/kvm.h>
+@@ -1133,5 +1134,41 @@ static inline void kvm_vcpu_set_dy_eligible(struct kvm_vcpu *vcpu, bool val)
+ {
+ }
+ #endif /* CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT */
++
++#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
++
++void kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *,
++			   struct irq_bypass_producer *);
++void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *,
++			   struct irq_bypass_producer *);
++void kvm_arch_irq_bypass_stop(struct irq_bypass_consumer *);
++void kvm_arch_irq_bypass_resume(struct irq_bypass_consumer *);
++void kvm_arch_irq_bypass_update(struct irq_bypass_consumer *);
++
++#else
++
++static inline void kvm_arch_irq_bypass_add_producer(
++			struct irq_bypass_consumer *cons,
++			struct irq_bypass_producer *prod)
++{
++}
++static inline void kvm_arch_irq_bypass_del_producer(
++			struct irq_bypass_consumer *cons,
++			struct irq_bypass_producer *prod)
++{
++}
++static inline void kvm_arch_irq_bypass_stop(
++			struct irq_bypass_consumer *cons)
++{
++}
++static inline void kvm_arch_irq_bypass_resume(
++			struct irq_bypass_consumer *cons)
++{
++}
++static inline void kvm_arch_irq_bypass_update(
++			struct irq_bypass_consumer *cons)
++{
++}
++#endif /* CONFIG_HAVE_KVM_IRQ_BYPASS */
+ #endif
+ 
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index e2c876d..9f8014d 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -47,3 +47,6 @@ config KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ config KVM_COMPAT
+        def_bool y
+        depends on COMPAT && !S390
++
++config HAVE_KVM_IRQ_BYPASS
++       bool
 -- 
 1.9.1
