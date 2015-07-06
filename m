@@ -1,29 +1,29 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH 1/7] KVM: api: add kvm_irq_routing_extended_msi
-Date: Mon, 6 Jul 2015 16:09:12 +0100
-Message-ID: <559A9A18.806@arm.com>
-References: <1435592237-17924-2-git-send-email-eric.auger@linaro.org>
- <011f01d0b498$6a17aeb0$3e470c10$@samsung.com> <5596503E.6040902@arm.com>
- <00fd01d0b7b6$f6cf3550$e46d9ff0$@samsung.com> <559A3C9C.6050302@arm.com>
- <20150706093026.GA11590@cbox> <559A52E6.5050402@arm.com>
- <20150706103755.GC11590@cbox> <559A6164.1000401@redhat.com>
- <559A6527.1040107@arm.com> <20150706120837.GA13530@cbox>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [RFC v2 3/6] irq: bypass: Extend skeleton for ARM forwarding
+ control
+Date: Mon, 06 Jul 2015 17:35:06 +0200
+Message-ID: <559AA02A.6060703@linaro.org>
+References: <1436184692-20927-1-git-send-email-eric.auger@linaro.org>
+ <1436184692-20927-4-git-send-email-eric.auger@linaro.org>
+ <559A7425.4050506@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DAE3757CB6
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 10:57:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D88E957C73
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 11:24:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IMLehDtJwqUA for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Jul 2015 10:57:47 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A59957CAE
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 10:57:47 -0400 (EDT)
-In-Reply-To: <20150706120837.GA13530@cbox>
+ with ESMTP id LMSL9w0v5Iee for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Jul 2015 11:24:01 -0400 (EDT)
+Received: from mail-wi0-f169.google.com (mail-wi0-f169.google.com
+ [209.85.212.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E922657C72
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 11:24:00 -0400 (EDT)
+Received: by widjy10 with SMTP id jy10so164462232wid.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Jul 2015 08:35:27 -0700 (PDT)
+In-Reply-To: <559A7425.4050506@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,57 +33,66 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: "eric.auger@st.com" <eric.auger@st.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, eric.auger@st.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.williamson@redhat.com, avi.kivity@gmail.com, mtosatti@redhat.com, feng.wu@intel.com, joro@8bytes.org, b.reynal@virtualopensystems.com
+Cc: linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/07/15 13:08, Christoffer Dall wrote:
-> On Mon, Jul 06, 2015 at 12:23:19PM +0100, Andre Przywara wrote:
->> Hi Paolo,
->>
->> thanks for looking at this!
->>
->> On 06/07/15 12:07, Paolo Bonzini wrote:
->>>
->>>
->>> On 06/07/2015 12:37, Christoffer Dall wrote:
->>>> I don't view it as 'the kernel requires this' but as 'the kernel will
->>>> not complain with arbitrary error code if you set the devid flag'
->>>> capability, and it's up to userspace (as usual) to provide the correct
->>>> arguments for things to work, and up to the kernel to ensure we don't
->>>> crash the system etc.
->>>>
->>>> Thus, if you want to advertise it as a capability, I would rather call
->>>> it KVM_CAP_MSI_DEVID.
->>>
->>> I agree.  Does userspace know that ITS guests always require devid?
->>
->> Well, as we are about to implement this: yes. But the issue is that MSI
->> injection and GSI routing code is generic PCI code in userland (at least
->> in kvmtool, guess in QEMU, too), so I don't want to pull in any kind of
->> ARM specific code in there. The idea is to always provide the device ID
->> from the PCI code (for PCI devices it's just the B/D/F triplet), but
->> only send it to the kernel if needed. Querying a KVM capability is
->> perfectly fine for this IMO.
->>
->>> I
->>> guess it's okay to return -EINVAL if the userspace doesn't set the flag
->>> but the virtual hardware requires it.
->>
->> Yes, that is what I do in the kernel implementation. And that is
->> perfectly fine: the ITS emulation does not work without a device ID, the
->> ITS driver in the guest assigns the very same payload (and address) to
->> different devices, so there is no way to tell the MSIs apart without a
->> unique device ID.
->>
-> Just so I'm sure I understand: The way the kernel differentiates between
-> no-devid and devid==0, is whether or not the devid flag is set, correct?
+Hi Paolo,
+On 07/06/2015 02:27 PM, Paolo Bonzini wrote:
+> 
+> 
+> On 06/07/2015 14:11, Eric Auger wrote:
+>> diff --git a/kernel/irq/bypass.c b/kernel/irq/bypass.c
+>> index 5d0f92b..efadbe5 100644
+>> --- a/kernel/irq/bypass.c
+>> +++ b/kernel/irq/bypass.c
+>> @@ -19,6 +19,42 @@ static LIST_HEAD(producers);
+>>  static LIST_HEAD(consumers);
+>>  static DEFINE_MUTEX(lock);
+>>  
+>> +/* lock must be hold when calling connect */
+> 
+> If a lock must be held while callbacks are called, you have to document
+> that producers and consumers must _not_ call back into the IRQ bypass
+> manager.  (If they have to, you have to document explicitly "This
+> function can be called from producer and consumer callbacks" whenever
+> relevant).
+OK Thanks
 
-Yes, that is the idea. The plan for the implementation is like this:
-1) If the kernel does not need the device ID (x86, GICv2M), it does not
-care about the flag or the value at all.
-2) In case for ITS on ARM64, the kernel returns an error is the flag is
-not set.
-
-Cheers,
-Andre.
+Eric
+> 
+>> +static void connect(struct irq_bypass_producer *prod,
+>> +		    struct irq_bypass_consumer *cons)
+>> +{
+>> +	if (prod->stop)
+>> +		prod->stop(prod);
+>> +	if (cons->stop)
+>> +		cons->stop(cons);
+>> +	if (prod->add_consumer)
+>> +		prod->add_consumer(prod, cons);
+>> +	if (cons->add_producer)
+>> +		cons->add_producer(cons, prod);
+>> +	if (cons->resume)
+>> +		cons->resume(cons);
+>> +	if (prod->resume)
+>> +		prod->resume(prod);
+>> +}
+>> +
+>> +/* lock must be hold when calling disconnect */
+>> +static void disconnect(struct irq_bypass_producer *prod,
+>> +		       struct irq_bypass_consumer *cons)
+>> +{
+>> +	if (prod->stop)
+>> +		prod->stop(prod);
+>> +	if (cons->stop)
+>> +		cons->stop(cons);
+>> +	if (cons->del_producer)
+>> +		cons->del_producer(cons, prod);
+>> +	if (prod->del_consumer)
+>> +		prod->del_consumer(prod, cons);
+>> +	if (cons->resume)
+>> +		cons->resume(cons);
+>> +	if (prod->resume)
+>> +		prod->resume(prod);
+>> +}
+>> +
