@@ -1,78 +1,77 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH 1/7] KVM: api: add kvm_irq_routing_extended_msi
-Date: Mon, 06 Jul 2015 19:02:30 +0200
-Message-ID: <559AB4A6.8050803@linaro.org>
-References: <1435592237-17924-1-git-send-email-eric.auger@linaro.org> <1435592237-17924-2-git-send-email-eric.auger@linaro.org> <011f01d0b498$6a17aeb0$3e470c10$@samsung.com> <5596503E.6040902@arm.com> <00fd01d0b7b6$f6cf3550$e46d9ff0$@samsung.com> <559A3C9C.6050302@arm.com> <20150706093026.GA11590@cbox> <559A52E6.5050402@arm.com> <20150706103755.GC11590@cbox> <559A6164.1000401@redhat.com> <559A6527.1040107@arm.com> <559A6BBC.2040901@redhat.com> <024301d0b7f0$2b13b410$813b1c30$@samsung.com> <559A9854.2090607@linaro.org> <559AA449.80705@arm.com>
+Subject: Re: [RFC v2 3/6] irq: bypass: Extend skeleton for ARM forwarding
+ control
+Date: Mon, 06 Jul 2015 19:09:00 +0200
+Message-ID: <559AB62C.9000503@linaro.org>
+References: <1436184692-20927-1-git-send-email-eric.auger@linaro.org>
+ <1436184692-20927-4-git-send-email-eric.auger@linaro.org>
+ <559A7425.4050506@redhat.com> <559AA02A.6060703@linaro.org>
+ <559AA552.3010400@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <559AA449.80705@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Pavel Fedin <p.fedin@samsung.com>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Christoffer Dall' <christoffer.dall@linaro.org>
-Cc: "eric.auger@st.com" <eric.auger@st.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C9A1F57CF4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 12:57:54 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id lOGxt5nZF1lJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Jul 2015 12:57:54 -0400 (EDT)
+Received: from mail-wi0-f172.google.com (mail-wi0-f172.google.com
+ [209.85.212.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E79C357CED
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 12:57:53 -0400 (EDT)
+Received: by wiclp1 with SMTP id lp1so27505638wic.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Jul 2015 10:09:21 -0700 (PDT)
+In-Reply-To: <559AA552.3010400@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Paolo Bonzini <pbonzini@redhat.com>, eric.auger@st.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.williamson@redhat.com, avi.kivity@gmail.com, mtosatti@redhat.com, feng.wu@intel.com, joro@8bytes.org, b.reynal@virtualopensystems.com
+Cc: linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/06/2015 05:52 PM, Andre Przywara wrote:
-> Salut Eric,
+On 07/06/2015 05:57 PM, Paolo Bonzini wrote:
 > 
-> ....
 > 
->>>  ITS code in qemu just does:
->>>
->>> ---cut ---
->>>     msi_supported = true;
->>>     kvm_msi_flags = KVM_MSI_VALID_DEVID;
->>>     kvm_msi_via_irqfd_allowed = kvm_has_gsi_routing();
->>>     kvm_gsi_routing_allowed = kvm_msi_via_irqfd_allowed;
->>> --- cut ---
->>>
->>>  I set KVM_MSI_VALID_DEVID unconditionally here just because it will never be checked if
->>> kvm_msi_via_irqfd_allowed is false, it's just qemu specifics. The more canonical form would perhaps
->>> be:
->>> --- cut ---
->>> if (kvm_has_gsi_routing()) {
->>>     kvm_msi_flags = KVM_MSI_VALID_DEVID;
->> Personally I prefer a capability rather than hardcoding a global
->> variable value in the qemu interrupt controller code. All the more so
->> typically there is KVM GSI routing cap that could/should? be queried
->> instead of hardcoding the value I think.
->>
->> So not sure whether we eventually concluded;-)
->> - introduce a KVM_CAP_MSI_DEVID capability? All OK except Pavel not
->> convinced?
+> On 06/07/2015 17:35, Eric Auger wrote:
+>>>> diff --git a/kernel/irq/bypass.c b/kernel/irq/bypass.c
+>>>>>> index 5d0f92b..efadbe5 100644
+>>>>>> --- a/kernel/irq/bypass.c
+>>>>>> +++ b/kernel/irq/bypass.c
+>>>>>> @@ -19,6 +19,42 @@ static LIST_HEAD(producers);
+>>>>>>  static LIST_HEAD(consumers);
+>>>>>>  static DEFINE_MUTEX(lock);
+>>>>>>  
+>>>>>> +/* lock must be hold when calling connect */
+>>>>
+>>>> If a lock must be held while callbacks are called, you have to document
+>>>> that producers and consumers must _not_ call back into the IRQ bypass
+>>>> manager.  (If they have to, you have to document explicitly "This
+>>>> function can be called from producer and consumer callbacks" whenever
+>>>> relevant).
+>> OK Thanks
 > 
-> OK for me.
+> Also, please document on functions that take the irq bypass mutex that
+> they can sleep.  In fact irq_bypass_{,un}register_{producer,consumer}
+> need kerneldoc comments.
 > 
->> - userspaces puts the devid in struct kvm_irq_routing_msi pad field:
->> consensus (we do not intrduce a new kvm_irq_routing_ext_msi)
-> 
-> OK for me.
-> 
->> - userspace tells it conveyed a devid by setting
->> A) the kvm_irq_routing_entry's field?
-> 
-> You mean kvm_irq_routing_entry's "flags" here?
-yes!!
-> 
->> B) the kvm_irq_routing_entry's type
-> 
-> So personally I don't like it so much to use the generic flags field to
-> specify the meaning within one particular type only. Using a new type
-> instead seems to be more consistent, reusing an existing struct for that
-> sounds even better.
-> As written before (and coded in my branch) we can collapse that into the
-> existing MSI type while translating that into the kernel internal
-> routing structure to make the kernel code changes minimal.
-> 
->> no consensus. If there is a cap, does it really matter?
-> 
-> I guess not. But I prefer the new type anyway, as it also has a known
-> error path for older kernels.
-I am fine with the new type too.
+> The good thing is that this helps a bit forming a lock hierarchy across
+> the subsystems, for example irq bypass mutex outside vfio_platform_irq
+> spinlock, because you cannot have a spinlock inside the mutex.  I think
+> that all of your six callbacks are fine.
+
+arghh, no that's wrong then. I have plenty of them in the KVM/arm vgic
+part :-(
 
 Eric
 > 
-> Cheers,
-> Andre.
+> Paolo
 > 
