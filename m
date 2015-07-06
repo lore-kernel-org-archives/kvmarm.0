@@ -1,25 +1,24 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC v2 5/6] KVM: introduce kvm_arch functions for IRQ bypass
-Date: Mon,  6 Jul 2015 14:11:31 +0200
-Message-ID: <1436184692-20927-6-git-send-email-eric.auger@linaro.org>
+Subject: [RFC v2 6/6] KVM: eventfd: add irq bypass consumer management
+Date: Mon,  6 Jul 2015 14:11:32 +0200
+Message-ID: <1436184692-20927-7-git-send-email-eric.auger@linaro.org>
 References: <1436184692-20927-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AEDCE57A80
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 08:00:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7702457B6D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 08:00:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AwYlF7l9hSB2 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Jul 2015 08:00:40 -0400 (EDT)
-Received: from mail-wi0-f179.google.com (mail-wi0-f179.google.com
- [209.85.212.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9572D57951
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 08:00:40 -0400 (EDT)
-Received: by wifm2 with SMTP id m2so27764948wif.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Jul 2015 05:12:07 -0700 (PDT)
+ with ESMTP id 1UOqdW3oiLLe for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Jul 2015 08:00:42 -0400 (EDT)
+Received: from mail-wg0-f45.google.com (mail-wg0-f45.google.com [74.125.82.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 84D38578C7
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 08:00:42 -0400 (EDT)
+Received: by wgck11 with SMTP id k11so138483565wgc.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Jul 2015 05:12:09 -0700 (PDT)
 In-Reply-To: <1436184692-20927-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,93 +33,85 @@ To: eric.auger@st.com, eric.auger@linaro.org, linux-arm-kernel@lists.infradead.o
 Cc: linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch introduces
-- kvm_arch_irq_bypass_add_producer
-- kvm_arch_irq_bypass_del_producer
-- kvm_arch_irq_bypass_stop
-- kvm_arch_irq_bypass_resume
-- kvm_arch_irq_bypass_update
-
-They make possible to specialize the KVM IRQ bypass consumer in
-case CONFIG_KVM_HAVE_IRQ_BYPASS is set.
+This patch adds the registration/unregistration of an
+irq_bypass_consumer on irqfd assignment/deassignment.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
 ---
 
 v1 -> v2:
-- use CONFIG_KVM_HAVE_IRQ_BYPASS instead CONFIG_IRQ_BYPASS_MANAGER
-- rename all functions according to Paolo's proposal
-- add kvm_arch_irq_bypass_update according to Feng's need
+- populate of kvm and gsi removed
+- unregister the consumer on irqfd_shutdown
 ---
- include/linux/kvm_host.h | 37 +++++++++++++++++++++++++++++++++++++
- virt/kvm/Kconfig         |  3 +++
- 2 files changed, 40 insertions(+)
+ include/linux/kvm_irqfd.h |  1 +
+ virt/kvm/eventfd.c        | 14 +++++++++++---
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 9564fd7..91a5734 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -24,6 +24,7 @@
- #include <linux/err.h>
- #include <linux/irqflags.h>
- #include <linux/context_tracking.h>
+diff --git a/include/linux/kvm_irqfd.h b/include/linux/kvm_irqfd.h
+index f926b39..3c0bd07 100644
+--- a/include/linux/kvm_irqfd.h
++++ b/include/linux/kvm_irqfd.h
+@@ -64,6 +64,7 @@ struct kvm_kernel_irqfd {
+ 	struct list_head list;
+ 	poll_table pt;
+ 	struct work_struct shutdown;
++	struct irq_bypass_consumer consumer;
+ };
+ 
+ #endif /* __LINUX_KVM_IRQFD_H */
+diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+index b79dc61..9452754 100644
+--- a/virt/kvm/eventfd.c
++++ b/virt/kvm/eventfd.c
+@@ -35,6 +35,7 @@
+ #include <linux/srcu.h>
+ #include <linux/slab.h>
+ #include <linux/seqlock.h>
 +#include <linux/irqbypass.h>
- #include <asm/signal.h>
+ #include <trace/events/kvm.h>
  
- #include <linux/kvm.h>
-@@ -1133,5 +1134,41 @@ static inline void kvm_vcpu_set_dy_eligible(struct kvm_vcpu *vcpu, bool val)
- {
+ #include <kvm/iodev.h>
+@@ -140,6 +141,7 @@ irqfd_shutdown(struct work_struct *work)
+ 	/*
+ 	 * It is now safe to release the object's resources
+ 	 */
++	irq_bypass_unregister_consumer(&irqfd->consumer);
+ 	eventfd_ctx_put(irqfd->eventfd);
+ 	kfree(irqfd);
  }
- #endif /* CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT */
-+
-+#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
-+
-+void kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *,
-+			   struct irq_bypass_producer *);
-+void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *,
-+			   struct irq_bypass_producer *);
-+void kvm_arch_irq_bypass_stop(struct irq_bypass_consumer *);
-+void kvm_arch_irq_bypass_resume(struct irq_bypass_consumer *);
-+void kvm_arch_irq_bypass_update(struct irq_bypass_consumer *);
-+
-+#else
-+
-+static inline void kvm_arch_irq_bypass_add_producer(
-+			struct irq_bypass_consumer *cons,
-+			struct irq_bypass_producer *prod)
-+{
-+}
-+static inline void kvm_arch_irq_bypass_del_producer(
-+			struct irq_bypass_consumer *cons,
-+			struct irq_bypass_producer *prod)
-+{
-+}
-+static inline void kvm_arch_irq_bypass_stop(
-+			struct irq_bypass_consumer *cons)
-+{
-+}
-+static inline void kvm_arch_irq_bypass_resume(
-+			struct irq_bypass_consumer *cons)
-+{
-+}
-+static inline void kvm_arch_irq_bypass_update(
-+			struct irq_bypass_consumer *cons)
-+{
-+}
-+#endif /* CONFIG_HAVE_KVM_IRQ_BYPASS */
- #endif
+@@ -380,7 +382,14 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
+ 	 */
+ 	fdput(f);
  
-diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-index e2c876d..9f8014d 100644
---- a/virt/kvm/Kconfig
-+++ b/virt/kvm/Kconfig
-@@ -47,3 +47,6 @@ config KVM_GENERIC_DIRTYLOG_READ_PROTECT
- config KVM_COMPAT
-        def_bool y
-        depends on COMPAT && !S390
-+
-+config HAVE_KVM_IRQ_BYPASS
-+       bool
+-	/* irq_bypass_register_consumer(); */
++	irqfd->consumer.token = (void *)irqfd->eventfd;
++	irqfd->consumer.add_producer = kvm_arch_irq_bypass_add_producer;
++	irqfd->consumer.del_producer = kvm_arch_irq_bypass_del_producer;
++	irqfd->consumer.stop = kvm_arch_irq_bypass_stop;
++	irqfd->consumer.resume = kvm_arch_irq_bypass_resume;
++	irqfd->consumer.update = kvm_arch_irq_bypass_update;
++	ret = irq_bypass_register_consumer(&irqfd->consumer);
++	WARN_ON(ret);
+ 
+ 	return 0;
+ 
+@@ -481,8 +490,6 @@ kvm_irqfd_deassign(struct kvm *kvm, struct kvm_irqfd *args)
+ 	struct kvm_kernel_irqfd *irqfd, *tmp;
+ 	struct eventfd_ctx *eventfd;
+ 
+-	/* irq_bypass_unregister_consumer() */
+-
+ 	eventfd = eventfd_ctx_fdget(args->fd);
+ 	if (IS_ERR(eventfd))
+ 		return PTR_ERR(eventfd);
+@@ -501,6 +508,7 @@ kvm_irqfd_deassign(struct kvm *kvm, struct kvm_irqfd *args)
+ 			irqfd->irq_entry.type = 0;
+ 			write_seqcount_end(&irqfd->irq_entry_sc);
+ 			irqfd_deactivate(irqfd);
++			irq_bypass_unregister_consumer(&irqfd->consumer);
+ 		}
+ 	}
+ 
 -- 
 1.9.1
