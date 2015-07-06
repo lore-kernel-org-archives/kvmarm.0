@@ -1,119 +1,182 @@
 From: shannon.zhao@linaro.org
-Subject: [PATCH 18/18] KVM: ARM64: Add KVM_CAP_ARM_PMU and KVM_ARM_PMU_SET_IRQ
-Date: Mon,  6 Jul 2015 10:17:48 +0800
-Message-ID: <1436149068-3784-19-git-send-email-shannon.zhao@linaro.org>
+Subject: [PATCH 17/18] KVM: ARM64: Add PMU overflow interrupt routing
+Date: Mon,  6 Jul 2015 10:17:47 +0800
+Message-ID: <1436149068-3784-18-git-send-email-shannon.zhao@linaro.org>
 References: <1436149068-3784-1-git-send-email-shannon.zhao@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 783FC57B35
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2015 22:07:54 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id D5Kr2OeCGA64 for <kvmarm@lists.cs.columbia.edu>;
+ Sun,  5 Jul 2015 22:07:53 -0400 (EDT)
+Received: from mail-pa0-f50.google.com (mail-pa0-f50.google.com
+ [209.85.220.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5656F57B33
+ for <kvmarm@lists.cs.columbia.edu>; Sun,  5 Jul 2015 22:07:53 -0400 (EDT)
+Received: by pacgz10 with SMTP id gz10so13161071pac.3
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 05 Jul 2015 19:19:19 -0700 (PDT)
 In-Reply-To: <1436149068-3784-1-git-send-email-shannon.zhao@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, christoffer.dall@linaro.org, will.deacon@arm.com, marc.zyngier@arm.com, alex.bennee@linaro.org, shannon.zhao@linaro.org, zhaoshenglong@huawei.com
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-Add KVM_CAP_ARM_PMU for userspace to check whether KVM supports PMU. Add
-KVM_ARM_PMU_SET_IRQ for userspace to set PMU IRQ number.
+When calling perf_event_create_kernel_counter to create perf_event,
+assign a overflow handler. Then when perf event overflows, if vcpu
+doesn't run, call irq_work_queue to wake up vcpu. Otherwise call
+kvm_vgic_inject_irq to inject the interrupt.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm/kvm/arm.c       | 8 ++++++++
- include/kvm/arm_pmu.h    | 5 +++++
- include/uapi/linux/kvm.h | 4 ++++
- virt/kvm/arm/pmu.c       | 9 +++++++++
- 4 files changed, 26 insertions(+)
+ arch/arm/kvm/arm.c    |  2 ++
+ include/kvm/arm_pmu.h |  2 ++
+ virt/kvm/arm/pmu.c    | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 56 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 41eb063..350866e 100644
+index 4e82625..41eb063 100644
 --- a/arch/arm/kvm/arm.c
 +++ b/arch/arm/kvm/arm.c
-@@ -182,6 +182,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ARM_PSCI_0_2:
- 	case KVM_CAP_READONLY_MEM:
- 	case KVM_CAP_MP_STATE:
-+	case KVM_CAP_ARM_PMU:
- 		r = 1;
- 		break;
- 	case KVM_CAP_COALESCED_MMIO:
-@@ -816,6 +817,13 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 			return -E2BIG;
- 		return kvm_arm_copy_reg_indices(vcpu, user_list->reg);
- 	}
-+	case KVM_ARM_PMU_SET_IRQ: {
-+		uint32_t irq;
-+
-+		if (copy_from_user(&irq, argp, sizeof(irq)))
-+			return -EFAULT;
-+		return kvm_pmu_set_irq_num(vcpu, irq);
-+	}
- 	default:
- 		return -EINVAL;
+@@ -551,6 +551,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 			preempt_enable();
+ 			kvm_timer_sync_hwstate(vcpu);
+ 			kvm_vgic_sync_hwstate(vcpu);
++			kvm_pmu_sync_hwstate(vcpu);
+ 			continue;
+ 		}
+ 
+@@ -595,6 +596,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 
+ 		kvm_timer_sync_hwstate(vcpu);
+ 		kvm_vgic_sync_hwstate(vcpu);
++		kvm_pmu_sync_hwstate(vcpu);
+ 
+ 		ret = handle_exit(vcpu, run, ret);
  	}
 diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 5bcf27b..1a93f53 100644
+index 6985809..5bcf27b 100644
 --- a/include/kvm/arm_pmu.h
 +++ b/include/kvm/arm_pmu.h
-@@ -58,6 +58,7 @@ void kvm_pmu_enable_interrupt(struct kvm_vcpu *vcpu, unsigned long val);
- void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, unsigned long val);
- void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
+@@ -45,6 +45,7 @@ struct kvm_pmu {
+ };
+ 
+ #ifdef CONFIG_KVM_ARM_PMU
++void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu);
+ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
+ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, unsigned long select_idx,
+ 			       unsigned long val);
+@@ -59,6 +60,7 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
  				    unsigned long select_idx);
-+int kvm_pmu_set_irq_num(struct kvm_vcpu *vcpu, u32 irq);
  void kvm_pmu_init(struct kvm_vcpu *vcpu);
  #else
- void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu) {}
-@@ -76,6 +77,10 @@ void kvm_pmu_enable_interrupt(struct kvm_vcpu *vcpu, unsigned long val) {}
- void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, unsigned long val) {}
- void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
- 				    unsigned long select_idx) {}
-+int kvm_pmu_set_irq_num(struct kvm_vcpu *vcpu, u32 irq)
-+{
-+	return -ENXIO;
-+}
- static inline void kvm_pmu_init(struct kvm_vcpu *vcpu) {}
- #endif
- 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 716ad4a..90f5e73 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -817,6 +817,7 @@ struct kvm_ppc_smmu_info {
- #define KVM_CAP_DISABLE_QUIRKS 116
- #define KVM_CAP_X86_SMM 117
- #define KVM_CAP_MULTI_ADDRESS_SPACE 118
-+#define KVM_CAP_ARM_PMU 119
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1205,6 +1206,9 @@ struct kvm_s390_ucas_mapping {
- /* Available with KVM_CAP_X86_SMM */
- #define KVM_SMI                   _IO(KVMIO,   0xb7)
- 
-+/* Available with KVM_CAP_ARM_PMU */
-+#define KVM_ARM_PMU_SET_IRQ	  _IOW(KVMIO, 0xb8, __u32)
-+
- #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
- #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
- #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
++void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
+ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, unsigned long select_idx,
+ 			       unsigned long val) {}
 diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index f957b85..57585e1 100644
+index e655426..f957b85 100644
 --- a/virt/kvm/arm/pmu.c
 +++ b/virt/kvm/arm/pmu.c
-@@ -381,6 +381,15 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
- 	pmc->perf_event = event;
+@@ -20,6 +20,7 @@
+ #include <linux/kvm_host.h>
+ #include <linux/perf_event.h>
+ #include <kvm/arm_pmu.h>
++#include <kvm/arm_vgic.h>
+ 
+ /* PMU HW events mapping. */
+ static struct kvm_pmu_hw_event_map {
+@@ -81,6 +82,23 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu,
  }
  
-+int kvm_pmu_set_irq_num(struct kvm_vcpu *vcpu, u32 irq)
+ /**
++ * kvm_pmu_sync_hwstate - sync pmu state for cpu
++ * @vcpu: The vcpu pointer
++ *
++ * Inject virtual PMU IRQ if IRQ is pending for this cpu.
++ */
++void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
 +{
 +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
 +
-+	kvm_info("kvm_arm_set_pmu_irq: irq: %u\n", irq);
-+	pmu->irq_num = irq;
-+	return 0;
++	if (pmu->irq_pending) {
++		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, 1);
++		pmu->irq_pending = 0;
++		return;
++	}
++}
++
++/**
+  * kvm_pmu_vcpu_reset - reset pmu state for cpu
+  * @vcpu: The vcpu pointer
+  *
+@@ -96,6 +114,37 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
+ 	pmu->irq_pending = false;
+ }
+ 
++static void kvm_pum_trigger_pmi(struct irq_work *irq_work)
++{
++	struct kvm_pmu *pmu = container_of(irq_work, struct kvm_pmu, irq_work);
++	struct kvm_vcpu *vcpu = container_of(pmu, struct kvm_vcpu, arch.pmu);
++
++	kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, 1);
++}
++
++/**
++ * When perf event overflows, if vcpu doesn't run, call irq_work_queue to wake
++ * up vcpu. Otherwise call kvm_vgic_inject_irq to inject the interrupt.
++ */
++static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
++				  struct perf_sample_data *data,
++				  struct pt_regs *regs)
++{
++	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
++	struct kvm_vcpu *vcpu = pmc->vcpu;
++	struct kvm_pmu *pmu = &vcpu->arch.pmu;
++
++	if (pmc->interrupt == true) {
++		__set_bit(pmc->idx, (unsigned long *)&pmu->overflow_status);
++		pmu->irq_pending = 1;
++		if (vcpu->mode != IN_GUEST_MODE)
++			irq_work_queue(&pmu->irq_work);
++		else
++			kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
++					    pmu->irq_num, 1);
++	}
 +}
 +
  /**
-  * kvm_pmu_init - Initialize global PMU state for per vcpu
+  * kvm_pmu_set_counter_value - set PMU counter value
   * @vcpu: The vcpu pointer
+@@ -322,7 +371,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
+ 	attr.config = config;
+ 	attr.sample_period = (-pmc->counter) & (((u64)1 << 32) - 1);
+ 
+-	event = perf_event_create_kernel_counter(&attr, -1, current, NULL, pmc);
++	event = perf_event_create_kernel_counter(&attr, -1, current,
++						 kvm_pmu_perf_overflow, pmc);
+ 	if (IS_ERR(event)) {
+ 		kvm_err("kvm: pmu event creation failed %ld\n",
+ 			  PTR_ERR(event));
+@@ -351,4 +401,5 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	pmu->irq_num = -1;
++	init_irq_work(&pmu->irq_work, kvm_pum_trigger_pmi);
+ }
 -- 
 2.1.0
-
