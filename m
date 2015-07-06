@@ -1,32 +1,26 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH 1/7] KVM: api: add kvm_irq_routing_extended_msi
-Date: Mon, 6 Jul 2015 17:08:26 +0100
-Message-ID: <559AA7FA.5010804@arm.com>
-References: <1435592237-17924-1-git-send-email-eric.auger@linaro.org>
- <1435592237-17924-2-git-send-email-eric.auger@linaro.org>
- <011f01d0b498$6a17aeb0$3e470c10$@samsung.com> <5596503E.6040902@arm.com>
- <00fd01d0b7b6$f6cf3550$e46d9ff0$@samsung.com> <559A3C9C.6050302@arm.com>
- <20150706093026.GA11590@cbox> <559A52E6.5050402@arm.com>
- <20150706103755.GC11590@cbox> <559A6164.1000401@redhat.com>
- <559A6527.1040107@arm.com> <559A6BBC.2040901@redhat.com>
- <024301d0b7f0$2b13b410$813b1c30$@samsung.com> <559AA0D6.7070703@arm.com>
- <559AA4CF.7060300@redhat.com>
+Subject: Re: [PATCH 12/13] KVM: arm64: implement MSI injection in ITS emulation
+Date: Mon, 6 Jul 2015 17:46:37 +0100
+Message-ID: <559AB0ED.1090405@arm.com>
+References: <1432893209-27313-1-git-send-email-andre.przywara@arm.com>
+ <1432893209-27313-13-git-send-email-andre.przywara@arm.com>
+ <5579C8AA.8010903@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2306857CDA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 11:57:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FBD357CE0
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 12:35:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kedTzXQ7AiA5 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Jul 2015 11:57:00 -0400 (EDT)
+ with ESMTP id OPZoHbN21C2k for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Jul 2015 12:35:11 -0400 (EDT)
 Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
  [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D00AA57CD9
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 11:56:58 -0400 (EDT)
-In-Reply-To: <559AA4CF.7060300@redhat.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE6B357CDA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 12:35:11 -0400 (EDT)
+In-Reply-To: <5579C8AA.8010903@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,31 +30,81 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>, Pavel Fedin <p.fedin@samsung.com>, 'Christoffer Dall' <christoffer.dall@linaro.org>
-Cc: "eric.auger@st.com" <eric.auger@st.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Eric Auger <eric.auger@linaro.org>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/07/15 16:54, Paolo Bonzini wrote:
-> 
-> 
-> On 06/07/2015 17:37, Andre Przywara wrote:
->> Wouldn't:
->>     if (kvm_vm_check_extension(s, KVM_CAP_MSI_DEVID)) {
->>         kroute.flags = KVM_MSI_VALID_DEVID;
->>         kroute.u.msi.devid = (pci_bus_num(dev->bus) << 8) | dev->devfn;
->>     }
->>
->> be saner (without a global variable)?
->> That would make the interface more consistent, with a new flag being
->> protected by a new capability.
-> 
-> I agree that your version is niceer, but you still need to cache the
-> kvm_vm_check_extension result... in a global variable. :)
+Hi Eric,
 
-I used a static variable in a wrapper function in kvmtool ;-)
-TBH my argument wasn't so much about global variables (just saw that
-QEMU seems to use them already), but more about a consistent and
-architecture agnostic interface.
+....
 
-Ciao!
+>> diff --git a/virt/kvm/arm/its-emul.c b/virt/kvm/arm/its-emul.c
+>> index 574cf05..35e886c 100644
+>> --- a/virt/kvm/arm/its-emul.c
+>> +++ b/virt/kvm/arm/its-emul.c
+>> @@ -340,6 +340,55 @@ static bool handle_mmio_gits_idregs(struct kvm_vcpu *vcpu,
+>>  }
+>>  
+>>  /*
+>> + * Translates an incoming MSI request into the redistributor (=VCPU) and
+>> + * the associated LPI number. Sets the LPI pending bit and also marks the
+>> + * VCPU as having a pending interrupt.
+>> + */
+>> +int vits_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
+>> +{
+>> +	struct vgic_dist *dist = &kvm->arch.vgic;
+>> +	struct vgic_its *its = &dist->its;
+>> +	struct its_itte *itte;
+>> +	int cpuid;
+>> +	bool inject = false;
+>> +	int ret = 0;
+>> +
+>> +	if (!vgic_has_its(kvm))
+>> +		return -ENODEV;
+>> +
+>> +	if (!(msi->flags & KVM_MSI_VALID_DEVID))
+>> +		return -EINVAL;
+>> +
+>> +	spin_lock(&its->lock);
+>> +
+>> +	if (!its->enabled || !dist->lpis_enabled) {
+>> +		ret = -EAGAIN;
+>> +		goto out_unlock;
+>> +	}
+>> +
+>> +	itte = find_itte(kvm, msi->devid, msi->data);
+>> +	/* Triggering an unmapped IRQ gets silently dropped. */
+>> +	if (!itte || !itte->collection)
+>> +		goto out_unlock;
+>> +
+>> +	cpuid = itte->collection->target_addr;
+>> +	set_bit(cpuid, itte->pending);
+> so now the internal state is different from the pending state in ext
+> memory. I don't really understand where the ext mem is used?
+
+This is expected, as the ITS is allowed to cache the state. In a
+hardware ITS implementation the external memory is used to provide
+actual storage for the ITS, something we do not need for the emulation,
+as we have cheaper (host) memory for that.
+The only thing we have to model though is that the guest may use the
+external storage to take a snapshot of the current state, but it may
+only do so after having flushed the ITS "cache", which means we
+synchronize our internal data structures to that "external" memory.
+
+>> +	inject = itte->enabled;
+>> +
+>> +out_unlock:
+>> +	spin_unlock(&its->lock);
+>> +
+>> +	if (inject) {
+>> +		spin_lock(&dist->lock);
+>> +		set_bit(cpuid, dist->irq_pending_on_cpu);
+> isn't it atomic op?
+
+It is, but that's not what the lock protects. It's there to avoid
+stepping on someone else's toes, who might deal with the ITS data
+structures at the same time and would not expect a value to change in
+the middle (think about code iterating over dist->irq_pending_on_cpu).
+
+Cheers,
 Andre.
