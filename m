@@ -1,142 +1,106 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC v2 9/9] KVM: arm/arm64: implement IRQ bypass consumer functions
-Date: Mon,  6 Jul 2015 15:24:43 +0200
-Message-ID: <1436189083-32527-10-git-send-email-eric.auger@linaro.org>
-References: <1436189083-32527-1-git-send-email-eric.auger@linaro.org>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH 1/7] KVM: api: add kvm_irq_routing_extended_msi
+Date: Mon, 06 Jul 2015 16:32:12 +0300
+Message-ID: <024301d0b7f0$2b13b410$813b1c30$@samsung.com>
+References: <1435592237-17924-1-git-send-email-eric.auger@linaro.org>
+ <1435592237-17924-2-git-send-email-eric.auger@linaro.org>
+ <011f01d0b498$6a17aeb0$3e470c10$@samsung.com> <5596503E.6040902@arm.com>
+ <00fd01d0b7b6$f6cf3550$e46d9ff0$@samsung.com> <559A3C9C.6050302@arm.com>
+ <20150706093026.GA11590@cbox> <559A52E6.5050402@arm.com>
+ <20150706103755.GC11590@cbox> <559A6164.1000401@redhat.com>
+ <559A6527.1040107@arm.com> <559A6BBC.2040901@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BFF0357B9E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 09:14:00 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OyQ6SYlvvzDp for <kvmarm@lists.cs.columbia.edu>;
- Mon,  6 Jul 2015 09:14:00 -0400 (EDT)
-Received: from mail-wg0-f44.google.com (mail-wg0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E2A9057C02
- for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 09:13:59 -0400 (EDT)
-Received: by wguu7 with SMTP id u7so140471812wgu.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 06 Jul 2015 06:25:27 -0700 (PDT)
-In-Reply-To: <1436189083-32527-1-git-send-email-eric.auger@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@st.com, eric.auger@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, avi.kivity@gmail.com, mtosatti@redhat.com, feng.wu@intel.com, joro@8bytes.org, b.reynal@virtualopensystems.com
-Cc: pbonzini@redhat.com, alex.williamson@redhat.com, linux-kernel@vger.kernel.org, patches@linaro.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-reply-to: <559A6BBC.2040901@redhat.com>
+Content-language: ru
+Sender: linux-kernel-owner@vger.kernel.org
+To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Andre Przywara' <andre.przywara@arm.com>, 'Christoffer Dall' <christoffer.dall@linaro.org>
+Cc: 'Eric Auger' <eric.auger@linaro.org>, eric.auger@st.com, linux-arm-kernel@lists.infradead.org, 'Marc Zyngier' <Marc.Zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Implement IRQ bypass callbacks for arm/arm64 IRQ forwarding:
-- kvm_arch_irq_bypass_add_producer: perform VGIC/irqchip
-  settings for forwarding
-- kvm_arch_irq_bypass_del_producer: same for inverse operation
-- kvm_arch_irq_bypass_stop: halt guest execution
-- kvm_arch_irq_bypass_resume: resume guest execution
-- void kvm_arch_irq_bypass_update
+ Hi!
 
-and set CONFIG_HAVE_KVM_IRQ_BYPASS for arm/arm64.
+> > Well, as we are about to implement this: yes. But the issue is that MSI
+> > injection and GSI routing code is generic PCI code in userland (at least
+> > in kvmtool, guess in QEMU, too), so I don't want to pull in any kind of
+> > ARM specific code in there. The idea is to always provide the device ID
+> > from the PCI code (for PCI devices it's just the B/D/F triplet), but
+> > only send it to the kernel if needed. Querying a KVM capability is
+> > perfectly fine for this IMO.
+> 
+> Yes, I agree.
 
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
+ Actually, we already have this capability, it's KVM_CAP_IRQ_ROUTING. If we have this capability,
+and want to use irqfds with GICv3, we need to set KVM_MSI_VALID_DEVID. And there is no other way to
+use irqfds with GICv3.
+ Just for example, this is what i have done in qemu:
+--- cut ---
+int kvm_irqchip_add_msi_route(KVMState *s, MSIMessage msg, PCIDevice *dev)
+{
+    struct kvm_irq_routing_entry kroute = {};
+    int virq;
 
----
+    if (kvm_gsi_direct_mapping()) {
+        return kvm_arch_msi_data_to_gsi(msg.data);
+    }
 
-v1 -> v2:
-- struct kvm_kernel_irqfd is retrieved with container_of
-- function names changed
----
- arch/arm/kvm/Kconfig   |  1 +
- arch/arm/kvm/arm.c     | 40 ++++++++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/Kconfig |  1 +
- 3 files changed, 42 insertions(+)
+    if (!kvm_gsi_routing_enabled()) {
+        return -ENOSYS;
+    }
 
-diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
-index 7d38d25..19114a1 100644
---- a/arch/arm/kvm/Kconfig
-+++ b/arch/arm/kvm/Kconfig
-@@ -32,6 +32,7 @@ config KVM
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
- 	select IRQ_BYPASS_MANAGER
-+	select HAVE_KVM_IRQ_BYPASS
- 	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
- 	---help---
- 	  Support hosting virtualized guest machines.
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 46d4ef6..db8f040 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -27,6 +27,8 @@
- #include <linux/mman.h>
- #include <linux/sched.h>
- #include <linux/kvm.h>
-+#include <linux/kvm_irqfd.h>
-+#include <linux/irqbypass.h>
- #include <trace/events/kvm.h>
- 
- #define CREATE_TRACE_POINTS
-@@ -1149,6 +1151,44 @@ struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr)
- 	return NULL;
- }
- 
-+void kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *cons,
-+				      struct irq_bypass_producer *prod)
-+{
-+	struct kvm_kernel_irqfd *irqfd =
-+		container_of(cons, struct kvm_kernel_irqfd, consumer);
-+
-+	kvm_vgic_set_forward(irqfd->kvm, prod->irq, irqfd->gsi);
-+}
-+void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *cons,
-+				      struct irq_bypass_producer *prod)
-+{
-+	struct kvm_kernel_irqfd *irqfd =
-+		container_of(cons, struct kvm_kernel_irqfd, consumer);
-+
-+	kvm_vgic_unset_forward(irqfd->kvm, prod->irq, irqfd->gsi,
-+			       &prod->active);
-+}
-+
-+void kvm_arch_irq_bypass_stop(struct irq_bypass_consumer *cons)
-+{
-+	struct kvm_kernel_irqfd *irqfd =
-+		container_of(cons, struct kvm_kernel_irqfd, consumer);
-+
-+	kvm_arm_halt_guest(irqfd->kvm);
-+}
-+
-+void kvm_arch_irq_bypass_resume(struct irq_bypass_consumer *cons)
-+{
-+	struct kvm_kernel_irqfd *irqfd =
-+		container_of(cons, struct kvm_kernel_irqfd, consumer);
-+
-+	kvm_arm_resume_guest(irqfd->kvm);
-+}
-+
-+void kvm_arch_irq_bypass_update(struct irq_bypass_consumer *cons)
-+{
-+}
-+
- /**
-  * Initialize Hyp-mode and memory mappings on all CPUs.
-  */
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index dfaca85..822551c 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -32,6 +32,7 @@ config KVM
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
- 	select IRQ_BYPASS_MANAGER
-+	select HAVE_KVM_IRQ_BYPASS
- 	---help---
- 	  Support hosting virtualized guest machines.
- 
--- 
-1.9.1
+    virq = kvm_irqchip_get_virq(s);
+    if (virq < 0) {
+        return virq;
+    }
+
+    kroute.gsi = virq;
+    kroute.type = KVM_IRQ_ROUTING_MSI;
+    kroute.u.msi.address_lo = (uint32_t)msg.address;
+    kroute.u.msi.address_hi = msg.address >> 32;
+    kroute.u.msi.data = le32_to_cpu(msg.data);
+    kroute.flags = kvm_msi_flags;
+    if (kroute.flags & KVM_MSI_VALID_DEVID) {
+        kroute.u.msi.devid = (pci_bus_num(dev->bus) << 8) | dev->devfn;
+    }
+
+    if (kvm_arch_fixup_msi_route(&kroute, msg.address, msg.data)) {
+        kvm_irqchip_release_virq(s, virq);
+        return -EINVAL;
+    }
+
+    kvm_add_routing_entry(s, &kroute);
+    kvm_irqchip_commit_routes(s);
+
+    return virq;
+}
+--- cut ---
+
+ ITS code in qemu just does:
+
+---cut ---
+    msi_supported = true;
+    kvm_msi_flags = KVM_MSI_VALID_DEVID;
+    kvm_msi_via_irqfd_allowed = kvm_has_gsi_routing();
+    kvm_gsi_routing_allowed = kvm_msi_via_irqfd_allowed;
+--- cut ---
+
+ I set KVM_MSI_VALID_DEVID unconditionally here just because it will never be checked if
+kvm_msi_via_irqfd_allowed is false, it's just qemu specifics. The more canonical form would perhaps
+be:
+--- cut ---
+if (kvm_has_gsi_routing()) {
+    kvm_msi_flags = KVM_MSI_VALID_DEVID;
+    kvm_gsi_routing_allowed = true;
+    kvm_msi_via_irqfd_allowed = true;
+}
+--- cut ---
+
+ I can post my sets as RFCs to qemu mailing list, if you want to take a look at the whole change
+set.
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
