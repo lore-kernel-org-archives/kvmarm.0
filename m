@@ -1,91 +1,94 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v7 09/11] KVM: arm64: guest debug, HW assisted debug
- support
-Date: Mon, 6 Jul 2015 11:31:14 +0200
-Message-ID: <20150706093114.GB11590@cbox>
-References: <1435775343-20034-1-git-send-email-alex.bennee@linaro.org>
- <1435775343-20034-10-git-send-email-alex.bennee@linaro.org>
- <20150702084847.GB3418@arm.com>
- <87pp4asm6u.fsf@linaro.org>
- <20150703092323.GA1588@arm.com>
- <87h9plrzqq.fsf@linaro.org>
- <20150706085140.GA30342@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH 1/7] KVM: api: add kvm_irq_routing_extended_msi
+Date: Mon, 6 Jul 2015 11:05:26 +0100
+Message-ID: <559A52E6.5050402@arm.com>
+References: <1435592237-17924-1-git-send-email-eric.auger@linaro.org>
+ <1435592237-17924-2-git-send-email-eric.auger@linaro.org>
+ <011f01d0b498$6a17aeb0$3e470c10$@samsung.com> <5596503E.6040902@arm.com>
+ <00fd01d0b7b6$f6cf3550$e46d9ff0$@samsung.com> <559A3C9C.6050302@arm.com>
+ <20150706093026.GA11590@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <linux-doc-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20150706085140.GA30342@arm.com>
-Sender: linux-doc-owner@vger.kernel.org
-To: Will Deacon <will.deacon@arm.com>
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <Marc.Zyngier@arm.com>, "peter.maydell@linaro.org" <peter.maydell@linaro.org>, "agraf@suse.de" <agraf@suse.de>, "drjones@redhat.com" <drjones@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "zhichao.huang@linaro.org" <zhichao.huang@linaro.org>, "jan.kiszka@siemens.com" <jan.kiszka@siemens.com>, "dahi@linux.vnet.ibm.com" <dahi@linux.vnet.ibm.com>, "r65777@freescale.com" <r65777@freescale.com>, "bp@suse.de" <bp@suse.de>, Gleb Natapov <gleb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Catalin Marinas <Catalin.Marinas@arm.com>, Lorenzo Pieralisi <Lorenzo.Pieralisi@arm.com>, Ingo Molnar <mingo@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1578257530
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 05:54:17 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Gvg3Ps4Prt9C for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  6 Jul 2015 05:54:06 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C0E4C5751B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  6 Jul 2015 05:54:05 -0400 (EDT)
+In-Reply-To: <20150706093026.GA11590@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: "eric.auger@st.com" <eric.auger@st.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jul 06, 2015 at 09:51:40AM +0100, Will Deacon wrote:
-> On Fri, Jul 03, 2015 at 05:07:41PM +0100, Alex Benn=E9e wrote:
-> > Will Deacon <will.deacon@arm.com> writes:
-> > > On Thu, Jul 02, 2015 at 02:50:33PM +0100, Alex Benn=E9e wrote:
-> > >> Are you happy with this?:
-> > >
-> > > [...]
-> > >
-> > >> +/**
-> > >> + * kvm_arch_dev_ioctl_check_extension
-> > >> + *
-> > >> + * We currently assume that the number of HW registers is unifo=
-rm
-> > >> + * across all CPUs (see cpuinfo_sanity_check).
-> > >> + */
-> > >>  int kvm_arch_dev_ioctl_check_extension(long ext)
-> > >>  {
-> > >>         int r;
-> > >> @@ -64,6 +71,12 @@ int kvm_arch_dev_ioctl_check_extension(long e=
-xt)
-> > >>         case KVM_CAP_ARM_EL1_32BIT:
-> > >>                 r =3D cpu_has_32bit_el1();
-> > >>                 break;
-> > >> +       case KVM_CAP_GUEST_DEBUG_HW_BPS:
-> > >> +               r =3D hw_breakpoint_slots(TYPE_INST);
-> > >> +               break;
-> > >> +       case KVM_CAP_GUEST_DEBUG_HW_WPS:
-> > >> +               r  =3D hw_breakpoint_slots(TYPE_DATA);
-> > >> +               break;
-> > >
-> > > Whilst I much prefer this code, it actually adds an unwanted depe=
-ndency
-> > > on PERF_EVENTS that I didn't think about to start with. Sorry to =
-keep
-> > > messing you about -- I guess your original patch is the best thin=
-g after
-> > > all.
-> >=20
-> > Everything looks to be in hw_breakpoint.[ch] which does depend on
-> > CONFIG_HAVE_HW_BREAKPOINT which depends on PERF_EVENTS to be built.
-> > However the previous code depended on this behaviour as well.
->=20
-> I think your original approach (of sticking stuff in the header file)=
- works
-> regardless of the CONFIG option, no?
->=20
-> > It would seem weird to enable guest debug using HW debug registers =
-to
-> > debug the guest yet not allowing the host kernel to use them? Of co=
-urse
-> > this is the only code they would share as all the magic of guest
-> > debugging is already mostly there for dirty guest handling.
-> >=20
-> > I'm not familiar with Kconfig but it looks like this is all part of
-> > arm64 defconfig. Are people really going to want to disable PERF_EV=
-ENTS
-> > but still debug their guests with HW support?
->=20
-> Then it's your call. I just find the host dependency on perf a bit we=
-ird
-> to get guest debug working (especially as the dependency is completel=
-y
-> "fake" because we don't use any perf infrastructure at all).
->=20
-Agreed, let's see if we can avoid this.
+Hi Christoffer,
 
-Thanks,
--Christoffer
+On 06/07/15 10:30, Christoffer Dall wrote:
+> On Mon, Jul 06, 2015 at 09:30:20AM +0100, Andre Przywara wrote:
+>> Hi Pavel,
+>>
+>> On 06/07/15 07:42, Pavel Fedin wrote:
+>>>  Hello!
+>>>
+>>>> I like this approach, but it runs into problems:
+>>>> As you read above the current documentation says that the flags field
+>>>> must be zero and the current KVM_SET_GSI_ROUTING handler bails out if it
+>>>> isn't. So userland would need to know whether it's safe to set that
+>>>> field.
+>>>
+>>>  This problem does not exist because:
+>>> a) Older platforms do not need this flag, so they expect to get zero.
+>>> b) ARM64 + GICv3 platform cannot work without this flag.
+>>>
+>>>  This is perfectly OK combination IMO. Userland just knows, whether it needs to supply device ID or
+>>> not. For example, my modified qemu now has kvm_msi_flags global variable which defaults to 0. ITS
+>>> code, then, if activated, changes it to KVM_MSI_VALID_DEVID, and qemu starts supplying device IDs to
+>>> the related calls.
+>>
+>> Well, I had this solution before in kvmtool: If ARM && ITS then set the
+>> flag. But I wasn't really happy with this, as the IRQ routing, setup and
+>> injection code is rather architecture agnostic (implementing the generic
+>> KVM interface), so spraying in some architecture hacks sounded not very
+>> elegant.
+>> Also as the flag describes a rather generic feature (provide an unique
+>> device ID), I'd rather avoid to make this an ARM hack.
+>>
+>> That being said this is not a show stopper for me, so if the others are
+>> happy with this, I will go down your road.
+>>
+> There must be some way for userspace to discover if it's valid to set
+> the flag or not; either through a well-defined error-code probing
+> mechanism for KVM_SET_GSI_ROUTING or through advertising a capability.
+
+Right, makes sense, I was wondering about this requirement earlier, but
+couldn't find really good prior art in the code (KVM_GET_VCPU_EVENTS
+seems to be bad example).
+So I think we get along with a new VM specific capability like
+KVM_CAP_MSIS_REQUIRE_DEVID. This isn't strictly a "capability" (as it's
+more a requirement), but I guess it fits here anyway. It has to be
+per-VM, as a GICv2M guest does not need it, but an ITS guest does.
+We can use this very flag for both the KVM_SIGNAL_MSI and the
+KVM_SET_GSI_ROUTING ioctl, so interface churn is kept minimal.
+
+Does that make sense?
+
+Actually I have implemented this already last week, I will send it out
+along with a v2 of the ITS emulation later this week.
+
+Cheers,
+Andre.
