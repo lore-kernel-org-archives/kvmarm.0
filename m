@@ -1,31 +1,38 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: [PATCH 2/2] Detect vGIC presence at runtime
-Date: Tue, 07 Jul 2015 13:38:49 +0300
-Message-ID: <8f44081ef96f51c6f2a5753e5933d7de1e3c2c2f.1436264839.git.p.fedin@samsung.com>
-References: <cover.1436264839.git.p.fedin@samsung.com>
+Subject: RE: [PATCH 1/7] KVM: api: add kvm_irq_routing_extended_msi
+Date: Tue, 07 Jul 2015 13:57:51 +0300
+Message-ID: <023301d0b8a3$c5a30680$50e91380$@samsung.com>
+References: <1435592237-17924-1-git-send-email-eric.auger@linaro.org>
+ <1435592237-17924-2-git-send-email-eric.auger@linaro.org>
+ <011f01d0b498$6a17aeb0$3e470c10$@samsung.com> <5596503E.6040902@arm.com>
+ <00fd01d0b7b6$f6cf3550$e46d9ff0$@samsung.com> <559A3C9C.6050302@arm.com>
+ <20150706093026.GA11590@cbox> <559A52E6.5050402@arm.com>
+ <20150706103755.GC11590@cbox> <559A6164.1000401@redhat.com>
+ <559A6527.1040107@arm.com> <559A6BBC.2040901@redhat.com>
+ <024301d0b7f0$2b13b410$813b1c30$@samsung.com> <559AA0D6.7070703@arm.com>
+ <014c01d0b884$deff46d0$9cfdd470$@samsung.com> <559BA3BD.60404@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DFFCB57DDB
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2015 06:27:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0248057DEC
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2015 06:46:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tpI0A1-QRJNh for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Jul 2015 06:27:27 -0400 (EDT)
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com
- [210.118.77.11])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 91BC257DE0
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2015 06:27:27 -0400 (EDT)
-Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
- by mailout1.w1.samsung.com
+ with ESMTP id jeHle3vz5A1Y for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Jul 2015 06:46:24 -0400 (EDT)
+Received: from mailout4.w1.samsung.com (mailout4.w1.samsung.com
+ [210.118.77.14])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D665A57DE1
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2015 06:46:24 -0400 (EDT)
+Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
+ by mailout4.w1.samsung.com
  (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NR4000AY5KUPG80@mailout1.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Tue, 07 Jul 2015 11:38:54 +0100 (BST)
-In-reply-to: <cover.1436264839.git.p.fedin@samsung.com>
-In-reply-to: <cover.1436264839.git.p.fedin@samsung.com>
-References: <cover.1436264839.git.p.fedin@samsung.com>
+ with ESMTP id <0NR400FV26GHWU80@mailout4.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Tue, 07 Jul 2015 11:57:53 +0100 (BST)
+In-reply-to: <559BA3BD.60404@arm.com>
+Content-language: ru
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,76 +42,31 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: KVM-ARM mailing list <kvmarm@lists.cs.columbia.edu>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
+To: 'Andre Przywara' <andre.przywara@arm.com>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Christoffer Dall' <christoffer.dall@linaro.org>
+Cc: eric.auger@st.com, kvm@vger.kernel.org, 'Marc Zyngier' <Marc.Zyngier@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Allows to use KVM on hardware without vGIC. Interrupt controller has to be
-emulated in userspace in this case.
+> I just don't want to end up with something like:
+> (GICV3 && ARM64) || (GICV3 && ARM && KERNEL>4.4) || (SuperIRQC && i986)
+> or
+> (ARM || ARM64) && HAS_IRQ_ROUTING
+> 
+> Instead: If the kernel needs it, it tells you. Full stop.
 
-Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
----
- arch/arm/kvm/arm.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ Agree.
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index d9631ec..f2f7a13 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -61,6 +61,8 @@ static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
- static u8 kvm_next_vmid;
- static DEFINE_SPINLOCK(kvm_vmid_lock);
- 
-+static bool vgic_present;
-+
- static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
- {
- 	BUG_ON(preemptible());
-@@ -172,6 +174,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	switch (ext) {
- 	case KVM_CAP_IRQCHIP:
- 	case KVM_CAP_IRQFD:
-+		r = vgic_present;
-+		break;
- 	case KVM_CAP_IOEVENTFD:
- 	case KVM_CAP_DEVICE_CTRL:
- 	case KVM_CAP_USER_MEMORY:
-@@ -850,6 +854,8 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
- 
- 	switch (dev_id) {
- 	case KVM_ARM_DEVICE_VGIC_V2:
-+		if (!vgic_present)
-+			return -ENXIO;
- 		return kvm_vgic_addr(kvm, type, &dev_addr->addr, true);
- 	default:
- 		return -ENODEV;
-@@ -864,6 +870,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 
- 	switch (ioctl) {
- 	case KVM_CREATE_IRQCHIP: {
-+		if (!vgic_present)
-+			return -ENXIO;
- 		return kvm_vgic_create(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
- 	}
- 	case KVM_ARM_SET_DEVICE_ADDR: {
-@@ -1046,8 +1054,17 @@ static int init_hyp_mode(void)
- 	 * Init HYP view of VGIC
- 	 */
- 	err = kvm_vgic_hyp_init();
--	if (err)
-+	switch (err) {
-+	case 0:
-+		vgic_present = true;
-+		break;
-+	case -ENODEV:
-+	case -ENXIO:
-+		vgic_present = false;
-+		break;
-+	default:
- 		goto out_free_context;
-+	}
- 
- 	/*
- 	 * Init HYP architected timer support
--- 
-2.4.4
+> To be honest it's me to blame here to not having introduced the
+> capability earlier. At the moment ARM has a different code path for
+> KVM_SIGNAL_MSI, which does not bail out if the flag field is set. With
+> Eric's patches this changes and we use the irqchip.c generic code, which
+> returns -EINVAL atm. So I plan to introduce this capability already with
+> the ITS emulation series, so we can just pick it up in the IRQ routing
+> series.
+
+ Then may be you follow https://lkml.org/lkml/2015/7/7/115 and replace flag with something like
+KVM_SIGNAL_EXT_MSI ioctl ? After all you were one of people who voted against using flags.
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
