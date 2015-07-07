@@ -1,174 +1,128 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 2/3] arm: KVM: Implement lazy VFP switching outside of
- Hyp Mode
-Date: Tue, 7 Jul 2015 17:27:50 +0200
-Message-ID: <20150707152750.GC13530@cbox>
-References: <1435203028-23142-1-git-send-email-m.smarduch@samsung.com>
- <1435203028-23142-3-git-send-email-m.smarduch@samsung.com>
- <20150705193440.GB3869@cbox>
- <559AC0E6.2000107@samsung.com>
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH v8 03/11] KVM: arm: guest debug, add stub KVM_SET_GUEST_DEBUG ioctl
+Date: Tue,  7 Jul 2015 17:29:55 +0100
+Message-ID: <1436286603-15192-4-git-send-email-alex.bennee@linaro.org>
+References: <1436286603-15192-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <559AC0E6.2000107@samsung.com>
+In-Reply-To: <1436286603-15192-1-git-send-email-alex.bennee@linaro.org>
 Sender: kvm-owner@vger.kernel.org
-To: Mario Smarduch <m.smarduch@samsung.com>
-Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, pbonzini@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com
+To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, peter.maydell@linaro.org, agraf@suse.de, drjones@redhat.com, pbonzini@redhat.com, zhichao.huang@linaro.org
+Cc: jan.kiszka@siemens.com, dahi@linux.vnet.ibm.com, r65777@freescale.com, bp@suse.de, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Gleb Natapov <gleb@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jul 06, 2015 at 10:54:46AM -0700, Mario Smarduch wrote:
-> On 07/05/2015 12:34 PM, Christoffer Dall wrote:
-> > On Wed, Jun 24, 2015 at 08:30:27PM -0700, Mario Smarduch wrote:
-> >> This patch implements the VFP context switch code called from vcpu_put in
-> >> Host KVM. In addition it implements the logic to skip setting a VFP trap if one
-> >> is not needed. Also resets the flag if Host KVM switched registers to trap new
-> >> guest vfp accesses.
-> >>
-> >>
-> >> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
-> >> ---
-> >>  arch/arm/kvm/interrupts.S |   49 ++++++++++++++++++++++++++++-----------------
-> >>  1 file changed, 31 insertions(+), 18 deletions(-)
-> >>
-> >> diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
-> >> index 79caf79..0912edd 100644
-> >> --- a/arch/arm/kvm/interrupts.S
-> >> +++ b/arch/arm/kvm/interrupts.S
-> >> @@ -96,6 +96,21 @@ ENTRY(__kvm_flush_vm_context)
-> >>  	bx	lr
-> >>  ENDPROC(__kvm_flush_vm_context)
-> >>  
-> >> +ENTRY(__kvm_restore_host_vfp_state)
-> >> +	push    {r3-r7}
-> >> +
-> >> +	mov     r1, #0
-> >> +	str     r1, [r0, #VCPU_VFP_SAVED]
-> >> +
-> >> +	add     r7, r0, #VCPU_VFP_GUEST
-> >> +	store_vfp_state r7
-> >> +	add     r7, r0, #VCPU_VFP_HOST
-> >> +	ldr     r7, [r7]
-> >> +	restore_vfp_state r7
-> >> +
-> >> +	pop     {r3-r7}
-> >> +	bx      lr
-> >> +ENDPROC(__kvm_restore_host_vfp_state)
-> > 
-> > it feels a bit strange to introduce this function here when I cannot see
-> > how it's called.
-> > 
-> > At the very least, could you provide the C equivalent prototype in a
-> > comment or specify what the input registers are?  E.g.
-> 
-> Yes again that's on a todo list.
-> > 
-> > /*
-> >  * void __kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu);
-> >  */
-> > 
-> >>  
-> >>  /********************************************************************
-> >>   *  Hypervisor world-switch code
-> >> @@ -131,7 +146,13 @@ ENTRY(__kvm_vcpu_run)
-> >>  
-> >>  	@ Trap coprocessor CRx accesses
-> >>  	set_hstr vmentry
-> >> +
-> >> +	ldr	r1, [vcpu, #VCPU_VFP_SAVED]
-> >> +	cmp	r1, #1
-> >> +	beq     skip_guest_vfp_trap
-> >>  	set_hcptr vmentry, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
-> >> +skip_guest_vfp_trap:
-> >> +
-> >>  	set_hdcr vmentry
-> >>  
-> >>  	@ Write configured ID register into MIDR alias
-> >> @@ -173,18 +194,6 @@ __kvm_vcpu_return:
-> >>  	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
-> >>  
-> >>  #ifdef CONFIG_VFPv3
-> >> -	@ Save floating point registers we if let guest use them.
-> >> -	tst	r2, #(HCPTR_TCP(10) | HCPTR_TCP(11))
-> >> -	bne	after_vfp_restore
-> >> -
-> >> -	@ Switch VFP/NEON hardware state to the host's
-> >> -	add	r7, vcpu, #VCPU_VFP_GUEST
-> >> -	store_vfp_state r7
-> >> -	add	r7, vcpu, #VCPU_VFP_HOST
-> >> -	ldr	r7, [r7]
-> >> -	restore_vfp_state r7
-> >> -
-> >> -after_vfp_restore:
-> >>  	@ Restore FPEXC_EN which we clobbered on entry
-> >>  	pop	{r2}
-> >>  	VFPFMXR FPEXC, r2
-> >> @@ -363,10 +372,6 @@ hyp_hvc:
-> >>  	@ Check syndrome register
-> >>  	mrc	p15, 4, r1, c5, c2, 0	@ HSR
-> >>  	lsr	r0, r1, #HSR_EC_SHIFT
-> >> -#ifdef CONFIG_VFPv3
-> >> -	cmp	r0, #HSR_EC_CP_0_13
-> >> -	beq	switch_to_guest_vfp
-> >> -#endif
-> >>  	cmp	r0, #HSR_EC_HVC
-> >>  	bne	guest_trap		@ Not HVC instr.
-> >>  
-> >> @@ -380,7 +385,10 @@ hyp_hvc:
-> >>  	cmp     r2, #0
-> >>  	bne	guest_trap		@ Guest called HVC
-> >>  
-> >> -host_switch_to_hyp:
-> >> +	/*
-> >> +	 * Getting here means host called HVC, we shift parameters and branch
-> >> +	 * to Hyp function.
-> >> +	 */
-> > 
-> > not sure this comment change belongs in this patch (but the comment is
-> > well-written).
-> 
-> I built this patch on top of previous one. But IMO this series
-> is not ready for upstream yet.
-> 
-> > 
-> >>  	pop	{r0, r1, r2}
-> >>  
-> >>  	/* Check for __hyp_get_vectors */
-> >> @@ -411,6 +419,10 @@ guest_trap:
-> >>  
-> >>  	@ Check if we need the fault information
-> >>  	lsr	r1, r1, #HSR_EC_SHIFT
-> >> +#ifdef CONFIG_VFPv3
-> >> +	cmp	r1, #HSR_EC_CP_0_13
-> >> +	beq	switch_to_guest_vfp
-> >> +#endif
-> >>  	cmp	r1, #HSR_EC_IABT
-> >>  	mrceq	p15, 4, r2, c6, c0, 2	@ HIFAR
-> >>  	beq	2f
-> >> @@ -479,11 +491,12 @@ guest_trap:
-> >>   */
-> >>  #ifdef CONFIG_VFPv3
-> >>  switch_to_guest_vfp:
-> >> -	load_vcpu			@ Load VCPU pointer to r0
-> >>  	push	{r3-r7}
-> >>  
-> >>  	@ NEON/VFP used.  Turn on VFP access.
-> >>  	set_hcptr vmexit, (HCPTR_TCP(10) | HCPTR_TCP(11))
-> >> +	mov	r1, #1
-> >> +	str	r1, [vcpu, #VCPU_VFP_SAVED]
-> >>  
-> >>  	@ Switch VFP/NEON hardware state to the guest's
-> >>  	add	r7, r0, #VCPU_VFP_HOST
-> >> -- 
-> >> 1.7.9.5
-> >>
-> > It would probably be easier to just rebase this on the previous series
-> > and refer to that in the cover letter, but the approach here looks
-> > otherwise right to me.
-> 
-> What if we used the simplified approach (as Marc mentioned) and
-> let it run for quite a while and then move this series?
+This commit adds a stub function to support the KVM_SET_GUEST_DEBUG
+ioctl. Any unsupported flag will return -EINVAL. For now, only
+KVM_GUESTDBG_ENABLE is supported, although it won't have any effects.
 
-Sounds good, let's merge these things separately.
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>.
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 
--Christoffer
+---
+v2
+  - simplified form of the ioctl (stuff will go into setup_debug)
+v3
+ - KVM_GUESTDBG_VALID->KVM_GUESTDBG_VALID_MASK
+ - move mask check to the top of function
+ - add ioctl doc header
+ - split capability into separate patch
+ - tweaked commit wording w.r.t return of -EINVAL
+v4
+ - add r-b-tag
+v7
+ - moved ioctl to arm64/kvm/guest.c, stubbed arm/kvm/guest.c
+---
+ Documentation/virtual/kvm/api.txt |  2 +-
+ arch/arm/kvm/arm.c                |  7 -------
+ arch/arm/kvm/guest.c              |  6 ++++++
+ arch/arm64/kvm/guest.c            | 27 +++++++++++++++++++++++++++
+ 4 files changed, 34 insertions(+), 8 deletions(-)
+
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/=
+kvm/api.txt
+index c34c32d..ba635c7 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -2645,7 +2645,7 @@ handled.
+ 4.87 KVM_SET_GUEST_DEBUG
+=20
+ Capability: KVM_CAP_SET_GUEST_DEBUG
+-Architectures: x86, s390, ppc
++Architectures: x86, s390, ppc, arm64
+ Type: vcpu ioctl
+ Parameters: struct kvm_guest_debug (in)
+ Returns: 0 on success; -1 on error
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index d9631ec..92b80bc 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -302,13 +302,6 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ 	kvm_arm_set_running_vcpu(NULL);
+ }
+=20
+-int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+-					struct kvm_guest_debug *dbg)
+-{
+-	return -EINVAL;
+-}
+-
+-
+ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+ 				    struct kvm_mp_state *mp_state)
+ {
+diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
+index d503fbb..96e935b 100644
+--- a/arch/arm/kvm/guest.c
++++ b/arch/arm/kvm/guest.c
+@@ -290,3 +290,9 @@ int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *=
+vcpu,
+ {
+ 	return -EINVAL;
+ }
++
++int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
++					struct kvm_guest_debug *dbg)
++{
++	return -EINVAL;
++}
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index 9535bd5..0ba8677 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -331,3 +331,30 @@ int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu =
+*vcpu,
+ {
+ 	return -EINVAL;
+ }
++
++#define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE)
++
++/**
++ * kvm_arch_vcpu_ioctl_set_guest_debug - set up guest debugging
++ * @kvm:	pointer to the KVM struct
++ * @kvm_guest_debug: the ioctl data buffer
++ *
++ * This sets up and enables the VM for guest debugging. Userspace
++ * passes in a control flag to enable different debug types and
++ * potentially other architecture specific information in the rest of
++ * the structure.
++ */
++int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
++					struct kvm_guest_debug *dbg)
++{
++	if (dbg->control & ~KVM_GUESTDBG_VALID_MASK)
++		return -EINVAL;
++
++	if (dbg->control & KVM_GUESTDBG_ENABLE) {
++		vcpu->guest_debug =3D dbg->control;
++	} else {
++		/* If not enabled clear all flags */
++		vcpu->guest_debug =3D 0;
++	}
++	return 0;
++}
+--=20
+2.4.5
+
