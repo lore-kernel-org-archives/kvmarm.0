@@ -1,169 +1,174 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH 2/2] kvm: arm/arm64: implement kvm_arm_[halt, resume]_guest
-Date: Tue, 07 Jul 2015 16:10:37 +0200
-Message-ID: <559BDDDD.90103@linaro.org>
-References: <1436186996-22528-1-git-send-email-eric.auger@linaro.org>
- <1436186996-22528-3-git-send-email-eric.auger@linaro.org>
- <20150707134154.GG3381@hawk.localdomain>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH 2/3] arm: KVM: Implement lazy VFP switching outside of
+ Hyp Mode
+Date: Tue, 7 Jul 2015 17:27:50 +0200
+Message-ID: <20150707152750.GC13530@cbox>
+References: <1435203028-23142-1-git-send-email-m.smarduch@samsung.com>
+ <1435203028-23142-3-git-send-email-m.smarduch@samsung.com>
+ <20150705193440.GB3869@cbox>
+ <559AC0E6.2000107@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AF97757EBA
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2015 09:59:29 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I6bG1Q6lqkxQ for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Jul 2015 09:59:28 -0400 (EDT)
-Received: from mail-wg0-f45.google.com (mail-wg0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 97D0857EB5
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2015 09:59:28 -0400 (EDT)
-Received: by wgbgr6 with SMTP id gr6so15276719wgb.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 07 Jul 2015 07:10:58 -0700 (PDT)
-In-Reply-To: <20150707134154.GG3381@hawk.localdomain>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
-Cc: eric.auger@st.com, patches@linaro.org, marc.zyngier@arm.com, alex.williamson@redhat.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <559AC0E6.2000107@samsung.com>
+Sender: kvm-owner@vger.kernel.org
+To: Mario Smarduch <m.smarduch@samsung.com>
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, pbonzini@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/07/2015 03:41 PM, Andrew Jones wrote:
-> On Mon, Jul 06, 2015 at 02:49:56PM +0200, Eric Auger wrote:
->> On halt, the guest is forced to exit and prevented from being
->> re-entered. This is synchronous.
->>
->> Those two operations will be needed for IRQ forwarding setting.
->>
->> Signed-off-by: Eric Auger <eric.auger@linaro.org>
->>
->> ---
->> RFC v1 -> v2:
->> - add __maybe_unused
->>
->> RFC:
->> - rename the function and this latter becomes static
->> - remove __KVM_HAVE_ARCH_HALT_GUEST
->>
->> v4 -> v5: add arm64 support
->> - also defines __KVM_HAVE_ARCH_HALT_GUEST for arm64
->> - add pause field
->> ---
->>  arch/arm/include/asm/kvm_host.h   |  3 +++
->>  arch/arm/kvm/arm.c                | 35 ++++++++++++++++++++++++++++++++---
->>  arch/arm64/include/asm/kvm_host.h |  3 +++
->>  3 files changed, 38 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
->> index 304004d..899ae27 100644
->> --- a/arch/arm/include/asm/kvm_host.h
->> +++ b/arch/arm/include/asm/kvm_host.h
->> @@ -132,6 +132,9 @@ struct kvm_vcpu_arch {
->>  	/* vcpu power-off state */
->>  	bool power_off;
->>  
->> +	/* Don't run the guest */
->> +	bool pause;
->> +
->>  	/* IO related fields */
->>  	struct kvm_decode mmio_decode;
->>  
->> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
->> index 7537e68..46d4ef6 100644
->> --- a/arch/arm/kvm/arm.c
->> +++ b/arch/arm/kvm/arm.c
->> @@ -471,11 +471,39 @@ bool kvm_arch_intc_initialized(struct kvm *kvm)
->>  	return vgic_initialized(kvm);
->>  }
->>  
->> +static void kvm_arm_halt_guest(struct kvm *kvm) __maybe_unused;
->> +static void kvm_arm_resume_guest(struct kvm *kvm) __maybe_unused;
->> +
->> +static void kvm_arm_halt_guest(struct kvm *kvm)
->> +{
->> +	int i;
->> +	struct kvm_vcpu *vcpu;
->> +
->> +	kvm_for_each_vcpu(i, vcpu, kvm)
->> +		vcpu->arch.pause = true;
->> +	force_vm_exit(cpu_all_mask);
->> +}
->> +
->> +static void kvm_arm_resume_guest(struct kvm *kvm)
->> +{
->> +	int i;
->> +	struct kvm_vcpu *vcpu;
->> +
->> +	kvm_for_each_vcpu(i, vcpu, kvm) {
->> +		wait_queue_head_t *wq = kvm_arch_vcpu_wq(vcpu);
->> +
->> +		vcpu->arch.pause = false;
->> +		wake_up_interruptible(wq);
->> +	}
->> +}
->> +
->> +
->>  static void vcpu_pause(struct kvm_vcpu *vcpu)
->>  {
->>  	wait_queue_head_t *wq = kvm_arch_vcpu_wq(vcpu);
->>  
->> -	wait_event_interruptible(*wq, !vcpu->arch.power_off);
->> +	wait_event_interruptible(*wq, ((!vcpu->arch.power_off) &&
->> +				       (!vcpu->arch.pause)));
->>  }
->>  
->>  static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
->> @@ -525,7 +553,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>  
->>  		update_vttbr(vcpu->kvm);
->>  
->> -		if (vcpu->arch.power_off)
->> +		if (vcpu->arch.power_off || vcpu->arch.pause)
->>  			vcpu_pause(vcpu);
->>  
->>  		/*
->> @@ -551,7 +579,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>  			run->exit_reason = KVM_EXIT_INTR;
->>  		}
->>  
->> -		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm)) {
->> +		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
->> +		    vcpu->arch.pause) {
->>  			local_irq_enable();
->>  			preempt_enable();
->>  			kvm_vgic_sync_hwstate(vcpu);
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 009da6b..69e3785 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -125,6 +125,9 @@ struct kvm_vcpu_arch {
->>  	/* vcpu power-off state */
->>  	bool power_off;
->>  
->> +	/* Don't run the guest */
->> +	bool pause;
->> +
->>  	/* IO related fields */
->>  	struct kvm_decode mmio_decode;
+On Mon, Jul 06, 2015 at 10:54:46AM -0700, Mario Smarduch wrote:
+> On 07/05/2015 12:34 PM, Christoffer Dall wrote:
+> > On Wed, Jun 24, 2015 at 08:30:27PM -0700, Mario Smarduch wrote:
+> >> This patch implements the VFP context switch code called from vcpu_put in
+> >> Host KVM. In addition it implements the logic to skip setting a VFP trap if one
+> >> is not needed. Also resets the flag if Host KVM switched registers to trap new
+> >> guest vfp accesses.
+> >>
+> >>
+> >> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+> >> ---
+> >>  arch/arm/kvm/interrupts.S |   49 ++++++++++++++++++++++++++++-----------------
+> >>  1 file changed, 31 insertions(+), 18 deletions(-)
+> >>
+> >> diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
+> >> index 79caf79..0912edd 100644
+> >> --- a/arch/arm/kvm/interrupts.S
+> >> +++ b/arch/arm/kvm/interrupts.S
+> >> @@ -96,6 +96,21 @@ ENTRY(__kvm_flush_vm_context)
+> >>  	bx	lr
+> >>  ENDPROC(__kvm_flush_vm_context)
+> >>  
+> >> +ENTRY(__kvm_restore_host_vfp_state)
+> >> +	push    {r3-r7}
+> >> +
+> >> +	mov     r1, #0
+> >> +	str     r1, [r0, #VCPU_VFP_SAVED]
+> >> +
+> >> +	add     r7, r0, #VCPU_VFP_GUEST
+> >> +	store_vfp_state r7
+> >> +	add     r7, r0, #VCPU_VFP_HOST
+> >> +	ldr     r7, [r7]
+> >> +	restore_vfp_state r7
+> >> +
+> >> +	pop     {r3-r7}
+> >> +	bx      lr
+> >> +ENDPROC(__kvm_restore_host_vfp_state)
+> > 
+> > it feels a bit strange to introduce this function here when I cannot see
+> > how it's called.
+> > 
+> > At the very least, could you provide the C equivalent prototype in a
+> > comment or specify what the input registers are?  E.g.
 > 
-> So in the last patch, for cleanliness, maybe it would be better to
-> change the pause reference to a power_off reference in
-> kvm_arch_vcpu_ioctl_set_mpstate, and keep removing it. Or, maybe the
-> patch wouldn't look too bad if we just squashed this one into the
-> last one?
-yeah I need to think again about the patch structure and/or maybe adopt
-the lazy approach, putting both together.
+> Yes again that's on a todo list.
+> > 
+> > /*
+> >  * void __kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu);
+> >  */
+> > 
+> >>  
+> >>  /********************************************************************
+> >>   *  Hypervisor world-switch code
+> >> @@ -131,7 +146,13 @@ ENTRY(__kvm_vcpu_run)
+> >>  
+> >>  	@ Trap coprocessor CRx accesses
+> >>  	set_hstr vmentry
+> >> +
+> >> +	ldr	r1, [vcpu, #VCPU_VFP_SAVED]
+> >> +	cmp	r1, #1
+> >> +	beq     skip_guest_vfp_trap
+> >>  	set_hcptr vmentry, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
+> >> +skip_guest_vfp_trap:
+> >> +
+> >>  	set_hdcr vmentry
+> >>  
+> >>  	@ Write configured ID register into MIDR alias
+> >> @@ -173,18 +194,6 @@ __kvm_vcpu_return:
+> >>  	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
+> >>  
+> >>  #ifdef CONFIG_VFPv3
+> >> -	@ Save floating point registers we if let guest use them.
+> >> -	tst	r2, #(HCPTR_TCP(10) | HCPTR_TCP(11))
+> >> -	bne	after_vfp_restore
+> >> -
+> >> -	@ Switch VFP/NEON hardware state to the host's
+> >> -	add	r7, vcpu, #VCPU_VFP_GUEST
+> >> -	store_vfp_state r7
+> >> -	add	r7, vcpu, #VCPU_VFP_HOST
+> >> -	ldr	r7, [r7]
+> >> -	restore_vfp_state r7
+> >> -
+> >> -after_vfp_restore:
+> >>  	@ Restore FPEXC_EN which we clobbered on entry
+> >>  	pop	{r2}
+> >>  	VFPFMXR FPEXC, r2
+> >> @@ -363,10 +372,6 @@ hyp_hvc:
+> >>  	@ Check syndrome register
+> >>  	mrc	p15, 4, r1, c5, c2, 0	@ HSR
+> >>  	lsr	r0, r1, #HSR_EC_SHIFT
+> >> -#ifdef CONFIG_VFPv3
+> >> -	cmp	r0, #HSR_EC_CP_0_13
+> >> -	beq	switch_to_guest_vfp
+> >> -#endif
+> >>  	cmp	r0, #HSR_EC_HVC
+> >>  	bne	guest_trap		@ Not HVC instr.
+> >>  
+> >> @@ -380,7 +385,10 @@ hyp_hvc:
+> >>  	cmp     r2, #0
+> >>  	bne	guest_trap		@ Guest called HVC
+> >>  
+> >> -host_switch_to_hyp:
+> >> +	/*
+> >> +	 * Getting here means host called HVC, we shift parameters and branch
+> >> +	 * to Hyp function.
+> >> +	 */
+> > 
+> > not sure this comment change belongs in this patch (but the comment is
+> > well-written).
+> 
+> I built this patch on top of previous one. But IMO this series
+> is not ready for upstream yet.
+> 
+> > 
+> >>  	pop	{r0, r1, r2}
+> >>  
+> >>  	/* Check for __hyp_get_vectors */
+> >> @@ -411,6 +419,10 @@ guest_trap:
+> >>  
+> >>  	@ Check if we need the fault information
+> >>  	lsr	r1, r1, #HSR_EC_SHIFT
+> >> +#ifdef CONFIG_VFPv3
+> >> +	cmp	r1, #HSR_EC_CP_0_13
+> >> +	beq	switch_to_guest_vfp
+> >> +#endif
+> >>  	cmp	r1, #HSR_EC_IABT
+> >>  	mrceq	p15, 4, r2, c6, c0, 2	@ HIFAR
+> >>  	beq	2f
+> >> @@ -479,11 +491,12 @@ guest_trap:
+> >>   */
+> >>  #ifdef CONFIG_VFPv3
+> >>  switch_to_guest_vfp:
+> >> -	load_vcpu			@ Load VCPU pointer to r0
+> >>  	push	{r3-r7}
+> >>  
+> >>  	@ NEON/VFP used.  Turn on VFP access.
+> >>  	set_hcptr vmexit, (HCPTR_TCP(10) | HCPTR_TCP(11))
+> >> +	mov	r1, #1
+> >> +	str	r1, [vcpu, #VCPU_VFP_SAVED]
+> >>  
+> >>  	@ Switch VFP/NEON hardware state to the guest's
+> >>  	add	r7, r0, #VCPU_VFP_HOST
+> >> -- 
+> >> 1.7.9.5
+> >>
+> > It would probably be easier to just rebase this on the previous series
+> > and refer to that in the cover letter, but the approach here looks
+> > otherwise right to me.
+> 
+> What if we used the simplified approach (as Marc mentioned) and
+> let it run for quite a while and then move this series?
 
-Thanks again
+Sounds good, let's merge these things separately.
 
-Eric
-> 
-> drew
-> 
+-Christoffer
