@@ -1,33 +1,25 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC v2 3/6] irq: bypass: Extend skeleton for ARM forwarding
- control
-Date: Tue, 7 Jul 2015 15:22:34 +0200
-Message-ID: <559BD29A.9000208@redhat.com>
-References: <1436184692-20927-1-git-send-email-eric.auger@linaro.org>
- <1436184692-20927-4-git-send-email-eric.auger@linaro.org>
- <E959C4978C3B6342920538CF579893F0025F342B@SHSMSX104.ccr.corp.intel.com>
- <559BB167.1030603@redhat.com>
- <E959C4978C3B6342920538CF579893F0025F34FC@SHSMSX104.ccr.corp.intel.com>
- <559BB463.6090406@redhat.com>
- <E959C4978C3B6342920538CF579893F0025F3568@SHSMSX104.ccr.corp.intel.com>
- <559BB642.5010701@redhat.com>
- <E959C4978C3B6342920538CF579893F0025F35E1@SHSMSX104.ccr.corp.intel.com>
- <E959C4978C3B6342920538CF579893F0025F3645@SHSMSX104.ccr.corp.intel.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH 1/2] KVM: arm: rename pause into power_off
+Date: Tue, 7 Jul 2015 15:36:29 +0200
+Message-ID: <20150707133629.GF3381@hawk.localdomain>
+References: <1436186996-22528-1-git-send-email-eric.auger@linaro.org>
+ <1436186996-22528-2-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E91F57E73
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2015 09:11:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 21D1E57E89
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2015 09:25:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ei2KkiJIg3iu for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Jul 2015 09:11:13 -0400 (EDT)
+ with ESMTP id HS6vTC3uQAgq for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  7 Jul 2015 09:25:04 -0400 (EDT)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 86BF457E71
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2015 09:11:13 -0400 (EDT)
-In-Reply-To: <E959C4978C3B6342920538CF579893F0025F3645@SHSMSX104.ccr.corp.intel.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C64A457E5D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2015 09:25:04 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <1436186996-22528-2-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,25 +29,157 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "Wu, Feng" <feng.wu@intel.com>, Eric Auger <eric.auger@linaro.org>, "eric.auger@st.com" <eric.auger@st.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "avi.kivity@gmail.com" <avi.kivity@gmail.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "joro@8bytes.org" <joro@8bytes.org>, "b.reynal@virtualopensystems.com" <b.reynal@virtualopensystems.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "patches@linaro.org" <patches@linaro.org>
+To: Eric Auger <eric.auger@linaro.org>
+Cc: eric.auger@st.com, patches@linaro.org, marc.zyngier@arm.com, alex.williamson@redhat.com, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On Mon, Jul 06, 2015 at 02:49:55PM +0200, Eric Auger wrote:
+> The kvm_vcpu_arch pause field is renamed into power_off to prepare
+> for the introduction of a new pause field.
+> 
+> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+> 
+> v4 -> v5:
+> - fix compilation issue on arm64 (add power_off field in kvm_host.h)
+> ---
+>  arch/arm/include/asm/kvm_host.h   |  4 ++--
+>  arch/arm/kvm/arm.c                | 10 +++++-----
+>  arch/arm/kvm/psci.c               | 10 +++++-----
+>  arch/arm64/include/asm/kvm_host.h |  4 ++--
+>  4 files changed, 14 insertions(+), 14 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index e896d2c..304004d 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -129,8 +129,8 @@ struct kvm_vcpu_arch {
+>  	 * here.
+>  	 */
+>  
+> -	/* Don't run the guest on this vcpu */
+> -	bool pause;
 
+This patch should leave pause in. kvm_arch_vcpu_ioctl_set_mpstate still
+references it, compilation is broken until the next patch comes.
 
-On 07/07/2015 13:33, Wu, Feng wrote:
->>> > > The need to store the consumer->producer link seems to be unique to
->>> > > posted interrupts.  It is difficult to say without seeing the PI code,
->>> > > but I prefer to keep the bypass manager as small as possible.
->> > 
->> > Fine. I will follow your suggestion!
-> If using the following changes, how can we assign 'prod', we need to use
-> container_of to get struct kvm_kernel_irqfd and then refer to 'prod', but
-> we cannot do this in irq_bypass_register_consumer(), right? It is a
-> common API. But we can only get the associated producer info inside
-> bypass manager, right?
+> +	/* vcpu power-off state */
+> +	bool power_off;
+>  
+>  	/* IO related fields */
+>  	struct kvm_decode mmio_decode;
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index bcdf799..7537e68 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -475,7 +475,7 @@ static void vcpu_pause(struct kvm_vcpu *vcpu)
+>  {
+>  	wait_queue_head_t *wq = kvm_arch_vcpu_wq(vcpu);
+>  
+> -	wait_event_interruptible(*wq, !vcpu->arch.pause);
+> +	wait_event_interruptible(*wq, !vcpu->arch.power_off);
 
-KVM's add_producer and del_producer callbacks do have a pointer to the
-producer.
+Leaving pause in would allow this to already be
 
-Paolo
++       wait_event_interruptible(*wq, ((!vcpu->arch.power_off) &&
++                                      (!vcpu->arch.pause)));
+
+which feels better. The function name is vcpu_pause, so it's nice
+to see state named 'pause' in there.
+
+>  }
+>  
+>  static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+> @@ -525,7 +525,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  
+>  		update_vttbr(vcpu->kvm);
+>  
+> -		if (vcpu->arch.pause)
+> +		if (vcpu->arch.power_off)
+>  			vcpu_pause(vcpu);
+>  
+>  		/*
+> @@ -766,12 +766,12 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+>  	vcpu_reset_hcr(vcpu);
+>  
+>  	/*
+> -	 * Handle the "start in power-off" case by marking the VCPU as paused.
+> +	 * Handle the "start in power-off" case.
+>  	 */
+>  	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
+> -		vcpu->arch.pause = true;
+> +		vcpu->arch.power_off = true;
+>  	else
+> -		vcpu->arch.pause = false;
+> +		vcpu->arch.power_off = false;
+>  
+>  	return 0;
+>  }
+> diff --git a/arch/arm/kvm/psci.c b/arch/arm/kvm/psci.c
+> index 4b94b51..134971a 100644
+> --- a/arch/arm/kvm/psci.c
+> +++ b/arch/arm/kvm/psci.c
+> @@ -63,7 +63,7 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
+>  
+>  static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
+>  {
+> -	vcpu->arch.pause = true;
+> +	vcpu->arch.power_off = true;
+>  }
+>  
+>  static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+> @@ -87,7 +87,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	 */
+>  	if (!vcpu)
+>  		return PSCI_RET_INVALID_PARAMS;
+> -	if (!vcpu->arch.pause) {
+> +	if (!vcpu->arch.power_off) {
+>  		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
+>  			return PSCI_RET_ALREADY_ON;
+>  		else
+> @@ -115,7 +115,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+>  	 * the general puspose registers are undefined upon CPU_ON.
+>  	 */
+>  	*vcpu_reg(vcpu, 0) = context_id;
+> -	vcpu->arch.pause = false;
+> +	vcpu->arch.power_off = false;
+>  	smp_mb();		/* Make sure the above is visible */
+>  
+>  	wq = kvm_arch_vcpu_wq(vcpu);
+> @@ -152,7 +152,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+>  	kvm_for_each_vcpu(i, tmp, kvm) {
+>  		mpidr = kvm_vcpu_get_mpidr_aff(tmp);
+>  		if (((mpidr & target_affinity_mask) == target_affinity) &&
+> -		    !tmp->arch.pause) {
+> +		    !tmp->arch.power_off) {
+>  			return PSCI_0_2_AFFINITY_LEVEL_ON;
+>  		}
+>  	}
+> @@ -175,7 +175,7 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
+>  	 * re-initialized.
+>  	 */
+>  	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+> -		tmp->arch.pause = true;
+> +		tmp->arch.power_off = true;
+>  		kvm_vcpu_kick(tmp);
+>  	}
+>  
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 2709db2..009da6b 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -122,8 +122,8 @@ struct kvm_vcpu_arch {
+>  	 * here.
+>  	 */
+>  
+> -	/* Don't run the guest */
+> -	bool pause;
+> +	/* vcpu power-off state */
+> +	bool power_off;
+>  
+>  	/* IO related fields */
+>  	struct kvm_decode mmio_decode;
+> -- 
+> 1.9.1
+
+Thanks,
+drew
