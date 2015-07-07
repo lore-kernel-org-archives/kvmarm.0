@@ -1,72 +1,194 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH 1/7] KVM: api: add kvm_irq_routing_extended_msi
-Date: Tue, 07 Jul 2015 13:57:51 +0300
-Message-ID: <023301d0b8a3$c5a30680$50e91380$@samsung.com>
-References: <1435592237-17924-1-git-send-email-eric.auger@linaro.org>
- <1435592237-17924-2-git-send-email-eric.auger@linaro.org>
- <011f01d0b498$6a17aeb0$3e470c10$@samsung.com> <5596503E.6040902@arm.com>
- <00fd01d0b7b6$f6cf3550$e46d9ff0$@samsung.com> <559A3C9C.6050302@arm.com>
- <20150706093026.GA11590@cbox> <559A52E6.5050402@arm.com>
- <20150706103755.GC11590@cbox> <559A6164.1000401@redhat.com>
- <559A6527.1040107@arm.com> <559A6BBC.2040901@redhat.com>
- <024301d0b7f0$2b13b410$813b1c30$@samsung.com> <559AA0D6.7070703@arm.com>
- <014c01d0b884$deff46d0$9cfdd470$@samsung.com> <559BA3BD.60404@arm.com>
+From: "Wu, Feng" <feng.wu@intel.com>
+Subject: RE: [RFC v2 3/6] irq: bypass: Extend skeleton for ARM forwarding
+ control
+Date: Tue, 7 Jul 2015 10:58:56 +0000
+Message-ID: <E959C4978C3B6342920538CF579893F0025F342B@SHSMSX104.ccr.corp.intel.com>
+References: <1436184692-20927-1-git-send-email-eric.auger@linaro.org>
+ <1436184692-20927-4-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0248057DEC
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2015 06:46:27 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jeHle3vz5A1Y for <kvmarm@lists.cs.columbia.edu>;
- Tue,  7 Jul 2015 06:46:24 -0400 (EDT)
-Received: from mailout4.w1.samsung.com (mailout4.w1.samsung.com
- [210.118.77.14])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D665A57DE1
- for <kvmarm@lists.cs.columbia.edu>; Tue,  7 Jul 2015 06:46:24 -0400 (EDT)
-Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
- by mailout4.w1.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NR400FV26GHWU80@mailout4.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Tue, 07 Jul 2015 11:57:53 +0100 (BST)
-In-reply-to: <559BA3BD.60404@arm.com>
-Content-language: ru
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: 'Andre Przywara' <andre.przywara@arm.com>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Christoffer Dall' <christoffer.dall@linaro.org>
-Cc: eric.auger@st.com, kvm@vger.kernel.org, 'Marc Zyngier' <Marc.Zyngier@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Transfer-Encoding: 8BIT
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1436184692-20927-4-git-send-email-eric.auger@linaro.org>
+Content-Language: en-US
+Sender: linux-kernel-owner@vger.kernel.org
+To: Eric Auger <eric.auger@linaro.org>, "eric.auger@st.com" <eric.auger@st.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "avi.kivity@gmail.com" <avi.kivity@gmail.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "joro@8bytes.org" <joro@8bytes.org>, "b.reynal@virtualopensystems.com" <b.reynal@virtualopensystems.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "patches@linaro.org" <patches@linaro.org>, "Wu, Feng" <feng.wu@intel.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-> I just don't want to end up with something like:
-> (GICV3 && ARM64) || (GICV3 && ARM && KERNEL>4.4) || (SuperIRQC && i986)
-> or
-> (ARM || ARM64) && HAS_IRQ_ROUTING
+
+
+> -----Original Message-----
+> From: Eric Auger [mailto:eric.auger@linaro.org]
+> Sent: Monday, July 06, 2015 8:11 PM
+> To: eric.auger@st.com; eric.auger@linaro.org;
+> linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
+> kvm@vger.kernel.org; christoffer.dall@linaro.org; marc.zyngier@arm.com;
+> alex.williamson@redhat.com; pbonzini@redhat.com; avi.kivity@gmail.com;
+> mtosatti@redhat.com; Wu, Feng; joro@8bytes.org;
+> b.reynal@virtualopensystems.com
+> Cc: linux-kernel@vger.kernel.org; patches@linaro.org
+> Subject: [RFC v2 3/6] irq: bypass: Extend skeleton for ARM forwarding control
 > 
-> Instead: If the kernel needs it, it tells you. Full stop.
+> - [add,del]_[consumer,producer] updated to takes both the consumer and
+>   producer handles. This is requested to combine info from both,
+>   typically to link the source irq owned by the producer with the gsi
+>   owned by the consumer (forwarded IRQ setup).
+> - new methods are added:
+>   x stop/resume: Those are needed for forwarding since the state change
+>     requires to entermingle actions at consumer, producer.
+>   x consumer update for posted interrupts
+> - On handshake, we now call connect, disconnect which features the more
+>   complex sequence.
+> - add irq on producer side
+> 
+> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+> 
+> ---
+> 
+> v1 -> v2:
+> - remove vfio_device, kvm, gsi, opaque fields included in v1 except common
+> - all those in can be retrieved with container_of in callbacks
+> ---
+>  include/linux/irqbypass.h | 19 ++++++++++++++++---
+>  kernel/irq/bypass.c       | 44
+> ++++++++++++++++++++++++++++++++++++++++----
+>  2 files changed, 56 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/linux/irqbypass.h b/include/linux/irqbypass.h
+> index 718508e..8f62235 100644
+> --- a/include/linux/irqbypass.h
+> +++ b/include/linux/irqbypass.h
+> @@ -3,17 +3,30 @@
+> 
+>  #include <linux/list.h>
+> 
+> +struct irq_bypass_consumer;
+> +
+>  struct irq_bypass_producer {
+>  	struct list_head node;
+>  	void *token;
+> -	/* TBD */
+> +	int irq; /* linux irq */
+> +	void (*stop)(struct irq_bypass_producer *);
+> +	void (*resume)(struct irq_bypass_producer *);
+> +	void (*add_consumer)(struct irq_bypass_producer *,
+> +			     struct irq_bypass_consumer *);
+> +	void (*del_consumer)(struct irq_bypass_producer *,
+> +			     struct irq_bypass_consumer *);
+>  };
+> 
+>  struct irq_bypass_consumer {
+>  	struct list_head node;
+>  	void *token;
 
- Agree.
+Can we add a pointer to ' struct irq_bypass_producer ', and
+assign it when connecting, de-assign it when disconnecting.
+since in some case, I need to update IRTE from the consumer
+side, where I cannot get the related producer info (I need irq info)
+without iterating it again.
 
-> To be honest it's me to blame here to not having introduced the
-> capability earlier. At the moment ARM has a different code path for
-> KVM_SIGNAL_MSI, which does not bail out if the flag field is set. With
-> Eric's patches this changes and we use the irqchip.c generic code, which
-> returns -EINVAL atm. So I plan to introduce this capability already with
-> the ITS emulation series, so we can just pick it up in the IRQ routing
-> series.
+Thanks,
+Feng
 
- Then may be you follow https://lkml.org/lkml/2015/7/7/115 and replace flag with something like
-KVM_SIGNAL_EXT_MSI ioctl ? After all you were one of people who voted against using flags.
-
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
+> -	void (*add_producer)(struct irq_bypass_producer *);
+> -	void (*del_producer)(struct irq_bypass_producer *);
+> +	void (*stop)(struct irq_bypass_consumer *);
+> +	void (*resume)(struct irq_bypass_consumer *);
+> +	void (*add_producer)(struct irq_bypass_consumer *,
+> +			     struct irq_bypass_producer *);
+> +	void (*del_producer)(struct irq_bypass_consumer *,
+> +			     struct irq_bypass_producer *);
+> +	void (*update)(struct irq_bypass_consumer *);
+>  };
+> 
+>  int irq_bypass_register_producer(struct irq_bypass_producer *);
+> diff --git a/kernel/irq/bypass.c b/kernel/irq/bypass.c
+> index 5d0f92b..efadbe5 100644
+> --- a/kernel/irq/bypass.c
+> +++ b/kernel/irq/bypass.c
+> @@ -19,6 +19,42 @@ static LIST_HEAD(producers);
+>  static LIST_HEAD(consumers);
+>  static DEFINE_MUTEX(lock);
+> 
+> +/* lock must be hold when calling connect */
+> +static void connect(struct irq_bypass_producer *prod,
+> +		    struct irq_bypass_consumer *cons)
+> +{
+> +	if (prod->stop)
+> +		prod->stop(prod);
+> +	if (cons->stop)
+> +		cons->stop(cons);
+> +	if (prod->add_consumer)
+> +		prod->add_consumer(prod, cons);
+> +	if (cons->add_producer)
+> +		cons->add_producer(cons, prod);
+> +	if (cons->resume)
+> +		cons->resume(cons);
+> +	if (prod->resume)
+> +		prod->resume(prod);
+> +}
+> +
+> +/* lock must be hold when calling disconnect */
+> +static void disconnect(struct irq_bypass_producer *prod,
+> +		       struct irq_bypass_consumer *cons)
+> +{
+> +	if (prod->stop)
+> +		prod->stop(prod);
+> +	if (cons->stop)
+> +		cons->stop(cons);
+> +	if (cons->del_producer)
+> +		cons->del_producer(cons, prod);
+> +	if (prod->del_consumer)
+> +		prod->del_consumer(prod, cons);
+> +	if (cons->resume)
+> +		cons->resume(cons);
+> +	if (prod->resume)
+> +		prod->resume(prod);
+> +}
+> +
+>  int irq_bypass_register_producer(struct irq_bypass_producer *producer)
+>  {
+>  	struct irq_bypass_producer *tmp;
+> @@ -38,7 +74,7 @@ int irq_bypass_register_producer(struct
+> irq_bypass_producer *producer)
+> 
+>  	list_for_each_entry(consumer, &consumers, node) {
+>  		if (consumer->token == producer->token) {
+> -			consumer->add_producer(producer);
+> +			connect(producer, consumer);
+>  			break;
+>  		}
+>  	}
+> @@ -56,7 +92,7 @@ void irq_bypass_unregister_producer(struct
+> irq_bypass_producer *producer)
+> 
+>  	list_for_each_entry(consumer, &consumers, node) {
+>  		if (consumer->token == producer->token) {
+> -			consumer->del_producer(producer);
+> +			disconnect(producer, consumer);
+>  			break;
+>  		}
+>  	}
+> @@ -86,7 +122,7 @@ int irq_bypass_register_consumer(struct
+> irq_bypass_consumer *consumer)
+> 
+>  	list_for_each_entry(producer, &producers, node) {
+>  		if (producer->token == consumer->token) {
+> -			consumer->add_producer(producer);
+> +			connect(producer, consumer);
+>  			break;
+>  		}
+>  	}
+> @@ -104,7 +140,7 @@ void irq_bypass_unregister_consumer(struct
+> irq_bypass_consumer *consumer)
+> 
+>  	list_for_each_entry(producer, &producers, node) {
+>  		if (producer->token == consumer->token) {
+> -			consumer->del_producer(producer);
+> +			disconnect(producer, consumer);
+>  			break;
+>  		}
+>  	}
+> --
+> 1.9.1
