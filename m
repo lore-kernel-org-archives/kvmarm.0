@@ -1,53 +1,97 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [RFC PATCH] KVM: arm/arm64: Don't let userspace update CNTVOFF
- once guest is running
-Date: Wed, 8 Jul 2015 17:06:04 +0100
-Message-ID: <CAFEAcA-U1mEGy87ax4Cb1MLFcEP+sqc9BL_Q0hO6qg1J3FCMew@mail.gmail.com>
-References: <1435157697-28579-1-git-send-email-marc.zyngier@arm.com>
- <20150625080457.GD28244@cbox> <558BC2F5.9010303@huawei.com>
- <CAFEAcA_RzWSppaYA9vuAaL-MO6sQV1SgpXf3w-LScUdaarpOEQ@mail.gmail.com>
- <558BC90B.4060806@huawei.com> <558CD9DE.3010609@web.de> <55917E5B.3030401@huawei.com>
- <CAFEAcA-vS8B8pJUSseFw0OaKJFPe-0rMT-XHxjNbSvyxaZ+9Tg@mail.gmail.com> <559D483A.40507@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH 03/13] arm64: Add ARM64_HAS_VIRT_HOST_EXTN feature
+Date: Wed,  8 Jul 2015 17:19:06 +0100
+Message-ID: <1436372356-30410-4-git-send-email-marc.zyngier@arm.com>
+References: <1436372356-30410-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <559D483A.40507@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Claudio Fontana <claudio.fontana@huawei.com>, Jan Kiszka <jan.kiszka@web.de>, Christoffer Dall <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvm-devel <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B40B580C7
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2015 12:08:00 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 5nMNkqKc6mBD for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Jul 2015 12:07:59 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 31CCD580DB
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2015 12:07:59 -0400 (EDT)
+In-Reply-To: <1436372356-30410-1-git-send-email-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 8 July 2015 at 16:56, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> On 29/06/15 18:37, Peter Maydell wrote:
->> On 29 June 2015 at 18:20, Claudio Fontana <claudio.fontana@huawei.com> wrote:
->>> On 26.06.2015 06:49, Jan Kiszka wrote:
->>>> QEMU has the concept of write-back levels: KVM_PUT_RUNTIME_STATE,
->>>> KVM_PUT_RESET_STATE and KVM_PUT_FULL_STATE. I suspect this registers is
->>>> just sorted into the wrong category, thus written as part of the
->>>> RUNTIME_STATE. We had such bug patterns during the x86 maturing phase as
->>>> well.
->>
->>> It seems that QEMU target-arm ignores the level parameter to
->>> kvm_arch_put_registers completely.
->>>
->>> Is it intended?
->>
->> Yes, sort of. We don't in general know anything about the semantics
->> of most of the system registers. It should always be safe to
->> read them all out of the kernel and write them back...
->
-> I'm not sure you can safely assume this for time related things, unless
-> you can guarantee that all vcpus are stopped. Claudio is seeing time
-> jumping in weird ways, and so have I, which would tend to show that QEMU
-> is introducing some jitter.
->
-> Maybe not easily observable on real hardware, but the FastModel is
-> enough to show the issue.
->
-> So unless someone has a better solution, I'm seriously considering
-> getting this patch merged.
+Add a new ARM64_HAS_VIRT_HOST_EXTN features to indicate that the
+CPU has the ARMv8,1 VHE capability.
 
-I'd prefer it if somebody could investigate to see why QEMU
-is actually doing this -- so far we just have speculation.
+This will be used to trigger kernel patching in KVM.
 
--- PMM
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/include/asm/cpufeature.h |  3 ++-
+ arch/arm64/kernel/cpufeature.c      | 11 +++++++++++
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index c104421..6c3742d 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -25,8 +25,9 @@
+ #define ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE	1
+ #define ARM64_WORKAROUND_845719			2
+ #define ARM64_HAS_SYSREG_GIC_CPUIF		3
++#define ARM64_HAS_VIRT_HOST_EXTN		4
+ 
+-#define ARM64_NCAPS				4
++#define ARM64_NCAPS				5
+ 
+ #ifndef __ASSEMBLY__
+ 
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 5ad86ce..e1dcd63 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -21,6 +21,7 @@
+ #include <linux/types.h>
+ #include <asm/cpu.h>
+ #include <asm/cpufeature.h>
++#include <asm/virt.h>
+ 
+ static bool
+ has_id_aa64pfr0_feature(const struct arm64_cpu_capabilities *entry)
+@@ -31,6 +32,11 @@ has_id_aa64pfr0_feature(const struct arm64_cpu_capabilities *entry)
+ 	return (val & entry->register_mask) == entry->register_value;
+ }
+ 
++static bool runs_at_el2(const struct arm64_cpu_capabilities *entry)
++{
++	return is_kernel_in_hyp_mode();
++}
++
+ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 	{
+ 		.desc = "GIC system register CPU interface",
+@@ -39,6 +45,11 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.register_mask = (0xf << 24),
+ 		.register_value = (1 << 24),
+ 	},
++	{
++		.desc = "Virtualization Host Extensions",
++		.capability = ARM64_HAS_VIRT_HOST_EXTN,
++		.matches = runs_at_el2,
++	},
+ 	{},
+ };
+ 
+-- 
+2.1.4
