@@ -1,238 +1,58 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 12/13] arm64: KVM: Split sysreg save/restore
-Date: Wed,  8 Jul 2015 17:19:15 +0100
-Message-ID: <1436372356-30410-13-git-send-email-marc.zyngier@arm.com>
-References: <1436372356-30410-1-git-send-email-marc.zyngier@arm.com>
+Subject: Re: [RFC PATCH] KVM: arm/arm64: Don't let userspace update CNTVOFF
+ once guest is running
+Date: Wed, 08 Jul 2015 17:37:25 +0100
+Message-ID: <559D51C5.3070600@arm.com>
+References: <1435157697-28579-1-git-send-email-marc.zyngier@arm.com> <20150625080457.GD28244@cbox> <558BC2F5.9010303@huawei.com> <CAFEAcA_RzWSppaYA9vuAaL-MO6sQV1SgpXf3w-LScUdaarpOEQ@mail.gmail.com> <558BC90B.4060806@huawei.com> <558CD9DE.3010609@web.de> <55917E5B.3030401@huawei.com> <CAFEAcA-vS8B8pJUSseFw0OaKJFPe-0rMT-XHxjNbSvyxaZ+9Tg@mail.gmail.com> <559D483A.40507@arm.com> <CAFEAcA-U1mEGy87ax4Cb1MLFcEP+sqc9BL_Q0hO6qg1J3FCMew@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F095C581AD
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2015 12:08:18 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HWhlTCDcVnmj for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Jul 2015 12:08:17 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F2A0558146
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2015 12:08:13 -0400 (EDT)
-In-Reply-To: <1436372356-30410-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <CAFEAcA-U1mEGy87ax4Cb1MLFcEP+sqc9BL_Q0hO6qg1J3FCMew@mail.gmail.com>
+Sender: kvm-owner@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Claudio Fontana <claudio.fontana@huawei.com>, Jan Kiszka <jan.kiszka@web.de>, Christoffer Dall <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvm-devel <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we're starting to get different requirements for non-VHE and VHE
-code paths, use a slightly more fine-grained approach:
+On 08/07/15 17:06, Peter Maydell wrote:
+> On 8 July 2015 at 16:56, Marc Zyngier <marc.zyngier@arm.com> wrote:
+>> On 29/06/15 18:37, Peter Maydell wrote:
+>>> On 29 June 2015 at 18:20, Claudio Fontana <claudio.fontana@huawei.com> wrote:
+>>>> On 26.06.2015 06:49, Jan Kiszka wrote:
+>>>>> QEMU has the concept of write-back levels: KVM_PUT_RUNTIME_STATE,
+>>>>> KVM_PUT_RESET_STATE and KVM_PUT_FULL_STATE. I suspect this registers is
+>>>>> just sorted into the wrong category, thus written as part of the
+>>>>> RUNTIME_STATE. We had such bug patterns during the x86 maturing phase as
+>>>>> well.
+>>>
+>>>> It seems that QEMU target-arm ignores the level parameter to
+>>>> kvm_arch_put_registers completely.
+>>>>
+>>>> Is it intended?
+>>>
+>>> Yes, sort of. We don't in general know anything about the semantics
+>>> of most of the system registers. It should always be safe to
+>>> read them all out of the kernel and write them back...
+>>
+>> I'm not sure you can safely assume this for time related things, unless
+>> you can guarantee that all vcpus are stopped. Claudio is seeing time
+>> jumping in weird ways, and so have I, which would tend to show that QEMU
+>> is introducing some jitter.
+>>
+>> Maybe not easily observable on real hardware, but the FastModel is
+>> enough to show the issue.
+>>
+>> So unless someone has a better solution, I'm seriously considering
+>> getting this patch merged.
+> 
+> I'd prefer it if somebody could investigate to see why QEMU
+> is actually doing this -- so far we just have speculation.
 
-- __save/restore_sysregs: save/restore non-shared sysregs
-- __save/restore_shared_sysregs: save/restore only shared sysregs
+I'd prefer that too, but so far people seem to be more comfortable
+waiting for the issue to fix itself. In the meantime, VMs are broken in
+weird and wonderful ways, and I don't think the current status-quo helps
+anyone.
 
-Of course, non-VHE always requires both.
-
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm64/kvm/hyp.S | 91 +++++++++++++++++++++++++---------------------------
- 1 file changed, 44 insertions(+), 47 deletions(-)
-
-diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-index b61591b..3cbd2c4 100644
---- a/arch/arm64/kvm/hyp.S
-+++ b/arch/arm64/kvm/hyp.S
-@@ -280,11 +280,6 @@ skip_el1_restore:
- 	mrs	x20,	par_el1
- 	mrs	x21,	mdscr_el1
- 
--	mrs	x22,	tpidr_el0
--	mrs	x23,	tpidrro_el0
--	mrs	x24,	tpidr_el1
--	mrs	x25,	actlr_el1
--
- 	stp	x4, x5, [x3]
- 	stp	x6, x7, [x3, #16]
- 	stp	x8, x9, [x3, #32]
-@@ -294,8 +289,6 @@ skip_el1_restore:
- 	stp	x16, x17, [x3, #96]
- 	stp	x18, x19, [x3, #112]
- 	stp	x20, x21, [x3, #128]
--	stp	x22, x23, [x3, #144]
--	stp	x24, x25, [x3, #160]
- .endm
- 
- .macro save_debug
-@@ -508,8 +501,6 @@ skip_el1_restore:
- 	ldp	x16, x17, [x3, #96]
- 	ldp	x18, x19, [x3, #112]
- 	ldp	x20, x21, [x3, #128]
--	ldp	x22, x23, [x3, #144]
--	ldp	x24, x25, [x3, #160]
- 
- 	msr	vmpidr_el2,	x4
- 	msr	csselr_el1,	x5
-@@ -529,11 +520,6 @@ skip_el1_restore:
- 	msr_el1(cntkctl,	x19)
- 	msr	par_el1,	x20
- 	msr	mdscr_el1,	x21
--
--	msr	tpidr_el0,	x22
--	msr	tpidrro_el0,	x23
--	msr	tpidr_el1,	x24
--	msr	actlr_el1,	x25
- .endm
- 
- .macro restore_debug
-@@ -913,10 +899,12 @@ ifnvhe	nop,					"msr	vbar_el1, x2"
- 
- .macro save_timer_state
- 	// x0: vcpu pointer
--	ldr	x2, [x0, #VCPU_KVM]
--	kern_hyp_va x2
--	ldr	w3, [x2, #KVM_TIMER_ENABLED]
--	cbz	w3, 1f
-+	// x1: return code
-+	// x2: vcpu context
-+	ldr	x3, [x0, #VCPU_KVM]
-+	kern_hyp_va x3
-+	ldr	w4, [x3, #KVM_TIMER_ENABLED]
-+	cbz	w4, 1f
- 
- 	mrs_el0(x3, cntv_ctl)
- 	and	x3, x3, #3
-@@ -931,9 +919,9 @@ ifnvhe	nop,					"msr	vbar_el1, x2"
- 
- 1:
- 	// Allow physical timer/counter access for the host
--	mrs	x2, cnthctl_el2
--	orr	x2, x2, #3
--	msr	cnthctl_el2, x2
-+	mrs	x3, cnthctl_el2
-+	orr	x3, x3, #3
-+	msr	cnthctl_el2, x3
- 
- 	// Clear cntvoff for the host
- ifnvhe "msr	cntvoff_el2, xzr",		nop
-@@ -941,34 +929,43 @@ ifnvhe "msr	cntvoff_el2, xzr",		nop
- 
- .macro restore_timer_state
- 	// x0: vcpu pointer
-+	// x2: vcpu context
- 	// Disallow physical timer access for the guest
- 	// Physical counter access is allowed
--	mrs	x2, cnthctl_el2
--	orr	x2, x2, #1
--	bic	x2, x2, #2
--	msr	cnthctl_el2, x2
--
--	ldr	x2, [x0, #VCPU_KVM]
--	kern_hyp_va x2
--	ldr	w3, [x2, #KVM_TIMER_ENABLED]
--	cbz	w3, 1f
--
--	ldr	x3, [x2, #KVM_TIMER_CNTVOFF]
--	msr	cntvoff_el2, x3
--	ldr	x2, [x0, #VCPU_TIMER_CNTV_CVAL]
--	msr_el0(cntv_cval, x2)
-+	mrs	x3, cnthctl_el2
-+	orr	x3, x3, #1
-+	bic	x3, x3, #2
-+	msr	cnthctl_el2, x3
-+
-+	ldr	x3, [x0, #VCPU_KVM]
-+	kern_hyp_va x3
-+	ldr	w4, [x3, #KVM_TIMER_ENABLED]
-+	cbz	w4, 1f
-+
-+	ldr	x4, [x3, #KVM_TIMER_CNTVOFF]
-+	msr	cntvoff_el2, x4
-+	ldr	x4, [x0, #VCPU_TIMER_CNTV_CVAL]
-+	msr_el0(cntv_cval, x4)
- 	isb
- 
--	ldr	w2, [x0, #VCPU_TIMER_CNTV_CTL]
--	and	x2, x2, #3
--	msr_el0(cntv_ctl, x2)
-+	ldr	w4, [x0, #VCPU_TIMER_CNTV_CTL]
-+	and	x4, x4, #3
-+	msr_el0(cntv_ctl, x4)
- 1:
- .endm
- 
-+__save_shared_sysregs:
-+	save_shared_sysregs
-+	ret
-+
- __save_sysregs:
- 	save_sysregs
- 	ret
- 
-+__restore_shared_sysregs:
-+	restore_shared_sysregs
-+	ret
-+
- __restore_sysregs:
- 	restore_sysregs
- 	ret
-@@ -1010,10 +1007,9 @@ ENTRY(__kvm_vcpu_run)
- 
- 	save_host_regs
- 	bl __save_fpsimd
--ifnvhe "bl	__save_sysregs",		nop
--ifnvhe "b	1f",				nop
--	save_shared_sysregs
--1:
-+ifnvhe "bl	__save_sysregs",		"nop"
-+	bl	__save_shared_sysregs
-+
- 	compute_debug_state 1f
- 	bl	__save_debug
- 1:
-@@ -1027,6 +1023,7 @@ ifnvhe "b	1f",				nop
- 	add	x2, x0, #VCPU_CONTEXT
- 
- 	bl __restore_sysregs
-+	bl __restore_shared_sysregs
- 	bl __restore_fpsimd
- 
- 	skip_debug_state x3, 1f
-@@ -1048,6 +1045,7 @@ __kvm_vcpu_return:
- 	save_guest_regs
- 	bl __save_fpsimd
- 	bl __save_sysregs
-+	bl __save_shared_sysregs
- 
- 	skip_debug_state x3, 1f
- 	bl	__save_debug
-@@ -1064,10 +1062,8 @@ __kvm_vcpu_return:
- 	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
- 	kern_hyp_va x2
- 
--ifnvhe "bl	__restore_sysregs",		nop
--ifnvhe "b	1f",				nop
--	restore_shared_sysregs
--1:
-+ifnvhe "bl	__restore_sysregs",		"nop"
-+	bl	__restore_shared_sysregs
- 	bl __restore_fpsimd
- 
- 	skip_debug_state x3, 1f
-@@ -1159,7 +1155,8 @@ __kvm_hyp_panic:
- 	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
- 	kern_hyp_va x2
- 
--	bl __restore_sysregs
-+ifnvhe "bl __restore_sysregs",			"nop"
-+	bl __restore_shared_sysregs
- 
- 1:	adr	x0, __hyp_panic_str
- 	adr	x1, 2f
+	M.
 -- 
-2.1.4
+Jazz is not dead. It just smells funny...
