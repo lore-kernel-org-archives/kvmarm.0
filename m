@@ -1,21 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 00/13] arm64: Virtualization Host Extension support
-Date: Wed,  8 Jul 2015 17:19:03 +0100
-Message-ID: <1436372356-30410-1-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 06/13] arm64: KVM: VHE: Patch out kern_hyp_va
+Date: Wed,  8 Jul 2015 17:19:09 +0100
+Message-ID: <1436372356-30410-7-git-send-email-marc.zyngier@arm.com>
+References: <1436372356-30410-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C64F4580E5
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2015 12:07:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6EAD058128
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2015 12:08:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GqaG7fSlY4PB for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Jul 2015 12:07:57 -0400 (EDT)
+ with ESMTP id tkCu4-K1rQO4 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Jul 2015 12:08:04 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 67603580D6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2015 12:07:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6016F5813D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2015 12:08:04 -0400 (EDT)
+In-Reply-To: <1436372356-30410-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,67 +31,50 @@ To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-ARMv8.1 comes with the "Virtualization Host Extension" (VHE for
-short), which enables simpler support of Type-2 hypervisors.
+The kern_hyp_va macro is pretty meaninless with VHE, as there is
+only one mapping - the kernel one.
 
-This extension allows the kernel to directly run at EL2, and
-significantly reduces the number of system registers shared between
-host and guest, reducing the overhead of virtualization.
+In order to keep the code readable and efficient, use runtime
+patching to replace the 'and' instruction used to compute the VA
+with a 'nop'.
 
-In order to have the same kernel binary running on all versions of the
-architecture, this series makes heavy use of runtime code patching.
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/include/asm/kvm_mmu.h | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-The first ten patches massage the KVM code to deal with VHE and enable
-Linux to run at EL2.
-
-The next patch catches an ugly case when VHE capable CPUs are paired
-with some of their less capable siblings. This should never happen,
-but hey...
-
-The last two patches add an optimisation allowing a physical interrupt
-to be serviced on the host without doing a full save/restore, leading
-to potential reduction in interrupt latency.
-
-This has been tested on the FVP_Base_SLV-V8-A model, and based on
-v4.2-rc1. I've put a branch out on:
-
-git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/vhe
-
-Marc Zyngier (13):
-  arm/arm64: Add new is_kernel_in_hyp_mode predicate
-  arm64: Allow the arch timer to use the HYP timer
-  arm64: Add ARM64_HAS_VIRT_HOST_EXTN feature
-  arm64: KVM: skip HYP setup when already running in HYP
-  arm64: KVM: VHE: macroize VTCR_EL2 setup
-  arm64: KVM: VHE: Patch out kern_hyp_va
-  arm64: KVM: VHE: Patch out use of HVC
-  arm64: KVM: VHE: Preserve VHE config in world switch
-  arm64: KVM: VHE: Add alternatives for VHE-enabled world-switch
-  arm64: Add support for running Linux in EL2 mode
-  arm64: Panic when VHE and non VHE CPUs coexist
-  arm64: KVM: Split sysreg save/restore
-  arm64: KVM: VHE: Early interrupt handling
-
- arch/arm/include/asm/virt.h          |   5 +
- arch/arm/kvm/arm.c                   | 134 ++++++++-----
- arch/arm/kvm/mmu.c                   |   6 +
- arch/arm64/include/asm/cpufeature.h  |   3 +-
- arch/arm64/include/asm/kvm_arm.h     |   1 +
- arch/arm64/include/asm/kvm_asm.h     |  40 +++-
- arch/arm64/include/asm/kvm_emulate.h |   2 +
- arch/arm64/include/asm/kvm_mmu.h     |  24 ++-
- arch/arm64/include/asm/virt.h        |  25 +++
- arch/arm64/kernel/cpufeature.c       |  11 ++
- arch/arm64/kernel/head.S             |  38 +++-
- arch/arm64/kernel/smp.c              |   4 +
- arch/arm64/kvm/hyp-init.S            |   9 +-
- arch/arm64/kvm/hyp.S                 | 363 ++++++++++++++++++++++++-----------
- arch/arm64/kvm/vgic-v2-switch.S      |  19 +-
- arch/arm64/kvm/vgic-v3-switch.S      |  33 ++--
- arch/arm64/kvm/vhe-macros.h          |  54 ++++++
- drivers/clocksource/arm_arch_timer.c |  96 +++++----
- 18 files changed, 638 insertions(+), 229 deletions(-)
- create mode 100644 arch/arm64/kvm/vhe-macros.h
-
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index b525cd2..285642e 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -55,6 +55,8 @@
+ 
+ #ifdef __ASSEMBLY__
+ 
++#include <asm/alternative.h>
++#include <asm/cpufeature.h>
+ #include <asm/kvm_arm.h>
+ 
+ .macro setup_vtcr tmp1, tmp2
+@@ -69,12 +71,18 @@
+ 	msr	vtcr_el2, \tmp1
+ 	isb
+ .endm
++
++/* Stupid macro to deal with multiple level of macro expansion */
++.macro __vhe_nop inst val
++	alternative_insn "\inst\val", "nop", ARM64_HAS_VIRT_HOST_EXTN
++.endm
++
+ /*
+  * Convert a kernel VA into a HYP VA.
+  * reg: VA to be converted.
+  */
+ .macro kern_hyp_va	reg
+-	and	\reg, \reg, #HYP_PAGE_OFFSET_MASK
++	__vhe_nop "and \reg, \reg, #", __stringify(HYP_PAGE_OFFSET_MASK)
+ .endm
+ 
+ #else
 -- 
 2.1.4
