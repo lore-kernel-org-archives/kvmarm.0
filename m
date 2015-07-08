@@ -1,72 +1,50 @@
-From: Zhichao Huang <zhichao.huang@linaro.org>
-Subject: Re: [PATCH v3 08/11] KVM: arm: implement dirty bit mechanism for debug registers
-Date: Wed, 08 Jul 2015 18:50:22 +0800
-Message-ID: <123AABA4-2C79-462D-91FC-56FB52DB972C@linaro.org>
-References: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org> <1434969694-7432-9-git-send-email-zhichao.huang@linaro.org> <20150630092020.GP11332@cbox> <B3B5AB0D-020C-483D-A6DE-76E355865010@linaro.org> <20150703115611.GB14220@lvm> <5A7DE9A0-E7A6-40B0-80F9-896F7DED0E47@linaro.org> <20150707102405.GE23879@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [RFC PATCH] KVM: arm/arm64: Don't let userspace update CNTVOFF
+ once guest is running
+Date: Wed, 08 Jul 2015 16:56:42 +0100
+Message-ID: <559D483A.40507@arm.com>
+References: <1435157697-28579-1-git-send-email-marc.zyngier@arm.com> <20150625080457.GD28244@cbox> <558BC2F5.9010303@huawei.com> <CAFEAcA_RzWSppaYA9vuAaL-MO6sQV1SgpXf3w-LScUdaarpOEQ@mail.gmail.com> <558BC90B.4060806@huawei.com> <558CD9DE.3010609@web.de> <55917E5B.3030401@huawei.com> <CAFEAcA-vS8B8pJUSseFw0OaKJFPe-0rMT-XHxjNbSvyxaZ+9Tg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20150707102405.GE23879@arm.com>
+In-Reply-To: <CAFEAcA-vS8B8pJUSseFw0OaKJFPe-0rMT-XHxjNbSvyxaZ+9Tg@mail.gmail.com>
 Sender: kvm-owner@vger.kernel.org
-To: Will Deacon <will.deacon@arm.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <Marc.Zyngier@arm.com>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, "huangzhichao@huawei.com" <huangzhichao@huawei.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Claudio Fontana <claudio.fontana@huawei.com>
+Cc: Jan Kiszka <jan.kiszka@web.de>, Christoffer Dall <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvm-devel <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi, Will,
+On 29/06/15 18:37, Peter Maydell wrote:
+> On 29 June 2015 at 18:20, Claudio Fontana <claudio.fontana@huawei.com> wrote:
+>> On 26.06.2015 06:49, Jan Kiszka wrote:
+>>> QEMU has the concept of write-back levels: KVM_PUT_RUNTIME_STATE,
+>>> KVM_PUT_RESET_STATE and KVM_PUT_FULL_STATE. I suspect this registers is
+>>> just sorted into the wrong category, thus written as part of the
+>>> RUNTIME_STATE. We had such bug patterns during the x86 maturing phase as
+>>> well.
+> 
+>> It seems that QEMU target-arm ignores the level parameter to
+>> kvm_arch_put_registers completely.
+>>
+>> Is it intended?
+> 
+> Yes, sort of. We don't in general know anything about the semantics
+> of most of the system registers. It should always be safe to
+> read them all out of the kernel and write them back...
 
-Are you happy with this?:
+I'm not sure you can safely assume this for time related things, unless
+you can guarantee that all vcpus are stopped. Claudio is seeing time
+jumping in weird ways, and so have I, which would tend to show that QEMU
+is introducing some jitter.
 
-diff --git a/arch/arm/kernel/hw_breakpoint.c b/arch/arm/kernel/hw_breakpoint.c
+Maybe not easily observable on real hardware, but the FastModel is
+enough to show the issue.
 
-+bool hw_breakpoint_enabled(void)
-+{
-+    struct perf_event **slots;
-+    int i;
-+
-+    slots = this_cpu_ptr(bp_on_reg);
-+    for (i = 0; i < core_num_brps; i++) {
-+        if (slots[i])
-+            return true;
-+    }
-+
-+    slots = this_cpu_ptr(wp_on_reg);
-+    for (i = 0; i < core_num_wrps; i++) {
-+        if (slots[i])
-+            return true;
-+    }
-+
-+    return false;
-+}
+So unless someone has a better solution, I'm seriously considering
+getting this patch merged.
 
-It doesn't change any existing functions, and even doesn't add a new
-variables, it just provide an indication for KVM, and it's low-overhead.
+Thanks,
 
-We will only call it upon guest entry, so there is also no race for it.
-
-
-On July 7, 2015 6:24:06 PM GMT+08:00, Will Deacon <will.deacon@arm.com> wrote:
->On Tue, Jul 07, 2015 at 11:06:57AM +0100, Zhichao Huang wrote:
->> Chazy and me are talking about how to reduce the saving/restoring
->> overhead for debug registers.
->> We want to add a state in hw_breakpoint.c to indicate whether the
->host
->> enable any hwbrpts or not (might export a fuction that kvm can call),
->> then we can read this state from memory instead of reading from real
->> hardware registers, and to decide whether we need a world switch or
->> not.
->> Does it acceptable?
->
->Maybe, hard to tell without the code. There are obvious races to deal
->with
->if you use variables to indicate whether resources are in use -- why
->not
->just trap debug access from the host as well? Then you could keep track
->of
->the "owner" in kvm and trap accesses from everybody else.
->
->Will
-
+	M.
 -- 
-Zhichao Huang
+Jazz is not dead. It just smells funny...
