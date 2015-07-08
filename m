@@ -1,84 +1,67 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 02/10] arm/arm64: KVM: Move vgic handling to a non-preemptible section
-Date: Wed,  8 Jul 2015 18:56:34 +0100
-Message-ID: <1436378202-20224-3-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 01/10] arm/arm64: KVM: Fix ordering of timer/GIC on guest
+ entry
+Date: Wed,  8 Jul 2015 18:56:33 +0100
+Message-ID: <1436378202-20224-2-git-send-email-marc.zyngier@arm.com>
 References: <1436378202-20224-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 88DC85818D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2015 13:45:18 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id bWNBpZ60fZ-d for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  8 Jul 2015 13:45:17 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E84158191
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2015 13:45:17 -0400 (EDT)
 In-Reply-To: <1436378202-20224-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>, Andre Przywara <andre.przywara@arm.com>
+Cc: Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we're about to introduce some serious GIC-poking to the vgic code,
-it is important to make sure that we're going to poke the part of
-the GIC that belongs to the CPU we're about to run on (otherwise,
-we'd end up with some unexpected interrupts firing)...
-
-Introducing a non-preemptible section in kvm_arch_vcpu_ioctl_run
-prevents the problem from occuring.
-
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
----
- arch/arm/kvm/arm.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index d605180..1583a34 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -528,10 +528,20 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu=
-, struct kvm_run *run)
- 		if (vcpu->arch.pause)
- 			vcpu_pause(vcpu);
-=20
-+		/*
-+		 * Disarming the background timer must be done in a
-+		 * preemptible context, as this call may sleep.
-+		 */
- 		kvm_timer_flush_hwstate(vcpu);
--		kvm_vgic_flush_hwstate(vcpu);
-=20
-+		/*
-+		 * Preparing the interrupts to be injected also
-+		 * involves poking the GIC, which must be done in a
-+		 * non-preemptible context.
-+		 */
- 		preempt_disable();
-+		kvm_vgic_flush_hwstate(vcpu);
-+
- 		local_irq_disable();
-=20
- 		/*
-@@ -544,8 +554,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, =
-struct kvm_run *run)
-=20
- 		if (ret <=3D 0 || need_new_vmid_gen(vcpu->kvm)) {
- 			local_irq_enable();
--			preempt_enable();
- 			kvm_vgic_sync_hwstate(vcpu);
-+			preempt_enable();
- 			kvm_timer_sync_hwstate(vcpu);
- 			continue;
- 		}
-@@ -586,9 +596,11 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu,=
- struct kvm_run *run)
- 		 */
- 		kvm_guest_exit();
- 		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
--		preempt_enable();
-=20
- 		kvm_vgic_sync_hwstate(vcpu);
-+
-+		preempt_enable();
-+
- 		kvm_timer_sync_hwstate(vcpu);
-=20
- 		ret =3D handle_exit(vcpu, run, ret);
---=20
-2.1.4
-
+QXMgd2Ugbm93IGluamVjdCB0aGUgdGltZXIgaW50ZXJydXB0IHdoZW4gd2UncmUgYWJvdXQgdG8g
+ZW50ZXIKdGhlIGd1ZXN0LCBpdCBtYWtlcyBhIGxvdCBtb3JlIHNlbnNlIHRvIG1ha2Ugc3VyZSB0
+aGlzIGhhcHBlbnMKYmVmb3JlIHRoZSB2Z2ljIGNvZGUgcXVldWVzIHRoZSBwZW5kaW5nIGludGVy
+cnVwdHMuCgpPdGhlcndpc2UsIHdlIGdldCB0aGUgaW50ZXJydXB0IG9uIHRoZSBmb2xsb3dpbmcg
+ZXhpdCwgd2hpY2ggaXMKbm90IGdyZWF0IGZvciBsYXRlbmN5IChhbmQgbGVhZHMgdG8gYWxsIGtp
+bmQgb2YgYml6YXJyZSBpc3N1ZXMKd2hlbiB1c2luZyB3aXRoIGFjdGl2ZSBpbnRlcnJ1cHRzIGF0
+IHRoZSBIVyBsZXZlbCkuCgpTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdpZXIgPG1hcmMuenluZ2ll
+ckBhcm0uY29tPgpSZXZpZXdlZC1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8u
+b3JnPgpSZXZpZXdlZC1ieTogQ2hyaXN0b2ZmZXIgRGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5h
+cm8ub3JnPgotLS0KIGFyY2gvYXJtL2t2bS9hcm0uYyB8IDcgKysrLS0tLQogMSBmaWxlIGNoYW5n
+ZWQsIDMgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9hcmNoL2Fy
+bS9rdm0vYXJtLmMgYi9hcmNoL2FybS9rdm0vYXJtLmMKaW5kZXggYmM3MzhkMi4uZDYwNTE4MCAx
+MDA2NDQKLS0tIGEvYXJjaC9hcm0va3ZtL2FybS5jCisrKyBiL2FyY2gvYXJtL2t2bS9hcm0uYwpA
+QCAtNTI4LDggKzUyOCw4IEBAIGludCBrdm1fYXJjaF92Y3B1X2lvY3RsX3J1bihzdHJ1Y3Qga3Zt
+X3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1fcnVuICpydW4pCiAJCWlmICh2Y3B1LT5hcmNoLnBhdXNl
+KQogCQkJdmNwdV9wYXVzZSh2Y3B1KTsKIAotCQlrdm1fdmdpY19mbHVzaF9od3N0YXRlKHZjcHUp
+OwogCQlrdm1fdGltZXJfZmx1c2hfaHdzdGF0ZSh2Y3B1KTsKKwkJa3ZtX3ZnaWNfZmx1c2hfaHdz
+dGF0ZSh2Y3B1KTsKIAogCQlwcmVlbXB0X2Rpc2FibGUoKTsKIAkJbG9jYWxfaXJxX2Rpc2FibGUo
+KTsKQEAgLTU0NSw4ICs1NDUsOCBAQCBpbnQga3ZtX2FyY2hfdmNwdV9pb2N0bF9ydW4oc3RydWN0
+IGt2bV92Y3B1ICp2Y3B1LCBzdHJ1Y3Qga3ZtX3J1biAqcnVuKQogCQlpZiAocmV0IDw9IDAgfHwg
+bmVlZF9uZXdfdm1pZF9nZW4odmNwdS0+a3ZtKSkgewogCQkJbG9jYWxfaXJxX2VuYWJsZSgpOwog
+CQkJcHJlZW1wdF9lbmFibGUoKTsKLQkJCWt2bV90aW1lcl9zeW5jX2h3c3RhdGUodmNwdSk7CiAJ
+CQlrdm1fdmdpY19zeW5jX2h3c3RhdGUodmNwdSk7CisJCQlrdm1fdGltZXJfc3luY19od3N0YXRl
+KHZjcHUpOwogCQkJY29udGludWU7CiAJCX0KIApAQCAtNTg4LDkgKzU4OCw4IEBAIGludCBrdm1f
+YXJjaF92Y3B1X2lvY3RsX3J1bihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHN0cnVjdCBrdm1fcnVu
+ICpydW4pCiAJCXRyYWNlX2t2bV9leGl0KGt2bV92Y3B1X3RyYXBfZ2V0X2NsYXNzKHZjcHUpLCAq
+dmNwdV9wYyh2Y3B1KSk7CiAJCXByZWVtcHRfZW5hYmxlKCk7CiAKLQotCQlrdm1fdGltZXJfc3lu
+Y19od3N0YXRlKHZjcHUpOwogCQlrdm1fdmdpY19zeW5jX2h3c3RhdGUodmNwdSk7CisJCWt2bV90
+aW1lcl9zeW5jX2h3c3RhdGUodmNwdSk7CiAKIAkJcmV0ID0gaGFuZGxlX2V4aXQodmNwdSwgcnVu
+LCByZXQpOwogCX0KLS0gCjIuMS40CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
+YS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1h
+cm0K
