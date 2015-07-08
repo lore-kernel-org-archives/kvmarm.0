@@ -1,56 +1,94 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 03/10] KVM: arm/arm64: vgic: Convert struct vgic_lr to use
- bitfields
-Date: Wed,  8 Jul 2015 18:56:35 +0100
-Message-ID: <1436378202-20224-4-git-send-email-marc.zyngier@arm.com>
-References: <1436378202-20224-1-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 00/10] arm/arm64: KVM: Active interrupt state switching for shared devices
+Date: Wed,  8 Jul 2015 18:56:32 +0100
+Message-ID: <1436378202-20224-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D9E7A581A7
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2015 13:45:23 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uBtnX8Pz+yDh for <kvmarm@lists.cs.columbia.edu>;
- Wed,  8 Jul 2015 13:45:20 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 80F8D581A6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  8 Jul 2015 13:45:20 -0400 (EDT)
-In-Reply-To: <1436378202-20224-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Andre Przywara <andre.przywara@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-QXMgd2UncmUgYWJvdXQgdG8gY3JhbSBtb3JlIGluZm9ybWF0aW9uIGluIHRoZSB2Z2ljX2xyIHN0
-cnVjdHVyZQooSFcgaW50ZXJydXB0IG51bWJlciBhbmQgYWRkaXRpb25hbCBzdGF0ZSBpbmZvcm1h
-dGlvbiksIHdlIHN3aXRjaAp0byBhIGxheW91dCBzaW1pbGFyIHRvIHRoZSBIVydzOgoKLSB1c2Ug
-Yml0ZmllbGRzIHRvIHNhdmUgc3BhY2UgKHdlIGRvbid0IG5lZWQgbW9yZSB0aGFuIDEwIGJpdHMK
-ICB0byByZXByZXNlbnQgdGhlIGlycSBudW1iZXJzKQotIHNvdXJjZSBDUFUgYW5kIEhXIGludGVy
-cnVwdCBjYW4gc2hhcmUgdGhlIHNhbWUgZmllbGQsIGFzCiAgYSBTR0kgZG9lc24ndCBoYXZlIGEg
-cGh5c2ljYWwgbGluZS4KClNpZ25lZC1vZmYtYnk6IE1hcmMgWnluZ2llciA8bWFyYy56eW5naWVy
-QGFybS5jb20+ClJldmlld2VkLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5v
-cmc+Ci0tLQogaW5jbHVkZS9rdm0vYXJtX3ZnaWMuaCB8IDEwICsrKysrKystLS0KIDEgZmlsZSBj
-aGFuZ2VkLCA3IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvaW5j
-bHVkZS9rdm0vYXJtX3ZnaWMuaCBiL2luY2x1ZGUva3ZtL2FybV92Z2ljLmgKaW5kZXggMTMzZWEw
-MC4uNGY5ZmExZCAxMDA2NDQKLS0tIGEvaW5jbHVkZS9rdm0vYXJtX3ZnaWMuaAorKysgYi9pbmNs
-dWRlL2t2bS9hcm1fdmdpYy5oCkBAIC05NSwxMSArOTUsMTUgQEAgZW51bSB2Z2ljX3R5cGUgewog
-I2RlZmluZSBMUl9TVEFURV9BQ1RJVkUJCSgxIDw8IDEpCiAjZGVmaW5lIExSX1NUQVRFX01BU0sJ
-CSgzIDw8IDApCiAjZGVmaW5lIExSX0VPSV9JTlQJCSgxIDw8IDIpCisjZGVmaW5lIExSX0hXCQkJ
-KDEgPDwgMykKIAogc3RydWN0IHZnaWNfbHIgewotCXUxNglpcnE7Ci0JdTgJc291cmNlOwotCXU4
-CXN0YXRlOworCXVuc2lnbmVkIGlycToxMDsKKwl1bmlvbiB7CisJCXVuc2lnbmVkIGh3aXJxOjEw
-OworCQl1bnNpZ25lZCBzb3VyY2U6ODsKKwl9OworCXVuc2lnbmVkIHN0YXRlOjQ7CiB9OwogCiBz
-dHJ1Y3QgdmdpY192bWNyIHsKLS0gCjIuMS40CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5j
-b2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5m
-by9rdm1hcm0K
+>From day 1, our timer code has been using a terrible hack: whenever
+the guest is scheduled with a timer interrupt pending (i.e. the HW
+timer has expired), we restore the timer state with the MASK bit set,
+in order to avoid the physical interrupt to fire again. And again. And
+again...
+
+This is absolutely silly, for at least two reasons:
+
+- This relies on the device (the timer) having a mask bit that we can
+  play with. Not all devices are built like this.
+
+- This expects some behaviour of the guest that only works because the
+  both the kernel timer code and the KVM counterpart have been written
+  by the same idiot (the idiot being me).
+
+The One True Way is to set the GIC active bit when injecting the
+interrupt, and to context-switch across the world switch. This is what
+this series implements.
+
+We introduce a relatively simple infrastructure enabling the mapping
+of a virtual interrupt with its physical counterpart:
+
+- Whenever an virtual interrupt is injected, we look it up in an
+  rbtree. If we have a match, the interrupt is injected with the HW
+  bit set in the LR, together with the physical interrupt.
+
+- Across the world switch, we save/restore the active state for these
+  interrupts using the irqchip_state API.
+
+- On guest EOI, the HW interrupt is automagically deactivated by the
+  GIC, allowing the interrupt to be resampled.
+
+The timer code is slightly modified to set the active state at the
+same time as the injection.
+
+The last patch also allows non-shared devices to have their interrupt
+deactivated the same way (in this case we do not context-switch the
+active state). This is the first step in the long overdue direction of
+the mythical IRQ forwarding thing...
+
+This series is based on v4.2-rc1, and has been tested on Juno (GICv2)
+and the FVP Base model (GICv3 host, both GICv2 and GICv3 guests). I'd
+appreciate any form of testing, specially in the context of guest
+migration (there is obviously some interesting stuff there...).
+
+The code is otherwise available at
+git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/active-timer
+
+* From v1:
+  - Rebased on top of current mainline
+  - Fixed non-shared handling of forwarded interrupts
+  - Fixed memory leaks on VM exit
+  - Used RCU lists instead of an RB tree
+
+Marc Zyngier (10):
+  arm/arm64: KVM: Fix ordering of timer/GIC on guest entry
+  arm/arm64: KVM: Move vgic handling to a non-preemptible section
+  KVM: arm/arm64: vgic: Convert struct vgic_lr to use bitfields
+  KVM: arm/arm64: vgic: Allow HW irq to be encoded in LR
+  KVM: arm/arm64: vgic: Relax vgic_can_sample_irq for edge IRQs
+  KVM: arm/arm64: vgic: Allow dynamic mapping of physical/virtual
+    interrupts
+  KVM: arm/arm64: vgic: Allow HW interrupts to be queued to a guest
+  KVM: arm/arm64: vgic: Add vgic_{get,set}_phys_irq_active
+  KVM: arm/arm64: timer: Allow the timer to control the active state
+  KVM: arm/arm64: vgic: Allow non-shared device HW interrupts
+
+ arch/arm/kvm/arm.c                 |  21 ++-
+ include/kvm/arm_arch_timer.h       |   3 +
+ include/kvm/arm_vgic.h             |  38 +++++-
+ include/linux/irqchip/arm-gic-v3.h |   3 +
+ include/linux/irqchip/arm-gic.h    |   3 +-
+ virt/kvm/arm/arch_timer.c          |  13 +-
+ virt/kvm/arm/vgic-v2.c             |  16 ++-
+ virt/kvm/arm/vgic-v3.c             |  21 ++-
+ virt/kvm/arm/vgic.c                | 264 ++++++++++++++++++++++++++++++++++++-
+ 9 files changed, 363 insertions(+), 19 deletions(-)
+
+-- 
+2.1.4
+
