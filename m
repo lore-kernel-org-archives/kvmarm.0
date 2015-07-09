@@ -1,121 +1,44 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH 2/2] Detect vGIC presence at runtime
-Date: Thu, 09 Jul 2015 16:47:18 +0300
-Message-ID: <020c01d0ba4d$c60181a0$520484e0$@samsung.com>
-References: <cover.1436264839.git.p.fedin@samsung.com>
- <8f44081ef96f51c6f2a5753e5933d7de1e3c2c2f.1436264839.git.p.fedin@samsung.com>
- <20150709113721.GJ13530@cbox> <01b401d0ba45$e23be430$a6b3ac90$@samsung.com>
- <20150709132502.GO13530@cbox>
+From: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [RFC v2 0/6] IRQ bypass manager and irqfd consumer
+Date: Thu, 09 Jul 2015 08:13:43 -0600
+Message-ID: <1436451223.1391.219.camel@redhat.com>
+References: <1436184692-20927-1-git-send-email-eric.auger@linaro.org>
+	 <1436289468.1391.89.camel@redhat.com> <20150709122805.GW18569@8bytes.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 261D7583A5
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2015 09:35:49 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id a8i4KryaRjSd for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Jul 2015 09:35:47 -0400 (EDT)
-Received: from mailout4.w1.samsung.com (mailout4.w1.samsung.com
- [210.118.77.14])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 123BA58358
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2015 09:35:46 -0400 (EDT)
-Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
- by mailout4.w1.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NR800H5X3MVLT70@mailout4.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Thu, 09 Jul 2015 14:47:19 +0100 (BST)
-In-reply-to: <20150709132502.GO13530@cbox>
-Content-language: ru
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: 'Christoffer Dall' <christoffer.dall@linaro.org>
-Cc: 'Marc Zyngier' <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20150709122805.GW18569@8bytes.org>
+Sender: kvm-owner@vger.kernel.org
+To: Joerg Roedel <joro@8bytes.org>
+Cc: Eric Auger <eric.auger@linaro.org>, eric.auger@st.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, avi.kivity@gmail.com, mtosatti@redhat.com, feng.wu@intel.com, b.reynal@virtualopensystems.com, linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello!
-
-> I'd like to distinguish between the 'missing vgic' and 'something bad
-> happened when trying to initialize the vgic' cases, which I don't think
-> we do currently, because the ENXIO code is used in various situations.
-
- It is done. Check, for example, vgic_v2_probe(). -ENXIO is returned when some of resources are
-either missing from DT specification or wrongly given (not page-aligned). In the rest of cases error
-code is taken from underlying functions, which are more supposed to return things like -EINVAL or
--ENOMEM.
- If you are doubtful, i could suggest to replace -EINVAL with -ENODEV in cases where resources are
-not present. This would give more clear indication of "we don't have vGIC" condition.
-
-> I feel the init flow is relatively difficult to follow and adding a
-> bunch of flags here and there doesn't seem to help.  By adding a
-> function with a proper comment, it should be more clear, and I don't
-> like the switch statement on the error return values.
-
- Well, the alternative is:
- 1. If GIC node or vGIC resources are not present, return 0 instead of error code.
- 2. Implement a function which you suggest.
- Then:
- 1. Situation with missing vGIC is just considered to be normal; it's not a to-be-ignored error any
-more.
- 2. "vGIC present" situation is automatically determined by vgic_ops != NULL; this means that probe
-function completely worked and vGIC implementation has been chosen.
-
- Agree?
-
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
-
-
-> -----Original Message-----
-> From: Christoffer Dall [mailto:christoffer.dall@linaro.org]
-> Sent: Thursday, July 09, 2015 4:25 PM
-> To: Pavel Fedin
-> Cc: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org; 'Marc Zyngier'
-> Subject: Re: [PATCH 2/2] Detect vGIC presence at runtime
+On Thu, 2015-07-09 at 14:28 +0200, Joerg Roedel wrote:
+> On Tue, Jul 07, 2015 at 11:17:48AM -0600, Alex Williamson wrote:
+> > Hosting the bypass manager in kernel/irq seemed appropriate, but really
+> > it could be anywhere.  Does anyone have a different preference or
+> > specifically want it under their scope?  We had originally thought of
+> > this as an IOMMU service, but I think we've generalized it beyond that.
+> > I expect we should also add the necessary hooks to turn it into a
+> > loadable module to keep the tinification folks happy, I'll incorporate
+> > the current working changes and post a version with that.
 > 
-> On Thu, Jul 09, 2015 at 03:50:49PM +0300, Pavel Fedin wrote:
-> >  Hello!
-> >
-> > > why not report ENXIO as an error?  If probing the vgic fails due to
-> > > being unable to request the irq or something similar, then surely your
-> > > system has and error and this should be reported.
-> >
-> >  It is reported by probe function itself.
-> >  -ENODEV here means there's no GIC at all. -ENXIO happens when, for example, there is GIC node
-in
-> > the device tree, but it does not specify vGIC resources. Normally this means that vGIC is
-defunct on
-> > the machine.
+> Yeah, this is only an IOMMU service on x86, afaik. So drivers/iommu is
+> probably the wrong place to host it.
 > 
-> >
-> > > This may be more nicely implemented by letting the vgic init/probe
-> > > functions set the vgic_present, or maybe better yet, just export a
-> > > function from vgic.c:
-> > >
-> > > bool kvm_vgic_present(void)
-> > > {
-> > > 	return vgic_ops != NULL;
-> > > }
-> >
-> >  Is it necessary? Actually this flag is not needed anywhere else except arch/arm/kvm/arm.c, only
-at
-> > init time. Runtime should, i believe, use irqchip_in_kernel(), because userland can choose just
-not
-> > to use vGIC for some reason (testing for example).
-> >
-> I feel the init flow is relatively difficult to follow and adding a
-> bunch of flags here and there doesn't seem to help.  By adding a
-> function with a proper comment, it should be more clear, and I don't
-> like the switch statement on the error return values.
-> 
-> -Christoffer
+> Will there be any other producers than VFIO or any other consumers than
+> KVM? If not, it should live in one of these spaces. KVM is probably the
+> best choice, as any hardware feature that uses this targets
+> virtualization, so there will hardly ever be another consumer than KVM.
+
+If we think that it's *only* a kvm-vfio interaction then we could add it
+to virt/kvm/vfio.c.  vfio could use symbol_get to avoid a module
+dependency and effectively disable the code path when not used with kvm.
+The reverse model of hosting it in vfio and using symbol_get from
+kvm-vfio would also work.  Do we really want to declare it to be
+kvm-vfio specific though?  Another option would be to simply host it
+under virt/lib with module dependencies for both vfio and kvm.  Thanks,
+
+Alex
+
