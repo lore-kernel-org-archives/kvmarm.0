@@ -1,67 +1,59 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH] KVM: arm/arm64: Don't let userspace update CNTVOFF
- once guest is running
-Date: Thu, 9 Jul 2015 18:06:31 +0200
-Message-ID: <20150709160631.GA25650@cbox>
-References: <CAFEAcA-U1mEGy87ax4Cb1MLFcEP+sqc9BL_Q0hO6qg1J3FCMew@mail.gmail.com>
- <559D51C5.3070600@arm.com>
- <CAFEAcA-rWf5UkiP+5UbtjYihfhDOVaY4hVpXNRGMnYEhNWqwSQ@mail.gmail.com>
- <20150709102201.GH13530@cbox>
- <CAFEAcA-4rMB6i2=UBXjxTAHQWn5xMiCSiaYbknuXOuHmf4XY_A@mail.gmail.com>
- <20150709120531.GL13530@cbox>
- <CAFEAcA94qRKs7TV4MmrhD4O0+cE4SYPb4iKydQQbSzdrzKMC+w@mail.gmail.com>
- <20150709122406.GN13530@cbox>
- <20150709141723.GP13530@cbox>
- <CAFEAcA81LRcRu1r+H-6T_yT-AQ4XLAzX1osAWZYNPEDHSTiAQg@mail.gmail.com>
+From: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [RFC v2 0/6] IRQ bypass manager and irqfd consumer
+Date: Thu, 09 Jul 2015 10:06:35 -0600
+Message-ID: <1436457995.1391.231.camel@redhat.com>
+References: <1436184692-20927-1-git-send-email-eric.auger@linaro.org>
+ <1436289468.1391.89.camel@redhat.com> <20150709122805.GW18569@8bytes.org>
+ <1436451223.1391.219.camel@redhat.com> <559E8771.9010401@redhat.com>
+ <20150709153458.GX18569@8bytes.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA81LRcRu1r+H-6T_yT-AQ4XLAzX1osAWZYNPEDHSTiAQg@mail.gmail.com>
-Sender: kvm-owner@vger.kernel.org
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Claudio Fontana <claudio.fontana@huawei.com>, Jan Kiszka <jan.kiszka@web.de>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvm-devel <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DBA9058479
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2015 11:55:03 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id E8ieMf3QVlwv for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Jul 2015 11:55:02 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9790058478
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2015 11:55:02 -0400 (EDT)
+In-Reply-To: <20150709153458.GX18569@8bytes.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Joerg Roedel <joro@8bytes.org>
+Cc: eric.auger@st.com, kvm@vger.kernel.org, marc.zyngier@arm.com, mtosatti@redhat.com, linux-kernel@vger.kernel.org, patches@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, feng.wu@intel.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, avi.kivity@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jul 09, 2015 at 03:26:20PM +0100, Peter Maydell wrote:
-> On 9 July 2015 at 15:17, Christoffer Dall <christoffer.dall@linaro.org> wrote:
-> > On Thu, Jul 09, 2015 at 02:24:06PM +0200, Christoffer Dall wrote:
-> > So I ran this through GDB, and this happens when the guest probes the
-> > virtio devices, specifically the backtrace tells me that
-> >
-> > virtio_current_cpu_endian () at /root/src/qemu/hw/virtio/virtio.c:594
-> > => cc->virtio_is_big_endian
-> >   -> arm_cpu_is_big_endian
-> >     -> cpu_synchronize_state
-> >       -> kvm_cpu_synchronize_state
-> >
-> > which causes cpu->kvm_vcpu_dirty = true, which causes the run-loop to
-> > write the CNTVOFF on a per-vcpu basis without stopping anything, as far
-> > as I can tell.
+On Thu, 2015-07-09 at 17:34 +0200, Joerg Roedel wrote:
+> On Thu, Jul 09, 2015 at 04:38:41PM +0200, Paolo Bonzini wrote:
+> > >> On Tue, Jul 07, 2015 at 11:17:48AM -0600, Alex Williamson wrote:
+> > > If we think that it's *only* a kvm-vfio interaction then we could add it
+> > > to virt/kvm/vfio.c.  vfio could use symbol_get to avoid a module
+> > > dependency and effectively disable the code path when not used with kvm.
+> > > The reverse model of hosting it in vfio and using symbol_get from
+> > > kvm-vfio would also work.  Do we really want to declare it to be
+> > > kvm-vfio specific though?  Another option would be to simply host it
+> > > under virt/lib with module dependencies for both vfio and kvm.
+> > 
+> > I wonder if in the future we may have some kind of driver-mediated
+> > passthrough, e.g. for network drivers.  They might use the bypass
+> > mechanism too.  So I think drivers/vfio is too restrictive.
+> > 
+> > virt/ right now only hosts KVM, but it could for example host lguest
+> > too.  virt/lib/ is okay with me.
 > 
-> Ah, I was wondering if it was going to turn out to be this,
-> but I hadn't figured out why it was going to cause us to do
-> a write-back of state rather than just a read.
-> 
-> > So yeah, I guess the only required fix here is to fix QEMU in some way
-> > as to not fiddle with the timer registers in this way, and then I
-> > honestly don't know if we should try to fix legacy userspace in the
-> > kernel, but based on the feedback from Jan, I suppose not.
-> 
-> arm_cpu_is_big_endian() doesn't actually want to write
-> back any state -- all it's interested in is reading.
-> So we really ought not to need to write anything back there.
-> kvm-all.c's sync functions don't seem to provide a "sync
-> kernel state to userspace but I promise I'm not going to
-> dirty it" function though. I guess we could add one.
-> 
-> (Overall it's kind of fragile even if we can avoid this
-> specific case where we're writing back the counter state,
-> though -- we should probably think about the sync level
-> stuff as well.)
+> Yeah, virt/lib is probably the best choice.
 
-Sounds to me like we should add the sync level stuff first, as it should
-catch all callers, and afterwards consider adding the sync-one-way
-optimization.
+I will make it so.  Thanks,
 
--Christoffer
+Alex
