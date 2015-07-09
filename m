@@ -1,70 +1,35 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH 2/2] Detect vGIC presence at runtime
-Date: Thu, 09 Jul 2015 15:50:49 +0300
-Message-ID: <01b401d0ba45$e23be430$a6b3ac90$@samsung.com>
-References: <cover.1436264839.git.p.fedin@samsung.com>
- <8f44081ef96f51c6f2a5753e5933d7de1e3c2c2f.1436264839.git.p.fedin@samsung.com>
- <20150709113721.GJ13530@cbox>
+From: Zhichao Huang <zhichao.huang@linaro.org>
+Subject: Re: [PATCH v3 08/11] KVM: arm: implement dirty bit mechanism for debug registers
+Date: Thu, 09 Jul 2015 20:54:25 +0800
+Message-ID: <8E4AB63C-514A-46D0-9FF6-2158B2834CC6@linaro.org>
+References: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org> <1434969694-7432-9-git-send-email-zhichao.huang@linaro.org> <20150630092020.GP11332@cbox> <B3B5AB0D-020C-483D-A6DE-76E355865010@linaro.org> <20150703115611.GB14220@lvm> <5A7DE9A0-E7A6-40B0-80F9-896F7DED0E47@linaro.org> <20150707102405.GE23879@arm.com> <123AABA4-2C79-462D-91FC-56FB52DB972C@linaro.org> <20150708170855.GB6348@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1213B58374
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2015 08:39:21 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3-4FiuhGQ52p for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Jul 2015 08:39:19 -0400 (EDT)
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com
- [210.118.77.11])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E01CA58373
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2015 08:39:18 -0400 (EDT)
-Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
- by mailout1.w1.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NR800EMZ10Q3G50@mailout1.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Thu, 09 Jul 2015 13:50:50 +0100 (BST)
-In-reply-to: <20150709113721.GJ13530@cbox>
-Content-language: ru
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: 'Christoffer Dall' <christoffer.dall@linaro.org>
-Cc: 'Marc Zyngier' <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20150708170855.GB6348@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <Marc.Zyngier@arm.com>, "alex.bennee@linaro.org" <alex.bennee@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, "huangzhichao@huawei.com" <huangzhichao@huawei.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello!
 
-> why not report ENXIO as an error?  If probing the vgic fails due to
-> being unable to request the irq or something similar, then surely your
-> system has and error and this should be reported.
 
- It is reported by probe function itself.
- -ENODEV here means there's no GIC at all. -ENXIO happens when, for example, there is GIC node in
-the device tree, but it does not specify vGIC resources. Normally this means that vGIC is defunct on
-the machine.
+On July 9, 2015 1:08:55 AM GMT+08:00, Will Deacon <will.deacon@arm.com> wrote:
+>On Wed, Jul 08, 2015 at 11:50:22AM +0100, Zhichao Huang wrote:
+>> Are you happy with this?:
+>
+>You miss the reserved breakpoint, I think.
 
-> This may be more nicely implemented by letting the vgic init/probe
-> functions set the vgic_present, or maybe better yet, just export a
-> function from vgic.c:
-> 
-> bool kvm_vgic_present(void)
-> {
-> 	return vgic_ops != NULL;
-> }
+Sorry, I can't quite understand. What is the reserved breakpoint?
 
- Is it necessary? Actually this flag is not needed anywhere else except arch/arm/kvm/arm.c, only at
-init time. Runtime should, i believe, use irqchip_in_kernel(), because userland can choose just not
-to use vGIC for some reason (testing for example).
+When arch_[iu]ninstall_hw_breakpoint is called, it only set/clear the
+brps and wrps slots.
 
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
+>I also still don't understand why this is preferable to trapping.
+>
+>Will
+
+-- 
+Zhichao Huang
