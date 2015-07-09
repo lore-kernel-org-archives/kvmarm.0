@@ -1,80 +1,103 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 1/2] Fix NULL pointer dereferences if KVM is used without
- in-kernel irqchip
-Date: Thu, 9 Jul 2015 13:11:13 +0200
-Message-ID: <20150709111113.GI13530@cbox>
+Subject: Re: [PATCH 2/2] Detect vGIC presence at runtime
+Date: Thu, 9 Jul 2015 13:37:21 +0200
+Message-ID: <20150709113721.GJ13530@cbox>
 References: <cover.1436264839.git.p.fedin@samsung.com>
- <46c62639f325ef935c4ca24c5fc9d5eb2b4a0979.1436264839.git.p.fedin@samsung.com>
+ <8f44081ef96f51c6f2a5753e5933d7de1e3c2c2f.1436264839.git.p.fedin@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D11D05831F
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2015 06:59:34 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aSlpKEOh-CJe for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Jul 2015 06:59:33 -0400 (EDT)
-Received: from mail-lb0-f169.google.com (mail-lb0-f169.google.com
- [209.85.217.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 54C3658319
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2015 06:59:33 -0400 (EDT)
-Received: by lblf12 with SMTP id f12so3459031lbl.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Jul 2015 04:11:07 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <46c62639f325ef935c4ca24c5fc9d5eb2b4a0979.1436264839.git.p.fedin@samsung.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <8f44081ef96f51c6f2a5753e5933d7de1e3c2c2f.1436264839.git.p.fedin@samsung.com>
+Sender: kvm-owner@vger.kernel.org
 To: Pavel Fedin <p.fedin@samsung.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, KVM-ARM mailing list <kvmarm@lists.cs.columbia.edu>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jul 07, 2015 at 01:38:48PM +0300, Pavel Fedin wrote:
-> Makes qemu working again with kernel-irqchip=off option
+On Tue, Jul 07, 2015 at 02:11:01PM +0300, Pavel Fedin wrote:
+> Allows to use KVM on hardware without vGIC. Interrupt controller has to be
+> emulated in userspace in this case.
 > 
 > Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
 > ---
->  virt/kvm/arm/vgic.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  arch/arm/kvm/arm.c | 19 ++++++++++++++++++-
+>  1 file changed, 18 insertions(+), 1 deletion(-)
 > 
-> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> index 78fb820..3420657 100644
-> --- a/virt/kvm/arm/vgic.c
-> +++ b/virt/kvm/arm/vgic.c
-> @@ -100,6 +100,9 @@ static bool queue_sgi(struct kvm_vcpu *vcpu, int irq)
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index d9631ec..f2f7a13 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -61,6 +61,8 @@ static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
+>  static u8 kvm_next_vmid;
+>  static DEFINE_SPINLOCK(kvm_vmid_lock);
 >  
->  int kvm_vgic_map_resources(struct kvm *kvm)
->  {
-> +	if (!kvm->arch.vgic.vm_ops.map_resources)
-> +		return 0;
+> +static bool vgic_present;
 > +
->  	return kvm->arch.vgic.vm_ops.map_resources(kvm, vgic);
->  }
->  
-> @@ -1637,7 +1640,7 @@ static int vgic_vcpu_init_maps(struct kvm_vcpu *vcpu, int nr_irqs)
->   */
->  int kvm_vgic_get_max_vcpus(void)
+>  static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
 >  {
-> -	return vgic->max_gic_vcpus;
-> +	return vgic ? vgic->max_gic_vcpus : KVM_MAX_VCPUS;
->  }
+>  	BUG_ON(preemptible());
+> @@ -172,6 +174,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	switch (ext) {
+>  	case KVM_CAP_IRQCHIP:
+>  	case KVM_CAP_IRQFD:
+> +		r = vgic_present;
+> +		break;
+>  	case KVM_CAP_IOEVENTFD:
+>  	case KVM_CAP_DEVICE_CTRL:
+>  	case KVM_CAP_USER_MEMORY:
+> @@ -850,6 +854,8 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
 >  
->  void kvm_vgic_destroy(struct kvm *kvm)
+>  	switch (dev_id) {
+>  	case KVM_ARM_DEVICE_VGIC_V2:
+> +		if (!vgic_present)
+> +			return -ENXIO;
+>  		return kvm_vgic_addr(kvm, type, &dev_addr->addr, true);
+>  	default:
+>  		return -ENODEV;
+> @@ -864,6 +870,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
+>  
+>  	switch (ioctl) {
+>  	case KVM_CREATE_IRQCHIP: {
+> +		if (!vgic_present)
+> +			return -ENXIO;
+>  		return kvm_vgic_create(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
+>  	}
+>  	case KVM_ARM_SET_DEVICE_ADDR: {
+> @@ -1046,8 +1054,17 @@ static int init_hyp_mode(void)
+>  	 * Init HYP view of VGIC
+>  	 */
+>  	err = kvm_vgic_hyp_init();
+> -	if (err)
+> +	switch (err) {
+> +	case 0:
+> +		vgic_present = true;
+> +		break;
+> +	case -ENODEV:
+> +	case -ENXIO:
+> +		vgic_present = false;
+
+why not report ENXIO as an error?  If probing the vgic fails due to
+being unable to request the irq or something similar, then surely your
+system has and error and this should be reported.
+
+This may be more nicely implemented by letting the vgic init/probe
+functions set the vgic_present, or maybe better yet, just export a
+function from vgic.c:
+
+bool kvm_vgic_present(void)
+{
+	return vgic_ops != NULL;
+}
+
+> +		break;
+> +	default:
+>  		goto out_free_context;
+> +	}
+>  
+>  	/*
+>  	 * Init HYP architected timer support
 > -- 
 > 2.4.4
 > 
-
-This feels like defensive programming and it's a bit weird to return
-something from kvm_vgic_get_max_vcpus when there is no vgic...
-
-I would probably guard the callers with irqchip_in_kernel instead.
 
 -Christoffer
