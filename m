@@ -1,90 +1,113 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v2 0/7] KVM: arm/arm64: gsi routing support
-Date: Thu,  9 Jul 2015 10:22:10 +0200
-Message-ID: <1436430137-24205-1-git-send-email-eric.auger@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
+Subject: [PATCH v2 1/7] KVM: api: introduce KVM_IRQ_ROUTING_EXTENDED_MSI
+Date: Thu,  9 Jul 2015 10:22:11 +0200
+Message-ID: <1436430137-24205-2-git-send-email-eric.auger@linaro.org>
+References: <1436430137-24205-1-git-send-email-eric.auger@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 97D005827F
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2015 04:11:11 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id mIJ-Yt68qqsg for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Jul 2015 04:11:11 -0400 (EDT)
+Received: from mail-wi0-f180.google.com (mail-wi0-f180.google.com
+ [209.85.212.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CC0395827D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2015 04:11:10 -0400 (EDT)
+Received: by wifm2 with SMTP id m2so11064948wif.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Jul 2015 01:22:45 -0700 (PDT)
+In-Reply-To: <1436430137-24205-1-git-send-email-eric.auger@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger@st.com, eric.auger@linaro.org, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: patches@linaro.org, andre.przywara@arm.com, p.fedin@samsung.com, pbonzini@redhat.com
+Cc: andre.przywara@arm.com, pbonzini@redhat.com, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-With the advent of GICv3 ITS in-kernel emulation, KVM GSI routing
-appears to be requested. More specifically MSI routing is needed.
-irqchip routing does not sound to be really useful on arm but usage of
-MSI routing also mandates to integrate irqchip routing. The initial
-implementation of irqfd on arm must be upgraded with the integration
-of kvm irqchip.c code and the implementation of its standard hooks
-in the architecture specific part.
+On ARM, the MSI msg (address and data) comes along with
+out-of-band device ID information. The device ID encodes the
+device that writes the MSI msg. Let's convey the device id in
+kvm_irq_routing_msi and use a new routing entry type to
+indicate the devid is populated.
 
-In case KVM_SET_GSI_ROUTING ioctl is not called, a default routing
-table with flat irqchip routing entries is built enabling to inject gsi
-corresponding to the SPI indexes seen by the guest.
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
-As soon as KVM_SET_GSI_ROUTING is called, user-space overwrites this
-default routing table and is responsible for building the whole routing
-table.
-
-for arm/arm64 KVM_SET_GSI_ROUTING has a limited support:
-- only applies to KVM_IRQFD and not to KVM_IRQ_LINE
-
-- irqchip routing was tested on Calxeda midway (VFIO with irqfd)
-  with and without explicit routing
-- MSI routing without GICv3 ITS was tested using APM Xgene-I
-  (qemu VIRTIO-PCI vhost net without gsi_direct_mapping).
-- MSI routing with GICv3 ITS is *NOT* tested.
-
-Code can be found at https://git.linaro.org/people/eric.auger/linux.git/shortlog/refs/heads/v4.2-rc1-gsi-routing-v2
-
-It applies on Andre's [PATCH 00/13] arm64: KVM: GICv3 ITS emulation
-(http://www.spinics.net/lists/kvm/msg117402.html)
-
-History:
+---
 
 v1 -> v2:
-- user API changed:
-  x devid id passed in kvm_irq_routing_msi
-  x kept the new routing entry type: KVM_IRQ_ROUTING_EXTENDED_MSI
-- kvm_host.h: adopt Andre's proposal to replace the msi_msg by a struct
-  composed of the msi_msg and devid in kvm_kernel_irq_routing_entry
-- Fix bug reported by Pavel: Added KVM_IRQ_ROUTING_EXTENDED_MSI handling
-  in eventfd.c
-- added vgic_v2m_inject_msi in vgic-v2-emul.c as suggested by Andre
-- fix bug reported by Andre: bad setting of msi.flags and msi.devid
-  in kvm_send_userspace_msi
-- avoid injecting reserved IRQ numbers in vgic_irqfd_set_irq
+- devid id passed in kvm_irq_routing_msi instead of in
+  kvm_irq_routing_entry
 
-RFC -> PATCH:
-- clearly state limited support on arm/arm64:
-  KVM_IRQ_LINE not impacted by GSI routing
-- add default routing table feature (new patch file)
-- changed uapi to use padding field area
-- reword api.txt
+RFC -> PATCH
+- remove kvm_irq_routing_extended_msi and use union instead
+---
+ Documentation/virtual/kvm/api.txt | 10 +++++++++-
+ include/uapi/linux/kvm.h          |  6 +++++-
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
-Eric Auger (7):
-  KVM: api: introduce KVM_IRQ_ROUTING_EXTENDED_MSI
-  KVM: kvm_host: add devid in kvm_kernel_irq_routing_entry
-  KVM: irqchip: convey devid to kvm_set_msi
-  KVM: arm/arm64: enable irqchip routing
-  KVM: arm/arm64: build a default routing table
-  KVM: arm/arm64: enable MSI routing
-  KVM: arm: implement kvm_set_msi by gsi direct mapping
-
- Documentation/virtual/kvm/api.txt |  32 ++++++++++--
- arch/arm/include/asm/kvm_host.h   |   2 +
- arch/arm/kvm/Kconfig              |   3 ++
- arch/arm/kvm/Makefile             |   2 +-
- arch/arm64/include/asm/kvm_host.h |   1 +
- arch/arm64/kvm/Kconfig            |   2 +
- arch/arm64/kvm/Makefile           |   2 +-
- include/kvm/arm_vgic.h            |   9 ----
- include/linux/kvm_host.h          |   7 ++-
- include/uapi/linux/kvm.h          |   6 ++-
- virt/kvm/arm/vgic-v2-emul.c       |  12 +++++
- virt/kvm/arm/vgic.c               | 101 +++++++++++++++++++++++++++++---------
- virt/kvm/eventfd.c                |   6 ++-
- virt/kvm/irqchip.c                |  12 ++++-
- 14 files changed, 153 insertions(+), 44 deletions(-)
-
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index bea8de7..3d920cd 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -1453,6 +1453,7 @@ struct kvm_irq_routing_entry {
+ #define KVM_IRQ_ROUTING_IRQCHIP 1
+ #define KVM_IRQ_ROUTING_MSI 2
+ #define KVM_IRQ_ROUTING_S390_ADAPTER 3
++#define KVM_IRQ_ROUTING_EXTENDED_MSI 4
+ 
+ No flags are specified so far, the corresponding field must be set to zero.
+ 
+@@ -1465,9 +1466,16 @@ struct kvm_irq_routing_msi {
+ 	__u32 address_lo;
+ 	__u32 address_hi;
+ 	__u32 data;
+-	__u32 pad;
++	union {
++		__u32 pad;
++		__u32 devid;
++	};
+ };
+ 
++for KVM_IRQ_ROUTING_EXTENDED_MSI routing entry type, the kvm_irq_routing_msi
++routing entry is used and devid is populated with the device ID that wrote
++the MSI message. For PCI, this is usually a BFD identifier in the lower 16 bits.
++
+ struct kvm_irq_routing_s390_adapter {
+ 	__u64 ind_addr;
+ 	__u64 summary_addr;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 9a261e5..39ec164 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -829,7 +829,10 @@ struct kvm_irq_routing_msi {
+ 	__u32 address_lo;
+ 	__u32 address_hi;
+ 	__u32 data;
+-	__u32 pad;
++	union {
++		__u32 pad;
++		__u32 devid;
++	};
+ };
+ 
+ struct kvm_irq_routing_s390_adapter {
+@@ -844,6 +847,7 @@ struct kvm_irq_routing_s390_adapter {
+ #define KVM_IRQ_ROUTING_IRQCHIP 1
+ #define KVM_IRQ_ROUTING_MSI 2
+ #define KVM_IRQ_ROUTING_S390_ADAPTER 3
++#define KVM_IRQ_ROUTING_EXTENDED_MSI 4
+ 
+ struct kvm_irq_routing_entry {
+ 	__u32 gsi;
 -- 
 1.9.1
-
