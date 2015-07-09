@@ -1,25 +1,28 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v2 0/7] KVM: arm/arm64: gsi routing support
-Date: Thu, 9 Jul 2015 16:25:50 +0100
-Message-ID: <559E927E.8040403@arm.com>
-References: <1436430137-24205-1-git-send-email-eric.auger@linaro.org>
- <023601d0ba54$c4d6e020$4e84a060$@samsung.com>
+From: Joerg Roedel <joro@8bytes.org>
+Subject: Re: [RFC v2 0/6] IRQ bypass manager and irqfd consumer
+Date: Thu, 9 Jul 2015 17:34:58 +0200
+Message-ID: <20150709153458.GX18569@8bytes.org>
+References: <1436184692-20927-1-git-send-email-eric.auger@linaro.org>
+ <1436289468.1391.89.camel@redhat.com>
+ <20150709122805.GW18569@8bytes.org>
+ <1436451223.1391.219.camel@redhat.com>
+ <559E8771.9010401@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5347658440
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2015 11:14:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 06F855845E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2015 11:23:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NXXBtSCP68kH for <kvmarm@lists.cs.columbia.edu>;
- Thu,  9 Jul 2015 11:14:19 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EFB6858421
- for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2015 11:14:18 -0400 (EDT)
-In-Reply-To: <023601d0ba54$c4d6e020$4e84a060$@samsung.com>
+ with ESMTP id Y1Dhep4YxgKQ for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Jul 2015 11:23:25 -0400 (EDT)
+Received: from theia.8bytes.org (8bytes.org [81.169.241.247])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E13FA58442
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2015 11:23:24 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <559E8771.9010401@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,60 +32,28 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Pavel Fedin <p.fedin@samsung.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
-Cc: "eric.auger@st.com" <eric.auger@st.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: eric.auger@st.com, kvm@vger.kernel.org, marc.zyngier@arm.com, mtosatti@redhat.com, linux-kernel@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>, patches@linaro.org, feng.wu@intel.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, avi.kivity@gmail.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Pavel,
-
-On 09/07/15 15:37, Pavel Fedin wrote:
->  Hello!
+On Thu, Jul 09, 2015 at 04:38:41PM +0200, Paolo Bonzini wrote:
+> >> On Tue, Jul 07, 2015 at 11:17:48AM -0600, Alex Williamson wrote:
+> > If we think that it's *only* a kvm-vfio interaction then we could add it
+> > to virt/kvm/vfio.c.  vfio could use symbol_get to avoid a module
+> > dependency and effectively disable the code path when not used with kvm.
+> > The reverse model of hosting it in vfio and using symbol_get from
+> > kvm-vfio would also work.  Do we really want to declare it to be
+> > kvm-vfio specific though?  Another option would be to simply host it
+> > under virt/lib with module dependencies for both vfio and kvm.
 > 
->> v1 -> v2:
->> - user API changed:
->>   x devid id passed in kvm_irq_routing_msi
->>   x kept the new routing entry type: KVM_IRQ_ROUTING_EXTENDED_MSI
+> I wonder if in the future we may have some kind of driver-mediated
+> passthrough, e.g. for network drivers.  They might use the bypass
+> mechanism too.  So I think drivers/vfio is too restrictive.
 > 
->  Andre, you never replied to my last comment to the previous series.
+> virt/ right now only hosts KVM, but it could for example host lguest
+> too.  virt/lib/ is okay with me.
 
-Oh dear, my draft folder again :-( Sorry for that!
+Yeah, virt/lib is probably the best choice.
 
-> Are you going to do the same
-> change in your MSI API? Otherwise:
-> 1. KVM_IRQ_LINE - we have completely own convention. Well, this was already done before us, we
-> cannot fix it.
-> 2. KVM_SIGNAL_MSI - we use VALID_DEVID flag plus devid
 
-Yes, because there is already a flag value and no other way to specify
-this, in contrast to ...
-
-> 3. KVM_SET_GSI_ROUTING - we use KVM_IRQ_ROUTING_EXTENDED_MSI plus devid
-
-Here we already have a type field with some users, so lets piggy-back on
-this.
-
-Both ioctl extensions are coupled with a per-VM capability to let
-userland know that it needs to provide a device ID.
-
->  Don't (2) and (3) together still look bad? Since we agreed on not using flags, i would suggest to
-> have KVM_SIGNAL_EXTENDED_MSI counterpart, which also doesn't use flags.
-
-Using flags on its own (without an explicit capability) is what I
-opposed against, not flags in general. After all, that's what they are
-meant for, right? In case of KVM_SET_GSI_ROUTING it just seems awkward
-to me to use a flag when a different type would do as well.
-
-But after all, I don't have a strong opinion on that matter, so if
-others prefer using a flag I am also fine with that.
-
-Poka,
-Andre.
-
->  I know, we were already talking about it, so, if this gets ignored for the second time, i assume
-> the Architects decided that fancy APIs are cool, and i promise to stop this.
-> 
-> Kind regards,
-> Pavel Fedin
-> Expert Engineer
-> Samsung Electronics Research center Russia
-> 
+	Joerg
