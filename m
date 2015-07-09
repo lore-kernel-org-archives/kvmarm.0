@@ -1,42 +1,35 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH] KVM: arm/arm64: Don't let userspace update CNTVOFF
- once guest is running
-Date: Thu, 9 Jul 2015 14:24:06 +0200
-Message-ID: <20150709122406.GN13530@cbox>
-References: <55917E5B.3030401@huawei.com>
- <CAFEAcA-vS8B8pJUSseFw0OaKJFPe-0rMT-XHxjNbSvyxaZ+9Tg@mail.gmail.com>
- <559D483A.40507@arm.com>
- <CAFEAcA-U1mEGy87ax4Cb1MLFcEP+sqc9BL_Q0hO6qg1J3FCMew@mail.gmail.com>
- <559D51C5.3070600@arm.com>
- <CAFEAcA-rWf5UkiP+5UbtjYihfhDOVaY4hVpXNRGMnYEhNWqwSQ@mail.gmail.com>
- <20150709102201.GH13530@cbox>
- <CAFEAcA-4rMB6i2=UBXjxTAHQWn5xMiCSiaYbknuXOuHmf4XY_A@mail.gmail.com>
- <20150709120531.GL13530@cbox>
- <CAFEAcA94qRKs7TV4MmrhD4O0+cE4SYPb4iKydQQbSzdrzKMC+w@mail.gmail.com>
+From: Joerg Roedel <joro@8bytes.org>
+Subject: Re: [RFC v2 0/6] IRQ bypass manager and irqfd consumer
+Date: Thu, 9 Jul 2015 14:28:05 +0200
+Message-ID: <20150709122805.GW18569@8bytes.org>
+References: <1436184692-20927-1-git-send-email-eric.auger@linaro.org>
+ <1436289468.1391.89.camel@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA94qRKs7TV4MmrhD4O0+cE4SYPb4iKydQQbSzdrzKMC+w@mail.gmail.com>
-Sender: kvm-owner@vger.kernel.org
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Claudio Fontana <claudio.fontana@huawei.com>, Jan Kiszka <jan.kiszka@web.de>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvm-devel <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <1436289468.1391.89.camel@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Eric Auger <eric.auger@linaro.org>, eric.auger@st.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, avi.kivity@gmail.com, mtosatti@redhat.com, feng.wu@intel.com, b.reynal@virtualopensystems.com, linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Jul 09, 2015 at 01:07:24PM +0100, Peter Maydell wrote:
-> On 9 July 2015 at 13:05, Christoffer Dall <christoffer.dall@linaro.org> wrote:
-> > As I understand it, the problem is that if we ever run a VCPU after
-> > reading the value, and write back the value afterwards, you potentially
-> > make time go backwards and get inconsistent views of time from different
-> > VCPUs because they may have read the time before/after updating the
-> > CNTVOFF.
-> 
-> Right, but I think if QEMU does that it's a bug (and more to
-> the point I don't entirely understand why we would do that
-> yet, even given that we don't have a distinction between
-> "registers to sync always" and "registers to sync only on
-> reset"...)
-> 
-I think we have evidence that it does that, but we don't know why/how.
+On Tue, Jul 07, 2015 at 11:17:48AM -0600, Alex Williamson wrote:
+> Hosting the bypass manager in kernel/irq seemed appropriate, but really
+> it could be anywhere.  Does anyone have a different preference or
+> specifically want it under their scope?  We had originally thought of
+> this as an IOMMU service, but I think we've generalized it beyond that.
+> I expect we should also add the necessary hooks to turn it into a
+> loadable module to keep the tinification folks happy, I'll incorporate
+> the current working changes and post a version with that.
 
--Christoffer
+Yeah, this is only an IOMMU service on x86, afaik. So drivers/iommu is
+probably the wrong place to host it.
+
+Will there be any other producers than VFIO or any other consumers than
+KVM? If not, it should live in one of these spaces. KVM is probably the
+best choice, as any hardware feature that uses this targets
+virtualization, so there will hardly ever be another consumer than KVM.
+
+
+	Joerg
