@@ -1,103 +1,90 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 2/2] Detect vGIC presence at runtime
-Date: Thu, 9 Jul 2015 13:37:21 +0200
-Message-ID: <20150709113721.GJ13530@cbox>
-References: <cover.1436264839.git.p.fedin@samsung.com>
- <8f44081ef96f51c6f2a5753e5933d7de1e3c2c2f.1436264839.git.p.fedin@samsung.com>
+Subject: Re: [PATCH v3 08/11] KVM: arm: implement dirty bit mechanism for
+ debug registers
+Date: Thu, 9 Jul 2015 13:50:47 +0200
+Message-ID: <20150709115047.GK13530@cbox>
+References: <1434969694-7432-1-git-send-email-zhichao.huang@linaro.org>
+ <1434969694-7432-9-git-send-email-zhichao.huang@linaro.org>
+ <20150630092020.GP11332@cbox>
+ <B3B5AB0D-020C-483D-A6DE-76E355865010@linaro.org>
+ <20150703115611.GB14220@lvm>
+ <5A7DE9A0-E7A6-40B0-80F9-896F7DED0E47@linaro.org>
+ <20150707102405.GE23879@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 26AEC58331
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2015 07:39:10 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id MCP4es+Bbdhc for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  9 Jul 2015 07:39:09 -0400 (EDT)
+Received: from mail-la0-f49.google.com (mail-la0-f49.google.com
+ [209.85.215.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1451358330
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  9 Jul 2015 07:39:08 -0400 (EDT)
+Received: by lagx9 with SMTP id x9so244494025lag.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 09 Jul 2015 04:50:42 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <8f44081ef96f51c6f2a5753e5933d7de1e3c2c2f.1436264839.git.p.fedin@samsung.com>
-Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>
+In-Reply-To: <20150707102405.GE23879@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Will Deacon <will.deacon@arm.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "huangzhichao@huawei.com" <huangzhichao@huawei.com>, Zhichao Huang <zhichao.huang@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jul 07, 2015 at 02:11:01PM +0300, Pavel Fedin wrote:
-> Allows to use KVM on hardware without vGIC. Interrupt controller has to be
-> emulated in userspace in this case.
+On Tue, Jul 07, 2015 at 11:24:06AM +0100, Will Deacon wrote:
+> On Tue, Jul 07, 2015 at 11:06:57AM +0100, Zhichao Huang wrote:
+> > Chazy and me are talking about how to reduce the saving/restoring
+> > overhead for debug registers.
+> > We want to add a state in hw_breakpoint.c to indicate whether the host
+> > enable any hwbrpts or not (might export a fuction that kvm can call),
+> > then we can read this state from memory instead of reading from real
+> > hardware registers, and to decide whether we need a world switch or
+> > not.
+> > Does it acceptable?
 > 
-> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-> ---
->  arch/arm/kvm/arm.c | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
+> Maybe, hard to tell without the code. There are obvious races to deal with
+> if you use variables to indicate whether resources are in use -- why not
+> just trap debug access from the host as well? Then you could keep track of
+> the "owner" in kvm and trap accesses from everybody else.
 > 
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index d9631ec..f2f7a13 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -61,6 +61,8 @@ static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
->  static u8 kvm_next_vmid;
->  static DEFINE_SPINLOCK(kvm_vmid_lock);
->  
-> +static bool vgic_present;
-> +
->  static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
->  {
->  	BUG_ON(preemptible());
-> @@ -172,6 +174,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	switch (ext) {
->  	case KVM_CAP_IRQCHIP:
->  	case KVM_CAP_IRQFD:
-> +		r = vgic_present;
-> +		break;
->  	case KVM_CAP_IOEVENTFD:
->  	case KVM_CAP_DEVICE_CTRL:
->  	case KVM_CAP_USER_MEMORY:
-> @@ -850,6 +854,8 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
->  
->  	switch (dev_id) {
->  	case KVM_ARM_DEVICE_VGIC_V2:
-> +		if (!vgic_present)
-> +			return -ENXIO;
->  		return kvm_vgic_addr(kvm, type, &dev_addr->addr, true);
->  	default:
->  		return -ENODEV;
-> @@ -864,6 +870,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
->  
->  	switch (ioctl) {
->  	case KVM_CREATE_IRQCHIP: {
-> +		if (!vgic_present)
-> +			return -ENXIO;
->  		return kvm_vgic_create(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
->  	}
->  	case KVM_ARM_SET_DEVICE_ADDR: {
-> @@ -1046,8 +1054,17 @@ static int init_hyp_mode(void)
->  	 * Init HYP view of VGIC
->  	 */
->  	err = kvm_vgic_hyp_init();
-> -	if (err)
-> +	switch (err) {
-> +	case 0:
-> +		vgic_present = true;
-> +		break;
-> +	case -ENODEV:
-> +	case -ENXIO:
-> +		vgic_present = false;
+The only information we're looking for here is whether the host has
+enabled some break/watch point so that we need to disable them before
+running the guest.
 
-why not report ENXIO as an error?  If probing the vgic fails due to
-being unable to request the irq or something similar, then surely your
-system has and error and this should be reported.
+Just to re-iterate, when we are about to run a guest, we have the
+following cases:
 
-This may be more nicely implemented by letting the vgic init/probe
-functions set the vgic_present, or maybe better yet, just export a
-function from vgic.c:
+1) Neither the host nor the guest has configured any [WB]points
+2) Only the host has configured any [WB]points
+3) Only the guest has configured any [WB]points
+4) Both the host and the guest have configured any [WB]points
 
-bool kvm_vgic_present(void)
-{
-	return vgic_ops != NULL;
-}
+In case (1), KVM should enable trapping and swtich the register state on
+guest accesses.
 
-> +		break;
-> +	default:
->  		goto out_free_context;
-> +	}
->  
->  	/*
->  	 * Init HYP architected timer support
-> -- 
-> 2.4.4
-> 
+In cases (2), (3), and (4) we must switch the register state on each
+entry/exit.
 
+If we are to trap debug register accesses in KVM to set a flag to keep
+track of the owner (iow. has the host touched the registers) then don't
+we impose an ordering requirement of whether KVM or the breakpoint
+functionality gets initialized first, and we need to take special care
+when tearing down KVM to disable the traps?  It sounds a little complex.
+
+I've previously suggested to simply look at the B/W control registers to
+figure out what to do.  Caching the state in memory is an optimization,
+do we even have any idea how important such an optimization is?
+
+Thanks,
 -Christoffer
