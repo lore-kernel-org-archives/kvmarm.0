@@ -1,73 +1,81 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 4/6] irqchip: GIC: Use chip_data instead of handler_data
- for cascaded interrupts
-Date: Fri, 10 Jul 2015 09:21:35 +0100
-Message-ID: <559F808F.7080303@arm.com>
-References: <1436447951-22357-1-git-send-email-marc.zyngier@arm.com> <1436447951-22357-5-git-send-email-marc.zyngier@arm.com> <alpine.DEB.2.11.1507092331130.5134@nanos> <559F79C6.8020107@arm.com> <559F7F8C.8080701@linux.intel.com>
+From: harry <13401187209@126.com>
+Subject: ***SPAM*** KVM on ARM: How to add some functions into interrupt.S
+ with C code?
+Date: Fri, 10 Jul 2015 17:06:30 +0800 (CST)
+Message-ID: <5675dfef.1beed.14e77374fec.Coremail.13401187209@126.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <559F7F8C.8080701@linux.intel.com>
-Sender: kvm-owner@vger.kernel.org
-To: Jiang Liu <jiang.liu@linux.intel.com>, Thomas Gleixner <tglx@linutronix.de>
-Cc: Jason Cooper <jason@lakedaemon.net>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="===============1735150762328217616=="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E9CB584D5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 04:55:03 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id eTxOsimtvIVm for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Jul 2015 04:55:02 -0400 (EDT)
+Received: from m15-12.126.com (m15-12.126.com [220.181.15.12])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79038584D4
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 04:55:00 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/07/15 09:17, Jiang Liu wrote:
-> On 2015/7/10 15:52, Marc Zyngier wrote:
->> On 09/07/15 22:33, Thomas Gleixner wrote:
->>> On Thu, 9 Jul 2015, Marc Zyngier wrote:
->>>
->>>> When used as a primary interrupt controller, the GIC driver uses
->>>> irq_data->chip_data to extract controller-specific information.
->>>>
->>>> When used as a secondary interrupt controller, it uses handler_data
->>>> instead. As this difference is relatively pointless and only creates
->>>> confusion, change the secondary path to match what the rest of the
->>>> driver does.
->>>>
->>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>>> ---
->>>>  drivers/irqchip/irq-gic.c | 4 ++--
->>>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
->>>> index e264675..3c7f3a4 100644
->>>> --- a/drivers/irqchip/irq-gic.c
->>>> +++ b/drivers/irqchip/irq-gic.c
->>>> @@ -298,7 +298,7 @@ static void __exception_irq_entry gic_handle_irq(struct pt_regs *regs)
->>>>  
->>>>  static void gic_handle_cascade_irq(unsigned int irq, struct irq_desc *desc)
->>>>  {
->>>> -	struct gic_chip_data *chip_data = irq_get_handler_data(irq);
->>>> +	struct gic_chip_data *chip_data = irq_get_chip_data(irq);
->>>>  	struct irq_chip *chip = irq_get_chip(irq);
->>>
->>> You should make that
->>>
->>>     chip_data = irq_desc_get_chip_data(desc);
->>>     chip = irq_desc_get_chip(desc);
->>>
->>> That avoids two pointless lookups of irqdesc ....
->>
->> Ah, very good point.
->>
->> And it turns out that these constructs (use of irq_get_* when the
->> irq_desc is readily available) is actually fairly common in a number of
->> irqchip implementations used as secondary interrupt controllers.
->>
->> Time for another cleanup series, I believe... ;-)
-> Hi Marc,
-> 	I'm ahead of your request and expect an reviewed-by from
-> you then:). Please refer to http://lkml.org/lkml/2015/6/4/743 for
-> what we have done to clear up this interfaces.
+--===============1735150762328217616==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_444473_1624145918.1436519190506"
 
-Ah, let me dig this now (yeah, I've been slacking off on reviewing
-lately...). Looks awesome! :-)
+------=_Part_444473_1624145918.1436519190506
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
 
-Thanks!
+SSB3YW50IHRvIGFkZCBzb21lIGZ1bmN0aW9ucyBpbnRvIGludGVycnVwdC5TIHdpdGggQyBjb2Rl
+IHRvIGRvIHNvbWUgb3BlcmF0aW9ucyBpbiBoeXAgbW9kZSB3aXRoIGEgaHlwY2FsbC4KCgpJIGhh
+dmUgdHJpZWQgdG8gYWRkIC5nbG9iYWwgW2Z1bmN0aW9uIG5hbWVdIGFuZCB1c2UgYmwgW2Z1bmN0
+aW9uIG5hbWVdLCBidXQgdGhlcmUgd2lsbCBiZSBhIHByZWZldGNoIGFib3J0LgoKClNvIEkgd2Fu
+dCB0byBrbm93IGlmIHRoZSBDIGNvZGUgY2FuIGJlIGxpbmtlZCBpbnRvIGludGVycnVwdC5TIGFu
+ZCBob3cgdG8gYWNoaWV2ZSB0aGlzLgoKClRoYW5rIHlvdSBmb3IgaGVscC4=
+------=_Part_444473_1624145918.1436519190506
+Content-Type: text/html; charset=GBK
+Content-Transfer-Encoding: base64
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS43O2NvbG9yOiMwMDAwMDA7Zm9udC1zaXplOjE0cHg7
+Zm9udC1mYW1pbHk6QXJpYWwiPjxkaXY+SSB3YW50IHRvIGFkZCBzb21lIGZ1bmN0aW9ucyBpbnRv
+IGludGVycnVwdC5TIHdpdGggQyBjb2RlIHRvIGRvIHNvbWUgb3BlcmF0aW9ucyBpbiBoeXAgbW9k
+ZSB3aXRoIGEgaHlwY2FsbC48L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PkkgaGF2ZSB0cmllZCB0
+byBhZGQgLmdsb2JhbCBbZnVuY3Rpb24gbmFtZV0gYW5kIHVzZSBibCBbZnVuY3Rpb24gbmFtZV0s
+IGJ1dCB0aGVyZSB3aWxsIGJlIGEgcHJlZmV0Y2ggYWJvcnQuPC9kaXY+PGRpdj48YnI+PC9kaXY+
+PGRpdj5TbyBJIHdhbnQgdG8ga25vdyBpZiB0aGUgQyBjb2RlIGNhbiBiZSBsaW5rZWQgaW50byBp
+bnRlcnJ1cHQuUyBhbmQgaG93IHRvIGFjaGlldmUgdGhpcy48L2Rpdj48ZGl2Pjxicj48L2Rpdj48
+ZGl2PlRoYW5rIHlvdSBmb3IgaGVscC48L2Rpdj48L2Rpdj48YnI+PGJyPjxzcGFuIHRpdGxlPSJu
+ZXRlYXNlZm9vdGVyIj48c3BhbiBpZD0ibmV0ZWFzZV9tYWlsX2Zvb3RlciI+PGRpdiBpZD0ibmV0
+ZWFzZV9tYWlsX2Zvb3RlciI+PGRpdiBzdHlsZT0iYm9yZGVyLXRvcDojQ0NDQ0NDIDFweCBzb2xp
+ZDtwYWRkaW5nOjEwcHggNXB4O2ZvbnQtc2l6ZToxMnB4O2NvbG9yOiM3Nzc3Nzc7bGluZS1oZWln
+aHQ6MjJweCI+wLTX1CA8YiBzdHlsZT0iY29sb3I6I0NDMzMwMCI+zfjS1zwvYj48YiBzdHlsZT0i
+Y29sb3I6IzMzMzMzMyI+yta7+rrFwuvTys/kPC9iPiAtLSDT0MrWu/q+zdPQzfjS18rWu/q6xcLr
+08rP5KOsPGEgaWQ9Im1vYmlsZV9zZXQiIHN5cz0iMSIgbG9nPTEgbG9naWQ9ImZyZWVfc21zXzIw
+MTIwNTA0IiBocmVmPSJodHRwOi8vc2hvdWppLjE2My5jb20iIHRhcmdldD0iX2JsYW5rIiBzdHls
+ZT0iY29sb3I6IzMzNjZGRjt0ZXh0LWRlY29yYXRpb246bm9uZSI+wcu94s/qx+kmZ3Q7PC9hPjwv
+ZGl2PjwvZGl2Pgo8L3NwYW4+PC9zcGFuPg==
+------=_Part_444473_1624145918.1436519190506--
+
+
+--===============1735150762328217616==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============1735150762328217616==--
