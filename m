@@ -1,304 +1,323 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v2 11/15] KVM: arm64: handle pending bit for LPIs in ITS emulation
-Date: Fri, 10 Jul 2015 15:21:47 +0100
-Message-ID: <1436538111-4294-12-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v2 08/15] KVM: arm64: introduce ITS emulation file with stub
+ functions
+Date: Fri, 10 Jul 2015 15:21:44 +0100
+Message-ID: <1436538111-4294-9-git-send-email-andre.przywara@arm.com>
 References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2768F585A3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 10:10:33 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 78hL2pIm4Nv5 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Jul 2015 10:10:31 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 62CCD585AD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 10:10:31 -0400 (EDT)
 In-Reply-To: <1436538111-4294-1-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: marc.zyngier@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu
-Cc: eric.auger@linaro.org, Pavel Fedin <p.fedin@samsung.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As the actual LPI number in a guest can be quite high, but is mostly
-assigned using a very sparse allocation scheme, bitmaps and arrays
-for storing the virtual interrupt status are a waste of memory.
-We use our equivalent of the "Interrupt Translation Table Entry"
-(ITTE) to hold this extra status information for a virtual LPI.
-As the normal VGIC code cannot use it's fancy bitmaps to manage
-pending interrupts, we provide a hook in the VGIC code to let the
-ITS emulation handle the list register queueing itself.
-LPIs are located in a separate number range (>=8192), so
-distinguishing them is easy. With LPIs being only edge-triggered, we
-get away with a less complex IRQ handling.
+The ARM GICv3 ITS emulation code goes into a separate file, but
+needs to be connected to the GICv3 emulation, of which it is an
+option.
+Introduce the skeleton with function stubs to be filled later.
+Introduce the basic ITS data structure and initialize it, but don't
+return any success yet, as we are not yet ready for the show.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- include/kvm/arm_vgic.h      |  2 ++
- virt/kvm/arm/its-emul.c     | 71 ++++++++++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/its-emul.h     |  3 ++
- virt/kvm/arm/vgic-v3-emul.c |  2 ++
- virt/kvm/arm/vgic.c         | 72 ++++++++++++++++++++++++++++++++++-----------
- 5 files changed, 133 insertions(+), 17 deletions(-)
+ arch/arm64/kvm/Makefile            |   1 +
+ include/kvm/arm_vgic.h             |   6 ++
+ include/linux/irqchip/arm-gic-v3.h |   1 +
+ virt/kvm/arm/its-emul.c            | 125 +++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/its-emul.h            |  35 +++++++++++
+ virt/kvm/arm/vgic-v3-emul.c        |  24 ++++++-
+ 6 files changed, 189 insertions(+), 3 deletions(-)
+ create mode 100644 virt/kvm/arm/its-emul.c
+ create mode 100644 virt/kvm/arm/its-emul.h
 
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index f90f4aa..9803307 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -25,5 +25,6 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v2-emul.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += vgic-v2-switch.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3-emul.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/its-emul.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += vgic-v3-switch.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
 diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 1648668..2a67a10 100644
+index 8c6cb0e..9e9d4aa 100644
 --- a/include/kvm/arm_vgic.h
 +++ b/include/kvm/arm_vgic.h
-@@ -147,6 +147,8 @@ struct vgic_vm_ops {
- 	int	(*init_model)(struct kvm *);
- 	void	(*destroy_model)(struct kvm *);
- 	int	(*map_resources)(struct kvm *, const struct vgic_params *);
-+	bool	(*queue_lpis)(struct kvm_vcpu *);
-+	void	(*unqueue_lpi)(struct kvm_vcpu *, int irq);
+@@ -156,6 +156,11 @@ struct vgic_io_device {
+ 	struct kvm_io_device dev;
  };
  
- struct vgic_io_device {
++struct vgic_its {
++	bool			enabled;
++	spinlock_t		lock;
++};
++
+ struct vgic_dist {
+ 	spinlock_t		lock;
+ 	bool			in_kernel;
+@@ -264,6 +269,7 @@ struct vgic_dist {
+ 	u64			*pendbaser;
+ 
+ 	bool			lpis_enabled;
++	struct vgic_its		its;
+ };
+ 
+ struct vgic_v2_cpu_if {
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index ffbc034..df4e527 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -177,6 +177,7 @@
+ #define GITS_CWRITER			0x0088
+ #define GITS_CREADR			0x0090
+ #define GITS_BASER			0x0100
++#define GITS_IDREGS_BASE		0xffd0
+ #define GITS_PIDR2			GICR_PIDR2
+ 
+ #define GITS_TRANSLATER			0x10040
 diff --git a/virt/kvm/arm/its-emul.c b/virt/kvm/arm/its-emul.c
-index 7f217fa..b9c40d7 100644
---- a/virt/kvm/arm/its-emul.c
+new file mode 100644
+index 0000000..659dd39
+--- /dev/null
 +++ b/virt/kvm/arm/its-emul.c
-@@ -50,8 +50,26 @@ struct its_itte {
- 	struct its_collection *collection;
- 	u32 lpi;
- 	u32 event_id;
-+	bool enabled;
-+	unsigned long *pending;
- };
- 
-+#define for_each_lpi(dev, itte, kvm) \
-+	list_for_each_entry(dev, &(kvm)->arch.vgic.its.device_list, dev_list) \
-+		list_for_each_entry(itte, &(dev)->itt, itte_list)
+@@ -0,0 +1,125 @@
++/*
++ * GICv3 ITS emulation
++ *
++ * Copyright (C) 2015 ARM Ltd.
++ * Author: Andre Przywara <andre.przywara@arm.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+static struct its_itte *find_itte_by_lpi(struct kvm *kvm, int lpi)
++#include <linux/cpu.h>
++#include <linux/kvm.h>
++#include <linux/kvm_host.h>
++#include <linux/interrupt.h>
++
++#include <linux/irqchip/arm-gic-v3.h>
++#include <kvm/arm_vgic.h>
++
++#include <asm/kvm_emulate.h>
++#include <asm/kvm_arm.h>
++#include <asm/kvm_mmu.h>
++
++#include "vgic.h"
++#include "its-emul.h"
++
++static bool handle_mmio_misc_gits(struct kvm_vcpu *vcpu,
++				  struct kvm_exit_mmio *mmio,
++				  phys_addr_t offset)
 +{
-+	struct its_device *device;
-+	struct its_itte *itte;
-+
-+	for_each_lpi(device, itte, kvm) {
-+		if (itte->lpi == lpi)
-+			return itte;
-+	}
-+	return NULL;
++	return false;
 +}
 +
- #define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
++static bool handle_mmio_gits_idregs(struct kvm_vcpu *vcpu,
++				    struct kvm_exit_mmio *mmio,
++				    phys_addr_t offset)
++{
++	return false;
++}
++
++static bool handle_mmio_gits_cbaser(struct kvm_vcpu *vcpu,
++				    struct kvm_exit_mmio *mmio,
++				    phys_addr_t offset)
++{
++	return false;
++}
++
++static bool handle_mmio_gits_cwriter(struct kvm_vcpu *vcpu,
++				     struct kvm_exit_mmio *mmio,
++				     phys_addr_t offset)
++{
++	return false;
++}
++
++static bool handle_mmio_gits_creadr(struct kvm_vcpu *vcpu,
++				    struct kvm_exit_mmio *mmio,
++				    phys_addr_t offset)
++{
++	return false;
++}
++
++static const struct vgic_io_range vgicv3_its_ranges[] = {
++	{
++		.base		= GITS_CTLR,
++		.len		= 0x10,
++		.bits_per_irq	= 0,
++		.handle_mmio	= handle_mmio_misc_gits,
++	},
++	{
++		.base		= GITS_CBASER,
++		.len		= 0x08,
++		.bits_per_irq	= 0,
++		.handle_mmio	= handle_mmio_gits_cbaser,
++	},
++	{
++		.base		= GITS_CWRITER,
++		.len		= 0x08,
++		.bits_per_irq	= 0,
++		.handle_mmio	= handle_mmio_gits_cwriter,
++	},
++	{
++		.base		= GITS_CREADR,
++		.len		= 0x08,
++		.bits_per_irq	= 0,
++		.handle_mmio	= handle_mmio_gits_creadr,
++	},
++	{
++		/* We don't need any memory from the guest. */
++		.base		= GITS_BASER,
++		.len		= 0x40,
++		.bits_per_irq	= 0,
++		.handle_mmio	= handle_mmio_raz_wi,
++	},
++	{
++		.base		= GITS_IDREGS_BASE,
++		.len		= 0x30,
++		.bits_per_irq	= 0,
++		.handle_mmio	= handle_mmio_gits_idregs,
++	},
++};
++
++/* This is called on setting the LPI enable bit in the redistributor. */
++void vgic_enable_lpis(struct kvm_vcpu *vcpu)
++{
++}
++
++int vits_init(struct kvm *kvm)
++{
++	struct vgic_dist *dist = &kvm->arch.vgic;
++	struct vgic_its *its = &dist->its;
++
++	spin_lock_init(&its->lock);
++
++	its->enabled = false;
++
++	return -ENXIO;
++}
+diff --git a/virt/kvm/arm/its-emul.h b/virt/kvm/arm/its-emul.h
+new file mode 100644
+index 0000000..5dc8e2f
+--- /dev/null
++++ b/virt/kvm/arm/its-emul.h
+@@ -0,0 +1,35 @@
++/*
++ * GICv3 ITS emulation definitions
++ *
++ * Copyright (C) 2015 ARM Ltd.
++ * Author: Andre Przywara <andre.przywara@arm.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef __KVM_ITS_EMUL_H__
++#define __KVM_ITS_EMUL_H__
++
++#include <linux/kvm.h>
++#include <linux/kvm_host.h>
++
++#include <asm/kvm_emulate.h>
++#include <asm/kvm_arm.h>
++#include <asm/kvm_mmu.h>
++
++#include "vgic.h"
++
++void vgic_enable_lpis(struct kvm_vcpu *vcpu);
++int vits_init(struct kvm *kvm);
++
++#endif
+diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+index 5269ad1..f5865e7 100644
+--- a/virt/kvm/arm/vgic-v3-emul.c
++++ b/virt/kvm/arm/vgic-v3-emul.c
+@@ -48,6 +48,7 @@
+ #include <asm/kvm_mmu.h>
  
- /* The distributor lock is held by the VGIC MMIO handler. */
-@@ -145,6 +163,59 @@ static bool handle_mmio_gits_idregs(struct kvm_vcpu *vcpu,
+ #include "vgic.h"
++#include "its-emul.h"
+ 
+ static bool handle_mmio_rao_wi(struct kvm_vcpu *vcpu,
+ 			       struct kvm_exit_mmio *mmio, phys_addr_t offset)
+@@ -530,9 +531,20 @@ static bool handle_mmio_ctlr_redist(struct kvm_vcpu *vcpu,
+ 				    struct kvm_exit_mmio *mmio,
+ 				    phys_addr_t offset)
+ {
+-	/* since we don't support LPIs, this register is zero for now */
+-	vgic_reg_access(mmio, NULL, offset,
+-			ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
++	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
++	u32 reg;
++
++	if (!vgic_has_its(vcpu->kvm)) {
++		vgic_reg_access(mmio, NULL, offset,
++				ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
++		return false;
++	}
++	reg = dist->lpis_enabled ? GICR_CTLR_ENABLE_LPIS : 0;
++	vgic_reg_access(mmio, &reg, offset,
++			ACCESS_READ_VALUE | ACCESS_WRITE_VALUE);
++	if (!dist->lpis_enabled && (reg & GICR_CTLR_ENABLE_LPIS)) {
++		/* Eventually do something */
++	}
  	return false;
  }
  
-+/*
-+ * Find all enabled and pending LPIs and queue them into the list
-+ * registers.
-+ * The dist lock is held by the caller.
-+ */
-+bool vits_queue_lpis(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_its *its = &vcpu->kvm->arch.vgic.its;
-+	struct its_device *device;
-+	struct its_itte *itte;
-+	bool ret = true;
-+
-+	if (!vgic_has_its(vcpu->kvm))
-+		return true;
-+	if (!its->enabled || !vcpu->kvm->arch.vgic.lpis_enabled)
-+		return true;
-+
-+	spin_lock(&its->lock);
-+	for_each_lpi(device, itte, vcpu->kvm) {
-+		if (!itte->enabled || !test_bit(vcpu->vcpu_id, itte->pending))
-+			continue;
-+
-+		if (!itte->collection)
-+			continue;
-+
-+		if (itte->collection->target_addr != vcpu->vcpu_id)
-+			continue;
-+
-+		__clear_bit(vcpu->vcpu_id, itte->pending);
-+
-+		ret &= vgic_queue_irq(vcpu, 0, itte->lpi);
-+	}
-+
-+	spin_unlock(&its->lock);
-+	return ret;
-+}
-+
-+/* Called with the distributor lock held by the caller. */
-+void vits_unqueue_lpi(struct kvm_vcpu *vcpu, int lpi)
-+{
-+	struct vgic_its *its = &vcpu->kvm->arch.vgic.its;
-+	struct its_itte *itte;
-+
-+	spin_lock(&its->lock);
-+
-+	/* Find the right ITTE and put the pending state back in there */
-+	itte = find_itte_by_lpi(vcpu->kvm, lpi);
-+	if (itte)
-+		__set_bit(vcpu->vcpu_id, itte->pending);
-+
-+	spin_unlock(&its->lock);
-+}
-+
- static int vits_handle_command(struct kvm_vcpu *vcpu, u64 *its_cmd)
- {
- 	return -ENODEV;
-diff --git a/virt/kvm/arm/its-emul.h b/virt/kvm/arm/its-emul.h
-index 472a6d0..cc5d5ff 100644
---- a/virt/kvm/arm/its-emul.h
-+++ b/virt/kvm/arm/its-emul.h
-@@ -33,4 +33,7 @@ void vgic_enable_lpis(struct kvm_vcpu *vcpu);
- int vits_init(struct kvm *kvm);
- void vits_destroy(struct kvm *kvm);
- 
-+bool vits_queue_lpis(struct kvm_vcpu *vcpu);
-+void vits_unqueue_lpi(struct kvm_vcpu *vcpu, int irq);
-+
- #endif
-diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
-index 49be3c3..4132c26 100644
---- a/virt/kvm/arm/vgic-v3-emul.c
-+++ b/virt/kvm/arm/vgic-v3-emul.c
-@@ -948,6 +948,8 @@ void vgic_v3_init_emulation(struct kvm *kvm)
- 	dist->vm_ops.init_model = vgic_v3_init_model;
- 	dist->vm_ops.destroy_model = vgic_v3_destroy_model;
- 	dist->vm_ops.map_resources = vgic_v3_map_resources;
-+	dist->vm_ops.queue_lpis = vits_queue_lpis;
-+	dist->vm_ops.unqueue_lpi = vits_unqueue_lpi;
- 
- 	dist->vgic_dist_base = VGIC_ADDR_UNDEF;
- 	dist->vgic_redist_base = VGIC_ADDR_UNDEF;
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 49ee92b..9dfd094 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -95,6 +95,20 @@ static bool queue_sgi(struct kvm_vcpu *vcpu, int irq)
- 	return vcpu->kvm->arch.vgic.vm_ops.queue_sgi(vcpu, irq);
- }
- 
-+static bool vgic_queue_lpis(struct kvm_vcpu *vcpu)
-+{
-+	if (vcpu->kvm->arch.vgic.vm_ops.queue_lpis)
-+		return vcpu->kvm->arch.vgic.vm_ops.queue_lpis(vcpu);
-+	else
-+		return true;
-+}
-+
-+static void vgic_unqueue_lpi(struct kvm_vcpu *vcpu, int irq)
-+{
-+	if (vcpu->kvm->arch.vgic.vm_ops.unqueue_lpi)
-+		vcpu->kvm->arch.vgic.vm_ops.unqueue_lpi(vcpu, irq);
-+}
-+
- int kvm_vgic_map_resources(struct kvm *kvm)
- {
- 	return kvm->arch.vgic.vm_ops.map_resources(kvm, vgic);
-@@ -1135,6 +1149,10 @@ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu)
- 	for_each_clear_bit(lr, elrsr_ptr, vgic->nr_lr) {
- 		vlr = vgic_get_lr(vcpu, lr);
- 
-+		/* We don't care about LPIs here */
-+		if (vlr.irq >= 8192)
-+			continue;
-+
- 		if (!vgic_irq_is_enabled(vcpu, vlr.irq)) {
- 			vlr.state = 0;
- 			vgic_set_lr(vcpu, lr, vlr);
-@@ -1147,25 +1165,33 @@ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu)
- static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
- 				 int lr_nr, int sgi_source_id)
- {
-+	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
- 	struct vgic_lr vlr;
- 
- 	vlr.state = 0;
- 	vlr.irq = irq;
- 	vlr.source = sgi_source_id;
- 
--	if (vgic_irq_is_active(vcpu, irq)) {
--		vlr.state |= LR_STATE_ACTIVE;
--		kvm_debug("Set active, clear distributor: 0x%x\n", vlr.state);
--		vgic_irq_clear_active(vcpu, irq);
--		vgic_update_state(vcpu->kvm);
--	} else if (vgic_dist_irq_is_pending(vcpu, irq)) {
--		vlr.state |= LR_STATE_PENDING;
--		kvm_debug("Set pending: 0x%x\n", vlr.state);
--	}
--
--	if (!vgic_irq_is_edge(vcpu, irq))
--		vlr.state |= LR_EOI_INT;
-+	/* We care only about state for SGIs/PPIs/SPIs, not for LPIs */
-+	if (irq < dist->nr_irqs) {
-+		if (vgic_irq_is_active(vcpu, irq)) {
-+			vlr.state |= LR_STATE_ACTIVE;
-+			kvm_debug("Set active, clear distributor: 0x%x\n",
-+				  vlr.state);
-+			vgic_irq_clear_active(vcpu, irq);
-+			vgic_update_state(vcpu->kvm);
-+		} else if (vgic_dist_irq_is_pending(vcpu, irq)) {
-+			vlr.state |= LR_STATE_PENDING;
-+			kvm_debug("Set pending: 0x%x\n", vlr.state);
-+		}
- 
-+		if (!vgic_irq_is_edge(vcpu, irq))
-+			vlr.state |= LR_EOI_INT;
-+	} else {
-+		/* If this is an LPI, it can only be pending */
-+		if (irq >= 8192)
-+			vlr.state |= LR_STATE_PENDING;
-+	}
- 	vgic_set_lr(vcpu, lr_nr, vlr);
- 	vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
- }
-@@ -1177,7 +1203,6 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
-  */
- bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq)
- {
--	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
- 	u64 elrsr = vgic_get_elrsr(vcpu);
- 	unsigned long *elrsr_ptr = u64_to_bitmask(&elrsr);
- 	int lr;
-@@ -1185,7 +1210,6 @@ bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq)
- 	/* Sanitize the input... */
- 	BUG_ON(sgi_source_id & ~7);
- 	BUG_ON(sgi_source_id && irq >= VGIC_NR_SGIS);
--	BUG_ON(irq >= dist->nr_irqs);
- 
- 	kvm_debug("Queue IRQ%d\n", irq);
- 
-@@ -1265,8 +1289,12 @@ static void __kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
- 			overflow = 1;
+@@ -861,6 +873,12 @@ static int vgic_v3_map_resources(struct kvm *kvm,
+ 		rdbase += GIC_V3_REDIST_SIZE;
  	}
  
--
--
-+	/*
-+	 * LPIs are not mapped in our bitmaps, so we leave the iteration
-+	 * to the ITS emulation code.
-+	 */
-+	if (!vgic_queue_lpis(vcpu))
-+		overflow = 1;
- 
- epilog:
- 	if (overflow) {
-@@ -1387,6 +1415,16 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- 	for_each_clear_bit(lr_nr, elrsr_ptr, vgic_cpu->nr_lr) {
- 		vlr = vgic_get_lr(vcpu, lr_nr);
- 
-+		/* LPIs are handled separately */
-+		if (vlr.irq >= 8192) {
-+			/* We just need to take care about still pending LPIs */
-+			if (vlr.state & LR_STATE_PENDING) {
-+				vgic_unqueue_lpi(vcpu, vlr.irq);
-+				pending = true;
-+			}
-+			continue;
-+		}
++	if (vgic_has_its(kvm)) {
++		ret = vits_init(kvm);
++		if (ret)
++			goto out_unregister;
++	}
 +
- 		BUG_ON(!(vlr.state & LR_STATE_MASK));
- 		pending = true;
- 
-@@ -1411,7 +1449,7 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- 	}
- 	vgic_update_state(vcpu->kvm);
- 
--	/* vgic_update_state would not cover only-active IRQs */
-+	/* vgic_update_state would not cover only-active IRQs or LPIs */
- 	if (pending)
- 		set_bit(vcpu->vcpu_id, dist->irq_pending_on_cpu);
- }
+ 	dist->redist_iodevs = iodevs;
+ 	dist->ready = true;
+ 	goto out;
 -- 
 2.3.5
-
