@@ -1,24 +1,33 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: ***SPAM*** KVM on ARM: How to add some functions into interrupt.S
- with C code?
-Date: Fri, 10 Jul 2015 14:38:38 +0100
-Message-ID: <559FCADE.3030200@arm.com>
-References: <5675dfef.1beed.14e77374fec.Coremail.13401187209@126.com>
+From: hiwu <hiwu@derytech.com.tw>
+Subject: KVM/ARM: trap every load /store instruction
+Date: Fri, 10 Jul 2015 22:16:55 +0800
+Message-ID: <559FD3D7.4030605@derytech.com.tw>
+References: <1434718396-13110-1-git-send-email-marc.zyngier@arm.com>
+ <1434718396-13110-6-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE9F658519
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 09:27:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BA58558547
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 10:05:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id x8cFjPO1rqpM for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Jul 2015 09:27:04 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 850225850D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 09:27:04 -0400 (EDT)
-In-Reply-To: <5675dfef.1beed.14e77374fec.Coremail.13401187209@126.com>
+ with ESMTP id WA0GBWQib71O for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Jul 2015 10:05:21 -0400 (EDT)
+Received: from msr8.hinet.net (msr8.hinet.net [168.95.4.108])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D9CA5853B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 10:05:20 -0400 (EDT)
+Received: from dns.derytech.com.tw (218-161-54-187.HINET-IP.hinet.net
+ [218.161.54.187])
+ by msr8.hinet.net (8.14.9/8.14.9) with ESMTP id t6AEGumG013389
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO)
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 22:16:57 +0800 (CST)
+Received: from [127.0.0.1] (1-160-13-154.dynamic.hinet.net [1.160.13.154])
+ (Authenticated sender: hiwu@derytech.com.tw)
+ by dns.derytech.com.tw (Postfix) with ESMTPA id E5956A60038
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 22:14:45 +0800 (CST)
+In-Reply-To: <1434718396-13110-6-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,38 +37,13 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: harry <13401187209@126.com>, kvmarm@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Harry,
+Hi:
 
-On 10/07/15 10:06, harry wrote:
-> I want to add some functions into interrupt.S with C code to do some
-> operations in hyp mode with a hypcall.
-> 
-> I have tried to add .global [function name] and use bl [function name],
-> but there will be a prefetch abort.
-> 
-> So I want to know if the C code can be linked into interrupt.S and how
-> to achieve this.
+Is it possible to trap every  load /store instruction (ldr/str) on KVM/ARM ?
 
-It is most likely to fail if your C code is not part of the section that
-gets mapped in HYP mode. So jumping there gets you an abort because this
-area is not covered by any HYP page table.
+Thank you
 
-At the moment, only the code that is between __kvm_hyp_code_start and
-__kvm_hyp_code_end is mapped at HYP, and that's fairly restrictive. You
-could adopt something similar to what we've done for arm64, where
-__kvm_hyp_code_{start,end} are just #defines that resolve as symbols
-created in vmlinux.lds.S.
-
-You could then make both interrupt.S and your C code to be part of the
-same .hyp.text section, using something an attribute like
-__attribute__((__section__(".hyp.text"))). This should ensure that all
-the HYP code can get mapped by create_hyp_mapping in one go.
-
-Hope this helps,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+-Jack
