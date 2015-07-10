@@ -1,21 +1,25 @@
-From: harry <13401187209@126.com>
-Subject: ***SPAM*** KVM on ARM: How to add some functions into interrupt.S
- with C code?
-Date: Fri, 10 Jul 2015 17:06:30 +0800 (CST)
-Message-ID: <5675dfef.1beed.14e77374fec.Coremail.13401187209@126.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [RFC PATCH] target-arm: kvm: Differentiate registers based on
+ write-back levels
+Date: Fri, 10 Jul 2015 13:00:53 +0200
+Message-ID: <1436526053-4516-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============1735150762328217616=="
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E9CB584D5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 04:55:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C0A2D584DD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 06:49:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eTxOsimtvIVm for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Jul 2015 04:55:02 -0400 (EDT)
-Received: from m15-12.126.com (m15-12.126.com [220.181.15.12])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 79038584D4
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 04:55:00 -0400 (EDT)
+ with ESMTP id jRJO-4dHNLsA for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Jul 2015 06:49:11 -0400 (EDT)
+Received: from mail-lb0-f173.google.com (mail-lb0-f173.google.com
+ [209.85.217.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3449584D0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 06:49:11 -0400 (EDT)
+Received: by lblf12 with SMTP id f12so20952634lbl.2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 04:00:48 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -25,57 +29,138 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
+To: qemu-devel@nongnu.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Jan Kiszka <jan.kiszka@web.de>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============1735150762328217616==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_444473_1624145918.1436519190506"
+Some registers like the CNTVCT register should only be written to the
+kernel as part of machine initialization or on vmload operations, but
+never during runtime, as this can potentially make time go backwards or
+create inconsistent time observations between VCPUs.
 
-------=_Part_444473_1624145918.1436519190506
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
+Introduce a list of registers that should not be written back at runtime
+and check this list on syncing the register state to the KVM state.
 
-SSB3YW50IHRvIGFkZCBzb21lIGZ1bmN0aW9ucyBpbnRvIGludGVycnVwdC5TIHdpdGggQyBjb2Rl
-IHRvIGRvIHNvbWUgb3BlcmF0aW9ucyBpbiBoeXAgbW9kZSB3aXRoIGEgaHlwY2FsbC4KCgpJIGhh
-dmUgdHJpZWQgdG8gYWRkIC5nbG9iYWwgW2Z1bmN0aW9uIG5hbWVdIGFuZCB1c2UgYmwgW2Z1bmN0
-aW9uIG5hbWVdLCBidXQgdGhlcmUgd2lsbCBiZSBhIHByZWZldGNoIGFib3J0LgoKClNvIEkgd2Fu
-dCB0byBrbm93IGlmIHRoZSBDIGNvZGUgY2FuIGJlIGxpbmtlZCBpbnRvIGludGVycnVwdC5TIGFu
-ZCBob3cgdG8gYWNoaWV2ZSB0aGlzLgoKClRoYW5rIHlvdSBmb3IgaGVscC4=
-------=_Part_444473_1624145918.1436519190506
-Content-Type: text/html; charset=GBK
-Content-Transfer-Encoding: base64
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ target-arm/kvm.c     | 34 +++++++++++++++++++++++++++++++++-
+ target-arm/kvm32.c   |  2 +-
+ target-arm/kvm64.c   |  2 +-
+ target-arm/kvm_arm.h |  3 ++-
+ target-arm/machine.c |  2 +-
+ 5 files changed, 38 insertions(+), 5 deletions(-)
 
-PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS43O2NvbG9yOiMwMDAwMDA7Zm9udC1zaXplOjE0cHg7
-Zm9udC1mYW1pbHk6QXJpYWwiPjxkaXY+SSB3YW50IHRvIGFkZCBzb21lIGZ1bmN0aW9ucyBpbnRv
-IGludGVycnVwdC5TIHdpdGggQyBjb2RlIHRvIGRvIHNvbWUgb3BlcmF0aW9ucyBpbiBoeXAgbW9k
-ZSB3aXRoIGEgaHlwY2FsbC48L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PkkgaGF2ZSB0cmllZCB0
-byBhZGQgLmdsb2JhbCBbZnVuY3Rpb24gbmFtZV0gYW5kIHVzZSBibCBbZnVuY3Rpb24gbmFtZV0s
-IGJ1dCB0aGVyZSB3aWxsIGJlIGEgcHJlZmV0Y2ggYWJvcnQuPC9kaXY+PGRpdj48YnI+PC9kaXY+
-PGRpdj5TbyBJIHdhbnQgdG8ga25vdyBpZiB0aGUgQyBjb2RlIGNhbiBiZSBsaW5rZWQgaW50byBp
-bnRlcnJ1cHQuUyBhbmQgaG93IHRvIGFjaGlldmUgdGhpcy48L2Rpdj48ZGl2Pjxicj48L2Rpdj48
-ZGl2PlRoYW5rIHlvdSBmb3IgaGVscC48L2Rpdj48L2Rpdj48YnI+PGJyPjxzcGFuIHRpdGxlPSJu
-ZXRlYXNlZm9vdGVyIj48c3BhbiBpZD0ibmV0ZWFzZV9tYWlsX2Zvb3RlciI+PGRpdiBpZD0ibmV0
-ZWFzZV9tYWlsX2Zvb3RlciI+PGRpdiBzdHlsZT0iYm9yZGVyLXRvcDojQ0NDQ0NDIDFweCBzb2xp
-ZDtwYWRkaW5nOjEwcHggNXB4O2ZvbnQtc2l6ZToxMnB4O2NvbG9yOiM3Nzc3Nzc7bGluZS1oZWln
-aHQ6MjJweCI+wLTX1CA8YiBzdHlsZT0iY29sb3I6I0NDMzMwMCI+zfjS1zwvYj48YiBzdHlsZT0i
-Y29sb3I6IzMzMzMzMyI+yta7+rrFwuvTys/kPC9iPiAtLSDT0MrWu/q+zdPQzfjS18rWu/q6xcLr
-08rP5KOsPGEgaWQ9Im1vYmlsZV9zZXQiIHN5cz0iMSIgbG9nPTEgbG9naWQ9ImZyZWVfc21zXzIw
-MTIwNTA0IiBocmVmPSJodHRwOi8vc2hvdWppLjE2My5jb20iIHRhcmdldD0iX2JsYW5rIiBzdHls
-ZT0iY29sb3I6IzMzNjZGRjt0ZXh0LWRlY29yYXRpb246bm9uZSI+wcu94s/qx+kmZ3Q7PC9hPjwv
-ZGl2PjwvZGl2Pgo8L3NwYW4+PC9zcGFuPg==
-------=_Part_444473_1624145918.1436519190506--
-
-
---===============1735150762328217616==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============1735150762328217616==--
+diff --git a/target-arm/kvm.c b/target-arm/kvm.c
+index 548bfd7..2e92699 100644
+--- a/target-arm/kvm.c
++++ b/target-arm/kvm.c
+@@ -409,7 +409,35 @@ bool write_kvmstate_to_list(ARMCPU *cpu)
+     return ok;
+ }
+ 
+-bool write_list_to_kvmstate(ARMCPU *cpu)
++typedef struct cpreg_state_level {
++    uint64_t kvm_idx;
++    int level;
++} cpreg_state_level;
++
++/* All system registers not listed in the following table are assumed to be
++ * of the level KVM_PUT_RUNTIME_STATE, a register should be written less
++ * often, you must add it to this table with a state of either
++ * KVM_PUT_RESET_STATE or KVM_PUT_FULL_STATE.
++ */
++cpreg_state_level non_runtime_cpregs[] = {
++    { KVM_REG_ARM_TIMER_CNT, KVM_PUT_FULL_STATE },
++};
++
++static int cpreg_level(uint64_t kvm_idx)
++{
++    int i;
++
++    for (i = 0; i < ARRAY_SIZE(non_runtime_cpregs); i++) {
++        cpreg_state_level *l = &non_runtime_cpregs[i];
++        if (l->kvm_idx == kvm_idx) {
++            return l->level;
++        }
++    }
++
++    return KVM_PUT_RUNTIME_STATE;
++}
++
++bool write_list_to_kvmstate(ARMCPU *cpu, int level)
+ {
+     CPUState *cs = CPU(cpu);
+     int i;
+@@ -421,6 +449,10 @@ bool write_list_to_kvmstate(ARMCPU *cpu)
+         uint32_t v32;
+         int ret;
+ 
++        if (cpreg_level(regidx) > level) {
++            continue;
++        }
++
+         r.id = regidx;
+         switch (regidx & KVM_REG_SIZE_MASK) {
+         case KVM_REG_SIZE_U32:
+diff --git a/target-arm/kvm32.c b/target-arm/kvm32.c
+index d7e7d68..9fbd5fd 100644
+--- a/target-arm/kvm32.c
++++ b/target-arm/kvm32.c
+@@ -367,7 +367,7 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+      * managed to update the CPUARMState with, and only allowing those
+      * to be written back up into the kernel).
+      */
+-    if (!write_list_to_kvmstate(cpu)) {
++    if (!write_list_to_kvmstate(cpu, level)) {
+         return EINVAL;
+     }
+ 
+diff --git a/target-arm/kvm64.c b/target-arm/kvm64.c
+index ac34f51..2911679 100644
+--- a/target-arm/kvm64.c
++++ b/target-arm/kvm64.c
+@@ -280,7 +280,7 @@ int kvm_arch_put_registers(CPUState *cs, int level)
+         return ret;
+     }
+ 
+-    if (!write_list_to_kvmstate(cpu)) {
++    if (!write_list_to_kvmstate(cpu, level)) {
+         return EINVAL;
+     }
+ 
+diff --git a/target-arm/kvm_arm.h b/target-arm/kvm_arm.h
+index 5abd591..ce03e97 100644
+--- a/target-arm/kvm_arm.h
++++ b/target-arm/kvm_arm.h
+@@ -71,6 +71,7 @@ bool kvm_arm_reg_syncs_via_cpreg_list(uint64_t regidx);
+ /**
+  * write_list_to_kvmstate:
+  * @cpu: ARMCPU
++ * @level: the state level to sync
+  *
+  * For each register listed in the ARMCPU cpreg_indexes list, write
+  * its value from the cpreg_values list into the kernel (via ioctl).
+@@ -83,7 +84,7 @@ bool kvm_arm_reg_syncs_via_cpreg_list(uint64_t regidx);
+  * Note that we do not stop early on failure -- we will attempt
+  * writing all registers in the list.
+  */
+-bool write_list_to_kvmstate(ARMCPU *cpu);
++bool write_list_to_kvmstate(ARMCPU *cpu, int level);
+ 
+ /**
+  * write_kvmstate_to_list:
+diff --git a/target-arm/machine.c b/target-arm/machine.c
+index 9eb51df..32adfe7 100644
+--- a/target-arm/machine.c
++++ b/target-arm/machine.c
+@@ -251,7 +251,7 @@ static int cpu_post_load(void *opaque, int version_id)
+     }
+ 
+     if (kvm_enabled()) {
+-        if (!write_list_to_kvmstate(cpu)) {
++        if (!write_list_to_kvmstate(cpu, KVM_PUT_FULL_STATE)) {
+             return -1;
+         }
+         /* Note that it's OK for the TCG side not to know about
+-- 
+2.1.2.330.g565301e.dirty
