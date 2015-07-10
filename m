@@ -1,25 +1,25 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v2 4/7] KVM: arm/arm64: enable irqchip routing
-Date: Sat, 11 Jul 2015 00:15:52 +0100
-Message-ID: <55A05228.4030203@arm.com>
+Subject: Re: [PATCH v2 6/7] KVM: arm/arm64: enable MSI routing
+Date: Sat, 11 Jul 2015 00:16:22 +0100
+Message-ID: <55A05246.50204@arm.com>
 References: <1436430137-24205-1-git-send-email-eric.auger@linaro.org>
- <1436430137-24205-5-git-send-email-eric.auger@linaro.org>
+ <1436430137-24205-7-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E133A585D1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 19:08:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C9090585F2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 19:08:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qcOPyWldJZ52 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 10 Jul 2015 19:07:59 -0400 (EDT)
+ with ESMTP id 6hH6bOaJM9Di for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 10 Jul 2015 19:08:30 -0400 (EDT)
 Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
  [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B9ED585CD
- for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 19:07:59 -0400 (EDT)
-In-Reply-To: <1436430137-24205-5-git-send-email-eric.auger@linaro.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 64415585E5
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 10 Jul 2015 19:08:29 -0400 (EDT)
+In-Reply-To: <1436430137-24205-7-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,140 +33,139 @@ To: Eric Auger <eric.auger@linaro.org>, "eric.auger@st.com" <eric.auger@st.com>
 Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
-
 On 09/07/15 09:22, Eric Auger wrote:
-> This patch adds compilation and link against irqchip.
+> Up to now, only irqchip routing entries could be set. This patch
+> adds the capability to insert MSI routing entries, with or without
+> device id. Although standard MSI entries can be set, their
+> injection still is not supported. For ARM64, let's also increase
+> KVM_MAX_IRQ_ROUTES to 4096: include SPI irqchip flat routes plus
+> MSI routes. In the future this might be extended.
 > 
-> On ARM, irqchip routing is not really useful since there is
-> a single irqchip. However main motivation behind using irqchip
-> code is to enable MSI routing code. With the support of in-kernel
-> GICv3 ITS emulation, it now seems to be a MUST HAVE requirement.
+> The new MSI routing entry type also must be managed similarly to
+> legacy KVM_IRQ_ROUTING_MSI in eventfd irqfd_wakeup and irqfd_update.
 > 
-
-....
-
+> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+> 
+> ---
+> 
+> v1 -> v2:
+> - adapt to new routing entry types
+> 
+> RFC -> PATCH:
+> - move api MSI routing updates into that patch file
+> - use new devid field of user api struct
+> ---
+>  Documentation/virtual/kvm/api.txt | 10 ++++++++++
+>  include/linux/kvm_host.h          |  2 ++
+>  virt/kvm/arm/vgic.c               | 13 +++++++++++++
+>  virt/kvm/eventfd.c                |  6 ++++--
+>  4 files changed, 29 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+> index 9276dac..686b121 100644
+> --- a/Documentation/virtual/kvm/api.txt
+> +++ b/Documentation/virtual/kvm/api.txt
+> @@ -1431,6 +1431,11 @@ Sets the GSI routing table entries, overwriting any previously set entries.
+>  On arm/arm64, GSI routing has the following limitation:
+>  - GSI routing does not apply to KVM_IRQ_LINE but only to KVM_IRQFD.
+>  
+> +On arm/arm64, MSI routing through in-kernel GICv3 ITS must use
+> +KVM_IRQ_ROUTING_EXTENDED_MSI routing type and device ID must be set
+> +in msi struct. Otherwise, KVM_IRQ_ROUTING_MSI must be used without
+> +populating the msi devid field.
+> +
+>  struct kvm_irq_routing {
+>  	__u32 nr;
+>  	__u32 flags;
+> @@ -2342,6 +2347,11 @@ On arm/arm64, gsi routing being supported, the following can happen:
+>  - in case no routing entry is associated to this gsi, injection fails
+>  - in case the gsi is associated to an irqchip routing entry,
+>    irqchip.pin + 32 corresponds to the injected SPI ID.
+> +- in case the gsi is associated to an MSI routing entry,
+> +  * without GICv3 ITS in-kernel emulation, MSI data matches the SPI ID
+> +    of the injected SPI
+> +  * with GICv3 ITS in-kernel emulation, the MSI message and device ID
+> +    are translated into an LPI.
+>  
+>  4.76 KVM_PPC_ALLOCATE_HTAB
+>  
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index cac0fe4..ea1a810 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -976,6 +976,8 @@ static inline int mmu_notifier_retry(struct kvm *kvm, unsigned long mmu_seq)
+>  
+>  #ifdef CONFIG_S390
+>  #define KVM_MAX_IRQ_ROUTES 4096 //FIXME: we can have more than that...
+> +#elif defined(CONFIG_ARM64)
+> +#define KVM_MAX_IRQ_ROUTES 4096
+>  #else
+>  #define KVM_MAX_IRQ_ROUTES 1024
+>  #endif
 > diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> index 3630971..6c6c25e 100644
+> index 63be67e..c5546d8 100644
 > --- a/virt/kvm/arm/vgic.c
 > +++ b/virt/kvm/arm/vgic.c
-> @@ -2215,44 +2215,65 @@ out_free_irq:
->  	return ret;
->  }
->  
-> -int kvm_irq_map_gsi(struct kvm *kvm,
-> -		    struct kvm_kernel_irq_routing_entry *entries,
-> -		    int gsi)
-> +int vgic_irqfd_set_irq(struct kvm_kernel_irq_routing_entry *e,
-> +			struct kvm *kvm, int irq_source_id,
-> +			int level, bool line_status)
->  {
-> -	return 0;
-> -}
-> -
-> -int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned irqchip, unsigned pin)
-> -{
-> -	return pin;
-> -}
-> -
-> -int kvm_set_irq(struct kvm *kvm, int irq_source_id,
-> -		u32 irq, int level, bool line_status)
-> -{
-> -	unsigned int spi = irq + VGIC_NR_PRIVATE_IRQS;
-> +	unsigned int spi_id = e->irqchip.pin + VGIC_NR_PRIVATE_IRQS;
->  
-> -	trace_kvm_set_irq(irq, level, irq_source_id);
-> +	trace_kvm_set_irq(spi_id, level, irq_source_id);
->  
->  	BUG_ON(!vgic_initialized(kvm));
->  
-> -	return kvm_vgic_inject_irq(kvm, 0, spi, level);
-> +	if (spi_id > min(kvm->arch.vgic.nr_irqs, 1020))
-> +		return -EINVAL;
-> +	return kvm_vgic_inject_irq(kvm, 0, spi_id, level);
-> +}
-> +
-> +/**
-> + * Populates a kvm routing entry from a user routing entry
-> + * @e: kvm internal formatted entry
-> + * @ue: user api formatted entry
-> + * return 0 on success, -EINVAL on errors.
-> + */
-> +int kvm_set_routing_entry(struct kvm_kernel_irq_routing_entry *e,
-> +			  const struct kvm_irq_routing_entry *ue)
-> +{
-> +	int r = -EINVAL;
-> +
-> +	switch (ue->type) {
-> +	case KVM_IRQ_ROUTING_IRQCHIP:
-> +		e->set = vgic_irqfd_set_irq;
-> +		e->irqchip.irqchip = ue->u.irqchip.irqchip;
-> +		e->irqchip.pin = ue->u.irqchip.pin;
-> +		if ((e->irqchip.pin >= KVM_IRQCHIP_NUM_PINS) ||
-> +		    (e->irqchip.irqchip >= KVM_NR_IRQCHIPS))
-> +			goto out;
-> +		break;
-> +	default:
-> +		goto out;
-> +	}
-> +	r = 0;
-> +out:
-> +	return r;
->  }
->  
-> -/* MSI not implemented yet */
->  int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
->  		struct kvm *kvm, int irq_source_id,
->  		int level, bool line_status)
->  {
-> -	return 0;
-> -}
-> +	struct kvm_msi msi;
-> +
-> +	msi.address_lo = e->msi.address_lo;
-> +	msi.address_hi = e->msi.address_hi;
-> +	msi.data = e->msi.data;
-> +	if (e->type == KVM_IRQ_ROUTING_EXTENDED_MSI) {
-> +		msi.devid = e->devid;
-> +		msi.flags = KVM_MSI_VALID_DEVID;
-> +	}
+> @@ -2252,6 +2252,19 @@ int kvm_set_routing_entry(struct kvm_kernel_irq_routing_entry *e,
+>  		    (e->irqchip.irqchip >= KVM_NR_IRQCHIPS))
+>  			goto out;
+>  		break;
 
-Can't we make the assignment unconditional?
-The GICv2m MSI code does not care about the devid and the ITS code
-requires it.
-This simplifies quite something in the following patches.
-(This refers to the idea of not using the extended type in the kernel).
+what about:
 
->  
-> -#ifdef CONFIG_HAVE_KVM_MSI
-> -int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi)
-> -{
->  	if (kvm->arch.vgic.vm_ops.inject_msi)
-> -		return kvm->arch.vgic.vm_ops.inject_msi(kvm, msi);
-> +		return kvm->arch.vgic.vm_ops.inject_msi(kvm, &msi);
->  	else
->  		return -ENODEV;
->  }
-> -#endif
-> diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-> index e678f8a..f26cadd 100644
-> --- a/virt/kvm/irqchip.c
-> +++ b/virt/kvm/irqchip.c
-> @@ -29,7 +29,9 @@
->  #include <linux/srcu.h>
->  #include <linux/export.h>
->  #include <trace/events/kvm.h>
-> +#if !defined(CONFIG_ARM) && !defined(CONFIG_ARM64)
->  #include "irq.h"
-> +#endif
++	case KVM_IRQ_ROUTING_EXTENDED_MSI:
++		e->devid = ue->u.msi.devid;
++		/* fall through */
+> +	case KVM_IRQ_ROUTING_MSI:
+...
 
-To what irq.h is that referring to? And why is ARM not allowed to
-include that?
+Also if we avoid KVM_IRQ_ROUTING_EXTENDED_MSI in the kernel, we could:
++		e->type = KVM_IRQ_ROUTING_MSI;
+(before the fall through) and then get rid of the rest of this patch at all.
 
 Cheers,
 Andre.
 
+> +		e->set = kvm_set_msi;
+> +		e->msi.address_lo = ue->u.msi.address_lo;
+> +		e->msi.address_hi = ue->u.msi.address_hi;
+> +		e->msi.data = ue->u.msi.data;
+> +		break;
+
+
+
+> +	case KVM_IRQ_ROUTING_EXTENDED_MSI:
+> +		e->set = kvm_set_msi;
+> +		e->msi.address_lo = ue->u.msi.address_lo;
+> +		e->msi.address_hi = ue->u.msi.address_hi;
+> +		e->msi.data = ue->u.msi.data;
+> +		e->devid = ue->u.msi.devid;
+> +		break;
+>  	default:
+>  		goto out;
+>  	}
+> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+> index 9ff4193..d76d05d 100644
+> --- a/virt/kvm/eventfd.c
+> +++ b/virt/kvm/eventfd.c
+> @@ -238,7 +238,8 @@ irqfd_wakeup(wait_queue_t *wait, unsigned mode, int sync, void *key)
+>  			irq = irqfd->irq_entry;
+>  		} while (read_seqcount_retry(&irqfd->irq_entry_sc, seq));
+>  		/* An event has been signaled, inject an interrupt */
+> -		if (irq.type == KVM_IRQ_ROUTING_MSI)
+> +		if (irq.type == KVM_IRQ_ROUTING_MSI ||
+> +		    irq.type == KVM_IRQ_ROUTING_EXTENDED_MSI)
+>  			kvm_set_msi(&irq, kvm, KVM_USERSPACE_IRQ_SOURCE_ID, 1,
+>  					false);
+>  		else
+> @@ -294,7 +295,8 @@ static void irqfd_update(struct kvm *kvm, struct _irqfd *irqfd)
+>  	e = entries;
+>  	for (i = 0; i < n_entries; ++i, ++e) {
+>  		/* Only fast-path MSI. */
+> -		if (e->type == KVM_IRQ_ROUTING_MSI)
+> +		if (e->type == KVM_IRQ_ROUTING_MSI ||
+> +		    e->type == KVM_IRQ_ROUTING_EXTENDED_MSI)
+>  			irqfd->irq_entry = *e;
+>  	}
 >  
->  struct kvm_irq_routing_table {
->  	int chip[KVM_NR_IRQCHIPS][KVM_IRQCHIP_NUM_PINS];
 > 
