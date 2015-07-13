@@ -1,130 +1,113 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH] target-arm: kvm: Differentiate registers based on
- write-back levels
-Date: Sat, 11 Jul 2015 14:18:50 +0200
-Message-ID: <20150711121850.GB25650@cbox>
-References: <1436526053-4516-1-git-send-email-christoffer.dall@linaro.org>
- <CAFEAcA8a+RDxPwKsjKSzSZq6khqZjKEZXCokp3rQEuaNBj0B1Q@mail.gmail.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v2 1/7] KVM: api: introduce KVM_IRQ_ROUTING_EXTENDED_MSI
+Date: Mon, 13 Jul 2015 11:25:23 +0200
+Message-ID: <55A38403.8080409@linaro.org>
+References: <1436430137-24205-1-git-send-email-eric.auger@linaro.org> <1436430137-24205-2-git-send-email-eric.auger@linaro.org> <55A04A72.4010205@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DEFD58641
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Jul 2015 08:07:14 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gV-Kl-uGYaGR for <kvmarm@lists.cs.columbia.edu>;
- Sat, 11 Jul 2015 08:07:03 -0400 (EDT)
-Received: from mail-lb0-f171.google.com (mail-lb0-f171.google.com
- [209.85.217.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0348958634
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Jul 2015 08:07:02 -0400 (EDT)
-Received: by lbbyj8 with SMTP id yj8so19776603lbb.0
- for <kvmarm@lists.cs.columbia.edu>; Sat, 11 Jul 2015 05:18:42 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8a+RDxPwKsjKSzSZq6khqZjKEZXCokp3rQEuaNBj0B1Q@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Jan Kiszka <jan.kiszka@web.de>, QEMU Developers <qemu-devel@nongnu.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <55A04A72.4010205@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>, "eric.auger@st.com" <eric.auger@st.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "p.fedin@samsung.com" <p.fedin@samsung.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jul 10, 2015 at 12:22:31PM +0100, Peter Maydell wrote:
-> On 10 July 2015 at 12:00, Christoffer Dall <christoffer.dall@linaro.org> wrote:
-> > Some registers like the CNTVCT register should only be written to the
-> > kernel as part of machine initialization or on vmload operations, but
-> > never during runtime, as this can potentially make time go backwards or
-> > create inconsistent time observations between VCPUs.
-> >
-> > Introduce a list of registers that should not be written back at runtime
-> > and check this list on syncing the register state to the KVM state.
+Hi Andre,
+On 07/11/2015 12:42 AM, Andre Przywara wrote:
+> On 09/07/15 09:22, Eric Auger wrote:
+>> On ARM, the MSI msg (address and data) comes along with
+>> out-of-band device ID information. The device ID encodes the
+>> device that writes the MSI msg. Let's convey the device id in
+>> kvm_irq_routing_msi and use a new routing entry type to
+>> indicate the devid is populated.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
 > 
-> Thanks for picking this one up...
+> Reviewed-by: Andre Przywara <andre.przywara@arm.com>
 > 
-> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> > ---
-> >  target-arm/kvm.c     | 34 +++++++++++++++++++++++++++++++++-
-> >  target-arm/kvm32.c   |  2 +-
-> >  target-arm/kvm64.c   |  2 +-
-> >  target-arm/kvm_arm.h |  3 ++-
-> >  target-arm/machine.c |  2 +-
-> >  5 files changed, 38 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/target-arm/kvm.c b/target-arm/kvm.c
-> > index 548bfd7..2e92699 100644
-> > --- a/target-arm/kvm.c
-> > +++ b/target-arm/kvm.c
-> > @@ -409,7 +409,35 @@ bool write_kvmstate_to_list(ARMCPU *cpu)
-> >      return ok;
-> >  }
-> >
-> > -bool write_list_to_kvmstate(ARMCPU *cpu)
-> > +typedef struct cpreg_state_level {
-> > +    uint64_t kvm_idx;
-> > +    int level;
-> > +} cpreg_state_level;
+> Just some forward looking statement: If this gets based on top of my ITS
+> emulation v2 series,
+yes this is my intent
+ the documentation should state that the new
+> KVM_CAP_MSI_DEVID capability tells userland about the need to provide
+> the device ID.
+I will add this note
+
+Thanks!
+Eric
 > 
-> (QEMU's coding style prefers CPRegStateLevel for struct types.)
+> Cheers,
+> Andre.
+> 
+>>
+>> ---
+>>
+>> v1 -> v2:
+>> - devid id passed in kvm_irq_routing_msi instead of in
+>>   kvm_irq_routing_entry
+>>
+>> RFC -> PATCH
+>> - remove kvm_irq_routing_extended_msi and use union instead
+>> ---
+>>  Documentation/virtual/kvm/api.txt | 10 +++++++++-
+>>  include/uapi/linux/kvm.h          |  6 +++++-
+>>  2 files changed, 14 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+>> index bea8de7..3d920cd 100644
+>> --- a/Documentation/virtual/kvm/api.txt
+>> +++ b/Documentation/virtual/kvm/api.txt
+>> @@ -1453,6 +1453,7 @@ struct kvm_irq_routing_entry {
+>>  #define KVM_IRQ_ROUTING_IRQCHIP 1
+>>  #define KVM_IRQ_ROUTING_MSI 2
+>>  #define KVM_IRQ_ROUTING_S390_ADAPTER 3
+>> +#define KVM_IRQ_ROUTING_EXTENDED_MSI 4
+>>  
+>>  No flags are specified so far, the corresponding field must be set to zero.
+>>  
+>> @@ -1465,9 +1466,16 @@ struct kvm_irq_routing_msi {
+>>  	__u32 address_lo;
+>>  	__u32 address_hi;
+>>  	__u32 data;
+>> -	__u32 pad;
+>> +	union {
+>> +		__u32 pad;
+>> +		__u32 devid;
+>> +	};
+>>  };
+>>  
+>> +for KVM_IRQ_ROUTING_EXTENDED_MSI routing entry type, the kvm_irq_routing_msi
+>> +routing entry is used and devid is populated with the device ID that wrote
+>> +the MSI message. For PCI, this is usually a BFD identifier in the lower 16 bits.
+>> +
+>>  struct kvm_irq_routing_s390_adapter {
+>>  	__u64 ind_addr;
+>>  	__u64 summary_addr;
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index 9a261e5..39ec164 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -829,7 +829,10 @@ struct kvm_irq_routing_msi {
+>>  	__u32 address_lo;
+>>  	__u32 address_hi;
+>>  	__u32 data;
+>> -	__u32 pad;
+>> +	union {
+>> +		__u32 pad;
+>> +		__u32 devid;
+>> +	};
+>>  };
+>>  
+>>  struct kvm_irq_routing_s390_adapter {
+>> @@ -844,6 +847,7 @@ struct kvm_irq_routing_s390_adapter {
+>>  #define KVM_IRQ_ROUTING_IRQCHIP 1
+>>  #define KVM_IRQ_ROUTING_MSI 2
+>>  #define KVM_IRQ_ROUTING_S390_ADAPTER 3
+>> +#define KVM_IRQ_ROUTING_EXTENDED_MSI 4
+>>  
+>>  struct kvm_irq_routing_entry {
+>>  	__u32 gsi;
+>>
 > 
 
-ok
-
-> > +
-> > +/* All system registers not listed in the following table are assumed to be
-> > + * of the level KVM_PUT_RUNTIME_STATE, a register should be written less
-> > + * often, you must add it to this table with a state of either
-> > + * KVM_PUT_RESET_STATE or KVM_PUT_FULL_STATE.
-> > + */
-> > +cpreg_state_level non_runtime_cpregs[] = {
-> > +    { KVM_REG_ARM_TIMER_CNT, KVM_PUT_FULL_STATE },
-> 
-> This should be KVM_PUT_RESET_STATE, right?
-> 
-should it?  If you reset a real machine, you will not necessarily see a
-counter value of zero will you?
-
-I guess this depends on whether QEMU reset means power the system
-completely off and then on again, or some softer reset?
-
-> > +};
-> 
-> The other option here would be to keep the level information
-> in the cpreg structs (which is where we put everything else
-> we know about cpregs); we'd probably need to then initialise
-> some other data structure if we wanted to avoid the hash
-> table lookup for every register in write_list_to_kvmstate.
-> 
-> I guess if we expect this list to remain a fairly small
-> set of exceptional cases then this is OK (and vaguely
-> comparable to the existing kvm_arm_reg_syncs_via-cpreg_list
-> handling).
-
-I thought about this too, and sent this as an RFC for exactly this
-reason.  I did it this way initially for two reasons: (1) I don't
-understand the hash-table register initialization flow for aarch64 and
-(2) I could really only identify this single register for now that needs
-to be marked as a non-runtime register, and then this is less invasive.
-
-> 
-> Don't we need separate 32-bit and 64-bit versions of
-> this list?
-> 
-Do we?  I thought this file would compile separately for the 32-bit and
-64-bit versions and the register index define is the same name for both
-architectures, did I get this wrong?
-
-Of course, for other registers with unique-to-32-bit-or-64-bit reg index
-defines, yes, we would need a separate table.  Should they then be
-defined in the kvm32.c and kvm64.c and passed in as a pointer to
-write_kvmstate_to_list() ?
-
-Thanks,
--Christoffer
