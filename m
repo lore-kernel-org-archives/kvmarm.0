@@ -1,27 +1,22 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v2 4/7] KVM: arm/arm64: enable irqchip routing
-Date: Mon, 13 Jul 2015 11:58:44 +0200
-Message-ID: <55A38BD4.50401@linaro.org>
-References: <1436430137-24205-1-git-send-email-eric.auger@linaro.org>
- <1436430137-24205-5-git-send-email-eric.auger@linaro.org>
- <55A05228.4030203@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Extensions for KVM MSI related ioctls
+Date: Mon, 13 Jul 2015 11:25:53 +0100
+Message-ID: <55A39231.4050904@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DAAF558691
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2015 05:47:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 31F68580C6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2015 06:14:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uQGdZPlLKZ2X for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Jul 2015 05:47:24 -0400 (EDT)
-Received: from mail-wg0-f51.google.com (mail-wg0-f51.google.com [74.125.82.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 97C0C58089
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2015 05:47:24 -0400 (EDT)
-Received: by wgkl9 with SMTP id l9so21577584wgk.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2015 02:59:09 -0700 (PDT)
-In-Reply-To: <55A05228.4030203@arm.com>
+ with ESMTP id D8TzKDOIl60z for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 13 Jul 2015 06:14:09 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 882F45801B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2015 06:14:09 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,169 +26,49 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, "eric.auger@st.com" <eric.auger@st.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Paolo Bonzini <pbonzini@redhat.com>, Eric Auger <eric.auger@linaro.org>, Pavel Fedin <p.fedin@samsung.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Gleb Natapov <gleb@kernel.org>, Jan Kiszka <jan.kiszka@siemens.com>, Marcelo Tosatti <mtosatti@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
-On 07/11/2015 01:15 AM, Andre Przywara wrote:
-> Hi Eric,
-> 
-> On 09/07/15 09:22, Eric Auger wrote:
->> This patch adds compilation and link against irqchip.
->>
->> On ARM, irqchip routing is not really useful since there is
->> a single irqchip. However main motivation behind using irqchip
->> code is to enable MSI routing code. With the support of in-kernel
->> GICv3 ITS emulation, it now seems to be a MUST HAVE requirement.
->>
-> 
-> ....
-> 
->> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
->> index 3630971..6c6c25e 100644
->> --- a/virt/kvm/arm/vgic.c
->> +++ b/virt/kvm/arm/vgic.c
->> @@ -2215,44 +2215,65 @@ out_free_irq:
->>  	return ret;
->>  }
->>  
->> -int kvm_irq_map_gsi(struct kvm *kvm,
->> -		    struct kvm_kernel_irq_routing_entry *entries,
->> -		    int gsi)
->> +int vgic_irqfd_set_irq(struct kvm_kernel_irq_routing_entry *e,
->> +			struct kvm *kvm, int irq_source_id,
->> +			int level, bool line_status)
->>  {
->> -	return 0;
->> -}
->> -
->> -int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned irqchip, unsigned pin)
->> -{
->> -	return pin;
->> -}
->> -
->> -int kvm_set_irq(struct kvm *kvm, int irq_source_id,
->> -		u32 irq, int level, bool line_status)
->> -{
->> -	unsigned int spi = irq + VGIC_NR_PRIVATE_IRQS;
->> +	unsigned int spi_id = e->irqchip.pin + VGIC_NR_PRIVATE_IRQS;
->>  
->> -	trace_kvm_set_irq(irq, level, irq_source_id);
->> +	trace_kvm_set_irq(spi_id, level, irq_source_id);
->>  
->>  	BUG_ON(!vgic_initialized(kvm));
->>  
->> -	return kvm_vgic_inject_irq(kvm, 0, spi, level);
->> +	if (spi_id > min(kvm->arch.vgic.nr_irqs, 1020))
->> +		return -EINVAL;
->> +	return kvm_vgic_inject_irq(kvm, 0, spi_id, level);
->> +}
->> +
->> +/**
->> + * Populates a kvm routing entry from a user routing entry
->> + * @e: kvm internal formatted entry
->> + * @ue: user api formatted entry
->> + * return 0 on success, -EINVAL on errors.
->> + */
->> +int kvm_set_routing_entry(struct kvm_kernel_irq_routing_entry *e,
->> +			  const struct kvm_irq_routing_entry *ue)
->> +{
->> +	int r = -EINVAL;
->> +
->> +	switch (ue->type) {
->> +	case KVM_IRQ_ROUTING_IRQCHIP:
->> +		e->set = vgic_irqfd_set_irq;
->> +		e->irqchip.irqchip = ue->u.irqchip.irqchip;
->> +		e->irqchip.pin = ue->u.irqchip.pin;
->> +		if ((e->irqchip.pin >= KVM_IRQCHIP_NUM_PINS) ||
->> +		    (e->irqchip.irqchip >= KVM_NR_IRQCHIPS))
->> +			goto out;
->> +		break;
->> +	default:
->> +		goto out;
->> +	}
->> +	r = 0;
->> +out:
->> +	return r;
->>  }
->>  
->> -/* MSI not implemented yet */
->>  int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
->>  		struct kvm *kvm, int irq_source_id,
->>  		int level, bool line_status)
->>  {
->> -	return 0;
->> -}
->> +	struct kvm_msi msi;
->> +
->> +	msi.address_lo = e->msi.address_lo;
->> +	msi.address_hi = e->msi.address_hi;
->> +	msi.data = e->msi.data;
->> +	if (e->type == KVM_IRQ_ROUTING_EXTENDED_MSI) {
->> +		msi.devid = e->devid;
->> +		msi.flags = KVM_MSI_VALID_DEVID;
->> +	}
-> 
-> Can't we make the assignment unconditional?
-> The GICv2m MSI code does not care about the devid and the ITS code
-> requires it.
-> This simplifies quite something in the following patches.
-> (This refers to the idea of not using the extended type in the kernel).
+Hi Paolo,
 
-How are we going to make sure the userspace provided a valid devid then?
-- we have this info at user struct level: kvm_irq_routing_msi
-- we wouldn't propagate the info at kernel struct level:
-kvm_kernel_irq_routing_entry
-- the only place where we could check the devid availability against the
-need is at kvm_set_routing_entry I think (routing adaptation on ARM).
+we (Pavel, Eric and me) need your quick advice on how to proceed with a
+small API extension:
+(tl;dr: skip to the numbered list at the end)
 
-What is going to happen if devid == 0 since unset?
+For using MSIs in a guest when running on an ARM(64) system using a
+GICv3 interrupt controller we need to have a device ID available. On
+real hardware this information is sampled from the bus by the ITS part
+of the interrupt controller.
+To make this work for guests, we need to extend two ioctls which deal
+with MSIs: KVM_SIGNAL_MSI and KVM_SET_GSI_ROUTING.
 
-> 
->>  
->> -#ifdef CONFIG_HAVE_KVM_MSI
->> -int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi)
->> -{
->>  	if (kvm->arch.vgic.vm_ops.inject_msi)
->> -		return kvm->arch.vgic.vm_ops.inject_msi(kvm, msi);
->> +		return kvm->arch.vgic.vm_ops.inject_msi(kvm, &msi);
->>  	else
->>  		return -ENODEV;
->>  }
->> -#endif
->> diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
->> index e678f8a..f26cadd 100644
->> --- a/virt/kvm/irqchip.c
->> +++ b/virt/kvm/irqchip.c
->> @@ -29,7 +29,9 @@
->>  #include <linux/srcu.h>
->>  #include <linux/export.h>
->>  #include <trace/events/kvm.h>
->> +#if !defined(CONFIG_ARM) && !defined(CONFIG_ARM64)
->>  #include "irq.h"
->> +#endif
-> 
-> To what irq.h is that referring to? And why is ARM not allowed to
-> include that?
-this refers to arch/x86/kvm/irq.h, arch/powerpc/kvm/irq.h, ...
+The idea that we sketched so far in [1] and [2] is to use a new
+capability (KVM_CAP_MSI_DEVID) to advertise both a flag bit for
+KVM_SIGNAL_MSI and a new type for KVM_SET_GSI_ROUTING.
 
-This typically declares things we have in include/kvm/arm_vgic.h
-like irqchip_in_kernel
+Since current kernels bail out on any flag value != 0 in KVM_SIGNAL_MSI,
+we need the new capability to tell userland about it in a reliable and
+portable way (to avoid hacks like #ifdef ARM && USES_IRQ_ROUTING in
+userland).
 
-So currently I don't see things we should put in that header.
+For KVM_SET_GSI_ROUTING there was the idea of using the very same flag
+value in it's own flag field, but I find it saner to use a new routing
+type instead (KVM_IRQ_ROUTING_EXTENDED_MSI). Both approaches would
+piggy-back on the existing struct kvm_irq_routing_msi and re-purpose the
+pad field in there.
 
-Cheers
+Summarized:
+1) Add a new KVM_CAP_MSI_DEVID to advertise the device ID extension.
+2) Use a KVM_MSI_VALID_DEVID flag in KVM_SIGNAL_MSI to re-purpose part
+   of struct kvm_msi.
+3) Add a new routing type KVM_IRQ_ROUTING_EXTENDED_MSI for
+   KVM_SET_GSI_ROUTING to add device IDs in struct kvm_irq_routing_msi.
 
-Eric
+Is that a sensible way to extend the KVM API?
 
+Cheers,
+Andre.
 
-
-
-> Cheers,
-> Andre.
-> 
->>  
->>  struct kvm_irq_routing_table {
->>  	int chip[KVM_NR_IRQCHIPS][KVM_IRQCHIP_NUM_PINS];
->>
+[1]:https://lists.cs.columbia.edu/pipermail/kvmarm/2015-July/015622.html
+[2]:https://lists.cs.columbia.edu/pipermail/kvmarm/2015-July/015689.html
