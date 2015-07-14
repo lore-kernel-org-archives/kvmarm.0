@@ -1,61 +1,55 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: Extensions for KVM MSI related ioctls
-Date: Mon, 13 Jul 2015 15:29:45 +0100
-Message-ID: <55A3CB59.80906@arm.com>
-References: <55A39231.4050904@arm.com> <55A3B090.6090002@redhat.com>
- <03b901d0bd70$6c2f4b50$448de1f0$@samsung.com> <55A3CA17.1010500@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5632C586EB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2015 10:17:58 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Gcu4P1F0zcoZ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 13 Jul 2015 10:17:57 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EBEC0586E9
- for <kvmarm@lists.cs.columbia.edu>; Mon, 13 Jul 2015 10:17:55 -0400 (EDT)
-In-Reply-To: <55A3CA17.1010500@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>, Pavel Fedin <p.fedin@samsung.com>, 'Paolo Bonzini' <pbonzini@redhat.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 'Gleb Natapov' <gleb@kernel.org>, 'Jan Kiszka' <jan.kiszka@siemens.com>, 'Marcelo Tosatti' <mtosatti@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: [PATCH v2 0/3] KVM: arm/arm64: Allow to use KVM without in-kernel
+ irqchip
+Date: Tue, 14 Jul 2015 15:06:02 +0300
+Message-ID: <cover.1436874248.git.p.fedin@samsung.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+This patch set brings back functionality which was broken in v4.1. The
+overall goal is to eventually enable using virtual timer too, but for now
+changes affect only a possibility to run KVM itself. The guest currently
+has to use another timer because there's no API to propagate interrupts
+from in-kernel virtual timer to the interrupt controller emulated in
+userspace.
 
-On 13/07/15 15:24, Eric Auger wrote:
-> On 07/13/2015 03:32 PM, Pavel Fedin wrote:
->>  Hello!
->>
->>> I think I prefer the flag.  Offhand it sounds easier to add support for
->>> it to non-ARM architectures, compared to KVM_IRQ_ROUTING_EXTENDED_MSI.
->>
->>  Actually i also voted for flag, because it is already introduced in (2), and i'm not a fan of
->> adding new definitions where we can reuse existing ones. IMHO using flag would make an API more
->> consistent.
-> 
-> OK I will respin with user space flag.
-> 
-> Andre, what about the kernel routing entry struct. You wanted me to get
-> rid of  KVM_IRQ_ROUTING_EXTENDED_MSI there too. Will you be able to
-> manage a usespace wrong setting if the type is not set?
+v1=>v2:
+- Do not use defensive approach in patch 0001. Use correct conditions in
+  callers instead
+- Added ARM64-specific code, without which attempt to run a VM ends in a
+  HYP crash because of unset vGIC save/restore function pointers
 
-I am about to see how this all fits together, but I don't expect any
-serious problems, at least on the kvmtool side.
-Instead of setting a different type I just set the flag and guard that
-by the capability: should be not an issue.
+Christoffer Dall: I decided to leave original approach of 0002 as it is,
+because:
+- It is much simpler to implement than doing changes inside both probe
+  functions.
+- These are all use cases for vgic_present flag. Nothing else is going to
+  rely on it. IMHO this switch is very short and stylish :) If you don't
+  like two error codes, we could change -ENXIO to -ENODEV where appropriate,
+  this change would be small enough.
+Actually i tried to discuss some things with you, but you stopped replying,
+therefore i respin in order to revive the thing. On top of this i have
+complete implementation of API which allows to emulate GIC in userspace by
+qemu, and now i can run any virtual machine, including generic timer, on
+vGIC-less machine. RasPI-2 is expected to benefit too.
 
-Cheers,
-Andre.
+Pavel Fedin (3):
+  KVM: arm: Fix NULL pointer dereference if KVM is used without
+    in-kernel irqchip
+  KVM: arm: Detect vGIC presence at runtime
+  KVM: arm64: Introduce default dummy save/restore functions
+
+ arch/arm/include/asm/kvm_host.h   |  5 +++++
+ arch/arm/kvm/arm.c                | 24 +++++++++++++++++++++---
+ arch/arm64/include/asm/kvm_asm.h  |  1 +
+ arch/arm64/include/asm/kvm_host.h |  8 ++++++++
+ arch/arm64/kvm/vgic-v2-switch.S   |  5 +++++
+ virt/kvm/arm/vgic.c               |  2 ++
+ 6 files changed, 42 insertions(+), 3 deletions(-)
+
+-- 
+2.4.4
+
