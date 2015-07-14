@@ -1,100 +1,83 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: [PATCH v2 2/3] KVM: arm: Detect vGIC presence at runtime
-Date: Tue, 14 Jul 2015 15:06:04 +0300
-Message-ID: <e664e112531093dcb47c2028c72670d755e76f08.1436874248.git.p.fedin@samsung.com>
-References: <cover.1436874248.git.p.fedin@samsung.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 3/3] KVM: arm64: Introduce default dummy save/restore
+ functions
+Date: Tue, 14 Jul 2015 13:28:42 +0100
+Message-ID: <55A5007A.4040802@arm.com>
+References: <cover.1436874248.git.p.fedin@samsung.com> <248fcfc798e243b618c5275eef8aa333253fd4da.1436874248.git.p.fedin@samsung.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <cover.1436874248.git.p.fedin@samsung.com>
-In-reply-to: <cover.1436874248.git.p.fedin@samsung.com>
-References: <cover.1436874248.git.p.fedin@samsung.com>
+In-Reply-To: <248fcfc798e243b618c5275eef8aa333253fd4da.1436874248.git.p.fedin@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>
+To: Pavel Fedin <p.fedin@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Allows to use KVM on hardware without vGIC. Interrupt controller has to be
-emulated in userspace in this case.
+On 14/07/15 13:06, Pavel Fedin wrote:
+> Necessary for KVM without irqchip to function on ARM64. Allows to use
+> software GICv2 emulation where hardware acceleration is not available.
+> 
+> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+> ---
+>  arch/arm/include/asm/kvm_host.h   | 5 +++++
+>  arch/arm64/include/asm/kvm_asm.h  | 1 +
+>  arch/arm64/include/asm/kvm_host.h | 8 ++++++++
+>  arch/arm64/kvm/vgic-v2-switch.S   | 5 +++++
+>  virt/kvm/arm/vgic.c               | 2 ++
+>  5 files changed, 21 insertions(+)
+> 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index d71607c..c469c95 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -218,6 +218,11 @@ static inline int kvm_arch_dev_ioctl_check_extension(long ext)
+>  	return 0;
+>  }
+>  
+> +static inline void vgic_arch_pre_setup(void)
+> +{
+> +
+> +}
+> +
+>  static inline void vgic_arch_setup(const struct vgic_params *vgic)
+>  {
+>  	BUG_ON(vgic->type != VGIC_V2);
+> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> index 4f7310f..933a442 100644
+> --- a/arch/arm64/include/asm/kvm_asm.h
+> +++ b/arch/arm64/include/asm/kvm_asm.h
+> @@ -132,6 +132,7 @@ extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>  
+>  extern u64 __vgic_v3_get_ich_vtr_el2(void);
+>  
+> +extern char __dummy_vgic_save_restore[];
+>  extern char __save_vgic_v2_state[];
+>  extern char __restore_vgic_v2_state[];
+>  extern char __save_vgic_v3_state[];
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index f0f58c9..b322895 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -221,6 +221,14 @@ struct vgic_sr_vectors {
+>  	void	*restore_vgic;
+>  };
+>  
+> +static inline void vgic_arch_pre_setup(void)
+> +{
+> +	extern struct vgic_sr_vectors __vgic_sr_vectors;
+> +
+> +	__vgic_sr_vectors.save_vgic	= __dummy_vgic_save_restore;
+> +	__vgic_sr_vectors.restore_vgic	= __dummy_vgic_save_restore;
+> +}
+> +
 
--ENODEV return code from probe function means there's no GIC at all. -ENXIO
-happens when, for example, there is GIC node in the device tree, but it does
-not specify vGIC resources. Normally this means that vGIC hardware is defunct.
-Any other code is still treated as full stop because it might mean some really
-serious problems.
+You may want to check commit 8a14849, which makes this whole patch
+irrelevant.
 
-Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
----
- arch/arm/kvm/arm.c | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+Also, we do check whether or not the GIC is enabled for a given VM, and
+not touching the registers if they are not. What is wrong with that?
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 5668c4e..7e389fd 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -61,6 +61,8 @@ static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
- static u8 kvm_next_vmid;
- static DEFINE_SPINLOCK(kvm_vmid_lock);
- 
-+static bool vgic_present;
-+
- static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
- {
- 	BUG_ON(preemptible());
-@@ -131,7 +133,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	kvm->arch.vmid_gen = 0;
- 
- 	/* The maximum number of VCPUs is limited by the host's GIC model */
--	kvm->arch.max_vcpus = kvm_vgic_get_max_vcpus();
-+	kvm->arch.max_vcpus = vgic_present ?
-+				kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
- 
- 	return ret;
- out_free_stage2_pgd:
-@@ -172,6 +175,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	switch (ext) {
- 	case KVM_CAP_IRQCHIP:
- 	case KVM_CAP_IRQFD:
-+		r = vgic_present;
-+		break;
- 	case KVM_CAP_IOEVENTFD:
- 	case KVM_CAP_DEVICE_CTRL:
- 	case KVM_CAP_USER_MEMORY:
-@@ -850,6 +855,8 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
- 
- 	switch (dev_id) {
- 	case KVM_ARM_DEVICE_VGIC_V2:
-+		if (!vgic_present)
-+			return -ENXIO;
- 		return kvm_vgic_addr(kvm, type, &dev_addr->addr, true);
- 	default:
- 		return -ENODEV;
-@@ -864,6 +871,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
- 
- 	switch (ioctl) {
- 	case KVM_CREATE_IRQCHIP: {
-+		if (!vgic_present)
-+			return -ENXIO;
- 		return kvm_vgic_create(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
- 	}
- 	case KVM_ARM_SET_DEVICE_ADDR: {
-@@ -1046,8 +1055,17 @@ static int init_hyp_mode(void)
- 	 * Init HYP view of VGIC
- 	 */
- 	err = kvm_vgic_hyp_init();
--	if (err)
-+	switch (err) {
-+	case 0:
-+		vgic_present = true;
-+		break;
-+	case -ENODEV:
-+	case -ENXIO:
-+		vgic_present = false;
-+		break;
-+	default:
- 		goto out_free_context;
-+	}
- 
- 	/*
- 	 * Init HYP architected timer support
+	M.
 -- 
-2.4.4
-
+Jazz is not dead. It just smells funny...
