@@ -1,83 +1,64 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Introduce default dummy save/restore
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH v2 3/3] KVM: arm64: Introduce default dummy save/restore
  functions
-Date: Tue, 14 Jul 2015 13:28:42 +0100
-Message-ID: <55A5007A.4040802@arm.com>
-References: <cover.1436874248.git.p.fedin@samsung.com> <248fcfc798e243b618c5275eef8aa333253fd4da.1436874248.git.p.fedin@samsung.com>
+Date: Tue, 14 Jul 2015 16:02:39 +0300
+Message-ID: <020d01d0be35$5d3bab00$17b30100$@samsung.com>
+References: <cover.1436874248.git.p.fedin@samsung.com>
+ <248fcfc798e243b618c5275eef8aa333253fd4da.1436874248.git.p.fedin@samsung.com>
+ <55A5007A.4040802@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <248fcfc798e243b618c5275eef8aa333253fd4da.1436874248.git.p.fedin@samsung.com>
-Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2AC7D58776
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Jul 2015 08:50:56 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id KkbjPtvbnu2I for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 14 Jul 2015 08:50:54 -0400 (EDT)
+Received: from mailout3.w1.samsung.com (mailout3.w1.samsung.com
+ [210.118.77.13])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 37BFA58775
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 14 Jul 2015 08:50:53 -0400 (EDT)
+Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
+ by mailout3.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NRH00BGFAWG0C90@mailout3.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Tue, 14 Jul 2015 14:02:40 +0100 (BST)
+In-reply-to: <55A5007A.4040802@arm.com>
+Content-language: ru
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: 'Marc Zyngier' <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 14/07/15 13:06, Pavel Fedin wrote:
-> Necessary for KVM without irqchip to function on ARM64. Allows to use
-> software GICv2 emulation where hardware acceleration is not available.
-> 
-> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-> ---
->  arch/arm/include/asm/kvm_host.h   | 5 +++++
->  arch/arm64/include/asm/kvm_asm.h  | 1 +
->  arch/arm64/include/asm/kvm_host.h | 8 ++++++++
->  arch/arm64/kvm/vgic-v2-switch.S   | 5 +++++
->  virt/kvm/arm/vgic.c               | 2 ++
->  5 files changed, 21 insertions(+)
-> 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index d71607c..c469c95 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -218,6 +218,11 @@ static inline int kvm_arch_dev_ioctl_check_extension(long ext)
->  	return 0;
->  }
->  
-> +static inline void vgic_arch_pre_setup(void)
-> +{
-> +
-> +}
-> +
->  static inline void vgic_arch_setup(const struct vgic_params *vgic)
->  {
->  	BUG_ON(vgic->type != VGIC_V2);
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 4f7310f..933a442 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -132,6 +132,7 @@ extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
->  
->  extern u64 __vgic_v3_get_ich_vtr_el2(void);
->  
-> +extern char __dummy_vgic_save_restore[];
->  extern char __save_vgic_v2_state[];
->  extern char __restore_vgic_v2_state[];
->  extern char __save_vgic_v3_state[];
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index f0f58c9..b322895 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -221,6 +221,14 @@ struct vgic_sr_vectors {
->  	void	*restore_vgic;
->  };
->  
-> +static inline void vgic_arch_pre_setup(void)
-> +{
-> +	extern struct vgic_sr_vectors __vgic_sr_vectors;
-> +
-> +	__vgic_sr_vectors.save_vgic	= __dummy_vgic_save_restore;
-> +	__vgic_sr_vectors.restore_vgic	= __dummy_vgic_save_restore;
-> +}
-> +
+ Hello!
 
-You may want to check commit 8a14849, which makes this whole patch
-irrelevant.
+> You may want to check commit 8a14849, which makes this whole patch
+> irrelevant.
 
-Also, we do check whether or not the GIC is enabled for a given VM, and
-not touching the registers if they are not. What is wrong with that?
+ Thank you very much for pointing out, i will recheck.
+ My patches are based on linux-stable.git, should i base them on something else?
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> Also, we do check whether or not the GIC is enabled for a given VM, and
+> not touching the registers if they are not. What is wrong with that?
+
+ Look at arch/arm64/kvm/hyp.S, __kvm_vcpu_run function. It unconditionally calls entries in
+__vgic_sr_vectors table. If vGIC initialization did not complete, this table stays unset and
+contains zeroes. That was the problem.
+ Ok, this is 64-bit-specific, i can fix this up later. My patch set can be used without 0003, in
+this case it will fix only ARM32 architecture. So if you would like to accept the rest, you can do
+it.
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
