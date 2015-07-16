@@ -1,34 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Introduce default dummy save/restore
- functions
-Date: Thu, 16 Jul 2015 15:30:24 +0200
-Message-ID: <20150716133024.GF7845@cbox>
-References: <cover.1436874248.git.p.fedin@samsung.com>
- <248fcfc798e243b618c5275eef8aa333253fd4da.1436874248.git.p.fedin@samsung.com>
- <55A5007A.4040802@arm.com>
- <020d01d0be35$5d3bab00$17b30100$@samsung.com>
+Subject: Re: [PATCH v4 0/2] arm/arm64: KVM: Optimize arm64 fp/simd, saves
+ 30-50% on exits for non-VHE
+Date: Thu, 16 Jul 2015 17:52:53 +0200
+Message-ID: <20150716155253.GU7845@cbox>
+References: <1436577547-5646-1-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <020d01d0be35$5d3bab00$17b30100$@samsung.com>
+In-Reply-To: <1436577547-5646-1-git-send-email-m.smarduch@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: 'Marc Zyngier' <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Eric Auger' <eric.auger@linaro.org>
+To: Mario Smarduch <m.smarduch@samsung.com>
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jul 14, 2015 at 04:02:39PM +0300, Pavel Fedin wrote:
->  Hello!
+On Fri, Jul 10, 2015 at 06:19:05PM -0700, Mario Smarduch wrote:
+> This is a followp to previous iteration but implemented on top of VHE patches. 
+> Only non-VHE path is addressied by this patch. In second patch 32-bit handler 
+> is updated to keep exit handling consistent with 64-bit code, and nothing
+> has changed.
 > 
-> > You may want to check commit 8a14849, which makes this whole patch
-> > irrelevant.
-> 
->  Thank you very much for pointing out, i will recheck.
->  My patches are based on linux-stable.git, should i base them on something else?
-> 
-
-A recent mainline -rc or kvm/next or kvmarm/next is generally preferred.
-
-Basing upstream patches on stable is a bit weird.
+Why not simply preserve this the way it was in v3 and have it merged
+first - after all we have reviewed it and I thought it was more or less
+ready to be merged - I suspect the VHE patches may have a way to go
+still ?
 
 -Christoffer
