@@ -1,81 +1,210 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] arm64/kvm: Add generic v8 KVM target
-Date: Fri, 17 Jul 2015 10:56:39 +0100
-Message-ID: <55A8D157.9010601@arm.com>
-References: <559180CA.3050905@arm.com> <CAFEAcA-E+KdiL4suQ0DoEvB-zGpNZ7-dq46FegC_iXYRPvo9jA@mail.gmail.com> <559185D4.7060308@arm.com> <85D36B67-643B-407F-944F-D18D54FF9909@caviumnetworks.com> <D805D093-CCFE-4835-853A-B2654DAA10A1@caviumnetworks.com> <559642EE.1050605@arm.com> <CAFEAcA8nt7yr0K4QesJjWqEwBgziWOt2DViY70E=z2wjt=X7XA@mail.gmail.com> <559647A7.7010309@arm.com> <CAFEAcA-XyGRLSdQSye5OP6vRQKLZtMY4Erg7jfcpr-oo-HqJ7A@mail.gmail.com> <55965F81.5050609@arm.com> <20150717093334.GA24504@cbox>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH 02/18] KVM: ARM64: Add initial support for PMU
+Date: Fri, 17 Jul 2015 11:58:07 +0200
+Message-ID: <20150717095807.GK14024@cbox>
+References: <1436149068-3784-1-git-send-email-shannon.zhao@linaro.org>
+ <1436149068-3784-3-git-send-email-shannon.zhao@linaro.org>
+ <20150716182553.GB14024@cbox>
+ <55A8B92F.9070706@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20150717093334.GA24504@cbox>
+Content-Disposition: inline
+In-Reply-To: <55A8B92F.9070706@linaro.org>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Chalamarla, Tirumalesh" <Tirumalesh.Chalamarla@caviumnetworks.com>, kvm-devel <kvm@vger.kernel.org>, "timur@codeaurora.org" <timur@codeaurora.org>, "vgandhi@codeaurora.org" <vgandhi@codeaurora.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+To: Shannon Zhao <shannon.zhao@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, marc.zyngier@arm.com, alex.bennee@linaro.org, zhaoshenglong@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17/07/15 10:33, Christoffer Dall wrote:
-> On Fri, Jul 03, 2015 at 11:10:09AM +0100, Marc Zyngier wrote:
->> On 03/07/15 10:34, Peter Maydell wrote:
->>> On 3 July 2015 at 09:28, Marc Zyngier <marc.zyngier@arm.com> wrote:
->>>> On 03/07/15 09:12, Peter Maydell wrote:
->>>>> I would still like to see the proponents of this patch say
->>>>> what their model is for userspace support of cross-host migration,
->>>>> if we're abandoning the model the current API envisages.
->>>>
->>>> I thought we had discussed this above, and don't really see this as a
->>>> departure from the current model:
->>>>
->>>> - "-cpu host" results in "GENERIC" being used: VM can only be migrated
->>>> to the exact same HW (no cross-host migration). MIDR should probably
->>>> become RO.
->>>> - "-cpu host" results in "A57" (for example): VM can be migrated to a
->>>> variety of A57 platforms, and allow for some fuzzing on the revision (or
->>>> accept any revision).
->>>> - "-cpu a57" forces an A57 model to be emulated, always. It is always
->>>> possible to migrate such a VM on any host.
->>>>
->>>> I think only the first point is new, but the last two are what we have
->>>> (or what we should have).
->>>
->>> Right, but the implicit idea of this GENERIC patch seems to
->>> be that new host CPU types don't get their own KVM_ARM_TARGET_*
->>> constant, and are thus forever unable to do cross-host migration.
->>> It's not clear to me why we'd want to have new CPUs be second
->>> class citizens like that.
->>
->> I certainly don't want to see *any* CPU be a second class citizen. But
->> let's face it, we're adding more and more targets that don't implement
->> anything new, and just satisfy themselves with the generic implementation.
->>
->> I see it as an incentive to provide something useful (tables of all the
->> registers with default values?) so that cross-host migration becomes a
->> reality instead of the figment of our imagination (as it is now). If it
->> wasn't already ABI, I'd have removed the existing targets until we have
->> something meaningful to put there.
+On Fri, Jul 17, 2015 at 04:13:35PM +0800, Shannon Zhao wrote:
 > 
-> What we're doing now certainly seems silly, because we're adding kernel
-> patches without bringing anything to the table...
 > 
->>
->> Now, I also have my own doubts about cross-host migration (timers
->> anyone?). But I don't see the above as a change in policy. More as a way
->> to outline the fact that we currently don't have the right level of
->> information/infrastructure to support it at all.
->>
-> The one thing that I've lost track of here (sorry) is whether we're
-> enforcing the inability to do cross-host migration with the generic
-> target when this patch is merged or do we leave this up to the graces of
-> userspace?
+> On 2015/7/17 2:25, Christoffer Dall wrote:
+> > On Mon, Jul 06, 2015 at 10:17:32AM +0800, shannon.zhao@linaro.org wrote:
+> >> From: Shannon Zhao <shannon.zhao@linaro.org>
+> >>
+> >> Here we plan to support virtual PMU for guest by full software
+> >> emulation, so define some basic structs and functions preparing for
+> >> futher steps. Define struct kvm_pmc for performance monitor counter and
+> >> struct kvm_pmu for performance monitor unit for each vcpu. According to
+> >> ARMv8 spec, the PMU contains at most 32(ARMV8_MAX_COUNTERS) counters.
+> >> Initialize PMU for each vcpu when kvm initialize vcpus, while reset PMU
+> >> when kvm reset vcpus.
+> >> Since this only supports ARM64 (or PMUv3), add a separate config symbol
+> >> for it.
+> >>
+> >> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> >> ---
+> >>  arch/arm/kvm/arm.c                |  4 +++
+> >>  arch/arm64/include/asm/kvm_host.h |  2 ++
+> >>  arch/arm64/include/asm/pmu.h      |  2 ++
+> >>  arch/arm64/kvm/Kconfig            |  7 +++++
+> >>  arch/arm64/kvm/Makefile           |  1 +
+> >>  arch/arm64/kvm/reset.c            |  3 +++
+> >>  include/kvm/arm_pmu.h             | 54 ++++++++++++++++++++++++++++++++++++++
+> >>  virt/kvm/arm/pmu.c                | 55 +++++++++++++++++++++++++++++++++++++++
+> >>  8 files changed, 128 insertions(+)
+> >>  create mode 100644 include/kvm/arm_pmu.h
+> >>  create mode 100644 virt/kvm/arm/pmu.c
+> >>
+> >> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> >> index bc738d2..4e82625 100644
+> >> --- a/arch/arm/kvm/arm.c
+> >> +++ b/arch/arm/kvm/arm.c
+> >> @@ -28,6 +28,7 @@
+> >>  #include <linux/sched.h>
+> >>  #include <linux/kvm.h>
+> >>  #include <trace/events/kvm.h>
+> >> +#include <kvm/arm_pmu.h>
+> >>  
+> >>  #define CREATE_TRACE_POINTS
+> >>  #include "trace.h"
+> >> @@ -278,6 +279,9 @@ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
+> >>  	/* Set up the timer */
+> >>  	kvm_timer_vcpu_init(vcpu);
+> >>  
+> >> +	/* Set up the PMU */
+> >> +	kvm_pmu_init(vcpu);
+> >> +
+> >>  	return 0;
+> >>  }
+> >>  
+> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> >> index 2709db2..3c88873 100644
+> >> --- a/arch/arm64/include/asm/kvm_host.h
+> >> +++ b/arch/arm64/include/asm/kvm_host.h
+> >> @@ -42,6 +42,7 @@
+> >>  
+> >>  #include <kvm/arm_vgic.h>
+> >>  #include <kvm/arm_arch_timer.h>
+> >> +#include <kvm/arm_pmu.h>
+> >>  
+> >>  #define KVM_VCPU_MAX_FEATURES 3
+> >>  
+> >> @@ -116,6 +117,7 @@ struct kvm_vcpu_arch {
+> >>  	/* VGIC state */
+> >>  	struct vgic_cpu vgic_cpu;
+> >>  	struct arch_timer_cpu timer_cpu;
+> >> +	struct kvm_pmu pmu;
+> >>  
+> >>  	/*
+> >>  	 * Anything that is not used directly from assembly code goes
+> >> diff --git a/arch/arm64/include/asm/pmu.h b/arch/arm64/include/asm/pmu.h
+> >> index b9f394a..95681e6 100644
+> >> --- a/arch/arm64/include/asm/pmu.h
+> >> +++ b/arch/arm64/include/asm/pmu.h
+> >> @@ -19,6 +19,8 @@
+> >>  #ifndef __ASM_PMU_H
+> >>  #define __ASM_PMU_H
+> >>  
+> >> +#include <linux/perf_event.h>
+> >> +
+> >>  #define ARMV8_MAX_COUNTERS      32
+> >>  #define ARMV8_COUNTER_MASK      (ARMV8_MAX_COUNTERS - 1)
+> >>  
+> >> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> >> index bfffe8f..eae3a1b 100644
+> >> --- a/arch/arm64/kvm/Kconfig
+> >> +++ b/arch/arm64/kvm/Kconfig
+> >> @@ -31,6 +31,7 @@ config KVM
+> >>  	select KVM_VFIO
+> >>  	select HAVE_KVM_EVENTFD
+> >>  	select HAVE_KVM_IRQFD
+> >> +	select KVM_ARM_PMU
+> >>  	---help---
+> >>  	  Support hosting virtualized guest machines.
+> >>  
+> >> @@ -52,4 +53,10 @@ config KVM_ARM_MAX_VCPUS
+> >>  	  large, so only choose a reasonable number that you expect to
+> >>  	  actually use.
+> >>  
+> >> +config KVM_ARM_PMU
+> >> +	bool
+> >> +	depends on KVM_ARM_HOST
+> >> +	---help---
+> >> +	  Adds support for the Performance Monitoring in virtual machines.
+> > 
+> > Adds support for a virtual Performance Monitoring Unit (PMU) in virtual
+> > machines.
+> > 
+> >> +
+> >>  endif # VIRTUALIZATION
+> >> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> >> index f90f4aa..78db4ee 100644
+> >> --- a/arch/arm64/kvm/Makefile
+> >> +++ b/arch/arm64/kvm/Makefile
+> >> @@ -27,3 +27,4 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3.o
+> >>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3-emul.o
+> >>  kvm-$(CONFIG_KVM_ARM_HOST) += vgic-v3-switch.o
+> >>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
+> >> +kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
+> >> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> >> index 0b43265..ee2c2e9 100644
+> >> --- a/arch/arm64/kvm/reset.c
+> >> +++ b/arch/arm64/kvm/reset.c
+> >> @@ -107,5 +107,8 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >>  	/* Reset timer */
+> >>  	kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
+> >>  
+> >> +	/* Reset PMU */
+> >> +	kvm_pmu_vcpu_reset(vcpu);
+> >> +
+> >>  	return 0;
+> >>  }
+> >> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> >> new file mode 100644
+> >> index 0000000..27d14ca
+> >> --- /dev/null
+> >> +++ b/include/kvm/arm_pmu.h
+> >> @@ -0,0 +1,54 @@
+> >> +/*
+> >> + * Copyright (C) 2015 Linaro Ltd.
+> >> + * Author: Shannon Zhao <shannon.zhao@linaro.org>
+> >> + *
+> >> + * This program is free software; you can redistribute it and/or modify
+> >> + * it under the terms of the GNU General Public License version 2 as
+> >> + * published by the Free Software Foundation.
+> >> + *
+> >> + * This program is distributed in the hope that it will be useful,
+> >> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> >> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> >> + * GNU General Public License for more details.
+> >> + *
+> >> + * You should have received a copy of the GNU General Public License
+> >> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> >> + */
+> >> +
+> >> +#ifndef __ASM_ARM_KVM_PMU_H
+> >> +#define __ASM_ARM_KVM_PMU_H
+> >> +
+> >> +#include <asm/pmu.h>
+> >> +#include <linux/irq_work.h>
+> >> +
+> >> +struct kvm_pmc {
+> >> +	u8 idx;
+> > 
+> > which index is this?  Does it map to something architecturally or is it
+> > just the array index number?
+> > 
+> 
+> It's the index of the PMU counter.
+> 
 
-The jury is still out on that one.
+sorry, I don't feel this answers my question? ;)
 
-I was initially not going to enforce anything (after all, this isn't
-that different from the whole CNTVOFF story where we allow userspace to
-shoot itself in the foot), but I'm equally happy to make MIDR_EL1
-read-only if we're creating a generic guest...
+> >> +	u64 counter;
+> >> +	u64 eventsel;
+> > 
+> > does this map to PMEVTYPER<n>_EL0.evtCount?
+> > 
+> No, it just stores the event type.
+> 
+
+can you specify more clearly what this maps to/how I derive its meaning?
+
+Is this a perf (Linux) event type number, or an architecturally defined
+thing?
+
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+-Christoffer
