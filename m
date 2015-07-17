@@ -1,177 +1,200 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 16/18] KVM: ARM64: Add access handlers for PMEVCNTRn_EL0
- and PMEVTYPERn_EL0 register
-Date: Fri, 17 Jul 2015 17:19:00 +0200
-Message-ID: <20150717151900.GA14024@cbox>
+Subject: Re: [PATCH 17/18] KVM: ARM64: Add PMU overflow interrupt routing
+Date: Fri, 17 Jul 2015 17:28:42 +0200
+Message-ID: <20150717152842.GB14024@cbox>
 References: <1436149068-3784-1-git-send-email-shannon.zhao@linaro.org>
- <1436149068-3784-17-git-send-email-shannon.zhao@linaro.org>
+ <1436149068-3784-18-git-send-email-shannon.zhao@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1436149068-3784-17-git-send-email-shannon.zhao@linaro.org>
+In-Reply-To: <1436149068-3784-18-git-send-email-shannon.zhao@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: shannon.zhao@linaro.org
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, marc.zyngier@arm.com, alex.bennee@linaro.org, zhaoshenglong@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jul 06, 2015 at 10:17:46AM +0800, shannon.zhao@linaro.org wrote:
+On Mon, Jul 06, 2015 at 10:17:47AM +0800, shannon.zhao@linaro.org wrote:
 > From: Shannon Zhao <shannon.zhao@linaro.org>
 > 
-> Add access handler which emulates writing and reading PMEVCNTRn_EL0 and
-> PMEVTYPERn_EL0.
+> When calling perf_event_create_kernel_counter to create perf_event,
+> assign a overflow handler. Then when perf event overflows, if vcpu
+> doesn't run, call irq_work_queue to wake up vcpu. Otherwise call
+> kvm_vgic_inject_irq to inject the interrupt.
 > 
 > Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 > ---
->  arch/arm64/kvm/sys_regs.c | 106 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 106 insertions(+)
+>  arch/arm/kvm/arm.c    |  2 ++
+>  include/kvm/arm_pmu.h |  2 ++
+>  virt/kvm/arm/pmu.c    | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  3 files changed, 56 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 70afcba..5663d83 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -548,6 +548,30 @@ static bool access_pmswinc(struct kvm_vcpu *vcpu,
->  	return true;
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index 4e82625..41eb063 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -551,6 +551,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  			preempt_enable();
+>  			kvm_timer_sync_hwstate(vcpu);
+>  			kvm_vgic_sync_hwstate(vcpu);
+> +			kvm_pmu_sync_hwstate(vcpu);
+>  			continue;
+>  		}
+>  
+> @@ -595,6 +596,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  
+>  		kvm_timer_sync_hwstate(vcpu);
+>  		kvm_vgic_sync_hwstate(vcpu);
+> +		kvm_pmu_sync_hwstate(vcpu);
+>  
+>  		ret = handle_exit(vcpu, run, ret);
+>  	}
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 6985809..5bcf27b 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -45,6 +45,7 @@ struct kvm_pmu {
+>  };
+>  
+>  #ifdef CONFIG_KVM_ARM_PMU
+> +void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu);
+>  void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
+>  void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, unsigned long select_idx,
+>  			       unsigned long val);
+> @@ -59,6 +60,7 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
+>  				    unsigned long select_idx);
+>  void kvm_pmu_init(struct kvm_vcpu *vcpu);
+>  #else
+> +void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
+>  void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, unsigned long select_idx,
+>  			       unsigned long val) {}
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index e655426..f957b85 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -20,6 +20,7 @@
+>  #include <linux/kvm_host.h>
+>  #include <linux/perf_event.h>
+>  #include <kvm/arm_pmu.h>
+> +#include <kvm/arm_vgic.h>
+>  
+>  /* PMU HW events mapping. */
+>  static struct kvm_pmu_hw_event_map {
+> @@ -81,6 +82,23 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu,
 >  }
 >  
-> +/* PMU reg accessor. */
-> +static bool access_pmu_reg(struct kvm_vcpu *vcpu,
-> +			   const struct sys_reg_params *p,
-> +			   const struct sys_reg_desc *r)
+>  /**
+> + * kvm_pmu_sync_hwstate - sync pmu state for cpu
+> + * @vcpu: The vcpu pointer
+> + *
+> + * Inject virtual PMU IRQ if IRQ is pending for this cpu.
+> + */
+> +void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
 > +{
-> +	unsigned long val;
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
 > +
-> +	if (p->is_write) {
-> +		val = *vcpu_reg(vcpu, p->Rt);
-> +		if (!p->is_aarch32)
-> +			vcpu_sys_reg(vcpu, r->reg) = val;
-> +		else
-> +			vcpu_cp15(vcpu, r->reg) = val & 0xffffffffUL;
-> +	} else {
-> +		if (!p->is_aarch32)
-> +			val = vcpu_sys_reg(vcpu, r->reg);
-> +		else
-> +			val = vcpu_cp15(vcpu, r->reg);
-> +		*vcpu_reg(vcpu, p->Rt) = val;
+> +	if (pmu->irq_pending) {
+> +		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, 1);
+
+don't you need to check if irq_num is set all these places where you use
+it, somehow?
+
+> +		pmu->irq_pending = 0;
+> +		return;
 > +	}
+> +}
 
-shouldn't these functions act completely analogously to access_pmxevcntr
-(introduced in patch 09/18), only instead of using the valur of
-PMSELR_EL0 for the index, this should be some offset calculation or
-r->reg?
+I'm not sure I understand why this function is needed at this point in
+the first place.  Why don't we just inject the interrupt when the
+overflow happens?
 
-I think you also need a 32-bit mapping with the right offset for the
-p->is_aarch32 check to make sense here (I may have forgotten this in a
-few patches, please check all of them for this).
+I'm also not completely clear on the relationship between when the
+physical counter overflows and when the virtual one does - do we always
+keep that in sync somehow?  (this may relate to one of my questions
+in one of the previous patches).
+
 
 > +
-> +	return true;
+> +/**
+>   * kvm_pmu_vcpu_reset - reset pmu state for cpu
+>   * @vcpu: The vcpu pointer
+>   *
+> @@ -96,6 +114,37 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
+>  	pmu->irq_pending = false;
+>  }
+>  
+> +static void kvm_pum_trigger_pmi(struct irq_work *irq_work)
+> +{
+> +	struct kvm_pmu *pmu = container_of(irq_work, struct kvm_pmu, irq_work);
+> +	struct kvm_vcpu *vcpu = container_of(pmu, struct kvm_vcpu, arch.pmu);
+> +
+> +	kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, 1);
 > +}
 > +
->  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
->  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
->  	/* DBGBVRn_EL1 */						\
-> @@ -563,6 +587,20 @@ static bool access_pmswinc(struct kvm_vcpu *vcpu,
->  	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b111),	\
->  	  trap_debug_regs, reset_val, (DBGWCR0_EL1 + (n)), 0 }
->  
-> +/* Macro to expand the PMEVCNTRn_EL0 register */
-> +#define PMU_PMEVCNTR_EL0(n)						\
-> +	/* PMEVCNTRn_EL0 */						\
-> +	{ Op0(0b11), Op1(0b011), CRn(0b1110),				\
-> +	  CRm((0b1000 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
-> +	  access_pmu_reg, reset_val, (PMEVCNTR0_EL0 + (n)*2), 0 }
+> +/**
+> + * When perf event overflows, if vcpu doesn't run, call irq_work_queue to wake
+> + * up vcpu. Otherwise call kvm_vgic_inject_irq to inject the interrupt.
+> + */
+> +static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
+> +				  struct perf_sample_data *data,
+> +				  struct pt_regs *regs)
+> +{
+> +	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
+> +	struct kvm_vcpu *vcpu = pmc->vcpu;
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
 > +
-> +/* Macro to expand the PMEVTYPERn_EL0 register */
-> +#define PMU_PMEVTYPER_EL0(n)						\
-> +	/* PMEVTYPERn_EL0 */						\
-> +	{ Op0(0b11), Op1(0b011), CRn(0b1110),				\
-> +	  CRm((0b1100 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
-> +	  access_pmu_reg, reset_val, (PMEVTYPER0_EL0 + (n)*2), 0 }
-> +
->  /*
->   * Architected system registers.
->   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-> @@ -784,6 +822,74 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ Op0(0b11), Op1(0b011), CRn(0b1101), CRm(0b0000), Op2(0b011),
->  	  NULL, reset_unknown, TPIDRRO_EL0 },
->  
-> +	/* PMEVCNTRn_EL0 */
-> +	PMU_PMEVCNTR_EL0(0),
-> +	PMU_PMEVCNTR_EL0(1),
-> +	PMU_PMEVCNTR_EL0(2),
-> +	PMU_PMEVCNTR_EL0(3),
-> +	PMU_PMEVCNTR_EL0(4),
-> +	PMU_PMEVCNTR_EL0(5),
-> +	PMU_PMEVCNTR_EL0(6),
-> +	PMU_PMEVCNTR_EL0(7),
-> +	PMU_PMEVCNTR_EL0(8),
-> +	PMU_PMEVCNTR_EL0(9),
-> +	PMU_PMEVCNTR_EL0(10),
-> +	PMU_PMEVCNTR_EL0(11),
-> +	PMU_PMEVCNTR_EL0(12),
-> +	PMU_PMEVCNTR_EL0(13),
-> +	PMU_PMEVCNTR_EL0(14),
-> +	PMU_PMEVCNTR_EL0(15),
-> +	PMU_PMEVCNTR_EL0(16),
-> +	PMU_PMEVCNTR_EL0(17),
-> +	PMU_PMEVCNTR_EL0(18),
-> +	PMU_PMEVCNTR_EL0(19),
-> +	PMU_PMEVCNTR_EL0(20),
-> +	PMU_PMEVCNTR_EL0(21),
-> +	PMU_PMEVCNTR_EL0(22),
-> +	PMU_PMEVCNTR_EL0(23),
-> +	PMU_PMEVCNTR_EL0(24),
-> +	PMU_PMEVCNTR_EL0(25),
-> +	PMU_PMEVCNTR_EL0(26),
-> +	PMU_PMEVCNTR_EL0(27),
-> +	PMU_PMEVCNTR_EL0(28),
-> +	PMU_PMEVCNTR_EL0(29),
-> +	PMU_PMEVCNTR_EL0(30),
-> +	/* PMEVTYPERn_EL0 */
-> +	PMU_PMEVTYPER_EL0(0),
-> +	PMU_PMEVTYPER_EL0(1),
-> +	PMU_PMEVTYPER_EL0(2),
-> +	PMU_PMEVTYPER_EL0(3),
-> +	PMU_PMEVTYPER_EL0(4),
-> +	PMU_PMEVTYPER_EL0(5),
-> +	PMU_PMEVTYPER_EL0(6),
-> +	PMU_PMEVTYPER_EL0(7),
-> +	PMU_PMEVTYPER_EL0(8),
-> +	PMU_PMEVTYPER_EL0(9),
-> +	PMU_PMEVTYPER_EL0(10),
-> +	PMU_PMEVTYPER_EL0(11),
-> +	PMU_PMEVTYPER_EL0(12),
-> +	PMU_PMEVTYPER_EL0(13),
-> +	PMU_PMEVTYPER_EL0(14),
-> +	PMU_PMEVTYPER_EL0(15),
-> +	PMU_PMEVTYPER_EL0(16),
-> +	PMU_PMEVTYPER_EL0(17),
-> +	PMU_PMEVTYPER_EL0(18),
-> +	PMU_PMEVTYPER_EL0(19),
-> +	PMU_PMEVTYPER_EL0(20),
-> +	PMU_PMEVTYPER_EL0(21),
-> +	PMU_PMEVTYPER_EL0(22),
-> +	PMU_PMEVTYPER_EL0(23),
-> +	PMU_PMEVTYPER_EL0(24),
-> +	PMU_PMEVTYPER_EL0(25),
-> +	PMU_PMEVTYPER_EL0(26),
-> +	PMU_PMEVTYPER_EL0(27),
-> +	PMU_PMEVTYPER_EL0(28),
-> +	PMU_PMEVTYPER_EL0(29),
-> +	PMU_PMEVTYPER_EL0(30),
-> +	/* PMCCFILTR_EL0 */
-> +	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b1111), Op2(0b111),
-> +	  access_pmu_reg, reset_val, PMCCFILTR_EL0, 0 },
-> +
+> +	if (pmc->interrupt == true) {
+> +		__set_bit(pmc->idx, (unsigned long *)&pmu->overflow_status);
 
-why is PMCCFULTR just accessing state on the VCPU, shouldn't this have
-the same behavior as accesses to PMXEVTYPER_EL0, just for the cycle
-counter event?
+why not declare overflow_status as an unsigned long instead?
 
->  	/* DACR32_EL2 */
->  	{ Op0(0b11), Op1(0b100), CRn(0b0011), CRm(0b0000), Op2(0b000),
->  	  NULL, reset_unknown, DACR32_EL2 },
+> +		pmu->irq_pending = 1;
+> +		if (vcpu->mode != IN_GUEST_MODE)
+> +			irq_work_queue(&pmu->irq_work);
+
+why do you need to do this only when the vcpu is in guest mode?
+
+also, aren't all the counters per-cpu, so how can the cpu ever be in
+guest mode while this is happening?
+
+> +		else
+> +			kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+> +					    pmu->irq_num, 1);
+
+what context is this overflow handler function?  kvm_vgic_inject_irq
+grabs a mutex, so it can sleep...
+
+from a quick glance at the perf core code, it looks like this is in
+interrupt context, so that call to kvm_vgic_inject_irq looks bad.
+
+
+> +	}
+> +}
+> +
+>  /**
+>   * kvm_pmu_set_counter_value - set PMU counter value
+>   * @vcpu: The vcpu pointer
+> @@ -322,7 +371,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
+>  	attr.config = config;
+>  	attr.sample_period = (-pmc->counter) & (((u64)1 << 32) - 1);
+>  
+> -	event = perf_event_create_kernel_counter(&attr, -1, current, NULL, pmc);
+> +	event = perf_event_create_kernel_counter(&attr, -1, current,
+> +						 kvm_pmu_perf_overflow, pmc);
+
+do we properly tear this down when the vcpu dies so that we never start
+dereferencing the vcpu in kvm_pmu_perf_overflow if the vcpu goes away?
+
+>  	if (IS_ERR(event)) {
+>  		kvm_err("kvm: pmu event creation failed %ld\n",
+>  			  PTR_ERR(event));
+> @@ -351,4 +401,5 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
+>  	}
+>  
+>  	pmu->irq_num = -1;
+> +	init_irq_work(&pmu->irq_work, kvm_pum_trigger_pmi);
+>  }
 > -- 
 > 2.1.0
 > 
