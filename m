@@ -1,34 +1,32 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH v2 3/7] KVM: irqchip: convey devid to kvm_set_msi
-Date: Fri, 17 Jul 2015 13:21:23 +0300
-Message-ID: <029401d0c07a$55a3ddd0$00eb9970$@samsung.com>
-References: <1436430137-24205-1-git-send-email-eric.auger@linaro.org>
- <1436430137-24205-4-git-send-email-eric.auger@linaro.org>
- <01d401d0c062$086c2ee0$19448ca0$@samsung.com> <55A8D44A.3030105@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 0/2] arm/arm64: KVM: Optimize arm64 fp/simd, saves
+ 30-50% on exits
+Date: Fri, 17 Jul 2015 11:28:09 +0100
+Message-ID: <55A8D8B9.2050903@arm.com>
+References: <1437082178-11039-1-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <55A8D44A.3030105@redhat.com>
-Content-language: ru
+In-Reply-To: <1437082178-11039-1-git-send-email-m.smarduch@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: 'Paolo Bonzini' <pbonzini@redhat.com>, 'Eric Auger' <eric.auger@linaro.org>, eric.auger@st.com, linux-arm-kernel@lists.infradead.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: patches@linaro.org, andre.przywara@arm.com
+To: Mario Smarduch <m.smarduch@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello!
-
-> >> > +	} else if (!msi->flags)
-> >> > +		return -EINVAL;
-> >  Did you mean "if (msg->flags)" here (inverted condition)?
+On 16/07/15 22:29, Mario Smarduch wrote:
+> Currently we save/restore fp/simd on each exit. The first patch optimizes arm64
+> save/restore, we only do so on Guest access. hackbench and several lmbench
+> tests show anywhere from 30% to 50% of exits don't context switch the vfp/simd
+> registers.
 > 
-> Indeed, and also you need { } around the return for the QEMU coding
-> standard.
+> For second patch 32-bit handler is updated to keep exit handling consistent
+> with 64-bit code.
 
- It's kernel and not qemu :)
+This looks pretty good, I'll take these patches in for 4.3.
 
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
+Thanks,
 
+	M.
+-- 
+Jazz is not dead. It just smells funny...
