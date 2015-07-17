@@ -1,22 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 05/12] ui: remove pointless double const in keymap declarations
-Date: Fri, 17 Jul 2015 17:02:11 +0100
-Message-ID: <1437148938-5394-6-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH 02/12] qcow: fix signedness bugs
+Date: Fri, 17 Jul 2015 17:02:08 +0100
+Message-ID: <1437148938-5394-3-git-send-email-andre.przywara@arm.com>
 References: <1437148938-5394-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 728E558CF5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2015 11:50:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F00958CCB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2015 11:50:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 99rjYNY6P0Wd for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Jul 2015 11:50:24 -0400 (EDT)
+ with ESMTP id UOVvXzw0CMWq for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Jul 2015 11:50:20 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D09FE58CD2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2015 11:50:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B99A458CCD
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2015 11:50:20 -0400 (EDT)
 In-Reply-To: <1437148938-5394-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,40 +31,56 @@ To: will.deacon@arm.com, kvm@vger.kernel.org
 Cc: Szabolcs.Nagy@arm.com, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-clang does not like two const specifiers in one declaration, so
-remove one to let clang compile kvmtool.
+Some functions in qcow.c return u64, but are checked against < 0
+because they want to check for the -1 error return value.
+Do an explicit comparison against the casted -1 to express this
+properly.
+This was silently compiled out by gcc, but clang complained about it.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- ui/gtk3.c | 2 +-
- ui/sdl.c  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ disk/qcow.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/ui/gtk3.c b/ui/gtk3.c
-index b2335bc..1e08a8f 100644
---- a/ui/gtk3.c
-+++ b/ui/gtk3.c
-@@ -34,7 +34,7 @@ struct set2_scancode {
- 	.type = SCANCODE_ESCAPED,	\
- }
+diff --git a/disk/qcow.c b/disk/qcow.c
+index e26c419..64cf927 100644
+--- a/disk/qcow.c
++++ b/disk/qcow.c
+@@ -679,7 +679,7 @@ static struct qcow_refcount_block *qcow_grow_refcount_block(struct qcow *q,
+ 	}
  
--static const struct set2_scancode const keymap[256] = {
-+static const struct set2_scancode keymap[256] = {
- 	[9]	= DEFINE_SC(0x76),	/* <esc> */
- 	[10]	= DEFINE_SC(0x16),	/* 1 */
- 	[11]	= DEFINE_SC(0x1e),	/* 2 */
-diff --git a/ui/sdl.c b/ui/sdl.c
-index a260002..f97a511 100644
---- a/ui/sdl.c
-+++ b/ui/sdl.c
-@@ -36,7 +36,7 @@ struct set2_scancode {
- 	.type = SCANCODE_ESCAPED,\
- }
+ 	new_block_offset = qcow_alloc_clusters(q, q->cluster_size, 0);
+-	if (new_block_offset < 0)
++	if (new_block_offset == (u64)-1)
+ 		return NULL;
  
--static const struct set2_scancode const keymap[256] = {
-+static const struct set2_scancode keymap[256] = {
- 	[9]	= DEFINE_SC(0x76),	/* <esc> */
- 	[10]	= DEFINE_SC(0x16),	/* 1 */
- 	[11]	= DEFINE_SC(0x1e),	/* 2 */
+ 	rfb = new_refcount_block(q, new_block_offset);
+@@ -848,7 +848,7 @@ again:
+ 	for (i = 0; i < clust_num; i++) {
+ 		clust_idx = q->free_clust_idx++;
+ 		clust_refcount = qcow_get_refcount(q, clust_idx);
+-		if (clust_refcount < 0)
++		if (clust_refcount == (u16)-1)
+ 			return -1;
+ 		else if (clust_refcount > 0)
+ 			goto again;
+@@ -915,7 +915,7 @@ static int get_cluster_table(struct qcow *q, u64 offset,
+ 		l2t_new_offset = qcow_alloc_clusters(q,
+ 			l2t_size*sizeof(u64), 1);
+ 
+-		if (l2t_new_offset < 0)
++		if (l2t_new_offset != (u64)-1)
+ 			goto error;
+ 
+ 		l2t = new_cache_table(q, l2t_new_offset);
+@@ -1004,7 +1004,7 @@ static ssize_t qcow_write_cluster(struct qcow *q, u64 offset,
+ 	clust_start &= QCOW2_OFFSET_MASK;
+ 	if (!(clust_flags & QCOW2_OFLAG_COPIED)) {
+ 		clust_new_start	= qcow_alloc_clusters(q, q->cluster_size, 1);
+-		if (clust_new_start < 0) {
++		if (clust_new_start != (u64)-1) {
+ 			pr_warning("Cluster alloc error");
+ 			goto error;
+ 		}
 -- 
 2.3.5
