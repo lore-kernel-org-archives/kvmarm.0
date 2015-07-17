@@ -1,134 +1,110 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 2/3] KVM: arm: Detect vGIC presence at runtime
-Date: Fri, 17 Jul 2015 18:14:00 +0100
-Message-ID: <55A937D8.6030307@arm.com>
-References: <cover.1436874248.git.p.fedin@samsung.com>
- <e664e112531093dcb47c2028c72670d755e76f08.1436874248.git.p.fedin@samsung.com>
+From: "Chalamarla, Tirumalesh" <Tirumalesh.Chalamarla@caviumnetworks.com>
+Subject: Re: [PATCH] arm64/kvm: Add generic v8 KVM target
+Date: Fri, 17 Jul 2015 17:56:37 +0000
+Message-ID: <7778CE94-C9BF-4C65-9ECF-B9E32597E2FC@caviumnetworks.com>
+References: <559185D4.7060308@arm.com>
+ <85D36B67-643B-407F-944F-D18D54FF9909@caviumnetworks.com>
+ <D805D093-CCFE-4835-853A-B2654DAA10A1@caviumnetworks.com>
+ <559642EE.1050605@arm.com>
+ <CAFEAcA8nt7yr0K4QesJjWqEwBgziWOt2DViY70E=z2wjt=X7XA@mail.gmail.com>
+ <559647A7.7010309@arm.com>
+ <CAFEAcA-XyGRLSdQSye5OP6vRQKLZtMY4Erg7jfcpr-oo-HqJ7A@mail.gmail.com>
+ <55965F81.5050609@arm.com> <20150717093334.GA24504@cbox>
+ <55A8D157.9010601@arm.com> <20150717101533.GL14024@cbox>
+ <55A8D6C6.3090907@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2467F58D9C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2015 13:02:08 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9EkhJB8PTsyx for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Jul 2015 13:02:07 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D604E58D97
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2015 13:02:06 -0400 (EDT)
-In-Reply-To: <e664e112531093dcb47c2028c72670d755e76f08.1436874248.git.p.fedin@samsung.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Pavel Fedin <p.fedin@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: 8BIT
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <55A8D6C6.3090907@arm.com>
+Content-Language: en-US
+Content-ID: <A807D46DC717D44A856F8F195CD6FCB0@namprd07.prod.outlook.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, "Chalamarla, Tirumalesh" <Tirumalesh.Chalamarla@caviumnetworks.com>, kvm-devel <kvm@vger.kernel.org>, "timur@codeaurora.org" <timur@codeaurora.org>, "vgandhi@codeaurora.org" <vgandhi@codeaurora.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 14/07/15 13:06, Pavel Fedin wrote:
-> Allows to use KVM on hardware without vGIC. Interrupt controller has to be
-> emulated in userspace in this case.
+
+> On Jul 17, 2015, at 3:19 AM, Marc Zyngier <marc.zyngier@arm.com> wrote:
 > 
-> -ENODEV return code from probe function means there's no GIC at all. -ENXIO
-> happens when, for example, there is GIC node in the device tree, but it does
-> not specify vGIC resources. Normally this means that vGIC hardware is defunct.
-> Any other code is still treated as full stop because it might mean some really
-> serious problems.
-
-As mentioned in a previous email, supporting systems that don't even
-have a GIC at all (hence don't support the management of an ACTIVE
-state) is going to keep us in the dark ages. See the active timer series
-that mandates it.
-
-So keeping KVM alive when we get an -ENODEV is not acceptable. No GIC,
-no fun.
-
+> On 17/07/15 11:15, Christoffer Dall wrote:
+>> On Fri, Jul 17, 2015 at 10:56:39AM +0100, Marc Zyngier wrote:
+>>> On 17/07/15 10:33, Christoffer Dall wrote:
+>>>> On Fri, Jul 03, 2015 at 11:10:09AM +0100, Marc Zyngier wrote:
+>>>>> On 03/07/15 10:34, Peter Maydell wrote:
+>>>>>> On 3 July 2015 at 09:28, Marc Zyngier <marc.zyngier@arm.com> wrote:
+>>>>>>> On 03/07/15 09:12, Peter Maydell wrote:
+>>>>>>>> I would still like to see the proponents of this patch say
+>>>>>>>> what their model is for userspace support of cross-host migration,
+>>>>>>>> if we're abandoning the model the current API envisages.
+>>>>>>> 
+>>>>>>> I thought we had discussed this above, and don't really see this as a
+>>>>>>> departure from the current model:
+>>>>>>> 
+>>>>>>> - "-cpu host" results in "GENERIC" being used: VM can only be migrated
+>>>>>>> to the exact same HW (no cross-host migration). MIDR should probably
+>>>>>>> become RO.
+>>>>>>> - "-cpu host" results in "A57" (for example): VM can be migrated to a
+>>>>>>> variety of A57 platforms, and allow for some fuzzing on the revision (or
+>>>>>>> accept any revision).
+>>>>>>> - "-cpu a57" forces an A57 model to be emulated, always. It is always
+>>>>>>> possible to migrate such a VM on any host.
+>>>>>>> 
+>>>>>>> I think only the first point is new, but the last two are what we have
+>>>>>>> (or what we should have).
+>>>>>> 
+>>>>>> Right, but the implicit idea of this GENERIC patch seems to
+>>>>>> be that new host CPU types don't get their own KVM_ARM_TARGET_*
+>>>>>> constant, and are thus forever unable to do cross-host migration.
+>>>>>> It's not clear to me why we'd want to have new CPUs be second
+>>>>>> class citizens like that.
+>>>>> 
+>>>>> I certainly don't want to see *any* CPU be a second class citizen. But
+>>>>> let's face it, we're adding more and more targets that don't implement
+>>>>> anything new, and just satisfy themselves with the generic implementation.
+>>>>> 
+>>>>> I see it as an incentive to provide something useful (tables of all the
+>>>>> registers with default values?) so that cross-host migration becomes a
+>>>>> reality instead of the figment of our imagination (as it is now). If it
+>>>>> wasn't already ABI, I'd have removed the existing targets until we have
+>>>>> something meaningful to put there.
+>>>> 
+>>>> What we're doing now certainly seems silly, because we're adding kernel
+>>>> patches without bringing anything to the table...
+>>>> 
+>>>>> 
+>>>>> Now, I also have my own doubts about cross-host migration (timers
+>>>>> anyone?). But I don't see the above as a change in policy. More as a way
+>>>>> to outline the fact that we currently don't have the right level of
+>>>>> information/infrastructure to support it at all.
+>>>>> 
+>>>> The one thing that I've lost track of here (sorry) is whether we're
+>>>> enforcing the inability to do cross-host migration with the generic
+>>>> target when this patch is merged or do we leave this up to the graces of
+>>>> userspace?
+>>> 
+>>> The jury is still out on that one.
+>>> 
+>>> I was initially not going to enforce anything (after all, this isn't
+>>> that different from the whole CNTVOFF story where we allow userspace to
+>>> shoot itself in the foot), but I'm equally happy to make MIDR_EL1
+>>> read-only if we're creating a generic guest...
+>>> 
+>> Looking at the code, midr_el1 is already an invariant register, so isn't
+>> this automagically enforced already?
 > 
-> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-> ---
->  arch/arm/kvm/arm.c | 22 ++++++++++++++++++++--
->  1 file changed, 20 insertions(+), 2 deletions(-)
+> Ah, you're perfectly right, I has already in that fantasy world where we
+> can actually migrate VMs across implementations.
 > 
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index 5668c4e..7e389fd 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -61,6 +61,8 @@ static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
->  static u8 kvm_next_vmid;
->  static DEFINE_SPINLOCK(kvm_vmid_lock);
->  
-> +static bool vgic_present;
-> +
-
-This needs documentation.
-
->  static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
->  {
->  	BUG_ON(preemptible());
-> @@ -131,7 +133,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  	kvm->arch.vmid_gen = 0;
->  
->  	/* The maximum number of VCPUs is limited by the host's GIC model */
-> -	kvm->arch.max_vcpus = kvm_vgic_get_max_vcpus();
-> +	kvm->arch.max_vcpus = vgic_present ?
-> +				kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
->  
->  	return ret;
->  out_free_stage2_pgd:
-> @@ -172,6 +175,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	switch (ext) {
->  	case KVM_CAP_IRQCHIP:
->  	case KVM_CAP_IRQFD:
-> +		r = vgic_present;
-> +		break;
->  	case KVM_CAP_IOEVENTFD:
->  	case KVM_CAP_DEVICE_CTRL:
->  	case KVM_CAP_USER_MEMORY:
-> @@ -850,6 +855,8 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
->  
->  	switch (dev_id) {
->  	case KVM_ARM_DEVICE_VGIC_V2:
-> +		if (!vgic_present)
-> +			return -ENXIO;
->  		return kvm_vgic_addr(kvm, type, &dev_addr->addr, true);
->  	default:
->  		return -ENODEV;
-> @@ -864,6 +871,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
->  
->  	switch (ioctl) {
->  	case KVM_CREATE_IRQCHIP: {
-> +		if (!vgic_present)
-> +			return -ENXIO;
->  		return kvm_vgic_create(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
->  	}
->  	case KVM_ARM_SET_DEVICE_ADDR: {
-> @@ -1046,8 +1055,17 @@ static int init_hyp_mode(void)
->  	 * Init HYP view of VGIC
->  	 */
->  	err = kvm_vgic_hyp_init();
-> -	if (err)
-> +	switch (err) {
-> +	case 0:
-> +		vgic_present = true;
-> +		break;
-> +	case -ENODEV:
-> +	case -ENXIO:
-> +		vgic_present = false;
-> +		break;
-> +	default:
->  		goto out_free_context;
-> +	}
->  
->  	/*
->  	 * Init HYP architected timer support
+>> In that case, I'm fine with merging this patch.
+> 
+> Cool. I'll queue that for 4.3.
 > 
 
+this sounds nice. 
+> Thanks,
+> 
+> 	M.
+> -- 
+> Jazz is not dead. It just smells funny...
 
--- 
-Jazz is not dead. It just smells funny...
