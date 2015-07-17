@@ -1,110 +1,169 @@
-From: "Chalamarla, Tirumalesh" <Tirumalesh.Chalamarla@caviumnetworks.com>
-Subject: Re: [PATCH] arm64/kvm: Add generic v8 KVM target
-Date: Fri, 17 Jul 2015 17:56:37 +0000
-Message-ID: <7778CE94-C9BF-4C65-9ECF-B9E32597E2FC@caviumnetworks.com>
-References: <559185D4.7060308@arm.com>
- <85D36B67-643B-407F-944F-D18D54FF9909@caviumnetworks.com>
- <D805D093-CCFE-4835-853A-B2654DAA10A1@caviumnetworks.com>
- <559642EE.1050605@arm.com>
- <CAFEAcA8nt7yr0K4QesJjWqEwBgziWOt2DViY70E=z2wjt=X7XA@mail.gmail.com>
- <559647A7.7010309@arm.com>
- <CAFEAcA-XyGRLSdQSye5OP6vRQKLZtMY4Erg7jfcpr-oo-HqJ7A@mail.gmail.com>
- <55965F81.5050609@arm.com> <20150717093334.GA24504@cbox>
- <55A8D157.9010601@arm.com> <20150717101533.GL14024@cbox>
- <55A8D6C6.3090907@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v2 04/10] KVM: arm/arm64: vgic: Allow HW irq to be
+ encoded in LR
+Date: Fri, 17 Jul 2015 21:50:08 +0200
+Message-ID: <20150717195008.GE14024@cbox>
+References: <1436378202-20224-1-git-send-email-marc.zyngier@arm.com>
+ <1436378202-20224-5-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <55A8D6C6.3090907@arm.com>
-Content-Language: en-US
-Content-ID: <A807D46DC717D44A856F8F195CD6FCB0@namprd07.prod.outlook.com>
+Content-Disposition: inline
+In-Reply-To: <1436378202-20224-5-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, "Chalamarla, Tirumalesh" <Tirumalesh.Chalamarla@caviumnetworks.com>, kvm-devel <kvm@vger.kernel.org>, "timur@codeaurora.org" <timur@codeaurora.org>, "vgandhi@codeaurora.org" <vgandhi@codeaurora.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On Wed, Jul 08, 2015 at 06:56:36PM +0100, Marc Zyngier wrote:
+> Now that struct vgic_lr supports the LR_HW bit and carries a hwirq
+> field, we can encode that information into the list registers.
+> 
+> This patch provides implementations for both GICv2 and GICv3.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  include/linux/irqchip/arm-gic-v3.h |  3 +++
+>  include/linux/irqchip/arm-gic.h    |  3 ++-
+>  virt/kvm/arm/vgic-v2.c             | 16 +++++++++++++++-
+>  virt/kvm/arm/vgic-v3.c             | 21 ++++++++++++++++++---
+>  4 files changed, 38 insertions(+), 5 deletions(-)
+> 
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index ffbc034..cf637d6 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -268,9 +268,12 @@
+>  
+>  #define ICH_LR_EOI			(1UL << 41)
+>  #define ICH_LR_GROUP			(1UL << 60)
+> +#define ICH_LR_HW			(1UL << 61)
+>  #define ICH_LR_STATE			(3UL << 62)
+>  #define ICH_LR_PENDING_BIT		(1UL << 62)
+>  #define ICH_LR_ACTIVE_BIT		(1UL << 63)
+> +#define ICH_LR_PHYS_ID_SHIFT		32
+> +#define ICH_LR_PHYS_ID_MASK		(0x3ffUL << ICH_LR_PHYS_ID_SHIFT)
+>  
+>  #define ICH_MISR_EOI			(1 << 0)
+>  #define ICH_MISR_U			(1 << 1)
+> diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
+> index 9de976b..ca88dad 100644
+> --- a/include/linux/irqchip/arm-gic.h
+> +++ b/include/linux/irqchip/arm-gic.h
+> @@ -71,11 +71,12 @@
+>  
+>  #define GICH_LR_VIRTUALID		(0x3ff << 0)
+>  #define GICH_LR_PHYSID_CPUID_SHIFT	(10)
+> -#define GICH_LR_PHYSID_CPUID		(7 << GICH_LR_PHYSID_CPUID_SHIFT)
+> +#define GICH_LR_PHYSID_CPUID		(0x3ff << GICH_LR_PHYSID_CPUID_SHIFT)
+>  #define GICH_LR_STATE			(3 << 28)
+>  #define GICH_LR_PENDING_BIT		(1 << 28)
+>  #define GICH_LR_ACTIVE_BIT		(1 << 29)
+>  #define GICH_LR_EOI			(1 << 19)
+> +#define GICH_LR_HW			(1 << 31)
+>  
+>  #define GICH_VMCR_CTRL_SHIFT		0
+>  #define GICH_VMCR_CTRL_MASK		(0x21f << GICH_VMCR_CTRL_SHIFT)
+> diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
+> index f9b9c7c..8d7b04d 100644
+> --- a/virt/kvm/arm/vgic-v2.c
+> +++ b/virt/kvm/arm/vgic-v2.c
+> @@ -48,6 +48,10 @@ static struct vgic_lr vgic_v2_get_lr(const struct kvm_vcpu *vcpu, int lr)
+>  		lr_desc.state |= LR_STATE_ACTIVE;
+>  	if (val & GICH_LR_EOI)
+>  		lr_desc.state |= LR_EOI_INT;
+> +	if (val & GICH_LR_HW) {
+> +		lr_desc.state |= LR_HW;
+> +		lr_desc.hwirq = (val & GICH_LR_PHYSID_CPUID) >> GICH_LR_PHYSID_CPUID_SHIFT;
+> +	}
+>  
+>  	return lr_desc;
+>  }
+> @@ -55,7 +59,9 @@ static struct vgic_lr vgic_v2_get_lr(const struct kvm_vcpu *vcpu, int lr)
+>  static void vgic_v2_set_lr(struct kvm_vcpu *vcpu, int lr,
+>  			   struct vgic_lr lr_desc)
+>  {
+> -	u32 lr_val = (lr_desc.source << GICH_LR_PHYSID_CPUID_SHIFT) | lr_desc.irq;
+> +	u32 lr_val;
+> +
+> +	lr_val = lr_desc.irq;
+>  
+>  	if (lr_desc.state & LR_STATE_PENDING)
+>  		lr_val |= GICH_LR_PENDING_BIT;
+> @@ -64,6 +70,14 @@ static void vgic_v2_set_lr(struct kvm_vcpu *vcpu, int lr,
+>  	if (lr_desc.state & LR_EOI_INT)
+>  		lr_val |= GICH_LR_EOI;
+>  
+> +	if (lr_desc.state & LR_HW) {
+> +		lr_val |= GICH_LR_HW;
+> +		lr_val |= (u32)lr_desc.hwirq << GICH_LR_PHYSID_CPUID_SHIFT;
+> +	}
+> +
+> +	if (lr_desc.irq < VGIC_NR_SGIS)
+> +		lr_val |= (lr_desc.source << GICH_LR_PHYSID_CPUID_SHIFT);
+> +
+>  	vcpu->arch.vgic_cpu.vgic_v2.vgic_lr[lr] = lr_val;
+>  }
+>  
+> diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
+> index dff0602..afbf925 100644
+> --- a/virt/kvm/arm/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic-v3.c
+> @@ -67,6 +67,10 @@ static struct vgic_lr vgic_v3_get_lr(const struct kvm_vcpu *vcpu, int lr)
+>  		lr_desc.state |= LR_STATE_ACTIVE;
+>  	if (val & ICH_LR_EOI)
+>  		lr_desc.state |= LR_EOI_INT;
+> +	if (val & ICH_LR_HW) {
+> +		lr_desc.state |= LR_HW;
+> +		lr_desc.hwirq = (val >> ICH_LR_PHYS_ID_SHIFT) & GENMASK(9, 0);
+> +	}
+>  
+>  	return lr_desc;
+>  }
+> @@ -84,10 +88,17 @@ static void vgic_v3_set_lr(struct kvm_vcpu *vcpu, int lr,
+>  	 * Eventually we want to make this configurable, so we may revisit
+>  	 * this in the future.
+>  	 */
+> -	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
+> +	switch (vcpu->kvm->arch.vgic.vgic_model) {
+> +	case KVM_DEV_TYPE_ARM_VGIC_V3:
+>  		lr_val |= ICH_LR_GROUP;
+> -	else
+> -		lr_val |= (u32)lr_desc.source << GICH_LR_PHYSID_CPUID_SHIFT;
+> +		break;
+> +	case  KVM_DEV_TYPE_ARM_VGIC_V2:
+> +		if (lr_desc.irq < VGIC_NR_SGIS)
+> +			lr_val |= (u32)lr_desc.source << GICH_LR_PHYSID_CPUID_SHIFT;
 
-> On Jul 17, 2015, at 3:19 AM, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> 
-> On 17/07/15 11:15, Christoffer Dall wrote:
->> On Fri, Jul 17, 2015 at 10:56:39AM +0100, Marc Zyngier wrote:
->>> On 17/07/15 10:33, Christoffer Dall wrote:
->>>> On Fri, Jul 03, 2015 at 11:10:09AM +0100, Marc Zyngier wrote:
->>>>> On 03/07/15 10:34, Peter Maydell wrote:
->>>>>> On 3 July 2015 at 09:28, Marc Zyngier <marc.zyngier@arm.com> wrote:
->>>>>>> On 03/07/15 09:12, Peter Maydell wrote:
->>>>>>>> I would still like to see the proponents of this patch say
->>>>>>>> what their model is for userspace support of cross-host migration,
->>>>>>>> if we're abandoning the model the current API envisages.
->>>>>>> 
->>>>>>> I thought we had discussed this above, and don't really see this as a
->>>>>>> departure from the current model:
->>>>>>> 
->>>>>>> - "-cpu host" results in "GENERIC" being used: VM can only be migrated
->>>>>>> to the exact same HW (no cross-host migration). MIDR should probably
->>>>>>> become RO.
->>>>>>> - "-cpu host" results in "A57" (for example): VM can be migrated to a
->>>>>>> variety of A57 platforms, and allow for some fuzzing on the revision (or
->>>>>>> accept any revision).
->>>>>>> - "-cpu a57" forces an A57 model to be emulated, always. It is always
->>>>>>> possible to migrate such a VM on any host.
->>>>>>> 
->>>>>>> I think only the first point is new, but the last two are what we have
->>>>>>> (or what we should have).
->>>>>> 
->>>>>> Right, but the implicit idea of this GENERIC patch seems to
->>>>>> be that new host CPU types don't get their own KVM_ARM_TARGET_*
->>>>>> constant, and are thus forever unable to do cross-host migration.
->>>>>> It's not clear to me why we'd want to have new CPUs be second
->>>>>> class citizens like that.
->>>>> 
->>>>> I certainly don't want to see *any* CPU be a second class citizen. But
->>>>> let's face it, we're adding more and more targets that don't implement
->>>>> anything new, and just satisfy themselves with the generic implementation.
->>>>> 
->>>>> I see it as an incentive to provide something useful (tables of all the
->>>>> registers with default values?) so that cross-host migration becomes a
->>>>> reality instead of the figment of our imagination (as it is now). If it
->>>>> wasn't already ABI, I'd have removed the existing targets until we have
->>>>> something meaningful to put there.
->>>> 
->>>> What we're doing now certainly seems silly, because we're adding kernel
->>>> patches without bringing anything to the table...
->>>> 
->>>>> 
->>>>> Now, I also have my own doubts about cross-host migration (timers
->>>>> anyone?). But I don't see the above as a change in policy. More as a way
->>>>> to outline the fact that we currently don't have the right level of
->>>>> information/infrastructure to support it at all.
->>>>> 
->>>> The one thing that I've lost track of here (sorry) is whether we're
->>>> enforcing the inability to do cross-host migration with the generic
->>>> target when this patch is merged or do we leave this up to the graces of
->>>> userspace?
->>> 
->>> The jury is still out on that one.
->>> 
->>> I was initially not going to enforce anything (after all, this isn't
->>> that different from the whole CNTVOFF story where we allow userspace to
->>> shoot itself in the foot), but I'm equally happy to make MIDR_EL1
->>> read-only if we're creating a generic guest...
->>> 
->> Looking at the code, midr_el1 is already an invariant register, so isn't
->> this automagically enforced already?
-> 
-> Ah, you're perfectly right, I has already in that fantasy world where we
-> can actually migrate VMs across implementations.
-> 
->> In that case, I'm fine with merging this patch.
-> 
-> Cool. I'll queue that for 4.3.
-> 
+I forget how this works: Why are we mixing GICH_LR_ stuff with ICH_LR_
+in the same function?  Aren't we always accessing these registers via
+the system registers interface from the hypervisor control point of
+view, regardless of which GIC version the guest sees?
 
-this sounds nice. 
-> Thanks,
-> 
-> 	M.
+I guess my question here is: Why should this not be
+ICH_LR_PHYSID_CORE_SHIFT?
+
+Thanks,
+-Christoffer
+
+> +		break;
+> +	default:
+> +		BUG();
+> +	}
+>  
+>  	if (lr_desc.state & LR_STATE_PENDING)
+>  		lr_val |= ICH_LR_PENDING_BIT;
+> @@ -95,6 +106,10 @@ static void vgic_v3_set_lr(struct kvm_vcpu *vcpu, int lr,
+>  		lr_val |= ICH_LR_ACTIVE_BIT;
+>  	if (lr_desc.state & LR_EOI_INT)
+>  		lr_val |= ICH_LR_EOI;
+> +	if (lr_desc.state & LR_HW) {
+> +		lr_val |= ICH_LR_HW;
+> +		lr_val |= ((u64)lr_desc.hwirq) << ICH_LR_PHYS_ID_SHIFT;
+> +	}
+>  
+>  	vcpu->arch.vgic_cpu.vgic_v3.vgic_lr[LR_INDEX(lr)] = lr_val;
+>  }
 > -- 
-> Jazz is not dead. It just smells funny...
-
+> 2.1.4
+> 
