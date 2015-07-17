@@ -1,147 +1,169 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 18/18] KVM: ARM64: Add KVM_CAP_ARM_PMU and
- KVM_ARM_PMU_SET_IRQ
-Date: Fri, 17 Jul 2015 17:32:13 +0200
-Message-ID: <20150717153213.GC14024@cbox>
-References: <1436149068-3784-1-git-send-email-shannon.zhao@linaro.org>
- <1436149068-3784-19-git-send-email-shannon.zhao@linaro.org>
+Subject: Re: [PATCH v2] target-arm: kvm: Differentiate registers based on
+ write-back levels
+Date: Fri, 17 Jul 2015 17:39:01 +0200
+Message-ID: <20150717153901.GD14024@cbox>
+References: <1437046488-10773-1-git-send-email-christoffer.dall@linaro.org>
+ <CAFEAcA_cyXztq2E007cOjmm7usq_KNJ4AsUXRCkNwyETibcfqg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D067F58CB8
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2015 11:26:49 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id QcJvBQjgDx7f for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 17 Jul 2015 11:26:48 -0400 (EDT)
+Received: from mail-la0-f51.google.com (mail-la0-f51.google.com
+ [209.85.215.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 57E4F58CB7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2015 11:26:48 -0400 (EDT)
+Received: by lahh5 with SMTP id h5so63258769lah.2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2015 08:38:43 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1436149068-3784-19-git-send-email-shannon.zhao@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: shannon.zhao@linaro.org
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, marc.zyngier@arm.com, alex.bennee@linaro.org, zhaoshenglong@huawei.com
+In-Reply-To: <CAFEAcA_cyXztq2E007cOjmm7usq_KNJ4AsUXRCkNwyETibcfqg@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Jan Kiszka <jan.kiszka@web.de>, QEMU Developers <qemu-devel@nongnu.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jul 06, 2015 at 10:17:48AM +0800, shannon.zhao@linaro.org wrote:
-> From: Shannon Zhao <shannon.zhao@linaro.org>
+On Fri, Jul 17, 2015 at 03:29:56PM +0100, Peter Maydell wrote:
+> On 16 July 2015 at 12:34, Christoffer Dall <christoffer.dall@linaro.org> wrote:
+> > Some registers like the CNTVCT register should only be written to the
+> > kernel as part of machine initialization or on vmload operations, but
+> > never during runtime, as this can potentially make time go backwards or
+> > create inconsistent time observations between VCPUs.
+> >
+> > Introduce a list of registers that should not be written back at runtime
+> > and check this list on syncing the register state to the KVM state.
 > 
-> Add KVM_CAP_ARM_PMU for userspace to check whether KVM supports PMU. Add
-> KVM_ARM_PMU_SET_IRQ for userspace to set PMU IRQ number.
+> Thanks. I think this should go into QEMU 2.4, given that it fixes
+> a bug with time misbehaving in guests. Are you happy that it's
+> received enough testing? (I have given 32-bit KVM a spin but have
+> no convenient 64-bit box to test with, and besides, I didn't notice the
+> bug in the first place :-))
+
+I tested this on both Juno and Mustang, with a simple loop kernel
+booting and doing hackbench test, but if we want to be on the extra
+careful side, perhaps Alex can run it through his migration test setup?
+I don't think that's necessary though.
+
 > 
-> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> ---
->  arch/arm/kvm/arm.c       | 8 ++++++++
->  include/kvm/arm_pmu.h    | 5 +++++
->  include/uapi/linux/kvm.h | 4 ++++
->  virt/kvm/arm/pmu.c       | 9 +++++++++
->  4 files changed, 26 insertions(+)
+> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > ---
+> > Changes since RFC:
+> >  - Move cpreg_level to kvm_arm_cpreg_level and into kvm32.c and kvm64.c
+> >  - Changed struct name and declare as static const
 > 
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index 41eb063..350866e 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -182,6 +182,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_ARM_PSCI_0_2:
->  	case KVM_CAP_READONLY_MEM:
->  	case KVM_CAP_MP_STATE:
-> +	case KVM_CAP_ARM_PMU:
->  		r = 1;
->  		break;
->  	case KVM_CAP_COALESCED_MMIO:
-> @@ -816,6 +817,13 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
->  			return -E2BIG;
->  		return kvm_arm_copy_reg_indices(vcpu, user_list->reg);
->  	}
-> +	case KVM_ARM_PMU_SET_IRQ: {
-> +		uint32_t irq;
-> +
-> +		if (copy_from_user(&irq, argp, sizeof(irq)))
-> +			return -EFAULT;
-> +		return kvm_pmu_set_irq_num(vcpu, irq);
-> +	}
->  	default:
->  		return -EINVAL;
->  	}
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 5bcf27b..1a93f53 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -58,6 +58,7 @@ void kvm_pmu_enable_interrupt(struct kvm_vcpu *vcpu, unsigned long val);
->  void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, unsigned long val);
->  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
->  				    unsigned long select_idx);
-> +int kvm_pmu_set_irq_num(struct kvm_vcpu *vcpu, u32 irq);
->  void kvm_pmu_init(struct kvm_vcpu *vcpu);
->  #else
->  void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu) {}
-> @@ -76,6 +77,10 @@ void kvm_pmu_enable_interrupt(struct kvm_vcpu *vcpu, unsigned long val) {}
->  void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, unsigned long val) {}
->  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
->  				    unsigned long select_idx) {}
-> +int kvm_pmu_set_irq_num(struct kvm_vcpu *vcpu, u32 irq)
-> +{
-> +	return -ENXIO;
-> +}
->  static inline void kvm_pmu_init(struct kvm_vcpu *vcpu) {}
->  #endif
->  
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 716ad4a..90f5e73 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -817,6 +817,7 @@ struct kvm_ppc_smmu_info {
->  #define KVM_CAP_DISABLE_QUIRKS 116
->  #define KVM_CAP_X86_SMM 117
->  #define KVM_CAP_MULTI_ADDRESS_SPACE 118
-> +#define KVM_CAP_ARM_PMU 119
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> @@ -1205,6 +1206,9 @@ struct kvm_s390_ucas_mapping {
->  /* Available with KVM_CAP_X86_SMM */
->  #define KVM_SMI                   _IO(KVMIO,   0xb7)
->  
-> +/* Available with KVM_CAP_ARM_PMU */
-> +#define KVM_ARM_PMU_SET_IRQ	  _IOW(KVMIO, 0xb8, __u32)
-> +
-
-does this really warrant a completely new ioctl?  Perhaps a new kvm
-device that you create with a PMU would be better, in that way you could
-choose whether you want the PMU for the guest or not.
-
-Alternatively, we have some room to spare in the features array of
-KVM_ARM_VCPU_INIT.
-
-Alternatively to the alternative, does the IRQ number appear in any
-register somewhere?  If so, we could use the ONE_REG interface to set
-the irq number.
-
-In any case, the new ABI should be documented in
-Documentation/virtual/kvm/api.txt.
-
-
->  #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
->  #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
->  #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
-> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> index f957b85..57585e1 100644
-> --- a/virt/kvm/arm/pmu.c
-> +++ b/virt/kvm/arm/pmu.c
-> @@ -381,6 +381,15 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
->  	pmc->perf_event = event;
->  }
->  
-> +int kvm_pmu_set_irq_num(struct kvm_vcpu *vcpu, u32 irq)
-> +{
-> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +
-> +	kvm_info("kvm_arm_set_pmu_irq: irq: %u\n", irq);
-
-kvm_debug instead?
-
-> +	pmu->irq_num = irq;
-> +	return 0;
-> +}
-> +
->  /**
->   * kvm_pmu_init - Initialize global PMU state for per vcpu
->   * @vcpu: The vcpu pointer
-> -- 
-> 2.1.0
+> I have a couple of minor comments on the comments below, and you
+> forgot to update the stub version of write_list_to_kvmstate().
+> I can just fix these up as I put it into target-arm.next, though.
+> Fixed up version at:
+> 
+>  https://git.linaro.org/people/peter.maydell/qemu-arm.git target-arm.next
+> 
+> If interested parties could test that by end-of-Monday that
+> would be nice (since rc2 is scheduled for Tuesday).
+> 
+> >  dtc                  |  2 +-
+> >  target-arm/kvm.c     |  6 +++++-
+> >  target-arm/kvm32.c   | 30 +++++++++++++++++++++++++++++-
+> >  target-arm/kvm64.c   | 30 +++++++++++++++++++++++++++++-
+> >  target-arm/kvm_arm.h | 12 +++++++++++-
+> >  target-arm/machine.c |  2 +-
+> >  6 files changed, 76 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/dtc b/dtc
+> > index 65cc4d2..bc895d6 160000
+> > --- a/dtc
+> > +++ b/dtc
+> > @@ -1 +1 @@
+> > -Subproject commit 65cc4d2748a2c2e6f27f1cf39e07a5dbabd80ebf
+> > +Subproject commit bc895d6d09695d05ceb8b52486ffe861d6cfbdde
+> 
+> Stray submodule change :-)
 > 
 
-Thanks,
+Damn, keeps happening to me.  ok, I'll stop using git commit -a for qemu
+changes.
+
+> > diff --git a/target-arm/kvm32.c b/target-arm/kvm32.c
+> > index d7e7d68..6769815 100644
+> > --- a/target-arm/kvm32.c
+> > +++ b/target-arm/kvm32.c
+> > @@ -153,6 +153,34 @@ bool kvm_arm_reg_syncs_via_cpreg_list(uint64_t regidx)
+> >      }
+> >  }
+> >
+> > +typedef struct CPRegStateLevel {
+> > +    uint64_t regidx;
+> > +    int level;
+> > +} CPRegStateLevel;
+> > +
+> > +/* All coprocessor registers not listed in the following table are assumed to
+> > + * be of the level KVM_PUT_RUNTIME_STATE, a register should be written less
+> 
+> ". If a register".
+> 
+> > + * often, you must add it to this table with a state of either
+> > + * KVM_PUT_RESET_STATE or KVM_PUT_FULL_STATE.
+> > + */
+> > +static const CPRegStateLevel non_runtime_cpregs[] = {
+> > +    { KVM_REG_ARM_TIMER_CNT, KVM_PUT_FULL_STATE },
+> > +};
+> 
+> > diff --git a/target-arm/kvm64.c b/target-arm/kvm64.c
+> > index ac34f51..d59f41c 100644
+> > --- a/target-arm/kvm64.c
+> > +++ b/target-arm/kvm64.c
+> > @@ -139,6 +139,34 @@ bool kvm_arm_reg_syncs_via_cpreg_list(uint64_t regidx)
+> >      }
+> >  }
+> >
+> > +typedef struct CPRegStateLevel {
+> > +    uint64_t regidx;
+> > +    int level;
+> > +} CPRegStateLevel;
+> > +
+> > +/* All system not listed in the following table are assumed to be of the level
+> 
+> "system registers"
+> 
+> > + * KVM_PUT_RUNTIME_STATE, a register should be written less often, you must
+> 
+> ". If a register"
+> 
+> > + * add it to this table with a state of either KVM_PUT_RESET_STATE or
+> > + * KVM_PUT_FULL_STATE.
+> > + */
+> > +static const CPRegStateLevel non_runtime_cpregs[] = {
+> > +    { KVM_REG_ARM_TIMER_CNT, KVM_PUT_FULL_STATE },
+> > +};
+> 
+> > --- a/target-arm/kvm_arm.h
+> > +++ b/target-arm/kvm_arm.h
+> 
+> > @@ -83,7 +93,7 @@ bool kvm_arm_reg_syncs_via_cpreg_list(uint64_t regidx);
+> >  * Note that we do not stop early on failure -- we will attempt
+> >   * writing all registers in the list.
+> >  */
+> > -bool write_list_to_kvmstate(ARMCPU *cpu);
+> > +bool write_list_to_kvmstate(ARMCPU *cpu, int level);
+> 
+> You forgot to update the stub function in target-arm/kvm-stub.c,
+> so this breaks compilation on non-ARM hosts.
+> 
+whoops, who cares about non-ARM hosts anyway.
+
+Thanks for fixing these up, the fixed up version looks good.
 -Christoffer
