@@ -1,71 +1,39 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 04/12] Makefile: remove unneeded -s switch on compiling BIOS
- files
-Date: Fri, 17 Jul 2015 17:02:10 +0100
-Message-ID: <1437148938-5394-5-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH 11/12] avoid using predefined PAGE_SIZE
+Date: Fri, 17 Jul 2015 17:02:17 +0100
+Message-ID: <1437148938-5394-12-git-send-email-andre.przywara@arm.com>
 References: <1437148938-5394-1-git-send-email-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DDAD58CDE
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2015 11:50:24 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id h+XYGEyaraBj for <kvmarm@lists.cs.columbia.edu>;
- Fri, 17 Jul 2015 11:50:23 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7802058CDF
- for <kvmarm@lists.cs.columbia.edu>; Fri, 17 Jul 2015 11:50:23 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1437148938-5394-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: will.deacon@arm.com, kvm@vger.kernel.org
 Cc: Szabolcs.Nagy@arm.com, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Stripping has no effect on object files, so having "-s -c" on the
-command line makes no sense.
-In fact clang complains about it and aborts with an error, so lets
-just remove the unneeded "-s" switch here.
+The musl-libc comes with a predefined PAGE_SIZE macro, which may be
+wrong on systems which support multiple smallest page sizes.
+Make sure we use our own (runtime evaluated) definition of PAGE_SIZE.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- Makefile | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ include/kvm/kvm.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index 151fa9d..46e4a9d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -421,15 +421,15 @@ x86/bios.o: x86/bios/bios.bin x86/bios/bios-rom.h
+diff --git a/include/kvm/kvm.h b/include/kvm/kvm.h
+index 9818046..8b12cd6 100644
+--- a/include/kvm/kvm.h
++++ b/include/kvm/kvm.h
+@@ -19,6 +19,10 @@
+ #define HOME_DIR		getenv("HOME")
+ #define KVM_BINARY_NAME		"lkvm"
  
- x86/bios/bios.bin.elf: x86/bios/entry.S x86/bios/e820.c x86/bios/int10.c x86/bios/int15.c x86/bios/rom.ld.S
- 	$(E) "  CC       x86/bios/memcpy.o"
--	$(Q) $(CC) -include code16gcc.h $(CFLAGS) $(BIOS_CFLAGS) -c -s x86/bios/memcpy.c -o x86/bios/memcpy.o
-+	$(Q) $(CC) -include code16gcc.h $(CFLAGS) $(BIOS_CFLAGS) -c x86/bios/memcpy.c -o x86/bios/memcpy.o
- 	$(E) "  CC       x86/bios/e820.o"
--	$(Q) $(CC) -include code16gcc.h $(CFLAGS) $(BIOS_CFLAGS) -c -s x86/bios/e820.c -o x86/bios/e820.o
-+	$(Q) $(CC) -include code16gcc.h $(CFLAGS) $(BIOS_CFLAGS) -c x86/bios/e820.c -o x86/bios/e820.o
- 	$(E) "  CC       x86/bios/int10.o"
--	$(Q) $(CC) -include code16gcc.h $(CFLAGS) $(BIOS_CFLAGS) -c -s x86/bios/int10.c -o x86/bios/int10.o
-+	$(Q) $(CC) -include code16gcc.h $(CFLAGS) $(BIOS_CFLAGS) -c x86/bios/int10.c -o x86/bios/int10.o
- 	$(E) "  CC       x86/bios/int15.o"
--	$(Q) $(CC) -include code16gcc.h $(CFLAGS) $(BIOS_CFLAGS) -c -s x86/bios/int15.c -o x86/bios/int15.o
-+	$(Q) $(CC) -include code16gcc.h $(CFLAGS) $(BIOS_CFLAGS) -c x86/bios/int15.c -o x86/bios/int15.o
- 	$(E) "  CC       x86/bios/entry.o"
--	$(Q) $(CC) $(CFLAGS) $(BIOS_CFLAGS) -c -s x86/bios/entry.S -o x86/bios/entry.o
-+	$(Q) $(CC) $(CFLAGS) $(BIOS_CFLAGS) -c x86/bios/entry.S -o x86/bios/entry.o
- 	$(E) "  LD      " $@
- 	$(Q) $(LD) -T x86/bios/rom.ld.S -o x86/bios/bios.bin.elf x86/bios/memcpy.o x86/bios/entry.o x86/bios/e820.o x86/bios/int10.o x86/bios/int15.o
++/* Let's determine the actual page size at runtime. */
++#ifdef PAGE_SIZE
++#undef PAGE_SIZE
++#endif
+ #define PAGE_SIZE (sysconf(_SC_PAGE_SIZE))
  
+ #define DEFINE_KVM_EXT(ext)		\
 -- 
 2.3.5
+
