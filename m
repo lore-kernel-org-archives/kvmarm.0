@@ -1,200 +1,144 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 17/18] KVM: ARM64: Add PMU overflow interrupt routing
-Date: Fri, 17 Jul 2015 17:28:42 +0200
-Message-ID: <20150717152842.GB14024@cbox>
+Subject: Re: [PATCH 18/18] KVM: ARM64: Add KVM_CAP_ARM_PMU and
+ KVM_ARM_PMU_SET_IRQ
+Date: Fri, 17 Jul 2015 17:32:13 +0200
+Message-ID: <20150717153213.GC14024@cbox>
 References: <1436149068-3784-1-git-send-email-shannon.zhao@linaro.org>
- <1436149068-3784-18-git-send-email-shannon.zhao@linaro.org>
+ <1436149068-3784-19-git-send-email-shannon.zhao@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1436149068-3784-18-git-send-email-shannon.zhao@linaro.org>
+In-Reply-To: <1436149068-3784-19-git-send-email-shannon.zhao@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: shannon.zhao@linaro.org
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, marc.zyngier@arm.com, alex.bennee@linaro.org, zhaoshenglong@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jul 06, 2015 at 10:17:47AM +0800, shannon.zhao@linaro.org wrote:
+On Mon, Jul 06, 2015 at 10:17:48AM +0800, shannon.zhao@linaro.org wrote:
 > From: Shannon Zhao <shannon.zhao@linaro.org>
 > 
-> When calling perf_event_create_kernel_counter to create perf_event,
-> assign a overflow handler. Then when perf event overflows, if vcpu
-> doesn't run, call irq_work_queue to wake up vcpu. Otherwise call
-> kvm_vgic_inject_irq to inject the interrupt.
+> Add KVM_CAP_ARM_PMU for userspace to check whether KVM supports PMU. Add
+> KVM_ARM_PMU_SET_IRQ for userspace to set PMU IRQ number.
 > 
 > Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 > ---
->  arch/arm/kvm/arm.c    |  2 ++
->  include/kvm/arm_pmu.h |  2 ++
->  virt/kvm/arm/pmu.c    | 53 ++++++++++++++++++++++++++++++++++++++++++++++++++-
->  3 files changed, 56 insertions(+), 1 deletion(-)
+>  arch/arm/kvm/arm.c       | 8 ++++++++
+>  include/kvm/arm_pmu.h    | 5 +++++
+>  include/uapi/linux/kvm.h | 4 ++++
+>  virt/kvm/arm/pmu.c       | 9 +++++++++
+>  4 files changed, 26 insertions(+)
 > 
 > diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index 4e82625..41eb063 100644
+> index 41eb063..350866e 100644
 > --- a/arch/arm/kvm/arm.c
 > +++ b/arch/arm/kvm/arm.c
-> @@ -551,6 +551,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  			preempt_enable();
->  			kvm_timer_sync_hwstate(vcpu);
->  			kvm_vgic_sync_hwstate(vcpu);
-> +			kvm_pmu_sync_hwstate(vcpu);
->  			continue;
->  		}
->  
-> @@ -595,6 +596,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  
->  		kvm_timer_sync_hwstate(vcpu);
->  		kvm_vgic_sync_hwstate(vcpu);
-> +		kvm_pmu_sync_hwstate(vcpu);
->  
->  		ret = handle_exit(vcpu, run, ret);
+> @@ -182,6 +182,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_ARM_PSCI_0_2:
+>  	case KVM_CAP_READONLY_MEM:
+>  	case KVM_CAP_MP_STATE:
+> +	case KVM_CAP_ARM_PMU:
+>  		r = 1;
+>  		break;
+>  	case KVM_CAP_COALESCED_MMIO:
+> @@ -816,6 +817,13 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  			return -E2BIG;
+>  		return kvm_arm_copy_reg_indices(vcpu, user_list->reg);
+>  	}
+> +	case KVM_ARM_PMU_SET_IRQ: {
+> +		uint32_t irq;
+> +
+> +		if (copy_from_user(&irq, argp, sizeof(irq)))
+> +			return -EFAULT;
+> +		return kvm_pmu_set_irq_num(vcpu, irq);
+> +	}
+>  	default:
+>  		return -EINVAL;
 >  	}
 > diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 6985809..5bcf27b 100644
+> index 5bcf27b..1a93f53 100644
 > --- a/include/kvm/arm_pmu.h
 > +++ b/include/kvm/arm_pmu.h
-> @@ -45,6 +45,7 @@ struct kvm_pmu {
->  };
->  
->  #ifdef CONFIG_KVM_ARM_PMU
-> +void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu);
->  void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
->  void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, unsigned long select_idx,
->  			       unsigned long val);
-> @@ -59,6 +60,7 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
+> @@ -58,6 +58,7 @@ void kvm_pmu_enable_interrupt(struct kvm_vcpu *vcpu, unsigned long val);
+>  void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, unsigned long val);
+>  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
 >  				    unsigned long select_idx);
+> +int kvm_pmu_set_irq_num(struct kvm_vcpu *vcpu, u32 irq);
 >  void kvm_pmu_init(struct kvm_vcpu *vcpu);
 >  #else
-> +void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu) {}
->  static inline void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
->  void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, unsigned long select_idx,
->  			       unsigned long val) {}
+>  void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu) {}
+> @@ -76,6 +77,10 @@ void kvm_pmu_enable_interrupt(struct kvm_vcpu *vcpu, unsigned long val) {}
+>  void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, unsigned long val) {}
+>  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
+>  				    unsigned long select_idx) {}
+> +int kvm_pmu_set_irq_num(struct kvm_vcpu *vcpu, u32 irq)
+> +{
+> +	return -ENXIO;
+> +}
+>  static inline void kvm_pmu_init(struct kvm_vcpu *vcpu) {}
+>  #endif
+>  
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 716ad4a..90f5e73 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -817,6 +817,7 @@ struct kvm_ppc_smmu_info {
+>  #define KVM_CAP_DISABLE_QUIRKS 116
+>  #define KVM_CAP_X86_SMM 117
+>  #define KVM_CAP_MULTI_ADDRESS_SPACE 118
+> +#define KVM_CAP_ARM_PMU 119
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> @@ -1205,6 +1206,9 @@ struct kvm_s390_ucas_mapping {
+>  /* Available with KVM_CAP_X86_SMM */
+>  #define KVM_SMI                   _IO(KVMIO,   0xb7)
+>  
+> +/* Available with KVM_CAP_ARM_PMU */
+> +#define KVM_ARM_PMU_SET_IRQ	  _IOW(KVMIO, 0xb8, __u32)
+> +
+
+does this really warrant a completely new ioctl?  Perhaps a new kvm
+device that you create with a PMU would be better, in that way you could
+choose whether you want the PMU for the guest or not.
+
+Alternatively, we have some room to spare in the features array of
+KVM_ARM_VCPU_INIT.
+
+Alternatively to the alternative, does the IRQ number appear in any
+register somewhere?  If so, we could use the ONE_REG interface to set
+the irq number.
+
+In any case, the new ABI should be documented in
+Documentation/virtual/kvm/api.txt.
+
+
+>  #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+>  #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+>  #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
 > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> index e655426..f957b85 100644
+> index f957b85..57585e1 100644
 > --- a/virt/kvm/arm/pmu.c
 > +++ b/virt/kvm/arm/pmu.c
-> @@ -20,6 +20,7 @@
->  #include <linux/kvm_host.h>
->  #include <linux/perf_event.h>
->  #include <kvm/arm_pmu.h>
-> +#include <kvm/arm_vgic.h>
->  
->  /* PMU HW events mapping. */
->  static struct kvm_pmu_hw_event_map {
-> @@ -81,6 +82,23 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu,
+> @@ -381,6 +381,15 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
+>  	pmc->perf_event = event;
 >  }
 >  
->  /**
-> + * kvm_pmu_sync_hwstate - sync pmu state for cpu
-> + * @vcpu: The vcpu pointer
-> + *
-> + * Inject virtual PMU IRQ if IRQ is pending for this cpu.
-> + */
-> +void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
+> +int kvm_pmu_set_irq_num(struct kvm_vcpu *vcpu, u32 irq)
 > +{
 > +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
 > +
-> +	if (pmu->irq_pending) {
-> +		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, 1);
+> +	kvm_info("kvm_arm_set_pmu_irq: irq: %u\n", irq);
 
-don't you need to check if irq_num is set all these places where you use
-it, somehow?
+kvm_debug instead?
 
-> +		pmu->irq_pending = 0;
-> +		return;
-> +	}
-> +}
-
-I'm not sure I understand why this function is needed at this point in
-the first place.  Why don't we just inject the interrupt when the
-overflow happens?
-
-I'm also not completely clear on the relationship between when the
-physical counter overflows and when the virtual one does - do we always
-keep that in sync somehow?  (this may relate to one of my questions
-in one of the previous patches).
-
-
-> +
-> +/**
->   * kvm_pmu_vcpu_reset - reset pmu state for cpu
->   * @vcpu: The vcpu pointer
->   *
-> @@ -96,6 +114,37 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
->  	pmu->irq_pending = false;
->  }
->  
-> +static void kvm_pum_trigger_pmi(struct irq_work *irq_work)
-> +{
-> +	struct kvm_pmu *pmu = container_of(irq_work, struct kvm_pmu, irq_work);
-> +	struct kvm_vcpu *vcpu = container_of(pmu, struct kvm_vcpu, arch.pmu);
-> +
-> +	kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, 1);
-> +}
-> +
-> +/**
-> + * When perf event overflows, if vcpu doesn't run, call irq_work_queue to wake
-> + * up vcpu. Otherwise call kvm_vgic_inject_irq to inject the interrupt.
-> + */
-> +static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
-> +				  struct perf_sample_data *data,
-> +				  struct pt_regs *regs)
-> +{
-> +	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
-> +	struct kvm_vcpu *vcpu = pmc->vcpu;
-> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +
-> +	if (pmc->interrupt == true) {
-> +		__set_bit(pmc->idx, (unsigned long *)&pmu->overflow_status);
-
-why not declare overflow_status as an unsigned long instead?
-
-> +		pmu->irq_pending = 1;
-> +		if (vcpu->mode != IN_GUEST_MODE)
-> +			irq_work_queue(&pmu->irq_work);
-
-why do you need to do this only when the vcpu is in guest mode?
-
-also, aren't all the counters per-cpu, so how can the cpu ever be in
-guest mode while this is happening?
-
-> +		else
-> +			kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-> +					    pmu->irq_num, 1);
-
-what context is this overflow handler function?  kvm_vgic_inject_irq
-grabs a mutex, so it can sleep...
-
-from a quick glance at the perf core code, it looks like this is in
-interrupt context, so that call to kvm_vgic_inject_irq looks bad.
-
-
-> +	}
+> +	pmu->irq_num = irq;
+> +	return 0;
 > +}
 > +
 >  /**
->   * kvm_pmu_set_counter_value - set PMU counter value
+>   * kvm_pmu_init - Initialize global PMU state for per vcpu
 >   * @vcpu: The vcpu pointer
-> @@ -322,7 +371,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
->  	attr.config = config;
->  	attr.sample_period = (-pmc->counter) & (((u64)1 << 32) - 1);
->  
-> -	event = perf_event_create_kernel_counter(&attr, -1, current, NULL, pmc);
-> +	event = perf_event_create_kernel_counter(&attr, -1, current,
-> +						 kvm_pmu_perf_overflow, pmc);
-
-do we properly tear this down when the vcpu dies so that we never start
-dereferencing the vcpu in kvm_pmu_perf_overflow if the vcpu goes away?
-
->  	if (IS_ERR(event)) {
->  		kvm_err("kvm: pmu event creation failed %ld\n",
->  			  PTR_ERR(event));
-> @@ -351,4 +401,5 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
->  	}
->  
->  	pmu->irq_num = -1;
-> +	init_irq_work(&pmu->irq_work, kvm_pum_trigger_pmi);
->  }
 > -- 
 > 2.1.0
 > 
