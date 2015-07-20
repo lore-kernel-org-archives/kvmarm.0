@@ -1,7 +1,7 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 14/14] extend GSI IRQ routing to take a device ID
-Date: Mon, 20 Jul 2015 14:02:16 +0100
-Message-ID: <1437397336-21385-15-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH 12/14] arm: setup SPI IRQ routing tables
+Date: Mon, 20 Jul 2015 14:02:14 +0100
+Message-ID: <1437397336-21385-13-git-send-email-andre.przywara@arm.com>
 References: <1437397336-21385-1-git-send-email-andre.przywara@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1437397336-21385-1-git-send-email-andre.przywara@arm.com>
@@ -10,123 +10,76 @@ To: will.deacon@arm.com, marc.zyngier@arm.com
 Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger@linaro.org, Pavel Fedin <p.fedin@samsung.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-For ITS emulation we need the device ID along with the MSI payload
-and doorbell address to identify an MSI, so we need to put it in the
-GSI IRQ routing table too.
-There is a per-VM capability by which the kernel signals the need for
-a device ID, so check this and put the device ID into the routing
-table if needed.
-For PCI devices we take the bus/device/function triplet and and that
-to the routing setup call.
+Since we soon start using GSI routing on ARM platforms too, we have
+to setup the initial SPI routing table. Before the first call to
+KVM_SET_GSI_ROUTING, the kernel holds this table internally, but this
+is overwritten with the ioctl, so we have to explicitly set it up
+here.
+The routing is actually not used for IRQs triggered by KVM_IRQ_LINE,
+but it needs to be here anyway. We use a simple 1:1 mapping.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- hw/pci-shmem.c    |  3 ++-
- include/kvm/irq.h |  2 +-
- irq.c             | 24 ++++++++++++++++++++++--
- virtio/pci.c      |  6 ++++--
- 4 files changed, 29 insertions(+), 6 deletions(-)
+ arm/gic.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-diff --git a/hw/pci-shmem.c b/hw/pci-shmem.c
-index 7ce98cb..512b5b0 100644
---- a/hw/pci-shmem.c
-+++ b/hw/pci-shmem.c
-@@ -135,7 +135,8 @@ int pci_shmem__get_local_irqfd(struct kvm *kvm)
- 			return fd;
- 
- 		if (pci_shmem_pci_device.msix.ctrl & cpu_to_le16(PCI_MSIX_FLAGS_ENABLE)) {
--			gsi = irq__add_msix_route(kvm, &msix_table[0].msg);
-+			gsi = irq__add_msix_route(kvm, &msix_table[0].msg,
-+						  pci_shmem_device.dev_num << 3);
- 			if (gsi < 0)
- 				return gsi;
- 		} else {
-diff --git a/include/kvm/irq.h b/include/kvm/irq.h
-index f35eb7e..ee059e3 100644
---- a/include/kvm/irq.h
-+++ b/include/kvm/irq.h
-@@ -20,7 +20,7 @@ int irq__init(struct kvm *kvm);
- int irq__exit(struct kvm *kvm);
- 
- int irq__allocate_routing_entry(void);
--int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg);
-+int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg, u32 device_id);
- void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg);
- 
+diff --git a/arm/gic.c b/arm/gic.c
+index 187fe46..ba1ce50 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -23,6 +23,8 @@
+ #define KVM_VGIC_V3_ADDR_TYPE_ITS 4
  #endif
-diff --git a/irq.c b/irq.c
-index 25ac8d7..ea365de 100644
---- a/irq.c
-+++ b/irq.c
-@@ -62,7 +62,21 @@ static bool check_for_irq_routing(struct kvm *kvm)
- 	return has_irq_routing > 0;
+ 
++#define IRQCHIP_GIC 0
++
+ static int gic_fd = -1;
+ static u64 gic_redists_base;
+ static u64 gic_redists_size;
+@@ -45,6 +47,34 @@ int irqchip_parser(const struct option *opt, const char *arg, int unset)
+ 	return 0;
  }
  
--int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
-+static bool check_for_msi_devid(struct kvm *kvm)
++static int irq__routing_init(struct kvm *kvm)
 +{
-+	static int needs_devid = 0;
++	int r;
++	int irqlines = ALIGN(irq__get_nr_allocated_lines(), 32);
 +
-+	if (needs_devid == 0) {
-+		if (kvm__supports_vm_extension(kvm, KVM_CAP_MSI_DEVID))
-+			needs_devid = 1;
-+		else
-+			needs_devid = -1;
++	/*
++	 * This describes the default routing that the kernel uses without
++	 * any routing explicitly set up via KVM_SET_GSI_ROUTING. So we
++	 * don't need to commit these setting right now. The first actual
++	 * user (MSI routing) will engage these mappings then.
++	 */
++	for (next_gsi = 0; next_gsi < irqlines; next_gsi++) {
++		r = irq__allocate_routing_entry();
++		if (r)
++			return r;
++
++		irq_routing->entries[irq_routing->nr++] =
++			(struct kvm_irq_routing_entry) {
++				.gsi = next_gsi,
++				.type = KVM_IRQ_ROUTING_IRQCHIP,
++				.u.irqchip.irqchip = IRQCHIP_GIC,
++				.u.irqchip.pin = next_gsi,
++		};
 +	}
 +
-+	return needs_devid > 0;
++	return 0;
 +}
 +
-+int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg, u32 device_id)
+ static int gic__create_msi_frame(struct kvm *kvm, enum irqchip_type type,
+ 				 u64 msi_frame_addr)
  {
- 	int r;
+@@ -226,6 +256,8 @@ static int gic__init_gic(struct kvm *kvm)
+ 			return ret;
+ 	}
  
-@@ -73,7 +87,7 @@ int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
- 	if (r)
- 		return r;
- 
--	irq_routing->entries[irq_routing->nr++] =
-+	irq_routing->entries[irq_routing->nr] =
- 		(struct kvm_irq_routing_entry) {
- 			.gsi = next_gsi,
- 			.type = KVM_IRQ_ROUTING_MSI,
-@@ -82,6 +96,12 @@ int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
- 			.u.msi.data = msg->data,
- 		};
- 
-+	if (check_for_msi_devid(kvm)) {
-+		irq_routing->entries[irq_routing->nr].flags = KVM_MSI_VALID_DEVID;
-+		irq_routing->entries[irq_routing->nr].u.msi.devid = device_id;
-+	}
-+	irq_routing->nr++;
++	irq__routing_init(kvm);
 +
- 	r = ioctl(kvm->vm_fd, KVM_SET_GSI_ROUTING, irq_routing);
- 	if (r)
- 		return r;
-diff --git a/virtio/pci.c b/virtio/pci.c
-index e92a2df..f12773f 100644
---- a/virtio/pci.c
-+++ b/virtio/pci.c
-@@ -191,7 +191,8 @@ static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *v
- 				break;
- 
- 			gsi = irq__add_msix_route(kvm,
--						  &vpci->msix_table[vec].msg);
-+						  &vpci->msix_table[vec].msg,
-+						  vpci->dev_hdr.dev_num << 3);
- 			if (gsi >= 0)
- 				vpci->config_gsi = gsi;
- 			break;
-@@ -203,7 +204,8 @@ static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *v
- 				break;
- 
- 			gsi = irq__add_msix_route(kvm,
--						  &vpci->msix_table[vec].msg);
-+						  &vpci->msix_table[vec].msg,
-+						  vpci->dev_hdr.dev_num << 3);
- 			if (gsi < 0)
- 				break;
- 			vpci->gsis[vpci->queue_selector] = gsi;
+ 	if (!ioctl(gic_fd, KVM_HAS_DEVICE_ATTR, &vgic_init_attr)) {
+ 		ret = ioctl(gic_fd, KVM_SET_DEVICE_ATTR, &vgic_init_attr);
+ 		if (ret)
 -- 
 2.3.5
 
