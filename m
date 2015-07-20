@@ -1,87 +1,448 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 0/3] KVM: arm/arm64: Allow to use KVM without in-kernel
- irqchip
-Date: Mon, 20 Jul 2015 09:08:19 +0100
-Message-ID: <55ACAC73.9090500@arm.com>
-References: <cover.1436874248.git.p.fedin@samsung.com> <55A93488.9060408@arm.com> <00df01d0c22b$fcaef0d0$f60cd270$@samsung.com>
+From: Varun Sethi <Varun.Sethi@freescale.com>
+Subject: high interrupt latency in guest VM with VFIO PCI  (using legacy
+ interrupts)
+Date: Mon, 20 Jul 2015 11:46:41 +0000
+Message-ID: <BN1PR0301MB06277E9344EE21ACCA70C2B9EA850@BN1PR0301MB0627.namprd03.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <00df01d0c22b$fcaef0d0$f60cd270$@samsung.com>
-Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: 'Christoffer Dall' <christoffer.dall@linaro.org>, 'Eric Auger' <eric.auger@linaro.org>
+Content-Type: multipart/mixed; boundary="===============7287381350740256962=="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CF30658E5A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jul 2015 07:34:38 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id bW7cvWgYfOkU for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 20 Jul 2015 07:34:37 -0400 (EDT)
+Received: from na01-bl2-obe.outbound.protection.outlook.com
+ (mail-bl2on0127.outbound.protection.outlook.com [65.55.169.127])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AEDCE58E57
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 20 Jul 2015 07:34:37 -0400 (EDT)
+Content-Language: en-US
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 19/07/15 15:05, Pavel Fedin wrote:
->  Hello!
-> 
->> Believe it or not, we're not only patch reviewing machines, and if you
->> count the number of pending patches, you'll quickly notice that yours
->> are basically noise in the grand scheme of things.
->>
->> So please cut us some slack.
-> 
-> What do you mean exactly? Stop discussions and just do everything you
-> suggest before respin? Plz don't attempt to read this between lines,
-> i can be bad at communication; this is not a complain and/or hurt
-> indication, i am just asking. :)
+--===============7287381350740256962==
+Content-Language: en-US
+Content-Type: multipart/alternative;
+	boundary="_000_BN1PR0301MB06277E9344EE21ACCA70C2B9EA850BN1PR0301MB0627_"
 
-It means that a pause in the discussion for a week (or even more) is not
-uncommon at all. It just means that the other party is busy with things
-of higher priority. In all cases, a gentle "ping" will be better
-received than this "you've stopped replying so I'm going to repost until
-you stop ignoring me" kind of behaviour. It is unnecessary, irritating,
-and overall counter-productive.
+--_000_BN1PR0301MB06277E9344EE21ACCA70C2B9EA850BN1PR0301MB0627_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
->>> complete implementation of API which allows to emulate GIC in userspace by
->>> qemu, and now i can run any virtual machine, including generic timer, on
->>> vGIC-less machine. RasPI-2 is expected to benefit too.
->>
->> Do you mean feeding interrupts back to userspace?
-> 
->  Yes, exactly. I have a working proof-of-concept here.
-> 
->> How is that going to
->> work with the active-timer series that really mandates a full blown GIC?
->> Your pet platform might cope with it, but I can't see that happening on
->> the RPi.
-> 
-> I don't know, sorry, things are happening too fast and i can't follow
-> everything.
+Hi Marc,
+I am currently validating VFIO PCI device assignment (using legacy interrup=
+ts) on Freescale LS2085 SOC(ARM64, GICv3). This is being done on kernel-4.0=
+. I have also pulled irqfd patches submitted by Eric.
 
-It uses the host GIC to perform a context switch of the ACTIVE state of
-the timer interrupt instead of the ugly hack we have. Without a GIC, the
-is no context switching, and the timer is useless.
+I am using e1000 nic for my testing. During my testing I am observing a hug=
+e interrupt latency. I took a kernel trace and observed the following.
 
-> Well, actually it is possible to work without virtual timer at all.
-> Yes, this means qemu has to implement some memory-mapped timer. With
-> HW models like vexpress this is already done and works fine. I even
-> tried to address this:
-> https://lists.gnu.org/archive/html/qemu-devel/2015-06/msg06627.html,
-> but Peter suggested to complete an API instead.
-> I have done this as a proof-of-concept and case study for my project,
-> so i want to upstream this in order not to be lost.
 
-I don't care much for such an API, mostly because it will obviously
-bitrot very quickly (your "broken VGIC" platform is hopefully a one off
-that won't be repeated again, and the RPi is out of scope anyway).
+      |  vfio_intx_handler() {
 
-It would have to be extremely non-intrusive and completely safe for this
-to be taken in...
+ 0)   2.120 us    |    vfio_send_intx_eventfd();
 
-> After all, recent specs say that generic timer can also be
-> memory-mapped. So, making KVM working without both vGIC and vTimer is
-> not a real problem. This patchset addresses this scenario too, just 
-> needs some extra bits on vtimer side (ability to init KVM without
-> it).
+ 0) + 15.640 us   |  }
 
-Different generic timer. That's the memory-mapped one, which is not
-per-CPU. Per-CPU timer is what we care about.
+ ------------------------------------------
 
-Thanks,
+ 0)    <idle>-0    =3D>  kworker-374
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+ ------------------------------------------
+
+
+
+ 0)               |  kvm_set_irq() {
+
+ 0)               |    kvm_vgic_inject_irq() {
+
+ 0)   0.120 us    |      vgic_bitmap_get_irq_val();
+
+ 0)   0.120 us    |      vgic_bitmap_get_irq_val();
+
+ 0)   0.120 us    |      vgic_bitmap_get_irq_val();
+
+ 0)   0.160 us    |      vgic_bitmap_set_irq_val();
+
+ 0)   0.240 us    |      vgic_bitmap_set_irq_val();
+
+ 0)   0.120 us    |      vgic_bitmap_get_irq_val();
+
+ 0)               |      vgic_can_sample_irq() {
+
+ 0)   0.120 us    |        vgic_bitmap_get_irq_val();
+
+ 0)   0.120 us    |        vgic_bitmap_get_irq_val();
+
+ 0)   2.480 us    |      }
+
+ 0)   0.280 us    |      vgic_cpu_irq_set();
+
+ 0)               |      kvm_vcpu_kick() {
+
+ ------------------------------------------
+
+ 0)  kworker-374   =3D>  qemu-sy-1575
+
+ ------------------------------------------
+
+
+
+ 0)               |          kvm_sched_in() {
+
+ 0)               |            kvm_arch_vcpu_load() {
+
+ 0)   0.160 us    |              kvm_arm_set_running_vcpu();
+
+ 0)   1.480 us    |            }
+
+ 0)   2.800 us    |          }
+
+ 0)               |          kvm_vcpu_check_block() {
+
+ 0)               |            kvm_arch_vcpu_runnable() {
+
+ 0)   0.120 us    |              kvm_vgic_vcpu_pending_irq();
+
+0)   1.280 us    |            }
+
+ 0)   2.480 us    |          }
+
+ 0) # 760113.4 us |        } /* kvm_vcpu_block */
+
+ 0) # 760114.8 us |      } /* kvm_handle_wfx */
+
+It seems that interrupts are disabled for a  significant amount of time.
+
+Regards
+Varun
+
+
+--_000_BN1PR0301MB06277E9344EE21ACCA70C2B9EA850BN1PR0301MB0627_
+Content-Type: text/html; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:dt=3D"uuid:C2F41010-65B3-11d1-A29F-00AA00C14882" xmlns:m=3D"http://sc=
+hemas.microsoft.com/office/2004/12/omml" xmlns=3D"http://www.w3.org/TR/REC-=
+html40">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
+>
+<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
+<style><!--
+/* Font Definitions */
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:#0563C1;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{mso-style-priority:99;
+	color:#954F72;
+	text-decoration:underline;}
+p
+	{mso-style-priority:99;
+	mso-margin-top-alt:auto;
+	margin-right:0in;
+	mso-margin-bottom-alt:auto;
+	margin-left:0in;
+	font-size:12.0pt;
+	font-family:"Times New Roman",serif;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:"Calibri",sans-serif;
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-family:"Calibri",sans-serif;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+--></style><!--[if gte mso 9]><xml>
+<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+<o:shapelayout v:ext=3D"edit">
+<o:idmap v:ext=3D"edit" data=3D"1" />
+</o:shapelayout></xml><![endif]-->
+</head>
+<body lang=3D"EN-US" link=3D"#0563C1" vlink=3D"#954F72">
+<div class=3D"WordSection1">
+<p class=3D"MsoNormal">Hi Marc,<o:p></o:p></p>
+<p class=3D"MsoNormal">I am currently validating VFIO PCI device assignment=
+ (using legacy interrupts) on Freescale LS2085 SOC(ARM64, GICv3). This is b=
+eing done on kernel-4.0. I have also pulled irqfd patches submitted by Eric=
+.<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">I am using e1000 nic for my testing. During my testi=
+ng I am observing a huge interrupt latency. I took a kernel trace and obser=
+ved the following.<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp; |&nbsp; vfio_intx_handler() {&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp; 2.120 us&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; vfio_send_intx_eventfd(=
+);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0) &#43; 1=
+5.640 us&nbsp;&nbsp; |&nbsp; }&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;----------=
+--------------------------------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp;&nbsp; &lt;idle&gt;-0&nbsp;&nbsp;&nbsp; =3D&gt;&nbsp; kworker-374&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp=
+;<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;----------=
+--------------------------------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+; |&nbsp; kvm_set_irq() {&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+; |&nbsp;&nbsp;&nbsp; kvm_vgic_inject_irq() {&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp; 0.120 us&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; vgic_bitmap=
+_get_irq_val();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp; 0.120 us&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; vgic_bitmap=
+_get_irq_val();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp; 0.120 us&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; vgic_bitmap=
+_get_irq_val();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp; 0.160 us&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; vgic_bitmap=
+_set_irq_val();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp; 0.240 us&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; vgic_bitmap=
+_set_irq_val();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp; 0.120 us&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; vgic_bitmap=
+_get_irq_val();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; vgic_can_sample_irq() {&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp; 0.120 us&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+ vgic_bitmap_get_irq_val();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp; 0.120 us&nbsp; &nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+ vgic_bitmap_get_irq_val();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp; 2.480 us&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp; 0.280 us&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; vgic_cpu_ir=
+q_set();&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; kvm_vcpu_kick() {&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;----------=
+--------------------------------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp; k=
+worker-374&nbsp;&nbsp; =3D&gt;&nbsp; qemu-sy-1575&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;----------=
+--------------------------------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; kvm_sched_in() {&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; kvm_a=
+rch_vcpu_load() {&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp; 0.160 us&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; kvm_arm_set_running_vcpu();
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp; 1.480 us&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp; }&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp; 2.800 us&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp; }&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; kvm_vcpu_check_bl=
+ock() {&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; kvm_a=
+rch_vcpu_runnable() {&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp; 0.120 us&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; kvm_vgic_vcpu_pending_irq();<o:p></o:p=
+></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">0)&nbsp;&nbsp; 1=
+.280 us&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp; }&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;0)&nbsp;&n=
+bsp; 2.480 us&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp; }&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;<span styl=
+e=3D"background:yellow;mso-highlight:yellow">0) # 760113.4 us |&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } /* kvm_vcpu_block */&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></span></p>
+<p style=3D"margin:0in;margin-bottom:.0001pt"><span style=3D"font-size:11.0=
+pt;font-family:&quot;Calibri&quot;,sans-serif;color:black;background:yellow=
+;mso-highlight:yellow">&nbsp;0) # 760114.8 us |&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p; } /* kvm_handle_wfx */</span><span style=3D"font-size:11.0pt;font-family=
+:&quot;Calibri&quot;,sans-serif;color:black">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">It seems that interrupts are disabled for a &nbsp;si=
+gnificant amount of time.
+<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+<p class=3D"MsoNormal">Regards<o:p></o:p></p>
+<p class=3D"MsoNormal">Varun<o:p></o:p></p>
+<p class=3D"MsoNormal"><o:p>&nbsp;</o:p></p>
+</div>
+</body>
+</html>
+
+--_000_BN1PR0301MB06277E9344EE21ACCA70C2B9EA850BN1PR0301MB0627_--
+
+--===============7287381350740256962==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============7287381350740256962==--
