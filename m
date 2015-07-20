@@ -1,96 +1,87 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 00/14] kvmtool: add ITS emulation and GSI routing for ARM
-Date: Mon, 20 Jul 2015 14:02:02 +0100
-Message-ID: <1437397336-21385-1-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH 06/14] TEMPORARY: arm: update public headers for GICv3 ITS emulation
+Date: Mon, 20 Jul 2015 14:02:08 +0100
+Message-ID: <1437397336-21385-7-git-send-email-andre.przywara@arm.com>
+References: <1437397336-21385-1-git-send-email-andre.przywara@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1437397336-21385-1-git-send-email-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: will.deacon@arm.com, marc.zyngier@arm.com
 Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, eric.auger@linaro.org, Pavel Fedin <p.fedin@samsung.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+This patch is preliminary and updates the headers from a kernel with
+ITS emulation support. It should be replaced by a proper header
+update once ITS support is upstream.
+Contains a "hack" to support compiling on ARM, too.
 
-this series teaches kvmtool how to support KVM's ITS emulation. Also
-(as this is somewhat related and has been co-developed) it enables GSI
-routing for ARM/ARM64, which allows IRQFDs to be used, for instance
-to use vhost_net. At the moment this is dependent on the guest
-using the ITS emulation, but GICv2M support patches will follow.
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ arm/aarch64/include/asm/kvm.h | 3 +++
+ arm/gic.c                     | 4 ++++
+ include/linux/kvm.h           | 6 +++++-
+ 3 files changed, 12 insertions(+), 1 deletion(-)
 
-The first 4 patches are generic fixes and refactoring to pave the
-road for the rest of the patches. Most importantly the first two pull
-the GSI routing code from x86 into generic code.
-The following 7 patches add ITS emulation support. They reserve and
-register the required ITS register frame and populate a DT node with
-the necessary data. Also the patches add the device ID to the
-KVM_SIGNAL_MSI ioctl.
-For enabling a guest ITS, the new --irqchip= parameter is extended
-to allow "--irqchip=gicv3-its".
-The remaining three patches enable IRQ GSI routing for ARM/ARM64.
-This is needed to use IRQFDs, which is a prerequisite for vhost
-functionality, for instance. The code sets up the (dummy) SPI
-routing table and adds the device ID to the routing entry.
-
-The ITS part relies on my kernel ITS emulation patches [1], the
-IRQ routing part on Eric's respective series[2].
-This code can also be found in my kvmtool git repository [3].
-
-Cheers,
-Andre.
-
-[1] https://lists.cs.columbia.edu/pipermail/kvmarm/2015-July/015687.html
-[2] https://lists.cs.columbia.edu/pipermail/kvmarm/2015-July/015621.html
-[3] git://linux-arm.org/kvmtool.git (branch: its/v2)
-    http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/its/v2
-
-
-Andre Przywara (14):
-  irq: move IRQ routing into irq.c
-  MSI-X: update GSI routing after changed MSI-X configuration
-  virtio: fix endianness check for vhost support
-  FDT: introduce global phandle allocation
-  arm: use new phandle allocation functions
-  TEMPORARY: arm: update public headers for GICv3 ITS emulation
-  arm: allow creation of an MSI register frame region
-  arm: FDT: create MSI controller DT node
-  add kvm__check_vm_capability
-  PCI: inject PCI device ID on MSI injection
-  arm64: enable GICv3-ITS emulation
-  arm: setup SPI IRQ routing tables
-  TEMPORARY: update public headers for kvm_irq_routing_msi extension
-  extend GSI IRQ routing to take a device ID
-
- Makefile                                 |   5 +-
- arm/aarch32/arm-cpu.c                    |   4 +-
- arm/aarch64/arm-cpu.c                    |   5 +-
- arm/aarch64/include/asm/kvm.h            |   3 +
- arm/fdt.c                                |   8 +-
- arm/gic.c                                | 103 +++++++++++++++++++++++-
- arm/include/arm-common/gic.h             |   3 +-
- arm/include/arm-common/kvm-config-arch.h |   2 +-
- arm/include/arm-common/kvm-cpu-arch.h    |   3 +-
- arm/include/arm-common/pci.h             |   2 +-
- arm/irq.c                                |   9 ---
- arm/pci.c                                |  13 ++-
- hw/pci-shmem.c                           |   5 +-
- include/kvm/fdt.h                        |  10 +--
- include/kvm/irq.h                        |   8 +-
- include/kvm/kvm.h                        |   1 +
- include/kvm/virtio.h                     |   9 ++-
- include/linux/kvm.h                      |  11 ++-
- irq.c                                    | 134 +++++++++++++++++++++++++++++++
- kvm-fdt.c                                |  26 ++++++
- kvm.c                                    |  28 +++++++
- mips/irq.c                               |  10 ---
- powerpc/irq.c                            |  31 -------
- virtio/net.c                             |   2 +-
- virtio/pci.c                             |  72 ++++++++++++++---
- x86/irq.c                                |  45 ++---------
- 26 files changed, 419 insertions(+), 133 deletions(-)
- delete mode 100644 arm/irq.c
- create mode 100644 kvm-fdt.c
- delete mode 100644 mips/irq.c
- delete mode 100644 powerpc/irq.c
-
+diff --git a/arm/aarch64/include/asm/kvm.h b/arm/aarch64/include/asm/kvm.h
+index d268320..e42435c 100644
+--- a/arm/aarch64/include/asm/kvm.h
++++ b/arm/aarch64/include/asm/kvm.h
+@@ -82,8 +82,11 @@ struct kvm_regs {
+ #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
+ #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
+ 
++#define KVM_VGIC_V3_ADDR_TYPE_ITS	4
++
+ #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
+ #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
++#define KVM_VGIC_V3_ITS_SIZE		SZ_64K
+ 
+ #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
+ #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
+diff --git a/arm/gic.c b/arm/gic.c
+index 2c1a547..93a8a1d 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -18,6 +18,10 @@
+ #define KVM_VGIC_V3_ADDR_TYPE_REDIST 3
+ #endif
+ 
++#ifndef KVM_VGIC_V3_ADDR_TYPE_ITS
++#define KVM_VGIC_V3_ADDR_TYPE_ITS 4
++#endif
++
+ static int gic_fd = -1;
+ static u64 gic_redists_base;
+ static u64 gic_redists_size;
+diff --git a/include/linux/kvm.h b/include/linux/kvm.h
+index 4b60056..39428d1 100644
+--- a/include/linux/kvm.h
++++ b/include/linux/kvm.h
+@@ -815,6 +815,8 @@ struct kvm_ppc_smmu_info {
+ #define KVM_CAP_S390_IRQ_STATE 114
+ #define KVM_CAP_PPC_HWRNG 115
+ 
++#define KVM_CAP_MSI_DEVID 119
++
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+ struct kvm_irq_routing_irqchip {
+@@ -965,12 +967,14 @@ struct kvm_one_reg {
+ 	__u64 addr;
+ };
+ 
++#define KVM_MSI_VALID_DEVID	(1U << 0)
+ struct kvm_msi {
+ 	__u32 address_lo;
+ 	__u32 address_hi;
+ 	__u32 data;
+ 	__u32 flags;
+-	__u8  pad[16];
++	__u32 devid;
++	__u8  pad[12];
+ };
+ 
+ struct kvm_arm_device_addr {
 -- 
 2.3.5
 
