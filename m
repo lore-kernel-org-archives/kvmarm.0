@@ -1,75 +1,45 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 03/10] KVM: arm/arm64: vgic: Convert struct vgic_lr
- to use bitfields
-Date: Tue, 21 Jul 2015 19:02:25 +0100
-Message-ID: <55AE8931.7020806@arm.com>
-References: <1436378202-20224-1-git-send-email-marc.zyngier@arm.com> <1436378202-20224-4-git-send-email-marc.zyngier@arm.com> <20150717221534.GJ14024@cbox>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH v2 0/3] KVM: arm/arm64: Allow to use KVM without in-kernel
+ irqchip
+Date: Wed, 22 Jul 2015 10:19:26 +0300
+Message-ID: <03d901d0c44e$beadaa90$3c08ffb0$@samsung.com>
+References: <cover.1436874248.git.p.fedin@samsung.com>
+ <55A93488.9060408@arm.com> <00df01d0c22b$fcaef0d0$f60cd270$@samsung.com>
+ <55ACAC73.9090500@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20150717221534.GJ14024@cbox>
+In-reply-to: <55ACAC73.9090500@arm.com>
+Content-language: ru
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, =?windows-1252?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Eric Auger <eric.auger@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
+To: 'Marc Zyngier' <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: 'Christoffer Dall' <christoffer.dall@linaro.org>, 'Eric Auger' <eric.auger@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17/07/15 23:15, Christoffer Dall wrote:
-> On Wed, Jul 08, 2015 at 06:56:35PM +0100, Marc Zyngier wrote:
->> As we're about to cram more information in the vgic_lr structure
->> (HW interrupt number and additional state information), we switch
->> to a layout similar to the HW's:
->>
->> - use bitfields to save space (we don't need more than 10 bits
->>   to represent the irq numbers)
->> - source CPU and HW interrupt can share the same field, as
->>   a SGI doesn't have a physical line.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
->> ---
->>  include/kvm/arm_vgic.h | 10 +++++++---
->>  1 file changed, 7 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->> index 133ea00..4f9fa1d 100644
->> --- a/include/kvm/arm_vgic.h
->> +++ b/include/kvm/arm_vgic.h
->> @@ -95,11 +95,15 @@ enum vgic_type {
->>  #define LR_STATE_ACTIVE		(1 << 1)
->>  #define LR_STATE_MASK		(3 << 0)
->>  #define LR_EOI_INT		(1 << 2)
->> +#define LR_HW			(1 << 3)
->> =20
->>  struct vgic_lr {
->> -	u16	irq;
->> -	u8	source;
->> -	u8	state;
->> +	unsigned irq:10;
->> +	union {
->> +		unsigned hwirq:10;
->> +		unsigned source:8;
->=20
-> why 8?  why not 3?
+ Hello!
 
-Because I can't count :-).
+> It means that a pause in the discussion for a week (or even more) is not
+> uncommon at all. It just means that the other party is busy with things
+> of higher priority. In all cases, a gentle "ping" will be better
+> received than this "you've stopped replying so I'm going to repost until
+> you stop ignoring me" kind of behaviour.
 
->> +	};
->> +	unsigned state:4;
->>  };
->> =20
->>  struct vgic_vmcr {
->> --=20
->> 2.1.4
->>
->=20
-> otherwise:
->=20
-> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
->=20
+ Ok, sorry for that.
 
-Thanks,
+> I don't care much for such an API, mostly because it will obviously
+> bitrot very quickly (your "broken VGIC" platform is hopefully a one off
+> that won't be repeated again, and the RPi is out of scope anyway).
+> 
+> It would have to be extremely non-intrusive and completely safe for this
+> to be taken in...
 
-	M.
---=20
-Jazz is not dead. It just smells funny...
+ Ok, let's leave this API alone then for now...
+ Will then be a concensus if i tweak the thing a little bit and we just enable KVM without both vGIC
+and vTimer ? It will be an emulator's problem how to handle them then.
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
+
