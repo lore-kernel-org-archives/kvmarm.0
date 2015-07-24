@@ -1,108 +1,82 @@
-From: "Wu, Feng" <feng.wu@intel.com>
-Subject: RE: [RFC v2 0/6] IRQ bypass manager and irqfd consumer
-Date: Fri, 24 Jul 2015 01:27:29 +0000
-Message-ID: <E959C4978C3B6342920538CF579893F00264820D@SHSMSX104.ccr.corp.intel.com>
-References: <1436184692-20927-1-git-send-email-eric.auger@linaro.org>
+From: Pranavkumar Sawargaonkar <pranavkumar@linaro.org>
+Subject: [RFC 0/2] VFIO: Add virtual MSI doorbell support.
+Date: Fri, 24 Jul 2015 14:33:08 +0530
+Message-ID: <1437728590-23126-1-git-send-email-pranavkumar@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1436184692-20927-1-git-send-email-eric.auger@linaro.org>
-Content-Language: en-US
-Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@linaro.org>, "eric.auger@st.com" <eric.auger@st.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, "avi.kivity@gmail.com" <avi.kivity@gmail.com>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "joro@8bytes.org" <joro@8bytes.org>, "b.reynal@virtualopensystems.com" <b.reynal@virtualopensystems.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "patches@linaro.org" <patches@linaro.org>, "Wu, Feng" <feng.wu@intel.com>
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 84EC859166
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jul 2015 04:51:11 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id UbnSx8DV3SeG for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 24 Jul 2015 04:51:09 -0400 (EDT)
+Received: from mail-pd0-f173.google.com (mail-pd0-f173.google.com
+ [209.85.192.173])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 843ED59109
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jul 2015 04:51:09 -0400 (EDT)
+Received: by pdjr16 with SMTP id r16so10904300pdj.3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 24 Jul 2015 02:03:23 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: rob.herring@linaro.org, arnd@arndb.de, marc.zyngier@arm.com, patches@apm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, linux-arm-kernel@lists.infradead.org, bhelgaas@google.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
+In current VFIO MSI/MSI-X implementation, linux host kernel
+allocates MSI/MSI-X vectors when userspace requests through vfio ioctls.
+Vfio creates irqfd mappings to notify MSI/MSI-X interrupts
+to the userspace when raised.
+Guest OS will see emulated MSI/MSI-X controller and receives an interrupt
+when kernel notifies the same via irqfd.
 
+Host kernel allocates MSI/MSI-X using standard linux routines
+like pci_enable_msix_range() and pci_enable_msi_range(). 
+These routines along with requset_irq() in host kernel sets up 
+MSI/MSI-X vectors with Physical MSI/MSI-X addresses provided by
+interrupt controller driver in host kernel.
 
-> -----Original Message-----
-> From: linux-kernel-owner@vger.kernel.org
-> [mailto:linux-kernel-owner@vger.kernel.org] On Behalf Of Eric Auger
-> Sent: Monday, July 06, 2015 8:11 PM
-> To: eric.auger@st.com; eric.auger@linaro.org;
-> linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
-> kvm@vger.kernel.org; christoffer.dall@linaro.org; marc.zyngier@arm.com;
-> alex.williamson@redhat.com; pbonzini@redhat.com; avi.kivity@gmail.com;
-> mtosatti@redhat.com; Wu, Feng; joro@8bytes.org;
-> b.reynal@virtualopensystems.com
-> Cc: linux-kernel@vger.kernel.org; patches@linaro.org
-> Subject: [RFC v2 0/6] IRQ bypass manager and irqfd consumer
-> 
-> This series introduces and extends the IRQ bypass manager written
-> by Alex and transforms irqfd into an IRQ bypass manager consumer.
-> The producer part, in my case the VFIO platform driver will be introduced
-> separately. That code should be usable by both ARM IRQ forwarding
-> and Intel Posted Interrupts.
-> 
-> The IRQ bypass manager enables to setup a negotiated link between an
-> IRQ producer and an IRQ consumer (typically the VFIO driver and KVM irqfd).
-> 
-> The series currently includes Alex's code which was sent my email.
-> Its structure obvioulsy will adapt to Alex's will.
-> 
-> Also the irq bypass manager gets compiled/linked on arm/arm64 along
-> with KVM and VFIO platform driver.
-> 
-> can be found at:
-> https://git.linaro.org/people/eric.auger/linux.git/shortlog/refs/heads/v4.2-rc1-
-> bypass-fwd-v2
-> 
-> Best Regards
-> 
-> Eric
-> 
-> History:
-> v1 -> v2:
-> - isolate the bypass manager and irqfd consumer in this series
-> - take into account Paolo's comments and use container_of strategy and
->   remove additional fields introduced in v1.
-> - create kvm_irqfd.h
-> - add unregistration in irqfd_shutdown
+This means when a device is assigned with the guest OS, MSI/MSI-X addresses
+present in PCIe EP are the PAs programmed by the host linux kernel.
 
-Hi Eric,
+In x86 MSI/MSI-X physical address range is reserved and iommu is aware
+about these addreses and transalation is bypassed for these address range.
 
-[4/6], [5/6], and [6/6] of this series are common to forwarded irq and posted
-interrupts, did you have a chance to get a new version of them based on
-Alex's latest irqbypass manager patch:
+Unlike x86, ARM/ARM64 does not reserve MSI/MSI-X Physical address range and
+all the transactions including MSI go through iommu/smmu without bypass.
+This requires extending current vfio MSI layer with additional functionality
+for ARM/ARM64 by
+1. Programing IOVA (referred as a MSI virtual doorbell address)
+   in device's MSI vector as a MSI address.
+   This IOVA will be provided by the userspace based on the
+   MSI/MSI-X addresses reserved for the guest.
+2. Create an IOMMU mapping between this IOVA and
+   Physical address (PA) assigned to the MSI vector.
 
-https://lkml.org/lkml/2015/7/16/810
+This RFC is proposing a solution for MSI/MSI-X passthrough for ARM/ARM64.
 
-Thanks a lot!
+Pranavkumar Sawargaonkar (2):
+  drivers: vfio: iommu map and unmap device specific memory from
+    kernel.
+  drivers: vfio: pci: Add virtual MSI doorbell support.
 
-Thanks,
-Feng
+ drivers/vfio/pci/vfio_pci.c         |   32 ++++++++++++++++++
+ drivers/vfio/pci/vfio_pci_intrs.c   |   64 +++++++++++++++++++++++++++++++++++
+ drivers/vfio/pci/vfio_pci_private.h |    3 ++
+ drivers/vfio/vfio.c                 |   29 ++++++++++++++++
+ drivers/vfio/vfio_iommu_type1.c     |   60 ++++++++++++++++++++++++++++++++
+ include/linux/vfio.h                |   11 +++++-
+ include/uapi/linux/vfio.h           |   19 +++++++++++
+ 7 files changed, 217 insertions(+), 1 deletion(-)
 
-> 
-> v1: originally part of [RFC 00/17] ARM IRQ forward control based on IRQ
->     bypass manager (https://lkml.org/lkml/2015/7/2/268)
-> 
-> 
-> Eric Auger (6):
->   KVM: arm/arm64: select IRQ_BYPASS_MANAGER
->   VFIO: platform: select IRQ_BYPASS_MANAGER
->   irq: bypass: Extend skeleton for ARM forwarding control
->   KVM: create kvm_irqfd.h
->   KVM: introduce kvm_arch functions for IRQ bypass
->   KVM: eventfd: add irq bypass consumer management
-> 
->  arch/arm/kvm/Kconfig          |   1 +
->  arch/arm64/kvm/Kconfig        |   1 +
->  drivers/vfio/platform/Kconfig |   1 +
->  include/linux/irqbypass.h     |  19 ++++++--
->  include/linux/kvm_host.h      |  37 ++++++++++++++
->  include/linux/kvm_irqfd.h     |  70 +++++++++++++++++++++++++++
->  kernel/irq/bypass.c           |  44 +++++++++++++++--
->  virt/kvm/Kconfig              |   3 ++
->  virt/kvm/eventfd.c            | 109 +++++++++++++-----------------------------
->  9 files changed, 203 insertions(+), 82 deletions(-)
->  create mode 100644 include/linux/kvm_irqfd.h
-> 
-> --
-> 1.9.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
+-- 
+1.7.9.5
