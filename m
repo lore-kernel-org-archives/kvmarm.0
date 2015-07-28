@@ -1,38 +1,62 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 0/3] KVM: arm/arm64: Allow to use KVM without in-kernel
- irqchip
-Date: Mon, 27 Jul 2015 10:02:08 +0100
-Message-ID: <55B5F390.4090303@arm.com>
-References: <cover.1436874248.git.p.fedin@samsung.com> <55A93488.9060408@arm.com> <00df01d0c22b$fcaef0d0$f60cd270$@samsung.com> <55ACAC73.9090500@arm.com> <03d901d0c44e$beadaa90$3c08ffb0$@samsung.com> <55B11AEC.4050804@arm.com> <008f01d0c625$45d91a90$d18b4fb0$@samsung.com> <55B26277.80205@arm.com> <007901d0c7a1$99981f50$ccc85df0$@samsung.com> <55B5DD88.5070203@arm.com> <00d101d0c847$6039ac50$20ad04f0$@samsung.com>
+From: Vladimir Murzin <vladimir.murzin@arm.com>
+Subject: [PATCH] arm64: KVM: remove remaining reference to vgic_sr_vectors
+Date: Tue, 28 Jul 2015 10:42:23 +0100
+Message-ID: <1438076543-6768-1-git-send-email-vladimir.murzin@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <00d101d0c847$6039ac50$20ad04f0$@samsung.com>
-Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Cc: 'Christoffer Dall' <christoffer.dall@linaro.org>, 'Eric Auger' <eric.auger@linaro.org>
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: marc.zyngier@arm.com, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 27/07/15 09:36, Pavel Fedin wrote:
->  Hello!
-> 
->>> And i agreed. So, i repeat the question. Will it be OK if we just
->>> enable KVM without both vGIC and vTimer, and that's all we do? It
->>> will be userland's problem how to handle them. I need to tweak my
->>> first patchset a very small bit in order to do this.
->>
->> I I'll repeat what I already said: "Show me the patches".
->>
->> I'll only give you an answer once I exactly know what you're up to.
-> 
->  You have already seen them, it is the very same patchset we are discussing in this thread.
+Since commit 8a14849 (arm64: KVM: Switch vgic save/restore to
+alternative_insn) vgic_sr_vectors is not used anymore, so remove
+remaining leftovers and kill the structure.
 
-And I've replied ten days ago. So far, I haven't seen a v3 that
-addresses the comments I had.
+Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+---
+ arch/arm64/include/asm/kvm_host.h |    5 -----
+ arch/arm64/kernel/asm-offsets.c   |    2 --
+ 2 files changed, 7 deletions(-)
 
-Thanks,
-
-	M.
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 2709db2..19f1182 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -216,11 +216,6 @@ static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
+ 		     hyp_stack_ptr, vector_ptr);
+ }
+ 
+-struct vgic_sr_vectors {
+-	void	*save_vgic;
+-	void	*restore_vgic;
+-};
+-
+ static inline void kvm_arch_hardware_disable(void) {}
+ static inline void kvm_arch_hardware_unsetup(void) {}
+ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+index c99701a..f0c960d 100644
+--- a/arch/arm64/kernel/asm-offsets.c
++++ b/arch/arm64/kernel/asm-offsets.c
+@@ -125,8 +125,6 @@ int main(void)
+   DEFINE(KVM_TIMER_ENABLED,	offsetof(struct kvm, arch.timer.enabled));
+   DEFINE(VCPU_KVM,		offsetof(struct kvm_vcpu, kvm));
+   DEFINE(VCPU_VGIC_CPU,		offsetof(struct kvm_vcpu, arch.vgic_cpu));
+-  DEFINE(VGIC_SAVE_FN,		offsetof(struct vgic_sr_vectors, save_vgic));
+-  DEFINE(VGIC_RESTORE_FN,	offsetof(struct vgic_sr_vectors, restore_vgic));
+   DEFINE(VGIC_V2_CPU_HCR,	offsetof(struct vgic_cpu, vgic_v2.vgic_hcr));
+   DEFINE(VGIC_V2_CPU_VMCR,	offsetof(struct vgic_cpu, vgic_v2.vgic_vmcr));
+   DEFINE(VGIC_V2_CPU_MISR,	offsetof(struct vgic_cpu, vgic_v2.vgic_misr));
 -- 
-Jazz is not dead. It just smells funny...
+1.7.9.5
