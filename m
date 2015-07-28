@@ -1,78 +1,91 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC 0/2] VFIO: Add virtual MSI doorbell support.
-Date: Tue, 28 Jul 2015 17:55:04 +0100
-Message-ID: <55B7B3E8.9020000@arm.com>
-References: <1437728590-23126-1-git-send-email-pranavkumar@linaro.org> <1438100507.5211.170.camel@redhat.com>
+From: Bhushan Bharat <Bharat.Bhushan@freescale.com>
+Subject: RE: [RFC 0/2] VFIO: Add virtual MSI doorbell support.
+Date: Tue, 28 Jul 2015 17:23:45 +0000
+Message-ID: <CY1PR0301MB127660D71378F009918DDDD5908D0@CY1PR0301MB1276.namprd03.prod.outlook.com>
+References: <1437728590-23126-1-git-send-email-pranavkumar@linaro.org>
+ <1438100507.5211.170.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1438100507.5211.170.camel@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Language: en-US
+Sender: kvm-owner@vger.kernel.org
 To: Alex Williamson <alex.williamson@redhat.com>, Pranavkumar Sawargaonkar <pranavkumar@linaro.org>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, Will Deacon <Will.Deacon@arm.com>, "bhelgaas@google.com" <bhelgaas@google.com>, "arnd@arndb.de" <arnd@arndb.de>, "rob.herring@linaro.org" <rob.herring@linaro.org>, "eric.auger@linaro.org" <eric.auger@linaro.org>, "patches@apm.com" <patches@apm.com>, Bharat Bhushan <Bharat.Bhushan@freescale.com>, Stuart Yoder <stuart.yoder@freescale.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "bhelgaas@google.com" <bhelgaas@google.com>, "arnd@arndb.de" <arnd@arndb.de>, "rob.herring@linaro.org" <rob.herring@linaro.org>, "eric.auger@linaro.org" <eric.auger@linaro.org>, "patches@apm.com" <patches@apm.com>, Stuart Yoder <stuart.yoder@freescale.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Alex,
-
-On 28/07/15 17:21, Alex Williamson wrote:
-> On Fri, 2015-07-24 at 14:33 +0530, Pranavkumar Sawargaonkar wrote:
->> In current VFIO MSI/MSI-X implementation, linux host kernel
->> allocates MSI/MSI-X vectors when userspace requests through vfio ioctls.
->> Vfio creates irqfd mappings to notify MSI/MSI-X interrupts
->> to the userspace when raised.
->> Guest OS will see emulated MSI/MSI-X controller and receives an interrupt
->> when kernel notifies the same via irqfd.
->>
->> Host kernel allocates MSI/MSI-X using standard linux routines
->> like pci_enable_msix_range() and pci_enable_msi_range(). 
->> These routines along with requset_irq() in host kernel sets up 
->> MSI/MSI-X vectors with Physical MSI/MSI-X addresses provided by
->> interrupt controller driver in host kernel.
->>
->> This means when a device is assigned with the guest OS, MSI/MSI-X addresses
->> present in PCIe EP are the PAs programmed by the host linux kernel.
->>
->> In x86 MSI/MSI-X physical address range is reserved and iommu is aware
->> about these addreses and transalation is bypassed for these address range.
->>
->> Unlike x86, ARM/ARM64 does not reserve MSI/MSI-X Physical address range and
->> all the transactions including MSI go through iommu/smmu without bypass.
->> This requires extending current vfio MSI layer with additional functionality
->> for ARM/ARM64 by
->> 1. Programing IOVA (referred as a MSI virtual doorbell address)
->>    in device's MSI vector as a MSI address.
->>    This IOVA will be provided by the userspace based on the
->>    MSI/MSI-X addresses reserved for the guest.
->> 2. Create an IOMMU mapping between this IOVA and
->>    Physical address (PA) assigned to the MSI vector.
->>
->> This RFC is proposing a solution for MSI/MSI-X passthrough for ARM/ARM64.
-> 
-> 
-> Hi Pranavkumar,
-> 
-> Freescale has the same, or very similar, need, so any solution in this
-> space will need to work for both ARM and powerpc.  I'm not a big fan of
-> this approach as it seems to require the user to configure MSI/X via
-> ioctl and then call a separate ioctl mapping the doorbells.  That's more
-> code for the user, more code to get wrong and potentially a gap between
-> configuring MSI/X and enabling mappings where we could see IOMMU faults.
-> 
-> If we know that doorbell mappings are required, why can't we set aside a
-> bank of IOVA space and have them mapped automatically as MSI/X is being
-> configured?  Then the user's need for special knowledge and handling of
-> this case is limited to setup.  The IOVA space will be mapped and used
-> as needed, we only need the user to specify the IOVA space reserved for
-> this.  Thanks,
-
-I guess my immediate worry is that it seems to impose a fixed mapping
-for all the guests, which would restrict the "shape" of the mappings we
-give to a guest. Or did you intend for that IOVA mapping to be defined
-on a "per userspace instance" basis?
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+SGkgQWxleCwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBbGV4IFdp
+bGxpYW1zb24gW21haWx0bzphbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbV0NCj4gU2VudDogVHVl
+c2RheSwgSnVseSAyOCwgMjAxNSA5OjUyIFBNDQo+IFRvOiBQcmFuYXZrdW1hciBTYXdhcmdhb25r
+YXINCj4gQ2M6IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IGt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5l
+ZHU7IGxpbnV4LWFybS0NCj4ga2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmc7IGxpbnV4LWtlcm5l
+bEB2Z2VyLmtlcm5lbC5vcmc7DQo+IGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZzsgbWFyYy56
+eW5naWVyQGFybS5jb207IHdpbGwuZGVhY29uQGFybS5jb207DQo+IGJoZWxnYWFzQGdvb2dsZS5j
+b207IGFybmRAYXJuZGIuZGU7IHJvYi5oZXJyaW5nQGxpbmFyby5vcmc7DQo+IGVyaWMuYXVnZXJA
+bGluYXJvLm9yZzsgcGF0Y2hlc0BhcG0uY29tOyBCaHVzaGFuIEJoYXJhdC1SNjU3Nzc7IFlvZGVy
+DQo+IFN0dWFydC1CMDgyNDgNCj4gU3ViamVjdDogUmU6IFtSRkMgMC8yXSBWRklPOiBBZGQgdmly
+dHVhbCBNU0kgZG9vcmJlbGwgc3VwcG9ydC4NCj4gDQo+IE9uIEZyaSwgMjAxNS0wNy0yNCBhdCAx
+NDozMyArMDUzMCwgUHJhbmF2a3VtYXIgU2F3YXJnYW9ua2FyIHdyb3RlOg0KPiA+IEluIGN1cnJl
+bnQgVkZJTyBNU0kvTVNJLVggaW1wbGVtZW50YXRpb24sIGxpbnV4IGhvc3Qga2VybmVsIGFsbG9j
+YXRlcw0KPiA+IE1TSS9NU0ktWCB2ZWN0b3JzIHdoZW4gdXNlcnNwYWNlIHJlcXVlc3RzIHRocm91
+Z2ggdmZpbyBpb2N0bHMuDQo+ID4gVmZpbyBjcmVhdGVzIGlycWZkIG1hcHBpbmdzIHRvIG5vdGlm
+eSBNU0kvTVNJLVggaW50ZXJydXB0cyB0byB0aGUNCj4gPiB1c2Vyc3BhY2Ugd2hlbiByYWlzZWQu
+DQo+ID4gR3Vlc3QgT1Mgd2lsbCBzZWUgZW11bGF0ZWQgTVNJL01TSS1YIGNvbnRyb2xsZXIgYW5k
+IHJlY2VpdmVzIGFuDQo+ID4gaW50ZXJydXB0IHdoZW4ga2VybmVsIG5vdGlmaWVzIHRoZSBzYW1l
+IHZpYSBpcnFmZC4NCj4gPg0KPiA+IEhvc3Qga2VybmVsIGFsbG9jYXRlcyBNU0kvTVNJLVggdXNp
+bmcgc3RhbmRhcmQgbGludXggcm91dGluZXMgbGlrZQ0KPiA+IHBjaV9lbmFibGVfbXNpeF9yYW5n
+ZSgpIGFuZCBwY2lfZW5hYmxlX21zaV9yYW5nZSgpLg0KPiA+IFRoZXNlIHJvdXRpbmVzIGFsb25n
+IHdpdGggcmVxdXNldF9pcnEoKSBpbiBob3N0IGtlcm5lbCBzZXRzIHVwDQo+ID4gTVNJL01TSS1Y
+IHZlY3RvcnMgd2l0aCBQaHlzaWNhbCBNU0kvTVNJLVggYWRkcmVzc2VzIHByb3ZpZGVkIGJ5DQo+
+ID4gaW50ZXJydXB0IGNvbnRyb2xsZXIgZHJpdmVyIGluIGhvc3Qga2VybmVsLg0KPiA+DQo+ID4g
+VGhpcyBtZWFucyB3aGVuIGEgZGV2aWNlIGlzIGFzc2lnbmVkIHdpdGggdGhlIGd1ZXN0IE9TLCBN
+U0kvTVNJLVgNCj4gPiBhZGRyZXNzZXMgcHJlc2VudCBpbiBQQ0llIEVQIGFyZSB0aGUgUEFzIHBy
+b2dyYW1tZWQgYnkgdGhlIGhvc3QgbGludXgNCj4ga2VybmVsLg0KPiA+DQo+ID4gSW4geDg2IE1T
+SS9NU0ktWCBwaHlzaWNhbCBhZGRyZXNzIHJhbmdlIGlzIHJlc2VydmVkIGFuZCBpb21tdSBpcyBh
+d2FyZQ0KPiA+IGFib3V0IHRoZXNlIGFkZHJlc2VzIGFuZCB0cmFuc2FsYXRpb24gaXMgYnlwYXNz
+ZWQgZm9yIHRoZXNlIGFkZHJlc3MgcmFuZ2UuDQo+ID4NCj4gPiBVbmxpa2UgeDg2LCBBUk0vQVJN
+NjQgZG9lcyBub3QgcmVzZXJ2ZSBNU0kvTVNJLVggUGh5c2ljYWwgYWRkcmVzcw0KPiA+IHJhbmdl
+IGFuZCBhbGwgdGhlIHRyYW5zYWN0aW9ucyBpbmNsdWRpbmcgTVNJIGdvIHRocm91Z2ggaW9tbXUv
+c21tdQ0KPiB3aXRob3V0IGJ5cGFzcy4NCj4gPiBUaGlzIHJlcXVpcmVzIGV4dGVuZGluZyBjdXJy
+ZW50IHZmaW8gTVNJIGxheWVyIHdpdGggYWRkaXRpb25hbA0KPiA+IGZ1bmN0aW9uYWxpdHkgZm9y
+IEFSTS9BUk02NCBieSAxLiBQcm9ncmFtaW5nIElPVkEgKHJlZmVycmVkIGFzIGEgTVNJDQo+ID4g
+dmlydHVhbCBkb29yYmVsbCBhZGRyZXNzKQ0KPiA+ICAgIGluIGRldmljZSdzIE1TSSB2ZWN0b3Ig
+YXMgYSBNU0kgYWRkcmVzcy4NCj4gPiAgICBUaGlzIElPVkEgd2lsbCBiZSBwcm92aWRlZCBieSB0
+aGUgdXNlcnNwYWNlIGJhc2VkIG9uIHRoZQ0KPiA+ICAgIE1TSS9NU0ktWCBhZGRyZXNzZXMgcmVz
+ZXJ2ZWQgZm9yIHRoZSBndWVzdC4NCj4gPiAyLiBDcmVhdGUgYW4gSU9NTVUgbWFwcGluZyBiZXR3
+ZWVuIHRoaXMgSU9WQSBhbmQNCj4gPiAgICBQaHlzaWNhbCBhZGRyZXNzIChQQSkgYXNzaWduZWQg
+dG8gdGhlIE1TSSB2ZWN0b3IuDQo+ID4NCj4gPiBUaGlzIFJGQyBpcyBwcm9wb3NpbmcgYSBzb2x1
+dGlvbiBmb3IgTVNJL01TSS1YIHBhc3N0aHJvdWdoIGZvcg0KPiBBUk0vQVJNNjQuDQo+IA0KPiAN
+Cj4gSGkgUHJhbmF2a3VtYXIsDQo+IA0KPiBGcmVlc2NhbGUgaGFzIHRoZSBzYW1lLCBvciB2ZXJ5
+IHNpbWlsYXIsIG5lZWQsIHNvIGFueSBzb2x1dGlvbiBpbiB0aGlzIHNwYWNlDQo+IHdpbGwgbmVl
+ZCB0byB3b3JrIGZvciBib3RoIEFSTSBhbmQgcG93ZXJwYy4gIEknbSBub3QgYSBiaWcgZmFuIG9m
+IHRoaXMNCj4gYXBwcm9hY2ggYXMgaXQgc2VlbXMgdG8gcmVxdWlyZSB0aGUgdXNlciB0byBjb25m
+aWd1cmUgTVNJL1ggdmlhIGlvY3RsIGFuZCB0aGVuDQo+IGNhbGwgYSBzZXBhcmF0ZSBpb2N0bCBt
+YXBwaW5nIHRoZSBkb29yYmVsbHMuICBUaGF0J3MgbW9yZSBjb2RlIGZvciB0aGUgdXNlciwNCj4g
+bW9yZSBjb2RlIHRvIGdldCB3cm9uZyBhbmQgcG90ZW50aWFsbHkgYSBnYXAgYmV0d2VlbiBjb25m
+aWd1cmluZyBNU0kvWA0KPiBhbmQgZW5hYmxpbmcgbWFwcGluZ3Mgd2hlcmUgd2UgY291bGQgc2Vl
+IElPTU1VIGZhdWx0cy4NCj4gDQo+IElmIHdlIGtub3cgdGhhdCBkb29yYmVsbCBtYXBwaW5ncyBh
+cmUgcmVxdWlyZWQsIHdoeSBjYW4ndCB3ZSBzZXQgYXNpZGUgYQ0KPiBiYW5rIG9mIElPVkEgc3Bh
+Y2UgYW5kIGhhdmUgdGhlbSBtYXBwZWQgYXV0b21hdGljYWxseSBhcyBNU0kvWCBpcyBiZWluZw0K
+PiBjb25maWd1cmVkPyAgVGhlbiB0aGUgdXNlcidzIG5lZWQgZm9yIHNwZWNpYWwga25vd2xlZGdl
+IGFuZCBoYW5kbGluZyBvZiB0aGlzDQo+IGNhc2UgaXMgbGltaXRlZCB0byBzZXR1cC4gIFRoZSBJ
+T1ZBIHNwYWNlIHdpbGwgYmUgbWFwcGVkIGFuZCB1c2VkIGFzIG5lZWRlZCwNCj4gd2Ugb25seSBu
+ZWVkIHRoZSB1c2VyIHRvIHNwZWNpZnkgdGhlIElPVkEgc3BhY2UgcmVzZXJ2ZWQgZm9yIHRoaXMu
+ICBUaGFua3MsDQoNCldlIHByb2JhYmx5IG5lZWQgYSBtaXggb2YgYm90aCB0byBzdXBwb3J0IEZy
+ZWVzY2FsZSBQb3dlclBDIGFuZCBBUk0gYmFzZWQgbWFjaGluZXMuDQpJbiB0aGlzIG1peCBtb2Rl
+IGtlcm5lbCB2ZmlvIGRyaXZlciB3aWxsIHJlc2VydmUgc29tZSBJT1ZBIGZvciBtYXBwaW5nIE1T
+SSBwYWdlL3MuIElmIGFueSBvdGhlciBpb3ZhIG1hcHBpbmcgd2lsbCBvdmVybGFwIHdpdGggdGhp
+cyB0aGVuIGl0IHdpbGwgcmV0dXJuIGVycm9yIGFuZCB1c2VyLXNwYWNlLiBJZGVhbGx5IHRoaXMg
+c2hvdWxkIGJlIGNob29zZW4gaW4gc3VjaCBhIHdheSB0aGF0IGl0IG5ldmVyIG92ZXJsYXAsIHdo
+aWNoIGlzIGVhc3kgb24gc29tZSBzeXN0ZW1zIGJ1dCBjYW4gYmUgdHJpY2t5IG9uIHNvbWUgb3Ro
+ZXIgc3lzdGVtIGxpa2UgRnJlZXNjYWxlIFBvd2VyUEMuIFRoaXMgaXMgbm90IHN1ZmZpY2llbnQg
+Zm9yIGF0LWxlYXN0IEZyZWVzY2FsZSBQb3dlclBDIGJhc2VkIFNPQy4gVGhpcyBpcyBiZWNhdXNl
+IG9mIGhhcmR3YXJlIGxpbWl0YXRpb24sIHdoZXJlIHdlIG5lZWQgdG8gZml0IHRoaXMgcmVzZXJ2
+ZWQgaW92YSBhZGRyZXNzIHdpdGhpbiBhcGVydHVyZSBkZWNpZGVkIGJ5IHVzZXItc3BhY2UuIFNv
+IGlmIHdlIGFsbG93IHVzZXItc3BhY2UgdG8gY2hhbmdlIHRoaXMgcmVzZXJ2ZWQgaW92YSBhZGRy
+ZXNzIHRvIGEgdmFsdWUgZGVjaWRlZCBieSB1c2VyLXNwZWNlIGl0c2VsZiB0aGVuIHdlIGNhbiBz
+dXBwb3J0IGJvdGggQVJNL1Bvd2VyUEMgYmFzZWQgc29sdXRpb25zLg0KDQpJIGhhdmUgc29tZSBp
+bXBsZW1lbnRhdGlvbiByZWFkeS90ZXN0ZWQgd2l0aCB0aGlzIGFwcHJvYWNoIGFuZCBpZiB0aGlz
+IGFwcHJvYWNoIGxvb2tzIGdvb2QgdGhlbiBJIGNhbiBzdWJtaXQgYSBSRkMgcGF0Y2guDQoNClRo
+YW5rcw0KLUJoYXJhdA0KPiANCj4gQWxleA0KDQo=
