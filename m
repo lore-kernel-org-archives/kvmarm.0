@@ -1,90 +1,100 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 08/14] MIPS: remove seeks from load_flat_binary()
-Date: Thu, 30 Jul 2015 11:52:25 +0100
-Message-ID: <1438253551-2378-9-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH 11/14] arm/arm64: use read_file() in kernel and initrd loading
+Date: Thu, 30 Jul 2015 11:52:28 +0100
+Message-ID: <1438253551-2378-12-git-send-email-andre.przywara@arm.com>
 References: <1438253551-2378-1-git-send-email-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D02BF596F8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2015 06:40:06 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id n1omMdJd9aIG for <kvmarm@lists.cs.columbia.edu>;
- Thu, 30 Jul 2015 06:40:06 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D4171596E9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2015 06:40:04 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1438253551-2378-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: will.deacon@arm.com, kvm@vger.kernel.org
 Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Remove the need to rewind the kernel image file if loading it as a
-flat binary by re-using the already read portion of the file passed
-in as a buffer.
-This allows the MIPS flat binary kernel image to be read from a pipe.
+Use the new read_file() wrapper in our arm/arm64 kernel image loading
+function instead of the private implementation.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- mips/kvm.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ arm/kvm.c | 42 ++++++++++++++++++++----------------------
+ 1 file changed, 20 insertions(+), 22 deletions(-)
 
-diff --git a/mips/kvm.c b/mips/kvm.c
-index ed81a02..d970ee0 100644
---- a/mips/kvm.c
-+++ b/mips/kvm.c
-@@ -164,24 +164,26 @@ static void kvm__mips_install_cmdline(struct kvm *kvm)
- /* Load at the 1M point. */
- #define KERNEL_LOAD_ADDR 0x1000000
+diff --git a/arm/kvm.c b/arm/kvm.c
+index 6e3f80e..277d9e6 100644
+--- a/arm/kvm.c
++++ b/arm/kvm.c
+@@ -87,19 +87,6 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
+ 		die("Failed to create virtual GIC");
+ }
  
--static bool load_flat_binary(struct kvm *kvm, int fd_kernel)
-+static bool load_flat_binary(struct kvm *kvm, int fd_kernel, const void *buf,
-+			     int buflen)
- {
- 	void *p;
- 	void *k_start;
- 	int nr;
- 
--	if (lseek(fd_kernel, 0, SEEK_SET) < 0)
--		die_perror("lseek");
+-static int read_image(int fd, void **pos, void *limit)
+-{
+-	int count;
 -
- 	p = k_start = guest_flat_to_host(kvm, KERNEL_LOAD_ADDR);
+-	while (((count = xread(fd, *pos, SZ_64K)) > 0) && *pos <= limit)
+-		*pos += count;
+-
+-	if (pos < 0)
+-		die_perror("xread");
+-
+-	return *pos < limit ? 0 : -ENOMEM;
+-}
+-
+ #define FDT_ALIGN	SZ_2M
+ #define INITRD_ALIGN	4
+ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
+@@ -107,6 +94,7 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
+ {
+ 	void *pos, *kernel_end, *limit;
+ 	unsigned long guest_addr;
++	ssize_t file_size;
  
-+	memcpy(p, buf, buflen);
-+	p += buflen;
+ 	/*
+ 	 * Linux requires the initrd and dtb to be mapped inside lowmem,
+@@ -116,13 +104,17 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
+ 
+ 	pos = kvm->ram_start + ARM_KERN_OFFSET(kvm);
+ 	kvm->arch.kern_guest_start = host_to_guest_flat(kvm, pos);
+-	if (read_image(fd_kernel, &pos, limit) == -ENOMEM)
+-		die("kernel image too big to contain in guest memory.");
++	file_size = read_file(fd_kernel, pos, limit - pos);
++	if (file_size < 0) {
++		if (errno == ENOMEM)
++			die("kernel image too big to contain in guest memory.");
 +
- 	while ((nr = read(fd_kernel, p, 65536)) > 0)
- 		p += nr;
++		die_perror("kernel read");
++	}
++	kernel_end = pos + file_size;
  
- 	kvm->arch.is64bit = true;
- 	kvm->arch.entry_point = 0xffffffff81000000ull;
+-	kernel_end = pos;
+-	pr_info("Loaded kernel to 0x%llx (%llu bytes)",
+-		kvm->arch.kern_guest_start,
+-		host_to_guest_flat(kvm, pos) - kvm->arch.kern_guest_start);
++	pr_info("Loaded kernel to 0x%llx (%zd bytes)",
++		kvm->arch.kern_guest_start, file_size);
  
--	pr_info("Loaded kernel to 0x%x (%ld bytes)", KERNEL_LOAD_ADDR, (long int)(p - k_start));
-+	pr_info("Loaded kernel to 0x%x (%ld bytes)", KERNEL_LOAD_ADDR,
-+		(long int)(p - k_start));
+ 	/*
+ 	 * Now load backwards from the end of memory so the kernel
+@@ -160,11 +152,17 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
+ 			die("initrd overlaps with kernel image.");
  
- 	return true;
- }
-@@ -357,7 +359,7 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
- 		return true;
- 	}
+ 		initrd_start = guest_addr;
+-		if (read_image(fd_initrd, &pos, limit) == -ENOMEM)
+-			die("initrd too big to contain in guest memory.");
++
++		file_size = read_file(fd_initrd, pos, limit - pos);
++		if (file_size == -1) {
++			if (errno == ENOMEM)
++				die("initrd too big to contain in guest memory.");
++
++			die_perror("initrd read");
++		}
  
--	return load_flat_binary(kvm, fd_kernel);
-+	return load_flat_binary(kvm, fd_kernel, &eh, sizeof(eh));
- }
- 
- void ioport__map_irq(u8 *irq)
+ 		kvm->arch.initrd_guest_start = initrd_start;
+-		kvm->arch.initrd_size = host_to_guest_flat(kvm, pos) - initrd_start;
++		kvm->arch.initrd_size = file_size;
+ 		pr_info("Loaded initrd to 0x%llx (%llu bytes)",
+ 			kvm->arch.initrd_guest_start,
+ 			kvm->arch.initrd_size);
 -- 
 2.3.5
+
