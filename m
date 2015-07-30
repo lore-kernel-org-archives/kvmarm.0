@@ -1,254 +1,90 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 09/14] arm: move kernel loading into arm/kvm.c
-Date: Thu, 30 Jul 2015 11:52:26 +0100
-Message-ID: <1438253551-2378-10-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH 08/14] MIPS: remove seeks from load_flat_binary()
+Date: Thu, 30 Jul 2015 11:52:25 +0100
+Message-ID: <1438253551-2378-9-git-send-email-andre.przywara@arm.com>
 References: <1438253551-2378-1-git-send-email-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D02BF596F8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2015 06:40:06 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id n1omMdJd9aIG for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 30 Jul 2015 06:40:06 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D4171596E9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 30 Jul 2015 06:40:04 -0400 (EDT)
 In-Reply-To: <1438253551-2378-1-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: will.deacon@arm.com, kvm@vger.kernel.org
 Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-For some reasons (probably to have easy access to the command line)
-the kernel loading for arm and arm64 was located in arm/fdt.c.
-Move the routines to kvm.c (where other architectures put it) to
-only have real device tree code in fdt.c. We use the pointer in
-struct kvm to access the command line string.
+Remove the need to rewind the kernel image file if loading it as a
+flat binary by re-using the already read portion of the file passed
+in as a buffer.
+This allows the MIPS flat binary kernel image to be read from a pipe.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arm/fdt.c | 96 +--------------------------------------------------------------
- arm/kvm.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 90 insertions(+), 95 deletions(-)
+ mips/kvm.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/arm/fdt.c b/arm/fdt.c
-index cb4f00d..381d48f 100644
---- a/arm/fdt.c
-+++ b/arm/fdt.c
-@@ -9,14 +9,11 @@
+diff --git a/mips/kvm.c b/mips/kvm.c
+index ed81a02..d970ee0 100644
+--- a/mips/kvm.c
++++ b/mips/kvm.c
+@@ -164,24 +164,26 @@ static void kvm__mips_install_cmdline(struct kvm *kvm)
+ /* Load at the 1M point. */
+ #define KERNEL_LOAD_ADDR 0x1000000
  
- #include <stdbool.h>
- 
--#include <asm/setup.h>
- #include <linux/byteorder.h>
- #include <linux/kernel.h>
- #include <linux/sizes.h>
- #include <linux/psci.h>
- 
--static char kern_cmdline[COMMAND_LINE_SIZE];
--
- bool kvm__load_firmware(struct kvm *kvm, const char *firmware_filename)
+-static bool load_flat_binary(struct kvm *kvm, int fd_kernel)
++static bool load_flat_binary(struct kvm *kvm, int fd_kernel, const void *buf,
++			     int buflen)
  {
- 	return false;
-@@ -145,7 +142,7 @@ static int setup_fdt(struct kvm *kvm)
- 	/* /chosen */
- 	_FDT(fdt_begin_node(fdt, "chosen"));
- 	_FDT(fdt_property_cell(fdt, "linux,pci-probe-only", 1));
--	_FDT(fdt_property_string(fdt, "bootargs", kern_cmdline));
-+	_FDT(fdt_property_string(fdt, "bootargs", kvm->cfg.real_cmdline));
+ 	void *p;
+ 	void *k_start;
+ 	int nr;
  
- 	/* Initrd */
- 	if (kvm->arch.initrd_size != 0) {
-@@ -223,94 +220,3 @@ static int setup_fdt(struct kvm *kvm)
- 	return 0;
+-	if (lseek(fd_kernel, 0, SEEK_SET) < 0)
+-		die_perror("lseek");
+-
+ 	p = k_start = guest_flat_to_host(kvm, KERNEL_LOAD_ADDR);
+ 
++	memcpy(p, buf, buflen);
++	p += buflen;
++
+ 	while ((nr = read(fd_kernel, p, 65536)) > 0)
+ 		p += nr;
+ 
+ 	kvm->arch.is64bit = true;
+ 	kvm->arch.entry_point = 0xffffffff81000000ull;
+ 
+-	pr_info("Loaded kernel to 0x%x (%ld bytes)", KERNEL_LOAD_ADDR, (long int)(p - k_start));
++	pr_info("Loaded kernel to 0x%x (%ld bytes)", KERNEL_LOAD_ADDR,
++		(long int)(p - k_start));
+ 
+ 	return true;
  }
- late_init(setup_fdt);
--
--static int read_image(int fd, void **pos, void *limit)
--{
--	int count;
--
--	while (((count = xread(fd, *pos, SZ_64K)) > 0) && *pos <= limit)
--		*pos += count;
--
--	if (pos < 0)
--		die_perror("xread");
--
--	return *pos < limit ? 0 : -ENOMEM;
--}
--
--#define FDT_ALIGN	SZ_2M
--#define INITRD_ALIGN	4
--bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
--				 const char *kernel_cmdline)
--{
--	void *pos, *kernel_end, *limit;
--	unsigned long guest_addr;
--
--	/*
--	 * Linux requires the initrd and dtb to be mapped inside lowmem,
--	 * so we can't just place them at the top of memory.
--	 */
--	limit = kvm->ram_start + min(kvm->ram_size, (u64)SZ_256M) - 1;
--
--	pos = kvm->ram_start + ARM_KERN_OFFSET(kvm);
--	kvm->arch.kern_guest_start = host_to_guest_flat(kvm, pos);
--	if (read_image(fd_kernel, &pos, limit) == -ENOMEM)
--		die("kernel image too big to contain in guest memory.");
--
--	kernel_end = pos;
--	pr_info("Loaded kernel to 0x%llx (%llu bytes)",
--		kvm->arch.kern_guest_start,
--		host_to_guest_flat(kvm, pos) - kvm->arch.kern_guest_start);
--
--	/*
--	 * Now load backwards from the end of memory so the kernel
--	 * decompressor has plenty of space to work with. First up is
--	 * the device tree blob...
--	 */
--	pos = limit;
--	pos -= (FDT_MAX_SIZE + FDT_ALIGN);
--	guest_addr = ALIGN(host_to_guest_flat(kvm, pos), FDT_ALIGN);
--	pos = guest_flat_to_host(kvm, guest_addr);
--	if (pos < kernel_end)
--		die("fdt overlaps with kernel image.");
--
--	kvm->arch.dtb_guest_start = guest_addr;
--	pr_info("Placing fdt at 0x%llx - 0x%llx",
--		kvm->arch.dtb_guest_start,
--		host_to_guest_flat(kvm, limit));
--	limit = pos;
--
--	/* ... and finally the initrd, if we have one. */
--	if (fd_initrd != -1) {
--		struct stat sb;
--		unsigned long initrd_start;
--
--		if (lseek(fd_initrd, 0, SEEK_SET) < 0)
--			die_perror("lseek");
--
--		if (fstat(fd_initrd, &sb))
--			die_perror("fstat");
--
--		pos -= (sb.st_size + INITRD_ALIGN);
--		guest_addr = ALIGN(host_to_guest_flat(kvm, pos), INITRD_ALIGN);
--		pos = guest_flat_to_host(kvm, guest_addr);
--		if (pos < kernel_end)
--			die("initrd overlaps with kernel image.");
--
--		initrd_start = guest_addr;
--		if (read_image(fd_initrd, &pos, limit) == -ENOMEM)
--			die("initrd too big to contain in guest memory.");
--
--		kvm->arch.initrd_guest_start = initrd_start;
--		kvm->arch.initrd_size = host_to_guest_flat(kvm, pos) - initrd_start;
--		pr_info("Loaded initrd to 0x%llx (%llu bytes)",
--			kvm->arch.initrd_guest_start,
--			kvm->arch.initrd_size);
--	} else {
--		kvm->arch.initrd_size = 0;
--	}
--
--	strncpy(kern_cmdline, kernel_cmdline, COMMAND_LINE_SIZE);
--	kern_cmdline[COMMAND_LINE_SIZE - 1] = '\0';
--
--	return true;
--}
-diff --git a/arm/kvm.c b/arm/kvm.c
-index d0e4a20..6e3f80e 100644
---- a/arm/kvm.c
-+++ b/arm/kvm.c
-@@ -3,6 +3,7 @@
- #include "kvm/util.h"
- #include "kvm/8250-serial.h"
- #include "kvm/virtio-console.h"
-+#include "kvm/fdt.h"
+@@ -357,7 +359,7 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
+ 		return true;
+ 	}
  
- #include "arm-common/gic.h"
- 
-@@ -85,3 +86,91 @@ void kvm__arch_init(struct kvm *kvm, const char *hugetlbfs_path, u64 ram_size)
- 	if (gic__create(kvm, kvm->cfg.arch.irqchip))
- 		die("Failed to create virtual GIC");
+-	return load_flat_binary(kvm, fd_kernel);
++	return load_flat_binary(kvm, fd_kernel, &eh, sizeof(eh));
  }
-+
-+static int read_image(int fd, void **pos, void *limit)
-+{
-+	int count;
-+
-+	while (((count = xread(fd, *pos, SZ_64K)) > 0) && *pos <= limit)
-+		*pos += count;
-+
-+	if (pos < 0)
-+		die_perror("xread");
-+
-+	return *pos < limit ? 0 : -ENOMEM;
-+}
-+
-+#define FDT_ALIGN	SZ_2M
-+#define INITRD_ALIGN	4
-+bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
-+				 const char *kernel_cmdline)
-+{
-+	void *pos, *kernel_end, *limit;
-+	unsigned long guest_addr;
-+
-+	/*
-+	 * Linux requires the initrd and dtb to be mapped inside lowmem,
-+	 * so we can't just place them at the top of memory.
-+	 */
-+	limit = kvm->ram_start + min(kvm->ram_size, (u64)SZ_256M) - 1;
-+
-+	pos = kvm->ram_start + ARM_KERN_OFFSET(kvm);
-+	kvm->arch.kern_guest_start = host_to_guest_flat(kvm, pos);
-+	if (read_image(fd_kernel, &pos, limit) == -ENOMEM)
-+		die("kernel image too big to contain in guest memory.");
-+
-+	kernel_end = pos;
-+	pr_info("Loaded kernel to 0x%llx (%llu bytes)",
-+		kvm->arch.kern_guest_start,
-+		host_to_guest_flat(kvm, pos) - kvm->arch.kern_guest_start);
-+
-+	/*
-+	 * Now load backwards from the end of memory so the kernel
-+	 * decompressor has plenty of space to work with. First up is
-+	 * the device tree blob...
-+	 */
-+	pos = limit;
-+	pos -= (FDT_MAX_SIZE + FDT_ALIGN);
-+	guest_addr = ALIGN(host_to_guest_flat(kvm, pos), FDT_ALIGN);
-+	pos = guest_flat_to_host(kvm, guest_addr);
-+	if (pos < kernel_end)
-+		die("fdt overlaps with kernel image.");
-+
-+	kvm->arch.dtb_guest_start = guest_addr;
-+	pr_info("Placing fdt at 0x%llx - 0x%llx",
-+		kvm->arch.dtb_guest_start,
-+		host_to_guest_flat(kvm, limit));
-+	limit = pos;
-+
-+	/* ... and finally the initrd, if we have one. */
-+	if (fd_initrd != -1) {
-+		struct stat sb;
-+		unsigned long initrd_start;
-+
-+		if (lseek(fd_initrd, 0, SEEK_SET) < 0)
-+			die_perror("lseek");
-+
-+		if (fstat(fd_initrd, &sb))
-+			die_perror("fstat");
-+
-+		pos -= (sb.st_size + INITRD_ALIGN);
-+		guest_addr = ALIGN(host_to_guest_flat(kvm, pos), INITRD_ALIGN);
-+		pos = guest_flat_to_host(kvm, guest_addr);
-+		if (pos < kernel_end)
-+			die("initrd overlaps with kernel image.");
-+
-+		initrd_start = guest_addr;
-+		if (read_image(fd_initrd, &pos, limit) == -ENOMEM)
-+			die("initrd too big to contain in guest memory.");
-+
-+		kvm->arch.initrd_guest_start = initrd_start;
-+		kvm->arch.initrd_size = host_to_guest_flat(kvm, pos) - initrd_start;
-+		pr_info("Loaded initrd to 0x%llx (%llu bytes)",
-+			kvm->arch.initrd_guest_start,
-+			kvm->arch.initrd_size);
-+	} else {
-+		kvm->arch.initrd_size = 0;
-+	}
-+
-+	return true;
-+}
+ 
+ void ioport__map_irq(u8 *irq)
 -- 
 2.3.5
-
