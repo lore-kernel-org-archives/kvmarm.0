@@ -1,337 +1,114 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v4 3/5] KVM: create kvm_irqfd.h
-Date: Mon,  3 Aug 2015 19:20:42 +0200
-Message-ID: <1438622444-25444-4-git-send-email-eric.auger@linaro.org>
-References: <1438622444-25444-1-git-send-email-eric.auger@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH 04/18] KVM: ARM64: Add reset and access handlers for
+ PMCR_EL0 register
+Date: Mon, 3 Aug 2015 21:39:03 +0200
+Message-ID: <20150803193903.GA4690@cbox>
+References: <1436149068-3784-1-git-send-email-shannon.zhao@linaro.org>
+ <1436149068-3784-5-git-send-email-shannon.zhao@linaro.org>
+ <20150716195534.GD14024@cbox>
+ <55A8C0B8.1000101@linaro.org>
+ <20150717102133.GN14024@cbox>
+ <55AD9D89.7010502@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6CDA859F21
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Aug 2015 13:09:06 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1hfR+zzqFIAZ for <kvmarm@lists.cs.columbia.edu>;
- Mon,  3 Aug 2015 13:09:00 -0400 (EDT)
-Received: from mail-wi0-f180.google.com (mail-wi0-f180.google.com
- [209.85.212.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C166C59F07
- for <kvmarm@lists.cs.columbia.edu>; Mon,  3 Aug 2015 13:08:59 -0400 (EDT)
-Received: by wibud3 with SMTP id ud3so123177199wib.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 03 Aug 2015 10:21:42 -0700 (PDT)
-In-Reply-To: <1438622444-25444-1-git-send-email-eric.auger@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, feng.wu@intel.com, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: patches@linaro.org, marc.zyngier@arm.com, joro@8bytes.org, mtosatti@redhat.com, linux-kernel@vger.kernel.org, avi.kivity@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <55AD9D89.7010502@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Shannon Zhao <shannon.zhao@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, marc.zyngier@arm.com, alex.bennee@linaro.org, zhaoshenglong@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Move _irqfd_resampler and _irqfd struct declarations in a new
-public header: kvm_irqfd.h. They are respectively renamed into
-kvm_kernel_irqfd_resampler and kvm_kernel_irqfd. Those datatypes
-will be used by architecture specific code, in the context of
-IRQ bypass manager integration.
+On Tue, Jul 21, 2015 at 09:16:57AM +0800, Shannon Zhao wrote:
+> 
+> 
+> On 2015/7/17 18:21, Christoffer Dall wrote:
+> > On Fri, Jul 17, 2015 at 04:45:44PM +0800, Shannon Zhao wrote:
+> >>
+> >>
+> >> On 2015/7/17 3:55, Christoffer Dall wrote:
+> >>> On Mon, Jul 06, 2015 at 10:17:34AM +0800, shannon.zhao@linaro.org wrote:
+> >>>> From: Shannon Zhao <shannon.zhao@linaro.org>
+> >>>>
+> >>>> Add reset handler which gets host value of PMCR_EL0 and make writable
+> >>>> bits architecturally UNKNOWN. Add access handler which emulates
+> >>>> writing and reading PMCR_EL0 register.
+> >>>>
+> >>>> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> >>>> ---
+> >>>>  arch/arm64/kvm/sys_regs.c | 41 ++++++++++++++++++++++++++++++++++++++++-
+> >>>>  1 file changed, 40 insertions(+), 1 deletion(-)
+> >>>>
+> >>>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> >>>> index c370b40..152ee17 100644
+> >>>> --- a/arch/arm64/kvm/sys_regs.c
+> >>>> +++ b/arch/arm64/kvm/sys_regs.c
+> >>>> @@ -33,6 +33,7 @@
+> >>>>  #include <asm/kvm_emulate.h>
+> >>>>  #include <asm/kvm_host.h>
+> >>>>  #include <asm/kvm_mmu.h>
+> >>>> +#include <asm/pmu.h>
+> >>>>  
+> >>>>  #include <trace/events/kvm.h>
+> >>>>  
+> >>>> @@ -236,6 +237,44 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> >>>>  	vcpu_sys_reg(vcpu, MPIDR_EL1) = (1ULL << 31) | mpidr;
+> >>>>  }
+> >>>>  
+> >>>> +static void reset_pmcr_el0(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> >>>> +{
+> >>>> +	u32 pmcr;
+> >>>> +
+> >>>> +	asm volatile("mrs %0, pmcr_el0\n" : "=r" (pmcr));
+> >>>> +	vcpu_sys_reg(vcpu, PMCR_EL0) = (pmcr & ~ARMV8_PMCR_MASK)
+> >>>> +				       | (ARMV8_PMCR_MASK & 0xdecafbad);
+> >>>
+> >>> You could add a comment that this resets to UNKNOWN as to not make
+> >>> people confused about the pseudo-random hex value.
+> >>>
+> >> Ok.
+> >>
+> >>> Have we thought about whether we want to tell the guest that it has the
+> >>> same PMU as available on the real hardware, or does the virtualization
+> >>> layer suggest to us that we should adjust this somehow?
+> >>>
+> >> I guess here the number of PMU counters is what we can adjust, right?
+> >> Are we worried about that the host will run out of counters when guest
+> >> and host register lots of events?
+> > 
+> > that's what I wonder; if perf itself reserves a counter for example,
+> > then we'll at best be able to measure with N-1 counters for the guest (N
+> > being the number of counters on the physical CPU), so why tell the guest
+> > we have N counters?
+> > 
+> 
+> I'm not sure whether perf itself reserves one counter. Here I just pass
+> the hardware information to guest.
+> 
+> > Of course, we can never even be guaranteed to have N-1 counters
+> > avaialable either, so maybe the sane choice is just to tell the guest
+> > what kind of hardware we have, and then fiddle the best we can with the
+> > remaining counters?  After all, correct functionality of the guest
+> > doesn't depend on this, it's a best-effort kind of thing...
+> > 
+> > Thoughts?
+> > 
+> >> The PMU of cortex-a57 has 6 counters. IIUC, if one of the guest vcpu
+> >> process registers 6 events and some host process register 6 events too,
+> >> these events will be monitored in real hardware PMU counter when the
+> >> related process runs on the cpu. And when other processes are scheduled
+> >> to run, it will switch the contexts of PMU counters.
+> > 
+> > That depends on the way the counters are used by perf I think.  What if
+> > you have system wide events?  What if the KVM (vcpu) process itself is
+> > being monitored for some events?
+> > 
+> 
+> Not sure what will happen when the number of monitored events is greater
+> than counters. I guess the perf layer may balance the events?
+> 
+I'm not sure either, but we need to have thought about these things, I
+suppose.  You should probably look at the code or try it out.
 
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
----
- include/linux/kvm_irqfd.h | 69 ++++++++++++++++++++++++++++++++++
- virt/kvm/eventfd.c        | 95 ++++++++++++-----------------------------------
- 2 files changed, 92 insertions(+), 72 deletions(-)
- create mode 100644 include/linux/kvm_irqfd.h
-
-diff --git a/include/linux/kvm_irqfd.h b/include/linux/kvm_irqfd.h
-new file mode 100644
-index 0000000..f926b39
---- /dev/null
-+++ b/include/linux/kvm_irqfd.h
-@@ -0,0 +1,69 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * irqfd: Allows an fd to be used to inject an interrupt to the guest
-+ * Credit goes to Avi Kivity for the original idea.
-+ */
-+
-+#ifndef __LINUX_KVM_IRQFD_H
-+#define __LINUX_KVM_IRQFD_H
-+
-+#include <linux/kvm_host.h>
-+#include <linux/poll.h>
-+
-+/*
-+ * Resampling irqfds are a special variety of irqfds used to emulate
-+ * level triggered interrupts.  The interrupt is asserted on eventfd
-+ * trigger.  On acknowledgment through the irq ack notifier, the
-+ * interrupt is de-asserted and userspace is notified through the
-+ * resamplefd.  All resamplers on the same gsi are de-asserted
-+ * together, so we don't need to track the state of each individual
-+ * user.  We can also therefore share the same irq source ID.
-+ */
-+struct kvm_kernel_irqfd_resampler {
-+	struct kvm *kvm;
-+	/*
-+	 * List of resampling struct _irqfd objects sharing this gsi.
-+	 * RCU list modified under kvm->irqfds.resampler_lock
-+	 */
-+	struct list_head list;
-+	struct kvm_irq_ack_notifier notifier;
-+	/*
-+	 * Entry in list of kvm->irqfd.resampler_list.  Use for sharing
-+	 * resamplers among irqfds on the same gsi.
-+	 * Accessed and modified under kvm->irqfds.resampler_lock
-+	 */
-+	struct list_head link;
-+};
-+
-+struct kvm_kernel_irqfd {
-+	/* Used for MSI fast-path */
-+	struct kvm *kvm;
-+	wait_queue_t wait;
-+	/* Update side is protected by irqfds.lock */
-+	struct kvm_kernel_irq_routing_entry irq_entry;
-+	seqcount_t irq_entry_sc;
-+	/* Used for level IRQ fast-path */
-+	int gsi;
-+	struct work_struct inject;
-+	/* The resampler used by this irqfd (resampler-only) */
-+	struct kvm_kernel_irqfd_resampler *resampler;
-+	/* Eventfd notified on resample (resampler-only) */
-+	struct eventfd_ctx *resamplefd;
-+	/* Entry in list of irqfds for a resampler (resampler-only) */
-+	struct list_head resampler_link;
-+	/* Used for setup/shutdown */
-+	struct eventfd_ctx *eventfd;
-+	struct list_head list;
-+	poll_table pt;
-+	struct work_struct shutdown;
-+};
-+
-+#endif /* __LINUX_KVM_IRQFD_H */
-diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-index 9ff4193..647ffb8 100644
---- a/virt/kvm/eventfd.c
-+++ b/virt/kvm/eventfd.c
-@@ -23,6 +23,7 @@
- 
- #include <linux/kvm_host.h>
- #include <linux/kvm.h>
-+#include <linux/kvm_irqfd.h>
- #include <linux/workqueue.h>
- #include <linux/syscalls.h>
- #include <linux/wait.h>
-@@ -39,68 +40,14 @@
- #include <kvm/iodev.h>
- 
- #ifdef CONFIG_HAVE_KVM_IRQFD
--/*
-- * --------------------------------------------------------------------
-- * irqfd: Allows an fd to be used to inject an interrupt to the guest
-- *
-- * Credit goes to Avi Kivity for the original idea.
-- * --------------------------------------------------------------------
-- */
--
--/*
-- * Resampling irqfds are a special variety of irqfds used to emulate
-- * level triggered interrupts.  The interrupt is asserted on eventfd
-- * trigger.  On acknowledgement through the irq ack notifier, the
-- * interrupt is de-asserted and userspace is notified through the
-- * resamplefd.  All resamplers on the same gsi are de-asserted
-- * together, so we don't need to track the state of each individual
-- * user.  We can also therefore share the same irq source ID.
-- */
--struct _irqfd_resampler {
--	struct kvm *kvm;
--	/*
--	 * List of resampling struct _irqfd objects sharing this gsi.
--	 * RCU list modified under kvm->irqfds.resampler_lock
--	 */
--	struct list_head list;
--	struct kvm_irq_ack_notifier notifier;
--	/*
--	 * Entry in list of kvm->irqfd.resampler_list.  Use for sharing
--	 * resamplers among irqfds on the same gsi.
--	 * Accessed and modified under kvm->irqfds.resampler_lock
--	 */
--	struct list_head link;
--};
--
--struct _irqfd {
--	/* Used for MSI fast-path */
--	struct kvm *kvm;
--	wait_queue_t wait;
--	/* Update side is protected by irqfds.lock */
--	struct kvm_kernel_irq_routing_entry irq_entry;
--	seqcount_t irq_entry_sc;
--	/* Used for level IRQ fast-path */
--	int gsi;
--	struct work_struct inject;
--	/* The resampler used by this irqfd (resampler-only) */
--	struct _irqfd_resampler *resampler;
--	/* Eventfd notified on resample (resampler-only) */
--	struct eventfd_ctx *resamplefd;
--	/* Entry in list of irqfds for a resampler (resampler-only) */
--	struct list_head resampler_link;
--	/* Used for setup/shutdown */
--	struct eventfd_ctx *eventfd;
--	struct list_head list;
--	poll_table pt;
--	struct work_struct shutdown;
--};
- 
- static struct workqueue_struct *irqfd_cleanup_wq;
- 
- static void
- irqfd_inject(struct work_struct *work)
- {
--	struct _irqfd *irqfd = container_of(work, struct _irqfd, inject);
-+	struct kvm_kernel_irqfd *irqfd =
-+		container_of(work, struct kvm_kernel_irqfd, inject);
- 	struct kvm *kvm = irqfd->kvm;
- 
- 	if (!irqfd->resampler) {
-@@ -121,12 +68,13 @@ irqfd_inject(struct work_struct *work)
- static void
- irqfd_resampler_ack(struct kvm_irq_ack_notifier *kian)
- {
--	struct _irqfd_resampler *resampler;
-+	struct kvm_kernel_irqfd_resampler *resampler;
- 	struct kvm *kvm;
--	struct _irqfd *irqfd;
-+	struct kvm_kernel_irqfd *irqfd;
- 	int idx;
- 
--	resampler = container_of(kian, struct _irqfd_resampler, notifier);
-+	resampler = container_of(kian,
-+			struct kvm_kernel_irqfd_resampler, notifier);
- 	kvm = resampler->kvm;
- 
- 	kvm_set_irq(kvm, KVM_IRQFD_RESAMPLE_IRQ_SOURCE_ID,
-@@ -141,9 +89,9 @@ irqfd_resampler_ack(struct kvm_irq_ack_notifier *kian)
- }
- 
- static void
--irqfd_resampler_shutdown(struct _irqfd *irqfd)
-+irqfd_resampler_shutdown(struct kvm_kernel_irqfd *irqfd)
- {
--	struct _irqfd_resampler *resampler = irqfd->resampler;
-+	struct kvm_kernel_irqfd_resampler *resampler = irqfd->resampler;
- 	struct kvm *kvm = resampler->kvm;
- 
- 	mutex_lock(&kvm->irqfds.resampler_lock);
-@@ -168,7 +116,8 @@ irqfd_resampler_shutdown(struct _irqfd *irqfd)
- static void
- irqfd_shutdown(struct work_struct *work)
- {
--	struct _irqfd *irqfd = container_of(work, struct _irqfd, shutdown);
-+	struct kvm_kernel_irqfd *irqfd =
-+		container_of(work, struct kvm_kernel_irqfd, shutdown);
- 	u64 cnt;
- 
- 	/*
-@@ -198,7 +147,7 @@ irqfd_shutdown(struct work_struct *work)
- 
- /* assumes kvm->irqfds.lock is held */
- static bool
--irqfd_is_active(struct _irqfd *irqfd)
-+irqfd_is_active(struct kvm_kernel_irqfd *irqfd)
- {
- 	return list_empty(&irqfd->list) ? false : true;
- }
-@@ -209,7 +158,7 @@ irqfd_is_active(struct _irqfd *irqfd)
-  * assumes kvm->irqfds.lock is held
-  */
- static void
--irqfd_deactivate(struct _irqfd *irqfd)
-+irqfd_deactivate(struct kvm_kernel_irqfd *irqfd)
- {
- 	BUG_ON(!irqfd_is_active(irqfd));
- 
-@@ -224,7 +173,8 @@ irqfd_deactivate(struct _irqfd *irqfd)
- static int
- irqfd_wakeup(wait_queue_t *wait, unsigned mode, int sync, void *key)
- {
--	struct _irqfd *irqfd = container_of(wait, struct _irqfd, wait);
-+	struct kvm_kernel_irqfd *irqfd =
-+		container_of(wait, struct kvm_kernel_irqfd, wait);
- 	unsigned long flags = (unsigned long)key;
- 	struct kvm_kernel_irq_routing_entry irq;
- 	struct kvm *kvm = irqfd->kvm;
-@@ -274,12 +224,13 @@ static void
- irqfd_ptable_queue_proc(struct file *file, wait_queue_head_t *wqh,
- 			poll_table *pt)
- {
--	struct _irqfd *irqfd = container_of(pt, struct _irqfd, pt);
-+	struct kvm_kernel_irqfd *irqfd =
-+		container_of(pt, struct kvm_kernel_irqfd, pt);
- 	add_wait_queue(wqh, &irqfd->wait);
- }
- 
- /* Must be called under irqfds.lock */
--static void irqfd_update(struct kvm *kvm, struct _irqfd *irqfd)
-+static void irqfd_update(struct kvm *kvm, struct kvm_kernel_irqfd *irqfd)
- {
- 	struct kvm_kernel_irq_routing_entry *e;
- 	struct kvm_kernel_irq_routing_entry entries[KVM_NR_IRQCHIPS];
-@@ -304,7 +255,7 @@ static void irqfd_update(struct kvm *kvm, struct _irqfd *irqfd)
- static int
- kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
- {
--	struct _irqfd *irqfd, *tmp;
-+	struct kvm_kernel_irqfd *irqfd, *tmp;
- 	struct fd f;
- 	struct eventfd_ctx *eventfd = NULL, *resamplefd = NULL;
- 	int ret;
-@@ -340,7 +291,7 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
- 	irqfd->eventfd = eventfd;
- 
- 	if (args->flags & KVM_IRQFD_FLAG_RESAMPLE) {
--		struct _irqfd_resampler *resampler;
-+		struct kvm_kernel_irqfd_resampler *resampler;
- 
- 		resamplefd = eventfd_ctx_fdget(args->resamplefd);
- 		if (IS_ERR(resamplefd)) {
-@@ -525,7 +476,7 @@ kvm_eventfd_init(struct kvm *kvm)
- static int
- kvm_irqfd_deassign(struct kvm *kvm, struct kvm_irqfd *args)
- {
--	struct _irqfd *irqfd, *tmp;
-+	struct kvm_kernel_irqfd *irqfd, *tmp;
- 	struct eventfd_ctx *eventfd;
- 
- 	eventfd = eventfd_ctx_fdget(args->fd);
-@@ -581,7 +532,7 @@ kvm_irqfd(struct kvm *kvm, struct kvm_irqfd *args)
- void
- kvm_irqfd_release(struct kvm *kvm)
- {
--	struct _irqfd *irqfd, *tmp;
-+	struct kvm_kernel_irqfd *irqfd, *tmp;
- 
- 	spin_lock_irq(&kvm->irqfds.lock);
- 
-@@ -604,7 +555,7 @@ kvm_irqfd_release(struct kvm *kvm)
-  */
- void kvm_irq_routing_update(struct kvm *kvm)
- {
--	struct _irqfd *irqfd;
-+	struct kvm_kernel_irqfd *irqfd;
- 
- 	spin_lock_irq(&kvm->irqfds.lock);
- 
--- 
-1.9.1
+Thanks,
+-Christoffer
