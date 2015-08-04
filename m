@@ -1,231 +1,151 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 09/11] KVM: arm/arm64: vgic: Prevent userspace
- injection of a mapped interrupt
-Date: Tue, 4 Aug 2015 19:38:07 +0200
-Message-ID: <20150804173807.GH29335@cbox>
+Subject: Re: [PATCH v3 10/11] KVM: arm/arm64: timer: Allow the timer to
+ control the active state
+Date: Tue, 4 Aug 2015 19:40:27 +0200
+Message-ID: <20150804174027.GI29335@cbox>
 References: <1437753309-17989-1-git-send-email-marc.zyngier@arm.com>
- <1437753309-17989-10-git-send-email-marc.zyngier@arm.com>
- <20150804134509.GB29335@cbox> <55C0E221.6050009@arm.com>
+ <1437753309-17989-11-git-send-email-marc.zyngier@arm.com>
+ <20150804135652.GC29335@cbox>
+ <55C0E4FD.6000100@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E3DC5A07A
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Aug 2015 13:24:40 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id szsWg1ARuhgx for <kvmarm@lists.cs.columbia.edu>;
- Tue,  4 Aug 2015 13:24:39 -0400 (EDT)
-Received: from mail-lb0-f174.google.com (mail-lb0-f174.google.com
- [209.85.217.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6CE6A5A076
- for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Aug 2015 13:24:39 -0400 (EDT)
-Received: by lbbpo9 with SMTP id po9so10412536lbb.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Aug 2015 10:37:23 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <55C0E221.6050009@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <55C0E4FD.6000100@arm.com>
+Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Andre Przywara <Andre.Przywara@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Eric Auger <eric.auger@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Aug 04, 2015 at 05:02:41PM +0100, Marc Zyngier wrote:
-> On 04/08/15 14:45, Christoffer Dall wrote:
-> > On Fri, Jul 24, 2015 at 04:55:07PM +0100, Marc Zyngier wrote:
-> >> Virtual interrupts mapped to a HW interrupt should only be triggered
-> >> from inside the kernel. Otherwise, you could end up confusing the
-> >> kernel (and the GIC's) state machine.
+On Tue, Aug 04, 2015 at 05:14:53PM +0100, Marc Zyngier wrote:
+> On 04/08/15 14:56, Christoffer Dall wrote:
+> > On Fri, Jul 24, 2015 at 04:55:08PM +0100, Marc Zyngier wrote:
+> >> In order to remove the crude hack where we sneak the masked bit
+> >> into the timer's control register, make use of the phys_irq_map
+> >> API control the active state of the interrupt.
 > >>
-> >> Rearrange the injection path so that kvm_vgic_inject_irq is
-> >> used for non-mapped interrupts, and kvm_vgic_inject_mapped_irq is
-> >> used for mapped interrupts. The latter should only be called from
-> >> inside the kernel (timer, VFIO).
+> >> This causes some limited changes to allow for potential error
+> >> propagation.
 > >>
 > >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > >> ---
-> >>  include/kvm/arm_vgic.h |  2 +
-> >>  virt/kvm/arm/vgic.c    | 99 ++++++++++++++++++++++++++++++++++----------------
-> >>  2 files changed, 70 insertions(+), 31 deletions(-)
+> >>  arch/arm/kvm/reset.c         |  4 +---
+> >>  arch/arm64/kvm/reset.c       |  4 +---
+> >>  include/kvm/arm_arch_timer.h |  7 +++++--
+> >>  virt/kvm/arm/arch_timer.c    | 29 ++++++++++++++++++++++-------
+> >>  4 files changed, 29 insertions(+), 15 deletions(-)
 > >>
-> >> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> >> index 7306b4b..f6bfd79 100644
-> >> --- a/include/kvm/arm_vgic.h
-> >> +++ b/include/kvm/arm_vgic.h
-> >> @@ -351,6 +351,8 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
-> >>  void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
-> >>  int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
-> >>  			bool level);
-> >> +int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid,
-> >> +			       struct irq_phys_map *map, bool level);
-> >>  void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
-> >>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
-> >>  int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
-> >> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> >> index 3f7b690..e40ef70 100644
-> >> --- a/virt/kvm/arm/vgic.c
-> >> +++ b/virt/kvm/arm/vgic.c
-> >> @@ -1533,7 +1533,8 @@ static int vgic_validate_injection(struct kvm_vcpu *vcpu, int irq, int level)
-> >>  }
+> >> diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
+> >> index f558c07..eeb85858 100644
+> >> --- a/arch/arm/kvm/reset.c
+> >> +++ b/arch/arm/kvm/reset.c
+> >> @@ -77,7 +77,5 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >>  	kvm_reset_coprocs(vcpu);
 > >>  
-> >>  static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
-> >> -				  unsigned int irq_num, bool level)
-> >> +				   struct irq_phys_map *map,
-> >> +				   unsigned int irq_num, bool level)
-> >>  {
-> >>  	struct vgic_dist *dist = &kvm->arch.vgic;
-> >>  	struct kvm_vcpu *vcpu;
-> >> @@ -1541,6 +1542,9 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
-> >>  	int enabled;
-> >>  	bool ret = true, can_inject = true;
-> >>  
-> >> +	if (irq_num >= min(kvm->arch.vgic.nr_irqs, 1020))
-> >> +		return -EINVAL;
-> >> +
-> >>  	spin_lock(&dist->lock);
-> >>  
-> >>  	vcpu = kvm_get_vcpu(kvm, cpuid);
-> >> @@ -1603,14 +1607,42 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
-> >>  out:
-> >>  	spin_unlock(&dist->lock);
-> >>  
-> >> -	return ret ? cpuid : -EINVAL;
-> >> +	if (!ret) {
-> > 
-> > don't you mean if (ret) here?  hint: ret is a bool
-> 
-> Ouch. Nice catch!
-> 
-> > 
-> >> +		/* kick the specified vcpu */
-> >> +		kvm_vcpu_kick(kvm_get_vcpu(kvm, cpuid));
-> >> +	}
-> >> +
-> >> +	return 0;
-> > 
-> > isn't this a change in the internal API?
-> > Before, we would return -EINVAL when ret is false.  Not sure if this
-> > has any consequences though?
-> 
-> I don't think this is a change in API. Before this patch, we would
-> either return a vcpuid or -EINVAL. But the error would not be propagated
-> beyond kvm_vgic_inject_irq, effectively discarding the error code.
-> 
-> Also, it is a bit odd to return an error because the toggling of the
-> line wasn't significant (like bringing the line down on an
-> edge-triggered interrupt).
-> 
-
-true, indeed, my brain was too fried to think it through.
-
-(why does coming back from vacation always involve paging in weird vgic
-stuff for me?)
-
-> > 
-> >> +}
-> >> +
-> >> +static int vgic_lazy_init(struct kvm *kvm)
-> >> +{
-> >> +	int ret = 0;
-> >> +
-> >> +	if (unlikely(!vgic_initialized(kvm))) {
-> >> +		/*
-> >> +		 * We only provide the automatic initialization of the VGIC
-> >> +		 * for the legacy case of a GICv2. Any other type must
-> >> +		 * be explicitly initialized once setup with the respective
-> >> +		 * KVM device call.
-> >> +		 */
-> >> +		if (kvm->arch.vgic.vgic_model != KVM_DEV_TYPE_ARM_VGIC_V2)
-> >> +			return -EBUSY;
-> >> +
-> >> +		mutex_lock(&kvm->lock);
-> >> +		ret = vgic_init(kvm);
-> >> +		mutex_unlock(&kvm->lock);
-> >> +	}
-> >> +
-> >> +	return ret;
-> >>  }
-> >>  
-> >>  /**
-> >>   * kvm_vgic_inject_irq - Inject an IRQ from a device to the vgic
-> >>   * @kvm:     The VM structure pointer
-> >>   * @cpuid:   The CPU for PPIs
-> >> - * @irq_num: The IRQ number that is assigned to the device
-> >> + * @irq_num: The IRQ number that is assigned to the device. This IRQ
-> >> + *           must not be mapped to a HW interrupt.
-> >>   * @level:   Edge-triggered:  true:  to trigger the interrupt
-> >>   *			      false: to ignore the call
-> >>   *	     Level-sensitive  true:  activates an interrupt
-> >> @@ -1623,39 +1655,44 @@ out:
-> >>  int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
-> >>  			bool level)
-> >>  {
-> >> -	int ret = 0;
-> >> -	int vcpu_id;
+> >>  	/* Reset arch_timer context */
+> >> -	kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
 > >> -
-> >> -	if (unlikely(!vgic_initialized(kvm))) {
-> >> -		/*
-> >> -		 * We only provide the automatic initialization of the VGIC
-> >> -		 * for the legacy case of a GICv2. Any other type must
-> >> -		 * be explicitly initialized once setup with the respective
-> >> -		 * KVM device call.
-> >> -		 */
-> >> -		if (kvm->arch.vgic.vgic_model != KVM_DEV_TYPE_ARM_VGIC_V2) {
-> >> -			ret = -EBUSY;
-> >> -			goto out;
-> >> -		}
-> >> -		mutex_lock(&kvm->lock);
-> >> -		ret = vgic_init(kvm);
-> >> -		mutex_unlock(&kvm->lock);
-> >> +	struct irq_phys_map *map;
-> >> +	int ret;
+> >> -	return 0;
+> >> +	return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
+> >>  }
+> >> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+> >> index b4af618..91cf535 100644
+> >> --- a/arch/arm64/kvm/reset.c
+> >> +++ b/arch/arm64/kvm/reset.c
+> >> @@ -121,7 +121,5 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+> >>  	kvm_reset_sys_regs(vcpu);
 > >>  
-> >> -		if (ret)
-> >> -			goto out;
-> >> -	}
-> >> +	ret = vgic_lazy_init(kvm);
-> >> +	if (ret)
-> >> +		return ret;
+> >>  	/* Reset timer */
+> >> -	kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
+> >> -
+> >> -	return 0;
+> >> +	return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
+> >>  }
+> >> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> >> index e596675..e1e4d7c 100644
+> >> --- a/include/kvm/arm_arch_timer.h
+> >> +++ b/include/kvm/arm_arch_timer.h
+> >> @@ -52,13 +52,16 @@ struct arch_timer_cpu {
 > >>  
-> >> -	if (irq_num >= min(kvm->arch.vgic.nr_irqs, 1020))
-> >> +	map = vgic_irq_map_search(kvm_get_vcpu(kvm, cpuid), irq_num);
-> >> +	if (map)
-> >>  		return -EINVAL;
+> >>  	/* Timer IRQ */
+> >>  	const struct kvm_irq_level	*irq;
+> >> +
+> >> +	/* VGIC mapping */
+> >> +	struct irq_phys_map		*map;
+> >>  };
 > >>  
-> >> -	vcpu_id = vgic_update_irq_pending(kvm, cpuid, irq_num, level);
-> >> -	if (vcpu_id >= 0) {
-> >> -		/* kick the specified vcpu */
-> >> -		kvm_vcpu_kick(kvm_get_vcpu(kvm, vcpu_id));
-> >> -	}
-> >> +	return vgic_update_irq_pending(kvm, cpuid, NULL, irq_num, level);
-> >> +}
+> >>  int kvm_timer_hyp_init(void);
+> >>  void kvm_timer_enable(struct kvm *kvm);
+> >>  void kvm_timer_init(struct kvm *kvm);
+> >> -void kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+> >> -			  const struct kvm_irq_level *irq);
+> >> +int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+> >> +			 const struct kvm_irq_level *irq);
+> >>  void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
+> >>  void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu);
+> >>  void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu);
+> >> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> >> index 98c95f2..76e38d2 100644
+> >> --- a/virt/kvm/arm/arch_timer.c
+> >> +++ b/virt/kvm/arm/arch_timer.c
+> >> @@ -64,10 +64,10 @@ static void kvm_timer_inject_irq(struct kvm_vcpu *vcpu)
+> >>  	int ret;
+> >>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
 > >>  
-> >> -out:
-> >> -	return ret;
-> >> +/**
-> >> + * kvm_vgic_inject_mapped_irq - Inject a physically mapped IRQ to the vgic
-> >> + * @kvm:     The VM structure pointer
-> >> + * @cpuid:   The CPU for PPIs
-> >> + * @map:     Pointer to a irq_phys_map structure describing the mapping
-> >> + * @level:   Edge-triggered:  true:  to trigger the interrupt
-> >> + *			      false: to ignore the call
-> >> + *	     Level-sensitive  true:  activates an interrupt
-> >> + *			      false: deactivates an interrupt
+> >> -	timer->cntv_ctl |= ARCH_TIMER_CTRL_IT_MASK;
+> >> -	ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+> >> -				  timer->irq->irq,
+> >> -				  timer->irq->level);
+> >> +	kvm_vgic_set_phys_irq_active(timer->map, true);
 > > 
-> > just noticed this unfortunate use of the words 'activate/deactivate'
-> > here, which is not true, it just raises/lowers the input signal...
+> > actually, I'm not sure I understand the point of setting this boolean?
+> > Is it just a check?  It seems everywhere we find the map in the VGIC
+> > code, we have a BUG_ON(!map->active), so why doesn't (!!map) imply that
+> > it should be marked as active?
+> > 
+> > Is this again for non-shared devices?
 > > 
 > 
-> I'll clean that up.
+> Setting the boolean here means that the interrupt should be marked
+> active at the distributor level when the interrupt is injected. This
+> also allows the timer code to find out when we can inject another
+> interrupt (by checking that the interrupt is now inactive).
+> 
+> As for the BUG_ON(), this is really some debug stuff to make sure we
+> have a consistent state.
+> 
+> Non-shared devices are handled separately (and setting the active state
+> doesn't make much sense, as we expect this to be entirely HW driven).
+> 
+> Do you see anything I should add to make it more clear?
 > 
 
-Thanks,
--Christoffer
+no, I'm good with it now, I think adding more commentary etc. will just
+confuse people even more... One simply has to understand this part of
+the logic.
+
+> >> +	ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
+> >> +					 timer->map,
+> >> +					 timer->irq->level);
+> >>  	WARN_ON(ret);
+> >>  }
+> >>  
+> >> @@ -117,7 +117,8 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
+> >>  	cycle_t cval, now;
+> >>  
+> >>  	if ((timer->cntv_ctl & ARCH_TIMER_CTRL_IT_MASK) ||
+> >> -		!(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE))
+> >> +	    !(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE) ||
+> >> +	    kvm_vgic_get_phys_irq_active(timer->map))
+> > 
+> > hmm, maybe this answers my question above.  It is the virtual active
+> > state preventing us to keep injecting the virtual side?
+> > 
+> 
+> Exactly. This is effectively what the MASK state was doing, now
+> replicated in SW...
+> 
+
+ok, in that case:
+
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
