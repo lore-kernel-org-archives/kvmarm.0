@@ -1,379 +1,145 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 07/18] KVM: ARM64: PMU: Add perf event map and introduce
- perf event creating function
-Date: Mon, 3 Aug 2015 21:55:47 +0200
-Message-ID: <20150803195547.GB4690@cbox>
-References: <1436149068-3784-1-git-send-email-shannon.zhao@linaro.org>
- <1436149068-3784-8-git-send-email-shannon.zhao@linaro.org>
- <20150717143043.GR14024@cbox>
- <55ADA1C7.5040002@linaro.org>
+From: Pranavkumar Sawargaonkar <pranavkumar@linaro.org>
+Subject: Re: [RFC 0/2] VFIO: Add virtual MSI doorbell support.
+Date: Tue, 4 Aug 2015 11:18:19 +0530
+Message-ID: <CAAHg+HgosCe=1T5ER-4AS1g779RxCDjcrazKV4CQC-43zDK-+Q@mail.gmail.com>
+References: <1437728590-23126-1-git-send-email-pranavkumar@linaro.org>
+ <1438100507.5211.170.camel@redhat.com>
+ <CY1PR0301MB127660D71378F009918DDDD5908D0@CY1PR0301MB1276.namprd03.prod.outlook.com>
+ <1438106335.5211.219.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <55ADA1C7.5040002@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: Shannon Zhao <shannon.zhao@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, marc.zyngier@arm.com, alex.bennee@linaro.org, zhaoshenglong@huawei.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F3DD59E3F
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Aug 2015 01:35:57 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id M0FIo7w89LIf for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Aug 2015 01:35:56 -0400 (EDT)
+Received: from mail-pa0-f54.google.com (mail-pa0-f54.google.com
+ [209.85.220.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1221759E3A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Aug 2015 01:35:55 -0400 (EDT)
+Received: by padck2 with SMTP id ck2so107785407pad.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 03 Aug 2015 22:48:39 -0700 (PDT)
+In-Reply-To: <1438106335.5211.219.camel@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Bhushan Bharat <Bharat.Bhushan@freescale.com>
+Cc: "rob.herring@linaro.org" <rob.herring@linaro.org>, "arnd@arndb.de" <arnd@arndb.de>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "patches@apm.com" <patches@apm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Stuart Yoder <stuart.yoder@freescale.com>, Alex Williamson <alex.williamson@redhat.com>, "bhelgaas@google.com" <bhelgaas@google.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jul 21, 2015 at 09:35:03AM +0800, Shannon Zhao wrote:
-> 
-> 
-> On 2015/7/17 22:30, Christoffer Dall wrote:
-> > On Mon, Jul 06, 2015 at 10:17:37AM +0800, shannon.zhao@linaro.org wrote:
-> >> From: Shannon Zhao <shannon.zhao@linaro.org>
-> >>
-> >> When we use tools like perf on host, perf passes the event type and the
-> >> id in this type category to kernel, then kernel will map them to event
-> >> number and write this number to PMU PMEVTYPER<n>_EL0 register. While
-> >> we're trapping and emulating guest accesses to PMU registers, we get the
-> >> event number and map it to the event type and the id reversely.
-> > 
-> > There's something with the nomenclature that makes this really hard to
-> > read.
-> > 
-> > you mention here: "event type", "the id", and "event number".  The
-> > former two I think are perf identifiers, and the latter is the hardware
-> > event number, is this right?
-> > 
-> 
-> Yeah, right.
-> 
+Hi Bharat,
 
-ok, if we can clarify our nomenclature throughout here I think that
-would make the patches easier to understand/read.
+On 28 July 2015 at 23:28, Alex Williamson <alex.williamson@redhat.com> wrote:
+> On Tue, 2015-07-28 at 17:23 +0000, Bhushan Bharat wrote:
+>> Hi Alex,
+>>
+>> > -----Original Message-----
+>> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+>> > Sent: Tuesday, July 28, 2015 9:52 PM
+>> > To: Pranavkumar Sawargaonkar
+>> > Cc: kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; linux-arm-
+>> > kernel@lists.infradead.org; linux-kernel@vger.kernel.org;
+>> > christoffer.dall@linaro.org; marc.zyngier@arm.com; will.deacon@arm.com;
+>> > bhelgaas@google.com; arnd@arndb.de; rob.herring@linaro.org;
+>> > eric.auger@linaro.org; patches@apm.com; Bhushan Bharat-R65777; Yoder
+>> > Stuart-B08248
+>> > Subject: Re: [RFC 0/2] VFIO: Add virtual MSI doorbell support.
+>> >
+>> > On Fri, 2015-07-24 at 14:33 +0530, Pranavkumar Sawargaonkar wrote:
+>> > > In current VFIO MSI/MSI-X implementation, linux host kernel allocates
+>> > > MSI/MSI-X vectors when userspace requests through vfio ioctls.
+>> > > Vfio creates irqfd mappings to notify MSI/MSI-X interrupts to the
+>> > > userspace when raised.
+>> > > Guest OS will see emulated MSI/MSI-X controller and receives an
+>> > > interrupt when kernel notifies the same via irqfd.
+>> > >
+>> > > Host kernel allocates MSI/MSI-X using standard linux routines like
+>> > > pci_enable_msix_range() and pci_enable_msi_range().
+>> > > These routines along with requset_irq() in host kernel sets up
+>> > > MSI/MSI-X vectors with Physical MSI/MSI-X addresses provided by
+>> > > interrupt controller driver in host kernel.
+>> > >
+>> > > This means when a device is assigned with the guest OS, MSI/MSI-X
+>> > > addresses present in PCIe EP are the PAs programmed by the host linux
+>> > kernel.
+>> > >
+>> > > In x86 MSI/MSI-X physical address range is reserved and iommu is aware
+>> > > about these addreses and transalation is bypassed for these address range.
+>> > >
+>> > > Unlike x86, ARM/ARM64 does not reserve MSI/MSI-X Physical address
+>> > > range and all the transactions including MSI go through iommu/smmu
+>> > without bypass.
+>> > > This requires extending current vfio MSI layer with additional
+>> > > functionality for ARM/ARM64 by 1. Programing IOVA (referred as a MSI
+>> > > virtual doorbell address)
+>> > >    in device's MSI vector as a MSI address.
+>> > >    This IOVA will be provided by the userspace based on the
+>> > >    MSI/MSI-X addresses reserved for the guest.
+>> > > 2. Create an IOMMU mapping between this IOVA and
+>> > >    Physical address (PA) assigned to the MSI vector.
+>> > >
+>> > > This RFC is proposing a solution for MSI/MSI-X passthrough for
+>> > ARM/ARM64.
+>> >
+>> >
+>> > Hi Pranavkumar,
+>> >
+>> > Freescale has the same, or very similar, need, so any solution in this space
+>> > will need to work for both ARM and powerpc.  I'm not a big fan of this
+>> > approach as it seems to require the user to configure MSI/X via ioctl and then
+>> > call a separate ioctl mapping the doorbells.  That's more code for the user,
+>> > more code to get wrong and potentially a gap between configuring MSI/X
+>> > and enabling mappings where we could see IOMMU faults.
+>> >
+>> > If we know that doorbell mappings are required, why can't we set aside a
+>> > bank of IOVA space and have them mapped automatically as MSI/X is being
+>> > configured?  Then the user's need for special knowledge and handling of this
+>> > case is limited to setup.  The IOVA space will be mapped and used as needed,
+>> > we only need the user to specify the IOVA space reserved for this.  Thanks,
+>>
+>> We probably need a mix of both to support Freescale PowerPC and ARM
+>> based machines.
+>> In this mix mode kernel vfio driver will reserve some IOVA for mapping
+>> MSI page/s.
+>
+> If vfio is reserving pages independently from the user, this becomes
+> what Marc called "shaping" the VM and what x86 effectively does.  An
+> interface extension should expose these implicit regions so the user can
+> avoid them for DMA memory mapping.
+>
+>>  If any other iova mapping will overlap with this then it will return
+>> error and user-space. Ideally this should be choosen in such a way
+>> that it never overlap, which is easy on some systems but can be tricky
+>> on some other system like Freescale PowerPC. This is not sufficient
+>> for at-least Freescale PowerPC based SOC. This is because of hardware
+>> limitation, where we need to fit this reserved iova address within
+>> aperture decided by user-space. So if we allow user-space to change
+>> this reserved iova address to a value decided by user-spece itself
+>> then we can support both ARM/PowerPC based solutions.
+>
+> Yes, that's my intention, to allow userspace to specify the reserved
+> region.  I believe you have some additional restrictions on the number
+> of MSI banks available and whether MSI banks can be shared, but I would
+> hope that doesn't preclude a shared interface with ARM.
+>
+>> I have some implementation ready/tested with this approach and if this
+>> approach looks good then I can submit a RFC patch.
+>
+> Yes, please post.  Thanks,
 
-> >>
-> >> Check whether the event type is same with the one to be set.
-> > 
-> > when?
-> > 
-> In function kvm_pmu_set_counter_event_type before create a new perf event.
-
-do you mean when the guest configures some counter and we we create a
-perf event accordingly?
-
-If so, I think this could be clarified in the commit text.
-
-> 
-> >> +	if ((data & ARMV8_EVTYPE_EVENT) == pmc->eventsel)
-> >> +		return;
-> 
-> 
-> >> If not,
-> >> stop counter to monitor current event and find the event type map id.
-> >> According to the bits of data to configure this perf_event attr and
-> >> set exclude_host to 1 for guest. Then call perf_event API to create the
-> >> corresponding event and save the event pointer.
-> >>
-> >> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> >> ---
-> >>  include/kvm/arm_pmu.h |   4 ++
-> >>  virt/kvm/arm/pmu.c    | 173 ++++++++++++++++++++++++++++++++++++++++++++++++++
-> >>  2 files changed, 177 insertions(+)
-> >>
-> >> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> >> index 27d14ca..1050b24 100644
-> >> --- a/include/kvm/arm_pmu.h
-> >> +++ b/include/kvm/arm_pmu.h
-> >> @@ -45,9 +45,13 @@ struct kvm_pmu {
-> >>  
-> >>  #ifdef CONFIG_KVM_ARM_PMU
-> >>  void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
-> >> +void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
-> >> +				    unsigned long select_idx);
-> >>  void kvm_pmu_init(struct kvm_vcpu *vcpu);
-> >>  #else
-> >>  static inline void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
-> >> +void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
-> >> +				    unsigned long select_idx) {}
-> >>  static inline void kvm_pmu_init(struct kvm_vcpu *vcpu) {}
-> >>  #endif
-> >>  
-> >> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> >> index dc252d0..50a3c82 100644
-> >> --- a/virt/kvm/arm/pmu.c
-> >> +++ b/virt/kvm/arm/pmu.c
-> >> @@ -18,8 +18,68 @@
-> >>  #include <linux/cpu.h>
-> >>  #include <linux/kvm.h>
-> >>  #include <linux/kvm_host.h>
-> >> +#include <linux/perf_event.h>
-> >>  #include <kvm/arm_pmu.h>
-> >>  
-> >> +/* PMU HW events mapping. */
-> >> +static struct kvm_pmu_hw_event_map {
-> >> +	unsigned eventsel;
-> >> +	unsigned event_type;
-> >> +} kvm_pmu_hw_events[] = {
-> >> +	[0] = { 0x11, PERF_COUNT_HW_CPU_CYCLES },
-> >> +	[1] = { 0x08, PERF_COUNT_HW_INSTRUCTIONS },
-> >> +	[2] = { 0x04, PERF_COUNT_HW_CACHE_REFERENCES },
-> >> +	[3] = { 0x03, PERF_COUNT_HW_CACHE_MISSES },
-> >> +	[4] = { 0x10, PERF_COUNT_HW_BRANCH_MISSES },
-> >> +};
-> >> +
-> >> +/* PMU HW cache events mapping. */
-> >> +static struct kvm_pmu_hw_cache_event_map {
-> >> +	unsigned eventsel;
-> >> +	unsigned cache_type;
-> >> +	unsigned cache_op;
-> >> +	unsigned cache_result;
-> >> +} kvm_pmu_hw_cache_events[] = {
-> >> +	[0] = { 0x04, PERF_COUNT_HW_CACHE_L1D, PERF_COUNT_HW_CACHE_OP_READ,
-> >> +		      PERF_COUNT_HW_CACHE_RESULT_ACCESS },
-> >> +	[1] = { 0x03, PERF_COUNT_HW_CACHE_L1D, PERF_COUNT_HW_CACHE_OP_READ,
-> >> +		      PERF_COUNT_HW_CACHE_RESULT_MISS },
-> >> +	[2] = { 0x04, PERF_COUNT_HW_CACHE_L1D, PERF_COUNT_HW_CACHE_OP_WRITE,
-> >> +		      PERF_COUNT_HW_CACHE_RESULT_ACCESS },
-> >> +	[3] = { 0x03, PERF_COUNT_HW_CACHE_L1D, PERF_COUNT_HW_CACHE_OP_WRITE,
-> >> +		      PERF_COUNT_HW_CACHE_RESULT_MISS },
-> > 
-> > seems to me that the four entries above will never be used, because
-> > you'll always match them in kvm_pmu_hw_events above?
-> > 
-> 
-> Yes, I found this before, but for the completeness I list them.
-> 
-
-hmm, having unused entries for completeness is a bit weird, IMHO.
-Either way, a comment explaining why they're missing or that some are
-never used would be helpful.
-
-> > Is this because perf map multiple generic perf events to the same
-> > hardware event? 
-> I think so.
-> 
-> > Does it matter if we register this with perf as one or
-> > the other then?
-> > 
-> I think it's ok because the hardware event numbers are same.
-> 
-
-ok
-
-> 
-> >> +	[4] = { 0x12, PERF_COUNT_HW_CACHE_BPU, PERF_COUNT_HW_CACHE_OP_READ,
-> >> +		      PERF_COUNT_HW_CACHE_RESULT_ACCESS },
-> >> +	[5] = { 0x10, PERF_COUNT_HW_CACHE_BPU, PERF_COUNT_HW_CACHE_OP_READ,
-> >> +		      PERF_COUNT_HW_CACHE_RESULT_MISS },
-> >> +	[6] = { 0x12, PERF_COUNT_HW_CACHE_BPU, PERF_COUNT_HW_CACHE_OP_WRITE,
-> >> +		      PERF_COUNT_HW_CACHE_RESULT_ACCESS },
-> >> +	[7] = { 0x10, PERF_COUNT_HW_CACHE_BPU, PERF_COUNT_HW_CACHE_OP_WRITE,
-> >> +		      PERF_COUNT_HW_CACHE_RESULT_MISS },
-> >> +};
-> >> +
-> >> +/**
-> >> + * kvm_pmu_stop_counter - stop PMU counter for the selected counter
-> >> + * @vcpu: The vcpu pointer
-> >> + * @select_idx: The counter index
-> >> + *
-> >> + * If this counter has been configured to monitor some event, disable and
-> >> + * release it.
-> >> + */
-> >> +static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu,
-> >> +				 unsigned long select_idx)
-> >> +{
-> >> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> >> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
-> >> +
-> >> +	if (pmc->perf_event) {
-> >> +		perf_event_disable(pmc->perf_event);
-> >> +		perf_event_release_kernel(pmc->perf_event);
-> >> +	}
-> >> +	pmc->perf_event = NULL;
-> >> +	pmc->eventsel = 0xff;
-> > 
-> > why is 0xff 'unused' or reserved?  If we're choosing this arbitrarily,
-> > why is it not 0x3ff?  Should we create a define for this?
-> > 
-> 
-> Yeah, 0x3ff may be better.
-> 
-> >> +}
-> >> +
-> >>  /**
-> >>   * kvm_pmu_vcpu_reset - reset pmu state for cpu
-> >>   * @vcpu: The vcpu pointer
-> >> @@ -27,12 +87,125 @@
-> >>   */
-> >>  void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
-> >>  {
-> >> +	int i;
-> >>  	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> >>  
-> >> +	for (i = 0; i < ARMV8_MAX_COUNTERS; i++)
-> >> +		kvm_pmu_stop_counter(vcpu, i);
-> >> +	pmu->overflow_status = 0;
-> >>  	pmu->irq_pending = false;
-> >>  }
-> >>  
-> >>  /**
-> >> + * kvm_pmu_find_hw_event - find hardware event
-> >> + * @pmu: The pmu pointer
-> >> + * @event_select: The number of selected event type
-> >> + *
-> >> + * Based on the number of selected event type, find out whether it belongs to
-> >> + * PERF_TYPE_HARDWARE. If so, return the corresponding event id.
-> >> + */
-> >> +static unsigned kvm_pmu_find_hw_event(struct kvm_pmu *pmu,
-> >> +				      unsigned long event_select)
-> >> +{
-> >> +	int i;
-> >> +
-> >> +	for (i = 0; i < ARRAY_SIZE(kvm_pmu_hw_events); i++)
-> >> +		if (kvm_pmu_hw_events[i].eventsel == event_select)
-> >> +			break;
-> >> +
-> >> +	if (i == ARRAY_SIZE(kvm_pmu_hw_events))
-> >> +		return PERF_COUNT_HW_MAX;
-> >> +
-> >> +	return kvm_pmu_hw_events[i].event_type;
-> > 
-> > you can just return this directly in the loop if you have a match and
-> > unconditionally return PERF_COUNT_HW_MAX outside the loop without having
-> > to check the loop condition.
-> > 
-> ok
-> >> +}
-> >> +
-> >> +/**
-> >> + * kvm_pmu_find_hw_cache_event - find hardware cache event
-> >> + * @pmu: The pmu pointer
-> >> + * @event_select: The number of selected event type
-> >> + *
-> >> + * Based on the number of selected event type, find out whether it belongs to
-> >> + * PERF_TYPE_HW_CACHE. If so, return the corresponding event id.
-> >> + */
-> >> +static unsigned kvm_pmu_find_hw_cache_event(struct kvm_pmu *pmu,
-> >> +					    unsigned long event_select)
-> >> +{
-> >> +	int i;
-> >> +	unsigned config;
-> >> +
-> >> +	for (i = 0; i < ARRAY_SIZE(kvm_pmu_hw_cache_events); i++)
-> >> +		if (kvm_pmu_hw_cache_events[i].eventsel == event_select)
-> >> +			break;
-> >> +
-> >> +	if (i == ARRAY_SIZE(kvm_pmu_hw_cache_events))
-> >> +		return PERF_COUNT_HW_CACHE_MAX;
-> > 
-> > I feel like I just read this code, can we reuse it with a pointer to the
-> > array?
-> > 
-> >> +
-> >> +	config = (kvm_pmu_hw_cache_events[i].cache_type & 0xff)
-> >> +		 | ((kvm_pmu_hw_cache_events[i].cache_op & 0xff) << 8)
-> >> +		 | ((kvm_pmu_hw_cache_events[i].cache_result & 0xff) << 16);
-> >> +
-> >> +	return config;
-> >> +}
-> >> +
-> >> +/**
-> >> + * kvm_pmu_set_counter_event_type - set selected counter to monitor some event
-> >> + * @vcpu: The vcpu pointer
-> >> + * @data: The data guest writes to PMXEVTYPER_EL0
-> >> + * @select_idx: The number of selected counter
-> >> + *
-> >> + * Firstly check whether the event type is same with the one to be set.
-> >> + * If not, stop counter to monitor current event and find the event type map id.
-> >> + * According to the bits of data to configure this perf_event attr and set
-> >> + * exclude_host to 1 for guest. Then call perf_event API to create the
-> >> + * corresponding event and save the event pointer.
-> > 
-> > This text seems to be describing more how the function does something,
-> > as opposed to what it does and why.  I found it a little hard to read.
-> > 
-> >> + */
-> >> +void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
-> >> +				    unsigned long select_idx)
-> >> +{
-> >> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> >> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
-> >> +	struct perf_event *event;
-> >> +	struct perf_event_attr attr;
-> >> +	unsigned config, type = PERF_TYPE_RAW;
-> >> +
-> >> +	if ((data & ARMV8_EVTYPE_EVENT) == pmc->eventsel)
-> >> +		return;
-> >> +
-> >> +	kvm_pmu_stop_counter(vcpu, select_idx);
-> >> +	pmc->eventsel = data & ARMV8_EVTYPE_EVENT;
-> >> +
-> >> +	config = kvm_pmu_find_hw_event(pmu, pmc->eventsel);
-> >> +	if (config != PERF_COUNT_HW_MAX) {
-> >> +		type = PERF_TYPE_HARDWARE;
-> >> +	} else {
-> >> +		config = kvm_pmu_find_hw_cache_event(pmu, pmc->eventsel);
-> >> +		if (config != PERF_COUNT_HW_CACHE_MAX)
-> >> +			type = PERF_TYPE_HW_CACHE;
-> >> +	}
-> >> +
-> >> +	if (type == PERF_TYPE_RAW)
-> >> +		config = pmc->eventsel;
-> > 
-> > don't you need to memset attr to 0 first?
-> > 
-> ok
-> > otherwise, how do you ensure that for example exclude_guest is always
-> > clear?
-> > 
-> >> +
-> >> +	attr.type = type;
-> >> +	attr.size = sizeof(attr);
-> >> +	attr.pinned = true;
-> >> +	attr.exclude_user = data & ARMV8_EXCLUDE_EL0 ? 1 : 0;
-> >> +	attr.exclude_kernel = data & ARMV8_EXCLUDE_EL1 ? 1 : 0;
-> >> +	attr.exclude_hv = data & ARMV8_INCLUDE_EL2 ? 0 : 1;
-> > 
-> > should the guest be able to see something counted in the hypervisor ever
-> > or should that only be the host being able to see that?
-> > 
-> > my gut feeling is that the hypervisor should be hidden from the guest
-> > and that exclude_hv = 0, is the right choice.  But this is a question
-> > about the semantics of perf, I suppose.
-> > 
-> 
-> This is what I'm not sure. I just thought about if guest has complete
-> ELs(EL3-EL0) and how to deal with nested virtualization.
-> 
-
-nested virtualization is really not very likely to happen on arm64.  I
-think the right way to look at this is that we're emulating a platform
-without EL2 and therefore the guest should not see any events from EL2.
-
-> >> +	attr.exclude_host = 1;
-> >> +	attr.config = config;
-> >> +	attr.sample_period = (-pmc->counter) & (((u64)1 << 32) - 1);
-> > 
-> > whoa, what is this scary calculation?
-> > 
-> > definitely needs an explanation?
-> > 
-> >> +
-> >> +	event = perf_event_create_kernel_counter(&attr, -1, current, NULL, pmc);
-> >> +	if (IS_ERR(event)) {
-> >> +		kvm_err("kvm: pmu event creation failed %ld\n",
-> >> +			  PTR_ERR(event));
-> > 
-> > doesn't this mean we'll spam the kernel log if the guest supplies
-> > bogus/unsupported event numbers?
-> > 
-> 
-> X86 uses printk_once, is that ok to us here?
-
-yeah, that should be fine.
-
-> 
-> > In that case it shoudl be kvm_debug and the guest should be able to see
-> > this somehow (e.g. events don't count).
-> > 
-> 
-> Yes, will think about this.
-> 
-
-printk_once of kvm_debug would be fine.
+Could you please share a tentative timeline by which you will be
+posting your patches ?
+Also are you planning to post counterpart patches for qemu or kvmtool ?
 
 Thanks,
--Christoffer
+Pranav
