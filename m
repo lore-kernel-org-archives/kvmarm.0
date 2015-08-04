@@ -1,151 +1,212 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 10/11] KVM: arm/arm64: timer: Allow the timer to
- control the active state
-Date: Tue, 4 Aug 2015 19:40:27 +0200
-Message-ID: <20150804174027.GI29335@cbox>
+Subject: Re: [PATCH v3 11/11] KVM: arm/arm64: vgic: Allow HW interrupts for
+ non-shared devices
+Date: Tue, 4 Aug 2015 20:07:49 +0200
+Message-ID: <20150804180749.GJ29335@cbox>
 References: <1437753309-17989-1-git-send-email-marc.zyngier@arm.com>
- <1437753309-17989-11-git-send-email-marc.zyngier@arm.com>
- <20150804135652.GC29335@cbox>
- <55C0E4FD.6000100@arm.com>
+ <1437753309-17989-12-git-send-email-marc.zyngier@arm.com>
+ <20150804143209.GD29335@cbox> <55C0F1A5.1070204@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D643459FB9
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Aug 2015 13:54:22 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id JptvOlwU-fQU for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  4 Aug 2015 13:54:21 -0400 (EDT)
+Received: from mail-la0-f46.google.com (mail-la0-f46.google.com
+ [209.85.215.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 726A159B51
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  4 Aug 2015 13:54:21 -0400 (EDT)
+Received: by lady2 with SMTP id y2so8906935lad.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 04 Aug 2015 11:07:06 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <55C0E4FD.6000100@arm.com>
-Sender: kvm-owner@vger.kernel.org
+In-Reply-To: <55C0F1A5.1070204@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Eric Auger <eric.auger@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Andre Przywara <Andre.Przywara@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Aug 04, 2015 at 05:14:53PM +0100, Marc Zyngier wrote:
-> On 04/08/15 14:56, Christoffer Dall wrote:
-> > On Fri, Jul 24, 2015 at 04:55:08PM +0100, Marc Zyngier wrote:
-> >> In order to remove the crude hack where we sneak the masked bit
-> >> into the timer's control register, make use of the phys_irq_map
-> >> API control the active state of the interrupt.
+On Tue, Aug 04, 2015 at 06:08:53PM +0100, Marc Zyngier wrote:
+> On 04/08/15 15:32, Christoffer Dall wrote:
+> > On Fri, Jul 24, 2015 at 04:55:09PM +0100, Marc Zyngier wrote:
+> >> So far, the only use of the HW interrupt facility is the timer,
+> >> implying that the active state is context-switched for each vcpu,
+> >> as the device is is shared across all vcpus.
 > >>
-> >> This causes some limited changes to allow for potential error
-> >> propagation.
+> >> This does not work for a device that has been assigned to a VM,
+> >> as the guest is entierely in control of that device (the HW is
+> >> not shared). In that case, it makes sense to bypass the whole
+> >> active state switching, and only track the deactivation of the
+> >> interrupt.
 > >>
 > >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > >> ---
-> >>  arch/arm/kvm/reset.c         |  4 +---
-> >>  arch/arm64/kvm/reset.c       |  4 +---
-> >>  include/kvm/arm_arch_timer.h |  7 +++++--
-> >>  virt/kvm/arm/arch_timer.c    | 29 ++++++++++++++++++++++-------
-> >>  4 files changed, 29 insertions(+), 15 deletions(-)
+> >>  include/kvm/arm_vgic.h    |  6 ++--
+> >>  virt/kvm/arm/arch_timer.c |  3 +-
+> >>  virt/kvm/arm/vgic.c       | 73 +++++++++++++++++++++++++++++++++++++----------
+> >>  3 files changed, 64 insertions(+), 18 deletions(-)
 > >>
-> >> diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
-> >> index f558c07..eeb85858 100644
-> >> --- a/arch/arm/kvm/reset.c
-> >> +++ b/arch/arm/kvm/reset.c
-> >> @@ -77,7 +77,5 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
-> >>  	kvm_reset_coprocs(vcpu);
-> >>  
-> >>  	/* Reset arch_timer context */
-> >> -	kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
-> >> -
-> >> -	return 0;
-> >> +	return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
-> >>  }
-> >> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> >> index b4af618..91cf535 100644
-> >> --- a/arch/arm64/kvm/reset.c
-> >> +++ b/arch/arm64/kvm/reset.c
-> >> @@ -121,7 +121,5 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
-> >>  	kvm_reset_sys_regs(vcpu);
-> >>  
-> >>  	/* Reset timer */
-> >> -	kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
-> >> -
-> >> -	return 0;
-> >> +	return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
-> >>  }
-> >> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-> >> index e596675..e1e4d7c 100644
-> >> --- a/include/kvm/arm_arch_timer.h
-> >> +++ b/include/kvm/arm_arch_timer.h
-> >> @@ -52,13 +52,16 @@ struct arch_timer_cpu {
-> >>  
-> >>  	/* Timer IRQ */
-> >>  	const struct kvm_irq_level	*irq;
-> >> +
-> >> +	/* VGIC mapping */
-> >> +	struct irq_phys_map		*map;
+> >> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> >> index f6bfd79..6f0a4e1 100644
+> >> --- a/include/kvm/arm_vgic.h
+> >> +++ b/include/kvm/arm_vgic.h
+> >> @@ -164,7 +164,8 @@ struct irq_phys_map {
+> >>  	u32			phys_irq;
+> >>  	u32			irq;
+> >>  	bool			deleted;
+> >> -	bool			active;
+> >> +	bool			shared;
+> >> +	bool			active; /* Only valid if shared */
 > >>  };
 > >>  
-> >>  int kvm_timer_hyp_init(void);
-> >>  void kvm_timer_enable(struct kvm *kvm);
-> >>  void kvm_timer_init(struct kvm *kvm);
-> >> -void kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
-> >> -			  const struct kvm_irq_level *irq);
-> >> +int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
-> >> +			 const struct kvm_irq_level *irq);
-> >>  void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
-> >>  void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu);
-> >>  void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu);
+> >>  struct irq_phys_map_entry {
+> >> @@ -357,7 +358,8 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
+> >>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+> >>  int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
+> >>  struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+> >> -					   int virt_irq, int irq);
+> >> +					   int virt_irq, int irq,
+> >> +					   bool shared);
+> >>  int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
+> >>  bool kvm_vgic_get_phys_irq_active(struct irq_phys_map *map);
+> >>  void kvm_vgic_set_phys_irq_active(struct irq_phys_map *map, bool active);
 > >> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> >> index 98c95f2..76e38d2 100644
+> >> index 76e38d2..db21d8f 100644
 > >> --- a/virt/kvm/arm/arch_timer.c
 > >> +++ b/virt/kvm/arm/arch_timer.c
-> >> @@ -64,10 +64,10 @@ static void kvm_timer_inject_irq(struct kvm_vcpu *vcpu)
+> >> @@ -203,7 +203,8 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+> >>  	 * Tell the VGIC that the virtual interrupt is tied to a
+> >>  	 * physical interrupt. We do that once per VCPU.
+> >>  	 */
+> >> -	map = kvm_vgic_map_phys_irq(vcpu, irq->irq, host_vtimer_irq);
+> >> +	map = kvm_vgic_map_phys_irq(vcpu, irq->irq,
+> >> +				    host_vtimer_irq, true);
+> >>  	if (WARN_ON(IS_ERR(map)))
+> >>  		return PTR_ERR(map);
+> >>  
+> >> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+> >> index e40ef70..5e6b816 100644
+> >> --- a/virt/kvm/arm/vgic.c
+> >> +++ b/virt/kvm/arm/vgic.c
+> >> @@ -1128,19 +1128,25 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
+> >>  		 * active in the physical world. Otherwise the
+> >>  		 * physical interrupt will fire and the guest will
+> >>  		 * exit before processing the virtual interrupt.
+> >> +		 *
+> >> +		 * This is of course only valid for a shared
+> >> +		 * interrupt. A non shared interrupt should already be
+> >> +		 * active.
+> >>  		 */
+> >>  		if (map) {
+> >> -			int ret;
+> >> -
+> >> -			BUG_ON(!map->active);
+> >>  			vlr.hwirq = map->phys_irq;
+> >>  			vlr.state |= LR_HW;
+> >>  			vlr.state &= ~LR_EOI_INT;
+> >>  
+> >> -			ret = irq_set_irqchip_state(map->irq,
+> >> -						    IRQCHIP_STATE_ACTIVE,
+> >> -						    true);
+> >> -			WARN_ON(ret);
+> >> +			if (map->shared) {
+> >> +				int ret;
+> >> +
+> >> +				BUG_ON(!map->active);
+> >> +				ret = irq_set_irqchip_state(map->irq,
+> >> +							    IRQCHIP_STATE_ACTIVE,
+> >> +							    true);
+> >> +				WARN_ON(ret);
+> >> +			}
+> >>  
+> >>  			/*
+> >>  			 * Make sure we're not going to sample this
+> >> @@ -1383,21 +1389,41 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+> >>  static int vgic_sync_hwirq(struct kvm_vcpu *vcpu, struct vgic_lr vlr)
+> >>  {
+> >>  	struct irq_phys_map *map;
+> >> +	bool active;
 > >>  	int ret;
-> >>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
 > >>  
-> >> -	timer->cntv_ctl |= ARCH_TIMER_CTRL_IT_MASK;
-> >> -	ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-> >> -				  timer->irq->irq,
-> >> -				  timer->irq->level);
-> >> +	kvm_vgic_set_phys_irq_active(timer->map, true);
-> > 
-> > actually, I'm not sure I understand the point of setting this boolean?
-> > Is it just a check?  It seems everywhere we find the map in the VGIC
-> > code, we have a BUG_ON(!map->active), so why doesn't (!!map) imply that
-> > it should be marked as active?
-> > 
-> > Is this again for non-shared devices?
-> > 
-> 
-> Setting the boolean here means that the interrupt should be marked
-> active at the distributor level when the interrupt is injected. This
-> also allows the timer code to find out when we can inject another
-> interrupt (by checking that the interrupt is now inactive).
-> 
-> As for the BUG_ON(), this is really some debug stuff to make sure we
-> have a consistent state.
-> 
-> Non-shared devices are handled separately (and setting the active state
-> doesn't make much sense, as we expect this to be entirely HW driven).
-> 
-> Do you see anything I should add to make it more clear?
-> 
-
-no, I'm good with it now, I think adding more commentary etc. will just
-confuse people even more... One simply has to understand this part of
-the logic.
-
-> >> +	ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
-> >> +					 timer->map,
-> >> +					 timer->irq->level);
+> >>  	if (!(vlr.state & LR_HW))
+> >>  		return 0;
+> >>  
+> >>  	map = vgic_irq_map_search(vcpu, vlr.irq);
+> >> -	BUG_ON(!map || !map->active);
+> >> +	BUG_ON(!map);
+> >> +	BUG_ON(map->shared && !map->active);
+> >>  
+> >>  	ret = irq_get_irqchip_state(map->irq,
+> >>  				    IRQCHIP_STATE_ACTIVE,
+> >> -				    &map->active);
+> >> +				    &active);
+> >>  
 > >>  	WARN_ON(ret);
-> >>  }
 > >>  
-> >> @@ -117,7 +117,8 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
-> >>  	cycle_t cval, now;
-> >>  
-> >>  	if ((timer->cntv_ctl & ARCH_TIMER_CTRL_IT_MASK) ||
-> >> -		!(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE))
-> >> +	    !(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE) ||
-> >> +	    kvm_vgic_get_phys_irq_active(timer->map))
+> >> -	if (map->active) {
+> >> +	/*
+> >> +	 * For a non-shared interrupt, we have to cater for two
+> >> +	 * possible deactivation conditions:
+> >> +	 *
+> >> +	 * - the physical interrupt is now inactive (EOIed from the
+> >> +         *   guest)
 > > 
-> > hmm, maybe this answers my question above.  It is the virtual active
-> > state preventing us to keep injecting the virtual side?
+> > nit: whitespace funkyness
 > > 
+> >> +	 * - the physical interrupt is still active, but its virtual
+> >> +	 *   counterpart is flagged as "not queued", indicating another
+> >> +	 *   interrupt has fired between the EOI and the guest exit.
+> >> +	 *
+> >> +	 * Also, we are not reactivating a non-shared interrupt
+> > 
+> > what does reactivating mean? did you mean deactivate?
 > 
-> Exactly. This is effectively what the MASK state was doing, now
-> replicated in SW...
+> Deactivate indeed.
 > 
+> >> +	 * ourselves. This is always left to the guest.
+> > 
+> > In which case, add ", because the device is solely owned by the guest."
+> 
+> Sure.
+> 
+> >> +	 */
+> >> +	if (!map->shared)
+> >> +		return !active || !vgic_irq_is_queued(vcpu, vlr.irq);
+> > 
+> > do you really need the second part of the disjunction?
+> > 
+> > The effect seems to be that we clear the queued flag once again, and
+> > clear the LR.  If we don't do this, won't we simply pick up the pending
+> > flag next time we're about to run this VCPU and piggy-back on the
+> > existing LR.  Perhaps this is a weird flow though?
+> 
+> Crucially, we free the LR in this case (the set_bit on elrsr_ptr). If we
+> don't do this, we're indeed going to schedule the vcpu (it has something
+> to process), but we never allow piggy-backing on level interrupts. We'd
+> need some special hack to handle this.
+> 
+> I definitely feel more comfortable reporting that the interrupt has been
+> deactivated (which is the case), and let the normal flow pick up the
+> next injected interrupt.
+> 
+Yes, you're right, it's much better this way.
 
-ok, in that case:
+I assume you'll still wait with this stuff until the priority drop / EOI
+stuff is in, so I'll do a formal review again once all the dependencies
+are there.
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+But this looks good to me.
+
+-Christoffer
