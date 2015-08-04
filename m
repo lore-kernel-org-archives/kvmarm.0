@@ -1,277 +1,408 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 10/10] KVM: arm/arm64: vgic: Allow non-shared device
- HW interrupts
-Date: Tue, 4 Aug 2015 14:26:01 +0200
-Message-ID: <20150804122601.GB29453@cbox>
-References: <1436378202-20224-1-git-send-email-marc.zyngier@arm.com>
- <1436378202-20224-11-git-send-email-marc.zyngier@arm.com>
- <20150717221521.GH14024@cbox>
- <55AE88E9.1070802@arm.com>
+Subject: Re: [PATCH v3 06/11] KVM: arm/arm64: vgic: Allow dynamic mapping of
+ physical/virtual interrupts
+Date: Tue, 4 Aug 2015 15:04:57 +0200
+Message-ID: <20150804130457.GA29335@cbox>
+References: <1437753309-17989-1-git-send-email-marc.zyngier@arm.com>
+ <1437753309-17989-7-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <55AE88E9.1070802@arm.com>
+In-Reply-To: <1437753309-17989-7-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Eric Auger <eric.auger@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@linaro.org>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Jul 21, 2015 at 07:01:13PM +0100, Marc Zyngier wrote:
-> On 17/07/15 23:15, Christoffer Dall wrote:
-> > On Wed, Jul 08, 2015 at 06:56:42PM +0100, Marc Zyngier wrote:
-> >> So far, the only use of the HW interrupt facility is the timer,
-> >> implying that the active state is context-switched for each vcpu,
-> >> as the device is is shared across all vcpus.
-> >>
-> >> This does not work for a device that has been assigned to a VM,
-> >> as the guest is entierely in control of that device (the HW is
-> >> not shared). In that case, it makes sense to bypass the whole
-> >> active state switchint, and only track the deactivation of the
-> > 
-> > switching
-> > 
-> >> interrupt.
-> >>
-> >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> >> ---
-> >>  include/kvm/arm_vgic.h    |  5 ++--
-> >>  virt/kvm/arm/arch_timer.c |  2 +-
-> >>  virt/kvm/arm/vgic.c       | 62 ++++++++++++++++++++++++++++++++++++-----------
-> >>  3 files changed, 52 insertions(+), 17 deletions(-)
-> >>
-> >> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> >> index 9fd4023..31c987a 100644
-> >> --- a/include/kvm/arm_vgic.h
-> >> +++ b/include/kvm/arm_vgic.h
-> >> @@ -163,7 +163,8 @@ struct irq_phys_map {
-> >>  	u32			virt_irq;
-> >>  	u32			phys_irq;
-> >>  	u32			irq;
-> >> -	bool			active;
-> >> +	bool			shared;
-> >> +	bool			active; /* Only valid if shared */
-> >>  };
-> >>  
-> >>  struct irq_phys_map_entry {
-> >> @@ -354,7 +355,7 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
-> >>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
-> >>  int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
-> >>  struct irq_phys_map *vgic_map_phys_irq(struct kvm_vcpu *vcpu,
-> >> -				       int virt_irq, int irq);
-> >> +				       int virt_irq, int irq, bool shared);
-> >>  int vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
-> >>  bool vgic_get_phys_irq_active(struct irq_phys_map *map);
-> >>  void vgic_set_phys_irq_active(struct irq_phys_map *map, bool active);
-> >> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> >> index b9fff78..9544d79 100644
-> >> --- a/virt/kvm/arm/arch_timer.c
-> >> +++ b/virt/kvm/arm/arch_timer.c
-> >> @@ -202,7 +202,7 @@ void kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
-> >>  	 * Tell the VGIC that the virtual interrupt is tied to a
-> >>  	 * physical interrupt. We do that once per VCPU.
-> >>  	 */
-> >> -	timer->map = vgic_map_phys_irq(vcpu, irq->irq, host_vtimer_irq);
-> >> +	timer->map = vgic_map_phys_irq(vcpu, irq->irq, host_vtimer_irq, true);
-> >>  	WARN_ON(!timer->map);
-> >>  }
-> >>  
-> >> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> >> index 39f9479..3585bb0 100644
-> >> --- a/virt/kvm/arm/vgic.c
-> >> +++ b/virt/kvm/arm/vgic.c
-> >> @@ -1123,18 +1123,21 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
-> >>  		map = vgic_irq_map_search(vcpu, irq);
-> >>  
-> >>  		if (map) {
-> >> -			int ret;
-> >> -
-> >> -			BUG_ON(!map->active);
-> >>  			vlr.hwirq = map->phys_irq;
-> >>  			vlr.state |= LR_HW;
-> >>  			vlr.state &= ~LR_EOI_INT;
-> >>  
-> >> -			ret = irq_set_irqchip_state(map->irq,
-> >> -						    IRQCHIP_STATE_ACTIVE,
-> >> -						    true);
-> >>  			vgic_irq_set_queued(vcpu, irq);
-> >> -			WARN_ON(ret);
-> >> +
-> >> +			if (map->shared) {
-> >> +				int ret;
-> >> +
-> >> +				BUG_ON(!map->active);
-> >> +				ret = irq_set_irqchip_state(map->irq,
-> >> +							    IRQCHIP_STATE_ACTIVE,
-> >> +							    true);
-> >> +				WARN_ON(ret);
-> > 
-> > do we have any other example of a shared device or is this really simply
-> > because the timer hardware is fscking strangely tied to the gic and is a
-> > total one-off?
+On Fri, Jul 24, 2015 at 04:55:04PM +0100, Marc Zyngier wrote:
+> In order to be able to feed physical interrupts to a guest, we need
+> to be able to establish the virtual-physical mapping between the two
+> worlds.
 > 
-> I don't think of it as a one-off. PMUs could very well be in the same
-> category.
+> The mappings are kept in a set of RCU lists, indexed by virtual interrupts.
 > 
-> > In the latter case, would it be cleaner to drop this notion of a shared
-> > device entirely and put all this logic in the arch timer code instead?
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm/kvm/arm.c     |   2 +
+>  include/kvm/arm_vgic.h |  26 +++++++
+>  virt/kvm/arm/vgic.c    | 189 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>  3 files changed, 216 insertions(+), 1 deletion(-)
 > 
-> My initial implementation did exactly that (hence the cut-n-paste crap
-> you spotted in patch #6). It wasn't bad, but it did put a lot of GIC
-> knowledge inside the timer code, and a few callbacks too many between
-> the two subsystems.
-> 
-> >> +			}
-> >>  		}
-> >>  	}
-> >>  
-> >> @@ -1366,21 +1369,37 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
-> >>  static int vgic_sync_hwirq(struct kvm_vcpu *vcpu, struct vgic_lr vlr)
-> >>  {
-> >>  	struct irq_phys_map *map;
-> >> +	bool active;
-> >>  	int ret;
-> >>  
-> >>  	if (!(vlr.state & LR_HW))
-> >>  		return 0;
-> >>  
-> >>  	map = vgic_irq_map_search(vcpu, vlr.irq);
-> >> -	BUG_ON(!map || !map->active);
-> >> +	BUG_ON(!map);
-> >> +	BUG_ON(map->shared && !map->active);
-> >>  
-> >>  	ret = irq_get_irqchip_state(map->irq,
-> >>  				    IRQCHIP_STATE_ACTIVE,
-> >> -				    &map->active);
-> >> +				    &active);
-> >>  
-> >>  	WARN_ON(ret);
-> >>  
-> >> -	if (map->active) {
-> >> +	/*
-> >> +	 * For a non-shared interrupt, we have to catter for two
-> > 
-> > s/catter/cater/ ?
-> 
-> Yup.
-> 
-> >> +	 * possible deactivation conditions
-> > 
-> > conditions:
-> > 
-> >> +	 *
-> >> +	 * - the interrupt is now inactive
-> >> +	 * - the interrupt is still active, but is flagged as not
-> >> +	 *   queued, indicating another interrupt has fired before we
-> >> +	 *   could observe the deactivate.
-> > 
-> > are these physical or virtual interrupts we are talking about?  I assume
-> > virtual, but it would be good to be specific.  It's not like we're going
-> > to remember any of this in a little bit.
-> 
-> There is a massive ambiguity here. It should read:
-> - the physical interrupt is now inactive (EOIed from the guest)
-> - the physical interrupt is still active, but its virtual counterpart is
-> flagged as "not queued", indicating another interrupt has fired between
-> the EOI and the guest exit.
-> 
-> >> +	 */
-> >> +	if (!map->shared)
-> >> +		return !active || !vgic_irq_is_queued(vcpu, vlr.irq);
-> > 
-> > if the second part of the disjunction returns true, doesn't this mean
-> > we can potentially write the active+pending state in the LR for a HW
-> > interrupt, which is not allowed?
-> 
-> I don't think so. If the physical interrupt has fired, it is because it
-> has been EOIed (hence deactivated) first (the active state would
-> otherwise prevent it from firing).
-> 
-> >> +
-> >> +	map->active = active;
-> >> +
-> >> +	if (active) {
-> > 
-> > should you be doing this for a non-shared interrupt?
-> 
-> No. A non-shared interrupt is only dealt with by a single VM, so there
-> is no need to clear its state. That would actually completely confuse
-> both the device and the VM if you did, because you could now inject a
-> new interrupt while the previous one is still in progress. Mayhem follows...
-> 
-> >>  		ret = irq_set_irqchip_state(map->irq,
-> >>  					    IRQCHIP_STATE_ACTIVE,
-> >>  					    false);
-> >> @@ -1523,6 +1542,7 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
-> >>  	int edge_triggered, level_triggered;
-> >>  	int enabled;
-> >>  	bool ret = true, can_inject = true;
-> >> +	struct irq_phys_map *map;
-> >>  
-> >>  	spin_lock(&dist->lock);
-> >>  
-> >> @@ -1569,6 +1589,18 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
-> >>  		goto out;
-> >>  	}
-> >>  
-> >> +	map = vgic_irq_map_search(vcpu, irq_num);
-> >> +	if (map && !map->shared) {
-> >> +		/*
-> >> +		 * We are told to inject a HW irq, so we have to trust
-> >> +		 * the caller that the previous one has been EOIed,
-> >> +		 * and that a new one is now active. Clearing the
-> >> +		 * queued state will have the effect of making it
-> >> +		 * sample-able again.
-> >> +		 */
-> >> +		vgic_irq_clear_queued(vcpu, irq_num);
-> > 
-> > see my question above about active+pending
-> 
-> I hope I convinced you above. I realize there is one thing missing
-> though. Userspace shouldn't be allowed to inject a mapped interrupt.
-> Ever. I'll fix that.
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index f1bf418..ce404a5 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -125,6 +125,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  	if (ret)
+>  		goto out_free_stage2_pgd;
+>  
+> +	kvm_vgic_early_init(kvm);
+>  	kvm_timer_init(kvm);
+>  
+>  	/* Mark the initial VMID generation invalid */
+> @@ -249,6 +250,7 @@ out:
+>  
+>  void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
+>  {
+> +	kvm_vgic_vcpu_early_init(vcpu);
+>  }
+>  
+>  void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index a881e39..68212a1 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -159,6 +159,20 @@ struct vgic_io_device {
+>  	struct kvm_io_device dev;
+>  };
+>  
+> +struct irq_phys_map {
+> +	u32			virt_irq;
+> +	u32			phys_irq;
+> +	u32			irq;
+> +	bool			deleted;
+> +	bool			active;
+> +};
+> +
+> +struct irq_phys_map_entry {
+> +	struct list_head	entry;
+> +	struct rcu_head		rcu;
+> +	struct irq_phys_map	map;
+> +};
+> +
+>  struct vgic_dist {
+>  	spinlock_t		lock;
+>  	bool			in_kernel;
+> @@ -256,6 +270,10 @@ struct vgic_dist {
+>  	struct vgic_vm_ops	vm_ops;
+>  	struct vgic_io_device	dist_iodev;
+>  	struct vgic_io_device	*redist_iodevs;
+> +
+> +	/* Virtual irq to hwirq mapping */
+> +	spinlock_t		irq_phys_map_lock;
+> +	struct list_head	irq_phys_map_list;
+>  };
+>  
+>  struct vgic_v2_cpu_if {
+> @@ -307,6 +325,9 @@ struct vgic_cpu {
+>  		struct vgic_v2_cpu_if	vgic_v2;
+>  		struct vgic_v3_cpu_if	vgic_v3;
+>  	};
+> +
+> +	/* Protected by the distributor's irq_phys_map_lock */
+> +	struct list_head	irq_phys_map_list;
+>  };
+>  
+>  #define LR_EMPTY	0xff
+> @@ -321,8 +342,10 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
+>  int kvm_vgic_hyp_init(void);
+>  int kvm_vgic_map_resources(struct kvm *kvm);
+>  int kvm_vgic_get_max_vcpus(void);
+> +void kvm_vgic_early_init(struct kvm *kvm);
+>  int kvm_vgic_create(struct kvm *kvm, u32 type);
+>  void kvm_vgic_destroy(struct kvm *kvm);
+> +void kvm_vgic_vcpu_early_init(struct kvm_vcpu *vcpu);
+>  void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu);
+>  void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
+>  void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
+> @@ -331,6 +354,9 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
+>  void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
+>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+>  int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
+> +struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+> +					   int virt_irq, int irq);
+> +int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
+>  
+>  #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+>  #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
+> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+> index 5bd1695..c74d929 100644
+> --- a/virt/kvm/arm/vgic.c
+> +++ b/virt/kvm/arm/vgic.c
+> @@ -24,6 +24,7 @@
+>  #include <linux/of.h>
+>  #include <linux/of_address.h>
+>  #include <linux/of_irq.h>
+> +#include <linux/rculist.h>
+>  #include <linux/uaccess.h>
+>  
+>  #include <asm/kvm_emulate.h>
+> @@ -82,6 +83,8 @@ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu);
+>  static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu);
+>  static struct vgic_lr vgic_get_lr(const struct kvm_vcpu *vcpu, int lr);
+>  static void vgic_set_lr(struct kvm_vcpu *vcpu, int lr, struct vgic_lr lr_desc);
+> +static struct irq_phys_map *vgic_irq_map_search(struct kvm_vcpu *vcpu,
+> +						int virt_irq);
+>  
+>  static const struct vgic_ops *vgic_ops;
+>  static const struct vgic_params *vgic;
+> @@ -1583,6 +1586,166 @@ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
+>  	return IRQ_HANDLED;
+>  }
+>  
+> +static struct list_head *vgic_get_irq_phys_map_list(struct kvm_vcpu *vcpu,
+> +						    int virt_irq)
+> +{
+> +	if (virt_irq < VGIC_NR_PRIVATE_IRQS)
+> +		return &vcpu->arch.vgic_cpu.irq_phys_map_list;
+> +	else
+> +		return &vcpu->kvm->arch.vgic.irq_phys_map_list;
+> +}
+> +
+> +/**
+> + * kvm_vgic_map_phys_irq - map a virtual IRQ to a physical IRQ
+> + * @vcpu: The VCPU pointer
+> + * @virt_irq: The virtual irq number
+> + * @irq: The Linux IRQ number
+> + *
+> + * Establish a mapping between a guest visible irq (@virt_irq) and a
+> + * Linux irq (@irq). On injection, @virt_irq will be associated with
+> + * the physical interrupt represented by @irq.
+> + *
+> + * Returns a valid pointer on success, and an error pointer otherwise
+> + */
+> +struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+> +					   int virt_irq, int irq)
+> +{
+> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +	struct list_head *root = vgic_get_irq_phys_map_list(vcpu, virt_irq);
+> +	struct irq_phys_map *map;
+> +	struct irq_phys_map_entry *entry;
+> +	struct irq_desc *desc;
+> +	struct irq_data *data;
+> +	int phys_irq;
+> +
+> +	desc = irq_to_desc(irq);
+> +	if (!desc) {
+> +		kvm_err("kvm_vgic_map_phys_irq: no interrupt descriptor\n");
+
+super over-ridiculous nit:
+if you respin you could consider "%s: no...", __FUNC__
+
+> +		return ERR_PTR(-EINVAL);
+> +	}
+> +
+> +	data = irq_desc_get_irq_data(desc);
+> +	while (data->parent_data)
+> +		data = data->parent_data;
+> +
+> +	phys_irq = data->hwirq;
+> +
+> +	/* Create a new mapping */
+> +	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
+> +	if (!entry)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	spin_lock(&dist->irq_phys_map_lock);
+> +
+> +	/* Try to match an existing mapping */
+> +	map = vgic_irq_map_search(vcpu, virt_irq);
+> +	if (map) {
+> +		/* Make sure this mapping matches */
+
+why do we need to check that it matches?  Is it ever allowed to have
+multiple mappings of a virtual interrupt?
+
+> +		if (map->phys_irq != phys_irq	||
+> +		    map->irq      != irq)
+> +			map = ERR_PTR(-EINVAL);
+> +
+> +		goto out;
+
+why is this a valid situation?  Shouldn't you return -EEXIST or
+something instead?  (that would also simplify the error-checking free
+routine below).
+
+If you want it to be valid to map the same virq to irq multiple times
+(to free the caller from some bookkeeping, I presume?) then that should
+be part of the function documentation, and I think we should add a
+"found existing mapping" comment above the goto out statement.
+
+> +	}
+> +
+> +	map           = &entry->map;
+> +	map->virt_irq = virt_irq;
+> +	map->phys_irq = phys_irq;
+> +	map->irq      = irq;
+> +
+> +	list_add_tail_rcu(&entry->entry, root);
+> +
+> +out:
+> +	spin_unlock(&dist->irq_phys_map_lock);
+> +	/* If we've found a hit in the existing list, free the useless
+> +	 * entry */
+> +	if (IS_ERR(map) || map != &entry->map)
+> +		kfree(entry);
+> +	return map;
+> +}
+> +
+> +static struct irq_phys_map *vgic_irq_map_search(struct kvm_vcpu *vcpu,
+> +						int virt_irq)
+> +{
+> +	struct list_head *root = vgic_get_irq_phys_map_list(vcpu, virt_irq);
+> +	struct irq_phys_map_entry *entry;
+> +	struct irq_phys_map *map;
+> +
+> +	rcu_read_lock();
+> +
+> +	list_for_each_entry_rcu(entry, root, entry) {
+> +		map = &entry->map;
+> +		if (map->virt_irq == virt_irq && !map->deleted) {
+> +			rcu_read_unlock();
+> +			return map;
+> +		}
+> +	}
+> +
+> +	rcu_read_unlock();
+> +
+> +	return NULL;
+> +}
+> +
+> +static void vgic_free_phys_irq_map_rcu(struct rcu_head *rcu)
+> +{
+> +	struct irq_phys_map_entry *entry;
+> +
+> +	entry = container_of(rcu, struct irq_phys_map_entry, rcu);
+> +	kfree(entry);
+> +}
+> +
+> +/**
+> + * kvm_vgic_unmap_phys_irq - Remove a virtual to physical IRQ mapping
+> + * @vcpu: The VCPU pointer
+> + * @map: The pointer to a mapping obtained through kvm_vgic_map_phys_irq
+> + *
+> + * Remove an existing mapping between virtual and physical interrupts.
+> + */
+> +int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map)
+> +{
+> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +	struct irq_phys_map_entry *entry;
+> +	struct list_head *root;
+> +
+> +	if (!map)
+> +		return -EINVAL;
+> +
+> +	root = vgic_get_irq_phys_map_list(vcpu, map->virt_irq);
+> +
+> +	spin_lock(&dist->irq_phys_map_lock);
+> +
+> +	list_for_each_entry(entry, root, entry) {
+> +		if (&entry->map == map && !map->deleted) {
+> +			map->deleted = true;
+
+why do you need the 'deleted' flag?  You now search the list only after
+holding the lock, so the race I pointed out before doesn't exist
+anymore.  Is there an additional issue that the deleted flag is taking
+care of?
+
+> +			list_del_rcu(&entry->entry);
+> +			call_rcu(&entry->rcu, vgic_free_phys_irq_map_rcu);
+> +			break;
+> +		}
+> +	}
+> +
+> +	spin_unlock(&dist->irq_phys_map_lock);
+> +
+> +	return 0;
+> +}
+> +
+> +static void vgic_destroy_irq_phys_map(struct kvm *kvm, struct list_head *root)
+> +{
+> +	struct vgic_dist *dist = &kvm->arch.vgic;
+> +	struct irq_phys_map_entry *entry;
+> +
+> +	spin_lock(&dist->irq_phys_map_lock);
+> +
+> +	list_for_each_entry(entry, root, entry) {
+> +		if (!entry->map.deleted) {
+> +			entry->map.deleted = true;
+> +			list_del_rcu(&entry->entry);
+> +			call_rcu(&entry->rcu, vgic_free_phys_irq_map_rcu);
+> +		}
+> +	}
+> +
+> +	spin_unlock(&dist->irq_phys_map_lock);
+> +}
+> +
+>  void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> @@ -1591,6 +1754,7 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  	kfree(vgic_cpu->active_shared);
+>  	kfree(vgic_cpu->pend_act_shared);
+>  	kfree(vgic_cpu->vgic_irq_lr_map);
+> +	vgic_destroy_irq_phys_map(vcpu->kvm, &vgic_cpu->irq_phys_map_list);
+>  	vgic_cpu->pending_shared = NULL;
+>  	vgic_cpu->active_shared = NULL;
+>  	vgic_cpu->pend_act_shared = NULL;
+> @@ -1628,6 +1792,17 @@ static int vgic_vcpu_init_maps(struct kvm_vcpu *vcpu, int nr_irqs)
+>  }
+>  
+>  /**
+> + * kvm_vgic_vcpu_early_init - Earliest possible per-vcpu vgic init stage
+
+earliest possible... oh how I love the vgic code.
+
+If you have the energy and context to write a comment in the beginning
+of this file describing the init flow, I think that would be useful...
+
+> + *
+> + * No memory allocation should be performed here, only static init.
+> + */
+> +void kvm_vgic_vcpu_early_init(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> +	INIT_LIST_HEAD(&vgic_cpu->irq_phys_map_list);
+> +}
+> +
+> +/**
+>   * kvm_vgic_get_max_vcpus - Get the maximum number of VCPUs allowed by HW
+>   *
+>   * The host's GIC naturally limits the maximum amount of VCPUs a guest
+> @@ -1664,6 +1839,7 @@ void kvm_vgic_destroy(struct kvm *kvm)
+>  	kfree(dist->irq_spi_target);
+>  	kfree(dist->irq_pending_on_cpu);
+>  	kfree(dist->irq_active_on_cpu);
+> +	vgic_destroy_irq_phys_map(kvm, &dist->irq_phys_map_list);
+>  	dist->irq_sgi_sources = NULL;
+>  	dist->irq_spi_cpu = NULL;
+>  	dist->irq_spi_target = NULL;
+> @@ -1787,6 +1963,18 @@ static int init_vgic_model(struct kvm *kvm, int type)
+>  	return 0;
+>  }
+>  
+> +/**
+> + * kvm_vgic_early_init - Earliest possible vgic initialization stage
+> + *
+> + * No memory allocation should be performed here, only static init.
+> + */
+> +void kvm_vgic_early_init(struct kvm *kvm)
+> +{
+> +	spin_lock_init(&kvm->arch.vgic.lock);
+
+so here we're initializing the data structures even before the vgic is
+created, right?  So therefore it's safe to move the vgic.lock init up
+here?
+
+> +	spin_lock_init(&kvm->arch.vgic.irq_phys_map_lock);
+> +	INIT_LIST_HEAD(&kvm->arch.vgic.irq_phys_map_list);
+> +}
+> +
+>  int kvm_vgic_create(struct kvm *kvm, u32 type)
+>  {
+>  	int i, vcpu_lock_idx = -1, ret;
+> @@ -1832,7 +2020,6 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>  	if (ret)
+>  		goto out_unlock;
+>  
+> -	spin_lock_init(&kvm->arch.vgic.lock);
+>  	kvm->arch.vgic.in_kernel = true;
+>  	kvm->arch.vgic.vgic_model = type;
+>  	kvm->arch.vgic.vctrl_base = vgic->vctrl_base;
+> -- 
+> 2.1.4
 > 
 
-I think I get it; I think the confusion comes from the fact that all
-this depends on the non-shared forwareded interrupts must be configured
-with separate deactivate and priority drop (correct?), and since this
-support is not in nor is a requirement for this series, it's kind of
-hard to understand.
-
-I noticed now that you had in the cover letter that this patch wasn't
-intended for merging, but I didn't before...
-
-> >> +	}
-> >> +
-> >>  	if (!vgic_can_sample_irq(vcpu, irq_num)) {
-> >>  		/*
-> >>  		 * Level interrupt in progress, will be picked up
-> >> @@ -1662,7 +1694,7 @@ static struct list_head *vgic_get_irq_phys_map(struct kvm_vcpu *vcpu,
-> >>  }
-> >>  
-> >>  struct irq_phys_map *vgic_map_phys_irq(struct kvm_vcpu *vcpu,
-> >> -				       int virt_irq, int irq)
-> >> +				       int virt_irq, int irq, bool shared)
-> >>  {
-> >>  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> >>  	struct list_head *root = vgic_get_irq_phys_map(vcpu, virt_irq);
-> >> @@ -1691,7 +1723,8 @@ struct irq_phys_map *vgic_map_phys_irq(struct kvm_vcpu *vcpu,
-> >>  	if (map) {
-> >>  		/* Make sure this mapping matches */
-> >>  		if (map->phys_irq != phys_irq	||
-> >> -		    map->irq      != irq)
-> >> +		    map->irq      != irq	||
-> >> +		    map->shared   != shared)
-> > 
-> > this really feels like a BUG() - if we have an existing mapping for the
-> > same virtual IRQ, but it's shared in one case and not shared in the
-> > other?  Shouldn we even allow the caller to get this far?
-> 
-> How early do you want to detect it? All we can do is tell the caller to
-> bugger off by returning an error (we return NULL at the moment, meaning
-> that the caller doesn't get a mapping at all).
-> 
-
-fair enough, I hope the caller then has a BUG_ON(mapping == NULL).
-
+Thanks,
 -Christoffer
