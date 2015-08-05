@@ -1,159 +1,145 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 09/11] KVM: arm/arm64: vgic: Prevent userspace
- injection of a mapped interrupt
-Date: Wed, 5 Aug 2015 15:47:54 +0200
-Message-ID: <20150805134754.GB4657@cbox>
-References: <1437753309-17989-1-git-send-email-marc.zyngier@arm.com>
- <1437753309-17989-10-git-send-email-marc.zyngier@arm.com>
- <55C0E690.1090808@linaro.org> <55C0EBF5.2060708@arm.com>
- <55C1BBF9.2060004@linaro.org> <55C1DAE9.1050609@arm.com>
- <20150805105345.GA4657@cbox> <55C1F7CF.5070904@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 1/2] arm64: KVM: Optimize arm64 skip 30-50% vfp/simd
+ save/restore on exits
+Date: Wed, 05 Aug 2015 17:11:37 +0100
+Message-ID: <55C235B9.3000800@arm.com>
+References: <1437082178-11039-1-git-send-email-m.smarduch@samsung.com> <1437082178-11039-2-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 13E5C5A1EB
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2015 09:34:30 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bWmvIbT3Ia5a for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Aug 2015 09:34:24 -0400 (EDT)
-Received: from mail-la0-f50.google.com (mail-la0-f50.google.com
- [209.85.215.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F126E5A1EA
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2015 09:34:23 -0400 (EDT)
-Received: by labkb6 with SMTP id kb6so7204644lab.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 05 Aug 2015 06:47:10 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <55C1F7CF.5070904@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <Andre.Przywara@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1437082178-11039-2-git-send-email-m.smarduch@samsung.com>
+Sender: kvm-owner@vger.kernel.org
+To: Mario Smarduch <m.smarduch@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Aug 05, 2015 at 01:47:27PM +0200, Eric Auger wrote:
-> On 08/05/2015 12:53 PM, Christoffer Dall wrote:
-> > On Wed, Aug 05, 2015 at 10:44:09AM +0100, Marc Zyngier wrote:
-> >> On 05/08/15 08:32, Eric Auger wrote:
-> >>> Hi Marc,
-> >>> On 08/04/2015 06:44 PM, Marc Zyngier wrote:
-> >>>> On 04/08/15 17:21, Eric Auger wrote:
-> >>>>> Hi Marc,
-> >>>>> On 07/24/2015 05:55 PM, Marc Zyngier wrote:
-> >>>>>> Virtual interrupts mapped to a HW interrupt should only be triggered
-> >>>>>> from inside the kernel. Otherwise, you could end up confusing the
-> >>>>>> kernel (and the GIC's) state machine.
-> >>>>>>
-> >>>>>> Rearrange the injection path so that kvm_vgic_inject_irq is
-> >>>>>> used for non-mapped interrupts, and kvm_vgic_inject_mapped_irq is
-> >>>>>> used for mapped interrupts. The latter should only be called from
-> >>>>>> inside the kernel (timer, VFIO).
-> >>>>> nit: I would replace VFIO by irqfd.
-> >>>>> VFIO just triggers the eventfd/irqfd. This is KVM/irqfd that injects the
-> >>>>> virtual irq upon the irqfd signaling and he irqfd adaptation/ARM
-> >>>>> currently is implemented in vgic.c
-> >>>>
-> >>>> Ah, thanks for reminding me of the right terminology, I tend to think of
-> >>>> it as one big bag of nasty tricks... ;-)
-> >>>>
-> >>>> I'll update the commit message.
-> >>>>
-> >>>>>>
-> >>>>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> >>>>>> ---
-> >>>>>>  include/kvm/arm_vgic.h |  2 +
-> >>>>>>  virt/kvm/arm/vgic.c    | 99 ++++++++++++++++++++++++++++++++++----------------
-> >>>>>>  2 files changed, 70 insertions(+), 31 deletions(-)
-> >>>>>>
-> >>>>>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> >>>>>> index 7306b4b..f6bfd79 100644
-> >>>>>> --- a/include/kvm/arm_vgic.h
-> >>>>>> +++ b/include/kvm/arm_vgic.h
-> >>>>>> @@ -351,6 +351,8 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
-> >>>>>>  void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
-> >>>>>>  int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
-> >>>>>>  			bool level);
-> >>>>>> +int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid,
-> >>>>>> +			       struct irq_phys_map *map, bool level);
-> >>>>>>  void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
-> >>>>>>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
-> >>>>>>  int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
-> >>>>>> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> >>>>>> index 3f7b690..e40ef70 100644
-> >>>>>> --- a/virt/kvm/arm/vgic.c
-> >>>>>> +++ b/virt/kvm/arm/vgic.c
-> >>>>>> @@ -1533,7 +1533,8 @@ static int vgic_validate_injection(struct kvm_vcpu *vcpu, int irq, int level)
-> >>>>>>  }
-> >>>>>>  
-> >>>>>>  static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
-> >>>>>> -				  unsigned int irq_num, bool level)
-> >>>>>> +				   struct irq_phys_map *map,
-> >>>>>> +				   unsigned int irq_num, bool level)
-> >>>>>>  {
-> >>>>> In vgic_update_irq_pending, I needed to modify the following line and
-> >>>>> add the "&& !map".
-> >>>>>
-> >>>>>         if (!vgic_validate_injection(vcpu, irq_num, level) && !map) {
-> >>>>>
-> >>>>> Without that, the level being not properly modeled for level sensitive
-> >>>>> forwarded IRQs, the 2d injection fails.
-> >>>>
-> >>>> Ah! Is that because we never see the line being reset to zero, and the
-> >>>> VGIC still sees the line as pending at the distributor level?
-> >>> yes indeed
-> >>
-> >> Then it is a bigger problem we need to solve, and your solution just
-> >> papers over the issue.
-> >>
-> >> The main problem is that irqfd is essentially an edge-triggered
-> >> signalling. Fire and forget. Given that we're dealing with a level
-> >> triggered interrupt, we end up with the interrupt still marked as
-> >> pending (nobody took the signal down).
-> this does not really relate to irqfd: irqfd also comes with the concept
-> of resamplefd. in case the IRQ is not forwarded, this is the
-> irqfd_resampler_ack function that toggles the IRQ down (eventfd.c). Its
-> execution is triggered in vgic_process_maintenance. With forwarding the
-> EOI is not trappable anymore so this disappears.
+On 16/07/15 22:29, Mario Smarduch wrote:
+> This patch only saves and restores FP/SIMD registers on Guest access. To do
+> this cptr_el2 FP/SIMD trap is set on Guest entry and later checked on exit.
+> lmbench, hackbench show significant improvements, for 30-50% exits FP/SIMD
+> context is not saved/restored
 > 
-> 
-> >> The usual way to get out of that mess in is to evaluate the state of the
-> >> level on EOI. But we can't trap on EOI for a HW interrupt.
-> >>
-> >> So it raises the question: should we instead consider the HW pending
-> >> state instead of the software one for mapped interrupts? It is
-> >> expensive, but it feels more correct.
-> >>
-> > I thought we already covered this at LCA.  For mapped interrupts
-> > (forwarded) we should never consider the software pending state, because
-> > that state is managed by the hardware.  Or am I confusing concepts here?
-> 
-> Yes we discussed we should bypass most of the SW states.
-> 
-> in my previous integration I proposed a patch "KVM: arm: vgic: fix state
-> machine for forwarded IRQ". What's wrong with the below approach?
-> 
-> 
->     Fix multiple injection of level sensitive forwarded IRQs.
->     With current code, the second injection fails since the
->     state bitmaps are not reset (process_maintenance is not
->     called anymore).
-> 
->     New implementation follows those principles:
->     - A forwarded IRQ only can be sampled when it is pending
->     - when queueing the IRQ (programming the LR), the pending state
->       is removed as for edge sensitive IRQs
->     - an injection of a forwarded IRQ is considered always valid since
->       coming from the HW and level always is 1.
-> 
-I don't see anything wrong, and I thought this was what we discussed.
+> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
 
--Christoffer
+So this patch seems to break 32bit guests on arm64.  I've had a look,
+squashed a few bugs that I dangerously overlooked during the review, but
+it still doesn't work (it doesn't crash anymore, but I get random
+illegal VFP instructions in 32bit guests).
+
+I'd be glad if someone could eyeball the following patch and tell me
+what's going wrong. If we don't find the root cause quickly enough, I'll
+have to drop the series from -next, and that'd be a real shame.
+
+Thanks,
+
+	M.
+
+commit 5777dc55fbc170426a85e00c26002dd5a795cfa5
+Author: Marc Zyngier <marc.zyngier@arm.com>
+Date:   Wed Aug 5 16:53:01 2015 +0100
+
+    KVM: arm64: NOTAFIX: Prevent crash when 32bit guest uses VFP
+
+    Since we switch FPSIMD in a lazy way, access to FPEXC32_EL2
+    must be guarded by skip_fpsimd_state. Otherwise, all hell
+    break loose.
+
+    Also, FPEXC32_EL2 must be restored when we trap to EL2 to
+    enable floating point.
+
+    Note that while it prevents the host from catching fire, the
+    guest still doesn't work properly, and I don't understand why just
+    yet.
+
+    Not-really-signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+
+diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+index c8e0c70..b53ec5d 100644
+--- a/arch/arm64/kvm/hyp.S
++++ b/arch/arm64/kvm/hyp.S
+@@ -431,10 +431,12 @@
+ 	add	x3, x2, #CPU_SYSREG_OFFSET(DACR32_EL2)
+ 	mrs	x4, dacr32_el2
+ 	mrs	x5, ifsr32_el2
+-	mrs	x6, fpexc32_el2
+ 	stp	x4, x5, [x3]
+-	str	x6, [x3, #16]
+
++	skip_fpsimd_state x8, 3f
++	mrs	x6, fpexc32_el2
++	str	x6, [x3, #16]
++3:
+ 	skip_debug_state x8, 2f
+ 	mrs	x7, dbgvcr32_el2
+ 	str	x7, [x3, #24]
+@@ -461,10 +463,8 @@
+
+ 	add	x3, x2, #CPU_SYSREG_OFFSET(DACR32_EL2)
+ 	ldp	x4, x5, [x3]
+-	ldr	x6, [x3, #16]
+ 	msr	dacr32_el2, x4
+ 	msr	ifsr32_el2, x5
+-	msr	fpexc32_el2, x6
+
+ 	skip_debug_state x8, 2f
+ 	ldr	x7, [x3, #24]
+@@ -669,12 +669,14 @@ __restore_debug:
+ 	ret
+
+ __save_fpsimd:
++	skip_fpsimd_state x3, 1f
+ 	save_fpsimd
+-	ret
++1:	ret
+
+ __restore_fpsimd:
++	skip_fpsimd_state x3, 1f
+ 	restore_fpsimd
+-	ret
++1:	ret
+
+ switch_to_guest_fpsimd:
+ 	push	x4, lr
+@@ -682,6 +684,7 @@ switch_to_guest_fpsimd:
+ 	mrs	x2, cptr_el2
+ 	bic	x2, x2, #CPTR_EL2_TFP
+ 	msr	cptr_el2, x2
++	isb
+
+ 	mrs	x0, tpidr_el2
+
+@@ -692,6 +695,10 @@ switch_to_guest_fpsimd:
+ 	add	x2, x0, #VCPU_CONTEXT
+ 	bl __restore_fpsimd
+
++	skip_32bit_state x3, 1f
++	ldr	x4, [x2, #CPU_SYSREG_OFFSET(FPEXC32_EL2)]
++	msr	fpexc32_el2, x4
++1:
+ 	pop	x4, lr
+ 	pop	x2, x3
+ 	pop	x0, x1
+@@ -754,9 +761,7 @@ __kvm_vcpu_return:
+ 	add	x2, x0, #VCPU_CONTEXT
+
+ 	save_guest_regs
+-	skip_fpsimd_state x3, 1f
+ 	bl __save_fpsimd
+-1:
+ 	bl __save_sysregs
+
+ 	skip_debug_state x3, 1f
+@@ -777,9 +782,7 @@ __kvm_vcpu_return:
+ 	kern_hyp_va x2
+
+ 	bl __restore_sysregs
+-	skip_fpsimd_state x3, 1f
+ 	bl __restore_fpsimd
+-1:
+ 	/* Clear FPSIMD and Trace trapping */
+ 	msr     cptr_el2, xzr
+
+
+-- 
+Jazz is not dead. It just smells funny...
