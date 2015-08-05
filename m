@@ -1,82 +1,90 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 06/11] KVM: arm/arm64: vgic: Allow dynamic mapping
- of physical/virtual interrupts
-Date: Tue, 04 Aug 2015 19:10:55 +0100
-Message-ID: <55C1002F.6070801@arm.com>
-References: <1437753309-17989-1-git-send-email-marc.zyngier@arm.com> <1437753309-17989-7-git-send-email-marc.zyngier@arm.com> <20150804130457.GA29335@cbox> <55C0D9C7.7060707@arm.com> <20150804173650.GG29335@cbox>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v3 09/11] KVM: arm/arm64: vgic: Prevent userspace injection
+ of a mapped interrupt
+Date: Wed, 05 Aug 2015 09:32:09 +0200
+Message-ID: <55C1BBF9.2060004@linaro.org>
+References: <1437753309-17989-1-git-send-email-marc.zyngier@arm.com> <1437753309-17989-10-git-send-email-marc.zyngier@arm.com> <55C0E690.1090808@linaro.org> <55C0EBF5.2060708@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20150804173650.GG29335@cbox>
+In-Reply-To: <55C0EBF5.2060708@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Eric Auger <eric.auger@linaro.org>, =?windows-1252?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
+To: Marc Zyngier <marc.zyngier@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, =?windows-1252?Q?Alex?= =?windows-1252?Q?_Benn=E9e?= <alex.bennee@linaro.org>, Andre Przywara <Andre.Przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 04/08/15 18:36, Christoffer Dall wrote:
-> On Tue, Aug 04, 2015 at 04:27:03PM +0100, Marc Zyngier wrote:
->> On 04/08/15 14:04, Christoffer Dall wrote:
->>> On Fri, Jul 24, 2015 at 04:55:04PM +0100, Marc Zyngier wrote:
->>>> In order to be able to feed physical interrupts to a guest, we need
->>>> to be able to establish the virtual-physical mapping between the two
->>>> worlds.
->>>>
->>>> The mappings are kept in a set of RCU lists, indexed by virtual interrupts.
->>>>
->>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>>> ---
->>>>  arch/arm/kvm/arm.c     |   2 +
->>>>  include/kvm/arm_vgic.h |  26 +++++++
->>>>  virt/kvm/arm/vgic.c    | 189 ++++++++++++++++++++++++++++++++++++++++++++++++-
->>>>  3 files changed, 216 insertions(+), 1 deletion(-)
->>>>
-
-[...]
-
->>>> +/**
->>>> + * kvm_vgic_unmap_phys_irq - Remove a virtual to physical IRQ mapping
->>>> + * @vcpu: The VCPU pointer
->>>> + * @map: The pointer to a mapping obtained through kvm_vgic_map_phys_irq
->>>> + *
->>>> + * Remove an existing mapping between virtual and physical interrupts.
->>>> + */
->>>> +int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map)
->>>> +{
->>>> +     struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->>>> +     struct irq_phys_map_entry *entry;
->>>> +     struct list_head *root;
->>>> +
->>>> +     if (!map)
->>>> +             return -EINVAL;
->>>> +
->>>> +     root = vgic_get_irq_phys_map_list(vcpu, map->virt_irq);
->>>> +
->>>> +     spin_lock(&dist->irq_phys_map_lock);
->>>> +
->>>> +     list_for_each_entry(entry, root, entry) {
->>>> +             if (&entry->map == map && !map->deleted) {
->>>> +                     map->deleted = true;
+Hi Marc,
+On 08/04/2015 06:44 PM, Marc Zyngier wrote:
+> On 04/08/15 17:21, Eric Auger wrote:
+>> Hi Marc,
+>> On 07/24/2015 05:55 PM, Marc Zyngier wrote:
+>>> Virtual interrupts mapped to a HW interrupt should only be triggered
+>>> from inside the kernel. Otherwise, you could end up confusing the
+>>> kernel (and the GIC's) state machine.
 >>>
->>> why do you need the 'deleted' flag?  You now search the list only after
->>> holding the lock, so the race I pointed out before doesn't exist
->>> anymore.  Is there an additional issue that the deleted flag is taking
->>> care of?
->>
->> This could still race with a destroy occuring before we take the lock,
->> and before we get get RCU to do the cleanup (the list would still be
->> populated).
->>
+>>> Rearrange the injection path so that kvm_vgic_inject_irq is
+>>> used for non-mapped interrupts, and kvm_vgic_inject_mapped_irq is
+>>> used for mapped interrupts. The latter should only be called from
+>>> inside the kernel (timer, VFIO).
+>> nit: I would replace VFIO by irqfd.
+>> VFIO just triggers the eventfd/irqfd. This is KVM/irqfd that injects the
+>> virtual irq upon the irqfd signaling and he irqfd adaptation/ARM
+>> currently is implemented in vgic.c
 > 
-> That's not how I understand list_del_rcu; I think it deletes the entry
-> immediately with the right memory barriers.  It is only the free
-> operation that happens on rcu sync and can be/is deferred.
+> Ah, thanks for reminding me of the right terminology, I tend to think of
+> it as one big bag of nasty tricks... ;-)
+> 
+> I'll update the commit message.
+> 
+>>>
+>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>> ---
+>>>  include/kvm/arm_vgic.h |  2 +
+>>>  virt/kvm/arm/vgic.c    | 99 ++++++++++++++++++++++++++++++++++----------------
+>>>  2 files changed, 70 insertions(+), 31 deletions(-)
+>>>
+>>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>>> index 7306b4b..f6bfd79 100644
+>>> --- a/include/kvm/arm_vgic.h
+>>> +++ b/include/kvm/arm_vgic.h
+>>> @@ -351,6 +351,8 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
+>>>  void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
+>>>  int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
+>>>  			bool level);
+>>> +int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid,
+>>> +			       struct irq_phys_map *map, bool level);
+>>>  void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
+>>>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+>>>  int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
+>>> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+>>> index 3f7b690..e40ef70 100644
+>>> --- a/virt/kvm/arm/vgic.c
+>>> +++ b/virt/kvm/arm/vgic.c
+>>> @@ -1533,7 +1533,8 @@ static int vgic_validate_injection(struct kvm_vcpu *vcpu, int irq, int level)
+>>>  }
+>>>  
+>>>  static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
+>>> -				  unsigned int irq_num, bool level)
+>>> +				   struct irq_phys_map *map,
+>>> +				   unsigned int irq_num, bool level)
+>>>  {
+>> In vgic_update_irq_pending, I needed to modify the following line and
+>> add the "&& !map".
+>>
+>>         if (!vgic_validate_injection(vcpu, irq_num, level) && !map) {
+>>
+>> Without that, the level being not properly modeled for level sensitive
+>> forwarded IRQs, the 2d injection fails.
+> 
+> Ah! Is that because we never see the line being reset to zero, and the
+> VGIC still sees the line as pending at the distributor level?
+yes indeed
 
-Indeed. I stupidly though the two were deferred, but reading the code
-definitely confirmed your point. I'll get rid of the delete stuff.
+Eric
+> 
+> Thanks,
+> 
+> 	M.
+> 
 
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
