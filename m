@@ -1,28 +1,29 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: [PATCH v3 3/3] Make KVM_CAP_IRQFD dependent on KVM_CAP_IRQCHIP
-Date: Wed, 05 Aug 2015 13:53:59 +0300
-Message-ID: <64d0b7f9daf507c537edb45b63a8a0f7d2a7d781.1438770954.git.p.fedin@samsung.com>
+Subject: [PATCH v3 1/3] Fix NULL pointer dereference if KVM is used without
+ in-kernel irqchip
+Date: Wed, 05 Aug 2015 13:53:57 +0300
+Message-ID: <34464c9cb7c603a22bb6849b78575ee286368936.1438770954.git.p.fedin@samsung.com>
 References: <cover.1438770954.git.p.fedin@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC1695A0D8
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2015 06:41:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C4895A0CA
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2015 06:41:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Gh8CHJdEdZVE for <kvmarm@lists.cs.columbia.edu>;
- Wed,  5 Aug 2015 06:41:23 -0400 (EDT)
+ with ESMTP id dqVL8sTeTMC2 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  5 Aug 2015 06:41:22 -0400 (EDT)
 Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com
  [210.118.77.11])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0DED65A0D0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2015 06:41:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D806A5A0CF
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  5 Aug 2015 06:41:22 -0400 (EDT)
 Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
  by mailout1.w1.samsung.com
  (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NSL005KSVM9N510@mailout1.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Wed, 05 Aug 2015 11:54:09 +0100 (BST)
+ with ESMTP id <0NSL002X7VM8A910@mailout1.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Wed, 05 Aug 2015 11:54:08 +0100 (BST)
 In-reply-to: <cover.1438770954.git.p.fedin@samsung.com>
 In-reply-to: <cover.1438770954.git.p.fedin@samsung.com>
 References: <cover.1438770954.git.p.fedin@samsung.com>
@@ -39,39 +40,34 @@ To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now at least ARM is able to determine whether the machine has
-virtualization support for irqchip or not at runtime. Obviously,
-irqfd requires irqchip.
+Makes qemu working again with kernel-irqchip=off option, allowing to use
+GIC emulation in userspace.
+
+Previously kvm_vgic_map_resources() used to include irqchip_in_kernel()
+check, and vgic_v2_map_resources() still has it, but now vm_ops are not
+initialized before kvm_vgic_create(). Therefore kvm_vgic_map_resources()
+call without vGIC instantiation attempts to call
+vm_ops.map_resources == NULL
+
+The bug was introduced in b26e5fdac43c1b7c394502917e42e3b91f3aa1a3
 
 Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
 ---
-This has to be verified with PowerPC and S390 maintainers. I've got an
-impression that KVM_CAP_IRQCHIP is forgotten on these architectures
-(their KConfig selects HAVE_KVM_IRQCHIP but KVM_CAP_IRQCHIP is not
-mentioned anywhere in the respective code).
----
- virt/kvm/kvm_main.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ arch/arm/kvm/arm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9097741..7b49618 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2478,12 +2478,13 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- #ifdef CONFIG_HAVE_KVM_MSI
- 	case KVM_CAP_SIGNAL_MSI:
- #endif
-+	case KVM_CAP_CHECK_EXTENSION_VM:
-+		return 1;
- #ifdef CONFIG_HAVE_KVM_IRQFD
- 	case KVM_CAP_IRQFD:
- 	case KVM_CAP_IRQFD_RESAMPLE:
-+		return kvm_vm_ioctl_check_extension(kvm, KVM_CAP_IRQCHIP);
- #endif
--	case KVM_CAP_CHECK_EXTENSION_VM:
--		return 1;
- #ifdef CONFIG_HAVE_KVM_IRQ_ROUTING
- 	case KVM_CAP_IRQ_ROUTING:
- 		return KVM_MAX_IRQ_ROUTES;
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 483b5d1..199a50a 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -449,7 +449,7 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
+ 	 * Map the VGIC hardware resources before running a vcpu the first
+ 	 * time on this VM.
+ 	 */
+-	if (unlikely(!vgic_ready(kvm))) {
++	if (unlikely(irqchip_in_kernel(kvm) && !vgic_ready(kvm))) {
+ 		ret = kvm_vgic_map_resources(kvm);
+ 		if (ret)
+ 			return ret;
 -- 
 2.4.4
