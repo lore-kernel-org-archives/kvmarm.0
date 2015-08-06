@@ -1,28 +1,25 @@
-From: nick <xerofoify@gmail.com>
-Subject: Re: [PATCH] kvm:arm:Fix error handling in the function vgic_v3_probe
-Date: Thu, 06 Aug 2015 09:16:45 -0400
-Message-ID: <55C35E3D.9000708@gmail.com>
-References: <1438793303-30228-1-git-send-email-xerofoify@gmail.com>
- <55C240D9.5060900@redhat.com> <55C242C6.6060200@gmail.com>
- <55C31582.4000809@arm.com> <55C34C77.7090303@redhat.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH 11/13] arm64: Panic when VHE and non VHE CPUs coexist
+Date: Thu, 6 Aug 2015 15:08:30 +0100
+Message-ID: <20150806140829.GC17691@e104818-lin.cambridge.arm.com>
+References: <1436372356-30410-1-git-send-email-marc.zyngier@arm.com>
+ <1436372356-30410-12-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A934559E20
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Aug 2015 09:04:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 298ED5A020
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Aug 2015 09:55:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KYfBRRnKQJbX for <kvmarm@lists.cs.columbia.edu>;
- Thu,  6 Aug 2015 09:03:57 -0400 (EDT)
-Received: from mail-ig0-f178.google.com (mail-ig0-f178.google.com
- [209.85.213.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A586D59B98
- for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Aug 2015 09:03:57 -0400 (EDT)
-Received: by igk11 with SMTP id 11so10952320igk.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 06 Aug 2015 06:16:47 -0700 (PDT)
-In-Reply-To: <55C34C77.7090303@redhat.com>
+ with ESMTP id ZQBtjtoVL5vF for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  6 Aug 2015 09:55:43 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C819859FD3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  6 Aug 2015 09:55:43 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <1436372356-30410-12-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,34 +29,83 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
-Cc: "gleb@kernel.org" <gleb@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On Wed, Jul 08, 2015 at 05:19:14PM +0100, Marc Zyngier wrote:
+> Having both VHE and non-VHE capable CPUs in the same system
+> is likely to be a recipe for disaster.
+> 
+> If the boot CPU has VHE, but a secondary is not, we won't be
+> able to downgrade and run the kernel at EL1. Add CPU hotplug
+> to the mix, and this produces a terrifying mess.
+> 
+> Let's solve the problem once and for all. If you mix VHE and
+> non-VHE CPUs in the same system, you deserve to loose, and this
+> patch makes sure you don't get a chance.
+> 
+> This is implemented by storing the kernel execution level in
+> a global variable. Secondaries will park themselves in a
+> WFI loop if they observe a mismatch. Also, the primary CPU
+> will detect that the secondary CPU has died on a mismatched
+> execution level. Panic will follow.
 
+We don't have such system yet but we could try it on the model. Do you
+know how far the secondary CPU goes? If it gets to the cpuid sanity
+checking, we could do the check together with the rest of the features
+(we could add a new CHECK_FATAL macro to make this even more obvious):
 
-On 2015-08-06 08:00 AM, Paolo Bonzini wrote:
-> 
-> 
-> On 06/08/2015 10:06, Marc Zyngier wrote:
->>> If this structure of function pointers can handle function pointers with a return type of 
->>> void I will be glad to do what you request otherwise this would require a major rewrite
->>> of kvm arm subsystem for a very simple bug fix.
->>
->> Just like Paolo said, the error you report should never happen, and
->> would be caught by a WARN_ON() the first time anyone boots the kernel.
->> Also, failing to register the device ops results in not being able to
->> instantiate a VGIC. No harm done. I really don't understand why you want
->> to rewrite the probe functions.
-> 
-> I think he just misunderstood my suggestion.  I didn't suggest making
-> the probe functions return void.  I suggested that
-> kvm_register_device_ops return void.
-> 
-> Paolo
-> 
-Unfortunately the other maintainer is right in the s390 kvm subsystem uses the return value of the call to 
-kvm_register_device_ops. However we could do something like a WARN_ON if kvm_register_device_ops fails in 
-callers that never are required to never use it's return value.
-Sorry about the Misunderstanding as I misread your suggestion.
-Nick
+diff --git a/arch/arm64/include/asm/cpu.h b/arch/arm64/include/asm/cpu.h
+index 8e797b2fcc01..36cc81c9b9df 100644
+--- a/arch/arm64/include/asm/cpu.h
++++ b/arch/arm64/include/asm/cpu.h
+@@ -29,6 +29,7 @@ struct cpuinfo_arm64 {
+ 	u32		reg_cntfrq;
+ 	u32		reg_dczid;
+ 	u32		reg_midr;
++	u32		reg_currentel;
+ 
+ 	u64		reg_id_aa64dfr0;
+ 	u64		reg_id_aa64dfr1;
+diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
+index ee6403df9fe4..de3e8903b5a8 100644
+--- a/arch/arm64/include/asm/cputype.h
++++ b/arch/arm64/include/asm/cputype.h
+@@ -118,6 +118,14 @@ static inline bool id_aa64mmfr0_mixed_endian_el0(u64 mmfr0)
+ 	return (ID_AA64MMFR0_BIGEND(mmfr0) == 0x1) ||
+ 		(ID_AA64MMFR0_BIGENDEL0(mmfr0) == 0x1);
+ }
++
++static inline unsigned int read_currentel(void)
++{
++	u64 el;
++	asm("mrs	%0, CurrentEL" : "=r" (el));
++	return el;
++}
++
+ #endif /* __ASSEMBLY__ */
+ 
+ #endif
+diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
+index 75d5a867e7fb..c0269210fd54 100644
+--- a/arch/arm64/kernel/cpuinfo.c
++++ b/arch/arm64/kernel/cpuinfo.c
+@@ -132,6 +132,9 @@ static void cpuinfo_sanity_check(struct cpuinfo_arm64 *cur)
+ 	/* If different, timekeeping will be broken (especially with KVM) */
+ 	diff |= CHECK(cntfrq, boot, cur, cpu);
+ 
++	/* Same EL for all CPUs */
++	diff |= CHECK(currentel, boot, cur, cpu);
++
+ 	/*
+ 	 * The kernel uses self-hosted debug features and expects CPUs to
+ 	 * support identical debug features. We presently need CTX_CMPs, WRPs,
+@@ -205,6 +208,7 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
+ 	info->reg_ctr = read_cpuid_cachetype();
+ 	info->reg_dczid = read_cpuid(DCZID_EL0);
+ 	info->reg_midr = read_cpuid_id();
++	info->reg_currentel = read_currentel();
+ 
+ 	info->reg_id_aa64dfr0 = read_cpuid(ID_AA64DFR0_EL1);
+ 	info->reg_id_aa64dfr1 = read_cpuid(ID_AA64DFR1_EL1);
