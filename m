@@ -1,28 +1,28 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH 1/2] KVM: arm: rename pause into power_off
-Date: Fri, 07 Aug 2015 14:36:40 +0200
-Message-ID: <55C4A658.3060302@linaro.org>
+Subject: Re: [PATCH 2/2] kvm: arm/arm64: implement kvm_arm_[halt, resume]_guest
+Date: Fri, 07 Aug 2015 14:56:31 +0200
+Message-ID: <55C4AAFF.8080408@linaro.org>
 References: <1436186996-22528-1-git-send-email-eric.auger@linaro.org>
- <1436186996-22528-2-git-send-email-eric.auger@linaro.org>
- <20150718090913.GN14024@cbox>
+ <1436186996-22528-3-git-send-email-eric.auger@linaro.org>
+ <20150718091851.GO14024@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 071BE5A3FD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 08:24:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BA04B5A413
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 08:44:21 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5Xm18MLXrHF4 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Aug 2015 08:24:29 -0400 (EDT)
-Received: from mail-wi0-f178.google.com (mail-wi0-f178.google.com
- [209.85.212.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BC16A5A3F7
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 08:24:28 -0400 (EDT)
-Received: by wicgj17 with SMTP id gj17so59871752wic.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Aug 2015 05:37:20 -0700 (PDT)
-In-Reply-To: <20150718090913.GN14024@cbox>
+ with ESMTP id 0sAT9INtuVyw for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Aug 2015 08:44:20 -0400 (EDT)
+Received: from mail-wi0-f171.google.com (mail-wi0-f171.google.com
+ [209.85.212.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5744E5A40B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 08:44:20 -0400 (EDT)
+Received: by wibxm9 with SMTP id xm9so64789676wib.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Aug 2015 05:57:12 -0700 (PDT)
+In-Reply-To: <20150718091851.GO14024@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,129 +36,161 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: eric.auger@st.com, patches@linaro.org, marc.zyngier@arm.com, alex.williamson@redhat.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgQ2hyaXN0b2ZmZXIsCk9uIDA3LzE4LzIwMTUgMTE6MDkgQU0sIENocmlzdG9mZmVyIERhbGwg
-d3JvdGU6Cj4gT24gTW9uLCBKdWwgMDYsIDIwMTUgYXQgMDI6NDk6NTVQTSArMDIwMCwgRXJpYyBB
-dWdlciB3cm90ZToKPj4gVGhlIGt2bV92Y3B1X2FyY2ggcGF1c2UgZmllbGQgaXMgcmVuYW1lZCBp
-bnRvIHBvd2VyX29mZiB0byBwcmVwYXJlCj4+IGZvciB0aGUgaW50cm9kdWN0aW9uIG9mIGEgbmV3
-IHBhdXNlIGZpZWxkLgo+Pgo+PiBTaWduZWQtb2ZmLWJ5OiBFcmljIEF1Z2VyIDxlcmljLmF1Z2Vy
-QGxpbmFyby5vcmc+Cj4+Cj4+IHY0IC0+IHY1Ogo+PiAtIGZpeCBjb21waWxhdGlvbiBpc3N1ZSBv
-biBhcm02NCAoYWRkIHBvd2VyX29mZiBmaWVsZCBpbiBrdm1faG9zdC5oKQo+PiAtLS0KPj4gIGFy
-Y2gvYXJtL2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggICB8ICA0ICsrLS0KPj4gIGFyY2gvYXJtL2t2
-bS9hcm0uYyAgICAgICAgICAgICAgICB8IDEwICsrKysrLS0tLS0KPj4gIGFyY2gvYXJtL2t2bS9w
-c2NpLmMgICAgICAgICAgICAgICB8IDEwICsrKysrLS0tLS0KPj4gIGFyY2gvYXJtNjQvaW5jbHVk
-ZS9hc20va3ZtX2hvc3QuaCB8ICA0ICsrLS0KPj4gIDQgZmlsZXMgY2hhbmdlZCwgMTQgaW5zZXJ0
-aW9ucygrKSwgMTQgZGVsZXRpb25zKC0pCj4+Cj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybS9pbmNs
-dWRlL2FzbS9rdm1faG9zdC5oIGIvYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+PiBp
-bmRleCBlODk2ZDJjLi4zMDQwMDRkIDEwMDY0NAo+PiAtLS0gYS9hcmNoL2FybS9pbmNsdWRlL2Fz
-bS9rdm1faG9zdC5oCj4+ICsrKyBiL2FyY2gvYXJtL2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPj4g
-QEAgLTEyOSw4ICsxMjksOCBAQCBzdHJ1Y3Qga3ZtX3ZjcHVfYXJjaCB7Cj4+ICAJICogaGVyZS4K
-Pj4gIAkgKi8KPj4gIAo+PiAtCS8qIERvbid0IHJ1biB0aGUgZ3Vlc3Qgb24gdGhpcyB2Y3B1ICov
-Cj4+IC0JYm9vbCBwYXVzZTsKPj4gKwkvKiB2Y3B1IHBvd2VyLW9mZiBzdGF0ZSAqLwo+PiArCWJv
-b2wgcG93ZXJfb2ZmOwo+PiAgCj4+ICAJLyogSU8gcmVsYXRlZCBmaWVsZHMgKi8KPj4gIAlzdHJ1
-Y3Qga3ZtX2RlY29kZSBtbWlvX2RlY29kZTsKPj4gZGlmZiAtLWdpdCBhL2FyY2gvYXJtL2t2bS9h
-cm0uYyBiL2FyY2gvYXJtL2t2bS9hcm0uYwo+PiBpbmRleCBiY2RmNzk5Li43NTM3ZTY4IDEwMDY0
-NAo+PiAtLS0gYS9hcmNoL2FybS9rdm0vYXJtLmMKPj4gKysrIGIvYXJjaC9hcm0va3ZtL2FybS5j
-Cj4+IEBAIC00NzUsNyArNDc1LDcgQEAgc3RhdGljIHZvaWQgdmNwdV9wYXVzZShzdHJ1Y3Qga3Zt
-X3ZjcHUgKnZjcHUpCj4+ICB7Cj4+ICAJd2FpdF9xdWV1ZV9oZWFkX3QgKndxID0ga3ZtX2FyY2hf
-dmNwdV93cSh2Y3B1KTsKPj4gIAo+PiAtCXdhaXRfZXZlbnRfaW50ZXJydXB0aWJsZSgqd3EsICF2
-Y3B1LT5hcmNoLnBhdXNlKTsKPj4gKwl3YWl0X2V2ZW50X2ludGVycnVwdGlibGUoKndxLCAhdmNw
-dS0+YXJjaC5wb3dlcl9vZmYpOwo+IAo+IHdvdWxkIHRoZXJlIGJlIGFueSBiZW5lZml0IHRvIHNp
-bXBseSBjYWxsaW5nIGt2bV92Y3B1X2Jsb2NrKCkgaW5zdGVhZCBvZgo+IHZjcHVfcGF1c2UsIGFu
-ZCByZXdyaXRlIGt2bV9hcmNoX3ZjcHVfcnVubmFibGUgdG86CldvdWxkbid0IGl0IHNvbWVob3cg
-Y2hhbmdlIHRoZSBrbm93biBiZWhhdmlvciBvciBrdm1fdmNwdV9ibG9jayB3aGljaCBpcwpleHBl
-Y3RlZC91c2VkIHRvIGV4aXQgb24gSVJRL0ZJUSAoV0ZJKS4gSGVyZSBpdCB3b3VsZCBleGl0IHdo
-ZW4KcG93ZXJfb2ZmIGNoYW5nZXMgdG8gZmFsc2UgKG9yIG1heWJlIHlvdSBtZWFudCBwYXVzZSBi
-ZWxvdyBpbiB0aGUgbmV3CmNvbnRleHQ/KS4KPiAKPiBpbnQga3ZtX2FyY2hfdmNwdV9ydW5uYWJs
-ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnYpCj4gewo+IOKWuCAgICAgICByZXR1cm4gIXZjcHUtPmFyY2gu
-cG93ZXJfb2ZmICYmCj4gCQkoISF2LT5hcmNoLmlycV9saW5lcyB8fCBrdm1fdmdpY192Y3B1X3Bl
-bmRpbmdfaXJxKHYpKTsKPiB9Cj4gCj4gTm90IHN1cmUgcmVhbGx5LCBjZXJ0YWlubHkgdGhlIHJ1
-bm5hYmxlIGZ1bmN0aW9uIGRvZXMgbm90IGJlY29tZSBtb3JlCj4gcmVhZGFibGUuClRvIG1lIHRo
-ZSB1c2FnZSBvZiBrdm1fdmNwdV9ibG9jayBsb29rcyBtb3JlIGNvbXBsZXggdGhhbiB0aGlzIGNv
-ZGUgYW5kCkkgd291bGQgcHJlZmVyIGtlZXBpbmcgdGhhdCB2ZXJzaW9uIGlmIHlvdSBkb24ndCBt
-aW5kLgo+IAo+PiAgfQo+PiAgCj4+ICBzdGF0aWMgaW50IGt2bV92Y3B1X2luaXRpYWxpemVkKHN0
-cnVjdCBrdm1fdmNwdSAqdmNwdSkKPj4gQEAgLTUyNSw3ICs1MjUsNyBAQCBpbnQga3ZtX2FyY2hf
-dmNwdV9pb2N0bF9ydW4oc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBzdHJ1Y3Qga3ZtX3J1biAqcnVu
-KQo+PiAgCj4+ICAJCXVwZGF0ZV92dHRicih2Y3B1LT5rdm0pOwo+PiAgCj4+IC0JCWlmICh2Y3B1
-LT5hcmNoLnBhdXNlKQo+PiArCQlpZiAodmNwdS0+YXJjaC5wb3dlcl9vZmYpCj4+ICAJCQl2Y3B1
-X3BhdXNlKHZjcHUpOwo+IAo+IGxvb2tpbmcgYmFjayBvdmVyIHRoaXMgY29kZSwgaG93IGRvZXMg
-dGhpcyBhY3R1YWxseSBndWFyYW50ZWUgdGhhdCB3ZQo+IGRvbid0IHJ1biBhIHBvd2VyZWQtb2Zm
-IGNwdT8KPiAKPiB2Y3B1X3BhdXNlKCkganVzdCBkb2VzIGEgd2FpdF9ldmVudF9pbnRlcnJ1cHRp
-YmxlKCksIHNvIGlmIHdlIGdldAo+IHNjaGVkdWxlZCBhZ2Fpbiwgd2UnbGwganVzdCBwcm9jZWVk
-IHJ1bm5pbmcuIAphY3R1YWxseSBpdCBhbHNvIGNoZWNrcyB0aGUgIXZjcHUtPmFyY2gucG93ZXJf
-b2ZmIGNvbmRpdGlvbiwgcmlnaHQ/CiBJcyB0aGVyZSBhbnkgY2FzZSB3aGVyZSB3ZQo+IGNvdWxk
-IGdldCBzY2hlZHVsZWQgd2l0aG91dCBzaWduYWxfcGVuZGluZygpIGJlaW5nIHRydWUgYW5kIHRo
-ZXJlZm9yZQo+IGluYWR2ZXJ0ZWRseSBydW4gdGhlIHZjcHU/Cmt2bV9hcm1faGFsdF9ndWVzdCBj
-YW4gaGFwcGVuIGF0IGFueSB0aW1lLCBpbmNsdWRpbmcgYWZ0ZXIgdGhlIGV4ZWN1dGlvbgpvZiBh
-Ym92ZSB2Y3B1X3BhdXNlKHZjcHUpIGNhbGwuIFRoaXMgaXMgdGhlIHJlYXNvbiB3aHkgSSBhZGRl
-ZCB0aGUKc2Vjb25kIGNoZWNrIGJlbG93LCBvbmNlIHdlIGVudGVyZWQgdGhlIGNyaXRpY2FsIHNl
-Y3Rpb24gYW5kIGp1c3QgYmVmb3JlCnJ1bm5pbmcgdGhlIHZjcHUuCgpXaXRoIHJlZ2FyZCB0byBy
-ZW5hbWVkIHBvd2VyX29mZiBib29sZWFuIG15IHVuZGVyc3RhbmRpbmcgaXM6Cgpwb3dlcl9vZmYg
-aXMgc2V0Ci0gb24ga3ZtX2FyY2hfdmNwdV9pb2N0bF92Y3B1X2luaXQvS1ZNX0FSTV9WQ1BVX1BP
-V0VSX09GRgotIG9uIFBTQ0kgY2FsbHMgZnJvbSBndWVzdHMgdGhyb3VnaCB0cmFwcyBmcm9tIEhW
-QyBpbnN0cnVjdGlvbnMKaW4gdGhhdCBjYXNlIEkgZG9uJ3QgdGhpbmsgdGhpcyBjYW4gaGFwcGVu
-CgotIG9uIEtWTV9TRVRfTVBfU1RBVEUgaW9jdGw6IEkgdGhpbmsgaW4gdGhhdCBjYXNlLCB3aGF0
-IHlvdSBkZXNjcmliZSBjYW4KaGFwcGVuLgoKRG8geW91IHNoYXJlIHRoZSBzYW1lIHVuZGVyc3Rh
-bmRpbmc/CgpCZXN0IFJlZ2FyZHMKCkVyaWMKCj4gCj4gaWYgc28sIHdlIHNob3VsZCBjaGFuZ2Ug
-dGhlIGxpbmUgYmVsb3cgbGlrZSB0aGlzOgo+IAo+IGRpZmYgLS1naXQgYS9hcmNoL2FybS9rdm0v
-YXJtLmMgYi9hcmNoL2FybS9rdm0vYXJtLmMKPiBpbmRleCBiYzczOGQyLi45OGYzMWU2IDEwMDY0
-NAo+IC0tLSBhL2FyY2gvYXJtL2t2bS9hcm0uYwo+ICsrKyBiL2FyY2gvYXJtL2t2bS9hcm0uYwo+
-IEBAIC01NDIsNyArNTQyLDggQEAgaW50IGt2bV9hcmNoX3ZjcHVfaW9jdGxfcnVuKHN0cnVjdCBr
-dm1fdmNwdSAqdmNwdSwgc3RydWN0IGt2bV9ydW4gKnJ1bikKPiAgCQkJcnVuLT5leGl0X3JlYXNv
-biA9IEtWTV9FWElUX0lOVFI7Cj4gIAkJfQo+ICAKPiAtCQlpZiAocmV0IDw9IDAgfHwgbmVlZF9u
-ZXdfdm1pZF9nZW4odmNwdS0+a3ZtKSkgewo+ICsJCWlmIChyZXQgPD0gMCB8fCBuZWVkX25ld192
-bWlkX2dlbih2Y3B1LT5rdm0pIHx8Cj4gKwkJICAgIHZjcHUtPmFyY2gucG93ZXJfb2ZmKSB7Cj4g
-IAkJCWxvY2FsX2lycV9lbmFibGUoKTsKPiAgCQkJcHJlZW1wdF9lbmFibGUoKTsKPiAgCQkJa3Zt
-X3RpbWVyX3N5bmNfaHdzdGF0ZSh2Y3B1KTsKPiAKPiAKPiBTb3JyeSBmb3IgcG9sbHV0aW5nIHlv
-dXIgcGF0Y2ggd2l0aCB0aGVzZSBxdWVzdGlvbnMsIEknbSBvdGhlcndpc2UgZmluZQo+IHdpdGgg
-dGhlIHJlbmFtZS4KPiAKPiBUaGFua3MsCj4gLUNocmlzdG9mZmVyCj4gCj4+ICAKPj4gIAkJLyoK
-Pj4gQEAgLTc2NiwxMiArNzY2LDEyIEBAIHN0YXRpYyBpbnQga3ZtX2FyY2hfdmNwdV9pb2N0bF92
-Y3B1X2luaXQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAo+PiAgCXZjcHVfcmVzZXRfaGNyKHZjcHUp
-Owo+PiAgCj4+ICAJLyoKPj4gLQkgKiBIYW5kbGUgdGhlICJzdGFydCBpbiBwb3dlci1vZmYiIGNh
-c2UgYnkgbWFya2luZyB0aGUgVkNQVSBhcyBwYXVzZWQuCj4+ICsJICogSGFuZGxlIHRoZSAic3Rh
-cnQgaW4gcG93ZXItb2ZmIiBjYXNlLgo+PiAgCSAqLwo+PiAgCWlmICh0ZXN0X2JpdChLVk1fQVJN
-X1ZDUFVfUE9XRVJfT0ZGLCB2Y3B1LT5hcmNoLmZlYXR1cmVzKSkKPj4gLQkJdmNwdS0+YXJjaC5w
-YXVzZSA9IHRydWU7Cj4+ICsJCXZjcHUtPmFyY2gucG93ZXJfb2ZmID0gdHJ1ZTsKPj4gIAllbHNl
-Cj4+IC0JCXZjcHUtPmFyY2gucGF1c2UgPSBmYWxzZTsKPj4gKwkJdmNwdS0+YXJjaC5wb3dlcl9v
-ZmYgPSBmYWxzZTsKPj4gIAo+PiAgCXJldHVybiAwOwo+PiAgfQo+PiBkaWZmIC0tZ2l0IGEvYXJj
-aC9hcm0va3ZtL3BzY2kuYyBiL2FyY2gvYXJtL2t2bS9wc2NpLmMKPj4gaW5kZXggNGI5NGI1MS4u
-MTM0OTcxYSAxMDA2NDQKPj4gLS0tIGEvYXJjaC9hcm0va3ZtL3BzY2kuYwo+PiArKysgYi9hcmNo
-L2FybS9rdm0vcHNjaS5jCj4+IEBAIC02Myw3ICs2Myw3IEBAIHN0YXRpYyB1bnNpZ25lZCBsb25n
-IGt2bV9wc2NpX3ZjcHVfc3VzcGVuZChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4+ICAKPj4gIHN0
-YXRpYyB2b2lkIGt2bV9wc2NpX3ZjcHVfb2ZmKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPj4gIHsK
-Pj4gLQl2Y3B1LT5hcmNoLnBhdXNlID0gdHJ1ZTsKPj4gKwl2Y3B1LT5hcmNoLnBvd2VyX29mZiA9
-IHRydWU7Cj4+ICB9Cj4+ICAKPj4gIHN0YXRpYyB1bnNpZ25lZCBsb25nIGt2bV9wc2NpX3ZjcHVf
-b24oc3RydWN0IGt2bV92Y3B1ICpzb3VyY2VfdmNwdSkKPj4gQEAgLTg3LDcgKzg3LDcgQEAgc3Rh
-dGljIHVuc2lnbmVkIGxvbmcga3ZtX3BzY2lfdmNwdV9vbihzdHJ1Y3Qga3ZtX3ZjcHUgKnNvdXJj
-ZV92Y3B1KQo+PiAgCSAqLwo+PiAgCWlmICghdmNwdSkKPj4gIAkJcmV0dXJuIFBTQ0lfUkVUX0lO
-VkFMSURfUEFSQU1TOwo+PiAtCWlmICghdmNwdS0+YXJjaC5wYXVzZSkgewo+PiArCWlmICghdmNw
-dS0+YXJjaC5wb3dlcl9vZmYpIHsKPj4gIAkJaWYgKGt2bV9wc2NpX3ZlcnNpb24oc291cmNlX3Zj
-cHUpICE9IEtWTV9BUk1fUFNDSV8wXzEpCj4+ICAJCQlyZXR1cm4gUFNDSV9SRVRfQUxSRUFEWV9P
-TjsKPj4gIAkJZWxzZQo+PiBAQCAtMTE1LDcgKzExNSw3IEBAIHN0YXRpYyB1bnNpZ25lZCBsb25n
-IGt2bV9wc2NpX3ZjcHVfb24oc3RydWN0IGt2bV92Y3B1ICpzb3VyY2VfdmNwdSkKPj4gIAkgKiB0
-aGUgZ2VuZXJhbCBwdXNwb3NlIHJlZ2lzdGVycyBhcmUgdW5kZWZpbmVkIHVwb24gQ1BVX09OLgo+
-PiAgCSAqLwo+PiAgCSp2Y3B1X3JlZyh2Y3B1LCAwKSA9IGNvbnRleHRfaWQ7Cj4+IC0JdmNwdS0+
-YXJjaC5wYXVzZSA9IGZhbHNlOwo+PiArCXZjcHUtPmFyY2gucG93ZXJfb2ZmID0gZmFsc2U7Cj4+
-ICAJc21wX21iKCk7CQkvKiBNYWtlIHN1cmUgdGhlIGFib3ZlIGlzIHZpc2libGUgKi8KPj4gIAo+
-PiAgCXdxID0ga3ZtX2FyY2hfdmNwdV93cSh2Y3B1KTsKPj4gQEAgLTE1Miw3ICsxNTIsNyBAQCBz
-dGF0aWMgdW5zaWduZWQgbG9uZyBrdm1fcHNjaV92Y3B1X2FmZmluaXR5X2luZm8oc3RydWN0IGt2
-bV92Y3B1ICp2Y3B1KQo+PiAgCWt2bV9mb3JfZWFjaF92Y3B1KGksIHRtcCwga3ZtKSB7Cj4+ICAJ
-CW1waWRyID0ga3ZtX3ZjcHVfZ2V0X21waWRyX2FmZih0bXApOwo+PiAgCQlpZiAoKChtcGlkciAm
-IHRhcmdldF9hZmZpbml0eV9tYXNrKSA9PSB0YXJnZXRfYWZmaW5pdHkpICYmCj4+IC0JCSAgICAh
-dG1wLT5hcmNoLnBhdXNlKSB7Cj4+ICsJCSAgICAhdG1wLT5hcmNoLnBvd2VyX29mZikgewo+PiAg
-CQkJcmV0dXJuIFBTQ0lfMF8yX0FGRklOSVRZX0xFVkVMX09OOwo+PiAgCQl9Cj4+ICAJfQo+PiBA
-QCAtMTc1LDcgKzE3NSw3IEBAIHN0YXRpYyB2b2lkIGt2bV9wcmVwYXJlX3N5c3RlbV9ldmVudChz
-dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIHUzMiB0eXBlKQo+PiAgCSAqIHJlLWluaXRpYWxpemVkLgo+
-PiAgCSAqLwo+PiAgCWt2bV9mb3JfZWFjaF92Y3B1KGksIHRtcCwgdmNwdS0+a3ZtKSB7Cj4+IC0J
-CXRtcC0+YXJjaC5wYXVzZSA9IHRydWU7Cj4+ICsJCXRtcC0+YXJjaC5wb3dlcl9vZmYgPSB0cnVl
-Owo+PiAgCQlrdm1fdmNwdV9raWNrKHRtcCk7Cj4+ICAJfQo+PiAgCj4+IGRpZmYgLS1naXQgYS9h
-cmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNt
-L2t2bV9ob3N0LmgKPj4gaW5kZXggMjcwOWRiMi4uMDA5ZGE2YiAxMDA2NDQKPj4gLS0tIGEvYXJj
-aC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4+ICsrKyBiL2FyY2gvYXJtNjQvaW5jbHVk
-ZS9hc20va3ZtX2hvc3QuaAo+PiBAQCAtMTIyLDggKzEyMiw4IEBAIHN0cnVjdCBrdm1fdmNwdV9h
-cmNoIHsKPj4gIAkgKiBoZXJlLgo+PiAgCSAqLwo+PiAgCj4+IC0JLyogRG9uJ3QgcnVuIHRoZSBn
-dWVzdCAqLwo+PiAtCWJvb2wgcGF1c2U7Cj4+ICsJLyogdmNwdSBwb3dlci1vZmYgc3RhdGUgKi8K
-Pj4gKwlib29sIHBvd2VyX29mZjsKPj4gIAo+PiAgCS8qIElPIHJlbGF0ZWQgZmllbGRzICovCj4+
-ICAJc3RydWN0IGt2bV9kZWNvZGUgbW1pb19kZWNvZGU7Cj4+IC0tIAo+PiAxLjkuMQo+PgoKX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxp
-bmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29s
-dW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+On 07/18/2015 11:18 AM, Christoffer Dall wrote:
+> On Mon, Jul 06, 2015 at 02:49:56PM +0200, Eric Auger wrote:
+>> On halt, the guest is forced to exit and prevented from being
+>> re-entered. This is synchronous.
+>>
+>> Those two operations will be needed for IRQ forwarding setting.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+>>
+>> ---
+>> RFC v1 -> v2:
+>> - add __maybe_unused
+>>
+>> RFC:
+>> - rename the function and this latter becomes static
+>> - remove __KVM_HAVE_ARCH_HALT_GUEST
+>>
+>> v4 -> v5: add arm64 support
+>> - also defines __KVM_HAVE_ARCH_HALT_GUEST for arm64
+>> - add pause field
+>> ---
+>>  arch/arm/include/asm/kvm_host.h   |  3 +++
+>>  arch/arm/kvm/arm.c                | 35 ++++++++++++++++++++++++++++++++---
+>>  arch/arm64/include/asm/kvm_host.h |  3 +++
+>>  3 files changed, 38 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+>> index 304004d..899ae27 100644
+>> --- a/arch/arm/include/asm/kvm_host.h
+>> +++ b/arch/arm/include/asm/kvm_host.h
+>> @@ -132,6 +132,9 @@ struct kvm_vcpu_arch {
+>>  	/* vcpu power-off state */
+>>  	bool power_off;
+>>  
+>> +	/* Don't run the guest */
+>> +	bool pause;
+>> +
+>>  	/* IO related fields */
+>>  	struct kvm_decode mmio_decode;
+>>  
+>> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+>> index 7537e68..46d4ef6 100644
+>> --- a/arch/arm/kvm/arm.c
+>> +++ b/arch/arm/kvm/arm.c
+>> @@ -471,11 +471,39 @@ bool kvm_arch_intc_initialized(struct kvm *kvm)
+>>  	return vgic_initialized(kvm);
+>>  }
+>>  
+>> +static void kvm_arm_halt_guest(struct kvm *kvm) __maybe_unused;
+>> +static void kvm_arm_resume_guest(struct kvm *kvm) __maybe_unused;
+>> +
+>> +static void kvm_arm_halt_guest(struct kvm *kvm)
+>> +{
+>> +	int i;
+>> +	struct kvm_vcpu *vcpu;
+>> +
+>> +	kvm_for_each_vcpu(i, vcpu, kvm)
+>> +		vcpu->arch.pause = true;
+>> +	force_vm_exit(cpu_all_mask);
+>> +}
+>> +
+>> +static void kvm_arm_resume_guest(struct kvm *kvm)
+>> +{
+>> +	int i;
+>> +	struct kvm_vcpu *vcpu;
+>> +
+>> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+>> +		wait_queue_head_t *wq = kvm_arch_vcpu_wq(vcpu);
+>> +
+>> +		vcpu->arch.pause = false;
+>> +		wake_up_interruptible(wq);
+>> +	}
+>> +}
+>> +
+>> +
+>>  static void vcpu_pause(struct kvm_vcpu *vcpu)
+>>  {
+>>  	wait_queue_head_t *wq = kvm_arch_vcpu_wq(vcpu);
+>>  
+>> -	wait_event_interruptible(*wq, !vcpu->arch.power_off);
+>> +	wait_event_interruptible(*wq, ((!vcpu->arch.power_off) &&
+>> +				       (!vcpu->arch.pause)));
+>>  }
+>>  
+>>  static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+>> @@ -525,7 +553,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>>  
+>>  		update_vttbr(vcpu->kvm);
+>>  
+>> -		if (vcpu->arch.power_off)
+>> +		if (vcpu->arch.power_off || vcpu->arch.pause)
+>>  			vcpu_pause(vcpu);
+> 
+> These two changes really make me feel like kvm_arch_vcpu_runnable()
+> should be changed to check for both flags and all thes eplaces should
+> check for runnable instead.
+> 
+> To make the runnable function more robust, perhaps it should check:
+> 
+> 1. The vcpu is neither paused nor powered off
+> 2. The vcpu is not in a WFI state (vcpu->arch.wfi_request) OR there are
+>    pending interrupts (the current check).
+> 
+> Then the logic would fit the name of the function, instead of being a
+> specific check only called through handle_wfx.
+
+Reading this again, I reconsider what I said in previous comment answer
+and this definitively makes sense to update the runnable function. I
+was/am afraid by this vcpu_block function and I need to better undertand
+it - I think what I said previously is not correct - .
+
+I will investigate that direction.
+
+Eric
+> 
+>>  
+>>  		/*
+>> @@ -551,7 +579,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>>  			run->exit_reason = KVM_EXIT_INTR;
+>>  		}
+>>  
+>> -		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm)) {
+>> +		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
+>> +		    vcpu->arch.pause) {
+> 
+> so why do we need to re-check the pause flag, but not the power_off
+> flag?  That is non-trivial for sure, so if it's correct, deserves a
+> comment.  Also see my comment on the last patch.
+> 
+>>  			local_irq_enable();
+>>  			preempt_enable();
+>>  			kvm_vgic_sync_hwstate(vcpu);
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 009da6b..69e3785 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -125,6 +125,9 @@ struct kvm_vcpu_arch {
+>>  	/* vcpu power-off state */
+>>  	bool power_off;
+>>  
+>> +	/* Don't run the guest */
+> 
+> Probably need to be more clear about this being an implementation
+> requirement rather than being guest visible or related to any
+> architectural concept.
+> 
+>> +	bool pause;
+>> +
+>>  	/* IO related fields */
+>>  	struct kvm_decode mmio_decode;
+>>  
+>> -- 
+>> 1.9.1
+>>
+> 
+> Thanks,
+> -Christoffer
+> 
