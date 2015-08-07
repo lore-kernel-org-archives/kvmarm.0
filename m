@@ -1,23 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 11/11] KVM: arm/arm64: vgic: Allow HW interrupts for
- non-shared devices
-Date: Fri,  7 Aug 2015 16:45:47 +0100
-Message-ID: <1438962347-17541-12-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v4 09/11] KVM: arm/arm64: vgic: Prevent userspace injection of
+ a mapped interrupt
+Date: Fri,  7 Aug 2015 16:45:45 +0100
+Message-ID: <1438962347-17541-10-git-send-email-marc.zyngier@arm.com>
 References: <1438962347-17541-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD9365A4AD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:33:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 82A355A49C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:33:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id A6sND5MmZS4l for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Aug 2015 11:33:16 -0400 (EDT)
+ with ESMTP id O3GLM67xQeAe for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Aug 2015 11:33:14 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F42B5A498
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:33:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B8BB5A4AD
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:33:13 -0400 (EDT)
 In-Reply-To: <1438962347-17541-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,220 +32,181 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.in
 Cc: Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-So far, the only use of the HW interrupt facility is the timer,
-implying that the active state is context-switched for each vcpu,
-as the device is is shared across all vcpus.
+Virtual interrupts mapped to a HW interrupt should only be triggered
+from inside the kernel. Otherwise, you could end up confusing the
+kernel (and the GIC's) state machine.
 
-This does not work for a device that has been assigned to a VM,
-as the guest is entierely in control of that device (the HW is
-not shared). In that case, it makes sense to bypass the whole
-active state switching, and only track the deactivation of the
-interrupt.
+Rearrange the injection path so that kvm_vgic_inject_irq is
+used for non-mapped interrupts, and kvm_vgic_inject_mapped_irq is
+used for mapped interrupts. The latter should only be called from
+inside the kernel (timer, irqfd).
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/kvm/arm_vgic.h    |  6 ++--
- virt/kvm/arm/arch_timer.c |  3 +-
- virt/kvm/arm/vgic.c       | 73 ++++++++++++++++++++++++++++++++++++++---------
- 3 files changed, 65 insertions(+), 17 deletions(-)
+ include/kvm/arm_vgic.h |   2 +
+ virt/kvm/arm/vgic.c    | 103 +++++++++++++++++++++++++++++++++----------------
+ 2 files changed, 72 insertions(+), 33 deletions(-)
 
 diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index d901f1a..7ef9ce0 100644
+index e789e47..d901f1a 100644
 --- a/include/kvm/arm_vgic.h
 +++ b/include/kvm/arm_vgic.h
-@@ -163,7 +163,8 @@ struct irq_phys_map {
- 	u32			virt_irq;
- 	u32			phys_irq;
- 	u32			irq;
--	bool			active;
-+	bool			shared;
-+	bool			active; /* Only valid if shared */
- };
- 
- struct irq_phys_map_entry {
-@@ -356,7 +357,8 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
+@@ -350,6 +350,8 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
+ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
+ 			bool level);
++int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid,
++			       struct irq_phys_map *map, bool level);
+ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
  int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
- struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
--					   int virt_irq, int irq);
-+					   int virt_irq, int irq,
-+					   bool shared);
- int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
- bool kvm_vgic_get_phys_irq_active(struct irq_phys_map *map);
- void kvm_vgic_set_phys_irq_active(struct irq_phys_map *map, bool active);
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 76e38d2..db21d8f 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -203,7 +203,8 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
- 	 * Tell the VGIC that the virtual interrupt is tied to a
- 	 * physical interrupt. We do that once per VCPU.
- 	 */
--	map = kvm_vgic_map_phys_irq(vcpu, irq->irq, host_vtimer_irq);
-+	map = kvm_vgic_map_phys_irq(vcpu, irq->irq,
-+				    host_vtimer_irq, true);
- 	if (WARN_ON(IS_ERR(map)))
- 		return PTR_ERR(map);
- 
 diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 9eb489a..3a3c06f5 100644
+index b553a8f..9eb489a 100644
 --- a/virt/kvm/arm/vgic.c
 +++ b/virt/kvm/arm/vgic.c
-@@ -1150,19 +1150,25 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
- 		 * active in the physical world. Otherwise the
- 		 * physical interrupt will fire and the guest will
- 		 * exit before processing the virtual interrupt.
-+		 *
-+		 * This is of course only valid for a shared
-+		 * interrupt. A non shared interrupt should already be
-+		 * active.
- 		 */
- 		if (map) {
--			int ret;
--
--			BUG_ON(!map->active);
- 			vlr.hwirq = map->phys_irq;
- 			vlr.state |= LR_HW;
- 			vlr.state &= ~LR_EOI_INT;
+@@ -1555,7 +1555,8 @@ static int vgic_validate_injection(struct kvm_vcpu *vcpu, int irq, int level)
+ }
  
--			ret = irq_set_irqchip_state(map->irq,
--						    IRQCHIP_STATE_ACTIVE,
--						    true);
--			WARN_ON(ret);
-+			if (map->shared) {
-+				int ret;
-+
-+				BUG_ON(!map->active);
-+				ret = irq_set_irqchip_state(map->irq,
-+							    IRQCHIP_STATE_ACTIVE,
-+							    true);
-+				WARN_ON(ret);
-+			}
- 
- 			/*
- 			 * Make sure we're not going to sample this
-@@ -1405,21 +1411,42 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
- static int vgic_sync_hwirq(struct kvm_vcpu *vcpu, struct vgic_lr vlr)
+ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
+-				  unsigned int irq_num, bool level)
++				   struct irq_phys_map *map,
++				   unsigned int irq_num, bool level)
  {
- 	struct irq_phys_map *map;
-+	bool active;
- 	int ret;
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	struct kvm_vcpu *vcpu;
+@@ -1563,6 +1564,9 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
+ 	int enabled;
+ 	bool ret = true, can_inject = true;
  
- 	if (!(vlr.state & LR_HW))
- 		return 0;
- 
- 	map = vgic_irq_map_search(vcpu, vlr.irq);
--	BUG_ON(!map || !map->active);
-+	BUG_ON(!map);
-+	BUG_ON(map->shared && !map->active);
- 
- 	ret = irq_get_irqchip_state(map->irq,
- 				    IRQCHIP_STATE_ACTIVE,
--				    &map->active);
-+				    &active);
- 
- 	WARN_ON(ret);
- 
--	if (map->active) {
-+	/*
-+	 * For a non-shared interrupt, we have to cater for two
-+	 * possible deactivation conditions:
-+	 *
-+	 * - the physical interrupt is now inactive (EOIed from the
-+	 *   guest)
-+	 * - the physical interrupt is still active, but its virtual
-+	 *   counterpart is flagged as "not queued", indicating another
-+	 *   interrupt has fired between the EOI and the guest exit.
-+	 *
-+	 * Also, we are not deactivating a non-shared interrupt
-+	 * ourselves. This is always left to the guest, who solely own
-+	 * the device.
-+	 */
-+	if (!map->shared)
-+		return !active || !vgic_irq_is_queued(vcpu, vlr.irq);
++	if (irq_num >= min(kvm->arch.vgic.nr_irqs, 1020))
++		return -EINVAL;
 +
-+	map->active = active;
-+
-+	if (active) {
- 		ret = irq_set_irqchip_state(map->irq,
- 					    IRQCHIP_STATE_ACTIVE,
- 					    false);
-@@ -1612,6 +1639,17 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
- 		goto out;
- 	}
+ 	spin_lock(&dist->lock);
  
-+	if (map && !map->shared) {
-+		/*
-+		 * We are told to inject a HW irq, so we have to trust
-+		 * the caller that the previous one has been EOIed,
-+		 * and that a new one is now active. Clearing the
-+		 * queued state will have the effect of making it
-+		 * sample-able again.
-+		 */
-+		vgic_irq_clear_queued(vcpu, irq_num);
+ 	vcpu = kvm_get_vcpu(kvm, cpuid);
+@@ -1625,18 +1629,46 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
+ out:
+ 	spin_unlock(&dist->lock);
+ 
+-	return ret ? cpuid : -EINVAL;
++	if (ret) {
++		/* kick the specified vcpu */
++		kvm_vcpu_kick(kvm_get_vcpu(kvm, cpuid));
 +	}
 +
- 	if (!vgic_can_sample_irq(vcpu, irq_num)) {
- 		/*
- 		 * Level interrupt in progress, will be picked up
-@@ -1742,16 +1780,21 @@ static struct list_head *vgic_get_irq_phys_map_list(struct kvm_vcpu *vcpu,
-  * @vcpu: The VCPU pointer
-  * @virt_irq: The virtual irq number
-  * @irq: The Linux IRQ number
-+ * @shared: Indicates if the interrupt has to be context-switched or
-+ *          if it is private to a VM
-  *
-  * Establish a mapping between a guest visible irq (@virt_irq) and a
-  * Linux irq (@irq). On injection, @virt_irq will be associated with
-  * the physical interrupt represented by @irq. This mapping can be
-  * established multiple times as long as the parameters are the same.
-+ * If @shared is true, the active state of the interrupt will be
-+ * context-switched.
-  *
-  * Returns a valid pointer on success, and an error pointer otherwise
-  */
- struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
--					   int virt_irq, int irq)
-+					   int virt_irq, int irq,
-+					   bool shared)
- {
- 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
- 	struct list_head *root = vgic_get_irq_phys_map_list(vcpu, virt_irq);
-@@ -1785,7 +1828,8 @@ struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
- 	if (map) {
- 		/* Make sure this mapping matches */
- 		if (map->phys_irq != phys_irq	||
--		    map->irq      != irq)
-+		    map->irq      != irq	||
-+		    map->shared   != shared)
- 			map = ERR_PTR(-EINVAL);
- 
- 		/* Found an existing, valid mapping */
-@@ -1796,6 +1840,7 @@ struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
- 	map->virt_irq = virt_irq;
- 	map->phys_irq = phys_irq;
- 	map->irq      = irq;
-+	map->shared   = shared;
- 
- 	list_add_tail_rcu(&entry->entry, root);
- 
-@@ -1846,7 +1891,7 @@ static void vgic_free_phys_irq_map_rcu(struct rcu_head *rcu)
-  */
- bool kvm_vgic_get_phys_irq_active(struct irq_phys_map *map)
- {
--	BUG_ON(!map);
-+	BUG_ON(!map || !map->shared);
- 	return map->active;
++	return 0;
++}
++
++static int vgic_lazy_init(struct kvm *kvm)
++{
++	int ret = 0;
++
++	if (unlikely(!vgic_initialized(kvm))) {
++		/*
++		 * We only provide the automatic initialization of the VGIC
++		 * for the legacy case of a GICv2. Any other type must
++		 * be explicitly initialized once setup with the respective
++		 * KVM device call.
++		 */
++		if (kvm->arch.vgic.vgic_model != KVM_DEV_TYPE_ARM_VGIC_V2)
++			return -EBUSY;
++
++		mutex_lock(&kvm->lock);
++		ret = vgic_init(kvm);
++		mutex_unlock(&kvm->lock);
++	}
++
++	return ret;
  }
  
-@@ -1858,7 +1903,7 @@ bool kvm_vgic_get_phys_irq_active(struct irq_phys_map *map)
-  */
- void kvm_vgic_set_phys_irq_active(struct irq_phys_map *map, bool active)
+ /**
+  * kvm_vgic_inject_irq - Inject an IRQ from a device to the vgic
+  * @kvm:     The VM structure pointer
+  * @cpuid:   The CPU for PPIs
+- * @irq_num: The IRQ number that is assigned to the device
++ * @irq_num: The IRQ number that is assigned to the device. This IRQ
++ *           must not be mapped to a HW interrupt.
+  * @level:   Edge-triggered:  true:  to trigger the interrupt
+  *			      false: to ignore the call
+- *	     Level-sensitive  true:  activates an interrupt
+- *			      false: deactivates an interrupt
++ *	     Level-sensitive  true:  raise the input signal
++ *			      false: lower the input signal
+  *
+  * The GIC is not concerned with devices being active-LOW or active-HIGH for
+  * level-sensitive interrupts.  You can think of the level parameter as 1
+@@ -1645,39 +1677,44 @@ out:
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
+ 			bool level)
  {
--	BUG_ON(!map);
-+	BUG_ON(!map || !map->shared);
- 	map->active = active;
+-	int ret = 0;
+-	int vcpu_id;
+-
+-	if (unlikely(!vgic_initialized(kvm))) {
+-		/*
+-		 * We only provide the automatic initialization of the VGIC
+-		 * for the legacy case of a GICv2. Any other type must
+-		 * be explicitly initialized once setup with the respective
+-		 * KVM device call.
+-		 */
+-		if (kvm->arch.vgic.vgic_model != KVM_DEV_TYPE_ARM_VGIC_V2) {
+-			ret = -EBUSY;
+-			goto out;
+-		}
+-		mutex_lock(&kvm->lock);
+-		ret = vgic_init(kvm);
+-		mutex_unlock(&kvm->lock);
++	struct irq_phys_map *map;
++	int ret;
+ 
+-		if (ret)
+-			goto out;
+-	}
++	ret = vgic_lazy_init(kvm);
++	if (ret)
++		return ret;
+ 
+-	if (irq_num >= min(kvm->arch.vgic.nr_irqs, 1020))
++	map = vgic_irq_map_search(kvm_get_vcpu(kvm, cpuid), irq_num);
++	if (map)
+ 		return -EINVAL;
+ 
+-	vcpu_id = vgic_update_irq_pending(kvm, cpuid, irq_num, level);
+-	if (vcpu_id >= 0) {
+-		/* kick the specified vcpu */
+-		kvm_vcpu_kick(kvm_get_vcpu(kvm, vcpu_id));
+-	}
++	return vgic_update_irq_pending(kvm, cpuid, NULL, irq_num, level);
++}
+ 
+-out:
+-	return ret;
++/**
++ * kvm_vgic_inject_mapped_irq - Inject a physically mapped IRQ to the vgic
++ * @kvm:     The VM structure pointer
++ * @cpuid:   The CPU for PPIs
++ * @map:     Pointer to a irq_phys_map structure describing the mapping
++ * @level:   Edge-triggered:  true:  to trigger the interrupt
++ *			      false: to ignore the call
++ *	     Level-sensitive  true:  raise the input signal
++ *			      false: lower the input signal
++ *
++ * The GIC is not concerned with devices being active-LOW or active-HIGH for
++ * level-sensitive interrupts.  You can think of the level parameter as 1
++ * being HIGH and 0 being LOW and all devices being active-HIGH.
++ */
++int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid,
++			       struct irq_phys_map *map, bool level)
++{
++	int ret;
++
++	ret = vgic_lazy_init(kvm);
++	if (ret)
++		return ret;
++
++	return vgic_update_irq_pending(kvm, cpuid, map, map->virt_irq, level);
  }
  
+ static irqreturn_t vgic_maintenance_handler(int irq, void *data)
 -- 
 2.1.4
