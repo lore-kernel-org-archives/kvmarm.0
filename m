@@ -1,26 +1,25 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v2 2/4] KVM: arm/arm64: check power_off in
- kvm_arch_vcpu_runnable
-Date: Fri,  7 Aug 2015 18:08:31 +0200
-Message-ID: <1438963713-10460-3-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v2 4/4] KVM: arm/arm64: implement kvm_arm_[halt,resume]_guest
+Date: Fri,  7 Aug 2015 18:08:33 +0200
+Message-ID: <1438963713-10460-5-git-send-email-eric.auger@linaro.org>
 References: <1438963713-10460-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 817795A4E3
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:56:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E878F5A4A8
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:56:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I1ghfmFRsKht for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Aug 2015 11:56:31 -0400 (EDT)
-Received: from mail-wi0-f173.google.com (mail-wi0-f173.google.com
- [209.85.212.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 425885A4DB
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:56:31 -0400 (EDT)
-Received: by wijp15 with SMTP id p15so65650356wij.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Aug 2015 09:09:23 -0700 (PDT)
+ with ESMTP id Y-mUePevK9-m for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Aug 2015 11:56:34 -0400 (EDT)
+Received: from mail-wi0-f181.google.com (mail-wi0-f181.google.com
+ [209.85.212.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB9255A515
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:56:33 -0400 (EDT)
+Received: by wibxm9 with SMTP id xm9so71908493wib.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Aug 2015 09:09:26 -0700 (PDT)
 In-Reply-To: <1438963713-10460-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,27 +34,125 @@ To: eric.auger@st.com, eric.auger@linaro.org, christoffer.dall@linaro.org, marc.
 Cc: pbonzini@redhat.com, linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-kvm_arch_vcpu_runnable now also checks whether the power_off
-flag is set.
+We introduce kvm_arm_halt_guest and resume functions. They
+will be used for IRQ forward state change.
+
+Halt is synchronous and prevents the guest from being re-entered.
+We use the same mechanism put in place for PSCI former pause,
+now renamed power_off. A new flag is introduced in arch vcpu state,
+pause, only meant to be used by those functions.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
----
- arch/arm/kvm/arm.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
+---
+v1 -> v2:
+- check pause in kvm_arch_vcpu_runnable
+- we cannot use kvm_vcpu_block since this latter would exit on
+  IRQ/FIQ and this is not what we want
+---
+ arch/arm/include/asm/kvm_host.h   |  3 +++
+ arch/arm/kvm/arm.c                | 35 +++++++++++++++++++++++++++++++----
+ arch/arm64/include/asm/kvm_host.h |  3 +++
+ 3 files changed, 37 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 304004d..dac85f6 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -132,6 +132,9 @@ struct kvm_vcpu_arch {
+ 	/* vcpu power-off state */
+ 	bool power_off;
+ 
++	 /* Exit and don't run the guest (internal implementation need) */
++	bool pause;
++
+ 	/* IO related fields */
+ 	struct kvm_decode mmio_decode;
+ 
 diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 3ac6b4c..4f50be3 100644
+index cc404a8..0529b38 100644
 --- a/arch/arm/kvm/arm.c
 +++ b/arch/arm/kvm/arm.c
-@@ -347,7 +347,8 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
-  */
+@@ -348,7 +348,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
  int kvm_arch_vcpu_runnable(struct kvm_vcpu *v)
  {
--	return !!v->arch.irq_lines || kvm_vgic_vcpu_pending_irq(v);
-+	return ((!!v->arch.irq_lines || kvm_vgic_vcpu_pending_irq(v))
-+		&& !v->arch.power_off);
+ 	return ((!!v->arch.irq_lines || kvm_vgic_vcpu_pending_irq(v))
+-		&& !v->arch.power_off);
++		&& !v->arch.power_off && !v->arch.pause);
  }
  
  /* Just ensure a guest exit from a particular CPU */
+@@ -474,11 +474,38 @@ bool kvm_arch_intc_initialized(struct kvm *kvm)
+ 	return vgic_initialized(kvm);
+ }
+ 
++static void kvm_arm_halt_guest(struct kvm *kvm) __maybe_unused;
++static void kvm_arm_resume_guest(struct kvm *kvm) __maybe_unused;
++
++static void kvm_arm_halt_guest(struct kvm *kvm)
++{
++	int i;
++	struct kvm_vcpu *vcpu;
++
++	kvm_for_each_vcpu(i, vcpu, kvm)
++		vcpu->arch.pause = true;
++	force_vm_exit(cpu_all_mask);
++}
++
++static void kvm_arm_resume_guest(struct kvm *kvm)
++{
++	int i;
++	struct kvm_vcpu *vcpu;
++
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		wait_queue_head_t *wq = kvm_arch_vcpu_wq(vcpu);
++
++		vcpu->arch.pause = false;
++		wake_up_interruptible(wq);
++	}
++}
++
+ static void vcpu_sleep(struct kvm_vcpu *vcpu)
+ {
+ 	wait_queue_head_t *wq = kvm_arch_vcpu_wq(vcpu);
+ 
+-	wait_event_interruptible(*wq, !vcpu->arch.power_off);
++	wait_event_interruptible(*wq, ((!vcpu->arch.power_off) &&
++				       (!vcpu->arch.pause)));
+ }
+ 
+ static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+@@ -528,7 +555,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 
+ 		update_vttbr(vcpu->kvm);
+ 
+-		if (vcpu->arch.power_off)
++		if (vcpu->arch.power_off || vcpu->arch.pause)
+ 			vcpu_sleep(vcpu);
+ 
+ 		/*
+@@ -556,7 +583,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		}
+ 
+ 		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
+-			vcpu->arch.power_off) {
++			vcpu->arch.power_off || vcpu->arch.pause) {
+ 			local_irq_enable();
+ 			kvm_vgic_sync_hwstate(vcpu);
+ 			preempt_enable();
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 009da6b..69e3785 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -125,6 +125,9 @@ struct kvm_vcpu_arch {
+ 	/* vcpu power-off state */
+ 	bool power_off;
+ 
++	/* Don't run the guest */
++	bool pause;
++
+ 	/* IO related fields */
+ 	struct kvm_decode mmio_decode;
+ 
 -- 
 1.9.1
