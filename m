@@ -1,24 +1,24 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 09/11] KVM: arm/arm64: vgic: Prevent userspace injection of
- a mapped interrupt
-Date: Fri,  7 Aug 2015 16:45:45 +0100
-Message-ID: <1438962347-17541-10-git-send-email-marc.zyngier@arm.com>
-References: <1438962347-17541-1-git-send-email-marc.zyngier@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [PATCH v2 0/4] KVM: arm/arm64: guest synchronous halt/resume
+Date: Fri,  7 Aug 2015 18:08:29 +0200
+Message-ID: <1438963713-10460-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 82A355A49C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:33:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AE725A4C5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:56:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id O3GLM67xQeAe for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Aug 2015 11:33:14 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B8BB5A4AD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:33:13 -0400 (EDT)
-In-Reply-To: <1438962347-17541-1-git-send-email-marc.zyngier@arm.com>
+ with ESMTP id vn3EOdaxck+W for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Aug 2015 11:56:28 -0400 (EDT)
+Received: from mail-wi0-f174.google.com (mail-wi0-f174.google.com
+ [209.85.212.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15F555A4C3
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:56:27 -0400 (EDT)
+Received: by wibxm9 with SMTP id xm9so67294538wib.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Aug 2015 09:09:20 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,185 +28,50 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Andre Przywara <andre.przywara@arm.com>
+To: eric.auger@st.com, eric.auger@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, drjones@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Virtual interrupts mapped to a HW interrupt should only be triggered
-from inside the kernel. Otherwise, you could end up confusing the
-kernel (and the GIC's) state machine.
+This series introduces the capability to synchronously exit the guest
+and prevent it from being re-entered. This modality will be used by
+IRQ forwarding series when changing the state of the IRQ.
 
-Rearrange the injection path so that kvm_vgic_inject_irq is
-used for non-mapped interrupts, and kvm_vgic_inject_mapped_irq is
-used for mapped interrupts. The latter should only be called from
-inside the kernel (timer, irqfd).
+Former pause flag used when starting the vcpu in KVM_ARM_VCPU_POWER_OFF
+state, in PSCI calls and in KVM_SET_MP_STATE ioctl is renamed into
+power_off. A new pause flag is introduced. Both now are checked in
+kvm_arch_vcpu_runnable and in the VCPU_RUN critical section, before
+entering the vcpu.
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- include/kvm/arm_vgic.h |   2 +
- virt/kvm/arm/vgic.c    | 103 +++++++++++++++++++++++++++++++++----------------
- 2 files changed, 72 insertions(+), 33 deletions(-)
+Best Regards
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index e789e47..d901f1a 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -350,6 +350,8 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
- void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
- int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
- 			bool level);
-+int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid,
-+			       struct irq_phys_map *map, bool level);
- void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
- int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
- int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index b553a8f..9eb489a 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -1555,7 +1555,8 @@ static int vgic_validate_injection(struct kvm_vcpu *vcpu, int irq, int level)
- }
- 
- static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
--				  unsigned int irq_num, bool level)
-+				   struct irq_phys_map *map,
-+				   unsigned int irq_num, bool level)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
- 	struct kvm_vcpu *vcpu;
-@@ -1563,6 +1564,9 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
- 	int enabled;
- 	bool ret = true, can_inject = true;
- 
-+	if (irq_num >= min(kvm->arch.vgic.nr_irqs, 1020))
-+		return -EINVAL;
-+
- 	spin_lock(&dist->lock);
- 
- 	vcpu = kvm_get_vcpu(kvm, cpuid);
-@@ -1625,18 +1629,46 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
- out:
- 	spin_unlock(&dist->lock);
- 
--	return ret ? cpuid : -EINVAL;
-+	if (ret) {
-+		/* kick the specified vcpu */
-+		kvm_vcpu_kick(kvm_get_vcpu(kvm, cpuid));
-+	}
-+
-+	return 0;
-+}
-+
-+static int vgic_lazy_init(struct kvm *kvm)
-+{
-+	int ret = 0;
-+
-+	if (unlikely(!vgic_initialized(kvm))) {
-+		/*
-+		 * We only provide the automatic initialization of the VGIC
-+		 * for the legacy case of a GICv2. Any other type must
-+		 * be explicitly initialized once setup with the respective
-+		 * KVM device call.
-+		 */
-+		if (kvm->arch.vgic.vgic_model != KVM_DEV_TYPE_ARM_VGIC_V2)
-+			return -EBUSY;
-+
-+		mutex_lock(&kvm->lock);
-+		ret = vgic_init(kvm);
-+		mutex_unlock(&kvm->lock);
-+	}
-+
-+	return ret;
- }
- 
- /**
-  * kvm_vgic_inject_irq - Inject an IRQ from a device to the vgic
-  * @kvm:     The VM structure pointer
-  * @cpuid:   The CPU for PPIs
-- * @irq_num: The IRQ number that is assigned to the device
-+ * @irq_num: The IRQ number that is assigned to the device. This IRQ
-+ *           must not be mapped to a HW interrupt.
-  * @level:   Edge-triggered:  true:  to trigger the interrupt
-  *			      false: to ignore the call
-- *	     Level-sensitive  true:  activates an interrupt
-- *			      false: deactivates an interrupt
-+ *	     Level-sensitive  true:  raise the input signal
-+ *			      false: lower the input signal
-  *
-  * The GIC is not concerned with devices being active-LOW or active-HIGH for
-  * level-sensitive interrupts.  You can think of the level parameter as 1
-@@ -1645,39 +1677,44 @@ out:
- int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int irq_num,
- 			bool level)
- {
--	int ret = 0;
--	int vcpu_id;
--
--	if (unlikely(!vgic_initialized(kvm))) {
--		/*
--		 * We only provide the automatic initialization of the VGIC
--		 * for the legacy case of a GICv2. Any other type must
--		 * be explicitly initialized once setup with the respective
--		 * KVM device call.
--		 */
--		if (kvm->arch.vgic.vgic_model != KVM_DEV_TYPE_ARM_VGIC_V2) {
--			ret = -EBUSY;
--			goto out;
--		}
--		mutex_lock(&kvm->lock);
--		ret = vgic_init(kvm);
--		mutex_unlock(&kvm->lock);
-+	struct irq_phys_map *map;
-+	int ret;
- 
--		if (ret)
--			goto out;
--	}
-+	ret = vgic_lazy_init(kvm);
-+	if (ret)
-+		return ret;
- 
--	if (irq_num >= min(kvm->arch.vgic.nr_irqs, 1020))
-+	map = vgic_irq_map_search(kvm_get_vcpu(kvm, cpuid), irq_num);
-+	if (map)
- 		return -EINVAL;
- 
--	vcpu_id = vgic_update_irq_pending(kvm, cpuid, irq_num, level);
--	if (vcpu_id >= 0) {
--		/* kick the specified vcpu */
--		kvm_vcpu_kick(kvm_get_vcpu(kvm, vcpu_id));
--	}
-+	return vgic_update_irq_pending(kvm, cpuid, NULL, irq_num, level);
-+}
- 
--out:
--	return ret;
-+/**
-+ * kvm_vgic_inject_mapped_irq - Inject a physically mapped IRQ to the vgic
-+ * @kvm:     The VM structure pointer
-+ * @cpuid:   The CPU for PPIs
-+ * @map:     Pointer to a irq_phys_map structure describing the mapping
-+ * @level:   Edge-triggered:  true:  to trigger the interrupt
-+ *			      false: to ignore the call
-+ *	     Level-sensitive  true:  raise the input signal
-+ *			      false: lower the input signal
-+ *
-+ * The GIC is not concerned with devices being active-LOW or active-HIGH for
-+ * level-sensitive interrupts.  You can think of the level parameter as 1
-+ * being HIGH and 0 being LOW and all devices being active-HIGH.
-+ */
-+int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid,
-+			       struct irq_phys_map *map, bool level)
-+{
-+	int ret;
-+
-+	ret = vgic_lazy_init(kvm);
-+	if (ret)
-+		return ret;
-+
-+	return vgic_update_irq_pending(kvm, cpuid, map, map->virt_irq, level);
- }
- 
- static irqreturn_t vgic_maintenance_handler(int irq, void *data)
+Eric
+
+History:
+
+v1 -> v2:
+- check pause, power_off and in kvm_arch_vcpu_runnable
+- check power_off in vcpu_run critcal section before guest entry
+- correct compil issue in first patch reported by Andrew
+- rename vcpu_pause into vcpu_sleep
+
+RFC -> PATCH v1:
+- originally part of [RFC 00/17] ARM IRQ forward control based on IRQ
+  bypass manager (https://lkml.org/lkml/2015/7/2/268) and isolated in
+  this series.
+- added __maybe_unused following Marc's advice
+
+
+Eric Auger (4):
+  KVM: arm/arm64: rename pause into power_off
+  KVM: arm/arm64: check power_off in kvm_arch_vcpu_runnable
+  KVM: arm/arm64: check power_off in critical section before VCPU run
+  KVM: arm/arm64: implement kvm_arm_[halt,resume]_guest
+
+ arch/arm/include/asm/kvm_host.h   |  5 +++-
+ arch/arm/kvm/arm.c                | 53 ++++++++++++++++++++++++++++++---------
+ arch/arm/kvm/psci.c               | 10 ++++----
+ arch/arm64/include/asm/kvm_host.h |  3 +++
+ 4 files changed, 53 insertions(+), 18 deletions(-)
+
 -- 
-2.1.4
+1.9.1
