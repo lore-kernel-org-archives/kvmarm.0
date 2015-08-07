@@ -1,41 +1,57 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 05/11] KVM: arm/arm64: vgic: Relax vgic_can_sample_irq for edge IRQs
-Date: Fri,  7 Aug 2015 16:45:41 +0100
-Message-ID: <1438962347-17541-6-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v4 03/11] KVM: arm/arm64: vgic: Convert struct vgic_lr to use
+ bitfields
+Date: Fri,  7 Aug 2015 16:45:39 +0100
+Message-ID: <1438962347-17541-4-git-send-email-marc.zyngier@arm.com>
 References: <1438962347-17541-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E67225A44E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:33:05 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id CWBr3SM9SLrW for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Aug 2015 11:33:05 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 097AC5A46A
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:33:04 -0400 (EDT)
 In-Reply-To: <1438962347-17541-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Andre Przywara <andre.przywara@arm.com>
+Cc: Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We only set the irq_queued flag for level interrupts, meaning
-that "!vgic_irq_is_queued(vcpu, irq)" is a good enough predicate
-for all interrupts.
-
-This will allow us to inject edge HW interrupts, for which the
-state ACTIVE+PENDING is not allowed.
-
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- virt/kvm/arm/vgic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index bc40137..5bd1695 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -375,7 +375,7 @@ void vgic_cpu_irq_clear(struct kvm_vcpu *vcpu, int irq)
- 
- static bool vgic_can_sample_irq(struct kvm_vcpu *vcpu, int irq)
- {
--	return vgic_irq_is_edge(vcpu, irq) || !vgic_irq_is_queued(vcpu, irq);
-+	return !vgic_irq_is_queued(vcpu, irq);
- }
- 
- /**
--- 
-2.1.4
-
+QXMgd2UncmUgYWJvdXQgdG8gY3JhbSBtb3JlIGluZm9ybWF0aW9uIGluIHRoZSB2Z2ljX2xyIHN0
+cnVjdHVyZQooSFcgaW50ZXJydXB0IG51bWJlciBhbmQgYWRkaXRpb25hbCBzdGF0ZSBpbmZvcm1h
+dGlvbiksIHdlIHN3aXRjaAp0byBhIGxheW91dCBzaW1pbGFyIHRvIHRoZSBIVydzOgoKLSB1c2Ug
+Yml0ZmllbGRzIHRvIHNhdmUgc3BhY2UgKHdlIGRvbid0IG5lZWQgbW9yZSB0aGFuIDEwIGJpdHMK
+ICB0byByZXByZXNlbnQgdGhlIGlycSBudW1iZXJzKQotIHNvdXJjZSBDUFUgYW5kIEhXIGludGVy
+cnVwdCBjYW4gc2hhcmUgdGhlIHNhbWUgZmllbGQsIGFzCiAgYSBTR0kgZG9lc24ndCBoYXZlIGEg
+cGh5c2ljYWwgbGluZS4KClJldmlld2VkLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxp
+bmFyby5vcmc+ClJldmlld2VkLWJ5OiBDaHJpc3RvZmZlciBEYWxsIDxjaHJpc3RvZmZlci5kYWxs
+QGxpbmFyby5vcmc+ClNpZ25lZC1vZmYtYnk6IE1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFy
+bS5jb20+Ci0tLQogaW5jbHVkZS9rdm0vYXJtX3ZnaWMuaCB8IDEwICsrKysrKystLS0KIDEgZmls
+ZSBjaGFuZ2VkLCA3IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEv
+aW5jbHVkZS9rdm0vYXJtX3ZnaWMuaCBiL2luY2x1ZGUva3ZtL2FybV92Z2ljLmgKaW5kZXggMTMz
+ZWEwMC4uYTg4MWUzOSAxMDA2NDQKLS0tIGEvaW5jbHVkZS9rdm0vYXJtX3ZnaWMuaAorKysgYi9p
+bmNsdWRlL2t2bS9hcm1fdmdpYy5oCkBAIC05NSwxMSArOTUsMTUgQEAgZW51bSB2Z2ljX3R5cGUg
+ewogI2RlZmluZSBMUl9TVEFURV9BQ1RJVkUJCSgxIDw8IDEpCiAjZGVmaW5lIExSX1NUQVRFX01B
+U0sJCSgzIDw8IDApCiAjZGVmaW5lIExSX0VPSV9JTlQJCSgxIDw8IDIpCisjZGVmaW5lIExSX0hX
+CQkJKDEgPDwgMykKIAogc3RydWN0IHZnaWNfbHIgewotCXUxNglpcnE7Ci0JdTgJc291cmNlOwot
+CXU4CXN0YXRlOworCXVuc2lnbmVkIGlycToxMDsKKwl1bmlvbiB7CisJCXVuc2lnbmVkIGh3aXJx
+OjEwOworCQl1bnNpZ25lZCBzb3VyY2U6MzsKKwl9OworCXVuc2lnbmVkIHN0YXRlOjQ7CiB9Owog
+CiBzdHJ1Y3QgdmdpY192bWNyIHsKLS0gCjIuMS40CgpfX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5j
+cy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0
+aW5mby9rdm1hcm0K
