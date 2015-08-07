@@ -1,22 +1,24 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 00/11] arm/arm64: KVM: Active interrupt state switching for
- shared devices
-Date: Fri,  7 Aug 2015 16:45:36 +0100
-Message-ID: <1438962347-17541-1-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v4 07/11] KVM: arm/arm64: vgic: Allow HW interrupts to be
+ queued to a guest
+Date: Fri,  7 Aug 2015 16:45:43 +0100
+Message-ID: <1438962347-17541-8-git-send-email-marc.zyngier@arm.com>
+References: <1438962347-17541-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EA375A44E
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:33:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BC30C5A469
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:33:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pKw+7zvUZ-hl for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Aug 2015 11:33:00 -0400 (EDT)
+ with ESMTP id 2Fe+yNwvWZmr for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Aug 2015 11:33:10 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7521B5A447
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:33:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5FF7E5A48C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:33:10 -0400 (EDT)
+In-Reply-To: <1438962347-17541-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,103 +32,139 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.in
 Cc: Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
->From day 1, our timer code has been using a terrible hack: whenever
-the guest is scheduled with a timer interrupt pending (i.e. the HW
-timer has expired), we restore the timer state with the MASK bit set,
-in order to avoid the physical interrupt to fire again. And again. And
-again...
+To allow a HW interrupt to be injected into a guest, we lookup the
+guest virtual interrupt in the irq_phys_map list, and if we have
+a match, encode both interrupts in the LR.
 
-This is absolutely silly, for at least two reasons:
+We also mark the interrupt as "active" at the host distributor level.
 
-- This relies on the device (the timer) having a mask bit that we can
-  play with. Not all devices are built like this.
+On guest EOI on the virtual interrupt, the host interrupt will be
+deactivated.
 
-- This expects some behaviour of the guest that only works because the
-  both the kernel timer code and the KVM counterpart have been written
-  by the same idiot (the idiot being me).
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ virt/kvm/arm/vgic.c | 89 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 86 insertions(+), 3 deletions(-)
 
-The One True Way is to set the GIC active bit when injecting the
-interrupt, and to context-switch across the world switch. This is what
-this series implements.
-
-We introduce a relatively simple infrastructure enabling the mapping
-of a virtual interrupt with its physical counterpart:
-
-- Whenever an virtual interrupt is injected, we look it up in an
-  rbtree. If we have a match, the interrupt is injected with the HW
-  bit set in the LR, together with the physical interrupt.
-
-- Across the world switch, we save/restore the active state for these
-  interrupts using the irqchip_state API.
-
-- On guest EOI, the HW interrupt is automagically deactivated by the
-  GIC, allowing the interrupt to be resampled.
-
-The timer code is slightly modified to set the active state at the
-same time as the injection.
-
-The last patch also allows non-shared devices to have their interrupt
-deactivated the same way (in this case we do not context-switch the
-active state). This is the first step in the long overdue direction of
-the mythical IRQ forwarding thing... This last patch is not a
-candidate for merging, but is included for completeness, and to allow
-Eric to base his own code on this stuff.
-
-This series is based on v4.2-rc2 + the current queue for 4.3, and has
-been tested on Juno, Cubietruck (GICv2) and the FVP Base model (GICv3
-host, both GICv2 and GICv3 guests). I'd appreciate any form of
-testing, specially in the context of guest migration (there is
-obviously some interesting stuff there...).
-
-The code is otherwise available at
-git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/active-timer-next
-
-* From v3:
-  - Fixed RCU thinko
-  - Some more documentation
-  - Added RBs from Christoffer
-
-* From v2:
-  - Many comments added
-  - Fixed potential race between unmap and destroy
-  - Removed the requirement for a GFP_ATOMIC allocations in map
-  - New function names for the exported functions (map, unmap, get, set, init)
-  - New patch preventing the injection of a HW mapped interrupt, and
-    offer a new injection API
-
-* From v1:
-  - Rebased on top of current mainline
-  - Fixed non-shared handling of forwarded interrupts
-  - Fixed memory leaks on VM exit
-  - Used RCU lists instead of an RB tree
-
-Marc Zyngier (11):
-  arm/arm64: KVM: Fix ordering of timer/GIC on guest entry
-  arm/arm64: KVM: Move vgic handling to a non-preemptible section
-  KVM: arm/arm64: vgic: Convert struct vgic_lr to use bitfields
-  KVM: arm/arm64: vgic: Allow HW irq to be encoded in LR
-  KVM: arm/arm64: vgic: Relax vgic_can_sample_irq for edge IRQs
-  KVM: arm/arm64: vgic: Allow dynamic mapping of physical/virtual
-    interrupts
-  KVM: arm/arm64: vgic: Allow HW interrupts to be queued to a guest
-  KVM: arm/arm64: vgic: Add vgic_{get,set}_phys_irq_active
-  KVM: arm/arm64: vgic: Prevent userspace injection of a mapped
-    interrupt
-  KVM: arm/arm64: timer: Allow the timer to control the active state
-  KVM: arm/arm64: vgic: Allow HW interrupts for non-shared devices
-
- arch/arm/kvm/arm.c                 |  21 +-
- arch/arm/kvm/reset.c               |   4 +-
- arch/arm64/kvm/reset.c             |   4 +-
- include/kvm/arm_arch_timer.h       |   7 +-
- include/kvm/arm_vgic.h             |  41 +++-
- include/linux/irqchip/arm-gic-v3.h |   3 +
- include/linux/irqchip/arm-gic.h    |   3 +-
- virt/kvm/arm/arch_timer.c          |  30 ++-
- virt/kvm/arm/vgic-v2.c             |  16 +-
- virt/kvm/arm/vgic-v3.c             |  21 +-
- virt/kvm/arm/vgic.c                | 472 ++++++++++++++++++++++++++++++++++---
- 11 files changed, 557 insertions(+), 65 deletions(-)
-
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 51c9900..9d009d2 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -1140,6 +1140,39 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
+ 	if (!vgic_irq_is_edge(vcpu, irq))
+ 		vlr.state |= LR_EOI_INT;
+ 
++	if (vlr.irq >= VGIC_NR_SGIS) {
++		struct irq_phys_map *map;
++		map = vgic_irq_map_search(vcpu, irq);
++
++		/*
++		 * If we have a mapping, and the virtual interrupt is
++		 * being injected, then we must set the state to
++		 * active in the physical world. Otherwise the
++		 * physical interrupt will fire and the guest will
++		 * exit before processing the virtual interrupt.
++		 */
++		if (map) {
++			int ret;
++
++			BUG_ON(!map->active);
++			vlr.hwirq = map->phys_irq;
++			vlr.state |= LR_HW;
++			vlr.state &= ~LR_EOI_INT;
++
++			ret = irq_set_irqchip_state(map->irq,
++						    IRQCHIP_STATE_ACTIVE,
++						    true);
++			WARN_ON(ret);
++
++			/*
++			 * Make sure we're not going to sample this
++			 * again, as a HW-backed interrupt cannot be
++			 * in the PENDING_ACTIVE stage.
++			 */
++			vgic_irq_set_queued(vcpu, irq);
++		}
++	}
++
+ 	vgic_set_lr(vcpu, lr_nr, vlr);
+ 	vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
+ }
+@@ -1364,6 +1397,39 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+ 	return level_pending;
+ }
+ 
++/*
++ * Save the physical active state, and reset it to inactive.
++ *
++ * Return 1 if HW interrupt went from active to inactive, and 0 otherwise.
++ */
++static int vgic_sync_hwirq(struct kvm_vcpu *vcpu, struct vgic_lr vlr)
++{
++	struct irq_phys_map *map;
++	int ret;
++
++	if (!(vlr.state & LR_HW))
++		return 0;
++
++	map = vgic_irq_map_search(vcpu, vlr.irq);
++	BUG_ON(!map || !map->active);
++
++	ret = irq_get_irqchip_state(map->irq,
++				    IRQCHIP_STATE_ACTIVE,
++				    &map->active);
++
++	WARN_ON(ret);
++
++	if (map->active) {
++		ret = irq_set_irqchip_state(map->irq,
++					    IRQCHIP_STATE_ACTIVE,
++					    false);
++		WARN_ON(ret);
++		return 0;
++	}
++
++	return 1;
++}
++
+ /* Sync back the VGIC state after a guest run */
+ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ {
+@@ -1378,14 +1444,31 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ 	elrsr = vgic_get_elrsr(vcpu);
+ 	elrsr_ptr = u64_to_bitmask(&elrsr);
+ 
+-	/* Clear mappings for empty LRs */
+-	for_each_set_bit(lr, elrsr_ptr, vgic->nr_lr) {
++	/* Deal with HW interrupts, and clear mappings for empty LRs */
++	for (lr = 0; lr < vgic->nr_lr; lr++) {
+ 		struct vgic_lr vlr;
+ 
+-		if (!test_and_clear_bit(lr, vgic_cpu->lr_used))
++		if (!test_bit(lr, vgic_cpu->lr_used))
+ 			continue;
+ 
+ 		vlr = vgic_get_lr(vcpu, lr);
++		if (vgic_sync_hwirq(vcpu, vlr)) {
++			/*
++			 * So this is a HW interrupt that the guest
++			 * EOI-ed. Clean the LR state and allow the
++			 * interrupt to be sampled again.
++			 */
++			vlr.state = 0;
++			vlr.hwirq = 0;
++			vgic_set_lr(vcpu, lr, vlr);
++			vgic_irq_clear_queued(vcpu, vlr.irq);
++			set_bit(lr, elrsr_ptr);
++		}
++
++		if (!test_bit(lr, elrsr_ptr))
++			continue;
++
++		clear_bit(lr, vgic_cpu->lr_used);
+ 
+ 		BUG_ON(vlr.irq >= dist->nr_irqs);
+ 		vgic_cpu->vgic_irq_lr_map[vlr.irq] = LR_EMPTY;
 -- 
 2.1.4
