@@ -1,24 +1,27 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v2 0/4] KVM: arm/arm64: guest synchronous halt/resume
-Date: Fri,  7 Aug 2015 18:08:29 +0200
-Message-ID: <1438963713-10460-1-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v2 3/4] KVM: arm/arm64: check power_off in critical section
+ before VCPU run
+Date: Fri,  7 Aug 2015 18:08:32 +0200
+Message-ID: <1438963713-10460-4-git-send-email-eric.auger@linaro.org>
+References: <1438963713-10460-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AE725A4C5
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:56:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 38EFB5A503
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:56:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vn3EOdaxck+W for <kvmarm@lists.cs.columbia.edu>;
- Fri,  7 Aug 2015 11:56:28 -0400 (EDT)
-Received: from mail-wi0-f174.google.com (mail-wi0-f174.google.com
- [209.85.212.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15F555A4C3
- for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:56:27 -0400 (EDT)
-Received: by wibxm9 with SMTP id xm9so67294538wib.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Aug 2015 09:09:20 -0700 (PDT)
+ with ESMTP id eafpLRIc2fcM for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  7 Aug 2015 11:56:32 -0400 (EDT)
+Received: from mail-wi0-f182.google.com (mail-wi0-f182.google.com
+ [209.85.212.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6FD545A504
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  7 Aug 2015 11:56:32 -0400 (EDT)
+Received: by wibxm9 with SMTP id xm9so71907583wib.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 07 Aug 2015 09:09:25 -0700 (PDT)
+In-Reply-To: <1438963713-10460-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,46 +35,30 @@ To: eric.auger@st.com, eric.auger@linaro.org, christoffer.dall@linaro.org, marc.
 Cc: pbonzini@redhat.com, linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series introduces the capability to synchronously exit the guest
-and prevent it from being re-entered. This modality will be used by
-IRQ forwarding series when changing the state of the IRQ.
+In case KVM_SET_MP_STATE ioctl is called just after we executed the
+vcpu_sleep check, we can enter the guest although KVM_MP_STATE_STOPPED
+is set. Let's check the power_off state in the critical section,
+just before entering the guest.
 
-Former pause flag used when starting the vcpu in KVM_ARM_VCPU_POWER_OFF
-state, in PSCI calls and in KVM_SET_MP_STATE ioctl is renamed into
-power_off. A new pause flag is introduced. Both now are checked in
-kvm_arch_vcpu_runnable and in the VCPU_RUN critical section, before
-entering the vcpu.
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
+Reported-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ arch/arm/kvm/arm.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Best Regards
-
-Eric
-
-History:
-
-v1 -> v2:
-- check pause, power_off and in kvm_arch_vcpu_runnable
-- check power_off in vcpu_run critcal section before guest entry
-- correct compil issue in first patch reported by Andrew
-- rename vcpu_pause into vcpu_sleep
-
-RFC -> PATCH v1:
-- originally part of [RFC 00/17] ARM IRQ forward control based on IRQ
-  bypass manager (https://lkml.org/lkml/2015/7/2/268) and isolated in
-  this series.
-- added __maybe_unused following Marc's advice
-
-
-Eric Auger (4):
-  KVM: arm/arm64: rename pause into power_off
-  KVM: arm/arm64: check power_off in kvm_arch_vcpu_runnable
-  KVM: arm/arm64: check power_off in critical section before VCPU run
-  KVM: arm/arm64: implement kvm_arm_[halt,resume]_guest
-
- arch/arm/include/asm/kvm_host.h   |  5 +++-
- arch/arm/kvm/arm.c                | 53 ++++++++++++++++++++++++++++++---------
- arch/arm/kvm/psci.c               | 10 ++++----
- arch/arm64/include/asm/kvm_host.h |  3 +++
- 4 files changed, 53 insertions(+), 18 deletions(-)
-
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 4f50be3..cc404a8 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -555,7 +555,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 			run->exit_reason = KVM_EXIT_INTR;
+ 		}
+ 
+-		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm)) {
++		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm) ||
++			vcpu->arch.power_off) {
+ 			local_irq_enable();
+ 			kvm_vgic_sync_hwstate(vcpu);
+ 			preempt_enable();
 -- 
 1.9.1
