@@ -1,25 +1,25 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v5 2/5] KVM: arm/arm64: select IRQ_BYPASS_MANAGER
-Date: Mon, 10 Aug 2015 15:31:04 +0200
-Message-ID: <1439213467-13668-3-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v5 4/5] KVM: introduce kvm_arch functions for IRQ bypass
+Date: Mon, 10 Aug 2015 15:31:06 +0200
+Message-ID: <1439213467-13668-5-git-send-email-eric.auger@linaro.org>
 References: <1439213467-13668-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 819D05A7D5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 09:18:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C01515A823
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 09:19:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0BUoFwDRpm-T for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Aug 2015 09:18:56 -0400 (EDT)
-Received: from mail-wi0-f180.google.com (mail-wi0-f180.google.com
- [209.85.212.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 94FDD5A79A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 09:18:56 -0400 (EDT)
-Received: by wijp15 with SMTP id p15so135811150wij.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 06:31:57 -0700 (PDT)
+ with ESMTP id z8Gkj+9s5qYN for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Aug 2015 09:19:00 -0400 (EDT)
+Received: from mail-wi0-f175.google.com (mail-wi0-f175.google.com
+ [209.85.212.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9BADC5A813
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 09:18:59 -0400 (EDT)
+Received: by wicja10 with SMTP id ja10so25865064wic.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 06:32:00 -0700 (PDT)
 In-Reply-To: <1439213467-13668-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,86 +34,74 @@ To: eric.auger@st.com, eric.auger@linaro.org, linux-arm-kernel@lists.infradead.o
 Cc: marc.zyngier@arm.com, linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Select IRQ_BYPASS_MANAGER when CONFIG_KVM is set
-Also add compilation of virt/lib.
+This patch introduces
+- kvm_arch_irq_bypass_add_producer
+- kvm_arch_irq_bypass_del_producer
+- kvm_arch_irq_bypass_stop
+- kvm_arch_irq_bypass_start
+
+They make possible to specialize the KVM IRQ bypass consumer in
+case CONFIG_KVM_HAVE_IRQ_BYPASS is set.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Feng Wu <feng.wu@intel.com>
 
 ---
+v4 -> v5:
+- remove static inline stub functions
 
-v3 -> v4:
-- add compilation of virt/lib in arm/arm64 KVM
-
-v2 -> v3:
-- [Feng Wu] Correct a typo in 'arch/arm64/kvm/Kconfig'
+v2 -> v3 (Feng Wu):
+- use 'kvm_arch_irq_bypass_start' instead of 'kvm_arch_irq_bypass_resume'
+- Remove 'kvm_arch_irq_bypass_update', which is not needed to be
+  a irqbypass callback per Alex's comments.
+- Make kvm_arch_irq_bypass_add_producer return 'int'
 
 v1 -> v2:
-- also set IRQ_BYPASS_MANAGER for arm64
+- use CONFIG_KVM_HAVE_IRQ_BYPASS instead CONFIG_IRQ_BYPASS_MANAGER
+- rename all functions according to Paolo's proposal
+- add kvm_arch_irq_bypass_update according to Feng's need
 ---
- arch/arm/kvm/Kconfig    | 2 ++
- arch/arm/kvm/Makefile   | 1 +
- arch/arm64/kvm/Kconfig  | 2 ++
- arch/arm64/kvm/Makefile | 1 +
- 4 files changed, 6 insertions(+)
+ include/linux/kvm_host.h | 10 ++++++++++
+ virt/kvm/Kconfig         |  3 +++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
-index bfb915d..3c565b9 100644
---- a/arch/arm/kvm/Kconfig
-+++ b/arch/arm/kvm/Kconfig
-@@ -3,6 +3,7 @@
- #
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 05e99b8..5ac8d21 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -24,6 +24,7 @@
+ #include <linux/err.h>
+ #include <linux/irqflags.h>
+ #include <linux/context_tracking.h>
++#include <linux/irqbypass.h>
+ #include <asm/signal.h>
  
- source "virt/kvm/Kconfig"
-+source "virt/lib/Kconfig"
+ #include <linux/kvm.h>
+@@ -1151,5 +1152,14 @@ static inline void kvm_vcpu_set_dy_eligible(struct kvm_vcpu *vcpu, bool val)
+ {
+ }
+ #endif /* CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT */
++
++#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
++int kvm_arch_irq_bypass_add_producer(struct irq_bypass_consumer *,
++			   struct irq_bypass_producer *);
++void kvm_arch_irq_bypass_del_producer(struct irq_bypass_consumer *,
++			   struct irq_bypass_producer *);
++void kvm_arch_irq_bypass_stop(struct irq_bypass_consumer *);
++void kvm_arch_irq_bypass_start(struct irq_bypass_consumer *);
++#endif /* CONFIG_HAVE_KVM_IRQ_BYPASS */
+ #endif
  
- menuconfig VIRTUALIZATION
- 	bool "Virtualization"
-@@ -31,6 +32,7 @@ config KVM
- 	select KVM_VFIO
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
-+	select IRQ_BYPASS_MANAGER
- 	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
- 	---help---
- 	  Support hosting virtualized guest machines.
-diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
-index c5eef02c..a6a41dd 100644
---- a/arch/arm/kvm/Makefile
-+++ b/arch/arm/kvm/Makefile
-@@ -24,3 +24,4 @@ obj-y += $(KVM)/arm/vgic.o
- obj-y += $(KVM)/arm/vgic-v2.o
- obj-y += $(KVM)/arm/vgic-v2-emul.o
- obj-y += $(KVM)/arm/arch_timer.o
-+obj-y += ../../../virt/lib/
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index bfffe8f..2509539 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -3,6 +3,7 @@
- #
- 
- source "virt/kvm/Kconfig"
-+source "virt/lib/Kconfig"
- 
- menuconfig VIRTUALIZATION
- 	bool "Virtualization"
-@@ -31,6 +32,7 @@ config KVM
- 	select KVM_VFIO
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
-+	select IRQ_BYPASS_MANAGER
- 	---help---
- 	  Support hosting virtualized guest machines.
- 
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index f90f4aa..55eec69 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -27,3 +27,4 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3-emul.o
- kvm-$(CONFIG_KVM_ARM_HOST) += vgic-v3-switch.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
-+kvm-$(CONFIG_KVM_ARM_HOST) += ../../../virt/lib/
+diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+index e2c876d..9f8014d 100644
+--- a/virt/kvm/Kconfig
++++ b/virt/kvm/Kconfig
+@@ -47,3 +47,6 @@ config KVM_GENERIC_DIRTYLOG_READ_PROTECT
+ config KVM_COMPAT
+        def_bool y
+        depends on COMPAT && !S390
++
++config HAVE_KVM_IRQ_BYPASS
++       bool
 -- 
 1.9.1
