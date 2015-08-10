@@ -1,121 +1,83 @@
 From: Zhichao Huang <zhichao.huang@linaro.org>
-Subject: [PATCH v4 08/15] KVM: arm: add a trace event for cp14 traps
-Date: Mon, 10 Aug 2015 21:26:00 +0800
-Message-ID: <1439213167-8988-9-git-send-email-zhichao.huang@linaro.org>
+Subject: [PATCH v4 09/15] KVM: arm: redefine kvm_cpu_context_t to save the host cp14 states
+Date: Mon, 10 Aug 2015 21:26:01 +0800
+Message-ID: <1439213167-8988-10-git-send-email-zhichao.huang@linaro.org>
 References: <1439213167-8988-1-git-send-email-zhichao.huang@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE1F85A766
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 09:14:45 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YLA+CJ7pCbuT for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Aug 2015 09:14:44 -0400 (EDT)
-Received: from mail-pa0-f44.google.com (mail-pa0-f44.google.com
- [209.85.220.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 00E415A777
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 09:14:43 -0400 (EDT)
-Received: by pabyb7 with SMTP id yb7so106839422pab.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 06:27:44 -0700 (PDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1439213167-8988-1-git-send-email-zhichao.huang@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com
 Cc: huangzhichao@huawei.com, Zhichao Huang <zhichao.huang@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There are too many cp15 traps, so we don't reuse the cp15 trace event
-but add a new trace event to trace the access of debug registers.
+Redefine kvm_cpu_context_t as a new struct that include the cp14 states,
+which we used to save the host cp14 states.
 
 Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/kvm/coproc.c | 14 ++++++++++++++
- arch/arm/kvm/trace.h  | 30 ++++++++++++++++++++++++++++++
- 2 files changed, 44 insertions(+)
+ arch/arm/include/asm/kvm_host.h | 6 +++++-
+ arch/arm/kernel/asm-offsets.c   | 4 +++-
+ arch/arm/kvm/interrupts.S       | 6 ++++--
+ 3 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-index 2164f4e..d15b250 100644
---- a/arch/arm/kvm/coproc.c
-+++ b/arch/arm/kvm/coproc.c
-@@ -643,6 +643,13 @@ int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
- 	params.Rt2 = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
- 	params.CRm = 0;
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 63ac005..fc461ac 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -91,7 +91,11 @@ struct kvm_vcpu_fault_info {
+ 	u32 hyp_pc;		/* PC when exception was taken from Hyp mode */
+ };
  
-+	if (global == cp14_regs)
-+		trace_kvm_emulate_cp14_imp(params.Op1, params.Rt1, params.CRn,
-+			params.CRm, params.Op2, params.is_write);
-+	else
-+		trace_kvm_emulate_cp15_imp(params.Op1, params.Rt1, params.CRn,
-+			params.CRm, params.Op2, params.is_write);
-+
- 	if (!emulate_cp(vcpu, &params, target_specific, nr_specific))
- 		return 1;
- 	if (!emulate_cp(vcpu, &params, global, nr_global))
-@@ -680,6 +687,13 @@ int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
- 	params.Op2 = (kvm_vcpu_get_hsr(vcpu) >> 17) & 0x7;
- 	params.Rt2 = 0;
+-typedef struct vfp_hard_struct kvm_cpu_context_t;
++struct kvm_cpu_context {
++	struct vfp_hard_struct vfp;
++	u32 cp14[NR_CP14_REGS];
++};
++typedef struct kvm_cpu_context kvm_cpu_context_t;
  
-+	if (global == cp14_regs)
-+		trace_kvm_emulate_cp14_imp(params.Op1, params.Rt1, params.CRn,
-+			params.CRm, params.Op2, params.is_write);
-+	else
-+		trace_kvm_emulate_cp15_imp(params.Op1, params.Rt1, params.CRn,
-+			params.CRm, params.Op2, params.is_write);
-+
- 	if (!emulate_cp(vcpu, &params, target_specific, nr_specific))
- 		return 1;
- 	if (!emulate_cp(vcpu, &params, global, nr_global))
-diff --git a/arch/arm/kvm/trace.h b/arch/arm/kvm/trace.h
-index 0ec3539..988da03 100644
---- a/arch/arm/kvm/trace.h
-+++ b/arch/arm/kvm/trace.h
-@@ -159,6 +159,36 @@ TRACE_EVENT(kvm_emulate_cp15_imp,
- 			__entry->CRm, __entry->Op2)
- );
+ struct kvm_vcpu_arch {
+ 	struct kvm_regs regs;
+diff --git a/arch/arm/kernel/asm-offsets.c b/arch/arm/kernel/asm-offsets.c
+index 9158de0..cee4254 100644
+--- a/arch/arm/kernel/asm-offsets.c
++++ b/arch/arm/kernel/asm-offsets.c
+@@ -175,7 +175,9 @@ int main(void)
+   DEFINE(VCPU_CP14,		offsetof(struct kvm_vcpu, arch.cp14));
+   DEFINE(VCPU_CP15,		offsetof(struct kvm_vcpu, arch.cp15));
+   DEFINE(VCPU_VFP_GUEST,	offsetof(struct kvm_vcpu, arch.vfp_guest));
+-  DEFINE(VCPU_VFP_HOST,		offsetof(struct kvm_vcpu, arch.host_cpu_context));
++  DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
++  DEFINE(VCPU_VFP_HOST,		offsetof(struct kvm_cpu_context, vfp));
++  DEFINE(VCPU_CP14_HOST,	offsetof(struct kvm_cpu_context, cp14));
+   DEFINE(VCPU_REGS,		offsetof(struct kvm_vcpu, arch.regs));
+   DEFINE(VCPU_USR_REGS,		offsetof(struct kvm_vcpu, arch.regs.usr_regs));
+   DEFINE(VCPU_SVC_REGS,		offsetof(struct kvm_vcpu, arch.regs.svc_regs));
+diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
+index 48333ff..d4ff22e 100644
+--- a/arch/arm/kvm/interrupts.S
++++ b/arch/arm/kvm/interrupts.S
+@@ -176,8 +176,9 @@ __kvm_vcpu_return:
+ 	@ Switch VFP/NEON hardware state to the host's
+ 	add	r7, vcpu, #VCPU_VFP_GUEST
+ 	store_vfp_state r7
+-	add	r7, vcpu, #VCPU_VFP_HOST
++	add	r7, vcpu, #VCPU_HOST_CONTEXT
+ 	ldr	r7, [r7]
++	add	r7, r7, #VCPU_VFP_HOST
+ 	restore_vfp_state r7
  
-+/* Architecturally implementation defined CP14 register access */
-+TRACE_EVENT(kvm_emulate_cp14_imp,
-+	TP_PROTO(unsigned long Op1, unsigned long Rt1, unsigned long CRn,
-+		 unsigned long CRm, unsigned long Op2, bool is_write),
-+	TP_ARGS(Op1, Rt1, CRn, CRm, Op2, is_write),
-+
-+	TP_STRUCT__entry(
-+		__field(	unsigned int,	Op1		)
-+		__field(	unsigned int,	Rt1		)
-+		__field(	unsigned int,	CRn		)
-+		__field(	unsigned int,	CRm		)
-+		__field(	unsigned int,	Op2		)
-+		__field(	bool,		is_write	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->is_write		= is_write;
-+		__entry->Op1			= Op1;
-+		__entry->Rt1			= Rt1;
-+		__entry->CRn			= CRn;
-+		__entry->CRm			= CRm;
-+		__entry->Op2			= Op2;
-+	),
-+
-+	TP_printk("Implementation defined CP14: %s\tp14, %u, r%u, c%u, c%u, %u",
-+			(__entry->is_write) ? "mcr" : "mrc",
-+			__entry->Op1, __entry->Rt1, __entry->CRn,
-+			__entry->CRm, __entry->Op2)
-+);
-+
- TRACE_EVENT(kvm_wfx,
- 	TP_PROTO(unsigned long vcpu_pc, bool is_wfe),
- 	TP_ARGS(vcpu_pc, is_wfe),
+ after_vfp_restore:
+@@ -484,8 +485,9 @@ switch_to_guest_vfp:
+ 	set_hcptr vmtrap, (HCPTR_TCP(10) | HCPTR_TCP(11))
+ 
+ 	@ Switch VFP/NEON hardware state to the guest's
+-	add	r7, r0, #VCPU_VFP_HOST
++	add	r7, r0, #VCPU_HOST_CONTEXT
+ 	ldr	r7, [r7]
++	add	r7, r7, #VCPU_VFP_HOST
+ 	store_vfp_state r7
+ 	add	r7, r0, #VCPU_VFP_GUEST
+ 	restore_vfp_state r7
 -- 
 1.7.12.4
+
