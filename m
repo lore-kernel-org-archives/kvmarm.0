@@ -1,100 +1,118 @@
 From: Zhichao Huang <zhichao.huang@linaro.org>
-Subject: [PATCH v4 11/15] KVM: arm: add a function to keep track of host use
- of the debug registers
-Date: Mon, 10 Aug 2015 21:26:03 +0800
-Message-ID: <1439213167-8988-12-git-send-email-zhichao.huang@linaro.org>
+Subject: [PATCH v4 12/15] KVM: arm: keep track of host use of the debug registers
+Date: Mon, 10 Aug 2015 21:26:04 +0800
+Message-ID: <1439213167-8988-13-git-send-email-zhichao.huang@linaro.org>
 References: <1439213167-8988-1-git-send-email-zhichao.huang@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C22415A7AD
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 09:15:42 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id m9Yp5BmPInhQ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Aug 2015 09:15:42 -0400 (EDT)
-Received: from mail-pa0-f54.google.com (mail-pa0-f54.google.com
- [209.85.220.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D77D75A71D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 09:15:41 -0400 (EDT)
-Received: by pacgr6 with SMTP id gr6so27303372pac.2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 06:28:42 -0700 (PDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1439213167-8988-1-git-send-email-zhichao.huang@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com
 Cc: huangzhichao@huawei.com, Zhichao Huang <zhichao.huang@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we're about to implement a lazy world switch for debug registers,
-we add a function reading the break/watch control variables directly to
-indicate whether the host has enabled any break/watch points or not.
+Every guest entry, we need to keep track of host use of the debug
+registers.
+
+We only call the function upon guest entry, after preempt_disable()
+and local_irq_disable(), so there is no race for it.
 
 Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
 ---
- arch/arm/include/asm/hw_breakpoint.h |  5 +++++
- arch/arm/kernel/hw_breakpoint.c      | 21 +++++++++++++++++++++
- 2 files changed, 26 insertions(+)
+ arch/arm/include/asm/kvm_asm.h    | 3 +++
+ arch/arm/include/asm/kvm_host.h   | 4 ++++
+ arch/arm/kernel/asm-offsets.c     | 1 +
+ arch/arm/kvm/arm.c                | 2 ++
+ arch/arm/kvm/coproc.c             | 8 ++++++++
+ arch/arm64/include/asm/kvm_host.h | 1 +
+ 6 files changed, 19 insertions(+)
 
-diff --git a/arch/arm/include/asm/hw_breakpoint.h b/arch/arm/include/asm/hw_breakpoint.h
-index f2f4c61..6f375c5 100644
---- a/arch/arm/include/asm/hw_breakpoint.h
-+++ b/arch/arm/include/asm/hw_breakpoint.h
-@@ -66,9 +66,14 @@ int arch_install_hw_breakpoint(struct perf_event *bp);
- void arch_uninstall_hw_breakpoint(struct perf_event *bp);
- void hw_breakpoint_pmu_read(struct perf_event *bp);
- int hw_breakpoint_slots(int type);
-+bool hw_breakpoint_enabled(void);
+diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+index 7443a3a..5b1c3eb 100644
+--- a/arch/arm/include/asm/kvm_asm.h
++++ b/arch/arm/include/asm/kvm_asm.h
+@@ -64,6 +64,9 @@
+ #define cp14_DBGDSCRext	65	/* Debug Status and Control external */
+ #define NR_CP14_REGS	66	/* Number of regs (incl. invalid) */
  
- #else
- static inline void clear_ptrace_hw_breakpoint(struct task_struct *tsk) {}
-+static inline bool hw_breakpoint_enabled(void)
-+{
-+	return false;
-+}
++#define KVM_ARM_DEBUG_HOST_INUSE_SHIFT	0
++#define KVM_ARM_DEBUG_HOST_INUSE	(1 << KVM_ARM_DEBUG_HOST_INUSE_SHIFT)
++
+ #define ARM_EXCEPTION_RESET	  0
+ #define ARM_EXCEPTION_UNDEFINED   1
+ #define ARM_EXCEPTION_SOFTWARE    2
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index fc461ac..7338f34 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -131,6 +131,9 @@ struct kvm_vcpu_arch {
+ 	/* System control coprocessor (cp14) */
+ 	u32 cp14[NR_CP14_REGS];
  
- #endif	/* CONFIG_HAVE_HW_BREAKPOINT */
- #endif  /* __ASSEMBLY */
-diff --git a/arch/arm/kernel/hw_breakpoint.c b/arch/arm/kernel/hw_breakpoint.c
-index dc7d0a9..f56788f 100644
---- a/arch/arm/kernel/hw_breakpoint.c
-+++ b/arch/arm/kernel/hw_breakpoint.c
-@@ -227,6 +227,27 @@ static int get_num_brps(void)
- 	return core_has_mismatch_brps() ? brps - 1 : brps;
++	/* Debug State */
++	u32 debug_flags;
++
+ 	/*
+ 	 * Anything that is not used directly from assembly code goes
+ 	 * here.
+@@ -237,5 +240,6 @@ static inline void kvm_arch_hardware_unsetup(void) {}
+ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+ static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
++void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+ 
+ #endif /* __ARM_KVM_HOST_H__ */
+diff --git a/arch/arm/kernel/asm-offsets.c b/arch/arm/kernel/asm-offsets.c
+index cee4254..7750597 100644
+--- a/arch/arm/kernel/asm-offsets.c
++++ b/arch/arm/kernel/asm-offsets.c
+@@ -178,6 +178,7 @@ int main(void)
+   DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
+   DEFINE(VCPU_VFP_HOST,		offsetof(struct kvm_cpu_context, vfp));
+   DEFINE(VCPU_CP14_HOST,	offsetof(struct kvm_cpu_context, cp14));
++  DEFINE(VCPU_DEBUG_FLAGS,	offsetof(struct kvm_vcpu, arch.debug_flags));
+   DEFINE(VCPU_REGS,		offsetof(struct kvm_vcpu, arch.regs));
+   DEFINE(VCPU_USR_REGS,		offsetof(struct kvm_vcpu, arch.regs.usr_regs));
+   DEFINE(VCPU_SVC_REGS,		offsetof(struct kvm_vcpu, arch.regs.svc_regs));
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index bc738d2..0129346 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -550,6 +550,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 			continue;
+ 		}
+ 
++		kvm_arm_setup_debug(vcpu);
++
+ 		/**************************************************************
+ 		 * Enter the guest
+ 		 */
+diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+index d15b250..b37afd6 100644
+--- a/arch/arm/kvm/coproc.c
++++ b/arch/arm/kvm/coproc.c
+@@ -1516,3 +1516,11 @@ void kvm_reset_coprocs(struct kvm_vcpu *vcpu)
+ 		if (vcpu->arch.cp15[num] == 0x42424242)
+ 			panic("Didn't reset vcpu->arch.cp15[%zi]", num);
  }
- 
-+/* Indicate whether the host has enabled any break/watch points or not. */
-+bool hw_breakpoint_enabled(void)
++
++void kvm_arm_setup_debug(struct kvm_vcpu *vcpu)
 +{
-+	struct perf_event **slots;
-+	int i;
-+
-+	slots = this_cpu_ptr(bp_on_reg);
-+	for (i = 0; i < core_num_brps; i++) {
-+		if (slots[i])
-+			return true;
-+	}
-+
-+	slots = this_cpu_ptr(wp_on_reg);
-+	for (i = 0; i < core_num_wrps; i++) {
-+		if (slots[i])
-+			return true;
-+	}
-+
-+	return false;
++	if (hw_breakpoint_enabled())
++		vcpu->arch.debug_flags |= KVM_ARM_DEBUG_HOST_INUSE;
++	else
++		vcpu->arch.debug_flags &= ~KVM_ARM_DEBUG_HOST_INUSE;
 +}
-+
- /*
-  * In order to access the breakpoint/watchpoint control registers,
-  * we must be running in debug monitor mode. Unfortunately, we can
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 2709db2..84fa4f0 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -226,5 +226,6 @@ static inline void kvm_arch_hardware_unsetup(void) {}
+ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+ static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
++static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
+ 
+ #endif /* __ARM64_KVM_HOST_H__ */
 -- 
 1.7.12.4
+
