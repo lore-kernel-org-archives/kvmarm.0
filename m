@@ -1,158 +1,105 @@
 From: Zhichao Huang <zhichao.huang@linaro.org>
-Subject: [PATCH v4 13/15] KVM: arm: keep track of guest use of the debug registers
-Date: Mon, 10 Aug 2015 21:26:05 +0800
-Message-ID: <1439213167-8988-14-git-send-email-zhichao.huang@linaro.org>
+Subject: [PATCH v4 14/15] KVM: arm: implement lazy world switch for debug
+ registers
+Date: Mon, 10 Aug 2015 21:26:06 +0800
+Message-ID: <1439213167-8988-15-git-send-email-zhichao.huang@linaro.org>
 References: <1439213167-8988-1-git-send-email-zhichao.huang@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6496B5A7DF
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 09:16:10 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id UP3Sy2zbmep5 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Aug 2015 09:16:09 -0400 (EDT)
+Received: from mail-pa0-f47.google.com (mail-pa0-f47.google.com
+ [209.85.220.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C06B5A79E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 09:16:09 -0400 (EDT)
+Received: by pacrr5 with SMTP id rr5so104075544pac.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 06:29:10 -0700 (PDT)
 In-Reply-To: <1439213167-8988-1-git-send-email-zhichao.huang@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com
 Cc: huangzhichao@huawei.com, Zhichao Huang <zhichao.huang@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We trap debug register accesses from guest all the time, and read the
-BCR/WCR to indicate whether the guest has enabled any break/watch points
-or not.
+Avoid world-switching all the debug registers when neither the host
+nor the guest has configured any [WB]points.
 
 Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
 ---
- arch/arm/include/asm/kvm_asm.h |  2 ++
- arch/arm/kvm/coproc.c          | 75 +++++++++++++++++++++++++++++++++++++++---
- 2 files changed, 72 insertions(+), 5 deletions(-)
+ arch/arm/kvm/interrupts_head.S | 23 +++++++++++++++++++++--
+ 1 file changed, 21 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
-index 5b1c3eb..e9e1f0a 100644
---- a/arch/arm/include/asm/kvm_asm.h
-+++ b/arch/arm/include/asm/kvm_asm.h
-@@ -65,7 +65,9 @@
- #define NR_CP14_REGS	66	/* Number of regs (incl. invalid) */
+diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
+index b9e7410..7ad0adf 100644
+--- a/arch/arm/kvm/interrupts_head.S
++++ b/arch/arm/kvm/interrupts_head.S
+@@ -332,6 +332,21 @@ vcpu	.req	r0		@ vcpu pointer always in r0
+ 	sub	r12, r2, r12		@ How many WPs to skip
+ .endm
  
- #define KVM_ARM_DEBUG_HOST_INUSE_SHIFT	0
-+#define KVM_ARM_DEBUG_GUEST_INUSE_SHIFT	1
- #define KVM_ARM_DEBUG_HOST_INUSE	(1 << KVM_ARM_DEBUG_HOST_INUSE_SHIFT)
-+#define KVM_ARM_DEBUG_GUEST_INUSE	(1 << KVM_ARM_DEBUG_GUEST_INUSE_SHIFT)
- 
- #define ARM_EXCEPTION_RESET	  0
- #define ARM_EXCEPTION_UNDEFINED   1
-diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-index b37afd6..d9dcd28b 100644
---- a/arch/arm/kvm/coproc.c
-+++ b/arch/arm/kvm/coproc.c
-@@ -220,7 +220,22 @@ bool access_vm_reg(struct kvm_vcpu *vcpu,
- 	return true;
- }
- 
--static bool trap_debug32(struct kvm_vcpu *vcpu,
-+/* Indicate whether the guest has enabled any break/watch points or not. */
-+static bool guest_debug_in_use(struct kvm_vcpu *vcpu)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < ARM_MAX_BRP; i++)
-+		if (vcpu->arch.cp14[cp14_DBGBCR0 + i] & 0x1)
-+			return true;
-+	for (i = 0; i < ARM_MAX_WRP; i++)
-+		if (vcpu->arch.cp14[cp14_DBGWCR0 + i] & 0x1)
-+			return true;
-+
-+	return false;
-+}
-+
-+static bool __trap_debug32(struct kvm_vcpu *vcpu,
- 			const struct coproc_params *p,
- 			const struct coproc_reg *r)
- {
-@@ -232,6 +247,56 @@ static bool trap_debug32(struct kvm_vcpu *vcpu,
- 	return true;
- }
- 
-+/*
-+ * We want to avoid world-switching all the DBG registers all the
-+ * time:
++/* If VCPU_DEBUG_FLAGS is not set, it means that neither the host
++ * nor the guest has configured any [WB]points.
 + *
-+ * When we are about to run a guest, we have the following cases:
++ * We avoid world-switching all the debug registers in that case.
 + *
-+ * 1) Neither the host nor the guest has configured any [WB]points
-+ * 2) Only the host has configured any [WB]points
-+ * 3) Only the guest has configured any [WB]points
-+ * 4) Both the host and the guest have configured any [WB]points
++ * Assume vcpu pointer in vcpu reg
 + *
-+ * - In case (1), KVM should enable trapping and swtich the register
-+ *   state on guest accesses.
-+ * - In cases (2), (3), and (4) we must switch the register state on each
-+ *   entry/exit.
-+ *
-+ * For ARMv7, if the CONFIG_HAVE_HW_BREAKPOINT is set, ARM_DSCR_MDBGEN
-+ * is always set(ARM64 use it to indicate that debug registers are actively
-+ * in use).
-+ *
-+ * - We add a function reading the break/watch control variables directly to
-+ *   indicate whether the host has enabled any break/watch points or not.
-+ *   We only call the function upon guest entry, after preempt_disable() and
-+ *   local_irq_disable(), so there is no race for it.
-+ *
-+ * - We trap debug register accesses from guest all the time, and read the
-+ *   BCR/WCR to indicate whether the guest has enabled any break/watch points
-+ *   or not.
-+ *
-+ * For this, we can keep track of the host/guest use of debug registers,
-+ * and skip the save/restore dance when neither the host nor the guest has
-+ * configured any [WB]points.
++ * clobbers r2
 + */
-+static bool trap_debug32(struct kvm_vcpu *vcpu,
-+			const struct coproc_params *p,
-+			const struct coproc_reg *r)
-+{
-+	__trap_debug32(vcpu, p, r);
++.macro skip_debug_state target
++	ldr	r2, [vcpu, #VCPU_DEBUG_FLAGS]
++	cmp	r2, #0
++	beq	\target
++.endm
 +
-+	if (p->is_write) {
-+		if ((vcpu->arch.cp14[r->reg] & 0x1) ||
-+		    guest_debug_in_use(vcpu))
-+			vcpu->arch.debug_flags |= KVM_ARM_DEBUG_GUEST_INUSE;
-+		else
-+			vcpu->arch.debug_flags &= ~KVM_ARM_DEBUG_GUEST_INUSE;
-+	}
+ /* Reads cp14 registers from hardware.
+  * Writes cp14 registers in-order to the CP14 struct pointed to by r10
+  *
+@@ -340,12 +355,14 @@ vcpu	.req	r0		@ vcpu pointer always in r0
+  * Clobbers r2-r12
+  */
+ .macro save_debug_state
++	skip_debug_state 9999f
 +
-+	return true;
-+}
+ 	read_hw_dbg_num
+ 	cp14_read_and_str r10, 4, cp14_DBGBVR0, r11
+ 	cp14_read_and_str r10, 5, cp14_DBGBCR0, r11
+ 	cp14_read_and_str r10, 6, cp14_DBGWVR0, r12
+ 	cp14_read_and_str r10, 7, cp14_DBGWCR0, r12
+-
++9999:
+ 	/* DBGDSCR reg */
+ 	mrc	p14, 0, r2, c0, c1, 0
+ 	str	r2, [r10, #CP14_OFFSET(cp14_DBGDSCRext)]
+@@ -359,12 +376,14 @@ vcpu	.req	r0		@ vcpu pointer always in r0
+  * Clobbers r2-r12
+  */
+ .macro restore_debug_state
++	skip_debug_state 9999f
 +
- /* DBGIDR (RO) Debug ID */
- static bool trap_dbgidr(struct kvm_vcpu *vcpu,
- 			const struct coproc_params *p,
-@@ -419,13 +484,13 @@ static const struct coproc_reg cp15_regs[] = {
- #define DBG_BCR_BVR_WCR_WVR(n)					\
- 	/* DBGBVRn */						\
- 	{ CRn( 0), CRm((n)), Op1( 0), Op2( 4), is32,		\
--	  trap_debug32,	reset_val, (cp14_DBGBVR0 + (n)), 0 },	\
-+	  __trap_debug32, reset_val, (cp14_DBGBVR0 + (n)), 0 },	\
- 	/* DBGBCRn */						\
- 	{ CRn( 0), CRm((n)), Op1( 0), Op2( 5), is32,		\
- 	  trap_debug32,	reset_val, (cp14_DBGBCR0 + (n)), 0 },	\
- 	/* DBGWVRn */						\
- 	{ CRn( 0), CRm((n)), Op1( 0), Op2( 6), is32,		\
--	  trap_debug32,	reset_val, (cp14_DBGWVR0 + (n)), 0 },	\
-+	  __trap_debug32, reset_val, (cp14_DBGWVR0 + (n)), 0 },	\
- 	/* DBGWCRn */						\
- 	{ CRn( 0), CRm((n)), Op1( 0), Op2( 7), is32,		\
- 	  trap_debug32,	reset_val, (cp14_DBGWCR0 + (n)), 0 }
-@@ -462,7 +527,7 @@ static const struct coproc_reg cp14_regs[] = {
- 	/* DBGDSAR (64bit) */
- 	{ CRn( 0), CRm( 2), Op1( 0), Op2( 0), is64, trap_raz_wi },
- 	/* DBGDSCRext */
--	{ CRn( 0), CRm( 2), Op1( 0), Op2( 2), is32, trap_debug32,
-+	{ CRn( 0), CRm( 2), Op1( 0), Op2( 2), is32, __trap_debug32,
- 				reset_val, cp14_DBGDSCRext, 0 },
- 	DBG_BCR_BVR_WCR_WVR(2),
- 	/* DBGDTRTXext */
-@@ -474,7 +539,7 @@ static const struct coproc_reg cp14_regs[] = {
- 	DBG_BCR_BVR_WCR_WVR(5),
- 	DBG_BCR_BVR_WCR_WVR(6),
- 	/* DBGVCR */
--	{ CRn( 0), CRm( 7), Op1( 0), Op2( 0), is32, trap_debug32 },
-+	{ CRn( 0), CRm( 7), Op1( 0), Op2( 0), is32, __trap_debug32 },
- 	DBG_BCR_BVR_WCR_WVR(7),
- 	DBG_BCR_BVR_WCR_WVR(8),
- 	DBG_BCR_BVR_WCR_WVR(9),
+ 	read_hw_dbg_num
+ 	cp14_ldr_and_write r10, 4, cp14_DBGBVR0, r11
+ 	cp14_ldr_and_write r10, 5, cp14_DBGBCR0, r11
+ 	cp14_ldr_and_write r10, 6, cp14_DBGWVR0, r12
+ 	cp14_ldr_and_write r10, 7, cp14_DBGWCR0, r12
+-
++9999:
+ 	/* DBGDSCR reg */
+ 	ldr	r2, [r10, #CP14_OFFSET(cp14_DBGDSCRext)]
+ 	mcr	p14, 0, r2, c0, c2, 2
 -- 
 1.7.12.4
-
