@@ -1,24 +1,27 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v3 00/10] ARM IRQ forward control based on IRQ bypass manager
-Date: Mon, 10 Aug 2015 15:20:54 +0200
-Message-ID: <1439212864-12954-1-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v3 07/10] KVM: arm/arm64: vgic: Allow HW interrupts for
+ non-shared devices
+Date: Mon, 10 Aug 2015 15:21:01 +0200
+Message-ID: <1439212864-12954-8-git-send-email-eric.auger@linaro.org>
+References: <1439212864-12954-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 40F365A665
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 09:08:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B9DAD5A6B1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 09:09:03 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NSFFX+Zk+7xk for <kvmarm@lists.cs.columbia.edu>;
- Mon, 10 Aug 2015 09:08:52 -0400 (EDT)
-Received: from mail-wi0-f174.google.com (mail-wi0-f174.google.com
- [209.85.212.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 097CE59B5C
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 09:08:51 -0400 (EDT)
-Received: by wicja10 with SMTP id ja10so36943263wic.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 06:21:52 -0700 (PDT)
+ with ESMTP id DzWW3PdaNa5B for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 10 Aug 2015 09:09:02 -0400 (EDT)
+Received: from mail-wi0-f180.google.com (mail-wi0-f180.google.com
+ [209.85.212.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4B4C55A6A9
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 09:09:02 -0400 (EDT)
+Received: by wicne3 with SMTP id ne3so21959887wic.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 10 Aug 2015 06:22:03 -0700 (PDT)
+In-Reply-To: <1439212864-12954-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,122 +35,234 @@ To: eric.auger@st.com, eric.auger@linaro.org, linux-arm-kernel@lists.infradead.o
 Cc: pbonzini@redhat.com, linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series allows to set ARM IRQ forwarding between a VFIO platform
-device physical IRQ and a guest virtual IRQ. The link is coordinated
-by the IRQ bypass manager.
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-The principle is the VFIO platform driver registers an IRQ bypass producer
-struct on VFIO_IRQ_SET_ACTION_TRIGGER while KVM irqfd registers a consumer
-struct on the irqfd assignment. This leads to a handshake based on the
-eventfd context (used as token) match. When either of the producer/consumer
-disappears, an unregistration occurs and the link is disconnected.
+So far, the only use of the HW interrupt facility was the timer,
+implying that the active state is context-switched for each vcpu,
+as the device is is shared across all vcpus.
 
-This kernel integration deprecates the former kvm-vfio approach:
-https://lkml.org/lkml/2015/4/13/353. Some rationale about that change can
-be found in IRQ bypass manager thread: https://lkml.org/lkml/2015/6/29/268
+This does not work for a device that has been assigned to a VM,
+as the guest is entierely in control of that device (the HW is
+not shared). In that case, it makes sense to bypass the whole
+active state switching.
 
-Dependencies:
-1- [PATCH v4 00/11] arm/arm64: KVM: Active interrupt state switching
-   for shared devices (http://www.spinics.net/lists/arm-kernel/msg437884.html)
-   except PATCH 11
-2- [PATCH 0/6] irqchip: GICv2/v3: Add support for irq_vcpu_affinity
-3- [PATCH v4] virt: IRQ bypass manager (https://lkml.org/lkml/2015/8/6/526)
-4- [PATCH 0/2] KVM: arm/arm64: Guest synchronous halt/resume
-   (https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg950942.html)
+Also the VGIC state machine is adapted to support those assigned
+(non shared) HW IRQs:
+- nly can be sampled when it is pending
+- when queueing the IRQ (programming the LR), the pending state is
+  removed as for edge sensitive IRQs
+- queued state is not modelled. Level state is not modelled
+- its injection always is valid since steming from the HW.
 
-All those pieces can be found at:
-https://git.linaro.org/people/eric.auger/linux.git/shortlog/refs/heads/v4.2-rc6-irq-forward-v3
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
-More backgroung on ARM IRQ forwarding in the text below and at
-http://www.linux-kvm.org/images/a/a8/01x04-ARMdevice.pdf.
+---
 
-A forwarded IRQ is deactivated by the guest and not by the host.
-When the guest deactivates the associated virtual IRQ, the interrupt
-controller automatically completes the physical IRQ. Obviously
-this requires some HW support in the interrupt controller. This is
-the case for ARM GICv2.
-
-The direct benefit is that, for a level sensitive IRQ, a VM exit
-can be avoided on forwarded IRQ completion.
-
-When the IRQ is forwarded, the VFIO platform driver does not need to
-mask the physical IRQ anymore before signaling the eventfd. Indeed
-genirq lowers the running priority, enabling other physical IRQ to hit
-except that one.
-
-Besides, the injection still is based on irqfd triggering. The only
-impact on irqfd process is resamplefd is not called anymore on
-virtual IRQ completion since deactivation is not trapped by KVM.
-
-This was tested on Calxeda Midway, assigning the xgmac main IRQ
-
-History:
-
-v2 (RFC) -> v3(PATCH):
-- all dependencies now have a patch status
-- we dropped the producer active boolean exchanged between the
-  VFIO producer and irqfd arm consumer. As a consequence, on
-  unforward, if the IRQ is active, this latter is deactivated
-  without VFIO-masking it. So we do not exactly come back to the
-  exact state where we would be in unforwarded state. A new
-  physical IRQ can hit while the previous virtual IRQ is under
-  treatment. Its injection in the guest may be rejected thanks
-  to the VGIC state machine. This IRQ will be lost but I don't
-  think this is a severe issue. In case no new IRQ hits, the
-  guest deactivation of the virtual IRQ will trigger the resamplefd
-  which will VFIO unmask the non-masked IRQ. This also has no
-  consequence.
-- VFIO platform driver consumer_add now can fail. It rejects the
-  transition for forwarding state in case the IRQ is active
-- the series is rebased on new irq_vcpu_affinity series
-- no dependency anymore on "chip/vgic adaptations for forwarded irq"
-  which was partially integrated into Marc's series. A fix is still
-  needed through.
-- Guest synchronous halt/resume patch re-integrated into this series
-- integrate a new patch file coming mixing
+- a mix of
   [PATCH v4 11/11] KVM: arm/arm64: vgic: Allow HW interrupts for
-                   non-shared devices &
+                   non-shared devices
   [RFC v2 2/4] KVM: arm: vgic: fix state machine for forwarded IRQ
+---
+ include/kvm/arm_vgic.h    |  6 +++--
+ virt/kvm/arm/arch_timer.c |  3 ++-
+ virt/kvm/arm/vgic.c       | 58 +++++++++++++++++++++++++++++++++++------------
+ 3 files changed, 49 insertions(+), 18 deletions(-)
 
-v1 -> v2:
-- irq bypass manager and irqfd consumer moved in a separate patch
-- kvm_arm_[halt,resume]_guest moved in a separate patch
-- remove VFIO external functions since we do not need them anymore
-- apply container_of strategy advised by Paolo. Only active field
-  remains and discussions will tell whether we get rid of it.
-- renamed kvm_arch functions
-
-- kvm-vfio v6 -> RFC v1 based on IRQ bypass manager
-  see previous history in https://lkml.org/lkml/2015/4/13/353).
-
-Best Regards
-
-Eric
-
-
-Eric Auger (9):
-  VFIO: platform: registration of a dummy IRQ bypass producer
-  VFIO: platform: test forwarded state when selecting the IRQ handler
-  VFIO: platform: single handler using function pointer
-  VFIO: platform: add vfio_platform_set_automasked
-  VFIO: platform: add vfio_platform_is_active
-  VFIO: platform: add irq bypass producer management
-  KVM: arm/arm64: vgic: support irqfd injection of a forwarded IRQ
-  KVM: arm/arm64: vgic: forwarding control
-  KVM: arm/arm64: implement IRQ bypass consumer functions
-
-Marc Zyngier (1):
-  KVM: arm/arm64: vgic: Allow HW interrupts for non-shared devices
-
- arch/arm/kvm/Kconfig                          |   1 +
- arch/arm/kvm/arm.c                            |  35 +++++
- arch/arm64/kvm/Kconfig                        |   1 +
- drivers/vfio/platform/vfio_platform_irq.c     | 113 +++++++++++++-
- drivers/vfio/platform/vfio_platform_private.h |   4 +
- include/kvm/arm_vgic.h                        |  12 +-
- virt/kvm/arm/arch_timer.c                     |   3 +-
- virt/kvm/arm/vgic.c                           | 215 ++++++++++++++++++++++++--
- 8 files changed, 358 insertions(+), 26 deletions(-)
-
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index d901f1a..7ef9ce0 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -163,7 +163,8 @@ struct irq_phys_map {
+ 	u32			virt_irq;
+ 	u32			phys_irq;
+ 	u32			irq;
+-	bool			active;
++	bool			shared;
++	bool			active; /* Only valid if shared */
+ };
+ 
+ struct irq_phys_map_entry {
+@@ -356,7 +357,8 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
+ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+ int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
+ struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+-					   int virt_irq, int irq);
++					   int virt_irq, int irq,
++					   bool shared);
+ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
+ bool kvm_vgic_get_phys_irq_active(struct irq_phys_map *map);
+ void kvm_vgic_set_phys_irq_active(struct irq_phys_map *map, bool active);
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 76e38d2..db21d8f 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -203,7 +203,8 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+ 	 * Tell the VGIC that the virtual interrupt is tied to a
+ 	 * physical interrupt. We do that once per VCPU.
+ 	 */
+-	map = kvm_vgic_map_phys_irq(vcpu, irq->irq, host_vtimer_irq);
++	map = kvm_vgic_map_phys_irq(vcpu, irq->irq,
++				    host_vtimer_irq, true);
+ 	if (WARN_ON(IS_ERR(map)))
+ 		return PTR_ERR(map);
+ 
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 9eb489a..fbd5ba5 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -400,7 +400,11 @@ void vgic_cpu_irq_clear(struct kvm_vcpu *vcpu, int irq)
+ 
+ static bool vgic_can_sample_irq(struct kvm_vcpu *vcpu, int irq)
+ {
+-	return !vgic_irq_is_queued(vcpu, irq);
++	struct irq_phys_map *map = vgic_irq_map_search(vcpu, irq);
++	bool shared_hw = map && !map->shared;
++
++	return !vgic_irq_is_queued(vcpu, irq) ||
++			(shared_hw && vgic_dist_irq_is_pending(vcpu, irq));
+ }
+ 
+ /**
+@@ -1150,19 +1154,26 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
+ 		 * active in the physical world. Otherwise the
+ 		 * physical interrupt will fire and the guest will
+ 		 * exit before processing the virtual interrupt.
++		 *
++		 * This is of course only valid for a shared
++		 * interrupt. A non shared interrupt should already be
++		 * active.
+ 		 */
+ 		if (map) {
+-			int ret;
+-
+-			BUG_ON(!map->active);
+ 			vlr.hwirq = map->phys_irq;
+ 			vlr.state |= LR_HW;
+ 			vlr.state &= ~LR_EOI_INT;
+ 
+-			ret = irq_set_irqchip_state(map->irq,
+-						    IRQCHIP_STATE_ACTIVE,
+-						    true);
+-			WARN_ON(ret);
++			if (map->shared) {
++				int ret;
++
++				BUG_ON(!map->active);
++				ret = irq_set_irqchip_state(
++						map->irq,
++						IRQCHIP_STATE_ACTIVE,
++						true);
++				WARN_ON(ret);
++			}
+ 
+ 			/*
+ 			 * Make sure we're not going to sample this
+@@ -1229,10 +1240,13 @@ bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq)
+ 
+ static bool vgic_queue_hwirq(struct kvm_vcpu *vcpu, int irq)
+ {
++	struct irq_phys_map *map = vgic_irq_map_search(vcpu, irq);
++	bool shared_hw = map && !map->shared;
++
+ 	if (!vgic_can_sample_irq(vcpu, irq))
+ 		return true; /* level interrupt, already queued */
+ 
+-	if (vgic_queue_irq(vcpu, 0, irq)) {
++	if (vgic_queue_irq(vcpu, 0, irq) || shared_hw) {
+ 		if (vgic_irq_is_edge(vcpu, irq)) {
+ 			vgic_dist_irq_clear_pending(vcpu, irq);
+ 			vgic_cpu_irq_clear(vcpu, irq);
+@@ -1411,7 +1425,12 @@ static int vgic_sync_hwirq(struct kvm_vcpu *vcpu, struct vgic_lr vlr)
+ 		return 0;
+ 
+ 	map = vgic_irq_map_search(vcpu, vlr.irq);
+-	BUG_ON(!map || !map->active);
++	BUG_ON(!map);
++
++	if (!map->shared)
++		return 0;
++
++	BUG_ON(map->shared && !map->active);
+ 
+ 	ret = irq_get_irqchip_state(map->irq,
+ 				    IRQCHIP_STATE_ACTIVE,
+@@ -1563,6 +1582,7 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
+ 	int edge_triggered, level_triggered;
+ 	int enabled;
+ 	bool ret = true, can_inject = true;
++	bool shared_hw = map && !map->shared;
+ 
+ 	if (irq_num >= min(kvm->arch.vgic.nr_irqs, 1020))
+ 		return -EINVAL;
+@@ -1573,7 +1593,8 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
+ 	edge_triggered = vgic_irq_is_edge(vcpu, irq_num);
+ 	level_triggered = !edge_triggered;
+ 
+-	if (!vgic_validate_injection(vcpu, irq_num, level)) {
++	if (!vgic_validate_injection(vcpu, irq_num, level) &&
++		!shared_hw) {
+ 		ret = false;
+ 		goto out;
+ 	}
+@@ -1742,16 +1763,21 @@ static struct list_head *vgic_get_irq_phys_map_list(struct kvm_vcpu *vcpu,
+  * @vcpu: The VCPU pointer
+  * @virt_irq: The virtual irq number
+  * @irq: The Linux IRQ number
++ * @shared: Indicates if the interrupt has to be context-switched or
++ *          if it is private to a VM
+  *
+  * Establish a mapping between a guest visible irq (@virt_irq) and a
+  * Linux irq (@irq). On injection, @virt_irq will be associated with
+  * the physical interrupt represented by @irq. This mapping can be
+  * established multiple times as long as the parameters are the same.
++ * If @shared is true, the active state of the interrupt will be
++ * context-switched.
+  *
+  * Returns a valid pointer on success, and an error pointer otherwise
+  */
+ struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+-					   int virt_irq, int irq)
++					   int virt_irq, int irq,
++					   bool shared)
+ {
+ 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+ 	struct list_head *root = vgic_get_irq_phys_map_list(vcpu, virt_irq);
+@@ -1785,7 +1811,8 @@ struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+ 	if (map) {
+ 		/* Make sure this mapping matches */
+ 		if (map->phys_irq != phys_irq	||
+-		    map->irq      != irq)
++		    map->irq      != irq	||
++		    map->shared   != shared)
+ 			map = ERR_PTR(-EINVAL);
+ 
+ 		/* Found an existing, valid mapping */
+@@ -1796,6 +1823,7 @@ struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+ 	map->virt_irq = virt_irq;
+ 	map->phys_irq = phys_irq;
+ 	map->irq      = irq;
++	map->shared   = shared;
+ 
+ 	list_add_tail_rcu(&entry->entry, root);
+ 
+@@ -1846,7 +1874,7 @@ static void vgic_free_phys_irq_map_rcu(struct rcu_head *rcu)
+  */
+ bool kvm_vgic_get_phys_irq_active(struct irq_phys_map *map)
+ {
+-	BUG_ON(!map);
++	BUG_ON(!map || !map->shared);
+ 	return map->active;
+ }
+ 
+@@ -1858,7 +1886,7 @@ bool kvm_vgic_get_phys_irq_active(struct irq_phys_map *map)
+  */
+ void kvm_vgic_set_phys_irq_active(struct irq_phys_map *map, bool active)
+ {
+-	BUG_ON(!map);
++	BUG_ON(!map || !map->shared);
+ 	map->active = active;
+ }
+ 
 -- 
 1.9.1
