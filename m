@@ -1,27 +1,28 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH 3/6] irqchip: GICv3: Skip LPI deactivation
-Date: Tue, 11 Aug 2015 11:42:50 +0200
-Message-ID: <55C9C39A.3060208@linaro.org>
+Subject: Re: [PATCH 4/6] irqchip: GIC: Use chip_data instead of handler_data
+ for cascaded interrupts
+Date: Tue, 11 Aug 2015 11:45:18 +0200
+Message-ID: <55C9C42E.8070602@linaro.org>
 References: <1436447951-22357-1-git-send-email-marc.zyngier@arm.com>
- <1436447951-22357-4-git-send-email-marc.zyngier@arm.com>
+ <1436447951-22357-5-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31FAB5A89C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Aug 2015 05:30:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 469215A8A2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Aug 2015 05:32:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kcvZxhkJwJT5 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 11 Aug 2015 05:30:31 -0400 (EDT)
+ with ESMTP id Qi+-+Tsz5pNX for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 11 Aug 2015 05:32:57 -0400 (EDT)
 Received: from mail-wi0-f169.google.com (mail-wi0-f169.google.com
  [209.85.212.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 080F25A898
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Aug 2015 05:30:30 -0400 (EDT)
-Received: by wijp15 with SMTP id p15so168626539wij.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Aug 2015 02:43:33 -0700 (PDT)
-In-Reply-To: <1436447951-22357-4-git-send-email-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5947A5A89E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Aug 2015 05:32:57 -0400 (EDT)
+Received: by wibhh20 with SMTP id hh20so187032725wib.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 11 Aug 2015 02:46:00 -0700 (PDT)
+In-Reply-To: <1436447951-22357-5-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,46 +36,44 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Thomas Gleixner <tglx@linutronix.de>, J
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Jiang Liu <jiang.liu@linux.intel.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi Marc,
 On 07/09/2015 03:19 PM, Marc Zyngier wrote:
-> Contrary to other GICv3 interrupts, LPIs do not have an active state
-> by virtue of being edge-triggered only (they only have a pending state).
+> When used as a primary interrupt controller, the GIC driver uses
+> irq_data->chip_data to extract controller-specific information.
 > 
-> Given this, there is no point trying to deactivate them, and we can
-> skip the ICC_DIR_EL1 entierely.
+> When used as a secondary interrupt controller, it uses handler_data
+> instead. As this difference is relatively pointless and only creates
+> confusion, change the secondary path to match what the rest of the
+> driver does.
+not really related to this series' topic, is it?
+
+Eric
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  drivers/irqchip/irq-gic-v3.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+>  drivers/irqchip/irq-gic.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-> index 49768fc..e02592b 100644
-> --- a/drivers/irqchip/irq-gic-v3.c
-> +++ b/drivers/irqchip/irq-gic-v3.c
-> @@ -295,10 +295,14 @@ static int gic_irq_get_irqchip_state(struct irq_data *d,
+> diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
+> index e264675..3c7f3a4 100644
+> --- a/drivers/irqchip/irq-gic.c
+> +++ b/drivers/irqchip/irq-gic.c
+> @@ -298,7 +298,7 @@ static void __exception_irq_entry gic_handle_irq(struct pt_regs *regs)
 >  
->  static void gic_eoi_irq(struct irq_data *d)
+>  static void gic_handle_cascade_irq(unsigned int irq, struct irq_desc *desc)
 >  {
-> -	if (static_key_true(&supports_deactivate))
-> +	if (static_key_true(&supports_deactivate)) {
-> +		/* No need to deactivate an LPI */
-> +		if (gic_irq(d) >= 8192)
-In case of EOIMode == 0, we do not call EOI. I can't understand whether
-it is an issue.
-In 4.8.3 Properties of LPI, in 2d note it is written:
-
-"SW must issue a write to EOI to clear the active priorities register,
-hence the CPU interface still requires an active state for LPIs, even
-through this is not necessary within the redistributor"
-
-Eric
-> +			return;
->  		gic_write_dir(gic_irq(d));
-> -	else
-> +	} else {
->  		gic_write_eoir(gic_irq(d));
-> +	}
+> -	struct gic_chip_data *chip_data = irq_get_handler_data(irq);
+> +	struct gic_chip_data *chip_data = irq_get_chip_data(irq);
+>  	struct irq_chip *chip = irq_get_chip(irq);
+>  	unsigned int cascade_irq, gic_irq;
+>  	unsigned long status;
+> @@ -341,7 +341,7 @@ void __init gic_cascade_irq(unsigned int gic_nr, unsigned int irq)
+>  {
+>  	if (gic_nr >= MAX_GIC_NR)
+>  		BUG();
+> -	if (irq_set_handler_data(irq, &gic_data[gic_nr]) != 0)
+> +	if (irq_set_chip_data(irq, &gic_data[gic_nr]) != 0)
+>  		BUG();
+>  	irq_set_chained_handler(irq, gic_handle_cascade_irq);
 >  }
->  
->  static int gic_set_type(struct irq_data *d, unsigned int type)
 > 
