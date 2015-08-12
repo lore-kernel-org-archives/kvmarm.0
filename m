@@ -1,91 +1,117 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v2 04/15] KVM: arm/arm64: extend arch CAP checks to allow
- per-VM capabilities
-Date: Wed, 12 Aug 2015 14:26:34 +0200
-Message-ID: <55CB3B7A.3070300@linaro.org>
-References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com> <1436538111-4294-5-git-send-email-andre.przywara@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 1/6] irqchip: GICv3: Convert to EOImode == 1
+Date: Wed, 12 Aug 2015 13:38:27 +0100
+Message-ID: <55CB3E43.3010209@arm.com>
+References: <1436447951-22357-1-git-send-email-marc.zyngier@arm.com>
+ <1436447951-22357-2-git-send-email-marc.zyngier@arm.com>
+ <55C9BD00.7030901@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1436538111-4294-5-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, marc.zyngier@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu
-Cc: Pavel Fedin <p.fedin@samsung.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 548F25ABB1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Aug 2015 08:25:27 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id wRF5QXrwl4j8 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 12 Aug 2015 08:25:26 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DE0C5AB98
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Aug 2015 08:25:25 -0400 (EDT)
+In-Reply-To: <55C9BD00.7030901@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Eric Auger <eric.auger@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Jiang Liu <jiang.liu@linux.intel.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
+On 11/08/15 10:14, Eric Auger wrote:
+> Hi Marc,
+> On 07/09/2015 03:19 PM, Marc Zyngier wrote:
+>> So far, GICv3 has been used in with EOImode == 0. The effect of this
+>> mode is to perform the priority drop and the deactivation of the
+>> interrupt at the same time.
+>>
+>> While this works perfectly for Linux (we only have a single priority),
+>> it causes issues when an interrupt is forwarded to a guest, and when
+>> we want the guest to perform the EOI itself.
+>>
+>> For this case, the GIC architecture provides EOImode == 1, where:
+>> - A write to ICC_EOIR1_EL1 drops the priority of the interrupt and leaves
+>> it active. Other interrupts at the same priority level can now be taken,
+>> but the active interrupt cannot be taken again
+>> - A write to ICC_DIR_EL1 marks the interrupt as inactive, meaning it can
+>> now be taken again.
+>>
+>> This patch converts the driver to be able to use this new mode, depending
+>> on whether or not the kernel can behave as a hypervisor. No feature change.
+>>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  drivers/irqchip/irq-gic-v3.c       | 28 +++++++++++++++++++++++++---
+>>  include/linux/irqchip/arm-gic-v3.h |  9 +++++++++
+>>  2 files changed, 34 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+>> index c52f7ba..49768fc 100644
+>> --- a/drivers/irqchip/irq-gic-v3.c
+>> +++ b/drivers/irqchip/irq-gic-v3.c
+>> @@ -30,6 +30,7 @@
+>>  #include <asm/cputype.h>
+>>  #include <asm/exception.h>
+>>  #include <asm/smp_plat.h>
+>> +#include <asm/virt.h>
+>>  
+>>  #include "irq-gic-common.h"
+>>  #include "irqchip.h"
+>> @@ -50,6 +51,7 @@ struct gic_chip_data {
+>>  };
+>>  
+>>  static struct gic_chip_data gic_data __read_mostly;
+>> +static struct static_key supports_deactivate = STATIC_KEY_INIT_TRUE;
+>>  
+>>  #define gic_data_rdist()		(this_cpu_ptr(gic_data.rdists.rdist))
+>>  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+>> @@ -293,7 +295,10 @@ static int gic_irq_get_irqchip_state(struct irq_data *d,
+>>  
+>>  static void gic_eoi_irq(struct irq_data *d)
+>>  {
+>> -	gic_write_eoir(gic_irq(d));
+>> +	if (static_key_true(&supports_deactivate))
+>> +		gic_write_dir(gic_irq(d));
+>> +	else
+>> +		gic_write_eoir(gic_irq(d));
+>>  }
+>>  
+>>  static int gic_set_type(struct irq_data *d, unsigned int type)
+>> @@ -343,6 +348,10 @@ static asmlinkage void __exception_irq_entry gic_handle_irq(struct pt_regs *regs
+>>  
+>>  		if (likely(irqnr > 15 && irqnr < 1020) || irqnr >= 8192) {
+>>  			int err;
+>> +
+>> +			if (static_key_true(&supports_deactivate))
+>> +				gic_write_eoir(irqnr);
+>> +
+>>  			err = handle_domain_irq(gic_data.domain, irqnr, regs);
+>>  			if (err) {
+>>  				WARN_ONCE(true, "Unexpected interrupt received!\n");
+> shouldn't we DIR here as well in case of err (we did EOI before)?
 
-Best Regards
+Yes, we should, very good point. I'll fix that up.
 
-Eric
-
-On 07/10/2015 04:21 PM, Andre Przywara wrote:
-> KVM capabilities can be a per-VM property, though ARM/ARM64 currently
-> does not pass on the VM pointer to the architecture specific
-> capability handlers.
-> Add a "struct kvm*" parameter to those function to later allow proper
-> per-VM capability reporting.
+> Besides Reviewed-by: Eric Auger <eric.auger@linaro.org> if it can help.
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  arch/arm/include/asm/kvm_host.h   | 2 +-
->  arch/arm/kvm/arm.c                | 2 +-
->  arch/arm64/include/asm/kvm_host.h | 2 +-
->  arch/arm64/kvm/reset.c            | 2 +-
->  4 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index e896d2c..56cac05 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -213,7 +213,7 @@ static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
->  	kvm_call_hyp((void*)hyp_stack_ptr, vector_ptr, pgd_ptr);
->  }
->  
-> -static inline int kvm_arch_dev_ioctl_check_extension(long ext)
-> +static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
->  {
->  	return 0;
->  }
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index bc738d2..7c65353 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -196,7 +196,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  		r = KVM_MAX_VCPUS;
->  		break;
->  	default:
-> -		r = kvm_arch_dev_ioctl_check_extension(ext);
-> +		r = kvm_arch_dev_ioctl_check_extension(kvm, ext);
->  		break;
->  	}
->  	return r;
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 2709db2..8d78a72 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -47,7 +47,7 @@
->  
->  int __attribute_const__ kvm_target_cpu(void);
->  int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
-> -int kvm_arch_dev_ioctl_check_extension(long ext);
-> +int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext);
->  
->  struct kvm_arch {
->  	/* The VMID generation used for the virt. memory system */
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index 0b43265..866502b 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -56,7 +56,7 @@ static bool cpu_has_32bit_el1(void)
->  	return !!(pfr0 & 0x20);
->  }
->  
-> -int kvm_arch_dev_ioctl_check_extension(long ext)
-> +int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
->  {
->  	int r;
->  
-> 
 
+Thanks!
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
