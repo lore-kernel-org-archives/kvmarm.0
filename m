@@ -1,60 +1,80 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 4/6] irqchip: GIC: Use chip_data instead of handler_data
- for cascaded interrupts
-Date: Wed, 12 Aug 2015 14:41:42 +0100
-Message-ID: <55CB4D16.9070608@arm.com>
-References: <1436447951-22357-1-git-send-email-marc.zyngier@arm.com>
- <1436447951-22357-5-git-send-email-marc.zyngier@arm.com>
- <55C9C42E.8070602@linaro.org>
+Subject: Re: [PATCH 5/6] irqchip: GICv3: Don't deactivate interrupts forwarded
+ to a guest
+Date: Wed, 12 Aug 2015 15:20:07 +0100
+Message-ID: <55CB5617.1030901@arm.com>
+References: <1436447951-22357-1-git-send-email-marc.zyngier@arm.com> <1436447951-22357-6-git-send-email-marc.zyngier@arm.com> <55C9C860.4020107@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CCEA5AC26
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Aug 2015 09:28:41 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MrNQ9ClUWj6x for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Aug 2015 09:28:40 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EE1F15AC23
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Aug 2015 09:28:39 -0400 (EDT)
-In-Reply-To: <55C9C42E.8070602@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <55C9C860.4020107@linaro.org>
+Sender: kvm-owner@vger.kernel.org
 To: Eric Auger <eric.auger@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Jiang Liu <jiang.liu@linux.intel.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Jiang Liu <jiang.liu@linux.intel.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 11/08/15 10:45, Eric Auger wrote:
-> Hi Marc,
+On 11/08/15 11:03, Eric Auger wrote:
 > On 07/09/2015 03:19 PM, Marc Zyngier wrote:
->> When used as a primary interrupt controller, the GIC driver uses
->> irq_data->chip_data to extract controller-specific information.
+>> Commit 0a4377de3056 ("genirq: Introduce irq_set_vcpu_affinity() to
+>> target an interrupt to a VCPU") added just what we needed at the
+>> lowest level to allow an interrupt to be deactivated by a guest.
 >>
->> When used as a secondary interrupt controller, it uses handler_data
->> instead. As this difference is relatively pointless and only creates
->> confusion, change the secondary path to match what the rest of the
->> driver does.
-> not really related to this series' topic, is it?
+>> When such a request reaches the GIC, it knows it doesn't need to
+>> perform the deactivation anymore, and can safely leave the guest
+>> do its magic. This of course requires additional support in both
+>> VFIO and KVM.
+>>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  drivers/irqchip/irq-gic-v3.c | 29 +++++++++++++++++++++++++++--
+>>  1 file changed, 27 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+>> index e02592b..a1ca9e6 100644
+>> --- a/drivers/irqchip/irq-gic-v3.c
+>> +++ b/drivers/irqchip/irq-gic-v3.c
+>> @@ -70,6 +70,11 @@ static inline int gic_irq_in_rdist(struct irq_data *d)
+>>  	return gic_irq(d) < 32;
+>>  }
+>>  
+>> +static inline bool forwarded_irq(struct irq_data *d)
+>> +{
+>> +	return d->handler_data != NULL;
+>> +}
+>> +
+>>  static inline void __iomem *gic_dist_base(struct irq_data *d)
+>>  {
+>>  	if (gic_irq_in_rdist(d))	/* SGI+PPI -> SGI_base for this CPU */
+>> @@ -231,6 +236,12 @@ static void gic_poke_irq(struct irq_data *d, u32 offset)
+>>  static void gic_mask_irq(struct irq_data *d)
+>>  {
+>>  	gic_poke_irq(d, GICD_ICENABLER);
+>> +	/*
+>> +	 * When masking a forwarded interrupt, make sure it is
+>> +	 * deactivated as well.
+> To me it is not straightforward to understand why a forwarded IRQ would
+> need to be DIR'ed when masked. This is needed because of the disable_irq
+> optimisation, I would add a related comment.
+> 
 
-It is. Or was. We use the handler_data field to hold the vcpu
-information, but that's also used by the chained interrupt handler to
-find out which secondary it is.
+The lazy disable_irq is just an optimization.
 
-But this patch is wrong anyway, as it entirely breaks secondary GICs (I
-found out when I merged this with a patch from Jon Hunter fixing some
-other related stuff). Took me hours to get an EB up and running!
+The real reason is that if we mask an interrupt on the host, it is
+because we don't want the guest to process it at all. There is three cases:
 
-I have a working version now, which makes this patch irrelevant.
+1) The interrupt was inactive: no problem
+2) The interrupt was active, but not presented to the guest yet: no
+problem either. The interrupt will be taken again on unmask.
+3) The interrupt was active and presented to the guest: we might get a
+double deactivate, which shouldn't be a big deal (but mostly should not
+occur at all).
+
+Would something like this make sense?
+
+On a related note, I wonder if we need to mark the interrupt pending if
+it is configured as edge. Otherwise, we could loose an interrupt in case
+2 (mask, deactivate, unmask, oh look nothing triggers). Thoughts?
 
 Thanks,
 
