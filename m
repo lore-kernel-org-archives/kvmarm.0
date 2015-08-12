@@ -1,50 +1,118 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 2/6] irqchip: GIC: Convert to EOImode == 1
-Date: Wed, 12 Aug 2015 18:40:14 +0100
-Message-ID: <20150812174014.GG5393@e104818-lin.cambridge.arm.com>
-References: <1436447951-22357-1-git-send-email-marc.zyngier@arm.com>
- <1436447951-22357-3-git-send-email-marc.zyngier@arm.com>
- <55C9BD24.10708@linaro.org>
- <55CB4AC3.6040400@arm.com>
+From: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v3 01/10] VFIO: platform: registration of a dummy IRQ
+ bypass producer
+Date: Wed, 12 Aug 2015 12:56:10 -0600
+Message-ID: <1439405770.4023.526.camel@redhat.com>
+References: <1439212864-12954-1-git-send-email-eric.auger@linaro.org>
+	 <1439212864-12954-2-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <55CB4AC3.6040400@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Eric Auger <eric.auger@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>, Jiang Liu <jiang.liu@linux.intel.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1439212864-12954-2-git-send-email-eric.auger@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Eric Auger <eric.auger@linaro.org>
+Cc: eric.auger@st.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, feng.wu@intel.com, linux-kernel@vger.kernel.org, patches@linaro.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Aug 12, 2015 at 02:31:47PM +0100, Marc Zyngier wrote:
-> On 11/08/15 10:15, Eric Auger wrote:
-> > On 07/09/2015 03:19 PM, Marc Zyngier wrote:
-> >>  static int gic_irq_set_irqchip_state(struct irq_data *d,
-> >> @@ -272,11 +278,15 @@ static void __exception_irq_entry gic_handle_irq(struct pt_regs *regs)
-> >>  		irqnr = irqstat & GICC_IAR_INT_ID_MASK;
-> >>  
-> >>  		if (likely(irqnr > 15 && irqnr < 1021)) {
-> > shouldn't we have < 1020?
+On Mon, 2015-08-10 at 15:20 +0200, Eric Auger wrote:
+> Register a dummy producer with void callbacks
 > 
-> Looks like you have unearthed a very long standing (though not fatal)
-> bug - I can trace it back to 2005 and the inclusion of the Realview
-> support (see include/asm-arm/arch-realview/entry-macro.S in 8ad68bbf for
-> the details).
+> Signed-off-by: Eric Auger <eric.auger@linaro.org>
 > 
-> It may be that the original GIC didn't make number 1020 a special one,
-> though the earliest spec I have access to (GICv1) is already making 1020
-> a reserved interrupt number. And looking at the pre-existing code
-> (arch/arm/common/gic.c), 1020 seems to already be considered an invalid
-> number.
+> ---
 > 
-> CC-ing Catalin, as he was the one who introduced it... ;-) Unless he
-> says otherwise, I'll cook a patch for that.
+> v2 -> v3:
+> - rename vfio_platform_irq_bypass_resume into *_start
+> ---
+>  drivers/vfio/platform/vfio_platform_irq.c     | 32 +++++++++++++++++++++++++++
+>  drivers/vfio/platform/vfio_platform_private.h |  2 ++
+>  2 files changed, 34 insertions(+)
+> 
+> diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
+> index 88bba57..b5cb8c7 100644
+> --- a/drivers/vfio/platform/vfio_platform_irq.c
+> +++ b/drivers/vfio/platform/vfio_platform_irq.c
+> @@ -20,6 +20,7 @@
+>  #include <linux/types.h>
+>  #include <linux/vfio.h>
+>  #include <linux/irq.h>
+> +#include <linux/irqbypass.h>
+>  
+>  #include "vfio_platform_private.h"
+>  
+> @@ -177,6 +178,27 @@ static irqreturn_t vfio_irq_handler(int irq, void *dev_id)
+>  	return IRQ_HANDLED;
+>  }
+>  
+> +static void vfio_platform_irq_bypass_stop(struct irq_bypass_producer *prod)
+> +{
+> +}
+> +
+> +static void vfio_platform_irq_bypass_start(struct irq_bypass_producer *prod)
+> +{
+> +}
+> +
+> +static int vfio_platform_irq_bypass_add_consumer(
+> +			struct irq_bypass_producer *prod,
+> +			struct irq_bypass_consumer *cons)
+> +{
+> +	return 0;
+> +}
+> +
+> +static void vfio_platform_irq_bypass_del_consumer(
+> +			struct irq_bypass_producer *prod,
+> +			struct irq_bypass_consumer *cons)
+> +{
+> +}
+> +
+>  static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+>  			    int fd, irq_handler_t handler)
+>  {
+> @@ -186,6 +208,7 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+>  
+>  	if (irq->trigger) {
+>  		free_irq(irq->hwirq, irq);
+> +		irq_bypass_unregister_producer(&irq->producer);
+>  		kfree(irq->name);
+>  		eventfd_ctx_put(irq->trigger);
+>  		irq->trigger = NULL;
+> @@ -216,6 +239,15 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+>  		return ret;
+>  	}
+>  
+> +	irq->producer.token = (void *)trigger;
+> +	irq->producer.irq = irq->hwirq;
+> +	irq->producer.add_consumer = vfio_platform_irq_bypass_add_consumer;
+> +	irq->producer.del_consumer = vfio_platform_irq_bypass_del_consumer;
+> +	irq->producer.stop = vfio_platform_irq_bypass_stop;
+> +	irq->producer.start = vfio_platform_irq_bypass_start;
+> +	ret = irq_bypass_register_producer(&irq->producer);
+> +	WARN_ON(ret);
 
-I really have no idea where it came from. The code probably pre-dates
-the existence of a GIC architecture spec (the GIC spec used to be part
-of the board or CPU TRM).
+For what purpose?
 
-I don't see any problem with using 1020 here.
-
--- 
-Catalin
+> +
+>  	if (!irq->masked)
+>  		enable_irq(irq->hwirq);
+>  
+> diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
+> index 1c9b3d5..1d2d4d6 100644
+> --- a/drivers/vfio/platform/vfio_platform_private.h
+> +++ b/drivers/vfio/platform/vfio_platform_private.h
+> @@ -17,6 +17,7 @@
+>  
+>  #include <linux/types.h>
+>  #include <linux/interrupt.h>
+> +#include <linux/irqbypass.h>
+>  
+>  #define VFIO_PLATFORM_OFFSET_SHIFT   40
+>  #define VFIO_PLATFORM_OFFSET_MASK (((u64)(1) << VFIO_PLATFORM_OFFSET_SHIFT) - 1)
+> @@ -37,6 +38,7 @@ struct vfio_platform_irq {
+>  	spinlock_t		lock;
+>  	struct virqfd		*unmask;
+>  	struct virqfd		*mask;
+> +	struct irq_bypass_producer producer;
+>  };
+>  
+>  struct vfio_platform_region {
