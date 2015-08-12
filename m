@@ -1,77 +1,50 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: KVM Live migration with GICv3
-Date: Wed, 12 Aug 2015 17:34:25 +0100
-Message-ID: <55CB7591.5080408@arm.com>
-References: <CALicx6soU-pqs3XgkEHxtBVy9yR-7irSU4ZJvC3D6V2UmKHQqA@mail.gmail.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH 2/6] irqchip: GIC: Convert to EOImode == 1
+Date: Wed, 12 Aug 2015 18:40:14 +0100
+Message-ID: <20150812174014.GG5393@e104818-lin.cambridge.arm.com>
+References: <1436447951-22357-1-git-send-email-marc.zyngier@arm.com>
+ <1436447951-22357-3-git-send-email-marc.zyngier@arm.com>
+ <55C9BD24.10708@linaro.org>
+ <55CB4AC3.6040400@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DCC35AAFE
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Aug 2015 12:21:22 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YRX2zVZ2KlSE for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Aug 2015 12:21:21 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 38A1E5A91F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Aug 2015 12:21:20 -0400 (EDT)
-In-Reply-To: <CALicx6soU-pqs3XgkEHxtBVy9yR-7irSU4ZJvC3D6V2UmKHQqA@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vijay Kilari <vijay.kilari@gmail.com>, kvmarm@lists.cs.columbia.edu, Christoffer Dall <christoffer.dall@linaro.org>, =?windows-1252?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, p.fedin@samsung.com
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <55CB4AC3.6040400@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Eric Auger <eric.auger@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Christoffer Dall <christoffer.dall@linaro.org>, Jiang Liu <jiang.liu@linux.intel.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 11/08/15 06:25, Vijay Kilari wrote:
-> Hi,
+On Wed, Aug 12, 2015 at 02:31:47PM +0100, Marc Zyngier wrote:
+> On 11/08/15 10:15, Eric Auger wrote:
+> > On 07/09/2015 03:19 PM, Marc Zyngier wrote:
+> >>  static int gic_irq_set_irqchip_state(struct irq_data *d,
+> >> @@ -272,11 +278,15 @@ static void __exception_irq_entry gic_handle_irq(struct pt_regs *regs)
+> >>  		irqnr = irqstat & GICC_IAR_INT_ID_MASK;
+> >>  
+> >>  		if (likely(irqnr > 15 && irqnr < 1021)) {
+> > shouldn't we have < 1020?
 > 
->    I have prototyped Live migration with GICv3.
-> For this I have made following changes
+> Looks like you have unearthed a very long standing (though not fatal)
+> bug - I can trace it back to 2005 and the inclusion of the Realview
+> support (see include/asm-arm/arch-realview/entry-macro.S in 8ad68bbf for
+> the details).
 > 
-> 1) Save and Restore of GICv3 registers in QEMU.
->     - For GICv2, QEMU is saving/restoring GICD, GICC  registers. For GICv3,
->      we have to save/restore GICD, GICR and ICC registers.
->      However ICC registers are system registers which cannot be
-> accessed @ EL0 level (SRE=1). So these ICC registers should be
-> accessed as mmio registers by QEMU, for this we have to add ioctl to
-> access ICC @ EL1 level similar to GICC registers of GICv2.
-
-I've already replied to this. The ICC_* registers *must* be exposed as
-system registers. There is no GICC_* state to save. And I don't get your
-EL0 access thing.
-
+> It may be that the original GIC didn't make number 1020 a special one,
+> though the earliest spec I have access to (GICv1) is already making 1020
+> a reserved interrupt number. And looking at the pre-existing code
+> (arch/arm/common/gic.c), 1020 seems to already be considered an invalid
+> number.
 > 
-> 2) KVM ioctls in kernel provides only 32-bit register access to GIC
-> registers, where
->    as some registers in GICD/GICR requires 64-bit register access. I
-> propose to use mmio.flag to specify 32/64 bit access.
+> CC-ing Catalin, as he was the one who introduced it... ;-) Unless he
+> says otherwise, I'll cook a patch for that.
 
-I don't believe the MMIO registers *require* 64bit access. The spec says:
+I really have no idea where it came from. The code probably pre-dates
+the existence of a GIC architecture spec (the GIC spec used to be part
+of the board or CPU TRM).
 
-"For the GITS_*, GICD_* and GICR_* registers, the upper 32 bits and the
-lower 32 bits can be accessed independently, unless the register
-requires a 64 bit access."
+I don't see any problem with using 1020 here.
 
-and as far as I can see, no register mandates a 64bit access.
-
-> 
-> 3) KVM ioctls to access ICC registers for GICv3
-> 
-> Please provide your initial feedback. Let me know if some of this
-> issues are already fixed
-> 
-> I am attending KVM-forum next week @ Seattle. We can discuss there as well.
-
-Feel free to come and talk to us.
-
-	M.
 -- 
-Jazz is not dead. It just smells funny...
+Catalin
