@@ -1,141 +1,380 @@
-From: "Suzuki K. Poulose" <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH 12/14] arm64: Check for selected granule support
-Date: Thu, 13 Aug 2015 15:45:07 +0100
-Message-ID: <55CCAD73.7080702@arm.com>
-References: <1439465645-22584-1-git-send-email-suzuki.poulose@arm.com>	<1439465645-22584-13-git-send-email-suzuki.poulose@arm.com>
- <CAPvkgC3=S1BxdzZM4uUOmyXLjii48SMpCof6i6HdNeTG_fydfg@mail.gmail.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v2 09/15] KVM: arm64: implement basic ITS register handlers
+Date: Thu, 13 Aug 2015 17:25:32 +0200
+Message-ID: <55CCB6EC.50609@linaro.org>
+References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com> <1436538111-4294-10-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C8B755AAEF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 10:32:03 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RFwpwRRuHvsk for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 Aug 2015 10:32:01 -0400 (EDT)
-Received: from eu-smtp-delivery-143.mimecast.com
- (eu-smtp-delivery-143.mimecast.com [207.82.80.143])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C0135A2CF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 10:32:00 -0400 (EDT)
-In-Reply-To: <CAPvkgC3=S1BxdzZM4uUOmyXLjii48SMpCof6i6HdNeTG_fydfg@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Steve Capper <steve.capper@linaro.org>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1436538111-4294-10-git-send-email-andre.przywara@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>, marc.zyngier@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu
+Cc: Pavel Fedin <p.fedin@samsung.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 13/08/15 13:28, Steve Capper wrote:
-> On 13 August 2015 at 12:34, Suzuki K. Poulose <suzuki.poulose@arm.com> wrote:
->> From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
->>
->> Ensure that the selected page size is supported by the
->> CPU(s).
->>
->> Cc: Mark Rutland <mark.rutland@arm.com>
->> Cc: Catalin Marinas <catalin.marinas@arm.com>
->> Cc: Will Deacon <will.deacon@arm.com>
->> Signed-off-by: Suzuki K. Poulose <suzuki.poulose@arm.com>
->> ---
->>   arch/arm64/include/asm/sysreg.h |    6 ++++++
->>   arch/arm64/kernel/head.S        |   24 +++++++++++++++++++++++-
->>   2 files changed, 29 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
->> index a7f3d4b..e01d323 100644
->> --- a/arch/arm64/include/asm/sysreg.h
->> +++ b/arch/arm64/include/asm/sysreg.h
->> @@ -87,4 +87,10 @@ static inline void config_sctlr_el1(u32 clear, u32 set)
->>   }
->>   #endif
->>
->> +#define ID_AA64MMFR0_TGran4_SHIFT      28
->> +#define ID_AA64MMFR0_TGran64_SHIFT     24
->> +
->> +#define ID_AA64MMFR0_TGran4_ENABLED    0x0
->> +#define ID_AA64MMFR0_TGran64_ENABLED   0x0
->> +
->>   #endif /* __ASM_SYSREG_H */
->> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
->> index 01b8e58..0cb04db 100644
->> --- a/arch/arm64/kernel/head.S
->> +++ b/arch/arm64/kernel/head.S
->> @@ -31,10 +31,11 @@
->>   #include <asm/cputype.h>
->>   #include <asm/kernel-pgtable.h>
->>   #include <asm/memory.h>
->> -#include <asm/thread_info.h>
->>   #include <asm/pgtable-hwdef.h>
->>   #include <asm/pgtable.h>
->>   #include <asm/page.h>
->> +#include <asm/sysreg.h>
->> +#include <asm/thread_info.h>
->>   #include <asm/virt.h>
->>
->>   #define __PHYS_OFFSET  (KERNEL_START - TEXT_OFFSET)
->> @@ -606,9 +607,25 @@ ENDPROC(__secondary_switched)
->>    *  x27 = *virtual* address to jump to upon completion
->>    *
->>    * other registers depend on the function called upon completion
->> + * Checks if the selected granule size is supported by the CPU.
->>    */
->> +#if    defined(CONFIG_ARM64_64K_PAGES)
->> +
->> +#define ID_AA64MMFR0_TGran_SHIFT       ID_AA64MMFR0_TGran64_SHIFT
->> +#define ID_AA64MMFR0_TGran_ENABLED     ID_AA64MMFR0_TGran64_ENABLED
->> +
->> +#else
->> +
->> +#define ID_AA64MMFR0_TGran_SHIFT       ID_AA64MMFR0_TGran4_SHIFT
->> +#define ID_AA64MMFR0_TGran_ENABLED     ID_AA64MMFR0_TGran4_ENABLED
->> +
->> +#endif
->>          .section        ".idmap.text", "ax"
->>   __enable_mmu:
->> +       mrs     x1, ID_AA64MMFR0_EL1
->> +       ubfx    x2, x1, #ID_AA64MMFR0_TGran_SHIFT, 4
->> +       cmp     x2, #ID_AA64MMFR0_TGran_ENABLED
->> +       b.ne    __no_granule_support
->>          ldr     x5, =vectors
->>          msr     vbar_el1, x5
->>          msr     ttbr0_el1, x25                  // load TTBR0
->> @@ -626,3 +643,8 @@ __enable_mmu:
->>          isb
->>          br      x27
->>   ENDPROC(__enable_mmu)
->> +
->> +__no_granule_support:
->> +       wfe
->> +       b __no_granule_support
->> +ENDPROC(__no_granule_support)
->> --
->> 1.7.9.5
->>
->
-> Hi Suzuki,
-> Is is possible to tell the user that the kernel has failed to boot due
-> to the kernel granule being unsupported?
+On 07/10/2015 04:21 PM, Andre Przywara wrote:
+> Add emulation for some basic MMIO registers used in the ITS emulation.
+> This includes:
+> - GITS_{CTLR,TYPER,IIDR}
+> - ID registers
+> - GITS_{CBASER,CREADR,CWRITER}
+>   those implement the ITS command buffer handling
+> 
+> Most of the handlers are pretty straight forward
+straightforward?
+, but CWRITER goes
+> some extra miles to allow fine grained locking. The idea here
+> is to let only the first instance iterate through the command ring
+> buffer, CWRITER accesses on other VCPUs meanwhile will be picked up
+> by that first instance and handled as well. The ITS lock is thus only
+> hold for very small periods of time and is dropped before the actual
+> command handler is called.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  include/kvm/arm_vgic.h             |   3 +
+>  include/linux/irqchip/arm-gic-v3.h |   8 ++
+>  virt/kvm/arm/its-emul.c            | 205 +++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/its-emul.h            |   1 +
+>  virt/kvm/arm/vgic-v3-emul.c        |   2 +
+>  5 files changed, 219 insertions(+)
+> 
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 9e9d4aa..b432055 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -159,6 +159,9 @@ struct vgic_io_device {
+>  struct vgic_its {
+>  	bool			enabled;
+>  	spinlock_t		lock;
+> +	u64			cbaser;
+> +	int			creadr;
+> +	int			cwriter;
+>  };
+>  
+>  struct vgic_dist {
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index df4e527..0b450c7 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -179,15 +179,23 @@
+>  #define GITS_BASER			0x0100
+>  #define GITS_IDREGS_BASE		0xffd0
+>  #define GITS_PIDR2			GICR_PIDR2
+> +#define GITS_PIDR4			0xffd0
+> +#define GITS_CIDR0			0xfff0
+> +#define GITS_CIDR1			0xfff4
+> +#define GITS_CIDR2			0xfff8
+> +#define GITS_CIDR3			0xfffc
+>  
+>  #define GITS_TRANSLATER			0x10040
+>  
+>  #define GITS_CTLR_ENABLE		(1U << 0)
+>  #define GITS_CTLR_QUIESCENT		(1U << 31)
+>  
+> +#define GITS_TYPER_PLPIS		(1UL << 0)
+> +#define GITS_TYPER_IDBITS_SHIFT		8
+>  #define GITS_TYPER_DEVBITS_SHIFT	13
+>  #define GITS_TYPER_DEVBITS(r)		((((r) >> GITS_TYPER_DEVBITS_SHIFT) & 0x1f) + 1)
+>  #define GITS_TYPER_PTA			(1UL << 19)
+> +#define GITS_TYPER_HWCOLLCNT_SHIFT	24
+>  
+>  #define GITS_CBASER_VALID		(1UL << 63)
+>  #define GITS_CBASER_nCnB		(0UL << 59)
+> diff --git a/virt/kvm/arm/its-emul.c b/virt/kvm/arm/its-emul.c
+> index 659dd39..b498f06 100644
+> --- a/virt/kvm/arm/its-emul.c
+> +++ b/virt/kvm/arm/its-emul.c
+> @@ -32,10 +32,62 @@
+>  #include "vgic.h"
+>  #include "its-emul.h"
+>  
+> +#define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
+> +
+> +/* The distributor lock is held by the VGIC MMIO handler. */
+>  static bool handle_mmio_misc_gits(struct kvm_vcpu *vcpu,
+>  				  struct kvm_exit_mmio *mmio,
+>  				  phys_addr_t offset)
+>  {
+> +	struct vgic_its *its = &vcpu->kvm->arch.vgic.its;
+> +	u32 reg;
+> +	bool was_enabled;
+> +
+> +	switch (offset & ~3) {
+> +	case 0x00:		/* GITS_CTLR */
+> +		/* We never defer any command execution. */
+> +		reg = GITS_CTLR_QUIESCENT;
+> +		if (its->enabled)
+> +			reg |= GITS_CTLR_ENABLE;
+> +		was_enabled = its->enabled;
+> +		vgic_reg_access(mmio, &reg, offset & 3,
+> +				ACCESS_READ_VALUE | ACCESS_WRITE_VALUE);
+> +		its->enabled = !!(reg & GITS_CTLR_ENABLE);
+> +		return !was_enabled && its->enabled;
+> +	case 0x04:		/* GITS_IIDR */
+> +		reg = (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
+> +		vgic_reg_access(mmio, &reg, offset & 3,
+> +				ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
+> +		break;
+> +	case 0x08:		/* GITS_TYPER */
+> +		/*
+> +		 * We use linear CPU numbers for redistributor addressing,
+> +		 * so GITS_TYPER.PTA is 0.
+> +		 * To avoid memory waste on the guest side, we keep the
+> +		 * number of IDBits and DevBits low for the time being.
+> +		 * This could later be made configurable by userland.
+> +		 * Since we have all collections in linked list, we claim
+> +		 * that we can hold all of the collection tables in our
+> +		 * own memory and that the ITT entry size is 1 byte (the
+> +		 * smallest possible one).
+> +		 */
+> +		reg = GITS_TYPER_PLPIS;
+> +		reg |= 0xff << GITS_TYPER_HWCOLLCNT_SHIFT;
+> +		reg |= 0x0f << GITS_TYPER_DEVBITS_SHIFT;
+> +		reg |= 0x0f << GITS_TYPER_IDBITS_SHIFT;
+> +		vgic_reg_access(mmio, &reg, offset & 3,
+> +				ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
+> +		break;
+> +	case 0x0c:
+> +		/* The upper 32bits of TYPER are all 0 for the time being.
+> +		 * Should we need more than 256 collections, we can enable
+> +		 * some bits in here.
+> +		 */
+> +		vgic_reg_access(mmio, NULL, offset & 3,
+> +				ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
+> +		break;
+> +	}
+> +
+>  	return false;
+>  }
+>  
+> @@ -43,20 +95,142 @@ static bool handle_mmio_gits_idregs(struct kvm_vcpu *vcpu,
+>  				    struct kvm_exit_mmio *mmio,
+>  				    phys_addr_t offset)
+>  {
+> +	u32 reg = 0;
+> +	int idreg = (offset & ~3) + GITS_IDREGS_BASE;
+> +
+> +	switch (idreg) {
+> +	case GITS_PIDR2:
+> +		reg = GIC_PIDR2_ARCH_GICv3;
+> +		break;
+> +	case GITS_PIDR4:
+> +		/* This is a 64K software visible page */
+> +		reg = 0x40;
+> +		break;
+> +	/* Those are the ID registers for (any) GIC. */
+> +	case GITS_CIDR0:
+> +		reg = 0x0d;
+> +		break;
+> +	case GITS_CIDR1:
+> +		reg = 0xf0;
+> +		break;
+> +	case GITS_CIDR2:
+> +		reg = 0x05;
+> +		break;
+> +	case GITS_CIDR3:
+> +		reg = 0xb1;
+> +		break;
+> +	}
+> +	vgic_reg_access(mmio, &reg, offset & 3,
+> +			ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
+>  	return false;
+>  }
+>  
+> +static int vits_handle_command(struct kvm_vcpu *vcpu, u64 *its_cmd)
+> +{
+> +	return -ENODEV;
+> +}
+> +
+>  static bool handle_mmio_gits_cbaser(struct kvm_vcpu *vcpu,
+>  				    struct kvm_exit_mmio *mmio,
+>  				    phys_addr_t offset)
+>  {
+> +	struct vgic_its *its = &vcpu->kvm->arch.vgic.its;
+> +	int mode = ACCESS_READ_VALUE;
+> +
+> +	mode |= its->enabled ? ACCESS_WRITE_IGNORED : ACCESS_WRITE_VALUE;
+> +
+> +	vgic_handle_base_register(vcpu, mmio, offset, &its->cbaser, mode);
+> +
+> +	/* Writing CBASER resets the read pointer. */
+> +	if (mmio->is_write)
+> +		its->creadr = 0;
+> +
+>  	return false;
+>  }
+>  
+> +static int its_cmd_buffer_size(struct kvm *kvm)
+> +{
+> +	struct vgic_its *its = &kvm->arch.vgic.its;
+> +
+> +	return ((its->cbaser & 0xff) + 1) << 12;
+> +}
+> +
+> +static gpa_t its_cmd_buffer_base(struct kvm *kvm)
+> +{
+> +	struct vgic_its *its = &kvm->arch.vgic.its;
+> +
+> +	return BASER_BASE_ADDRESS(its->cbaser);
+> +}
+> +
+> +/*
+> + * By writing to CWRITER the guest announces new commands to be processed.
+> + * Since we cannot read from guest memory inside the ITS spinlock, we
+> + * iterate over the command buffer (with the lock dropped) until the read
+> + * pointer matches the write pointer. Other VCPUs writing this register in the
+> + * meantime will just update the write pointer, leaving the command
+> + * processing to the first instance of the function.
+> + */
+I am lost, isn't the dist lock hold by vgic_handle_mmio_access before
+calling call_range_handler/range->handle_mmio ?
 
-We don't have anything up at this time. The "looping address" is actually a clue
-to the (expert) user. Not sure we can do something, until we get something like DEBUG_LL(?)
-Or we should let it continue and end in a panic(?). The current situation can boot a
-multi-cluster system with boot cluster having the Tgran support(which doesn't make a
-strong use case though). I will try out some options and get back to you.
+if confirmed we need to move the command enumeration + execution
+somewhere else. Besides that piece of code may deserve to be
+encaspulated in a function. what do you think?
 
 
-Thanks
-Suzuki
+>  static bool handle_mmio_gits_cwriter(struct kvm_vcpu *vcpu,
+>  				     struct kvm_exit_mmio *mmio,
+>  				     phys_addr_t offset)
+>  {
+> +	struct vgic_its *its = &vcpu->kvm->arch.vgic.its;
+> +	gpa_t cbaser = its_cmd_buffer_base(vcpu->kvm);
+> +	u64 cmd_buf[4];
+> +	u32 reg;
+> +	bool finished;
+> +
+> +	/* The upper 32 bits are RES0 */
+> +	if ((offset & ~3) == 0x04) {
+> +		vgic_reg_access(mmio, &reg, offset & 3,
+> +				ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
+> +		return false;
+> +	}
+> +
+> +	reg = its->cwriter & 0xfffe0;
+> +	vgic_reg_access(mmio, &reg, offset & 3,
+> +			ACCESS_READ_VALUE | ACCESS_WRITE_VALUE);
+> +	if (!mmio->is_write)
+> +		return false;
+> +
+> +	reg &= 0xfffe0;
+> +	if (reg > its_cmd_buffer_size(vcpu->kvm))
+> +		return false;
+> +
+> +	spin_lock(&its->lock);
+> +
+> +	/*
+> +	 * If there is still another VCPU handling commands, let this
+> +	 * one pick up the new CWRITER and process our new commands as well.
+> +	 */
+> +	finished = (its->cwriter != its->creadr);
+> +	its->cwriter = reg;
+> +
+> +	spin_unlock(&its->lock);
+> +
+> +	while (!finished) {
+> +		int ret = kvm_read_guest(vcpu->kvm, cbaser + its->creadr,
+> +					 cmd_buf, 32);
+> +		if (ret) {
+> +			/*
+> +			 * Gah, we are screwed. Reset CWRITER to that command
+> +			 * that we have finished processing and return.
+> +			 */
+> +			spin_lock(&its->lock);
+> +			its->cwriter = its->creadr;
+> +			spin_unlock(&its->lock);
+> +			break;
+> +		}
+> +		vits_handle_command(vcpu, cmd_buf);
+> +
+> +		spin_lock(&its->lock);
+> +		its->creadr += 32;
+> +		if (its->creadr == its_cmd_buffer_size(vcpu->kvm))
+> +			its->creadr = 0;
+> +		finished = (its->creadr == its->cwriter);
+> +		spin_unlock(&its->lock);
+> +	}
+> +
+>  	return false;
+>  }
+>  
+> @@ -64,6 +238,20 @@ static bool handle_mmio_gits_creadr(struct kvm_vcpu *vcpu,
+>  				    struct kvm_exit_mmio *mmio,
+>  				    phys_addr_t offset)
+>  {
+> +	struct vgic_its *its = &vcpu->kvm->arch.vgic.its;
+> +	u32 reg;
+> +
+> +	switch (offset & ~3) {
+> +	case 0x00:
+> +		reg = its->creadr & 0xfffe0;
+> +		vgic_reg_access(mmio, &reg, offset & 3,
+> +				ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
+> +		break;
+> +	case 0x04:
+> +		vgic_reg_access(mmio, &reg, offset & 3,
+> +				ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
+> +		break;
+> +	}
+>  	return false;
+>  }
+>  
+> @@ -117,9 +305,26 @@ int vits_init(struct kvm *kvm)
+>  	struct vgic_dist *dist = &kvm->arch.vgic;
+>  	struct vgic_its *its = &dist->its;
+>  
+> +	dist->pendbaser = kmalloc(sizeof(u64) * dist->nr_cpus, GFP_KERNEL);
+check_patch advises to use kmalloc_array here (warning). or kcalloc?
 
->
-> Cheers,
-> --
-> Steve
->
+Eric
+
+> +	if (!dist->pendbaser)
+> +		return -ENOMEM;
+> +
+>  	spin_lock_init(&its->lock);
+>  
+>  	its->enabled = false;
+>  
+>  	return -ENXIO;
+>  }
+> +
+> +void vits_destroy(struct kvm *kvm)
+> +{
+> +	struct vgic_dist *dist = &kvm->arch.vgic;
+> +	struct vgic_its *its = &dist->its;
+> +
+> +	if (!vgic_has_its(kvm))
+> +		return;
+> +
+> +	kfree(dist->pendbaser);
+> +
+> +	its->enabled = false;
+> +}
+> diff --git a/virt/kvm/arm/its-emul.h b/virt/kvm/arm/its-emul.h
+> index 5dc8e2f..472a6d0 100644
+> --- a/virt/kvm/arm/its-emul.h
+> +++ b/virt/kvm/arm/its-emul.h
+> @@ -31,5 +31,6 @@
+>  
+>  void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+>  int vits_init(struct kvm *kvm);
+> +void vits_destroy(struct kvm *kvm);
+>  
+>  #endif
+> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+> index f5865e7..49be3c3 100644
+> --- a/virt/kvm/arm/vgic-v3-emul.c
+> +++ b/virt/kvm/arm/vgic-v3-emul.c
+> @@ -928,6 +928,8 @@ static void vgic_v3_destroy_model(struct kvm *kvm)
+>  {
+>  	struct vgic_dist *dist = &kvm->arch.vgic;
+>  
+> +	vits_destroy(kvm);
+> +
+>  	kfree(dist->irq_spi_mpidr);
+>  	dist->irq_spi_mpidr = NULL;
+>  }
+> 
+
