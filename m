@@ -1,130 +1,313 @@
-From: Steve Capper <steve.capper@linaro.org>
-Subject: Re: [PATCH 12/14] arm64: Check for selected granule support
-Date: Thu, 13 Aug 2015 13:28:28 +0100
-Message-ID: <CAPvkgC3=S1BxdzZM4uUOmyXLjii48SMpCof6i6HdNeTG_fydfg@mail.gmail.com>
-References: <1439465645-22584-1-git-send-email-suzuki.poulose@arm.com>
- <1439465645-22584-13-git-send-email-suzuki.poulose@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v2 08/15] KVM: arm64: introduce ITS emulation file with
+ stub functions
+Date: Thu, 13 Aug 2015 14:48:27 +0200
+Message-ID: <55CC921B.503@linaro.org>
+References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com> <1436538111-4294-9-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA7065AEDC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 08:15:20 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WuJrKvvqhQFq for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 Aug 2015 08:15:19 -0400 (EDT)
-Received: from mail-io0-f175.google.com (mail-io0-f175.google.com
- [209.85.223.175])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C51A25AEDB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 08:15:19 -0400 (EDT)
-Received: by iodt126 with SMTP id t126so50199254iod.2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 05:28:28 -0700 (PDT)
-In-Reply-To: <1439465645-22584-13-git-send-email-suzuki.poulose@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1436538111-4294-9-git-send-email-andre.przywara@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>, marc.zyngier@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu
+Cc: Pavel Fedin <p.fedin@samsung.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 13 August 2015 at 12:34, Suzuki K. Poulose <suzuki.poulose@arm.com> wrote:
-> From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
->
-> Ensure that the selected page size is supported by the
-> CPU(s).
->
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-> Signed-off-by: Suzuki K. Poulose <suzuki.poulose@arm.com>
+On 07/10/2015 04:21 PM, Andre Przywara wrote:
+> The ARM GICv3 ITS emulation code goes into a separate file, but
+> needs to be connected to the GICv3 emulation, of which it is an
+> option.
+> Introduce the skeleton with function stubs to be filled later.
+> Introduce the basic ITS data structure and initialize it, but don't
+> return any success yet, as we are not yet ready for the show.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
->  arch/arm64/include/asm/sysreg.h |    6 ++++++
->  arch/arm64/kernel/head.S        |   24 +++++++++++++++++++++++-
->  2 files changed, 29 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index a7f3d4b..e01d323 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -87,4 +87,10 @@ static inline void config_sctlr_el1(u32 clear, u32 set)
->  }
->  #endif
->
-> +#define ID_AA64MMFR0_TGran4_SHIFT      28
-> +#define ID_AA64MMFR0_TGran64_SHIFT     24
+>  arch/arm64/kvm/Makefile            |   1 +
+>  include/kvm/arm_vgic.h             |   6 ++
+>  include/linux/irqchip/arm-gic-v3.h |   1 +
+>  virt/kvm/arm/its-emul.c            | 125 +++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/its-emul.h            |  35 +++++++++++
+>  virt/kvm/arm/vgic-v3-emul.c        |  24 ++++++-
+>  6 files changed, 189 insertions(+), 3 deletions(-)
+>  create mode 100644 virt/kvm/arm/its-emul.c
+>  create mode 100644 virt/kvm/arm/its-emul.h
+> 
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index f90f4aa..9803307 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -25,5 +25,6 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v2-emul.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += vgic-v2-switch.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3-emul.o
+> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/its-emul.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += vgic-v3-switch.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 8c6cb0e..9e9d4aa 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -156,6 +156,11 @@ struct vgic_io_device {
+>  	struct kvm_io_device dev;
+>  };
+>  
+> +struct vgic_its {
+> +	bool			enabled;
+> +	spinlock_t		lock;
+> +};
 > +
-> +#define ID_AA64MMFR0_TGran4_ENABLED    0x0
-> +#define ID_AA64MMFR0_TGran64_ENABLED   0x0
+>  struct vgic_dist {
+>  	spinlock_t		lock;
+>  	bool			in_kernel;
+> @@ -264,6 +269,7 @@ struct vgic_dist {
+>  	u64			*pendbaser;
+>  
+>  	bool			lpis_enabled;
+> +	struct vgic_its		its;
+>  };
+>  
+>  struct vgic_v2_cpu_if {
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index ffbc034..df4e527 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -177,6 +177,7 @@
+>  #define GITS_CWRITER			0x0088
+>  #define GITS_CREADR			0x0090
+>  #define GITS_BASER			0x0100
+> +#define GITS_IDREGS_BASE		0xffd0
+>  #define GITS_PIDR2			GICR_PIDR2
+>  
+>  #define GITS_TRANSLATER			0x10040
+> diff --git a/virt/kvm/arm/its-emul.c b/virt/kvm/arm/its-emul.c
+> new file mode 100644
+> index 0000000..659dd39
+> --- /dev/null
+> +++ b/virt/kvm/arm/its-emul.c
+> @@ -0,0 +1,125 @@
+> +/*
+> + * GICv3 ITS emulation
+> + *
+> + * Copyright (C) 2015 ARM Ltd.
+> + * Author: Andre Przywara <andre.przywara@arm.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
 > +
->  #endif /* __ASM_SYSREG_H */
-> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-> index 01b8e58..0cb04db 100644
-> --- a/arch/arm64/kernel/head.S
-> +++ b/arch/arm64/kernel/head.S
-> @@ -31,10 +31,11 @@
->  #include <asm/cputype.h>
->  #include <asm/kernel-pgtable.h>
->  #include <asm/memory.h>
-> -#include <asm/thread_info.h>
->  #include <asm/pgtable-hwdef.h>
->  #include <asm/pgtable.h>
->  #include <asm/page.h>
-> +#include <asm/sysreg.h>
-> +#include <asm/thread_info.h>
->  #include <asm/virt.h>
->
->  #define __PHYS_OFFSET  (KERNEL_START - TEXT_OFFSET)
-> @@ -606,9 +607,25 @@ ENDPROC(__secondary_switched)
->   *  x27 = *virtual* address to jump to upon completion
->   *
->   * other registers depend on the function called upon completion
-> + * Checks if the selected granule size is supported by the CPU.
->   */
-> +#if    defined(CONFIG_ARM64_64K_PAGES)
+> +#include <linux/cpu.h>
+> +#include <linux/kvm.h>
+> +#include <linux/kvm_host.h>
+> +#include <linux/interrupt.h>
 > +
-> +#define ID_AA64MMFR0_TGran_SHIFT       ID_AA64MMFR0_TGran64_SHIFT
-> +#define ID_AA64MMFR0_TGran_ENABLED     ID_AA64MMFR0_TGran64_ENABLED
+> +#include <linux/irqchip/arm-gic-v3.h>
+> +#include <kvm/arm_vgic.h>
 > +
-> +#else
+> +#include <asm/kvm_emulate.h>
+> +#include <asm/kvm_arm.h>
+> +#include <asm/kvm_mmu.h>
 > +
-> +#define ID_AA64MMFR0_TGran_SHIFT       ID_AA64MMFR0_TGran4_SHIFT
-> +#define ID_AA64MMFR0_TGran_ENABLED     ID_AA64MMFR0_TGran4_ENABLED
+> +#include "vgic.h"
+> +#include "its-emul.h"
+> +
+> +static bool handle_mmio_misc_gits(struct kvm_vcpu *vcpu,
+> +				  struct kvm_exit_mmio *mmio,
+> +				  phys_addr_t offset)
+> +{
+> +	return false;
+> +}
+> +
+> +static bool handle_mmio_gits_idregs(struct kvm_vcpu *vcpu,
+> +				    struct kvm_exit_mmio *mmio,
+> +				    phys_addr_t offset)
+> +{
+> +	return false;
+> +}
+> +
+> +static bool handle_mmio_gits_cbaser(struct kvm_vcpu *vcpu,
+> +				    struct kvm_exit_mmio *mmio,
+> +				    phys_addr_t offset)
+> +{
+> +	return false;
+> +}
+> +
+> +static bool handle_mmio_gits_cwriter(struct kvm_vcpu *vcpu,
+> +				     struct kvm_exit_mmio *mmio,
+> +				     phys_addr_t offset)
+> +{
+> +	return false;
+> +}
+> +
+> +static bool handle_mmio_gits_creadr(struct kvm_vcpu *vcpu,
+> +				    struct kvm_exit_mmio *mmio,
+> +				    phys_addr_t offset)
+> +{
+> +	return false;
+> +}
+> +
+> +static const struct vgic_io_range vgicv3_its_ranges[] = {
+> +	{
+> +		.base		= GITS_CTLR,
+> +		.len		= 0x10,
+> +		.bits_per_irq	= 0,
+> +		.handle_mmio	= handle_mmio_misc_gits,
+> +	},
+> +	{
+> +		.base		= GITS_CBASER,
+> +		.len		= 0x08,
+> +		.bits_per_irq	= 0,
+> +		.handle_mmio	= handle_mmio_gits_cbaser,
+> +	},
+> +	{
+> +		.base		= GITS_CWRITER,
+> +		.len		= 0x08,
+> +		.bits_per_irq	= 0,
+> +		.handle_mmio	= handle_mmio_gits_cwriter,
+> +	},
+> +	{
+> +		.base		= GITS_CREADR,
+> +		.len		= 0x08,
+> +		.bits_per_irq	= 0,
+> +		.handle_mmio	= handle_mmio_gits_creadr,
+> +	},
+> +	{
+> +		/* We don't need any memory from the guest. */
+> +		.base		= GITS_BASER,
+> +		.len		= 0x40,
+> +		.bits_per_irq	= 0,
+> +		.handle_mmio	= handle_mmio_raz_wi,
+> +	},
+> +	{
+> +		.base		= GITS_IDREGS_BASE,
+> +		.len		= 0x30,
+> +		.bits_per_irq	= 0,
+> +		.handle_mmio	= handle_mmio_gits_idregs,
+> +	},
+> +};
+> +
+> +/* This is called on setting the LPI enable bit in the redistributor. */
+> +void vgic_enable_lpis(struct kvm_vcpu *vcpu)
+> +{
+> +}
+> +
+> +int vits_init(struct kvm *kvm)
+> +{
+> +	struct vgic_dist *dist = &kvm->arch.vgic;
+> +	struct vgic_its *its = &dist->its;
+> +
+> +	spin_lock_init(&its->lock);
+> +
+> +	its->enabled = false;
+> +
+> +	return -ENXIO;
+> +}
+> diff --git a/virt/kvm/arm/its-emul.h b/virt/kvm/arm/its-emul.h
+> new file mode 100644
+> index 0000000..5dc8e2f
+> --- /dev/null
+> +++ b/virt/kvm/arm/its-emul.h
+> @@ -0,0 +1,35 @@
+> +/*
+> + * GICv3 ITS emulation definitions
+> + *
+> + * Copyright (C) 2015 ARM Ltd.
+> + * Author: Andre Przywara <andre.przywara@arm.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#ifndef __KVM_ITS_EMUL_H__
+> +#define __KVM_ITS_EMUL_H__
+> +
+> +#include <linux/kvm.h>
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/kvm_emulate.h>
+> +#include <asm/kvm_arm.h>
+> +#include <asm/kvm_mmu.h>
+> +
+> +#include "vgic.h"
+> +
+> +void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+> +int vits_init(struct kvm *kvm);
 > +
 > +#endif
->         .section        ".idmap.text", "ax"
->  __enable_mmu:
-> +       mrs     x1, ID_AA64MMFR0_EL1
-> +       ubfx    x2, x1, #ID_AA64MMFR0_TGran_SHIFT, 4
-> +       cmp     x2, #ID_AA64MMFR0_TGran_ENABLED
-> +       b.ne    __no_granule_support
->         ldr     x5, =vectors
->         msr     vbar_el1, x5
->         msr     ttbr0_el1, x25                  // load TTBR0
-> @@ -626,3 +643,8 @@ __enable_mmu:
->         isb
->         br      x27
->  ENDPROC(__enable_mmu)
+> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+> index 5269ad1..f5865e7 100644
+> --- a/virt/kvm/arm/vgic-v3-emul.c
+> +++ b/virt/kvm/arm/vgic-v3-emul.c
+> @@ -48,6 +48,7 @@
+>  #include <asm/kvm_mmu.h>
+>  
+>  #include "vgic.h"
+> +#include "its-emul.h"
+>  
+>  static bool handle_mmio_rao_wi(struct kvm_vcpu *vcpu,
+>  			       struct kvm_exit_mmio *mmio, phys_addr_t offset)
+> @@ -530,9 +531,20 @@ static bool handle_mmio_ctlr_redist(struct kvm_vcpu *vcpu,
+>  				    struct kvm_exit_mmio *mmio,
+>  				    phys_addr_t offset)
+>  {
+> -	/* since we don't support LPIs, this register is zero for now */
+> -	vgic_reg_access(mmio, NULL, offset,
+> -			ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
+> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +	u32 reg;
 > +
-> +__no_granule_support:
-> +       wfe
-> +       b __no_granule_support
-> +ENDPROC(__no_granule_support)
-> --
-> 1.7.9.5
->
+> +	if (!vgic_has_its(vcpu->kvm)) {
+> +		vgic_reg_access(mmio, NULL, offset,
+> +				ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
+> +		return false;
+> +	}
+can't we remove above block and ...
+> +	reg = dist->lpis_enabled ? GICR_CTLR_ENABLE_LPIS : 0;
+> +	vgic_reg_access(mmio, &reg, offset,
+> +			ACCESS_READ_VALUE | ACCESS_WRITE_VALUE);
+> +	if (!dist->lpis_enabled && (reg & GICR_CTLR_ENABLE_LPIS
+add vgic_has_its(vcpu->kvm) && above?
 
-Hi Suzuki,
-Is is possible to tell the user that the kernel has failed to boot due
-to the kernel granule being unsupported?
+Besides Reviewed-by: Eric Auger <eric.auger@linaro.org>
 
-Cheers,
---
-Steve
+Eric
+)) {
+> +		/* Eventually do something */
+> +	}
+>  	return false;
+>  }
+>  
+> @@ -861,6 +873,12 @@ static int vgic_v3_map_resources(struct kvm *kvm,
+>  		rdbase += GIC_V3_REDIST_SIZE;
+>  	}
+>  
+> +	if (vgic_has_its(kvm)) {
+> +		ret = vits_init(kvm);
+> +		if (ret)
+> +			goto out_unregister;
+> +	}
+> +
+>  	dist->redist_iodevs = iodevs;
+>  	dist->ready = true;
+>  	goto out;
+> 
+
