@@ -1,24 +1,28 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 4/4] irqchip: GIC: Don't deactivate interrupts forwarded to
- a guest
-Date: Thu, 13 Aug 2015 09:28:46 +0100
-Message-ID: <1439454526-1185-5-git-send-email-marc.zyngier@arm.com>
-References: <1439454526-1185-1-git-send-email-marc.zyngier@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v5 5/5] KVM: eventfd: add irq bypass consumer management
+Date: Thu, 13 Aug 2015 11:19:21 +0200
+Message-ID: <55CC6119.10001@linaro.org>
+References: <1439213467-13668-1-git-send-email-eric.auger@linaro.org>	
+ <1439213467-13668-6-git-send-email-eric.auger@linaro.org>
+ <1439406307.4023.532.camel@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1443C5ADAE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 04:16:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 740455AA45
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 05:06:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZniFggb8nnnW for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 Aug 2015 04:16:04 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 248575AD86
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 04:16:04 -0400 (EDT)
-In-Reply-To: <1439454526-1185-1-git-send-email-marc.zyngier@arm.com>
+ with ESMTP id 4NQ46Z7R5sqF for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 13 Aug 2015 05:06:56 -0400 (EDT)
+Received: from mail-wi0-f174.google.com (mail-wi0-f174.google.com
+ [209.85.212.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 530885A9EB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 05:06:56 -0400 (EDT)
+Received: by wicja10 with SMTP id ja10so143556938wic.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 02:20:04 -0700 (PDT)
+In-Reply-To: <1439406307.4023.532.camel@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,120 +32,104 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Jiang Liu <jiang.liu@linux.intel.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: feng.wu@intel.com, kvm@vger.kernel.org, patches@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, eric.auger@st.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Commit 0a4377de3056 ("genirq: Introduce irq_set_vcpu_affinity() to
-target an interrupt to a VCPU") added just what we needed at the
-lowest level to allow an interrupt to be deactivated by a guest.
+Hi Alex,
+On 08/12/2015 09:05 PM, Alex Williamson wrote:
+> On Mon, 2015-08-10 at 15:31 +0200, Eric Auger wrote:
+>> This patch adds the registration/unregistration of an
+>> irq_bypass_consumer on irqfd assignment/deassignment.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+>> Signed-off-by: Feng Wu <feng.wu@intel.com>
+>>
+>> ---
+>>
+>> v4 -> v5:
+>> - due to removal of static inline stubs, add
+>>   #ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
+>>   around consumer registration/unregistration
+>> - add pr_info when registration fails
+>>
+>> v2 -> v3 (Feng Wu):
+>> - Use kvm_arch_irq_bypass_start
+>> - Remove kvm_arch_irq_bypass_update
+>> - Add member 'struct irq_bypass_producer *producer' in
+>>   'struct kvm_kernel_irqfd', it is needed by posted interrupt.
+>> - Remove 'irq_bypass_unregister_consumer' in kvm_irqfd_deassign()
+>>
+>> v1 -> v2:
+>> - populate of kvm and gsi removed
+>> - unregister the consumer on irqfd_shutdown
+>> ---
+>>  include/linux/kvm_irqfd.h |  2 ++
+>>  virt/kvm/eventfd.c        | 15 +++++++++++++++
+>>  2 files changed, 17 insertions(+)
+>>
+>> diff --git a/include/linux/kvm_irqfd.h b/include/linux/kvm_irqfd.h
+>> index f926b39..0c1de05 100644
+>> --- a/include/linux/kvm_irqfd.h
+>> +++ b/include/linux/kvm_irqfd.h
+>> @@ -64,6 +64,8 @@ struct kvm_kernel_irqfd {
+>>  	struct list_head list;
+>>  	poll_table pt;
+>>  	struct work_struct shutdown;
+>> +	struct irq_bypass_consumer consumer;
+>> +	struct irq_bypass_producer *producer;
+>>  };
+>>  
+>>  #endif /* __LINUX_KVM_IRQFD_H */
+>> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+>> index 647ffb8..d7a230f 100644
+>> --- a/virt/kvm/eventfd.c
+>> +++ b/virt/kvm/eventfd.c
+>> @@ -35,6 +35,7 @@
+>>  #include <linux/srcu.h>
+>>  #include <linux/slab.h>
+>>  #include <linux/seqlock.h>
+>> +#include <linux/irqbypass.h>
+>>  #include <trace/events/kvm.h>
+>>  
+>>  #include <kvm/iodev.h>
+>> @@ -140,6 +141,9 @@ irqfd_shutdown(struct work_struct *work)
+>>  	/*
+>>  	 * It is now safe to release the object's resources
+>>  	 */
+>> +#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
+>> +	irq_bypass_unregister_consumer(&irqfd->consumer);
+>> +#endif
+>>  	eventfd_ctx_put(irqfd->eventfd);
+>>  	kfree(irqfd);
+>>  }
+>> @@ -379,6 +383,17 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
+>>  	 * we might race against the POLLHUP
+>>  	 */
+>>  	fdput(f);
+>> +#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
+>> +	irqfd->consumer.token = (void *)irqfd->eventfd;
+>> +	irqfd->consumer.add_producer = kvm_arch_irq_bypass_add_producer;
+>> +	irqfd->consumer.del_producer = kvm_arch_irq_bypass_del_producer;
+>> +	irqfd->consumer.stop = kvm_arch_irq_bypass_stop;
+>> +	irqfd->consumer.start = kvm_arch_irq_bypass_start;
+>> +	ret = irq_bypass_register_consumer(&irqfd->consumer);
+>> +	if (ret)
+>> +		pr_info("irq bypass consumer (token %p) registration fails: %d\n",
+>> +				irqfd->consumer.token, ret);
+>> +#endif
+> 
+> Does this series compile on its own?  Aren't all these arch function
+> unresolved?
+yes it does since by default CONFIG_HAVE_KVM_IRQ_BYPASS is not defined
 
-When such a request reaches the GIC, it knows it doesn't need to
-perform the deactivation anymore, and can safely leave the guest
-do its magic. This of course requires additional support in both
-VFIO and KVM.
+Best Regards
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- drivers/irqchip/irq-gic.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
-
-diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-index b020c3a..ea691be 100644
---- a/drivers/irqchip/irq-gic.c
-+++ b/drivers/irqchip/irq-gic.c
-@@ -148,6 +148,34 @@ static inline bool primary_gic_irq(struct irq_data *d)
- 	return true;
- }
- 
-+static inline bool cascading_gic_irq(struct irq_data *d)
-+{
-+	/*
-+	 * If handler_data pointing to one of the secondary GICs, then
-+	 * this is the cascading interrupt, and it cannot possibly be
-+	 * forwarded.
-+	 */
-+	if (d->handler_data >= (void *)(gic_data + 1) &&
-+	    d->handler_data <  (void *)(gic_data + MAX_GIC_NR))
-+		return true;
-+
-+	return false;
-+}
-+
-+static inline bool forwarded_irq(struct irq_data *d)
-+{
-+	/*
-+	 * A forwarded interrupt:
-+	 * - is on the primary GIC
-+	 * - has its handler_data set to a value
-+	 * - that isn't a secondary GIC
-+	 */
-+	if (primary_gic_irq(d) && d->handler_data && !cascading_gic_irq(d))
-+		return true;
-+
-+	return false;
-+}
-+
- /*
-  * Routines to acknowledge, disable and enable interrupts
-  */
-@@ -166,6 +194,18 @@ static int gic_peek_irq(struct irq_data *d, u32 offset)
- static void gic_mask_irq(struct irq_data *d)
- {
- 	gic_poke_irq(d, GIC_DIST_ENABLE_CLEAR);
-+	/*
-+	 * When masking a forwarded interrupt, make sure it is
-+	 * deactivated as well.
-+	 *
-+	 * This ensures that an interrupt that is getting
-+	 * disabled/masked will not get "stuck", because there is
-+	 * noone to deactivate it (guest is being terminated).
-+	 */
-+	if (static_key_true(&supports_deactivate)) {
-+		if (forwarded_irq(d))
-+			gic_poke_irq(d, GIC_DIST_ACTIVE_CLEAR);
-+	}
- }
- 
- static void gic_unmask_irq(struct irq_data *d)
-@@ -178,6 +218,10 @@ static void gic_eoi_irq(struct irq_data *d)
- 	u32 deact_offset = GIC_CPU_EOI;
- 
- 	if (static_key_true(&supports_deactivate)) {
-+		/* Do not deactivate an IRQ forwarded to a vcpu. */
-+		if (forwarded_irq(d))
-+			return;
-+
- 		if (primary_gic_irq(d))
- 			deact_offset = GIC_CPU_DEACTIVATE;
- 	}
-@@ -251,6 +295,19 @@ static int gic_set_type(struct irq_data *d, unsigned int type)
- 	return gic_configure_irq(gicirq, type, base, NULL);
- }
- 
-+static int gic_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu)
-+{
-+	/* Only interrupts on the primary GIC can be forwarded to a vcpu. */
-+	if (static_key_true(&supports_deactivate)) {
-+		if (primary_gic_irq(d) && !cascading_gic_irq(d)) {
-+			d->handler_data = vcpu;
-+			return 0;
-+		}
-+	}
-+
-+	return -EINVAL;
-+}
-+
- #ifdef CONFIG_SMP
- static int gic_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
- 			    bool force)
-@@ -346,6 +403,7 @@ static struct irq_chip gic_chip = {
- #endif
- 	.irq_get_irqchip_state	= gic_irq_get_irqchip_state,
- 	.irq_set_irqchip_state	= gic_irq_set_irqchip_state,
-+	.irq_set_vcpu_affinity	= gic_irq_set_vcpu_affinity,
- 	.flags			= IRQCHIP_SET_TYPE_MASKED,
- };
- 
--- 
-2.1.4
+Eric
+> 
+>>  
+>>  	return 0;
+>>  
+> 
+> 
+> 
