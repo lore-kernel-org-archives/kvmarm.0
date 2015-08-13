@@ -1,22 +1,22 @@
 From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
-Subject: [PATCH 04/14] arm64: Calculate size for idmap_pg_dir at compile time
-Date: Thu, 13 Aug 2015 12:33:54 +0100
-Message-ID: <1439465645-22584-5-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH 03/14] arm64: Introduce helpers for page table levels
+Date: Thu, 13 Aug 2015 12:33:53 +0100
+Message-ID: <1439465645-22584-4-git-send-email-suzuki.poulose@arm.com>
 References: <1439465645-22584-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 407BF5AE12
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 07:21:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F35605AE18
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 07:21:27 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 29aaWnMzRYUG for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id Z8MCkEGCfzZt for <kvmarm@lists.cs.columbia.edu>;
  Thu, 13 Aug 2015 07:21:27 -0400 (EDT)
 Received: from eu-smtp-delivery-143.mimecast.com
  (eu-smtp-delivery-143.mimecast.com [146.101.78.143])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 517095AE14
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D6D65AE12
  for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 07:21:27 -0400 (EDT)
 In-Reply-To: <1439465645-22584-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -34,10 +34,12 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
 
-Now that we can calculate the number of levels required for
-mapping a va width, reserve exact number of pages that would
-be required to cover the idmap. The idmap should be able to handle
-the maximum physical address size supported.
+Introduce helpers for finding the number of page table
+levels required for a given VA width, shift for a particular
+page table level.
+
+Convert the existing users to the new helpers. More users
+to follow.
 
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc: Mark Rutland <mark.rutland@arm.com>
@@ -45,47 +47,54 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will.deacon@arm.com>
 Signed-off-by: Suzuki K. Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/include/asm/boot.h           |    1 +
- arch/arm64/include/asm/kernel-pgtable.h |    7 +++++--
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/pgtable-hwdef.h |   15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/boot.h b/arch/arm64/include/asm/boot.h
-index 81151b6..678b63e 100644
---- a/arch/arm64/include/asm/boot.h
-+++ b/arch/arm64/include/asm/boot.h
-@@ -2,6 +2,7 @@
- #ifndef __ASM_BOOT_H
- #define __ASM_BOOT_H
+diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+index 24154b0..ce18389 100644
+--- a/arch/arm64/include/asm/pgtable-hwdef.h
++++ b/arch/arm64/include/asm/pgtable-hwdef.h
+@@ -16,13 +16,21 @@
+ #ifndef __ASM_PGTABLE_HWDEF_H
+ #define __ASM_PGTABLE_HWDEF_H
  
-+#include <asm/page.h>
- #include <asm/sizes.h>
++/*
++ * Number of page-table levels required to address 'va_bits' wide
++ * address, without section mapping
++ */
++#define ARM64_HW_PGTABLE_LEVELS(va_bits) (((va_bits) - 4) / (PAGE_SHIFT - 3))
++#define ARM64_HW_PGTABLE_LEVEL_SHIFT(level) \
++		((PAGE_SHIFT - 3) * (level) + 3)
++
+ #define PTRS_PER_PTE		(1 << (PAGE_SHIFT - 3))
  
  /*
-diff --git a/arch/arm64/include/asm/kernel-pgtable.h b/arch/arm64/include/asm/kernel-pgtable.h
-index 5876a36..def7168 100644
---- a/arch/arm64/include/asm/kernel-pgtable.h
-+++ b/arch/arm64/include/asm/kernel-pgtable.h
-@@ -33,16 +33,19 @@
-  * map to pte level. The swapper also maps the FDT (see __create_page_tables
-  * for more information). Note that the number of ID map translation levels
-  * could be increased on the fly if system RAM is out of reach for the default
-- * VA range, so 3 pages are reserved in all cases.
-+ * VA range, so pages required to map highest possible PA are reserved in all
-+ * cases.
+  * PMD_SHIFT determines the size a level 2 page table entry can map.
   */
- #if ARM64_SWAPPER_USES_SECTION_MAPS
- #define SWAPPER_PGTABLE_LEVELS	(CONFIG_PGTABLE_LEVELS - 1)
-+#define IDMAP_PGTABLE_LEVELS	(ARM64_HW_PGTABLE_LEVELS(PHYS_MASK_SHIFT) - 1)
- #else
- #define SWAPPER_PGTABLE_LEVELS	(CONFIG_PGTABLE_LEVELS)
-+#define IDMAP_PGTABLE_LEVELS	(ARM64_HW_PGTABLE_LEVELS(PHYS_MASK_SHIFT))
- #endif
- 
- #define SWAPPER_DIR_SIZE	(SWAPPER_PGTABLE_LEVELS * PAGE_SIZE)
--#define IDMAP_DIR_SIZE		(3 * PAGE_SIZE)
-+#define IDMAP_DIR_SIZE		(IDMAP_PGTABLE_LEVELS * PAGE_SIZE)
- 
- /* Initial memory map size */
- #if ARM64_SWAPPER_USES_SECTION_MAPS
+ #if CONFIG_PGTABLE_LEVELS > 2
+-#define PMD_SHIFT		((PAGE_SHIFT - 3) * 2 + 3)
++#define PMD_SHIFT		ARM64_HW_PGTABLE_LEVEL_SHIFT(2)
+ #define PMD_SIZE		(_AC(1, UL) << PMD_SHIFT)
+ #define PMD_MASK		(~(PMD_SIZE-1))
+ #define PTRS_PER_PMD		PTRS_PER_PTE
+@@ -32,7 +40,7 @@
+  * PUD_SHIFT determines the size a level 1 page table entry can map.
+  */
+ #if CONFIG_PGTABLE_LEVELS > 3
+-#define PUD_SHIFT		((PAGE_SHIFT - 3) * 3 + 3)
++#define PUD_SHIFT		ARM64_HW_PGTABLE_LEVEL_SHIFT(3)
+ #define PUD_SIZE		(_AC(1, UL) << PUD_SHIFT)
+ #define PUD_MASK		(~(PUD_SIZE-1))
+ #define PTRS_PER_PUD		PTRS_PER_PTE
+@@ -42,7 +50,8 @@
+  * PGDIR_SHIFT determines the size a top-level page table entry can map
+  * (depending on the configuration, this level can be 0, 1 or 2).
+  */
+-#define PGDIR_SHIFT		((PAGE_SHIFT - 3) * CONFIG_PGTABLE_LEVELS + 3)
++#define PGDIR_SHIFT	\
++		ARM64_HW_PGTABLE_LEVEL_SHIFT(CONFIG_PGTABLE_LEVELS)
+ #define PGDIR_SIZE		(_AC(1, UL) << PGDIR_SHIFT)
+ #define PGDIR_MASK		(~(PGDIR_SIZE-1))
+ #define PTRS_PER_PGD		(1 << (VA_BITS - PGDIR_SHIFT))
 -- 
 1.7.9.5
