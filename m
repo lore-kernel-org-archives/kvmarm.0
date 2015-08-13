@@ -1,23 +1,24 @@
 From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
-Subject: [PATCH 03/14] arm64: Introduce helpers for page table levels
-Date: Thu, 13 Aug 2015 12:33:53 +0100
-Message-ID: <1439465645-22584-4-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH 07/14] arm64: Kconfig: Fix help text about AArch32 support
+ with 64K pages
+Date: Thu, 13 Aug 2015 12:33:57 +0100
+Message-ID: <1439465645-22584-8-git-send-email-suzuki.poulose@arm.com>
 References: <1439465645-22584-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F35605AE18
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 07:21:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5ED155AE40
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 07:21:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Z8MCkEGCfzZt for <kvmarm@lists.cs.columbia.edu>;
- Thu, 13 Aug 2015 07:21:27 -0400 (EDT)
+ with ESMTP id 7MN+DZiJCiIT for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 13 Aug 2015 07:21:28 -0400 (EDT)
 Received: from eu-smtp-delivery-143.mimecast.com
  (eu-smtp-delivery-143.mimecast.com [146.101.78.143])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D6D65AE12
- for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 07:21:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92E2E5AE17
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 07:21:28 -0400 (EDT)
 In-Reply-To: <1439465645-22584-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,72 +30,36 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
 
-Introduce helpers for finding the number of page table
-levels required for a given VA width, shift for a particular
-page table level.
+Update the help text for ARM64_64K_PAGES to reflect the reality
+about AArch32 support.
 
-Convert the existing users to the new helpers. More users
-to follow.
-
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc: Mark Rutland <mark.rutland@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will.deacon@arm.com>
 Signed-off-by: Suzuki K. Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/include/asm/pgtable-hwdef.h |   15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ arch/arm64/Kconfig |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-index 24154b0..ce18389 100644
---- a/arch/arm64/include/asm/pgtable-hwdef.h
-+++ b/arch/arm64/include/asm/pgtable-hwdef.h
-@@ -16,13 +16,21 @@
- #ifndef __ASM_PGTABLE_HWDEF_H
- #define __ASM_PGTABLE_HWDEF_H
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index d1fb2a3..b247897 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -449,8 +449,8 @@ config ARM64_64K_PAGES
+ 	help
+ 	  This feature enables 64KB pages support (4KB by default)
+ 	  allowing only two levels of page tables and faster TLB
+-	  look-up. AArch32 emulation is not available when this feature
+-	  is enabled.
++	  look-up. AArch32 emulation requires applications compiled
++	  with 64K aligned segments.
  
-+/*
-+ * Number of page-table levels required to address 'va_bits' wide
-+ * address, without section mapping
-+ */
-+#define ARM64_HW_PGTABLE_LEVELS(va_bits) (((va_bits) - 4) / (PAGE_SHIFT - 3))
-+#define ARM64_HW_PGTABLE_LEVEL_SHIFT(level) \
-+		((PAGE_SHIFT - 3) * (level) + 3)
-+
- #define PTRS_PER_PTE		(1 << (PAGE_SHIFT - 3))
+ endchoice
  
- /*
-  * PMD_SHIFT determines the size a level 2 page table entry can map.
-  */
- #if CONFIG_PGTABLE_LEVELS > 2
--#define PMD_SHIFT		((PAGE_SHIFT - 3) * 2 + 3)
-+#define PMD_SHIFT		ARM64_HW_PGTABLE_LEVEL_SHIFT(2)
- #define PMD_SIZE		(_AC(1, UL) << PMD_SHIFT)
- #define PMD_MASK		(~(PMD_SIZE-1))
- #define PTRS_PER_PMD		PTRS_PER_PTE
-@@ -32,7 +40,7 @@
-  * PUD_SHIFT determines the size a level 1 page table entry can map.
-  */
- #if CONFIG_PGTABLE_LEVELS > 3
--#define PUD_SHIFT		((PAGE_SHIFT - 3) * 3 + 3)
-+#define PUD_SHIFT		ARM64_HW_PGTABLE_LEVEL_SHIFT(3)
- #define PUD_SIZE		(_AC(1, UL) << PUD_SHIFT)
- #define PUD_MASK		(~(PUD_SIZE-1))
- #define PTRS_PER_PUD		PTRS_PER_PTE
-@@ -42,7 +50,8 @@
-  * PGDIR_SHIFT determines the size a top-level page table entry can map
-  * (depending on the configuration, this level can be 0, 1 or 2).
-  */
--#define PGDIR_SHIFT		((PAGE_SHIFT - 3) * CONFIG_PGTABLE_LEVELS + 3)
-+#define PGDIR_SHIFT	\
-+		ARM64_HW_PGTABLE_LEVEL_SHIFT(CONFIG_PGTABLE_LEVELS)
- #define PGDIR_SIZE		(_AC(1, UL) << PGDIR_SHIFT)
- #define PGDIR_MASK		(~(PGDIR_SIZE-1))
- #define PTRS_PER_PGD		(1 << (VA_BITS - PGDIR_SHIFT))
 -- 
 1.7.9.5
