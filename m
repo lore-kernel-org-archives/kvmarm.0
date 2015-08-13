@@ -1,24 +1,23 @@
-From: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v5 5/5] KVM: eventfd: add irq bypass consumer management
-Date: Wed, 12 Aug 2015 13:05:07 -0600
-Message-ID: <1439406307.4023.532.camel@redhat.com>
-References: <1439213467-13668-1-git-send-email-eric.auger@linaro.org>
- <1439213467-13668-6-git-send-email-eric.auger@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH v2 1/4] irqchip: GICv3: Convert to EOImode == 1
+Date: Thu, 13 Aug 2015 09:28:43 +0100
+Message-ID: <1439454526-1185-2-git-send-email-marc.zyngier@arm.com>
+References: <1439454526-1185-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F17B5A4AD
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Aug 2015 14:52:08 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 887CB5AD6A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 04:15:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jg4lv7qUjego for <kvmarm@lists.cs.columbia.edu>;
- Wed, 12 Aug 2015 14:52:03 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BAD255A3DF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 12 Aug 2015 14:52:03 -0400 (EDT)
-In-Reply-To: <1439213467-13668-6-git-send-email-eric.auger@linaro.org>
+ with ESMTP id kdC0OQgW41CT for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 13 Aug 2015 04:15:58 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D31F5AD86
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 13 Aug 2015 04:15:58 -0400 (EDT)
+In-Reply-To: <1439454526-1185-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,94 +27,158 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>
-Cc: feng.wu@intel.com, kvm@vger.kernel.org, patches@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, eric.auger@st.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Jiang Liu <jiang.liu@linux.intel.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, 2015-08-10 at 15:31 +0200, Eric Auger wrote:
-> This patch adds the registration/unregistration of an
-> irq_bypass_consumer on irqfd assignment/deassignment.
-> 
-> Signed-off-by: Eric Auger <eric.auger@linaro.org>
-> Signed-off-by: Feng Wu <feng.wu@intel.com>
-> 
-> ---
-> 
-> v4 -> v5:
-> - due to removal of static inline stubs, add
->   #ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
->   around consumer registration/unregistration
-> - add pr_info when registration fails
-> 
-> v2 -> v3 (Feng Wu):
-> - Use kvm_arch_irq_bypass_start
-> - Remove kvm_arch_irq_bypass_update
-> - Add member 'struct irq_bypass_producer *producer' in
->   'struct kvm_kernel_irqfd', it is needed by posted interrupt.
-> - Remove 'irq_bypass_unregister_consumer' in kvm_irqfd_deassign()
-> 
-> v1 -> v2:
-> - populate of kvm and gsi removed
-> - unregister the consumer on irqfd_shutdown
-> ---
->  include/linux/kvm_irqfd.h |  2 ++
->  virt/kvm/eventfd.c        | 15 +++++++++++++++
->  2 files changed, 17 insertions(+)
-> 
-> diff --git a/include/linux/kvm_irqfd.h b/include/linux/kvm_irqfd.h
-> index f926b39..0c1de05 100644
-> --- a/include/linux/kvm_irqfd.h
-> +++ b/include/linux/kvm_irqfd.h
-> @@ -64,6 +64,8 @@ struct kvm_kernel_irqfd {
->  	struct list_head list;
->  	poll_table pt;
->  	struct work_struct shutdown;
-> +	struct irq_bypass_consumer consumer;
-> +	struct irq_bypass_producer *producer;
->  };
->  
->  #endif /* __LINUX_KVM_IRQFD_H */
-> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-> index 647ffb8..d7a230f 100644
-> --- a/virt/kvm/eventfd.c
-> +++ b/virt/kvm/eventfd.c
-> @@ -35,6 +35,7 @@
->  #include <linux/srcu.h>
->  #include <linux/slab.h>
->  #include <linux/seqlock.h>
-> +#include <linux/irqbypass.h>
->  #include <trace/events/kvm.h>
->  
->  #include <kvm/iodev.h>
-> @@ -140,6 +141,9 @@ irqfd_shutdown(struct work_struct *work)
->  	/*
->  	 * It is now safe to release the object's resources
->  	 */
-> +#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
-> +	irq_bypass_unregister_consumer(&irqfd->consumer);
-> +#endif
->  	eventfd_ctx_put(irqfd->eventfd);
->  	kfree(irqfd);
->  }
-> @@ -379,6 +383,17 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
->  	 * we might race against the POLLHUP
->  	 */
->  	fdput(f);
-> +#ifdef CONFIG_HAVE_KVM_IRQ_BYPASS
-> +	irqfd->consumer.token = (void *)irqfd->eventfd;
-> +	irqfd->consumer.add_producer = kvm_arch_irq_bypass_add_producer;
-> +	irqfd->consumer.del_producer = kvm_arch_irq_bypass_del_producer;
-> +	irqfd->consumer.stop = kvm_arch_irq_bypass_stop;
-> +	irqfd->consumer.start = kvm_arch_irq_bypass_start;
-> +	ret = irq_bypass_register_consumer(&irqfd->consumer);
-> +	if (ret)
-> +		pr_info("irq bypass consumer (token %p) registration fails: %d\n",
-> +				irqfd->consumer.token, ret);
-> +#endif
+So far, GICv3 has been used in with EOImode == 0. The effect of this
+mode is to perform the priority drop and the deactivation of the
+interrupt at the same time.
 
-Does this series compile on its own?  Aren't all these arch function
-unresolved?
+While this works perfectly for Linux (we only have a single priority),
+it causes issues when an interrupt is forwarded to a guest, and when
+we want the guest to perform the EOI itself.
 
->  
->  	return 0;
->  
+For this case, the GIC architecture provides EOImode == 1, where:
+- A write to ICC_EOIR1_EL1 drops the priority of the interrupt and leaves
+it active. Other interrupts at the same priority level can now be taken,
+but the active interrupt cannot be taken again
+- A write to ICC_DIR_EL1 marks the interrupt as inactive, meaning it can
+now be taken again.
+
+This patch converts the driver to be able to use this new mode, depending
+on whether or not the kernel can behave as a hypervisor. No feature change.
+
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ drivers/irqchip/irq-gic-v3.c       | 37 +++++++++++++++++++++++++++++++++----
+ include/linux/irqchip/arm-gic-v3.h |  9 +++++++++
+ 2 files changed, 42 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+index c52f7ba..61190fb 100644
+--- a/drivers/irqchip/irq-gic-v3.c
++++ b/drivers/irqchip/irq-gic-v3.c
+@@ -30,6 +30,7 @@
+ #include <asm/cputype.h>
+ #include <asm/exception.h>
+ #include <asm/smp_plat.h>
++#include <asm/virt.h>
+ 
+ #include "irq-gic-common.h"
+ #include "irqchip.h"
+@@ -50,6 +51,7 @@ struct gic_chip_data {
+ };
+ 
+ static struct gic_chip_data gic_data __read_mostly;
++static struct static_key supports_deactivate = STATIC_KEY_INIT_TRUE;
+ 
+ #define gic_data_rdist()		(this_cpu_ptr(gic_data.rdists.rdist))
+ #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+@@ -293,7 +295,14 @@ static int gic_irq_get_irqchip_state(struct irq_data *d,
+ 
+ static void gic_eoi_irq(struct irq_data *d)
+ {
+-	gic_write_eoir(gic_irq(d));
++	if (static_key_true(&supports_deactivate)) {
++		/* No need to deactivate an LPI */
++		if (gic_irq(d) >= 8192)
++			return;
++		gic_write_dir(gic_irq(d));
++	} else {
++		gic_write_eoir(gic_irq(d));
++	}
+ }
+ 
+ static int gic_set_type(struct irq_data *d, unsigned int type)
+@@ -343,15 +352,24 @@ static asmlinkage void __exception_irq_entry gic_handle_irq(struct pt_regs *regs
+ 
+ 		if (likely(irqnr > 15 && irqnr < 1020) || irqnr >= 8192) {
+ 			int err;
++
++			if (static_key_true(&supports_deactivate))
++				gic_write_eoir(irqnr);
++
+ 			err = handle_domain_irq(gic_data.domain, irqnr, regs);
+ 			if (err) {
+ 				WARN_ONCE(true, "Unexpected interrupt received!\n");
+-				gic_write_eoir(irqnr);
++				if (static_key_true(&supports_deactivate))
++					gic_write_dir(irqnr);
++				else
++					gic_write_eoir(irqnr);
+ 			}
+ 			continue;
+ 		}
+ 		if (irqnr < 16) {
+ 			gic_write_eoir(irqnr);
++			if (static_key_true(&supports_deactivate))
++				gic_write_dir(irqnr);
+ #ifdef CONFIG_SMP
+ 			handle_IPI(irqnr, regs);
+ #else
+@@ -451,8 +469,13 @@ static void gic_cpu_sys_reg_init(void)
+ 	/* Set priority mask register */
+ 	gic_write_pmr(DEFAULT_PMR_VALUE);
+ 
+-	/* EOI deactivates interrupt too (mode 0) */
+-	gic_write_ctlr(ICC_CTLR_EL1_EOImode_drop_dir);
++	if (static_key_true(&supports_deactivate)) {
++		/* EOI drops priority only (mode 1) */
++		gic_write_ctlr(ICC_CTLR_EL1_EOImode_drop);
++	} else {
++		/* EOI deactivates interrupt too (mode 0) */
++		gic_write_ctlr(ICC_CTLR_EL1_EOImode_drop_dir);
++	}
+ 
+ 	/* ... and let's hit the road... */
+ 	gic_write_grpen1(1);
+@@ -820,6 +843,12 @@ static int __init gic_of_init(struct device_node *node, struct device_node *pare
+ 	if (of_property_read_u64(node, "redistributor-stride", &redist_stride))
+ 		redist_stride = 0;
+ 
++	if (!is_hyp_mode_available())
++		static_key_slow_dec(&supports_deactivate);
++
++	if (static_key_true(&supports_deactivate))
++		pr_info("GIC: Using split EOI/Deactivate mode\n");
++
+ 	gic_data.dist_base = dist_base;
+ 	gic_data.redist_regions = rdist_regs;
+ 	gic_data.nr_redist_regions = nr_redist_regions;
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index ffbc034..bc98832 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -104,6 +104,8 @@
+ #define GICR_SYNCR			0x00C0
+ #define GICR_MOVLPIR			0x0100
+ #define GICR_MOVALLR			0x0110
++#define GICR_ISACTIVER			GICD_ISACTIVER
++#define GICR_ICACTIVER			GICD_ICACTIVER
+ #define GICR_IDREGS			GICD_IDREGS
+ #define GICR_PIDR2			GICD_PIDR2
+ 
+@@ -288,6 +290,7 @@
+ #define ICH_VMCR_PMR_MASK		(0xffUL << ICH_VMCR_PMR_SHIFT)
+ 
+ #define ICC_EOIR1_EL1			sys_reg(3, 0, 12, 12, 1)
++#define ICC_DIR_EL1			sys_reg(3, 0, 12, 11, 1)
+ #define ICC_IAR1_EL1			sys_reg(3, 0, 12, 12, 0)
+ #define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
+ #define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
+@@ -384,6 +387,12 @@ static inline void gic_write_eoir(u64 irq)
+ 	isb();
+ }
+ 
++static inline void gic_write_dir(u64 irq)
++{
++	asm volatile("msr_s " __stringify(ICC_DIR_EL1) ", %0" : : "r" (irq));
++	isb();
++}
++
+ struct irq_domain;
+ int its_cpu_init(void);
+ int its_init(struct device_node *node, struct rdists *rdists,
+-- 
+2.1.4
