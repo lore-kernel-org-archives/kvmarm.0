@@ -1,333 +1,80 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v2 11/15] KVM: arm64: handle pending bit for LPIs in ITS
- emulation
-Date: Fri, 14 Aug 2015 13:58:37 +0200
-Message-ID: <55CDD7ED.90008@linaro.org>
-References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com> <1436538111-4294-12-git-send-email-andre.przywara@arm.com>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH v3 2/3] Detect vGIC presence at runtime
+Date: Fri, 14 Aug 2015 15:26:56 +0300
+Message-ID: <017201d0d68c$82ae4950$880adbf0$@samsung.com>
+References: <cover.1438770954.git.p.fedin@samsung.com>
+ <cad42f98c38c042430da47bf69ac2db81cb957af.1438770954.git.p.fedin@samsung.com>
+ <55CDD056.8010703@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1436538111-4294-12-git-send-email-andre.przywara@arm.com>
+In-reply-to: <55CDD056.8010703@arm.com>
+Content-language: ru
 Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, marc.zyngier@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu
-Cc: Pavel Fedin <p.fedin@samsung.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+To: 'Marc Zyngier' <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: 'Christoffer Dall' <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/10/2015 04:21 PM, Andre Przywara wrote:
-> As the actual LPI number in a guest can be quite high, but is mostly
-> assigned using a very sparse allocation scheme, bitmaps and arrays
-> for storing the virtual interrupt status are a waste of memory.
-> We use our equivalent of the "Interrupt Translation Table Entry"
-> (ITTE) to hold this extra status information for a virtual LPI.
-> As the normal VGIC code cannot use it's fancy bitmaps to manage
-> pending interrupts, we provide a hook in the VGIC code to let the
-> ITS emulation handle the list register queueing itself.
-> LPIs are located in a separate number range (>=8192), so
-> distinguishing them is easy. With LPIs being only edge-triggered, we
-> get away with a less complex IRQ handling.
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  include/kvm/arm_vgic.h      |  2 ++
->  virt/kvm/arm/its-emul.c     | 71 ++++++++++++++++++++++++++++++++++++++++++++
->  virt/kvm/arm/its-emul.h     |  3 ++
->  virt/kvm/arm/vgic-v3-emul.c |  2 ++
->  virt/kvm/arm/vgic.c         | 72 ++++++++++++++++++++++++++++++++++-----------
->  5 files changed, 133 insertions(+), 17 deletions(-)
-> 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 1648668..2a67a10 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -147,6 +147,8 @@ struct vgic_vm_ops {
->  	int	(*init_model)(struct kvm *);
->  	void	(*destroy_model)(struct kvm *);
->  	int	(*map_resources)(struct kvm *, const struct vgic_params *);
-> +	bool	(*queue_lpis)(struct kvm_vcpu *);
-> +	void	(*unqueue_lpi)(struct kvm_vcpu *, int irq);
->  };
->  
->  struct vgic_io_device {
-> diff --git a/virt/kvm/arm/its-emul.c b/virt/kvm/arm/its-emul.c
-> index 7f217fa..b9c40d7 100644
-> --- a/virt/kvm/arm/its-emul.c
-> +++ b/virt/kvm/arm/its-emul.c
-> @@ -50,8 +50,26 @@ struct its_itte {
->  	struct its_collection *collection;
->  	u32 lpi;
->  	u32 event_id;
-> +	bool enabled;
-> +	unsigned long *pending;
->  };
->  
-> +#define for_each_lpi(dev, itte, kvm) \
-> +	list_for_each_entry(dev, &(kvm)->arch.vgic.its.device_list, dev_list) \
-> +		list_for_each_entry(itte, &(dev)->itt, itte_list)
-> +
-You have a checkpatch error here:
+ Hello! Thank you for quick response.
 
-ERROR: Macros with complex values should be enclosed in parentheses
-#52: FILE: virt/kvm/arm/its-emul.c:57:
-+#define for_each_lpi(dev, itte, kvm) \
-+	list_for_each_entry(dev, &(kvm)->arch.vgic.its.device_list, dev_list) \
-+		list_for_each_entry(itte, &(dev)->itt, itte_list)
+> This is fairly unreadable. Please use a switch statement instead.
 
-> +static struct its_itte *find_itte_by_lpi(struct kvm *kvm, int lpi)
-> +{
-can't we have the same LPI present in different interrupt translation
-tables? I don't know it is a sensible setting but I did not succeed in
-finding it was not possible.
-> +	struct its_device *device;
-> +	struct its_itte *itte;
-> +
-> +	for_each_lpi(device, itte, kvm) {
-> +		if (itte->lpi == lpi)
-> +			return itte;
-> +	}
-> +	return NULL;
-> +}
-> +
->  #define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
->  
->  /* The distributor lock is held by the VGIC MMIO handler. */
-> @@ -145,6 +163,59 @@ static bool handle_mmio_gits_idregs(struct kvm_vcpu *vcpu,
->  	return false;
->  }
->  
-> +/*
-> + * Find all enabled and pending LPIs and queue them into the list
-> + * registers.
-> + * The dist lock is held by the caller.
-> + */
-> +bool vits_queue_lpis(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vgic_its *its = &vcpu->kvm->arch.vgic.its;
-> +	struct its_device *device;
-> +	struct its_itte *itte;
-> +	bool ret = true;
-> +
-> +	if (!vgic_has_its(vcpu->kvm))
-> +		return true;
-> +	if (!its->enabled || !vcpu->kvm->arch.vgic.lpis_enabled)
-> +		return true;
-> +
-> +	spin_lock(&its->lock);
-> +	for_each_lpi(device, itte, vcpu->kvm) {
-> +		if (!itte->enabled || !test_bit(vcpu->vcpu_id, itte->pending))
-> +			continue;
-> +
-> +		if (!itte->collection)
-> +			continue;
-> +
-> +		if (itte->collection->target_addr != vcpu->vcpu_id)
-> +			continue;
-> +
-> +		__clear_bit(vcpu->vcpu_id, itte->pending);
-> +
-> +		ret &= vgic_queue_irq(vcpu, 0, itte->lpi);
-what if the vgic_queue_irq fails since no LR can be found, the
-itte->pending was cleared so we forget that LPI? shouldn't we restore
-the pending state in ITT? in vgic_queue_hwirq the state change only is
-performed if the vgic_queue_irq succeeds
-> +	}
-> +
-> +	spin_unlock(&its->lock);
-> +	return ret;
-> +}
-> +
-> +/* Called with the distributor lock held by the caller. */
-> +void vits_unqueue_lpi(struct kvm_vcpu *vcpu, int lpi)
-I was a bit confused by the name of the function, with regard to
-existing vgic_unqueue_irqs which restores the states in accordance to
-what we have in LR. Wouldn't it make sense to call it
-vits_lpi_set_pending(vcpu, lpi) or something that looks more similar to
-vgic_dist_irq_set_pending setter which I think it mirrors.
+ Christoffer disliked it in v1, so i thought a bit and changed it. Ok, will change it back.
 
-> +{
-> +	struct vgic_its *its = &vcpu->kvm->arch.vgic.its;
-> +	struct its_itte *itte;
-> +
-> +	spin_lock(&its->lock);
-> +
-> +	/* Find the right ITTE and put the pending state back in there */
-> +	itte = find_itte_by_lpi(vcpu->kvm, lpi);
-> +	if (itte)
-> +		__set_bit(vcpu->vcpu_id, itte->pending);
-> +
-> +	spin_unlock(&its->lock);
-> +}
-> +
->  static int vits_handle_command(struct kvm_vcpu *vcpu, u64 *its_cmd)
->  {
->  	return -ENODEV;
-> diff --git a/virt/kvm/arm/its-emul.h b/virt/kvm/arm/its-emul.h
-> index 472a6d0..cc5d5ff 100644
-> --- a/virt/kvm/arm/its-emul.h
-> +++ b/virt/kvm/arm/its-emul.h
-> @@ -33,4 +33,7 @@ void vgic_enable_lpis(struct kvm_vcpu *vcpu);
->  int vits_init(struct kvm *kvm);
->  void vits_destroy(struct kvm *kvm);
->  
-> +bool vits_queue_lpis(struct kvm_vcpu *vcpu);
-> +void vits_unqueue_lpi(struct kvm_vcpu *vcpu, int irq);
-> +
->  #endif
-> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
-> index 49be3c3..4132c26 100644
-> --- a/virt/kvm/arm/vgic-v3-emul.c
-> +++ b/virt/kvm/arm/vgic-v3-emul.c
-> @@ -948,6 +948,8 @@ void vgic_v3_init_emulation(struct kvm *kvm)
->  	dist->vm_ops.init_model = vgic_v3_init_model;
->  	dist->vm_ops.destroy_model = vgic_v3_destroy_model;
->  	dist->vm_ops.map_resources = vgic_v3_map_resources;
-> +	dist->vm_ops.queue_lpis = vits_queue_lpis;
-> +	dist->vm_ops.unqueue_lpi = vits_unqueue_lpi;
->  
->  	dist->vgic_dist_base = VGIC_ADDR_UNDEF;
->  	dist->vgic_redist_base = VGIC_ADDR_UNDEF;
-> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> index 49ee92b..9dfd094 100644
-> --- a/virt/kvm/arm/vgic.c
-> +++ b/virt/kvm/arm/vgic.c
-> @@ -95,6 +95,20 @@ static bool queue_sgi(struct kvm_vcpu *vcpu, int irq)
->  	return vcpu->kvm->arch.vgic.vm_ops.queue_sgi(vcpu, irq);
->  }
->  
-> +static bool vgic_queue_lpis(struct kvm_vcpu *vcpu)
-> +{
-> +	if (vcpu->kvm->arch.vgic.vm_ops.queue_lpis)
-> +		return vcpu->kvm->arch.vgic.vm_ops.queue_lpis(vcpu);
-> +	else
-> +		return true;
-> +}
-> +
-> +static void vgic_unqueue_lpi(struct kvm_vcpu *vcpu, int irq)
-> +{
-> +	if (vcpu->kvm->arch.vgic.vm_ops.unqueue_lpi)
-> +		vcpu->kvm->arch.vgic.vm_ops.unqueue_lpi(vcpu, irq);
-> +}
-> +
->  int kvm_vgic_map_resources(struct kvm *kvm)
->  {
->  	return kvm->arch.vgic.vm_ops.map_resources(kvm, vgic);
-> @@ -1135,6 +1149,10 @@ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu)
->  	for_each_clear_bit(lr, elrsr_ptr, vgic->nr_lr) {
->  		vlr = vgic_get_lr(vcpu, lr);
->  
-> +		/* We don't care about LPIs here */
-> +		if (vlr.irq >= 8192)
-> +			continue;
-> +
->  		if (!vgic_irq_is_enabled(vcpu, vlr.irq)) {
->  			vlr.state = 0;
->  			vgic_set_lr(vcpu, lr, vlr);
-> @@ -1147,25 +1165,33 @@ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu)
->  static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
->  				 int lr_nr, int sgi_source_id)
->  {
-> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->  	struct vgic_lr vlr;
->  
->  	vlr.state = 0;
->  	vlr.irq = irq;
->  	vlr.source = sgi_source_id;
->  
-> -	if (vgic_irq_is_active(vcpu, irq)) {
-> -		vlr.state |= LR_STATE_ACTIVE;
-> -		kvm_debug("Set active, clear distributor: 0x%x\n", vlr.state);
-> -		vgic_irq_clear_active(vcpu, irq);
-> -		vgic_update_state(vcpu->kvm);
-> -	} else if (vgic_dist_irq_is_pending(vcpu, irq)) {
-> -		vlr.state |= LR_STATE_PENDING;
-> -		kvm_debug("Set pending: 0x%x\n", vlr.state);
-> -	}
-> -
-> -	if (!vgic_irq_is_edge(vcpu, irq))
-> -		vlr.state |= LR_EOI_INT;
-> +	/* We care only about state for SGIs/PPIs/SPIs, not for LPIs */
-> +	if (irq < dist->nr_irqs) {
-> +		if (vgic_irq_is_active(vcpu, irq)) {
-> +			vlr.state |= LR_STATE_ACTIVE;
-> +			kvm_debug("Set active, clear distributor: 0x%x\n",
-> +				  vlr.state);
-> +			vgic_irq_clear_active(vcpu, irq);
-> +			vgic_update_state(vcpu->kvm);
-> +		} else if (vgic_dist_irq_is_pending(vcpu, irq)) {
-> +			vlr.state |= LR_STATE_PENDING;
-> +			kvm_debug("Set pending: 0x%x\n", vlr.state);
-> +		}
->  
-> +		if (!vgic_irq_is_edge(vcpu, irq))
-> +			vlr.state |= LR_EOI_INT;
-> +	} else {
-> +		/* If this is an LPI, it can only be pending */
-> +		if (irq >= 8192)
-> +			vlr.state |= LR_STATE_PENDING;
-> +	}
->  	vgic_set_lr(vcpu, lr_nr, vlr);
->  	vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
->  }
-> @@ -1177,7 +1203,6 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
->   */
->  bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq)
->  {
-> -	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->  	u64 elrsr = vgic_get_elrsr(vcpu);
->  	unsigned long *elrsr_ptr = u64_to_bitmask(&elrsr);
->  	int lr;
-> @@ -1185,7 +1210,6 @@ bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq)
->  	/* Sanitize the input... */
->  	BUG_ON(sgi_source_id & ~7);
->  	BUG_ON(sgi_source_id && irq >= VGIC_NR_SGIS);
-> -	BUG_ON(irq >= dist->nr_irqs);
-Is it safe to remove that check. What if it is attempted to inject an
-SPI larger than supported. I think you should refine the check but not
-remove it.
->  
->  	kvm_debug("Queue IRQ%d\n", irq);
->  
-> @@ -1265,8 +1289,12 @@ static void __kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
->  			overflow = 1;
->  	}
->  
-> -
-> -
-> +	/*
-> +	 * LPIs are not mapped in our bitmaps, so we leave the iteration
-> +	 * to the ITS emulation code.
-> +	 */
-> +	if (!vgic_queue_lpis(vcpu))
-> +		overflow = 1;
->  
->  epilog:
->  	if (overflow) {
-> @@ -1387,6 +1415,16 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
->  	for_each_clear_bit(lr_nr, elrsr_ptr, vgic_cpu->nr_lr) {
->  		vlr = vgic_get_lr(vcpu, lr_nr);
->  
-> +		/* LPIs are handled separately */
-> +		if (vlr.irq >= 8192) {
-> +			/* We just need to take care about still pending LPIs */
-> +			if (vlr.state & LR_STATE_PENDING) {
-> +				vgic_unqueue_lpi(vcpu, vlr.irq);
-> +				pending = true;
-> +			}
-> +			continue;
-don't we need to reset the LR & update elrsr?
-> +		}
-> +
->  		BUG_ON(!(vlr.state & LR_STATE_MASK));
->  		pending = true;
->  
-> @@ -1411,7 +1449,7 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
->  	}
->  	vgic_update_state(vcpu->kvm);
->  
-> -	/* vgic_update_state would not cover only-active IRQs */
-> +	/* vgic_update_state would not cover only-active IRQs or LPIs */
->  	if (pending)
->  		set_bit(vcpu->vcpu_id, dist->irq_pending_on_cpu);
->  }
-> 
+> And here, we're going to assume that the arch timer still usable. We
+> definitely need a way to *prevent* the timer to be used when there is no
+> GIC. Otherwise, we're going to start trying to setup the mapping for the
+> active state, and the guest may start poking it.
+
+But, this seems to be already done, isn't it?
+According to http://lxr.free-electrons.com/source/arch/arm/kvm/arm.c#L439:
+--- cut ---
+459         /*
+460          * Enable the arch timers only if we have an in-kernel VGIC
+461          * and it has been properly initialized, since we cannot handle
+462          * interrupts from the virtual timer with a userspace gic.
+463          */
+464         if (irqchip_in_kernel(kvm) && vgic_initialized(kvm))
+465                 kvm_timer_enable(kvm);
+--- cut ---
+ 
+ Without kvm->arch.timer.enabled set to 1 by kvm_timer_enable() VM context save/restore code will
+not actually touch timer registers. Therefore the host part of the code will not do anything.
+ As to guest itself, only userspace can stop it from accessing timer registers. My experimental qemu
+does this by removing generic timer node from guest's device tree. Virtual timer access simply
+cannot be trapped, otherwise there would be no problem at all. But, OK, even if the guest programs
+timer, we will just see "Unexpected IRQ 27" on the console, and the guest will not work, so it's not
+terribly fatal.
+
+ You know, i actually looked at it before posting v3. I tried to omit kvm_timer_hyp_init() call too,
+and got lots of crashes because:
+1. kvm_timer_init() is called unconditionally
+2. qemu does some initialization of timer registers unconditionally using ioctl, and they end up in
+kvm_arm_timer_set_reg()
+ Both of these points end up in kvm_phys_timer_read() which dereferences timecounter == NULL.
+ Well, i could make kvm_phys_timer_read() just returning 0 in this case, but this could mis-trigger
+kvm_timer_should_fire() in some circumstances. I would have to patch it too... At this point i
+decided to stop because the result perhaps does not worth the effort and amount of patching.
+
+ While writing this message i was walking through this code once again, and... I have a suggestion.
+Actually, if we are really paranoid, we could be afraid of kvm_vgic_inject_irq() being called, which
+would do some weird things without vGIC. It is possible to add a check for kvm->arch.timer.enabled
+in kvm_timer_sync_hwstate() and kvm_timer_flush_hwstate(). If the timer is disabled those functions
+will simply return doing nothing. This would guarantee that interrupt injection is never attempted.
+
+ What do you think?
+
+ And some more. Actually, it is possible to emulate generic timer in userspace, just not the virtual
+one. IIRC access to physical timer can be trapped. So, if we modify guest's device tree by removing
+virtual timer IRQ, the guest will fall back to physical timer. And this will be caught by the
+hypervisor. After this all we have to do is to add corresponding exit code which would allow the
+userspace to emulate missing CP15 (or system in case of ARM64) registers. So, this timer issue is
+not grave, just i postpone implementing it until GIC issues are settled down.
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
+
 
