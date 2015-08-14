@@ -1,80 +1,247 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH v3 2/3] Detect vGIC presence at runtime
-Date: Fri, 14 Aug 2015 15:26:56 +0300
-Message-ID: <017201d0d68c$82ae4950$880adbf0$@samsung.com>
-References: <cover.1438770954.git.p.fedin@samsung.com>
- <cad42f98c38c042430da47bf69ac2db81cb957af.1438770954.git.p.fedin@samsung.com>
- <55CDD056.8010703@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v2 12/15] KVM: arm64: sync LPI configuration and pending
+ tables
+Date: Fri, 14 Aug 2015 14:35:50 +0200
+Message-ID: <55CDE0A6.5010906@linaro.org>
+References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com> <1436538111-4294-13-git-send-email-andre.przywara@arm.com> <55CDD7CB.9020103@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <55CDD056.8010703@arm.com>
-Content-language: ru
+In-Reply-To: <55CDD7CB.9020103@linaro.org>
 Sender: kvm-owner@vger.kernel.org
-To: 'Marc Zyngier' <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: 'Christoffer Dall' <christoffer.dall@linaro.org>
+To: Andre Przywara <andre.przywara@arm.com>, marc.zyngier@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu
+Cc: Pavel Fedin <p.fedin@samsung.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello! Thank you for quick response.
+On 08/14/2015 01:58 PM, Eric Auger wrote:
+> On 07/10/2015 04:21 PM, Andre Przywara wrote:
+>> The LPI configuration and pending tables of the GICv3 LPIs are held
+>> in tables in (guest) memory. To achieve reasonable performance, we
+>> cache this data in our own data structures, so we need to sync those
+>> two views from time to time. This behaviour is well described in the
+>> GICv3 spec and is also exercised by hardware, so the sync points are
+>> well known.
+>>
+>> Provide functions that read the guest memory and store the
+>> information from the configuration and pending tables in the kernel.
+>>
+>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> ---
+> would help to have change log between v1 -> v2 (valid for the whole series)
+>>  include/kvm/arm_vgic.h  |   2 +
+>>  virt/kvm/arm/its-emul.c | 124 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>  virt/kvm/arm/its-emul.h |   3 ++
+>>  3 files changed, 129 insertions(+)
+>>
+>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>> index 2a67a10..323c33a 100644
+>> --- a/include/kvm/arm_vgic.h
+>> +++ b/include/kvm/arm_vgic.h
+>> @@ -167,6 +167,8 @@ struct vgic_its {
+>>  	int			cwriter;
+>>  	struct list_head	device_list;
+>>  	struct list_head	collection_list;
+>> +	/* memory used for buffering guest's memory */
+>> +	void			*buffer_page;
+>>  };
+>>  
+>>  struct vgic_dist {
+>> diff --git a/virt/kvm/arm/its-emul.c b/virt/kvm/arm/its-emul.c
+>> index b9c40d7..05245cb 100644
+>> --- a/virt/kvm/arm/its-emul.c
+>> +++ b/virt/kvm/arm/its-emul.c
+>> @@ -50,6 +50,7 @@ struct its_itte {
+>>  	struct its_collection *collection;
+>>  	u32 lpi;
+>>  	u32 event_id;
+>> +	u8 priority;
+>>  	bool enabled;
+>>  	unsigned long *pending;
+>>  };
+>> @@ -70,8 +71,124 @@ static struct its_itte *find_itte_by_lpi(struct kvm *kvm, int lpi)
+>>  	return NULL;
+>>  }
+>>  
+>> +#define LPI_PROP_ENABLE_BIT(p)	((p) & LPI_PROP_ENABLED)
+>> +#define LPI_PROP_PRIORITY(p)	((p) & 0xfc)
+>> +
+>> +/* stores the priority and enable bit for a given LPI */
+>> +static void update_lpi_config(struct kvm *kvm, struct its_itte *itte, u8 prop)
+>> +{
+>> +	itte->priority = LPI_PROP_PRIORITY(prop);
+>> +	itte->enabled  = LPI_PROP_ENABLE_BIT(prop);
+>> +}
+>> +
+>> +#define GIC_LPI_OFFSET 8192
+>> +
+>> +/* We scan the table in chunks the size of the smallest page size */
+> 4kB chunks?
+>> +#define CHUNK_SIZE 4096U
+>> +
+>>  #define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
+>>  
+>> +static int nr_idbits_propbase(u64 propbaser)
+>> +{
+>> +	int nr_idbits = (1U << (propbaser & 0x1f)) + 1;
+>> +
+>> +	return max(nr_idbits, INTERRUPT_ID_BITS_ITS);
+>> +}
+>> +
+>> +/*
+>> + * Scan the whole LPI configuration table and put the LPI configuration
+>> + * data in our own data structures. This relies on the LPI being
+>> + * mapped before.
+>> + */
+>> +static bool its_update_lpis_configuration(struct kvm *kvm)
+>> +{
+>> +	struct vgic_dist *dist = &kvm->arch.vgic;
+>> +	u8 *prop = dist->its.buffer_page;
+>> +	u32 tsize;
+>> +	gpa_t propbase;
+>> +	int lpi = GIC_LPI_OFFSET;
+>> +	struct its_itte *itte;
+>> +	struct its_device *device;
+>> +	int ret;
+>> +
+>> +	propbase = BASER_BASE_ADDRESS(dist->propbaser);
+>> +	tsize = nr_idbits_propbase(dist->propbaser);
+>> +
+>> +	while (tsize > 0) {
+>> +		int chunksize = min(tsize, CHUNK_SIZE);
+>> +
+>> +		ret = kvm_read_guest(kvm, propbase, prop, chunksize);
+> I think you still have the spin_lock issue  since if my understanding is
+> correct this is called from
+> vgic_handle_mmio_access/vcall_range_handler/gic_enable_lpis
+> where vgic_handle_mmio_access. Or does it take another path?
+> 
+> Shouldn't we create a new kvm_io_device to avoid holding the dist lock?
 
-> This is fairly unreadable. Please use a switch statement instead.
+Sorry I forgot it was the case already. But currently we always register
+the same io ops (registration entry point being
+vgic_register_kvm_io_dev) and maybe we should have separate dispatcher
+function for dist, redit and its?
 
- Christoffer disliked it in v1, so i thought a bit and changed it. Ok, will change it back.
-
-> And here, we're going to assume that the arch timer still usable. We
-> definitely need a way to *prevent* the timer to be used when there is no
-> GIC. Otherwise, we're going to start trying to setup the mapping for the
-> active state, and the guest may start poking it.
-
-But, this seems to be already done, isn't it?
-According to http://lxr.free-electrons.com/source/arch/arm/kvm/arm.c#L439:
---- cut ---
-459         /*
-460          * Enable the arch timers only if we have an in-kernel VGIC
-461          * and it has been properly initialized, since we cannot handle
-462          * interrupts from the virtual timer with a userspace gic.
-463          */
-464         if (irqchip_in_kernel(kvm) && vgic_initialized(kvm))
-465                 kvm_timer_enable(kvm);
---- cut ---
- 
- Without kvm->arch.timer.enabled set to 1 by kvm_timer_enable() VM context save/restore code will
-not actually touch timer registers. Therefore the host part of the code will not do anything.
- As to guest itself, only userspace can stop it from accessing timer registers. My experimental qemu
-does this by removing generic timer node from guest's device tree. Virtual timer access simply
-cannot be trapped, otherwise there would be no problem at all. But, OK, even if the guest programs
-timer, we will just see "Unexpected IRQ 27" on the console, and the guest will not work, so it's not
-terribly fatal.
-
- You know, i actually looked at it before posting v3. I tried to omit kvm_timer_hyp_init() call too,
-and got lots of crashes because:
-1. kvm_timer_init() is called unconditionally
-2. qemu does some initialization of timer registers unconditionally using ioctl, and they end up in
-kvm_arm_timer_set_reg()
- Both of these points end up in kvm_phys_timer_read() which dereferences timecounter == NULL.
- Well, i could make kvm_phys_timer_read() just returning 0 in this case, but this could mis-trigger
-kvm_timer_should_fire() in some circumstances. I would have to patch it too... At this point i
-decided to stop because the result perhaps does not worth the effort and amount of patching.
-
- While writing this message i was walking through this code once again, and... I have a suggestion.
-Actually, if we are really paranoid, we could be afraid of kvm_vgic_inject_irq() being called, which
-would do some weird things without vGIC. It is possible to add a check for kvm->arch.timer.enabled
-in kvm_timer_sync_hwstate() and kvm_timer_flush_hwstate(). If the timer is disabled those functions
-will simply return doing nothing. This would guarantee that interrupt injection is never attempted.
-
- What do you think?
-
- And some more. Actually, it is possible to emulate generic timer in userspace, just not the virtual
-one. IIRC access to physical timer can be trapped. So, if we modify guest's device tree by removing
-virtual timer IRQ, the guest will fall back to physical timer. And this will be caught by the
-hypervisor. After this all we have to do is to add corresponding exit code which would allow the
-userspace to emulate missing CP15 (or system in case of ARM64) registers. So, this timer issue is
-not grave, just i postpone implementing it until GIC issues are settled down.
-
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
-
+Eric
+> 
+> Eric
+>> +		if (ret)
+>> +			return false;
+>> +
+>> +		spin_lock(&dist->its.lock);
+>> +		/*
+>> +		 * Updating the status for all allocated LPIs. We catch
+>> +		 * those LPIs that get disabled. We really don't care
+>> +		 * about unmapped LPIs, as they need to be updated
+>> +		 * later manually anyway once they get mapped.
+>> +		 */
+>> +		for_each_lpi(device, itte, kvm) {
+>> +			if (itte->lpi < lpi || itte->lpi >= lpi + chunksize)
+>> +				continue;
+>> +
+>> +			update_lpi_config(kvm, itte, prop[itte->lpi - lpi]);
+>> +		}
+>> +		spin_unlock(&dist->its.lock);
+>> +		tsize -= chunksize;
+>> +		lpi += chunksize;
+>> +		propbase += chunksize;
+>> +	}
+>> +
+>> +	return true;
+>> +}
+>> +
+>> +/*
+>> + * Scan the whole LPI pending table and sync the pending bit in there
+>> + * with our own data structures. This relies on the LPI being
+>> + * mapped before.
+>> + */
+>> +static bool its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
+>> +{
+>> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+>> +	unsigned long *pendmask = dist->its.buffer_page;
+>> +	u32 nr_lpis = VITS_NR_LPIS;
+>> +	gpa_t pendbase;
+>> +	int lpi = 0;
+>> +	struct its_itte *itte;
+>> +	struct its_device *device;
+>> +	int ret;
+>> +	int lpi_bit, nr_bits;
+>> +
+>> +	pendbase = BASER_BASE_ADDRESS(dist->pendbaser[vcpu->vcpu_id]);
+>> +
+>> +	while (nr_lpis > 0) {
+>> +		nr_bits = min(nr_lpis, CHUNK_SIZE * 8);
+>> +
+>> +		ret = kvm_read_guest(vcpu->kvm, pendbase, pendmask,
+>> +				     nr_bits / 8);
+>> +		if (ret)
+>> +			return false;
+>> +
+>> +		spin_lock(&dist->its.lock);
+>> +		for_each_lpi(device, itte, vcpu->kvm) {
+>> +			lpi_bit = itte->lpi - lpi;
+>> +			if (lpi_bit < 0 || lpi_bit >= nr_bits)
+>> +				continue;
+>> +			if (test_bit(lpi_bit, pendmask))
+>> +				__set_bit(vcpu->vcpu_id, itte->pending);
+>> +			else
+>> +				__clear_bit(vcpu->vcpu_id, itte->pending);
+>> +		}
+>> +		spin_unlock(&dist->its.lock);
+>> +		nr_lpis -= nr_bits;
+>> +		lpi += nr_bits;
+>> +		pendbase += nr_bits / 8;
+>> +	}
+>> +
+>> +	return true;
+>> +}
+>> +
+>>  /* The distributor lock is held by the VGIC MMIO handler. */
+>>  static bool handle_mmio_misc_gits(struct kvm_vcpu *vcpu,
+>>  				  struct kvm_exit_mmio *mmio,
+>> @@ -389,6 +506,8 @@ static const struct vgic_io_range vgicv3_its_ranges[] = {
+>>  /* This is called on setting the LPI enable bit in the redistributor. */
+>>  void vgic_enable_lpis(struct kvm_vcpu *vcpu)
+>>  {
+>> +	its_update_lpis_configuration(vcpu->kvm);
+>> +	its_sync_lpi_pending_table(vcpu);
+>>  }
+>>  
+>>  int vits_init(struct kvm *kvm)
+>> @@ -400,6 +519,10 @@ int vits_init(struct kvm *kvm)
+>>  	if (!dist->pendbaser)
+>>  		return -ENOMEM;
+>>  
+>> +	its->buffer_page = kmalloc(CHUNK_SIZE, GFP_KERNEL);
+>> +	if (!its->buffer_page)
+>> +		return -ENOMEM;
+>> +
+>>  	spin_lock_init(&its->lock);
+>>  
+>>  	INIT_LIST_HEAD(&its->device_list);
+>> @@ -442,6 +565,7 @@ void vits_destroy(struct kvm *kvm)
+>>  		kfree(container_of(cur, struct its_collection, coll_list));
+>>  	}
+>>  
+>> +	kfree(its->buffer_page);
+>>  	kfree(dist->pendbaser);
+>>  
+>>  	its->enabled = false;
+>> diff --git a/virt/kvm/arm/its-emul.h b/virt/kvm/arm/its-emul.h
+>> index cc5d5ff..cbc3877 100644
+>> --- a/virt/kvm/arm/its-emul.h
+>> +++ b/virt/kvm/arm/its-emul.h
+>> @@ -29,6 +29,9 @@
+>>  
+>>  #include "vgic.h"
+>>  
+>> +#define INTERRUPT_ID_BITS_ITS 16
+>> +#define VITS_NR_LPIS (1U << INTERRUPT_ID_BITS_ITS)
+>> +
+>>  void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+>>  int vits_init(struct kvm *kvm);
+>>  void vits_destroy(struct kvm *kvm);
+>>
+> 
 
