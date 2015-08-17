@@ -1,142 +1,173 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v3 06/10] VFIO: platform: add irq bypass producer
- management
-Date: Mon, 17 Aug 2015 17:51:49 +0200
-Message-ID: <55D20315.9000008@linaro.org>
-References: <1439212864-12954-1-git-send-email-eric.auger@linaro.org>	
- <1439212864-12954-7-git-send-email-eric.auger@linaro.org>
- <1439405812.4023.530.camel@redhat.com>
+Subject: Re: [PATCH v2 1/4] irqchip: GICv3: Convert to EOImode == 1
+Date: Mon, 17 Aug 2015 18:10:56 +0200
+Message-ID: <55D20790.1050100@linaro.org>
+References: <1439454526-1185-1-git-send-email-marc.zyngier@arm.com> <1439454526-1185-2-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B6235C683
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2015 11:39:16 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FK-b6q6D75Y3 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Aug 2015 11:39:15 -0400 (EDT)
-Received: from mail-wi0-f176.google.com (mail-wi0-f176.google.com
- [209.85.212.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1295C5C67E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2015 11:39:14 -0400 (EDT)
-Received: by wibhh20 with SMTP id hh20so84973715wib.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2015 08:52:34 -0700 (PDT)
-In-Reply-To: <1439405812.4023.530.camel@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: eric.auger@st.com, kvm@vger.kernel.org, patches@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, feng.wu@intel.com, kvmarm@lists.cs.columbia.edu
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1439454526-1185-2-git-send-email-marc.zyngier@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Jiang Liu <jiang.liu@linux.intel.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Alex,
-On 08/12/2015 08:56 PM, Alex Williamson wrote:
-> On Mon, 2015-08-10 at 15:21 +0200, Eric Auger wrote:
->> This patch populates the IRQ bypass callacks:
->> - stop/start producer simply consist in disabling/enabling the host irq
->> - add/del consumer: basically set the automasked flag to false/true
->>
->> Signed-off-by: Eric Auger <eric.auger@linaro.org>
->>
->> ---
->> v2 -> v3:
->> - vfio_platform_irq_bypass_add_consumer now returns an error in case
->>   the IRQ is recognized as active
->> - active boolean not set anymore
->> - do not VFIO mask the IRQ anymore on unforward
->>
->> v1 -> v2:
->> - device handle caching in vfio_platform_device is introduced in a
->>   separate patch
->> - use container_of
->> ---
->>  drivers/vfio/platform/vfio_platform_irq.c | 23 ++++++++++++++++++++++-
->>  1 file changed, 22 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
->> index efaee58..400a188 100644
->> --- a/drivers/vfio/platform/vfio_platform_irq.c
->> +++ b/drivers/vfio/platform/vfio_platform_irq.c
->> @@ -224,23 +224,44 @@ static int vfio_platform_is_active(struct vfio_platform_irq *irq)
->>  
->>  static void vfio_platform_irq_bypass_stop(struct irq_bypass_producer *prod)
->>  {
->> +	disable_irq(prod->irq);
->>  }
->>  
->>  static void vfio_platform_irq_bypass_start(struct irq_bypass_producer *prod)
->>  {
->> +	enable_irq(prod->irq);
->>  }
->>  
->>  static int vfio_platform_irq_bypass_add_consumer(
->>  			struct irq_bypass_producer *prod,
->>  			struct irq_bypass_consumer *cons)
->>  {
->> -	return 0;
->> +	struct vfio_platform_irq *irq =
->> +		container_of(prod, struct vfio_platform_irq, producer);
->> +
->> +	/*
->> +	 * if the IRQ is active at irqchip level or VFIO (auto)masked
->> +	 * this means the host IRQ is already under injection in the
->> +	 * guest and this not safe to change the forwarding state at
->> +	 * that stage.
->> +	 * It is not possible to differentiate user-space masking
->> +	 * from auto-masking, leading to possible false detection of
->> +	 * active state.
->> +	 */
->> +	if (vfio_platform_is_active(irq))
->> +		return -EAGAIN;
+Hi Marc,
+On 08/13/2015 10:28 AM, Marc Zyngier wrote:
+> So far, GICv3 has been used in with EOImode == 0. The effect of this
+> mode is to perform the priority drop and the deactivation of the
+> interrupt at the same time.
 > 
-> Here's an example of why we don't want WARN_ON if a registration fails,
-> this is effectively random.  When and how is a re-try going to happen?
-To be honest I did not intend to implement any retry mechanism. I rather
-intended to change the user-side which currently is not adapted to that
-start-up. Typically with current QEMU code we have this 2 phase IRQ
-signal startup, first set up eventfd signaling, then VFIO mask, then
-turn irqfd on. With such sequence forwarding setup will fail because the
-IRQ is seen as masked (false detection of activity).
-
-Do you mandate such a retry mechanism? If forwarding fails we resort on
-standard irqfd ...
-
-I think forwarding setup should be as much static as possible (I think
-this opinion also is shared by Marc?).
-
-Please let me know your opinion on this.
+> While this works perfectly for Linux (we only have a single priority),
+> it causes issues when an interrupt is forwarded to a guest, and when
+> we want the guest to perform the EOI itself.
+> 
+> For this case, the GIC architecture provides EOImode == 1, where:
+> - A write to ICC_EOIR1_EL1 drops the priority of the interrupt and leaves
+> it active. Other interrupts at the same priority level can now be taken,
+> but the active interrupt cannot be taken again
+> - A write to ICC_DIR_EL1 marks the interrupt as inactive, meaning it can
+> now be taken again.
+> 
+> This patch converts the driver to be able to use this new mode, depending
+> on whether or not the kernel can behave as a hypervisor. No feature change.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  drivers/irqchip/irq-gic-v3.c       | 37 +++++++++++++++++++++++++++++++++----
+>  include/linux/irqchip/arm-gic-v3.h |  9 +++++++++
+>  2 files changed, 42 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+> index c52f7ba..61190fb 100644
+> --- a/drivers/irqchip/irq-gic-v3.c
+> +++ b/drivers/irqchip/irq-gic-v3.c
+> @@ -30,6 +30,7 @@
+>  #include <asm/cputype.h>
+>  #include <asm/exception.h>
+>  #include <asm/smp_plat.h>
+> +#include <asm/virt.h>
+>  
+>  #include "irq-gic-common.h"
+>  #include "irqchip.h"
+> @@ -50,6 +51,7 @@ struct gic_chip_data {
+>  };
+>  
+>  static struct gic_chip_data gic_data __read_mostly;
+> +static struct static_key supports_deactivate = STATIC_KEY_INIT_TRUE;
+>  
+>  #define gic_data_rdist()		(this_cpu_ptr(gic_data.rdists.rdist))
+>  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+> @@ -293,7 +295,14 @@ static int gic_irq_get_irqchip_state(struct irq_data *d,
+>  
+>  static void gic_eoi_irq(struct irq_data *d)
+>  {
+> -	gic_write_eoir(gic_irq(d));
+> +	if (static_key_true(&supports_deactivate)) {
+> +		/* No need to deactivate an LPI */
+> +		if (gic_irq(d) >= 8192)
+> +			return;
+> +		gic_write_dir(gic_irq(d));
+> +	} else {
+> +		gic_write_eoir(gic_irq(d));
+> +	}
+>  }
+>  
+>  static int gic_set_type(struct irq_data *d, unsigned int type)
+> @@ -343,15 +352,24 @@ static asmlinkage void __exception_irq_entry gic_handle_irq(struct pt_regs *regs
+>  
+>  		if (likely(irqnr > 15 && irqnr < 1020) || irqnr >= 8192) {
+>  			int err;
+> +
+> +			if (static_key_true(&supports_deactivate))
+> +				gic_write_eoir(irqnr);
+> +
+>  			err = handle_domain_irq(gic_data.domain, irqnr, regs);
+>  			if (err) {
+>  				WARN_ONCE(true, "Unexpected interrupt received!\n");
+> -				gic_write_eoir(irqnr);
+> +				if (static_key_true(&supports_deactivate))
+> +					gic_write_dir(irqnr);
+shouldn't be needed to DIR the irq if LPI but is it harmful? Just
+because we don't do it on gic_eoi_irq ...
 
 Best Regards
 
 Eric
-
-> 
->> +
->> +	return vfio_platform_set_automasked(irq, false);
-> 
-> set_forwarded just seems so much more logical here.
-> 
->>  }
->>  
->>  static void vfio_platform_irq_bypass_del_consumer(
->>  			struct irq_bypass_producer *prod,
->>  			struct irq_bypass_consumer *cons)
->>  {
->> +	struct vfio_platform_irq *irq =
->> +		container_of(prod, struct vfio_platform_irq, producer);
->> +
->> +	vfio_platform_set_automasked(irq, true);
->>  }
->>  
->>  static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
-> 
-> 
+> +				else
+> +					gic_write_eoir(irqnr);
+>  			}
+>  			continue;
+>  		}
+>  		if (irqnr < 16) {
+>  			gic_write_eoir(irqnr);
+> +			if (static_key_true(&supports_deactivate))
+> +				gic_write_dir(irqnr);
+>  #ifdef CONFIG_SMP
+>  			handle_IPI(irqnr, regs);
+>  #else
+> @@ -451,8 +469,13 @@ static void gic_cpu_sys_reg_init(void)
+>  	/* Set priority mask register */
+>  	gic_write_pmr(DEFAULT_PMR_VALUE);
+>  
+> -	/* EOI deactivates interrupt too (mode 0) */
+> -	gic_write_ctlr(ICC_CTLR_EL1_EOImode_drop_dir);
+> +	if (static_key_true(&supports_deactivate)) {
+> +		/* EOI drops priority only (mode 1) */
+> +		gic_write_ctlr(ICC_CTLR_EL1_EOImode_drop);
+> +	} else {
+> +		/* EOI deactivates interrupt too (mode 0) */
+> +		gic_write_ctlr(ICC_CTLR_EL1_EOImode_drop_dir);
+> +	}
+>  
+>  	/* ... and let's hit the road... */
+>  	gic_write_grpen1(1);
+> @@ -820,6 +843,12 @@ static int __init gic_of_init(struct device_node *node, struct device_node *pare
+>  	if (of_property_read_u64(node, "redistributor-stride", &redist_stride))
+>  		redist_stride = 0;
+>  
+> +	if (!is_hyp_mode_available())
+> +		static_key_slow_dec(&supports_deactivate);
+> +
+> +	if (static_key_true(&supports_deactivate))
+> +		pr_info("GIC: Using split EOI/Deactivate mode\n");
+> +
+>  	gic_data.dist_base = dist_base;
+>  	gic_data.redist_regions = rdist_regs;
+>  	gic_data.nr_redist_regions = nr_redist_regions;
+> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+> index ffbc034..bc98832 100644
+> --- a/include/linux/irqchip/arm-gic-v3.h
+> +++ b/include/linux/irqchip/arm-gic-v3.h
+> @@ -104,6 +104,8 @@
+>  #define GICR_SYNCR			0x00C0
+>  #define GICR_MOVLPIR			0x0100
+>  #define GICR_MOVALLR			0x0110
+> +#define GICR_ISACTIVER			GICD_ISACTIVER
+> +#define GICR_ICACTIVER			GICD_ICACTIVER
+>  #define GICR_IDREGS			GICD_IDREGS
+>  #define GICR_PIDR2			GICD_PIDR2
+>  
+> @@ -288,6 +290,7 @@
+>  #define ICH_VMCR_PMR_MASK		(0xffUL << ICH_VMCR_PMR_SHIFT)
+>  
+>  #define ICC_EOIR1_EL1			sys_reg(3, 0, 12, 12, 1)
+> +#define ICC_DIR_EL1			sys_reg(3, 0, 12, 11, 1)
+>  #define ICC_IAR1_EL1			sys_reg(3, 0, 12, 12, 0)
+>  #define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
+>  #define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
+> @@ -384,6 +387,12 @@ static inline void gic_write_eoir(u64 irq)
+>  	isb();
+>  }
+>  
+> +static inline void gic_write_dir(u64 irq)
+> +{
+> +	asm volatile("msr_s " __stringify(ICC_DIR_EL1) ", %0" : : "r" (irq));
+> +	isb();
+> +}
+> +
+>  struct irq_domain;
+>  int its_cpu_init(void);
+>  int its_init(struct device_node *node, struct rdists *rdists,
 > 
