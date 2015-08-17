@@ -1,192 +1,127 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v2 14/15] KVM: arm64: implement MSI injection in ITS
- emulation
-Date: Mon, 17 Aug 2015 15:44:50 +0200
-Message-ID: <55D1E552.4060508@linaro.org>
-References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com>
- <1436538111-4294-15-git-send-email-andre.przywara@arm.com>
+Subject: Re: [PATCH v3 01/10] VFIO: platform: registration of a dummy IRQ
+ bypass producer
+Date: Mon, 17 Aug 2015 17:17:12 +0200
+Message-ID: <55D1FAF8.9000700@linaro.org>
+References: <1439212864-12954-1-git-send-email-eric.auger@linaro.org>	 <1439212864-12954-2-git-send-email-eric.auger@linaro.org> <1439405770.4023.526.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C9255BF8E
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2015 09:32:17 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LZAdMsdVNPan for <kvmarm@lists.cs.columbia.edu>;
- Mon, 17 Aug 2015 09:32:16 -0400 (EDT)
-Received: from mail-wi0-f173.google.com (mail-wi0-f173.google.com
- [209.85.212.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2204D5BF50
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2015 09:32:15 -0400 (EDT)
-Received: by wicne3 with SMTP id ne3so75512931wic.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 17 Aug 2015 06:45:35 -0700 (PDT)
-In-Reply-To: <1436538111-4294-15-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, marc.zyngier@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1439405770.4023.526.camel@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: eric.auger@st.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, feng.wu@intel.com, linux-kernel@vger.kernel.org, patches@linaro.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/10/2015 04:21 PM, Andre Przywara wrote:
-> When userland wants to inject a MSI into the guest, we have to use
-> our data structures to find the LPI number and the VCPU to receive
-> the interrupt.
-> Use the wrapper functions to iterate the linked lists and find the
-> proper Interrupt Translation Table Entry. Then set the pending bit
-> in this ITTE to be later picked up by the LR handling code. Kick
-> the VCPU which is meant to handle this interrupt.
-> We provide a VGIC emulation model specific routine for the actual
-> MSI injection. The wrapper functions return an error for models not
-> (yet) implementing MSIs (like the GICv2 emulation).
-> We also provide the handler for the ITS "INT" command, which allows a
-> guest to trigger an MSI via the ITS command queue.
+Hi Alex,
+On 08/12/2015 08:56 PM, Alex Williamson wrote:
+> On Mon, 2015-08-10 at 15:20 +0200, Eric Auger wrote:
+>> Register a dummy producer with void callbacks
+>>
+>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+>>
+>> ---
+>>
+>> v2 -> v3:
+>> - rename vfio_platform_irq_bypass_resume into *_start
+>> ---
+>>  drivers/vfio/platform/vfio_platform_irq.c     | 32 +++++++++++++++++++++++++++
+>>  drivers/vfio/platform/vfio_platform_private.h |  2 ++
+>>  2 files changed, 34 insertions(+)
+>>
+>> diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
+>> index 88bba57..b5cb8c7 100644
+>> --- a/drivers/vfio/platform/vfio_platform_irq.c
+>> +++ b/drivers/vfio/platform/vfio_platform_irq.c
+>> @@ -20,6 +20,7 @@
+>>  #include <linux/types.h>
+>>  #include <linux/vfio.h>
+>>  #include <linux/irq.h>
+>> +#include <linux/irqbypass.h>
+>>  
+>>  #include "vfio_platform_private.h"
+>>  
+>> @@ -177,6 +178,27 @@ static irqreturn_t vfio_irq_handler(int irq, void *dev_id)
+>>  	return IRQ_HANDLED;
+>>  }
+>>  
+>> +static void vfio_platform_irq_bypass_stop(struct irq_bypass_producer *prod)
+>> +{
+>> +}
+>> +
+>> +static void vfio_platform_irq_bypass_start(struct irq_bypass_producer *prod)
+>> +{
+>> +}
+>> +
+>> +static int vfio_platform_irq_bypass_add_consumer(
+>> +			struct irq_bypass_producer *prod,
+>> +			struct irq_bypass_consumer *cons)
+>> +{
+>> +	return 0;
+>> +}
+>> +
+>> +static void vfio_platform_irq_bypass_del_consumer(
+>> +			struct irq_bypass_producer *prod,
+>> +			struct irq_bypass_consumer *cons)
+>> +{
+>> +}
+>> +
+>>  static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+>>  			    int fd, irq_handler_t handler)
+>>  {
+>> @@ -186,6 +208,7 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+>>  
+>>  	if (irq->trigger) {
+>>  		free_irq(irq->hwirq, irq);
+>> +		irq_bypass_unregister_producer(&irq->producer);
+>>  		kfree(irq->name);
+>>  		eventfd_ctx_put(irq->trigger);
+>>  		irq->trigger = NULL;
+>> @@ -216,6 +239,15 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
+>>  		return ret;
+>>  	}
+>>  
+>> +	irq->producer.token = (void *)trigger;
+>> +	irq->producer.irq = irq->hwirq;
+>> +	irq->producer.add_consumer = vfio_platform_irq_bypass_add_consumer;
+>> +	irq->producer.del_consumer = vfio_platform_irq_bypass_del_consumer;
+>> +	irq->producer.stop = vfio_platform_irq_bypass_stop;
+>> +	irq->producer.start = vfio_platform_irq_bypass_start;
+>> +	ret = irq_bypass_register_producer(&irq->producer);
+>> +	WARN_ON(ret);
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  include/kvm/arm_vgic.h      |  1 +
->  virt/kvm/arm/its-emul.c     | 65 +++++++++++++++++++++++++++++++++++++++++++++
->  virt/kvm/arm/its-emul.h     |  2 ++
->  virt/kvm/arm/vgic-v3-emul.c |  1 +
->  4 files changed, 69 insertions(+)
-> 
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index 323c33a..9e1abf9 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -149,6 +149,7 @@ struct vgic_vm_ops {
->  	int	(*map_resources)(struct kvm *, const struct vgic_params *);
->  	bool	(*queue_lpis)(struct kvm_vcpu *);
->  	void	(*unqueue_lpi)(struct kvm_vcpu *, int irq);
-> +	int	(*inject_msi)(struct kvm *, struct kvm_msi *);
->  };
->  
->  struct vgic_io_device {
-> diff --git a/virt/kvm/arm/its-emul.c b/virt/kvm/arm/its-emul.c
-> index 89534c6..a1c12bb 100644
-> --- a/virt/kvm/arm/its-emul.c
-> +++ b/virt/kvm/arm/its-emul.c
-> @@ -323,6 +323,55 @@ static bool handle_mmio_gits_idregs(struct kvm_vcpu *vcpu,
->  }
->  
->  /*
-> + * Translates an incoming MSI request into the redistributor (=VCPU) and
-> + * the associated LPI number. Sets the LPI pending bit and also marks the
-> + * VCPU as having a pending interrupt.
-> + */
-> +int vits_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
-> +{
-> +	struct vgic_dist *dist = &kvm->arch.vgic;
-> +	struct vgic_its *its = &dist->its;
-> +	struct its_itte *itte;
-> +	int cpuid;
-> +	bool inject = false;
-> +	int ret = 0;
-> +
-> +	if (!vgic_has_its(kvm))
-> +		return -ENODEV;
-> +
-> +	if (!(msi->flags & KVM_MSI_VALID_DEVID))
-> +		return -EINVAL;
-> +
-> +	spin_lock(&its->lock);
-> +
-> +	if (!its->enabled || !dist->lpis_enabled) {
-> +		ret = -EAGAIN;
-> +		goto out_unlock;
-> +	}
-> +
-> +	itte = find_itte(kvm, msi->devid, msi->data);
-> +	/* Triggering an unmapped IRQ gets silently dropped. */
-> +	if (!itte || !itte->collection)
-> +		goto out_unlock;
-> +
-> +	cpuid = itte->collection->target_addr;
-what if MAPC was not done?
-> +	__set_bit(cpuid, itte->pending);
-> +	inject = itte->enabled;
-> +
-> +out_unlock:
-> +	spin_unlock(&its->lock);
-> +
-> +	if (inject) {
-> +		spin_lock(&dist->lock);
-deadlock when called from vits_handle_command?
+> For what purpose?
+Yes. I will replace by a simple pr_info as done in eventfd.c.
+
+Best Regards
 
 Eric
-> +		__set_bit(cpuid, dist->irq_pending_on_cpu);
-> +		spin_unlock(&dist->lock);
-> +		kvm_vcpu_kick(kvm_get_vcpu(kvm, cpuid));
-> +	}
-> +
-> +	return ret;
-> +}
-> +
-> +/*
->   * Find all enabled and pending LPIs and queue them into the list
->   * registers.
->   * The dist lock is held by the caller.
-> @@ -787,6 +836,19 @@ static int vits_cmd_handle_movall(struct kvm *kvm, u64 *its_cmd)
->  	return 0;
->  }
->  
-> +/* The INT command injects the LPI associated with that DevID/EvID pair. */
-> +static int vits_cmd_handle_int(struct kvm *kvm, u64 *its_cmd)
-> +{
-> +	struct kvm_msi msi = {
-> +		.data = its_cmd_get_id(its_cmd),
-> +		.devid = its_cmd_get_deviceid(its_cmd),
-> +		.flags = KVM_MSI_VALID_DEVID,
-> +	};
-> +
-> +	vits_inject_msi(kvm, &msi);
-> +	return 0;
-> +}
-> +
->  static int vits_handle_command(struct kvm_vcpu *vcpu, u64 *its_cmd)
->  {
->  	u8 cmd = its_cmd_get_command(its_cmd);
-> @@ -817,6 +879,9 @@ static int vits_handle_command(struct kvm_vcpu *vcpu, u64 *its_cmd)
->  	case GITS_CMD_MOVALL:
->  		ret = vits_cmd_handle_movall(vcpu->kvm, its_cmd);
->  		break;
-> +	case GITS_CMD_INT:
-> +		ret = vits_cmd_handle_int(vcpu->kvm, its_cmd);
-> +		break;
->  	case GITS_CMD_INV:
->  		ret = vits_cmd_handle_inv(vcpu->kvm, its_cmd);
->  		break;
-> diff --git a/virt/kvm/arm/its-emul.h b/virt/kvm/arm/its-emul.h
-> index 830524a..95e56a7 100644
-> --- a/virt/kvm/arm/its-emul.h
-> +++ b/virt/kvm/arm/its-emul.h
-> @@ -36,6 +36,8 @@ void vgic_enable_lpis(struct kvm_vcpu *vcpu);
->  int vits_init(struct kvm *kvm);
->  void vits_destroy(struct kvm *kvm);
->  
-> +int vits_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
-> +
->  bool vits_queue_lpis(struct kvm_vcpu *vcpu);
->  void vits_unqueue_lpi(struct kvm_vcpu *vcpu, int irq);
->  
-> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
-> index 4132c26..30bf7035 100644
-> --- a/virt/kvm/arm/vgic-v3-emul.c
-> +++ b/virt/kvm/arm/vgic-v3-emul.c
-> @@ -948,6 +948,7 @@ void vgic_v3_init_emulation(struct kvm *kvm)
->  	dist->vm_ops.init_model = vgic_v3_init_model;
->  	dist->vm_ops.destroy_model = vgic_v3_destroy_model;
->  	dist->vm_ops.map_resources = vgic_v3_map_resources;
-> +	dist->vm_ops.inject_msi = vits_inject_msi;
->  	dist->vm_ops.queue_lpis = vits_queue_lpis;
->  	dist->vm_ops.unqueue_lpi = vits_unqueue_lpi;
->  
+> 
+>> +
+>>  	if (!irq->masked)
+>>  		enable_irq(irq->hwirq);
+>>  
+>> diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
+>> index 1c9b3d5..1d2d4d6 100644
+>> --- a/drivers/vfio/platform/vfio_platform_private.h
+>> +++ b/drivers/vfio/platform/vfio_platform_private.h
+>> @@ -17,6 +17,7 @@
+>>  
+>>  #include <linux/types.h>
+>>  #include <linux/interrupt.h>
+>> +#include <linux/irqbypass.h>
+>>  
+>>  #define VFIO_PLATFORM_OFFSET_SHIFT   40
+>>  #define VFIO_PLATFORM_OFFSET_MASK (((u64)(1) << VFIO_PLATFORM_OFFSET_SHIFT) - 1)
+>> @@ -37,6 +38,7 @@ struct vfio_platform_irq {
+>>  	spinlock_t		lock;
+>>  	struct virqfd		*unmask;
+>>  	struct virqfd		*mask;
+>> +	struct irq_bypass_producer producer;
+>>  };
+>>  
+>>  struct vfio_platform_region {
+> 
+> 
 > 
