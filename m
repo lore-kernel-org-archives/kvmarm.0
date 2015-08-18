@@ -1,143 +1,100 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v2 4/4] irqchip: GIC: Don't deactivate interrupts forwarded
- to a guest
-Date: Tue, 18 Aug 2015 10:26:08 +0200
-Message-ID: <55D2EC20.9020304@linaro.org>
-References: <1439454526-1185-1-git-send-email-marc.zyngier@arm.com> <1439454526-1185-5-git-send-email-marc.zyngier@arm.com>
+From: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v3 04/10] VFIO: platform: add vfio_platform_set_automasked
+Date: Tue, 18 Aug 2015 11:44:24 -0600
+Message-ID: <1439919864.4023.626.camel@redhat.com>
+References: <1439212864-12954-1-git-send-email-eric.auger@linaro.org>
+ <1439212864-12954-5-git-send-email-eric.auger@linaro.org>
+ <1439405794.4023.528.camel@redhat.com> <55D1FFE8.9050104@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1439454526-1185-5-git-send-email-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Jiang Liu <jiang.liu@linux.intel.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C1C465C8EB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Aug 2015 13:45:29 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id FpLhLbXdrq3I for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 18 Aug 2015 13:45:28 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 79B4D5C8E9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 18 Aug 2015 13:45:27 -0400 (EDT)
+In-Reply-To: <55D1FFE8.9050104@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Eric Auger <eric.auger@linaro.org>
+Cc: eric.auger@st.com, kvm@vger.kernel.org, patches@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, feng.wu@intel.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-On 08/13/2015 10:28 AM, Marc Zyngier wrote:
-> Commit 0a4377de3056 ("genirq: Introduce irq_set_vcpu_affinity() to
-> target an interrupt to a VCPU") added just what we needed at the
-> lowest level to allow an interrupt to be deactivated by a guest.
+On Mon, 2015-08-17 at 17:38 +0200, Eric Auger wrote:
+> On 08/12/2015 08:56 PM, Alex Williamson wrote:
+> > On Mon, 2015-08-10 at 15:20 +0200, Eric Auger wrote:
+> >> This function makes possible to change the automasked mode.
+> >>
+> >> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+> >>
+> >> ---
+> >>
+> >> v1 -> v2:
+> >> - set forwarded flag
+> >> ---
+> >>  drivers/vfio/platform/vfio_platform_irq.c | 19 +++++++++++++++++++
+> >>  1 file changed, 19 insertions(+)
+> >>
+> >> diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
+> >> index b31b1f0..a285384 100644
+> >> --- a/drivers/vfio/platform/vfio_platform_irq.c
+> >> +++ b/drivers/vfio/platform/vfio_platform_irq.c
+> >> @@ -186,6 +186,25 @@ static irqreturn_t vfio_handler(int irq, void *dev_id)
+> >>  	return ret;
+> >>  }
+> >>  
+> >> +static int vfio_platform_set_automasked(struct vfio_platform_irq *irq,
+> >> +					   bool automasked)
+> >> +{
+> >> +	unsigned long flags;
+> >> +
+> >> +	spin_lock_irqsave(&irq->lock, flags);
+> >> +	if (automasked) {
+> >> +		irq->forwarded = true;
+> >> +		irq->flags |= VFIO_IRQ_INFO_AUTOMASKED;
+> >> +		irq->handler = vfio_automasked_irq_handler;
+> >> +	} else {
+> >> +		irq->forwarded = false;
+> >> +		irq->flags &= ~VFIO_IRQ_INFO_AUTOMASKED;
+> >> +		irq->handler = vfio_irq_handler;
+> >> +	}
+> >> +	spin_unlock_irqrestore(&irq->lock, flags);
+> >> +	return 0;
+> > 
+> > In vfio-speak, automasked means level and we're not magically changing
+> > the IRQ from level to edge, we're simply able to handle level
+> > differently based on a hardware optimization.  Should the user visible
+> > flags therefore change based on this?  Aren't we really setting the
+> > forwarded state rather than the automasked state?
 > 
-> When such a request reaches the GIC, it knows it doesn't need to
-> perform the deactivation anymore, and can safely leave the guest
-> do its magic. This of course requires additional support in both
-> VFIO and KVM.
+> Well actually this was following the discussion we had a long time ago
+> about that topic:
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  drivers/irqchip/irq-gic.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 58 insertions(+)
+> http://lkml.iu.edu/hypermail/linux/kernel/1409.1/03659.html
 > 
-> diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-> index b020c3a..ea691be 100644
-> --- a/drivers/irqchip/irq-gic.c
-> +++ b/drivers/irqchip/irq-gic.c
-> @@ -148,6 +148,34 @@ static inline bool primary_gic_irq(struct irq_data *d)
->  	return true;
->  }
->  
-> +static inline bool cascading_gic_irq(struct irq_data *d)
-> +{
-> +	/*
-> +	 * If handler_data pointing to one of the secondary GICs, then
-> +	 * this is the cascading interrupt, and it cannot possibly be
-a cascading interrupt?
-> +	 * forwarded.
-> +	 */
-> +	if (d->handler_data >= (void *)(gic_data + 1) &&
-> +	    d->handler_data <  (void *)(gic_data + MAX_GIC_NR))
-there is an accessor for d->handler_data: irq_data_get_irq_handler_data
-
-besides:
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
-Tested-by: Eric Auger <eric.auger@linaro.org> on Calxeda Midway with
-VFIO SPI assignment
-
-Best Regards
-
-Eric
-
-
-> +		return true;
-> +
-> +	return false;
-> +}
-> +
-> +static inline bool forwarded_irq(struct irq_data *d)
-> +{
-> +	/*
-> +	 * A forwarded interrupt:
-> +	 * - is on the primary GIC
-> +	 * - has its handler_data set to a value
-> +	 * - that isn't a secondary GIC
-> +	 */
-> +	if (primary_gic_irq(d) && d->handler_data && !cascading_gic_irq(d))
-> +		return true;
-> +
-> +	return false;
-> +}
-> +
->  /*
->   * Routines to acknowledge, disable and enable interrupts
->   */
-> @@ -166,6 +194,18 @@ static int gic_peek_irq(struct irq_data *d, u32 offset)
->  static void gic_mask_irq(struct irq_data *d)
->  {
->  	gic_poke_irq(d, GIC_DIST_ENABLE_CLEAR);
-> +	/*
-> +	 * When masking a forwarded interrupt, make sure it is
-> +	 * deactivated as well.
-> +	 *
-> +	 * This ensures that an interrupt that is getting
-> +	 * disabled/masked will not get "stuck", because there is
-> +	 * noone to deactivate it (guest is being terminated).
-> +	 */
-> +	if (static_key_true(&supports_deactivate)) {
-> +		if (forwarded_irq(d))
-> +			gic_poke_irq(d, GIC_DIST_ACTIVE_CLEAR);
-> +	}
->  }
->  
->  static void gic_unmask_irq(struct irq_data *d)
-> @@ -178,6 +218,10 @@ static void gic_eoi_irq(struct irq_data *d)
->  	u32 deact_offset = GIC_CPU_EOI;
->  
->  	if (static_key_true(&supports_deactivate)) {
-> +		/* Do not deactivate an IRQ forwarded to a vcpu. */
-> +		if (forwarded_irq(d))
-> +			return;
-> +
->  		if (primary_gic_irq(d))
->  			deact_offset = GIC_CPU_DEACTIVATE;
->  	}
-> @@ -251,6 +295,19 @@ static int gic_set_type(struct irq_data *d, unsigned int type)
->  	return gic_configure_irq(gicirq, type, base, NULL);
->  }
->  
-> +static int gic_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu)
-> +{
-> +	/* Only interrupts on the primary GIC can be forwarded to a vcpu. */
-> +	if (static_key_true(&supports_deactivate)) {
-> +		if (primary_gic_irq(d) && !cascading_gic_irq(d)) {
-> +			d->handler_data = vcpu;
-> +			return 0;
-> +		}
-> +	}
-> +
-> +	return -EINVAL;
-> +}
-> +
->  #ifdef CONFIG_SMP
->  static int gic_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
->  			    bool force)
-> @@ -346,6 +403,7 @@ static struct irq_chip gic_chip = {
->  #endif
->  	.irq_get_irqchip_state	= gic_irq_get_irqchip_state,
->  	.irq_set_irqchip_state	= gic_irq_set_irqchip_state,
-> +	.irq_set_vcpu_affinity	= gic_irq_set_vcpu_affinity,
->  	.flags			= IRQCHIP_SET_TYPE_MASKED,
->  };
->  
+> I did not really know how to conclude ...
 > 
+> If it is preferred I can hide this to the userspace, no problem.
+
+I think that was based on the user being involved in enabling forwarding
+though, now that it's hidden and automatic, it doesn't make much sense
+to me to toggle any of the interrupt info details based on the state of
+the forward.  The user always needs to handle the interrupt as level
+since the bypass can be torn down at any point in time.  We're taking
+advantage of the in-kernel path to make further optimizations, which
+seems like they should be transparent to the user.  Thanks,
+
+Alex
