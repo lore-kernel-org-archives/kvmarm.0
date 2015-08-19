@@ -1,28 +1,30 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: PING: [PATCH] KVM: arm64: Decode basic HYP fault information
-Date: Wed, 19 Aug 2015 10:26:34 +0300
-Message-ID: <00f201d0da50$60c115d0$22434170$@samsung.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v4 1/2] arm64: KVM: Optimize arm64 skip 30-50% vfp/simd
+ save/restore on exits
+Date: Wed, 19 Aug 2015 19:49:58 +0200
+Message-ID: <20150819174958.GA11518@cbox>
+References: <1437082178-11039-1-git-send-email-m.smarduch@samsung.com>
+ <1437082178-11039-2-git-send-email-m.smarduch@samsung.com>
+ <55C235B9.3000800@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 92AEA5C989
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2015 03:13:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 93FCF5C9FB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2015 13:35:30 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2qXIwSWnTv0n for <kvmarm@lists.cs.columbia.edu>;
- Wed, 19 Aug 2015 03:13:13 -0400 (EDT)
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com
- [210.118.77.11])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6EA9E5C556
- for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2015 03:13:13 -0400 (EDT)
-Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
- by mailout1.w1.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NTB002MQJCB2G00@mailout1.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Wed, 19 Aug 2015 08:26:35 +0100 (BST)
-Content-language: ru
+ with ESMTP id 5gFHOpJqVY25 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 19 Aug 2015 13:35:29 -0400 (EDT)
+Received: from mail-la0-f43.google.com (mail-la0-f43.google.com
+ [209.85.215.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4FAD45C9F9
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2015 13:35:28 -0400 (EDT)
+Received: by laba3 with SMTP id a3so7834382lab.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 19 Aug 2015 10:48:53 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <55C235B9.3000800@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,169 +34,177 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: 'Marc Zyngier' <marc.zyngier@arm.com>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-PING
+Hi Mario,
 
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
-
-
-> -----Original Message-----
-> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Behalf Of Pavel Fedin
-> Sent: Tuesday, August 11, 2015 10:34 AM
-> To: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org
-> Cc: 'Christoffer Dall'; 'Marc Zyngier'
-> Subject: [PATCH] KVM: arm64: Decode basic HYP fault information
+On Wed, Aug 05, 2015 at 05:11:37PM +0100, Marc Zyngier wrote:
+> On 16/07/15 22:29, Mario Smarduch wrote:
+> > This patch only saves and restores FP/SIMD registers on Guest access. To do
+> > this cptr_el2 FP/SIMD trap is set on Guest entry and later checked on exit.
+> > lmbench, hackbench show significant improvements, for 30-50% exits FP/SIMD
+> > context is not saved/restored
+> > 
+> > Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
 > 
-> Print exception vector name, exception class and PC translated to EL1 virtual
-> address. Significantly aids debugging HYP crashes without special means like
-> JTAG.
+> So this patch seems to break 32bit guests on arm64.  I've had a look,
+> squashed a few bugs that I dangerously overlooked during the review, but
+> it still doesn't work (it doesn't crash anymore, but I get random
+> illegal VFP instructions in 32bit guests).
 > 
-> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-> ---
->  arch/arm64/kvm/handle_exit.c | 30 +++++++++++++++++++++++++++++
->  arch/arm64/kvm/hyp.S         | 46 +++++++++++++++++---------------------------
->  2 files changed, 48 insertions(+), 28 deletions(-)
+> I'd be glad if someone could eyeball the following patch and tell me
+> what's going wrong. If we don't find the root cause quickly enough, I'll
+> have to drop the series from -next, and that'd be a real shame.
 > 
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 29b184a..4d70d64 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -136,3 +136,33 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  		return 0;
->  	}
->  }
-> +
-> +static const char *const hyp_faults[] = {
-> +	"EL2t Synchronous",
-> +	"EL2t IRQ",
-> +	"EL2t FIQ",
-> +	"EL2t Error",
-> +	"EL2h Synchronous",
-> +	"EL2h IRQ",
-> +	"EL2h FIQ",
-> +	"EL2h Error",
-> +	"EL1 Synchronous",
-> +	"EL1 IRQ",
-> +	"EL1 FIQ",
-> +	"EL1 Error"
-> +};
-> +
-> +void kvm_hyp_panic(unsigned long vector, unsigned int spsr, unsigned long pc,
-> +		   unsigned int esr, unsigned long far, unsigned long hpfar,
-> +		   unsigned long par, struct kvm_vcpu *vcpu)
-> +{
-> +	pr_emerg("Unhandled HYP exception %s on VCPU %p\n",
-> +		hyp_faults[vector], vcpu);
-> +	pr_emerg("PC : %016lx SPSR : %08x         ESR: %08x\n", pc, spsr, esr);
-> +	pr_emerg("FAR: %016lx HPFAR: %016lx PAR: %016lx\n", far, hpfar, par);
-> +
-> +	pr_emerg("Exception class: %02x Translated PC: %016lx\n",
-> +		esr >> ESR_ELx_EC_SHIFT, pc - HYP_PAGE_OFFSET + PAGE_OFFSET);
-> +
-> +	panic("HYP panic");
-> +}
+> Thanks,
+> 
+> 	M.
+> 
+> commit 5777dc55fbc170426a85e00c26002dd5a795cfa5
+> Author: Marc Zyngier <marc.zyngier@arm.com>
+> Date:   Wed Aug 5 16:53:01 2015 +0100
+> 
+>     KVM: arm64: NOTAFIX: Prevent crash when 32bit guest uses VFP
+> 
+>     Since we switch FPSIMD in a lazy way, access to FPEXC32_EL2
+>     must be guarded by skip_fpsimd_state. Otherwise, all hell
+>     break loose.
+> 
+>     Also, FPEXC32_EL2 must be restored when we trap to EL2 to
+>     enable floating point.
+> 
+>     Note that while it prevents the host from catching fire, the
+>     guest still doesn't work properly, and I don't understand why just
+>     yet.
+> 
+>     Not-really-signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> 
 > diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-> index c81eaaf..62785cd 100644
+> index c8e0c70..b53ec5d 100644
 > --- a/arch/arm64/kvm/hyp.S
 > +++ b/arch/arm64/kvm/hyp.S
-> @@ -1060,13 +1060,11 @@ __kvm_hyp_panic:
->  	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
+> @@ -431,10 +431,12 @@
+>  	add	x3, x2, #CPU_SYSREG_OFFSET(DACR32_EL2)
+>  	mrs	x4, dacr32_el2
+>  	mrs	x5, ifsr32_el2
+> -	mrs	x6, fpexc32_el2
+>  	stp	x4, x5, [x3]
+> -	str	x6, [x3, #16]
+> 
+> +	skip_fpsimd_state x8, 3f
+> +	mrs	x6, fpexc32_el2
+> +	str	x6, [x3, #16]
+> +3:
+>  	skip_debug_state x8, 2f
+>  	mrs	x7, dbgvcr32_el2
+>  	str	x7, [x3, #24]
+> @@ -461,10 +463,8 @@
+> 
+>  	add	x3, x2, #CPU_SYSREG_OFFSET(DACR32_EL2)
+>  	ldp	x4, x5, [x3]
+> -	ldr	x6, [x3, #16]
+>  	msr	dacr32_el2, x4
+>  	msr	ifsr32_el2, x5
+> -	msr	fpexc32_el2, x6
+> 
+>  	skip_debug_state x8, 2f
+>  	ldr	x7, [x3, #24]
+> @@ -669,12 +669,14 @@ __restore_debug:
+>  	ret
+> 
+>  __save_fpsimd:
+> +	skip_fpsimd_state x3, 1f
+>  	save_fpsimd
+> -	ret
+> +1:	ret
+> 
+>  __restore_fpsimd:
+> +	skip_fpsimd_state x3, 1f
+>  	restore_fpsimd
+> -	ret
+> +1:	ret
+> 
+>  switch_to_guest_fpsimd:
+>  	push	x4, lr
+> @@ -682,6 +684,7 @@ switch_to_guest_fpsimd:
+>  	mrs	x2, cptr_el2
+>  	bic	x2, x2, #CPTR_EL2_TFP
+>  	msr	cptr_el2, x2
+> +	isb
+> 
+>  	mrs	x0, tpidr_el2
+> 
+> @@ -692,6 +695,10 @@ switch_to_guest_fpsimd:
+>  	add	x2, x0, #VCPU_CONTEXT
+>  	bl __restore_fpsimd
+> 
+> +	skip_32bit_state x3, 1f
+> +	ldr	x4, [x2, #CPU_SYSREG_OFFSET(FPEXC32_EL2)]
+> +	msr	fpexc32_el2, x4
+> +1:
+>  	pop	x4, lr
+>  	pop	x2, x3
+>  	pop	x0, x1
+> @@ -754,9 +761,7 @@ __kvm_vcpu_return:
+>  	add	x2, x0, #VCPU_CONTEXT
+> 
+>  	save_guest_regs
+> -	skip_fpsimd_state x3, 1f
+>  	bl __save_fpsimd
+> -1:
+>  	bl __save_sysregs
+> 
+>  	skip_debug_state x3, 1f
+> @@ -777,9 +782,7 @@ __kvm_vcpu_return:
 >  	kern_hyp_va x2
 > 
-> +	mov	x0, lr
 >  	bl __restore_sysregs
-> +	mov	lr, x0
-> 
-> -1:	adr	x0, __hyp_panic_str
-> -	adr	x1, 2f
-> -	ldp	x2, x3, [x1]
-> -	sub	x0, x0, x2
-> -	add	x0, x0, x3
-> +1:	mov	x0, lr
->  	mrs	x1, spsr_el2
->  	mrs	x2, elr_el2
->  	mrs	x3, esr_el2
-> @@ -1078,20 +1076,11 @@ __kvm_hyp_panic:
->  	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
->  		      PSR_MODE_EL1h)
->  	msr	spsr_el2, lr
-> -	ldr	lr, =panic
-> +	ldr	lr, =kvm_hyp_panic
->  	msr	elr_el2, lr
->  	eret
-> -
-> -	.align	3
-> -2:	.quad	HYP_PAGE_OFFSET
-> -	.quad	PAGE_OFFSET
->  ENDPROC(__kvm_hyp_panic)
-> 
-> -__hyp_panic_str:
-> -	.ascii	"HYP panic:\nPS:%08x PC:%p ESR:%p\nFAR:%p HPFAR:%p PAR:%p\nVCPU:%p\n\0"
-> -
-> -	.align	2
-> -
->  /*
->   * u64 kvm_call_hyp(void *hypfn, ...);
->   *
-> @@ -1115,26 +1104,27 @@ ENTRY(kvm_call_hyp)
->  	ret
->  ENDPROC(kvm_call_hyp)
-> 
-> -.macro invalid_vector	label, target
-> +.macro invalid_vector	label, N, target
->  	.align	2
->  \label:
-> +	mov lr, #\N
->  	b \target
->  ENDPROC(\label)
->  .endm
-> 
->  	/* None of these should ever happen */
-> -	invalid_vector	el2t_sync_invalid, __kvm_hyp_panic
-> -	invalid_vector	el2t_irq_invalid, __kvm_hyp_panic
-> -	invalid_vector	el2t_fiq_invalid, __kvm_hyp_panic
-> -	invalid_vector	el2t_error_invalid, __kvm_hyp_panic
-> -	invalid_vector	el2h_sync_invalid, __kvm_hyp_panic
-> -	invalid_vector	el2h_irq_invalid, __kvm_hyp_panic
-> -	invalid_vector	el2h_fiq_invalid, __kvm_hyp_panic
-> -	invalid_vector	el2h_error_invalid, __kvm_hyp_panic
-> -	invalid_vector	el1_sync_invalid, __kvm_hyp_panic
-> -	invalid_vector	el1_irq_invalid, __kvm_hyp_panic
-> -	invalid_vector	el1_fiq_invalid, __kvm_hyp_panic
-> -	invalid_vector	el1_error_invalid, __kvm_hyp_panic
-> +	invalid_vector	el2t_sync_invalid, 0, __kvm_hyp_panic
-> +	invalid_vector	el2t_irq_invalid, 1, __kvm_hyp_panic
-> +	invalid_vector	el2t_fiq_invalid, 2, __kvm_hyp_panic
-> +	invalid_vector	el2t_error_invalid, 3, __kvm_hyp_panic
-> +	invalid_vector	el2h_sync_invalid, 4, __kvm_hyp_panic
-> +	invalid_vector	el2h_irq_invalid, 5, __kvm_hyp_panic
-> +	invalid_vector	el2h_fiq_invalid, 6, __kvm_hyp_panic
-> +	invalid_vector	el2h_error_invalid, 7, __kvm_hyp_panic
-> +	invalid_vector	el1_sync_invalid, 8, __kvm_hyp_panic
-> +	invalid_vector	el1_irq_invalid, 9, __kvm_hyp_panic
-> +	invalid_vector	el1_fiq_invalid, 10, __kvm_hyp_panic
-> +	invalid_vector	el1_error_invalid, 11, __kvm_hyp_panic
-> 
->  el1_sync:					// Guest trapped into EL2
->  	push	x0, x1
-> --
-> 2.4.4
+> -	skip_fpsimd_state x3, 1f
+>  	bl __restore_fpsimd
+> -1:
+>  	/* Clear FPSIMD and Trace trapping */
+>  	msr     cptr_el2, xzr
 > 
 > 
-> Kind regards,
-> Pavel Fedin
-> Expert Engineer
-> Samsung Electronics Research center Russia
-> 
-> 
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Marc and I have hunted down the issue at KVM Forum and we believe we've
+found the issue.  Please have a look at the following follow-up patch to
+Marc's patch above:
+
+diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+index 8b2a73b4..842e727 100644
+--- a/arch/arm64/kvm/hyp.S
++++ b/arch/arm64/kvm/hyp.S
+@@ -769,11 +769,26 @@
+ 
+ .macro activate_traps
+ 	ldr     x2, [x0, #VCPU_HCR_EL2]
++
++	/*
++	 * We are about to set CPTR_EL2.TFP to trap all floating point
++	 * register accesses to EL2, however, the ARM ARM clearly states that
++	 * traps are only taken to EL2 if the operation would not otherwise
++	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
++	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
++	 */
++	tbnz	x2, #HCR_RW_SHIFT, 99f // open code skip_32bit_state
++	mov	x3, #(1 << 30)
++	msr	fpexc32_el2, x3
++	isb
++99:
++
+ 	msr     hcr_el2, x2
+ 	mov	x2, #CPTR_EL2_TTA
+ 	orr     x2, x2, #CPTR_EL2_TFP
+ 	msr	cptr_el2, x2
+ 
++
+ 	mov	x2, #(1 << 15)	// Trap CP15 Cr=15
+ 	msr	hstr_el2, x2
+ 
+
+
+Thanks,
+-Christoffer
