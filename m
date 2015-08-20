@@ -1,76 +1,71 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 21/25] KVM: arm/arm64: vgic: Add vgic_{get,set}_phys_irq_active
-Date: Thu, 20 Aug 2015 17:28:59 +0100
-Message-ID: <1440088143-4722-22-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 14/25] arm/arm64: KVM: Fix ordering of timer/GIC on guest entry
+Date: Thu, 20 Aug 2015 17:28:52 +0100
+Message-ID: <1440088143-4722-15-git-send-email-marc.zyngier@arm.com>
 References: <1440088143-4722-1-git-send-email-marc.zyngier@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1440088143-4722-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, Gleb Natapov <gleb@kernel.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Mario Smarduch <m.smarduch@samsung.com>, "Suzuki K. Poulose" <suzuki.poulose@arm.com>, Vladimir Murzin <vladimir.murzin@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Mario Smarduch <m.smarduch@samsung.com>, "Suzuki K. Poulose" <suzuki.poulose@arm.com>, Vladimir Murzin <vladimir.murzin@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to control the active state of an interrupt, introduce
-a pair of accessors allowing the state to be set/queried.
+As we now inject the timer interrupt when we're about to enter
+the guest, it makes a lot more sense to make sure this happens
+before the vgic code queues the pending interrupts.
 
-This only affects the logical state, and the HW state will only be
-applied at world-switch time.
+Otherwise, we get the interrupt on the following exit, which is
+not great for latency (and leads to all kind of bizarre issues
+when using with active interrupts at the HW level).
 
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- include/kvm/arm_vgic.h |  2 ++
- virt/kvm/arm/vgic.c    | 24 ++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
+ arch/arm/kvm/arm.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index c0e6354..e789e47 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -356,6 +356,8 @@ int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
- struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
- 					   int virt_irq, int irq);
- int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
-+bool kvm_vgic_get_phys_irq_active(struct irq_phys_map *map);
-+void kvm_vgic_set_phys_irq_active(struct irq_phys_map *map, bool active);
- 
- #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
- #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 9d009d2..b553a8f 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -1802,6 +1802,30 @@ static void vgic_free_phys_irq_map_rcu(struct rcu_head *rcu)
- }
- 
- /**
-+ * kvm_vgic_get_phys_irq_active - Return the active state of a mapped IRQ
-+ *
-+ * Return the logical active state of a mapped interrupt. This doesn't
-+ * necessarily reflects the current HW state.
-+ */
-+bool kvm_vgic_get_phys_irq_active(struct irq_phys_map *map)
-+{
-+	BUG_ON(!map);
-+	return map->active;
-+}
-+
-+/**
-+ * kvm_vgic_set_phys_irq_active - Set the active state of a mapped IRQ
-+ *
-+ * Set the logical active state of a mapped interrupt. This doesn't
-+ * immediately affects the HW state.
-+ */
-+void kvm_vgic_set_phys_irq_active(struct irq_phys_map *map, bool active)
-+{
-+	BUG_ON(!map);
-+	map->active = active;
-+}
-+
-+/**
-  * kvm_vgic_unmap_phys_irq - Remove a virtual to physical IRQ mapping
-  * @vcpu: The VCPU pointer
-  * @map: The pointer to a mapping obtained through kvm_vgic_map_phys_irq
--- 
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 9ce5cf0..1141d21 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -523,8 +523,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, =
+struct kvm_run *run)
+ 		if (vcpu->arch.pause)
+ 			vcpu_pause(vcpu);
+=20
+-		kvm_vgic_flush_hwstate(vcpu);
+ 		kvm_timer_flush_hwstate(vcpu);
++		kvm_vgic_flush_hwstate(vcpu);
+=20
+ 		preempt_disable();
+ 		local_irq_disable();
+@@ -540,8 +540,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, =
+struct kvm_run *run)
+ 		if (ret <=3D 0 || need_new_vmid_gen(vcpu->kvm)) {
+ 			local_irq_enable();
+ 			preempt_enable();
+-			kvm_timer_sync_hwstate(vcpu);
+ 			kvm_vgic_sync_hwstate(vcpu);
++			kvm_timer_sync_hwstate(vcpu);
+ 			continue;
+ 		}
+=20
+@@ -587,9 +587,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, =
+struct kvm_run *run)
+ 		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
+ 		preempt_enable();
+=20
+-
+-		kvm_timer_sync_hwstate(vcpu);
+ 		kvm_vgic_sync_hwstate(vcpu);
++		kvm_timer_sync_hwstate(vcpu);
+=20
+ 		ret =3D handle_exit(vcpu, run, ret);
+ 	}
+--=20
 2.1.4
 
