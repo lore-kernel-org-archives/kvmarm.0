@@ -1,73 +1,150 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 25/25] arm: KVM: keep arm vfp/simd exit handling consistent with arm64
-Date: Thu, 20 Aug 2015 17:29:03 +0100
-Message-ID: <1440088143-4722-26-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 23/25] KVM: arm/arm64: timer: Allow the timer to control the active state
+Date: Thu, 20 Aug 2015 17:29:01 +0100
+Message-ID: <1440088143-4722-24-git-send-email-marc.zyngier@arm.com>
 References: <1440088143-4722-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1440088143-4722-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, Gleb Natapov <gleb@kernel.org>
-Cc: Mario Smarduch <m.smarduch@samsung.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, "Suzuki K. Poulose" <suzuki.poulose@arm.com>, Vladimir Murzin <vladimir.murzin@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Mario Smarduch <m.smarduch@samsung.com>, "Suzuki K. Poulose" <suzuki.poulose@arm.com>, Vladimir Murzin <vladimir.murzin@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Mario Smarduch <m.smarduch@samsung.com>
+In order to remove the crude hack where we sneak the masked bit
+into the timer's control register, make use of the phys_irq_map
+API control the active state of the interrupt.
 
-After enhancing arm64 FP/SIMD exit handling, ARMv7 VFP exit branch is moved
-to guest trap handling. This allows us to keep exit handling flow between both
-architectures consistent.
+This causes some limited changes to allow for potential error
+propagation.
 
-Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/interrupts.S | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ arch/arm/kvm/reset.c         |  4 +---
+ arch/arm64/kvm/reset.c       |  4 +---
+ include/kvm/arm_arch_timer.h |  7 +++++--
+ virt/kvm/arm/arch_timer.c    | 29 ++++++++++++++++++++++-------
+ 4 files changed, 29 insertions(+), 15 deletions(-)
 
-diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
-index 568494d..900ef6d 100644
---- a/arch/arm/kvm/interrupts.S
-+++ b/arch/arm/kvm/interrupts.S
-@@ -361,10 +361,6 @@ hyp_hvc:
- 	@ Check syndrome register
- 	mrc	p15, 4, r1, c5, c2, 0	@ HSR
- 	lsr	r0, r1, #HSR_EC_SHIFT
--#ifdef CONFIG_VFPv3
--	cmp	r0, #HSR_EC_CP_0_13
--	beq	switch_to_guest_vfp
--#endif
- 	cmp	r0, #HSR_EC_HVC
- 	bne	guest_trap		@ Not HVC instr.
+diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
+index f558c07..eeb8585 100644
+--- a/arch/arm/kvm/reset.c
++++ b/arch/arm/kvm/reset.c
+@@ -77,7 +77,5 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	kvm_reset_coprocs(vcpu);
  
-@@ -378,7 +374,10 @@ hyp_hvc:
- 	cmp     r2, #0
- 	bne	guest_trap		@ Guest called HVC
+ 	/* Reset arch_timer context */
+-	kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
+-
+-	return 0;
++	return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
+ }
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index b4af618..91cf535 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -121,7 +121,5 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	kvm_reset_sys_regs(vcpu);
  
--host_switch_to_hyp:
+ 	/* Reset timer */
+-	kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
+-
+-	return 0;
++	return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
+ }
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index e596675..e1e4d7c 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -52,13 +52,16 @@ struct arch_timer_cpu {
+ 
+ 	/* Timer IRQ */
+ 	const struct kvm_irq_level	*irq;
++
++	/* VGIC mapping */
++	struct irq_phys_map		*map;
+ };
+ 
+ int kvm_timer_hyp_init(void);
+ void kvm_timer_enable(struct kvm *kvm);
+ void kvm_timer_init(struct kvm *kvm);
+-void kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+-			  const struct kvm_irq_level *irq);
++int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
++			 const struct kvm_irq_level *irq);
+ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu);
+ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu);
+ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 98c95f2..76e38d2 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -64,10 +64,10 @@ static void kvm_timer_inject_irq(struct kvm_vcpu *vcpu)
+ 	int ret;
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 
+-	timer->cntv_ctl |= ARCH_TIMER_CTRL_IT_MASK;
+-	ret = kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
+-				  timer->irq->irq,
+-				  timer->irq->level);
++	kvm_vgic_set_phys_irq_active(timer->map, true);
++	ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
++					 timer->map,
++					 timer->irq->level);
+ 	WARN_ON(ret);
+ }
+ 
+@@ -117,7 +117,8 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
+ 	cycle_t cval, now;
+ 
+ 	if ((timer->cntv_ctl & ARCH_TIMER_CTRL_IT_MASK) ||
+-		!(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE))
++	    !(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE) ||
++	    kvm_vgic_get_phys_irq_active(timer->map))
+ 		return false;
+ 
+ 	cval = timer->cntv_cval;
+@@ -184,10 +185,11 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+ 	timer_arm(timer, ns);
+ }
+ 
+-void kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+-			  const struct kvm_irq_level *irq)
++int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
++			 const struct kvm_irq_level *irq)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
++	struct irq_phys_map *map;
+ 
+ 	/*
+ 	 * The vcpu timer irq number cannot be determined in
+@@ -196,6 +198,17 @@ void kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+ 	 * vcpu timer irq number when the vcpu is reset.
+ 	 */
+ 	timer->irq = irq;
++
 +	/*
-+	 * Getting here means host called HVC, we shift parameters and branch
-+	 * to Hyp function.
++	 * Tell the VGIC that the virtual interrupt is tied to a
++	 * physical interrupt. We do that once per VCPU.
 +	 */
- 	pop	{r0, r1, r2}
++	map = kvm_vgic_map_phys_irq(vcpu, irq->irq, host_vtimer_irq);
++	if (WARN_ON(IS_ERR(map)))
++		return PTR_ERR(map);
++
++	timer->map = map;
++	return 0;
+ }
  
- 	/* Check for __hyp_get_vectors */
-@@ -409,6 +408,10 @@ guest_trap:
+ void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+@@ -335,6 +348,8 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
  
- 	@ Check if we need the fault information
- 	lsr	r1, r1, #HSR_EC_SHIFT
-+#ifdef CONFIG_VFPv3
-+	cmp	r1, #HSR_EC_CP_0_13
-+	beq	switch_to_guest_vfp
-+#endif
- 	cmp	r1, #HSR_EC_IABT
- 	mrceq	p15, 4, r2, c6, c0, 2	@ HIFAR
- 	beq	2f
-@@ -477,7 +480,6 @@ guest_trap:
-  */
- #ifdef CONFIG_VFPv3
- switch_to_guest_vfp:
--	load_vcpu			@ Load VCPU pointer to r0
- 	push	{r3-r7}
+ 	timer_disarm(timer);
++	if (timer->map)
++		kvm_vgic_unmap_phys_irq(vcpu, timer->map);
+ }
  
- 	@ NEON/VFP used.  Turn on VFP access.
+ void kvm_timer_enable(struct kvm *kvm)
 -- 
 2.1.4
 
