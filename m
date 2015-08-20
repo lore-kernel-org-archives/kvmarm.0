@@ -1,59 +1,57 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 09/25] KVM: arm64: guest debug, HW assisted debug support
-Date: Thu, 20 Aug 2015 17:28:47 +0100
-Message-ID: <1440088143-4722-10-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 13/25] arm64: KVM: remove remaining reference to vgic_sr_vectors
+Date: Thu, 20 Aug 2015 17:28:51 +0100
+Message-ID: <1440088143-4722-14-git-send-email-marc.zyngier@arm.com>
 References: <1440088143-4722-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1440088143-4722-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, Gleb Natapov <gleb@kernel.org>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Mario Smarduch <m.smarduch@samsung.com>, "Suzuki K. Poulose" <suzuki.poulose@arm.com>, Vladimir Murzin <vladimir.murzin@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Vladimir Murzin <Vladimir.Murzin@arm.com>, Vladimir Murzin <vladimir.murzin@arm.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Mario Smarduch <m.smarduch@samsung.com>, "Suzuki K. Poulose" <suzuki.poulose@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-=46rom: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+From: Vladimir Murzin <Vladimir.Murzin@arm.com>
 
-This adds support for userspace to control the HW debug registers for
-guest debug. In the debug ioctl we copy an IMPDEF registers into a new
-register set called host_debug_state.
+Since commit 8a14849 (arm64: KVM: Switch vgic save/restore to
+alternative_insn) vgic_sr_vectors is not used anymore, so remove
+remaining leftovers and kill the structure.
 
-We use the recently introduced vcpu parameter debug_ptr to select which
-register set is copied into the real registers when world switch occurs=
-=2E
-
-I've made some helper functions from hw_breakpoint.c more widely
-available for re-use.
-
-As with single step we need to tweak the guest registers to enable the
-exceptions so we need to save and restore those bits.
-
-Two new capabilities have been added to the KVM_EXTENSION ioctl to allo=
-w
-userspace to query the number of hardware break and watch points
-available on the host hardware.
-
-Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- include/uapi/linux/kvm.h | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm64/include/asm/kvm_host.h | 5 -----
+ arch/arm64/kernel/asm-offsets.c   | 2 --
+ 2 files changed, 7 deletions(-)
 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 4ab3c6a..a1e08e7 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -820,6 +820,8 @@ struct kvm_ppc_smmu_info {
- #define KVM_CAP_DISABLE_QUIRKS 116
- #define KVM_CAP_X86_SMM 117
- #define KVM_CAP_MULTI_ADDRESS_SPACE 118
-+#define KVM_CAP_GUEST_DEBUG_HW_BPS 119
-+#define KVM_CAP_GUEST_DEBUG_HW_WPS 120
-=20
- #ifdef KVM_CAP_IRQ_ROUTING
-=20
---=20
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 409217f..415938d 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -246,11 +246,6 @@ static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
+ 		     hyp_stack_ptr, vector_ptr);
+ }
+ 
+-struct vgic_sr_vectors {
+-	void	*save_vgic;
+-	void	*restore_vgic;
+-};
+-
+ static inline void kvm_arch_hardware_disable(void) {}
+ static inline void kvm_arch_hardware_unsetup(void) {}
+ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+index d886308..8d89cf8 100644
+--- a/arch/arm64/kernel/asm-offsets.c
++++ b/arch/arm64/kernel/asm-offsets.c
+@@ -132,8 +132,6 @@ int main(void)
+   DEFINE(KVM_TIMER_ENABLED,	offsetof(struct kvm, arch.timer.enabled));
+   DEFINE(VCPU_KVM,		offsetof(struct kvm_vcpu, kvm));
+   DEFINE(VCPU_VGIC_CPU,		offsetof(struct kvm_vcpu, arch.vgic_cpu));
+-  DEFINE(VGIC_SAVE_FN,		offsetof(struct vgic_sr_vectors, save_vgic));
+-  DEFINE(VGIC_RESTORE_FN,	offsetof(struct vgic_sr_vectors, restore_vgic));
+   DEFINE(VGIC_V2_CPU_HCR,	offsetof(struct vgic_cpu, vgic_v2.vgic_hcr));
+   DEFINE(VGIC_V2_CPU_VMCR,	offsetof(struct vgic_cpu, vgic_v2.vgic_vmcr));
+   DEFINE(VGIC_V2_CPU_MISR,	offsetof(struct vgic_cpu, vgic_v2.vgic_misr));
+-- 
 2.1.4
 
