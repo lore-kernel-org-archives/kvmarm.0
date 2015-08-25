@@ -1,78 +1,90 @@
-From: harry <tiancaixiaoyu90@126.com>
-Subject: KVM/ARM:Read SP_usr and SP_svc in HYP mode
-Date: Tue, 25 Aug 2015 12:40:28 +0800 (CST)
-Message-ID: <4dca1652.6049.14f63284666.Coremail.tiancaixiaoyu90@126.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v2 08/15] KVM: arm64: introduce ITS emulation file with
+ stub functions
+Date: Tue, 25 Aug 2015 10:39:45 +0100
+Message-ID: <55DC37E1.6060401@arm.com>
+References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com>
+ <1436538111-4294-9-git-send-email-andre.przywara@arm.com>
+ <55CC921B.503@linaro.org>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============8345562649741037271=="
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 24E3E41375
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2015 00:26:53 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RqybTzjKLNyG for <kvmarm@lists.cs.columbia.edu>;
- Tue, 25 Aug 2015 00:26:52 -0400 (EDT)
-Received: from m15-1.126.com (m15-1.126.com [220.181.15.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A0CA41374
- for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2015 00:26:50 -0400 (EDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <55CC921B.503@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Eric Auger <eric.auger@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, Pavel Fedin <p.fedin@samsung.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============8345562649741037271==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_96853_1779189227.1440477628006"
+Salut Eric,
 
-------=_Part_96853_1779189227.1440477628006
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
+=2E...
 
-SGksCgpOb3cgSSB3YW50IHRvIGRvIG1vcmUgdGhpbmdzIGluIEhZUCBtb2RlLCBzbyBJIG5lZWQg
-dG8gcmVhZCBTUF91c3IgYW5kIFNQX3N2YyB0byBnZXQgc29tZSBpbmZvcm1hdGlvbiBpbiBIWVAg
-bW9kZS4gQnV0IEkgZG9uJ3Qga25vdyBob3cgdG8gYWNoaWV2ZSBpdC4gSXMgdGhlcmUgYW55IGFz
-bSBjb21tYW5kIHRvIGFjaGlldmUgdGhpcz8gT3IgZG8gSSBuZWVkIHRvIHN3aXRjaCB0aGUgbW9k
-ZSBtYW51YWxseSB0byByZWFkIGl0PwoKVGhhbmtzIGFuZCByZWdhcmRzLApIYXJyeQo=
-------=_Part_96853_1779189227.1440477628006
-Content-Type: text/html; charset=GBK
-Content-Transfer-Encoding: base64
+>> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul=
+=2Ec
+>> index 5269ad1..f5865e7 100644
+>> --- a/virt/kvm/arm/vgic-v3-emul.c
+>> +++ b/virt/kvm/arm/vgic-v3-emul.c
+>> @@ -48,6 +48,7 @@
+>>  #include <asm/kvm_mmu.h>
+>> =20
+>>  #include "vgic.h"
+>> +#include "its-emul.h"
+>> =20
+>>  static bool handle_mmio_rao_wi(struct kvm_vcpu *vcpu,
+>>  			       struct kvm_exit_mmio *mmio, phys_addr_t offset)
+>> @@ -530,9 +531,20 @@ static bool handle_mmio_ctlr_redist(struct kvm_=
+vcpu *vcpu,
+>>  				    struct kvm_exit_mmio *mmio,
+>>  				    phys_addr_t offset)
+>>  {
+>> -	/* since we don't support LPIs, this register is zero for now */
+>> -	vgic_reg_access(mmio, NULL, offset,
+>> -			ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
+>> +	struct vgic_dist *dist =3D &vcpu->kvm->arch.vgic;
+>> +	u32 reg;
+>> +
+>> +	if (!vgic_has_its(vcpu->kvm)) {
+>> +		vgic_reg_access(mmio, NULL, offset,
+>> +				ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
+>> +		return false;
+>> +	}
+> can't we remove above block and ...
+>> +	reg =3D dist->lpis_enabled ? GICR_CTLR_ENABLE_LPIS : 0;
+>> +	vgic_reg_access(mmio, &reg, offset,
+>> +			ACCESS_READ_VALUE | ACCESS_WRITE_VALUE);
+>> +	if (!dist->lpis_enabled && (reg & GICR_CTLR_ENABLE_LPIS
+> add vgic_has_its(vcpu->kvm) && above?
 
-PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS43O2NvbG9yOiMwMDAwMDA7Zm9udC1zaXplOjE0cHg7
-Zm9udC1mYW1pbHk6QXJpYWwiPjxkaXY+SGksPGJyPjxicj5Ob3cgSSB3YW50IHRvIGRvIG1vcmUg
-dGhpbmdzIGluIEhZUCBtb2RlLCBzbyBJIG5lZWQgdG8gcmVhZCBTUF91c3IgYW5kIFNQX3N2YyB0
-byBnZXQgc29tZSBpbmZvcm1hdGlvbiBpbiBIWVAgbW9kZS4gQnV0IEkgZG9uJ3Qga25vdyBob3cg
-dG8gYWNoaWV2ZSBpdC4gSXMgdGhlcmUgYW55IGFzbSBjb21tYW5kIHRvIGFjaGlldmUgdGhpcz8g
-T3IgZG8gSSBuZWVkIHRvIHN3aXRjaCB0aGUgbW9kZSBtYW51YWxseSB0byByZWFkIGl0Pzxicj48
-YnI+VGhhbmtzIGFuZCByZWdhcmRzLDxicj5IYXJyeTxicj48L2Rpdj48L2Rpdj48YnI+PGJyPjxz
-cGFuIHRpdGxlPSJuZXRlYXNlZm9vdGVyIj48c3BhbiBpZD0ibmV0ZWFzZV9tYWlsX2Zvb3RlciI+
-PGRpdiBpZD0ibmV0ZWFzZV9tYWlsX2Zvb3RlciI+PGRpdiBzdHlsZT0iYm9yZGVyLXRvcDojQ0ND
-IDFweCBzb2xpZDtwYWRkaW5nOjEwcHggNXB4O2ZvbnQtc2l6ZToxMnB4O2NvbG9yOiM3Nzc7bGlu
-ZS1oZWlnaHQ6MjJweCI+PGEgbG9nPTEgbG9naWQ9ImZvb3Rlcl9iZWF1dHlfMjAxNTA4MTYiIGhy
-ZWY9Imh0dHA6Ly9yLm1haWwuMTYzLmNvbS9yLmpzcD91cmw9aHR0cCUzQSUyRiUyRjEuMTYzLmNv
-bSUyRmhkJTJGb25lYWN0JTJGaGRmcmFtZS5kbyUzRmlkJTNEMjElMjZmcm9tJTNEZm9vdGVyX2Jl
-YXV0eSZzaWduPTgxNzU5MzY4MSZfcl9pZ25vcmVfc3RhdElkPTdfMTNfNzlfNDgmX3JfaWdub3Jl
-X3VpZD1udEAxNjMuY29tIiB0YXJnZXQ9Il9ibGFuayIgc3R5bGU9ImNvbG9yOiMzMzY2RkY7dGV4
-dC1kZWNvcmF0aW9uOm5vbmUiPs/EyNWzqc/6sPG088XGw8DXsda70qox1Ko8L2E+PC9kaXY+PC9k
-aXY+DQo8L3NwYW4+PC9zcGFuPg==
-------=_Part_96853_1779189227.1440477628006--
+Yeah, makes some sense. Changed that.
+>=20
+> Besides Reviewed-by: Eric Auger <eric.auger@linaro.org>
 
+Merci!
 
---===============8345562649741037271==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Andr=E9
 
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============8345562649741037271==--
+>=20
+> Eric
+> )) {
+>> +		/* Eventually do something */
+>> +	}
+>>  	return false;
+>>  }
+>> =20
+>> @@ -861,6 +873,12 @@ static int vgic_v3_map_resources(struct kvm *kv=
+m,
+>>  		rdbase +=3D GIC_V3_REDIST_SIZE;
+>>  	}
+>> =20
+>> +	if (vgic_has_its(kvm)) {
+>> +		ret =3D vits_init(kvm);
+>> +		if (ret)
+>> +			goto out_unregister;
+>> +	}
+>> +
+>>  	dist->redist_iodevs =3D iodevs;
+>>  	dist->ready =3D true;
+>>  	goto out;
+>>
+>=20
