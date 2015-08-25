@@ -1,208 +1,78 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v2 07/15] KVM: arm64: handle ITS related GICv3
- redistributor registers
-Date: Mon, 24 Aug 2015 19:08:19 +0100
-Message-ID: <55DB5D93.3090007@arm.com>
-References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com>
- <1436538111-4294-8-git-send-email-andre.przywara@arm.com>
- <55CC8AE2.2070807@linaro.org>
+From: harry <tiancaixiaoyu90@126.com>
+Subject: KVM/ARM:Read SP_usr and SP_svc in HYP mode
+Date: Tue, 25 Aug 2015 12:40:28 +0800 (CST)
+Message-ID: <4dca1652.6049.14f63284666.Coremail.tiancaixiaoyu90@126.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <55CC8AE2.2070807@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Eric Auger <eric.auger@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, Pavel Fedin <p.fedin@samsung.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Content-Type: multipart/mixed; boundary="===============8345562649741037271=="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 24E3E41375
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2015 00:26:53 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id RqybTzjKLNyG for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Aug 2015 00:26:52 -0400 (EDT)
+Received: from m15-1.126.com (m15-1.126.com [220.181.15.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A0CA41374
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2015 00:26:50 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
+--===============8345562649741037271==
+Content-Type: multipart/alternative;
+	boundary="----=_Part_96853_1779189227.1440477628006"
 
-On 13/08/15 13:17, Eric Auger wrote:
-> On 07/10/2015 04:21 PM, Andre Przywara wrote:
->> In the GICv3 redistributor there are the PENDBASER and PROPBASER
->> registers which we did not emulate so far, as they only make sense
->> when having an ITS. In preparation for that emulate those MMIO
->> accesses by storing the 64-bit data written into it into a variable
->> which we later read in the ITS emulation.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> ---
->>  include/kvm/arm_vgic.h      |  8 ++++++++
->>  virt/kvm/arm/vgic-v3-emul.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
->>  virt/kvm/arm/vgic.c         | 35 +++++++++++++++++++++++++++++++++++
->>  virt/kvm/arm/vgic.h         |  4 ++++
->>  4 files changed, 91 insertions(+)
->>
->> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->> index 3ee063b..8c6cb0e 100644
->> --- a/include/kvm/arm_vgic.h
->> +++ b/include/kvm/arm_vgic.h
->> @@ -256,6 +256,14 @@ struct vgic_dist {
->>  	struct vgic_vm_ops	vm_ops;
->>  	struct vgic_io_device	dist_iodev;
->>  	struct vgic_io_device	*redist_iodevs;
->> +
->> +	/* Address of LPI configuration table shared by all redistributors */
->> +	u64			propbaser;
->> +
->> +	/* Addresses of LPI pending tables per redistributor */
->> +	u64			*pendbaser;
->> +
->> +	bool			lpis_enabled;
->>  };
->>  
->>  struct vgic_v2_cpu_if {
->> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
->> index a8cf669..5269ad1 100644
->> --- a/virt/kvm/arm/vgic-v3-emul.c
->> +++ b/virt/kvm/arm/vgic-v3-emul.c
->> @@ -651,6 +651,38 @@ static bool handle_mmio_cfg_reg_redist(struct kvm_vcpu *vcpu,
->>  	return vgic_handle_cfg_reg(reg, mmio, offset);
->>  }
->>  
->> +/* We don't trigger any actions here, just store the register value */
->> +static bool handle_mmio_propbaser_redist(struct kvm_vcpu *vcpu,
->> +					 struct kvm_exit_mmio *mmio,
->> +					 phys_addr_t offset)
->> +{
->> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->> +	int mode = ACCESS_READ_VALUE;
->> +
->> +	/* Storing a value with LPIs already enabled is undefined */
->> +	mode |= dist->lpis_enabled ? ACCESS_WRITE_IGNORED : ACCESS_WRITE_VALUE;
->> +	vgic_handle_base_register(vcpu, mmio, offset, &dist->propbaser, mode);
->> +
->> +	return false;
->> +}
->> +
->> +/* We don't trigger any actions here, just store the register value */
->> +static bool handle_mmio_pendbaser_redist(struct kvm_vcpu *vcpu,
->> +					 struct kvm_exit_mmio *mmio,
->> +					 phys_addr_t offset)
->> +{
->> +	struct kvm_vcpu *rdvcpu = mmio->private;
->> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->> +	int mode = ACCESS_READ_VALUE;
->> +
->> +	/* Storing a value with LPIs already enabled is undefined */
->> +	mode |= dist->lpis_enabled ? ACCESS_WRITE_IGNORED : ACCESS_WRITE_VALUE;
->> +	vgic_handle_base_register(vcpu, mmio, offset,
->> +				  &dist->pendbaser[rdvcpu->vcpu_id], mode);
->> +
->> +	return false;
->> +}
->> +
->>  #define SGI_base(x) ((x) + SZ_64K)
->>  
->>  static const struct vgic_io_range vgic_redist_ranges[] = {
->> @@ -679,6 +711,18 @@ static const struct vgic_io_range vgic_redist_ranges[] = {
->>  		.handle_mmio    = handle_mmio_raz_wi,
->>  	},
->>  	{
->> +		.base		= GICR_PENDBASER,
->> +		.len		= 0x08,
->> +		.bits_per_irq	= 0,
->> +		.handle_mmio	= handle_mmio_pendbaser_redist,
->> +	},
->> +	{
->> +		.base		= GICR_PROPBASER,
->> +		.len		= 0x08,
->> +		.bits_per_irq	= 0,
->> +		.handle_mmio	= handle_mmio_propbaser_redist,
->> +	},
->> +	{
->>  		.base           = GICR_IDREGS,
->>  		.len            = 0x30,
->>  		.bits_per_irq   = 0,
->> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
->> index 15e447f..49ee92b 100644
->> --- a/virt/kvm/arm/vgic.c
->> +++ b/virt/kvm/arm/vgic.c
->> @@ -446,6 +446,41 @@ void vgic_reg_access(struct kvm_exit_mmio *mmio, u32 *reg,
->>  	}
->>  }
->>  
->> +/* handle a 64-bit register access */
->> +void vgic_handle_base_register(struct kvm_vcpu *vcpu,
->> +			       struct kvm_exit_mmio *mmio,
->> +			       phys_addr_t offset, u64 *basereg,
->> +			       int mode)
->> +{
-> why do we have vcpu in the proto? I don't see it used. Also if it were
-> can't we fetch it from mmio->private?
-> 
-> why not renaming this into something like vgic_reg64_access as par
-> vgic_reg_access 32b flavor above. vgic_handle* usually is the name of
-> the region handler returning bool?
+------=_Part_96853_1779189227.1440477628006
+Content-Type: text/plain; charset=GBK
+Content-Transfer-Encoding: base64
 
-Makes sense, I both renamed the function and removed the vcpu parameter.
-I need to check whether we need the vcpu to do some endianness checks in
-the future, though. Using mmio->private would be a hack, then.
+SGksCgpOb3cgSSB3YW50IHRvIGRvIG1vcmUgdGhpbmdzIGluIEhZUCBtb2RlLCBzbyBJIG5lZWQg
+dG8gcmVhZCBTUF91c3IgYW5kIFNQX3N2YyB0byBnZXQgc29tZSBpbmZvcm1hdGlvbiBpbiBIWVAg
+bW9kZS4gQnV0IEkgZG9uJ3Qga25vdyBob3cgdG8gYWNoaWV2ZSBpdC4gSXMgdGhlcmUgYW55IGFz
+bSBjb21tYW5kIHRvIGFjaGlldmUgdGhpcz8gT3IgZG8gSSBuZWVkIHRvIHN3aXRjaCB0aGUgbW9k
+ZSBtYW51YWxseSB0byByZWFkIGl0PwoKVGhhbmtzIGFuZCByZWdhcmRzLApIYXJyeQo=
+------=_Part_96853_1779189227.1440477628006
+Content-Type: text/html; charset=GBK
+Content-Transfer-Encoding: base64
 
-Cheers,
-Andre.
+PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS43O2NvbG9yOiMwMDAwMDA7Zm9udC1zaXplOjE0cHg7
+Zm9udC1mYW1pbHk6QXJpYWwiPjxkaXY+SGksPGJyPjxicj5Ob3cgSSB3YW50IHRvIGRvIG1vcmUg
+dGhpbmdzIGluIEhZUCBtb2RlLCBzbyBJIG5lZWQgdG8gcmVhZCBTUF91c3IgYW5kIFNQX3N2YyB0
+byBnZXQgc29tZSBpbmZvcm1hdGlvbiBpbiBIWVAgbW9kZS4gQnV0IEkgZG9uJ3Qga25vdyBob3cg
+dG8gYWNoaWV2ZSBpdC4gSXMgdGhlcmUgYW55IGFzbSBjb21tYW5kIHRvIGFjaGlldmUgdGhpcz8g
+T3IgZG8gSSBuZWVkIHRvIHN3aXRjaCB0aGUgbW9kZSBtYW51YWxseSB0byByZWFkIGl0Pzxicj48
+YnI+VGhhbmtzIGFuZCByZWdhcmRzLDxicj5IYXJyeTxicj48L2Rpdj48L2Rpdj48YnI+PGJyPjxz
+cGFuIHRpdGxlPSJuZXRlYXNlZm9vdGVyIj48c3BhbiBpZD0ibmV0ZWFzZV9tYWlsX2Zvb3RlciI+
+PGRpdiBpZD0ibmV0ZWFzZV9tYWlsX2Zvb3RlciI+PGRpdiBzdHlsZT0iYm9yZGVyLXRvcDojQ0ND
+IDFweCBzb2xpZDtwYWRkaW5nOjEwcHggNXB4O2ZvbnQtc2l6ZToxMnB4O2NvbG9yOiM3Nzc7bGlu
+ZS1oZWlnaHQ6MjJweCI+PGEgbG9nPTEgbG9naWQ9ImZvb3Rlcl9iZWF1dHlfMjAxNTA4MTYiIGhy
+ZWY9Imh0dHA6Ly9yLm1haWwuMTYzLmNvbS9yLmpzcD91cmw9aHR0cCUzQSUyRiUyRjEuMTYzLmNv
+bSUyRmhkJTJGb25lYWN0JTJGaGRmcmFtZS5kbyUzRmlkJTNEMjElMjZmcm9tJTNEZm9vdGVyX2Jl
+YXV0eSZzaWduPTgxNzU5MzY4MSZfcl9pZ25vcmVfc3RhdElkPTdfMTNfNzlfNDgmX3JfaWdub3Jl
+X3VpZD1udEAxNjMuY29tIiB0YXJnZXQ9Il9ibGFuayIgc3R5bGU9ImNvbG9yOiMzMzY2RkY7dGV4
+dC1kZWNvcmF0aW9uOm5vbmUiPs/EyNWzqc/6sPG088XGw8DXsda70qox1Ko8L2E+PC9kaXY+PC9k
+aXY+DQo8L3NwYW4+PC9zcGFuPg==
+------=_Part_96853_1779189227.1440477628006--
 
-> 
->> +	u32 reg;
->> +	u64 breg;
->> +
->> +	switch (offset & ~3) {
->> +	case 0x00:
->> +		breg = *basereg;
->> +		reg = lower_32_bits(breg);
->> +		vgic_reg_access(mmio, &reg, offset & 3, mode);
->> +		if (mmio->is_write && (mode & ACCESS_WRITE_VALUE)) {
->> +			breg &= GENMASK_ULL(63, 32);
->> +			breg |= reg;
->> +			*basereg = breg;
->> +		}
->> +		break;
->> +	case 0x04:
->> +		breg = *basereg;
->> +		reg = upper_32_bits(breg);
->> +		vgic_reg_access(mmio, &reg, offset & 3, mode);
->> +		if (mmio->is_write && (mode & ACCESS_WRITE_VALUE)) {
->> +			breg  = lower_32_bits(breg);
->> +			breg |= (u64)reg << 32;
->> +			*basereg = breg;
->> +		}
->> +		break;
->> +	}
->> +}
->> +
->> +
->> +
-> some spare white lines
-> 
-> Best Regards
-> 
-> Eric
->>  bool handle_mmio_raz_wi(struct kvm_vcpu *vcpu, struct kvm_exit_mmio *mmio,
->>  			phys_addr_t offset)
->>  {
->> diff --git a/virt/kvm/arm/vgic.h b/virt/kvm/arm/vgic.h
->> index a093f5c..b2d791c 100644
->> --- a/virt/kvm/arm/vgic.h
->> +++ b/virt/kvm/arm/vgic.h
->> @@ -71,6 +71,10 @@ void vgic_reg_access(struct kvm_exit_mmio *mmio, u32 *reg,
->>  		     phys_addr_t offset, int mode);
->>  bool handle_mmio_raz_wi(struct kvm_vcpu *vcpu, struct kvm_exit_mmio *mmio,
->>  			phys_addr_t offset);
->> +void vgic_handle_base_register(struct kvm_vcpu *vcpu,
->> +			       struct kvm_exit_mmio *mmio,
->> +			       phys_addr_t offset, u64 *basereg,
->> +			       int mode);
->>  
->>  static inline
->>  u32 mmio_data_read(struct kvm_exit_mmio *mmio, u32 mask)
->>
-> 
+
+--===============8345562649741037271==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============8345562649741037271==--
