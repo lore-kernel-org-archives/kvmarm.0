@@ -1,176 +1,100 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v2 10/15] KVM: arm64: add data structures to model ITS
- interrupt translation
-Date: Tue, 25 Aug 2015 12:15:11 +0100
-Message-ID: <55DC4E3F.506@arm.com>
-References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com>
- <1436538111-4294-11-git-send-email-andre.przywara@arm.com>
- <55CCBBBF.1080407@linaro.org>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: KVM Live migration with GICv3
+Date: Tue, 25 Aug 2015 14:27:11 +0300
+Message-ID: <013601d0df28$fcb635b0$f622a110$@samsung.com>
+References: <CALicx6soU-pqs3XgkEHxtBVy9yR-7irSU4ZJvC3D6V2UmKHQqA@mail.gmail.com>
+ <009101d0d400$c92925f0$5b7b71d0$@samsung.com>
+ <CALicx6s4BOuHsP40r2zuqgiLh+Rx=e=UQvwV5_R7LJB9-dpkig@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <55CCBBBF.1080407@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: Eric Auger <eric.auger@linaro.org>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Pavel Fedin <p.fedin@samsung.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 40F9941911
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2015 07:13:37 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id THvfNPPUdw7j for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 25 Aug 2015 07:13:35 -0400 (EDT)
+Received: from mailout4.w1.samsung.com (mailout4.w1.samsung.com
+ [210.118.77.14])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2FCF2418CB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 25 Aug 2015 07:13:34 -0400 (EDT)
+Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
+ by mailout4.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NTM00EJNYHC5B90@mailout4.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Tue, 25 Aug 2015 12:27:13 +0100 (BST)
+In-reply-to: <CALicx6s4BOuHsP40r2zuqgiLh+Rx=e=UQvwV5_R7LJB9-dpkig@mail.gmail.com>
+Content-language: ru
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: 'Vijay Kilari' <vijay.kilari@gmail.com>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
-
-On 13/08/15 16:46, Eric Auger wrote:
-> 
-> On 07/10/2015 04:21 PM, Andre Przywara wrote:
->> The GICv3 Interrupt Translation Service (ITS) uses tables in memory
->> to allow a sophisticated interrupt routing. It features device tables,
->> an interrupt table per device and a table connecting "collections" to
->> actual CPUs (aka. redistributors in the GICv3 lingo).
->> Since the interrupt numbers for the LPIs are allocated quite sparsely
->> and the range can be quite huge (8192 LPIs being the minimum), using
->> bitmaps or arrays for storing information is a waste of memory.
->> We use linked lists instead, which we iterate linearily. This works
->> very well with the actual number of LPIs/MSIs in the guest being
->> quite low. Should the number of LPIs exceed the number where iterating
->> through lists seems acceptable, we can later revisit this and use more
->> efficient data structures.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> ---
->>  include/kvm/arm_vgic.h  |  3 +++
->>  virt/kvm/arm/its-emul.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 51 insertions(+)
->>
->> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->> index b432055..1648668 100644
->> --- a/include/kvm/arm_vgic.h
->> +++ b/include/kvm/arm_vgic.h
->> @@ -25,6 +25,7 @@
->>  #include <linux/spinlock.h>
->>  #include <linux/types.h>
->>  #include <kvm/iodev.h>
->> +#include <linux/list.h>
->>  
->>  #define VGIC_NR_IRQS_LEGACY	256
->>  #define VGIC_NR_SGIS		16
->> @@ -162,6 +163,8 @@ struct vgic_its {
->>  	u64			cbaser;
->>  	int			creadr;
->>  	int			cwriter;
->> +	struct list_head	device_list;
->> +	struct list_head	collection_list;
->>  };
->>  
->>  struct vgic_dist {
->> diff --git a/virt/kvm/arm/its-emul.c b/virt/kvm/arm/its-emul.c
->> index b498f06..7f217fa 100644
->> --- a/virt/kvm/arm/its-emul.c
->> +++ b/virt/kvm/arm/its-emul.c
->> @@ -21,6 +21,7 @@
->>  #include <linux/kvm.h>
->>  #include <linux/kvm_host.h>
->>  #include <linux/interrupt.h>
->> +#include <linux/list.h>
->>  
->>  #include <linux/irqchip/arm-gic-v3.h>
->>  #include <kvm/arm_vgic.h>
->> @@ -32,6 +33,25 @@
->>  #include "vgic.h"
->>  #include "its-emul.h"
->>  
->> +struct its_device {
->> +	struct list_head dev_list;
->> +	struct list_head itt;
->> +	u32 device_id;
->> +};
->> +
->> +struct its_collection {
->> +	struct list_head coll_list;
->> +	u32 collection_id;
->> +	u32 target_addr;
->> +};
->> +
->> +struct its_itte {
->> +	struct list_head itte_list;
->> +	struct its_collection *collection;
->> +	u32 lpi;
->> +	u32 event_id;
->> +};
->> +
->>  #define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
->>  
->>  /* The distributor lock is held by the VGIC MMIO handler. */
->> @@ -311,6 +331,9 @@ int vits_init(struct kvm *kvm)
->>  
->>  	spin_lock_init(&its->lock);
->>  
->> +	INIT_LIST_HEAD(&its->device_list);
->> +	INIT_LIST_HEAD(&its->collection_list);
->> +
->>  	its->enabled = false;
->>  
->>  	return -ENXIO;
->> @@ -320,11 +343,36 @@ void vits_destroy(struct kvm *kvm)
->>  {
->>  	struct vgic_dist *dist = &kvm->arch.vgic;
->>  	struct vgic_its *its = &dist->its;
->> +	struct its_device *dev;
->> +	struct its_itte *itte;
->> +	struct list_head *dev_cur, *dev_temp;
->> +	struct list_head *cur, *temp;
->>  
->>  	if (!vgic_has_its(kvm))
->>  		return;
->>  
->> +	if (!its->device_list.next)
-> Why not using list_empty? But I think I would simply remove this since
-> the empty case if handle below...
-
-list_empty() requires the list to be initialized before. This check here
-is to detect that map_resources was never called (this is only done on
-the first VCPU run) and thus device_list is basically still all zeroes.
-If we abort the guest without ever running a VCPU (for instance because
-some initialization failed), we call vits_destroy() anyway (because this
-is called when tearing down the VGIC device).
-So the check is here to detect early that vits_destroy() has been called
-without the ITS ever been fully initialized. This fixed a real bug when
-the guest start was aborted before the ITS was ever used.
-I will add a comment to make this clear.
-
->> +		return;
->> +
->> +	spin_lock(&its->lock);
->> +	list_for_each_safe(dev_cur, dev_temp, &its->device_list) {
->> +		dev = container_of(dev_cur, struct its_device, dev_list);
-> isn't the usage of list_for_each_entry_safe more synthetic here?
-
-If I got this correctly, we need the _safe variant if we want to remove
-the list item within the loop. Or am I missing something here?
-
-Cheers,
-Andre.
-
-
->> +		list_for_each_safe(cur, temp, &dev->itt) {
->> +			itte = (container_of(cur, struct its_itte, itte_list));
-> same
-> 
-> Eric
->> +			list_del(cur);
->> +			kfree(itte);
->> +		}
->> +		list_del(dev_cur);
->> +		kfree(dev);
->> +	}
->> +
->> +	list_for_each_safe(cur, temp, &its->collection_list) {
->> +		list_del(cur);
->> +		kfree(container_of(cur, struct its_collection, coll_list));
->> +	}
->> +
->>  	kfree(dist->pendbaser);
->>  
->>  	its->enabled = false;
->> +	spin_unlock(&its->lock);
->>  }
->>
-> 
+IEhlbGxvISBXaGVyZSBhcmUgeW91PyBJJ2QgbGlrZSB0byB0YWtlIGEgbG9vayBhdCB5b3VyIGNv
+ZGUuCgpLaW5kIHJlZ2FyZHMsClBhdmVsIEZlZGluCkV4cGVydCBFbmdpbmVlcgpTYW1zdW5nIEVs
+ZWN0cm9uaWNzIFJlc2VhcmNoIGNlbnRlciBSdXNzaWEKCgo+IC0tLS0tT3JpZ2luYWwgTWVzc2Fn
+ZS0tLS0tCj4gRnJvbTogVmlqYXkgS2lsYXJpIFttYWlsdG86dmlqYXkua2lsYXJpQGdtYWlsLmNv
+bV0KPiBTZW50OiBUdWVzZGF5LCBBdWd1c3QgMTEsIDIwMTUgNjoxNiBQTQo+IFRvOiBQYXZlbCBG
+ZWRpbgo+IENjOiBrdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1OyBDaHJpc3RvZmZlciBEYWxs
+OyBBbGV4IEJlbm7DqWUKPiBTdWJqZWN0OiBSZTogS1ZNIExpdmUgbWlncmF0aW9uIHdpdGggR0lD
+djMKPiAKPiBPbiBUdWUsIEF1ZyAxMSwgMjAxNSBhdCAxMjoxMSBQTSwgUGF2ZWwgRmVkaW4gPHAu
+ZmVkaW5Ac2Ftc3VuZy5jb20+IHdyb3RlOgo+ID4gIEhlbGxvIQo+ID4KPiA+PiAgICBJIGhhdmUg
+cHJvdG90eXBlZCBMaXZlIG1pZ3JhdGlvbiB3aXRoIEdJQ3YzLgo+ID4KPiA+ICBUaGlzIGlzIGlu
+dGVyZXN0aW5nIG9mIGNvdXJzZSwgaSB3aWxsIG5lZWQgdGhpcyBmb3IgbXkgcHJvamVjdCB0b28g
+YW5kIGkgd2FzIGFsc28gZ29pbmcgdG8gdGFrZSBhIGxvb2sgYXQKPiB0aGlzIGxhdGVyLgo+ID4K
+PiA+PiBGb3IgdGhpcyBJIGhhdmUgbWFkZSBmb2xsb3dpbmcgY2hhbmdlcwo+ID4+Cj4gPj4gMSkg
+U2F2ZSBhbmQgUmVzdG9yZSBvZiBHSUN2MyByZWdpc3RlcnMgaW4gUUVNVS4KPiA+PiAgICAgLSBG
+b3IgR0lDdjIsIFFFTVUgaXMgc2F2aW5nL3Jlc3RvcmluZyBHSUNELCBHSUNDICByZWdpc3RlcnMu
+IEZvciBHSUN2MywKPiA+PiAgICAgIHdlIGhhdmUgdG8gc2F2ZS9yZXN0b3JlIEdJQ0QsIEdJQ1Ig
+YW5kIElDQyByZWdpc3RlcnMuCj4gPj4gICAgICBIb3dldmVyIElDQyByZWdpc3RlcnMgYXJlIHN5
+c3RlbSByZWdpc3RlcnMgd2hpY2ggY2Fubm90IGJlCj4gPj4gYWNjZXNzZWQgQCBFTDAgbGV2ZWwg
+KFNSRT0xKS4gU28gdGhlc2UgSUNDIHJlZ2lzdGVycyBzaG91bGQgYmUKPiA+PiBhY2Nlc3NlZCBh
+cyBtbWlvIHJlZ2lzdGVycyBieSBRRU1VLCBmb3IgdGhpcyB3ZSBoYXZlIHRvIGFkZCBpb2N0bCB0
+bwo+ID4+IGFjY2VzcyBJQ0MgQCBFTDEgbGV2ZWwgc2ltaWxhciB0byBHSUNDIHJlZ2lzdGVycyBv
+ZiBHSUN2Mi4KPiA+Cj4gPiAgU29ycnksIHlvdXIgZGVzY3JpcHRpb24gaXMgYSBiaXQgZnV6enku
+IFdoYXQgaW9jdGwncyBkaWQgeW91IGhhdmUgdG8gYWRkIGFuZCB3aHk/Cj4gPiAgVGhlIGtlcm5l
+bCBhbHJlYWR5IGhhcyBLVk1fR0VUX09ORV9SRUcgYW5kIEtWTV9TRVRfT05FX1JFRyBpb2N0bCdz
+LiBBbmQgdGhleSBjYW4gYmUgdXNlZAo+IHRvIGFjY2VzcyBhbnl0aGluZyBpbnNpZGUgdGhlIFZN
+LCBpbmNsdWRpbmcgc3lzdGVtIHJlZ2lzdGVycy4gSSBiZWxpZXZlIHlvdSB3b3VsZCBuZWVkIG9u
+bHkgdG8KPiBpbXBsZW1lbnQgaGFuZGxlcnMgZm9yIEdJQ3YzIHJlZ2lzdGVycy4KPiAKPiBJIG1l
+YW4gQ1BVIGludGVyZmFjZSByZWdpc3RlcnMgR0lDQyogZGVmaW5lZCBmb3IgdmdpY3YyIHVuZGVy
+Cj4gInZnaWNfY3B1X3Jhbmdlc1tdIiBpbgo+IHZpcnQva3ZtL2FybS92Z2ljLXYyLWVtdWwuYyBu
+ZWVkcyB0byBiZSBzYXZlZCBhbmQgcmVzdG9yZWQgZm9yIHZnaWN2MyBhcyB3ZWxsLgo+IFNvIHRv
+ICBhY2Nlc3MgdmdpY19jcHVfcmFuZ2VzW10gZm9yIHZnaWN2Mywgd2UgbmVlZCB0byByZWdpc3Rl
+ciBkZXZpY2UKPiBmb3IgQ1BVIHJlZ2lzdGVycyBzcGFjZQo+IHNpbWlsYXIgdG8gZ2ljdjIgaW4g
+UUVNVSBmb3IgZ2ljdjMuCj4gCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KPiAg
+ICAgbWVtb3J5X3JlZ2lvbl9pbml0X3Jlc2VydmF0aW9uKCZzLT5jcHVpb21lbVswXSwgT0JKRUNU
+KHMpLAo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgImt2bS1naWNfY3B1Iiwg
+MHgxMDAwKTsKPiAgICAgc3lzYnVzX2luaXRfbW1pbyhzYmQsICZzLT5jcHVpb21lbVswXSk7Cj4g
+ICAgIGt2bV9hcm1fcmVnaXN0ZXJfZGV2aWNlKCZzLT5jcHVpb21lbVswXSwKPiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgKEtWTV9BUk1fREVWSUNFX1ZHSUNfVjMgPDwgS1ZNX0FSTV9ERVZJ
+Q0VfSURfU0hJRlQpCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgS1ZNX1ZHSUNfVjNf
+QUREUl9UWVBFX0NQVSwKPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgS1ZNX0RFVl9BUk1f
+VkdJQ19HUlBfQUREUiwKPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgS1ZNX1ZHSUNfVjNf
+QUREUl9UWVBFX0NQVSwKPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcy0+ZGV2X2ZkKTsK
+PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4gCj4gQW55d2F5LCBJIHdpbGwg
+c2VuZCBSRkMgcGF0Y2hlcy4KPiAKPiA+Cj4gPj4gUGxlYXNlIHByb3ZpZGUgeW91ciBpbml0aWFs
+IGZlZWRiYWNrLgo+ID4KPiA+ICBXb3VsZCBiZSBuaWNlIHRvIHRha2UgYSBsb29rIGF0IHBhdGNo
+ZXMuCj4gPgo+ID4+IEkgYW0gYXR0ZW5kaW5nIEtWTS1mb3J1bSBuZXh0IHdlZWsgQCBTZWF0dGxl
+LiBXZSBjYW4gZGlzY3VzcyB0aGVyZSBhcyB3ZWxsLgo+ID4KPiA+ICBJIHdvdWxkIGxvdmUgdG8g
+Z28gdGhlcmUsIGFuZCBteSBjb21wYW55IHdhbnRlZCB0byBzZW5kIG1lIHRoZXJlLiBCdXQgaXQg
+YXBwZWFycyB0byBiZSBleHRyZW1lbHkKPiBkaWZmaWN1bHQgZm9yIGEgdGVjaCBzcGVjaWFsaXN0
+IGZyb20gUnVzc2lhIHRvIGdldCBhIFVTIHZpc2EuIFRoZXkgYXJlIHN0aWxsIGNvbnNpZGVyaW5n
+IG1lIGFuZCB0aGUgdGltZSBpcwo+IHJ1bm5pbmcgb3V0LCBzbyBpJ20gdW5saWtlbHkgdG8gYXR0
+ZW5kLCB1bmZvcnR1bmF0ZWx5Lgo+ID4KPiA+IEtpbmQgcmVnYXJkcywKPiA+IFBhdmVsIEZlZGlu
+Cj4gPiBFeHBlcnQgRW5naW5lZXIKPiA+IFNhbXN1bmcgRWxlY3Ryb25pY3MgUmVzZWFyY2ggY2Vu
+dGVyIFJ1c3NpYQo+ID4KPiA+CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5l
+ZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
