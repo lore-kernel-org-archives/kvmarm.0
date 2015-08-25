@@ -1,129 +1,380 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 4/4] irqchip: GIC: Don't deactivate interrupts forwarded to a guest
-Date: Tue, 25 Aug 2015 12:53:25 +0100
-Message-ID: <1440503605-10185-5-git-send-email-marc.zyngier@arm.com>
-References: <1440503605-10185-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1440503605-10185-1-git-send-email-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
-Cc: Eric Auger <eric.auger@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Jiang Liu <jiang.liu@linux.intel.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v2 11/15] KVM: arm64: handle pending bit for LPIs in ITS
+ emulation
+Date: Tue, 25 Aug 2015 15:34:06 +0100
+Message-ID: <55DC7CDE.3020409@arm.com>
+References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com>
+ <1436538111-4294-12-git-send-email-andre.przywara@arm.com>
+ <55CDD7ED.90008@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <55CDD7ED.90008@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Eric Auger <eric.auger@linaro.org>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Pavel Fedin <p.fedin@samsung.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Commit 0a4377de3056 ("genirq: Introduce irq_set_vcpu_affinity() to
-target an interrupt to a VCPU") added just what we needed at the
-lowest level to allow an interrupt to be deactivated by a guest.
+Hi Eric,
 
-When such a request reaches the GIC, it knows it doesn't need to
-perform the deactivation anymore, and can safely leave the guest
-do its magic. This of course requires additional support in both
-VFIO and KVM.
+On 14/08/15 12:58, Eric Auger wrote:
+> On 07/10/2015 04:21 PM, Andre Przywara wrote:
+>> As the actual LPI number in a guest can be quite high, but is mostly
+>> assigned using a very sparse allocation scheme, bitmaps and arrays
+>> for storing the virtual interrupt status are a waste of memory.
+>> We use our equivalent of the "Interrupt Translation Table Entry"
+>> (ITTE) to hold this extra status information for a virtual LPI.
+>> As the normal VGIC code cannot use it's fancy bitmaps to manage
+>> pending interrupts, we provide a hook in the VGIC code to let the
+>> ITS emulation handle the list register queueing itself.
+>> LPIs are located in a separate number range (>=8192), so
+>> distinguishing them is easy. With LPIs being only edge-triggered, we
+>> get away with a less complex IRQ handling.
+>>
+>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> ---
+>>  include/kvm/arm_vgic.h      |  2 ++
+>>  virt/kvm/arm/its-emul.c     | 71 ++++++++++++++++++++++++++++++++++++++++++++
+>>  virt/kvm/arm/its-emul.h     |  3 ++
+>>  virt/kvm/arm/vgic-v3-emul.c |  2 ++
+>>  virt/kvm/arm/vgic.c         | 72 ++++++++++++++++++++++++++++++++++-----------
+>>  5 files changed, 133 insertions(+), 17 deletions(-)
+>>
+>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>> index 1648668..2a67a10 100644
+>> --- a/include/kvm/arm_vgic.h
+>> +++ b/include/kvm/arm_vgic.h
+>> @@ -147,6 +147,8 @@ struct vgic_vm_ops {
+>>       int     (*init_model)(struct kvm *);
+>>       void    (*destroy_model)(struct kvm *);
+>>       int     (*map_resources)(struct kvm *, const struct vgic_params *);
+>> +     bool    (*queue_lpis)(struct kvm_vcpu *);
+>> +     void    (*unqueue_lpi)(struct kvm_vcpu *, int irq);
+>>  };
+>>
+>>  struct vgic_io_device {
+>> diff --git a/virt/kvm/arm/its-emul.c b/virt/kvm/arm/its-emul.c
+>> index 7f217fa..b9c40d7 100644
+>> --- a/virt/kvm/arm/its-emul.c
+>> +++ b/virt/kvm/arm/its-emul.c
+>> @@ -50,8 +50,26 @@ struct its_itte {
+>>       struct its_collection *collection;
+>>       u32 lpi;
+>>       u32 event_id;
+>> +     bool enabled;
+>> +     unsigned long *pending;
+>>  };
+>>
+>> +#define for_each_lpi(dev, itte, kvm) \
+>> +     list_for_each_entry(dev, &(kvm)->arch.vgic.its.device_list, dev_list) \
+>> +             list_for_each_entry(itte, &(dev)->itt, itte_list)
+>> +
+> You have a checkpatch error here:
+> 
+> ERROR: Macros with complex values should be enclosed in parentheses
+> #52: FILE: virt/kvm/arm/its-emul.c:57:
+> +#define for_each_lpi(dev, itte, kvm) \
+> +       list_for_each_entry(dev, &(kvm)->arch.vgic.its.device_list, dev_list) \
+> +               list_for_each_entry(itte, &(dev)->itt, itte_list)
 
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
-Tested-by: Eric Auger <eric.auger@linaro.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- drivers/irqchip/irq-gic.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+I know about that one. The problem is that if I add the parentheses it
+breaks the usage below due to the curly brackets. But the definition
+above is just so convenient and I couldn't find another neat solution so
+far. If you are concerned about that I can give it another try,
+otherwise I tend to just ignore checkpatch here.
 
-diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-index 505aaf3..5e48850 100644
---- a/drivers/irqchip/irq-gic.c
-+++ b/drivers/irqchip/irq-gic.c
-@@ -148,6 +148,36 @@ static inline bool primary_gic_irq(struct irq_data *d)
- 	return true;
- }
- 
-+static inline bool cascading_gic_irq(struct irq_data *d)
-+{
-+	void *data = irq_data_get_irq_handler_data(d);
-+
-+	/*
-+	 * If handler_data pointing to one of the secondary GICs, then
-+	 * this is a cascading interrupt, and it cannot possibly be
-+	 * forwarded.
-+	 */
-+	if (data >= (void *)(gic_data + 1) &&
-+	    data <  (void *)(gic_data + MAX_GIC_NR))
-+		return true;
-+
-+	return false;
-+}
-+
-+static inline bool forwarded_irq(struct irq_data *d)
-+{
-+	/*
-+	 * A forwarded interrupt:
-+	 * - is on the primary GIC
-+	 * - has its handler_data set to a value
-+	 * - that isn't a secondary GIC
-+	 */
-+	if (primary_gic_irq(d) && d->handler_data && !cascading_gic_irq(d))
-+		return true;
-+
-+	return false;
-+}
-+
- /*
-  * Routines to acknowledge, disable and enable interrupts
-  */
-@@ -166,6 +196,18 @@ static int gic_peek_irq(struct irq_data *d, u32 offset)
- static void gic_mask_irq(struct irq_data *d)
- {
- 	gic_poke_irq(d, GIC_DIST_ENABLE_CLEAR);
-+	/*
-+	 * When masking a forwarded interrupt, make sure it is
-+	 * deactivated as well.
-+	 *
-+	 * This ensures that an interrupt that is getting
-+	 * disabled/masked will not get "stuck", because there is
-+	 * noone to deactivate it (guest is being terminated).
-+	 */
-+	if (static_key_true(&supports_deactivate)) {
-+		if (forwarded_irq(d))
-+			gic_poke_irq(d, GIC_DIST_ACTIVE_CLEAR);
-+	}
- }
- 
- static void gic_unmask_irq(struct irq_data *d)
-@@ -178,6 +220,10 @@ static void gic_eoi_irq(struct irq_data *d)
- 	u32 deact_offset = GIC_CPU_EOI;
- 
- 	if (static_key_true(&supports_deactivate)) {
-+		/* Do not deactivate an IRQ forwarded to a vcpu. */
-+		if (forwarded_irq(d))
-+			return;
-+
- 		if (primary_gic_irq(d))
- 			deact_offset = GIC_CPU_DEACTIVATE;
- 	}
-@@ -251,6 +297,19 @@ static int gic_set_type(struct irq_data *d, unsigned int type)
- 	return gic_configure_irq(gicirq, type, base, NULL);
- }
- 
-+static int gic_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu)
-+{
-+	/* Only interrupts on the primary GIC can be forwarded to a vcpu. */
-+	if (static_key_true(&supports_deactivate)) {
-+		if (primary_gic_irq(d) && !cascading_gic_irq(d)) {
-+			d->handler_data = vcpu;
-+			return 0;
-+		}
-+	}
-+
-+	return -EINVAL;
-+}
-+
- #ifdef CONFIG_SMP
- static int gic_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
- 			    bool force)
-@@ -346,6 +405,7 @@ static struct irq_chip gic_chip = {
- #endif
- 	.irq_get_irqchip_state	= gic_irq_get_irqchip_state,
- 	.irq_set_irqchip_state	= gic_irq_set_irqchip_state,
-+	.irq_set_vcpu_affinity	= gic_irq_set_vcpu_affinity,
- 	.flags			= IRQCHIP_SET_TYPE_MASKED,
- };
- 
--- 
-2.1.4
+>> +static struct its_itte *find_itte_by_lpi(struct kvm *kvm, int lpi)
+>> +{
+> can't we have the same LPI present in different interrupt translation
+> tables? I don't know it is a sensible setting but I did not succeed in
+> finding it was not possible.
+
+Thanks to Marc I am happy (and relieved!) to point you to 6.1.1 LPI INTIDs:
+"The behavior of the GIC is UNPREDICTABLE if software:
+- Maps multiple EventID/DeviceID combinations to the same physical LPI
+INTID."
+
+So I exercise the freedom of UNPREDICTABLE here ;-)
+
+>> +     struct its_device *device;
+>> +     struct its_itte *itte;
+>> +
+>> +     for_each_lpi(device, itte, kvm) {
+>> +             if (itte->lpi == lpi)
+>> +                     return itte;
+>> +     }
+>> +     return NULL;
+>> +}
+>> +
+>>  #define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
+>>
+>>  /* The distributor lock is held by the VGIC MMIO handler. */
+>> @@ -145,6 +163,59 @@ static bool handle_mmio_gits_idregs(struct kvm_vcpu *vcpu,
+>>       return false;
+>>  }
+>>
+>> +/*
+>> + * Find all enabled and pending LPIs and queue them into the list
+>> + * registers.
+>> + * The dist lock is held by the caller.
+>> + */
+>> +bool vits_queue_lpis(struct kvm_vcpu *vcpu)
+>> +{
+>> +     struct vgic_its *its = &vcpu->kvm->arch.vgic.its;
+>> +     struct its_device *device;
+>> +     struct its_itte *itte;
+>> +     bool ret = true;
+>> +
+>> +     if (!vgic_has_its(vcpu->kvm))
+>> +             return true;
+>> +     if (!its->enabled || !vcpu->kvm->arch.vgic.lpis_enabled)
+>> +             return true;
+>> +
+>> +     spin_lock(&its->lock);
+>> +     for_each_lpi(device, itte, vcpu->kvm) {
+>> +             if (!itte->enabled || !test_bit(vcpu->vcpu_id, itte->pending))
+>> +                     continue;
+>> +
+>> +             if (!itte->collection)
+>> +                     continue;
+>> +
+>> +             if (itte->collection->target_addr != vcpu->vcpu_id)
+>> +                     continue;
+>> +
+>> +             __clear_bit(vcpu->vcpu_id, itte->pending);
+>> +
+>> +             ret &= vgic_queue_irq(vcpu, 0, itte->lpi);
+> what if the vgic_queue_irq fails since no LR can be found, the
+> itte->pending was cleared so we forget that LPI? shouldn't we restore
+> the pending state in ITT? in vgic_queue_hwirq the state change only is
+> performed if the vgic_queue_irq succeeds
+
+Of course you are right. I will just only clear the bit if the call
+succeeds.
+
+>> +     }
+>> +
+>> +     spin_unlock(&its->lock);
+>> +     return ret;
+>> +}
+>> +
+>> +/* Called with the distributor lock held by the caller. */
+>> +void vits_unqueue_lpi(struct kvm_vcpu *vcpu, int lpi)
+> I was a bit confused by the name of the function, with regard to
+> existing vgic_unqueue_irqs which restores the states in accordance to
+> what we have in LR. Wouldn't it make sense to call it
+> vits_lpi_set_pending(vcpu, lpi) or something that looks more similar to
+> vgic_dist_irq_set_pending setter which I think it mirrors.
+
+Well, vgic_unqueue_irqs() "move[s] pending/active IRQs from LRs to the
+distributor", this is what vits_unqueue_lpi() also does, just for one
+_single_ LPI instead of iterating over all LRs. Originally I planned to
+call vgic_unqueue_irqs on every guest exit, so this would have a more
+obvious match.
+Admittedly the function does not do much "unqueueing", as this is done
+in the caller, so I will think about the renaming part.
+
+>> +{
+>> +     struct vgic_its *its = &vcpu->kvm->arch.vgic.its;
+>> +     struct its_itte *itte;
+>> +
+>> +     spin_lock(&its->lock);
+>> +
+>> +     /* Find the right ITTE and put the pending state back in there */
+>> +     itte = find_itte_by_lpi(vcpu->kvm, lpi);
+>> +     if (itte)
+>> +             __set_bit(vcpu->vcpu_id, itte->pending);
+>> +
+>> +     spin_unlock(&its->lock);
+>> +}
+>> +
+>>  static int vits_handle_command(struct kvm_vcpu *vcpu, u64 *its_cmd)
+>>  {
+>>       return -ENODEV;
+>> diff --git a/virt/kvm/arm/its-emul.h b/virt/kvm/arm/its-emul.h
+>> index 472a6d0..cc5d5ff 100644
+>> --- a/virt/kvm/arm/its-emul.h
+>> +++ b/virt/kvm/arm/its-emul.h
+>> @@ -33,4 +33,7 @@ void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+>>  int vits_init(struct kvm *kvm);
+>>  void vits_destroy(struct kvm *kvm);
+>>
+>> +bool vits_queue_lpis(struct kvm_vcpu *vcpu);
+>> +void vits_unqueue_lpi(struct kvm_vcpu *vcpu, int irq);
+>> +
+>>  #endif
+>> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+>> index 49be3c3..4132c26 100644
+>> --- a/virt/kvm/arm/vgic-v3-emul.c
+>> +++ b/virt/kvm/arm/vgic-v3-emul.c
+>> @@ -948,6 +948,8 @@ void vgic_v3_init_emulation(struct kvm *kvm)
+>>       dist->vm_ops.init_model = vgic_v3_init_model;
+>>       dist->vm_ops.destroy_model = vgic_v3_destroy_model;
+>>       dist->vm_ops.map_resources = vgic_v3_map_resources;
+>> +     dist->vm_ops.queue_lpis = vits_queue_lpis;
+>> +     dist->vm_ops.unqueue_lpi = vits_unqueue_lpi;
+>>
+>>       dist->vgic_dist_base = VGIC_ADDR_UNDEF;
+>>       dist->vgic_redist_base = VGIC_ADDR_UNDEF;
+>> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+>> index 49ee92b..9dfd094 100644
+>> --- a/virt/kvm/arm/vgic.c
+>> +++ b/virt/kvm/arm/vgic.c
+>> @@ -95,6 +95,20 @@ static bool queue_sgi(struct kvm_vcpu *vcpu, int irq)
+>>       return vcpu->kvm->arch.vgic.vm_ops.queue_sgi(vcpu, irq);
+>>  }
+>>
+>> +static bool vgic_queue_lpis(struct kvm_vcpu *vcpu)
+>> +{
+>> +     if (vcpu->kvm->arch.vgic.vm_ops.queue_lpis)
+>> +             return vcpu->kvm->arch.vgic.vm_ops.queue_lpis(vcpu);
+>> +     else
+>> +             return true;
+>> +}
+>> +
+>> +static void vgic_unqueue_lpi(struct kvm_vcpu *vcpu, int irq)
+>> +{
+>> +     if (vcpu->kvm->arch.vgic.vm_ops.unqueue_lpi)
+>> +             vcpu->kvm->arch.vgic.vm_ops.unqueue_lpi(vcpu, irq);
+>> +}
+>> +
+>>  int kvm_vgic_map_resources(struct kvm *kvm)
+>>  {
+>>       return kvm->arch.vgic.vm_ops.map_resources(kvm, vgic);
+>> @@ -1135,6 +1149,10 @@ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu)
+>>       for_each_clear_bit(lr, elrsr_ptr, vgic->nr_lr) {
+>>               vlr = vgic_get_lr(vcpu, lr);
+>>
+>> +             /* We don't care about LPIs here */
+>> +             if (vlr.irq >= 8192)
+>> +                     continue;
+>> +
+>>               if (!vgic_irq_is_enabled(vcpu, vlr.irq)) {
+>>                       vlr.state = 0;
+>>                       vgic_set_lr(vcpu, lr, vlr);
+>> @@ -1147,25 +1165,33 @@ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu)
+>>  static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
+>>                                int lr_nr, int sgi_source_id)
+>>  {
+>> +     struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+>>       struct vgic_lr vlr;
+>>
+>>       vlr.state = 0;
+>>       vlr.irq = irq;
+>>       vlr.source = sgi_source_id;
+>>
+>> -     if (vgic_irq_is_active(vcpu, irq)) {
+>> -             vlr.state |= LR_STATE_ACTIVE;
+>> -             kvm_debug("Set active, clear distributor: 0x%x\n", vlr.state);
+>> -             vgic_irq_clear_active(vcpu, irq);
+>> -             vgic_update_state(vcpu->kvm);
+>> -     } else if (vgic_dist_irq_is_pending(vcpu, irq)) {
+>> -             vlr.state |= LR_STATE_PENDING;
+>> -             kvm_debug("Set pending: 0x%x\n", vlr.state);
+>> -     }
+>> -
+>> -     if (!vgic_irq_is_edge(vcpu, irq))
+>> -             vlr.state |= LR_EOI_INT;
+>> +     /* We care only about state for SGIs/PPIs/SPIs, not for LPIs */
+>> +     if (irq < dist->nr_irqs) {
+>> +             if (vgic_irq_is_active(vcpu, irq)) {
+>> +                     vlr.state |= LR_STATE_ACTIVE;
+>> +                     kvm_debug("Set active, clear distributor: 0x%x\n",
+>> +                               vlr.state);
+>> +                     vgic_irq_clear_active(vcpu, irq);
+>> +                     vgic_update_state(vcpu->kvm);
+>> +             } else if (vgic_dist_irq_is_pending(vcpu, irq)) {
+>> +                     vlr.state |= LR_STATE_PENDING;
+>> +                     kvm_debug("Set pending: 0x%x\n", vlr.state);
+>> +             }
+>>
+>> +             if (!vgic_irq_is_edge(vcpu, irq))
+>> +                     vlr.state |= LR_EOI_INT;
+>> +     } else {
+>> +             /* If this is an LPI, it can only be pending */
+>> +             if (irq >= 8192)
+>> +                     vlr.state |= LR_STATE_PENDING;
+>> +     }
+>>       vgic_set_lr(vcpu, lr_nr, vlr);
+>>       vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
+>>  }
+>> @@ -1177,7 +1203,6 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
+>>   */
+>>  bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq)
+>>  {
+>> -     struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+>>       u64 elrsr = vgic_get_elrsr(vcpu);
+>>       unsigned long *elrsr_ptr = u64_to_bitmask(&elrsr);
+>>       int lr;
+>> @@ -1185,7 +1210,6 @@ bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq)
+>>       /* Sanitize the input... */
+>>       BUG_ON(sgi_source_id & ~7);
+>>       BUG_ON(sgi_source_id && irq >= VGIC_NR_SGIS);
+>> -     BUG_ON(irq >= dist->nr_irqs);
+> Is it safe to remove that check. What if it is attempted to inject an
+> SPI larger than supported. I think you should refine the check but not
+> remove it.
+
+The check is now in vgic_queue_irq_to_lr (see above), where we
+differentiate between LPIs (>=8192) and SPIs (<dist->nr_irqs). Please
+correct me if I am wrong on this, but since we are not setting any state
+bits the vgic_set_lr() and vgic_sync_lr_elrsr() calls should be NOPs in
+this case, right?
+I may re-add the explicit check here for the sake of clarity, though.
+
+>>
+>>       kvm_debug("Queue IRQ%d\n", irq);
+>>
+>> @@ -1265,8 +1289,12 @@ static void __kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>>                       overflow = 1;
+>>       }
+>>
+>> -
+>> -
+>> +     /*
+>> +      * LPIs are not mapped in our bitmaps, so we leave the iteration
+>> +      * to the ITS emulation code.
+>> +      */
+>> +     if (!vgic_queue_lpis(vcpu))
+>> +             overflow = 1;
+>>
+>>  epilog:
+>>       if (overflow) {
+>> @@ -1387,6 +1415,16 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>>       for_each_clear_bit(lr_nr, elrsr_ptr, vgic_cpu->nr_lr) {
+>>               vlr = vgic_get_lr(vcpu, lr_nr);
+>>
+>> +             /* LPIs are handled separately */
+>> +             if (vlr.irq >= 8192) {
+>> +                     /* We just need to take care about still pending LPIs */
+>> +                     if (vlr.state & LR_STATE_PENDING) {
+>> +                             vgic_unqueue_lpi(vcpu, vlr.irq);
+>> +                             pending = true;
+>> +                     }
+>> +                     continue;
+> don't we need to reset the LR & update elrsr?
+
+Mmmh, interesting, I just wonder how it worked before. I will move most
+of the lower part into an else clause and call the LR maintainance code
+in both cases.
+
+Cheers,
+Andre.
+
+>> +             }
+>> +
+>>               BUG_ON(!(vlr.state & LR_STATE_MASK));
+>>               pending = true;
+>>
+>> @@ -1411,7 +1449,7 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>>       }
+>>       vgic_update_state(vcpu->kvm);
+>>
+>> -     /* vgic_update_state would not cover only-active IRQs */
+>> +     /* vgic_update_state would not cover only-active IRQs or LPIs */
+>>       if (pending)
+>>               set_bit(vcpu->vcpu_id, dist->irq_pending_on_cpu);
+>>  }
+>>
+> 
