@@ -1,199 +1,176 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v2 09/15] KVM: arm64: implement basic ITS register handlers
-Date: Tue, 25 Aug 2015 11:23:01 +0100
-Message-ID: <55DC4205.5030806@arm.com>
+Subject: Re: [PATCH v2 10/15] KVM: arm64: add data structures to model ITS
+ interrupt translation
+Date: Tue, 25 Aug 2015 12:15:11 +0100
+Message-ID: <55DC4E3F.506@arm.com>
 References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com>
- <1436538111-4294-10-git-send-email-andre.przywara@arm.com>
- <55CCB6EC.50609@linaro.org>
+ <1436538111-4294-11-git-send-email-andre.przywara@arm.com>
+ <55CCBBBF.1080407@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: quoted-printable
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <55CCB6EC.50609@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <55CCBBBF.1080407@linaro.org>
+Sender: kvm-owner@vger.kernel.org
 To: Eric Auger <eric.auger@linaro.org>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Pavel Fedin <p.fedin@samsung.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Pavel Fedin <p.fedin@samsung.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Eric,
 
-....
-
+On 13/08/15 16:46, Eric Auger wrote:
+> 
+> On 07/10/2015 04:21 PM, Andre Przywara wrote:
+>> The GICv3 Interrupt Translation Service (ITS) uses tables in memory
+>> to allow a sophisticated interrupt routing. It features device tables,
+>> an interrupt table per device and a table connecting "collections" to
+>> actual CPUs (aka. redistributors in the GICv3 lingo).
+>> Since the interrupt numbers for the LPIs are allocated quite sparsely
+>> and the range can be quite huge (8192 LPIs being the minimum), using
+>> bitmaps or arrays for storing information is a waste of memory.
+>> We use linked lists instead, which we iterate linearily. This works
+>> very well with the actual number of LPIs/MSIs in the guest being
+>> quite low. Should the number of LPIs exceed the number where iterating
+>> through lists seems acceptable, we can later revisit this and use more
+>> efficient data structures.
+>>
+>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> ---
+>>  include/kvm/arm_vgic.h  |  3 +++
+>>  virt/kvm/arm/its-emul.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 51 insertions(+)
+>>
+>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>> index b432055..1648668 100644
+>> --- a/include/kvm/arm_vgic.h
+>> +++ b/include/kvm/arm_vgic.h
+>> @@ -25,6 +25,7 @@
+>>  #include <linux/spinlock.h>
+>>  #include <linux/types.h>
+>>  #include <kvm/iodev.h>
+>> +#include <linux/list.h>
+>>  
+>>  #define VGIC_NR_IRQS_LEGACY	256
+>>  #define VGIC_NR_SGIS		16
+>> @@ -162,6 +163,8 @@ struct vgic_its {
+>>  	u64			cbaser;
+>>  	int			creadr;
+>>  	int			cwriter;
+>> +	struct list_head	device_list;
+>> +	struct list_head	collection_list;
+>>  };
+>>  
+>>  struct vgic_dist {
 >> diff --git a/virt/kvm/arm/its-emul.c b/virt/kvm/arm/its-emul.c
->> index 659dd39..b498f06 100644
+>> index b498f06..7f217fa 100644
 >> --- a/virt/kvm/arm/its-emul.c
 >> +++ b/virt/kvm/arm/its-emul.c
->> @@ -32,10 +32,62 @@
+>> @@ -21,6 +21,7 @@
+>>  #include <linux/kvm.h>
+>>  #include <linux/kvm_host.h>
+>>  #include <linux/interrupt.h>
+>> +#include <linux/list.h>
+>>  
+>>  #include <linux/irqchip/arm-gic-v3.h>
+>>  #include <kvm/arm_vgic.h>
+>> @@ -32,6 +33,25 @@
 >>  #include "vgic.h"
 >>  #include "its-emul.h"
->>
->> +#define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
+>>  
+>> +struct its_device {
+>> +	struct list_head dev_list;
+>> +	struct list_head itt;
+>> +	u32 device_id;
+>> +};
 >> +
->> +/* The distributor lock is held by the VGIC MMIO handler. */
->>  static bool handle_mmio_misc_gits(struct kvm_vcpu *vcpu,
->>                                 struct kvm_exit_mmio *mmio,
->>                                 phys_addr_t offset)
+>> +struct its_collection {
+>> +	struct list_head coll_list;
+>> +	u32 collection_id;
+>> +	u32 target_addr;
+>> +};
+>> +
+>> +struct its_itte {
+>> +	struct list_head itte_list;
+>> +	struct its_collection *collection;
+>> +	u32 lpi;
+>> +	u32 event_id;
+>> +};
+>> +
+>>  #define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
+>>  
+>>  /* The distributor lock is held by the VGIC MMIO handler. */
+>> @@ -311,6 +331,9 @@ int vits_init(struct kvm *kvm)
+>>  
+>>  	spin_lock_init(&its->lock);
+>>  
+>> +	INIT_LIST_HEAD(&its->device_list);
+>> +	INIT_LIST_HEAD(&its->collection_list);
+>> +
+>>  	its->enabled = false;
+>>  
+>>  	return -ENXIO;
+>> @@ -320,11 +343,36 @@ void vits_destroy(struct kvm *kvm)
 >>  {
->> +     struct vgic_its *its =3D &vcpu->kvm->arch.vgic.its;
->> +     u32 reg;
->> +     bool was_enabled;
->> +
->> +     switch (offset & ~3) {
->> +     case 0x00:              /* GITS_CTLR */
->> +             /* We never defer any command execution. */
->> +             reg =3D GITS_CTLR_QUIESCENT;
->> +             if (its->enabled)
->> +                     reg |=3D GITS_CTLR_ENABLE;
->> +             was_enabled =3D its->enabled;
->> +             vgic_reg_access(mmio, &reg, offset & 3,
->> +                             ACCESS_READ_VALUE | ACCESS_WRITE_VALUE);
->> +             its->enabled =3D !!(reg & GITS_CTLR_ENABLE);
->> +             return !was_enabled && its->enabled;
->> +     case 0x04:              /* GITS_IIDR */
->> +             reg =3D (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
->> +             vgic_reg_access(mmio, &reg, offset & 3,
->> +                             ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
->> +             break;
->> +     case 0x08:              /* GITS_TYPER */
->> +             /*
->> +              * We use linear CPU numbers for redistributor addressing,
->> +              * so GITS_TYPER.PTA is 0.
->> +              * To avoid memory waste on the guest side, we keep the
->> +              * number of IDBits and DevBits low for the time being.
->> +              * This could later be made configurable by userland.
->> +              * Since we have all collections in linked list, we claim
->> +              * that we can hold all of the collection tables in our
->> +              * own memory and that the ITT entry size is 1 byte (the
->> +              * smallest possible one).
->> +              */
->> +             reg =3D GITS_TYPER_PLPIS;
->> +             reg |=3D 0xff << GITS_TYPER_HWCOLLCNT_SHIFT;
->> +             reg |=3D 0x0f << GITS_TYPER_DEVBITS_SHIFT;
->> +             reg |=3D 0x0f << GITS_TYPER_IDBITS_SHIFT;
->> +             vgic_reg_access(mmio, &reg, offset & 3,
->> +                             ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
->> +             break;
->> +     case 0x0c:
->> +             /* The upper 32bits of TYPER are all 0 for the time being.
->> +              * Should we need more than 256 collections, we can enable
->> +              * some bits in here.
->> +              */
->> +             vgic_reg_access(mmio, NULL, offset & 3,
->> +                             ACCESS_READ_RAZ | ACCESS_WRITE_IGNORED);
->> +             break;
->> +     }
->> +
->>       return false;
->>  }
->>
->> @@ -43,20 +95,142 @@ static bool handle_mmio_gits_idregs(struct kvm_vcpu=
- *vcpu,
->>                                   struct kvm_exit_mmio *mmio,
->>                                   phys_addr_t offset)
->>  {
->> +     u32 reg =3D 0;
->> +     int idreg =3D (offset & ~3) + GITS_IDREGS_BASE;
->> +
->> +     switch (idreg) {
->> +     case GITS_PIDR2:
->> +             reg =3D GIC_PIDR2_ARCH_GICv3;
->> +             break;
->> +     case GITS_PIDR4:
->> +             /* This is a 64K software visible page */
->> +             reg =3D 0x40;
->> +             break;
->> +     /* Those are the ID registers for (any) GIC. */
->> +     case GITS_CIDR0:
->> +             reg =3D 0x0d;
->> +             break;
->> +     case GITS_CIDR1:
->> +             reg =3D 0xf0;
->> +             break;
->> +     case GITS_CIDR2:
->> +             reg =3D 0x05;
->> +             break;
->> +     case GITS_CIDR3:
->> +             reg =3D 0xb1;
->> +             break;
->> +     }
->> +     vgic_reg_access(mmio, &reg, offset & 3,
->> +                     ACCESS_READ_VALUE | ACCESS_WRITE_IGNORED);
->>       return false;
->>  }
->>
->> +static int vits_handle_command(struct kvm_vcpu *vcpu, u64 *its_cmd)
->> +{
->> +     return -ENODEV;
->> +}
->> +
->>  static bool handle_mmio_gits_cbaser(struct kvm_vcpu *vcpu,
->>                                   struct kvm_exit_mmio *mmio,
->>                                   phys_addr_t offset)
->>  {
->> +     struct vgic_its *its =3D &vcpu->kvm->arch.vgic.its;
->> +     int mode =3D ACCESS_READ_VALUE;
->> +
->> +     mode |=3D its->enabled ? ACCESS_WRITE_IGNORED : ACCESS_WRITE_VALUE;
->> +
->> +     vgic_handle_base_register(vcpu, mmio, offset, &its->cbaser, mode);
->> +
->> +     /* Writing CBASER resets the read pointer. */
->> +     if (mmio->is_write)
->> +             its->creadr =3D 0;
->> +
->>       return false;
->>  }
->>
->> +static int its_cmd_buffer_size(struct kvm *kvm)
->> +{
->> +     struct vgic_its *its =3D &kvm->arch.vgic.its;
->> +
->> +     return ((its->cbaser & 0xff) + 1) << 12;
->> +}
->> +
->> +static gpa_t its_cmd_buffer_base(struct kvm *kvm)
->> +{
->> +     struct vgic_its *its =3D &kvm->arch.vgic.its;
->> +
->> +     return BASER_BASE_ADDRESS(its->cbaser);
->> +}
->> +
->> +/*
->> + * By writing to CWRITER the guest announces new commands to be process=
-ed.
->> + * Since we cannot read from guest memory inside the ITS spinlock, we
->> + * iterate over the command buffer (with the lock dropped) until the re=
-ad
->> + * pointer matches the write pointer. Other VCPUs writing this register=
- in the
->> + * meantime will just update the write pointer, leaving the command
->> + * processing to the first instance of the function.
->> + */
-> I am lost, isn't the dist lock hold by vgic_handle_mmio_access before
-> calling call_range_handler/range->handle_mmio ?
+>>  	struct vgic_dist *dist = &kvm->arch.vgic;
+>>  	struct vgic_its *its = &dist->its;
+>> +	struct its_device *dev;
+>> +	struct its_itte *itte;
+>> +	struct list_head *dev_cur, *dev_temp;
+>> +	struct list_head *cur, *temp;
+>>  
+>>  	if (!vgic_has_its(kvm))
+>>  		return;
+>>  
+>> +	if (!its->device_list.next)
+> Why not using list_empty? But I think I would simply remove this since
+> the empty case if handle below...
 
-Indeed, I was so focussed on the ITS lock...
+list_empty() requires the list to be initialized before. This check here
+is to detect that map_resources was never called (this is only done on
+the first VCPU run) and thus device_list is basically still all zeroes.
+If we abort the guest without ever running a VCPU (for instance because
+some initialization failed), we call vits_destroy() anyway (because this
+is called when tearing down the VGIC device).
+So the check is here to detect early that vits_destroy() has been called
+without the ITS ever been fully initialized. This fixed a real bug when
+the guest start was aborted before the ITS was ever used.
+I will add a comment to make this clear.
 
-> if confirmed we need to move the command enumeration + execution
-> somewhere else.
+>> +		return;
+>> +
+>> +	spin_lock(&its->lock);
+>> +	list_for_each_safe(dev_cur, dev_temp, &its->device_list) {
+>> +		dev = container_of(dev_cur, struct its_device, dev_list);
+> isn't the usage of list_for_each_entry_safe more synthetic here?
 
-I think we get away with dropping the dist lock after doing the actual
-register access. Just before returning we then take it again to make the
-caller happy.
-I will give this a try. Thanks for spotting this!
-
-> Besides that piece of code may deserve to be
-> encaspulated in a function. what do you think?
-
-Makes some sense, yes.
+If I got this correctly, we need the _safe variant if we want to remove
+the list item within the loop. Or am I missing something here?
 
 Cheers,
-Andr=E9
+Andre.
+
+
+>> +		list_for_each_safe(cur, temp, &dev->itt) {
+>> +			itte = (container_of(cur, struct its_itte, itte_list));
+> same
+> 
+> Eric
+>> +			list_del(cur);
+>> +			kfree(itte);
+>> +		}
+>> +		list_del(dev_cur);
+>> +		kfree(dev);
+>> +	}
+>> +
+>> +	list_for_each_safe(cur, temp, &its->collection_list) {
+>> +		list_del(cur);
+>> +		kfree(container_of(cur, struct its_collection, coll_list));
+>> +	}
+>> +
+>>  	kfree(dist->pendbaser);
+>>  
+>>  	its->enabled = false;
+>> +	spin_unlock(&its->lock);
+>>  }
+>>
+> 
