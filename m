@@ -1,102 +1,231 @@
-From: Vijay Kilari <vijay.kilari@gmail.com>
-Subject: Re: KVM Live migration with GICv3
-Date: Wed, 26 Aug 2015 19:54:31 +0530
-Message-ID: <CALicx6vGO64DC0NTXSuyCBDK0q1Sac+zmswy72aRZX+Mynpr8w@mail.gmail.com>
-References: <CALicx6soU-pqs3XgkEHxtBVy9yR-7irSU4ZJvC3D6V2UmKHQqA@mail.gmail.com>
- <009101d0d400$c92925f0$5b7b71d0$@samsung.com>
- <CALicx6s4BOuHsP40r2zuqgiLh+Rx=e=UQvwV5_R7LJB9-dpkig@mail.gmail.com>
- <013601d0df28$fcb635b0$f622a110$@samsung.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B58C348AC7
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Aug 2015 10:24:30 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aiNK3KEZ6pzq for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Aug 2015 10:24:29 -0400 (EDT)
-Received: from mail-vk0-f43.google.com (mail-vk0-f43.google.com
- [209.85.213.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A174D48AC3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Aug 2015 10:24:29 -0400 (EDT)
-Received: by vkif69 with SMTP id f69so83417982vki.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Aug 2015 07:24:31 -0700 (PDT)
-In-Reply-To: <013601d0df28$fcb635b0$f622a110$@samsung.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: kvmarm@lists.cs.columbia.edu
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH v4 3/4] irqchip: GIC: Convert to EOImode == 1
+Date: Wed, 26 Aug 2015 17:00:44 +0100
+Message-ID: <1440604845-28229-4-git-send-email-marc.zyngier@arm.com>
+References: <1440604845-28229-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1440604845-28229-1-git-send-email-marc.zyngier@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Jiang Liu <jiang.liu@linux.intel.com>, Eric Auger <eric.auger@linaro.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gVHVlLCBBdWcgMjUsIDIwMTUgYXQgNDo1NyBQTSwgUGF2ZWwgRmVkaW4gPHAuZmVkaW5Ac2Ft
-c3VuZy5jb20+IHdyb3RlOgo+ICBIZWxsbyEgV2hlcmUgYXJlIHlvdT8gSSdkIGxpa2UgdG8gdGFr
-ZSBhIGxvb2sgYXQgeW91ciBjb2RlLgoKICAgU29ycnksICBJIGFtIG9jY3VwaWVkIHdpdGggb3Ro
-ZXIgdGFza3MgZm9yIG5leHQgMiB3ZWVrcywgQWZ0ZXIgdGhhdApJIHdpbGwgbG9vayBpbnRvIHRo
-aXMuCgo+Cj4gS2luZCByZWdhcmRzLAo+IFBhdmVsIEZlZGluCj4gRXhwZXJ0IEVuZ2luZWVyCj4g
-U2Ftc3VuZyBFbGVjdHJvbmljcyBSZXNlYXJjaCBjZW50ZXIgUnVzc2lhCj4KPgo+PiAtLS0tLU9y
-aWdpbmFsIE1lc3NhZ2UtLS0tLQo+PiBGcm9tOiBWaWpheSBLaWxhcmkgW21haWx0bzp2aWpheS5r
-aWxhcmlAZ21haWwuY29tXQo+PiBTZW50OiBUdWVzZGF5LCBBdWd1c3QgMTEsIDIwMTUgNjoxNiBQ
-TQo+PiBUbzogUGF2ZWwgRmVkaW4KPj4gQ2M6IGt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHU7
-IENocmlzdG9mZmVyIERhbGw7IEFsZXggQmVubsOpZQo+PiBTdWJqZWN0OiBSZTogS1ZNIExpdmUg
-bWlncmF0aW9uIHdpdGggR0lDdjMKPj4KPj4gT24gVHVlLCBBdWcgMTEsIDIwMTUgYXQgMTI6MTEg
-UE0sIFBhdmVsIEZlZGluIDxwLmZlZGluQHNhbXN1bmcuY29tPiB3cm90ZToKPj4gPiAgSGVsbG8h
-Cj4+ID4KPj4gPj4gICAgSSBoYXZlIHByb3RvdHlwZWQgTGl2ZSBtaWdyYXRpb24gd2l0aCBHSUN2
-My4KPj4gPgo+PiA+ICBUaGlzIGlzIGludGVyZXN0aW5nIG9mIGNvdXJzZSwgaSB3aWxsIG5lZWQg
-dGhpcyBmb3IgbXkgcHJvamVjdCB0b28gYW5kIGkgd2FzIGFsc28gZ29pbmcgdG8gdGFrZSBhIGxv
-b2sgYXQKPj4gdGhpcyBsYXRlci4KPj4gPgo+PiA+PiBGb3IgdGhpcyBJIGhhdmUgbWFkZSBmb2xs
-b3dpbmcgY2hhbmdlcwo+PiA+Pgo+PiA+PiAxKSBTYXZlIGFuZCBSZXN0b3JlIG9mIEdJQ3YzIHJl
-Z2lzdGVycyBpbiBRRU1VLgo+PiA+PiAgICAgLSBGb3IgR0lDdjIsIFFFTVUgaXMgc2F2aW5nL3Jl
-c3RvcmluZyBHSUNELCBHSUNDICByZWdpc3RlcnMuIEZvciBHSUN2MywKPj4gPj4gICAgICB3ZSBo
-YXZlIHRvIHNhdmUvcmVzdG9yZSBHSUNELCBHSUNSIGFuZCBJQ0MgcmVnaXN0ZXJzLgo+PiA+PiAg
-ICAgIEhvd2V2ZXIgSUNDIHJlZ2lzdGVycyBhcmUgc3lzdGVtIHJlZ2lzdGVycyB3aGljaCBjYW5u
-b3QgYmUKPj4gPj4gYWNjZXNzZWQgQCBFTDAgbGV2ZWwgKFNSRT0xKS4gU28gdGhlc2UgSUNDIHJl
-Z2lzdGVycyBzaG91bGQgYmUKPj4gPj4gYWNjZXNzZWQgYXMgbW1pbyByZWdpc3RlcnMgYnkgUUVN
-VSwgZm9yIHRoaXMgd2UgaGF2ZSB0byBhZGQgaW9jdGwgdG8KPj4gPj4gYWNjZXNzIElDQyBAIEVM
-MSBsZXZlbCBzaW1pbGFyIHRvIEdJQ0MgcmVnaXN0ZXJzIG9mIEdJQ3YyLgo+PiA+Cj4+ID4gIFNv
-cnJ5LCB5b3VyIGRlc2NyaXB0aW9uIGlzIGEgYml0IGZ1enp5LiBXaGF0IGlvY3RsJ3MgZGlkIHlv
-dSBoYXZlIHRvIGFkZCBhbmQgd2h5Pwo+PiA+ICBUaGUga2VybmVsIGFscmVhZHkgaGFzIEtWTV9H
-RVRfT05FX1JFRyBhbmQgS1ZNX1NFVF9PTkVfUkVHIGlvY3RsJ3MuIEFuZCB0aGV5IGNhbiBiZSB1
-c2VkCj4+IHRvIGFjY2VzcyBhbnl0aGluZyBpbnNpZGUgdGhlIFZNLCBpbmNsdWRpbmcgc3lzdGVt
-IHJlZ2lzdGVycy4gSSBiZWxpZXZlIHlvdSB3b3VsZCBuZWVkIG9ubHkgdG8KPj4gaW1wbGVtZW50
-IGhhbmRsZXJzIGZvciBHSUN2MyByZWdpc3RlcnMuCj4+Cj4+IEkgbWVhbiBDUFUgaW50ZXJmYWNl
-IHJlZ2lzdGVycyBHSUNDKiBkZWZpbmVkIGZvciB2Z2ljdjIgdW5kZXIKPj4gInZnaWNfY3B1X3Jh
-bmdlc1tdIiBpbgo+PiB2aXJ0L2t2bS9hcm0vdmdpYy12Mi1lbXVsLmMgbmVlZHMgdG8gYmUgc2F2
-ZWQgYW5kIHJlc3RvcmVkIGZvciB2Z2ljdjMgYXMgd2VsbC4KPj4gU28gdG8gIGFjY2VzcyB2Z2lj
-X2NwdV9yYW5nZXNbXSBmb3IgdmdpY3YzLCB3ZSBuZWVkIHRvIHJlZ2lzdGVyIGRldmljZQo+PiBm
-b3IgQ1BVIHJlZ2lzdGVycyBzcGFjZQo+PiBzaW1pbGFyIHRvIGdpY3YyIGluIFFFTVUgZm9yIGdp
-Y3YzLgo+Pgo+PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+PiAgICAgbWVtb3J5
-X3JlZ2lvbl9pbml0X3Jlc2VydmF0aW9uKCZzLT5jcHVpb21lbVswXSwgT0JKRUNUKHMpLAo+PiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICJrdm0tZ2ljX2NwdSIsIDB4MTAwMCk7
-Cj4+ICAgICBzeXNidXNfaW5pdF9tbWlvKHNiZCwgJnMtPmNwdWlvbWVtWzBdKTsKPj4gICAgIGt2
-bV9hcm1fcmVnaXN0ZXJfZGV2aWNlKCZzLT5jcHVpb21lbVswXSwKPj4gICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIChLVk1fQVJNX0RFVklDRV9WR0lDX1YzIDw8IEtWTV9BUk1fREVWSUNFX0lE
-X1NISUZUKQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCBLVk1fVkdJQ19WM19BRERS
-X1RZUEVfQ1BVLAo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgS1ZNX0RFVl9BUk1fVkdJ
-Q19HUlBfQUREUiwKPj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgIEtWTV9WR0lDX1YzX0FE
-RFJfVFlQRV9DUFUsCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzLT5kZXZfZmQpOwo+
-PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4+Cj4+IEFueXdheSwgSSB3aWxs
-IHNlbmQgUkZDIHBhdGNoZXMuCj4+Cj4+ID4KPj4gPj4gUGxlYXNlIHByb3ZpZGUgeW91ciBpbml0
-aWFsIGZlZWRiYWNrLgo+PiA+Cj4+ID4gIFdvdWxkIGJlIG5pY2UgdG8gdGFrZSBhIGxvb2sgYXQg
-cGF0Y2hlcy4KPj4gPgo+PiA+PiBJIGFtIGF0dGVuZGluZyBLVk0tZm9ydW0gbmV4dCB3ZWVrIEAg
-U2VhdHRsZS4gV2UgY2FuIGRpc2N1c3MgdGhlcmUgYXMgd2VsbC4KPj4gPgo+PiA+ICBJIHdvdWxk
-IGxvdmUgdG8gZ28gdGhlcmUsIGFuZCBteSBjb21wYW55IHdhbnRlZCB0byBzZW5kIG1lIHRoZXJl
-LiBCdXQgaXQgYXBwZWFycyB0byBiZSBleHRyZW1lbHkKPj4gZGlmZmljdWx0IGZvciBhIHRlY2gg
-c3BlY2lhbGlzdCBmcm9tIFJ1c3NpYSB0byBnZXQgYSBVUyB2aXNhLiBUaGV5IGFyZSBzdGlsbCBj
-b25zaWRlcmluZyBtZSBhbmQgdGhlIHRpbWUgaXMKPj4gcnVubmluZyBvdXQsIHNvIGknbSB1bmxp
-a2VseSB0byBhdHRlbmQsIHVuZm9ydHVuYXRlbHkuCj4+ID4KPj4gPiBLaW5kIHJlZ2FyZHMsCj4+
-ID4gUGF2ZWwgRmVkaW4KPj4gPiBFeHBlcnQgRW5naW5lZXIKPj4gPiBTYW1zdW5nIEVsZWN0cm9u
-aWNzIFJlc2VhcmNoIGNlbnRlciBSdXNzaWEKPj4gPgo+PiA+Cj4KX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1A
-bGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxt
-YW4vbGlzdGluZm8va3ZtYXJtCg==
+So far, GICv2 has been used with EOImode == 0. The effect of this
+mode is to perform the priority drop and the deactivation of the
+interrupt at the same time.
+
+While this works perfectly for Linux (we only have a single priority),
+it causes issues when an interrupt is forwarded to a guest, and when
+we want the guest to perform the EOI itself.
+
+For this case, the GIC architecture provides EOImode == 1, where:
+- A write to the EOI register drops the priority of the interrupt
+  and leaves it active. Other interrupts at the same priority level
+  can now be taken, but the active interrupt cannot be taken again
+- A write to the DIR marks the interrupt as inactive, meaning it can
+  now be taken again.
+
+We only enable this feature when booted in HYP mode and that
+the device-tree reported a suitable CPU interface. Observable behaviour
+should remain unchanged.
+
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ drivers/irqchip/irq-gic.c       | 69 +++++++++++++++++++++++++++++++++++++++--
+ include/linux/irqchip/arm-gic.h |  4 +++
+ 2 files changed, 70 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
+index 4dd8826..9215897 100644
+--- a/drivers/irqchip/irq-gic.c
++++ b/drivers/irqchip/irq-gic.c
+@@ -46,6 +46,7 @@
+ #include <asm/irq.h>
+ #include <asm/exception.h>
+ #include <asm/smp_plat.h>
++#include <asm/virt.h>
+ 
+ #include "irq-gic-common.h"
+ #include "irqchip.h"
+@@ -82,6 +83,8 @@ static DEFINE_RAW_SPINLOCK(irq_controller_lock);
+ #define NR_GIC_CPU_IF 8
+ static u8 gic_cpu_map[NR_GIC_CPU_IF] __read_mostly;
+ 
++static struct static_key supports_deactivate = STATIC_KEY_INIT_TRUE;
++
+ #ifndef MAX_GIC_NR
+ #define MAX_GIC_NR	1
+ #endif
+@@ -157,6 +160,11 @@ static void gic_mask_irq(struct irq_data *d)
+ 	gic_poke_irq(d, GIC_DIST_ENABLE_CLEAR);
+ }
+ 
++static void gic_eoimode1_mask_irq(struct irq_data *d)
++{
++	gic_mask_irq(d);
++}
++
+ static void gic_unmask_irq(struct irq_data *d)
+ {
+ 	gic_poke_irq(d, GIC_DIST_ENABLE_SET);
+@@ -167,6 +175,11 @@ static void gic_eoi_irq(struct irq_data *d)
+ 	writel_relaxed(gic_irq(d), gic_cpu_base(d) + GIC_CPU_EOI);
+ }
+ 
++static void gic_eoimode1_eoi_irq(struct irq_data *d)
++{
++	writel_relaxed(gic_irq(d), gic_cpu_base(d) + GIC_CPU_DEACTIVATE);
++}
++
+ static int gic_irq_set_irqchip_state(struct irq_data *d,
+ 				     enum irqchip_irq_state which, bool val)
+ {
+@@ -272,11 +285,15 @@ static void __exception_irq_entry gic_handle_irq(struct pt_regs *regs)
+ 		irqnr = irqstat & GICC_IAR_INT_ID_MASK;
+ 
+ 		if (likely(irqnr > 15 && irqnr < 1021)) {
++			if (static_key_true(&supports_deactivate))
++				writel_relaxed(irqstat, cpu_base + GIC_CPU_EOI);
+ 			handle_domain_irq(gic->domain, irqnr, regs);
+ 			continue;
+ 		}
+ 		if (irqnr < 16) {
+ 			writel_relaxed(irqstat, cpu_base + GIC_CPU_EOI);
++			if (static_key_true(&supports_deactivate))
++				writel_relaxed(irqstat, cpu_base + GIC_CPU_DEACTIVATE);
+ #ifdef CONFIG_SMP
+ 			handle_IPI(irqnr, regs);
+ #endif
+@@ -327,6 +344,20 @@ static struct irq_chip gic_chip = {
+ 	.flags			= IRQCHIP_SET_TYPE_MASKED,
+ };
+ 
++static struct irq_chip gic_eoimode1_chip = {
++	.name			= "GICv2",
++	.irq_mask		= gic_eoimode1_mask_irq,
++	.irq_unmask		= gic_unmask_irq,
++	.irq_eoi		= gic_eoimode1_eoi_irq,
++	.irq_set_type		= gic_set_type,
++#ifdef CONFIG_SMP
++	.irq_set_affinity	= gic_set_affinity,
++#endif
++	.irq_get_irqchip_state	= gic_irq_get_irqchip_state,
++	.irq_set_irqchip_state	= gic_irq_set_irqchip_state,
++	.flags			= IRQCHIP_SET_TYPE_MASKED,
++};
++
+ void __init gic_cascade_irq(unsigned int gic_nr, unsigned int irq)
+ {
+ 	if (gic_nr >= MAX_GIC_NR)
+@@ -359,6 +390,10 @@ static void gic_cpu_if_up(void)
+ {
+ 	void __iomem *cpu_base = gic_data_cpu_base(&gic_data[0]);
+ 	u32 bypass = 0;
++	u32 mode = 0;
++
++	if (static_key_true(&supports_deactivate))
++		mode = GIC_CPU_CTRL_EOImodeNS;
+ 
+ 	/*
+ 	* Preserve bypass disable bits to be written back later
+@@ -366,7 +401,7 @@ static void gic_cpu_if_up(void)
+ 	bypass = readl(cpu_base + GIC_CPU_CTRL);
+ 	bypass &= GICC_DIS_BYPASS_MASK;
+ 
+-	writel_relaxed(bypass | GICC_ENABLE, cpu_base + GIC_CPU_CTRL);
++	writel_relaxed(bypass | mode | GICC_ENABLE, cpu_base + GIC_CPU_CTRL);
+ }
+ 
+ 
+@@ -789,13 +824,20 @@ void __init gic_init_physaddr(struct device_node *node)
+ static int gic_irq_domain_map(struct irq_domain *d, unsigned int irq,
+ 				irq_hw_number_t hw)
+ {
++	struct irq_chip *chip = &gic_chip;
++
++	if (static_key_true(&supports_deactivate)) {
++		if (d->host_data == (void *)&gic_data[0])
++			chip = &gic_eoimode1_chip;
++	}
++
+ 	if (hw < 32) {
+ 		irq_set_percpu_devid(irq);
+-		irq_domain_set_info(d, irq, hw, &gic_chip, d->host_data,
++		irq_domain_set_info(d, irq, hw, chip, d->host_data,
+ 				    handle_percpu_devid_irq, NULL, NULL);
+ 		set_irq_flags(irq, IRQF_VALID | IRQF_NOAUTOEN);
+ 	} else {
+-		irq_domain_set_info(d, irq, hw, &gic_chip, d->host_data,
++		irq_domain_set_info(d, irq, hw, chip, d->host_data,
+ 				    handle_fasteoi_irq, NULL, NULL);
+ 		set_irq_flags(irq, IRQF_VALID | IRQF_PROBE);
+ 	}
+@@ -986,6 +1028,8 @@ void __init gic_init_bases(unsigned int gic_nr, int irq_start,
+ 		register_cpu_notifier(&gic_cpu_notifier);
+ #endif
+ 		set_handle_irq(gic_handle_irq);
++		if (static_key_true(&supports_deactivate))
++			pr_info("GIC: Using split EOI/Deactivate mode\n");
+ 	}
+ 
+ 	gic_dist_init(gic);
+@@ -1001,6 +1045,7 @@ gic_of_init(struct device_node *node, struct device_node *parent)
+ {
+ 	void __iomem *cpu_base;
+ 	void __iomem *dist_base;
++	struct resource cpu_res;
+ 	u32 percpu_offset;
+ 	int irq;
+ 
+@@ -1013,6 +1058,16 @@ gic_of_init(struct device_node *node, struct device_node *parent)
+ 	cpu_base = of_iomap(node, 1);
+ 	WARN(!cpu_base, "unable to map gic cpu registers\n");
+ 
++	of_address_to_resource(node, 1, &cpu_res);
++
++	/*
++	 * Disable split EOI/Deactivate if either HYP is not available
++	 * or the CPU interface is too small.
++	 */
++	if (gic_cnt == 0 && (!is_hyp_mode_available() ||
++			     resource_size(&cpu_res) < SZ_8K))
++		static_key_slow_dec(&supports_deactivate);
++
+ 	if (of_property_read_u32(node, "cpu-offset", &percpu_offset))
+ 		percpu_offset = 0;
+ 
+@@ -1132,6 +1187,14 @@ gic_v2_acpi_init(struct acpi_table_header *table)
+ 	}
+ 
+ 	/*
++	 * Disable split EOI/Deactivate if HYP is not available. ACPI
++	 * guarantees that we'll always have a GICv2, so the CPU
++	 * interface will always be the right size.
++	 */
++	if (!is_hyp_mode_available())
++		static_key_slow_dec(&supports_deactivate);
++
++	/*
+ 	 * Initialize zero GIC instance (no multi-GIC support). Also, set GIC
+ 	 * as default IRQ domain to allow for GSI registration and GSI to IRQ
+ 	 * number translation (see acpi_register_gsi() and acpi_gsi_to_irq()).
+diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
+index 9de976b..b1533c0 100644
+--- a/include/linux/irqchip/arm-gic.h
++++ b/include/linux/irqchip/arm-gic.h
+@@ -20,9 +20,13 @@
+ #define GIC_CPU_ALIAS_BINPOINT		0x1c
+ #define GIC_CPU_ACTIVEPRIO		0xd0
+ #define GIC_CPU_IDENT			0xfc
++#define GIC_CPU_DEACTIVATE		0x1000
+ 
+ #define GICC_ENABLE			0x1
+ #define GICC_INT_PRI_THRESHOLD		0xf0
++
++#define GIC_CPU_CTRL_EOImodeNS		(1 << 9)
++
+ #define GICC_IAR_INT_ID_MASK		0x3ff
+ #define GICC_INT_SPURIOUS		1023
+ #define GICC_DIS_BYPASS_MASK		0x1e0
+-- 
+2.1.4
