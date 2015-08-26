@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 4/4] irqchip: GIC: Don't deactivate interrupts forwarded to a guest
-Date: Wed, 26 Aug 2015 17:00:45 +0100
-Message-ID: <1440604845-28229-5-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v4 2/4] irqchip: GICv3: Don't deactivate interrupts forwarded to a guest
+Date: Wed, 26 Aug 2015 17:00:43 +0100
+Message-ID: <1440604845-28229-3-git-send-email-marc.zyngier@arm.com>
 References: <1440604845-28229-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1440604845-28229-1-git-send-email-marc.zyngier@arm.com>
@@ -21,51 +21,26 @@ VFIO and KVM.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- drivers/irqchip/irq-gic.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
+ drivers/irqchip/irq-gic-v3.c | 27 +++++++++++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-index 9215897..0f1f00c 100644
---- a/drivers/irqchip/irq-gic.c
-+++ b/drivers/irqchip/irq-gic.c
-@@ -140,6 +140,36 @@ static inline unsigned int gic_irq(struct irq_data *d)
- 	return d->hwirq;
+diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+index e4eba7e..51635af 100644
+--- a/drivers/irqchip/irq-gic-v3.c
++++ b/drivers/irqchip/irq-gic-v3.c
+@@ -70,6 +70,11 @@ static inline int gic_irq_in_rdist(struct irq_data *d)
+ 	return gic_irq(d) < 32;
  }
  
-+static inline bool cascading_gic_irq(struct irq_data *d)
-+{
-+	void *data = irq_data_get_irq_handler_data(d);
-+
-+	/*
-+	 * If handler_data pointing to one of the secondary GICs, then
-+	 * this is a cascading interrupt, and it cannot possibly be
-+	 * forwarded.
-+	 */
-+	if (data >= (void *)(gic_data + 1) &&
-+	    data <  (void *)(gic_data + MAX_GIC_NR))
-+		return true;
-+
-+	return false;
-+}
-+
 +static inline bool forwarded_irq(struct irq_data *d)
 +{
-+	/*
-+	 * A forwarded interrupt:
-+	 * - is on the primary GIC
-+	 * - has its handler_data set to a value
-+	 * - that isn't a secondary GIC
-+	 */
-+	if (d->handler_data && !cascading_gic_irq(d))
-+		return true;
-+
-+	return false;
++	return d->handler_data != NULL;
 +}
 +
- /*
-  * Routines to acknowledge, disable and enable interrupts
-  */
-@@ -163,6 +193,16 @@ static void gic_mask_irq(struct irq_data *d)
+ static inline void __iomem *gic_dist_base(struct irq_data *d)
+ {
+ 	if (gic_irq_in_rdist(d))	/* SGI+PPI -> SGI_base for this CPU */
+@@ -236,6 +241,16 @@ static void gic_mask_irq(struct irq_data *d)
  static void gic_eoimode1_mask_irq(struct irq_data *d)
  {
  	gic_mask_irq(d);
@@ -78,40 +53,38 @@ index 9215897..0f1f00c 100644
 +	 * noone to deactivate it (guest is being terminated).
 +	 */
 +	if (forwarded_irq(d))
-+		gic_poke_irq(d, GIC_DIST_ACTIVE_CLEAR);
++		gic_poke_irq(d, GICD_ICACTIVER);
  }
  
  static void gic_unmask_irq(struct irq_data *d)
-@@ -177,6 +217,10 @@ static void gic_eoi_irq(struct irq_data *d)
- 
+@@ -306,9 +321,10 @@ static void gic_eoi_irq(struct irq_data *d)
  static void gic_eoimode1_eoi_irq(struct irq_data *d)
  {
-+	/* Do not deactivate an IRQ forwarded to a vcpu. */
-+	if (forwarded_irq(d))
-+		return;
-+
- 	writel_relaxed(gic_irq(d), gic_cpu_base(d) + GIC_CPU_DEACTIVATE);
+ 	/*
+-	 * No need to deactivate an LPI.
++	 * No need to deactivate an LPI, or an interrupt that
++	 * is is getting forwarded to a vcpu.
+ 	 */
+-	if (gic_irq(d) >= 8192)
++	if (gic_irq(d) >= 8192 || forwarded_irq(d))
+ 		return;
+ 	gic_write_dir(gic_irq(d));
  }
- 
-@@ -246,6 +290,16 @@ static int gic_set_type(struct irq_data *d, unsigned int type)
- 	return gic_configure_irq(gicirq, type, base, NULL);
+@@ -339,6 +355,12 @@ static int gic_set_type(struct irq_data *d, unsigned int type)
+ 	return gic_configure_irq(irq, type, base, rwp_wait);
  }
  
 +static int gic_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu)
 +{
-+	/* Only interrupts on the primary GIC can be forwarded to a vcpu. */
-+	if (cascading_gic_irq(d))
-+		return -EINVAL;
-+
 +	d->handler_data = vcpu;
 +	return 0;
 +}
 +
- #ifdef CONFIG_SMP
- static int gic_set_affinity(struct irq_data *d, const struct cpumask *mask_val,
- 			    bool force)
-@@ -355,6 +409,7 @@ static struct irq_chip gic_eoimode1_chip = {
- #endif
+ static u64 gic_mpidr_to_affinity(u64 mpidr)
+ {
+ 	u64 aff;
+@@ -703,6 +725,7 @@ static struct irq_chip gic_eoimode1_chip = {
+ 	.irq_set_affinity	= gic_set_affinity,
  	.irq_get_irqchip_state	= gic_irq_get_irqchip_state,
  	.irq_set_irqchip_state	= gic_irq_set_irqchip_state,
 +	.irq_set_vcpu_affinity	= gic_irq_set_vcpu_affinity,
