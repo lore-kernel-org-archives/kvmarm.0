@@ -1,7 +1,7 @@
 From: Pavel Fedin <p.fedin@samsung.com>
 Subject: RE: [PATCH] KVM: arm/arm64: BUG: Fix losing level-sensitive interrupts
-Date: Wed, 26 Aug 2015 14:33:06 +0300
-Message-ID: <00d901d0dff2$fa5616d0$ef024470$@samsung.com>
+Date: Wed, 26 Aug 2015 16:11:33 +0300
+Message-ID: <011d01d0e000$bbbd94d0$3338be70$@samsung.com>
 References: <1440571563-7004-1-git-send-email-p.fedin@samsung.com>
  <20150826092721.43e8cbfd@arm.com>
  <00d701d0dfee$2f464810$8dd2d830$@samsung.com> <55DD9F5B.4080602@arm.com>
@@ -18,34 +18,15 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
  Hello!
 
-> As for v4.1 not having that problem, the pl011 driver has gone though a
-> lot if rework lately, and I wouldn't be surprised if it now exhibited a
-> different behaviour thanks to the broken userspace behaviour.
+> Sorry, but I don't really want to introduce another bug
+> in the VGIC code (we have too many already). And what you're suggesting
+> is to actually introduce a bug.
 
- Sorry, you misunderstood me. Or i wrote badly. I meant that _KVM_ did not have this particular
-problem in kernel v4.0, because:
-http://lxr.free-electrons.com/source/virt/kvm/arm/vgic.c?v=4.0#L998
- you see, LR_STATE_PENDING is assigned unconditionally. Is this code correct? I believe yes. Compare
-with:
-http://lxr.free-electrons.com/source/virt/kvm/arm/vgic.c#L1104
- Now it is possible to have neither PENDING nor ACTIVE irq. Does it even make sense? So what is
-wrong with the modification as follows?
---- cut ---
-         if (vgic_irq_is_active(vcpu, irq)) {
-                 vlr.state |= LR_STATE_ACTIVE;
-                 kvm_debug("Set active, clear distributor: 0x%x\n", vlr.state);
-                 vgic_irq_clear_active(vcpu, irq);
-                 vgic_update_state(vcpu->kvm);
-         } else {
-                 vlr.state |= LR_STATE_PENDING;
-                 kvm_debug("Set pending: 0x%x\n", vlr.state);
-         }
---- cut ---
- Alex, are you reading us? Can you explain, why you introduced that extra check?
-
-> And what you're suggesting is to actually introduce a bug.
-
- Why would that be a bug, if it was not a bug in kernel 4.0?
+ Another, alternate idea...
+ So far, we have a situation when empty LR, containing only LR_INT_EOI bit, is queued. Can we say
+that this is wrong?
+ If you agree, may be do something else instead? May be we should cancel such "ghost" interrupts
+early, avoiding immediate and completely unnecessary maintenance interrupts upon guest entry?
 
 Kind regards,
 Pavel Fedin
