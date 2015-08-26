@@ -1,85 +1,56 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 1/4] irqchip: GICv3: Convert to EOImode == 1
-Date: Wed, 26 Aug 2015 11:09:58 +0100
-Message-ID: <55DD9076.7080000@arm.com>
-References: <1440503605-10185-1-git-send-email-marc.zyngier@arm.com> <1440503605-10185-2-git-send-email-marc.zyngier@arm.com> <55DD7EDB.7010208@linaro.org>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH] KVM: arm/arm64: BUG: Fix losing level-sensitive interrupts
+Date: Wed, 26 Aug 2015 13:58:47 +0300
+Message-ID: <00d701d0dfee$2f464810$8dd2d830$@samsung.com>
+References: <1440571563-7004-1-git-send-email-p.fedin@samsung.com>
+ <20150826092721.43e8cbfd@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <55DD7EDB.7010208@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Jiang Liu <jiang.liu@linux.intel.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <20150826092721.43e8cbfd@arm.com>
+Content-language: ru
+Sender: kvm-owner@vger.kernel.org
+To: 'Marc Zyngier' <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Christoffer Dall' <christoffer.dall@linaro.org>, =?ISO-8859-1?Q?'Alex_Benn=E9e'?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 26/08/15 09:54, Eric Auger wrote:
-> Hi Marc,
-> On 08/25/2015 01:53 PM, Marc Zyngier wrote:
->> So far, GICv3 has been used in with EOImode == 0. The effect of this
->> mode is to perform the priority drop and the deactivation of the
->> interrupt at the same time.
->>
->> While this works perfectly for Linux (we only have a single priority),
->> it causes issues when an interrupt is forwarded to a guest, and when
->> we want the guest to perform the EOI itself.
->>
->> For this case, the GIC architecture provides EOImode == 1, where:
->> - A write to ICC_EOIR1_EL1 drops the priority of the interrupt and
->>   leaves it active. Other interrupts at the same priority level can
->>   now be taken, but the active interrupt cannot be taken again
->> - A write to ICC_DIR_EL1 marks the interrupt as inactive, meaning
->>   it can now be taken again.
->>
->> This patch converts the driver to be able to use this new mode,
->> depending on whether or not the kernel can behave as a hypervisor.
->> No feature change.
->>
->> Reviewed-by: Eric Auger <eric.auger@linaro.org>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  drivers/irqchip/irq-gic-v3.c       | 39 ++++++++++++++++++++++++++++++++++----
->>  include/linux/irqchip/arm-gic-v3.h |  9 +++++++++
->>  2 files changed, 44 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
->> index c52f7ba..addd2ee 100644
->> --- a/drivers/irqchip/irq-gic-v3.c
->> +++ b/drivers/irqchip/irq-gic-v3.c
->> @@ -30,6 +30,7 @@
->>  #include <asm/cputype.h>
->>  #include <asm/exception.h>
->>  #include <asm/smp_plat.h>
->> +#include <asm/virt.h>
->>  
->>  #include "irq-gic-common.h"
->>  #include "irqchip.h"
->> @@ -50,6 +51,7 @@ struct gic_chip_data {
->>  };
->>  
->>  static struct gic_chip_data gic_data __read_mostly;
->> +static struct static_key supports_deactivate = STATIC_KEY_INIT_TRUE;
-> 
-> in http://www.spinics.net/lists/arm-kernel/msg439813.html, Catalin
-> reported the direct usage of static_key was deprecated. Sorry I learned
-> that after my last review.
-> 
-> see https://lkml.org/lkml/2015/8/3/539
+ Hello!
 
-Hi Eric,
+> So userspace drops the line to 0 *before* the guest had a chance to do
+> anything? Well, this is not the expected behaviour for a level
+> triggered interrupt
 
-I'm aware of Peter's work to rework static keys, but that code is not
-merged yet (though I believe it is on its way to 4.3). I have an
-additional patch that repaints the code to use static_key_likely() all
-over the place, but I keep it separate for the time being.
+ I know. But, still...
+ Imagine that we have misconfigured the HW for some reason. The device pulses an IRQ line, but we
+think it's a level IRQ. What will happen in a real hardware? Not much, the interrupt will still be
+sampled.
+ So, for better modelling the hardware, shouldn't we improve KVM's behavior here? Especially if
+before v4.1 it actually did not have this problem.
 
-If this series makes it in for 4.3, I'll post the repainting patch after
--rc1. Otherwise, I'll just update it in my tree.
+> This really feels like a userspace bug to me (I vaguely remember some
+> QEMU issues regarding this a while ago, but my memory is a bit hazy).
 
-I'm about to post v4 anyway, and I'll mention this in the cover letter.
+ You know, may be it's really qemu's problem, to tell the truth i'm lazy to read the whole PL011
+spec, but qemu appears to pulse the line without PL011 interrupt servicing at all. I know this
+because my kernel is patched, it uses software emulation of vCPU interface, because vGIC is broken
+on ThunderX. And LR state change and all the maintenance is done upon EOIR write (which is trapped).
+With this change consequences of losing an interrupt are much more severe, the IRQ line get stuck
+and stops working at all. Subsequent injections are blocked by vgic_can_sample_irq(), which returns
+false because vgic_irq_is_queued() returns true. Because vgic_irq_clear_queued() is called during
+maintenance procedure, which in this case never happens, because the interrupt is never EOIed,
+because it was never made PENDING in the LR. Actually that's how i found this.
+ So, here is why i am describing these unrelated things here: with IRQ line processing completely
+locked up, line switches between 1 and 0 is still injected (vgic_update_irq_pending() is called with
+both values, i added some debug output in order to see this). The guest successfully boots up to a
+login prompt, everything is fine, just i cannot type anything on the console because serial port's
+interrupt is locked up. I suppose that this pulsing has to do with output FIFO. Could this be some
+bug in kernel's pl011 driver itself, which does something wrong and does not handle interrupts in a
+proper way during output?
 
-Thanks,
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+
