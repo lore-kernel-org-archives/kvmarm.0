@@ -1,116 +1,82 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 00/13] arm64: Virtualization Host Extension support
-Date: Wed, 26 Aug 2015 10:59:11 +0100
-Message-ID: <55DD8DEF.9080301@arm.com>
-References: <1436372356-30410-1-git-send-email-marc.zyngier@arm.com>
- <55DD82FB.60903@huawei.com> <55DD851B.4040106@siemens.com>
+Subject: Re: [PATCH v3 1/4] irqchip: GICv3: Convert to EOImode == 1
+Date: Wed, 26 Aug 2015 11:09:58 +0100
+Message-ID: <55DD9076.7080000@arm.com>
+References: <1440503605-10185-1-git-send-email-marc.zyngier@arm.com> <1440503605-10185-2-git-send-email-marc.zyngier@arm.com> <55DD7EDB.7010208@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C12C41349
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Aug 2015 05:59:15 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id K1sqe77PcCuU for <kvmarm@lists.cs.columbia.edu>;
- Wed, 26 Aug 2015 05:59:13 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C5E6A4113E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Aug 2015 05:59:13 -0400 (EDT)
-In-Reply-To: <55DD851B.4040106@siemens.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Jan Kiszka <jan.kiszka@siemens.com>, Antonios Motakis <antonios.motakis@huawei.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, jani.kokkonen@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <55DD7EDB.7010208@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Eric Auger <eric.auger@linaro.org>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Jiang Liu <jiang.liu@linux.intel.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 26/08/15 10:21, Jan Kiszka wrote:
-> On 2015-08-26 11:12, Antonios Motakis wrote:
->> Hello Marc,
->> 
->> On 08-Jul-15 18:19, Marc Zyngier wrote:
->>> ARMv8.1 comes with the "Virtualization Host Extension" (VHE for 
->>> short), which enables simpler support of Type-2 hypervisors.
->>> 
->>> This extension allows the kernel to directly run at EL2, and 
->>> significantly reduces the number of system registers shared
->>> between host and guest, reducing the overhead of virtualization.
->>> 
->>> In order to have the same kernel binary running on all versions
->>> of the architecture, this series makes heavy use of runtime code
->>> patching.
->>> 
->>> The first ten patches massage the KVM code to deal with VHE and
->>> enable Linux to run at EL2.
->> 
->> I am currently working on getting the Jailhouse hypervisor to work
->> on AArch64.
->> 
->> I've been looking at your patches, trying to figure out the
->> implications for Jailhouse. It seems there are a few :)
->> 
->> Jailhouse likes to be loaded by Linux into memory, and then to
->> inject itself at a higher level than Linux (demoting Linux into
->> being the "root cell"). This works on x86 and ARM (AArch32 and
->> eventually AArch64 without VHE). What this means in ARM, is that
->> Jailhouse hooks into the HVC stub exposed by Linux, and happily
->> installs itself in EL2.
->> 
->> With Linux running in EL2 though, that won't be as straightforward.
->> It looks like we can't just demote Linux to EL1 without breaking
->> something. Obviously it's OK for us that KVM won't work, but it
->> looks like at least the timer code will break horribly if we try to
->> do something like that.
->> 
->> Any comments on this? One work around would be to just remap the
->> incoming interrupt from the timer, so Linux never really realizes
->> it's not running in EL2 anymore. Then we would also have to deal
->> with the intricacies of removing and re-adding vCPUs to the Linux
->> root cell, so we would have to maintain the illusion of running in
->> EL2 for each one of them.
-
-Unfortunately, there is more to downgrading to EL1 than just interrupts.
-You need to migrate the whole VM context from EL2 to EL1 in an atomic
-fashion, clear the HCR_EL2.E2H and HCR_EL2.TGE bits while running at EL2
-(which is a bit like pulling the rug from under your own feet so you
-need to transition via a low mapping or an idmap), reinstall the EL2
-stub and do an exception return into EL1.
-
-And that's only for the CPU. Downgrading to EL1 has other fun
-consequences at the system level (SMMUs listening to TLB traffic would
-need to be reconfigured on the flight - it's a joke, don't even think of
-it).
-
+On 26/08/15 09:54, Eric Auger wrote:
+> Hi Marc,
+> On 08/25/2015 01:53 PM, Marc Zyngier wrote:
+>> So far, GICv3 has been used in with EOImode == 0. The effect of this
+>> mode is to perform the priority drop and the deactivation of the
+>> interrupt at the same time.
+>>
+>> While this works perfectly for Linux (we only have a single priority),
+>> it causes issues when an interrupt is forwarded to a guest, and when
+>> we want the guest to perform the EOI itself.
+>>
+>> For this case, the GIC architecture provides EOImode == 1, where:
+>> - A write to ICC_EOIR1_EL1 drops the priority of the interrupt and
+>>   leaves it active. Other interrupts at the same priority level can
+>>   now be taken, but the active interrupt cannot be taken again
+>> - A write to ICC_DIR_EL1 marks the interrupt as inactive, meaning
+>>   it can now be taken again.
+>>
+>> This patch converts the driver to be able to use this new mode,
+>> depending on whether or not the kernel can behave as a hypervisor.
+>> No feature change.
+>>
+>> Reviewed-by: Eric Auger <eric.auger@linaro.org>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  drivers/irqchip/irq-gic-v3.c       | 39 ++++++++++++++++++++++++++++++++++----
+>>  include/linux/irqchip/arm-gic-v3.h |  9 +++++++++
+>>  2 files changed, 44 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+>> index c52f7ba..addd2ee 100644
+>> --- a/drivers/irqchip/irq-gic-v3.c
+>> +++ b/drivers/irqchip/irq-gic-v3.c
+>> @@ -30,6 +30,7 @@
+>>  #include <asm/cputype.h>
+>>  #include <asm/exception.h>
+>>  #include <asm/smp_plat.h>
+>> +#include <asm/virt.h>
+>>  
+>>  #include "irq-gic-common.h"
+>>  #include "irqchip.h"
+>> @@ -50,6 +51,7 @@ struct gic_chip_data {
+>>  };
+>>  
+>>  static struct gic_chip_data gic_data __read_mostly;
+>> +static struct static_key supports_deactivate = STATIC_KEY_INIT_TRUE;
 > 
-> Without knowing any of the details, I would say there are two
-> strategies regarding this:
+> in http://www.spinics.net/lists/arm-kernel/msg439813.html, Catalin
+> reported the direct usage of static_key was deprecated. Sorry I learned
+> that after my last review.
 > 
-> - Disable KVM support in the Linux kernel - then we shouldn't boot
-> into EL2 in the first place, should we?
+> see https://lkml.org/lkml/2015/8/3/539
 
-Disabling KVM support won't drop the kernel to EL1. At least that's not
-what the current code does (we stay at EL2 if we detect VHE), and that's
-way too early to be able to parse a command line option.
+Hi Eric,
 
-> - Emulate what Linux is missing after take-over by Jailhouse (we do 
-> this on x86 with VT-d interrupt remapping which cannot be disabled 
-> anymore for Linux once it started with it, and we cannot boot
-> without it when we want to use the x2APIC).
+I'm aware of Peter's work to rework static keys, but that code is not
+merged yet (though I believe it is on its way to 4.3). I have an
+additional patch that repaints the code to use static_key_likely() all
+over the place, but I keep it separate for the time being.
 
-I can't really see what you want to emulate (I'm afraid I'm lacking the
-x86-specific background).
+If this series makes it in for 4.3, I'll post the repainting patch after
+-rc1. Otherwise, I'll just update it in my tree.
 
-As far as I can see, the only practical solution to this is to have a
-VHE config option, and Jailhouse that can be set to conflict it (depends
-on !VHE).
+I'm about to post v4 anyway, and I'll mention this in the cover letter.
 
 Thanks,
 
