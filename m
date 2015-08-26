@@ -1,181 +1,121 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v3 1/4] irqchip: GICv3: Convert to EOImode == 1
-Date: Wed, 26 Aug 2015 10:54:51 +0200
-Message-ID: <55DD7EDB.7010208@linaro.org>
-References: <1440503605-10185-1-git-send-email-marc.zyngier@arm.com> <1440503605-10185-2-git-send-email-marc.zyngier@arm.com>
+From: Antonios Motakis <antonios.motakis@huawei.com>
+Subject: Re: [PATCH 00/13] arm64: Virtualization Host Extension support
+Date: Wed, 26 Aug 2015 11:12:27 +0200
+Message-ID: <55DD82FB.60903@huawei.com>
+References: <1436372356-30410-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1440503605-10185-2-git-send-email-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Jiang Liu <jiang.liu@linux.intel.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1436372356-30410-1-git-send-email-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Claudio Fontana <claudio.fontana@huawei.com>, jani.kokkonen@huawei.com, Jan Kiszka <jan.kiszka@siemens.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-On 08/25/2015 01:53 PM, Marc Zyngier wrote:
-> So far, GICv3 has been used in with EOImode == 0. The effect of this
-> mode is to perform the priority drop and the deactivation of the
-> interrupt at the same time.
-> 
-> While this works perfectly for Linux (we only have a single priority),
-> it causes issues when an interrupt is forwarded to a guest, and when
-> we want the guest to perform the EOI itself.
-> 
-> For this case, the GIC architecture provides EOImode == 1, where:
-> - A write to ICC_EOIR1_EL1 drops the priority of the interrupt and
->   leaves it active. Other interrupts at the same priority level can
->   now be taken, but the active interrupt cannot be taken again
-> - A write to ICC_DIR_EL1 marks the interrupt as inactive, meaning
->   it can now be taken again.
-> 
-> This patch converts the driver to be able to use this new mode,
-> depending on whether or not the kernel can behave as a hypervisor.
-> No feature change.
-> 
-> Reviewed-by: Eric Auger <eric.auger@linaro.org>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  drivers/irqchip/irq-gic-v3.c       | 39 ++++++++++++++++++++++++++++++++++----
->  include/linux/irqchip/arm-gic-v3.h |  9 +++++++++
->  2 files changed, 44 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-> index c52f7ba..addd2ee 100644
-> --- a/drivers/irqchip/irq-gic-v3.c
-> +++ b/drivers/irqchip/irq-gic-v3.c
-> @@ -30,6 +30,7 @@
->  #include <asm/cputype.h>
->  #include <asm/exception.h>
->  #include <asm/smp_plat.h>
-> +#include <asm/virt.h>
->  
->  #include "irq-gic-common.h"
->  #include "irqchip.h"
-> @@ -50,6 +51,7 @@ struct gic_chip_data {
->  };
->  
->  static struct gic_chip_data gic_data __read_mostly;
-> +static struct static_key supports_deactivate = STATIC_KEY_INIT_TRUE;
+Hello Marc,
 
-in http://www.spinics.net/lists/arm-kernel/msg439813.html, Catalin
-reported the direct usage of static_key was deprecated. Sorry I learned
-that after my last review.
+On 08-Jul-15 18:19, Marc Zyngier wrote:
+> ARMv8.1 comes with the "Virtualization Host Extension" (VHE for
+> short), which enables simpler support of Type-2 hypervisors.
+>=20
+> This extension allows the kernel to directly run at EL2, and
+> significantly reduces the number of system registers shared between
+> host and guest, reducing the overhead of virtualization.
+>=20
+> In order to have the same kernel binary running on all versions of th=
+e
+> architecture, this series makes heavy use of runtime code patching.
+>=20
+> The first ten patches massage the KVM code to deal with VHE and enabl=
+e
+> Linux to run at EL2.
 
-see https://lkml.org/lkml/2015/8/3/539
+I am currently working on getting the Jailhouse hypervisor to work on A=
+Arch64.
 
-Best Regards
+I've been looking at your patches, trying to figure out the implication=
+s for Jailhouse. It seems there are a few :)
 
-Eric
->  
->  #define gic_data_rdist()		(this_cpu_ptr(gic_data.rdists.rdist))
->  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
-> @@ -293,7 +295,14 @@ static int gic_irq_get_irqchip_state(struct irq_data *d,
->  
->  static void gic_eoi_irq(struct irq_data *d)
->  {
-> -	gic_write_eoir(gic_irq(d));
-> +	if (static_key_true(&supports_deactivate)) {
-> +		/* No need to deactivate an LPI */
-> +		if (gic_irq(d) >= 8192)
-> +			return;
-> +		gic_write_dir(gic_irq(d));
-> +	} else {
-> +		gic_write_eoir(gic_irq(d));
-> +	}
->  }
->  
->  static int gic_set_type(struct irq_data *d, unsigned int type)
-> @@ -343,15 +352,26 @@ static asmlinkage void __exception_irq_entry gic_handle_irq(struct pt_regs *regs
->  
->  		if (likely(irqnr > 15 && irqnr < 1020) || irqnr >= 8192) {
->  			int err;
-> +
-> +			if (static_key_true(&supports_deactivate))
-> +				gic_write_eoir(irqnr);
-> +
->  			err = handle_domain_irq(gic_data.domain, irqnr, regs);
->  			if (err) {
->  				WARN_ONCE(true, "Unexpected interrupt received!\n");
-> -				gic_write_eoir(irqnr);
-> +				if (static_key_true(&supports_deactivate)) {
-> +					if (irqnr < 8192)
-> +						gic_write_dir(irqnr);
-> +				} else {
-> +					gic_write_eoir(irqnr);
-> +				}
->  			}
->  			continue;
->  		}
->  		if (irqnr < 16) {
->  			gic_write_eoir(irqnr);
-> +			if (static_key_true(&supports_deactivate))
-> +				gic_write_dir(irqnr);
->  #ifdef CONFIG_SMP
->  			handle_IPI(irqnr, regs);
->  #else
-> @@ -451,8 +471,13 @@ static void gic_cpu_sys_reg_init(void)
->  	/* Set priority mask register */
->  	gic_write_pmr(DEFAULT_PMR_VALUE);
->  
-> -	/* EOI deactivates interrupt too (mode 0) */
-> -	gic_write_ctlr(ICC_CTLR_EL1_EOImode_drop_dir);
-> +	if (static_key_true(&supports_deactivate)) {
-> +		/* EOI drops priority only (mode 1) */
-> +		gic_write_ctlr(ICC_CTLR_EL1_EOImode_drop);
-> +	} else {
-> +		/* EOI deactivates interrupt too (mode 0) */
-> +		gic_write_ctlr(ICC_CTLR_EL1_EOImode_drop_dir);
-> +	}
->  
->  	/* ... and let's hit the road... */
->  	gic_write_grpen1(1);
-> @@ -820,6 +845,12 @@ static int __init gic_of_init(struct device_node *node, struct device_node *pare
->  	if (of_property_read_u64(node, "redistributor-stride", &redist_stride))
->  		redist_stride = 0;
->  
-> +	if (!is_hyp_mode_available())
-> +		static_key_slow_dec(&supports_deactivate);
-> +
-> +	if (static_key_true(&supports_deactivate))
-> +		pr_info("GIC: Using split EOI/Deactivate mode\n");
-> +
->  	gic_data.dist_base = dist_base;
->  	gic_data.redist_regions = rdist_regs;
->  	gic_data.nr_redist_regions = nr_redist_regions;
-> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-> index ffbc034..bc98832 100644
-> --- a/include/linux/irqchip/arm-gic-v3.h
-> +++ b/include/linux/irqchip/arm-gic-v3.h
-> @@ -104,6 +104,8 @@
->  #define GICR_SYNCR			0x00C0
->  #define GICR_MOVLPIR			0x0100
->  #define GICR_MOVALLR			0x0110
-> +#define GICR_ISACTIVER			GICD_ISACTIVER
-> +#define GICR_ICACTIVER			GICD_ICACTIVER
->  #define GICR_IDREGS			GICD_IDREGS
->  #define GICR_PIDR2			GICD_PIDR2
->  
-> @@ -288,6 +290,7 @@
->  #define ICH_VMCR_PMR_MASK		(0xffUL << ICH_VMCR_PMR_SHIFT)
->  
->  #define ICC_EOIR1_EL1			sys_reg(3, 0, 12, 12, 1)
-> +#define ICC_DIR_EL1			sys_reg(3, 0, 12, 11, 1)
->  #define ICC_IAR1_EL1			sys_reg(3, 0, 12, 12, 0)
->  #define ICC_SGI1R_EL1			sys_reg(3, 0, 12, 11, 5)
->  #define ICC_PMR_EL1			sys_reg(3, 0, 4, 6, 0)
-> @@ -384,6 +387,12 @@ static inline void gic_write_eoir(u64 irq)
->  	isb();
->  }
->  
-> +static inline void gic_write_dir(u64 irq)
-> +{
-> +	asm volatile("msr_s " __stringify(ICC_DIR_EL1) ", %0" : : "r" (irq));
-> +	isb();
-> +}
-> +
->  struct irq_domain;
->  int its_cpu_init(void);
->  int its_init(struct device_node *node, struct rdists *rdists,
-> 
+Jailhouse likes to be loaded by Linux into memory, and then to inject i=
+tself at a higher level than Linux (demoting Linux into being the "root=
+ cell"). This works on x86 and ARM (AArch32 and eventually AArch64 with=
+out VHE). What this means in ARM, is that Jailhouse hooks into the HVC =
+stub exposed by Linux, and happily installs itself in EL2.
+
+With Linux running in EL2 though, that won't be as straightforward. It =
+looks like we can't just demote Linux to EL1 without breaking something=
+=2E Obviously it's OK for us that KVM won't work, but it looks like at =
+least the timer code will break horribly if we try to do something like=
+ that.
+
+Any comments on this? One work around would be to just remap the incomi=
+ng interrupt from the timer, so Linux never really realizes it's not ru=
+nning in EL2 anymore. Then we would also have to deal with the intricac=
+ies of removing and re-adding vCPUs to the Linux root cell, so we would=
+ have to maintain the illusion of running in EL2 for each one of them.
+
+Cheers,
+Antonios
+
+>=20
+> The next patch catches an ugly case when VHE capable CPUs are paired
+> with some of their less capable siblings. This should never happen,
+> but hey...
+>=20
+> The last two patches add an optimisation allowing a physical interrup=
+t
+> to be serviced on the host without doing a full save/restore, leading
+> to potential reduction in interrupt latency.
+>=20
+> This has been tested on the FVP_Base_SLV-V8-A model, and based on
+> v4.2-rc1. I've put a branch out on:
+>=20
+> git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git k=
+vm-arm64/vhe
+>=20
+> Marc Zyngier (13):
+>   arm/arm64: Add new is_kernel_in_hyp_mode predicate
+>   arm64: Allow the arch timer to use the HYP timer
+>   arm64: Add ARM64_HAS_VIRT_HOST_EXTN feature
+>   arm64: KVM: skip HYP setup when already running in HYP
+>   arm64: KVM: VHE: macroize VTCR_EL2 setup
+>   arm64: KVM: VHE: Patch out kern_hyp_va
+>   arm64: KVM: VHE: Patch out use of HVC
+>   arm64: KVM: VHE: Preserve VHE config in world switch
+>   arm64: KVM: VHE: Add alternatives for VHE-enabled world-switch
+>   arm64: Add support for running Linux in EL2 mode
+>   arm64: Panic when VHE and non VHE CPUs coexist
+>   arm64: KVM: Split sysreg save/restore
+>   arm64: KVM: VHE: Early interrupt handling
+>=20
+>  arch/arm/include/asm/virt.h          |   5 +
+>  arch/arm/kvm/arm.c                   | 134 ++++++++-----
+>  arch/arm/kvm/mmu.c                   |   6 +
+>  arch/arm64/include/asm/cpufeature.h  |   3 +-
+>  arch/arm64/include/asm/kvm_arm.h     |   1 +
+>  arch/arm64/include/asm/kvm_asm.h     |  40 +++-
+>  arch/arm64/include/asm/kvm_emulate.h |   2 +
+>  arch/arm64/include/asm/kvm_mmu.h     |  24 ++-
+>  arch/arm64/include/asm/virt.h        |  25 +++
+>  arch/arm64/kernel/cpufeature.c       |  11 ++
+>  arch/arm64/kernel/head.S             |  38 +++-
+>  arch/arm64/kernel/smp.c              |   4 +
+>  arch/arm64/kvm/hyp-init.S            |   9 +-
+>  arch/arm64/kvm/hyp.S                 | 363 ++++++++++++++++++++++++-=
+----------
+>  arch/arm64/kvm/vgic-v2-switch.S      |  19 +-
+>  arch/arm64/kvm/vgic-v3-switch.S      |  33 ++--
+>  arch/arm64/kvm/vhe-macros.h          |  54 ++++++
+>  drivers/clocksource/arm_arch_timer.c |  96 +++++----
+>  18 files changed, 638 insertions(+), 229 deletions(-)
+>  create mode 100644 arch/arm64/kvm/vhe-macros.h
+>=20
+
+--=20
+Antonios Motakis
+Virtualization Engineer
+Huawei Technologies Duesseldorf GmbH
+European Research Center
+Riesstrasse 25, 80992 M=FCnchen
+
