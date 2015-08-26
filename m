@@ -1,34 +1,102 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH] KVM: arm/arm64: BUG: Fix losing level-sensitive interrupts
-Date: Wed, 26 Aug 2015 17:26:55 +0300
-Message-ID: <014c01d0e00b$42de2060$c89a6120$@samsung.com>
-References: <1440571563-7004-1-git-send-email-p.fedin@samsung.com>
- <20150826140214.GB29439@cbox>
+From: Vijay Kilari <vijay.kilari@gmail.com>
+Subject: Re: KVM Live migration with GICv3
+Date: Wed, 26 Aug 2015 19:54:31 +0530
+Message-ID: <CALicx6vGO64DC0NTXSuyCBDK0q1Sac+zmswy72aRZX+Mynpr8w@mail.gmail.com>
+References: <CALicx6soU-pqs3XgkEHxtBVy9yR-7irSU4ZJvC3D6V2UmKHQqA@mail.gmail.com>
+ <009101d0d400$c92925f0$5b7b71d0$@samsung.com>
+ <CALicx6s4BOuHsP40r2zuqgiLh+Rx=e=UQvwV5_R7LJB9-dpkig@mail.gmail.com>
+ <013601d0df28$fcb635b0$f622a110$@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <20150826140214.GB29439@cbox>
-Content-language: ru
-Sender: kvm-owner@vger.kernel.org
-To: 'Christoffer Dall' <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>, =?ISO-8859-1?Q?'Alex_Benn=E9e'?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B58C348AC7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Aug 2015 10:24:30 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id aiNK3KEZ6pzq for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 26 Aug 2015 10:24:29 -0400 (EDT)
+Received: from mail-vk0-f43.google.com (mail-vk0-f43.google.com
+ [209.85.213.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A174D48AC3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Aug 2015 10:24:29 -0400 (EDT)
+Received: by vkif69 with SMTP id f69so83417982vki.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 26 Aug 2015 07:24:31 -0700 (PDT)
+In-Reply-To: <013601d0df28$fcb635b0$f622a110$@samsung.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Pavel Fedin <p.fedin@samsung.com>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello!
-
-> Hmm, there is definitely an inconsistency in the vgic code by getting
-> here, but this is the wrong fix.  I think you want something more along
-> the lines of the following (completely untested, not even compile
-> tested):
-
- Thank you very much. I also tried to propose an alternate solution like this, i will test it, and
-adjust if needed. My "bad codebase, broken HW and buggy userspace" appears to be particulary prone
-to finding these problems, i think it's going to be a nice testbed. :)
-
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
-
-
+T24gVHVlLCBBdWcgMjUsIDIwMTUgYXQgNDo1NyBQTSwgUGF2ZWwgRmVkaW4gPHAuZmVkaW5Ac2Ft
+c3VuZy5jb20+IHdyb3RlOgo+ICBIZWxsbyEgV2hlcmUgYXJlIHlvdT8gSSdkIGxpa2UgdG8gdGFr
+ZSBhIGxvb2sgYXQgeW91ciBjb2RlLgoKICAgU29ycnksICBJIGFtIG9jY3VwaWVkIHdpdGggb3Ro
+ZXIgdGFza3MgZm9yIG5leHQgMiB3ZWVrcywgQWZ0ZXIgdGhhdApJIHdpbGwgbG9vayBpbnRvIHRo
+aXMuCgo+Cj4gS2luZCByZWdhcmRzLAo+IFBhdmVsIEZlZGluCj4gRXhwZXJ0IEVuZ2luZWVyCj4g
+U2Ftc3VuZyBFbGVjdHJvbmljcyBSZXNlYXJjaCBjZW50ZXIgUnVzc2lhCj4KPgo+PiAtLS0tLU9y
+aWdpbmFsIE1lc3NhZ2UtLS0tLQo+PiBGcm9tOiBWaWpheSBLaWxhcmkgW21haWx0bzp2aWpheS5r
+aWxhcmlAZ21haWwuY29tXQo+PiBTZW50OiBUdWVzZGF5LCBBdWd1c3QgMTEsIDIwMTUgNjoxNiBQ
+TQo+PiBUbzogUGF2ZWwgRmVkaW4KPj4gQ2M6IGt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHU7
+IENocmlzdG9mZmVyIERhbGw7IEFsZXggQmVubsOpZQo+PiBTdWJqZWN0OiBSZTogS1ZNIExpdmUg
+bWlncmF0aW9uIHdpdGggR0lDdjMKPj4KPj4gT24gVHVlLCBBdWcgMTEsIDIwMTUgYXQgMTI6MTEg
+UE0sIFBhdmVsIEZlZGluIDxwLmZlZGluQHNhbXN1bmcuY29tPiB3cm90ZToKPj4gPiAgSGVsbG8h
+Cj4+ID4KPj4gPj4gICAgSSBoYXZlIHByb3RvdHlwZWQgTGl2ZSBtaWdyYXRpb24gd2l0aCBHSUN2
+My4KPj4gPgo+PiA+ICBUaGlzIGlzIGludGVyZXN0aW5nIG9mIGNvdXJzZSwgaSB3aWxsIG5lZWQg
+dGhpcyBmb3IgbXkgcHJvamVjdCB0b28gYW5kIGkgd2FzIGFsc28gZ29pbmcgdG8gdGFrZSBhIGxv
+b2sgYXQKPj4gdGhpcyBsYXRlci4KPj4gPgo+PiA+PiBGb3IgdGhpcyBJIGhhdmUgbWFkZSBmb2xs
+b3dpbmcgY2hhbmdlcwo+PiA+Pgo+PiA+PiAxKSBTYXZlIGFuZCBSZXN0b3JlIG9mIEdJQ3YzIHJl
+Z2lzdGVycyBpbiBRRU1VLgo+PiA+PiAgICAgLSBGb3IgR0lDdjIsIFFFTVUgaXMgc2F2aW5nL3Jl
+c3RvcmluZyBHSUNELCBHSUNDICByZWdpc3RlcnMuIEZvciBHSUN2MywKPj4gPj4gICAgICB3ZSBo
+YXZlIHRvIHNhdmUvcmVzdG9yZSBHSUNELCBHSUNSIGFuZCBJQ0MgcmVnaXN0ZXJzLgo+PiA+PiAg
+ICAgIEhvd2V2ZXIgSUNDIHJlZ2lzdGVycyBhcmUgc3lzdGVtIHJlZ2lzdGVycyB3aGljaCBjYW5u
+b3QgYmUKPj4gPj4gYWNjZXNzZWQgQCBFTDAgbGV2ZWwgKFNSRT0xKS4gU28gdGhlc2UgSUNDIHJl
+Z2lzdGVycyBzaG91bGQgYmUKPj4gPj4gYWNjZXNzZWQgYXMgbW1pbyByZWdpc3RlcnMgYnkgUUVN
+VSwgZm9yIHRoaXMgd2UgaGF2ZSB0byBhZGQgaW9jdGwgdG8KPj4gPj4gYWNjZXNzIElDQyBAIEVM
+MSBsZXZlbCBzaW1pbGFyIHRvIEdJQ0MgcmVnaXN0ZXJzIG9mIEdJQ3YyLgo+PiA+Cj4+ID4gIFNv
+cnJ5LCB5b3VyIGRlc2NyaXB0aW9uIGlzIGEgYml0IGZ1enp5LiBXaGF0IGlvY3RsJ3MgZGlkIHlv
+dSBoYXZlIHRvIGFkZCBhbmQgd2h5Pwo+PiA+ICBUaGUga2VybmVsIGFscmVhZHkgaGFzIEtWTV9H
+RVRfT05FX1JFRyBhbmQgS1ZNX1NFVF9PTkVfUkVHIGlvY3RsJ3MuIEFuZCB0aGV5IGNhbiBiZSB1
+c2VkCj4+IHRvIGFjY2VzcyBhbnl0aGluZyBpbnNpZGUgdGhlIFZNLCBpbmNsdWRpbmcgc3lzdGVt
+IHJlZ2lzdGVycy4gSSBiZWxpZXZlIHlvdSB3b3VsZCBuZWVkIG9ubHkgdG8KPj4gaW1wbGVtZW50
+IGhhbmRsZXJzIGZvciBHSUN2MyByZWdpc3RlcnMuCj4+Cj4+IEkgbWVhbiBDUFUgaW50ZXJmYWNl
+IHJlZ2lzdGVycyBHSUNDKiBkZWZpbmVkIGZvciB2Z2ljdjIgdW5kZXIKPj4gInZnaWNfY3B1X3Jh
+bmdlc1tdIiBpbgo+PiB2aXJ0L2t2bS9hcm0vdmdpYy12Mi1lbXVsLmMgbmVlZHMgdG8gYmUgc2F2
+ZWQgYW5kIHJlc3RvcmVkIGZvciB2Z2ljdjMgYXMgd2VsbC4KPj4gU28gdG8gIGFjY2VzcyB2Z2lj
+X2NwdV9yYW5nZXNbXSBmb3IgdmdpY3YzLCB3ZSBuZWVkIHRvIHJlZ2lzdGVyIGRldmljZQo+PiBm
+b3IgQ1BVIHJlZ2lzdGVycyBzcGFjZQo+PiBzaW1pbGFyIHRvIGdpY3YyIGluIFFFTVUgZm9yIGdp
+Y3YzLgo+Pgo+PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQo+PiAgICAgbWVtb3J5
+X3JlZ2lvbl9pbml0X3Jlc2VydmF0aW9uKCZzLT5jcHVpb21lbVswXSwgT0JKRUNUKHMpLAo+PiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICJrdm0tZ2ljX2NwdSIsIDB4MTAwMCk7
+Cj4+ICAgICBzeXNidXNfaW5pdF9tbWlvKHNiZCwgJnMtPmNwdWlvbWVtWzBdKTsKPj4gICAgIGt2
+bV9hcm1fcmVnaXN0ZXJfZGV2aWNlKCZzLT5jcHVpb21lbVswXSwKPj4gICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIChLVk1fQVJNX0RFVklDRV9WR0lDX1YzIDw8IEtWTV9BUk1fREVWSUNFX0lE
+X1NISUZUKQo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCBLVk1fVkdJQ19WM19BRERS
+X1RZUEVfQ1BVLAo+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgS1ZNX0RFVl9BUk1fVkdJ
+Q19HUlBfQUREUiwKPj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgIEtWTV9WR0lDX1YzX0FE
+RFJfVFlQRV9DUFUsCj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzLT5kZXZfZmQpOwo+
+PiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCj4+Cj4+IEFueXdheSwgSSB3aWxs
+IHNlbmQgUkZDIHBhdGNoZXMuCj4+Cj4+ID4KPj4gPj4gUGxlYXNlIHByb3ZpZGUgeW91ciBpbml0
+aWFsIGZlZWRiYWNrLgo+PiA+Cj4+ID4gIFdvdWxkIGJlIG5pY2UgdG8gdGFrZSBhIGxvb2sgYXQg
+cGF0Y2hlcy4KPj4gPgo+PiA+PiBJIGFtIGF0dGVuZGluZyBLVk0tZm9ydW0gbmV4dCB3ZWVrIEAg
+U2VhdHRsZS4gV2UgY2FuIGRpc2N1c3MgdGhlcmUgYXMgd2VsbC4KPj4gPgo+PiA+ICBJIHdvdWxk
+IGxvdmUgdG8gZ28gdGhlcmUsIGFuZCBteSBjb21wYW55IHdhbnRlZCB0byBzZW5kIG1lIHRoZXJl
+LiBCdXQgaXQgYXBwZWFycyB0byBiZSBleHRyZW1lbHkKPj4gZGlmZmljdWx0IGZvciBhIHRlY2gg
+c3BlY2lhbGlzdCBmcm9tIFJ1c3NpYSB0byBnZXQgYSBVUyB2aXNhLiBUaGV5IGFyZSBzdGlsbCBj
+b25zaWRlcmluZyBtZSBhbmQgdGhlIHRpbWUgaXMKPj4gcnVubmluZyBvdXQsIHNvIGknbSB1bmxp
+a2VseSB0byBhdHRlbmQsIHVuZm9ydHVuYXRlbHkuCj4+ID4KPj4gPiBLaW5kIHJlZ2FyZHMsCj4+
+ID4gUGF2ZWwgRmVkaW4KPj4gPiBFeHBlcnQgRW5naW5lZXIKPj4gPiBTYW1zdW5nIEVsZWN0cm9u
+aWNzIFJlc2VhcmNoIGNlbnRlciBSdXNzaWEKPj4gPgo+PiA+Cj4KX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1A
+bGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxt
+YW4vbGlzdGluZm8va3ZtYXJtCg==
