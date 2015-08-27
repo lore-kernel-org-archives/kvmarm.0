@@ -1,94 +1,100 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: BUG FIX: Do not inject spurious
- interrupts
-Date: Thu, 27 Aug 2015 14:44:42 +0200
-Message-ID: <20150827124442.GD29439@cbox>
-References: <1440676282-2152-1-git-send-email-p.fedin@samsung.com>
+From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: [RFC PATCH v3 0/3] vfio: platform: return device properties for
+	a platform device
+Date: Thu, 27 Aug 2015 14:52:00 +0200
+Message-ID: <55DF07F0.3070405@linaro.org>
+References: <1419024032-1269-1-git-send-email-a.motakis@virtualopensystems.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1440676282-2152-1-git-send-email-p.fedin@samsung.com>
-Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <1419024032-1269-1-git-send-email-a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: antonios.motakis-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+Cc: tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Aug 27, 2015 at 02:51:22PM +0300, Pavel Fedin wrote:
-> Commit 71760950bf3dc796e5e53ea3300dec724a09f593
-> ("arm/arm64: KVM: add a common vgic_queue_irq_to_lr fn") introduced
-> vgic_queue_irq_to_lr() function with additional vgic_dist_irq_is_pending()
-> check before setting LR_STATE_PENDING bit. In some cases it started
-> causing the following situation if the userland quickly drops the IRQ back
-> to inactive state for some reason:
-> 1. Userland injects an IRQ with level == 1, this ends up in
->    vgic_update_irq_pending(), which in turn calls vgic_dist_irq_set_pending()
->    for this IRQ.
-> 2. vCPU gets kicked. But kernel does not manage to reschedule it quickly
->    (!!!)
-> 3. Userland quickly resets the IRQ to level == 0. vgic_update_irq_pending()
->    in this case will call vgic_dist_irq_clear_pending() and reset the
->    pending flag.
-> 4. vCPU finally wakes up. It succesfully rolls through through
->    __kvm_vgic_flush_hwstate(), which populates vGIC registers. However,
->    since neither pending nor active flags are now set for this IRQ,
->    vgic_queue_irq_to_lr() does not set any state bits on this LR at all.
->    Since this is level-sensitive IRQ, we end up in LR containing only
->    LR_EOI_INT bit, causing unnecessary immediate exit from the guest.
-> 
-> This patch fixes the problem by adding forgotten vgic_cpu_irq_clear().
-> This causes the IRQ not to be included into any lists, if it has been
-> picked up after getting dropped to inactive level. Since this is a
-> level-sensitive IRQ, this is correct behavior.
-> 
-> The bug was caught on ARM64 kernel v4.1.6, running qemu "virt" guest,
-> where it was caused by emulated pl011.
+Hi Baptiste, Antonios,
 
-It's a bit weird to just sned this as a new patch without replying to my
-mail from yesterday with feedback, explaining changes from what I did
-etc.  Anyway.
+What are the plans wrt this series? I am currently integrating another
+QEMU VFIO platform devices where this series could be useful I think
+(Feb 2015). Do you intend to follow up and bring it upstream?
 
+Alex, do you see some show-stoppers in this series or do you advise to
+simply follow-up?
+
+Thank you in advance
+
+Best Regards
+
+Eric
+
+
+On 12/19/2014 10:20 PM, Antonios Motakis wrote:
+> This RFC's intention is to show what an interface to access device
+> properties for the VFIO platform driver can look like. These properties
+> can be from the device tree node describing the device, or ACPI properties
+> in the future.
 > 
-> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-> ---
->  virt/kvm/arm/vgic.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+> If a device property corresponding to a platform device bound by VFIO PLATFORM
+> or VFIO AMBA is available, this patch series will allow the user to query
+> for this information. This can be useful for userspace drivers to automatically
+> query parameters related to the device.
 > 
-> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> index 34dad3c..bf155e3 100644
-> --- a/virt/kvm/arm/vgic.c
-> +++ b/virt/kvm/arm/vgic.c
-> @@ -1111,7 +1111,8 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
->  		kvm_debug("Set active, clear distributor: 0x%x\n", vlr.state);
->  		vgic_irq_clear_active(vcpu, irq);
->  		vgic_update_state(vcpu->kvm);
-> -	} else if (vgic_dist_irq_is_pending(vcpu, irq)) {
-> +	} else {
-> +		WARN_ON(!vgic_dist_irq_is_pending(vcpu, irq));
->  		vlr.state |= LR_STATE_PENDING;
->  		kvm_debug("Set pending: 0x%x\n", vlr.state);
->  	}
-> @@ -1567,8 +1568,10 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
->  	} else {
->  		if (level_triggered) {
->  			vgic_dist_irq_clear_level(vcpu, irq_num);
-> -			if (!vgic_dist_irq_soft_pend(vcpu, irq_num))
-> +			if (!vgic_dist_irq_soft_pend(vcpu, irq_num)) {
->  				vgic_dist_irq_clear_pending(vcpu, irq_num);
-> +				vgic_cpu_irq_clear(vcpu, irq_num);
-
-I think you're missing a potential change to the irq_pending_on_cpu
-field here, which you have to compute by calling vgic_update_state()
-like we do elsewhere when we change status bits (note that this is
-different from the incorrect approach I suggested yesterday where we
-always just clear the bit for that vcpu).
-
-> +			}
->  		}
->  
->  		ret = false;
-> -- 
-> 2.4.4
+> Specifically for QEMU, reading the "compatible" property of the device tree
+> node could be of use to find out what device is being assigned to the guest and
+> handle appropriately a wider range of devices in the future, and to generate an
+> appropriate device tree for the guest.
 > 
-
--Christoffer
+> Older versions of this series where specifically targeted at device tree
+> properties. This version has been reworked on top of Rafael J. Wysocki's
+> uniform device properties API for device tree and ACPI devices. This will allow
+> us to use the API in the future with devices described via ACPI.
+> 
+> This also means a kernel including the uniform device properties API is needed
+> to apply these patches, in additon to the VFIO patches, e.g. branch pm+acpi-3.19-rc1
+> from https://git.kernel.org/cgit/linux/kernel/git/rafael/linux-pm.git/
+> 
+> The API to get the list of available properties and the device tree full_name
+> have been removed. These probably don't serve an useful purpose, as the user
+> of this API need to know anyway what properties are specific to the device he
+> wants to access with VFIO. If we decide to reintroduce the list of properties
+> in the future, the generic device properties API in the kernel will have to
+> be extended accordingly.
+> 
+> A kernel with this series and all the dependencies applied can be pulled from
+> branch vfio-device-properties-v3 from the repository:
+> https://github.com/virtualopensystems/linux-kvm-arm.git
+> 
+> Changes since v2:
+>  - Reworked on top of Rafael J. Wysocki's uniform device properties API for
+>    device tree and ACPI
+>  - Support for u64 array properties
+>  - Removed API to get list of available properties and device tree full_name
+> Changes since v1:
+>  - Updated for VFIO platform patch series v8:
+>    VFIO AMBA devices now supported in addition to VFIO PLATFORM devices
+>  - Refactored and cleaned up the code
+> 
+> Antonios Motakis (3):
+>   vfio: platform: add device properties skeleton and user API
+>   vfio: platform: access device property as a list of strings
+>   vfio: platform: return device properties as arrays of unsigned
+>     integers
+> 
+>  drivers/vfio/platform/Makefile                |   3 +-
+>  drivers/vfio/platform/properties.c            | 162 ++++++++++++++++++++++++++
+>  drivers/vfio/platform/vfio_platform_common.c  |  35 ++++++
+>  drivers/vfio/platform/vfio_platform_private.h |   7 ++
+>  include/uapi/linux/vfio.h                     |  26 +++++
+>  5 files changed, 232 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/vfio/platform/properties.c
+> 
