@@ -1,100 +1,105 @@
-From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: [RFC PATCH v3 0/3] vfio: platform: return device properties for
-	a platform device
-Date: Thu, 27 Aug 2015 14:52:00 +0200
-Message-ID: <55DF07F0.3070405@linaro.org>
-References: <1419024032-1269-1-git-send-email-a.motakis@virtualopensystems.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v4 0/4] irqchip: GICv2/v3: Add support for irq_vcpu_affinity
+Date: Thu, 27 Aug 2015 15:03:12 +0200
+Message-ID: <55DF0A90.9010407@linaro.org>
+References: <1440604845-28229-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <1419024032-1269-1-git-send-email-a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: antonios.motakis-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-Cc: tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1440604845-28229-1-git-send-email-marc.zyngier@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Jiang Liu <jiang.liu@linux.intel.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Baptiste, Antonios,
+Hi Marc,
 
-What are the plans wrt this series? I am currently integrating another
-QEMU VFIO platform devices where this series could be useful I think
-(Feb 2015). Do you intend to follow up and bring it upstream?
+I tested the series on Calxeda Midway with VFIO use case. Also reviewed
+it again without finding anything new.
 
-Alex, do you see some show-stoppers in this series or do you advise to
-simply follow-up?
-
-Thank you in advance
+Tested-by: Eric Auger <eric.auger@linaro.org>
+Reviewed-by: Eric Auger <eric.auger@linaro.org>
 
 Best Regards
 
 Eric
 
 
-On 12/19/2014 10:20 PM, Antonios Motakis wrote:
-> This RFC's intention is to show what an interface to access device
-> properties for the VFIO platform driver can look like. These properties
-> can be from the device tree node describing the device, or ACPI properties
-> in the future.
+On 08/26/2015 06:00 PM, Marc Zyngier wrote:
+> The GICv2 and GICv3 architectures allow an active physical interrupt
+> to be forwarded to a guest, and the guest to indirectly perform the
+> deactivation of the interrupt by performing an EOI on the virtual
+> interrupt (see for example the GICv2 spec, 3.2.1).
 > 
-> If a device property corresponding to a platform device bound by VFIO PLATFORM
-> or VFIO AMBA is available, this patch series will allow the user to query
-> for this information. This can be useful for userspace drivers to automatically
-> query parameters related to the device.
+> This allows some substantial performance improvement for level
+> triggered interrupts that otherwise have to be masked/unmasked in
+> VFIO, not to mention the required trap back to KVM when the guest
+> performs an EOI.
 > 
-> Specifically for QEMU, reading the "compatible" property of the device tree
-> node could be of use to find out what device is being assigned to the guest and
-> handle appropriately a wider range of devices in the future, and to generate an
-> appropriate device tree for the guest.
+> To enable this, the GICs need to be switched to a different EOImode,
+> where a taken interrupt can be left "active" (which prevents the same
+> interrupt from being taken again), while other interrupts are still
+> being processed normally.
 > 
-> Older versions of this series where specifically targeted at device tree
-> properties. This version has been reworked on top of Rafael J. Wysocki's
-> uniform device properties API for device tree and ACPI devices. This will allow
-> us to use the API in the future with devices described via ACPI.
+> We also use the new irq_set_vcpu_affinity hook that was introduced for
+> Intel's "Posted Interrupts" to determine whether or not to perform the
+> deactivation at EOI-time.
 > 
-> This also means a kernel including the uniform device properties API is needed
-> to apply these patches, in additon to the VFIO patches, e.g. branch pm+acpi-3.19-rc1
-> from https://git.kernel.org/cgit/linux/kernel/git/rafael/linux-pm.git/
+> As all of this only makes sense when the kernel can behave as a
+> hypervisor, we only enable this mode on detecting that the kernel was
+> actually booted in HYP mode, and that the GIC supports this feature.
 > 
-> The API to get the list of available properties and the device tree full_name
-> have been removed. These probably don't serve an useful purpose, as the user
-> of this API need to know anyway what properties are specific to the device he
-> wants to access with VFIO. If we decide to reintroduce the list of properties
-> in the future, the generic device properties API in the kernel will have to
-> be extended accordingly.
+> This series is a complete rework of a RFC I sent over a year ago:
 > 
-> A kernel with this series and all the dependencies applied can be pulled from
-> branch vfio-device-properties-v3 from the repository:
-> https://github.com/virtualopensystems/linux-kvm-arm.git
+> http://lists.infradead.org/pipermail/linux-arm-kernel/2014-June/266328.html
 > 
-> Changes since v2:
->  - Reworked on top of Rafael J. Wysocki's uniform device properties API for
->    device tree and ACPI
->  - Support for u64 array properties
->  - Removed API to get list of available properties and device tree full_name
-> Changes since v1:
->  - Updated for VFIO platform patch series v8:
->    VFIO AMBA devices now supported in addition to VFIO PLATFORM devices
->  - Refactored and cleaned up the code
+> Since then, a lot has been either merged (the irqchip_state) or reworked
+> (my active-timer series: http://www.spinics.net/lists/kvm/msg118768.html),
+> and this implements the last few bits for Eric Auger's series to
+> finally make it into the kernel:
 > 
-> Antonios Motakis (3):
->   vfio: platform: add device properties skeleton and user API
->   vfio: platform: access device property as a list of strings
->   vfio: platform: return device properties as arrays of unsigned
->     integers
+> https://lkml.org/lkml/2015/7/2/268
+> https://lkml.org/lkml/2015/7/6/291
 > 
->  drivers/vfio/platform/Makefile                |   3 +-
->  drivers/vfio/platform/properties.c            | 162 ++++++++++++++++++++++++++
->  drivers/vfio/platform/vfio_platform_common.c  |  35 ++++++
->  drivers/vfio/platform/vfio_platform_private.h |   7 ++
->  include/uapi/linux/vfio.h                     |  26 +++++
->  5 files changed, 232 insertions(+), 1 deletion(-)
->  create mode 100644 drivers/vfio/platform/properties.c
+> With all these patches combined, physical interrupt routing from the
+> kernel into a VM becomes possible.
+> 
+> Note that the implementation makes use of the static_key mechanism,
+> which is undergoing an extensive rework in 4.3. I intend to convert
+> this code once both are in mainline.
+> 
+> This has been tested on Juno (GICv2) and FastModel (GICv3). A branch
+> is available at:
+> 
+> git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git irq/gic-irq-vcpu-affinity-v4
+> 
+> * From v3:
+>   - Use separate irq_chip structures, leading to much nicer code (tglx)
+>   - Dropped Eric's Tested/Reviewed-by as there is significant changes
+> 
+> * From v2:
+>   - Another small fix from Eric
+>   - Some commit message cleanups
+> 
+> * From v1:
+>   - Fixes after review from Eric
+>   - Got rid of the cascaded GICv2 hack (it was broken anyway)
+>   - Folded the LPI deactivation patch (it makes more sense as part of
+>     the main one.
+>   - Some clarifying comments about the "deactivate on mask"
+>   - I haven't retained Eric's Reviewed/Tested-by, as the code as
+>     significantly changed on GICv2
+> 
+> Marc Zyngier (4):
+>   irqchip: GICv3: Convert to EOImode == 1
+>   irqchip: GICv3: Don't deactivate interrupts forwarded to a guest
+>   irqchip: GIC: Convert to EOImode == 1
+>   irqchip: GIC: Don't deactivate interrupts forwarded to a guest
+> 
+>  drivers/irqchip/irq-gic-v3.c       |  70 +++++++++++++++++++++--
+>  drivers/irqchip/irq-gic.c          | 111 ++++++++++++++++++++++++++++++++++++-
+>  include/linux/irqchip/arm-gic-v3.h |   9 +++
+>  include/linux/irqchip/arm-gic.h    |   4 ++
+>  4 files changed, 188 insertions(+), 6 deletions(-)
 > 
