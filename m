@@ -1,119 +1,111 @@
-From: Christopher Covington <cov@codeaurora.org>
-Subject: Re: add multiple times opening support to a virtserialport
-Date: Thu, 27 Aug 2015 10:23:38 -0400
-Message-ID: <55DF1D6A.4080507@codeaurora.org>
-References: <CAHxyncujhHABs1Ld78biVZemeL=AZMqJow3vbCqdASf-1qBb5A@mail.gmail.com>
+From: Christian Pinto <c.pinto-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+Subject: Re: [RFC PATCH v3 0/3] vfio: platform: return device properties for
+	a platform device
+Date: Thu, 27 Aug 2015 16:27:23 +0200
+Message-ID: <55DF1E4B.6040604@virtualopensystems.com>
+References: <1419024032-1269-1-git-send-email-a.motakis@virtualopensystems.com>
+	<55DF07F0.3070405@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <CAHxyncujhHABs1Ld78biVZemeL=AZMqJow3vbCqdASf-1qBb5A@mail.gmail.com>
-Sender: kvm-owner@vger.kernel.org
-To: Matt Ma <matt.ma@linaro.org>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <55DF07F0.3070405-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, antonios.motakis-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+Cc: tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/24/2015 08:00 AM, Matt Ma wrote:
-> Hi all,
-> 
-> Linaro has developed the foundation for the new Android Emulator code
-> base based on a fairly recent upstream QEMU code base, when we
-> re-based the code, we updated the device model to be more virtio based
-> (for example the drives are now virtio block devices). The aim of this
-> is to minimise the delta between upstream and the Android specific
-> changes to QEMU. One Android emulator specific feature is the
-> AndroidPipe.
-> 
-> AndroidPipe is a communication channel between the guest system and
-> the emulator itself. Guest side device node can be opened by multi
-> processes at the same time with different service name. It has a
-> de-multiplexer on the QEMU side to figure out which service the guest
-> actually wanted, so the first write after opening device node is the
-> service name guest wanted, after QEMU backend receive this service
-> name, create a corresponding communication channel, initialize related
-> component, such as file descriptor which connect to the host socket
-> serve. So each opening in guest will create a separated communication
-> channel.
-> 
-> We can create a separate device for each service type, however some
-> services, such as the OpenGL emulation, need to have multiple open
-> channels at a time. This is currently not possible using the
-> virtserialport which can only be opened once.
-> 
-> Current virtserialport can not  be opened by multiple processes at the
-> same time. I know virtserialport has provided buffers beforehand to
-> cache data from host to guest, so even there is no guest read, data
-> can still be transported from host to guest kernel, when there is
-> guest read request, just copy cached data to user space.
-> 
-> We are not sure clearly whether virtio can support
-> multi-open-per-device semantics or not, followings are just our
-> initial ideas about adding multi-open-per-device feature to a port:
-> 
-> * when there is a open request on a port, kernel will allocate a
-> portclient with new id and __wait_queue_head to track this request
-> * save this portclient in file->private_data
-> * guest kernel pass this portclient info to QEMU and notify that the
-> port has been opened
-> * QEMU backend will create a clientinfo struct to track this
-> communication channel, initialize related component
-> * we may change the kernel side strategy of allocating receiving
-> buffers in advance to a new strategy, that is when there is a read
-> request:
->     - allocate a port_buffer, put user space buffer address to
-> port_buffer.buf, share memory to avoid memcpy
->     - put both portclient id(or portclient addrss) and port_buffer.buf
-> to virtqueue, that is the length of buffers chain is 2
->     - kick to notify QEMU backend to consume read buffer
->     - QEMU backend read portclient info firstly to find the correct
-> clientinfo, then read host data directly into virtqueue buffer to
-> avoid memcpy
->     - guest kernel will wait(similarly in block mode, because the user
-> space address has been put into virtqueue) until QEMU backend has
-> consumed buffer(all data/part data/nothing have been sent to host
-> side)
->     - if nothing has been read from host and file descriptor is in
-> block mode, read request will wait through __wait_queue_head until
-> host side is readable
-> 
-> * above read logic may change the current behavior of transferring
-> data to guest kernel even without guest user read
-> 
-> * when there is a write request:
->     - allocate a port_buffer, put user space buffer address to
-> port_buffer.buf, share memory to avoid memcpy
->     - put both portclient id(or portclient addrss) and port_buffer.buf
-> to virtqueue, the length of buffers chain is 2
->     - kick to notify QEMU backend to consume write buffer
->     - QEMU backend read portclient info firstly to find the correct
-> clientinfo, then write the virtqueue buffer content to host side as
-> current logic
->     - guest kernel will wait(similarly in block mode, because the user
-> space address has been put into virtqueue) until QEMU backend has
-> consumed buffer(all data/part data/nothing have been receive from host
-> side)
->     - if nothing has been sent out and file descriptor is in block
-> mode, write request will wait through __wait_queue_head until host
-> side is writable
-> 
-> We obviously don't want to regress existing virtio behaviour and
-> performance and welcome the communities expertise to point out
-> anything we may have missed out before we get to far down implementing
-> our initial proof-of-concept.
+Hello Eric,
 
-Would virtio-vsock be interesting for your purposes?
+We intend to follow-up on this patch series to have it upstream 
+depending on the comments of the community.
 
-http://events.linuxfoundation.org/sites/events/files/slides/stefanha-kvm-forum-2015.pdf
+Best,
 
-(Video doesn't seem to be up yet, but should probably be available eventually
-at the following link)
+Christian
 
-https://www.youtube.com/playlist?list=PLW3ep1uCIRfyLNSu708gWG7uvqlolk0ep
-
-Regards,
-Christopher Covington
-
--- 
-Qualcomm Innovation Center, Inc.
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+On 27/08/2015 14:52, Eric Auger wrote:
+> Hi Baptiste, Antonios,
+>
+> What are the plans wrt this series? I am currently integrating another
+> QEMU VFIO platform devices where this series could be useful I think
+> (Feb 2015). Do you intend to follow up and bring it upstream?
+>
+> Alex, do you see some show-stoppers in this series or do you advise to
+> simply follow-up?
+>
+> Thank you in advance
+>
+> Best Regards
+>
+> Eric
+>
+>
+> On 12/19/2014 10:20 PM, Antonios Motakis wrote:
+>> This RFC's intention is to show what an interface to access device
+>> properties for the VFIO platform driver can look like. These properties
+>> can be from the device tree node describing the device, or ACPI properties
+>> in the future.
+>>
+>> If a device property corresponding to a platform device bound by VFIO PLATFORM
+>> or VFIO AMBA is available, this patch series will allow the user to query
+>> for this information. This can be useful for userspace drivers to automatically
+>> query parameters related to the device.
+>>
+>> Specifically for QEMU, reading the "compatible" property of the device tree
+>> node could be of use to find out what device is being assigned to the guest and
+>> handle appropriately a wider range of devices in the future, and to generate an
+>> appropriate device tree for the guest.
+>>
+>> Older versions of this series where specifically targeted at device tree
+>> properties. This version has been reworked on top of Rafael J. Wysocki's
+>> uniform device properties API for device tree and ACPI devices. This will allow
+>> us to use the API in the future with devices described via ACPI.
+>>
+>> This also means a kernel including the uniform device properties API is needed
+>> to apply these patches, in additon to the VFIO patches, e.g. branch pm+acpi-3.19-rc1
+>> from https://git.kernel.org/cgit/linux/kernel/git/rafael/linux-pm.git/
+>>
+>> The API to get the list of available properties and the device tree full_name
+>> have been removed. These probably don't serve an useful purpose, as the user
+>> of this API need to know anyway what properties are specific to the device he
+>> wants to access with VFIO. If we decide to reintroduce the list of properties
+>> in the future, the generic device properties API in the kernel will have to
+>> be extended accordingly.
+>>
+>> A kernel with this series and all the dependencies applied can be pulled from
+>> branch vfio-device-properties-v3 from the repository:
+>> https://github.com/virtualopensystems/linux-kvm-arm.git
+>>
+>> Changes since v2:
+>>   - Reworked on top of Rafael J. Wysocki's uniform device properties API for
+>>     device tree and ACPI
+>>   - Support for u64 array properties
+>>   - Removed API to get list of available properties and device tree full_name
+>> Changes since v1:
+>>   - Updated for VFIO platform patch series v8:
+>>     VFIO AMBA devices now supported in addition to VFIO PLATFORM devices
+>>   - Refactored and cleaned up the code
+>>
+>> Antonios Motakis (3):
+>>    vfio: platform: add device properties skeleton and user API
+>>    vfio: platform: access device property as a list of strings
+>>    vfio: platform: return device properties as arrays of unsigned
+>>      integers
+>>
+>>   drivers/vfio/platform/Makefile                |   3 +-
+>>   drivers/vfio/platform/properties.c            | 162 ++++++++++++++++++++++++++
+>>   drivers/vfio/platform/vfio_platform_common.c  |  35 ++++++
+>>   drivers/vfio/platform/vfio_platform_private.h |   7 ++
+>>   include/uapi/linux/vfio.h                     |  26 +++++
+>>   5 files changed, 232 insertions(+), 1 deletion(-)
+>>   create mode 100644 drivers/vfio/platform/properties.c
+>>
