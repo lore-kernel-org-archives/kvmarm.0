@@ -1,141 +1,64 @@
-From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: [RFC PATCH v3 0/3] vfio: platform: return device properties for
-	a platform device
-Date: Thu, 27 Aug 2015 16:55:57 +0200
-Message-ID: <55DF24FD.8050308@linaro.org>
-References: <1419024032-1269-1-git-send-email-a.motakis@virtualopensystems.com>
-	<55DF07F0.3070405@linaro.org>
-	<55DF1E4B.6040604@virtualopensystems.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <55DF1E4B.6040604-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Christian Pinto <c.pinto-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>, antonios.motakis-hv44wF8Li93QT0dZR+AlfA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-Cc: tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH v2] arm64: KVM: Do not inject a 64bit fault for a 32bit guest
+Date: Thu, 27 Aug 2015 16:10:01 +0100
+Message-ID: <1440688201-6324-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Russell King <rmk+kernel@arm.linux.org.uk>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-OK Thanks!
+When injecting a fault into a misbehaving 32bit guest, it seems
+rather idiotic to also inject a 64bit fault that is only going
+to corrupt the guest state. This leads to a situation where we
+perform an illegal exception return at EL2 causing the host
+to crash instead of killing the guest.
 
-I will duly review it then ;-)
+Just fix the stupid bug that has been there from day 1.
 
-Best Regards
+Cc: stable@vger.kernel.org
+Reported-by: Russell King <rmk+kernel@arm.linux.org.uk>
+Tested-by: Russell King <rmk+kernel@arm.linux.org.uk>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/kvm/inject_fault.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-Eric
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index f02530e..85c5715 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -168,8 +168,8 @@ void kvm_inject_dabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ {
+ 	if (!(vcpu->arch.hcr_el2 & HCR_RW))
+ 		inject_abt32(vcpu, false, addr);
+-
+-	inject_abt64(vcpu, false, addr);
++	else
++		inject_abt64(vcpu, false, addr);
+ }
+ 
+ /**
+@@ -184,8 +184,8 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr)
+ {
+ 	if (!(vcpu->arch.hcr_el2 & HCR_RW))
+ 		inject_abt32(vcpu, true, addr);
+-
+-	inject_abt64(vcpu, true, addr);
++	else
++		inject_abt64(vcpu, true, addr);
+ }
+ 
+ /**
+@@ -198,6 +198,6 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+ {
+ 	if (!(vcpu->arch.hcr_el2 & HCR_RW))
+ 		inject_undef32(vcpu);
+-
+-	inject_undef64(vcpu);
++	else
++		inject_undef64(vcpu);
+ }
+-- 
+2.1.4
 
-On 08/27/2015 04:27 PM, Christian Pinto wrote:
-> Hello Eric,
-> 
-> We intend to follow-up on this patch series to have it upstream
-> depending on the comments of the community.
-> 
-> Best,
-> 
-> Christian
-> 
-> On 27/08/2015 14:52, Eric Auger wrote:
->> Hi Baptiste, Antonios,
->>
->> What are the plans wrt this series? I am currently integrating another
->> QEMU VFIO platform devices where this series could be useful I think
->> (Feb 2015). Do you intend to follow up and bring it upstream?
->>
->> Alex, do you see some show-stoppers in this series or do you advise to
->> simply follow-up?
->>
->> Thank you in advance
->>
->> Best Regards
->>
->> Eric
->>
->>
->> On 12/19/2014 10:20 PM, Antonios Motakis wrote:
->>> This RFC's intention is to show what an interface to access device
->>> properties for the VFIO platform driver can look like. These properties
->>> can be from the device tree node describing the device, or ACPI
->>> properties
->>> in the future.
->>>
->>> If a device property corresponding to a platform device bound by VFIO
->>> PLATFORM
->>> or VFIO AMBA is available, this patch series will allow the user to
->>> query
->>> for this information. This can be useful for userspace drivers to
->>> automatically
->>> query parameters related to the device.
->>>
->>> Specifically for QEMU, reading the "compatible" property of the
->>> device tree
->>> node could be of use to find out what device is being assigned to the
->>> guest and
->>> handle appropriately a wider range of devices in the future, and to
->>> generate an
->>> appropriate device tree for the guest.
->>>
->>> Older versions of this series where specifically targeted at device tree
->>> properties. This version has been reworked on top of Rafael J. Wysocki's
->>> uniform device properties API for device tree and ACPI devices. This
->>> will allow
->>> us to use the API in the future with devices described via ACPI.
->>>
->>> This also means a kernel including the uniform device properties API
->>> is needed
->>> to apply these patches, in additon to the VFIO patches, e.g. branch
->>> pm+acpi-3.19-rc1
->>> from https://git.kernel.org/cgit/linux/kernel/git/rafael/linux-pm.git/
->>>
->>> The API to get the list of available properties and the device tree
->>> full_name
->>> have been removed. These probably don't serve an useful purpose, as
->>> the user
->>> of this API need to know anyway what properties are specific to the
->>> device he
->>> wants to access with VFIO. If we decide to reintroduce the list of
->>> properties
->>> in the future, the generic device properties API in the kernel will
->>> have to
->>> be extended accordingly.
->>>
->>> A kernel with this series and all the dependencies applied can be
->>> pulled from
->>> branch vfio-device-properties-v3 from the repository:
->>> https://github.com/virtualopensystems/linux-kvm-arm.git
->>>
->>> Changes since v2:
->>>   - Reworked on top of Rafael J. Wysocki's uniform device properties
->>> API for
->>>     device tree and ACPI
->>>   - Support for u64 array properties
->>>   - Removed API to get list of available properties and device tree
->>> full_name
->>> Changes since v1:
->>>   - Updated for VFIO platform patch series v8:
->>>     VFIO AMBA devices now supported in addition to VFIO PLATFORM devices
->>>   - Refactored and cleaned up the code
->>>
->>> Antonios Motakis (3):
->>>    vfio: platform: add device properties skeleton and user API
->>>    vfio: platform: access device property as a list of strings
->>>    vfio: platform: return device properties as arrays of unsigned
->>>      integers
->>>
->>>   drivers/vfio/platform/Makefile                |   3 +-
->>>   drivers/vfio/platform/properties.c            | 162
->>> ++++++++++++++++++++++++++
->>>   drivers/vfio/platform/vfio_platform_common.c  |  35 ++++++
->>>   drivers/vfio/platform/vfio_platform_private.h |   7 ++
->>>   include/uapi/linux/vfio.h                     |  26 +++++
->>>   5 files changed, 232 insertions(+), 1 deletion(-)
->>>   create mode 100644 drivers/vfio/platform/properties.c
->>>
-> 
