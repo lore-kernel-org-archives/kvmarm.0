@@ -1,91 +1,52 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 00/13] arm64: Virtualization Host Extension support
-Date: Fri, 28 Aug 2015 08:04:25 +0100
-Message-ID: <20150828080425.4fb41861@arm.com>
-References: <1436372356-30410-1-git-send-email-marc.zyngier@arm.com>
-	<55DD82FB.60903@huawei.com>
-	<55DD851B.4040106@siemens.com>
-	<55DD8DEF.9080301@arm.com>
-	<55DDA024.8040303@huawei.com>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH] KVM: arm/arm64: BUG FIX: Do not inject spurious interrupts
+Date: Fri, 28 Aug 2015 12:11:17 +0300
+Message-ID: <00ca01d0e171$7ff1c710$7fd55530$@samsung.com>
+References: <1440676282-2152-1-git-send-email-p.fedin@samsung.com>
+ <20150827124442.GD29439@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <55DDA024.8040303@huawei.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Antonios Motakis <antonios.motakis@huawei.com>
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Claudio Fontana <claudio.fontana@huawei.com>, jani.kokkonen@huawei.com
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <20150827124442.GD29439@cbox>
+Content-language: ru
+Sender: kvm-owner@vger.kernel.org
+To: 'Christoffer Dall' <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, 26 Aug 2015 13:16:52 +0200
-Antonios Motakis <antonios.motakis@huawei.com> wrote:
-> On 26-Aug-15 11:59, Marc Zyngier wrote:
+ Hello!
 
-[...]
+> It's a bit weird to just sned this as a new patch without replying to my
+> mail from yesterday with feedback
 
-> > Unfortunately, there is more to downgrading to EL1 than just interrupts.
-> > You need to migrate the whole VM context from EL2 to EL1 in an atomic
-> > fashion, clear the HCR_EL2.E2H and HCR_EL2.TGE bits while running at EL2
-> > (which is a bit like pulling the rug from under your own feet so you
-> > need to transition via a low mapping or an idmap), reinstall the EL2
-> > stub and do an exception return into EL1.
-> 
-> When enabling Jailhouse, we already do most of that. We already use
-> identity mapping, since we need to switch on the MMU for EL2, switch
-> the exception level, etc. Jailhouse entry looks a lot like
-> initializing a new kernel; we just save the state of what was running
-> before it and restore it as the "root cell".
-> 
-> So I think we could handle the cpu context switch, with changes only
-> in the Jailhouse entry code. But then of course, Linux would be
-> expecting to be in EL2, while it is running in EL1, so we would have
-> to emulate the differences in behavior. But...
+ Sorry. But changes are actually minimal, and i remember that i replied to you with the promise of
+testing your suggestion. So, done, works fine. :)
 
-There would be (almost) no difference in behaviour - VHE is designed
-for the kernel to be unchanged, and the only difference is the timer
-interrupt as you noticed.
+> I think you're missing a potential change to the irq_pending_on_cpu
+> field here, which you have to compute by calling vgic_update_state()
+> like we do elsewhere when we change status bits
 
-What is really tricky is to perform the downgrade, because you're
-completely changing the way the code is executed *while running it*.
-This is not just about changing the memory map, but also changing the
-effect of most system registers.
+ I have just checked this. vgic_update_state() never resets this bit. This bit is reset only in
+__kvm_vgic_flush_hwstate() and only if we have consumed completely everything. I have followed
+through the code and looks like it's perfectly safe to have this bit set while nothing is actually
+pendng. Following __kvm_vgic_flush_hwstate(), having this bit cleared is actually a shorthand for
+"no interrupt is pending at all". If it is set without any interrupt actually being pending (this
+ends up in pa_percpu and pa_shared being all zeroes), all three for_each_set_bit() loops will just
+not do anything, and we still get to "epilog:" label, just after a bit longer check. And, since we
+are here, the guest has already been disturbed.
 
-> 
-> > 
-> > And that's only for the CPU. Downgrading to EL1 has other fun
-> > consequences at the system level (SMMUs listening to TLB traffic
-> > would need to be reconfigured on the flight - it's a joke, don't
-> > even think of it).
-> 
-> ...but then there's that.
-> 
-> Hm... even if the kernel is running in EL2, it will still be
-> configuring stage 1 on the SMMU, no? I wonder if this could still be
-> handled somehow... The root cell would be restored with identity
-> mapping, too... Just thinking out loud :)
+> different from the incorrect approach I suggested yesterday where we
+> always just clear the bit for that vcpu).
 
-Stage-1 and EL2 are two vastly unrelated concept. The main issue is
-that it is likely that your SMMU knows about VHE as well (it listens to
-EL2-VHE DVM messages), and need to be reconfigured as well. Good luck
-with that.
+ Yes, it is extremely bad idea to clear it because this bit summarizes all interrupts for this vcpu,
+and clearing it means that we are going to lose everything.
+ An alternate would be: clear the bit, THEN call vgic_update_state() which would set it back if
+necessary. But does this extra bit of complexity worth anything, given one paragraph above?
 
-[...]
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
 
-> > As far as I can see, the only practical solution to this is to have
-> > a VHE config option, and Jailhouse that can be set to conflict it
-> > (depends on !VHE).
-> 
-> Having a toggle to turn VHE off at build time would definitely be the
-> easy way out. Then we can just tell the user that we only support
-> kernels built without it (the Jailhouse driver is out of tree atm).
-> 
-> I don't have access to a VHE model though. Are you considering to add
-> a config option for VHE in the next version of your patches?
 
-Yes, that's the plan.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny.
