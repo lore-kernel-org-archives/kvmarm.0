@@ -1,152 +1,91 @@
-From: Matt Ma <matt.ma@linaro.org>
-Subject: Re: virtio-serial: Add multiple times opening support to
- virtserialport(port)
-Date: Fri, 28 Aug 2015 09:54:43 +0800
-Message-ID: <CAHxyncsssCnxHEeV7cXvpjpB=VZkPYmBJ=he24mRfKkRqBWzyA@mail.gmail.com>
-References: <CAHxyncvh+iECmEq4OADax9vsK_GGpCtZQBWd6cXsn4T9tVRFiw@mail.gmail.com>
- <1440577573.32587.11.camel@redhat.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 00/13] arm64: Virtualization Host Extension support
+Date: Fri, 28 Aug 2015 08:04:25 +0100
+Message-ID: <20150828080425.4fb41861@arm.com>
+References: <1436372356-30410-1-git-send-email-marc.zyngier@arm.com>
+	<55DD82FB.60903@huawei.com>
+	<55DD851B.4040106@siemens.com>
+	<55DD8DEF.9080301@arm.com>
+	<55DDA024.8040303@huawei.com>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============4371735970071520039=="
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F2EB4487B4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Aug 2015 21:54:38 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QH5carS0ewk0 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 27 Aug 2015 21:54:38 -0400 (EDT)
-Received: from mail-ob0-f177.google.com (mail-ob0-f177.google.com
- [209.85.214.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F41E346FDA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Aug 2015 21:54:37 -0400 (EDT)
-Received: by obkg7 with SMTP id g7so31547518obk.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Aug 2015 18:54:43 -0700 (PDT)
-In-Reply-To: <1440577573.32587.11.camel@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <55DDA024.8040303@huawei.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Antonios Motakis <antonios.motakis@huawei.com>
+Cc: Jan Kiszka <jan.kiszka@siemens.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Claudio Fontana <claudio.fontana@huawei.com>, jani.kokkonen@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============4371735970071520039==
-Content-Type: multipart/alternative; boundary=001a11c30284193cbc051e555ec4
+On Wed, 26 Aug 2015 13:16:52 +0200
+Antonios Motakis <antonios.motakis@huawei.com> wrote:
+> On 26-Aug-15 11:59, Marc Zyngier wrote:
 
---001a11c30284193cbc051e555ec4
-Content-Type: text/plain; charset=UTF-8
+[...]
 
-Hi Gerd,
+> > Unfortunately, there is more to downgrading to EL1 than just interrupts.
+> > You need to migrate the whole VM context from EL2 to EL1 in an atomic
+> > fashion, clear the HCR_EL2.E2H and HCR_EL2.TGE bits while running at EL2
+> > (which is a bit like pulling the rug from under your own feet so you
+> > need to transition via a low mapping or an idmap), reinstall the EL2
+> > stub and do an exception return into EL1.
+> 
+> When enabling Jailhouse, we already do most of that. We already use
+> identity mapping, since we need to switch on the MMU for EL2, switch
+> the exception level, etc. Jailhouse entry looks a lot like
+> initializing a new kernel; we just save the state of what was running
+> before it and restore it as the "root cell".
+> 
+> So I think we could handle the cpu context switch, with changes only
+> in the Jailhouse entry code. But then of course, Linux would be
+> expecting to be in EL2, while it is running in EL1, so we would have
+> to emulate the differences in behavior. But...
 
-On 26 August 2015 at 16:26, Gerd Hoffmann <kraxel@redhat.com> wrote:
+There would be (almost) no difference in behaviour - VHE is designed
+for the kernel to be unchanged, and the only difference is the timer
+interrupt as you noticed.
 
->   Hi,
->
-> > AndroidPipe is a communication channel between the guest system and
-> > the emulator itself. Guest side device node can be opened by multi
-> > processes at the same time with different service name. It has a
-> > de-multiplexer on the QEMU side to figure out which service the guest
-> > actually wanted, so the first write after opening device node is the
-> > service name guest wanted, after QEMU backend receive this service
-> > name, create a corresponding communication channel, initialize related
-> > component, such as file descriptor which connect to the host socket
-> > serve. So each opening in guest will create a separated communication
-> > channel.
-> >
-> > We can create a separate device for each service type, however some
-> > services, such as the OpenGL emulation, need to have multiple open
-> > channels at a time. This is currently not possible using the
-> > virtserialport which can only be opened once.
->
-> vsock probably works better then:
->
->
-> http://events.linuxfoundation.org/sites/events/files/slides/stefanha-kvm-forum-2015.pdf
->
-> Also: for opengl you might want check out virtio-gpu (assuming you can
-> build mesa for android).
->
-> https://www.kraxel.org/slides/qemu-opengl/
->
-> cheers,
->   Gerd
->
-> Thanks for looking at this  mail. It may be suitable for our target, and
-we are
-looking at virtio-vsock already.
+What is really tricky is to perform the downgrade, because you're
+completely changing the way the code is executed *while running it*.
+This is not just about changing the memory map, but also changing the
+effect of most system registers.
+
+> 
+> > 
+> > And that's only for the CPU. Downgrading to EL1 has other fun
+> > consequences at the system level (SMMUs listening to TLB traffic
+> > would need to be reconfigured on the flight - it's a joke, don't
+> > even think of it).
+> 
+> ...but then there's that.
+> 
+> Hm... even if the kernel is running in EL2, it will still be
+> configuring stage 1 on the SMMU, no? I wonder if this could still be
+> handled somehow... The root cell would be restored with identity
+> mapping, too... Just thinking out loud :)
+
+Stage-1 and EL2 are two vastly unrelated concept. The main issue is
+that it is likely that your SMMU knows about VHE as well (it listens to
+EL2-VHE DVM messages), and need to be reconfigured as well. Good luck
+with that.
+
+[...]
+
+> > As far as I can see, the only practical solution to this is to have
+> > a VHE config option, and Jailhouse that can be set to conflict it
+> > (depends on !VHE).
+> 
+> Having a toggle to turn VHE off at build time would definitely be the
+> easy way out. Then we can just tell the user that we only support
+> kernels built without it (the Jailhouse driver is out of tree atm).
+> 
+> I don't have access to a VHE model though. Are you considering to add
+> a config option for VHE in the next version of your patches?
+
+Yes, that's the plan.
 
 Thanks,
--Matt
 
---001a11c30284193cbc051e555ec4
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Hi Gerd,<br><div class=3D"gmail_extra"><br><div class=3D"g=
-mail_quote">On 26 August 2015 at 16:26, Gerd Hoffmann <span dir=3D"ltr">&lt=
-;<a href=3D"mailto:kraxel@redhat.com" target=3D"_blank">kraxel@redhat.com</=
-a>&gt;</span> wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin:0=
-pt 0pt 0pt 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">=
-=C2=A0 Hi,<br>
-<span><br>
-&gt; AndroidPipe is a communication channel between the guest system and<br=
->
-&gt; the emulator itself. Guest side device node can be opened by multi<br>
-&gt; processes at the same time with different service name. It has a<br>
-&gt; de-multiplexer on the QEMU side to figure out which service the guest<=
-br>
-&gt; actually wanted, so the first write after opening device node is the<b=
-r>
-&gt; service name guest wanted, after QEMU backend receive this service<br>
-&gt; name, create a corresponding communication channel, initialize related=
-<br>
-&gt; component, such as file descriptor which connect to the host socket<br=
->
-&gt; serve. So each opening in guest will create a separated communication<=
-br>
-&gt; channel.<br>
-&gt;<br>
-&gt; We can create a separate device for each service type, however some<br=
->
-&gt; services, such as the OpenGL emulation, need to have multiple open<br>
-&gt; channels at a time. This is currently not possible using the<br>
-&gt; virtserialport which can only be opened once.<br>
-<br>
-</span>vsock probably works better then:<br>
-<br>
-<a href=3D"http://events.linuxfoundation.org/sites/events/files/slides/stef=
-anha-kvm-forum-2015.pdf" rel=3D"noreferrer" target=3D"_blank">http://events=
-.linuxfoundation.org/sites/events/files/slides/stefanha-kvm-forum-2015.pdf<=
-/a><br>
-<br>
-Also: for opengl you might want check out virtio-gpu (assuming you can<br>
-build mesa for android).<br>
-<br>
-<a href=3D"https://www.kraxel.org/slides/qemu-opengl/" rel=3D"noreferrer" t=
-arget=3D"_blank">https://www.kraxel.org/slides/qemu-opengl/</a><br>
-<br>
-cheers,<br>
-=C2=A0 Gerd<br>
-<br></blockquote><div>Thanks for looking at this=C2=A0 mail. It may be suit=
-able for our target, and we are <br>looking at virtio-vsock already.<br><br=
-></div><div>Thanks,<br></div><div>-Matt<br> </div></div><br></div></div>
-
---001a11c30284193cbc051e555ec4--
-
---===============4371735970071520039==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============4371735970071520039==--
+	M.
+-- 
+Jazz is not dead. It just smells funny.
