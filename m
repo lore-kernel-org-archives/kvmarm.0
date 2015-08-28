@@ -1,142 +1,152 @@
-From: Asias He <asias.hejun@gmail.com>
-Subject: Re: add multiple times opening support to a
-	virtserialport
-Date: Fri, 28 Aug 2015 09:41:31 +0800
-Message-ID: <CAFO3S41Z7Qoa57tvhnFHEsKheNv0QEjyFQ4NPTKGfbmNZOq3MQ@mail.gmail.com>
-References: <CAHxyncujhHABs1Ld78biVZemeL=AZMqJow3vbCqdASf-1qBb5A@mail.gmail.com>
-	<55DF1D6A.4080507@codeaurora.org> <20150827183048.GE29439@cbox>
+From: Matt Ma <matt.ma@linaro.org>
+Subject: Re: virtio-serial: Add multiple times opening support to
+ virtserialport(port)
+Date: Fri, 28 Aug 2015 09:54:43 +0800
+Message-ID: <CAHxyncsssCnxHEeV7cXvpjpB=VZkPYmBJ=he24mRfKkRqBWzyA@mail.gmail.com>
+References: <CAHxyncvh+iECmEq4OADax9vsK_GGpCtZQBWd6cXsn4T9tVRFiw@mail.gmail.com>
+ <1440577573.32587.11.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org>
-In-Reply-To: <20150827183048.GE29439@cbox>
-List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
-	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
-List-Archive: <http://lists.nongnu.org/archive/html/qemu-devel>
-List-Post: <mailto:qemu-devel@nongnu.org>
-List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
-List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
-	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Errors-To: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
-Sender: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: KVM <kvm@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, QEMU Developers <qemu-devel@nongnu.org>, Christopher Covington <cov@codeaurora.org>, Stefan Hajnoczi <stefanha@redhat.com>, kvmarm@lists.cs.columbia.edu, Matt Ma <matt.ma@linaro.org>
+Content-Type: multipart/mixed; boundary="===============4371735970071520039=="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F2EB4487B4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Aug 2015 21:54:38 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id QH5carS0ewk0 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 27 Aug 2015 21:54:38 -0400 (EDT)
+Received: from mail-ob0-f177.google.com (mail-ob0-f177.google.com
+ [209.85.214.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F41E346FDA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Aug 2015 21:54:37 -0400 (EDT)
+Received: by obkg7 with SMTP id g7so31547518obk.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 27 Aug 2015 18:54:43 -0700 (PDT)
+In-Reply-To: <1440577573.32587.11.camel@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hello Christoffer,
+--===============4371735970071520039==
+Content-Type: multipart/alternative; boundary=001a11c30284193cbc051e555ec4
 
-On Fri, Aug 28, 2015 at 2:30 AM, Christoffer Dall
-<christoffer.dall@linaro.org> wrote:
-> On Thu, Aug 27, 2015 at 10:23:38AM -0400, Christopher Covington wrote:
->> On 07/24/2015 08:00 AM, Matt Ma wrote:
->> > Hi all,
->> >
->> > Linaro has developed the foundation for the new Android Emulator code
->> > base based on a fairly recent upstream QEMU code base, when we
->> > re-based the code, we updated the device model to be more virtio based
->> > (for example the drives are now virtio block devices). The aim of this
->> > is to minimise the delta between upstream and the Android specific
->> > changes to QEMU. One Android emulator specific feature is the
->> > AndroidPipe.
->> >
->> > AndroidPipe is a communication channel between the guest system and
->> > the emulator itself. Guest side device node can be opened by multi
->> > processes at the same time with different service name. It has a
->> > de-multiplexer on the QEMU side to figure out which service the guest
->> > actually wanted, so the first write after opening device node is the
->> > service name guest wanted, after QEMU backend receive this service
->> > name, create a corresponding communication channel, initialize related
->> > component, such as file descriptor which connect to the host socket
->> > serve. So each opening in guest will create a separated communication
->> > channel.
->> >
->> > We can create a separate device for each service type, however some
->> > services, such as the OpenGL emulation, need to have multiple open
->> > channels at a time. This is currently not possible using the
->> > virtserialport which can only be opened once.
->> >
->> > Current virtserialport can not  be opened by multiple processes at the
->> > same time. I know virtserialport has provided buffers beforehand to
->> > cache data from host to guest, so even there is no guest read, data
->> > can still be transported from host to guest kernel, when there is
->> > guest read request, just copy cached data to user space.
->> >
->> > We are not sure clearly whether virtio can support
->> > multi-open-per-device semantics or not, followings are just our
->> > initial ideas about adding multi-open-per-device feature to a port:
->> >
->> > * when there is a open request on a port, kernel will allocate a
->> > portclient with new id and __wait_queue_head to track this request
->> > * save this portclient in file->private_data
->> > * guest kernel pass this portclient info to QEMU and notify that the
->> > port has been opened
->> > * QEMU backend will create a clientinfo struct to track this
->> > communication channel, initialize related component
->> > * we may change the kernel side strategy of allocating receiving
->> > buffers in advance to a new strategy, that is when there is a read
->> > request:
->> >     - allocate a port_buffer, put user space buffer address to
->> > port_buffer.buf, share memory to avoid memcpy
->> >     - put both portclient id(or portclient addrss) and port_buffer.buf
->> > to virtqueue, that is the length of buffers chain is 2
->> >     - kick to notify QEMU backend to consume read buffer
->> >     - QEMU backend read portclient info firstly to find the correct
->> > clientinfo, then read host data directly into virtqueue buffer to
->> > avoid memcpy
->> >     - guest kernel will wait(similarly in block mode, because the user
->> > space address has been put into virtqueue) until QEMU backend has
->> > consumed buffer(all data/part data/nothing have been sent to host
->> > side)
->> >     - if nothing has been read from host and file descriptor is in
->> > block mode, read request will wait through __wait_queue_head until
->> > host side is readable
->> >
->> > * above read logic may change the current behavior of transferring
->> > data to guest kernel even without guest user read
->> >
->> > * when there is a write request:
->> >     - allocate a port_buffer, put user space buffer address to
->> > port_buffer.buf, share memory to avoid memcpy
->> >     - put both portclient id(or portclient addrss) and port_buffer.buf
->> > to virtqueue, the length of buffers chain is 2
->> >     - kick to notify QEMU backend to consume write buffer
->> >     - QEMU backend read portclient info firstly to find the correct
->> > clientinfo, then write the virtqueue buffer content to host side as
->> > current logic
->> >     - guest kernel will wait(similarly in block mode, because the user
->> > space address has been put into virtqueue) until QEMU backend has
->> > consumed buffer(all data/part data/nothing have been receive from host
->> > side)
->> >     - if nothing has been sent out and file descriptor is in block
->> > mode, write request will wait through __wait_queue_head until host
->> > side is writable
->> >
->> > We obviously don't want to regress existing virtio behaviour and
->> > performance and welcome the communities expertise to point out
->> > anything we may have missed out before we get to far down implementing
->> > our initial proof-of-concept.
+--001a11c30284193cbc051e555ec4
+Content-Type: text/plain; charset=UTF-8
+
+Hi Gerd,
+
+On 26 August 2015 at 16:26, Gerd Hoffmann <kraxel@redhat.com> wrote:
+
+>   Hi,
 >
-> Hi Chris,
+> > AndroidPipe is a communication channel between the guest system and
+> > the emulator itself. Guest side device node can be opened by multi
+> > processes at the same time with different service name. It has a
+> > de-multiplexer on the QEMU side to figure out which service the guest
+> > actually wanted, so the first write after opening device node is the
+> > service name guest wanted, after QEMU backend receive this service
+> > name, create a corresponding communication channel, initialize related
+> > component, such as file descriptor which connect to the host socket
+> > serve. So each opening in guest will create a separated communication
+> > channel.
+> >
+> > We can create a separate device for each service type, however some
+> > services, such as the OpenGL emulation, need to have multiple open
+> > channels at a time. This is currently not possible using the
+> > virtserialport which can only be opened once.
 >
->>
->> Would virtio-vsock be interesting for your purposes?
->>
->> http://events.linuxfoundation.org/sites/events/files/slides/stefanha-kvm-forum-2015.pdf
->>
->> (Video doesn't seem to be up yet, but should probably be available eventually
->> at the following link)
->>
->> https://www.youtube.com/playlist?list=PLW3ep1uCIRfyLNSu708gWG7uvqlolk0ep
->>
-> Thanks for looking at this lengthy mail.  Yes, we are looking at
-> virtio-vsock already, and I think this is definietely the right fix.
-
-Glad to hear from potential user of virtio-vsock ;-)
-
+> vsock probably works better then:
 >
-> -Christoffer
 >
+> http://events.linuxfoundation.org/sites/events/files/slides/stefanha-kvm-forum-2015.pdf
+>
+> Also: for opengl you might want check out virtio-gpu (assuming you can
+> build mesa for android).
+>
+> https://www.kraxel.org/slides/qemu-opengl/
+>
+> cheers,
+>   Gerd
+>
+> Thanks for looking at this  mail. It may be suitable for our target, and
+we are
+looking at virtio-vsock already.
 
+Thanks,
+-Matt
 
+--001a11c30284193cbc051e555ec4
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Asias
+<div dir=3D"ltr">Hi Gerd,<br><div class=3D"gmail_extra"><br><div class=3D"g=
+mail_quote">On 26 August 2015 at 16:26, Gerd Hoffmann <span dir=3D"ltr">&lt=
+;<a href=3D"mailto:kraxel@redhat.com" target=3D"_blank">kraxel@redhat.com</=
+a>&gt;</span> wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin:0=
+pt 0pt 0pt 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">=
+=C2=A0 Hi,<br>
+<span><br>
+&gt; AndroidPipe is a communication channel between the guest system and<br=
+>
+&gt; the emulator itself. Guest side device node can be opened by multi<br>
+&gt; processes at the same time with different service name. It has a<br>
+&gt; de-multiplexer on the QEMU side to figure out which service the guest<=
+br>
+&gt; actually wanted, so the first write after opening device node is the<b=
+r>
+&gt; service name guest wanted, after QEMU backend receive this service<br>
+&gt; name, create a corresponding communication channel, initialize related=
+<br>
+&gt; component, such as file descriptor which connect to the host socket<br=
+>
+&gt; serve. So each opening in guest will create a separated communication<=
+br>
+&gt; channel.<br>
+&gt;<br>
+&gt; We can create a separate device for each service type, however some<br=
+>
+&gt; services, such as the OpenGL emulation, need to have multiple open<br>
+&gt; channels at a time. This is currently not possible using the<br>
+&gt; virtserialport which can only be opened once.<br>
+<br>
+</span>vsock probably works better then:<br>
+<br>
+<a href=3D"http://events.linuxfoundation.org/sites/events/files/slides/stef=
+anha-kvm-forum-2015.pdf" rel=3D"noreferrer" target=3D"_blank">http://events=
+.linuxfoundation.org/sites/events/files/slides/stefanha-kvm-forum-2015.pdf<=
+/a><br>
+<br>
+Also: for opengl you might want check out virtio-gpu (assuming you can<br>
+build mesa for android).<br>
+<br>
+<a href=3D"https://www.kraxel.org/slides/qemu-opengl/" rel=3D"noreferrer" t=
+arget=3D"_blank">https://www.kraxel.org/slides/qemu-opengl/</a><br>
+<br>
+cheers,<br>
+=C2=A0 Gerd<br>
+<br></blockquote><div>Thanks for looking at this=C2=A0 mail. It may be suit=
+able for our target, and we are <br>looking at virtio-vsock already.<br><br=
+></div><div>Thanks,<br></div><div>-Matt<br> </div></div><br></div></div>
+
+--001a11c30284193cbc051e555ec4--
+
+--===============4371735970071520039==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============4371735970071520039==--
