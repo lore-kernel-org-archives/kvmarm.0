@@ -1,7 +1,7 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 1/2] arm/arm64: KVM: Add tracepoints for vgic and timer
-Date: Sun, 30 Aug 2015 15:55:21 +0200
-Message-ID: <1440942922-23955-2-git-send-email-christoffer.dall@linaro.org>
+Subject: [PATCH 2/2] arm/arm64: KVM: Improve kvm_exit tracepoint
+Date: Sun, 30 Aug 2015 15:55:22 +0200
+Message-ID: <1440942922-23955-3-git-send-email-christoffer.dall@linaro.org>
 References: <1440942922-23955-1-git-send-email-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1440942922-23955-1-git-send-email-christoffer.dall@linaro.org>
@@ -10,186 +10,125 @@ To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger
 Cc: Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The VGIC and timer code for KVM arm/arm64 doesn't have any tracepoints
-or tracepoint infrastructure defined.  Rewriting some of the timer code
-handling showed me how much we need this, so let's add these simple
-trace points once and for all and we can easily expand with additional
-trace points in these files as we go along.
+The ARM architecture only saves the exit class to the HSR (ESR_EL2 for
+arm64) on synchronous exceptions, not on asynchronous exceptions like an
+IRQ.  However, we only report the exception class on kvm_exit, which is
+confusing because an IRQ looks like it exited at some PC with the same
+reason as the previous exit.  Add a lookup table for the exception index
+and prepend the kvm_exit tracepoint text with the exception type to
+clarify this situation.
+
+Also resolve the exception class (EC) to a human-friendly text version
+so the trace output becomes immediately usable for debugging this code.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/arch_timer.c |  4 ++
- virt/kvm/arm/trace.h      | 97 +++++++++++++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic.c       |  9 +++++
- 3 files changed, 110 insertions(+)
- create mode 100644 virt/kvm/arm/trace.h
+ arch/arm/include/asm/kvm_arm.h   | 20 ++++++++++++++++++++
+ arch/arm/kvm/arm.c               |  2 +-
+ arch/arm/kvm/trace.h             | 10 +++++++---
+ arch/arm64/include/asm/kvm_arm.h | 16 ++++++++++++++++
+ 4 files changed, 44 insertions(+), 4 deletions(-)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 8a0fdfc..f63b208 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -28,6 +28,8 @@
- #include <kvm/arm_vgic.h>
- #include <kvm/arm_arch_timer.h>
+diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
+index d995821..dc641dd 100644
+--- a/arch/arm/include/asm/kvm_arm.h
++++ b/arch/arm/include/asm/kvm_arm.h
+@@ -218,4 +218,24 @@
+ #define HSR_DABT_CM		(1U << 8)
+ #define HSR_DABT_EA		(1U << 9)
  
-+#include "trace.h"
++#define kvm_arm_exception_type	\
++	{0, "RESET" }, 		\
++	{1, "UNDEFINED" },	\
++	{2, "SOFTWARE" },	\
++	{3, "PREF_ABORT" },	\
++	{4, "DATA_ABORT" },	\
++	{5, "IRQ" },		\
++	{6, "FIQ" },		\
++	{7, "HVC" }
 +
- static struct timecounter *timecounter;
- static struct workqueue_struct *wqueue;
- static unsigned int host_vtimer_irq;
-@@ -128,6 +130,8 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu)
- 
- 	BUG_ON(!vgic_initialized(vcpu->kvm));
- 
-+	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer->map->virt_irq,
-+				   timer->irq->level);
- 	ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
- 					 timer->map,
- 					 timer->irq.level);
-diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
-new file mode 100644
-index 0000000..48c3c90
---- /dev/null
-+++ b/virt/kvm/arm/trace.h
-@@ -0,0 +1,97 @@
-+#if !defined(_TRACE_KVM_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_KVM_H
++#define HSRECN(x) { HSR_EC_##x, #x }
 +
-+#include <linux/tracepoint.h>
++#define kvm_arm_exception_class \
++	HSRECN(UNKNOWN), HSRECN(WFI), HSRECN(CP15_32), HSRECN(CP15_64), \
++	HSRECN(CP14_MR), HSRECN(CP14_LS), HSRECN(CP_0_13), HSRECN(CP10_ID), \
++	HSRECN(JAZELLE), HSRECN(BXJ), HSRECN(CP14_64), HSRECN(SVC_HYP), \
++	HSRECN(HVC), HSRECN(SMC), HSRECN(IABT), HSRECN(IABT_HYP), \
++	HSRECN(DABT), HSRECN(DABT_HYP)
 +
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM kvm
 +
-+/*
-+ * Tracepoints for vgic
-+ */
-+TRACE_EVENT(kvm_vgic_set_irqchip_active,
-+	TP_PROTO(unsigned long vcpu_id, __u32 irq),
-+	TP_ARGS(vcpu_id, irq),
-+
-+	TP_STRUCT__entry(
-+		__field(	unsigned long,	vcpu_id	)
-+		__field(	__u32,		irq	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->vcpu_id	= vcpu_id;
-+		__entry->irq		= irq;
-+	),
-+
-+	TP_printk("VCPU: %ld, IRQ %d", __entry->vcpu_id, __entry->irq)
-+);
-+
-+TRACE_EVENT(kvm_vgic_clear_irqchip_active,
-+	TP_PROTO(unsigned long vcpu_id, __u32 irq),
-+	TP_ARGS(vcpu_id, irq),
-+
-+	TP_STRUCT__entry(
-+		__field(	unsigned long,	vcpu_id	)
-+		__field(	__u32,		irq	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->vcpu_id	= vcpu_id;
-+		__entry->irq		= irq;
-+	),
-+
-+	TP_printk("VCPU: %ld, IRQ %d", __entry->vcpu_id, __entry->irq)
-+);
-+
-+TRACE_EVENT(vgic_update_irq_pending,
-+	TP_PROTO(unsigned long vcpu_id, __u32 irq, bool level),
-+	TP_ARGS(vcpu_id, irq, level),
-+
-+	TP_STRUCT__entry(
-+		__field(	unsigned long,	vcpu_id	)
-+		__field(	__u32,		irq	)
-+		__field(	bool,		level	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->vcpu_id	= vcpu_id;
-+		__entry->irq		= irq;
-+		__entry->level		= level;
-+	),
-+
-+	TP_printk("VCPU: %ld, IRQ %d, level: %d",
-+		  __entry->vcpu_id, __entry->irq, __entry->level)
-+);
-+
-+/*
-+ * Tracepoints for arch_timer
-+ */
-+TRACE_EVENT(kvm_timer_inject_irq,
-+	TP_PROTO(unsigned long vcpu_id, __u32 irq, int level),
-+	TP_ARGS(vcpu_id, irq, level),
-+
-+	TP_STRUCT__entry(
-+		__field(	unsigned long,	vcpu_id	)
-+		__field(	__u32,		irq	)
-+		__field(	int,		level	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->vcpu_id	= vcpu_id;
-+		__entry->irq		= irq;
-+		__entry->level		= level;
-+	),
-+
-+	TP_printk("VCPU: %ld, IRQ %d, level %d",
-+		  __entry->vcpu_id, __entry->irq, __entry->level)
-+);
-+
-+#endif /* _TRACE_KVM_H */
-+
-+#undef TRACE_INCLUDE_PATH
-+#define TRACE_INCLUDE_PATH ../../../virt/kvm/arm
-+#undef TRACE_INCLUDE_FILE
-+#define TRACE_INCLUDE_FILE trace
-+
-+/* This part must be outside protection */
-+#include <trace/define_trace.h>
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index f4ea950..45c95a0 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -34,6 +34,9 @@
- #include <asm/kvm.h>
- #include <kvm/iodev.h>
- 
-+#define CREATE_TRACE_POINTS
-+#include "trace.h"
-+
- /*
-  * How the whole thing works (courtesy of Christoffer Dall):
-  *
-@@ -1314,6 +1317,8 @@ epilog:
- 			struct irq_phys_map *map;
- 			map = vgic_irq_map_search(vcpu, vlr.irq);
- 
-+			trace_kvm_vgic_set_irqchip_active(vcpu->vcpu_id,
-+							  vlr.irq);
- 			ret = irq_set_irqchip_state(map->irq,
- 						    IRQCHIP_STATE_ACTIVE,
- 						    true);
-@@ -1449,6 +1454,8 @@ static bool vgic_sync_hwirq(struct kvm_vcpu *vcpu, int lr, struct vgic_lr vlr)
- 		 * non-active so that other VMs can see interrupts from this
- 		 * device.
+ #endif /* __ARM_KVM_ARM_H__ */
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 102a4aa..ffec2f2 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -606,7 +606,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		 * guest time.
  		 */
-+		trace_kvm_vgic_clear_irqchip_active(vcpu->vcpu_id,
-+						    vlr.irq);
- 		ret = irq_set_irqchip_state(map->irq,
- 					    IRQCHIP_STATE_ACTIVE,
- 					    false);
-@@ -1585,6 +1592,8 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
- 	int enabled;
- 	bool ret = true, can_inject = true;
+ 		kvm_guest_exit();
+-		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
++		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
  
-+	trace_vgic_update_irq_pending(cpuid, irq_num, level);
+ 		/*
+ 		 * We must sync the timer state before the vgic state so that
+diff --git a/arch/arm/kvm/trace.h b/arch/arm/kvm/trace.h
+index 0ec3539..c25a885 100644
+--- a/arch/arm/kvm/trace.h
++++ b/arch/arm/kvm/trace.h
+@@ -25,21 +25,25 @@ TRACE_EVENT(kvm_entry,
+ );
+ 
+ TRACE_EVENT(kvm_exit,
+-	TP_PROTO(unsigned int exit_reason, unsigned long vcpu_pc),
+-	TP_ARGS(exit_reason, vcpu_pc),
++	TP_PROTO(int idx, unsigned int exit_reason, unsigned long vcpu_pc),
++	TP_ARGS(idx, exit_reason, vcpu_pc),
+ 
+ 	TP_STRUCT__entry(
++		__field(	int,		idx		)
+ 		__field(	unsigned int,	exit_reason	)
+ 		__field(	unsigned long,	vcpu_pc		)
+ 	),
+ 
+ 	TP_fast_assign(
++		__entry->idx			= idx;
+ 		__entry->exit_reason		= exit_reason;
+ 		__entry->vcpu_pc		= vcpu_pc;
+ 	),
+ 
+-	TP_printk("HSR_EC: 0x%04x, PC: 0x%08lx",
++	TP_printk("%s: HSR_EC: 0x%04x (%s), PC: 0x%08lx",
++		  __print_symbolic(__entry->idx, kvm_arm_exception_type),
+ 		  __entry->exit_reason,
++		  __print_symbolic(__entry->exit_reason, kvm_arm_exception_class),
+ 		  __entry->vcpu_pc)
+ );
+ 
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 7605e09..ffb86bf 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -197,4 +197,20 @@
+ /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
+ #define HPFAR_MASK	(~UL(0xf))
+ 
++#define kvm_arm_exception_type	\
++	{0, "IRQ" }, 		\
++	{1, "TRAP" }
 +
- 	if (irq_num >= min(kvm->arch.vgic.nr_irqs, 1020))
- 		return -EINVAL;
- 
++#define ECN(x) { ESR_ELx_EC_##x, #x }
++
++#define kvm_arm_exception_class \
++	ECN(UNKNOWN), ECN(WFx), ECN(CP15_32), ECN(CP15_64), ECN(CP14_MR), \
++	ECN(CP14_LS), ECN(FP_ASIMD), ECN(CP10_ID), ECN(CP14_64), ECN(SVC64), \
++	ECN(HVC64), ECN(SMC64), ECN(SYS64), ECN(IMP_DEF), ECN(IABT_LOW), \
++	ECN(IABT_CUR), ECN(PC_ALIGN), ECN(DABT_LOW), ECN(DABT_CUR), \
++	ECN(SP_ALIGN), ECN(FP_EXC32), ECN(FP_EXC64), ECN(SERROR), \
++	ECN(BREAKPT_LOW), ECN(BREAKPT_CUR), ECN(SOFTSTP_LOW), \
++	ECN(SOFTSTP_CUR), ECN(WATCHPT_LOW), ECN(WATCHPT_CUR), \
++	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64)
++
+ #endif /* __ARM64_KVM_ARM_H__ */
 -- 
 2.1.2.330.g565301e.dirty
 
