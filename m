@@ -1,134 +1,66 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 2/2] arm/arm64: KVM: Improve kvm_exit tracepoint
-Date: Sun, 30 Aug 2015 15:55:22 +0200
-Message-ID: <1440942922-23955-3-git-send-email-christoffer.dall@linaro.org>
-References: <1440942922-23955-1-git-send-email-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1440942922-23955-1-git-send-email-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
+From: Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: [RFC PATCH v3 0/3] vfio: platform: return device properties for
+	a platform device
+Date: Sun, 30 Aug 2015 16:06:38 +0200
+Message-ID: <20150830140638.GB24113@cbox>
+References: <1419024032-1269-1-git-send-email-a.motakis@virtualopensystems.com>
+	<55DF07F0.3070405@linaro.org>
+	<1440691887.20355.27.camel@redhat.com>
+	<55DF45D0.5040704@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <55DF45D0.5040704-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Cc: iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The ARM architecture only saves the exit class to the HSR (ESR_EL2 for
-arm64) on synchronous exceptions, not on asynchronous exceptions like an
-IRQ.  However, we only report the exception class on kvm_exit, which is
-confusing because an IRQ looks like it exited at some PC with the same
-reason as the previous exit.  Add a lookup table for the exception index
-and prepend the kvm_exit tracepoint text with the exception type to
-clarify this situation.
+Hi Eric,
 
-Also resolve the exception class (EC) to a human-friendly text version
-so the trace output becomes immediately usable for debugging this code.
+On Thu, Aug 27, 2015 at 07:16:00PM +0200, Eric Auger wrote:
+> Hi Alex,
+> On 08/27/2015 06:11 PM, Alex Williamson wrote:
+> > On Thu, 2015-08-27 at 14:52 +0200, Eric Auger wrote:
+> >> Hi Baptiste, Antonios,
+> >>
+> >> What are the plans wrt this series? I am currently integrating another
+> >> QEMU VFIO platform devices where this series could be useful I think
+> >> (Feb 2015). Do you intend to follow up and bring it upstream?
+> >>
+> >> Alex, do you see some show-stoppers in this series or do you advise to
+> >> simply follow-up?
+> > 
+> > I'm at a bit of a disadvantage not really knowing what types of
+> > properties a user will be able to retrieve here.  The interface itself
+> > seems sort of like a game of Go Fish.  Should the properties we're
+> > looking for be generally available via sysfs?  The ioctl proposed needs
+> > some work to fit within the argsz/flags model that vfio typically uses.
+> > It's unclear what argsz vs length represents and defining the flags
+> > field as 'type' limits the future extensions of the ioctl.  Thanks,
+> 
+> The properties that I need can be found in /proc/device-tree too. They
+> are of different types, with void cell value, with string cell
+> values(single & multiple), with integer cell value(s), array ...
+> 
+> The aim is to be able to assign a highly configurable platform device to
+> a guest, read some property values on host and write the same values in
+> guest dt node.
+> 
+Can you reiterate why QEMU and VFIO don't already have the information
+necessary to setup resources and present a DT to the guest that the
+guest can use?
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- arch/arm/include/asm/kvm_arm.h   | 20 ++++++++++++++++++++
- arch/arm/kvm/arm.c               |  2 +-
- arch/arm/kvm/trace.h             | 10 +++++++---
- arch/arm64/include/asm/kvm_arm.h | 16 ++++++++++++++++
- 4 files changed, 44 insertions(+), 4 deletions(-)
+In any case, using /proc/device-tree seems brittle to me.
 
-diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
-index d995821..dc641dd 100644
---- a/arch/arm/include/asm/kvm_arm.h
-+++ b/arch/arm/include/asm/kvm_arm.h
-@@ -218,4 +218,24 @@
- #define HSR_DABT_CM		(1U << 8)
- #define HSR_DABT_EA		(1U << 9)
- 
-+#define kvm_arm_exception_type	\
-+	{0, "RESET" }, 		\
-+	{1, "UNDEFINED" },	\
-+	{2, "SOFTWARE" },	\
-+	{3, "PREF_ABORT" },	\
-+	{4, "DATA_ABORT" },	\
-+	{5, "IRQ" },		\
-+	{6, "FIQ" },		\
-+	{7, "HVC" }
-+
-+#define HSRECN(x) { HSR_EC_##x, #x }
-+
-+#define kvm_arm_exception_class \
-+	HSRECN(UNKNOWN), HSRECN(WFI), HSRECN(CP15_32), HSRECN(CP15_64), \
-+	HSRECN(CP14_MR), HSRECN(CP14_LS), HSRECN(CP_0_13), HSRECN(CP10_ID), \
-+	HSRECN(JAZELLE), HSRECN(BXJ), HSRECN(CP14_64), HSRECN(SVC_HYP), \
-+	HSRECN(HVC), HSRECN(SMC), HSRECN(IABT), HSRECN(IABT_HYP), \
-+	HSRECN(DABT), HSRECN(DABT_HYP)
-+
-+
- #endif /* __ARM_KVM_ARM_H__ */
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 102a4aa..ffec2f2 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -606,7 +606,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		 * guest time.
- 		 */
- 		kvm_guest_exit();
--		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
-+		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
- 
- 		/*
- 		 * We must sync the timer state before the vgic state so that
-diff --git a/arch/arm/kvm/trace.h b/arch/arm/kvm/trace.h
-index 0ec3539..c25a885 100644
---- a/arch/arm/kvm/trace.h
-+++ b/arch/arm/kvm/trace.h
-@@ -25,21 +25,25 @@ TRACE_EVENT(kvm_entry,
- );
- 
- TRACE_EVENT(kvm_exit,
--	TP_PROTO(unsigned int exit_reason, unsigned long vcpu_pc),
--	TP_ARGS(exit_reason, vcpu_pc),
-+	TP_PROTO(int idx, unsigned int exit_reason, unsigned long vcpu_pc),
-+	TP_ARGS(idx, exit_reason, vcpu_pc),
- 
- 	TP_STRUCT__entry(
-+		__field(	int,		idx		)
- 		__field(	unsigned int,	exit_reason	)
- 		__field(	unsigned long,	vcpu_pc		)
- 	),
- 
- 	TP_fast_assign(
-+		__entry->idx			= idx;
- 		__entry->exit_reason		= exit_reason;
- 		__entry->vcpu_pc		= vcpu_pc;
- 	),
- 
--	TP_printk("HSR_EC: 0x%04x, PC: 0x%08lx",
-+	TP_printk("%s: HSR_EC: 0x%04x (%s), PC: 0x%08lx",
-+		  __print_symbolic(__entry->idx, kvm_arm_exception_type),
- 		  __entry->exit_reason,
-+		  __print_symbolic(__entry->exit_reason, kvm_arm_exception_class),
- 		  __entry->vcpu_pc)
- );
- 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 7605e09..ffb86bf 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -197,4 +197,20 @@
- /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
- #define HPFAR_MASK	(~UL(0xf))
- 
-+#define kvm_arm_exception_type	\
-+	{0, "IRQ" }, 		\
-+	{1, "TRAP" }
-+
-+#define ECN(x) { ESR_ELx_EC_##x, #x }
-+
-+#define kvm_arm_exception_class \
-+	ECN(UNKNOWN), ECN(WFx), ECN(CP15_32), ECN(CP15_64), ECN(CP14_MR), \
-+	ECN(CP14_LS), ECN(FP_ASIMD), ECN(CP10_ID), ECN(CP14_64), ECN(SVC64), \
-+	ECN(HVC64), ECN(SMC64), ECN(SYS64), ECN(IMP_DEF), ECN(IABT_LOW), \
-+	ECN(IABT_CUR), ECN(PC_ALIGN), ECN(DABT_LOW), ECN(DABT_CUR), \
-+	ECN(SP_ALIGN), ECN(FP_EXC32), ECN(FP_EXC64), ECN(SERROR), \
-+	ECN(BREAKPT_LOW), ECN(BREAKPT_CUR), ECN(SOFTSTP_LOW), \
-+	ECN(SOFTSTP_CUR), ECN(WATCHPT_LOW), ECN(WATCHPT_CUR), \
-+	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64)
-+
- #endif /* __ARM64_KVM_ARM_H__ */
--- 
-2.1.2.330.g565301e.dirty
-
+-Christoffer
