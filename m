@@ -1,43 +1,48 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 4/9] arm/arm64: Implement GICD_ICFGR as RO for PPIs
-Date: Sun, 30 Aug 2015 15:54:21 +0200
-Message-ID: <1440942866-23802-5-git-send-email-christoffer.dall@linaro.org>
-References: <1440942866-23802-1-git-send-email-christoffer.dall@linaro.org>
+Subject: [PATCH 0/2] Improve and add tracepoints for KVM on arm/arm64
+Date: Sun, 30 Aug 2015 15:55:20 +0200
+Message-ID: <1440942922-23955-1-git-send-email-christoffer.dall@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1440942866-23802-1-git-send-email-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 Cc: Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The GICD_ICFGR allows the bits for the SGIs and PPIs to be read only.
-We currently simulate this behavior by writing a hardcoded value to the
-register for the SGIs and PPIs on every write of these bits to the
-register (ignoring what the guest actually wrote), and by writing the
-same value as the reset value to the register.
+The timer and vgic code didn't have tracepoints for quite a while and
+we've been adding those ad-hoc when doing development a lot of times.
+Add some simple tracepoints for those parts of KVM to get the
+infrastructure in place.
 
-This is a bit counter-intuitive, as the register is RO for these bits,
-and we can just implement it that way, allowing us to control the value
-of the bits purely in the reset code.
+Also improve the kvm_exit tracepoint on arm/arm64 to print something
+meaningful and be much less misleading compared to what we have now.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- virt/kvm/arm/vgic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This series depends on the "Rework architected timer and fix UEFI reset=
+"
+series sent earlier.  It is also available here:
 
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index c5750be..0ba92d3 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -655,7 +655,7 @@ bool vgic_handle_cfg_reg(u32 *reg, struct kvm_exit_mmio *mmio,
- 			ACCESS_READ_VALUE | ACCESS_WRITE_VALUE);
- 	if (mmio->is_write) {
- 		if (offset < 8) {
--			*reg = ~0U; /* Force PPIs/SGIs to 1 */
-+			/* Ignore writes to read-only SGI and PPI bits */
- 			return false;
- 		}
- 
--- 
+https://git.linaro.org/people/christoffer.dall/linux-kvm-arm.git tracin=
+g-fixup
+
+I borrowed some of this code from Alex Benn=C3=A9e, thanks!
+
+Christoffer Dall (2):
+  arm/arm64: KVM: Add tracepoints for vgic and timer
+  arm/arm64: KVM: Improve kvm_exit tracepoint
+
+ arch/arm/include/asm/kvm_arm.h   | 20 +++++++++
+ arch/arm/kvm/arm.c               |  2 +-
+ arch/arm/kvm/trace.h             | 10 +++--
+ arch/arm64/include/asm/kvm_arm.h | 16 +++++++
+ virt/kvm/arm/arch_timer.c        |  4 ++
+ virt/kvm/arm/trace.h             | 97 ++++++++++++++++++++++++++++++++=
+++++++++
+ virt/kvm/arm/vgic.c              |  9 ++++
+ 7 files changed, 154 insertions(+), 4 deletions(-)
+ create mode 100644 virt/kvm/arm/trace.h
+
+--=20
 2.1.2.330.g565301e.dirty
 
