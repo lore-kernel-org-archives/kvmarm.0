@@ -1,104 +1,97 @@
-From: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v3 04/10] VFIO: platform: add
- vfio_platform_set_automasked
-Date: Mon, 31 Aug 2015 08:54:34 -0600
-Message-ID: <1441032874.20355.126.camel@redhat.com>
-References: <1439212864-12954-1-git-send-email-eric.auger@linaro.org>
-	 <1439212864-12954-5-git-send-email-eric.auger@linaro.org>
-	 <1439405794.4023.528.camel@redhat.com> <55D1FFE8.9050104@linaro.org>
-	 <1439919864.4023.626.camel@redhat.com> <55E43DFC.8050608@huawei.com>
+From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: [RFC PATCH v3 0/3] vfio: platform: return device properties for
+	a platform device
+Date: Mon, 31 Aug 2015 19:02:15 +0200
+Message-ID: <55E48897.4090907@linaro.org>
+References: <1419024032-1269-1-git-send-email-a.motakis@virtualopensystems.com>
+	<55DF07F0.3070405@linaro.org>
+	<1440691887.20355.27.camel@redhat.com>
+	<55DF45D0.5040704@linaro.org> <20150830140638.GB24113@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <55E43DFC.8050608@huawei.com>
-Sender: kvm-owner@vger.kernel.org
-To: Antonios Motakis <antonios.motakis@huawei.com>
-Cc: Eric Auger <eric.auger@linaro.org>, eric.auger@st.com, kvm@vger.kernel.org, patches@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, feng.wu@intel.com, kvmarm@lists.cs.columbia.edu
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20150830140638.GB24113@cbox>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Cc: iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, 2015-08-31 at 13:43 +0200, Antonios Motakis wrote:
+Hi Christoffer,
+On 08/30/2015 04:06 PM, Christoffer Dall wrote:
+> Hi Eric,
 > 
-> On 18-Aug-15 19:44, Alex Williamson wrote:
-> > On Mon, 2015-08-17 at 17:38 +0200, Eric Auger wrote:
-> >> On 08/12/2015 08:56 PM, Alex Williamson wrote:
-> >>> On Mon, 2015-08-10 at 15:20 +0200, Eric Auger wrote:
-> >>>> This function makes possible to change the automasked mode.
-> >>>>
-> >>>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
-> >>>>
-> >>>> ---
-> >>>>
-> >>>> v1 -> v2:
-> >>>> - set forwarded flag
-> >>>> ---
-> >>>>  drivers/vfio/platform/vfio_platform_irq.c | 19 +++++++++++++++++++
-> >>>>  1 file changed, 19 insertions(+)
-> >>>>
-> >>>> diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
-> >>>> index b31b1f0..a285384 100644
-> >>>> --- a/drivers/vfio/platform/vfio_platform_irq.c
-> >>>> +++ b/drivers/vfio/platform/vfio_platform_irq.c
-> >>>> @@ -186,6 +186,25 @@ static irqreturn_t vfio_handler(int irq, void *dev_id)
-> >>>>  	return ret;
-> >>>>  }
-> >>>>  
-> >>>> +static int vfio_platform_set_automasked(struct vfio_platform_irq *irq,
-> >>>> +					   bool automasked)
-> >>>> +{
-> >>>> +	unsigned long flags;
-> >>>> +
-> >>>> +	spin_lock_irqsave(&irq->lock, flags);
-> >>>> +	if (automasked) {
-> >>>> +		irq->forwarded = true;
-> >>>> +		irq->flags |= VFIO_IRQ_INFO_AUTOMASKED;
-> >>>> +		irq->handler = vfio_automasked_irq_handler;
-> >>>> +	} else {
-> >>>> +		irq->forwarded = false;
-> >>>> +		irq->flags &= ~VFIO_IRQ_INFO_AUTOMASKED;
-> >>>> +		irq->handler = vfio_irq_handler;
-> >>>> +	}
-> >>>> +	spin_unlock_irqrestore(&irq->lock, flags);
-> >>>> +	return 0;
-> >>>
-> >>> In vfio-speak, automasked means level and we're not magically changing
-> >>> the IRQ from level to edge, we're simply able to handle level
-> >>> differently based on a hardware optimization.  Should the user visible
-> >>> flags therefore change based on this?  Aren't we really setting the
-> >>> forwarded state rather than the automasked state?
-> >>
-> >> Well actually this was following the discussion we had a long time ago
-> >> about that topic:
-> >>
-> >> http://lkml.iu.edu/hypermail/linux/kernel/1409.1/03659.html
-> >>
-> >> I did not really know how to conclude ...
-> >>
-> >> If it is preferred I can hide this to the userspace, no problem.
-> > 
-> > I think that was based on the user being involved in enabling forwarding
-> > though, now that it's hidden and automatic, it doesn't make much sense
-> > to me to toggle any of the interrupt info details based on the state of
-> > the forward.  The user always needs to handle the interrupt as level
-> > since the bypass can be torn down at any point in time.  We're taking
-> > advantage of the in-kernel path to make further optimizations, which
-> > seems like they should be transparent to the user.  Thanks,
+> On Thu, Aug 27, 2015 at 07:16:00PM +0200, Eric Auger wrote:
+>> Hi Alex,
+>> On 08/27/2015 06:11 PM, Alex Williamson wrote:
+>>> On Thu, 2015-08-27 at 14:52 +0200, Eric Auger wrote:
+>>>> Hi Baptiste, Antonios,
+>>>>
+>>>> What are the plans wrt this series? I am currently integrating another
+>>>> QEMU VFIO platform devices where this series could be useful I think
+>>>> (Feb 2015). Do you intend to follow up and bring it upstream?
+>>>>
+>>>> Alex, do you see some show-stoppers in this series or do you advise to
+>>>> simply follow-up?
+>>>
+>>> I'm at a bit of a disadvantage not really knowing what types of
+>>> properties a user will be able to retrieve here.  The interface itself
+>>> seems sort of like a game of Go Fish.  Should the properties we're
+>>> looking for be generally available via sysfs?  The ioctl proposed needs
+>>> some work to fit within the argsz/flags model that vfio typically uses.
+>>> It's unclear what argsz vs length represents and defining the flags
+>>> field as 'type' limits the future extensions of the ioctl.  Thanks,
+>>
+>> The properties that I need can be found in /proc/device-tree too. They
+>> are of different types, with void cell value, with string cell
+>> values(single & multiple), with integer cell value(s), array ...
+>>
+>> The aim is to be able to assign a highly configurable platform device to
+>> a guest, read some property values on host and write the same values in
+>> guest dt node.
+>>
+> Can you reiterate why QEMU and VFIO don't already have the information
+> necessary to setup resources and present a DT to the guest that the
+> guest can use?
+A vfio-platform driver was bound to the passthrough'ed device. QEMU
+current knows the compat string of the device and the node's name and
+that's it.
+
+The VFIO platform driver currently does not allow to return device
+specific information. It just returns generic info such as resource
+info. The driver is HW agnostic.
+
+
+The QEMU VFIO device should be able to check some characteristics of the
+host device tree. Typically if the host node does not comply with some
+constraints it may not be possible to assign the device.
+
+We do not want the QEMU end-user to have in-depth knowledge of the HW so
+passing the info in the QEMU command line does not sound to be the good
+solution.
+
+
+As you mentioned /proc/device-tree depends on kernel option. I am able
+to find the properties in sysfs too but can we systematically rely on
+sysfs (CONFIG_SYSFS)? Also I would have expected the values to be human
+readable but they are not. Currently investigating open/read from qemu
+but is better than an ioctl API? ...
+
+Please let me know if I answered to your question.
+
+Best Regards
+
+Eric
 > 
-> I wonder if it makes sense to rename VFIO_IRQ_INFO_AUTOMASKED to
-> VFIO_IRQ_INFO_LEVEL_TRIGGERED, and reintroduce VFIO_IRQ_INFO_AUTOMASKED as
-> an alias, so compatibility with user space can be maintained? This way
-> this semantic misunderstanding could be left behind.
-
-Is there really a misunderstanding here?  I think the change is that the
-user was previously involved and updating the flag reinforced that.  Now
-the user is not involved and the flag changing is just unexpected noise.
-"automasked" is intentionally not "level" because being level triggered
-may not be the only reason we'd need to mask an interrupt upon receiving
-it.  We could actually have automasked edge triggered interrupts if we
-wanted.  We don't do that, so we can equate automasked to level
-currently, but technically automasked simply indicates that an unmask is
-required to get the next interrupt.  In this case the VM is able to
-effectively do the unmask itself.  Thanks,
-
-Alex
-
+> In any case, using /proc/device-tree seems brittle to me.
+> 
+> -Christoffer
+> 
