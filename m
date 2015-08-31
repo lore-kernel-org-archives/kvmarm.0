@@ -1,231 +1,292 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 12/13] arm64: KVM: Split sysreg save/restore
-Date: Mon, 31 Aug 2015 20:49:17 +0200
-Message-ID: <20150831184917.GC10991@cbox>
+Subject: Re: [PATCH 13/13] arm64: KVM: VHE: Early interrupt handling
+Date: Mon, 31 Aug 2015 20:52:26 +0200
+Message-ID: <20150831185226.GD10991@cbox>
 References: <1436372356-30410-1-git-send-email-marc.zyngier@arm.com>
- <1436372356-30410-13-git-send-email-marc.zyngier@arm.com>
+ <1436372356-30410-14-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1436372356-30410-13-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+In-Reply-To: <1436372356-30410-14-git-send-email-marc.zyngier@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jul 08, 2015 at 05:19:15PM +0100, Marc Zyngier wrote:
-> As we're starting to get different requirements for non-VHE and VHE
-> code paths, use a slightly more fine-grained approach:
+On Wed, Jul 08, 2015 at 05:19:16PM +0100, Marc Zyngier wrote:
+> With VHE enabled, it is possible to let the kernel handle an interrupt
+> without saving the full guest context, and without restoring the full
+> host context either. This reduces the latency of handling an interrupt.
 > 
-> - __save/restore_sysregs: save/restore non-shared sysregs
-> - __save/restore_shared_sysregs: save/restore only shared sysregs
+> When an interrupt fires we can:
+> - save the guest's general purpose registers, shared system registers
+>   and timer state
+> - switch to a host context (setting vectors, deactivating traps and
+>   stage-2 translation)
+> - restore the host's shared sysregs
 > 
-> Of course, non-VHE always requires both.
+> At that stage, we're able to jump to the interrupt handler.
 > 
+> On return from the handler, we can finish the switch (save/restore
+> whatever is missing from the above).
 
-I'm sorry, I don't really understand what this patch does.
+This feels like a specific optimization, and again it looks to me like
+we're just going to see more of this.
 
-What is a 'shared sysreg' exactly?  One that is shared between the host
-and the guest?
+For example, sending a virtual IPI shoud ideally be done without having
+to do all the crazy save/restore stuff.
 
-Or one that is shared between EL1 and EL2?  Or is that the same thing?
+Maybe I'm missing something overall here, but I feel the whole design of
+this solution requires some justification in the cover letter.
 
+Thanks,
+-Christoffer
+
+> 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm64/kvm/hyp.S | 91 +++++++++++++++++++++++++---------------------------
->  1 file changed, 44 insertions(+), 47 deletions(-)
+>  arch/arm/kvm/arm.c              |  3 +++
+>  arch/arm64/kvm/hyp.S            | 56 ++++++++++++++++++++++++++++++++++++++---
+>  arch/arm64/kvm/vgic-v2-switch.S | 19 +++++++++++---
+>  arch/arm64/kvm/vgic-v3-switch.S | 33 +++++++++++++-----------
+>  4 files changed, 90 insertions(+), 21 deletions(-)
 > 
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index ca3c662..ab9333f 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -573,6 +573,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  		 * disabled.  Enabling the interrupts now will have
+>  		 * the effect of taking the interrupt again, in SVC
+>  		 * mode this time.
+> +		 *
+> +		 * With VHE, the interrupt is likely to have been
+> +		 * already taken already.
+>  		 */
+>  		local_irq_enable();
+>  
 > diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-> index b61591b..3cbd2c4 100644
+> index 3cbd2c4..ac95ba3 100644
 > --- a/arch/arm64/kvm/hyp.S
 > +++ b/arch/arm64/kvm/hyp.S
-> @@ -280,11 +280,6 @@ skip_el1_restore:
->  	mrs	x20,	par_el1
->  	mrs	x21,	mdscr_el1
->  
-> -	mrs	x22,	tpidr_el0
-> -	mrs	x23,	tpidrro_el0
-> -	mrs	x24,	tpidr_el1
-> -	mrs	x25,	actlr_el1
-> -
->  	stp	x4, x5, [x3]
->  	stp	x6, x7, [x3, #16]
->  	stp	x8, x9, [x3, #32]
-> @@ -294,8 +289,6 @@ skip_el1_restore:
->  	stp	x16, x17, [x3, #96]
->  	stp	x18, x19, [x3, #112]
->  	stp	x20, x21, [x3, #128]
-> -	stp	x22, x23, [x3, #144]
-> -	stp	x24, x25, [x3, #160]
+> @@ -714,8 +714,10 @@ skip_el1_restore:
 >  .endm
 >  
->  .macro save_debug
-> @@ -508,8 +501,6 @@ skip_el1_restore:
->  	ldp	x16, x17, [x3, #96]
->  	ldp	x18, x19, [x3, #112]
->  	ldp	x20, x21, [x3, #128]
-> -	ldp	x22, x23, [x3, #144]
-> -	ldp	x24, x25, [x3, #160]
->  
->  	msr	vmpidr_el2,	x4
->  	msr	csselr_el1,	x5
-> @@ -529,11 +520,6 @@ skip_el1_restore:
->  	msr_el1(cntkctl,	x19)
->  	msr	par_el1,	x20
->  	msr	mdscr_el1,	x21
-> -
-> -	msr	tpidr_el0,	x22
-> -	msr	tpidrro_el0,	x23
-> -	msr	tpidr_el1,	x24
-> -	msr	actlr_el1,	x25
+>  .macro skip_32bit_state tmp, target
+> -	// Skip 32bit state if not needed
+> -	mrs	\tmp, hcr_el2
+> +	// Skip 32bit state if not needed.
+> +	// With VHE, we may have cleared the RW bit in HCR_EL2 early,
+> +	// and have to rely on the memory version instead.
+> +ifnvhe "mrs	\tmp, hcr_el2",			_S_(ldr	\tmp, [x0, #VCPU_HCR_EL2])
+>  	tbnz	\tmp, #HCR_RW_SHIFT, \target
 >  .endm
 >  
->  .macro restore_debug
-> @@ -913,10 +899,12 @@ ifnvhe	nop,					"msr	vbar_el1, x2"
+> @@ -1053,11 +1055,18 @@ __kvm_vcpu_return:
+>  	save_guest_32bit_state
 >  
->  .macro save_timer_state
->  	// x0: vcpu pointer
-> -	ldr	x2, [x0, #VCPU_KVM]
-> -	kern_hyp_va x2
-> -	ldr	w3, [x2, #KVM_TIMER_ENABLED]
-> -	cbz	w3, 1f
-> +	// x1: return code
-> +	// x2: vcpu context
-> +	ldr	x3, [x0, #VCPU_KVM]
-> +	kern_hyp_va x3
-> +	ldr	w4, [x3, #KVM_TIMER_ENABLED]
-> +	cbz	w4, 1f
+>  	save_timer_state
+> +ifnvhe "b	1f",		nop
+> +	alternative_insn	"bl __vgic_v2_disable", \
+> +				"bl __vgic_v3_disable", \
+> +				ARM64_HAS_SYSREG_GIC_CPUIF
+> +1:
+>  	save_vgic_state
 >  
->  	mrs_el0(x3, cntv_ctl)
->  	and	x3, x3, #3
-> @@ -931,9 +919,9 @@ ifnvhe	nop,					"msr	vbar_el1, x2"
+>  	deactivate_traps
+>  	deactivate_vm
 >  
->  1:
->  	// Allow physical timer/counter access for the host
-> -	mrs	x2, cnthctl_el2
-> -	orr	x2, x2, #3
-> -	msr	cnthctl_el2, x2
-> +	mrs	x3, cnthctl_el2
-> +	orr	x3, x3, #3
-> +	msr	cnthctl_el2, x3
->  
->  	// Clear cntvoff for the host
->  ifnvhe "msr	cntvoff_el2, xzr",		nop
-> @@ -941,34 +929,43 @@ ifnvhe "msr	cntvoff_el2, xzr",		nop
->  
->  .macro restore_timer_state
->  	// x0: vcpu pointer
-> +	// x2: vcpu context
->  	// Disallow physical timer access for the guest
->  	// Physical counter access is allowed
-> -	mrs	x2, cnthctl_el2
-> -	orr	x2, x2, #1
-> -	bic	x2, x2, #2
-> -	msr	cnthctl_el2, x2
-> -
-> -	ldr	x2, [x0, #VCPU_KVM]
-> -	kern_hyp_va x2
-> -	ldr	w3, [x2, #KVM_TIMER_ENABLED]
-> -	cbz	w3, 1f
-> -
-> -	ldr	x3, [x2, #KVM_TIMER_CNTVOFF]
-> -	msr	cntvoff_el2, x3
-> -	ldr	x2, [x0, #VCPU_TIMER_CNTV_CVAL]
-> -	msr_el0(cntv_cval, x2)
-> +	mrs	x3, cnthctl_el2
-> +	orr	x3, x3, #1
-> +	bic	x3, x3, #2
-> +	msr	cnthctl_el2, x3
+> +__kvm_vcpu_return_irq:
 > +
-> +	ldr	x3, [x0, #VCPU_KVM]
-> +	kern_hyp_va x3
-> +	ldr	w4, [x3, #KVM_TIMER_ENABLED]
-> +	cbz	w4, 1f
+>  	// Host context
+>  	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
+>  	kern_hyp_va x2
+> @@ -1355,8 +1364,47 @@ el1_irq:
+>  	push	x0, x1
+>  	push	x2, x3
+>  	mrs	x0, tpidr_el2
+> -	mov	x1, #ARM_EXCEPTION_IRQ
+> -	b	__kvm_vcpu_return
+> +ifnvhe _S_(mov	x1, #ARM_EXCEPTION_IRQ),	nop
+> +ifnvhe "b	__kvm_vcpu_return", 		nop
 > +
-> +	ldr	x4, [x3, #KVM_TIMER_CNTVOFF]
-> +	msr	cntvoff_el2, x4
-> +	ldr	x4, [x0, #VCPU_TIMER_CNTV_CVAL]
-> +	msr_el0(cntv_cval, x4)
->  	isb
->  
-> -	ldr	w2, [x0, #VCPU_TIMER_CNTV_CTL]
-> -	and	x2, x2, #3
-> -	msr_el0(cntv_ctl, x2)
-> +	ldr	w4, [x0, #VCPU_TIMER_CNTV_CTL]
-> +	and	x4, x4, #3
-> +	msr_el0(cntv_ctl, x4)
->  1:
->  .endm
->  
-> +__save_shared_sysregs:
-> +	save_shared_sysregs
-> +	ret
+> +	// Fallthrough for VHE
+> +	add	x2, x0, #VCPU_CONTEXT
 > +
->  __save_sysregs:
->  	save_sysregs
->  	ret
->  
-> +__restore_shared_sysregs:
-> +	restore_shared_sysregs
-> +	ret
-> +
->  __restore_sysregs:
->  	restore_sysregs
->  	ret
-> @@ -1010,10 +1007,9 @@ ENTRY(__kvm_vcpu_run)
->  
->  	save_host_regs
->  	bl __save_fpsimd
-> -ifnvhe "bl	__save_sysregs",		nop
-> -ifnvhe "b	1f",				nop
-> -	save_shared_sysregs
-> -1:
-> +ifnvhe "bl	__save_sysregs",		"nop"
+> +	save_guest_regs
 > +	bl	__save_shared_sysregs
+> +	save_timer_state
+> +	alternative_insn	"bl __vgic_v2_disable", \
+> +				"bl __vgic_v3_disable", \
+> +				ARM64_HAS_SYSREG_GIC_CPUIF
+> +	deactivate_traps
+> +	deactivate_vm
 > +
->  	compute_debug_state 1f
->  	bl	__save_debug
+> +	isb	// Needed to ensure TGE is on and vectors have been switched
+> +
+> +	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
+> +	restore_shared_sysregs
+> +
+> +	mov	x0, x2
+> +	adrp	x1, handle_arch_irq
+> +	add	x1, x1, #:lo12:handle_arch_irq
+> +	ldr	x1, [x1]
+> +	blr	x1
+> +
+> +	// Back from the interrupt handler, finalize the world switch
+> +	mrs	x0, tpidr_el2
+> +	add	x2, x0, #VCPU_CONTEXT
+> +
+> +	bl	__save_fpsimd
+> +	bl	__save_sysregs	// We've already saved the shared regs
+> +	save_guest_32bit_state
+> +
+> +	skip_debug_state x3, 1f
+> +	bl	__save_debug
+> +1:
+> +	save_vgic_state
+> +
+> +	mov	x1,	#ARM_EXCEPTION_IRQ
+> +	b	__kvm_vcpu_return_irq
+>  
+>  	.ltorg
+>  
+> diff --git a/arch/arm64/kvm/vgic-v2-switch.S b/arch/arm64/kvm/vgic-v2-switch.S
+> index 3f00071..c8864b4 100644
+> --- a/arch/arm64/kvm/vgic-v2-switch.S
+> +++ b/arch/arm64/kvm/vgic-v2-switch.S
+> @@ -26,16 +26,30 @@
+>  #include <asm/kvm_arm.h>
+>  #include <asm/kvm_mmu.h>
+>  
+> +#include "vhe-macros.h"
+> +
+>  	.text
+>  	.pushsection	.hyp.text, "ax"
+>  
+> +ENTRY(__vgic_v2_disable)
+> +	/* Get VGIC VCTRL base into x2 */
+> +	ldr	x2, [x0, #VCPU_KVM]
+> +	kern_hyp_va	x2
+> +	ldr	x2, [x2, #KVM_VGIC_VCTRL]
+> +	kern_hyp_va	x2
+> +	cbz	x2, 1f		// disabled
+> +
+> +	/* Clear GICH_HCR */
+> +	str	wzr, [x2, #GICH_HCR]
+> +1:	ret
+> +ENDPROC(__vgic_v2_disable)
+> +
+>  /*
+>   * Save the VGIC CPU state into memory
+>   * x0: Register pointing to VCPU struct
+>   * Do not corrupt x1!!!
+>   */
+>  ENTRY(__save_vgic_v2_state)
+> -__save_vgic_v2_state:
+>  	/* Get VGIC VCTRL base into x2 */
+>  	ldr	x2, [x0, #VCPU_KVM]
+>  	kern_hyp_va	x2
+> @@ -75,7 +89,7 @@ CPU_BE(	str	w10, [x3, #VGIC_V2_CPU_ELRSR] )
+>  	str	w11, [x3, #VGIC_V2_CPU_APR]
+>  
+>  	/* Clear GICH_HCR */
+> -	str	wzr, [x2, #GICH_HCR]
+> +ifnvhe	_S_(str	wzr, [x2, #GICH_HCR]),		nop
+>  
+>  	/* Save list registers */
+>  	add	x2, x2, #GICH_LR0
+> @@ -95,7 +109,6 @@ ENDPROC(__save_vgic_v2_state)
+>   * x0: Register pointing to VCPU struct
+>   */
+>  ENTRY(__restore_vgic_v2_state)
+> -__restore_vgic_v2_state:
+>  	/* Get VGIC VCTRL base into x2 */
+>  	ldr	x2, [x0, #VCPU_KVM]
+>  	kern_hyp_va	x2
+> diff --git a/arch/arm64/kvm/vgic-v3-switch.S b/arch/arm64/kvm/vgic-v3-switch.S
+> index 3c20730..b9b45e3 100644
+> --- a/arch/arm64/kvm/vgic-v3-switch.S
+> +++ b/arch/arm64/kvm/vgic-v3-switch.S
+> @@ -25,6 +25,8 @@
+>  #include <asm/kvm_asm.h>
+>  #include <asm/kvm_arm.h>
+>  
+> +#include "vhe-macros.h"
+> +
+>  	.text
+>  	.pushsection	.hyp.text, "ax"
+>  
+> @@ -35,11 +37,21 @@
+>  #define LR_OFFSET(n)	(VGIC_V3_CPU_LR + (15 - n) * 8)
+>  
+>  /*
+> + * Disable the vcpu interface, preventing interrupts from
+> + * being delivered.
+> + */
+> +ENTRY(__vgic_v3_disable)
+> +	// Nuke the HCR register.
+> +	msr_s	ICH_HCR_EL2, xzr
+> +	ret
+> +ENDPROC(__vgic_v3_disable)
+> +
+> +/*
+>   * Save the VGIC CPU state into memory
+>   * x0: Register pointing to VCPU struct
+>   * Do not corrupt x1!!!
+>   */
+> -.macro	save_vgic_v3_state
+> +ENTRY(__save_vgic_v3_state)
+>  	// Compute the address of struct vgic_cpu
+>  	add	x3, x0, #VCPU_VGIC_CPU
+>  
+> @@ -58,7 +70,7 @@
+>  	str	w7, [x3, #VGIC_V3_CPU_EISR]
+>  	str	w8, [x3, #VGIC_V3_CPU_ELRSR]
+>  
+> -	msr_s	ICH_HCR_EL2, xzr
+> +ifnvhe	_S_(msr_s	ICH_HCR_EL2, xzr),	nop
+>  
+>  	mrs_s	x21, ICH_VTR_EL2
+>  	mvn	w22, w21
+> @@ -137,15 +149,17 @@
+>  	orr	x5, x5, #ICC_SRE_EL2_ENABLE
+>  	msr_s	ICC_SRE_EL2, x5
+>  	isb
+> -	mov	x5, #1
+> +	// If using VHE, we don't care about EL1 and can early out.
+> +ifnvhe "mov	x5, #1",			ret
+>  	msr_s	ICC_SRE_EL1, x5
+> -.endm
+> +	ret
+> +ENDPROC(__save_vgic_v3_state)
+>  
+>  /*
+>   * Restore the VGIC CPU state from memory
+>   * x0: Register pointing to VCPU struct
+>   */
+> -.macro	restore_vgic_v3_state
+> +ENTRY(__restore_vgic_v3_state)
+>  	// Compute the address of struct vgic_cpu
+>  	add	x3, x0, #VCPU_VGIC_CPU
+>  
+> @@ -249,15 +263,6 @@
+>  	and	x5, x5, #~ICC_SRE_EL2_ENABLE
+>  	msr_s	ICC_SRE_EL2, x5
 >  1:
-> @@ -1027,6 +1023,7 @@ ifnvhe "b	1f",				nop
->  	add	x2, x0, #VCPU_CONTEXT
+> -.endm
+> -
+> -ENTRY(__save_vgic_v3_state)
+> -	save_vgic_v3_state
+> -	ret
+> -ENDPROC(__save_vgic_v3_state)
+> -
+> -ENTRY(__restore_vgic_v3_state)
+> -	restore_vgic_v3_state
+>  	ret
+>  ENDPROC(__restore_vgic_v3_state)
 >  
->  	bl __restore_sysregs
-> +	bl __restore_shared_sysregs
->  	bl __restore_fpsimd
->  
->  	skip_debug_state x3, 1f
-> @@ -1048,6 +1045,7 @@ __kvm_vcpu_return:
->  	save_guest_regs
->  	bl __save_fpsimd
->  	bl __save_sysregs
-> +	bl __save_shared_sysregs
->  
->  	skip_debug_state x3, 1f
->  	bl	__save_debug
-> @@ -1064,10 +1062,8 @@ __kvm_vcpu_return:
->  	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
->  	kern_hyp_va x2
->  
-> -ifnvhe "bl	__restore_sysregs",		nop
-> -ifnvhe "b	1f",				nop
-> -	restore_shared_sysregs
-> -1:
-> +ifnvhe "bl	__restore_sysregs",		"nop"
-> +	bl	__restore_shared_sysregs
->  	bl __restore_fpsimd
->  
->  	skip_debug_state x3, 1f
-> @@ -1159,7 +1155,8 @@ __kvm_hyp_panic:
->  	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
->  	kern_hyp_va x2
->  
-> -	bl __restore_sysregs
-> +ifnvhe "bl __restore_sysregs",			"nop"
-> +	bl __restore_shared_sysregs
->  
->  1:	adr	x0, __hyp_panic_str
->  	adr	x1, 2f
 > -- 
 > 2.1.4
 > 
