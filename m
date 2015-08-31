@@ -1,41 +1,50 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH 1/3] KVM: arm64: Implement vGICv3 distributor and
- redistributor access from userspace
-Date: Mon, 31 Aug 2015 10:35:05 +0300
-Message-ID: <013f01d0e3bf$8ed1fed0$ac75fc70$@samsung.com>
+Subject: RE: [PATCH 3/3] KVM: arm64: Implement accessors for vGIC CPU interface
+ registers
+Date: Mon, 31 Aug 2015 10:43:27 +0300
+Message-ID: <014001d0e3c0$b9d6ea40$2d84bec0$@samsung.com>
 References: <cover.1440766141.git.p.fedin@samsung.com>
- <cb311e13e56311c535362f32177313850c51af66.1440766141.git.p.fedin@samsung.com>
- <20150830164237.GD24113@cbox>
+ <2857f7cad7c17109dfa3028f79af28893c0171ce.1440766141.git.p.fedin@samsung.com>
+ <20150830165015.GE24113@cbox>
+ <CAFEAcA_+Q+byqn4=ByRZ_EtJ2LzF8dj1ac52R_MPbmJkDLSjhA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <20150830164237.GD24113@cbox>
+In-reply-to: <CAFEAcA_+Q+byqn4=ByRZ_EtJ2LzF8dj1ac52R_MPbmJkDLSjhA@mail.gmail.com>
 Content-language: ru
 Sender: kvm-owner@vger.kernel.org
-To: 'Christoffer Dall' <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>
+To: 'Peter Maydell' <peter.maydell@linaro.org>, 'Christoffer Dall' <christoffer.dall@linaro.org>
+Cc: 'Marc Zyngier' <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, 'kvm-devel' <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
  Hello!
 
-> > +	len = vgic_v3_get_reg_size(attr);
-> > +	if (len < 0)
-> > +		return len;
-> >
-> > -	return -ENXIO;
-> > +	ret = vgic_v3_attr_regs_access(dev, attr, (len == 8) ? (void *)&reg64 :
-> > +					(void *)&reg, len, false);
+> > I had imagined we would encode the GICv3 register accesses through the
+> > device API and not through the system register API, since I'm not crazy
+> > about polluting the general system register handling logic with GIC
+> > registers solely for the purposes of migration.
 > 
-> this use of the ternary operator is terrible, but it should be solved if
-> you always use a u64 for the reg parameter.
+> There's an interesting design question lurking under this
+> about the extent to which you expose the h/w design split
+> between the CPU interface and the GIC proper as part of the
+> KVM APIs.
 
- I also dislike this, but this is the best thing i could invent. This is dictated by put_user() and
-get_user(), which rely on typeof() of their arguments. Well, i could do some castings, but they are
-no less ugly, and would give more headache to bigendian systems.
-However, what about doing the same thing as GET/SET_ONE_REG does by just assuming that everything is
-64-bit wide? This would automatically resolve two other issues you have commented on. By the way,
-handling it in userspace would also be simpler.
+ I could split up handling logic from access logic. So that in sys_regs.c we would have something like:
+
+static bool access_gic_ctlr(struct kvm_vcpu *vcpu,
+			    const struct sys_reg_params *p,
+			    const struct sys_reg_desc *r)
+{
+	return vgicv3_access_ctlr(vcpu, vcpu_reg(vcpu, p->Rt), p->is_write);
+}
+
+ And in vgic-v3-emul.c we would have the handler itself with the prototype:
+
+bool vgicv3_access_ctlr(struct kvm_vcpu *vcpu, u64 *val, bool write);
+
+ Would this be OK?
+ In my personal opinion system register access API fits perfectly well for this task, because after all these are system registers. And implementing this as device attribute would, i guess, give no difference from code's point of view. We would have to encode system register numbers into attribute, then perform table lookup, actually duplicating our system register access code. Does it worth that?
 
 Kind regards,
 Pavel Fedin
