@@ -1,77 +1,119 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH v4 0/3] KVM: arm/arm64: Allow to use KVM without in-kernel
- irqchip
-Date: Mon, 31 Aug 2015 14:24:01 +0300
-Message-ID: <017b01d0e3df$8a06d4a0$9e147de0$@samsung.com>
-References: <cover.1439804074.git.p.fedin@samsung.com>
+From: Antonios Motakis <antonios.motakis@huawei.com>
+Subject: Re: [PATCH v3 04/10] VFIO: platform: add vfio_platform_set_automasked
+Date: Mon, 31 Aug 2015 13:43:56 +0200
+Message-ID: <55E43DFC.8050608@huawei.com>
+References: <1439212864-12954-1-git-send-email-eric.auger@linaro.org>
+ <1439212864-12954-5-git-send-email-eric.auger@linaro.org>
+ <1439405794.4023.528.camel@redhat.com> <55D1FFE8.9050104@linaro.org>
+ <1439919864.4023.626.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <cover.1439804074.git.p.fedin@samsung.com>
-Content-language: ru
-Sender: kvm-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: 'Marc Zyngier' <marc.zyngier@arm.com>, 'Christoffer Dall' <christoffer.dall@linaro.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1439919864.4023.626.camel@redhat.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Alex Williamson <alex.williamson@redhat.com>, Eric Auger <eric.auger@linaro.org>
+Cc: eric.auger@st.com, kvm@vger.kernel.org, patches@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, feng.wu@intel.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello! Two weeks has passed, i have fixed up Marc's notes, so PING...
-
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
 
 
-> -----Original Message-----
-> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Behalf Of Pavel Fedin
-> Sent: Monday, August 17, 2015 12:44 PM
-> To: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org
-> Cc: Marc Zyngier; Christoffer Dall
-> Subject: [PATCH v4 0/3] KVM: arm/arm64: Allow to use KVM without in-kernel irqchip
-> 
-> This patch set brings back functionality which was broken in v4.0.
-> Unfortunately because of restrictions of such a hardware is is impossible
-> to take advantage of virtual architected timer, therefore guest, running
-> in such restricted mode, has to use some memory-mapped timer. But it is
-> still better than nothing.
-> 
-> v3 => v4:
-> - Revert back to using switch on kvm_vgic_hyp_init() return code. I decided
->   to leave 'vgic_present = false' statement because it helps to understand
->   the code.
-> 
-> v2 => v3:
-> - Improved commit messages, added references to commits where the respective
->   functionality was broken
-> - Explicitly specify that the solution currently affects only vGIC and has
->   nothing to do with timer.
-> - Fixed code style according to previous notes
-> - Removed ARM64 save/restore patch introduced in v2 because it was already
->   obsolete for linux-next
-> - Modify KVM_CAP_IRQFD handling in correct place
-> 
-> v1 => v2:
-> - Do not use defensive approach in patch 0001. Use correct conditions in
->   callers instead
-> - Added ARM64-specific code, without which attempt to run a VM ends in a
->   HYP crash because of unset vGIC save/restore function pointers
-> 
-> 
-> Pavel Fedin (3):
->   Fix NULL pointer dereference if KVM is used without in-kernel irqchip
->   Detect vGIC presence at runtime
->   Make KVM_CAP_IRQFD dependent on KVM_CAP_IRQCHIP
-> 
->  arch/arm/kvm/arm.c  | 24 +++++++++++++++++++++---
->  virt/kvm/kvm_main.c |  5 +++--
->  2 files changed, 24 insertions(+), 5 deletions(-)
-> 
-> --
-> 2.4.4
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+On 18-Aug-15 19:44, Alex Williamson wrote:
+> On Mon, 2015-08-17 at 17:38 +0200, Eric Auger wrote:
+>> On 08/12/2015 08:56 PM, Alex Williamson wrote:
+>>> On Mon, 2015-08-10 at 15:20 +0200, Eric Auger wrote:
+>>>> This function makes possible to change the automasked mode.
+>>>>
+>>>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+>>>>
+>>>> ---
+>>>>
+>>>> v1 -> v2:
+>>>> - set forwarded flag
+>>>> ---
+>>>>  drivers/vfio/platform/vfio_platform_irq.c | 19 ++++++++++++++++++=
++
+>>>>  1 file changed, 19 insertions(+)
+>>>>
+>>>> diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/v=
+fio/platform/vfio_platform_irq.c
+>>>> index b31b1f0..a285384 100644
+>>>> --- a/drivers/vfio/platform/vfio_platform_irq.c
+>>>> +++ b/drivers/vfio/platform/vfio_platform_irq.c
+>>>> @@ -186,6 +186,25 @@ static irqreturn_t vfio_handler(int irq, void=
+ *dev_id)
+>>>>  	return ret;
+>>>>  }
+>>>> =20
+>>>> +static int vfio_platform_set_automasked(struct vfio_platform_irq =
+*irq,
+>>>> +					   bool automasked)
+>>>> +{
+>>>> +	unsigned long flags;
+>>>> +
+>>>> +	spin_lock_irqsave(&irq->lock, flags);
+>>>> +	if (automasked) {
+>>>> +		irq->forwarded =3D true;
+>>>> +		irq->flags |=3D VFIO_IRQ_INFO_AUTOMASKED;
+>>>> +		irq->handler =3D vfio_automasked_irq_handler;
+>>>> +	} else {
+>>>> +		irq->forwarded =3D false;
+>>>> +		irq->flags &=3D ~VFIO_IRQ_INFO_AUTOMASKED;
+>>>> +		irq->handler =3D vfio_irq_handler;
+>>>> +	}
+>>>> +	spin_unlock_irqrestore(&irq->lock, flags);
+>>>> +	return 0;
+>>>
+>>> In vfio-speak, automasked means level and we're not magically chang=
+ing
+>>> the IRQ from level to edge, we're simply able to handle level
+>>> differently based on a hardware optimization.  Should the user visi=
+ble
+>>> flags therefore change based on this?  Aren't we really setting the
+>>> forwarded state rather than the automasked state?
+>>
+>> Well actually this was following the discussion we had a long time a=
+go
+>> about that topic:
+>>
+>> http://lkml.iu.edu/hypermail/linux/kernel/1409.1/03659.html
+>>
+>> I did not really know how to conclude ...
+>>
+>> If it is preferred I can hide this to the userspace, no problem.
+>=20
+> I think that was based on the user being involved in enabling forward=
+ing
+> though, now that it's hidden and automatic, it doesn't make much sens=
+e
+> to me to toggle any of the interrupt info details based on the state =
+of
+> the forward.  The user always needs to handle the interrupt as level
+> since the bypass can be torn down at any point in time.  We're taking
+> advantage of the in-kernel path to make further optimizations, which
+> seems like they should be transparent to the user.  Thanks,
 
+I wonder if it makes sense to rename VFIO_IRQ_INFO_AUTOMASKED to
+VFIO_IRQ_INFO_LEVEL_TRIGGERED, and reintroduce VFIO_IRQ_INFO_AUTOMASKED=
+ as
+an alias, so compatibility with user space can be maintained? This way
+this semantic misunderstanding could be left behind.
+
+Cheers,
+Antonios
+
+>=20
+> Alex
+>=20
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+>=20
+
+--=20
+Antonios Motakis
+Virtualization Engineer
+Huawei Technologies Duesseldorf GmbH
+European Research Center
+Riesstrasse 25, 80992 M=FCnchen
