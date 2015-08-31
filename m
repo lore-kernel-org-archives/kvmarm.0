@@ -1,57 +1,43 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 3/3] KVM: arm64: Implement accessors for vGIC CPU
- interface registers
-Date: Mon, 31 Aug 2015 11:03:21 +0200
-Message-ID: <20150831090321.GK24113@cbox>
-References: <cover.1440766141.git.p.fedin@samsung.com>
- <2857f7cad7c17109dfa3028f79af28893c0171ce.1440766141.git.p.fedin@samsung.com>
- <20150830165015.GE24113@cbox>
- <CAFEAcA_+Q+byqn4=ByRZ_EtJ2LzF8dj1ac52R_MPbmJkDLSjhA@mail.gmail.com>
- <014001d0e3c0$b9d6ea40$2d84bec0$@samsung.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH 9/9] arm/arm64: KVM: arch timer: Reset CNTV_CTL to 0
+Date: Mon, 31 Aug 2015 11:02:53 +0200
+Message-ID: <CAKv+Gu_f97gu+TftpdJDef4X89sjYB2udUybpmm=M113_TTiPw@mail.gmail.com>
+References: <1440942866-23802-1-git-send-email-christoffer.dall@linaro.org>
+	<1440942866-23802-10-git-send-email-christoffer.dall@linaro.org>
+	<CAKv+Gu-4KKUUt7J==CPK6J79mWXLeMJFsG_fj85tYB2orzfrZg@mail.gmail.com>
+	<20150831085752.GH24113@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <014001d0e3c0$b9d6ea40$2d84bec0$@samsung.com>
+In-Reply-To: <20150831085752.GH24113@cbox>
 Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: 'Peter Maydell' <peter.maydell@linaro.org>, 'Marc Zyngier' <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, 'kvm-devel' <kvm@vger.kernel.org>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, KVM devel mailing list <kvm@vger.kernel.org>, Laszlo Ersek <lersek@redhat.com>, Drew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Aug 31, 2015 at 10:43:27AM +0300, Pavel Fedin wrote:
->  Hello!
-> 
-> > > I had imagined we would encode the GICv3 register accesses through the
-> > > device API and not through the system register API, since I'm not crazy
-> > > about polluting the general system register handling logic with GIC
-> > > registers solely for the purposes of migration.
-> > 
-> > There's an interesting design question lurking under this
-> > about the extent to which you expose the h/w design split
-> > between the CPU interface and the GIC proper as part of the
-> > KVM APIs.
-> 
->  I could split up handling logic from access logic. So that in sys_regs.c we would have something like:
-> 
-> static bool access_gic_ctlr(struct kvm_vcpu *vcpu,
-> 			    const struct sys_reg_params *p,
-> 			    const struct sys_reg_desc *r)
-> {
-> 	return vgicv3_access_ctlr(vcpu, vcpu_reg(vcpu, p->Rt), p->is_write);
-> }
-> 
->  And in vgic-v3-emul.c we would have the handler itself with the prototype:
-> 
-> bool vgicv3_access_ctlr(struct kvm_vcpu *vcpu, u64 *val, bool write);
-> 
->  Would this be OK?
->  In my personal opinion system register access API fits perfectly well for this task, because after all these are system registers. And implementing this as device attribute would, i guess, give no difference from code's point of view. We would have to encode system register numbers into attribute, then perform table lookup, actually duplicating our system register access code. Does it worth that?
-> 
-I think it's worth moving the thing to device attributes, yes,
-especially given that I never expect us to trap and emulate GICv3 system
-register accesses from a guest in KVM.  Is that correct?
+On 31 August 2015 at 10:57, Christoffer Dall
+<christoffer.dall@linaro.org> wrote:
+> On Mon, Aug 31, 2015 at 10:46:59AM +0200, Ard Biesheuvel wrote:
+>> On 30 August 2015 at 15:54, Christoffer Dall
+>> <christoffer.dall@linaro.org> wrote:
+>> > Provide a better quality of implementation and be architecture compliant
+>> > on ARMv7 for the architected timer by resetting the CNTV_CTL to 0 on
+>> > reset of the timer, and call kvm_timer_update_state(vcpu) at the same
+>> > time, ensuring the timer output is not asserted after, for example, a
+>> > PSCI system reset.
+>> >
+>> > This change alone fixes the UEFI reset issue reported by Laszlo back in
+>> > February.
+>> >
+>>
+>> Do you have a link to that report? I can't quite remember the details ...
+>>
+> There was no public mailing list cc'ed on the report, and the bugzilla
+> bug was created in a non-public Red Hat instance.
+>
+> But you were cc'ed on the original mail from Laszlo.  Look for an e-mail
+> from February 5th with the subject "virtual timer interrupt stuck across
+> guest firmware reboot on KVM".
+>
 
-However, if there's a strong argument that this is really CPU state and
-not state associated with the GIC device, I'd be willing to reconsider.
-
--Christoffer
+Found it, thanks.
