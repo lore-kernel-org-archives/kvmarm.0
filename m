@@ -1,43 +1,100 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 9/9] arm/arm64: KVM: arch timer: Reset CNTV_CTL to 0
-Date: Mon, 31 Aug 2015 11:02:53 +0200
-Message-ID: <CAKv+Gu_f97gu+TftpdJDef4X89sjYB2udUybpmm=M113_TTiPw@mail.gmail.com>
-References: <1440942866-23802-1-git-send-email-christoffer.dall@linaro.org>
-	<1440942866-23802-10-git-send-email-christoffer.dall@linaro.org>
-	<CAKv+Gu-4KKUUt7J==CPK6J79mWXLeMJFsG_fj85tYB2orzfrZg@mail.gmail.com>
-	<20150831085752.GH24113@cbox>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v2 05/15] KVM: arm/arm64: make GIC frame address initialization
+ model specific
+Date: Mon, 31 Aug 2015 11:31:37 +0200
+Message-ID: <55E41EF9.6020901@linaro.org>
+References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com> <1436538111-4294-6-git-send-email-andre.przywara@arm.com> <55CB43FB.4070400@linaro.org> <55DB534C.8040207@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20150831085752.GH24113@cbox>
+In-Reply-To: <55DB534C.8040207@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, KVM devel mailing list <kvm@vger.kernel.org>, Laszlo Ersek <lersek@redhat.com>, Drew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Pavel Fedin <p.fedin@samsung.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 31 August 2015 at 10:57, Christoffer Dall
-<christoffer.dall@linaro.org> wrote:
-> On Mon, Aug 31, 2015 at 10:46:59AM +0200, Ard Biesheuvel wrote:
->> On 30 August 2015 at 15:54, Christoffer Dall
->> <christoffer.dall@linaro.org> wrote:
->> > Provide a better quality of implementation and be architecture compliant
->> > on ARMv7 for the architected timer by resetting the CNTV_CTL to 0 on
->> > reset of the timer, and call kvm_timer_update_state(vcpu) at the same
->> > time, ensuring the timer output is not asserted after, for example, a
->> > PSCI system reset.
->> >
->> > This change alone fixes the UEFI reset issue reported by Laszlo back in
->> > February.
->> >
->>
->> Do you have a link to that report? I can't quite remember the details ...
->>
-> There was no public mailing list cc'ed on the report, and the bugzilla
-> bug was created in a non-public Red Hat instance.
->
-> But you were cc'ed on the original mail from Laszlo.  Look for an e-mail
-> from February 5th with the subject "virtual timer interrupt stuck across
-> guest firmware reboot on KVM".
->
+On 08/24/2015 07:24 PM, Andre Przywara wrote:
+> Hi,
+> 
+> On 12/08/15 14:02, Eric Auger wrote:
+>> On 07/10/2015 04:21 PM, Andre Przywara wrote:
+>>> Currently we initialize all the possible GIC frame addresses in one
+>>> function, without looking at the specific GIC model we instantiate
+>>> for the guest.
+>>> As this gets confusing when adding another VGIC model later, lets
+>>> move these initializations into the respective model's init 
+>> nit: tobe more precise the init emulation function (not the
+>> vgic_v2/v3_init_model model's init function). pfouh?! ;-)
+>> functions.
+> 
+> OK, will try to find a wording that is not completely confusing.
+> 
+>>>
+>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>>> ---
+>>>  virt/kvm/arm/vgic-v2-emul.c | 3 +++
+>>>  virt/kvm/arm/vgic-v3-emul.c | 3 +++
+>>>  virt/kvm/arm/vgic.c         | 3 ---
+>>>  3 files changed, 6 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/virt/kvm/arm/vgic-v2-emul.c b/virt/kvm/arm/vgic-v2-emul.c
+>>> index 1390797..8faa28c 100644
+>>> --- a/virt/kvm/arm/vgic-v2-emul.c
+>>> +++ b/virt/kvm/arm/vgic-v2-emul.c
+>>> @@ -567,6 +567,9 @@ void vgic_v2_init_emulation(struct kvm *kvm)
+>>>  	dist->vm_ops.init_model = vgic_v2_init_model;
+>>>  	dist->vm_ops.map_resources = vgic_v2_map_resources;
+>>>  
+>>> +	dist->vgic_cpu_base = VGIC_ADDR_UNDEF;
+>>> +	dist->vgic_dist_base = VGIC_ADDR_UNDEF;
+>> Looks strange to see the common dist_base here. Why don't you leave it
+>> in common part, kvm_vgic_create; all the more so you left
+>> kvm->arch.vgic.vctrl_base = vgic->vctrl_base in kvm_vgic_create.
+> 
+> The idea behind this is that dist_base refers to similar, but not
+> identical distributors (v2 vs. v3), so I found it a good idea to
+> initialize it in here. Also vctrl_base is host facing and not set by
+> userland, so this doesn't really compare here.
+ok
 
-Found it, thanks.
+Eric
+> 
+> Cheers,
+> Andre.
+> 
+>>> +
+>>>  	kvm->arch.max_vcpus = VGIC_V2_MAX_CPUS;
+>>>  }
+>>>  
+>>> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+>>> index d2eeb20..1f42348 100644
+>>> --- a/virt/kvm/arm/vgic-v3-emul.c
+>>> +++ b/virt/kvm/arm/vgic-v3-emul.c
+>>> @@ -885,6 +885,9 @@ void vgic_v3_init_emulation(struct kvm *kvm)
+>>>  	dist->vm_ops.destroy_model = vgic_v3_destroy_model;
+>>>  	dist->vm_ops.map_resources = vgic_v3_map_resources;
+>>>  
+>>> +	dist->vgic_dist_base = VGIC_ADDR_UNDEF;
+>>> +	dist->vgic_redist_base = VGIC_ADDR_UNDEF;
+>>> +
+>>>  	kvm->arch.max_vcpus = KVM_MAX_VCPUS;
+>>>  }
+>>>  
+>>> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+>>> index cc8f5ed..59f1801 100644
+>>> --- a/virt/kvm/arm/vgic.c
+>>> +++ b/virt/kvm/arm/vgic.c
+>>> @@ -1830,9 +1830,6 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>>>  	kvm->arch.vgic.in_kernel = true;
+>>>  	kvm->arch.vgic.vgic_model = type;
+>>>  	kvm->arch.vgic.vctrl_base = vgic->vctrl_base;
+>>> -	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
+>>> -	kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+>>> -	kvm->arch.vgic.vgic_redist_base = VGIC_ADDR_UNDEF;
+>>>  
+>>>  out_unlock:
+>>>  	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
+>>>
+>>
+
