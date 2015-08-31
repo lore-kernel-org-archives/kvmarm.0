@@ -1,14 +1,16 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH] KVM: arm64: Decode basic HYP fault information
-Date: Mon, 31 Aug 2015 09:33:40 +0300
-Message-ID: <012d01d0e3b6$fa327c30$ee977490$@samsung.com>
-References: <00aa01d0d408$1ba96ea0$52fc4be0$@samsung.com>
- <20150830174434.GG24113@cbox>
+Subject: RE: [PATCH 1/3] KVM: arm64: Implement vGICv3 distributor and
+ redistributor access from userspace
+Date: Mon, 31 Aug 2015 10:35:05 +0300
+Message-ID: <013f01d0e3bf$8ed1fed0$ac75fc70$@samsung.com>
+References: <cover.1440766141.git.p.fedin@samsung.com>
+ <cb311e13e56311c535362f32177313850c51af66.1440766141.git.p.fedin@samsung.com>
+ <20150830164237.GD24113@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <20150830174434.GG24113@cbox>
+In-reply-to: <20150830164237.GD24113@cbox>
 Content-language: ru
 Sender: kvm-owner@vger.kernel.org
 To: 'Christoffer Dall' <christoffer.dall@linaro.org>
@@ -17,19 +19,23 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
  Hello!
 
-> my overall concern with this patch is that it adds complexity to an
-> already really bad situation, and potentially increases the likelihood
-> of not seeing any debug info at all.
+> > +	len = vgic_v3_get_reg_size(attr);
+> > +	if (len < 0)
+> > +		return len;
+> >
+> > -	return -ENXIO;
+> > +	ret = vgic_v3_attr_regs_access(dev, attr, (len == 8) ? (void *)&reg64 :
+> > +					(void *)&reg, len, false);
+> 
+> this use of the ternary operator is terrible, but it should be solved if
+> you always use a u64 for the reg parameter.
 
- Why? In this case we currently already drop into C code. I do the same, with some more useful
-printout. What is fundamentally changed?
-
-> do you encounter this kind of panic a lot?  I haven't experienced a
-> great need for more hyp debugging help lately...
-
- I met it once, and i had a stable way to reproduce it. At the end it appeared to be another HW
-quirk, but, still, this patch helped a lot to find out what was wrong. The main missing information
-was vector number, and translated PC is also useful.
+ I also dislike this, but this is the best thing i could invent. This is dictated by put_user() and
+get_user(), which rely on typeof() of their arguments. Well, i could do some castings, but they are
+no less ugly, and would give more headache to bigendian systems.
+However, what about doing the same thing as GET/SET_ONE_REG does by just assuming that everything is
+64-bit wide? This would automatically resolve two other issues you have commented on. By the way,
+handling it in userspace would also be simpler.
 
 Kind regards,
 Pavel Fedin
