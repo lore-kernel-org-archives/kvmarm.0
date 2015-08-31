@@ -1,119 +1,40 @@
-From: Antonios Motakis <antonios.motakis@huawei.com>
-Subject: Re: [PATCH v3 04/10] VFIO: platform: add vfio_platform_set_automasked
-Date: Mon, 31 Aug 2015 13:43:56 +0200
-Message-ID: <55E43DFC.8050608@huawei.com>
-References: <1439212864-12954-1-git-send-email-eric.auger@linaro.org>
- <1439212864-12954-5-git-send-email-eric.auger@linaro.org>
- <1439405794.4023.528.camel@redhat.com> <55D1FFE8.9050104@linaro.org>
- <1439919864.4023.626.camel@redhat.com>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH 3/3] KVM: arm64: Implement accessors for vGIC CPU interface
+ registers
+Date: Mon, 31 Aug 2015 14:49:46 +0300
+Message-ID: <018101d0e3e3$2285a690$6790f3b0$@samsung.com>
+References: <cover.1440766141.git.p.fedin@samsung.com>
+ <2857f7cad7c17109dfa3028f79af28893c0171ce.1440766141.git.p.fedin@samsung.com>
+ <20150830165015.GE24113@cbox>
+ <CAFEAcA_+Q+byqn4=ByRZ_EtJ2LzF8dj1ac52R_MPbmJkDLSjhA@mail.gmail.com>
+ <014001d0e3c0$b9d6ea40$2d84bec0$@samsung.com> <20150831090321.GK24113@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1439919864.4023.626.camel@redhat.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Alex Williamson <alex.williamson@redhat.com>, Eric Auger <eric.auger@linaro.org>
-Cc: eric.auger@st.com, kvm@vger.kernel.org, patches@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com, feng.wu@intel.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <20150831090321.GK24113@cbox>
+Content-language: ru
+Sender: kvm-owner@vger.kernel.org
+To: 'Christoffer Dall' <christoffer.dall@linaro.org>
+Cc: 'Peter Maydell' <peter.maydell@linaro.org>, 'Marc Zyngier' <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, 'kvm-devel' <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+ Hello!
+
+> I think it's worth moving the thing to device attributes, yes,
+> especially given that I never expect us to trap and emulate GICv3 system
+> register accesses from a guest in KVM.  Is that correct?
+
+ Yes, but nevertheless, for GICv2 attributes we reuse the same code which is expected to trap MMIO
+accesses from guest. And there we also have MMIO handlers for the CPU interface, which are also
+never trapped from guest. So why cannot we do the same for GICv3 CPU interface, and simply reuse
+existing APIs?
+ I am currently working on full support in qemu, and it's not difficult to deal with CPU fd's.
+Because anyway you have to iterate through all VCPUs in order to save state correctly.
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
 
 
-On 18-Aug-15 19:44, Alex Williamson wrote:
-> On Mon, 2015-08-17 at 17:38 +0200, Eric Auger wrote:
->> On 08/12/2015 08:56 PM, Alex Williamson wrote:
->>> On Mon, 2015-08-10 at 15:20 +0200, Eric Auger wrote:
->>>> This function makes possible to change the automasked mode.
->>>>
->>>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
->>>>
->>>> ---
->>>>
->>>> v1 -> v2:
->>>> - set forwarded flag
->>>> ---
->>>>  drivers/vfio/platform/vfio_platform_irq.c | 19 ++++++++++++++++++=
-+
->>>>  1 file changed, 19 insertions(+)
->>>>
->>>> diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/v=
-fio/platform/vfio_platform_irq.c
->>>> index b31b1f0..a285384 100644
->>>> --- a/drivers/vfio/platform/vfio_platform_irq.c
->>>> +++ b/drivers/vfio/platform/vfio_platform_irq.c
->>>> @@ -186,6 +186,25 @@ static irqreturn_t vfio_handler(int irq, void=
- *dev_id)
->>>>  	return ret;
->>>>  }
->>>> =20
->>>> +static int vfio_platform_set_automasked(struct vfio_platform_irq =
-*irq,
->>>> +					   bool automasked)
->>>> +{
->>>> +	unsigned long flags;
->>>> +
->>>> +	spin_lock_irqsave(&irq->lock, flags);
->>>> +	if (automasked) {
->>>> +		irq->forwarded =3D true;
->>>> +		irq->flags |=3D VFIO_IRQ_INFO_AUTOMASKED;
->>>> +		irq->handler =3D vfio_automasked_irq_handler;
->>>> +	} else {
->>>> +		irq->forwarded =3D false;
->>>> +		irq->flags &=3D ~VFIO_IRQ_INFO_AUTOMASKED;
->>>> +		irq->handler =3D vfio_irq_handler;
->>>> +	}
->>>> +	spin_unlock_irqrestore(&irq->lock, flags);
->>>> +	return 0;
->>>
->>> In vfio-speak, automasked means level and we're not magically chang=
-ing
->>> the IRQ from level to edge, we're simply able to handle level
->>> differently based on a hardware optimization.  Should the user visi=
-ble
->>> flags therefore change based on this?  Aren't we really setting the
->>> forwarded state rather than the automasked state?
->>
->> Well actually this was following the discussion we had a long time a=
-go
->> about that topic:
->>
->> http://lkml.iu.edu/hypermail/linux/kernel/1409.1/03659.html
->>
->> I did not really know how to conclude ...
->>
->> If it is preferred I can hide this to the userspace, no problem.
->=20
-> I think that was based on the user being involved in enabling forward=
-ing
-> though, now that it's hidden and automatic, it doesn't make much sens=
-e
-> to me to toggle any of the interrupt info details based on the state =
-of
-> the forward.  The user always needs to handle the interrupt as level
-> since the bypass can be torn down at any point in time.  We're taking
-> advantage of the in-kernel path to make further optimizations, which
-> seems like they should be transparent to the user.  Thanks,
-
-I wonder if it makes sense to rename VFIO_IRQ_INFO_AUTOMASKED to
-VFIO_IRQ_INFO_LEVEL_TRIGGERED, and reintroduce VFIO_IRQ_INFO_AUTOMASKED=
- as
-an alias, so compatibility with user space can be maintained? This way
-this semantic misunderstanding could be left behind.
-
-Cheers,
-Antonios
-
->=20
-> Alex
->=20
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
->=20
-
---=20
-Antonios Motakis
-Virtualization Engineer
-Huawei Technologies Duesseldorf GmbH
-European Research Center
-Riesstrasse 25, 80992 M=FCnchen
