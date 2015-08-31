@@ -1,37 +1,39 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 3/3] KVM: arm64: Implement accessors for vGIC CPU
- interface registers
-Date: Sun, 30 Aug 2015 19:39:05 +0100
-Message-ID: <CAFEAcA_+Q+byqn4=ByRZ_EtJ2LzF8dj1ac52R_MPbmJkDLSjhA@mail.gmail.com>
-References: <cover.1440766141.git.p.fedin@samsung.com> <2857f7cad7c17109dfa3028f79af28893c0171ce.1440766141.git.p.fedin@samsung.com>
- <20150830165015.GE24113@cbox>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH] KVM: arm64: Decode basic HYP fault information
+Date: Mon, 31 Aug 2015 09:33:40 +0300
+Message-ID: <012d01d0e3b6$fa327c30$ee977490$@samsung.com>
+References: <00aa01d0d408$1ba96ea0$52fc4be0$@samsung.com>
+ <20150830174434.GG24113@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20150830165015.GE24113@cbox>
+In-reply-to: <20150830174434.GG24113@cbox>
+Content-language: ru
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Pavel Fedin <p.fedin@samsung.com>, Marc Zyngier <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>
+To: 'Christoffer Dall' <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 30 August 2015 at 17:50, Christoffer Dall
-<christoffer.dall@linaro.org> wrote:
-> I had imagined we would encode the GICv3 register accesses through the
-> device API and not through the system register API, since I'm not crazy
-> about polluting the general system register handling logic with GIC
-> registers solely for the purposes of migration.
+ Hello!
 
-There's an interesting design question lurking under this
-about the extent to which you expose the h/w design split
-between the CPU interface and the GIC proper as part of the
-KVM APIs. I'm inclined to agree that it's better to for our
-purposes treat both bits as just part of an irqchip device,
-but I haven't given it a great deal of thought.
+> my overall concern with this patch is that it adds complexity to an
+> already really bad situation, and potentially increases the likelihood
+> of not seeing any debug info at all.
 
-(Similarly in the QEMU emulated-GICv3 case you could also
-split the CPU i/f more formally, or not. The kernel's choice
-would have implications for which way QEMU ends up going,
-I think.)
+ Why? In this case we currently already drop into C code. I do the same, with some more useful
+printout. What is fundamentally changed?
 
-thanks
--- PMM
+> do you encounter this kind of panic a lot?  I haven't experienced a
+> great need for more hyp debugging help lately...
+
+ I met it once, and i had a stable way to reproduce it. At the end it appeared to be another HW
+quirk, but, still, this patch helped a lot to find out what was wrong. The main missing information
+was vector number, and translated PC is also useful.
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
+
+
