@@ -1,292 +1,130 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 13/13] arm64: KVM: VHE: Early interrupt handling
-Date: Mon, 31 Aug 2015 20:52:26 +0200
-Message-ID: <20150831185226.GD10991@cbox>
-References: <1436372356-30410-1-git-send-email-marc.zyngier@arm.com>
- <1436372356-30410-14-git-send-email-marc.zyngier@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [RFC PATCH v3 0/3] vfio: platform: return device properties for
+ a platform device
+Date: Tue, 01 Sep 2015 09:31:56 +0200
+Message-ID: <55E5546C.7040504@linaro.org>
+References: <1419024032-1269-1-git-send-email-a.motakis@virtualopensystems.com>
+ <55DF07F0.3070405@linaro.org> <1440691887.20355.27.camel@redhat.com>
+ <55DF45D0.5040704@linaro.org> <20150830140638.GB24113@cbox>
+ <55E48897.4090907@linaro.org> <20150831173359.GA10991@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1436372356-30410-14-git-send-email-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DB90848B05
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Sep 2015 03:32:30 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id kYmmdOVr2HCr for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Sep 2015 03:32:29 -0400 (EDT)
+Received: from mail-wi0-f182.google.com (mail-wi0-f182.google.com
+ [209.85.212.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 836B248AB0
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Sep 2015 03:32:29 -0400 (EDT)
+Received: by wibz8 with SMTP id z8so22035678wib.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Sep 2015 00:32:45 -0700 (PDT)
+In-Reply-To: <20150831173359.GA10991@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: iommu@lists.linux-foundation.org, Alex Williamson <alex.williamson@redhat.com>, tech@virtualopensystems.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jul 08, 2015 at 05:19:16PM +0100, Marc Zyngier wrote:
-> With VHE enabled, it is possible to let the kernel handle an interrupt
-> without saving the full guest context, and without restoring the full
-> host context either. This reduces the latency of handling an interrupt.
-> 
-> When an interrupt fires we can:
-> - save the guest's general purpose registers, shared system registers
->   and timer state
-> - switch to a host context (setting vectors, deactivating traps and
->   stage-2 translation)
-> - restore the host's shared sysregs
-> 
-> At that stage, we're able to jump to the interrupt handler.
-> 
-> On return from the handler, we can finish the switch (save/restore
-> whatever is missing from the above).
+On 08/31/2015 07:33 PM, Christoffer Dall wrote:
+> On Mon, Aug 31, 2015 at 07:02:15PM +0200, Eric Auger wrote:
+>> Hi Christoffer,
+>> On 08/30/2015 04:06 PM, Christoffer Dall wrote:
+>>> Hi Eric,
+>>>
+>>> On Thu, Aug 27, 2015 at 07:16:00PM +0200, Eric Auger wrote:
+>>>> Hi Alex,
+>>>> On 08/27/2015 06:11 PM, Alex Williamson wrote:
+>>>>> On Thu, 2015-08-27 at 14:52 +0200, Eric Auger wrote:
+>>>>>> Hi Baptiste, Antonios,
+>>>>>>
+>>>>>> What are the plans wrt this series? I am currently integrating another
+>>>>>> QEMU VFIO platform devices where this series could be useful I think
+>>>>>> (Feb 2015). Do you intend to follow up and bring it upstream?
+>>>>>>
+>>>>>> Alex, do you see some show-stoppers in this series or do you advise to
+>>>>>> simply follow-up?
+>>>>>
+>>>>> I'm at a bit of a disadvantage not really knowing what types of
+>>>>> properties a user will be able to retrieve here.  The interface itself
+>>>>> seems sort of like a game of Go Fish.  Should the properties we're
+>>>>> looking for be generally available via sysfs?  The ioctl proposed needs
+>>>>> some work to fit within the argsz/flags model that vfio typically uses.
+>>>>> It's unclear what argsz vs length represents and defining the flags
+>>>>> field as 'type' limits the future extensions of the ioctl.  Thanks,
+>>>>
+>>>> The properties that I need can be found in /proc/device-tree too. They
+>>>> are of different types, with void cell value, with string cell
+>>>> values(single & multiple), with integer cell value(s), array ...
+>>>>
+>>>> The aim is to be able to assign a highly configurable platform device to
+>>>> a guest, read some property values on host and write the same values in
+>>>> guest dt node.
+>>>>
+>>> Can you reiterate why QEMU and VFIO don't already have the information
+>>> necessary to setup resources and present a DT to the guest that the
+>>> guest can use?
+>> A vfio-platform driver was bound to the passthrough'ed device. QEMU
+>> current knows the compat string of the device and the node's name and
+>> that's it.
+>>
+>> The VFIO platform driver currently does not allow to return device
+>> specific information. It just returns generic info such as resource
+>> info. The driver is HW agnostic.
+>>
+>>
+>> The QEMU VFIO device should be able to check some characteristics of the
+>> host device tree. Typically if the host node does not comply with some
+>> constraints it may not be possible to assign the device.
+>>
+>> We do not want the QEMU end-user to have in-depth knowledge of the HW so
+>> passing the info in the QEMU command line does not sound to be the good
+>> solution.
+>>
+>>
+>> As you mentioned /proc/device-tree depends on kernel option. I am able
+>> to find the properties in sysfs too but can we systematically rely on
+>> sysfs (CONFIG_SYSFS)? Also I would have expected the values to be human
+>> readable but they are not. Currently investigating open/read from qemu
+>> but is better than an ioctl API? ...
+>>
+> Yeah it does, but I thought we originally planned that the driver for a
+> specific platform device in QEMU should know these details,
+Yes that's the objective to put this intelligence in the QEMU VFIO
+device or more precisely in the associated function that builds its
+guest dt node.
 
-This feels like a specific optimization, and again it looks to me like
-we're just going to see more of this.
+Let's take an example. Assuming an xgmac supports different speeds, you
+need to set those on guest. Either you put arbitrary values or you reuse
+the values that were set on host. Typically some values may not be
+supported by the HW.
 
-For example, sending a virtual IPI shoud ideally be done without having
-to do all the crazy save/restore stuff.
+Idea of genericity was ruled out indeed meaning each device needs to
+have a specialized QEMU VFIO device and an associated dt node creation
+function. Now this does not prevent from exploiting host dt information.
+Does that make sense?
 
-Maybe I'm missing something overall here, but I feel the whole design of
-this solution requires some justification in the cover letter.
-
-Thanks,
--Christoffer
-
+Eric
+ and that you
+> simply have to add code for each supported device, instead of trying to
+> solve this generically.  (It was never the user who should supply it on
+> the command line).  But perhaps we moved on from our original idea?
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm/kvm/arm.c              |  3 +++
->  arch/arm64/kvm/hyp.S            | 56 ++++++++++++++++++++++++++++++++++++++---
->  arch/arm64/kvm/vgic-v2-switch.S | 19 +++++++++++---
->  arch/arm64/kvm/vgic-v3-switch.S | 33 +++++++++++++-----------
->  4 files changed, 90 insertions(+), 21 deletions(-)
+> I think relying on sysfs is probably reasonable, but I'm really not an
+> expert in the right ways here.
 > 
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index ca3c662..ab9333f 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -573,6 +573,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		 * disabled.  Enabling the interrupts now will have
->  		 * the effect of taking the interrupt again, in SVC
->  		 * mode this time.
-> +		 *
-> +		 * With VHE, the interrupt is likely to have been
-> +		 * already taken already.
->  		 */
->  		local_irq_enable();
->  
-> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-> index 3cbd2c4..ac95ba3 100644
-> --- a/arch/arm64/kvm/hyp.S
-> +++ b/arch/arm64/kvm/hyp.S
-> @@ -714,8 +714,10 @@ skip_el1_restore:
->  .endm
->  
->  .macro skip_32bit_state tmp, target
-> -	// Skip 32bit state if not needed
-> -	mrs	\tmp, hcr_el2
-> +	// Skip 32bit state if not needed.
-> +	// With VHE, we may have cleared the RW bit in HCR_EL2 early,
-> +	// and have to rely on the memory version instead.
-> +ifnvhe "mrs	\tmp, hcr_el2",			_S_(ldr	\tmp, [x0, #VCPU_HCR_EL2])
->  	tbnz	\tmp, #HCR_RW_SHIFT, \target
->  .endm
->  
-> @@ -1053,11 +1055,18 @@ __kvm_vcpu_return:
->  	save_guest_32bit_state
->  
->  	save_timer_state
-> +ifnvhe "b	1f",		nop
-> +	alternative_insn	"bl __vgic_v2_disable", \
-> +				"bl __vgic_v3_disable", \
-> +				ARM64_HAS_SYSREG_GIC_CPUIF
-> +1:
->  	save_vgic_state
->  
->  	deactivate_traps
->  	deactivate_vm
->  
-> +__kvm_vcpu_return_irq:
-> +
->  	// Host context
->  	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
->  	kern_hyp_va x2
-> @@ -1355,8 +1364,47 @@ el1_irq:
->  	push	x0, x1
->  	push	x2, x3
->  	mrs	x0, tpidr_el2
-> -	mov	x1, #ARM_EXCEPTION_IRQ
-> -	b	__kvm_vcpu_return
-> +ifnvhe _S_(mov	x1, #ARM_EXCEPTION_IRQ),	nop
-> +ifnvhe "b	__kvm_vcpu_return", 		nop
-> +
-> +	// Fallthrough for VHE
-> +	add	x2, x0, #VCPU_CONTEXT
-> +
-> +	save_guest_regs
-> +	bl	__save_shared_sysregs
-> +	save_timer_state
-> +	alternative_insn	"bl __vgic_v2_disable", \
-> +				"bl __vgic_v3_disable", \
-> +				ARM64_HAS_SYSREG_GIC_CPUIF
-> +	deactivate_traps
-> +	deactivate_vm
-> +
-> +	isb	// Needed to ensure TGE is on and vectors have been switched
-> +
-> +	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
-> +	restore_shared_sysregs
-> +
-> +	mov	x0, x2
-> +	adrp	x1, handle_arch_irq
-> +	add	x1, x1, #:lo12:handle_arch_irq
-> +	ldr	x1, [x1]
-> +	blr	x1
-> +
-> +	// Back from the interrupt handler, finalize the world switch
-> +	mrs	x0, tpidr_el2
-> +	add	x2, x0, #VCPU_CONTEXT
-> +
-> +	bl	__save_fpsimd
-> +	bl	__save_sysregs	// We've already saved the shared regs
-> +	save_guest_32bit_state
-> +
-> +	skip_debug_state x3, 1f
-> +	bl	__save_debug
-> +1:
-> +	save_vgic_state
-> +
-> +	mov	x1,	#ARM_EXCEPTION_IRQ
-> +	b	__kvm_vcpu_return_irq
->  
->  	.ltorg
->  
-> diff --git a/arch/arm64/kvm/vgic-v2-switch.S b/arch/arm64/kvm/vgic-v2-switch.S
-> index 3f00071..c8864b4 100644
-> --- a/arch/arm64/kvm/vgic-v2-switch.S
-> +++ b/arch/arm64/kvm/vgic-v2-switch.S
-> @@ -26,16 +26,30 @@
->  #include <asm/kvm_arm.h>
->  #include <asm/kvm_mmu.h>
->  
-> +#include "vhe-macros.h"
-> +
->  	.text
->  	.pushsection	.hyp.text, "ax"
->  
-> +ENTRY(__vgic_v2_disable)
-> +	/* Get VGIC VCTRL base into x2 */
-> +	ldr	x2, [x0, #VCPU_KVM]
-> +	kern_hyp_va	x2
-> +	ldr	x2, [x2, #KVM_VGIC_VCTRL]
-> +	kern_hyp_va	x2
-> +	cbz	x2, 1f		// disabled
-> +
-> +	/* Clear GICH_HCR */
-> +	str	wzr, [x2, #GICH_HCR]
-> +1:	ret
-> +ENDPROC(__vgic_v2_disable)
-> +
->  /*
->   * Save the VGIC CPU state into memory
->   * x0: Register pointing to VCPU struct
->   * Do not corrupt x1!!!
->   */
->  ENTRY(__save_vgic_v2_state)
-> -__save_vgic_v2_state:
->  	/* Get VGIC VCTRL base into x2 */
->  	ldr	x2, [x0, #VCPU_KVM]
->  	kern_hyp_va	x2
-> @@ -75,7 +89,7 @@ CPU_BE(	str	w10, [x3, #VGIC_V2_CPU_ELRSR] )
->  	str	w11, [x3, #VGIC_V2_CPU_APR]
->  
->  	/* Clear GICH_HCR */
-> -	str	wzr, [x2, #GICH_HCR]
-> +ifnvhe	_S_(str	wzr, [x2, #GICH_HCR]),		nop
->  
->  	/* Save list registers */
->  	add	x2, x2, #GICH_LR0
-> @@ -95,7 +109,6 @@ ENDPROC(__save_vgic_v2_state)
->   * x0: Register pointing to VCPU struct
->   */
->  ENTRY(__restore_vgic_v2_state)
-> -__restore_vgic_v2_state:
->  	/* Get VGIC VCTRL base into x2 */
->  	ldr	x2, [x0, #VCPU_KVM]
->  	kern_hyp_va	x2
-> diff --git a/arch/arm64/kvm/vgic-v3-switch.S b/arch/arm64/kvm/vgic-v3-switch.S
-> index 3c20730..b9b45e3 100644
-> --- a/arch/arm64/kvm/vgic-v3-switch.S
-> +++ b/arch/arm64/kvm/vgic-v3-switch.S
-> @@ -25,6 +25,8 @@
->  #include <asm/kvm_asm.h>
->  #include <asm/kvm_arm.h>
->  
-> +#include "vhe-macros.h"
-> +
->  	.text
->  	.pushsection	.hyp.text, "ax"
->  
-> @@ -35,11 +37,21 @@
->  #define LR_OFFSET(n)	(VGIC_V3_CPU_LR + (15 - n) * 8)
->  
->  /*
-> + * Disable the vcpu interface, preventing interrupts from
-> + * being delivered.
-> + */
-> +ENTRY(__vgic_v3_disable)
-> +	// Nuke the HCR register.
-> +	msr_s	ICH_HCR_EL2, xzr
-> +	ret
-> +ENDPROC(__vgic_v3_disable)
-> +
-> +/*
->   * Save the VGIC CPU state into memory
->   * x0: Register pointing to VCPU struct
->   * Do not corrupt x1!!!
->   */
-> -.macro	save_vgic_v3_state
-> +ENTRY(__save_vgic_v3_state)
->  	// Compute the address of struct vgic_cpu
->  	add	x3, x0, #VCPU_VGIC_CPU
->  
-> @@ -58,7 +70,7 @@
->  	str	w7, [x3, #VGIC_V3_CPU_EISR]
->  	str	w8, [x3, #VGIC_V3_CPU_ELRSR]
->  
-> -	msr_s	ICH_HCR_EL2, xzr
-> +ifnvhe	_S_(msr_s	ICH_HCR_EL2, xzr),	nop
->  
->  	mrs_s	x21, ICH_VTR_EL2
->  	mvn	w22, w21
-> @@ -137,15 +149,17 @@
->  	orr	x5, x5, #ICC_SRE_EL2_ENABLE
->  	msr_s	ICC_SRE_EL2, x5
->  	isb
-> -	mov	x5, #1
-> +	// If using VHE, we don't care about EL1 and can early out.
-> +ifnvhe "mov	x5, #1",			ret
->  	msr_s	ICC_SRE_EL1, x5
-> -.endm
-> +	ret
-> +ENDPROC(__save_vgic_v3_state)
->  
->  /*
->   * Restore the VGIC CPU state from memory
->   * x0: Register pointing to VCPU struct
->   */
-> -.macro	restore_vgic_v3_state
-> +ENTRY(__restore_vgic_v3_state)
->  	// Compute the address of struct vgic_cpu
->  	add	x3, x0, #VCPU_VGIC_CPU
->  
-> @@ -249,15 +263,6 @@
->  	and	x5, x5, #~ICC_SRE_EL2_ENABLE
->  	msr_s	ICC_SRE_EL2, x5
->  1:
-> -.endm
-> -
-> -ENTRY(__save_vgic_v3_state)
-> -	save_vgic_v3_state
-> -	ret
-> -ENDPROC(__save_vgic_v3_state)
-> -
-> -ENTRY(__restore_vgic_v3_state)
-> -	restore_vgic_v3_state
->  	ret
->  ENDPROC(__restore_vgic_v3_state)
->  
-> -- 
-> 2.1.4
+> Thanks,
+> -Christoffer
 > 
