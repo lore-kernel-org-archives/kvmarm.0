@@ -1,81 +1,36 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: Implement vGICv3 distributor and
- redistributor access from userspace
-Date: Tue, 1 Sep 2015 14:52:15 +0100
-Message-ID: <55E5AD8F.80304@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH 3/3] KVM: arm64: Implement accessors for vGIC CPU
+ interface registers
+Date: Tue, 1 Sep 2015 16:06:55 +0200
+Message-ID: <20150901140655.GF10991@cbox>
 References: <cover.1440766141.git.p.fedin@samsung.com>
- <cb311e13e56311c535362f32177313850c51af66.1440766141.git.p.fedin@samsung.com>
- <20150830164237.GD24113@cbox>
+ <2857f7cad7c17109dfa3028f79af28893c0171ce.1440766141.git.p.fedin@samsung.com>
+ <20150830165015.GE24113@cbox>
+ <010801d0e4b7$698757d0$3c960770$@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20150830164237.GD24113@cbox>
+Content-Disposition: inline
+In-Reply-To: <010801d0e4b7$698757d0$3c960770$@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, Pavel Fedin <p.fedin@samsung.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Pavel Fedin <p.fedin@samsung.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Pavel,
-
-...
-
->> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
->> index e661e7f..b3847e1 100644
->> --- a/virt/kvm/arm/vgic-v3-emul.c
->> +++ b/virt/kvm/arm/vgic-v3-emul.c
-...
->> @@ -1000,40 +1102,95 @@ static void vgic_v3_destroy(struct kvm_device *dev)
->>  	kfree(dev);
->>  }
->>  
->> +static u32 vgic_v3_get_reg_size(struct kvm_device_attr *attr)
->> +{
->> +	u32 offset;
->> +
->> +	switch (attr->group) {
->> +	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
->> +		offset = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
->> +		if (offset >= GICD_IROUTER && offset <= 0x7FD8)
+On Tue, Sep 01, 2015 at 04:09:18PM +0300, Pavel Fedin wrote:
+>  Hello!
 > 
-> eh, 0x7FD8 ?
+> > Have you thought about proper locking/serializing of access to the GIC
+> > state in these accessor functions?  
 > 
->> +			return 8;
->> +		else
->> +			return 4;
->> +		break;
->> +
->> +	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
->> +		offset = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
->> +		if ((offset == GICR_TYPER) ||
->> +		    (offset >= GICR_SETLPIR && offset <= GICR_INVALLR))
->> +			return 8;
->> +		else
->> +			return 4;
->> +		break;
->> +
->> +	default:
->> +		return -ENXIO;
->> +	}
->> +}
+>  I am in the process of rewriting the whole thing, and i came to this point.
+>  What kind of locking  would you expect ? It's a CPU interface, it does not affect state of any
+> other vCPUs. And, since i am getting/setting its registers, i assume that the vCPU is not running.
+> Well, i added the check. What next?
 > 
-> this feels wrong.
+I think we make some assumptions throughout the vgic code that only the
+vcpu itself touches the state of the registers.  Maybe there is no need
+for additional locking, but I'd sleep better at night if I knew that
+whoever implemented save/restore logic had thought about concurrency.
 
-I agree on this, actually I consider this dangerous. Currently the
-memory behind addr in QEMU (hw/intc/arm_gic_kvm.c:kvm_arm_gic_get() for
-instance) is only uint32_t, so you have to take care to provide uint64_t
-backing for those registers, which means that there must be a match
-between the register size the kernel knows and the size userland thinks
-of. So I'd rather see the access size controlled by userland, probably
-using Christoffer's suggestion below.
-
-Also the GIC specification says that everything must be accessible with
-32-bit accesses. Correct me if I am wrong on this, but vCPUs are not
-supposed to run while you are getting/setting VGIC registers, right? So
-there shouldn't be any issues with non-atomic accesses to 64-bit
-registers, which means you could just go ahead and do everything in
-32-bit only. This would also help with supporting 32-bit userland and/or
-kernel later.
-
-Cheers,
-Andre.
+-Christoffer
