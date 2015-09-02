@@ -1,305 +1,119 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 04/15] KVM: arm: common infrastructure for handling
- AArch32 CP14/CP15
-Date: Wed, 2 Sep 2015 15:09:49 +0200
-Message-ID: <20150902130949.GK10991@cbox>
-References: <1439213167-8988-1-git-send-email-zhichao.huang@linaro.org>
- <1439213167-8988-5-git-send-email-zhichao.huang@linaro.org>
+From: Baptiste Reynal <b.reynal@virtualopensystems.com>
+Subject: Re: [RFC PATCH v3 0/3] vfio: platform: return device properties for a
+ platform device
+Date: Wed, 2 Sep 2015 15:42:54 +0200
+Message-ID: <CAN9JPjF8DCmZgcSN2MLVS2JmiRh_PisfAbauCL0_DZRCrTG2pw@mail.gmail.com>
+References: <20150830140638.GB24113@cbox> <55E48897.4090907@linaro.org>
+ <20150831173359.GA10991@cbox> <55E5546C.7040504@linaro.org>
+ <20150901092813.GE10991@cbox>
+ <CAN9JPjGfuv_YOBEdZA_AD13oHej7wMCR50=zQTZmgzHx-jBj_A@mail.gmail.com>
+ <20150901155205.GA19385@cbox>
+ <CAN9JPjFwsiYzR6RtDA-5UZYoNALGu8crXVyA+m6ptsWv=qJi5A@mail.gmail.com>
+ <20150902092128.GG10991@cbox>
+ <CAN9JPjHzPFC1LMuEneXXSYRs1bTXJHZmB6E8Dy+Fp=XRPScEEw@mail.gmail.com>
+ <20150902103259.GI10991@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1439213167-8988-5-git-send-email-zhichao.huang@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: Zhichao Huang <zhichao.huang@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com, huangzhichao@huawei.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9820A419A9
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Sep 2015 09:42:36 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id rEwqpbRCbtUF for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Sep 2015 09:42:34 -0400 (EDT)
+Received: from mail-qk0-f169.google.com (mail-qk0-f169.google.com
+ [209.85.220.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 526F541338
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Sep 2015 09:42:33 -0400 (EDT)
+Received: by qkdv1 with SMTP id v1so5370764qkd.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Sep 2015 06:42:55 -0700 (PDT)
+In-Reply-To: <20150902103259.GI10991@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Linux IOMMU <iommu@lists.linux-foundation.org>, Alex Williamson <alex.williamson@redhat.com>, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>, kvm-arm <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Aug 10, 2015 at 09:25:56PM +0800, Zhichao Huang wrote:
-> As we're about to trap a bunch of CP14 registers, let's rework
-> the CP15 handling so it can be generalized and work with multiple
-> tables.
-> 
-> We stop trapping access here, because we haven't finished our trap
-> handlers. We will enable trapping agian until everything is OK.
-> 
-> Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
-> ---
->  arch/arm/kvm/coproc.c          | 168 ++++++++++++++++++++++++++---------------
->  arch/arm/kvm/interrupts_head.S |   2 +-
->  2 files changed, 110 insertions(+), 60 deletions(-)
-> 
-> diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-> index 4db571d..d23395b 100644
-> --- a/arch/arm/kvm/coproc.c
-> +++ b/arch/arm/kvm/coproc.c
-> @@ -375,6 +375,9 @@ static const struct coproc_reg cp15_regs[] = {
->  	{ CRn(15), CRm( 0), Op1( 4), Op2( 0), is32, access_cbar},
->  };
->  
-> +static const struct coproc_reg cp14_regs[] = {
-> +};
-> +
->  /* Target specific emulation tables */
->  static struct kvm_coproc_target_table *target_tables[KVM_ARM_NUM_TARGETS];
->  
-> @@ -424,43 +427,75 @@ static const struct coproc_reg *find_reg(const struct coproc_params *params,
->  	return NULL;
->  }
->  
-> -static int emulate_cp15(struct kvm_vcpu *vcpu,
-> -			const struct coproc_params *params)
-> +/*
-> + * emulate_cp --  tries to match a cp14/cp15 access in a handling table,
-> + *                and call the corresponding trap handler.
-> + *
-> + * @params: pointer to the descriptor of the access
-> + * @table: array of trap descriptors
-> + * @num: size of the trap descriptor array
-> + *
-> + * Return 0 if the access has been handled, and -1 if not.
-> + */
-> +static int emulate_cp(struct kvm_vcpu *vcpu,
-> +			const struct coproc_params *params,
-> +			const struct coproc_reg *table,
-> +			size_t num)
->  {
-> -	size_t num;
-> -	const struct coproc_reg *table, *r;
-> -
-> -	trace_kvm_emulate_cp15_imp(params->Op1, params->Rt1, params->CRn,
-> -				   params->CRm, params->Op2, params->is_write);
-> +	const struct coproc_reg *r;
->  
-> -	table = get_target_table(vcpu->arch.target, &num);
-> +	if (!table)
-> +		return -1;	/* Not handled */
->  
-> -	/* Search target-specific then generic table. */
->  	r = find_reg(params, table, num);
-> -	if (!r)
-> -		r = find_reg(params, cp15_regs, ARRAY_SIZE(cp15_regs));
->  
-> -	if (likely(r)) {
-> +	if (r) {
->  		/* If we don't have an accessor, we should never get here! */
->  		BUG_ON(!r->access);
->  
->  		if (likely(r->access(vcpu, params, r))) {
->  			/* Skip instruction, since it was emulated */
->  			kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-> -			return 1;
->  		}
-> -		/* If access function fails, it should complain. */
-> -	} else {
-> -		kvm_err("Unsupported guest CP15 access at: %08lx\n",
-> -			*vcpu_pc(vcpu));
-> -		print_cp_instr(params);
-> +
-> +		/* Handled */
-> +		return 0;
->  	}
-> +
-> +	/* Not handled */
-> +	return -1;
-> +}
-> +
-> +static void unhandled_cp_access(struct kvm_vcpu *vcpu,
-> +				const struct coproc_params *params)
-> +{
-> +	u8 hsr_ec = kvm_vcpu_trap_get_class(vcpu);
-> +	int cp;
-> +
-> +	switch (hsr_ec) {
-> +	case HSR_EC_CP15_32:
-> +	case HSR_EC_CP15_64:
-> +		cp = 15;
-> +		break;
-> +	case HSR_EC_CP14_MR:
-> +	case HSR_EC_CP14_64:
-> +		cp = 14;
-> +		break;
-> +	default:
-> +		WARN_ON((cp = -1));
-> +	}
-> +
-> +	kvm_err("Unsupported guest CP%d access at: %08lx\n",
-> +		cp, *vcpu_pc(vcpu));
-> +	print_cp_instr(params);
->  	kvm_inject_undefined(vcpu);
-> -	return 1;
->  }
->  
-> -static int kvm_handle_cp_64(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> -			    bool cp15)
-> +int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
-> +			const struct coproc_reg *global,
-> +			size_t nr_global,
-> +			const struct coproc_reg *target_specific,
-> +			size_t nr_specific)
->  {
->  	struct coproc_params params;
->  
-> @@ -474,37 +509,15 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  	params.Rt2 = (kvm_vcpu_get_hsr(vcpu) >> 10) & 0xf;
->  	params.CRm = 0;
->  
-> -	if (cp15)
-> -		return emulate_cp15(vcpu, &params);
-> +	if (!emulate_cp(vcpu, &params, target_specific, nr_specific))
-> +		return 1;
-> +	if (!emulate_cp(vcpu, &params, global, nr_global))
-> +		return 1;
->  
-> -	/* raz_wi cp14 */
-> -	(void)trap_raz_wi(vcpu, &params, NULL);
-> -
-> -	/* handled */
-> -	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-> +	unhandled_cp_access(vcpu, &params);
->  	return 1;
->  }
->  
-> -/**
-> - * kvm_handle_cp15_64 -- handles a mrrc/mcrr trap on a guest CP15 access
-> - * @vcpu: The VCPU pointer
-> - * @run:  The kvm_run struct
-> - */
-> -int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> -{
-> -	return kvm_handle_cp_64(vcpu, run, 1);
-> -}
-> -
-> -/**
-> - * kvm_handle_cp14_64 -- handles a mrrc/mcrr trap on a guest CP14 access
-> - * @vcpu: The VCPU pointer
-> - * @run:  The kvm_run struct
-> - */
-> -int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> -{
-> -	return kvm_handle_cp_64(vcpu, run, 0);
-> -}
-> -
->  static void reset_coproc_regs(struct kvm_vcpu *vcpu,
->  			      const struct coproc_reg *table, size_t num)
->  {
-> @@ -515,8 +528,11 @@ static void reset_coproc_regs(struct kvm_vcpu *vcpu,
->  			table[i].reset(vcpu, &table[i]);
->  }
->  
-> -static int kvm_handle_cp_32(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> -			      bool cp15)
-> +int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
-> +			const struct coproc_reg *global,
-> +			size_t nr_global,
-> +			const struct coproc_reg *target_specific,
-> +			size_t nr_specific)
->  {
->  	struct coproc_params params;
->  
-> @@ -530,25 +546,57 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  	params.Op2 = (kvm_vcpu_get_hsr(vcpu) >> 17) & 0x7;
->  	params.Rt2 = 0;
->  
-> -	if (cp15)
-> -		return emulate_cp15(vcpu, &params);
-> -
-> -	/* raz_wi cp14 */
-> -	(void)trap_raz_wi(vcpu, &params, NULL);
-> +	if (!emulate_cp(vcpu, &params, target_specific, nr_specific))
-> +		return 1;
-> +	if (!emulate_cp(vcpu, &params, global, nr_global))
-> +		return 1;
->  
-> -	/* handled */
-> -	kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-> +	unhandled_cp_access(vcpu, &params);
->  	return 1;
->  }
->  
->  /**
-> + * kvm_handle_cp15_64 -- handles a mrrc/mcrr trap on a guest CP15 access
-> + * @vcpu: The VCPU pointer
-> + * @run:  The kvm_run struct
-> + */
-> +int kvm_handle_cp15_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +{
-> +	const struct coproc_reg *target_specific;
-> +	size_t num;
-> +
-> +	target_specific = get_target_table(vcpu->arch.target, &num);
-> +	return kvm_handle_cp_64(vcpu,
-> +				cp15_regs, ARRAY_SIZE(cp15_regs),
-> +				target_specific, num);
-> +}
-> +
-> +/**
->   * kvm_handle_cp15_32 -- handles a mrc/mcr trap on a guest CP15 access
->   * @vcpu: The VCPU pointer
->   * @run:  The kvm_run struct
->   */
->  int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  {
-> -	return kvm_handle_cp_32(vcpu, run, 1);
-> +	const struct coproc_reg *target_specific;
-> +	size_t num;
-> +
-> +	target_specific = get_target_table(vcpu->arch.target, &num);
-> +	return kvm_handle_cp_32(vcpu,
-> +				cp15_regs, ARRAY_SIZE(cp15_regs),
-> +				target_specific, num);
-> +}
-> +
-> +/**
-> + * kvm_handle_cp14_64 -- handles a mrrc/mcrr trap on a guest CP14 access
-> + * @vcpu: The VCPU pointer
-> + * @run:  The kvm_run struct
-> + */
-> +int kvm_handle_cp14_64(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +{
-> +	return kvm_handle_cp_64(vcpu,
-> +				cp14_regs, ARRAY_SIZE(cp14_regs),
-> +				NULL, 0);
->  }
->  
->  /**
-> @@ -558,7 +606,9 @@ int kvm_handle_cp15_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
->   */
->  int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  {
-> -	return kvm_handle_cp_32(vcpu, run, 0);
-> +	return kvm_handle_cp_32(vcpu,
-> +				cp14_regs, ARRAY_SIZE(cp14_regs),
-> +				NULL, 0);
->  }
->  
->  /******************************************************************************
-> diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
-> index 7c4075c..7ac5e51 100644
-> --- a/arch/arm/kvm/interrupts_head.S
-> +++ b/arch/arm/kvm/interrupts_head.S
-> @@ -633,7 +633,7 @@ ARM_BE8(rev	r6, r6  )
->   * (hardware reset value is 0) */
->  .macro set_hdcr operation
->  	mrc	p15, 4, r2, c1, c1, 1
-> -	ldr	r3, =(HDCR_TPM|HDCR_TPMCR|HDCR_TDRA|HDCR_TDOSA|HDCR_TDA)
-> +	ldr	r3, =(HDCR_TPM|HDCR_TPMCR)
+On Wed, Sep 2, 2015 at 12:32 PM, Christoffer Dall
+<christoffer.dall@linaro.org> wrote:
+> On Wed, Sep 02, 2015 at 11:49:12AM +0200, Baptiste Reynal wrote:
+>> On Wed, Sep 2, 2015 at 11:21 AM, Christoffer Dall
+>> <christoffer.dall@linaro.org> wrote:
+>> > On Wed, Sep 02, 2015 at 09:21:26AM +0200, Baptiste Reynal wrote:
+>> >> On Tue, Sep 1, 2015 at 5:52 PM, Christoffer Dall
+>> >> <christoffer.dall@linaro.org> wrote:
+>> >> > On Tue, Sep 01, 2015 at 05:32:21PM +0200, Baptiste Reynal wrote:
+>> >> >> Hi everyone,
+>> >> >>
+>> >> >> The usefullness of this patch has already been discussed during the
+>> >> >> first releases (http://lists.linuxfoundation.org/pipermail/iommu/2014-August/009586.html).
+>> >> >> I underline the fact that it avoids implementing the logic on the
+>> >> >> userspace program, as VFIO can be used for many usage (userspace
+>> >> >> drivers and device assignment).
+>> >> >>
+>> >> >> If you're interested in the implementation on the userspace side, an
+>> >> >> RFC has been suggested for QEMU:
+>> >> >> http://lists.gnu.org/archive/html/qemu-devel/2015-01/msg01211.html
+>> >> >
+>> >> > This one-year-old discussion is hardly exhaustive.
+>> >> >
+>> >> > I think you missed the gist of the question for Eric a bit as well.
+>> >> >
+>> >> > One important question for me is whether seeing the host DT is always
+>> >> > sufficient or if the kernel and physical device driver can have more
+>> >> > information about the device and its configuration which userspace may
+>> >> > need, which cannot be directly read in the DT (for example because the
+>> >> > driver has initialized the device in a specific way).  My point is, it's
+>> >> > really not about DT-specific things (what if you used ACPI?), but it's
+>> >> > about retrieving properties of a device and its configuration from
+>> >> > userspace.
+>> >> >
+>> >> > Have we thought about the possible ways to achieve this and weight one
+>> >> > option against the other?
+>> >>
+>> >> Problem is that now we only have a very few platform devices behind an
+>> >> IOMMU, so we don't have the visibility to know if such a case will
+>> >> occur. With the current use cases, the interface seems to be
+>> >> sufficient.
+>> >
+>> > Ideally we can think about future use cases based on the experience of
+>> > people in the community and come up with a solution considering future
+>> > use cases.
+>> >
+>> >> By using IOCTL, we can always change the implementation
+>> >> later without any change on the userspace.
+>> >
+>> > Can you be more concrete with what you mean here?
+>> >
+>>
+>> By using an IOCTL, we define an API that allows to retrieve device
+>> properties from userspace. The way it is retrieved is handled by the
+>> kernel (For example for now if OF is unavailable, the kernel will
+>> retrieve the property using ACPI) and is totally transparent from the
+>> userspace point of view.
+>
+> ok, I thought that this series was targeting device tree specifically,
+> but I see that you changed this approach in v3.
+>
+>>
+>> My point is that we can go with the current naive implementation for
+>> now, and we might extend it later according to the needs of future
+>> devices, without changing anything from the userspace point of view.
+>>
+> fair enough.
+>
+> Is this series exporting properties not already exported through sysfs?
 
-I know I said ok to this, but I don't like the ordering of this with
-these patches.
+Currently not, only OF and ACPI properties are read.
 
-I think we should only stop trapping debug accesses when we have proper
-world-switching in place.
-
-You should be able to put all the infrastructure needed in place first,
-and then hook things up in the end.
-
-Thanks,
--Christoffer
-
->  	.if \operation == vmentry
->  	orr	r2, r2, r3		@ Trap some perfmon accesses
->  	.else
-> -- 
-> 1.7.12.4
-> 
+>
+> -Christoffer
