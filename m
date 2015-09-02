@@ -1,86 +1,252 @@
-From: Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: [RFC PATCH v3 0/3] vfio: platform: return device properties for
-	a platform device
-Date: Wed, 2 Sep 2015 11:21:28 +0200
-Message-ID: <20150902092128.GG10991@cbox>
-References: <1440691887.20355.27.camel@redhat.com>
-	<55DF45D0.5040704@linaro.org> <20150830140638.GB24113@cbox>
-	<55E48897.4090907@linaro.org> <20150831173359.GA10991@cbox>
-	<55E5546C.7040504@linaro.org> <20150901092813.GE10991@cbox>
-	<CAN9JPjGfuv_YOBEdZA_AD13oHej7wMCR50=zQTZmgzHx-jBj_A@mail.gmail.com>
-	<20150901155205.GA19385@cbox>
-	<CAN9JPjFwsiYzR6RtDA-5UZYoNALGu8crXVyA+m6ptsWv=qJi5A@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH 02/14] arm64: Handle section maps for swapper/idmap
+Date: Wed, 2 Sep 2015 11:38:20 +0200
+Message-ID: <CAKv+Gu-0ut3o3iy322tbyqLAmR_gfzoE5272O3U3qSd5Zoh0Hw@mail.gmail.com>
+References: <1439465645-22584-1-git-send-email-suzuki.poulose@arm.com>
+ <1439465645-22584-3-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <CAN9JPjFwsiYzR6RtDA-5UZYoNALGu8crXVyA+m6ptsWv=qJi5A-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-Cc: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Linux IOMMU <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, VirtualOpenSystems Technical Team <tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>, kvm-arm <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E0A9841978
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Sep 2015 05:38:01 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ZqRV9xEyWK05 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Sep 2015 05:38:00 -0400 (EDT)
+Received: from mail-ig0-f174.google.com (mail-ig0-f174.google.com
+ [209.85.213.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 86F1E41973
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Sep 2015 05:38:00 -0400 (EDT)
+Received: by igbkq10 with SMTP id kq10so21088872igb.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Sep 2015 02:38:20 -0700 (PDT)
+In-Reply-To: <1439465645-22584-3-git-send-email-suzuki.poulose@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
+Cc: KVM devel mailing list <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Sep 02, 2015 at 09:21:26AM +0200, Baptiste Reynal wrote:
-> On Tue, Sep 1, 2015 at 5:52 PM, Christoffer Dall
-> <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
-> > On Tue, Sep 01, 2015 at 05:32:21PM +0200, Baptiste Reynal wrote:
-> >> Hi everyone,
-> >>
-> >> The usefullness of this patch has already been discussed during the
-> >> first releases (http://lists.linuxfoundation.org/pipermail/iommu/2014-August/009586.html).
-> >> I underline the fact that it avoids implementing the logic on the
-> >> userspace program, as VFIO can be used for many usage (userspace
-> >> drivers and device assignment).
-> >>
-> >> If you're interested in the implementation on the userspace side, an
-> >> RFC has been suggested for QEMU:
-> >> http://lists.gnu.org/archive/html/qemu-devel/2015-01/msg01211.html
-> >
-> > This one-year-old discussion is hardly exhaustive.
-> >
-> > I think you missed the gist of the question for Eric a bit as well.
-> >
-> > One important question for me is whether seeing the host DT is always
-> > sufficient or if the kernel and physical device driver can have more
-> > information about the device and its configuration which userspace may
-> > need, which cannot be directly read in the DT (for example because the
-> > driver has initialized the device in a specific way).  My point is, it's
-> > really not about DT-specific things (what if you used ACPI?), but it's
-> > about retrieving properties of a device and its configuration from
-> > userspace.
-> >
-> > Have we thought about the possible ways to achieve this and weight one
-> > option against the other?
-> 
-> Problem is that now we only have a very few platform devices behind an
-> IOMMU, so we don't have the visibility to know if such a case will
-> occur. With the current use cases, the interface seems to be
-> sufficient. 
+On 13 August 2015 at 13:33, Suzuki K. Poulose <suzuki.poulose@arm.com> wrote:
+> From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
+>
+> We use section maps with 4K page size to create the
+> swapper/idmaps. So far we have used !64K or 4K checks
+> to handle the case where we use the section maps. This
+> patch adds a symbol to make it clear those cases.
+>
 
-Ideally we can think about future use cases based on the experience of
-people in the community and come up with a solution considering future
-use cases.
+That sentence does not make sense.
 
-> By using IOCTL, we can always change the implementation
-> later without any change on the userspace.
-
-Can you be more concrete with what you mean here?
-
-> 
-> Do you think we can valid the API, then if such a case occurs (when
-> the device informations changes between the device tree and the
-> running state) we can change the kernel implementation ?
-> 
-
-Sorry, I don't understand this paragraph.
-
--Christoffer
+> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> Cc: Will Deacon <will.deacon@arm.com>
+> Signed-off-by: Suzuki K. Poulose <suzuki.poulose@arm.com>
+> ---
+>  arch/arm64/include/asm/kernel-pgtable.h |   31 +++++++++-----
+>  arch/arm64/mm/mmu.c                     |   70 ++++++++++++++-----------------
+>  2 files changed, 51 insertions(+), 50 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kernel-pgtable.h b/arch/arm64/include/asm/kernel-pgtable.h
+> index 622929d..5876a36 100644
+> --- a/arch/arm64/include/asm/kernel-pgtable.h
+> +++ b/arch/arm64/include/asm/kernel-pgtable.h
+> @@ -19,6 +19,13 @@
+>  #ifndef __ASM_KERNEL_PGTABLE_H
+>  #define __ASM_KERNEL_PGTABLE_H
+>
+> +/* With 4K pages, we use section maps. */
+> +#ifdef CONFIG_ARM64_4K_PAGES
+> +#define ARM64_SWAPPER_USES_SECTION_MAPS 1
+> +#else
+> +#define ARM64_SWAPPER_USES_SECTION_MAPS 0
+> +#endif
+> +
+>  /*
+>   * The idmap and swapper page tables need some space reserved in the kernel
+>   * image. Both require pgd, pud (4 levels only) and pmd tables to (section)
+> @@ -28,26 +35,28 @@
+>   * could be increased on the fly if system RAM is out of reach for the default
+>   * VA range, so 3 pages are reserved in all cases.
+>   */
+> -#ifdef CONFIG_ARM64_64K_PAGES
+> -#define SWAPPER_PGTABLE_LEVELS (CONFIG_PGTABLE_LEVELS)
+> -#else
+> +#if ARM64_SWAPPER_USES_SECTION_MAPS
+>  #define SWAPPER_PGTABLE_LEVELS (CONFIG_PGTABLE_LEVELS - 1)
+> +#else
+> +#define SWAPPER_PGTABLE_LEVELS (CONFIG_PGTABLE_LEVELS)
+>  #endif
+>
+>  #define SWAPPER_DIR_SIZE       (SWAPPER_PGTABLE_LEVELS * PAGE_SIZE)
+>  #define IDMAP_DIR_SIZE         (3 * PAGE_SIZE)
+>
+>  /* Initial memory map size */
+> -#ifdef CONFIG_ARM64_64K_PAGES
+> -#define SWAPPER_BLOCK_SHIFT    PAGE_SHIFT
+> -#define SWAPPER_BLOCK_SIZE     PAGE_SIZE
+> -#define SWAPPER_TABLE_SHIFT    PMD_SHIFT
+> -#else
+> +#if ARM64_SWAPPER_USES_SECTION_MAPS
+>  #define SWAPPER_BLOCK_SHIFT    SECTION_SHIFT
+>  #define SWAPPER_BLOCK_SIZE     SECTION_SIZE
+>  #define SWAPPER_TABLE_SHIFT    PUD_SHIFT
+> +#else
+> +#define SWAPPER_BLOCK_SHIFT    PAGE_SHIFT
+> +#define SWAPPER_BLOCK_SIZE     PAGE_SIZE
+> +#define SWAPPER_TABLE_SHIFT    PMD_SHIFT
+>  #endif
+>
+> +/* The size of the initial kernel direct mapping */
+> +#define SWAPPER_INIT_MAP_SIZE  (_AC(1, UL) << SWAPPER_TABLE_SHIFT)
+>
+>  /*
+>   * Initial memory map attributes.
+> @@ -55,10 +64,10 @@
+>  #define SWAPPER_PTE_FLAGS      PTE_TYPE_PAGE | PTE_AF | PTE_SHARED
+>  #define SWAPPER_PMD_FLAGS      PMD_TYPE_SECT | PMD_SECT_AF | PMD_SECT_S
+>
+> -#ifdef CONFIG_ARM64_64K_PAGES
+> -#define SWAPPER_MM_MMUFLAGS    PTE_ATTRINDX(MT_NORMAL) | SWAPPER_PTE_FLAGS
+> -#else
+> +#if ARM64_SWAPPER_USES_SECTION_MAPS
+>  #define SWAPPER_MM_MMUFLAGS    PMD_ATTRINDX(MT_NORMAL) | SWAPPER_PMD_FLAGS
+> +#else
+> +#define SWAPPER_MM_MMUFLAGS    PTE_ATTRINDX(MT_NORMAL) | SWAPPER_PTE_FLAGS
+>  #endif
+>
+>
+> diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+> index 9211b85..71230488 100644
+> --- a/arch/arm64/mm/mmu.c
+> +++ b/arch/arm64/mm/mmu.c
+> @@ -32,6 +32,7 @@
+>
+>  #include <asm/cputype.h>
+>  #include <asm/fixmap.h>
+> +#include <asm/kernel-pgtable.h>
+>  #include <asm/sections.h>
+>  #include <asm/setup.h>
+>  #include <asm/sizes.h>
+> @@ -353,14 +354,11 @@ static void __init map_mem(void)
+>          * memory addressable from the initial direct kernel mapping.
+>          *
+>          * The initial direct kernel mapping, located at swapper_pg_dir, gives
+> -        * us PUD_SIZE (4K pages) or PMD_SIZE (64K pages) memory starting from
+> -        * PHYS_OFFSET (which must be aligned to 2MB as per
+> -        * Documentation/arm64/booting.txt).
+> +        * us PUD_SIZE (with SECTION maps, i.e, 4K) or PMD_SIZE (without
+> +        * SECTION maps, i.e, 64K pages) memory starting from PHYS_OFFSET
+> +        * (which must be aligned to 2MB as per Documentation/arm64/booting.txt).
+>          */
+> -       if (IS_ENABLED(CONFIG_ARM64_64K_PAGES))
+> -               limit = PHYS_OFFSET + PMD_SIZE;
+> -       else
+> -               limit = PHYS_OFFSET + PUD_SIZE;
+> +       limit = PHYS_OFFSET + SWAPPER_INIT_MAP_SIZE;
+>         memblock_set_current_limit(limit);
+>
+>         /* map all the memory banks */
+> @@ -371,21 +369,24 @@ static void __init map_mem(void)
+>                 if (start >= end)
+>                         break;
+>
+> -#ifndef CONFIG_ARM64_64K_PAGES
+> -               /*
+> -                * For the first memory bank align the start address and
+> -                * current memblock limit to prevent create_mapping() from
+> -                * allocating pte page tables from unmapped memory.
+> -                * When 64K pages are enabled, the pte page table for the
+> -                * first PGDIR_SIZE is already present in swapper_pg_dir.
+> -                */
+> -               if (start < limit)
+> -                       start = ALIGN(start, PMD_SIZE);
+> -               if (end < limit) {
+> -                       limit = end & PMD_MASK;
+> -                       memblock_set_current_limit(limit);
+> +               if (ARM64_SWAPPER_USES_SECTION_MAPS) {
+> +                       /*
+> +                        * For the first memory bank align the start address and
+> +                        * current memblock limit to prevent create_mapping() from
+> +                        * allocating pte page tables from unmapped memory. With
+> +                        * the section maps, if the first block doesn't end on section
+> +                        * size boundary, create_mapping() will try to allocate a pte
+> +                        * page, which may be returned from an unmapped area.
+> +                        * When section maps are not used, the pte page table for the
+> +                        * current limit is already present in swapper_pg_dir.
+> +                        */
+> +                       if (start < limit)
+> +                               start = ALIGN(start, SECTION_SIZE);
+> +                       if (end < limit) {
+> +                               limit = end & SECTION_MASK;
+> +                               memblock_set_current_limit(limit);
+> +                       }
+>                 }
+> -#endif
+>                 __map_memblock(start, end);
+>         }
+>
+> @@ -638,7 +639,7 @@ void *__init fixmap_remap_fdt(phys_addr_t dt_phys)
+>  {
+>         const u64 dt_virt_base = __fix_to_virt(FIX_FDT);
+>         pgprot_t prot = PAGE_KERNEL | PTE_RDONLY;
+> -       int granularity, size, offset;
+> +       int size, offset;
+>         void *dt_virt;
+>
+>         /*
+> @@ -664,24 +665,15 @@ void *__init fixmap_remap_fdt(phys_addr_t dt_phys)
+>          */
+>         BUILD_BUG_ON(dt_virt_base % SZ_2M);
+>
+> -       if (IS_ENABLED(CONFIG_ARM64_64K_PAGES)) {
+> -               BUILD_BUG_ON(__fix_to_virt(FIX_FDT_END) >> PMD_SHIFT !=
+> -                            __fix_to_virt(FIX_BTMAP_BEGIN) >> PMD_SHIFT);
+> -
+> -               granularity = PAGE_SIZE;
+> -       } else {
+> -               BUILD_BUG_ON(__fix_to_virt(FIX_FDT_END) >> PUD_SHIFT !=
+> -                            __fix_to_virt(FIX_BTMAP_BEGIN) >> PUD_SHIFT);
+> -
+> -               granularity = PMD_SIZE;
+> -       }
+> +       BUILD_BUG_ON(__fix_to_virt(FIX_FDT_END) >> SWAPPER_TABLE_SHIFT !=
+> +                    __fix_to_virt(FIX_BTMAP_BEGIN) >> SWAPPER_TABLE_SHIFT);
+>
+> -       offset = dt_phys % granularity;
+> +       offset = dt_phys % SWAPPER_BLOCK_SIZE;
+>         dt_virt = (void *)dt_virt_base + offset;
+>
+>         /* map the first chunk so we can read the size from the header */
+> -       create_mapping(round_down(dt_phys, granularity), dt_virt_base,
+> -                      granularity, prot);
+> +       create_mapping(round_down(dt_phys, SWAPPER_BLOCK_SIZE), dt_virt_base,
+> +                      SWAPPER_BLOCK_SIZE, prot);
+>
+>         if (fdt_check_header(dt_virt) != 0)
+>                 return NULL;
+> @@ -690,9 +682,9 @@ void *__init fixmap_remap_fdt(phys_addr_t dt_phys)
+>         if (size > MAX_FDT_SIZE)
+>                 return NULL;
+>
+> -       if (offset + size > granularity)
+> -               create_mapping(round_down(dt_phys, granularity), dt_virt_base,
+> -                              round_up(offset + size, granularity), prot);
+> +       if (offset + size > SWAPPER_BLOCK_SIZE)
+> +               create_mapping(round_down(dt_phys, SWAPPER_BLOCK_SIZE), dt_virt_base,
+> +                              round_up(offset + size, SWAPPER_BLOCK_SIZE), prot);
+>
+>         memblock_reserve(dt_phys, size);
+>
+> --
+> 1.7.9.5
+>
