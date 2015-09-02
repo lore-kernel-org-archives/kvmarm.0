@@ -1,417 +1,257 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: [PATCH v2 5/5] Implement vGICv3 CPU interface access
-Date: Wed, 02 Sep 2015 11:09:49 +0300
-Message-ID: <32a2a871d5ee6c15860b21a73fb26f6372304c4d.1441180858.git.p.fedin@samsung.com>
+Subject: [PATCH v2 3/5] KVM: arm64: Refactor system register handlers
+Date: Wed, 02 Sep 2015 11:09:47 +0300
+Message-ID: <2e6ed446ce8140855bf90cd45248f350d976d4ad.1441180858.git.p.fedin@samsung.com>
 References: <cover.1441180858.git.p.fedin@samsung.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DD4A48AAA
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Sep 2015 04:09:46 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 7trG8yizW25K for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Sep 2015 04:09:37 -0400 (EDT)
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com
+ [210.118.77.11])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8286E48A7F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Sep 2015 04:09:37 -0400 (EDT)
+Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
+ by mailout1.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NU100MJUIOJFT70@mailout1.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Wed, 02 Sep 2015 09:09:55 +0100 (BST)
 In-reply-to: <cover.1441180858.git.p.fedin@samsung.com>
 In-reply-to: <cover.1441180858.git.p.fedin@samsung.com>
 References: <cover.1441180858.git.p.fedin@samsung.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The access is done similar to GICv2, using KVM_DEV_ARM_VGIC_GRP_CPU_REGS
-group, however attribute ID encodes corresponding system register. Access
-size is always 64 bits.
-
-Since CPU interface state actually affects only a single vCPU, no vGIC
-locking is done. Just made sure that the vCPU is not running.
+Replace Rt with data pointer in struct sys_reg_params. This will allow to
+reuse system register handling code in implementation of vGICv3 CPU
+interface access API. Additionally, got rid of "massive hack"
+in kvm_handle_cp_64().
 
 Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
 ---
- Documentation/virtual/kvm/devices/arm-vgic.txt |  38 +++-
- arch/arm64/include/uapi/asm/kvm.h              |   7 +
- include/linux/irqchip/arm-gic-v3.h             |  18 +-
- virt/kvm/arm/vgic-v3-emul.c                    | 246 +++++++++++++++++++++++++
- 4 files changed, 305 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/sys_regs.c            | 51 +++++++++++++++++-------------------
+ arch/arm64/kvm/sys_regs.h            |  4 +--
+ arch/arm64/kvm/sys_regs_generic_v8.c |  2 +-
+ 3 files changed, 27 insertions(+), 30 deletions(-)
 
-diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
-index 43f2627..f7dd916 100644
---- a/Documentation/virtual/kvm/devices/arm-vgic.txt
-+++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
-@@ -89,7 +89,7 @@ Groups:
-     -ENODEV: Getting or setting this register is not yet supported
-     -EBUSY: One or more VCPUs are running
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index b41607d..0a82b9e 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -102,7 +102,7 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
  
--  KVM_DEV_ARM_VGIC_GRP_CPU_REGS
-+  KVM_DEV_ARM_VGIC_GRP_CPU_REGS (vGICv2)
-   Attributes:
-     The attr field of kvm_device_attr encodes two values:
-     bits:     | 63   ....  40 | 39 ..  32  |  31   ....    0 |
-@@ -117,11 +117,45 @@ Groups:
+ 	BUG_ON(!p->is_write);
  
-   Limitations:
-     - Priorities are not implemented, and registers are RAZ/WI
--    - Currently only implemented for KVM_DEV_TYPE_ARM_VGIC_V2.
-   Errors:
-     -ENODEV: Getting or setting this register is not yet supported
-     -EBUSY: One or more VCPUs are running
+-	val = *vcpu_reg(vcpu, p->Rt);
++	val = *p->val;
+ 	if (!p->is_aarch32) {
+ 		vcpu_sys_reg(vcpu, r->reg) = val;
+ 	} else {
+@@ -125,13 +125,10 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
+ 			   const struct sys_reg_params *p,
+ 			   const struct sys_reg_desc *r)
+ {
+-	u64 val;
+-
+ 	if (!p->is_write)
+ 		return read_from_write_only(vcpu, p);
  
-+  KVM_DEV_ARM_VGIC_GRP_CPU_REGS (vGICv3)
-+  Attributes:
-+    The attr field of kvm_device_attr encodes the following values:
-+    bits:   | 63 .. 56 | 55 .. 48 | 47 ... 40 | 39 .. 32 | 31 .. 0 |
-+    values: |   arch   |   size   | reserved  |  cpu id  |  reg id |
-+
-+    All CPU interface regs are (rw, 64-bit). The only supported size value is
-+    KVM_REG_SIZE_U64.
-+
-+    Arch, size and reg id fields actually encode system register to be
-+    accessed. Normally these values are obtained using  ARM64_SYS_REG() macro.
-+    Getting or setting such a register has the same effect as reading or
-+    writing the register on the actual hardware.
-+
-+    The Active Priorities Registers AP0Rn and AP1Rn are implementation defined,
-+    so we set a fixed format for our implementation that fits with the model of
-+    a "GICv3 implementation without the security extensions" which we present
-+    to the guest. This interface always exposes four register APR[0-3]
-+    describing the maximum possible 128 preemption levels. The semantics of the
-+    register indicates if any interrupts in a given preemption level are in the
-+    active state by setting the corresponding bit.
-+
-+    Thus, preemption level X has one or more active interrupts if and only if:
-+
-+      APRn[X mod 32] == 0b1,  where n = X / 32
-+
-+    Bits for undefined preemption levels are RAZ/WI.
-+
-+  Limitations:
-+    - Priorities are not implemented, and registers are RAZ/WI
-+  Errors:
-+    -ENODEV: Getting or setting this register is not yet supported
-+    -EBUSY: One or more VCPUs are running
-+
-+
-   KVM_DEV_ARM_VGIC_GRP_NR_IRQS
-   Attributes:
-     A value describing the number of interrupts (SGI, PPI and SPI) for
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index b7a0a6d..1d052f4 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -201,6 +201,13 @@ struct kvm_arch_memory_slot {
- #define   KVM_DEV_ARM_VGIC_CPUID_MASK	(0xffULL << KVM_DEV_ARM_VGIC_CPUID_SHIFT)
- #define   KVM_DEV_ARM_VGIC_OFFSET_SHIFT	0
- #define   KVM_DEV_ARM_VGIC_OFFSET_MASK	(0xffffffffULL << KVM_DEV_ARM_VGIC_OFFSET_SHIFT)
-+#define   KVM_DEV_ARM_VGIC_REG_MASK	(KVM_REG_SIZE_MASK | \
-+					 KVM_REG_ARM64_SYSREG_OP0_MASK | \
-+					 KVM_REG_ARM64_SYSREG_OP1_MASK | \
-+					 KVM_REG_ARM64_SYSREG_CRN_MASK | \
-+					 KVM_REG_ARM64_SYSREG_CRM_MASK | \
-+					 KVM_REG_ARM64_SYSREG_OP2_MASK)
-+
- #define KVM_DEV_ARM_VGIC_GRP_NR_IRQS	3
- #define KVM_DEV_ARM_VGIC_GRP_CTRL	4
- #define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
-diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
-index 9eeeb95..dbc5c49 100644
---- a/include/linux/irqchip/arm-gic-v3.h
-+++ b/include/linux/irqchip/arm-gic-v3.h
-@@ -259,8 +259,14 @@
- /*
-  * CPU interface registers
-  */
--#define ICC_CTLR_EL1_EOImode_drop_dir	(0U << 1)
--#define ICC_CTLR_EL1_EOImode_drop	(1U << 1)
-+#define ICC_CTLR_EL1_CBPR_SHIFT		0
-+#define ICC_CTLR_EL1_EOImode_SHIFT	1
-+#define ICC_CTLR_EL1_EOImode_drop_dir	(0U << ICC_CTLR_EL1_EOImode_SHIFT)
-+#define ICC_CTLR_EL1_EOImode_drop	(1U << ICC_CTLR_EL1_EOImode_SHIFT)
-+#define ICC_CTLR_EL1_PRIbits_MASK	(7U << 8)
-+#define ICC_CTLR_EL1_IDbits_MASK	(7U << 11)
-+#define ICC_CTLR_EL1_SEIS		(1U << 14)
-+#define ICC_CTLR_EL1_A3V		(1U << 15)
- #define ICC_SRE_EL1_SRE			(1U << 0)
+-	val = *vcpu_reg(vcpu, p->Rt);
+-	vgic_v3_dispatch_sgi(vcpu, val);
++	vgic_v3_dispatch_sgi(vcpu, *p->val);
  
- /*
-@@ -285,6 +291,14 @@
+ 	return true;
+ }
+@@ -153,7 +150,7 @@ static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
+ 	if (p->is_write) {
+ 		return ignore_write(vcpu, p);
+ 	} else {
+-		*vcpu_reg(vcpu, p->Rt) = (1 << 3);
++		*p->val = (1 << 3);
+ 		return true;
+ 	}
+ }
+@@ -167,7 +164,7 @@ static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
+ 	} else {
+ 		u32 val;
+ 		asm volatile("mrs %0, dbgauthstatus_el1" : "=r" (val));
+-		*vcpu_reg(vcpu, p->Rt) = val;
++		*p->val = val;
+ 		return true;
+ 	}
+ }
+@@ -204,10 +201,10 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
+ 			    const struct sys_reg_desc *r)
+ {
+ 	if (p->is_write) {
+-		vcpu_sys_reg(vcpu, r->reg) = *vcpu_reg(vcpu, p->Rt);
++		vcpu_sys_reg(vcpu, r->reg) = *p->val;
+ 		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
+ 	} else {
+-		*vcpu_reg(vcpu, p->Rt) = vcpu_sys_reg(vcpu, r->reg);
++		*p->val = vcpu_sys_reg(vcpu, r->reg);
+ 	}
  
- #define ICH_VMCR_CTLR_SHIFT		0
- #define ICH_VMCR_CTLR_MASK		(0x21f << ICH_VMCR_CTLR_SHIFT)
-+#define ICH_VMCR_ENG0_SHIFT		0
-+#define ICH_VMCR_ENG0			(1 << ICH_VMCR_ENG0_SHIFT)
-+#define ICH_VMCR_ENG1_SHIFT		1
-+#define ICH_VMCR_ENG1			(1 << ICH_VMCR_ENG1_SHIFT)
-+#define ICH_VMCR_CBPR_SHIFT		4
-+#define ICH_VMCR_CBPR			(1 << ICH_VMCR_CBPR_SHIFT)
-+#define ICH_VMCR_EOIM_SHIFT		9
-+#define ICH_VMCR_EOIM			(1 << ICH_VMCR_EOIM_SHIFT)
- #define ICH_VMCR_BPR1_SHIFT		18
- #define ICH_VMCR_BPR1_MASK		(7 << ICH_VMCR_BPR1_SHIFT)
- #define ICH_VMCR_BPR0_SHIFT		21
-diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
-index 66d2b54..c01cc62 100644
---- a/virt/kvm/arm/vgic-v3-emul.c
-+++ b/virt/kvm/arm/vgic-v3-emul.c
-@@ -48,6 +48,7 @@
- #include <asm/kvm_arm.h>
- #include <asm/kvm_mmu.h>
+ 	trace_trap_reg(__func__, r->reg, p->is_write, *vcpu_reg(vcpu, p->Rt));
+@@ -704,10 +701,10 @@ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
+ 		u64 pfr = read_cpuid(ID_AA64PFR0_EL1);
+ 		u32 el3 = !!((pfr >> 12) & 0xf);
  
-+#include "sys_regs.h"
- #include "vgic.h"
+-		*vcpu_reg(vcpu, p->Rt) = ((((dfr >> 20) & 0xf) << 28) |
+-					  (((dfr >> 12) & 0xf) << 24) |
+-					  (((dfr >> 28) & 0xf) << 20) |
+-					  (6 << 16) | (el3 << 14) | (el3 << 12));
++		*p->val = ((((dfr >> 20) & 0xf) << 28) |
++			   (((dfr >> 12) & 0xf) << 24) |
++			   (((dfr >> 28) & 0xf) << 20) |
++			   (6 << 16) | (el3 << 14) | (el3 << 12));
+ 		return true;
+ 	}
+ }
+@@ -717,10 +714,10 @@ static bool trap_debug32(struct kvm_vcpu *vcpu,
+ 			 const struct sys_reg_desc *r)
+ {
+ 	if (p->is_write) {
+-		vcpu_cp14(vcpu, r->reg) = *vcpu_reg(vcpu, p->Rt);
++		vcpu_cp14(vcpu, r->reg) = *p->val;
+ 		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
+ 	} else {
+-		*vcpu_reg(vcpu, p->Rt) = vcpu_cp14(vcpu, r->reg);
++		*p->val = vcpu_cp14(vcpu, r->reg);
+ 	}
  
- static bool handle_mmio_rao_wi(struct kvm_vcpu *vcpu,
-@@ -991,6 +992,249 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg)
- 		vgic_kick_vcpus(vcpu->kvm);
+ 	return true;
+@@ -1069,12 +1066,14 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+ {
+ 	struct sys_reg_params params;
+ 	u32 hsr = kvm_vcpu_get_hsr(vcpu);
++	int Rt = (hsr >> 5) & 0xf;
+ 	int Rt2 = (hsr >> 10) & 0xf;
++	unsigned long val;
+ 
+ 	params.is_aarch32 = true;
+ 	params.is_32bit = false;
+ 	params.CRm = (hsr >> 1) & 0xf;
+-	params.Rt = (hsr >> 5) & 0xf;
++	params.val = &val;
+ 	params.is_write = ((hsr & 1) == 0);
+ 
+ 	params.Op0 = 0;
+@@ -1083,15 +1082,12 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+ 	params.CRn = 0;
+ 
+ 	/*
+-	 * Massive hack here. Store Rt2 in the top 32bits so we only
+-	 * have one register to deal with. As we use the same trap
++	 * Make a 64-bit value out of Rt and Rt2. As we use the same trap
+ 	 * backends between AArch32 and AArch64, we get away with it.
+ 	 */
+ 	if (params.is_write) {
+-		u64 val = *vcpu_reg(vcpu, params.Rt);
+-		val &= 0xffffffff;
++		val = *vcpu_reg(vcpu, Rt) & 0xffffffff;
+ 		val |= *vcpu_reg(vcpu, Rt2) << 32;
+-		*vcpu_reg(vcpu, params.Rt) = val;
+ 	}
+ 
+ 	if (!emulate_cp(vcpu, &params, target_specific, nr_specific))
+@@ -1102,11 +1098,10 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+ 	unhandled_cp_access(vcpu, &params);
+ 
+ out:
+-	/* Do the opposite hack for the read side */
++	/* Split up the value between registers for the read side */
+ 	if (!params.is_write) {
+-		u64 val = *vcpu_reg(vcpu, params.Rt);
+-		val >>= 32;
+-		*vcpu_reg(vcpu, Rt2) = val;
++		*vcpu_reg(vcpu, Rt) = val & 0xffffffff;
++		*vcpu_reg(vcpu, Rt2) = val >> 32;
+ 	}
+ 
+ 	return 1;
+@@ -1125,11 +1120,12 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
+ {
+ 	struct sys_reg_params params;
+ 	u32 hsr = kvm_vcpu_get_hsr(vcpu);
++	int Rt  = (hsr >> 5) & 0xf;
+ 
+ 	params.is_aarch32 = true;
+ 	params.is_32bit = true;
+ 	params.CRm = (hsr >> 1) & 0xf;
+-	params.Rt  = (hsr >> 5) & 0xf;
++	params.val = vcpu_reg(vcpu, Rt);
+ 	params.is_write = ((hsr & 1) == 0);
+ 	params.CRn = (hsr >> 10) & 0xf;
+ 	params.Op0 = 0;
+@@ -1237,6 +1233,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ {
+ 	struct sys_reg_params params;
+ 	unsigned long esr = kvm_vcpu_get_hsr(vcpu);
++	int Rt = (esr >> 5) & 0x1f;
+ 
+ 	trace_kvm_handle_sys_reg(esr);
+ 
+@@ -1247,7 +1244,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	params.CRn = (esr >> 10) & 0xf;
+ 	params.CRm = (esr >> 1) & 0xf;
+ 	params.Op2 = (esr >> 17) & 0x7;
+-	params.Rt = (esr >> 5) & 0x1f;
++	params.val = vcpu_reg(vcpu, Rt);
+ 	params.is_write = !(esr & 1);
+ 
+ 	return emulate_sys_reg(vcpu, &params);
+diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
+index eaa324e..3267518 100644
+--- a/arch/arm64/kvm/sys_regs.h
++++ b/arch/arm64/kvm/sys_regs.h
+@@ -28,7 +28,7 @@ struct sys_reg_params {
+ 	u8	CRn;
+ 	u8	CRm;
+ 	u8	Op2;
+-	u8	Rt;
++	u_long	*val;
+ 	bool	is_write;
+ 	bool	is_aarch32;
+ 	bool	is_32bit;	/* Only valid if is_aarch32 is true */
+@@ -79,7 +79,7 @@ static inline bool ignore_write(struct kvm_vcpu *vcpu,
+ static inline bool read_zero(struct kvm_vcpu *vcpu,
+ 			     const struct sys_reg_params *p)
+ {
+-	*vcpu_reg(vcpu, p->Rt) = 0;
++	*p->val = 0;
+ 	return true;
  }
  
-+static bool access_gic_ctlr(struct kvm_vcpu *vcpu,
-+			    const struct sys_reg_params *p,
-+			    const struct sys_reg_desc *r)
-+{
-+	u64 val;
-+	struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
-+
-+	if (p->is_write) {
-+		val = *p->val;
-+
-+		vgicv3->vgic_vmcr &= ~(ICH_VMCR_CBPR|ICH_VMCR_EOIM);
-+		vgicv3->vgic_vmcr |= (val << (ICH_VMCR_CBPR_SHIFT -
-+						ICC_CTLR_EL1_CBPR_SHIFT)) &
-+					ICH_VMCR_CBPR;
-+		vgicv3->vgic_vmcr |= (val << (ICH_VMCR_EOIM_SHIFT -
-+						ICC_CTLR_EL1_EOImode_SHIFT)) &
-+					ICH_VMCR_EOIM;
-+	} else {
-+		asm volatile("mrs_s %0," __stringify(ICC_IAR1_EL1)
-+			     : "=r" (val));
-+		val &= (ICC_CTLR_EL1_A3V | ICC_CTLR_EL1_SEIS |
-+			ICC_CTLR_EL1_IDbits_MASK | ICC_CTLR_EL1_PRIbits_MASK);
-+		val |= (vgicv3->vgic_vmcr & ICH_VMCR_CBPR) >>
-+			(ICH_VMCR_CBPR_SHIFT - ICC_CTLR_EL1_CBPR_SHIFT);
-+		val |= (vgicv3->vgic_vmcr & ICH_VMCR_EOIM) >>
-+			(ICH_VMCR_EOIM_SHIFT - ICC_CTLR_EL1_EOImode_SHIFT);
-+
-+		*p->val = val;
-+	}
-+
-+	return true;
-+}
-+
-+static bool access_gic_pmr(struct kvm_vcpu *vcpu,
-+			   const struct sys_reg_params *p,
-+			   const struct sys_reg_desc *r)
-+{
-+	struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
-+
-+	if (p->is_write) {
-+		vgicv3->vgic_vmcr &= ~ICH_VMCR_PMR_MASK;
-+		vgicv3->vgic_vmcr |= (*p->val << ICH_VMCR_PMR_SHIFT) &
-+					ICH_VMCR_PMR_MASK;
-+	} else {
-+		*p->val = (vgicv3->vgic_vmcr & ICH_VMCR_PMR_MASK) >>
-+			  ICH_VMCR_PMR_SHIFT;
-+	}
-+
-+	return true;
-+}
-+
-+static bool access_gic_bpr0(struct kvm_vcpu *vcpu,
-+			    const struct sys_reg_params *p,
-+			    const struct sys_reg_desc *r)
-+{
-+	struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
-+
-+	if (p->is_write) {
-+		vgicv3->vgic_vmcr &= ~ICH_VMCR_BPR0_MASK;
-+		vgicv3->vgic_vmcr |= (*p->val << ICH_VMCR_BPR0_SHIFT) &
-+				     ICH_VMCR_BPR0_MASK;
-+	} else {
-+		*p->val = (vgicv3->vgic_vmcr & ICH_VMCR_BPR0_MASK) >>
-+			  ICH_VMCR_BPR0_SHIFT;
-+	}
-+
-+	return true;
-+}
-+
-+static bool access_gic_bpr1(struct kvm_vcpu *vcpu,
-+			    const struct sys_reg_params *p,
-+			    const struct sys_reg_desc *r)
-+{
-+	struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
-+
-+	if (p->is_write) {
-+		vgicv3->vgic_vmcr &= ~ICH_VMCR_BPR1_MASK;
-+		vgicv3->vgic_vmcr |= (*p->val << ICH_VMCR_BPR1_SHIFT) &
-+				     ICH_VMCR_BPR1_MASK;
-+	} else {
-+		*p->val = (vgicv3->vgic_vmcr & ICH_VMCR_BPR1_MASK) >>
-+			  ICH_VMCR_BPR1_SHIFT;
-+	}
-+
-+	return true;
-+}
-+
-+static bool access_gic_grpen0(struct kvm_vcpu *vcpu,
-+			      const struct sys_reg_params *p,
-+			      const struct sys_reg_desc *r)
-+{
-+	struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
-+
-+	if (p->is_write) {
-+		vgicv3->vgic_vmcr &= ~ICH_VMCR_ENG0;
-+		vgicv3->vgic_vmcr |= (*p->val << ICH_VMCR_ENG0_SHIFT) &
-+				     ICH_VMCR_ENG0;
-+	} else {
-+		*p->val = (vgicv3->vgic_vmcr & ICH_VMCR_ENG0) >>
-+			  ICH_VMCR_ENG0_SHIFT;
-+	}
-+
-+	return true;
-+}
-+
-+static bool access_gic_grpen1(struct kvm_vcpu *vcpu,
-+			      const struct sys_reg_params *p,
-+			      const struct sys_reg_desc *r)
-+{
-+	struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
-+
-+	if (p->is_write) {
-+		vgicv3->vgic_vmcr &= ~ICH_VMCR_ENG1;
-+		vgicv3->vgic_vmcr |= (*p->val << ICH_VMCR_ENG1_SHIFT) &
-+				     ICH_VMCR_ENG1;
-+	} else {
-+		*p->val = (vgicv3->vgic_vmcr & ICH_VMCR_ENG1) >>
-+			  ICH_VMCR_ENG1_SHIFT;
-+	}
-+
-+	return true;
-+}
-+
-+static bool access_gic_ap0r(struct kvm_vcpu *vcpu,
-+			      const struct sys_reg_params *p,
-+			      const struct sys_reg_desc *r)
-+{
-+	struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
-+	u8 idx = r->Op2 & 3;
-+
-+	if (p->is_write) {
-+		vgicv3->vgic_ap0r[idx] = *p->val;
-+	} else {
-+		*p->val = vgicv3->vgic_ap0r[idx];
-+	}
-+
-+	return true;
-+}
-+
-+static bool access_gic_ap1r(struct kvm_vcpu *vcpu,
-+			      const struct sys_reg_params *p,
-+			      const struct sys_reg_desc *r)
-+{
-+	struct vgic_v3_cpu_if *vgicv3 = &vcpu->arch.vgic_cpu.vgic_v3;
-+	u8 idx = r->Op2 & 3;
-+
-+	if (p->is_write) {
-+		vgicv3->vgic_ap0r[idx] = *p->val;
-+	} else {
-+		*p->val = vgicv3->vgic_ap0r[idx];
-+	}
-+
-+	return true;
-+}
-+
-+static const struct sys_reg_desc gic_v3_icc_reg_descs[] = {
-+	/* ICC_PMR_EL1 */
-+	{ Op0(0b11), Op1(0b000), CRn(0b0100), CRm(0b0110), Op2(0b000),
-+	  access_gic_pmr },
-+	/* ICC_BPR0_EL1 */
-+	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1000), Op2(0b011),
-+	  access_gic_bpr0 },
-+	/* ICC_AP0R0_EL1 */
-+        { Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1000), Op2(0b100),
-+	  access_gic_ap0r },
-+	/* ICC_AP0R1_EL1 */
-+        { Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1000), Op2(0b101),
-+	  access_gic_ap0r },
-+	/* ICC_AP0R2_EL1 */
-+        { Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1000), Op2(0b110),
-+	  access_gic_ap0r },
-+	/* ICC_AP0R3_EL1 */
-+        { Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1000), Op2(0b111),
-+	  access_gic_ap0r },
-+	/* ICC_AP1R0_EL1 */
-+        { Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1001), Op2(0b000),
-+	  access_gic_ap1r },
-+	/* ICC_AP1R1_EL1 */
-+        { Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1001), Op2(0b001),
-+	  access_gic_ap1r },
-+	/* ICC_AP1R2_EL1 */
-+        { Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1001), Op2(0b010),
-+	  access_gic_ap1r },
-+	/* ICC_AP1R3_EL1 */
-+        { Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1001), Op2(0b011),
-+	  access_gic_ap1r },
-+	/* ICC_BPR1_EL1 */
-+	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1100), Op2(0b011),
-+	  access_gic_bpr1 },
-+	/* ICC_CTLR_EL1 */
-+	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1100), Op2(0b100),
-+	  access_gic_ctlr },
-+	/* ICC_IGRPEN0_EL1 */
-+	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1100), Op2(0b110),
-+	  access_gic_grpen0 },
-+	/* ICC_GRPEN1_EL1 */
-+	{ Op0(0b11), Op1(0b000), CRn(0b1100), CRm(0b1100), Op2(0b111),
-+	  access_gic_grpen1 },
-+};
-+
-+static int vgic_v3_cpu_regs_access(struct kvm_device *dev,
-+				   struct kvm_device_attr *attr,
-+				   bool is_write, int cpuid)
-+{
-+	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
-+	u64 id = attr->attr & KVM_DEV_ARM_VGIC_REG_MASK;
-+	struct kvm_vcpu *vcpu;
-+	struct sys_reg_params params;
-+	u_long reg;
-+	const struct sys_reg_desc *r;
-+
-+	params.val = &reg;
-+	params.is_write = is_write;
-+	params.is_aarch32 = false;
-+	params.is_32bit = false;
-+
-+	r = find_reg_by_id(id, &params, gic_v3_icc_reg_descs,
-+			   ARRAY_SIZE(gic_v3_icc_reg_descs));
-+	if (!r)
-+		return -ENXIO;
-+
-+	if (is_write) {
-+		if (get_user(reg, uaddr))
-+			return -EFAULT;
-+	}
-+
-+	if (cpuid >= atomic_read(&dev->kvm->online_vcpus))
-+		return -EINVAL;
-+
-+	vcpu = kvm_get_vcpu(dev->kvm, cpuid);
-+	/* Ensure that VCPU is not running */
-+	if (unlikely(vcpu->cpu != -1))
-+			return -EBUSY;
-+
-+	if (!r->access(vcpu, &params, r))
-+		return -EINVAL;
-+
-+	if (!is_write)
-+		return put_user(reg, uaddr);
-+
-+	return 0;
-+}
-+
- static int vgic_v3_attr_regs_access(struct kvm_device *dev,
- 				    struct kvm_device_attr *attr,
- 				    bool is_write)
-@@ -1015,6 +1259,8 @@ static int vgic_v3_attr_regs_access(struct kvm_device *dev,
- 		mmio.phys_addr = vgic->vgic_redist_base;
- 		ranges = vgic_redist_ranges;
- 		break;
-+	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
-+		return vgic_v3_cpu_regs_access(dev, attr, is_write, cpuid);
- 	default:
- 		return -ENXIO;
- 	}
+diff --git a/arch/arm64/kvm/sys_regs_generic_v8.c b/arch/arm64/kvm/sys_regs_generic_v8.c
+index 1e45768..c805576 100644
+--- a/arch/arm64/kvm/sys_regs_generic_v8.c
++++ b/arch/arm64/kvm/sys_regs_generic_v8.c
+@@ -37,7 +37,7 @@ static bool access_actlr(struct kvm_vcpu *vcpu,
+ 	if (p->is_write)
+ 		return ignore_write(vcpu, p);
+ 
+-	*vcpu_reg(vcpu, p->Rt) = vcpu_sys_reg(vcpu, ACTLR_EL1);
++	*p->val = vcpu_sys_reg(vcpu, ACTLR_EL1);
+ 	return true;
+ }
+ 
 -- 
 2.4.4
-
