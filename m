@@ -1,278 +1,97 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 10/15] KVM: arm: implement world switch for debug
- registers
-Date: Wed, 2 Sep 2015 16:53:27 +0200
-Message-ID: <20150902145327.GL10991@cbox>
+Subject: Re: [PATCH v4 09/15] KVM: arm: redefine kvm_cpu_context_t to save
+ the host cp14 states
+Date: Wed, 2 Sep 2015 16:54:22 +0200
+Message-ID: <20150902145422.GM10991@cbox>
 References: <1439213167-8988-1-git-send-email-zhichao.huang@linaro.org>
- <1439213167-8988-11-git-send-email-zhichao.huang@linaro.org>
+ <1439213167-8988-10-git-send-email-zhichao.huang@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1439213167-8988-11-git-send-email-zhichao.huang@linaro.org>
+In-Reply-To: <1439213167-8988-10-git-send-email-zhichao.huang@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Zhichao Huang <zhichao.huang@linaro.org>
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com, huangzhichao@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Aug 10, 2015 at 09:26:02PM +0800, Zhichao Huang wrote:
-> Implement switching of the debug registers. While the number
-> of registers is massive, CPUs usually don't implement them all
-> (A15 has 6 breakpoints and 4 watchpoints, which gives us a total
-> of 22 registers "only").
+On Mon, Aug 10, 2015 at 09:26:01PM +0800, Zhichao Huang wrote:
+> Redefine kvm_cpu_context_t as a new struct that include the cp14 states,
+> which we used to save the host cp14 states.
 > 
 > Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
 > ---
->  arch/arm/kvm/interrupts_head.S | 170 ++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 159 insertions(+), 11 deletions(-)
+>  arch/arm/include/asm/kvm_host.h | 6 +++++-
+>  arch/arm/kernel/asm-offsets.c   | 4 +++-
+>  arch/arm/kvm/interrupts.S       | 6 ++++--
+>  3 files changed, 12 insertions(+), 4 deletions(-)
 > 
-> diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
-> index 7ac5e51..b9e7410 100644
-> --- a/arch/arm/kvm/interrupts_head.S
-> +++ b/arch/arm/kvm/interrupts_head.S
-> @@ -5,6 +5,7 @@
->  #define VCPU_USR_SP		(VCPU_USR_REG(13))
->  #define VCPU_USR_LR		(VCPU_USR_REG(14))
->  #define CP15_OFFSET(_cp15_reg_idx) (VCPU_CP15 + (_cp15_reg_idx * 4))
-> +#define CP14_OFFSET(_cp14_reg_idx) ((_cp14_reg_idx) * 4)
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 63ac005..fc461ac 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -91,7 +91,11 @@ struct kvm_vcpu_fault_info {
+>  	u32 hyp_pc;		/* PC when exception was taken from Hyp mode */
+>  };
 >  
->  /*
->   * Many of these macros need to access the VCPU structure, which is always
-> @@ -239,6 +240,136 @@ vcpu	.req	r0		@ vcpu pointer always in r0
->  	save_guest_regs_mode irq, #VCPU_IRQ_REGS
->  .endm
+> -typedef struct vfp_hard_struct kvm_cpu_context_t;
+> +struct kvm_cpu_context {
+> +	struct vfp_hard_struct vfp;
+> +	u32 cp14[NR_CP14_REGS];
+> +};
+> +typedef struct kvm_cpu_context kvm_cpu_context_t;
 >  
-> +/* Assume r10/r11/r12 are in use, clobbers r2-r3 */
-> +.macro cp14_read_and_str base Op2 cp14_reg0 skip_num
-> +	adr	r3, 1f
-> +	add	r3, r3, \skip_num, lsl #3
+>  struct kvm_vcpu_arch {
+>  	struct kvm_regs regs;
+> diff --git a/arch/arm/kernel/asm-offsets.c b/arch/arm/kernel/asm-offsets.c
+> index 9158de0..cee4254 100644
+> --- a/arch/arm/kernel/asm-offsets.c
+> +++ b/arch/arm/kernel/asm-offsets.c
+> @@ -175,7 +175,9 @@ int main(void)
+>    DEFINE(VCPU_CP14,		offsetof(struct kvm_vcpu, arch.cp14));
+>    DEFINE(VCPU_CP15,		offsetof(struct kvm_vcpu, arch.cp15));
+>    DEFINE(VCPU_VFP_GUEST,	offsetof(struct kvm_vcpu, arch.vfp_guest));
+> -  DEFINE(VCPU_VFP_HOST,		offsetof(struct kvm_vcpu, arch.host_cpu_context));
+> +  DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
+> +  DEFINE(VCPU_VFP_HOST,		offsetof(struct kvm_cpu_context, vfp));
+> +  DEFINE(VCPU_CP14_HOST,	offsetof(struct kvm_cpu_context, cp14));
 
-can this code be compiled in Thumb-2 ?  If so, are all the instructions
-below 32-bit wide?
+it's a bit weird to call these last two VCPU_ something when they're not
+offsets of the vcpu struct...
 
-> +	bx	r3
-> +1:
-> +	mrc	p14, 0, r2, c0, c15, \Op2
-> +	str     r2, [\base, #CP14_OFFSET(\cp14_reg0+15)]
-> +	mrc	p14, 0, r2, c0, c14, \Op2
-> +	str     r2, [\base, #CP14_OFFSET(\cp14_reg0+14)]
-> +	mrc	p14, 0, r2, c0, c13, \Op2
-> +	str     r2, [\base, #CP14_OFFSET(\cp14_reg0+13)]
-> +	mrc	p14, 0, r2, c0, c12, \Op2
-> +	str     r2, [\base, #CP14_OFFSET(\cp14_reg0+12)]
-> +	mrc	p14, 0, r2, c0, c11, \Op2
-> +	str     r2, [\base, #CP14_OFFSET(\cp14_reg0+11)]
-> +	mrc	p14, 0, r2, c0, c10, \Op2
-> +	str     r2, [\base, #CP14_OFFSET(\cp14_reg0+10)]
-> +	mrc	p14, 0, r2, c0, c9, \Op2
-> +	str     r2, [\base, #CP14_OFFSET(\cp14_reg0+9)]
-> +	mrc	p14, 0, r2, c0, c8, \Op2
-> +	str     r2, [\base, #CP14_OFFSET(\cp14_reg0+8)]
-> +	mrc	p14, 0, r2, c0, c7, \Op2
-> +	str     r2, [\base, #CP14_OFFSET(\cp14_reg0+7)]
-> +	mrc	p14, 0, r2, c0, c6, \Op2
-> +	str     r2, [\base, #CP14_OFFSET(\cp14_reg0+6)]
-> +	mrc	p14, 0, r2, c0, c5, \Op2
-> +	str     r2, [\base, #CP14_OFFSET(\cp14_reg0+5)]
-> +	mrc	p14, 0, r2, c0, c4, \Op2
-> +	str     r2, [\base, #CP14_OFFSET(\cp14_reg0+4)]
-> +	mrc	p14, 0, r2, c0, c3, \Op2
-> +	str     r2, [\base, #CP14_OFFSET(\cp14_reg0+3)]
-> +	mrc	p14, 0, r2, c0, c2, \Op2
-> +	str     r2, [\base, #CP14_OFFSET(\cp14_reg0+2)]
-> +	mrc	p14, 0, r2, c0, c1, \Op2
-> +	str     r2, [\base, #CP14_OFFSET(\cp14_reg0+1)]
-> +	mrc	p14, 0, r2, c0, c0, \Op2
-> +	str     r2, [\base, #CP14_OFFSET(\cp14_reg0)]
-> +.endm
-> +
-> +/* Assume r11/r12 are in use, clobbers r2-r3 */
-> +.macro cp14_ldr_and_write base Op2 cp14_reg0 skip_num
-> +	adr	r3, 1f
-> +	add	r3, r3, \skip_num, lsl #3
-
-see above
-
-> +	bx	r3
-> +1:
-> +	ldr     r2, [\base, #CP14_OFFSET(\cp14_reg0+15)]
-> +	mcr	p14, 0, r2, c0, c15, \Op2
-> +	ldr     r2, [\base, #CP14_OFFSET(\cp14_reg0+14)]
-> +	mcr	p14, 0, r2, c0, c14, \Op2
-> +	ldr     r2, [\base, #CP14_OFFSET(\cp14_reg0+13)]
-> +	mcr	p14, 0, r2, c0, c13, \Op2
-> +	ldr     r2, [\base, #CP14_OFFSET(\cp14_reg0+12)]
-> +	mcr	p14, 0, r2, c0, c12, \Op2
-> +	ldr     r2, [\base, #CP14_OFFSET(\cp14_reg0+11)]
-> +	mcr	p14, 0, r2, c0, c11, \Op2
-> +	ldr     r2, [\base, #CP14_OFFSET(\cp14_reg0+10)]
-> +	mcr	p14, 0, r2, c0, c10, \Op2
-> +	ldr     r2, [\base, #CP14_OFFSET(\cp14_reg0+9)]
-> +	mcr	p14, 0, r2, c0, c9, \Op2
-> +	ldr     r2, [\base, #CP14_OFFSET(\cp14_reg0+8)]
-> +	mcr	p14, 0, r2, c0, c8, \Op2
-> +	ldr     r2, [\base, #CP14_OFFSET(\cp14_reg0+7)]
-> +	mcr	p14, 0, r2, c0, c7, \Op2
-> +	ldr     r2, [\base, #CP14_OFFSET(\cp14_reg0+6)]
-> +	mcr	p14, 0, r2, c0, c6, \Op2
-> +	ldr     r2, [\base, #CP14_OFFSET(\cp14_reg0+5)]
-> +	mcr	p14, 0, r2, c0, c5, \Op2
-> +	ldr     r2, [\base, #CP14_OFFSET(\cp14_reg0+4)]
-> +	mcr	p14, 0, r2, c0, c4, \Op2
-> +	ldr     r2, [\base, #CP14_OFFSET(\cp14_reg0+3)]
-> +	mcr	p14, 0, r2, c0, c3, \Op2
-> +	ldr     r2, [\base, #CP14_OFFSET(\cp14_reg0+2)]
-> +	mcr	p14, 0, r2, c0, c2, \Op2
-> +	ldr     r2, [\base, #CP14_OFFSET(\cp14_reg0+1)]
-> +	mcr	p14, 0, r2, c0, c1, \Op2
-> +	ldr     r2, [\base, #CP14_OFFSET(\cp14_reg0)]
-> +	mcr	p14, 0, r2, c0, c0, \Op2
-> +.endm
-> +
-> +/* Get extract number of BRPs and WRPs. Saved in r11/r12 */
-> +.macro read_hw_dbg_num
-> +	mrc	p14, 0, r2, c0, c0, 0
-
-can you add @ DBGDIDR here, so we know which register we are looking at?
-
-> +	ubfx	r11, r2, #24, #4
-> +	add	r11, r11, #1		@ Extract BRPs
-> +	ubfx	r12, r2, #28, #4
-> +	add	r12, r12, #1		@ Extract WRPs
-> +	mov	r2, #16
-> +	sub	r11, r2, r11		@ How many BPs to skip
-> +	sub	r12, r2, r12		@ How many WPs to skip
-> +.endm
-> +
-> +/* Reads cp14 registers from hardware.
-> + * Writes cp14 registers in-order to the CP14 struct pointed to by r10
-> + *
-> + * Assumes vcpu pointer in vcpu reg
-> + *
-> + * Clobbers r2-r12
-> + */
-> +.macro save_debug_state
-> +	read_hw_dbg_num
-> +	cp14_read_and_str r10, 4, cp14_DBGBVR0, r11
-> +	cp14_read_and_str r10, 5, cp14_DBGBCR0, r11
-> +	cp14_read_and_str r10, 6, cp14_DBGWVR0, r12
-> +	cp14_read_and_str r10, 7, cp14_DBGWCR0, r12
-> +
-> +	/* DBGDSCR reg */
-> +	mrc	p14, 0, r2, c0, c1, 0
-> +	str	r2, [r10, #CP14_OFFSET(cp14_DBGDSCRext)]
-
-so again we're touching the scary register on every world-switch.  Since
-it sounds like we have experience telling us that this can cause
-troubles, I'm wondering if we can get around it by:
-
-Only ever allow the guest to use debugging registers if we managed to
-enter_monitor_mode on the host, and in that case only allow guest
-debugging with the configuration of DBGDSCR that the host has.
-
-If the host never managed to enable debugging, the guest probably won't
-succeed either, and we should just trap all guest accesses to the debug
-registers.
-
-Does this work?
-
-> +.endm
-> +
-> +/* Reads cp14 registers in-order from the CP14 struct pointed to by r10
-> + * Writes cp14 registers to hardware.
-> + *
-> + * Assumes vcpu pointer in vcpu reg
-> + *
-> + * Clobbers r2-r12
-> + */
-> +.macro restore_debug_state
-> +	read_hw_dbg_num
-> +	cp14_ldr_and_write r10, 4, cp14_DBGBVR0, r11
-> +	cp14_ldr_and_write r10, 5, cp14_DBGBCR0, r11
-> +	cp14_ldr_and_write r10, 6, cp14_DBGWVR0, r12
-> +	cp14_ldr_and_write r10, 7, cp14_DBGWCR0, r12
-> +
-> +	/* DBGDSCR reg */
-> +	ldr	r2, [r10, #CP14_OFFSET(cp14_DBGDSCRext)]
-> +	mcr	p14, 0, r2, c0, c2, 2
-
-same as above
-
-> +.endm
-> +
->  /* Reads cp14/cp15 registers from hardware and stores them in memory
->   * @store_to_vcpu: If 0, registers are written in-order to the stack,
->   * 		   otherwise to the VCPU struct pointed to by vcpup
-> @@ -248,11 +379,17 @@ vcpu	.req	r0		@ vcpu pointer always in r0
->   * Clobbers r2 - r12
->   */
->  .macro read_coproc_state store_to_vcpu
-> -	.if \store_to_vcpu == 0
-> -	mrc	p14, 0, r2, c0, c1, 0	@ DBGDSCR
-> -	push	{r2}
-> +	.if \store_to_vcpu == 1
-> +	add	r10, vcpu, #VCPU_CP14
-> +	.else
-> +	add	r10, vcpu, #VCPU_HOST_CONTEXT
-> +	ldr	r10, [r10]
-> +	add	r10, r10, #VCPU_CP14_HOST
->  	.endif
+>    DEFINE(VCPU_REGS,		offsetof(struct kvm_vcpu, arch.regs));
+>    DEFINE(VCPU_USR_REGS,		offsetof(struct kvm_vcpu, arch.regs.usr_regs));
+>    DEFINE(VCPU_SVC_REGS,		offsetof(struct kvm_vcpu, arch.regs.svc_regs));
+> diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
+> index 48333ff..d4ff22e 100644
+> --- a/arch/arm/kvm/interrupts.S
+> +++ b/arch/arm/kvm/interrupts.S
+> @@ -176,8 +176,9 @@ __kvm_vcpu_return:
+>  	@ Switch VFP/NEON hardware state to the host's
+>  	add	r7, vcpu, #VCPU_VFP_GUEST
+>  	store_vfp_state r7
+> -	add	r7, vcpu, #VCPU_VFP_HOST
+> +	add	r7, vcpu, #VCPU_HOST_CONTEXT
+>  	ldr	r7, [r7]
+> +	add	r7, r7, #VCPU_VFP_HOST
+>  	restore_vfp_state r7
 >  
-> +	/* Assumes r10 pointer in cp14 regs  */
-> +	bl __save_debug_state
-> +
->  	mrc	p15, 0, r2, c1, c0, 0	@ SCTLR
->  	mrc	p15, 0, r3, c1, c0, 2	@ CPACR
->  	mrc	p15, 0, r4, c2, c0, 2	@ TTBCR
-> @@ -331,6 +468,17 @@ vcpu	.req	r0		@ vcpu pointer always in r0
->   * Assumes vcpu pointer in vcpu reg
->   */
->  .macro write_coproc_state read_from_vcpu
-> +	.if \read_from_vcpu == 1
-> +	add	r10, vcpu, #VCPU_CP14
-> +	.else
-> +	add	r10, vcpu, #VCPU_HOST_CONTEXT
-> +	ldr	r10, [r10]
-> +	add	r10, r10, #VCPU_CP14_HOST
-> +	.endif
-> +
-> +	/* Assumes r10 pointer in cp14 regs  */
-> +	bl __restore_debug_state
-> +
->  	.if \read_from_vcpu == 0
->  	pop	{r2,r4-r7}
->  	.else
-> @@ -399,14 +547,6 @@ vcpu	.req	r0		@ vcpu pointer always in r0
->  	mcr	p15, 0, r10, c10, c2, 0	@ PRRR
->  	mcr	p15, 0, r11, c10, c2, 1	@ NMRR
->  	mcr	p15, 2, r12, c0, c0, 0	@ CSSELR
-> -
-> -	.if \read_from_vcpu == 0
-> -	pop	{r2}
-> -	.else
-> -	mov	r2, #0
-> -	.endif
-> -
-> -	mcr	p14, 0, r2, c0, c2, 2	@ DBGDSCR
->  .endm
+>  after_vfp_restore:
+> @@ -484,8 +485,9 @@ switch_to_guest_vfp:
+>  	set_hcptr vmtrap, (HCPTR_TCP(10) | HCPTR_TCP(11))
 >  
->  /*
-> @@ -657,3 +797,11 @@ ARM_BE8(rev	r6, r6  )
->  .macro load_vcpu
->  	mrc	p15, 4, vcpu, c13, c0, 2	@ HTPIDR
->  .endm
-> +
-> +__save_debug_state:
-> +	save_debug_state
-> +	bx	lr
-> +
-> +__restore_debug_state:
-> +	restore_debug_state
-> +	bx	lr
+>  	@ Switch VFP/NEON hardware state to the guest's
+> -	add	r7, r0, #VCPU_VFP_HOST
+> +	add	r7, r0, #VCPU_HOST_CONTEXT
+>  	ldr	r7, [r7]
+> +	add	r7, r7, #VCPU_VFP_HOST
+>  	store_vfp_state r7
+>  	add	r7, r0, #VCPU_VFP_GUEST
+>  	restore_vfp_state r7
 > -- 
 > 1.7.12.4
 > 
 
-The rest of the register mangling looks ok this time though.
+Otherwise this look ok.
 
 -Christoffer
