@@ -1,102 +1,199 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH 12/14] arm64: Check for selected granule support
-Date: Wed, 2 Sep 2015 12:19:07 +0200
-Message-ID: <CAKv+Gu-eWRcFQkn_99WF_3H=u8qAAVis60SuegdxyeYK3v5QdQ@mail.gmail.com>
-References: <1439465645-22584-1-git-send-email-suzuki.poulose@arm.com>
-	<1439465645-22584-13-git-send-email-suzuki.poulose@arm.com>
-	<CAPvkgC3=S1BxdzZM4uUOmyXLjii48SMpCof6i6HdNeTG_fydfg@mail.gmail.com>
-	<55CCAD73.7080702@arm.com>
-	<20150813172946.GD4602@e104818-lin.cambridge.arm.com>
-	<CAKv+Gu8vfsL+SFqgsXESfYC5a90-rnHbLqVFuOkvDXTt2b1E3Q@mail.gmail.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH] ARM/ARM64: KVM: remove 'config KVM_ARM_MAX_VCPUS'
+Date: Wed, 2 Sep 2015 12:25:55 +0200
+Message-ID: <20150902102555.GH10991@cbox>
+References: <1441175481-18348-1-git-send-email-ming.lei@canonical.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu8vfsL+SFqgsXESfYC5a90-rnHbLqVFuOkvDXTt2b1E3Q@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: "Suzuki K. Poulose" <Suzuki.Poulose@arm.com>, Steve Capper <steve.capper@linaro.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Will Deacon <Will.Deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1441175481-18348-1-git-send-email-ming.lei@canonical.com>
+Sender: kvm-owner@vger.kernel.org
+To: Ming Lei <ming.lei@canonical.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, Dann Frazier <dann.frazier@canonical.com>, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 2 September 2015 at 11:48, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> On 13 August 2015 at 19:29, Catalin Marinas <catalin.marinas@arm.com> wrote:
->> On Thu, Aug 13, 2015 at 03:45:07PM +0100, Suzuki K. Poulose wrote:
->>> On 13/08/15 13:28, Steve Capper wrote:
->>> >On 13 August 2015 at 12:34, Suzuki K. Poulose <suzuki.poulose@arm.com> wrote:
->>> >>  __enable_mmu:
->>> >>+       mrs     x1, ID_AA64MMFR0_EL1
->>> >>+       ubfx    x2, x1, #ID_AA64MMFR0_TGran_SHIFT, 4
->>> >>+       cmp     x2, #ID_AA64MMFR0_TGran_ENABLED
->>> >>+       b.ne    __no_granule_support
->>> >>         ldr     x5, =vectors
->>> >>         msr     vbar_el1, x5
->>> >>         msr     ttbr0_el1, x25                  // load TTBR0
->>> >>@@ -626,3 +643,8 @@ __enable_mmu:
->>> >>         isb
->>> >>         br      x27
->>> >>  ENDPROC(__enable_mmu)
->>> >>+
->>> >>+__no_granule_support:
->>> >>+       wfe
->>> >>+       b __no_granule_support
->>> >>+ENDPROC(__no_granule_support)
->>> >>--
->>> >>1.7.9.5
->>> >>
->>> >
->>> >Is is possible to tell the user that the kernel has failed to boot due
->>> >to the kernel granule being unsupported?
->>>
->>> We don't have anything up at this time. The "looping address" is actually a clue
->>> to the (expert) user. Not sure we can do something, until we get something like DEBUG_LL(?)
->>
->> No.
->>
->>> Or we should let it continue and end in a panic(?). The current situation can boot a
->>> multi-cluster system with boot cluster having the Tgran support(which doesn't make a
->>> strong use case though). I will try out some options and get back to you.
->>
->> If the boot CPU does not support 16KB pages, in general there isn't much
->> we can do since the console printing is done after we enabled the MMU.
->> Even mapping the UART address requires fixmap support and the PAGE_SIZE
->> is hard-coded in the kernel image. The DT is also mapped at run-time.
->>
->> While in theory it's possible to fall back to a 4KB page size just
->> enough to load the DT and figure out the early console, I suggest we
->> just live with the "looping address" clue.
->>
->
-> Couldn't we allocate some flag bits in the Image header to communicate
-> the page size to the bootloader?
+On Wed, Sep 02, 2015 at 02:31:21PM +0800, Ming Lei wrote:
+> This patch removes config option of KVM_ARM_MAX_VCPUS,
+> and like other ARCHs, just choose the maximum allowed
+> value from hardware, and follows the reasons:
+> 
+> 1) from distribution view, the option has to be
+> defined as the max allowed value because it need to
+> meet all kinds of virtulization applications and
+> need to support most of SoCs;
+> 
+> 2) using a bigger value doesn't introduce extra memory
+> consumption, and the help text in Kconfig isn't accurate
+> because kvm_vpu structure isn't allocated until request
+> of creating VCPU is sent from QEMU;
 
-Something like this perhaps?
+This used to be true because of the vgic bitmaps, but that is now
+dynamically allocated, so I believe you're correct in saying that the
+text is no longer accurate.
 
-------------8<---------------
-diff --git a/Documentation/arm64/booting.txt b/Documentation/arm64/booting.txt
-index 7d9d3c2286b2..13a8aaa9a6e9 100644
---- a/Documentation/arm64/booting.txt
-+++ b/Documentation/arm64/booting.txt
-@@ -104,7 +104,8 @@ Header notes:
- - The flags field (introduced in v3.17) is a little-endian 64-bit field
-   composed as follows:
-   Bit 0:       Kernel endianness.  1 if BE, 0 if LE.
--  Bits 1-63:   Reserved.
-+  Bits 1-2:    Kernel page size.   0=unspecified, 1=4K, 2=16K, 3=64K
-+  Bits 3-63:   Reserved.
+> 
+> 3) the main effect is that the field of vcpus[] in 'struct kvm'
+> becomes a bit bigger(sizeof(void *) per vcpu) and need more cache
+> lines to hold the structure, but 'struct kvm' is one generic struct,
+> and it has worked well on other ARCHs already in this way. Also,
+> the world switch frequecy is often low, for example, it is ~2000
+> when running kernel building load in VM from APM xgene KVM host,
+> so the effect is very small, and the difference can't be observed
+> in my test at all.
 
- - When image_size is zero, a bootloader should attempt to keep as much
-   memory as possible free for use by the kernel immediately after the
-diff --git a/arch/arm64/kernel/image.h b/arch/arm64/kernel/image.h
-index 8fae0756e175..5def289bda84 100644
---- a/arch/arm64/kernel/image.h
-+++ b/arch/arm64/kernel/image.h
-@@ -47,7 +47,9 @@
- #define __HEAD_FLAG_BE 0
- #endif
+While I'm not prinicipally opposed to removing this option, I have to
+point out that this analysis is far far over-simplified.  You have
+chosen a workload which excercised only CPU and memory virtualization,
+mostly solved by the hardware virtualization support, and therefore you
+don't see many exits.
 
--#define __HEAD_FLAGS   (__HEAD_FLAG_BE << 0)
-+#define __HEAD_FLAG_PAGE_SIZE ((PAGE_SHIFT - 10) / 2)
-+
-+#define __HEAD_FLAGS   (__HEAD_FLAG_BE << 0) | (__HEAD_FLAG_PAGE_SIZE << 1)
+Try running an I/O bound workload, or something which involves a lot of
+virtual IPIs, and you'll see a higher number of exits.
 
- /*
-  * These will output as part of the Image header, which should be little-endian
+However, I still doubt that the effects will be noticable in the grand
+scheme of things.
+
+> 
+> Cc: Dann Frazier <dann.frazier@canonical.com>
+> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: kvmarm@lists.cs.columbia.edu
+> Cc: kvm@vger.kernel.org
+> Signed-off-by: Ming Lei <ming.lei@canonical.com>
+> ---
+>  arch/arm/include/asm/kvm_host.h   |  8 ++------
+>  arch/arm/kvm/Kconfig              | 11 -----------
+>  arch/arm64/include/asm/kvm_host.h |  8 ++------
+>  arch/arm64/kvm/Kconfig            | 11 -----------
+>  include/kvm/arm_vgic.h            |  6 +-----
+>  virt/kvm/arm/vgic-v3.c            |  2 +-
+>  6 files changed, 6 insertions(+), 40 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index dcba0fa..c8c226a 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -29,12 +29,6 @@
+>  
+>  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+>  
+> -#if defined(CONFIG_KVM_ARM_MAX_VCPUS)
+> -#define KVM_MAX_VCPUS CONFIG_KVM_ARM_MAX_VCPUS
+> -#else
+> -#define KVM_MAX_VCPUS 0
+> -#endif
+> -
+>  #define KVM_USER_MEM_SLOTS 32
+>  #define KVM_PRIVATE_MEM_SLOTS 4
+>  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+> @@ -44,6 +38,8 @@
+>  
+>  #include <kvm/arm_vgic.h>
+>  
+> +#define KVM_MAX_VCPUS VGIC_V2_MAX_CPUS
+> +
+>  u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
+>  int __attribute_const__ kvm_target_cpu(void);
+>  int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+> index bfb915d..210ecca 100644
+> --- a/arch/arm/kvm/Kconfig
+> +++ b/arch/arm/kvm/Kconfig
+> @@ -45,15 +45,4 @@ config KVM_ARM_HOST
+>  	---help---
+>  	  Provides host support for ARM processors.
+>  
+> -config KVM_ARM_MAX_VCPUS
+> -	int "Number maximum supported virtual CPUs per VM"
+> -	depends on KVM_ARM_HOST
+> -	default 4
+> -	help
+> -	  Static number of max supported virtual CPUs per VM.
+> -
+> -	  If you choose a high number, the vcpu structures will be quite
+> -	  large, so only choose a reasonable number that you expect to
+> -	  actually use.
+> -
+>  endif # VIRTUALIZATION
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 415938d..3fb58ea 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -30,12 +30,6 @@
+>  
+>  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+>  
+> -#if defined(CONFIG_KVM_ARM_MAX_VCPUS)
+> -#define KVM_MAX_VCPUS CONFIG_KVM_ARM_MAX_VCPUS
+> -#else
+> -#define KVM_MAX_VCPUS 0
+> -#endif
+> -
+>  #define KVM_USER_MEM_SLOTS 32
+>  #define KVM_PRIVATE_MEM_SLOTS 4
+>  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+> @@ -43,6 +37,8 @@
+>  #include <kvm/arm_vgic.h>
+>  #include <kvm/arm_arch_timer.h>
+>  
+> +#define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
+> +
+>  #define KVM_VCPU_MAX_FEATURES 3
+>  
+>  int __attribute_const__ kvm_target_cpu(void);
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index bfffe8f..5c7e920 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -41,15 +41,4 @@ config KVM_ARM_HOST
+>  	---help---
+>  	  Provides host support for ARM processors.
+>  
+> -config KVM_ARM_MAX_VCPUS
+> -	int "Number maximum supported virtual CPUs per VM"
+> -	depends on KVM_ARM_HOST
+> -	default 4
+> -	help
+> -	  Static number of max supported virtual CPUs per VM.
+> -
+> -	  If you choose a high number, the vcpu structures will be quite
+> -	  large, so only choose a reasonable number that you expect to
+> -	  actually use.
+> -
+>  endif # VIRTUALIZATION
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index d901f1a..4e14dac 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -35,11 +35,7 @@
+>  #define VGIC_V3_MAX_LRS		16
+>  #define VGIC_MAX_IRQS		1024
+>  #define VGIC_V2_MAX_CPUS	8
+> -
+> -/* Sanity checks... */
+> -#if (KVM_MAX_VCPUS > 255)
+> -#error Too many KVM VCPUs, the VGIC only supports up to 255 VCPUs for now
+> -#endif
+> +#define VGIC_V3_MAX_CPUS	255
+>  
+>  #if (VGIC_NR_IRQS_LEGACY & 31)
+>  #error "VGIC_NR_IRQS must be a multiple of 32"
+> diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
+> index afbf925..7dd5d62 100644
+> --- a/virt/kvm/arm/vgic-v3.c
+> +++ b/virt/kvm/arm/vgic-v3.c
+> @@ -288,7 +288,7 @@ int vgic_v3_probe(struct device_node *vgic_node,
+>  
+>  	vgic->vctrl_base = NULL;
+>  	vgic->type = VGIC_V3;
+> -	vgic->max_gic_vcpus = KVM_MAX_VCPUS;
+> +	vgic->max_gic_vcpus = VGIC_V3_MAX_CPUS;
+>  
+>  	kvm_info("%s@%llx IRQ%d\n", vgic_node->name,
+>  		 vcpu_res.start, vgic->maint_irq);
+> -- 
+> 1.9.1
+
+
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
