@@ -1,199 +1,114 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] ARM/ARM64: KVM: remove 'config KVM_ARM_MAX_VCPUS'
-Date: Wed, 2 Sep 2015 12:25:55 +0200
-Message-ID: <20150902102555.GH10991@cbox>
-References: <1441175481-18348-1-git-send-email-ming.lei@canonical.com>
+Subject: Re: [RFC PATCH v3 0/3] vfio: platform: return device properties for
+ a platform device
+Date: Wed, 2 Sep 2015 12:32:59 +0200
+Message-ID: <20150902103259.GI10991@cbox>
+References: <20150830140638.GB24113@cbox> <55E48897.4090907@linaro.org>
+ <20150831173359.GA10991@cbox> <55E5546C.7040504@linaro.org>
+ <20150901092813.GE10991@cbox>
+ <CAN9JPjGfuv_YOBEdZA_AD13oHej7wMCR50=zQTZmgzHx-jBj_A@mail.gmail.com>
+ <20150901155205.GA19385@cbox>
+ <CAN9JPjFwsiYzR6RtDA-5UZYoNALGu8crXVyA+m6ptsWv=qJi5A@mail.gmail.com>
+ <20150902092128.GG10991@cbox>
+ <CAN9JPjHzPFC1LMuEneXXSYRs1bTXJHZmB6E8Dy+Fp=XRPScEEw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A6A84141D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Sep 2015 06:31:16 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id nF0PWW1dKBbs for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Sep 2015 06:31:15 -0400 (EDT)
+Received: from mail-lb0-f176.google.com (mail-lb0-f176.google.com
+ [209.85.217.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DF64D413E0
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Sep 2015 06:31:14 -0400 (EDT)
+Received: by lbbmp1 with SMTP id mp1so3364094lbb.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Sep 2015 03:31:34 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1441175481-18348-1-git-send-email-ming.lei@canonical.com>
-Sender: kvm-owner@vger.kernel.org
-To: Ming Lei <ming.lei@canonical.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, Dann Frazier <dann.frazier@canonical.com>, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+In-Reply-To: <CAN9JPjHzPFC1LMuEneXXSYRs1bTXJHZmB6E8Dy+Fp=XRPScEEw@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Baptiste Reynal <b.reynal@virtualopensystems.com>
+Cc: Linux IOMMU <iommu@lists.linux-foundation.org>, Alex Williamson <alex.williamson@redhat.com>, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>, kvm-arm <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Sep 02, 2015 at 02:31:21PM +0800, Ming Lei wrote:
-> This patch removes config option of KVM_ARM_MAX_VCPUS,
-> and like other ARCHs, just choose the maximum allowed
-> value from hardware, and follows the reasons:
+On Wed, Sep 02, 2015 at 11:49:12AM +0200, Baptiste Reynal wrote:
+> On Wed, Sep 2, 2015 at 11:21 AM, Christoffer Dall
+> <christoffer.dall@linaro.org> wrote:
+> > On Wed, Sep 02, 2015 at 09:21:26AM +0200, Baptiste Reynal wrote:
+> >> On Tue, Sep 1, 2015 at 5:52 PM, Christoffer Dall
+> >> <christoffer.dall@linaro.org> wrote:
+> >> > On Tue, Sep 01, 2015 at 05:32:21PM +0200, Baptiste Reynal wrote:
+> >> >> Hi everyone,
+> >> >>
+> >> >> The usefullness of this patch has already been discussed during the
+> >> >> first releases (http://lists.linuxfoundation.org/pipermail/iommu/2014-August/009586.html).
+> >> >> I underline the fact that it avoids implementing the logic on the
+> >> >> userspace program, as VFIO can be used for many usage (userspace
+> >> >> drivers and device assignment).
+> >> >>
+> >> >> If you're interested in the implementation on the userspace side, an
+> >> >> RFC has been suggested for QEMU:
+> >> >> http://lists.gnu.org/archive/html/qemu-devel/2015-01/msg01211.html
+> >> >
+> >> > This one-year-old discussion is hardly exhaustive.
+> >> >
+> >> > I think you missed the gist of the question for Eric a bit as well.
+> >> >
+> >> > One important question for me is whether seeing the host DT is always
+> >> > sufficient or if the kernel and physical device driver can have more
+> >> > information about the device and its configuration which userspace may
+> >> > need, which cannot be directly read in the DT (for example because the
+> >> > driver has initialized the device in a specific way).  My point is, it's
+> >> > really not about DT-specific things (what if you used ACPI?), but it's
+> >> > about retrieving properties of a device and its configuration from
+> >> > userspace.
+> >> >
+> >> > Have we thought about the possible ways to achieve this and weight one
+> >> > option against the other?
+> >>
+> >> Problem is that now we only have a very few platform devices behind an
+> >> IOMMU, so we don't have the visibility to know if such a case will
+> >> occur. With the current use cases, the interface seems to be
+> >> sufficient.
+> >
+> > Ideally we can think about future use cases based on the experience of
+> > people in the community and come up with a solution considering future
+> > use cases.
+> >
+> >> By using IOCTL, we can always change the implementation
+> >> later without any change on the userspace.
+> >
+> > Can you be more concrete with what you mean here?
+> >
 > 
-> 1) from distribution view, the option has to be
-> defined as the max allowed value because it need to
-> meet all kinds of virtulization applications and
-> need to support most of SoCs;
-> 
-> 2) using a bigger value doesn't introduce extra memory
-> consumption, and the help text in Kconfig isn't accurate
-> because kvm_vpu structure isn't allocated until request
-> of creating VCPU is sent from QEMU;
+> By using an IOCTL, we define an API that allows to retrieve device
+> properties from userspace. The way it is retrieved is handled by the
+> kernel (For example for now if OF is unavailable, the kernel will
+> retrieve the property using ACPI) and is totally transparent from the
+> userspace point of view.
 
-This used to be true because of the vgic bitmaps, but that is now
-dynamically allocated, so I believe you're correct in saying that the
-text is no longer accurate.
+ok, I thought that this series was targeting device tree specifically,
+but I see that you changed this approach in v3.
 
 > 
-> 3) the main effect is that the field of vcpus[] in 'struct kvm'
-> becomes a bit bigger(sizeof(void *) per vcpu) and need more cache
-> lines to hold the structure, but 'struct kvm' is one generic struct,
-> and it has worked well on other ARCHs already in this way. Also,
-> the world switch frequecy is often low, for example, it is ~2000
-> when running kernel building load in VM from APM xgene KVM host,
-> so the effect is very small, and the difference can't be observed
-> in my test at all.
-
-While I'm not prinicipally opposed to removing this option, I have to
-point out that this analysis is far far over-simplified.  You have
-chosen a workload which excercised only CPU and memory virtualization,
-mostly solved by the hardware virtualization support, and therefore you
-don't see many exits.
-
-Try running an I/O bound workload, or something which involves a lot of
-virtual IPIs, and you'll see a higher number of exits.
-
-However, I still doubt that the effects will be noticable in the grand
-scheme of things.
-
+> My point is that we can go with the current naive implementation for
+> now, and we might extend it later according to the needs of future
+> devices, without changing anything from the userspace point of view.
 > 
-> Cc: Dann Frazier <dann.frazier@canonical.com>
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: kvmarm@lists.cs.columbia.edu
-> Cc: kvm@vger.kernel.org
-> Signed-off-by: Ming Lei <ming.lei@canonical.com>
-> ---
->  arch/arm/include/asm/kvm_host.h   |  8 ++------
->  arch/arm/kvm/Kconfig              | 11 -----------
->  arch/arm64/include/asm/kvm_host.h |  8 ++------
->  arch/arm64/kvm/Kconfig            | 11 -----------
->  include/kvm/arm_vgic.h            |  6 +-----
->  virt/kvm/arm/vgic-v3.c            |  2 +-
->  6 files changed, 6 insertions(+), 40 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index dcba0fa..c8c226a 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -29,12 +29,6 @@
->  
->  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
->  
-> -#if defined(CONFIG_KVM_ARM_MAX_VCPUS)
-> -#define KVM_MAX_VCPUS CONFIG_KVM_ARM_MAX_VCPUS
-> -#else
-> -#define KVM_MAX_VCPUS 0
-> -#endif
-> -
->  #define KVM_USER_MEM_SLOTS 32
->  #define KVM_PRIVATE_MEM_SLOTS 4
->  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
-> @@ -44,6 +38,8 @@
->  
->  #include <kvm/arm_vgic.h>
->  
-> +#define KVM_MAX_VCPUS VGIC_V2_MAX_CPUS
-> +
->  u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
->  int __attribute_const__ kvm_target_cpu(void);
->  int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
-> index bfb915d..210ecca 100644
-> --- a/arch/arm/kvm/Kconfig
-> +++ b/arch/arm/kvm/Kconfig
-> @@ -45,15 +45,4 @@ config KVM_ARM_HOST
->  	---help---
->  	  Provides host support for ARM processors.
->  
-> -config KVM_ARM_MAX_VCPUS
-> -	int "Number maximum supported virtual CPUs per VM"
-> -	depends on KVM_ARM_HOST
-> -	default 4
-> -	help
-> -	  Static number of max supported virtual CPUs per VM.
-> -
-> -	  If you choose a high number, the vcpu structures will be quite
-> -	  large, so only choose a reasonable number that you expect to
-> -	  actually use.
-> -
->  endif # VIRTUALIZATION
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 415938d..3fb58ea 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -30,12 +30,6 @@
->  
->  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
->  
-> -#if defined(CONFIG_KVM_ARM_MAX_VCPUS)
-> -#define KVM_MAX_VCPUS CONFIG_KVM_ARM_MAX_VCPUS
-> -#else
-> -#define KVM_MAX_VCPUS 0
-> -#endif
-> -
->  #define KVM_USER_MEM_SLOTS 32
->  #define KVM_PRIVATE_MEM_SLOTS 4
->  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
-> @@ -43,6 +37,8 @@
->  #include <kvm/arm_vgic.h>
->  #include <kvm/arm_arch_timer.h>
->  
-> +#define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
-> +
->  #define KVM_VCPU_MAX_FEATURES 3
->  
->  int __attribute_const__ kvm_target_cpu(void);
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index bfffe8f..5c7e920 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -41,15 +41,4 @@ config KVM_ARM_HOST
->  	---help---
->  	  Provides host support for ARM processors.
->  
-> -config KVM_ARM_MAX_VCPUS
-> -	int "Number maximum supported virtual CPUs per VM"
-> -	depends on KVM_ARM_HOST
-> -	default 4
-> -	help
-> -	  Static number of max supported virtual CPUs per VM.
-> -
-> -	  If you choose a high number, the vcpu structures will be quite
-> -	  large, so only choose a reasonable number that you expect to
-> -	  actually use.
-> -
->  endif # VIRTUALIZATION
-> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-> index d901f1a..4e14dac 100644
-> --- a/include/kvm/arm_vgic.h
-> +++ b/include/kvm/arm_vgic.h
-> @@ -35,11 +35,7 @@
->  #define VGIC_V3_MAX_LRS		16
->  #define VGIC_MAX_IRQS		1024
->  #define VGIC_V2_MAX_CPUS	8
-> -
-> -/* Sanity checks... */
-> -#if (KVM_MAX_VCPUS > 255)
-> -#error Too many KVM VCPUs, the VGIC only supports up to 255 VCPUs for now
-> -#endif
-> +#define VGIC_V3_MAX_CPUS	255
->  
->  #if (VGIC_NR_IRQS_LEGACY & 31)
->  #error "VGIC_NR_IRQS must be a multiple of 32"
-> diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
-> index afbf925..7dd5d62 100644
-> --- a/virt/kvm/arm/vgic-v3.c
-> +++ b/virt/kvm/arm/vgic-v3.c
-> @@ -288,7 +288,7 @@ int vgic_v3_probe(struct device_node *vgic_node,
->  
->  	vgic->vctrl_base = NULL;
->  	vgic->type = VGIC_V3;
-> -	vgic->max_gic_vcpus = KVM_MAX_VCPUS;
-> +	vgic->max_gic_vcpus = VGIC_V3_MAX_CPUS;
->  
->  	kvm_info("%s@%llx IRQ%d\n", vgic_node->name,
->  		 vcpu_res.start, vgic->maint_irq);
-> -- 
-> 1.9.1
+fair enough.
 
+Is this series exporting properties not already exported through sysfs?
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+-Christoffer
