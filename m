@@ -1,33 +1,39 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 5/9] arm/arm64: KVM: Use appropriate define in VGIC reset
- code
-Date: Thu, 03 Sep 2015 16:04:58 +0100
-Message-ID: <55E8619A.9030604@arm.com>
-References: <1440942866-23802-1-git-send-email-christoffer.dall@linaro.org> <1440942866-23802-6-git-send-email-christoffer.dall@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v2 2/5] KVM: arm64: Implement vGICv3 distributor and
+ redistributor access from userspace
+Date: Thu, 3 Sep 2015 16:20:41 +0100
+Message-ID: <CAFEAcA8PDSnTX54mQAoVsuwWzv3CWo0B3-7YQP8=Nqi_Epoj6A@mail.gmail.com>
+References: <cover.1441180858.git.p.fedin@samsung.com> <bc92849c39f24de8301df2f367c3ba0ed066e5e8.1441180858.git.p.fedin@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1440942866-23802-6-git-send-email-christoffer.dall@linaro.org>
+In-Reply-To: <bc92849c39f24de8301df2f367c3ba0ed066e5e8.1441180858.git.p.fedin@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+To: Pavel Fedin <p.fedin@samsung.com>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 30/08/15 14:54, Christoffer Dall wrote:
-> We currently initialize the SGIs to be enabled in the VGIC code, but we
-> use the VGIC_NR_PPIS define for this purpose, instead of the the more
-> natural VGIC_NR_SGIS.  Change this slightly confusing use of the
-> defines.
-> 
-> Note: This should have no functional change, as both names are defined
-> to the number 16.
-> 
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+On 2 September 2015 at 09:09, Pavel Fedin <p.fedin@samsung.com> wrote:
+> The access is done similar to vGICv2, using KVM_DEV_ARM_VGIC_GRP_DIST_REGS
+> and KVM_DEV_ARM_VGIC_GRP_REDIST_REGS with KVM_SET_DEVICE_ATTR and
+> KVM_GET_DEVICE_ATTR ioctls.
+>
+> Some registers are 64-bit wide according to the specification.
+> KVM_DEV_ARM_VGIC_64BIT flag is introduced, allowing to perform full 64-bit
+> accesses.
+>
+> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+> ---
+> +  KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
+> +  Attributes:
+> +    The attr field of kvm_device_attr encodes two values:
+> +    bits:     |  63  | 62  ..  40 | 39 ..  32  |  31   ....    0 |
+> +    values:   | size |  reserved  |   cpu id   |      offset     |
 
-Ah, that's a confusing one, well spotted.
+We should avoid imposing an accidental limit on the maximum
+number of CPUs in the userspace API. GICv3 doesn't have a
+limit at 256 CPUs, so I think we should define an attr format
+which lets us specify a complete affinity specification.
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+thanks
+-- PMM
