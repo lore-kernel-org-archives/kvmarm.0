@@ -1,25 +1,28 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH 2/2] arm/arm64: KVM: Improve kvm_exit tracepoint
-Date: Thu, 3 Sep 2015 17:29:50 +0100
-Message-ID: <55E8757E.5020803@arm.com>
-References: <1440942922-23955-1-git-send-email-christoffer.dall@linaro.org>
- <1440942922-23955-3-git-send-email-christoffer.dall@linaro.org>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [RFC PATCH v3 0/3] vfio: platform: return device properties for
+ a platform device
+Date: Thu, 03 Sep 2015 18:46:49 +0200
+Message-ID: <55E87979.9060604@linaro.org>
+References: <1440691887.20355.27.camel@redhat.com>	<55DF45D0.5040704@linaro.org>	<20150830140638.GB24113@cbox>	<55E48897.4090907@linaro.org>	<20150831173359.GA10991@cbox>	<55E5546C.7040504@linaro.org>	<20150901092813.GE10991@cbox>	<CAN9JPjGfuv_YOBEdZA_AD13oHej7wMCR50=zQTZmgzHx-jBj_A@mail.gmail.com>	<20150901155205.GA19385@cbox>	<CAN9JPjFwsiYzR6RtDA-5UZYoNALGu8crXVyA+m6ptsWv=qJi5A@mail.gmail.com>	<20150902092128.GG10991@cbox>	<CAN9JPjHzPFC1LMuEneXXSYRs1bTXJHZmB6E8Dy+Fp=XRPScEEw@mail.gmail.com>	<1441212724.20355.306.camel@redhat.com>
+ <CAN9JPjF0Lex2wD=_iiriTaYdukva+rxhdwPTQnGqC5kQFCEYGg@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D04564169C
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2015 12:28:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DE514141D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2015 12:47:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ks0HhEJ4g3rx for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Sep 2015 12:28:11 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CDB484141D
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2015 12:28:10 -0400 (EDT)
-In-Reply-To: <1440942922-23955-3-git-send-email-christoffer.dall@linaro.org>
+ with ESMTP id GEsk6B7JGhmb for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Sep 2015 12:47:16 -0400 (EDT)
+Received: from mail-wi0-f181.google.com (mail-wi0-f181.google.com
+ [209.85.212.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 498C9412FA
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2015 12:47:15 -0400 (EDT)
+Received: by wiclk2 with SMTP id lk2so14700805wic.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Sep 2015 09:47:39 -0700 (PDT)
+In-Reply-To: <CAN9JPjF0Lex2wD=_iiriTaYdukva+rxhdwPTQnGqC5kQFCEYGg@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,147 +32,111 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+To: Baptiste Reynal <b.reynal@virtualopensystems.com>, Alex Williamson <alex.williamson@redhat.com>
+Cc: Linux IOMMU <iommu@lists.linux-foundation.org>, VirtualOpenSystems Technical Team <tech@virtualopensystems.com>, kvm-arm <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
-
-On 30/08/15 14:55, Christoffer Dall wrote:
-> The ARM architecture only saves the exit class to the HSR (ESR_EL2 for
-> arm64) on synchronous exceptions, not on asynchronous exceptions like an
-> IRQ.  However, we only report the exception class on kvm_exit, which is
-> confusing because an IRQ looks like it exited at some PC with the same
-> reason as the previous exit.  Add a lookup table for the exception index
-> and prepend the kvm_exit tracepoint text with the exception type to
-> clarify this situation.
+Dear all,
+On 09/03/2015 09:42 AM, Baptiste Reynal wrote:
+> On Wed, Sep 2, 2015 at 6:52 PM, Alex Williamson
+> <alex.williamson@redhat.com> wrote:
+>> On Wed, 2015-09-02 at 11:49 +0200, Baptiste Reynal wrote:
+>>> On Wed, Sep 2, 2015 at 11:21 AM, Christoffer Dall
+>>> <christoffer.dall@linaro.org> wrote:
+>>>> On Wed, Sep 02, 2015 at 09:21:26AM +0200, Baptiste Reynal wrote:
+>>>>> On Tue, Sep 1, 2015 at 5:52 PM, Christoffer Dall
+>>>>> <christoffer.dall@linaro.org> wrote:
+>>>>>> On Tue, Sep 01, 2015 at 05:32:21PM +0200, Baptiste Reynal wrote:
+>>>>>>> Hi everyone,
+>>>>>>>
+>>>>>>> The usefullness of this patch has already been discussed during the
+>>>>>>> first releases (http://lists.linuxfoundation.org/pipermail/iommu/2014-August/009586.html).
+>>>>>>> I underline the fact that it avoids implementing the logic on the
+>>>>>>> userspace program, as VFIO can be used for many usage (userspace
+>>>>>>> drivers and device assignment).
+>>>>>>>
+>>>>>>> If you're interested in the implementation on the userspace side, an
+>>>>>>> RFC has been suggested for QEMU:
+>>>>>>> http://lists.gnu.org/archive/html/qemu-devel/2015-01/msg01211.html
+>>>>>>
+>>>>>> This one-year-old discussion is hardly exhaustive.
+>>>>>>
+>>>>>> I think you missed the gist of the question for Eric a bit as well.
+>>>>>>
+>>>>>> One important question for me is whether seeing the host DT is always
+>>>>>> sufficient or if the kernel and physical device driver can have more
+>>>>>> information about the device and its configuration which userspace may
+>>>>>> need, which cannot be directly read in the DT (for example because the
+>>>>>> driver has initialized the device in a specific way).  My point is, it's
+>>>>>> really not about DT-specific things (what if you used ACPI?), but it's
+>>>>>> about retrieving properties of a device and its configuration from
+>>>>>> userspace.
+>>>>>>
+>>>>>> Have we thought about the possible ways to achieve this and weight one
+>>>>>> option against the other?
+>>>>>
+>>>>> Problem is that now we only have a very few platform devices behind an
+>>>>> IOMMU, so we don't have the visibility to know if such a case will
+>>>>> occur. With the current use cases, the interface seems to be
+>>>>> sufficient.
+>>>>
+>>>> Ideally we can think about future use cases based on the experience of
+>>>> people in the community and come up with a solution considering future
+>>>> use cases.
+>>>>
+>>>>> By using IOCTL, we can always change the implementation
+>>>>> later without any change on the userspace.
+>>>>
+>>>> Can you be more concrete with what you mean here?
+>>>>
+>>>
+>>> By using an IOCTL, we define an API that allows to retrieve device
+>>> properties from userspace. The way it is retrieved is handled by the
+>>> kernel (For example for now if OF is unavailable, the kernel will
+>>> retrieve the property using ACPI) and is totally transparent from the
+>>> userspace point of view.
+>>>
+>>> My point is that we can go with the current naive implementation for
+>>> now, and we might extend it later according to the needs of future
+>>> devices, without changing anything from the userspace point of view.
+>>
+>> I don't really like "ioctl" and "naive implementation" in the same
+>> thought.  The ioctl itself needs to be well thought out for current and
+>> future needs, including independence from the source data type
+>> (OF/DT/ACPI/etc), proven that it's necessary, it's not redundant to
+>> existing interfaces, and vfio should be the one hosting it.  Thanks,
+>>
 > 
-> Also resolve the exception class (EC) to a human-friendly text version
-> so the trace output becomes immediately usable for debugging this code.
+> The word we used, naive, does not mean a bad implementation of the
+> IOCTL interface but rather it was referring to the fact that at this
+> moment we export 1-to-1 the information available in the device tree
+> via sys or proc file system. So one could obtain the same result
+> without such interface, however our implementation is aready
+> independent from the source of such information, since OF and ACPI are
+> supported already, and there will be no problem in extending the
+> interface to support more.
+I rebooted my host in ACPI mode and I am not able to find the attribute
+files anymore in sysfs. the of_node directory where the files were
+located does not exist anymore (/sys/firmware/devicetree/base) and I
+wonder whether we can get access to those same info somewhere in sysfs
+(/sys/firmware). Obviously they are in the ACPI tables but ... Alex do
+you know how it works on x86?
 
-That patch just proved very useful for me, especially since the encoding
-of .EC is different between ARM & ARM64, so thanks for that!
+So I wonder whether the userspace has a unified way to fetch data in
+sysfs whatever the type of HW description (DT, ACPI) or at least if it
+not a unified way whether he have a simple way to achieve that on userspace.
 
-But still there is HSR.EC reported for asynchronous exceptions, which is
-confusing, so I wonder if it would be worth to have two tracepoints to
-just report the PC for async exits and .EC and PC for traps?
-I guess it would be neater to have this differentiation in the
-TRACE_EVENT macro invocation, but I reckon it is not powerful enough?
+As opposed to that the kernel offers that feature through the unified
+device properties API, the one used in this series.
 
-Also this patch is independent from both the first one and the reworked
-arch timer series. I see your intention of pushing your arch timer
-series through ;-), but I suggest to make this patch separate and add
-1/2 to the arch timer series.
+Best Regards
 
-Cheers,
-Andre.
-
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
->  arch/arm/include/asm/kvm_arm.h   | 20 ++++++++++++++++++++
->  arch/arm/kvm/arm.c               |  2 +-
->  arch/arm/kvm/trace.h             | 10 +++++++---
->  arch/arm64/include/asm/kvm_arm.h | 16 ++++++++++++++++
->  4 files changed, 44 insertions(+), 4 deletions(-)
+Eric
 > 
-> diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
-> index d995821..dc641dd 100644
-> --- a/arch/arm/include/asm/kvm_arm.h
-> +++ b/arch/arm/include/asm/kvm_arm.h
-> @@ -218,4 +218,24 @@
->  #define HSR_DABT_CM		(1U << 8)
->  #define HSR_DABT_EA		(1U << 9)
->  
-> +#define kvm_arm_exception_type	\
-> +	{0, "RESET" }, 		\
-> +	{1, "UNDEFINED" },	\
-> +	{2, "SOFTWARE" },	\
-> +	{3, "PREF_ABORT" },	\
-> +	{4, "DATA_ABORT" },	\
-> +	{5, "IRQ" },		\
-> +	{6, "FIQ" },		\
-> +	{7, "HVC" }
-> +
-> +#define HSRECN(x) { HSR_EC_##x, #x }
-> +
-> +#define kvm_arm_exception_class \
-> +	HSRECN(UNKNOWN), HSRECN(WFI), HSRECN(CP15_32), HSRECN(CP15_64), \
-> +	HSRECN(CP14_MR), HSRECN(CP14_LS), HSRECN(CP_0_13), HSRECN(CP10_ID), \
-> +	HSRECN(JAZELLE), HSRECN(BXJ), HSRECN(CP14_64), HSRECN(SVC_HYP), \
-> +	HSRECN(HVC), HSRECN(SMC), HSRECN(IABT), HSRECN(IABT_HYP), \
-> +	HSRECN(DABT), HSRECN(DABT_HYP)
-> +
-> +
->  #endif /* __ARM_KVM_ARM_H__ */
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index 102a4aa..ffec2f2 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -606,7 +606,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		 * guest time.
->  		 */
->  		kvm_guest_exit();
-> -		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
-> +		trace_kvm_exit(ret, kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
->  
->  		/*
->  		 * We must sync the timer state before the vgic state so that
-> diff --git a/arch/arm/kvm/trace.h b/arch/arm/kvm/trace.h
-> index 0ec3539..c25a885 100644
-> --- a/arch/arm/kvm/trace.h
-> +++ b/arch/arm/kvm/trace.h
-> @@ -25,21 +25,25 @@ TRACE_EVENT(kvm_entry,
->  );
->  
->  TRACE_EVENT(kvm_exit,
-> -	TP_PROTO(unsigned int exit_reason, unsigned long vcpu_pc),
-> -	TP_ARGS(exit_reason, vcpu_pc),
-> +	TP_PROTO(int idx, unsigned int exit_reason, unsigned long vcpu_pc),
-> +	TP_ARGS(idx, exit_reason, vcpu_pc),
->  
->  	TP_STRUCT__entry(
-> +		__field(	int,		idx		)
->  		__field(	unsigned int,	exit_reason	)
->  		__field(	unsigned long,	vcpu_pc		)
->  	),
->  
->  	TP_fast_assign(
-> +		__entry->idx			= idx;
->  		__entry->exit_reason		= exit_reason;
->  		__entry->vcpu_pc		= vcpu_pc;
->  	),
->  
-> -	TP_printk("HSR_EC: 0x%04x, PC: 0x%08lx",
-> +	TP_printk("%s: HSR_EC: 0x%04x (%s), PC: 0x%08lx",
-> +		  __print_symbolic(__entry->idx, kvm_arm_exception_type),
->  		  __entry->exit_reason,
-> +		  __print_symbolic(__entry->exit_reason, kvm_arm_exception_class),
->  		  __entry->vcpu_pc)
->  );
->  
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 7605e09..ffb86bf 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -197,4 +197,20 @@
->  /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
->  #define HPFAR_MASK	(~UL(0xf))
->  
-> +#define kvm_arm_exception_type	\
-> +	{0, "IRQ" }, 		\
-> +	{1, "TRAP" }
-> +
-> +#define ECN(x) { ESR_ELx_EC_##x, #x }
-> +
-> +#define kvm_arm_exception_class \
-> +	ECN(UNKNOWN), ECN(WFx), ECN(CP15_32), ECN(CP15_64), ECN(CP14_MR), \
-> +	ECN(CP14_LS), ECN(FP_ASIMD), ECN(CP10_ID), ECN(CP14_64), ECN(SVC64), \
-> +	ECN(HVC64), ECN(SMC64), ECN(SYS64), ECN(IMP_DEF), ECN(IABT_LOW), \
-> +	ECN(IABT_CUR), ECN(PC_ALIGN), ECN(DABT_LOW), ECN(DABT_CUR), \
-> +	ECN(SP_ALIGN), ECN(FP_EXC32), ECN(FP_EXC64), ECN(SERROR), \
-> +	ECN(BREAKPT_LOW), ECN(BREAKPT_CUR), ECN(SOFTSTP_LOW), \
-> +	ECN(SOFTSTP_CUR), ECN(WATCHPT_LOW), ECN(WATCHPT_CUR), \
-> +	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64)
-> +
->  #endif /* __ARM64_KVM_ARM_H__ */
+> The next release will take into account your comments about argsz and flags.
 > 
+> Regards,
+> Baptiste
+> 
+>> Alex
+>>
