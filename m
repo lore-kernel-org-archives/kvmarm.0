@@ -1,45 +1,62 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 0/9] Rework architected timer and fix UEFI reset
-Date: Thu, 03 Sep 2015 18:10:56 +0100
-Message-ID: <55E87F20.40900@arm.com>
-References: <1440942866-23802-1-git-send-email-christoffer.dall@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH 2/2] arm/arm64: KVM: Improve kvm_exit tracepoint
+Date: Thu, 3 Sep 2015 19:14:08 +0200
+Message-ID: <20150903171408.GG5171@cbox>
+References: <1440942922-23955-1-git-send-email-christoffer.dall@linaro.org>
+ <1440942922-23955-3-git-send-email-christoffer.dall@linaro.org>
+ <55E8757E.5020803@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1440942866-23802-1-git-send-email-christoffer.dall@linaro.org>
+Content-Disposition: inline
+In-Reply-To: <55E8757E.5020803@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
-
-On 30/08/15 14:54, Christoffer Dall wrote:
-> The architected timer integration with the vgic had some shortcomings in
-> that certain guests (one being UEFI) weren't fully supported.
+On Thu, Sep 03, 2015 at 05:29:50PM +0100, Andre Przywara wrote:
+> Hi Christoffer,
 > 
-> In fixing this I also found that we are scheduling the hrtimer for the
-> virtual timer way too often, with a potential performance overhead.
+> On 30/08/15 14:55, Christoffer Dall wrote:
+> > The ARM architecture only saves the exit class to the HSR (ESR_EL2 for
+> > arm64) on synchronous exceptions, not on asynchronous exceptions like an
+> > IRQ.  However, we only report the exception class on kvm_exit, which is
+> > confusing because an IRQ looks like it exited at some PC with the same
+> > reason as the previous exit.  Add a lookup table for the exception index
+> > and prepend the kvm_exit tracepoint text with the exception type to
+> > clarify this situation.
+> > 
+> > Also resolve the exception class (EC) to a human-friendly text version
+> > so the trace output becomes immediately usable for debugging this code.
 > 
-> This series tries to address these problems in proviging level-triggered
-> semantics for the arch timer and vgic intergration and seeks to clarify
-> the behavior when setting/clearing the active state on the physical
-> distributor.
+> That patch just proved very useful for me, especially since the encoding
+> of .EC is different between ARM & ARM64, so thanks for that!
 > 
-> Series based on kvmarm/next and also available at:
-> https://git.linaro.org/people/christoffer.dall/linux-kvm-arm.git timer-rework
+> But still there is HSR.EC reported for asynchronous exceptions, which is
+> confusing, so I wonder if it would be worth to have two tracepoints to
+> just report the PC for async exits and .EC and PC for traps?
+> I guess it would be neater to have this differentiation in the
+> TRACE_EVENT macro invocation, but I reckon it is not powerful enough?
 
-I'm quite pleased with the overall look of this series. It fixes a
-number of issues that have been around for a while, plus some others
-I've recently introduced...
+I'd really like to have a single kvm_exit macro, because userspace
+scripts etc. count this event.
 
-Now, I fear this is probably too big a series to be shipped as a fix for
-4.3. Can you come up with a minimal series that we could merge quickly
-(I'm thinking patches 7 and 9), and leave the rest for the following
-merge window?
+I thought about doing something more meaningful, but couldn't think of a
+better way, and in any case, this needs to be fixed first and we can
+always add something on top.
 
-Thanks,
+Patches are welcome :)
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> 
+> Also this patch is independent from both the first one and the reworked
+> arch timer series. I see your intention of pushing your arch timer
+> series through ;-), but I suggest to make this patch separate and add
+> 1/2 to the arch timer series.
+> 
+I anticipate this will not go in before the next merge window opens, and
+surely the timer patch series in which ever form it ends up being in,
+should go in before that, given that it fixes real issues, so hence the
+way I sent out these patches.  No hidden agendas - for once ;)
+
+-Christoffer
