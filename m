@@ -1,111 +1,113 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [RFC PATCH v3 2/3] vfio: platform: access device property as
- a list of strings
-Date: Thu, 03 Sep 2015 18:49:08 +0200
-Message-ID: <55E87A04.4020508@linaro.org>
+From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: [RFC PATCH v3 3/3] vfio: platform: return device properties as
+	arrays of unsigned integers
+Date: Thu, 03 Sep 2015 18:49:29 +0200
+Message-ID: <55E87A19.6010009@linaro.org>
 References: <1419024032-1269-1-git-send-email-a.motakis@virtualopensystems.com>
- <1419024032-1269-3-git-send-email-a.motakis@virtualopensystems.com>
+	<1419024032-1269-4-git-send-email-a.motakis@virtualopensystems.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EACD41978
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2015 12:49:35 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xqpVHgcOyHTM for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Sep 2015 12:49:34 -0400 (EDT)
-Received: from mail-wi0-f172.google.com (mail-wi0-f172.google.com
- [209.85.212.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 53565412FA
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Sep 2015 12:49:34 -0400 (EDT)
-Received: by wibz8 with SMTP id z8so105521929wib.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Sep 2015 09:49:57 -0700 (PDT)
-In-Reply-To: <1419024032-1269-3-git-send-email-a.motakis@virtualopensystems.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Baptiste Reynal <b.reynal@virtualopensystems.com>, kvmarm@lists.cs.columbia.edu, iommu@lists.linux-foundation.org, alex.williamson@redhat.com
-Cc: list@lists.cs.columbia.edu, VFIO DRIVER <kvm@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, open@lists.cs.columbia.edu, tech@virtualopensystems.com
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <1419024032-1269-4-git-send-email-a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org
+Cc: tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org, VFIO DRIVER <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, open list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 12/19/2014 10:20 PM, Antonios Motakis wrote:
-> Certain device properties (e.g. the device node name, the compatible
-> string), are available as a list of strings (separated by the null
-> terminating character). Let the VFIO user query this type of properties.
+> Certain properties of a device are accessible as an array of unsigned
+> integers, either u64, u32, u16, or u8. Let the VFIO user query this
+> type of device properties.
 > 
-> Signed-off-by: Antonios Motakis <a.motakis@virtualopensystems.com>
+> Signed-off-by: Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
 > ---
->  drivers/vfio/platform/properties.c | 43 +++++++++++++++++++++++++++++++++++++-
->  1 file changed, 42 insertions(+), 1 deletion(-)
+>  drivers/vfio/platform/properties.c | 62 +++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 61 insertions(+), 1 deletion(-)
 > 
 > diff --git a/drivers/vfio/platform/properties.c b/drivers/vfio/platform/properties.c
-> index 8b90465..39c6342 100644
+> index 39c6342..645f6e5c 100644
 > --- a/drivers/vfio/platform/properties.c
 > +++ b/drivers/vfio/platform/properties.c
-> @@ -7,7 +7,48 @@ static int dev_property_get_strings(struct device *dev,
->  				    char *name, unsigned *lenp,
->  				    void __user *datap, unsigned long datasz)
+> @@ -55,7 +55,67 @@ static int dev_property_get_uint(struct device *dev, char *name,
+>  				 uint32_t type, unsigned *lenp,
+>  				 void __user *datap, unsigned long datasz)
 >  {
 > -	return -EINVAL;
-> +	const char **val;
-> +	int n, i, ret;
+> +	int ret, n;
+> +	u8 *out;
+> +	size_t sz;
+> +	int (*func)(const struct device *, const char *, void *, size_t)
+> +		= NULL;
 > +
-> +	*lenp = 0;
+> +	switch (type) {
+> +	case VFIO_DEV_PROPERTY_TYPE_U64:
+> +		sz = sizeof(u64);
+> +		func = (int (*)(const struct device *,
+> +				const char *, void *, size_t))
+> +			device_property_read_u64_array;
+> +		break;
+> +	case VFIO_DEV_PROPERTY_TYPE_U32:
+> +		sz = sizeof(u32);
+> +		func = (int (*)(const struct device *,
+> +				const char *, void *, size_t))
+> +			device_property_read_u32_array;
+> +		break;
+> +	case VFIO_DEV_PROPERTY_TYPE_U16:
+> +		sz = sizeof(u16);
+> +		func = (int (*)(const struct device *,
+> +				const char *, void *, size_t))
+> +			device_property_read_u16_array;
+> +		break;
+> +	case VFIO_DEV_PROPERTY_TYPE_U8:
+> +		sz = sizeof(u8);
+> +		func = (int (*)(const struct device *,
+> +				const char *, void *, size_t))
+> +			device_property_read_u8_array;
+> +		break;
 > +
-> +	n = device_property_read_string_array(dev, name, NULL, 0);
-> +	if (n < 0)
-don't know if n==0 can happen? property found but not value?
-> +		return n;
-> +
-> +	val = kcalloc(n, sizeof(char*), GFP_KERNEL);
-char *, checkpatch error.
-> +	if (!val)
-> +		return -ENOMEM;
-> +
-> +	ret = device_property_read_string_array(dev, name, val, n);
-> +	if (ret < 0)
-> +		goto out;
-> +
-> +	ret = 0;
-why not initializing ret at declaration time?
-> +
-> +	for (i = 0; i < n; i++) {
-> +		size_t len = strlen(val[i]) + 1;
-> +
-> +		if (datasz < len) {
-> +			ret = -EOVERFLOW;
-> +			while (i < n)
-> +				*lenp += strlen(val[i++]) + 1;
-why do you set *lenp to the length of all strings even if they can't be
-copied?
-> +			goto out;
-> +		}
-> +
-> +		if (copy_to_user(datap, val[i], len)) {
-> +			ret = -EFAULT;
-so in that case *lenp is not incremented?
-> +			goto out;
-> +		}
-Can't you have a similar implementation as for uxx, see next patch
-comments. Can't you copy to user in one shot. Can't that code be simplified.
-> +
-> +		*lenp += len;
-> +		datap += len;
-> +		datasz -= len;
+> +	default:
+> +		return -EINVAL;
 > +	}
 > +
+> +	/* get size of array */
+> +	n = func(dev, name, NULL, 0);
+> +	if (n < 0)
+> +		return n;
+> +
+> +	if (lenp)
+> +		*lenp = n * sz;
+is it really relevant to check lenp is allocated? also what if it is not...
+> +
+> +	if (n * sz > datasz)
+> +		return -EOVERFLOW;
+so you could have done that too for strings. Isn't it simpler? Note the
+*lengp value is not consistent with what was done for strings.
+> +
+> +	out = kcalloc(n, sz, GFP_KERNEL);
+> +	if (!out)
+> +		return -EFAULT;
+-ENOMEM?
+> +
+> +	ret = func(dev, name, out, n);
+> +	if (ret)
+> +		goto out;
+> +
+> +	if (copy_to_user(datap, out, n * sz))
+> +		ret = -EFAULT;
+> +
 > +out:
-> +	kfree(val);
+> +	kfree(out);
 > +	return ret;
 >  }
 >  
->  static int dev_property_get_uint(struct device *dev, char *name,
+>  int vfio_platform_dev_properties(struct device *dev,
 > 
