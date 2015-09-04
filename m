@@ -1,60 +1,103 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH 12/14] arm64: Check for selected granule support
-Date: Fri, 4 Sep 2015 14:58:17 +0100
-Message-ID: <20150904135817.GE17253@e104818-lin.cambridge.arm.com>
-References: <1439465645-22584-1-git-send-email-suzuki.poulose@arm.com>
- <1439465645-22584-13-git-send-email-suzuki.poulose@arm.com>
- <CAPvkgC3=S1BxdzZM4uUOmyXLjii48SMpCof6i6HdNeTG_fydfg@mail.gmail.com>
- <55CCAD73.7080702@arm.com>
- <20150813172946.GD4602@e104818-lin.cambridge.arm.com>
- <CAKv+Gu8vfsL+SFqgsXESfYC5a90-rnHbLqVFuOkvDXTt2b1E3Q@mail.gmail.com>
- <CAKv+Gu-eWRcFQkn_99WF_3H=u8qAAVis60SuegdxyeYK3v5QdQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu-eWRcFQkn_99WF_3H=u8qAAVis60SuegdxyeYK3v5QdQ@mail.gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Steve Capper <steve.capper@linaro.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Suzuki K. Poulose" <Suzuki.Poulose@arm.com>, Marc Zyngier <Marc.Zyngier@arm.com>, Will Deacon <Will.Deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PATCH 1/2] arm/arm64: KVM: vgic: Move active state handling to flush_hwstate
+Date: Fri,  4 Sep 2015 16:24:38 +0200
+Message-ID: <1441376679-8341-2-git-send-email-christoffer.dall@linaro.org>
+References: <1441376679-8341-1-git-send-email-christoffer.dall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1441376679-8341-1-git-send-email-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Sep 02, 2015 at 12:19:07PM +0200, Ard Biesheuvel wrote:
-> On 2 September 2015 at 11:48, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> > Couldn't we allocate some flag bits in the Image header to communicate
-> > the page size to the bootloader?
-> 
-> Something like this perhaps?
-> 
-> ------------8<---------------
-> diff --git a/Documentation/arm64/booting.txt b/Documentation/arm64/booting.txt
-> index 7d9d3c2286b2..13a8aaa9a6e9 100644
-> --- a/Documentation/arm64/booting.txt
-> +++ b/Documentation/arm64/booting.txt
-> @@ -104,7 +104,8 @@ Header notes:
->  - The flags field (introduced in v3.17) is a little-endian 64-bit field
->    composed as follows:
->    Bit 0:       Kernel endianness.  1 if BE, 0 if LE.
-> -  Bits 1-63:   Reserved.
-> +  Bits 1-2:    Kernel page size.   0=unspecified, 1=4K, 2=16K, 3=64K
-> +  Bits 3-63:   Reserved.
-> 
->  - When image_size is zero, a bootloader should attempt to keep as much
->    memory as possible free for use by the kernel immediately after the
-> diff --git a/arch/arm64/kernel/image.h b/arch/arm64/kernel/image.h
-> index 8fae0756e175..5def289bda84 100644
-> --- a/arch/arm64/kernel/image.h
-> +++ b/arch/arm64/kernel/image.h
-> @@ -47,7 +47,9 @@
->  #define __HEAD_FLAG_BE 0
->  #endif
-> 
-> -#define __HEAD_FLAGS   (__HEAD_FLAG_BE << 0)
-> +#define __HEAD_FLAG_PAGE_SIZE ((PAGE_SHIFT - 10) / 2)
-> +
-> +#define __HEAD_FLAGS   (__HEAD_FLAG_BE << 0) | (__HEAD_FLAG_PAGE_SIZE << 1)
+We currently set the physical active state only when we *inject* a new
+pending virtual interrupt, but this is actually not correct, because we
+could have been preempted and run something else on the system that
+resets the active state to clear.  This causes us to run the VM with the
+timer set to fire, but without setting the physical active state.
 
-I'm fine with this.
+The solution is to always check the LR configurations, and we if have a
+mapped interrupt in the LR in either the pending or active state
+(virtual), then set the physical active state.
 
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ virt/kvm/arm/vgic.c | 42 ++++++++++++++++++++++++++----------------
+ 1 file changed, 26 insertions(+), 16 deletions(-)
+
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 9eb489a..6bd1c9b 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -1144,26 +1144,11 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
+ 		struct irq_phys_map *map;
+ 		map = vgic_irq_map_search(vcpu, irq);
+ 
+-		/*
+-		 * If we have a mapping, and the virtual interrupt is
+-		 * being injected, then we must set the state to
+-		 * active in the physical world. Otherwise the
+-		 * physical interrupt will fire and the guest will
+-		 * exit before processing the virtual interrupt.
+-		 */
+ 		if (map) {
+-			int ret;
+-
+-			BUG_ON(!map->active);
+ 			vlr.hwirq = map->phys_irq;
+ 			vlr.state |= LR_HW;
+ 			vlr.state &= ~LR_EOI_INT;
+ 
+-			ret = irq_set_irqchip_state(map->irq,
+-						    IRQCHIP_STATE_ACTIVE,
+-						    true);
+-			WARN_ON(ret);
+-
+ 			/*
+ 			 * Make sure we're not going to sample this
+ 			 * again, as a HW-backed interrupt cannot be
+@@ -1255,7 +1240,7 @@ static void __kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+ 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+ 	unsigned long *pa_percpu, *pa_shared;
+-	int i, vcpu_id;
++	int i, vcpu_id, lr, ret;
+ 	int overflow = 0;
+ 	int nr_shared = vgic_nr_shared_irqs(dist);
+ 
+@@ -1310,6 +1295,31 @@ epilog:
+ 		 */
+ 		clear_bit(vcpu_id, dist->irq_pending_on_cpu);
+ 	}
++
++	for (lr = 0; lr < vgic->nr_lr; lr++) {
++		struct vgic_lr vlr;
++
++		if (!test_bit(lr, vgic_cpu->lr_used))
++			continue;
++
++		vlr = vgic_get_lr(vcpu, lr);
++
++		/*
++		 * If we have a mapping, and the virtual interrupt is
++		 * presented to the guest (as pending or active), then we must
++		 * set the state to active in the physical world. See
++		 * Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt.
++		 */
++		if (vlr.state & LR_HW) {
++			struct irq_phys_map *map;
++			map = vgic_irq_map_search(vcpu, vlr.irq);
++
++			ret = irq_set_irqchip_state(map->irq,
++						    IRQCHIP_STATE_ACTIVE,
++						    true);
++			WARN_ON(ret);
++		}
++	}
+ }
+ 
+ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
 -- 
-Catalin
+2.1.2.330.g565301e.dirty
+
