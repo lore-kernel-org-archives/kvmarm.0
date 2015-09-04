@@ -1,63 +1,142 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v2 0/8] Rework architected timer and forwarded IRQs handling
-Date: Fri,  4 Sep 2015 21:40:42 +0200
-Message-ID: <1441395650-19663-1-git-send-email-christoffer.dall@linaro.org>
+Subject: [PATCH v2 1/8] KVM: Add kvm_arch_vcpu_{un}blocking callbacks
+Date: Fri,  4 Sep 2015 21:40:43 +0200
+Message-ID: <1441395650-19663-2-git-send-email-christoffer.dall@linaro.org>
+References: <1441395650-19663-1-git-send-email-christoffer.dall@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1441395650-19663-1-git-send-email-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The architected timer integration with the VGIC had some shortcomings in
-that certain guest operations weren't fully supported.
+Some times it is useful for architecture implementations of KVM to know
+when the VCPU thread is about to block or when it comes back from
+blocking (arm/arm64 needs to know this to properly implement timers, for
+example).
 
-This series tries to address these problems in providing level-triggered
-semantics for the arch timer and VGIC integration and seeks to clarify
-the behavior when setting/clearing the active state on the physical
-distributor.
+Therefore provide a generic architecture callback function in line with
+what we do elsewhere for KVM generic-arch interactions.
 
-It also fixes a few other bugs in the VGIC code and finally adds support
-for edge-triggered forwarded interrupts.
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ arch/arm/include/asm/kvm_host.h     | 3 +++
+ arch/arm64/include/asm/kvm_host.h   | 3 +++
+ arch/mips/include/asm/kvm_host.h    | 2 ++
+ arch/powerpc/include/asm/kvm_host.h | 2 ++
+ arch/s390/include/asm/kvm_host.h    | 2 ++
+ arch/x86/include/asm/kvm_host.h     | 3 +++
+ include/linux/kvm_host.h            | 2 ++
+ virt/kvm/kvm_main.c                 | 3 +++
+ 8 files changed, 20 insertions(+)
 
-The edge-triggered forwarded interrupts code is untested but probably
-better to clearly do something wrong and raise a warning.
-
-Changes since v1:
- - Sent out bug fixes for active state and UEFI reset as separate
-   patches.
- - Fixed various spelling nits
- - Rewrote proposed documentation file trying to address Eric's and
-   Marc's comments
- - Rewrote kvm_timer_update_irq and kvm_timer_update_state according to
-   Marc's suggestion (thanks!)
- - Added additional patch to support edge-triggered forwarded
-   interrupts.
-
-Christoffer Dall (8):
-  KVM: Add kvm_arch_vcpu_{un}blocking callbacks
-  arm/arm64: KVM: arch_timer: Only schedule soft timer on vcpu_block
-  arm/arm64: KVM: vgic: Factor out level irq processing on guest exit
-  arm/arm64: KVM: Implement GICD_ICFGR as RO for PPIs
-  arm/arm64: KVM: Use appropriate define in VGIC reset code
-  arm/arm64: KVM: Add forwarded physical interrupts documentation
-  arm/arm64: KVM: Rework the arch timer to use level-triggered semantics
-  arm/arm64: KVM: Support edge-triggered forwarded interrupts
-
- Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt | 181 +++++++++++++++++++++
- arch/arm/kvm/arm.c                                 |  21 ++-
- arch/mips/include/asm/kvm_host.h                   |   2 +
- arch/powerpc/include/asm/kvm_host.h                |   2 +
- arch/s390/include/asm/kvm_host.h                   |   2 +
- arch/x86/include/asm/kvm_host.h                    |   3 +
- include/kvm/arm_arch_timer.h                       |   4 +-
- include/kvm/arm_vgic.h                             |   3 -
- include/linux/kvm_host.h                           |   2 +
- virt/kvm/arm/arch_timer.c                          | 150 +++++++++++------
- virt/kvm/arm/vgic.c                                | 163 +++++++++----------
- virt/kvm/kvm_main.c                                |   3 +
- 12 files changed, 398 insertions(+), 138 deletions(-)
- create mode 100644 Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
-
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index dcba0fa..86fcf6e 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -236,4 +236,7 @@ static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
+ 
++static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
++static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
++
+ #endif /* __ARM_KVM_HOST_H__ */
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 415938d..dd143f5 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -257,4 +257,7 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+ void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
+ 
++static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
++static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
++
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+index e8c8d9d..58f0f4d 100644
+--- a/arch/mips/include/asm/kvm_host.h
++++ b/arch/mips/include/asm/kvm_host.h
+@@ -845,5 +845,7 @@ static inline void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+ 		struct kvm_memory_slot *slot) {}
+ static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
++static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
++static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+ 
+ #endif /* __MIPS_KVM_HOST_H__ */
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index d91f65b..179f9a7 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -702,5 +702,7 @@ static inline void kvm_arch_memslots_updated(struct kvm *kvm, struct kvm_memslot
+ static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
+ static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+ static inline void kvm_arch_exit(void) {}
++static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
++static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+ 
+ #endif /* __POWERPC_KVM_HOST_H__ */
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index 3024acb..04a97df 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -640,5 +640,7 @@ static inline void kvm_arch_memslots_updated(struct kvm *kvm, struct kvm_memslot
+ static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
+ static inline void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+ 		struct kvm_memory_slot *slot) {}
++static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
++static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+ 
+ #endif
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 2a7f5d7..26c4086 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1202,4 +1202,7 @@ int __x86_set_memory_region(struct kvm *kvm,
+ int x86_set_memory_region(struct kvm *kvm,
+ 			  const struct kvm_userspace_memory_region *mem);
+ 
++static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
++static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
++
+ #endif /* _ASM_X86_KVM_HOST_H */
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 9564fd7..87d7be6 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -619,6 +619,8 @@ int kvm_vcpu_write_guest(struct kvm_vcpu *vcpu, gpa_t gpa, const void *data,
+ void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn);
+ 
+ void kvm_vcpu_block(struct kvm_vcpu *vcpu);
++void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu);
++void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu);
+ void kvm_vcpu_kick(struct kvm_vcpu *vcpu);
+ int kvm_vcpu_yield_to(struct kvm_vcpu *target);
+ void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 8b8a444..04b59dd 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1946,6 +1946,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+ 		} while (single_task_running() && ktime_before(cur, stop));
+ 	}
+ 
++	kvm_arch_vcpu_blocking(vcpu);
++
+ 	for (;;) {
+ 		prepare_to_wait(&vcpu->wq, &wait, TASK_INTERRUPTIBLE);
+ 
+@@ -1959,6 +1961,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+ 	finish_wait(&vcpu->wq, &wait);
+ 	cur = ktime_get();
+ 
++	kvm_arch_vcpu_unblocking(vcpu);
+ out:
+ 	trace_kvm_vcpu_wakeup(ktime_to_ns(cur) - ktime_to_ns(start), waited);
+ }
 -- 
 2.1.2.330.g565301e.dirty
 
