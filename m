@@ -1,78 +1,94 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: Fix PSCI affinity info return value for
- non valid cores
-Date: Fri, 4 Sep 2015 16:55:28 +0100
-Message-ID: <20150904155528.GA6390@leverpostej>
-References: <1441379184-16749-1-git-send-email-a.spyridakis@virtualopensystems.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH 6/9] arm/arm64: KVM: Add mapped interrupts documentation
+Date: Fri, 4 Sep 2015 17:57:33 +0200
+Message-ID: <20150904155733.GN5171@cbox>
+References: <1440942866-23802-1-git-send-email-christoffer.dall@linaro.org>
+ <1440942866-23802-7-git-send-email-christoffer.dall@linaro.org>
+ <55E865D8.9080406@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1441379184-16749-1-git-send-email-a.spyridakis@virtualopensystems.com>
+In-Reply-To: <55E865D8.9080406@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Alexander Spyridakis <a.spyridakis@virtualopensystems.com>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <Marc.Zyngier@arm.com>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Sep 04, 2015 at 04:06:24PM +0100, Alexander Spyridakis wrote:
-> If a guest requests the affinity info for a non-existing vCPU we need to
-> properly return an error, instead of erroneously reporting an off state.
+On Thu, Sep 03, 2015 at 04:23:04PM +0100, Marc Zyngier wrote:
+> On 30/08/15 14:54, Christoffer Dall wrote:
+> > Mapped interrupts on arm/arm64 is a tricky concept and the way we deal
+> > with them is not apparently easy to understand by reading various specs.
+> > 
+> > Therefore, add a proper documentation file explaining the flow and
+> > rationale of the behavior of the vgic.
+> > 
+> > Some of this text was contributed by Marc Zyngier.
+> > 
+> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > ---
+> >  Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt | 59 ++++++++++++++++++++++
+> >  1 file changed, 59 insertions(+)
+> >  create mode 100644 Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
+> > 
+> > diff --git a/Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt b/Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
+> > new file mode 100644
+> > index 0000000..49e1357
+> > --- /dev/null
+> > +++ b/Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
+> > @@ -0,0 +1,59 @@
+> > +KVM/ARM VGIC Mapped Interrupts
+> > +==============================
+> > +
+> > +Setting the Physical Active State for Edge vs. Level Triggered IRQs
+> > +-------------------------------------------------------------------
+> > +
+> > +Mapped non-shared interrupts injected to a guest should always mark the
+> > +interrupt as active on the physical distributor.
+> > +
+> > +The reasoning for level-triggered interrupts:
+> > +For level-triggered interrupts, we have to mark the interrupt as active
+> > +on the physical distributor, because otherwise, as the line remains
+> > +asserted, the guest will never execute because the host will keep taking
+> > +interrupts.  As soon as the guest deactivates the interrupt, the
+> > +physical line is sampled by the hardware again and the host takes a new
+> > +interrupt if the physical line is still asserted.
+> > +
+> > +The reasoning for edge-triggered interrupts:
+> > +For edge-triggered interrupts, if we set the HW bit in the LR we also
+> > +have to mark the interrupt as active on the physical distributor.  If we
+> > +don't set the physical active bit and the interrupt hits again before
+> > +the guest has deactivated the interrupt, the interrupt goes to the host,
+> > +which cannot set the state to ACTIVE+PENDING in the LR, because that is
+> > +not supported when setting the HW bit in the LR.
+> > +
+> > +An alternative could be to not use HW bit at all, and inject
+> > +edge-triggered interrupts from a physical assigned device as pure
+> > +virtual interrupts, but that would potentially slow down handling of the
+> > +interrupt in the guest, because a physical interrupt occurring in the
+> > +middle of the guest ISR would preempt the guest for the host to handle
+> > +the interrupt.
 > 
-> Signed-off-by: Alexander Spyridakis <a.spyridakis@virtualopensystems.com>
-> Signed-off-by: Alvise Rigo <a.rigo@virtualopensystems.com>
-
-This looks correct to me per the PSCI 0.2 spec:
-
-Acked-by: Mark Rutland <mark.rutland@arm.com>
-
-Was this spotted by inspection, or do you have some client for which
-this is important?
-
-Thanks,
-Mark.
-
-> ---
->  arch/arm/kvm/psci.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
+> It would be worth mentioning that this is valid for PPIs and SPIs. LPIs
+> do not have an Active state (they are either Pending or not), so we'll
+> have to deal with edge interrupts as you just described at some point.
+> Other architectures do something similar, I'd expect.
 > 
-> diff --git a/arch/arm/kvm/psci.c b/arch/arm/kvm/psci.c
-> index 4b94b51..ad6f642 100644
-> --- a/arch/arm/kvm/psci.c
-> +++ b/arch/arm/kvm/psci.c
-> @@ -126,7 +126,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
->  
->  static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
->  {
-> -	int i;
-> +	int i, matching_cpus = 0;
->  	unsigned long mpidr;
->  	unsigned long target_affinity;
->  	unsigned long target_affinity_mask;
-> @@ -151,12 +151,16 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
->  	 */
->  	kvm_for_each_vcpu(i, tmp, kvm) {
->  		mpidr = kvm_vcpu_get_mpidr_aff(tmp);
-> -		if (((mpidr & target_affinity_mask) == target_affinity) &&
-> -		    !tmp->arch.pause) {
-> -			return PSCI_0_2_AFFINITY_LEVEL_ON;
-> +		if ((mpidr & target_affinity_mask) == target_affinity) {
-> +			matching_cpus++;
-> +			if (!tmp->arch.pause)
-> +				return PSCI_0_2_AFFINITY_LEVEL_ON;
->  		}
->  	}
->  
-> +	if (!matching_cpus)
-> +		return PSCI_RET_INVALID_PARAMS;
-> +
->  	return PSCI_0_2_AFFINITY_LEVEL_OFF;
->  }
->  
-> -- 
-> 2.5.1
+> > +
+> > +
+> > +Life Cycle for Forwarded Physical Interrupts
+> > +--------------------------------------------
+> > +
+> > +By forwarded physical interrupts we mean interrupts presented to a guest
+> > +representing a real HW event originally signaled to the host as a
 > 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> s/signaled/signalled/
 > 
+Actaully this was my first version as well, but aspell told me it was
+spelled signaled.
+
+Turns out it's mostly acceptable to use both spellings:
+
+http://www.merriam-webster.com/dictionary/signaled
+
+-Christoffer
