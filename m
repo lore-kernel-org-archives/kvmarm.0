@@ -1,347 +1,152 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v2 1/5] KVM: arm/arm64: Refactor vGIC attributes handling
- code
-Date: Fri, 4 Sep 2015 14:03:08 +0100
-Message-ID: <55E9968C.9010703@arm.com>
-References: <cover.1441180858.git.p.fedin@samsung.com>
- <f92e6d50897d2eb9e48dc91c0264e9409a50bc41.1441180858.git.p.fedin@samsung.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH 1/9] KVM: Add kvm_arch_vcpu_{un}blocking callbacks
+Date: Fri, 4 Sep 2015 15:50:08 +0200
+Message-ID: <55E9A190.10602@linaro.org>
+References: <1440942866-23802-1-git-send-email-christoffer.dall@linaro.org>
+ <1440942866-23802-2-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <f92e6d50897d2eb9e48dc91c0264e9409a50bc41.1441180858.git.p.fedin@samsung.com>
+In-Reply-To: <1440942866-23802-2-git-send-email-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Pavel,
+Hi Christoffer,
+On 08/30/2015 03:54 PM, Christoffer Dall wrote:
+> Some times it is useful for architecture implementations of KVM to know
+> when the VCPU thread is about to block or when it comes back from
+> blocking (arm/arm64 needs to know this to properly implement timers, for
+> example).
+what about vcpu_sleep()? Is that callback specific to kvm_vcpu_block
+function entry/exit points or is it more generic? The question also
+applies to future halt/resume functions
 
-On 02/09/15 09:09, Pavel Fedin wrote:
-> Separate all implementation-independent code in vgic_attr_regs_access()
-> and move it to vgic.c. This will allow to reuse this code for vGICv3
-> implementation.
+Thanks
+
+Eric
 > 
-> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+> Therefore provide a generic architecture callback function in line with
+> what we do elsewhere for KVM generic-arch interactions.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > ---
->  virt/kvm/arm/vgic-v2-emul.c | 126 +++++++++-----------------------------------
->  virt/kvm/arm/vgic.c         |  77 +++++++++++++++++++++++++++
->  virt/kvm/arm/vgic.h         |   4 ++
->  3 files changed, 107 insertions(+), 100 deletions(-)
+>  arch/arm/include/asm/kvm_host.h     | 3 +++
+>  arch/arm64/include/asm/kvm_host.h   | 3 +++
+>  arch/mips/include/asm/kvm_host.h    | 2 ++
+>  arch/powerpc/include/asm/kvm_host.h | 2 ++
+>  arch/s390/include/asm/kvm_host.h    | 2 ++
+>  arch/x86/include/asm/kvm_host.h     | 3 +++
+>  include/linux/kvm_host.h            | 2 ++
+>  virt/kvm/kvm_main.c                 | 3 +++
+>  8 files changed, 20 insertions(+)
 > 
-> diff --git a/virt/kvm/arm/vgic-v2-emul.c b/virt/kvm/arm/vgic-v2-emul.c
-> index 1390797..557c5a6 100644
-> --- a/virt/kvm/arm/vgic-v2-emul.c
-> +++ b/virt/kvm/arm/vgic-v2-emul.c
-> @@ -661,97 +661,38 @@ static const struct vgic_io_range vgic_cpu_ranges[] = {
->  	},
->  };
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index dcba0fa..86fcf6e 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -236,4 +236,7 @@ static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
 >  
-> -static int vgic_attr_regs_access(struct kvm_device *dev,
-> -				 struct kvm_device_attr *attr,
-> -				 u32 *reg, bool is_write)
-> +static int vgic_v2_attr_regs_access(struct kvm_device *dev,
-> +				    struct kvm_device_attr *attr,
-> +				    __le32 *data, bool is_write)
->  {
-> -	const struct vgic_io_range *r = NULL, *ranges;
-> +	const struct vgic_io_range *ranges;
->  	phys_addr_t offset;
-> -	int ret, cpuid, c;
-> -	struct kvm_vcpu *vcpu, *tmp_vcpu;
-> -	struct vgic_dist *vgic;
-> +	int cpuid;
-> +	struct vgic_dist *vgic = &dev->kvm->arch.vgic;
->  	struct kvm_exit_mmio mmio;
-> -	u32 data;
+> +static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+> +static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+> +
+>  #endif /* __ARM_KVM_HOST_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 415938d..dd143f5 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -257,4 +257,7 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+>  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
 >  
->  	offset = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
->  	cpuid = (attr->attr & KVM_DEV_ARM_VGIC_CPUID_MASK) >>
->  		KVM_DEV_ARM_VGIC_CPUID_SHIFT;
+> +static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+> +static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+> +
+>  #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/arch/mips/include/asm/kvm_host.h b/arch/mips/include/asm/kvm_host.h
+> index e8c8d9d..58f0f4d 100644
+> --- a/arch/mips/include/asm/kvm_host.h
+> +++ b/arch/mips/include/asm/kvm_host.h
+> @@ -845,5 +845,7 @@ static inline void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+>  		struct kvm_memory_slot *slot) {}
+>  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+> +static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+> +static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
 >  
-> -	mutex_lock(&dev->kvm->lock);
-> -
-> -	ret = vgic_init(dev->kvm);
-> -	if (ret)
-> -		goto out;
-> -
-> -	if (cpuid >= atomic_read(&dev->kvm->online_vcpus)) {
-> -		ret = -EINVAL;
-> -		goto out;
-> -	}
-> -
-> -	vcpu = kvm_get_vcpu(dev->kvm, cpuid);
-> -	vgic = &dev->kvm->arch.vgic;
-> -
-> -	mmio.len = 4;
-> -	mmio.is_write = is_write;
-> -	mmio.data = &data;
-> -	if (is_write)
-> -		mmio_data_write(&mmio, ~0, *reg);
->  	switch (attr->group) {
->  	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
-> -		mmio.phys_addr = vgic->vgic_dist_base + offset;
-> +		mmio.phys_addr = vgic->vgic_dist_base;
->  		ranges = vgic_dist_ranges;
->  		break;
->  	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
-> -		mmio.phys_addr = vgic->vgic_cpu_base + offset;
-> +		mmio.phys_addr = vgic->vgic_cpu_base;
->  		ranges = vgic_cpu_ranges;
->  		break;
->  	default:
-> -		BUG();
-> +		return -ENXIO;
+>  #endif /* __MIPS_KVM_HOST_H__ */
+> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+> index d91f65b..179f9a7 100644
+> --- a/arch/powerpc/include/asm/kvm_host.h
+> +++ b/arch/powerpc/include/asm/kvm_host.h
+> @@ -702,5 +702,7 @@ static inline void kvm_arch_memslots_updated(struct kvm *kvm, struct kvm_memslot
+>  static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
+>  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+>  static inline void kvm_arch_exit(void) {}
+> +static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+> +static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+>  
+>  #endif /* __POWERPC_KVM_HOST_H__ */
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index 3024acb..04a97df 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -640,5 +640,7 @@ static inline void kvm_arch_memslots_updated(struct kvm *kvm, struct kvm_memslot
+>  static inline void kvm_arch_flush_shadow_all(struct kvm *kvm) {}
+>  static inline void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+>  		struct kvm_memory_slot *slot) {}
+> +static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+> +static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+>  
+>  #endif
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 2a7f5d7..26c4086 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1202,4 +1202,7 @@ int __x86_set_memory_region(struct kvm *kvm,
+>  int x86_set_memory_region(struct kvm *kvm,
+>  			  const struct kvm_userspace_memory_region *mem);
+>  
+> +static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+> +static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+> +
+>  #endif /* _ASM_X86_KVM_HOST_H */
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 9564fd7..87d7be6 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -619,6 +619,8 @@ int kvm_vcpu_write_guest(struct kvm_vcpu *vcpu, gpa_t gpa, const void *data,
+>  void kvm_vcpu_mark_page_dirty(struct kvm_vcpu *vcpu, gfn_t gfn);
+>  
+>  void kvm_vcpu_block(struct kvm_vcpu *vcpu);
+> +void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu);
+> +void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu);
+>  void kvm_vcpu_kick(struct kvm_vcpu *vcpu);
+>  int kvm_vcpu_yield_to(struct kvm_vcpu *target);
+>  void kvm_vcpu_on_spin(struct kvm_vcpu *vcpu);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 8b8a444..04b59dd 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1946,6 +1946,8 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>  		} while (single_task_running() && ktime_before(cur, stop));
 >  	}
-> -	r = vgic_find_range(ranges, 4, offset);
 >  
-> -	if (unlikely(!r || !r->handle_mmio)) {
-> -		ret = -ENXIO;
-> -		goto out;
-> -	}
-> -
-> -
-> -	spin_lock(&vgic->lock);
-> -
-> -	/*
-> -	 * Ensure that no other VCPU is running by checking the vcpu->cpu
-> -	 * field.  If no other VPCUs are running we can safely access the VGIC
-> -	 * state, because even if another VPU is run after this point, that
-> -	 * VCPU will not touch the vgic state, because it will block on
-> -	 * getting the vgic->lock in kvm_vgic_sync_hwstate().
-> -	 */
-> -	kvm_for_each_vcpu(c, tmp_vcpu, dev->kvm) {
-> -		if (unlikely(tmp_vcpu->cpu != -1)) {
-> -			ret = -EBUSY;
-> -			goto out_vgic_unlock;
-> -		}
-> -	}
-> -
-> -	/*
-> -	 * Move all pending IRQs from the LRs on all VCPUs so the pending
-> -	 * state can be properly represented in the register state accessible
-> -	 * through this API.
-> -	 */
-> -	kvm_for_each_vcpu(c, tmp_vcpu, dev->kvm)
-> -		vgic_unqueue_irqs(tmp_vcpu);
-> -
-> -	offset -= r->base;
-> -	r->handle_mmio(vcpu, &mmio, offset);
-> -
-> -	if (!is_write)
-> -		*reg = mmio_data_read(&mmio, ~0);
-> +	mmio.is_write = is_write;
-> +	mmio.data = data;
+> +	kvm_arch_vcpu_blocking(vcpu);
+> +
+>  	for (;;) {
+>  		prepare_to_wait(&vcpu->wq, &wait, TASK_INTERRUPTIBLE);
 >  
-> -	ret = 0;
-> -out_vgic_unlock:
-> -	spin_unlock(&vgic->lock);
-> -out:
-> -	mutex_unlock(&dev->kvm->lock);
-> -	return ret;
-> +	return vgic_attr_regs_access(dev, ranges, &mmio, offset, sizeof(data),
-> +				     cpuid);
-
-Isn't the len parameter redundant here? I see that you don't initialize
-mmio.len (which is a bit scary, btw), so can't you just use that field?
-
+> @@ -1959,6 +1961,7 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
+>  	finish_wait(&vcpu->wq, &wait);
+>  	cur = ktime_get();
+>  
+> +	kvm_arch_vcpu_unblocking(vcpu);
+>  out:
+>  	trace_kvm_vcpu_wakeup(ktime_to_ns(cur) - ktime_to_ns(start), waited);
 >  }
->  
->  static int vgic_v2_create(struct kvm_device *dev, u32 type)
-> @@ -767,53 +708,38 @@ static void vgic_v2_destroy(struct kvm_device *dev)
->  static int vgic_v2_set_attr(struct kvm_device *dev,
->  			    struct kvm_device_attr *attr)
->  {
-> +	u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-> +	u32 reg;
-> +	__le32 data;
-
-That (and other parts of this patch) sneak in some endianness handling,
-which I'd like to be mentioned in the commit message, but preferably be
-in a separate patch. The commit message here talks only about refactoring.
-
->  	int ret;
->  
->  	ret = vgic_set_common_attr(dev, attr);
->  	if (ret != -ENXIO)
->  		return ret;
->  
-> -	switch (attr->group) {
-> -	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
-> -	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
-> -		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-> -		u32 reg;
-> -
-> -		if (get_user(reg, uaddr))
-> -			return -EFAULT;
-> -
-> -		return vgic_attr_regs_access(dev, attr, &reg, true);
-> -	}
-> -
-> -	}
-> +	if (get_user(reg, uaddr))
-> +		return -EFAULT;
->  
-> -	return -ENXIO;
-> +	data = cpu_to_le32(reg);
-
-Again changes to the code that exceed refactoring. Please move that to a
-separate patch and explain them.
-
-> +	return vgic_v2_attr_regs_access(dev, attr, &data, true);
->  }
->  
->  static int vgic_v2_get_attr(struct kvm_device *dev,
->  			    struct kvm_device_attr *attr)
->  {
-> +	u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-> +	__le32 data = 0;
->  	int ret;
->  
->  	ret = vgic_get_common_attr(dev, attr);
->  	if (ret != -ENXIO)
->  		return ret;
->  
-> -	switch (attr->group) {
-> -	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
-> -	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
-> -		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-> -		u32 reg = 0;
-> -
-> -		ret = vgic_attr_regs_access(dev, attr, &reg, false);
-> -		if (ret)
-> -			return ret;
-> -		return put_user(reg, uaddr);
-> -	}
-> -
-> -	}
-> +	ret = vgic_v2_attr_regs_access(dev, attr, &data, false);
-> +	if (ret)
-> +		return ret;
->  
-> -	return -ENXIO;
-> +	return put_user(le32_to_cpu(data), uaddr);
->  }
->  
->  static int vgic_v2_has_attr(struct kvm_device *dev,
-> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> index 9eb489a..33b00e5 100644
-> --- a/virt/kvm/arm/vgic.c
-> +++ b/virt/kvm/arm/vgic.c
-> @@ -2410,6 +2410,83 @@ int vgic_has_attr_regs(const struct vgic_io_range *ranges, phys_addr_t offset)
->  		return -ENXIO;
->  }
->  
-> +int vgic_attr_regs_access(struct kvm_device *dev,
-> +			  const struct vgic_io_range *ranges,
-> +			  struct kvm_exit_mmio *mmio, phys_addr_t offset,
-> +			  int len, int cpuid)
-> +{
-> +	const struct vgic_io_range *r;
-> +	int ret, c;
-> +	struct kvm_vcpu *vcpu, *tmp_vcpu;
-> +	struct vgic_dist *vgic;
-> +
-> +	r = vgic_find_range(ranges, len, offset);
-> +
-> +	if (unlikely(!r || !r->handle_mmio))
-> +		return -ENXIO;
-> +
-> +	mutex_lock(&dev->kvm->lock);
-> +
-> +	ret = vgic_init(dev->kvm);
-> +	if (ret)
-> +		goto out;
-> +
-> +	if (cpuid >= atomic_read(&dev->kvm->online_vcpus)) {
-> +		ret = -EINVAL;
-> +		goto out;
-> +	}
-> +
-> +	vcpu = kvm_get_vcpu(dev->kvm, cpuid);
-> +	vgic = &dev->kvm->arch.vgic;
-> +
-> +	spin_lock(&vgic->lock);
-> +
-> +	/*
-> +	 * Ensure that no other VCPU is running by checking the vcpu->cpu
-> +	 * field.  If no other VPCUs are running we can safely access the VGIC
-> +	 * state, because even if another VPU is run after this point, that
-> +	 * VCPU will not touch the vgic state, because it will block on
-> +	 * getting the vgic->lock in kvm_vgic_sync_hwstate().
-> +	 */
-> +	kvm_for_each_vcpu(c, tmp_vcpu, dev->kvm) {
-> +		if (unlikely(tmp_vcpu->cpu != -1)) {
-> +			ret = -EBUSY;
-> +			goto out_vgic_unlock;
-> +		}
-> +	}
-> +
-> +	/*
-> +	 * Move all pending IRQs from the LRs on all VCPUs so the pending
-> +	 * state can be properly represented in the register state accessible
-> +	 * through this API.
-> +	 */
-> +	kvm_for_each_vcpu(c, tmp_vcpu, dev->kvm)
-> +		vgic_unqueue_irqs(tmp_vcpu);
-> +
-> +	/*
-> +	 * Unfortunately our MMIO handlers can process only up to 32 bits per
-> +	 * access. For 64-bit registers we have to split up the operation.
-> +	 */
-> +	mmio->len = sizeof(u32);
-> +	mmio->phys_addr += offset;
-
-I find it a bit awkward to change the mmio struct which has been setup
-by the caller. For a possible solution, see the next comment.
-
-> +	offset -= r->base;
-> +	r->handle_mmio(vcpu, mmio, offset);
-> +
-> +	if (len == sizeof(u64)) {
-> +		mmio->data += sizeof(u32);
-> +		mmio->phys_addr += sizeof(u32);
-> +		offset += sizeof(u32);
-> +		r->handle_mmio(vcpu, mmio, offset);
-> +	}
-
-Can't you just call call_range_handler(vcpu, mmio, offset, r) here
-instead, which does the 64-bit split for you?
-Or if there is something that prevents this, refactor this function to
-be used from both places?
-
-But again, I'd prefer that this patch be pure refactoring, and any
-changes to the code be in (a) separate patch(es).
-64 bit preparations are clearly not just refactoring.
-
-Cheers,
-Andre.
-
-> +
-> +	ret = 0;
-> +out_vgic_unlock:
-> +	spin_unlock(&vgic->lock);
-> +out:
-> +	mutex_unlock(&dev->kvm->lock);
-> +	return ret;
-> +}
-> +
->  static void vgic_init_maintenance_interrupt(void *info)
->  {
->  	enable_percpu_irq(vgic->maint_irq, 0);
-> diff --git a/virt/kvm/arm/vgic.h b/virt/kvm/arm/vgic.h
-> index 0df74cb..a08348d 100644
-> --- a/virt/kvm/arm/vgic.h
-> +++ b/virt/kvm/arm/vgic.h
-> @@ -132,6 +132,10 @@ void vgic_kick_vcpus(struct kvm *kvm);
->  int vgic_has_attr_regs(const struct vgic_io_range *ranges, phys_addr_t offset);
->  int vgic_set_common_attr(struct kvm_device *dev, struct kvm_device_attr *attr);
->  int vgic_get_common_attr(struct kvm_device *dev, struct kvm_device_attr *attr);
-> +int vgic_attr_regs_access(struct kvm_device *dev,
-> +			  const struct vgic_io_range *ranges,
-> +			  struct kvm_exit_mmio *mmio, phys_addr_t offset,
-> +			  int len, int cpuid);
->  
->  int vgic_init(struct kvm *kvm);
->  void vgic_v2_init_emulation(struct kvm *kvm);
 > 
+
