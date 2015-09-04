@@ -1,61 +1,63 @@
-From: Alexander Spyridakis <a.spyridakis@virtualopensystems.com>
-Subject: Re: [PATCH] KVM: arm/arm64: Fix PSCI affinity info return value for
- non valid cores
-Date: Fri, 4 Sep 2015 18:32:34 +0200
-Message-ID: <CAJRNFK+0HHjZ4DaZPeAUR0bJziztX=PW5uCL57erEcD5UHerDw@mail.gmail.com>
-References: <1441379184-16749-1-git-send-email-a.spyridakis@virtualopensystems.com>
- <55E9BECD.6040302@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 58B7C412DD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2015 12:32:32 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id n9Mdy3AsnfHd for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Sep 2015 12:32:30 -0400 (EDT)
-Received: from mail-lb0-f170.google.com (mail-lb0-f170.google.com
- [209.85.217.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6A1FF41278
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2015 12:32:30 -0400 (EDT)
-Received: by lbcao8 with SMTP id ao8so14242198lbc.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Sep 2015 09:32:55 -0700 (PDT)
-Received: from mail-la0-f46.google.com (mail-la0-f46.google.com.
- [209.85.215.46])
- by smtp.googlemail.com with ESMTPSA id j5sm409441lbq.43.2015.09.04.09.32.54
- for <kvmarm@lists.cs.columbia.edu>
- (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 04 Sep 2015 09:32:54 -0700 (PDT)
-Received: by lamp12 with SMTP id p12so16458238lam.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Sep 2015 09:32:54 -0700 (PDT)
-In-Reply-To: <55E9BECD.6040302@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, KVM General <kvm@vger.kernel.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [PATCH v2 0/8] Rework architected timer and forwarded IRQs handling
+Date: Fri,  4 Sep 2015 21:40:42 +0200
+Message-ID: <1441395650-19663-1-git-send-email-christoffer.dall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 4 September 2015 at 17:54, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> Seems sound to me. Out of curiosity, how was this found?
+The architected timer integration with the VGIC had some shortcomings in
+that certain guest operations weren't fully supported.
 
-Hello Mark,
+This series tries to address these problems in providing level-triggered
+semantics for the arch timer and VGIC integration and seeks to clarify
+the behavior when setting/clearing the active state on the physical
+distributor.
 
-This issue came up when testing some basic bare metal tests with KVM,
-which originally were meant for the multi-threading TCG effort
-(https://git.virtualopensystems.com/dev/tcg_baremetal_tests.git).
-While shutting down the system the test relies on PSCI to find out if
-all secondary cores are powered-off by incrementally polling PSCI for
-every cpu id. In the case of QEMU/TCG everything was fine, but with
-KVM there was no error response for non-existing cores, and so the
-system could not shut down properly.
+It also fixes a few other bugs in the VGIC code and finally adds support
+for edge-triggered forwarded interrupts.
 
-Kind regards.
+The edge-triggered forwarded interrupts code is untested but probably
+better to clearly do something wrong and raise a warning.
+
+Changes since v1:
+ - Sent out bug fixes for active state and UEFI reset as separate
+   patches.
+ - Fixed various spelling nits
+ - Rewrote proposed documentation file trying to address Eric's and
+   Marc's comments
+ - Rewrote kvm_timer_update_irq and kvm_timer_update_state according to
+   Marc's suggestion (thanks!)
+ - Added additional patch to support edge-triggered forwarded
+   interrupts.
+
+Christoffer Dall (8):
+  KVM: Add kvm_arch_vcpu_{un}blocking callbacks
+  arm/arm64: KVM: arch_timer: Only schedule soft timer on vcpu_block
+  arm/arm64: KVM: vgic: Factor out level irq processing on guest exit
+  arm/arm64: KVM: Implement GICD_ICFGR as RO for PPIs
+  arm/arm64: KVM: Use appropriate define in VGIC reset code
+  arm/arm64: KVM: Add forwarded physical interrupts documentation
+  arm/arm64: KVM: Rework the arch timer to use level-triggered semantics
+  arm/arm64: KVM: Support edge-triggered forwarded interrupts
+
+ Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt | 181 +++++++++++++++++++++
+ arch/arm/kvm/arm.c                                 |  21 ++-
+ arch/mips/include/asm/kvm_host.h                   |   2 +
+ arch/powerpc/include/asm/kvm_host.h                |   2 +
+ arch/s390/include/asm/kvm_host.h                   |   2 +
+ arch/x86/include/asm/kvm_host.h                    |   3 +
+ include/kvm/arm_arch_timer.h                       |   4 +-
+ include/kvm/arm_vgic.h                             |   3 -
+ include/linux/kvm_host.h                           |   2 +
+ virt/kvm/arm/arch_timer.c                          | 150 +++++++++++------
+ virt/kvm/arm/vgic.c                                | 163 +++++++++----------
+ virt/kvm/kvm_main.c                                |   3 +
+ 12 files changed, 398 insertions(+), 138 deletions(-)
+ create mode 100644 Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
+
+-- 
+2.1.2.330.g565301e.dirty
+
