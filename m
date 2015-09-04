@@ -1,54 +1,59 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH v3 2/5] KVM: arm64: Implement vGICv3 distributor and
- redistributor access from userspace
-Date: Fri, 04 Sep 2015 18:22:56 +0300
-Message-ID: <023101d0e725$938927f0$ba9b77d0$@samsung.com>
+Subject: RE: [PATCH v3 3/5] KVM: arm64: Refactor system register handlers
+Date: Fri, 04 Sep 2015 18:32:57 +0300
+Message-ID: <023c01d0e726$fa307e80$ee917b80$@samsung.com>
 References: <cover.1441370053.git.p.fedin@samsung.com>
- <fc3dabfbff09f5c70affdde2996f3658b2000825.1441370053.git.p.fedin@samsung.com>
- <55E9A267.4040404@arm.com>
+ <855f207e2bb867041cd967d9ad02b7cb5f846e00.1441370053.git.p.fedin@samsung.com>
+ <55E9B4BA.2030808@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <55E9A267.4040404@arm.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E0E8041289
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2015 11:32:36 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id G3xkL15kK7mB for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Sep 2015 11:32:34 -0400 (EDT)
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com
+ [210.118.77.11])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D8CB741280
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2015 11:32:34 -0400 (EDT)
+Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
+ by mailout1.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NU500M25SIYAT20@mailout1.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Fri, 04 Sep 2015 16:32:59 +0100 (BST)
+In-reply-to: <55E9B4BA.2030808@arm.com>
 Content-language: ru
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: 'Andre Przywara' <andre.przywara@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <Marc.Zyngier@arm.com>, 'Peter Maydell' <peter.maydell@linaro.org>
+Cc: 'Marc Zyngier' <Marc.Zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
  Hello!
 
-> > The access is done similar to vGICv2, using KVM_DEV_ARM_VGIC_GRP_DIST_REGS
-> > and KVM_DEV_ARM_VGIC_GRP_REDIST_REGS with KVM_SET_DEVICE_ATTR and
-> > KVM_GET_DEVICE_ATTR ioctls. Since GICv3 can handle large number of CPUs,
-> > KVM_DEV_ARM_VGIC_CPUID_MASK has been extended to 20 bits. This is enough
-> > for 1048576 CPUs.
-> 
-> I guess the 20 bits come from 8 bits for Aff2 and Aff1 and 4-bits for
-> Aff0? If so, please mention this. But I am not sure we should limit the
-> cpu index in this public API
+> Mmmh, not sure about this, but I guess u64 would be more precise here?
+> With the Rt2 handling below we rely on this being 64 bits anyway. But I
+> guess that breaks with assigning vcpu_reg later and since this is arm64
+> only, long is always 64 bits?
 
- The documentation is confusing. It is actually not the affinity ID, but just number from 0 to N.
-See http://lxr.free-electrons.com/source/include/linux/kvm_host.h#L427 - this is the function which
-gets this "id" and returns vcpu structure.
- So, we can have up to 1 << 20 = 1048576 CPUs. Enough?
- If you are OK with this, i can post a separate patch to fix the documentation, or include it in
-respin.
- 
-> we could push the size bit into offset and use the
-> full upper 32 bits for cpuid, or at least 28 bits plus 4 reserved.
-
- Actually 20 bits comes from ARM64_SYS_REG() macro, which i reuse for KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
---- cut ---
-    bits:   | 63 .. 56 | 55 .. 48 | 47 ... 40 | 39 .. 32 | 31 .. 0 |
-    values: |   arch   |   size   | reserved  |  cpu id  |  reg id |
---- cut ---
- arch = KVM_REG_ARM64 and size = KVM_REG_SIZE_U64. I decided not to invent own macro.
-
+ It is because ' params.val = &val'. And params.val is u_long * because of: 'params.val =
+vcpu_reg(vcpu, Rt)'. vcpu_reg() is declared as unsigned long * :
+http://lxr.free-electrons.com/source/arch/arm64/include/asm/kvm_emulate.h#L102
+ Initially i declared params.val as u64 *, but got warning in 'params.val = vcpu_reg(vcpu, Rt)'. So
+i decided to change it to u_long * instead of having casts here and there. Do you like casts?
 
 Kind regards,
 Pavel Fedin
 Expert Engineer
 Samsung Electronics Research center Russia
-
