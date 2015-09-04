@@ -1,24 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 0/2] arm/arm64: KVM: Fix arthictected timer issues
-Date: Fri,  4 Sep 2015 16:24:37 +0200
-Message-ID: <1441376679-8341-1-git-send-email-christoffer.dall@linaro.org>
+Subject: Re: [PATCH 2/2] arm/arm64: KVM: arch timer: Reset CNTV_CTL to 0
+Date: Fri, 4 Sep 2015 16:47:19 +0200
+Message-ID: <20150904144719.GJ5171@cbox>
+References: <1441376679-8341-1-git-send-email-christoffer.dall@linaro.org>
+ <1441376679-8341-3-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0464412EF
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2015 10:22:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EA508412EF
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2015 10:45:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JEAgiKJm3h2b for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Sep 2015 10:22:47 -0400 (EDT)
-Received: from mail-la0-f43.google.com (mail-la0-f43.google.com
- [209.85.215.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2DB1C412D6
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2015 10:22:47 -0400 (EDT)
-Received: by laeb10 with SMTP id b10so14785913lae.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Sep 2015 07:23:12 -0700 (PDT)
+ with ESMTP id ObWm8ksk7x+D for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Sep 2015 10:45:26 -0400 (EDT)
+Received: from mail-lb0-f171.google.com (mail-lb0-f171.google.com
+ [209.85.217.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EB6E9412D6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2015 10:45:25 -0400 (EDT)
+Received: by lbbmp1 with SMTP id mp1so12633353lbb.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Sep 2015 07:45:51 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1441376679-8341-3-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,30 +33,59 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Laszlo Ersek <lersek@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-These two patches fix two separate issues with the architected timer and
-the corresponding interrupt injection to VMs on KVM/ARM.
+On Fri, Sep 04, 2015 at 04:24:39PM +0200, Christoffer Dall wrote:
+> Provide a better quality of implementation and be architecture compliant
+> on ARMv7 for the architected timer by resetting the CNTV_CTL to 0 on
+> reset of the timer, and call kvm_timer_update_state(vcpu) at the same
+> time, ensuring the timer output is not asserted after, for example, a
+> PSCI system reset.
 
-The first patch fixes an issue introduced with the active timer state
-switching series recently merged for v4.3, which could cause a guest to
-loop without progress if another VCPU is run on the same physical CPU
-and preempts the original VCPU while the guest is running the ISR for
-the timer interrupt.
+forgot to remove the bit about kvm_timer_update_state(vcpu) which is no
+longer valid when these patches are merged before the rework series.
 
-The second patch resets the architected timer's control register to zero
-on system reset, ensuring that interrupts are not injected when a system
-resets.  This fixes a long-standing issue with UEFI, where soft reset
-initiated from within UEFI prevented the system from booting again.
+Marc, if you're otherwise happy with this patch, can you fix this up at
+commit time?
 
-Christoffer Dall (2):
-  arm/arm64: KVM: vgic: Move active state handling to flush_hwstate
-  arm/arm64: KVM: arch timer: Reset CNTV_CTL to 0
+Thanks,
+-Christoffer
 
- virt/kvm/arm/arch_timer.c |  8 ++++++++
- virt/kvm/arm/vgic.c       | 42 ++++++++++++++++++++++++++----------------
- 2 files changed, 34 insertions(+), 16 deletions(-)
-
--- 
-2.1.2.330.g565301e.dirty
+> 
+> This change alone fixes the UEFI reset issue reported by Laszlo back in
+> February.
+> 
+> Cc: Laszlo Ersek <lersek@redhat.com>
+> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Cc: Drew Jones <drjones@redhat.com>
+> Cc: Wei Huang <wei@redhat.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>  virt/kvm/arm/arch_timer.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index 76e38d2..48c6e1a 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -200,6 +200,14 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+>  	timer->irq = irq;
+>  
+>  	/*
+> +	 * The bits in CNTV_CTL are architecturally reset to UNKNOWN for ARMv8
+> +	 * and to 0 for ARMv7.  We provide an implementation that always
+> +	 * resets the timer to be disabled and unmasked and is compliant with
+> +	 * the ARMv7 architecture.
+> +	 */
+> +	timer->cntv_ctl = 0;
+> +
+> +	/*
+>  	 * Tell the VGIC that the virtual interrupt is tied to a
+>  	 * physical interrupt. We do that once per VCPU.
+>  	 */
+> -- 
+> 2.1.2.330.g565301e.dirty
+> 
