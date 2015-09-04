@@ -1,36 +1,55 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 2/2] arm/arm64: KVM: arch timer: Reset CNTV_CTL to 0
-Date: Fri, 04 Sep 2015 15:51:44 +0100
-Message-ID: <55E9B000.9040502@arm.com>
-References: <1441376679-8341-1-git-send-email-christoffer.dall@linaro.org> <1441376679-8341-3-git-send-email-christoffer.dall@linaro.org> <20150904144719.GJ5171@cbox>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+From: Alexander Spyridakis <a.spyridakis@virtualopensystems.com>
+Subject: [PATCH] KVM: arm/arm64: Fix PSCI affinity info return value for non valid cores
+Date: Fri,  4 Sep 2015 17:06:24 +0200
+Message-ID: <1441379184-16749-1-git-send-email-a.spyridakis@virtualopensystems.com>
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20150904144719.GJ5171@cbox>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Laszlo Ersek <lersek@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Drew Jones <drjones@redhat.com>, Wei Huang <wei@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: marc.zyngier@arm.com, christoffer.dall@linaro.org, a.rigo@virtualopensystems.com, Alexander Spyridakis <a.spyridakis@virtualopensystems.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 04/09/15 15:47, Christoffer Dall wrote:
-> On Fri, Sep 04, 2015 at 04:24:39PM +0200, Christoffer Dall wrote:
->> Provide a better quality of implementation and be architecture compliant
->> on ARMv7 for the architected timer by resetting the CNTV_CTL to 0 on
->> reset of the timer, and call kvm_timer_update_state(vcpu) at the same
->> time, ensuring the timer output is not asserted after, for example, a
->> PSCI system reset.
-> 
-> forgot to remove the bit about kvm_timer_update_state(vcpu) which is no
-> longer valid when these patches are merged before the rework series.
-> 
-> Marc, if you're otherwise happy with this patch, can you fix this up at
-> commit time?
+If a guest requests the affinity info for a non-existing vCPU we need to
+properly return an error, instead of erroneously reporting an off state.
 
-No problem, I can fix the commit message on applying the patch.
+Signed-off-by: Alexander Spyridakis <a.spyridakis@virtualopensystems.com>
+Signed-off-by: Alvise Rigo <a.rigo@virtualopensystems.com>
+---
+ arch/arm/kvm/psci.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-Thanks,
-
-	M.
+diff --git a/arch/arm/kvm/psci.c b/arch/arm/kvm/psci.c
+index 4b94b51..ad6f642 100644
+--- a/arch/arm/kvm/psci.c
++++ b/arch/arm/kvm/psci.c
+@@ -126,7 +126,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+ 
+ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+ {
+-	int i;
++	int i, matching_cpus = 0;
+ 	unsigned long mpidr;
+ 	unsigned long target_affinity;
+ 	unsigned long target_affinity_mask;
+@@ -151,12 +151,16 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+ 	 */
+ 	kvm_for_each_vcpu(i, tmp, kvm) {
+ 		mpidr = kvm_vcpu_get_mpidr_aff(tmp);
+-		if (((mpidr & target_affinity_mask) == target_affinity) &&
+-		    !tmp->arch.pause) {
+-			return PSCI_0_2_AFFINITY_LEVEL_ON;
++		if ((mpidr & target_affinity_mask) == target_affinity) {
++			matching_cpus++;
++			if (!tmp->arch.pause)
++				return PSCI_0_2_AFFINITY_LEVEL_ON;
+ 		}
+ 	}
+ 
++	if (!matching_cpus)
++		return PSCI_RET_INVALID_PARAMS;
++
+ 	return PSCI_0_2_AFFINITY_LEVEL_OFF;
+ }
+ 
 -- 
-Jazz is not dead. It just smells funny...
+2.5.1
+
