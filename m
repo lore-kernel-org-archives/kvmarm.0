@@ -1,23 +1,32 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 0/2] arm/arm64: KVM: Fix arthictected timer issues
-Date: Fri, 04 Sep 2015 16:35:20 +0100
-Message-ID: <55E9BA38.7030305@arm.com>
-References: <1441376679-8341-1-git-send-email-christoffer.dall@linaro.org>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH v3 5/5] KVM: arm64: Implement vGICv3 CPU interface access
+Date: Fri, 04 Sep 2015 18:40:00 +0300
+Message-ID: <023d01d0e727$f6630650$e32912f0$@samsung.com>
+References: <cover.1441370053.git.p.fedin@samsung.com>
+ <20be17e4e8aebcd7f1a52a634f449955bef99996.1441370053.git.p.fedin@samsung.com>
+ <55E9B528.50106@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0206841289
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2015 11:34:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BFE941280
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2015 11:39:39 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dZz8pwERTZcL for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Sep 2015 11:34:56 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DD2E941280
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2015 11:34:56 -0400 (EDT)
-In-Reply-To: <1441376679-8341-1-git-send-email-christoffer.dall@linaro.org>
+ with ESMTP id k3BVLhNsUxog for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Sep 2015 11:39:37 -0400 (EDT)
+Received: from mailout4.w1.samsung.com (mailout4.w1.samsung.com
+ [210.118.77.14])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 75F7A41278
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2015 11:39:36 -0400 (EDT)
+Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
+ by mailout4.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NU500HYASUPUZ10@mailout4.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Fri, 04 Sep 2015 16:40:01 +0100 (BST)
+In-reply-to: <55E9B528.50106@arm.com>
+Content-language: ru
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,31 +36,22 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org
+To: 'Andre Przywara' <andre.przywara@arm.com>
+Cc: 'Marc Zyngier' <Marc.Zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+ Hello!
 
-On 04/09/15 15:24, Christoffer Dall wrote:
-> These two patches fix two separate issues with the architected timer and
-> the corresponding interrupt injection to VMs on KVM/ARM.
-> 
-> The first patch fixes an issue introduced with the active timer state
-> switching series recently merged for v4.3, which could cause a guest to
-> loop without progress if another VCPU is run on the same physical CPU
-> and preempts the original VCPU while the guest is running the ISR for
-> the timer interrupt.
-> 
-> The second patch resets the architected timer's control register to zero
-> on system reset, ensuring that interrupts are not injected when a system
-> resets.  This fixes a long-standing issue with UEFI, where soft reset
-> initiated from within UEFI prevented the system from booting again.
+> So can you model the register size according to the spec and allow
+> 32-bit accesses from userland?
 
-Thanks for respinning these patches. I've queued them in our -next
-queue. I'll send this to Paolo some time next week, once they get some
-hammering.
+ I can. But i'll have to invent my own macro for encoding register IDs into the attribute, as well
+as drop reusing index_to_params(). Will it be OK?
+ Upside: i can further extend "cpu id" (actually CPU index) field to 31 bit. :)
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+ It's friday evening here, work week is almost over, i'll read your replies 2 days later on monday.
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
