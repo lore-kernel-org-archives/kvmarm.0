@@ -1,113 +1,44 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v3 4/5] KVM: arm64: Introduce find_reg_by_id()
-Date: Fri, 4 Sep 2015 16:12:10 +0100
-Message-ID: <55E9B4CA.9010200@arm.com>
-References: <cover.1441370053.git.p.fedin@samsung.com>
- <377ee7e0674b45c421ef0ee5c371cd748314d91c.1441370053.git.p.fedin@samsung.com>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH v2 1/5] KVM: arm/arm64: Refactor vGIC attributes handling
+ code
+Date: Fri, 04 Sep 2015 18:11:23 +0300
+Message-ID: <022701d0e723$f6bf7b00$e43e7100$@samsung.com>
+References: <cover.1441180858.git.p.fedin@samsung.com>
+ <f92e6d50897d2eb9e48dc91c0264e9409a50bc41.1441180858.git.p.fedin@samsung.com>
+ <55E9968C.9010703@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 38871412ED
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2015 11:10:28 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ICmWatSPZTNU for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Sep 2015 11:10:27 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EEB6A412D0
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2015 11:10:26 -0400 (EDT)
-In-Reply-To: <377ee7e0674b45c421ef0ee5c371cd748314d91c.1441370053.git.p.fedin@samsung.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <55E9968C.9010703@arm.com>
+Content-language: ru
+Sender: kvm-owner@vger.kernel.org
+To: 'Andre Przywara' <andre.przywara@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 04/09/15 13:40, Pavel Fedin wrote:
-> In order to implement vGICv3 CPU interface access, we will need to perform
-> table lookup of system registers. We would need both index_to_params() and
-> find_reg() exported for that purpose, but instead we export a single
-> function which combines them both.
-> 
-> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+ Hello!
 
-Reviewed-by: Andre Przywara <andre.przywara@arm.com>
+> Isn't the len parameter redundant here? I see that you don't initialize
+> mmio.len (which is a bit scary, btw), so can't you just use that field?
 
-> ---
->  arch/arm64/kvm/sys_regs.c | 22 +++++++++++++++-------
->  arch/arm64/kvm/sys_regs.h |  4 ++++
->  2 files changed, 19 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index fe6b517..21403fa 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1283,6 +1283,17 @@ static bool index_to_params(u64 id, struct sys_reg_params *params)
->  	}
->  }
->  
-> +const struct sys_reg_desc *find_reg_by_id(u64 id,
-> +					  struct sys_reg_params *params,
-> +					  const struct sys_reg_desc table[],
-> +					  unsigned int num)
-> +{
-> +	if (!index_to_params(id, params))
-> +		return NULL;
-> +
-> +	return find_reg(params, table, num);
-> +}
-> +
->  /* Decode an index value, and find the sys_reg_desc entry. */
->  static const struct sys_reg_desc *index_to_sys_reg_desc(struct kvm_vcpu *vcpu,
->  						    u64 id)
-> @@ -1410,10 +1421,8 @@ static int get_invariant_sys_reg(u64 id, void __user *uaddr)
->  	struct sys_reg_params params;
->  	const struct sys_reg_desc *r;
->  
-> -	if (!index_to_params(id, &params))
-> -		return -ENOENT;
-> -
-> -	r = find_reg(&params, invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs));
-> +	r = find_reg_by_id(id, &params, invariant_sys_regs,
-> +			   ARRAY_SIZE(invariant_sys_regs));
->  	if (!r)
->  		return -ENOENT;
->  
-> @@ -1427,9 +1436,8 @@ static int set_invariant_sys_reg(u64 id, void __user *uaddr)
->  	int err;
->  	u64 val = 0; /* Make sure high bits are 0 for 32-bit regs */
->  
-> -	if (!index_to_params(id, &params))
-> -		return -ENOENT;
-> -	r = find_reg(&params, invariant_sys_regs, ARRAY_SIZE(invariant_sys_regs));
-> +	r = find_reg_by_id(id, &params, invariant_sys_regs,
-> +			   ARRAY_SIZE(invariant_sys_regs));
->  	if (!r)
->  		return -ENOENT;
->  
-> diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-> index 3267518..0646108 100644
-> --- a/arch/arm64/kvm/sys_regs.h
-> +++ b/arch/arm64/kvm/sys_regs.h
-> @@ -136,6 +136,10 @@ static inline int cmp_sys_reg(const struct sys_reg_desc *i1,
->  	return i1->Op2 - i2->Op2;
->  }
->  
-> +const struct sys_reg_desc *find_reg_by_id(u64 id,
-> +					  struct sys_reg_params *params,
-> +					  const struct sys_reg_desc table[],
-> +					  unsigned int num);
->  
->  #define Op0(_x) 	.Op0 = _x
->  #define Op1(_x) 	.Op1 = _x
-> 
+ This was because of split below. I did not know about call_range_handler(), and now i will redo
+this.
+
+> That (and other parts of this patch) sneak in some endianness handling,
+> which I'd like to be mentioned in the commit message, but preferably be
+> in a separate patch. The commit message here talks only about refactoring.
+
+ These come from mmio_data_read() and mmio_data_write() in original vgic_attr_regs_access().
+These inlines cannot be used with arbitrary data length, so i opened them up (they contain
+endianness conversion plus masking which isn't used in our case) and moved endianness conversion to
+load/store part.
+ If i make this a separate patch, it will be two lines patch. Does it worth that? In the next respin
+i'd better add this explanation to commit message. Would it be OK?
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
+
+
