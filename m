@@ -1,218 +1,191 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v2 6/8] arm/arm64: KVM: Add forwarded physical interrupts documentation
-Date: Fri,  4 Sep 2015 21:40:48 +0200
-Message-ID: <1441395650-19663-7-git-send-email-christoffer.dall@linaro.org>
+Subject: [PATCH v2 3/8] arm/arm64: KVM: vgic: Factor out level irq processing
+ on guest exit
+Date: Fri,  4 Sep 2015 21:40:45 +0200
+Message-ID: <1441395650-19663-4-git-send-email-christoffer.dall@linaro.org>
 References: <1441395650-19663-1-git-send-email-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B4DC9412D6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2015 15:39:06 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 5s+HLOLU1-cQ for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Sep 2015 15:39:05 -0400 (EDT)
+Received: from mail-la0-f53.google.com (mail-la0-f53.google.com
+ [209.85.215.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A61E9418D8
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Sep 2015 15:39:05 -0400 (EDT)
+Received: by lamp12 with SMTP id p12so19250378lam.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 04 Sep 2015 12:39:32 -0700 (PDT)
 In-Reply-To: <1441395650-19663-1-git-send-email-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Forwarded physical interrupts on arm/arm64 is a tricky concept and the
-way we deal with them is not apparently easy to understand by reading
-various specs.
+Currently vgic_process_maintenance() processes dealing with a completed
+level-triggered interrupt directly, but we are soon going to reuse this
+logic for level-triggered mapped interrupts with the HW bit set, so
+move this logic into a separate static function.
 
-Therefore, add a proper documentation file explaining the flow and
-rationale of the behavior of the vgic.
+Probably the most scary part of this commit is convincing yourself that
+the current flow is safe compared to the old one.  In the following I
+try to list the changes and why they are harmless:
 
-Some of this text was contributed by Marc Zyngier and edited by me.
-Omissions and errors are all mine.
+  Move vgic_irq_clear_queued after kvm_notify_acked_irq:
+    Harmless because the effect of clearing the queued flag wrt.
+    kvm_set_irq is only that vgic_update_irq_pending does not set the
+    pending bit on the emulated CPU interface or in the pending_on_cpu
+    bitmask, but we set this in __kvm_vgic_sync_hwstate later on if the
+    level is stil high.
 
+  Move vgic_set_lr before kvm_notify_acked_irq:
+    Also, harmless because the LR are cpu-local operations and
+    kvm_notify_acked only affects the dist
+
+  Move vgic_dist_irq_clear_soft_pend after kvm_notify_acked_irq:
+    Also harmless because it's just a bit which is cleared and altering
+    the line state does not affect this bit.
+
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt | 181 +++++++++++++++++++++
- 1 file changed, 181 insertions(+)
- create mode 100644 Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
+ virt/kvm/arm/vgic.c | 88 ++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 50 insertions(+), 38 deletions(-)
 
-diff --git a/Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt b/Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
-new file mode 100644
-index 0000000..24b6f28
---- /dev/null
-+++ b/Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
-@@ -0,0 +1,181 @@
-+KVM/ARM VGIC Forwarded Physical Interrupts
-+==========================================
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 6bd1c9b..fe0e5db 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -1322,12 +1322,56 @@ epilog:
+ 	}
+ }
+ 
++static int process_level_irq(struct kvm_vcpu *vcpu, int lr, struct vgic_lr vlr)
++{
++	int level_pending = 0;
 +
-+The KVM/ARM code implements software support for the ARM Generic
-+Interrupt Controller's (GIC's) hardware support for virtualization by
-+allowing software to inject virtual interrupts to a VM, which the guest
-+OS sees as regular interrupts.  The code is famously known as the VGIC.
++	vlr.state = 0;
++	vlr.hwirq = 0;
++	vgic_set_lr(vcpu, lr, vlr);
 +
-+Some of these virtual interrupts, however, correspond to physical
-+interrupts from real physical devices.  One example could be the
-+architected timer, which itself supports virtualization, and therefore
-+lets a guest OS program the hardware device directly to raise an
-+interrupt at some point in time.  When such an interrupt is raised, the
-+host OS initially handles the interrupt and must somehow signal this
-+event as a virtual interrupt to the guest.  Another example could be a
-+passthrough device, where the physical interrupts are initially handled
-+by the host, but the device driver for the device lives in the guest OS
-+and KVM must therefore somehow inject a virtual interrupt on behalf of
-+the physical one to the guest OS.
++	/*
++	 * If the IRQ was EOIed (called from vgic_process_maintenance) or it
++	 * went from active to non-active (called from vgic_sync_hwirq) it was
++	 * also ACKed and we we therefore assume we can clear the soft pending
++	 * state (should it had been set) for this interrupt.
++	 *
++	 * Note: if the IRQ soft pending state was set after the IRQ was
++	 * acked, it actually shouldn't be cleared, but we have no way of
++	 * knowing that unless we start trapping ACKs when the soft-pending
++	 * state is set.
++	 */
++	vgic_dist_irq_clear_soft_pend(vcpu, vlr.irq);
 +
-+These virtual interrupts corresponding to a physical interrupt on the
-+host are called forwarded physical interrupts, but are also sometimes
-+referred to as 'virtualized physical interrupts' and 'mapped interrupts'.
++	/*
++	 * Tell the gic to start sampling the line of this interrupt again.
++	 */
++	vgic_irq_clear_queued(vcpu, vlr.irq);
 +
-+Forwarded physical interrupts are handled slightly differently compared
-+to virtual interrupts generated purely by a software emulated device.
++	/* Any additional pending interrupt? */
++	if (vgic_dist_irq_get_level(vcpu, vlr.irq)) {
++		vgic_cpu_irq_set(vcpu, vlr.irq);
++		level_pending = 1;
++	} else {
++		vgic_dist_irq_clear_pending(vcpu, vlr.irq);
++		vgic_cpu_irq_clear(vcpu, vlr.irq);
++	}
 +
++	/*
++	 * Despite being EOIed, the LR may not have
++	 * been marked as empty.
++	 */
++	vgic_sync_lr_elrsr(vcpu, lr, vlr);
 +
-+The HW bit
-+----------
-+Virtual interrupts are signalled to the guest by programming the List
-+Registers (LRs) on the GIC before running a VCPU.  The LR is programmed
-+with the virtual IRQ number and the state of the interrupt (Pending,
-+Active, or Pending+Active).  When the guest ACKs and EOIs a virtual
-+interrupt, the LR state moves from Pending to Active, and finally to
-+inactive.
++	return level_pending;
++}
 +
-+The LRs include an extra bit, called the HW bit.  When this bit is set,
-+KVM must also program an additional field in the LR, the physical IRQ
-+number, to link the virtual with the physical IRQ.
-+
-+When the HW bit is set, KVM must EITHER set the Pending OR the Active
-+bit, never both at the same time.
-+
-+Setting the HW bit causes the hardware to deactivate the physical
-+interrupt on the physical distributor when the guest deactivates the
-+corresponding virtual interrupt.
-+
-+
-+Forwarded Physical Interrupts Life Cycle
-+----------------------------------------
-+
-+The state of forwarded physical interrupts is managed in the following way:
-+
-+  - The physical interrupt is acked by the host, and becomes active on
-+    the physical distributor (*).
-+  - KVM sets the LR.Pending bit, because this is the only way the GICV
-+    interface is going to present it to the guest.
-+  - LR.Pending will stay set as long as the guest has not acked the interrupt.
-+  - LR.Pending transitions to LR.Active on the guest read of the IAR, as
-+    expected.
-+  - On guest EOI, the *physical distributor* active bit gets cleared,
-+    but the LR.Active is left untouched (set).
-+  - KVM clears the LR when on VM exits when the physical distributor
-+    active state has been cleared.
-+
-+(*): The host handling is slightly more complicated.  For some devices
-+(shared), KVM directly sets the active state on the physical distributor
-+before entering the guest, and for some devices (non-shared) the host
-+configures the GIC such that it does not deactivate the interrupt on
-+host EOIs, but only performs a priority drop allowing the GIC to receive
-+other interrupts and leaves the interrupt in the active state on the
-+physical distributor.
-+
-+
-+Forwarded Edge and Level Triggered PPIs and SPIs
-+------------------------------------------------
-+Forwarded physical interrupts injected should always be active on the
-+physical distributor when injected to a guest.
-+
-+Level-triggered interrupts will keep the interrupt line to the GIC
-+asserted, typically until the guest programs the device to deassert the
-+line.  This means that the interrupt will remain pending on the physical
-+distributor until the guest has reprogrammed the device.  Since we
-+always run the VM with interrupts enabled on the CPU, a pending
-+interrupt will exit the guest as soon as we switch into the guest,
-+preventing the guest from ever making progress as the process repeats
-+over and over.  Therefore, the active state on the physical distributor
-+must be set when entering the guest, preventing the GIC from forwarding
-+the pending interrupt to the CPU.  As soon as the guest deactivates
-+(EOIs) the interrupt, the physical line is sampled by the hardware again
-+and the host takes a new interrupt if and only if the physical line is
-+still asserted.
-+
-+Edge-triggered interrupts do not exhibit the same problem with
-+preventing guest execution that level-triggered interrupts do.  One
-+option is to not use HW bit at all, and inject edge-triggered interrupts
-+from a physical device as pure virtual interrupts.  But that would
-+potentially slow down handling of the interrupt in the guest, because a
-+physical interrupt occurring in the middle of the guest ISR would
-+preempt the guest for the host to handle the interrupt.  Additionally,
-+if you configure the system to handle interrupts on a separate physical
-+core from that running your VCPU, you still have to interrupt the VCPU
-+to queue the pending state onto the LR, even though the guest won't use
-+this information until the guest ISR completes.  Therefore, the HW
-+bit should always be set for forwarded edge-triggered interrupts.  With
-+the HW bit set, the virtual interrupt is injected and additional
-+physical interrupts occurring before the guest deactivates the interrupt
-+simply mark the state on the physical distributor as Pending+Active.  As
-+soon as the guest deactivates the interrupt, the host takes another
-+interrupt if and only if there was a physical interrupt between
-+injecting the forwarded interrupt to the guest the guest deactivating
-+the interrupt.
-+
-+Consequently, whenever we schedule a VCPU with one or more LRs with the
-+HW bit set, the interrupt must also be active on the physical
-+distributor.
-+
-+
-+Forwarded LPIs
-+--------------
-+LPIs, introduced in GICv3, are always edge-triggered and do not have an
-+active state.  They become pending when a device signal them, and as
-+soon as they are acked by the CPU, they are inactive again.
-+
-+It therefore doesn't make sense, and is not supported, to set the HW bit
-+for physical LPIs that are forwarded to a VM as virtual interrupts,
-+typically virtual SPIs.
-+
-+For LPIs, there is no other choice than to preempt the VCPU thread if
-+necessary, and queue the pending state onto the LR.
-+
-+
-+Putting It Together: The Architected Timer
-+------------------------------------------
-+The architected timer is a device that signals interrupts with level
-+triggered semantics.  The timer hardware is directly accessed by VCPUs
-+which program the timer to fire at some point in time.  Each VCPU on a
-+system programs the timer to fire at different times, and therefore the
-+hardware is multiplexed between multiple VCPUs.  This is implemented by
-+context-switching the timer state along with each VCPU thread.
-+
-+However, this means that a scenario like the following is entirely
-+possible, and in fact, typical:
-+
-+1.  KVM runs the VCPU
-+2.  The guest programs the time to fire in T+100
-+3.  The guest is idle and calls WFI (wait-for-interrupts)
-+4.  The hardware traps to the host
-+5.  KVM stores the timer state to memory and disables the hardware timer
-+6.  KVM schedules a soft timer to fire in T+(100 - time since step 2)
-+7.  KVM puts the VCPU thread to sleep (on a waitqueue)
-+8.  The soft timer fires, waking up the VCPU thread
-+9.  KVM reprograms the timer hardware with the VCPU's values
-+10. KVM marks the timer interrupt as active on the physical distributor
-+11. KVM injects a forwarded physical interrupt to the guest
-+12. KVM runs the VCPU
-+
-+Notice that KVM injects a forwarded physical interrupt in step 11 without
-+the corresponding interrupt having actually fired on the host.  That is
-+exactly why we mark the timer interrupt as active in step 10, because
-+the active state on the physical distributor is part of the state
-+belonging to the timer hardware, which is context-switched along with
-+the VCPU thread.
-+
-+If the guest does not idle because it is busy, flow looks like this
-+instead:
-+
-+1.  KVM runs the VCPU
-+2.  The guest programs the time to fire in T+100
-+4.  At T+100 the timer fires and a physical IRQ causes the VM to exit
-+5.  With interrupts disabled on the CPU, KVM looks at the timer state
-+    and injects a forwarded physical interrupt because it concludes the
-+    timer has expired.
-+6.  KVM marks the timer interrupt as active on the physical distributor
-+7.  KVM runs the VCPU
-+
-+Notice that again the forwarded physical interrupt is injected to the
-+guest without having actually been handled on the host.  In this case it
-+is because the physical interrupt is forwarded to the guest before KVM
-+enables physical interrupts on the CPU after exiting the guest.
+ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+ {
+ 	u32 status = vgic_get_interrupt_status(vcpu);
+ 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+-	bool level_pending = false;
+ 	struct kvm *kvm = vcpu->kvm;
++	int level_pending = 0;
+ 
+ 	kvm_debug("STATUS = %08x\n", status);
+ 
+@@ -1342,54 +1386,22 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+ 
+ 		for_each_set_bit(lr, eisr_ptr, vgic->nr_lr) {
+ 			struct vgic_lr vlr = vgic_get_lr(vcpu, lr);
+-			WARN_ON(vgic_irq_is_edge(vcpu, vlr.irq));
+ 
+-			spin_lock(&dist->lock);
+-			vgic_irq_clear_queued(vcpu, vlr.irq);
++			WARN_ON(vgic_irq_is_edge(vcpu, vlr.irq));
+ 			WARN_ON(vlr.state & LR_STATE_MASK);
+-			vlr.state = 0;
+-			vgic_set_lr(vcpu, lr, vlr);
+ 
+-			/*
+-			 * If the IRQ was EOIed it was also ACKed and we we
+-			 * therefore assume we can clear the soft pending
+-			 * state (should it had been set) for this interrupt.
+-			 *
+-			 * Note: if the IRQ soft pending state was set after
+-			 * the IRQ was acked, it actually shouldn't be
+-			 * cleared, but we have no way of knowing that unless
+-			 * we start trapping ACKs when the soft-pending state
+-			 * is set.
+-			 */
+-			vgic_dist_irq_clear_soft_pend(vcpu, vlr.irq);
+ 
+ 			/*
+ 			 * kvm_notify_acked_irq calls kvm_set_irq()
+-			 * to reset the IRQ level. Need to release the
+-			 * lock for kvm_set_irq to grab it.
++			 * to reset the IRQ level, which grabs the dist->lock
++			 * so we call this before taking the dist->lock.
+ 			 */
+-			spin_unlock(&dist->lock);
+-
+ 			kvm_notify_acked_irq(kvm, 0,
+ 					     vlr.irq - VGIC_NR_PRIVATE_IRQS);
+-			spin_lock(&dist->lock);
+-
+-			/* Any additional pending interrupt? */
+-			if (vgic_dist_irq_get_level(vcpu, vlr.irq)) {
+-				vgic_cpu_irq_set(vcpu, vlr.irq);
+-				level_pending = true;
+-			} else {
+-				vgic_dist_irq_clear_pending(vcpu, vlr.irq);
+-				vgic_cpu_irq_clear(vcpu, vlr.irq);
+-			}
+ 
++			spin_lock(&dist->lock);
++			level_pending |= process_level_irq(vcpu, lr, vlr);
+ 			spin_unlock(&dist->lock);
+-
+-			/*
+-			 * Despite being EOIed, the LR may not have
+-			 * been marked as empty.
+-			 */
+-			vgic_sync_lr_elrsr(vcpu, lr, vlr);
+ 		}
+ 	}
+ 
 -- 
 2.1.2.330.g565301e.dirty
-
