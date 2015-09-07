@@ -1,63 +1,58 @@
 From: Pavel Fedin <p.fedin@samsung.com>
 Subject: RE: [PATCH v3 2/5] KVM: arm64: Implement vGICv3 distributor and
  redistributor access from userspace
-Date: Mon, 07 Sep 2015 10:56:52 +0300
-Message-ID: <015e01d0e942$c2dbc340$489349c0$@samsung.com>
+Date: Mon, 07 Sep 2015 11:50:05 +0300
+Message-ID: <017c01d0e94a$31ec3600$95c4a200$@samsung.com>
 References: <cover.1441370053.git.p.fedin@samsung.com>
  <fc3dabfbff09f5c70affdde2996f3658b2000825.1441370053.git.p.fedin@samsung.com>
  <55E9A267.4040404@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 810ED4117E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2015 03:56:24 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jTGbsJhMjB4I for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Sep 2015 03:56:22 -0400 (EDT)
-Received: from mailout3.w1.samsung.com (mailout3.w1.samsung.com
- [210.118.77.13])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9695F40FB5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2015 03:56:22 -0400 (EDT)
-Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
- by mailout3.w1.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NUA006WWREU2F00@mailout3.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Mon, 07 Sep 2015 08:56:54 +0100 (BST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-reply-to: <55E9A267.4040404@arm.com>
 Content-language: ru
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: 'Andre Przywara' <andre.przywara@arm.com>
-Cc: 'Marc Zyngier' <Marc.Zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <Marc.Zyngier@arm.com>, 'Peter Maydell' <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
  Hello!
 
-> > --- a/virt/kvm/arm/vgic.c
-> > +++ b/virt/kvm/arm/vgic.c
-> > @@ -2468,6 +2468,7 @@ int vgic_attr_regs_access(struct kvm_device *dev,
-> >  	 * access. For 64-bit registers we have to split up the operation.
-> >  	 */
-> >  	mmio->len = sizeof(u32);
-> > +	mmio->private = vcpu; /* For redistributor handlers */
+> > +	mmio.is_write = is_write;
+> > +
+> > +	if (attr->attr & KVM_DEV_ARM_VGIC_64BIT) {
+> > +		u64 __user *uaddr = (u64 __user *)(long)attr->addr;
+> > +		__le64 data;
+> > +
+> > +		if (is_write) {
+> > +			u64 reg;
+> > +
+> > +			if (get_user(reg, uaddr))
 > 
-> I guess this can be moved into the caller and then you can drop the vcpu
-> parameter and use private here instead, no?
+> Wouldn't the use of copy_from_user/copy_to_user here make this whole
+> switch redundant? Even if not, you could think about moving this logic
+> into into vgic_attr_regs_access() and just hardcode "len=4" into GICv2
+> accesses.
 
- No because 'vcpu' is not a parameter. It is figured out in the middle of the function, under
-dev->kvm->lock mutex, out of 'cpuid' index.
+ No, because endianess conversion is still strongly typed. And this ends up in:
+
+if (is_write) {
+	u64 reg;
+	__le64 data;
+
+	copy_from_user(&reg, uaddr, mmio.len);
+
+	if (mmio.len == 8)
+		data = cpu_to_le64(reg);
+	else
+		*((__le32 *)&data) = cpu_to_le32(*((__le32 *)&reg);
+
+isn't this even more ugly? Regardless of where it is placed.
 
 Kind regards,
 Pavel Fedin
 Expert Engineer
 Samsung Electronics Research center Russia
+
+
