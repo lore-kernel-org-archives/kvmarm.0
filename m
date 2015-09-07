@@ -1,124 +1,259 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH 1/2] arm/arm64: KVM: vgic: Move active state handling to
- flush_hwstate
-Date: Mon, 7 Sep 2015 16:44:04 +0200
-Message-ID: <55EDA2B4.5000903@linaro.org>
-References: <1441376679-8341-1-git-send-email-christoffer.dall@linaro.org>
- <1441376679-8341-2-git-send-email-christoffer.dall@linaro.org>
+Subject: Re: [PATCH v2 2/8] arm/arm64: KVM: arch_timer: Only schedule soft
+ timer on vcpu_block
+Date: Mon, 7 Sep 2015 17:01:59 +0200
+Message-ID: <55EDA6E7.4080100@linaro.org>
+References: <1441395650-19663-1-git-send-email-christoffer.dall@linaro.org>
+ <1441395650-19663-3-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1441376679-8341-2-git-send-email-christoffer.dall@linaro.org>
+In-Reply-To: <1441395650-19663-3-git-send-email-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-On 09/04/2015 04:24 PM, Christoffer Dall wrote:
-> We currently set the physical active state only when we *inject* a new
-> pending virtual interrupt, but this is actually not correct, because we
-> could have been preempted and run something else on the system that
-> resets the active state to clear.  This causes us to run the VM with the
-> timer set to fire, but without setting the physical active state.
+Hi Christoffer,
+On 09/04/2015 09:40 PM, Christoffer Dall wrote:
+> We currently schedule a soft timer every time we exit the guest if the
+> timer did not expire while running the guest.  This is really not
+> necessary, because the only work we do in the timer work function is to
+> kick the vcpu.
 > 
-> The solution is to always check the LR configurations, and we if have a
-> mapped interrupt in the LR in either the pending or active state
-> (virtual), then set the physical active state.
+> Kicking the vcpu does two things:
+> (1) If the vpcu thread is on a waitqueue, make it runnable and remove it
+> from the waitqueue.
+> (2) If the vcpu is running on a different physical CPU from the one
+> doing the kick, it sends a reschedule IPI.
 > 
-> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> The second case cannot happen, because the soft timer is only ever
+> scheduled when the vcpu is not running.  The first case is only relevant
+> when the vcpu thread is on a waitqueue, which is only the case when the
+> vcpu thread has called kvm_vcpu_block().
+> 
+> Therefore, we only need to make sure a timer is scheduled for
+> kvm_vcpu_block(), which we do by encapsulating all calls to
+> kvm_vcpu_block() with kvm_timer_{un}schedule calls.
+> 
+> Additionally, we only schedule a soft timer if the timer is enabled and
+> unmasked, since it is useless otherwise.
+> 
+> Note that theoretically userspace can use the SET_ONE_REG interface to
+> change registers that should cause the timer to fire, even if the vcpu
+> is blocked without a scheduled timer, but this case was not supported
+> before this patch and we leave it for future work for now.
+> 
 > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > ---
->  virt/kvm/arm/vgic.c | 42 ++++++++++++++++++++++++++----------------
->  1 file changed, 26 insertions(+), 16 deletions(-)
+>  arch/arm/include/asm/kvm_host.h   |  3 --
+>  arch/arm/kvm/arm.c                | 10 +++++
+>  arch/arm64/include/asm/kvm_host.h |  3 --
+>  include/kvm/arm_arch_timer.h      |  2 +
+>  virt/kvm/arm/arch_timer.c         | 91 ++++++++++++++++++++++++++-------------
+>  5 files changed, 72 insertions(+), 37 deletions(-)
 > 
-> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> index 9eb489a..6bd1c9b 100644
-> --- a/virt/kvm/arm/vgic.c
-> +++ b/virt/kvm/arm/vgic.c
-> @@ -1144,26 +1144,11 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
->  		struct irq_phys_map *map;
->  		map = vgic_irq_map_search(vcpu, irq);
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 86fcf6e..dcba0fa 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -236,7 +236,4 @@ static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
 >  
-> -		/*
-> -		 * If we have a mapping, and the virtual interrupt is
-> -		 * being injected, then we must set the state to
-> -		 * active in the physical world. Otherwise the
-> -		 * physical interrupt will fire and the guest will
-> -		 * exit before processing the virtual interrupt.
-> -		 */
->  		if (map) {
-> -			int ret;
+> -static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+> -static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
 > -
-> -			BUG_ON(!map->active);
-I have a question about this map->active. I did not find any user of
-kvm_vgic_set_phys_irq_active anymore. The flag is directly updated in
-vgic_sync_hwirq through the irq_get_irqchip_state query. In the same
-function, before there is a "BUG_ON(!map || !map->active);"
-
-Can't we have this BUG_ON firing?
-
-
->  			vlr.hwirq = map->phys_irq;
->  			vlr.state |= LR_HW;
->  			vlr.state &= ~LR_EOI_INT;
->  
-> -			ret = irq_set_irqchip_state(map->irq,
-> -						    IRQCHIP_STATE_ACTIVE,
-> -						    true);
-> -			WARN_ON(ret);
-> -
->  			/*
->  			 * Make sure we're not going to sample this
->  			 * again, as a HW-backed interrupt cannot be
-> @@ -1255,7 +1240,7 @@ static void __kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->  	unsigned long *pa_percpu, *pa_shared;
-> -	int i, vcpu_id;
-> +	int i, vcpu_id, lr, ret;
->  	int overflow = 0;
->  	int nr_shared = vgic_nr_shared_irqs(dist);
->  
-> @@ -1310,6 +1295,31 @@ epilog:
->  		 */
->  		clear_bit(vcpu_id, dist->irq_pending_on_cpu);
->  	}
-> +
-> +	for (lr = 0; lr < vgic->nr_lr; lr++) {
-> +		struct vgic_lr vlr;
-> +
-> +		if (!test_bit(lr, vgic_cpu->lr_used))
-> +			continue;
-> +
-> +		vlr = vgic_get_lr(vcpu, lr);
-> +
-> +		/*
-> +		 * If we have a mapping, and the virtual interrupt is
-> +		 * presented to the guest (as pending or active), then we must
-> +		 * set the state to active in the physical world. See
-> +		 * Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt.
-if upstreamed in 4.3 whereas the other series is not there,
-vgic-mapped-irqs.txt won't be available.
-> +		 */
-> +		if (vlr.state & LR_HW) {
-> +			struct irq_phys_map *map;
-> +			map = vgic_irq_map_search(vcpu, vlr.irq);
-> +
-> +			ret = irq_set_irqchip_state(map->irq,
-> +						    IRQCHIP_STATE_ACTIVE,
-> +						    true);
-I understand the need for manually setting the phys dist state in case
-of timer however for non shared IRQs, GIC does the job directly. But I
-guess it does not harm.
-
-Eric
-> +			WARN_ON(ret);
-> +		}
-> +	}
+>  #endif /* __ARM_KVM_HOST_H__ */
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index ce404a5..bdf8871 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -271,6 +271,16 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+>  	return kvm_timer_should_fire(vcpu);
 >  }
 >  
->  static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+> +void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+> +{
+> +	kvm_timer_schedule(vcpu);
+> +}
+> +
+> +void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+> +{
+> +	kvm_timer_unschedule(vcpu);
+> +}
+> +
+>  int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
+>  {
+>  	/* Force users to call KVM_ARM_VCPU_INIT */
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index dd143f5..415938d 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -257,7 +257,4 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+>  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
+>  
+> -static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+> -static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+> -
+>  #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index e1e4d7c..ef14cc1 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -71,5 +71,7 @@ u64 kvm_arm_timer_get_reg(struct kvm_vcpu *, u64 regid);
+>  int kvm_arm_timer_set_reg(struct kvm_vcpu *, u64 regid, u64 value);
+>  
+>  bool kvm_timer_should_fire(struct kvm_vcpu *vcpu);
+> +void kvm_timer_schedule(struct kvm_vcpu *vcpu);
+> +void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
+>  
+>  #endif
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index 48c6e1a..7991537 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -111,14 +111,21 @@ static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
+>  	return HRTIMER_NORESTART;
+>  }
+>  
+> +static bool kvm_timer_irq_can_fire(struct kvm_vcpu *vcpu)
+> +{
+> +	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +
+> +	return !(timer->cntv_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
+> +		(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE) &&
+> +		!kvm_vgic_get_phys_irq_active(timer->map);
+kvm_vgic_get_phys_irq_active(timer->map) checks a logical state and not
+the actual HW state. What is the exact aim of that check? in case the
+PPI already is active, ie. timer hit, no use to schedule anything?
+
+> +}
+> +
+>  bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
+>  {
+>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+>  	cycle_t cval, now;
+>  
+> -	if ((timer->cntv_ctl & ARCH_TIMER_CTRL_IT_MASK) ||
+> -	    !(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE) ||
+> -	    kvm_vgic_get_phys_irq_active(timer->map))
+> +	if (!kvm_timer_irq_can_fire(vcpu))
+>  		return false;
+>  
+>  	cval = timer->cntv_cval;
+> @@ -127,24 +134,61 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
+>  	return cval <= now;
+>  }
+>  
+> -/**
+> - * kvm_timer_flush_hwstate - prepare to move the virt timer to the cpu
+> - * @vcpu: The vcpu pointer
+> - *
+> - * Disarm any pending soft timers, since the world-switch code will write the
+> - * virtual timer state back to the physical CPU.
+> +/*
+> + * Schedule the background timer before calling kvm_vcpu_block, so that this
+> + * thread is removed from its waitqueue and made runnable when there's a timer
+> + * interrupt to handle.
+>   */
+> -void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+> +void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+>  {
+>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	u64 ns;
+> +	cycle_t cval, now;
+> +
+> +	BUG_ON(timer_is_armed(timer));
+> +
+> +	/*
+> +	 * No need to schedule a background timer if the guest timer has
+> +	 * already expired, because kvm_vcpu_block will return before putting
+> +	 * the thread to sleep.
+> +	 */
+> +	if (kvm_timer_should_fire(vcpu))
+> +		return;
+>  
+>  	/*
+> -	 * We're about to run this vcpu again, so there is no need to
+> -	 * keep the background timer running, as we're about to
+> -	 * populate the CPU timer again.
+> +	 * If the timer is either not capable of raising interrupts (disabled
+> +	 * or masked) or if we already have a background timer, then there's
+> +	 * no more work for us to do.
+I don't understand the comment about "if we already have a background
+timer", related to the above comment...
+>  	 */
+> +	if (!kvm_timer_irq_can_fire(vcpu))
+> +		return;
+> +
+> +	/*  The timer has not yet expired, schedule a background timer */
+> +	cval = timer->cntv_cval;
+> +	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
+> +
+> +	ns = cyclecounter_cyc2ns(timecounter->cc,
+> +				 cval - now,
+> +				 timecounter->mask,
+> +				 &timecounter->frac);
+> +	timer_arm(timer, ns);
+> +}
+> +
+> +void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
+> +{
+> +	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+>  	timer_disarm(timer);
+> +}
+>  
+> +/**
+> + * kvm_timer_flush_hwstate - prepare to move the virt timer to the cpu
+> + * @vcpu: The vcpu pointer
+> + *
+> + * Check if the virtual timer has expired while we were running in the host,
+> + * and inject an interrupt if that was the case.
+> + */
+> +void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+> +{
+>  	/*
+>  	 * If the timer expired while we were not scheduled, now is the time
+>  	 * to inject it.
+above comment seems duplicated now?
+> @@ -157,32 +201,17 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+>   * kvm_timer_sync_hwstate - sync timer state from cpu
+>   * @vcpu: The vcpu pointer
+>   *
+> - * Check if the virtual timer was armed and either schedule a corresponding
+> - * soft timer or inject directly if already expired.
+> + * Check if the virtual timer has expired while we were running in the guest,
+> + * and inject an interrupt if that was the case.
+>   */
+>  void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+>  {
+>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> -	cycle_t cval, now;
+> -	u64 ns;
+>  
+>  	BUG_ON(timer_is_armed(timer));
+>  
+> -	if (kvm_timer_should_fire(vcpu)) {
+> -		/*
+> -		 * Timer has already expired while we were not
+> -		 * looking. Inject the interrupt and carry on.
+> -		 */
+> +	if (kvm_timer_should_fire(vcpu))
+>  		kvm_timer_inject_irq(vcpu);
+> -		return;
+> -	}
+> -
+> -	cval = timer->cntv_cval;
+> -	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
+> -
+> -	ns = cyclecounter_cyc2ns(timecounter->cc, cval - now, timecounter->mask,
+> -				 &timecounter->frac);
+> -	timer_arm(timer, ns);
+>  }
+>  
+>  int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
 > 
 
