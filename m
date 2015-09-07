@@ -1,28 +1,29 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v2 3/8] arm/arm64: KVM: vgic: Factor out level irq
- processing on guest exit
-Date: Mon, 7 Sep 2015 17:32:35 +0200
-Message-ID: <55EDAE13.7020905@linaro.org>
-References: <1441395650-19663-1-git-send-email-christoffer.dall@linaro.org>
- <1441395650-19663-4-git-send-email-christoffer.dall@linaro.org>
+Subject: Re: [PATCH 1/2] arm/arm64: KVM: vgic: Move active state handling to
+ flush_hwstate
+Date: Mon, 7 Sep 2015 17:46:26 +0200
+Message-ID: <55EDB152.3020204@linaro.org>
+References: <1441376679-8341-1-git-send-email-christoffer.dall@linaro.org>
+ <1441376679-8341-2-git-send-email-christoffer.dall@linaro.org>
+ <55EDA2B4.5000903@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AFDA540F90
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2015 11:32:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 427904117E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2015 11:46:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t9M+9p-V-mLK for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Sep 2015 11:32:52 -0400 (EDT)
-Received: from mail-wi0-f174.google.com (mail-wi0-f174.google.com
- [209.85.212.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7BD9540402
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2015 11:32:52 -0400 (EDT)
-Received: by wicfx3 with SMTP id fx3so92432174wic.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 07 Sep 2015 08:33:26 -0700 (PDT)
-In-Reply-To: <1441395650-19663-4-git-send-email-christoffer.dall@linaro.org>
+ with ESMTP id FYcDT+NiLe5U for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Sep 2015 11:46:43 -0400 (EDT)
+Received: from mail-wi0-f176.google.com (mail-wi0-f176.google.com
+ [209.85.212.176])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 16B9340F90
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Sep 2015 11:46:42 -0400 (EDT)
+Received: by wiclk2 with SMTP id lk2so92920091wic.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 07 Sep 2015 08:47:16 -0700 (PDT)
+In-Reply-To: <55EDA2B4.5000903@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,167 +37,115 @@ To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu
 Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 09/04/2015 09:40 PM, Christoffer Dall wrote:
-> Currently vgic_process_maintenance() processes dealing with a completed
-> level-triggered interrupt directly, but we are soon going to reuse this
-> logic for level-triggered mapped interrupts with the HW bit set, so
-> move this logic into a separate static function.
+On 09/07/2015 04:44 PM, Eric Auger wrote:
+> Hi,
+> On 09/04/2015 04:24 PM, Christoffer Dall wrote:
+>> We currently set the physical active state only when we *inject* a new
+>> pending virtual interrupt, but this is actually not correct, because we
+>> could have been preempted and run something else on the system that
+>> resets the active state to clear.  This causes us to run the VM with the
+>> timer set to fire, but without setting the physical active state.
+>>
+>> The solution is to always check the LR configurations, and we if have a
+>> mapped interrupt in the LR in either the pending or active state
+>> (virtual), then set the physical active state.
+>>
+>> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+>> ---
+>>  virt/kvm/arm/vgic.c | 42 ++++++++++++++++++++++++++----------------
+>>  1 file changed, 26 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+>> index 9eb489a..6bd1c9b 100644
+>> --- a/virt/kvm/arm/vgic.c
+>> +++ b/virt/kvm/arm/vgic.c
+>> @@ -1144,26 +1144,11 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
+>>  		struct irq_phys_map *map;
+>>  		map = vgic_irq_map_search(vcpu, irq);
+>>  
+>> -		/*
+>> -		 * If we have a mapping, and the virtual interrupt is
+>> -		 * being injected, then we must set the state to
+>> -		 * active in the physical world. Otherwise the
+>> -		 * physical interrupt will fire and the guest will
+>> -		 * exit before processing the virtual interrupt.
+>> -		 */
+>>  		if (map) {
+>> -			int ret;
+>> -
+>> -			BUG_ON(!map->active);
+> I have a question about this map->active. I did not find any user of
+> kvm_vgic_set_phys_irq_active anymore. The flag is directly updated in
+> vgic_sync_hwirq through the irq_get_irqchip_state query. In the same
+> function, before there is a "BUG_ON(!map || !map->active);"
 > 
-> Probably the most scary part of this commit is convincing yourself that
-> the current flow is safe compared to the old one.  In the following I
-> try to list the changes and why they are harmless:
-> 
->   Move vgic_irq_clear_queued after kvm_notify_acked_irq:
->     Harmless because the effect of clearing the queued flag wrt.
->     kvm_set_irq is only that vgic_update_irq_pending does not set the
->     pending bit on the emulated CPU interface or in the pending_on_cpu
->     bitmask,
-well actually the notifier calls vgic_update_irq_pending with level ==0
-so it does not reach the can_sample.
- but we set this in __kvm_vgic_sync_hwstate later on if the
->     level is stil high.
-still
-
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
+> Can't we have this BUG_ON firing?
+hum ignore that comment. Didn't see the call to
+kvm_vgic_set_phys_irq_active in arch_timer.c
 
 Eric
 > 
->   Move vgic_set_lr before kvm_notify_acked_irq:
->     Also, harmless because the LR are cpu-local operations and
->     kvm_notify_acked only affects the dist
 > 
->   Move vgic_dist_irq_clear_soft_pend after kvm_notify_acked_irq:
->     Also harmless because it's just a bit which is cleared and altering
->     the line state does not affect this bit.
+>>  			vlr.hwirq = map->phys_irq;
+>>  			vlr.state |= LR_HW;
+>>  			vlr.state &= ~LR_EOI_INT;
+>>  
+>> -			ret = irq_set_irqchip_state(map->irq,
+>> -						    IRQCHIP_STATE_ACTIVE,
+>> -						    true);
+>> -			WARN_ON(ret);
+>> -
+>>  			/*
+>>  			 * Make sure we're not going to sample this
+>>  			 * again, as a HW-backed interrupt cannot be
+>> @@ -1255,7 +1240,7 @@ static void __kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>>  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>>  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+>>  	unsigned long *pa_percpu, *pa_shared;
+>> -	int i, vcpu_id;
+>> +	int i, vcpu_id, lr, ret;
+>>  	int overflow = 0;
+>>  	int nr_shared = vgic_nr_shared_irqs(dist);
+>>  
+>> @@ -1310,6 +1295,31 @@ epilog:
+>>  		 */
+>>  		clear_bit(vcpu_id, dist->irq_pending_on_cpu);
+>>  	}
+>> +
+>> +	for (lr = 0; lr < vgic->nr_lr; lr++) {
+>> +		struct vgic_lr vlr;
+>> +
+>> +		if (!test_bit(lr, vgic_cpu->lr_used))
+>> +			continue;
+>> +
+>> +		vlr = vgic_get_lr(vcpu, lr);
+>> +
+>> +		/*
+>> +		 * If we have a mapping, and the virtual interrupt is
+>> +		 * presented to the guest (as pending or active), then we must
+>> +		 * set the state to active in the physical world. See
+>> +		 * Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt.
+> if upstreamed in 4.3 whereas the other series is not there,
+> vgic-mapped-irqs.txt won't be available.
+>> +		 */
+>> +		if (vlr.state & LR_HW) {
+>> +			struct irq_phys_map *map;
+>> +			map = vgic_irq_map_search(vcpu, vlr.irq);
+>> +
+>> +			ret = irq_set_irqchip_state(map->irq,
+>> +						    IRQCHIP_STATE_ACTIVE,
+>> +						    true);
+> I understand the need for manually setting the phys dist state in case
+> of timer however for non shared IRQs, GIC does the job directly. But I
+> guess it does not harm.
 > 
-> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
-> ---
->  virt/kvm/arm/vgic.c | 88 ++++++++++++++++++++++++++++++-----------------------
->  1 file changed, 50 insertions(+), 38 deletions(-)
-> 
-> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> index 6bd1c9b..fe0e5db 100644
-> --- a/virt/kvm/arm/vgic.c
-> +++ b/virt/kvm/arm/vgic.c
-> @@ -1322,12 +1322,56 @@ epilog:
->  	}
->  }
->  
-> +static int process_level_irq(struct kvm_vcpu *vcpu, int lr, struct vgic_lr vlr)
-> +{
-> +	int level_pending = 0;
-> +
-> +	vlr.state = 0;
-> +	vlr.hwirq = 0;
-> +	vgic_set_lr(vcpu, lr, vlr);
-> +
-> +	/*
-> +	 * If the IRQ was EOIed (called from vgic_process_maintenance) or it
-> +	 * went from active to non-active (called from vgic_sync_hwirq) it was
-> +	 * also ACKed and we we therefore assume we can clear the soft pending
-> +	 * state (should it had been set) for this interrupt.
-> +	 *
-> +	 * Note: if the IRQ soft pending state was set after the IRQ was
-> +	 * acked, it actually shouldn't be cleared, but we have no way of
-> +	 * knowing that unless we start trapping ACKs when the soft-pending
-> +	 * state is set.
-> +	 */
-> +	vgic_dist_irq_clear_soft_pend(vcpu, vlr.irq);
-> +
-> +	/*
-> +	 * Tell the gic to start sampling the line of this interrupt again.
-> +	 */
-> +	vgic_irq_clear_queued(vcpu, vlr.irq);
-> +
-> +	/* Any additional pending interrupt? */
-> +	if (vgic_dist_irq_get_level(vcpu, vlr.irq)) {
-> +		vgic_cpu_irq_set(vcpu, vlr.irq);
-> +		level_pending = 1;
-> +	} else {
-> +		vgic_dist_irq_clear_pending(vcpu, vlr.irq);
-> +		vgic_cpu_irq_clear(vcpu, vlr.irq);
-> +	}
-> +
-> +	/*
-> +	 * Despite being EOIed, the LR may not have
-> +	 * been marked as empty.
-> +	 */
-> +	vgic_sync_lr_elrsr(vcpu, lr, vlr);
-> +
-> +	return level_pending;
-> +}
-> +
->  static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
->  {
->  	u32 status = vgic_get_interrupt_status(vcpu);
->  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> -	bool level_pending = false;
->  	struct kvm *kvm = vcpu->kvm;
-> +	int level_pending = 0;
->  
->  	kvm_debug("STATUS = %08x\n", status);
->  
-> @@ -1342,54 +1386,22 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
->  
->  		for_each_set_bit(lr, eisr_ptr, vgic->nr_lr) {
->  			struct vgic_lr vlr = vgic_get_lr(vcpu, lr);
-> -			WARN_ON(vgic_irq_is_edge(vcpu, vlr.irq));
->  
-> -			spin_lock(&dist->lock);
-> -			vgic_irq_clear_queued(vcpu, vlr.irq);
-> +			WARN_ON(vgic_irq_is_edge(vcpu, vlr.irq));
->  			WARN_ON(vlr.state & LR_STATE_MASK);
-> -			vlr.state = 0;
-> -			vgic_set_lr(vcpu, lr, vlr);
->  
-> -			/*
-> -			 * If the IRQ was EOIed it was also ACKed and we we
-> -			 * therefore assume we can clear the soft pending
-> -			 * state (should it had been set) for this interrupt.
-> -			 *
-> -			 * Note: if the IRQ soft pending state was set after
-> -			 * the IRQ was acked, it actually shouldn't be
-> -			 * cleared, but we have no way of knowing that unless
-> -			 * we start trapping ACKs when the soft-pending state
-> -			 * is set.
-> -			 */
-> -			vgic_dist_irq_clear_soft_pend(vcpu, vlr.irq);
->  
->  			/*
->  			 * kvm_notify_acked_irq calls kvm_set_irq()
-> -			 * to reset the IRQ level. Need to release the
-> -			 * lock for kvm_set_irq to grab it.
-> +			 * to reset the IRQ level, which grabs the dist->lock
-> +			 * so we call this before taking the dist->lock.
->  			 */
-> -			spin_unlock(&dist->lock);
-> -
->  			kvm_notify_acked_irq(kvm, 0,
->  					     vlr.irq - VGIC_NR_PRIVATE_IRQS);
-> -			spin_lock(&dist->lock);
-> -
-> -			/* Any additional pending interrupt? */
-> -			if (vgic_dist_irq_get_level(vcpu, vlr.irq)) {
-> -				vgic_cpu_irq_set(vcpu, vlr.irq);
-> -				level_pending = true;
-> -			} else {
-> -				vgic_dist_irq_clear_pending(vcpu, vlr.irq);
-> -				vgic_cpu_irq_clear(vcpu, vlr.irq);
-> -			}
->  
-> +			spin_lock(&dist->lock);
-> +			level_pending |= process_level_irq(vcpu, lr, vlr);
->  			spin_unlock(&dist->lock);
-> -
-> -			/*
-> -			 * Despite being EOIed, the LR may not have
-> -			 * been marked as empty.
-> -			 */
-> -			vgic_sync_lr_elrsr(vcpu, lr, vlr);
->  		}
->  	}
->  
+> Eric
+>> +			WARN_ON(ret);
+>> +		}
+>> +	}
+>>  }
+>>  
+>>  static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+>>
 > 
