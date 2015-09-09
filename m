@@ -1,27 +1,33 @@
-From: Baptiste Reynal <b.reynal@virtualopensystems.com>
-Subject: [RFC PATCH v4 3/3] vfio: platform: return device properties as arrays
- of unsigned integers
-Date: Wed,  9 Sep 2015 11:17:11 +0200
-Message-ID: <1441790231-22920-4-git-send-email-b.reynal@virtualopensystems.com>
-References: <1441790231-22920-1-git-send-email-b.reynal@virtualopensystems.com>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH v3 2/5] KVM: arm64: Implement vGICv3 distributor and
+ redistributor access from userspace
+Date: Wed, 09 Sep 2015 14:28:32 +0300
+Message-ID: <020101d0eaf2$a9242d50$fb6c87f0$@samsung.com>
+References: <cover.1441370053.git.p.fedin@samsung.com>
+ <fc3dabfbff09f5c70affdde2996f3658b2000825.1441370053.git.p.fedin@samsung.com>
+ <55E9A267.4040404@arm.com> <015e01d0e942$c2dbc340$489349c0$@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CB27C41294
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2015 05:19:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9259340FF5
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2015 07:27:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bLmUNJH+SfJX for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Sep 2015 05:19:43 -0400 (EDT)
-Received: from mail-wi0-f174.google.com (mail-wi0-f174.google.com
- [209.85.212.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 01B1D41172
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2015 05:19:42 -0400 (EDT)
-Received: by wiclk2 with SMTP id lk2so149354982wic.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Sep 2015 02:20:21 -0700 (PDT)
-In-Reply-To: <1441790231-22920-1-git-send-email-b.reynal@virtualopensystems.com>
+ with ESMTP id aRI4VzBxbEM6 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Sep 2015 07:27:56 -0400 (EDT)
+Received: from mailout3.w1.samsung.com (mailout3.w1.samsung.com
+ [210.118.77.13])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7759140FAB
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2015 07:27:56 -0400 (EDT)
+Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
+ by mailout3.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NUE00FMTQJLYY20@mailout3.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Wed, 09 Sep 2015 12:28:34 +0100 (BST)
+In-reply-to: <015e01d0e942$c2dbc340$489349c0$@samsung.com>
+Content-language: ru
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,94 +37,51 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, iommu@lists.linux-foundation.org
-Cc: "open list:VFIO PLATFORM DRIVER" <kvm@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, alex.williamson@redhat.com, tech@virtualopensystems.com
+To: 'Andre Przywara' <andre.przywara@arm.com>
+Cc: 'Marc Zyngier' <Marc.Zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Antonios Motakis <a.motakis@virtualopensystems.com>
+ Hello Andre! I haven't heard from you on any of my questions. But, nevertheless, i would like to
+inform you (and other interested people) that i'm leaving on vacation, and will be back 2 weeks
+later. Just in case if someone writes me something and i don't reply.
 
-Certain properties of a device are accessible as an array of unsigned
-integers, either u64, u32, u16, or u8. Let the VFIO user query this
-type of device properties.
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
 
-Signed-off-by: Antonios Motakis <a.motakis@virtualopensystems.com>
-Signed-off-by: Baptiste Reynal <b.reynal@virtualopensystems.com>
----
- drivers/vfio/platform/properties.c | 62 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 61 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/platform/properties.c b/drivers/vfio/platform/properties.c
-index 8bf9c8f..625e2d3 100644
---- a/drivers/vfio/platform/properties.c
-+++ b/drivers/vfio/platform/properties.c
-@@ -70,7 +70,67 @@ static int dev_property_get_uint(struct device *dev, uint32_t *flags,
- 				 char *name, uint32_t type, unsigned *lenp,
- 				 void __user *datap, unsigned long datasz)
- {
--	return -EINVAL;
-+	int ret, n;
-+	u8 *out;
-+	size_t sz;
-+	int (*func)(const struct device *, const char *, void *, size_t)
-+		= NULL;
-+
-+	switch (type) {
-+	case VFIO_DEV_PROPERTY_TYPE_U64:
-+		sz = sizeof(u64);
-+		func = (int (*)(const struct device *,
-+				const char *, void *, size_t))
-+			device_property_read_u64_array;
-+		break;
-+	case VFIO_DEV_PROPERTY_TYPE_U32:
-+		sz = sizeof(u32);
-+		func = (int (*)(const struct device *,
-+				const char *, void *, size_t))
-+			device_property_read_u32_array;
-+		break;
-+	case VFIO_DEV_PROPERTY_TYPE_U16:
-+		sz = sizeof(u16);
-+		func = (int (*)(const struct device *,
-+				const char *, void *, size_t))
-+			device_property_read_u16_array;
-+		break;
-+	case VFIO_DEV_PROPERTY_TYPE_U8:
-+		sz = sizeof(u8);
-+		func = (int (*)(const struct device *,
-+				const char *, void *, size_t))
-+			device_property_read_u8_array;
-+		break;
-+
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	/* get size of array */
-+	n = func(dev, name, NULL, 0);
-+	if (n < 0)
-+		return n;
-+
-+	if (lenp)
-+		*lenp = n * sz;
-+
-+	if (n * sz > datasz)
-+		return -EOVERFLOW;
-+
-+	out = kcalloc(n, sz, GFP_KERNEL);
-+	if (!out)
-+		return -ENOMEM;
-+
-+	ret = func(dev, name, out, n);
-+	if (ret)
-+		goto out;
-+
-+	if (copy_to_user(datap, out, n * sz))
-+		ret = -EFAULT;
-+
-+out:
-+	kfree(out);
-+	return ret;
- }
- 
- int vfio_platform_dev_properties(struct device *dev, uint32_t *flags,
--- 
-2.5.1
+> -----Original Message-----
+> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Behalf Of Pavel Fedin
+> Sent: Monday, September 07, 2015 10:57 AM
+> To: 'Andre Przywara'
+> Cc: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org; 'Marc Zyngier'; 'Peter Maydell'
+> Subject: RE: [PATCH v3 2/5] KVM: arm64: Implement vGICv3 distributor and redistributor access
+> from userspace
+> 
+>  Hello!
+> 
+> > > --- a/virt/kvm/arm/vgic.c
+> > > +++ b/virt/kvm/arm/vgic.c
+> > > @@ -2468,6 +2468,7 @@ int vgic_attr_regs_access(struct kvm_device *dev,
+> > >  	 * access. For 64-bit registers we have to split up the operation.
+> > >  	 */
+> > >  	mmio->len = sizeof(u32);
+> > > +	mmio->private = vcpu; /* For redistributor handlers */
+> >
+> > I guess this can be moved into the caller and then you can drop the vcpu
+> > parameter and use private here instead, no?
+> 
+>  No because 'vcpu' is not a parameter. It is figured out in the middle of the function, under
+> dev->kvm->lock mutex, out of 'cpuid' index.
+> 
+> Kind regards,
+> Pavel Fedin
+> Expert Engineer
+> Samsung Electronics Research center Russia
+> 
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe kvm" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
