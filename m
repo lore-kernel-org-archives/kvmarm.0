@@ -1,272 +1,292 @@
-From: Julien Grall <julien.grall@citrix.com>
-Subject: Re: [PATCH v4 3/4] irqchip: GIC: Convert to EOImode == 1
-Date: Wed, 9 Sep 2015 20:23:29 +0100
-Message-ID: <55F08731.3050402@citrix.com>
-References: <1440604845-28229-1-git-send-email-marc.zyngier@arm.com>
- <1440604845-28229-4-git-send-email-marc.zyngier@arm.com>
+From: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Subject: Re: [RFC PATCH v4 1/3] vfio: platform: add device properties
+ skeleton and user API
+Date: Wed, 09 Sep 2015 14:48:12 -0600
+Message-ID: <1441831692.20355.540.camel@redhat.com>
+References: <1441790231-22920-1-git-send-email-b.reynal@virtualopensystems.com>
+	 <1441790231-22920-2-git-send-email-b.reynal@virtualopensystems.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1440604845-28229-4-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, Pranavkumar Sawargaonkar <pranavkumar@linaro.org>
-Cc: Ian Campbell <ian.campbell@citrix.com>, kvm@vger.kernel.org, Eric Auger <eric.auger@linaro.org>, Stefano Stabellini <stefano.stabellini@eu.citrix.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Jiang Liu <jiang.liu@linux.intel.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Return-path: <linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+In-Reply-To: <1441790231-22920-2-git-send-email-b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+Sender: linux-api-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+To: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+Cc: kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org, Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>, open list <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "open list:VFIO PLATFORM DRIVER" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "open list:ABI/API" <linux-api-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-I've been trying the latest linus/master (a794b4f), which include this
-patch, as baremetal kernel on X-gene. This is failing on early boot
-without much log.
-
-After bisecting the tree, I found the error coming from this patch.
-While this patch is valid, it made me remembered that X-Gene (at least
-the first version) as an odd GICv2.
-
-The GICC is divided in 2 area of 4K, each one aligned at a 64KB address.
-This means that, the address of GICC_DIR won't be 0x1000 but 0x10000.
-
-We had the same issue on Xen when we did the first port of X-gene [1].
-Although, we choose to add a quirk in Xen for this platform in order to
-map contiguously in the virtual memory the 2 part of GICC.
-
-Note that, back then, Ian suggested to extend the bindings to support a
-such platform [2]. AFAICT, there was no follow-up on it.
-
-Regards,
-
-[1] http://lists.xen.org/archives/html/xen-devel/2013-11/msg03526.html
-[2] http://www.spinics.net/lists/devicetree/msg10478.html
-
-On 26/08/15 17:00, Marc Zyngier wrote:
-> So far, GICv2 has been used with EOImode == 0. The effect of this
-> mode is to perform the priority drop and the deactivation of the
-> interrupt at the same time.
+On Wed, 2015-09-09 at 11:17 +0200, Baptiste Reynal wrote:
+> From: Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
 > 
-> While this works perfectly for Linux (we only have a single priority),
-> it causes issues when an interrupt is forwarded to a guest, and when
-> we want the guest to perform the EOI itself.
+> This patch introduces an API that allows to return device properties (OF
+> or ACPI) of a device bound to the vfio-platform/vfio-amba driver and the
+> skeleton of the implementation for VFIO_PLATFORM. Information about any
+> device node bound by VFIO_PLATFORM should be queried via the introduced
+> ioctl VFIO_DEVICE_GET_DEV_PROPERTY.
 > 
-> For this case, the GIC architecture provides EOImode == 1, where:
-> - A write to the EOI register drops the priority of the interrupt
->   and leaves it active. Other interrupts at the same priority level
->   can now be taken, but the active interrupt cannot be taken again
-> - A write to the DIR marks the interrupt as inactive, meaning it can
->   now be taken again.
+> The user needs to know the name and the data type of the property he is
+> accessing.
 > 
-> We only enable this feature when booted in HYP mode and that
-> the device-tree reported a suitable CPU interface. Observable behaviour
-> should remain unchanged.
+> Signed-off-by: Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+> Signed-off-by: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  drivers/irqchip/irq-gic.c       | 69 +++++++++++++++++++++++++++++++++++++++--
->  include/linux/irqchip/arm-gic.h |  4 +++
->  2 files changed, 70 insertions(+), 3 deletions(-)
+> v3 -> v4:
+>  - added flags placeholder in vfio_dev_properties
+>  - ioctl returns -E2BIG if the buffer is too small
+>  - details VFIO_DEVICE_GET_DEV_PROPERTY documentation
+> ---
+>  drivers/vfio/platform/Makefile                |  3 +-
+>  drivers/vfio/platform/properties.c            | 77 +++++++++++++++++++++++++++
+>  drivers/vfio/platform/vfio_platform_common.c  | 35 ++++++++++++
+>  drivers/vfio/platform/vfio_platform_private.h |  7 +++
+>  include/uapi/linux/vfio.h                     | 31 +++++++++++
+>  5 files changed, 152 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/vfio/platform/properties.c
 > 
-> diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-> index 4dd8826..9215897 100644
-> --- a/drivers/irqchip/irq-gic.c
-> +++ b/drivers/irqchip/irq-gic.c
-> @@ -46,6 +46,7 @@
->  #include <asm/irq.h>
->  #include <asm/exception.h>
->  #include <asm/smp_plat.h>
-> +#include <asm/virt.h>
+> diff --git a/drivers/vfio/platform/Makefile b/drivers/vfio/platform/Makefile
+> index 9ce8afe..37cf5ed 100644
+> --- a/drivers/vfio/platform/Makefile
+> +++ b/drivers/vfio/platform/Makefile
+> @@ -1,5 +1,6 @@
 >  
->  #include "irq-gic-common.h"
->  #include "irqchip.h"
-> @@ -82,6 +83,8 @@ static DEFINE_RAW_SPINLOCK(irq_controller_lock);
->  #define NR_GIC_CPU_IF 8
->  static u8 gic_cpu_map[NR_GIC_CPU_IF] __read_mostly;
+> -vfio-platform-y := vfio_platform.o vfio_platform_common.o vfio_platform_irq.o
+> +vfio-platform-y := vfio_platform.o vfio_platform_common.o vfio_platform_irq.o \
+> +		   properties.o
 >  
-> +static struct static_key supports_deactivate = STATIC_KEY_INIT_TRUE;
+>  obj-$(CONFIG_VFIO_PLATFORM) += vfio-platform.o
+>  obj-$(CONFIG_VFIO_PLATFORM) += reset/
+> diff --git a/drivers/vfio/platform/properties.c b/drivers/vfio/platform/properties.c
+> new file mode 100644
+> index 0000000..98754c2
+> --- /dev/null
+> +++ b/drivers/vfio/platform/properties.c
+> @@ -0,0 +1,77 @@
+> +/*
+> + * Copyright (C) 2015 - Virtual Open Systems
+> + * Authors: Antonios Motakis <a.motakis-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+> + *          Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License, version 2, as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + */
 > +
->  #ifndef MAX_GIC_NR
->  #define MAX_GIC_NR	1
->  #endif
-> @@ -157,6 +160,11 @@ static void gic_mask_irq(struct irq_data *d)
->  	gic_poke_irq(d, GIC_DIST_ENABLE_CLEAR);
->  }
->  
-> +static void gic_eoimode1_mask_irq(struct irq_data *d)
+> +#include <linux/slab.h>
+> +#include <linux/vfio.h>
+> +#include <linux/property.h>
+> +#include "vfio_platform_private.h"
+> +
+> +static int dev_property_get_strings(struct device *dev, uint32_t *flags,
+> +				    char *name, unsigned *lenp,
+> +				    void __user *datap, unsigned long datasz)
 > +{
-> +	gic_mask_irq(d);
+> +	return -EINVAL;
 > +}
 > +
->  static void gic_unmask_irq(struct irq_data *d)
->  {
->  	gic_poke_irq(d, GIC_DIST_ENABLE_SET);
-> @@ -167,6 +175,11 @@ static void gic_eoi_irq(struct irq_data *d)
->  	writel_relaxed(gic_irq(d), gic_cpu_base(d) + GIC_CPU_EOI);
->  }
->  
-> +static void gic_eoimode1_eoi_irq(struct irq_data *d)
+> +static int dev_property_get_uint(struct device *dev, uint32_t *flags,
+> +				 char *name, uint32_t type, unsigned *lenp,
+> +				 void __user *datap, unsigned long datasz)
 > +{
-> +	writel_relaxed(gic_irq(d), gic_cpu_base(d) + GIC_CPU_DEACTIVATE);
+> +	return -EINVAL;
 > +}
 > +
->  static int gic_irq_set_irqchip_state(struct irq_data *d,
->  				     enum irqchip_irq_state which, bool val)
->  {
-> @@ -272,11 +285,15 @@ static void __exception_irq_entry gic_handle_irq(struct pt_regs *regs)
->  		irqnr = irqstat & GICC_IAR_INT_ID_MASK;
->  
->  		if (likely(irqnr > 15 && irqnr < 1021)) {
-> +			if (static_key_true(&supports_deactivate))
-> +				writel_relaxed(irqstat, cpu_base + GIC_CPU_EOI);
->  			handle_domain_irq(gic->domain, irqnr, regs);
->  			continue;
->  		}
->  		if (irqnr < 16) {
->  			writel_relaxed(irqstat, cpu_base + GIC_CPU_EOI);
-> +			if (static_key_true(&supports_deactivate))
-> +				writel_relaxed(irqstat, cpu_base + GIC_CPU_DEACTIVATE);
->  #ifdef CONFIG_SMP
->  			handle_IPI(irqnr, regs);
->  #endif
-> @@ -327,6 +344,20 @@ static struct irq_chip gic_chip = {
->  	.flags			= IRQCHIP_SET_TYPE_MASKED,
->  };
->  
-> +static struct irq_chip gic_eoimode1_chip = {
-> +	.name			= "GICv2",
-> +	.irq_mask		= gic_eoimode1_mask_irq,
-> +	.irq_unmask		= gic_unmask_irq,
-> +	.irq_eoi		= gic_eoimode1_eoi_irq,
-> +	.irq_set_type		= gic_set_type,
-> +#ifdef CONFIG_SMP
-> +	.irq_set_affinity	= gic_set_affinity,
-> +#endif
-> +	.irq_get_irqchip_state	= gic_irq_get_irqchip_state,
-> +	.irq_set_irqchip_state	= gic_irq_set_irqchip_state,
-> +	.flags			= IRQCHIP_SET_TYPE_MASKED,
-> +};
+> +int vfio_platform_dev_properties(struct device *dev, uint32_t *flags,
+> +				 uint32_t type, unsigned *lenp,
+> +				 void __user *datap, unsigned long datasz)
+> +{
+> +	char *name;
+> +	long namesz;
+> +	int ret;
 > +
->  void __init gic_cascade_irq(unsigned int gic_nr, unsigned int irq)
->  {
->  	if (gic_nr >= MAX_GIC_NR)
-> @@ -359,6 +390,10 @@ static void gic_cpu_if_up(void)
->  {
->  	void __iomem *cpu_base = gic_data_cpu_base(&gic_data[0]);
->  	u32 bypass = 0;
-> +	u32 mode = 0;
+> +	namesz = strnlen_user(datap, datasz);
+> +	if (!namesz)
+> +		return -EFAULT;
+> +	if (namesz > datasz)
+> +		return -EINVAL;
 > +
-> +	if (static_key_true(&supports_deactivate))
-> +		mode = GIC_CPU_CTRL_EOImodeNS;
->  
->  	/*
->  	* Preserve bypass disable bits to be written back later
-> @@ -366,7 +401,7 @@ static void gic_cpu_if_up(void)
->  	bypass = readl(cpu_base + GIC_CPU_CTRL);
->  	bypass &= GICC_DIS_BYPASS_MASK;
->  
-> -	writel_relaxed(bypass | GICC_ENABLE, cpu_base + GIC_CPU_CTRL);
-> +	writel_relaxed(bypass | mode | GICC_ENABLE, cpu_base + GIC_CPU_CTRL);
->  }
->  
->  
-> @@ -789,13 +824,20 @@ void __init gic_init_physaddr(struct device_node *node)
->  static int gic_irq_domain_map(struct irq_domain *d, unsigned int irq,
->  				irq_hw_number_t hw)
->  {
-> +	struct irq_chip *chip = &gic_chip;
-> +
-> +	if (static_key_true(&supports_deactivate)) {
-> +		if (d->host_data == (void *)&gic_data[0])
-> +			chip = &gic_eoimode1_chip;
+> +	name = kzalloc(namesz, GFP_KERNEL);
+
+What prevents the user from passing an arbitrarily large string here?
+
+> +	if (!name)
+> +		return -ENOMEM;
+> +	if (strncpy_from_user(name, datap, namesz) <= 0) {
+> +		kfree(name);
+> +		return -EFAULT;
 > +	}
 > +
->  	if (hw < 32) {
->  		irq_set_percpu_devid(irq);
-> -		irq_domain_set_info(d, irq, hw, &gic_chip, d->host_data,
-> +		irq_domain_set_info(d, irq, hw, chip, d->host_data,
->  				    handle_percpu_devid_irq, NULL, NULL);
->  		set_irq_flags(irq, IRQF_VALID | IRQF_NOAUTOEN);
->  	} else {
-> -		irq_domain_set_info(d, irq, hw, &gic_chip, d->host_data,
-> +		irq_domain_set_info(d, irq, hw, chip, d->host_data,
->  				    handle_fasteoi_irq, NULL, NULL);
->  		set_irq_flags(irq, IRQF_VALID | IRQF_PROBE);
->  	}
-> @@ -986,6 +1028,8 @@ void __init gic_init_bases(unsigned int gic_nr, int irq_start,
->  		register_cpu_notifier(&gic_cpu_notifier);
->  #endif
->  		set_handle_irq(gic_handle_irq);
-> +		if (static_key_true(&supports_deactivate))
-> +			pr_info("GIC: Using split EOI/Deactivate mode\n");
->  	}
->  
->  	gic_dist_init(gic);
-> @@ -1001,6 +1045,7 @@ gic_of_init(struct device_node *node, struct device_node *parent)
->  {
->  	void __iomem *cpu_base;
->  	void __iomem *dist_base;
-> +	struct resource cpu_res;
->  	u32 percpu_offset;
->  	int irq;
->  
-> @@ -1013,6 +1058,16 @@ gic_of_init(struct device_node *node, struct device_node *parent)
->  	cpu_base = of_iomap(node, 1);
->  	WARN(!cpu_base, "unable to map gic cpu registers\n");
->  
-> +	of_address_to_resource(node, 1, &cpu_res);
+> +	switch (type) {
+> +	case VFIO_DEV_PROPERTY_TYPE_STRINGS:
+> +		ret = dev_property_get_strings(dev, flags, name, lenp,
+> +				datap, datasz);
+> +		break;
 > +
-> +	/*
-> +	 * Disable split EOI/Deactivate if either HYP is not available
-> +	 * or the CPU interface is too small.
-> +	 */
-> +	if (gic_cnt == 0 && (!is_hyp_mode_available() ||
-> +			     resource_size(&cpu_res) < SZ_8K))
-> +		static_key_slow_dec(&supports_deactivate);
+> +	case VFIO_DEV_PROPERTY_TYPE_U64:
+> +	case VFIO_DEV_PROPERTY_TYPE_U32:
+> +	case VFIO_DEV_PROPERTY_TYPE_U16:
+> +	case VFIO_DEV_PROPERTY_TYPE_U8:
+> +		ret = dev_property_get_uint(dev, flags, name, type, lenp,
+> +					    datap, datasz);
+> +		break;
 > +
->  	if (of_property_read_u32(node, "cpu-offset", &percpu_offset))
->  		percpu_offset = 0;
+> +	default:
+> +		ret = -EINVAL;
+> +	}
+> +
+> +	kfree(name);
+> +	return ret;
+> +}
+> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
+> index e43efb5..44ba22c 100644
+> --- a/drivers/vfio/platform/vfio_platform_common.c
+> +++ b/drivers/vfio/platform/vfio_platform_common.c
+> @@ -20,6 +20,7 @@
+>  #include <linux/types.h>
+>  #include <linux/uaccess.h>
+>  #include <linux/vfio.h>
+> +#include <linux/property.h>
 >  
-> @@ -1132,6 +1187,14 @@ gic_v2_acpi_init(struct acpi_table_header *table)
+>  #include "vfio_platform_private.h"
+>  
+> @@ -302,6 +303,34 @@ static long vfio_platform_ioctl(void *device_data,
+>  			return vdev->reset(vdev);
+>  		else
+>  			return -EINVAL;
+> +	} else if (cmd == VFIO_DEVICE_GET_DEV_PROPERTY) {
+> +		struct vfio_dev_property info;
+> +		void __user *datap;
+> +		unsigned long datasz;
+> +		int ret;
+> +
+> +		if (!vdev->dev)
+> +			return -EINVAL;
+> +
+> +		minsz = offsetofend(struct vfio_dev_property, length);
+> +
+> +		if (copy_from_user(&info, (void __user *)arg, minsz))
+> +			return -EFAULT;
+> +
+> +		if (info.argsz < minsz)
+> +			return -EINVAL;
+> +
+> +		datap = (void __user *) arg + minsz;
+> +		datasz = info.argsz - minsz;
+> +
+> +		ret = vfio_platform_dev_properties(vdev->dev, &info.flags,
+
+Why the address of flags, I don't see anyone modifying it and there's
+nothing defined in the ioctl description for flags being modified on
+return.  In fact, there are no flags defined yet, it's just a
+future-proofing mechanism of the ioctl, so why propagate it at all right
+now?
+
+> +				info.type, &info.length, datap, datasz);
+> +
+> +		if (copy_to_user((void __user *)arg, &info, minsz))
+> +			ret = -EFAULT;
+> +
+> +		return ret;
+> +
 >  	}
+>  
+>  	return -ENOTTY;
+> @@ -553,6 +582,12 @@ int vfio_platform_probe_common(struct vfio_platform_device *vdev,
+>  
+>  	vfio_platform_get_reset(vdev, dev);
+>  
+> +	/* add device properties flag */
+> +	if (device_property_present(dev, "name")) {
+> +		vdev->dev = dev;
+
+It seems precarious to leave ->dev dangling in the else case.  This is a
+future bug waiting to happen.
+
+> +		vdev->flags |= VFIO_DEVICE_FLAGS_DEV_PROPERTIES;
+> +	}
+> +
+>  	mutex_init(&vdev->igate);
+>  
+>  	return 0;
+> diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
+> index 1c9b3d5..c75b089 100644
+> --- a/drivers/vfio/platform/vfio_platform_private.h
+> +++ b/drivers/vfio/platform/vfio_platform_private.h
+> @@ -56,6 +56,7 @@ struct vfio_platform_device {
+>  	u32				num_irqs;
+>  	int				refcnt;
+>  	struct mutex			igate;
+> +	struct device			*dev;
 >  
 >  	/*
-> +	 * Disable split EOI/Deactivate if HYP is not available. ACPI
-> +	 * guarantees that we'll always have a GICv2, so the CPU
-> +	 * interface will always be the right size.
-> +	 */
-> +	if (!is_hyp_mode_available())
-> +		static_key_slow_dec(&supports_deactivate);
-> +
-> +	/*
->  	 * Initialize zero GIC instance (no multi-GIC support). Also, set GIC
->  	 * as default IRQ domain to allow for GSI registration and GSI to IRQ
->  	 * number translation (see acpi_register_gsi() and acpi_gsi_to_irq()).
-> diff --git a/include/linux/irqchip/arm-gic.h b/include/linux/irqchip/arm-gic.h
-> index 9de976b..b1533c0 100644
-> --- a/include/linux/irqchip/arm-gic.h
-> +++ b/include/linux/irqchip/arm-gic.h
-> @@ -20,9 +20,13 @@
->  #define GIC_CPU_ALIAS_BINPOINT		0x1c
->  #define GIC_CPU_ACTIVEPRIO		0xd0
->  #define GIC_CPU_IDENT			0xfc
-> +#define GIC_CPU_DEACTIVATE		0x1000
+>  	 * These fields should be filled by the bus specific binder
+> @@ -89,4 +90,10 @@ extern int vfio_platform_set_irqs_ioctl(struct vfio_platform_device *vdev,
+>  					unsigned start, unsigned count,
+>  					void *data);
 >  
->  #define GICC_ENABLE			0x1
->  #define GICC_INT_PRI_THRESHOLD		0xf0
+> +/* device properties support in properties.c */
+> +extern int vfio_platform_dev_properties(struct device *dev, uint32_t *flags,
+> +					uint32_t type, unsigned *lenp,
+> +					void __user *datap,
+> +					unsigned long datasz);
 > +
-> +#define GIC_CPU_CTRL_EOImodeNS		(1 << 9)
+>  #endif /* VFIO_PLATFORM_PRIVATE_H */
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 9fd7b5d..a1a0eaa 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -164,12 +164,43 @@ struct vfio_device_info {
+>  #define VFIO_DEVICE_FLAGS_PCI	(1 << 1)	/* vfio-pci device */
+>  #define VFIO_DEVICE_FLAGS_PLATFORM (1 << 2)	/* vfio-platform device */
+>  #define VFIO_DEVICE_FLAGS_AMBA  (1 << 3)	/* vfio-amba device */
+> +#define VFIO_DEVICE_FLAGS_DEV_PROPERTIES (1 << 4) /* Device properties */
+>  	__u32	num_regions;	/* Max region index + 1 */
+>  	__u32	num_irqs;	/* Max IRQ index + 1 */
+>  };
+>  #define VFIO_DEVICE_GET_INFO		_IO(VFIO_TYPE, VFIO_BASE + 7)
+>  
+>  /**
+> + * VFIO_DEVICE_GET_DEV_PROPERTY - _IOR(VFIO_TYPE, VFIO_BASE + 17,
+> + *						struct vfio_devtree_info)
+> + *
+> + * Retrieve a device property, e.g. from a HW description (device tree or ACPI)
+> + * if available.
+> + * Caller will initialize data[] with a single string with the requested
+> + * devicetree property name, and type depending on whether an array of strings
+> + * or an array of u32 values is expected. On success, data[] will be filled
+> + * with the requested information, either as an array of u32, or with a list
+> + * of strings separated by the NULL terminating character.
+> + * Return: 0 on success, -errno on failure.
+> + * Errors:
+> + *   E2BIG: the property is too big to fit in the data[] buffer (the required
+> + *          size is then written into the length field).
+
+I don't know which is more correct, but the
+VFIO_DEVICE_GET_PCI_HOT_RESET_INFO uses ENOSPC when the buffer size is
+too small.  If there's no compelling reason to be different, let's use
+it here too.
+
+> + */
+> +struct vfio_dev_property {
+> +	__u32	argsz;
+> +	__u32	flags;	/* Placeholder for future extension */
+> +	__u32	type;
+> +#define VFIO_DEV_PROPERTY_TYPE_STRINGS	0
+> +#define VFIO_DEV_PROPERTY_TYPE_U8	1
+> +#define VFIO_DEV_PROPERTY_TYPE_U16	2
+> +#define VFIO_DEV_PROPERTY_TYPE_U32	3
+> +#define VFIO_DEV_PROPERTY_TYPE_U64	4
+> +	__u32	length;	/* Size of data[] */
+> +	__u8	data[];
+> +};
+> +#define VFIO_DEVICE_GET_DEV_PROPERTY	_IO(VFIO_TYPE, VFIO_BASE + 17)
 > +
->  #define GICC_IAR_INT_ID_MASK		0x3ff
->  #define GICC_INT_SPURIOUS		1023
->  #define GICC_DIS_BYPASS_MASK		0x1e0
-> 
-
-
--- 
-Julien Grall
+> +/**
+>   * VFIO_DEVICE_GET_REGION_INFO - _IOWR(VFIO_TYPE, VFIO_BASE + 8,
+>   *				       struct vfio_region_info)
+>   *
