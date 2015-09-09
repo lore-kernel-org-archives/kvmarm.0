@@ -1,90 +1,320 @@
-From: Tushar Jagad <tushar.jagad@linaro.org>
-Subject: [PATCH RFC 3/4] arm64: kvm: Setup MIDR as per target vcpu
-Date: Wed,  9 Sep 2015 14:08:33 +0530
-Message-ID: <1441787914-3191-4-git-send-email-tushar.jagad@linaro.org>
-References: <1441787914-3191-1-git-send-email-tushar.jagad@linaro.org>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v3 07/10] KVM: arm/arm64: vgic: Allow HW interrupts for
+ non-shared devices
+Date: Wed, 9 Sep 2015 10:41:32 +0200
+Message-ID: <55EFF0BC.8090200@linaro.org>
+References: <1439212864-12954-1-git-send-email-eric.auger@linaro.org>
+ <1439212864-12954-8-git-send-email-eric.auger@linaro.org>
+ <20150902194246.GV10991@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1441787914-3191-1-git-send-email-tushar.jagad@linaro.org>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
-Cc: peter.maydell@linaro.org, marc.zyngier@arm.com, patches@apm.com, qemu-devel@nongnu.org, tushar.jagad@linaro.org, christoffer.dall@linaro.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9722D412F2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2015 04:41:46 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id zjYiDaUkDdAt for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Sep 2015 04:41:45 -0400 (EDT)
+Received: from mail-wi0-f180.google.com (mail-wi0-f180.google.com
+ [209.85.212.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3359A41145
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Sep 2015 04:41:45 -0400 (EDT)
+Received: by wiclk2 with SMTP id lk2so12861334wic.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Sep 2015 01:42:24 -0700 (PDT)
+In-Reply-To: <20150902194246.GV10991@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: eric.auger@st.com, kvm@vger.kernel.org, patches@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, pbonzini@redhat.com, feng.wu@intel.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-For Cross CPU targets guest kernel should see MIDR value as per the
-target specified.
+Hi Christoffer,
+On 09/02/2015 09:42 PM, Christoffer Dall wrote:
+> On Mon, Aug 10, 2015 at 03:21:01PM +0200, Eric Auger wrote:
+>> From: Marc Zyngier <marc.zyngier@arm.com>
+>>
+>> So far, the only use of the HW interrupt facility was the timer,
+>> implying that the active state is context-switched for each vcpu,
+>> as the device is is shared across all vcpus.
+>>
+>> This does not work for a device that has been assigned to a VM,
+>> as the guest is entierely in control of that device (the HW is
+>> not shared). In that case, it makes sense to bypass the whole
+>> active state switching.
+>>
+>> Also the VGIC state machine is adapted to support those assigned
+>> (non shared) HW IRQs:
+>> - nly can be sampled when it is pending
+>> - when queueing the IRQ (programming the LR), the pending state is
+>>   removed as for edge sensitive IRQs
+>> - queued state is not modelled. Level state is not modelled
+>> - its injection always is valid since steming from the HW.
+>>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+>>
+>> ---
+>>
+>> - a mix of
+>>   [PATCH v4 11/11] KVM: arm/arm64: vgic: Allow HW interrupts for
+>>                    non-shared devices
+>>   [RFC v2 2/4] KVM: arm: vgic: fix state machine for forwarded IRQ
+>> ---
+>>  include/kvm/arm_vgic.h    |  6 +++--
+>>  virt/kvm/arm/arch_timer.c |  3 ++-
+>>  virt/kvm/arm/vgic.c       | 58 +++++++++++++++++++++++++++++++++++------------
+>>  3 files changed, 49 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>> index d901f1a..7ef9ce0 100644
+>> --- a/include/kvm/arm_vgic.h
+>> +++ b/include/kvm/arm_vgic.h
+>> @@ -163,7 +163,8 @@ struct irq_phys_map {
+>>  	u32			virt_irq;
+>>  	u32			phys_irq;
+>>  	u32			irq;
+>> -	bool			active;
+>> +	bool			shared;
+>> +	bool			active; /* Only valid if shared */
+>>  };
+>>  
+>>  struct irq_phys_map_entry {
+>> @@ -356,7 +357,8 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
+>>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+>>  int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
+>>  struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+>> -					   int virt_irq, int irq);
+>> +					   int virt_irq, int irq,
+>> +					   bool shared);
+>>  int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
+>>  bool kvm_vgic_get_phys_irq_active(struct irq_phys_map *map);
+>>  void kvm_vgic_set_phys_irq_active(struct irq_phys_map *map, bool active);
+>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+>> index 76e38d2..db21d8f 100644
+>> --- a/virt/kvm/arm/arch_timer.c
+>> +++ b/virt/kvm/arm/arch_timer.c
+>> @@ -203,7 +203,8 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+>>  	 * Tell the VGIC that the virtual interrupt is tied to a
+>>  	 * physical interrupt. We do that once per VCPU.
+>>  	 */
+>> -	map = kvm_vgic_map_phys_irq(vcpu, irq->irq, host_vtimer_irq);
+>> +	map = kvm_vgic_map_phys_irq(vcpu, irq->irq,
+>> +				    host_vtimer_irq, true);
+>>  	if (WARN_ON(IS_ERR(map)))
+>>  		return PTR_ERR(map);
+>>  
+>> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+>> index 9eb489a..fbd5ba5 100644
+>> --- a/virt/kvm/arm/vgic.c
+>> +++ b/virt/kvm/arm/vgic.c
+>> @@ -400,7 +400,11 @@ void vgic_cpu_irq_clear(struct kvm_vcpu *vcpu, int irq)
+>>  
+>>  static bool vgic_can_sample_irq(struct kvm_vcpu *vcpu, int irq)
+>>  {
+>> -	return !vgic_irq_is_queued(vcpu, irq);
+>> +	struct irq_phys_map *map = vgic_irq_map_search(vcpu, irq);
+>> +	bool shared_hw = map && !map->shared;
+> 
+> why is shared true when map->shared is false?
+> 
+>> +
+>> +	return !vgic_irq_is_queued(vcpu, irq) ||
+>> +			(shared_hw && vgic_dist_irq_is_pending(vcpu, irq));
+> 
+> so for forwarded, non-shared, level-triggered IRQs, we always sample the
+> line if it's pending?  Why?
+I tried to integrate into the updated state machine for non shared
+mapped IRQ but I fail.
 
-This patch adds support to construct the value for MIDR register
-based on the target vcpu.
+1) The first problem encountered is how to reset the level of the IRQ
+(since its completion is not trapped). I added this reset in
+process_queued_irq. I think this was the most natural place since at
+sink time we get aware the IRQ is deactivated at physical distributor
+level. However I observe  failures in vgic_validate_injection. I think
+there is due to a race between update_irq_pending and sync. As soon as
+the guest EOI's the virtual IRQ (and also the pIRQ), a new physical IRQ
+hits and gets injected by irqfd. This injection can happen before the
+sync. So I would be tempted to keep my current strategy of ignoring the
+validate_injection in case of non-shared mapped IRQ and not model the
+level state. The vIRQ directly comes from the HW so it must be valid
+(guest deactivated the previous occurence).
 
-Signed-off-by: Tushar Jagad <tushar.jagad@linaro.org>
----
- arch/arm64/kvm/sys_regs.c |   43 +++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 39 insertions(+), 4 deletions(-)
+2) can_sample.
+once the above problem fixed, next issue is the can_sample failure.
+Queued state also is reset in process_queued_irq and can_sample fails.
+Same punishment. So currently the only manner I found to make this work
+and sample the IRQ only once is to use the pending state which I reset
+when I queue the IRQ.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 273eecd..cb12783 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -172,10 +172,45 @@ static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
- 
- static void reset_midr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- {
--	/*
--	 * We only export the host's MPIDR_EL1 for now.
--	 */
--	vcpu_sys_reg(vcpu, MIDR_EL1) = read_cpuid_id();
-+	__u32 target;
-+	unsigned long implementor;
-+	unsigned long part_num;
-+	__u32 midr_el1;
-+
-+	target = vcpu->arch.target;
-+	switch (target) {
-+	case KVM_ARM_TARGET_AEM_V8:
-+		part_num = ARM_CPU_PART_AEM_V8;
-+		implementor = ARM_CPU_IMP_ARM;
-+		break;
-+	case KVM_ARM_TARGET_FOUNDATION_V8:
-+		part_num = ARM_CPU_PART_FOUNDATION;
-+		implementor = ARM_CPU_IMP_ARM;
-+		break;
-+	case KVM_ARM_TARGET_CORTEX_A53:
-+		part_num = ARM_CPU_PART_CORTEX_A53;
-+		implementor = ARM_CPU_IMP_ARM;
-+		break;
-+	case KVM_ARM_TARGET_CORTEX_A57:
-+		part_num = ARM_CPU_PART_CORTEX_A57;
-+		implementor = ARM_CPU_IMP_ARM;
-+		break;
-+	case KVM_ARM_TARGET_XGENE_POTENZA:
-+		part_num = APM_CPU_PART_POTENZA;
-+		implementor = ARM_CPU_IMP_APM;
-+		break;
-+
-+	default:
-+		implementor = 0;
-+		part_num = 0;
-+	}
-+
-+	if (implementor && part_num)
-+		midr_el1 = MIDR_CPU_PART(implementor, part_num);
-+	else
-+		midr_el1 = read_cpuid_id();
-+
-+	vcpu_sys_reg(vcpu, MIDR_EL1) = midr_el1;
- }
- 
- /*
--- 
-1.7.9.5
+So currently I don't think non-shared mapped IRQ fit the updated state
+machine.
+
+Any Thoughts?
+
+Eric
+> 
+>>  }
+>>  
+>>  /**
+>> @@ -1150,19 +1154,26 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
+>>  		 * active in the physical world. Otherwise the
+>>  		 * physical interrupt will fire and the guest will
+>>  		 * exit before processing the virtual interrupt.
+>> +		 *
+>> +		 * This is of course only valid for a shared
+>> +		 * interrupt. A non shared interrupt should already be
+>> +		 * active.
+>>  		 */
+>>  		if (map) {
+>> -			int ret;
+>> -
+>> -			BUG_ON(!map->active);
+>>  			vlr.hwirq = map->phys_irq;
+>>  			vlr.state |= LR_HW;
+>>  			vlr.state &= ~LR_EOI_INT;
+>>  
+>> -			ret = irq_set_irqchip_state(map->irq,
+>> -						    IRQCHIP_STATE_ACTIVE,
+>> -						    true);
+>> -			WARN_ON(ret);
+>> +			if (map->shared) {
+>> +				int ret;
+>> +
+>> +				BUG_ON(!map->active);
+>> +				ret = irq_set_irqchip_state(
+>> +						map->irq,
+>> +						IRQCHIP_STATE_ACTIVE,
+>> +						true);
+>> +				WARN_ON(ret);
+>> +			}
+> 
+> this stuff all needs to be rebased onto my latest timer/active state
+> rework series.
+> 
+>>  
+>>  			/*
+>>  			 * Make sure we're not going to sample this
+>> @@ -1229,10 +1240,13 @@ bool vgic_queue_irq(struct kvm_vcpu *vcpu, u8 sgi_source_id, int irq)
+>>  
+>>  static bool vgic_queue_hwirq(struct kvm_vcpu *vcpu, int irq)
+>>  {
+>> +	struct irq_phys_map *map = vgic_irq_map_search(vcpu, irq);
+>> +	bool shared_hw = map && !map->shared;
+> 
+> same question as above?
+> 
+>> +
+>>  	if (!vgic_can_sample_irq(vcpu, irq))
+>>  		return true; /* level interrupt, already queued */
+>>  
+>> -	if (vgic_queue_irq(vcpu, 0, irq)) {
+>> +	if (vgic_queue_irq(vcpu, 0, irq) || shared_hw) {
+>>  		if (vgic_irq_is_edge(vcpu, irq)) {
+>>  			vgic_dist_irq_clear_pending(vcpu, irq);
+>>  			vgic_cpu_irq_clear(vcpu, irq);
+>> @@ -1411,7 +1425,12 @@ static int vgic_sync_hwirq(struct kvm_vcpu *vcpu, struct vgic_lr vlr)
+>>  		return 0;
+>>  
+>>  	map = vgic_irq_map_search(vcpu, vlr.irq);
+>> -	BUG_ON(!map || !map->active);
+>> +	BUG_ON(!map);
+>> +
+>> +	if (!map->shared)
+>> +		return 0;
+>> +
+>> +	BUG_ON(map->shared && !map->active);
+>>  
+>>  	ret = irq_get_irqchip_state(map->irq,
+>>  				    IRQCHIP_STATE_ACTIVE,
+>> @@ -1563,6 +1582,7 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
+>>  	int edge_triggered, level_triggered;
+>>  	int enabled;
+>>  	bool ret = true, can_inject = true;
+>> +	bool shared_hw = map && !map->shared;
+> 
+> same
+> 
+>>  
+>>  	if (irq_num >= min(kvm->arch.vgic.nr_irqs, 1020))
+>>  		return -EINVAL;
+>> @@ -1573,7 +1593,8 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
+>>  	edge_triggered = vgic_irq_is_edge(vcpu, irq_num);
+>>  	level_triggered = !edge_triggered;
+>>  
+>> -	if (!vgic_validate_injection(vcpu, irq_num, level)) {
+>> +	if (!vgic_validate_injection(vcpu, irq_num, level) &&
+>> +		!shared_hw) {
+>>  		ret = false;
+>>  		goto out;
+>>  	}
+>> @@ -1742,16 +1763,21 @@ static struct list_head *vgic_get_irq_phys_map_list(struct kvm_vcpu *vcpu,
+>>   * @vcpu: The VCPU pointer
+>>   * @virt_irq: The virtual irq number
+>>   * @irq: The Linux IRQ number
+>> + * @shared: Indicates if the interrupt has to be context-switched or
+>> + *          if it is private to a VM
+>>   *
+>>   * Establish a mapping between a guest visible irq (@virt_irq) and a
+>>   * Linux irq (@irq). On injection, @virt_irq will be associated with
+>>   * the physical interrupt represented by @irq. This mapping can be
+>>   * established multiple times as long as the parameters are the same.
+>> + * If @shared is true, the active state of the interrupt will be
+>> + * context-switched.
+>>   *
+>>   * Returns a valid pointer on success, and an error pointer otherwise
+>>   */
+>>  struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+>> -					   int virt_irq, int irq)
+>> +					   int virt_irq, int irq,
+>> +					   bool shared)
+>>  {
+>>  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+>>  	struct list_head *root = vgic_get_irq_phys_map_list(vcpu, virt_irq);
+>> @@ -1785,7 +1811,8 @@ struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+>>  	if (map) {
+>>  		/* Make sure this mapping matches */
+>>  		if (map->phys_irq != phys_irq	||
+>> -		    map->irq      != irq)
+>> +		    map->irq      != irq	||
+>> +		    map->shared   != shared)
+>>  			map = ERR_PTR(-EINVAL);
+>>  
+>>  		/* Found an existing, valid mapping */
+>> @@ -1796,6 +1823,7 @@ struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+>>  	map->virt_irq = virt_irq;
+>>  	map->phys_irq = phys_irq;
+>>  	map->irq      = irq;
+>> +	map->shared   = shared;
+>>  
+>>  	list_add_tail_rcu(&entry->entry, root);
+>>  
+>> @@ -1846,7 +1874,7 @@ static void vgic_free_phys_irq_map_rcu(struct rcu_head *rcu)
+>>   */
+>>  bool kvm_vgic_get_phys_irq_active(struct irq_phys_map *map)
+>>  {
+>> -	BUG_ON(!map);
+>> +	BUG_ON(!map || !map->shared);
+>>  	return map->active;
+>>  }
+>>  
+>> @@ -1858,7 +1886,7 @@ bool kvm_vgic_get_phys_irq_active(struct irq_phys_map *map)
+>>   */
+>>  void kvm_vgic_set_phys_irq_active(struct irq_phys_map *map, bool active)
+>>  {
+>> -	BUG_ON(!map);
+>> +	BUG_ON(!map || !map->shared);
+>>  	map->active = active;
+>>  }
+>>  
+>> -- 
+>> 1.9.1
+>>
