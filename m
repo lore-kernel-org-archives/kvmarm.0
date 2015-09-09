@@ -1,14 +1,11 @@
 From: Tushar Jagad <tushar.jagad@linaro.org>
-Subject: [PATCH RFC 4/4] arm/arm64: kvm: Disable comparision of cpu and vcpu
- target
-Date: Wed,  9 Sep 2015 14:08:34 +0530
-Message-ID: <1441787914-3191-5-git-send-email-tushar.jagad@linaro.org>
-References: <1441787914-3191-1-git-send-email-tushar.jagad@linaro.org>
+Subject: [PATCH RFC 0/4] arm64: cross cpu support
+Date: Wed,  9 Sep 2015 14:08:30 +0530
+Message-ID: <1441787914-3191-1-git-send-email-tushar.jagad@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1441787914-3191-1-git-send-email-tushar.jagad@linaro.org>
 List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
  <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
 List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
@@ -22,29 +19,37 @@ To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 Cc: peter.maydell@linaro.org, marc.zyngier@arm.com, patches@apm.com, qemu-devel@nongnu.org, tushar.jagad@linaro.org, christoffer.dall@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch disables comparison of physical cpu and vcpu for supporting
-cross cpu guests.
+Currently running guests having vcpus different from the host cpu
+(for example running cortex-a57 guest on X-Gene) is not supported in
+arm64 kvm.
 
-Signed-off-by: Tushar Jagad <tushar.jagad@linaro.org>
----
- arch/arm/kvm/arm.c |    5 -----
- 1 file changed, 5 deletions(-)
+This patchset adds basic support for running guests in cross cpu
+configuration. Currently the cross cpu functionality is limited
+to
+- Target specific MIDR register value i.e. /proc/cpuinfo will reflect the
+  value of cpu requested.
+- Hardware debug capability infomation i.e. guest kernel will see the number
+  of breakpoints and watchpoints as requested by the user.
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 8907d37..b3214b2 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -698,11 +698,6 @@ static int kvm_vcpu_set_target(struct kvm_vcpu *vcpu,
- 	unsigned int i;
- 	u64 aa64dfr;
- 
--	int phys_target = kvm_target_cpu();
--
--	if (init->target != phys_target)
--		return -EINVAL;
--
- 	/*
- 	 * Secondary and subsequent calls to KVM_ARM_VCPU_INIT must
- 	 * use the same target.
--- 
+These patches are based on top of kernel tag v4.2.
+
+Marc Zyngier (1):
+  arm64: KVM: add MIDR_EL1 switching
+
+Tushar Jagad (3):
+  arm64: kvm: enable trapping of read access to regs in TID3 group
+  arm64: kvm: Setup MIDR as per target vcpu
+  arm/arm64: kvm: Disable comparision of cpu and vcpu target
+
+ Documentation/virtual/kvm/api.txt |    8 +
+ arch/arm/kvm/arm.c                |   53 +++-
+ arch/arm64/include/asm/kvm_arm.h  |    2 +-
+ arch/arm64/include/asm/kvm_asm.h  |   40 ++-
+ arch/arm64/include/asm/kvm_host.h |    4 +-
+ arch/arm64/include/uapi/asm/kvm.h |    7 +
+ arch/arm64/kvm/hyp.S              |    4 +
+ arch/arm64/kvm/sys_regs.c         |  496 +++++++++++++++++++++++++++++++++----
+ 8 files changed, 556 insertions(+), 58 deletions(-)
+
+--
 1.7.9.5
