@@ -1,22 +1,23 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v2 01/22] ARM64: Move PMU register related defines to asm/pmu.h
-Date: Fri, 11 Sep 2015 16:54:54 +0800
-Message-ID: <1441961715-11688-2-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v2 17/22] KVM: ARM64: Add reset and access handlers for
+ PMSWINC register
+Date: Fri, 11 Sep 2015 16:55:10 +0800
+Message-ID: <1441961715-11688-18-git-send-email-zhaoshenglong@huawei.com>
 References: <1441961715-11688-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DA85341022
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2015 04:55:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6C5C74142D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2015 04:55:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id z1UjD+GVutOy for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Sep 2015 04:55:30 -0400 (EDT)
+ with ESMTP id YwPlwfhLXVXL for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Sep 2015 04:55:46 -0400 (EDT)
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4C48C410D7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2015 04:55:28 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 78FA046F4F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2015 04:55:39 -0400 (EDT)
 In-Reply-To: <1441961715-11688-1-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,124 +34,150 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-To use the ARMv8 PMU related register defines from the KVM code,
-we move the relevant definitions to asm/pmu.h header file.
+Add access handler which emulates writing and reading PMSWINC
+register and add support for creating software increment event.
 
-Signed-off-by: Anup Patel <anup.patel@linaro.org>
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm64/include/asm/pmu.h   | 45 ++++++++++++++++++++++++++++++++++++++++++
- arch/arm64/kernel/perf_event.c | 35 --------------------------------
- 2 files changed, 45 insertions(+), 35 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 18 +++++++++++++++++-
+ include/kvm/arm_pmu.h     |  2 ++
+ virt/kvm/arm/pmu.c        | 33 +++++++++++++++++++++++++++++++++
+ 3 files changed, 52 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/pmu.h b/arch/arm64/include/asm/pmu.h
-index b7710a5..b9f394a 100644
---- a/arch/arm64/include/asm/pmu.h
-+++ b/arch/arm64/include/asm/pmu.h
-@@ -19,6 +19,51 @@
- #ifndef __ASM_PMU_H
- #define __ASM_PMU_H
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index b47cd0b..24d00a0 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -335,6 +335,11 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+ 			vcpu_sys_reg(vcpu, PMOVSSET_EL0) &= ~val;
+ 			break;
+ 		}
++		case PMSWINC_EL0: {
++			val = *vcpu_reg(vcpu, p->Rt);
++			kvm_pmu_software_increment(vcpu, val);
++			break;
++		}
+ 		case PMCR_EL0: {
+ 			/* Only update writeable bits of PMCR */
+ 			val = vcpu_sys_reg(vcpu, r->reg);
+@@ -364,6 +369,8 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+ 			*vcpu_reg(vcpu, p->Rt) = val;
+ 			break;
+ 		}
++		case PMSWINC_EL0:
++			return read_zero(vcpu, p);
+ 		default:
+ 			*vcpu_reg(vcpu, p->Rt) = vcpu_sys_reg(vcpu, r->reg);
+ 			break;
+@@ -576,7 +583,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  access_pmu_regs, reset_unknown, PMOVSCLR_EL0 },
+ 	/* PMSWINC_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b100),
+-	  trap_raz_wi },
++	  access_pmu_regs, reset_unknown, PMSWINC_EL0 },
+ 	/* PMSELR_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b101),
+ 	  access_pmu_regs, reset_unknown, PMSELR_EL0 },
+@@ -833,6 +840,11 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
+ 			vcpu_cp15(vcpu, c9_PMOVSSET) &= ~val;
+ 			break;
+ 		}
++		case c9_PMSWINC: {
++			val = *vcpu_reg(vcpu, p->Rt);
++			kvm_pmu_software_increment(vcpu, val);
++			break;
++		}
+ 		case c9_PMCR: {
+ 			/* Only update writeable bits of PMCR */
+ 			val = vcpu_cp15(vcpu, r->reg);
+@@ -862,6 +874,8 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
+ 			*vcpu_reg(vcpu, p->Rt) = val;
+ 			break;
+ 		}
++		case c9_PMSWINC:
++			return read_zero(vcpu, p);
+ 		default:
+ 			*vcpu_reg(vcpu, p->Rt) = vcpu_cp15(vcpu, r->reg);
+ 			break;
+@@ -907,6 +921,8 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	  reset_unknown_cp15, c9_PMCNTENCLR },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), access_pmu_cp15_regs,
+ 	  reset_unknown_cp15, c9_PMOVSCLR },
++	{ Op1( 0), CRn( 9), CRm(12), Op2( 4), access_pmu_cp15_regs,
++	  reset_unknown_cp15, c9_PMSWINC },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmu_cp15_regs,
+ 	  reset_unknown_cp15, c9_PMSELR },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmu_cp15_regs,
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 59e70af..1a27357 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -41,6 +41,7 @@ unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu,
+ 					unsigned long select_idx);
+ void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, unsigned long val);
+ void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, unsigned long val);
++void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, unsigned long val);
+ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
+ 				    unsigned long select_idx);
+ #else
+@@ -51,6 +52,7 @@ unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu,
+ }
+ void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, unsigned long val) {}
+ void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, unsigned long val) {}
++void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, unsigned long val) {}
+ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
+ 				    unsigned long select_idx) {}
+ #endif
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index c6cdc4e..5f5a483 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -163,6 +163,35 @@ void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, unsigned long val)
+ }
  
-+#define ARMV8_MAX_COUNTERS      32
-+#define ARMV8_COUNTER_MASK      (ARMV8_MAX_COUNTERS - 1)
-+
-+/*
-+ * Per-CPU PMCR: config reg
+ /**
++ * kvm_pmu_software_increment - do software increment
++ * @vcpu: The vcpu pointer
++ * @val: the value guest writes to PMSWINC register
 + */
-+#define ARMV8_PMCR_E		(1 << 0) /* Enable all counters */
-+#define ARMV8_PMCR_P		(1 << 1) /* Reset all counters */
-+#define ARMV8_PMCR_C		(1 << 2) /* Cycle counter reset */
-+#define ARMV8_PMCR_D		(1 << 3) /* CCNT counts every 64th cpu cycle */
-+#define ARMV8_PMCR_X		(1 << 4) /* Export to ETM */
-+#define ARMV8_PMCR_DP		(1 << 5) /* Disable CCNT if non-invasive debug*/
-+#define	ARMV8_PMCR_N_SHIFT	11	 /* Number of counters supported */
-+#define	ARMV8_PMCR_N_MASK	0x1f
-+#define	ARMV8_PMCR_MASK		0x3f	 /* Mask for writable bits */
++void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, unsigned long val)
++{
++	int i;
++	unsigned int type, enable;
 +
-+/*
-+ * PMCNTEN: counters enable reg
-+ */
-+#define	ARMV8_CNTEN_MASK	0xffffffff	/* Mask for writable bits */
++	for (i = 0; i < 32; i++) {
++		if ((val >> i) & 0x1) {
++			if (!vcpu_mode_is_32bit(vcpu)) {
++				type = vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i)
++				       & ARMV8_EVTYPE_EVENT;
++				enable = vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
++				if ((type == 0) && ((enable >> i) & 0x1))
++					vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i)++;
++			} else {
++				type = vcpu_cp15(vcpu, c14_PMEVTYPER0 + i)
++				       & ARMV8_EVTYPE_EVENT;
++				enable = vcpu_cp15(vcpu, c9_PMCNTENSET);
++				if ((type == 0) && ((enable >> i) & 0x1))
++					vcpu_cp15(vcpu, c14_PMEVCNTR0 + i)++;
++			}
++		}
++	}
++}
 +
-+/*
-+ * PMINTEN: counters interrupt enable reg
-+ */
-+#define	ARMV8_INTEN_MASK	0xffffffff	/* Mask for writable bits */
-+
-+/*
-+ * PMOVSR: counters overflow flag status reg
-+ */
-+#define	ARMV8_OVSR_MASK		0xffffffff	/* Mask for writable bits */
-+#define	ARMV8_OVERFLOWED_MASK	ARMV8_OVSR_MASK
-+
-+/*
-+ * PMXEVTYPER: Event selection reg
-+ */
-+#define	ARMV8_EVTYPE_MASK	0xc80003ff	/* Mask for writable bits */
-+#define	ARMV8_EVTYPE_EVENT	0x3ff		/* Mask for EVENT bits */
-+
-+/*
-+ * Event filters for PMUv3
-+ */
-+#define	ARMV8_EXCLUDE_EL1	(1 << 31)
-+#define	ARMV8_EXCLUDE_EL0	(1 << 30)
-+#define	ARMV8_INCLUDE_EL2	(1 << 27)
-+
- #ifdef CONFIG_HW_PERF_EVENTS
++/**
+  * kvm_pmu_find_hw_event - find hardware event
+  * @pmu: The pmu pointer
+  * @event_select: The number of selected event type
+@@ -239,6 +268,10 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
+ 	kvm_pmu_stop_counter(vcpu, select_idx);
+ 	kvm_pmu_set_evttyper(vcpu, select_idx, data);
  
- /* The events for a given PMU register set. */
-diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-index b31e9a4..96538d7 100644
---- a/arch/arm64/kernel/perf_event.c
-+++ b/arch/arm64/kernel/perf_event.c
-@@ -824,9 +824,6 @@ static const unsigned armv8_pmuv3_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
- #define	ARMV8_IDX_COUNTER0	1
- #define	ARMV8_IDX_COUNTER_LAST	(ARMV8_IDX_CYCLE_COUNTER + cpu_pmu->num_events - 1)
- 
--#define	ARMV8_MAX_COUNTERS	32
--#define	ARMV8_COUNTER_MASK	(ARMV8_MAX_COUNTERS - 1)
--
- /*
-  * ARMv8 low level PMU access
-  */
-@@ -837,38 +834,6 @@ static const unsigned armv8_pmuv3_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
- #define	ARMV8_IDX_TO_COUNTER(x)	\
- 	(((x) - ARMV8_IDX_COUNTER0) & ARMV8_COUNTER_MASK)
- 
--/*
-- * Per-CPU PMCR: config reg
-- */
--#define ARMV8_PMCR_E		(1 << 0) /* Enable all counters */
--#define ARMV8_PMCR_P		(1 << 1) /* Reset all counters */
--#define ARMV8_PMCR_C		(1 << 2) /* Cycle counter reset */
--#define ARMV8_PMCR_D		(1 << 3) /* CCNT counts every 64th cpu cycle */
--#define ARMV8_PMCR_X		(1 << 4) /* Export to ETM */
--#define ARMV8_PMCR_DP		(1 << 5) /* Disable CCNT if non-invasive debug*/
--#define	ARMV8_PMCR_N_SHIFT	11	 /* Number of counters supported */
--#define	ARMV8_PMCR_N_MASK	0x1f
--#define	ARMV8_PMCR_MASK		0x3f	 /* Mask for writable bits */
--
--/*
-- * PMOVSR: counters overflow flag status reg
-- */
--#define	ARMV8_OVSR_MASK		0xffffffff	/* Mask for writable bits */
--#define	ARMV8_OVERFLOWED_MASK	ARMV8_OVSR_MASK
--
--/*
-- * PMXEVTYPER: Event selection reg
-- */
--#define	ARMV8_EVTYPE_MASK	0xc80003ff	/* Mask for writable bits */
--#define	ARMV8_EVTYPE_EVENT	0x3ff		/* Mask for EVENT bits */
--
--/*
-- * Event filters for PMUv3
-- */
--#define	ARMV8_EXCLUDE_EL1	(1 << 31)
--#define	ARMV8_EXCLUDE_EL0	(1 << 30)
--#define	ARMV8_INCLUDE_EL2	(1 << 27)
--
- static inline u32 armv8pmu_pmcr_read(void)
- {
- 	u32 val;
++	/* For software increment event we don't need to create perf event */
++	if (new_eventsel == 0)
++		return;
++
+ 	config = kvm_pmu_find_hw_event(pmu, new_eventsel);
+ 	if (config != PERF_COUNT_HW_MAX) {
+ 		type = PERF_TYPE_HARDWARE;
 -- 
 2.0.4
