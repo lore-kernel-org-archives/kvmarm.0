@@ -1,182 +1,155 @@
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: Re: [PATCH v2 02/22] KVM: ARM64: Define PMU data structure for each
- vcpu
-Date: Fri, 11 Sep 2015 17:58:15 +0800
-Message-ID: <55F2A5B7.3050903@huawei.com>
-References: <1441961715-11688-1-git-send-email-zhaoshenglong@huawei.com>
- <1441961715-11688-3-git-send-email-zhaoshenglong@huawei.com>
- <55F29A9D.1080502@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 04/22] KVM: ARM64: Add reset and access handlers for
+ PMCR_EL0 register
+Date: Fri, 11 Sep 2015 11:07:51 +0100
+Message-ID: <55F2A7F7.4010801@arm.com>
+References: <1441961715-11688-1-git-send-email-zhaoshenglong@huawei.com> <1441961715-11688-5-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B93A411E3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2015 05:58:16 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id I11RVqjPbVHU for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Sep 2015 05:58:14 -0400 (EDT)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3AD340FA7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2015 05:58:11 -0400 (EDT)
-In-Reply-To: <55F29A9D.1080502@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1441961715-11688-5-git-send-email-zhaoshenglong@huawei.com>
+Sender: kvm-owner@vger.kernel.org
+To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, christoffer.dall@linaro.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, shannon.zhao@linaro.org, peter.huangpeng@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 11/09/15 09:54, Shannon Zhao wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
+> 
+> Add reset handler which gets host value of PMCR_EL0 and make writable
+> bits architecturally UNKNOWN. Add a common access handler for PMU
+> registers which emulates writing and reading register and add emulation
+> for PMCR.
+> 
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 76 +++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 74 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index c370b40..db1be44 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -33,6 +33,7 @@
+>  #include <asm/kvm_emulate.h>
+>  #include <asm/kvm_host.h>
+>  #include <asm/kvm_mmu.h>
+> +#include <asm/pmu.h>
+>  
+>  #include <trace/events/kvm.h>
+>  
+> @@ -236,6 +237,48 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>  	vcpu_sys_reg(vcpu, MPIDR_EL1) = (1ULL << 31) | mpidr;
+>  }
+>  
+> +static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	u32 pmcr;
+> +
+> +	asm volatile("mrs %0, pmcr_el0\n" : "=r" (pmcr));
+> +	/* Writable bits of PMCR_EL0 (ARMV8_PMCR_MASK) is reset to UNKNOWN*/
+> +	if (!vcpu_mode_is_32bit(vcpu))
+> +		vcpu_sys_reg(vcpu, r->reg) = (pmcr & ~ARMV8_PMCR_MASK)
+> +					     | (ARMV8_PMCR_MASK & 0xdecafbad);
+> +	else
+> +		vcpu_cp15(vcpu, r->reg) = (pmcr & ~ARMV8_PMCR_MASK)
+> +					  | (ARMV8_PMCR_MASK & 0xdecafbad);
 
+I have some concerns about blindly reusing the top bits of the host's
+PMCR_EL0 register, specially when it comes to the PMCR_EL0.N. Given that
+we're fully emulating the PMU, shouldn't we simply define how many
+counters we're emulating?
 
-On 2015/9/11 17:10, Marc Zyngier wrote:
-> On 11/09/15 09:54, Shannon Zhao wrote:
->> From: Shannon Zhao <shannon.zhao@linaro.org>
->>
->> Here we plan to support virtual PMU for guest by full software
->> emulation, so define some basic structs and functions preparing for
->> futher steps. Define struct kvm_pmc for performance monitor counter and
->> struct kvm_pmu for performance monitor unit for each vcpu. According to
->> ARMv8 spec, the PMU contains at most 32(ARMV8_MAX_COUNTERS) counters.
->>
->> Since this only supports ARM64 (or PMUv3), add a separate config symbol
->> for it.
->>
->> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
->> ---
->>  arch/arm64/include/asm/kvm_host.h |  2 ++
->>  arch/arm64/include/asm/pmu.h      |  2 ++
->>  arch/arm64/kvm/Kconfig            |  8 ++++++++
->>  include/kvm/arm_pmu.h             | 39 +++++++++++++++++++++++++++++++++++++++
->>  4 files changed, 51 insertions(+)
->>  create mode 100644 include/kvm/arm_pmu.h
->>
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index 2709db2..3c88873 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -42,6 +42,7 @@
->>  
->>  #include <kvm/arm_vgic.h>
->>  #include <kvm/arm_arch_timer.h>
->> +#include <kvm/arm_pmu.h>
->>  
->>  #define KVM_VCPU_MAX_FEATURES 3
->>  
->> @@ -116,6 +117,7 @@ struct kvm_vcpu_arch {
->>  	/* VGIC state */
->>  	struct vgic_cpu vgic_cpu;
->>  	struct arch_timer_cpu timer_cpu;
->> +	struct kvm_pmu pmu;
->>  
->>  	/*
->>  	 * Anything that is not used directly from assembly code goes
->> diff --git a/arch/arm64/include/asm/pmu.h b/arch/arm64/include/asm/pmu.h
->> index b9f394a..95681e6 100644
->> --- a/arch/arm64/include/asm/pmu.h
->> +++ b/arch/arm64/include/asm/pmu.h
->> @@ -19,6 +19,8 @@
->>  #ifndef __ASM_PMU_H
->>  #define __ASM_PMU_H
->>  
->> +#include <linux/perf_event.h>
->> +
-> 
-> This include file seems out of place here, as I don't think anything in
-> this file is directly PMU related.
-> 
->>  #define ARMV8_MAX_COUNTERS      32
->>  #define ARMV8_COUNTER_MASK      (ARMV8_MAX_COUNTERS - 1)
->>  
->> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
->> index bfffe8f..3c7c58d 100644
->> --- a/arch/arm64/kvm/Kconfig
->> +++ b/arch/arm64/kvm/Kconfig
->> @@ -31,6 +31,7 @@ config KVM
->>  	select KVM_VFIO
->>  	select HAVE_KVM_EVENTFD
->>  	select HAVE_KVM_IRQFD
->> +	select KVM_ARM_PMU
->>  	---help---
->>  	  Support hosting virtualized guest machines.
->>  
->> @@ -52,4 +53,11 @@ config KVM_ARM_MAX_VCPUS
->>  	  large, so only choose a reasonable number that you expect to
->>  	  actually use.
->>  
->> +config KVM_ARM_PMU
->> +	bool
->> +	depends on KVM_ARM_HOST
->> +	---help---
->> +	  Adds support for a virtual Performance Monitoring Unit (PMU) in
->> +	  virtual machines.
->> +
->>  endif # VIRTUALIZATION
->> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
->> new file mode 100644
->> index 0000000..64af88a
->> --- /dev/null
->> +++ b/include/kvm/arm_pmu.h
->> @@ -0,0 +1,39 @@
->> +/*
->> + * Copyright (C) 2015 Linaro Ltd.
->> + * Author: Shannon Zhao <shannon.zhao@linaro.org>
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License version 2 as
->> + * published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> + *
->> + * You should have received a copy of the GNU General Public License
->> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#ifndef __ASM_ARM_KVM_PMU_H
->> +#define __ASM_ARM_KVM_PMU_H
->> +
->> +#include <asm/pmu.h>
->> +
->> +struct kvm_pmc {
->> +	u8 idx;/* index into the pmu->pmc array */
->> +	struct perf_event *perf_event;
->> +	struct kvm_vcpu *vcpu;
->> +};
->> +
-> 
-> Since you have a struct perf_event here, it makes more sense to #include
-> linux/perf.h here.
+> +}
+> +
+> +/* PMU registers accessor. */
+> +static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+> +			    const struct sys_reg_params *p,
+> +			    const struct sys_reg_desc *r)
+> +{
+> +	unsigned long val;
+> +
+> +	if (p->is_write) {
+> +		switch (r->reg) {
+> +		case PMCR_EL0: {
+> +			/* Only update writeable bits of PMCR */
+> +			val = vcpu_sys_reg(vcpu, r->reg);
+> +			val &= ~ARMV8_PMCR_MASK;
+> +			val |= *vcpu_reg(vcpu, p->Rt) & ARMV8_PMCR_MASK;
+> +			vcpu_sys_reg(vcpu, r->reg) = val;
+> +			break;
+> +		}
+> +		default:
+> +			vcpu_sys_reg(vcpu, r->reg) = *vcpu_reg(vcpu, p->Rt);
+> +			break;
+> +		}
+> +	} else {
+> +		*vcpu_reg(vcpu, p->Rt) = vcpu_sys_reg(vcpu, r->reg);
+> +	}
+> +
+> +	return true;
+> +}
+> +
+>  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+>  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+>  	/* DBGBVRn_EL1 */						\
+> @@ -427,7 +470,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  
+>  	/* PMCR_EL0 */
+>  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b000),
+> -	  trap_raz_wi },
+> +	  access_pmu_regs, reset_pmcr, PMCR_EL0, },
+>  	/* PMCNTENSET_EL0 */
+>  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b001),
+>  	  trap_raz_wi },
+> @@ -632,6 +675,34 @@ static const struct sys_reg_desc cp14_64_regs[] = {
+>  	{ Op1( 0), CRm( 2), .access = trap_raz_wi },
+>  };
+>  
+> +/* PMU CP15 registers accessor. */
+> +static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
+> +				 const struct sys_reg_params *p,
+> +				 const struct sys_reg_desc *r)
+> +{
+> +	unsigned long val;
+> +
+> +	if (p->is_write) {
+> +		switch (r->reg) {
+> +		case c9_PMCR: {
+> +			/* Only update writeable bits of PMCR */
+> +			val = vcpu_cp15(vcpu, r->reg);
+> +			val &= ~ARMV8_PMCR_MASK;
+> +			val |= *vcpu_reg(vcpu, p->Rt) & ARMV8_PMCR_MASK;
+> +			vcpu_cp15(vcpu, r->reg) = val;
+> +			break;
+> +		}
+> +		default:
+> +			vcpu_cp15(vcpu, r->reg) = *vcpu_reg(vcpu, p->Rt);
+> +			break;
+> +		}
+> +	} else {
+> +		*vcpu_reg(vcpu, p->Rt) = vcpu_cp15(vcpu, r->reg);
+> +	}
+> +
+> +	return true;
+> +}
+> +
+>  /*
+>   * Trapped cp15 registers. TTBR0/TTBR1 get a double encoding,
+>   * depending on the way they are accessed (as a 32bit or a 64bit
+> @@ -660,7 +731,8 @@ static const struct sys_reg_desc cp15_regs[] = {
+>  	{ Op1( 0), CRn( 7), CRm(14), Op2( 2), access_dcsw },
+>  
+>  	/* PMU */
+> -	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), trap_raz_wi },
+> +	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), access_pmu_cp15_regs,
+> +	  reset_pmcr, c9_PMCR },
+>  	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), trap_raz_wi },
+>  	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), trap_raz_wi },
+>  	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
 > 
 
-Ok, will fix this.
-
->> +struct kvm_pmu {
->> +#ifdef CONFIG_KVM_ARM_PMU
->> +	/* PMU IRQ Number per VCPU */
->> +	int irq_num;
->> +	/* IRQ pending flag */
->> +	bool irq_pending;
->> +	struct kvm_pmc pmc[ARMV8_MAX_COUNTERS];
->> +#endif
->> +};
->> +
->> +#endif
->>
-> 
-> Thanks,
-> 
-> 	M.
-> 
 
 -- 
-Shannon
+Jazz is not dead. It just smells funny...
