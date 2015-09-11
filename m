@@ -1,24 +1,21 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v2 14/22] KVM: ARM64: Add reset and access handlers for
- PMOVSSET and PMOVSCLR register
-Date: Fri, 11 Sep 2015 16:55:07 +0800
-Message-ID: <1441961715-11688-15-git-send-email-zhaoshenglong@huawei.com>
-References: <1441961715-11688-1-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v2 00/22] KVM: ARM64: Add guest PMU support
+Date: Fri, 11 Sep 2015 16:54:53 +0800
+Message-ID: <1441961715-11688-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD59942F39
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2015 04:55:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 16E2240FB3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2015 04:55:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KouqOltpdgeu for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Sep 2015 04:55:41 -0400 (EDT)
+ with ESMTP id hAl3t3uMStLO for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Sep 2015 04:55:30 -0400 (EDT)
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 888F3421ED
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2015 04:55:34 -0400 (EDT)
-In-Reply-To: <1441961715-11688-1-git-send-email-zhaoshenglong@huawei.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4778F40FA6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2015 04:55:28 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,93 +31,111 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-Since the reset value of PMOVSSET and PMOVSCLR is UNKNOWN, use
-reset_unknown for its reset handler. Add a new case to emulate writing
-PMOVSSET or PMOVSCLR register.
+This patchset adds guest PMU support for KVM on ARM64. It takes
+trap-and-emulate approach. When guest wants to monitor one event, it
+will be trapped by KVM and KVM will call perf_event API to create a perf
+event and call relevant perf_event APIs to get the count value of event.
 
-Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
----
- arch/arm64/kvm/sys_regs.c | 33 ++++++++++++++++++++++++++++++---
- 1 file changed, 30 insertions(+), 3 deletions(-)
+Use perf to test this patchset in guest. When using "perf list", it
+shows the list of the hardware events and hardware cache events perf
+supports. Then use "perf stat -e EVENT" to monitor some event. For
+example, use "perf stat -e cycles" to count cpu cycles and
+"perf stat -e cache-misses" to count cache misses.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c3d4fb5..11fc183 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -323,6 +323,18 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
- 			vcpu_sys_reg(vcpu, PMINTENSET_EL1) &= ~val;
- 			break;
- 		}
-+		case PMOVSSET_EL0: {
-+			val = *vcpu_reg(vcpu, p->Rt);
-+			vcpu_sys_reg(vcpu, r->reg) |= val;
-+			vcpu_sys_reg(vcpu, PMOVSCLR_EL0) |= val;
-+			break;
-+		}
-+		case PMOVSCLR_EL0: {
-+			val = *vcpu_reg(vcpu, p->Rt);
-+			vcpu_sys_reg(vcpu, r->reg) &= ~val;
-+			vcpu_sys_reg(vcpu, PMOVSSET_EL0) &= ~val;
-+			break;
-+		}
- 		case PMCR_EL0: {
- 			/* Only update writeable bits of PMCR */
- 			val = vcpu_sys_reg(vcpu, r->reg);
-@@ -561,7 +573,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  access_pmu_regs, reset_unknown, PMCNTENCLR_EL0 },
- 	/* PMOVSCLR_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b011),
--	  trap_raz_wi },
-+	  access_pmu_regs, reset_unknown, PMOVSCLR_EL0 },
- 	/* PMSWINC_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b100),
- 	  trap_raz_wi },
-@@ -588,7 +600,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  trap_raz_wi },
- 	/* PMOVSSET_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1110), Op2(0b011),
--	  trap_raz_wi },
-+	  access_pmu_regs, reset_unknown, PMOVSSET_EL0 },
- 
- 	/* TPIDR_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1101), CRm(0b0000), Op2(0b010),
-@@ -809,6 +821,18 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
- 			vcpu_cp15(vcpu, c9_PMINTENSET) &= ~val;
- 			break;
- 		}
-+		case c9_PMOVSSET: {
-+			val = *vcpu_reg(vcpu, p->Rt);
-+			vcpu_cp15(vcpu, r->reg) |= val;
-+			vcpu_cp15(vcpu, c9_PMOVSCLR) |= val;
-+			break;
-+		}
-+		case c9_PMOVSCLR: {
-+			val = *vcpu_reg(vcpu, p->Rt);
-+			vcpu_cp15(vcpu, r->reg) &= ~val;
-+			vcpu_cp15(vcpu, c9_PMOVSSET) &= ~val;
-+			break;
-+		}
- 		case c9_PMCR: {
- 			/* Only update writeable bits of PMCR */
- 			val = vcpu_cp15(vcpu, r->reg);
-@@ -881,7 +905,8 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	  reset_unknown_cp15, c9_PMCNTENSET },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), access_pmu_cp15_regs,
- 	  reset_unknown_cp15, c9_PMCNTENCLR },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
-+	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), access_pmu_cp15_regs,
-+	  reset_unknown_cp15, c9_PMOVSCLR },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmu_cp15_regs,
- 	  reset_unknown_cp15, c9_PMSELR },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmu_cp15_regs,
-@@ -899,6 +924,8 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	  reset_unknown_cp15, c9_PMINTENSET },
- 	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), access_pmu_cp15_regs,
- 	  reset_unknown_cp15, c9_PMINTENCLR },
-+	{ Op1( 0), CRn( 9), CRm(14), Op2( 3), access_pmu_cp15_regs,
-+	  reset_unknown_cp15, c9_PMOVSSET },
- 
- 	{ Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, c10_PRRR },
- 	{ Op1( 0), CRn(10), CRm( 2), Op2( 1), access_vm_reg, NULL, c10_NMRR },
+Below are the outputs of "perf stat -r 5 sleep 5" when running in host
+and guest.
+
+Host:
+ Performance counter stats for 'sleep 5' (5 runs):
+
+          0.551428      task-clock (msec)         #    0.000 CPUs utilized            ( +-  0.91% )
+                 1      context-switches          #    0.002 M/sec
+                 0      cpu-migrations            #    0.000 K/sec
+                48      page-faults               #    0.088 M/sec                    ( +-  1.05% )
+           1150265      cycles                    #    2.086 GHz                      ( +-  0.92% )
+   <not supported>      stalled-cycles-frontend
+   <not supported>      stalled-cycles-backend
+            526398      instructions              #    0.46  insns per cycle          ( +-  0.89% )
+   <not supported>      branches
+              9485      branch-misses             #   17.201 M/sec                    ( +-  2.35% )
+
+       5.000831616 seconds time elapsed                                          ( +-  0.00% )
+
+Guest:
+ Performance counter stats for 'sleep 5' (5 runs):
+
+          0.730868      task-clock (msec)         #    0.000 CPUs utilized            ( +-  1.13% )
+                 1      context-switches          #    0.001 M/sec
+                 0      cpu-migrations            #    0.000 K/sec
+                48      page-faults               #    0.065 M/sec                    ( +-  0.42% )
+           1642982      cycles                    #    2.248 GHz                      ( +-  1.04% )
+   <not supported>      stalled-cycles-frontend
+   <not supported>      stalled-cycles-backend
+            637964      instructions              #    0.39  insns per cycle          ( +-  0.65% )
+   <not supported>      branches
+             10377      branch-misses             #   14.198 M/sec                    ( +-  1.09% )
+
+       5.001289068 seconds time elapsed                                          ( +-  0.00% )
+
+This patchset can be fetched from [1] and the relevant QEMU version for
+test can be fetched from [2].
+
+Thanks,
+Shannon
+
+[1] https://git.linaro.org/people/shannon.zhao/linux-mainline.git  KVM_ARM64_PMU_v2
+[2] https://git.linaro.org/people/shannon.zhao/qemu.git  PMU_v2
+
+Shannon Zhao (22):
+  ARM64: Move PMU register related defines to asm/pmu.h
+  KVM: ARM64: Define PMU data structure for each vcpu
+  KVM: ARM64: Add offset defines for PMU registers
+  KVM: ARM64: Add reset and access handlers for PMCR_EL0 register
+  KVM: ARM64: Add a helper for CP15 registers reset to UNKNOWN
+  KVM: ARM64: Add reset and access handlers for PMSELR register
+  KVM: ARM64: Add reset and access handlers for PMCEID0 and PMCEID1
+    register
+  KVM: ARM64: PMU: Add perf event map and introduce perf event creating
+    function
+  KVM: ARM64: Add reset and access handlers for PMXEVTYPER register
+  KVM: ARM64: Add reset and access handlers for PMXEVCNTR register
+  KVM: ARM64: Add reset and access handlers for PMCCNTR register
+  KVM: ARM64: Add reset and access handlers for PMCNTENSET and
+    PMCNTENCLR register
+  KVM: ARM64: Add reset and access handlers for PMINTENSET and
+    PMINTENCLR register
+  KVM: ARM64: Add reset and access handlers for PMOVSSET and PMOVSCLR
+    register
+  KVM: ARM64: Add a helper for CP15 registers reset to specified value
+  KVM: ARM64: Add reset and access handlers for PMUSERENR register
+  KVM: ARM64: Add reset and access handlers for PMSWINC register
+  KVM: ARM64: Add access handlers for PMEVCNTRn and PMEVTYPERn register
+  KVM: ARM64: Add PMU overflow interrupt routing
+  KVM: ARM64: Reset PMU state when resetting vcpu
+  KVM: ARM64: Free perf event of PMU when destroying vcpu
+  KVM: ARM64: Add a new kvm ARM PMU device
+
+ Documentation/virtual/kvm/devices/arm-pmu.txt |  15 +
+ arch/arm/kvm/arm.c                            |   4 +
+ arch/arm64/include/asm/kvm_asm.h              |  59 ++-
+ arch/arm64/include/asm/kvm_host.h             |   2 +
+ arch/arm64/include/asm/pmu.h                  |  49 +++
+ arch/arm64/include/uapi/asm/kvm.h             |   3 +
+ arch/arm64/kernel/perf_event.c                |  35 --
+ arch/arm64/kvm/Kconfig                        |   8 +
+ arch/arm64/kvm/Makefile                       |   1 +
+ arch/arm64/kvm/reset.c                        |   3 +
+ arch/arm64/kvm/sys_regs.c                     | 490 +++++++++++++++++++++++--
+ arch/arm64/kvm/sys_regs.h                     |  16 +
+ include/kvm/arm_pmu.h                         |  66 ++++
+ include/linux/kvm_host.h                      |   1 +
+ include/uapi/linux/kvm.h                      |   2 +
+ virt/kvm/arm/pmu.c                            | 500 ++++++++++++++++++++++++++
+ virt/kvm/kvm_main.c                           |   4 +
+ 17 files changed, 1188 insertions(+), 70 deletions(-)
+ create mode 100644 Documentation/virtual/kvm/devices/arm-pmu.txt
+ create mode 100644 include/kvm/arm_pmu.h
+ create mode 100644 virt/kvm/arm/pmu.c
+
 -- 
 2.0.4
