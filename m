@@ -1,23 +1,23 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v2 21/22] KVM: ARM64: Free perf event of PMU when destroying
- vcpu
-Date: Fri, 11 Sep 2015 16:55:14 +0800
-Message-ID: <1441961715-11688-22-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v2 14/22] KVM: ARM64: Add reset and access handlers for
+ PMOVSSET and PMOVSCLR register
+Date: Fri, 11 Sep 2015 16:55:07 +0800
+Message-ID: <1441961715-11688-15-git-send-email-zhaoshenglong@huawei.com>
 References: <1441961715-11688-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B69D641451
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2015 04:55:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD59942F39
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2015 04:55:42 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cgTNraf60Tl7 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 11 Sep 2015 04:55:45 -0400 (EDT)
+ with ESMTP id KouqOltpdgeu for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Sep 2015 04:55:41 -0400 (EDT)
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DC074431D6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2015 04:55:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 888F3421ED
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2015 04:55:34 -0400 (EDT)
 In-Reply-To: <1441961715-11688-1-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,78 +34,93 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-When KVM frees VCPU, it needs to free the perf_event of PMU.
+Since the reset value of PMOVSSET and PMOVSCLR is UNKNOWN, use
+reset_unknown for its reset handler. Add a new case to emulate writing
+PMOVSSET or PMOVSCLR register.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm/kvm/arm.c    |  1 +
- include/kvm/arm_pmu.h |  2 ++
- virt/kvm/arm/pmu.c    | 21 +++++++++++++++++++++
- 3 files changed, 24 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 33 ++++++++++++++++++++++++++++++---
+ 1 file changed, 30 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index ee5d667..a7215c0 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -257,6 +257,7 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
- 	kvm_mmu_free_memory_caches(vcpu);
- 	kvm_timer_vcpu_terminate(vcpu);
- 	kvm_vgic_vcpu_destroy(vcpu);
-+	kvm_pmu_vcpu_destroy(vcpu);
- 	kmem_cache_free(kvm_vcpu_cache, vcpu);
- }
- 
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index d74e183..2b6fcb1 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -38,6 +38,7 @@ struct kvm_pmu {
- 
- #ifdef CONFIG_KVM_ARM_PMU
- void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
-+void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu);
- void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu);
- unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu,
- 					unsigned long select_idx);
-@@ -48,6 +49,7 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, unsigned long data,
- 				    unsigned long select_idx);
- #else
- void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
-+void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu) {}
- void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu) {}
- unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu,
- 					unsigned long select_idx)
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 8476d5e..8eccac9 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -109,6 +109,27 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
- }
- 
- /**
-+ * kvm_pmu_vcpu_destroy - free perf event of PMU for cpu
-+ * @vcpu: The vcpu pointer
-+ *
-+ */
-+void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
-+{
-+	int i;
-+	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-+
-+	for (i = 0; i < ARMV8_MAX_COUNTERS; i++) {
-+		struct kvm_pmc *pmc = &pmu->pmc[i];
-+
-+		if (pmc->perf_event) {
-+			perf_event_disable(pmc->perf_event);
-+			perf_event_release_kernel(pmc->perf_event);
-+			pmc->perf_event = NULL;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c3d4fb5..11fc183 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -323,6 +323,18 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+ 			vcpu_sys_reg(vcpu, PMINTENSET_EL1) &= ~val;
+ 			break;
+ 		}
++		case PMOVSSET_EL0: {
++			val = *vcpu_reg(vcpu, p->Rt);
++			vcpu_sys_reg(vcpu, r->reg) |= val;
++			vcpu_sys_reg(vcpu, PMOVSCLR_EL0) |= val;
++			break;
 +		}
-+	}
-+}
-+
-+/**
-  * kvm_pmu_sync_hwstate - sync pmu state for cpu
-  * @vcpu: The vcpu pointer
-  *
++		case PMOVSCLR_EL0: {
++			val = *vcpu_reg(vcpu, p->Rt);
++			vcpu_sys_reg(vcpu, r->reg) &= ~val;
++			vcpu_sys_reg(vcpu, PMOVSSET_EL0) &= ~val;
++			break;
++		}
+ 		case PMCR_EL0: {
+ 			/* Only update writeable bits of PMCR */
+ 			val = vcpu_sys_reg(vcpu, r->reg);
+@@ -561,7 +573,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  access_pmu_regs, reset_unknown, PMCNTENCLR_EL0 },
+ 	/* PMOVSCLR_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b011),
+-	  trap_raz_wi },
++	  access_pmu_regs, reset_unknown, PMOVSCLR_EL0 },
+ 	/* PMSWINC_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b100),
+ 	  trap_raz_wi },
+@@ -588,7 +600,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  trap_raz_wi },
+ 	/* PMOVSSET_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1110), Op2(0b011),
+-	  trap_raz_wi },
++	  access_pmu_regs, reset_unknown, PMOVSSET_EL0 },
+ 
+ 	/* TPIDR_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1101), CRm(0b0000), Op2(0b010),
+@@ -809,6 +821,18 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
+ 			vcpu_cp15(vcpu, c9_PMINTENSET) &= ~val;
+ 			break;
+ 		}
++		case c9_PMOVSSET: {
++			val = *vcpu_reg(vcpu, p->Rt);
++			vcpu_cp15(vcpu, r->reg) |= val;
++			vcpu_cp15(vcpu, c9_PMOVSCLR) |= val;
++			break;
++		}
++		case c9_PMOVSCLR: {
++			val = *vcpu_reg(vcpu, p->Rt);
++			vcpu_cp15(vcpu, r->reg) &= ~val;
++			vcpu_cp15(vcpu, c9_PMOVSSET) &= ~val;
++			break;
++		}
+ 		case c9_PMCR: {
+ 			/* Only update writeable bits of PMCR */
+ 			val = vcpu_cp15(vcpu, r->reg);
+@@ -881,7 +905,8 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	  reset_unknown_cp15, c9_PMCNTENSET },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), access_pmu_cp15_regs,
+ 	  reset_unknown_cp15, c9_PMCNTENCLR },
+-	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
++	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), access_pmu_cp15_regs,
++	  reset_unknown_cp15, c9_PMOVSCLR },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmu_cp15_regs,
+ 	  reset_unknown_cp15, c9_PMSELR },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmu_cp15_regs,
+@@ -899,6 +924,8 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	  reset_unknown_cp15, c9_PMINTENSET },
+ 	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), access_pmu_cp15_regs,
+ 	  reset_unknown_cp15, c9_PMINTENCLR },
++	{ Op1( 0), CRn( 9), CRm(14), Op2( 3), access_pmu_cp15_regs,
++	  reset_unknown_cp15, c9_PMOVSSET },
+ 
+ 	{ Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, c10_PRRR },
+ 	{ Op1( 0), CRn(10), CRm( 2), Op2( 1), access_vm_reg, NULL, c10_NMRR },
 -- 
 2.0.4
