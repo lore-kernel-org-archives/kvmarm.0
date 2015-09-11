@@ -1,26 +1,24 @@
-From: Julien Grall <julien.grall@citrix.com>
-Subject: Re: [PATCH v4 3/4] irqchip: GIC: Convert to EOImode == 1
-Date: Thu, 10 Sep 2015 17:30:17 +0100
-Message-ID: <55F1B019.6050800@citrix.com>
-References: <1440604845-28229-1-git-send-email-marc.zyngier@arm.com>
- <1440604845-28229-4-git-send-email-marc.zyngier@arm.com>
- <55F08731.3050402@citrix.com> <55F15353.2000800@arm.com>
- <55F1AE75.6000405@citrix.com> <55F1B011.6090204@arm.com>
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Subject: [PATCH v2 06/22] KVM: ARM64: Add reset and access handlers for PMSELR
+ register
+Date: Fri, 11 Sep 2015 16:54:59 +0800
+Message-ID: <1441961715-11688-7-git-send-email-zhaoshenglong@huawei.com>
+References: <1441961715-11688-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F97B411E3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2015 12:30:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 37C7540FAB
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2015 04:55:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hCAfRmSFP4YM for <kvmarm@lists.cs.columbia.edu>;
- Thu, 10 Sep 2015 12:30:45 -0400 (EDT)
-Received: from SMTP02.CITRIX.COM (smtp02.citrix.com [66.165.176.63])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 97600411AA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 10 Sep 2015 12:30:45 -0400 (EDT)
-In-Reply-To: <55F1B011.6090204@arm.com>
+ with ESMTP id uC11zBzbn2R3 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 11 Sep 2015 04:55:31 -0400 (EDT)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3B03E411E3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 11 Sep 2015 04:55:29 -0400 (EDT)
+In-Reply-To: <1441961715-11688-1-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,30 +28,44 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, Pranavkumar Sawargaonkar <pranavkumar@linaro.org>
-Cc: Ian Campbell <ian.campbell@citrix.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Jiang Liu <jiang.liu@linux.intel.com>
+To: kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/09/15 17:30, Marc Zyngier wrote:
-> On 10/09/15 17:23, Julien Grall wrote:
->> On 10/09/15 10:54, Marc Zyngier wrote:
-> 
-> [...]
-> 
->>> In the meantime, can you give the following patch a shot? My Mustang is 
->>> wired to a 4kB CPU interface, so I'll need your help to test it.
->>
->> I applied the two patches on top of linus/master and I'm able to boot
->> correctly on X-gene. Thank you!
-> 
-> Thanks for testing. Can I put your Tested-by tag on the patch when I
-> send it to Thomas?
+From: Shannon Zhao <shannon.zhao@linaro.org>
 
-Sure:
+Since the reset value of PMSELR_EL0 is UNKNOWN, use reset_unknown for
+its reset handler. As it doesn't need to deal with the acsessing action
+specially, it uses default case to emulate writing and reading PMSELR
+register.
 
-Tested-by: Julien Grall <julien.grall@citrix.com>
+Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+---
+ arch/arm64/kvm/sys_regs.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Regards,
-
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index db1be44..24b8972 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -485,7 +485,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  trap_raz_wi },
+ 	/* PMSELR_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b101),
+-	  trap_raz_wi },
++	  access_pmu_regs, reset_unknown, PMSELR_EL0 },
+ 	/* PMCEID0_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b110),
+ 	  trap_raz_wi },
+@@ -736,7 +736,8 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
+-	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), trap_raz_wi },
++	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmu_cp15_regs,
++	  reset_unknown_cp15, c9_PMSELR },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), trap_raz_wi },
 -- 
-Julien Grall
+2.0.4
