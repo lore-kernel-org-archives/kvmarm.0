@@ -1,48 +1,56 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 08/22] KVM: ARM64: PMU: Add perf event map and introduce
- perf event creating function
-Date: Fri, 11 Sep 2015 15:14:27 +0100
-Message-ID: <55F2E1C3.1060807@arm.com>
-References: <1441961715-11688-1-git-send-email-zhaoshenglong@huawei.com> <1441961715-11688-9-git-send-email-zhaoshenglong@huawei.com> <55F2B52F.8000300@arm.com> <55F2D89A.5060907@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Subject: [GIT PULL] KVM/ARM fixes for 4.3-rc2
+Date: Sun, 13 Sep 2015 11:56:34 +0100
+Message-ID: <1442141798-19191-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <55F2D89A.5060907@linaro.org>
 Sender: kvm-owner@vger.kernel.org
-To: Shannon Zhao <shannon.zhao@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, christoffer.dall@linaro.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, peter.huangpeng@huawei.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Gleb Natapov <gleb@kernel.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Alexander Spyridakis <a.spyridakis@virtualopensystems.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 11/09/15 14:35, Shannon Zhao wrote:
-> 
-> 
-> On 2015/9/11 19:04, Marc Zyngier wrote:
+Hi Paolo,
 
-[...]
+This is the KVM/ARM pull request for Linux 4.3-rc2. Not much so far,
+just a small set of fixes.
 
->> Having had a chat with Will, it appears that a much better solution
->> would be to ask perf to use raw events instead of trying to map things
->> to perf events (which the guest has already done).
->>
->> See drivers/oprofile/oprofile_perf.c::op_perf_setup().
->>
->> Thoughts?
->>
-> 
-> Yeah, directly using PERF_TYPE_RAW event looks simpler. But should we 
-> check whether the value of event number written to PMXEVTYPER_EL0 is 
-> valid? Or That is guaranteed by guest?
+Thanks!
 
-I don't think we need to check for anything. Userspace is allowed to
-request any event and the PMU will count it if this event exists, or
-won't if it doesn't.
+        M.
 
-We shouldn't be doing more validation than that, if only because most
-events are microarchitectural, and they are mostly undocumented.
+The following changes since commit 054167b3d55127feb64978eddf3f9f3a84fe493b:
 
-Thanks,
+  arm: KVM: keep arm vfp/simd exit handling consistent with arm64 (2015-08-19 22:27:58 +0100)
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-4.3-rc2
+
+for you to fetch changes up to 0c0672922dcc70ffba11d96385e98e42fb3ae08d:
+
+  arm/arm64: KVM: Fix PSCI affinity info return value for non valid cores (2015-09-04 17:02:48 +0100)
+
+----------------------------------------------------------------
+KVM/ARM changes for 4.3-rc2
+
+- Fix timer interrupt injection after the rework
+  that went in during the merge window
+- Reset the timer to zero on reboot
+- Make sure the TCR_EL2 RES1 bits are really set to 1
+- Fix a PSCI affinity bug for non-existing vcpus
+
+----------------------------------------------------------------
+Alexander Spyridakis (1):
+      arm/arm64: KVM: Fix PSCI affinity info return value for non valid cores
+
+Christoffer Dall (2):
+      arm/arm64: KVM: vgic: Move active state handling to flush_hwstate
+      arm/arm64: KVM: arch timer: Reset CNTV_CTL to 0
+
+Mark Rutland (1):
+      arm64: KVM: set {v,}TCR_EL2 RES1 bits
+
+ arch/arm/kvm/psci.c              | 12 ++++++++----
+ arch/arm64/include/asm/kvm_arm.h | 10 +++++++---
+ virt/kvm/arm/arch_timer.c        |  8 ++++++++
+ virt/kvm/arm/vgic.c              | 42 +++++++++++++++++++++++++---------------
+ 4 files changed, 49 insertions(+), 23 deletions(-)
