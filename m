@@ -1,90 +1,194 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: BUG FIX: Do not inject spurious interrupts
-Date: Mon, 14 Sep 2015 13:29:32 +0200
-Message-ID: <20150914112932.GH15712@cbox>
-References: <1440676282-2152-1-git-send-email-p.fedin@samsung.com>
- <20150827124442.GD29439@cbox>
- <00ca01d0e171$7ff1c710$7fd55530$@samsung.com>
+Subject: Re: [PATCH v2 3/8] arm/arm64: KVM: vgic: Factor out level irq
+ processing on guest exit
+Date: Mon, 14 Sep 2015 13:31:46 +0200
+Message-ID: <20150914113146.GI15712@cbox>
+References: <1441395650-19663-1-git-send-email-christoffer.dall@linaro.org>
+ <1441395650-19663-4-git-send-email-christoffer.dall@linaro.org>
+ <55EDAE13.7020905@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BB91412F2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2015 07:26:58 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gY2vX7LcZBZR for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Sep 2015 07:26:57 -0400 (EDT)
-Received: from mail-lb0-f171.google.com (mail-lb0-f171.google.com
- [209.85.217.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E031141291
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2015 07:26:56 -0400 (EDT)
-Received: by lbcjc2 with SMTP id jc2so65496925lbc.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2015 04:27:49 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <00ca01d0e171$7ff1c710$7fd55530$@samsung.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: 'Marc Zyngier' <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+In-Reply-To: <55EDAE13.7020905@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Eric Auger <eric.auger@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Aug 28, 2015 at 12:11:17PM +0300, Pavel Fedin wrote:
->  Hello!
+On Mon, Sep 07, 2015 at 05:32:35PM +0200, Eric Auger wrote:
 > 
-> > It's a bit weird to just sned this as a new patch without replying to my
-> > mail from yesterday with feedback
 > 
->  Sorry. But changes are actually minimal, and i remember that i replied to you with the promise of
-> testing your suggestion. So, done, works fine. :)
-> 
-> > I think you're missing a potential change to the irq_pending_on_cpu
-> > field here, which you have to compute by calling vgic_update_state()
-> > like we do elsewhere when we change status bits
-> 
->  I have just checked this. vgic_update_state() never resets this bit. This bit is reset only in
-> __kvm_vgic_flush_hwstate() and only if we have consumed completely everything. I have followed
-> through the code and looks like it's perfectly safe to have this bit set while nothing is actually
-> pendng. Following __kvm_vgic_flush_hwstate(), having this bit cleared is actually a shorthand for
-> "no interrupt is pending at all". If it is set without any interrupt actually being pending (this
-> ends up in pa_percpu and pa_shared being all zeroes), all three for_each_set_bit() loops will just
-> not do anything, and we still get to "epilog:" label, just after a bit longer check. And, since we
-> are here, the guest has already been disturbed.
+> On 09/04/2015 09:40 PM, Christoffer Dall wrote:
+> > Currently vgic_process_maintenance() processes dealing with a completed
+> > level-triggered interrupt directly, but we are soon going to reuse this
+> > logic for level-triggered mapped interrupts with the HW bit set, so
+> > move this logic into a separate static function.
+> > 
+> > Probably the most scary part of this commit is convincing yourself that
+> > the current flow is safe compared to the old one.  In the following I
+> > try to list the changes and why they are harmless:
+> > 
+> >   Move vgic_irq_clear_queued after kvm_notify_acked_irq:
+> >     Harmless because the effect of clearing the queued flag wrt.
+> >     kvm_set_irq is only that vgic_update_irq_pending does not set the
+> >     pending bit on the emulated CPU interface or in the pending_on_cpu
+> >     bitmask,
+> well actually the notifier calls vgic_update_irq_pending with level ==0
+> so it does not reach the can_sample.
+>  but we set this in __kvm_vgic_sync_hwstate later on if the
 
-ok, looks like it is functionally correct, but I'm not thrilled about us
-setting the state in the VGIC to something is pending on the CPU, when
-really there is not.  In that case, we should explicitly mark the bit as
-a hint and not rely on its correctness and your patch should explain
-this in vgic_update_irq_pending().
+can the notifier never go through a flow where it calls the function
+with level = 1 ?  For example if the interrupt hit in between?
 
-The alternative is to just call compute_pending which does nothing more
-than a few bitwise and/or operations plus a couple of handfuls of
-load/stores on this IRQ injection path, so I don't see the problem doing
-this.
+In any case, it should still be functionally correct.
 
-Does the code look awful?  If so, why?
-
-> 
-> > different from the incorrect approach I suggested yesterday where we
-> > always just clear the bit for that vcpu).
-> 
->  Yes, it is extremely bad idea to clear it because this bit summarizes all interrupts for this vcpu,
-> and clearing it means that we are going to lose everything.
-
-yes, I see this.
-
->  An alternate would be: clear the bit, THEN call vgic_update_state() which would set it back if
-> necessary. But does this extra bit of complexity worth anything, given one paragraph above?
-> 
-I'm not sure your suggested approach works, because you could still
-loose state for other IRQs I think.
+Thanks for the RB.
 
 -Christoffer
+
+> >     level is stil high.
+> still
+> 
+> Reviewed-by: Eric Auger <eric.auger@linaro.org>
+> 
+> Eric
+> > 
+> >   Move vgic_set_lr before kvm_notify_acked_irq:
+> >     Also, harmless because the LR are cpu-local operations and
+> >     kvm_notify_acked only affects the dist
+> > 
+> >   Move vgic_dist_irq_clear_soft_pend after kvm_notify_acked_irq:
+> >     Also harmless because it's just a bit which is cleared and altering
+> >     the line state does not affect this bit.
+> > 
+> > Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > ---
+> >  virt/kvm/arm/vgic.c | 88 ++++++++++++++++++++++++++++++-----------------------
+> >  1 file changed, 50 insertions(+), 38 deletions(-)
+> > 
+> > diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+> > index 6bd1c9b..fe0e5db 100644
+> > --- a/virt/kvm/arm/vgic.c
+> > +++ b/virt/kvm/arm/vgic.c
+> > @@ -1322,12 +1322,56 @@ epilog:
+> >  	}
+> >  }
+> >  
+> > +static int process_level_irq(struct kvm_vcpu *vcpu, int lr, struct vgic_lr vlr)
+> > +{
+> > +	int level_pending = 0;
+> > +
+> > +	vlr.state = 0;
+> > +	vlr.hwirq = 0;
+> > +	vgic_set_lr(vcpu, lr, vlr);
+> > +
+> > +	/*
+> > +	 * If the IRQ was EOIed (called from vgic_process_maintenance) or it
+> > +	 * went from active to non-active (called from vgic_sync_hwirq) it was
+> > +	 * also ACKed and we we therefore assume we can clear the soft pending
+> > +	 * state (should it had been set) for this interrupt.
+> > +	 *
+> > +	 * Note: if the IRQ soft pending state was set after the IRQ was
+> > +	 * acked, it actually shouldn't be cleared, but we have no way of
+> > +	 * knowing that unless we start trapping ACKs when the soft-pending
+> > +	 * state is set.
+> > +	 */
+> > +	vgic_dist_irq_clear_soft_pend(vcpu, vlr.irq);
+> > +
+> > +	/*
+> > +	 * Tell the gic to start sampling the line of this interrupt again.
+> > +	 */
+> > +	vgic_irq_clear_queued(vcpu, vlr.irq);
+> > +
+> > +	/* Any additional pending interrupt? */
+> > +	if (vgic_dist_irq_get_level(vcpu, vlr.irq)) {
+> > +		vgic_cpu_irq_set(vcpu, vlr.irq);
+> > +		level_pending = 1;
+> > +	} else {
+> > +		vgic_dist_irq_clear_pending(vcpu, vlr.irq);
+> > +		vgic_cpu_irq_clear(vcpu, vlr.irq);
+> > +	}
+> > +
+> > +	/*
+> > +	 * Despite being EOIed, the LR may not have
+> > +	 * been marked as empty.
+> > +	 */
+> > +	vgic_sync_lr_elrsr(vcpu, lr, vlr);
+> > +
+> > +	return level_pending;
+> > +}
+> > +
+> >  static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+> >  {
+> >  	u32 status = vgic_get_interrupt_status(vcpu);
+> >  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> > -	bool level_pending = false;
+> >  	struct kvm *kvm = vcpu->kvm;
+> > +	int level_pending = 0;
+> >  
+> >  	kvm_debug("STATUS = %08x\n", status);
+> >  
+> > @@ -1342,54 +1386,22 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+> >  
+> >  		for_each_set_bit(lr, eisr_ptr, vgic->nr_lr) {
+> >  			struct vgic_lr vlr = vgic_get_lr(vcpu, lr);
+> > -			WARN_ON(vgic_irq_is_edge(vcpu, vlr.irq));
+> >  
+> > -			spin_lock(&dist->lock);
+> > -			vgic_irq_clear_queued(vcpu, vlr.irq);
+> > +			WARN_ON(vgic_irq_is_edge(vcpu, vlr.irq));
+> >  			WARN_ON(vlr.state & LR_STATE_MASK);
+> > -			vlr.state = 0;
+> > -			vgic_set_lr(vcpu, lr, vlr);
+> >  
+> > -			/*
+> > -			 * If the IRQ was EOIed it was also ACKed and we we
+> > -			 * therefore assume we can clear the soft pending
+> > -			 * state (should it had been set) for this interrupt.
+> > -			 *
+> > -			 * Note: if the IRQ soft pending state was set after
+> > -			 * the IRQ was acked, it actually shouldn't be
+> > -			 * cleared, but we have no way of knowing that unless
+> > -			 * we start trapping ACKs when the soft-pending state
+> > -			 * is set.
+> > -			 */
+> > -			vgic_dist_irq_clear_soft_pend(vcpu, vlr.irq);
+> >  
+> >  			/*
+> >  			 * kvm_notify_acked_irq calls kvm_set_irq()
+> > -			 * to reset the IRQ level. Need to release the
+> > -			 * lock for kvm_set_irq to grab it.
+> > +			 * to reset the IRQ level, which grabs the dist->lock
+> > +			 * so we call this before taking the dist->lock.
+> >  			 */
+> > -			spin_unlock(&dist->lock);
+> > -
+> >  			kvm_notify_acked_irq(kvm, 0,
+> >  					     vlr.irq - VGIC_NR_PRIVATE_IRQS);
+> > -			spin_lock(&dist->lock);
+> > -
+> > -			/* Any additional pending interrupt? */
+> > -			if (vgic_dist_irq_get_level(vcpu, vlr.irq)) {
+> > -				vgic_cpu_irq_set(vcpu, vlr.irq);
+> > -				level_pending = true;
+> > -			} else {
+> > -				vgic_dist_irq_clear_pending(vcpu, vlr.irq);
+> > -				vgic_cpu_irq_clear(vcpu, vlr.irq);
+> > -			}
+> >  
+> > +			spin_lock(&dist->lock);
+> > +			level_pending |= process_level_irq(vcpu, lr, vlr);
+> >  			spin_unlock(&dist->lock);
+> > -
+> > -			/*
+> > -			 * Despite being EOIed, the LR may not have
+> > -			 * been marked as empty.
+> > -			 */
+> > -			vgic_sync_lr_elrsr(vcpu, lr, vlr);
+> >  		}
+> >  	}
+> >  
+> > 
+> 
