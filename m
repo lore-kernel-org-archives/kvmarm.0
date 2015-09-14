@@ -1,361 +1,387 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v3 09/10] KVM: arm/arm64: vgic: forwarding control
-Date: Mon, 14 Sep 2015 11:29:34 +0200
-Message-ID: <55F6937E.2060605@linaro.org>
-References: <1439212864-12954-1-git-send-email-eric.auger@linaro.org>
- <1439212864-12954-10-git-send-email-eric.auger@linaro.org>
- <20150902195825.GW10991@cbox>
+Subject: Re: [PATCH v2 7/8] arm/arm64: KVM: Rework the arch timer to use
+ level-triggered semantics
+Date: Mon, 14 Sep 2015 11:29:53 +0200
+Message-ID: <55F69391.6040203@linaro.org>
+References: <1441395650-19663-1-git-send-email-christoffer.dall@linaro.org>
+ <1441395650-19663-8-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5114F40FA6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2015 05:29:42 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UGjmhDunP4o9 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Sep 2015 05:29:38 -0400 (EDT)
-Received: from mail-la0-f43.google.com (mail-la0-f43.google.com
- [209.85.215.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 90AA740C9D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2015 05:29:37 -0400 (EDT)
-Received: by lahg1 with SMTP id g1so52897731lah.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Sep 2015 02:30:29 -0700 (PDT)
-In-Reply-To: <20150902195825.GW10991@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: eric.auger@st.com, kvm@vger.kernel.org, patches@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, pbonzini@redhat.com, feng.wu@intel.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1441395650-19663-8-git-send-email-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Christoffer,
-On 09/02/2015 09:58 PM, Christoffer Dall wrote:
-> On Mon, Aug 10, 2015 at 03:21:03PM +0200, Eric Auger wrote:
->> Implements kvm_vgic_[set|unset]_forward.
->>
->> Handle low-level VGIC programming: physical IRQ/guest IRQ mapping,
->> list register cleanup, VGIC state machine. Also interacts with
->> the irqchip.
->>
->> Signed-off-by: Eric Auger <eric.auger@linaro.org>
->>
->> ---
->>
->> v2 -> v3:
->> - on unforward, we do not compute & output the active state anymore.
->>   This means if the unforward happens while the physical IRQ is
->>   active, we will not VFIO mask the IRQ while deactiving it. If a
->>   new physical IRQ hits, the corresponding virtual IRQ might not
->>   be injected (hence lost) due to VGIC state machine.
->>
->> bypass rfc v2:
->> - use irq_set_vcpu_affinity API
->> - use irq_set_irqchip_state instead of chip->irq_eoi
->>
->> bypass rfc:
->> - rename kvm_arch_{set|unset}_forward into
->>   kvm_vgic_{set|unset}_forward. Remove __KVM_HAVE_ARCH_HALT_GUEST.
->>   The function is bound to be called by ARM code only.
->>
->> v4 -> v5:
->> - fix arm64 compilation issues, ie. also defines
->>   __KVM_HAVE_ARCH_HALT_GUEST for arm64
->>
->> v3 -> v4:
->> - code originally located in kvm_vfio_arm.c
->> - kvm_arch_vfio_{set|unset}_forward renamed into
->>   kvm_arch_{set|unset}_forward
->> - split into 2 functions (set/unset) since unset does not fail anymore
->> - unset can be invoked at whatever time. Extra care is taken to handle
->>   transition in VGIC state machine, LR cleanup, ...
->>
->> v2 -> v3:
->> - renaming of kvm_arch_set_fwd_state into kvm_arch_vfio_set_forward
->> - takes a bool arg instead of kvm_fwd_irq_action enum
->> - removal of KVM_VFIO_IRQ_CLEANUP
->> - platform device check now happens here
->> - more precise errors returned
->> - irq_eoi handled externally to this patch (VGIC)
->> - correct enable_irq bug done twice
->> - reword the commit message
->> - correct check of platform_bus_type
->> - use raw_spin_lock_irqsave and check the validity of the handler
->> ---
->>  include/kvm/arm_vgic.h |   6 ++
->>  virt/kvm/arm/vgic.c    | 149 +++++++++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 155 insertions(+)
->>
->> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->> index 7ef9ce0..409ac0f 100644
->> --- a/include/kvm/arm_vgic.h
->> +++ b/include/kvm/arm_vgic.h
->> @@ -363,6 +363,12 @@ int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
->>  bool kvm_vgic_get_phys_irq_active(struct irq_phys_map *map);
->>  void kvm_vgic_set_phys_irq_active(struct irq_phys_map *map, bool active);
->>  
->> +int kvm_vgic_set_forward(struct kvm *kvm,
->> +			 unsigned int host_irq, unsigned int guest_irq);
->> +
->> +void kvm_vgic_unset_forward(struct kvm *kvm,
->> +			    unsigned int host_irq, unsigned int guest_irq);
->> +
->>  #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
->>  #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
->>  #define vgic_ready(k)		((k)->arch.vgic.ready)
->> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
->> index 03a85b3..b15999a 100644
->> --- a/virt/kvm/arm/vgic.c
->> +++ b/virt/kvm/arm/vgic.c
->> @@ -2551,3 +2551,152 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
->>  {
->>  	return 0;
->>  }
->> +
->> +/**
->> + * kvm_vgic_set_forward - Set IRQ forwarding
->> + *
->> + * @kvm: handle to the VM
->> + * @host_irq: physical IRQ number
->> + * @guest_irq: virtual IRQ number
->> + *
->> + * This function is supposed to be called only if the IRQ
->> + * is not in progress: ie. not active at GIC level and not
->> + * currently under injection in the guest. The physical IRQ must
->> + * also be disabled and the guest must have been exited and
+On 09/04/2015 09:40 PM, Christoffer Dall wrote:
+> The arch timer currently uses edge-triggered semantics in the sense that
+> the line is never sampled by the vgic and lowering the line from the
+> timer to the vgic doesn't have any affect on the pending state of
+s/affect/effect
+> virtual interrupts in the vgic.  This means that we do not support a
+> guest with the otherwise valid behavior of (1) disable interrupts (2)
+> enable the timer (3) disable the timer (4) enable interrupts.  Such a
+> guest would validly not expect to see any interrupts on real hardware,
+> but will see interrupts on KVM.
 > 
-> when you say the guest you mean all VCPUs, right?
+> This patches fixes this shortcoming through the following series of
+> changes.
+> 
+> First, we change the flow of the timer/vgic sync/flush operations.  Now
+> the timer is always flushed/synced before the vgic,
+for the flush it was already the case
+ because the vgic
+> samples the state of the timer output.  This has the implication that we
+> move the timer operations in to non-preempible sections, but that is
+> fine after the previous commit getting rid of hrtimer schedules on every
+> entry/exit.
+> 
+> Second, we change the internal behavior of the timer, letting the timer
+> keep track of its previous output state, and only lower/raise the line
+> to the vgic when the state changes.  Note that in theory this could have
+> been accomplished more simply by signalling the vgic every time the
+> state *potentially* changed, but we don't want to be hitting the vgic
+> more often than necessary.
+> 
+> Third, we get rid of the use of the map->active field in the vgic and
+> instead simply set the interrupt as active on the physical distributor
+> whenever we signal a mapped interrupt to the guest, and we reset the
+> active state when we sync back the HW state from the vgic.
+> 
+> Fourth, and finally, we now initialize the timer PPIs (and all the other
+> unused PPIs for now), to be level-triggered, and modify the sync code to
+> sample the line state on HW sync and re-inject a new interrupt if it is
+> still pending at that time.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>  arch/arm/kvm/arm.c           | 11 ++++++--
+>  include/kvm/arm_arch_timer.h |  2 +-
+>  include/kvm/arm_vgic.h       |  3 --
+>  virt/kvm/arm/arch_timer.c    | 65 +++++++++++++++++++++++++++++-------------
+>  virt/kvm/arm/vgic.c          | 67 +++++++++++++++-----------------------------
+>  5 files changed, 78 insertions(+), 70 deletions(-)
+> 
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index bdf8871..102a4aa 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -561,9 +561,9 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  
+>  		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm)) {
+>  			local_irq_enable();
+> +			kvm_timer_sync_hwstate(vcpu);
+>  			kvm_vgic_sync_hwstate(vcpu);
+>  			preempt_enable();
+> -			kvm_timer_sync_hwstate(vcpu);
+>  			continue;
+>  		}
+>  
+> @@ -608,12 +608,17 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  		kvm_guest_exit();
+>  		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
+>  
+> +		/*
+> +		 * We must sync the timer state before the vgic state so that
+> +		 * the vgic can properly sample the updated state of the
+> +		 * interrupt line.
+> +		 */
+> +		kvm_timer_sync_hwstate(vcpu);
+> +
+>  		kvm_vgic_sync_hwstate(vcpu);
+>  
+>  		preempt_enable();
+>  
+> -		kvm_timer_sync_hwstate(vcpu);
+> -
+>  		ret = handle_exit(vcpu, run, ret);
+>  	}
+>  
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index ef14cc1..1800227 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -51,7 +51,7 @@ struct arch_timer_cpu {
+>  	bool				armed;
+>  
+>  	/* Timer IRQ */
+> -	const struct kvm_irq_level	*irq;
+> +	struct kvm_irq_level		irq;
+>  
+>  	/* VGIC mapping */
+>  	struct irq_phys_map		*map;
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index d901f1a..99011a0 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -163,7 +163,6 @@ struct irq_phys_map {
+>  	u32			virt_irq;
+>  	u32			phys_irq;
+>  	u32			irq;
+> -	bool			active;
+>  };
+>  
+>  struct irq_phys_map_entry {
+> @@ -358,8 +357,6 @@ int kvm_vgic_vcpu_active_irq(struct kvm_vcpu *vcpu);
+>  struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+>  					   int virt_irq, int irq);
+>  int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
+> -bool kvm_vgic_get_phys_irq_active(struct irq_phys_map *map);
+> -void kvm_vgic_set_phys_irq_active(struct irq_phys_map *map, bool active);
+>  
+>  #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+>  #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index 7991537..0cdd092 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -59,18 +59,6 @@ static void timer_disarm(struct arch_timer_cpu *timer)
+>  	}
+>  }
+>  
+> -static void kvm_timer_inject_irq(struct kvm_vcpu *vcpu)
+> -{
+> -	int ret;
+> -	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> -
+> -	kvm_vgic_set_phys_irq_active(timer->map, true);
+> -	ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
+> -					 timer->map,
+> -					 timer->irq->level);
+> -	WARN_ON(ret);
+> -}
+> -
+>  static irqreturn_t kvm_arch_timer_handler(int irq, void *dev_id)
+>  {
+>  	struct kvm_vcpu *vcpu = *(struct kvm_vcpu **)dev_id;
+> @@ -116,8 +104,7 @@ static bool kvm_timer_irq_can_fire(struct kvm_vcpu *vcpu)
+>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+>  
+>  	return !(timer->cntv_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
+> -		(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE) &&
+> -		!kvm_vgic_get_phys_irq_active(timer->map);
+> +		(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE);
+>  }
+>  
+>  bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
+> @@ -134,6 +121,41 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
+>  	return cval <= now;
+>  }
+>  
+> +static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level)
+> +{
+> +	int ret;
+> +	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +
+> +	BUG_ON(!vgic_initialized(vcpu->kvm));
+> +
+> +	timer->irq.level = new_level;
+> +	ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
+> +					 timer->map,
+> +					 timer->irq.level);
+> +	WARN_ON(ret);
+> +}
+> +
+> +/*
+> + * Check if there was a change in the timer state (should we raise or lower
+> + * the line level to the GIC).
+> + */
+> +static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +
+> +	/*
+> +	 * If userspace modified the timer registers via SET_ONE_REG before
+> +	 * the vgic was initialized, we mustn't set the timer->irq.level value
+> +	 * because the guest would never see the interrupt.  Instead wait
+> +	 * until we call this funciton from kvm_timer_flush_hwstate.
+s/funciton/function
+> +	 */
+> +	if (!vgic_initialized(vcpu->kvm))
+> +	    return;
+> +
+> +	if (kvm_timer_should_fire(vcpu) != timer->irq.level)
+> +		kvm_timer_update_irq(vcpu, !timer->irq.level);
+> +}
+> +
+>  /*
+>   * Schedule the background timer before calling kvm_vcpu_block, so that this
+>   * thread is removed from its waitqueue and made runnable when there's a timer
+> @@ -193,8 +215,7 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+>  	 * If the timer expired while we were not scheduled, now is the time
+>  	 * to inject it.
+>  	 */
+> -	if (kvm_timer_should_fire(vcpu))
+> -		kvm_timer_inject_irq(vcpu);
+> +	kvm_timer_update_state(vcpu);
+>  }
+>  
+>  /**
+> @@ -210,8 +231,11 @@ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+>  
+>  	BUG_ON(timer_is_armed(timer));
+>  
+> -	if (kvm_timer_should_fire(vcpu))
+> -		kvm_timer_inject_irq(vcpu);
+> +	/*
+> +	 * The guest could have modified the timer registers or the timer
+> +	 * could have expired, update the timer state.
+> +	 */
+> +	kvm_timer_update_state(vcpu);
+>  }
+>  
+>  int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+> @@ -226,7 +250,7 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+>  	 * kvm_vcpu_set_target(). To handle this, we determine
+>  	 * vcpu timer irq number when the vcpu is reset.
+>  	 */
+> -	timer->irq = irq;
+> +	timer->irq.irq = irq->irq;
+>  
+>  	/*
+>  	 * The bits in CNTV_CTL are architecturally reset to UNKNOWN for ARMv8
+> @@ -235,6 +259,7 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+>  	 * the ARMv7 architecture.
+>  	 */
+>  	timer->cntv_ctl = 0;
+> +	kvm_timer_update_state(vcpu);
+>  
+>  	/*
+>  	 * Tell the VGIC that the virtual interrupt is tied to a
+> @@ -279,6 +304,8 @@ int kvm_arm_timer_set_reg(struct kvm_vcpu *vcpu, u64 regid, u64 value)
+>  	default:
+>  		return -1;
+>  	}
+> +
+> +	kvm_timer_update_state(vcpu);
+>  	return 0;
+>  }
+>  
+> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+> index 9ed8d53..f4ea950 100644
+> --- a/virt/kvm/arm/vgic.c
+> +++ b/virt/kvm/arm/vgic.c
+> @@ -1422,34 +1422,43 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+>  /*
+>   * Save the physical active state, and reset it to inactive.
+>   *
+> - * Return 1 if HW interrupt went from active to inactive, and 0 otherwise.
+> + * Return true if there's a pending level triggered interrupt line to queue.
+>   */
+> -static int vgic_sync_hwirq(struct kvm_vcpu *vcpu, struct vgic_lr vlr)
+> +static bool vgic_sync_hwirq(struct kvm_vcpu *vcpu, int lr, struct vgic_lr vlr)
+>  {
+>  	struct irq_phys_map *map;
+> +	bool phys_active;
+>  	int ret;
+>  
+>  	if (!(vlr.state & LR_HW))
+>  		return 0;
+>  
+>  	map = vgic_irq_map_search(vcpu, vlr.irq);
+> -	BUG_ON(!map || !map->active);
+> +	BUG_ON(!map);
+>  
+>  	ret = irq_get_irqchip_state(map->irq,
+>  				    IRQCHIP_STATE_ACTIVE,
+> -				    &map->active);
+> +				    &phys_active);
+>  
+>  	WARN_ON(ret);
+>  
+> -	if (map->active) {
+> +	if (phys_active) {
+> +		/*
+> +		 * Interrupt still marked as active on the physical
+> +		 * distributor, so guest did not EOI it yet.  Reset to
+> +		 * non-active so that other VMs can see interrupts from this
+> +		 * device.
+> +		 */
+>  		ret = irq_set_irqchip_state(map->irq,
+>  					    IRQCHIP_STATE_ACTIVE,
+>  					    false);
+>  		WARN_ON(ret);
+> -		return 0;
+> +		return false;
+>  	}
+>  
+> -	return 1;
+> +	/* Mapped edge-triggered interrupts not yet supported. */
+> +	WARN_ON(vgic_irq_is_edge(vcpu, vlr.irq));
+> +	return process_level_irq(vcpu, lr, vlr);
+>  }
+>  
+>  /* Sync back the VGIC state after a guest run */
+> @@ -1474,18 +1483,8 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+>  			continue;
+>  
+>  		vlr = vgic_get_lr(vcpu, lr);
+> -		if (vgic_sync_hwirq(vcpu, vlr)) {
+> -			/*
+> -			 * So this is a HW interrupt that the guest
+> -			 * EOI-ed. Clean the LR state and allow the
+> -			 * interrupt to be sampled again.
+> -			 */
+> -			vlr.state = 0;
+> -			vlr.hwirq = 0;
+> -			vgic_set_lr(vcpu, lr, vlr);
+> -			vgic_irq_clear_queued(vcpu, vlr.irq);
+> -			set_bit(lr, elrsr_ptr);
+> -		}
+> +		if (vgic_sync_hwirq(vcpu, lr, vlr))
+> +			level_pending = true;
+>  
+>  		if (!test_bit(lr, elrsr_ptr))
+>  			continue;
+> @@ -1861,30 +1860,6 @@ static void vgic_free_phys_irq_map_rcu(struct rcu_head *rcu)
+>  }
+>  
+>  /**
+> - * kvm_vgic_get_phys_irq_active - Return the active state of a mapped IRQ
+> - *
+> - * Return the logical active state of a mapped interrupt. This doesn't
+> - * necessarily reflects the current HW state.
+> - */
+> -bool kvm_vgic_get_phys_irq_active(struct irq_phys_map *map)
+> -{
+> -	BUG_ON(!map);
+> -	return map->active;
+> -}
+> -
+> -/**
+> - * kvm_vgic_set_phys_irq_active - Set the active state of a mapped IRQ
+> - *
+> - * Set the logical active state of a mapped interrupt. This doesn't
+> - * immediately affects the HW state.
+> - */
+> -void kvm_vgic_set_phys_irq_active(struct irq_phys_map *map, bool active)
+> -{
+> -	BUG_ON(!map);
+> -	map->active = active;
+> -}
+> -
+> -/**
+>   * kvm_vgic_unmap_phys_irq - Remove a virtual to physical IRQ mapping
+>   * @vcpu: The VCPU pointer
+>   * @map: The pointer to a mapping obtained through kvm_vgic_map_phys_irq
+> @@ -2112,10 +2087,14 @@ int vgic_init(struct kvm *kvm)
+>  			if (i < VGIC_NR_SGIS)
+>  				vgic_bitmap_set_irq_val(&dist->irq_enabled,
+>  							vcpu->vcpu_id, i, 1);
+> -			if (i < VGIC_NR_PRIVATE_IRQS)
+> +			if (i < VGIC_NR_SGIS)
+>  				vgic_bitmap_set_irq_val(&dist->irq_cfg,
+>  							vcpu->vcpu_id, i,
+>  							VGIC_CFG_EDGE);
+> +			else if (i < VGIC_NR_PRIVATE_IRQS) /* PPIs */
+> +				vgic_bitmap_set_irq_val(&dist->irq_cfg,
+> +							vcpu->vcpu_id, i,
+> +							VGIC_CFG_LEVEL);
+nit: use the same if block for enable & cfg?
+>  		}
+>  
+>  		vgic_enable(vcpu);
+> 
 
-yes that's correct.
-> 
->> + * prevented from being re-entered.
->> + */
->> +int kvm_vgic_set_forward(struct kvm *kvm,
->> +			 unsigned int host_irq,
->> +			 unsigned int guest_irq)
->> +{
->> +	struct irq_phys_map *map = NULL;
->> +	struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, 0);
->> +	int spi_id = guest_irq + VGIC_NR_PRIVATE_IRQS;
->> +
->> +	kvm_debug("%s host_irq=%d guest_irq=%d\n",
->> +		__func__, host_irq, guest_irq);
->> +
->> +	if (!vcpu)
->> +		return 0;
->> +
->> +	irq_set_vcpu_affinity(host_irq, vcpu);
-> 
-> why are we hard-coding this to vcpu 0 ?
-is that OK if I use dist->irq_spi_target[guest_irq]
-> 
-> missing white space before the code block.  Where does the code block
-> belong exactly?
-> 
->> +	/*
->> +	 * next physical IRQ will be be handled as forwarded
-> 
-> what do you mean with 'next' here?
-I mean the next occurrence of the same physical IRQ
-> 
->> +	 * by the host (priority drop only)
->> +	 */
->> +
->> +	map = kvm_vgic_map_phys_irq(vcpu, spi_id, host_irq, false);
->> +	/*
->> +	 * next guest_irq injection will be considered as
->> +	 * forwarded and next flush will program LR
->> +	 * without maintenance IRQ but with HW bit set
->> +	 */
-> 
-> also here, I don't understand what you mean by next.
-I meant the next occurrence of the same IRQ injection into the guest
-> 
-> Perhaps these comments were supposed to come before the function calls?
-OK I see what you mean, I will rephrase to set comments before the
-function calls.
-> 
->> +	return !map;
->> +}
->> +
->> +/**
->> + * kvm_vgic_unset_forward - Unset IRQ forwarding
->> + *
->> + * @kvm: handle to the VM
->> + * @host_irq: physical IRQ number
->> + * @guest_irq: virtual IRQ number
->> + *
->> + * This function must be called when the host_irq is disabled
->> + * and guest has been exited and prevented from being re-entered.
->> + *
-> 
-> extra white space here
-OK
-> 
->> + */
->> +void kvm_vgic_unset_forward(struct kvm *kvm,
->> +			    unsigned int host_irq,
->> +			    unsigned int guest_irq)
->> +{
->> +	struct kvm_vcpu *vcpu = kvm_get_vcpu(kvm, 0);
->> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->> +	struct vgic_dist *dist = &kvm->arch.vgic;
->> +	int ret, lr;
->> +	struct vgic_lr vlr;
->> +	int spi_id = guest_irq + VGIC_NR_PRIVATE_IRQS;
->> +	bool queued = false, needs_deactivate = true;
->> +	struct irq_phys_map *map;
->> +	bool active;
->> +
->> +	kvm_debug("%s host_irq=%d guest_irq=%d\n",
->> +		__func__, host_irq, guest_irq);
->> +
->> +	spin_lock(&dist->lock);
->> +
->> +	irq_get_irqchip_state(host_irq, IRQCHIP_STATE_ACTIVE, &active);
->> +
->> +	if (!vcpu)
->> +		goto out;
->> +
->> +	map = vgic_irq_map_search(vcpu, spi_id);
->> +	BUG_ON(!map);
->> +	ret = kvm_vgic_unmap_phys_irq(vcpu, map);
->> +	BUG_ON(ret);
->> +	/*
->> +	 * subsequent update_irq_pending or flush will handle this
->> +	 * irq as not forwarded
->> +	 */
-> 
-> missing white space before this comment block as well, also here with
-> 'subsequent' do you mean "At this point" ?
-I mean any new execution of update_irq_pending/flush will handle this
-irq as not forwarded. Since the state machine for forwarded IRQ and non
-forwarded IRQ is different, we need to convert the states into the new
-state machine's ones.
-> 
->> +	if (likely(!(active))) {
->> +		/*
->> +		 * the IRQ was not active. let's simply prepare the states
->> +		 * for subsequent non forwarded injection.
->> +		 */
->> +		vgic_dist_irq_clear_level(vcpu, spi_id);
->> +		vgic_dist_irq_clear_pending(vcpu, spi_id);
->> +		vgic_irq_clear_queued(vcpu, spi_id);
->> +		needs_deactivate = false;
->> +		goto out;
->> +	}
->> +
->> +	/* is there any list register with valid state? */
->> +	lr = vgic_cpu->vgic_irq_lr_map[spi_id];
->> +	if (lr != LR_EMPTY) {
->> +		vlr = vgic_get_lr(vcpu, lr);
->> +		if (vlr.state & LR_STATE_MASK)
->> +			queued = true;
->> +	}
->> +
->> +	if (!queued) {
->> +		vgic_irq_clear_queued(vcpu, spi_id);
->> +		if (vgic_dist_irq_is_pending(vcpu, spi_id)) {
->> +			/*
->> +			 * IRQ is injected but not yet queued. LR will be
->> +			 * written with EOI_INT and process_maintenance will
->> +			 * reset the states: queued, level(resampler). Pending
->> +			 * will be reset on flush.
->> +			 */
->> +			vgic_dist_irq_set_level(vcpu, spi_id);
-> 
-> so this is all only valid for level-triggered interrupts?  Do we check
-> this somewhere along the call path?
-Up to now I only tested with level-sensitive IRQs. Now I have the means
-I will also test with non shared edge-sensitive mapped IRQs.
-> 
->> +		} else {
->> +			/*
->> +			 * We are somewhere before the update_irq_pending.
->> +			 * we can't be sure the virtual IRQ will ever be
->> +			 * injected (due to previous disable_irq).
-> 
-> I don't understand this.  Do we somehow know at this point that there is
-> a pending IRQ to inject as a virtual IRQ?
-No we just know the physical IRQ is active at physical distributor level.
-
-There can be a long path before the virtual IRQ gets injected into the
-guest:
-phys IRQ hits (1) -> genirq handler(2) -> VFIO handler(3) ->
-update_irq_pending in irqfd thread (4) -> flush (LR programming,5) ->
-guest deactivates the virq/pirq (6)
-
-There is no valid state LR. There is no pending state recorded. So we
-are between (1) an (4) excluded.
-
-
-However we cannot be sure a virtual IRQ will ever be injected. Typically
-since the physical IRQ was disabled previously, it might happen that the
-VFIO physical handler is never reached and irqfd is never signalled.
-(genirq handler never calls the VFIO handler)
-> 
->> +			 * Let's simply clear the level which was not correctly
->> +			 * modelled in forwarded state.
->> +			 */
->> +			vgic_dist_irq_clear_level(vcpu, spi_id);
->> +		}
->> +		goto out;
->> +	}
->> +
->> +	/*
->> +	 * the virtual IRQ is queued and a valid LR exists, let's patch it so
->> +	 * that when EOI happens a maintenance IRQ gets triggered
->> +	 */
->> +	vlr.state |= LR_EOI_INT;
->> +	vgic_set_lr(vcpu, lr, vlr);
->> +
->> +	vgic_dist_irq_set_level(vcpu, spi_id);
->> +	vgic_dist_irq_set_pending(vcpu, spi_id);
-> 
-> how do you know this is the case?  couldn't it be active in the LR?
-for a level sensitive IRQ the pending state stays active until the EOI
-maintenance gets called right? pending is set by vgic_queue_hwirq and
-reset by process_queued_irq?
-> 
->> +	vgic_irq_set_queued(vcpu, spi_id);
->> +	 /* The maintenance IRQ will reset all states above */
-> 
-> then why do we bother setting them to anything here?
-well isn't it cleaner? What if somebody else queries those values before
-the EOI maintenance gets called, a new injection for instance?
-> 
->> +
->> +out:
->> +	irq_set_irqchip_state(host_irq, IRQCHIP_STATE_ACTIVE, false);
->> +	irq_set_vcpu_affinity(host_irq, NULL);
->> +	/* next occurrence will be deactivated by the host */
-> 
-> I'm beginning to understand what you mean by 'next' here.
-
-> 
-> Can you make it more explicit by saying "After this function returns, a
-> physical IRQ will be..." ?
-
-yes. I was failing finding the appropriate wording I aknowledge.
-
-Thanks
-
-Eric
-> 
->> +
->> +	spin_unlock(&dist->lock);
->> +}
->> +
->> -- 
->> 1.9.1
->>
-> Thanks,
-> -Christoffer
-> 
