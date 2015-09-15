@@ -1,22 +1,23 @@
 From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
-Subject: [PATCH 11/15] arm64: Cleanup VTCR_EL2 computation
-Date: Tue, 15 Sep 2015 16:41:20 +0100
-Message-ID: <1442331684-28818-12-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH 07/15] arm64: Kconfig: Fix help text about AArch32 support
+ with 64K pages
+Date: Tue, 15 Sep 2015 16:41:16 +0100
+Message-ID: <1442331684-28818-8-git-send-email-suzuki.poulose@arm.com>
 References: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CABE641CC1
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C8F0E412A6
  for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ohOe2ZDVb0Tq for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id F7bFhBMXCrpZ for <kvmarm@lists.cs.columbia.edu>;
  Tue, 15 Sep 2015 11:40:49 -0400 (EDT)
 Received: from eu-smtp-delivery-143.mimecast.com
  (eu-smtp-delivery-143.mimecast.com [146.101.78.143])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 21B3641338
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A2BD9421ED
  for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:47 -0400 (EDT)
 In-Reply-To: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -29,60 +30,38 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, ard.biesheuvel@linaro.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin.Marinas@arm.com, Will.Deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, ard.biesheuvel@linaro.org, Marc.Zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
 
-No functional changes. Group the common bits for VCTR_EL2
-initialisation for better readability. The granule size
-and the entry level are controlled by the page size.
+Update the help text for ARM64_64K_PAGES to reflect the reality
+about AArch32 support.
 
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
 Signed-off-by: Suzuki K. Poulose <suzuki.poulose@arm.com>
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/include/asm/kvm_arm.h |   13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ arch/arm64/Kconfig |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index bdf139e..699554d 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -138,6 +138,9 @@
-  * The magic numbers used for VTTBR_X in this patch can be found in Tables
-  * D4-23 and D4-25 in ARM DDI 0487A.b.
-  */
-+#define VTCR_EL2_COMMON_BITS	(VTCR_EL2_SH0_INNER | VTCR_EL2_ORGN0_WBWA | \
-+				 VTCR_EL2_IRGN0_WBWA | VTCR_EL2_T0SZ_40B)
-+
- #ifdef CONFIG_ARM64_64K_PAGES
- /*
-  * Stage2 translation configuration:
-@@ -145,9 +148,8 @@
-  * 64kB pages (TG0 = 1)
-  * 2 level page tables (SL = 1)
-  */
--#define VTCR_EL2_FLAGS		(VTCR_EL2_TG0_64K | VTCR_EL2_SH0_INNER | \
--				 VTCR_EL2_ORGN0_WBWA | VTCR_EL2_IRGN0_WBWA | \
--				 VTCR_EL2_SL0_LVL1 | VTCR_EL2_T0SZ_40B)
-+#define VTCR_EL2_FLAGS		(VTCR_EL2_TG0_64K | VTCR_EL2_SL0_LVL1 | \
-+				 VTCR_EL2_COMMON_BITS)
- #define VTTBR_X		(38 - VTCR_EL2_T0SZ_40B)
- #else
- /*
-@@ -156,9 +158,8 @@
-  * 4kB pages (TG0 = 0)
-  * 3 level page tables (SL = 1)
-  */
--#define VTCR_EL2_FLAGS		(VTCR_EL2_TG0_4K | VTCR_EL2_SH0_INNER | \
--				 VTCR_EL2_ORGN0_WBWA | VTCR_EL2_IRGN0_WBWA | \
--				 VTCR_EL2_SL0_LVL1 | VTCR_EL2_T0SZ_40B)
-+#define VTCR_EL2_FLAGS		(VTCR_EL2_TG0_4K | VTCR_EL2_SL0_LVL1 | \
-+				 VTCR_EL2_COMMON_BITS)
- #define VTTBR_X		(37 - VTCR_EL2_T0SZ_40B)
- #endif
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index ab0a36f..83bca48 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -350,8 +350,8 @@ config ARM64_64K_PAGES
+ 	help
+ 	  This feature enables 64KB pages support (4KB by default)
+ 	  allowing only two levels of page tables and faster TLB
+-	  look-up. AArch32 emulation is not available when this feature
+-	  is enabled.
++	  look-up. AArch32 emulation requires applications compiled
++	  with 64K aligned segments.
+ 
+ endchoice
  
 -- 
 1.7.9.5
