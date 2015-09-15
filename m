@@ -1,109 +1,248 @@
 From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
-Subject: [PATCHv2 00/15] arm64: 16K translation granule support
-Date: Tue, 15 Sep 2015 16:41:09 +0100
-Message-ID: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ECD6A412EF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:44 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 738wMXocF9qF for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Sep 2015 11:40:43 -0400 (EDT)
-Received: from eu-smtp-delivery-143.mimecast.com
- (eu-smtp-delivery-143.mimecast.com [146.101.78.143])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A9488412A6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:43 -0400 (EDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Subject: [PATCH 02/15] arm64: Handle section maps for swapper/idmap
+Date: Tue, 15 Sep 2015 16:41:11 +0100
+Message-ID: <1442331684-28818-3-git-send-email-suzuki.poulose@arm.com>
+References: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
+Sender: kvm-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, ard.biesheuvel@linaro.org, Marc.Zyngier@arm.com, Catalin.Marinas@arm.com, Will.Deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: linux-kernel@vger.kernel.org, Catalin.Marinas@arm.com, Will.Deacon@arm.com, Mark.Rutland@arm.com, Marc.Zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, ard.biesheuvel@linaro.org, suzuki.poulose@arm.com, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
 
-This series enables the 16K page size support on Linux for arm64.
-Adds support for 48bit VA(4 level), 47bit VA(3 level) and
-36bit VA(2 level) with 16K. 16K was a late addition to the architecture
-and is not implemented by all CPUs. Added a check to ensure the
-selected granule size is supported by the CPU, failing which the CPU
-won't proceed with booting. Also the kernel page size is added to the
-kernel image header (patch from Ard).
+We use section maps with 4K page size to create the swapper/idmaps.
+So far we have used !64K or 4K checks to handle the case where we
+use the section maps.
+This patch adds a new symbol, ARM64_SWAPPER_USES_SECTION_MAPS, to
+handle cases where we use section maps, instead of using the page size
+symbols.
 
-KVM bits have been tested on a fast model with GICv3 using kvmtool [1].
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Signed-off-by: Suzuki K. Poulose <suzuki.poulose@arm.com>
+---
+Changes since v1:
+  - Use ARM64_SWAPPER_USES_SECTION_MAPS for vmemmap_populate()
+  - Fix description
+---
+ arch/arm64/include/asm/kernel-pgtable.h |   31 ++++++++-----
+ arch/arm64/mm/mmu.c                     |   72 ++++++++++++++-------------=
+----
+ 2 files changed, 52 insertions(+), 51 deletions(-)
 
-Patches 1-7	cleans up the kernel page size handling code.
-Patch 8		Adds a check to ensure the CPU supports the selected granule size.
-Patch 9		Adds the page size information to image header.
-Patches 10-13	Fixes some issues with the KVM bits, mainly the fake PGD
-             	handling code.
-Patches 14-15	Adds the 16k page size support bits.
-
-This series applies on top of 4.3-rc1.
-
-The tree is also available here:
-
-        git://linux-arm.org/linux-skp.git  16k/v2-4.3-rc1
-
-Changes since V1:
-  - Rebase to 4.3-rc1
-  - Fix vmemmap_populate for 16K (use !ARM64_SWAPPER_USES_SECTION_MAPS)
-  - Better description for patch2 (suggested-by: Ard)
-  - Add page size information to the image header flags.
-  - Added reviewed-by/tested-by Ard.
-
-[1] git://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git
-
-Ard Biesheuvel (1):
-  arm64: Add page size to the kernel image header
-
-Suzuki K. Poulose (14):
-  arm64: Move swapper pagetable definitions
-  arm64: Handle section maps for swapper/idmap
-  arm64: Introduce helpers for page table levels
-  arm64: Calculate size for idmap_pg_dir at compile time
-  arm64: Handle 4 level page table for swapper
-  arm64: Clean config usages for page size
-  arm64: Kconfig: Fix help text about AArch32 support with 64K pages
-  arm64: Check for selected granule support
-  arm64: kvm: Fix {V}TCR_EL2_TG0 mask
-  arm64: Cleanup VTCR_EL2 computation
-  arm: kvm: Move fake PGD handling to arch specific files
-  arm64: kvm: Rewrite fake pgd handling
-  arm64: Add 16K page size support
-  arm64: 36 bit VA
-
- Documentation/arm64/booting.txt         |    7 +-
- arch/arm/include/asm/kvm_mmu.h          |    7 ++
- arch/arm/kvm/mmu.c                      |   44 ++--------
- arch/arm64/Kconfig                      |   37 +++++++--
- arch/arm64/Kconfig.debug                |    2 +-
- arch/arm64/include/asm/boot.h           |    1 +
- arch/arm64/include/asm/fixmap.h         |    4 +-
- arch/arm64/include/asm/kernel-pgtable.h |   77 ++++++++++++++++++
- arch/arm64/include/asm/kvm_arm.h        |   29 +++++--
- arch/arm64/include/asm/kvm_mmu.h        |  135 +++++++++++++++++++++----------
- arch/arm64/include/asm/page.h           |   20 +----
- arch/arm64/include/asm/pgtable-hwdef.h  |   15 +++-
- arch/arm64/include/asm/sysreg.h         |    8 ++
- arch/arm64/include/asm/thread_info.h    |    4 +-
- arch/arm64/kernel/head.S                |   71 +++++++++-------
- arch/arm64/kernel/image.h               |    5 +-
- arch/arm64/kernel/vmlinux.lds.S         |    1 +
- arch/arm64/mm/mmu.c                     |   72 ++++++++---------
- arch/arm64/mm/proc.S                    |    4 +-
- 19 files changed, 348 insertions(+), 195 deletions(-)
- create mode 100644 arch/arm64/include/asm/kernel-pgtable.h
-
--- 
+diff --git a/arch/arm64/include/asm/kernel-pgtable.h b/arch/arm64/include/a=
+sm/kernel-pgtable.h
+index 622929d..5876a36 100644
+--- a/arch/arm64/include/asm/kernel-pgtable.h
++++ b/arch/arm64/include/asm/kernel-pgtable.h
+@@ -19,6 +19,13 @@
+ #ifndef __ASM_KERNEL_PGTABLE_H
+ #define __ASM_KERNEL_PGTABLE_H
+=20
++/* With 4K pages, we use section maps. */
++#ifdef CONFIG_ARM64_4K_PAGES
++#define ARM64_SWAPPER_USES_SECTION_MAPS 1
++#else
++#define ARM64_SWAPPER_USES_SECTION_MAPS 0
++#endif
++
+ /*
+  * The idmap and swapper page tables need some space reserved in the kerne=
+l
+  * image. Both require pgd, pud (4 levels only) and pmd tables to (section=
+)
+@@ -28,26 +35,28 @@
+  * could be increased on the fly if system RAM is out of reach for the def=
+ault
+  * VA range, so 3 pages are reserved in all cases.
+  */
+-#ifdef CONFIG_ARM64_64K_PAGES
+-#define SWAPPER_PGTABLE_LEVELS=09(CONFIG_PGTABLE_LEVELS)
+-#else
++#if ARM64_SWAPPER_USES_SECTION_MAPS
+ #define SWAPPER_PGTABLE_LEVELS=09(CONFIG_PGTABLE_LEVELS - 1)
++#else
++#define SWAPPER_PGTABLE_LEVELS=09(CONFIG_PGTABLE_LEVELS)
+ #endif
+=20
+ #define SWAPPER_DIR_SIZE=09(SWAPPER_PGTABLE_LEVELS * PAGE_SIZE)
+ #define IDMAP_DIR_SIZE=09=09(3 * PAGE_SIZE)
+=20
+ /* Initial memory map size */
+-#ifdef CONFIG_ARM64_64K_PAGES
+-#define SWAPPER_BLOCK_SHIFT=09PAGE_SHIFT
+-#define SWAPPER_BLOCK_SIZE=09PAGE_SIZE
+-#define SWAPPER_TABLE_SHIFT=09PMD_SHIFT
+-#else
++#if ARM64_SWAPPER_USES_SECTION_MAPS
+ #define SWAPPER_BLOCK_SHIFT=09SECTION_SHIFT
+ #define SWAPPER_BLOCK_SIZE=09SECTION_SIZE
+ #define SWAPPER_TABLE_SHIFT=09PUD_SHIFT
++#else
++#define SWAPPER_BLOCK_SHIFT=09PAGE_SHIFT
++#define SWAPPER_BLOCK_SIZE=09PAGE_SIZE
++#define SWAPPER_TABLE_SHIFT=09PMD_SHIFT
+ #endif
+=20
++/* The size of the initial kernel direct mapping */
++#define SWAPPER_INIT_MAP_SIZE=09(_AC(1, UL) << SWAPPER_TABLE_SHIFT)
+=20
+ /*
+  * Initial memory map attributes.
+@@ -55,10 +64,10 @@
+ #define SWAPPER_PTE_FLAGS=09PTE_TYPE_PAGE | PTE_AF | PTE_SHARED
+ #define SWAPPER_PMD_FLAGS=09PMD_TYPE_SECT | PMD_SECT_AF | PMD_SECT_S
+=20
+-#ifdef CONFIG_ARM64_64K_PAGES
+-#define SWAPPER_MM_MMUFLAGS=09PTE_ATTRINDX(MT_NORMAL) | SWAPPER_PTE_FLAGS
+-#else
++#if ARM64_SWAPPER_USES_SECTION_MAPS
+ #define SWAPPER_MM_MMUFLAGS=09PMD_ATTRINDX(MT_NORMAL) | SWAPPER_PMD_FLAGS
++#else
++#define SWAPPER_MM_MMUFLAGS=09PTE_ATTRINDX(MT_NORMAL) | SWAPPER_PTE_FLAGS
+ #endif
+=20
+=20
+diff --git a/arch/arm64/mm/mmu.c b/arch/arm64/mm/mmu.c
+index 9211b85..f533312 100644
+--- a/arch/arm64/mm/mmu.c
++++ b/arch/arm64/mm/mmu.c
+@@ -32,6 +32,7 @@
+=20
+ #include <asm/cputype.h>
+ #include <asm/fixmap.h>
++#include <asm/kernel-pgtable.h>
+ #include <asm/sections.h>
+ #include <asm/setup.h>
+ #include <asm/sizes.h>
+@@ -353,14 +354,11 @@ static void __init map_mem(void)
+ =09 * memory addressable from the initial direct kernel mapping.
+ =09 *
+ =09 * The initial direct kernel mapping, located at swapper_pg_dir, gives
+-=09 * us PUD_SIZE (4K pages) or PMD_SIZE (64K pages) memory starting from
+-=09 * PHYS_OFFSET (which must be aligned to 2MB as per
+-=09 * Documentation/arm64/booting.txt).
++=09 * us PUD_SIZE (with SECTION maps, i.e, 4K) or PMD_SIZE (without
++=09 * SECTION maps, i.e, 64K pages) memory starting from PHYS_OFFSET
++=09 * (which must be aligned to 2MB as per Documentation/arm64/booting.txt=
+).
+ =09 */
+-=09if (IS_ENABLED(CONFIG_ARM64_64K_PAGES))
+-=09=09limit =3D PHYS_OFFSET + PMD_SIZE;
+-=09else
+-=09=09limit =3D PHYS_OFFSET + PUD_SIZE;
++=09limit =3D PHYS_OFFSET + SWAPPER_INIT_MAP_SIZE;
+ =09memblock_set_current_limit(limit);
+=20
+ =09/* map all the memory banks */
+@@ -371,21 +369,24 @@ static void __init map_mem(void)
+ =09=09if (start >=3D end)
+ =09=09=09break;
+=20
+-#ifndef CONFIG_ARM64_64K_PAGES
+-=09=09/*
+-=09=09 * For the first memory bank align the start address and
+-=09=09 * current memblock limit to prevent create_mapping() from
+-=09=09 * allocating pte page tables from unmapped memory.
+-=09=09 * When 64K pages are enabled, the pte page table for the
+-=09=09 * first PGDIR_SIZE is already present in swapper_pg_dir.
+-=09=09 */
+-=09=09if (start < limit)
+-=09=09=09start =3D ALIGN(start, PMD_SIZE);
+-=09=09if (end < limit) {
+-=09=09=09limit =3D end & PMD_MASK;
+-=09=09=09memblock_set_current_limit(limit);
++=09=09if (ARM64_SWAPPER_USES_SECTION_MAPS) {
++=09=09=09/*
++=09=09=09 * For the first memory bank align the start address and
++=09=09=09 * current memblock limit to prevent create_mapping() from
++=09=09=09 * allocating pte page tables from unmapped memory. With
++=09=09=09 * the section maps, if the first block doesn't end on section
++=09=09=09 * size boundary, create_mapping() will try to allocate a pte
++=09=09=09 * page, which may be returned from an unmapped area.
++=09=09=09 * When section maps are not used, the pte page table for the
++=09=09=09 * current limit is already present in swapper_pg_dir.
++=09=09=09 */
++=09=09=09if (start < limit)
++=09=09=09=09start =3D ALIGN(start, SECTION_SIZE);
++=09=09=09if (end < limit) {
++=09=09=09=09limit =3D end & SECTION_MASK;
++=09=09=09=09memblock_set_current_limit(limit);
++=09=09=09}
+ =09=09}
+-#endif
+ =09=09__map_memblock(start, end);
+ =09}
+=20
+@@ -498,7 +499,7 @@ int kern_addr_valid(unsigned long addr)
+ =09return pfn_valid(pte_pfn(*pte));
+ }
+ #ifdef CONFIG_SPARSEMEM_VMEMMAP
+-#ifdef CONFIG_ARM64_64K_PAGES
++#if !ARM64_SWAPPER_USES_SECTION_MAPS
+ int __meminit vmemmap_populate(unsigned long start, unsigned long end, int=
+ node)
+ {
+ =09return vmemmap_populate_basepages(start, end, node);
+@@ -638,7 +639,7 @@ void *__init fixmap_remap_fdt(phys_addr_t dt_phys)
+ {
+ =09const u64 dt_virt_base =3D __fix_to_virt(FIX_FDT);
+ =09pgprot_t prot =3D PAGE_KERNEL | PTE_RDONLY;
+-=09int granularity, size, offset;
++=09int size, offset;
+ =09void *dt_virt;
+=20
+ =09/*
+@@ -664,24 +665,15 @@ void *__init fixmap_remap_fdt(phys_addr_t dt_phys)
+ =09 */
+ =09BUILD_BUG_ON(dt_virt_base % SZ_2M);
+=20
+-=09if (IS_ENABLED(CONFIG_ARM64_64K_PAGES)) {
+-=09=09BUILD_BUG_ON(__fix_to_virt(FIX_FDT_END) >> PMD_SHIFT !=3D
+-=09=09=09     __fix_to_virt(FIX_BTMAP_BEGIN) >> PMD_SHIFT);
+-
+-=09=09granularity =3D PAGE_SIZE;
+-=09} else {
+-=09=09BUILD_BUG_ON(__fix_to_virt(FIX_FDT_END) >> PUD_SHIFT !=3D
+-=09=09=09     __fix_to_virt(FIX_BTMAP_BEGIN) >> PUD_SHIFT);
+-
+-=09=09granularity =3D PMD_SIZE;
+-=09}
++=09BUILD_BUG_ON(__fix_to_virt(FIX_FDT_END) >> SWAPPER_TABLE_SHIFT !=3D
++=09=09     __fix_to_virt(FIX_BTMAP_BEGIN) >> SWAPPER_TABLE_SHIFT);
+=20
+-=09offset =3D dt_phys % granularity;
++=09offset =3D dt_phys % SWAPPER_BLOCK_SIZE;
+ =09dt_virt =3D (void *)dt_virt_base + offset;
+=20
+ =09/* map the first chunk so we can read the size from the header */
+-=09create_mapping(round_down(dt_phys, granularity), dt_virt_base,
+-=09=09       granularity, prot);
++=09create_mapping(round_down(dt_phys, SWAPPER_BLOCK_SIZE), dt_virt_base,
++=09=09       SWAPPER_BLOCK_SIZE, prot);
+=20
+ =09if (fdt_check_header(dt_virt) !=3D 0)
+ =09=09return NULL;
+@@ -690,9 +682,9 @@ void *__init fixmap_remap_fdt(phys_addr_t dt_phys)
+ =09if (size > MAX_FDT_SIZE)
+ =09=09return NULL;
+=20
+-=09if (offset + size > granularity)
+-=09=09create_mapping(round_down(dt_phys, granularity), dt_virt_base,
+-=09=09=09       round_up(offset + size, granularity), prot);
++=09if (offset + size > SWAPPER_BLOCK_SIZE)
++=09=09create_mapping(round_down(dt_phys, SWAPPER_BLOCK_SIZE), dt_virt_base=
+,
++=09=09=09       round_up(offset + size, SWAPPER_BLOCK_SIZE), prot);
+=20
+ =09memblock_reserve(dt_phys, size);
+=20
+--=20
 1.7.9.5
+
