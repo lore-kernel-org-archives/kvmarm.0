@@ -1,23 +1,23 @@
 From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
-Subject: [PATCH 09/15] arm64: Add page size to the kernel image header
-Date: Tue, 15 Sep 2015 16:41:18 +0100
-Message-ID: <1442331684-28818-10-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH 03/15] arm64: Introduce helpers for page table levels
+Date: Tue, 15 Sep 2015 16:41:12 +0100
+Message-ID: <1442331684-28818-4-git-send-email-suzuki.poulose@arm.com>
 References: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B468E42E58
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 660A7412C2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mTuAmEGUmRvM for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Sep 2015 11:40:49 -0400 (EDT)
+ with ESMTP id vIaTzJjo6G9R for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Sep 2015 11:40:45 -0400 (EDT)
 Received: from eu-smtp-delivery-143.mimecast.com
  (eu-smtp-delivery-143.mimecast.com [146.101.78.143])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 12B9F412A6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 55C43412E6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:45 -0400 (EDT)
 In-Reply-To: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,55 +29,74 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, ard.biesheuvel@linaro.org, Marc.Zyngier@arm.com, Catalin.Marinas@arm.com, Will.Deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, ard.biesheuvel@linaro.org, Marc.Zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
 
-This patch adds the page size to the arm64 kernel image header
-so that one can infer the PAGESIZE used by the kernel. This will
-be helpful to diagnose failures to boot the kernel with page size
-not supported by the CPU.
+Introduce helpers for finding the number of page table
+levels required for a given VA width, shift for a particular
+page table level.
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Convert the existing users to the new helpers. More users
+to follow.
+
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Signed-off-by: Suzuki K. Poulose <suzuki.poulose@arm.com>
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- Documentation/arm64/booting.txt |    7 ++++++-
- arch/arm64/kernel/image.h       |    5 ++++-
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/pgtable-hwdef.h |   15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/arm64/booting.txt b/Documentation/arm64/booting.txt
-index 7d9d3c2..aaf6d77 100644
---- a/Documentation/arm64/booting.txt
-+++ b/Documentation/arm64/booting.txt
-@@ -104,7 +104,12 @@ Header notes:
- - The flags field (introduced in v3.17) is a little-endian 64-bit field
-   composed as follows:
-   Bit 0:	Kernel endianness.  1 if BE, 0 if LE.
--  Bits 1-63:	Reserved.
-+  Bit 1-2:	Kernel Page size.
-+			0 - Unspecified.
-+			1 - 4K
-+			2 - 16K
-+			3 - 64K
-+  Bits 3-63:	Reserved.
+diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+index 24154b0..ce18389 100644
+--- a/arch/arm64/include/asm/pgtable-hwdef.h
++++ b/arch/arm64/include/asm/pgtable-hwdef.h
+@@ -16,13 +16,21 @@
+ #ifndef __ASM_PGTABLE_HWDEF_H
+ #define __ASM_PGTABLE_HWDEF_H
  
- - When image_size is zero, a bootloader should attempt to keep as much
-   memory as possible free for use by the kernel immediately after the
-diff --git a/arch/arm64/kernel/image.h b/arch/arm64/kernel/image.h
-index 8fae075..73b736c 100644
---- a/arch/arm64/kernel/image.h
-+++ b/arch/arm64/kernel/image.h
-@@ -47,7 +47,10 @@
- #define __HEAD_FLAG_BE	0
- #endif
- 
--#define __HEAD_FLAGS	(__HEAD_FLAG_BE << 0)
-+#define __HEAD_FLAG_PAGE_SIZE ((PAGE_SHIFT - 10) / 2)
++/*
++ * Number of page-table levels required to address 'va_bits' wide
++ * address, without section mapping
++ */
++#define ARM64_HW_PGTABLE_LEVELS(va_bits) (((va_bits) - 4) / (PAGE_SHIFT - 3))
++#define ARM64_HW_PGTABLE_LEVEL_SHIFT(level) \
++		((PAGE_SHIFT - 3) * (level) + 3)
 +
-+#define __HEAD_FLAGS	(__HEAD_FLAG_BE << 0) |		\
-+			(__HEAD_FLAG_PAGE_SIZE << 1)
+ #define PTRS_PER_PTE		(1 << (PAGE_SHIFT - 3))
  
  /*
-  * These will output as part of the Image header, which should be little-endian
+  * PMD_SHIFT determines the size a level 2 page table entry can map.
+  */
+ #if CONFIG_PGTABLE_LEVELS > 2
+-#define PMD_SHIFT		((PAGE_SHIFT - 3) * 2 + 3)
++#define PMD_SHIFT		ARM64_HW_PGTABLE_LEVEL_SHIFT(2)
+ #define PMD_SIZE		(_AC(1, UL) << PMD_SHIFT)
+ #define PMD_MASK		(~(PMD_SIZE-1))
+ #define PTRS_PER_PMD		PTRS_PER_PTE
+@@ -32,7 +40,7 @@
+  * PUD_SHIFT determines the size a level 1 page table entry can map.
+  */
+ #if CONFIG_PGTABLE_LEVELS > 3
+-#define PUD_SHIFT		((PAGE_SHIFT - 3) * 3 + 3)
++#define PUD_SHIFT		ARM64_HW_PGTABLE_LEVEL_SHIFT(3)
+ #define PUD_SIZE		(_AC(1, UL) << PUD_SHIFT)
+ #define PUD_MASK		(~(PUD_SIZE-1))
+ #define PTRS_PER_PUD		PTRS_PER_PTE
+@@ -42,7 +50,8 @@
+  * PGDIR_SHIFT determines the size a top-level page table entry can map
+  * (depending on the configuration, this level can be 0, 1 or 2).
+  */
+-#define PGDIR_SHIFT		((PAGE_SHIFT - 3) * CONFIG_PGTABLE_LEVELS + 3)
++#define PGDIR_SHIFT	\
++		ARM64_HW_PGTABLE_LEVEL_SHIFT(CONFIG_PGTABLE_LEVELS)
+ #define PGDIR_SIZE		(_AC(1, UL) << PGDIR_SHIFT)
+ #define PGDIR_MASK		(~(PGDIR_SIZE-1))
+ #define PTRS_PER_PGD		(1 << (VA_BITS - PGDIR_SHIFT))
 -- 
 1.7.9.5
