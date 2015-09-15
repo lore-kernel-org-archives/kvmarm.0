@@ -1,23 +1,23 @@
 From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
-Subject: [PATCH 04/15] arm64: Calculate size for idmap_pg_dir at compile time
-Date: Tue, 15 Sep 2015 16:41:13 +0100
-Message-ID: <1442331684-28818-5-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH 08/15] arm64: Check for selected granule support
+Date: Tue, 15 Sep 2015 16:41:17 +0100
+Message-ID: <1442331684-28818-9-git-send-email-suzuki.poulose@arm.com>
 References: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2253941479
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A7E9541CC1
  for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4JMs-5BGLUj1 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id xtvYW7L3vJL6 for <kvmarm@lists.cs.columbia.edu>;
  Tue, 15 Sep 2015 11:40:46 -0400 (EDT)
 Received: from eu-smtp-delivery-143.mimecast.com
  (eu-smtp-delivery-143.mimecast.com [146.101.78.143])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE16941349
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 91B4A412C2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:46 -0400 (EDT)
 In-Reply-To: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,12 +34,9 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
 
-Now that we can calculate the number of levels required for
-mapping a va width, reserve exact number of pages that would
-be required to cover the idmap. The idmap should be able to handle
-the maximum physical address size supported.
+Ensure that the selected page size is supported by the
+CPU(s).
 
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc: Mark Rutland <mark.rutland@arm.com>
 Cc: Catalin Marinas <catalin.marinas@arm.com>
 Cc: Will Deacon <will.deacon@arm.com>
@@ -47,47 +44,76 @@ Signed-off-by: Suzuki K. Poulose <suzuki.poulose@arm.com>
 Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/include/asm/boot.h           |    1 +
- arch/arm64/include/asm/kernel-pgtable.h |    7 +++++--
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/sysreg.h |    6 ++++++
+ arch/arm64/kernel/head.S        |   24 +++++++++++++++++++++++-
+ 2 files changed, 29 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/boot.h b/arch/arm64/include/asm/boot.h
-index 81151b6..678b63e 100644
---- a/arch/arm64/include/asm/boot.h
-+++ b/arch/arm64/include/asm/boot.h
-@@ -2,6 +2,7 @@
- #ifndef __ASM_BOOT_H
- #define __ASM_BOOT_H
- 
-+#include <asm/page.h>
- #include <asm/sizes.h>
- 
- /*
-diff --git a/arch/arm64/include/asm/kernel-pgtable.h b/arch/arm64/include/asm/kernel-pgtable.h
-index 5876a36..def7168 100644
---- a/arch/arm64/include/asm/kernel-pgtable.h
-+++ b/arch/arm64/include/asm/kernel-pgtable.h
-@@ -33,16 +33,19 @@
-  * map to pte level. The swapper also maps the FDT (see __create_page_tables
-  * for more information). Note that the number of ID map translation levels
-  * could be increased on the fly if system RAM is out of reach for the default
-- * VA range, so 3 pages are reserved in all cases.
-+ * VA range, so pages required to map highest possible PA are reserved in all
-+ * cases.
-  */
- #if ARM64_SWAPPER_USES_SECTION_MAPS
- #define SWAPPER_PGTABLE_LEVELS	(CONFIG_PGTABLE_LEVELS - 1)
-+#define IDMAP_PGTABLE_LEVELS	(ARM64_HW_PGTABLE_LEVELS(PHYS_MASK_SHIFT) - 1)
- #else
- #define SWAPPER_PGTABLE_LEVELS	(CONFIG_PGTABLE_LEVELS)
-+#define IDMAP_PGTABLE_LEVELS	(ARM64_HW_PGTABLE_LEVELS(PHYS_MASK_SHIFT))
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index a7f3d4b..e01d323 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -87,4 +87,10 @@ static inline void config_sctlr_el1(u32 clear, u32 set)
+ }
  #endif
  
- #define SWAPPER_DIR_SIZE	(SWAPPER_PGTABLE_LEVELS * PAGE_SIZE)
--#define IDMAP_DIR_SIZE		(3 * PAGE_SIZE)
-+#define IDMAP_DIR_SIZE		(IDMAP_PGTABLE_LEVELS * PAGE_SIZE)
++#define ID_AA64MMFR0_TGran4_SHIFT	28
++#define ID_AA64MMFR0_TGran64_SHIFT	24
++
++#define ID_AA64MMFR0_TGran4_ENABLED	0x0
++#define ID_AA64MMFR0_TGran64_ENABLED	0x0
++
+ #endif	/* __ASM_SYSREG_H */
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index 01b8e58..0cb04db 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -31,10 +31,11 @@
+ #include <asm/cputype.h>
+ #include <asm/kernel-pgtable.h>
+ #include <asm/memory.h>
+-#include <asm/thread_info.h>
+ #include <asm/pgtable-hwdef.h>
+ #include <asm/pgtable.h>
+ #include <asm/page.h>
++#include <asm/sysreg.h>
++#include <asm/thread_info.h>
+ #include <asm/virt.h>
  
- /* Initial memory map size */
- #if ARM64_SWAPPER_USES_SECTION_MAPS
+ #define __PHYS_OFFSET	(KERNEL_START - TEXT_OFFSET)
+@@ -606,9 +607,25 @@ ENDPROC(__secondary_switched)
+  *  x27 = *virtual* address to jump to upon completion
+  *
+  * other registers depend on the function called upon completion
++ * Checks if the selected granule size is supported by the CPU.
+  */
++#if	defined(CONFIG_ARM64_64K_PAGES)
++
++#define ID_AA64MMFR0_TGran_SHIFT	ID_AA64MMFR0_TGran64_SHIFT
++#define ID_AA64MMFR0_TGran_ENABLED	ID_AA64MMFR0_TGran64_ENABLED
++
++#else
++
++#define ID_AA64MMFR0_TGran_SHIFT	ID_AA64MMFR0_TGran4_SHIFT
++#define ID_AA64MMFR0_TGran_ENABLED	ID_AA64MMFR0_TGran4_ENABLED
++
++#endif
+ 	.section	".idmap.text", "ax"
+ __enable_mmu:
++	mrs	x1, ID_AA64MMFR0_EL1
++	ubfx	x2, x1, #ID_AA64MMFR0_TGran_SHIFT, 4
++	cmp	x2, #ID_AA64MMFR0_TGran_ENABLED
++	b.ne	__no_granule_support
+ 	ldr	x5, =vectors
+ 	msr	vbar_el1, x5
+ 	msr	ttbr0_el1, x25			// load TTBR0
+@@ -626,3 +643,8 @@ __enable_mmu:
+ 	isb
+ 	br	x27
+ ENDPROC(__enable_mmu)
++
++__no_granule_support:
++	wfe
++	b __no_granule_support
++ENDPROC(__no_granule_support)
 -- 
 1.7.9.5
