@@ -1,30 +1,22 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v2 6/8] arm/arm64: KVM: Add forwarded physical interrupts
- documentation
-Date: Tue, 15 Sep 2015 16:16:07 +0100
-Message-ID: <55F83637.3060400@arm.com>
-References: <1441395650-19663-1-git-send-email-christoffer.dall@linaro.org>
- <1441395650-19663-7-git-send-email-christoffer.dall@linaro.org>
- <55ED7427.1020901@arm.com> <55EE9FA4.3060204@linaro.org>
- <55EF1389.10802@arm.com>
- <CAMJs5B_Qxkfu=KSA0oUm386_mgZ73_NQEqS6e+gBGxwBMJVezg@mail.gmail.com>
- <55F2B932.2030901@arm.com> <20150914114219.GJ15712@cbox>
+From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
+Subject: [PATCHv2 00/15] arm64: 16K translation granule support
+Date: Tue, 15 Sep 2015 16:41:09 +0100
+Message-ID: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D0196412C2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:13:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ECD6A412EF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:44 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yHAdA5gzWcUS for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Sep 2015 11:13:53 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DCB940FB3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:13:52 -0400 (EDT)
-In-Reply-To: <20150914114219.GJ15712@cbox>
+ with ESMTP id 738wMXocF9qF for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Sep 2015 11:40:43 -0400 (EDT)
+Received: from eu-smtp-delivery-143.mimecast.com
+ (eu-smtp-delivery-143.mimecast.com [146.101.78.143])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A9488412A6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:43 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,126 +26,84 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, ard.biesheuvel@linaro.org, Marc.Zyngier@arm.com, Catalin.Marinas@arm.com, Will.Deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
+From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
 
-On 14/09/15 12:42, Christoffer Dall wrote:
-....
->>>> Where is this done? I see that the physical dist state is altered on the
->>>> actual IRQ forwarding, but not on later exits/entries? Do you mean
->>>> kvm_vgic_flush_hwstate() with "flush"?
->>>
->>> this is a bug and should be fixed in the 'fixes' patches I sent last
->>> week.  We should set active state on every entry to the guest for IRQs
->>> with the HW bit set in either pending or active state.
->>
->> OK, sorry, I missed that one patch, I was looking at what should become
->> -rc1 soon (because that's what I want to rebase my ITS emulation patches
->> on). That patch wasn't in queue at the time I started looking at it.
->>
->> So I updated to the latest queue containing those two fixes and also
->> applied your v2 series. Indeed this series addresses some of the things
->> I was wondering about the last time, but the main thing still persists:
->> - Every time the physical dist state is active we have the virtual state
->> still at pending or active.
-> 
-> For the arch timer, yes.
-> 
-> For a passthrough device, there should be a situation where the physical
-> dist state is active but we didn't see the virtual state updated at the
-> vgic yet (after physical IRQ fires and before the VFIO ISR calls
-> kvm_set_irq).
+This series enables the 16K page size support on Linux for arm64.
+Adds support for 48bit VA(4 level), 47bit VA(3 level) and
+36bit VA(2 level) with 16K. 16K was a late addition to the architecture
+and is not implemented by all CPUs. Added a check to ensure the
+selected granule size is supported by the CPU, failing which the CPU
+won't proceed with booting. Also the kernel page size is added to the
+kernel image header (patch from Ard).
 
-But then we wouldn't get into vgic_sync_hwirq(), because we wouldn't
-inject a mapped IRQ before kvm_set_irq() is called, would we?
+KVM bits have been tested on a fast model with GICv3 using kvmtool [1].
 
->> - If the physical dist state is non-active, the virtual state is
->> inactive (LR.state==8: HW bit) as well. The associated ELRSR bit is 1
->> (LR empty).
->> (I was tracing every HW mapped LR in vgic_sync_hwirq() for this)
->>
->> So that contradicts:
->>
->> +  - On guest EOI, the *physical distributor* active bit gets cleared,
->> +    but the LR.Active is left untouched (set).
->>
->> This is the main point I was actually wondering about: I cannot confirm
->> this statement. In my tests the LR state and the physical dist state
->> always correspond, as excepted by reading the spec.
->>
->> I reckon that these observations are mostly independent from the actual
->> KVM code, as I try to observe hardware state (physical distributor and
->> LRs) before KVM tinkers with them.
-> 
-> ok, I got this paragraph from Marc, so we really need to ask him?  Which
-> hardware are you seeing this behavior on?  Perhaps implementations vary
-> on this point?
+Patches 1-7	cleans up the kernel page size handling code.
+Patch 8		Adds a check to ensure the CPU supports the selected granule size.
+Patch 9		Adds the page size information to image header.
+Patches 10-13	Fixes some issues with the KVM bits, mainly the fake PGD
+             	handling code.
+Patches 14-15	Adds the 16k page size support bits.
 
-I checked this on Midway and Juno. Both have a GIC-400, but I don't have
-access to any other GIC implementations.
-I added the two BUG_ONs shown below to prove that assumption.
+This series applies on top of 4.3-rc1.
 
-Eric, I've been told you observed the behaviour with the GIC not syncing
-LR and phys state for a mapped HWIRQ which was not the timer.
-Can you reproduce this? Does it complain with the patch below?
+The tree is also available here:
 
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 5942ce9..7fac16e 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -1459,9 +1459,12 @@ static bool vgic_sync_hwirq(struct kvm_vcpu
- 					     IRQCHIP_STATE_ACTIVE,
- 					     false);
- 		WARN_ON(ret);
-+		BUG_ON(!(vlr.state & 3));
- 		return false;
- 	}
+        git://linux-arm.org/linux-skp.git  16k/v2-4.3-rc1
 
-+	BUG_ON(vlr.state & 3);
-+
- 	return process_queued_irq(vcpu, lr, vlr);
- }
+Changes since V1:
+  - Rebase to 4.3-rc1
+  - Fix vmemmap_populate for 16K (use !ARM64_SWAPPER_USES_SECTION_MAPS)
+  - Better description for patch2 (suggested-by: Ard)
+  - Add page size information to the image header flags.
+  - Added reviewed-by/tested-by Ard.
 
-> 
-> I have no objections removing this point from the doc though, I'm just
-> relaying information on this one.
+[1] git://git.kernel.org/pub/scm/linux/kernel/git/will/kvmtool.git
 
-I see, I talked with Marc and I am about to gather more data with the
-above patch to prove that this never happens.
+Ard Biesheuvel (1):
+  arm64: Add page size to the kernel image header
 
->>
->> ...
->>
->>>
->>>> Is this an observation, an implementation bug or is this mentioned in
->>>> the spec? Needing to spoon-feed the VGIC by doing it's job sounds a bit
->>>> awkward to me.
->>>
->>> What do you mean?  How are we spoon-feeding the VGIC?
->>
->> By looking at the physical dist state and all LRs and clearing the LR we
->> do what the GIC is actually supposed to do for us - and what it actually
->> does according to my observations.
->>
->> The point is that patch 1 in my ITS emulation series is reworking the LR
->> handling and this patch was based on assumptions that seem to be no
->> longer true (i.e. we don't care about inactive LRs except for our LR
->> mapping code). So I want to be sure that I fully get what is going on
->> here and I struggle at this at the moment due to the above statement.
->>
->> What are the plans regarding your "v2: Rework architected timer..."
->> series? Will this be queued for 4.4? I want to do the
->> rebasing^Wrewriting of my series only once if possible ;-)
->>
-> I think we should settle on this series ASAP and base your ITS stuff on
-> top of it.  What do you think?
+Suzuki K. Poulose (14):
+  arm64: Move swapper pagetable definitions
+  arm64: Handle section maps for swapper/idmap
+  arm64: Introduce helpers for page table levels
+  arm64: Calculate size for idmap_pg_dir at compile time
+  arm64: Handle 4 level page table for swapper
+  arm64: Clean config usages for page size
+  arm64: Kconfig: Fix help text about AArch32 support with 64K pages
+  arm64: Check for selected granule support
+  arm64: kvm: Fix {V}TCR_EL2_TG0 mask
+  arm64: Cleanup VTCR_EL2 computation
+  arm: kvm: Move fake PGD handling to arch specific files
+  arm64: kvm: Rewrite fake pgd handling
+  arm64: Add 16K page size support
+  arm64: 36 bit VA
 
-Yeah, that's what I was thinking too. So I will be working against
-4.3-rc1 with your timer-rework-v2 branch plus the other fixes from the
-kvm-arm queue merged.
+ Documentation/arm64/booting.txt         |    7 +-
+ arch/arm/include/asm/kvm_mmu.h          |    7 ++
+ arch/arm/kvm/mmu.c                      |   44 ++--------
+ arch/arm64/Kconfig                      |   37 +++++++--
+ arch/arm64/Kconfig.debug                |    2 +-
+ arch/arm64/include/asm/boot.h           |    1 +
+ arch/arm64/include/asm/fixmap.h         |    4 +-
+ arch/arm64/include/asm/kernel-pgtable.h |   77 ++++++++++++++++++
+ arch/arm64/include/asm/kvm_arm.h        |   29 +++++--
+ arch/arm64/include/asm/kvm_mmu.h        |  135 +++++++++++++++++++++----------
+ arch/arm64/include/asm/page.h           |   20 +----
+ arch/arm64/include/asm/pgtable-hwdef.h  |   15 +++-
+ arch/arm64/include/asm/sysreg.h         |    8 ++
+ arch/arm64/include/asm/thread_info.h    |    4 +-
+ arch/arm64/kernel/head.S                |   71 +++++++++-------
+ arch/arm64/kernel/image.h               |    5 +-
+ arch/arm64/kernel/vmlinux.lds.S         |    1 +
+ arch/arm64/mm/mmu.c                     |   72 ++++++++---------
+ arch/arm64/mm/proc.S                    |    4 +-
+ 19 files changed, 348 insertions(+), 195 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kernel-pgtable.h
 
-Cheers,
-Andre.
+-- 
+1.7.9.5
