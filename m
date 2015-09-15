@@ -1,24 +1,22 @@
-From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
-Subject: [PATCH 12/15] arm: kvm: Move fake PGD handling to arch specific files
-Date: Tue, 15 Sep 2015 16:41:21 +0100
-Message-ID: <1442331684-28818-13-git-send-email-suzuki.poulose@arm.com>
-References: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: [PATCH] KVM: arm64: remove all traces of the ThumbEE registers
+Date: Tue, 15 Sep 2015 17:15:33 +0100
+Message-ID: <1442333733-16347-1-git-send-email-will.deacon@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A0643418D8
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D367041300
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 12:14:35 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YSKNBAqBDbkQ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Sep 2015 11:40:49 -0400 (EDT)
-Received: from eu-smtp-delivery-143.mimecast.com
- (eu-smtp-delivery-143.mimecast.com [146.101.78.143])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DDB6041AF6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:47 -0400 (EDT)
-In-Reply-To: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
+ with ESMTP id p+XjB9Vyg2Ge for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Sep 2015 12:14:34 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C820411E3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 12:14:33 -0400 (EDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,160 +26,113 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, ard.biesheuvel@linaro.org, Marc.Zyngier@arm.com, Catalin.Marinas@arm.com, Will.Deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
+Although the ThumbEE registers and traps were present in earlier
+versions of the v8 architecture, it was retrospectively removed and so
+we can do the same.
 
-Rearrange the code for fake pgd handling, which is applicable
-to only ARM64. The intention is to keep the common code cleaner,
-unaware of the underlying hacks.
-
-Cc: kvmarm@lists.cs.columbia.edu
-Cc: christoffer.dall@linaro.org
-Cc: Marc.Zyngier@arm.com
-Signed-off-by: Suzuki K. Poulose <suzuki.poulose@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Will Deacon <will.deacon@arm.com>
 ---
- arch/arm/include/asm/kvm_mmu.h   |    7 ++++++
- arch/arm/kvm/mmu.c               |   44 +++++---------------------------------
- arch/arm64/include/asm/kvm_mmu.h |   43 +++++++++++++++++++++++++++++++++++++
- 3 files changed, 55 insertions(+), 39 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h |  1 -
+ arch/arm64/include/asm/kvm_asm.h |  4 +---
+ arch/arm64/kvm/hyp.S             | 22 ++++------------------
+ arch/arm64/kvm/sys_regs.c        |  7 -------
+ 4 files changed, 5 insertions(+), 29 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 405aa18..1c9aa8a 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -173,6 +173,13 @@ static inline unsigned int kvm_get_hwpgd_size(void)
- 	return PTRS_PER_S2_PGD * sizeof(pgd_t);
- }
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 7605e095217f..cdc9888134e5 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -168,7 +168,6 @@
+ #define VTTBR_VMID_MASK	  (UL(0xFF) << VTTBR_VMID_SHIFT)
  
-+static inline pgd_t *kvm_setup_fake_pgd(pgd_t *pgd)
-+{
-+	return pgd;
-+}
-+
-+static inline void kvm_free_fake_pgd(pgd_t *pgd) {}
-+
- struct kvm;
+ /* Hyp System Trap Register */
+-#define HSTR_EL2_TTEE	(1 << 16)
+ #define HSTR_EL2_T(x)	(1 << x)
  
- #define kvm_flush_dcache_to_poc(a,l)	__cpuc_flush_dcache_area((a), (l))
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 7b42012..b210622 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -677,43 +677,11 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
- 	 * guest, we allocate a fake PGD and pre-populate it to point
- 	 * to the next-level page table, which will be the real
- 	 * initial page table pointed to by the VTTBR.
--	 *
--	 * When KVM_PREALLOC_LEVEL==2, we allocate a single page for
--	 * the PMD and the kernel will use folded pud.
--	 * When KVM_PREALLOC_LEVEL==1, we allocate 2 consecutive PUD
--	 * pages.
- 	 */
--	if (KVM_PREALLOC_LEVEL > 0) {
--		int i;
+ /* Hyp Coproccessor Trap Register Shifts */
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 67fa0de3d483..5e377101f919 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -53,9 +53,7 @@
+ #define	IFSR32_EL2	25	/* Instruction Fault Status Register */
+ #define	FPEXC32_EL2	26	/* Floating-Point Exception Control Register */
+ #define	DBGVCR32_EL2	27	/* Debug Vector Catch Register */
+-#define	TEECR32_EL1	28	/* ThumbEE Configuration Register */
+-#define	TEEHBR32_EL1	29	/* ThumbEE Handler Base Register */
+-#define	NR_SYS_REGS	30
++#define	NR_SYS_REGS	28
+ 
+ /* 32bit mapping */
+ #define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
+diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+index 6addf97aadb3..c4016d411f4a 100644
+--- a/arch/arm64/kvm/hyp.S
++++ b/arch/arm64/kvm/hyp.S
+@@ -433,20 +433,13 @@
+ 	mrs	x5, ifsr32_el2
+ 	stp	x4, x5, [x3]
+ 
+-	skip_fpsimd_state x8, 3f
++	skip_fpsimd_state x8, 2f
+ 	mrs	x6, fpexc32_el2
+ 	str	x6, [x3, #16]
+-3:
+-	skip_debug_state x8, 2f
++2:
++	skip_debug_state x8, 1f
+ 	mrs	x7, dbgvcr32_el2
+ 	str	x7, [x3, #24]
+-2:
+-	skip_tee_state x8, 1f
 -
--		/*
--		 * Allocate fake pgd for the page table manipulation macros to
--		 * work.  This is not used by the hardware and we have no
--		 * alignment requirement for this allocation.
--		 */
--		pgd = kmalloc(PTRS_PER_S2_PGD * sizeof(pgd_t),
--				GFP_KERNEL | __GFP_ZERO);
+-	add	x3, x2, #CPU_SYSREG_OFFSET(TEECR32_EL1)
+-	mrs	x4, teecr32_el1
+-	mrs	x5, teehbr32_el1
+-	stp	x4, x5, [x3]
+ 1:
+ .endm
+ 
+@@ -466,16 +459,9 @@
+ 	msr	dacr32_el2, x4
+ 	msr	ifsr32_el2, x5
+ 
+-	skip_debug_state x8, 2f
++	skip_debug_state x8, 1f
+ 	ldr	x7, [x3, #24]
+ 	msr	dbgvcr32_el2, x7
+-2:
+-	skip_tee_state x8, 1f
 -
--		if (!pgd) {
--			kvm_free_hwpgd(hwpgd);
--			return -ENOMEM;
--		}
+-	add	x3, x2, #CPU_SYSREG_OFFSET(TEECR32_EL1)
+-	ldp	x4, x5, [x3]
+-	msr	teecr32_el1, x4
+-	msr	teehbr32_el1, x5
+ 1:
+ .endm
+ 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index b41607d270ac..6c35e49757d8 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -539,13 +539,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ Op0(0b10), Op1(0b000), CRn(0b0111), CRm(0b1110), Op2(0b110),
+ 	  trap_dbgauthstatus_el1 },
+ 
+-	/* TEECR32_EL1 */
+-	{ Op0(0b10), Op1(0b010), CRn(0b0000), CRm(0b0000), Op2(0b000),
+-	  NULL, reset_val, TEECR32_EL1, 0 },
+-	/* TEEHBR32_EL1 */
+-	{ Op0(0b10), Op1(0b010), CRn(0b0001), CRm(0b0000), Op2(0b000),
+-	  NULL, reset_val, TEEHBR32_EL1, 0 },
 -
--		/* Plug the HW PGD into the fake one. */
--		for (i = 0; i < PTRS_PER_S2_PGD; i++) {
--			if (KVM_PREALLOC_LEVEL == 1)
--				pgd_populate(NULL, pgd + i,
--					     (pud_t *)hwpgd + i * PTRS_PER_PUD);
--			else if (KVM_PREALLOC_LEVEL == 2)
--				pud_populate(NULL, pud_offset(pgd, 0) + i,
--					     (pmd_t *)hwpgd + i * PTRS_PER_PMD);
--		}
--	} else {
--		/*
--		 * Allocate actual first-level Stage-2 page table used by the
--		 * hardware for Stage-2 page table walks.
--		 */
--		pgd = (pgd_t *)hwpgd;
-+	pgd = kvm_setup_fake_pgd(hwpgd);
-+	if (IS_ERR(pgd)) {
-+		kvm_free_hwpgd(hwpgd);
-+		return PTR_ERR(pgd);
- 	}
- 
- 	kvm_clean_pgd(pgd);
-@@ -820,9 +788,7 @@ void kvm_free_stage2_pgd(struct kvm *kvm)
- 
- 	unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
- 	kvm_free_hwpgd(kvm_get_hwpgd(kvm));
--	if (KVM_PREALLOC_LEVEL > 0)
--		kfree(kvm->arch.pgd);
--
-+	kvm_free_fake_pgd(kvm->arch.pgd);
- 	kvm->arch.pgd = NULL;
- }
- 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 6150567..2567fe8 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -198,6 +198,49 @@ static inline unsigned int kvm_get_hwpgd_size(void)
- 	return PTRS_PER_S2_PGD * sizeof(pgd_t);
- }
- 
-+/*
-+ * Allocate fake pgd for the page table manipulation macros to
-+ * work.  This is not used by the hardware and we have no
-+ * alignment requirement for this allocation.
-+ */
-+static inline pgd_t* kvm_setup_fake_pgd(pgd_t *hwpgd)
-+{
-+	int i;
-+	pgd_t *pgd;
-+
-+	if (!KVM_PREALLOC_LEVEL)
-+		return hwpgd;
-+	/*
-+	 * When KVM_PREALLOC_LEVEL==2, we allocate a single page for
-+	 * the PMD and the kernel will use folded pud.
-+	 * When KVM_PREALLOC_LEVEL==1, we allocate 2 consecutive PUD
-+	 * pages.
-+	 */
-+	pgd = kmalloc(PTRS_PER_S2_PGD * sizeof(pgd_t),
-+			GFP_KERNEL | __GFP_ZERO);
-+
-+	if (!pgd)
-+		return ERR_PTR(-ENOMEM);
-+
-+	/* Plug the HW PGD into the fake one. */
-+	for (i = 0; i < PTRS_PER_S2_PGD; i++) {
-+		if (KVM_PREALLOC_LEVEL == 1)
-+			pgd_populate(NULL, pgd + i,
-+				     (pud_t *)hwpgd + i * PTRS_PER_PUD);
-+		else if (KVM_PREALLOC_LEVEL == 2)
-+			pud_populate(NULL, pud_offset(pgd, 0) + i,
-+				     (pmd_t *)hwpgd + i * PTRS_PER_PMD);
-+	}
-+
-+	return pgd;
-+}
-+
-+static inline void kvm_free_fake_pgd(pgd_t *pgd)
-+{
-+	if (KVM_PREALLOC_LEVEL > 0)
-+		kfree(pgd);
-+}
-+
- static inline bool kvm_page_empty(void *ptr)
- {
- 	struct page *ptr_page = virt_to_page(ptr);
+ 	/* MDCCSR_EL1 */
+ 	{ Op0(0b10), Op1(0b011), CRn(0b0000), CRm(0b0001), Op2(0b000),
+ 	  trap_raz_wi },
 -- 
-1.7.9.5
+2.1.4
