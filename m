@@ -1,23 +1,23 @@
 From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
-Subject: [PATCH 08/15] arm64: Check for selected granule support
-Date: Tue, 15 Sep 2015 16:41:17 +0100
-Message-ID: <1442331684-28818-9-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH 09/15] arm64: Add page size to the kernel image header
+Date: Tue, 15 Sep 2015 16:41:18 +0100
+Message-ID: <1442331684-28818-10-git-send-email-suzuki.poulose@arm.com>
 References: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A7E9541CC1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B468E42E58
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xtvYW7L3vJL6 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Sep 2015 11:40:46 -0400 (EDT)
+ with ESMTP id mTuAmEGUmRvM for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Sep 2015 11:40:49 -0400 (EDT)
 Received: from eu-smtp-delivery-143.mimecast.com
  (eu-smtp-delivery-143.mimecast.com [146.101.78.143])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 91B4A412C2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 12B9F412A6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Sep 2015 11:40:47 -0400 (EDT)
 In-Reply-To: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,91 +29,55 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, ard.biesheuvel@linaro.org, Marc.Zyngier@arm.com, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, ard.biesheuvel@linaro.org, Marc.Zyngier@arm.com, Catalin.Marinas@arm.com, Will.Deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Ensure that the selected page size is supported by the
-CPU(s).
+This patch adds the page size to the arm64 kernel image header
+so that one can infer the PAGESIZE used by the kernel. This will
+be helpful to diagnose failures to boot the kernel with page size
+not supported by the CPU.
 
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Signed-off-by: Suzuki K. Poulose <suzuki.poulose@arm.com>
-Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/include/asm/sysreg.h |    6 ++++++
- arch/arm64/kernel/head.S        |   24 +++++++++++++++++++++++-
- 2 files changed, 29 insertions(+), 1 deletion(-)
+ Documentation/arm64/booting.txt |    7 ++++++-
+ arch/arm64/kernel/image.h       |    5 ++++-
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index a7f3d4b..e01d323 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -87,4 +87,10 @@ static inline void config_sctlr_el1(u32 clear, u32 set)
- }
+diff --git a/Documentation/arm64/booting.txt b/Documentation/arm64/booting.txt
+index 7d9d3c2..aaf6d77 100644
+--- a/Documentation/arm64/booting.txt
++++ b/Documentation/arm64/booting.txt
+@@ -104,7 +104,12 @@ Header notes:
+ - The flags field (introduced in v3.17) is a little-endian 64-bit field
+   composed as follows:
+   Bit 0:	Kernel endianness.  1 if BE, 0 if LE.
+-  Bits 1-63:	Reserved.
++  Bit 1-2:	Kernel Page size.
++			0 - Unspecified.
++			1 - 4K
++			2 - 16K
++			3 - 64K
++  Bits 3-63:	Reserved.
+ 
+ - When image_size is zero, a bootloader should attempt to keep as much
+   memory as possible free for use by the kernel immediately after the
+diff --git a/arch/arm64/kernel/image.h b/arch/arm64/kernel/image.h
+index 8fae075..73b736c 100644
+--- a/arch/arm64/kernel/image.h
++++ b/arch/arm64/kernel/image.h
+@@ -47,7 +47,10 @@
+ #define __HEAD_FLAG_BE	0
  #endif
  
-+#define ID_AA64MMFR0_TGran4_SHIFT	28
-+#define ID_AA64MMFR0_TGran64_SHIFT	24
+-#define __HEAD_FLAGS	(__HEAD_FLAG_BE << 0)
++#define __HEAD_FLAG_PAGE_SIZE ((PAGE_SHIFT - 10) / 2)
 +
-+#define ID_AA64MMFR0_TGran4_ENABLED	0x0
-+#define ID_AA64MMFR0_TGran64_ENABLED	0x0
-+
- #endif	/* __ASM_SYSREG_H */
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index 01b8e58..0cb04db 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -31,10 +31,11 @@
- #include <asm/cputype.h>
- #include <asm/kernel-pgtable.h>
- #include <asm/memory.h>
--#include <asm/thread_info.h>
- #include <asm/pgtable-hwdef.h>
- #include <asm/pgtable.h>
- #include <asm/page.h>
-+#include <asm/sysreg.h>
-+#include <asm/thread_info.h>
- #include <asm/virt.h>
++#define __HEAD_FLAGS	(__HEAD_FLAG_BE << 0) |		\
++			(__HEAD_FLAG_PAGE_SIZE << 1)
  
- #define __PHYS_OFFSET	(KERNEL_START - TEXT_OFFSET)
-@@ -606,9 +607,25 @@ ENDPROC(__secondary_switched)
-  *  x27 = *virtual* address to jump to upon completion
-  *
-  * other registers depend on the function called upon completion
-+ * Checks if the selected granule size is supported by the CPU.
-  */
-+#if	defined(CONFIG_ARM64_64K_PAGES)
-+
-+#define ID_AA64MMFR0_TGran_SHIFT	ID_AA64MMFR0_TGran64_SHIFT
-+#define ID_AA64MMFR0_TGran_ENABLED	ID_AA64MMFR0_TGran64_ENABLED
-+
-+#else
-+
-+#define ID_AA64MMFR0_TGran_SHIFT	ID_AA64MMFR0_TGran4_SHIFT
-+#define ID_AA64MMFR0_TGran_ENABLED	ID_AA64MMFR0_TGran4_ENABLED
-+
-+#endif
- 	.section	".idmap.text", "ax"
- __enable_mmu:
-+	mrs	x1, ID_AA64MMFR0_EL1
-+	ubfx	x2, x1, #ID_AA64MMFR0_TGran_SHIFT, 4
-+	cmp	x2, #ID_AA64MMFR0_TGran_ENABLED
-+	b.ne	__no_granule_support
- 	ldr	x5, =vectors
- 	msr	vbar_el1, x5
- 	msr	ttbr0_el1, x25			// load TTBR0
-@@ -626,3 +643,8 @@ __enable_mmu:
- 	isb
- 	br	x27
- ENDPROC(__enable_mmu)
-+
-+__no_granule_support:
-+	wfe
-+	b __no_granule_support
-+ENDPROC(__no_granule_support)
+ /*
+  * These will output as part of the Image header, which should be little-endian
 -- 
 1.7.9.5
