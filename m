@@ -1,38 +1,51 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 0/3] arm/arm64: KVM: Fix !irqchip_in_kernel() handling
-Date: Wed, 16 Sep 2015 16:58:04 +0100
-Message-ID: <1442419087-24648-1-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 2/3] arm64: KVM: Disable virtual timer even if the guest is not using it
+Date: Wed, 16 Sep 2015 16:58:06 +0100
+Message-ID: <1442419087-24648-3-git-send-email-marc.zyngier@arm.com>
+References: <1442419087-24648-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1442419087-24648-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: Pavel Fedin <p.fedin@samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-It is quite obvious that the non kernel-irqchip has been bitrotting
-for a while now. Pavel has been doing some work to address this, but
-it turns out that there is more fun to be had...
+When running a guest with the architected timer disabled (with QEMU and
+the kernel_irqchip=off option, for example), it is important to make
+sure the timer gets turned off. Otherwise, the guest may try to
+enable it anyway, leading to a screaming HW interrupt.
 
-This series picks up one of Pavel's series (which is an obvious fix),
-and adds another fix for both arm and arm64.
+The fix is to unconditionally turn off the virtual timer on guest
+exit.
 
-With these two patches applied, I get a working system as long as I
-don't need timers - which is expected.
+Cc: stable@vger.kernel.org
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/kvm/hyp.S | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Tested on X-Gene.
-
-Marc Zyngier (2):
-  arm64: KVM: Disable virtual timer even if the guest is not using it
-  arm: KVM: Disable virtual timer even if the guest is not using it
-
-Pavel Fedin (1):
-  arm/arm64: KVM: vgic: Check for !irqchip_in_kernel() when mapping
-    resources
-
- arch/arm/kvm/arm.c             | 2 +-
- arch/arm/kvm/interrupts_head.S | 6 ++++--
- arch/arm64/kvm/hyp.S           | 4 ++--
- 3 files changed, 7 insertions(+), 5 deletions(-)
-
+diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+index 6addf97..38f5434 100644
+--- a/arch/arm64/kvm/hyp.S
++++ b/arch/arm64/kvm/hyp.S
+@@ -570,8 +570,6 @@ alternative_endif
+ 	mrs	x3, cntv_ctl_el0
+ 	and	x3, x3, #3
+ 	str	w3, [x0, #VCPU_TIMER_CNTV_CTL]
+-	bic	x3, x3, #1		// Clear Enable
+-	msr	cntv_ctl_el0, x3
+ 
+ 	isb
+ 
+@@ -579,6 +577,8 @@ alternative_endif
+ 	str	x3, [x0, #VCPU_TIMER_CNTV_CVAL]
+ 
+ 1:
++	msr	cntv_ctl_el0, xzr
++
+ 	// Allow physical timer/counter access for the host
+ 	mrs	x2, cnthctl_el2
+ 	orr	x2, x2, #3
 -- 
 2.1.4
 
