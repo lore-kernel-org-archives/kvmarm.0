@@ -1,83 +1,43 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: [PATCH] arm64: KVM: Fix user access for debug registers
-Date: Wed, 16 Sep 2015 15:42:45 +0100
-Message-ID: <87vbbamnmi.fsf@linaro.org>
-References: <1442400070-23316-1-git-send-email-marc.zyngier@arm.com>
+Date: Wed, 16 Sep 2015 15:46:17 +0100
+Message-ID: <55F980B9.6080601@arm.com>
+References: <1442400070-23316-1-git-send-email-marc.zyngier@arm.com> <20150916134141.GA15903@cbox> <87wpvqmnxw.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1982A41294
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2015 10:41:50 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s1tmsHuCn6Vf for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Sep 2015 10:41:49 -0400 (EDT)
-Received: from mail-wi0-f177.google.com (mail-wi0-f177.google.com
- [209.85.212.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F21DB41289
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2015 10:41:48 -0400 (EDT)
-Received: by wiclk2 with SMTP id lk2so76740591wic.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2015 07:42:47 -0700 (PDT)
-In-reply-to: <1442400070-23316-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <87wpvqmnxw.fsf@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Ck1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+IHdyaXRlczoKCj4gV2hlbiBzZXR0
-aW5nIHRoZSBkZWJ1ZyByZWdpc3RlciBmcm9tIHVzZXJzcGFjZSwgbWFrZSBzdXJlIHRoYXQKPiBj
-b3B5X2Zyb21fdXNlcigpIGlzIGNhbGxlZCB3aXRoIGl0cyBwYXJhbWV0ZXJzIGluIHRoZSBleHBl
-Y3RlZAo+IG9yZGVyLiBJdCBvdGhlcndpc2UgZG9lc24ndCBkbyB3aGF0IHlvdSB0aGluay4KCk9v
-cHMuIFdlbGwgdGhhdCBleHBvc2VzIGEgYmlnIGhvbGUgaW4gbXkgdGVzdGluZy4gV2hpbGUgSSB0
-ZXN0ZWQKZGVidWdnaW5nIGluc2lkZSB0aGUgZ3Vlc3Qgd29ya2VkIGJlZm9yZSBhbmQgYWZ0ZXIg
-YmVpbmcgZ3Vlc3QgZGVidWdnZWQKSSB0aGluayBHREJzIHRlbmRlbmN5IHRvIHJlbG9hZCBhbGwg
-dGhlIGRlYnVnIHJlZ2lzdGVycyBiZXR3ZWVuIGVhY2gKc3RlcCBtYXkgaGF2ZSBtYXNrZWQgdGhp
-cy4KCkRlYnVnZ2luZyBHREIgaW4gYWN0aW9uIG9yIHNvbWUgc29ydCBvZiBtaWdyYXRpb24gZXZl
-bnQgd291bGQgb2YgY291cnNlCnNjcmV3IHRoaXMgdXAgYnV0IEknbSBhZnJhaWQgbXkgdGVzdGlu
-ZyB3YXNuJ3QgZXZpbCBlbm91Z2guCgpBbnl3YXkgaGF2ZSBhOgoKUmV2aWV3ZWQtYnk6IEFsZXgg
-QmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KCj4KPiBSZXBvcnRlZC1ieTogUGV0ZXIg
-TWF5ZGVsbCA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPgo+IENjOiBBbGV4IEJlbm7DqWUgPGFs
-ZXguYmVubmVlQGxpbmFyby5vcmc+Cj4gRml4ZXM6IDg0ZTY5MGJmYmVkMSAoIktWTTogYXJtNjQ6
-IGludHJvZHVjZSB2Y3B1LT5hcmNoLmRlYnVnX3B0ciIpCj4gU2lnbmVkLW9mZi1ieTogTWFyYyBa
-eW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KPiAtLS0KPiAgYXJjaC9hcm02NC9rdm0vc3lz
-X3JlZ3MuYyB8IDggKysrKy0tLS0KPiAgMSBmaWxlIGNoYW5nZWQsIDQgaW5zZXJ0aW9ucygrKSwg
-NCBkZWxldGlvbnMoLSkKPgo+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5j
-IGIvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYwo+IGluZGV4IGI0MTYwN2QuLjFkMDQ2M2UgMTAw
-NjQ0Cj4gLS0tIGEvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYwo+ICsrKyBiL2FyY2gvYXJtNjQv
-a3ZtL3N5c19yZWdzLmMKPiBAQCAtMjcyLDcgKzI3Miw3IEBAIHN0YXRpYyBpbnQgc2V0X2J2cihz
-dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkLAo+ICB7
-Cj4gIAlfX3U2NCAqciA9ICZ2Y3B1LT5hcmNoLnZjcHVfZGVidWdfc3RhdGUuZGJnX2J2cltyZC0+
-cmVnXTsKPiAgCj4gLQlpZiAoY29weV9mcm9tX3VzZXIodWFkZHIsIHIsIEtWTV9SRUdfU0laRShy
-ZWctPmlkKSkgIT0gMCkKPiArCWlmIChjb3B5X2Zyb21fdXNlcihyLCB1YWRkciwgS1ZNX1JFR19T
-SVpFKHJlZy0+aWQpKSAhPSAwKQo+ICAJCXJldHVybiAtRUZBVUxUOwo+ICAJcmV0dXJuIDA7Cj4g
-IH0KPiBAQCAtMzE0LDcgKzMxNCw3IEBAIHN0YXRpYyBpbnQgc2V0X2JjcihzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUsIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkLAo+ICB7Cj4gIAlfX3U2NCAq
-ciA9ICZ2Y3B1LT5hcmNoLnZjcHVfZGVidWdfc3RhdGUuZGJnX2JjcltyZC0+cmVnXTsKPiAgCj4g
-LQlpZiAoY29weV9mcm9tX3VzZXIodWFkZHIsIHIsIEtWTV9SRUdfU0laRShyZWctPmlkKSkgIT0g
-MCkKPiArCWlmIChjb3B5X2Zyb21fdXNlcihyLCB1YWRkciwgS1ZNX1JFR19TSVpFKHJlZy0+aWQp
-KSAhPSAwKQo+ICAJCXJldHVybiAtRUZBVUxUOwo+ICAKPiAgCXJldHVybiAwOwo+IEBAIC0zNTgs
-NyArMzU4LDcgQEAgc3RhdGljIGludCBzZXRfd3ZyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgY29u
-c3Qgc3RydWN0IHN5c19yZWdfZGVzYyAqcmQsCj4gIHsKPiAgCV9fdTY0ICpyID0gJnZjcHUtPmFy
-Y2gudmNwdV9kZWJ1Z19zdGF0ZS5kYmdfd3ZyW3JkLT5yZWddOwo+ICAKPiAtCWlmIChjb3B5X2Zy
-b21fdXNlcih1YWRkciwgciwgS1ZNX1JFR19TSVpFKHJlZy0+aWQpKSAhPSAwKQo+ICsJaWYgKGNv
-cHlfZnJvbV91c2VyKHIsIHVhZGRyLCBLVk1fUkVHX1NJWkUocmVnLT5pZCkpICE9IDApCj4gIAkJ
-cmV0dXJuIC1FRkFVTFQ7Cj4gIAlyZXR1cm4gMDsKPiAgfQo+IEBAIC00MDAsNyArNDAwLDcgQEAg
-c3RhdGljIGludCBzZXRfd2NyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgY29uc3Qgc3RydWN0IHN5
-c19yZWdfZGVzYyAqcmQsCj4gIHsKPiAgCV9fdTY0ICpyID0gJnZjcHUtPmFyY2gudmNwdV9kZWJ1
-Z19zdGF0ZS5kYmdfd2NyW3JkLT5yZWddOwo+ICAKPiAtCWlmIChjb3B5X2Zyb21fdXNlcih1YWRk
-ciwgciwgS1ZNX1JFR19TSVpFKHJlZy0+aWQpKSAhPSAwKQo+ICsJaWYgKGNvcHlfZnJvbV91c2Vy
-KHIsIHVhZGRyLCBLVk1fUkVHX1NJWkUocmVnLT5pZCkpICE9IDApCj4gIAkJcmV0dXJuIC1FRkFV
-TFQ7Cj4gIAlyZXR1cm4gMDsKPiAgfQoKLS0gCkFsZXggQmVubsOpZQpfX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFy
-bUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFp
-bG1hbi9saXN0aW5mby9rdm1hcm0K
+On 16/09/15 15:35, Alex Benn=C3=A9e wrote:
+>=20
+> Christoffer Dall <christoffer.dall@linaro.org> writes:
+>=20
+>> On Wed, Sep 16, 2015 at 11:41:10AM +0100, Marc Zyngier wrote:
+>>> When setting the debug register from userspace, make sure that
+>>> copy_from_user() is called with its parameters in the expected
+>>> order. It otherwise doesn't do what you think.
+>>>
+>>> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+>>> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>> Fixes: 84e690bfbed1 ("KVM: arm64: introduce vcpu->arch.debug_ptr")
+>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>
+>> yikes!
+>=20
+> OK I'm now muchly confused as to how it could have worked...
+
+Well, we only write the registers at boot time, and corrupting userspac=
+e
+did go unnoticed. I was only able to reproduce this on a model with PAN
+enabled.
+
+Copy-paste bug.
+
+	M.
+--=20
+Jazz is not dead. It just smells funny...
