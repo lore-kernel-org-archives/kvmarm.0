@@ -1,13 +1,34 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 2/3] arm64: KVM: Disable virtual timer even if the guest is not using it
-Date: Wed, 16 Sep 2015 16:58:06 +0100
-Message-ID: <1442419087-24648-3-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 3/3] arm: KVM: Disable virtual timer even if the guest is not
+ using it
+Date: Wed, 16 Sep 2015 16:58:07 +0100
+Message-ID: <1442419087-24648-4-git-send-email-marc.zyngier@arm.com>
 References: <1442419087-24648-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 20FB0423B1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2015 11:57:21 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id zXQN5eLIv5vJ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Sep 2015 11:57:20 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DF7141F7F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2015 11:57:20 -0400 (EDT)
 In-Reply-To: <1442419087-24648-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: Pavel Fedin <p.fedin@samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 When running a guest with the architected timer disabled (with QEMU and
@@ -21,31 +42,32 @@ exit.
 Cc: stable@vger.kernel.org
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp.S | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm/kvm/interrupts_head.S | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-index 6addf97..38f5434 100644
---- a/arch/arm64/kvm/hyp.S
-+++ b/arch/arm64/kvm/hyp.S
-@@ -570,8 +570,6 @@ alternative_endif
- 	mrs	x3, cntv_ctl_el0
- 	and	x3, x3, #3
- 	str	w3, [x0, #VCPU_TIMER_CNTV_CTL]
--	bic	x3, x3, #1		// Clear Enable
--	msr	cntv_ctl_el0, x3
+diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
+index 702740d..51a5950 100644
+--- a/arch/arm/kvm/interrupts_head.S
++++ b/arch/arm/kvm/interrupts_head.S
+@@ -515,8 +515,7 @@ ARM_BE8(rev	r6, r6  )
  
+ 	mrc	p15, 0, r2, c14, c3, 1	@ CNTV_CTL
+ 	str	r2, [vcpu, #VCPU_TIMER_CNTV_CTL]
+-	bic	r2, #1			@ Clear ENABLE
+-	mcr	p15, 0, r2, c14, c3, 1	@ CNTV_CTL
++
  	isb
  
-@@ -579,6 +577,8 @@ alternative_endif
- 	str	x3, [x0, #VCPU_TIMER_CNTV_CVAL]
+ 	mrrc	p15, 3, rr_lo_hi(r2, r3), c14	@ CNTV_CVAL
+@@ -529,6 +528,9 @@ ARM_BE8(rev	r6, r6  )
+ 	mcrr	p15, 4, r2, r2, c14	@ CNTVOFF
  
  1:
-+	msr	cntv_ctl_el0, xzr
++	mov	r2, #0			@ Clear ENABLE
++	mcr	p15, 0, r2, c14, c3, 1	@ CNTV_CTL
 +
- 	// Allow physical timer/counter access for the host
- 	mrs	x2, cnthctl_el2
- 	orr	x2, x2, #3
+ 	@ Allow physical timer/counter access for the host
+ 	mrc	p15, 4, r2, c14, c1, 0	@ CNTHCTL
+ 	orr	r2, r2, #(CNTHCTL_PL1PCEN | CNTHCTL_PL1PCTEN)
 -- 
 2.1.4
-
