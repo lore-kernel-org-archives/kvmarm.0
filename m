@@ -1,46 +1,113 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] arm64: KVM: Fix user access for debug registers
-Date: Wed, 16 Sep 2015 15:06:57 +0100
-Message-ID: <55F97781.1060502@arm.com>
-References: <1442400070-23316-1-git-send-email-marc.zyngier@arm.com> <20150916134141.GA15903@cbox>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [Qemu-devel] Could not boot a guest vm from kvm mode based on APM
+ X-Gene Host and latest qemu
+Date: Wed, 16 Sep 2015 15:34:18 +0100
+Message-ID: <87y4g6mo0l.fsf@linaro.org>
+References: <55F76064.8010504@hpe.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20150916134141.GA15903@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, =?windows-1252?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B1F641450
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2015 10:33:28 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id WF6kkpTnNam7 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Sep 2015 10:33:22 -0400 (EDT)
+Received: from mail-wi0-f175.google.com (mail-wi0-f175.google.com
+ [209.85.212.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7440F413E2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2015 10:33:22 -0400 (EDT)
+Received: by wiclk2 with SMTP id lk2so74004936wic.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2015 07:34:20 -0700 (PDT)
+In-reply-to: <55F76064.8010504@hpe.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: liang yan <liangy@hpe.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 16/09/15 14:41, Christoffer Dall wrote:
-> On Wed, Sep 16, 2015 at 11:41:10AM +0100, Marc Zyngier wrote:
->> When setting the debug register from userspace, make sure that
->> copy_from_user() is called with its parameters in the expected
->> order. It otherwise doesn't do what you think.
->>
->> Reported-by: Peter Maydell <peter.maydell@linaro.org>
->> Cc: Alex Benn=E9e <alex.bennee@linaro.org>
->> Fixes: 84e690bfbed1 ("KVM: arm64: introduce vcpu->arch.debug_ptr")
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->
-> yikes!
->
-> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
->
-
-Thanks. Merged and pushed out to -next, together with the physaddr_t pa=
-tch.
-
-        M.
---
-Jazz is not dead. It just smells funny...
-
-________________________________
-
--- IMPORTANT NOTICE: The contents of this email and any attachments are=
- confidential and may also be privileged. If you are not the intended r=
-ecipient, please notify the sender immediately and do not disclose the =
-contents to any other person, use it for any purpose, or store or copy =
-the information in any medium. Thank you.
-
+CmxpYW5nIHlhbiA8bGlhbmd5QGhwZS5jb20+IHdyaXRlczoKCj4gSGVsbG8sIEFsbCwKPgo+IEkg
+YW0gdHJ5aW5nIHRvIGVuYWJsZSBrdm0gZm9yIGEgZ3Vlc3Qgdm0gb24gYW4gQVBNIFgtR2VuZSBI
+b3N0IHdpdGggCj4gbGF0ZXN0IHFlbXUsIGJ1dCBjb3VsZCBub3QgbWFrZSBpdCB3b3JrLgo+Cj4g
+VGhlIGhvc3QgaXMgQVBNIFgtR2VuZSA4LWNvcmUsIExpbnV4IGtlcm5lbCBpcyA0LjEuMC1yYzct
+MS1hcm02NCwKPgo+IEd1ZXN0IGtlcm5lbCBpcyBsaW51eC0zLjE2cmMzCj4KPiBRRU1VIGlzIGxh
+dGVzdCB2ZXJzaW9uCj4KPiBIb3N0IGhhcyB0aGVzZSBkbWVzZyBpbmZvCj4gWyAgICAyLjcwODI1
+OV0ga3ZtIFsxXTogR0lDSCBiYXNlPTB4NzgwYzAwMDAsIEdJQ1YgYmFzZT0weDc4MGUwMDAwLCBJ
+UlE9MjUKPiBbICAgIDIuNzA4MzI3XSBrdm0gWzFdOiB0aW1lciBJUlEzMAo+IFsgICAgMi43MDgz
+MzVdIGt2bSBbMV06IEh5cCBtb2RlIGluaXRpYWxpemVkIHN1Y2Nlc3NmdWxseQo+Cj4gSG9zdCBo
+YXMgZGV2L2t2bS4KPgo+IGNvbW1hbmQtbGluZSBpcwo+IGFhcmNoNjQtc29mdG1tdS9xZW11LXN5
+c3RlbS1hYXJjaDY0IC1tYWNoaW5lIHZpcnQsa2VybmVsX2lycWNoaXA9b2ZmIAo+IC1jcHUgY29y
+dGV4LWE1NyAtbWFjaGluZSBhY2NlbD1rdm0gLW5vZ3JhcGhpYyAtc21wIDEgLW0gMjA0OCAta2Vy
+bmVsIAo+IGFhcmNoNjQtbGludXgtMy4xNnJjMy1idWlsZHJvb3QuaW1nICAtLWFwcGVuZCAiY29u
+c29sZT10dHlBTUEwIgoKSSB0aG91Z2h0IEkgcmVjb2duaXNlZCBvbmUgb2YgbXkgaW1hZ2VzIDst
+KQoKV2h5IGFyZSB5b3UgcnVubmluZyB3aXRoIGtlcm5lbF9pcnFjaGlwPW9mZj8KCldpdGhvdXQg
+aXQgSSBjYW4gYm9vdCB0aGUgaW1hZ2UgZmluZSBvbiBteSBBUE0gcnVubmluZyA0LjMuMC1yYzEt
+YWpiIGJ1dAp3aXRoIGl0IEkgaGVscGZ1bGx5IHNlZyB0aGUga2VybmVsOgoKWzE2MDM1Ljk5MDUx
+OF0gQmFkIG1vZGUgaW4gU3luY2hyb25vdXMgQWJvcnQgaGFuZGxlciBkZXRlY3RlZCwgY29kZSAw
+eDg2MDAwMDA2IC0tIElBQlQgKGN1cnJlbnQgRUwpClsxNjAzNS45OTc5NzBdIENQVTogMSBQSUQ6
+IDIxMzI4IENvbW06IHFlbXUtc3lzdGVtLWFhciBOb3QgdGFpbnRlZCA0LjMuMC1yYzEtYWpiICM0
+NDYKWzE2MDM2LjAwNDIwM10gSGFyZHdhcmUgbmFtZTogQVBNIFgtR2VuZSBNdXN0YW5nIGJvYXJk
+IChEVCkKWzE2MDM2LjAwODE5MV0gdGFzazogZmZmZmZmYzNlY2VhODAwMCB0aTogZmZmZmZmYzNk
+ODA3ODAwMCB0YXNrLnRpOiBmZmZmZmZjM2Q4MDc4MDAwClsxNjAzNi4wMTQzMzhdIFBDIGlzIGF0
+IDB4MApbMTYwMzYuMDE1NTY0XSBMUiBpcyBhdCBrdm1fdmdpY19tYXBfcmVzb3VyY2VzKzB4MzAv
+MHgzYwpbMTYwMzYuMDE5MjkxXSBwYyA6IFs8MDAwMDAwMDAwMDAwMDAwMD5dIGxyIDogWzxmZmZm
+ZmZjMDAwMGFlOTAwPl0gcHN0YXRlOiAwMDAwMDE0NQpbMTYwMzYuMDI1MzUwXSBzcCA6IGZmZmZm
+ZmMzZDgwN2JiMjAKWzE2MDM2LjAyNzM0OF0geDI5OiBmZmZmZmZjM2Q4MDdiYjIwIHgyODogZmZm
+ZmZmYzNkODA3ODAwMCAKWzE2MDM2LjAzMTM1NV0geDI3OiBmZmZmZmZjMDAwNjQyMDAwIHgyNjog
+MDAwMDAwMDAwMDAwMDAxZCAKWzE2MDM2LjAzNTM2MV0geDI1OiAwMDAwMDAwMDAwMDAwMTFiIHgy
+NDogZmZmZmZmYzNkODBjMTAwMCAKWzE2MDM2LjAzOTM2OF0geDIzOiAwMDAwMDAwMDAwMDAwMDAw
+IHgyMjogMDAwMDAwMDAwMDAwMDAwMCAKWzE2MDM2LjA0MzM3NF0geDIxOiBmZmZmZmZjMGZhMjQw
+MDAwIHgyMDogZmZmZmZmYzBmYTgwNzgwMCAKWzE2MDM2LjA0NzM4MF0geDE5OiBmZmZmZmZjMGZh
+ODA3ODAwIHgxODogMDAwMDAwN2Y5N2FmMjBlMCAKWzE2MDM2LjA1MTM4N10geDE3OiAwMDAwMDA3
+Zjk5YzQ0ODEwIHgxNjogZmZmZmZmYzAwMDFmYjAzMCAKWzE2MDM2LjA1NTM5NF0geDE1OiAwMDAw
+MDA3Zjk5Y2M5NTg4IHgxNDogMDAwMDAwMDAwMDkyMjAwMCAKWzE2MDM2LjA1OTQwMV0geDEzOiAw
+MDAwMDAwMDAwOTdlYjgwIHgxMjogMDAwMDAwMDAwMDRkZTBmMCAKWzE2MDM2LjA2MzQwNl0geDEx
+OiAwMDAwMDAwMDAwMDAwMDM4IHgxMDogMDAwMDAwMDBmZmZmZmZmZiAKWzE2MDM2LjA2NzQxM10g
+eDkgOiAwMDAwMDA3Zjk3YWYyNDgwIHg4IDogMDAwMDAwMDAwMDAwMDA1MCAKWzE2MDM2LjA3MTQx
+OV0geDcgOiBmZmZmZmZjM2VjMjRjODQwIHg2IDogMDAwMDAwMDAwMDAwMDAwMCAKWzE2MDM2LjA3
+NTQyNF0geDUgOiAwMDAwMDAwMDAwMDAwMDAzIHg0IDogZmZmZmZmYzNlY2U3MjA4MCAKWzE2MDM2
+LjA3OTQzMF0geDMgOiBmZmZmZmZjM2VjZTcyMDgwIHgyIDogMDAwMDAwMDAwMDAwMDAwMCAKWzE2
+MDM2LjA4MzQzNl0geDEgOiBmZmZmZmZjMDAwYTI2MjYwIHgwIDogZmZmZmZmYzBmYTgwNzgwMCAK
+ClsxNjAzNi4wODc2MjhdIEludGVybmFsIGVycm9yOiBPb3BzIC0gYmFkIG1vZGU6IDAgWyMxXSBT
+TVAKWzE2MDM2LjA5MTUyOF0gTW9kdWxlcyBsaW5rZWQgaW46ClsxNjAzNi4wOTMyNzhdIENQVTog
+MSBQSUQ6IDIxMzI4IENvbW06IHFlbXUtc3lzdGVtLWFhciBOb3QgdGFpbnRlZCA0LjMuMC1yYzEt
+YWpiICM0NDYKWzE2MDM2LjA5OTUxMF0gSGFyZHdhcmUgbmFtZTogQVBNIFgtR2VuZSBNdXN0YW5n
+IGJvYXJkIChEVCkKWzE2MDM2LjEwMzQ5N10gdGFzazogZmZmZmZmYzNlY2VhODAwMCB0aTogZmZm
+ZmZmYzNkODA3ODAwMCB0YXNrLnRpOiBmZmZmZmZjM2Q4MDc4MDAwClsxNjAzNi4xMDk2NDJdIFBD
+IGlzIGF0IDB4MApbMTYwMzYuMTEwODY0XSBMUiBpcyBhdCBrdm1fdmdpY19tYXBfcmVzb3VyY2Vz
+KzB4MzAvMHgzYwpbMTYwMzYuMTE0NTkwXSBwYyA6IFs8MDAwMDAwMDAwMDAwMDAwMD5dIGxyIDog
+WzxmZmZmZmZjMDAwMGFlOTAwPl0gcHN0YXRlOiAwMDAwMDE0NQpbMTYwMzYuMTIwNjQ5XSBzcCA6
+IGZmZmZmZmMzZDgwN2JiMjAKWzE2MDM2LjEyMjY0OF0geDI5OiBmZmZmZmZjM2Q4MDdiYjIwIHgy
+ODogZmZmZmZmYzNkODA3ODAwMCAKWzE2MDM2LjEyNjY1NF0geDI3OiBmZmZmZmZjMDAwNjQyMDAw
+IHgyNjogMDAwMDAwMDAwMDAwMDAxZCAKWzE2MDM2LjEzMDY1OV0geDI1OiAwMDAwMDAwMDAwMDAw
+MTFiIHgyNDogZmZmZmZmYzNkODBjMTAwMCAKWzE2MDM2LjEzNDY2Nl0geDIzOiAwMDAwMDAwMDAw
+MDAwMDAwIHgyMjogMDAwMDAwMDAwMDAwMDAwMCAKWzE2MDM2LjEzODY3MV0geDIxOiBmZmZmZmZj
+MGZhMjQwMDAwIHgyMDogZmZmZmZmYzBmYTgwNzgwMCAKWzE2MDM2LjE0MjY3OF0geDE5OiBmZmZm
+ZmZjMGZhODA3ODAwIHgxODogMDAwMDAwN2Y5N2FmMjBlMCAKWzE2MDM2LjE0NjY4NV0geDE3OiAw
+MDAwMDA3Zjk5YzQ0ODEwIHgxNjogZmZmZmZmYzAwMDFmYjAzMCAKWzE2MDM2LjE1MDY5MF0geDE1
+OiAwMDAwMDA3Zjk5Y2M5NTg4IHgxNDogMDAwMDAwMDAwMDkyMjAwMCAKWzE2MDM2LjE1NDY5Nl0g
+eDEzOiAwMDAwMDAwMDAwOTdlYjgwIHgxMjogMDAwMDAwMDAwMDRkZTBmMCAKWzE2MDM2LjE1ODcw
+MV0geDExOiAwMDAwMDAwMDAwMDAwMDM4IHgxMDogMDAwMDAwMDBmZmZmZmZmZiAKWzE2MDM2LjE2
+MjcwNl0geDkgOiAwMDAwMDA3Zjk3YWYyNDgwIHg4IDogMDAwMDAwMDAwMDAwMDA1MCAKWzE2MDM2
+LjE2NjcxMl0geDcgOiBmZmZmZmZjM2VjMjRjODQwIHg2IDogMDAwMDAwMDAwMDAwMDAwMCAKWzE2
+MDM2LjE3MDcxOV0geDUgOiAwMDAwMDAwMDAwMDAwMDAzIHg0IDogZmZmZmZmYzNlY2U3MjA4MCAK
+WzE2MDM2LjE3NDcyNV0geDMgOiBmZmZmZmZjM2VjZTcyMDgwIHgyIDogMDAwMDAwMDAwMDAwMDAw
+MCAKWzE2MDM2LjE3ODczMV0geDEgOiBmZmZmZmZjMDAwYTI2MjYwIHgwIDogZmZmZmZmYzBmYTgw
+NzgwMCAKCj4KPgo+IHdoZW4gdXNpbmcgY3B1ICJjb3J0ZXgtYTU3IiwgZ290IHRoZSBlcnJvciAi
+a3ZtX2luaXRfdmNwdSBmYWlsZWQ6IAo+IEludmFsaWQgYXJndW1lbnQiCj4gd2hlbiB1c2luZyBj
+cHUgImhvc3QiLCBnb3QgdGhlIGVycm9yICJGYWlsZWQgdG8gcmV0cmlldmUgaG9zdCBDUFUgZmVh
+dHVyZXMhIgo+Cj4gQnkgdGhlIHdheSwgYWxsIHRoZSBjb21tYW5kIGxpbmUgd29ya3Mgd2VsbCB1
+bmRlciAidGNnIiBtb2RlLgo+IEFueW9uZSBoYXMgYSBxdWljayBpZGVhPyBUaGFua3MgaW4gYWR2
+YW5jZS4KPgo+IEJlc3QsCj4gTGlhbmcKCi0tIApBbGV4IEJlbm7DqWUKX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1h
+cm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21h
+aWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
