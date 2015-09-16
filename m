@@ -1,111 +1,51 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [Qemu-devel] Could not boot a guest vm from kvm mode based on
- APM X-Gene Host and latest qemu
-Date: Wed, 16 Sep 2015 18:33:03 +0100
-Message-ID: <55F9A7CF.5060508@arm.com>
-References: <55F76064.8010504@hpe.com> <87y4g6mo0l.fsf@linaro.org>
+Subject: Re: [PATCH] KVM: arm64: remove all traces of the ThumbEE registers
+Date: Wed, 16 Sep 2015 18:34:25 +0100
+Message-ID: <55F9A821.1000707@arm.com>
+References: <1442333733-16347-1-git-send-email-will.deacon@arm.com> <CAFEAcA94VNogBEGh9ohB3M8fEqfLRPWVj8yaCK-3HGa-ht2fLg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FFF6412F3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2015 13:32:08 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9yqQrX73YAdO for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Sep 2015 13:32:06 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C625A40FB5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2015 13:32:06 -0400 (EDT)
-In-Reply-To: <87y4g6mo0l.fsf@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, liang yan <liangy@hpe.com>
-Cc: qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <CAFEAcA94VNogBEGh9ohB3M8fEqfLRPWVj8yaCK-3HGa-ht2fLg@mail.gmail.com>
+Sender: kvm-owner@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>, Will Deacon <will.deacon@arm.com>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMTYvMDkvMTUgMTU6MzQsIEFsZXggQmVubsOpZSB3cm90ZToKPiAKPiBsaWFuZyB5YW4gPGxp
-YW5neUBocGUuY29tPiB3cml0ZXM6Cj4gCj4+IEhlbGxvLCBBbGwsCj4+Cj4+IEkgYW0gdHJ5aW5n
-IHRvIGVuYWJsZSBrdm0gZm9yIGEgZ3Vlc3Qgdm0gb24gYW4gQVBNIFgtR2VuZSBIb3N0IHdpdGgg
-Cj4+IGxhdGVzdCBxZW11LCBidXQgY291bGQgbm90IG1ha2UgaXQgd29yay4KPj4KPj4gVGhlIGhv
-c3QgaXMgQVBNIFgtR2VuZSA4LWNvcmUsIExpbnV4IGtlcm5lbCBpcyA0LjEuMC1yYzctMS1hcm02
-NCwKPj4KPj4gR3Vlc3Qga2VybmVsIGlzIGxpbnV4LTMuMTZyYzMKPj4KPj4gUUVNVSBpcyBsYXRl
-c3QgdmVyc2lvbgo+Pgo+PiBIb3N0IGhhcyB0aGVzZSBkbWVzZyBpbmZvCj4+IFsgICAgMi43MDgy
-NTldIGt2bSBbMV06IEdJQ0ggYmFzZT0weDc4MGMwMDAwLCBHSUNWIGJhc2U9MHg3ODBlMDAwMCwg
-SVJRPTI1Cj4+IFsgICAgMi43MDgzMjddIGt2bSBbMV06IHRpbWVyIElSUTMwCj4+IFsgICAgMi43
-MDgzMzVdIGt2bSBbMV06IEh5cCBtb2RlIGluaXRpYWxpemVkIHN1Y2Nlc3NmdWxseQo+Pgo+PiBI
-b3N0IGhhcyBkZXYva3ZtLgo+Pgo+PiBjb21tYW5kLWxpbmUgaXMKPj4gYWFyY2g2NC1zb2Z0bW11
-L3FlbXUtc3lzdGVtLWFhcmNoNjQgLW1hY2hpbmUgdmlydCxrZXJuZWxfaXJxY2hpcD1vZmYgCj4+
-IC1jcHUgY29ydGV4LWE1NyAtbWFjaGluZSBhY2NlbD1rdm0gLW5vZ3JhcGhpYyAtc21wIDEgLW0g
-MjA0OCAta2VybmVsIAo+PiBhYXJjaDY0LWxpbnV4LTMuMTZyYzMtYnVpbGRyb290LmltZyAgLS1h
-cHBlbmQgImNvbnNvbGU9dHR5QU1BMCIKPiAKPiBJIHRob3VnaHQgSSByZWNvZ25pc2VkIG9uZSBv
-ZiBteSBpbWFnZXMgOy0pCj4gCj4gV2h5IGFyZSB5b3UgcnVubmluZyB3aXRoIGtlcm5lbF9pcnFj
-aGlwPW9mZj8KPiAKPiBXaXRob3V0IGl0IEkgY2FuIGJvb3QgdGhlIGltYWdlIGZpbmUgb24gbXkg
-QVBNIHJ1bm5pbmcgNC4zLjAtcmMxLWFqYiBidXQKPiB3aXRoIGl0IEkgaGVscGZ1bGx5IHNlZyB0
-aGUga2VybmVsOgo+IAo+IFsxNjAzNS45OTA1MThdIEJhZCBtb2RlIGluIFN5bmNocm9ub3VzIEFi
-b3J0IGhhbmRsZXIgZGV0ZWN0ZWQsIGNvZGUgMHg4NjAwMDAwNiAtLSBJQUJUIChjdXJyZW50IEVM
-KQo+IFsxNjAzNS45OTc5NzBdIENQVTogMSBQSUQ6IDIxMzI4IENvbW06IHFlbXUtc3lzdGVtLWFh
-ciBOb3QgdGFpbnRlZCA0LjMuMC1yYzEtYWpiICM0NDYKPiBbMTYwMzYuMDA0MjAzXSBIYXJkd2Fy
-ZSBuYW1lOiBBUE0gWC1HZW5lIE11c3RhbmcgYm9hcmQgKERUKQo+IFsxNjAzNi4wMDgxOTFdIHRh
-c2s6IGZmZmZmZmMzZWNlYTgwMDAgdGk6IGZmZmZmZmMzZDgwNzgwMDAgdGFzay50aTogZmZmZmZm
-YzNkODA3ODAwMAo+IFsxNjAzNi4wMTQzMzhdIFBDIGlzIGF0IDB4MAo+IFsxNjAzNi4wMTU1NjRd
-IExSIGlzIGF0IGt2bV92Z2ljX21hcF9yZXNvdXJjZXMrMHgzMC8weDNjCj4gWzE2MDM2LjAxOTI5
-MV0gcGMgOiBbPDAwMDAwMDAwMDAwMDAwMDA+XSBsciA6IFs8ZmZmZmZmYzAwMDBhZTkwMD5dIHBz
-dGF0ZTogMDAwMDAxNDUKPiBbMTYwMzYuMDI1MzUwXSBzcCA6IGZmZmZmZmMzZDgwN2JiMjAKPiBb
-MTYwMzYuMDI3MzQ4XSB4Mjk6IGZmZmZmZmMzZDgwN2JiMjAgeDI4OiBmZmZmZmZjM2Q4MDc4MDAw
-IAo+IFsxNjAzNi4wMzEzNTVdIHgyNzogZmZmZmZmYzAwMDY0MjAwMCB4MjY6IDAwMDAwMDAwMDAw
-MDAwMWQgCj4gWzE2MDM2LjAzNTM2MV0geDI1OiAwMDAwMDAwMDAwMDAwMTFiIHgyNDogZmZmZmZm
-YzNkODBjMTAwMCAKPiBbMTYwMzYuMDM5MzY4XSB4MjM6IDAwMDAwMDAwMDAwMDAwMDAgeDIyOiAw
-MDAwMDAwMDAwMDAwMDAwIAo+IFsxNjAzNi4wNDMzNzRdIHgyMTogZmZmZmZmYzBmYTI0MDAwMCB4
-MjA6IGZmZmZmZmMwZmE4MDc4MDAgCj4gWzE2MDM2LjA0NzM4MF0geDE5OiBmZmZmZmZjMGZhODA3
-ODAwIHgxODogMDAwMDAwN2Y5N2FmMjBlMCAKPiBbMTYwMzYuMDUxMzg3XSB4MTc6IDAwMDAwMDdm
-OTljNDQ4MTAgeDE2OiBmZmZmZmZjMDAwMWZiMDMwIAo+IFsxNjAzNi4wNTUzOTRdIHgxNTogMDAw
-MDAwN2Y5OWNjOTU4OCB4MTQ6IDAwMDAwMDAwMDA5MjIwMDAgCj4gWzE2MDM2LjA1OTQwMV0geDEz
-OiAwMDAwMDAwMDAwOTdlYjgwIHgxMjogMDAwMDAwMDAwMDRkZTBmMCAKPiBbMTYwMzYuMDYzNDA2
-XSB4MTE6IDAwMDAwMDAwMDAwMDAwMzggeDEwOiAwMDAwMDAwMGZmZmZmZmZmIAo+IFsxNjAzNi4w
-Njc0MTNdIHg5IDogMDAwMDAwN2Y5N2FmMjQ4MCB4OCA6IDAwMDAwMDAwMDAwMDAwNTAgCj4gWzE2
-MDM2LjA3MTQxOV0geDcgOiBmZmZmZmZjM2VjMjRjODQwIHg2IDogMDAwMDAwMDAwMDAwMDAwMCAK
-PiBbMTYwMzYuMDc1NDI0XSB4NSA6IDAwMDAwMDAwMDAwMDAwMDMgeDQgOiBmZmZmZmZjM2VjZTcy
-MDgwIAo+IFsxNjAzNi4wNzk0MzBdIHgzIDogZmZmZmZmYzNlY2U3MjA4MCB4MiA6IDAwMDAwMDAw
-MDAwMDAwMDAgCj4gWzE2MDM2LjA4MzQzNl0geDEgOiBmZmZmZmZjMDAwYTI2MjYwIHgwIDogZmZm
-ZmZmYzBmYTgwNzgwMCAKPiAKPiBbMTYwMzYuMDg3NjI4XSBJbnRlcm5hbCBlcnJvcjogT29wcyAt
-IGJhZCBtb2RlOiAwIFsjMV0gU01QCj4gWzE2MDM2LjA5MTUyOF0gTW9kdWxlcyBsaW5rZWQgaW46
-Cj4gWzE2MDM2LjA5MzI3OF0gQ1BVOiAxIFBJRDogMjEzMjggQ29tbTogcWVtdS1zeXN0ZW0tYWFy
-IE5vdCB0YWludGVkIDQuMy4wLXJjMS1hamIgIzQ0Ngo+IFsxNjAzNi4wOTk1MTBdIEhhcmR3YXJl
-IG5hbWU6IEFQTSBYLUdlbmUgTXVzdGFuZyBib2FyZCAoRFQpCj4gWzE2MDM2LjEwMzQ5N10gdGFz
-azogZmZmZmZmYzNlY2VhODAwMCB0aTogZmZmZmZmYzNkODA3ODAwMCB0YXNrLnRpOiBmZmZmZmZj
-M2Q4MDc4MDAwCj4gWzE2MDM2LjEwOTY0Ml0gUEMgaXMgYXQgMHgwCj4gWzE2MDM2LjExMDg2NF0g
-TFIgaXMgYXQga3ZtX3ZnaWNfbWFwX3Jlc291cmNlcysweDMwLzB4M2MKPiBbMTYwMzYuMTE0NTkw
-XSBwYyA6IFs8MDAwMDAwMDAwMDAwMDAwMD5dIGxyIDogWzxmZmZmZmZjMDAwMGFlOTAwPl0gcHN0
-YXRlOiAwMDAwMDE0NQo+IFsxNjAzNi4xMjA2NDldIHNwIDogZmZmZmZmYzNkODA3YmIyMAo+IFsx
-NjAzNi4xMjI2NDhdIHgyOTogZmZmZmZmYzNkODA3YmIyMCB4Mjg6IGZmZmZmZmMzZDgwNzgwMDAg
-Cj4gWzE2MDM2LjEyNjY1NF0geDI3OiBmZmZmZmZjMDAwNjQyMDAwIHgyNjogMDAwMDAwMDAwMDAw
-MDAxZCAKPiBbMTYwMzYuMTMwNjU5XSB4MjU6IDAwMDAwMDAwMDAwMDAxMWIgeDI0OiBmZmZmZmZj
-M2Q4MGMxMDAwIAo+IFsxNjAzNi4xMzQ2NjZdIHgyMzogMDAwMDAwMDAwMDAwMDAwMCB4MjI6IDAw
-MDAwMDAwMDAwMDAwMDAgCj4gWzE2MDM2LjEzODY3MV0geDIxOiBmZmZmZmZjMGZhMjQwMDAwIHgy
-MDogZmZmZmZmYzBmYTgwNzgwMCAKPiBbMTYwMzYuMTQyNjc4XSB4MTk6IGZmZmZmZmMwZmE4MDc4
-MDAgeDE4OiAwMDAwMDA3Zjk3YWYyMGUwIAo+IFsxNjAzNi4xNDY2ODVdIHgxNzogMDAwMDAwN2Y5
-OWM0NDgxMCB4MTY6IGZmZmZmZmMwMDAxZmIwMzAgCj4gWzE2MDM2LjE1MDY5MF0geDE1OiAwMDAw
-MDA3Zjk5Y2M5NTg4IHgxNDogMDAwMDAwMDAwMDkyMjAwMCAKPiBbMTYwMzYuMTU0Njk2XSB4MTM6
-IDAwMDAwMDAwMDA5N2ViODAgeDEyOiAwMDAwMDAwMDAwNGRlMGYwIAo+IFsxNjAzNi4xNTg3MDFd
-IHgxMTogMDAwMDAwMDAwMDAwMDAzOCB4MTA6IDAwMDAwMDAwZmZmZmZmZmYgCj4gWzE2MDM2LjE2
-MjcwNl0geDkgOiAwMDAwMDA3Zjk3YWYyNDgwIHg4IDogMDAwMDAwMDAwMDAwMDA1MCAKPiBbMTYw
-MzYuMTY2NzEyXSB4NyA6IGZmZmZmZmMzZWMyNGM4NDAgeDYgOiAwMDAwMDAwMDAwMDAwMDAwIAo+
-IFsxNjAzNi4xNzA3MTldIHg1IDogMDAwMDAwMDAwMDAwMDAwMyB4NCA6IGZmZmZmZmMzZWNlNzIw
-ODAgCj4gWzE2MDM2LjE3NDcyNV0geDMgOiBmZmZmZmZjM2VjZTcyMDgwIHgyIDogMDAwMDAwMDAw
-MDAwMDAwMCAKPiBbMTYwMzYuMTc4NzMxXSB4MSA6IGZmZmZmZmMwMDBhMjYyNjAgeDAgOiBmZmZm
-ZmZjMGZhODA3ODAwIAoKSSd2ZSBwb3N0ZWQgdGhlIHJlbGV2YW50IHBhdGNoZXMgdGhlcmU6Cgpo
-dHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9waXBlcm1haWwva3ZtYXJtLzIwMTUtU2VwdGVt
-YmVyLzAxNjQ4Ny5odG1sCgpJJ2QgYXBwcmVjaWF0ZSBhbnkgZm9ybSBvZiB0ZXN0aW5nLgoKVGhh
-bmtzLAoKCU0uCi0tIApKYXp6IGlzIG5vdCBkZWFkLiBJdCBqdXN0IHNtZWxscyBmdW5ueS4uLgpf
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFp
-bGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5j
-b2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On 15/09/15 17:23, Peter Maydell wrote:
+> On 15 September 2015 at 17:15, Will Deacon <will.deacon@arm.com> wrote:
+>> Although the ThumbEE registers and traps were present in earlier
+>> versions of the v8 architecture, it was retrospectively removed and so
+>> we can do the same.
+>>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> Signed-off-by: Will Deacon <will.deacon@arm.com>
+> 
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index b41607d270ac..6c35e49757d8 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -539,13 +539,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>>         { Op0(0b10), Op1(0b000), CRn(0b0111), CRm(0b1110), Op2(0b110),
+>>           trap_dbgauthstatus_el1 },
+>>
+>> -       /* TEECR32_EL1 */
+>> -       { Op0(0b10), Op1(0b010), CRn(0b0000), CRm(0b0000), Op2(0b000),
+>> -         NULL, reset_val, TEECR32_EL1, 0 },
+>> -       /* TEEHBR32_EL1 */
+>> -       { Op0(0b10), Op1(0b010), CRn(0b0001), CRm(0b0000), Op2(0b000),
+>> -         NULL, reset_val, TEEHBR32_EL1, 0 },
+>> -
+> 
+> I guess this is a VM migration compatibility break between kernels
+> without this patch and kernels with it? I think that's OK at this
+> point, but it would be nice to mention it in the commit message.
+
+I'll add comment to that effect.
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
