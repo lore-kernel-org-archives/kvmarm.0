@@ -1,72 +1,51 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH] arm64: KVM: Fix user access for debug registers
-Date: Wed, 16 Sep 2015 11:41:10 +0100
-Message-ID: <1442400070-23316-1-git-send-email-marc.zyngier@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH] arm64: KVM: Fix user access for debug registers
+Date: Wed, 16 Sep 2015 15:41:41 +0200
+Message-ID: <20150916134141.GA15903@cbox>
+References: <1442400070-23316-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2817C413DD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2015 09:38:59 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id J3qv8gPEY4Eu for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Sep 2015 09:38:58 -0400 (EDT)
+Received: from mail-la0-f51.google.com (mail-la0-f51.google.com
+ [209.85.215.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 375B2411E2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2015 09:38:57 -0400 (EDT)
+Received: by lahg1 with SMTP id g1so100181237lah.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Sep 2015 06:39:56 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1442400070-23316-1-git-send-email-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-When setting the debug register from userspace, make sure that
-copy_from_user() is called with its parameters in the expected
-order. It otherwise doesn't do what you think.
+On Wed, Sep 16, 2015 at 11:41:10AM +0100, Marc Zyngier wrote:
+> When setting the debug register from userspace, make sure that
+> copy_from_user() is called with its parameters in the expected
+> order. It otherwise doesn't do what you think.
+> =
 
-Reported-by: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-=46ixes: 84e690bfbed1 ("KVM: arm64: introduce vcpu->arch.debug_ptr")
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm64/kvm/sys_regs.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Alex Benn=E9e <alex.bennee@linaro.org>
+> Fixes: 84e690bfbed1 ("KVM: arm64: introduce vcpu->arch.debug_ptr")
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index b41607d..1d0463e 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -272,7 +272,7 @@ static int set_bvr(struct kvm_vcpu *vcpu, const str=
-uct sys_reg_desc *rd,
- {
- 	__u64 *r =3D &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
-=20
--	if (copy_from_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-+	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) !=3D 0)
- 		return -EFAULT;
- 	return 0;
- }
-@@ -314,7 +314,7 @@ static int set_bcr(struct kvm_vcpu *vcpu, const str=
-uct sys_reg_desc *rd,
- {
- 	__u64 *r =3D &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg];
-=20
--	if (copy_from_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-+	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) !=3D 0)
- 		return -EFAULT;
-=20
- 	return 0;
-@@ -358,7 +358,7 @@ static int set_wvr(struct kvm_vcpu *vcpu, const str=
-uct sys_reg_desc *rd,
- {
- 	__u64 *r =3D &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg];
-=20
--	if (copy_from_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-+	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) !=3D 0)
- 		return -EFAULT;
- 	return 0;
- }
-@@ -400,7 +400,7 @@ static int set_wcr(struct kvm_vcpu *vcpu, const str=
-uct sys_reg_desc *rd,
- {
- 	__u64 *r =3D &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg];
-=20
--	if (copy_from_user(uaddr, r, KVM_REG_SIZE(reg->id)) !=3D 0)
-+	if (copy_from_user(r, uaddr, KVM_REG_SIZE(reg->id)) !=3D 0)
- 		return -EFAULT;
- 	return 0;
- }
---=20
-2.1.4
+yikes!
 
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
