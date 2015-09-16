@@ -1,50 +1,38 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 1/3] arm/arm64: KVM: vgic: Check for !irqchip_in_kernel() when mapping resources
-Date: Wed, 16 Sep 2015 16:58:05 +0100
-Message-ID: <1442419087-24648-2-git-send-email-marc.zyngier@arm.com>
-References: <1442419087-24648-1-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 0/3] arm/arm64: KVM: Fix !irqchip_in_kernel() handling
+Date: Wed, 16 Sep 2015 16:58:04 +0100
+Message-ID: <1442419087-24648-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1442419087-24648-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: Pavel Fedin <p.fedin@samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Pavel Fedin <p.fedin@samsung.com>
+It is quite obvious that the non kernel-irqchip has been bitrotting
+for a while now. Pavel has been doing some work to address this, but
+it turns out that there is more fun to be had...
 
-Until b26e5fdac43c ("arm/arm64: KVM: introduce per-VM ops"),
-kvm_vgic_map_resources() used to include a check on irqchip_in_kernel(),
-and vgic_v2_map_resources() still has it.
+This series picks up one of Pavel's series (which is an obvious fix),
+and adds another fix for both arm and arm64.
 
-But now vm_ops are not initialized until we call kvm_vgic_create().
-Therefore kvm_vgic_map_resources() can being called without a VGIC,
-and we die because vm_ops.map_resources is NULL.
+With these two patches applied, I get a working system as long as I
+don't need timers - which is expected.
 
-Fixing this restores QEMU's kernel-irqchip=off option to a working state,
-allowing to use GIC emulation in userspace.
+Tested on X-Gene.
 
-Fixes: b26e5fdac43c ("arm/arm64: KVM: introduce per-VM ops")
-Cc: stable@vger.kernel.org
-Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-[maz: reworked commit message]
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm/kvm/arm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Marc Zyngier (2):
+  arm64: KVM: Disable virtual timer even if the guest is not using it
+  arm: KVM: Disable virtual timer even if the guest is not using it
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index ce404a5..dc017ad 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -446,7 +446,7 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
- 	 * Map the VGIC hardware resources before running a vcpu the first
- 	 * time on this VM.
- 	 */
--	if (unlikely(!vgic_ready(kvm))) {
-+	if (unlikely(irqchip_in_kernel(kvm) && !vgic_ready(kvm))) {
- 		ret = kvm_vgic_map_resources(kvm);
- 		if (ret)
- 			return ret;
+Pavel Fedin (1):
+  arm/arm64: KVM: vgic: Check for !irqchip_in_kernel() when mapping
+    resources
+
+ arch/arm/kvm/arm.c             | 2 +-
+ arch/arm/kvm/interrupts_head.S | 6 ++++--
+ arch/arm64/kvm/hyp.S           | 4 ++--
+ 3 files changed, 7 insertions(+), 5 deletions(-)
+
 -- 
 2.1.4
 
