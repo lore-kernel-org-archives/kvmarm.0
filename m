@@ -1,127 +1,195 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 7/8] arm64: KVM: Remove all traces of the ThumbEE registers
-Date: Thu, 17 Sep 2015 15:46:10 +0100
-Message-ID: <1442501171-24484-8-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 8/8] arm/arm64: KVM: Remove 'config KVM_ARM_MAX_VCPUS'
+Date: Thu, 17 Sep 2015 15:46:11 +0100
+Message-ID: <1442501171-24484-9-git-send-email-marc.zyngier@arm.com>
 References: <1442501171-24484-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 232AA42F0A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Sep 2015 10:45:41 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id sndxTAJe1xaf for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Sep 2015 10:45:40 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0178048833
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Sep 2015 10:45:40 -0400 (EDT)
 In-Reply-To: <1442501171-24484-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, Gleb Natapov <gleb@kernel.org>
-Cc: Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Marek Majtyka <marek.majtyka@tieto.com>, Pavel Fedin <p.fedin@samsung.com>, Ming Lei <ming.lei@canonical.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, Marek Majtyka <marek.majtyka@tieto.com>, Ming Lei <ming.lei@canonical.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Will Deacon <will.deacon@arm.com>
+From: Ming Lei <ming.lei@canonical.com>
 
-Although the ThumbEE registers and traps were present in earlier
-versions of the v8 architecture, it was retrospectively removed and so
-we can do the same.
+This patch removes config option of KVM_ARM_MAX_VCPUS,
+and like other ARCHs, just choose the maximum allowed
+value from hardware, and follows the reasons:
 
-Whilst this breaks migrating a guest started on a previous version of
-the kernel, it is much better to kill these (non existent) registers
-as soon as possible.
+1) from distribution view, the option has to be
+defined as the max allowed value because it need to
+meet all kinds of virtulization applications and
+need to support most of SoCs;
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Will Deacon <will.deacon@arm.com>
-[maz: added commend about migration]
+2) using a bigger value doesn't introduce extra memory
+consumption, and the help text in Kconfig isn't accurate
+because kvm_vpu structure isn't allocated until request
+of creating VCPU is sent from QEMU;
+
+3) the main effect is that the field of vcpus[] in 'struct kvm'
+becomes a bit bigger(sizeof(void *) per vcpu) and need more cache
+lines to hold the structure, but 'struct kvm' is one generic struct,
+and it has worked well on other ARCHs already in this way. Also,
+the world switch frequecy is often low, for example, it is ~2000
+when running kernel building load in VM from APM xgene KVM host,
+so the effect is very small, and the difference can't be observed
+in my test at all.
+
+Cc: Dann Frazier <dann.frazier@canonical.com>
+Signed-off-by: Ming Lei <ming.lei@canonical.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_arm.h |  1 -
- arch/arm64/include/asm/kvm_asm.h |  4 +---
- arch/arm64/kvm/hyp.S             | 22 ++++------------------
- arch/arm64/kvm/sys_regs.c        |  7 -------
- 4 files changed, 5 insertions(+), 29 deletions(-)
+ arch/arm/include/asm/kvm_host.h   |  8 ++------
+ arch/arm/kvm/Kconfig              | 11 -----------
+ arch/arm64/include/asm/kvm_host.h |  8 ++------
+ arch/arm64/kvm/Kconfig            | 11 -----------
+ include/kvm/arm_vgic.h            |  6 +-----
+ virt/kvm/arm/vgic-v3.c            |  2 +-
+ 6 files changed, 6 insertions(+), 40 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index cbc5e1a..9694f26 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -172,7 +172,6 @@
- #define VTTBR_VMID_MASK	  (UL(0xFF) << VTTBR_VMID_SHIFT)
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index dcba0fa..c8c226a 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -29,12 +29,6 @@
  
- /* Hyp System Trap Register */
--#define HSTR_EL2_TTEE	(1 << 16)
- #define HSTR_EL2_T(x)	(1 << x)
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
  
- /* Hyp Coproccessor Trap Register Shifts */
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 67fa0de..5e37710 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -53,9 +53,7 @@
- #define	IFSR32_EL2	25	/* Instruction Fault Status Register */
- #define	FPEXC32_EL2	26	/* Floating-Point Exception Control Register */
- #define	DBGVCR32_EL2	27	/* Debug Vector Catch Register */
--#define	TEECR32_EL1	28	/* ThumbEE Configuration Register */
--#define	TEEHBR32_EL1	29	/* ThumbEE Handler Base Register */
--#define	NR_SYS_REGS	30
-+#define	NR_SYS_REGS	28
- 
- /* 32bit mapping */
- #define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
-diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-index 60a83e2..8563477 100644
---- a/arch/arm64/kvm/hyp.S
-+++ b/arch/arm64/kvm/hyp.S
-@@ -433,20 +433,13 @@
- 	mrs	x5, ifsr32_el2
- 	stp	x4, x5, [x3]
- 
--	skip_fpsimd_state x8, 3f
-+	skip_fpsimd_state x8, 2f
- 	mrs	x6, fpexc32_el2
- 	str	x6, [x3, #16]
--3:
--	skip_debug_state x8, 2f
-+2:
-+	skip_debug_state x8, 1f
- 	mrs	x7, dbgvcr32_el2
- 	str	x7, [x3, #24]
--2:
--	skip_tee_state x8, 1f
+-#if defined(CONFIG_KVM_ARM_MAX_VCPUS)
+-#define KVM_MAX_VCPUS CONFIG_KVM_ARM_MAX_VCPUS
+-#else
+-#define KVM_MAX_VCPUS 0
+-#endif
 -
--	add	x3, x2, #CPU_SYSREG_OFFSET(TEECR32_EL1)
--	mrs	x4, teecr32_el1
--	mrs	x5, teehbr32_el1
--	stp	x4, x5, [x3]
- 1:
- .endm
+ #define KVM_USER_MEM_SLOTS 32
+ #define KVM_PRIVATE_MEM_SLOTS 4
+ #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+@@ -44,6 +38,8 @@
  
-@@ -466,16 +459,9 @@
- 	msr	dacr32_el2, x4
- 	msr	ifsr32_el2, x5
+ #include <kvm/arm_vgic.h>
  
--	skip_debug_state x8, 2f
-+	skip_debug_state x8, 1f
- 	ldr	x7, [x3, #24]
- 	msr	dbgvcr32_el2, x7
--2:
--	skip_tee_state x8, 1f
++#define KVM_MAX_VCPUS VGIC_V2_MAX_CPUS
++
+ u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
+ int __attribute_const__ kvm_target_cpu(void);
+ int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+index bfb915d..210ecca 100644
+--- a/arch/arm/kvm/Kconfig
++++ b/arch/arm/kvm/Kconfig
+@@ -45,15 +45,4 @@ config KVM_ARM_HOST
+ 	---help---
+ 	  Provides host support for ARM processors.
+ 
+-config KVM_ARM_MAX_VCPUS
+-	int "Number maximum supported virtual CPUs per VM"
+-	depends on KVM_ARM_HOST
+-	default 4
+-	help
+-	  Static number of max supported virtual CPUs per VM.
 -
--	add	x3, x2, #CPU_SYSREG_OFFSET(TEECR32_EL1)
--	ldp	x4, x5, [x3]
--	msr	teecr32_el1, x4
--	msr	teehbr32_el1, x5
- 1:
- .endm
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 1d0463e..d03d3af 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -539,13 +539,6 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ Op0(0b10), Op1(0b000), CRn(0b0111), CRm(0b1110), Op2(0b110),
- 	  trap_dbgauthstatus_el1 },
- 
--	/* TEECR32_EL1 */
--	{ Op0(0b10), Op1(0b010), CRn(0b0000), CRm(0b0000), Op2(0b000),
--	  NULL, reset_val, TEECR32_EL1, 0 },
--	/* TEEHBR32_EL1 */
--	{ Op0(0b10), Op1(0b010), CRn(0b0001), CRm(0b0000), Op2(0b000),
--	  NULL, reset_val, TEEHBR32_EL1, 0 },
+-	  If you choose a high number, the vcpu structures will be quite
+-	  large, so only choose a reasonable number that you expect to
+-	  actually use.
 -
- 	/* MDCCSR_EL1 */
- 	{ Op0(0b10), Op1(0b011), CRn(0b0000), CRm(0b0001), Op2(0b000),
- 	  trap_raz_wi },
+ endif # VIRTUALIZATION
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 415938d..3fb58ea 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -30,12 +30,6 @@
+ 
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+ 
+-#if defined(CONFIG_KVM_ARM_MAX_VCPUS)
+-#define KVM_MAX_VCPUS CONFIG_KVM_ARM_MAX_VCPUS
+-#else
+-#define KVM_MAX_VCPUS 0
+-#endif
+-
+ #define KVM_USER_MEM_SLOTS 32
+ #define KVM_PRIVATE_MEM_SLOTS 4
+ #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+@@ -43,6 +37,8 @@
+ #include <kvm/arm_vgic.h>
+ #include <kvm/arm_arch_timer.h>
+ 
++#define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
++
+ #define KVM_VCPU_MAX_FEATURES 3
+ 
+ int __attribute_const__ kvm_target_cpu(void);
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index bfffe8f..5c7e920 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -41,15 +41,4 @@ config KVM_ARM_HOST
+ 	---help---
+ 	  Provides host support for ARM processors.
+ 
+-config KVM_ARM_MAX_VCPUS
+-	int "Number maximum supported virtual CPUs per VM"
+-	depends on KVM_ARM_HOST
+-	default 4
+-	help
+-	  Static number of max supported virtual CPUs per VM.
+-
+-	  If you choose a high number, the vcpu structures will be quite
+-	  large, so only choose a reasonable number that you expect to
+-	  actually use.
+-
+ endif # VIRTUALIZATION
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index d901f1a..4e14dac 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -35,11 +35,7 @@
+ #define VGIC_V3_MAX_LRS		16
+ #define VGIC_MAX_IRQS		1024
+ #define VGIC_V2_MAX_CPUS	8
+-
+-/* Sanity checks... */
+-#if (KVM_MAX_VCPUS > 255)
+-#error Too many KVM VCPUs, the VGIC only supports up to 255 VCPUs for now
+-#endif
++#define VGIC_V3_MAX_CPUS	255
+ 
+ #if (VGIC_NR_IRQS_LEGACY & 31)
+ #error "VGIC_NR_IRQS must be a multiple of 32"
+diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
+index afbf925..7dd5d62 100644
+--- a/virt/kvm/arm/vgic-v3.c
++++ b/virt/kvm/arm/vgic-v3.c
+@@ -288,7 +288,7 @@ int vgic_v3_probe(struct device_node *vgic_node,
+ 
+ 	vgic->vctrl_base = NULL;
+ 	vgic->type = VGIC_V3;
+-	vgic->max_gic_vcpus = KVM_MAX_VCPUS;
++	vgic->max_gic_vcpus = VGIC_V3_MAX_CPUS;
+ 
+ 	kvm_info("%s@%llx IRQ%d\n", vgic_node->name,
+ 		 vcpu_res.start, vgic->maint_irq);
 -- 
 2.1.4
-
