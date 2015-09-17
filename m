@@ -1,28 +1,24 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [Qemu-devel] Could not boot a guest vm from kvm mode based on APM
- X-Gene Host and latest qemu
-Date: Thu, 17 Sep 2015 08:44:50 +0100
-Message-ID: <87r3lxebgt.fsf@linaro.org>
-References: <55F76064.8010504@hpe.com> <87y4g6mo0l.fsf@linaro.org>
- <55FA0320.1040701@hpe.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] ARM/ARM64: KVM: remove 'config KVM_ARM_MAX_VCPUS'
+Date: Thu, 17 Sep 2015 09:15:08 +0100
+Message-ID: <55FA768C.6050101@arm.com>
+References: <1441175481-18348-1-git-send-email-ming.lei@canonical.com>	<20150902102555.GH10991@cbox>	<CACVXFVOfaqRtobQ6us8VdsU+DOgPzxKCbTGqmG7nyds9kqMn_g@mail.gmail.com>
+ <CACVXFVMGLGsxmrPhmJVn0mNOrk+sQskrjTEiOBsUzR3jUmhpiA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E9B02423B1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Sep 2015 03:43:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 061F8418D8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Sep 2015 04:14:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mk9vJ5XcJV+d for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Sep 2015 03:43:52 -0400 (EDT)
-Received: from mail-wi0-f179.google.com (mail-wi0-f179.google.com
- [209.85.212.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AA5BD41451
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Sep 2015 03:43:52 -0400 (EDT)
-Received: by wiclk2 with SMTP id lk2so11718513wic.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Sep 2015 00:44:53 -0700 (PDT)
-In-reply-to: <55FA0320.1040701@hpe.com>
+ with ESMTP id kA01LZVxAs9x for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Sep 2015 04:14:10 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 60D7D412F3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Sep 2015 04:14:10 -0400 (EDT)
+In-Reply-To: <CACVXFVMGLGsxmrPhmJVn0mNOrk+sQskrjTEiOBsUzR3jUmhpiA@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,104 +28,210 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: liang yan <liangy@hpe.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu
+To: Ming Lei <ming.lei@canonical.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Catalin Marinas <catalin.marinas@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, KVM General <kvm@vger.kernel.org>, Dann Frazier <dann.frazier@canonical.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-CmxpYW5nIHlhbiA8bGlhbmd5QGhwZS5jb20+IHdyaXRlczoKCj4gT24gMDkvMTYvMjAxNSAwODoz
-NCBBTSwgQWxleCBCZW5uw6llIHdyb3RlOgo+PiBsaWFuZyB5YW4gPGxpYW5neUBocGUuY29tPiB3
-cml0ZXM6Cj4+Cj4+PiBIZWxsbywgQWxsLAo+Pj4KPj4+IEkgYW0gdHJ5aW5nIHRvIGVuYWJsZSBr
-dm0gZm9yIGEgZ3Vlc3Qgdm0gb24gYW4gQVBNIFgtR2VuZSBIb3N0IHdpdGgKPj4+IGxhdGVzdCBx
-ZW11LCBidXQgY291bGQgbm90IG1ha2UgaXQgd29yay4KPj4+Cj4+PiBUaGUgaG9zdCBpcyBBUE0g
-WC1HZW5lIDgtY29yZSwgTGludXgga2VybmVsIGlzIDQuMS4wLXJjNy0xLWFybTY0LAo+Pj4KPj4+
-IEd1ZXN0IGtlcm5lbCBpcyBsaW51eC0zLjE2cmMzCj4+Pgo+Pj4gUUVNVSBpcyBsYXRlc3QgdmVy
-c2lvbgo+Pj4KPj4+IEhvc3QgaGFzIHRoZXNlIGRtZXNnIGluZm8KPj4+IFsgICAgMi43MDgyNTld
-IGt2bSBbMV06IEdJQ0ggYmFzZT0weDc4MGMwMDAwLCBHSUNWIGJhc2U9MHg3ODBlMDAwMCwgSVJR
-PTI1Cj4+PiBbICAgIDIuNzA4MzI3XSBrdm0gWzFdOiB0aW1lciBJUlEzMAo+Pj4gWyAgICAyLjcw
-ODMzNV0ga3ZtIFsxXTogSHlwIG1vZGUgaW5pdGlhbGl6ZWQgc3VjY2Vzc2Z1bGx5Cj4+Pgo+Pj4g
-SG9zdCBoYXMgZGV2L2t2bS4KPj4+Cj4+PiBjb21tYW5kLWxpbmUgaXMKPj4+IGFhcmNoNjQtc29m
-dG1tdS9xZW11LXN5c3RlbS1hYXJjaDY0IC1tYWNoaW5lIHZpcnQsa2VybmVsX2lycWNoaXA9b2Zm
-Cj4+PiAtY3B1IGNvcnRleC1hNTcgLW1hY2hpbmUgYWNjZWw9a3ZtIC1ub2dyYXBoaWMgLXNtcCAx
-IC1tIDIwNDggLWtlcm5lbAo+Pj4gYWFyY2g2NC1saW51eC0zLjE2cmMzLWJ1aWxkcm9vdC5pbWcg
-IC0tYXBwZW5kICJjb25zb2xlPXR0eUFNQTAiCj4+IEkgdGhvdWdodCBJIHJlY29nbmlzZWQgb25l
-IG9mIG15IGltYWdlcyA7LSkKPj4KPj4gV2h5IGFyZSB5b3UgcnVubmluZyB3aXRoIGtlcm5lbF9p
-cnFjaGlwPW9mZj8KPgo+Cj4gSGVsbG8sIEFsZXgsCj4KPiBUaGFua3MgZm9yIHlvdXIgcmVwbHkg
-YW5kIHlvdXIgcHJlLWJvb3QgaW1hZ2UuIFZlcnkgaGVscGZ1bC4KPgo+IFRoZSByZWFzb24gSSBy
-YW4gd2l0aCAia2VybmVsX2lycWNoaXA9b2ZmIiBpcyBiZWNhdXNlIGl0IHNob3dlZCB0aGUgCj4g
-ZXJyb3IgIkNyZWF0ZSBrZXJuZWwgaXJxY2hpcCBmYWlsZWQ6IE5vIHN1Y2ggZGV2aWNlIgo+IGFy
-ZSB5b3UgZmFtaWxpYXIgd2l0aCBpdD8KCk5vIGJ1dCBJIHN1c3BlY3QgaXQgaXMgYSBrZXJuZWwg
-Y29uZmlndXJhdGlvbiBpc3N1ZS4gQXJlIHlvdSBydW5uaW5nIGEKZGVmY29uZmlnPwoKPgo+IEkg
-ZGlkIG5vdCB0cnkga2VybmVsIDQuMy54IHlldCwgaGF2ZSB5b3UgcmVsZWFzZWQgb24geW91ciBs
-aW5hcm8gd2Vic2l0ZSAKPiBub3c/CgpUaGF0J3MgcnVubmluZyBkaXJlY3RseSBmcm9tIExpbnVz
-JyB0cmVlIHNvIGl0J3MgcHVyZSBtYWlubGluZS4KCj4gVGhhbmtzIGZvciB5b3VyIGxvZyBmaWxl
-LCBpdCBzaG93cyBzb21ldGhpbmcgd3Jvbmcgd2l0aCB0aGUgdmNwdSwgSSBhbSAKPiBnb25uYSBj
-aGVjayB0aGUga3ZtIGNvZGUgZnJvbSBob3N0IGtlcm5lbCBub3cuCj4gV2lsbCBsZXQgeW91IGtu
-b3cgdGhlIHVwZGF0ZS4KCk1hcmsgWnluZ2llciBwb2ludGVkIG91dCB0aGF0J3MgYSBrbm93IGJ1
-ZyB0aGF0IHRoZXJlIGFyZSBwYXRjaGVzCmluLWZsaWdodCBmb3IuCgo+Cj4KPiBCZXN0LAo+IExp
-YW5nCj4KPj4gV2l0aG91dCBpdCBJIGNhbiBib290IHRoZSBpbWFnZSBmaW5lIG9uIG15IEFQTSBy
-dW5uaW5nIDQuMy4wLXJjMS1hamIgYnV0Cj4+IHdpdGggaXQgSSBoZWxwZnVsbHkgc2VnIHRoZSBr
-ZXJuZWw6Cj4gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Cj4+
-Cj4+IFsxNjAzNS45OTA1MThdIEJhZCBtb2RlIGluIFN5bmNocm9ub3VzIEFib3J0IGhhbmRsZXIg
-ZGV0ZWN0ZWQsIGNvZGUgMHg4NjAwMDAwNiAtLSBJQUJUIChjdXJyZW50IEVMKQo+ID09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQo+PiBbMTYwMzUuOTk3OTcwXSBD
-UFU6IDEgUElEOiAyMTMyOCBDb21tOiBxZW11LXN5c3RlbS1hYXIgTm90IHRhaW50ZWQgNC4zLjAt
-cmMxLWFqYiAjNDQ2Cj4+IFsxNjAzNi4wMDQyMDNdIEhhcmR3YXJlIG5hbWU6IEFQTSBYLUdlbmUg
-TXVzdGFuZyBib2FyZCAoRFQpCj4+IFsxNjAzNi4wMDgxOTFdIHRhc2s6IGZmZmZmZmMzZWNlYTgw
-MDAgdGk6IGZmZmZmZmMzZDgwNzgwMDAgdGFzay50aTogZmZmZmZmYzNkODA3ODAwMAo+PiBbMTYw
-MzYuMDE0MzM4XSBQQyBpcyBhdCAweDAKPj4gWzE2MDM2LjAxNTU2NF0gTFIgaXMgYXQga3ZtX3Zn
-aWNfbWFwX3Jlc291cmNlcysweDMwLzB4M2MKPj4gWzE2MDM2LjAxOTI5MV0gcGMgOiBbPDAwMDAw
-MDAwMDAwMDAwMDA+XSBsciA6IFs8ZmZmZmZmYzAwMDBhZTkwMD5dIHBzdGF0ZTogMDAwMDAxNDUK
-Pj4gWzE2MDM2LjAyNTM1MF0gc3AgOiBmZmZmZmZjM2Q4MDdiYjIwCj4+IFsxNjAzNi4wMjczNDhd
-IHgyOTogZmZmZmZmYzNkODA3YmIyMCB4Mjg6IGZmZmZmZmMzZDgwNzgwMDAKPj4gWzE2MDM2LjAz
-MTM1NV0geDI3OiBmZmZmZmZjMDAwNjQyMDAwIHgyNjogMDAwMDAwMDAwMDAwMDAxZAo+PiBbMTYw
-MzYuMDM1MzYxXSB4MjU6IDAwMDAwMDAwMDAwMDAxMWIgeDI0OiBmZmZmZmZjM2Q4MGMxMDAwCj4+
-IFsxNjAzNi4wMzkzNjhdIHgyMzogMDAwMDAwMDAwMDAwMDAwMCB4MjI6IDAwMDAwMDAwMDAwMDAw
-MDAKPj4gWzE2MDM2LjA0MzM3NF0geDIxOiBmZmZmZmZjMGZhMjQwMDAwIHgyMDogZmZmZmZmYzBm
-YTgwNzgwMAo+PiBbMTYwMzYuMDQ3MzgwXSB4MTk6IGZmZmZmZmMwZmE4MDc4MDAgeDE4OiAwMDAw
-MDA3Zjk3YWYyMGUwCj4+IFsxNjAzNi4wNTEzODddIHgxNzogMDAwMDAwN2Y5OWM0NDgxMCB4MTY6
-IGZmZmZmZmMwMDAxZmIwMzAKPj4gWzE2MDM2LjA1NTM5NF0geDE1OiAwMDAwMDA3Zjk5Y2M5NTg4
-IHgxNDogMDAwMDAwMDAwMDkyMjAwMAo+PiBbMTYwMzYuMDU5NDAxXSB4MTM6IDAwMDAwMDAwMDA5
-N2ViODAgeDEyOiAwMDAwMDAwMDAwNGRlMGYwCj4+IFsxNjAzNi4wNjM0MDZdIHgxMTogMDAwMDAw
-MDAwMDAwMDAzOCB4MTA6IDAwMDAwMDAwZmZmZmZmZmYKPj4gWzE2MDM2LjA2NzQxM10geDkgOiAw
-MDAwMDA3Zjk3YWYyNDgwIHg4IDogMDAwMDAwMDAwMDAwMDA1MAo+PiBbMTYwMzYuMDcxNDE5XSB4
-NyA6IGZmZmZmZmMzZWMyNGM4NDAgeDYgOiAwMDAwMDAwMDAwMDAwMDAwCj4+IFsxNjAzNi4wNzU0
-MjRdIHg1IDogMDAwMDAwMDAwMDAwMDAwMyB4NCA6IGZmZmZmZmMzZWNlNzIwODAKPj4gWzE2MDM2
-LjA3OTQzMF0geDMgOiBmZmZmZmZjM2VjZTcyMDgwIHgyIDogMDAwMDAwMDAwMDAwMDAwMAo+PiBb
-MTYwMzYuMDgzNDM2XSB4MSA6IGZmZmZmZmMwMDBhMjYyNjAgeDAgOiBmZmZmZmZjMGZhODA3ODAw
-Cj4gPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09Cj4+IFsxNjAzNi4wODc2Mjhd
-IEludGVybmFsIGVycm9yOiBPb3BzIC0gYmFkIG1vZGU6IDAgWyMxXSBTTVAKPiA9PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT0KPgo+PiBbMTYwMzYuMDkxNTI4XSBNb2R1bGVzIGxp
-bmtlZCBpbjoKPj4gWzE2MDM2LjA5MzI3OF0gQ1BVOiAxIFBJRDogMjEzMjggQ29tbTogcWVtdS1z
-eXN0ZW0tYWFyIE5vdCB0YWludGVkIDQuMy4wLXJjMS1hamIgIzQ0Ngo+PiBbMTYwMzYuMDk5NTEw
-XSBIYXJkd2FyZSBuYW1lOiBBUE0gWC1HZW5lIE11c3RhbmcgYm9hcmQgKERUKQo+PiBbMTYwMzYu
-MTAzNDk3XSB0YXNrOiBmZmZmZmZjM2VjZWE4MDAwIHRpOiBmZmZmZmZjM2Q4MDc4MDAwIHRhc2su
-dGk6IGZmZmZmZmMzZDgwNzgwMDAKPj4gWzE2MDM2LjEwOTY0Ml0gUEMgaXMgYXQgMHgwCj4+IFsx
-NjAzNi4xMTA4NjRdIExSIGlzIGF0IGt2bV92Z2ljX21hcF9yZXNvdXJjZXMrMHgzMC8weDNjCj4+
-IFsxNjAzNi4xMTQ1OTBdIHBjIDogWzwwMDAwMDAwMDAwMDAwMDAwPl0gbHIgOiBbPGZmZmZmZmMw
-MDAwYWU5MDA+XSBwc3RhdGU6IDAwMDAwMTQ1Cj4+IFsxNjAzNi4xMjA2NDldIHNwIDogZmZmZmZm
-YzNkODA3YmIyMAo+PiBbMTYwMzYuMTIyNjQ4XSB4Mjk6IGZmZmZmZmMzZDgwN2JiMjAgeDI4OiBm
-ZmZmZmZjM2Q4MDc4MDAwCj4+IFsxNjAzNi4xMjY2NTRdIHgyNzogZmZmZmZmYzAwMDY0MjAwMCB4
-MjY6IDAwMDAwMDAwMDAwMDAwMWQKPj4gWzE2MDM2LjEzMDY1OV0geDI1OiAwMDAwMDAwMDAwMDAw
-MTFiIHgyNDogZmZmZmZmYzNkODBjMTAwMAo+PiBbMTYwMzYuMTM0NjY2XSB4MjM6IDAwMDAwMDAw
-MDAwMDAwMDAgeDIyOiAwMDAwMDAwMDAwMDAwMDAwCj4+IFsxNjAzNi4xMzg2NzFdIHgyMTogZmZm
-ZmZmYzBmYTI0MDAwMCB4MjA6IGZmZmZmZmMwZmE4MDc4MDAKPj4gWzE2MDM2LjE0MjY3OF0geDE5
-OiBmZmZmZmZjMGZhODA3ODAwIHgxODogMDAwMDAwN2Y5N2FmMjBlMAo+PiBbMTYwMzYuMTQ2Njg1
-XSB4MTc6IDAwMDAwMDdmOTljNDQ4MTAgeDE2OiBmZmZmZmZjMDAwMWZiMDMwCj4+IFsxNjAzNi4x
-NTA2OTBdIHgxNTogMDAwMDAwN2Y5OWNjOTU4OCB4MTQ6IDAwMDAwMDAwMDA5MjIwMDAKPj4gWzE2
-MDM2LjE1NDY5Nl0geDEzOiAwMDAwMDAwMDAwOTdlYjgwIHgxMjogMDAwMDAwMDAwMDRkZTBmMAo+
-PiBbMTYwMzYuMTU4NzAxXSB4MTE6IDAwMDAwMDAwMDAwMDAwMzggeDEwOiAwMDAwMDAwMGZmZmZm
-ZmZmCj4+IFsxNjAzNi4xNjI3MDZdIHg5IDogMDAwMDAwN2Y5N2FmMjQ4MCB4OCA6IDAwMDAwMDAw
-MDAwMDAwNTAKPj4gWzE2MDM2LjE2NjcxMl0geDcgOiBmZmZmZmZjM2VjMjRjODQwIHg2IDogMDAw
-MDAwMDAwMDAwMDAwMAo+PiBbMTYwMzYuMTcwNzE5XSB4NSA6IDAwMDAwMDAwMDAwMDAwMDMgeDQg
-OiBmZmZmZmZjM2VjZTcyMDgwCj4+IFsxNjAzNi4xNzQ3MjVdIHgzIDogZmZmZmZmYzNlY2U3MjA4
-MCB4MiA6IDAwMDAwMDAwMDAwMDAwMDAKPj4gWzE2MDM2LjE3ODczMV0geDEgOiBmZmZmZmZjMDAw
-YTI2MjYwIHgwIDogZmZmZmZmYzBmYTgwNzgwMAo+Pgo+Pj4KPj4+IHdoZW4gdXNpbmcgY3B1ICJj
-b3J0ZXgtYTU3IiwgZ290IHRoZSBlcnJvciAia3ZtX2luaXRfdmNwdSBmYWlsZWQ6Cj4+PiBJbnZh
-bGlkIGFyZ3VtZW50Igo+Pj4gd2hlbiB1c2luZyBjcHUgImhvc3QiLCBnb3QgdGhlIGVycm9yICJG
-YWlsZWQgdG8gcmV0cmlldmUgaG9zdCBDUFUgZmVhdHVyZXMhIgo+Pj4KPj4+IEJ5IHRoZSB3YXks
-IGFsbCB0aGUgY29tbWFuZCBsaW5lIHdvcmtzIHdlbGwgdW5kZXIgInRjZyIgbW9kZS4KPj4+IEFu
-eW9uZSBoYXMgYSBxdWljayBpZGVhPyBUaGFua3MgaW4gYWR2YW5jZS4KPj4+Cj4+PiBCZXN0LAo+
-Pj4gTGlhbmcKCi0tIApBbGV4IEJlbm7DqWUKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29s
-dW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8v
-a3ZtYXJtCg==
+On 17/09/15 07:08, Ming Lei wrote:
+> On Wed, Sep 2, 2015 at 7:42 PM, Ming Lei <ming.lei@canonical.com> wrote:
+>> On Wed, Sep 2, 2015 at 6:25 PM, Christoffer Dall
+>> <christoffer.dall@linaro.org> wrote:
+>>> On Wed, Sep 02, 2015 at 02:31:21PM +0800, Ming Lei wrote:
+>>>> This patch removes config option of KVM_ARM_MAX_VCPUS,
+>>>> and like other ARCHs, just choose the maximum allowed
+>>>> value from hardware, and follows the reasons:
+>>>>
+>>>> 1) from distribution view, the option has to be
+>>>> defined as the max allowed value because it need to
+>>>> meet all kinds of virtulization applications and
+>>>> need to support most of SoCs;
+>>>>
+>>>> 2) using a bigger value doesn't introduce extra memory
+>>>> consumption, and the help text in Kconfig isn't accurate
+>>>> because kvm_vpu structure isn't allocated until request
+>>>> of creating VCPU is sent from QEMU;
+>>>
+>>> This used to be true because of the vgic bitmaps, but that is now
+>>> dynamically allocated, so I believe you're correct in saying that the
+>>> text is no longer accurate.
+>>>
+>>>>
+>>>> 3) the main effect is that the field of vcpus[] in 'struct kvm'
+>>>> becomes a bit bigger(sizeof(void *) per vcpu) and need more cache
+>>>> lines to hold the structure, but 'struct kvm' is one generic struct,
+>>>> and it has worked well on other ARCHs already in this way. Also,
+>>>> the world switch frequecy is often low, for example, it is ~2000
+>>>> when running kernel building load in VM from APM xgene KVM host,
+>>>> so the effect is very small, and the difference can't be observed
+>>>> in my test at all.
+>>>
+>>> While I'm not prinicipally opposed to removing this option, I have to
+>>> point out that this analysis is far far over-simplified.  You have
+>>> chosen a workload which excercised only CPU and memory virtualization,
+>>> mostly solved by the hardware virtualization support, and therefore you
+>>> don't see many exits.
+>>>
+>>> Try running an I/O bound workload, or something which involves a lot of
+>>> virtual IPIs, and you'll see a higher number of exits.
+>>
+>> Yeah, the frequency of exits becomes higher(6600/sec) when I run a
+>> totally I/O benchmark(fio: 4 jobs, bs 4k, libaio over virtio-blk) in a
+>> quad-core VM, but it is still not high enough to cause any difference
+>> on the test result.
+>>
+>>>
+>>> However, I still doubt that the effects will be noticable in the grand
+>>> scheme of things.
+>>>>
+>>>> Cc: Dann Frazier <dann.frazier@canonical.com>
+>>>> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+>>>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>>>> Cc: kvmarm@lists.cs.columbia.edu
+>>>> Cc: kvm@vger.kernel.org
+>>>> Signed-off-by: Ming Lei <ming.lei@canonical.com>
+>>>> ---
+>>>>  arch/arm/include/asm/kvm_host.h   |  8 ++------
+>>>>  arch/arm/kvm/Kconfig              | 11 -----------
+>>>>  arch/arm64/include/asm/kvm_host.h |  8 ++------
+>>>>  arch/arm64/kvm/Kconfig            | 11 -----------
+>>>>  include/kvm/arm_vgic.h            |  6 +-----
+>>>>  virt/kvm/arm/vgic-v3.c            |  2 +-
+>>>>  6 files changed, 6 insertions(+), 40 deletions(-)
+>>>>
+>>>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+>>>> index dcba0fa..c8c226a 100644
+>>>> --- a/arch/arm/include/asm/kvm_host.h
+>>>> +++ b/arch/arm/include/asm/kvm_host.h
+>>>> @@ -29,12 +29,6 @@
+>>>>
+>>>>  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+>>>>
+>>>> -#if defined(CONFIG_KVM_ARM_MAX_VCPUS)
+>>>> -#define KVM_MAX_VCPUS CONFIG_KVM_ARM_MAX_VCPUS
+>>>> -#else
+>>>> -#define KVM_MAX_VCPUS 0
+>>>> -#endif
+>>>> -
+>>>>  #define KVM_USER_MEM_SLOTS 32
+>>>>  #define KVM_PRIVATE_MEM_SLOTS 4
+>>>>  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+>>>> @@ -44,6 +38,8 @@
+>>>>
+>>>>  #include <kvm/arm_vgic.h>
+>>>>
+>>>> +#define KVM_MAX_VCPUS VGIC_V2_MAX_CPUS
+>>>> +
+>>>>  u32 *kvm_vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num, u32 mode);
+>>>>  int __attribute_const__ kvm_target_cpu(void);
+>>>>  int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
+>>>> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+>>>> index bfb915d..210ecca 100644
+>>>> --- a/arch/arm/kvm/Kconfig
+>>>> +++ b/arch/arm/kvm/Kconfig
+>>>> @@ -45,15 +45,4 @@ config KVM_ARM_HOST
+>>>>       ---help---
+>>>>         Provides host support for ARM processors.
+>>>>
+>>>> -config KVM_ARM_MAX_VCPUS
+>>>> -     int "Number maximum supported virtual CPUs per VM"
+>>>> -     depends on KVM_ARM_HOST
+>>>> -     default 4
+>>>> -     help
+>>>> -       Static number of max supported virtual CPUs per VM.
+>>>> -
+>>>> -       If you choose a high number, the vcpu structures will be quite
+>>>> -       large, so only choose a reasonable number that you expect to
+>>>> -       actually use.
+>>>> -
+>>>>  endif # VIRTUALIZATION
+>>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>>> index 415938d..3fb58ea 100644
+>>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>>> @@ -30,12 +30,6 @@
+>>>>
+>>>>  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+>>>>
+>>>> -#if defined(CONFIG_KVM_ARM_MAX_VCPUS)
+>>>> -#define KVM_MAX_VCPUS CONFIG_KVM_ARM_MAX_VCPUS
+>>>> -#else
+>>>> -#define KVM_MAX_VCPUS 0
+>>>> -#endif
+>>>> -
+>>>>  #define KVM_USER_MEM_SLOTS 32
+>>>>  #define KVM_PRIVATE_MEM_SLOTS 4
+>>>>  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+>>>> @@ -43,6 +37,8 @@
+>>>>  #include <kvm/arm_vgic.h>
+>>>>  #include <kvm/arm_arch_timer.h>
+>>>>
+>>>> +#define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
+>>>> +
+>>>>  #define KVM_VCPU_MAX_FEATURES 3
+>>>>
+>>>>  int __attribute_const__ kvm_target_cpu(void);
+>>>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+>>>> index bfffe8f..5c7e920 100644
+>>>> --- a/arch/arm64/kvm/Kconfig
+>>>> +++ b/arch/arm64/kvm/Kconfig
+>>>> @@ -41,15 +41,4 @@ config KVM_ARM_HOST
+>>>>       ---help---
+>>>>         Provides host support for ARM processors.
+>>>>
+>>>> -config KVM_ARM_MAX_VCPUS
+>>>> -     int "Number maximum supported virtual CPUs per VM"
+>>>> -     depends on KVM_ARM_HOST
+>>>> -     default 4
+>>>> -     help
+>>>> -       Static number of max supported virtual CPUs per VM.
+>>>> -
+>>>> -       If you choose a high number, the vcpu structures will be quite
+>>>> -       large, so only choose a reasonable number that you expect to
+>>>> -       actually use.
+>>>> -
+>>>>  endif # VIRTUALIZATION
+>>>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+>>>> index d901f1a..4e14dac 100644
+>>>> --- a/include/kvm/arm_vgic.h
+>>>> +++ b/include/kvm/arm_vgic.h
+>>>> @@ -35,11 +35,7 @@
+>>>>  #define VGIC_V3_MAX_LRS              16
+>>>>  #define VGIC_MAX_IRQS                1024
+>>>>  #define VGIC_V2_MAX_CPUS     8
+>>>> -
+>>>> -/* Sanity checks... */
+>>>> -#if (KVM_MAX_VCPUS > 255)
+>>>> -#error Too many KVM VCPUs, the VGIC only supports up to 255 VCPUs for now
+>>>> -#endif
+>>>> +#define VGIC_V3_MAX_CPUS     255
+>>>>
+>>>>  #if (VGIC_NR_IRQS_LEGACY & 31)
+>>>>  #error "VGIC_NR_IRQS must be a multiple of 32"
+>>>> diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
+>>>> index afbf925..7dd5d62 100644
+>>>> --- a/virt/kvm/arm/vgic-v3.c
+>>>> +++ b/virt/kvm/arm/vgic-v3.c
+>>>> @@ -288,7 +288,7 @@ int vgic_v3_probe(struct device_node *vgic_node,
+>>>>
+>>>>       vgic->vctrl_base = NULL;
+>>>>       vgic->type = VGIC_V3;
+>>>> -     vgic->max_gic_vcpus = KVM_MAX_VCPUS;
+>>>> +     vgic->max_gic_vcpus = VGIC_V3_MAX_CPUS;
+>>>>
+>>>>       kvm_info("%s@%llx IRQ%d\n", vgic_node->name,
+>>>>                vcpu_res.start, vgic->maint_irq);
+>>>> --
+>>>> 1.9.1
+>>>
+>>>
+>>> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> 
+> Hi Guys,
+> 
+> Is there any chance to merge this patch?
+
+Ah, I missed it, thanks for the heads up. I've just queued it.
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
