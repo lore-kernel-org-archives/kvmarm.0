@@ -1,63 +1,65 @@
 From: Mario Smarduch <m.smarduch@samsung.com>
-Subject: [PATCH 0/2] KVM/arm: add fp/simd lazy switch support
-Date: Thu, 17 Sep 2015 18:05:15 -0700
-Message-ID: <1442538317-13618-1-git-send-email-m.smarduch@samsung.com>
+Subject: [PATCH 1/2] KVM/arm: add hooks for armv7 fp/simd lazy switch support
+Date: Thu, 17 Sep 2015 18:05:16 -0700
+Message-ID: <1442538317-13618-2-git-send-email-m.smarduch@samsung.com>
+References: <1442538317-13618-1-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D7339431BE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Sep 2015 21:04:19 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Uq5TI-YpwtBB for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Sep 2015 21:04:18 -0400 (EDT)
-Received: from usmailout4.samsung.com (mailout4.w2.samsung.com
- [211.189.100.14])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 11FF242E5B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Sep 2015 21:04:17 -0400 (EDT)
-Received: from uscpsbgex2.samsung.com
- (u123.gpu85.samsung.co.kr [203.254.195.123]) by usmailout4.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NUU003GSLOWQZ30@usmailout4.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Thu, 17 Sep 2015 21:05:20 -0400 (EDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <1442538317-13618-1-git-send-email-m.smarduch@samsung.com>
+Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Mario Smarduch <m.smarduch@samsung.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-These patches enable armv7 fp/simd lazy switch. On guest entry fp/simd
-access trap is set, and on guest first access fp/simd registers are switched -
-host saved, guest restored. CPU continues with guest fp/simd content until
-vcpu_put where guest is saved and host is restored. 
+Basic hooks are added to support fp/simd lazy switch. A vcpu flag to track 
+fp/simd state, offset into the vcpu structure and switch prototype function.
 
-Running floating point workload illustrates reduction of fp/simd context 
-switches the amount depends on the load. For a light load with with FP 
-application running only 2% of all exits result in calls to lazy switch.
+Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+---
+ arch/arm/include/asm/kvm_asm.h  | 1 +
+ arch/arm/include/asm/kvm_host.h | 3 +++
+ arch/arm/kernel/asm-offsets.c   | 1 +
+ 3 files changed, 5 insertions(+)
 
-arm64 version is in test and appears to work fine, remaining work is
-boot arm32 guest on arm64 and verify operation. Initial intent was to post
-all patches at once, but arm64 version will be posted soon.
-
-Mario Smarduch (2):
-  add hooks for armv7 vfp/simd lazy switch support
-  enable armv7 vfp/simd lazy switch
-
- arch/arm/include/asm/kvm_asm.h  |  1 +
- arch/arm/include/asm/kvm_host.h |  3 +++
- arch/arm/kernel/asm-offsets.c   |  1 +
- arch/arm/kvm/arm.c              | 17 +++++++++++++++++
- arch/arm/kvm/interrupts.S       | 40 +++++++++++++++++++++++++++++-----------
- 5 files changed, 51 insertions(+), 11 deletions(-)
-
+diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+index 194c91b..4b45d79 100644
+--- a/arch/arm/include/asm/kvm_asm.h
++++ b/arch/arm/include/asm/kvm_asm.h
+@@ -97,6 +97,7 @@ extern char __kvm_hyp_code_end[];
+ extern void __kvm_flush_vm_context(void);
+ extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
+ extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
++extern void __kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu);
+ 
+ extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+ #endif
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index dcba0fa..4858f6c 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -111,6 +111,9 @@ struct kvm_vcpu_arch {
+ 	/* Interrupt related fields */
+ 	u32 irq_lines;		/* IRQ and FIQ levels */
+ 
++	/* Track fp/simd lazy switch */
++	u32 vfp_lazy;
++
+ 	/* Exception Information */
+ 	struct kvm_vcpu_fault_info fault;
+ 
+diff --git a/arch/arm/kernel/asm-offsets.c b/arch/arm/kernel/asm-offsets.c
+index 871b826..4a80802f 100644
+--- a/arch/arm/kernel/asm-offsets.c
++++ b/arch/arm/kernel/asm-offsets.c
+@@ -191,6 +191,7 @@ int main(void)
+   DEFINE(VCPU_HPFAR,		offsetof(struct kvm_vcpu, arch.fault.hpfar));
+   DEFINE(VCPU_HYP_PC,		offsetof(struct kvm_vcpu, arch.fault.hyp_pc));
+   DEFINE(VCPU_VGIC_CPU,		offsetof(struct kvm_vcpu, arch.vgic_cpu));
++  DEFINE(VCPU_VFP_LAZY,		offsetof(struct kvm_vcpu, arch.vfp_lazy));
+   DEFINE(VGIC_V2_CPU_HCR,	offsetof(struct vgic_cpu, vgic_v2.vgic_hcr));
+   DEFINE(VGIC_V2_CPU_VMCR,	offsetof(struct vgic_cpu, vgic_v2.vgic_vmcr));
+   DEFINE(VGIC_V2_CPU_MISR,	offsetof(struct vgic_cpu, vgic_v2.vgic_misr));
 -- 
 1.9.1
+
