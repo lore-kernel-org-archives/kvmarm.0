@@ -1,24 +1,28 @@
-From: Antonios Motakis <antonios.motakis@huawei.com>
-Subject: Re: [PATCH 2/2] KVM/arm: enable armv7 fp/simd lazy switch
-Date: Tue, 22 Sep 2015 16:01:05 +0200
-Message-ID: <56015F21.60200@huawei.com>
-References: <1442538317-13618-1-git-send-email-m.smarduch@samsung.com>
- <1442538317-13618-3-git-send-email-m.smarduch@samsung.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [RFC 0/2] VFIO: Add virtual MSI doorbell support.
+Date: Tue, 22 Sep 2015 23:09:14 +0100
+Message-ID: <20150922230914.79972137@arm.com>
+References: <1437728590-23126-1-git-send-email-pranavkumar@linaro.org>
+ <1438100507.5211.170.camel@redhat.com>
+ <CY1PR0301MB127660D71378F009918DDDD5908D0@CY1PR0301MB1276.namprd03.prod.outlook.com>
+ <1438106335.5211.219.camel@redhat.com>
+ <CAAHg+HgosCe=1T5ER-4AS1g779RxCDjcrazKV4CQC-43zDK-+Q@mail.gmail.com>
+ <CY1PR0301MB12761E7FA759BD1D6F218B8B90760@CY1PR0301MB1276.namprd03.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E772648F0A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Sep 2015 10:01:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A6DB848EF0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Sep 2015 18:08:01 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EuWznYRVNdMy for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Sep 2015 10:01:28 -0400 (EDT)
-Received: from lhrrgout.huawei.com (lhrrgout.huawei.com [194.213.3.17])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3FA4B48F06
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Sep 2015 10:01:27 -0400 (EDT)
-In-Reply-To: <1442538317-13618-3-git-send-email-m.smarduch@samsung.com>
+ with ESMTP id W0boicq1COxk for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Sep 2015 18:08:00 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A8E348EDB
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Sep 2015 18:07:59 -0400 (EDT)
+In-Reply-To: <CY1PR0301MB12761E7FA759BD1D6F218B8B90760@CY1PR0301MB1276.namprd03.prod.outlook.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,179 +32,147 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mario Smarduch <m.smarduch@samsung.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Bhushan Bharat <Bharat.Bhushan@freescale.com>
+Cc: "rob.herring@linaro.org" <rob.herring@linaro.org>, "arnd@arndb.de" <arnd@arndb.de>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "patches@apm.com" <patches@apm.com>, Will Deacon <Will.Deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Stuart Yoder <stuart.yoder@freescale.com>, Alex Williamson <alex.williamson@redhat.com>, "bhelgaas@google.com" <bhelgaas@google.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hello,
+On Tue, 4 Aug 2015 06:52:01 +0100
+Bhushan Bharat <Bharat.Bhushan@freescale.com> wrote:
 
-On 18-Sep-15 03:05, Mario Smarduch wrote:
-> Adds code to enable fp/simd lazy switch. On each entry check if fp/simd
-> registers have been switched to guest, if no set the trap flag. On trap =
+> 
+> 
+> > -----Original Message-----
+> > From: Pranavkumar Sawargaonkar [mailto:pranavkumar@linaro.org]
+> > Sent: Tuesday, August 04, 2015 11:18 AM
+> > To: Bhushan Bharat-R65777
+> > Cc: kvm@vger.kernel.org; Alex Williamson; kvmarm@lists.cs.columbia.edu;
+> > linux-arm-kernel@lists.infradead.org; linux-kernel@vger.kernel.org;
+> > christoffer.dall@linaro.org; marc.zyngier@arm.com; will.deacon@arm.com;
+> > bhelgaas@google.com; arnd@arndb.de; rob.herring@linaro.org;
+> > eric.auger@linaro.org; patches@apm.com; Yoder Stuart-B08248
+> > Subject: Re: [RFC 0/2] VFIO: Add virtual MSI doorbell support.
+> > 
+> > Hi Bharat,
+> > 
+> > On 28 July 2015 at 23:28, Alex Williamson <alex.williamson@redhat.com>
+> > wrote:
+> > > On Tue, 2015-07-28 at 17:23 +0000, Bhushan Bharat wrote:
+> > >> Hi Alex,
+> > >>
+> > >> > -----Original Message-----
+> > >> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > >> > Sent: Tuesday, July 28, 2015 9:52 PM
+> > >> > To: Pranavkumar Sawargaonkar
+> > >> > Cc: kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; linux-arm-
+> > >> > kernel@lists.infradead.org; linux-kernel@vger.kernel.org;
+> > >> > christoffer.dall@linaro.org; marc.zyngier@arm.com;
+> > >> > will.deacon@arm.com; bhelgaas@google.com; arnd@arndb.de;
+> > >> > rob.herring@linaro.org; eric.auger@linaro.org; patches@apm.com;
+> > >> > Bhushan Bharat-R65777; Yoder
+> > >> > Stuart-B08248
+> > >> > Subject: Re: [RFC 0/2] VFIO: Add virtual MSI doorbell support.
+> > >> >
+> > >> > On Fri, 2015-07-24 at 14:33 +0530, Pranavkumar Sawargaonkar wrote:
+> > >> > > In current VFIO MSI/MSI-X implementation, linux host kernel
+> > >> > > allocates MSI/MSI-X vectors when userspace requests through vfio
+> > ioctls.
+> > >> > > Vfio creates irqfd mappings to notify MSI/MSI-X interrupts to the
+> > >> > > userspace when raised.
+> > >> > > Guest OS will see emulated MSI/MSI-X controller and receives an
+> > >> > > interrupt when kernel notifies the same via irqfd.
+> > >> > >
+> > >> > > Host kernel allocates MSI/MSI-X using standard linux routines
+> > >> > > like
+> > >> > > pci_enable_msix_range() and pci_enable_msi_range().
+> > >> > > These routines along with requset_irq() in host kernel sets up
+> > >> > > MSI/MSI-X vectors with Physical MSI/MSI-X addresses provided by
+> > >> > > interrupt controller driver in host kernel.
+> > >> > >
+> > >> > > This means when a device is assigned with the guest OS, MSI/MSI-X
+> > >> > > addresses present in PCIe EP are the PAs programmed by the host
+> > >> > > linux
+> > >> > kernel.
+> > >> > >
+> > >> > > In x86 MSI/MSI-X physical address range is reserved and iommu is
+> > >> > > aware about these addreses and transalation is bypassed for these
+> > address range.
+> > >> > >
+> > >> > > Unlike x86, ARM/ARM64 does not reserve MSI/MSI-X Physical address
+> > >> > > range and all the transactions including MSI go through
+> > >> > > iommu/smmu
+> > >> > without bypass.
+> > >> > > This requires extending current vfio MSI layer with additional
+> > >> > > functionality for ARM/ARM64 by 1. Programing IOVA (referred as a
+> > >> > > MSI virtual doorbell address)
+> > >> > >    in device's MSI vector as a MSI address.
+> > >> > >    This IOVA will be provided by the userspace based on the
+> > >> > >    MSI/MSI-X addresses reserved for the guest.
+> > >> > > 2. Create an IOMMU mapping between this IOVA and
+> > >> > >    Physical address (PA) assigned to the MSI vector.
+> > >> > >
+> > >> > > This RFC is proposing a solution for MSI/MSI-X passthrough for
+> > >> > ARM/ARM64.
+> > >> >
+> > >> >
+> > >> > Hi Pranavkumar,
+> > >> >
+> > >> > Freescale has the same, or very similar, need, so any solution in
+> > >> > this space will need to work for both ARM and powerpc.  I'm not a
+> > >> > big fan of this approach as it seems to require the user to
+> > >> > configure MSI/X via ioctl and then call a separate ioctl mapping
+> > >> > the doorbells.  That's more code for the user, more code to get
+> > >> > wrong and potentially a gap between configuring MSI/X and enabling
+> > mappings where we could see IOMMU faults.
+> > >> >
+> > >> > If we know that doorbell mappings are required, why can't we set
+> > >> > aside a bank of IOVA space and have them mapped automatically as
+> > >> > MSI/X is being configured?  Then the user's need for special
+> > >> > knowledge and handling of this case is limited to setup.  The IOVA
+> > >> > space will be mapped and used as needed, we only need the user to
+> > >> > specify the IOVA space reserved for this.  Thanks,
+> > >>
+> > >> We probably need a mix of both to support Freescale PowerPC and ARM
+> > >> based machines.
+> > >> In this mix mode kernel vfio driver will reserve some IOVA for
+> > >> mapping MSI page/s.
+> > >
+> > > If vfio is reserving pages independently from the user, this becomes
+> > > what Marc called "shaping" the VM and what x86 effectively does.  An
+> > > interface extension should expose these implicit regions so the user
+> > > can avoid them for DMA memory mapping.
+> > >
+> > >>  If any other iova mapping will overlap with this then it will return
+> > >> error and user-space. Ideally this should be choosen in such a way
+> > >> that it never overlap, which is easy on some systems but can be
+> > >> tricky on some other system like Freescale PowerPC. This is not
+> > >> sufficient for at-least Freescale PowerPC based SOC. This is because
+> > >> of hardware limitation, where we need to fit this reserved iova
+> > >> address within aperture decided by user-space. So if we allow
+> > >> user-space to change this reserved iova address to a value decided by
+> > >> user-spece itself then we can support both ARM/PowerPC based
+> > solutions.
+> > >
+> > > Yes, that's my intention, to allow userspace to specify the reserved
+> > > region.  I believe you have some additional restrictions on the number
+> > > of MSI banks available and whether MSI banks can be shared, but I
+> > > would hope that doesn't preclude a shared interface with ARM.
+> > >
+> > >> I have some implementation ready/tested with this approach and if
+> > >> this approach looks good then I can submit a RFC patch.
+> > >
+> > > Yes, please post.  Thanks,
+> > 
+> > Could you please share a tentative timeline by which you will be posting your
+> > patches ?
+> 
+> I have not touched that code for a while, I am planning to send the
+> patch in couple of weeks.
 
-> switch fp/simd registers and set vfp_lazy to true and disable trapping. =
+Have we made any progress on this subject? It looks like a lot of time
+has passed, but I haven't seen anything. Did I miss it?
 
-> When the vcpu is about to be put, then context switch fp/simd registers
-> save guest and restore host and reset the vfp_lazy state to enable trappi=
-ng =
+Thanks,
 
-> again.
-> =
-
-
-This description confused me a bit, since KVM on ARMv7 already exhibits
-lazy switching behavior for VFP. Should the description highlight the
-intended improvement in behavior?
-
-If I understand correctly, instead of restoring the host state on every
-exit, you postpone it until the task actually gets rescheduled, right?
-
-> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
-> ---
->  arch/arm/kvm/arm.c        | 17 +++++++++++++++++
->  arch/arm/kvm/interrupts.S | 40 +++++++++++++++++++++++++++++-----------
->  2 files changed, 46 insertions(+), 11 deletions(-)
-> =
-
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index ce404a5..0acbb69 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -105,6 +105,20 @@ void kvm_arch_check_processor_compat(void *rtn)
->  	*(int *)rtn =3D 0;
->  }
->  =
-
-> +/**
-> + * kvm_switch_fp_regs() - switch guest/host VFP/SIMD registers
-> + * @vcpu:      pointer to vcpu structure.
-> + *
-> + */
-> +static void kvm_switch_fp_regs(struct kvm_vcpu *vcpu)
-> +{
-> +#ifdef CONFIG_ARM
-> +	if (vcpu->arch.vfp_lazy =3D=3D 1) {
-> +		kvm_call_hyp(__kvm_restore_host_vfp_state, vcpu);
-> +		vcpu->arch.vfp_lazy =3D 0;
-> +	}
-> +#endif
-> +}
->  =
-
->  /**
->   * kvm_arch_init_vm - initializes a VM data structure
-> @@ -295,6 +309,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cp=
-u)
->  =
-
->  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  {
-> +	/* Check if Guest accessed VFP registers */
-> +	kvm_switch_fp_regs(vcpu);
-> +
->  	/*
->  	 * The arch-generic KVM code expects the cpu field of a vcpu to be -1
->  	 * if the vcpu is no longer assigned to a cpu.  This is used for the
-> diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
-> index 900ef6d..a47acc1 100644
-> --- a/arch/arm/kvm/interrupts.S
-> +++ b/arch/arm/kvm/interrupts.S
-> @@ -96,6 +96,24 @@ ENTRY(__kvm_flush_vm_context)
->  	bx	lr
->  ENDPROC(__kvm_flush_vm_context)
->  =
-
-> +/**
-> + * void __kvm_restore_host_vfp_state(struct vcpu *vcpu) - Executes a lazy
-> + *	fp/simd switch, saves the guest, restores host.
-> + *
-> + */
-> +ENTRY(__kvm_restore_host_vfp_state)
-> +	push    {r3-r7}
-> +
-> +	add     r7, r0, #VCPU_VFP_GUEST
-> +	store_vfp_state r7
-> +
-> +	add     r7, r0, #VCPU_VFP_HOST
-> +	ldr     r7, [r7]
-> +	restore_vfp_state r7
-> +
-> +	pop     {r3-r7}
-> +	bx      lr
-> +ENDPROC(__kvm_restore_host_vfp_state)
->  =
-
->  /********************************************************************
->   *  Hypervisor world-switch code
-> @@ -131,7 +149,14 @@ ENTRY(__kvm_vcpu_run)
->  =
-
->  	@ Trap coprocessor CRx accesses
->  	set_hstr vmentry
-> +
-> +	ldr     r1, [vcpu, #VCPU_VFP_LAZY]
-> +	cmp     r1, #1
-> +	beq     skip_guest_vfp_trap
-> +
->  	set_hcptr vmentry, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
-> +skip_guest_vfp_trap:
-
-I believe that HCPTR_TTA is not part of the floating point extensions.
-
-> +
->  	set_hdcr vmentry
->  =
-
->  	@ Write configured ID register into MIDR alias
-> @@ -170,22 +195,12 @@ __kvm_vcpu_return:
->  	@ Don't trap coprocessor accesses for host kernel
->  	set_hstr vmexit
->  	set_hdcr vmexit
-> -	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11)), after_vf=
-p_restore
-> +	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
-
-If you don't use the functionality of the macro to branch on change,
-then maybe the functionality should also be removed from the macro.
-
->  =
-
->  #ifdef CONFIG_VFPv3
-> -	@ Switch VFP/NEON hardware state to the host's
-> -	add	r7, vcpu, #VCPU_VFP_GUEST
-> -	store_vfp_state r7
-> -	add	r7, vcpu, #VCPU_VFP_HOST
-> -	ldr	r7, [r7]
-> -	restore_vfp_state r7
-> -
-> -after_vfp_restore:
->  	@ Restore FPEXC_EN which we clobbered on entry
->  	pop	{r2}
->  	VFPFMXR FPEXC, r2
-> -#else
-> -after_vfp_restore:
->  #endif
->  =
-
->  	@ Reset Hyp-role
-> @@ -485,6 +500,9 @@ switch_to_guest_vfp:
->  	@ NEON/VFP used.  Turn on VFP access.
->  	set_hcptr vmtrap, (HCPTR_TCP(10) | HCPTR_TCP(11))
->  =
-
-> +	mov     r1, #1
-> +	str     r1, [vcpu, #VCPU_VFP_LAZY]
-> +
->  	@ Switch VFP/NEON hardware state to the guest's
->  	add	r7, r0, #VCPU_VFP_HOST
->  	ldr	r7, [r7]
-> =
-
-
--- =
-
-Antonios Motakis
-Virtualization Engineer
-Huawei Technologies Duesseldorf GmbH
-European Research Center
-Riesstrasse 25, 80992 M=FCnchen
+	M.
+-- 
+Jazz is not dead. It just smells funny.
