@@ -1,184 +1,178 @@
 From: Mario Smarduch <m.smarduch@samsung.com>
-Subject: [RFT - PATCH v2 2/2] enable armv8 fp/simd lazy switch
-Date: Tue, 22 Sep 2015 16:34:03 -0700
-Message-ID: <1442964843-11953-3-git-send-email-m.smarduch@samsung.com>
-References: <1442964843-11953-1-git-send-email-m.smarduch@samsung.com>
+Subject: Re: [PATCH 2/2] KVM/arm: enable armv7 fp/simd lazy switch
+Date: Tue, 22 Sep 2015 17:39:03 -0700
+Message-ID: <5601F4A6.4020708@samsung.com>
+References: <1442538317-13618-1-git-send-email-m.smarduch@samsung.com>
+ <1442538317-13618-3-git-send-email-m.smarduch@samsung.com>
+ <56015F21.60200@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <1442964843-11953-1-git-send-email-m.smarduch@samsung.com>
+In-reply-to: <56015F21.60200@huawei.com>
 Sender: kvm-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Mario Smarduch <m.smarduch@samsung.com>
+To: Antonios Motakis <antonios.motakis@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch enables arm64 lazy fp/simd switch. Removes the ARM constraint,
-and follows the same approach as armv7 version - found here
+Hi Antonios,
 
-https://lists.cs.columbia.edu/pipermail/kvmarm/2015-September/016518.html
+On 9/22/2015 7:01 AM, Antonios Motakis wrote:
+> Hello,
+> 
+> On 18-Sep-15 03:05, Mario Smarduch wrote:
+>> Adds code to enable fp/simd lazy switch. On each entry check if fp/simd
+>> registers have been switched to guest, if no set the trap flag. On trap 
+>> switch fp/simd registers and set vfp_lazy to true and disable trapping. 
+>> When the vcpu is about to be put, then context switch fp/simd registers
+>> save guest and restore host and reset the vfp_lazy state to enable trapping 
+>> again.
+>>
+> 
+> This description confused me a bit, since KVM on ARMv7 already exhibits
+> lazy switching behavior for VFP. Should the description highlight the
+> intended improvement in behavior?
+> 
+> If I understand correctly, instead of restoring the host state on every
+> exit, you postpone it until the task actually gets rescheduled, right?
 
-To summarize - provided the guest accesses fp/simd unit we limit number of 
-fp/simd context switches to one per vCPU scheduled execution.
+Yes that's right, I'll reword to highlight the changes.
+> 
+>> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+>> ---
+>>  arch/arm/kvm/arm.c        | 17 +++++++++++++++++
+>>  arch/arm/kvm/interrupts.S | 40 +++++++++++++++++++++++++++++-----------
+>>  2 files changed, 46 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+>> index ce404a5..0acbb69 100644
+>> --- a/arch/arm/kvm/arm.c
+>> +++ b/arch/arm/kvm/arm.c
+>> @@ -105,6 +105,20 @@ void kvm_arch_check_processor_compat(void *rtn)
+>>  	*(int *)rtn = 0;
+>>  }
+>>  
+>> +/**
+>> + * kvm_switch_fp_regs() - switch guest/host VFP/SIMD registers
+>> + * @vcpu:      pointer to vcpu structure.
+>> + *
+>> + */
+>> +static void kvm_switch_fp_regs(struct kvm_vcpu *vcpu)
+>> +{
+>> +#ifdef CONFIG_ARM
+>> +	if (vcpu->arch.vfp_lazy == 1) {
+>> +		kvm_call_hyp(__kvm_restore_host_vfp_state, vcpu);
+>> +		vcpu->arch.vfp_lazy = 0;
+>> +	}
+>> +#endif
+>> +}
+>>  
+>>  /**
+>>   * kvm_arch_init_vm - initializes a VM data structure
+>> @@ -295,6 +309,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>>  
+>>  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>>  {
+>> +	/* Check if Guest accessed VFP registers */
+>> +	kvm_switch_fp_regs(vcpu);
+>> +
+>>  	/*
+>>  	 * The arch-generic KVM code expects the cpu field of a vcpu to be -1
+>>  	 * if the vcpu is no longer assigned to a cpu.  This is used for the
+>> diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
+>> index 900ef6d..a47acc1 100644
+>> --- a/arch/arm/kvm/interrupts.S
+>> +++ b/arch/arm/kvm/interrupts.S
+>> @@ -96,6 +96,24 @@ ENTRY(__kvm_flush_vm_context)
+>>  	bx	lr
+>>  ENDPROC(__kvm_flush_vm_context)
+>>  
+>> +/**
+>> + * void __kvm_restore_host_vfp_state(struct vcpu *vcpu) - Executes a lazy
+>> + *	fp/simd switch, saves the guest, restores host.
+>> + *
+>> + */
+>> +ENTRY(__kvm_restore_host_vfp_state)
+>> +	push    {r3-r7}
+>> +
+>> +	add     r7, r0, #VCPU_VFP_GUEST
+>> +	store_vfp_state r7
+>> +
+>> +	add     r7, r0, #VCPU_VFP_HOST
+>> +	ldr     r7, [r7]
+>> +	restore_vfp_state r7
+>> +
+>> +	pop     {r3-r7}
+>> +	bx      lr
+>> +ENDPROC(__kvm_restore_host_vfp_state)
+>>  
+>>  /********************************************************************
+>>   *  Hypervisor world-switch code
+>> @@ -131,7 +149,14 @@ ENTRY(__kvm_vcpu_run)
+>>  
+>>  	@ Trap coprocessor CRx accesses
+>>  	set_hstr vmentry
+>> +
+>> +	ldr     r1, [vcpu, #VCPU_VFP_LAZY]
+>> +	cmp     r1, #1
+>> +	beq     skip_guest_vfp_trap
+>> +
+>>  	set_hcptr vmentry, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
+>> +skip_guest_vfp_trap:
+> 
+> I believe that HCPTR_TTA is not part of the floating point extensions.
 
-Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
----
- arch/arm/kvm/arm.c               |  2 --
- arch/arm64/include/asm/kvm_asm.h |  1 +
- arch/arm64/kvm/hyp.S             | 58 +++++++++++++++++++++++++++-------------
- 3 files changed, 40 insertions(+), 21 deletions(-)
+Yes you're right trap on tracing is not enabled.
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 0acbb69..7260853 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -112,12 +112,10 @@ void kvm_arch_check_processor_compat(void *rtn)
-  */
- static void kvm_switch_fp_regs(struct kvm_vcpu *vcpu)
- {
--#ifdef CONFIG_ARM
- 	if (vcpu->arch.vfp_lazy == 1) {
- 		kvm_call_hyp(__kvm_restore_host_vfp_state, vcpu);
- 		vcpu->arch.vfp_lazy = 0;
- 	}
--#endif
- }
- 
- /**
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 67fa0de..7d9936b 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -119,6 +119,7 @@ extern char __kvm_hyp_vector[];
- extern void __kvm_flush_vm_context(void);
- extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
- extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
-+extern void __kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu);
- 
- extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-index 39aa322..2273916 100644
---- a/arch/arm64/kvm/hyp.S
-+++ b/arch/arm64/kvm/hyp.S
-@@ -385,14 +385,6 @@
- 	tbz	\tmp, #KVM_ARM64_DEBUG_DIRTY_SHIFT, \target
- .endm
- 
--/*
-- * Branch to target if CPTR_EL2.TFP bit is set (VFP/SIMD trapping enabled)
-- */
--.macro skip_fpsimd_state tmp, target
--	mrs	\tmp, cptr_el2
--	tbnz	\tmp, #CPTR_EL2_TFP_SHIFT, \target
--.endm
--
- .macro compute_debug_state target
- 	// Compute debug state: If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY
- 	// is set, we do a full save/restore cycle and disable trapping.
-@@ -433,10 +425,6 @@
- 	mrs	x5, ifsr32_el2
- 	stp	x4, x5, [x3]
- 
--	skip_fpsimd_state x8, 3f
--	mrs	x6, fpexc32_el2
--	str	x6, [x3, #16]
--3:
- 	skip_debug_state x8, 2f
- 	mrs	x7, dbgvcr32_el2
- 	str	x7, [x3, #24]
-@@ -495,8 +483,14 @@
- 	isb
- 99:
- 	msr     hcr_el2, x2
--	mov	x2, #CPTR_EL2_TTA
-+
-+	mov     x2, #0
-+	ldr     x3, [x0, #VCPU_VFP_LAZY]
-+	tbnz    x3, #0, 98f
-+
- 	orr     x2, x2, #CPTR_EL2_TFP
-+98:
-+	orr     x2, x2, #CPTR_EL2_TTA
- 	msr	cptr_el2, x2
- 
- 	mov	x2, #(1 << 15)	// Trap CP15 Cr=15
-@@ -674,14 +668,12 @@ __restore_debug:
- 	ret
- 
- __save_fpsimd:
--	skip_fpsimd_state x3, 1f
- 	save_fpsimd
--1:	ret
-+	ret
- 
- __restore_fpsimd:
--	skip_fpsimd_state x3, 1f
- 	restore_fpsimd
--1:	ret
-+	ret
- 
- switch_to_guest_fpsimd:
- 	push	x4, lr
-@@ -693,6 +685,9 @@ switch_to_guest_fpsimd:
- 
- 	mrs	x0, tpidr_el2
- 
-+	mov     x2, #1
-+	str     x2, [x0, #VCPU_VFP_LAZY]
-+
- 	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
- 	kern_hyp_va x2
- 	bl __save_fpsimd
-@@ -768,7 +763,6 @@ __kvm_vcpu_return:
- 	add	x2, x0, #VCPU_CONTEXT
- 
- 	save_guest_regs
--	bl __save_fpsimd
- 	bl __save_sysregs
- 
- 	skip_debug_state x3, 1f
-@@ -789,7 +783,6 @@ __kvm_vcpu_return:
- 	kern_hyp_va x2
- 
- 	bl __restore_sysregs
--	bl __restore_fpsimd
- 	/* Clear FPSIMD and Trace trapping */
- 	msr     cptr_el2, xzr
- 
-@@ -868,6 +861,33 @@ ENTRY(__kvm_flush_vm_context)
- 	ret
- ENDPROC(__kvm_flush_vm_context)
- 
-+/**
-+ * kvm_switch_fp_regs() - switch guest/host VFP/SIMD registers
-+ * @vcpu:      pointer to vcpu structure.
-+ *
-+ */
-+ENTRY(__kvm_restore_host_vfp_state)
-+	push    x4, lr
-+
-+	kern_hyp_va x0
-+	add     x2, x0, #VCPU_CONTEXT
-+
-+	// Load Guest HCR, determine if guest is 32 or 64 bit
-+	ldr     x3, [x0, #VCPU_HCR_EL2]
-+	tbnz	x3, #HCR_RW_SHIFT, 1f
-+	mrs     x4, fpexc32_el2
-+	str     x4, [x2, #CPU_SYSREG_OFFSET(FPEXC32_EL2)]
-+1:
-+	bl __save_fpsimd
-+
-+	ldr     x2, [x0, #VCPU_HOST_CONTEXT]
-+	kern_hyp_va x2
-+	bl __restore_fpsimd
-+
-+	pop	x4, lr
-+	ret
-+ENDPROC(__kvm_restore_host_vfp_state)
-+
- __kvm_hyp_panic:
- 	// Guess the context by looking at VTTBR:
- 	// If zero, then we're already a host.
--- 
-1.9.1
+> 
+>> +
+>>  	set_hdcr vmentry
+>>  
+>>  	@ Write configured ID register into MIDR alias
+>> @@ -170,22 +195,12 @@ __kvm_vcpu_return:
+>>  	@ Don't trap coprocessor accesses for host kernel
+>>  	set_hstr vmexit
+>>  	set_hdcr vmexit
+>> -	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11)), after_vfp_restore
+>> +	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
+> 
+> If you don't use the functionality of the macro to branch on change,
+> then maybe the functionality should also be removed from the macro.
 
+Yes, the macros needs to change.
+
+> 
+>>  
+>>  #ifdef CONFIG_VFPv3
+>> -	@ Switch VFP/NEON hardware state to the host's
+>> -	add	r7, vcpu, #VCPU_VFP_GUEST
+>> -	store_vfp_state r7
+>> -	add	r7, vcpu, #VCPU_VFP_HOST
+>> -	ldr	r7, [r7]
+>> -	restore_vfp_state r7
+>> -
+>> -after_vfp_restore:
+>>  	@ Restore FPEXC_EN which we clobbered on entry
+>>  	pop	{r2}
+>>  	VFPFMXR FPEXC, r2
+>> -#else
+>> -after_vfp_restore:
+>>  #endif
+>>  
+>>  	@ Reset Hyp-role
+>> @@ -485,6 +500,9 @@ switch_to_guest_vfp:
+>>  	@ NEON/VFP used.  Turn on VFP access.
+>>  	set_hcptr vmtrap, (HCPTR_TCP(10) | HCPTR_TCP(11))
+>>  
+>> +	mov     r1, #1
+>> +	str     r1, [vcpu, #VCPU_VFP_LAZY]
+>> +
+>>  	@ Switch VFP/NEON hardware state to the guest's
+>>  	add	r7, r0, #VCPU_VFP_HOST
+>>  	ldr	r7, [r7]
+>>
+> 
+
+Thanks for reviewing.
+
+- Mario
