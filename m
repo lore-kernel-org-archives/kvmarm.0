@@ -1,34 +1,39 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v2 00/15] KVM: arm64: GICv3 ITS emulation
-Date: Thu, 24 Sep 2015 12:35:05 +0100
-Message-ID: <5603DFE9.2090106@arm.com>
-References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com>
- <168d01d0f6ba$b83a1ab0$28ae5010$@samsung.com>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH v3 5/5] KVM: arm64: Implement vGICv3 CPU interface access
+Date: Thu, 24 Sep 2015 15:08:13 +0300
+Message-ID: <16a001d0f6c1$b113cbd0$133b6370$@samsung.com>
+References: <cover.1441370053.git.p.fedin@samsung.com>
+ <20be17e4e8aebcd7f1a52a634f449955bef99996.1441370053.git.p.fedin@samsung.com>
+ <55E9B528.50106@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <168d01d0f6ba$b83a1ab0$28ae5010$@samsung.com>
+In-reply-to: <55E9B528.50106@arm.com>
+Content-language: ru
 Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "eric.auger@linaro.org" <eric.auger@linaro.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: 'Andre Przywara' <andre.przywara@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <Marc.Zyngier@arm.com>, 'Peter Maydell' <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Pavel,
+ Hello!
 
-On 24/09/15 12:18, Pavel Fedin wrote:
->  Hello Andre and others!
-> 
->  How are things going? I see the last message in thread something like 1 month old, then silence...
->  Our project relies on this feature, any assistance needed?
+> The only thing that is pure 64-bit is the MRS/MSR _instruction_ in
+> Aarch64, which always takes a x<nn> register.
+> So can you model the register size according to the spec and allow
+> 32-bit accesses from userland?
 
-I am about to make it work on top of Christoffer's latest arch timer
-rework patches, which means I need to rewrite most of patch 1. Currently
-that boots, but hangs as soon as I put some load on it. Finding the
-reason for this is a bit tedious at the moment.
-I have addressed the comments from the list on the other patches, so
-ideally I can send a new revision as soon as I fixed that bug in the
-first patch.
+ I would like to complete the rework and respin v4, but this is, i guess, the only major issue left.
+Additionally, it impacts the API. So...
+ In order to allow 32-bit accesses we would have to drop using ARM64_SYS_REG() for building
+attribute ID and introduce something own, like KVM_DEV_ARM_VGIC_REG(). It will have different bits
+layout (actually it will be missing 'arch' and 'size' field, and instead i will use
+KVM_DEV_ARM_VGIC_64BIT flag for length specification, the same as for redistributor.
+ Will this be OK ?
 
-Cheers,
-Andre.
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
+
+
