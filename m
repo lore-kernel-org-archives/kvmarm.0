@@ -1,7 +1,7 @@
 From: Shannon Zhao <shannon.zhao@linaro.org>
-Subject: [PATCH v3 15/20] KVM: ARM64: Add reset and access handlers for PMSWINC register
-Date: Thu, 24 Sep 2015 15:31:20 -0700
-Message-ID: <1443133885-3366-16-git-send-email-shannon.zhao@linaro.org>
+Subject: [PATCH v3 16/20] KVM: ARM64: Add access handlers for PMEVCNTRn and PMEVTYPERn register
+Date: Thu, 24 Sep 2015 15:31:21 -0700
+Message-ID: <1443133885-3366-17-git-send-email-shannon.zhao@linaro.org>
 References: <1443133885-3366-1-git-send-email-shannon.zhao@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1443133885-3366-1-git-send-email-shannon.zhao@linaro.org>
@@ -10,151 +10,210 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, will.deacon@arm.com, wei@redhat.com, alex.bennee@linaro.org, peter.huangpeng@huawei.com, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add access handler which emulates writing and reading PMSWINC
-register and add support for creating software increment event.
+Add access handler which emulates writing and reading PMEVCNTRn and
+PMEVTYPERn.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm64/kvm/sys_regs.c | 18 +++++++++++++++++-
- include/kvm/arm_pmu.h     |  2 ++
- virt/kvm/arm/pmu.c        | 33 +++++++++++++++++++++++++++++++++
- 3 files changed, 52 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 164 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 164 insertions(+)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 749e1e2..dd790c7 100644
+index dd790c7..0c785fc 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -543,6 +543,11 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
- 			vcpu_sys_reg(vcpu, PMOVSSET_EL0) &= ~val;
- 			break;
- 		}
-+		case PMSWINC_EL0: {
-+			val = *vcpu_reg(vcpu, p->Rt);
-+			kvm_pmu_software_increment(vcpu, val);
-+			break;
-+		}
- 		case PMCR_EL0: {
- 			/* Only update writeable bits of PMCR */
- 			val = vcpu_sys_reg(vcpu, r->reg);
-@@ -572,6 +577,8 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
- 			*vcpu_reg(vcpu, p->Rt) = val;
- 			break;
- 		}
-+		case PMSWINC_EL0:
-+			return read_zero(vcpu, p);
- 		default:
- 			*vcpu_reg(vcpu, p->Rt) = vcpu_sys_reg(vcpu, r->reg);
- 			break;
-@@ -784,7 +791,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  access_pmu_regs, reset_unknown, PMOVSCLR_EL0 },
- 	/* PMSWINC_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b100),
--	  trap_raz_wi },
-+	  access_pmu_regs, reset_unknown, PMSWINC_EL0 },
- 	/* PMSELR_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b101),
- 	  access_pmu_regs, reset_unknown, PMSELR_EL0 },
-@@ -1070,6 +1077,11 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
- 			vcpu_cp15(vcpu, c9_PMOVSSET) &= ~val;
- 			break;
- 		}
-+		case c9_PMSWINC: {
-+			val = *vcpu_reg(vcpu, p->Rt);
-+			kvm_pmu_software_increment(vcpu, val);
-+			break;
-+		}
- 		case c9_PMCR: {
- 			/* Only update writeable bits of PMCR */
- 			val = vcpu_cp15(vcpu, r->reg);
-@@ -1099,6 +1111,8 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
- 			*vcpu_reg(vcpu, p->Rt) = val;
- 			break;
- 		}
-+		case c9_PMSWINC:
-+			return read_zero(vcpu, p);
- 		default:
- 			*vcpu_reg(vcpu, p->Rt) = vcpu_cp15(vcpu, r->reg);
- 			break;
-@@ -1144,6 +1158,8 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	  reset_unknown_cp15, c9_PMCNTENCLR },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), access_pmu_cp15_regs,
- 	  reset_unknown_cp15, c9_PMOVSCLR },
-+	{ Op1( 0), CRn( 9), CRm(12), Op2( 4), access_pmu_cp15_regs,
-+	  reset_unknown_cp15, c9_PMSWINC },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmu_cp15_regs,
- 	  reset_unknown_cp15, c9_PMSELR },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmu_cp15_regs,
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 9b4ee5e..9293133 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -41,6 +41,7 @@ struct kvm_pmu {
- unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx);
- void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val);
- void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u32 val);
-+void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u32 val);
- void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
- 				    u32 select_idx);
- #else
-@@ -50,6 +51,7 @@ unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx)
- }
- void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val) {}
- void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u32 val) {}
-+void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u32 val) {}
- void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
- 				    u32 select_idx) {}
- #endif
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 46145d1..18637c9 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -134,6 +134,35 @@ void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val)
+@@ -603,6 +603,20 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+ 	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b111),	\
+ 	  trap_wcr, reset_wcr, n, 0,  get_wcr, set_wcr }
+ 
++/* Macro to expand the PMEVCNTRn_EL0 register */
++#define PMU_PMEVCNTR_EL0(n)						\
++	/* PMEVCNTRn_EL0 */						\
++	{ Op0(0b11), Op1(0b011), CRn(0b1110),				\
++	  CRm((0b1000 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
++	  access_pmu_regs, reset_unknown, (PMEVCNTR0_EL0 + n), }
++
++/* Macro to expand the PMEVTYPERn_EL0 register */
++#define PMU_PMEVTYPER_EL0(n)						\
++	/* PMEVTYPERn_EL0 */						\
++	{ Op0(0b11), Op1(0b011), CRn(0b1110),				\
++	  CRm((0b1100 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
++	  access_pmu_regs, reset_unknown, (PMEVTYPER0_EL0 + n), }
++
+ /*
+  * Architected system registers.
+  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+@@ -824,6 +838,74 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1101), CRm(0b0000), Op2(0b011),
+ 	  NULL, reset_unknown, TPIDRRO_EL0 },
+ 
++	/* PMEVCNTRn_EL0 */
++	PMU_PMEVCNTR_EL0(0),
++	PMU_PMEVCNTR_EL0(1),
++	PMU_PMEVCNTR_EL0(2),
++	PMU_PMEVCNTR_EL0(3),
++	PMU_PMEVCNTR_EL0(4),
++	PMU_PMEVCNTR_EL0(5),
++	PMU_PMEVCNTR_EL0(6),
++	PMU_PMEVCNTR_EL0(7),
++	PMU_PMEVCNTR_EL0(8),
++	PMU_PMEVCNTR_EL0(9),
++	PMU_PMEVCNTR_EL0(10),
++	PMU_PMEVCNTR_EL0(11),
++	PMU_PMEVCNTR_EL0(12),
++	PMU_PMEVCNTR_EL0(13),
++	PMU_PMEVCNTR_EL0(14),
++	PMU_PMEVCNTR_EL0(15),
++	PMU_PMEVCNTR_EL0(16),
++	PMU_PMEVCNTR_EL0(17),
++	PMU_PMEVCNTR_EL0(18),
++	PMU_PMEVCNTR_EL0(19),
++	PMU_PMEVCNTR_EL0(20),
++	PMU_PMEVCNTR_EL0(21),
++	PMU_PMEVCNTR_EL0(22),
++	PMU_PMEVCNTR_EL0(23),
++	PMU_PMEVCNTR_EL0(24),
++	PMU_PMEVCNTR_EL0(25),
++	PMU_PMEVCNTR_EL0(26),
++	PMU_PMEVCNTR_EL0(27),
++	PMU_PMEVCNTR_EL0(28),
++	PMU_PMEVCNTR_EL0(29),
++	PMU_PMEVCNTR_EL0(30),
++	/* PMEVTYPERn_EL0 */
++	PMU_PMEVTYPER_EL0(0),
++	PMU_PMEVTYPER_EL0(1),
++	PMU_PMEVTYPER_EL0(2),
++	PMU_PMEVTYPER_EL0(3),
++	PMU_PMEVTYPER_EL0(4),
++	PMU_PMEVTYPER_EL0(5),
++	PMU_PMEVTYPER_EL0(6),
++	PMU_PMEVTYPER_EL0(7),
++	PMU_PMEVTYPER_EL0(8),
++	PMU_PMEVTYPER_EL0(9),
++	PMU_PMEVTYPER_EL0(10),
++	PMU_PMEVTYPER_EL0(11),
++	PMU_PMEVTYPER_EL0(12),
++	PMU_PMEVTYPER_EL0(13),
++	PMU_PMEVTYPER_EL0(14),
++	PMU_PMEVTYPER_EL0(15),
++	PMU_PMEVTYPER_EL0(16),
++	PMU_PMEVTYPER_EL0(17),
++	PMU_PMEVTYPER_EL0(18),
++	PMU_PMEVTYPER_EL0(19),
++	PMU_PMEVTYPER_EL0(20),
++	PMU_PMEVTYPER_EL0(21),
++	PMU_PMEVTYPER_EL0(22),
++	PMU_PMEVTYPER_EL0(23),
++	PMU_PMEVTYPER_EL0(24),
++	PMU_PMEVTYPER_EL0(25),
++	PMU_PMEVTYPER_EL0(26),
++	PMU_PMEVTYPER_EL0(27),
++	PMU_PMEVTYPER_EL0(28),
++	PMU_PMEVTYPER_EL0(29),
++	PMU_PMEVTYPER_EL0(30),
++	/* PMCCFILTR_EL0 */
++	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b1111), Op2(0b111),
++	  access_pmu_regs, reset_unknown, PMCCFILTR_EL0, },
++
+ 	/* DACR32_EL2 */
+ 	{ Op0(0b11), Op1(0b100), CRn(0b0011), CRm(0b0000), Op2(0b000),
+ 	  NULL, reset_unknown, DACR32_EL2 },
+@@ -1122,6 +1204,20 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
+ 	return true;
  }
  
- /**
-+ * kvm_pmu_software_increment - do software increment
-+ * @vcpu: The vcpu pointer
-+ * @val: the value guest writes to PMSWINC register
-+ */
-+void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u32 val)
-+{
-+	int i;
-+	u32 type, enable;
++/* Macro to expand the PMEVCNTRn register */
++#define PMU_PMEVCNTR(n)							\
++	/* PMEVCNTRn */							\
++	{ Op1(0), CRn(0b1110),						\
++	  CRm((0b1000 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
++	  access_pmu_cp15_regs, reset_unknown_cp15, (c14_PMEVCNTR0 + n), }
 +
-+	for (i = 0; i < 32; i++) {
-+		if ((val >> i) & 0x1) {
-+			if (!vcpu_mode_is_32bit(vcpu)) {
-+				type = vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i)
-+				       & ARMV8_EVTYPE_EVENT;
-+				enable = vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
-+				if ((type == 0) && ((enable >> i) & 0x1))
-+					vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i)++;
-+			} else {
-+				type = vcpu_cp15(vcpu, c14_PMEVTYPER0 + i)
-+				       & ARMV8_EVTYPE_EVENT;
-+				enable = vcpu_cp15(vcpu, c9_PMCNTENSET);
-+				if ((type == 0) && ((enable >> i) & 0x1))
-+					vcpu_cp15(vcpu, c14_PMEVCNTR0 + i)++;
-+			}
-+		}
-+	}
-+}
++/* Macro to expand the PMEVTYPERn register */
++#define PMU_PMEVTYPER(n)						\
++	/* PMEVTYPERn */						\
++	{ Op1(0), CRn(0b1110),						\
++	  CRm((0b1100 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
++	  access_pmu_cp15_regs, reset_unknown_cp15, (c14_PMEVTYPER0 + n), }
 +
-+/**
-  * kvm_pmu_set_counter_event_type - set selected counter to monitor some event
-  * @vcpu: The vcpu pointer
-  * @data: The data guest writes to PMXEVTYPER_EL0
-@@ -165,6 +194,10 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
- 	kvm_pmu_stop_counter(vcpu, select_idx);
- 	kvm_pmu_set_evttyper(vcpu, select_idx, data);
+ /*
+  * Trapped cp15 registers. TTBR0/TTBR1 get a double encoding,
+  * depending on the way they are accessed (as a 32bit or a 64bit
+@@ -1190,6 +1286,74 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	{ Op1( 0), CRn(12), CRm(12), Op2( 5), trap_raz_wi },
  
-+	/* For software increment event it does't need to create perf event */
-+	if (new_eventsel == 0)
-+		return;
+ 	{ Op1( 0), CRn(13), CRm( 0), Op2( 1), access_vm_reg, NULL, c13_CID },
 +
- 	memset(&attr, 0, sizeof(struct perf_event_attr));
- 	attr.type = PERF_TYPE_RAW;
- 	attr.size = sizeof(attr);
++	/* PMEVCNTRn */
++	PMU_PMEVCNTR(0),
++	PMU_PMEVCNTR(1),
++	PMU_PMEVCNTR(2),
++	PMU_PMEVCNTR(3),
++	PMU_PMEVCNTR(4),
++	PMU_PMEVCNTR(5),
++	PMU_PMEVCNTR(6),
++	PMU_PMEVCNTR(7),
++	PMU_PMEVCNTR(8),
++	PMU_PMEVCNTR(9),
++	PMU_PMEVCNTR(10),
++	PMU_PMEVCNTR(11),
++	PMU_PMEVCNTR(12),
++	PMU_PMEVCNTR(13),
++	PMU_PMEVCNTR(14),
++	PMU_PMEVCNTR(15),
++	PMU_PMEVCNTR(16),
++	PMU_PMEVCNTR(17),
++	PMU_PMEVCNTR(18),
++	PMU_PMEVCNTR(19),
++	PMU_PMEVCNTR(20),
++	PMU_PMEVCNTR(21),
++	PMU_PMEVCNTR(22),
++	PMU_PMEVCNTR(23),
++	PMU_PMEVCNTR(24),
++	PMU_PMEVCNTR(25),
++	PMU_PMEVCNTR(26),
++	PMU_PMEVCNTR(27),
++	PMU_PMEVCNTR(28),
++	PMU_PMEVCNTR(29),
++	PMU_PMEVCNTR(30),
++	/* PMEVTYPERn */
++	PMU_PMEVTYPER(0),
++	PMU_PMEVTYPER(1),
++	PMU_PMEVTYPER(2),
++	PMU_PMEVTYPER(3),
++	PMU_PMEVTYPER(4),
++	PMU_PMEVTYPER(5),
++	PMU_PMEVTYPER(6),
++	PMU_PMEVTYPER(7),
++	PMU_PMEVTYPER(8),
++	PMU_PMEVTYPER(9),
++	PMU_PMEVTYPER(10),
++	PMU_PMEVTYPER(11),
++	PMU_PMEVTYPER(12),
++	PMU_PMEVTYPER(13),
++	PMU_PMEVTYPER(14),
++	PMU_PMEVTYPER(15),
++	PMU_PMEVTYPER(16),
++	PMU_PMEVTYPER(17),
++	PMU_PMEVTYPER(18),
++	PMU_PMEVTYPER(19),
++	PMU_PMEVTYPER(20),
++	PMU_PMEVTYPER(21),
++	PMU_PMEVTYPER(22),
++	PMU_PMEVTYPER(23),
++	PMU_PMEVTYPER(24),
++	PMU_PMEVTYPER(25),
++	PMU_PMEVTYPER(26),
++	PMU_PMEVTYPER(27),
++	PMU_PMEVTYPER(28),
++	PMU_PMEVTYPER(29),
++	PMU_PMEVTYPER(30),
++	/* PMCCFILTR */
++	{ Op1(0), CRn(14), CRm(15), Op2(7), access_pmu_cp15_regs,
++	  reset_val_cp15, c14_PMCCFILTR, 0 },
+ };
+ 
+ static const struct sys_reg_desc cp15_64_regs[] = {
 -- 
 2.1.4
 
