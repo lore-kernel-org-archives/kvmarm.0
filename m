@@ -1,207 +1,160 @@
-From: Shannon Zhao <shannon.zhao@linaro.org>
-Subject: [PATCH v3 20/20] KVM: ARM64: Add a new kvm ARM PMU device
-Date: Thu, 24 Sep 2015 15:31:25 -0700
-Message-ID: <1443133885-3366-21-git-send-email-shannon.zhao@linaro.org>
-References: <1443133885-3366-1-git-send-email-shannon.zhao@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1443133885-3366-1-git-send-email-shannon.zhao@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+From: GreenSocs <no-reply@greensocs.com>
+Subject: New GreenSocs Website: Home of Open Source SystemC Infrastructure
+Date: Thu, 24 Sep 2015 11:45:31 +0200
+Message-ID: <ccf17a792b08edf74e78218f99c6faf0@newsletter.greensocs.com>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============8668991558417284768=="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B2F1A4A4FC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Sep 2015 06:10:34 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 6FDDhgoXO4EI for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Sep 2015 06:10:33 -0400 (EDT)
+Received: from greensocs.com (greensocs.com [193.104.36.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A2304A4F8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Sep 2015 06:10:33 -0400 (EDT)
+Received: from localhost (localhost [127.0.0.1])
+ by greensocs.com (Postfix) with ESMTP id 75BC713C2BE3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Sep 2015 12:11:53 +0200 (CEST)
+Received: from greensocs.com ([127.0.0.1])
+ by localhost (gs-01.greensocs.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id AL1sUe4Bzn2i for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Sep 2015 12:11:51 +0200 (CEST)
+List-Owner: <mailto:webmaster@greensocs.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, will.deacon@arm.com, wei@redhat.com, alex.bennee@linaro.org, peter.huangpeng@huawei.com, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a new kvm device type KVM_DEV_TYPE_ARM_PMU_V3 for ARM PMU. Implement
-the kvm_device_ops for it.
+--===============8668991558417284768==
+Content-Type: multipart/alternative;
+	boundary="b1_ccf17a792b08edf74e78218f99c6faf0"
 
-Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
----
- Documentation/virtual/kvm/devices/arm-pmu.txt | 15 +++++
- arch/arm64/include/uapi/asm/kvm.h             |  3 +
- include/linux/kvm_host.h                      |  1 +
- include/uapi/linux/kvm.h                      |  2 +
- virt/kvm/arm/pmu.c                            | 88 +++++++++++++++++++++++++++
- virt/kvm/kvm_main.c                           |  4 ++
- 6 files changed, 113 insertions(+)
- create mode 100644 Documentation/virtual/kvm/devices/arm-pmu.txt
+--b1_ccf17a792b08edf74e78218f99c6faf0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/Documentation/virtual/kvm/devices/arm-pmu.txt b/Documentation/virtual/kvm/devices/arm-pmu.txt
-new file mode 100644
-index 0000000..49481c4
---- /dev/null
-+++ b/Documentation/virtual/kvm/devices/arm-pmu.txt
-@@ -0,0 +1,15 @@
-+ARM Virtual Performance Monitor Unit (vPMU)
-+===========================================
-+
-+Device types supported:
-+  KVM_DEV_TYPE_ARM_PMU_V3         ARM Performance Monitor Unit v3
-+
-+Instantiate one PMU instance for per VCPU through this API.
-+
-+Groups:
-+  KVM_DEV_ARM_PMU_GRP_IRQ
-+  Attributes:
-+    A value describing the interrupt number of PMU overflow interrupt.
-+
-+  Errors:
-+    -EINVAL: Value set is out of the expected range
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 0cd7b59..1309a93 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -204,6 +204,9 @@ struct kvm_arch_memory_slot {
- #define KVM_DEV_ARM_VGIC_GRP_CTRL	4
- #define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
- 
-+/* Device Control API: ARM PMU */
-+#define KVM_DEV_ARM_PMU_GRP_IRQ		0
-+
- /* KVM_IRQ_LINE irq field index values */
- #define KVM_ARM_IRQ_TYPE_SHIFT		24
- #define KVM_ARM_IRQ_TYPE_MASK		0xff
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 1bef9e2..f6be696 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1122,6 +1122,7 @@ extern struct kvm_device_ops kvm_mpic_ops;
- extern struct kvm_device_ops kvm_xics_ops;
- extern struct kvm_device_ops kvm_arm_vgic_v2_ops;
- extern struct kvm_device_ops kvm_arm_vgic_v3_ops;
-+extern struct kvm_device_ops kvm_arm_pmu_ops;
- 
- #ifdef CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT
- 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index a9256f0..f41e6b6 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1025,6 +1025,8 @@ enum kvm_device_type {
- #define KVM_DEV_TYPE_FLIC		KVM_DEV_TYPE_FLIC
- 	KVM_DEV_TYPE_ARM_VGIC_V3,
- #define KVM_DEV_TYPE_ARM_VGIC_V3	KVM_DEV_TYPE_ARM_VGIC_V3
-+	KVM_DEV_TYPE_ARM_PMU_V3,
-+#define	KVM_DEV_TYPE_ARM_PMU_V3		KVM_DEV_TYPE_ARM_PMU_V3
- 	KVM_DEV_TYPE_MAX,
- };
- 
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 00ef0b4..0aa4bc1 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -19,6 +19,7 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- #include <linux/perf_event.h>
-+#include <linux/uaccess.h>
- #include <asm/kvm_emulate.h>
- #include <kvm/arm_pmu.h>
- #include <kvm/arm_vgic.h>
-@@ -324,3 +325,90 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
- 	}
- 	pmc->perf_event = event;
- }
-+
-+static int kvm_arm_pmu_set_irq(struct kvm *kvm, int irq)
-+{
-+	int j;
-+	struct kvm_vcpu *vcpu;
-+
-+	kvm_for_each_vcpu(j, vcpu, kvm) {
-+		struct kvm_pmu *pmu = &vcpu->arch.pmu;
-+
-+		kvm_debug("Set kvm ARM PMU irq: %d\n", irq);
-+		pmu->irq_num = irq;
-+	}
-+
-+	return 0;
-+}
-+
-+static int kvm_arm_pmu_create(struct kvm_device *dev, u32 type)
-+{
-+	int i, j;
-+	struct kvm_vcpu *vcpu;
-+	struct kvm *kvm = dev->kvm;
-+
-+	kvm_for_each_vcpu(j, vcpu, kvm) {
-+		struct kvm_pmu *pmu = &vcpu->arch.pmu;
-+
-+		memset(pmu, 0, sizeof(*pmu));
-+		for (i = 0; i < ARMV8_MAX_COUNTERS; i++) {
-+			pmu->pmc[i].idx = i;
-+			pmu->pmc[i].vcpu = vcpu;
-+		}
-+		pmu->irq_num = -1;
-+	}
-+
-+	return 0;
-+}
-+
-+static void kvm_arm_pmu_destroy(struct kvm_device *dev)
-+{
-+	kfree(dev);
-+}
-+
-+static int kvm_arm_pmu_set_attr(struct kvm_device *dev,
-+				struct kvm_device_attr *attr)
-+{
-+	switch (attr->group) {
-+	case KVM_DEV_ARM_PMU_GRP_IRQ: {
-+		int __user *uaddr = (int __user *)(long)attr->addr;
-+		int reg;
-+
-+		if (get_user(reg, uaddr))
-+			return -EFAULT;
-+
-+		if (reg < VGIC_NR_SGIS || reg > dev->kvm->arch.vgic.nr_irqs)
-+			return -EINVAL;
-+
-+		return kvm_arm_pmu_set_irq(dev->kvm, reg);
-+	}
-+	}
-+
-+	return -ENXIO;
-+}
-+
-+static int kvm_arm_pmu_get_attr(struct kvm_device *dev,
-+				struct kvm_device_attr *attr)
-+{
-+	return 0;
-+}
-+
-+static int kvm_arm_pmu_has_attr(struct kvm_device *dev,
-+				struct kvm_device_attr *attr)
-+{
-+	switch (attr->group) {
-+	case KVM_DEV_ARM_PMU_GRP_IRQ:
-+		return 0;
-+	}
-+
-+	return -ENXIO;
-+}
-+
-+struct kvm_device_ops kvm_arm_pmu_ops = {
-+	.name = "kvm-arm-pmu",
-+	.create = kvm_arm_pmu_create,
-+	.destroy = kvm_arm_pmu_destroy,
-+	.set_attr = kvm_arm_pmu_set_attr,
-+	.get_attr = kvm_arm_pmu_get_attr,
-+	.has_attr = kvm_arm_pmu_has_attr,
-+};
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index a25a731..028bd54 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2639,6 +2639,10 @@ static struct kvm_device_ops *kvm_device_ops_table[KVM_DEV_TYPE_MAX] = {
- #ifdef CONFIG_KVM_XICS
- 	[KVM_DEV_TYPE_XICS]		= &kvm_xics_ops,
- #endif
-+
-+#ifdef CONFIG_KVM_ARM_PMU
-+	[KVM_DEV_TYPE_ARM_PMU_V3]	= &kvm_arm_pmu_ops,
-+#endif
- };
- 
- int kvm_register_device_ops(struct kvm_device_ops *ops, u32 type)
--- 
-2.1.4
 
+
+Could your Software engineers be even more productive using a Virtual
+Platform? Could your Hardware be even better tuned with a pre-silicon
+model? Visit the new GreenSocs=C2=AE=0A<http://newsletter.greensocs.com/lt.=
+php?id=3DYB5RHgZLBQAHCw>
+web site to find out how...
+
+http://newsletter.greensocs.com/lt.php?id=3DYB5RHgZLBQAHCw
+
+You can download our example platforms for ARM and x86 FREE today, complete
+with full source code.
+
+GreenSocs is the home of Open Source SystemC infrastructure, including QBox
+the SystemC integration of QEMU, supporting a wide variety of CPU cores at
+blistering performance within the TLM-2.0 standard.
+
+We make virtual platforms using standards, and give you the source code and
+support to make your own.
+
+On our new website you will find information about GreenSocs, as well as
+much improved documentation about the open source infrastructure covering
+registers, parameters, sockets, and a wide range of interfaces from
+Ethernet to serial, memory mapped busses to graphics, and of course our
+range of consulting and support services.
+
+A lot has happened in the GreenSocs infrastructure recently including much
+better integrations with QEMU, support for multi-threaded simulation,
+Windows support and significant cleaning of the infrastructure and much
+more...
+
+What would you like to do Virtually? Come and tell us!
+
+<http://newsletter.greensocs.com/lt.php?id=3DYB5WHgZLBQAHCw>
+
+
+
+--
+
+ This message was sent to kvmarm@lists.cs.columbia.edu. You are being sent=
+=0Athis email as you
+have had communication with GreenSocs in the past. We undertake not to send
+more than 2 newsletters per year. You can opt-out completely
+<http://newsletter.greensocs.com/lt.php?id=3DYB5QHgZLBQAHCw>
+from all future mailings.
+
+=20
+
+
+--b1_ccf17a792b08edf74e78218f99c6faf0
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<html><head>=0A        <meta content=3D"text/html;charset=3DUTF-8" http-equ=
+iv=3D"Content-Type">=0A        <title></title></head><body><p><style type=
+=3D"text/css">strong,a {color: green}</style></p>
+<p>Could your Software engineers be even more productive using a Virtual Pl=
+atform? Could your Hardware be even better tuned with a pre-silicon model? =
+Visit the new&nbsp;<a href=3D"http://newsletter.greensocs.com/lt.php?id=3Df=
+B5RHgZLBQAHCw" ><span style=3D"font-family: Arial, sans-serif;">Green</span=
+><span style=3D"font-family: 'Arial Black', sans-serif;">Socs</span>&reg;</=
+a>&nbsp;web site to find out how...</p>
+<p><a href=3D"http://www.greensocs.com/">http://www.greensocs.com/</a></p>
+<p>You can download our example platforms for ARM and x86 <strong>FREE</str=
+ong> today, complete with <strong>full source</strong> code.</p>
+<p>GreenSocs is the home of Open Source SystemC infrastructure, including Q=
+Box the SystemC integration of QEMU, supporting a wide variety of CPU cores=
+ at blistering performance within the TLM-2.0 standard.</p>
+<p>We make virtual platforms using standards, and give you the source code =
+and support to make your own.</p>
+<p>On our new website you will find information about GreenSocs, as well as=
+ much improved documentation about the open source infrastructure covering =
+registers, parameters, sockets, and a wide range of interfaces from Etherne=
+t to serial, memory mapped busses to graphics, and of course our range of c=
+onsulting and support services.</p>
+<p>A lot has happened in the GreenSocs infrastructure recently including mu=
+ch better integrations with QEMU, support for multi-threaded simulation, Wi=
+ndows support and significant cleaning of the infrastructure and much more.=
+..</p>
+<p>What would <strong>you</strong> like to do Virtually? Come and tell us!<=
+/p>
+<p>&nbsp;</p>
+<p><a href=3D"http://newsletter.greensocs.com/lt.php?id=3DfB5WHgZLBQAHCw" >=
+<img src=3D"http://static.greensocs.com/logo.png" alt=3D"GreenSocs" /></a><=
+/p>
+<p>&nbsp;</p><br />--
+ =20
+    <div class=3D"footer" style=3D"text-align:left; font-size: 75%;">
+      <p>This message was sent to kvmarm@lists.cs.columbia.edu. You are bei=
+ng sent this email as you have had communication with GreenSocs in the past=
+. We undertake not to send more than 2 newsletters per year. You can <a hre=
+f=3D"http://newsletter.greensocs.com/lt.php?id=3DfB5QHgZLBQAHCw" >opt-out c=
+ompletely</a> from all future mailings.</p>
+    </div>
+
+  =0A<img src=3D"http://newsletter.greensocs.com/ut.php?u=3Df2e1bbc61cbdd79=
+a2f4609f59d4a51dc&amp;m=3D5" width=3D"1" height=3D"1" border=3D"0" alt=3D""=
+ /></body></html>
+
+
+--b1_ccf17a792b08edf74e78218f99c6faf0--
+
+
+--===============8668991558417284768==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============8668991558417284768==--
