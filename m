@@ -1,7 +1,7 @@
 From: Shannon Zhao <shannon.zhao@linaro.org>
-Subject: [PATCH v3 01/20] ARM64: Move PMU register related defines to asm/pmu.h
-Date: Thu, 24 Sep 2015 15:31:06 -0700
-Message-ID: <1443133885-3366-2-git-send-email-shannon.zhao@linaro.org>
+Subject: [PATCH v3 03/20] KVM: ARM64: Add offset defines for PMU registers
+Date: Thu, 24 Sep 2015 15:31:08 -0700
+Message-ID: <1443133885-3366-4-git-send-email-shannon.zhao@linaro.org>
 References: <1443133885-3366-1-git-send-email-shannon.zhao@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1443133885-3366-1-git-send-email-shannon.zhao@linaro.org>
@@ -10,125 +10,100 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, will.deacon@arm.com, wei@redhat.com, alex.bennee@linaro.org, peter.huangpeng@huawei.com, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To use the ARMv8 PMU related register defines from the KVM code,
-we move the relevant definitions to asm/pmu.h header file.
+We are about to trap and emulate acccesses to each PMU register
+individually. This adds the context offsets for the AArch64 PMU
+registers and their AArch32 counterparts.
 
-Signed-off-by: Anup Patel <anup.patel@linaro.org>
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm64/include/asm/pmu.h   | 45 ++++++++++++++++++++++++++++++++++++++++++
- arch/arm64/kernel/perf_event.c | 35 --------------------------------
- 2 files changed, 45 insertions(+), 35 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h | 59 +++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 52 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/include/asm/pmu.h b/arch/arm64/include/asm/pmu.h
-index b7710a5..b9f394a 100644
---- a/arch/arm64/include/asm/pmu.h
-+++ b/arch/arm64/include/asm/pmu.h
-@@ -19,6 +19,51 @@
- #ifndef __ASM_PMU_H
- #define __ASM_PMU_H
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 67fa0de..0a4dfcc 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -48,14 +48,36 @@
+ #define MDSCR_EL1	22	/* Monitor Debug System Control Register */
+ #define MDCCINT_EL1	23	/* Monitor Debug Comms Channel Interrupt Enable Reg */
  
-+#define ARMV8_MAX_COUNTERS      32
-+#define ARMV8_COUNTER_MASK      (ARMV8_MAX_COUNTERS - 1)
++/* Performance Monitors Registers */
++#define PMCR_EL0	24	/* Control Register */
++#define PMOVSSET_EL0	25	/* Overflow Flag Status Set Register */
++#define PMOVSCLR_EL0	26	/* Overflow Flag Status Clear Register */
++#define PMSELR_EL0	27	/* Event Counter Selection Register */
++#define PMCEID0_EL0	28	/* Common Event Identification Register 0 */
++#define PMCEID1_EL0	29	/* Common Event Identification Register 1 */
++#define PMEVCNTR0_EL0	30	/* Event Counter Register (0-30) */
++#define PMEVCNTR30_EL0	60
++#define PMCCNTR_EL0	61	/* Cycle Counter Register */
++#define PMEVTYPER0_EL0	62	/* Event Type Register (0-30) */
++#define PMEVTYPER30_EL0	92
++#define PMCCFILTR_EL0	93	/* Cycle Count Filter Register */
++#define PMXEVCNTR_EL0	94	/* Selected Event Count Register */
++#define PMXEVTYPER_EL0	95	/* Selected Event Type Register */
++#define PMCNTENSET_EL0	96	/* Count Enable Set Register */
++#define PMCNTENCLR_EL0	97	/* Count Enable Clear Register */
++#define PMINTENSET_EL1	98	/* Interrupt Enable Set Register */
++#define PMINTENCLR_EL1	99	/* Interrupt Enable Clear Register */
++#define PMUSERENR_EL0	100	/* User Enable Register */
++#define PMSWINC_EL0	101	/* Software Increment Register */
 +
-+/*
-+ * Per-CPU PMCR: config reg
-+ */
-+#define ARMV8_PMCR_E		(1 << 0) /* Enable all counters */
-+#define ARMV8_PMCR_P		(1 << 1) /* Reset all counters */
-+#define ARMV8_PMCR_C		(1 << 2) /* Cycle counter reset */
-+#define ARMV8_PMCR_D		(1 << 3) /* CCNT counts every 64th cpu cycle */
-+#define ARMV8_PMCR_X		(1 << 4) /* Export to ETM */
-+#define ARMV8_PMCR_DP		(1 << 5) /* Disable CCNT if non-invasive debug*/
-+#define	ARMV8_PMCR_N_SHIFT	11	 /* Number of counters supported */
-+#define	ARMV8_PMCR_N_MASK	0x1f
-+#define	ARMV8_PMCR_MASK		0x3f	 /* Mask for writable bits */
-+
-+/*
-+ * PMCNTEN: counters enable reg
-+ */
-+#define	ARMV8_CNTEN_MASK	0xffffffff	/* Mask for writable bits */
-+
-+/*
-+ * PMINTEN: counters interrupt enable reg
-+ */
-+#define	ARMV8_INTEN_MASK	0xffffffff	/* Mask for writable bits */
-+
-+/*
-+ * PMOVSR: counters overflow flag status reg
-+ */
-+#define	ARMV8_OVSR_MASK		0xffffffff	/* Mask for writable bits */
-+#define	ARMV8_OVERFLOWED_MASK	ARMV8_OVSR_MASK
-+
-+/*
-+ * PMXEVTYPER: Event selection reg
-+ */
-+#define	ARMV8_EVTYPE_MASK	0xc80003ff	/* Mask for writable bits */
-+#define	ARMV8_EVTYPE_EVENT	0x3ff		/* Mask for EVENT bits */
-+
-+/*
-+ * Event filters for PMUv3
-+ */
-+#define	ARMV8_EXCLUDE_EL1	(1 << 31)
-+#define	ARMV8_EXCLUDE_EL0	(1 << 30)
-+#define	ARMV8_INCLUDE_EL2	(1 << 27)
-+
- #ifdef CONFIG_HW_PERF_EVENTS
+ /* 32bit specific registers. Keep them at the end of the range */
+-#define	DACR32_EL2	24	/* Domain Access Control Register */
+-#define	IFSR32_EL2	25	/* Instruction Fault Status Register */
+-#define	FPEXC32_EL2	26	/* Floating-Point Exception Control Register */
+-#define	DBGVCR32_EL2	27	/* Debug Vector Catch Register */
+-#define	TEECR32_EL1	28	/* ThumbEE Configuration Register */
+-#define	TEEHBR32_EL1	29	/* ThumbEE Handler Base Register */
+-#define	NR_SYS_REGS	30
++#define	DACR32_EL2	102	/* Domain Access Control Register */
++#define	IFSR32_EL2	103	/* Instruction Fault Status Register */
++#define	FPEXC32_EL2	104	/* Floating-Point Exception Control Register */
++#define	DBGVCR32_EL2	105	/* Debug Vector Catch Register */
++#define	TEECR32_EL1	106	/* ThumbEE Configuration Register */
++#define	TEEHBR32_EL1	107	/* ThumbEE Handler Base Register */
++#define	NR_SYS_REGS	108
  
- /* The events for a given PMU register set. */
-diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-index f9a74d4..534e8ad 100644
---- a/arch/arm64/kernel/perf_event.c
-+++ b/arch/arm64/kernel/perf_event.c
-@@ -741,9 +741,6 @@ static const unsigned armv8_pmuv3_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
- #define	ARMV8_IDX_COUNTER0	1
- #define	ARMV8_IDX_COUNTER_LAST	(ARMV8_IDX_CYCLE_COUNTER + cpu_pmu->num_events - 1)
+ /* 32bit mapping */
+ #define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
+@@ -77,6 +99,24 @@
+ #define c6_IFAR		(c6_DFAR + 1)	/* Instruction Fault Address Register */
+ #define c7_PAR		(PAR_EL1 * 2)	/* Physical Address Register */
+ #define c7_PAR_high	(c7_PAR + 1)	/* PAR top 32 bits */
++
++/* Performance Monitors*/
++#define c9_PMCR		(PMCR_EL0 * 2)
++#define c9_PMOVSSET	(PMOVSSET_EL0 * 2)
++#define c9_PMOVSCLR	(PMOVSCLR_EL0 * 2)
++#define c9_PMCCNTR	(PMCCNTR_EL0 * 2)
++#define c9_PMSELR	(PMSELR_EL0 * 2)
++#define c9_PMCEID0	(PMCEID0_EL0 * 2)
++#define c9_PMCEID1	(PMCEID1_EL0 * 2)
++#define c9_PMXEVCNTR	(PMXEVCNTR_EL0 * 2)
++#define c9_PMXEVTYPER	(PMXEVTYPER_EL0 * 2)
++#define c9_PMCNTENSET	(PMCNTENSET_EL0 * 2)
++#define c9_PMCNTENCLR	(PMCNTENCLR_EL0 * 2)
++#define c9_PMINTENSET	(PMINTENSET_EL1 * 2)
++#define c9_PMINTENCLR	(PMINTENCLR_EL1 * 2)
++#define c9_PMUSERENR	(PMUSERENR_EL0 * 2)
++#define c9_PMSWINC	(PMSWINC_EL0 * 2)
++
+ #define c10_PRRR	(MAIR_EL1 * 2)	/* Primary Region Remap Register */
+ #define c10_NMRR	(c10_PRRR + 1)	/* Normal Memory Remap Register */
+ #define c12_VBAR	(VBAR_EL1 * 2)	/* Vector Base Address Register */
+@@ -88,6 +128,11 @@
+ #define c10_AMAIR1	(c10_AMAIR0 + 1)/* Aux Memory Attr Indirection Reg */
+ #define c14_CNTKCTL	(CNTKCTL_EL1 * 2) /* Timer Control Register (PL1) */
  
--#define	ARMV8_MAX_COUNTERS	32
--#define	ARMV8_COUNTER_MASK	(ARMV8_MAX_COUNTERS - 1)
--
- /*
-  * ARMv8 low level PMU access
-  */
-@@ -754,38 +751,6 @@ static const unsigned armv8_pmuv3_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
- #define	ARMV8_IDX_TO_COUNTER(x)	\
- 	(((x) - ARMV8_IDX_COUNTER0) & ARMV8_COUNTER_MASK)
- 
--/*
-- * Per-CPU PMCR: config reg
-- */
--#define ARMV8_PMCR_E		(1 << 0) /* Enable all counters */
--#define ARMV8_PMCR_P		(1 << 1) /* Reset all counters */
--#define ARMV8_PMCR_C		(1 << 2) /* Cycle counter reset */
--#define ARMV8_PMCR_D		(1 << 3) /* CCNT counts every 64th cpu cycle */
--#define ARMV8_PMCR_X		(1 << 4) /* Export to ETM */
--#define ARMV8_PMCR_DP		(1 << 5) /* Disable CCNT if non-invasive debug*/
--#define	ARMV8_PMCR_N_SHIFT	11	 /* Number of counters supported */
--#define	ARMV8_PMCR_N_MASK	0x1f
--#define	ARMV8_PMCR_MASK		0x3f	 /* Mask for writable bits */
--
--/*
-- * PMOVSR: counters overflow flag status reg
-- */
--#define	ARMV8_OVSR_MASK		0xffffffff	/* Mask for writable bits */
--#define	ARMV8_OVERFLOWED_MASK	ARMV8_OVSR_MASK
--
--/*
-- * PMXEVTYPER: Event selection reg
-- */
--#define	ARMV8_EVTYPE_MASK	0xc80003ff	/* Mask for writable bits */
--#define	ARMV8_EVTYPE_EVENT	0x3ff		/* Mask for EVENT bits */
--
--/*
-- * Event filters for PMUv3
-- */
--#define	ARMV8_EXCLUDE_EL1	(1 << 31)
--#define	ARMV8_EXCLUDE_EL0	(1 << 30)
--#define	ARMV8_INCLUDE_EL2	(1 << 27)
--
- static inline u32 armv8pmu_pmcr_read(void)
- {
- 	u32 val;
++/* Performance Monitors*/
++#define c14_PMEVCNTR0	(PMEVCNTR0_EL0 * 2)
++#define c14_PMEVTYPER0	(PMEVTYPER0_EL0 * 2)
++#define c14_PMCCFILTR	(PMCCFILTR_EL0 * 2)
++
+ #define cp14_DBGDSCRext	(MDSCR_EL1 * 2)
+ #define cp14_DBGBCR0	(DBGBCR0_EL1 * 2)
+ #define cp14_DBGBVR0	(DBGBVR0_EL1 * 2)
 -- 
 2.1.4
 
