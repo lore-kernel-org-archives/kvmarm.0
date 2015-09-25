@@ -1,162 +1,82 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC 0/2] VFIO: Add virtual MSI doorbell support.
-Date: Fri, 25 Sep 2015 10:12:06 -0700
-Message-ID: <20150925171206.GA2151@lvm>
-References: <1437728590-23126-1-git-send-email-pranavkumar@linaro.org>
- <1438100507.5211.170.camel@redhat.com>
- <CY1PR0301MB127660D71378F009918DDDD5908D0@CY1PR0301MB1276.namprd03.prod.outlook.com>
- <1438106335.5211.219.camel@redhat.com>
- <CAAHg+HgosCe=1T5ER-4AS1g779RxCDjcrazKV4CQC-43zDK-+Q@mail.gmail.com>
- <CY1PR0301MB12761E7FA759BD1D6F218B8B90760@CY1PR0301MB1276.namprd03.prod.outlook.com>
- <20150922230914.79972137@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [PATCH v3 0/4] KVM: arm/arm64: guest synchronous halt/resume
+Date: Fri, 25 Sep 2015 23:41:13 +0200
+Message-ID: <1443217277-13173-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20150922230914.79972137@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Bhushan Bharat <Bharat.Bhushan@freescale.com>, Pranavkumar Sawargaonkar <pranavkumar@linaro.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Alex Williamson <alex.williamson@redhat.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Will Deacon <Will.Deacon@arm.com>, "bhelgaas@google.com" <bhelgaas@google.com>, "arnd@arndb.de" <arnd@arndb.de>, "rob.herring@linaro.org" <rob.herring@linaro.org>, "eric.auger@linaro.org" <eric.auger@linaro.org>, "patches@apm.com" <patches@apm.com>, Stuart Yoder <stuart.yoder@freescale.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EF30B48A84
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Sep 2015 17:41:05 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 8U5qk4RTKMay for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 Sep 2015 17:41:04 -0400 (EDT)
+Received: from mail-pa0-f53.google.com (mail-pa0-f53.google.com
+ [209.85.220.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B383148A7F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Sep 2015 17:41:04 -0400 (EDT)
+Received: by padhy16 with SMTP id hy16so116481282pad.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Sep 2015 14:42:28 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: eric.auger@st.com, eric.auger@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, drjones@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Sep 22, 2015 at 11:09:14PM +0100, Marc Zyngier wrote:
-> On Tue, 4 Aug 2015 06:52:01 +0100
-> Bhushan Bharat <Bharat.Bhushan@freescale.com> wrote:
-> 
-> > 
-> > 
-> > > -----Original Message-----
-> > > From: Pranavkumar Sawargaonkar [mailto:pranavkumar@linaro.org]
-> > > Sent: Tuesday, August 04, 2015 11:18 AM
-> > > To: Bhushan Bharat-R65777
-> > > Cc: kvm@vger.kernel.org; Alex Williamson; kvmarm@lists.cs.columbia.edu;
-> > > linux-arm-kernel@lists.infradead.org; linux-kernel@vger.kernel.org;
-> > > christoffer.dall@linaro.org; marc.zyngier@arm.com; will.deacon@arm.com;
-> > > bhelgaas@google.com; arnd@arndb.de; rob.herring@linaro.org;
-> > > eric.auger@linaro.org; patches@apm.com; Yoder Stuart-B08248
-> > > Subject: Re: [RFC 0/2] VFIO: Add virtual MSI doorbell support.
-> > > 
-> > > Hi Bharat,
-> > > 
-> > > On 28 July 2015 at 23:28, Alex Williamson <alex.williamson@redhat.com>
-> > > wrote:
-> > > > On Tue, 2015-07-28 at 17:23 +0000, Bhushan Bharat wrote:
-> > > >> Hi Alex,
-> > > >>
-> > > >> > -----Original Message-----
-> > > >> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> > > >> > Sent: Tuesday, July 28, 2015 9:52 PM
-> > > >> > To: Pranavkumar Sawargaonkar
-> > > >> > Cc: kvm@vger.kernel.org; kvmarm@lists.cs.columbia.edu; linux-arm-
-> > > >> > kernel@lists.infradead.org; linux-kernel@vger.kernel.org;
-> > > >> > christoffer.dall@linaro.org; marc.zyngier@arm.com;
-> > > >> > will.deacon@arm.com; bhelgaas@google.com; arnd@arndb.de;
-> > > >> > rob.herring@linaro.org; eric.auger@linaro.org; patches@apm.com;
-> > > >> > Bhushan Bharat-R65777; Yoder
-> > > >> > Stuart-B08248
-> > > >> > Subject: Re: [RFC 0/2] VFIO: Add virtual MSI doorbell support.
-> > > >> >
-> > > >> > On Fri, 2015-07-24 at 14:33 +0530, Pranavkumar Sawargaonkar wrote:
-> > > >> > > In current VFIO MSI/MSI-X implementation, linux host kernel
-> > > >> > > allocates MSI/MSI-X vectors when userspace requests through vfio
-> > > ioctls.
-> > > >> > > Vfio creates irqfd mappings to notify MSI/MSI-X interrupts to the
-> > > >> > > userspace when raised.
-> > > >> > > Guest OS will see emulated MSI/MSI-X controller and receives an
-> > > >> > > interrupt when kernel notifies the same via irqfd.
-> > > >> > >
-> > > >> > > Host kernel allocates MSI/MSI-X using standard linux routines
-> > > >> > > like
-> > > >> > > pci_enable_msix_range() and pci_enable_msi_range().
-> > > >> > > These routines along with requset_irq() in host kernel sets up
-> > > >> > > MSI/MSI-X vectors with Physical MSI/MSI-X addresses provided by
-> > > >> > > interrupt controller driver in host kernel.
-> > > >> > >
-> > > >> > > This means when a device is assigned with the guest OS, MSI/MSI-X
-> > > >> > > addresses present in PCIe EP are the PAs programmed by the host
-> > > >> > > linux
-> > > >> > kernel.
-> > > >> > >
-> > > >> > > In x86 MSI/MSI-X physical address range is reserved and iommu is
-> > > >> > > aware about these addreses and transalation is bypassed for these
-> > > address range.
-> > > >> > >
-> > > >> > > Unlike x86, ARM/ARM64 does not reserve MSI/MSI-X Physical address
-> > > >> > > range and all the transactions including MSI go through
-> > > >> > > iommu/smmu
-> > > >> > without bypass.
-> > > >> > > This requires extending current vfio MSI layer with additional
-> > > >> > > functionality for ARM/ARM64 by 1. Programing IOVA (referred as a
-> > > >> > > MSI virtual doorbell address)
-> > > >> > >    in device's MSI vector as a MSI address.
-> > > >> > >    This IOVA will be provided by the userspace based on the
-> > > >> > >    MSI/MSI-X addresses reserved for the guest.
-> > > >> > > 2. Create an IOMMU mapping between this IOVA and
-> > > >> > >    Physical address (PA) assigned to the MSI vector.
-> > > >> > >
-> > > >> > > This RFC is proposing a solution for MSI/MSI-X passthrough for
-> > > >> > ARM/ARM64.
-> > > >> >
-> > > >> >
-> > > >> > Hi Pranavkumar,
-> > > >> >
-> > > >> > Freescale has the same, or very similar, need, so any solution in
-> > > >> > this space will need to work for both ARM and powerpc.  I'm not a
-> > > >> > big fan of this approach as it seems to require the user to
-> > > >> > configure MSI/X via ioctl and then call a separate ioctl mapping
-> > > >> > the doorbells.  That's more code for the user, more code to get
-> > > >> > wrong and potentially a gap between configuring MSI/X and enabling
-> > > mappings where we could see IOMMU faults.
-> > > >> >
-> > > >> > If we know that doorbell mappings are required, why can't we set
-> > > >> > aside a bank of IOVA space and have them mapped automatically as
-> > > >> > MSI/X is being configured?  Then the user's need for special
-> > > >> > knowledge and handling of this case is limited to setup.  The IOVA
-> > > >> > space will be mapped and used as needed, we only need the user to
-> > > >> > specify the IOVA space reserved for this.  Thanks,
-> > > >>
-> > > >> We probably need a mix of both to support Freescale PowerPC and ARM
-> > > >> based machines.
-> > > >> In this mix mode kernel vfio driver will reserve some IOVA for
-> > > >> mapping MSI page/s.
-> > > >
-> > > > If vfio is reserving pages independently from the user, this becomes
-> > > > what Marc called "shaping" the VM and what x86 effectively does.  An
-> > > > interface extension should expose these implicit regions so the user
-> > > > can avoid them for DMA memory mapping.
-> > > >
-> > > >>  If any other iova mapping will overlap with this then it will return
-> > > >> error and user-space. Ideally this should be choosen in such a way
-> > > >> that it never overlap, which is easy on some systems but can be
-> > > >> tricky on some other system like Freescale PowerPC. This is not
-> > > >> sufficient for at-least Freescale PowerPC based SOC. This is because
-> > > >> of hardware limitation, where we need to fit this reserved iova
-> > > >> address within aperture decided by user-space. So if we allow
-> > > >> user-space to change this reserved iova address to a value decided by
-> > > >> user-spece itself then we can support both ARM/PowerPC based
-> > > solutions.
-> > > >
-> > > > Yes, that's my intention, to allow userspace to specify the reserved
-> > > > region.  I believe you have some additional restrictions on the number
-> > > > of MSI banks available and whether MSI banks can be shared, but I
-> > > > would hope that doesn't preclude a shared interface with ARM.
-> > > >
-> > > >> I have some implementation ready/tested with this approach and if
-> > > >> this approach looks good then I can submit a RFC patch.
-> > > >
-> > > > Yes, please post.  Thanks,
-> > > 
-> > > Could you please share a tentative timeline by which you will be posting your
-> > > patches ?
-> > 
-> > I have not touched that code for a while, I am planning to send the
-> > patch in couple of weeks.
-> 
-> Have we made any progress on this subject? It looks like a lot of time
-> has passed, but I haven't seen anything. Did I miss it?
-> 
-Pranav is going to respin his series, because we are clarly not making
-progress on this front.
+This series introduces the capability to synchronously exit the guest
+and prevent it from being re-entered. This modality will be used by
+IRQ forwarding series when changing the state of the IRQ.
 
-Thanks,
--Christoffer
+Former pause flag used when starting the vcpu in KVM_ARM_VCPU_POWER_OFF
+state, in PSCI calls and in KVM_SET_MP_STATE ioctl is renamed into
+power_off. A new pause flag is introduced. Both now are checked in
+kvm_arch_vcpu_runnable and in the VCPU_RUN critical section, before
+entering the vcpu.
+
+Best Regards
+
+Eric
+
+History:
+v2 -> v3:
+- unified the comment associated to the pause flag
+- correct commit message of "KVM: arm/arm64: check power_off in
+  critical section before VCPU run"
+- add Christoffer R-b on whole series
+
+v1 -> v2:
+- check pause, power_off and in kvm_arch_vcpu_runnable
+- check power_off in vcpu_run critcal section before guest entry
+- correct compil issue in first patch reported by Andrew
+- rename vcpu_pause into vcpu_sleep
+
+RFC -> PATCH v1:
+- originally part of [RFC 00/17] ARM IRQ forward control based on IRQ
+  bypass manager (https://lkml.org/lkml/2015/7/2/268) and isolated in
+  this series.
+- added __maybe_unused following Marc's advice
+
+
+Eric Auger (4):
+  KVM: arm/arm64: rename pause into power_off
+  KVM: arm/arm64: check power_off in kvm_arch_vcpu_runnable
+  KVM: arm/arm64: check power_off in critical section before VCPU run
+  KVM: arm/arm64: implement kvm_arm_[halt,resume]_guest
+
+ arch/arm/include/asm/kvm_host.h   |  5 +++-
+ arch/arm/kvm/arm.c                | 53 ++++++++++++++++++++++++++++++---------
+ arch/arm/kvm/psci.c               | 10 ++++----
+ arch/arm64/include/asm/kvm_host.h |  5 +++-
+ 4 files changed, 54 insertions(+), 19 deletions(-)
+
+-- 
+1.9.1
