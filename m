@@ -1,82 +1,180 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v3 0/4] KVM: arm/arm64: guest synchronous halt/resume
-Date: Fri, 25 Sep 2015 23:41:13 +0200
-Message-ID: <1443217277-13173-1-git-send-email-eric.auger@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EF30B48A84
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Sep 2015 17:41:05 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8U5qk4RTKMay for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Sep 2015 17:41:04 -0400 (EDT)
-Received: from mail-pa0-f53.google.com (mail-pa0-f53.google.com
- [209.85.220.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B383148A7F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Sep 2015 17:41:04 -0400 (EDT)
-Received: by padhy16 with SMTP id hy16so116481282pad.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Sep 2015 14:42:28 -0700 (PDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Subject: [PATCH v3 1/4] KVM: arm/arm64: rename pause into power_off
+Date: Fri, 25 Sep 2015 23:41:14 +0200
+Message-ID: <1443217277-13173-2-git-send-email-eric.auger@linaro.org>
+References: <1443217277-13173-1-git-send-email-eric.auger@linaro.org>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1443217277-13173-1-git-send-email-eric.auger@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
 To: eric.auger@st.com, eric.auger@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, drjones@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series introduces the capability to synchronously exit the guest
-and prevent it from being re-entered. This modality will be used by
-IRQ forwarding series when changing the state of the IRQ.
+The kvm_vcpu_arch pause field is renamed into power_off to prepare
+for the introduction of a new pause field. Also vcpu_pause is renamed
+into vcpu_sleep since we will sleep until both power_off and pause are
+false.
 
-Former pause flag used when starting the vcpu in KVM_ARM_VCPU_POWER_OFF
-state, in PSCI calls and in KVM_SET_MP_STATE ioctl is renamed into
-power_off. A new pause flag is introduced. Both now are checked in
-kvm_arch_vcpu_runnable and in the VCPU_RUN critical section, before
-entering the vcpu.
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 
-Best Regards
-
-Eric
-
-History:
-v2 -> v3:
-- unified the comment associated to the pause flag
-- correct commit message of "KVM: arm/arm64: check power_off in
-  critical section before VCPU run"
-- add Christoffer R-b on whole series
+---
 
 v1 -> v2:
-- check pause, power_off and in kvm_arch_vcpu_runnable
-- check power_off in vcpu_run critcal section before guest entry
-- correct compil issue in first patch reported by Andrew
+- rename pause in kvm_arch_vcpu_ioctl_[set,get]_mpstate
 - rename vcpu_pause into vcpu_sleep
+---
+ arch/arm/include/asm/kvm_host.h   |  4 ++--
+ arch/arm/kvm/arm.c                | 20 ++++++++++----------
+ arch/arm/kvm/psci.c               | 10 +++++-----
+ arch/arm64/include/asm/kvm_host.h |  4 ++--
+ 4 files changed, 19 insertions(+), 19 deletions(-)
 
-RFC -> PATCH v1:
-- originally part of [RFC 00/17] ARM IRQ forward control based on IRQ
-  bypass manager (https://lkml.org/lkml/2015/7/2/268) and isolated in
-  this series.
-- added __maybe_unused following Marc's advice
-
-
-Eric Auger (4):
-  KVM: arm/arm64: rename pause into power_off
-  KVM: arm/arm64: check power_off in kvm_arch_vcpu_runnable
-  KVM: arm/arm64: check power_off in critical section before VCPU run
-  KVM: arm/arm64: implement kvm_arm_[halt,resume]_guest
-
- arch/arm/include/asm/kvm_host.h   |  5 +++-
- arch/arm/kvm/arm.c                | 53 ++++++++++++++++++++++++++++++---------
- arch/arm/kvm/psci.c               | 10 ++++----
- arch/arm64/include/asm/kvm_host.h |  5 +++-
- 4 files changed, 54 insertions(+), 19 deletions(-)
-
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index 3df1e97..1931a25 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -125,8 +125,8 @@ struct kvm_vcpu_arch {
+ 	 * here.
+ 	 */
+ 
+-	/* Don't run the guest on this vcpu */
+-	bool pause;
++	/* vcpu power-off state */
++	bool power_off;
+ 
+ 	/* IO related fields */
+ 	struct kvm_decode mmio_decode;
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index a9491ef..2b19ef7 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -318,7 +318,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+ 				    struct kvm_mp_state *mp_state)
+ {
+-	if (vcpu->arch.pause)
++	if (vcpu->arch.power_off)
+ 		mp_state->mp_state = KVM_MP_STATE_STOPPED;
+ 	else
+ 		mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
+@@ -331,10 +331,10 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+ {
+ 	switch (mp_state->mp_state) {
+ 	case KVM_MP_STATE_RUNNABLE:
+-		vcpu->arch.pause = false;
++		vcpu->arch.power_off = false;
+ 		break;
+ 	case KVM_MP_STATE_STOPPED:
+-		vcpu->arch.pause = true;
++		vcpu->arch.power_off = true;
+ 		break;
+ 	default:
+ 		return -EINVAL;
+@@ -478,11 +478,11 @@ bool kvm_arch_intc_initialized(struct kvm *kvm)
+ 	return vgic_initialized(kvm);
+ }
+ 
+-static void vcpu_pause(struct kvm_vcpu *vcpu)
++static void vcpu_sleep(struct kvm_vcpu *vcpu)
+ {
+ 	wait_queue_head_t *wq = kvm_arch_vcpu_wq(vcpu);
+ 
+-	wait_event_interruptible(*wq, !vcpu->arch.pause);
++	wait_event_interruptible(*wq, !vcpu->arch.power_off);
+ }
+ 
+ static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+@@ -532,8 +532,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 
+ 		update_vttbr(vcpu->kvm);
+ 
+-		if (vcpu->arch.pause)
+-			vcpu_pause(vcpu);
++		if (vcpu->arch.power_off)
++			vcpu_sleep(vcpu);
+ 
+ 		/*
+ 		 * Disarming the background timer must be done in a
+@@ -780,12 +780,12 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+ 	vcpu_reset_hcr(vcpu);
+ 
+ 	/*
+-	 * Handle the "start in power-off" case by marking the VCPU as paused.
++	 * Handle the "start in power-off" case.
+ 	 */
+ 	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
+-		vcpu->arch.pause = true;
++		vcpu->arch.power_off = true;
+ 	else
+-		vcpu->arch.pause = false;
++		vcpu->arch.power_off = false;
+ 
+ 	return 0;
+ }
+diff --git a/arch/arm/kvm/psci.c b/arch/arm/kvm/psci.c
+index ad6f642..0b55696 100644
+--- a/arch/arm/kvm/psci.c
++++ b/arch/arm/kvm/psci.c
+@@ -63,7 +63,7 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
+ 
+ static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
+ {
+-	vcpu->arch.pause = true;
++	vcpu->arch.power_off = true;
+ }
+ 
+ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+@@ -87,7 +87,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+ 	 */
+ 	if (!vcpu)
+ 		return PSCI_RET_INVALID_PARAMS;
+-	if (!vcpu->arch.pause) {
++	if (!vcpu->arch.power_off) {
+ 		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
+ 			return PSCI_RET_ALREADY_ON;
+ 		else
+@@ -115,7 +115,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+ 	 * the general puspose registers are undefined upon CPU_ON.
+ 	 */
+ 	*vcpu_reg(vcpu, 0) = context_id;
+-	vcpu->arch.pause = false;
++	vcpu->arch.power_off = false;
+ 	smp_mb();		/* Make sure the above is visible */
+ 
+ 	wq = kvm_arch_vcpu_wq(vcpu);
+@@ -153,7 +153,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+ 		mpidr = kvm_vcpu_get_mpidr_aff(tmp);
+ 		if ((mpidr & target_affinity_mask) == target_affinity) {
+ 			matching_cpus++;
+-			if (!tmp->arch.pause)
++			if (!tmp->arch.power_off)
+ 				return PSCI_0_2_AFFINITY_LEVEL_ON;
+ 		}
+ 	}
+@@ -179,7 +179,7 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
+ 	 * re-initialized.
+ 	 */
+ 	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+-		tmp->arch.pause = true;
++		tmp->arch.power_off = true;
+ 		kvm_vcpu_kick(tmp);
+ 	}
+ 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 4562459..d89ec1b 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -148,8 +148,8 @@ struct kvm_vcpu_arch {
+ 		u32	mdscr_el1;
+ 	} guest_debug_preserved;
+ 
+-	/* Don't run the guest */
+-	bool pause;
++	/* vcpu power-off state */
++	bool power_off;
+ 
+ 	/* IO related fields */
+ 	struct kvm_decode mmio_decode;
 -- 
 1.9.1
