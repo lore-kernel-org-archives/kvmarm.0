@@ -1,7 +1,7 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: [PATCH v4 5/7] KVM: arm64: Refactor system register handlers
-Date: Mon, 28 Sep 2015 18:27:32 +0300
-Message-ID: <119455aa3576e47d61b625523ea553bcc9a9a07d.1443451687.git.p.fedin@samsung.com>
+Subject: [PATCH v4 2/7] KVM: arm/arm64: Refactor vGIC attributes handling code
+Date: Mon, 28 Sep 2015 18:27:29 +0300
+Message-ID: <b45cd9b29413271cc583f9ee9b222f4c1e54190c.1443451687.git.p.fedin@samsung.com>
 References: <cover.1443451687.git.p.fedin@samsung.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-reply-to: <cover.1443451687.git.p.fedin@samsung.com>
@@ -12,257 +12,280 @@ To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Replace Rt with data pointer in struct sys_reg_params. This will allow to
-reuse system register handling code in implementation of vGICv3 CPU
-interface access API. Additionally, got rid of "massive hack"
-in kvm_handle_cp_64().
+Separate all implementation-independent code in vgic_attr_regs_access()
+and move it to vgic.c. This will allow to reuse this code for vGICv3
+implementation.
 
 Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
 ---
- arch/arm64/kvm/sys_regs.c            | 61 +++++++++++++++++-------------------
- arch/arm64/kvm/sys_regs.h            |  4 +--
- arch/arm64/kvm/sys_regs_generic_v8.c |  2 +-
- 3 files changed, 32 insertions(+), 35 deletions(-)
+ virt/kvm/arm/vgic-v2-emul.c | 118 +++++++++-----------------------------------
+ virt/kvm/arm/vgic.c         |  64 ++++++++++++++++++++++++
+ virt/kvm/arm/vgic.h         |   4 ++
+ 3 files changed, 92 insertions(+), 94 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d03d3af..39db06dd 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -102,7 +102,7 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+diff --git a/virt/kvm/arm/vgic-v2-emul.c b/virt/kvm/arm/vgic-v2-emul.c
+index 959b9c6..b4699c1 100644
+--- a/virt/kvm/arm/vgic-v2-emul.c
++++ b/virt/kvm/arm/vgic-v2-emul.c
+@@ -661,38 +661,20 @@ static const struct vgic_io_range vgic_cpu_ranges[] = {
+ 	},
+ };
  
- 	BUG_ON(!p->is_write);
- 
--	val = *vcpu_reg(vcpu, p->Rt);
-+	val = *p->val;
- 	if (!p->is_aarch32) {
- 		vcpu_sys_reg(vcpu, r->reg) = val;
- 	} else {
-@@ -125,13 +125,10 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
- 			   const struct sys_reg_params *p,
- 			   const struct sys_reg_desc *r)
+-static int vgic_attr_regs_access(struct kvm_device *dev,
+-				 struct kvm_device_attr *attr,
+-				 __le32 *data, bool is_write)
++static int vgic_v2_attr_regs_access(struct kvm_device *dev,
++				    struct kvm_device_attr *attr,
++				    __le32 *data, bool is_write)
  {
--	u64 val;
+-	const struct vgic_io_range *r = NULL, *ranges;
++	const struct vgic_io_range *ranges;
+ 	phys_addr_t offset;
+-	int ret, cpuid, c;
+-	struct kvm_vcpu *vcpu, *tmp_vcpu;
+-	struct vgic_dist *vgic;
++	int cpuid;
++	struct vgic_dist *vgic = &dev->kvm->arch.vgic;
+ 	struct kvm_exit_mmio mmio;
+ 
+ 	offset = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
+ 	cpuid = (attr->attr & KVM_DEV_ARM_VGIC_CPUID_MASK) >>
+ 		KVM_DEV_ARM_VGIC_CPUID_SHIFT;
+ 
+-	mutex_lock(&dev->kvm->lock);
 -
- 	if (!p->is_write)
- 		return read_from_write_only(vcpu, p);
- 
--	val = *vcpu_reg(vcpu, p->Rt);
--	vgic_v3_dispatch_sgi(vcpu, val);
-+	vgic_v3_dispatch_sgi(vcpu, *p->val);
- 
- 	return true;
- }
-@@ -153,7 +150,7 @@ static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
- 	if (p->is_write) {
- 		return ignore_write(vcpu, p);
- 	} else {
--		*vcpu_reg(vcpu, p->Rt) = (1 << 3);
-+		*p->val = (1 << 3);
- 		return true;
+-	ret = vgic_init(dev->kvm);
+-	if (ret)
+-		goto out;
+-
+-	if (cpuid >= atomic_read(&dev->kvm->online_vcpus)) {
+-		ret = -EINVAL;
+-		goto out;
+-	}
+-
+-	vcpu = kvm_get_vcpu(dev->kvm, cpuid);
+-	vgic = &dev->kvm->arch.vgic;
+-
+-	mmio.len = 4;
+-	mmio.is_write = is_write;
+-	mmio.data = data;
+ 	switch (attr->group) {
+ 	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+ 		mmio.phys_addr = vgic->vgic_dist_base + offset;
+@@ -703,49 +685,14 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
+ 		ranges = vgic_cpu_ranges;
+ 		break;
+ 	default:
+-		BUG();
++		return -ENXIO;
  	}
+-	r = vgic_find_range(ranges, 4, offset);
+-
+-	if (unlikely(!r || !r->handle_mmio)) {
+-		ret = -ENXIO;
+-		goto out;
+-	}
+-
+-
+-	spin_lock(&vgic->lock);
+-
+-	/*
+-	 * Ensure that no other VCPU is running by checking the vcpu->cpu
+-	 * field.  If no other VPCUs are running we can safely access the VGIC
+-	 * state, because even if another VPU is run after this point, that
+-	 * VCPU will not touch the vgic state, because it will block on
+-	 * getting the vgic->lock in kvm_vgic_sync_hwstate().
+-	 */
+-	kvm_for_each_vcpu(c, tmp_vcpu, dev->kvm) {
+-		if (unlikely(tmp_vcpu->cpu != -1)) {
+-			ret = -EBUSY;
+-			goto out_vgic_unlock;
+-		}
+-	}
+-
+-	/*
+-	 * Move all pending IRQs from the LRs on all VCPUs so the pending
+-	 * state can be properly represented in the register state accessible
+-	 * through this API.
+-	 */
+-	kvm_for_each_vcpu(c, tmp_vcpu, dev->kvm)
+-		vgic_unqueue_irqs(tmp_vcpu);
+ 
+-	offset -= r->base;
+-	r->handle_mmio(vcpu, &mmio, offset);
++	mmio.len = 4;
++	mmio.is_write = is_write;
++	mmio.data = data;
+ 
+-	ret = 0;
+-out_vgic_unlock:
+-	spin_unlock(&vgic->lock);
+-out:
+-	mutex_unlock(&dev->kvm->lock);
+-	return ret;
++	return vgic_attr_regs_access(dev, ranges, &mmio, offset, cpuid);
  }
-@@ -167,7 +164,7 @@ static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
- 	} else {
- 		u32 val;
- 		asm volatile("mrs %0, dbgauthstatus_el1" : "=r" (val));
--		*vcpu_reg(vcpu, p->Rt) = val;
-+		*p->val = val;
- 		return true;
- 	}
- }
-@@ -204,13 +201,13 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
- 			    const struct sys_reg_desc *r)
+ 
+ static int vgic_v2_create(struct kvm_device *dev, u32 type)
+@@ -761,55 +708,38 @@ static void vgic_v2_destroy(struct kvm_device *dev)
+ static int vgic_v2_set_attr(struct kvm_device *dev,
+ 			    struct kvm_device_attr *attr)
  {
- 	if (p->is_write) {
--		vcpu_sys_reg(vcpu, r->reg) = *vcpu_reg(vcpu, p->Rt);
-+		vcpu_sys_reg(vcpu, r->reg) = *p->val;
- 		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
- 	} else {
--		*vcpu_reg(vcpu, p->Rt) = vcpu_sys_reg(vcpu, r->reg);
-+		*p->val = vcpu_sys_reg(vcpu, r->reg);
- 	}
++	u32 __user *uaddr = (u32 __user *)(long)attr->addr;
++	u32 reg;
++	__le32 data;
+ 	int ret;
  
--	trace_trap_reg(__func__, r->reg, p->is_write, *vcpu_reg(vcpu, p->Rt));
-+	trace_trap_reg(__func__, r->reg, p->is_write, *p->val);
+ 	ret = vgic_set_common_attr(dev, attr);
+ 	if (ret != -ENXIO)
+ 		return ret;
  
- 	return true;
- }
-@@ -228,7 +225,7 @@ static inline void reg_to_dbg(struct kvm_vcpu *vcpu,
- 			      const struct sys_reg_params *p,
- 			      u64 *dbg_reg)
- {
--	u64 val = *vcpu_reg(vcpu, p->Rt);
-+	u64 val = *p->val;
+-	switch (attr->group) {
+-	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+-	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
+-		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+-		u32 reg;
+-		__le32 data;
+-
+-		if (get_user(reg, uaddr))
+-			return -EFAULT;
+-
+-		data = cpu_to_le32(reg);
+-		return vgic_attr_regs_access(dev, attr, &data, true);
+-	}
+-
+-	}
++	if (get_user(reg, uaddr))
++		return -EFAULT;
  
- 	if (p->is_32bit) {
- 		val &= 0xffffffffUL;
-@@ -248,7 +245,7 @@ static inline void dbg_to_reg(struct kvm_vcpu *vcpu,
- 	if (p->is_32bit)
- 		val &= 0xffffffffUL;
- 
--	*vcpu_reg(vcpu, p->Rt) = val;
-+	*p->val = val;
- }
- 
- static inline bool trap_bvr(struct kvm_vcpu *vcpu,
-@@ -697,10 +694,10 @@ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
- 		u64 pfr = read_cpuid(ID_AA64PFR0_EL1);
- 		u32 el3 = !!((pfr >> 12) & 0xf);
- 
--		*vcpu_reg(vcpu, p->Rt) = ((((dfr >> 20) & 0xf) << 28) |
--					  (((dfr >> 12) & 0xf) << 24) |
--					  (((dfr >> 28) & 0xf) << 20) |
--					  (6 << 16) | (el3 << 14) | (el3 << 12));
-+		*p->val = ((((dfr >> 20) & 0xf) << 28) |
-+			   (((dfr >> 12) & 0xf) << 24) |
-+			   (((dfr >> 28) & 0xf) << 20) |
-+			   (6 << 16) | (el3 << 14) | (el3 << 12));
- 		return true;
- 	}
- }
-@@ -710,10 +707,10 @@ static bool trap_debug32(struct kvm_vcpu *vcpu,
- 			 const struct sys_reg_desc *r)
- {
- 	if (p->is_write) {
--		vcpu_cp14(vcpu, r->reg) = *vcpu_reg(vcpu, p->Rt);
-+		vcpu_cp14(vcpu, r->reg) = *p->val;
- 		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
- 	} else {
--		*vcpu_reg(vcpu, p->Rt) = vcpu_cp14(vcpu, r->reg);
-+		*p->val = vcpu_cp14(vcpu, r->reg);
- 	}
- 
- 	return true;
-@@ -740,12 +737,12 @@ static inline bool trap_xvr(struct kvm_vcpu *vcpu,
- 		u64 val = *dbg_reg;
- 
- 		val &= 0xffffffffUL;
--		val |= *vcpu_reg(vcpu, p->Rt) << 32;
-+		val |= *p->val << 32;
- 		*dbg_reg = val;
- 
- 		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
- 	} else {
--		*vcpu_reg(vcpu, p->Rt) = *dbg_reg >> 32;
-+		*p->val = *dbg_reg >> 32;
- 	}
- 
- 	trace_trap_reg(__func__, rd->reg, p->is_write, *dbg_reg);
-@@ -1062,12 +1059,14 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
- {
- 	struct sys_reg_params params;
- 	u32 hsr = kvm_vcpu_get_hsr(vcpu);
-+	int Rt = (hsr >> 5) & 0xf;
- 	int Rt2 = (hsr >> 10) & 0xf;
-+	unsigned long val;
- 
- 	params.is_aarch32 = true;
- 	params.is_32bit = false;
- 	params.CRm = (hsr >> 1) & 0xf;
--	params.Rt = (hsr >> 5) & 0xf;
-+	params.val = &val;
- 	params.is_write = ((hsr & 1) == 0);
- 
- 	params.Op0 = 0;
-@@ -1076,15 +1075,12 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
- 	params.CRn = 0;
- 
- 	/*
--	 * Massive hack here. Store Rt2 in the top 32bits so we only
--	 * have one register to deal with. As we use the same trap
-+	 * Make a 64-bit value out of Rt and Rt2. As we use the same trap
- 	 * backends between AArch32 and AArch64, we get away with it.
- 	 */
- 	if (params.is_write) {
--		u64 val = *vcpu_reg(vcpu, params.Rt);
--		val &= 0xffffffff;
-+		val = *vcpu_reg(vcpu, Rt) & 0xffffffff;
- 		val |= *vcpu_reg(vcpu, Rt2) << 32;
--		*vcpu_reg(vcpu, params.Rt) = val;
- 	}
- 
- 	if (!emulate_cp(vcpu, &params, target_specific, nr_specific))
-@@ -1095,11 +1091,10 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
- 	unhandled_cp_access(vcpu, &params);
- 
- out:
--	/* Do the opposite hack for the read side */
-+	/* Split up the value between registers for the read side */
- 	if (!params.is_write) {
--		u64 val = *vcpu_reg(vcpu, params.Rt);
--		val >>= 32;
--		*vcpu_reg(vcpu, Rt2) = val;
-+		*vcpu_reg(vcpu, Rt) = val & 0xffffffff;
-+		*vcpu_reg(vcpu, Rt2) = val >> 32;
- 	}
- 
- 	return 1;
-@@ -1118,11 +1113,12 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
- {
- 	struct sys_reg_params params;
- 	u32 hsr = kvm_vcpu_get_hsr(vcpu);
-+	int Rt  = (hsr >> 5) & 0xf;
- 
- 	params.is_aarch32 = true;
- 	params.is_32bit = true;
- 	params.CRm = (hsr >> 1) & 0xf;
--	params.Rt  = (hsr >> 5) & 0xf;
-+	params.val = vcpu_reg(vcpu, Rt);
- 	params.is_write = ((hsr & 1) == 0);
- 	params.CRn = (hsr >> 10) & 0xf;
- 	params.Op0 = 0;
-@@ -1230,6 +1226,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
- 	struct sys_reg_params params;
- 	unsigned long esr = kvm_vcpu_get_hsr(vcpu);
-+	int Rt = (esr >> 5) & 0x1f;
- 
- 	trace_kvm_handle_sys_reg(esr);
- 
-@@ -1240,7 +1237,7 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 	params.CRn = (esr >> 10) & 0xf;
- 	params.CRm = (esr >> 1) & 0xf;
- 	params.Op2 = (esr >> 17) & 0x7;
--	params.Rt = (esr >> 5) & 0x1f;
-+	params.val = vcpu_reg(vcpu, Rt);
- 	params.is_write = !(esr & 1);
- 
- 	return emulate_sys_reg(vcpu, &params);
-diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index eaa324e..3267518 100644
---- a/arch/arm64/kvm/sys_regs.h
-+++ b/arch/arm64/kvm/sys_regs.h
-@@ -28,7 +28,7 @@ struct sys_reg_params {
- 	u8	CRn;
- 	u8	CRm;
- 	u8	Op2;
--	u8	Rt;
-+	u_long	*val;
- 	bool	is_write;
- 	bool	is_aarch32;
- 	bool	is_32bit;	/* Only valid if is_aarch32 is true */
-@@ -79,7 +79,7 @@ static inline bool ignore_write(struct kvm_vcpu *vcpu,
- static inline bool read_zero(struct kvm_vcpu *vcpu,
- 			     const struct sys_reg_params *p)
- {
--	*vcpu_reg(vcpu, p->Rt) = 0;
-+	*p->val = 0;
- 	return true;
+-	return -ENXIO;
++	data = cpu_to_le32(reg);
++	return vgic_v2_attr_regs_access(dev, attr, &data, true);
  }
  
-diff --git a/arch/arm64/kvm/sys_regs_generic_v8.c b/arch/arm64/kvm/sys_regs_generic_v8.c
-index 1e45768..c805576 100644
---- a/arch/arm64/kvm/sys_regs_generic_v8.c
-+++ b/arch/arm64/kvm/sys_regs_generic_v8.c
-@@ -37,7 +37,7 @@ static bool access_actlr(struct kvm_vcpu *vcpu,
- 	if (p->is_write)
- 		return ignore_write(vcpu, p);
+ static int vgic_v2_get_attr(struct kvm_device *dev,
+ 			    struct kvm_device_attr *attr)
+ {
++	u32 __user *uaddr = (u32 __user *)(long)attr->addr;
++	__le32 data = 0;
+ 	int ret;
  
--	*vcpu_reg(vcpu, p->Rt) = vcpu_sys_reg(vcpu, ACTLR_EL1);
-+	*p->val = vcpu_sys_reg(vcpu, ACTLR_EL1);
- 	return true;
+ 	ret = vgic_get_common_attr(dev, attr);
+ 	if (ret != -ENXIO)
+ 		return ret;
+ 
+-	switch (attr->group) {
+-	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+-	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
+-		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
+-		__le32 data = 0;
+-
+-		ret = vgic_attr_regs_access(dev, attr, &data, false);
+-		if (ret)
+-			return ret;
+-		return put_user(le32_to_cpu(data), uaddr);
+-	}
+-
+-	}
++	ret = vgic_v2_attr_regs_access(dev, attr, &data, false);
++	if (ret)
++		return ret;
+ 
+-	return -ENXIO;
++	return put_user(le32_to_cpu(data), uaddr);
  }
  
+ static int vgic_v2_has_attr(struct kvm_device *dev,
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 6bd1c9b..91e0f15 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -2420,6 +2420,70 @@ int vgic_has_attr_regs(const struct vgic_io_range *ranges, phys_addr_t offset)
+ 		return -ENXIO;
+ }
+ 
++int vgic_attr_regs_access(struct kvm_device *dev,
++			  const struct vgic_io_range *ranges,
++			  struct kvm_exit_mmio *mmio, phys_addr_t offset,
++			  int cpuid)
++{
++	const struct vgic_io_range *r;
++	int ret, c;
++	struct kvm_vcpu *vcpu, *tmp_vcpu;
++	struct vgic_dist *vgic;
++
++	r = vgic_find_range(ranges, 4, offset);
++
++	if (unlikely(!r || !r->handle_mmio))
++		return -ENXIO;
++
++	mutex_lock(&dev->kvm->lock);
++
++	ret = vgic_init(dev->kvm);
++	if (ret)
++		goto out;
++
++	if (cpuid >= atomic_read(&dev->kvm->online_vcpus)) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	vcpu = kvm_get_vcpu(dev->kvm, cpuid);
++	vgic = &dev->kvm->arch.vgic;
++
++	spin_lock(&vgic->lock);
++
++	/*
++	 * Ensure that no other VCPU is running by checking the vcpu->cpu
++	 * field.  If no other VPCUs are running we can safely access the VGIC
++	 * state, because even if another VPU is run after this point, that
++	 * VCPU will not touch the vgic state, because it will block on
++	 * getting the vgic->lock in kvm_vgic_sync_hwstate().
++	 */
++	kvm_for_each_vcpu(c, tmp_vcpu, dev->kvm) {
++		if (unlikely(tmp_vcpu->cpu != -1)) {
++			ret = -EBUSY;
++			goto out_vgic_unlock;
++		}
++	}
++
++	/*
++	 * Move all pending IRQs from the LRs on all VCPUs so the pending
++	 * state can be properly represented in the register state accessible
++	 * through this API.
++	 */
++	kvm_for_each_vcpu(c, tmp_vcpu, dev->kvm)
++		vgic_unqueue_irqs(tmp_vcpu);
++
++	offset -= r->base;
++	r->handle_mmio(vcpu, mmio, offset);
++
++	ret = 0;
++out_vgic_unlock:
++	spin_unlock(&vgic->lock);
++out:
++	mutex_unlock(&dev->kvm->lock);
++	return ret;
++}
++
+ static void vgic_init_maintenance_interrupt(void *info)
+ {
+ 	enable_percpu_irq(vgic->maint_irq, 0);
+diff --git a/virt/kvm/arm/vgic.h b/virt/kvm/arm/vgic.h
+index 0df74cb..75c253b 100644
+--- a/virt/kvm/arm/vgic.h
++++ b/virt/kvm/arm/vgic.h
+@@ -132,6 +132,10 @@ void vgic_kick_vcpus(struct kvm *kvm);
+ int vgic_has_attr_regs(const struct vgic_io_range *ranges, phys_addr_t offset);
+ int vgic_set_common_attr(struct kvm_device *dev, struct kvm_device_attr *attr);
+ int vgic_get_common_attr(struct kvm_device *dev, struct kvm_device_attr *attr);
++int vgic_attr_regs_access(struct kvm_device *dev,
++			  const struct vgic_io_range *ranges,
++			  struct kvm_exit_mmio *mmio, phys_addr_t offset,
++			  int cpuid);
+ 
+ int vgic_init(struct kvm *kvm);
+ void vgic_v2_init_emulation(struct kvm *kvm);
 -- 
 2.4.4
 
