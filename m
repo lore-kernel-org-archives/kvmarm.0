@@ -1,194 +1,248 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v3 3/8] arm/arm64: KVM: vgic: Factor out level irq processing
- on guest exit
-Date: Tue, 29 Sep 2015 16:49:00 +0200
-Message-ID: <1443538145-11990-4-git-send-email-christoffer.dall@linaro.org>
+Subject: [PATCH v3 2/8] arm/arm64: KVM: arch_timer: Only schedule soft timer on vcpu_block
+Date: Tue, 29 Sep 2015 16:48:59 +0200
+Message-ID: <1443538145-11990-3-git-send-email-christoffer.dall@linaro.org>
 References: <1443538145-11990-1-git-send-email-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4927B412EF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Sep 2015 10:47:37 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id j-h0n38x2y52 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Sep 2015 10:47:36 -0400 (EDT)
-Received: from mail-la0-f46.google.com (mail-la0-f46.google.com
- [209.85.215.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7FD6F41172
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Sep 2015 10:47:35 -0400 (EDT)
-Received: by laer8 with SMTP id r8so11593225lae.2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Sep 2015 07:49:09 -0700 (PDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1443538145-11990-1-git-send-email-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Currently vgic_process_maintenance() processes dealing with a completed
-level-triggered interrupt directly, but we are soon going to reuse this
-logic for level-triggered mapped interrupts with the HW bit set, so
-move this logic into a separate static function.
+We currently schedule a soft timer every time we exit the guest if the
+timer did not expire while running the guest.  This is really not
+necessary, because the only work we do in the timer work function is to
+kick the vcpu.
 
-Probably the most scary part of this commit is convincing yourself that
-the current flow is safe compared to the old one.  In the following I
-try to list the changes and why they are harmless:
+Kicking the vcpu does two things:
+(1) If the vpcu thread is on a waitqueue, make it runnable and remove it
+from the waitqueue.
+(2) If the vcpu is running on a different physical CPU from the one
+doing the kick, it sends a reschedule IPI.
 
-  Move vgic_irq_clear_queued after kvm_notify_acked_irq:
-    Harmless because the only potential effect of clearing the queued
-    flag wrt.  kvm_set_irq is that vgic_update_irq_pending does not set
-    the pending bit on the emulated CPU interface or in the
-    pending_on_cpu bitmask if the function is called with level=1.
-    However, the point of kvm_notify_acked_irq is to call kvm_set_irq
-    with level=0, and we set the queued flag again in
-    __kvm_vgic_sync_hwstate later on if the level is stil high.
+The second case cannot happen, because the soft timer is only ever
+scheduled when the vcpu is not running.  The first case is only relevant
+when the vcpu thread is on a waitqueue, which is only the case when the
+vcpu thread has called kvm_vcpu_block().
 
-  Move vgic_set_lr before kvm_notify_acked_irq:
-    Also, harmless because the LR are cpu-local operations and
-    kvm_notify_acked only affects the dist
+Therefore, we only need to make sure a timer is scheduled for
+kvm_vcpu_block(), which we do by encapsulating all calls to
+kvm_vcpu_block() with kvm_timer_{un}schedule calls.
 
-  Move vgic_dist_irq_clear_soft_pend after kvm_notify_acked_irq:
-    Also harmless because it's just a bit which is cleared and altering
-    the line state does not affect this bit.
+Additionally, we only schedule a soft timer if the timer is enabled and
+unmasked, since it is useless otherwise.
 
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Note that theoretically userspace can use the SET_ONE_REG interface to
+change registers that should cause the timer to fire, even if the vcpu
+is blocked without a scheduled timer, but this case was not supported
+before this patch and we leave it for future work for now.
+
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic.c | 88 ++++++++++++++++++++++++++++++-----------------------
- 1 file changed, 50 insertions(+), 38 deletions(-)
+ arch/arm/include/asm/kvm_host.h   |  3 --
+ arch/arm/kvm/arm.c                | 10 +++++
+ arch/arm64/include/asm/kvm_host.h |  3 --
+ include/kvm/arm_arch_timer.h      |  2 +
+ virt/kvm/arm/arch_timer.c         | 92 ++++++++++++++++++++++++---------------
+ 5 files changed, 70 insertions(+), 40 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 6bd1c9b..fe0e5db 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -1322,12 +1322,56 @@ epilog:
- 	}
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index ca41d94..3df1e97 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -233,7 +233,4 @@ static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
+ 
+-static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+-static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
+-
+ #endif /* __ARM_KVM_HOST_H__ */
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index dc017ad..134863f 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -271,6 +271,16 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
+ 	return kvm_timer_should_fire(vcpu);
  }
  
-+static int process_level_irq(struct kvm_vcpu *vcpu, int lr, struct vgic_lr vlr)
++void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
 +{
-+	int level_pending = 0;
-+
-+	vlr.state = 0;
-+	vlr.hwirq = 0;
-+	vgic_set_lr(vcpu, lr, vlr);
-+
-+	/*
-+	 * If the IRQ was EOIed (called from vgic_process_maintenance) or it
-+	 * went from active to non-active (called from vgic_sync_hwirq) it was
-+	 * also ACKed and we we therefore assume we can clear the soft pending
-+	 * state (should it had been set) for this interrupt.
-+	 *
-+	 * Note: if the IRQ soft pending state was set after the IRQ was
-+	 * acked, it actually shouldn't be cleared, but we have no way of
-+	 * knowing that unless we start trapping ACKs when the soft-pending
-+	 * state is set.
-+	 */
-+	vgic_dist_irq_clear_soft_pend(vcpu, vlr.irq);
-+
-+	/*
-+	 * Tell the gic to start sampling the line of this interrupt again.
-+	 */
-+	vgic_irq_clear_queued(vcpu, vlr.irq);
-+
-+	/* Any additional pending interrupt? */
-+	if (vgic_dist_irq_get_level(vcpu, vlr.irq)) {
-+		vgic_cpu_irq_set(vcpu, vlr.irq);
-+		level_pending = 1;
-+	} else {
-+		vgic_dist_irq_clear_pending(vcpu, vlr.irq);
-+		vgic_cpu_irq_clear(vcpu, vlr.irq);
-+	}
-+
-+	/*
-+	 * Despite being EOIed, the LR may not have
-+	 * been marked as empty.
-+	 */
-+	vgic_sync_lr_elrsr(vcpu, lr, vlr);
-+
-+	return level_pending;
++	kvm_timer_schedule(vcpu);
 +}
 +
- static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
++void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
++{
++	kvm_timer_unschedule(vcpu);
++}
++
+ int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
  {
- 	u32 status = vgic_get_interrupt_status(vcpu);
- 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
--	bool level_pending = false;
- 	struct kvm *kvm = vcpu->kvm;
-+	int level_pending = 0;
+ 	/* Force users to call KVM_ARM_VCPU_INIT */
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 5dae2d8..4562459 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -254,7 +254,4 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+ void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
  
- 	kvm_debug("STATUS = %08x\n", status);
- 
-@@ -1342,54 +1386,22 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
- 
- 		for_each_set_bit(lr, eisr_ptr, vgic->nr_lr) {
- 			struct vgic_lr vlr = vgic_get_lr(vcpu, lr);
--			WARN_ON(vgic_irq_is_edge(vcpu, vlr.irq));
- 
--			spin_lock(&dist->lock);
--			vgic_irq_clear_queued(vcpu, vlr.irq);
-+			WARN_ON(vgic_irq_is_edge(vcpu, vlr.irq));
- 			WARN_ON(vlr.state & LR_STATE_MASK);
--			vlr.state = 0;
--			vgic_set_lr(vcpu, lr, vlr);
- 
--			/*
--			 * If the IRQ was EOIed it was also ACKed and we we
--			 * therefore assume we can clear the soft pending
--			 * state (should it had been set) for this interrupt.
--			 *
--			 * Note: if the IRQ soft pending state was set after
--			 * the IRQ was acked, it actually shouldn't be
--			 * cleared, but we have no way of knowing that unless
--			 * we start trapping ACKs when the soft-pending state
--			 * is set.
--			 */
--			vgic_dist_irq_clear_soft_pend(vcpu, vlr.irq);
- 
- 			/*
- 			 * kvm_notify_acked_irq calls kvm_set_irq()
--			 * to reset the IRQ level. Need to release the
--			 * lock for kvm_set_irq to grab it.
-+			 * to reset the IRQ level, which grabs the dist->lock
-+			 * so we call this before taking the dist->lock.
- 			 */
--			spin_unlock(&dist->lock);
+-static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
+-static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
 -
- 			kvm_notify_acked_irq(kvm, 0,
- 					     vlr.irq - VGIC_NR_PRIVATE_IRQS);
--			spin_lock(&dist->lock);
--
--			/* Any additional pending interrupt? */
--			if (vgic_dist_irq_get_level(vcpu, vlr.irq)) {
--				vgic_cpu_irq_set(vcpu, vlr.irq);
--				level_pending = true;
--			} else {
--				vgic_dist_irq_clear_pending(vcpu, vlr.irq);
--				vgic_cpu_irq_clear(vcpu, vlr.irq);
--			}
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index e1e4d7c..ef14cc1 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -71,5 +71,7 @@ u64 kvm_arm_timer_get_reg(struct kvm_vcpu *, u64 regid);
+ int kvm_arm_timer_set_reg(struct kvm_vcpu *, u64 regid, u64 value);
  
-+			spin_lock(&dist->lock);
-+			level_pending |= process_level_irq(vcpu, lr, vlr);
- 			spin_unlock(&dist->lock);
--
--			/*
--			 * Despite being EOIed, the LR may not have
--			 * been marked as empty.
--			 */
--			vgic_sync_lr_elrsr(vcpu, lr, vlr);
- 		}
- 	}
+ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu);
++void kvm_timer_schedule(struct kvm_vcpu *vcpu);
++void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
  
+ #endif
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 48c6e1a..756c62d 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -111,14 +111,21 @@ static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
+ 	return HRTIMER_NORESTART;
+ }
+ 
++static bool kvm_timer_irq_can_fire(struct kvm_vcpu *vcpu)
++{
++	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
++
++	return !(timer->cntv_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
++		(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE) &&
++		!kvm_vgic_get_phys_irq_active(timer->map);
++}
++
+ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+ 	cycle_t cval, now;
+ 
+-	if ((timer->cntv_ctl & ARCH_TIMER_CTRL_IT_MASK) ||
+-	    !(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE) ||
+-	    kvm_vgic_get_phys_irq_active(timer->map))
++	if (!kvm_timer_irq_can_fire(vcpu))
+ 		return false;
+ 
+ 	cval = timer->cntv_cval;
+@@ -127,28 +134,60 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
+ 	return cval <= now;
+ }
+ 
+-/**
+- * kvm_timer_flush_hwstate - prepare to move the virt timer to the cpu
+- * @vcpu: The vcpu pointer
+- *
+- * Disarm any pending soft timers, since the world-switch code will write the
+- * virtual timer state back to the physical CPU.
++/*
++ * Schedule the background timer before calling kvm_vcpu_block, so that this
++ * thread is removed from its waitqueue and made runnable when there's a timer
++ * interrupt to handle.
+  */
+-void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
++void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
++	u64 ns;
++	cycle_t cval, now;
++
++	BUG_ON(timer_is_armed(timer));
+ 
+ 	/*
+-	 * We're about to run this vcpu again, so there is no need to
+-	 * keep the background timer running, as we're about to
+-	 * populate the CPU timer again.
++	 * No need to schedule a background timer if the guest timer has
++	 * already expired, because kvm_vcpu_block will return before putting
++	 * the thread to sleep.
+ 	 */
+-	timer_disarm(timer);
++	if (kvm_timer_should_fire(vcpu))
++		return;
+ 
+ 	/*
+-	 * If the timer expired while we were not scheduled, now is the time
+-	 * to inject it.
++	 * If the timer is not capable of raising interrupts (disabled or
++	 * masked), then there's no more work for us to do.
+ 	 */
++	if (!kvm_timer_irq_can_fire(vcpu))
++		return;
++
++	/*  The timer has not yet expired, schedule a background timer */
++	cval = timer->cntv_cval;
++	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
++
++	ns = cyclecounter_cyc2ns(timecounter->cc,
++				 cval - now,
++				 timecounter->mask,
++				 &timecounter->frac);
++	timer_arm(timer, ns);
++}
++
++void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
++{
++	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
++	timer_disarm(timer);
++}
++
++/**
++ * kvm_timer_flush_hwstate - prepare to move the virt timer to the cpu
++ * @vcpu: The vcpu pointer
++ *
++ * Check if the virtual timer has expired while we were running in the host,
++ * and inject an interrupt if that was the case.
++ */
++void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
++{
+ 	if (kvm_timer_should_fire(vcpu))
+ 		kvm_timer_inject_irq(vcpu);
+ }
+@@ -157,32 +196,17 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+  * kvm_timer_sync_hwstate - sync timer state from cpu
+  * @vcpu: The vcpu pointer
+  *
+- * Check if the virtual timer was armed and either schedule a corresponding
+- * soft timer or inject directly if already expired.
++ * Check if the virtual timer has expired while we were running in the guest,
++ * and inject an interrupt if that was the case.
+  */
+ void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
+ {
+ 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+-	cycle_t cval, now;
+-	u64 ns;
+ 
+ 	BUG_ON(timer_is_armed(timer));
+ 
+-	if (kvm_timer_should_fire(vcpu)) {
+-		/*
+-		 * Timer has already expired while we were not
+-		 * looking. Inject the interrupt and carry on.
+-		 */
++	if (kvm_timer_should_fire(vcpu))
+ 		kvm_timer_inject_irq(vcpu);
+-		return;
+-	}
+-
+-	cval = timer->cntv_cval;
+-	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
+-
+-	ns = cyclecounter_cyc2ns(timecounter->cc, cval - now, timecounter->mask,
+-				 &timecounter->frac);
+-	timer_arm(timer, ns);
+ }
+ 
+ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
 -- 
 2.1.2.330.g565301e.dirty
+
