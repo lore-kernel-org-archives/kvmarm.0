@@ -1,58 +1,54 @@
-From: Zhichao Huang <zhichao.huang@linaro.org>
-Subject: Re: [PATCH v4 15/15] KVM: arm: enable trapping of all debug registers
-Date: Tue, 29 Sep 2015 13:41:45 +0800
-Message-ID: <560A2499.3030409@linaro.org>
-References: <1439213167-8988-1-git-send-email-zhichao.huang@linaro.org> <1439213167-8988-16-git-send-email-zhichao.huang@linaro.org> <20150902160814.GS10991@cbox>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v2] KVM: arm/arm64: BUG FIX: Do not inject spurious
+ interrupts
+Date: Tue, 29 Sep 2015 09:25:18 +0200
+Message-ID: <20150929072518.GC9002@cbox>
+References: <1443189629-8744-1-git-send-email-p.fedin@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20150902160814.GS10991@cbox>
+Content-Disposition: inline
+In-Reply-To: <1443189629-8744-1-git-send-email-p.fedin@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com, huangzhichao@huawei.com
+To: Pavel Fedin <p.fedin@samsung.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 2015/9/3 0:08, Christoffer Dall wrote:
-> On Mon, Aug 10, 2015 at 09:26:07PM +0800, Zhichao Huang wrote:
->> Enable trapping of the debug registers unconditionally, allowing guests to
->> use the debug infrastructure.
->>
->> Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
->> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
->> ---
->>  arch/arm/kvm/interrupts_head.S | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
->> index 7ad0adf..494991d 100644
->> --- a/arch/arm/kvm/interrupts_head.S
->> +++ b/arch/arm/kvm/interrupts_head.S
->> @@ -792,7 +792,7 @@ ARM_BE8(rev	r6, r6  )
->>   * (hardware reset value is 0) */
->>  .macro set_hdcr operation
->>  	mrc	p15, 4, r2, c1, c1, 1
->> -	ldr	r3, =(HDCR_TPM|HDCR_TPMCR)
->> +	ldr	r3, =(HDCR_TPM|HDCR_TPMCR|HDCR_TDRA|HDCR_TDOSA|HDCR_TDA)
+On Fri, Sep 25, 2015 at 05:00:29PM +0300, Pavel Fedin wrote:
+> Commit 71760950bf3dc796e5e53ea3300dec724a09f593
+> ("arm/arm64: KVM: add a common vgic_queue_irq_to_lr fn") introduced
+> vgic_queue_irq_to_lr() function with additional vgic_dist_irq_is_pending()
+> check before setting LR_STATE_PENDING bit. In some cases it started
+> causing the following situation if the userland quickly drops a
+> level-sensitive IRQ back to inactive state for some reason:
+> 1. Userland injects an IRQ with level == 1, this ends up in
+>    vgic_update_irq_pending(), which in turn calls
+>    vgic_dist_irq_set_pending() for this IRQ.
+> 2. vCPU gets kicked. But kernel does not manage to reschedule it quickly
+>    (!!!)
+> 3. Userland quickly resets the IRQ to level == 0. vgic_update_irq_pending()
+>    in this case will call vgic_dist_irq_clear_pending() and reset the
+>    pending flag.
+> 4. vCPU finally wakes up. It successfully rolls through through
+>    __kvm_vgic_flush_hwstate(), which populates vGIC registers. However,
+>    since neither pending nor active flags are now set for this IRQ,
+>    vgic_queue_irq_to_lr() does not set any state bits on this LR at all.
+>    Since this is level-sensitive IRQ, we end up in LR containing only
+>    LR_EOI_INT bit, causing unnecessary immediate exit from the guest.
 > 
-> eh, but I thought we didn't have to trap accesses to the debug registers
-> if we switch them, because the guest is likely to be using them?
+> This patch fixes the problem by adding forgotten vgic_cpu_irq_clear().
+> This causes the IRQ not to be included into any lists, if it has been
+> picked up after getting dropped to inactive level. Since this is a
+> level-sensitive IRQ, this is correct behavior. Additionally,
+> irq_pending_on_cpu will also be reset if this was the only pending
+> interrupt, saving us from unnecessary wakeups.
 > 
-> Maybe I am getting confused, can you repeat for me exactly when we
-> context-switch the registers and when we trap accesses to them?
+> The bug was caught on ARM64 kernel v4.1.6, running qemu "virt" guest,
+> where it was caused by emulated pl011.
 > 
+> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
 
-Since we don't want to world switch the dangerous register(DBGDSCR), we have
-to trap accesses all the time, to prevent the guest to write to the real register.
+I reworked the commit message and applied this patch.
 
-> Thanks,
-> -Christoffer
-> 
->>  	.if \operation == vmentry
->>  	orr	r2, r2, r3		@ Trap some perfmon accesses
->>  	.else
->> -- 
->> 1.7.12.4
->>
+Thanks,
+-Christoffer
