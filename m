@@ -1,248 +1,247 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH v3 2/8] arm/arm64: KVM: arch_timer: Only schedule soft timer on vcpu_block
-Date: Tue, 29 Sep 2015 16:48:59 +0200
-Message-ID: <1443538145-11990-3-git-send-email-christoffer.dall@linaro.org>
+Subject: [PATCH v3 6/8] arm/arm64: KVM: Add forwarded physical interrupts
+ documentation
+Date: Tue, 29 Sep 2015 16:49:03 +0200
+Message-ID: <1443538145-11990-7-git-send-email-christoffer.dall@linaro.org>
 References: <1443538145-11990-1-git-send-email-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C0E584156D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Sep 2015 10:47:41 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id bz284dsxOhu8 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Sep 2015 10:47:40 -0400 (EDT)
+Received: from mail-la0-f44.google.com (mail-la0-f44.google.com
+ [209.85.215.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EBF3C411E3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Sep 2015 10:47:38 -0400 (EDT)
+Received: by lahh2 with SMTP id h2so11758977lah.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Sep 2015 07:49:13 -0700 (PDT)
 In-Reply-To: <1443538145-11990-1-git-send-email-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We currently schedule a soft timer every time we exit the guest if the
-timer did not expire while running the guest.  This is really not
-necessary, because the only work we do in the timer work function is to
-kick the vcpu.
+Forwarded physical interrupts on arm/arm64 is a tricky concept and the
+way we deal with them is not apparently easy to understand by reading
+various specs.
 
-Kicking the vcpu does two things:
-(1) If the vpcu thread is on a waitqueue, make it runnable and remove it
-from the waitqueue.
-(2) If the vcpu is running on a different physical CPU from the one
-doing the kick, it sends a reschedule IPI.
+Therefore, add a proper documentation file explaining the flow and
+rationale of the behavior of the vgic.
 
-The second case cannot happen, because the soft timer is only ever
-scheduled when the vcpu is not running.  The first case is only relevant
-when the vcpu thread is on a waitqueue, which is only the case when the
-vcpu thread has called kvm_vcpu_block().
-
-Therefore, we only need to make sure a timer is scheduled for
-kvm_vcpu_block(), which we do by encapsulating all calls to
-kvm_vcpu_block() with kvm_timer_{un}schedule calls.
-
-Additionally, we only schedule a soft timer if the timer is enabled and
-unmasked, since it is useless otherwise.
-
-Note that theoretically userspace can use the SET_ONE_REG interface to
-change registers that should cause the timer to fire, even if the vcpu
-is blocked without a scheduled timer, but this case was not supported
-before this patch and we leave it for future work for now.
+Some of this text was contributed by Marc Zyngier and edited by me.
+Omissions and errors are all mine.
 
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/include/asm/kvm_host.h   |  3 --
- arch/arm/kvm/arm.c                | 10 +++++
- arch/arm64/include/asm/kvm_host.h |  3 --
- include/kvm/arm_arch_timer.h      |  2 +
- virt/kvm/arm/arch_timer.c         | 92 ++++++++++++++++++++++++---------------
- 5 files changed, 70 insertions(+), 40 deletions(-)
+ Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt | 186 +++++++++++++++++++++
+ 1 file changed, 186 insertions(+)
+ create mode 100644 Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index ca41d94..3df1e97 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -233,7 +233,4 @@ static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
- 
--static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
--static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
--
- #endif /* __ARM_KVM_HOST_H__ */
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index dc017ad..134863f 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -271,6 +271,16 @@ int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu)
- 	return kvm_timer_should_fire(vcpu);
- }
- 
-+void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
-+{
-+	kvm_timer_schedule(vcpu);
-+}
+diff --git a/Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt b/Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
+new file mode 100644
+index 0000000..213d650
+--- /dev/null
++++ b/Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
+@@ -0,0 +1,186 @@
++KVM/ARM VGIC Forwarded Physical Interrupts
++==========================================
 +
-+void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
-+{
-+	kvm_timer_unschedule(vcpu);
-+}
++The KVM/ARM code implements software support for the ARM Generic
++Interrupt Controller's (GIC's) hardware support for virtualization by
++allowing software to inject virtual interrupts to a VM, which the guest
++OS sees as regular interrupts.  The code is famously known as the VGIC.
 +
- int kvm_arch_vcpu_init(struct kvm_vcpu *vcpu)
- {
- 	/* Force users to call KVM_ARM_VCPU_INIT */
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 5dae2d8..4562459 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -254,7 +254,4 @@ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
- void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
- void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
- 
--static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu) {}
--static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
--
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index e1e4d7c..ef14cc1 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -71,5 +71,7 @@ u64 kvm_arm_timer_get_reg(struct kvm_vcpu *, u64 regid);
- int kvm_arm_timer_set_reg(struct kvm_vcpu *, u64 regid, u64 value);
- 
- bool kvm_timer_should_fire(struct kvm_vcpu *vcpu);
-+void kvm_timer_schedule(struct kvm_vcpu *vcpu);
-+void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
- 
- #endif
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 48c6e1a..756c62d 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -111,14 +111,21 @@ static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
- 	return HRTIMER_NORESTART;
- }
- 
-+static bool kvm_timer_irq_can_fire(struct kvm_vcpu *vcpu)
-+{
-+	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
++Some of these virtual interrupts, however, correspond to physical
++interrupts from real physical devices.  One example could be the
++architected timer, which itself supports virtualization, and therefore
++lets a guest OS program the hardware device directly to raise an
++interrupt at some point in time.  When such an interrupt is raised, the
++host OS initially handles the interrupt and must somehow signal this
++event as a virtual interrupt to the guest.  Another example could be a
++passthrough device, where the physical interrupts are initially handled
++by the host, but the device driver for the device lives in the guest OS
++and KVM must therefore somehow inject a virtual interrupt on behalf of
++the physical one to the guest OS.
 +
-+	return !(timer->cntv_ctl & ARCH_TIMER_CTRL_IT_MASK) &&
-+		(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE) &&
-+		!kvm_vgic_get_phys_irq_active(timer->map);
-+}
++These virtual interrupts corresponding to a physical interrupt on the
++host are called forwarded physical interrupts, but are also sometimes
++referred to as 'virtualized physical interrupts' and 'mapped interrupts'.
 +
- bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 	cycle_t cval, now;
- 
--	if ((timer->cntv_ctl & ARCH_TIMER_CTRL_IT_MASK) ||
--	    !(timer->cntv_ctl & ARCH_TIMER_CTRL_ENABLE) ||
--	    kvm_vgic_get_phys_irq_active(timer->map))
-+	if (!kvm_timer_irq_can_fire(vcpu))
- 		return false;
- 
- 	cval = timer->cntv_cval;
-@@ -127,28 +134,60 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
- 	return cval <= now;
- }
- 
--/**
-- * kvm_timer_flush_hwstate - prepare to move the virt timer to the cpu
-- * @vcpu: The vcpu pointer
-- *
-- * Disarm any pending soft timers, since the world-switch code will write the
-- * virtual timer state back to the physical CPU.
-+/*
-+ * Schedule the background timer before calling kvm_vcpu_block, so that this
-+ * thread is removed from its waitqueue and made runnable when there's a timer
-+ * interrupt to handle.
-  */
--void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
-+void kvm_timer_schedule(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	u64 ns;
-+	cycle_t cval, now;
++Forwarded physical interrupts are handled slightly differently compared
++to virtual interrupts generated purely by a software emulated device.
 +
-+	BUG_ON(timer_is_armed(timer));
- 
- 	/*
--	 * We're about to run this vcpu again, so there is no need to
--	 * keep the background timer running, as we're about to
--	 * populate the CPU timer again.
-+	 * No need to schedule a background timer if the guest timer has
-+	 * already expired, because kvm_vcpu_block will return before putting
-+	 * the thread to sleep.
- 	 */
--	timer_disarm(timer);
-+	if (kvm_timer_should_fire(vcpu))
-+		return;
- 
- 	/*
--	 * If the timer expired while we were not scheduled, now is the time
--	 * to inject it.
-+	 * If the timer is not capable of raising interrupts (disabled or
-+	 * masked), then there's no more work for us to do.
- 	 */
-+	if (!kvm_timer_irq_can_fire(vcpu))
-+		return;
 +
-+	/*  The timer has not yet expired, schedule a background timer */
-+	cval = timer->cntv_cval;
-+	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
++The HW bit
++----------
++Virtual interrupts are signalled to the guest by programming the List
++Registers (LRs) on the GIC before running a VCPU.  The LR is programmed
++with the virtual IRQ number and the state of the interrupt (Pending,
++Active, or Pending+Active).  When the guest ACKs and EOIs a virtual
++interrupt, the LR state moves from Pending to Active, and finally to
++inactive.
 +
-+	ns = cyclecounter_cyc2ns(timecounter->cc,
-+				 cval - now,
-+				 timecounter->mask,
-+				 &timecounter->frac);
-+	timer_arm(timer, ns);
-+}
++The LRs include an extra bit, called the HW bit.  When this bit is set,
++KVM must also program an additional field in the LR, the physical IRQ
++number, to link the virtual with the physical IRQ.
 +
-+void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
-+{
-+	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	timer_disarm(timer);
-+}
++When the HW bit is set, KVM must EITHER set the Pending OR the Active
++bit, never both at the same time.
 +
-+/**
-+ * kvm_timer_flush_hwstate - prepare to move the virt timer to the cpu
-+ * @vcpu: The vcpu pointer
-+ *
-+ * Check if the virtual timer has expired while we were running in the host,
-+ * and inject an interrupt if that was the case.
-+ */
-+void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
-+{
- 	if (kvm_timer_should_fire(vcpu))
- 		kvm_timer_inject_irq(vcpu);
- }
-@@ -157,32 +196,17 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
-  * kvm_timer_sync_hwstate - sync timer state from cpu
-  * @vcpu: The vcpu pointer
-  *
-- * Check if the virtual timer was armed and either schedule a corresponding
-- * soft timer or inject directly if already expired.
-+ * Check if the virtual timer has expired while we were running in the guest,
-+ * and inject an interrupt if that was the case.
-  */
- void kvm_timer_sync_hwstate(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
--	cycle_t cval, now;
--	u64 ns;
- 
- 	BUG_ON(timer_is_armed(timer));
- 
--	if (kvm_timer_should_fire(vcpu)) {
--		/*
--		 * Timer has already expired while we were not
--		 * looking. Inject the interrupt and carry on.
--		 */
-+	if (kvm_timer_should_fire(vcpu))
- 		kvm_timer_inject_irq(vcpu);
--		return;
--	}
--
--	cval = timer->cntv_cval;
--	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
--
--	ns = cyclecounter_cyc2ns(timecounter->cc, cval - now, timecounter->mask,
--				 &timecounter->frac);
--	timer_arm(timer, ns);
- }
- 
- int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
++Setting the HW bit causes the hardware to deactivate the physical
++interrupt on the physical distributor when the guest deactivates the
++corresponding virtual interrupt.
++
++
++Forwarded Physical Interrupts Life Cycle
++----------------------------------------
++
++The state of forwarded physical interrupts is managed in the following way:
++
++  - The physical interrupt is acked by the host, and becomes active on
++    the physical distributor (*).
++  - KVM sets the LR.Pending bit, because this is the only way the GICV
++    interface is going to present it to the guest.
++  - LR.Pending will stay set as long as the guest has not acked the interrupt.
++  - LR.Pending transitions to LR.Active on the guest read of the IAR, as
++    expected.
++  - On guest EOI, the *physical distributor* active bit gets cleared,
++    but the LR.Active is left untouched (set).
++  - KVM clears the LR on VM exits when the physical distributor
++    active state has been cleared.
++
++(*): The host handling is slightly more complicated.  For some forwarded
++interrupts (shared), KVM directly sets the active state on the physical
++distributor before entering the guest, because the interrupt is never actually
++handled on the host (see details on the timer as an example below).  For other
++forwarded interrupts (non-shared) the host does not deactivate the interrupt
++when the host ISR completes, but leaves the interrupt active until the guest
++deactivates it.  Leaving the interrupt active is allowed, because the GIC is
++configured with EOIMode=1, which causes EOI operations to perform a priority
++drop allowing the GIC to receive other interrupts of the default priority.
++
++
++Forwarded Edge and Level Triggered PPIs and SPIs
++------------------------------------------------
++Forwarded physical interrupts injected should always be active on the
++physical distributor when injected to a guest.
++
++Level-triggered interrupts will keep the interrupt line to the GIC
++asserted, typically until the guest programs the device to deassert the
++line.  This means that the interrupt will remain pending on the physical
++distributor until the guest has reprogrammed the device.  Since we
++always run the VM with interrupts enabled on the CPU, a pending
++interrupt will exit the guest as soon as we switch into the guest,
++preventing the guest from ever making progress as the process repeats
++over and over.  Therefore, the active state on the physical distributor
++must be set when entering the guest, preventing the GIC from forwarding
++the pending interrupt to the CPU.  As soon as the guest deactivates the
++interrupt, the physical line is sampled by the hardware again and the host
++takes a new interrupt if and only if the physical line is still asserted.
++
++Edge-triggered interrupts do not exhibit the same problem with
++preventing guest execution that level-triggered interrupts do.  One
++option is to not use HW bit at all, and inject edge-triggered interrupts
++from a physical device as pure virtual interrupts.  But that would
++potentially slow down handling of the interrupt in the guest, because a
++physical interrupt occurring in the middle of the guest ISR would
++preempt the guest for the host to handle the interrupt.  Additionally,
++if you configure the system to handle interrupts on a separate physical
++core from that running your VCPU, you still have to interrupt the VCPU
++to queue the pending state onto the LR, even though the guest won't use
++this information until the guest ISR completes.  Therefore, the HW
++bit should always be set for forwarded edge-triggered interrupts.  With
++the HW bit set, the virtual interrupt is injected and additional
++physical interrupts occurring before the guest deactivates the interrupt
++simply mark the state on the physical distributor as Pending+Active.  As
++soon as the guest deactivates the interrupt, the host takes another
++interrupt if and only if there was a physical interrupt between injecting
++the forwarded interrupt to the guest and the guest deactivating the
++interrupt.
++
++Consequently, whenever we schedule a VCPU with one or more LRs with the
++HW bit set, the interrupt must also be active on the physical
++distributor.
++
++
++Forwarded LPIs
++--------------
++LPIs, introduced in GICv3, are always edge-triggered and do not have an
++active state.  They become pending when a device signal them, and as
++soon as they are acked by the CPU, they are inactive again.
++
++It therefore doesn't make sense, and is not supported, to set the HW bit
++for physical LPIs that are forwarded to a VM as virtual interrupts,
++typically virtual SPIs.
++
++For LPIs, there is no other choice than to preempt the VCPU thread if
++necessary, and queue the pending state onto the LR.
++
++
++Putting It Together: The Architected Timer
++------------------------------------------
++The architected timer is a device that signals interrupts with level
++triggered semantics.  The timer hardware is directly accessed by VCPUs
++which program the timer to fire at some point in time.  Each VCPU on a
++system programs the timer to fire at different times, and therefore the
++hardware is multiplexed between multiple VCPUs.  This is implemented by
++context-switching the timer state along with each VCPU thread.
++
++However, this means that a scenario like the following is entirely
++possible, and in fact, typical:
++
++1.  KVM runs the VCPU
++2.  The guest programs the time to fire in T+100
++3.  The guest is idle and calls WFI (wait-for-interrupts)
++4.  The hardware traps to the host
++5.  KVM stores the timer state to memory and disables the hardware timer
++6.  KVM schedules a soft timer to fire in T+(100 - time since step 2)
++7.  KVM puts the VCPU thread to sleep (on a waitqueue)
++8.  The soft timer fires, waking up the VCPU thread
++9.  KVM reprograms the timer hardware with the VCPU's values
++10. KVM marks the timer interrupt as active on the physical distributor
++11. KVM injects a forwarded physical interrupt to the guest
++12. KVM runs the VCPU
++
++Notice that KVM injects a forwarded physical interrupt in step 11 without
++the corresponding interrupt having actually fired on the host.  That is
++exactly why we mark the timer interrupt as active in step 10, because
++the active state on the physical distributor is part of the state
++belonging to the timer hardware, which is context-switched along with
++the VCPU thread.
++
++If the guest does not idle because it is busy, flow looks like this
++instead:
++
++1.  KVM runs the VCPU
++2.  The guest programs the time to fire in T+100
++4.  At T+100 the timer fires and a physical IRQ causes the VM to exit
++    (note that this initially only traps to EL2 and does not run the host ISR
++    until KVM has returned to the host).
++5.  With interrupts still disabled on the CPU coming back from the guest, KVM
++    stores the virtual timer state to memory and disables the virtual hw timer.
++6.  KVM looks at the timer state (in memory) and injects a forwarded physical
++    interrupt because it concludes the timer has expired.
++7.  KVM marks the timer interrupt as active on the physical distributor
++7.  KVM enables the timer, enables interrupts, and runs the VCPU
++
++Notice that again the forwarded physical interrupt is injected to the
++guest without having actually been handled on the host.  In this case it
++is because the physical interrupt is never actually seen by the host because the
++timer is disabled upon guest return, and the virtual forwarded interrupt is
++injected on the KVM guest entry path.
 -- 
 2.1.2.330.g565301e.dirty
-
