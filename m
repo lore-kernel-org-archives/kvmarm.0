@@ -1,85 +1,81 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 10/15] KVM: arm: implement world switch for debug
- registers
-Date: Tue, 29 Sep 2015 09:34:54 +0200
-Message-ID: <20150929073454.GD9002@cbox>
+Subject: Re: [PATCH v4 15/15] KVM: arm: enable trapping of all debug registers
+Date: Tue, 29 Sep 2015 09:38:14 +0200
+Message-ID: <20150929073814.GE9002@cbox>
 References: <1439213167-8988-1-git-send-email-zhichao.huang@linaro.org>
- <1439213167-8988-11-git-send-email-zhichao.huang@linaro.org>
- <20150902145327.GL10991@cbox>
- <560A2273.6050207@linaro.org>
+ <1439213167-8988-16-git-send-email-zhichao.huang@linaro.org>
+ <20150902160814.GS10991@cbox> <560A2499.3030409@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4221E4130A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Sep 2015 03:36:42 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3qf+EArWzvq1 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 29 Sep 2015 03:36:41 -0400 (EDT)
+Received: from mail-la0-f47.google.com (mail-la0-f47.google.com
+ [209.85.215.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2DAFF41252
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Sep 2015 03:36:40 -0400 (EDT)
+Received: by laclj5 with SMTP id lj5so92570716lac.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Sep 2015 00:38:13 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <560A2273.6050207@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+In-Reply-To: <560A2499.3030409@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Zhichao Huang <zhichao.huang@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, alex.bennee@linaro.org, will.deacon@arm.com, huangzhichao@huawei.com
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, will.deacon@arm.com, huangzhichao@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Sep 29, 2015 at 01:32:35PM +0800, Zhichao Huang wrote:
+On Tue, Sep 29, 2015 at 01:41:45PM +0800, Zhichao Huang wrote:
 > 
 > 
-> On 2015/9/2 22:53, Christoffer Dall wrote:
-> >> +/* Reads cp14 registers from hardware.
-> >> + * Writes cp14 registers in-order to the CP14 struct pointed to by r10
-> >> + *
-> >> + * Assumes vcpu pointer in vcpu reg
-> >> + *
-> >> + * Clobbers r2-r12
-> >> + */
-> >> +.macro save_debug_state
-> >> +	read_hw_dbg_num
-> >> +	cp14_read_and_str r10, 4, cp14_DBGBVR0, r11
-> >> +	cp14_read_and_str r10, 5, cp14_DBGBCR0, r11
-> >> +	cp14_read_and_str r10, 6, cp14_DBGWVR0, r12
-> >> +	cp14_read_and_str r10, 7, cp14_DBGWCR0, r12
-> >> +
-> >> +	/* DBGDSCR reg */
-> >> +	mrc	p14, 0, r2, c0, c1, 0
-> >> +	str	r2, [r10, #CP14_OFFSET(cp14_DBGDSCRext)]
+> On 2015/9/3 0:08, Christoffer Dall wrote:
+> > On Mon, Aug 10, 2015 at 09:26:07PM +0800, Zhichao Huang wrote:
+> >> Enable trapping of the debug registers unconditionally, allowing guests to
+> >> use the debug infrastructure.
+> >>
+> >> Signed-off-by: Zhichao Huang <zhichao.huang@linaro.org>
+> >> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> >> ---
+> >>  arch/arm/kvm/interrupts_head.S | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
+> >> index 7ad0adf..494991d 100644
+> >> --- a/arch/arm/kvm/interrupts_head.S
+> >> +++ b/arch/arm/kvm/interrupts_head.S
+> >> @@ -792,7 +792,7 @@ ARM_BE8(rev	r6, r6  )
+> >>   * (hardware reset value is 0) */
+> >>  .macro set_hdcr operation
+> >>  	mrc	p15, 4, r2, c1, c1, 1
+> >> -	ldr	r3, =(HDCR_TPM|HDCR_TPMCR)
+> >> +	ldr	r3, =(HDCR_TPM|HDCR_TPMCR|HDCR_TDRA|HDCR_TDOSA|HDCR_TDA)
 > > 
-> > so again we're touching the scary register on every world-switch.  Since
-> > it sounds like we have experience telling us that this can cause
-> > troubles, I'm wondering if we can get around it by:
+> > eh, but I thought we didn't have to trap accesses to the debug registers
+> > if we switch them, because the guest is likely to be using them?
 > > 
-> > Only ever allow the guest to use debugging registers if we managed to
-> > enter_monitor_mode on the host, and in that case only allow guest
-> > debugging with the configuration of DBGDSCR that the host has.
-> > 
-> > If the host never managed to enable debugging, the guest probably won't
-> > succeed either, and we should just trap all guest accesses to the debug
-> > registers.
-> > 
-> > Does this work?
+> > Maybe I am getting confused, can you repeat for me exactly when we
+> > context-switch the registers and when we trap accesses to them?
 > > 
 > 
-> I think it works. Since the register is dangerous, we will try not to
-> world switch it. It means that the guest will not be able to write the register,
-> and will always see what the host set. So the guest will not be able to use
-> hardware debug feature if the host disable it.
+> Since we don't want to world switch the dangerous register(DBGDSCR), we have
+> to trap accesses all the time, to prevent the guest to write to the real register.
 > 
-I talked to Will about this the last day of Linaro Connect and we
-arrived at the conclusion that since you cannot trap on only a subset of
-the debug registers (namely the DBGDSCR and the registers related to the
-OS lock etc.), there is simply no safe and robus way to do this on
-ARMv7.
-
-Therfore, this patch series probably needs to be reworked so that we
-*always* set TDA for the guest, and when the guest programs a break- or
-watchpoint, then we program the hardware registers directly in KVM
-without telling perf or hw_breakpoints about this, and we only do any of
-this if monitor_mode_enabled() is true.  If not, then debugging inside
-the guest simply won't work.
-
-I also don't think that checking the host's breakpoint and wathcpoint
-registers are necessary after all, since they are context switched per
-process on the host, so this will only be a problem for guests when the
-user uses GDB on the VCPU thread (in which case he's asking for trouble
-anyway) or with using the weird perf CPU-wide breakpoints, which is very
-far from a the common case, so I wouldn't worry about this for now.
-
-Hopefully this makes sense.
+ok, so this is in line with my comment to your previous patch, but you
+did have world-switching code of DBGDSCR in this series, hence my
+confusion.  So you would need to get rid of this for the new version of
+the series.
 
 Thanks,
 -Christoffer
