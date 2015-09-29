@@ -1,130 +1,87 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 07/11] KVM: arm/arm64: vgic: Allow HW interrupts to be
- queued to a guest
-Date: Tue, 29 Sep 2015 15:44:45 +0200
-Message-ID: <20150929134445.GF9002@cbox>
-References: <1438962347-17541-1-git-send-email-marc.zyngier@arm.com>
- <1438962347-17541-8-git-send-email-marc.zyngier@arm.com>
- <5602E778.3080004@arm.com>
+Subject: Re: [PATCH v2 7/8] arm/arm64: KVM: Rework the arch timer to use
+ level-triggered semantics
+Date: Tue, 29 Sep 2015 16:30:46 +0200
+Message-ID: <20150929143046.GG9002@cbox>
+References: <1441395650-19663-1-git-send-email-christoffer.dall@linaro.org>
+ <1441395650-19663-8-git-send-email-christoffer.dall@linaro.org>
+ <5602E4F5.9080109@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D66AC41289
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Sep 2015 09:43:11 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RYi7kAqwSowS for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Sep 2015 09:43:10 -0400 (EDT)
-Received: from mail-la0-f44.google.com (mail-la0-f44.google.com
- [209.85.215.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C00D41145
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Sep 2015 09:43:10 -0400 (EDT)
-Received: by labzv5 with SMTP id zv5so9146193lab.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Sep 2015 06:44:43 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <5602E778.3080004@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <5602E4F5.9080109@arm.com>
+Sender: kvm-owner@vger.kernel.org
 To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Sep 23, 2015 at 06:55:04PM +0100, Andre Przywara wrote:
-> Salut Marc,
+On Wed, Sep 23, 2015 at 06:44:21PM +0100, Andre Przywara wrote:
+> Hi Christoffer,
 > 
-> I know that this patch is already merged, but ....
-> 
-> On 07/08/15 16:45, Marc Zyngier wrote:
 > > diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> > index 51c9900..9d009d2 100644
-> ...
-> > @@ -1364,6 +1397,39 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
-> >  	return level_pending;
-> >  }
-> >  
-> > +/*
-> > + * Save the physical active state, and reset it to inactive.
-> > + *
-> > + * Return 1 if HW interrupt went from active to inactive, and 0 otherwise.
-> > + */
-> > +static int vgic_sync_hwirq(struct kvm_vcpu *vcpu, struct vgic_lr vlr)
-> > +{
-> > +	struct irq_phys_map *map;
-> > +	int ret;
-> > +
-> > +	if (!(vlr.state & LR_HW))
-> > +		return 0;
-> > +
-> > +	map = vgic_irq_map_search(vcpu, vlr.irq);
-> > +	BUG_ON(!map || !map->active);
-> > +
-> > +	ret = irq_get_irqchip_state(map->irq,
-> > +				    IRQCHIP_STATE_ACTIVE,
-> > +				    &map->active);
-> > +
-> > +	WARN_ON(ret);
-> > +
-> > +	if (map->active) {
-> > +		ret = irq_set_irqchip_state(map->irq,
-> > +					    IRQCHIP_STATE_ACTIVE,
-> > +					    false);
-> > +		WARN_ON(ret);
-> > +		return 0;
-> > +	}
-> > +
-> > +	return 1;
-> > +}
-> > +
-> >  /* Sync back the VGIC state after a guest run */
-> >  static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+> > index 9ed8d53..f4ea950 100644
+> > --- a/virt/kvm/arm/vgic.c
+> > +++ b/virt/kvm/arm/vgic.c
+> > @@ -1422,34 +1422,43 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+> >  /*
+> >   * Save the physical active state, and reset it to inactive.
+> >   *
+> > - * Return 1 if HW interrupt went from active to inactive, and 0 otherwise.
+> > + * Return true if there's a pending level triggered interrupt line to queue.
+> >   */
+> > -static int vgic_sync_hwirq(struct kvm_vcpu *vcpu, struct vgic_lr vlr)
+> > +static bool vgic_sync_hwirq(struct kvm_vcpu *vcpu, int lr, struct vgic_lr vlr)
 > >  {
-> > @@ -1378,14 +1444,31 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
-> >  	elrsr = vgic_get_elrsr(vcpu);
-> >  	elrsr_ptr = u64_to_bitmask(&elrsr);
+> >  	struct irq_phys_map *map;
+> > +	bool phys_active;
+> >  	int ret;
 > >  
-> > -	/* Clear mappings for empty LRs */
-> > -	for_each_set_bit(lr, elrsr_ptr, vgic->nr_lr) {
-> > +	/* Deal with HW interrupts, and clear mappings for empty LRs */
-> > +	for (lr = 0; lr < vgic->nr_lr; lr++) {
-> >  		struct vgic_lr vlr;
+> >  	if (!(vlr.state & LR_HW))
+> >  		return 0;
 > >  
-> > -		if (!test_and_clear_bit(lr, vgic_cpu->lr_used))
-> > +		if (!test_bit(lr, vgic_cpu->lr_used))
-> >  			continue;
+> >  	map = vgic_irq_map_search(vcpu, vlr.irq);
+> > -	BUG_ON(!map || !map->active);
+> > +	BUG_ON(!map);
 > >  
-> >  		vlr = vgic_get_lr(vcpu, lr);
-> > +		if (vgic_sync_hwirq(vcpu, vlr)) {
-> > +			/*
-> > +			 * So this is a HW interrupt that the guest
-> > +			 * EOI-ed. Clean the LR state and allow the
-> > +			 * interrupt to be sampled again.
-> > +			 */
-> > +			vlr.state = 0;
-> > +			vlr.hwirq = 0;
-> > +			vgic_set_lr(vcpu, lr, vlr);
-> > +			vgic_irq_clear_queued(vcpu, vlr.irq);
+> >  	ret = irq_get_irqchip_state(map->irq,
+> >  				    IRQCHIP_STATE_ACTIVE,
+> > -				    &map->active);
+> > +				    &phys_active);
+> >  
+> >  	WARN_ON(ret);
+> >  
+> > -	if (map->active) {
+> > +	if (phys_active) {
+> > +		/*
+> > +		 * Interrupt still marked as active on the physical
+> > +		 * distributor, so guest did not EOI it yet.  Reset to
+> > +		 * non-active so that other VMs can see interrupts from this
+> > +		 * device.
+> > +		 */
+> >  		ret = irq_set_irqchip_state(map->irq,
+> >  					    IRQCHIP_STATE_ACTIVE,
+> >  					    false);
+> >  		WARN_ON(ret);
+> > -		return 0;
+> > +		return false;
+> >  	}
+> >  
+> > -	return 1;
+> > +	/* Mapped edge-triggered interrupts not yet supported. */
+> > +	WARN_ON(vgic_irq_is_edge(vcpu, vlr.irq));
+> > +	return process_level_irq(vcpu, lr, vlr);
 > 
-> Isn't this line altering common VGIC state without holding the lock?
-> Eric removed the coarse dist->lock around the whole
-> __kvm_vgic_sync_hwstate() function, we take it now in
-> vgic_process_maintenance(), but don't hold it here AFAICT.
-> As long as we are only dealing with private timer IRQs this is probably
-> not a problem, but the IRQ number could be a SPI as well, right?
+> Don't you miss the dist->lock here? The other call to
+> process_level_irq() certainly does it, and Eric recently removed the
+> coarse grained lock around the whole __kvm_vgic_sync_hwstate() function.
+> So we don't hold the lock here, but we change quite some common VGIC
+> state in there.
 > 
-I don't see a problematic race with this though, as all we're doing is
-to clear a bit in a bitmap, which is always checked atomically, so
-adding a lock around this really doesn't change anything as far as I can
-tell.
 
-Nevertheless, my rework series also addresses this.
+Indeed I think we should.
 
+I'll fix that for the next revision.
+
+Thanks,
 -Christoffer
