@@ -1,23 +1,23 @@
 From: Bharat Bhushan <Bharat.Bhushan@freescale.com>
-Subject: [RFC PATCH 3/6] vfio: Extend iommu-info to return MSIs automap state
-Date: Wed, 30 Sep 2015 20:26:26 +0530
-Message-ID: <1443624989-24346-3-git-send-email-Bharat.Bhushan@freescale.com>
+Subject: [RFC PATCH 5/6] vfio-pci: Create iommu mapping for msi interrupt
+Date: Wed, 30 Sep 2015 20:26:28 +0530
+Message-ID: <1443624989-24346-5-git-send-email-Bharat.Bhushan@freescale.com>
 References: <1443624989-24346-1-git-send-email-Bharat.Bhushan@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 174F1410BB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Sep 2015 05:21:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E88F4126B
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Sep 2015 05:22:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jpxLMwrjuyeG for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Sep 2015 05:21:49 -0400 (EDT)
-Received: from na01-bn1-obe.outbound.protection.outlook.com
- (mail-bn1bon0115.outbound.protection.outlook.com [157.56.111.115])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3CA8B412F3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Sep 2015 05:21:49 -0400 (EDT)
+ with ESMTP id D8evbmy9Extp for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Sep 2015 05:21:58 -0400 (EDT)
+Received: from na01-by2-obe.outbound.protection.outlook.com
+ (mail-by2on0139.outbound.protection.outlook.com [207.46.100.139])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F3D0A410D7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Sep 2015 05:21:57 -0400 (EDT)
 In-Reply-To: <1443624989-24346-1-git-send-email-Bharat.Bhushan@freescale.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,98 +32,90 @@ To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, alex.williamson@redhat.co
 Cc: marc.zyngier@arm.com, will.deacon@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch allows the user-space to know whether msi-pages
-are automatically mapped with some magic iova or not.
-
-Even if the msi-pages are automatically mapped, still user-space
-wants to over-ride the automatic iova selection for msi-mapping.
-For this user-space need to know whether it is allowed to change
-the automatic mapping or not and this API provides this mechanism.
-Follow up patches will provide how to over-ride this.
+An MSI-address is allocated and programmed in pcie device
+during interrupt configuration. Now for a pass-through device,
+try to create the iommu mapping for this allocted/programmed
+msi-address.  If the iommu mapping is created and the msi
+address programmed in the pcie device is different from
+msi-iova as per iommu programming then reconfigure the pci
+device to use msi-iova as msi address.
 
 Signed-off-by: Bharat Bhushan <Bharat.Bhushan@freescale.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 32 ++++++++++++++++++++++++++++++++
- include/uapi/linux/vfio.h       |  3 +++
- 2 files changed, 35 insertions(+)
+ drivers/vfio/pci/vfio_pci_intrs.c | 36 ++++++++++++++++++++++++++++++++++--
+ 1 file changed, 34 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index fa5d3e4..3315fb6 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -59,6 +59,7 @@ struct vfio_iommu {
- 	struct rb_root		dma_list;
- 	bool			v2;
- 	bool			nesting;
-+	bool			allow_msi_reconfig;
- 	struct list_head	reserved_iova_list;
- };
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index 1f577b4..c9690af 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -312,13 +312,23 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_device *vdev,
+ 	int irq = msix ? vdev->msix[vector].vector : pdev->irq + vector;
+ 	char *name = msix ? "vfio-msix" : "vfio-msi";
+ 	struct eventfd_ctx *trigger;
++	struct msi_msg msg;
++	struct vfio_device *device;
++	uint64_t msi_addr, msi_iova;
+ 	int ret;
  
-@@ -1117,6 +1118,23 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
- 	return ret;
- }
+ 	if (vector >= vdev->num_ctx)
+ 		return -EINVAL;
  
-+static
-+int vfio_domains_get_msi_maps(struct vfio_iommu *iommu,
-+			      struct iommu_domain_msi_maps *msi_maps)
-+{
-+	struct vfio_domain *d;
-+	int ret;
++	device = vfio_device_get_from_dev(&pdev->dev);
++	if (device == NULL)
++		return -EINVAL;
 +
-+	mutex_lock(&iommu->lock);
-+	/* All domains have same msi-automap property, pick first */
-+	d = list_first_entry(&iommu->domain_list, struct vfio_domain, next);
-+	ret = iommu_domain_get_attr(d->domain, DOMAIN_ATTR_MSI_MAPPING,
-+				    msi_maps);
-+	mutex_unlock(&iommu->lock);
+ 	if (vdev->ctx[vector].trigger) {
+ 		free_irq(irq, vdev->ctx[vector].trigger);
++		get_cached_msi_msg(irq, &msg);
++		msi_iova = ((u64)msg.address_hi << 32) | msg.address_lo;
++		vfio_device_unmap_msi(device, msi_iova, PAGE_SIZE);
+ 		kfree(vdev->ctx[vector].name);
+ 		eventfd_ctx_put(vdev->ctx[vector].trigger);
+ 		vdev->ctx[vector].trigger = NULL;
+@@ -346,12 +356,11 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_device *vdev,
+ 	 * cached value of the message prior to enabling.
+ 	 */
+ 	if (msix) {
+-		struct msi_msg msg;
+-
+ 		get_cached_msi_msg(irq, &msg);
+ 		pci_write_msi_msg(irq, &msg);
+ 	}
+ 
 +
-+	return ret;
-+}
+ 	ret = request_irq(irq, vfio_msihandler, 0,
+ 			  vdev->ctx[vector].name, trigger);
+ 	if (ret) {
+@@ -360,6 +369,29 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_device *vdev,
+ 		return ret;
+ 	}
+ 
++	/* Re-program the new-iova in pci-device in case there is
++	 * different iommu-mapping created for programmed msi-address.
++	 */
++	get_cached_msi_msg(irq, &msg);
++	msi_iova = 0;
++	msi_addr = (u64)(msg.address_hi) << 32 | (u64)(msg.address_lo);
++	ret = vfio_device_map_msi(device, msi_addr, PAGE_SIZE, &msi_iova);
++	if (ret) {
++		free_irq(irq, vdev->ctx[vector].trigger);
++		kfree(vdev->ctx[vector].name);
++		eventfd_ctx_put(trigger);
++		return ret;
++	}
 +
- static long vfio_iommu_type1_ioctl(void *iommu_data,
- 				   unsigned int cmd, unsigned long arg)
- {
-@@ -1138,6 +1156,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 		}
- 	} else if (cmd == VFIO_IOMMU_GET_INFO) {
- 		struct vfio_iommu_type1_info info;
-+		struct iommu_domain_msi_maps msi_maps;
-+		int ret;
- 
- 		minsz = offsetofend(struct vfio_iommu_type1_info, iova_pgsizes);
- 
-@@ -1149,6 +1169,18 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 
- 		info.flags = 0;
- 
-+		ret = vfio_domains_get_msi_maps(iommu, &msi_maps);
-+		if (ret)
-+			return ret;
++	/* Reprogram only if iommu-mapped iova is different from msi-address */
++	if (msi_iova && (msi_iova != msi_addr)) {
++		msg.address_hi = (u32)(msi_iova >> 32);
++		/* Keep Lower bits from original msi message address */
++		msg.address_lo &= PAGE_MASK;
++		msg.address_lo |= (u32)(msi_iova & 0x00000000ffffffff);
++		pci_write_msi_msg(irq, &msg);
++	}
 +
-+		if (msi_maps.override_automap) {
-+			info.flags |= VFIO_IOMMU_INFO_MSI_ALLOW_RECONFIG;
-+			iommu->allow_msi_reconfig = true;
-+		}
-+
-+		if (msi_maps.automap)
-+			info.flags |= VFIO_IOMMU_INFO_MSI_AUTOMAP;
-+
- 		info.iova_pgsizes = vfio_pgsize_bitmap(iommu);
+ 	vdev->ctx[vector].trigger = trigger;
  
- 		return copy_to_user((void __user *)arg, &info, minsz);
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 1abd1a9..9998f6e 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -391,6 +391,9 @@ struct vfio_iommu_type1_info {
- 	__u32	argsz;
- 	__u32	flags;
- #define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info */
-+#define VFIO_IOMMU_INFO_MSI_AUTOMAP (1 << 1)	/* MSI pages are auto-mapped
-+						   in iommu */
-+#define VFIO_IOMMU_INFO_MSI_ALLOW_RECONFIG (1 << 2) /* Allows reconfig automap*/
- 	__u64	iova_pgsizes;		/* Bitmap of supported page sizes */
- };
- 
+ 	return 0;
 -- 
 1.9.3
