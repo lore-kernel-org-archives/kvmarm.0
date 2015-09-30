@@ -1,22 +1,24 @@
 From: Bharat Bhushan <Bharat.Bhushan@freescale.com>
-Subject: [RFC PATCH 1/6] vfio: Add interface for add/del reserved iova region
-Date: Wed, 30 Sep 2015 20:26:24 +0530
-Message-ID: <1443624989-24346-1-git-send-email-Bharat.Bhushan@freescale.com>
+Subject: [RFC PATCH 4/6] vfio: Add interface to iommu-map/unmap MSI pages
+Date: Wed, 30 Sep 2015 20:26:27 +0530
+Message-ID: <1443624989-24346-4-git-send-email-Bharat.Bhushan@freescale.com>
+References: <1443624989-24346-1-git-send-email-Bharat.Bhushan@freescale.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C3C6A411E2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Sep 2015 05:21:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D4EF410BB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Sep 2015 05:21:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Dp4fT9OEVnpH for <kvmarm@lists.cs.columbia.edu>;
- Wed, 30 Sep 2015 05:21:45 -0400 (EDT)
-Received: from na01-by2-obe.outbound.protection.outlook.com
- (mail-by2on0124.outbound.protection.outlook.com [207.46.100.124])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 28DE2410BB
- for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Sep 2015 05:21:44 -0400 (EDT)
+ with ESMTP id KfUdOa2Tr8px for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Sep 2015 05:21:54 -0400 (EDT)
+Received: from na01-bn1-obe.outbound.protection.outlook.com
+ (mail-bn1bon0148.outbound.protection.outlook.com [157.56.111.148])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4E00240FA2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Sep 2015 05:21:54 -0400 (EDT)
+In-Reply-To: <1443624989-24346-1-git-send-email-Bharat.Bhushan@freescale.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,327 +32,260 @@ To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, alex.williamson@redhat.co
 Cc: marc.zyngier@arm.com, will.deacon@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This Patch adds the VFIO APIs to add and remove reserved iova
-regions. The reserved iova region can be used for mapping some
-specific physical address in iommu.
+For MSI interrupts to work for a pass-through devices we need
+to have mapping of msi-pages in iommu. Now on some platforms
+(like x86) does this msi-pages mapping happens magically and in these
+case they chooses an iova which they somehow know that it will never
+overlap with guest memory. But this magic iova selection
+may not be always true for all platform (like PowerPC and ARM64).
 
-Currently we are planning to use this interface for adding iova
-regions for creating iommu of msi-pages. But the API are designed
-for future extension where some other physical address can be mapped.
+Also on x86 platform, there is no problem as long as running a x86-guest
+on x86-host but there can be issues when running a non-x86 guest on
+x86 host or other userspace applications like (I think ODP/DPDK).
+As in these cases there can be chances that it overlaps with guest
+memory mapping.
+
+This patch add interface to iommu-map and iommu-unmap msi-pages at
+reserved iova chosen by userspace.
 
 Signed-off-by: Bharat Bhushan <Bharat.Bhushan@freescale.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 201 +++++++++++++++++++++++++++++++++++++++-
- include/uapi/linux/vfio.h       |  43 +++++++++
- 2 files changed, 243 insertions(+), 1 deletion(-)
+ drivers/vfio/vfio.c             |  52 +++++++++++++++++++
+ drivers/vfio/vfio_iommu_type1.c | 111 ++++++++++++++++++++++++++++++++++++++++
+ include/linux/vfio.h            |   9 +++-
+ 3 files changed, 171 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 57d8c37..fa5d3e4 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -59,6 +59,7 @@ struct vfio_iommu {
- 	struct rb_root		dma_list;
- 	bool			v2;
- 	bool			nesting;
-+	struct list_head	reserved_iova_list;
- };
- 
- struct vfio_domain {
-@@ -77,6 +78,15 @@ struct vfio_dma {
- 	int			prot;		/* IOMMU_READ/WRITE */
- };
- 
-+struct vfio_resvd_region {
-+	dma_addr_t	iova;
-+	size_t		size;
-+	int		prot;			/* IOMMU_READ/WRITE */
-+	int		refcount;		/* ref count of mappings */
-+	uint64_t	map_paddr;		/* Mapped Physical Address */
-+	struct list_head next;
-+};
-+
- struct vfio_group {
- 	struct iommu_group	*iommu_group;
- 	struct list_head	next;
-@@ -106,6 +116,38 @@ static struct vfio_dma *vfio_find_dma(struct vfio_iommu *iommu,
- 	return NULL;
+diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+index 2fb29df..a817d2d 100644
+--- a/drivers/vfio/vfio.c
++++ b/drivers/vfio/vfio.c
+@@ -605,6 +605,58 @@ static int vfio_iommu_group_notifier(struct notifier_block *nb,
+ 	return NOTIFY_OK;
  }
  
-+/* This function must be called with iommu->lock held */
-+static bool vfio_overlap_with_resvd_region(struct vfio_iommu *iommu,
-+					   dma_addr_t start, size_t size)
++int vfio_device_map_msi(struct vfio_device *device, uint64_t msi_addr,
++			uint32_t size, uint64_t *msi_iova)
 +{
-+	struct vfio_resvd_region *region;
++	struct vfio_container *container = device->group->container;
++	struct vfio_iommu_driver *driver;
++	int ret;
 +
-+	list_for_each_entry(region, &iommu->reserved_iova_list, next) {
-+		if (region->iova < start)
-+			return (start - region->iova < region->size);
-+		else if (start < region->iova)
-+			return (region->iova - start < size);
++	/* Validate address and size */
++	if (!msi_addr || !size || !msi_iova)
++		return -EINVAL;
 +
-+		return (region->size > 0 && size > 0);
++	down_read(&container->group_lock);
++
++	driver = container->iommu_driver;
++	if (!driver || !driver->ops || !driver->ops->msi_map) {
++		up_read(&container->group_lock);
++		return -EINVAL;
 +	}
 +
-+	return false;
++	ret = driver->ops->msi_map(container->iommu_data,
++				   msi_addr, size, msi_iova);
++
++	up_read(&container->group_lock);
++	return ret;
 +}
 +
-+/* This function must be called with iommu->lock held */
-+static
-+struct vfio_resvd_region *vfio_find_resvd_region(struct vfio_iommu *iommu,
-+						 dma_addr_t start, size_t size)
++int vfio_device_unmap_msi(struct vfio_device *device, uint64_t msi_iova,
++			  uint64_t size)
 +{
-+	struct vfio_resvd_region *region;
++	struct vfio_container *container = device->group->container;
++	struct vfio_iommu_driver *driver;
++	int ret;
 +
-+	list_for_each_entry(region, &iommu->reserved_iova_list, next)
-+		if (region->iova == start && region->size == size)
-+			return region;
++	/* Validate address and size */
++	if (!msi_iova || !size)
++		return -EINVAL;
 +
-+	return NULL;
++	down_read(&container->group_lock);
++
++	driver = container->iommu_driver;
++	if (!driver || !driver->ops || !driver->ops->msi_unmap) {
++		up_read(&container->group_lock);
++		return -EINVAL;
++	}
++
++	ret = driver->ops->msi_unmap(container->iommu_data,
++				     msi_iova, size);
++
++	up_read(&container->group_lock);
++	return ret;
 +}
 +
- static void vfio_link_dma(struct vfio_iommu *iommu, struct vfio_dma *new)
- {
- 	struct rb_node **link = &iommu->dma_list.rb_node, *parent = NULL;
-@@ -580,7 +622,8 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
- 
- 	mutex_lock(&iommu->lock);
- 
--	if (vfio_find_dma(iommu, iova, size)) {
-+	if (vfio_find_dma(iommu, iova, size) ||
-+	    vfio_overlap_with_resvd_region(iommu, iova, size)) {
- 		mutex_unlock(&iommu->lock);
- 		return -EEXIST;
- 	}
-@@ -626,6 +669,127 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+ /**
+  * VFIO driver API
+  */
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 3315fb6..ab376c2 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -1003,12 +1003,34 @@ out_free:
  	return ret;
  }
  
-+/* This function must be called with iommu->lock held */
-+static
-+int vfio_iommu_resvd_region_del(struct vfio_iommu *iommu,
-+				dma_addr_t iova, size_t size, int prot)
++static void vfio_iommu_unmap_all_reserved_regions(struct vfio_iommu *iommu)
 +{
-+	struct vfio_resvd_region *res_region;
++	struct vfio_resvd_region *region;
++	struct vfio_domain *d;
 +
-+	res_region = vfio_find_resvd_region(iommu, iova, size);
-+	/* Region should not be mapped in iommu */
-+	if (res_region == NULL || res_region->map_paddr)
-+		return -EINVAL;
++	list_for_each_entry(region, &iommu->reserved_iova_list, next) {
++		list_for_each_entry(d, &iommu->domain_list, next) {
++			if (!region->map_paddr)
++				continue;
 +
-+	list_del(&res_region->next);
-+	kfree(res_region);
-+	return 0;
++			if (!iommu_iova_to_phys(d->domain, region->iova))
++				continue;
++
++			iommu_unmap(d->domain, region->iova, PAGE_SIZE);
++			region->map_paddr = 0;
++			cond_resched();
++		}
++	}
 +}
 +
-+/* This function must be called with iommu->lock held */
-+static int vfio_iommu_resvd_region_add(struct vfio_iommu *iommu,
-+				       dma_addr_t iova, size_t size, int prot)
+ static void vfio_iommu_unmap_unpin_all(struct vfio_iommu *iommu)
+ {
+ 	struct rb_node *node;
+ 
+ 	while ((node = rb_first(&iommu->dma_list)))
+ 		vfio_remove_dma(iommu, rb_entry(node, struct vfio_dma, node));
++
++	vfio_iommu_unmap_all_reserved_regions(iommu);
+ }
+ 
+ static void vfio_iommu_type1_detach_group(void *iommu_data,
+@@ -1048,6 +1070,93 @@ done:
+ 	mutex_unlock(&iommu->lock);
+ }
+ 
++static int vfio_iommu_type1_msi_map(void *iommu_data, uint64_t msi_addr,
++				    uint64_t size, uint64_t *msi_iova)
 +{
-+	struct vfio_resvd_region *res_region;
-+
-+	/* Check overlap with with dma maping and reserved regions */
-+	if (vfio_find_dma(iommu, iova, size) ||
-+	    vfio_find_resvd_region(iommu, iova, size))
-+		return -EEXIST;
-+
-+	res_region = kzalloc(sizeof(*res_region), GFP_KERNEL);
-+	if (res_region == NULL)
-+		return -ENOMEM;
-+
-+	res_region->iova = iova;
-+	res_region->size = size;
-+	res_region->prot = prot;
-+	res_region->refcount = 0;
-+	res_region->map_paddr = 0;
-+
-+	list_add(&res_region->next, &iommu->reserved_iova_list);
-+
-+	return 0;
-+}
-+
-+static
-+int vfio_handle_reserved_region_add(struct vfio_iommu *iommu,
-+				struct vfio_iommu_reserved_region_add *region)
-+{
-+	dma_addr_t iova = region->iova;
-+	size_t size = region->size;
-+	int flags = region->flags;
-+	uint64_t mask;
-+	int prot = 0;
++	struct vfio_iommu *iommu = iommu_data;
++	struct vfio_resvd_region *region;
 +	int ret;
-+
-+	/* Verify that none of our __u64 fields overflow */
-+	if (region->size != size || region->iova != iova)
-+		return -EINVAL;
-+
-+	mask = ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
-+
-+	WARN_ON(mask & PAGE_MASK);
-+
-+	if (flags & VFIO_IOMMU_RES_REGION_READ)
-+		prot |= IOMMU_READ;
-+	if (flags & VFIO_IOMMU_RES_REGION_WRITE)
-+		prot |= IOMMU_WRITE;
-+
-+	if (!prot || !size || (size | iova) & mask)
-+		return -EINVAL;
-+
-+	/* Don't allow IOVA wrap */
-+	if (iova + size - 1 < iova)
-+		return -EINVAL;
 +
 +	mutex_lock(&iommu->lock);
 +
-+	if (region->flags & VFIO_IOMMU_RES_REGION_ADD) {
-+		ret = vfio_iommu_resvd_region_add(iommu, iova, size, prot);
-+		if (ret) {
++	/* Do not try ceate iommu-mapping if msi reconfig not allowed */
++	if (!iommu->allow_msi_reconfig) {
++		mutex_unlock(&iommu->lock);
++		return 0;
++	}
++
++	/* Check if there is already region mapping the msi page */
++	list_for_each_entry(region, &iommu->reserved_iova_list, next) {
++		if (region->map_paddr == msi_addr) {
++			*msi_iova = region->iova;
++			region->refcount++;
 +			mutex_unlock(&iommu->lock);
-+			return ret;
++			return 0;
 +		}
 +	}
 +
++	/* Get a unmapped reserved region */
++	list_for_each_entry(region, &iommu->reserved_iova_list, next) {
++		if (!region->map_paddr)
++			break;
++	}
++
++	if (region == NULL) {
++		mutex_unlock(&iommu->lock);
++		return -ENODEV;
++	}
++
++	ret = vfio_iommu_map(iommu, region->iova, msi_addr >> PAGE_SHIFT,
++			     size >> PAGE_SHIFT, region->prot);
++	if (ret) {
++		mutex_unlock(&iommu->lock);
++		return ret;
++	}
++
++	region->map_paddr = msi_addr;
++	*msi_iova = region->iova;
++	region->refcount++;
++
 +	mutex_unlock(&iommu->lock);
++
 +	return 0;
 +}
 +
-+static
-+int vfio_handle_reserved_region_del(struct vfio_iommu *iommu,
-+				struct vfio_iommu_reserved_region_del *region)
++static int vfio_iommu_type1_msi_unmap(void *iommu_data, uint64_t iova,
++				      uint64_t size)
 +{
-+	dma_addr_t iova = region->iova;
-+	size_t size = region->size;
-+	int flags = region->flags;
-+	int ret;
-+
-+	if (!(flags & VFIO_IOMMU_RES_REGION_DEL))
-+		return -EINVAL;
++	struct vfio_iommu *iommu = iommu_data;
++	struct vfio_resvd_region *region;
++	struct vfio_domain *d;
 +
 +	mutex_lock(&iommu->lock);
 +
-+	/* Check for the region */
-+	if (vfio_find_resvd_region(iommu, iova, size) == NULL) {
++	/* find the region mapping the msi page */
++	list_for_each_entry(region, &iommu->reserved_iova_list, next)
++		if (region->iova == iova)
++			break;
++
++	if (region == NULL || region->refcount <= 0) {
 +		mutex_unlock(&iommu->lock);
 +		return -EINVAL;
 +	}
 +
-+	/* remove the reserved region */
-+	if (region->flags & VFIO_IOMMU_RES_REGION_DEL) {
-+		ret = vfio_iommu_resvd_region_del(iommu, iova, size, flags);
-+		if (ret) {
-+			mutex_unlock(&iommu->lock);
-+			return ret;
++	region->refcount--;
++	if (!region->refcount) {
++		list_for_each_entry(d, &iommu->domain_list, next) {
++			if (!iommu_iova_to_phys(d->domain, iova))
++				continue;
++
++			iommu_unmap(d->domain, iova, size);
++			cond_resched();
 +		}
 +	}
++	region->map_paddr = 0;
 +
 +	mutex_unlock(&iommu->lock);
 +	return 0;
 +}
 +
- static int vfio_bus_type(struct device *dev, void *data)
+ static void *vfio_iommu_type1_open(unsigned long arg)
  {
- 	struct bus_type **bus = data;
-@@ -905,6 +1069,7 @@ static void *vfio_iommu_type1_open(unsigned long arg)
- 	}
+ 	struct vfio_iommu *iommu;
+@@ -1264,6 +1373,8 @@ static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
+ 	.ioctl		= vfio_iommu_type1_ioctl,
+ 	.attach_group	= vfio_iommu_type1_attach_group,
+ 	.detach_group	= vfio_iommu_type1_detach_group,
++	.msi_map	= vfio_iommu_type1_msi_map,
++	.msi_unmap	= vfio_iommu_type1_msi_unmap,
+ };
  
- 	INIT_LIST_HEAD(&iommu->domain_list);
-+	INIT_LIST_HEAD(&iommu->reserved_iova_list);
- 	iommu->dma_list = RB_ROOT;
- 	mutex_init(&iommu->lock);
+ static int __init vfio_iommu_type1_init(void)
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index ddb4409..b91085d 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -52,6 +52,10 @@ extern void *vfio_del_group_dev(struct device *dev);
+ extern struct vfio_device *vfio_device_get_from_dev(struct device *dev);
+ extern void vfio_device_put(struct vfio_device *device);
+ extern void *vfio_device_data(struct vfio_device *device);
++extern int vfio_device_map_msi(struct vfio_device *device, uint64_t msi_addr,
++			       uint32_t size, uint64_t *msi_iova);
++int vfio_device_unmap_msi(struct vfio_device *device, uint64_t msi_iova,
++			  uint64_t size);
  
-@@ -1020,6 +1185,40 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 			return ret;
+ /**
+  * struct vfio_iommu_driver_ops - VFIO IOMMU driver callbacks
+@@ -72,7 +76,10 @@ struct vfio_iommu_driver_ops {
+ 					struct iommu_group *group);
+ 	void		(*detach_group)(void *iommu_data,
+ 					struct iommu_group *group);
+-
++	int		(*msi_map)(void *iommu_data, uint64_t msi_addr,
++				   uint64_t size, uint64_t *msi_iova);
++	int		(*msi_unmap)(void *iommu_data, uint64_t msi_iova,
++				     uint64_t size);
+ };
  
- 		return copy_to_user((void __user *)arg, &unmap, minsz);
-+	} else if (cmd == VFIO_IOMMU_RESERVED_REGION_ADD) {
-+		struct vfio_iommu_reserved_region_add region;
-+		long ret;
-+
-+		minsz = offsetofend(struct vfio_iommu_reserved_region_add,
-+				    size);
-+		if (copy_from_user(&region, (void __user *)arg, minsz))
-+			return -EFAULT;
-+
-+		if (region.argsz < minsz)
-+			return -EINVAL;
-+
-+		ret = vfio_handle_reserved_region_add(iommu, &region);
-+		if (ret)
-+			return ret;
-+
-+		return copy_to_user((void __user *)arg, &region, minsz);
-+	} else if (cmd == VFIO_IOMMU_RESERVED_REGION_DEL) {
-+		struct vfio_iommu_reserved_region_del region;
-+		long ret;
-+
-+		minsz = offsetofend(struct vfio_iommu_reserved_region_del,
-+				    size);
-+		if (copy_from_user(&region, (void __user *)arg, minsz))
-+			return -EFAULT;
-+
-+		if (region.argsz < minsz)
-+			return -EINVAL;
-+
-+		ret = vfio_handle_reserved_region_del(iommu, &region);
-+		if (ret)
-+			return ret;
-+
-+		return copy_to_user((void __user *)arg, &region, minsz);
- 	}
- 
- 	return -ENOTTY;
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index b57b750..1abd1a9 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -440,6 +440,49 @@ struct vfio_iommu_type1_dma_unmap {
- #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
- #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
- 
-+/**************** Reserved IOVA region specific APIs **********************/
-+
-+/*
-+ * VFIO_IOMMU_RESERVED_REGION_ADD - _IO(VFIO_TYPE, VFIO_BASE + 17,
-+ *					struct vfio_iommu_reserved_region_add)
-+ * This is used to add a reserved iova region.
-+ * @flags - Input: VFIO_IOMMU_RES_REGION_ADD flag is for adding
-+ * a reserved region.
-+ * Also pass READ/WRITE/IOMMU flags to be used in iommu mapping.
-+ * @iova - Input: IOVA base address of reserved region
-+ * @size - Input: Size of the reserved region
-+ * Return: 0 on success, -errno on failure
-+ */
-+struct vfio_iommu_reserved_region_add {
-+	__u32   argsz;
-+	__u32   flags;
-+#define VFIO_IOMMU_RES_REGION_ADD	(1 << 0) /* Add a reserved region */
-+#define VFIO_IOMMU_RES_REGION_READ	(1 << 1) /* readable region */
-+#define VFIO_IOMMU_RES_REGION_WRITE	(1 << 2) /* writable region */
-+	__u64	iova;
-+	__u64   size;
-+};
-+#define VFIO_IOMMU_RESERVED_REGION_ADD _IO(VFIO_TYPE, VFIO_BASE + 17)
-+
-+/*
-+ * VFIO_IOMMU_RESERVED_REGION_DEL - _IO(VFIO_TYPE, VFIO_BASE + 18,
-+ *					struct vfio_iommu_reserved_region_del)
-+ * This is used to delete an existing reserved iova region.
-+ * @flags - VFIO_IOMMU_RES_REGION_DEL flag is for deleting a region use,
-+ *  only a unmapped region can be deleted.
-+ * @iova - Input: IOVA base address of reserved region
-+ * @size - Input: Size of the reserved region
-+ * Return: 0 on success, -errno on failure
-+ */
-+struct vfio_iommu_reserved_region_del {
-+	__u32   argsz;
-+	__u32   flags;
-+#define VFIO_IOMMU_RES_REGION_DEL	(1 << 0) /* unset the reserved region */
-+	__u64	iova;
-+	__u64   size;
-+};
-+#define VFIO_IOMMU_RESERVED_REGION_DEL _IO(VFIO_TYPE, VFIO_BASE + 18)
-+
- /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
- 
- /*
+ extern int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops);
 -- 
 1.9.3
