@@ -1,85 +1,114 @@
-From: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-Subject: [RFC PATCH v5 0/3] vfio: platform: return device properties for a
-	platform device
-Date: Wed, 30 Sep 2015 11:07:47 +0200
-Message-ID: <1443604077-3155-1-git-send-email-b.reynal@virtualopensystems.com>
+From: Baptiste Reynal <b.reynal@virtualopensystems.com>
+Subject: [RFC PATCH v5 2/3] vfio: platform: access device property as a list
+ of strings
+Date: Wed, 30 Sep 2015 11:09:06 +0200
+Message-ID: <1443604149-3242-2-git-send-email-b.reynal@virtualopensystems.com>
+References: <1443604149-3242-1-git-send-email-b.reynal@virtualopensystems.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
-Cc: tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DA644117E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Sep 2015 05:07:44 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id KEW3sLMK5Cz0 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Sep 2015 05:07:42 -0400 (EDT)
+Received: from mail-wi0-f175.google.com (mail-wi0-f175.google.com
+ [209.85.212.175])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 66A23412F3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Sep 2015 05:07:42 -0400 (EDT)
+Received: by wiclk2 with SMTP id lk2so51661954wic.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Sep 2015 02:09:18 -0700 (PDT)
+In-Reply-To: <1443604149-3242-1-git-send-email-b.reynal@virtualopensystems.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu, iommu@lists.linux-foundation.org, alex.williamson@redhat.com, christoffer.dall@linaro.org, eric.auger@linaro.org
+Cc: tech@virtualopensystems.com, open list <linux-kernel@vger.kernel.org>, "open list:VFIO PLATFORM DRIVER" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This RFC's intention is to show what an interface to access device
-properties for the VFIO platform driver can look like. These properties
-can be retrieved from the device tree node describing the device, or ACPI
-properties.
+From: Antonios Motakis <a.motakis@virtualopensystems.com>
 
-If a device property corresponding to a platform device bound to VFIO PLATFORM
-or VFIO AMBA is available, this patch series will allow the user to query
-for this information. This can be useful for userspace drivers to automatically
-query parameters related to the device.
+Certain device properties (e.g. the device node name, the compatible
+string), are available as a list of strings (separated by the null
+terminating character). Let the VFIO user query this type of properties.
 
-Specifically for QEMU, reading the "compatible" property of the device tree
-node could be of use to find out what device is being assigned to the guest and
-handle appropriately a wider range of devices in the future, and to generate an
-appropriate device tree for the guest.
+Signed-off-by: Antonios Motakis <a.motakis@virtualopensystems.com>
+Signed-off-by: Baptiste Reynal <b.reynal@virtualopensystems.com>
 
-Older versions of this series were specifically targeted at device tree
-properties. The v3 has been reworked on top of Rafael J. Wysocki's
-uniform device properties API for device tree and ACPI devices. This will allow
-us to use the API in the future with devices described via ACPI.
+---
+v4 -> v5:
+ - return ENOSPC when the buffer size is too small
+ - remove strlen call
 
-The API to get the list of available properties and the device tree full_name
-have been removed. These probably don't serve an useful purpose, as the user
-of this API need to know anyway what properties are specific to the device he
-wants to access with VFIO. If we decide to reintroduce the list of properties
-in the future, the generic device properties API in the kernel will have to
-be extended accordingly.
+v3 -> v4:
+ - The list length is computed before strings copy. If the entire list
+   doesn't fit, no strings are copied to the user.
+---
+ drivers/vfio/platform/properties.c | 43 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
 
-A kernel with this series and all the dependencies applied can be pulled from
-branch vfio-device-properties-v5 from the repository:
-https://git.virtualopensystems.com/dev/linux.git
-
-Changes since v4:
- - Rework code according to Alex Williamson's comments
-Changes since v3:
- - Rebased on top on v4.2
- - Rework VFIO_DEVICE_GET_DEV_PROPERTY ioctl
- - Rework code according to Eric Auger's comments
-Changes since v2:
- - Reworked on top of Rafael J. Wysocki's uniform device properties API for
-   device tree and ACPI
- - Support for u64 array properties
- - Removed API to get list of available properties and device tree full_name
-Changes since v1:
- - Updated for VFIO platform patch series v8:
-   VFIO AMBA devices now supported in addition to VFIO PLATFORM devices
- - Refactored and cleaned up the code
-
-Antonios Motakis (3):
-  vfio: platform: add device properties skeleton and user API
-  vfio: platform: access device property as a list of strings
-  vfio: platform: return device properties as arrays of unsigned
-    integers
-
- drivers/vfio/platform/Makefile                |   3 +-
- drivers/vfio/platform/properties.c            | 178 ++++++++++++++++++++++++++
- drivers/vfio/platform/vfio_platform_common.c  |  34 +++++
- drivers/vfio/platform/vfio_platform_private.h |   9 ++
- include/uapi/linux/vfio.h                     |  31 +++++
- 5 files changed, 254 insertions(+), 1 deletion(-)
- create mode 100644 drivers/vfio/platform/properties.c
-
+diff --git a/drivers/vfio/platform/properties.c b/drivers/vfio/platform/properties.c
+index 48c90c5..212755f 100644
+--- a/drivers/vfio/platform/properties.c
++++ b/drivers/vfio/platform/properties.c
+@@ -22,7 +22,48 @@ static int dev_property_get_strings(struct device *dev,
+ 				    char *name, unsigned *lenp,
+ 				    void __user *datap, unsigned long datasz)
+ {
+-	return -EINVAL;
++	const char **val;
++	int n, i, ret;
++
++	if (lenp == NULL)
++		return -EFAULT;
++
++	*lenp = 0;
++
++	n = device_property_read_string_array(dev, name, NULL, 0);
++	if (n < 0)
++		return n;
++
++	val = kcalloc(n, sizeof(char *), GFP_KERNEL);
++	if (!val)
++		return -ENOMEM;
++
++	ret = device_property_read_string_array(dev, name, val, n);
++	if (ret < 0)
++		goto out;
++
++	for (i = 0; i < n; i++)
++		*lenp += strlen(val[i]) + 1;
++
++	if (datasz < *lenp) {
++		ret = -ENOSPC;
++		goto out;
++	}
++
++	for (i = 0; i < n; i++) {
++		size_t len = strlen(val[i]) + 1;
++
++		if (copy_to_user(datap, val[i], len)) {
++			ret = -EFAULT;
++			goto out;
++		}
++
++		datap += len;
++	}
++
++out:
++	kfree(val);
++	return ret;
+ }
+ 
+ static int dev_property_get_uint(struct device *dev,
 -- 
 2.6.0
