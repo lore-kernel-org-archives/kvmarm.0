@@ -1,140 +1,250 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 07/11] KVM: arm/arm64: vgic: Allow HW interrupts to be
- queued to a guest
-Date: Thu, 1 Oct 2015 12:25:04 +0200
-Message-ID: <20151001102504.GA32011@cbox>
-References: <1438962347-17541-1-git-send-email-marc.zyngier@arm.com>
- <1438962347-17541-8-git-send-email-marc.zyngier@arm.com>
- <5602E778.3080004@arm.com>
- <20150929134445.GF9002@cbox>
- <560BEC68.4010400@arm.com>
+From: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+Subject: [PATCH v3 2/6] arm64: GICv3: change unsigned types for AArch32
+ compatibility
+Date: Thu,  1 Oct 2015 13:47:15 +0100
+Message-ID: <1443703639-3730-3-git-send-email-jean-philippe.brucker@arm.com>
+References: <1443703639-3730-1-git-send-email-jean-philippe.brucker@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <560BEC68.4010400@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Eric Auger <eric.auger@linaro.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B740D41451
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Oct 2015 08:46:47 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id c0Bl0wPEyNrW for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  1 Oct 2015 08:46:46 -0400 (EDT)
+Received: from eu-smtp-delivery-143.mimecast.com
+ (eu-smtp-delivery-143.mimecast.com [146.101.78.143])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F08CF41390
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  1 Oct 2015 08:46:44 -0400 (EDT)
+In-Reply-To: <1443703639-3730-1-git-send-email-jean-philippe.brucker@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: Jason Cooper <jason@lakedaemon.net>, Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Sep 30, 2015 at 03:06:32PM +0100, Andre Przywara wrote:
-> Hi Christoffer,
-> 
-> On 29/09/15 14:44, Christoffer Dall wrote:
-> > On Wed, Sep 23, 2015 at 06:55:04PM +0100, Andre Przywara wrote:
-> >> Salut Marc,
-> >>
-> >> I know that this patch is already merged, but ....
-> >>
-> >> On 07/08/15 16:45, Marc Zyngier wrote:
-> >>> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> >>> index 51c9900..9d009d2 100644
-> >> ...
-> >>> @@ -1364,6 +1397,39 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
-> >>>  	return level_pending;
-> >>>  }
-> >>>  
-> >>> +/*
-> >>> + * Save the physical active state, and reset it to inactive.
-> >>> + *
-> >>> + * Return 1 if HW interrupt went from active to inactive, and 0 otherwise.
-> >>> + */
-> >>> +static int vgic_sync_hwirq(struct kvm_vcpu *vcpu, struct vgic_lr vlr)
-> >>> +{
-> >>> +	struct irq_phys_map *map;
-> >>> +	int ret;
-> >>> +
-> >>> +	if (!(vlr.state & LR_HW))
-> >>> +		return 0;
-> >>> +
-> >>> +	map = vgic_irq_map_search(vcpu, vlr.irq);
-> >>> +	BUG_ON(!map || !map->active);
-> >>> +
-> >>> +	ret = irq_get_irqchip_state(map->irq,
-> >>> +				    IRQCHIP_STATE_ACTIVE,
-> >>> +				    &map->active);
-> >>> +
-> >>> +	WARN_ON(ret);
-> >>> +
-> >>> +	if (map->active) {
-> >>> +		ret = irq_set_irqchip_state(map->irq,
-> >>> +					    IRQCHIP_STATE_ACTIVE,
-> >>> +					    false);
-> >>> +		WARN_ON(ret);
-> >>> +		return 0;
-> >>> +	}
-> >>> +
-> >>> +	return 1;
-> >>> +}
-> >>> +
-> >>>  /* Sync back the VGIC state after a guest run */
-> >>>  static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
-> >>>  {
-> >>> @@ -1378,14 +1444,31 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
-> >>>  	elrsr = vgic_get_elrsr(vcpu);
-> >>>  	elrsr_ptr = u64_to_bitmask(&elrsr);
-> >>>  
-> >>> -	/* Clear mappings for empty LRs */
-> >>> -	for_each_set_bit(lr, elrsr_ptr, vgic->nr_lr) {
-> >>> +	/* Deal with HW interrupts, and clear mappings for empty LRs */
-> >>> +	for (lr = 0; lr < vgic->nr_lr; lr++) {
-> >>>  		struct vgic_lr vlr;
-> >>>  
-> >>> -		if (!test_and_clear_bit(lr, vgic_cpu->lr_used))
-> >>> +		if (!test_bit(lr, vgic_cpu->lr_used))
-> >>>  			continue;
-> >>>  
-> >>>  		vlr = vgic_get_lr(vcpu, lr);
-> >>> +		if (vgic_sync_hwirq(vcpu, vlr)) {
-> >>> +			/*
-> >>> +			 * So this is a HW interrupt that the guest
-> >>> +			 * EOI-ed. Clean the LR state and allow the
-> >>> +			 * interrupt to be sampled again.
-> >>> +			 */
-> >>> +			vlr.state = 0;
-> >>> +			vlr.hwirq = 0;
-> >>> +			vgic_set_lr(vcpu, lr, vlr);
-> >>> +			vgic_irq_clear_queued(vcpu, vlr.irq);
-> >>
-> >> Isn't this line altering common VGIC state without holding the lock?
-> >> Eric removed the coarse dist->lock around the whole
-> >> __kvm_vgic_sync_hwstate() function, we take it now in
-> >> vgic_process_maintenance(), but don't hold it here AFAICT.
-> >> As long as we are only dealing with private timer IRQs this is probably
-> >> not a problem, but the IRQ number could be a SPI as well, right?
-> >>
-> > I don't see a problematic race with this though, as all we're doing is
-> > to clear a bit in a bitmap, which is always checked atomically, so
-> > adding a lock around this really doesn't change anything as far as I can
-> > tell.
-> 
-> Indeed I found a similar comment in some older revisions of the code.
-> 
-> But isn't it that other code holding the lock (thinking about
-> kvm_vgic_flush_hwstate() in particular) assumes that no-one else tinkers
-> with the VGIC state while it holds the lock?
-> So couldn't we (potentially) run into inconsistent state because we
-> cleared the queued bit while the flushing code runs over all interrupts?
-> Maybe not in this particular case, but in general?
+This patch does a few simple compatibility-related changes:
+- change the system register access prototypes to their actual size,
+- homogenise mpidr accesses with unsigned long,
+- force the 64bit register values to unsigned long long.
 
-In general, yes, you should lock operations accessing the distributor.
+Note: the list registers are 64bit on GICv3, but the AArch32 vGIC driver
+will need to split their values into two 32bit registers: LRn and LRCn.
 
-It just feels silly to do 
+Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+---
+ arch/arm64/include/asm/arch_gicv3.h |   35 ++++++++++++++++++++---------------
+ drivers/irqchip/irq-gic-v3.c        |   25 ++++++++++++-------------
+ include/linux/irqchip/arm-gic-v3.h  |   18 +++++++++---------
+ 3 files changed, 41 insertions(+), 37 deletions(-)
 
-spin_lock();
-vgic_irq_clear_queued(...);
-spin_unlock();
-
-because vgic_irq_clear_queued just clears a bit and I don't see the
-race.
-
-> 
-> Haven't looked at your new series yet, but will do this ASAP.
-> 
-Thanks, much appreciated.  Based on your comment on the previous
-version, the whole thing is now wrapped in a spinlock so this point is
-moot.  Unless there's a clear race to be fixed here, I would prefer if
-we focus our energy on getting the other series merged.
-
--Christoffer
+diff --git a/arch/arm64/include/asm/arch_gicv3.h b/arch/arm64/include/asm/arch_gicv3.h
+index e6b68a8..bd8f005 100644
+--- a/arch/arm64/include/asm/arch_gicv3.h
++++ b/arch/arm64/include/asm/arch_gicv3.h
+@@ -78,21 +78,26 @@
+ 
+ #include <linux/stringify.h>
+ 
+-/* Low level accessors */
++/*
++ * Low-level accessors
++ *
++ * These system registers are 32 bits, but we make sure that the compiler
++ * sets the GP register's most significant bits to 0 with an explicit cast.
++ */
+ 
+-static inline void gic_write_eoir(u64 irq)
++static inline void gic_write_eoir(u32 irq)
+ {
+-	asm volatile("msr_s " __stringify(ICC_EOIR1_EL1) ", %0" : : "r" (irq));
++	asm volatile("msr_s " __stringify(ICC_EOIR1_EL1) ", %0" : : "r" ((u64)irq));
+ 	isb();
+ }
+ 
+-static inline void gic_write_dir(u64 irq)
++static inline void gic_write_dir(u32 irq)
+ {
+-	asm volatile("msr_s " __stringify(ICC_DIR_EL1) ", %0" : : "r" (irq));
++	asm volatile("msr_s " __stringify(ICC_DIR_EL1) ", %0" : : "r" ((u64)irq));
+ 	isb();
+ }
+ 
+-static inline u64 gic_read_iar(void)
++static inline u32 gic_read_iar(void)
+ {
+ 	u64 irqstat;
+ 
+@@ -100,20 +105,20 @@ static inline u64 gic_read_iar(void)
+ 	return irqstat;
+ }
+ 
+-static inline void gic_write_pmr(u64 val)
++static inline void gic_write_pmr(u32 val)
+ {
+-	asm volatile("msr_s " __stringify(ICC_PMR_EL1) ", %0" : : "r" (val));
++	asm volatile("msr_s " __stringify(ICC_PMR_EL1) ", %0" : : "r" ((u64)val));
+ }
+ 
+-static inline void gic_write_ctlr(u64 val)
++static inline void gic_write_ctlr(u32 val)
+ {
+-	asm volatile("msr_s " __stringify(ICC_CTLR_EL1) ", %0" : : "r" (val));
++	asm volatile("msr_s " __stringify(ICC_CTLR_EL1) ", %0" : : "r" ((u64)val));
+ 	isb();
+ }
+ 
+-static inline void gic_write_grpen1(u64 val)
++static inline void gic_write_grpen1(u32 val)
+ {
+-	asm volatile("msr_s " __stringify(ICC_GRPEN1_EL1) ", %0" : : "r" (val));
++	asm volatile("msr_s " __stringify(ICC_GRPEN1_EL1) ", %0" : : "r" ((u64)val));
+ 	isb();
+ }
+ 
+@@ -122,7 +127,7 @@ static inline void gic_write_sgi1r(u64 val)
+ 	asm volatile("msr_s " __stringify(ICC_SGI1R_EL1) ", %0" : : "r" (val));
+ }
+ 
+-static inline u64 gic_read_sre(void)
++static inline u32 gic_read_sre(void)
+ {
+ 	u64 val;
+ 
+@@ -130,9 +135,9 @@ static inline u64 gic_read_sre(void)
+ 	return val;
+ }
+ 
+-static inline void gic_write_sre(u64 val)
++static inline void gic_write_sre(u32 val)
+ {
+-	asm volatile("msr_s " __stringify(ICC_SRE_EL1) ", %0" : : "r" (val));
++	asm volatile("msr_s " __stringify(ICC_SRE_EL1) ", %0" : : "r" ((u64)val));
+ 	isb();
+ }
+ 
+diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+index a08eda8..0fb8d6d 100644
+--- a/drivers/irqchip/irq-gic-v3.c
++++ b/drivers/irqchip/irq-gic-v3.c
+@@ -327,11 +327,11 @@ static int gic_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu)
+ 	return 0;
+ }
+ 
+-static u64 gic_mpidr_to_affinity(u64 mpidr)
++static u64 gic_mpidr_to_affinity(unsigned long mpidr)
+ {
+ 	u64 aff;
+ 
+-	aff = (MPIDR_AFFINITY_LEVEL(mpidr, 3) << 32 |
++	aff = ((u64)MPIDR_AFFINITY_LEVEL(mpidr, 3) << 32 |
+ 	       MPIDR_AFFINITY_LEVEL(mpidr, 2) << 16 |
+ 	       MPIDR_AFFINITY_LEVEL(mpidr, 1) << 8  |
+ 	       MPIDR_AFFINITY_LEVEL(mpidr, 0));
+@@ -341,7 +341,7 @@ static u64 gic_mpidr_to_affinity(u64 mpidr)
+ 
+ static asmlinkage void __exception_irq_entry gic_handle_irq(struct pt_regs *regs)
+ {
+-	u64 irqnr;
++	u32 irqnr;
+ 
+ 	do {
+ 		irqnr = gic_read_iar();
+@@ -405,7 +405,7 @@ static void __init gic_dist_init(void)
+ 
+ static int gic_populate_rdist(void)
+ {
+-	u64 mpidr = cpu_logical_map(smp_processor_id());
++	unsigned long mpidr = cpu_logical_map(smp_processor_id());
+ 	u64 typer;
+ 	u32 aff;
+ 	int i;
+@@ -436,10 +436,9 @@ static int gic_populate_rdist(void)
+ 				u64 offset = ptr - gic_data.redist_regions[i].redist_base;
+ 				gic_data_rdist_rd_base() = ptr;
+ 				gic_data_rdist()->phys_base = gic_data.redist_regions[i].phys_base + offset;
+-				pr_info("CPU%d: found redistributor %llx region %d:%pa\n",
+-					smp_processor_id(),
+-					(unsigned long long)mpidr,
+-					i, &gic_data_rdist()->phys_base);
++				pr_info("CPU%d: found redistributor %lx region %d:%pa\n",
++					smp_processor_id(), mpidr, i,
++					&gic_data_rdist()->phys_base);
+ 				return 0;
+ 			}
+ 
+@@ -454,8 +453,8 @@ static int gic_populate_rdist(void)
+ 	}
+ 
+ 	/* We couldn't even deal with ourselves... */
+-	WARN(true, "CPU%d: mpidr %llx has no re-distributor!\n",
+-	     smp_processor_id(), (unsigned long long)mpidr);
++	WARN(true, "CPU%d: mpidr %lx has no re-distributor!\n",
++	     smp_processor_id(), mpidr);
+ 	return -ENODEV;
+ }
+ 
+@@ -525,10 +524,10 @@ static struct notifier_block gic_cpu_notifier = {
+ };
+ 
+ static u16 gic_compute_target_list(int *base_cpu, const struct cpumask *mask,
+-				   u64 cluster_id)
++				   unsigned long cluster_id)
+ {
+ 	int cpu = *base_cpu;
+-	u64 mpidr = cpu_logical_map(cpu);
++	unsigned long mpidr = cpu_logical_map(cpu);
+ 	u16 tlist = 0;
+ 
+ 	while (cpu < nr_cpu_ids) {
+@@ -589,7 +588,7 @@ static void gic_raise_softirq(const struct cpumask *mask, unsigned int irq)
+ 	smp_wmb();
+ 
+ 	for_each_cpu(cpu, mask) {
+-		u64 cluster_id = cpu_logical_map(cpu) & ~0xffUL;
++		unsigned long cluster_id = cpu_logical_map(cpu) & ~0xffUL;
+ 		u16 tlist;
+ 
+ 		tlist = gic_compute_target_list(&cpu, mask, cluster_id);
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index 5ab6e37..47663c6 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -264,16 +264,16 @@
+ /*
+  * Hypervisor interface registers (SRE only)
+  */
+-#define ICH_LR_VIRTUAL_ID_MASK		((1UL << 32) - 1)
+-
+-#define ICH_LR_EOI			(1UL << 41)
+-#define ICH_LR_GROUP			(1UL << 60)
+-#define ICH_LR_HW			(1UL << 61)
+-#define ICH_LR_STATE			(3UL << 62)
+-#define ICH_LR_PENDING_BIT		(1UL << 62)
+-#define ICH_LR_ACTIVE_BIT		(1UL << 63)
++#define ICH_LR_VIRTUAL_ID_MASK		((1ULL << 32) - 1)
++
++#define ICH_LR_EOI			(1ULL << 41)
++#define ICH_LR_GROUP			(1ULL << 60)
++#define ICH_LR_HW			(1ULL << 61)
++#define ICH_LR_STATE			(3ULL << 62)
++#define ICH_LR_PENDING_BIT		(1ULL << 62)
++#define ICH_LR_ACTIVE_BIT		(1ULL << 63)
+ #define ICH_LR_PHYS_ID_SHIFT		32
+-#define ICH_LR_PHYS_ID_MASK		(0x3ffUL << ICH_LR_PHYS_ID_SHIFT)
++#define ICH_LR_PHYS_ID_MASK		(0x3ffULL << ICH_LR_PHYS_ID_SHIFT)
+ 
+ #define ICH_MISR_EOI			(1 << 0)
+ #define ICH_MISR_U			(1 << 1)
+-- 
+1.7.9.5
