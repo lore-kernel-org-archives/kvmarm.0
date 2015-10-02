@@ -1,46 +1,81 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: [RFC] Handling CP15 timer without in-kernel irqchip
-Date: Fri, 02 Oct 2015 10:28:42 +0300
-Message-ID: <00a001d0fce3$f76e2170$e64a6450$@samsung.com>
+Subject: RE: [PATCH v2 09/15] KVM: arm64: implement basic ITS register handlers
+Date: Fri, 02 Oct 2015 10:51:38 +0300
+Message-ID: <00a101d0fce7$2d60fc00$8822f400$@samsung.com>
+References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com>
+ <1436538111-4294-10-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2A039412D6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Oct 2015 03:50:05 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id wrDbTvoehgIc for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Oct 2015 03:50:03 -0400 (EDT)
+Received: from mailout3.w1.samsung.com (mailout3.w1.samsung.com
+ [210.118.77.13])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4D0B8412A6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Oct 2015 03:50:02 -0400 (EDT)
+Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
+ by mailout3.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NVL00DE71U76M60@mailout3.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Fri, 02 Oct 2015 08:51:43 +0100 (BST)
+In-reply-to: <1436538111-4294-10-git-send-email-andre.przywara@arm.com>
 Content-language: ru
-Sender: kvm-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: marc.zyngier@arm.com, 'Christoffer Dall' <christoffer.dall@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: 'Andre Przywara' <andre.przywara@arm.com>, marc.zyngier@arm.com, christoffer.dall@linaro.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
  Hello!
 
- Since c2f58514cfb374d5368c9da945f1765cd48eb0da ("arm/arm64: KVM: vgic: Check for
-!irqchip_in_kernel() when mapping resources") we can run qemu with kernel_irqchip=off option. The
-only remaining problem is how to handle CP15 timer in this case.
- I have applied my old experimental patches to kernel 4.2.2. Using them, i can run 'virt' machine
-with software-emulated GICv2 on GICv3 hardware without v2 backwards compatibility. Also, i studied
-4.3 code, and it seems to be feasible to add this support to 4.3 and on.
- The only main question now is how would we do it. We can actually use two possible approaches:
+ Long time has passed, but i started working on live migration of this thing, and found some more
+problems.
 
- 1. If there's no in-kernel irqchip, we revert to older timer behavior (ARCH_TIMER_CTRL_IT_MASK
-hack), and forward the timer IRQ to userspace using new KVM_EXIT_IRQ return code. Timer IRQ has to
-be treated as edge-triggered in this case. This is the approach which my current implementation
-uses.
+> @@ -117,9 +305,26 @@ int vits_init(struct kvm *kvm)
+>  	struct vgic_dist *dist = &kvm->arch.vgic;
+>  	struct vgic_its *its = &dist->its;
+> 
+> +	dist->pendbaser = kmalloc(sizeof(u64) * dist->nr_cpus, GFP_KERNEL);
+> +	if (!dist->pendbaser)
+> +		return -ENOMEM;
+> +
+>  	spin_lock_init(&its->lock);
+> 
+>  	its->enabled = false;
+> 
+>  	return -ENXIO;
+>  }
+> +
 
- 2. Another possible approach, based on how device tree binding is handled by Linux. It is possible
-to remove virtual timer IRQ from the device tree, in this case the kernel reverts to using physical
-timer. When running under hypervisor, accesses to physical CP15 timer are trapped into HYP,
-therefore we can forward them to userspace using new exit code, something like KVM_EXIT_REG_ACCESS.
-In this case the timer would be also emulated by the userspace, which is slower, but allows better
-emulation. Also, this could be used in order to run some other guests which just expect physical
-timer to be there.
+ vits_init() allocates table for per-CPU pendbaser values. However, it is called from within
+vgicv3_map_resources(), which is in turn called upon first vCPU run. This is too late, because in
+case of live migration we would first want to set up all registers from within the userspace. But,
+when i start doing this, i crash in handle_mmio_pendbaser_redist(), because of dist->pendbaser being
+NULL.
+ The solution is to split the function up. I moved vgic_register_kvm_io_dev() (introduced by later
+patch) to vits_map_resources(), which is now called where vits_init() originally was. My new
+vits_init() (which is made reentrant by checking for dist->pendbaser != NULL) is now called from
+within two places:
+ a) vits_map_resources()
+ b) handle_mmio_pendbaser_redist()
 
- Both approaches have their own limitations, but anyway this is much better than nothing. What do
-you think, and which approach do you like more?
+ Therefore, all allocations happen either on first vCPU run, or on first PENDBASER access, whatever
+comes first. An alternative is to do allocations during KVM_DEV_ARM_VGIC_CTRL_INIT.
 
 Kind regards,
 Pavel Fedin
 Expert Engineer
 Samsung Electronics Research center Russia
-
-
