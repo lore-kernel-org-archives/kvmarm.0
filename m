@@ -1,45 +1,43 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [RFC] Handling CP15 timer without in-kernel irqchip
-Date: Fri, 02 Oct 2015 13:33:14 +0300
-Message-ID: <00d601d0fcfd$bf3d3790$3db7a6b0$@samsung.com>
-References: <00a001d0fce3$f76e2170$e64a6450$@samsung.com>
- <20151002112224.73e46be1@arm.com>
+Subject: RE: [PATCH v2 01/15] KVM: arm/arm64: VGIC: don't track used LRs in the
+ distributor
+Date: Fri, 02 Oct 2015 13:39:26 +0300
+Message-ID: <00d701d0fcfe$9cba1d40$d62e57c0$@samsung.com>
+References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com>
+ <1436538111-4294-2-git-send-email-andre.przywara@arm.com>
+ <00cb01d0fcf8$6a906000$3fb12000$@samsung.com> <560E5D2F.1000401@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <20151002112224.73e46be1@arm.com>
+In-reply-to: <560E5D2F.1000401@arm.com>
 Content-language: ru
 Sender: kvm-owner@vger.kernel.org
-To: 'Marc Zyngier' <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Christoffer Dall' <christoffer.dall@linaro.org>
+To: 'Andre Przywara' <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: 'Marc Zyngier' <Marc.Zyngier@arm.com>, christoffer.dall@linaro.org, eric.auger@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
  Hello!
 
-> - How do you find out that your guest is Linux?
+> For instance how did you come up with that 16384? LPIs could actually be
+> much bigger (in fact the emulation currently support up to 64k).
 
- Yes, i agree. No way. And it's not host kernel's job anyway.
+ Well, read "at least 16384". I actually don't remember the exact value you've put in.
 
-> - How do you ensure that the guest will not require the virtual timer?
+> >  Since the map itself is actually used only for piggy-back optimization, it is possible to
+> easily
+> > get rid of it using for_each_set_bit(lr, vgic_cpu->lr_used, vgic->nr_lr) iteration instead.
+> 
+> Can't you use the ELRSR bitmap instead? The idea of lr_used sounds like
+> a moot optimization to me.
 
- Agree again. Except device tree, no way. If the guest has its own hardcoded assumptions, it's
-doomed. (*)
-
-> - Who is going to maintain this new ABI that would exist for the sole
->   benefit of broken hardware?
-
- The ABI is simple, just one more exit code. And it's not only for broken hardware. It is quite
-legitimate thing to have GICv3 without v2 backwards compatibility.
-
-> - What is wrong with exposing another, memory mapped timer and remove
->   the architected timer entirely?
-
- Well... qemu guys don't want to remove CP15, i already proposed it, and it was very simple thing to
-do. :) But, again, this is also device-tree-based, the same concern applies as to (*).
+ I'll take a look. You seem to be right, lr_used became a direct (well, inverted) copy of elrsr
+after full elrsr synchronization was introduced long time ago. It's just current code relying on
+lr_used everywhere.
 
 Kind regards,
 Pavel Fedin
 Expert Engineer
 Samsung Electronics Research center Russia
+
 
