@@ -1,79 +1,45 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v2 01/15] KVM: arm/arm64: VGIC: don't track used LRs in
- the distributor
-Date: Fri, 2 Oct 2015 11:32:15 +0100
-Message-ID: <560E5D2F.1000401@arm.com>
-References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com>
- <1436538111-4294-2-git-send-email-andre.przywara@arm.com>
- <00cb01d0fcf8$6a906000$3fb12000$@samsung.com>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [RFC] Handling CP15 timer without in-kernel irqchip
+Date: Fri, 02 Oct 2015 13:33:14 +0300
+Message-ID: <00d601d0fcfd$bf3d3790$3db7a6b0$@samsung.com>
+References: <00a001d0fce3$f76e2170$e64a6450$@samsung.com>
+ <20151002112224.73e46be1@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4019E41294
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Oct 2015 06:29:36 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5j-jwe+t4AHu for <kvmarm@lists.cs.columbia.edu>;
- Fri,  2 Oct 2015 06:29:30 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EBFF641278
- for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Oct 2015 06:29:29 -0400 (EDT)
-In-Reply-To: <00cb01d0fcf8$6a906000$3fb12000$@samsung.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Pavel Fedin <p.fedin@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <20151002112224.73e46be1@arm.com>
+Content-language: ru
+Sender: kvm-owner@vger.kernel.org
+To: 'Marc Zyngier' <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Christoffer Dall' <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Pavel,
+ Hello!
 
-On 02/10/15 10:55, Pavel Fedin wrote:
->  Hello! One more concern.
-> 
->> Currently we track which IRQ has been mapped to which VGIC list
->> register and also have to synchronize both. We used to do this
->> to hold some extra state (for instance the active bit).
->> It turns out that this extra state in the LRs is no longer needed and
->> this extra tracking causes some pain later.
-> 
->  Returning to the beginning, can you explain, what kind of pain exactly does it bring?
->  For some reasons here i had to keep all this tracking mechanism, and modified your patchset. I see
-> no significant problems, except memory usage. I have to allocate vgic_irq_lr_map large enough to
-> hold indexes up to 16384, and indexes from dist->nr_irqs to 8192 appear to be not used.
+> - How do you find out that your guest is Linux?
 
-Yes, this was the main problem I was concerned about. Actually not so
-much about memory usage really, but more about the idea of pushing the
-concept of bitmaps beyond the point where it is a reasonable data
-structure to use.
-I briefly thought about extending the bitmaps, but that sounded like a
-hack to me.
-For instance how did you come up with that 16384? LPIs could actually be
-much bigger (in fact the emulation currently support up to 64k).
-In my opinion removing that tracking mechanism is actually a good idea.
-Most implementations actually have only _four_ list registers and since
-we keep them shadowed in our KVM data structure, iterating over all of
-them is not really painful.
+ Yes, i agree. No way. And it's not host kernel's job anyway.
 
->  Since the map itself is actually used only for piggy-back optimization, it is possible to easily
-> get rid of it using for_each_set_bit(lr, vgic_cpu->lr_used, vgic->nr_lr) iteration instead.
+> - How do you ensure that the guest will not require the virtual timer?
 
-Can't you use the ELRSR bitmap instead? The idea of lr_used sounds like
-a moot optimization to me.
+ Agree again. Except device tree, no way. If the guest has its own hardcoded assumptions, it's
+doomed. (*)
 
-Cheers,
-Andre.
+> - Who is going to maintain this new ABI that would exist for the sole
+>   benefit of broken hardware?
 
-> The rest
-> of mechanism will work as it is, there's no need to remove the state tracking bitmap and
-> optimization itself.
->  I am currently testing this approach and preparing my alternative patch for upstreaming.
+ The ABI is simple, just one more exit code. And it's not only for broken hardware. It is quite
+legitimate thing to have GICv3 without v2 backwards compatibility.
+
+> - What is wrong with exposing another, memory mapped timer and remove
+>   the architected timer entirely?
+
+ Well... qemu guys don't want to remove CP15, i already proposed it, and it was very simple thing to
+do. :) But, again, this is also device-tree-based, the same concern applies as to (*).
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
+
