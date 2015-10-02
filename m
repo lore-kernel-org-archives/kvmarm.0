@@ -1,49 +1,32 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [PATCHv2] arm: Fail on unknown subtest
-Date: Fri, 2 Oct 2015 11:21:34 +0200
-Message-ID: <20151002092134.GA3719@hawk.localdomain>
-References: <20150929154752.GA21067@hawk.localdomain>
- <1443728785-10461-1-git-send-email-cov@codeaurora.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC] Handling CP15 timer without in-kernel irqchip
+Date: Fri, 2 Oct 2015 11:30:44 +0200
+Message-ID: <560E4EC4.5050101@redhat.com>
+References: <00a001d0fce3$f76e2170$e64a6450$@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1443728785-10461-1-git-send-email-cov@codeaurora.org>
+In-Reply-To: <00a001d0fce3$f76e2170$e64a6450$@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christopher Covington <cov@codeaurora.org>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, pbonzini@redhat.com
+To: Pavel Fedin <p.fedin@samsung.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: marc.zyngier@arm.com, 'Christoffer Dall' <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 01, 2015 at 03:46:25PM -0400, Christopher Covington wrote:
-> Signed-off-by: Christopher Covington <cov@codeaurora.org>
-> ---
->  arm/selftest.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/arm/selftest.c b/arm/selftest.c
-> index fc9ec60..f4a5030 100644
-> --- a/arm/selftest.c
-> +++ b/arm/selftest.c
-> @@ -376,6 +376,9 @@ int main(int argc, char **argv)
->  		cpumask_set_cpu(0, &smp_reported);
->  		while (!cpumask_full(&smp_reported))
->  			cpu_relax();
-> +	} else {
-> +		printf("Unknown subtest\n");
-> +		abort();
->  	}
->  
->  	return report_summary();
-> -- 
-> Qualcomm Innovation Center, Inc.
-> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-> a Linux Foundation Collaborative Project
-> 
-> 
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-and applied to https://github.com/rhdrjones/kvm-unit-tests/tree/staging
+On 02/10/2015 09:28, Pavel Fedin wrote:
+>  2. Another possible approach, based on how device tree binding is handled by Linux. It is possible
+> to remove virtual timer IRQ from the device tree, in this case the kernel reverts to using physical
+> timer. When running under hypervisor, accesses to physical CP15 timer are trapped into HYP,
+> therefore we can forward them to userspace using new exit code, something like KVM_EXIT_REG_ACCESS.
+> In this case the timer would be also emulated by the userspace, which is slower, but allows better
+> emulation. Also, this could be used in order to run some other guests which just expect physical
+> timer to be there.
+> 
+>  Both approaches have their own limitations, but anyway this is much better than nothing. What do
+> you think, and which approach do you like more?
 
-Thanks,
-drew
+I like the latter.  But I guess one could even do both?
+
+Paolo
