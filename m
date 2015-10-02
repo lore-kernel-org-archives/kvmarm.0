@@ -1,46 +1,79 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [RFC] Handling CP15 timer without in-kernel irqchip
-Date: Fri, 2 Oct 2015 11:23:50 +0100
-Message-ID: <CAFEAcA9hn9WJYhbOMZX+qe9FVRgaTJPDfs-dbiYWxc0ej8OuLw@mail.gmail.com>
-References: <00a001d0fce3$f76e2170$e64a6450$@samsung.com> <560E4EC4.5050101@redhat.com>
- <CAFEAcA8WjD9zf8GW_ARdK-wZCA5Ttyd3_a7WikhdjhHsAqvRHA@mail.gmail.com>
- <560E56DC.6020406@redhat.com> <CAFEAcA9xuaE6DmpZGD1g9DXTSctiawwrV1iq1xXv+EO7qDR+xA@mail.gmail.com>
- <560E59FA.9070205@redhat.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v2 01/15] KVM: arm/arm64: VGIC: don't track used LRs in
+ the distributor
+Date: Fri, 2 Oct 2015 11:32:15 +0100
+Message-ID: <560E5D2F.1000401@arm.com>
+References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com>
+ <1436538111-4294-2-git-send-email-andre.przywara@arm.com>
+ <00cb01d0fcf8$6a906000$3fb12000$@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <560E59FA.9070205@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Pavel Fedin <p.fedin@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4019E41294
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Oct 2015 06:29:36 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 5j-jwe+t4AHu for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Oct 2015 06:29:30 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EBFF641278
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Oct 2015 06:29:29 -0400 (EDT)
+In-Reply-To: <00cb01d0fcf8$6a906000$3fb12000$@samsung.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Pavel Fedin <p.fedin@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 2 October 2015 at 11:18, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->
-> On 02/10/2015 12:16, Peter Maydell wrote:
->> On 2 October 2015 at 11:05, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>> On 02/10/2015 11:58, Peter Maydell wrote:
->>>> I definitely dislike the latter -- userspace ends up having to
->>>> emulate part of the CPU even though that CPU support is really
->>>> there in hardware. Also it requires us to edit the device tree,
->>>> which means it won't work at all on boards other than 'virt'
->>>> where we use the kernel's device tree rather than creating our
->>>> own. Better for the kernel to forward the timer
->>>> interrupts back out to userspace's irq controller.
->>>
->>> How do boards other than 'virt' work when emulated without KVM?  It must
->>> be possible to emulate the physical timer in QEMU.
->>
->> Without KVM is easy -- we emulate the physical timer as just
->> one of the parts of the emulated CPU. With KVM, we don't emulate
->> the CPU at all. We don't try to handle a "half TCG half KVM" setup.
->
-> I mean in the device tree.  Does the boot loader realize it's under a
-> hypervisor, and provide different device trees to the kernel?
+Hi Pavel,
 
-No. The device tree says "you have both physical and virtual
-timers", the guest kernel always prefers the virtual timer, and
-this works for both KVM and TCG.
+On 02/10/15 10:55, Pavel Fedin wrote:
+>  Hello! One more concern.
+> 
+>> Currently we track which IRQ has been mapped to which VGIC list
+>> register and also have to synchronize both. We used to do this
+>> to hold some extra state (for instance the active bit).
+>> It turns out that this extra state in the LRs is no longer needed and
+>> this extra tracking causes some pain later.
+> 
+>  Returning to the beginning, can you explain, what kind of pain exactly does it bring?
+>  For some reasons here i had to keep all this tracking mechanism, and modified your patchset. I see
+> no significant problems, except memory usage. I have to allocate vgic_irq_lr_map large enough to
+> hold indexes up to 16384, and indexes from dist->nr_irqs to 8192 appear to be not used.
 
--- PMM
+Yes, this was the main problem I was concerned about. Actually not so
+much about memory usage really, but more about the idea of pushing the
+concept of bitmaps beyond the point where it is a reasonable data
+structure to use.
+I briefly thought about extending the bitmaps, but that sounded like a
+hack to me.
+For instance how did you come up with that 16384? LPIs could actually be
+much bigger (in fact the emulation currently support up to 64k).
+In my opinion removing that tracking mechanism is actually a good idea.
+Most implementations actually have only _four_ list registers and since
+we keep them shadowed in our KVM data structure, iterating over all of
+them is not really painful.
+
+>  Since the map itself is actually used only for piggy-back optimization, it is possible to easily
+> get rid of it using for_each_set_bit(lr, vgic_cpu->lr_used, vgic->nr_lr) iteration instead.
+
+Can't you use the ELRSR bitmap instead? The idea of lr_used sounds like
+a moot optimization to me.
+
+Cheers,
+Andre.
+
+> The rest
+> of mechanism will work as it is, there's no need to remove the state tracking bitmap and
+> optimization itself.
+>  I am currently testing this approach and preparing my alternative patch for upstreaming.
