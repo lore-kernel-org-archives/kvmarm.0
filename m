@@ -1,41 +1,59 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v2 01/15] KVM: arm/arm64: VGIC: don't track used LRs in
- the distributor
-Date: Fri, 2 Oct 2015 13:49:17 +0100
-Message-ID: <560E7D4D.1090009@arm.com>
-References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com>
- <1436538111-4294-2-git-send-email-andre.przywara@arm.com>
- <00cb01d0fcf8$6a906000$3fb12000$@samsung.com> <560E5D2F.1000401@arm.com>
- <00f301d0fd0f$6b21ac10$41650430$@samsung.com>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: [PATCH 0/2] KVM: arm/arm64: Clean up some obsolete code
+Date: Fri, 02 Oct 2015 17:44:27 +0300
+Message-ID: <cover.1443796321.git.p.fedin@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <00f301d0fd0f$6b21ac10$41650430$@samsung.com>
-Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "eric.auger@linaro.org" <eric.auger@linaro.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6095B4169C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Oct 2015 10:42:55 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Ax6iHgkb6ufx for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Oct 2015 10:42:53 -0400 (EDT)
+Received: from mailout4.w1.samsung.com (mailout4.w1.samsung.com
+ [210.118.77.14])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 67B7540FF5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Oct 2015 10:42:53 -0400 (EDT)
+Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
+ by mailout4.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NVL00LCBKYA9550@mailout4.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Fri, 02 Oct 2015 15:44:34 +0100 (BST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Pavel,
+Current KVM code has lots of old redundancies, which can be cleaned up.
+This patchset is actually a better alternative to
+http://www.spinics.net/lists/arm-kernel/msg430726.html, which allows to
+keep piggy-backed LRs. The idea is based on the fact that our code also
+maintains LR state in elrsr, and this information is enough to track LR
+usage.
 
-On 02/10/15 13:39, Pavel Fedin wrote:
->  Hello!
-> 
->> Can't you use the ELRSR bitmap instead? The idea of lr_used sounds like
->> a moot optimization to me.
-> 
->  This perfectly works on 4.2, but will break HW interrupt forwarding on 4.3. If you look at 4.3
-> __kvm_vgic_sync_hwstate(), you'll notice that for HW interrupts lr_used and elrsr_ptr will diverge
-> at this point, and this function actually brings them into sync. And it relies on lr_used for the
-> loop to operate correctly (no idea why we use "for" loop here with extra check instead of
-> "for_each_set_bit(lr, vgic_cpu->lr_used, vgic->nr_lr)", looks stupid to me).
+This patchset is made against linux-next of 02.10.2015. Thanks to Andre
+for pointing out some 4.3 specifics.
 
-I know, because I have reworked my patch lately to work on top of 4.3-rc
-and Christoffer's timer rework series. I have something which "works
-now"(TM), but wanted to wait for Christoffer's respin to send out.
-I will send you this new version this as a sneak preview in private,
-maybe that helps.
+Pavel Fedin (2):
+  Optimize away redundant LR tracking
+  Merge vgic_set_lr() and vgic_sync_lr_elrsr()
 
-Cheers,
-Andre.
+ include/kvm/arm_vgic.h |   7 ----
+ virt/kvm/arm/vgic-v2.c |   5 ---
+ virt/kvm/arm/vgic-v3.c |   5 ---
+ virt/kvm/arm/vgic.c    | 104 +++++++++++++++----------------------------------
+ 4 files changed, 32 insertions(+), 89 deletions(-)
+
+-- 
+2.4.4
