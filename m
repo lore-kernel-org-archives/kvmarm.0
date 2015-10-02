@@ -1,134 +1,63 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] arm: Add PMU test
-Date: Fri, 2 Oct 2015 11:58:32 +0200
-Message-ID: <20151002095832.GC3719@hawk.localdomain>
-References: <1443728841-10501-1-git-send-email-cov@codeaurora.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [RFC] Handling CP15 timer without in-kernel irqchip
+Date: Fri, 2 Oct 2015 10:58:21 +0100
+Message-ID: <CAFEAcA8WjD9zf8GW_ARdK-wZCA5Ttyd3_a7WikhdjhHsAqvRHA@mail.gmail.com>
+References: <00a001d0fce3$f76e2170$e64a6450$@samsung.com>
+ <560E4EC4.5050101@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1443728841-10501-1-git-send-email-cov@codeaurora.org>
-Sender: kvm-owner@vger.kernel.org
-To: Christopher Covington <cov@codeaurora.org>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org, wei@redhat.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 633A64130B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Oct 2015 05:56:59 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id vSNrQMvgnDkf for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Oct 2015 05:56:58 -0400 (EDT)
+Received: from mail-vk0-f54.google.com (mail-vk0-f54.google.com
+ [209.85.213.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7FBBB41B69
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Oct 2015 05:56:58 -0400 (EDT)
+Received: by vkat63 with SMTP id t63so56631231vka.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 02 Oct 2015 02:58:41 -0700 (PDT)
+In-Reply-To: <560E4EC4.5050101@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 01, 2015 at 03:47:21PM -0400, Christopher Covington wrote:
-> Beginning with just a read of the control register, add plumbing
-> for testing the ARM Performance Monitors Unit (PMU).
-> 
-> Signed-off-by: Christopher Covington <cov@codeaurora.org>
-
-Hi Christopher,
-
-PMU tests are a great idea. I think Wei Huang has started working
-on them too. I've CC'ed him so you two can work out how to proceed
-without duplication of effort.
-
-For kvm-unit-tests patches please make sure the kvm-unit-tests flag
-is in the PATCH tag. You may want to run
-
-  git config format.subjectprefix "kvm-unit-tests PATCH"
-
-in your git repo.
-
-
-> ---
->  arm/pmu.c                    | 31 +++++++++++++++++++++++++++++++
->  arm/unittests.cfg            |  5 +++++
->  config/config-arm-common.mak |  4 +++-
->  3 files changed, 39 insertions(+), 1 deletion(-)
->  create mode 100644 arm/pmu.c
-> 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> new file mode 100644
-> index 0000000..b1e3c7a
-> --- /dev/null
-> +++ b/arm/pmu.c
-> @@ -0,0 +1,31 @@
-> +#include "libcflat.h"
-> +
-> +union pmcr_el0 {
-> +	struct {
-> +		unsigned int implementor:8;
-> +		unsigned int identification_code:8;
-> +		unsigned int num_counters:5;
-> +		unsigned int zeros:4;
-> +		unsigned int cycle_counter_long:1;
-> +		unsigned int cycle_counter_disable_when_prohibited:1;
-> +		unsigned int event_counter_export:1;
-> +		unsigned int cycle_counter_clock_divider:1;
-> +		unsigned int cycle_counter_reset:1;
-> +		unsigned int event_counter_reset:1;
-> +		unsigned int enable:1;
-> +	} split;
-
-I'd use an anonymous struct here. And, since I prefer to avoid needing
-to remember a data structure is a union, I'd also make the union anonymous
-and wrap it inside a struct, i.e.
-
-struct pmu_data {
-        union {
-                uint32_t pmcr_el0;
-                struct {
-			...
-		};
-	};
-};
-
-> +	uint32_t full;
-> +};
-> +
-> +int main()
-> +{
-> +	union pmcr_el0 pmcr;
-> +
-> +	asm volatile("mrs %0, pmcr_el0\n" : "=r" (pmcr));
-> +
-> +	printf("PMU implementor:     0x%x\n", pmcr.split.implementor);
-> +	printf("Identification code: 0x%x\n", pmcr.split.identification_code);
-> +	printf("Event counters:      %d\n", pmcr.split.num_counters);
-> +
-> +	return report_summary();
-> +}
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index e068a0c..d3deb6a 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -35,3 +35,8 @@ file = selftest.flat
->  smp = `getconf _NPROCESSORS_CONF`
->  extra_params = -append 'smp'
->  groups = selftest
-> +
-> +# Test PMU support
-> +[pmu]
-> +file = pmu.flat
-> +groups = pmu
-> diff --git a/config/config-arm-common.mak b/config/config-arm-common.mak
-> index 698555d..b34d04c 100644
-> --- a/config/config-arm-common.mak
-> +++ b/config/config-arm-common.mak
-> @@ -11,7 +11,8 @@ endif
->  
->  tests-common = \
->  	$(TEST_DIR)/selftest.flat \
-> -	$(TEST_DIR)/spinlock-test.flat
-> +	$(TEST_DIR)/spinlock-test.flat \
-> +	$(TEST_DIR)/pmu.flat
->  
->  all: test_cases
->  
-> @@ -70,3 +71,4 @@ test_cases: $(generated_files) $(tests-common) $(tests)
->  
->  $(TEST_DIR)/selftest.elf: $(cstart.o) $(TEST_DIR)/selftest.o
->  $(TEST_DIR)/spinlock-test.elf: $(cstart.o) $(TEST_DIR)/spinlock-test.o
-> +$(TEST_DIR)/pmu.elf: $(cstart.o) $(TEST_DIR)/pmu.o
-> -- 
-> Qualcomm Innovation Center, Inc.
-> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-> a Linux Foundation Collaborative Project
-> 
+On 2 October 2015 at 10:30, Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
+>
+> On 02/10/2015 09:28, Pavel Fedin wrote:
+>>  2. Another possible approach, based on how device tree binding is handled by Linux. It is possible
+>> to remove virtual timer IRQ from the device tree, in this case the kernel reverts to using physical
+>> timer. When running under hypervisor, accesses to physical CP15 timer are trapped into HYP,
+>> therefore we can forward them to userspace using new exit code, something like KVM_EXIT_REG_ACCESS.
+>> In this case the timer would be also emulated by the userspace, which is slower, but allows better
+>> emulation. Also, this could be used in order to run some other guests which just expect physical
+>> timer to be there.
+>>
+>>  Both approaches have their own limitations, but anyway this is much better than nothing. What do
+>> you think, and which approach do you like more?
+>
+> I like the latter.  But I guess one could even do both?
 
-Thanks,
-drew 
+I definitely dislike the latter -- userspace ends up having to
+emulate part of the CPU even though that CPU support is really
+there in hardware. Also it requires us to edit the device tree,
+which means it won't work at all on boards other than 'virt'
+where we use the kernel's device tree rather than creating our
+own. Better for the kernel to forward the timer
+interrupts back out to userspace's irq controller.
+
+-- PMM
