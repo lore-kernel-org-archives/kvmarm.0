@@ -1,158 +1,136 @@
 From: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [RFC PATCH 2/6] iommu: Add interface to get msi-pages mapping
- attributes
-Date: Fri, 02 Oct 2015 16:45:48 -0600
-Message-ID: <1443825948.26107.187.camel@redhat.com>
+Subject: Re: [RFC PATCH 3/6] vfio: Extend iommu-info to return MSIs automap
+ state
+Date: Fri, 02 Oct 2015 16:46:01 -0600
+Message-ID: <1443825961.26107.188.camel@redhat.com>
 References: <1443624989-24346-1-git-send-email-Bharat.Bhushan@freescale.com>
-	 <1443624989-24346-2-git-send-email-Bharat.Bhushan@freescale.com>
+ <1443624989-24346-3-git-send-email-Bharat.Bhushan@freescale.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1443624989-24346-2-git-send-email-Bharat.Bhushan@freescale.com>
-Sender: kvm-owner@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E425412A6
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Oct 2015 18:44:20 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 9Nauvuq7DohU for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  2 Oct 2015 18:44:19 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 96A2A4126B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  2 Oct 2015 18:44:19 -0400 (EDT)
+In-Reply-To: <1443624989-24346-3-git-send-email-Bharat.Bhushan@freescale.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Bharat Bhushan <Bharat.Bhushan@freescale.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, eric.auger@linaro.org, pranavkumar@linaro.org, marc.zyngier@arm.com, will.deacon@arm.com
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-[really ought to consider cc'ing the iommu list]
-
 On Wed, 2015-09-30 at 20:26 +0530, Bharat Bhushan wrote:
-> This APIs return the capability of automatically mapping msi-pages
-> in iommu with some magic iova. Which is what currently most of
-> iommu's does and is the default behaviour.
+> This patch allows the user-space to know whether msi-pages
+> are automatically mapped with some magic iova or not.
 > 
-> Further API returns whether iommu allows the user to define different
-> iova for mai-page mapping for the domain. This is required when a msi
-> capable device is directly assigned to user-space/VM and user-space/VM
-> need to define a non-overlapping (from other dma-able address space)
-> iova for msi-pages mapping in iommu.
+> Even if the msi-pages are automatically mapped, still user-space
+> wants to over-ride the automatic iova selection for msi-mapping.
+> For this user-space need to know whether it is allowed to change
+> the automatic mapping or not and this API provides this mechanism.
+> Follow up patches will provide how to over-ride this.
 > 
-> This patch just define the interface and follow up patches will
-> extend this interface.
-
-This is backwards, generally you want to add the infrastructure and only
-expose it once all the pieces are in place for it to work.  For
-instance, patch 1/6 exposes a new userspace interface for vfio that
-doesn't do anything yet.  How does the user know if it's there, *and*
-works?
-
 > Signed-off-by: Bharat Bhushan <Bharat.Bhushan@freescale.com>
 > ---
->  drivers/iommu/arm-smmu.c        |  3 +++
->  drivers/iommu/fsl_pamu_domain.c |  3 +++
->  drivers/iommu/iommu.c           | 14 ++++++++++++++
->  include/linux/iommu.h           |  9 ++++++++-
->  4 files changed, 28 insertions(+), 1 deletion(-)
+>  drivers/vfio/vfio_iommu_type1.c | 32 ++++++++++++++++++++++++++++++++
+>  include/uapi/linux/vfio.h       |  3 +++
+>  2 files changed, 35 insertions(+)
 > 
-> diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
-> index 66a803b..a3956fb 100644
-> --- a/drivers/iommu/arm-smmu.c
-> +++ b/drivers/iommu/arm-smmu.c
-> @@ -1406,6 +1406,9 @@ static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
->  	case DOMAIN_ATTR_NESTING:
->  		*(int *)data = (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED);
->  		return 0;
-> +	case DOMAIN_ATTR_MSI_MAPPING:
-> +		/* Dummy handling added */
-> +		return 0;
->  	default:
->  		return -ENODEV;
->  	}
-> diff --git a/drivers/iommu/fsl_pamu_domain.c b/drivers/iommu/fsl_pamu_domain.c
-> index 1d45293..9a94430 100644
-> --- a/drivers/iommu/fsl_pamu_domain.c
-> +++ b/drivers/iommu/fsl_pamu_domain.c
-> @@ -856,6 +856,9 @@ static int fsl_pamu_get_domain_attr(struct iommu_domain *domain,
->  	case DOMAIN_ATTR_FSL_PAMUV1:
->  		*(int *)data = DOMAIN_ATTR_FSL_PAMUV1;
->  		break;
-> +	case DOMAIN_ATTR_MSI_MAPPING:
-> +		/* Dummy handling added */
-> +		break;
->  	default:
->  		pr_debug("Unsupported attribute type\n");
->  		ret = -EINVAL;
-> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> index d4f527e..16c2eab 100644
-> --- a/drivers/iommu/iommu.c
-> +++ b/drivers/iommu/iommu.c
-> @@ -1216,6 +1216,7 @@ int iommu_domain_get_attr(struct iommu_domain *domain,
->  	bool *paging;
->  	int ret = 0;
->  	u32 *count;
-> +	struct iommu_domain_msi_maps *msi_maps;
->  
->  	switch (attr) {
->  	case DOMAIN_ATTR_GEOMETRY:
-> @@ -1236,6 +1237,19 @@ int iommu_domain_get_attr(struct iommu_domain *domain,
->  			ret = -ENODEV;
->  
->  		break;
-> +	case DOMAIN_ATTR_MSI_MAPPING:
-> +		msi_maps = data;
-> +
-> +		/* Default MSI-pages are magically mapped with some iova and
-> +		 * do now allow to configure with different iova.
-> +		 */
-> +		msi_maps->automap = true;
-> +		msi_maps->override_automap = false;
-
-There's no magic.  I think what you're trying to express is the
-difference between platforms that support MSI within the IOMMU IOVA
-space and thus need explicit IOMMU mappings vs platforms where MSI
-mappings either bypass the IOMMU entirely or are setup implicitly with
-interrupt remapping support.
-
-Why does it make sense to impose any sort of defaults?  If the IOMMU
-driver doesn't tell us what to do, I don't think we want to assume
-anything.
-
-> +
-> +		if (domain->ops->domain_get_attr)
-> +			ret = domain->ops->domain_get_attr(domain, attr, data);
-> +
-> +		break;
->  	default:
->  		if (!domain->ops->domain_get_attr)
->  			return -EINVAL;
-> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-> index 0546b87..6d49f3f 100644
-> --- a/include/linux/iommu.h
-> +++ b/include/linux/iommu.h
-> @@ -83,6 +83,13 @@ struct iommu_domain {
->  	struct iommu_domain_geometry geometry;
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index fa5d3e4..3315fb6 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -59,6 +59,7 @@ struct vfio_iommu {
+>  	struct rb_root		dma_list;
+>  	bool			v2;
+>  	bool			nesting;
+> +	bool			allow_msi_reconfig;
+>  	struct list_head	reserved_iova_list;
 >  };
 >  
-> +struct iommu_domain_msi_maps {
-> +	dma_addr_t base_address;
-> +	dma_addr_t size;
-
-size_t?
-
-> +	bool automap;
-> +	bool override_automap;
-> +};
+> @@ -1117,6 +1118,23 @@ static int vfio_domains_have_iommu_cache(struct vfio_iommu *iommu)
+>  	return ret;
+>  }
+>  
+> +static
+> +int vfio_domains_get_msi_maps(struct vfio_iommu *iommu,
+> +			      struct iommu_domain_msi_maps *msi_maps)
+> +{
+> +	struct vfio_domain *d;
+> +	int ret;
 > +
->  enum iommu_cap {
->  	IOMMU_CAP_CACHE_COHERENCY,	/* IOMMU can enforce cache coherent DMA
->  					   transactions */
-> @@ -111,6 +118,7 @@ enum iommu_attr {
->  	DOMAIN_ATTR_FSL_PAMU_ENABLE,
->  	DOMAIN_ATTR_FSL_PAMUV1,
->  	DOMAIN_ATTR_NESTING,	/* two stages of translation */
-> +	DOMAIN_ATTR_MSI_MAPPING, /* Provides MSIs mapping in iommu */
->  	DOMAIN_ATTR_MAX,
+> +	mutex_lock(&iommu->lock);
+> +	/* All domains have same msi-automap property, pick first */
+> +	d = list_first_entry(&iommu->domain_list, struct vfio_domain, next);
+> +	ret = iommu_domain_get_attr(d->domain, DOMAIN_ATTR_MSI_MAPPING,
+> +				    msi_maps);
+> +	mutex_unlock(&iommu->lock);
+> +
+> +	return ret;
+> +}
+> +
+>  static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  				   unsigned int cmd, unsigned long arg)
+>  {
+> @@ -1138,6 +1156,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  		}
+>  	} else if (cmd == VFIO_IOMMU_GET_INFO) {
+>  		struct vfio_iommu_type1_info info;
+> +		struct iommu_domain_msi_maps msi_maps;
+> +		int ret;
+>  
+>  		minsz = offsetofend(struct vfio_iommu_type1_info, iova_pgsizes);
+>  
+> @@ -1149,6 +1169,18 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  
+>  		info.flags = 0;
+>  
+> +		ret = vfio_domains_get_msi_maps(iommu, &msi_maps);
+> +		if (ret)
+> +			return ret;
+
+And now ioctl(VFIO_IOMMU_GET_INFO) no longer works for any IOMMU
+implementing domain_get_attr but not supporting DOMAIN_ATTR_MSI_MAPPING.
+
+> +
+> +		if (msi_maps.override_automap) {
+> +			info.flags |= VFIO_IOMMU_INFO_MSI_ALLOW_RECONFIG;
+> +			iommu->allow_msi_reconfig = true;
+> +		}
+> +
+> +		if (msi_maps.automap)
+> +			info.flags |= VFIO_IOMMU_INFO_MSI_AUTOMAP;
+> +
+>  		info.iova_pgsizes = vfio_pgsize_bitmap(iommu);
+>  
+>  		return copy_to_user((void __user *)arg, &info, minsz);
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 1abd1a9..9998f6e 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -391,6 +391,9 @@ struct vfio_iommu_type1_info {
+>  	__u32	argsz;
+>  	__u32	flags;
+>  #define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info */
+> +#define VFIO_IOMMU_INFO_MSI_AUTOMAP (1 << 1)	/* MSI pages are auto-mapped
+> +						   in iommu */
+> +#define VFIO_IOMMU_INFO_MSI_ALLOW_RECONFIG (1 << 2) /* Allows reconfig automap*/
+>  	__u64	iova_pgsizes;		/* Bitmap of supported page sizes */
 >  };
 >  
-> @@ -167,7 +175,6 @@ struct iommu_ops {
->  	int (*domain_set_windows)(struct iommu_domain *domain, u32 w_count);
->  	/* Get the numer of window per domain */
->  	u32 (*domain_get_windows)(struct iommu_domain *domain);
-> -
->  #ifdef CONFIG_OF_IOMMU
->  	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
->  #endif
 
-
-
+Once again, exposing interfaces to the user before they actually do
+anything is backwards.
