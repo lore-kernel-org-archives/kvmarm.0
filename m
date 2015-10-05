@@ -1,211 +1,142 @@
 From: Bhushan Bharat <Bharat.Bhushan@freescale.com>
 Subject: RE: [RFC PATCH 2/6] iommu: Add interface to get msi-pages mapping
  attributes
-Date: Mon, 5 Oct 2015 05:17:26 +0000
-Message-ID: <CY1PR0301MB1276314EF1DDB2CFBAEDCD6C90480@CY1PR0301MB1276.namprd03.prod.outlook.com>
+Date: Mon, 5 Oct 2015 05:56:57 +0000
+Message-ID: <CY1PR0301MB12760A0696F40CA26BAB67F390480@CY1PR0301MB1276.namprd03.prod.outlook.com>
 References: <1443624989-24346-1-git-send-email-Bharat.Bhushan@freescale.com>
- <1443624989-24346-2-git-send-email-Bharat.Bhushan@freescale.com>
+	 <1443624989-24346-2-git-send-email-Bharat.Bhushan@freescale.com>
  <1443825948.26107.187.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F0AB41172
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 01:15:40 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vXISbWi2Iham for <kvmarm@lists.cs.columbia.edu>;
- Mon,  5 Oct 2015 01:15:38 -0400 (EDT)
-Received: from na01-bn1-obe.outbound.protection.outlook.com
- (mail-bn1bon0110.outbound.protection.outlook.com [157.56.111.110])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9931E410D7
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 01:15:38 -0400 (EDT)
-In-Reply-To: <1443825948.26107.187.camel@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Language: en-US
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "eric.auger@linaro.org" <eric.auger@linaro.org>, "pranavkumar@linaro.org" <pranavkumar@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-> -----Original Message-----
-> From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> Sent: Saturday, October 03, 2015 4:16 AM
-> To: Bhushan Bharat-R65777 <Bharat.Bhushan@freescale.com>
-> Cc: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org;
-> christoffer.dall@linaro.org; eric.auger@linaro.org; pranavkumar@linaro.org;
-> marc.zyngier@arm.com; will.deacon@arm.com
-> Subject: Re: [RFC PATCH 2/6] iommu: Add interface to get msi-pages
-> mapping attributes
-> 
-> [really ought to consider cc'ing the iommu list]
-> 
-> On Wed, 2015-09-30 at 20:26 +0530, Bharat Bhushan wrote:
-> > This APIs return the capability of automatically mapping msi-pages in
-> > iommu with some magic iova. Which is what currently most of iommu's
-> > does and is the default behaviour.
-> >
-> > Further API returns whether iommu allows the user to define different
-> > iova for mai-page mapping for the domain. This is required when a msi
-> > capable device is directly assigned to user-space/VM and user-space/VM
-> > need to define a non-overlapping (from other dma-able address space)
-> > iova for msi-pages mapping in iommu.
-> >
-> > This patch just define the interface and follow up patches will extend
-> > this interface.
-> 
-> This is backwards, generally you want to add the infrastructure and only
-> expose it once all the pieces are in place for it to work.  For instance, patch
-> 1/6 exposes a new userspace interface for vfio that doesn't do anything yet.
-> How does the user know if it's there, *and* works?
-
-Ok, I will reorder the patches.
-
-> 
-> > Signed-off-by: Bharat Bhushan <Bharat.Bhushan@freescale.com>
-> > ---
-> >  drivers/iommu/arm-smmu.c        |  3 +++
-> >  drivers/iommu/fsl_pamu_domain.c |  3 +++
-> >  drivers/iommu/iommu.c           | 14 ++++++++++++++
-> >  include/linux/iommu.h           |  9 ++++++++-
-> >  4 files changed, 28 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
-> index
-> > 66a803b..a3956fb 100644
-> > --- a/drivers/iommu/arm-smmu.c
-> > +++ b/drivers/iommu/arm-smmu.c
-> > @@ -1406,6 +1406,9 @@ static int arm_smmu_domain_get_attr(struct
-> iommu_domain *domain,
-> >  	case DOMAIN_ATTR_NESTING:
-> >  		*(int *)data = (smmu_domain->stage ==
-> ARM_SMMU_DOMAIN_NESTED);
-> >  		return 0;
-> > +	case DOMAIN_ATTR_MSI_MAPPING:
-> > +		/* Dummy handling added */
-> > +		return 0;
-> >  	default:
-> >  		return -ENODEV;
-> >  	}
-> > diff --git a/drivers/iommu/fsl_pamu_domain.c
-> > b/drivers/iommu/fsl_pamu_domain.c index 1d45293..9a94430 100644
-> > --- a/drivers/iommu/fsl_pamu_domain.c
-> > +++ b/drivers/iommu/fsl_pamu_domain.c
-> > @@ -856,6 +856,9 @@ static int fsl_pamu_get_domain_attr(struct
-> iommu_domain *domain,
-> >  	case DOMAIN_ATTR_FSL_PAMUV1:
-> >  		*(int *)data = DOMAIN_ATTR_FSL_PAMUV1;
-> >  		break;
-> > +	case DOMAIN_ATTR_MSI_MAPPING:
-> > +		/* Dummy handling added */
-> > +		break;
-> >  	default:
-> >  		pr_debug("Unsupported attribute type\n");
-> >  		ret = -EINVAL;
-> > diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c index
-> > d4f527e..16c2eab 100644
-> > --- a/drivers/iommu/iommu.c
-> > +++ b/drivers/iommu/iommu.c
-> > @@ -1216,6 +1216,7 @@ int iommu_domain_get_attr(struct
-> iommu_domain *domain,
-> >  	bool *paging;
-> >  	int ret = 0;
-> >  	u32 *count;
-> > +	struct iommu_domain_msi_maps *msi_maps;
-> >
-> >  	switch (attr) {
-> >  	case DOMAIN_ATTR_GEOMETRY:
-> > @@ -1236,6 +1237,19 @@ int iommu_domain_get_attr(struct
-> iommu_domain *domain,
-> >  			ret = -ENODEV;
-> >
-> >  		break;
-> > +	case DOMAIN_ATTR_MSI_MAPPING:
-> > +		msi_maps = data;
-> > +
-> > +		/* Default MSI-pages are magically mapped with some iova
-> and
-> > +		 * do now allow to configure with different iova.
-> > +		 */
-> > +		msi_maps->automap = true;
-> > +		msi_maps->override_automap = false;
-> 
-> There's no magic.  I think what you're trying to express is the difference
-> between platforms that support MSI within the IOMMU IOVA space and
-> thus need explicit IOMMU mappings vs platforms where MSI mappings
-> either bypass the IOMMU entirely or are setup implicitly with interrupt
-> remapping support.
-
-Yes, I wants to differentiate the platforms which requires explicit iommu mapping for MSI with other platforms.
-I will change the comment and use better name (need_mapping/need_iommu_mapping/require_mapping).
-
-> 
-> Why does it make sense to impose any sort of defaults?  If the IOMMU
-> driver doesn't tell us what to do, I don't think we want to assume anything.
-> 
-> > +
-> > +		if (domain->ops->domain_get_attr)
-> > +			ret = domain->ops->domain_get_attr(domain, attr,
-> data);
-> > +
-> > +		break;
-> >  	default:
-> >  		if (!domain->ops->domain_get_attr)
-> >  			return -EINVAL;
-> > diff --git a/include/linux/iommu.h b/include/linux/iommu.h index
-> > 0546b87..6d49f3f 100644
-> > --- a/include/linux/iommu.h
-> > +++ b/include/linux/iommu.h
-> > @@ -83,6 +83,13 @@ struct iommu_domain {
-> >  	struct iommu_domain_geometry geometry;  };
-> >
-> > +struct iommu_domain_msi_maps {
-> > +	dma_addr_t base_address;
-> > +	dma_addr_t size;
-> 
-> size_t?
-
-Will remove above two fields as they are redundant.
-
-Thanks
--Bharat
-
-> 
-> > +	bool automap;
-> > +	bool override_automap;
-> > +};
-> > +
-> >  enum iommu_cap {
-> >  	IOMMU_CAP_CACHE_COHERENCY,	/* IOMMU can enforce cache
-> coherent DMA
-> >  					   transactions */
-> > @@ -111,6 +118,7 @@ enum iommu_attr {
-> >  	DOMAIN_ATTR_FSL_PAMU_ENABLE,
-> >  	DOMAIN_ATTR_FSL_PAMUV1,
-> >  	DOMAIN_ATTR_NESTING,	/* two stages of translation */
-> > +	DOMAIN_ATTR_MSI_MAPPING, /* Provides MSIs mapping in iommu
-> */
-> >  	DOMAIN_ATTR_MAX,
-> >  };
-> >
-> > @@ -167,7 +175,6 @@ struct iommu_ops {
-> >  	int (*domain_set_windows)(struct iommu_domain *domain, u32
-> w_count);
-> >  	/* Get the numer of window per domain */
-> >  	u32 (*domain_get_windows)(struct iommu_domain *domain);
-> > -
-> >  #ifdef CONFIG_OF_IOMMU
-> >  	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
-> > #endif
-> 
-> 
+Rm9yZ290IHRvIHJlc3BvbmQgdG8gb25lIG9mIHRoZSBjb21tZW50IC4uDQoNCj4gLS0tLS1Pcmln
+aW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQmh1c2hhbiBCaGFyYXQtUjY1Nzc3DQo+IFNlbnQ6
+IE1vbmRheSwgT2N0b2JlciAwNSwgMjAxNSAxMDo0NyBBTQ0KPiBUbzogJ0FsZXggV2lsbGlhbXNv
+bicgPGFsZXgud2lsbGlhbXNvbkByZWRoYXQuY29tPg0KPiBDYzoga3ZtYXJtQGxpc3RzLmNzLmNv
+bHVtYmlhLmVkdTsga3ZtQHZnZXIua2VybmVsLm9yZzsNCj4gY2hyaXN0b2ZmZXIuZGFsbEBsaW5h
+cm8ub3JnOyBlcmljLmF1Z2VyQGxpbmFyby5vcmc7IHByYW5hdmt1bWFyQGxpbmFyby5vcmc7DQo+
+IG1hcmMuenluZ2llckBhcm0uY29tOyB3aWxsLmRlYWNvbkBhcm0uY29tDQo+IFN1YmplY3Q6IFJF
+OiBbUkZDIFBBVENIIDIvNl0gaW9tbXU6IEFkZCBpbnRlcmZhY2UgdG8gZ2V0IG1zaS1wYWdlcw0K
+PiBtYXBwaW5nIGF0dHJpYnV0ZXMNCj4gDQo+IA0KPiANCj4gPiAtLS0tLU9yaWdpbmFsIE1lc3Nh
+Z2UtLS0tLQ0KPiA+IEZyb206IEFsZXggV2lsbGlhbXNvbiBbbWFpbHRvOmFsZXgud2lsbGlhbXNv
+bkByZWRoYXQuY29tXQ0KPiA+IFNlbnQ6IFNhdHVyZGF5LCBPY3RvYmVyIDAzLCAyMDE1IDQ6MTYg
+QU0NCj4gPiBUbzogQmh1c2hhbiBCaGFyYXQtUjY1Nzc3IDxCaGFyYXQuQmh1c2hhbkBmcmVlc2Nh
+bGUuY29tPg0KPiA+IENjOiBrdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1OyBrdm1Admdlci5r
+ZXJuZWwub3JnOw0KPiA+IGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9yZzsgZXJpYy5hdWdlckBs
+aW5hcm8ub3JnOw0KPiA+IHByYW5hdmt1bWFyQGxpbmFyby5vcmc7IG1hcmMuenluZ2llckBhcm0u
+Y29tOyB3aWxsLmRlYWNvbkBhcm0uY29tDQo+ID4gU3ViamVjdDogUmU6IFtSRkMgUEFUQ0ggMi82
+XSBpb21tdTogQWRkIGludGVyZmFjZSB0byBnZXQgbXNpLXBhZ2VzDQo+ID4gbWFwcGluZyBhdHRy
+aWJ1dGVzDQo+ID4NCj4gPiBbcmVhbGx5IG91Z2h0IHRvIGNvbnNpZGVyIGNjJ2luZyB0aGUgaW9t
+bXUgbGlzdF0NCj4gPg0KPiA+IE9uIFdlZCwgMjAxNS0wOS0zMCBhdCAyMDoyNiArMDUzMCwgQmhh
+cmF0IEJodXNoYW4gd3JvdGU6DQo+ID4gPiBUaGlzIEFQSXMgcmV0dXJuIHRoZSBjYXBhYmlsaXR5
+IG9mIGF1dG9tYXRpY2FsbHkgbWFwcGluZyBtc2ktcGFnZXMNCj4gPiA+IGluIGlvbW11IHdpdGgg
+c29tZSBtYWdpYyBpb3ZhLiBXaGljaCBpcyB3aGF0IGN1cnJlbnRseSBtb3N0IG9mDQo+ID4gPiBp
+b21tdSdzIGRvZXMgYW5kIGlzIHRoZSBkZWZhdWx0IGJlaGF2aW91ci4NCj4gPiA+DQo+ID4gPiBG
+dXJ0aGVyIEFQSSByZXR1cm5zIHdoZXRoZXIgaW9tbXUgYWxsb3dzIHRoZSB1c2VyIHRvIGRlZmlu
+ZQ0KPiA+ID4gZGlmZmVyZW50IGlvdmEgZm9yIG1haS1wYWdlIG1hcHBpbmcgZm9yIHRoZSBkb21h
+aW4uIFRoaXMgaXMgcmVxdWlyZWQNCj4gPiA+IHdoZW4gYSBtc2kgY2FwYWJsZSBkZXZpY2UgaXMg
+ZGlyZWN0bHkgYXNzaWduZWQgdG8gdXNlci1zcGFjZS9WTSBhbmQNCj4gPiA+IHVzZXItc3BhY2Uv
+Vk0gbmVlZCB0byBkZWZpbmUgYSBub24tb3ZlcmxhcHBpbmcgKGZyb20gb3RoZXIgZG1hLWFibGUN
+Cj4gPiA+IGFkZHJlc3Mgc3BhY2UpIGlvdmEgZm9yIG1zaS1wYWdlcyBtYXBwaW5nIGluIGlvbW11
+Lg0KPiA+ID4NCj4gPiA+IFRoaXMgcGF0Y2gganVzdCBkZWZpbmUgdGhlIGludGVyZmFjZSBhbmQg
+Zm9sbG93IHVwIHBhdGNoZXMgd2lsbA0KPiA+ID4gZXh0ZW5kIHRoaXMgaW50ZXJmYWNlLg0KPiA+
+DQo+ID4gVGhpcyBpcyBiYWNrd2FyZHMsIGdlbmVyYWxseSB5b3Ugd2FudCB0byBhZGQgdGhlIGlu
+ZnJhc3RydWN0dXJlIGFuZA0KPiA+IG9ubHkgZXhwb3NlIGl0IG9uY2UgYWxsIHRoZSBwaWVjZXMg
+YXJlIGluIHBsYWNlIGZvciBpdCB0byB3b3JrLiAgRm9yDQo+ID4gaW5zdGFuY2UsIHBhdGNoDQo+
+ID4gMS82IGV4cG9zZXMgYSBuZXcgdXNlcnNwYWNlIGludGVyZmFjZSBmb3IgdmZpbyB0aGF0IGRv
+ZXNuJ3QgZG8gYW55dGhpbmcNCj4geWV0Lg0KPiA+IEhvdyBkb2VzIHRoZSB1c2VyIGtub3cgaWYg
+aXQncyB0aGVyZSwgKmFuZCogd29ya3M/DQo+IA0KPiBPaywgSSB3aWxsIHJlb3JkZXIgdGhlIHBh
+dGNoZXMuDQo+IA0KPiA+DQo+ID4gPiBTaWduZWQtb2ZmLWJ5OiBCaGFyYXQgQmh1c2hhbiA8Qmhh
+cmF0LkJodXNoYW5AZnJlZXNjYWxlLmNvbT4NCj4gPiA+IC0tLQ0KPiA+ID4gIGRyaXZlcnMvaW9t
+bXUvYXJtLXNtbXUuYyAgICAgICAgfCAgMyArKysNCj4gPiA+ICBkcml2ZXJzL2lvbW11L2ZzbF9w
+YW11X2RvbWFpbi5jIHwgIDMgKysrDQo+ID4gPiAgZHJpdmVycy9pb21tdS9pb21tdS5jICAgICAg
+ICAgICB8IDE0ICsrKysrKysrKysrKysrDQo+ID4gPiAgaW5jbHVkZS9saW51eC9pb21tdS5oICAg
+ICAgICAgICB8ICA5ICsrKysrKysrLQ0KPiA+ID4gIDQgZmlsZXMgY2hhbmdlZCwgMjggaW5zZXJ0
+aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPiA+ID4NCj4gPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJz
+L2lvbW11L2FybS1zbW11LmMgYi9kcml2ZXJzL2lvbW11L2FybS1zbW11LmMNCj4gPiBpbmRleA0K
+PiA+ID4gNjZhODAzYi4uYTM5NTZmYiAxMDA2NDQNCj4gPiA+IC0tLSBhL2RyaXZlcnMvaW9tbXUv
+YXJtLXNtbXUuYw0KPiA+ID4gKysrIGIvZHJpdmVycy9pb21tdS9hcm0tc21tdS5jDQo+ID4gPiBA
+QCAtMTQwNiw2ICsxNDA2LDkgQEAgc3RhdGljIGludCBhcm1fc21tdV9kb21haW5fZ2V0X2F0dHIo
+c3RydWN0DQo+ID4gaW9tbXVfZG9tYWluICpkb21haW4sDQo+ID4gPiAgCWNhc2UgRE9NQUlOX0FU
+VFJfTkVTVElORzoNCj4gPiA+ICAJCSooaW50ICopZGF0YSA9IChzbW11X2RvbWFpbi0+c3RhZ2Ug
+PT0NCj4gPiBBUk1fU01NVV9ET01BSU5fTkVTVEVEKTsNCj4gPiA+ICAJCXJldHVybiAwOw0KPiA+
+ID4gKwljYXNlIERPTUFJTl9BVFRSX01TSV9NQVBQSU5HOg0KPiA+ID4gKwkJLyogRHVtbXkgaGFu
+ZGxpbmcgYWRkZWQgKi8NCj4gPiA+ICsJCXJldHVybiAwOw0KPiA+ID4gIAlkZWZhdWx0Og0KPiA+
+ID4gIAkJcmV0dXJuIC1FTk9ERVY7DQo+ID4gPiAgCX0NCj4gPiA+IGRpZmYgLS1naXQgYS9kcml2
+ZXJzL2lvbW11L2ZzbF9wYW11X2RvbWFpbi5jDQo+ID4gPiBiL2RyaXZlcnMvaW9tbXUvZnNsX3Bh
+bXVfZG9tYWluLmMgaW5kZXggMWQ0NTI5My4uOWE5NDQzMCAxMDA2NDQNCj4gPiA+IC0tLSBhL2Ry
+aXZlcnMvaW9tbXUvZnNsX3BhbXVfZG9tYWluLmMNCj4gPiA+ICsrKyBiL2RyaXZlcnMvaW9tbXUv
+ZnNsX3BhbXVfZG9tYWluLmMNCj4gPiA+IEBAIC04NTYsNiArODU2LDkgQEAgc3RhdGljIGludCBm
+c2xfcGFtdV9nZXRfZG9tYWluX2F0dHIoc3RydWN0DQo+ID4gaW9tbXVfZG9tYWluICpkb21haW4s
+DQo+ID4gPiAgCWNhc2UgRE9NQUlOX0FUVFJfRlNMX1BBTVVWMToNCj4gPiA+ICAJCSooaW50ICop
+ZGF0YSA9IERPTUFJTl9BVFRSX0ZTTF9QQU1VVjE7DQo+ID4gPiAgCQlicmVhazsNCj4gPiA+ICsJ
+Y2FzZSBET01BSU5fQVRUUl9NU0lfTUFQUElORzoNCj4gPiA+ICsJCS8qIER1bW15IGhhbmRsaW5n
+IGFkZGVkICovDQo+ID4gPiArCQlicmVhazsNCj4gPiA+ICAJZGVmYXVsdDoNCj4gPiA+ICAJCXBy
+X2RlYnVnKCJVbnN1cHBvcnRlZCBhdHRyaWJ1dGUgdHlwZVxuIik7DQo+ID4gPiAgCQlyZXQgPSAt
+RUlOVkFMOw0KPiA+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvaW9tbXUvaW9tbXUuYyBiL2RyaXZl
+cnMvaW9tbXUvaW9tbXUuYyBpbmRleA0KPiA+ID4gZDRmNTI3ZS4uMTZjMmVhYiAxMDA2NDQNCj4g
+PiA+IC0tLSBhL2RyaXZlcnMvaW9tbXUvaW9tbXUuYw0KPiA+ID4gKysrIGIvZHJpdmVycy9pb21t
+dS9pb21tdS5jDQo+ID4gPiBAQCAtMTIxNiw2ICsxMjE2LDcgQEAgaW50IGlvbW11X2RvbWFpbl9n
+ZXRfYXR0cihzdHJ1Y3QNCj4gPiBpb21tdV9kb21haW4gKmRvbWFpbiwNCj4gPiA+ICAJYm9vbCAq
+cGFnaW5nOw0KPiA+ID4gIAlpbnQgcmV0ID0gMDsNCj4gPiA+ICAJdTMyICpjb3VudDsNCj4gPiA+
+ICsJc3RydWN0IGlvbW11X2RvbWFpbl9tc2lfbWFwcyAqbXNpX21hcHM7DQo+ID4gPg0KPiA+ID4g
+IAlzd2l0Y2ggKGF0dHIpIHsNCj4gPiA+ICAJY2FzZSBET01BSU5fQVRUUl9HRU9NRVRSWToNCj4g
+PiA+IEBAIC0xMjM2LDYgKzEyMzcsMTkgQEAgaW50IGlvbW11X2RvbWFpbl9nZXRfYXR0cihzdHJ1
+Y3QNCj4gPiBpb21tdV9kb21haW4gKmRvbWFpbiwNCj4gPiA+ICAJCQlyZXQgPSAtRU5PREVWOw0K
+PiA+ID4NCj4gPiA+ICAJCWJyZWFrOw0KPiA+ID4gKwljYXNlIERPTUFJTl9BVFRSX01TSV9NQVBQ
+SU5HOg0KPiA+ID4gKwkJbXNpX21hcHMgPSBkYXRhOw0KPiA+ID4gKw0KPiA+ID4gKwkJLyogRGVm
+YXVsdCBNU0ktcGFnZXMgYXJlIG1hZ2ljYWxseSBtYXBwZWQgd2l0aCBzb21lIGlvdmENCj4gPiBh
+bmQNCj4gPiA+ICsJCSAqIGRvIG5vdyBhbGxvdyB0byBjb25maWd1cmUgd2l0aCBkaWZmZXJlbnQg
+aW92YS4NCj4gPiA+ICsJCSAqLw0KPiA+ID4gKwkJbXNpX21hcHMtPmF1dG9tYXAgPSB0cnVlOw0K
+PiA+ID4gKwkJbXNpX21hcHMtPm92ZXJyaWRlX2F1dG9tYXAgPSBmYWxzZTsNCj4gPg0KPiA+IFRo
+ZXJlJ3Mgbm8gbWFnaWMuICBJIHRoaW5rIHdoYXQgeW91J3JlIHRyeWluZyB0byBleHByZXNzIGlz
+IHRoZQ0KPiA+IGRpZmZlcmVuY2UgYmV0d2VlbiBwbGF0Zm9ybXMgdGhhdCBzdXBwb3J0IE1TSSB3
+aXRoaW4gdGhlIElPTU1VIElPVkENCj4gPiBzcGFjZSBhbmQgdGh1cyBuZWVkIGV4cGxpY2l0IElP
+TU1VIG1hcHBpbmdzIHZzIHBsYXRmb3JtcyB3aGVyZSBNU0kNCj4gPiBtYXBwaW5ncyBlaXRoZXIg
+YnlwYXNzIHRoZSBJT01NVSBlbnRpcmVseSBvciBhcmUgc2V0dXAgaW1wbGljaXRseSB3aXRoDQo+
+ID4gaW50ZXJydXB0IHJlbWFwcGluZyBzdXBwb3J0Lg0KPiANCj4gWWVzLCBJIHdhbnRzIHRvIGRp
+ZmZlcmVudGlhdGUgdGhlIHBsYXRmb3JtcyB3aGljaCByZXF1aXJlcyBleHBsaWNpdCBpb21tdQ0K
+PiBtYXBwaW5nIGZvciBNU0kgd2l0aCBvdGhlciBwbGF0Zm9ybXMuDQo+IEkgd2lsbCBjaGFuZ2Ug
+dGhlIGNvbW1lbnQgYW5kIHVzZSBiZXR0ZXIgbmFtZQ0KPiAobmVlZF9tYXBwaW5nL25lZWRfaW9t
+bXVfbWFwcGluZy9yZXF1aXJlX21hcHBpbmcpLg0KPiANCj4gPg0KPiA+IFdoeSBkb2VzIGl0IG1h
+a2Ugc2Vuc2UgdG8gaW1wb3NlIGFueSBzb3J0IG9mIGRlZmF1bHRzPyAgSWYgdGhlIElPTU1VDQo+
+ID4gZHJpdmVyIGRvZXNuJ3QgdGVsbCB1cyB3aGF0IHRvIGRvLCBJIGRvbid0IHRoaW5rIHdlIHdh
+bnQgdG8gYXNzdW1lIGFueXRoaW5nLg0KDQpBZ3JlZSwgaW4gdGhpcyBwYXRjaCBzZXJpZXMgSSBy
+ZXN0cmljdGVkIHRoZSBjaGFuZ2UgdG8gc21tdSBvbmx5LiBJIHdpbGwgdHJ5IGV4dGVuZGluZyB0
+aGlzIHRvIG90aGVyIGlvbW11J3MgYXMgd2VsbC4NCg0KVGhhbmtzDQotQmhhcmF0DQoNCj4gPg0K
+PiA+ID4gKw0KPiA+ID4gKwkJaWYgKGRvbWFpbi0+b3BzLT5kb21haW5fZ2V0X2F0dHIpDQo+ID4g
+PiArCQkJcmV0ID0gZG9tYWluLT5vcHMtPmRvbWFpbl9nZXRfYXR0cihkb21haW4sIGF0dHIsDQo+
+ID4gZGF0YSk7DQo+ID4gPiArDQo+ID4gPiArCQlicmVhazsNCj4gPiA+ICAJZGVmYXVsdDoNCj4g
+PiA+ICAJCWlmICghZG9tYWluLT5vcHMtPmRvbWFpbl9nZXRfYXR0cikNCj4gPiA+ICAJCQlyZXR1
+cm4gLUVJTlZBTDsNCj4gPiA+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2xpbnV4L2lvbW11LmggYi9p
+bmNsdWRlL2xpbnV4L2lvbW11LmggaW5kZXgNCj4gPiA+IDA1NDZiODcuLjZkNDlmM2YgMTAwNjQ0
+DQo+ID4gPiAtLS0gYS9pbmNsdWRlL2xpbnV4L2lvbW11LmgNCj4gPiA+ICsrKyBiL2luY2x1ZGUv
+bGludXgvaW9tbXUuaA0KPiA+ID4gQEAgLTgzLDYgKzgzLDEzIEBAIHN0cnVjdCBpb21tdV9kb21h
+aW4gew0KPiA+ID4gIAlzdHJ1Y3QgaW9tbXVfZG9tYWluX2dlb21ldHJ5IGdlb21ldHJ5OyAgfTsN
+Cj4gPiA+DQo+ID4gPiArc3RydWN0IGlvbW11X2RvbWFpbl9tc2lfbWFwcyB7DQo+ID4gPiArCWRt
+YV9hZGRyX3QgYmFzZV9hZGRyZXNzOw0KPiA+ID4gKwlkbWFfYWRkcl90IHNpemU7DQo+ID4NCj4g
+PiBzaXplX3Q/DQo+IA0KPiBXaWxsIHJlbW92ZSBhYm92ZSB0d28gZmllbGRzIGFzIHRoZXkgYXJl
+IHJlZHVuZGFudC4NCj4gDQo+IFRoYW5rcw0KPiAtQmhhcmF0DQo+IA0KPiA+DQo+ID4gPiArCWJv
+b2wgYXV0b21hcDsNCj4gPiA+ICsJYm9vbCBvdmVycmlkZV9hdXRvbWFwOw0KPiA+ID4gK307DQo+
+ID4gPiArDQo+ID4gPiAgZW51bSBpb21tdV9jYXAgew0KPiA+ID4gIAlJT01NVV9DQVBfQ0FDSEVf
+Q09IRVJFTkNZLAkvKiBJT01NVSBjYW4gZW5mb3JjZSBjYWNoZQ0KPiA+IGNvaGVyZW50IERNQQ0K
+PiA+ID4gIAkJCQkJICAgdHJhbnNhY3Rpb25zICovDQo+ID4gPiBAQCAtMTExLDYgKzExOCw3IEBA
+IGVudW0gaW9tbXVfYXR0ciB7DQo+ID4gPiAgCURPTUFJTl9BVFRSX0ZTTF9QQU1VX0VOQUJMRSwN
+Cj4gPiA+ICAJRE9NQUlOX0FUVFJfRlNMX1BBTVVWMSwNCj4gPiA+ICAJRE9NQUlOX0FUVFJfTkVT
+VElORywJLyogdHdvIHN0YWdlcyBvZiB0cmFuc2xhdGlvbiAqLw0KPiA+ID4gKwlET01BSU5fQVRU
+Ul9NU0lfTUFQUElORywgLyogUHJvdmlkZXMgTVNJcyBtYXBwaW5nIGluIGlvbW11DQo+ID4gKi8N
+Cj4gPiA+ICAJRE9NQUlOX0FUVFJfTUFYLA0KPiA+ID4gIH07DQo+ID4gPg0KPiA+ID4gQEAgLTE2
+Nyw3ICsxNzUsNiBAQCBzdHJ1Y3QgaW9tbXVfb3BzIHsNCj4gPiA+ICAJaW50ICgqZG9tYWluX3Nl
+dF93aW5kb3dzKShzdHJ1Y3QgaW9tbXVfZG9tYWluICpkb21haW4sIHUzMg0KPiA+IHdfY291bnQp
+Ow0KPiA+ID4gIAkvKiBHZXQgdGhlIG51bWVyIG9mIHdpbmRvdyBwZXIgZG9tYWluICovDQo+ID4g
+PiAgCXUzMiAoKmRvbWFpbl9nZXRfd2luZG93cykoc3RydWN0IGlvbW11X2RvbWFpbiAqZG9tYWlu
+KTsNCj4gPiA+IC0NCj4gPiA+ICAjaWZkZWYgQ09ORklHX09GX0lPTU1VDQo+ID4gPiAgCWludCAo
+Km9mX3hsYXRlKShzdHJ1Y3QgZGV2aWNlICpkZXYsIHN0cnVjdCBvZl9waGFuZGxlX2FyZ3MgKmFy
+Z3MpOw0KPiA+ID4gI2VuZGlmDQo+ID4NCj4gPg0KDQo=
