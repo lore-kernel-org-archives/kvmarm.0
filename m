@@ -1,50 +1,64 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 09/15] arm64: Add page size to the kernel image header
-Date: Mon, 5 Oct 2015 17:43:30 +0200
-Message-ID: <20151005154330.GI9011@cbox>
-References: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
- <1442331684-28818-10-git-send-email-suzuki.poulose@arm.com>
- <20151002154900.GN6963@e104818-lin.cambridge.arm.com>
- <20151002163131.GO6963@e104818-lin.cambridge.arm.com>
- <560EB5DE.7080007@arm.com>
+Subject: Re: [RFT - PATCH v2 0/2] KVM/arm64: add fp/simd lazy switch support
+Date: Mon, 5 Oct 2015 17:45:40 +0200
+Message-ID: <20151005154540.GJ9011@cbox>
+References: <1442964843-11953-1-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 95DF1412D6
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 11:43:40 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id UkyuAnX+z7T9 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  5 Oct 2015 11:43:39 -0400 (EDT)
+Received: from mail-la0-f54.google.com (mail-la0-f54.google.com
+ [209.85.215.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6A43F412AF
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 11:43:39 -0400 (EDT)
+Received: by laddr2 with SMTP id dr2so10481518lad.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 05 Oct 2015 08:45:29 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <560EB5DE.7080007@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, "Suzuki K. Poulose" <suzuki.poulose@arm.com>, kvm@vger.kernel.org, ard.biesheuvel@linaro.org, Will.Deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <1442964843-11953-1-git-send-email-m.smarduch@samsung.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Mario Smarduch <m.smarduch@samsung.com>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 02, 2015 at 05:50:38PM +0100, Marc Zyngier wrote:
-> On 02/10/15 17:31, Catalin Marinas wrote:
-> > On Fri, Oct 02, 2015 at 04:49:01PM +0100, Catalin Marinas wrote:
-> >> On Tue, Sep 15, 2015 at 04:41:18PM +0100, Suzuki K. Poulose wrote:
-> >>> From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> >>>
-> >>> This patch adds the page size to the arm64 kernel image header
-> >>> so that one can infer the PAGESIZE used by the kernel. This will
-> >>> be helpful to diagnose failures to boot the kernel with page size
-> >>> not supported by the CPU.
-> >>>
-> >>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> >>
-> >> This patch needs you signed-off-by as well since you are posting it. And
-> >> IIRC I acked it as well, I'll check.
-> >>
-> >> If you are fine with adding your signed-of-by, I can add it to the patch
-> >> when applying (unless I see other issues with the series).
-> > 
-> > Actually, I just realised that the kvm patches don't have any acks, so
-> > I'm not taking this series yet. You may want to repost once you have all
-> > the acks in place.
-> > 
+On Tue, Sep 22, 2015 at 04:34:01PM -0700, Mario Smarduch wrote:
+> This is a 2nd itteration for arm64, v1 patches were posted by mistake from an 
+> older branch which included several bugs. Hopefully didn't waste too much of 
+> anyones time.
 > 
-> I'm in the middle of it. I should be done next week (I may have said the
-> same thing two weeks ago...).
+> This patch series is a followup to the armv7 fp/simd lazy switch
+> implementation, uses similar approach and depends on the series - see
+> https://lists.cs.columbia.edu/pipermail/kvmarm/2015-September/016516.html
 > 
-Very near the top of my to-review list as well, will try to get it done
-this week.
+> It's based on earlier arm64 fp/simd optimization work - see
+> https://lists.cs.columbia.edu/pipermail/kvmarm/2015-July/015748.html
+> 
+> And subsequent fixes by Marc and Christoffer at KVM Forum hackathon to handle
+> 32-bit guest on 64 bit host (and may require more here) - see
+> https://lists.cs.columbia.edu/pipermail/kvmarm/2015-August/016128.html
+> 
+> This series has be tested with arm64 on arm64 with several FP applications 
+> running on host and guest, with substantial decrease on number of 
+> fp/simd context switches. From about 30% down to 2% with one guest running.
+> 
+> At this time I don't have arm32/arm64 working and hoping Christoffer and/or
+> Marc (or anyone) can test 32-bit guest/64-bit host.
+> 
+Did you already have some test infrastructure/applications that I can
+reuse for this purpose or do I have to write userspace software?
 
 -Christoffer
