@@ -1,32 +1,30 @@
-From: Baptiste Reynal <b.reynal@virtualopensystems.com>
+From: Peter Maydell <peter.maydell@linaro.org>
 Subject: Re: [RFC PATCH v5 0/3] vfio: platform: return device properties for a
  platform device
-Date: Mon, 5 Oct 2015 12:04:00 +0200
-Message-ID: <CAN9JPjH7m28Y8U+xuN91MOro_2qfRz53uOmQ2kCUpfp-eoM4dg@mail.gmail.com>
+Date: Mon, 5 Oct 2015 11:07:35 +0100
+Message-ID: <CAFEAcA_ZGaS__7LPFR_JJEs0=KpDNjYQB_ib2pNDLLp2S0zSMA@mail.gmail.com>
 References: <1443604077-3155-1-git-send-email-b.reynal@virtualopensystems.com>
- <1443814099.26107.124.camel@redhat.com>
- <20151002202844.GD32011@cbox>
+ <1443814099.26107.124.camel@redhat.com> <20151002202844.GD32011@cbox>
  <CAFEAcA84seKfSh94XFJZxBeBzRd=twj2QaFvjMeDKYhrWQu7Nw@mail.gmail.com>
- <CAN9JPjF+gYJaxm1kO5c4Swps4TDKrHxJ3v-NP2D_YzEghkn1DA@mail.gmail.com>
- <20151005095325.GG9011@cbox>
+ <20151005093739.GF9011@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D221041291
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 06:02:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CB38A41291
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 06:06:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MjVA16h4R9e7 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  5 Oct 2015 06:02:10 -0400 (EDT)
-Received: from mail-qg0-f41.google.com (mail-qg0-f41.google.com
- [209.85.192.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 024EC4117C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 06:02:09 -0400 (EDT)
-Received: by qgx61 with SMTP id 61so144960597qgx.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 05 Oct 2015 03:04:01 -0700 (PDT)
-In-Reply-To: <20151005095325.GG9011@cbox>
+ with ESMTP id 4id-q3PcpH9j for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  5 Oct 2015 06:06:04 -0400 (EDT)
+Received: from mail-vk0-f53.google.com (mail-vk0-f53.google.com
+ [209.85.213.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 096764117C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 06:06:03 -0400 (EDT)
+Received: by vkgd64 with SMTP id d64so93336176vkg.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 05 Oct 2015 03:07:54 -0700 (PDT)
+In-Reply-To: <20151005093739.GF9011@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,55 +35,55 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>, "tech@virtualopensystems.com" <tech@virtualopensystems.com>, Linux IOMMU <iommu@lists.linux-foundation.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Cc: Alex Williamson <alex.williamson@redhat.com>, "tech@virtualopensystems.com" <tech@virtualopensystems.com>, iommu@lists.linux-foundation.org, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 5, 2015 at 11:53 AM, Christoffer Dall
+On 5 October 2015 at 10:37, Christoffer Dall
 <christoffer.dall@linaro.org> wrote:
-> [why are you top-posting?]
+> On Fri, Oct 02, 2015 at 11:53:07PM +0100, Peter Maydell wrote:
+>>  * I don't really want to build in a lot of infrastructure into
+>>    QEMU to either build the DTC compiler into it or else introduce
+>>    a runtime dependency on the dtc binary
 >
-> On Mon, Oct 05, 2015 at 11:42:38AM +0200, Baptiste Reynal wrote:
->> In this patch series we want to wrap an already available kernel
->> interface to expose a device property to userspace,
->
-> which 'already available kernel interface' is that exactly?
+> what level of complexity are we really talking about here?  Doesn't QEMU
+> already link against libfdt and doesn't it support exactly what we're
+> trying to do here?
 
-We use the unified device property interface.
+We link against libfdt, but libfdt is for manipulating and creating
+dt binary blobs. As I understand it what sysfs exposes to userspace
+is not a dt binary blob (or fragment thereof) but a bit of dt source.
+libfdt doesn't do parsing of source into blobs; that is done by the
+dtc compiler, which QEMU doesn't currently build and which is set
+up to build only a separate command line binary anyway, not to be
+a utility library for compiling dt sources.
 
->
->> in order to keep
->> the code lighter on the userspace. We need those properties in VFIO as
->
-> I'm not sure I agree with your 'need those properties in VFIO' statement
-> here, can you elaborate?
->
+Do correct me if I'm wrong about the sysfs interface -- if it is
+just exposing dt blobs that would be easier to deal with.
 
-For device assignment, we need to transfer those properties to the
-guest in order to fully exploit the device (and not simply transfer
-generic properties for a given device).
+> I also don't think this is the job of VFIO, assuming there is some
+> better place to do this.  I initially thought exposing device properties
+> in some canonical format from sysfs independently from whether the
+> system was booted with ACPI or DT was the right thing to do, but the
+> counter argument to this was essentially that the guest kernel needs the
+> same description as the host kernel and therefore we really have to find
+> a way to pass the HW description bits on to the guest.
 
-The example I have in mind is the PL330 which can have optionnal
-properties, as described in
-Documentation/devicetree/bindings/dma/arm-pl330.txt
+So we end up with even more code to pass through ACPI table
+fragments as well :-(
 
->> VFIO grants the possibility to develop userspace drivers.
+>> (except "don't do device passthrough for platform devices, insist
+>> on a real bus like PCI"...)
 >>
->> The sysfs doesn't seems to be ready for this kind of usage. We can
->> only find raw data that require heavy parsing. Here we retrieve
->> directly usable data and it can be extended later according to new
->> needs (as it is already done with ACPI).
->
-> Why couldn't you expose this kind of data through sysfs instead of VFIO
-> and independently of VFIO?  Would that be more wrong/difficult/whatever?
->
+> While I appreciate the simplicity of this solution from our
+> (maintainers') point of view, I still see the latter point as relatively
+> moot.  We have hardware with 10G platform ethernet devices that people
+> want to do device assignment on already, and I think we should try to
+> find a reasonable set of boundaries for setups that we can support
+> upstream instead of this becoming a black hole of derivative code bases
+> to do this sort of thing.
 
-This has been bound to VFIO as we needed it for VFIO, but I don't see
-any reasons not to expose it somewhere else if it may be reused.
+Yeah, speaking more seriously I agree we do need to do something
+here. It's just all irritatingly awkward...
 
->>
->> This interface has been developed for VFIO and is currently bound to
->> it, though there is no special dependencies with it. We could make it
->> more generic, but I can only think of VFIO to use it.
->
-> Thanks,
-> -Christoffer
+thanks
+-- PMM
