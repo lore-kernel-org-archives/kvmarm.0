@@ -1,114 +1,117 @@
 From: Bhushan Bharat <Bharat.Bhushan@freescale.com>
-Subject: RE: [RFC PATCH 5/6] vfio-pci: Create iommu mapping for msi interrupt
-Date: Mon, 5 Oct 2015 07:20:49 +0000
-Message-ID: <CY1PR0301MB1276F1B231284369F36D486490480@CY1PR0301MB1276.namprd03.prod.outlook.com>
+Subject: RE: [RFC PATCH 6/6] arm-smmu: Allow to set iommu mapping for MSI
+Date: Mon, 5 Oct 2015 08:33:05 +0000
+Message-ID: <CY1PR0301MB127637C2EA08365A249864C090480@CY1PR0301MB1276.namprd03.prod.outlook.com>
 References: <1443624989-24346-1-git-send-email-Bharat.Bhushan@freescale.com>
-	 <1443624989-24346-5-git-send-email-Bharat.Bhushan@freescale.com>
- <1443825993.26107.190.camel@redhat.com>
+ <1443624989-24346-6-git-send-email-Bharat.Bhushan@freescale.com>
+ <1443826005.26107.191.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1443825993.26107.190.camel@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2759C4117E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 04:31:18 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id M29R0NKA3Nd0 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  5 Oct 2015 04:31:16 -0400 (EDT)
+Received: from na01-bl2-obe.outbound.protection.outlook.com
+ (mail-bl2on0104.outbound.protection.outlook.com [65.55.169.104])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8EB6F4117C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 04:31:16 -0400 (EDT)
+In-Reply-To: <1443826005.26107.191.camel@redhat.com>
 Content-Language: en-US
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "eric.auger@linaro.org" <eric.auger@linaro.org>, "pranavkumar@linaro.org" <pranavkumar@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQWxleCBXaWxsaWFtc29u
-IFttYWlsdG86YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFNhdHVyZGF5LCBP
-Y3RvYmVyIDAzLCAyMDE1IDQ6MTcgQU0NCj4gVG86IEJodXNoYW4gQmhhcmF0LVI2NTc3NyA8Qmhh
-cmF0LkJodXNoYW5AZnJlZXNjYWxlLmNvbT4NCj4gQ2M6IGt2bWFybUBsaXN0cy5jcy5jb2x1bWJp
-YS5lZHU7IGt2bUB2Z2VyLmtlcm5lbC5vcmc7DQo+IGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9y
-ZzsgZXJpYy5hdWdlckBsaW5hcm8ub3JnOyBwcmFuYXZrdW1hckBsaW5hcm8ub3JnOw0KPiBtYXJj
-Lnp5bmdpZXJAYXJtLmNvbTsgd2lsbC5kZWFjb25AYXJtLmNvbQ0KPiBTdWJqZWN0OiBSZTogW1JG
-QyBQQVRDSCA1LzZdIHZmaW8tcGNpOiBDcmVhdGUgaW9tbXUgbWFwcGluZyBmb3IgbXNpDQo+IGlu
-dGVycnVwdA0KPiANCj4gT24gV2VkLCAyMDE1LTA5LTMwIGF0IDIwOjI2ICswNTMwLCBCaGFyYXQg
-Qmh1c2hhbiB3cm90ZToNCj4gPiBBbiBNU0ktYWRkcmVzcyBpcyBhbGxvY2F0ZWQgYW5kIHByb2dy
-YW1tZWQgaW4gcGNpZSBkZXZpY2UgZHVyaW5nDQo+ID4gaW50ZXJydXB0IGNvbmZpZ3VyYXRpb24u
-IE5vdyBmb3IgYSBwYXNzLXRocm91Z2ggZGV2aWNlLCB0cnkgdG8gY3JlYXRlDQo+ID4gdGhlIGlv
-bW11IG1hcHBpbmcgZm9yIHRoaXMgYWxsb2N0ZWQvcHJvZ3JhbW1lZCBtc2ktYWRkcmVzcy4gIElm
-IHRoZQ0KPiA+IGlvbW11IG1hcHBpbmcgaXMgY3JlYXRlZCBhbmQgdGhlIG1zaSBhZGRyZXNzIHBy
-b2dyYW1tZWQgaW4gdGhlIHBjaWUNCj4gPiBkZXZpY2UgaXMgZGlmZmVyZW50IGZyb20gbXNpLWlv
-dmEgYXMgcGVyIGlvbW11IHByb2dyYW1taW5nIHRoZW4NCj4gPiByZWNvbmZpZ3VyZSB0aGUgcGNp
-IGRldmljZSB0byB1c2UgbXNpLWlvdmEgYXMgbXNpIGFkZHJlc3MuDQo+ID4NCj4gPiBTaWduZWQt
-b2ZmLWJ5OiBCaGFyYXQgQmh1c2hhbiA8QmhhcmF0LkJodXNoYW5AZnJlZXNjYWxlLmNvbT4NCj4g
-PiAtLS0NCj4gPiAgZHJpdmVycy92ZmlvL3BjaS92ZmlvX3BjaV9pbnRycy5jIHwgMzYNCj4gPiAr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0NCj4gPiAgMSBmaWxlIGNoYW5nZWQs
-IDM0IGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEv
-ZHJpdmVycy92ZmlvL3BjaS92ZmlvX3BjaV9pbnRycy5jDQo+ID4gYi9kcml2ZXJzL3ZmaW8vcGNp
-L3ZmaW9fcGNpX2ludHJzLmMNCj4gPiBpbmRleCAxZjU3N2I0Li5jOTY5MGFmIDEwMDY0NA0KPiA+
-IC0tLSBhL2RyaXZlcnMvdmZpby9wY2kvdmZpb19wY2lfaW50cnMuYw0KPiA+ICsrKyBiL2RyaXZl
-cnMvdmZpby9wY2kvdmZpb19wY2lfaW50cnMuYw0KPiA+IEBAIC0zMTIsMTMgKzMxMiwyMyBAQCBz
-dGF0aWMgaW50IHZmaW9fbXNpX3NldF92ZWN0b3Jfc2lnbmFsKHN0cnVjdA0KPiB2ZmlvX3BjaV9k
-ZXZpY2UgKnZkZXYsDQo+ID4gIAlpbnQgaXJxID0gbXNpeCA/IHZkZXYtPm1zaXhbdmVjdG9yXS52
-ZWN0b3IgOiBwZGV2LT5pcnEgKyB2ZWN0b3I7DQo+ID4gIAljaGFyICpuYW1lID0gbXNpeCA/ICJ2
-ZmlvLW1zaXgiIDogInZmaW8tbXNpIjsNCj4gPiAgCXN0cnVjdCBldmVudGZkX2N0eCAqdHJpZ2dl
-cjsNCj4gPiArCXN0cnVjdCBtc2lfbXNnIG1zZzsNCj4gPiArCXN0cnVjdCB2ZmlvX2RldmljZSAq
-ZGV2aWNlOw0KPiA+ICsJdWludDY0X3QgbXNpX2FkZHIsIG1zaV9pb3ZhOw0KPiA+ICAJaW50IHJl
-dDsNCj4gPg0KPiA+ICAJaWYgKHZlY3RvciA+PSB2ZGV2LT5udW1fY3R4KQ0KPiA+ICAJCXJldHVy
-biAtRUlOVkFMOw0KPiA+DQo+ID4gKwlkZXZpY2UgPSB2ZmlvX2RldmljZV9nZXRfZnJvbV9kZXYo
-JnBkZXYtPmRldik7DQo+IA0KPiBIYXZlIHlvdSBsb29rZWQgYXQgdGhpcyBmdW5jdGlvbj8gIEkg
-ZG9uJ3QgdGhpbmsgd2Ugd2FudCB0byBiZSBkb2luZyB0aGF0DQo+IGV2ZXJ5IHRpbWUgd2Ugd2Fu
-dCB0byBwb2tlIHRoZSBpbnRlcnJ1cHQgY29uZmlndXJhdGlvbi4NCg0KSSBhbSB0cnlpbmcgdG8g
-ZGVzY3JpYmUgd2hhdCBJIHVuZGVyc3Rvb2QsIGEgZGV2aWNlIGNhbiBoYXZlIG1hbnkgaW50ZXJy
-dXB0cyBhbmQgd2Ugc2hvdWxkIHNldHVwIGlvbW11IG9ubHkgb25jZSwgd2hlbiBjYWxsZWQgZm9y
-IHRoZSBmaXJzdCB0aW1lIHRvIGVuYWJsZS9zZXR1cCBpbnRlcnJ1cHQuDQpTaW1pbGFybHkgd2hl
-biBkaXNhYmxpbmcgdGhlIGludGVycnVwdCB3ZSBzaG91bGQgaW9tbXUtdW5tYXAgd2hlbiBjYWxs
-ZWQgZm9yIHRoZSBsYXN0IGVuYWJsZWQgaW50ZXJydXB0IGZvciB0aGF0IGRldmljZS4gTm93IHdp
-dGggdGhpcyB1bmRlcnN0YW5kaW5nLCBzaG91bGQgSSBtb3ZlIHRoaXMgbWFwLXVubWFwIHRvIHNl
-cGFyYXRlIGZ1bmN0aW9ucyBhbmQgY2FsbCB0aGVtIGZyb20gdmZpb19tc2lfc2V0X2Jsb2NrKCkg
-cmF0aGVyIHRoYW4gaW4gdmZpb19tc2lfc2V0X3ZlY3Rvcl9zaWduYWwoKQ0KDQo+ICBBbHNvIG5v
-dGUgdGhhdA0KPiBJT01NVSBtYXBwaW5ncyBkb24ndCBvcGVyYXRlIG9uIGRldmljZXMsIGJ1dCBn
-cm91cHMsIHNvIG1heWJlIHdlIHdhbnQNCj4gdG8gcGFzcyB0aGUgZ3JvdXAuDQoNClllcywgaXQg
-b3BlcmF0ZXMgb24gZ3JvdXAuIEkgaGVzaXRhdGVkIHRvIGFkZCBhbiBBUEkgdG8gZ2V0IGdyb3Vw
-LiBEbyB5b3Ugc3VnZ2VzdCB0byB0aGF0IGl0IGlzIG9rIHRvIGFkZCBBUEkgdG8gZ2V0IGdyb3Vw
-IGZyb20gZGV2aWNlLg0KDQo+IA0KPiA+ICsJaWYgKGRldmljZSA9PSBOVUxMKQ0KPiA+ICsJCXJl
-dHVybiAtRUlOVkFMOw0KPiANCj4gVGhpcyB3b3VsZCBiZSBhIGxlZ2l0aW1hdGUgQlVHX09OKCFk
-ZXZpY2UpDQo+IA0KPiA+ICsNCj4gPiAgCWlmICh2ZGV2LT5jdHhbdmVjdG9yXS50cmlnZ2VyKSB7
-DQo+ID4gIAkJZnJlZV9pcnEoaXJxLCB2ZGV2LT5jdHhbdmVjdG9yXS50cmlnZ2VyKTsNCj4gPiAr
-CQlnZXRfY2FjaGVkX21zaV9tc2coaXJxLCAmbXNnKTsNCj4gPiArCQltc2lfaW92YSA9ICgodTY0
-KW1zZy5hZGRyZXNzX2hpIDw8IDMyKSB8IG1zZy5hZGRyZXNzX2xvOw0KPiA+ICsJCXZmaW9fZGV2
-aWNlX3VubWFwX21zaShkZXZpY2UsIG1zaV9pb3ZhLCBQQUdFX1NJWkUpOw0KPiA+ICAJCWtmcmVl
-KHZkZXYtPmN0eFt2ZWN0b3JdLm5hbWUpOw0KPiA+ICAJCWV2ZW50ZmRfY3R4X3B1dCh2ZGV2LT5j
-dHhbdmVjdG9yXS50cmlnZ2VyKTsNCj4gPiAgCQl2ZGV2LT5jdHhbdmVjdG9yXS50cmlnZ2VyID0g
-TlVMTDsNCj4gPiBAQCAtMzQ2LDEyICszNTYsMTEgQEAgc3RhdGljIGludCB2ZmlvX21zaV9zZXRf
-dmVjdG9yX3NpZ25hbChzdHJ1Y3QNCj4gdmZpb19wY2lfZGV2aWNlICp2ZGV2LA0KPiA+ICAJICog
-Y2FjaGVkIHZhbHVlIG9mIHRoZSBtZXNzYWdlIHByaW9yIHRvIGVuYWJsaW5nLg0KPiA+ICAJICov
-DQo+ID4gIAlpZiAobXNpeCkgew0KPiA+IC0JCXN0cnVjdCBtc2lfbXNnIG1zZzsNCj4gPiAtDQo+
-ID4gIAkJZ2V0X2NhY2hlZF9tc2lfbXNnKGlycSwgJm1zZyk7DQo+ID4gIAkJcGNpX3dyaXRlX21z
-aV9tc2coaXJxLCAmbXNnKTsNCj4gPiAgCX0NCj4gPg0KPiA+ICsNCj4gDQo+IGdyYXR1aXRvdXMg
-bmV3bGluZQ0KPiANCj4gPiAgCXJldCA9IHJlcXVlc3RfaXJxKGlycSwgdmZpb19tc2loYW5kbGVy
-LCAwLA0KPiA+ICAJCQkgIHZkZXYtPmN0eFt2ZWN0b3JdLm5hbWUsIHRyaWdnZXIpOw0KPiA+ICAJ
-aWYgKHJldCkgew0KPiA+IEBAIC0zNjAsNiArMzY5LDI5IEBAIHN0YXRpYyBpbnQgdmZpb19tc2lf
-c2V0X3ZlY3Rvcl9zaWduYWwoc3RydWN0DQo+IHZmaW9fcGNpX2RldmljZSAqdmRldiwNCj4gPiAg
-CQlyZXR1cm4gcmV0Ow0KPiA+ICAJfQ0KPiA+DQo+ID4gKwkvKiBSZS1wcm9ncmFtIHRoZSBuZXct
-aW92YSBpbiBwY2ktZGV2aWNlIGluIGNhc2UgdGhlcmUgaXMNCj4gPiArCSAqIGRpZmZlcmVudCBp
-b21tdS1tYXBwaW5nIGNyZWF0ZWQgZm9yIHByb2dyYW1tZWQgbXNpLWFkZHJlc3MuDQo+ID4gKwkg
-Ki8NCj4gPiArCWdldF9jYWNoZWRfbXNpX21zZyhpcnEsICZtc2cpOw0KPiA+ICsJbXNpX2lvdmEg
-PSAwOw0KPiA+ICsJbXNpX2FkZHIgPSAodTY0KShtc2cuYWRkcmVzc19oaSkgPDwgMzIgfCAodTY0
-KShtc2cuYWRkcmVzc19sbyk7DQo+ID4gKwlyZXQgPSB2ZmlvX2RldmljZV9tYXBfbXNpKGRldmlj
-ZSwgbXNpX2FkZHIsIFBBR0VfU0laRSwNCj4gJm1zaV9pb3ZhKTsNCj4gPiArCWlmIChyZXQpIHsN
-Cj4gPiArCQlmcmVlX2lycShpcnEsIHZkZXYtPmN0eFt2ZWN0b3JdLnRyaWdnZXIpOw0KPiA+ICsJ
-CWtmcmVlKHZkZXYtPmN0eFt2ZWN0b3JdLm5hbWUpOw0KPiA+ICsJCWV2ZW50ZmRfY3R4X3B1dCh0
-cmlnZ2VyKTsNCj4gPiArCQlyZXR1cm4gcmV0Ow0KPiA+ICsJfQ0KPiA+ICsNCj4gPiArCS8qIFJl
-cHJvZ3JhbSBvbmx5IGlmIGlvbW11LW1hcHBlZCBpb3ZhIGlzIGRpZmZlcmVudCBmcm9tIG1zaS0N
-Cj4gYWRkcmVzcyAqLw0KPiA+ICsJaWYgKG1zaV9pb3ZhICYmIChtc2lfaW92YSAhPSBtc2lfYWRk
-cikpIHsNCj4gPiArCQltc2cuYWRkcmVzc19oaSA9ICh1MzIpKG1zaV9pb3ZhID4+IDMyKTsNCj4g
-PiArCQkvKiBLZWVwIExvd2VyIGJpdHMgZnJvbSBvcmlnaW5hbCBtc2kgbWVzc2FnZSBhZGRyZXNz
-ICovDQo+ID4gKwkJbXNnLmFkZHJlc3NfbG8gJj0gUEFHRV9NQVNLOw0KPiA+ICsJCW1zZy5hZGRy
-ZXNzX2xvIHw9ICh1MzIpKG1zaV9pb3ZhICYgMHgwMDAwMDAwMGZmZmZmZmZmKTsNCj4gDQo+IFNl
-ZW1zIGxpa2UgeW91J3JlIG1ha2luZyBzb21lIGFzc3VtcHRpb25zIGhlcmUgdGhhdCBhcmUgZGVw
-ZW5kZW50IG9uIHRoZQ0KPiBhcmNoaXRlY3R1cmUgYW5kIG1heWJlIHRoZSBwbGF0Zm9ybS4NCg0K
-V2hhdCBJIHRyaWVkIGlzIHRvIG1hcCB0aGUgbXNpIHBhZ2Ugd2l0aCBkaWZmZXJlbnQgaW92YSwg
-d2hpY2ggaXMgcGFnZSBzaXplIGFsaWduZWQuIEJ1dCB0aGUgb2Zmc2V0IHdpdGhpbiB0aGUgcGFn
-ZSB3aWxsIHJlbWFpbiBzYW1lLg0KRm9yIGV4YW1wbGUsIG9yaWdpbmFsIG1zaSBhZGRyZXNzIHdh
-cyAweDA2MDNfMDA0MCBhbmQgd2UgaGF2ZSBhIHJlc2VydmVkIHJlZ2lvbiBhdCAweGYwMDBfMDAw
-MC4gU28gaW9tbXUgbWFwcGluZyBpcyBjcmVhdGVkIGZvciAweGYwMDBfMDAwMCA9PjB4MDYwMF8z
-MDAwIG9mIHNpemUgMHgxMDAwLg0KDQpTbyB0aGUgbmV3IGFkZHJlc3MgdG8gYmUgcHJvZ3JhbW1l
-ZCBpbiBkZXZpY2UgaXMgMHhmMDAwXzAwNDAsIG9mZnNldCAweDQwIGFkZGVkIHRvIGJhc2UgYWRk
-cmVzcyBpbiBpb21tdSBtYXBwaW5nLg0KDQpUaGFua3MNCi1CaGFyYXQNCg0KPiANCj4gPiArCQlw
-Y2lfd3JpdGVfbXNpX21zZyhpcnEsICZtc2cpOw0KPiA+ICsJfQ0KPiA+ICsNCj4gPiAgCXZkZXYt
-PmN0eFt2ZWN0b3JdLnRyaWdnZXIgPSB0cmlnZ2VyOw0KPiA+DQo+ID4gIAlyZXR1cm4gMDsNCj4g
-DQo+IA0KDQo=
+
+
+> -----Original Message-----
+> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> Sent: Saturday, October 03, 2015 4:17 AM
+> To: Bhushan Bharat-R65777 <Bharat.Bhushan@freescale.com>
+> Cc: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org;
+> christoffer.dall@linaro.org; eric.auger@linaro.org; pranavkumar@linaro.org;
+> marc.zyngier@arm.com; will.deacon@arm.com
+> Subject: Re: [RFC PATCH 6/6] arm-smmu: Allow to set iommu mapping for
+> MSI
+> 
+> On Wed, 2015-09-30 at 20:26 +0530, Bharat Bhushan wrote:
+> > Finally ARM SMMU declare that iommu-mapping for MSI-pages are not set
+> > automatically and it should be set explicitly.
+> >
+> > Signed-off-by: Bharat Bhushan <Bharat.Bhushan@freescale.com>
+> > ---
+> >  drivers/iommu/arm-smmu.c | 7 ++++++-
+> >  1 file changed, 6 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
+> index
+> > a3956fb..9d37e72 100644
+> > --- a/drivers/iommu/arm-smmu.c
+> > +++ b/drivers/iommu/arm-smmu.c
+> > @@ -1401,13 +1401,18 @@ static int arm_smmu_domain_get_attr(struct
+> iommu_domain *domain,
+> >  				    enum iommu_attr attr, void *data)  {
+> >  	struct arm_smmu_domain *smmu_domain =
+> to_smmu_domain(domain);
+> > +	struct iommu_domain_msi_maps *msi_maps;
+> >
+> >  	switch (attr) {
+> >  	case DOMAIN_ATTR_NESTING:
+> >  		*(int *)data = (smmu_domain->stage ==
+> ARM_SMMU_DOMAIN_NESTED);
+> >  		return 0;
+> >  	case DOMAIN_ATTR_MSI_MAPPING:
+> > -		/* Dummy handling added */
+> > +		msi_maps = data;
+> > +
+> > +		msi_maps->automap = false;
+> > +		msi_maps->override_automap = true;
+> > +
+> >  		return 0;
+> >  	default:
+> >  		return -ENODEV;
+> 
+> In previous discussions I understood one of the problems you were trying to
+> solve was having a limited number of MSI banks and while you may be able
+> to get isolated MSI banks for some number of users, it wasn't unlimited and
+> sharing may be required.  I don't see any of that addressed in this series.
+
+That problem was on PowerPC. Infact there were two problems, one which MSI bank to be used and second how to create iommu-mapping for device assigned to userspace.
+First problem was PowerPC specific and that will be solved separately.
+For second problem, earlier I tried to added a couple of MSI specific ioctls and you suggested (IIUC) that we should have a generic reserved-iova type of API and then we can map MSI bank using reserved-iova and this will not require involvement of user-space.
+
+> 
+> Also, the management of reserved IOVAs vs MSI addresses looks really
+> dubious to me.  How does your platform pick an MSI address and what are
+> we breaking by covertly changing it?  We seem to be masking over at the
+> VFIO level, where there should be lower level interfaces doing the right thing
+> when we configure MSI on the device.
+
+Yes, In my understanding the right solution should be:
+ 1) VFIO driver should know what physical-msi-address will be used for devices in an iommu-group.
+    I did not find an generic API, on PowerPC I added some function in ffrescale msi-driver and called from vfio-iommu-fsl-pamu.c (not yet upstreamed).
+ 2) VFIO driver should know what IOVA to be used for creating iommu-mapping (VFIO APIs patch of this patch series)
+ 3) VFIO driver will create the iommu-mapping using (1) and (2)
+ 4) VFIO driver should be able to tell the msi-driver that for a given device it should use different IOVA. So when composing the msi message (for the devices is the given iommu-group) it should use that programmed iova as MSI-address. This interface also needed to be developed.
+
+I was not sure of which approach we should take. The current approach in the patch is simple to develop so I went ahead to take input but I agree this does not look very good.
+What do you think, should drop this approach and work out the approach as described above.
+
+Thanks
+-Bharat
+> 
+> The problem of reporting "automap" base address isn't addressed more than
+> leaving some unused field in iommu_domain_msi_maps.
