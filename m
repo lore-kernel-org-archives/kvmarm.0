@@ -1,251 +1,211 @@
 From: Bhushan Bharat <Bharat.Bhushan@freescale.com>
-Subject: RE: [RFC PATCH 1/6] vfio: Add interface for add/del reserved iova
- region
-Date: Mon, 5 Oct 2015 04:55:56 +0000
-Message-ID: <CY1PR0301MB127662473625F595FB222C5C90480@CY1PR0301MB1276.namprd03.prod.outlook.com>
+Subject: RE: [RFC PATCH 2/6] iommu: Add interface to get msi-pages mapping
+ attributes
+Date: Mon, 5 Oct 2015 05:17:26 +0000
+Message-ID: <CY1PR0301MB1276314EF1DDB2CFBAEDCD6C90480@CY1PR0301MB1276.namprd03.prod.outlook.com>
 References: <1443624989-24346-1-git-send-email-Bharat.Bhushan@freescale.com>
- <1443825938.26107.186.camel@redhat.com>
+ <1443624989-24346-2-git-send-email-Bharat.Bhushan@freescale.com>
+ <1443825948.26107.187.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1443825938.26107.186.camel@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F0AB41172
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 01:15:40 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id vXISbWi2Iham for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  5 Oct 2015 01:15:38 -0400 (EDT)
+Received: from na01-bn1-obe.outbound.protection.outlook.com
+ (mail-bn1bon0110.outbound.protection.outlook.com [157.56.111.110])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9931E410D7
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 01:15:38 -0400 (EDT)
+In-Reply-To: <1443825948.26107.187.camel@redhat.com>
 Content-Language: en-US
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "eric.auger@linaro.org" <eric.auger@linaro.org>, "pranavkumar@linaro.org" <pranavkumar@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgQWxleCwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBbGV4IFdp
-bGxpYW1zb24gW21haWx0bzphbGV4LndpbGxpYW1zb25AcmVkaGF0LmNvbV0NCj4gU2VudDogU2F0
-dXJkYXksIE9jdG9iZXIgMDMsIDIwMTUgNDoxNiBBTQ0KPiBUbzogQmh1c2hhbiBCaGFyYXQtUjY1
-Nzc3IDxCaGFyYXQuQmh1c2hhbkBmcmVlc2NhbGUuY29tPg0KPiBDYzoga3ZtYXJtQGxpc3RzLmNz
-LmNvbHVtYmlhLmVkdTsga3ZtQHZnZXIua2VybmVsLm9yZzsNCj4gY2hyaXN0b2ZmZXIuZGFsbEBs
-aW5hcm8ub3JnOyBlcmljLmF1Z2VyQGxpbmFyby5vcmc7IHByYW5hdmt1bWFyQGxpbmFyby5vcmc7
-DQo+IG1hcmMuenluZ2llckBhcm0uY29tOyB3aWxsLmRlYWNvbkBhcm0uY29tDQo+IFN1YmplY3Q6
-IFJlOiBbUkZDIFBBVENIIDEvNl0gdmZpbzogQWRkIGludGVyZmFjZSBmb3IgYWRkL2RlbCByZXNl
-cnZlZCBpb3ZhDQo+IHJlZ2lvbg0KPiANCj4gT24gV2VkLCAyMDE1LTA5LTMwIGF0IDIwOjI2ICsw
-NTMwLCBCaGFyYXQgQmh1c2hhbiB3cm90ZToNCj4gPiBUaGlzIFBhdGNoIGFkZHMgdGhlIFZGSU8g
-QVBJcyB0byBhZGQgYW5kIHJlbW92ZSByZXNlcnZlZCBpb3ZhIHJlZ2lvbnMuDQo+ID4gVGhlIHJl
-c2VydmVkIGlvdmEgcmVnaW9uIGNhbiBiZSB1c2VkIGZvciBtYXBwaW5nIHNvbWUgc3BlY2lmaWMN
-Cj4gPiBwaHlzaWNhbCBhZGRyZXNzIGluIGlvbW11Lg0KPiA+DQo+ID4gQ3VycmVudGx5IHdlIGFy
-ZSBwbGFubmluZyB0byB1c2UgdGhpcyBpbnRlcmZhY2UgZm9yIGFkZGluZyBpb3ZhDQo+ID4gcmVn
-aW9ucyBmb3IgY3JlYXRpbmcgaW9tbXUgb2YgbXNpLXBhZ2VzLiBCdXQgdGhlIEFQSSBhcmUgZGVz
-aWduZWQgZm9yDQo+ID4gZnV0dXJlIGV4dGVuc2lvbiB3aGVyZSBzb21lIG90aGVyIHBoeXNpY2Fs
-IGFkZHJlc3MgY2FuIGJlIG1hcHBlZC4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IEJoYXJhdCBC
-aHVzaGFuIDxCaGFyYXQuQmh1c2hhbkBmcmVlc2NhbGUuY29tPg0KPiA+IC0tLQ0KPiA+ICBkcml2
-ZXJzL3ZmaW8vdmZpb19pb21tdV90eXBlMS5jIHwgMjAxDQo+ICsrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKy0NCj4gPiAgaW5jbHVkZS91YXBpL2xpbnV4L3ZmaW8uaCAgICAg
-ICB8ICA0MyArKysrKysrKysNCj4gPiAgMiBmaWxlcyBjaGFuZ2VkLCAyNDMgaW5zZXJ0aW9ucygr
-KSwgMSBkZWxldGlvbigtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvdmZpby92Zmlv
-X2lvbW11X3R5cGUxLmMNCj4gPiBiL2RyaXZlcnMvdmZpby92ZmlvX2lvbW11X3R5cGUxLmMgaW5k
-ZXggNTdkOGMzNy4uZmE1ZDNlNCAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL3ZmaW8vdmZpb19p
-b21tdV90eXBlMS5jDQo+ID4gKysrIGIvZHJpdmVycy92ZmlvL3ZmaW9faW9tbXVfdHlwZTEuYw0K
-PiA+IEBAIC01OSw2ICs1OSw3IEBAIHN0cnVjdCB2ZmlvX2lvbW11IHsNCj4gPiAgCXN0cnVjdCBy
-Yl9yb290CQlkbWFfbGlzdDsNCj4gPiAgCWJvb2wJCQl2MjsNCj4gPiAgCWJvb2wJCQluZXN0aW5n
-Ow0KPiA+ICsJc3RydWN0IGxpc3RfaGVhZAlyZXNlcnZlZF9pb3ZhX2xpc3Q7DQo+IA0KPiBUaGlz
-IGFsaWdubWVudCBsZWFkcyB0byBwb29yIHBhY2tpbmcgaW4gdGhlIHN0cnVjdHVyZSwgcHV0IGl0
-IGFib3ZlIHRoZSBib29scy4NCg0Kb2sNCg0KPiANCj4gPiAgfTsNCj4gPg0KPiA+ICBzdHJ1Y3Qg
-dmZpb19kb21haW4gew0KPiA+IEBAIC03Nyw2ICs3OCwxNSBAQCBzdHJ1Y3QgdmZpb19kbWEgew0K
-PiA+ICAJaW50CQkJcHJvdDsJCS8qIElPTU1VX1JFQUQvV1JJVEUgKi8NCj4gPiAgfTsNCj4gPg0K
-PiA+ICtzdHJ1Y3QgdmZpb19yZXN2ZF9yZWdpb24gew0KPiA+ICsJZG1hX2FkZHJfdAlpb3ZhOw0K
-PiA+ICsJc2l6ZV90CQlzaXplOw0KPiA+ICsJaW50CQlwcm90OwkJCS8qIElPTU1VX1JFQUQvV1JJ
-VEUgKi8NCj4gPiArCWludAkJcmVmY291bnQ7CQkvKiByZWYgY291bnQgb2YgbWFwcGluZ3MgKi8N
-Cj4gPiArCXVpbnQ2NF90CW1hcF9wYWRkcjsJCS8qIE1hcHBlZCBQaHlzaWNhbCBBZGRyZXNzDQo+
-ICovDQo+IA0KPiBwaHlzX2FkZHJfdA0KDQpPaywNCg0KPiANCj4gPiArCXN0cnVjdCBsaXN0X2hl
-YWQgbmV4dDsNCj4gPiArfTsNCj4gPiArDQo+ID4gIHN0cnVjdCB2ZmlvX2dyb3VwIHsNCj4gPiAg
-CXN0cnVjdCBpb21tdV9ncm91cAkqaW9tbXVfZ3JvdXA7DQo+ID4gIAlzdHJ1Y3QgbGlzdF9oZWFk
-CW5leHQ7DQo+ID4gQEAgLTEwNiw2ICsxMTYsMzggQEAgc3RhdGljIHN0cnVjdCB2ZmlvX2RtYSAq
-dmZpb19maW5kX2RtYShzdHJ1Y3QNCj4gdmZpb19pb21tdSAqaW9tbXUsDQo+ID4gIAlyZXR1cm4g
-TlVMTDsNCj4gPiAgfQ0KPiA+DQo+ID4gKy8qIFRoaXMgZnVuY3Rpb24gbXVzdCBiZSBjYWxsZWQg
-d2l0aCBpb21tdS0+bG9jayBoZWxkICovIHN0YXRpYyBib29sDQo+ID4gK3ZmaW9fb3ZlcmxhcF93
-aXRoX3Jlc3ZkX3JlZ2lvbihzdHJ1Y3QgdmZpb19pb21tdSAqaW9tbXUsDQo+ID4gKwkJCQkJICAg
-ZG1hX2FkZHJfdCBzdGFydCwgc2l6ZV90IHNpemUpIHsNCj4gPiArCXN0cnVjdCB2ZmlvX3Jlc3Zk
-X3JlZ2lvbiAqcmVnaW9uOw0KPiA+ICsNCj4gPiArCWxpc3RfZm9yX2VhY2hfZW50cnkocmVnaW9u
-LCAmaW9tbXUtPnJlc2VydmVkX2lvdmFfbGlzdCwgbmV4dCkgew0KPiA+ICsJCWlmIChyZWdpb24t
-PmlvdmEgPCBzdGFydCkNCj4gPiArCQkJcmV0dXJuIChzdGFydCAtIHJlZ2lvbi0+aW92YSA8IHJl
-Z2lvbi0+c2l6ZSk7DQo+ID4gKwkJZWxzZSBpZiAoc3RhcnQgPCByZWdpb24tPmlvdmEpDQo+ID4g
-KwkJCXJldHVybiAocmVnaW9uLT5pb3ZhIC0gc3RhcnQgPCBzaXplKTsNCj4gDQo+IDw9IG9uIGJv
-dGggb2YgdGhlIHJldHVybiBsaW5lcz8NCg0KSSB0aGluayBpcyBzaG91bGQgYmUgIjwiIGFuZCBu
-b3QgIj08Iiwgbm8gPw0KDQo+IA0KPiA+ICsNCj4gPiArCQlyZXR1cm4gKHJlZ2lvbi0+c2l6ZSA+
-IDAgJiYgc2l6ZSA+IDApOw0KPiA+ICsJfQ0KPiA+ICsNCj4gPiArCXJldHVybiBmYWxzZTsNCj4g
-PiArfQ0KPiA+ICsNCj4gPiArLyogVGhpcyBmdW5jdGlvbiBtdXN0IGJlIGNhbGxlZCB3aXRoIGlv
-bW11LT5sb2NrIGhlbGQgKi8gc3RhdGljDQo+ID4gK3N0cnVjdCB2ZmlvX3Jlc3ZkX3JlZ2lvbiAq
-dmZpb19maW5kX3Jlc3ZkX3JlZ2lvbihzdHJ1Y3QgdmZpb19pb21tdQ0KPiAqaW9tbXUsDQo+ID4g
-KwkJCQkJCSBkbWFfYWRkcl90IHN0YXJ0LCBzaXplX3QNCj4gc2l6ZSkgew0KPiA+ICsJc3RydWN0
-IHZmaW9fcmVzdmRfcmVnaW9uICpyZWdpb247DQo+ID4gKw0KPiA+ICsJbGlzdF9mb3JfZWFjaF9l
-bnRyeShyZWdpb24sICZpb21tdS0+cmVzZXJ2ZWRfaW92YV9saXN0LCBuZXh0KQ0KPiA+ICsJCWlm
-IChyZWdpb24tPmlvdmEgPT0gc3RhcnQgJiYgcmVnaW9uLT5zaXplID09IHNpemUpDQo+ID4gKwkJ
-CXJldHVybiByZWdpb247DQo+ID4gKw0KPiA+ICsJcmV0dXJuIE5VTEw7DQo+ID4gK30NCj4gPiAr
-DQo+ID4gIHN0YXRpYyB2b2lkIHZmaW9fbGlua19kbWEoc3RydWN0IHZmaW9faW9tbXUgKmlvbW11
-LCBzdHJ1Y3QgdmZpb19kbWENCj4gPiAqbmV3KSAgew0KPiA+ICAJc3RydWN0IHJiX25vZGUgKips
-aW5rID0gJmlvbW11LT5kbWFfbGlzdC5yYl9ub2RlLCAqcGFyZW50ID0NCj4gTlVMTDsgQEANCj4g
-PiAtNTgwLDcgKzYyMiw4IEBAIHN0YXRpYyBpbnQgdmZpb19kbWFfZG9fbWFwKHN0cnVjdCB2Zmlv
-X2lvbW11ICppb21tdSwNCj4gPg0KPiA+ICAJbXV0ZXhfbG9jaygmaW9tbXUtPmxvY2spOw0KPiA+
-DQo+ID4gLQlpZiAodmZpb19maW5kX2RtYShpb21tdSwgaW92YSwgc2l6ZSkpIHsNCj4gPiArCWlm
-ICh2ZmlvX2ZpbmRfZG1hKGlvbW11LCBpb3ZhLCBzaXplKSB8fA0KPiA+ICsJICAgIHZmaW9fb3Zl
-cmxhcF93aXRoX3Jlc3ZkX3JlZ2lvbihpb21tdSwgaW92YSwgc2l6ZSkpIHsNCj4gPiAgCQltdXRl
-eF91bmxvY2soJmlvbW11LT5sb2NrKTsNCj4gPiAgCQlyZXR1cm4gLUVFWElTVDsNCj4gPiAgCX0N
-Cj4gPiBAQCAtNjI2LDYgKzY2OSwxMjcgQEAgc3RhdGljIGludCB2ZmlvX2RtYV9kb19tYXAoc3Ry
-dWN0IHZmaW9faW9tbXUNCj4gKmlvbW11LA0KPiA+ICAJcmV0dXJuIHJldDsNCj4gPiAgfQ0KPiA+
-DQo+ID4gKy8qIFRoaXMgZnVuY3Rpb24gbXVzdCBiZSBjYWxsZWQgd2l0aCBpb21tdS0+bG9jayBo
-ZWxkICovIHN0YXRpYyBpbnQNCj4gPiArdmZpb19pb21tdV9yZXN2ZF9yZWdpb25fZGVsKHN0cnVj
-dCB2ZmlvX2lvbW11ICppb21tdSwNCj4gPiArCQkJCWRtYV9hZGRyX3QgaW92YSwgc2l6ZV90IHNp
-emUsIGludCBwcm90KSB7DQo+ID4gKwlzdHJ1Y3QgdmZpb19yZXN2ZF9yZWdpb24gKnJlc19yZWdp
-b247DQo+IA0KPiBIYXZlIHNvbWUgY29uc2lzdGVuY3kgaW4gbmFtaW5nLCBqdXN0IHVzZSAicmVn
-aW9uIi4NCg0KT2ssDQoNCj4gPiArDQo+ID4gKwlyZXNfcmVnaW9uID0gdmZpb19maW5kX3Jlc3Zk
-X3JlZ2lvbihpb21tdSwgaW92YSwgc2l6ZSk7DQo+ID4gKwkvKiBSZWdpb24gc2hvdWxkIG5vdCBi
-ZSBtYXBwZWQgaW4gaW9tbXUgKi8NCj4gPiArCWlmIChyZXNfcmVnaW9uID09IE5VTEwgfHwgcmVz
-X3JlZ2lvbi0+bWFwX3BhZGRyKQ0KPiA+ICsJCXJldHVybiAtRUlOVkFMOw0KPiANCj4gQXJlIHRo
-ZXNlIHR3byBzZXBhcmF0ZSBlcnJvcnM/ICAhcmVnaW9uIGlzIC1FSU5WQUwsIGJ1dCBiZWluZyBt
-YXBwZWQgaXMgLQ0KPiBFQlVTWS4NCg0KWWVzLCB3aWxsIHNlcGFyYXRlIHRoZW0uDQoNCj4gDQo+
-ID4gKw0KPiA+ICsJbGlzdF9kZWwoJnJlc19yZWdpb24tPm5leHQpOw0KPiA+ICsJa2ZyZWUocmVz
-X3JlZ2lvbik7DQo+ID4gKwlyZXR1cm4gMDsNCj4gPiArfQ0KPiA+ICsNCj4gPiArLyogVGhpcyBm
-dW5jdGlvbiBtdXN0IGJlIGNhbGxlZCB3aXRoIGlvbW11LT5sb2NrIGhlbGQgKi8gc3RhdGljIGlu
-dA0KPiA+ICt2ZmlvX2lvbW11X3Jlc3ZkX3JlZ2lvbl9hZGQoc3RydWN0IHZmaW9faW9tbXUgKmlv
-bW11LA0KPiA+ICsJCQkJICAgICAgIGRtYV9hZGRyX3QgaW92YSwgc2l6ZV90IHNpemUsIGludCBw
-cm90KSB7DQo+ID4gKwlzdHJ1Y3QgdmZpb19yZXN2ZF9yZWdpb24gKnJlc19yZWdpb247DQo+ID4g
-Kw0KPiA+ICsJLyogQ2hlY2sgb3ZlcmxhcCB3aXRoIHdpdGggZG1hIG1hcGluZyBhbmQgcmVzZXJ2
-ZWQgcmVnaW9ucyAqLw0KPiA+ICsJaWYgKHZmaW9fZmluZF9kbWEoaW9tbXUsIGlvdmEsIHNpemUp
-IHx8DQo+ID4gKwkgICAgdmZpb19maW5kX3Jlc3ZkX3JlZ2lvbihpb21tdSwgaW92YSwgc2l6ZSkp
-DQo+ID4gKwkJcmV0dXJuIC1FRVhJU1Q7DQo+ID4gKw0KPiA+ICsJcmVzX3JlZ2lvbiA9IGt6YWxs
-b2Moc2l6ZW9mKCpyZXNfcmVnaW9uKSwgR0ZQX0tFUk5FTCk7DQo+ID4gKwlpZiAocmVzX3JlZ2lv
-biA9PSBOVUxMKQ0KPiA+ICsJCXJldHVybiAtRU5PTUVNOw0KPiA+ICsNCj4gPiArCXJlc19yZWdp
-b24tPmlvdmEgPSBpb3ZhOw0KPiA+ICsJcmVzX3JlZ2lvbi0+c2l6ZSA9IHNpemU7DQo+ID4gKwly
-ZXNfcmVnaW9uLT5wcm90ID0gcHJvdDsNCj4gPiArCXJlc19yZWdpb24tPnJlZmNvdW50ID0gMDsN
-Cj4gPiArCXJlc19yZWdpb24tPm1hcF9wYWRkciA9IDA7DQo+IA0KPiBUaGV5J3JlIGFscmVhZHkg
-MCBieSB0aGUga3phbGxvYw0KDQpZZXMgOykNCj4gDQo+ID4gKw0KPiA+ICsJbGlzdF9hZGQoJnJl
-c19yZWdpb24tPm5leHQsICZpb21tdS0+cmVzZXJ2ZWRfaW92YV9saXN0KTsNCj4gPiArDQo+ID4g
-KwlyZXR1cm4gMDsNCj4gPiArfQ0KPiA+ICsNCj4gPiArc3RhdGljDQo+ID4gK2ludCB2ZmlvX2hh
-bmRsZV9yZXNlcnZlZF9yZWdpb25fYWRkKHN0cnVjdCB2ZmlvX2lvbW11ICppb21tdSwNCj4gPiAr
-CQkJCXN0cnVjdCB2ZmlvX2lvbW11X3Jlc2VydmVkX3JlZ2lvbl9hZGQNCj4gKnJlZ2lvbikgew0K
-PiA+ICsJZG1hX2FkZHJfdCBpb3ZhID0gcmVnaW9uLT5pb3ZhOw0KPiA+ICsJc2l6ZV90IHNpemUg
-PSByZWdpb24tPnNpemU7DQo+ID4gKwlpbnQgZmxhZ3MgPSByZWdpb24tPmZsYWdzOw0KPiA+ICsJ
-dWludDY0X3QgbWFzazsNCj4gPiArCWludCBwcm90ID0gMDsNCj4gPiArCWludCByZXQ7DQo+ID4g
-Kw0KPiA+ICsJLyogVmVyaWZ5IHRoYXQgbm9uZSBvZiBvdXIgX191NjQgZmllbGRzIG92ZXJmbG93
-ICovDQo+ID4gKwlpZiAocmVnaW9uLT5zaXplICE9IHNpemUgfHwgcmVnaW9uLT5pb3ZhICE9IGlv
-dmEpDQo+ID4gKwkJcmV0dXJuIC1FSU5WQUw7DQo+ID4gKw0KPiA+ICsJbWFzayA9ICgodWludDY0
-X3QpMSA8PCBfX2Zmcyh2ZmlvX3Bnc2l6ZV9iaXRtYXAoaW9tbXUpKSkgLSAxOw0KPiA+ICsNCj4g
-PiArCVdBUk5fT04obWFzayAmIFBBR0VfTUFTSyk7DQo+ID4gKw0KPiA+ICsJaWYgKGZsYWdzICYg
-VkZJT19JT01NVV9SRVNfUkVHSU9OX1JFQUQpDQo+ID4gKwkJcHJvdCB8PSBJT01NVV9SRUFEOw0K
-PiA+ICsJaWYgKGZsYWdzICYgVkZJT19JT01NVV9SRVNfUkVHSU9OX1dSSVRFKQ0KPiA+ICsJCXBy
-b3QgfD0gSU9NTVVfV1JJVEU7DQo+ID4gKw0KPiA+ICsJaWYgKCFwcm90IHx8ICFzaXplIHx8IChz
-aXplIHwgaW92YSkgJiBtYXNrKQ0KPiA+ICsJCXJldHVybiAtRUlOVkFMOw0KPiA+ICsNCj4gPiAr
-CS8qIERvbid0IGFsbG93IElPVkEgd3JhcCAqLw0KPiA+ICsJaWYgKGlvdmEgKyBzaXplIC0gMSA8
-IGlvdmEpDQo+ID4gKwkJcmV0dXJuIC1FSU5WQUw7DQo+ID4gKw0KPiA+ICsJbXV0ZXhfbG9jaygm
-aW9tbXUtPmxvY2spOw0KPiA+ICsNCj4gPiArCWlmIChyZWdpb24tPmZsYWdzICYgVkZJT19JT01N
-VV9SRVNfUkVHSU9OX0FERCkgew0KPiA+ICsJCXJldCA9IHZmaW9faW9tbXVfcmVzdmRfcmVnaW9u
-X2FkZChpb21tdSwgaW92YSwgc2l6ZSwNCj4gcHJvdCk7DQo+ID4gKwkJaWYgKHJldCkgew0KPiA+
-ICsJCQltdXRleF91bmxvY2soJmlvbW11LT5sb2NrKTsNCj4gPiArCQkJcmV0dXJuIHJldDsNCj4g
-PiArCQl9DQo+ID4gKwl9DQo+IA0KPiBTaWxlbnRseSBmYWlsIGlmIG5vdCBWRklPX0lPTU1VX1JF
-U19SRUdJT05fQUREPw0KDQpBcyBwZXIgYmVsb3cgY29tbWVudCB3ZSBkbyBub3QgbmVlZCB0aGlz
-IGZsYWcuIFNvIHRoZSBhYm92ZSBmbGFnIGNoZWNraW5nIHdpbGwgYmUgcmVtb3ZlZC4NCg0KPiAN
-Cj4gPiArDQo+ID4gKwltdXRleF91bmxvY2soJmlvbW11LT5sb2NrKTsNCj4gPiArCXJldHVybiAw
-Ow0KPiA+ICt9DQo+ID4gKw0KPiA+ICtzdGF0aWMNCj4gPiAraW50IHZmaW9faGFuZGxlX3Jlc2Vy
-dmVkX3JlZ2lvbl9kZWwoc3RydWN0IHZmaW9faW9tbXUgKmlvbW11LA0KPiA+ICsJCQkJc3RydWN0
-IHZmaW9faW9tbXVfcmVzZXJ2ZWRfcmVnaW9uX2RlbA0KPiAqcmVnaW9uKSB7DQo+ID4gKwlkbWFf
-YWRkcl90IGlvdmEgPSByZWdpb24tPmlvdmE7DQo+ID4gKwlzaXplX3Qgc2l6ZSA9IHJlZ2lvbi0+
-c2l6ZTsNCj4gPiArCWludCBmbGFncyA9IHJlZ2lvbi0+ZmxhZ3M7DQo+ID4gKwlpbnQgcmV0Ow0K
-PiA+ICsNCj4gPiArCWlmICghKGZsYWdzICYgVkZJT19JT01NVV9SRVNfUkVHSU9OX0RFTCkpDQo+
-ID4gKwkJcmV0dXJuIC1FSU5WQUw7DQo+ID4gKw0KPiA+ICsJbXV0ZXhfbG9jaygmaW9tbXUtPmxv
-Y2spOw0KPiA+ICsNCj4gPiArCS8qIENoZWNrIGZvciB0aGUgcmVnaW9uICovDQo+ID4gKwlpZiAo
-dmZpb19maW5kX3Jlc3ZkX3JlZ2lvbihpb21tdSwgaW92YSwgc2l6ZSkgPT0gTlVMTCkgew0KPiA+
-ICsJCW11dGV4X3VubG9jaygmaW9tbXUtPmxvY2spOw0KPiA+ICsJCXJldHVybiAtRUlOVkFMOw0K
-PiA+ICsJfQ0KPiA+ICsNCj4gPiArCS8qIHJlbW92ZSB0aGUgcmVzZXJ2ZWQgcmVnaW9uICovDQo+
-ID4gKwlpZiAocmVnaW9uLT5mbGFncyAmIFZGSU9fSU9NTVVfUkVTX1JFR0lPTl9ERUwpIHsNCj4g
-PiArCQlyZXQgPSB2ZmlvX2lvbW11X3Jlc3ZkX3JlZ2lvbl9kZWwoaW9tbXUsIGlvdmEsIHNpemUs
-DQo+IGZsYWdzKTsNCj4gPiArCQlpZiAocmV0KSB7DQo+ID4gKwkJCW11dGV4X3VubG9jaygmaW9t
-bXUtPmxvY2spOw0KPiA+ICsJCQlyZXR1cm4gcmV0Ow0KPiA+ICsJCX0NCj4gPiArCX0NCj4gPiAr
-DQo+ID4gKwltdXRleF91bmxvY2soJmlvbW11LT5sb2NrKTsNCj4gPiArCXJldHVybiAwOw0KPiA+
-ICt9DQo+ID4gKw0KPiA+ICBzdGF0aWMgaW50IHZmaW9fYnVzX3R5cGUoc3RydWN0IGRldmljZSAq
-ZGV2LCB2b2lkICpkYXRhKSAgew0KPiA+ICAJc3RydWN0IGJ1c190eXBlICoqYnVzID0gZGF0YTsN
-Cj4gPiBAQCAtOTA1LDYgKzEwNjksNyBAQCBzdGF0aWMgdm9pZCAqdmZpb19pb21tdV90eXBlMV9v
-cGVuKHVuc2lnbmVkDQo+IGxvbmcgYXJnKQ0KPiA+ICAJfQ0KPiA+DQo+ID4gIAlJTklUX0xJU1Rf
-SEVBRCgmaW9tbXUtPmRvbWFpbl9saXN0KTsNCj4gPiArCUlOSVRfTElTVF9IRUFEKCZpb21tdS0+
-cmVzZXJ2ZWRfaW92YV9saXN0KTsNCj4gPiAgCWlvbW11LT5kbWFfbGlzdCA9IFJCX1JPT1Q7DQo+
-ID4gIAltdXRleF9pbml0KCZpb21tdS0+bG9jayk7DQo+ID4NCj4gPiBAQCAtMTAyMCw2ICsxMTg1
-LDQwIEBAIHN0YXRpYyBsb25nIHZmaW9faW9tbXVfdHlwZTFfaW9jdGwodm9pZA0KPiAqaW9tbXVf
-ZGF0YSwNCj4gPiAgCQkJcmV0dXJuIHJldDsNCj4gPg0KPiA+ICAJCXJldHVybiBjb3B5X3RvX3Vz
-ZXIoKHZvaWQgX191c2VyICopYXJnLCAmdW5tYXAsIG1pbnN6KTsNCj4gPiArCX0gZWxzZSBpZiAo
-Y21kID09IFZGSU9fSU9NTVVfUkVTRVJWRURfUkVHSU9OX0FERCkgew0KPiA+ICsJCXN0cnVjdCB2
-ZmlvX2lvbW11X3Jlc2VydmVkX3JlZ2lvbl9hZGQgcmVnaW9uOw0KPiA+ICsJCWxvbmcgcmV0Ow0K
-PiA+ICsNCj4gPiArCQltaW5zeiA9IG9mZnNldG9mZW5kKHN0cnVjdA0KPiB2ZmlvX2lvbW11X3Jl
-c2VydmVkX3JlZ2lvbl9hZGQsDQo+ID4gKwkJCQkgICAgc2l6ZSk7DQo+ID4gKwkJaWYgKGNvcHlf
-ZnJvbV91c2VyKCZyZWdpb24sICh2b2lkIF9fdXNlciAqKWFyZywgbWluc3opKQ0KPiA+ICsJCQly
-ZXR1cm4gLUVGQVVMVDsNCj4gPiArDQo+ID4gKwkJaWYgKHJlZ2lvbi5hcmdzeiA8IG1pbnN6KQ0K
-PiA+ICsJCQlyZXR1cm4gLUVJTlZBTDsNCj4gPiArDQo+ID4gKwkJcmV0ID0gdmZpb19oYW5kbGVf
-cmVzZXJ2ZWRfcmVnaW9uX2FkZChpb21tdSwgJnJlZ2lvbik7DQo+ID4gKwkJaWYgKHJldCkNCj4g
-PiArCQkJcmV0dXJuIHJldDsNCj4gPiArDQo+ID4gKwkJcmV0dXJuIGNvcHlfdG9fdXNlcigodm9p
-ZCBfX3VzZXIgKilhcmcsICZyZWdpb24sIG1pbnN6KTsNCj4gPiArCX0gZWxzZSBpZiAoY21kID09
-IFZGSU9fSU9NTVVfUkVTRVJWRURfUkVHSU9OX0RFTCkgew0KPiA+ICsJCXN0cnVjdCB2ZmlvX2lv
-bW11X3Jlc2VydmVkX3JlZ2lvbl9kZWwgcmVnaW9uOw0KPiA+ICsJCWxvbmcgcmV0Ow0KPiA+ICsN
-Cj4gPiArCQltaW5zeiA9IG9mZnNldG9mZW5kKHN0cnVjdA0KPiB2ZmlvX2lvbW11X3Jlc2VydmVk
-X3JlZ2lvbl9kZWwsDQo+ID4gKwkJCQkgICAgc2l6ZSk7DQo+ID4gKwkJaWYgKGNvcHlfZnJvbV91
-c2VyKCZyZWdpb24sICh2b2lkIF9fdXNlciAqKWFyZywgbWluc3opKQ0KPiA+ICsJCQlyZXR1cm4g
-LUVGQVVMVDsNCj4gPiArDQo+ID4gKwkJaWYgKHJlZ2lvbi5hcmdzeiA8IG1pbnN6KQ0KPiA+ICsJ
-CQlyZXR1cm4gLUVJTlZBTDsNCj4gPiArDQo+ID4gKwkJcmV0ID0gdmZpb19oYW5kbGVfcmVzZXJ2
-ZWRfcmVnaW9uX2RlbChpb21tdSwgJnJlZ2lvbik7DQo+ID4gKwkJaWYgKHJldCkNCj4gPiArCQkJ
-cmV0dXJuIHJldDsNCj4gPiArDQo+ID4gKwkJcmV0dXJuIGNvcHlfdG9fdXNlcigodm9pZCBfX3Vz
-ZXIgKilhcmcsICZyZWdpb24sIG1pbnN6KTsNCj4gDQo+IFNvIHdlJ3ZlIGp1c3QgY3JlYXRlZCBh
-biBpbnRlcmZhY2UgdGhhdCBpcyBhdmFpbGFibGUgZm9yIGFsbCB2ZmlvLXR5cGUxIHVzZXJzLA0K
-PiB3aGV0aGVyIGl0IG1ha2VzIGFueSBzZW5zZSBmb3IgdGhlIHBsYXRmb3JtIG9yIG5vdCwNCg0K
-SG93IHdlIHNob3VsZCBkZWNpZGUgdGhhdCBhIGdpdmVuIHBsYXRmb3JtIG5lZWRzIHRoaXMgb3Ig
-bm90Pw0KDQo+IGFuZCBpdCBhbGxvd3MgdGhlIHVzZXIgdG8NCj4gY29uc3VtZSBhcmJpdHJhcnkg
-YW1vdW50cyBvZiBrZXJuZWwgbWVtb3J5LCBieSBtYWtpbmcgYW4gaW5maW5pdGVseSBsb25nDQo+
-IGxpc3Qgb2YgcmVzZXJ2ZWQgaW92YSBlbnRyaWVzLCBicmlsbGlhbnQhDQoNCkkgd2FzIG5vdCBz
-dXJlIG9mIGhvdyB0byBsaW1pdCB0aGUgdXNlci4gV2hhdCBJIHdhcyB0aGlua2luZyBvZiBoYXZp
-bmcgYSBkZWZhdWx0IG51bWJlciBvZiBwYWdlcyBhIHVzZXIgY2FuIHJlc2VydmUgKDUxMiBwYWdl
-cykuIEFsc28gd2UgY2FuIGdpdmUgYSBzeXNmcyBpbnRlcmZhY2Ugc28gdGhhdCB1c2VyIGNhbiBj
-aGFuZ2UgdGhlIGRlZmF1bHQgbnVtYmVyIG9mIHBhZ2VzLiBEb2VzIHRoaXMgc291bmQgZ29vZD8g
-SWYgbm90IHBsZWFzZSBzdWdnZXN0Pw0KDQo+IA0KPiA+ICAJfQ0KPiA+DQo+ID4gIAlyZXR1cm4g
-LUVOT1RUWTsNCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS91YXBpL2xpbnV4L3ZmaW8uaCBiL2lu
-Y2x1ZGUvdWFwaS9saW51eC92ZmlvLmgNCj4gPiBpbmRleCBiNTdiNzUwLi4xYWJkMWE5IDEwMDY0
-NA0KPiA+IC0tLSBhL2luY2x1ZGUvdWFwaS9saW51eC92ZmlvLmgNCj4gPiArKysgYi9pbmNsdWRl
-L3VhcGkvbGludXgvdmZpby5oDQo+ID4gQEAgLTQ0MCw2ICs0NDAsNDkgQEAgc3RydWN0IHZmaW9f
-aW9tbXVfdHlwZTFfZG1hX3VubWFwIHsNCj4gPiAgI2RlZmluZSBWRklPX0lPTU1VX0VOQUJMRQlf
-SU8oVkZJT19UWVBFLCBWRklPX0JBU0UgKyAxNSkNCj4gPiAgI2RlZmluZSBWRklPX0lPTU1VX0RJ
-U0FCTEUJX0lPKFZGSU9fVFlQRSwgVkZJT19CQVNFICsgMTYpDQo+ID4NCj4gPiArLyoqKioqKioq
-KioqKioqKiogUmVzZXJ2ZWQgSU9WQSByZWdpb24gc3BlY2lmaWMgQVBJcw0KPiA+ICsqKioqKioq
-KioqKioqKioqKioqKioqLw0KPiA+ICsNCj4gPiArLyoNCj4gPiArICogVkZJT19JT01NVV9SRVNF
-UlZFRF9SRUdJT05fQUREIC0gX0lPKFZGSU9fVFlQRSwgVkZJT19CQVNFDQo+ICsgMTcsDQo+ID4g
-KyAqCQkJCQlzdHJ1Y3QNCj4gdmZpb19pb21tdV9yZXNlcnZlZF9yZWdpb25fYWRkKQ0KPiA+ICsg
-KiBUaGlzIGlzIHVzZWQgdG8gYWRkIGEgcmVzZXJ2ZWQgaW92YSByZWdpb24uDQo+ID4gKyAqIEBm
-bGFncyAtIElucHV0OiBWRklPX0lPTU1VX1JFU19SRUdJT05fQUREIGZsYWcgaXMgZm9yIGFkZGlu
-Zw0KPiA+ICsgKiBhIHJlc2VydmVkIHJlZ2lvbi4NCj4gDQo+IFdoeSBlbHNlIHdvdWxkIHdlIGNh
-bGwgVkZJT19JT01NVV9SRVNFUlZFRF9SRUdJT05fQUREIGV4Y2VwdCB0bw0KPiBhZGQgYSByZWdp
-b24sIHRoaXMgZmxhZyBpcyByZWR1bmRhbnQuDQoNCk9rLCB3aWxsIHJlbW92ZSB0aGlzLg0KDQo+
-IA0KPiA+ICsgKiBBbHNvIHBhc3MgUkVBRC9XUklURS9JT01NVSBmbGFncyB0byBiZSB1c2VkIGlu
-IGlvbW11IG1hcHBpbmcuDQo+ID4gKyAqIEBpb3ZhIC0gSW5wdXQ6IElPVkEgYmFzZSBhZGRyZXNz
-IG9mIHJlc2VydmVkIHJlZ2lvbg0KPiA+ICsgKiBAc2l6ZSAtIElucHV0OiBTaXplIG9mIHRoZSBy
-ZXNlcnZlZCByZWdpb24NCj4gPiArICogUmV0dXJuOiAwIG9uIHN1Y2Nlc3MsIC1lcnJubyBvbiBm
-YWlsdXJlICAqLyBzdHJ1Y3QNCj4gPiArdmZpb19pb21tdV9yZXNlcnZlZF9yZWdpb25fYWRkIHsN
-Cj4gPiArCV9fdTMyICAgYXJnc3o7DQo+ID4gKwlfX3UzMiAgIGZsYWdzOw0KPiA+ICsjZGVmaW5l
-IFZGSU9fSU9NTVVfUkVTX1JFR0lPTl9BREQJKDEgPDwgMCkgLyogQWRkIGEgcmVzZXJ2ZWQNCj4g
-cmVnaW9uICovDQo+ID4gKyNkZWZpbmUgVkZJT19JT01NVV9SRVNfUkVHSU9OX1JFQUQJKDEgPDwg
-MSkgLyogcmVhZGFibGUgcmVnaW9uICovDQo+ID4gKyNkZWZpbmUgVkZJT19JT01NVV9SRVNfUkVH
-SU9OX1dSSVRFCSgxIDw8IDIpIC8qIHdyaXRhYmxlDQo+IHJlZ2lvbiAqLw0KPiA+ICsJX191NjQJ
-aW92YTsNCj4gPiArCV9fdTY0ICAgc2l6ZTsNCj4gPiArfTsNCj4gPiArI2RlZmluZSBWRklPX0lP
-TU1VX1JFU0VSVkVEX1JFR0lPTl9BREQgX0lPKFZGSU9fVFlQRSwNCj4gVkZJT19CQVNFICsgMTcp
-DQo+ID4gKw0KPiA+ICsvKg0KPiA+ICsgKiBWRklPX0lPTU1VX1JFU0VSVkVEX1JFR0lPTl9ERUwg
-LSBfSU8oVkZJT19UWVBFLCBWRklPX0JBU0UgKw0KPiAxOCwNCj4gPiArICoJCQkJCXN0cnVjdA0K
-PiB2ZmlvX2lvbW11X3Jlc2VydmVkX3JlZ2lvbl9kZWwpDQo+ID4gKyAqIFRoaXMgaXMgdXNlZCB0
-byBkZWxldGUgYW4gZXhpc3RpbmcgcmVzZXJ2ZWQgaW92YSByZWdpb24uDQo+ID4gKyAqIEBmbGFn
-cyAtIFZGSU9fSU9NTVVfUkVTX1JFR0lPTl9ERUwgZmxhZyBpcyBmb3IgZGVsZXRpbmcgYSByZWdp
-b24NCj4gPiArdXNlLA0KPiA+ICsgKiAgb25seSBhIHVubWFwcGVkIHJlZ2lvbiBjYW4gYmUgZGVs
-ZXRlZC4NCj4gPiArICogQGlvdmEgLSBJbnB1dDogSU9WQSBiYXNlIGFkZHJlc3Mgb2YgcmVzZXJ2
-ZWQgcmVnaW9uDQo+ID4gKyAqIEBzaXplIC0gSW5wdXQ6IFNpemUgb2YgdGhlIHJlc2VydmVkIHJl
-Z2lvbg0KPiA+ICsgKiBSZXR1cm46IDAgb24gc3VjY2VzcywgLWVycm5vIG9uIGZhaWx1cmUgICov
-IHN0cnVjdA0KPiA+ICt2ZmlvX2lvbW11X3Jlc2VydmVkX3JlZ2lvbl9kZWwgew0KPiA+ICsJX191
-MzIgICBhcmdzejsNCj4gPiArCV9fdTMyICAgZmxhZ3M7DQo+ID4gKyNkZWZpbmUgVkZJT19JT01N
-VV9SRVNfUkVHSU9OX0RFTAkoMSA8PCAwKSAvKiB1bnNldCB0aGUNCj4gcmVzZXJ2ZWQgcmVnaW9u
-ICovDQo+ID4gKwlfX3U2NAlpb3ZhOw0KPiA+ICsJX191NjQgICBzaXplOw0KPiA+ICt9Ow0KPiA+
-ICsjZGVmaW5lIFZGSU9fSU9NTVVfUkVTRVJWRURfUkVHSU9OX0RFTCBfSU8oVkZJT19UWVBFLA0K
-PiBWRklPX0JBU0UgKyAxOCkNCj4gPiArDQo+IA0KPiBUaGVzZSBhcmUgZWZmZWN0aXZlbHkgYm90
-aA0KPiANCj4gc3RydWN0IHZmaW9faW9tbXVfdHlwZTFfZG1hX3VubWFwDQoNClllcywgZG8geW91
-IHdhbnQgdG8gc3VnZ2VzdCB0aGF0IHdlIHNob3VsZCB1c2UgIiBzdHJ1Y3QgdmZpb19pb21tdV90
-eXBlMV9kbWFfdW5tYXAiLiBJIGZvdW5kIHRoYXQgY29uZnVzaW5nLg0KV2hhdCBpcyB3ZSB1c2Ug
-InN0cnVjdCB2ZmlvX2lvbW11X3Jlc2VydmVkX3JlZ2lvbiIgYW5kIHVzZSBmbGFnIFZGSU9fSU9N
-TVVfUkVTX1JFR0lPTl9ERUwvIFZGSU9fSU9NTVVfUkVTX1JFR0lPTl9BREQuDQoNClRoYW5rcw0K
-LUJoYXJhdA0KDQo+IA0KPiA+ICAvKiAtLS0tLS0tLSBBZGRpdGlvbmFsIEFQSSBmb3IgU1BBUFIg
-VENFIChTZXJ2ZXIgUE9XRVJQQykgSU9NTVUNCj4gPiAtLS0tLS0tLSAqLw0KPiA+DQo+ID4gIC8q
-DQo+IA0KPiANCg0K
+
+
+> -----Original Message-----
+> From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> Sent: Saturday, October 03, 2015 4:16 AM
+> To: Bhushan Bharat-R65777 <Bharat.Bhushan@freescale.com>
+> Cc: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org;
+> christoffer.dall@linaro.org; eric.auger@linaro.org; pranavkumar@linaro.org;
+> marc.zyngier@arm.com; will.deacon@arm.com
+> Subject: Re: [RFC PATCH 2/6] iommu: Add interface to get msi-pages
+> mapping attributes
+> 
+> [really ought to consider cc'ing the iommu list]
+> 
+> On Wed, 2015-09-30 at 20:26 +0530, Bharat Bhushan wrote:
+> > This APIs return the capability of automatically mapping msi-pages in
+> > iommu with some magic iova. Which is what currently most of iommu's
+> > does and is the default behaviour.
+> >
+> > Further API returns whether iommu allows the user to define different
+> > iova for mai-page mapping for the domain. This is required when a msi
+> > capable device is directly assigned to user-space/VM and user-space/VM
+> > need to define a non-overlapping (from other dma-able address space)
+> > iova for msi-pages mapping in iommu.
+> >
+> > This patch just define the interface and follow up patches will extend
+> > this interface.
+> 
+> This is backwards, generally you want to add the infrastructure and only
+> expose it once all the pieces are in place for it to work.  For instance, patch
+> 1/6 exposes a new userspace interface for vfio that doesn't do anything yet.
+> How does the user know if it's there, *and* works?
+
+Ok, I will reorder the patches.
+
+> 
+> > Signed-off-by: Bharat Bhushan <Bharat.Bhushan@freescale.com>
+> > ---
+> >  drivers/iommu/arm-smmu.c        |  3 +++
+> >  drivers/iommu/fsl_pamu_domain.c |  3 +++
+> >  drivers/iommu/iommu.c           | 14 ++++++++++++++
+> >  include/linux/iommu.h           |  9 ++++++++-
+> >  4 files changed, 28 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
+> index
+> > 66a803b..a3956fb 100644
+> > --- a/drivers/iommu/arm-smmu.c
+> > +++ b/drivers/iommu/arm-smmu.c
+> > @@ -1406,6 +1406,9 @@ static int arm_smmu_domain_get_attr(struct
+> iommu_domain *domain,
+> >  	case DOMAIN_ATTR_NESTING:
+> >  		*(int *)data = (smmu_domain->stage ==
+> ARM_SMMU_DOMAIN_NESTED);
+> >  		return 0;
+> > +	case DOMAIN_ATTR_MSI_MAPPING:
+> > +		/* Dummy handling added */
+> > +		return 0;
+> >  	default:
+> >  		return -ENODEV;
+> >  	}
+> > diff --git a/drivers/iommu/fsl_pamu_domain.c
+> > b/drivers/iommu/fsl_pamu_domain.c index 1d45293..9a94430 100644
+> > --- a/drivers/iommu/fsl_pamu_domain.c
+> > +++ b/drivers/iommu/fsl_pamu_domain.c
+> > @@ -856,6 +856,9 @@ static int fsl_pamu_get_domain_attr(struct
+> iommu_domain *domain,
+> >  	case DOMAIN_ATTR_FSL_PAMUV1:
+> >  		*(int *)data = DOMAIN_ATTR_FSL_PAMUV1;
+> >  		break;
+> > +	case DOMAIN_ATTR_MSI_MAPPING:
+> > +		/* Dummy handling added */
+> > +		break;
+> >  	default:
+> >  		pr_debug("Unsupported attribute type\n");
+> >  		ret = -EINVAL;
+> > diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c index
+> > d4f527e..16c2eab 100644
+> > --- a/drivers/iommu/iommu.c
+> > +++ b/drivers/iommu/iommu.c
+> > @@ -1216,6 +1216,7 @@ int iommu_domain_get_attr(struct
+> iommu_domain *domain,
+> >  	bool *paging;
+> >  	int ret = 0;
+> >  	u32 *count;
+> > +	struct iommu_domain_msi_maps *msi_maps;
+> >
+> >  	switch (attr) {
+> >  	case DOMAIN_ATTR_GEOMETRY:
+> > @@ -1236,6 +1237,19 @@ int iommu_domain_get_attr(struct
+> iommu_domain *domain,
+> >  			ret = -ENODEV;
+> >
+> >  		break;
+> > +	case DOMAIN_ATTR_MSI_MAPPING:
+> > +		msi_maps = data;
+> > +
+> > +		/* Default MSI-pages are magically mapped with some iova
+> and
+> > +		 * do now allow to configure with different iova.
+> > +		 */
+> > +		msi_maps->automap = true;
+> > +		msi_maps->override_automap = false;
+> 
+> There's no magic.  I think what you're trying to express is the difference
+> between platforms that support MSI within the IOMMU IOVA space and
+> thus need explicit IOMMU mappings vs platforms where MSI mappings
+> either bypass the IOMMU entirely or are setup implicitly with interrupt
+> remapping support.
+
+Yes, I wants to differentiate the platforms which requires explicit iommu mapping for MSI with other platforms.
+I will change the comment and use better name (need_mapping/need_iommu_mapping/require_mapping).
+
+> 
+> Why does it make sense to impose any sort of defaults?  If the IOMMU
+> driver doesn't tell us what to do, I don't think we want to assume anything.
+> 
+> > +
+> > +		if (domain->ops->domain_get_attr)
+> > +			ret = domain->ops->domain_get_attr(domain, attr,
+> data);
+> > +
+> > +		break;
+> >  	default:
+> >  		if (!domain->ops->domain_get_attr)
+> >  			return -EINVAL;
+> > diff --git a/include/linux/iommu.h b/include/linux/iommu.h index
+> > 0546b87..6d49f3f 100644
+> > --- a/include/linux/iommu.h
+> > +++ b/include/linux/iommu.h
+> > @@ -83,6 +83,13 @@ struct iommu_domain {
+> >  	struct iommu_domain_geometry geometry;  };
+> >
+> > +struct iommu_domain_msi_maps {
+> > +	dma_addr_t base_address;
+> > +	dma_addr_t size;
+> 
+> size_t?
+
+Will remove above two fields as they are redundant.
+
+Thanks
+-Bharat
+
+> 
+> > +	bool automap;
+> > +	bool override_automap;
+> > +};
+> > +
+> >  enum iommu_cap {
+> >  	IOMMU_CAP_CACHE_COHERENCY,	/* IOMMU can enforce cache
+> coherent DMA
+> >  					   transactions */
+> > @@ -111,6 +118,7 @@ enum iommu_attr {
+> >  	DOMAIN_ATTR_FSL_PAMU_ENABLE,
+> >  	DOMAIN_ATTR_FSL_PAMUV1,
+> >  	DOMAIN_ATTR_NESTING,	/* two stages of translation */
+> > +	DOMAIN_ATTR_MSI_MAPPING, /* Provides MSIs mapping in iommu
+> */
+> >  	DOMAIN_ATTR_MAX,
+> >  };
+> >
+> > @@ -167,7 +175,6 @@ struct iommu_ops {
+> >  	int (*domain_set_windows)(struct iommu_domain *domain, u32
+> w_count);
+> >  	/* Get the numer of window per domain */
+> >  	u32 (*domain_get_windows)(struct iommu_domain *domain);
+> > -
+> >  #ifdef CONFIG_OF_IOMMU
+> >  	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
+> > #endif
+> 
+> 
