@@ -1,27 +1,31 @@
-From: Bhushan Bharat <Bharat.Bhushan@freescale.com>
-Subject: RE: [RFC PATCH 6/6] arm-smmu: Allow to set iommu mapping for MSI
-Date: Mon, 5 Oct 2015 08:33:05 +0000
-Message-ID: <CY1PR0301MB127637C2EA08365A249864C090480@CY1PR0301MB1276.namprd03.prod.outlook.com>
-References: <1443624989-24346-1-git-send-email-Bharat.Bhushan@freescale.com>
- <1443624989-24346-6-git-send-email-Bharat.Bhushan@freescale.com>
- <1443826005.26107.191.camel@redhat.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [RFC PATCH v5 0/3] vfio: platform: return device properties for
+ a platform device
+Date: Mon, 5 Oct 2015 11:37:39 +0200
+Message-ID: <20151005093739.GF9011@cbox>
+References: <1443604077-3155-1-git-send-email-b.reynal@virtualopensystems.com>
+ <1443814099.26107.124.camel@redhat.com>
+ <20151002202844.GD32011@cbox>
+ <CAFEAcA84seKfSh94XFJZxBeBzRd=twj2QaFvjMeDKYhrWQu7Nw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2759C4117E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 04:31:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 39BC64141A
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 05:35:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id M29R0NKA3Nd0 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  5 Oct 2015 04:31:16 -0400 (EDT)
-Received: from na01-bl2-obe.outbound.protection.outlook.com
- (mail-bl2on0104.outbound.protection.outlook.com [65.55.169.104])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8EB6F4117C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 04:31:16 -0400 (EDT)
-In-Reply-To: <1443826005.26107.191.camel@redhat.com>
-Content-Language: en-US
+ with ESMTP id 3BTtZ36CkLSK for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  5 Oct 2015 05:35:40 -0400 (EDT)
+Received: from mail-lb0-f169.google.com (mail-lb0-f169.google.com
+ [209.85.217.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F137741294
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 05:35:39 -0400 (EDT)
+Received: by lbcao8 with SMTP id ao8so54550961lbc.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 05 Oct 2015 02:37:29 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA84seKfSh94XFJZxBeBzRd=twj2QaFvjMeDKYhrWQu7Nw@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,87 +35,59 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alex Williamson <alex.williamson@redhat.com>, "tech@virtualopensystems.com" <tech@virtualopensystems.com>, iommu@lists.linux-foundation.org, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-> -----Original Message-----
-> From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> Sent: Saturday, October 03, 2015 4:17 AM
-> To: Bhushan Bharat-R65777 <Bharat.Bhushan@freescale.com>
-> Cc: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org;
-> christoffer.dall@linaro.org; eric.auger@linaro.org; pranavkumar@linaro.org;
-> marc.zyngier@arm.com; will.deacon@arm.com
-> Subject: Re: [RFC PATCH 6/6] arm-smmu: Allow to set iommu mapping for
-> MSI
+On Fri, Oct 02, 2015 at 11:53:07PM +0100, Peter Maydell wrote:
+> On 2 October 2015 at 21:28, Christoffer Dall
+> <christoffer.dall@linaro.org> wrote:
+> > We discussed this for the purposes of ARM during SFO15 last week, and
+> > basically arrived at the conclusion that the resonable thing to do is to
+> > rely on sysfs device tree parsing in userspace.  We don't have a great
+> > solution for ACPI yet, but we also don't know of any ACPI-only devices
+> > that want platform device passthrough yet.
 > 
-> On Wed, 2015-09-30 at 20:26 +0530, Bharat Bhushan wrote:
-> > Finally ARM SMMU declare that iommu-mapping for MSI-pages are not set
-> > automatically and it should be set explicitly.
-> >
-> > Signed-off-by: Bharat Bhushan <Bharat.Bhushan@freescale.com>
-> > ---
-> >  drivers/iommu/arm-smmu.c | 7 ++++++-
-> >  1 file changed, 6 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
-> index
-> > a3956fb..9d37e72 100644
-> > --- a/drivers/iommu/arm-smmu.c
-> > +++ b/drivers/iommu/arm-smmu.c
-> > @@ -1401,13 +1401,18 @@ static int arm_smmu_domain_get_attr(struct
-> iommu_domain *domain,
-> >  				    enum iommu_attr attr, void *data)  {
-> >  	struct arm_smmu_domain *smmu_domain =
-> to_smmu_domain(domain);
-> > +	struct iommu_domain_msi_maps *msi_maps;
-> >
-> >  	switch (attr) {
-> >  	case DOMAIN_ATTR_NESTING:
-> >  		*(int *)data = (smmu_domain->stage ==
-> ARM_SMMU_DOMAIN_NESTED);
-> >  		return 0;
-> >  	case DOMAIN_ATTR_MSI_MAPPING:
-> > -		/* Dummy handling added */
-> > +		msi_maps = data;
-> > +
-> > +		msi_maps->automap = false;
-> > +		msi_maps->override_automap = true;
-> > +
-> >  		return 0;
-> >  	default:
-> >  		return -ENODEV;
+> I wasn't hugely happy with that approach though:
+>  * it's DT specific and just won't work on ACPI platforms; implementing
+>    features with a "needs DT" dependency seems like it will come back to
+>    bite us later
+
+I tend to agree with that point of view, but I don't have hugely better
+ideas.
+
+>  * I don't really want to build in a lot of infrastructure into
+>    QEMU to either build the DTC compiler into it or else introduce
+>    a runtime dependency on the dtc binary
+
+what level of complexity are we really talking about here?  Doesn't QEMU
+already link against libfdt and doesn't it support exactly what we're
+trying to do here?
+
+> , if this is just going
+>    to be a stopgap solution until somebody says "has to work on
+>    ACPI" and we need to do it some other way
 > 
-> In previous discussions I understood one of the problems you were trying to
-> solve was having a limited number of MSI banks and while you may be able
-> to get isolated MSI banks for some number of users, it wasn't unlimited and
-> sharing may be required.  I don't see any of that addressed in this series.
+> On the other hand I don't exactly have a better approach to suggest
 
-That problem was on PowerPC. Infact there were two problems, one which MSI bank to be used and second how to create iommu-mapping for device assigned to userspace.
-First problem was PowerPC specific and that will be solved separately.
-For second problem, earlier I tried to added a couple of MSI specific ioctls and you suggested (IIUC) that we should have a generic reserved-iova type of API and then we can map MSI bank using reserved-iova and this will not require involvement of user-space.
+I also don't think this is the job of VFIO, assuming there is some
+better place to do this.  I initially thought exposing device properties
+in some canonical format from sysfs independently from whether the
+system was booted with ACPI or DT was the right thing to do, but the
+counter argument to this was essentially that the guest kernel needs the
+same description as the host kernel and therefore we really have to find
+a way to pass the HW description bits on to the guest.
 
+> (except "don't do device passthrough for platform devices, insist
+> on a real bus like PCI"...)
 > 
-> Also, the management of reserved IOVAs vs MSI addresses looks really
-> dubious to me.  How does your platform pick an MSI address and what are
-> we breaking by covertly changing it?  We seem to be masking over at the
-> VFIO level, where there should be lower level interfaces doing the right thing
-> when we configure MSI on the device.
+While I appreciate the simplicity of this solution from our
+(maintainers') point of view, I still see the latter point as relatively
+moot.  We have hardware with 10G platform ethernet devices that people
+want to do device assignment on already, and I think we should try to
+find a reasonable set of boundaries for setups that we can support
+upstream instead of this becoming a black hole of derivative code bases
+to do this sort of thing.
 
-Yes, In my understanding the right solution should be:
- 1) VFIO driver should know what physical-msi-address will be used for devices in an iommu-group.
-    I did not find an generic API, on PowerPC I added some function in ffrescale msi-driver and called from vfio-iommu-fsl-pamu.c (not yet upstreamed).
- 2) VFIO driver should know what IOVA to be used for creating iommu-mapping (VFIO APIs patch of this patch series)
- 3) VFIO driver will create the iommu-mapping using (1) and (2)
- 4) VFIO driver should be able to tell the msi-driver that for a given device it should use different IOVA. So when composing the msi message (for the devices is the given iommu-group) it should use that programmed iova as MSI-address. This interface also needed to be developed.
-
-I was not sure of which approach we should take. The current approach in the patch is simple to develop so I went ahead to take input but I agree this does not look very good.
-What do you think, should drop this approach and work out the approach as described above.
-
-Thanks
--Bharat
-> 
-> The problem of reporting "automap" base address isn't addressed more than
-> leaving some unused field in iommu_domain_msi_maps.
+Thanks,
+-Christoffer
