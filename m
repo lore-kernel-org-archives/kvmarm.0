@@ -1,66 +1,73 @@
-From: Baptiste Reynal <b.reynal-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>
-Subject: Re: [RFC PATCH v5 0/3] vfio: platform: return device properties for a
-	platform device
-Date: Mon, 5 Oct 2015 11:42:38 +0200
-Message-ID: <CAN9JPjF+gYJaxm1kO5c4Swps4TDKrHxJ3v-NP2D_YzEghkn1DA@mail.gmail.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [RFC PATCH v5 0/3] vfio: platform: return device properties for
+ a platform device
+Date: Mon, 5 Oct 2015 11:53:25 +0200
+Message-ID: <20151005095325.GG9011@cbox>
 References: <1443604077-3155-1-git-send-email-b.reynal@virtualopensystems.com>
-	<1443814099.26107.124.camel@redhat.com>
-	<20151002202844.GD32011@cbox>
-	<CAFEAcA84seKfSh94XFJZxBeBzRd=twj2QaFvjMeDKYhrWQu7Nw@mail.gmail.com>
+ <1443814099.26107.124.camel@redhat.com>
+ <20151002202844.GD32011@cbox>
+ <CAFEAcA84seKfSh94XFJZxBeBzRd=twj2QaFvjMeDKYhrWQu7Nw@mail.gmail.com>
+ <CAN9JPjF+gYJaxm1kO5c4Swps4TDKrHxJ3v-NP2D_YzEghkn1DA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <CAFEAcA84seKfSh94XFJZxBeBzRd=twj2QaFvjMeDKYhrWQu7Nw-JsoAwUIsXosN+BqQ9rBEUg@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Peter Maydell <peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Cc: "tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org" <tech-lrHrjnjw1UfHK3s98zE1ajGjJy/sRE9J@public.gmane.org>, Linux IOMMU <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 462EB41291
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 05:51:27 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id P9RsvZjmckRf for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  5 Oct 2015 05:51:26 -0400 (EDT)
+Received: from mail-la0-f49.google.com (mail-la0-f49.google.com
+ [209.85.215.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2D4A54117C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 05:51:26 -0400 (EDT)
+Received: by laddr2 with SMTP id dr2so4508045lad.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 05 Oct 2015 02:53:16 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <CAN9JPjF+gYJaxm1kO5c4Swps4TDKrHxJ3v-NP2D_YzEghkn1DA@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Baptiste Reynal <b.reynal@virtualopensystems.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, "tech@virtualopensystems.com" <tech@virtualopensystems.com>, Linux IOMMU <iommu@lists.linux-foundation.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In this patch series we want to wrap an already available kernel
-interface to expose a device property to userspace, in order to keep
-the code lighter on the userspace. We need those properties in VFIO as
-VFIO grants the possibility to develop userspace drivers.
+[why are you top-posting?]
 
-The sysfs doesn't seems to be ready for this kind of usage. We can
-only find raw data that require heavy parsing. Here we retrieve
-directly usable data and it can be extended later according to new
-needs (as it is already done with ACPI).
+On Mon, Oct 05, 2015 at 11:42:38AM +0200, Baptiste Reynal wrote:
+> In this patch series we want to wrap an already available kernel
+> interface to expose a device property to userspace, 
 
-This interface has been developed for VFIO and is currently bound to
-it, though there is no special dependencies with it. We could make it
-more generic, but I can only think of VFIO to use it.
+which 'already available kernel interface' is that exactly?
 
-On Sat, Oct 3, 2015 at 12:53 AM, Peter Maydell <peter.maydell-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
-> On 2 October 2015 at 21:28, Christoffer Dall
-> <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
->> We discussed this for the purposes of ARM during SFO15 last week, and
->> basically arrived at the conclusion that the resonable thing to do is to
->> rely on sysfs device tree parsing in userspace.  We don't have a great
->> solution for ACPI yet, but we also don't know of any ACPI-only devices
->> that want platform device passthrough yet.
->
-> I wasn't hugely happy with that approach though:
->  * it's DT specific and just won't work on ACPI platforms; implementing
->    features with a "needs DT" dependency seems like it will come back to
->    bite us later
->  * I don't really want to build in a lot of infrastructure into
->    QEMU to either build the DTC compiler into it or else introduce
->    a runtime dependency on the dtc binary, if this is just going
->    to be a stopgap solution until somebody says "has to work on
->    ACPI" and we need to do it some other way
->
-> On the other hand I don't exactly have a better approach to suggest
-> (except "don't do device passthrough for platform devices, insist
-> on a real bus like PCI"...)
->
-> thanks
-> -- PMM
+> in order to keep
+> the code lighter on the userspace. We need those properties in VFIO as
+
+I'm not sure I agree with your 'need those properties in VFIO' statement
+here, can you elaborate?
+
+> VFIO grants the possibility to develop userspace drivers.
+> 
+> The sysfs doesn't seems to be ready for this kind of usage. We can
+> only find raw data that require heavy parsing. Here we retrieve
+> directly usable data and it can be extended later according to new
+> needs (as it is already done with ACPI).
+
+Why couldn't you expose this kind of data through sysfs instead of VFIO
+and independently of VFIO?  Would that be more wrong/difficult/whatever?
+
+> 
+> This interface has been developed for VFIO and is currently bound to
+> it, though there is no special dependencies with it. We could make it
+> more generic, but I can only think of VFIO to use it.
+
+Thanks,
+-Christoffer
