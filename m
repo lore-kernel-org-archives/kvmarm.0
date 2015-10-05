@@ -1,31 +1,26 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [RFC PATCH v5 0/3] vfio: platform: return device properties for
- a platform device
-Date: Mon, 5 Oct 2015 11:48:11 +0100
-Message-ID: <20151005104811.GD19064@leverpostej>
-References: <1443604077-3155-1-git-send-email-b.reynal@virtualopensystems.com>
- <1443814099.26107.124.camel@redhat.com>
- <20151002202844.GD32011@cbox>
- <CAFEAcA84seKfSh94XFJZxBeBzRd=twj2QaFvjMeDKYhrWQu7Nw@mail.gmail.com>
- <20151005093739.GF9011@cbox>
- <CAFEAcA_ZGaS__7LPFR_JJEs0=KpDNjYQB_ib2pNDLLp2S0zSMA@mail.gmail.com>
- <20151005103200.GB11536@cbox>
+From: "Suzuki K. Poulose" <Suzuki.Poulose@arm.com>
+Subject: Re: [PATCH 09/15] arm64: Add page size to the kernel image header
+Date: Mon, 05 Oct 2015 14:02:00 +0100
+Message-ID: <561274C8.20500@arm.com>
+References: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
+ <1442331684-28818-10-git-send-email-suzuki.poulose@arm.com>
+ <20151002154900.GN6963@e104818-lin.cambridge.arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D10F1412FA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 06:46:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 54F914141D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 09:00:19 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UT8o0kOjQl4w for <kvmarm@lists.cs.columbia.edu>;
- Mon,  5 Oct 2015 06:46:41 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6907F41291
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 06:46:41 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <20151005103200.GB11536@cbox>
+ with ESMTP id IhO4hoxjRVjd for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  5 Oct 2015 09:00:17 -0400 (EDT)
+Received: from eu-smtp-delivery-143.mimecast.com
+ (eu-smtp-delivery-143.mimecast.com [207.82.80.143])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 850FF41457
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 09:00:11 -0400 (EDT)
+In-Reply-To: <20151002154900.GN6963@e104818-lin.cambridge.arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,73 +30,36 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: iommu@lists.linux-foundation.org, Alex Williamson <alex.williamson@redhat.com>, Shannon Zhao <shannon.zhao@linaro.org>, "tech@virtualopensystems.com" <tech@virtualopensystems.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "ard.biesheuvel@linaro.org" <ard.biesheuvel@linaro.org>, Marc Zyngier <Marc.Zyngier@arm.com>, Will Deacon <Will.Deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 05, 2015 at 12:32:00PM +0200, Christoffer Dall wrote:
-> [cc'ing Mark R. and Shannon for their input on FDT and ACPI].
-> 
-> On Mon, Oct 05, 2015 at 11:07:35AM +0100, Peter Maydell wrote:
-> > On 5 October 2015 at 10:37, Christoffer Dall
-> > <christoffer.dall@linaro.org> wrote:
-> > > On Fri, Oct 02, 2015 at 11:53:07PM +0100, Peter Maydell wrote:
-> > >>  * I don't really want to build in a lot of infrastructure into
-> > >>    QEMU to either build the DTC compiler into it or else introduce
-> > >>    a runtime dependency on the dtc binary
-> > >
-> > > what level of complexity are we really talking about here?  Doesn't QEMU
-> > > already link against libfdt and doesn't it support exactly what we're
-> > > trying to do here?
-> > 
-> > We link against libfdt, but libfdt is for manipulating and creating
-> > dt binary blobs. As I understand it what sysfs exposes to userspace
-> > is not a dt binary blob (or fragment thereof) but a bit of dt source.
-> > libfdt doesn't do parsing of source into blobs; that is done by the
-> > dtc compiler, which QEMU doesn't currently build and which is set
-> > up to build only a separate command line binary anyway, not to be
-> > a utility library for compiling dt sources.
-> > 
-> > Do correct me if I'm wrong about the sysfs interface -- if it is
-> > just exposing dt blobs that would be easier to deal with.
-> > 
-> 
-> I thought there was also /sys/firmware/fdt being the unflattened one
-> accessible by libfdt, but dtc -I dtb seems to be unhappy parsin this on
-> my Mustang.
-> 
-> Mark, can you refresh my memory about this?
+On 02/10/15 16:49, Catalin Marinas wrote:
+> On Tue, Sep 15, 2015 at 04:41:18PM +0100, Suzuki K. Poulose wrote:
+>> From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>>
+>> This patch adds the page size to the arm64 kernel image header
+>> so that one can infer the PAGESIZE used by the kernel. This will
+>> be helpful to diagnose failures to boot the kernel with page size
+>> not supported by the CPU.
+>>
+>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>
+> This patch needs you signed-off-by as well since you are posting it. And
+> IIRC I acked it as well, I'll check.
+>
 
-/sys/firmware/fdt is the original, unadulterated DTB passed to the
-kernel, while /sys/firmware/device-tree is the unflattened form which
-may have had overlays (or perhaps other fixups) applied.
+Yes, you did mention that you were OK with the patch. But I thought there was
+no  'Acked-by' tag added. Hence didn't pick that up.
 
-For runtime stuff I'd generally expect /sys/firmware/device-tree to be
-preferable (e.g. if we want to expose some device added by an overlay).
-We added /sys/firmware/fdt for kexec, as memory reservations are in the
-DTB header, which doesn't show up in the unflattened tree.
 
-> > > I also don't think this is the job of VFIO, assuming there is some
-> > > better place to do this.  I initially thought exposing device properties
-> > > in some canonical format from sysfs independently from whether the
-> > > system was booted with ACPI or DT was the right thing to do, but the
-> > > counter argument to this was essentially that the guest kernel needs the
-> > > same description as the host kernel and therefore we really have to find
-> > > a way to pass the HW description bits on to the guest.
-> > 
-> > So we end up with even more code to pass through ACPI table
-> > fragments as well :-(
-> > 
-> 
-> Probaby, yes.  But I think it's even worse, because there's no guarantee
-> you can get at the original firmware data, because it's all from the
-> DSDT so invoking the initial 'probe' method of the device entry could
-> theoretically overwrite itself...  (If I remember the details
-> correctly).
+> If you are fine with adding your signed-of-by, I can add it to the patch
+> when applying (unless I see other issues with the series).
+>
 
-I don't think you can realistically expose host AML to the guest. Even
-if it doesn't overwrite itself, it could perform oneshot configuration
-that breaks if executed repeatedly, try to access otehr bits of ACPI
-which may or may not be present, call to secure firmware, etc.
+Yes, please go ahead, if I don't have to send another version depending on
+the review of KVM bits. If I not, I will add the S-o-b and your Acked-by.
 
-Mark.
+
+Thanks
+Suzuki
