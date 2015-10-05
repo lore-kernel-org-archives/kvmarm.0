@@ -1,182 +1,171 @@
-From: Wei Huang <wei@redhat.com>
-Subject: Re: [kvm-unit-tests PATCHv2] arm: Add PMU test
-Date: Mon, 5 Oct 2015 16:37:41 -0500
-Message-ID: <5612EDA5.9010506@redhat.com>
-References: <1443728841-10501-1-git-send-email-cov@codeaurora.org>
- <1443800908-12159-1-git-send-email-cov@codeaurora.org>
+From: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [RFC PATCH 5/6] vfio-pci: Create iommu mapping for msi interrupt
+Date: Mon, 05 Oct 2015 16:44:56 -0600
+Message-ID: <1444085096.26107.363.camel@redhat.com>
+References: <1443624989-24346-1-git-send-email-Bharat.Bhushan@freescale.com>
+	 <1443624989-24346-5-git-send-email-Bharat.Bhushan@freescale.com>
+	 <1443825993.26107.190.camel@redhat.com>
+	 <CY1PR0301MB1276F1B231284369F36D486490480@CY1PR0301MB1276.namprd03.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1443800908-12159-1-git-send-email-cov@codeaurora.org>
+In-Reply-To: <CY1PR0301MB1276F1B231284369F36D486490480@CY1PR0301MB1276.namprd03.prod.outlook.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christopher Covington <cov@codeaurora.org>, drjones@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc: shannon.zhao@linaro.org, alistair.francis@xilinx.com
+To: Bhushan Bharat <Bharat.Bhushan@freescale.com>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "eric.auger@linaro.org" <eric.auger@linaro.org>, "pranavkumar@linaro.org" <pranavkumar@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 10/02/2015 10:48 AM, Christopher Covington wrote:
-> Add test the ARM Performance Monitors Unit (PMU). The informational
-> fields from the control register are printed, but not checked, and
-> the number of cycles it takes to run a known-instruction-count loop
-> is printed, but not checked. Once QEMU is fixed, we can at least
-> begin to check for IPC == 1 when using -icount.
-
-Thanks for submitting it. I think this is a good starting point to add
-PMU unit testing support for ARM. Some comments below.
-
+On Mon, 2015-10-05 at 07:20 +0000, Bhushan Bharat wrote:
 > 
-> Signed-off-by: Christopher Covington <cov@codeaurora.org>
-> ---
->  arm/pmu.c               | 89 +++++++++++++++++++++++++++++++++++++++++++++++++
->  arm/unittests.cfg       | 11 ++++++
->  config/config-arm64.mak |  4 ++-
->  3 files changed, 103 insertions(+), 1 deletion(-)
->  create mode 100644 arm/pmu.c
 > 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> new file mode 100644
-> index 0000000..f724c2c
-> --- /dev/null
-> +++ b/arm/pmu.c
-> @@ -0,0 +1,89 @@
-> +/*
-> + * Test the ARM Performance Monitors Unit (PMU).
-> + *
-> + * Copyright 2015 The Linux Foundation. All rights reserved.
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms of the GNU Lesser General Public License version 2.1 and
-> + * only version 2.1 as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
-> + * for more details.
-> + */
-> +#include "libcflat.h"
-> +
-> +struct pmu_data {
-> +	union {
-> +		uint32_t pmcr_el0;
-> +		struct {
-> +			unsigned int enable:1;
-> +			unsigned int event_counter_reset:1;
-> +			unsigned int cycle_counter_reset:1;
-> +			unsigned int cycle_counter_clock_divider:1;
-> +			unsigned int event_counter_export:1;
-> +			unsigned int cycle_counter_disable_when_prohibited:1;
-> +			unsigned int cycle_counter_long:1;
-> +			unsigned int zeros:4;
-> +			unsigned int num_counters:5;
-> +			unsigned int identification_code:8;
-> +			unsigned int implementor:8;
-                        ^^^^^^^^
-Not saying it is a problem because "unsigned int" is 32-bit on 64bit
-machine. But to make it consistent with pmcr_el0, I would prefer
-"unsigned int" been replaced by "uint32_t".
-
-> +		};
-> +	};
-> +};
-> +
-> +/* Execute a known number of guest instructions. Only odd instruction counts
-> + * greater than or equal to 3 are supported. The control register (PMCR) is
-> + * initialized with the provided value (allowing for example for the cycle
-> + * counter or eventer count to be reset if needed). After the known instruction
-> + * count loop, zero is written to the PMCR to disable counting, allowing the
-> + * cycle counter or event counters to be read as needed at a later time.
-> + */
-> +static void measure_instrs(int len, struct pmu_data pmcr)
-> +{
-> +	int i = (len - 1) / 2;
-> +
-> +	if (len < 3 || ((len - 1) % 2))
-> +		abort();
-> +
-> +	asm volatile(
-> +		"msr pmcr_el0, %[pmcr]\n"
-> +		"1: subs %[i], %[i], #1\n"
-> +		"b.gt 1b\n"
-> +		"msr pmcr_el0, xzr"
-> +	: [i] "+r" (i) : [pmcr] "r" (pmcr) : "cc");
-> +}
-> +
-> +int main()
-> +{
-> +	struct pmu_data pmcr;
-> +	const int samples = 10;
-> +
-> +	asm volatile("mrs %0, pmcr_el0" : "=r" (pmcr));
-> +
-> +	printf("PMU implementor:     %c\n", pmcr.implementor);
-> +	printf("Identification code: 0x%x\n", pmcr.identification_code);
-> +	printf("Event counters:      %d\n", pmcr.num_counters);
-> +
-> +	pmcr.cycle_counter_reset = 1;
-> +	pmcr.enable = 1;
-> +
-> +	printf("\ninstructions : cycles0 cycles1 ...\n");
-> +
-> +	for (int i = 3; i < 300; i += 32) {
-> +		int avg, sum = 0;
-> +		printf("%d :", i);
-> +		for (int j = 0; j < samples; j++) {
-> +			int val;
-> +			measure_instrs(i, pmcr);
-> +			asm volatile("mrs %0, pmccntr_el0" : "=r" (val));
-> +			sum += val;
-> +			printf(" %d", val);
-> +		}
-> +		avg = sum / samples;
-> +		printf(" sum=%d avg=%d avg_ipc=%d avg_cpi=%d\n", sum, avg, i / avg, avg / i);
-> +	}
-
-I understand that, as stated in commit message, it currently doesn't
-check the correctness of PMU counter values. But it would be better if
-testing code can be abstracted into an independent function (e.g.
-instr_cycle_check) for report("Instruction Cycles",
-instr_cycle_check()). You can return TRUE in the checking code for now.
-
-
-> +
-> +	return report_summary();
-> +}
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index e068a0c..b3b7ff4 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -35,3 +35,14 @@ file = selftest.flat
->  smp = `getconf _NPROCESSORS_CONF`
->  extra_params = -append 'smp'
->  groups = selftest
-> +
-> +# Test PMU support without -icount
-> +[pmu]
-> +file = pmu.flat
-> +groups = pmu
-> +
-> +# Test PMU support with -icount
-> +[pmu-icount]
-> +file = pmu.flat
-> +groups = pmu
-> +extra_params = -icount 0
-> diff --git a/config/config-arm64.mak b/config/config-arm64.mak
-> index d61b703..140b611 100644
-> --- a/config/config-arm64.mak
-> +++ b/config/config-arm64.mak
-> @@ -12,9 +12,11 @@ cflatobjs += lib/arm64/processor.o
->  cflatobjs += lib/arm64/spinlock.o
->  
->  # arm64 specific tests
-> -tests =
-> +tests = $(TEST_DIR)/pmu.flat
->  
->  include config/config-arm-common.mak
->  
->  arch_clean: arm_clean
->  	$(RM) lib/arm64/.*.d
-> +
-> +$(TEST_DIR)/pmu.elf: $(cstart.o) $(TEST_DIR)/pmu.o
+> > -----Original Message-----
+> > From: Alex Williamson [mailto:alex.williamson@redhat.com]
+> > Sent: Saturday, October 03, 2015 4:17 AM
+> > To: Bhushan Bharat-R65777 <Bharat.Bhushan@freescale.com>
+> > Cc: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org;
+> > christoffer.dall@linaro.org; eric.auger@linaro.org; pranavkumar@linaro.org;
+> > marc.zyngier@arm.com; will.deacon@arm.com
+> > Subject: Re: [RFC PATCH 5/6] vfio-pci: Create iommu mapping for msi
+> > interrupt
+> > 
+> > On Wed, 2015-09-30 at 20:26 +0530, Bharat Bhushan wrote:
+> > > An MSI-address is allocated and programmed in pcie device during
+> > > interrupt configuration. Now for a pass-through device, try to create
+> > > the iommu mapping for this allocted/programmed msi-address.  If the
+> > > iommu mapping is created and the msi address programmed in the pcie
+> > > device is different from msi-iova as per iommu programming then
+> > > reconfigure the pci device to use msi-iova as msi address.
+> > >
+> > > Signed-off-by: Bharat Bhushan <Bharat.Bhushan@freescale.com>
+> > > ---
+> > >  drivers/vfio/pci/vfio_pci_intrs.c | 36
+> > > ++++++++++++++++++++++++++++++++++--
+> > >  1 file changed, 34 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/drivers/vfio/pci/vfio_pci_intrs.c
+> > > b/drivers/vfio/pci/vfio_pci_intrs.c
+> > > index 1f577b4..c9690af 100644
+> > > --- a/drivers/vfio/pci/vfio_pci_intrs.c
+> > > +++ b/drivers/vfio/pci/vfio_pci_intrs.c
+> > > @@ -312,13 +312,23 @@ static int vfio_msi_set_vector_signal(struct
+> > vfio_pci_device *vdev,
+> > >  	int irq = msix ? vdev->msix[vector].vector : pdev->irq + vector;
+> > >  	char *name = msix ? "vfio-msix" : "vfio-msi";
+> > >  	struct eventfd_ctx *trigger;
+> > > +	struct msi_msg msg;
+> > > +	struct vfio_device *device;
+> > > +	uint64_t msi_addr, msi_iova;
+> > >  	int ret;
+> > >
+> > >  	if (vector >= vdev->num_ctx)
+> > >  		return -EINVAL;
+> > >
+> > > +	device = vfio_device_get_from_dev(&pdev->dev);
+> > 
+> > Have you looked at this function?  I don't think we want to be doing that
+> > every time we want to poke the interrupt configuration.
 > 
+> I am trying to describe what I understood, a device can have many interrupts and we should setup iommu only once, when called for the first time to enable/setup interrupt.
+> Similarly when disabling the interrupt we should iommu-unmap when called for the last enabled interrupt for that device. Now with this understanding, should I move this map-unmap to separate functions and call them from vfio_msi_set_block() rather than in vfio_msi_set_vector_signal()
+
+Interrupts can be setup and torn down at any time and I don't see how
+one function or the other makes much difference.
+vfio_device_get_from_dev() is enough overhead that the data we need
+should be cached if we're going to call it with some regularity.  Maybe
+vfio_iommu_driver_ops.open() should be called with a pointer to the
+vfio_device... or the vfio_group.
+
+> >  Also note that
+> > IOMMU mappings don't operate on devices, but groups, so maybe we want
+> > to pass the group.
+> 
+> Yes, it operates on group. I hesitated to add an API to get group. Do you suggest to that it is ok to add API to get group from device.
+
+No, the above suggestion is probably better.
+
+> > 
+> > > +	if (device == NULL)
+> > > +		return -EINVAL;
+> > 
+> > This would be a legitimate BUG_ON(!device)
+> > 
+> > > +
+> > >  	if (vdev->ctx[vector].trigger) {
+> > >  		free_irq(irq, vdev->ctx[vector].trigger);
+> > > +		get_cached_msi_msg(irq, &msg);
+> > > +		msi_iova = ((u64)msg.address_hi << 32) | msg.address_lo;
+> > > +		vfio_device_unmap_msi(device, msi_iova, PAGE_SIZE);
+> > >  		kfree(vdev->ctx[vector].name);
+> > >  		eventfd_ctx_put(vdev->ctx[vector].trigger);
+> > >  		vdev->ctx[vector].trigger = NULL;
+> > > @@ -346,12 +356,11 @@ static int vfio_msi_set_vector_signal(struct
+> > vfio_pci_device *vdev,
+> > >  	 * cached value of the message prior to enabling.
+> > >  	 */
+> > >  	if (msix) {
+> > > -		struct msi_msg msg;
+> > > -
+> > >  		get_cached_msi_msg(irq, &msg);
+> > >  		pci_write_msi_msg(irq, &msg);
+> > >  	}
+> > >
+> > > +
+> > 
+> > gratuitous newline
+> > 
+> > >  	ret = request_irq(irq, vfio_msihandler, 0,
+> > >  			  vdev->ctx[vector].name, trigger);
+> > >  	if (ret) {
+> > > @@ -360,6 +369,29 @@ static int vfio_msi_set_vector_signal(struct
+> > vfio_pci_device *vdev,
+> > >  		return ret;
+> > >  	}
+> > >
+> > > +	/* Re-program the new-iova in pci-device in case there is
+> > > +	 * different iommu-mapping created for programmed msi-address.
+> > > +	 */
+> > > +	get_cached_msi_msg(irq, &msg);
+> > > +	msi_iova = 0;
+> > > +	msi_addr = (u64)(msg.address_hi) << 32 | (u64)(msg.address_lo);
+> > > +	ret = vfio_device_map_msi(device, msi_addr, PAGE_SIZE,
+> > &msi_iova);
+> > > +	if (ret) {
+> > > +		free_irq(irq, vdev->ctx[vector].trigger);
+> > > +		kfree(vdev->ctx[vector].name);
+> > > +		eventfd_ctx_put(trigger);
+> > > +		return ret;
+> > > +	}
+> > > +
+> > > +	/* Reprogram only if iommu-mapped iova is different from msi-
+> > address */
+> > > +	if (msi_iova && (msi_iova != msi_addr)) {
+> > > +		msg.address_hi = (u32)(msi_iova >> 32);
+> > > +		/* Keep Lower bits from original msi message address */
+> > > +		msg.address_lo &= PAGE_MASK;
+> > > +		msg.address_lo |= (u32)(msi_iova & 0x00000000ffffffff);
+> > 
+> > Seems like you're making some assumptions here that are dependent on the
+> > architecture and maybe the platform.
+> 
+> What I tried is to map the msi page with different iova, which is page size aligned. But the offset within the page will remain same.
+> For example, original msi address was 0x0603_0040 and we have a reserved region at 0xf000_0000. So iommu mapping is created for 0xf000_0000 =>0x0600_3000 of size 0x1000.
+> 
+> So the new address to be programmed in device is 0xf000_0040, offset 0x40 added to base address in iommu mapping.
+
+Don't you need ~PAGE_MASK for it to work like that?  The & with
+0x00000000ffffffff shouldn't be needed either, certainly not with all
+the leading zeros.
+
+> > > +		pci_write_msi_msg(irq, &msg);
+> > > +	}
+> > > +
+> > >  	vdev->ctx[vector].trigger = trigger;
+> > >
+> > >  	return 0;
+> > 
+> > 
+> 
+
+
+
