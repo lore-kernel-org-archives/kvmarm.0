@@ -1,110 +1,60 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: PING: [PATCH v4 0/7] KVM: arm64: Implement API for vGICv3 live
- migration
-Date: Tue, 06 Oct 2015 11:41:08 +0300
-Message-ID: <00ca01d10012$bfd629b0$3f827d10$@samsung.com>
+From: Bhushan Bharat <Bharat.Bhushan@freescale.com>
+Subject: RE: [RFC PATCH 3/6] vfio: Extend iommu-info to return MSIs automap
+ state
+Date: Tue, 6 Oct 2015 08:53:51 +0000
+Message-ID: <CY1PR0301MB12762322B3669142A04F9DB890370@CY1PR0301MB1276.namprd03.prod.outlook.com>
+References: <1443624989-24346-1-git-send-email-Bharat.Bhushan@freescale.com>
+	 <1443624989-24346-3-git-send-email-Bharat.Bhushan@freescale.com>
+	 <1443825961.26107.188.camel@redhat.com>
+	 <CY1PR0301MB1276F6E301D347F20D7A766590480@CY1PR0301MB1276.namprd03.prod.outlook.com>
+ <1444085102.26107.364.camel@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E1CD9412E6
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Oct 2015 04:39:20 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id unwFW+oHuVRb for <kvmarm@lists.cs.columbia.edu>;
- Tue,  6 Oct 2015 04:39:18 -0400 (EDT)
-Received: from mailout3.w1.samsung.com (mailout3.w1.samsung.com
- [210.118.77.13])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D5B94412D0
- for <kvmarm@lists.cs.columbia.edu>; Tue,  6 Oct 2015 04:39:18 -0400 (EDT)
-Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
- by mailout3.w1.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NVS00JYHISM1N40@mailout3.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Tue, 06 Oct 2015 09:41:10 +0100 (BST)
-Content-language: ru
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: 'Marc Zyngier' <marc.zyngier@arm.com>, 'Andre Przywara' <andre.przywara@arm.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1444085102.26107.364.camel@redhat.com>
+Content-Language: en-US
+Sender: kvm-owner@vger.kernel.org
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "christoffer.dall@linaro.org" <christoffer.dall@linaro.org>, "eric.auger@linaro.org" <eric.auger@linaro.org>, "pranavkumar@linaro.org" <pranavkumar@linaro.org>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "will.deacon@arm.com" <will.deacon@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello! Sorry if you're terribly busy, but... small gentle PING...
-
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
-
-> -----Original Message-----
-> From: kvmarm-bounces@lists.cs.columbia.edu [mailto:kvmarm-bounces@lists.cs.columbia.edu] On
-> Behalf Of Pavel Fedin
-> Sent: Monday, September 28, 2015 6:27 PM
-> To: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org
-> Cc: Marc Zyngier; Andre Przywara
-> Subject: [PATCH v4 0/7] KVM: arm64: Implement API for vGICv3 live migration
-> 
-> This patchset adds necessary userspace API in order to support vGICv3 live
-> migration. GICv3 registers are accessed using device attribute ioctls,
-> similar to GICv2.
-> 
-> v3 => v4:
-> - Split pure refactoring from anything else
-> - Documentation brought up to date
-> - Cleaned up 'mmio' structure usage in vgic_attr_regs_access(),
->   use call_range_handler() for 64-bit access handling
-> - Rebased on new linux-next
-> 
-> v2 => v3:
-> - KVM_DEV_ARM_VGIC_CPUID_MASK enlarged to 20 bits, allowing more than 256
->   CPUs.
-> - Bug fix: Correctly set mmio->private, necessary for redistributor access.
-> - Added accessors for ICC_AP0R and ICC_AP1R registers
-> - Rebased on new linux-next
-> 
-> v1 => v2:
-> - Do not use generic register get/set API for CPU interface, use only
->   device attributes.
-> - Introduce size specifier for distributor and redistributor register
->   accesses, do not assume size any more.
-> - Lots of refactor and reusable code extraction.
-> - Added forgotten documentation
-> 
-> Pavel Fedin (7):
->   KVM: arm/arm64: Move endianness conversion out of
->     vgic_attr_regs_access()
->   KVM: arm/arm64: Refactor vGIC attributes handling code
->   KVM: arm/arm64: Fix the documentation
->   KVM: arm64: Implement vGICv3 distributor and redistributor access from
->     userspace
->   KVM: arm64: Refactor system register handlers
->   KVM: arm64: Introduce find_reg_by_id()
->   Implement vGICv3 CPU interface access
-> 
->  Documentation/virtual/kvm/devices/arm-vgic.txt |  90 ++++++-
->  arch/arm64/include/uapi/asm/kvm.h              |  11 +-
->  arch/arm64/kvm/sys_regs.c                      |  83 +++---
->  arch/arm64/kvm/sys_regs.h                      |   8 +-
->  arch/arm64/kvm/sys_regs_generic_v8.c           |   2 +-
->  include/linux/irqchip/arm-gic-v3.h             |  18 +-
->  virt/kvm/arm/vgic-v2-emul.c                    | 122 ++-------
->  virt/kvm/arm/vgic-v3-emul.c                    | 338 ++++++++++++++++++++++++-
->  virt/kvm/arm/vgic.c                            |  65 +++++
->  virt/kvm/arm/vgic.h                            |   4 +
->  10 files changed, 571 insertions(+), 170 deletions(-)
-> 
-> --
-> 2.4.4
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQWxleCBXaWxsaWFtc29u
+IFttYWlsdG86YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb21dDQo+IFNlbnQ6IFR1ZXNkYXksIE9j
+dG9iZXIgMDYsIDIwMTUgNDoxNSBBTQ0KPiBUbzogQmh1c2hhbiBCaGFyYXQtUjY1Nzc3IDxCaGFy
+YXQuQmh1c2hhbkBmcmVlc2NhbGUuY29tPg0KPiBDYzoga3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlh
+LmVkdTsga3ZtQHZnZXIua2VybmVsLm9yZzsNCj4gY2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3Jn
+OyBlcmljLmF1Z2VyQGxpbmFyby5vcmc7IHByYW5hdmt1bWFyQGxpbmFyby5vcmc7DQo+IG1hcmMu
+enluZ2llckBhcm0uY29tOyB3aWxsLmRlYWNvbkBhcm0uY29tDQo+IFN1YmplY3Q6IFJlOiBbUkZD
+IFBBVENIIDMvNl0gdmZpbzogRXh0ZW5kIGlvbW11LWluZm8gdG8gcmV0dXJuIE1TSXMNCj4gYXV0
+b21hcCBzdGF0ZQ0KPiANCj4gT24gTW9uLCAyMDE1LTEwLTA1IGF0IDA2OjAwICswMDAwLCBCaHVz
+aGFuIEJoYXJhdCB3cm90ZToNCj4gPiA+IC0xMTM4LDYgKzExNTYsOCBAQA0KPiA+ID4gPiBzdGF0
+aWMgbG9uZyB2ZmlvX2lvbW11X3R5cGUxX2lvY3RsKHZvaWQgKmlvbW11X2RhdGEsDQo+ID4gPiA+
+ICAJCX0NCj4gPiA+ID4gIAl9IGVsc2UgaWYgKGNtZCA9PSBWRklPX0lPTU1VX0dFVF9JTkZPKSB7
+DQo+ID4gPiA+ICAJCXN0cnVjdCB2ZmlvX2lvbW11X3R5cGUxX2luZm8gaW5mbzsNCj4gPiA+ID4g
+KwkJc3RydWN0IGlvbW11X2RvbWFpbl9tc2lfbWFwcyBtc2lfbWFwczsNCj4gPiA+ID4gKwkJaW50
+IHJldDsNCj4gPiA+ID4NCj4gPiA+ID4gIAkJbWluc3ogPSBvZmZzZXRvZmVuZChzdHJ1Y3QgdmZp
+b19pb21tdV90eXBlMV9pbmZvLA0KPiA+ID4gaW92YV9wZ3NpemVzKTsNCj4gPiA+ID4NCj4gPiA+
+ID4gQEAgLTExNDksNiArMTE2OSwxOCBAQCBzdGF0aWMgbG9uZyB2ZmlvX2lvbW11X3R5cGUxX2lv
+Y3RsKHZvaWQNCj4gPiA+ID4gKmlvbW11X2RhdGEsDQo+ID4gPiA+DQo+ID4gPiA+ICAJCWluZm8u
+ZmxhZ3MgPSAwOw0KPiA+ID4gPg0KPiA+ID4gPiArCQlyZXQgPSB2ZmlvX2RvbWFpbnNfZ2V0X21z
+aV9tYXBzKGlvbW11LCAmbXNpX21hcHMpOw0KPiA+ID4gPiArCQlpZiAocmV0KQ0KPiA+ID4gPiAr
+CQkJcmV0dXJuIHJldDsNCj4gPiA+DQo+ID4gPiBBbmQgbm93IGlvY3RsKFZGSU9fSU9NTVVfR0VU
+X0lORk8pIG5vIGxvbmdlciB3b3JrcyBmb3IgYW55DQo+IElPTU1VDQo+ID4gPiBpbXBsZW1lbnRp
+bmcgZG9tYWluX2dldF9hdHRyIGJ1dCBub3Qgc3VwcG9ydGluZw0KPiA+ID4gRE9NQUlOX0FUVFJf
+TVNJX01BUFBJTkcuDQo+ID4NCj4gPiBXaXRoIHRoaXMgY3VycmVudCBwYXRjaCB2ZXJzaW9uIHRo
+aXMgd2lsbCBnZXQgdGhlIGRlZmF1bHQgYXNzdW1lZCBiZWhhdmlvcg0KPiBhcyB5b3UgY29tbWVu
+dGVkIG9uIHByZXZpb3VzIHBhdGNoLg0KPiANCj4gSG93IHNvPw0KDQpZb3UgYXJlIHJpZ2h0LCB0
+aGUgaW9jdGwgd2lsbCByZXR1cm4gZmFpbHVyZS4gQnV0IHRoYXQgc2hvdWxkIGJlIG9rLCByaWdo
+dD8NCg0KPiANCj4gKyAgICAgICAgICAgICAgIG1zaV9tYXBzLT5hdXRvbWFwID0gdHJ1ZTsNCj4g
+KyAgICAgICAgICAgICAgIG1zaV9tYXBzLT5vdmVycmlkZV9hdXRvbWFwID0gZmFsc2U7DQo+ICsN
+Cj4gKyAgICAgICAgICAgICAgIGlmIChkb21haW4tPm9wcy0+ZG9tYWluX2dldF9hdHRyKQ0KPiAr
+ICAgICAgICAgICAgICAgICAgICAgICByZXQgPSBkb21haW4tPm9wcy0+ZG9tYWluX2dldF9hdHRy
+KGRvbWFpbiwgYXR0ciwNCj4gKyBkYXRhKTsNCj4gDQo+IElmIGRvbWFpbl9nZXRfYXR0ciBpcyBp
+bXBsZW1lbnRlZCwgYnV0IERPTUFJTl9BVFRSX01TSV9NQVBQSU5HIGlzDQo+IG5vdCwgcmV0IHNo
+b3VsZCBiZSBhbiBlcnJvciBjb2RlLg0KDQpDdXJyZW50bHkgaXQgcmV0dXJucyBzYW1lIGVycm9y
+IGNvZGUgcmV0dXJuZWQgYnkgZG9tYWluLT5vcHMtPmRvbWFpbl9nZXRfYXR0cigpLiANCkkgZG8g
+bm90IHRoaW5rIHdlIHdhbnQgdG8gY29tcGxpY2F0ZSB0aGF0IHdlIHJldHVybiBhbiBlcnJvciB0
+byB1c2VyLXNwYWNlIHRoYXQgbXNpJ3MgcHJvYmFibHkgY2Fubm90IGJlIHVzZWQgYnV0IHVzZXIt
+c3BhY2UgY2FuIGNvbnRpbnVlIHdpdGggTGVnYWN5IGludGVycnVwdCwgb3IgeW91IHdhbnQgdGhh
+dD8NCg0KVGhhbmtzDQotQmhhcmF0DQoNCg==
