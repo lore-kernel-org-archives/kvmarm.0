@@ -1,209 +1,33 @@
-From: Mario Smarduch <m.smarduch@samsung.com>
-Subject: [PATCH v2 2/2] enable armv8 fp/simd lazy switch
-Date: Mon, 05 Oct 2015 19:33:14 -0700
-Message-ID: <1444098794-19244-3-git-send-email-m.smarduch@samsung.com>
-References: <1444098794-19244-1-git-send-email-m.smarduch@samsung.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 45D48412DD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 22:31:42 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id uvxmkVNc1E7d for <kvmarm@lists.cs.columbia.edu>;
- Mon,  5 Oct 2015 22:31:38 -0400 (EDT)
-Received: from usmailout4.samsung.com (mailout4.w2.samsung.com
- [211.189.100.14])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C8E1E4169C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  5 Oct 2015 22:31:38 -0400 (EDT)
-Received: from uscpsbgex3.samsung.com
- (u124.gpu85.samsung.co.kr [203.254.195.124]) by usmailout4.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NVS00KCN1RW1770@usmailout4.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Mon, 05 Oct 2015 22:33:32 -0400 (EDT)
-In-reply-to: <1444098794-19244-1-git-send-email-m.smarduch@samsung.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: [PATCH] KVM: arm/arm64: Fix memory leak if timer initialization fails
+Date: Tue, 06 Oct 2015 11:14:35 +0300
+Message-ID: <1444119275-8972-1-git-send-email-p.fedin@samsung.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: marc.zyngier@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch enables arm64 lazy fp/simd switch. Removes the ARM constraint,
-and follows the same approach as armv7 version - found here.
+Jump to correct label and free kvm_host_cpu_state
 
-https://lists.cs.columbia.edu/pipermail/kvmarm/2015-September/016567.html
-
-To summarize - provided the guest accesses fp/simd unit we limit number
-of fp/simd context switches to two per vCPU execution schedule.
-
-Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
 ---
- arch/arm/kvm/arm.c               |  2 --
- arch/arm64/include/asm/kvm_asm.h |  1 +
- arch/arm64/kvm/hyp.S             | 59 +++++++++++++++++++++++++++-------------
- 3 files changed, 41 insertions(+), 21 deletions(-)
+ arch/arm/kvm/arm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 1b1f9e9..fe609f1 100644
+index dc017ad..78b2869 100644
 --- a/arch/arm/kvm/arm.c
 +++ b/arch/arm/kvm/arm.c
-@@ -112,12 +112,10 @@ void kvm_arch_check_processor_compat(void *rtn)
-  */
- static void kvm_switch_fp_regs(struct kvm_vcpu *vcpu)
- {
--#ifdef CONFIG_ARM
- 	if (vcpu->arch.vfp_lazy == 1) {
- 		kvm_call_hyp(__kvm_restore_host_vfp_state, vcpu);
- 		vcpu->arch.vfp_lazy = 0;
- 	}
--#endif
- }
+@@ -1080,7 +1080,7 @@ static int init_hyp_mode(void)
+ 	 */
+ 	err = kvm_timer_hyp_init();
+ 	if (err)
+-		goto out_free_mappings;
++		goto out_free_context;
  
- /**
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 5e37710..83dcac5 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -117,6 +117,7 @@ extern char __kvm_hyp_vector[];
- extern void __kvm_flush_vm_context(void);
- extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
- extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
-+extern void __kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu);
- 
- extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-index e583613..ea99f66 100644
---- a/arch/arm64/kvm/hyp.S
-+++ b/arch/arm64/kvm/hyp.S
-@@ -385,14 +385,6 @@
- 	tbz	\tmp, #KVM_ARM64_DEBUG_DIRTY_SHIFT, \target
- .endm
- 
--/*
-- * Branch to target if CPTR_EL2.TFP bit is set (VFP/SIMD trapping enabled)
-- */
--.macro skip_fpsimd_state tmp, target
--	mrs	\tmp, cptr_el2
--	tbnz	\tmp, #CPTR_EL2_TFP_SHIFT, \target
--.endm
--
- .macro compute_debug_state target
- 	// Compute debug state: If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY
- 	// is set, we do a full save/restore cycle and disable trapping.
-@@ -433,10 +425,6 @@
- 	mrs	x5, ifsr32_el2
- 	stp	x4, x5, [x3]
- 
--	skip_fpsimd_state x8, 2f
--	mrs	x6, fpexc32_el2
--	str	x6, [x3, #16]
--2:
- 	skip_debug_state x8, 1f
- 	mrs	x7, dbgvcr32_el2
- 	str	x7, [x3, #24]
-@@ -481,8 +469,15 @@
- 	isb
- 99:
- 	msr     hcr_el2, x2
--	mov	x2, #CPTR_EL2_TTA
-+
-+	mov     x2, #0
-+	ldr     w3, [x0, #VCPU_VFP_LAZY]
-+	tbnz    w3, #0, 98f
-+
- 	orr     x2, x2, #CPTR_EL2_TFP
-+98:
-+	orr     x2, x2, #CPTR_EL2_TTA
-+
- 	msr	cptr_el2, x2
- 
- 	mov	x2, #(1 << 15)	// Trap CP15 Cr=15
-@@ -669,14 +664,12 @@ __restore_debug:
- 	ret
- 
- __save_fpsimd:
--	skip_fpsimd_state x3, 1f
- 	save_fpsimd
--1:	ret
-+	ret
- 
- __restore_fpsimd:
--	skip_fpsimd_state x3, 1f
- 	restore_fpsimd
--1:	ret
-+	ret
- 
- switch_to_guest_fpsimd:
- 	push	x4, lr
-@@ -688,6 +681,9 @@ switch_to_guest_fpsimd:
- 
- 	mrs	x0, tpidr_el2
- 
-+	mov     w2, #1
-+	str     w2, [x0, #VCPU_VFP_LAZY]
-+
- 	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
- 	kern_hyp_va x2
- 	bl __save_fpsimd
-@@ -763,7 +759,6 @@ __kvm_vcpu_return:
- 	add	x2, x0, #VCPU_CONTEXT
- 
- 	save_guest_regs
--	bl __save_fpsimd
- 	bl __save_sysregs
- 
- 	skip_debug_state x3, 1f
-@@ -784,7 +779,6 @@ __kvm_vcpu_return:
- 	kern_hyp_va x2
- 
- 	bl __restore_sysregs
--	bl __restore_fpsimd
- 	/* Clear FPSIMD and Trace trapping */
- 	msr     cptr_el2, xzr
- 
-@@ -863,6 +857,33 @@ ENTRY(__kvm_flush_vm_context)
- 	ret
- ENDPROC(__kvm_flush_vm_context)
- 
-+/**
-+ * kvm_switch_fp_regs() - switch guest/host VFP/SIMD registers
-+ * @vcpu:      pointer to vcpu structure.
-+ *
-+ */
-+ENTRY(__kvm_restore_host_vfp_state)
-+	push    x4, lr
-+
-+	kern_hyp_va x0
-+	add     x2, x0, #VCPU_CONTEXT
-+
-+	// Load Guest HCR, determine if guest is 32 or 64 bit
-+	ldr     x3, [x0, #VCPU_HCR_EL2]
-+	tbnz    x3, #HCR_RW_SHIFT, 1f
-+	mrs     x4, fpexc32_el2
-+	str     x4, [x2, #CPU_SYSREG_OFFSET(FPEXC32_EL2)]
-+1:
-+	bl __save_fpsimd
-+
-+	ldr     x2, [x0, #VCPU_HOST_CONTEXT]
-+	kern_hyp_va x2
-+	bl __restore_fpsimd
-+
-+	pop     x4, lr
-+	ret
-+ENDPROC(__kvm_restore_host_vfp_state)
-+
- __kvm_hyp_panic:
- 	// Guess the context by looking at VTTBR:
- 	// If zero, then we're already a host.
+ #ifndef CONFIG_HOTPLUG_CPU
+ 	free_boot_hyp_pgd();
 -- 
-1.9.1
+2.4.4
+
