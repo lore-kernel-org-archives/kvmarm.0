@@ -1,7 +1,7 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v3 05/16] KVM: arm/arm64: extend arch CAP checks to allow per-VM capabilities
-Date: Wed,  7 Oct 2015 15:55:15 +0100
-Message-ID: <1444229726-31559-6-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v3 11/16] KVM: arm64: add data structures to model ITS interrupt translation
+Date: Wed,  7 Oct 2015 15:55:21 +0100
+Message-ID: <1444229726-31559-12-git-send-email-andre.przywara@arm.com>
 References: <1444229726-31559-1-git-send-email-andre.przywara@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1444229726-31559-1-git-send-email-andre.przywara@arm.com>
@@ -10,75 +10,159 @@ To: marc.zyngier@arm.com, christoffer.dall@linaro.org
 Cc: eric.auger@linaro.org, p.fedin@samsung.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-KVM capabilities can be a per-VM property, though ARM/ARM64 currently
-does not pass on the VM pointer to the architecture specific
-capability handlers.
-Add a "struct kvm*" parameter to those function to later allow proper
-per-VM capability reporting.
+The GICv3 Interrupt Translation Service (ITS) uses tables in memory
+to allow a sophisticated interrupt routing. It features device tables,
+an interrupt table per device and a table connecting "collections" to
+actual CPUs (aka. redistributors in the GICv3 lingo).
+Since the interrupt numbers for the LPIs are allocated quite sparsely
+and the range can be quite huge (8192 LPIs being the minimum), using
+bitmaps or arrays for storing information is a waste of memory.
+We use linked lists instead, which we iterate linearily. This works
+very well with the actual number of LPIs/MSIs in the guest being
+quite low. Should the number of LPIs exceed the number where iterating
+through lists seems acceptable, we can later revisit this and use more
+efficient data structures.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
 Changelog v2..v3:
-- none
+- add a comment
 
- arch/arm/include/asm/kvm_host.h   | 2 +-
- arch/arm/kvm/arm.c                | 2 +-
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/kvm/reset.c            | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+ include/kvm/arm_vgic.h  |  3 +++
+ virt/kvm/arm/its-emul.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 69 insertions(+)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 3df1e97..88e84db 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -210,7 +210,7 @@ static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
- 	kvm_call_hyp((void*)hyp_stack_ptr, vector_ptr, pgd_ptr);
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 9ac850d..c3eb414 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -25,6 +25,7 @@
+ #include <linux/spinlock.h>
+ #include <linux/types.h>
+ #include <kvm/iodev.h>
++#include <linux/list.h>
+ 
+ #define VGIC_NR_IRQS_LEGACY	256
+ #define VGIC_NR_SGIS		16
+@@ -174,6 +175,8 @@ struct vgic_its {
+ 	u64			cbaser;
+ 	int			creadr;
+ 	int			cwriter;
++	struct list_head	device_list;
++	struct list_head	collection_list;
+ };
+ 
+ struct vgic_dist {
+diff --git a/virt/kvm/arm/its-emul.c b/virt/kvm/arm/its-emul.c
+index 9bbed86..bab8033 100644
+--- a/virt/kvm/arm/its-emul.c
++++ b/virt/kvm/arm/its-emul.c
+@@ -21,6 +21,7 @@
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+ #include <linux/interrupt.h>
++#include <linux/list.h>
+ 
+ #include <linux/irqchip/arm-gic-v3.h>
+ #include <kvm/arm_vgic.h>
+@@ -32,6 +33,34 @@
+ #include "vgic.h"
+ #include "its-emul.h"
+ 
++struct its_device {
++	struct list_head dev_list;
++
++	/* the head for the list of ITTEs */
++	struct list_head itt;
++	u32 device_id;
++};
++
++#define COLLECTION_NOT_MAPPED ((u32)-1)
++
++struct its_collection {
++	struct list_head coll_list;
++
++	u32 collection_id;
++	u32 target_addr;
++};
++
++#define its_is_collection_mapped(coll) ((coll) && \
++				((coll)->target_addr != COLLECTION_NOT_MAPPED))
++
++struct its_itte {
++	struct list_head itte_list;
++
++	struct its_collection *collection;
++	u32 lpi;
++	u32 event_id;
++};
++
+ #define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
+ 
+ /* The distributor lock is held by the VGIC MMIO handler. */
+@@ -125,6 +154,12 @@ static bool handle_mmio_gits_idregs(struct kvm_vcpu *vcpu,
+ 	return false;
  }
  
--static inline int kvm_arch_dev_ioctl_check_extension(long ext)
-+static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
++static void its_free_itte(struct its_itte *itte)
++{
++	list_del(&itte->itte_list);
++	kfree(itte);
++}
++
+ /*
+  * This function is called with both the ITS and the distributor lock dropped,
+  * so the actual command handlers must take the respective locks when needed.
+@@ -321,6 +356,9 @@ int vits_init(struct kvm *kvm)
+ 
+ 	spin_lock_init(&its->lock);
+ 
++	INIT_LIST_HEAD(&its->device_list);
++	INIT_LIST_HEAD(&its->collection_list);
++
+ 	its->enabled = false;
+ 
+ 	return -ENXIO;
+@@ -330,11 +368,39 @@ void vits_destroy(struct kvm *kvm)
  {
- 	return 0;
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	struct vgic_its *its = &dist->its;
++	struct its_device *dev;
++	struct its_itte *itte;
++	struct list_head *dev_cur, *dev_temp;
++	struct list_head *cur, *temp;
+ 
+ 	if (!vgic_has_its(kvm))
+ 		return;
+ 
++	/*
++	 * We may end up here without the lists ever having been initialized.
++	 * Check this and bail out early to avoid dereferencing a NULL pointer.
++	 */
++	if (!its->device_list.next)
++		return;
++
++	spin_lock(&its->lock);
++	list_for_each_safe(dev_cur, dev_temp, &its->device_list) {
++		dev = container_of(dev_cur, struct its_device, dev_list);
++		list_for_each_safe(cur, temp, &dev->itt) {
++			itte = (container_of(cur, struct its_itte, itte_list));
++			its_free_itte(itte);
++		}
++		list_del(dev_cur);
++		kfree(dev);
++	}
++
++	list_for_each_safe(cur, temp, &its->collection_list) {
++		list_del(cur);
++		kfree(container_of(cur, struct its_collection, coll_list));
++	}
++
+ 	kfree(dist->pendbaser);
+ 
+ 	its->enabled = false;
++	spin_unlock(&its->lock);
  }
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 6c7f4520..bdbefcd 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -197,7 +197,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = KVM_MAX_VCPUS;
- 		break;
- 	default:
--		r = kvm_arch_dev_ioctl_check_extension(ext);
-+		r = kvm_arch_dev_ioctl_check_extension(kvm, ext);
- 		break;
- 	}
- 	return r;
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 4562459..c41e613 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -43,7 +43,7 @@
- 
- int __attribute_const__ kvm_target_cpu(void);
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
--int kvm_arch_dev_ioctl_check_extension(long ext);
-+int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext);
- 
- struct kvm_arch {
- 	/* The VMID generation used for the virt. memory system */
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 91cf535..4d7f78b4 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -63,7 +63,7 @@ static bool cpu_has_32bit_el1(void)
-  * We currently assume that the number of HW registers is uniform
-  * across all CPUs (see cpuinfo_sanity_check).
-  */
--int kvm_arch_dev_ioctl_check_extension(long ext)
-+int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
- {
- 	int r;
- 
 -- 
 2.5.1
 
