@@ -1,45 +1,68 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 4/7] KVM: arm64: Implement vGICv3 distributor and
- redistributor access from userspace
-Date: Wed, 7 Oct 2015 22:07:11 +0200
-Message-ID: <20151007200711.GD14315@cbox>
-References: <cover.1443451687.git.p.fedin@samsung.com>
- <9d42bb0fd6abf17bae0179c4233c45d267c25162.1443451687.git.p.fedin@samsung.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: Virt MM DEBUG_LL support arm32
+Date: Wed, 7 Oct 2015 22:05:26 +0100
+Message-ID: <CAFEAcA8RWhh8agbfAR8JARXU6BY7PyLt3Z9UPzEh7xvJsev7Ng@mail.gmail.com>
+References: <5614683A.1010007@samsung.com>
+ <CAFEAcA9ShOzMG7kk9hQRgizJ_u2=Y2B5v6SXi678M1RMZQcPVA@mail.gmail.com>
+ <56154AF4.60206@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <9d42bb0fd6abf17bae0179c4233c45d267c25162.1443451687.git.p.fedin@samsung.com>
-Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BCC3941457
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Oct 2015 17:03:49 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id qrAktwI1Gn8r for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Oct 2015 17:03:48 -0400 (EDT)
+Received: from mail-vk0-f44.google.com (mail-vk0-f44.google.com
+ [209.85.213.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B622D413E0
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Oct 2015 17:03:48 -0400 (EDT)
+Received: by vkfp126 with SMTP id p126so19946083vkf.3
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 07 Oct 2015 14:05:46 -0700 (PDT)
+In-Reply-To: <56154AF4.60206@samsung.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Mario Smarduch <m.smarduch@samsung.com>
+Cc: Peter Maydell <peter.maydell@linaro.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Pavel,
+On 7 October 2015 at 17:40, Mario Smarduch <m.smarduch@samsung.com> wrote:
+> On 10/7/2015 12:07 AM, Peter Maydell wrote:
+>> On 7 October 2015 at 01:32, Mario Smarduch <m.smarduch@samsung.com> wrote:
+>>> Hi Peter,
+>>>    I noticed that icedcc, and 8250 don't work
+>>> with DEBUG_LL early debug print. And the kernel dies if
+>>> these are selected. Besides PL011 is there any other
+>>> serial devices that can be used for early debug with Virt MM?
+>>> Maybe some additional options are needed?
+>>
+>> PL011 and semihosting are the obvious choices for early
+>> debug output. There's no 8250 in the virt board so that
+>> definitely isn't going to work. We don't currently implement
+>> the ICE DCC channel, though I think Edgar was considering
+>> connecting it up to a chardev backend.
+>>
+>> Really though, I think the UART and semihosting should
+>> be enough for whatever the guest wants to do in the way
+>> of early debug. Why do you need more options?
 
+> No actually I was thinking of limiting choices to the ones that work for
+> Virt MM during kernel config. But thought that maybe others may be
+> supported through some options. Form me PL011 alone is enough.
 
-On Mon, Sep 28, 2015 at 06:27:31PM +0300, Pavel Fedin wrote:
-> The access is done similar to vGICv2, using KVM_DEV_ARM_VGIC_GRP_DIST_REGS
-> and KVM_DEV_ARM_VGIC_GRP_REDIST_REGS with KVM_SET_DEVICE_ATTR and
-> KVM_GET_DEVICE_ATTR ioctls. Since GICv3 can handle large number of CPUs,
-> KVM_DEV_ARM_VGIC_CPUID_MASK has been extended to 20 bits. This is enough
-> for 1048576 CPUs.
-> 
-> Some registers are 64-bit wide according to the specification.
-> KVM_DEV_ARM_VGIC_64BIT flag is introduced, allowing to perform full 64-bit
-> accesses. vgic_attr_regs_access() has also been fixed up in order to be
-> able to perform 64-bit accesses correctly.
-> 
-Apologies for the long delay in responding to this.
+8250 I think is what kvmtool uses, which is why that is a
+permitted option. Not sure who's implementing ICE DCC
+(though as I say QEMU might eventually).
 
-We went over this and discussed this during Linaro Connect, and we came
-up with an API that we believe considers the future, works well with how
-things are going to be designed in QEMU, and follows the architecture.
-
-I'm sorry to make you rework your patches at this stage, but I'd like
-you to take a look at the patch for the API that I just sent out
-(subject: KVM: arm/arm64: Add VGICv3 save/restore API documentation) and
-adapt this patch set to use that API instead and then I'll review that.
-
-Thanks,
--Christoffer
+thanks
+-- PMM
