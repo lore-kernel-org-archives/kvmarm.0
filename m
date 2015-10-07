@@ -1,87 +1,45 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 3/7] KVM: arm/arm64: Fix the documentation
-Date: Wed, 7 Oct 2015 22:04:39 +0200
-Message-ID: <20151007200439.GC14315@cbox>
+Subject: Re: [PATCH v4 4/7] KVM: arm64: Implement vGICv3 distributor and
+ redistributor access from userspace
+Date: Wed, 7 Oct 2015 22:07:11 +0200
+Message-ID: <20151007200711.GD14315@cbox>
 References: <cover.1443451687.git.p.fedin@samsung.com>
- <5b6b8e9e002bc6a9cc5e6a881032d6b930830e74.1443451687.git.p.fedin@samsung.com>
+ <9d42bb0fd6abf17bae0179c4233c45d267c25162.1443451687.git.p.fedin@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <5b6b8e9e002bc6a9cc5e6a881032d6b930830e74.1443451687.git.p.fedin@samsung.com>
+In-Reply-To: <9d42bb0fd6abf17bae0179c4233c45d267c25162.1443451687.git.p.fedin@samsung.com>
 Sender: kvm-owner@vger.kernel.org
 To: Pavel Fedin <p.fedin@samsung.com>
 Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Sep 28, 2015 at 06:27:30PM +0300, Pavel Fedin wrote:
-> During refactoring we noticed some mistakes in the documentation.
-> Correct them.
-> 
-> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-> ---
->  Documentation/virtual/kvm/devices/arm-vgic.txt | 18 ++++++++++--------
->  1 file changed, 10 insertions(+), 8 deletions(-)
-> 
-> diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
-> index 3fb9054..4727829 100644
-> --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
-> +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
-> @@ -44,28 +44,29 @@ Groups:
->    Attributes:
->      The attr field of kvm_device_attr encodes two values:
->      bits:     | 63   ....  40 | 39 ..  32  |  31   ....    0 |
-> -    values:   |    reserved   |   cpu id   |      offset     |
-> +    values:   |    reserved   |  cpu idx   |      offset     |
+Hi Pavel,
 
-why should this be changed to cpu idx?
 
->  
->      All distributor regs are (rw, 32-bit)
->  
->      The offset is relative to the "Distributor base address" as defined in the
->      GICv2 specs.  Getting or setting such a register has the same effect as
-> -    reading or writing the register on the actual hardware from the cpu
-> -    specified with cpu id field.  Note that most distributor fields are not
-> -    banked, but return the same value regardless of the cpu id used to access
-> -    the register.
-> +    reading or writing the register on the actual hardware from the cpu whose
-> +    index is specified with cpu idx field.  Note that most distributor fields
-> +    are not banked, but return the same value regardless of the cpu idx used to
-> +    access the register.
->    Limitations:
->      - Priorities are not implemented, and registers are RAZ/WI
->      - Currently only implemented for KVM_DEV_TYPE_ARM_VGIC_V2.
->    Errors:
-> -    -ENODEV: Getting or setting this register is not yet supported
-> +    -ENXIO: Getting or setting this register is not yet supported
->      -EBUSY: One or more VCPUs are running
-> +    -EINVAL: Invalid CPU index supplied
->  
->    KVM_DEV_ARM_VGIC_GRP_CPU_REGS
->    Attributes:
->      The attr field of kvm_device_attr encodes two values:
->      bits:     | 63   ....  40 | 39 ..  32  |  31   ....    0 |
-> -    values:   |    reserved   |   cpu id   |      offset     |
-> +    values:   |    reserved   |  cpu idx   |      offset     |
->  
->      All CPU interface regs are (rw, 32-bit)
->  
-> @@ -91,8 +92,9 @@ Groups:
->      - Priorities are not implemented, and registers are RAZ/WI
->      - Currently only implemented for KVM_DEV_TYPE_ARM_VGIC_V2.
->    Errors:
-> -    -ENODEV: Getting or setting this register is not yet supported
-> +    -ENXIO: Getting or setting this register is not yet supported
->      -EBUSY: One or more VCPUs are running
-> +    -EINVAL: Invalid CPU index supplied
->  
->    KVM_DEV_ARM_VGIC_GRP_NR_IRQS
->    Attributes:
-> -- 
-> 2.4.4
+On Mon, Sep 28, 2015 at 06:27:31PM +0300, Pavel Fedin wrote:
+> The access is done similar to vGICv2, using KVM_DEV_ARM_VGIC_GRP_DIST_REGS
+> and KVM_DEV_ARM_VGIC_GRP_REDIST_REGS with KVM_SET_DEVICE_ATTR and
+> KVM_GET_DEVICE_ATTR ioctls. Since GICv3 can handle large number of CPUs,
+> KVM_DEV_ARM_VGIC_CPUID_MASK has been extended to 20 bits. This is enough
+> for 1048576 CPUs.
 > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Some registers are 64-bit wide according to the specification.
+> KVM_DEV_ARM_VGIC_64BIT flag is introduced, allowing to perform full 64-bit
+> accesses. vgic_attr_regs_access() has also been fixed up in order to be
+> able to perform 64-bit accesses correctly.
+> 
+Apologies for the long delay in responding to this.
+
+We went over this and discussed this during Linaro Connect, and we came
+up with an API that we believe considers the future, works well with how
+things are going to be designed in QEMU, and follows the architecture.
+
+I'm sorry to make you rework your patches at this stage, but I'd like
+you to take a look at the patch for the API that I just sent out
+(subject: KVM: arm/arm64: Add VGICv3 save/restore API documentation) and
+adapt this patch set to use that API instead and then I'll review that.
+
+Thanks,
+-Christoffer
