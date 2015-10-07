@@ -1,56 +1,180 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: Virt MM DEBUG_LL support arm32
-Date: Wed, 7 Oct 2015 08:07:51 +0100
-Message-ID: <CAFEAcA9ShOzMG7kk9hQRgizJ_u2=Y2B5v6SXi678M1RMZQcPVA@mail.gmail.com>
-References: <5614683A.1010007@samsung.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v3 17/20] KVM: ARM64: Add PMU overflow interrupt routing
+Date: Wed, 07 Oct 2015 09:17:25 +0100
+Message-ID: <5614D515.3060800@arm.com>
+References: <1443133885-3366-1-git-send-email-shannon.zhao@linaro.org> <1443133885-3366-18-git-send-email-shannon.zhao@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D900412AF
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Oct 2015 03:06:16 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id h9EXU-uHi3rl for <kvmarm@lists.cs.columbia.edu>;
- Wed,  7 Oct 2015 03:06:15 -0400 (EDT)
-Received: from mail-vk0-f53.google.com (mail-vk0-f53.google.com
- [209.85.213.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 403F5412A6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Oct 2015 03:06:15 -0400 (EDT)
-Received: by vkfp126 with SMTP id p126so5227750vkf.3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 07 Oct 2015 00:08:11 -0700 (PDT)
-In-Reply-To: <5614683A.1010007@samsung.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mario Smarduch <m.smarduch@samsung.com>
-Cc: Peter Maydell <peter.maydell@linaro.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1443133885-3366-18-git-send-email-shannon.zhao@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, christoffer.dall@linaro.org, will.deacon@arm.com, wei@redhat.com, alex.bennee@linaro.org, peter.huangpeng@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 7 October 2015 at 01:32, Mario Smarduch <m.smarduch@samsung.com> wrote:
-> Hi Peter,
->    I noticed that icedcc, and 8250 don't work
-> with DEBUG_LL early debug print. And the kernel dies if
-> these are selected. Besides PL011 is there any other
-> serial devices that can be used for early debug with Virt MM?
-> Maybe some additional options are needed?
+On 24/09/15 23:31, Shannon Zhao wrote:
+> When calling perf_event_create_kernel_counter to create perf_event,
+> assign a overflow handler. Then when perf event overflows, set
+> irq_pending and call kvm_vcpu_kick() to sync the interrupt.
+> 
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> ---
+>  arch/arm/kvm/arm.c    |  4 ++++
+>  include/kvm/arm_pmu.h |  2 ++
+>  virt/kvm/arm/pmu.c    | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  3 files changed, 59 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index ce404a5..3fca263 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -28,6 +28,7 @@
+>  #include <linux/sched.h>
+>  #include <linux/kvm.h>
+>  #include <trace/events/kvm.h>
+> +#include <kvm/arm_pmu.h>
+>  
+>  #define CREATE_TRACE_POINTS
+>  #include "trace.h"
+> @@ -554,6 +555,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  			kvm_vgic_sync_hwstate(vcpu);
+>  			preempt_enable();
+>  			kvm_timer_sync_hwstate(vcpu);
+> +			kvm_pmu_sync_hwstate(vcpu);
+>  			continue;
+>  		}
+>  
+> @@ -604,6 +606,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  
+>  		kvm_timer_sync_hwstate(vcpu);
+>  
+> +		kvm_pmu_sync_hwstate(vcpu);
+> +
+>  		ret = handle_exit(vcpu, run, ret);
+>  	}
 
-PL011 and semihosting are the obvious choices for early
-debug output. There's no 8250 in the virt board so that
-definitely isn't going to work. We don't currently implement
-the ICE DCC channel, though I think Edgar was considering
-connecting it up to a chardev backend.
+The code around here is about to change with Christopher's patches. Most
+importantly, virtual devices must signal their changes before we touch
+the vgic. I suspect this will have some impacts, see below.
 
-Really though, I think the UART and semihosting should
-be enough for whatever the guest wants to do in the way
-of early debug. Why do you need more options?
+>  
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 9293133..953c400 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -38,6 +38,7 @@ struct kvm_pmu {
+>  };
+>  
+>  #ifdef CONFIG_KVM_ARM_PMU
+> +void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu);
+>  unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx);
+>  void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val);
+>  void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u32 val);
+> @@ -45,6 +46,7 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u32 val);
+>  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
+>  				    u32 select_idx);
+>  #else
+> +void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu) {}
+>  unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx)
+>  {
+>  	return 0;
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index 18637c9..ca7e849 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -21,6 +21,7 @@
+>  #include <linux/perf_event.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <kvm/arm_pmu.h>
+> +#include <kvm/arm_vgic.h>
+>  
+>  static void kvm_pmu_set_evttyper(struct kvm_vcpu *vcpu, u32 idx, u32 val)
+>  {
+> @@ -62,6 +63,56 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, u32 select_idx)
+>  }
+>  
+>  /**
+> + * kvm_pmu_sync_hwstate - sync pmu state for cpu
+> + * @vcpu: The vcpu pointer
+> + *
+> + * Inject virtual PMU IRQ if IRQ is pending for this cpu.
+> + */
+> +void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +
+> +	if (pmu->irq_pending && (pmu->irq_num != -1)) {
 
-thanks
--- PMM
+How likely is that pmu->irq_num could be -1? I don't think the interrupt
+can be made optional.
+
+> +		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, 1);
+> +		pmu->irq_pending = false;
+> +	}
+
+So you're signalling the interrupt as an edge, not a level. Is that an
+accurate modelling of the PMU interrupt?
+
+My hunch is that the interrupt should still be pending until the guest
+has cleared the overflow condition (by writing to PMOVSCLR_EL0). You can
+probably lift most of that logic from  Christoffer's rework of the timer
+state.
+
+> +}
+> +
+> +/**
+> + * When perf event overflows, set irq_pending and call kvm_vcpu_kick() to inject
+> + * the interrupt.
+> + */
+> +static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
+> +				  struct perf_sample_data *data,
+> +				  struct pt_regs *regs)
+> +{
+> +	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
+> +	struct kvm_vcpu *vcpu = pmc->vcpu;
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +	int idx = pmc->idx;
+> +
+> +	if (!vcpu_mode_is_32bit(vcpu)) {
+> +		if ((vcpu_sys_reg(vcpu, PMINTENSET_EL1) >> idx) & 0x1) {
+> +			__set_bit(idx,
+> +			    (unsigned long *)&vcpu_sys_reg(vcpu, PMOVSSET_EL0));
+> +			__set_bit(idx,
+> +			    (unsigned long *)&vcpu_sys_reg(vcpu, PMOVSCLR_EL0));
+> +			pmu->irq_pending = true;
+> +			kvm_vcpu_kick(vcpu);
+> +		}
+> +	} else {
+> +		if ((vcpu_cp15(vcpu, c9_PMINTENSET) >> idx) & 0x1) {
+> +			__set_bit(idx,
+> +				(unsigned long *)&vcpu_cp15(vcpu, c9_PMOVSSET));
+> +			__set_bit(idx,
+> +				(unsigned long *)&vcpu_cp15(vcpu, c9_PMOVSCLR));
+> +			pmu->irq_pending = true;
+> +			kvm_vcpu_kick(vcpu);
+> +		}
+> +	}
+> +}
+> +
+> +/**
+>   * kvm_pmu_get_counter_value - get PMU counter value
+>   * @vcpu: The vcpu pointer
+>   * @select_idx: The counter index
+> @@ -225,7 +276,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
+>  	/* The initial sample period (overflow count) of an event. */
+>  	attr.sample_period = (-counter) & (((u64)1 << overflow_bit) - 1);
+>  
+> -	event = perf_event_create_kernel_counter(&attr, -1, current, NULL, pmc);
+> +	event = perf_event_create_kernel_counter(&attr, -1, current,
+> +						 kvm_pmu_perf_overflow, pmc);
+>  	if (IS_ERR(event)) {
+>  		printk_once("kvm: pmu event creation failed %ld\n",
+>  			    PTR_ERR(event));
+> 
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
