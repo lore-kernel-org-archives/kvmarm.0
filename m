@@ -1,37 +1,70 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 00/16] KVM: arm64: GICv3 ITS emulation
-Date: Wed, 07 Oct 2015 17:22:07 +0100
-Message-ID: <561546AF.90903@arm.com>
-References: <1444229726-31559-1-git-send-email-andre.przywara@arm.com> <029601d1011a$026e1000$074a3000$@samsung.com>
+From: Mario Smarduch <m.smarduch@samsung.com>
+Subject: Re: Virt MM DEBUG_LL support arm32
+Date: Wed, 07 Oct 2015 09:40:20 -0700
+Message-ID: <56154AF4.60206@samsung.com>
+References: <5614683A.1010007@samsung.com>
+ <CAFEAcA9ShOzMG7kk9hQRgizJ_u2=Y2B5v6SXi678M1RMZQcPVA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <029601d1011a$026e1000$074a3000$@samsung.com>
-Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>, 'Andre Przywara' <andre.przywara@arm.com>, christoffer.dall@linaro.org
-Cc: eric.auger@linaro.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EB81E412EF
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Oct 2015 12:38:28 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 8xNfYOeIwAAg for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Oct 2015 12:38:26 -0400 (EDT)
+Received: from usmailout4.samsung.com (mailout4.w2.samsung.com
+ [211.189.100.14])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D23474126B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Oct 2015 12:38:26 -0400 (EDT)
+Received: from uscpsbgex2.samsung.com
+ (u123.gpu85.samsung.co.kr [203.254.195.123]) by usmailout4.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NVU00A0XZNAMH20@usmailout4.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Wed, 07 Oct 2015 12:40:22 -0400 (EDT)
+In-reply-to: <CAFEAcA9ShOzMG7kk9hQRgizJ_u2=Y2B5v6SXi678M1RMZQcPVA@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/10/15 17:05, Pavel Fedin wrote:
->  Hello!
+
+
+On 10/7/2015 12:07 AM, Peter Maydell wrote:
+> On 7 October 2015 at 01:32, Mario Smarduch <m.smarduch@samsung.com> wrote:
+>> Hi Peter,
+>>    I noticed that icedcc, and 8250 don't work
+>> with DEBUG_LL early debug print. And the kernel dies if
+>> these are selected. Besides PL011 is there any other
+>> serial devices that can be used for early debug with Virt MM?
+>> Maybe some additional options are needed?
 > 
->  One more concern about the whole thing. I already replied to the previous series, but looks like my
-> reply was missed.
->  Your implementation does not care about live migration at all. And there's one fundamental issue
-> with it. In the redistributor LPIs can be only pending, but in the CPU interface they still can be
-> active. And they have priorities, therefore they can be preempted, so we can have even more than one
-> active LPI at once. How to migrate this state?
->  Here i am trying to prototype this by leaving active interrupts in LRs and allowing the userland to
-> read/write them. This looks a bit stupid, additionally this will create problems if we are e. g.
-> migrating from host with 8 LRs to host with 4 LRs, while having 6 active LPIs. Can anybody suggest
-> better solution?
->  Technically LPI pending table has unused bits from 0 to 8191, and we have 8192 LPIs, so we could
-> push active state there, just for migration. Would this be a big violation of specification? It says
-> nothing about these bits at all.
+> PL011 and semihosting are the obvious choices for early
+> debug output. There's no 8250 in the virt board so that
+> definitely isn't going to work. We don't currently implement
+> the ICE DCC channel, though I think Edgar was considering
+> connecting it up to a chardev backend.
+> 
+> Really though, I think the UART and semihosting should
+> be enough for whatever the guest wants to do in the way
+> of early debug. Why do you need more options?
+> 
+> thanks
+> -- PMM
+> 
 
-LPIs do not have an active state, at the redistributor or otherwise.
+No actually I was thinking of limiting choices to the ones that work for
+Virt MM during kernel config. But thought that maybe others may be
+supported through some options. Form me PL011 alone is enough.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+- Mario
