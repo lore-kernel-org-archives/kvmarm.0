@@ -1,166 +1,110 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v3 00/16] KVM: arm64: GICv3 ITS emulation
-Date: Wed,  7 Oct 2015 15:55:10 +0100
-Message-ID: <1444229726-31559-1-git-send-email-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
+Subject: [PATCH v3 03/16] KVM: extend struct kvm_msi to hold a 32-bit device ID
+Date: Wed,  7 Oct 2015 15:55:13 +0100
+Message-ID: <1444229726-31559-4-git-send-email-andre.przywara@arm.com>
+References: <1444229726-31559-1-git-send-email-andre.przywara@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EE6042E9C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Oct 2015 10:52:46 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id l4LAeoEzUoHJ for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Oct 2015 10:52:41 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 16C2941479
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Oct 2015 10:52:41 -0400 (EDT)
+In-Reply-To: <1444229726-31559-1-git-send-email-andre.przywara@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: eric.auger@linaro.org, p.fedin@samsung.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+The ARM GICv3 ITS MSI controller requires a device ID to be able to
+assign the proper interrupt vector. On real hardware, this ID is
+sampled from the bus. To be able to emulate an ITS controller, extend
+the KVM MSI interface to let userspace provide such a device ID. For
+PCI devices, the device ID is simply the 16-bit bus-device-function
+triplet, which should be easily available to the userland tool.
 
-another respin and rebase of the ITS emulation series.
-Major changes compared to v2 (beside some minor things like added
-comments and function renames) are the rebasing and adaption to 4.3-rc
-and Christoffer's timer rework series. Also the locking has been
-reworked to cope with the dependencies of the its and the dist lock
-in connection with the PROPBASER/PENDBASER and the command handling.
-For a more detailed changelog see below or look at the respective
-commit messages.
+Also there is a new KVM capability which advertises whether the
+current VM requires a device ID to be set along with the MSI data.
+This flag is still reported as not available everywhere, later we will
+enable it when ITS emulation is used.
 
-This should address most of the comments I got on the list.
-Many thanks to the diligent reviewers!
-I didn't bother to fine-tune patch 01/16 too much, as I guess there
-will be more discussion around this based on Pavel's latest post.
-
-These patches go on top of Christoffer's timer rework series [1],
-which itself is on top of 4.3-rc2.
-You can find all of this code in the its-emul/v3 branch of my
-repository [2].
-
-Cheers,
-Andre.
-
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reviewed-by: Eric Auger <eric.auger@linaro.org>
+---
 Changelog v2..v3:
-- adapt to 4.3-rc and Christoffer's timer rework
-- adapt spin locks on handling PROPBASER/PENDBASER registers
-- rework locking in ITS command handling (dropping dist where needed)
-- only clear LPI pending bit if LPI could actually be queued
-- simplify GICR_CTLR handling
-- properly free ITTEs (including our pending bitmap)
-- fix corner cases with unmapped collections
-- keep retire_lr() around
-- rename vgic_handle_base_register to vgic_reg64_access()
-- use kcalloc instead of kmalloc
-- minor fixes, renames and added comments
+- adjust KVM_CAP number to not clash with upstream
 
-Changelog v1..v2
-- fix issues when using non-ITS GICv3 emulation
-- streamline frame address initialization (new patch 05/15)
-- preallocate buffer memory for reading from guest's memory
-- move locking into the actual command handlers
--   preallocate memory for new structures if needed
-- use non-atomic __set_bit() and __clear_bit() when under the lock
-- add INT command handler to allow LPI injection from the guest
-- rewrite CWRITER handler to align with new locking scheme
-- remove unneeded CONFIG_HAVE_KVM_MSI #ifdefs
-- check memory table size against our LPI limit (65536 interrupts)
-- observe initial gap of 1024 interrupts in pending table
-- use term "configuration table" to be in line with the spec
-- clarify and extend documentation on API extensions
-- introduce new KVM_CAP_MSI_DEVID capability to advertise device ID requirement
-- update, fix and add many comments
-- minor style changes as requested by reviewers
+ Documentation/virtual/kvm/api.txt | 12 ++++++++++--
+ include/uapi/linux/kvm.h          |  5 ++++-
+ 2 files changed, 14 insertions(+), 3 deletions(-)
 
----------------
-
-The GICv3 ITS (Interrupt Translation Service) is a part of the
-ARM GICv3 interrupt controller [4] used for implementing MSIs.
-It specifies a new kind of interrupts (LPIs), which are mapped to
-establish a connection between a device, its MSI payload value and
-the target processor the IRQ is eventually delivered to.
-In order to allow using MSIs in an ARM64 KVM guest, we emulate this
-ITS widget in the kernel.
-The ITS works by reading commands written by software (from the guest
-in our case) into a (guest allocated) memory region and establishing
-the mapping between a device, the MSI payload and the target CPU.
-We parse these commands and update our internal data structures to
-reflect those changes. On an MSI injection we iterate those
-structures to learn the LPI number we have to inject.
-For the time being we use simple lists to hold the data, this is
-good enough for the small number of entries each of the components
-currently have. Should this become a performance bottleneck in the
-future, those can be extended to arrays or trees if needed.
-
-Most of the code lives in a separate source file (its-emul.c), though
-there are some changes necessary both in vgic.c and vgic-v3-emul.c.
-
-Patch 01/16 gets rid of the internal tracking of the used LR for
-an injected IRQ, see the commit message for more details.
-Patch 03/16 extends the KVM MSI ioctl to hold a device ID.
-Patch 04-06 make small changes to the existing VGIC code which make
-adaptions to the ITS later easier.
-The rest of the patches implement the ITS functionality step by step.
-For more details see the respective commit messages.
-
-For the time being this series gives us the ability to use emulated
-PCI devices that can use MSIs in the guest. Those have to be
-triggered by letting the userland device emulation simulate the MSI
-write with the KVM_SIGNAL_MSI ioctl. This will be translated into
-the proper LPI by the ITS emulation and injected into the guest in
-the usual way (just with a higher IRQ number).
-
-This series is based on 4.3-rc2 and can be found at the its-emul/v3
-branch of this repository [2].
-For this to be used you need a GICv3 host machine (a fast model would
-do), though it does not rely on any host ITS bits (neither in hardware
-or software).
-
-To test this you can use the kvmtool patches available in the "its"
-branch here [3].
-Start a guest with: "$ lkvm run --irqchip=gicv3-its --force-pci"
-and see the ITS being used for instance by the virtio devices.
-
-[1]: https://git.linaro.org/people/christoffer.dall/linux-kvm-arm.git/shortlog/refs/heads/timer-rework-v3
-[2]: git://linux-arm.org/linux-ap.git
-     http://www.linux-arm.org/git?p=linux-ap.git;a=log;h=refs/heads/its-emul/v3
-[3]: git://linux-arm.org/kvmtool.git
-     http://www.linux-arm.org/git?p=kvmtool.git;a=log;h=refs/heads/its
-[4]: http://arminfo.emea.arm.com/help/topic/com.arm.doc.ihi0069a/IHI0069A_gic_architecture_specification.pdf
-
-Andre Przywara (16):
-  KVM: arm/arm64: VGIC: don't track used LRs in the distributor
-  KVM: arm/arm64: remove now unused code after stay-in-LR rework
-  KVM: extend struct kvm_msi to hold a 32-bit device ID
-  KVM: arm/arm64: add emulation model specific destroy function
-  KVM: arm/arm64: extend arch CAP checks to allow per-VM capabilities
-  KVM: arm/arm64: make GIC frame address initialization model specific
-  KVM: arm64: Introduce new MMIO region for the ITS base address
-  KVM: arm64: handle ITS related GICv3 redistributor registers
-  KVM: arm64: introduce ITS emulation file with stub functions
-  KVM: arm64: implement basic ITS register handlers
-  KVM: arm64: add data structures to model ITS interrupt translation
-  KVM: arm64: handle pending bit for LPIs in ITS emulation
-  KVM: arm64: sync LPI configuration and pending tables
-  KVM: arm64: implement ITS command queue command handlers
-  KVM: arm64: implement MSI injection in ITS emulation
-  KVM: arm64: enable ITS emulation as a virtual MSI controller
-
- Documentation/virtual/kvm/api.txt              |   14 +-
- Documentation/virtual/kvm/devices/arm-vgic.txt |    9 +
- arch/arm/include/asm/kvm_host.h                |    2 +-
- arch/arm/kvm/arm.c                             |    2 +-
- arch/arm64/include/asm/kvm_host.h              |    2 +-
- arch/arm64/include/uapi/asm/kvm.h              |    2 +
- arch/arm64/kvm/Kconfig                         |    1 +
- arch/arm64/kvm/Makefile                        |    1 +
- arch/arm64/kvm/reset.c                         |    8 +-
- include/kvm/arm_vgic.h                         |   43 +-
- include/linux/irqchip/arm-gic-v3.h             |   14 +-
- include/uapi/linux/kvm.h                       |    5 +-
- virt/kvm/arm/its-emul.c                        | 1187 ++++++++++++++++++++++++
- virt/kvm/arm/its-emul.h                        |   55 ++
- virt/kvm/arm/vgic-v2-emul.c                    |    3 +
- virt/kvm/arm/vgic-v2.c                         |    1 +
- virt/kvm/arm/vgic-v3-emul.c                    |  101 +-
- virt/kvm/arm/vgic-v3.c                         |    1 +
- virt/kvm/arm/vgic.c                            |  292 +++---
- virt/kvm/arm/vgic.h                            |    3 +
- 20 files changed, 1601 insertions(+), 145 deletions(-)
- create mode 100644 virt/kvm/arm/its-emul.c
- create mode 100644 virt/kvm/arm/its-emul.h
-
+diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+index d9eccee..a302e0a 100644
+--- a/Documentation/virtual/kvm/api.txt
++++ b/Documentation/virtual/kvm/api.txt
+@@ -2147,10 +2147,18 @@ struct kvm_msi {
+ 	__u32 address_hi;
+ 	__u32 data;
+ 	__u32 flags;
+-	__u8  pad[16];
++	__u32 devid;
++	__u8  pad[12];
+ };
+ 
+-No flags are defined so far. The corresponding field must be 0.
++flags: KVM_MSI_VALID_DEVID: devid contains a valid value
++devid: If KVM_MSI_VALID_DEVID is set, contains a unique device identifier
++       for the device that wrote the MSI message.
++       For PCI, this is usually a BFD identifier in the lower 16 bits.
++
++The per-VM KVM_CAP_MSI_DEVID capability advertises the need to provide
++the device ID. If this capability is not set, userland cannot rely on
++the kernel to allow the KVM_MSI_VALID_DEVID flag being set.
+ 
+ 
+ 4.71 KVM_CREATE_PIT2
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index a9256f0..eae9ba1 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -824,6 +824,7 @@ struct kvm_ppc_smmu_info {
+ #define KVM_CAP_MULTI_ADDRESS_SPACE 118
+ #define KVM_CAP_GUEST_DEBUG_HW_BPS 119
+ #define KVM_CAP_GUEST_DEBUG_HW_WPS 120
++#define KVM_CAP_MSI_DEVID 121
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -975,12 +976,14 @@ struct kvm_one_reg {
+ 	__u64 addr;
+ };
+ 
++#define KVM_MSI_VALID_DEVID	(1U << 0)
+ struct kvm_msi {
+ 	__u32 address_lo;
+ 	__u32 address_hi;
+ 	__u32 data;
+ 	__u32 flags;
+-	__u8  pad[16];
++	__u32 devid;
++	__u8  pad[12];
+ };
+ 
+ struct kvm_arm_device_addr {
 -- 
 2.5.1
-
