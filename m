@@ -1,168 +1,189 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v3 11/16] KVM: arm64: add data structures to model ITS interrupt translation
-Date: Wed,  7 Oct 2015 15:55:21 +0100
-Message-ID: <1444229726-31559-12-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v3 08/16] KVM: arm64: handle ITS related GICv3 redistributor
+ registers
+Date: Wed,  7 Oct 2015 15:55:18 +0100
+Message-ID: <1444229726-31559-9-git-send-email-andre.przywara@arm.com>
 References: <1444229726-31559-1-git-send-email-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 451B9431D6
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Oct 2015 10:52:54 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id UJmdWX8cvcy4 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  7 Oct 2015 10:52:52 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8126642E9C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  7 Oct 2015 10:52:49 -0400 (EDT)
 In-Reply-To: <1444229726-31559-1-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: eric.auger@linaro.org, p.fedin@samsung.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The GICv3 Interrupt Translation Service (ITS) uses tables in memory
-to allow a sophisticated interrupt routing. It features device tables,
-an interrupt table per device and a table connecting "collections" to
-actual CPUs (aka. redistributors in the GICv3 lingo).
-Since the interrupt numbers for the LPIs are allocated quite sparsely
-and the range can be quite huge (8192 LPIs being the minimum), using
-bitmaps or arrays for storing information is a waste of memory.
-We use linked lists instead, which we iterate linearily. This works
-very well with the actual number of LPIs/MSIs in the guest being
-quite low. Should the number of LPIs exceed the number where iterating
-through lists seems acceptable, we can later revisit this and use more
-efficient data structures.
+In the GICv3 redistributor there are the PENDBASER and PROPBASER
+registers which we did not emulate so far, as they only make sense
+when having an ITS. In preparation for that emulate those MMIO
+accesses by storing the 64-bit data written into it into a variable
+which we later read in the ITS emulation.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
 Changelog v2..v3:
-- add a comment
+- rename vgic_handle_base_register to vgic_reg64_access()
 
- include/kvm/arm_vgic.h  |  3 +++
- virt/kvm/arm/its-emul.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 69 insertions(+)
+ include/kvm/arm_vgic.h      |  8 ++++++++
+ virt/kvm/arm/vgic-v3-emul.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic.c         | 31 +++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic.h         |  2 ++
+ 4 files changed, 85 insertions(+)
 
 diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 9ac850d..c3eb414 100644
+index 067ad09..06c33bc 100644
 --- a/include/kvm/arm_vgic.h
 +++ b/include/kvm/arm_vgic.h
-@@ -25,6 +25,7 @@
- #include <linux/spinlock.h>
- #include <linux/types.h>
- #include <kvm/iodev.h>
-+#include <linux/list.h>
- 
- #define VGIC_NR_IRQS_LEGACY	256
- #define VGIC_NR_SGIS		16
-@@ -174,6 +175,8 @@ struct vgic_its {
- 	u64			cbaser;
- 	int			creadr;
- 	int			cwriter;
-+	struct list_head	device_list;
-+	struct list_head	collection_list;
+@@ -272,6 +272,14 @@ struct vgic_dist {
+ 	/* Virtual irq to hwirq mapping */
+ 	spinlock_t		irq_phys_map_lock;
+ 	struct list_head	irq_phys_map_list;
++
++	/* Address of LPI configuration table shared by all redistributors */
++	u64			propbaser;
++
++	/* Addresses of LPI pending tables per redistributor */
++	u64			*pendbaser;
++
++	bool			lpis_enabled;
  };
  
- struct vgic_dist {
-diff --git a/virt/kvm/arm/its-emul.c b/virt/kvm/arm/its-emul.c
-index 9bbed86..bab8033 100644
---- a/virt/kvm/arm/its-emul.c
-+++ b/virt/kvm/arm/its-emul.c
-@@ -21,6 +21,7 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- #include <linux/interrupt.h>
-+#include <linux/list.h>
- 
- #include <linux/irqchip/arm-gic-v3.h>
- #include <kvm/arm_vgic.h>
-@@ -32,6 +33,34 @@
- #include "vgic.h"
- #include "its-emul.h"
- 
-+struct its_device {
-+	struct list_head dev_list;
-+
-+	/* the head for the list of ITTEs */
-+	struct list_head itt;
-+	u32 device_id;
-+};
-+
-+#define COLLECTION_NOT_MAPPED ((u32)-1)
-+
-+struct its_collection {
-+	struct list_head coll_list;
-+
-+	u32 collection_id;
-+	u32 target_addr;
-+};
-+
-+#define its_is_collection_mapped(coll) ((coll) && \
-+				((coll)->target_addr != COLLECTION_NOT_MAPPED))
-+
-+struct its_itte {
-+	struct list_head itte_list;
-+
-+	struct its_collection *collection;
-+	u32 lpi;
-+	u32 event_id;
-+};
-+
- #define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
- 
- /* The distributor lock is held by the VGIC MMIO handler. */
-@@ -125,6 +154,12 @@ static bool handle_mmio_gits_idregs(struct kvm_vcpu *vcpu,
- 	return false;
+ struct vgic_v2_cpu_if {
+diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+index a8cf669..6939f7c 100644
+--- a/virt/kvm/arm/vgic-v3-emul.c
++++ b/virt/kvm/arm/vgic-v3-emul.c
+@@ -651,6 +651,38 @@ static bool handle_mmio_cfg_reg_redist(struct kvm_vcpu *vcpu,
+ 	return vgic_handle_cfg_reg(reg, mmio, offset);
  }
  
-+static void its_free_itte(struct its_itte *itte)
++/* We don't trigger any actions here, just store the register value */
++static bool handle_mmio_propbaser_redist(struct kvm_vcpu *vcpu,
++					 struct kvm_exit_mmio *mmio,
++					 phys_addr_t offset)
 +{
-+	list_del(&itte->itte_list);
-+	kfree(itte);
++	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
++	int mode = ACCESS_READ_VALUE;
++
++	/* Storing a value with LPIs already enabled is undefined */
++	mode |= dist->lpis_enabled ? ACCESS_WRITE_IGNORED : ACCESS_WRITE_VALUE;
++	vgic_reg64_access(mmio, offset, &dist->propbaser, mode);
++
++	return false;
 +}
 +
- /*
-  * This function is called with both the ITS and the distributor lock dropped,
-  * so the actual command handlers must take the respective locks when needed.
-@@ -321,6 +356,9 @@ int vits_init(struct kvm *kvm)
- 
- 	spin_lock_init(&its->lock);
- 
-+	INIT_LIST_HEAD(&its->device_list);
-+	INIT_LIST_HEAD(&its->collection_list);
++/* We don't trigger any actions here, just store the register value */
++static bool handle_mmio_pendbaser_redist(struct kvm_vcpu *vcpu,
++					 struct kvm_exit_mmio *mmio,
++					 phys_addr_t offset)
++{
++	struct kvm_vcpu *rdvcpu = mmio->private;
++	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
++	int mode = ACCESS_READ_VALUE;
 +
- 	its->enabled = false;
- 
- 	return -ENXIO;
-@@ -330,11 +368,39 @@ void vits_destroy(struct kvm *kvm)
- {
- 	struct vgic_dist *dist = &kvm->arch.vgic;
- 	struct vgic_its *its = &dist->its;
-+	struct its_device *dev;
-+	struct its_itte *itte;
-+	struct list_head *dev_cur, *dev_temp;
-+	struct list_head *cur, *temp;
- 
- 	if (!vgic_has_its(kvm))
- 		return;
- 
-+	/*
-+	 * We may end up here without the lists ever having been initialized.
-+	 * Check this and bail out early to avoid dereferencing a NULL pointer.
-+	 */
-+	if (!its->device_list.next)
-+		return;
++	/* Storing a value with LPIs already enabled is undefined */
++	mode |= dist->lpis_enabled ? ACCESS_WRITE_IGNORED : ACCESS_WRITE_VALUE;
++	vgic_reg64_access(mmio, offset,
++			  &dist->pendbaser[rdvcpu->vcpu_id], mode);
 +
-+	spin_lock(&its->lock);
-+	list_for_each_safe(dev_cur, dev_temp, &its->device_list) {
-+		dev = container_of(dev_cur, struct its_device, dev_list);
-+		list_for_each_safe(cur, temp, &dev->itt) {
-+			itte = (container_of(cur, struct its_itte, itte_list));
-+			its_free_itte(itte);
-+		}
-+		list_del(dev_cur);
-+		kfree(dev);
-+	}
++	return false;
++}
 +
-+	list_for_each_safe(cur, temp, &its->collection_list) {
-+		list_del(cur);
-+		kfree(container_of(cur, struct its_collection, coll_list));
-+	}
-+
- 	kfree(dist->pendbaser);
+ #define SGI_base(x) ((x) + SZ_64K)
  
- 	its->enabled = false;
-+	spin_unlock(&its->lock);
+ static const struct vgic_io_range vgic_redist_ranges[] = {
+@@ -679,6 +711,18 @@ static const struct vgic_io_range vgic_redist_ranges[] = {
+ 		.handle_mmio    = handle_mmio_raz_wi,
+ 	},
+ 	{
++		.base		= GICR_PENDBASER,
++		.len		= 0x08,
++		.bits_per_irq	= 0,
++		.handle_mmio	= handle_mmio_pendbaser_redist,
++	},
++	{
++		.base		= GICR_PROPBASER,
++		.len		= 0x08,
++		.bits_per_irq	= 0,
++		.handle_mmio	= handle_mmio_propbaser_redist,
++	},
++	{
+ 		.base           = GICR_IDREGS,
+ 		.len            = 0x30,
+ 		.bits_per_irq   = 0,
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 4219f22..11bf692 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -471,6 +471,37 @@ void vgic_reg_access(struct kvm_exit_mmio *mmio, u32 *reg,
+ 	}
  }
+ 
++/* handle a 64-bit register access */
++void vgic_reg64_access(struct kvm_exit_mmio *mmio, phys_addr_t offset,
++		       u64 *basereg, int mode)
++{
++	u32 reg;
++	u64 breg;
++
++	switch (offset & ~3) {
++	case 0x00:
++		breg = *basereg;
++		reg = lower_32_bits(breg);
++		vgic_reg_access(mmio, &reg, offset & 3, mode);
++		if (mmio->is_write && (mode & ACCESS_WRITE_VALUE)) {
++			breg &= GENMASK_ULL(63, 32);
++			breg |= reg;
++			*basereg = breg;
++		}
++		break;
++	case 0x04:
++		breg = *basereg;
++		reg = upper_32_bits(breg);
++		vgic_reg_access(mmio, &reg, offset & 3, mode);
++		if (mmio->is_write && (mode & ACCESS_WRITE_VALUE)) {
++			breg  = lower_32_bits(breg);
++			breg |= (u64)reg << 32;
++			*basereg = breg;
++		}
++		break;
++	}
++}
++
+ bool handle_mmio_raz_wi(struct kvm_vcpu *vcpu, struct kvm_exit_mmio *mmio,
+ 			phys_addr_t offset)
+ {
+diff --git a/virt/kvm/arm/vgic.h b/virt/kvm/arm/vgic.h
+index a093f5c..104f780 100644
+--- a/virt/kvm/arm/vgic.h
++++ b/virt/kvm/arm/vgic.h
+@@ -71,6 +71,8 @@ void vgic_reg_access(struct kvm_exit_mmio *mmio, u32 *reg,
+ 		     phys_addr_t offset, int mode);
+ bool handle_mmio_raz_wi(struct kvm_vcpu *vcpu, struct kvm_exit_mmio *mmio,
+ 			phys_addr_t offset);
++void vgic_reg64_access(struct kvm_exit_mmio *mmio, phys_addr_t offset,
++		       u64 *basereg, int mode);
+ 
+ static inline
+ u32 mmio_data_read(struct kvm_exit_mmio *mmio, u32 mask)
 -- 
 2.5.1
-
