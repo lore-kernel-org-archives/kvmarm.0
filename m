@@ -1,58 +1,87 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 11/15] KVM: arm64: handle pending bit for LPIs in ITS
- emulation
-Date: Wed, 7 Oct 2015 21:53:18 +0200
-Message-ID: <20151007195318.GB14315@cbox>
-References: <1436538111-4294-1-git-send-email-andre.przywara@arm.com>
- <1436538111-4294-12-git-send-email-andre.przywara@arm.com>
- <017701d100db$b003c550$100b4ff0$@samsung.com>
+Subject: Re: [PATCH v4 3/7] KVM: arm/arm64: Fix the documentation
+Date: Wed, 7 Oct 2015 22:04:39 +0200
+Message-ID: <20151007200439.GC14315@cbox>
+References: <cover.1443451687.git.p.fedin@samsung.com>
+ <5b6b8e9e002bc6a9cc5e6a881032d6b930830e74.1443451687.git.p.fedin@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <017701d100db$b003c550$100b4ff0$@samsung.com>
+In-Reply-To: <5b6b8e9e002bc6a9cc5e6a881032d6b930830e74.1443451687.git.p.fedin@samsung.com>
 Sender: kvm-owner@vger.kernel.org
 To: Pavel Fedin <p.fedin@samsung.com>
-Cc: 'Andre Przywara' <andre.przywara@arm.com>, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, 'Peter Maydell' <peter.maydell@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Oct 07, 2015 at 11:39:30AM +0300, Pavel Fedin wrote:
->  Hello!
+On Mon, Sep 28, 2015 at 06:27:30PM +0300, Pavel Fedin wrote:
+> During refactoring we noticed some mistakes in the documentation.
+> Correct them.
 > 
-> > +/* Called with the distributor lock held by the caller. */
-> > +void vits_unqueue_lpi(struct kvm_vcpu *vcpu, int lpi)
-> > +{
-> > +	struct vgic_its *its = &vcpu->kvm->arch.vgic.its;
-> > +	struct its_itte *itte;
-> > +
-> > +	spin_lock(&its->lock);
-> > +
-> > +	/* Find the right ITTE and put the pending state back in there */
-> > +	itte = find_itte_by_lpi(vcpu->kvm, lpi);
-> > +	if (itte)
-> > +		__set_bit(vcpu->vcpu_id, itte->pending);
-> > +
-> > +	spin_unlock(&its->lock);
-> > +}
+> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+> ---
+>  Documentation/virtual/kvm/devices/arm-vgic.txt | 18 ++++++++++--------
+>  1 file changed, 10 insertions(+), 8 deletions(-)
 > 
->  I am working on implementing live migration for the ITS. And here i have one fundamental problem.
-> vits_unqueue_lpi() processes only PENDING state. And looks like this corresponds to the HW
-> implementation, which has only bitwise pending table. But, in terms of migration, we can actually
-> have LPI in active state, while it's being processed.
+> diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
+> index 3fb9054..4727829 100644
+> --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
+> +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
+> @@ -44,28 +44,29 @@ Groups:
+>    Attributes:
+>      The attr field of kvm_device_attr encodes two values:
+>      bits:     | 63   ....  40 | 39 ..  32  |  31   ....    0 |
+> -    values:   |    reserved   |   cpu id   |      offset     |
+> +    values:   |    reserved   |  cpu idx   |      offset     |
 
-I thought LPIs had strict fire-and-forget semantics, not allowing any
-active state, and that they are either pending or inactive?
+why should this be changed to cpu idx?
 
-
->  The question is - how can we handle it? Should we have one more bitwise table for active LPIs, or
-> is it enough to remember only a single, currently active LPI? Can LPIs be preempted on a real
-> hardware, or not?
+>  
+>      All distributor regs are (rw, 32-bit)
+>  
+>      The offset is relative to the "Distributor base address" as defined in the
+>      GICv2 specs.  Getting or setting such a register has the same effect as
+> -    reading or writing the register on the actual hardware from the cpu
+> -    specified with cpu id field.  Note that most distributor fields are not
+> -    banked, but return the same value regardless of the cpu id used to access
+> -    the register.
+> +    reading or writing the register on the actual hardware from the cpu whose
+> +    index is specified with cpu idx field.  Note that most distributor fields
+> +    are not banked, but return the same value regardless of the cpu idx used to
+> +    access the register.
+>    Limitations:
+>      - Priorities are not implemented, and registers are RAZ/WI
+>      - Currently only implemented for KVM_DEV_TYPE_ARM_VGIC_V2.
+>    Errors:
+> -    -ENODEV: Getting or setting this register is not yet supported
+> +    -ENXIO: Getting or setting this register is not yet supported
+>      -EBUSY: One or more VCPUs are running
+> +    -EINVAL: Invalid CPU index supplied
+>  
+>    KVM_DEV_ARM_VGIC_GRP_CPU_REGS
+>    Attributes:
+>      The attr field of kvm_device_attr encodes two values:
+>      bits:     | 63   ....  40 | 39 ..  32  |  31   ....    0 |
+> -    values:   |    reserved   |   cpu id   |      offset     |
+> +    values:   |    reserved   |  cpu idx   |      offset     |
+>  
+>      All CPU interface regs are (rw, 32-bit)
+>  
+> @@ -91,8 +92,9 @@ Groups:
+>      - Priorities are not implemented, and registers are RAZ/WI
+>      - Currently only implemented for KVM_DEV_TYPE_ARM_VGIC_V2.
+>    Errors:
+> -    -ENODEV: Getting or setting this register is not yet supported
+> +    -ENXIO: Getting or setting this register is not yet supported
+>      -EBUSY: One or more VCPUs are running
+> +    -EINVAL: Invalid CPU index supplied
+>  
+>    KVM_DEV_ARM_VGIC_GRP_NR_IRQS
+>    Attributes:
+> -- 
+> 2.4.4
 > 
-Perhaps you're asking if LPIs have active state semantics on real
-hardware and thus supports threaded interrupt handling for LPIs?
-
-That is not supported on real hardware, which I think addresses your
-concerns.
-
-Thanks,
--Christoffer
+> --
+> To unsubscribe from this list: send the line "unsubscribe kvm" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
