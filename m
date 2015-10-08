@@ -1,42 +1,32 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH v4 3/7] KVM: arm/arm64: Fix the documentation
-Date: Thu, 08 Oct 2015 09:52:02 +0300
-Message-ID: <002f01d10195$d6961550$83c23ff0$@samsung.com>
-References: <cover.1443451687.git.p.fedin@samsung.com>
- <5b6b8e9e002bc6a9cc5e6a881032d6b930830e74.1443451687.git.p.fedin@samsung.com>
- <20151007200439.GC14315@cbox>
+Subject: RE: [PATCH] KVM: arm/arm64: Add VGICv3 save/restore API documentation
+Date: Thu, 08 Oct 2015 10:17:09 +0300
+Message-ID: <003a01d10199$58e96590$0abc30b0$@samsung.com>
+References: <1444247430-14808-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <20151007200439.GC14315@cbox>
+In-reply-to: <1444247430-14808-1-git-send-email-christoffer.dall@linaro.org>
 Content-language: ru
 Sender: kvm-owner@vger.kernel.org
-To: 'Christoffer Dall' <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Peter Maydell' <peter.maydell@linaro.org>, 'Marc Zyngier' <marc.zyngier@arm.com>, 'Andre Przywara' <andre.przywara@arm.com>
+To: 'Christoffer Dall' <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, 'Andre Przywara' <andre.przywara@arm.com>, 'Peter Maydell' <peter.maydell@linaro.org>, 'Marc Zyngier' <marc.zyngier@arm.com>, 'Eric Auger' <eric.auger@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
  Hello!
 
-> > --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
-> > +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
-> > @@ -44,28 +44,29 @@ Groups:
-> >    Attributes:
-> >      The attr field of kvm_device_attr encodes two values:
-> >      bits:     | 63   ....  40 | 39 ..  32  |  31   ....    0 |
-> > -    values:   |    reserved   |   cpu id   |      offset     |
-> > +    values:   |    reserved   |  cpu idx   |      offset     |
-> 
-> why should this be changed to cpu idx?
+> +    The mpidr encoding is based on the affinity information in the
+> +    architecture defined MPIDR, and the field is encoded as follows:
+> +      | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
+> +      |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
 
- Because it's index (from 0 to N - 1), and "cpu id" may confuse readers that it should be MPIDR
-affinity value. In register access function we do "vcpu = kvm_get_vcpu(dev->kvm, cpuid);" (see here:
-http://lxr.free-electrons.com/source/virt/kvm/arm/vgic-v2-emul.c#L664), and kvm_get_vcpu just
-indexes the array: http://lxr.free-electrons.com/source/include/linux/kvm_host.h#L427
- I decided to change this after http://www.spinics.net/lists/kvm-arm/msg16359.html, Andre clearly
-mistook this ID for being affinity value.
- Before GICv3 nobody saw the difference because we had only up to 16 CPUs, with IDs from 0 to 15, i.
-e. corresponding to indexes.
+ One concern about this... Does it already have "We are Bosses, we Decided it, It's not subject to
+change, We do not care" status? Actually, current approach with using index instead of Aff bits
+works pretty well. It works fine with qemu too, because internally qemu also maintains CPU index,
+which it uses for GICv2 accesses.
+ Keeping index allows to reuse more code, and provides better backwards compatibility. So could we
+do this?
 
 Kind regards,
 Pavel Fedin
