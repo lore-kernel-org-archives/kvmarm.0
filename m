@@ -1,96 +1,32 @@
-From: Mario Smarduch <m.smarduch@samsung.com>
-Subject: Re: Virt MM DEBUG_LL support arm32
-Date: Thu, 08 Oct 2015 15:07:36 -0700
-Message-ID: <5616E928.1090705@samsung.com>
-References: <5614683A.1010007@samsung.com>
- <CAFEAcA9ShOzMG7kk9hQRgizJ_u2=Y2B5v6SXi678M1RMZQcPVA@mail.gmail.com>
- <56154AF4.60206@samsung.com>
- <CAFEAcA8RWhh8agbfAR8JARXU6BY7PyLt3Z9UPzEh7xvJsev7Ng@mail.gmail.com>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH] KVM: arm/arm64: Add VGICv3 save/restore API documentation
+Date: Fri, 09 Oct 2015 10:30:31 +0300
+Message-ID: <00e601d10264$61cdafb0$25690f10$@samsung.com>
+References: <1444247430-14808-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 62267419C7
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Oct 2015 18:05:39 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CvP3vxUCz97q for <kvmarm@lists.cs.columbia.edu>;
- Thu,  8 Oct 2015 18:05:37 -0400 (EDT)
-Received: from usmailout1.samsung.com (mailout1.w2.samsung.com
- [211.189.100.11])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C6B8413E0
- for <kvmarm@lists.cs.columbia.edu>; Thu,  8 Oct 2015 18:05:37 -0400 (EDT)
-Received: from uscpsbgex4.samsung.com
- (u125.gpu85.samsung.co.kr [203.254.195.125]) by mailout1.w2.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NVX00JNV9GP0J00@mailout1.w2.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Thu, 08 Oct 2015 18:07:37 -0400 (EDT)
-In-reply-to: <CAFEAcA8RWhh8agbfAR8JARXU6BY7PyLt3Z9UPzEh7xvJsev7Ng@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <1444247430-14808-1-git-send-email-christoffer.dall@linaro.org>
+Content-language: ru
+Sender: kvm-owner@vger.kernel.org
+To: 'Christoffer Dall' <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, 'Andre Przywara' <andre.przywara@arm.com>, 'Peter Maydell' <peter.maydell@linaro.org>, 'Marc Zyngier' <marc.zyngier@arm.com>, 'Eric Auger' <eric.auger@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+ Hello!
+
+> +  KVM_DEV_ARM_VGIC_CPU_SYSREGS
+> +  Attributes:
+> +    The attr field of kvm_device_attr encodes two values:
+> +    bits:     | 63      ....       32 | 31  ....  16 | 15  ....  0 |
+> +    values:   |         mpidr         |      RES     |    instr    |
+
+ One small clarification: do you really want it to be different from KVM_DEV_ARM_VGIC_GRP_CPU_REGS?
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
 
 
-On 10/7/2015 2:05 PM, Peter Maydell wrote:
-> On 7 October 2015 at 17:40, Mario Smarduch <m.smarduch@samsung.com> wrote:
->> On 10/7/2015 12:07 AM, Peter Maydell wrote:
->>> On 7 October 2015 at 01:32, Mario Smarduch <m.smarduch@samsung.com> wrote:
->>>> Hi Peter,
->>>>    I noticed that icedcc, and 8250 don't work
->>>> with DEBUG_LL early debug print. And the kernel dies if
->>>> these are selected. Besides PL011 is there any other
->>>> serial devices that can be used for early debug with Virt MM?
->>>> Maybe some additional options are needed?
->>>
->>> PL011 and semihosting are the obvious choices for early
->>> debug output. There's no 8250 in the virt board so that
->>> definitely isn't going to work. We don't currently implement
->>> the ICE DCC channel, though I think Edgar was considering
->>> connecting it up to a chardev backend.
->>>
->>> Really though, I think the UART and semihosting should
->>> be enough for whatever the guest wants to do in the way
->>> of early debug. Why do you need more options?
-> 
->> No actually I was thinking of limiting choices to the ones that work for
->> Virt MM during kernel config. But thought that maybe others may be
->> supported through some options. Form me PL011 alone is enough.
-> 
-> 8250 I think is what kvmtool uses, which is why that is a
-> permitted option. Not sure who's implementing ICE DCC
-> (though as I say QEMU might eventually).
-
-I see thanks for pointing that out.
-
-> 
-> thanks
-> -- PMM
-> 
-
-I came across the issue of selecting wrong UART for DEBUG_LL while
-trying to boot arm32 on arm64. ARCH_VIRT system type defaults
-for 'Kernel low-level debugging port' are not too clear.
-
-I'm wondering if it would make sense to add entries for virtual
-system types (like QEMU Virt or kvmtool virt) and enhance
-help section with possible UART_PHYS address, also set a default
-port. It appears like hard coding is going to be deprecated.
-
-This is not a major enhancement but when you're out of options
-and you just see a blank screen anything helps. Especially for virtual
-host where you may start suspecting the host system as well. Since I
-tripped over it, I took a closer look.
-
-Thanks,
-  Mario
