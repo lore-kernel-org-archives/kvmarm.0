@@ -1,46 +1,109 @@
-From: Wei Huang <wei@redhat.com>
-Subject: [PATCH] arm/arm64: KVM : Enable vhost device selection under KVM config menu
-Date: Fri,  9 Oct 2015 10:08:43 -0500
-Message-ID: <1444403323-8333-1-git-send-email-wei@redhat.com>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
-To: linux-kernel@vger.kernel.orgn
-Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, pbonzini@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, catalin.marinas@arm.comn, will.deacon@arm.com, drjones@redhat.com
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: Virt MM DEBUG_LL support arm32
+Date: Sat, 10 Oct 2015 12:51:48 +0200
+Message-ID: <20151010105148.GA29128@cbox>
+References: <5614683A.1010007@samsung.com>
+ <CAFEAcA9ShOzMG7kk9hQRgizJ_u2=Y2B5v6SXi678M1RMZQcPVA@mail.gmail.com>
+ <56154AF4.60206@samsung.com>
+ <CAFEAcA8RWhh8agbfAR8JARXU6BY7PyLt3Z9UPzEh7xvJsev7Ng@mail.gmail.com>
+ <5616E928.1090705@samsung.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EDA4C412DD
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Oct 2015 06:49:29 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 8OR8dDytCAkk for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 10 Oct 2015 06:49:28 -0400 (EDT)
+Received: from mail-lb0-f177.google.com (mail-lb0-f177.google.com
+ [209.85.217.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9201541252
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Oct 2015 06:49:28 -0400 (EDT)
+Received: by lbwr8 with SMTP id r8so103232163lbw.2
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Oct 2015 03:51:31 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <5616E928.1090705@samsung.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Mario Smarduch <m.smarduch@samsung.com>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-vhost drivers provide guest VMs with better I/O performance and lower
-CPU utilization. This patch allows users to select vhost devices under
-KVM configuration menu on ARM. This makes vhost support on arm/arm64
-on a par with other architectures (e.g. x86, ppc).
+Hi Mario,
 
-Signed-off-by: Wei Huang <wei@redhat.com>
----
- arch/arm/kvm/Kconfig   | 2 ++
- arch/arm64/kvm/Kconfig | 2 ++
- 2 files changed, 4 insertions(+)
+On Thu, Oct 08, 2015 at 03:07:36PM -0700, Mario Smarduch wrote:
+> 
+> 
+> On 10/7/2015 2:05 PM, Peter Maydell wrote:
+> > On 7 October 2015 at 17:40, Mario Smarduch <m.smarduch@samsung.com> wrote:
+> >> On 10/7/2015 12:07 AM, Peter Maydell wrote:
+> >>> On 7 October 2015 at 01:32, Mario Smarduch <m.smarduch@samsung.com> wrote:
+> >>>> Hi Peter,
+> >>>>    I noticed that icedcc, and 8250 don't work
+> >>>> with DEBUG_LL early debug print. And the kernel dies if
+> >>>> these are selected. Besides PL011 is there any other
+> >>>> serial devices that can be used for early debug with Virt MM?
+> >>>> Maybe some additional options are needed?
+> >>>
+> >>> PL011 and semihosting are the obvious choices for early
+> >>> debug output. There's no 8250 in the virt board so that
+> >>> definitely isn't going to work. We don't currently implement
+> >>> the ICE DCC channel, though I think Edgar was considering
+> >>> connecting it up to a chardev backend.
+> >>>
+> >>> Really though, I think the UART and semihosting should
+> >>> be enough for whatever the guest wants to do in the way
+> >>> of early debug. Why do you need more options?
+> > 
+> >> No actually I was thinking of limiting choices to the ones that work for
+> >> Virt MM during kernel config. But thought that maybe others may be
+> >> supported through some options. Form me PL011 alone is enough.
+> > 
+> > 8250 I think is what kvmtool uses, which is why that is a
+> > permitted option. Not sure who's implementing ICE DCC
+> > (though as I say QEMU might eventually).
+> 
+> I see thanks for pointing that out.
+> 
+> > 
+> > thanks
+> > -- PMM
+> > 
+> 
+> I came across the issue of selecting wrong UART for DEBUG_LL while
+> trying to boot arm32 on arm64. ARCH_VIRT system type defaults
+> for 'Kernel low-level debugging port' are not too clear.
+> 
+> I'm wondering if it would make sense to add entries for virtual
+> system types (like QEMU Virt or kvmtool virt) and enhance
+> help section with possible UART_PHYS address, also set a default
+> port. It appears like hard coding is going to be deprecated.
+> 
+> This is not a major enhancement but when you're out of options
+> and you just see a blank screen anything helps. Especially for virtual
+> host where you may start suspecting the host system as well. Since I
+> tripped over it, I took a closer look.
+> 
+I agree that it is particularly discouraging when you just get a blank
+screen, and it is in fact one of the top support questions I get from
+new users in private as well.
 
-diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
-index 210ecca..68045e7 100644
---- a/arch/arm/kvm/Kconfig
-+++ b/arch/arm/kvm/Kconfig
-@@ -45,4 +45,6 @@ config KVM_ARM_HOST
- 	---help---
- 	  Provides host support for ARM processors.
- 
-+source drivers/vhost/Kconfig
-+
- endif # VIRTUALIZATION
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index 5c7e920..38102f5 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -41,4 +41,6 @@ config KVM_ARM_HOST
- 	---help---
- 	  Provides host support for ARM processors.
- 
-+source drivers/vhost/Kconfig
-+
- endif # VIRTUALIZATION
--- 
-2.4.3
+I think there were some discussions with Rob and Grant in the past about
+some way for Linux to discover the location of the UART for early
+printk, but I have forgotten the details and where that landed.
 
+I personally think it would be a good idea with *any* viable easy method
+to configure a kernel to support earlyprintk for our two virtual
+platforms: QEMU's virt board and kvmtool's platform.
+
+-Christoffer
