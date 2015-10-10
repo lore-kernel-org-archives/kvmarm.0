@@ -1,31 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: Virt MM DEBUG_LL support arm32
-Date: Sat, 10 Oct 2015 12:51:48 +0200
-Message-ID: <20151010105148.GA29128@cbox>
-References: <5614683A.1010007@samsung.com>
- <CAFEAcA9ShOzMG7kk9hQRgizJ_u2=Y2B5v6SXi678M1RMZQcPVA@mail.gmail.com>
- <56154AF4.60206@samsung.com>
- <CAFEAcA8RWhh8agbfAR8JARXU6BY7PyLt3Z9UPzEh7xvJsev7Ng@mail.gmail.com>
- <5616E928.1090705@samsung.com>
+Subject: Re: [PATCH 13/15] arm64: kvm: Rewrite fake pgd handling
+Date: Sat, 10 Oct 2015 16:52:27 +0200
+Message-ID: <20151010145227.GB29128@cbox>
+References: <1442331684-28818-1-git-send-email-suzuki.poulose@arm.com>
+ <1442331684-28818-14-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EDA4C412DD
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Oct 2015 06:49:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ABC7A411E3
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Oct 2015 10:50:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8OR8dDytCAkk for <kvmarm@lists.cs.columbia.edu>;
- Sat, 10 Oct 2015 06:49:28 -0400 (EDT)
-Received: from mail-lb0-f177.google.com (mail-lb0-f177.google.com
- [209.85.217.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9201541252
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Oct 2015 06:49:28 -0400 (EDT)
-Received: by lbwr8 with SMTP id r8so103232163lbw.2
- for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Oct 2015 03:51:31 -0700 (PDT)
+ with ESMTP id tuZLnZIpH76M for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 10 Oct 2015 10:50:06 -0400 (EDT)
+Received: from mail-lb0-f172.google.com (mail-lb0-f172.google.com
+ [209.85.217.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F0173411E2
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Oct 2015 10:50:05 -0400 (EDT)
+Received: by lbbwt4 with SMTP id wt4so106828672lbb.1
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 10 Oct 2015 07:52:09 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <5616E928.1090705@samsung.com>
+In-Reply-To: <1442331684-28818-14-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,75 +32,340 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mario Smarduch <m.smarduch@samsung.com>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, ard.biesheuvel@linaro.org, Marc.Zyngier@arm.com, Catalin.Marinas@arm.com, Will.Deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Mario,
+Hi Suzuki,
 
-On Thu, Oct 08, 2015 at 03:07:36PM -0700, Mario Smarduch wrote:
+On Tue, Sep 15, 2015 at 04:41:22PM +0100, Suzuki K. Poulose wrote:
+> From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
 > 
-> 
-> On 10/7/2015 2:05 PM, Peter Maydell wrote:
-> > On 7 October 2015 at 17:40, Mario Smarduch <m.smarduch@samsung.com> wrote:
-> >> On 10/7/2015 12:07 AM, Peter Maydell wrote:
-> >>> On 7 October 2015 at 01:32, Mario Smarduch <m.smarduch@samsung.com> wrote:
-> >>>> Hi Peter,
-> >>>>    I noticed that icedcc, and 8250 don't work
-> >>>> with DEBUG_LL early debug print. And the kernel dies if
-> >>>> these are selected. Besides PL011 is there any other
-> >>>> serial devices that can be used for early debug with Virt MM?
-> >>>> Maybe some additional options are needed?
-> >>>
-> >>> PL011 and semihosting are the obvious choices for early
-> >>> debug output. There's no 8250 in the virt board so that
-> >>> definitely isn't going to work. We don't currently implement
-> >>> the ICE DCC channel, though I think Edgar was considering
-> >>> connecting it up to a chardev backend.
-> >>>
-> >>> Really though, I think the UART and semihosting should
-> >>> be enough for whatever the guest wants to do in the way
-> >>> of early debug. Why do you need more options?
-> > 
-> >> No actually I was thinking of limiting choices to the ones that work for
-> >> Virt MM during kernel config. But thought that maybe others may be
-> >> supported through some options. Form me PL011 alone is enough.
-> > 
-> > 8250 I think is what kvmtool uses, which is why that is a
-> > permitted option. Not sure who's implementing ICE DCC
-> > (though as I say QEMU might eventually).
-> 
-> I see thanks for pointing that out.
-> 
-> > 
-> > thanks
-> > -- PMM
-> > 
-> 
-> I came across the issue of selecting wrong UART for DEBUG_LL while
-> trying to boot arm32 on arm64. ARCH_VIRT system type defaults
-> for 'Kernel low-level debugging port' are not too clear.
-> 
-> I'm wondering if it would make sense to add entries for virtual
-> system types (like QEMU Virt or kvmtool virt) and enhance
-> help section with possible UART_PHYS address, also set a default
-> port. It appears like hard coding is going to be deprecated.
-> 
-> This is not a major enhancement but when you're out of options
-> and you just see a blank screen anything helps. Especially for virtual
-> host where you may start suspecting the host system as well. Since I
-> tripped over it, I took a closer look.
-> 
-I agree that it is particularly discouraging when you just get a blank
-screen, and it is in fact one of the top support questions I get from
-new users in private as well.
+> The existing fake pgd handling code assumes that the stage-2 entry
+> level can only be one level down that of the host, which may not be
+> true always(e.g, with the introduction of 16k pagesize).
 
-I think there were some discussions with Rob and Grant in the past about
-some way for Linux to discover the location of the UART for early
-printk, but I have forgotten the details and where that landed.
+I had to refresh my mind a fair bit to be able to review this, so I
+thought it may be useful to just remind us all what the constraints of
+this whole thing is, and make sure we agree on this:
 
-I personally think it would be a good idea with *any* viable easy method
-to configure a kernel to support earlyprintk for our two virtual
-platforms: QEMU's virt board and kvmtool's platform.
+1. We fix the IPA max width to 40 bits
+2. We don't support systems with a PARange smaller than 40 bits (do we
+   check this anywhere or document this anywhere?)
+3. We always assume we are running on a system with PARange of 40 bits
+   and we are therefore constrained to use concatination.
 
+As an implication of (3) above, this code will attempt to allocate 256K
+of physically contiguous memory for each VM on the system.  That is
+probably ok, but I just wanted to point it out in case it raises any
+eyebrows for other people following this thread.
+
+> 
+> e.g.
+> With 16k page size and 48bit VA and 40bit IPA we have the following
+> split for page table levels:
+> 
+> level:  0       1         2         3
+> bits : [47] [46 - 36] [35 - 25] [24 - 14] [13 - 0]
+>          ^       ^     ^
+>          |       |     |
+>    host entry    |     x---- stage-2 entry
+>                  |
+>         IPA -----x
+
+Isn't the stage-2 entry using bits [39:25], because you resolve
+more than 11 bits on the initial level of lookup when you concatenate
+tables?
+
+> 
+> The stage-2 entry level is 2, due to the concatenation of 16tables
+> at level 2(mandated by the hardware). So, we need to fake two levels
+> to actually reach the hyp page table. This case cannot be handled
+> with the existing code, as, all we know about is KVM_PREALLOC_LEVEL
+> which kind of stands for two different pieces of information.
+> 
+> 1) Whether we have fake page table entry levels.
+> 2) The entry level of stage-2 translation.
+> 
+> We loose the information about the number of fake levels that
+> we may have to use. Also, KVM_PREALLOC_LEVEL computation itself
+> is wrong, as we assume the hw entry level is always 1 level down
+> from the host.
+> 
+> This patch introduces two seperate indicators :
+> 1) Accurate entry level for stage-2 translation - HYP_PGTABLE_ENTRY_LEVEL -
+>    using the new helpers.
+> 2) Number of levels of fake pagetable entries. (KVM_FAKE_PGTABLE_LEVELS)
+> 
+> The following conditions hold true for all cases(with 40bit IPA)
+> 1) The stage-2 entry level <= 2
+> 2) Number of fake page-table entries is in the inclusive range [0, 2].
+
+nit: Number of fake levels of page tables
+
+> 
+> Cc: kvmarm@lists.cs.columbia.edu
+> Cc: christoffer.dall@linaro.org
+> Cc: Marc.Zyngier@arm.com
+> Signed-off-by: Suzuki K. Poulose <suzuki.poulose@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_mmu.h |  114 ++++++++++++++++++++------------------
+>  1 file changed, 61 insertions(+), 53 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 2567fe8..72cfd9e 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -41,18 +41,6 @@
+>   */
+>  #define TRAMPOLINE_VA		(HYP_PAGE_OFFSET_MASK & PAGE_MASK)
+>  
+> -/*
+> - * KVM_MMU_CACHE_MIN_PAGES is the number of stage2 page table translation
+> - * levels in addition to the PGD and potentially the PUD which are
+> - * pre-allocated (we pre-allocate the fake PGD and the PUD when the Stage-2
+> - * tables use one level of tables less than the kernel.
+> - */
+> -#ifdef CONFIG_ARM64_64K_PAGES
+> -#define KVM_MMU_CACHE_MIN_PAGES	1
+> -#else
+> -#define KVM_MMU_CACHE_MIN_PAGES	2
+> -#endif
+> -
+>  #ifdef __ASSEMBLY__
+>  
+>  /*
+> @@ -80,6 +68,26 @@
+>  #define KVM_PHYS_SIZE	(1UL << KVM_PHYS_SHIFT)
+>  #define KVM_PHYS_MASK	(KVM_PHYS_SIZE - 1UL)
+>  
+> +/*
+> + * At stage-2 entry level, upto 16 tables can be concatenated and
+
+nit: Can you rewrite the first part of this comment to be in line with
+the ARM ARM, such as: "The stage-2 page tables can concatenate up to 16
+tables at the inital level"  ?
+
+
+> + * the hardware expects us to use concatenation, whenever possible.
+
+I think the 'hardware expects us' is a bit vague.  At least I find this
+whole part of the architecture incredibly confusing already, so it would
+help me in the future if we put something like:
+
+"The hardware requires that we use concatenation depending on the
+supported PARange and page size.  We always assume the hardware's PASize
+is maximum 40 bits in this context, and with a fixed IPA width of 40
+bits, we concatenate 2 tables for 4K pages, 16 tables for 16K pages, and
+do not use concatenation for 64K pages."
+
+Did I get this right?
+
+> + * So, number of page table levels for KVM_PHYS_SHIFT is always
+> + * the number of normal page table levels for (KVM_PHYS_SHIFT - 4).
+> + */
+> +#define HYP_PGTABLE_LEVELS	ARM64_HW_PGTABLE_LEVELS(KVM_PHYS_SHIFT - 4)
+
+I see the math lines up, but I don't think it's intuitive, as I don't
+understand why it's obvious that it's the 'normal' page table for
+KVM_PHYS_SHIFT - 4.
+
+I see this as an architectural limitation given in the ARM ARM, and we
+should just refer to that, and do:
+
+#if PAGE_SHIFT == 12
+#define S2_PGTABLE_LEVELS	3
+#else
+#define S2_PGTABLE_LEVELS	2
+#endif
+
+> +/* Number of bits normally addressed by HYP_PGTABLE_LEVELS */
+> +#define HYP_PGTABLE_SHIFT	ARM64_HW_PGTABLE_LEVEL_SHIFT(HYP_PGTABLE_LEVELS + 1)
+> +#define HYP_PGDIR_SHIFT		ARM64_HW_PGTABLE_LEVEL_SHIFT(HYP_PGTABLE_LEVELS)
+> +#define HYP_PGTABLE_ENTRY_LEVEL	(4 - HYP_PGTABLE_LEVELS)
+
+We are introducing a huge number of defines here, which are all more or
+less opaque to anyone coming back to this code.
+
+I may be extraordinarily stupid, but I really need each define explained
+in a comment to be able to follow this code (those above and the
+S2_ENTRY_TABLES below).
+
+> +/*
+> + * KVM_MMU_CACHE_MIN_PAGES is the number of stage2 page table translation
+> + * levels in addition to the PGD and potentially the PUD which are
+> + * pre-allocated (we pre-allocate the fake PGD and the PUD when the Stage-2
+> + * tables use one level of tables less than the kernel.
+> + */
+> +#define KVM_MMU_CACHE_MIN_PAGES	(HYP_PGTABLE_LEVELS - 1)
+> +
+>  int create_hyp_mappings(void *from, void *to);
+>  int create_hyp_io_mappings(void *from, void *to, phys_addr_t);
+>  void free_boot_hyp_pgd(void);
+> @@ -145,56 +153,41 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
+>  #define kvm_pud_addr_end(addr, end)	pud_addr_end(addr, end)
+>  #define kvm_pmd_addr_end(addr, end)	pmd_addr_end(addr, end)
+>  
+> -/*
+> - * In the case where PGDIR_SHIFT is larger than KVM_PHYS_SHIFT, we can address
+> - * the entire IPA input range with a single pgd entry, and we would only need
+> - * one pgd entry.  Note that in this case, the pgd is actually not used by
+> - * the MMU for Stage-2 translations, but is merely a fake pgd used as a data
+> - * structure for the kernel pgtable macros to work.
+> - */
+> -#if PGDIR_SHIFT > KVM_PHYS_SHIFT
+> -#define PTRS_PER_S2_PGD_SHIFT	0
+> +/* Number of concatenated tables in stage-2 entry level */
+> +#if KVM_PHYS_SHIFT > HYP_PGTABLE_SHIFT
+> +#define S2_ENTRY_TABLES_SHIFT	(KVM_PHYS_SHIFT - HYP_PGTABLE_SHIFT)
+>  #else
+> -#define PTRS_PER_S2_PGD_SHIFT	(KVM_PHYS_SHIFT - PGDIR_SHIFT)
+> +#define S2_ENTRY_TABLES_SHIFT	0
+>  #endif
+> +#define S2_ENTRY_TABLES		(1 << (S2_ENTRY_TABLES_SHIFT))
+> +
+> +/* Number of page table levels we fake to reach the hw pgtable for hyp */
+> +#define KVM_FAKE_PGTABLE_LEVELS	(CONFIG_PGTABLE_LEVELS - HYP_PGTABLE_LEVELS)
+> +
+> +#define PTRS_PER_S2_PGD_SHIFT	(KVM_PHYS_SHIFT - HYP_PGDIR_SHIFT)
+>  #define PTRS_PER_S2_PGD		(1 << PTRS_PER_S2_PGD_SHIFT)
+>  #define S2_PGD_ORDER		get_order(PTRS_PER_S2_PGD * sizeof(pgd_t))
+>  
+>  #define kvm_pgd_index(addr)	(((addr) >> PGDIR_SHIFT) & (PTRS_PER_S2_PGD - 1))
+>  
+> -/*
+> - * If we are concatenating first level stage-2 page tables, we would have less
+> - * than or equal to 16 pointers in the fake PGD, because that's what the
+> - * architecture allows.  In this case, (4 - CONFIG_PGTABLE_LEVELS)
+> - * represents the first level for the host, and we add 1 to go to the next
+> - * level (which uses contatenation) for the stage-2 tables.
+> - */
+> -#if PTRS_PER_S2_PGD <= 16
+> -#define KVM_PREALLOC_LEVEL	(4 - CONFIG_PGTABLE_LEVELS + 1)
+> -#else
+> -#define KVM_PREALLOC_LEVEL	(0)
+> -#endif
+> -
+>  static inline void *kvm_get_hwpgd(struct kvm *kvm)
+>  {
+>  	pgd_t *pgd = kvm->arch.pgd;
+>  	pud_t *pud;
+>  
+> -	if (KVM_PREALLOC_LEVEL == 0)
+> +	if (KVM_FAKE_PGTABLE_LEVELS == 0)
+>  		return pgd;
+>  
+>  	pud = pud_offset(pgd, 0);
+> -	if (KVM_PREALLOC_LEVEL == 1)
+> +	if (HYP_PGTABLE_ENTRY_LEVEL == 1)
+>  		return pud;
+>  
+> -	BUG_ON(KVM_PREALLOC_LEVEL != 2);
+> +	BUG_ON(HYP_PGTABLE_ENTRY_LEVEL != 2);
+>  	return pmd_offset(pud, 0);
+>  }
+>  
+>  static inline unsigned int kvm_get_hwpgd_size(void)
+>  {
+> -	if (KVM_PREALLOC_LEVEL > 0)
+> -		return PTRS_PER_S2_PGD * PAGE_SIZE;
+>  	return PTRS_PER_S2_PGD * sizeof(pgd_t);
+>  }
+>  
+> @@ -207,27 +200,38 @@ static inline pgd_t* kvm_setup_fake_pgd(pgd_t *hwpgd)
+>  {
+>  	int i;
+>  	pgd_t *pgd;
+> +	pud_t *pud;
+>  
+> -	if (!KVM_PREALLOC_LEVEL)
+> +	if (KVM_FAKE_PGTABLE_LEVELS == 0)
+>  		return hwpgd;
+> -	/*
+> -	 * When KVM_PREALLOC_LEVEL==2, we allocate a single page for
+> -	 * the PMD and the kernel will use folded pud.
+> -	 * When KVM_PREALLOC_LEVEL==1, we allocate 2 consecutive PUD
+> -	 * pages.
+> -	 */
+> +
+>  	pgd = kmalloc(PTRS_PER_S2_PGD * sizeof(pgd_t),
+>  			GFP_KERNEL | __GFP_ZERO);
+>  
+>  	if (!pgd)
+>  		return ERR_PTR(-ENOMEM);
+> +	/*
+> +	 * If the stage-2 entry is two level down from that of the host,
+> +	 * we are using a 4-level table on host (since HYP_PGTABLE_ENTRY_LEVEL
+> +	 * cannot be < 2. So, this implies we need to allocat a PUD table
+> +	 * to map the concatenated PMD tables.
+> +	 */
+> +	if (KVM_FAKE_PGTABLE_LEVELS == 2) {
+> +		pud = (pud_t *)__get_free_pages(GFP_KERNEL | __GFP_ZERO, 0);
+> +		if (!pud) {
+> +			kfree(pgd);
+> +			return ERR_PTR(-ENOMEM);
+> +		}
+> +		/* plug the pud into the PGD */
+> +		pgd_populate(NULL, pgd, pud);
+> +	}
+>  
+>  	/* Plug the HW PGD into the fake one. */
+> -	for (i = 0; i < PTRS_PER_S2_PGD; i++) {
+> -		if (KVM_PREALLOC_LEVEL == 1)
+> +	for (i = 0; i < S2_ENTRY_TABLES; i++) {
+> +		if (HYP_PGTABLE_ENTRY_LEVEL == 1)
+>  			pgd_populate(NULL, pgd + i,
+>  				     (pud_t *)hwpgd + i * PTRS_PER_PUD);
+> -		else if (KVM_PREALLOC_LEVEL == 2)
+> +		else if (HYP_PGTABLE_ENTRY_LEVEL == 2)
+>  			pud_populate(NULL, pud_offset(pgd, 0) + i,
+>  				     (pmd_t *)hwpgd + i * PTRS_PER_PMD);
+>  	}
+> @@ -237,8 +241,12 @@ static inline pgd_t* kvm_setup_fake_pgd(pgd_t *hwpgd)
+>  
+>  static inline void kvm_free_fake_pgd(pgd_t *pgd)
+>  {
+> -	if (KVM_PREALLOC_LEVEL > 0)
+> +	if (KVM_FAKE_PGTABLE_LEVELS > 0) {
+> +		/* free the PUD table */
+> +		if (KVM_FAKE_PGTABLE_LEVELS == 2)
+> +			free_page((unsigned long)pud_offset(pgd, 0));
+>  		kfree(pgd);
+> +	}
+>  }
+>  
+>  static inline bool kvm_page_empty(void *ptr)
+> @@ -253,14 +261,14 @@ static inline bool kvm_page_empty(void *ptr)
+>  #define kvm_pmd_table_empty(kvm, pmdp) (0)
+>  #else
+>  #define kvm_pmd_table_empty(kvm, pmdp) \
+> -	(kvm_page_empty(pmdp) && (!(kvm) || KVM_PREALLOC_LEVEL < 2))
+> +	(kvm_page_empty(pmdp) && (!(kvm) || HYP_PGTABLE_ENTRY_LEVEL < 2))
+>  #endif
+>  
+>  #ifdef __PAGETABLE_PUD_FOLDED
+>  #define kvm_pud_table_empty(kvm, pudp) (0)
+>  #else
+>  #define kvm_pud_table_empty(kvm, pudp) \
+> -	(kvm_page_empty(pudp) && (!(kvm) || KVM_PREALLOC_LEVEL < 1))
+> +	(kvm_page_empty(pudp) && (!(kvm) || HYP_PGTABLE_ENTRY_LEVEL < 1))
+>  #endif
+>  
+>  
+> -- 
+> 1.7.9.5
+> 
+
+I actually wonder from looking at this whole patch if we even want to go
+here.  Maybe this is really the time to say that we should get rid of
+the dependency between the host page table layout and the stage-2 page
+table layout.
+
+Since the rest of this series looks pretty good, I'm wondering if you
+should just disable KVM in the config system if 16K pages is selected,
+and then you can move ahead with this series while we fix KVM properly?
+
+[Sorry for taking so long to get around to looking at this].
+
+Thanks,
 -Christoffer
