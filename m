@@ -1,34 +1,57 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 3/7] KVM: arm/arm64: Fix the documentation
-Date: Mon, 12 Oct 2015 13:56:51 +0200
-Message-ID: <20151012115651.GA21861@cbox>
-References: <cover.1443451687.git.p.fedin@samsung.com>
- <5b6b8e9e002bc6a9cc5e6a881032d6b930830e74.1443451687.git.p.fedin@samsung.com>
- <20151007200439.GC14315@cbox>
- <002f01d10195$d6961550$83c23ff0$@samsung.com>
- <20151008082425.GF14315@cbox>
- <016c01d104bd$e1317560$a3946020$@samsung.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] KVM: arm: use GIC support unconditionally
+Date: Mon, 12 Oct 2015 15:22:31 +0200
+Message-ID: <6276915.O3N4ZN0iPv@wuerfel>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <016c01d104bd$e1317560$a3946020$@samsung.com>
-Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Peter Maydell' <peter.maydell@linaro.org>, 'Marc Zyngier' <marc.zyngier@arm.com>, 'Andre Przywara' <andre.przywara@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2BA2B41390
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Oct 2015 09:20:57 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id fyn5MKFP5NRH for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Oct 2015 09:20:55 -0400 (EDT)
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.13])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E020841338
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Oct 2015 09:20:54 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Gleb Natapov <gleb@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 12, 2015 at 10:16:13AM +0300, Pavel Fedin wrote:
->  Hello!
-> 
-> > >
-> > ok, fair enough.  This kind of rationale is helpful to put in the commit
-> > text though.
-> 
->  By the way, may be apply this as a standalone patch? Should i post a standalone version with the
-> updated commit message then?
-> 
-Sure, as you prefer.
+The vgic code on ARM is built for all configurations that enable KVM,
+but the parent_data field that it references is only present when
+CONFIG_IRQ_DOMAIN_HIERARCHY is set:
 
-Thanks,
--Christoffer
+virt/kvm/arm/vgic.c: In function 'kvm_vgic_map_phys_irq':
+virt/kvm/arm/vgic.c:1781:13: error: 'struct irq_data' has no member named 'parent_data'
+
+This flag is implied by the GIC driver, and indeed the VGIC code only
+makes sense if a GIC is present. This changes the CONFIG_KVM symbol
+to always select GIC, which avoids the issue.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Fixes: 662d9715840 ("arm/arm64: KVM: Kill CONFIG_KVM_ARM_{VGIC,TIMER}")
+
+diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+index 210eccadb69a..356970f3b25e 100644
+--- a/arch/arm/kvm/Kconfig
++++ b/arch/arm/kvm/Kconfig
+@@ -21,6 +21,7 @@ config KVM
+ 	depends on MMU && OF
+ 	select PREEMPT_NOTIFIERS
+ 	select ANON_INODES
++	select ARM_GIC
+ 	select HAVE_KVM_CPU_RELAX_INTERCEPT
+ 	select HAVE_KVM_ARCH_TLB_FLUSH_ALL
+ 	select KVM_MMIO
