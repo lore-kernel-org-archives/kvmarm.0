@@ -1,21 +1,25 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: [PATCH] arm64: kvm: restore EL1N SP for panic
-Date: Mon, 12 Oct 2015 15:04:50 +0100
-Message-ID: <1444658690-8180-1-git-send-email-mark.rutland@arm.com>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH v3 00/16] KVM: arm64: GICv3 ITS emulation
+Date: Mon, 12 Oct 2015 15:12:17 +0100
+Message-ID: <561BBFC1.4070200@arm.com>
+References: <1444229726-31559-1-git-send-email-andre.przywara@arm.com>
+ <20151010153744.GH29128@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 55477410EB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Oct 2015 10:03:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6B33411E2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Oct 2015 10:09:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pWoHhqONEoOF for <kvmarm@lists.cs.columbia.edu>;
- Mon, 12 Oct 2015 10:03:09 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9F57C40F9B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Oct 2015 10:03:09 -0400 (EDT)
+ with ESMTP id rqtvI5agX+bU for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 12 Oct 2015 10:09:12 -0400 (EDT)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A3B2941022
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 12 Oct 2015 10:09:12 -0400 (EDT)
+In-Reply-To: <20151010153744.GH29128@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -25,55 +29,60 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-If we panic in hyp mode, we inject a call to panic() into the EL1N host
-kernel. If a guest context is active, we first attempt to restore the
-minimal amount of state necessary to execute the host kernel with
-restore_sysregs.
+Hej,
 
-However, the SP is restored as part of restore_common_regs, and so we
-may return to the host's panic() function with the SP of the guest. Any
-calculations based on the SP will be bogus, and any attempt to access
-the stack will result in recursive data aborts.
+On 10/10/15 16:37, Christoffer Dall wrote:
+> Hi Andre,
+> 
+> 
+> On Wed, Oct 07, 2015 at 03:55:10PM +0100, Andre Przywara wrote:
+>> Hi,
+>>
+>> another respin and rebase of the ITS emulation series.
+>> Major changes compared to v2 (beside some minor things like added
+>> comments and function renames) are the rebasing and adaption to 4.3-rc
+>> and Christoffer's timer rework series. Also the locking has been
+>> reworked to cope with the dependencies of the its and the dist lock
+>> in connection with the PROPBASER/PENDBASER and the command handling.
+>> For a more detailed changelog see below or look at the respective
+>> commit messages.
+>>
+>> This should address most of the comments I got on the list.
+>> Many thanks to the diligent reviewers!
+>> I didn't bother to fine-tune patch 01/16 too much, as I guess there
+>> will be more discussion around this based on Pavel's latest post.
+>>
+>> These patches go on top of Christoffer's timer rework series [1],
+>> which itself is on top of 4.3-rc2.
+>> You can find all of this code in the its-emul/v3 branch of my
+>> repository [2].
+> 
+> Thanks for rebasing the series!
+> 
+> Just a heads up that I may not be able to review this series for the
+> next 1-2 weeks, so I'm afraid it's not going to make it in for v4.4,
+> sorry.
+> 
+> Please let me know if this breaks expectations from everyone.
 
-When running Linux as a guest, the guest's EL1N SP is like to be some
-valid kernel address. In this case, the host kernel may use that region
-as a stack for panic(), corrupting it in the process.
+No worries, I wasn't expecting this for 4.4 anyway.
+I'd rather see the prerequisites like your timer series going upstream
+first, I will then rebase it on top of 4.4-rc1 (with fixes from newer
+review comments incorporated).
+Maybe we can take Pavel's cleanup (replacing my 1/16 and 2/16) for 4.4
+already? (I will reply on those soon)
+Also what is the status of Eric's IRQ routing support? Should this go in
+first now?
 
-Avoid the problem by restoring the host SP prior to returning to the
-host. To prevent misleading backtraces in the host, the FP is zeroed at
-the same time. We don't need any of the other "common" registers in
-order to panic successfully.
+Cheers,
+Andre.
 
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: <kvmarm@lists.cs.columbia.edu>
----
- arch/arm64/kvm/hyp.S | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-index e583613..1599701 100644
---- a/arch/arm64/kvm/hyp.S
-+++ b/arch/arm64/kvm/hyp.S
-@@ -880,6 +880,14 @@ __kvm_hyp_panic:
- 
- 	bl __restore_sysregs
- 
-+	/*
-+	 * Make sure we have a valid host stack, and don't leave junk in the
-+	 * frame pointer that will give us a misleading host stack unwinding.
-+	 */
-+	ldr	x22, [x2, #CPU_GP_REG_OFFSET(CPU_SP_EL1)]
-+	msr	sp_el1, x22
-+	mov	x29, xzr
-+
- 1:	adr	x0, __hyp_panic_str
- 	adr	x1, 2f
- 	ldp	x2, x3, [x1]
--- 
-1.9.1
+> Othersie, I will try review it with due dilligence so it makes it in for
+> v4.5.
+> 
+> Best,
+> -Christoffer
