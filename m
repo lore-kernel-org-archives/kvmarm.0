@@ -1,86 +1,41 @@
-From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
-Subject: [PATCH v3 19/24] arm64/kvm: Make use of the system wide safe values
-Date: Tue, 13 Oct 2015 18:22:27 +0100
-Message-ID: <1444756952-31145-20-git-send-email-suzuki.poulose@arm.com>
-References: <1444756952-31145-1-git-send-email-suzuki.poulose@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v3 00/16] KVM: arm64: GICv3 ITS emulation
+Date: Wed, 14 Oct 2015 10:48:46 +0200
+Message-ID: <561E16EE.10707@linaro.org>
+References: <1444229726-31559-1-git-send-email-andre.przywara@arm.com>
+ <20151010153744.GH29128@cbox> <561BBFC1.4070200@arm.com>
+ <00dc01d10501$46352810$d29f7830$@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B7C8841300
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Oct 2015 13:20:57 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id V8T77615FUY3 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 13 Oct 2015 13:20:56 -0400 (EDT)
-Received: from eu-smtp-delivery-143.mimecast.com
- (eu-smtp-delivery-143.mimecast.com [207.82.80.143])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 708FF41172
- for <kvmarm@lists.cs.columbia.edu>; Tue, 13 Oct 2015 13:20:55 -0400 (EDT)
-In-Reply-To: <1444756952-31145-1-git-send-email-suzuki.poulose@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: ryan.arnold@linaro.org, ard.biesheuvel@linaro.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, edward.nevill@linaro.org, aph@redhat.com, andre.przywara@arm.com, dave.martin@arm.com
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <00dc01d10501$46352810$d29f7830$@samsung.com>
+Sender: kvm-owner@vger.kernel.org
+To: Pavel Fedin <p.fedin@samsung.com>, 'Andre Przywara' <andre.przywara@arm.com>, 'Christoffer Dall' <christoffer.dall@linaro.org>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Use the system wide safe value from the new API for safer
-decisions
+Hi Andre, Pavel
+On 10/12/2015 05:18 PM, Pavel Fedin wrote:
+>  Hello!
+> 
+>> Also what is the status of Eric's IRQ routing support? Should this go in
+>> first now?
+> 
+>  I'd say without vITS there's nothing to use IRQ routing with. It could go in and just lay around
+> silently, so that it's not forgotten, but for example current qemu just knows that with GICv2m it
+> should use hardcoded linear MSI->SPI mapping.
+Currently the gsi routing applies on top of ITS emulation series. I am
+going to rebase it soon. It can go in 4.5 with ITS emulation series.
 
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu
-Signed-off-by: Suzuki K. Poulose <suzuki.poulose@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- arch/arm64/kvm/reset.c    |    2 +-
- arch/arm64/kvm/sys_regs.c |   12 ++++++------
- 2 files changed, 7 insertions(+), 7 deletions(-)
+Best Regards
 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 91cf535..f34745c 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -53,7 +53,7 @@ static bool cpu_has_32bit_el1(void)
- {
- 	u64 pfr0;
- 
--	pfr0 = read_cpuid(ID_AA64PFR0_EL1);
-+	pfr0 = read_system_reg(SYS_ID_AA64PFR0_EL1);
- 	return !!(pfr0 & 0x20);
- }
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d03d3af..87a64e8 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -693,13 +693,13 @@ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
- 	if (p->is_write) {
- 		return ignore_write(vcpu, p);
- 	} else {
--		u64 dfr = read_cpuid(ID_AA64DFR0_EL1);
--		u64 pfr = read_cpuid(ID_AA64PFR0_EL1);
--		u32 el3 = !!((pfr >> 12) & 0xf);
-+		u64 dfr = read_system_reg(SYS_ID_AA64DFR0_EL1);
-+		u64 pfr = read_system_reg(SYS_ID_AA64PFR0_EL1);
-+		u32 el3 = !!cpuid_feature_extract_field(pfr, ID_AA64PFR0_EL3_SHIFT);
- 
--		*vcpu_reg(vcpu, p->Rt) = ((((dfr >> 20) & 0xf) << 28) |
--					  (((dfr >> 12) & 0xf) << 24) |
--					  (((dfr >> 28) & 0xf) << 20) |
-+		*vcpu_reg(vcpu, p->Rt) = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
-+					  (((dfr >> ID_AA64DFR0_BRPS_SHIFT) & 0xf) << 24) |
-+					  (((dfr >> ID_AA64DFR0_CTX_CMPS_SHIFT) & 0xf) << 20) |
- 					  (6 << 16) | (el3 << 14) | (el3 << 12));
- 		return true;
- 	}
--- 
-1.7.9.5
+Eric
+> 
+> Kind regards,
+> Pavel Fedin
+> Expert Engineer
+> Samsung Electronics Research center Russia
+> 
+> 
+
