@@ -1,143 +1,53 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] VFIO: platform: AMD xgbe reset module
-Date: Thu, 15 Oct 2015 21:42:19 +0200
-Message-ID: <20151015194219.GG21930@cbox>
-References: <1444836792-2405-1-git-send-email-eric.auger@linaro.org>
- <7287273.XGFpHqQ9fN@wuerfel> <20151015121228.GA965@cbox>
- <5270338.MbsQ1bGczu@wuerfel> <561FBC31.3020900@linaro.org>
- <1444927997.4059.470.camel@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BCB0E412D6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Oct 2015 15:39:38 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id tlcm7Kopsw43 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Oct 2015 15:39:37 -0400 (EDT)
-Received: from mail-lb0-f176.google.com (mail-lb0-f176.google.com
- [209.85.217.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4B2E141294
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Oct 2015 15:39:36 -0400 (EDT)
-Received: by lbcao8 with SMTP id ao8so82140983lbc.3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Oct 2015 12:41:55 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <1444927997.4059.470.camel@redhat.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: thomas.lendacky@amd.com, kvm@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, patches@linaro.org, linux-kernel@vger.kernel.org, suravee.suthikulpanit@amd.com, eric.auger@st.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+From: Michal Marek <mmarek@suse.com>
+Subject: [PATCH 2/9] KVM: arm: Do not indent the arguments of DECLARE_BITMAP
+Date: Thu, 15 Oct 2015 22:16:28 +0200
+Message-ID: <1444940195-28272-3-git-send-email-mmarek@suse.com>
+References: <1444940195-28272-1-git-send-email-mmarek@suse.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1444940195-28272-1-git-send-email-mmarek@suse.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Oct 15, 2015 at 10:53:17AM -0600, Alex Williamson wrote:
-> On Thu, 2015-10-15 at 16:46 +0200, Eric Auger wrote:
-> > Hi Arnd,
-> > On 10/15/2015 03:59 PM, Arnd Bergmann wrote:
-> > > On Thursday 15 October 2015 14:12:28 Christoffer Dall wrote:
-> > >>>
-> > >>> enum vfio_platform_op {
-> > >>>       VFIO_PLATFORM_BIND,
-> > >>>       VFIO_PLATFORM_UNBIND,
-> > >>>       VFIO_PLATFORM_RESET,
-> > >>> };
-> > >>>
-> > >>> struct platform_driver {
-> > >>>         int (*probe)(struct platform_device *);
-> > >>>         int (*remove)(struct platform_device *);
-> > >>>       ...
-> > >>>       int (*vfio_manage)(struct platform_device *, enum vfio_platform_op);
-> > >>>         struct device_driver driver;
-> > >>> };
-> > >>>
-> > >>> This would integrate much more closely into the platform driver framework,
-> > >>> just like the regular vfio driver integrates into the PCI framework.
-> > >>> Unlike PCI however, you can't just use the generic driver framework to
-> > >>> unbind the driver, because you still need device specific code.
-> > >>>
-> > >> Thanks for these suggestions, really helpful.
-> > >>
-> > >> What I don't understand in the latter example is how VFIO knows which
-> > >> struct platform_driver to interact with?
-> > > 
-> > > This would assume that the driver remains bound to the device, so VFIO
-> > > gets a pointer to the device from somewhere (as it does today) and then
-> > > follows the dev->driver pointer to get to the platform_driver.
-> 
-> The complexity of managing a bi-modal driver seems like far more than a
-> little bit of code duplication in a device specific reset module and
-> extends into how userspace makes devices available through vfio, so I
-> think it's too late for that discussion.
->   
+Besides being a coding style issue, it confuses make tags:
 
-I have had extremely limited exposure to the implementation details of
-the drivers for devices relevant for VFIO platform, so apologies for
-asking stupid questions.
+ctags: Warning: include/kvm/arm_vgic.h:307: null expansion of name pattern "\1"
+ctags: Warning: include/kvm/arm_vgic.h:308: null expansion of name pattern "\1"
+ctags: Warning: include/kvm/arm_vgic.h:309: null expansion of name pattern "\1"
+ctags: Warning: include/kvm/arm_vgic.h:317: null expansion of name pattern "\1"
 
-I'm sure that your point is valid, I just fully understand how the
-complexities of a bi-modal driver arise?
+Cc: kvmarm@lists.cs.columbia.edu
+Signed-off-by: Michal Marek <mmarek@suse.com>
+---
+ include/kvm/arm_vgic.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Is it simply that the reset function in a particular device driver may
-not be self-contained so therefore the whole driver would need to be
-refactored to be able to do a reset for the purpose of VFIO?
-
-> > >> Also, just so I'm sure I understand correctly, VFIO_PLATFORM_UNBIND is
-> > >> then called by VFIO before the VFIO driver unbinds from the device
-> > >> (unbinding the platform driver from the device being a completely
-> > >> separate thing)?
-> > > 
-> > > This is where we'd need a little more changes for this approach. Instead
-> > > of unbinding the device from its driver, the idea would be that the
-> > > driver remains bound as far as the driver model is concerned, but
-> > > it would be in a quiescent state where no other subsystem interacts with
-> > > it (i.e. it gets unregistered from networking core or whichever it uses).
-> > 
-> > Currently we use the same mechanism as for PCI, ie. unbind the native
-> > driver and then bind VFIO platform driver in its place. Don't you think
-> > changing this may be a pain for user-space tools that are designed to
-> > work that way for PCI?
-> > 
-> > My personal preference would be to start with your first proposal since
-> > it looks (to me) less complex and "unknown" that the 2d approach.
-> > 
-> > Let's wait for Alex opinion too...
-> 
-> I thought the reason we took the approach we have now is so that we
-> don't have reset code loaded into the kernel unless we have a device
-> that needs it.  Therefore we don't really want to preemptively load all
-> the reset drivers and have them do a registration.  The unfortunate
-> side-effect of that is the platform code needs to go looking for the
-> driver. 
-
-Does the current approach have a separate driver for doing VFIO reset or
-does it reuse the existing device driver?
-
-Why does the driver registering itself instead of using symbol_get
-imply that we must load reset drivers that we don't need?
-
-Thanks,
--Christoffer
-
-
-> We do that via the __symbol_get() trick, which only fails
-> without modules because the underscore variant isn't defined in that
-> case.  I remember asking Eric previously why we're using that rather
-> than symbol_get(), I've since forgotten his answer, but the fact that
-> __symbol_get() is only defined for modules makes it moot, we either need
-> to make symbol_get() work or define __symbol_get() for non-module
-> builds.
-> 
-> Otherwise, we should probably abandon the idea of these reset functions
-> being modules and build them into the vfio platform driver (which would
-> still be less loaded, dead code than a bi-modal host driver).  Thanks,
-> 
-> Alex
-> 
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index d901f1a47be6..58c5c0eb8d2d 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -304,9 +304,9 @@ struct vgic_cpu {
+ 	u8		*vgic_irq_lr_map;
+ 
+ 	/* Pending/active/both interrupts on this VCPU */
+-	DECLARE_BITMAP(	pending_percpu, VGIC_NR_PRIVATE_IRQS);
+-	DECLARE_BITMAP(	active_percpu, VGIC_NR_PRIVATE_IRQS);
+-	DECLARE_BITMAP(	pend_act_percpu, VGIC_NR_PRIVATE_IRQS);
++	DECLARE_BITMAP(pending_percpu, VGIC_NR_PRIVATE_IRQS);
++	DECLARE_BITMAP(active_percpu, VGIC_NR_PRIVATE_IRQS);
++	DECLARE_BITMAP(pend_act_percpu, VGIC_NR_PRIVATE_IRQS);
+ 
+ 	/* Pending/active/both shared interrupts, dynamically sized */
+ 	unsigned long	*pending_shared;
+@@ -314,7 +314,7 @@ struct vgic_cpu {
+ 	unsigned long   *pend_act_shared;
+ 
+ 	/* Bitmap of used/free list registers */
+-	DECLARE_BITMAP(	lr_used, VGIC_V2_MAX_LRS);
++	DECLARE_BITMAP(lr_used, VGIC_V2_MAX_LRS);
+ 
+ 	/* Number of list registers on this CPU */
+ 	int		nr_lr;
+-- 
+2.1.4
