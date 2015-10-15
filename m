@@ -1,27 +1,24 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm: use GIC support unconditionally
-Date: Thu, 15 Oct 2015 14:34:27 +0200
-Message-ID: <20151015123427.GE21930@cbox>
-References: <6276915.O3N4ZN0iPv@wuerfel>
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH] VFIO: platform: AMD xgbe reset module
+Date: Thu, 15 Oct 2015 15:59:56 +0200
+Message-ID: <5270338.MbsQ1bGczu@wuerfel>
+References: <1444836792-2405-1-git-send-email-eric.auger@linaro.org>
+ <7287273.XGFpHqQ9fN@wuerfel> <20151015121228.GA965@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 10B2441338
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Oct 2015 08:31:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D8706413DD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Oct 2015 09:57:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CqZRMb1yD3cu for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Oct 2015 08:31:46 -0400 (EDT)
-Received: from mail-lb0-f170.google.com (mail-lb0-f170.google.com
- [209.85.217.170])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D04754053F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Oct 2015 08:31:45 -0400 (EDT)
-Received: by lbbpp2 with SMTP id pp2so38602746lbb.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Oct 2015 05:34:03 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <6276915.O3N4ZN0iPv@wuerfel>
+ with ESMTP id InF3HpDpZwNQ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Oct 2015 09:57:52 -0400 (EDT)
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.13])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3102F41294
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Oct 2015 09:57:51 -0400 (EDT)
+In-Reply-To: <20151015121228.GA965@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,40 +28,49 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Gleb Natapov <gleb@kernel.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: thomas.lendacky@amd.com, kvm@vger.kernel.org, patches@linaro.org, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, suravee.suthikulpanit@amd.com, eric.auger@st.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 12, 2015 at 03:22:31PM +0200, Arnd Bergmann wrote:
-> The vgic code on ARM is built for all configurations that enable KVM,
-> but the parent_data field that it references is only present when
-> CONFIG_IRQ_DOMAIN_HIERARCHY is set:
+On Thursday 15 October 2015 14:12:28 Christoffer Dall wrote:
+> > 
+> > enum vfio_platform_op {
+> >       VFIO_PLATFORM_BIND,
+> >       VFIO_PLATFORM_UNBIND,
+> >       VFIO_PLATFORM_RESET,
+> > };
+> > 
+> > struct platform_driver {
+> >         int (*probe)(struct platform_device *);
+> >         int (*remove)(struct platform_device *);
+> >       ...
+> >       int (*vfio_manage)(struct platform_device *, enum vfio_platform_op);
+> >         struct device_driver driver;
+> > };
+> > 
+> > This would integrate much more closely into the platform driver framework,
+> > just like the regular vfio driver integrates into the PCI framework.
+> > Unlike PCI however, you can't just use the generic driver framework to
+> > unbind the driver, because you still need device specific code.
+> > 
+> Thanks for these suggestions, really helpful.
 > 
-> virt/kvm/arm/vgic.c: In function 'kvm_vgic_map_phys_irq':
-> virt/kvm/arm/vgic.c:1781:13: error: 'struct irq_data' has no member named 'parent_data'
-> 
-> This flag is implied by the GIC driver, and indeed the VGIC code only
-> makes sense if a GIC is present. This changes the CONFIG_KVM symbol
-> to always select GIC, which avoids the issue.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> Fixes: 662d9715840 ("arm/arm64: KVM: Kill CONFIG_KVM_ARM_{VGIC,TIMER}")
-> 
-> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
-> index 210eccadb69a..356970f3b25e 100644
-> --- a/arch/arm/kvm/Kconfig
-> +++ b/arch/arm/kvm/Kconfig
-> @@ -21,6 +21,7 @@ config KVM
->  	depends on MMU && OF
->  	select PREEMPT_NOTIFIERS
->  	select ANON_INODES
-> +	select ARM_GIC
->  	select HAVE_KVM_CPU_RELAX_INTERCEPT
->  	select HAVE_KVM_ARCH_TLB_FLUSH_ALL
->  	select KVM_MMIO
-> 
+> What I don't understand in the latter example is how VFIO knows which
+> struct platform_driver to interact with?
 
-Applied.
+This would assume that the driver remains bound to the device, so VFIO
+gets a pointer to the device from somewhere (as it does today) and then
+follows the dev->driver pointer to get to the platform_driver.
+ 
+> Also, just so I'm sure I understand correctly, VFIO_PLATFORM_UNBIND is
+> then called by VFIO before the VFIO driver unbinds from the device
+> (unbinding the platform driver from the device being a completely
+> separate thing)?
 
-Thanks,
--Christoffer
+This is where we'd need a little more changes for this approach. Instead
+of unbinding the device from its driver, the idea would be that the
+driver remains bound as far as the driver model is concerned, but
+it would be in a quiescent state where no other subsystem interacts with
+it (i.e. it gets unregistered from networking core or whichever it uses).
+
+	Arnd
