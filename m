@@ -1,24 +1,28 @@
-From: Arnd Bergmann <arnd@arndb.de>
+From: Eric Auger <eric.auger@linaro.org>
 Subject: Re: [PATCH] VFIO: platform: AMD xgbe reset module
-Date: Thu, 15 Oct 2015 16:28:17 +0200
-Message-ID: <9585756.nfBEboTrrV@wuerfel>
+Date: Thu, 15 Oct 2015 16:46:09 +0200
+Message-ID: <561FBC31.3020900@linaro.org>
 References: <1444836792-2405-1-git-send-email-eric.auger@linaro.org>
- <20151015121228.GA965@cbox> <561FB63E.4070404@linaro.org>
+ <7287273.XGFpHqQ9fN@wuerfel> <20151015121228.GA965@cbox>
+ <5270338.MbsQ1bGczu@wuerfel>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5A97141711
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Oct 2015 10:26:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79C4341252
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Oct 2015 10:43:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6UU5Pc+j--Sh for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Oct 2015 10:26:42 -0400 (EDT)
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2311241451
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Oct 2015 10:26:41 -0400 (EDT)
-In-Reply-To: <561FB63E.4070404@linaro.org>
+ with ESMTP id skSFJKi4Iyjz for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 15 Oct 2015 10:43:52 -0400 (EDT)
+Received: from mail-qk0-f181.google.com (mail-qk0-f181.google.com
+ [209.85.220.181])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7CC8440FA6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Oct 2015 10:43:52 -0400 (EDT)
+Received: by qkap81 with SMTP id p81so38798101qka.2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Oct 2015 07:46:11 -0700 (PDT)
+In-Reply-To: <5270338.MbsQ1bGczu@wuerfel>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,48 +32,71 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>
+To: Arnd Bergmann <arnd@arndb.de>, Christoffer Dall <christoffer.dall@linaro.org>
 Cc: thomas.lendacky@amd.com, kvm@vger.kernel.org, patches@linaro.org, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, suravee.suthikulpanit@amd.com, eric.auger@st.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thursday 15 October 2015 16:20:46 Eric Auger wrote:
-> On 10/15/2015 02:12 PM, Christoffer Dall wrote:
-> > On Thu, Oct 15, 2015 at 01:21:55PM +0200, Arnd Bergmann wrote:
-> >> On Thursday 15 October 2015 10:08:02 Eric Auger wrote:
-> >>> On 10/14/2015 05:38 PM, Arnd Bergmann wrote:
-> >>>> On Wednesday 14 October 2015 15:33:12 Eric Auger wrote:
-> >> A possible solution could be something inside the xgbe driver like
-> >>
-> >>
-> >> static void xgbe_init_module(void)
-> >> {
-> >> 	int ret = 0;
-> >>
-> >> 	if (IS_ENABLED(CONFIG_AMD_XGBE_ETHERNET)
-> >> 		ret = platform_driver_register(&xgbe_driver);
-> >> 	if (ret)
-> >> 		return ret;
-> >>
-> >> 	if (IS_ENABLED(CONFIG_VFIO_PLATFORM))
-> >> 		ret = vfio_platform_register_reset(&xgbe_of_match, xgbe_platform_reset);
-> >>
-> >> 	return ret;	
-> >> }
-> >>
-> >> This way you have exactly one driver module that gets loaded for the
-> >> device and you can use it either with the platform_driver or through
-> >> vfio.
-> If I understand it correctly you still need 2 loaded modules (VFIO
-> driver & XGBE driver which implements the reset function) or am I
-> missing something?
+Hi Arnd,
+On 10/15/2015 03:59 PM, Arnd Bergmann wrote:
+> On Thursday 15 October 2015 14:12:28 Christoffer Dall wrote:
+>>>
+>>> enum vfio_platform_op {
+>>>       VFIO_PLATFORM_BIND,
+>>>       VFIO_PLATFORM_UNBIND,
+>>>       VFIO_PLATFORM_RESET,
+>>> };
+>>>
+>>> struct platform_driver {
+>>>         int (*probe)(struct platform_device *);
+>>>         int (*remove)(struct platform_device *);
+>>>       ...
+>>>       int (*vfio_manage)(struct platform_device *, enum vfio_platform_op);
+>>>         struct device_driver driver;
+>>> };
+>>>
+>>> This would integrate much more closely into the platform driver framework,
+>>> just like the regular vfio driver integrates into the PCI framework.
+>>> Unlike PCI however, you can't just use the generic driver framework to
+>>> unbind the driver, because you still need device specific code.
+>>>
+>> Thanks for these suggestions, really helpful.
+>>
+>> What I don't understand in the latter example is how VFIO knows which
+>> struct platform_driver to interact with?
+> 
+> This would assume that the driver remains bound to the device, so VFIO
+> gets a pointer to the device from somewhere (as it does today) and then
+> follows the dev->driver pointer to get to the platform_driver.
 
-That is correct, yes.
- 
-> I had a similar mechanism of registration in my PATCH v1 but I did the
-> registration from the reset module itself instead of in the native
-> driver, as you suggest here.
+>  
+>> Also, just so I'm sure I understand correctly, VFIO_PLATFORM_UNBIND is
+>> then called by VFIO before the VFIO driver unbinds from the device
+>> (unbinding the platform driver from the device being a completely
+>> separate thing)?
+> 
+> This is where we'd need a little more changes for this approach. Instead
+> of unbinding the device from its driver, the idea would be that the
+> driver remains bound as far as the driver model is concerned, but
+> it would be in a quiescent state where no other subsystem interacts with
+> it (i.e. it gets unregistered from networking core or whichever it uses).
 
-Right. The main difference is that you don't have two modules fighting
-over the same device with the approach here.
+Currently we use the same mechanism as for PCI, ie. unbind the native
+driver and then bind VFIO platform driver in its place. Don't you think
+changing this may be a pain for user-space tools that are designed to
+work that way for PCI?
 
-	Arnd
+My personal preference would be to start with your first proposal since
+it looks (to me) less complex and "unknown" that the 2d approach.
+
+Let's wait for Alex opinion too...
+
+Thanks again
+
+Eric
+
+
+
+
+> 
+> 	Arnd
+> 
