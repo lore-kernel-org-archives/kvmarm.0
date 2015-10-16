@@ -1,28 +1,25 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH] VFIO: platform: AMD xgbe reset module
-Date: Fri, 16 Oct 2015 15:56:03 +0200
-Message-ID: <562101F3.6050601@linaro.org>
-References: <1444836792-2405-1-git-send-email-eric.auger@linaro.org>
- <1444927997.4059.470.camel@redhat.com> <5620F665.5010903@linaro.org>
- <3768580.4oTvTNW7Bh@wuerfel>
+From: Wei Huang <wei@redhat.com>
+Subject: Re: [PATCH v3 10/20] KVM: ARM64: Add reset and access handlers for
+ PMCCNTR register
+Date: Fri, 16 Oct 2015 10:06:35 -0500
+Message-ID: <5621127B.8070704@redhat.com>
+References: <1443133885-3366-1-git-send-email-shannon.zhao@linaro.org>
+ <1443133885-3366-11-git-send-email-shannon.zhao@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A80D411BE
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Oct 2015 09:53:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F1748412AF
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Oct 2015 11:04:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4iBd21jvUu74 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Oct 2015 09:53:45 -0400 (EDT)
-Received: from mail-wi0-f177.google.com (mail-wi0-f177.google.com
- [209.85.212.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CEA35411AA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Oct 2015 09:53:45 -0400 (EDT)
-Received: by wijq8 with SMTP id q8so12163014wij.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Oct 2015 06:56:06 -0700 (PDT)
-In-Reply-To: <3768580.4oTvTNW7Bh@wuerfel>
+ with ESMTP id 0Ln4qKJP+Csq for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Oct 2015 11:04:21 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 94888411BE
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Oct 2015 11:04:21 -0400 (EDT)
+In-Reply-To: <1443133885-3366-11-git-send-email-shannon.zhao@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,76 +29,74 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: thomas.lendacky@amd.com, kvm@vger.kernel.org, patches@linaro.org, linux-kernel@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>, suravee.suthikulpanit@amd.com, eric.auger@st.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Arnd,
-On 10/16/2015 03:26 PM, Arnd Bergmann wrote:
-> On Friday 16 October 2015 15:06:45 Eric Auger wrote:
+
+
+On 09/24/2015 05:31 PM, Shannon Zhao wrote:
+> Since the reset value of PMCCNTR is UNKNOWN, use reset_unknown for its
+> reset handler. Add a new case to emulate reading to PMCCNTR register.
 > 
->>  I've since forgotten his answer, but the fact that
->>> __symbol_get() is only defined for modules makes it moot, we either need
->>> to make symbol_get() work or define __symbol_get() for non-module
->>> builds.
->> I currently don't see any solution for any of those. The only solution I
->> can see is someone registers the reset function pointer to vfio.
->>
->> I think we could keep the existing reset modules, do the request_module
->> from VFIO, using their module name registered in the lookup table. But
->> instead of having the reset function in the look-up table we would have
->> the reset modules register their reset function pointer to VFIO. I think
->> this could work around the symbol_get issue.
->>
->> This still leaves the layer violation argument though.
->>
->> Assuming this works, would that be an acceptable solution, although I
->> acknowledge this does not perfectly fit into the driver model?
-> 
-> I think it's possible to avoid the layering violation that way too,
-> by loading the module based on the compatible string, with a module_alias.
-> 
-> static void vfio_platform_get_reset(struct vfio_platform_device *vdev,
->                                     struct device *dev)
-> {
->         const char *compat;
->         int (*reset)(struct vfio_platform_device *);
->         int ret, i;
-> 	char modname[256];
-> 
->         ret = device_property_read_string(dev, "compatible", &compat);
->         if (ret)
->                 return;
-> 
-> 	reset = vfio_platform_lookup_reset(compat);
-> 	if (!reset) {
-> 		snprintf(modname, "vfio-reset:%s", compat);
-> 		request_module(modname);
-> 		reset = vfio_platform_lookup_reset(compat);
-> 	}
-> 
-> 	vdev->reset = reset;
-> }
-> 
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 > ---
+>  arch/arm64/kvm/sys_regs.c | 17 +++++++++++++++--
+>  1 file changed, 15 insertions(+), 2 deletions(-)
 > 
-> #define module_vfio_reset_handler(compat, reset)			\
-> MODULE_ALIAS("vfio_reset" compat);					\
-> static int reset ## _module_init(void)					\
-> {									\
-> 	return vfio_reset_register(THIS_MODULE, compat, &reset);	\
-> }
-> 
-> I think that solution is good enough, as it avoids most of the
-> problems with the current implementation but is a simple enough change.
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index e7f6058..c38c2de 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -518,6 +518,12 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+>  		}
+>  	} else {
+>  		switch (r->reg) {
+> +		case PMCCNTR_EL0: {
+> +			val = kvm_pmu_get_counter_value(vcpu,
+> +							ARMV8_MAX_COUNTERS - 1);
+> +			*vcpu_reg(vcpu, p->Rt) = val;
+> +			break;
+> +		}
+>  		case PMXEVCNTR_EL0: {
+>  			val = kvm_pmu_get_counter_value(vcpu,
+>  						vcpu_sys_reg(vcpu, PMSELR_EL0));
+> @@ -748,7 +754,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	  access_pmu_regs, reset_pmceid, PMCEID1_EL0 },
+>  	/* PMCCNTR_EL0 */
+>  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b000),
+> -	  trap_raz_wi },
+> +	  access_pmu_regs, reset_unknown, PMCCNTR_EL0 },
+>  	/* PMXEVTYPER_EL0 */
+>  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b001),
+>  	  access_pmu_regs, reset_unknown, PMXEVTYPER_EL0 },
+> @@ -997,6 +1003,12 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
+>  		}
+>  	} else {
+>  		switch (r->reg) {
+> +		case c9_PMCCNTR: {
+> +			val = kvm_pmu_get_counter_value(vcpu,
+> +							ARMV8_MAX_COUNTERS - 1);
 
-That looks a good perspective. Thanks for the hint! Let's code now ;-)
+PMCCNTR is for cycle counter. There is a filter register, PMCCFILTR_EL0,
+associated with it. When kvm_pmu_set_counter_event_type() is called, I
+didn't see this filter config been used in perf_event_attr when
+perf_event is created.
 
-Best Regards
-
-Eric
-
-
-> 
-> 	Arnd
+> +			*vcpu_reg(vcpu, p->Rt) = val;
+> +			break;
+> +		}
+>  		case c9_PMXEVCNTR: {
+>  			val = kvm_pmu_get_counter_value(vcpu,
+>  						    vcpu_cp15(vcpu, c9_PMSELR));
+> @@ -1051,7 +1063,8 @@ static const struct sys_reg_desc cp15_regs[] = {
+>  	  reset_pmceid, c9_PMCEID0 },
+>  	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmu_cp15_regs,
+>  	  reset_pmceid, c9_PMCEID1 },
+> -	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), trap_raz_wi },
+> +	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), access_pmu_cp15_regs,
+> +	  reset_unknown_cp15, c9_PMCCNTR },
+>  	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_cp15_regs,
+>  	  reset_unknown_cp15, c9_PMXEVTYPER },
+>  	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), access_pmu_cp15_regs,
 > 
