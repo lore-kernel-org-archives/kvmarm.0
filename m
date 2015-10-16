@@ -1,163 +1,141 @@
-From: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH] VFIO: platform: AMD xgbe reset module
-Date: Thu, 15 Oct 2015 14:26:26 -0600
-Message-ID: <1444940786.4059.497.camel@redhat.com>
-References: <1444836792-2405-1-git-send-email-eric.auger@linaro.org>
- <7287273.XGFpHqQ9fN@wuerfel> <20151015121228.GA965@cbox>
- <5270338.MbsQ1bGczu@wuerfel> <561FBC31.3020900@linaro.org>
- <1444927997.4059.470.camel@redhat.com> <20151015194219.GG21930@cbox>
+From: Wei Huang <wei@redhat.com>
+Subject: Re: [PATCH v3 00/20] KVM: ARM64: Add guest PMU support
+Date: Thu, 15 Oct 2015 23:55:23 -0500
+Message-ID: <5620833B.5050803@redhat.com>
+References: <1443133885-3366-1-git-send-email-shannon.zhao@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 48786412D6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Oct 2015 16:24:11 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jQlMApH7iMvj for <kvmarm@lists.cs.columbia.edu>;
- Thu, 15 Oct 2015 16:24:09 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 270B741278
- for <kvmarm@lists.cs.columbia.edu>; Thu, 15 Oct 2015 16:24:08 -0400 (EDT)
-In-Reply-To: <20151015194219.GG21930@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: thomas.lendacky@amd.com, kvm@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, patches@linaro.org, linux-kernel@vger.kernel.org, suravee.suthikulpanit@amd.com, eric.auger@st.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1443133885-3366-1-git-send-email-shannon.zhao@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, will.deacon@arm.com, alex.bennee@linaro.org, peter.huangpeng@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, 2015-10-15 at 21:42 +0200, Christoffer Dall wrote:
-> On Thu, Oct 15, 2015 at 10:53:17AM -0600, Alex Williamson wrote:
-> > On Thu, 2015-10-15 at 16:46 +0200, Eric Auger wrote:
-> > > Hi Arnd,
-> > > On 10/15/2015 03:59 PM, Arnd Bergmann wrote:
-> > > > On Thursday 15 October 2015 14:12:28 Christoffer Dall wrote:
-> > > >>>
-> > > >>> enum vfio_platform_op {
-> > > >>>       VFIO_PLATFORM_BIND,
-> > > >>>       VFIO_PLATFORM_UNBIND,
-> > > >>>       VFIO_PLATFORM_RESET,
-> > > >>> };
-> > > >>>
-> > > >>> struct platform_driver {
-> > > >>>         int (*probe)(struct platform_device *);
-> > > >>>         int (*remove)(struct platform_device *);
-> > > >>>       ...
-> > > >>>       int (*vfio_manage)(struct platform_device *, enum vfio_platform_op);
-> > > >>>         struct device_driver driver;
-> > > >>> };
-> > > >>>
-> > > >>> This would integrate much more closely into the platform driver framework,
-> > > >>> just like the regular vfio driver integrates into the PCI framework.
-> > > >>> Unlike PCI however, you can't just use the generic driver framework to
-> > > >>> unbind the driver, because you still need device specific code.
-> > > >>>
-> > > >> Thanks for these suggestions, really helpful.
-> > > >>
-> > > >> What I don't understand in the latter example is how VFIO knows which
-> > > >> struct platform_driver to interact with?
-> > > > 
-> > > > This would assume that the driver remains bound to the device, so VFIO
-> > > > gets a pointer to the device from somewhere (as it does today) and then
-> > > > follows the dev->driver pointer to get to the platform_driver.
-> > 
-> > The complexity of managing a bi-modal driver seems like far more than a
-> > little bit of code duplication in a device specific reset module and
-> > extends into how userspace makes devices available through vfio, so I
-> > think it's too late for that discussion.
-> >   
+
+
+On 09/24/2015 05:31 PM, Shannon Zhao wrote:
+> This patchset adds guest PMU support for KVM on ARM64. It takes
+> trap-and-emulate approach. When guest wants to monitor one event, it
+> will be trapped by KVM and KVM will call perf_event API to create a perf
+> event and call relevant perf_event APIs to get the count value of event.
 > 
-> I have had extremely limited exposure to the implementation details of
-> the drivers for devices relevant for VFIO platform, so apologies for
-> asking stupid questions.
+> Use perf to test this patchset in guest. When using "perf list", it
+> shows the list of the hardware events and hardware cache events perf
+> supports. Then use "perf stat -e EVENT" to monitor some event. For
+> example, use "perf stat -e cycles" to count cpu cycles and
+> "perf stat -e cache-misses" to count cache misses.
 > 
-> I'm sure that your point is valid, I just fully understand how the
-> complexities of a bi-modal driver arise?
+> Below are the outputs of "perf stat -r 5 sleep 5" when running in host
+> and guest.
 > 
-> Is it simply that the reset function in a particular device driver may
-> not be self-contained so therefore the whole driver would need to be
-> refactored to be able to do a reset for the purpose of VFIO?
-
-Yes, I would expect that reset function in a driver is not typically
-self contained, probably referencing driver specific data structures for
-register offsets, relying on various mappings that are expected to be
-created from the driver probe() function, etc.  It also creates a
-strange dependency on the host driver, how is the user to know they need
-the native host driver loaded for full functionality in a device
-assignment scenario?  Are we going to need to do a module_request() of
-the host driver in vfio platform anyway?  What if there are multiple
-devices and the host driver claims the others when loaded?  In the case
-of PCI and SR-IOV virtual functions, I often blacklist the host VF
-driver because I shouldn't need it when I only intend to use the device
-in guests.  Not to mention that we'd have to drop a little bit of vfio
-knowledge into each host driver that we intend to enlighten like this,
-and how do we resolve whether the host driver, potentially compiled from
-a separate source tree has this support.
-
-I really don't see the layering violation in having a set of reset
-functions and some lookup mechanism to pick the correct one.  The vfio
-platform driver is a meta driver and sometimes we need to enlighten it a
-little bit more about the device it's operating on.  For PCI we have all
-sorts of special functionality for reset, but we have a standard to work
-with there, so we may need to choose between a bus reset, PM reset, AF
-FLR, PCIe FLR, or device specific reset, but it's all buried in the PCI
-core code; where device specific resets are the exception on PCI, they
-are the norm on platform.
-
-> > > >> Also, just so I'm sure I understand correctly, VFIO_PLATFORM_UNBIND is
-> > > >> then called by VFIO before the VFIO driver unbinds from the device
-> > > >> (unbinding the platform driver from the device being a completely
-> > > >> separate thing)?
-> > > > 
-> > > > This is where we'd need a little more changes for this approach. Instead
-> > > > of unbinding the device from its driver, the idea would be that the
-> > > > driver remains bound as far as the driver model is concerned, but
-> > > > it would be in a quiescent state where no other subsystem interacts with
-> > > > it (i.e. it gets unregistered from networking core or whichever it uses).
-> > > 
-> > > Currently we use the same mechanism as for PCI, ie. unbind the native
-> > > driver and then bind VFIO platform driver in its place. Don't you think
-> > > changing this may be a pain for user-space tools that are designed to
-> > > work that way for PCI?
-> > > 
-> > > My personal preference would be to start with your first proposal since
-> > > it looks (to me) less complex and "unknown" that the 2d approach.
-> > > 
-> > > Let's wait for Alex opinion too...
-> > 
-> > I thought the reason we took the approach we have now is so that we
-> > don't have reset code loaded into the kernel unless we have a device
-> > that needs it.  Therefore we don't really want to preemptively load all
-> > the reset drivers and have them do a registration.  The unfortunate
-> > side-effect of that is the platform code needs to go looking for the
-> > driver. 
+> Host:
+>  Performance counter stats for 'sleep 5' (5 runs):
 > 
-> Does the current approach have a separate driver for doing VFIO reset or
-> does it reuse the existing device driver?
+>           0.551428      task-clock (msec)         #    0.000 CPUs utilized            ( +-  0.91% )
+>                  1      context-switches          #    0.002 M/sec
+>                  0      cpu-migrations            #    0.000 K/sec
+>                 48      page-faults               #    0.088 M/sec                    ( +-  1.05% )
+>            1150265      cycles                    #    2.086 GHz                      ( +-  0.92% )
+>    <not supported>      stalled-cycles-frontend
+>    <not supported>      stalled-cycles-backend
+>             526398      instructions              #    0.46  insns per cycle          ( +-  0.89% )
+>    <not supported>      branches
+>               9485      branch-misses             #   17.201 M/sec                    ( +-  2.35% )
+> 
+>        5.000831616 seconds time elapsed                                          ( +-  0.00% )
+> 
+> Guest:
+>  Performance counter stats for 'sleep 5' (5 runs):
+> 
+>           0.730868      task-clock (msec)         #    0.000 CPUs utilized            ( +-  1.13% )
+>                  1      context-switches          #    0.001 M/sec
+>                  0      cpu-migrations            #    0.000 K/sec
+>                 48      page-faults               #    0.065 M/sec                    ( +-  0.42% )
+>            1642982      cycles                    #    2.248 GHz                      ( +-  1.04% )
+>    <not supported>      stalled-cycles-frontend
+>    <not supported>      stalled-cycles-backend
+>             637964      instructions              #    0.39  insns per cycle          ( +-  0.65% )
+>    <not supported>      branches
+>              10377      branch-misses             #   14.198 M/sec                    ( +-  1.09% )
+> 
+>        5.001289068 seconds time elapsed                                          ( +-  0.00% )
+> 
 
-They're separate modules, not drivers.  They simply export a reset
-function, no module init or exit function.  A table lookup via the
-device compatibility string identifies the module to load and name of
-reset function.  At one point I suggested that we simply use standard
-naming based on the compatibility string to name the module and reset
-function to avoid the table, but that was thought to be too hackish or
-perhaps dangerous to have vfio requesting modules like that.
+Thanks for V3. One suggestion is to run more perf stress tests, such as
+"perf test". So we know the corner cases are covered as much as possible.
 
-> Why does the driver registering itself instead of using symbol_get
-> imply that we must load reset drivers that we don't need?
-
-Who would register the reset driver if not the reset "driver" itself?
-Either we have a table/list of registered reset drivers and we can pick
-the one we want and the code is already loaded, or we have a table/list
-of who provides which reset driver and we load and get a pointer when we
-determine that we need it.  Are there other options?  Thanks,
-
-Alex
+> This patchset can be fetched from [1] and the relevant QEMU version for
+> test can be fetched from [2].
+> 
+> Thanks,
+> Shannon
+> 
+> [1] https://git.linaro.org/people/shannon.zhao/linux-mainline.git  KVM_ARM64_PMU_v3
+> [2] https://git.linaro.org/people/shannon.zhao/qemu.git  PMU_v2
+> 
+> Changes since v2->v3:
+> * Directly use perf raw event type to create perf_event in KVM
+> * Add a helper vcpu_sysreg_write
+> * remove unrelated header file
+> 
+> Changes since v1->v2:
+> * Use switch...case for registers access handler instead of adding
+>   alone handler for each register
+> * Try to use the sys_regs to store the register value instead of adding
+>   new variables in struct kvm_pmc
+> * Fix the handle of cp15 regs
+> * Create a new kvm device vPMU, then userspace could choose whether to
+>   create PMU
+> * Fix the handle of PMU overflow interrupt
+> 
+> Shannon Zhao (20):
+>   ARM64: Move PMU register related defines to asm/pmu.h
+>   KVM: ARM64: Define PMU data structure for each vcpu
+>   KVM: ARM64: Add offset defines for PMU registers
+>   KVM: ARM64: Add reset and access handlers for PMCR_EL0 register
+>   KVM: ARM64: Add reset and access handlers for PMSELR register
+>   KVM: ARM64: Add reset and access handlers for PMCEID0 and PMCEID1
+>     register
+>   KVM: ARM64: PMU: Add perf event map and introduce perf event creating
+>     function
+>   KVM: ARM64: Add reset and access handlers for PMXEVTYPER register
+>   KVM: ARM64: Add reset and access handlers for PMXEVCNTR register
+>   KVM: ARM64: Add reset and access handlers for PMCCNTR register
+>   KVM: ARM64: Add reset and access handlers for PMCNTENSET and
+>     PMCNTENCLR register
+>   KVM: ARM64: Add reset and access handlers for PMINTENSET and
+>     PMINTENCLR register
+>   KVM: ARM64: Add reset and access handlers for PMOVSSET and PMOVSCLR
+>     register
+>   KVM: ARM64: Add reset and access handlers for PMUSERENR register
+>   KVM: ARM64: Add reset and access handlers for PMSWINC register
+>   KVM: ARM64: Add access handlers for PMEVCNTRn and PMEVTYPERn register
+>   KVM: ARM64: Add PMU overflow interrupt routing
+>   KVM: ARM64: Reset PMU state when resetting vcpu
+>   KVM: ARM64: Free perf event of PMU when destroying vcpu
+>   KVM: ARM64: Add a new kvm ARM PMU device
+> 
+>  Documentation/virtual/kvm/devices/arm-pmu.txt |  15 +
+>  arch/arm/kvm/arm.c                            |   5 +
+>  arch/arm64/include/asm/kvm_asm.h              |  59 +++-
+>  arch/arm64/include/asm/kvm_host.h             |   2 +
+>  arch/arm64/include/asm/pmu.h                  |  47 +++
+>  arch/arm64/include/uapi/asm/kvm.h             |   3 +
+>  arch/arm64/kernel/perf_event.c                |  35 --
+>  arch/arm64/kvm/Kconfig                        |   8 +
+>  arch/arm64/kvm/Makefile                       |   1 +
+>  arch/arm64/kvm/reset.c                        |   3 +
+>  arch/arm64/kvm/sys_regs.c                     | 488 ++++++++++++++++++++++++--
+>  arch/arm64/kvm/sys_regs.h                     |  16 +
+>  include/kvm/arm_pmu.h                         |  65 ++++
+>  include/linux/kvm_host.h                      |   1 +
+>  include/uapi/linux/kvm.h                      |   2 +
+>  virt/kvm/arm/pmu.c                            | 414 ++++++++++++++++++++++
+>  virt/kvm/kvm_main.c                           |   4 +
+>  17 files changed, 1098 insertions(+), 70 deletions(-)
+>  create mode 100644 Documentation/virtual/kvm/devices/arm-pmu.txt
+>  create mode 100644 include/kvm/arm_pmu.h
+>  create mode 100644 virt/kvm/arm/pmu.c
+> 
