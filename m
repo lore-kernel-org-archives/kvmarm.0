@@ -1,29 +1,24 @@
-From: Eric Auger <eric.auger@linaro.org>
+From: Arnd Bergmann <arnd@arndb.de>
 Subject: Re: [PATCH] VFIO: platform: AMD xgbe reset module
-Date: Fri, 16 Oct 2015 15:06:45 +0200
-Message-ID: <5620F665.5010903@linaro.org>
+Date: Fri, 16 Oct 2015 15:26:34 +0200
+Message-ID: <3768580.4oTvTNW7Bh@wuerfel>
 References: <1444836792-2405-1-git-send-email-eric.auger@linaro.org>
- <7287273.XGFpHqQ9fN@wuerfel> <20151015121228.GA965@cbox>
- <5270338.MbsQ1bGczu@wuerfel> <561FBC31.3020900@linaro.org>
- <1444927997.4059.470.camel@redhat.com>
+ <1444927997.4059.470.camel@redhat.com> <5620F665.5010903@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C09F413E2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Oct 2015 09:04:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 58D4D4156D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Oct 2015 09:24:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KOj1xSkz9TQ4 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 16 Oct 2015 09:04:28 -0400 (EDT)
-Received: from mail-wi0-f178.google.com (mail-wi0-f178.google.com
- [209.85.212.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 138D540FA6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Oct 2015 09:04:27 -0400 (EDT)
-Received: by wicll6 with SMTP id ll6so9142566wic.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Oct 2015 06:06:48 -0700 (PDT)
-In-Reply-To: <1444927997.4059.470.camel@redhat.com>
+ with ESMTP id DFMOErPgJ6-R for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 16 Oct 2015 09:24:23 -0400 (EDT)
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.130])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2E1764130B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 16 Oct 2015 09:24:22 -0400 (EDT)
+In-Reply-To: <5620F665.5010903@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,94 +28,65 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: thomas.lendacky@amd.com, kvm@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, patches@linaro.org, linux-kernel@vger.kernel.org, suravee.suthikulpanit@amd.com, eric.auger@st.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Eric Auger <eric.auger@linaro.org>
+Cc: thomas.lendacky@amd.com, kvm@vger.kernel.org, patches@linaro.org, linux-kernel@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>, suravee.suthikulpanit@amd.com, eric.auger@st.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-RGVhciBhbGwsCk9uIDEwLzE1LzIwMTUgMDY6NTMgUE0sIEFsZXggV2lsbGlhbXNvbiB3cm90ZToK
-PiBPbiBUaHUsIDIwMTUtMTAtMTUgYXQgMTY6NDYgKzAyMDAsIEVyaWMgQXVnZXIgd3JvdGU6Cj4+
-IEhpIEFybmQsCj4+IE9uIDEwLzE1LzIwMTUgMDM6NTkgUE0sIEFybmQgQmVyZ21hbm4gd3JvdGU6
-Cj4+PiBPbiBUaHVyc2RheSAxNSBPY3RvYmVyIDIwMTUgMTQ6MTI6MjggQ2hyaXN0b2ZmZXIgRGFs
-bCB3cm90ZToKPj4+Pj4KPj4+Pj4gZW51bSB2ZmlvX3BsYXRmb3JtX29wIHsKPj4+Pj4gICAgICAg
-VkZJT19QTEFURk9STV9CSU5ELAo+Pj4+PiAgICAgICBWRklPX1BMQVRGT1JNX1VOQklORCwKPj4+
-Pj4gICAgICAgVkZJT19QTEFURk9STV9SRVNFVCwKPj4+Pj4gfTsKPj4+Pj4KPj4+Pj4gc3RydWN0
-IHBsYXRmb3JtX2RyaXZlciB7Cj4+Pj4+ICAgICAgICAgaW50ICgqcHJvYmUpKHN0cnVjdCBwbGF0
-Zm9ybV9kZXZpY2UgKik7Cj4+Pj4+ICAgICAgICAgaW50ICgqcmVtb3ZlKShzdHJ1Y3QgcGxhdGZv
-cm1fZGV2aWNlICopOwo+Pj4+PiAgICAgICAuLi4KPj4+Pj4gICAgICAgaW50ICgqdmZpb19tYW5h
-Z2UpKHN0cnVjdCBwbGF0Zm9ybV9kZXZpY2UgKiwgZW51bSB2ZmlvX3BsYXRmb3JtX29wKTsKPj4+
-Pj4gICAgICAgICBzdHJ1Y3QgZGV2aWNlX2RyaXZlciBkcml2ZXI7Cj4+Pj4+IH07Cj4+Pj4+Cj4+
-Pj4+IFRoaXMgd291bGQgaW50ZWdyYXRlIG11Y2ggbW9yZSBjbG9zZWx5IGludG8gdGhlIHBsYXRm
-b3JtIGRyaXZlciBmcmFtZXdvcmssCj4+Pj4+IGp1c3QgbGlrZSB0aGUgcmVndWxhciB2ZmlvIGRy
-aXZlciBpbnRlZ3JhdGVzIGludG8gdGhlIFBDSSBmcmFtZXdvcmsuCj4+Pj4+IFVubGlrZSBQQ0kg
-aG93ZXZlciwgeW91IGNhbid0IGp1c3QgdXNlIHRoZSBnZW5lcmljIGRyaXZlciBmcmFtZXdvcmsg
-dG8KPj4+Pj4gdW5iaW5kIHRoZSBkcml2ZXIsIGJlY2F1c2UgeW91IHN0aWxsIG5lZWQgZGV2aWNl
-IHNwZWNpZmljIGNvZGUuCj4+Pj4+Cj4+Pj4gVGhhbmtzIGZvciB0aGVzZSBzdWdnZXN0aW9ucywg
-cmVhbGx5IGhlbHBmdWwuCj4+Pj4KPj4+PiBXaGF0IEkgZG9uJ3QgdW5kZXJzdGFuZCBpbiB0aGUg
-bGF0dGVyIGV4YW1wbGUgaXMgaG93IFZGSU8ga25vd3Mgd2hpY2gKPj4+PiBzdHJ1Y3QgcGxhdGZv
-cm1fZHJpdmVyIHRvIGludGVyYWN0IHdpdGg/Cj4+Pgo+Pj4gVGhpcyB3b3VsZCBhc3N1bWUgdGhh
-dCB0aGUgZHJpdmVyIHJlbWFpbnMgYm91bmQgdG8gdGhlIGRldmljZSwgc28gVkZJTwo+Pj4gZ2V0
-cyBhIHBvaW50ZXIgdG8gdGhlIGRldmljZSBmcm9tIHNvbWV3aGVyZSAoYXMgaXQgZG9lcyB0b2Rh
-eSkgYW5kIHRoZW4KPj4+IGZvbGxvd3MgdGhlIGRldi0+ZHJpdmVyIHBvaW50ZXIgdG8gZ2V0IHRv
-IHRoZSBwbGF0Zm9ybV9kcml2ZXIuCj4gCj4gVGhlIGNvbXBsZXhpdHkgb2YgbWFuYWdpbmcgYSBi
-aS1tb2RhbCBkcml2ZXIgc2VlbXMgbGlrZSBmYXIgbW9yZSB0aGFuIGEKPiBsaXR0bGUgYml0IG9m
-IGNvZGUgZHVwbGljYXRpb24gaW4gYSBkZXZpY2Ugc3BlY2lmaWMgcmVzZXQgbW9kdWxlIGFuZAo+
-IGV4dGVuZHMgaW50byBob3cgdXNlcnNwYWNlIG1ha2VzIGRldmljZXMgYXZhaWxhYmxlIHRocm91
-Z2ggdmZpbywgc28gSQo+IHRoaW5rIGl0J3MgdG9vIGxhdGUgZm9yIHRoYXQgZGlzY3Vzc2lvbi4K
-PiAgIAo+Pj4+IEFsc28sIGp1c3Qgc28gSSdtIHN1cmUgSSB1bmRlcnN0YW5kIGNvcnJlY3RseSwg
-VkZJT19QTEFURk9STV9VTkJJTkQgaXMKPj4+PiB0aGVuIGNhbGxlZCBieSBWRklPIGJlZm9yZSB0
-aGUgVkZJTyBkcml2ZXIgdW5iaW5kcyBmcm9tIHRoZSBkZXZpY2UKPj4+PiAodW5iaW5kaW5nIHRo
-ZSBwbGF0Zm9ybSBkcml2ZXIgZnJvbSB0aGUgZGV2aWNlIGJlaW5nIGEgY29tcGxldGVseQo+Pj4+
-IHNlcGFyYXRlIHRoaW5nKT8KPj4+Cj4+PiBUaGlzIGlzIHdoZXJlIHdlJ2QgbmVlZCBhIGxpdHRs
-ZSBtb3JlIGNoYW5nZXMgZm9yIHRoaXMgYXBwcm9hY2guIEluc3RlYWQKPj4+IG9mIHVuYmluZGlu
-ZyB0aGUgZGV2aWNlIGZyb20gaXRzIGRyaXZlciwgdGhlIGlkZWEgd291bGQgYmUgdGhhdCB0aGUK
-Pj4+IGRyaXZlciByZW1haW5zIGJvdW5kIGFzIGZhciBhcyB0aGUgZHJpdmVyIG1vZGVsIGlzIGNv
-bmNlcm5lZCwgYnV0Cj4+PiBpdCB3b3VsZCBiZSBpbiBhIHF1aWVzY2VudCBzdGF0ZSB3aGVyZSBu
-byBvdGhlciBzdWJzeXN0ZW0gaW50ZXJhY3RzIHdpdGgKPj4+IGl0IChpLmUuIGl0IGdldHMgdW5y
-ZWdpc3RlcmVkIGZyb20gbmV0d29ya2luZyBjb3JlIG9yIHdoaWNoZXZlciBpdCB1c2VzKS4KPj4K
-Pj4gQ3VycmVudGx5IHdlIHVzZSB0aGUgc2FtZSBtZWNoYW5pc20gYXMgZm9yIFBDSSwgaWUuIHVu
-YmluZCB0aGUgbmF0aXZlCj4+IGRyaXZlciBhbmQgdGhlbiBiaW5kIFZGSU8gcGxhdGZvcm0gZHJp
-dmVyIGluIGl0cyBwbGFjZS4gRG9uJ3QgeW91IHRoaW5rCj4+IGNoYW5naW5nIHRoaXMgbWF5IGJl
-IGEgcGFpbiBmb3IgdXNlci1zcGFjZSB0b29scyB0aGF0IGFyZSBkZXNpZ25lZCB0bwo+PiB3b3Jr
-IHRoYXQgd2F5IGZvciBQQ0k/Cj4+Cj4+IE15IHBlcnNvbmFsIHByZWZlcmVuY2Ugd291bGQgYmUg
-dG8gc3RhcnQgd2l0aCB5b3VyIGZpcnN0IHByb3Bvc2FsIHNpbmNlCj4+IGl0IGxvb2tzICh0byBt
-ZSkgbGVzcyBjb21wbGV4IGFuZCAidW5rbm93biIgdGhhdCB0aGUgMmQgYXBwcm9hY2guCj4+Cj4+
-IExldCdzIHdhaXQgZm9yIEFsZXggb3BpbmlvbiB0b28uLi4KPiAKPiBJIHRob3VnaHQgdGhlIHJl
-YXNvbiB3ZSB0b29rIHRoZSBhcHByb2FjaCB3ZSBoYXZlIG5vdyBpcyBzbyB0aGF0IHdlCj4gZG9u
-J3QgaGF2ZSByZXNldCBjb2RlIGxvYWRlZCBpbnRvIHRoZSBrZXJuZWwgdW5sZXNzIHdlIGhhdmUg
-YSBkZXZpY2UKPiB0aGF0IG5lZWRzIGl0LiAgVGhlcmVmb3JlIHdlIGRvbid0IHJlYWxseSB3YW50
-IHRvIHByZWVtcHRpdmVseSBsb2FkIGFsbAo+IHRoZSByZXNldCBkcml2ZXJzIGFuZCBoYXZlIHRo
-ZW0gZG8gYSByZWdpc3RyYXRpb24uICBUaGUgdW5mb3J0dW5hdGUKPiBzaWRlLWVmZmVjdCBvZiB0
-aGF0IGlzIHRoZSBwbGF0Zm9ybSBjb2RlIG5lZWRzIHRvIGdvIGxvb2tpbmcgZm9yIHRoZQo+IGRy
-aXZlci4gIFdlIGRvIHRoYXQgdmlhIHRoZSBfX3N5bWJvbF9nZXQoKSB0cmljaywgd2hpY2ggb25s
-eSBmYWlscwo+IHdpdGhvdXQgbW9kdWxlcyBiZWNhdXNlIHRoZSB1bmRlcnNjb3JlIHZhcmlhbnQg
-aXNuJ3QgZGVmaW5lZCBpbiB0aGF0Cj4gY2FzZS4gIEkgcmVtZW1iZXIgYXNraW5nIEVyaWMgcHJl
-dmlvdXNseSB3aHkgd2UncmUgdXNpbmcgdGhhdCByYXRoZXIKPiB0aGFuIHN5bWJvbF9nZXQoKSwK
-CnRoZSByYXRpb25hbGUgYmVoaW5kIHVzaW5nIF9fZ2V0X3N5bWJvbCBpcyB0aGF0IHRoZSBmdW5j
-dGlvbiB0YWtlcyBhCmNoYXIgKiBhcyBhcmd1bWVudCB3aGlsZSB0aGUgZ2V0X3N5bWJvbCBtYWNy
-byB0YWtlcyB0aGUgdmVyeSBzeW1ib2wuIEkKbmVlZGVkIHRvIHByb3ZpZGUgYSBzdHJpbmcgc2lu
-Y2UgdGhpcyBpcyB3aGF0IGlzIHN0b3JlZCBpbiB0aGUgbG9va3VwCnRhYmxlLiBVbmZvcnR1bmF0
-ZWx5IEkgZGlkIG5vdCBzZWUgdGhlICNpZiBDT05GSUdfTU9EVUxFUy4gSSBTaG91bGQgaGF2ZQpi
-ZWVuIHdhcm5lZCBhYm91dCAiX18iIGFuZCBBbGV4IGRvdWJ0cywgc2luIG9mIG5hw692ZXR5LgoK
-IEkndmUgc2luY2UgZm9yZ290dGVuIGhpcyBhbnN3ZXIsIGJ1dCB0aGUgZmFjdCB0aGF0Cj4gX19z
-eW1ib2xfZ2V0KCkgaXMgb25seSBkZWZpbmVkIGZvciBtb2R1bGVzIG1ha2VzIGl0IG1vb3QsIHdl
-IGVpdGhlciBuZWVkCj4gdG8gbWFrZSBzeW1ib2xfZ2V0KCkgd29yayBvciBkZWZpbmUgX19zeW1i
-b2xfZ2V0KCkgZm9yIG5vbi1tb2R1bGUKPiBidWlsZHMuCkkgY3VycmVudGx5IGRvbid0IHNlZSBh
-bnkgc29sdXRpb24gZm9yIGFueSBvZiB0aG9zZS4gVGhlIG9ubHkgc29sdXRpb24gSQpjYW4gc2Vl
-IGlzIHNvbWVvbmUgcmVnaXN0ZXJzIHRoZSByZXNldCBmdW5jdGlvbiBwb2ludGVyIHRvIHZmaW8u
-CgpJIHRoaW5rIHdlIGNvdWxkIGtlZXAgdGhlIGV4aXN0aW5nIHJlc2V0IG1vZHVsZXMsIGRvIHRo
-ZSByZXF1ZXN0X21vZHVsZQpmcm9tIFZGSU8sIHVzaW5nIHRoZWlyIG1vZHVsZSBuYW1lIHJlZ2lz
-dGVyZWQgaW4gdGhlIGxvb2t1cCB0YWJsZS4gQnV0Cmluc3RlYWQgb2YgaGF2aW5nIHRoZSByZXNl
-dCBmdW5jdGlvbiBpbiB0aGUgbG9vay11cCB0YWJsZSB3ZSB3b3VsZCBoYXZlCnRoZSByZXNldCBt
-b2R1bGVzIHJlZ2lzdGVyIHRoZWlyIHJlc2V0IGZ1bmN0aW9uIHBvaW50ZXIgdG8gVkZJTy4gSSB0
-aGluawp0aGlzIGNvdWxkIHdvcmsgYXJvdW5kIHRoZSBzeW1ib2xfZ2V0IGlzc3VlLgoKVGhpcyBz
-dGlsbCBsZWF2ZXMgdGhlIGxheWVyIHZpb2xhdGlvbiBhcmd1bWVudCB0aG91Z2guCgpBc3N1bWlu
-ZyB0aGlzIHdvcmtzLCB3b3VsZCB0aGF0IGJlIGFuIGFjY2VwdGFibGUgc29sdXRpb24sIGFsdGhv
-dWdoIEkKYWNrbm93bGVkZ2UgdGhpcyBkb2VzIG5vdCBwZXJmZWN0bHkgZml0IGludG8gdGhlIGRy
-aXZlciBtb2RlbD8KCkJlc3QgUmVnYXJkcwoKRXJpYwo+IAo+IE90aGVyd2lzZSwgd2Ugc2hvdWxk
-IHByb2JhYmx5IGFiYW5kb24gdGhlIGlkZWEgb2YgdGhlc2UgcmVzZXQgZnVuY3Rpb25zCj4gYmVp
-bmcgbW9kdWxlcyBhbmQgYnVpbGQgdGhlbSBpbnRvIHRoZSB2ZmlvIHBsYXRmb3JtIGRyaXZlciAo
-d2hpY2ggd291bGQKPiBzdGlsbCBiZSBsZXNzIGxvYWRlZCwgZGVhZCBjb2RlIHRoYW4gYSBiaS1t
-b2RhbCBob3N0IGRyaXZlcikuICBUaGFua3MsCgo+IAo+IEFsZXgKPiAKCl9fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3Zt
-YXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9t
-YWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Friday 16 October 2015 15:06:45 Eric Auger wrote:
+
+>  I've since forgotten his answer, but the fact that
+> > __symbol_get() is only defined for modules makes it moot, we either need
+> > to make symbol_get() work or define __symbol_get() for non-module
+> > builds.
+> I currently don't see any solution for any of those. The only solution I
+> can see is someone registers the reset function pointer to vfio.
+> 
+> I think we could keep the existing reset modules, do the request_module
+> from VFIO, using their module name registered in the lookup table. But
+> instead of having the reset function in the look-up table we would have
+> the reset modules register their reset function pointer to VFIO. I think
+> this could work around the symbol_get issue.
+> 
+> This still leaves the layer violation argument though.
+> 
+> Assuming this works, would that be an acceptable solution, although I
+> acknowledge this does not perfectly fit into the driver model?
+
+I think it's possible to avoid the layering violation that way too,
+by loading the module based on the compatible string, with a module_alias.
+
+static void vfio_platform_get_reset(struct vfio_platform_device *vdev,
+                                    struct device *dev)
+{
+        const char *compat;
+        int (*reset)(struct vfio_platform_device *);
+        int ret, i;
+	char modname[256];
+
+        ret = device_property_read_string(dev, "compatible", &compat);
+        if (ret)
+                return;
+
+	reset = vfio_platform_lookup_reset(compat);
+	if (!reset) {
+		snprintf(modname, "vfio-reset:%s", compat);
+		request_module(modname);
+		reset = vfio_platform_lookup_reset(compat);
+	}
+
+	vdev->reset = reset;
+}
+
+---
+
+#define module_vfio_reset_handler(compat, reset)			\
+MODULE_ALIAS("vfio_reset" compat);					\
+static int reset ## _module_init(void)					\
+{									\
+	return vfio_reset_register(THIS_MODULE, compat, &reset);	\
+}
+
+I think that solution is good enough, as it avoids most of the
+problems with the current implementation but is a simple enough change.
+
+	Arnd
