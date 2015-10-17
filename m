@@ -1,26 +1,29 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 3/3] arm/arm64: KVM: Fix disabled distributor operation
-Date: Sat, 17 Oct 2015 22:30:22 +0200
-Message-ID: <1445113822-7831-4-git-send-email-christoffer.dall@linaro.org>
+Subject: Re: [PATCH 1/3] arm/arm64: KVM: Fix arch timer behavior for disabled
+ interrupts
+Date: Sat, 17 Oct 2015 23:50:42 +0200
+Message-ID: <20151017215042.GA1348@cbox>
 References: <1445113822-7831-1-git-send-email-christoffer.dall@linaro.org>
+ <1445113822-7831-2-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9422140FB3
- for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Oct 2015 16:28:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 301BF4141D
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Oct 2015 17:47:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZgL4uRIyLLeS for <kvmarm@lists.cs.columbia.edu>;
- Sat, 17 Oct 2015 16:28:11 -0400 (EDT)
-Received: from mail-lb0-f179.google.com (mail-lb0-f179.google.com
- [209.85.217.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 93FDD41479
- for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Oct 2015 16:28:11 -0400 (EDT)
-Received: by lbbpp2 with SMTP id pp2so91470325lbb.0
- for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Oct 2015 13:30:36 -0700 (PDT)
-In-Reply-To: <1445113822-7831-1-git-send-email-christoffer.dall@linaro.org>
+ with ESMTP id 4iFEYrHKlV0v for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 17 Oct 2015 17:47:51 -0400 (EDT)
+Received: from mail-lb0-f182.google.com (mail-lb0-f182.google.com
+ [209.85.217.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1CEDD412ED
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Oct 2015 17:47:50 -0400 (EDT)
+Received: by lbcao8 with SMTP id ao8so119802368lbc.3
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 17 Oct 2015 14:50:14 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1445113822-7831-2-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,62 +37,49 @@ To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.in
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We currently do a single update of the vgic state when the distrbutor
-enable/disable control register is accessed and then bypass updating the
-state for as long as the distributor remains disabled.
+On Sat, Oct 17, 2015 at 10:30:20PM +0200, Christoffer Dall wrote:
+> We have an interesting issue when the guest disables the timer interrupt
+> on the VGIC, which happens when turning VCPUs off using PSCI, for
+> example.
+> 
+> The problem is that because the guest disables the virtual interrupt at
+> the VGIC level, we never inject interrupts to the guest and therefore
+> never mark the interrupt as active on the physical distributor.  The
+> host also never takes the timer interrupt (we only use the timer device
+> to trigger a guest exit and everything else is done in software), so the
+> interrupt does not become active through normal means.
+> 
+> The result is that we keep entering the guest with a programmed timer
+> that will always fire as soon as we context switch the hardware timer
+> state and run the guest, preventing forward progress for the VCPU.
+> 
+> Since the active state on the physical distributor is really part of the
+> timer logic, it is the job of our virtual arch timer driver to manage
+> this state.
+> 
+> The timer->map->active boolean field indicates whether we have signalled
+> this interrupt to the vgic and if that interrupt is still pending or
+> active.  As long as that is the case, the hardware doesn't have to
+> generate physical interrupts and therefore we mark the interrupt as
+> active on the physical distributor.
+> 
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Reported-by: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+Marc was worried about the performance implications of this fix on
+Mustang given the potentially slow MMIO path to the GIC on that system,
+so I ran some before and after applying this series:
 
-This is incorrect, because updating the state does not consider the
-distributor enable bit, and this you can end up in a situation where an
-interrupt is marked as pending on the CPU interface, but not pending on
-the distributor, which is an impossible state to be in, and triggers a
-warning.  Consider for example the following sequence of events:
+BM	Hackbench	Kernbench	PbZip C		PbZip D
+--	---------	---------	-------		-------
+Before	17.94		51.66		17.69		10.59
+After	18.14		51.62		17.82		10.62
 
-1. An interrupt is marked as pending on the distributor
-   - the interrupt is also forwarded to the CPU interface
-2. The guest turns off the distributor (it's about to do a reboot)
-   - we stop updating the CPU interface state from now on
-3. The guest disables the pending interrupt
-   - we remove the pending state from the distributor, but don't touch
-     the CPU interface, see point 2.
+The slight increase on hackbench is well within the variability (1.409
+for the 8 runs behind these numbers) so I don't think this will be
+noticable.  That said, there's room for optimizations here by only
+touching the GIC on vcpu load/put and when the value changes, but I
+think this is premature.
 
-Since the distributor disable bit really means that no interrupts should
-be forwarded to the CPU interface, we modify the code to keep updating
-the internal VGIC state, but always set the CPU interface pending bits
-to zero when the distributor is disabled.
-
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- virt/kvm/arm/vgic.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
-
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 58b1256..66c6616 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -1012,6 +1012,12 @@ static int compute_pending_for_cpu(struct kvm_vcpu *vcpu)
- 	pend_percpu = vcpu->arch.vgic_cpu.pending_percpu;
- 	pend_shared = vcpu->arch.vgic_cpu.pending_shared;
- 
-+	if (!dist->enabled) {
-+		bitmap_zero(pend_percpu, VGIC_NR_PRIVATE_IRQS);
-+		bitmap_zero(pend_shared, nr_shared);
-+		return 0;
-+	}
-+
- 	pending = vgic_bitmap_get_cpu_map(&dist->irq_pending, vcpu_id);
- 	enabled = vgic_bitmap_get_cpu_map(&dist->irq_enabled, vcpu_id);
- 	bitmap_and(pend_percpu, pending, enabled, VGIC_NR_PRIVATE_IRQS);
-@@ -1039,11 +1045,6 @@ void vgic_update_state(struct kvm *kvm)
- 	struct kvm_vcpu *vcpu;
- 	int c;
- 
--	if (!dist->enabled) {
--		set_bit(0, dist->irq_pending_on_cpu);
--		return;
--	}
--
- 	kvm_for_each_vcpu(c, vcpu, kvm) {
- 		if (compute_pending_for_cpu(vcpu))
- 			set_bit(c, dist->irq_pending_on_cpu);
--- 
-2.1.2.330.g565301e.dirty
+-Christoffer
