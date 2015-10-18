@@ -1,135 +1,157 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH 4/4] vfio: platform: use list of registered reset function
-Date: Sun, 18 Oct 2015 18:00:15 +0200
-Message-ID: <1445184015-24414-5-git-send-email-eric.auger@linaro.org>
-References: <1445184015-24414-1-git-send-email-eric.auger@linaro.org>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCHv4 1/3] arm: Add PMU test
+Date: Sun, 18 Oct 2015 19:54:35 +0200
+Message-ID: <20151018175435.GA12158@hawk.localdomain>
+References: <5612EDA5.9010506@redhat.com>
+ <1444662470-13045-1-git-send-email-cov@codeaurora.org>
+ <1444662470-13045-2-git-send-email-cov@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E4E14130A
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 11:58:21 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gl7SBIlRuFbF for <kvmarm@lists.cs.columbia.edu>;
- Sun, 18 Oct 2015 11:58:20 -0400 (EDT)
-Received: from mail-wi0-f177.google.com (mail-wi0-f177.google.com
- [209.85.212.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F0EA24142D
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 11:58:19 -0400 (EDT)
-Received: by wikq8 with SMTP id q8so20936617wik.1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 09:00:47 -0700 (PDT)
-In-Reply-To: <1445184015-24414-1-git-send-email-eric.auger@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, arnd@arndb.de, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, patches@linaro.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1444662470-13045-2-git-send-email-cov@codeaurora.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christopher Covington <cov@codeaurora.org>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wei@redhat.com, alindsay@codeaurora.org, croberts@codeaurora.org, shannon.zhao@linaro.org, alistair.francis@xilinx.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Remove the static lookup table and use the dynamic list of registered
-reset functions instead. Also load the reset module through its alias.
-The reset struct module pointer is stored in vfio_platform_device.
+On Mon, Oct 12, 2015 at 11:07:48AM -0400, Christopher Covington wrote:
+> Beginning with a simple sanity check of the control register, add
+> a unit test for the ARM Performance Monitors Unit (PMU).
+> 
+> Signed-off-by: Christopher Covington <cov@codeaurora.org>
+> ---
+>  arm/pmu.c                    | 82 ++++++++++++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg            |  5 +++
+>  config/config-arm-common.mak |  4 ++-
+>  3 files changed, 90 insertions(+), 1 deletion(-)
+>  create mode 100644 arm/pmu.c
+> 
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> new file mode 100644
+> index 0000000..42d0ee1
+> --- /dev/null
+> +++ b/arm/pmu.c
+> @@ -0,0 +1,82 @@
+> +/*
+> + * Test the ARM Performance Monitors Unit (PMU).
+> + *
+> + * Copyright 2015 The Linux Foundation. All rights reserved.
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU Lesser General Public License version 2.1 and
+> + * only version 2.1 as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+> + * for more details.
+> + */
+> +#include "libcflat.h"
+> +
+> +#if defined(__arm__)
+> +static inline uint32_t get_pmcr(void)
+> +{
+> +	uint32_t ret;
+> +
+> +	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
+> +	return ret;
+> +}
+> +#elif defined(__aarch64__)
+> +static inline uint32_t get_pmcr(void)
+> +{
+> +	uint32_t ret;
+> +
+> +	asm volatile("mrs %0, pmcr_el0" : "=r" (ret));
+> +	return ret;
+> +}
+> +#endif
+> +
+> +struct pmu_data {
+> +	union {
+> +		uint32_t pmcr_el0;
+> +		struct {
+> +			uint32_t enable:1;
+> +			uint32_t event_counter_reset:1;
+> +			uint32_t cycle_counter_reset:1;
+> +			uint32_t cycle_counter_clock_divider:1;
+> +			uint32_t event_counter_export:1;
+> +			uint32_t cycle_counter_disable_when_prohibited:1;
+> +			uint32_t cycle_counter_long:1;
+> +			uint32_t reserved:4;
+> +			uint32_t counters:5;
+> +			uint32_t identification_code:8;
+> +			uint32_t implementer:8;
+> +		};
+> +	};
+> +};
+> +
+> +/*
+> + * As a simple sanity check on the PMCR_EL0, ensure the implementer field isn't
+> + * null. Also print out a couple other interesting fields for diagnostic
+> + * purposes. For example, as of fall 2015, QEMU TCG mode doesn't implement
+> + * event counters and therefore reports zero event counters, but hopefully
+> + * support for at least the instructions event will be added in the future and
+> + * the reported number of event counters will become nonzero.
+> + */
+> +static bool check_pmcr(void)
+> +{
+> +	struct pmu_data pmu;
+> +
+> +	pmu.pmcr_el0 = get_pmcr();
+> +
+> +	printf("PMU implementer:     %c\n", pmu.implementer);
+> +	printf("Identification code: 0x%x\n", pmu.identification_code);
+> +	printf("Event counters:      %d\n", pmu.counters);
+> +
+> +	return pmu.implementer != 0;
+> +}
+> +
+> +int main(void)
+> +{
+> +	report_prefix_push("pmu");
+> +
+> +	report("Control register", check_pmcr());
+> +
+> +	return report_summary();
+> +}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index e068a0c..fd94adb 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -35,3 +35,8 @@ file = selftest.flat
+>  smp = `getconf _NPROCESSORS_CONF`
+>  extra_params = -append 'smp'
+>  groups = selftest
+> +
+> +# Test PMU support without -icount
+> +[pmu]
+> +file = pmu.flat
+> +groups = pmu
+> diff --git a/config/config-arm-common.mak b/config/config-arm-common.mak
+> index 698555d..b34d04c 100644
+> --- a/config/config-arm-common.mak
+> +++ b/config/config-arm-common.mak
+> @@ -11,7 +11,8 @@ endif
+>  
+>  tests-common = \
+>  	$(TEST_DIR)/selftest.flat \
+> -	$(TEST_DIR)/spinlock-test.flat
+> +	$(TEST_DIR)/spinlock-test.flat \
+> +	$(TEST_DIR)/pmu.flat
+>  
+>  all: test_cases
+>  
+> @@ -70,3 +71,4 @@ test_cases: $(generated_files) $(tests-common) $(tests)
+>  
+>  $(TEST_DIR)/selftest.elf: $(cstart.o) $(TEST_DIR)/selftest.o
+>  $(TEST_DIR)/spinlock-test.elf: $(cstart.o) $(TEST_DIR)/spinlock-test.o
+> +$(TEST_DIR)/pmu.elf: $(cstart.o) $(TEST_DIR)/pmu.o
+> -- 
+> Qualcomm Innovation Center, Inc.
+> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+> a Linux Foundation Collaborative Project
+> 
+>
 
-This patch fixes the issue related to the usage of __symbol_get, which
-besides from being moot, prevented compilation with CONFIG_MODULES
-disabled.
-
-Also usage of MODULE_ALIAS makes possible to add a new reset module
-without needing to update the framework. This was suggested by Arnd.
-
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
-Reported-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/vfio/platform/vfio_platform_common.c  | 46 +++++++++++++++------------
- drivers/vfio/platform/vfio_platform_private.h |  1 +
- 2 files changed, 26 insertions(+), 21 deletions(-)
-
-diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-index 31a6a8c..f3b6299 100644
---- a/drivers/vfio/platform/vfio_platform_common.c
-+++ b/drivers/vfio/platform/vfio_platform_common.c
-@@ -27,37 +27,41 @@ struct list_head reset_list;
- LIST_HEAD(reset_list);
- static DEFINE_MUTEX(driver_lock);
- 
--static const struct vfio_platform_reset_combo reset_lookup_table[] = {
--	{
--		.compat = "calxeda,hb-xgmac",
--		.reset_function_name = "vfio_platform_calxedaxgmac_reset",
--		.module_name = "vfio-platform-calxedaxgmac",
--	},
--};
-+static vfio_platform_reset_fn_t vfio_platform_lookup_reset(const char *compat,
-+					struct module **module)
-+{
-+	struct vfio_platform_reset_node *iter;
-+
-+	list_for_each_entry(iter, &reset_list, link) {
-+		if (!strcmp(iter->compat, compat) &&
-+			try_module_get(iter->owner)) {
-+			*module = iter->owner;
-+			return iter->reset;
-+		}
-+	}
-+
-+	return NULL;
-+}
- 
- static void vfio_platform_get_reset(struct vfio_platform_device *vdev,
- 				    struct device *dev)
- {
--	int (*reset)(struct vfio_platform_device *);
--	int i;
--
--	for (i = 0 ; i < ARRAY_SIZE(reset_lookup_table); i++) {
--		if (!strcmp(reset_lookup_table[i].compat, vdev->compat)) {
--			request_module(reset_lookup_table[i].module_name);
--			reset = __symbol_get(
--				reset_lookup_table[i].reset_function_name);
--			if (reset) {
--				vdev->reset = reset;
--				return;
--			}
--		}
-+	char modname[256];
-+
-+	vdev->reset = vfio_platform_lookup_reset(vdev->compat,
-+						&vdev->reset_module);
-+	if (!vdev->reset) {
-+		snprintf(modname, 256, "vfio-reset:%s", vdev->compat);
-+		request_module(modname);
-+		vdev->reset = vfio_platform_lookup_reset(vdev->compat,
-+							 &vdev->reset_module);
- 	}
- }
- 
- static void vfio_platform_put_reset(struct vfio_platform_device *vdev)
- {
- 	if (vdev->reset)
--		symbol_put_addr(vdev->reset);
-+		module_put(vdev->reset_module);
- }
- 
- static int vfio_platform_regions_init(struct vfio_platform_device *vdev)
-diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
-index b274646..2070dcc 100644
---- a/drivers/vfio/platform/vfio_platform_private.h
-+++ b/drivers/vfio/platform/vfio_platform_private.h
-@@ -57,6 +57,7 @@ struct vfio_platform_device {
- 	int				refcnt;
- 	struct mutex			igate;
- 	const char			*compat;
-+	struct module			*reset_module;
- 
- 	/*
- 	 * These fields should be filled by the bus specific binder
--- 
-1.9.1
+Reviewed-by: Andrew Jones <drjones@redhat.com> 
