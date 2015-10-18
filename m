@@ -1,27 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm64: Count guest exit due to various reasons
-Date: Sun, 18 Oct 2015 21:53:04 +0200
-Message-ID: <20151018195304.GA7531@cbox>
-References: <1445155482-12482-1-git-send-email-amittomer25@gmail.com>
+Subject: Re: [PATCH] KVM/arm: kernel low level debug suport for ARM32 virtual
+ platforms
+Date: Sun, 18 Oct 2015 21:57:06 +0200
+Message-ID: <20151018195706.GB7531@cbox>
+References: <1445051999-24360-1-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 442AA41049
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 15:50:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 60B5C41049
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 15:54:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9jC50SN5PJs8 for <kvmarm@lists.cs.columbia.edu>;
- Sun, 18 Oct 2015 15:50:09 -0400 (EDT)
-Received: from mail-lb0-f180.google.com (mail-lb0-f180.google.com
- [209.85.217.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 086F441022
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 15:50:08 -0400 (EDT)
-Received: by lbbwb3 with SMTP id wb3so67030514lbb.1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 12:52:35 -0700 (PDT)
+ with ESMTP id ZVy8WgMzxgxO for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 18 Oct 2015 15:54:10 -0400 (EDT)
+Received: from mail-lf0-f43.google.com (mail-lf0-f43.google.com
+ [209.85.215.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A95C541022
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 15:54:10 -0400 (EDT)
+Received: by lffv3 with SMTP id v3so98439922lff.0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 12:56:37 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1445155482-12482-1-git-send-email-amittomer25@gmail.com>
+In-Reply-To: <1445051999-24360-1-git-send-email-m.smarduch@samsung.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,146 +32,70 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Amit <amittomer25@gmail.com>
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu
+To: Mario Smarduch <m.smarduch@samsung.com>
+Cc: linux@arm.linux.org.uk, kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, will.deacon@arm.com, grant.likely@secretlab.ca, robherring2@gmail.com, catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sun, Oct 18, 2015 at 01:34:42PM +0530, Amit wrote:
-> From: Amit Singh Tomar <amittomer25@gmail.com>
+On Fri, Oct 16, 2015 at 08:19:59PM -0700, Mario Smarduch wrote:
+> When booting a VM using QEMU or Kvmtool there are no clear ways to 
+> enable low level debugging for these virtual platforms. some menu port 
+> choices are not supported by the virtual platforms at all. And there is no
+> help on the location of physical and virtual addresses for the ports.
+> This may lead to wrong debug port and a frozen VM with a blank screen.
 > 
-> This patch adds guest exit statistics to debugfs, This can be helpful
-> while measuring KVM performance.
+> This patch adds menu selections for QEMU and Kvmtool virtual platforms for low 
+> level kernel print debugging. Help section displays port physical and
+> virutal addresses.
 > 
-> Signed-off-by: Amit Singh Tomar <amittomer25@gmail.com>
+> ARM reference models use the MIDR register to run-time select UART port address 
+> (for ARCH_VEXPRESS) based on A9 or A15 part numbers. Looked for a same approach
+> but couldn't find a way to differentiate between virtual platforms, something
+> like a platform register.
+> 
+> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
 > ---
->  arch/arm/include/asm/kvm_host.h   | 2 ++
->  arch/arm/kvm/arm.c                | 1 +
->  arch/arm/kvm/guest.c              | 2 ++
->  arch/arm/kvm/mmio.c               | 1 +
->  arch/arm64/include/asm/kvm_host.h | 5 +++++
->  arch/arm64/kvm/guest.c            | 8 ++++++++
->  arch/arm64/kvm/handle_exit.c      | 3 +++
->  7 files changed, 22 insertions(+)
+
+I can't think of any better way to do this and I would be happy to see
+this functionality in Linux, so:
+
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+
+>  arch/arm/Kconfig.debug | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
 > 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index c4072d9..d1f3159 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -147,6 +147,8 @@ struct kvm_vcpu_stat {
->  	u32 halt_successful_poll;
->  	u32 halt_attempted_poll;
->  	u32 halt_wakeup;
-> +	u32 mmio_exit_stat;
-> +	u32 exits;
->  };
+> diff --git a/arch/arm/Kconfig.debug b/arch/arm/Kconfig.debug
+> index a2e16f9..d126bd4 100644
+> --- a/arch/arm/Kconfig.debug
+> +++ b/arch/arm/Kconfig.debug
+> @@ -1155,6 +1155,28 @@ choice
+>  		  This option selects UART0 on VIA/Wondermedia System-on-a-chip
+>  		  devices, including VT8500, WM8505, WM8650 and WM8850.
 >  
->  int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index 78b2869..5d0a2c5 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -569,6 +569,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
->  
->  		vcpu->mode = OUTSIDE_GUEST_MODE;
-> +		vcpu->stat.exits++;
->  		/*
->  		 * Back from guest
->  		 *************************************************************/
-> diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-> index 96e935b..0eea5fc 100644
-> --- a/arch/arm/kvm/guest.c
-> +++ b/arch/arm/kvm/guest.c
-> @@ -33,6 +33,8 @@
->  #define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
->  
->  struct kvm_stats_debugfs_item debugfs_entries[] = {
-> +	VCPU_STAT(mmio_exit_stat),
-> +	VCPU_STAT(exits),
->  	{ NULL }
->  };
->  
-> diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-> index 974b1c6..51d518e 100644
-> --- a/arch/arm/kvm/mmio.c
-> +++ b/arch/arm/kvm/mmio.c
-> @@ -184,6 +184,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  	}
->  
->  	rt = vcpu->arch.mmio_decode.rt;
-> +	vcpu->stat.mmio_exit_stat++;
->  
->  	if (is_write) {
->  		data = vcpu_data_guest_to_host(vcpu, *vcpu_reg(vcpu, rt), len);
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index ed03968..b32c938 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -194,6 +194,11 @@ struct kvm_vcpu_stat {
->  	u32 halt_successful_poll;
->  	u32 halt_attempted_poll;
->  	u32 halt_wakeup;
-> +	u32 hvc_exit_stat;
-> +	u32 wfx_exit_stat;
-> +	u32 wfi_exit_stat;
-> +	u32 mmio_exit_stat;
-> +	u32 exits;
->  };
->  
->  int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index d250160..b1943cd 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -34,7 +34,15 @@
->  
->  #include "trace.h"
->  
-> +#define VM_STAT(x) { #x, offsetof(struct kvm, stat.x), KVM_STAT_VM }
-> +#define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
+> +	config DEBUG_VIRT_UART_QEMU
+> +		bool "Kernel low-level debugging on QEMU Virtual Platform"
+> +		depends on ARCH_VIRT
+> +		select DEBUG_UART_PL01X
+> +		help
+> +		  Say Y here if you want the debug print routines to direct
+> +		  their output to PL011 UART port on QEMU Virtual Platform.
+> +		  Appropriate address values are:
+> +			PHYS		VIRT
+> +			0x9000000	0xf8090000
 > +
->  struct kvm_stats_debugfs_item debugfs_entries[] = {
-> +	VCPU_STAT(hvc_exit_stat),
-> +	VCPU_STAT(wfx_exit_stat),
-> +	VCPU_STAT(wfi_exit_stat),
-> +	VCPU_STAT(mmio_exit_stat),
-> +	VCPU_STAT(exits),
->  	{ NULL }
->  };
->  
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 68a0759..6e38c50 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -39,6 +39,7 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  
->  	trace_kvm_hvc_arm64(*vcpu_pc(vcpu), *vcpu_reg(vcpu, 0),
->  			    kvm_vcpu_hvc_get_imm(vcpu));
-> +	vcpu->stat.hvc_exit_stat++;
->  
->  	ret = kvm_psci_call(vcpu);
->  	if (ret < 0) {
-> @@ -71,9 +72,11 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  {
->  	if (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
->  		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
-> +		vcpu->stat.wfx_exit_stat++;
->  		kvm_vcpu_on_spin(vcpu);
->  	} else {
->  		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), false);
-> +		vcpu->stat.wfi_exit_stat++;
->  		kvm_vcpu_block(vcpu);
->  	}
->  
+> +	config DEBUG_VIRT_UART_KVMTOOL
+> +		bool "Kernel low-level debugging on Kvmtool Virtual Platform"
+> +		depends on ARCH_VIRT
+> +		select DEBUG_UART_8250
+> +		help
+> +		  Say Y here if you want the debug print routines to direct
+> +		  their output to 8250 UART port on Kvmtool Virtual
+> +		  Platform. Appropriate address values are:
+> +			PHYS		VIRT
+> +			0x3f8		0xf80903f8
+> +
+>  	config DEBUG_ICEDCC
+>  		bool "Kernel low-level debugging via EmbeddedICE DCC channel"
+>  		help
 > -- 
 > 1.9.1
 > 
-
-I thought the idea was to not use this infrastructure anymore and
-instead use tracepoints to count exit reasons?
-
-I'm cc'ing Wei here who sent some patches to QEMU for this purpose
-recently.
-
-Thanks,
--Christoffer
