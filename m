@@ -1,28 +1,27 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM/arm: kernel low level debug suport for ARM32 virtual
- platforms
-Date: Sun, 18 Oct 2015 21:57:06 +0200
-Message-ID: <20151018195706.GB7531@cbox>
-References: <1445051999-24360-1-git-send-email-m.smarduch@samsung.com>
+Subject: Re: [PATCH] arm64: kvm: restore EL1N SP for panic
+Date: Sun, 18 Oct 2015 22:13:52 +0200
+Message-ID: <20151018201352.GD7531@cbox>
+References: <1444658690-8180-1-git-send-email-mark.rutland@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 60B5C41049
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 15:54:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 96A46412D0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 16:10:58 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZVy8WgMzxgxO for <kvmarm@lists.cs.columbia.edu>;
- Sun, 18 Oct 2015 15:54:10 -0400 (EDT)
-Received: from mail-lf0-f43.google.com (mail-lf0-f43.google.com
- [209.85.215.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A95C541022
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 15:54:10 -0400 (EDT)
-Received: by lffv3 with SMTP id v3so98439922lff.0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 12:56:37 -0700 (PDT)
+ with ESMTP id bS7ctDjh3Rde for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 18 Oct 2015 16:10:57 -0400 (EDT)
+Received: from mail-lf0-f48.google.com (mail-lf0-f48.google.com
+ [209.85.215.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7FFBD41022
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 16:10:56 -0400 (EDT)
+Received: by lffz202 with SMTP id z202so15653264lff.3
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 13:13:23 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1445051999-24360-1-git-send-email-m.smarduch@samsung.com>
+In-Reply-To: <1444658690-8180-1-git-send-email-mark.rutland@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,70 +31,34 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mario Smarduch <m.smarduch@samsung.com>
-Cc: linux@arm.linux.org.uk, kvm@vger.kernel.org, marc.zyngier@arm.com, andre.przywara@arm.com, will.deacon@arm.com, grant.likely@secretlab.ca, robherring2@gmail.com, catalin.marinas@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 16, 2015 at 08:19:59PM -0700, Mario Smarduch wrote:
-> When booting a VM using QEMU or Kvmtool there are no clear ways to 
-> enable low level debugging for these virtual platforms. some menu port 
-> choices are not supported by the virtual platforms at all. And there is no
-> help on the location of physical and virtual addresses for the ports.
-> This may lead to wrong debug port and a frozen VM with a blank screen.
+On Mon, Oct 12, 2015 at 03:04:50PM +0100, Mark Rutland wrote:
+> If we panic in hyp mode, we inject a call to panic() into the EL1N host
+> kernel. If a guest context is active, we first attempt to restore the
+> minimal amount of state necessary to execute the host kernel with
+> restore_sysregs.
 > 
-> This patch adds menu selections for QEMU and Kvmtool virtual platforms for low 
-> level kernel print debugging. Help section displays port physical and
-> virutal addresses.
+> However, the SP is restored as part of restore_common_regs, and so we
+> may return to the host's panic() function with the SP of the guest. Any
+> calculations based on the SP will be bogus, and any attempt to access
+> the stack will result in recursive data aborts.
 > 
-> ARM reference models use the MIDR register to run-time select UART port address 
-> (for ARCH_VEXPRESS) based on A9 or A15 part numbers. Looked for a same approach
-> but couldn't find a way to differentiate between virtual platforms, something
-> like a platform register.
+> When running Linux as a guest, the guest's EL1N SP is like to be some
+> valid kernel address. In this case, the host kernel may use that region
+> as a stack for panic(), corrupting it in the process.
 > 
-> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
-> ---
+> Avoid the problem by restoring the host SP prior to returning to the
+> host. To prevent misleading backtraces in the host, the FP is zeroed at
+> the same time. We don't need any of the other "common" registers in
+> order to panic successfully.
+> 
+> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> Cc: <kvmarm@lists.cs.columbia.edu>
 
-I can't think of any better way to do this and I would be happy to see
-this functionality in Linux, so:
-
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-
->  arch/arm/Kconfig.debug | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
-> 
-> diff --git a/arch/arm/Kconfig.debug b/arch/arm/Kconfig.debug
-> index a2e16f9..d126bd4 100644
-> --- a/arch/arm/Kconfig.debug
-> +++ b/arch/arm/Kconfig.debug
-> @@ -1155,6 +1155,28 @@ choice
->  		  This option selects UART0 on VIA/Wondermedia System-on-a-chip
->  		  devices, including VT8500, WM8505, WM8650 and WM8850.
->  
-> +	config DEBUG_VIRT_UART_QEMU
-> +		bool "Kernel low-level debugging on QEMU Virtual Platform"
-> +		depends on ARCH_VIRT
-> +		select DEBUG_UART_PL01X
-> +		help
-> +		  Say Y here if you want the debug print routines to direct
-> +		  their output to PL011 UART port on QEMU Virtual Platform.
-> +		  Appropriate address values are:
-> +			PHYS		VIRT
-> +			0x9000000	0xf8090000
-> +
-> +	config DEBUG_VIRT_UART_KVMTOOL
-> +		bool "Kernel low-level debugging on Kvmtool Virtual Platform"
-> +		depends on ARCH_VIRT
-> +		select DEBUG_UART_8250
-> +		help
-> +		  Say Y here if you want the debug print routines to direct
-> +		  their output to 8250 UART port on Kvmtool Virtual
-> +		  Platform. Appropriate address values are:
-> +			PHYS		VIRT
-> +			0x3f8		0xf80903f8
-> +
->  	config DEBUG_ICEDCC
->  		bool "Kernel low-level debugging via EmbeddedICE DCC channel"
->  		help
-> -- 
-> 1.9.1
-> 
+Applied - thanks,
+-Christoffer
