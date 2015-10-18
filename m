@@ -1,27 +1,29 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] arm64: kvm: restore EL1N SP for panic
-Date: Sun, 18 Oct 2015 22:13:52 +0200
-Message-ID: <20151018201352.GD7531@cbox>
-References: <1444658690-8180-1-git-send-email-mark.rutland@arm.com>
+Subject: Re: [PATCH 2/9] KVM: arm: Do not indent the arguments of
+ DECLARE_BITMAP
+Date: Sun, 18 Oct 2015 22:34:58 +0200
+Message-ID: <20151018203458.GE7531@cbox>
+References: <1444940195-28272-1-git-send-email-mmarek@suse.com>
+ <1444940195-28272-3-git-send-email-mmarek@suse.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 96A46412D0
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 16:10:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D4F141289
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 16:32:06 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bS7ctDjh3Rde for <kvmarm@lists.cs.columbia.edu>;
- Sun, 18 Oct 2015 16:10:57 -0400 (EDT)
-Received: from mail-lf0-f48.google.com (mail-lf0-f48.google.com
- [209.85.215.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7FFBD41022
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 16:10:56 -0400 (EDT)
-Received: by lffz202 with SMTP id z202so15653264lff.3
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 13:13:23 -0700 (PDT)
+ with ESMTP id UmAhasx7hzWi for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 18 Oct 2015 16:32:02 -0400 (EDT)
+Received: from mail-lf0-f41.google.com (mail-lf0-f41.google.com
+ [209.85.215.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 66F074117E
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 16:32:01 -0400 (EDT)
+Received: by lffv3 with SMTP id v3so98618394lff.0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 13:34:28 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1444658690-8180-1-git-send-email-mark.rutland@arm.com>
+In-Reply-To: <1444940195-28272-3-git-send-email-mmarek@suse.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,34 +33,66 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Michal Marek <mmarek@suse.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 12, 2015 at 03:04:50PM +0100, Mark Rutland wrote:
-> If we panic in hyp mode, we inject a call to panic() into the EL1N host
-> kernel. If a guest context is active, we first attempt to restore the
-> minimal amount of state necessary to execute the host kernel with
-> restore_sysregs.
+On Thu, Oct 15, 2015 at 10:16:28PM +0200, Michal Marek wrote:
+> Besides being a coding style issue, it confuses make tags:
 > 
-> However, the SP is restored as part of restore_common_regs, and so we
-> may return to the host's panic() function with the SP of the guest. Any
-> calculations based on the SP will be bogus, and any attempt to access
-> the stack will result in recursive data aborts.
+> ctags: Warning: include/kvm/arm_vgic.h:307: null expansion of name pattern "\1"
+> ctags: Warning: include/kvm/arm_vgic.h:308: null expansion of name pattern "\1"
+> ctags: Warning: include/kvm/arm_vgic.h:309: null expansion of name pattern "\1"
+> ctags: Warning: include/kvm/arm_vgic.h:317: null expansion of name pattern "\1"
 > 
-> When running Linux as a guest, the guest's EL1N SP is like to be some
-> valid kernel address. In this case, the host kernel may use that region
-> as a stack for panic(), corrupting it in the process.
-> 
-> Avoid the problem by restoring the host SP prior to returning to the
-> host. To prevent misleading backtraces in the host, the FP is zeroed at
-> the same time. We don't need any of the other "common" registers in
-> order to panic successfully.
-> 
-> Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: <kvmarm@lists.cs.columbia.edu>
+> Cc: kvmarm@lists.cs.columbia.edu
+> Signed-off-by: Michal Marek <mmarek@suse.com>
+> ---
 
-Applied - thanks,
+Is not being able to deal with a whitespace not a make tags problem?
+
+As for coding style, do we really entertain these kinds of changes just
+to adhere to a coding style?  It feels unnecessary taints the log etc.
+
+However, I'm curious what the general concesus and previous practice for
+this sort of thing is?
+
+Thanks,
 -Christoffer
+
+>  include/kvm/arm_vgic.h | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index d901f1a47be6..58c5c0eb8d2d 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -304,9 +304,9 @@ struct vgic_cpu {
+>  	u8		*vgic_irq_lr_map;
+>  
+>  	/* Pending/active/both interrupts on this VCPU */
+> -	DECLARE_BITMAP(	pending_percpu, VGIC_NR_PRIVATE_IRQS);
+> -	DECLARE_BITMAP(	active_percpu, VGIC_NR_PRIVATE_IRQS);
+> -	DECLARE_BITMAP(	pend_act_percpu, VGIC_NR_PRIVATE_IRQS);
+> +	DECLARE_BITMAP(pending_percpu, VGIC_NR_PRIVATE_IRQS);
+> +	DECLARE_BITMAP(active_percpu, VGIC_NR_PRIVATE_IRQS);
+> +	DECLARE_BITMAP(pend_act_percpu, VGIC_NR_PRIVATE_IRQS);
+>  
+>  	/* Pending/active/both shared interrupts, dynamically sized */
+>  	unsigned long	*pending_shared;
+> @@ -314,7 +314,7 @@ struct vgic_cpu {
+>  	unsigned long   *pend_act_shared;
+>  
+>  	/* Bitmap of used/free list registers */
+> -	DECLARE_BITMAP(	lr_used, VGIC_V2_MAX_LRS);
+> +	DECLARE_BITMAP(lr_used, VGIC_V2_MAX_LRS);
+>  
+>  	/* Number of list registers on this CPU */
+>  	int		nr_lr;
+> -- 
+> 2.1.4
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
