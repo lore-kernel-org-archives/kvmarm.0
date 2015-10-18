@@ -1,24 +1,24 @@
-From: Amit <amittomer25@gmail.com>
-Subject: [PATCH] KVM: arm64: Count guest exit due to various reasons
-Date: Sun, 18 Oct 2015 13:34:42 +0530
-Message-ID: <1445155482-12482-1-git-send-email-amittomer25@gmail.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [PATCH 0/4] VFIO platform reset module rework
+Date: Sun, 18 Oct 2015 18:00:11 +0200
+Message-ID: <1445184015-24414-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 94F83412A6
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 04:02:38 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 15F6641280
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 11:58:15 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0RVaPkgoq+6T for <kvmarm@lists.cs.columbia.edu>;
- Sun, 18 Oct 2015 04:02:37 -0400 (EDT)
-Received: from mail-pa0-f67.google.com (mail-pa0-f67.google.com
- [209.85.220.67])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 969C341172
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 04:02:37 -0400 (EDT)
-Received: by pacik9 with SMTP id ik9so17647675pac.3
- for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 01:05:03 -0700 (PDT)
+ with ESMTP id n89JrPSsKfXQ for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 18 Oct 2015 11:58:14 -0400 (EDT)
+Received: from mail-wi0-f182.google.com (mail-wi0-f182.google.com
+ [209.85.212.182])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E8E9B411AA
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 11:58:13 -0400 (EDT)
+Received: by wicll6 with SMTP id ll6so65669428wic.0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 18 Oct 2015 09:00:40 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,135 +28,36 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com
+To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, arnd@arndb.de, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Amit Singh Tomar <amittomer25@gmail.com>
+This series fixes the current implementation by getting rid of the
+usage of __symbol_get which caused a compilation issue with
+CONFIG_MODULES disabled. On top of this, the usage of MODULE_ALIAS makes
+possible to add a new reset module without being obliged to update the
+framework. The new implementation relies on the reset module registering
+its reset function to the vfio-platform driver.
 
-This patch adds guest exit statistics to debugfs, This can be helpful
-while measuring KVM performance.
+The series is available at
 
-Signed-off-by: Amit Singh Tomar <amittomer25@gmail.com>
----
- arch/arm/include/asm/kvm_host.h   | 2 ++
- arch/arm/kvm/arm.c                | 1 +
- arch/arm/kvm/guest.c              | 2 ++
- arch/arm/kvm/mmio.c               | 1 +
- arch/arm64/include/asm/kvm_host.h | 5 +++++
- arch/arm64/kvm/guest.c            | 8 ++++++++
- arch/arm64/kvm/handle_exit.c      | 3 +++
- 7 files changed, 22 insertions(+)
+https://git.linaro.org/people/eric.auger/linux.git/shortlog/refs/heads/v4.3-rc5-rework-xgbe-v2
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index c4072d9..d1f3159 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -147,6 +147,8 @@ struct kvm_vcpu_stat {
- 	u32 halt_successful_poll;
- 	u32 halt_attempted_poll;
- 	u32 halt_wakeup;
-+	u32 mmio_exit_stat;
-+	u32 exits;
- };
- 
- int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 78b2869..5d0a2c5 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -569,6 +569,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
- 
- 		vcpu->mode = OUTSIDE_GUEST_MODE;
-+		vcpu->stat.exits++;
- 		/*
- 		 * Back from guest
- 		 *************************************************************/
-diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-index 96e935b..0eea5fc 100644
---- a/arch/arm/kvm/guest.c
-+++ b/arch/arm/kvm/guest.c
-@@ -33,6 +33,8 @@
- #define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
- 
- struct kvm_stats_debugfs_item debugfs_entries[] = {
-+	VCPU_STAT(mmio_exit_stat),
-+	VCPU_STAT(exits),
- 	{ NULL }
- };
- 
-diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-index 974b1c6..51d518e 100644
---- a/arch/arm/kvm/mmio.c
-+++ b/arch/arm/kvm/mmio.c
-@@ -184,6 +184,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	}
- 
- 	rt = vcpu->arch.mmio_decode.rt;
-+	vcpu->stat.mmio_exit_stat++;
- 
- 	if (is_write) {
- 		data = vcpu_data_guest_to_host(vcpu, *vcpu_reg(vcpu, rt), len);
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index ed03968..b32c938 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -194,6 +194,11 @@ struct kvm_vcpu_stat {
- 	u32 halt_successful_poll;
- 	u32 halt_attempted_poll;
- 	u32 halt_wakeup;
-+	u32 hvc_exit_stat;
-+	u32 wfx_exit_stat;
-+	u32 wfi_exit_stat;
-+	u32 mmio_exit_stat;
-+	u32 exits;
- };
- 
- int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index d250160..b1943cd 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -34,7 +34,15 @@
- 
- #include "trace.h"
- 
-+#define VM_STAT(x) { #x, offsetof(struct kvm, stat.x), KVM_STAT_VM }
-+#define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
-+
- struct kvm_stats_debugfs_item debugfs_entries[] = {
-+	VCPU_STAT(hvc_exit_stat),
-+	VCPU_STAT(wfx_exit_stat),
-+	VCPU_STAT(wfi_exit_stat),
-+	VCPU_STAT(mmio_exit_stat),
-+	VCPU_STAT(exits),
- 	{ NULL }
- };
- 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 68a0759..6e38c50 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -39,6 +39,7 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 
- 	trace_kvm_hvc_arm64(*vcpu_pc(vcpu), *vcpu_reg(vcpu, 0),
- 			    kvm_vcpu_hvc_get_imm(vcpu));
-+	vcpu->stat.hvc_exit_stat++;
- 
- 	ret = kvm_psci_call(vcpu);
- 	if (ret < 0) {
-@@ -71,9 +72,11 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
- 	if (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
- 		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
-+		vcpu->stat.wfx_exit_stat++;
- 		kvm_vcpu_on_spin(vcpu);
- 	} else {
- 		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), false);
-+		vcpu->stat.wfi_exit_stat++;
- 		kvm_vcpu_block(vcpu);
- 	}
- 
+Best Regards
+
+Eric
+
+
+Eric Auger (4):
+  vfio: platform: add capability to register a reset function
+  vfio: platform: reset: calxedaxgmac: add reset function registration
+  vfio: platform: add compat in vfio_platform_device
+  vfio: platform: use list of registered reset function
+
+ .../platform/reset/vfio_platform_calxedaxgmac.c    |  40 +++++++-
+ drivers/vfio/platform/vfio_platform_common.c       | 112 ++++++++++++++++-----
+ drivers/vfio/platform/vfio_platform_private.h      |  16 +++
+ 3 files changed, 140 insertions(+), 28 deletions(-)
+
 -- 
 1.9.1
