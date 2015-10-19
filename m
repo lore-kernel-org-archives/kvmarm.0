@@ -1,56 +1,70 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFT - PATCH v2 0/2] KVM/arm64: add fp/simd lazy switch support
-Date: Sun, 18 Oct 2015 23:07:38 +0200
-Message-ID: <20151018210738.GF7531@cbox>
-References: <1442964843-11953-1-git-send-email-m.smarduch@samsung.com>
- <20151005154540.GJ9011@cbox>
- <561BDFE3.5060403@samsung.com>
+Subject: Re: [PATCH v2 1/2] KVM/arm: add hooks for armv7 fp/simd lazy switch
+ support
+Date: Mon, 19 Oct 2015 10:53:32 +0200
+Message-ID: <20151019085332.GA24104@cbox>
+References: <1443311009-4811-1-git-send-email-m.smarduch@samsung.com>
+ <1443311009-4811-2-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <561BDFE3.5060403@samsung.com>
+In-Reply-To: <1443311009-4811-2-git-send-email-m.smarduch@samsung.com>
 Sender: kvm-owner@vger.kernel.org
 To: Mario Smarduch <m.smarduch@samsung.com>
-Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, antonios.motakis@huawei.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 12, 2015 at 09:29:23AM -0700, Mario Smarduch wrote:
-> Hi Christoffer, Marc -
->   I just threw this test your way without any explanation.
-
-I'm confused.  Did you send me something somewhere already?
-
+On Sat, Sep 26, 2015 at 04:43:28PM -0700, Mario Smarduch wrote:
+> This patch adds vcpu fields to track lazy state, save host FPEXC, and 
+> offsets to fields.
 > 
-> The test loops, does fp arithmetic and checks the truncated result.
-> It could be a little more dynamic have an initial run to
-> get the sum to compare against while looping, different fp
-> hardware may come up with a different sum, but truncation is
-> to 5'th decimal point.
+> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+> ---
+>  arch/arm/include/asm/kvm_host.h | 6 ++++++
+>  arch/arm/kernel/asm-offsets.c   | 2 ++
+>  2 files changed, 8 insertions(+)
 > 
-> The rationale is that if there is any fp/simd corruption
-> one of these runs should fail. I think most likely scenario
-> for that is a world switch in midst of fp operation. I've
-> instrumented (basically add some tracing to vcpu_put()) and
-> validated vcpu_put gets called thousands of time (for v7,v8)
-> for an over night test running two guests/host crunching
-> fp operations.
-> 
-> Other then that not sure how to really catch any problems
-> with the patches applied. Obviously this is a huge issues, if this has
-> any problems. If you or Marc have any other ideas I'd be happy
-> to enhance the test.
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index dcba0fa..194a8ef 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -111,6 +111,12 @@ struct kvm_vcpu_arch {
+>  	/* Interrupt related fields */
+>  	u32 irq_lines;		/* IRQ and FIQ levels */
+>  
+> +	/* Track fp/simd lazy switch state */
+> +	u32 vfp_lazy;
 
-I think it's important to run two VMs at the same time, each with some
-floating-point work, and then run some floating point on the host at the
-same time.
+so is this a flags field or basically a boolean?  If the latter, what is
+does it mean when the field is true vs. false?
 
-You can make that even more interesting by doing 32-bit guests at the
-same time as well.
+> +
+> +	/* Save host FPEXC register to restore on vcpu put */
+> +	u32 saved_fpexc;
 
-I believe Marc was running Panranoia
-(http://www.netlib.org/paranoia/paranoia.c) to test the last lazy
-series.
+is this only the host's state?  If so, why not name it host_fpexc?
 
 Thanks,
 -Christoffer
+
+> +
+>  	/* Exception Information */
+>  	struct kvm_vcpu_fault_info fault;
+>  
+> diff --git a/arch/arm/kernel/asm-offsets.c b/arch/arm/kernel/asm-offsets.c
+> index 871b826..e1c3a41 100644
+> --- a/arch/arm/kernel/asm-offsets.c
+> +++ b/arch/arm/kernel/asm-offsets.c
+> @@ -186,6 +186,8 @@ int main(void)
+>    DEFINE(VCPU_CPSR,		offsetof(struct kvm_vcpu, arch.regs.usr_regs.ARM_cpsr));
+>    DEFINE(VCPU_HCR,		offsetof(struct kvm_vcpu, arch.hcr));
+>    DEFINE(VCPU_IRQ_LINES,	offsetof(struct kvm_vcpu, arch.irq_lines));
+> +  DEFINE(VCPU_VFP_LAZY,		offsetof(struct kvm_vcpu, arch.vfp_lazy));
+> +  DEFINE(VCPU_VFP_FPEXC,	offsetof(struct kvm_vcpu, arch.saved_fpexc));
+>    DEFINE(VCPU_HSR,		offsetof(struct kvm_vcpu, arch.fault.hsr));
+>    DEFINE(VCPU_HxFAR,		offsetof(struct kvm_vcpu, arch.fault.hxfar));
+>    DEFINE(VCPU_HPFAR,		offsetof(struct kvm_vcpu, arch.fault.hpfar));
+> -- 
+> 1.9.1
+> 
