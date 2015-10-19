@@ -1,64 +1,86 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH 2/4] vfio: platform: reset: calxedaxgmac: add reset function registration
-Date: Mon, 19 Oct 2015 15:25:08 +0200
-Message-ID: <4837895.vpC7yteyEu@wuerfel>
-References: <1445184015-24414-1-git-send-email-eric.auger@linaro.org> <3829716.dW4OHEgDOa@wuerfel> <5624ED6A.5030408@linaro.org>
+From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
+Subject: [PATCHv4 18/24] arm64/kvm: Make use of the system wide safe values
+Date: Mon, 19 Oct 2015 14:24:55 +0100
+Message-ID: <1445261101-22344-19-git-send-email-suzuki.poulose@arm.com>
+References: <1445261101-22344-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <5624ED6A.5030408@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Eric Auger <eric.auger@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, eric.auger@st.com, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, christoffer.dall@linaro.org, patches@linaro.org
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A5B0340FF5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Oct 2015 09:23:03 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id lovf5aeHzCTa for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 19 Oct 2015 09:23:02 -0400 (EDT)
+Received: from eu-smtp-delivery-143.mimecast.com
+ (eu-smtp-delivery-143.mimecast.com [207.82.80.143])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AA2E240FAB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Oct 2015 09:23:02 -0400 (EDT)
+In-Reply-To: <1445261101-22344-1-git-send-email-suzuki.poulose@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: ryan.arnold@linaro.org, ard.biesheuvel@linaro.org, aph@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, edward.nevill@linaro.org, andre.przywara@arm.com, marc.zyngier@arm.com, dave.martin@arm.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Monday 19 October 2015 15:17:30 Eric Auger wrote:
-> Hi Arnd,
-> On 10/19/2015 03:04 PM, Arnd Bergmann wrote:
-> > On Sunday 18 October 2015 18:00:13 Eric Auger wrote:
-> >> diff --git a/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
-> >> index 619dc7d..4f76b17 100644
-> >> --- a/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
-> >> +++ b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
-> >> @@ -29,8 +29,7 @@
-> >>  #define DRIVER_VERSION  "0.1"
-> >>  #define DRIVER_AUTHOR   "Eric Auger <eric.auger@linaro.org>"
-> >>  #define DRIVER_DESC     "Reset support for Calxeda xgmac vfio platform device"
-> >> -
-> >> -#define CALXEDAXGMAC_COMPAT "calxeda,hb-xgmac"
-> >> +#define COMPAT		"calxeda,hb-xgmac"
-> > 
-> > Why the rename?
-> This define was not used. Since the code is meant to be duplicated from
-> one reset module to the other I thought it did not bring any have a
-> specialized name
+Use the system wide safe value from the new API for safer
+decisions
 
-I'd say it would be clearer to remove the macro then, and pass the
-string literal in the function call.
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu
+Signed-off-by: Suzuki K. Poulose <suzuki.poulose@arm.com>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ arch/arm64/kvm/reset.c    |    2 +-
+ arch/arm64/kvm/sys_regs.c |   12 ++++++------
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-> >>  /* XGMAC Register definitions */
-> >>  #define XGMAC_CONTROL           0x00000000      /* MAC Configuration */
-> >> @@ -80,6 +79,43 @@ int vfio_platform_calxedaxgmac_reset(struct vfio_platform_device *vdev)
-> >>  }
-> >>  EXPORT_SYMBOL_GPL(vfio_platform_calxedaxgmac_reset);
-> >>  
-> >> +static int __init vfio_platform_calxedaxgmac_init(void)
-> >> +{
-> >> +	int (*register_reset)(struct module *, char*,
-> >> +				vfio_platform_reset_fn_t);
-> >> +	int ret;
-> >> +
-> >> +	register_reset = symbol_get(vfio_platform_register_reset);
-> >> +	if (!register_reset)
-> >> +		return -EINVAL;
-> > 
-> > I don't understand what you do the symbol_get() here for.
-> > Why not just call that function directly
-> the function is implemented in a separate module. This is just to make
-> sure the vfio-platform module is loaded, in case the end-user attempts
-> to load the reset module without having this latter loaded.
-
-The module loader does all this for you.
-
-	Arnd
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 91cf535..f34745c 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -53,7 +53,7 @@ static bool cpu_has_32bit_el1(void)
+ {
+ 	u64 pfr0;
+ 
+-	pfr0 = read_cpuid(ID_AA64PFR0_EL1);
++	pfr0 = read_system_reg(SYS_ID_AA64PFR0_EL1);
+ 	return !!(pfr0 & 0x20);
+ }
+ 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index d03d3af..87a64e8 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -693,13 +693,13 @@ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
+ 	if (p->is_write) {
+ 		return ignore_write(vcpu, p);
+ 	} else {
+-		u64 dfr = read_cpuid(ID_AA64DFR0_EL1);
+-		u64 pfr = read_cpuid(ID_AA64PFR0_EL1);
+-		u32 el3 = !!((pfr >> 12) & 0xf);
++		u64 dfr = read_system_reg(SYS_ID_AA64DFR0_EL1);
++		u64 pfr = read_system_reg(SYS_ID_AA64PFR0_EL1);
++		u32 el3 = !!cpuid_feature_extract_field(pfr, ID_AA64PFR0_EL3_SHIFT);
+ 
+-		*vcpu_reg(vcpu, p->Rt) = ((((dfr >> 20) & 0xf) << 28) |
+-					  (((dfr >> 12) & 0xf) << 24) |
+-					  (((dfr >> 28) & 0xf) << 20) |
++		*vcpu_reg(vcpu, p->Rt) = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
++					  (((dfr >> ID_AA64DFR0_BRPS_SHIFT) & 0xf) << 24) |
++					  (((dfr >> ID_AA64DFR0_CTX_CMPS_SHIFT) & 0xf) << 20) |
+ 					  (6 << 16) | (el3 << 14) | (el3 << 12));
+ 		return true;
+ 	}
+-- 
+1.7.9.5
