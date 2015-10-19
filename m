@@ -1,86 +1,141 @@
-From: "Suzuki K. Poulose" <suzuki.poulose@arm.com>
-Subject: [PATCHv4 18/24] arm64/kvm: Make use of the system wide safe values
-Date: Mon, 19 Oct 2015 14:24:55 +0100
-Message-ID: <1445261101-22344-19-git-send-email-suzuki.poulose@arm.com>
-References: <1445261101-22344-1-git-send-email-suzuki.poulose@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH 1/3] arm/arm64: KVM: Fix arch timer behavior for disabled
+ interrupts
+Date: Mon, 19 Oct 2015 15:27:42 +0200
+Message-ID: <5624EFCE.2030302@linaro.org>
+References: <1445113822-7831-1-git-send-email-christoffer.dall@linaro.org>
+ <1445113822-7831-2-git-send-email-christoffer.dall@linaro.org>
+ <5624EB04.1090601@linaro.org> <20151019131427.GD24104@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A5B0340FF5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Oct 2015 09:23:03 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lovf5aeHzCTa for <kvmarm@lists.cs.columbia.edu>;
- Mon, 19 Oct 2015 09:23:02 -0400 (EDT)
-Received: from eu-smtp-delivery-143.mimecast.com
- (eu-smtp-delivery-143.mimecast.com [207.82.80.143])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA2E240FAB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 19 Oct 2015 09:23:02 -0400 (EDT)
-In-Reply-To: <1445261101-22344-1-git-send-email-suzuki.poulose@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: ryan.arnold@linaro.org, ard.biesheuvel@linaro.org, aph@redhat.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, edward.nevill@linaro.org, andre.przywara@arm.com, marc.zyngier@arm.com, dave.martin@arm.com
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20151019131427.GD24104@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Use the system wide safe value from the new API for safer
-decisions
+On 10/19/2015 03:14 PM, Christoffer Dall wrote:
+> On Mon, Oct 19, 2015 at 03:07:16PM +0200, Eric Auger wrote:
+>> Hi Christoffer,
+>> On 10/17/2015 10:30 PM, Christoffer Dall wrote:
+>>> We have an interesting issue when the guest disables the timer interrupt
+>>> on the VGIC, which happens when turning VCPUs off using PSCI, for
+>>> example.
+>>>
+>>> The problem is that because the guest disables the virtual interrupt at
+>>> the VGIC level, we never inject interrupts to the guest and therefore
+>>> never mark the interrupt as active on the physical distributor.  The
+>>> host also never takes the timer interrupt (we only use the timer device
+>>> to trigger a guest exit and everything else is done in software), so the
+>>> interrupt does not become active through normal means.
+>>>
+>>> The result is that we keep entering the guest with a programmed timer
+>>> that will always fire as soon as we context switch the hardware timer
+>>> state and run the guest, preventing forward progress for the VCPU.
+>>>
+>>> Since the active state on the physical distributor is really part of the
+>>> timer logic, it is the job of our virtual arch timer driver to manage
+>>> this state.
+>>>
+>>> The timer->map->active boolean field indicates whether we have signalled
+>>> this interrupt to the vgic and if that interrupt is still pending or
+>>> active.  As long as that is the case, the hardware doesn't have to
+>>> generate physical interrupts and therefore we mark the interrupt as
+>>> active on the physical distributor.
+>>>
+>>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>>> Reported-by: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
+>>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+>>> ---
+>>>  virt/kvm/arm/arch_timer.c | 19 +++++++++++++++++++
+>>>  virt/kvm/arm/vgic.c       | 43 +++++++++++--------------------------------
+>>>  2 files changed, 30 insertions(+), 32 deletions(-)
+>>>
+>>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+>>> index 48c6e1a..b9d3a32 100644
+>>> --- a/virt/kvm/arm/arch_timer.c
+>>> +++ b/virt/kvm/arm/arch_timer.c
+>>> @@ -137,6 +137,8 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu)
+>>>  void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+>>>  {
+>>>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+>>> +	bool phys_active;
+>>> +	int ret;
+>>>  
+>>>  	/*
+>>>  	 * We're about to run this vcpu again, so there is no need to
+>>> @@ -151,6 +153,23 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+>>>  	 */
+>>>  	if (kvm_timer_should_fire(vcpu))
+>>>  		kvm_timer_inject_irq(vcpu);
+>>> +
+>>> +	/*
+>>> +	 * We keep track of whether the edge-triggered interrupt has been
+>>> +	 * signalled to the vgic/guest, and if so, we mask the interrupt and
+>>> +	 * the physical distributor to prevent the timer from raising a
+>>> +	 * physical interrupt whenever we run a guest, preventing forward
+>>> +	 * VCPU progress.
+>> In practice don't you simply mark the IRQ as active at GIC physical
+>> distributor level, hence preventing the same IRQ from hitting again
+> 
+> yes, that's what I meant with my comment, I should reword to "...we mark
+> the interrupt as active on the physical distributor..."
+> 
+>>> +	 */
+>>> +	if (kvm_vgic_get_phys_irq_active(timer->map))
+>>> +		phys_active = true;
+>>> +	else
+>>> +		phys_active = false;
+>>> +
+>>> +	ret = irq_set_irqchip_state(timer->map->irq,
+>>> +				    IRQCHIP_STATE_ACTIVE,
+>>> +				    phys_active);
+>>
+>> physical distributor state is set in arch timer flush. It relates to a
+>> shared device behavior so I find it natural to do it there.
+>>
+>> However the map->active is set in arch_timer IRQ injection and unset in
+>> vgic sync. Why not doing the set in kvm_vgic_inject_mapped_irq?
+> 
+> Because you have to set it at every entry to the guest if you run
+> multiple VCPUs/VMs on this CPU or migrate this VCPU to a different CPU.
+I meant 	kvm_vgic_set_phys_irq_active(timer->map, true) call in
+kvm_timer_inject_irq? Couldn' that been done in
+kvm_vgic_inject_mapped_irq instead. Doesn't this apply to all mapped IRQs?
 
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu
-Signed-off-by: Suzuki K. Poulose <suzuki.poulose@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- arch/arm64/kvm/reset.c    |    2 +-
- arch/arm64/kvm/sys_regs.c |   12 ++++++------
- 2 files changed, 7 insertions(+), 7 deletions(-)
+Eric
+> 
+>>
+>>> +	WARN_ON(ret);
+>>>  }
+>>>  
+>>>  /**
+>>> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+>>> index 596455a..ea21bc2 100644
+>>> --- a/virt/kvm/arm/vgic.c
+>>> +++ b/virt/kvm/arm/vgic.c
+>>> @@ -1092,6 +1092,15 @@ static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu)
+>>>  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+>>>  	struct vgic_lr vlr = vgic_get_lr(vcpu, lr_nr);
+>>>  
+>>> +	/*
+>>> +	 * We must transfer the pending state back to the distributor before
+>>> +	 * retiring the LR, otherwise we may loose edge-triggered interrupts.
+>>> +	 */
+>>> +	if (vlr.state & LR_STATE_PENDING) {
+>>> +		vgic_dist_irq_set_pending(vcpu, irq);
+>>> +		vlr.hwirq = 0;
+>>> +	}
+>> That fix applies to any edge-sensitive IRQ, ie. not especially the
+>> timer's one? In the positive shouldn't you precise this in the commit
+>> msg too?
+>>
+> 
+> Probably, it could also be a separate patch.  I'll rework this.
+> 
+> Thanks,
+> -Christoffer
+> 
 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index 91cf535..f34745c 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -53,7 +53,7 @@ static bool cpu_has_32bit_el1(void)
- {
- 	u64 pfr0;
- 
--	pfr0 = read_cpuid(ID_AA64PFR0_EL1);
-+	pfr0 = read_system_reg(SYS_ID_AA64PFR0_EL1);
- 	return !!(pfr0 & 0x20);
- }
- 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d03d3af..87a64e8 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -693,13 +693,13 @@ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
- 	if (p->is_write) {
- 		return ignore_write(vcpu, p);
- 	} else {
--		u64 dfr = read_cpuid(ID_AA64DFR0_EL1);
--		u64 pfr = read_cpuid(ID_AA64PFR0_EL1);
--		u32 el3 = !!((pfr >> 12) & 0xf);
-+		u64 dfr = read_system_reg(SYS_ID_AA64DFR0_EL1);
-+		u64 pfr = read_system_reg(SYS_ID_AA64PFR0_EL1);
-+		u32 el3 = !!cpuid_feature_extract_field(pfr, ID_AA64PFR0_EL3_SHIFT);
- 
--		*vcpu_reg(vcpu, p->Rt) = ((((dfr >> 20) & 0xf) << 28) |
--					  (((dfr >> 12) & 0xf) << 24) |
--					  (((dfr >> 28) & 0xf) << 20) |
-+		*vcpu_reg(vcpu, p->Rt) = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
-+					  (((dfr >> ID_AA64DFR0_BRPS_SHIFT) & 0xf) << 24) |
-+					  (((dfr >> ID_AA64DFR0_CTX_CMPS_SHIFT) & 0xf) << 20) |
- 					  (6 << 16) | (el3 << 14) | (el3 << 12));
- 		return true;
- 	}
--- 
-1.7.9.5
