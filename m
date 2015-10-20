@@ -1,24 +1,29 @@
-From: Wei Huang <wei@redhat.com>
-Subject: Re: [PATCH] KVM: arm64: Count guest exit due to various reasons
-Date: Tue, 20 Oct 2015 00:17:47 -0500
-Message-ID: <5625CE7B.7080808@redhat.com>
-References: <1445155482-12482-1-git-send-email-amittomer25@gmail.com>
- <20151018195304.GA7531@cbox>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [RFT - PATCH v2 0/2] KVM/arm64: add fp/simd lazy switch support
+Date: Tue, 20 Oct 2015 09:21:49 +0200
+Message-ID: <20151020072149.GA9457@cbox>
+References: <1442964843-11953-1-git-send-email-m.smarduch@samsung.com>
+ <20151005154540.GJ9011@cbox> <561BDFE3.5060403@samsung.com>
+ <20151018210738.GF7531@cbox> <56256983.2030506@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 11EDA412C2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 01:15:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E6E741049
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 03:18:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VQQtdotG9JLr for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Oct 2015 01:15:19 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 85F8E412AF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 01:15:19 -0400 (EDT)
-In-Reply-To: <20151018195304.GA7531@cbox>
+ with ESMTP id Jzu6c386p+Po for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Oct 2015 03:18:47 -0400 (EDT)
+Received: from mail-lb0-f169.google.com (mail-lb0-f169.google.com
+ [209.85.217.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 552B840FA6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 03:18:47 -0400 (EDT)
+Received: by lbcao8 with SMTP id ao8so8274145lbc.3
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 00:21:17 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <56256983.2030506@samsung.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,160 +33,73 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, Amit <amittomer25@gmail.com>
-Cc: marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu
+To: Mario Smarduch <m.smarduch@samsung.com>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 10/18/2015 02:53 PM, Christoffer Dall wrote:
-> On Sun, Oct 18, 2015 at 01:34:42PM +0530, Amit wrote:
->> From: Amit Singh Tomar <amittomer25@gmail.com>
->>
->> This patch adds guest exit statistics to debugfs, This can be helpful
->> while measuring KVM performance.
->>
->> Signed-off-by: Amit Singh Tomar <amittomer25@gmail.com>
->> ---
->>  arch/arm/include/asm/kvm_host.h   | 2 ++
->>  arch/arm/kvm/arm.c                | 1 +
->>  arch/arm/kvm/guest.c              | 2 ++
->>  arch/arm/kvm/mmio.c               | 1 +
->>  arch/arm64/include/asm/kvm_host.h | 5 +++++
->>  arch/arm64/kvm/guest.c            | 8 ++++++++
->>  arch/arm64/kvm/handle_exit.c      | 3 +++
->>  7 files changed, 22 insertions(+)
->>
->> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
->> index c4072d9..d1f3159 100644
->> --- a/arch/arm/include/asm/kvm_host.h
->> +++ b/arch/arm/include/asm/kvm_host.h
->> @@ -147,6 +147,8 @@ struct kvm_vcpu_stat {
->>  	u32 halt_successful_poll;
->>  	u32 halt_attempted_poll;
->>  	u32 halt_wakeup;
->> +	u32 mmio_exit_stat;
->> +	u32 exits;
->>  };
->>  
->>  int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
->> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
->> index 78b2869..5d0a2c5 100644
->> --- a/arch/arm/kvm/arm.c
->> +++ b/arch/arm/kvm/arm.c
->> @@ -569,6 +569,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>  		ret = kvm_call_hyp(__kvm_vcpu_run, vcpu);
->>  
->>  		vcpu->mode = OUTSIDE_GUEST_MODE;
->> +		vcpu->stat.exits++;
->>  		/*
->>  		 * Back from guest
->>  		 *************************************************************/
->> diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
->> index 96e935b..0eea5fc 100644
->> --- a/arch/arm/kvm/guest.c
->> +++ b/arch/arm/kvm/guest.c
->> @@ -33,6 +33,8 @@
->>  #define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
->>  
->>  struct kvm_stats_debugfs_item debugfs_entries[] = {
->> +	VCPU_STAT(mmio_exit_stat),
->> +	VCPU_STAT(exits),
->>  	{ NULL }
->>  };
->>  
->> diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
->> index 974b1c6..51d518e 100644
->> --- a/arch/arm/kvm/mmio.c
->> +++ b/arch/arm/kvm/mmio.c
->> @@ -184,6 +184,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
->>  	}
->>  
->>  	rt = vcpu->arch.mmio_decode.rt;
->> +	vcpu->stat.mmio_exit_stat++;
->>  
->>  	if (is_write) {
->>  		data = vcpu_data_guest_to_host(vcpu, *vcpu_reg(vcpu, rt), len);
->> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->> index ed03968..b32c938 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -194,6 +194,11 @@ struct kvm_vcpu_stat {
->>  	u32 halt_successful_poll;
->>  	u32 halt_attempted_poll;
->>  	u32 halt_wakeup;
->> +	u32 hvc_exit_stat;
->> +	u32 wfx_exit_stat;
->> +	u32 wfi_exit_stat;
->> +	u32 mmio_exit_stat;
->> +	u32 exits;
->>  };
->>  
->>  int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
->> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
->> index d250160..b1943cd 100644
->> --- a/arch/arm64/kvm/guest.c
->> +++ b/arch/arm64/kvm/guest.c
->> @@ -34,7 +34,15 @@
->>  
->>  #include "trace.h"
->>  
->> +#define VM_STAT(x) { #x, offsetof(struct kvm, stat.x), KVM_STAT_VM }
->> +#define VCPU_STAT(x) { #x, offsetof(struct kvm_vcpu, stat.x), KVM_STAT_VCPU }
->> +
->>  struct kvm_stats_debugfs_item debugfs_entries[] = {
->> +	VCPU_STAT(hvc_exit_stat),
->> +	VCPU_STAT(wfx_exit_stat),
->> +	VCPU_STAT(wfi_exit_stat),
->> +	VCPU_STAT(mmio_exit_stat),
->> +	VCPU_STAT(exits),
->>  	{ NULL }
->>  };
->>  
->> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
->> index 68a0759..6e38c50 100644
->> --- a/arch/arm64/kvm/handle_exit.c
->> +++ b/arch/arm64/kvm/handle_exit.c
->> @@ -39,6 +39,7 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>  
->>  	trace_kvm_hvc_arm64(*vcpu_pc(vcpu), *vcpu_reg(vcpu, 0),
->>  			    kvm_vcpu_hvc_get_imm(vcpu));
->> +	vcpu->stat.hvc_exit_stat++;
->>  
->>  	ret = kvm_psci_call(vcpu);
->>  	if (ret < 0) {
->> @@ -71,9 +72,11 @@ static int kvm_handle_wfx(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>  {
->>  	if (kvm_vcpu_get_hsr(vcpu) & ESR_ELx_WFx_ISS_WFE) {
->>  		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
->> +		vcpu->stat.wfx_exit_stat++;
->>  		kvm_vcpu_on_spin(vcpu);
->>  	} else {
->>  		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), false);
->> +		vcpu->stat.wfi_exit_stat++;
->>  		kvm_vcpu_block(vcpu);
->>  	}
->>  
->> -- 
->> 1.9.1
->>
+On Mon, Oct 19, 2015 at 03:06:59PM -0700, Mario Smarduch wrote:
 > 
-> I thought the idea was to not use this infrastructure anymore and
-> instead use tracepoints to count exit reasons?
 > 
-> I'm cc'ing Wei here who sent some patches to QEMU for this purpose
-> recently.
+> On 10/18/2015 2:07 PM, Christoffer Dall wrote:
+> > On Mon, Oct 12, 2015 at 09:29:23AM -0700, Mario Smarduch wrote:
+> >> Hi Christoffer, Marc -
+> >>   I just threw this test your way without any explanation.
+> > 
+> > I'm confused.  Did you send me something somewhere already?
+> Yes in the last patchset
+> 
+> https://lists.cs.columbia.edu/pipermail/kvmarm/2015-October/016698.html
+> 
+> I included a simple test I put together.
+> 
 
-The patches I submitted were for fixing architecture-related issues
-while running kvm_stat on ARM platforms. I don't think tracepoint is
-meant to replace debugfs for kvm profiling. Both methods have their own
-benefits; and they are supported on x86 & ppc platforms. From this
-perspective I don't mind taking this patch (after review).
+Sorry, I missed that change in the cover letter.
+
+> > 
+> >>
+> >> The test loops, does fp arithmetic and checks the truncated result.
+> >> It could be a little more dynamic have an initial run to
+> >> get the sum to compare against while looping, different fp
+> >> hardware may come up with a different sum, but truncation is
+> >> to 5'th decimal point.
+> >>
+> >> The rationale is that if there is any fp/simd corruption
+> >> one of these runs should fail. I think most likely scenario
+> >> for that is a world switch in midst of fp operation. I've
+> >> instrumented (basically add some tracing to vcpu_put()) and
+> >> validated vcpu_put gets called thousands of time (for v7,v8)
+> >> for an over night test running two guests/host crunching
+> >> fp operations.
+> >>
+> >> Other then that not sure how to really catch any problems
+> >> with the patches applied. Obviously this is a huge issues, if this has
+> >> any problems. If you or Marc have any other ideas I'd be happy
+> >> to enhance the test.
+> > 
+> > I think it's important to run two VMs at the same time, each with some
+> > floating-point work, and then run some floating point on the host at the
+> > same time.
+> > 
+> > You can make that even more interesting by doing 32-bit guests at the
+> > same time as well.
+> 
+> Yes that's the test combination I've been running.
+
+ok, cool, then I trust these patches.
+
+> > 
+> > I believe Marc was running Panranoia
+> > (http://www.netlib.org/paranoia/paranoia.c) to test the last lazy
+> > series.
+> 
+> I'll try this test and run it for several days, see if anything shows up.
+> 
+
+I actually don't know what it does, i.e. if it just uses the FP hardware
+or if it actually checks the results produced.
+
+Several days may be unnecessary, but if your machine has nothing else to
+do, then why not.
 
 Thanks,
--Wei
-
-> 
-> Thanks,
-> -Christoffer
-> 
+-Christoffer
