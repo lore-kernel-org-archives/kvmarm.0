@@ -1,72 +1,85 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [GIT PULL 6/6] arm/arm64: KVM: Fix disabled distributor operation
-Date: Tue, 20 Oct 2015 18:19:07 +0200
-Message-ID: <1445357947-6022-7-git-send-email-christoffer.dall@linaro.org>
-References: <1445357947-6022-1-git-send-email-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1445357947-6022-1-git-send-email-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+Subject: [GIT PULL 0/6] A handful of fixes for KVM/ARM for v4.3-rc7
+Date: Tue, 20 Oct 2015 18:19:01 +0200
+Message-ID: <1445357947-6022-1-git-send-email-christoffer.dall@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 660B841CC5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 12:16:11 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id GhCHGbrJZ32a for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Oct 2015 12:16:05 -0400 (EDT)
+Received: from mail-lf0-f46.google.com (mail-lf0-f46.google.com
+ [209.85.215.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 73D1540FA7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 12:16:05 -0400 (EDT)
+Received: by lffv3 with SMTP id v3so8439909lff.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 09:18:37 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We currently do a single update of the vgic state when the distributor
-enable/disable control register is accessed and then bypass updating the
-state for as long as the distributor remains disabled.
+Hi Paolo,
 
-This is incorrect, because updating the state does not consider the
-distributor enable bit, and this you can end up in a situation where an
-interrupt is marked as pending on the CPU interface, but not pending on
-the distributor, which is an impossible state to be in, and triggers a
-warning.  Consider for example the following sequence of events:
+The following changes since commit 920552b213e3dc832a874b4e7ba29ecddbab31bc:
 
-1. An interrupt is marked as pending on the distributor
-   - the interrupt is also forwarded to the CPU interface
-2. The guest turns off the distributor (it's about to do a reboot)
-   - we stop updating the CPU interface state from now on
-3. The guest disables the pending interrupt
-   - we remove the pending state from the distributor, but don't touch
-     the CPU interface, see point 2.
+  KVM: disable halt_poll_ns as default for s390x (2015-09-25 10:31:30 +0200)
 
-Since the distributor disable bit really means that no interrupts should
-be forwarded to the CPU interface, we modify the code to keep updating
-the internal VGIC state, but always set the CPU interface pending bits
-to zero when the distributor is disabled.
+are available in the git repository at:
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- virt/kvm/arm/vgic.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-v4.3-rc7
 
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 58b1256..66c6616 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -1012,6 +1012,12 @@ static int compute_pending_for_cpu(struct kvm_vcpu *vcpu)
- 	pend_percpu = vcpu->arch.vgic_cpu.pending_percpu;
- 	pend_shared = vcpu->arch.vgic_cpu.pending_shared;
- 
-+	if (!dist->enabled) {
-+		bitmap_zero(pend_percpu, VGIC_NR_PRIVATE_IRQS);
-+		bitmap_zero(pend_shared, nr_shared);
-+		return 0;
-+	}
-+
- 	pending = vgic_bitmap_get_cpu_map(&dist->irq_pending, vcpu_id);
- 	enabled = vgic_bitmap_get_cpu_map(&dist->irq_enabled, vcpu_id);
- 	bitmap_and(pend_percpu, pending, enabled, VGIC_NR_PRIVATE_IRQS);
-@@ -1039,11 +1045,6 @@ void vgic_update_state(struct kvm *kvm)
- 	struct kvm_vcpu *vcpu;
- 	int c;
- 
--	if (!dist->enabled) {
--		set_bit(0, dist->irq_pending_on_cpu);
--		return;
--	}
--
- 	kvm_for_each_vcpu(c, vcpu, kvm) {
- 		if (compute_pending_for_cpu(vcpu))
- 			set_bit(c, dist->irq_pending_on_cpu);
--- 
-2.1.2.330.g565301e.dirty
+for you to fetch changes up to 0d997491f814c87310a6ad7be30a9049c7150489:
 
+  arm/arm64: KVM: Fix disabled distributor operation (2015-10-20 18:09:13 +0200)
+
+Sorry for sending these relatively late, but we had a situation where we
+found one breakage in the timer implementation changes merged for 4.3,
+then fixing that issue revealed another bug, and then that happened
+again, and now we have something that looks stable.
+
+Description of the fixes is in the tag and quoted below.
+
+Thanks,
+-Christoffer
+
+----------------------------------------------------------------
+A late round of KVM/ARM fixes for v4.3-rc7, fixing:
+ - A bug where level-triggered interrupts lowered from userspace
+   are still routed to the guest
+ - A memory leak an a failed initialization path
+ - A build error under certain configurations
+ - Several timer bugs introduced with moving the timer to the active
+   state handling instead of the masking trick.
+
+----------------------------------------------------------------
+Arnd Bergmann (1):
+      KVM: arm: use GIC support unconditionally
+
+Christoffer Dall (3):
+      arm/arm64: KVM: Fix arch timer behavior for disabled interrupts
+      arm/arm64: KVM: Clear map->active on pend/active clear
+      arm/arm64: KVM: Fix disabled distributor operation
+
+Pavel Fedin (2):
+      KVM: arm/arm64: Do not inject spurious interrupts
+      KVM: arm/arm64: Fix memory leak if timer initialization fails
+
+ arch/arm/kvm/Kconfig      |  1 +
+ arch/arm/kvm/arm.c        |  2 +-
+ virt/kvm/arm/arch_timer.c | 19 ++++++++++
+ virt/kvm/arm/vgic.c       | 95 +++++++++++++++++++++++++++--------------------
+ 4 files changed, 76 insertions(+), 41 deletions(-)
