@@ -1,24 +1,26 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [GIT PULL 0/6] A handful of fixes for KVM/ARM for v4.3-rc7
-Date: Tue, 20 Oct 2015 18:19:01 +0200
-Message-ID: <1445357947-6022-1-git-send-email-christoffer.dall@linaro.org>
+Subject: [GIT PULL 3/6] KVM: arm: use GIC support unconditionally
+Date: Tue, 20 Oct 2015 18:19:04 +0200
+Message-ID: <1445357947-6022-4-git-send-email-christoffer.dall@linaro.org>
+References: <1445357947-6022-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 660B841CC5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 12:16:11 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F38DD41CC5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 12:16:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GhCHGbrJZ32a for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Oct 2015 12:16:05 -0400 (EDT)
-Received: from mail-lf0-f46.google.com (mail-lf0-f46.google.com
- [209.85.215.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 73D1540FA7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 12:16:05 -0400 (EDT)
-Received: by lffv3 with SMTP id v3so8439909lff.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 09:18:37 -0700 (PDT)
+ with ESMTP id Px-o-x9LMW9f for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 20 Oct 2015 12:16:08 -0400 (EDT)
+Received: from mail-lf0-f49.google.com (mail-lf0-f49.google.com
+ [209.85.215.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B074F48A2A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 12:16:08 -0400 (EDT)
+Received: by lfaz124 with SMTP id z124so8434773lfa.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 09:18:40 -0700 (PDT)
+In-Reply-To: <1445357947-6022-1-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,57 +31,41 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Arnd Bergmann <arnd@arndb.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Paolo,
+From: Arnd Bergmann <arnd@arndb.de>
 
-The following changes since commit 920552b213e3dc832a874b4e7ba29ecddbab31bc:
+The vgic code on ARM is built for all configurations that enable KVM,
+but the parent_data field that it references is only present when
+CONFIG_IRQ_DOMAIN_HIERARCHY is set:
 
-  KVM: disable halt_poll_ns as default for s390x (2015-09-25 10:31:30 +0200)
+virt/kvm/arm/vgic.c: In function 'kvm_vgic_map_phys_irq':
+virt/kvm/arm/vgic.c:1781:13: error: 'struct irq_data' has no member named 'parent_data'
 
-are available in the git repository at:
+This flag is implied by the GIC driver, and indeed the VGIC code only
+makes sense if a GIC is present. This changes the CONFIG_KVM symbol
+to always select GIC, which avoids the issue.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-v4.3-rc7
+Fixes: 662d9715840 ("arm/arm64: KVM: Kill CONFIG_KVM_ARM_{VGIC,TIMER}")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ arch/arm/kvm/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-for you to fetch changes up to 0d997491f814c87310a6ad7be30a9049c7150489:
-
-  arm/arm64: KVM: Fix disabled distributor operation (2015-10-20 18:09:13 +0200)
-
-Sorry for sending these relatively late, but we had a situation where we
-found one breakage in the timer implementation changes merged for 4.3,
-then fixing that issue revealed another bug, and then that happened
-again, and now we have something that looks stable.
-
-Description of the fixes is in the tag and quoted below.
-
-Thanks,
--Christoffer
-
-----------------------------------------------------------------
-A late round of KVM/ARM fixes for v4.3-rc7, fixing:
- - A bug where level-triggered interrupts lowered from userspace
-   are still routed to the guest
- - A memory leak an a failed initialization path
- - A build error under certain configurations
- - Several timer bugs introduced with moving the timer to the active
-   state handling instead of the masking trick.
-
-----------------------------------------------------------------
-Arnd Bergmann (1):
-      KVM: arm: use GIC support unconditionally
-
-Christoffer Dall (3):
-      arm/arm64: KVM: Fix arch timer behavior for disabled interrupts
-      arm/arm64: KVM: Clear map->active on pend/active clear
-      arm/arm64: KVM: Fix disabled distributor operation
-
-Pavel Fedin (2):
-      KVM: arm/arm64: Do not inject spurious interrupts
-      KVM: arm/arm64: Fix memory leak if timer initialization fails
-
- arch/arm/kvm/Kconfig      |  1 +
- arch/arm/kvm/arm.c        |  2 +-
- virt/kvm/arm/arch_timer.c | 19 ++++++++++
- virt/kvm/arm/vgic.c       | 95 +++++++++++++++++++++++++++--------------------
- 4 files changed, 76 insertions(+), 41 deletions(-)
+diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+index 210ecca..356970f 100644
+--- a/arch/arm/kvm/Kconfig
++++ b/arch/arm/kvm/Kconfig
+@@ -21,6 +21,7 @@ config KVM
+ 	depends on MMU && OF
+ 	select PREEMPT_NOTIFIERS
+ 	select ANON_INODES
++	select ARM_GIC
+ 	select HAVE_KVM_CPU_RELAX_INTERCEPT
+ 	select HAVE_KVM_ARCH_TLB_FLUSH_ALL
+ 	select KVM_MMIO
+-- 
+2.1.2.330.g565301e.dirty
