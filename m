@@ -1,53 +1,61 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: PING: [PATCH v5 0/7] KVM: arm64: Implement API for vGICv3 live
- migration
-Date: Tue, 20 Oct 2015 13:44:41 +0300
-Message-ID: <024801d10b24$53a9cc20$fafd6460$@samsung.com>
-References: <022801d10b19$fdaf5830$f90e0890$@samsung.com>
- <20151020103707.GD9457@cbox>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C159B41022
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 06:42:15 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1V-lHsZMXn7T for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Oct 2015 06:42:13 -0400 (EDT)
-Received: from mailout3.w1.samsung.com (mailout3.w1.samsung.com
- [210.118.77.13])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D1EA840FA7
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 06:42:13 -0400 (EDT)
-Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
- by mailout3.w1.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NWI00I1PLUIAN20@mailout3.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Tue, 20 Oct 2015 11:44:42 +0100 (BST)
-In-reply-to: <20151020103707.GD9457@cbox>
-Content-language: ru
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: 'Christoffer Dall' <christoffer.dall@linaro.org>
-Cc: 'Marc Zyngier' <marc.zyngier@arm.com>, 'Andre Przywara' <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: [GIT PULL 1/6] KVM: arm/arm64: Do not inject spurious interrupts
+Date: Tue, 20 Oct 2015 18:19:02 +0200
+Message-ID: <1445357947-6022-2-git-send-email-christoffer.dall@linaro.org>
+References: <1445357947-6022-1-git-send-email-christoffer.dall@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1445357947-6022-1-git-send-email-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Pavel Fedin <p.fedin@samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello!
+From: Pavel Fedin <p.fedin@samsung.com>
 
-> We'll get to your patches when we get to them, but seriously, you have
-> to curb your eagerness a bit.
+When lowering a level-triggered line from userspace, we forgot to lower
+the pending bit on the emulated CPU interface and we also did not
+re-compute the pending_on_cpu bitmap for the CPU affected by the change.
 
- Ok, sorry for this disturbance then. It is enough for me to know it.
+Update vgic_update_irq_pending() to fix the two issues above and also
+raise a warning in vgic_quue_irq_to_lr if we encounter an interrupt
+pending on a CPU which is neither marked active nor pending.
 
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
+  [ Commit text reworked completely - Christoffer ]
+
+Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ virt/kvm/arm/vgic.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 6bd1c9b..596455a 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -1132,7 +1132,8 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
+ 		kvm_debug("Set active, clear distributor: 0x%x\n", vlr.state);
+ 		vgic_irq_clear_active(vcpu, irq);
+ 		vgic_update_state(vcpu->kvm);
+-	} else if (vgic_dist_irq_is_pending(vcpu, irq)) {
++	} else {
++		WARN_ON(!vgic_dist_irq_is_pending(vcpu, irq));
+ 		vlr.state |= LR_STATE_PENDING;
+ 		kvm_debug("Set pending: 0x%x\n", vlr.state);
+ 	}
+@@ -1607,8 +1608,12 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
+ 	} else {
+ 		if (level_triggered) {
+ 			vgic_dist_irq_clear_level(vcpu, irq_num);
+-			if (!vgic_dist_irq_soft_pend(vcpu, irq_num))
++			if (!vgic_dist_irq_soft_pend(vcpu, irq_num)) {
+ 				vgic_dist_irq_clear_pending(vcpu, irq_num);
++				vgic_cpu_irq_clear(vcpu, irq_num);
++				if (!compute_pending_for_cpu(vcpu))
++					clear_bit(cpuid, dist->irq_pending_on_cpu);
++			}
+ 		}
+ 
+ 		ret = false;
+-- 
+2.1.2.330.g565301e.dirty
+
