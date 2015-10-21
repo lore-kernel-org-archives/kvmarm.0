@@ -1,167 +1,323 @@
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: =?utf-8?B?UkU6IFtHSVQgUFVMTCAzLzZdIEtWTTogYXJtOiB1c2UgR0lDIHN1cHBvcnQgdW5jb25kaXRpb25h?=
- =?utf-8?B?bGx5?=
-Date: Tue, 20 Oct 2015 15:51:05 -0400 (EDT)
-Message-ID: <672714208.55851501.1445370665940.JavaMail.zimbra@zmail13.collab.prod.int.phx2.redhat.com>
-References: <1445357947-6022-1-git-send-email-christoffer.dall@linaro.org>
- <1445357947-6022-4-git-send-email-christoffer.dall@linaro.org>
+From: Mario Smarduch <m.smarduch@samsung.com>
+Subject: Re: [PATCH v2 2/2] KVM/arm: enable enhanced armv7 fp/simd lazy switch
+Date: Tue, 20 Oct 2015 18:10:59 -0700
+Message-ID: <5626E623.9000306@samsung.com>
+References: <1443311009-4811-1-git-send-email-m.smarduch@samsung.com>
+ <1443311009-4811-3-git-send-email-m.smarduch@samsung.com>
+ <20151019101437.GB24104@cbox> <56257BD0.70603@samsung.com>
+ <20151020072452.GB9457@cbox>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="===============6800880745601069482=="
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF4EC410BB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 15:48:44 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Tt0S7jJ-BUIV for <kvmarm@lists.cs.columbia.edu>;
- Tue, 20 Oct 2015 15:48:43 -0400 (EDT)
-Received: from mx4-phx2.redhat.com (mx4-phx2.redhat.com [209.132.183.25])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5707D40FA6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 20 Oct 2015 15:48:42 -0400 (EDT)
-In-Reply-To: <1445357947-6022-4-git-send-email-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, christoffer.dall@linaro.org
-Cc: marc.zyngier@arm.com, arnd@arndb.de
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <20151020072452.GB9457@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, antonios.motakis@huawei.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
---===============6800880745601069482==
-Content-Type: multipart/alternative;
-	boundary="----=_Part_55851502_745639444.1445370665965"
-
-------=_Part_55851502_745639444.1445370665965
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-
-Should this be "select" or "depends on"? Not a blocker, can always be fixed=
- in 4.4.
-
-Paolo
 
 
------Original Message-----
-From: Christoffer Dall [christoffer.dall@linaro.org]
-Received: marted=C3=AC, 20 ott 2015, 18:18
-To: Paolo Bonzini [pbonzini@redhat.com]; kvmarm@lists.cs.columbia.edu, kvm@=
-vger.kernel.org, linux-arm-kernel@lists.infradead.org
-CC: Marc Zyngier [marc.zyngier@arm.com]; Arnd Bergmann [arnd@arndb.de]; Chr=
-istoffer Dall [christoffer.dall@linaro.org]
-Subject: [GIT PULL 3/6] KVM: arm: use GIC support unconditionally
+On 10/20/2015 12:24 AM, Christoffer Dall wrote:
+> On Mon, Oct 19, 2015 at 04:25:04PM -0700, Mario Smarduch wrote:
+>>
+>>
+>> On 10/19/2015 3:14 AM, Christoffer Dall wrote:
+>>> On Sat, Sep 26, 2015 at 04:43:29PM -0700, Mario Smarduch wrote:
+>>>> This patch enhances current lazy vfp/simd hardware switch. In addition to
+>>>> current lazy switch, it tracks vfp/simd hardware state with a vcpu 
+>>>> lazy flag. 
+>>>>
+>>>> vcpu lazy flag is set on guest access and trap to vfp/simd hardware switch 
+>>>> handler. On vm-enter if lazy flag is set skip trap enable and saving 
+>>>> host fpexc. On vm-exit if flag is set skip hardware context switch
+>>>> and return to host with guest context.
+>>>>
+>>>> On vcpu_put check if vcpu lazy flag is set, and execute a hardware context 
+>>>> switch to restore host.
+>>>>
+>>>> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+>>>> ---
+>>>>  arch/arm/include/asm/kvm_asm.h |  1 +
+>>>>  arch/arm/kvm/arm.c             | 17 ++++++++++++
+>>>>  arch/arm/kvm/interrupts.S      | 60 +++++++++++++++++++++++++++++++-----------
+>>>>  arch/arm/kvm/interrupts_head.S | 12 ++++++---
+>>>>  4 files changed, 71 insertions(+), 19 deletions(-)
+>>>>
+>>>> diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+>>>> index 194c91b..4b45d79 100644
+>>>> --- a/arch/arm/include/asm/kvm_asm.h
+>>>> +++ b/arch/arm/include/asm/kvm_asm.h
+>>>> @@ -97,6 +97,7 @@ extern char __kvm_hyp_code_end[];
+>>>>  extern void __kvm_flush_vm_context(void);
+>>>>  extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
+>>>>  extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
+>>>> +extern void __kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu);
+>>>>  
+>>>>  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>>>>  #endif
+>>>> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+>>>> index ce404a5..79f49c7 100644
+>>>> --- a/arch/arm/kvm/arm.c
+>>>> +++ b/arch/arm/kvm/arm.c
+>>>> @@ -105,6 +105,20 @@ void kvm_arch_check_processor_compat(void *rtn)
+>>>>  	*(int *)rtn = 0;
+>>>>  }
+>>>>  
+>>>> +/**
+>>>> + * kvm_switch_fp_regs() - switch guest/host VFP/SIMD registers
+>>>> + * @vcpu:	pointer to vcpu structure.
+>>>> + *
+>>>
+>>> nit: stray blank line
+>> ok
+>>>
+>>>> + */
+>>>> +static void kvm_switch_fp_regs(struct kvm_vcpu *vcpu)
+>>>> +{
+>>>> +#ifdef CONFIG_ARM
+>>>> +	if (vcpu->arch.vfp_lazy == 1) {
+>>>> +		kvm_call_hyp(__kvm_restore_host_vfp_state, vcpu);
+>>>
+>>> why do you have to do this in HYP mode ?
+>>  Calling it directly works fine. I moved the function outside hyp start/end
+>> range in interrupts.S. Not thinking outside the box, just thought let them all
+>> be hyp calls.
+>>
+>>>
+>>>> +		vcpu->arch.vfp_lazy = 0;
+>>>> +	}
+>>>> +#endif
+>>>
+>>> we've tried to put stuff like this in header files to avoid the ifdefs
+>>> so far.  Could that be done here as well?
+>>
+>> That was a to do, but didn't get around to it.
+>>>
+>>>> +}
+>>>>  
+>>>>  /**
+>>>>   * kvm_arch_init_vm - initializes a VM data structure
+>>>> @@ -295,6 +309,9 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>>>>  
+>>>>  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>>>>  {
+>>>> +	/* Check if Guest accessed VFP registers */
+>>>
+>>> misleading comment: this function does more than checking
+>> Yep sure does, will change.
+>>>
+>>>> +	kvm_switch_fp_regs(vcpu);
+>>>> +
+>>>>  	/*
+>>>>  	 * The arch-generic KVM code expects the cpu field of a vcpu to be -1
+>>>>  	 * if the vcpu is no longer assigned to a cpu.  This is used for the
+>>>> diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
+>>>> index 900ef6d..6d98232 100644
+>>>> --- a/arch/arm/kvm/interrupts.S
+>>>> +++ b/arch/arm/kvm/interrupts.S
+>>>> @@ -96,6 +96,29 @@ ENTRY(__kvm_flush_vm_context)
+>>>>  	bx	lr
+>>>>  ENDPROC(__kvm_flush_vm_context)
+>>>>  
+>>>> +/**
+>>>> + * void __kvm_restore_host_vfp_state(struct vcpu *vcpu) - Executes a lazy
+>>>> + *     fp/simd switch, saves the guest, restores host.
+>>>> + *
+>>>
+>>> nit: stray blank line
+>> ok.
+>>>
+>>>> + */
+>>>> +ENTRY(__kvm_restore_host_vfp_state)
+>>>> +#ifdef CONFIG_VFPv3
+>>>> +	push	{r3-r7}
+>>>> +
+>>>> +	add	r7, r0, #VCPU_VFP_GUEST
+>>>> +	store_vfp_state r7
+>>>> +
+>>>> +	add	r7, r0, #VCPU_VFP_HOST
+>>>> +	ldr	r7, [r7]
+>>>> +	restore_vfp_state r7
+>>>> +
+>>>> +	ldr	r3, [vcpu, #VCPU_VFP_FPEXC]
+>>>
+>>> either use r0 or vcpu throughout this function please
+>> Yeah that's bad - in the same function to
+>>>
+>>>> +	VFPFMXR FPEXC, r3
+>>>> +
+>>>> +	pop	{r3-r7}
+>>>> +#endif
+>>>> +	bx	lr
+>>>> +ENDPROC(__kvm_restore_host_vfp_state)
+>>>>  
+>>>>  /********************************************************************
+>>>>   *  Hypervisor world-switch code
+>>>> @@ -119,11 +142,15 @@ ENTRY(__kvm_vcpu_run)
+>>>>  	@ If the host kernel has not been configured with VFPv3 support,
+>>>>  	@ then it is safer if we deny guests from using it as well.
+>>>>  #ifdef CONFIG_VFPv3
+>>>> +	@ r7 must be preserved until next vfp lazy check
+>>>
+>>> I don't understand this comment
+>>>
+>>>> +	vfp_inlazy_mode r7, skip_save_host_fpexc
+>>>> +
+>>>>  	@ Set FPEXC_EN so the guest doesn't trap floating point instructions
+>>>>  	VFPFMRX r2, FPEXC		@ VMRS
+>>>> -	push	{r2}
+>>>> +	str     r2, [vcpu, #VCPU_VFP_FPEXC]
+>>>>  	orr	r2, r2, #FPEXC_EN
+>>>>  	VFPFMXR FPEXC, r2		@ VMSR
+>>>> +skip_save_host_fpexc:
+>>>>  #endif
+>>>>  
+>>>>  	@ Configure Hyp-role
+>>>> @@ -131,7 +158,14 @@ ENTRY(__kvm_vcpu_run)
+>>>>  
+>>>>  	@ Trap coprocessor CRx accesses
+>>>>  	set_hstr vmentry
+>>>> -	set_hcptr vmentry, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
+>>>> +	set_hcptr vmentry, (HCPTR_TTA)
+>>>> +
+>>>> +	@ check if vfp_lazy flag set
+>>>> +	cmp     r7, #1
+>>>
+>>> if you meant that you need to preserve r7 down to here, could you
+>>> instead just move the VFP logic above down here and do the whole VFP
+>>> logic in one coherent block?
+>>
+>> I reworked the code both fpexc save and trap enable are handled at once.
+>>>
+>>>> +	beq     skip_guest_vfp_trap
+>>>> +	set_hcptr vmentry, (HCPTR_TCP(10) | HCPTR_TCP(11))
+>>>> +skip_guest_vfp_trap:
+>>>> +
+>>>>  	set_hdcr vmentry
+>>>>  
+>>>>  	@ Write configured ID register into MIDR alias
+>>>> @@ -170,22 +204,14 @@ __kvm_vcpu_return:
+>>>>  	@ Don't trap coprocessor accesses for host kernel
+>>>>  	set_hstr vmexit
+>>>>  	set_hdcr vmexit
+>>>> -	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11)), after_vfp_restore
+>>>> +	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
+>>>>  
+>>>>  #ifdef CONFIG_VFPv3
+>>>> -	@ Switch VFP/NEON hardware state to the host's
+>>>> -	add	r7, vcpu, #VCPU_VFP_GUEST
+>>>> -	store_vfp_state r7
+>>>> -	add	r7, vcpu, #VCPU_VFP_HOST
+>>>> -	ldr	r7, [r7]
+>>>> -	restore_vfp_state r7
+>>>> -
+>>>> -after_vfp_restore:
+>>>> -	@ Restore FPEXC_EN which we clobbered on entry
+>>>> -	pop	{r2}
+>>>> +	vfp_inlazy_mode r2, skip_restore_host_fpexc
+>>>> +	@ If vfp_lazy is not set, restore FPEXC_EN which we clobbered on entry
+>>>> +	ldr     r2, [vcpu, #VCPU_VFP_FPEXC]
+>>>
+>>> so we do this restore if, since we scheduled this VCPU thread, the guest
+>>> has not touched any VFP regs, is that correct?
+>> That's right.
+>>>
+>>> Did you measure how often we schedule the guest and run it until we
+>>> schedule another process without the guest touching any VFP regs?  I'm
+>>> just wondering if this complexity is worth it, or if we should just
+>>> switch the VFP regs on vcpu_load/vcpu_put instead?
+>>
+>> The loads I've been running mix of fp operations and lmbench mmu - shows huge
+>> decrease of fp save/restore like from ~30-50%, down to ~2%. What I did is
+>> measured all exits and fp/save restore for both scenarios. So yes it does make a
+>> difference. Of course will depend on the load, but should be never be worse then
+>> now.
+> 
+> True, and with the renaming the complexity shouldn't be that bad.
+> 
+>>>
+>>> Also, what do other architectures do here?
+>>
+>> x86 does a similar thing in it's kvm_arch_vcpu_put().
+>>
+> 
+> ok.
+> 
+>>>
+>>>>  	VFPFMXR FPEXC, r2
+>>>> -#else
+>>>> -after_vfp_restore:
+>>>> +skip_restore_host_fpexc:
+>>>>  #endif
+>>>>  
+>>>>  	@ Reset Hyp-role
+>>>> @@ -485,6 +511,10 @@ switch_to_guest_vfp:
+>>>>  	@ NEON/VFP used.  Turn on VFP access.
+>>>>  	set_hcptr vmtrap, (HCPTR_TCP(10) | HCPTR_TCP(11))
+>>>>  
+>>>> +	@ set lazy mode flag, switch hardware context on vcpu_put
+>>>> +	mov     r1, #1
+>>>> +	str     r1, [vcpu, #VCPU_VFP_LAZY]
+>>>> +
+>>>>  	@ Switch VFP/NEON hardware state to the guest's
+>>>>  	add	r7, r0, #VCPU_VFP_HOST
+>>>>  	ldr	r7, [r7]
+>>>> diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
+>>>> index 702740d..4561171 100644
+>>>> --- a/arch/arm/kvm/interrupts_head.S
+>>>> +++ b/arch/arm/kvm/interrupts_head.S
+>>>> @@ -594,7 +594,7 @@ ARM_BE8(rev	r6, r6  )
+>>>>   * If a label is specified with vmexit, it is branched to if VFP wasn't
+>>>>   * enabled.
+>>>>   */
+>>>> -.macro set_hcptr operation, mask, label = none
+>>>> +.macro set_hcptr operation, mask
+>>>>  	mrc	p15, 4, r2, c1, c1, 2
+>>>>  	ldr	r3, =\mask
+>>>>  	.if \operation == vmentry
+>>>> @@ -609,13 +609,17 @@ ARM_BE8(rev	r6, r6  )
+>>>>  	beq	1f
+>>>>  	.endif
+>>>>  	isb
+>>>> -	.if \label != none
+>>>> -	b	\label
+>>>> -	.endif
+>>>>  1:
+>>>>  	.endif
+>>>>  .endm
+>>>>  
+>>>> +/* Checks if VFP/SIMD lazy flag is set, if it is branch to label. */
+>>>
+>>> I don't easily understand the semantics of the lazy flag.  When set,
+>>> does it mean we've switched the hardware to the guest state?
+>>>
+> 
+> The conclusion here is probably that the lazy flag should instead be
+> called the dirty flag or something where a value of true has some more
+> intuitive meaning.
+> 
+> Thanks,
+> -Christoffer
 
-From: Arnd Bergmann <arnd@arndb.de>
+So to summarize arm patches will be reworked to include your latest comments.
+arm64 will directly call the host el1 function in vcpu_put. And a retest of both.
 
-The vgic code on ARM is built for all configurations that enable KVM,
-but the parent_data field that it references is only present when
-CONFIG_IRQ_DOMAIN_HIERARCHY is set:
+Any cutoff dates in mind?
 
-virt/kvm/arm/vgic.c: In function 'kvm_vgic_map_phys_irq':
-virt/kvm/arm/vgic.c:1781:13: error: 'struct irq_data' has no member named '=
-parent_data'
-
-This flag is implied by the GIC driver, and indeed the VGIC code only
-makes sense if a GIC is present. This changes the CONFIG_KVM symbol
-to always select GIC, which avoids the issue.
-
-Fixes: 662d9715840 ("arm/arm64: KVM: Kill CONFIG_KVM_ARM_{VGIC,TIMER}")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- arch/arm/kvm/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
-index 210ecca..356970f 100644
---- a/arch/arm/kvm/Kconfig
-+++ b/arch/arm/kvm/Kconfig
-@@ -21,6 +21,7 @@ config KVM
- =09depends on MMU && OF
- =09select PREEMPT_NOTIFIERS
- =09select ANON_INODES
-+=09select ARM_GIC
- =09select HAVE_KVM_CPU_RELAX_INTERCEPT
- =09select HAVE_KVM_ARCH_TLB_FLUSH_ALL
- =09select KVM_MMIO
---=20
-2.1.2.330.g565301e.dirty
+Thanks.
 
 
-------=_Part_55851502_745639444.1445370665965
-Content-Type: text/html; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-
-<html><body><div>Should this be &quot;select&quot; or &quot;depends on&quot=
-;? Not a blocker, can always be fixed in 4.4.
-<br>
-<br>Paolo
-<br>
-<br>
-<br>-----Original Message-----
-<br>From: Christoffer Dall [christoffer.dall@linaro.org]
-<br>Received: marted=C3=AC, 20 ott 2015, 18:18
-<br>To: Paolo Bonzini [pbonzini@redhat.com]; kvmarm@lists.cs.columbia.edu, =
-kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-<br>CC: Marc Zyngier [marc.zyngier@arm.com]; Arnd Bergmann [arnd@arndb.de];=
- Christoffer Dall [christoffer.dall@linaro.org]
-<br>Subject: [GIT PULL 3/6] KVM: arm: use GIC support unconditionally
-<br>
-<br></div><br><div>From: Arnd Bergmann &lt;arnd@arndb.de&gt;
-<br>
-<br>The vgic code on ARM is built for all configurations that enable KVM,
-<br>but the parent_data field that it references is only present when
-<br>CONFIG_IRQ_DOMAIN_HIERARCHY is set:
-<br>
-<br>virt/kvm/arm/vgic.c: In function 'kvm_vgic_map_phys_irq':
-<br>virt/kvm/arm/vgic.c:1781:13: error: 'struct irq_data' has no member nam=
-ed 'parent_data'
-<br>
-<br>This flag is implied by the GIC driver, and indeed the VGIC code only
-<br>makes sense if a GIC is present. This changes the CONFIG_KVM symbol
-<br>to always select GIC, which avoids the issue.
-<br>
-<br>Fixes: 662d9715840 (&quot;arm/arm64: KVM: Kill CONFIG_KVM_ARM_{VGIC,TIM=
-ER}&quot;)
-<br>Signed-off-by: Arnd Bergmann &lt;arnd@arndb.de&gt;
-<br>Acked-by: Marc Zyngier &lt;marc.zyngier@arm.com&gt;
-<br>Signed-off-by: Christoffer Dall &lt;christoffer.dall@linaro.org&gt;
-<br>---
-<br> arch/arm/kvm/Kconfig | 1 +
-<br> 1 file changed, 1 insertion(+)
-<br>
-<br>diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
-<br>index 210ecca..356970f 100644
-<br>--- a/arch/arm/kvm/Kconfig
-<br>+++ b/arch/arm/kvm/Kconfig
-<br>@@ -21,6 +21,7 @@ config KVM
-<br> &nbsp; &nbsp; &nbsp;depends on MMU &amp;&amp; OF
-<br> &nbsp; &nbsp; &nbsp;select PREEMPT_NOTIFIERS
-<br> &nbsp; &nbsp; &nbsp;select ANON_INODES
-<br>+&nbsp; &nbsp; &nbsp;select ARM_GIC
-<br> &nbsp; &nbsp; &nbsp;select HAVE_KVM_CPU_RELAX_INTERCEPT
-<br> &nbsp; &nbsp; &nbsp;select HAVE_KVM_ARCH_TLB_FLUSH_ALL
-<br> &nbsp; &nbsp; &nbsp;select KVM_MMIO
-<br>--=20
-<br>2.1.2.330.g565301e.dirty
-<br>
-<br></div></body></html>
-------=_Part_55851502_745639444.1445370665965--
-
---===============6800880745601069482==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-
-_______________________________________________
-kvmarm mailing list
-kvmarm@lists.cs.columbia.edu
-https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
---===============6800880745601069482==--
+> 
+>>>> +.macro vfp_inlazy_mode, reg, label
+>>>> +	ldr	\reg, [vcpu, #VCPU_VFP_LAZY]
+>>>> +	cmp	\reg, #1
+>>>> +	beq	\label
+>>>> +.endm
+>>>> +
+>>>>  /* Configures the HDCR (Hyp Debug Configuration Register) on entry/return
+>>>>   * (hardware reset value is 0) */
+>>>>  .macro set_hdcr operation
+>>>> -- 
+>>>> 1.9.1
+>>>>
