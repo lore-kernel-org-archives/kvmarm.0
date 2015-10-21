@@ -1,39 +1,74 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [GIT PULL 3/6] KVM: arm: use GIC support unconditionally
-Date: Wed, 21 Oct 2015 17:50:02 +0300
-Message-ID: <01c601d10c0f$c4e17e10$4ea47a30$@samsung.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [GIT PULL 0/6] A handful of fixes for KVM/ARM for v4.3-rc7
+Date: Wed, 21 Oct 2015 17:47:35 +0200
+Message-ID: <5627B397.9060001@redhat.com>
 References: <1445357947-6022-1-git-send-email-christoffer.dall@linaro.org>
- <1445357947-6022-4-git-send-email-christoffer.dall@linaro.org>
- <672714208.55851501.1445370665940.JavaMail.zimbra@zmail13.collab.prod.int.phx2.redhat.com>
- <9140096.cYCnE2rDUr@wuerfel>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <9140096.cYCnE2rDUr@wuerfel>
-Content-language: ru
+In-Reply-To: <1445357947-6022-1-git-send-email-christoffer.dall@linaro.org>
 Sender: kvm-owner@vger.kernel.org
-To: 'Arnd Bergmann' <arnd@arndb.de>, 'Paolo Bonzini' <pbonzini@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, christoffer.dall@linaro.org, marc.zyngier@arm.com
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello!
 
-> The only platform I can think of that uses ARMv7ve without actually having
-> a GIC is BCM2836 (Raspberry Pi 2). Can we actually run KVM on a platform
-> like that?
 
- We can, with two limitations:
-1. GIC has to be emulated in software. I have recently fixed support for this. The only problem here would be that KVM currently
-refuses to initialize if there's no vGIC, but it is easy to fix, i posted patches for this too.
-2. We cannot emulate CP15 timer, because accessing virtual timer registers cannot be trapped to HYP. However, it is possible to trap
-physical timer access, but a small KVM API extension is needed for this.
+On 20/10/2015 18:19, Christoffer Dall wrote:
+> Hi Paolo,
+> 
+> The following changes since commit 920552b213e3dc832a874b4e7ba29ecddbab31bc:
+> 
+>   KVM: disable halt_poll_ns as default for s390x (2015-09-25 10:31:30 +0200)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-v4.3-rc7
+> 
+> for you to fetch changes up to 0d997491f814c87310a6ad7be30a9049c7150489:
+> 
+>   arm/arm64: KVM: Fix disabled distributor operation (2015-10-20 18:09:13 +0200)
+> 
+> Sorry for sending these relatively late, but we had a situation where we
+> found one breakage in the timer implementation changes merged for 4.3,
+> then fixing that issue revealed another bug, and then that happened
+> again, and now we have something that looks stable.
+> 
+> Description of the fixes is in the tag and quoted below.
+> 
+> Thanks,
+> -Christoffer
+> 
+> ----------------------------------------------------------------
+> A late round of KVM/ARM fixes for v4.3-rc7, fixing:
+>  - A bug where level-triggered interrupts lowered from userspace
+>    are still routed to the guest
+>  - A memory leak an a failed initialization path
+>  - A build error under certain configurations
+>  - Several timer bugs introduced with moving the timer to the active
+>    state handling instead of the masking trick.
+> 
+> ----------------------------------------------------------------
+> Arnd Bergmann (1):
+>       KVM: arm: use GIC support unconditionally
+> 
+> Christoffer Dall (3):
+>       arm/arm64: KVM: Fix arch timer behavior for disabled interrupts
+>       arm/arm64: KVM: Clear map->active on pend/active clear
+>       arm/arm64: KVM: Fix disabled distributor operation
+> 
+> Pavel Fedin (2):
+>       KVM: arm/arm64: Do not inject spurious interrupts
+>       KVM: arm/arm64: Fix memory leak if timer initialization fails
+> 
+>  arch/arm/kvm/Kconfig      |  1 +
+>  arch/arm/kvm/arm.c        |  2 +-
+>  virt/kvm/arm/arch_timer.c | 19 ++++++++++
+>  virt/kvm/arm/vgic.c       | 95 +++++++++++++++++++++++++++--------------------
+>  4 files changed, 76 insertions(+), 41 deletions(-)
+> 
 
- Currently it is possible to run qemu vexpress model in this mode, because it has another, memory-mapped timer. It is only necessary
-to either remove CP15 timer from guest device tree, or disable support in guest .config.
+Pulled, thanks.  I'll send the fixes to Linus tomorrow.
 
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
-
+Paolo
