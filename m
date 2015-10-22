@@ -1,26 +1,26 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v2 1/6] vfio: platform: add capability to register a reset
- function
-Date: Thu, 22 Oct 2015 11:41:57 +0200
-Message-ID: <1445506922-6005-2-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v2 3/6] vfio: platform: reset: calxedaxgmac: add reset
+ function registration
+Date: Thu, 22 Oct 2015 11:41:59 +0200
+Message-ID: <1445506922-6005-4-git-send-email-eric.auger@linaro.org>
 References: <1445506922-6005-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F275241300
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Oct 2015 05:39:35 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 54092412D6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Oct 2015 05:39:38 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nmDJXVpUe3lj for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Oct 2015 05:39:33 -0400 (EDT)
-Received: from mail-wi0-f177.google.com (mail-wi0-f177.google.com
- [209.85.212.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B541F412D6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Oct 2015 05:39:33 -0400 (EDT)
-Received: by wijp11 with SMTP id p11so23067820wij.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Oct 2015 02:42:10 -0700 (PDT)
+ with ESMTP id fiRr3yvZM2VA for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Oct 2015 05:39:37 -0400 (EDT)
+Received: from mail-wi0-f172.google.com (mail-wi0-f172.google.com
+ [209.85.212.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A05FC4130B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Oct 2015 05:39:36 -0400 (EDT)
+Received: by wicll6 with SMTP id ll6so126980692wic.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Oct 2015 02:42:13 -0700 (PDT)
 In-Reply-To: <1445506922-6005-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,134 +35,58 @@ To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, b.reyn
 Cc: linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In preparation for subsequent changes in reset function lookup,
-lets introduce a dynamic list of reset combos (compat string,
-reset module, reset function). The list can be populated/voided with
-two new functions, vfio_platform_register/unregister_reset. Those are
-not yet used in this patch.
+This patch adds the reset function registration/unregistration.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
 ---
 
 v1 -> v2:
-- reset_list becomes static
-- vfio_platform_register/unregister_reset take a const char * as compat
-- fix node leak
-- add reset_lock to protect the reset list manipulation
-- move vfio_platform_reset_node declaration in vfio_platform_common.c
+- uses the module_vfio_reset_handler macro
+- add pr_info on vfio reset
+- do not export vfio_platform_calxedaxgmac_reset symbol anymore
 ---
- drivers/vfio/platform/vfio_platform_common.c  | 77 +++++++++++++++++++++++++++
- drivers/vfio/platform/vfio_platform_private.h |  7 +++
- 2 files changed, 84 insertions(+)
+ drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-index e43efb5..52a4c7b 100644
---- a/drivers/vfio/platform/vfio_platform_common.c
-+++ b/drivers/vfio/platform/vfio_platform_common.c
-@@ -23,6 +23,15 @@
+diff --git a/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
+index 619dc7d..8b2cccc 100644
+--- a/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
++++ b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
+@@ -25,13 +25,12 @@
+ #include <linux/io.h>
  
  #include "vfio_platform_private.h"
++#include "vfio_platform_reset_private.h"
  
-+struct vfio_platform_reset_node {
-+	struct list_head link;
-+	char *compat;
-+	struct module *owner;
-+	vfio_platform_reset_fn_t reset;
-+};
+ #define DRIVER_VERSION  "0.1"
+ #define DRIVER_AUTHOR   "Eric Auger <eric.auger@linaro.org>"
+ #define DRIVER_DESC     "Reset support for Calxeda xgmac vfio platform device"
+ 
+-#define CALXEDAXGMAC_COMPAT "calxeda,hb-xgmac"
+-
+ /* XGMAC Register definitions */
+ #define XGMAC_CONTROL           0x00000000      /* MAC Configuration */
+ 
+@@ -70,6 +69,8 @@ int vfio_platform_calxedaxgmac_reset(struct vfio_platform_device *vdev)
+ 			return -ENOMEM;
+ 	}
+ 
++	pr_info("VFIO reset of %s\n", vdev->name);
 +
-+static LIST_HEAD(reset_list);
-+static DEFINE_MUTEX(reset_lock);
- static DEFINE_MUTEX(driver_lock);
+ 	/* disable IRQ */
+ 	writel(0, reg.ioaddr + XGMAC_DMA_INTR_ENA);
  
- static const struct vfio_platform_reset_combo reset_lookup_table[] = {
-@@ -573,3 +582,71 @@ struct vfio_platform_device *vfio_platform_remove_common(struct device *dev)
- 	return vdev;
+@@ -78,7 +79,9 @@ int vfio_platform_calxedaxgmac_reset(struct vfio_platform_device *vdev)
+ 
+ 	return 0;
  }
- EXPORT_SYMBOL_GPL(vfio_platform_remove_common);
+-EXPORT_SYMBOL_GPL(vfio_platform_calxedaxgmac_reset);
 +
-+int vfio_platform_register_reset(struct module *reset_owner,
-+				 const char *compat,
-+				 vfio_platform_reset_fn_t reset)
-+{
-+	struct vfio_platform_reset_node *node, *iter;
-+	bool found = false;
-+
-+	mutex_lock(&reset_lock);
-+	list_for_each_entry(iter, &reset_list, link) {
-+		if (!strcmp(iter->compat, compat)) {
-+			found = true;
-+			break;
-+		}
-+	}
-+	if (found) {
-+		mutex_unlock(&reset_lock);
-+		return -EINVAL;
-+	}
-+
-+	node = kmalloc(sizeof(*node), GFP_KERNEL);
-+	if (!node) {
-+		mutex_unlock(&reset_lock);
-+		return -ENOMEM;
-+	}
-+
-+	node->compat = kstrdup(compat, GFP_KERNEL);
-+	if (!node->compat) {
-+		kfree(node);
-+		mutex_unlock(&reset_lock);
-+		return -ENOMEM;
-+	}
-+
-+	node->owner = reset_owner;
-+	node->reset = reset;
-+
-+	list_add(&node->link, &reset_list);
-+	mutex_unlock(&reset_lock);
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(vfio_platform_register_reset);
-+
-+int vfio_platform_unregister_reset(const char *compat)
-+{
-+	struct vfio_platform_reset_node *iter;
-+	bool found = false;
-+
-+	mutex_lock(&reset_lock);
-+	list_for_each_entry(iter, &reset_list, link) {
-+		if (!strcmp(iter->compat, compat)) {
-+			found = true;
-+			break;
-+		}
-+	}
-+	if (!found) {
-+		mutex_unlock(&reset_lock);
-+		return -EINVAL;
-+	}
-+
-+	list_del(&iter->link);
-+	kfree(iter->compat);
-+	kfree(iter);
-+	mutex_unlock(&reset_lock);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(vfio_platform_unregister_reset);
-+
-diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
-index 1c9b3d5..1fb1410 100644
---- a/drivers/vfio/platform/vfio_platform_private.h
-+++ b/drivers/vfio/platform/vfio_platform_private.h
-@@ -89,4 +89,11 @@ extern int vfio_platform_set_irqs_ioctl(struct vfio_platform_device *vdev,
- 					unsigned start, unsigned count,
- 					void *data);
++module_vfio_reset_handler("calxeda,hb-xgmac",
++			  vfio_platform_calxedaxgmac_reset);
  
-+typedef int (*vfio_platform_reset_fn_t)(struct vfio_platform_device *vdev);
-+
-+extern int vfio_platform_register_reset(struct module *owner,
-+					const char *compat,
-+					vfio_platform_reset_fn_t reset);
-+extern int vfio_platform_unregister_reset(const char *compat);
-+
- #endif /* VFIO_PLATFORM_PRIVATE_H */
+ MODULE_VERSION(DRIVER_VERSION);
+ MODULE_LICENSE("GPL v2");
 -- 
 1.9.1
