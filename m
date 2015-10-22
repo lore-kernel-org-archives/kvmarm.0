@@ -1,79 +1,207 @@
-From: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v2 6/6] vfio: platform: move get/put reset at open/release
-Date: Thu, 22 Oct 2015 09:40:44 -0600
-Message-ID: <1445528444.5050.8.camel@redhat.com>
-References: <1445506922-6005-1-git-send-email-eric.auger@linaro.org>
- <4304536.D7eNHjlsvD@wuerfel> <5628E41F.5050602@linaro.org>
- <9413126.UTMuRq7fA0@wuerfel> <5628F17C.9030907@linaro.org>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH v3 08/16] KVM: arm64: handle ITS related GICv3
+ redistributor registers
+Date: Thu, 22 Oct 2015 18:46:18 +0300
+Message-ID: <015d01d10ce0$cb7009a0$62501ce0$@samsung.com>
+References: <1444229726-31559-1-git-send-email-andre.przywara@arm.com>
+ <1444229726-31559-9-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EF512410D7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Oct 2015 11:38:10 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xE8Pag7WFzt5 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Oct 2015 11:38:09 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7EE5F40FF5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Oct 2015 11:38:08 -0400 (EDT)
-In-Reply-To: <5628F17C.9030907@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, kvm@vger.kernel.org, patches@linaro.org, linux-kernel@vger.kernel.org, eric.auger@st.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <1444229726-31559-9-git-send-email-andre.przywara@arm.com>
+Content-language: ru
+Sender: kvm-owner@vger.kernel.org
+To: 'Andre Przywara' <andre.przywara@arm.com>, marc.zyngier@arm.com, christoffer.dall@linaro.org
+Cc: eric.auger@linaro.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, 2015-10-22 at 16:23 +0200, Eric Auger wrote:
-> On 10/22/2015 04:10 PM, Arnd Bergmann wrote:
-> > On Thursday 22 October 2015 15:26:55 Eric Auger wrote:
-> >>>> @@ -181,6 +182,8 @@ static int vfio_platform_open(void *device_data)
-> >>>>                 if (ret)
-> >>>>                         goto err_irq;
-> >>>>  
-> >>>> +               vfio_platform_get_reset(vdev);
-> >>>> +
-> >>>>                 if (vdev->reset)
-> >>>>                         vdev->reset(vdev);
-> >>>>
-> >>>
-> >>> This needs some error handling to ensure that the open() fails
-> >>> if there is no reset handler.
-> >>
-> >> Is that really what we want? The code was meant to allow the use case
-> >> where the VFIO platform driver would be used without such reset module.
-> >>
-> >> I think the imperious need for a reset module depends on the device and
-> >> more importantly depends on the IOMMU mapping. With QEMU VFIO
-> >> integration this is needed because the whole VM memory is IOMMU mapped
-> >> but in a simpler user-space driver context, we might live without.
-> >>
-> >> Any thought?
-> > 
-> > I would think we need a reset driver for any device that can start DMA,
-> > otherwise things can go wrong as soon as you attach it to a different domain
-> > while there is ongoing DMA.
-> > 
-> > Maybe we could just allow devices to be attached without a reset handler,
-> > but then disallow DMA on them?
-> 
-> Well I am tempted to think that most assigned devices will perform DMA
-> accesses so to me this somehow comes to the same result, ie disallowing
-> functional passthrough for devices not properly/fully integrated.
-> 
-> Alex/Baptiste, any opinion on this?
+ Hello!
 
-We have an IOMMU and the user doesn't get access to the device until the
-IOMMU domain is established.  So, ideally yes, we should have a way to
-reset the device, but I don't see it as a requirement.  Thanks,
+ During my work on live migration i found a big bug in your implementation.
 
-Alex
+> -----Original Message-----
+> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Behalf Of Andre Przywara
+> Sent: Wednesday, October 07, 2015 5:55 PM
+> To: marc.zyngier@arm.com; christoffer.dall@linaro.org
+> Cc: eric.auger@linaro.org; p.fedin@samsung.com; kvmarm@lists.cs.columbia.edu; linux-arm-
+> kernel@lists.infradead.org; kvm@vger.kernel.org
+> Subject: [PATCH v3 08/16] KVM: arm64: handle ITS related GICv3 redistributor registers
+> 
+> In the GICv3 redistributor there are the PENDBASER and PROPBASER
+> registers which we did not emulate so far, as they only make sense
+> when having an ITS. In preparation for that emulate those MMIO
+> accesses by storing the 64-bit data written into it into a variable
+> which we later read in the ITS emulation.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+> Changelog v2..v3:
+> - rename vgic_handle_base_register to vgic_reg64_access()
+> 
+>  include/kvm/arm_vgic.h      |  8 ++++++++
+>  virt/kvm/arm/vgic-v3-emul.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic.c         | 31 +++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic.h         |  2 ++
+>  4 files changed, 85 insertions(+)
+> 
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 067ad09..06c33bc 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -272,6 +272,14 @@ struct vgic_dist {
+>  	/* Virtual irq to hwirq mapping */
+>  	spinlock_t		irq_phys_map_lock;
+>  	struct list_head	irq_phys_map_list;
+> +
+> +	/* Address of LPI configuration table shared by all redistributors */
+> +	u64			propbaser;
+> +
+> +	/* Addresses of LPI pending tables per redistributor */
+> +	u64			*pendbaser;
+> +
+> +	bool			lpis_enabled;
+>  };
+> 
+>  struct vgic_v2_cpu_if {
+> diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+> index a8cf669..6939f7c 100644
+> --- a/virt/kvm/arm/vgic-v3-emul.c
+> +++ b/virt/kvm/arm/vgic-v3-emul.c
+> @@ -651,6 +651,38 @@ static bool handle_mmio_cfg_reg_redist(struct kvm_vcpu *vcpu,
+>  	return vgic_handle_cfg_reg(reg, mmio, offset);
+>  }
+> 
+> +/* We don't trigger any actions here, just store the register value */
+> +static bool handle_mmio_propbaser_redist(struct kvm_vcpu *vcpu,
+> +					 struct kvm_exit_mmio *mmio,
+> +					 phys_addr_t offset)
+> +{
+> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +	int mode = ACCESS_READ_VALUE;
+> +
+> +	/* Storing a value with LPIs already enabled is undefined */
+> +	mode |= dist->lpis_enabled ? ACCESS_WRITE_IGNORED : ACCESS_WRITE_VALUE;
+> +	vgic_reg64_access(mmio, offset, &dist->propbaser, mode);
+> +
+> +	return false;
+> +}
+> +
+> +/* We don't trigger any actions here, just store the register value */
+> +static bool handle_mmio_pendbaser_redist(struct kvm_vcpu *vcpu,
+> +					 struct kvm_exit_mmio *mmio,
+> +					 phys_addr_t offset)
+> +{
+> +	struct kvm_vcpu *rdvcpu = mmio->private;
+> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +	int mode = ACCESS_READ_VALUE;
+> +
+> +	/* Storing a value with LPIs already enabled is undefined */
+> +	mode |= dist->lpis_enabled ? ACCESS_WRITE_IGNORED : ACCESS_WRITE_VALUE;
+
+ Here you store lpis_enabled globally, and this is plain wrong.
+
+ Linux kernel separately programs PENDBASER and enables LPIs on every CPU. Therefore, after CPU #0 is initialized (this happens much
+earlier than everything else), dist->lpis_enabled is set to true, and subsequent PROPBASER writes, even for different
+redistributors, will be ignored. As a result, you'll get dist->pendbaser[n] == NULL forever, where n > 0. And your
+its_sync_lpi_pending_table() actually reads some garbage from physical address 0 of the guest.
+
+ Attempts to write data to that region silently corrupts random qemu data during migration, that's how i discovered it.
+
+> +	vgic_reg64_access(mmio, offset,
+> +			  &dist->pendbaser[rdvcpu->vcpu_id], mode);
+> +
+> +	return false;
+> +}
+> +
+>  #define SGI_base(x) ((x) + SZ_64K)
+> 
+>  static const struct vgic_io_range vgic_redist_ranges[] = {
+> @@ -679,6 +711,18 @@ static const struct vgic_io_range vgic_redist_ranges[] = {
+>  		.handle_mmio    = handle_mmio_raz_wi,
+>  	},
+>  	{
+> +		.base		= GICR_PENDBASER,
+> +		.len		= 0x08,
+> +		.bits_per_irq	= 0,
+> +		.handle_mmio	= handle_mmio_pendbaser_redist,
+> +	},
+> +	{
+> +		.base		= GICR_PROPBASER,
+> +		.len		= 0x08,
+> +		.bits_per_irq	= 0,
+> +		.handle_mmio	= handle_mmio_propbaser_redist,
+> +	},
+> +	{
+>  		.base           = GICR_IDREGS,
+>  		.len            = 0x30,
+>  		.bits_per_irq   = 0,
+> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+> index 4219f22..11bf692 100644
+> --- a/virt/kvm/arm/vgic.c
+> +++ b/virt/kvm/arm/vgic.c
+> @@ -471,6 +471,37 @@ void vgic_reg_access(struct kvm_exit_mmio *mmio, u32 *reg,
+>  	}
+>  }
+> 
+> +/* handle a 64-bit register access */
+> +void vgic_reg64_access(struct kvm_exit_mmio *mmio, phys_addr_t offset,
+> +		       u64 *basereg, int mode)
+> +{
+> +	u32 reg;
+> +	u64 breg;
+> +
+> +	switch (offset & ~3) {
+> +	case 0x00:
+> +		breg = *basereg;
+> +		reg = lower_32_bits(breg);
+> +		vgic_reg_access(mmio, &reg, offset & 3, mode);
+> +		if (mmio->is_write && (mode & ACCESS_WRITE_VALUE)) {
+> +			breg &= GENMASK_ULL(63, 32);
+> +			breg |= reg;
+> +			*basereg = breg;
+> +		}
+> +		break;
+> +	case 0x04:
+> +		breg = *basereg;
+> +		reg = upper_32_bits(breg);
+> +		vgic_reg_access(mmio, &reg, offset & 3, mode);
+> +		if (mmio->is_write && (mode & ACCESS_WRITE_VALUE)) {
+> +			breg  = lower_32_bits(breg);
+> +			breg |= (u64)reg << 32;
+> +			*basereg = breg;
+> +		}
+> +		break;
+> +	}
+> +}
+> +
+>  bool handle_mmio_raz_wi(struct kvm_vcpu *vcpu, struct kvm_exit_mmio *mmio,
+>  			phys_addr_t offset)
+>  {
+> diff --git a/virt/kvm/arm/vgic.h b/virt/kvm/arm/vgic.h
+> index a093f5c..104f780 100644
+> --- a/virt/kvm/arm/vgic.h
+> +++ b/virt/kvm/arm/vgic.h
+> @@ -71,6 +71,8 @@ void vgic_reg_access(struct kvm_exit_mmio *mmio, u32 *reg,
+>  		     phys_addr_t offset, int mode);
+>  bool handle_mmio_raz_wi(struct kvm_vcpu *vcpu, struct kvm_exit_mmio *mmio,
+>  			phys_addr_t offset);
+> +void vgic_reg64_access(struct kvm_exit_mmio *mmio, phys_addr_t offset,
+> +		       u64 *basereg, int mode);
+> 
+>  static inline
+>  u32 mmio_data_read(struct kvm_exit_mmio *mmio, u32 mask)
+> --
+> 2.5.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe kvm" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
+
+
