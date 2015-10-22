@@ -1,116 +1,56 @@
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v2 1/6] vfio: platform: add capability to register a reset function
-Date: Thu, 22 Oct 2015 12:06:02 +0200
-Message-ID: <4039449.LR9NiiaAaC@wuerfel>
-References: <1445506922-6005-1-git-send-email-eric.auger@linaro.org> <1445506922-6005-2-git-send-email-eric.auger@linaro.org>
+Subject: Re: [PATCH v2 2/6] vfio: platform: reset: add
+ vfio_platform_reset_private.h
+Date: Thu, 22 Oct 2015 12:12:23 +0200
+Message-ID: <4144159.DC8Yilf9Tr@wuerfel>
+References: <1445506922-6005-1-git-send-email-eric.auger@linaro.org>
+ <1445506922-6005-3-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1445506922-6005-2-git-send-email-eric.auger@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A914411BE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Oct 2015 06:09:57 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id wN1HJqkD5rrA for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Oct 2015 06:09:55 -0400 (EDT)
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.187])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C364F41049
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Oct 2015 06:09:55 -0400 (EDT)
+In-Reply-To: <1445506922-6005-3-git-send-email-eric.auger@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Eric Auger <eric.auger@linaro.org>
-Cc: eric.auger@st.com, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, linux-kernel@vger.kernel.org, patches@linaro.org
+Cc: kvm@vger.kernel.org, patches@linaro.org, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, eric.auger@st.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thursday 22 October 2015 11:41:57 Eric Auger wrote:
-> In preparation for subsequent changes in reset function lookup,
-> lets introduce a dynamic list of reset combos (compat string,
-> reset module, reset function). The list can be populated/voided with
-> two new functions, vfio_platform_register/unregister_reset. Those are
-> not yet used in this patch.
+On Thursday 22 October 2015 11:41:58 Eric Auger wrote:
+> v2: creation
+> - this defines the module_vfio_reset_handler macro as suggested by Arnd
 > 
-> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+> Although Arnd suggested me to remove the vfio_platform_register_reset
+> symbol_get (since the module manager can handle the case where the
+> vfio-platform driver is not loaded), I prefered to keep it while
+> introducing the macro. The rationale is, when using symbol_get/put
+> we are able to release the hold from the reset module on vfio-platform
+> as soon as the registration is complete and I think this makes sense.
 
-Looks correct to me now, just a little style comments.
-
->  drivers/vfio/platform/vfio_platform_common.c  | 77 +++++++++++++++++++++++++++
->  drivers/vfio/platform/vfio_platform_private.h |  7 +++
->  2 files changed, 84 insertions(+)
-> 
-> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-> index e43efb5..52a4c7b 100644
-> --- a/drivers/vfio/platform/vfio_platform_common.c
-> +++ b/drivers/vfio/platform/vfio_platform_common.c
-> @@ -23,6 +23,15 @@
->  
->  #include "vfio_platform_private.h"
->  
-> +struct vfio_platform_reset_node {
-> +	struct list_head link;
-> +	char *compat;
-> +	struct module *owner;
-> +	vfio_platform_reset_fn_t reset;
-> +};
-> +
-> +static LIST_HEAD(reset_list);
-> +static DEFINE_MUTEX(reset_lock);
->  static DEFINE_MUTEX(driver_lock);
-
-I wonder if having a single mutex here would be enough. If you don't expect
-drivers to register/unregister a lot, you could just use driver_lock here
-as well.
-
->  static const struct vfio_platform_reset_combo reset_lookup_table[] = {
-> @@ -573,3 +582,71 @@ struct vfio_platform_device *vfio_platform_remove_common(struct device *dev)
->  	return vdev;
->  }
->  EXPORT_SYMBOL_GPL(vfio_platform_remove_common);
-> +
-> +int vfio_platform_register_reset(struct module *reset_owner,
-> +				 const char *compat,
-> +				 vfio_platform_reset_fn_t reset)
-> +{
-> +	struct vfio_platform_reset_node *node, *iter;
-> +	bool found = false;
-> +
-> +	mutex_lock(&reset_lock);
-> +	list_for_each_entry(iter, &reset_list, link) {
-> +		if (!strcmp(iter->compat, compat)) {
-> +			found = true;
-> +			break;
-> +		}
-> +	}
-> +	if (found) {
-> +		mutex_unlock(&reset_lock);
-> +		return -EINVAL;
-> +	}
-
-This seems to be an unnecesssary safeguard. I would not bother
-with the search, or otherwise do a WARN_ON here.
-
-> +	node = kmalloc(sizeof(*node), GFP_KERNEL);
-> +	if (!node) {
-> +		mutex_unlock(&reset_lock);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	node->compat = kstrdup(compat, GFP_KERNEL);
-> +	if (!node->compat) {
-> +		kfree(node);
-> +		mutex_unlock(&reset_lock);
-> +		return -ENOMEM;
-> +	}
-
-If you hold a lock, it's better to use a goto for handling errors
-and put the unlock and kfree there. I think it can be avoided
-entirely here though:
-
-It should be safe to define the interface as keeping a reference
-on the string and not do a kstrdup here. I would expect users to
-pass a string literal.
-
-We could even go as far as defining the entire interface as a shim,
-like
-
-#define vfio_platform_register_reset(__compat, __reset)	\
-static struct vfio_platform_reset_node __reset ## _node = {	\
-	.owner = THIS_MODULE,					\
-	.compat = __compat,					\
-	.reset = __reset,					\
-};								\
-__vfio_platform_register_reset(&__reset ## node);
-
-to make the function really simple.
+This makes it highly unusual. I can't think of a good reason to allow
+unloading the vfio platform module while a reset module is registered,
+that just causes a memory leak (or possibly a crash) when you do
+unload the core module while it's used by a reset driver, it
+prevents the reset module from getting loaded without loading the
+vfio module first (because the autoloading doesn't work), and it
+means we don't catch build errors in invalid configurations where you
+have only the reset driver but not the vfio driver enabled.
 
 	Arnd
