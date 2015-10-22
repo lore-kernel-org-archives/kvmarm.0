@@ -1,25 +1,24 @@
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v2 5/6] vfio: platform: use list of registered reset
- function
-Date: Thu, 22 Oct 2015 12:19:33 +0200
-Message-ID: <20554656.kA5nRBgtaJ@wuerfel>
+Subject: Re: [PATCH v2 6/6] vfio: platform: move get/put reset at open/release
+Date: Thu, 22 Oct 2015 12:29:13 +0200
+Message-ID: <4304536.D7eNHjlsvD@wuerfel>
 References: <1445506922-6005-1-git-send-email-eric.auger@linaro.org>
- <1445506922-6005-6-git-send-email-eric.auger@linaro.org>
+ <1445506922-6005-7-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC5A84126B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Oct 2015 06:17:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B0944126B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Oct 2015 06:26:47 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ghcfRea2rH1a for <kvmarm@lists.cs.columbia.edu>;
- Thu, 22 Oct 2015 06:17:11 -0400 (EDT)
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.131])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8ADFF40FAB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Oct 2015 06:17:11 -0400 (EDT)
-In-Reply-To: <1445506922-6005-6-git-send-email-eric.auger@linaro.org>
+ with ESMTP id j+qiWE+H6djS for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Oct 2015 06:26:45 -0400 (EDT)
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.17.24])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4BBC540FAB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Oct 2015 06:26:44 -0400 (EDT)
+In-Reply-To: <1445506922-6005-7-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,57 +32,35 @@ To: Eric Auger <eric.auger@linaro.org>
 Cc: kvm@vger.kernel.org, patches@linaro.org, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, eric.auger@st.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thursday 22 October 2015 11:42:01 Eric Auger wrote:
-> Remove the static lookup table and use the dynamic list of registered
-> reset functions instead. Also load the reset module through its alias.
-> The reset struct module pointer is stored in vfio_platform_device.
-> 
-> We also remove the useless struct device pointer parameter in
-> vfio_platform_get_reset.
-> 
-> This patch fixes the issue related to the usage of __symbol_get, which
-> besides from being moot, prevented compilation with CONFIG_MODULES
-> disabled.
-> 
-> Also usage of MODULE_ALIAS makes possible to add a new reset module
-> without needing to update the framework. This was suggested by Arnd.
+On Thursday 22 October 2015 11:42:02 Eric Auger wrote:
+> Currently reset lookup is done on probe. This introduces a
+> race with new registration mechanism in the case where the
+> vfio-platform driver is bound to the device before its module
+> is loaded: on the load, the probe happens which triggers the
+> reset module load which itself attempts to get the symbol for
+> the registration function (vfio_platform_register_reset). The
+> symbol is not yet available hence the lookup fails. In case we
+> do the lookup in the first open we are sure the vfio-platform
+> module is loaded and vfio_platform_register_reset is available.
 > 
 > Signed-off-by: Eric Auger <eric.auger@linaro.org>
-> Reported-by: Arnd Bergmann <arnd@arndb.de>
 
-Looks good, just small style issues:
+I don't understand the explanation. I would expect the request_module()
+call to block until the module is actually loaded. Is this not
+what happens?
 
-> 
-> -			}
-> +	mutex_lock(&reset_lock);
-> +	list_for_each_entry(iter, &reset_list, link) {
-> +		if (!strcmp(iter->compat, compat) &&
-> +			try_module_get(iter->owner)) {
-> +			*module = iter->owner;
-> +			mutex_unlock(&reset_lock);
-> +			return iter->reset;
->  		}
->  	}
-> +
-> +	mutex_unlock(&reset_lock);
-> +	return NULL;
-
-Better use 'break' to have a single mutex_unlock and return  statement.
-
-> +
+>         mutex_unlock(&driver_lock);
+> @@ -181,6 +182,8 @@ static int vfio_platform_open(void *device_data)
+>                 if (ret)
+>                         goto err_irq;
 >  
->  static void vfio_platform_put_reset(struct vfio_platform_device *vdev)
->  {
-> -	if (vdev->reset)
-> -		symbol_put_addr(vdev->reset);
-> +	if (vdev->reset) {
-> +		module_put(vdev->reset_module);
-> +		vdev->reset_module = NULL;
-> +		vdev->reset = NULL;
-> +	}
->  }
+> +               vfio_platform_get_reset(vdev);
+> +
+>                 if (vdev->reset)
+>                         vdev->reset(vdev);
+> 
 
-This gets called from the remove callback. No need to clear those
-struct members immediately before the kfree().
+This needs some error handling to ensure that the open() fails
+if there is no reset handler.
 
 	Arnd
