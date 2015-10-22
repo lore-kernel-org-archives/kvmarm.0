@@ -1,34 +1,89 @@
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v2 3/6] vfio: platform: reset: calxedaxgmac: add reset function registration
-Date: Thu, 22 Oct 2015 12:13:30 +0200
-Message-ID: <4810974.apRDTjc3oB@wuerfel>
-References: <1445506922-6005-1-git-send-email-eric.auger@linaro.org> <1445506922-6005-4-git-send-email-eric.auger@linaro.org>
+Subject: Re: [PATCH v2 5/6] vfio: platform: use list of registered reset
+ function
+Date: Thu, 22 Oct 2015 12:19:33 +0200
+Message-ID: <20554656.kA5nRBgtaJ@wuerfel>
+References: <1445506922-6005-1-git-send-email-eric.auger@linaro.org>
+ <1445506922-6005-6-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7Bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1445506922-6005-4-git-send-email-eric.auger@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AC5A84126B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Oct 2015 06:17:17 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ghcfRea2rH1a for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 22 Oct 2015 06:17:11 -0400 (EDT)
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.131])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8ADFF40FAB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 22 Oct 2015 06:17:11 -0400 (EDT)
+In-Reply-To: <1445506922-6005-6-git-send-email-eric.auger@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Eric Auger <eric.auger@linaro.org>
-Cc: eric.auger@st.com, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, christoffer.dall@linaro.org, linux-kernel@vger.kernel.org, patches@linaro.org
+Cc: kvm@vger.kernel.org, patches@linaro.org, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, eric.auger@st.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thursday 22 October 2015 11:41:59 Eric Auger wrote:
-> This patch adds the reset function registration/unregistration.
+On Thursday 22 October 2015 11:42:01 Eric Auger wrote:
+> Remove the static lookup table and use the dynamic list of registered
+> reset functions instead. Also load the reset module through its alias.
+> The reset struct module pointer is stored in vfio_platform_device.
+> 
+> We also remove the useless struct device pointer parameter in
+> vfio_platform_get_reset.
+> 
+> This patch fixes the issue related to the usage of __symbol_get, which
+> besides from being moot, prevented compilation with CONFIG_MODULES
+> disabled.
+> 
+> Also usage of MODULE_ALIAS makes possible to add a new reset module
+> without needing to update the framework. This was suggested by Arnd.
 > 
 > Signed-off-by: Eric Auger <eric.auger@linaro.org>
+> Reported-by: Arnd Bergmann <arnd@arndb.de>
 
-Looks good, except one thing:
-> @@ -70,6 +69,8 @@ int vfio_platform_calxedaxgmac_reset(struct vfio_platform_device *vdev)
->  			return -ENOMEM;
+Looks good, just small style issues:
+
+> 
+> -			}
+> +	mutex_lock(&reset_lock);
+> +	list_for_each_entry(iter, &reset_list, link) {
+> +		if (!strcmp(iter->compat, compat) &&
+> +			try_module_get(iter->owner)) {
+> +			*module = iter->owner;
+> +			mutex_unlock(&reset_lock);
+> +			return iter->reset;
+>  		}
 >  	}
->  
-> +	pr_info("VFIO reset of %s\n", vdev->name);
 > +
->  	/* disable IRQ */
->  	writel(0, reg.ioaddr + XGMAC_DMA_INTR_ENA);
->  
+> +	mutex_unlock(&reset_lock);
+> +	return NULL;
 
-This probably slipped in from debugging, please remove it.
+Better use 'break' to have a single mutex_unlock and return  statement.
+
+> +
+>  
+>  static void vfio_platform_put_reset(struct vfio_platform_device *vdev)
+>  {
+> -	if (vdev->reset)
+> -		symbol_put_addr(vdev->reset);
+> +	if (vdev->reset) {
+> +		module_put(vdev->reset_module);
+> +		vdev->reset_module = NULL;
+> +		vdev->reset = NULL;
+> +	}
+>  }
+
+This gets called from the remove callback. No need to clear those
+struct members immediately before the kfree().
 
 	Arnd
