@@ -1,26 +1,25 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v4 4/7] vfio: platform: reset: calxedaxgmac: add reset
- function registration
-Date: Fri, 23 Oct 2015 17:47:22 +0200
-Message-ID: <1445615245-31124-5-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v4 5/7] vfio: platform: add compat in vfio_platform_device
+Date: Fri, 23 Oct 2015 17:47:23 +0200
+Message-ID: <1445615245-31124-6-git-send-email-eric.auger@linaro.org>
 References: <1445615245-31124-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A80D41291
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F2B45412A6
  for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2015 11:45:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xq15S2YAP+hv for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Oct 2015 11:44:59 -0400 (EDT)
-Received: from mail-wi0-f177.google.com (mail-wi0-f177.google.com
- [209.85.212.177])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 85C0C4142D
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2015 11:44:58 -0400 (EDT)
-Received: by wicfv8 with SMTP id fv8so37831979wic.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2015 08:47:38 -0700 (PDT)
+ with ESMTP id CcsyD6h7lcbE for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Oct 2015 11:45:00 -0400 (EDT)
+Received: from mail-wi0-f172.google.com (mail-wi0-f172.google.com
+ [209.85.212.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F080B41451
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2015 11:44:59 -0400 (EDT)
+Received: by wicll6 with SMTP id ll6so37061041wic.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2015 08:47:40 -0700 (PDT)
 In-Reply-To: <1445615245-31124-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,55 +34,67 @@ To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, b.reyn
 Cc: linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch adds the reset function registration/unregistration.
-This is handled through the module_vfio_reset_handler macro. This
-latter also defines a MODULE_ALIAS which simplifies the load from
-vfio-platform.
+Let's retrieve the compatibility string on probe and store it
+in the vfio_platform_device struct
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
-Reviewed-by: Arnd Bergmann <arnd@arndb.de>
 
 ---
-
-v3 -> v4:
-- I restored the EXPORT_SYMBOL which will be removed when switching the
-  lookup method
-- Add Arnd R-b.
 
 v2 -> v3:
-- do not include vfio_platform_reset_private.h anymore (removed)
-- remove pr_info
-- rework commit message
-
-v1 -> v2:
-- uses the module_vfio_reset_handler macro
-- add pr_info on vfio reset
-- do not export vfio_platform_calxedaxgmac_reset symbol anymore
+- populate compat after vdev check
 ---
- drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/vfio/platform/vfio_platform_common.c  | 15 ++++++++-------
+ drivers/vfio/platform/vfio_platform_private.h |  1 +
+ 2 files changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
-index 619dc7d..80718f2 100644
---- a/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
-+++ b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
-@@ -30,8 +30,6 @@
- #define DRIVER_AUTHOR   "Eric Auger <eric.auger@linaro.org>"
- #define DRIVER_DESC     "Reset support for Calxeda xgmac vfio platform device"
- 
--#define CALXEDAXGMAC_COMPAT "calxeda,hb-xgmac"
+diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
+index 3b7e52c..f2d41a0 100644
+--- a/drivers/vfio/platform/vfio_platform_common.c
++++ b/drivers/vfio/platform/vfio_platform_common.c
+@@ -41,16 +41,11 @@ static const struct vfio_platform_reset_combo reset_lookup_table[] = {
+ static void vfio_platform_get_reset(struct vfio_platform_device *vdev,
+ 				    struct device *dev)
+ {
+-	const char *compat;
+ 	int (*reset)(struct vfio_platform_device *);
+-	int ret, i;
 -
- /* XGMAC Register definitions */
- #define XGMAC_CONTROL           0x00000000      /* MAC Configuration */
+-	ret = device_property_read_string(dev, "compatible", &compat);
+-	if (ret)
+-		return;
++	int i;
  
-@@ -80,6 +78,8 @@ int vfio_platform_calxedaxgmac_reset(struct vfio_platform_device *vdev)
- }
- EXPORT_SYMBOL_GPL(vfio_platform_calxedaxgmac_reset);
+ 	for (i = 0 ; i < ARRAY_SIZE(reset_lookup_table); i++) {
+-		if (!strcmp(reset_lookup_table[i].compat, compat)) {
++		if (!strcmp(reset_lookup_table[i].compat, vdev->compat)) {
+ 			request_module(reset_lookup_table[i].module_name);
+ 			reset = __symbol_get(
+ 				reset_lookup_table[i].reset_function_name);
+@@ -544,6 +539,12 @@ int vfio_platform_probe_common(struct vfio_platform_device *vdev,
+ 	if (!vdev)
+ 		return -EINVAL;
  
-+module_vfio_reset_handler("calxeda,hb-xgmac", vfio_platform_calxedaxgmac_reset);
++	ret = device_property_read_string(dev, "compatible", &vdev->compat);
++	if (ret) {
++		pr_err("VFIO: cannot retrieve compat for %s\n", vdev->name);
++		return -EINVAL;
++	}
 +
- MODULE_VERSION(DRIVER_VERSION);
- MODULE_LICENSE("GPL v2");
- MODULE_AUTHOR(DRIVER_AUTHOR);
+ 	group = iommu_group_get(dev);
+ 	if (!group) {
+ 		pr_err("VFIO: No IOMMU group for device %s\n", vdev->name);
+diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
+index fd262be..415310f 100644
+--- a/drivers/vfio/platform/vfio_platform_private.h
++++ b/drivers/vfio/platform/vfio_platform_private.h
+@@ -57,6 +57,7 @@ struct vfio_platform_device {
+ 	int				refcnt;
+ 	struct mutex			igate;
+ 	struct module			*parent_module;
++	const char			*compat;
+ 
+ 	/*
+ 	 * These fields should be filled by the bus specific binder
 -- 
 1.9.1
