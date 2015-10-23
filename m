@@ -1,27 +1,24 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v4 3/7] vfio: platform: introduce module_vfio_reset_handler
- macro
-Date: Fri, 23 Oct 2015 17:47:21 +0200
-Message-ID: <1445615245-31124-4-git-send-email-eric.auger@linaro.org>
-References: <1445615245-31124-1-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v4 0/7] VFIO platform reset module rework
+Date: Fri, 23 Oct 2015 17:47:18 +0200
+Message-ID: <1445615245-31124-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD6AF41349
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2015 11:44:57 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A45641291
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2015 11:44:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0by3LK0Q-9Qe for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Oct 2015 11:44:57 -0400 (EDT)
-Received: from mail-wi0-f179.google.com (mail-wi0-f179.google.com
- [209.85.212.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D037741457
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2015 11:44:56 -0400 (EDT)
-Received: by wijp11 with SMTP id p11so83412331wij.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2015 08:47:37 -0700 (PDT)
-In-Reply-To: <1445615245-31124-1-git-send-email-eric.auger@linaro.org>
+ with ESMTP id FLFNIzzlO7DH for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 23 Oct 2015 11:44:52 -0400 (EDT)
+Received: from mail-wi0-f180.google.com (mail-wi0-f180.google.com
+ [209.85.212.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AC8F741049
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2015 11:44:52 -0400 (EDT)
+Received: by wicfx6 with SMTP id fx6so37058573wic.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2015 08:47:32 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,52 +32,72 @@ To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, b.reyn
 Cc: linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The module_vfio_reset_handler macro
-- define a module alias
-- implement module init/exit function which respectively registers
-  and unregisters the reset function.
+This series fixes the current implementation by getting rid of the
+usage of __symbol_get which caused a compilation issue with
+CONFIG_MODULES disabled. On top of this, the usage of MODULE_ALIAS makes
+possible to add a new reset module without being obliged to update the
+framework. The new implementation relies on the reset module registering
+its reset function to the vfio-platform driver.
 
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
+The series is available at
 
----
+https://git.linaro.org/people/eric.auger/linux.git/shortlog/refs/heads/v4.3-rc6-rework-v3
+
+Best Regards
+
+Eric
+
 v3 -> v4:
-- pass reset to vfio_platform_unregister_reset
+- Remove the EXPORT_SYMBOL_GPL(vfio_platform_calxedaxgmac_reset) later
+  in [6/7], to keep the functionality working all along the series
+- Add Arnd R-b (I dared to keep them despite the above change)
+- vfio_platform_unregister_reset gets the reset function to do a double
+  check on the compat and the function pointer too
+- __vfio_platform_register_reset turned to 'void'
 
 v2 -> v3:
-- use vfio_platform_register_reset macro
+- use driver_mutex instead of reset_mutex
+- style fixes: single mutex_unlock
+- use static nodes; vfio_platform_register_reset now is a macro
+- vfio_platform_reset_private.h removed since reset_module_(un)register
+  disappear. No use of symbol_get anymore.
+- new patch introducing vfio-platform-base
+- reset look-up moved back at vfio-platform probe time
+- new patch featuring dev_info/dev_warn
 
 v1 -> v2:
-- remove vfio_platform_reset_private.h and move back the macro to
-  vfio_platform_private.h header: removed reset_module_register &
-  unregister (symbol_get)
-- defines the module_vfio_reset_handler macro as suggested by Arnd
-  (formerly in vfio_platform_reset_private.h)
----
- drivers/vfio/platform/vfio_platform_private.h | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+* in vfio_platform_common.c:
+  - move reset lookup at load time and put reset at release: this is to
+    prevent a race between the 2 load module loads
+  - reset_list becomes static
+  - vfio_platform_register/unregister_reset take a const char * as compat
+  - fix node link
+  - remove old combo struct and cleanup proto of vfio_platform_get_reset
+  - add mutex to protect the reset list
+* in calxeda xgmac reset module
+  - introduce vfio_platform_reset_private.h
+  - use module_vfio_reset_handler macro
+  - do not export vfio_platform_calxedaxgmac_reset symbol anymore
+  - add a pr_info to show the device is reset by vfio reset module
 
-diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
-index c563940..fd262be 100644
---- a/drivers/vfio/platform/vfio_platform_private.h
-+++ b/drivers/vfio/platform/vfio_platform_private.h
-@@ -110,4 +110,18 @@ static struct vfio_platform_reset_node __reset ## _node = {	\
- };								\
- __vfio_platform_register_reset(&__reset ## _node)
- 
-+#define module_vfio_reset_handler(compat, reset)		\
-+MODULE_ALIAS("vfio-reset:" compat);				\
-+static int __init reset ## _module_init(void)			\
-+{								\
-+	vfio_platform_register_reset(compat, reset);		\
-+	return 0;						\
-+};								\
-+static void __exit reset ## _module_exit(void)			\
-+{								\
-+	vfio_platform_unregister_reset(compat, reset);		\
-+};								\
-+module_init(reset ## _module_init);				\
-+module_exit(reset ## _module_exit)
-+
- #endif /* VFIO_PLATFORM_PRIVATE_H */
+
+
+Eric Auger (7):
+  vfio: platform: introduce vfio-platform-base module
+  vfio: platform: add capability to register a reset function
+  vfio: platform: introduce module_vfio_reset_handler macro
+  vfio: platform: reset: calxedaxgmac: add reset function registration
+  vfio: platform: add compat in vfio_platform_device
+  vfio: platform: use list of registered reset function
+  vfio: platform: add dev_info on device reset
+
+ drivers/vfio/platform/Makefile                     |   6 +-
+ .../platform/reset/vfio_platform_calxedaxgmac.c    |   5 +-
+ drivers/vfio/platform/vfio_amba.c                  |   1 +
+ drivers/vfio/platform/vfio_platform.c              |   1 +
+ drivers/vfio/platform/vfio_platform_common.c       | 119 +++++++++++++++------
+ drivers/vfio/platform/vfio_platform_private.h      |  40 ++++++-
+ 6 files changed, 130 insertions(+), 42 deletions(-)
+
 -- 
 1.9.1
