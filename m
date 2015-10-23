@@ -1,71 +1,34 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v3 2/7] vfio: platform: add capability to register a reset
- function
-Date: Fri, 23 Oct 2015 16:15:06 +0200
-Message-ID: <562A40EA.40706@linaro.org>
-References: <1445603835-14506-1-git-send-email-eric.auger@linaro.org>
- <1445603835-14506-3-git-send-email-eric.auger@linaro.org>
- <5723752.hDK15zeNcm@wuerfel>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v5 0/7] KVM: arm64: Implement API for vGICv3 live migration
+Date: Fri, 23 Oct 2015 15:20:16 +0100
+Message-ID: <CAFEAcA_SpUa9Czk4=95h-0RpHTBKVVf8CkX_5S7XOO7kt7at-Q@mail.gmail.com>
+References: <cover.1444638023.git.p.fedin@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 46302410EB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2015 10:12:30 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QEac90VekYsO for <kvmarm@lists.cs.columbia.edu>;
- Fri, 23 Oct 2015 10:12:28 -0400 (EDT)
-Received: from mail-wi0-f178.google.com (mail-wi0-f178.google.com
- [209.85.212.178])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3AB7D41049
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2015 10:12:28 -0400 (EDT)
-Received: by wicll6 with SMTP id ll6so33347547wic.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 23 Oct 2015 07:15:08 -0700 (PDT)
-In-Reply-To: <5723752.hDK15zeNcm@wuerfel>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Arnd Bergmann <arnd@arndb.de>, linux-arm-kernel@lists.infradead.org
-Cc: kvm@vger.kernel.org, patches@linaro.org, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, eric.auger@st.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <cover.1444638023.git.p.fedin@samsung.com>
+Sender: kvm-owner@vger.kernel.org
+To: Pavel Fedin <p.fedin@samsung.com>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/23/2015 03:07 PM, Arnd Bergmann wrote:
-> On Friday 23 October 2015 14:37:10 Eric Auger wrote:
->> +
->> +void vfio_platform_unregister_reset(const char *compat)
->> +{
->> +       struct vfio_platform_reset_node *iter, *temp;
->> +
->> +       mutex_lock(&driver_lock);
->> +       list_for_each_entry_safe(iter, temp, &reset_list, link) {
->> +               if (!strcmp(iter->compat, compat)) {
->> +                       list_del(&iter->link);
->> +                       break;
->> +               }
->> +       }
->> +
->> +       mutex_unlock(&driver_lock);
->> +}
->> +EXPORT_SYMBOL_GPL(vfio_platform_unregister_reset);
->>
-> 
-> This is slightly unsafe in case you ever get two drivers that register
-> with the same compat string. If we care about that, we could pass
-> and compare both the string and the function pointer, or the
-> vfio_platform_reset_node.
-OK
+On 12 October 2015 at 09:29, Pavel Fedin <p.fedin@samsung.com> wrote:
+> This patchset adds necessary userspace API in order to support vGICv3 live
+> migration. GICv3 registers are accessed using device attribute ioctls,
+> similar to GICv2.
+>
+> Whoever wants to test it, please note that this version is not
+> binary-compatible with previous one, the API has been seriously changed.
+> qemu patchess will be posted in some time.
+>
+> v4 => v5:
+> - Adapted to new API by Peter Maydell, Marc Zyngier and Christoffer Dall.
+>   Acked-by's on the documentation were dropped, just in case, because i
+>   slightly adjusted it. Additionally, i merged all doc updates into one
+>   patch.
 
-Thanks
+Could you tell us what you changed in the doc patch from the version
+that got sent out with the acks, please?
 
-Eric
-> 
-> 	Arnd
-> 
+thanks
+-- PMM
