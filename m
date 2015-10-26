@@ -1,165 +1,67 @@
-From: Christopher Covington <cov@codeaurora.org>
-Subject: [kvm-unit-tests PATCHv5 3/3] arm: pmu: Add CPI checking
-Date: Mon, 26 Oct 2015 11:38:50 -0400
-Message-ID: <1445873930-9058-4-git-send-email-cov@codeaurora.org>
-References: <1444662470-13045-1-git-send-email-cov@codeaurora.org>
- <1445873930-9058-1-git-send-email-cov@codeaurora.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [RFC PATCH 6/6] arm-smmu: Allow to set iommu mapping for MSI
+Date: Mon, 26 Oct 2015 16:40:59 +0100
+Message-ID: <20151026154059.GE20298@cbox>
+References: <1443624989-24346-1-git-send-email-Bharat.Bhushan@freescale.com>
+ <1443624989-24346-6-git-send-email-Bharat.Bhushan@freescale.com>
+ <1443826005.26107.191.camel@redhat.com>
+ <CY1PR0301MB127637C2EA08365A249864C090480@CY1PR0301MB1276.namprd03.prod.outlook.com>
+ <1444085675.26107.372.camel@redhat.com>
+ <BN3PR0301MB1265E14339BD005A912624B990370@BN3PR0301MB1265.namprd03.prod.outlook.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1445873930-9058-1-git-send-email-cov@codeaurora.org>
+Content-Disposition: inline
+In-Reply-To: <BN3PR0301MB1265E14339BD005A912624B990370@BN3PR0301MB1265.namprd03.prod.outlook.com>
 Sender: kvm-owner@vger.kernel.org
-To: drjones@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wei@redhat.com
-Cc: shannon.zhao@linaro.org, alistair.francis@xilinx.com, croberts@codeaurora.org, alindsay@codeaurora.org, Christopher Covington <cov@codeaurora.org>
+To: Bhushan Bharat <Bharat.Bhushan@freescale.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "eric.auger@linaro.org" <eric.auger@linaro.org>, "pranavkumar@linaro.org" <pranavkumar@linaro.org>, "will.deacon@arm.com" <will.deacon@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Calculate the numbers of cycles per instruction (CPI) implied by ARM
-PMU cycle counter values. The code includes a strict checking facility
-intended for the -icount option in TCG mode but it is not yet enabled
-in the configuration file. Enabling it must wait on infrastructure
-improvements which allow for different tests to be run on TCG versus
-KVM.
+On Tue, Oct 06, 2015 at 10:26:34AM +0000, Bhushan Bharat wrote:
 
-Signed-off-by: Christopher Covington <cov@codeaurora.org>
----
- arm/pmu.c | 105 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 104 insertions(+), 1 deletion(-)
+[...]
 
-diff --git a/arm/pmu.c b/arm/pmu.c
-index c44d708..59f26ab 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -43,6 +43,25 @@ static inline unsigned long get_pmccntr(void)
- 	asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r" (cycles));
- 	return cycles;
- }
-+
-+/*
-+ * Extra instructions such as `mov rd, #0` inserted by the compiler would be
-+ * difficult to compensate for, so hand assemble everything between, and
-+ * including, the PMCR accesses to start and stop counting.
-+ */
-+static inline void loop(int i, uint32_t pmcr)
-+{
-+	uint32_t z = 0;
-+
-+	asm volatile(
-+	"	mcr p15, 0, %[pmcr], c9, c12, 0\n"
-+	"1:	subs %[i], %[i], #1\n"
-+	"	bgt 1b\n"
-+	"	mcr p15, 0, %[z], c9, c12, 0\n"
-+	: [i] "+r" (i)
-+	: [pmcr] "r" (pmcr), [z] "r" (z)
-+	: "cc");
-+}
- #elif defined(__aarch64__)
- static inline uint32_t get_pmcr(void)
- {
-@@ -64,6 +83,23 @@ static inline unsigned long get_pmccntr(void)
- 	asm volatile("mrs %0, pmccntr_el0" : "=r" (cycles));
- 	return cycles;
- }
-+
-+/*
-+ * Extra instructions inserted by the compiler would be difficult to compensate
-+ * for, so hand assemble everything between, and including, the PMCR accesses
-+ * to start and stop counting.
-+ */
-+static inline void loop(int i, uint32_t pmcr)
-+{
-+	asm volatile(
-+	"	msr pmcr_el0, %[pmcr]\n"
-+	"1:	subs %[i], %[i], #1\n"
-+	"	b.gt 1b\n"
-+	"	msr pmcr_el0, xzr\n"
-+	: [i] "+r" (i)
-+	: [pmcr] "r" (pmcr)
-+	: "cc");
-+}
- #endif
- 
- struct pmu_data {
-@@ -131,12 +167,79 @@ static bool check_cycles_increase(void)
- 	return true;
- }
- 
--int main(void)
-+/*
-+ * Execute a known number of guest instructions. Only odd instruction counts
-+ * greater than or equal to 3 are supported by the in-line assembly code. The
-+ * control register (PMCR_EL0) is initialized with the provided value (allowing
-+ * for example for the cycle counter or event counters to be reset). At the end
-+ * of the exact instruction loop, zero is written to PMCR_EL0 to disable
-+ * counting, allowing the cycle counter or event counters to be read at the
-+ * leisure of the calling code.
-+ */
-+static void measure_instrs(int num, uint32_t pmcr)
-+{
-+	int i = (num - 1) / 2;
-+
-+	assert(num >= 3 && ((num - 1) % 2 == 0));
-+	loop(i, pmcr);
-+}
-+
-+/*
-+ * Measure cycle counts for various known instruction counts. Ensure that the
-+ * cycle counter progresses (similar to check_cycles_increase() but with more
-+ * instructions and using reset and stop controls). If supplied a positive,
-+ * nonzero CPI parameter, also strictly check that every measurement matches
-+ * it. Strict CPI checking is used to test -icount mode.
-+ */
-+static bool check_cpi(int cpi)
-+{
-+	struct pmu_data pmu = { {0} };
-+
-+	pmu.cycle_counter_reset = 1;
-+	pmu.enable = 1;
-+
-+	if (cpi > 0)
-+		printf("Checking for CPI=%d.\n", cpi);
-+	printf("instrs : cycles0 cycles1 ...\n");
-+
-+	for (int i = 3; i < 300; i += 32) {
-+		int avg, sum = 0;
-+
-+		printf("%d :", i);
-+		for (int j = 0; j < NR_SAMPLES; j++) {
-+			int cycles;
-+
-+			measure_instrs(i, pmu.pmcr_el0);
-+			cycles = get_pmccntr();
-+			printf(" %d", cycles);
-+
-+			if (!cycles || (cpi > 0 && cycles != i * cpi)) {
-+				printf("\n");
-+				return false;
-+			}
-+
-+			sum += cycles;
-+		}
-+		avg = sum / NR_SAMPLES;
-+		printf(" sum=%d avg=%d avg_ipc=%d avg_cpi=%d\n",
-+			sum, avg, i / avg, avg / i);
-+	}
-+
-+	return true;
-+}
-+
-+int main(int argc, char *argv[])
- {
-+	int cpi = 0;
-+
-+	if (argc > 1)
-+		cpi = atol(argv[0]);
-+
- 	report_prefix_push("pmu");
- 
- 	report("Control register", check_pmcr());
- 	report("Monotonically increasing cycle count", check_cycles_increase());
-+	report("Cycle/instruction ratio", check_cpi(cpi));
- 
- 	return report_summary();
- }
--- 
-Qualcomm Innovation Center, Inc.
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+> > 
+> > I'm certainly not interested in applying an maintaining an interim solution that
+> > isn't the right one.  It seems like VFIO is too involved in this process in your
+> > example.  On x86 we have per vector isolation and the only thing we're
+> > missing is reporting back of the region used by MSI vectors as reserved IOVA
+> > space (but it's standard on x86, so an x86 VM user will never use it for IOVA).
+> 
+> I remember you mentioned that there is no problem when running an x86 guest on an x86 host.  But it will interesting when running a non-x86 VMs on an x86 host  or non-VM userspace use of VFIO though. 
+> 
+> > In your model, the MSI IOVA space is programmable,
+> 
+> Yes, on PowerPC and ARM-SMMU case also we have to create mapping with an IOVA. First question is which IOVA to be used, and we added the reserved iova ioctl for same.
+> 
+> Second problem is we needed an msi-page physical address for setting up iommu-mapping, and so we needed to reserve an msi-page. I did this for PowerPC but not in a generic extension in msi-driver and will look the code a bit more details on adding an interface to reserve an msi-page or get a shared msi-page with allow-unsafe-interrupt.
 
+Sorry, I'm far from familiar with how x86 does interrupt handling and
+I know very little of PCIe and MSIs, so please allow me to ask some
+stupid questions:
+
+What does an msi-page physical address mean?
+
+> 
+> Third problem is to report the reserved IOVA to be used for MSI vectors for the given set of devices (devices in a vfio-group). 
+
+What do MSI vectors mean in this context?  Is this a Linux kernel
+construct, something tied to PCIe, something tied to the interrupt
+controller, or?
+
+In the case of ARM, AFAIU, you have a single doorbell register per ITS
+and devices can write to this register with their device id and the
+eventid.  So it's a register in a page somewhere.
+
+Now, what is the problem you don't understand with ARM here?
+
+> 
+> Mark/Christopher,
+> I am not an expert in this area so I might have to understand that code. If you think you can give solution to 2nd and 3rd problem quickly then please let me know.
+> 
+I don't really understand what you're asking, but if you can educate me
+on the concepts above I may be able to offer some advice.
+
+Thanks,
+-Christoffer
