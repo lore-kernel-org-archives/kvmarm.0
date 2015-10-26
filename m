@@ -1,165 +1,207 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCHv5 2/3] arm: pmu: Check cycle
- count increases
-Date: Mon, 26 Oct 2015 17:04:57 +0100
-Message-ID: <20151026160457.GH30256@hawk.localdomain>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCHv5 3/3] arm: pmu: Add CPI
+ checking
+Date: Mon, 26 Oct 2015 17:28:26 +0100
+Message-ID: <20151026162826.GI30256@hawk.localdomain>
 References: <1444662470-13045-1-git-send-email-cov@codeaurora.org>
  <1445873930-9058-1-git-send-email-cov@codeaurora.org>
- <1445873930-9058-3-git-send-email-cov@codeaurora.org>
- <20151026155843.GG30256@hawk.localdomain>
+ <1445873930-9058-4-git-send-email-cov@codeaurora.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 34F2240F9B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2015 12:02:15 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VkclCTZJ9gkD for <kvmarm@lists.cs.columbia.edu>;
- Mon, 26 Oct 2015 12:02:13 -0400 (EDT)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8DD91407A0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2015 12:02:13 -0400 (EDT)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <20151026155843.GG30256@hawk.localdomain>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <1445873930-9058-4-git-send-email-cov@codeaurora.org>
+Sender: kvm-owner@vger.kernel.org
 To: Christopher Covington <cov@codeaurora.org>
-Cc: alindsay@codeaurora.org, kvm@vger.kernel.org, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wei@redhat.com, alindsay@codeaurora.org, croberts@codeaurora.org, shannon.zhao@linaro.org, alistair.francis@xilinx.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 26, 2015 at 04:58:43PM +0100, Andrew Jones wrote:
-> On Mon, Oct 26, 2015 at 11:38:49AM -0400, Christopher Covington wrote:
-> > Ensure that reads of the PMCCNTR_EL0 are monotonically increasing,
-> > even for the smallest delta of two subsequent reads.
-> > 
-> > Signed-off-by: Christopher Covington <cov@codeaurora.org>
-> > ---
-> >  arm/pmu.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 60 insertions(+)
-> > 
-> > diff --git a/arm/pmu.c b/arm/pmu.c
-> > index 42d0ee1..c44d708 100644
-> > --- a/arm/pmu.c
-> > +++ b/arm/pmu.c
-> > @@ -14,6 +14,8 @@
-> >   */
-> >  #include "libcflat.h"
-> >  
-> > +#define NR_SAMPLES 10
-> > +
-> >  #if defined(__arm__)
-> >  static inline uint32_t get_pmcr(void)
-> >  {
-> > @@ -22,6 +24,25 @@ static inline uint32_t get_pmcr(void)
-> >  	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
-> >  	return ret;
-> >  }
-> > +
-> > +static inline void set_pmcr(uint32_t pmcr)
-> > +{
-> > +	asm volatile("mcr p15, 0, %0, c9, c12, 0" : : "r" (pmcr));
-> > +}
-> > +
-> > +/*
-> > + * While PMCCNTR can be accessed as a 64 bit coprocessor register, returning 64
-> > + * bits doesn't seem worth the trouble when differential usage of the result is
-> > + * expected (with differences that can easily fit in 32 bits). So just return
-> > + * the lower 32 bits of the cycle count in AArch32.
-> > + */
-> > +static inline unsigned long get_pmccntr(void)
-> > +{
-> > +	unsigned long cycles;
-> > +
-> > +	asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r" (cycles));
-> > +	return cycles;
-> > +}
-> >  #elif defined(__aarch64__)
-> >  static inline uint32_t get_pmcr(void)
-> >  {
-> > @@ -30,6 +51,19 @@ static inline uint32_t get_pmcr(void)
-> >  	asm volatile("mrs %0, pmcr_el0" : "=r" (ret));
-> >  	return ret;
-> >  }
-> > +
-> > +static inline void set_pmcr(uint32_t pmcr)
-> > +{
-> > +	asm volatile("msr pmcr_el0, %0" : : "r" (pmcr));
-> > +}
-> > +
-> > +static inline unsigned long get_pmccntr(void)
-> > +{
-> > +	unsigned long cycles;
-> > +
-> > +	asm volatile("mrs %0, pmccntr_el0" : "=r" (cycles));
-> > +	return cycles;
-> > +}
-> >  #endif
-> >  
-> >  struct pmu_data {
-> > @@ -72,11 +106,37 @@ static bool check_pmcr(void)
-> >  	return pmu.implementer != 0;
-> >  }
-> >  
-> > +/*
-> > + * Ensure that the cycle counter progresses between back-to-back reads.
-> > + */
-> > +static bool check_cycles_increase(void)
-> > +{
-> > +	struct pmu_data pmu = { {0} };
+On Mon, Oct 26, 2015 at 11:38:50AM -0400, Christopher Covington wrote:
+> Calculate the numbers of cycles per instruction (CPI) implied by ARM
+> PMU cycle counter values. The code includes a strict checking facility
+> intended for the -icount option in TCG mode but it is not yet enabled
+> in the configuration file. Enabling it must wait on infrastructure
+> improvements which allow for different tests to be run on TCG versus
+> KVM.
 > 
-> One set of {} is enough, and looks better.
+> Signed-off-by: Christopher Covington <cov@codeaurora.org>
+> ---
+>  arm/pmu.c | 105 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 104 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index c44d708..59f26ab 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -43,6 +43,25 @@ static inline unsigned long get_pmccntr(void)
+>  	asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r" (cycles));
+>  	return cycles;
+>  }
+> +
+> +/*
+> + * Extra instructions such as `mov rd, #0` inserted by the compiler would be
 
-Ah, just read your cover letter and now see that this was done on purpose.
-So your compiler complains about {0}? Is there a problem besides the
-warning? If not, then I'm still a bit inclined to keep the code neat. The
-warnings will go away with compiler updates.
+Probably don't need the 'such as `mov..`. Removing it also allows this
+comment to directly match the 64-bit one.
+
+> + * difficult to compensate for, so hand assemble everything between, and
+> + * including, the PMCR accesses to start and stop counting.
+> + */
+> +static inline void loop(int i, uint32_t pmcr)
+> +{
+> +	uint32_t z = 0;
+> +
+> +	asm volatile(
+> +	"	mcr p15, 0, %[pmcr], c9, c12, 0\n"
+> +	"1:	subs %[i], %[i], #1\n"
+> +	"	bgt 1b\n"
+> +	"	mcr p15, 0, %[z], c9, c12, 0\n"
+
+Thanks for making some formatting improvements. We're still
+missing the tabs after the instructions though. The format
+used by the kernel is
+
+[label]<tab>insn<tab>operands
+
+> +	: [i] "+r" (i)
+> +	: [pmcr] "r" (pmcr), [z] "r" (z)
+
+I don't think you should need the z variable. Just doing
+
+[z] "r" (0)
+
+should work.
+
+> +	: "cc");
+> +}
+>  #elif defined(__aarch64__)
+>  static inline uint32_t get_pmcr(void)
+>  {
+> @@ -64,6 +83,23 @@ static inline unsigned long get_pmccntr(void)
+>  	asm volatile("mrs %0, pmccntr_el0" : "=r" (cycles));
+>  	return cycles;
+>  }
+> +
+> +/*
+> + * Extra instructions inserted by the compiler would be difficult to compensate
+> + * for, so hand assemble everything between, and including, the PMCR accesses
+> + * to start and stop counting.
+> + */
+> +static inline void loop(int i, uint32_t pmcr)
+> +{
+> +	asm volatile(
+> +	"	msr pmcr_el0, %[pmcr]\n"
+> +	"1:	subs %[i], %[i], #1\n"
+> +	"	b.gt 1b\n"
+> +	"	msr pmcr_el0, xzr\n"
+
+same tab after insn comment
+
+> +	: [i] "+r" (i)
+> +	: [pmcr] "r" (pmcr)
+> +	: "cc");
+> +}
+>  #endif
+>  
+>  struct pmu_data {
+> @@ -131,12 +167,79 @@ static bool check_cycles_increase(void)
+>  	return true;
+>  }
+>  
+> -int main(void)
+> +/*
+> + * Execute a known number of guest instructions. Only odd instruction counts
+> + * greater than or equal to 3 are supported by the in-line assembly code. The
+> + * control register (PMCR_EL0) is initialized with the provided value (allowing
+> + * for example for the cycle counter or event counters to be reset). At the end
+> + * of the exact instruction loop, zero is written to PMCR_EL0 to disable
+> + * counting, allowing the cycle counter or event counters to be read at the
+> + * leisure of the calling code.
+> + */
+> +static void measure_instrs(int num, uint32_t pmcr)
+> +{
+> +	int i = (num - 1) / 2;
+> +
+> +	assert(num >= 3 && ((num - 1) % 2 == 0));
+> +	loop(i, pmcr);
+> +}
+> +
+> +/*
+> + * Measure cycle counts for various known instruction counts. Ensure that the
+> + * cycle counter progresses (similar to check_cycles_increase() but with more
+> + * instructions and using reset and stop controls). If supplied a positive,
+> + * nonzero CPI parameter, also strictly check that every measurement matches
+> + * it. Strict CPI checking is used to test -icount mode.
+> + */
+> +static bool check_cpi(int cpi)
+> +{
+> +	struct pmu_data pmu = { {0} };
+> +
+> +	pmu.cycle_counter_reset = 1;
+> +	pmu.enable = 1;
+> +
+> +	if (cpi > 0)
+> +		printf("Checking for CPI=%d.\n", cpi);
+> +	printf("instrs : cycles0 cycles1 ...\n");
+> +
+> +	for (int i = 3; i < 300; i += 32) {
+> +		int avg, sum = 0;
+> +
+> +		printf("%d :", i);
+> +		for (int j = 0; j < NR_SAMPLES; j++) {
+> +			int cycles;
+> +
+> +			measure_instrs(i, pmu.pmcr_el0);
+> +			cycles = get_pmccntr();
+> +			printf(" %d", cycles);
+> +
+> +			if (!cycles || (cpi > 0 && cycles != i * cpi)) {
+> +				printf("\n");
+> +				return false;
+> +			}
+> +
+> +			sum += cycles;
+> +		}
+> +		avg = sum / NR_SAMPLES;
+> +		printf(" sum=%d avg=%d avg_ipc=%d avg_cpi=%d\n",
+> +			sum, avg, i / avg, avg / i);
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +int main(int argc, char *argv[])
+>  {
+> +	int cpi = 0;
+> +
+> +	if (argc > 1)
+
+if (argc > 0)
+
+Unlike a real main() we don't have the program name automatically put
+in argv[0]. This inconsistency is a bit annoying, but to change it now
+probably isn't worth it.
+
+> +		cpi = atol(argv[0]);
+
+Ah, looks like the right index is being used here though, so the above
+check was probably supposed to be >=
+
+> +
+>  	report_prefix_push("pmu");
+>  
+>  	report("Control register", check_pmcr());
+>  	report("Monotonically increasing cycle count", check_cycles_increase());
+> +	report("Cycle/instruction ratio", check_cpi(cpi));
+>  
+>  	return report_summary();
+>  }
+> -- 
+> Qualcomm Innovation Center, Inc.
+> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+> a Linux Foundation Collaborative Project
+> 
+> 
 
 Thanks,
 drew
-> 
-> > +
-> > +	pmu.enable = 1;
-> > +	set_pmcr(pmu.pmcr_el0);
-> > +
-> > +	for (int i = 0; i < NR_SAMPLES; i++) {
-> > +		unsigned long a, b;
-> > +
-> > +		a = get_pmccntr();
-> > +		b = get_pmccntr();
-> > +
-> > +		if (a >= b) {
-> > +			printf("Read %ld then %ld.\n", a, b);
-> > +			return false;
-> > +		}
-> > +	}
-> > +
-> > +	return true;
-> > +}
-> > +
-> >  int main(void)
-> >  {
-> >  	report_prefix_push("pmu");
-> >  
-> >  	report("Control register", check_pmcr());
-> > +	report("Monotonically increasing cycle count", check_cycles_increase());
-> >  
-> >  	return report_summary();
-> >  }
-> > -- 
-> > Qualcomm Innovation Center, Inc.
-> > The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-> > a Linux Foundation Collaborative Project
-> > 
-> >
-> 
-> Otherwise
-> Reviewed-by: Andrew Jones <drjones@redhat.com>
