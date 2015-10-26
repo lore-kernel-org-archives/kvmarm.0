@@ -1,67 +1,82 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH 6/6] arm-smmu: Allow to set iommu mapping for MSI
-Date: Mon, 26 Oct 2015 16:40:59 +0100
-Message-ID: <20151026154059.GE20298@cbox>
-References: <1443624989-24346-1-git-send-email-Bharat.Bhushan@freescale.com>
- <1443624989-24346-6-git-send-email-Bharat.Bhushan@freescale.com>
- <1443826005.26107.191.camel@redhat.com>
- <CY1PR0301MB127637C2EA08365A249864C090480@CY1PR0301MB1276.namprd03.prod.outlook.com>
- <1444085675.26107.372.camel@redhat.com>
- <BN3PR0301MB1265E14339BD005A912624B990370@BN3PR0301MB1265.namprd03.prod.outlook.com>
+Subject: Re: [PATCH] KVM: arm64: Count guest exit due to various reasons
+Date: Mon, 26 Oct 2015 16:44:01 +0100
+Message-ID: <20151026154401.GF20298@cbox>
+References: <1445155482-12482-1-git-send-email-amittomer25@gmail.com>
+ <20151022211601.GA25602@cbox>
+ <CABHD4K_kJ0mVnX4yw2kAPYGCA0ZrjO_dCZdf3NLb3XxpxsLgUA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F6E640FA2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2015 11:40:35 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id JyQkWEsNsIhQ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 26 Oct 2015 11:40:34 -0400 (EDT)
+Received: from mail-lf0-f50.google.com (mail-lf0-f50.google.com
+ [209.85.215.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D2B1140F9B
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2015 11:40:32 -0400 (EDT)
+Received: by lffv3 with SMTP id v3so153486784lff.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 26 Oct 2015 08:43:20 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <BN3PR0301MB1265E14339BD005A912624B990370@BN3PR0301MB1265.namprd03.prod.outlook.com>
-Sender: kvm-owner@vger.kernel.org
-To: Bhushan Bharat <Bharat.Bhushan@freescale.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>, "marc.zyngier@arm.com" <marc.zyngier@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "eric.auger@linaro.org" <eric.auger@linaro.org>, "pranavkumar@linaro.org" <pranavkumar@linaro.org>, "will.deacon@arm.com" <will.deacon@arm.com>, Andre Przywara <andre.przywara@arm.com>
+In-Reply-To: <CABHD4K_kJ0mVnX4yw2kAPYGCA0ZrjO_dCZdf3NLb3XxpxsLgUA@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Amit Tomer <amittomer25@gmail.com>
+Cc: marc.zyngier@arm.com, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Oct 06, 2015 at 10:26:34AM +0000, Bhushan Bharat wrote:
-
-[...]
-
-> > 
-> > I'm certainly not interested in applying an maintaining an interim solution that
-> > isn't the right one.  It seems like VFIO is too involved in this process in your
-> > example.  On x86 we have per vector isolation and the only thing we're
-> > missing is reporting back of the region used by MSI vectors as reserved IOVA
-> > space (but it's standard on x86, so an x86 VM user will never use it for IOVA).
+On Mon, Oct 26, 2015 at 05:44:42PM +0530, Amit Tomer wrote:
+> Thanks for the Review.
 > 
-> I remember you mentioned that there is no problem when running an x86 guest on an x86 host.  But it will interesting when running a non-x86 VMs on an x86 host  or non-VM userspace use of VFIO though. 
 > 
-> > In your model, the MSI IOVA space is programmable,
+> > I think it would be even more useful to distinguish between mmio exits
+> > handled in the kernel vs. those going to userspace.
 > 
-> Yes, on PowerPC and ARM-SMMU case also we have to create mapping with an IOVA. First question is which IOVA to be used, and we added the reserved iova ioctl for same.
+> Ok, I would work on it.
 > 
-> Second problem is we needed an msi-page physical address for setting up iommu-mapping, and so we needed to reserve an msi-page. I did this for PowerPC but not in a generic extension in msi-driver and will look the code a bit more details on adding an interface to reserve an msi-page or get a shared msi-page with allow-unsafe-interrupt.
+> 
+> > why more exit stats on arm64 than on arm?
+> 
+> Intention is to just add these stats only for ARM64 but I had to do it for arm,
+> so that things don't break.
 
-Sorry, I'm far from familiar with how x86 does interrupt handling and
-I know very little of PCIe and MSIs, so please allow me to ask some
-stupid questions:
-
-What does an msi-page physical address mean?
+please keep both architectures up to date as much as possible for these
+kinds of changes.
 
 > 
-> Third problem is to report the reserved IOVA to be used for MSI vectors for the given set of devices (devices in a vfio-group). 
+> > why u32?  Would it not make sense to make these u64 or just unsigned
+> > long?
+> 
+> Ok, You mean to say, for ARM we should use u32 and for ARM64 we should
+> u64, right?
 
-What do MSI vectors mean in this context?  Is this a Linux kernel
-construct, something tied to PCIe, something tied to the interrupt
-controller, or?
-
-In the case of ARM, AFAIU, you have a single doorbell register per ITS
-and devices can write to this register with their device id and the
-eventid.  So it's a register in a page somewhere.
-
-Now, what is the problem you don't understand with ARM here?
+loss of context here, so I'm not sure.  Is there a reason why you
+cannot/shouldn't use u64?  I'm just thinking that overflows could happen
+fairly easy on u32, but otoh. there are some existing defines using u32
+for some reason...
 
 > 
-> Mark/Christopher,
-> I am not an expert in this area so I might have to understand that code. If you think you can give solution to 2nd and 3rd problem quickly then please let me know.
+> > either you should use one called wfx_exit_stat or you should distinguish
+> > between wfi and wfe; this is just a weird way of doing it.
 > 
-I don't really understand what you're asking, but if you can educate me
-on the concepts above I may be able to offer some advice.
+> Sorry, didn't just get your point here :(
+> 
+wfx means "either a wfi or wfe happened", so you either define two
+separate trace points, one for wfi and one for wfe, or you define a
+single tracepoint for wfx.
 
-Thanks,
+I'll look forward to v2.
+
 -Christoffer
