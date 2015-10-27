@@ -1,29 +1,29 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: [PATCH v4 3/3] KVM: arm/arm64: Merge vgic_set_lr() and
- vgic_sync_lr_elrsr()
-Date: Tue, 27 Oct 2015 11:37:31 +0300
-Message-ID: <e4e102cf45f80c2d4554d06108db9d62d4bd262d.1445934536.git.p.fedin@samsung.com>
+Subject: [PATCH v4 2/3] KVM: arm/arm64: Clean up vgic_retire_lr() and
+ surroundings
+Date: Tue, 27 Oct 2015 11:37:30 +0300
+Message-ID: <82a9773391b2545a6293b4fbb3d42dff12bd744b.1445934536.git.p.fedin@samsung.com>
 References: <cover.1445934536.git.p.fedin@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7261940FA2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Oct 2015 04:34:51 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A99D41349
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Oct 2015 04:34:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SrG1vpFvfBJi for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Oct 2015 04:34:50 -0400 (EDT)
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com
- [210.118.77.12])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15FAF412F3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Oct 2015 04:34:49 -0400 (EDT)
+ with ESMTP id h+zIHConZW35 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 27 Oct 2015 04:34:48 -0400 (EDT)
+Received: from mailout4.w1.samsung.com (mailout4.w1.samsung.com
+ [210.118.77.14])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CD52E412EF
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Oct 2015 04:34:48 -0400 (EDT)
 Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
- by mailout2.w1.samsung.com
+ by mailout4.w1.samsung.com
  (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NWV00IG2EMRKX60@mailout2.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Tue, 27 Oct 2015 08:37:39 +0000 (GMT)
+ with ESMTP id <0NWV00HH4EMQNK60@mailout4.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Tue, 27 Oct 2015 08:37:38 +0000 (GMT)
 In-reply-to: <cover.1445934536.git.p.fedin@samsung.com>
 In-reply-to: <cover.1445934536.git.p.fedin@samsung.com>
 References: <cover.1445934536.git.p.fedin@samsung.com>
@@ -40,137 +40,103 @@ To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now we see that vgic_set_lr() and vgic_sync_lr_elrsr() are always used
-together. Merge them into one function, saving from second vgic_ops
-dereferencing every time.
+1. Remove unnecessary 'irq' argument, because irq number can be retrieved
+   from the LR.
+2. Since cff9211eb1a1f58ce7f5a2d596b617928fd4be0e
+   ("arm/arm64: KVM: Fix arch timer behavior for disabled interrupts ")
+   LR_STATE_PENDING is queued back by vgic_retire_lr() itself. Also, it
+   clears vlr.state itself. Therefore, we remove the same, now duplicated,
+   check with all accompanying bit manipulations from vgic_unqueue_irqs().
+3. vgic_retire_lr() is always accompanied by vgic_irq_clear_queued(). Since
+   it already does more than just clearing the LR, move
+   vgic_irq_clear_queued() inside of it.
 
 Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
 ---
- include/kvm/arm_vgic.h |  1 -
- virt/kvm/arm/vgic-v2.c |  5 -----
- virt/kvm/arm/vgic-v3.c |  5 -----
- virt/kvm/arm/vgic.c    | 14 ++------------
- 4 files changed, 2 insertions(+), 23 deletions(-)
+ virt/kvm/arm/vgic.c | 37 ++++++++++---------------------------
+ 1 file changed, 10 insertions(+), 27 deletions(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 3936bf8..f62addc 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -112,7 +112,6 @@ struct vgic_vmcr {
- struct vgic_ops {
- 	struct vgic_lr	(*get_lr)(const struct kvm_vcpu *, int);
- 	void	(*set_lr)(struct kvm_vcpu *, int, struct vgic_lr);
--	void	(*sync_lr_elrsr)(struct kvm_vcpu *, int, struct vgic_lr);
- 	u64	(*get_elrsr)(const struct kvm_vcpu *vcpu);
- 	u64	(*get_eisr)(const struct kvm_vcpu *vcpu);
- 	void	(*clear_eisr)(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
-index c0f5d7f..ff02f08 100644
---- a/virt/kvm/arm/vgic-v2.c
-+++ b/virt/kvm/arm/vgic-v2.c
-@@ -79,11 +79,7 @@ static void vgic_v2_set_lr(struct kvm_vcpu *vcpu, int lr,
- 		lr_val |= (lr_desc.source << GICH_LR_PHYSID_CPUID_SHIFT);
- 
- 	vcpu->arch.vgic_cpu.vgic_v2.vgic_lr[lr] = lr_val;
--}
- 
--static void vgic_v2_sync_lr_elrsr(struct kvm_vcpu *vcpu, int lr,
--				  struct vgic_lr lr_desc)
--{
- 	if (!(lr_desc.state & LR_STATE_MASK))
- 		vcpu->arch.vgic_cpu.vgic_v2.vgic_elrsr |= (1ULL << lr);
- 	else
-@@ -167,7 +163,6 @@ static void vgic_v2_enable(struct kvm_vcpu *vcpu)
- static const struct vgic_ops vgic_v2_ops = {
- 	.get_lr			= vgic_v2_get_lr,
- 	.set_lr			= vgic_v2_set_lr,
--	.sync_lr_elrsr		= vgic_v2_sync_lr_elrsr,
- 	.get_elrsr		= vgic_v2_get_elrsr,
- 	.get_eisr		= vgic_v2_get_eisr,
- 	.clear_eisr		= vgic_v2_clear_eisr,
-diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
-index 92003cb..487d635 100644
---- a/virt/kvm/arm/vgic-v3.c
-+++ b/virt/kvm/arm/vgic-v3.c
-@@ -112,11 +112,7 @@ static void vgic_v3_set_lr(struct kvm_vcpu *vcpu, int lr,
- 	}
- 
- 	vcpu->arch.vgic_cpu.vgic_v3.vgic_lr[LR_INDEX(lr)] = lr_val;
--}
- 
--static void vgic_v3_sync_lr_elrsr(struct kvm_vcpu *vcpu, int lr,
--				  struct vgic_lr lr_desc)
--{
- 	if (!(lr_desc.state & LR_STATE_MASK))
- 		vcpu->arch.vgic_cpu.vgic_v3.vgic_elrsr |= (1U << lr);
- 	else
-@@ -212,7 +208,6 @@ static void vgic_v3_enable(struct kvm_vcpu *vcpu)
- static const struct vgic_ops vgic_v3_ops = {
- 	.get_lr			= vgic_v3_get_lr,
- 	.set_lr			= vgic_v3_set_lr,
--	.sync_lr_elrsr		= vgic_v3_sync_lr_elrsr,
- 	.get_elrsr		= vgic_v3_get_elrsr,
- 	.get_eisr		= vgic_v3_get_eisr,
- 	.clear_eisr		= vgic_v3_clear_eisr,
 diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 96e45f3..fe451d4 100644
+index 265a410..96e45f3 100644
 --- a/virt/kvm/arm/vgic.c
 +++ b/virt/kvm/arm/vgic.c
-@@ -1032,12 +1032,6 @@ static void vgic_set_lr(struct kvm_vcpu *vcpu, int lr,
- 	vgic_ops->set_lr(vcpu, lr, vlr);
+@@ -105,7 +105,7 @@
+ #include "vgic.h"
+ 
+ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu);
+-static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu);
++static void vgic_retire_lr(int lr_nr, struct kvm_vcpu *vcpu);
+ static struct vgic_lr vgic_get_lr(const struct kvm_vcpu *vcpu, int lr);
+ static void vgic_set_lr(struct kvm_vcpu *vcpu, int lr, struct vgic_lr lr_desc);
+ static u64 vgic_get_elrsr(struct kvm_vcpu *vcpu);
+@@ -717,30 +717,14 @@ void vgic_unqueue_irqs(struct kvm_vcpu *vcpu)
+ 		 * interrupt then move the active state to the
+ 		 * distributor tracking bit.
+ 		 */
+-		if (lr.state & LR_STATE_ACTIVE) {
++		if (lr.state & LR_STATE_ACTIVE)
+ 			vgic_irq_set_active(vcpu, lr.irq);
+-			lr.state &= ~LR_STATE_ACTIVE;
+-		}
+ 
+ 		/*
+ 		 * Reestablish the pending state on the distributor and the
+-		 * CPU interface.  It may have already been pending, but that
+-		 * is fine, then we are only setting a few bits that were
+-		 * already set.
++		 * CPU interface and mark the LR as free for other use.
+ 		 */
+-		if (lr.state & LR_STATE_PENDING) {
+-			vgic_dist_irq_set_pending(vcpu, lr.irq);
+-			lr.state &= ~LR_STATE_PENDING;
+-		}
+-
+-		vgic_set_lr(vcpu, i, lr);
+-
+-		/*
+-		 * Mark the LR as free for other use.
+-		 */
+-		BUG_ON(lr.state & LR_STATE_MASK);
+-		vgic_retire_lr(i, lr.irq, vcpu);
+-		vgic_irq_clear_queued(vcpu, lr.irq);
++		vgic_retire_lr(i, vcpu);
+ 
+ 		/* Finally update the VGIC state. */
+ 		vgic_update_state(vcpu->kvm);
+@@ -1099,16 +1083,18 @@ static inline void vgic_enable(struct kvm_vcpu *vcpu)
+ 	vgic_ops->enable(vcpu);
  }
  
--static void vgic_sync_lr_elrsr(struct kvm_vcpu *vcpu, int lr,
--			       struct vgic_lr vlr)
--{
--	vgic_ops->sync_lr_elrsr(vcpu, lr, vlr);
--}
--
- static inline u64 vgic_get_elrsr(struct kvm_vcpu *vcpu)
+-static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu)
++static void vgic_retire_lr(int lr_nr, struct kvm_vcpu *vcpu)
  {
- 	return vgic_ops->get_elrsr(vcpu);
-@@ -1100,7 +1094,6 @@ static void vgic_retire_lr(int lr_nr, struct kvm_vcpu *vcpu)
+ 	struct vgic_lr vlr = vgic_get_lr(vcpu, lr_nr);
  
- 	vlr.state = 0;
- 	vgic_set_lr(vcpu, lr_nr, vlr);
--	vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
- }
- 
- /*
-@@ -1162,7 +1155,6 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
++	vgic_irq_clear_queued(vcpu, vlr.irq);
++
+ 	/*
+ 	 * We must transfer the pending state back to the distributor before
+ 	 * retiring the LR, otherwise we may loose edge-triggered interrupts.
+ 	 */
+ 	if (vlr.state & LR_STATE_PENDING) {
+-		vgic_dist_irq_set_pending(vcpu, irq);
++		vgic_dist_irq_set_pending(vcpu, vlr.irq);
+ 		vlr.hwirq = 0;
  	}
  
- 	vgic_set_lr(vcpu, lr_nr, vlr);
--	vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
- }
+@@ -1135,11 +1121,8 @@ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu)
+ 	for_each_clear_bit(lr, elrsr_ptr, vgic->nr_lr) {
+ 		struct vgic_lr vlr = vgic_get_lr(vcpu, lr);
  
- /*
-@@ -1340,8 +1332,6 @@ static int process_queued_irq(struct kvm_vcpu *vcpu,
- 	vlr.hwirq = 0;
- 	vgic_set_lr(vcpu, lr, vlr);
- 
--	vgic_sync_lr_elrsr(vcpu, lr, vlr);
--
- 	return pending;
- }
- 
-@@ -1442,8 +1432,6 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- 	bool level_pending;
- 
- 	level_pending = vgic_process_maintenance(vcpu);
--	elrsr = vgic_get_elrsr(vcpu);
--	elrsr_ptr = u64_to_bitmask(&elrsr);
- 
- 	/* Deal with HW interrupts, and clear mappings for empty LRs */
- 	for (lr = 0; lr < vgic->nr_lr; lr++) {
-@@ -1454,6 +1442,8 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+-		if (!vgic_irq_is_enabled(vcpu, vlr.irq)) {
+-			vgic_retire_lr(lr, vlr.irq, vcpu);
+-			if (vgic_irq_is_queued(vcpu, vlr.irq))
+-				vgic_irq_clear_queued(vcpu, vlr.irq);
+-		}
++		if (!vgic_irq_is_enabled(vcpu, vlr.irq))
++			vgic_retire_lr(lr, vcpu);
  	}
+ }
  
- 	/* Check if we still have something up our sleeve... */
-+	elrsr = vgic_get_elrsr(vcpu);
-+	elrsr_ptr = u64_to_bitmask(&elrsr);
- 	pending = find_first_zero_bit(elrsr_ptr, vgic->nr_lr);
- 	if (level_pending || pending < vgic->nr_lr)
- 		set_bit(vcpu->vcpu_id, dist->irq_pending_on_cpu);
 -- 
 2.4.4
