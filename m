@@ -1,100 +1,53 @@
-From: Shannon Zhao <shannon.zhao@linaro.org>
-Subject: Re: [PATCH v3 00/20] KVM: ARM64: Add guest PMU support
-Date: Tue, 27 Oct 2015 09:15:09 +0800
-Message-ID: <562ED01D.4000308@linaro.org>
-References: <1443133885-3366-1-git-send-email-shannon.zhao@linaro.org>
- <20151026113349.GA20298@cbox>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH v3 2/3] KVM: arm/arm64: Merge vgic_set_lr() and
+ vgic_sync_lr_elrsr()
+Date: Tue, 27 Oct 2015 09:56:47 +0300
+Message-ID: <00b001d11084$a6347c00$f29d7400$@samsung.com>
+References: <cover.1445849885.git.p.fedin@samsung.com>
+ <31bc5d39898f4a51f8d75d338229856ff49c097e.1445849885.git.p.fedin@samsung.com>
+ <20151026152238.GD20298@cbox> <014d01d11005$f4f93a30$deebae90$@samsung.com>
+ <20151026194205.GG20298@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20151026113349.GA20298@cbox>
+In-reply-to: <20151026194205.GG20298@cbox>
+Content-language: ru
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, marc.zyngier@arm.com, will.deacon@arm.com, wei@redhat.com, alex.bennee@linaro.org, peter.huangpeng@huawei.com
+To: 'Christoffer Dall' <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>, 'Andre Przywara' <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+ Hello!
 
+> > --- cut ---
+> > Additionally, remove unnecessary vgic_set_lr() and LR_STATE_PENDING check
+> > in vgic_unqueue_irqs(), because all these things are now done by the
+> > following vgic_retire_lr().
+> > --- cut ---
+> 
+> This does not explain the question I'm raising.
+> 
+> After applying this patch, and before applying your next patch,
+> unqueueing an IRQ will not restore the pending state on the
+> distributor, but just throw that piece of state away
 
-On 2015/10/26 19:33, Christoffer Dall wrote:
-> On Thu, Sep 24, 2015 at 03:31:05PM -0700, Shannon Zhao wrote:
->> This patchset adds guest PMU support for KVM on ARM64. It takes
->> trap-and-emulate approach. When guest wants to monitor one event, it
->> will be trapped by KVM and KVM will call perf_event API to create a perf
->> event and call relevant perf_event APIs to get the count value of event.
->>
->> Use perf to test this patchset in guest. When using "perf list", it
->> shows the list of the hardware events and hardware cache events perf
->> supports. Then use "perf stat -e EVENT" to monitor some event. For
->> example, use "perf stat -e cycles" to count cpu cycles and
->> "perf stat -e cache-misses" to count cache misses.
->>
->> Below are the outputs of "perf stat -r 5 sleep 5" when running in host
->> and guest.
->>
->> Host:
->>  Performance counter stats for 'sleep 5' (5 runs):
->>
->>           0.551428      task-clock (msec)         #    0.000 CPUs utilized            ( +-  0.91% )
->>                  1      context-switches          #    0.002 M/sec
->>                  0      cpu-migrations            #    0.000 K/sec
->>                 48      page-faults               #    0.088 M/sec                    ( +-  1.05% )
->>            1150265      cycles                    #    2.086 GHz                      ( +-  0.92% )
->>    <not supported>      stalled-cycles-frontend
->>    <not supported>      stalled-cycles-backend
->>             526398      instructions              #    0.46  insns per cycle          ( +-  0.89% )
->>    <not supported>      branches
->>               9485      branch-misses             #   17.201 M/sec                    ( +-  2.35% )
->>
->>        5.000831616 seconds time elapsed                                          ( +-  0.00% )
->>
->> Guest:
->>  Performance counter stats for 'sleep 5' (5 runs):
->>
->>           0.730868      task-clock (msec)         #    0.000 CPUs utilized            ( +-  1.13% )
->>                  1      context-switches          #    0.001 M/sec
->>                  0      cpu-migrations            #    0.000 K/sec
->>                 48      page-faults               #    0.065 M/sec                    ( +-  0.42% )
->>            1642982      cycles                    #    2.248 GHz                      ( +-  1.04% )
->>    <not supported>      stalled-cycles-frontend
->>    <not supported>      stalled-cycles-backend
->>             637964      instructions              #    0.39  insns per cycle          ( +-  0.65% )
->>    <not supported>      branches
->>              10377      branch-misses             #   14.198 M/sec                    ( +-  1.09% )
->>
->>        5.001289068 seconds time elapsed                                          ( +-  0.00% )
-> 
-> This looks pretty cool!
-> 
-> I'll review your next patch set version in more detail.
-> 
-> Have you tried runnig a no-op cycle counter read test in the guest and
-> in the host?
-> 
-> Basically something like:
-> 
-> static void nop(void *junk)
-> {
-> }
-> 
-> static void test_nop(void)
-> {
-> 	unsigned long before,after;
-> 	before = read_cycles();
-> 	isb();
-> 	nop(NULL);
-> 	isb();
-> 	after = read_cycles();
-> }
-> 
-> I would be very curious to see if we get a ~6000 cycles overhead in the
-> guest compared to bare-metal, which I expect.
-> 
-Ok, I'll try this while I'm doing more tests on v4.
+ It will restore the state and not throw it away.
+ I guess i'm just not clear enough and you misunderstand me. This check in vgic_unqueue_irqs() is redundant from the beginning.
+Let's look at current vgic_retire_lr():
+https://git.kernel.org/cgit/linux/kernel/git/kvmarm/kvmarm.git/tree/virt/kvm/arm/vgic.c?h=next#n1099
+ It already does LR_STATE_PENDING check and pushback by itself, since cff9211eb1a1f58ce7f5a2d596b617928fd4be0e (it's your commit,
+BTW), so that this check:
+https://git.kernel.org/cgit/linux/kernel/git/kvmarm/kvmarm.git/tree/virt/kvm/arm/vgic.c?h=next#n728
+ is already redundant. So actually this is a separate change, and perhaps it's my fault to squash it in.
 
-> If we do, we should consider a hot-path in the the EL2 assembly code to
-> read the cycle counter to reduce the overhead to something more precise.
->  
+> which breaks bisectability and makes it impossible to understand the logic by looking
+> at this commit in isolation.
 
--- 
-Shannon
+ Will this be understood better if i make this particular refactor a separate commit, with better explanations?
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
+
