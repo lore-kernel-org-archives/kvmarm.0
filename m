@@ -1,32 +1,31 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: [PATCH v4 2/3] KVM: arm/arm64: Clean up vgic_retire_lr() and
- surroundings
-Date: Tue, 27 Oct 2015 11:37:30 +0300
-Message-ID: <82a9773391b2545a6293b4fbb3d42dff12bd744b.1445934536.git.p.fedin@samsung.com>
-References: <cover.1445934536.git.p.fedin@samsung.com>
+Subject: RE: [PATCH v5 0/7] KVM: arm64: Implement API for vGICv3 live migration
+Date: Wed, 28 Oct 2015 15:24:06 +0300
+Message-ID: <008601d1117b$8a995810$9fcc0830$@samsung.com>
+References: <cover.1444638023.git.p.fedin@samsung.com>
+ <CAFEAcA_SpUa9Czk4=95h-0RpHTBKVVf8CkX_5S7XOO7kt7at-Q@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A99D41349
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Oct 2015 04:34:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A0EC41145
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 08:21:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id h+zIHConZW35 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 27 Oct 2015 04:34:48 -0400 (EDT)
-Received: from mailout4.w1.samsung.com (mailout4.w1.samsung.com
- [210.118.77.14])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CD52E412EF
- for <kvmarm@lists.cs.columbia.edu>; Tue, 27 Oct 2015 04:34:48 -0400 (EDT)
+ with ESMTP id pT8zeTrfjNPq for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Oct 2015 08:21:15 -0400 (EDT)
+Received: from mailout3.w1.samsung.com (mailout3.w1.samsung.com
+ [210.118.77.13])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D341640FF5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 08:21:15 -0400 (EDT)
 Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
- by mailout4.w1.samsung.com
+ by mailout3.w1.samsung.com
  (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NWV00HH4EMQNK60@mailout4.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Tue, 27 Oct 2015 08:37:38 +0000 (GMT)
-In-reply-to: <cover.1445934536.git.p.fedin@samsung.com>
-In-reply-to: <cover.1445934536.git.p.fedin@samsung.com>
-References: <cover.1445934536.git.p.fedin@samsung.com>
+ with ESMTP id <0NWX00M9ZJS78300@mailout3.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Wed, 28 Oct 2015 12:24:07 +0000 (GMT)
+In-reply-to: <CAFEAcA_SpUa9Czk4=95h-0RpHTBKVVf8CkX_5S7XOO7kt7at-Q@mail.gmail.com>
+Content-language: ru
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,107 +35,40 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
+To: 'Peter Maydell' <peter.maydell@linaro.org>
+Cc: 'Marc Zyngier' <marc.zyngier@arm.com>, 'Andre Przywara' <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, 'kvm-devel' <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-1. Remove unnecessary 'irq' argument, because irq number can be retrieved
-   from the LR.
-2. Since cff9211eb1a1f58ce7f5a2d596b617928fd4be0e
-   ("arm/arm64: KVM: Fix arch timer behavior for disabled interrupts ")
-   LR_STATE_PENDING is queued back by vgic_retire_lr() itself. Also, it
-   clears vlr.state itself. Therefore, we remove the same, now duplicated,
-   check with all accompanying bit manipulations from vgic_unqueue_irqs().
-3. vgic_retire_lr() is always accompanied by vgic_irq_clear_queued(). Since
-   it already does more than just clearing the LR, move
-   vgic_irq_clear_queued() inside of it.
+ Hello!
 
-Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
----
- virt/kvm/arm/vgic.c | 37 ++++++++++---------------------------
- 1 file changed, 10 insertions(+), 27 deletions(-)
+> > v4 => v5:
+> > - Adapted to new API by Peter Maydell, Marc Zyngier and Christoffer Dall.
+> >   Acked-by's on the documentation were dropped, just in case, because i
+> >   slightly adjusted it. Additionally, i merged all doc updates into one
+> >   patch.
+> 
+> Could you tell us what you changed in the doc patch from the version
+> that got sent out with the acks, please?
 
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 265a410..96e45f3 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -105,7 +105,7 @@
- #include "vgic.h"
- 
- static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu);
--static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu);
-+static void vgic_retire_lr(int lr_nr, struct kvm_vcpu *vcpu);
- static struct vgic_lr vgic_get_lr(const struct kvm_vcpu *vcpu, int lr);
- static void vgic_set_lr(struct kvm_vcpu *vcpu, int lr, struct vgic_lr lr_desc);
- static u64 vgic_get_elrsr(struct kvm_vcpu *vcpu);
-@@ -717,30 +717,14 @@ void vgic_unqueue_irqs(struct kvm_vcpu *vcpu)
- 		 * interrupt then move the active state to the
- 		 * distributor tracking bit.
- 		 */
--		if (lr.state & LR_STATE_ACTIVE) {
-+		if (lr.state & LR_STATE_ACTIVE)
- 			vgic_irq_set_active(vcpu, lr.irq);
--			lr.state &= ~LR_STATE_ACTIVE;
--		}
- 
- 		/*
- 		 * Reestablish the pending state on the distributor and the
--		 * CPU interface.  It may have already been pending, but that
--		 * is fine, then we are only setting a few bits that were
--		 * already set.
-+		 * CPU interface and mark the LR as free for other use.
- 		 */
--		if (lr.state & LR_STATE_PENDING) {
--			vgic_dist_irq_set_pending(vcpu, lr.irq);
--			lr.state &= ~LR_STATE_PENDING;
--		}
--
--		vgic_set_lr(vcpu, i, lr);
--
--		/*
--		 * Mark the LR as free for other use.
--		 */
--		BUG_ON(lr.state & LR_STATE_MASK);
--		vgic_retire_lr(i, lr.irq, vcpu);
--		vgic_irq_clear_queued(vcpu, lr.irq);
-+		vgic_retire_lr(i, vcpu);
- 
- 		/* Finally update the VGIC state. */
- 		vgic_update_state(vcpu->kvm);
-@@ -1099,16 +1083,18 @@ static inline void vgic_enable(struct kvm_vcpu *vcpu)
- 	vgic_ops->enable(vcpu);
- }
- 
--static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu)
-+static void vgic_retire_lr(int lr_nr, struct kvm_vcpu *vcpu)
- {
- 	struct vgic_lr vlr = vgic_get_lr(vcpu, lr_nr);
- 
-+	vgic_irq_clear_queued(vcpu, vlr.irq);
-+
- 	/*
- 	 * We must transfer the pending state back to the distributor before
- 	 * retiring the LR, otherwise we may loose edge-triggered interrupts.
- 	 */
- 	if (vlr.state & LR_STATE_PENDING) {
--		vgic_dist_irq_set_pending(vcpu, irq);
-+		vgic_dist_irq_set_pending(vcpu, vlr.irq);
- 		vlr.hwirq = 0;
- 	}
- 
-@@ -1135,11 +1121,8 @@ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu)
- 	for_each_clear_bit(lr, elrsr_ptr, vgic->nr_lr) {
- 		struct vgic_lr vlr = vgic_get_lr(vcpu, lr);
- 
--		if (!vgic_irq_is_enabled(vcpu, vlr.irq)) {
--			vgic_retire_lr(lr, vlr.irq, vcpu);
--			if (vgic_irq_is_queued(vcpu, vlr.irq))
--				vgic_irq_clear_queued(vcpu, vlr.irq);
--		}
-+		if (!vgic_irq_is_enabled(vcpu, vlr.irq))
-+			vgic_retire_lr(lr, vcpu);
- 	}
- }
- 
--- 
-2.4.4
+ Sorry, completely forgot to answer this one...
+
+ The major differences / things to review are:
+
+1. Both GICv2 and GICv3 use the same value of KVM_DEV_ARM_VGIC_CPUID_MASK, which is extended to 32 bits. So GICv2 attribute layout also looks like:
+--- cut ---
+    bits:     | 63   ....  32  |  31   ....    0 |
+    values:   |  vcpu_index    |      offset     |
+--- cut ---
+
+2. KVM_DEV_ARM_VGIC_CPU_SYSREGS documentation originally says (error code description):
+--- cut ---
+    -EBUSY: One or more VCPUs are running
+--- cut ---
+ While my version says "VCPU is running". Since this is CPU interface, it does not affect other CPUs, so for simplicity i check only current vCPU in my code.
+
+ That's all. Just i'm maybe too careful about fundamentals...
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
