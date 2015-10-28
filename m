@@ -1,31 +1,24 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH v5 0/7] KVM: arm64: Implement API for vGICv3 live migration
-Date: Wed, 28 Oct 2015 15:24:06 +0300
-Message-ID: <008601d1117b$8a995810$9fcc0830$@samsung.com>
-References: <cover.1444638023.git.p.fedin@samsung.com>
- <CAFEAcA_SpUa9Czk4=95h-0RpHTBKVVf8CkX_5S7XOO7kt7at-Q@mail.gmail.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [PATCH v5 0/7] VFIO platform reset module rework
+Date: Wed, 28 Oct 2015 13:02:31 +0000
+Message-ID: <1446037358-2079-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A0EC41145
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 08:21:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 33A1A410EB
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 08:59:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pT8zeTrfjNPq for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Oct 2015 08:21:15 -0400 (EDT)
-Received: from mailout3.w1.samsung.com (mailout3.w1.samsung.com
- [210.118.77.13])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D341640FF5
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 08:21:15 -0400 (EDT)
-Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
- by mailout3.w1.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NWX00M9ZJS78300@mailout3.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Wed, 28 Oct 2015 12:24:07 +0000 (GMT)
-In-reply-to: <CAFEAcA_SpUa9Czk4=95h-0RpHTBKVVf8CkX_5S7XOO7kt7at-Q@mail.gmail.com>
-Content-language: ru
+ with ESMTP id oK775pOo9dve for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Oct 2015 08:59:54 -0400 (EDT)
+Received: from mail-wi0-f174.google.com (mail-wi0-f174.google.com
+ [209.85.212.174])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EDD48407A0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 08:59:53 -0400 (EDT)
+Received: by wicfx6 with SMTP id fx6so197443363wic.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 06:02:47 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,40 +28,79 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: 'Peter Maydell' <peter.maydell@linaro.org>
-Cc: 'Marc Zyngier' <marc.zyngier@arm.com>, 'Andre Przywara' <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, 'kvm-devel' <kvm@vger.kernel.org>
+To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, arnd@arndb.de, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello!
+This series fixes the current implementation by getting rid of the
+usage of __symbol_get which caused a compilation issue with
+CONFIG_MODULES disabled. On top of this, the usage of MODULE_ALIAS makes
+possible to add a new reset module without being obliged to update the
+framework. The new implementation relies on the reset module registering
+its reset function to the vfio-platform driver.
 
-> > v4 => v5:
-> > - Adapted to new API by Peter Maydell, Marc Zyngier and Christoffer Dall.
-> >   Acked-by's on the documentation were dropped, just in case, because i
-> >   slightly adjusted it. Additionally, i merged all doc updates into one
-> >   patch.
-> 
-> Could you tell us what you changed in the doc patch from the version
-> that got sent out with the acks, please?
+The series is available at
 
- Sorry, completely forgot to answer this one...
+https://git.linaro.org/people/eric.auger/linux.git/shortlog/refs/heads/v4.3-rc7-rework-v5
 
- The major differences / things to review are:
+Best Regards
 
-1. Both GICv2 and GICv3 use the same value of KVM_DEV_ARM_VGIC_CPUID_MASK, which is extended to 32 bits. So GICv2 attribute layout also looks like:
---- cut ---
-    bits:     | 63   ....  32  |  31   ....    0 |
-    values:   |  vcpu_index    |      offset     |
---- cut ---
+Eric
 
-2. KVM_DEV_ARM_VGIC_CPU_SYSREGS documentation originally says (error code description):
---- cut ---
-    -EBUSY: One or more VCPUs are running
---- cut ---
- While my version says "VCPU is running". Since this is CPU interface, it does not affect other CPUs, so for simplicity i check only current vCPU in my code.
+v4 -> v5:
+- no code change
+- only added Arnd's new R-b
 
- That's all. Just i'm maybe too careful about fundamentals...
+v3 -> v4:
+- Remove the EXPORT_SYMBOL_GPL(vfio_platform_calxedaxgmac_reset) later
+  in [6/7], to keep the functionality working all along the series
+- Add Arnd R-b (I dared to keep them despite the above change)
+- vfio_platform_unregister_reset gets the reset function to do a double
+  check on the compat and the function pointer too
+- __vfio_platform_register_reset turned to 'void'
 
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
+v2 -> v3:
+- use driver_mutex instead of reset_mutex
+- style fixes: single mutex_unlock
+- use static nodes; vfio_platform_register_reset now is a macro
+- vfio_platform_reset_private.h removed since reset_module_(un)register
+  disappear. No use of symbol_get anymore.
+- new patch introducing vfio-platform-base
+- reset look-up moved back at vfio-platform probe time
+- new patch featuring dev_info/dev_warn
+
+v1 -> v2:
+* in vfio_platform_common.c:
+  - move reset lookup at load time and put reset at release: this is to
+    prevent a race between the 2 load module loads
+  - reset_list becomes static
+  - vfio_platform_register/unregister_reset take a const char * as compat
+  - fix node link
+  - remove old combo struct and cleanup proto of vfio_platform_get_reset
+  - add mutex to protect the reset list
+* in calxeda xgmac reset module
+  - introduce vfio_platform_reset_private.h
+  - use module_vfio_reset_handler macro
+  - do not export vfio_platform_calxedaxgmac_reset symbol anymore
+  - add a pr_info to show the device is reset by vfio reset module
+
+
+Eric Auger (7):
+  vfio: platform: introduce vfio-platform-base module
+  vfio: platform: add capability to register a reset function
+  vfio: platform: introduce module_vfio_reset_handler macro
+  vfio: platform: reset: calxedaxgmac: add reset function registration
+  vfio: platform: add compat in vfio_platform_device
+  vfio: platform: use list of registered reset function
+  vfio: platform: add dev_info on device reset
+
+ drivers/vfio/platform/Makefile                     |   6 +-
+ .../platform/reset/vfio_platform_calxedaxgmac.c    |   5 +-
+ drivers/vfio/platform/vfio_amba.c                  |   1 +
+ drivers/vfio/platform/vfio_platform.c              |   1 +
+ drivers/vfio/platform/vfio_platform_common.c       | 119 +++++++++++++++------
+ drivers/vfio/platform/vfio_platform_private.h      |  40 ++++++-
+ 6 files changed, 130 insertions(+), 42 deletions(-)
+
+-- 
+1.9.1
