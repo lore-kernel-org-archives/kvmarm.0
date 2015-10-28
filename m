@@ -1,26 +1,24 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v5 6/7] vfio: platform: use list of registered reset function
-Date: Wed, 28 Oct 2015 13:02:37 +0000
-Message-ID: <1446037358-2079-7-git-send-email-eric.auger@linaro.org>
-References: <1446037358-2079-1-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v4] VFIO: platform: reset: AMD xgbe reset module
+Date: Wed, 28 Oct 2015 13:06:35 +0000
+Message-ID: <1446037595-2173-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C84741E71
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 09:00:13 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD7EC412AF
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 09:03:54 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fLgvbr4LHdom for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Oct 2015 09:00:07 -0400 (EDT)
-Received: from mail-wi0-f172.google.com (mail-wi0-f172.google.com
- [209.85.212.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C0810412AF
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 09:00:06 -0400 (EDT)
-Received: by wikq8 with SMTP id q8so251897544wik.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 06:03:00 -0700 (PDT)
-In-Reply-To: <1446037358-2079-1-git-send-email-eric.auger@linaro.org>
+ with ESMTP id 5haUCuSF23hW for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Oct 2015 09:03:52 -0400 (EDT)
+Received: from mail-wi0-f177.google.com (mail-wi0-f177.google.com
+ [209.85.212.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 363AB40FF5
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 09:03:51 -0400 (EDT)
+Received: by wikq8 with SMTP id q8so252040031wik.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 06:06:45 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,165 +29,204 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, arnd@arndb.de, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, patches@linaro.org
+Cc: thomas.lendacky@amd.com, patches@linaro.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Remove the static lookup table and use the dynamic list of registered
-reset functions instead. Also load the reset module through its alias.
-The reset struct module pointer is stored in vfio_platform_device.
+This patch introduces a module that registers and implements a low-level
+reset function for the AMD XGBE device.
 
-We also remove the useless struct device pointer parameter in
-vfio_platform_get_reset.
+it performs the following actions:
+- reset the PHY
+- disable auto-negotiation
+- disable & clear auto-negotiation IRQ
+- soft-reset the MAC
 
-This patch fixes the issue related to the usage of __symbol_get, which
-besides from being moot, prevented compilation with CONFIG_MODULES
-disabled.
-
-Also usage of MODULE_ALIAS makes possible to add a new reset module
-without needing to update the framework. This was suggested by Arnd.
+Those tiny pieces of code are inherited from the native xgbe driver.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
-Reported-by: Arnd Bergmann <arnd@arndb.de>
 Reviewed-by: Arnd Bergmann <arnd@arndb.de>
 
 ---
 
+Applies on top of [PATCH v5 0/7] VFIO platform reset module rework
+
 v3 -> v4:
-- add Arnd R-b.
-- Remove the EXPORT_SYMBOL_GPL(vfio_platform_calxedaxgmac_reset) here
+- add Arnd's R-b
 
 v2 -> v3:
-- remove clear of vfio_platform_device reset_module and reset
-  in vfio_platform_put_reset
-- single unlock in vfio_platform_lookup_reset
-- use driver_lock instead of reset_lock
+- in Kconfig, add empty line between the 2 options
+- remove DRIVER_VERSION, DRIVER_AUTHOR and DRIVER_DESC and put
+  strings directly in MODULE macros
 
 v1 -> v2:
-- use reset_lock in vfio_platform_lookup_reset
-- remove vfio_platform_reset_combo declaration
-- remove struct device *dev parameter in vfio_platform_get_reset
-- set reset_module and reset to NULL in put function
+- uses module_vfio_reset_handler macro
 ---
- .../platform/reset/vfio_platform_calxedaxgmac.c    |  1 -
- drivers/vfio/platform/vfio_platform_common.c       | 52 ++++++++++++----------
- drivers/vfio/platform/vfio_platform_private.h      |  7 +--
- 3 files changed, 30 insertions(+), 30 deletions(-)
+ drivers/vfio/platform/reset/Kconfig                |   8 ++
+ drivers/vfio/platform/reset/Makefile               |   2 +
+ .../vfio/platform/reset/vfio_platform_amdxgbe.c    | 127 +++++++++++++++++++++
+ 3 files changed, 137 insertions(+)
+ create mode 100644 drivers/vfio/platform/reset/vfio_platform_amdxgbe.c
 
-diff --git a/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
-index 80718f2..640f5d8 100644
---- a/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
-+++ b/drivers/vfio/platform/reset/vfio_platform_calxedaxgmac.c
-@@ -76,7 +76,6 @@ int vfio_platform_calxedaxgmac_reset(struct vfio_platform_device *vdev)
+diff --git a/drivers/vfio/platform/reset/Kconfig b/drivers/vfio/platform/reset/Kconfig
+index 746b96b..70cccc5 100644
+--- a/drivers/vfio/platform/reset/Kconfig
++++ b/drivers/vfio/platform/reset/Kconfig
+@@ -5,3 +5,11 @@ config VFIO_PLATFORM_CALXEDAXGMAC_RESET
+ 	  Enables the VFIO platform driver to handle reset for Calxeda xgmac
  
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(vfio_platform_calxedaxgmac_reset);
+ 	  If you don't know what to do here, say N.
++
++config VFIO_PLATFORM_AMDXGBE_RESET
++	tristate "VFIO support for AMD XGBE reset"
++	depends on VFIO_PLATFORM
++	help
++	  Enables the VFIO platform driver to handle reset for AMD XGBE
++
++	  If you don't know what to do here, say N.
+diff --git a/drivers/vfio/platform/reset/Makefile b/drivers/vfio/platform/reset/Makefile
+index 2a486af..93f4e23 100644
+--- a/drivers/vfio/platform/reset/Makefile
++++ b/drivers/vfio/platform/reset/Makefile
+@@ -1,5 +1,7 @@
+ vfio-platform-calxedaxgmac-y := vfio_platform_calxedaxgmac.o
++vfio-platform-amdxgbe-y := vfio_platform_amdxgbe.o
  
- module_vfio_reset_handler("calxeda,hb-xgmac", vfio_platform_calxedaxgmac_reset);
+ ccflags-y += -Idrivers/vfio/platform
  
-diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-index f2d41a0..f74836a 100644
---- a/drivers/vfio/platform/vfio_platform_common.c
-+++ b/drivers/vfio/platform/vfio_platform_common.c
-@@ -30,37 +30,43 @@
- static LIST_HEAD(reset_list);
- static DEFINE_MUTEX(driver_lock);
- 
--static const struct vfio_platform_reset_combo reset_lookup_table[] = {
--	{
--		.compat = "calxeda,hb-xgmac",
--		.reset_function_name = "vfio_platform_calxedaxgmac_reset",
--		.module_name = "vfio-platform-calxedaxgmac",
--	},
--};
--
--static void vfio_platform_get_reset(struct vfio_platform_device *vdev,
--				    struct device *dev)
-+static vfio_platform_reset_fn_t vfio_platform_lookup_reset(const char *compat,
-+					struct module **module)
- {
--	int (*reset)(struct vfio_platform_device *);
--	int i;
-+	struct vfio_platform_reset_node *iter;
-+	vfio_platform_reset_fn_t reset_fn = NULL;
- 
--	for (i = 0 ; i < ARRAY_SIZE(reset_lookup_table); i++) {
--		if (!strcmp(reset_lookup_table[i].compat, vdev->compat)) {
--			request_module(reset_lookup_table[i].module_name);
--			reset = __symbol_get(
--				reset_lookup_table[i].reset_function_name);
--			if (reset) {
--				vdev->reset = reset;
--				return;
--			}
-+	mutex_lock(&driver_lock);
-+	list_for_each_entry(iter, &reset_list, link) {
-+		if (!strcmp(iter->compat, compat) &&
-+			try_module_get(iter->owner)) {
-+			*module = iter->owner;
-+			reset_fn = iter->reset;
-+			break;
- 		}
- 	}
-+	mutex_unlock(&driver_lock);
-+	return reset_fn;
+ obj-$(CONFIG_VFIO_PLATFORM_CALXEDAXGMAC_RESET) += vfio-platform-calxedaxgmac.o
++obj-$(CONFIG_VFIO_PLATFORM_AMDXGBE_RESET) += vfio-platform-amdxgbe.o
+diff --git a/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c b/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c
+new file mode 100644
+index 0000000..1636e22
+--- /dev/null
++++ b/drivers/vfio/platform/reset/vfio_platform_amdxgbe.c
+@@ -0,0 +1,127 @@
++/*
++ * VFIO platform driver specialized for AMD xgbe reset
++ * reset code is inherited from AMD xgbe native driver
++ *
++ * Copyright (c) 2015 Linaro Ltd.
++ *              www.linaro.org
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/init.h>
++#include <linux/io.h>
++#include <uapi/linux/mdio.h>
++#include <linux/delay.h>
++
++#include "vfio_platform_private.h"
++
++#define DMA_MR			0x3000
++#define MAC_VR			0x0110
++#define DMA_ISR			0x3008
++#define MAC_ISR			0x00b0
++#define PCS_MMD_SELECT		0xff
++#define MDIO_AN_INT		0x8002
++#define MDIO_AN_INTMASK		0x8001
++
++static unsigned int xmdio_read(void *ioaddr, unsigned int mmd,
++			       unsigned int reg)
++{
++	unsigned int mmd_address, value;
++
++	mmd_address = (mmd << 16) | ((reg) & 0xffff);
++	iowrite32(mmd_address >> 8, ioaddr + (PCS_MMD_SELECT << 2));
++	value = ioread32(ioaddr + ((mmd_address & 0xff) << 2));
++	return value;
 +}
 +
-+static void vfio_platform_get_reset(struct vfio_platform_device *vdev)
++static void xmdio_write(void *ioaddr, unsigned int mmd,
++			unsigned int reg, unsigned int value)
 +{
-+	char modname[256];
++	unsigned int mmd_address;
 +
-+	vdev->reset = vfio_platform_lookup_reset(vdev->compat,
-+						&vdev->reset_module);
-+	if (!vdev->reset) {
-+		snprintf(modname, 256, "vfio-reset:%s", vdev->compat);
-+		request_module(modname);
-+		vdev->reset = vfio_platform_lookup_reset(vdev->compat,
-+							 &vdev->reset_module);
++	mmd_address = (mmd << 16) | ((reg) & 0xffff);
++	iowrite32(mmd_address >> 8, ioaddr + (PCS_MMD_SELECT << 2));
++	iowrite32(value, ioaddr + ((mmd_address & 0xff) << 2));
++}
++
++int vfio_platform_amdxgbe_reset(struct vfio_platform_device *vdev)
++{
++	struct vfio_platform_region xgmac_regs = vdev->regions[0];
++	struct vfio_platform_region xpcs_regs = vdev->regions[1];
++	u32 dma_mr_value, pcs_value, value;
++	unsigned int count;
++
++	if (!xgmac_regs.ioaddr) {
++		xgmac_regs.ioaddr =
++			ioremap_nocache(xgmac_regs.addr, xgmac_regs.size);
++		if (!xgmac_regs.ioaddr)
++			return -ENOMEM;
 +	}
- }
- 
- static void vfio_platform_put_reset(struct vfio_platform_device *vdev)
- {
- 	if (vdev->reset)
--		symbol_put_addr(vdev->reset);
-+		module_put(vdev->reset_module);
- }
- 
- static int vfio_platform_regions_init(struct vfio_platform_device *vdev)
-@@ -557,7 +563,7 @@ int vfio_platform_probe_common(struct vfio_platform_device *vdev,
- 		return ret;
- 	}
- 
--	vfio_platform_get_reset(vdev, dev);
-+	vfio_platform_get_reset(vdev);
- 
- 	mutex_init(&vdev->igate);
- 
-diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
-index 415310f..d1b0668 100644
---- a/drivers/vfio/platform/vfio_platform_private.h
-+++ b/drivers/vfio/platform/vfio_platform_private.h
-@@ -58,6 +58,7 @@ struct vfio_platform_device {
- 	struct mutex			igate;
- 	struct module			*parent_module;
- 	const char			*compat;
-+	struct module			*reset_module;
- 
- 	/*
- 	 * These fields should be filled by the bus specific binder
-@@ -81,12 +82,6 @@ struct vfio_platform_reset_node {
- 	vfio_platform_reset_fn_t reset;
- };
- 
--struct vfio_platform_reset_combo {
--	const char *compat;
--	const char *reset_function_name;
--	const char *module_name;
--};
--
- extern int vfio_platform_probe_common(struct vfio_platform_device *vdev,
- 				      struct device *dev);
- extern struct vfio_platform_device *vfio_platform_remove_common
++	if (!xpcs_regs.ioaddr) {
++		xpcs_regs.ioaddr =
++			ioremap_nocache(xpcs_regs.addr, xpcs_regs.size);
++		if (!xpcs_regs.ioaddr)
++			return -ENOMEM;
++	}
++
++	/* reset the PHY through MDIO*/
++	pcs_value = xmdio_read(xpcs_regs.ioaddr, MDIO_MMD_PCS, MDIO_CTRL1);
++	pcs_value |= MDIO_CTRL1_RESET;
++	xmdio_write(xpcs_regs.ioaddr, MDIO_MMD_PCS, MDIO_CTRL1, pcs_value);
++
++	count = 50;
++	do {
++		msleep(20);
++		pcs_value = xmdio_read(xpcs_regs.ioaddr, MDIO_MMD_PCS,
++					MDIO_CTRL1);
++	} while ((pcs_value & MDIO_CTRL1_RESET) && --count);
++
++	if (pcs_value & MDIO_CTRL1_RESET)
++		pr_warn("%s XGBE PHY reset timeout\n", __func__);
++
++	/* disable auto-negotiation */
++	value = xmdio_read(xpcs_regs.ioaddr, MDIO_MMD_AN, MDIO_CTRL1);
++	value &= ~MDIO_AN_CTRL1_ENABLE;
++	xmdio_write(xpcs_regs.ioaddr, MDIO_MMD_AN, MDIO_CTRL1, value);
++
++	/* disable AN IRQ */
++	xmdio_write(xpcs_regs.ioaddr, MDIO_MMD_AN, MDIO_AN_INTMASK, 0);
++
++	/* clear AN IRQ */
++	xmdio_write(xpcs_regs.ioaddr, MDIO_MMD_AN, MDIO_AN_INT, 0);
++
++	/* MAC software reset */
++	dma_mr_value = ioread32(xgmac_regs.ioaddr + DMA_MR);
++	dma_mr_value |= 0x1;
++	iowrite32(dma_mr_value, xgmac_regs.ioaddr + DMA_MR);
++
++	usleep_range(10, 15);
++
++	count = 2000;
++	while (count-- && (ioread32(xgmac_regs.ioaddr + DMA_MR) & 1))
++		usleep_range(500, 600);
++
++	if (!count)
++		pr_warn("%s MAC SW reset failed\n", __func__);
++
++	return 0;
++}
++
++module_vfio_reset_handler("amd,xgbe-seattle-v1a", vfio_platform_amdxgbe_reset);
++
++MODULE_VERSION("0.1");
++MODULE_LICENSE("GPL v2");
++MODULE_AUTHOR("Eric Auger <eric.auger@linaro.org>");
++MODULE_DESCRIPTION("Reset support for AMD xgbe vfio platform device");
 -- 
 1.9.1
