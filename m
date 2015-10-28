@@ -1,29 +1,28 @@
 From: Eric Auger <eric.auger@linaro.org>
 Subject: Re: [RFC] vfio/type1: handle case where IOMMU does not support
  PAGE_SIZE size
-Date: Wed, 28 Oct 2015 18:41:51 +0100
-Message-ID: <563108DF.6070406@linaro.org>
+Date: Wed, 28 Oct 2015 18:48:41 +0100
+Message-ID: <56310A79.4020309@linaro.org>
 References: <1446037965-2341-1-git-send-email-eric.auger@linaro.org>
- <1446049648.8018.397.camel@redhat.com> <20151028171410.GK18966@arm.com>
- <1446053322.8018.402.camel@redhat.com>
+ <1446049648.8018.397.camel@redhat.com> <563101A0.7020404@linaro.org>
+ <1446053858.8018.406.camel@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FAF641022
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 13:39:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6824F411BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 13:45:52 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id J22QOxGMPeFR for <kvmarm@lists.cs.columbia.edu>;
- Wed, 28 Oct 2015 13:39:04 -0400 (EDT)
-Received: from mail-wi0-f179.google.com (mail-wi0-f179.google.com
- [209.85.212.179])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C6B3B40FA2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 13:39:03 -0400 (EDT)
-Received: by wikq8 with SMTP id q8so262169028wik.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 10:41:57 -0700 (PDT)
-In-Reply-To: <1446053322.8018.402.camel@redhat.com>
+ with ESMTP id b+iG5-UrtCA5 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Oct 2015 13:45:51 -0400 (EDT)
+Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3997C41022
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 13:45:50 -0400 (EDT)
+Received: by wmec75 with SMTP id c75so10220356wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 10:48:45 -0700 (PDT)
+In-Reply-To: <1446053858.8018.406.camel@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,15 +32,40 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex Williamson <alex.williamson@redhat.com>, Will Deacon <will.deacon@arm.com>
-Cc: eric.auger@st.com, kvm@vger.kernel.org, patches@linaro.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: eric.auger@st.com, kvm@vger.kernel.org, patches@linaro.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Alex,
-On 10/28/2015 06:28 PM, Alex Williamson wrote:
-> On Wed, 2015-10-28 at 17:14 +0000, Will Deacon wrote:
->> On Wed, Oct 28, 2015 at 10:27:28AM -0600, Alex Williamson wrote:
+On 10/28/2015 06:37 PM, Alex Williamson wrote:
+> On Wed, 2015-10-28 at 18:10 +0100, Eric Auger wrote:
+>> Hi Alex,
+>> On 10/28/2015 05:27 PM, Alex Williamson wrote:
 >>> On Wed, 2015-10-28 at 13:12 +0000, Eric Auger wrote:
+>>>> Current vfio_pgsize_bitmap code hides the supported IOMMU page
+>>>> sizes smaller than PAGE_SIZE. As a result, in case the IOMMU
+>>>> does not support PAGE_SIZE page, the alignment check on map/unmap
+>>>> is done with larger page sizes, if any. This can fail although
+>>>> mapping could be done with pages smaller than PAGE_SIZE.
+>>>>
+>>>> vfio_pgsize_bitmap is modified to expose the IOMMU page sizes,
+>>>> supported by all domains, even those smaller than PAGE_SIZE. The
+>>>> alignment check on map is performed against PAGE_SIZE if the minimum
+>>>> IOMMU size is less than PAGE_SIZE or against the min page size greater
+>>>> than PAGE_SIZE.
+>>>>
+>>>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+>>>>
+>>>> ---
+>>>>
+>>>> This was tested on AMD Seattle with 64kB page host. ARM MMU 401
+>>>> currently expose 4kB, 2MB and 1GB page support. With a 64kB page host,
+>>>> the map/unmap check is done against 2MB. Some alignment check fail
+>>>> so VFIO_IOMMU_MAP_DMA fail while we could map using 4kB IOMMU page
+>>>> size.
+>>>> ---
+>>>>  drivers/vfio/vfio_iommu_type1.c | 25 +++++++++++--------------
+>>>>  1 file changed, 11 insertions(+), 14 deletions(-)
+>>>>
 >>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
 >>>> index 57d8c37..13fb974 100644
 >>>> --- a/drivers/vfio/vfio_iommu_type1.c
@@ -56,6 +80,55 @@ On 10/28/2015 06:28 PM, Alex Williamson wrote:
 >>> Isn't this and removing the WARN_ON()s the only real change in this
 >>> patch?  The rest looks like conversion to use IS_ALIGNED and the
 >>> following test, that I don't really understand...
+>> Yes basically you're right.
+> 
+> 
+> Ok, so with hopefully correcting my understand of what this does, isn't
+> this effectively the same:
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 57d8c37..7db4f5a 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -403,13 +403,19 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, stru
+>  static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
+>  {
+>         struct vfio_domain *domain;
+> -       unsigned long bitmap = PAGE_MASK;
+> +       unsigned long bitmap = ULONG_MAX;
+>  
+>         mutex_lock(&iommu->lock);
+>         list_for_each_entry(domain, &iommu->domain_list, next)
+>                 bitmap &= domain->domain->ops->pgsize_bitmap;
+>         mutex_unlock(&iommu->lock);
+>  
+> +       /* Some comment about how the IOMMU API splits requests */
+> +       if (bitmap & ~PAGE_MASK) {
+> +               bitmap &= PAGE_MASK;
+> +               bitmap |= PAGE_SIZE;
+> +       }
+> +
+>         return bitmap;
+>  }
+Yes, to me it is indeed the same
+>  
+> This would also expose to the user that we're accepting PAGE_SIZE, which
+> we weren't before, so it was not quite right to just let them do it
+> anyway.  I don't think we even need to get rid of the WARN_ONs, do we?
+> Thanks,
+
+The end-user might be afraid of those latter. Personally I would get rid
+of them but that's definitively up to you.
+
+Just let me know and I will respin.
+
+Best Regards
+
+Eric
+
+> 
+> Alex
+> 
 >>>
 >>>>  
 >>>>  	mutex_lock(&iommu->lock);
@@ -74,25 +147,18 @@ On 10/28/2015 06:28 PM, Alex Williamson wrote:
 >>>
 >>> This one.  If we're going to support sub-PAGE_SIZE mappings, why do we
 >>> care to cap alignment at PAGE_SIZE?
+>> My intent in this patch isn't to allow the user-space to map/unmap
+>> sub-PAGE_SIZE buffers. The new test makes sure the mapped area is bigger
+>> or equal than a host page whatever the supported page sizes.
 >>
->> Eric can clarify, but I think the intention here is to have VFIO continue
->> doing things in PAGE_SIZE chunks precisely so that we don't have to rework
->> all of the pinning code etc. The IOMMU API can then deal with the smaller
->> page size.
-> 
-> Gak, I read this wrong.  So really we're just artificially adding
-> PAGE_SIZE as a supported IOMMU size so long as the IOMMU support
-> something smaller than PAGE_SIZE, where PAGE_SIZE is obviously a
-> multiple of that smaller size.  Ok, but should we just do this once in
-> vfio_pgsize_bitmap()?  This is exactly why VT-d just reports ~(4k - 1)
-> for the iommu bitmap.
-Yes I can do this in vfio_pgsize_bitmap if you prefer.
-
-Thanks
-
-Eric
-
-> 
+>> I noticed that chunk construction, pinning and other many things are
+>> based on PAGE_SIZE and far be it from me to change that code! I want to
+>> keep that minimal granularity for all those computation.
+>>
+>> However on iommu side, I would like to rely on the fact the iommu driver
+>> is clever enough to choose the right page size and even to choose a size
+>> that is smaller than PAGE_SIZE if this latter is not supported.
+>>>
 >>>> -	mask = ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
 >>>> -
 >>>> -	if (unmap->iova & mask)
@@ -146,12 +212,19 @@ Eric
 >>> tell users that their locked memory limit needs to be 16x now?  The rest
 >>> of the code would need an audit as well to see what other sub-page bugs
 >>> might be hiding.  Thanks,
+>> So if the user is not allowed to map sub-PAGE_SIZE buffers, accounting
+>> still is based on PAGE_SIZE while iommu mapping can be based on
+>> sub-PAGE_SIZE pages. I am misunderstanding something?
 >>
->> I don't see that. The pinning all happens the same in VFIO, which can
->> then happily pass a 64k region to iommu_map. iommu_map will then call
->> ->map in 4k chunks on the IOMMU driver ops.
+>> Best Regards
+>>
+>> Eric
+>>>
+>>> Alex
+>>>
+>>>
+>>>
+>>
 > 
-> Yep, I see now that this isn't doing sub-page mappings.  Thanks,
 > 
-> Alex
 > 
