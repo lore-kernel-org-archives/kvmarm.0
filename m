@@ -1,150 +1,183 @@
 From: Christopher Covington <cov@codeaurora.org>
-Subject: [kvm-unit-tests PATCHv5 1/3] arm: Add PMU test
-Date: Wed, 28 Oct 2015 15:12:53 -0400
-Message-ID: <1446059575-23903-2-git-send-email-cov@codeaurora.org>
+Subject: [kvm-unit-tests PATCHv5 3/3] arm: pmu: Add CPI checking
+Date: Wed, 28 Oct 2015 15:12:55 -0400
+Message-ID: <1446059575-23903-4-git-send-email-cov@codeaurora.org>
 References: <1444662470-13045-1-git-send-email-cov@codeaurora.org>
  <1446059575-23903-1-git-send-email-cov@codeaurora.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 072954130A
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 15:13:04 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id bab-DQSV9hmo for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 28 Oct 2015 15:13:03 -0400 (EDT)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 04D81412F2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 28 Oct 2015 15:13:03 -0400 (EDT)
 In-Reply-To: <1446059575-23903-1-git-send-email-cov@codeaurora.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: drjones@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wei@redhat.com
-Cc: shannon.zhao@linaro.org, alistair.francis@xilinx.com, croberts@codeaurora.org, alindsay@codeaurora.org, Christopher Covington <cov@codeaurora.org>
+Cc: alindsay@codeaurora.org, croberts@codeaurora.org, shannon.zhao@linaro.org, alistair.francis@xilinx.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Beginning with a simple sanity check of the control register, add
-a unit test for the ARM Performance Monitors Unit (PMU).
+Calculate the numbers of cycles per instruction (CPI) implied by ARM
+PMU cycle counter values. The code includes a strict checking facility
+intended for the -icount option in TCG mode but it is not yet enabled
+in the configuration file. Enabling it must wait on infrastructure
+improvements which allow for different tests to be run on TCG versus
+KVM.
 
 Signed-off-by: Christopher Covington <cov@codeaurora.org>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- arm/pmu.c                    | 82 ++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg            |  5 +++
- config/config-arm-common.mak |  4 ++-
- 3 files changed, 90 insertions(+), 1 deletion(-)
- create mode 100644 arm/pmu.c
+ arm/pmu.c | 103 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 102 insertions(+), 1 deletion(-)
 
 diff --git a/arm/pmu.c b/arm/pmu.c
-new file mode 100644
-index 0000000..42d0ee1
---- /dev/null
+index 4334de4..788886a 100644
+--- a/arm/pmu.c
 +++ b/arm/pmu.c
-@@ -0,0 +1,82 @@
-+/*
-+ * Test the ARM Performance Monitors Unit (PMU).
-+ *
-+ * Copyright 2015 The Linux Foundation. All rights reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU Lesser General Public License version 2.1 and
-+ * only version 2.1 as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
-+ * for more details.
-+ */
-+#include "libcflat.h"
-+
-+#if defined(__arm__)
-+static inline uint32_t get_pmcr(void)
-+{
-+	uint32_t ret;
-+
-+	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
-+	return ret;
-+}
-+#elif defined(__aarch64__)
-+static inline uint32_t get_pmcr(void)
-+{
-+	uint32_t ret;
-+
-+	asm volatile("mrs %0, pmcr_el0" : "=r" (ret));
-+	return ret;
-+}
-+#endif
-+
-+struct pmu_data {
-+	union {
-+		uint32_t pmcr_el0;
-+		struct {
-+			uint32_t enable:1;
-+			uint32_t event_counter_reset:1;
-+			uint32_t cycle_counter_reset:1;
-+			uint32_t cycle_counter_clock_divider:1;
-+			uint32_t event_counter_export:1;
-+			uint32_t cycle_counter_disable_when_prohibited:1;
-+			uint32_t cycle_counter_long:1;
-+			uint32_t reserved:4;
-+			uint32_t counters:5;
-+			uint32_t identification_code:8;
-+			uint32_t implementer:8;
-+		};
-+	};
-+};
+@@ -43,6 +43,23 @@ static inline unsigned long get_pmccntr(void)
+ 	asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r" (cycles));
+ 	return cycles;
+ }
 +
 +/*
-+ * As a simple sanity check on the PMCR_EL0, ensure the implementer field isn't
-+ * null. Also print out a couple other interesting fields for diagnostic
-+ * purposes. For example, as of fall 2015, QEMU TCG mode doesn't implement
-+ * event counters and therefore reports zero event counters, but hopefully
-+ * support for at least the instructions event will be added in the future and
-+ * the reported number of event counters will become nonzero.
++ * Extra instructions inserted by the compiler would be difficult to compensate
++ * for, so hand assemble everything between, and including, the PMCR accesses
++ * to start and stop counting.
 + */
-+static bool check_pmcr(void)
++static inline void loop(int i, uint32_t pmcr)
 +{
-+	struct pmu_data pmu;
++	asm volatile(
++	"	mcr	p15, 0, %[pmcr], c9, c12, 0\n"
++	"1:	subs	%[i], %[i], #1\n"
++	"	bgt	1b\n"
++	"	mcr	p15, 0, %[z], c9, c12, 0\n"
++	: [i] "+r" (i)
++	: [pmcr] "r" (pmcr), [z] "r" (0)
++	: "cc");
++}
+ #elif defined(__aarch64__)
+ static inline uint32_t get_pmcr(void)
+ {
+@@ -64,6 +81,23 @@ static inline unsigned long get_pmccntr(void)
+ 	asm volatile("mrs %0, pmccntr_el0" : "=r" (cycles));
+ 	return cycles;
+ }
 +
-+	pmu.pmcr_el0 = get_pmcr();
++/*
++ * Extra instructions inserted by the compiler would be difficult to compensate
++ * for, so hand assemble everything between, and including, the PMCR accesses
++ * to start and stop counting.
++ */
++static inline void loop(int i, uint32_t pmcr)
++{
++	asm volatile(
++	"	msr	pmcr_el0, %[pmcr]\n"
++	"1:	subs	%[i], %[i], #1\n"
++	"	b.gt	1b\n"
++	"	msr	pmcr_el0, xzr\n"
++	: [i] "+r" (i)
++	: [pmcr] "r" (pmcr)
++	: "cc");
++}
+ #endif
+ 
+ struct pmu_data {
+@@ -131,12 +165,79 @@ static bool check_cycles_increase(void)
+ 	return true;
+ }
+ 
+-int main(void)
++/*
++ * Execute a known number of guest instructions. Only odd instruction counts
++ * greater than or equal to 3 are supported by the in-line assembly code. The
++ * control register (PMCR_EL0) is initialized with the provided value (allowing
++ * for example for the cycle counter or event counters to be reset). At the end
++ * of the exact instruction loop, zero is written to PMCR_EL0 to disable
++ * counting, allowing the cycle counter or event counters to be read at the
++ * leisure of the calling code.
++ */
++static void measure_instrs(int num, uint32_t pmcr)
++{
++	int i = (num - 1) / 2;
 +
-+	printf("PMU implementer:     %c\n", pmu.implementer);
-+	printf("Identification code: 0x%x\n", pmu.identification_code);
-+	printf("Event counters:      %d\n", pmu.counters);
-+
-+	return pmu.implementer != 0;
++	assert(num >= 3 && ((num - 1) % 2 == 0));
++	loop(i, pmcr);
 +}
 +
-+int main(void)
++/*
++ * Measure cycle counts for various known instruction counts. Ensure that the
++ * cycle counter progresses (similar to check_cycles_increase() but with more
++ * instructions and using reset and stop controls). If supplied a positive,
++ * nonzero CPI parameter, also strictly check that every measurement matches
++ * it. Strict CPI checking is used to test -icount mode.
++ */
++static bool check_cpi(int cpi)
 +{
-+	report_prefix_push("pmu");
++	struct pmu_data pmu = {0};
 +
-+	report("Control register", check_pmcr());
++	pmu.cycle_counter_reset = 1;
++	pmu.enable = 1;
 +
-+	return report_summary();
++	if (cpi > 0)
++		printf("Checking for CPI=%d.\n", cpi);
++	printf("instrs : cycles0 cycles1 ...\n");
++
++	for (int i = 3; i < 300; i += 32) {
++		int avg, sum = 0;
++
++		printf("%d :", i);
++		for (int j = 0; j < NR_SAMPLES; j++) {
++			int cycles;
++
++			measure_instrs(i, pmu.pmcr_el0);
++			cycles = get_pmccntr();
++			printf(" %d", cycles);
++
++			if (!cycles || (cpi > 0 && cycles != i * cpi)) {
++				printf("\n");
++				return false;
++			}
++
++			sum += cycles;
++		}
++		avg = sum / NR_SAMPLES;
++		printf(" sum=%d avg=%d avg_ipc=%d avg_cpi=%d\n",
++			sum, avg, i / avg, avg / i);
++	}
++
++	return true;
 +}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index e068a0c..fd94adb 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -35,3 +35,8 @@ file = selftest.flat
- smp = `getconf _NPROCESSORS_CONF`
- extra_params = -append 'smp'
- groups = selftest
 +
-+# Test PMU support without -icount
-+[pmu]
-+file = pmu.flat
-+groups = pmu
-diff --git a/config/config-arm-common.mak b/config/config-arm-common.mak
-index 698555d..b34d04c 100644
---- a/config/config-arm-common.mak
-+++ b/config/config-arm-common.mak
-@@ -11,7 +11,8 @@ endif
++int main(int argc, char *argv[])
+ {
++	int cpi = 0;
++
++	if (argc >= 1)
++		cpi = atol(argv[0]);
++
+ 	report_prefix_push("pmu");
  
- tests-common = \
- 	$(TEST_DIR)/selftest.flat \
--	$(TEST_DIR)/spinlock-test.flat
-+	$(TEST_DIR)/spinlock-test.flat \
-+	$(TEST_DIR)/pmu.flat
+ 	report("Control register", check_pmcr());
+ 	report("Monotonically increasing cycle count", check_cycles_increase());
++	report("Cycle/instruction ratio", check_cpi(cpi));
  
- all: test_cases
- 
-@@ -70,3 +71,4 @@ test_cases: $(generated_files) $(tests-common) $(tests)
- 
- $(TEST_DIR)/selftest.elf: $(cstart.o) $(TEST_DIR)/selftest.o
- $(TEST_DIR)/spinlock-test.elf: $(cstart.o) $(TEST_DIR)/spinlock-test.o
-+$(TEST_DIR)/pmu.elf: $(cstart.o) $(TEST_DIR)/pmu.o
+ 	return report_summary();
+ }
 -- 
 Qualcomm Innovation Center, Inc.
 The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
 a Linux Foundation Collaborative Project
-
