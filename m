@@ -1,124 +1,102 @@
-From: Christopher Covington <cov@codeaurora.org>
-Subject: [kvm-unit-tests PATCHv5 2/3] arm: pmu: Check cycle count increases
-Date: Wed, 28 Oct 2015 15:12:54 -0400
-Message-ID: <1446059575-23903-3-git-send-email-cov@codeaurora.org>
-References: <1444662470-13045-1-git-send-email-cov@codeaurora.org>
- <1446059575-23903-1-git-send-email-cov@codeaurora.org>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1446059575-23903-1-git-send-email-cov@codeaurora.org>
-Sender: kvm-owner@vger.kernel.org
-To: drjones@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wei@redhat.com
-Cc: shannon.zhao@linaro.org, alistair.francis@xilinx.com, croberts@codeaurora.org, alindsay@codeaurora.org, Christopher Covington <cov@codeaurora.org>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [PATCH] vfio/type1: handle case where IOMMU does not support
+ PAGE_SIZE size
+Date: Thu, 29 Oct 2015 13:59:45 +0000
+Message-ID: <1446127185-2096-1-git-send-email-eric.auger@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 998CF41049
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2015 09:56:57 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id p4PRdy9YuJ7I for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 29 Oct 2015 09:56:56 -0400 (EDT)
+Received: from mail-wi0-f172.google.com (mail-wi0-f172.google.com
+ [209.85.212.172])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8DAB541022
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2015 09:56:56 -0400 (EDT)
+Received: by wicll6 with SMTP id ll6so228659786wic.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2015 06:59:52 -0700 (PDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will.deacon@arm.com
+Cc: patches@linaro.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Ensure that reads of the PMCCNTR_EL0 are monotonically increasing,
-even for the smallest delta of two subsequent reads.
+Current vfio_pgsize_bitmap code hides the supported IOMMU page
+sizes smaller than PAGE_SIZE. As a result, in case the IOMMU
+does not support PAGE_SIZE page, the alignment check on map/unmap
+is done with larger page sizes, if any. This can fail although
+mapping could be done with pages smaller than PAGE_SIZE.
 
-Signed-off-by: Christopher Covington <cov@codeaurora.org>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+This patch modifies vfio_pgsize_bitmap implementation so that,
+in case the IOMMU supports page sizes smaller than PAGE_HOST
+we pretend PAGE_HOST is supported and hide sub-PAGE_HOST sizes.
+That way the user will be able to map/unmap buffers whose size/
+start address is aligned with PAGE_HOST. Pinning code uses that
+granularity while iommu driver can use the sub-PAGE_HOST size
+to map the buffer.
+
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+
 ---
- arm/pmu.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
 
-diff --git a/arm/pmu.c b/arm/pmu.c
-index 42d0ee1..4334de4 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -14,6 +14,8 @@
-  */
- #include "libcflat.h"
- 
-+#define NR_SAMPLES 10
-+
- #if defined(__arm__)
- static inline uint32_t get_pmcr(void)
+This was tested on AMD Seattle with 64kB page host. ARM MMU 401
+currently expose 4kB, 2MB and 1GB page support. With a 64kB page host,
+the map/unmap check is done against 2MB. Some alignment check fail
+so VFIO_IOMMU_MAP_DMA fail while we could map using 4kB IOMMU page
+size.
+
+RFC -> PATCH v1:
+- move all modifications in vfio_pgsize_bitmap following Alex'
+  suggestion to expose a fake PAGE_HOST support
+- restore WARN_ON's
+---
+ drivers/vfio/vfio_iommu_type1.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 57d8c37..cee504a 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -403,13 +403,26 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+ static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
  {
-@@ -22,6 +24,25 @@ static inline uint32_t get_pmcr(void)
- 	asm volatile("mrc p15, 0, %0, c9, c12, 0" : "=r" (ret));
- 	return ret;
- }
-+
-+static inline void set_pmcr(uint32_t pmcr)
-+{
-+	asm volatile("mcr p15, 0, %0, c9, c12, 0" : : "r" (pmcr));
-+}
-+
-+/*
-+ * While PMCCNTR can be accessed as a 64 bit coprocessor register, returning 64
-+ * bits doesn't seem worth the trouble when differential usage of the result is
-+ * expected (with differences that can easily fit in 32 bits). So just return
-+ * the lower 32 bits of the cycle count in AArch32.
-+ */
-+static inline unsigned long get_pmccntr(void)
-+{
-+	unsigned long cycles;
-+
-+	asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r" (cycles));
-+	return cycles;
-+}
- #elif defined(__aarch64__)
- static inline uint32_t get_pmcr(void)
- {
-@@ -30,6 +51,19 @@ static inline uint32_t get_pmcr(void)
- 	asm volatile("mrs %0, pmcr_el0" : "=r" (ret));
- 	return ret;
- }
-+
-+static inline void set_pmcr(uint32_t pmcr)
-+{
-+	asm volatile("msr pmcr_el0, %0" : : "r" (pmcr));
-+}
-+
-+static inline unsigned long get_pmccntr(void)
-+{
-+	unsigned long cycles;
-+
-+	asm volatile("mrs %0, pmccntr_el0" : "=r" (cycles));
-+	return cycles;
-+}
- #endif
+ 	struct vfio_domain *domain;
+-	unsigned long bitmap = PAGE_MASK;
++	unsigned long bitmap = ULONG_MAX;
  
- struct pmu_data {
-@@ -72,11 +106,37 @@ static bool check_pmcr(void)
- 	return pmu.implementer != 0;
- }
+ 	mutex_lock(&iommu->lock);
+ 	list_for_each_entry(domain, &iommu->domain_list, next)
+ 		bitmap &= domain->domain->ops->pgsize_bitmap;
+ 	mutex_unlock(&iommu->lock);
  
-+/*
-+ * Ensure that the cycle counter progresses between back-to-back reads.
-+ */
-+static bool check_cycles_increase(void)
-+{
-+	struct pmu_data pmu = {0};
-+
-+	pmu.enable = 1;
-+	set_pmcr(pmu.pmcr_el0);
-+
-+	for (int i = 0; i < NR_SAMPLES; i++) {
-+		unsigned long a, b;
-+
-+		a = get_pmccntr();
-+		b = get_pmccntr();
-+
-+		if (a >= b) {
-+			printf("Read %ld then %ld.\n", a, b);
-+			return false;
-+		}
++	/*
++	 * In case the IOMMU supports page sizes smaller than PAGE_HOST
++	 * we pretend PAGE_HOST is supported and hide sub-PAGE_HOST sizes.
++	 * That way the user will be able to map/unmap buffers whose size/
++	 * start address is aligned with PAGE_HOST. Pinning code uses that
++	 * granularity while iommu driver can use the sub-PAGE_HOST size
++	 * to map the buffer.
++	 */
++	if (bitmap & ~PAGE_MASK) {
++		bitmap &= PAGE_MASK;
++		bitmap |= PAGE_SIZE;
 +	}
 +
-+	return true;
-+}
-+
- int main(void)
- {
- 	report_prefix_push("pmu");
- 
- 	report("Control register", check_pmcr());
-+	report("Monotonically increasing cycle count", check_cycles_increase());
- 
- 	return report_summary();
+ 	return bitmap;
  }
+ 
 -- 
-Qualcomm Innovation Center, Inc.
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
-
+1.9.1
