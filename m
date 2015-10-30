@@ -1,7 +1,7 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v4 06/21] KVM: ARM64: Add reset and access handlers for PMCEID0 and PMCEID1 register
-Date: Fri, 30 Oct 2015 14:21:48 +0800
-Message-ID: <1446186123-11548-7-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v4 09/21] KVM: ARM64: Add reset and access handlers for PMXEVCNTR register
+Date: Fri, 30 Oct 2015 14:21:51 +0800
+Message-ID: <1446186123-11548-10-git-send-email-zhaoshenglong@huawei.com>
 References: <1446186123-11548-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -14,84 +14,98 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-Add reset handler which gets host value of PMCEID0 or PMCEID1. Since
-write action to PMCEID0 or PMCEID1 is ignored, add a new case for this.
+Since the reset value of PMXEVCNTR is UNKNOWN, use reset_unknown for
+its reset handler. Add access handler which emulates writing and reading
+PMXEVCNTR register. When reading PMXEVCNTR, call perf_event_read_value
+to get the count value of the perf event.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm64/kvm/sys_regs.c | 29 +++++++++++++++++++++++++----
- 1 file changed, 25 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 36 ++++++++++++++++++++++++++++++++++--
+ 1 file changed, 34 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 35d232e..cb82b15 100644
+index 4e606ea..b7ca2cd 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -469,6 +469,19 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	vcpu_sysreg_write(vcpu, r, val);
- }
+@@ -491,6 +491,16 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
  
-+static void reset_pmceid(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+{
-+	u64 pmceid;
+ 	if (p->is_write) {
+ 		switch (r->reg) {
++		case PMXEVCNTR_EL0: {
++			int index = PMEVCNTR0_EL0
++				    + vcpu_sys_reg(vcpu, PMSELR_EL0);
 +
-+	if (r->reg == PMCEID0_EL0 || r->reg == c9_PMCEID0)
-+		asm volatile("mrs %0, pmceid0_el0\n" : "=r" (pmceid));
-+	else
-+		/* PMCEID1_EL0 or c9_PMCEID1 */
-+		asm volatile("mrs %0, pmceid1_el0\n" : "=r" (pmceid));
-+
-+	vcpu_sysreg_write(vcpu, r, pmceid);
-+}
-+
- /* PMU registers accessor. */
- static bool access_pmu_regs(struct kvm_vcpu *vcpu,
- 			    const struct sys_reg_params *p,
-@@ -486,6 +499,9 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
- 			vcpu_sys_reg(vcpu, r->reg) = val;
- 			break;
++			val = kvm_pmu_get_counter_value(vcpu,
++						vcpu_sys_reg(vcpu, PMSELR_EL0));
++			vcpu_sys_reg(vcpu, index) += (s64)*vcpu_reg(vcpu, p->Rt)
++						     - val;
++			break;
++		}
+ 		case PMXEVTYPER_EL0: {
+ 			val = vcpu_sys_reg(vcpu, PMSELR_EL0);
+ 			kvm_pmu_set_counter_event_type(vcpu,
+@@ -519,6 +529,12 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
  		}
-+		case PMCEID0_EL0:
-+		case PMCEID1_EL0:
-+			return ignore_write(vcpu, p);
- 		default:
- 			vcpu_sys_reg(vcpu, r->reg) = *vcpu_reg(vcpu, p->Rt);
- 			break;
-@@ -710,10 +726,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  access_pmu_regs, reset_unknown, PMSELR_EL0 },
- 	/* PMCEID0_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b110),
+ 	} else {
+ 		switch (r->reg) {
++		case PMXEVCNTR_EL0: {
++			val = kvm_pmu_get_counter_value(vcpu,
++						vcpu_sys_reg(vcpu, PMSELR_EL0));
++			*vcpu_reg(vcpu, p->Rt) = val;
++			break;
++		}
+ 		case PMCR_EL0: {
+ 			/* PMCR.P & PMCR.C are RAZ */
+ 			val = vcpu_sys_reg(vcpu, r->reg)
+@@ -749,7 +765,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  access_pmu_regs, reset_unknown, PMXEVTYPER_EL0 },
+ 	/* PMXEVCNTR_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b010),
 -	  trap_raz_wi },
-+	  access_pmu_regs, reset_pmceid, PMCEID0_EL0 },
- 	/* PMCEID1_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b111),
--	  trap_raz_wi },
-+	  access_pmu_regs, reset_pmceid, PMCEID1_EL0 },
- 	/* PMCCNTR_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b000),
++	  access_pmu_regs, reset_unknown, PMXEVCNTR_EL0 },
+ 	/* PMUSERENR_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1110), Op2(0b000),
  	  trap_raz_wi },
-@@ -943,6 +959,9 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
- 			vcpu_cp15(vcpu, r->reg) = val;
- 			break;
+@@ -962,6 +978,15 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
+ 
+ 	if (p->is_write) {
+ 		switch (r->reg) {
++		case c9_PMXEVCNTR: {
++			int index = c14_PMEVCNTR0 + vcpu_cp15(vcpu, c9_PMSELR);
++
++			val = kvm_pmu_get_counter_value(vcpu,
++						    vcpu_cp15(vcpu, c9_PMSELR));
++			vcpu_cp15(vcpu, index) += (s64)*vcpu_reg(vcpu, p->Rt)
++						  - val;
++			break;
++		}
+ 		case c9_PMXEVTYPER: {
+ 			val = vcpu_cp15(vcpu, c9_PMSELR);
+ 			kvm_pmu_set_counter_event_type(vcpu,
+@@ -989,6 +1014,12 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
  		}
-+		case c9_PMCEID0:
-+		case c9_PMCEID1:
-+			return ignore_write(vcpu, p);
- 		default:
- 			vcpu_cp15(vcpu, r->reg) = *vcpu_reg(vcpu, p->Rt);
- 			break;
-@@ -1000,8 +1019,10 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmu_cp15_regs,
- 	  reset_unknown_cp15, c9_PMSELR },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), trap_raz_wi },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), trap_raz_wi },
-+	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmu_cp15_regs,
-+	  reset_pmceid, c9_PMCEID0 },
-+	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmu_cp15_regs,
-+	  reset_pmceid, c9_PMCEID1 },
+ 	} else {
+ 		switch (r->reg) {
++		case c9_PMXEVCNTR: {
++			val = kvm_pmu_get_counter_value(vcpu,
++						    vcpu_cp15(vcpu, c9_PMSELR));
++			*vcpu_reg(vcpu, p->Rt) = val;
++			break;
++		}
+ 		case c9_PMCR: {
+ 			/* PMCR.P & PMCR.C are RAZ */
+ 			val = vcpu_cp15(vcpu, r->reg)
+@@ -1047,7 +1078,8 @@ static const struct sys_reg_desc cp15_regs[] = {
  	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), trap_raz_wi },
- 	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), trap_raz_wi },
- 	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_cp15_regs,
+ 	  reset_unknown_cp15, c9_PMXEVTYPER },
+-	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), trap_raz_wi },
++	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), access_pmu_cp15_regs,
++	  reset_unknown_cp15, c9_PMXEVCNTR },
+ 	{ Op1( 0), CRn( 9), CRm(14), Op2( 0), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), trap_raz_wi },
 -- 
 2.0.4
 
