@@ -1,7 +1,7 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 5/7] x86: use read wrappers in kernel loading
-Date: Fri, 30 Oct 2015 18:26:58 +0000
-Message-ID: <1446229620-28088-6-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH 6/7] arm/arm64: use read_file() in kernel and initrd loading
+Date: Fri, 30 Oct 2015 18:26:59 +0000
+Message-ID: <1446229620-28088-7-git-send-email-andre.przywara@arm.com>
 References: <1446229620-28088-1-git-send-email-andre.przywara@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1446229620-28088-1-git-send-email-andre.przywara@arm.com>
@@ -10,116 +10,89 @@ To: will.deacon@arm.com, kvm@vger.kernel.org
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm-ppc@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Replace the unsafe read-loops in the x86 kernel image loading
-functions with our safe read_file() and read_in_full() wrappers.
-This should fix random fails in kernel image loading, especially
-from pipes and sockets.
+Use the new read_file() wrapper in our arm/arm64 kernel image loading
+function instead of the private implementation.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- x86/kvm.c | 35 ++++++++++++++---------------------
- 1 file changed, 14 insertions(+), 21 deletions(-)
+ arm/fdt.c | 40 ++++++++++++++++++----------------------
+ 1 file changed, 18 insertions(+), 22 deletions(-)
 
-diff --git a/x86/kvm.c b/x86/kvm.c
-index a0204b8..ae430a0 100644
---- a/x86/kvm.c
-+++ b/x86/kvm.c
-@@ -9,6 +9,7 @@
+diff --git a/arm/fdt.c b/arm/fdt.c
+index ec7453f..19d7ed9 100644
+--- a/arm/fdt.c
++++ b/arm/fdt.c
+@@ -224,19 +224,6 @@ static int setup_fdt(struct kvm *kvm)
+ }
+ late_init(setup_fdt);
  
- #include <asm/bootparam.h>
- #include <linux/kvm.h>
-+#include <linux/kernel.h>
- 
- #include <sys/types.h>
- #include <sys/ioctl.h>
-@@ -209,15 +210,14 @@ static inline void *guest_real_to_host(struct kvm *kvm, u16 selector, u16 offset
- static bool load_flat_binary(struct kvm *kvm, int fd_kernel)
+-static int read_image(int fd, void **pos, void *limit)
+-{
+-	int count;
+-
+-	while (((count = xread(fd, *pos, SZ_64K)) > 0) && *pos <= limit)
+-		*pos += count;
+-
+-	if (pos < 0)
+-		die_perror("xread");
+-
+-	return *pos < limit ? 0 : -ENOMEM;
+-}
+-
+ #define FDT_ALIGN	SZ_2M
+ #define INITRD_ALIGN	4
+ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
+@@ -244,6 +231,7 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
  {
- 	void *p;
--	int nr;
+ 	void *pos, *kernel_end, *limit;
+ 	unsigned long guest_addr;
++	ssize_t file_size;
  
  	if (lseek(fd_kernel, 0, SEEK_SET) < 0)
  		die_perror("lseek");
+@@ -256,13 +244,16 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
  
- 	p = guest_real_to_host(kvm, BOOT_LOADER_SELECTOR, BOOT_LOADER_IP);
+ 	pos = kvm->ram_start + ARM_KERN_OFFSET(kvm);
+ 	kvm->arch.kern_guest_start = host_to_guest_flat(kvm, pos);
+-	if (read_image(fd_kernel, &pos, limit) == -ENOMEM)
+-		die("kernel image too big to contain in guest memory.");
++	file_size = read_file(fd_kernel, pos, limit - pos);
++	if (file_size < 0) {
++		if (errno == ENOMEM)
++			die("kernel image too big to contain in guest memory.");
  
--	while ((nr = read(fd_kernel, p, 65536)) > 0)
--		p += nr;
-+	if (read_file(fd_kernel, p, kvm->cfg.ram_size) < 0)
-+		die_perror("read");
- 
- 	kvm->arch.boot_selector	= BOOT_LOADER_SELECTOR;
- 	kvm->arch.boot_ip	= BOOT_LOADER_IP;
-@@ -232,12 +232,10 @@ static bool load_bzimage(struct kvm *kvm, int fd_kernel, int fd_initrd,
- 			 const char *kernel_cmdline)
- {
- 	struct boot_params *kern_boot;
--	unsigned long setup_sects;
- 	struct boot_params boot;
- 	size_t cmdline_size;
--	ssize_t setup_size;
-+	ssize_t file_size;
- 	void *p;
--	int nr;
- 	u16 vidmode;
+-	kernel_end = pos;
+-	pr_info("Loaded kernel to 0x%llx (%llu bytes)",
+-		kvm->arch.kern_guest_start,
+-		host_to_guest_flat(kvm, pos) - kvm->arch.kern_guest_start);
++		die_perror("kernel read");
++	}
++	kernel_end = pos + file_size;
++	pr_info("Loaded kernel to 0x%llx (%zd bytes)",
++		kvm->arch.kern_guest_start, file_size);
  
  	/*
-@@ -248,7 +246,7 @@ static bool load_bzimage(struct kvm *kvm, int fd_kernel, int fd_initrd,
- 	if (lseek(fd_kernel, 0, SEEK_SET) < 0)
- 		die_perror("lseek");
+ 	 * Now load backwards from the end of memory so the kernel
+@@ -300,11 +291,16 @@ bool kvm__arch_load_kernel_image(struct kvm *kvm, int fd_kernel, int fd_initrd,
+ 			die("initrd overlaps with kernel image.");
  
--	if (read(fd_kernel, &boot, sizeof(boot)) != sizeof(boot))
-+	if (read_in_full(fd_kernel, &boot, sizeof(boot)) != sizeof(boot))
- 		return false;
+ 		initrd_start = guest_addr;
+-		if (read_image(fd_initrd, &pos, limit) == -ENOMEM)
+-			die("initrd too big to contain in guest memory.");
++		file_size = read_file(fd_initrd, pos, limit - pos);
++		if (file_size == -1) {
++			if (errno == ENOMEM)
++				die("initrd too big to contain in guest memory.");
++
++			die_perror("initrd read");
++		}
  
- 	if (memcmp(&boot.hdr.header, BZIMAGE_MAGIC, strlen(BZIMAGE_MAGIC)))
-@@ -262,20 +260,17 @@ static bool load_bzimage(struct kvm *kvm, int fd_kernel, int fd_initrd,
- 
- 	if (!boot.hdr.setup_sects)
- 		boot.hdr.setup_sects = BZ_DEFAULT_SETUP_SECTS;
--	setup_sects = boot.hdr.setup_sects + 1;
--
--	setup_size = setup_sects << 9;
-+	file_size = (boot.hdr.setup_sects + 1) << 9;
- 	p = guest_real_to_host(kvm, BOOT_LOADER_SELECTOR, BOOT_LOADER_IP);
-+	if (read_in_full(fd_kernel, p, file_size) != file_size)
-+		die_perror("kernel setup read");
- 
--	/* copy setup.bin to mem*/
--	if (read(fd_kernel, p, setup_size) != setup_size)
--		die_perror("read");
--
--	/* copy vmlinux.bin to BZ_KERNEL_START*/
-+	/* read actual kernel image (vmlinux.bin) to BZ_KERNEL_START */
- 	p = guest_flat_to_host(kvm, BZ_KERNEL_START);
--
--	while ((nr = read(fd_kernel, p, 65536)) > 0)
--		p += nr;
-+	file_size = read_file(fd_kernel, p,
-+			      kvm->cfg.ram_size - BZ_KERNEL_START);
-+	if (file_size < 0)
-+		die_perror("kernel read");
- 
- 	p = guest_flat_to_host(kvm, BOOT_CMDLINE_OFFSET);
- 	if (kernel_cmdline) {
-@@ -287,7 +282,6 @@ static bool load_bzimage(struct kvm *kvm, int fd_kernel, int fd_initrd,
- 		memcpy(p, kernel_cmdline, cmdline_size - 1);
- 	}
- 
--
- 	/* vidmode should be either specified or set by default */
- 	if (kvm->cfg.vnc || kvm->cfg.sdl || kvm->cfg.gtk) {
- 		if (!kvm->cfg.arch.vidmode)
-@@ -326,8 +320,7 @@ static bool load_bzimage(struct kvm *kvm, int fd_kernel, int fd_initrd,
- 		}
- 
- 		p = guest_flat_to_host(kvm, addr);
--		nr = read(fd_initrd, p, initrd_stat.st_size);
--		if (nr != initrd_stat.st_size)
-+		if (read_in_full(fd_initrd, p, initrd_stat.st_size) < 0)
- 			die("Failed to read initrd");
- 
- 		kern_boot->hdr.ramdisk_image	= addr;
+ 		kvm->arch.initrd_guest_start = initrd_start;
+-		kvm->arch.initrd_size = host_to_guest_flat(kvm, pos) - initrd_start;
++		kvm->arch.initrd_size = file_size;
+ 		pr_info("Loaded initrd to 0x%llx (%llu bytes)",
+ 			kvm->arch.initrd_guest_start,
+ 			kvm->arch.initrd_size);
 -- 
 2.5.1
 
