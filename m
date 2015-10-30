@@ -1,7 +1,7 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v4 13/21] KVM: ARM64: Add reset and access handlers for PMOVSSET and PMOVSCLR register
-Date: Fri, 30 Oct 2015 14:21:55 +0800
-Message-ID: <1446186123-11548-14-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v4 18/21] KVM: ARM64: Add PMU overflow interrupt routing
+Date: Fri, 30 Oct 2015 14:22:00 +0800
+Message-ID: <1446186123-11548-19-git-send-email-zhaoshenglong@huawei.com>
 References: <1446186123-11548-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -14,169 +14,169 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-Since the reset value of PMOVSSET and PMOVSCLR is UNKNOWN, use
-reset_unknown for its reset handler. Add a new case to emulate writing
-PMOVSSET or PMOVSCLR register.
-
-When writing non-zero value to PMOVSSET, pend PMU interrupt. When the
-value writing to PMOVSCLR is equal to the current value, clear the PMU
-pending interrupt.
+When calling perf_event_create_kernel_counter to create perf_event,
+assign a overflow handler. Then when perf event overflows, set
+irq_pending and call kvm_vcpu_kick() to sync the interrupt.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm64/kvm/sys_regs.c | 39 ++++++++++++++++++++++++++++++++++++---
- include/kvm/arm_pmu.h     |  4 ++++
- virt/kvm/arm/pmu.c        | 30 ++++++++++++++++++++++++++++++
- 3 files changed, 70 insertions(+), 3 deletions(-)
+ arch/arm/kvm/arm.c    |  4 +++
+ include/kvm/arm_pmu.h |  4 +++
+ virt/kvm/arm/pmu.c    | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 83 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 6d2febf..e03d3b8d 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -552,6 +552,21 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
- 			vcpu_sys_reg(vcpu, PMINTENSET_EL1) &= ~val;
- 			break;
- 		}
-+		case PMOVSSET_EL0: {
-+			val = *vcpu_reg(vcpu, p->Rt);
-+			kvm_pmu_overflow_set(vcpu, val);
-+			vcpu_sys_reg(vcpu, r->reg) |= val;
-+			vcpu_sys_reg(vcpu, PMOVSCLR_EL0) |= val;
-+			break;
-+		}
-+		case PMOVSCLR_EL0: {
-+			val = *vcpu_reg(vcpu, p->Rt);
-+			kvm_pmu_overflow_clear(vcpu, val,
-+					       vcpu_sys_reg(vcpu, r->reg));
-+			vcpu_sys_reg(vcpu, r->reg) &= ~val;
-+			vcpu_sys_reg(vcpu, PMOVSSET_EL0) &= ~val;
-+			break;
-+		}
- 		case PMCR_EL0: {
- 			/* Only update writeable bits of PMCR */
- 			val = vcpu_sys_reg(vcpu, r->reg);
-@@ -790,7 +805,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  access_pmu_regs, reset_unknown, PMCNTENCLR_EL0 },
- 	/* PMOVSCLR_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b011),
--	  trap_raz_wi },
-+	  access_pmu_regs, reset_unknown, PMOVSCLR_EL0 },
- 	/* PMSWINC_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b100),
- 	  trap_raz_wi },
-@@ -817,7 +832,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  trap_raz_wi },
- 	/* PMOVSSET_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1110), Op2(0b011),
--	  trap_raz_wi },
-+	  access_pmu_regs, reset_unknown, PMOVSSET_EL0 },
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 78b2869..9c0fec4 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -28,6 +28,7 @@
+ #include <linux/sched.h>
+ #include <linux/kvm.h>
+ #include <trace/events/kvm.h>
++#include <kvm/arm_pmu.h>
  
- 	/* TPIDR_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1101), CRm(0b0000), Op2(0b010),
-@@ -1083,6 +1098,21 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
- 			vcpu_cp15(vcpu, c9_PMINTENSET) &= ~val;
- 			break;
- 		}
-+		case c9_PMOVSSET: {
-+			val = *vcpu_reg(vcpu, p->Rt);
-+			kvm_pmu_overflow_set(vcpu, val);
-+			vcpu_cp15(vcpu, r->reg) |= val;
-+			vcpu_cp15(vcpu, c9_PMOVSCLR) |= val;
-+			break;
-+		}
-+		case c9_PMOVSCLR: {
-+			val = *vcpu_reg(vcpu, p->Rt);
-+			kvm_pmu_overflow_clear(vcpu, val,
-+					       vcpu_cp15(vcpu, r->reg));
-+			vcpu_cp15(vcpu, r->reg) &= ~val;
-+			vcpu_cp15(vcpu, c9_PMOVSSET) &= ~val;
-+			break;
-+		}
- 		case c9_PMCR: {
- 			/* Only update writeable bits of PMCR */
- 			val = vcpu_cp15(vcpu, r->reg);
-@@ -1162,7 +1192,8 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	  reset_unknown_cp15, c9_PMCNTENSET },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), access_pmu_cp15_regs,
- 	  reset_unknown_cp15, c9_PMCNTENCLR },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
-+	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), access_pmu_cp15_regs,
-+	  reset_unknown_cp15, c9_PMOVSCLR },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmu_cp15_regs,
- 	  reset_unknown_cp15, c9_PMSELR },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmu_cp15_regs,
-@@ -1180,6 +1211,8 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	  reset_unknown_cp15, c9_PMINTENSET },
- 	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), access_pmu_cp15_regs,
- 	  reset_unknown_cp15, c9_PMINTENCLR },
-+	{ Op1( 0), CRn( 9), CRm(14), Op2( 3), access_pmu_cp15_regs,
-+	  reset_unknown_cp15, c9_PMOVSSET },
+ #define CREATE_TRACE_POINTS
+ #include "trace.h"
+@@ -551,6 +552,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
  
- 	{ Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, c10_PRRR },
- 	{ Op1( 0), CRn(10), CRm( 2), Op2( 1), access_vm_reg, NULL, c10_NMRR },
+ 		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm)) {
+ 			local_irq_enable();
++			kvm_pmu_sync_hwstate(vcpu);
+ 			kvm_vgic_sync_hwstate(vcpu);
+ 			preempt_enable();
+ 			kvm_timer_sync_hwstate(vcpu);
+@@ -598,6 +600,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		kvm_guest_exit();
+ 		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
+ 
++		kvm_pmu_post_sync_hwstate(vcpu);
++
+ 		kvm_vgic_sync_hwstate(vcpu);
+ 
+ 		preempt_enable();
 diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 53d5907..ff17578 100644
+index acd025a..5e7f943 100644
 --- a/include/kvm/arm_pmu.h
 +++ b/include/kvm/arm_pmu.h
-@@ -42,6 +42,8 @@ struct kvm_pmu {
+@@ -39,6 +39,8 @@ struct kvm_pmu {
+ };
+ 
+ #ifdef CONFIG_KVM_ARM_PMU
++void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu);
++void kvm_pmu_post_sync_hwstate(struct kvm_vcpu *vcpu);
  unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx);
  void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val);
  void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u32 val, bool all_enable);
-+void kvm_pmu_overflow_clear(struct kvm_vcpu *vcpu, u32 val, u32 reg);
-+void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u32 val);
- void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
+@@ -49,6 +51,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
  				    u32 select_idx);
+ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u32 val);
  #else
-@@ -51,6 +53,8 @@ unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx)
- }
- void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val) {}
- void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u32 val, bool all_enable) {}
-+void kvm_pmu_overflow_clear(struct kvm_vcpu *vcpu, u32 val, u32 reg) {}
-+void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u32 val) {}
- void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
- 				    u32 select_idx) {}
- #endif
++void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu) {}
++void kvm_pmu_post_sync_hwstate(struct kvm_vcpu *vcpu) {}
+ unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx)
+ {
+ 	return 0;
 diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 3d9075e..5761386 100644
+index 11d1bfb..6d48d9a 100644
 --- a/virt/kvm/arm/pmu.c
 +++ b/virt/kvm/arm/pmu.c
-@@ -121,6 +121,36 @@ void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val)
+@@ -21,6 +21,7 @@
+ #include <linux/perf_event.h>
+ #include <asm/kvm_emulate.h>
+ #include <kvm/arm_pmu.h>
++#include <kvm/arm_vgic.h>
+ 
+ /**
+  * kvm_pmu_get_counter_value - get PMU counter value
+@@ -69,6 +70,78 @@ static void kvm_pmu_stop_counter(struct kvm_pmc *pmc)
  }
  
  /**
-+ * kvm_pmu_overflow_clear - clear PMU overflow interrupt
++ * kvm_pmu_sync_hwstate - sync pmu state for cpu
 + * @vcpu: The vcpu pointer
-+ * @val: the value guest writes to PMOVSCLR register
-+ * @reg: the current value of PMOVSCLR register
++ *
++ * Inject virtual PMU IRQ if IRQ is pending for this cpu.
 + */
-+void kvm_pmu_overflow_clear(struct kvm_vcpu *vcpu, u32 val, u32 reg)
++void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
 +{
 +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
++	u32 overflow;
 +
-+	/* If all overflow bits are cleared, clear interrupt pending status*/
-+	if (val == reg)
-+		pmu->irq_pending = false;
++	if (!vcpu_mode_is_32bit(vcpu))
++		overflow = vcpu_sys_reg(vcpu, PMOVSSET_EL0);
++	else
++		overflow = vcpu_cp15(vcpu, c9_PMOVSSET);
++
++	if ((pmu->irq_pending || overflow != 0) && (pmu->irq_num != -1))
++		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, 1);
++
++	pmu->irq_pending = false;
 +}
 +
 +/**
-+ * kvm_pmu_overflow_set - set PMU overflow interrupt
++ * kvm_pmu_post_sync_hwstate - post sync pmu state for cpu
 + * @vcpu: The vcpu pointer
-+ * @val: the value guest writes to PMOVSSET register
++ *
++ * Inject virtual PMU IRQ if IRQ is pending for this cpu when back from guest.
 + */
-+void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u32 val)
++void kvm_pmu_post_sync_hwstate(struct kvm_vcpu *vcpu)
 +{
 +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
 +
-+	if (val != 0) {
-+		pmu->irq_pending = true;
-+		kvm_vcpu_kick(vcpu);
++	if (pmu->irq_pending && (pmu->irq_num != -1))
++		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, 1);
++
++	pmu->irq_pending = false;
++}
++
++/**
++ * When perf event overflows, set irq_pending and call kvm_vcpu_kick() to inject
++ * the interrupt.
++ */
++static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
++				  struct perf_sample_data *data,
++				  struct pt_regs *regs)
++{
++	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
++	struct kvm_vcpu *vcpu = pmc->vcpu;
++	struct kvm_pmu *pmu = &vcpu->arch.pmu;
++	int idx = pmc->idx;
++
++	if (!vcpu_mode_is_32bit(vcpu)) {
++		if ((vcpu_sys_reg(vcpu, PMINTENSET_EL1) >> idx) & 0x1) {
++			__set_bit(idx,
++			    (unsigned long *)&vcpu_sys_reg(vcpu, PMOVSSET_EL0));
++			__set_bit(idx,
++			    (unsigned long *)&vcpu_sys_reg(vcpu, PMOVSCLR_EL0));
++			pmu->irq_pending = true;
++			kvm_vcpu_kick(vcpu);
++		}
++	} else {
++		if ((vcpu_cp15(vcpu, c9_PMINTENSET) >> idx) & 0x1) {
++			__set_bit(idx,
++				(unsigned long *)&vcpu_cp15(vcpu, c9_PMOVSSET));
++			__set_bit(idx,
++				(unsigned long *)&vcpu_cp15(vcpu, c9_PMOVSCLR));
++			pmu->irq_pending = true;
++			kvm_vcpu_kick(vcpu);
++		}
 +	}
 +}
 +
 +/**
-  * kvm_pmu_set_counter_event_type - set selected counter to monitor some event
+  * kvm_pmu_enable_counter - enable selected PMU counter
   * @vcpu: The vcpu pointer
-  * @data: The data guest writes to PMXEVTYPER_EL0
+  * @val: the value guest writes to PMCNTENSET register
+@@ -293,7 +366,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
+ 	/* The initial sample period (overflow count) of an event. */
+ 	attr.sample_period = (-counter) & pmc->bitmask;
+ 
+-	event = perf_event_create_kernel_counter(&attr, -1, current, NULL, pmc);
++	event = perf_event_create_kernel_counter(&attr, -1, current,
++						 kvm_pmu_perf_overflow, pmc);
+ 	if (IS_ERR(event)) {
+ 		printk_once("kvm: pmu event creation failed %ld\n",
+ 			    PTR_ERR(event));
 -- 
 2.0.4
 
