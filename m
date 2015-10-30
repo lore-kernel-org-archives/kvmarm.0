@@ -1,7 +1,7 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v4 09/21] KVM: ARM64: Add reset and access handlers for PMXEVCNTR register
-Date: Fri, 30 Oct 2015 14:21:51 +0800
-Message-ID: <1446186123-11548-10-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v4 07/21] KVM: ARM64: PMU: Add perf event map and introduce perf event creating function
+Date: Fri, 30 Oct 2015 14:21:49 +0800
+Message-ID: <1446186123-11548-8-git-send-email-zhaoshenglong@huawei.com>
 References: <1446186123-11548-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -14,98 +14,188 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-Since the reset value of PMXEVCNTR is UNKNOWN, use reset_unknown for
-its reset handler. Add access handler which emulates writing and reading
-PMXEVCNTR register. When reading PMXEVCNTR, call perf_event_read_value
-to get the count value of the perf event.
+When we use tools like perf on host, perf passes the event type and the
+id of this event type category to kernel, then kernel will map them to
+hardware event number and write this number to PMU PMEVTYPER<n>_EL0
+register. When getting the event number in KVM, directly use raw event
+type to create a perf_event for it.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm64/kvm/sys_regs.c | 36 ++++++++++++++++++++++++++++++++++--
- 1 file changed, 34 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/pmu.h |   2 +
+ arch/arm64/kvm/Makefile      |   1 +
+ include/kvm/arm_pmu.h        |  13 +++++
+ virt/kvm/arm/pmu.c           | 117 +++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 133 insertions(+)
+ create mode 100644 virt/kvm/arm/pmu.c
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 4e606ea..b7ca2cd 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -491,6 +491,16 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/include/asm/pmu.h b/arch/arm64/include/asm/pmu.h
+index b9f394a..2c025f2 100644
+--- a/arch/arm64/include/asm/pmu.h
++++ b/arch/arm64/include/asm/pmu.h
+@@ -31,6 +31,8 @@
+ #define ARMV8_PMCR_D		(1 << 3) /* CCNT counts every 64th cpu cycle */
+ #define ARMV8_PMCR_X		(1 << 4) /* Export to ETM */
+ #define ARMV8_PMCR_DP		(1 << 5) /* Disable CCNT if non-invasive debug*/
++/* Determines which PMCCNTR_EL0 bit generates an overflow */
++#define ARMV8_PMCR_LC		(1 << 6)
+ #define	ARMV8_PMCR_N_SHIFT	11	 /* Number of counters supported */
+ #define	ARMV8_PMCR_N_MASK	0x1f
+ #define	ARMV8_PMCR_MASK		0x3f	 /* Mask for writable bits */
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 1949fe5..18d56d8 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -27,3 +27,4 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3-emul.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += vgic-v3-switch.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
++kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 254d2b4..1908c88 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -38,4 +38,17 @@ struct kvm_pmu {
+ #endif
+ };
  
- 	if (p->is_write) {
- 		switch (r->reg) {
-+		case PMXEVCNTR_EL0: {
-+			int index = PMEVCNTR0_EL0
-+				    + vcpu_sys_reg(vcpu, PMSELR_EL0);
++#ifdef CONFIG_KVM_ARM_PMU
++unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx);
++void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
++				    u32 select_idx);
++#else
++unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx)
++{
++	return 0;
++}
++void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
++				    u32 select_idx) {}
++#endif
 +
-+			val = kvm_pmu_get_counter_value(vcpu,
-+						vcpu_sys_reg(vcpu, PMSELR_EL0));
-+			vcpu_sys_reg(vcpu, index) += (s64)*vcpu_reg(vcpu, p->Rt)
-+						     - val;
-+			break;
-+		}
- 		case PMXEVTYPER_EL0: {
- 			val = vcpu_sys_reg(vcpu, PMSELR_EL0);
- 			kvm_pmu_set_counter_event_type(vcpu,
-@@ -519,6 +529,12 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
- 		}
- 	} else {
- 		switch (r->reg) {
-+		case PMXEVCNTR_EL0: {
-+			val = kvm_pmu_get_counter_value(vcpu,
-+						vcpu_sys_reg(vcpu, PMSELR_EL0));
-+			*vcpu_reg(vcpu, p->Rt) = val;
-+			break;
-+		}
- 		case PMCR_EL0: {
- 			/* PMCR.P & PMCR.C are RAZ */
- 			val = vcpu_sys_reg(vcpu, r->reg)
-@@ -749,7 +765,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  access_pmu_regs, reset_unknown, PMXEVTYPER_EL0 },
- 	/* PMXEVCNTR_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b010),
--	  trap_raz_wi },
-+	  access_pmu_regs, reset_unknown, PMXEVCNTR_EL0 },
- 	/* PMUSERENR_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1110), Op2(0b000),
- 	  trap_raz_wi },
-@@ -962,6 +978,15 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
- 
- 	if (p->is_write) {
- 		switch (r->reg) {
-+		case c9_PMXEVCNTR: {
-+			int index = c14_PMEVCNTR0 + vcpu_cp15(vcpu, c9_PMSELR);
+ #endif
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+new file mode 100644
+index 0000000..900a64c
+--- /dev/null
++++ b/virt/kvm/arm/pmu.c
+@@ -0,0 +1,117 @@
++/*
++ * Copyright (C) 2015 Linaro Ltd.
++ * Author: Shannon Zhao <shannon.zhao@linaro.org>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+			val = kvm_pmu_get_counter_value(vcpu,
-+						    vcpu_cp15(vcpu, c9_PMSELR));
-+			vcpu_cp15(vcpu, index) += (s64)*vcpu_reg(vcpu, p->Rt)
-+						  - val;
-+			break;
-+		}
- 		case c9_PMXEVTYPER: {
- 			val = vcpu_cp15(vcpu, c9_PMSELR);
- 			kvm_pmu_set_counter_event_type(vcpu,
-@@ -989,6 +1014,12 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
- 		}
- 	} else {
- 		switch (r->reg) {
-+		case c9_PMXEVCNTR: {
-+			val = kvm_pmu_get_counter_value(vcpu,
-+						    vcpu_cp15(vcpu, c9_PMSELR));
-+			*vcpu_reg(vcpu, p->Rt) = val;
-+			break;
-+		}
- 		case c9_PMCR: {
- 			/* PMCR.P & PMCR.C are RAZ */
- 			val = vcpu_cp15(vcpu, r->reg)
-@@ -1047,7 +1078,8 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), trap_raz_wi },
- 	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_cp15_regs,
- 	  reset_unknown_cp15, c9_PMXEVTYPER },
--	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), trap_raz_wi },
-+	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), access_pmu_cp15_regs,
-+	  reset_unknown_cp15, c9_PMXEVCNTR },
- 	{ Op1( 0), CRn( 9), CRm(14), Op2( 0), trap_raz_wi },
- 	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), trap_raz_wi },
- 	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), trap_raz_wi },
++#include <linux/cpu.h>
++#include <linux/kvm.h>
++#include <linux/kvm_host.h>
++#include <linux/perf_event.h>
++#include <asm/kvm_emulate.h>
++#include <kvm/arm_pmu.h>
++
++/**
++ * kvm_pmu_get_counter_value - get PMU counter value
++ * @vcpu: The vcpu pointer
++ * @select_idx: The counter index
++ */
++unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx)
++{
++	u64 counter, enabled, running;
++	struct kvm_pmu *pmu = &vcpu->arch.pmu;
++	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
++
++	if (!vcpu_mode_is_32bit(vcpu))
++		counter = vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + select_idx);
++	else
++		counter = vcpu_cp15(vcpu, c14_PMEVCNTR0 + select_idx);
++
++	if (pmc->perf_event)
++		counter += perf_event_read_value(pmc->perf_event, &enabled,
++						 &running);
++
++	return counter & pmc->bitmask;
++}
++
++/**
++ * kvm_pmu_stop_counter - stop PMU counter
++ * @pmc: The PMU counter pointer
++ *
++ * If this counter has been configured to monitor some event, release it here.
++ */
++static void kvm_pmu_stop_counter(struct kvm_pmc *pmc)
++{
++	struct kvm_vcpu *vcpu = pmc->vcpu;
++	u64 counter;
++
++	if (pmc->perf_event) {
++		counter = kvm_pmu_get_counter_value(vcpu, pmc->idx);
++		if (!vcpu_mode_is_32bit(vcpu))
++			vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + pmc->idx) = counter;
++		else
++			vcpu_cp15(vcpu, c14_PMEVCNTR0 + pmc->idx) = counter;
++
++		perf_event_release_kernel(pmc->perf_event);
++		pmc->perf_event = NULL;
++	}
++}
++
++/**
++ * kvm_pmu_set_counter_event_type - set selected counter to monitor some event
++ * @vcpu: The vcpu pointer
++ * @data: The data guest writes to PMXEVTYPER_EL0
++ * @select_idx: The number of selected counter
++ *
++ * When OS accesses PMXEVTYPER_EL0, that means it wants to set a PMC to count an
++ * event with given hardware event number. Here we call perf_event API to
++ * emulate this action and create a kernel perf event for it.
++ */
++void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
++				    u32 select_idx)
++{
++	struct kvm_pmu *pmu = &vcpu->arch.pmu;
++	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
++	struct perf_event *event;
++	struct perf_event_attr attr;
++	u32 eventsel;
++	u64 counter;
++
++	kvm_pmu_stop_counter(pmc);
++	eventsel = data & ARMV8_EVTYPE_EVENT;
++
++	memset(&attr, 0, sizeof(struct perf_event_attr));
++	attr.type = PERF_TYPE_RAW;
++	attr.size = sizeof(attr);
++	attr.pinned = 1;
++	attr.disabled = 1;
++	attr.exclude_user = data & ARMV8_EXCLUDE_EL0 ? 1 : 0;
++	attr.exclude_kernel = data & ARMV8_EXCLUDE_EL1 ? 1 : 0;
++	attr.exclude_hv = 1; /* Don't count EL2 events */
++	attr.exclude_host = 1; /* Don't count host events */
++	attr.config = eventsel;
++
++	counter = kvm_pmu_get_counter_value(vcpu, select_idx);
++	/* The initial sample period (overflow count) of an event. */
++	attr.sample_period = (-counter) & pmc->bitmask;
++
++	event = perf_event_create_kernel_counter(&attr, -1, current, NULL, pmc);
++	if (IS_ERR(event)) {
++		printk_once("kvm: pmu event creation failed %ld\n",
++			    PTR_ERR(event));
++		return;
++	}
++
++	pmc->perf_event = event;
++}
 -- 
 2.0.4
 
