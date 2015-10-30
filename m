@@ -1,106 +1,110 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v2] vfio/type1: handle case where IOMMU does not support
- PAGE_SIZE size
-Date: Thu, 29 Oct 2015 17:49:42 +0000
-Message-ID: <1446140982-4059-1-git-send-email-eric.auger@linaro.org>
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Subject: [PATCH v4 03/21] KVM: ARM64: Add offset defines for PMU registers
+Date: Fri, 30 Oct 2015 14:21:45 +0800
+Message-ID: <1446186123-11548-4-git-send-email-zhaoshenglong@huawei.com>
+References: <1446186123-11548-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D99241280
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2015 13:47:10 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id INj2p8UcaTNi for <kvmarm@lists.cs.columbia.edu>;
- Thu, 29 Oct 2015 13:47:08 -0400 (EDT)
-Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AD3F441022
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2015 13:47:07 -0400 (EDT)
-Received: by wmec75 with SMTP id c75so29283248wme.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 29 Oct 2015 10:50:04 -0700 (PDT)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, will.deacon@arm.com
-Cc: patches@linaro.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1446186123-11548-1-git-send-email-zhaoshenglong@huawei.com>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, zhaoshenglong@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Current vfio_pgsize_bitmap code hides the supported IOMMU page
-sizes smaller than PAGE_SIZE. As a result, in case the IOMMU
-does not support PAGE_SIZE page, the alignment check on map/unmap
-is done with larger page sizes, if any. This can fail although
-mapping could be done with pages smaller than PAGE_SIZE.
+From: Shannon Zhao <shannon.zhao@linaro.org>
 
-This patch modifies vfio_pgsize_bitmap implementation so that,
-in case the IOMMU supports page sizes smaller than PAGE_SIZE
-we pretend PAGE_SIZE is supported and hide sub-PAGE_SIZE sizes.
-That way the user will be able to map/unmap buffers whose size/
-start address is aligned with PAGE_SIZE. Pinning code uses that
-granularity while iommu driver can use the sub-PAGE_SIZE size
-to map the buffer.
+We are about to trap and emulate acccesses to each PMU register
+individually. This adds the context offsets for the AArch64 PMU
+registers and their AArch32 counterparts.
 
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-Acked-by: Will Deacon <will.deacon@arm.com>
-
+Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
+ arch/arm64/include/asm/kvm_asm.h | 55 ++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 50 insertions(+), 5 deletions(-)
 
-This was tested on AMD Seattle with 64kB page host. ARM MMU 401
-currently expose 4kB, 2MB and 1GB page support. With a 64kB page host,
-the map/unmap check is done against 2MB. Some alignment check fail
-so VFIO_IOMMU_MAP_DMA fail while we could map using 4kB IOMMU page
-size.
-
-v1 -> v2:
-- correct PAGE_HOST type in comment and commit msg
-- Add Will's R-b
-
-RFC -> PATCH v1:
-- move all modifications in vfio_pgsize_bitmap following Alex'
-  suggestion to expose a fake PAGE_SIZE support
-- restore WARN_ON's
----
- drivers/vfio/vfio_iommu_type1.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 57d8c37..59d47cb 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -403,13 +403,26 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
- static unsigned long vfio_pgsize_bitmap(struct vfio_iommu *iommu)
- {
- 	struct vfio_domain *domain;
--	unsigned long bitmap = PAGE_MASK;
-+	unsigned long bitmap = ULONG_MAX;
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 5e37710..4f804c1 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -48,12 +48,34 @@
+ #define MDSCR_EL1	22	/* Monitor Debug System Control Register */
+ #define MDCCINT_EL1	23	/* Monitor Debug Comms Channel Interrupt Enable Reg */
  
- 	mutex_lock(&iommu->lock);
- 	list_for_each_entry(domain, &iommu->domain_list, next)
- 		bitmap &= domain->domain->ops->pgsize_bitmap;
- 	mutex_unlock(&iommu->lock);
- 
-+	/*
-+	 * In case the IOMMU supports page sizes smaller than PAGE_SIZE
-+	 * we pretend PAGE_SIZE is supported and hide sub-PAGE_SIZE sizes.
-+	 * That way the user will be able to map/unmap buffers whose size/
-+	 * start address is aligned with PAGE_SIZE. Pinning code uses that
-+	 * granularity while iommu driver can use the sub-PAGE_SIZE size
-+	 * to map the buffer.
-+	 */
-+	if (bitmap & ~PAGE_MASK) {
-+		bitmap &= PAGE_MASK;
-+		bitmap |= PAGE_SIZE;
-+	}
++/* Performance Monitors Registers */
++#define PMCR_EL0	24	/* Control Register */
++#define PMOVSSET_EL0	25	/* Overflow Flag Status Set Register */
++#define PMOVSCLR_EL0	26	/* Overflow Flag Status Clear Register */
++#define PMSELR_EL0	27	/* Event Counter Selection Register */
++#define PMCEID0_EL0	28	/* Common Event Identification Register 0 */
++#define PMCEID1_EL0	29	/* Common Event Identification Register 1 */
++#define PMEVCNTR0_EL0	30	/* Event Counter Register (0-30) */
++#define PMEVCNTR30_EL0	60
++#define PMCCNTR_EL0	61	/* Cycle Counter Register */
++#define PMEVTYPER0_EL0	62	/* Event Type Register (0-30) */
++#define PMEVTYPER30_EL0	92
++#define PMCCFILTR_EL0	93	/* Cycle Count Filter Register */
++#define PMXEVCNTR_EL0	94	/* Selected Event Count Register */
++#define PMXEVTYPER_EL0	95	/* Selected Event Type Register */
++#define PMCNTENSET_EL0	96	/* Count Enable Set Register */
++#define PMCNTENCLR_EL0	97	/* Count Enable Clear Register */
++#define PMINTENSET_EL1	98	/* Interrupt Enable Set Register */
++#define PMINTENCLR_EL1	99	/* Interrupt Enable Clear Register */
++#define PMUSERENR_EL0	100	/* User Enable Register */
++#define PMSWINC_EL0	101	/* Software Increment Register */
 +
- 	return bitmap;
- }
+ /* 32bit specific registers. Keep them at the end of the range */
+-#define	DACR32_EL2	24	/* Domain Access Control Register */
+-#define	IFSR32_EL2	25	/* Instruction Fault Status Register */
+-#define	FPEXC32_EL2	26	/* Floating-Point Exception Control Register */
+-#define	DBGVCR32_EL2	27	/* Debug Vector Catch Register */
+-#define	NR_SYS_REGS	28
++#define	DACR32_EL2	102	/* Domain Access Control Register */
++#define	IFSR32_EL2	103	/* Instruction Fault Status Register */
++#define	FPEXC32_EL2	104	/* Floating-Point Exception Control Register */
++#define	DBGVCR32_EL2	105	/* Debug Vector Catch Register */
++#define	NR_SYS_REGS	106
  
+ /* 32bit mapping */
+ #define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
+@@ -75,6 +97,24 @@
+ #define c6_IFAR		(c6_DFAR + 1)	/* Instruction Fault Address Register */
+ #define c7_PAR		(PAR_EL1 * 2)	/* Physical Address Register */
+ #define c7_PAR_high	(c7_PAR + 1)	/* PAR top 32 bits */
++
++/* Performance Monitors*/
++#define c9_PMCR		(PMCR_EL0 * 2)
++#define c9_PMOVSSET	(PMOVSSET_EL0 * 2)
++#define c9_PMOVSCLR	(PMOVSCLR_EL0 * 2)
++#define c9_PMCCNTR	(PMCCNTR_EL0 * 2)
++#define c9_PMSELR	(PMSELR_EL0 * 2)
++#define c9_PMCEID0	(PMCEID0_EL0 * 2)
++#define c9_PMCEID1	(PMCEID1_EL0 * 2)
++#define c9_PMXEVCNTR	(PMXEVCNTR_EL0 * 2)
++#define c9_PMXEVTYPER	(PMXEVTYPER_EL0 * 2)
++#define c9_PMCNTENSET	(PMCNTENSET_EL0 * 2)
++#define c9_PMCNTENCLR	(PMCNTENCLR_EL0 * 2)
++#define c9_PMINTENSET	(PMINTENSET_EL1 * 2)
++#define c9_PMINTENCLR	(PMINTENCLR_EL1 * 2)
++#define c9_PMUSERENR	(PMUSERENR_EL0 * 2)
++#define c9_PMSWINC	(PMSWINC_EL0 * 2)
++
+ #define c10_PRRR	(MAIR_EL1 * 2)	/* Primary Region Remap Register */
+ #define c10_NMRR	(c10_PRRR + 1)	/* Normal Memory Remap Register */
+ #define c12_VBAR	(VBAR_EL1 * 2)	/* Vector Base Address Register */
+@@ -86,6 +126,11 @@
+ #define c10_AMAIR1	(c10_AMAIR0 + 1)/* Aux Memory Attr Indirection Reg */
+ #define c14_CNTKCTL	(CNTKCTL_EL1 * 2) /* Timer Control Register (PL1) */
+ 
++/* Performance Monitors*/
++#define c14_PMEVCNTR0	(PMEVCNTR0_EL0 * 2)
++#define c14_PMEVTYPER0	(PMEVTYPER0_EL0 * 2)
++#define c14_PMCCFILTR	(PMCCFILTR_EL0 * 2)
++
+ #define cp14_DBGDSCRext	(MDSCR_EL1 * 2)
+ #define cp14_DBGBCR0	(DBGBCR0_EL1 * 2)
+ #define cp14_DBGBVR0	(DBGBVR0_EL1 * 2)
 -- 
-1.9.1
+2.0.4
+
+
