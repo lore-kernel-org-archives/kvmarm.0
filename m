@@ -1,117 +1,211 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 4/7] MIPS: use read wrappers in kernel loading
-Date: Fri, 30 Oct 2015 18:26:57 +0000
-Message-ID: <1446229620-28088-5-git-send-email-andre.przywara@arm.com>
-References: <1446229620-28088-1-git-send-email-andre.przywara@arm.com>
+From: Christopher Covington <cov@codeaurora.org>
+Subject: Re: [Qemu-devel] [kvm-unit-tests PATCHv5 3/3] arm: pmu: Add
+ CPI checking
+Date: Fri, 30 Oct 2015 15:32:43 -0400
+Message-ID: <5633C5DB.7090009@codeaurora.org>
+References: <1444662470-13045-1-git-send-email-cov@codeaurora.org> <1446059575-23903-1-git-send-email-cov@codeaurora.org> <1446059575-23903-4-git-send-email-cov@codeaurora.org> <20151030130022.GA8197@hawk.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1446229620-28088-1-git-send-email-andre.przywara@arm.com>
+In-Reply-To: <20151030130022.GA8197@hawk.localdomain>
 Sender: kvm-owner@vger.kernel.org
-To: will.deacon@arm.com, kvm@vger.kernel.org
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm-ppc@vger.kernel.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wei@redhat.com, alindsay@codeaurora.org, croberts@codeaurora.org, shannon.zhao@linaro.org, alistair.francis@xilinx.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Replace the unsafe read-loops used in the MIPS kernel image loading
-with our safe read_file() and read_in_full() wrappers.
-This should fix random fails in kernel image loading, especially
-from pipes and sockets.
+Hi Drew,
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+On 10/30/2015 09:00 AM, Andrew Jones wrote:
+> On Wed, Oct 28, 2015 at 03:12:55PM -0400, Christopher Covington wrote:
+>> Calculate the numbers of cycles per instruction (CPI) implied by ARM
+>> PMU cycle counter values. The code includes a strict checking facility
+>> intended for the -icount option in TCG mode but it is not yet enabled
+>> in the configuration file. Enabling it must wait on infrastructure
+>> improvements which allow for different tests to be run on TCG versus
+>> KVM.
+>>
+>> Signed-off-by: Christopher Covington <cov@codeaurora.org>
+>> ---
+>>  arm/pmu.c | 103 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>  1 file changed, 102 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arm/pmu.c b/arm/pmu.c
+>> index 4334de4..788886a 100644
+>> --- a/arm/pmu.c
+>> +++ b/arm/pmu.c
+>> @@ -43,6 +43,23 @@ static inline unsigned long get_pmccntr(void)
+>>  	asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r" (cycles));
+>>  	return cycles;
+>>  }
+>> +
+>> +/*
+>> + * Extra instructions inserted by the compiler would be difficult to compensate
+>> + * for, so hand assemble everything between, and including, the PMCR accesses
+>> + * to start and stop counting.
+>> + */
+>> +static inline void loop(int i, uint32_t pmcr)
+>> +{
+>> +	asm volatile(
+>> +	"	mcr	p15, 0, %[pmcr], c9, c12, 0\n"
+>> +	"1:	subs	%[i], %[i], #1\n"
+>> +	"	bgt	1b\n"
+>> +	"	mcr	p15, 0, %[z], c9, c12, 0\n"
+>> +	: [i] "+r" (i)
+>> +	: [pmcr] "r" (pmcr), [z] "r" (0)
+>> +	: "cc");
+>> +}
+>>  #elif defined(__aarch64__)
+>>  static inline uint32_t get_pmcr(void)
+>>  {
+>> @@ -64,6 +81,23 @@ static inline unsigned long get_pmccntr(void)
+>>  	asm volatile("mrs %0, pmccntr_el0" : "=r" (cycles));
+>>  	return cycles;
+>>  }
+>> +
+>> +/*
+>> + * Extra instructions inserted by the compiler would be difficult to compensate
+>> + * for, so hand assemble everything between, and including, the PMCR accesses
+>> + * to start and stop counting.
+>> + */
+>> +static inline void loop(int i, uint32_t pmcr)
+>> +{
+>> +	asm volatile(
+>> +	"	msr	pmcr_el0, %[pmcr]\n"
+>> +	"1:	subs	%[i], %[i], #1\n"
+>> +	"	b.gt	1b\n"
+>> +	"	msr	pmcr_el0, xzr\n"
+>> +	: [i] "+r" (i)
+>> +	: [pmcr] "r" (pmcr)
+>> +	: "cc");
+>> +}
+>>  #endif
+>>  
+>>  struct pmu_data {
+>> @@ -131,12 +165,79 @@ static bool check_cycles_increase(void)
+>>  	return true;
+>>  }
+>>  
+>> -int main(void)
+>> +/*
+>> + * Execute a known number of guest instructions. Only odd instruction counts
+>> + * greater than or equal to 3 are supported by the in-line assembly code. The
+>> + * control register (PMCR_EL0) is initialized with the provided value (allowing
+>> + * for example for the cycle counter or event counters to be reset). At the end
+>> + * of the exact instruction loop, zero is written to PMCR_EL0 to disable
+>> + * counting, allowing the cycle counter or event counters to be read at the
+>> + * leisure of the calling code.
+>> + */
+>> +static void measure_instrs(int num, uint32_t pmcr)
+>> +{
+>> +	int i = (num - 1) / 2;
+>> +
+>> +	assert(num >= 3 && ((num - 1) % 2 == 0));
+>> +	loop(i, pmcr);
+>> +}
+>> +
+>> +/*
+>> + * Measure cycle counts for various known instruction counts. Ensure that the
+>> + * cycle counter progresses (similar to check_cycles_increase() but with more
+>> + * instructions and using reset and stop controls). If supplied a positive,
+>> + * nonzero CPI parameter, also strictly check that every measurement matches
+>> + * it. Strict CPI checking is used to test -icount mode.
+>> + */
+>> +static bool check_cpi(int cpi)
+>> +{
+>> +	struct pmu_data pmu = {0};
+>> +
+>> +	pmu.cycle_counter_reset = 1;
+>> +	pmu.enable = 1;
+>> +
+>> +	if (cpi > 0)
+>> +		printf("Checking for CPI=%d.\n", cpi);
+>> +	printf("instrs : cycles0 cycles1 ...\n");
+>> +
+>> +	for (int i = 3; i < 300; i += 32) {
+>> +		int avg, sum = 0;
+>> +
+>> +		printf("%d :", i);
+>> +		for (int j = 0; j < NR_SAMPLES; j++) {
+>> +			int cycles;
+>> +
+>> +			measure_instrs(i, pmu.pmcr_el0);
+>> +			cycles = get_pmccntr();
+>> +			printf(" %d", cycles);
+>> +
+>> +			if (!cycles || (cpi > 0 && cycles != i * cpi)) {
+>> +				printf("\n");
+>> +				return false;
+>> +			}
+>> +
+>> +			sum += cycles;
+>> +		}
+>> +		avg = sum / NR_SAMPLES;
+>> +		printf(" sum=%d avg=%d avg_ipc=%d avg_cpi=%d\n",
+>> +			sum, avg, i / avg, avg / i);
+>> +	}
+>> +
+>> +	return true;
+>> +}
+>> +
+>> +int main(int argc, char *argv[])
+>>  {
+>> +	int cpi = 0;
+>> +
+>> +	if (argc >= 1)
+>> +		cpi = atol(argv[0]);
+>> +
+>>  	report_prefix_push("pmu");
+>>  
+>>  	report("Control register", check_pmcr());
+>>  	report("Monotonically increasing cycle count", check_cycles_increase());
+>> +	report("Cycle/instruction ratio", check_cpi(cpi));
+>>  
+>>  	return report_summary();
+>>  }
+> 
+> I applied and tested this (by adding -icount 1 -append 1 to the cmdline),
+
+Thanks for giving this a spin. For whatever reason the -icount argument is the
+exponent n in 2^n. I could match that logic if you prefer, but the pmu.c code
+currently takes the fully calculated shift value rather than the exponent.
+I've been testing with the following option pairs (dependent on 'accel = tcg'
+support).
+
+-- >8 --
+Subject: [PATCH] arm: pmu: Add -icount checking configurations
+
+Pass a couple -icount values in TCG mode and strictly check the
+resulting cycle counts.
+
+Signed-off-by: Christopher Covington <cov@codeaurora.org>
 ---
- mips/kvm.c | 36 ++++++++++++++++++------------------
- 1 file changed, 18 insertions(+), 18 deletions(-)
+ arm/unittests.cfg | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/mips/kvm.c b/mips/kvm.c
-index c1c596c..8fbf8de 100644
---- a/mips/kvm.c
-+++ b/mips/kvm.c
-@@ -168,20 +168,27 @@ static bool load_flat_binary(struct kvm *kvm, int fd_kernel)
- {
- 	void *p;
- 	void *k_start;
--	int nr;
-+	ssize_t kernel_size;
- 
- 	if (lseek(fd_kernel, 0, SEEK_SET) < 0)
- 		die_perror("lseek");
- 
- 	p = k_start = guest_flat_to_host(kvm, KERNEL_LOAD_ADDR);
- 
--	while ((nr = read(fd_kernel, p, 65536)) > 0)
--		p += nr;
-+	kernel_size = read_file(fd_kernel, p,
-+				kvm->cfg.ram_size - KERNEL_LOAD_ADDR);
-+	if (kernel_size == -1) {
-+		if (errno == ENOMEM)
-+			die("kernel too big for guest memory");
-+		else
-+			die_perror("kernel read");
-+	}
- 
- 	kvm->arch.is64bit = true;
- 	kvm->arch.entry_point = 0xffffffff81000000ull;
- 
--	pr_info("Loaded kernel to 0x%x (%ld bytes)", KERNEL_LOAD_ADDR, (long int)(p - k_start));
-+	pr_info("Loaded kernel to 0x%x (%zd bytes)", KERNEL_LOAD_ADDR,
-+		kernel_size);
- 
- 	return true;
- }
-@@ -197,7 +204,6 @@ static bool kvm__arch_get_elf_64_info(Elf64_Ehdr *ehdr, int fd_kernel,
- 				      struct kvm__arch_elf_info *ei)
- {
- 	int i;
--	size_t nr;
- 	Elf64_Phdr phdr;
- 
- 	if (ehdr->e_phentsize != sizeof(phdr)) {
-@@ -212,8 +218,7 @@ static bool kvm__arch_get_elf_64_info(Elf64_Ehdr *ehdr, int fd_kernel,
- 
- 	phdr.p_type = PT_NULL;
- 	for (i = 0; i < ehdr->e_phnum; i++) {
--		nr = read(fd_kernel, &phdr, sizeof(phdr));
--		if (nr != sizeof(phdr)) {
-+		if (read_in_full(fd_kernel, &phdr, sizeof(phdr)) != sizeof(phdr)) {
- 			pr_info("Couldn't read %d bytes for ELF PHDR.", (int)sizeof(phdr));
- 			return false;
- 		}
-@@ -243,7 +248,6 @@ static bool kvm__arch_get_elf_32_info(Elf32_Ehdr *ehdr, int fd_kernel,
- 				      struct kvm__arch_elf_info *ei)
- {
- 	int i;
--	size_t nr;
- 	Elf32_Phdr phdr;
- 
- 	if (ehdr->e_phentsize != sizeof(phdr)) {
-@@ -258,8 +262,7 @@ static bool kvm__arch_get_elf_32_info(Elf32_Ehdr *ehdr, int fd_kernel,
- 
- 	phdr.p_type = PT_NULL;
- 	for (i = 0; i < ehdr->e_phnum; i++) {
--		nr = read(fd_kernel, &phdr, sizeof(phdr));
--		if (nr != sizeof(phdr)) {
-+		if (read_in_full(fd_kernel, &phdr, sizeof(phdr)) != sizeof(phdr)) {
- 			pr_info("Couldn't read %d bytes for ELF PHDR.", (int)sizeof(phdr));
- 			return false;
- 		}
-@@ -334,14 +337,11 @@ static bool load_elf_binary(struct kvm *kvm, int fd_kernel)
- 	p = guest_flat_to_host(kvm, ei.load_addr);
- 
- 	pr_info("ELF Loading 0x%lx bytes from 0x%llx to 0x%llx",
--		(unsigned long)ei.len, (unsigned long long)ei.offset, (unsigned long long)ei.load_addr);
--	do {
--		nr = read(fd_kernel, p, ei.len);
--		if (nr < 0)
--			die_perror("read");
--		p += nr;
--		ei.len -= nr;
--	} while (ei.len);
-+		(unsigned long)ei.len, (unsigned long long)ei.offset,
-+		(unsigned long long)ei.load_addr);
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index fd94adb..5ca1e6a 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -40,3 +40,17 @@ groups = selftest
+ [pmu]
+ file = pmu.flat
+ groups = pmu
 +
-+	if (read_in_full(fd_kernel, p, ei.len) != (ssize_t)ei.len)
-+		die_perror("read");
- 
- 	return true;
- }
++# Test PMU support with -icount IPC=1
++[pmu-icount-1]
++file = pmu.flat
++extra_params = -icount 0 -append '1'
++groups = pmu
++accel = tcg
++
++# Test PMU support with -icount IPC=256
++[pmu-icount-256]
++file = pmu.flat
++extra_params = -icount 8 -append '256'
++groups = pmu
++accel = tcg
 -- 
-2.5.1
-
+Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
