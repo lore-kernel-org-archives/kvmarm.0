@@ -1,211 +1,99 @@
-From: Christopher Covington <cov@codeaurora.org>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCHv5 3/3] arm: pmu: Add
- CPI checking
-Date: Fri, 30 Oct 2015 15:32:43 -0400
-Message-ID: <5633C5DB.7090009@codeaurora.org>
-References: <1444662470-13045-1-git-send-email-cov@codeaurora.org> <1446059575-23903-1-git-send-email-cov@codeaurora.org> <1446059575-23903-4-git-send-email-cov@codeaurora.org> <20151030130022.GA8197@hawk.localdomain>
+From: Mario Smarduch <m.smarduch@samsung.com>
+Subject: [PATCH v3 0/3] KVM/arm64/arm: enhance armv7/8 fp/simd lazy switch
+Date: Fri, 30 Oct 2015 14:56:30 -0700
+Message-ID: <1446242193-8424-1-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20151030130022.GA8197@hawk.localdomain>
 Sender: kvm-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, wei@redhat.com, alindsay@codeaurora.org, croberts@codeaurora.org, shannon.zhao@linaro.org, alistair.francis@xilinx.com
+To: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: antonios.motakis@huawei.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Mario Smarduch <m.smarduch@samsung.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Drew,
+This short patch series combines the previous armv7 and armv8 versions.
+For an FP and lmbench load it reduces fp/simd context switch from 30-50% down 
+to 2%. Results will vary with load but is no worse then current
+approach. 
 
-On 10/30/2015 09:00 AM, Andrew Jones wrote:
-> On Wed, Oct 28, 2015 at 03:12:55PM -0400, Christopher Covington wrote:
->> Calculate the numbers of cycles per instruction (CPI) implied by ARM
->> PMU cycle counter values. The code includes a strict checking facility
->> intended for the -icount option in TCG mode but it is not yet enabled
->> in the configuration file. Enabling it must wait on infrastructure
->> improvements which allow for different tests to be run on TCG versus
->> KVM.
->>
->> Signed-off-by: Christopher Covington <cov@codeaurora.org>
->> ---
->>  arm/pmu.c | 103 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->>  1 file changed, 102 insertions(+), 1 deletion(-)
->>
->> diff --git a/arm/pmu.c b/arm/pmu.c
->> index 4334de4..788886a 100644
->> --- a/arm/pmu.c
->> +++ b/arm/pmu.c
->> @@ -43,6 +43,23 @@ static inline unsigned long get_pmccntr(void)
->>  	asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r" (cycles));
->>  	return cycles;
->>  }
->> +
->> +/*
->> + * Extra instructions inserted by the compiler would be difficult to compensate
->> + * for, so hand assemble everything between, and including, the PMCR accesses
->> + * to start and stop counting.
->> + */
->> +static inline void loop(int i, uint32_t pmcr)
->> +{
->> +	asm volatile(
->> +	"	mcr	p15, 0, %[pmcr], c9, c12, 0\n"
->> +	"1:	subs	%[i], %[i], #1\n"
->> +	"	bgt	1b\n"
->> +	"	mcr	p15, 0, %[z], c9, c12, 0\n"
->> +	: [i] "+r" (i)
->> +	: [pmcr] "r" (pmcr), [z] "r" (0)
->> +	: "cc");
->> +}
->>  #elif defined(__aarch64__)
->>  static inline uint32_t get_pmcr(void)
->>  {
->> @@ -64,6 +81,23 @@ static inline unsigned long get_pmccntr(void)
->>  	asm volatile("mrs %0, pmccntr_el0" : "=r" (cycles));
->>  	return cycles;
->>  }
->> +
->> +/*
->> + * Extra instructions inserted by the compiler would be difficult to compensate
->> + * for, so hand assemble everything between, and including, the PMCR accesses
->> + * to start and stop counting.
->> + */
->> +static inline void loop(int i, uint32_t pmcr)
->> +{
->> +	asm volatile(
->> +	"	msr	pmcr_el0, %[pmcr]\n"
->> +	"1:	subs	%[i], %[i], #1\n"
->> +	"	b.gt	1b\n"
->> +	"	msr	pmcr_el0, xzr\n"
->> +	: [i] "+r" (i)
->> +	: [pmcr] "r" (pmcr)
->> +	: "cc");
->> +}
->>  #endif
->>  
->>  struct pmu_data {
->> @@ -131,12 +165,79 @@ static bool check_cycles_increase(void)
->>  	return true;
->>  }
->>  
->> -int main(void)
->> +/*
->> + * Execute a known number of guest instructions. Only odd instruction counts
->> + * greater than or equal to 3 are supported by the in-line assembly code. The
->> + * control register (PMCR_EL0) is initialized with the provided value (allowing
->> + * for example for the cycle counter or event counters to be reset). At the end
->> + * of the exact instruction loop, zero is written to PMCR_EL0 to disable
->> + * counting, allowing the cycle counter or event counters to be read at the
->> + * leisure of the calling code.
->> + */
->> +static void measure_instrs(int num, uint32_t pmcr)
->> +{
->> +	int i = (num - 1) / 2;
->> +
->> +	assert(num >= 3 && ((num - 1) % 2 == 0));
->> +	loop(i, pmcr);
->> +}
->> +
->> +/*
->> + * Measure cycle counts for various known instruction counts. Ensure that the
->> + * cycle counter progresses (similar to check_cycles_increase() but with more
->> + * instructions and using reset and stop controls). If supplied a positive,
->> + * nonzero CPI parameter, also strictly check that every measurement matches
->> + * it. Strict CPI checking is used to test -icount mode.
->> + */
->> +static bool check_cpi(int cpi)
->> +{
->> +	struct pmu_data pmu = {0};
->> +
->> +	pmu.cycle_counter_reset = 1;
->> +	pmu.enable = 1;
->> +
->> +	if (cpi > 0)
->> +		printf("Checking for CPI=%d.\n", cpi);
->> +	printf("instrs : cycles0 cycles1 ...\n");
->> +
->> +	for (int i = 3; i < 300; i += 32) {
->> +		int avg, sum = 0;
->> +
->> +		printf("%d :", i);
->> +		for (int j = 0; j < NR_SAMPLES; j++) {
->> +			int cycles;
->> +
->> +			measure_instrs(i, pmu.pmcr_el0);
->> +			cycles = get_pmccntr();
->> +			printf(" %d", cycles);
->> +
->> +			if (!cycles || (cpi > 0 && cycles != i * cpi)) {
->> +				printf("\n");
->> +				return false;
->> +			}
->> +
->> +			sum += cycles;
->> +		}
->> +		avg = sum / NR_SAMPLES;
->> +		printf(" sum=%d avg=%d avg_ipc=%d avg_cpi=%d\n",
->> +			sum, avg, i / avg, avg / i);
->> +	}
->> +
->> +	return true;
->> +}
->> +
->> +int main(int argc, char *argv[])
->>  {
->> +	int cpi = 0;
->> +
->> +	if (argc >= 1)
->> +		cpi = atol(argv[0]);
->> +
->>  	report_prefix_push("pmu");
->>  
->>  	report("Control register", check_pmcr());
->>  	report("Monotonically increasing cycle count", check_cycles_increase());
->> +	report("Cycle/instruction ratio", check_cpi(cpi));
->>  
->>  	return report_summary();
->>  }
-> 
-> I applied and tested this (by adding -icount 1 -append 1 to the cmdline),
+In summary current lazy vfp/simd implementation switches hardware context only 
+on guest access and again on exit to host, otherwise hardware context is
+skipped. This patch set builds on that functionality and executes a hardware 
+context switch only when  vCPU is scheduled out or returns to user space.
 
-Thanks for giving this a spin. For whatever reason the -icount argument is the
-exponent n in 2^n. I could match that logic if you prefer, but the pmu.c code
-currently takes the fully calculated shift value rather than the exponent.
-I've been testing with the following option pairs (dependent on 'accel = tcg'
-support).
+Patches were tested on FVP sw platform. FP crunching applications summing up
+values, with outcome compared to known result were executed on several guests,
+and host.
 
--- >8 --
-Subject: [PATCH] arm: pmu: Add -icount checking configurations
+The test can be found here, https://github.com/mjsmar/arm-arm64-fpsimd-test
+Tests executed 24 hours.
 
-Pass a couple -icount values in TCG mode and strictly check the
-resulting cycle counts.
+armv7 test:
+- On host executed 12 fp crunching applications - used taskset to bind 
+- Two guests - with 12 fp crunching processes - used taskset to bind
+- half ran with 1ms sleep, remaining with no sleep
 
-Signed-off-by: Christopher Covington <cov@codeaurora.org>
----
- arm/unittests.cfg | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+armv8 test: 
+- same as above except used mix of armv7 and armv8 guests.
 
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index fd94adb..5ca1e6a 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -40,3 +40,17 @@ groups = selftest
- [pmu]
- file = pmu.flat
- groups = pmu
-+
-+# Test PMU support with -icount IPC=1
-+[pmu-icount-1]
-+file = pmu.flat
-+extra_params = -icount 0 -append '1'
-+groups = pmu
-+accel = tcg
-+
-+# Test PMU support with -icount IPC=256
-+[pmu-icount-256]
-+file = pmu.flat
-+extra_params = -icount 8 -append '256'
-+groups = pmu
-+accel = tcg
+Every so often injected a fault (via proc file entry) and mismatch between 
+expected and crunched summed value was reported. The FP crunch processes could 
+continue to run but with bad results.
+
+Looked at 'paranoia.c' - appears like a comprehensive hardware FP 
+precision/behavior test.  It will test various behaviors and may fail having 
+nothing to do with world switch of fp/simd - 
+- Adequacy of guard digits for Mult., Div. and Subt.
+- UnderflowThreshold = an underflow threshold.
+- V = an overflow threshold, roughly.
+...
+
+With outcomes like -
+- Smallest strictly positive number found is E0 = 4.94066e-324
+- Searching for Overflow threshold: This may generate an error.
+...
+
+Personally don't understand everything it's dong.
+
+Opted to use the simple tst-float executable.
+
+These patches are based on earlier arm64 fp/simd optimization work -
+https://lists.cs.columbia.edu/pipermail/kvmarm/2015-July/015748.html
+
+And subsequent fixes by Marc and Christoffer at KVM Forum hackathon to handle
+32-bit guest on 64 bit host - 
+https://lists.cs.columbia.edu/pipermail/kvmarm/2015-August/016128.html
+
+Changes since v2->v3:
+- combined arm v7 and v8 into one short patch series
+- moved access to fpexec_el2 back to EL2
+- Move host restore to EL1 from EL2 and call directly from host
+- optimize trap enable code 
+- renamed some variables to match usage
+
+Changes since v1->v2:
+- Fixed vfp/simd trap configuration to enable trace trapping
+- Removed set_hcptr branch label
+- Fixed handling of FPEXC to restore guest and host versions on vcpu_put
+- Tested arm32/arm64
+- rebased to 4.3-rc2
+- changed a couple register accesses from 64 to 32 bit
+
+
+Mario Smarduch (3):
+  hooks for armv7 fp/simd lazy switch support
+  enable enhanced armv7 fp/simd lazy switch
+  enable enhanced armv8 fp/simd lazy switch
+
+ arch/arm/include/asm/kvm_host.h   |  7 +++++
+ arch/arm/kernel/asm-offsets.c     |  2 ++
+ arch/arm/kvm/arm.c                |  6 ++++
+ arch/arm/kvm/interrupts.S         | 60 ++++++++++++++++++++++++++++-----------
+ arch/arm/kvm/interrupts_head.S    | 14 +++++----
+ arch/arm64/include/asm/kvm_host.h |  4 +++
+ arch/arm64/kernel/asm-offsets.c   |  1 +
+ arch/arm64/kvm/hyp.S              | 37 ++++++++++++++++++++----
+ 8 files changed, 103 insertions(+), 28 deletions(-)
+
 -- 
-Qualcomm Innovation Center, Inc.
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+1.9.1
+
