@@ -1,29 +1,28 @@
 From: Mario Smarduch <m.smarduch@samsung.com>
-Subject: [PATCH v3 2/3] KVM/arm/arm64: enable enhanced armv7 fp/simd lazy
- switch
-Date: Fri, 30 Oct 2015 14:56:32 -0700
-Message-ID: <1446242193-8424-3-git-send-email-m.smarduch@samsung.com>
+Subject: [PATCH 3/3] KVM/arm64: enable enhanced armv8 fp/simd lazy switch
+Date: Fri, 30 Oct 2015 14:56:33 -0700
+Message-ID: <1446242193-8424-4-git-send-email-m.smarduch@samsung.com>
 References: <1446242193-8424-1-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DDF8410D7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Oct 2015 17:54:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 677A541289
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Oct 2015 17:54:11 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sPleO-LH+ic7 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 30 Oct 2015 17:54:02 -0400 (EDT)
-Received: from usmailout4.samsung.com (mailout4.w2.samsung.com
- [211.189.100.14])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 70B18410BB
- for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Oct 2015 17:54:02 -0400 (EDT)
-Received: from uscpsbgex4.samsung.com
- (u125.gpu85.samsung.co.kr [203.254.195.125]) by usmailout4.samsung.com
+ with ESMTP id NuE95PkyXT9s for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 30 Oct 2015 17:54:10 -0400 (EDT)
+Received: from usmailout1.samsung.com (mailout1.w2.samsung.com
+ [211.189.100.11])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 392F541280
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 30 Oct 2015 17:54:10 -0400 (EDT)
+Received: from uscpsbgex2.samsung.com
+ (u123.gpu85.samsung.co.kr [203.254.195.123]) by mailout1.w2.samsung.com
  (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NX100MO1ZN3ZV50@usmailout4.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Fri, 30 Oct 2015 17:57:03 -0400 (EDT)
+ with ESMTP id <0NX1002G2ZNA2M50@mailout1.w2.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Fri, 30 Oct 2015 17:57:10 -0400 (EDT)
 In-reply-to: <1446242193-8424-1-git-send-email-m.smarduch@samsung.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -38,216 +37,133 @@ To: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.
 Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch tracks vfp/simd hardware state with a vcpu lazy flag. vCPU lazy 
-flag is set on guest access and traps to vfp/simd hardware switch handler. On 
-vm-enter if lazy flag is set skip trap enable and save host fpexc. On 
-vm-exit if flag is set skip hardware context switch and return to host with 
-guest context. In vcpu_put check if vcpu lazy flag is set, and execute a 
-hardware context switch to restore host.
-
-Also some arm64 field and empty function are added to compile for arm64.
+This patch enables arm64 lazy fp/simd switch, similar to arm described in
+second patch. Change from previous version - restore function is moved to
+host. 
 
 Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
 ---
- arch/arm/include/asm/kvm_host.h   |  1 +
- arch/arm/kvm/arm.c                |  6 ++++
- arch/arm/kvm/interrupts.S         | 60 ++++++++++++++++++++++++++++-----------
- arch/arm/kvm/interrupts_head.S    | 14 +++++----
- arch/arm64/include/asm/kvm_host.h |  4 +++
- 5 files changed, 63 insertions(+), 22 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  2 +-
+ arch/arm64/kernel/asm-offsets.c   |  1 +
+ arch/arm64/kvm/hyp.S              | 37 +++++++++++++++++++++++++++++++------
+ 3 files changed, 33 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index f1bf551..a9e86e0 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -227,6 +227,7 @@ int kvm_perf_teardown(void);
- void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
- 
- struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
-+void kvm_restore_host_vfp_state(struct kvm_vcpu *);
- 
- static inline void kvm_arch_hardware_disable(void) {}
- static inline void kvm_arch_hardware_unsetup(void) {}
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index dc017ad..11a56fe 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -296,6 +296,12 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- {
- 	/*
-+	 * If fp/simd registers are dirty save guest, restore host before
-+	 * releasing the cpu.
-+	 */
-+	if (vcpu->arch.vfp_dirty)
-+		kvm_restore_host_vfp_state(vcpu);
-+	/*
- 	 * The arch-generic KVM code expects the cpu field of a vcpu to be -1
- 	 * if the vcpu is no longer assigned to a cpu.  This is used for the
- 	 * optimized make_all_cpus_request path.
-diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
-index 900ef6d..ca25314 100644
---- a/arch/arm/kvm/interrupts.S
-+++ b/arch/arm/kvm/interrupts.S
-@@ -28,6 +28,32 @@
- #include "interrupts_head.S"
- 
- 	.text
-+/**
-+ * void kvm_restore_host_vfp_state(struct vcpu *vcpu) - Executes lazy
-+ * 	fp/simd switch, saves the guest, restores host. Called from host
-+ *	mode, placed outside of hyp region start/end.
-+ */
-+ENTRY(kvm_restore_host_vfp_state)
-+#ifdef CONFIG_VFPv3
-+	push    {r4-r7}
-+
-+	add     r7, vcpu, #VCPU_VFP_GUEST
-+	store_vfp_state r7
-+
-+	add     r7, vcpu, #VCPU_VFP_HOST
-+	ldr     r7, [r7]
-+	restore_vfp_state r7
-+
-+	ldr     r3, [vcpu, #VCPU_VFP_HOST_FPEXC]
-+	VFPFMXR FPEXC, r3
-+
-+	mov     r3, #0
-+	strb    r3, [vcpu, #VCPU_VFP_DIRTY]
-+
-+	pop     {r4-r7}
-+#endif
-+	bx      lr
-+ENDPROC(kvm_restore_host_vfp_state)
- 
- __kvm_hyp_code_start:
- 	.globl __kvm_hyp_code_start
-@@ -119,11 +145,16 @@ ENTRY(__kvm_vcpu_run)
- 	@ If the host kernel has not been configured with VFPv3 support,
- 	@ then it is safer if we deny guests from using it as well.
- #ifdef CONFIG_VFPv3
--	@ Set FPEXC_EN so the guest doesn't trap floating point instructions
-+	@ fp/simd register file has already been accessed, so skip host fpexc
-+	@ save and access trap enable.
-+	vfp_inlazy_mode r7, skip_guest_vfp_trap
-+
- 	VFPFMRX r2, FPEXC		@ VMRS
--	push	{r2}
-+	str     r2, [vcpu, #VCPU_VFP_HOST_FPEXC]
- 	orr	r2, r2, #FPEXC_EN
- 	VFPFMXR FPEXC, r2		@ VMSR
-+	set_hcptr vmentry, (HCPTR_TCP(10) | HCPTR_TCP(11))
-+skip_guest_vfp_trap:
- #endif
- 
- 	@ Configure Hyp-role
-@@ -131,7 +162,7 @@ ENTRY(__kvm_vcpu_run)
- 
- 	@ Trap coprocessor CRx accesses
- 	set_hstr vmentry
--	set_hcptr vmentry, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
-+	set_hcptr vmentry, (HCPTR_TTA)
- 	set_hdcr vmentry
- 
- 	@ Write configured ID register into MIDR alias
-@@ -170,22 +201,15 @@ __kvm_vcpu_return:
- 	@ Don't trap coprocessor accesses for host kernel
- 	set_hstr vmexit
- 	set_hdcr vmexit
--	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11)), after_vfp_restore
-+	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
- 
- #ifdef CONFIG_VFPv3
--	@ Switch VFP/NEON hardware state to the host's
--	add	r7, vcpu, #VCPU_VFP_GUEST
--	store_vfp_state r7
--	add	r7, vcpu, #VCPU_VFP_HOST
--	ldr	r7, [r7]
--	restore_vfp_state r7
--
--after_vfp_restore:
--	@ Restore FPEXC_EN which we clobbered on entry
--	pop	{r2}
-+	@ If fp/simd not dirty, restore FPEXC which we clobbered on entry.
-+	@ Otherwise return with guest FPEXC, later saved in vcpu_put.
-+	vfp_inlazy_mode r2, skip_restore_host_fpexc
-+	ldr     r2, [vcpu, #VCPU_VFP_HOST_FPEXC]
- 	VFPFMXR FPEXC, r2
--#else
--after_vfp_restore:
-+skip_restore_host_fpexc:
- #endif
- 
- 	@ Reset Hyp-role
-@@ -485,6 +509,10 @@ switch_to_guest_vfp:
- 	@ NEON/VFP used.  Turn on VFP access.
- 	set_hcptr vmtrap, (HCPTR_TCP(10) | HCPTR_TCP(11))
- 
-+	@ set lazy mode flag, switch hardware context on vcpu_put
-+	mov     r1, #1
-+	strb    r1, [vcpu, #VCPU_VFP_DIRTY]
-+
- 	@ Switch VFP/NEON hardware state to the guest's
- 	add	r7, r0, #VCPU_VFP_HOST
- 	ldr	r7, [r7]
-diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
-index 51a5950..34e71ee 100644
---- a/arch/arm/kvm/interrupts_head.S
-+++ b/arch/arm/kvm/interrupts_head.S
-@@ -593,10 +593,8 @@ ARM_BE8(rev	r6, r6  )
-  * (hardware reset value is 0). Keep previous value in r2.
-  * An ISB is emited on vmexit/vmtrap, but executed on vmexit only if
-  * VFP wasn't already enabled (always executed on vmtrap).
-- * If a label is specified with vmexit, it is branched to if VFP wasn't
-- * enabled.
-  */
--.macro set_hcptr operation, mask, label = none
-+.macro set_hcptr operation, mask
- 	mrc	p15, 4, r2, c1, c1, 2
- 	ldr	r3, =\mask
- 	.if \operation == vmentry
-@@ -611,13 +609,17 @@ ARM_BE8(rev	r6, r6  )
- 	beq	1f
- 	.endif
- 	isb
--	.if \label != none
--	b	\label
--	.endif
- 1:
- 	.endif
- .endm
- 
-+/* Checks if VFP/SIMD dirty flag is set, if it is branch to label. */
-+.macro vfp_inlazy_mode, reg, label
-+	ldr	\reg, [vcpu, #VCPU_VFP_DIRTY]
-+	cmp	\reg, #1
-+	beq	\label
-+.endm
-+
- /* Configures the HDCR (Hyp Debug Configuration Register) on entry/return
-  * (hardware reset value is 0) */
- .macro set_hdcr operation
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 4562459..26a2347 100644
+index 26a2347..dcecf92 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -157,6 +157,9 @@ struct kvm_vcpu_arch {
- 	/* Interrupt related fields */
- 	u64 irq_lines;		/* IRQ and FIQ levels */
- 
-+	/* fp/simd dirty flag true if guest accessed register file */
-+	bool    vfp_dirty;
-+
- 	/* Cache some mmu pages needed inside spinlock regions */
- 	struct kvm_mmu_memory_cache mmu_page_cache;
- 
-@@ -248,6 +251,7 @@ static inline void kvm_arch_hardware_unsetup(void) {}
+@@ -251,11 +251,11 @@ static inline void kvm_arch_hardware_unsetup(void) {}
  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
-+static inline void kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu) {}
+-static inline void kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu) {}
  
  void kvm_arm_init_debug(void);
  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+ void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
++void kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu);
+ 
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+index 8d89cf8..c9c5242 100644
+--- a/arch/arm64/kernel/asm-offsets.c
++++ b/arch/arm64/kernel/asm-offsets.c
+@@ -124,6 +124,7 @@ int main(void)
+   DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
+   DEFINE(VCPU_MDCR_EL2,	offsetof(struct kvm_vcpu, arch.mdcr_el2));
+   DEFINE(VCPU_IRQ_LINES,	offsetof(struct kvm_vcpu, arch.irq_lines));
++  DEFINE(VCPU_VFP_DIRTY,	offsetof(struct kvm_vcpu, arch.vfp_dirty));
+   DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
+   DEFINE(VCPU_HOST_DEBUG_STATE, offsetof(struct kvm_vcpu, arch.host_debug_state));
+   DEFINE(VCPU_TIMER_CNTV_CTL,	offsetof(struct kvm_vcpu, arch.timer_cpu.cntv_ctl));
+diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+index e583613..ed2c4cf 100644
+--- a/arch/arm64/kvm/hyp.S
++++ b/arch/arm64/kvm/hyp.S
+@@ -36,6 +36,28 @@
+ #define CPU_SYSREG_OFFSET(x)	(CPU_SYSREGS + 8*x)
+ 
+ 	.text
++
++/**
++ * void kvm_restore_host_vfp_state(struct vcpu *vcpu) - Executes lazy
++ *	fp/simd switch, saves the guest, restores host. Called from host
++ *	mode, placed outside of hyp section.
++ */
++ENTRY(kvm_restore_host_vfp_state)
++	push    xzr, lr
++
++	add     x2, x0, #VCPU_CONTEXT
++	mov     w3, #0
++	strb    w3, [x0, #VCPU_VFP_DIRTY]
++
++	bl __save_fpsimd
++
++	ldr     x2, [x0, #VCPU_HOST_CONTEXT]
++	bl __restore_fpsimd
++
++	pop     xzr, lr
++	ret
++ENDPROC(kvm_restore_host_vfp_state)
++
+ 	.pushsection	.hyp.text, "ax"
+ 	.align	PAGE_SHIFT
+ 
+@@ -482,7 +504,11 @@
+ 99:
+ 	msr     hcr_el2, x2
+ 	mov	x2, #CPTR_EL2_TTA
++
++	ldrb	w3, [x0, #VCPU_VFP_DIRTY]
++	tbnz    w3, #0, 98f
+ 	orr     x2, x2, #CPTR_EL2_TFP
++98:
+ 	msr	cptr_el2, x2
+ 
+ 	mov	x2, #(1 << 15)	// Trap CP15 Cr=15
+@@ -669,14 +695,12 @@ __restore_debug:
+ 	ret
+ 
+ __save_fpsimd:
+-	skip_fpsimd_state x3, 1f
+ 	save_fpsimd
+-1:	ret
++	ret
+ 
+ __restore_fpsimd:
+-	skip_fpsimd_state x3, 1f
+ 	restore_fpsimd
+-1:	ret
++	ret
+ 
+ switch_to_guest_fpsimd:
+ 	push	x4, lr
+@@ -688,6 +712,9 @@ switch_to_guest_fpsimd:
+ 
+ 	mrs	x0, tpidr_el2
+ 
++	mov     w2, #1
++	strb    w2, [x0, #VCPU_VFP_DIRTY]
++
+ 	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
+ 	kern_hyp_va x2
+ 	bl __save_fpsimd
+@@ -763,7 +790,6 @@ __kvm_vcpu_return:
+ 	add	x2, x0, #VCPU_CONTEXT
+ 
+ 	save_guest_regs
+-	bl __save_fpsimd
+ 	bl __save_sysregs
+ 
+ 	skip_debug_state x3, 1f
+@@ -784,7 +810,6 @@ __kvm_vcpu_return:
+ 	kern_hyp_va x2
+ 
+ 	bl __restore_sysregs
+-	bl __restore_fpsimd
+ 	/* Clear FPSIMD and Trace trapping */
+ 	msr     cptr_el2, xzr
+ 
 -- 
 1.9.1
