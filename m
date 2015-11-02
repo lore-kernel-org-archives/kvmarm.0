@@ -1,116 +1,102 @@
-From: Christopher Covington <cov@codeaurora.org>
-Subject: Re: [PATCH v4 17/21] KVM: ARM64: Add helper to handle PMCR
- register bits
-Date: Mon, 02 Nov 2015 16:20:40 -0500
-Message-ID: <5637D3A8.1040500@codeaurora.org>
-References: <1446186123-11548-1-git-send-email-zhaoshenglong@huawei.com>
- <1446186123-11548-18-git-send-email-zhaoshenglong@huawei.com>
+From: Mario Smarduch <m.smarduch@samsung.com>
+Subject: [PATCH] KVM/arm: kernel low level debug support for ARM32 virtual
+ platforms
+Date: Mon, 02 Nov 2015 15:51:53 -0800
+Message-ID: <1446508313-24404-1-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B4358497BD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2015 16:17:35 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6kwVdxWmOIaL for <kvmarm@lists.cs.columbia.edu>;
- Mon,  2 Nov 2015 16:17:34 -0500 (EST)
-Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7C5CA49013
- for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2015 16:17:34 -0500 (EST)
-In-Reply-To: <1446186123-11548-18-git-send-email-zhaoshenglong@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org
+Content-Type: text/plain
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux@arm.linux.org.uk, will.deacon@arm.com, andre.przywara@arm.com, grant.likely@secretlab.ca, robherring2@gmail.com, christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, Mario Smarduch <m.smarduch@samsung.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/30/2015 02:21 AM, Shannon Zhao wrote:
-> From: Shannon Zhao <shannon.zhao@linaro.org>
-> 
-> According to ARMv8 spec, when writing 1 to PMCR.E, all counters are
-> enabled by PMCNTENSET, while writing 0 to PMCR.E, all counters are
-> disabled. When writing 1 to PMCR.P, reset all event counters, not
-> including PMCCNTR, to zero. When writing 1 to PMCR.C, reset PMCCNTR to
-> zero.
+Hello,
+   this is a re-post from couple weeks ago, please take time to review this 
+simple patch which simplifies DEBUG_LL and prevents kernel crash on virtual 
+platforms.
 
-> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> index ae21089..11d1bfb 100644
-> --- a/virt/kvm/arm/pmu.c
-> +++ b/virt/kvm/arm/pmu.c
-> @@ -121,6 +121,56 @@ void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val)
->  }
->  
->  /**
-> + * kvm_pmu_handle_pmcr - handle PMCR register
-> + * @vcpu: The vcpu pointer
-> + * @val: the value guest writes to PMCR register
-> + */
-> +void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u32 val)
-> +{
-> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +	struct kvm_pmc *pmc;
-> +	u32 enable;
-> +	int i;
-> +
-> +	if (val & ARMV8_PMCR_E) {
-> +		if (!vcpu_mode_is_32bit(vcpu))
-> +			enable = vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
-> +		else
-> +			enable = vcpu_cp15(vcpu, c9_PMCNTENSET);
-> +
-> +		kvm_pmu_enable_counter(vcpu, enable, true);
-> +	} else
-> +		kvm_pmu_disable_counter(vcpu, 0xffffffffUL);
+Before this patch DEBUG_LL for 'dummy virtual machine':
 
-Nit: If using braces on one side of if-else, please use them on the other.
-(Search for "braces in both branches" in Documentation/CodingStyle.)
+( ) Kernel low-level debugging via EmbeddedICE DCC channel
+( ) Kernel low-level debug output via semihosting I/O
+( ) Kernel low-level debugging via 8250 UART
+( ) Kernel low-level debugging via ARM Ltd PL01x Primecell
 
-> +
-> +	if (val & ARMV8_PMCR_C) {
-> +		pmc = &pmu->pmc[ARMV8_MAX_COUNTERS - 1];
-> +		if (pmc->perf_event)
-> +			local64_set(&pmc->perf_event->count, 0);
-> +		if (!vcpu_mode_is_32bit(vcpu))
-> +			vcpu_sys_reg(vcpu, PMCCNTR_EL0) = 0;
-> +		else
-> +			vcpu_cp15(vcpu, c9_PMCCNTR) = 0;
-> +	}
-> +
-> +	if (val & ARMV8_PMCR_P) {
-> +		for (i = 0; i < ARMV8_MAX_COUNTERS - 1; i++) {
-> +			pmc = &pmu->pmc[i];
-> +			if (pmc->perf_event)
-> +				local64_set(&pmc->perf_event->count, 0);
-> +			if (!vcpu_mode_is_32bit(vcpu))
-> +				vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = 0;
-> +			else
-> +				vcpu_cp15(vcpu, c14_PMEVCNTR0 + i) = 0;
-> +		}
-> +	}
-> +
-> +	if (val & ARMV8_PMCR_LC) {
-> +		pmc = &pmu->pmc[ARMV8_MAX_COUNTERS - 1];
-> +		pmc->bitmask = 0xffffffffffffffffUL;
-> +	}
-> +}
-> +
-> +/**
->   * kvm_pmu_overflow_clear - clear PMU overflow interrupt
->   * @vcpu: The vcpu pointer
->   * @val: the value guest writes to PMOVSCLR register
-> 
+In summary if debug uart is not emulated kernel crashes.
+And once you pass that hurdle, uart physical/virtual addresses are unknown.
+DEBUG_LL comes in handy on many occasions and should be somewhat 
+intuitive to use like it is for physical platforms. For virtual platforms
+user may start daubting the host and get into a bigger mess.
 
+After this patch is applied user gets:
 
+(X) Kernel low-level debugging on QEMU Virtual Platform
+( ) Kernel low-level debugging on Kvmtool Virtual Platform
+	..... above repeated ....
+
+The virtual addresses selected follow arm reference models, high in vmalloc 
+section with high mem enabled and guest running with >= 1GB of memory. The 
+offset is leftover from arm reference models.
+
+The patch is against 4.2.0-rc2 commit 43297dda0a51
+
+Original Description
+--------------------
+When booting a VM using QEMU or Kvmtool there are no clear ways to 
+enable low level debugging for these virtual platforms. some menu port 
+choices are not supported by the virtual platforms at all. And there is no
+help on the location of physical and virtual addresses for the ports.
+This may lead to wrong debug port and a frozen VM with a blank screen.
+
+This patch adds menu selections for QEMU and Kvmtool virtual platforms for low 
+level kernel print debugging. Help section displays port physical and
+virutal addresses.
+
+ARM reference models use the MIDR register to run-time select UART port address 
+(for ARCH_VEXPRESS) based on A9 or A15 part numbers. Looked for a same approach
+but couldn't find a way to differentiate between virtual platforms, something
+like a platform register.
+
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+---
+ arch/arm/Kconfig.debug | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/arch/arm/Kconfig.debug b/arch/arm/Kconfig.debug
+index a2e16f9..d126bd4 100644
+--- a/arch/arm/Kconfig.debug
++++ b/arch/arm/Kconfig.debug
+@@ -1155,6 +1155,28 @@ choice
+ 		  This option selects UART0 on VIA/Wondermedia System-on-a-chip
+ 		  devices, including VT8500, WM8505, WM8650 and WM8850.
+ 
++	config DEBUG_VIRT_UART_QEMU
++		bool "Kernel low-level debugging on QEMU Virtual Platform"
++		depends on ARCH_VIRT
++		select DEBUG_UART_PL01X
++		help
++		  Say Y here if you want the debug print routines to direct
++		  their output to PL011 UART port on QEMU Virtual Platform.
++		  Appropriate address values are:
++			PHYS		VIRT
++			0x9000000	0xf8090000
++
++	config DEBUG_VIRT_UART_KVMTOOL
++		bool "Kernel low-level debugging on Kvmtool Virtual Platform"
++		depends on ARCH_VIRT
++		select DEBUG_UART_8250
++		help
++		  Say Y here if you want the debug print routines to direct
++		  their output to 8250 UART port on Kvmtool Virtual
++		  Platform. Appropriate address values are:
++			PHYS		VIRT
++			0x3f8		0xf80903f8
++
+ 	config DEBUG_ICEDCC
+ 		bool "Kernel low-level debugging via EmbeddedICE DCC channel"
+ 		help
 -- 
-Qualcomm Innovation Center, Inc.
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+1.9.1
+
