@@ -1,232 +1,85 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [Qemu-devel] [kvm-unit-tests PATCHv5 3/3] arm: pmu: Add CPI
- checking
-Date: Mon, 2 Nov 2015 09:58:14 -0600
-Message-ID: <20151102155814.GA5279@hawk.localdomain>
-References: <1444662470-13045-1-git-send-email-cov@codeaurora.org>
- <1446059575-23903-1-git-send-email-cov@codeaurora.org>
- <1446059575-23903-4-git-send-email-cov@codeaurora.org>
- <20151030130022.GA8197@hawk.localdomain>
- <5633C5DB.7090009@codeaurora.org>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [PATCH 0/7] kvmtool: Cleanup kernel loading
+Date: Mon, 2 Nov 2015 16:03:03 +0000
+Message-ID: <56378937.8050504@arm.com>
+References: <1446229620-28088-1-git-send-email-andre.przywara@arm.com>
+ <20151102145846.GH29657@arm.com>
+ <CAK7xexmj2wKknkeMQA7Jj5d_cmfe4PtY4B3vGavesT_V8VoBMA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <5633C5DB.7090009@codeaurora.org>
-Sender: kvm-owner@vger.kernel.org
-To: Christopher Covington <cov@codeaurora.org>
-Cc: wei@redhat.com, alindsay@codeaurora.org, kvm@vger.kernel.org, croberts@codeaurora.org, qemu-devel@nongnu.org, alistair.francis@xilinx.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5488748B41
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2015 10:59:28 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ovHL-imP6Ucl for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Nov 2015 10:59:27 -0500 (EST)
+Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
+ [217.140.96.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E08DF412C2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2015 10:59:26 -0500 (EST)
+In-Reply-To: <CAK7xexmj2wKknkeMQA7Jj5d_cmfe4PtY4B3vGavesT_V8VoBMA@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Dimitri John Ledkov <dimitri.j.ledkov@intel.com>, Will Deacon <will.deacon@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm-ppc@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 30, 2015 at 03:32:43PM -0400, Christopher Covington wrote:
-> Hi Drew,
-> 
-> On 10/30/2015 09:00 AM, Andrew Jones wrote:
-> > On Wed, Oct 28, 2015 at 03:12:55PM -0400, Christopher Covington wrote:
-> >> Calculate the numbers of cycles per instruction (CPI) implied by ARM
-> >> PMU cycle counter values. The code includes a strict checking facility
-> >> intended for the -icount option in TCG mode but it is not yet enabled
-> >> in the configuration file. Enabling it must wait on infrastructure
-> >> improvements which allow for different tests to be run on TCG versus
-> >> KVM.
-> >>
-> >> Signed-off-by: Christopher Covington <cov@codeaurora.org>
-> >> ---
-> >>  arm/pmu.c | 103 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
-> >>  1 file changed, 102 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/arm/pmu.c b/arm/pmu.c
-> >> index 4334de4..788886a 100644
-> >> --- a/arm/pmu.c
-> >> +++ b/arm/pmu.c
-> >> @@ -43,6 +43,23 @@ static inline unsigned long get_pmccntr(void)
-> >>  	asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r" (cycles));
-> >>  	return cycles;
-> >>  }
-> >> +
-> >> +/*
-> >> + * Extra instructions inserted by the compiler would be difficult to compensate
-> >> + * for, so hand assemble everything between, and including, the PMCR accesses
-> >> + * to start and stop counting.
-> >> + */
-> >> +static inline void loop(int i, uint32_t pmcr)
-> >> +{
-> >> +	asm volatile(
-> >> +	"	mcr	p15, 0, %[pmcr], c9, c12, 0\n"
-> >> +	"1:	subs	%[i], %[i], #1\n"
-> >> +	"	bgt	1b\n"
-> >> +	"	mcr	p15, 0, %[z], c9, c12, 0\n"
-> >> +	: [i] "+r" (i)
-> >> +	: [pmcr] "r" (pmcr), [z] "r" (0)
-> >> +	: "cc");
-> >> +}
-> >>  #elif defined(__aarch64__)
-> >>  static inline uint32_t get_pmcr(void)
-> >>  {
-> >> @@ -64,6 +81,23 @@ static inline unsigned long get_pmccntr(void)
-> >>  	asm volatile("mrs %0, pmccntr_el0" : "=r" (cycles));
-> >>  	return cycles;
-> >>  }
-> >> +
-> >> +/*
-> >> + * Extra instructions inserted by the compiler would be difficult to compensate
-> >> + * for, so hand assemble everything between, and including, the PMCR accesses
-> >> + * to start and stop counting.
-> >> + */
-> >> +static inline void loop(int i, uint32_t pmcr)
-> >> +{
-> >> +	asm volatile(
-> >> +	"	msr	pmcr_el0, %[pmcr]\n"
-> >> +	"1:	subs	%[i], %[i], #1\n"
-> >> +	"	b.gt	1b\n"
-> >> +	"	msr	pmcr_el0, xzr\n"
-> >> +	: [i] "+r" (i)
-> >> +	: [pmcr] "r" (pmcr)
-> >> +	: "cc");
-> >> +}
-> >>  #endif
-> >>  
-> >>  struct pmu_data {
-> >> @@ -131,12 +165,79 @@ static bool check_cycles_increase(void)
-> >>  	return true;
-> >>  }
-> >>  
-> >> -int main(void)
-> >> +/*
-> >> + * Execute a known number of guest instructions. Only odd instruction counts
-> >> + * greater than or equal to 3 are supported by the in-line assembly code. The
-> >> + * control register (PMCR_EL0) is initialized with the provided value (allowing
-> >> + * for example for the cycle counter or event counters to be reset). At the end
-> >> + * of the exact instruction loop, zero is written to PMCR_EL0 to disable
-> >> + * counting, allowing the cycle counter or event counters to be read at the
-> >> + * leisure of the calling code.
-> >> + */
-> >> +static void measure_instrs(int num, uint32_t pmcr)
-> >> +{
-> >> +	int i = (num - 1) / 2;
-> >> +
-> >> +	assert(num >= 3 && ((num - 1) % 2 == 0));
-> >> +	loop(i, pmcr);
-> >> +}
-> >> +
-> >> +/*
-> >> + * Measure cycle counts for various known instruction counts. Ensure that the
-> >> + * cycle counter progresses (similar to check_cycles_increase() but with more
-> >> + * instructions and using reset and stop controls). If supplied a positive,
-> >> + * nonzero CPI parameter, also strictly check that every measurement matches
-> >> + * it. Strict CPI checking is used to test -icount mode.
-> >> + */
-> >> +static bool check_cpi(int cpi)
-> >> +{
-> >> +	struct pmu_data pmu = {0};
-> >> +
-> >> +	pmu.cycle_counter_reset = 1;
-> >> +	pmu.enable = 1;
-> >> +
-> >> +	if (cpi > 0)
-> >> +		printf("Checking for CPI=%d.\n", cpi);
-> >> +	printf("instrs : cycles0 cycles1 ...\n");
-> >> +
-> >> +	for (int i = 3; i < 300; i += 32) {
-> >> +		int avg, sum = 0;
-> >> +
-> >> +		printf("%d :", i);
-> >> +		for (int j = 0; j < NR_SAMPLES; j++) {
-> >> +			int cycles;
-> >> +
-> >> +			measure_instrs(i, pmu.pmcr_el0);
-> >> +			cycles = get_pmccntr();
-> >> +			printf(" %d", cycles);
-> >> +
-> >> +			if (!cycles || (cpi > 0 && cycles != i * cpi)) {
-> >> +				printf("\n");
-> >> +				return false;
-> >> +			}
-> >> +
-> >> +			sum += cycles;
-> >> +		}
-> >> +		avg = sum / NR_SAMPLES;
-> >> +		printf(" sum=%d avg=%d avg_ipc=%d avg_cpi=%d\n",
-> >> +			sum, avg, i / avg, avg / i);
-> >> +	}
-> >> +
-> >> +	return true;
-> >> +}
-> >> +
-> >> +int main(int argc, char *argv[])
-> >>  {
-> >> +	int cpi = 0;
-> >> +
-> >> +	if (argc >= 1)
-> >> +		cpi = atol(argv[0]);
-> >> +
-> >>  	report_prefix_push("pmu");
-> >>  
-> >>  	report("Control register", check_pmcr());
-> >>  	report("Monotonically increasing cycle count", check_cycles_increase());
-> >> +	report("Cycle/instruction ratio", check_cpi(cpi));
-> >>  
-> >>  	return report_summary();
-> >>  }
-> > 
-> > I applied and tested this (by adding -icount 1 -append 1 to the cmdline),
-> 
-> Thanks for giving this a spin. For whatever reason the -icount argument is the
-> exponent n in 2^n. I could match that logic if you prefer, but the pmu.c code
+Hi Dimitri,
 
-Oh yeah, I forgot how you had that in your earlier posts. So in that
-case
-
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-
-I've applied these three patches to 
-
-https://github.com/rhdrjones/kvm-unit-tests/commits/staging
-
-I'll send a pull request to Paolo for that branch soon.
-
-Thanks,
-drew
-
-> currently takes the fully calculated shift value rather than the exponent.
-> I've been testing with the following option pairs (dependent on 'accel = tcg'
-> support).
+On 02/11/15 15:17, Dimitri John Ledkov wrote:
+> On 2 November 2015 at 14:58, Will Deacon <will.deacon@arm.com> wrote:
+>> On Fri, Oct 30, 2015 at 06:26:53PM +0000, Andre Przywara wrote:
+>>> Hi,
+>>
+>> Hello Andre,
+>>
+>>> this series cleans up kvmtool's kernel loading functionality a bit.
+>>> It has been broken out of a previous series I sent [1] and contains
+>>> just the cleanup and bug fix parts, which should be less controversial
+>>> and thus easier to merge ;-)
+>>> I will resend the pipe loading part later on as a separate series.
+>>>
+>>> The first patch properly abstracts kernel loading to move
+>>> responsibility into each architecture's code. It removes quite some
+>>> ugly code from the generic kvm.c file.
+>>> The later patches address the naive usage of read(2) to, well, read
+>>> data from files. Doing this without coping with the subtleties of
+>>> the UNIX read semantics (returning with less or none data read is not
+>>> an error) can provoke hard to debug failures.
+>>> So these patches make use of the existing and one new wrapper function
+>>> to make sure we read everything we actually wanted to.
+>>> The last patch moves the ARM kernel loading code into the proper
+>>> location to be in line with the other architectures.
+>>>
+>>> Please have a look and give some comments!
+>>
+>> Looks good to me, but I'd like to see some comments from some mips/ppc/x86
+>> people on the changes you're making over there.
 > 
-> -- >8 --
-> Subject: [PATCH] arm: pmu: Add -icount checking configurations
-> 
-> Pass a couple -icount values in TCG mode and strictly check the
-> resulting cycle counts.
-> 
-> Signed-off-by: Christopher Covington <cov@codeaurora.org>
-> ---
->  arm/unittests.cfg | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
-> 
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index fd94adb..5ca1e6a 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -40,3 +40,17 @@ groups = selftest
->  [pmu]
->  file = pmu.flat
->  groups = pmu
-> +
-> +# Test PMU support with -icount IPC=1
-> +[pmu-icount-1]
-> +file = pmu.flat
-> +extra_params = -icount 0 -append '1'
-> +groups = pmu
-> +accel = tcg
-> +
-> +# Test PMU support with -icount IPC=256
-> +[pmu-icount-256]
-> +file = pmu.flat
-> +extra_params = -icount 8 -append '256'
-> +groups = pmu
-> +accel = tcg
-> -- 
-> Qualcomm Innovation Center, Inc.
-> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-> a Linux Foundation Collaborative Project
-> 
+> Looks mostly good to me, as one of the kvmtool down streams. Over at
+> https://github.com/clearlinux/kvmtool we have some patches to tweak
+> the x86 boot flow, which will need rebasing/retweaking) specifically
+> this commit here -
+> https://github.com/clearlinux/kvmtool/commit/a8dee709f85735d16739d0eda0cc00d3c1b17477
+
+Awesome - I was actually thinking about coding something like this!
+In the last week I move the MIPS ELF loading out of mips/ into /elf.c to
+be able to load kvm-unit-tests' tests (which are Multiboot/ELF). As
+multiboot requires entering in protected mode, I was thinking about
+changing kvmtool to support entering a guest directly in protected mode
+- seems like this is mostly what you've done here already.
+
+Looks like we should both post our patches to merge them somehow ;-)
+
+Cheers,
+Andre.
