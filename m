@@ -1,64 +1,68 @@
-From: Christopher Covington <cov@codeaurora.org>
-Subject: Re: [PATCH v4 08/21] KVM: ARM64: Add reset and access
- handlers for PMXEVTYPER register
-Date: Mon, 02 Nov 2015 15:54:12 -0500
-Message-ID: <5637CD74.2010609@codeaurora.org>
-References: <1446186123-11548-1-git-send-email-zhaoshenglong@huawei.com> <1446186123-11548-9-git-send-email-zhaoshenglong@huawei.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v4 0/3] KVM: arm/arm64: Clean up some obsolete code
+Date: Mon, 2 Nov 2015 22:15:38 +0100
+Message-ID: <20151102211538.GA5819@cbox>
+References: <cover.1445934536.git.p.fedin@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1446186123-11548-9-git-send-email-zhaoshenglong@huawei.com>
-Sender: kvm-owner@vger.kernel.org
-To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, marc.zyngier@arm.com, christoffer.dall@linaro.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, shannon.zhao@linaro.org, peter.huangpeng@huawei.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C62C4981C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2015 16:12:33 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id C-pKhNtT+fsB for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  2 Nov 2015 16:12:32 -0500 (EST)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E1B48497C0
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  2 Nov 2015 16:12:31 -0500 (EST)
+Received: by wmeg8 with SMTP id g8so71446663wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 02 Nov 2015 13:15:40 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <cover.1445934536.git.p.fedin@samsung.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Pavel Fedin <p.fedin@samsung.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Shannon,
-
-On 10/30/2015 02:21 AM, Shannon Zhao wrote:
-> From: Shannon Zhao <shannon.zhao@linaro.org>
+On Tue, Oct 27, 2015 at 11:37:28AM +0300, Pavel Fedin wrote:
+> Current KVM code has lots of old redundancies, which can be cleaned up.
+> This patchset is actually a better alternative to
+> http://www.spinics.net/lists/arm-kernel/msg430726.html, which allows to
+> keep piggy-backed LRs. The idea is based on the fact that our code also
+> maintains LR state in elrsr, and this information is enough to track LR
+> usage.
 > 
-> Since the reset value of PMXEVTYPER is UNKNOWN, use reset_unknown or
-> reset_unknown_cp15 for its reset handler. Add access handler which
-> emulates writing and reading PMXEVTYPER register. When writing to
-> PMXEVTYPER, call kvm_pmu_set_counter_event_type to create a perf_event
-> for the selected event type.
+> In case of problems this series can be applied partially, each patch is
+> a complete refactoring step on its own.
 > 
-> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 26 ++++++++++++++++++++++++--
->  1 file changed, 24 insertions(+), 2 deletions(-)
+> Thanks to Andre Przywara for pinpointing some 4.3+ specifics.
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index cb82b15..4e606ea 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -491,6 +491,17 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
->  
->  	if (p->is_write) {
->  		switch (r->reg) {
-> +		case PMXEVTYPER_EL0: {
-> +			val = vcpu_sys_reg(vcpu, PMSELR_EL0);
-> +			kvm_pmu_set_counter_event_type(vcpu,
-> +						       *vcpu_reg(vcpu, p->Rt),
-> +						       val);
-> +			vcpu_sys_reg(vcpu, PMXEVTYPER_EL0) =
-> +							 *vcpu_reg(vcpu, p->Rt);
+> This version has been tested on SMDK5410 development board
+> (Exynos5410 SoC).
 
-Why does PMXEVTYPER get set directly? It seems like it could have an accessor
-that redirected to PMEVTYPER<n>.
+I ran this through my test scripts and I'm now quite sure that there's
+some breakage in here.
 
-> +			vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + val) =
-> +							 *vcpu_reg(vcpu, p->Rt);
+One of my tests is running two VMs in parallel, each booting up, running
+hackbench, and then doing reboot (from within the guest), and just
+repeating like that.
 
-I tried to look around briefly but couldn't find counter number range checking
-in the PMSELR handler or here. Should there be some here and in PMXEVCNTR?
+I've run your patches in the above config 100 times, and every time,
+the rebooting VMs got stuck before 50 reboots.
 
-Thanks,
-Christopher Covington
+Without these patches, I could run the above config 100 times, and every
+time, the rebooting VMs passed 200 reboots.
 
--- 
-Qualcomm Innovation Center, Inc.
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+I'll try to test each patch individually soon.
+
+-Christoffer
