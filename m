@@ -1,26 +1,25 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v6 3/8] vfio: platform: introduce module_vfio_reset_handler
- macro
-Date: Tue,  3 Nov 2015 18:12:14 +0000
-Message-ID: <1446574339-1843-4-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v6 5/8] vfio: platform: add compat in vfio_platform_device
+Date: Tue,  3 Nov 2015 18:12:16 +0000
+Message-ID: <1446574339-1843-6-git-send-email-eric.auger@linaro.org>
 References: <1446574339-1843-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B7FAC498AD
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79A90498E9
  for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Nov 2015 13:09:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4txcyf4uF3-x for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 Nov 2015 13:09:20 -0500 (EST)
-Received: from mail-wi0-f171.google.com (mail-wi0-f171.google.com
- [209.85.212.171])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 71146498D3
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Nov 2015 13:09:19 -0500 (EST)
-Received: by wicll6 with SMTP id ll6so17113854wic.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 03 Nov 2015 10:12:30 -0800 (PST)
+ with ESMTP id CZhRLzlnKZBe for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 Nov 2015 13:09:22 -0500 (EST)
+Received: from mail-wi0-f169.google.com (mail-wi0-f169.google.com
+ [209.85.212.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D119498ED
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 Nov 2015 13:09:22 -0500 (EST)
+Received: by wicll6 with SMTP id ll6so75145665wic.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 03 Nov 2015 10:12:33 -0800 (PST)
 In-Reply-To: <1446574339-1843-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,56 +34,67 @@ To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, b.reyn
 Cc: linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The module_vfio_reset_handler macro
-- define a module alias
-- implement module init/exit function which respectively registers
-  and unregisters the reset function.
+Let's retrieve the compatibility string on probe and store it
+in the vfio_platform_device struct
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
-Reviewed-by: Arnd Bergmann <arnd@arndb.de>
 
 ---
-v4 -> v5:
-- add Arnd's R-b
-
-v3 -> v4:
-- pass reset to vfio_platform_unregister_reset
 
 v2 -> v3:
-- use vfio_platform_register_reset macro
-
-v1 -> v2:
-- remove vfio_platform_reset_private.h and move back the macro to
-  vfio_platform_private.h header: removed reset_module_register &
-  unregister (symbol_get)
-- defines the module_vfio_reset_handler macro as suggested by Arnd
-  (formerly in vfio_platform_reset_private.h)
+- populate compat after vdev check
 ---
- drivers/vfio/platform/vfio_platform_private.h | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ drivers/vfio/platform/vfio_platform_common.c  | 15 ++++++++-------
+ drivers/vfio/platform/vfio_platform_private.h |  1 +
+ 2 files changed, 9 insertions(+), 7 deletions(-)
 
+diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
+index 3b7e52c..f2d41a0 100644
+--- a/drivers/vfio/platform/vfio_platform_common.c
++++ b/drivers/vfio/platform/vfio_platform_common.c
+@@ -41,16 +41,11 @@ static const struct vfio_platform_reset_combo reset_lookup_table[] = {
+ static void vfio_platform_get_reset(struct vfio_platform_device *vdev,
+ 				    struct device *dev)
+ {
+-	const char *compat;
+ 	int (*reset)(struct vfio_platform_device *);
+-	int ret, i;
+-
+-	ret = device_property_read_string(dev, "compatible", &compat);
+-	if (ret)
+-		return;
++	int i;
+ 
+ 	for (i = 0 ; i < ARRAY_SIZE(reset_lookup_table); i++) {
+-		if (!strcmp(reset_lookup_table[i].compat, compat)) {
++		if (!strcmp(reset_lookup_table[i].compat, vdev->compat)) {
+ 			request_module(reset_lookup_table[i].module_name);
+ 			reset = __symbol_get(
+ 				reset_lookup_table[i].reset_function_name);
+@@ -544,6 +539,12 @@ int vfio_platform_probe_common(struct vfio_platform_device *vdev,
+ 	if (!vdev)
+ 		return -EINVAL;
+ 
++	ret = device_property_read_string(dev, "compatible", &vdev->compat);
++	if (ret) {
++		pr_err("VFIO: cannot retrieve compat for %s\n", vdev->name);
++		return -EINVAL;
++	}
++
+ 	group = iommu_group_get(dev);
+ 	if (!group) {
+ 		pr_err("VFIO: No IOMMU group for device %s\n", vdev->name);
 diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
-index c563940..fd262be 100644
+index fd262be..415310f 100644
 --- a/drivers/vfio/platform/vfio_platform_private.h
 +++ b/drivers/vfio/platform/vfio_platform_private.h
-@@ -110,4 +110,18 @@ static struct vfio_platform_reset_node __reset ## _node = {	\
- };								\
- __vfio_platform_register_reset(&__reset ## _node)
+@@ -57,6 +57,7 @@ struct vfio_platform_device {
+ 	int				refcnt;
+ 	struct mutex			igate;
+ 	struct module			*parent_module;
++	const char			*compat;
  
-+#define module_vfio_reset_handler(compat, reset)		\
-+MODULE_ALIAS("vfio-reset:" compat);				\
-+static int __init reset ## _module_init(void)			\
-+{								\
-+	vfio_platform_register_reset(compat, reset);		\
-+	return 0;						\
-+};								\
-+static void __exit reset ## _module_exit(void)			\
-+{								\
-+	vfio_platform_unregister_reset(compat, reset);		\
-+};								\
-+module_init(reset ## _module_init);				\
-+module_exit(reset ## _module_exit)
-+
- #endif /* VFIO_PLATFORM_PRIVATE_H */
+ 	/*
+ 	 * These fields should be filled by the bus specific binder
 -- 
 1.9.1
