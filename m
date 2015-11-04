@@ -1,166 +1,116 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 16/21] arm/arm64: KVM: Add tracepoints for vgic and timer
-Date: Wed,  4 Nov 2015 15:49:55 +0100
-Message-ID: <1446648600-27297-17-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 20/21] KVM: arm/arm64: Clean up vgic_retire_lr() and surroundings
+Date: Wed,  4 Nov 2015 15:49:59 +0100
+Message-ID: <1446648600-27297-21-git-send-email-christoffer.dall@linaro.org>
 References: <1446648600-27297-1-git-send-email-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ECF0499C2
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2015 09:50:06 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Eq-JAzY6kwdo for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Nov 2015 09:50:05 -0500 (EST)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4A80F49A0E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2015 09:50:01 -0500 (EST)
-Received: by wmeg8 with SMTP id g8so43525881wme.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Nov 2015 06:53:14 -0800 (PST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1446648600-27297-1-git-send-email-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Pavel Fedin <p.fedin@samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The VGIC and timer code for KVM arm/arm64 doesn't have any tracepoints
-or tracepoint infrastructure defined.  Rewriting some of the timer code
-handling showed me how much we need this, so let's add these simple
-trace points once and for all and we can easily expand with additional
-trace points in these files as we go along.
+From: Pavel Fedin <p.fedin@samsung.com>
 
-Cc: Wei Huang <wei@redhat.com>
+1. Remove unnecessary 'irq' argument, because irq number can be retrieved
+   from the LR.
+2. Since cff9211eb1a1f58ce7f5a2d596b617928fd4be0e
+   ("arm/arm64: KVM: Fix arch timer behavior for disabled interrupts ")
+   LR_STATE_PENDING is queued back by vgic_retire_lr() itself. Also, it
+   clears vlr.state itself. Therefore, we remove the same, now duplicated,
+   check with all accompanying bit manipulations from vgic_unqueue_irqs().
+3. vgic_retire_lr() is always accompanied by vgic_irq_clear_queued(). Since
+   it already does more than just clearing the LR, move
+   vgic_irq_clear_queued() inside of it.
+
+Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/arch_timer.c |  4 +++
- virt/kvm/arm/trace.h      | 63 +++++++++++++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic.c       |  5 ++++
- 3 files changed, 72 insertions(+)
- create mode 100644 virt/kvm/arm/trace.h
+ virt/kvm/arm/vgic.c | 37 ++++++++++---------------------------
+ 1 file changed, 10 insertions(+), 27 deletions(-)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 523816d..21a0ab2 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -28,6 +28,8 @@
- #include <kvm/arm_vgic.h>
- #include <kvm/arm_arch_timer.h>
- 
-+#include "trace.h"
-+
- static struct timecounter *timecounter;
- static struct workqueue_struct *wqueue;
- static unsigned int host_vtimer_irq;
-@@ -129,6 +131,8 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level)
- 	BUG_ON(!vgic_initialized(vcpu->kvm));
- 
- 	timer->irq.level = new_level;
-+	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer->map->virt_irq,
-+				   timer->irq.level);
- 	ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
- 					 timer->map,
- 					 timer->irq.level);
-diff --git a/virt/kvm/arm/trace.h b/virt/kvm/arm/trace.h
-new file mode 100644
-index 0000000..37d8b98
---- /dev/null
-+++ b/virt/kvm/arm/trace.h
-@@ -0,0 +1,63 @@
-+#if !defined(_TRACE_KVM_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_KVM_H
-+
-+#include <linux/tracepoint.h>
-+
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM kvm
-+
-+/*
-+ * Tracepoints for vgic
-+ */
-+TRACE_EVENT(vgic_update_irq_pending,
-+	TP_PROTO(unsigned long vcpu_id, __u32 irq, bool level),
-+	TP_ARGS(vcpu_id, irq, level),
-+
-+	TP_STRUCT__entry(
-+		__field(	unsigned long,	vcpu_id	)
-+		__field(	__u32,		irq	)
-+		__field(	bool,		level	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->vcpu_id	= vcpu_id;
-+		__entry->irq		= irq;
-+		__entry->level		= level;
-+	),
-+
-+	TP_printk("VCPU: %ld, IRQ %d, level: %d",
-+		  __entry->vcpu_id, __entry->irq, __entry->level)
-+);
-+
-+/*
-+ * Tracepoints for arch_timer
-+ */
-+TRACE_EVENT(kvm_timer_update_irq,
-+	TP_PROTO(unsigned long vcpu_id, __u32 irq, int level),
-+	TP_ARGS(vcpu_id, irq, level),
-+
-+	TP_STRUCT__entry(
-+		__field(	unsigned long,	vcpu_id	)
-+		__field(	__u32,		irq	)
-+		__field(	int,		level	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->vcpu_id	= vcpu_id;
-+		__entry->irq		= irq;
-+		__entry->level		= level;
-+	),
-+
-+	TP_printk("VCPU: %ld, IRQ %d, level %d",
-+		  __entry->vcpu_id, __entry->irq, __entry->level)
-+);
-+
-+#endif /* _TRACE_KVM_H */
-+
-+#undef TRACE_INCLUDE_PATH
-+#define TRACE_INCLUDE_PATH ../../../virt/kvm/arm
-+#undef TRACE_INCLUDE_FILE
-+#define TRACE_INCLUDE_FILE trace
-+
-+/* This part must be outside protection */
-+#include <trace/define_trace.h>
 diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 84abc6f..d4669eb 100644
+index 265a410..96e45f3 100644
 --- a/virt/kvm/arm/vgic.c
 +++ b/virt/kvm/arm/vgic.c
-@@ -34,6 +34,9 @@
- #include <asm/kvm.h>
- #include <kvm/iodev.h>
+@@ -105,7 +105,7 @@
+ #include "vgic.h"
  
-+#define CREATE_TRACE_POINTS
-+#include "trace.h"
-+
- /*
-  * How the whole thing works (courtesy of Christoffer Dall):
-  *
-@@ -1574,6 +1577,8 @@ static int vgic_update_irq_pending(struct kvm *kvm, int cpuid,
- 	int enabled;
- 	bool ret = true, can_inject = true;
+ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu);
+-static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu);
++static void vgic_retire_lr(int lr_nr, struct kvm_vcpu *vcpu);
+ static struct vgic_lr vgic_get_lr(const struct kvm_vcpu *vcpu, int lr);
+ static void vgic_set_lr(struct kvm_vcpu *vcpu, int lr, struct vgic_lr lr_desc);
+ static u64 vgic_get_elrsr(struct kvm_vcpu *vcpu);
+@@ -717,30 +717,14 @@ void vgic_unqueue_irqs(struct kvm_vcpu *vcpu)
+ 		 * interrupt then move the active state to the
+ 		 * distributor tracking bit.
+ 		 */
+-		if (lr.state & LR_STATE_ACTIVE) {
++		if (lr.state & LR_STATE_ACTIVE)
+ 			vgic_irq_set_active(vcpu, lr.irq);
+-			lr.state &= ~LR_STATE_ACTIVE;
+-		}
  
-+	trace_vgic_update_irq_pending(cpuid, irq_num, level);
+ 		/*
+ 		 * Reestablish the pending state on the distributor and the
+-		 * CPU interface.  It may have already been pending, but that
+-		 * is fine, then we are only setting a few bits that were
+-		 * already set.
++		 * CPU interface and mark the LR as free for other use.
+ 		 */
+-		if (lr.state & LR_STATE_PENDING) {
+-			vgic_dist_irq_set_pending(vcpu, lr.irq);
+-			lr.state &= ~LR_STATE_PENDING;
+-		}
+-
+-		vgic_set_lr(vcpu, i, lr);
+-
+-		/*
+-		 * Mark the LR as free for other use.
+-		 */
+-		BUG_ON(lr.state & LR_STATE_MASK);
+-		vgic_retire_lr(i, lr.irq, vcpu);
+-		vgic_irq_clear_queued(vcpu, lr.irq);
++		vgic_retire_lr(i, vcpu);
+ 
+ 		/* Finally update the VGIC state. */
+ 		vgic_update_state(vcpu->kvm);
+@@ -1099,16 +1083,18 @@ static inline void vgic_enable(struct kvm_vcpu *vcpu)
+ 	vgic_ops->enable(vcpu);
+ }
+ 
+-static void vgic_retire_lr(int lr_nr, int irq, struct kvm_vcpu *vcpu)
++static void vgic_retire_lr(int lr_nr, struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_lr vlr = vgic_get_lr(vcpu, lr_nr);
+ 
++	vgic_irq_clear_queued(vcpu, vlr.irq);
 +
- 	if (irq_num >= min(kvm->arch.vgic.nr_irqs, 1020))
- 		return -EINVAL;
+ 	/*
+ 	 * We must transfer the pending state back to the distributor before
+ 	 * retiring the LR, otherwise we may loose edge-triggered interrupts.
+ 	 */
+ 	if (vlr.state & LR_STATE_PENDING) {
+-		vgic_dist_irq_set_pending(vcpu, irq);
++		vgic_dist_irq_set_pending(vcpu, vlr.irq);
+ 		vlr.hwirq = 0;
+ 	}
+ 
+@@ -1135,11 +1121,8 @@ static void vgic_retire_disabled_irqs(struct kvm_vcpu *vcpu)
+ 	for_each_clear_bit(lr, elrsr_ptr, vgic->nr_lr) {
+ 		struct vgic_lr vlr = vgic_get_lr(vcpu, lr);
+ 
+-		if (!vgic_irq_is_enabled(vcpu, vlr.irq)) {
+-			vgic_retire_lr(lr, vlr.irq, vcpu);
+-			if (vgic_irq_is_queued(vcpu, vlr.irq))
+-				vgic_irq_clear_queued(vcpu, vlr.irq);
+-		}
++		if (!vgic_irq_is_enabled(vcpu, vlr.irq))
++			vgic_retire_lr(lr, vcpu);
+ 	}
+ }
  
 -- 
 2.1.2.330.g565301e.dirty
+
