@@ -1,129 +1,70 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 08/21] arm/arm64: KVM: Support edge-triggered forwarded interrupts
-Date: Wed,  4 Nov 2015 15:49:47 +0100
-Message-ID: <1446648600-27297-9-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 04/21] arm/arm64: KVM: Implement GICD_ICFGR as RO for PPIs
+Date: Wed,  4 Nov 2015 15:49:43 +0100
+Message-ID: <1446648600-27297-5-git-send-email-christoffer.dall@linaro.org>
 References: <1446648600-27297-1-git-send-email-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E0E5E497BE
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2015 09:49:50 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id KqI78DQN2AP2 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Nov 2015 09:49:50 -0500 (EST)
+Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AD63B49938
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2015 09:49:49 -0500 (EST)
+Received: by wmll128 with SMTP id l128so116251981wml.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Nov 2015 06:53:02 -0800 (PST)
 In-Reply-To: <1446648600-27297-1-git-send-email-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We mark edge-triggered interrupts with the HW bit set as queued to
-prevent the VGIC code from injecting LRs with both the Active and
-Pending bits set at the same time while also setting the HW bit,
-because the hardware does not support this.
+The GICD_ICFGR allows the bits for the SGIs and PPIs to be read only.
+We currently simulate this behavior by writing a hardcoded value to the
+register for the SGIs and PPIs on every write of these bits to the
+register (ignoring what the guest actually wrote), and by writing the
+same value as the reset value to the register.
 
-However, this means that we must also clear the queued flag when we sync
-back a LR where the state on the physical distributor went from active
-to inactive because the guest deactivated the interrupt.  At this point
-we must also check if the interrupt is pending on the distributor, and
-tell the VGIC to queue it again if it is.
+This is a bit counter-intuitive, as the register is RO for these bits,
+and we can just implement it that way, allowing us to control the value
+of the bits purely in the reset code.
 
-Since these actions on the sync path are extremely close to those for
-level-triggered interrupts, rename process_level_irq to
-process_queued_irq, allowing it to cater for both cases.
-
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic.c | 40 ++++++++++++++++++++++------------------
- 1 file changed, 22 insertions(+), 18 deletions(-)
+ virt/kvm/arm/vgic.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 3c2909c..84abc6f 100644
+index 367a180..f8ca2e9 100644
 --- a/virt/kvm/arm/vgic.c
 +++ b/virt/kvm/arm/vgic.c
-@@ -1313,13 +1313,10 @@ epilog:
- 	}
- }
+@@ -690,10 +690,9 @@ bool vgic_handle_cfg_reg(u32 *reg, struct kvm_exit_mmio *mmio,
+ 	vgic_reg_access(mmio, &val, offset,
+ 			ACCESS_READ_VALUE | ACCESS_WRITE_VALUE);
+ 	if (mmio->is_write) {
+-		if (offset < 8) {
+-			*reg = ~0U; /* Force PPIs/SGIs to 1 */
++		/* Ignore writes to read-only SGI and PPI bits */
++		if (offset < 8)
+ 			return false;
+-		}
  
--static int process_level_irq(struct kvm_vcpu *vcpu, int lr, struct vgic_lr vlr)
-+static int process_queued_irq(struct kvm_vcpu *vcpu,
-+				   int lr, struct vgic_lr vlr)
- {
--	int level_pending = 0;
--
--	vlr.state = 0;
--	vlr.hwirq = 0;
--	vgic_set_lr(vcpu, lr, vlr);
-+	int pending = 0;
- 
- 	/*
- 	 * If the IRQ was EOIed (called from vgic_process_maintenance) or it
-@@ -1335,26 +1332,35 @@ static int process_level_irq(struct kvm_vcpu *vcpu, int lr, struct vgic_lr vlr)
- 	vgic_dist_irq_clear_soft_pend(vcpu, vlr.irq);
- 
- 	/*
--	 * Tell the gic to start sampling the line of this interrupt again.
-+	 * Tell the gic to start sampling this interrupt again.
- 	 */
- 	vgic_irq_clear_queued(vcpu, vlr.irq);
- 
- 	/* Any additional pending interrupt? */
--	if (vgic_dist_irq_get_level(vcpu, vlr.irq)) {
--		vgic_cpu_irq_set(vcpu, vlr.irq);
--		level_pending = 1;
-+	if (vgic_irq_is_edge(vcpu, vlr.irq)) {
-+		BUG_ON(!(vlr.state & LR_HW));
-+		pending = vgic_dist_irq_is_pending(vcpu, vlr.irq);
- 	} else {
--		vgic_dist_irq_clear_pending(vcpu, vlr.irq);
--		vgic_cpu_irq_clear(vcpu, vlr.irq);
-+		if (vgic_dist_irq_get_level(vcpu, vlr.irq)) {
-+			vgic_cpu_irq_set(vcpu, vlr.irq);
-+			pending = 1;
-+		} else {
-+			vgic_dist_irq_clear_pending(vcpu, vlr.irq);
-+			vgic_cpu_irq_clear(vcpu, vlr.irq);
-+		}
- 	}
- 
- 	/*
- 	 * Despite being EOIed, the LR may not have
- 	 * been marked as empty.
- 	 */
-+	vlr.state = 0;
-+	vlr.hwirq = 0;
-+	vgic_set_lr(vcpu, lr, vlr);
-+
- 	vgic_sync_lr_elrsr(vcpu, lr, vlr);
- 
--	return level_pending;
-+	return pending;
- }
- 
- static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
-@@ -1391,7 +1397,7 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
- 					     vlr.irq - VGIC_NR_PRIVATE_IRQS);
- 
- 			spin_lock(&dist->lock);
--			level_pending |= process_level_irq(vcpu, lr, vlr);
-+			level_pending |= process_queued_irq(vcpu, lr, vlr);
- 			spin_unlock(&dist->lock);
- 		}
- 	}
-@@ -1413,7 +1419,7 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
- /*
-  * Save the physical active state, and reset it to inactive.
-  *
-- * Return true if there's a pending level triggered interrupt line to queue.
-+ * Return true if there's a pending forwarded interrupt to queue.
-  */
- static bool vgic_sync_hwirq(struct kvm_vcpu *vcpu, int lr, struct vgic_lr vlr)
- {
-@@ -1438,10 +1444,8 @@ static bool vgic_sync_hwirq(struct kvm_vcpu *vcpu, int lr, struct vgic_lr vlr)
- 	if (phys_active)
- 		return 0;
- 
--	/* Mapped edge-triggered interrupts not yet supported. */
--	WARN_ON(vgic_irq_is_edge(vcpu, vlr.irq));
- 	spin_lock(&dist->lock);
--	level_pending = process_level_irq(vcpu, lr, vlr);
-+	level_pending = process_queued_irq(vcpu, lr, vlr);
- 	spin_unlock(&dist->lock);
- 	return level_pending;
- }
+ 		val = vgic_cfg_compress(val);
+ 		if (offset & 4) {
 -- 
 2.1.2.330.g565301e.dirty
-
