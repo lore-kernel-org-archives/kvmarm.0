@@ -1,150 +1,138 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 21/21] KVM: arm/arm64: Merge vgic_set_lr() and vgic_sync_lr_elrsr()
-Date: Wed,  4 Nov 2015 15:50:00 +0100
-Message-ID: <1446648600-27297-22-git-send-email-christoffer.dall@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PULL 00/21] KVM/ARM Changes for v4.4-rc1
+Date: Wed, 4 Nov 2015 16:28:05 +0100
+Message-ID: <563A2405.8070204@redhat.com>
 References: <1446648600-27297-1-git-send-email-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E181497E0
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2015 10:25:05 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 0YYxucuYcpXm for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Nov 2015 10:25:04 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 166CA49790
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2015 10:25:03 -0500 (EST)
 In-Reply-To: <1446648600-27297-1-git-send-email-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Pavel Fedin <p.fedin@samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Pavel Fedin <p.fedin@samsung.com>
 
-Now we see that vgic_set_lr() and vgic_sync_lr_elrsr() are always used
-together. Merge them into one function, saving from second vgic_ops
-dereferencing every time.
 
-Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- include/kvm/arm_vgic.h |  1 -
- virt/kvm/arm/vgic-v2.c |  5 -----
- virt/kvm/arm/vgic-v3.c |  5 -----
- virt/kvm/arm/vgic.c    | 14 ++------------
- 4 files changed, 2 insertions(+), 23 deletions(-)
+On 04/11/2015 15:49, Christoffer Dall wrote:
+> Hi Paolo,
+> 
+> Here is the set of changes for v4.4.  Some of the commits listed here were
+> already merged as fixes for v4.3, but since they are not in kvm/next yet, they
+> show up here.  Let me know if you want me to handle this differently somehow.
+> 
+> As usual, there's a lot of churn in the vgic and timer code, and then there are
+> number of smaller tweaks and adjustments.  Nothing major this time around.  For
+> a detailed description, see below.
+> 
+> The following changes since commit 920552b213e3dc832a874b4e7ba29ecddbab31bc:
+> 
+>   KVM: disable halt_poll_ns as default for s390x (2015-09-25 10:31:30 +0200)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-4.4
+> 
+> for you to fetch changes up to 26caea7693cb99833fe4ecc544c842289d6b3f69:
+> 
+>   KVM: arm/arm64: Merge vgic_set_lr() and vgic_sync_lr_elrsr() (2015-11-04 15:29:49 +0100)
+> 
+> 
+> Thanks,
+> -Christoffer
+> 
+> ----------------------------------------------------------------
+> KVM/ARM Changes for v4.4-rc1
+> 
+> Includes a number of fixes for the arch-timer, introducing proper
+> level-triggered semantics for the arch-timers, a series of patches to
+> synchronously halt a guest (prerequisite for IRQ forwarding), some tracepoint
+> improvements, a tweak for the EL2 panic handlers, some more VGIC cleanups
+> getting rid of redundant state, and finally a stylistic change that gets rid of
+> some ctags warnings.
+> 
+> Christoffer Dall (10):
+>   KVM: Add kvm_arch_vcpu_{un}blocking callbacks
+>   arm/arm64: KVM: arch_timer: Only schedule soft timer on vcpu_block
+>   arm/arm64: KVM: vgic: Factor out level irq processing on guest exit
+>   arm/arm64: KVM: Implement GICD_ICFGR as RO for PPIs
+>   arm/arm64: KVM: Use appropriate define in VGIC reset code
+>   arm/arm64: KVM: Add forwarded physical interrupts documentation
+>   arm/arm64: KVM: Rework the arch timer to use level-triggered semantics
+>   arm/arm64: KVM: Support edge-triggered forwarded interrupts
+>   arm/arm64: KVM: Improve kvm_exit tracepoint
+>   arm/arm64: KVM: Add tracepoints for vgic and timer
+> 
+> Eric Auger (4):
+>   KVM: arm/arm64: rename pause into power_off
+>   KVM: arm/arm64: check power_off in kvm_arch_vcpu_runnable
+>   KVM: arm/arm64: check power_off in critical section before VCPU run
+>   KVM: arm/arm64: implement kvm_arm_[halt,resume]_guest
+> 
+> Mark Rutland (1):
+>   arm64: kvm: restore EL1N SP for panic
+> 
+> Michal Marek (1):
+>   KVM: arm: Do not indent the arguments of DECLARE_BITMAP
+> 
+> Pavel Fedin (4):
+>   KVM: arm/arm64: Fix vGIC documentation
+>   KVM: arm/arm64: Optimize away redundant LR tracking
+>   KVM: arm/arm64: Clean up vgic_retire_lr() and surroundings
+>   KVM: arm/arm64: Merge vgic_set_lr() and vgic_sync_lr_elrsr()
+> 
+> Wei Huang (1):
+>   arm/arm64: KVM : Enable vhost device selection under KVM config menu
+> 
+>  Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt | 187 +++++++++++++
+>  Documentation/virtual/kvm/devices/arm-vgic.txt     |  18 +-
+>  arch/arm/include/asm/kvm_arm.h                     |  20 ++
+>  arch/arm/include/asm/kvm_host.h                    |   5 +-
+>  arch/arm/kvm/Kconfig                               |   2 +
+>  arch/arm/kvm/arm.c                                 |  76 +++--
+>  arch/arm/kvm/psci.c                                |  10 +-
+>  arch/arm/kvm/trace.h                               |  10 +-
+>  arch/arm64/include/asm/kvm_arm.h                   |  16 ++
+>  arch/arm64/include/asm/kvm_host.h                  |   5 +-
+>  arch/arm64/kvm/Kconfig                             |   2 +
+>  arch/arm64/kvm/hyp.S                               |   8 +
+>  arch/mips/include/asm/kvm_host.h                   |   2 +
+>  arch/powerpc/include/asm/kvm_host.h                |   2 +
+>  arch/s390/include/asm/kvm_host.h                   |   2 +
+>  arch/x86/include/asm/kvm_host.h                    |   3 +
+>  include/kvm/arm_arch_timer.h                       |   4 +-
+>  include/kvm/arm_vgic.h                             |  16 +-
+>  include/linux/kvm_host.h                           |   2 +
+>  virt/kvm/arm/arch_timer.c                          | 173 ++++++++----
+>  virt/kvm/arm/trace.h                               |  63 +++++
+>  virt/kvm/arm/vgic-v2.c                             |   6 +-
+>  virt/kvm/arm/vgic-v3.c                             |   6 +-
+>  virt/kvm/arm/vgic.c                                | 308 ++++++++-------------
+>  virt/kvm/kvm_main.c                                |   3 +
+>  25 files changed, 646 insertions(+), 303 deletions(-)
+>  create mode 100644 Documentation/virtual/kvm/arm/vgic-mapped-irqs.txt
+>  create mode 100644 virt/kvm/arm/trace.h
+> 
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 3936bf8..f62addc 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -112,7 +112,6 @@ struct vgic_vmcr {
- struct vgic_ops {
- 	struct vgic_lr	(*get_lr)(const struct kvm_vcpu *, int);
- 	void	(*set_lr)(struct kvm_vcpu *, int, struct vgic_lr);
--	void	(*sync_lr_elrsr)(struct kvm_vcpu *, int, struct vgic_lr);
- 	u64	(*get_elrsr)(const struct kvm_vcpu *vcpu);
- 	u64	(*get_eisr)(const struct kvm_vcpu *vcpu);
- 	void	(*clear_eisr)(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
-index c0f5d7f..ff02f08 100644
---- a/virt/kvm/arm/vgic-v2.c
-+++ b/virt/kvm/arm/vgic-v2.c
-@@ -79,11 +79,7 @@ static void vgic_v2_set_lr(struct kvm_vcpu *vcpu, int lr,
- 		lr_val |= (lr_desc.source << GICH_LR_PHYSID_CPUID_SHIFT);
- 
- 	vcpu->arch.vgic_cpu.vgic_v2.vgic_lr[lr] = lr_val;
--}
- 
--static void vgic_v2_sync_lr_elrsr(struct kvm_vcpu *vcpu, int lr,
--				  struct vgic_lr lr_desc)
--{
- 	if (!(lr_desc.state & LR_STATE_MASK))
- 		vcpu->arch.vgic_cpu.vgic_v2.vgic_elrsr |= (1ULL << lr);
- 	else
-@@ -167,7 +163,6 @@ static void vgic_v2_enable(struct kvm_vcpu *vcpu)
- static const struct vgic_ops vgic_v2_ops = {
- 	.get_lr			= vgic_v2_get_lr,
- 	.set_lr			= vgic_v2_set_lr,
--	.sync_lr_elrsr		= vgic_v2_sync_lr_elrsr,
- 	.get_elrsr		= vgic_v2_get_elrsr,
- 	.get_eisr		= vgic_v2_get_eisr,
- 	.clear_eisr		= vgic_v2_clear_eisr,
-diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
-index 92003cb..487d635 100644
---- a/virt/kvm/arm/vgic-v3.c
-+++ b/virt/kvm/arm/vgic-v3.c
-@@ -112,11 +112,7 @@ static void vgic_v3_set_lr(struct kvm_vcpu *vcpu, int lr,
- 	}
- 
- 	vcpu->arch.vgic_cpu.vgic_v3.vgic_lr[LR_INDEX(lr)] = lr_val;
--}
- 
--static void vgic_v3_sync_lr_elrsr(struct kvm_vcpu *vcpu, int lr,
--				  struct vgic_lr lr_desc)
--{
- 	if (!(lr_desc.state & LR_STATE_MASK))
- 		vcpu->arch.vgic_cpu.vgic_v3.vgic_elrsr |= (1U << lr);
- 	else
-@@ -212,7 +208,6 @@ static void vgic_v3_enable(struct kvm_vcpu *vcpu)
- static const struct vgic_ops vgic_v3_ops = {
- 	.get_lr			= vgic_v3_get_lr,
- 	.set_lr			= vgic_v3_set_lr,
--	.sync_lr_elrsr		= vgic_v3_sync_lr_elrsr,
- 	.get_elrsr		= vgic_v3_get_elrsr,
- 	.get_eisr		= vgic_v3_get_eisr,
- 	.clear_eisr		= vgic_v3_clear_eisr,
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 96e45f3..fe451d4 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -1032,12 +1032,6 @@ static void vgic_set_lr(struct kvm_vcpu *vcpu, int lr,
- 	vgic_ops->set_lr(vcpu, lr, vlr);
- }
- 
--static void vgic_sync_lr_elrsr(struct kvm_vcpu *vcpu, int lr,
--			       struct vgic_lr vlr)
--{
--	vgic_ops->sync_lr_elrsr(vcpu, lr, vlr);
--}
--
- static inline u64 vgic_get_elrsr(struct kvm_vcpu *vcpu)
- {
- 	return vgic_ops->get_elrsr(vcpu);
-@@ -1100,7 +1094,6 @@ static void vgic_retire_lr(int lr_nr, struct kvm_vcpu *vcpu)
- 
- 	vlr.state = 0;
- 	vgic_set_lr(vcpu, lr_nr, vlr);
--	vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
- }
- 
- /*
-@@ -1162,7 +1155,6 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
- 	}
- 
- 	vgic_set_lr(vcpu, lr_nr, vlr);
--	vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
- }
- 
- /*
-@@ -1340,8 +1332,6 @@ static int process_queued_irq(struct kvm_vcpu *vcpu,
- 	vlr.hwirq = 0;
- 	vgic_set_lr(vcpu, lr, vlr);
- 
--	vgic_sync_lr_elrsr(vcpu, lr, vlr);
--
- 	return pending;
- }
- 
-@@ -1442,8 +1432,6 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- 	bool level_pending;
- 
- 	level_pending = vgic_process_maintenance(vcpu);
--	elrsr = vgic_get_elrsr(vcpu);
--	elrsr_ptr = u64_to_bitmask(&elrsr);
- 
- 	/* Deal with HW interrupts, and clear mappings for empty LRs */
- 	for (lr = 0; lr < vgic->nr_lr; lr++) {
-@@ -1454,6 +1442,8 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
- 	}
- 
- 	/* Check if we still have something up our sleeve... */
-+	elrsr = vgic_get_elrsr(vcpu);
-+	elrsr_ptr = u64_to_bitmask(&elrsr);
- 	pending = find_first_zero_bit(elrsr_ptr, vgic->nr_lr);
- 	if (level_pending || pending < vgic->nr_lr)
- 		set_bit(vcpu->vcpu_id, dist->irq_pending_on_cpu);
--- 
-2.1.2.330.g565301e.dirty
+Pulled into kvm/next, thanks.
 
+Paolo
