@@ -1,26 +1,24 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 03/21] arm/arm64: KVM: vgic: Factor out level irq processing on
- guest exit
-Date: Wed,  4 Nov 2015 15:49:42 +0100
-Message-ID: <1446648600-27297-4-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 10/21] KVM: arm/arm64: rename pause into power_off
+Date: Wed,  4 Nov 2015 15:49:49 +0100
+Message-ID: <1446648600-27297-11-git-send-email-christoffer.dall@linaro.org>
 References: <1446648600-27297-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C63F4498B2
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2015 09:49:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 85EBE499E0
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2015 09:49:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BdhDeST8Pn5N for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Nov 2015 09:49:49 -0500 (EST)
-Received: from mail-wi0-f173.google.com (mail-wi0-f173.google.com
- [209.85.212.173])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EEBE7497BE
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2015 09:49:48 -0500 (EST)
-Received: by wicll6 with SMTP id ll6so91372306wic.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Nov 2015 06:53:01 -0800 (PST)
+ with ESMTP id pl7XVgiqKyE7 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 Nov 2015 09:49:56 -0500 (EST)
+Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BA9A749A00
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2015 09:49:55 -0500 (EST)
+Received: by wmeg8 with SMTP id g8so112699445wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Nov 2015 06:53:08 -0800 (PST)
 In-Reply-To: <1446648600-27297-1-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,181 +33,168 @@ To: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Currently vgic_process_maintenance() processes dealing with a completed
-level-triggered interrupt directly, but we are soon going to reuse this
-logic for level-triggered mapped interrupts with the HW bit set, so
-move this logic into a separate static function.
+From: Eric Auger <eric.auger@linaro.org>
 
-Probably the most scary part of this commit is convincing yourself that
-the current flow is safe compared to the old one.  In the following I
-try to list the changes and why they are harmless:
+The kvm_vcpu_arch pause field is renamed into power_off to prepare
+for the introduction of a new pause field. Also vcpu_pause is renamed
+into vcpu_sleep since we will sleep until both power_off and pause are
+false.
 
-  Move vgic_irq_clear_queued after kvm_notify_acked_irq:
-    Harmless because the only potential effect of clearing the queued
-    flag wrt.  kvm_set_irq is that vgic_update_irq_pending does not set
-    the pending bit on the emulated CPU interface or in the
-    pending_on_cpu bitmask if the function is called with level=1.
-    However, the point of kvm_notify_acked_irq is to call kvm_set_irq
-    with level=0, and we set the queued flag again in
-    __kvm_vgic_sync_hwstate later on if the level is stil high.
-
-  Move vgic_set_lr before kvm_notify_acked_irq:
-    Also, harmless because the LR are cpu-local operations and
-    kvm_notify_acked only affects the dist
-
-  Move vgic_dist_irq_clear_soft_pend after kvm_notify_acked_irq:
-    Also harmless, because now we check the level state in the
-    clear_soft_pend function and lower the pending bits if the level is
-    low.
-
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/vgic.c | 94 +++++++++++++++++++++++++++++++----------------------
- 1 file changed, 56 insertions(+), 38 deletions(-)
+ arch/arm/include/asm/kvm_host.h   |  4 ++--
+ arch/arm/kvm/arm.c                | 20 ++++++++++----------
+ arch/arm/kvm/psci.c               | 10 +++++-----
+ arch/arm64/include/asm/kvm_host.h |  4 ++--
+ 4 files changed, 19 insertions(+), 19 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 66c6616..367a180 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -107,6 +107,7 @@ static struct vgic_lr vgic_get_lr(const struct kvm_vcpu *vcpu, int lr);
- static void vgic_set_lr(struct kvm_vcpu *vcpu, int lr, struct vgic_lr lr_desc);
- static struct irq_phys_map *vgic_irq_map_search(struct kvm_vcpu *vcpu,
- 						int virt_irq);
-+static int compute_pending_for_cpu(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index c4072d9..107374f 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -126,8 +126,8 @@ struct kvm_vcpu_arch {
+ 	 * here.
+ 	 */
  
- static const struct vgic_ops *vgic_ops;
- static const struct vgic_params *vgic;
-@@ -357,6 +358,11 @@ static void vgic_dist_irq_clear_soft_pend(struct kvm_vcpu *vcpu, int irq)
- 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+-	/* Don't run the guest on this vcpu */
+-	bool pause;
++	/* vcpu power-off state */
++	bool power_off;
  
- 	vgic_bitmap_set_irq_val(&dist->irq_soft_pend, vcpu->vcpu_id, irq, 0);
-+	if (!vgic_dist_irq_get_level(vcpu, irq)) {
-+		vgic_dist_irq_clear_pending(vcpu, irq);
-+		if (!compute_pending_for_cpu(vcpu))
-+			clear_bit(vcpu->vcpu_id, dist->irq_pending_on_cpu);
-+	}
- }
- 
- static int vgic_dist_irq_is_pending(struct kvm_vcpu *vcpu, int irq)
-@@ -1338,12 +1344,56 @@ epilog:
- 	}
- }
- 
-+static int process_level_irq(struct kvm_vcpu *vcpu, int lr, struct vgic_lr vlr)
-+{
-+	int level_pending = 0;
-+
-+	vlr.state = 0;
-+	vlr.hwirq = 0;
-+	vgic_set_lr(vcpu, lr, vlr);
-+
-+	/*
-+	 * If the IRQ was EOIed (called from vgic_process_maintenance) or it
-+	 * went from active to non-active (called from vgic_sync_hwirq) it was
-+	 * also ACKed and we we therefore assume we can clear the soft pending
-+	 * state (should it had been set) for this interrupt.
-+	 *
-+	 * Note: if the IRQ soft pending state was set after the IRQ was
-+	 * acked, it actually shouldn't be cleared, but we have no way of
-+	 * knowing that unless we start trapping ACKs when the soft-pending
-+	 * state is set.
-+	 */
-+	vgic_dist_irq_clear_soft_pend(vcpu, vlr.irq);
-+
-+	/*
-+	 * Tell the gic to start sampling the line of this interrupt again.
-+	 */
-+	vgic_irq_clear_queued(vcpu, vlr.irq);
-+
-+	/* Any additional pending interrupt? */
-+	if (vgic_dist_irq_get_level(vcpu, vlr.irq)) {
-+		vgic_cpu_irq_set(vcpu, vlr.irq);
-+		level_pending = 1;
-+	} else {
-+		vgic_dist_irq_clear_pending(vcpu, vlr.irq);
-+		vgic_cpu_irq_clear(vcpu, vlr.irq);
-+	}
-+
-+	/*
-+	 * Despite being EOIed, the LR may not have
-+	 * been marked as empty.
-+	 */
-+	vgic_sync_lr_elrsr(vcpu, lr, vlr);
-+
-+	return level_pending;
-+}
-+
- static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+ 	/* IO related fields */
+ 	struct kvm_decode mmio_decode;
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 59125f4..9d2fb47 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -318,7 +318,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+ 				    struct kvm_mp_state *mp_state)
  {
- 	u32 status = vgic_get_interrupt_status(vcpu);
- 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
--	bool level_pending = false;
- 	struct kvm *kvm = vcpu->kvm;
-+	int level_pending = 0;
+-	if (vcpu->arch.pause)
++	if (vcpu->arch.power_off)
+ 		mp_state->mp_state = KVM_MP_STATE_STOPPED;
+ 	else
+ 		mp_state->mp_state = KVM_MP_STATE_RUNNABLE;
+@@ -331,10 +331,10 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
+ {
+ 	switch (mp_state->mp_state) {
+ 	case KVM_MP_STATE_RUNNABLE:
+-		vcpu->arch.pause = false;
++		vcpu->arch.power_off = false;
+ 		break;
+ 	case KVM_MP_STATE_STOPPED:
+-		vcpu->arch.pause = true;
++		vcpu->arch.power_off = true;
+ 		break;
+ 	default:
+ 		return -EINVAL;
+@@ -478,11 +478,11 @@ bool kvm_arch_intc_initialized(struct kvm *kvm)
+ 	return vgic_initialized(kvm);
+ }
  
- 	kvm_debug("STATUS = %08x\n", status);
+-static void vcpu_pause(struct kvm_vcpu *vcpu)
++static void vcpu_sleep(struct kvm_vcpu *vcpu)
+ {
+ 	wait_queue_head_t *wq = kvm_arch_vcpu_wq(vcpu);
  
-@@ -1358,54 +1408,22 @@ static bool vgic_process_maintenance(struct kvm_vcpu *vcpu)
+-	wait_event_interruptible(*wq, !vcpu->arch.pause);
++	wait_event_interruptible(*wq, !vcpu->arch.power_off);
+ }
  
- 		for_each_set_bit(lr, eisr_ptr, vgic->nr_lr) {
- 			struct vgic_lr vlr = vgic_get_lr(vcpu, lr);
--			WARN_ON(vgic_irq_is_edge(vcpu, vlr.irq));
+ static int kvm_vcpu_initialized(struct kvm_vcpu *vcpu)
+@@ -532,8 +532,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
  
--			spin_lock(&dist->lock);
--			vgic_irq_clear_queued(vcpu, vlr.irq);
-+			WARN_ON(vgic_irq_is_edge(vcpu, vlr.irq));
- 			WARN_ON(vlr.state & LR_STATE_MASK);
--			vlr.state = 0;
--			vgic_set_lr(vcpu, lr, vlr);
+ 		update_vttbr(vcpu->kvm);
  
--			/*
--			 * If the IRQ was EOIed it was also ACKed and we we
--			 * therefore assume we can clear the soft pending
--			 * state (should it had been set) for this interrupt.
--			 *
--			 * Note: if the IRQ soft pending state was set after
--			 * the IRQ was acked, it actually shouldn't be
--			 * cleared, but we have no way of knowing that unless
--			 * we start trapping ACKs when the soft-pending state
--			 * is set.
--			 */
--			vgic_dist_irq_clear_soft_pend(vcpu, vlr.irq);
+-		if (vcpu->arch.pause)
+-			vcpu_pause(vcpu);
++		if (vcpu->arch.power_off)
++			vcpu_sleep(vcpu);
  
- 			/*
- 			 * kvm_notify_acked_irq calls kvm_set_irq()
--			 * to reset the IRQ level. Need to release the
--			 * lock for kvm_set_irq to grab it.
-+			 * to reset the IRQ level, which grabs the dist->lock
-+			 * so we call this before taking the dist->lock.
- 			 */
--			spin_unlock(&dist->lock);
--
- 			kvm_notify_acked_irq(kvm, 0,
- 					     vlr.irq - VGIC_NR_PRIVATE_IRQS);
--			spin_lock(&dist->lock);
--
--			/* Any additional pending interrupt? */
--			if (vgic_dist_irq_get_level(vcpu, vlr.irq)) {
--				vgic_cpu_irq_set(vcpu, vlr.irq);
--				level_pending = true;
--			} else {
--				vgic_dist_irq_clear_pending(vcpu, vlr.irq);
--				vgic_cpu_irq_clear(vcpu, vlr.irq);
--			}
+ 		/*
+ 		 * Disarming the background timer must be done in a
+@@ -780,12 +780,12 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
+ 	vcpu_reset_hcr(vcpu);
  
-+			spin_lock(&dist->lock);
-+			level_pending |= process_level_irq(vcpu, lr, vlr);
- 			spin_unlock(&dist->lock);
--
--			/*
--			 * Despite being EOIed, the LR may not have
--			 * been marked as empty.
--			 */
--			vgic_sync_lr_elrsr(vcpu, lr, vlr);
+ 	/*
+-	 * Handle the "start in power-off" case by marking the VCPU as paused.
++	 * Handle the "start in power-off" case.
+ 	 */
+ 	if (test_bit(KVM_ARM_VCPU_POWER_OFF, vcpu->arch.features))
+-		vcpu->arch.pause = true;
++		vcpu->arch.power_off = true;
+ 	else
+-		vcpu->arch.pause = false;
++		vcpu->arch.power_off = false;
+ 
+ 	return 0;
+ }
+diff --git a/arch/arm/kvm/psci.c b/arch/arm/kvm/psci.c
+index ad6f642..0b55696 100644
+--- a/arch/arm/kvm/psci.c
++++ b/arch/arm/kvm/psci.c
+@@ -63,7 +63,7 @@ static unsigned long kvm_psci_vcpu_suspend(struct kvm_vcpu *vcpu)
+ 
+ static void kvm_psci_vcpu_off(struct kvm_vcpu *vcpu)
+ {
+-	vcpu->arch.pause = true;
++	vcpu->arch.power_off = true;
+ }
+ 
+ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+@@ -87,7 +87,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+ 	 */
+ 	if (!vcpu)
+ 		return PSCI_RET_INVALID_PARAMS;
+-	if (!vcpu->arch.pause) {
++	if (!vcpu->arch.power_off) {
+ 		if (kvm_psci_version(source_vcpu) != KVM_ARM_PSCI_0_1)
+ 			return PSCI_RET_ALREADY_ON;
+ 		else
+@@ -115,7 +115,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+ 	 * the general puspose registers are undefined upon CPU_ON.
+ 	 */
+ 	*vcpu_reg(vcpu, 0) = context_id;
+-	vcpu->arch.pause = false;
++	vcpu->arch.power_off = false;
+ 	smp_mb();		/* Make sure the above is visible */
+ 
+ 	wq = kvm_arch_vcpu_wq(vcpu);
+@@ -153,7 +153,7 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+ 		mpidr = kvm_vcpu_get_mpidr_aff(tmp);
+ 		if ((mpidr & target_affinity_mask) == target_affinity) {
+ 			matching_cpus++;
+-			if (!tmp->arch.pause)
++			if (!tmp->arch.power_off)
+ 				return PSCI_0_2_AFFINITY_LEVEL_ON;
  		}
  	}
+@@ -179,7 +179,7 @@ static void kvm_prepare_system_event(struct kvm_vcpu *vcpu, u32 type)
+ 	 * re-initialized.
+ 	 */
+ 	kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+-		tmp->arch.pause = true;
++		tmp->arch.power_off = true;
+ 		kvm_vcpu_kick(tmp);
+ 	}
  
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index ed03968..4b4157b 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -149,8 +149,8 @@ struct kvm_vcpu_arch {
+ 		u32	mdscr_el1;
+ 	} guest_debug_preserved;
+ 
+-	/* Don't run the guest */
+-	bool pause;
++	/* vcpu power-off state */
++	bool power_off;
+ 
+ 	/* IO related fields */
+ 	struct kvm_decode mmio_decode;
 -- 
 2.1.2.330.g565301e.dirty
