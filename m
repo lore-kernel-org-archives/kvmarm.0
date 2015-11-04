@@ -1,79 +1,150 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 18/21] KVM: arm: Do not indent the arguments of DECLARE_BITMAP
-Date: Wed,  4 Nov 2015 15:49:57 +0100
-Message-ID: <1446648600-27297-19-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 21/21] KVM: arm/arm64: Merge vgic_set_lr() and vgic_sync_lr_elrsr()
+Date: Wed,  4 Nov 2015 15:50:00 +0100
+Message-ID: <1446648600-27297-22-git-send-email-christoffer.dall@linaro.org>
 References: <1446648600-27297-1-git-send-email-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E93A4999F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2015 09:50:06 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id T96+6fO8j-sz for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 Nov 2015 09:50:05 -0500 (EST)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7AA65499DA
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 Nov 2015 09:50:03 -0500 (EST)
-Received: by wmll128 with SMTP id l128so116258388wml.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 04 Nov 2015 06:53:16 -0800 (PST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1446648600-27297-1-git-send-email-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Michal Marek <mmarek@suse.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Pavel Fedin <p.fedin@samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Michal Marek <mmarek@suse.com>
+From: Pavel Fedin <p.fedin@samsung.com>
 
-Besides being a coding style issue, it confuses make tags:
+Now we see that vgic_set_lr() and vgic_sync_lr_elrsr() are always used
+together. Merge them into one function, saving from second vgic_ops
+dereferencing every time.
 
-ctags: Warning: include/kvm/arm_vgic.h:307: null expansion of name pattern "\1"
-ctags: Warning: include/kvm/arm_vgic.h:308: null expansion of name pattern "\1"
-ctags: Warning: include/kvm/arm_vgic.h:309: null expansion of name pattern "\1"
-ctags: Warning: include/kvm/arm_vgic.h:317: null expansion of name pattern "\1"
-
-Cc: kvmarm@lists.cs.columbia.edu
-Signed-off-by: Michal Marek <mmarek@suse.com>
+Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- include/kvm/arm_vgic.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ include/kvm/arm_vgic.h |  1 -
+ virt/kvm/arm/vgic-v2.c |  5 -----
+ virt/kvm/arm/vgic-v3.c |  5 -----
+ virt/kvm/arm/vgic.c    | 14 ++------------
+ 4 files changed, 2 insertions(+), 23 deletions(-)
 
 diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 7bc5d02..8065801 100644
+index 3936bf8..f62addc 100644
 --- a/include/kvm/arm_vgic.h
 +++ b/include/kvm/arm_vgic.h
-@@ -299,9 +299,9 @@ struct vgic_cpu {
- 	u8		*vgic_irq_lr_map;
+@@ -112,7 +112,6 @@ struct vgic_vmcr {
+ struct vgic_ops {
+ 	struct vgic_lr	(*get_lr)(const struct kvm_vcpu *, int);
+ 	void	(*set_lr)(struct kvm_vcpu *, int, struct vgic_lr);
+-	void	(*sync_lr_elrsr)(struct kvm_vcpu *, int, struct vgic_lr);
+ 	u64	(*get_elrsr)(const struct kvm_vcpu *vcpu);
+ 	u64	(*get_eisr)(const struct kvm_vcpu *vcpu);
+ 	void	(*clear_eisr)(struct kvm_vcpu *vcpu);
+diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
+index c0f5d7f..ff02f08 100644
+--- a/virt/kvm/arm/vgic-v2.c
++++ b/virt/kvm/arm/vgic-v2.c
+@@ -79,11 +79,7 @@ static void vgic_v2_set_lr(struct kvm_vcpu *vcpu, int lr,
+ 		lr_val |= (lr_desc.source << GICH_LR_PHYSID_CPUID_SHIFT);
  
- 	/* Pending/active/both interrupts on this VCPU */
--	DECLARE_BITMAP(	pending_percpu, VGIC_NR_PRIVATE_IRQS);
--	DECLARE_BITMAP(	active_percpu, VGIC_NR_PRIVATE_IRQS);
--	DECLARE_BITMAP(	pend_act_percpu, VGIC_NR_PRIVATE_IRQS);
-+	DECLARE_BITMAP(pending_percpu, VGIC_NR_PRIVATE_IRQS);
-+	DECLARE_BITMAP(active_percpu, VGIC_NR_PRIVATE_IRQS);
-+	DECLARE_BITMAP(pend_act_percpu, VGIC_NR_PRIVATE_IRQS);
+ 	vcpu->arch.vgic_cpu.vgic_v2.vgic_lr[lr] = lr_val;
+-}
  
- 	/* Pending/active/both shared interrupts, dynamically sized */
- 	unsigned long	*pending_shared;
-@@ -309,7 +309,7 @@ struct vgic_cpu {
- 	unsigned long   *pend_act_shared;
+-static void vgic_v2_sync_lr_elrsr(struct kvm_vcpu *vcpu, int lr,
+-				  struct vgic_lr lr_desc)
+-{
+ 	if (!(lr_desc.state & LR_STATE_MASK))
+ 		vcpu->arch.vgic_cpu.vgic_v2.vgic_elrsr |= (1ULL << lr);
+ 	else
+@@ -167,7 +163,6 @@ static void vgic_v2_enable(struct kvm_vcpu *vcpu)
+ static const struct vgic_ops vgic_v2_ops = {
+ 	.get_lr			= vgic_v2_get_lr,
+ 	.set_lr			= vgic_v2_set_lr,
+-	.sync_lr_elrsr		= vgic_v2_sync_lr_elrsr,
+ 	.get_elrsr		= vgic_v2_get_elrsr,
+ 	.get_eisr		= vgic_v2_get_eisr,
+ 	.clear_eisr		= vgic_v2_clear_eisr,
+diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
+index 92003cb..487d635 100644
+--- a/virt/kvm/arm/vgic-v3.c
++++ b/virt/kvm/arm/vgic-v3.c
+@@ -112,11 +112,7 @@ static void vgic_v3_set_lr(struct kvm_vcpu *vcpu, int lr,
+ 	}
  
- 	/* Bitmap of used/free list registers */
--	DECLARE_BITMAP(	lr_used, VGIC_V2_MAX_LRS);
-+	DECLARE_BITMAP(lr_used, VGIC_V2_MAX_LRS);
+ 	vcpu->arch.vgic_cpu.vgic_v3.vgic_lr[LR_INDEX(lr)] = lr_val;
+-}
  
- 	/* Number of list registers on this CPU */
- 	int		nr_lr;
+-static void vgic_v3_sync_lr_elrsr(struct kvm_vcpu *vcpu, int lr,
+-				  struct vgic_lr lr_desc)
+-{
+ 	if (!(lr_desc.state & LR_STATE_MASK))
+ 		vcpu->arch.vgic_cpu.vgic_v3.vgic_elrsr |= (1U << lr);
+ 	else
+@@ -212,7 +208,6 @@ static void vgic_v3_enable(struct kvm_vcpu *vcpu)
+ static const struct vgic_ops vgic_v3_ops = {
+ 	.get_lr			= vgic_v3_get_lr,
+ 	.set_lr			= vgic_v3_set_lr,
+-	.sync_lr_elrsr		= vgic_v3_sync_lr_elrsr,
+ 	.get_elrsr		= vgic_v3_get_elrsr,
+ 	.get_eisr		= vgic_v3_get_eisr,
+ 	.clear_eisr		= vgic_v3_clear_eisr,
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 96e45f3..fe451d4 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -1032,12 +1032,6 @@ static void vgic_set_lr(struct kvm_vcpu *vcpu, int lr,
+ 	vgic_ops->set_lr(vcpu, lr, vlr);
+ }
+ 
+-static void vgic_sync_lr_elrsr(struct kvm_vcpu *vcpu, int lr,
+-			       struct vgic_lr vlr)
+-{
+-	vgic_ops->sync_lr_elrsr(vcpu, lr, vlr);
+-}
+-
+ static inline u64 vgic_get_elrsr(struct kvm_vcpu *vcpu)
+ {
+ 	return vgic_ops->get_elrsr(vcpu);
+@@ -1100,7 +1094,6 @@ static void vgic_retire_lr(int lr_nr, struct kvm_vcpu *vcpu)
+ 
+ 	vlr.state = 0;
+ 	vgic_set_lr(vcpu, lr_nr, vlr);
+-	vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
+ }
+ 
+ /*
+@@ -1162,7 +1155,6 @@ static void vgic_queue_irq_to_lr(struct kvm_vcpu *vcpu, int irq,
+ 	}
+ 
+ 	vgic_set_lr(vcpu, lr_nr, vlr);
+-	vgic_sync_lr_elrsr(vcpu, lr_nr, vlr);
+ }
+ 
+ /*
+@@ -1340,8 +1332,6 @@ static int process_queued_irq(struct kvm_vcpu *vcpu,
+ 	vlr.hwirq = 0;
+ 	vgic_set_lr(vcpu, lr, vlr);
+ 
+-	vgic_sync_lr_elrsr(vcpu, lr, vlr);
+-
+ 	return pending;
+ }
+ 
+@@ -1442,8 +1432,6 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ 	bool level_pending;
+ 
+ 	level_pending = vgic_process_maintenance(vcpu);
+-	elrsr = vgic_get_elrsr(vcpu);
+-	elrsr_ptr = u64_to_bitmask(&elrsr);
+ 
+ 	/* Deal with HW interrupts, and clear mappings for empty LRs */
+ 	for (lr = 0; lr < vgic->nr_lr; lr++) {
+@@ -1454,6 +1442,8 @@ static void __kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	/* Check if we still have something up our sleeve... */
++	elrsr = vgic_get_elrsr(vcpu);
++	elrsr_ptr = u64_to_bitmask(&elrsr);
+ 	pending = find_first_zero_bit(elrsr_ptr, vgic->nr_lr);
+ 	if (level_pending || pending < vgic->nr_lr)
+ 		set_bit(vcpu->vcpu_id, dist->irq_pending_on_cpu);
 -- 
 2.1.2.330.g565301e.dirty
+
