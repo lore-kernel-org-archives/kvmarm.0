@@ -1,176 +1,101 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 3/3] KVM/arm64: enable enhanced armv8 fp/simd lazy switch
-Date: Thu, 5 Nov 2015 16:02:55 +0100
-Message-ID: <20151105150255.GD5819@cbox>
-References: <1446242193-8424-1-git-send-email-m.smarduch@samsung.com>
- <1446242193-8424-4-git-send-email-m.smarduch@samsung.com>
+Subject: Re: [PATCH] KVM/arm: kernel low level debug support for ARM32
+ virtual platforms
+Date: Thu, 5 Nov 2015 16:04:54 +0100
+Message-ID: <20151105150454.GE5819@cbox>
+References: <1446508313-24404-1-git-send-email-m.smarduch@samsung.com>
+ <5638E1CD.8090006@codeaurora.org>
+ <5638F294.4060409@samsung.com>
+ <20151103175522.GA24856@arm.com>
+ <56390838.3000204@samsung.com>
+ <CAL_JsqJJHGwcdTDMh3WujJW0rDPxocVLEUpw95aVFC4FDEdDgA@mail.gmail.com>
+ <20151104133147.GB5819@cbox>
+ <563A531C.8090003@codeaurora.org>
+ <CAKv+Gu8GJgzv82fVfCU7VQB2_ckRkzUYcQOx51rT2WgnmO_fsw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1446242193-8424-4-git-send-email-m.smarduch@samsung.com>
+In-Reply-To: <CAKv+Gu8GJgzv82fVfCU7VQB2_ckRkzUYcQOx51rT2WgnmO_fsw@mail.gmail.com>
 Sender: kvm-owner@vger.kernel.org
-To: Mario Smarduch <m.smarduch@samsung.com>
-Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, antonios.motakis@huawei.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Christopher Covington <cov@codeaurora.org>, Rob Herring <robherring2@gmail.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Grant Likely <grant.likely@secretlab.ca>, Catalin Marinas <catalin.marinas@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Mario Smarduch <m.smarduch@samsung.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Oct 30, 2015 at 02:56:33PM -0700, Mario Smarduch wrote:
-> This patch enables arm64 lazy fp/simd switch, similar to arm described in
-> second patch. Change from previous version - restore function is moved to
-> host. 
+On Wed, Nov 04, 2015 at 07:51:58PM +0100, Ard Biesheuvel wrote:
+> On 4 November 2015 at 19:49, Christopher Covington <cov@codeaurora.org> wrote:
+> > On 11/04/2015 08:31 AM, Christoffer Dall wrote:
+> >> On Tue, Nov 03, 2015 at 01:39:44PM -0600, Rob Herring wrote:
+> >>> On Tue, Nov 3, 2015 at 1:17 PM, Mario Smarduch <m.smarduch@samsung.com> wrote:
+> >>>> On 11/3/2015 9:55 AM, Will Deacon wrote:
+> >>>>> On Tue, Nov 03, 2015 at 09:44:52AM -0800, Mario Smarduch wrote:
+> >>>>>> On 11/3/2015 8:33 AM, Christopher Covington wrote:
+> >>>>>>> On 11/02/2015 06:51 PM, Mario Smarduch wrote:
+> >>>>>>>>    this is a re-post from couple weeks ago, please take time to review this
+> >>>>>>>> simple patch which simplifies DEBUG_LL and prevents kernel crash on virtual
+> >>>>>>>> platforms.
+> >>>>>>>>
+> >>>>>>>> Before this patch DEBUG_LL for 'dummy virtual machine':
+> >>>>>>>>
+> >>>>>>>> ( ) Kernel low-level debugging via EmbeddedICE DCC channel
+> >>>>>>>> ( ) Kernel low-level debug output via semihosting I/O
+> >>>>>>>> ( ) Kernel low-level debugging via 8250 UART
+> >>>>>>>> ( ) Kernel low-level debugging via ARM Ltd PL01x Primecell
+> >>>>>>>>
+> >>>>>>>> In summary if debug uart is not emulated kernel crashes.
+> >>>>>>>> And once you pass that hurdle, uart physical/virtual addresses are unknown.
+> >>>>>>>> DEBUG_LL comes in handy on many occasions and should be somewhat
+> >>>>>>>> intuitive to use like it is for physical platforms. For virtual platforms
+> >>>>>>>> user may start daubting the host and get into a bigger mess.
+> >>>>>>>>
+> >>>>>>>> After this patch is applied user gets:
+> >>>>>>>>
+> >>>>>>>> (X) Kernel low-level debugging on QEMU Virtual Platform
+> >>>>>>>> ( ) Kernel low-level debugging on Kvmtool Virtual Platform
+> >>>>>>>>    ..... above repeated ....
+> >>>>>>>>
+> >>>>>>>> The virtual addresses selected follow arm reference models, high in vmalloc
+> >>>>>>>> section with high mem enabled and guest running with >= 1GB of memory. The
+> >>>>>>>> offset is leftover from arm reference models.
+> >>>>>>>
+> >>>>>>> Which model? It doesn't appear to match the vexpress AEM/RTSM/FVP/whatever
+> >>>>>>> which used 0x1c090000 for UART0.
+> >>>>>>
+> >>>>>> I recall QEMU virt model had it's own physical address map, for sure I saw the
+> >>>>>> virtio-mmio regions assigned in some ARM document. Peter would you know?
+> >>>>>>
+> >>>>>> As far as kvmtool I'm not sure, currently PC1 COM1 port is used? Andre will that
+> >>>>>> stay fixed?
+> >>>>>
+> >>>>> We make absolutely no guarantees about the memory map provided by kvmtool.
+> >>>>
+> >>>> If that's also the case for qemu, then I guess the best you can do is find a way
+> >>>> to dump the device tree. Find the uart, physical address and try figure out the
+> >>>> virtual address.
+> >>>>
+> >>>> Pretty involved, hoped for something more automated since that's a handy feature.
+> >>>
+> >>> You really only need LL_DEBUG now if you are debugging very early code
+> >>> before memory is setup and/or bad memory. Use earlycon instead which
+> >>> should already be supported both via the pl011 or semihosting. I used
+> >>> it with QEMU semihosting support.
+> >>>
+> >> Then we should really document how to use that with qemu's virt platform
+> >> and kvmtool's platform on both 32-bit and 64-bit so that users can
+> >> easily figure out what they're doing wrong when they get no output.
+> >>
+> >> In practice, the address for the pl011 is quite unlikely to change, I
+> >> dare speculate, so that documentation shouldn't need frequent updating.
+> >
+> > Is it not on by default since the following change?
+> >
+> > http://git.qemu.org/?p=qemu.git;a=commitdiff;h=f022b8e95379b0433d13509706b66f38fc15dde8
+> >
 > 
-> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  2 +-
->  arch/arm64/kernel/asm-offsets.c   |  1 +
->  arch/arm64/kvm/hyp.S              | 37 +++++++++++++++++++++++++++++++------
->  3 files changed, 33 insertions(+), 7 deletions(-)
+> Yes, but it still requires the plain 'earlycon' argument (i.e, without
+> '=pl011,...') to be passed on the kernel command line if you want
+> early output.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 26a2347..dcecf92 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -251,11 +251,11 @@ static inline void kvm_arch_hardware_unsetup(void) {}
->  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
->  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
->  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
-> -static inline void kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu) {}
->  
->  void kvm_arm_init_debug(void);
->  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
->  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
->  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
-> +void kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu);
->  
->  #endif /* __ARM64_KVM_HOST_H__ */
-> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-> index 8d89cf8..c9c5242 100644
-> --- a/arch/arm64/kernel/asm-offsets.c
-> +++ b/arch/arm64/kernel/asm-offsets.c
-> @@ -124,6 +124,7 @@ int main(void)
->    DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
->    DEFINE(VCPU_MDCR_EL2,	offsetof(struct kvm_vcpu, arch.mdcr_el2));
->    DEFINE(VCPU_IRQ_LINES,	offsetof(struct kvm_vcpu, arch.irq_lines));
-> +  DEFINE(VCPU_VFP_DIRTY,	offsetof(struct kvm_vcpu, arch.vfp_dirty));
->    DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
->    DEFINE(VCPU_HOST_DEBUG_STATE, offsetof(struct kvm_vcpu, arch.host_debug_state));
->    DEFINE(VCPU_TIMER_CNTV_CTL,	offsetof(struct kvm_vcpu, arch.timer_cpu.cntv_ctl));
-> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-> index e583613..ed2c4cf 100644
-> --- a/arch/arm64/kvm/hyp.S
-> +++ b/arch/arm64/kvm/hyp.S
-> @@ -36,6 +36,28 @@
->  #define CPU_SYSREG_OFFSET(x)	(CPU_SYSREGS + 8*x)
->  
->  	.text
-> +
-> +/**
-> + * void kvm_restore_host_vfp_state(struct vcpu *vcpu) - Executes lazy
-> + *	fp/simd switch, saves the guest, restores host. Called from host
-> + *	mode, placed outside of hyp section.
+I didn't notice this. Cool!
 
-same comments on style as previous patch
-
-> + */
-> +ENTRY(kvm_restore_host_vfp_state)
-> +	push    xzr, lr
-> +
-> +	add     x2, x0, #VCPU_CONTEXT
-> +	mov     w3, #0
-> +	strb    w3, [x0, #VCPU_VFP_DIRTY]
-
-I've been discussing with myself if it would make more sense to clear
-the dirty flag in the C-code...
-
-> +
-> +	bl __save_fpsimd
-> +
-> +	ldr     x2, [x0, #VCPU_HOST_CONTEXT]
-> +	bl __restore_fpsimd
-> +
-> +	pop     xzr, lr
-> +	ret
-> +ENDPROC(kvm_restore_host_vfp_state)
-> +
->  	.pushsection	.hyp.text, "ax"
->  	.align	PAGE_SHIFT
->  
-> @@ -482,7 +504,11 @@
->  99:
->  	msr     hcr_el2, x2
->  	mov	x2, #CPTR_EL2_TTA
-> +
-> +	ldrb	w3, [x0, #VCPU_VFP_DIRTY]
-> +	tbnz    w3, #0, 98f
->  	orr     x2, x2, #CPTR_EL2_TFP
-> +98:
-
-mmm, don't you need to only set the fpexc32 when you're actually going
-to trap the guest accesses?
-
-also, you can consider only setting this in vcpu_load (jumping quickly
-to EL2 to do so) if we're running a 32-bit guest.  Probably worth
-measuring the difference between the extra EL2 jump on vcpu_load
-compared to hitting this register on every entry/exit.
-
-Code-wise, it will be nicer to do it on vcpu_load.
-
->  	msr	cptr_el2, x2
->  
->  	mov	x2, #(1 << 15)	// Trap CP15 Cr=15
-> @@ -669,14 +695,12 @@ __restore_debug:
->  	ret
->  
->  __save_fpsimd:
-> -	skip_fpsimd_state x3, 1f
->  	save_fpsimd
-> -1:	ret
-> +	ret
->  
->  __restore_fpsimd:
-> -	skip_fpsimd_state x3, 1f
->  	restore_fpsimd
-> -1:	ret
-> +	ret
->  
->  switch_to_guest_fpsimd:
->  	push	x4, lr
-> @@ -688,6 +712,9 @@ switch_to_guest_fpsimd:
->  
->  	mrs	x0, tpidr_el2
->  
-> +	mov     w2, #1
-> +	strb    w2, [x0, #VCPU_VFP_DIRTY]
-
-hmm, just noticing this.  Are you not writing a 32-bit value to a
-potentially 8-bit field (ignoring padding in the struct), as the dirty
-flag is declared a bool.
-
-Are you also doing this on the 32-bit side?
-
-> +
->  	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
->  	kern_hyp_va x2
->  	bl __save_fpsimd
-> @@ -763,7 +790,6 @@ __kvm_vcpu_return:
->  	add	x2, x0, #VCPU_CONTEXT
->  
->  	save_guest_regs
-> -	bl __save_fpsimd
->  	bl __save_sysregs
->  
->  	skip_debug_state x3, 1f
-> @@ -784,7 +810,6 @@ __kvm_vcpu_return:
->  	kern_hyp_va x2
->  
->  	bl __restore_sysregs
-> -	bl __restore_fpsimd
->  	/* Clear FPSIMD and Trace trapping */
->  	msr     cptr_el2, xzr
->  
-> -- 
-> 1.9.1
-> 
-
-Thanks,
 -Christoffer
