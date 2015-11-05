@@ -1,101 +1,141 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM/arm: kernel low level debug support for ARM32
- virtual platforms
-Date: Thu, 5 Nov 2015 16:04:54 +0100
-Message-ID: <20151105150454.GE5819@cbox>
-References: <1446508313-24404-1-git-send-email-m.smarduch@samsung.com>
- <5638E1CD.8090006@codeaurora.org>
- <5638F294.4060409@samsung.com>
- <20151103175522.GA24856@arm.com>
- <56390838.3000204@samsung.com>
- <CAL_JsqJJHGwcdTDMh3WujJW0rDPxocVLEUpw95aVFC4FDEdDgA@mail.gmail.com>
- <20151104133147.GB5819@cbox>
- <563A531C.8090003@codeaurora.org>
- <CAKv+Gu8GJgzv82fVfCU7VQB2_ckRkzUYcQOx51rT2WgnmO_fsw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: arm: Fix crash in free_hyp_pgds() if timer
+ initialization fails
+Date: Thu, 5 Nov 2015 16:24:40 +0100
+Message-ID: <20151105152440.GF5819@cbox>
+References: <1445931608-8824-1-git-send-email-p.fedin@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu8GJgzv82fVfCU7VQB2_ckRkzUYcQOx51rT2WgnmO_fsw@mail.gmail.com>
+In-Reply-To: <1445931608-8824-1-git-send-email-p.fedin@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Christopher Covington <cov@codeaurora.org>, Rob Herring <robherring2@gmail.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Will Deacon <will.deacon@arm.com>, Grant Likely <grant.likely@secretlab.ca>, Catalin Marinas <catalin.marinas@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Mario Smarduch <m.smarduch@samsung.com>
+To: Pavel Fedin <p.fedin@samsung.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Nov 04, 2015 at 07:51:58PM +0100, Ard Biesheuvel wrote:
-> On 4 November 2015 at 19:49, Christopher Covington <cov@codeaurora.org> wrote:
-> > On 11/04/2015 08:31 AM, Christoffer Dall wrote:
-> >> On Tue, Nov 03, 2015 at 01:39:44PM -0600, Rob Herring wrote:
-> >>> On Tue, Nov 3, 2015 at 1:17 PM, Mario Smarduch <m.smarduch@samsung.com> wrote:
-> >>>> On 11/3/2015 9:55 AM, Will Deacon wrote:
-> >>>>> On Tue, Nov 03, 2015 at 09:44:52AM -0800, Mario Smarduch wrote:
-> >>>>>> On 11/3/2015 8:33 AM, Christopher Covington wrote:
-> >>>>>>> On 11/02/2015 06:51 PM, Mario Smarduch wrote:
-> >>>>>>>>    this is a re-post from couple weeks ago, please take time to review this
-> >>>>>>>> simple patch which simplifies DEBUG_LL and prevents kernel crash on virtual
-> >>>>>>>> platforms.
-> >>>>>>>>
-> >>>>>>>> Before this patch DEBUG_LL for 'dummy virtual machine':
-> >>>>>>>>
-> >>>>>>>> ( ) Kernel low-level debugging via EmbeddedICE DCC channel
-> >>>>>>>> ( ) Kernel low-level debug output via semihosting I/O
-> >>>>>>>> ( ) Kernel low-level debugging via 8250 UART
-> >>>>>>>> ( ) Kernel low-level debugging via ARM Ltd PL01x Primecell
-> >>>>>>>>
-> >>>>>>>> In summary if debug uart is not emulated kernel crashes.
-> >>>>>>>> And once you pass that hurdle, uart physical/virtual addresses are unknown.
-> >>>>>>>> DEBUG_LL comes in handy on many occasions and should be somewhat
-> >>>>>>>> intuitive to use like it is for physical platforms. For virtual platforms
-> >>>>>>>> user may start daubting the host and get into a bigger mess.
-> >>>>>>>>
-> >>>>>>>> After this patch is applied user gets:
-> >>>>>>>>
-> >>>>>>>> (X) Kernel low-level debugging on QEMU Virtual Platform
-> >>>>>>>> ( ) Kernel low-level debugging on Kvmtool Virtual Platform
-> >>>>>>>>    ..... above repeated ....
-> >>>>>>>>
-> >>>>>>>> The virtual addresses selected follow arm reference models, high in vmalloc
-> >>>>>>>> section with high mem enabled and guest running with >= 1GB of memory. The
-> >>>>>>>> offset is leftover from arm reference models.
-> >>>>>>>
-> >>>>>>> Which model? It doesn't appear to match the vexpress AEM/RTSM/FVP/whatever
-> >>>>>>> which used 0x1c090000 for UART0.
-> >>>>>>
-> >>>>>> I recall QEMU virt model had it's own physical address map, for sure I saw the
-> >>>>>> virtio-mmio regions assigned in some ARM document. Peter would you know?
-> >>>>>>
-> >>>>>> As far as kvmtool I'm not sure, currently PC1 COM1 port is used? Andre will that
-> >>>>>> stay fixed?
-> >>>>>
-> >>>>> We make absolutely no guarantees about the memory map provided by kvmtool.
-> >>>>
-> >>>> If that's also the case for qemu, then I guess the best you can do is find a way
-> >>>> to dump the device tree. Find the uart, physical address and try figure out the
-> >>>> virtual address.
-> >>>>
-> >>>> Pretty involved, hoped for something more automated since that's a handy feature.
-> >>>
-> >>> You really only need LL_DEBUG now if you are debugging very early code
-> >>> before memory is setup and/or bad memory. Use earlycon instead which
-> >>> should already be supported both via the pl011 or semihosting. I used
-> >>> it with QEMU semihosting support.
-> >>>
-> >> Then we should really document how to use that with qemu's virt platform
-> >> and kvmtool's platform on both 32-bit and 64-bit so that users can
-> >> easily figure out what they're doing wrong when they get no output.
-> >>
-> >> In practice, the address for the pl011 is quite unlikely to change, I
-> >> dare speculate, so that documentation shouldn't need frequent updating.
-> >
-> > Is it not on by default since the following change?
-> >
-> > http://git.qemu.org/?p=qemu.git;a=commitdiff;h=f022b8e95379b0433d13509706b66f38fc15dde8
-> >
-> 
-> Yes, but it still requires the plain 'earlycon' argument (i.e, without
-> '=pl011,...') to be passed on the kernel command line if you want
-> early output.
-> 
-I didn't notice this. Cool!
+Hi Pavel,
 
--Christoffer
+On Tue, Oct 27, 2015 at 10:40:08AM +0300, Pavel Fedin wrote:
+> After vGIC initialization succeeded, and timer initialization failed,
+> the following crash can be observed on ARM32:
+> 
+> kvm [1]: interrupt-controller@10484000 IRQ57
+> kvm [1]: kvm_arch_timer: can't find DT node
+> Unable to handle kernel paging request at virtual address 90484000
+> pgd = c0003000
+> [90484000] *pgd=80000040006003, *pmd=00000000
+> Internal error: Oops: 2a06 [#1] PREEMPT SMP ARM
+> ...
+> [<c003b790>] (v7_flush_kern_dcache_area) from [<c001d638>] (kvm_flush_dcache_pte+0x48/0x5c)
+> [<c001d638>] (kvm_flush_dcache_pte) from [<c001d898>] (unmap_range+0x24c/0x460)
+> [<c001d898>] (unmap_range) from [<c001ea4c>] (free_hyp_pgds+0x84/0x160)
+> [<c001ea4c>] (free_hyp_pgds) from [<c001c85c>] (kvm_arch_init+0x254/0x41c)
+> [<c001c85c>] (kvm_arch_init) from [<c00122b0>] (kvm_init+0x28/0x2b4)
+> [<c00122b0>] (kvm_init) from [<c0009988>] (do_one_initcall+0x9c/0x200)
+> 
+> This happens when unmapping reaches mapped vGIC control registers. The
+> problem root seems to be combination of two facts:
+> 1. vGIC control region is defined in device trees as having size of
+>    0x2000. But the specification defines only registers up to 0x1FC,
+>    therefore it is only one page, not two.
+> 2. unmap_ptes() is expected to recognize device memory and omit cache
+>    flushing. However, it tests only for PAGE_S2_DEVICE, while devices
+>    mapped for HYP mode have PAGE_HYP_DEVICE, which is different.
+>    Therefore, cache flush is attempted, and it dies when hitting the
+>    nonexistent second page.
+> 
+> This patch fixes the problem by adding missing recognition of
+> PAGE_HYP_DEVICE protection value.
+> 
+> The crash can be observed on Exynos 5410 (and probably on all Exynos5
+> family) with stock device trees (using MCT) and CONFIG_KVM enabled.
+> 
+> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+> ---
+>  arch/arm/kvm/mmu.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+> index 7b42012..839dd970 100644
+> --- a/arch/arm/kvm/mmu.c
+> +++ b/arch/arm/kvm/mmu.c
+> @@ -213,7 +213,10 @@ static void unmap_ptes(struct kvm *kvm, pmd_t *pmd,
+>  			kvm_tlb_flush_vmid_ipa(kvm, addr);
+>  
+>  			/* No need to invalidate the cache for device mappings */
+> -			if ((pte_val(old_pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
+> +			if (((pte_val(old_pte) & PAGE_S2_DEVICE)
+> +			     != PAGE_S2_DEVICE) &&
+> +			    ((pte_val(old_pte) & PAGE_HYP_DEVICE)
+> +			     != PAGE_HYP_DEVICE))
+>  				kvm_flush_dcache_pte(old_pte);
+>  
+>  			put_page(virt_to_page(pte));
+> -- 
+> 2.4.4
+> 
+
+Did you check if PAGE_HYP_DEVICE can mean something sane on a stage-2
+page table entry and vice verse?
+
+Also, the commit message and formatting here is horrible, see this
+reworked version:
+
+>From e15700dd24419bb0e7ddc79feaa4efdf20304f2c Mon Sep 17 00:00:00 2001
+From: Pavel Fedin <p.fedin@samsung.com>
+Date: Tue, 27 Oct 2015 10:40:08 +0300
+Subject: [PATCH] KVM: arm: Don't try to flush hyp-mode device mappings
+
+The unmap_ptes function is currently called to unmap both Stage-2 and
+Hyp mode page table entries.  Since calling clean and invalidate on
+device memory may raise exceptions, we currently test against
+PAGE_S2_DEVICE and do not flush for such mappings.  However, we should
+also be testing against PAGE_HYP_DEVICE.
+
+This fixes an issue observed on some 32-bit platforms, for example the
+Exynos 5410.
+
+Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ arch/arm/kvm/mmu.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
+
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index 6984342..f0c3aef 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -206,18 +206,20 @@ static void unmap_ptes(struct kvm *kvm, pmd_t *pmd,
+ 
+ 	start_pte = pte = pte_offset_kernel(pmd, addr);
+ 	do {
+-		if (!pte_none(*pte)) {
+-			pte_t old_pte = *pte;
++		if (pte_none(*pte))
++			continue;
+ 
+-			kvm_set_pte(pte, __pte(0));
+-			kvm_tlb_flush_vmid_ipa(kvm, addr);
++		pte_t old_pte = *pte;
+ 
+-			/* No need to invalidate the cache for device mappings */
+-			if ((pte_val(old_pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
+-				kvm_flush_dcache_pte(old_pte);
++		kvm_set_pte(pte, __pte(0));
++		kvm_tlb_flush_vmid_ipa(kvm, addr);
+ 
+-			put_page(virt_to_page(pte));
+-		}
++		/* No need to invalidate the cache for device mappings */
++		if ((pte_val(old_pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE &&
++		    (pte_val(old_pte) & PAGE_HYP_DEVICE) != PAGE_HYP_DEVICE)
++			kvm_flush_dcache_pte(old_pte);
++
++		put_page(virt_to_page(pte));
+ 	} while (pte++, addr += PAGE_SIZE, addr != end);
+ 
+ 	if (kvm_pte_table_empty(kvm, start_pte))
+-- 
+2.1.2.330.g565301e.dirty
+
