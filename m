@@ -1,426 +1,314 @@
-From: kbuild test robot <lkp@intel.com>
-Subject: Re: [PATCH] KVM: arm: Don't try to flush hyp-mode device mappings
-Date: Fri, 6 Nov 2015 07:11:04 +0800
-Message-ID: <201511060706.nDY6V8N8%fengguang.wu@intel.com>
-References: <20151105152440.GF5819@cbox>
+From: Mario Smarduch <m.smarduch@samsung.com>
+Subject: Re: [PATCH v3 2/3] KVM/arm/arm64: enable enhanced armv7 fp/simd lazy
+ switch
+Date: Thu, 05 Nov 2015 16:23:41 -0800
+Message-ID: <563BF30D.1040101@samsung.com>
+References: <1446242193-8424-1-git-send-email-m.smarduch@samsung.com>
+ <1446242193-8424-3-git-send-email-m.smarduch@samsung.com>
+ <20151105144848.GC5819@cbox>
 Mime-Version: 1.0
-Content-Type: multipart/mixed; boundary="ikeVEW9yuYc//A+q"
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20151105152440.GF5819@cbox>
-Sender: kvm-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 24689498B2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2015 19:20:29 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 4pbwXpVzgEOc for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 Nov 2015 19:20:26 -0500 (EST)
+Received: from usmailout1.samsung.com (mailout1.w2.samsung.com
+ [211.189.100.11])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CFF704989E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 Nov 2015 19:20:26 -0500 (EST)
+Received: from uscpsbgex1.samsung.com
+ (u122.gpu85.samsung.co.kr [203.254.195.122]) by mailout1.w2.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NXD004MVAFJ1W20@mailout1.w2.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Thu, 05 Nov 2015 19:23:43 -0500 (EST)
+In-reply-to: <20151105144848.GC5819@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kbuild-all@01.org, Pavel Fedin <p.fedin@samsung.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>
+Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
---ikeVEW9yuYc//A+q
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-Hi Christoffer,
+On 11/5/2015 6:48 AM, Christoffer Dall wrote:
+> On Fri, Oct 30, 2015 at 02:56:32PM -0700, Mario Smarduch wrote:
+>> This patch tracks vfp/simd hardware state with a vcpu lazy flag. vCPU lazy 
+>> flag is set on guest access and traps to vfp/simd hardware switch handler. On 
+>> vm-enter if lazy flag is set skip trap enable and save host fpexc. On 
+>> vm-exit if flag is set skip hardware context switch and return to host with 
+>> guest context. In vcpu_put check if vcpu lazy flag is set, and execute a 
+>> hardware context switch to restore host.
+>>
+>> Also some arm64 field and empty function are added to compile for arm64.
+>>
+>> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+>> ---
+>>  arch/arm/include/asm/kvm_host.h   |  1 +
+>>  arch/arm/kvm/arm.c                |  6 ++++
+>>  arch/arm/kvm/interrupts.S         | 60 ++++++++++++++++++++++++++++-----------
+>>  arch/arm/kvm/interrupts_head.S    | 14 +++++----
+>>  arch/arm64/include/asm/kvm_host.h |  4 +++
+>>  5 files changed, 63 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+>> index f1bf551..a9e86e0 100644
+>> --- a/arch/arm/include/asm/kvm_host.h
+>> +++ b/arch/arm/include/asm/kvm_host.h
+>> @@ -227,6 +227,7 @@ int kvm_perf_teardown(void);
+>>  void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
+>>  
+>>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+>> +void kvm_restore_host_vfp_state(struct kvm_vcpu *);
+>>  
+>>  static inline void kvm_arch_hardware_disable(void) {}
+>>  static inline void kvm_arch_hardware_unsetup(void) {}
+>> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+>> index dc017ad..11a56fe 100644
+>> --- a/arch/arm/kvm/arm.c
+>> +++ b/arch/arm/kvm/arm.c
+>> @@ -296,6 +296,12 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>>  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>>  {
+>>  	/*
+>> +	 * If fp/simd registers are dirty save guest, restore host before
+> 
+> If the fp/simd registers are dirty, then restore the host state before
+I'd drop 'releasing the cpu', the vcpu thread may be returning to
+user mode.
+> 
+>> +	 * releasing the cpu.
+>> +	 */
+>> +	if (vcpu->arch.vfp_dirty)
+>> +		kvm_restore_host_vfp_state(vcpu);
+>> +	/*
+>>  	 * The arch-generic KVM code expects the cpu field of a vcpu to be -1
+>>  	 * if the vcpu is no longer assigned to a cpu.  This is used for the
+>>  	 * optimized make_all_cpus_request path.
+>> diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
+>> index 900ef6d..ca25314 100644
+>> --- a/arch/arm/kvm/interrupts.S
+>> +++ b/arch/arm/kvm/interrupts.S
+>> @@ -28,6 +28,32 @@
+>>  #include "interrupts_head.S"
+>>  
+>>  	.text
+>> +/**
+>> + * void kvm_restore_host_vfp_state(struct vcpu *vcpu) - Executes lazy
+> 
+> nit: Can you move the multi-line description of the function into a
+> separate paragraph?
+Sure.
+> 
+>> + * 	fp/simd switch, saves the guest, restores host. Called from host
+>> + *	mode, placed outside of hyp region start/end.
+> 
+> Put the description in a separate paragraph and get rid of the "executes
+> lazy fp/simd swithch" part, that doesn't help understanding.  Just say
+> that this funciton restores the host state.
+Sure.
+> 
+>> + */
+>> +ENTRY(kvm_restore_host_vfp_state)
+>> +#ifdef CONFIG_VFPv3
+>> +	push    {r4-r7}
+>> +
+>> +	add     r7, vcpu, #VCPU_VFP_GUEST
+>> +	store_vfp_state r7
+>> +
+>> +	add     r7, vcpu, #VCPU_VFP_HOST
+>> +	ldr     r7, [r7]
+>> +	restore_vfp_state r7
+>> +
+>> +	ldr     r3, [vcpu, #VCPU_VFP_HOST_FPEXC]
+>> +	VFPFMXR FPEXC, r3
+>> +
+>> +	mov     r3, #0
+>> +	strb    r3, [vcpu, #VCPU_VFP_DIRTY]
+>> +
+>> +	pop     {r4-r7}
+>> +#endif
+>> +	bx      lr
+>> +ENDPROC(kvm_restore_host_vfp_state)
+>>  
+>>  __kvm_hyp_code_start:
+>>  	.globl __kvm_hyp_code_start
+>> @@ -119,11 +145,16 @@ ENTRY(__kvm_vcpu_run)
+>>  	@ If the host kernel has not been configured with VFPv3 support,
+>>  	@ then it is safer if we deny guests from using it as well.
+>>  #ifdef CONFIG_VFPv3
+>> -	@ Set FPEXC_EN so the guest doesn't trap floating point instructions
+>> +	@ fp/simd register file has already been accessed, so skip host fpexc
+>> +	@ save and access trap enable.
+>> +	vfp_inlazy_mode r7, skip_guest_vfp_trap
+> 
+> So, why do we need to touch this register at all on every CPU exit?
+> 
+> Is it not true that we can only be in one of two state:
+>  1) The register file is not dirty (not touched by the guest) and we
+>     should trap
+>  2) The register file is dirty, and we should not trap to EL2?
+> 
+> Only in the first case do we need to set the FPEXC, and couldn't we just
+> do that on vcpu_load and git rid of all this?  (except HCPTR_TCP which
+> we still need to adjust).
 
-[auto build test WARNING on: kvmarm/next]
-[also build test WARNING on: v4.3 next-20151105]
+I'm trying to think what happens if you're preempted after you saved
+the FPEXC and set the FPEXC_EN bit in kvm_arch_vcpu_load(). Could some
+thread pick up a bad FPEXC? May be possible to undo in the vcpu_put().
 
-url:    https://github.com/0day-ci/linux/commits/Christoffer-Dall/KVM-arm-Don-t-try-to-flush-hyp-mode-device-mappings/20151105-232548
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git next
-config: arm-axm55xx_defconfig (attached as .config)
-reproduce:
-        wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # save the attached .config to linux build tree
-        make.cross ARCH=arm 
+> 
+>> +
+>>  	VFPFMRX r2, FPEXC		@ VMRS
+>> -	push	{r2}
+>> +	str     r2, [vcpu, #VCPU_VFP_HOST_FPEXC]
+>>  	orr	r2, r2, #FPEXC_EN
+>>  	VFPFMXR FPEXC, r2		@ VMSR
+>> +	set_hcptr vmentry, (HCPTR_TCP(10) | HCPTR_TCP(11))
+>> +skip_guest_vfp_trap:
+>>  #endif
+>>  
+>>  	@ Configure Hyp-role
+>> @@ -131,7 +162,7 @@ ENTRY(__kvm_vcpu_run)
+>>  
+>>  	@ Trap coprocessor CRx accesses
+>>  	set_hstr vmentry
+>> -	set_hcptr vmentry, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
+>> +	set_hcptr vmentry, (HCPTR_TTA)
+> 
+> based on the above I think you can rework this to set the mask based on
+> the dirty flag and only hit the HCPTR once.
 
-All warnings (new ones prefixed by >>):
+Not sure how to do this, tracing always needs to be enabled, and it's
+independent of FP dirty state.
 
-   arch/arm/kvm/mmu.c: In function 'unmap_ptes':
->> arch/arm/kvm/mmu.c:212:3: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
-      pte_t old_pte = *pte;
-      ^
+> 
+>>  	set_hdcr vmentry
+>>  
+>>  	@ Write configured ID register into MIDR alias
+>> @@ -170,22 +201,15 @@ __kvm_vcpu_return:
+>>  	@ Don't trap coprocessor accesses for host kernel
+>>  	set_hstr vmexit
+>>  	set_hdcr vmexit
+>> -	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11)), after_vfp_restore
+>> +	set_hcptr vmexit, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
+>>  
+>>  #ifdef CONFIG_VFPv3
+>> -	@ Switch VFP/NEON hardware state to the host's
+>> -	add	r7, vcpu, #VCPU_VFP_GUEST
+>> -	store_vfp_state r7
+>> -	add	r7, vcpu, #VCPU_VFP_HOST
+>> -	ldr	r7, [r7]
+>> -	restore_vfp_state r7
+>> -
+>> -after_vfp_restore:
+>> -	@ Restore FPEXC_EN which we clobbered on entry
+>> -	pop	{r2}
+>> +	@ If fp/simd not dirty, restore FPEXC which we clobbered on entry.
+>> +	@ Otherwise return with guest FPEXC, later saved in vcpu_put.
+>> +	vfp_inlazy_mode r2, skip_restore_host_fpexc
+>> +	ldr     r2, [vcpu, #VCPU_VFP_HOST_FPEXC]
+> 
+> I think you should always just restore in this in vcpu_put instead of
+> hitting on this all the time.
+True, I was thinking of stack unwinding from older code.
+> 
+>>  	VFPFMXR FPEXC, r2
+>> -#else
+>> -after_vfp_restore:
+>> +skip_restore_host_fpexc:
+>>  #endif
+>>  
+>>  	@ Reset Hyp-role
+>> @@ -485,6 +509,10 @@ switch_to_guest_vfp:
+>>  	@ NEON/VFP used.  Turn on VFP access.
+>>  	set_hcptr vmtrap, (HCPTR_TCP(10) | HCPTR_TCP(11))
+>>  
+>> +	@ set lazy mode flag, switch hardware context on vcpu_put
+>> +	mov     r1, #1
+>> +	strb    r1, [vcpu, #VCPU_VFP_DIRTY]
+>> +
+>>  	@ Switch VFP/NEON hardware state to the guest's
+>>  	add	r7, r0, #VCPU_VFP_HOST
+>>  	ldr	r7, [r7]
+>> diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
+>> index 51a5950..34e71ee 100644
+>> --- a/arch/arm/kvm/interrupts_head.S
+>> +++ b/arch/arm/kvm/interrupts_head.S
+>> @@ -593,10 +593,8 @@ ARM_BE8(rev	r6, r6  )
+>>   * (hardware reset value is 0). Keep previous value in r2.
+>>   * An ISB is emited on vmexit/vmtrap, but executed on vmexit only if
+>>   * VFP wasn't already enabled (always executed on vmtrap).
+>> - * If a label is specified with vmexit, it is branched to if VFP wasn't
+>> - * enabled.
+>>   */
+>> -.macro set_hcptr operation, mask, label = none
+>> +.macro set_hcptr operation, mask
+>>  	mrc	p15, 4, r2, c1, c1, 2
+>>  	ldr	r3, =\mask
+>>  	.if \operation == vmentry
+>> @@ -611,13 +609,17 @@ ARM_BE8(rev	r6, r6  )
+>>  	beq	1f
+>>  	.endif
+>>  	isb
+>> -	.if \label != none
+>> -	b	\label
+>> -	.endif
+>>  1:
+>>  	.endif
+>>  .endm
+>>  
+>> +/* Checks if VFP/SIMD dirty flag is set, if it is branch to label. */
+>> +.macro vfp_inlazy_mode, reg, label
+> 
+> Again, I don't find this "in lazy mode" to mean that we've now switched
+> to the guest's VFP state intuitive or logical.
+> 
+> How about vfp_skip_if_dirty ?
+Yes sounds good.
 
-vim +212 arch/arm/kvm/mmu.c
-
-363ef89f8 Marc Zyngier     2014-12-19  196   *
-363ef89f8 Marc Zyngier     2014-12-19  197   * This is why right after unmapping a page/section and invalidating
-363ef89f8 Marc Zyngier     2014-12-19  198   * the corresponding TLBs, we call kvm_flush_dcache_p*() to make sure
-363ef89f8 Marc Zyngier     2014-12-19  199   * the IO subsystem will never hit in the cache.
-363ef89f8 Marc Zyngier     2014-12-19  200   */
-4f853a714 Christoffer Dall 2014-05-09  201  static void unmap_ptes(struct kvm *kvm, pmd_t *pmd,
-4f853a714 Christoffer Dall 2014-05-09  202  		       phys_addr_t addr, phys_addr_t end)
-4f728276f Marc Zyngier     2013-04-12  203  {
-4f853a714 Christoffer Dall 2014-05-09  204  	phys_addr_t start_addr = addr;
-4f853a714 Christoffer Dall 2014-05-09  205  	pte_t *pte, *start_pte;
-4f853a714 Christoffer Dall 2014-05-09  206  
-4f853a714 Christoffer Dall 2014-05-09  207  	start_pte = pte = pte_offset_kernel(pmd, addr);
-4f853a714 Christoffer Dall 2014-05-09  208  	do {
-8e9a96138 Christoffer Dall 2015-11-05  209  		if (pte_none(*pte))
-8e9a96138 Christoffer Dall 2015-11-05  210  			continue;
-8e9a96138 Christoffer Dall 2015-11-05  211  
-363ef89f8 Marc Zyngier     2014-12-19 @212  		pte_t old_pte = *pte;
-363ef89f8 Marc Zyngier     2014-12-19  213  
-4f728276f Marc Zyngier     2013-04-12  214  		kvm_set_pte(pte, __pte(0));
-d4cb9df5d Marc Zyngier     2013-05-14  215  		kvm_tlb_flush_vmid_ipa(kvm, addr);
-363ef89f8 Marc Zyngier     2014-12-19  216  
-363ef89f8 Marc Zyngier     2014-12-19  217  		/* No need to invalidate the cache for device mappings */
-8e9a96138 Christoffer Dall 2015-11-05  218  		if ((pte_val(old_pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE &&
-8e9a96138 Christoffer Dall 2015-11-05  219  		    (pte_val(old_pte) & PAGE_HYP_DEVICE) != PAGE_HYP_DEVICE)
-363ef89f8 Marc Zyngier     2014-12-19  220  			kvm_flush_dcache_pte(old_pte);
-
-:::::: The code at line 212 was first introduced by commit
-:::::: 363ef89f8e9bcedc28b976d0fe2d858fe139c122 arm/arm64: KVM: Invalidate data cache on unmap
-
-:::::: TO: Marc Zyngier <marc.zyngier@arm.com>
-:::::: CC: Christoffer Dall <christoffer.dall@linaro.org>
-
----
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
-
---ikeVEW9yuYc//A+q
-Content-Type: application/octet-stream
-Content-Disposition: attachment; filename=".config.gz"
-Content-Transfer-Encoding: base64
-
-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
-UM0DVdAe/uCNVQBxkqTPQysBAA==
-
---ikeVEW9yuYc//A+q--
+> 
+>> +	ldr	\reg, [vcpu, #VCPU_VFP_DIRTY]
+>> +	cmp	\reg, #1
+>> +	beq	\label
+>> +.endm
+>> +
+>>  /* Configures the HDCR (Hyp Debug Configuration Register) on entry/return
+>>   * (hardware reset value is 0) */
+>>  .macro set_hdcr operation
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 4562459..26a2347 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -157,6 +157,9 @@ struct kvm_vcpu_arch {
+>>  	/* Interrupt related fields */
+>>  	u64 irq_lines;		/* IRQ and FIQ levels */
+>>  
+>> +	/* fp/simd dirty flag true if guest accessed register file */
+>> +	bool    vfp_dirty;
+>> +
+>>  	/* Cache some mmu pages needed inside spinlock regions */
+>>  	struct kvm_mmu_memory_cache mmu_page_cache;
+>>  
+>> @@ -248,6 +251,7 @@ static inline void kvm_arch_hardware_unsetup(void) {}
+>>  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+>>  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+>>  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+>> +static inline void kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu) {}
+>>  
+>>  void kvm_arm_init_debug(void);
+>>  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+>> -- 
+>> 1.9.1
+>>
