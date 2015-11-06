@@ -1,32 +1,33 @@
 From: Mario Smarduch <m.smarduch@samsung.com>
-Subject: Re: [PATCH 3/3] KVM/arm64: enable enhanced armv8 fp/simd lazy switch
-Date: Fri, 06 Nov 2015 08:10:04 -0800
-Message-ID: <563CD0DC.5050408@samsung.com>
+Subject: Re: [PATCH v3 2/3] KVM/arm/arm64: enable enhanced armv7 fp/simd lazy
+ switch
+Date: Fri, 06 Nov 2015 08:16:14 -0800
+Message-ID: <563CD24E.5010302@samsung.com>
 References: <1446242193-8424-1-git-send-email-m.smarduch@samsung.com>
- <1446242193-8424-4-git-send-email-m.smarduch@samsung.com>
- <20151105150255.GD5819@cbox> <563BFAE8.3010401@samsung.com>
- <20151106112907.GG5819@cbox>
+ <1446242193-8424-3-git-send-email-m.smarduch@samsung.com>
+ <20151105144848.GC5819@cbox> <563BF30D.1040101@samsung.com>
+ <20151106113718.GH5819@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E9C64987C
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Nov 2015 11:06:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 80161498B2
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Nov 2015 11:13:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XnNSqdVx5IQ4 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Nov 2015 11:06:48 -0500 (EST)
+ with ESMTP id 1c1cpRhvdvNc for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Nov 2015 11:12:58 -0500 (EST)
 Received: from usmailout3.samsung.com (mailout3.w2.samsung.com
  [211.189.100.13])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5AC1F4985B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Nov 2015 11:06:47 -0500 (EST)
-Received: from uscpsbgex1.samsung.com
- (u122.gpu85.samsung.co.kr [203.254.195.122]) by usmailout3.samsung.com
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4CBAA4987C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Nov 2015 11:12:57 -0500 (EST)
+Received: from uscpsbgex3.samsung.com
+ (u124.gpu85.samsung.co.kr [203.254.195.124]) by usmailout3.samsung.com
  (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NXE006HDI8TR110@usmailout3.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Fri, 06 Nov 2015 11:10:05 -0500 (EST)
-In-reply-to: <20151106112907.GG5819@cbox>
+ with ESMTP id <0NXE006MBIJ4R110@usmailout3.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Fri, 06 Nov 2015 11:16:16 -0500 (EST)
+In-reply-to: <20151106113718.GH5819@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -42,181 +43,185 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 
 
-On 11/6/2015 3:29 AM, Christoffer Dall wrote:
-> On Thu, Nov 05, 2015 at 04:57:12PM -0800, Mario Smarduch wrote:
+On 11/6/2015 3:37 AM, Christoffer Dall wrote:
+> On Thu, Nov 05, 2015 at 04:23:41PM -0800, Mario Smarduch wrote:
 >>
 >>
->> On 11/5/2015 7:02 AM, Christoffer Dall wrote:
->>> On Fri, Oct 30, 2015 at 02:56:33PM -0700, Mario Smarduch wrote:
->>>> This patch enables arm64 lazy fp/simd switch, similar to arm described in
->>>> second patch. Change from previous version - restore function is moved to
->>>> host. 
+>> On 11/5/2015 6:48 AM, Christoffer Dall wrote:
+>>> On Fri, Oct 30, 2015 at 02:56:32PM -0700, Mario Smarduch wrote:
+>>>> This patch tracks vfp/simd hardware state with a vcpu lazy flag. vCPU lazy 
+>>>> flag is set on guest access and traps to vfp/simd hardware switch handler. On 
+>>>> vm-enter if lazy flag is set skip trap enable and save host fpexc. On 
+>>>> vm-exit if flag is set skip hardware context switch and return to host with 
+>>>> guest context. In vcpu_put check if vcpu lazy flag is set, and execute a 
+>>>> hardware context switch to restore host.
+>>>>
+>>>> Also some arm64 field and empty function are added to compile for arm64.
 >>>>
 >>>> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
 >>>> ---
->>>>  arch/arm64/include/asm/kvm_host.h |  2 +-
->>>>  arch/arm64/kernel/asm-offsets.c   |  1 +
->>>>  arch/arm64/kvm/hyp.S              | 37 +++++++++++++++++++++++++++++++------
->>>>  3 files changed, 33 insertions(+), 7 deletions(-)
+>>>>  arch/arm/include/asm/kvm_host.h   |  1 +
+>>>>  arch/arm/kvm/arm.c                |  6 ++++
+>>>>  arch/arm/kvm/interrupts.S         | 60 ++++++++++++++++++++++++++++-----------
+>>>>  arch/arm/kvm/interrupts_head.S    | 14 +++++----
+>>>>  arch/arm64/include/asm/kvm_host.h |  4 +++
+>>>>  5 files changed, 63 insertions(+), 22 deletions(-)
 >>>>
->>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>>> index 26a2347..dcecf92 100644
->>>> --- a/arch/arm64/include/asm/kvm_host.h
->>>> +++ b/arch/arm64/include/asm/kvm_host.h
->>>> @@ -251,11 +251,11 @@ static inline void kvm_arch_hardware_unsetup(void) {}
->>>>  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
->>>>  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
->>>>  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
->>>> -static inline void kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu) {}
+>>>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+>>>> index f1bf551..a9e86e0 100644
+>>>> --- a/arch/arm/include/asm/kvm_host.h
+>>>> +++ b/arch/arm/include/asm/kvm_host.h
+>>>> @@ -227,6 +227,7 @@ int kvm_perf_teardown(void);
+>>>>  void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
 >>>>  
->>>>  void kvm_arm_init_debug(void);
->>>>  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
->>>>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
->>>>  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
->>>> +void kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu);
+>>>>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
+>>>> +void kvm_restore_host_vfp_state(struct kvm_vcpu *);
 >>>>  
->>>>  #endif /* __ARM64_KVM_HOST_H__ */
->>>> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
->>>> index 8d89cf8..c9c5242 100644
->>>> --- a/arch/arm64/kernel/asm-offsets.c
->>>> +++ b/arch/arm64/kernel/asm-offsets.c
->>>> @@ -124,6 +124,7 @@ int main(void)
->>>>    DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
->>>>    DEFINE(VCPU_MDCR_EL2,	offsetof(struct kvm_vcpu, arch.mdcr_el2));
->>>>    DEFINE(VCPU_IRQ_LINES,	offsetof(struct kvm_vcpu, arch.irq_lines));
->>>> +  DEFINE(VCPU_VFP_DIRTY,	offsetof(struct kvm_vcpu, arch.vfp_dirty));
->>>>    DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
->>>>    DEFINE(VCPU_HOST_DEBUG_STATE, offsetof(struct kvm_vcpu, arch.host_debug_state));
->>>>    DEFINE(VCPU_TIMER_CNTV_CTL,	offsetof(struct kvm_vcpu, arch.timer_cpu.cntv_ctl));
->>>> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
->>>> index e583613..ed2c4cf 100644
->>>> --- a/arch/arm64/kvm/hyp.S
->>>> +++ b/arch/arm64/kvm/hyp.S
->>>> @@ -36,6 +36,28 @@
->>>>  #define CPU_SYSREG_OFFSET(x)	(CPU_SYSREGS + 8*x)
+>>>>  static inline void kvm_arch_hardware_disable(void) {}
+>>>>  static inline void kvm_arch_hardware_unsetup(void) {}
+>>>> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+>>>> index dc017ad..11a56fe 100644
+>>>> --- a/arch/arm/kvm/arm.c
+>>>> +++ b/arch/arm/kvm/arm.c
+>>>> @@ -296,6 +296,12 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>>>>  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>>>>  {
+>>>>  	/*
+>>>> +	 * If fp/simd registers are dirty save guest, restore host before
+>>>
+>>> If the fp/simd registers are dirty, then restore the host state before
+>> I'd drop 'releasing the cpu', the vcpu thread may be returning to
+>> user mode.
+>>>
+>>>> +	 * releasing the cpu.
+>>>> +	 */
+>>>> +	if (vcpu->arch.vfp_dirty)
+>>>> +		kvm_restore_host_vfp_state(vcpu);
+>>>> +	/*
+>>>>  	 * The arch-generic KVM code expects the cpu field of a vcpu to be -1
+>>>>  	 * if the vcpu is no longer assigned to a cpu.  This is used for the
+>>>>  	 * optimized make_all_cpus_request path.
+>>>> diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
+>>>> index 900ef6d..ca25314 100644
+>>>> --- a/arch/arm/kvm/interrupts.S
+>>>> +++ b/arch/arm/kvm/interrupts.S
+>>>> @@ -28,6 +28,32 @@
+>>>>  #include "interrupts_head.S"
 >>>>  
 >>>>  	.text
->>>> +
 >>>> +/**
 >>>> + * void kvm_restore_host_vfp_state(struct vcpu *vcpu) - Executes lazy
->>>> + *	fp/simd switch, saves the guest, restores host. Called from host
->>>> + *	mode, placed outside of hyp section.
 >>>
->>> same comments on style as previous patch
->> Got it.
+>>> nit: Can you move the multi-line description of the function into a
+>>> separate paragraph?
+>> Sure.
+>>>
+>>>> + * 	fp/simd switch, saves the guest, restores host. Called from host
+>>>> + *	mode, placed outside of hyp region start/end.
+>>>
+>>> Put the description in a separate paragraph and get rid of the "executes
+>>> lazy fp/simd swithch" part, that doesn't help understanding.  Just say
+>>> that this funciton restores the host state.
+>> Sure.
 >>>
 >>>> + */
 >>>> +ENTRY(kvm_restore_host_vfp_state)
->>>> +	push    xzr, lr
+>>>> +#ifdef CONFIG_VFPv3
+>>>> +	push    {r4-r7}
 >>>> +
->>>> +	add     x2, x0, #VCPU_CONTEXT
->>>> +	mov     w3, #0
->>>> +	strb    w3, [x0, #VCPU_VFP_DIRTY]
->>>
->>> I've been discussing with myself if it would make more sense to clear
->>> the dirty flag in the C-code...
->> Since all the work is done here I placed it here.
-> 
-> yeah, that's what I thought first, but then I thought it's typically
-> easier to understand the logic in the C-code and this is technically a
-> side-effect from the name of the function "kvm_restore_host_vfp_state"
-> which should then be "kvm_restore_host_vfp_state_and_clear_dirty_flag"
-> :)
-> 
-
-Ok I'll set in C.
->>>
+>>>> +	add     r7, vcpu, #VCPU_VFP_GUEST
+>>>> +	store_vfp_state r7
 >>>> +
->>>> +	bl __save_fpsimd
+>>>> +	add     r7, vcpu, #VCPU_VFP_HOST
+>>>> +	ldr     r7, [r7]
+>>>> +	restore_vfp_state r7
 >>>> +
->>>> +	ldr     x2, [x0, #VCPU_HOST_CONTEXT]
->>>> +	bl __restore_fpsimd
+>>>> +	ldr     r3, [vcpu, #VCPU_VFP_HOST_FPEXC]
+>>>> +	VFPFMXR FPEXC, r3
 >>>> +
->>>> +	pop     xzr, lr
->>>> +	ret
+>>>> +	mov     r3, #0
+>>>> +	strb    r3, [vcpu, #VCPU_VFP_DIRTY]
+>>>> +
+>>>> +	pop     {r4-r7}
+>>>> +#endif
+>>>> +	bx      lr
 >>>> +ENDPROC(kvm_restore_host_vfp_state)
+>>>>  
+>>>>  __kvm_hyp_code_start:
+>>>>  	.globl __kvm_hyp_code_start
+>>>> @@ -119,11 +145,16 @@ ENTRY(__kvm_vcpu_run)
+>>>>  	@ If the host kernel has not been configured with VFPv3 support,
+>>>>  	@ then it is safer if we deny guests from using it as well.
+>>>>  #ifdef CONFIG_VFPv3
+>>>> -	@ Set FPEXC_EN so the guest doesn't trap floating point instructions
+>>>> +	@ fp/simd register file has already been accessed, so skip host fpexc
+>>>> +	@ save and access trap enable.
+>>>> +	vfp_inlazy_mode r7, skip_guest_vfp_trap
+>>>
+>>> So, why do we need to touch this register at all on every CPU exit?
+>>>
+>>> Is it not true that we can only be in one of two state:
+>>>  1) The register file is not dirty (not touched by the guest) and we
+>>>     should trap
+>>>  2) The register file is dirty, and we should not trap to EL2?
+>>>
+>>> Only in the first case do we need to set the FPEXC, and couldn't we just
+>>> do that on vcpu_load and git rid of all this?  (except HCPTR_TCP which
+>>> we still need to adjust).
+>>
+>> I'm trying to think what happens if you're preempted after you saved
+>> the FPEXC and set the FPEXC_EN bit in kvm_arch_vcpu_load(). Could some
+>> thread pick up a bad FPEXC? May be possible to undo in the vcpu_put().
+> 
+> If you're preempted, vcpu_put will be called.  See kvm_preempt_ops in
+> virt/kvm/kvm_main.c.
+Yes we can cleanup in vcpu_put what we do in vcpu_load.
+> 
+>>
+>>>
 >>>> +
->>>>  	.pushsection	.hyp.text, "ax"
->>>>  	.align	PAGE_SHIFT
+>>>>  	VFPFMRX r2, FPEXC		@ VMRS
+>>>> -	push	{r2}
+>>>> +	str     r2, [vcpu, #VCPU_VFP_HOST_FPEXC]
+>>>>  	orr	r2, r2, #FPEXC_EN
+>>>>  	VFPFMXR FPEXC, r2		@ VMSR
+>>>> +	set_hcptr vmentry, (HCPTR_TCP(10) | HCPTR_TCP(11))
+>>>> +skip_guest_vfp_trap:
+>>>>  #endif
 >>>>  
->>>> @@ -482,7 +504,11 @@
->>>>  99:
->>>>  	msr     hcr_el2, x2
->>>>  	mov	x2, #CPTR_EL2_TTA
->>>> +
->>>> +	ldrb	w3, [x0, #VCPU_VFP_DIRTY]
->>>> +	tbnz    w3, #0, 98f
->>>>  	orr     x2, x2, #CPTR_EL2_TFP
->>>> +98:
+>>>>  	@ Configure Hyp-role
+>>>> @@ -131,7 +162,7 @@ ENTRY(__kvm_vcpu_run)
+>>>>  
+>>>>  	@ Trap coprocessor CRx accesses
+>>>>  	set_hstr vmentry
+>>>> -	set_hcptr vmentry, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
+>>>> +	set_hcptr vmentry, (HCPTR_TTA)
 >>>
->>> mmm, don't you need to only set the fpexc32 when you're actually going
->>> to trap the guest accesses?
+>>> based on the above I think you can rework this to set the mask based on
+>>> the dirty flag and only hit the HCPTR once.
 >>
->> My understanding is you always need to set enable in fpexec32 for 32 bit guests,
->> otherwise EL1 would get the trap instead of EL2. Not sure if that's the point
->> you're making.
->>
+>> Not sure how to do this, tracing always needs to be enabled, and it's
+>> independent of FP dirty state.
 > 
-> If you're expecting to trap all accesses by setting CPTR_EL2_TFP and
-> you're running a 32-bit guest, you must also enable in fpexec32, because
-> otherwise the trap is not taken to EL2, but to EL1 instead.
+> here, you do:
 > 
-> Before these patches, we *always* expected to trap VFP accesses after
-> entering the guest, but since that has now changed, you should only
-> fiddle with fpexec32 if you are indeed trapping (first entry after
-> vcpu_load) and if it's a 32-bit VM.
+> 	ldr r4, HCPTR_TTA
+> 	vfp_skip_if_dirty skip_vfp_trap
+> 	orr r4, r4, #(HCPTR_TCP(10) | HCPTR_TCP(11))
+> skip_vfp_trap:
+> 	set_hcptr vmentry, r4
 > 
-> Does that help?
-Yes sure does! Puts the vcpu_load jump to EL2 vs always into perspective.
+> if that works with the necessary rework of set_hcptr to take a register,
+> if the orr can be encoded propertly etc.  Maybe it's not worth it, it
+> just feels weird to touch this registers twice. 
+Yes definitely,  thanks for spelling out the details. A simple or looks quite
+different in assembler - we hates it :)
+
+Thanks.
+> Perhaps the nicer fix
+> is to just rename/refactor set_hcptr to be two functions, set_hcptr_bits
+> and clear_hcptr_bits.
 > 
->>>
->>> also, you can consider only setting this in vcpu_load (jumping quickly
->>> to EL2 to do so) if we're running a 32-bit guest.  Probably worth
->>> measuring the difference between the extra EL2 jump on vcpu_load
->>> compared to hitting this register on every entry/exit.
->>
->> Sure, makes sense since this is a hot code path.
->>>
->>> Code-wise, it will be nicer to do it on vcpu_load.
->>>
->>>>  	msr	cptr_el2, x2
->>>>  
->>>>  	mov	x2, #(1 << 15)	// Trap CP15 Cr=15
->>>> @@ -669,14 +695,12 @@ __restore_debug:
->>>>  	ret
->>>>  
->>>>  __save_fpsimd:
->>>> -	skip_fpsimd_state x3, 1f
->>>>  	save_fpsimd
->>>> -1:	ret
->>>> +	ret
->>>>  
->>>>  __restore_fpsimd:
->>>> -	skip_fpsimd_state x3, 1f
->>>>  	restore_fpsimd
->>>> -1:	ret
->>>> +	ret
->>>>  
->>>>  switch_to_guest_fpsimd:
->>>>  	push	x4, lr
->>>> @@ -688,6 +712,9 @@ switch_to_guest_fpsimd:
->>>>  
->>>>  	mrs	x0, tpidr_el2
->>>>  
->>>> +	mov     w2, #1
->>>> +	strb    w2, [x0, #VCPU_VFP_DIRTY]
->>>
->>> hmm, just noticing this.  Are you not writing a 32-bit value to a
->>> potentially 8-bit field (ignoring padding in the struct), as the dirty
->>> flag is declared a bool.
->>
->> From the manuals byte stores require a word size registers on arm64/arm32.
->> The interconnect probably drops the remaining bytes.
->> Also double checked and the compiler uses same instructions.
->>
-> 
-> duh, I didn't see the 'b' in strb - I guess I was too tired to review
-> patches.
-> 
+> Thanks,
 > -Christoffer
 > 
