@@ -1,127 +1,50 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH] ARM/arm64: KVM: test properly for a PTE's uncachedness
-Date: Fri,  6 Nov 2015 12:43:08 +0100
-Message-ID: <1446810188-13727-1-git-send-email-ard.biesheuvel@linaro.org>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH] KVM: arm: Fix crash in free_hyp_pgds() if timer
+ initialization fails
+Date: Fri, 06 Nov 2015 16:43:56 +0300
+Message-ID: <006d01d11899$2f7932f0$8e6b98d0$@samsung.com>
+References: <1445931608-8824-1-git-send-email-p.fedin@samsung.com>
+ <20151105152440.GF5819@cbox> <002601d11876$1bc3cf40$534b6dc0$@samsung.com>
+ <20151106114223.GI5819@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A62644989A
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Nov 2015 06:40:35 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R829l3i2s08r for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Nov 2015 06:40:34 -0500 (EST)
-Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 50BED49857
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Nov 2015 06:40:33 -0500 (EST)
-Received: by wmww144 with SMTP id w144so28221243wmw.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 06 Nov 2015 03:43:52 -0800 (PST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <20151106114223.GI5819@cbox>
+Content-language: ru
+Sender: kvm-owner@vger.kernel.org
+To: 'Christoffer Dall' <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The open coded tests for checking whether a PTE maps a page as
-uncached use a flawed 'pte_val(xxx) & CONST != CONST' pattern,
-which is not guaranteed to work since the type of a mapping is an
-index into the MAIR table, not a set of mutually exclusive bits.
+ Hello!
 
-Considering that, on arm64, the S2 type definitions use the following
-MAIR indexes
+> > > Did you check if PAGE_HYP_DEVICE can mean something sane on a stage-2
+> > > page table entry and vice verse?
+> >
+> >  I tried to, the chain of macros and variables is complicated enough not to
+> > get 200% sure, but anyway PAGE_HYP_DEVICE (as well as PAGE_S2_DEVICE)
+> > includes PROT_PTE_DEVICE, so this is definitely device.
+> >  I even tried to construct some mask in order to make a single check for only
+> > DEVICE flags, but, to make things even less understandable and predictable,
+> > the same code with different bitfields is reused by ARM64. So, i thought that
+> > it will be more reliable just to add a second test.
+> 
+> The thing I want to avoid is PAGE_HYP_DEVICE covering some normal S2
+> mapping, which we *should* flush but that we now end up ignoring?  That
+> doesn't sound like it can be the case because the device bit is the same
+> bit for both types of page tables, correct?
 
-    #define MT_S2_NORMAL            0xf
-    #define MT_S2_DEVICE_nGnRE      0x1
+ Yes, this is exactly what i think. If DEVICE bit is set, then it's somehow
+device memory and it doesn't need flashing.
 
-we have been getting lucky merely because the S2 device mappings also
-have the PTE_UXN bit set, which means that a device PTE still does not
-equal a normal PTE after masking with the former type.
+ Or, in order to be 200% sure, we could modify the whole unmapping logic to carry
+over a flag, telling whether we are removing normal or HYP mappings. But wouldn't
+this be much more complicated?
 
-Instead, implement proper checking against the MAIR indexes that are
-known to define uncached memory attributes.
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm/include/asm/kvm_mmu.h   | 11 +++++++++++
- arch/arm/kvm/mmu.c               |  5 ++---
- arch/arm64/include/asm/kvm_mmu.h | 12 ++++++++++++
- 3 files changed, 25 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 405aa1883307..422973835d41 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -279,6 +279,17 @@ static inline void __kvm_extend_hypmap(pgd_t *boot_hyp_pgd,
- 				       pgd_t *merged_hyp_pgd,
- 				       unsigned long hyp_idmap_start) { }
- 
-+static inline bool __kvm_pte_is_uncached(pte_t pte)
-+{
-+	switch (pte_val(pte) & L_PTE_MT_MASK) {
-+	case L_PTE_MT_UNCACHED:
-+	case L_PTE_MT_BUFFERABLE:
-+	case L_PTE_MT_DEV_SHARED:
-+		return true;
-+	}
-+	return false;
-+}
-+
- #endif	/* !__ASSEMBLY__ */
- 
- #endif /* __ARM_KVM_MMU_H__ */
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 6984342da13d..eb9a06e3dbee 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -213,7 +213,7 @@ static void unmap_ptes(struct kvm *kvm, pmd_t *pmd,
- 			kvm_tlb_flush_vmid_ipa(kvm, addr);
- 
- 			/* No need to invalidate the cache for device mappings */
--			if ((pte_val(old_pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
-+			if (!__kvm_pte_is_uncached(old_pte))
- 				kvm_flush_dcache_pte(old_pte);
- 
- 			put_page(virt_to_page(pte));
-@@ -305,8 +305,7 @@ static void stage2_flush_ptes(struct kvm *kvm, pmd_t *pmd,
- 
- 	pte = pte_offset_kernel(pmd, addr);
- 	do {
--		if (!pte_none(*pte) &&
--		    (pte_val(*pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
-+		if (!pte_none(*pte) && !__kvm_pte_is_uncached(*pte))
- 			kvm_flush_dcache_pte(*pte);
- 	} while (pte++, addr += PAGE_SIZE, addr != end);
- }
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 61505676d085..5806f412a47a 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -302,5 +302,17 @@ static inline void __kvm_extend_hypmap(pgd_t *boot_hyp_pgd,
- 	merged_hyp_pgd[idmap_idx] = __pgd(__pa(boot_hyp_pgd) | PMD_TYPE_TABLE);
- }
- 
-+static inline bool __kvm_pte_is_uncached(pte_t pte)
-+{
-+	switch (pte_val(pte) & PTE_ATTRINDX_MASK) {
-+	case PTE_ATTRINDX(MT_DEVICE_nGnRnE):
-+	case PTE_ATTRINDX(MT_DEVICE_nGnRE):
-+	case PTE_ATTRINDX(MT_DEVICE_GRE):
-+	case PTE_ATTRINDX(MT_NORMAL_NC):
-+		return true;
-+	}
-+	return false;
-+}
-+
- #endif /* __ASSEMBLY__ */
- #endif /* __ARM64_KVM_MMU_H__ */
--- 
-1.9.1
