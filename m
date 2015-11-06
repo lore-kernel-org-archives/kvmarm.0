@@ -1,29 +1,29 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 2/3] KVM/arm/arm64: enable enhanced armv7 fp/simd lazy
- switch
-Date: Fri, 6 Nov 2015 12:37:18 +0100
-Message-ID: <20151106113718.GH5819@cbox>
-References: <1446242193-8424-1-git-send-email-m.smarduch@samsung.com>
- <1446242193-8424-3-git-send-email-m.smarduch@samsung.com>
- <20151105144848.GC5819@cbox> <563BF30D.1040101@samsung.com>
+Subject: Re: [PATCH] KVM: arm: Fix crash in free_hyp_pgds() if timer
+ initialization fails
+Date: Fri, 6 Nov 2015 12:42:23 +0100
+Message-ID: <20151106114223.GI5819@cbox>
+References: <1445931608-8824-1-git-send-email-p.fedin@samsung.com>
+ <20151105152440.GF5819@cbox>
+ <002601d11876$1bc3cf40$534b6dc0$@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6985F4985B
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Nov 2015 06:33:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EB75497F8
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Nov 2015 06:39:04 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BxbCo5Z0uqzm for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 Nov 2015 06:33:57 -0500 (EST)
-Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id B6C0C49857
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Nov 2015 06:33:56 -0500 (EST)
-Received: by wmll128 with SMTP id l128so38364746wml.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 06 Nov 2015 03:37:14 -0800 (PST)
+ with ESMTP id KZd1XqjpdHge for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 Nov 2015 06:39:03 -0500 (EST)
+Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 19B9F497F4
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 Nov 2015 06:39:01 -0500 (EST)
+Received: by wmww144 with SMTP id w144so28193943wmw.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 06 Nov 2015 03:42:20 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <563BF30D.1040101@samsung.com>
+In-Reply-To: <002601d11876$1bc3cf40$534b6dc0$@samsung.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,181 +33,123 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mario Smarduch <m.smarduch@samsung.com>
-Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Pavel Fedin <p.fedin@samsung.com>
+Cc: 'Marc Zyngier' <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Nov 05, 2015 at 04:23:41PM -0800, Mario Smarduch wrote:
+On Fri, Nov 06, 2015 at 12:32:51PM +0300, Pavel Fedin wrote:
+>  Hello!
 > 
+> > > diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+> > > index 7b42012..839dd970 100644
+> > > --- a/arch/arm/kvm/mmu.c
+> > > +++ b/arch/arm/kvm/mmu.c
+> > > @@ -213,7 +213,10 @@ static void unmap_ptes(struct kvm *kvm, pmd_t *pmd,
+> > >  			kvm_tlb_flush_vmid_ipa(kvm, addr);
+> > >
+> > >  			/* No need to invalidate the cache for device mappings */
+> > > -			if ((pte_val(old_pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
+> > > +			if (((pte_val(old_pte) & PAGE_S2_DEVICE)
+> > > +			     != PAGE_S2_DEVICE) &&
+> > > +			    ((pte_val(old_pte) & PAGE_HYP_DEVICE)
+> > > +			     != PAGE_HYP_DEVICE))
+> > >  				kvm_flush_dcache_pte(old_pte);
+> > >
+> > >  			put_page(virt_to_page(pte));
+> > > --
+> > > 2.4.4
+> > >
+> > 
+> > Did you check if PAGE_HYP_DEVICE can mean something sane on a stage-2
+> > page table entry and vice verse?
 > 
-> On 11/5/2015 6:48 AM, Christoffer Dall wrote:
-> > On Fri, Oct 30, 2015 at 02:56:32PM -0700, Mario Smarduch wrote:
-> >> This patch tracks vfp/simd hardware state with a vcpu lazy flag. vCPU lazy 
-> >> flag is set on guest access and traps to vfp/simd hardware switch handler. On 
-> >> vm-enter if lazy flag is set skip trap enable and save host fpexc. On 
-> >> vm-exit if flag is set skip hardware context switch and return to host with 
-> >> guest context. In vcpu_put check if vcpu lazy flag is set, and execute a 
-> >> hardware context switch to restore host.
-> >>
-> >> Also some arm64 field and empty function are added to compile for arm64.
-> >>
-> >> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
-> >> ---
-> >>  arch/arm/include/asm/kvm_host.h   |  1 +
-> >>  arch/arm/kvm/arm.c                |  6 ++++
-> >>  arch/arm/kvm/interrupts.S         | 60 ++++++++++++++++++++++++++++-----------
-> >>  arch/arm/kvm/interrupts_head.S    | 14 +++++----
-> >>  arch/arm64/include/asm/kvm_host.h |  4 +++
-> >>  5 files changed, 63 insertions(+), 22 deletions(-)
-> >>
-> >> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> >> index f1bf551..a9e86e0 100644
-> >> --- a/arch/arm/include/asm/kvm_host.h
-> >> +++ b/arch/arm/include/asm/kvm_host.h
-> >> @@ -227,6 +227,7 @@ int kvm_perf_teardown(void);
-> >>  void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
-> >>  
-> >>  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
-> >> +void kvm_restore_host_vfp_state(struct kvm_vcpu *);
-> >>  
-> >>  static inline void kvm_arch_hardware_disable(void) {}
-> >>  static inline void kvm_arch_hardware_unsetup(void) {}
-> >> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> >> index dc017ad..11a56fe 100644
-> >> --- a/arch/arm/kvm/arm.c
-> >> +++ b/arch/arm/kvm/arm.c
-> >> @@ -296,6 +296,12 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-> >>  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-> >>  {
-> >>  	/*
-> >> +	 * If fp/simd registers are dirty save guest, restore host before
-> > 
-> > If the fp/simd registers are dirty, then restore the host state before
-> I'd drop 'releasing the cpu', the vcpu thread may be returning to
-> user mode.
-> > 
-> >> +	 * releasing the cpu.
-> >> +	 */
-> >> +	if (vcpu->arch.vfp_dirty)
-> >> +		kvm_restore_host_vfp_state(vcpu);
-> >> +	/*
-> >>  	 * The arch-generic KVM code expects the cpu field of a vcpu to be -1
-> >>  	 * if the vcpu is no longer assigned to a cpu.  This is used for the
-> >>  	 * optimized make_all_cpus_request path.
-> >> diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
-> >> index 900ef6d..ca25314 100644
-> >> --- a/arch/arm/kvm/interrupts.S
-> >> +++ b/arch/arm/kvm/interrupts.S
-> >> @@ -28,6 +28,32 @@
-> >>  #include "interrupts_head.S"
-> >>  
-> >>  	.text
-> >> +/**
-> >> + * void kvm_restore_host_vfp_state(struct vcpu *vcpu) - Executes lazy
-> > 
-> > nit: Can you move the multi-line description of the function into a
-> > separate paragraph?
-> Sure.
-> > 
-> >> + * 	fp/simd switch, saves the guest, restores host. Called from host
-> >> + *	mode, placed outside of hyp region start/end.
-> > 
-> > Put the description in a separate paragraph and get rid of the "executes
-> > lazy fp/simd swithch" part, that doesn't help understanding.  Just say
-> > that this funciton restores the host state.
-> Sure.
-> > 
-> >> + */
-> >> +ENTRY(kvm_restore_host_vfp_state)
-> >> +#ifdef CONFIG_VFPv3
-> >> +	push    {r4-r7}
-> >> +
-> >> +	add     r7, vcpu, #VCPU_VFP_GUEST
-> >> +	store_vfp_state r7
-> >> +
-> >> +	add     r7, vcpu, #VCPU_VFP_HOST
-> >> +	ldr     r7, [r7]
-> >> +	restore_vfp_state r7
-> >> +
-> >> +	ldr     r3, [vcpu, #VCPU_VFP_HOST_FPEXC]
-> >> +	VFPFMXR FPEXC, r3
-> >> +
-> >> +	mov     r3, #0
-> >> +	strb    r3, [vcpu, #VCPU_VFP_DIRTY]
-> >> +
-> >> +	pop     {r4-r7}
-> >> +#endif
-> >> +	bx      lr
-> >> +ENDPROC(kvm_restore_host_vfp_state)
-> >>  
-> >>  __kvm_hyp_code_start:
-> >>  	.globl __kvm_hyp_code_start
-> >> @@ -119,11 +145,16 @@ ENTRY(__kvm_vcpu_run)
-> >>  	@ If the host kernel has not been configured with VFPv3 support,
-> >>  	@ then it is safer if we deny guests from using it as well.
-> >>  #ifdef CONFIG_VFPv3
-> >> -	@ Set FPEXC_EN so the guest doesn't trap floating point instructions
-> >> +	@ fp/simd register file has already been accessed, so skip host fpexc
-> >> +	@ save and access trap enable.
-> >> +	vfp_inlazy_mode r7, skip_guest_vfp_trap
-> > 
-> > So, why do we need to touch this register at all on every CPU exit?
-> > 
-> > Is it not true that we can only be in one of two state:
-> >  1) The register file is not dirty (not touched by the guest) and we
-> >     should trap
-> >  2) The register file is dirty, and we should not trap to EL2?
-> > 
-> > Only in the first case do we need to set the FPEXC, and couldn't we just
-> > do that on vcpu_load and git rid of all this?  (except HCPTR_TCP which
-> > we still need to adjust).
-> 
-> I'm trying to think what happens if you're preempted after you saved
-> the FPEXC and set the FPEXC_EN bit in kvm_arch_vcpu_load(). Could some
-> thread pick up a bad FPEXC? May be possible to undo in the vcpu_put().
+>  I tried to, the chain of macros and variables is complicated enough not to
+> get 200% sure, but anyway PAGE_HYP_DEVICE (as well as PAGE_S2_DEVICE)
+> includes PROT_PTE_DEVICE, so this is definitely device.
+>  I even tried to construct some mask in order to make a single check for only
+> DEVICE flags, but, to make things even less understandable and predictable,
+> the same code with different bitfields is reused by ARM64. So, i thought that
+> it will be more reliable just to add a second test.
 
-If you're preempted, vcpu_put will be called.  See kvm_preempt_ops in
-virt/kvm/kvm_main.c.
+The thing I want to avoid is PAGE_HYP_DEVICE covering some normal S2
+mapping, which we *should* flush but that we now end up ignoring?  That
+doesn't sound like it can be the case because the device bit is the same
+bit for both types of page tables, correct?
 
 > 
 > > 
-> >> +
-> >>  	VFPFMRX r2, FPEXC		@ VMRS
-> >> -	push	{r2}
-> >> +	str     r2, [vcpu, #VCPU_VFP_HOST_FPEXC]
-> >>  	orr	r2, r2, #FPEXC_EN
-> >>  	VFPFMXR FPEXC, r2		@ VMSR
-> >> +	set_hcptr vmentry, (HCPTR_TCP(10) | HCPTR_TCP(11))
-> >> +skip_guest_vfp_trap:
-> >>  #endif
-> >>  
-> >>  	@ Configure Hyp-role
-> >> @@ -131,7 +162,7 @@ ENTRY(__kvm_vcpu_run)
-> >>  
-> >>  	@ Trap coprocessor CRx accesses
-> >>  	set_hstr vmentry
-> >> -	set_hcptr vmentry, (HCPTR_TTA | HCPTR_TCP(10) | HCPTR_TCP(11))
-> >> +	set_hcptr vmentry, (HCPTR_TTA)
-> > 
-> > based on the above I think you can rework this to set the mask based on
-> > the dirty flag and only hit the HCPTR once.
+> > Also, the commit message and formatting here is horrible, see this
+> > reworked version:
 > 
-> Not sure how to do this, tracing always needs to be enabled, and it's
-> independent of FP dirty state.
+> [skip]
+> 
+>  It's OK, to tell the truth the commit message is not that much important
+> for me, but i know that sometimes these changes require good elaboration,
+> so i included as much information as possible, together with crash
+> backtrace. I've seen something like this in "git log" before.
 
-here, you do:
+The problem with your commit message was that it focused on the symptom
+of the bug and how you saw it, instead of describing what the commit
+does and why the patch is correct from a general point of view.
 
-	ldr r4, HCPTR_TTA
-	vfp_skip_if_dirty skip_vfp_trap
-	orr r4, r4, #(HCPTR_TCP(10) | HCPTR_TCP(11))
-skip_vfp_trap:
-	set_hcptr vmentry, r4
+Think about your commit subject if you do "git log --oneline", then with
+your version I would think, "that commit addresses some weird bug that
+happens only in certain circumstances" as opposed to "this commit
+modifies the unmapping logic".
 
-if that works with the necessary rework of set_hcptr to take a register,
-if the orr can be encoded propertly etc.  Maybe it's not worth it, it
-just feels weird to touch this registers twice.  Perhaps the nicer fix
-is to just rename/refactor set_hcptr to be two functions, set_hcptr_bits
-and clear_hcptr_bits.
+>  Could you give me some directions on how to write better messages? And
+> about formatting, IIRC i adhere to "75 chars per line" rule, and always
+> (well, almost, unless forget to do so ;) ) run checkpatch.
 
-Thanks,
+For mail text, I think the convention is to use 72 chars per line.
+
+For code, it's advisable to stick to 80 chars per line, unless it makes
+the code absolutely imposible to read (in your original patch, you
+should just have let the lines be 82 chars or whatever it came to if you
+wanted to do it that way).
+
+> 
+> > diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+> > index 6984342..f0c3aef 100644
+> > --- a/arch/arm/kvm/mmu.c
+> > +++ b/arch/arm/kvm/mmu.c
+> > @@ -206,18 +206,20 @@ static void unmap_ptes(struct kvm *kvm, pmd_t *pmd,
+> > 
+> >  	start_pte = pte = pte_offset_kernel(pmd, addr);
+> >  	do {
+> > -		if (!pte_none(*pte)) {
+> > -			pte_t old_pte = *pte;
+> > +		if (pte_none(*pte))
+> > +			continue;
+> > 
+> > -			kvm_set_pte(pte, __pte(0));
+> > -			kvm_tlb_flush_vmid_ipa(kvm, addr);
+> > +		pte_t old_pte = *pte;
+> > 
+> > -			/* No need to invalidate the cache for device mappings */
+> > -			if ((pte_val(old_pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
+> > -				kvm_flush_dcache_pte(old_pte);
+> > +		kvm_set_pte(pte, __pte(0));
+> > +		kvm_tlb_flush_vmid_ipa(kvm, addr);
+> > 
+> > -			put_page(virt_to_page(pte));
+> > -		}
+> > +		/* No need to invalidate the cache for device mappings */
+> > +		if ((pte_val(old_pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE &&
+> > +		    (pte_val(old_pte) & PAGE_HYP_DEVICE) != PAGE_HYP_DEVICE)
+> > +			kvm_flush_dcache_pte(old_pte);
+> > +
+> > +		put_page(virt_to_page(pte));
+> >  	} while (pte++, addr += PAGE_SIZE, addr != end);
+> > 
+> >  	if (kvm_pte_table_empty(kvm, start_pte))
+> > --
+> 
+>  I see you inverted pte_none() check, and now kbuild bot complains about
+> "mixed declarations and code".
+> 
+Yeah, that can be easily fixed though.  I just did it quickly to
+illustrate my point.  I'll fix that up if we can agree on the
+PAGE_HYP_DEVICE and PAGE_S2_DEVICE stuff above.
+
 -Christoffer
