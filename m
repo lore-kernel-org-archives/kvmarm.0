@@ -1,22 +1,25 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
 Subject: Re: [PATCH] ARM/arm64: KVM: test properly for a PTE's uncachedness
-Date: Mon, 9 Nov 2015 08:17:09 +0000
-Message-ID: <20151109081709.2512e683@why.wild-wind.fr.eu.org>
+Date: Mon, 9 Nov 2015 17:21:59 +0100
+Message-ID: <20151109162159.GA12968@cbox>
 References: <1446810188-13727-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7CA88412E6
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Nov 2015 03:11:49 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2614B41294
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Nov 2015 11:21:59 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6Wshv10yoHZU for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 Nov 2015 03:11:48 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 551EC41145
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Nov 2015 03:11:48 -0500 (EST)
+ with ESMTP id 6NTaZ65PTLqJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 Nov 2015 11:21:57 -0500 (EST)
+Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B79EB41278
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 Nov 2015 11:21:57 -0500 (EST)
+Received: by wmnn186 with SMTP id n186so113104274wmn.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 09 Nov 2015 08:21:59 -0800 (PST)
+Content-Disposition: inline
 In-Reply-To: <1446810188-13727-1-git-send-email-ard.biesheuvel@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -28,12 +31,10 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 6 Nov 2015 12:43:08 +0100
-Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-
+On Fri, Nov 06, 2015 at 12:43:08PM +0100, Ard Biesheuvel wrote:
 > The open coded tests for checking whether a PTE maps a page as
 > uncached use a flawed 'pte_val(xxx) & CONST != CONST' pattern,
 > which is not guaranteed to work since the type of a mapping is an
@@ -53,11 +54,91 @@ Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
 > known to define uncached memory attributes.
 > 
 > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  arch/arm/include/asm/kvm_mmu.h   | 11 +++++++++++
+>  arch/arm/kvm/mmu.c               |  5 ++---
+>  arch/arm64/include/asm/kvm_mmu.h | 12 ++++++++++++
+>  3 files changed, 25 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> index 405aa1883307..422973835d41 100644
+> --- a/arch/arm/include/asm/kvm_mmu.h
+> +++ b/arch/arm/include/asm/kvm_mmu.h
+> @@ -279,6 +279,17 @@ static inline void __kvm_extend_hypmap(pgd_t *boot_hyp_pgd,
+>  				       pgd_t *merged_hyp_pgd,
+>  				       unsigned long hyp_idmap_start) { }
+>  
+> +static inline bool __kvm_pte_is_uncached(pte_t pte)
+> +{
+> +	switch (pte_val(pte) & L_PTE_MT_MASK) {
+> +	case L_PTE_MT_UNCACHED:
+> +	case L_PTE_MT_BUFFERABLE:
+> +	case L_PTE_MT_DEV_SHARED:
+> +		return true;
+> +	}
 
-Very well spotted, thanks Ard!
+so PTEs created by setting PAGE_S2_DEVICE will end up hitting in one of
+these because L_PTE_S2_MT_DEV_SHARED is the same as L_PTE_MT_BUFFERABLE
+for stage-2 mappings and PAGE_HYP_DEVICE end up using
+L_PTE_MT_DEV_SHARED.
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Totally obvious.
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+> +	return false;
+> +}
+> +
+>  #endif	/* !__ASSEMBLY__ */
+>  
+>  #endif /* __ARM_KVM_MMU_H__ */
+> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+> index 6984342da13d..eb9a06e3dbee 100644
+> --- a/arch/arm/kvm/mmu.c
+> +++ b/arch/arm/kvm/mmu.c
+> @@ -213,7 +213,7 @@ static void unmap_ptes(struct kvm *kvm, pmd_t *pmd,
+>  			kvm_tlb_flush_vmid_ipa(kvm, addr);
+>  
+>  			/* No need to invalidate the cache for device mappings */
+> -			if ((pte_val(old_pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
+> +			if (!__kvm_pte_is_uncached(old_pte))
+>  				kvm_flush_dcache_pte(old_pte);
+>  
+>  			put_page(virt_to_page(pte));
+> @@ -305,8 +305,7 @@ static void stage2_flush_ptes(struct kvm *kvm, pmd_t *pmd,
+>  
+>  	pte = pte_offset_kernel(pmd, addr);
+>  	do {
+> -		if (!pte_none(*pte) &&
+> -		    (pte_val(*pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
+> +		if (!pte_none(*pte) && !__kvm_pte_is_uncached(*pte))
+>  			kvm_flush_dcache_pte(*pte);
+>  	} while (pte++, addr += PAGE_SIZE, addr != end);
+>  }
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 61505676d085..5806f412a47a 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -302,5 +302,17 @@ static inline void __kvm_extend_hypmap(pgd_t *boot_hyp_pgd,
+>  	merged_hyp_pgd[idmap_idx] = __pgd(__pa(boot_hyp_pgd) | PMD_TYPE_TABLE);
+>  }
+>  
+> +static inline bool __kvm_pte_is_uncached(pte_t pte)
+> +{
+> +	switch (pte_val(pte) & PTE_ATTRINDX_MASK) {
+> +	case PTE_ATTRINDX(MT_DEVICE_nGnRnE):
+> +	case PTE_ATTRINDX(MT_DEVICE_nGnRE):
+> +	case PTE_ATTRINDX(MT_DEVICE_GRE):
+> +	case PTE_ATTRINDX(MT_NORMAL_NC):
+> +		return true;
+> +	}
+> +	return false;
+> +}
+> +
+>  #endif /* __ASSEMBLY__ */
+>  #endif /* __ARM64_KVM_MMU_H__ */
+> -- 
+> 1.9.1
+> 
+
+Thanks for this patch, I'll queue it.
+
+-Christoffer
