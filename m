@@ -1,62 +1,139 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH] kvmtool: Makefile: remove LDFLAGS from guest_init linking
-Date: Sun,  8 Nov 2015 17:35:19 +0000
-Message-ID: <1447004119-31873-1-git-send-email-andre.przywara@arm.com>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH] ARM/arm64: KVM: test properly for a PTE's uncachedness
+Date: Mon, 09 Nov 2015 10:24:08 +0300
+Message-ID: <017101d11abf$9feb9ff0$dfc2dfd0$@samsung.com>
+References: <1446810188-13727-1-git-send-email-ard.biesheuvel@linaro.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <1446810188-13727-1-git-send-email-ard.biesheuvel@linaro.org>
+Content-language: ru
 Sender: kvm-owner@vger.kernel.org
-To: will.deacon@arm.com, Riku Voipio <riku.voipio@linaro.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: 'Ard Biesheuvel' <ard.biesheuvel@linaro.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org
+Cc: kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Looking back at the HEAD from a few commits ago, it's obvious that
-using the LDFLAGS variable for linking the guest_init binary was
-rather pointless, as it was zeroed in the beginning and then never
-set.
+ Hello!
 
-As guest_init is a rather special binary that does not cope well with
-arbitrary linker flags, let's reinstantiate the previous state by
-removing the LDFLAGS variable from those linking steps. This allows
-LDFLAGS to be used for linking the actual kvmtool binary only and
-helps to re-merge commit d0e2772b93a ("Makefile: allow overriding
-CFLAGS on the command line").
+ I have tested this patch, it also fixes the crash on Exynos5410, and is indeed a better approach.
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
-Hi,
+Tested-by: Pavel Fedin <p.fedin@samsung.com>
 
-Riku: can you confirm that this patch together with the one that was
-reverted (d0e2772b93a) still works in your environment?
+CC'ed general KVM mailing list too.
 
-Will, if that works for Riku and you acknowledge this patch, can you
-also re-merge the reverted patch mentioned above? Turns out that the
-revert also made my other patch useless ;-)
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
 
-Cheers,
-Andre.
 
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 9138942..8095d59 100644
---- a/Makefile
-+++ b/Makefile
-@@ -385,13 +385,13 @@ ifneq ($(ARCH_PRE_INIT),)
- $(GUEST_PRE_INIT): $(ARCH_PRE_INIT)
- 	$(E) "  LINK    " $@
- 	$(Q) $(CC) -s -nostdlib $(ARCH_PRE_INIT) -o $@
--	$(Q) $(LD) $(LDFLAGS) -r -b binary -o guest/guest_pre_init.o $(GUEST_PRE_INIT)
-+	$(Q) $(LD) -r -b binary -o guest/guest_pre_init.o $(GUEST_PRE_INIT)
- endif
- 
- $(GUEST_INIT): guest/init.c
- 	$(E) "  LINK    " $@
- 	$(Q) $(CC) $(GUEST_INIT_FLAGS) guest/init.c -o $@
--	$(Q) $(LD) $(LDFLAGS) -r -b binary -o guest/guest_init.o $(GUEST_INIT)
-+	$(Q) $(LD) -r -b binary -o guest/guest_init.o $(GUEST_INIT)
- 
- %.s: %.c
- 	$(Q) $(CC) -o $@ -S $(CFLAGS) -fverbose-asm $<
--- 
-1.8.4
+> -----Original Message-----
+> From: kvmarm-bounces@lists.cs.columbia.edu [mailto:kvmarm-bounces@lists.cs.columbia.edu] On
+> Behalf Of Ard Biesheuvel
+> Sent: Friday, November 06, 2015 2:43 PM
+> To: linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu; marc.zyngier@arm.com;
+> christoffer.dall@linaro.org
+> Cc: Ard Biesheuvel
+> Subject: [PATCH] ARM/arm64: KVM: test properly for a PTE's uncachedness
+> 
+> The open coded tests for checking whether a PTE maps a page as
+> uncached use a flawed 'pte_val(xxx) & CONST != CONST' pattern,
+> which is not guaranteed to work since the type of a mapping is an
+> index into the MAIR table, not a set of mutually exclusive bits.
+> 
+> Considering that, on arm64, the S2 type definitions use the following
+> MAIR indexes
+> 
+>     #define MT_S2_NORMAL            0xf
+>     #define MT_S2_DEVICE_nGnRE      0x1
+> 
+> we have been getting lucky merely because the S2 device mappings also
+> have the PTE_UXN bit set, which means that a device PTE still does not
+> equal a normal PTE after masking with the former type.
+> 
+> Instead, implement proper checking against the MAIR indexes that are
+> known to define uncached memory attributes.
+> 
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  arch/arm/include/asm/kvm_mmu.h   | 11 +++++++++++
+>  arch/arm/kvm/mmu.c               |  5 ++---
+>  arch/arm64/include/asm/kvm_mmu.h | 12 ++++++++++++
+>  3 files changed, 25 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> index 405aa1883307..422973835d41 100644
+> --- a/arch/arm/include/asm/kvm_mmu.h
+> +++ b/arch/arm/include/asm/kvm_mmu.h
+> @@ -279,6 +279,17 @@ static inline void __kvm_extend_hypmap(pgd_t *boot_hyp_pgd,
+>  				       pgd_t *merged_hyp_pgd,
+>  				       unsigned long hyp_idmap_start) { }
+> 
+> +static inline bool __kvm_pte_is_uncached(pte_t pte)
+> +{
+> +	switch (pte_val(pte) & L_PTE_MT_MASK) {
+> +	case L_PTE_MT_UNCACHED:
+> +	case L_PTE_MT_BUFFERABLE:
+> +	case L_PTE_MT_DEV_SHARED:
+> +		return true;
+> +	}
+> +	return false;
+> +}
+> +
+>  #endif	/* !__ASSEMBLY__ */
+> 
+>  #endif /* __ARM_KVM_MMU_H__ */
+> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+> index 6984342da13d..eb9a06e3dbee 100644
+> --- a/arch/arm/kvm/mmu.c
+> +++ b/arch/arm/kvm/mmu.c
+> @@ -213,7 +213,7 @@ static void unmap_ptes(struct kvm *kvm, pmd_t *pmd,
+>  			kvm_tlb_flush_vmid_ipa(kvm, addr);
+> 
+>  			/* No need to invalidate the cache for device mappings */
+> -			if ((pte_val(old_pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
+> +			if (!__kvm_pte_is_uncached(old_pte))
+>  				kvm_flush_dcache_pte(old_pte);
+> 
+>  			put_page(virt_to_page(pte));
+> @@ -305,8 +305,7 @@ static void stage2_flush_ptes(struct kvm *kvm, pmd_t *pmd,
+> 
+>  	pte = pte_offset_kernel(pmd, addr);
+>  	do {
+> -		if (!pte_none(*pte) &&
+> -		    (pte_val(*pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
+> +		if (!pte_none(*pte) && !__kvm_pte_is_uncached(*pte))
+>  			kvm_flush_dcache_pte(*pte);
+>  	} while (pte++, addr += PAGE_SIZE, addr != end);
+>  }
+> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+> index 61505676d085..5806f412a47a 100644
+> --- a/arch/arm64/include/asm/kvm_mmu.h
+> +++ b/arch/arm64/include/asm/kvm_mmu.h
+> @@ -302,5 +302,17 @@ static inline void __kvm_extend_hypmap(pgd_t *boot_hyp_pgd,
+>  	merged_hyp_pgd[idmap_idx] = __pgd(__pa(boot_hyp_pgd) | PMD_TYPE_TABLE);
+>  }
+> 
+> +static inline bool __kvm_pte_is_uncached(pte_t pte)
+> +{
+> +	switch (pte_val(pte) & PTE_ATTRINDX_MASK) {
+> +	case PTE_ATTRINDX(MT_DEVICE_nGnRnE):
+> +	case PTE_ATTRINDX(MT_DEVICE_nGnRE):
+> +	case PTE_ATTRINDX(MT_DEVICE_GRE):
+> +	case PTE_ATTRINDX(MT_NORMAL_NC):
+> +		return true;
+> +	}
+> +	return false;
+> +}
+> +
+>  #endif /* __ASSEMBLY__ */
+>  #endif /* __ARM64_KVM_MMU_H__ */
+> --
+> 1.9.1
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
 
