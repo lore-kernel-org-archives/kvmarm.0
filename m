@@ -1,192 +1,145 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 3/3] KVM/arm64: enable enhanced armv8 fp/simd lazy switch
-Date: Tue, 10 Nov 2015 12:18:22 +0100
-Message-ID: <20151110111822.GC12968@cbox>
-References: <1446242193-8424-1-git-send-email-m.smarduch@samsung.com>
- <1446242193-8424-4-git-send-email-m.smarduch@samsung.com>
- <20151105150255.GD5819@cbox> <5641288B.90105@samsung.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v2] ARM/arm64: KVM: test properly for a PTE's uncachedness
+Date: Tue, 10 Nov 2015 14:15:45 +0100
+Message-ID: <CAKv+Gu_q0inrFoMNeQdF-f_msLEsyb_Fux0d4tQYmMb6Fgttrw@mail.gmail.com>
+References: <CAKv+Gu_agkv7aDqj7fgdoWU+9k=eJ-0YU7WrDKm1_wtr_xYQ6g@mail.gmail.com>
+	<1447148737-15363-1-git-send-email-ard.biesheuvel@linaro.org>
+	<20151110122203.GD12968@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E9AE497BE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2015 06:18:18 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 56vPTFYULW8I for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 Nov 2015 06:18:17 -0500 (EST)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 357E549630
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2015 06:18:16 -0500 (EST)
-Received: by wmvv187 with SMTP id v187so2511072wmv.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 Nov 2015 03:18:21 -0800 (PST)
-Content-Disposition: inline
-In-Reply-To: <5641288B.90105@samsung.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mario Smarduch <m.smarduch@samsung.com>
-Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20151110122203.GD12968@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, KVM devel mailing list <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, p.fedin@samsung.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Nov 09, 2015 at 03:13:15PM -0800, Mario Smarduch wrote:
-> 
-> 
-> On 11/5/2015 7:02 AM, Christoffer Dall wrote:
-> > On Fri, Oct 30, 2015 at 02:56:33PM -0700, Mario Smarduch wrote:
-> >> This patch enables arm64 lazy fp/simd switch, similar to arm described in
-> >> second patch. Change from previous version - restore function is moved to
-> >> host. 
-> >>
-> >> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
-> >> ---
-> >>  arch/arm64/include/asm/kvm_host.h |  2 +-
-> >>  arch/arm64/kernel/asm-offsets.c   |  1 +
-> >>  arch/arm64/kvm/hyp.S              | 37 +++++++++++++++++++++++++++++++------
-> >>  3 files changed, 33 insertions(+), 7 deletions(-)
-> >>
-> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> >> index 26a2347..dcecf92 100644
-> >> --- a/arch/arm64/include/asm/kvm_host.h
-> >> +++ b/arch/arm64/include/asm/kvm_host.h
-> >> @@ -251,11 +251,11 @@ static inline void kvm_arch_hardware_unsetup(void) {}
-> >>  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
-> >>  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
-> >>  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
-> >> -static inline void kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu) {}
-> >>  
-> >>  void kvm_arm_init_debug(void);
-> >>  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
-> >>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
-> >>  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
-> >> +void kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu);
-> >>  
-> >>  #endif /* __ARM64_KVM_HOST_H__ */
-> >> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-> >> index 8d89cf8..c9c5242 100644
-> >> --- a/arch/arm64/kernel/asm-offsets.c
-> >> +++ b/arch/arm64/kernel/asm-offsets.c
-> >> @@ -124,6 +124,7 @@ int main(void)
-> >>    DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
-> >>    DEFINE(VCPU_MDCR_EL2,	offsetof(struct kvm_vcpu, arch.mdcr_el2));
-> >>    DEFINE(VCPU_IRQ_LINES,	offsetof(struct kvm_vcpu, arch.irq_lines));
-> >> +  DEFINE(VCPU_VFP_DIRTY,	offsetof(struct kvm_vcpu, arch.vfp_dirty));
-> >>    DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
-> >>    DEFINE(VCPU_HOST_DEBUG_STATE, offsetof(struct kvm_vcpu, arch.host_debug_state));
-> >>    DEFINE(VCPU_TIMER_CNTV_CTL,	offsetof(struct kvm_vcpu, arch.timer_cpu.cntv_ctl));
-> >> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-> >> index e583613..ed2c4cf 100644
-> >> --- a/arch/arm64/kvm/hyp.S
-> >> +++ b/arch/arm64/kvm/hyp.S
-> >> @@ -36,6 +36,28 @@
-> >>  #define CPU_SYSREG_OFFSET(x)	(CPU_SYSREGS + 8*x)
-> >>  
-> >>  	.text
-> >> +
-> >> +/**
-> >> + * void kvm_restore_host_vfp_state(struct vcpu *vcpu) - Executes lazy
-> >> + *	fp/simd switch, saves the guest, restores host. Called from host
-> >> + *	mode, placed outside of hyp section.
-> > 
-> > same comments on style as previous patch
-> > 
-> >> + */
-> >> +ENTRY(kvm_restore_host_vfp_state)
-> >> +	push    xzr, lr
-> >> +
-> >> +	add     x2, x0, #VCPU_CONTEXT
-> >> +	mov     w3, #0
-> >> +	strb    w3, [x0, #VCPU_VFP_DIRTY]
-> > 
-> > I've been discussing with myself if it would make more sense to clear
-> > the dirty flag in the C-code...
-> > 
-> >> +
-> >> +	bl __save_fpsimd
-> >> +
-> >> +	ldr     x2, [x0, #VCPU_HOST_CONTEXT]
-> >> +	bl __restore_fpsimd
-> >> +
-> >> +	pop     xzr, lr
-> >> +	ret
-> >> +ENDPROC(kvm_restore_host_vfp_state)
-> >> +
-> >>  	.pushsection	.hyp.text, "ax"
-> >>  	.align	PAGE_SHIFT
-> >>  
-> >> @@ -482,7 +504,11 @@
-> >>  99:
-> >>  	msr     hcr_el2, x2
-> >>  	mov	x2, #CPTR_EL2_TTA
-> >> +
-> >> +	ldrb	w3, [x0, #VCPU_VFP_DIRTY]
-> >> +	tbnz    w3, #0, 98f
-> >>  	orr     x2, x2, #CPTR_EL2_TFP
-> >> +98:
-> > 
-> > mmm, don't you need to only set the fpexc32 when you're actually going
-> > to trap the guest accesses?
-> > 
-> > also, you can consider only setting this in vcpu_load (jumping quickly
-> > to EL2 to do so) if we're running a 32-bit guest.  Probably worth
-> > measuring the difference between the extra EL2 jump on vcpu_load
-> > compared to hitting this register on every entry/exit.
-> > 
-> > Code-wise, it will be nicer to do it on vcpu_load.
-> Hi Christoffer, Marc -
->   just want to run this by you, I ran a test with typical number of
-> fp threads and couple lmbench benchmarks  the stride and bandwidth ones. The
-> ratio of exits to vcpu puts is high 50:1 or so. But of course that's subject
-> to the loads you run.
-> 
-> I substituted:
-> tbnz x2, #HCR_RW_SHIFT, 99f
-> mov x3, #(1 << 30)
-> msr fpexc32_el2, x3
-> isb
-> 
-> with vcpu_load hyp call and check for 32 bit guest in C
-> mov x1, #(1 << 30)
-> msr fpexc32_el2, x3
-> ret
-> 
-> And then
-> skip_fpsimd_state x8, 2f
-> mrs	x6, fpexec_el2
-> str	x6, [x3, #16]
-> 
-> with vcpu_put hyp call with check for 32 bit guest in C this is called
-> substantially less often then vcpu_load since fp/simd registers are not
-> always dirty on vcpu_put
-> 
-> kern_hyp_va x0
-> add x2, x0, #VCPU_CONTEXT
-> mrs x1, fpexec32_el2
-> str x1, [x2, #CPU_SYSREG_OFFSET(FPEXC32_EL2)]
-> ret
-> 
-> Of course each hyp call has additional overhead, at a high exit to
-> vcpu_put ratio hyp call appears better. But all this is very
-> highly dependent on exit rate and fp/simd usage. IMO hyp call
-> works better under extreme loads should be pretty close
-> for general loads.
-> 
-> Any thoughts?
-> 
-I think the typical case will be lots of exits and few
-vcpu_load/vcpu_put, and I think it's reasonable to write the code that
-way.
+On 10 November 2015 at 13:22, Christoffer Dall
+<christoffer.dall@linaro.org> wrote:
+> On Tue, Nov 10, 2015 at 10:45:37AM +0100, Ard Biesheuvel wrote:
+>> Hi all,
+>>
+>> I wonder if this is a better way to address the problem. It looks at
+>> the nature of the memory rather than the nature of the mapping, which
+>> is probably a more reliable indicator of whether cache maintenance is
+>> required when performing the unmap.
+>>
+>>
+>> -----------8<----------------
+>> The open coded tests for checking whether a PTE maps a page as
+>> uncached use a flawed 'pte_val(xxx) & CONST != CONST' pattern,
+>> which is not guaranteed to work since the type of a mapping is
+>> not a set of mutually exclusive bits
+>>
+>> For HYP mappings, the type is an index into the MAIR table (i.e, the
+>> index itself does not contain any information whatsoever about the
+>> type of the mapping), and for stage-2 mappings it is a bit field where
+>> normal memory and device types are defined as follows:
+>>
+>>     #define MT_S2_NORMAL            0xf
+>>     #define MT_S2_DEVICE_nGnRE      0x1
+>>
+>> I.e., masking *and* comparing with the latter matches on the former,
+>> and we have been getting lucky merely because the S2 device mappings
+>> also have the PTE_UXN bit set, or we would misidentify memory mappings
+>> as device mappings.
+>>
+>> Since the unmap_range() code path (which contains one instance of the
+>> flawed test) is used both for HYP mappings and stage-2 mappings, and
+>> considering the difference between the two, it is non-trivial to fix
+>> this by rewriting the tests in place, as it would involve passing
+>> down the type of mapping through all the functions.
+>>
+>> However, since HYP mappings and stage-2 mappings both deal with host
+>> physical addresses, we can simply check whether the mapping is backed
+>> by memory that is managed by the host kernel, and only perform the
+>> D-cache maintenance if this is the case.
+>>
+>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>> ---
+>>  arch/arm/kvm/mmu.c | 15 +++++++--------
+>>  1 file changed, 7 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+>> index 6984342da13d..7dace909d5cf 100644
+>> --- a/arch/arm/kvm/mmu.c
+>> +++ b/arch/arm/kvm/mmu.c
+>> @@ -98,6 +98,11 @@ static void kvm_flush_dcache_pud(pud_t pud)
+>>       __kvm_flush_dcache_pud(pud);
+>>  }
+>>
+>> +static bool kvm_is_device_pfn(unsigned long pfn)
+>> +{
+>> +     return !pfn_valid(pfn);
+>> +}
+>> +
+>>  /**
+>>   * stage2_dissolve_pmd() - clear and flush huge PMD entry
+>>   * @kvm:     pointer to kvm structure.
+>> @@ -213,7 +218,7 @@ static void unmap_ptes(struct kvm *kvm, pmd_t *pmd,
+>>                       kvm_tlb_flush_vmid_ipa(kvm, addr);
+>>
+>>                       /* No need to invalidate the cache for device mappings */
+>> -                     if ((pte_val(old_pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
+>> +                     if (!kvm_is_device_pfn(__phys_to_pfn(addr)))
+>>                               kvm_flush_dcache_pte(old_pte);
+>>
+>>                       put_page(virt_to_page(pte));
+>> @@ -305,8 +310,7 @@ static void stage2_flush_ptes(struct kvm *kvm, pmd_t *pmd,
+>>
+>>       pte = pte_offset_kernel(pmd, addr);
+>>       do {
+>> -             if (!pte_none(*pte) &&
+>> -                 (pte_val(*pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
+>> +             if (!pte_none(*pte) && !kvm_is_device_pfn(__phys_to_pfn(addr)))
+>>                       kvm_flush_dcache_pte(*pte);
+>>       } while (pte++, addr += PAGE_SIZE, addr != end);
+>>  }
+>> @@ -1037,11 +1041,6 @@ static bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+>>       return kvm_vcpu_dabt_iswrite(vcpu);
+>>  }
+>>
+>> -static bool kvm_is_device_pfn(unsigned long pfn)
+>> -{
+>> -     return !pfn_valid(pfn);
+>> -}
+>> -
+>>  /**
+>>   * stage2_wp_ptes - write protect PMD range
+>>   * @pmd:     pointer to pmd entry
+>> --
+>> 1.9.1
+>>
+>
+> So PAGE_HYP_DEVICE is used only to map the vgic-v2 regions and
+> PAGE_S2_DEVICE is used to map the vgic VCPU interface and for all memory
+> regions where the vma has (vm_flags & VM_PFNMAP).
+>
+> Will these, and only these, cases be covered by the pfn_valid check?
+>
 
-That should also be much better for VHE.
+The pfn_valid() check will ensure that cache maintenance is only
+performed on regions that are known to the host as memory, are managed
+by the host (i.e., there is a struct page associated with them) and
+will be accessed by the host via cacheable mappings (they are covered
+by the linear mapping, or [on ARM] will be kmap'ed cacheable if they
+are highmem). If you look at the commit that introduced these tests
+(363ef89f8e9b arm/arm64: KVM: Invalidate data cache on unmap), the
+concern it addresses is that the guest may perform uncached accesses
+to regions that the host has mapped cacheable, meaning guest writes
+may be shadowed by clean cachelines, making them invisble to cache
+coherent I/O. So afaict, pfn_valid() is an appropriate check here.
 
-So I would go that direction.
+pfn_valid() will not misidentify device regions as memory (unless the
+host is really broken) so this should fix Pavel's case. The converse
+case (a memory region misidentified as a device) could only happen for
+a carve-out (i.e., via the /reserved-memory node) that is mapped
+inside the guest via a pass-through (VM_PFNMAP) mapping. That case is
+already dodgy, since the guest accesses would be forced
+uncached/ordered due to the fact that those mappings are forced
+PAGE_S2_DEVICE at stage 2 (as you mention), and would also be
+misidentified by the current code (due to the PAGE_S2_DEVICE
+attributes)
 
-Thanks,
--Christoffer
+-- 
+Ard.
