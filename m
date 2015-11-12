@@ -1,109 +1,64 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v9 5/6] target-arm: kvm - re-inject guest debug exceptions
-Date: Thu, 12 Nov 2015 16:20:50 +0000
-Message-ID: <1447345251-22625-6-git-send-email-alex.bennee@linaro.org>
-References: <1447345251-22625-1-git-send-email-alex.bennee@linaro.org>
+Subject: [PATCH v9 0/6] QEMU support for KVM Guest Debug on arm64
+Date: Thu, 12 Nov 2015 16:20:45 +0000
+Message-ID: <1447345251-22625-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E4A404989A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Nov 2015 11:21:11 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id t1wQd5K4FGI6 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 12 Nov 2015 11:21:06 -0500 (EST)
-Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 84FC949790
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Nov 2015 11:21:04 -0500 (EST)
-Received: by wmww144 with SMTP id w144so207576423wmw.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 12 Nov 2015 08:21:17 -0800 (PST)
-In-Reply-To: <1447345251-22625-1-git-send-email-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, christoffer.dall@linaro.org, zhichao.huang@linaro.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex@bennee.com>, kvm@vger.kernel.org, marc.zyngier@arm.com, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-RnJvbTogQWxleCBCZW5uw6llIDxhbGV4QGJlbm5lZS5jb20+CgpJZiB3ZSBjYW4ndCBmaW5kIGRl
-dGFpbHMgZm9yIHRoZSBkZWJ1ZyBleGNlcHRpb24gaW4gb3VyIGRlYnVnIHN0YXRlCnRoZW4gd2Ug
-Y2FuIGFzc3VtZSB0aGUgZXhjZXB0aW9uIGlzIGR1ZSB0byBkZWJ1Z2dpbmcgaW5zaWRlIHRoZSBn
-dWVzdC4KVG8gaW5qZWN0IHRoZSBleGNlcHRpb24gaW50byB0aGUgZ3Vlc3Qgc3RhdGUgd2UgcmUt
-dXNlIHRoZSBUQ0cgZXhjZXB0aW9uCmNvZGUgKGRvX2ludGVydXB0KS4KCkhvd2V2ZXIgd2hpbGUg
-Z3Vlc3QgZGVidWdnaW5nIGlzIGluIGVmZmVjdCB3ZSBjdXJyZW50bHkgY2FuJ3QgaGFuZGxlIHRo
-ZQpndWVzdCB1c2luZyBzaW5nbGUgc3RlcCB3aGljaCBpcyBoZWF2aWx5IHVzZWQgYnkgR0RCLgoK
-U2lnbmVkLW9mZi1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgoKLS0t
-CnY1OgogIC0gbmV3IGZvciB2NQotLS0KIHRhcmdldC1hcm0vaGVscGVyLWE2NC5jIHwgMTIgKysr
-KysrKysrKy0tCiB0YXJnZXQtYXJtL2t2bS5jICAgICAgICB8IDI3ICsrKysrKysrKysrKysrKysr
-KystLS0tLS0tLQogMiBmaWxlcyBjaGFuZ2VkLCAyOSBpbnNlcnRpb25zKCspLCAxMCBkZWxldGlv
-bnMoLSkKCmRpZmYgLS1naXQgYS90YXJnZXQtYXJtL2hlbHBlci1hNjQuYyBiL3RhcmdldC1hcm0v
-aGVscGVyLWE2NC5jCmluZGV4IGRlYjhkYmUuLmZjM2NjZGYgMTAwNjQ0Ci0tLSBhL3RhcmdldC1h
-cm0vaGVscGVyLWE2NC5jCisrKyBiL3RhcmdldC1hcm0vaGVscGVyLWE2NC5jCkBAIC0yNSw2ICsy
-NSw3IEBACiAjaW5jbHVkZSAicWVtdS9iaXRvcHMuaCIKICNpbmNsdWRlICJpbnRlcm5hbHMuaCIK
-ICNpbmNsdWRlICJxZW11L2NyYzMyYy5oIgorI2luY2x1ZGUgInN5c2VtdS9rdm0uaCIKICNpbmNs
-dWRlIDx6bGliLmg+IC8qIEZvciBjcmMzMiAqLwogCiAvKiBDMi40LjcgTXVsdGlwbHkgYW5kIGRp
-dmlkZSAqLwpAQCAtNDY5LDcgKzQ3MCw4IEBAIHZvaWQgYWFyY2g2NF9jcHVfZG9faW50ZXJydXB0
-KENQVVN0YXRlICpjcykKICAgICAgICAgICAgICAgICAgIG5ld19lbCk7CiAgICAgaWYgKHFlbXVf
-bG9nbGV2ZWxfbWFzayhDUFVfTE9HX0lOVCkKICAgICAgICAgJiYgIWV4Y3BfaXNfaW50ZXJuYWwo
-Y3MtPmV4Y2VwdGlvbl9pbmRleCkpIHsKLSAgICAgICAgcWVtdV9sb2dfbWFzayhDUFVfTE9HX0lO
-VCwgIi4uLndpdGggRVNSIDB4JSIgUFJJeDMyICJcbiIsCisgICAgICAgIHFlbXVfbG9nX21hc2so
-Q1BVX0xPR19JTlQsICIuLi53aXRoIEVTUiAleC8weCUiIFBSSXgzMiAiXG4iLAorICAgICAgICAg
-ICAgICAgICAgICAgIGVudi0+ZXhjZXB0aW9uLnN5bmRyb21lID4+IEFSTV9FTF9FQ19TSElGVCwK
-ICAgICAgICAgICAgICAgICAgICAgICBlbnYtPmV4Y2VwdGlvbi5zeW5kcm9tZSk7CiAgICAgfQog
-CkBAIC01MzUsNiArNTM3LDEyIEBAIHZvaWQgYWFyY2g2NF9jcHVfZG9faW50ZXJydXB0KENQVVN0
-YXRlICpjcykKICAgICBhYXJjaDY0X3Jlc3RvcmVfc3AoZW52LCBuZXdfZWwpOwogCiAgICAgZW52
-LT5wYyA9IGFkZHI7Ci0gICAgY3MtPmludGVycnVwdF9yZXF1ZXN0IHw9IENQVV9JTlRFUlJVUFRf
-RVhJVFRCOworCisgICAgcWVtdV9sb2dfbWFzayhDUFVfTE9HX0lOVCwgIi4uLnRvIEVMJWQgUEMg
-MHglIiBQUkl4NjQgIiBQU1RBVEUgMHgleFxuIiwKKyAgICAgICAgICAgICAgICAgIG5ld19lbCwg
-ZW52LT5wYywgcHN0YXRlX3JlYWQoZW52KSk7CisKKyAgICBpZiAoIWt2bV9lbmFibGVkKCkpIHsK
-KyAgICAgICAgY3MtPmludGVycnVwdF9yZXF1ZXN0IHw9IENQVV9JTlRFUlJVUFRfRVhJVFRCOwor
-ICAgIH0KIH0KICNlbmRpZgpkaWZmIC0tZ2l0IGEvdGFyZ2V0LWFybS9rdm0uYyBiL3RhcmdldC1h
-cm0va3ZtLmMKaW5kZXggMWY1N2U5Mi4uNGFjMTc3YSAxMDA2NDQKLS0tIGEvdGFyZ2V0LWFybS9r
-dm0uYworKysgYi90YXJnZXQtYXJtL2t2bS5jCkBAIC01MjksOSArNTI5LDEwIEBAIHN0YXRpYyBp
-bnQga3ZtX2hhbmRsZV9kZWJ1ZyhDUFVTdGF0ZSAqY3MsIHN0cnVjdCBrdm1fcnVuICpydW4pCiAg
-ICAgc3RydWN0IGt2bV9kZWJ1Z19leGl0X2FyY2ggKmFyY2hfaW5mbyA9ICZydW4tPmRlYnVnLmFy
-Y2g7CiAgICAgaW50IGhzcl9lYyA9IGFyY2hfaW5mby0+aHNyID4+IEFSTV9FTF9FQ19TSElGVDsK
-ICAgICBBUk1DUFUgKmNwdSA9IEFSTV9DUFUoY3MpOworICAgIENQVUNsYXNzICpjYyA9IENQVV9H
-RVRfQ0xBU1MoY3MpOwogICAgIENQVUFSTVN0YXRlICplbnYgPSAmY3B1LT5lbnY7CiAKLSAgICAv
-KiBFbnN1cmUgUEMgaXMgc3luY2hyb25pc2VkICovCisgICAgLyogRW5zdXJlIGFsbCBzdGF0ZSBp
-cyBzeW5jaHJvbmlzZWQgKi8KICAgICBrdm1fY3B1X3N5bmNocm9uaXplX3N0YXRlKGNzKTsKIAog
-ICAgIHN3aXRjaCAoaHNyX2VjKSB7CkBAIC01MzksNyArNTQwLDE0IEBAIHN0YXRpYyBpbnQga3Zt
-X2hhbmRsZV9kZWJ1ZyhDUFVTdGF0ZSAqY3MsIHN0cnVjdCBrdm1fcnVuICpydW4pCiAgICAgICAg
-IGlmIChjcy0+c2luZ2xlc3RlcF9lbmFibGVkKSB7CiAgICAgICAgICAgICByZXR1cm4gdHJ1ZTsK
-ICAgICAgICAgfSBlbHNlIHsKLSAgICAgICAgICAgIGVycm9yX3JlcG9ydCgiQ2FtZSBvdXQgb2Yg
-U0lOR0xFIFNURVAgd2hlbiBub3QgZW5hYmxlZCIpOworICAgICAgICAgICAgLyoKKyAgICAgICAg
-ICAgICAqIFRoZSBrZXJuZWwgc2hvdWxkIGhhdmUgc3VwcmVzc2VkIHRoZSBndWVzdHMgYWJpbGl0
-eSB0bworICAgICAgICAgICAgICogc2luZ2xlIHN0ZXAgYXQgdGhpcyBwb2ludCBzbyBzb21ldGhp
-bmcgaGFzIGdvbmUgd3JvbmcuCisgICAgICAgICAgICAgKi8KKyAgICAgICAgICAgIGVycm9yX3Jl
-cG9ydCgiJXM6IGd1ZXN0IHNpbmdsZS1zdGVwIHdoaWxlIGRlYnVnZ2luZyB1bnN1cHBvcnRlZCIK
-KyAgICAgICAgICAgICAgICAgICAgICAgICAiICglIlBSSXg2NCIsICUiUFJJeDMyIilcbiIsCisg
-ICAgICAgICAgICAgICAgICAgICAgICAgX19mdW5jX18sIGVudi0+cGMsIGFyY2hfaW5mby0+aHNy
-KTsKKyAgICAgICAgICAgIHJldHVybiBmYWxzZTsKICAgICAgICAgfQogICAgICAgICBicmVhazsK
-ICAgICBjYXNlIEVDX0FBNjRfQktQVDoKQEAgLTU2NCwxNCArNTcyLDE3IEBAIHN0YXRpYyBpbnQg
-a3ZtX2hhbmRsZV9kZWJ1ZyhDUFVTdGF0ZSAqY3MsIHN0cnVjdCBrdm1fcnVuICpydW4pCiAgICAg
-ZGVmYXVsdDoKICAgICAgICAgZXJyb3JfcmVwb3J0KCIlczogdW5oYW5kbGVkIGRlYnVnIGV4aXQg
-KCUiUFJJeDMyIiwgJSJQUkl4NjQiKVxuIiwKICAgICAgICAgICAgICAgICAgICAgIF9fZnVuY19f
-LCBhcmNoX2luZm8tPmhzciwgZW52LT5wYyk7CisgICAgICAgIHJldHVybiBmYWxzZTsKICAgICB9
-CiAKLSAgICAvKiBJZiB3ZSBkb24ndCBoYW5kbGUgdGhpcyBpdCBjb3VsZCBiZSBpdCByZWFsbHkg
-aXMgZm9yIHRoZQotICAgICAgIGd1ZXN0IHRvIGhhbmRsZSAqLwotICAgIHFlbXVfbG9nX21hc2so
-TE9HX1VOSU1QLAotICAgICAgICAgICAgICAgICAgIiVzOiByZS1pbmplY3RpbmcgZXhjZXB0aW9u
-IG5vdCB5ZXQgaW1wbGVtZW50ZWQiCi0gICAgICAgICAgICAgICAgICAiICgweCUiUFJJeDMyIiwg
-JSJQUkl4NjQiKVxuIiwKLSAgICAgICAgICAgICAgICAgIF9fZnVuY19fLCBoc3JfZWMsIGVudi0+
-cGMpOworICAgIC8qIElmIHdlIGFyZSBub3QgaGFuZGxpbmcgdGhlIGRlYnVnIGV4Y2VwdGlvbiBp
-dCBtdXN0IGJlbG9uZyB0bworICAgICAqIHRoZSBndWVzdC4gTGV0J3MgcmUtdXNlIHRoZSBleGlz
-dGluZyBUQ0cgaW50ZXJydXB0IGNvZGUgdG8gc2V0CisgICAgICogZXZlcnl0aGluZyB1cCBwcm9w
-ZXJseQorICAgICAqLworICAgIGNzLT5leGNlcHRpb25faW5kZXggPSBFWENQX0JLUFQ7CisgICAg
-ZW52LT5leGNlcHRpb24uc3luZHJvbWUgPSBhcmNoX2luZm8tPmhzcjsKKyAgICBlbnYtPmV4Y2Vw
-dGlvbi52YWRkcmVzcyA9IGFyY2hfaW5mby0+ZmFyOworICAgIGNjLT5kb19pbnRlcnJ1cHQoY3Mp
-OwogCiAgICAgcmV0dXJuIGZhbHNlOwogfQotLSAKMi42LjMKCl9fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxp
-c3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFu
-L2xpc3RpbmZvL2t2bWFybQo=
+Hi,
+
+Here is the latest patch set to support debugging of KVM guests on
+arm64. The main changes since the last post are that the kernel
+patches have now been mainlined. As the recent master has synced up
+headers they are no longer needed for this series.
+
+I've add a GDB Python based test into tests/guest-debug. However I
+haven't plumbed it in to the "make check" machinery as we don't really
+have a good solution for adding binaries for testing (especially in
+TCG cases). This patch can be dropped if wanted and I'll just keep it
+locally.
+
+So in summary the changes are:
+
+  - Kernel ABI now finalised and mainlined
+  - Fixed the handling of watchpoints
+  - Removed manual array fiddling in favour of g_array
+  - Addressed most of Peter Maydell's review comments
+  - The patch series is now checkpatch.pl clean
+
+More detailed changelogs are attached to each patch.
+
+GIT Repo:
+
+The patch series is based off a recent master and can be found at:
+
+https://github.com/stsquad/qemu
+branch: kvm/guest-debug-v9
+
+
+Alex Benn=C3=A9e (6):
+  target-arm: kvm64 - introduce kvm_arm_init_debug()
+  target-arm: kvm - implement software breakpoints
+  target-arm: kvm - support for single step
+  target-arm: kvm - add support for HW assisted debug
+  target-arm: kvm - re-inject guest debug exceptions
+  tests/guest-debug: introduce basic gdbstub tests
+
+ target-arm/helper-a64.c           |  12 +-
+ target-arm/kvm.c                  | 137 +++++++++++---
+ target-arm/kvm64.c                | 366 ++++++++++++++++++++++++++++++=
+++++++++
+ target-arm/kvm_arm.h              |  38 ++++
+ tests/guest-debug/test-gdbstub.py | 171 ++++++++++++++++++
+ 5 files changed, 696 insertions(+), 28 deletions(-)
+ create mode 100644 tests/guest-debug/test-gdbstub.py
+
+--=20
+2.6.3
+
