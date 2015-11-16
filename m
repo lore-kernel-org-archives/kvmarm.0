@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 15/21] arm64: KVM: Add panic handling
-Date: Mon, 16 Nov 2015 13:11:53 +0000
-Message-ID: <1447679519-17888-16-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 11/21] arm64: KVM: Implement the core world switch
+Date: Mon, 16 Nov 2015 13:11:49 +0000
+Message-ID: <1447679519-17888-12-git-send-email-marc.zyngier@arm.com>
 References: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F40B49947
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2015 08:12:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE855498E6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2015 08:12:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 435jYmniY6aa for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Nov 2015 08:12:08 -0500 (EST)
+ with ESMTP id pGPgtwTNjIuI for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Nov 2015 08:12:01 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BEB4498D3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2015 08:12:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BC594969A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2015 08:12:01 -0500 (EST)
 In-Reply-To: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,92 +31,166 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Mark Rutland <marc.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add the panic handler, together with the small bits of assembly
-code to call the kernel's panic implementation.
+Implement the core of the world switch in C. Not everything is there
+yet, and there is nothing to re-enter the world switch either.
+
+But this already outlines the code structure well enough.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/hyp-entry.S | 11 ++++++++++-
- arch/arm64/kvm/hyp/hyp.h       |  1 +
- arch/arm64/kvm/hyp/switch.c    | 35 +++++++++++++++++++++++++++++++++++
- 3 files changed, 46 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/Makefile |   1 +
+ arch/arm64/kvm/hyp/switch.c | 134 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 135 insertions(+)
+ create mode 100644 arch/arm64/kvm/hyp/switch.c
 
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index e11a129..7218eed 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -141,7 +141,16 @@ el1_irq:
- 	mov	x1, #ARM_EXCEPTION_IRQ
- 	b	__guest_exit
- 
--.macro invalid_vector	label, target = __kvm_hyp_panic
-+ENTRY(__hyp_do_panic)
-+	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
-+		      PSR_MODE_EL1h)
-+	msr	spsr_el2, lr
-+	ldr	lr, =panic
-+	msr	elr_el2, lr
-+	eret
-+ENDPROC(__hyp_do_panic)
-+
-+.macro invalid_vector	label, target = __hyp_panic
- 	.align	2
- \label:
- 	b \target
-diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-index 240fb79..d5d500d 100644
---- a/arch/arm64/kvm/hyp/hyp.h
-+++ b/arch/arm64/kvm/hyp/hyp.h
-@@ -74,6 +74,7 @@ void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
- void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
- 
- u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
-+void __noreturn __hyp_do_panic(unsigned long, ...);
- 
- #endif /* __ARM64_KVM_HYP_H__ */
- 
+diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+index 1e1ff06..9c11b0f 100644
+--- a/arch/arm64/kvm/hyp/Makefile
++++ b/arch/arm64/kvm/hyp/Makefile
+@@ -8,3 +8,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += entry.o
++obj-$(CONFIG_KVM_ARM_HOST) += switch.o
 diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 06d3e20..cdc2a96 100644
---- a/arch/arm64/kvm/hyp/switch.c
+new file mode 100644
+index 0000000..a3af81a
+--- /dev/null
 +++ b/arch/arm64/kvm/hyp/switch.c
-@@ -140,3 +140,38 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
- 
- 	return exit_code;
- }
+@@ -0,0 +1,134 @@
++/*
++ * Copyright (C) 2015 - ARM Ltd
++ * Author: Marc Zyngier <marc.zyngier@arm.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+static const char *__hyp_panic_string = "HYP panic:\nPS:%08x PC:%p ESR:%p\nFAR:%p HPFAR:%p PAR:%p\nVCPU:%p\n";
++#include "hyp.h"
 +
-+void __hyp_text __noreturn __hyp_panic(void)
++static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
 +{
-+	u64 spsr = read_sysreg(spsr_el2);
-+	u64 elr = read_sysreg(elr_el2);
-+	u64 par = read_sysreg(par_el1);
++	u64 val;
 +
-+	if (read_sysreg(vttbr_el2)) {
-+		struct kvm_vcpu *vcpu;
-+		struct kvm_cpu_context *host_ctxt;
-+
-+		vcpu = (struct kvm_vcpu *)read_sysreg(tpidr_el2);
-+		host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+		__deactivate_traps(vcpu);
-+		__deactivate_vm(vcpu);
-+		__sysreg_restore_state(host_ctxt);
-+
-+		write_sysreg(host_ctxt->gp_regs.sp_el1, sp_el1);
++	/*
++	 * We are about to set CPTR_EL2.TFP to trap all floating point
++	 * register accesses to EL2, however, the ARM ARM clearly states that
++	 * traps are only taken to EL2 if the operation would not otherwise
++	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
++	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
++	 */
++	val = vcpu->arch.hcr_el2;
++	if (val & HCR_RW) {
++		write_sysreg(1 << 30, fpexc32_el2);
++		isb();
 +	}
++	write_sysreg(val, hcr_el2);
++	write_sysreg(1 << 15, hstr_el2);
++	write_sysreg(CPTR_EL2_TTA | CPTR_EL2_TFP, cptr_el2);
++	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
++}
 +
-+	/* Call panic for real */
-+	while (1) {
-+		unsigned long str_va = (unsigned long)__hyp_panic_string;
++static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
++{
++	write_sysreg(HCR_RW, hcr_el2);
++	write_sysreg(0, hstr_el2);
++	write_sysreg(read_sysreg(mdcr_el2) & MDCR_EL2_HPMN_MASK, mdcr_el2);
++	write_sysreg(0, cptr_el2);
++}
 +
-+		str_va -= HYP_PAGE_OFFSET;
-+		str_va += PAGE_OFFSET;
-+		__hyp_do_panic(str_va,
-+			       spsr,  elr,
-+			       read_sysreg(esr_el2),   read_sysreg(far_el2),
-+			       read_sysreg(hpfar_el2), par,
-+			       read_sysreg(tpidr_el2));
-+	}
++static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
++{
++	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
++	write_sysreg(kvm->arch.vttbr, vttbr_el2);
++}
++
++static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
++{
++	write_sysreg(0, vttbr_el2);
++}
++
++static hyp_alternate_select(__vgic_call_save_state,
++			    __vgic_v2_save_state, __vgic_v3_save_state,
++			    ARM64_HAS_SYSREG_GIC_CPUIF);
++
++static hyp_alternate_select(__vgic_call_restore_state,
++			    __vgic_v2_restore_state, __vgic_v3_restore_state,
++			    ARM64_HAS_SYSREG_GIC_CPUIF);
++
++static void __hyp_text __vgic_save_state(struct kvm_vcpu *vcpu)
++{
++	__vgic_call_save_state()(vcpu);
++	write_sysreg(read_sysreg(hcr_el2) & ~HCR_INT_OVERRIDE, hcr_el2);
++}
++
++static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
++{
++	u64 val;
++
++	val = read_sysreg(hcr_el2);
++	val |= 	HCR_INT_OVERRIDE;
++	val |= vcpu->arch.irq_lines;
++	write_sysreg(val, hcr_el2);
++
++	__vgic_call_restore_state()(vcpu);
++}
++
++int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
++{
++	struct kvm_cpu_context *host_ctxt;
++	struct kvm_cpu_context *guest_ctxt;
++	u64 exit_code;
++
++	vcpu = kern_hyp_va(vcpu);
++	write_sysreg(vcpu, tpidr_el2);
++
++	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
++	guest_ctxt = &vcpu->arch.ctxt;
++
++	__sysreg_save_state(host_ctxt);
++	__debug_cond_save_state(vcpu, &vcpu->arch.host_debug_state, host_ctxt);
++
++	__activate_traps(vcpu);
++	__activate_vm(vcpu);
++
++	__vgic_restore_state(vcpu);
++	__timer_restore_state(vcpu);
++
++	/*
++	 * We must restore the 32-bit state before the sysregs, thanks
++	 * to Cortex-A57 erratum #852523.
++	 */
++	__sysreg32_restore_state(vcpu);
++	__sysreg_restore_state(guest_ctxt);
++	__debug_restore_state(vcpu, &vcpu->arch.vcpu_debug_state, guest_ctxt);
++
++	/* Jump in the fire! */
++	exit_code = __guest_enter(vcpu, host_ctxt);
++	/* And we're baaack! */
++
++	__sysreg_save_state(guest_ctxt);
++	__sysreg32_save_state(vcpu);
++	__timer_save_state(vcpu);
++	__vgic_save_state(vcpu);
++
++	__deactivate_traps(vcpu);
++	__deactivate_vm(vcpu);
++
++	__sysreg_restore_state(host_ctxt);
++
++	__debug_save_state(vcpu, &vcpu->arch.vcpu_debug_state, guest_ctxt);
++	__debug_clear_restore_state(vcpu, &vcpu->arch.host_debug_state, host_ctxt);
++
++	return exit_code;
 +}
 -- 
 2.1.4
