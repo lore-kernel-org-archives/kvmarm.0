@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 09/21] arm64: KVM: Implement guest entry
-Date: Mon, 16 Nov 2015 13:11:47 +0000
-Message-ID: <1447679519-17888-10-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 13/21] arm64: KVM: Implement TLB handling
+Date: Mon, 16 Nov 2015 13:11:51 +0000
+Message-ID: <1447679519-17888-14-git-send-email-marc.zyngier@arm.com>
 References: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4689049899
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2015 08:12:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D1422498D3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2015 08:12:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ku78l9GzSU-3 for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Nov 2015 08:12:00 -0500 (EST)
+ with ESMTP id IqnKddDWKZ8v for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Nov 2015 08:12:07 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AC1134993D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2015 08:11:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 208E34995C
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2015 08:12:05 -0500 (EST)
 In-Reply-To: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,33 +31,31 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Mark Rutland <marc.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Contrary to the previous patch, the guest entry is fairly different
-from its assembly counterpart, mostly because it is only concerned
-with saving/restoring the GP registers, and nothing else.
+Implement the TLB handling as a direct translation of the assembly
+code version.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/Makefile |   1 +
- arch/arm64/kvm/hyp/entry.S  | 155 ++++++++++++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/hyp.h    |   2 +
- 3 files changed, 158 insertions(+)
- create mode 100644 arch/arm64/kvm/hyp/entry.S
+ arch/arm64/kvm/hyp/Makefile |  1 +
+ arch/arm64/kvm/hyp/tlb.c    | 72 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 73 insertions(+)
+ create mode 100644 arch/arm64/kvm/hyp/tlb.c
 
 diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-index ec14cac..1e1ff06 100644
+index 56238d0..1a529f5 100644
 --- a/arch/arm64/kvm/hyp/Makefile
 +++ b/arch/arm64/kvm/hyp/Makefile
-@@ -7,3 +7,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += vgic-v3-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
-+obj-$(CONFIG_KVM_ARM_HOST) += entry.o
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+@@ -10,3 +10,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += entry.o
+ obj-$(CONFIG_KVM_ARM_HOST) += switch.o
+ obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
++obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
+diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
 new file mode 100644
-index 0000000..2c4449a
+index 0000000..d4a07d0
 --- /dev/null
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -0,0 +1,155 @@
++++ b/arch/arm64/kvm/hyp/tlb.c
+@@ -0,0 +1,72 @@
 +/*
 + * Copyright (C) 2015 - ARM Ltd
 + * Author: Marc Zyngier <marc.zyngier@arm.com>
@@ -75,155 +73,60 @@ index 0000000..2c4449a
 + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#include <linux/linkage.h>
++#include "hyp.h"
 +
-+#include <asm/asm-offsets.h>
-+#include <asm/assembler.h>
-+#include <asm/fpsimdmacros.h>
-+#include <asm/kvm.h>
-+#include <asm/kvm_arm.h>
-+#include <asm/kvm_asm.h>
-+#include <asm/kvm_mmu.h>
++void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
++{
++	dsb(ishst);
 +
-+#define CPU_GP_REG_OFFSET(x)	(CPU_GP_REGS + x)
-+#define CPU_XREG_OFFSET(x)	CPU_GP_REG_OFFSET(CPU_USER_PT_REGS + 8*x)
++	/* Switch to requested VMID */
++	kvm = kern_hyp_va(kvm);
++	write_sysreg(kvm->arch.vttbr, vttbr_el2);
++	isb();
 +
-+	.text
-+	.pushsection	.hyp.text, "ax"
++	/*
++	 * We could do so much better if we had the VA as well.
++	 * Instead, we invalidate Stage-2 for this IPA, and the
++	 * whole of Stage-1. Weep...
++	 */
++	ipa >>= 12;
++	asm volatile("tlbi ipas2e1is, %0" : : "r" (ipa));
++	dsb(ish);
++	/*
++	 * We have to ensure completion of the invalidation at Stage-2,
++	 * since a table walk on another CPU could refill a TLB with a
++	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
++	 * the Stage-1 invalidation happened first.
++	 */
++	asm volatile("tlbi vmalle1is" : : );
++	dsb(ish);
++	isb();
 +
-+.macro save_common_regs ctxt
-+	stp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
-+	stp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
-+	stp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
-+	stp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
-+	stp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
-+	stp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
-+.endm
++	write_sysreg(0, vttbr_el2);
++}
 +
-+.macro restore_common_regs ctxt
-+	ldp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
-+	ldp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
-+	ldp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
-+	ldp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
-+	ldp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
-+	ldp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
-+.endm
++void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
++{
++	dsb(ishst);
 +
-+.macro save_host_regs reg
-+	save_common_regs \reg
-+.endm
++	/* Switch to requested VMID */
++	kvm = kern_hyp_va(kvm);
++	write_sysreg(kvm->arch.vttbr, vttbr_el2);
++	isb();
 +
-+.macro restore_host_regs reg
-+	restore_common_regs \reg
-+.endm
++	asm volatile("tlbi vmalls12e1is" : : );
++	dsb(ish);
++	isb();
 +
-+.macro save_guest_regs
-+	// x0 is the vcpu address
-+	// x1 is the return code, do not corrupt!
-+	// x2 is the cpu context
-+	// x3 is a tmp register
-+	// Guest's x0-x3 are on the stack
++	write_sysreg(0, vttbr_el2);
++}
 +
-+	add	x2, x0, #VCPU_CONTEXT
-+
-+	// Compute base to save registers
-+	stp	x4, x5,   [x2, #CPU_XREG_OFFSET(4)]
-+	stp	x6, x7,   [x2, #CPU_XREG_OFFSET(6)]
-+	stp	x8, x9,   [x2, #CPU_XREG_OFFSET(8)]
-+	stp	x10, x11, [x2, #CPU_XREG_OFFSET(10)]
-+	stp	x12, x13, [x2, #CPU_XREG_OFFSET(12)]
-+	stp	x14, x15, [x2, #CPU_XREG_OFFSET(14)]
-+	stp	x16, x17, [x2, #CPU_XREG_OFFSET(16)]
-+	str	x18,      [x2, #CPU_XREG_OFFSET(18)]
-+
-+	pop	x6, x7			// x2, x3
-+	pop	x4, x5			// x0, x1
-+
-+	stp	x4, x5, [x2, #CPU_XREG_OFFSET(0)]
-+	stp	x6, x7, [x2, #CPU_XREG_OFFSET(2)]
-+
-+	save_common_regs x2
-+.endm
-+
-+.macro restore_guest_regs
-+	// Assume vcpu in x0, clobbers everything else
-+
-+	add	x2, x0, #VCPU_CONTEXT
-+
-+	// Prepare x0-x3 for later restore
-+	ldp	x4, x5, [x2, #CPU_XREG_OFFSET(0)]
-+	ldp	x6, x7, [x2, #CPU_XREG_OFFSET(2)]
-+	push	x4, x5		// Push x0-x3 on the stack
-+	push	x6, x7
-+
-+	// x4-x18
-+	ldp	x4, x5,   [x2, #CPU_XREG_OFFSET(4)] 
-+	ldp	x6, x7,   [x2, #CPU_XREG_OFFSET(6)] 
-+	ldp	x8, x9,   [x2, #CPU_XREG_OFFSET(8)] 
-+	ldp	x10, x11, [x2, #CPU_XREG_OFFSET(10)]
-+	ldp	x12, x13, [x2, #CPU_XREG_OFFSET(12)]
-+	ldp	x14, x15, [x2, #CPU_XREG_OFFSET(14)]
-+	ldp	x16, x17, [x2, #CPU_XREG_OFFSET(16)]
-+	ldr	x18,      [x2, #CPU_XREG_OFFSET(18)]
-+
-+	// x19-x29, lr
-+	restore_common_regs x2
-+
-+	// Last bits of the 64bit state
-+	pop	x2, x3
-+	pop	x0, x1
-+
-+	// Do not touch any register after this!
-+.endm
-+
-+/*
-+ * u64 __guest_enter(struct kvm_vcpu *vcpu,
-+ *		     struct kvm_cpu_context *host_ctxt);
-+ */
-+ENTRY(__guest_enter)
-+	// x0: vcpu
-+	// x1: host_ctxt
-+	// x2, x3: parameter registers
-+	// x4-x18: clobbered by macros
-+
-+	save_host_regs x1
-+
-+	// Preserve vcpu & host_ctxt for use at exit time
-+	stp	x0, x1, [sp, #-16]!
-+
-+	restore_guest_regs
-+	eret
-+ENDPROC(__guest_enter)
-+
-+ENTRY(__guest_exit)
-+	// x0: vcpu
-+	// x1: return code
-+	// x2-x3: free
-+	// x4-x29,lr: vcpu regs
-+	// vcpu x0-x3 on the stack
-+	save_guest_regs
-+
-+	// Restore vcpu & host_ctxt from the stack
-+	// (preserving return code in x1)
-+	ldp	x0, x2, [sp], #16
-+	restore_host_regs x2
-+
-+	mov	x0, x1
-+	ret
-+ENDPROC(__guest_exit)
-+
-+	/* Insert fault handling here */
-diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-index 9da4205..2937552 100644
---- a/arch/arm64/kvm/hyp/hyp.h
-+++ b/arch/arm64/kvm/hyp/hyp.h
-@@ -54,5 +54,7 @@ void __debug_clear_restore_state(struct kvm_vcpu *vcpu,
- 				 struct kvm_guest_debug_arch *dbg,
- 				 struct kvm_cpu_context *ctxt);
- 
-+u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
-+
- #endif /* __ARM64_KVM_HYP_H__ */
- 
++void __hyp_text __tlb_flush_vm_context(void)
++{
++	dsb(ishst);
++	asm volatile("tlbi alle1is	\n"
++		     "ic ialluis	  ": : );
++	dsb(ish);
++}
 -- 
 2.1.4
