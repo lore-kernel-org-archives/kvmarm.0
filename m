@@ -1,126 +1,111 @@
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: [PATCH 2/3] kvm: arm: make kvm_arm.h friendly to assembly code
-Date: Mon, 16 Nov 2015 11:28:17 +0000
-Message-ID: <1447673298-25503-3-git-send-email-vladimir.murzin@arm.com>
-References: <1447673298-25503-1-git-send-email-vladimir.murzin@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 49A8249786
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2015 06:28:18 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cOjHFqXSfczL for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Nov 2015 06:28:17 -0500 (EST)
-Received: from eu-smtp-delivery-143.mimecast.com
- (eu-smtp-delivery-143.mimecast.com [207.82.80.143])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FB9149776
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2015 06:28:17 -0500 (EST)
-In-Reply-To: <1447673298-25503-1-git-send-email-vladimir.murzin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH 00/21] arm64: KVM: world switch in C
+Date: Mon, 16 Nov 2015 13:11:38 +0000
+Message-ID: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Mark Rutland <marc.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-kvm_arm.h is included from both C code and assembly code; however some
-definitions in this header supplied with U/UL/ULL suffixes which might
-confuse assembly once they got evaluated.
-We have _AC macro for such cases, so just wrap problem places with it.
+Once upon a time, the KVM/arm64 world switch was a nice, clean, lean
+and mean piece of hand-crafted assembly code. Over time, features have
+crept in, the code has become harder to maintain, and the smallest
+change is a pain to introduce. The VHE patches are a prime example of
+why this doesn't work anymore.
 
-Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
----
- arch/arm/include/asm/kvm_arm.h |   33 +++++++++++++++++----------------
- 1 file changed, 17 insertions(+), 16 deletions(-)
+This series rewrites most of the existing assembly code in C, but keeps
+the existing code structure in place (most function names will look
+familiar to the reader). The biggest change is that we don't have to
+deal with a static register allocation (the compiler does it for us),
+we can easily follow structure and pointers, and only the lowest level
+is still in assembly code. Oh, and a negative diffstat.
 
-diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
-index b05bb5a..01d4d7a 100644
---- a/arch/arm/include/asm/kvm_arm.h
-+++ b/arch/arm/include/asm/kvm_arm.h
-@@ -19,6 +19,7 @@
- #ifndef __ARM_KVM_ARM_H__
- #define __ARM_KVM_ARM_H__
- 
-+#include <linux/const.h>
- #include <linux/types.h>
- 
- /* Hyp Configuration Register (HCR) bits */
-@@ -132,9 +133,9 @@
-  * space.
-  */
- #define KVM_PHYS_SHIFT	(40)
--#define KVM_PHYS_SIZE	(1ULL << KVM_PHYS_SHIFT)
--#define KVM_PHYS_MASK	(KVM_PHYS_SIZE - 1ULL)
--#define PTRS_PER_S2_PGD	(1ULL << (KVM_PHYS_SHIFT - 30))
-+#define KVM_PHYS_SIZE	(_AC(1, ULL) << KVM_PHYS_SHIFT)
-+#define KVM_PHYS_MASK	(KVM_PHYS_SIZE - _AC(1, ULL))
-+#define PTRS_PER_S2_PGD	(_AC(1, ULL) << (KVM_PHYS_SHIFT - 30))
- 
- /* Virtualization Translation Control Register (VTCR) bits */
- #define VTCR_SH0	(3 << 12)
-@@ -161,17 +162,17 @@
- #define VTTBR_X		(5 - KVM_T0SZ)
- #endif
- #define VTTBR_BADDR_SHIFT (VTTBR_X - 1)
--#define VTTBR_BADDR_MASK  (((1LLU << (40 - VTTBR_X)) - 1) << VTTBR_BADDR_SHIFT)
--#define VTTBR_VMID_SHIFT  (48LLU)
--#define VTTBR_VMID_MASK	  (0xffLLU << VTTBR_VMID_SHIFT)
-+#define VTTBR_BADDR_MASK  (((_AC(1, ULL) << (40 - VTTBR_X)) - 1) << VTTBR_BADDR_SHIFT)
-+#define VTTBR_VMID_SHIFT  _AC(48, ULL)
-+#define VTTBR_VMID_MASK	  (_AC(0xff, ULL) << VTTBR_VMID_SHIFT)
- 
- /* Hyp Syndrome Register (HSR) bits */
- #define HSR_EC_SHIFT	(26)
--#define HSR_EC		(0x3fU << HSR_EC_SHIFT)
--#define HSR_IL		(1U << 25)
-+#define HSR_EC		(_AC(0x3f, UL) << HSR_EC_SHIFT)
-+#define HSR_IL		(_AC(1, UL) << 25)
- #define HSR_ISS		(HSR_IL - 1)
- #define HSR_ISV_SHIFT	(24)
--#define HSR_ISV		(1U << HSR_ISV_SHIFT)
-+#define HSR_ISV		(_AC(1, UL) << HSR_ISV_SHIFT)
- #define HSR_SRT_SHIFT	(16)
- #define HSR_SRT_MASK	(0xf << HSR_SRT_SHIFT)
- #define HSR_FSC		(0x3f)
-@@ -179,9 +180,9 @@
- #define HSR_SSE		(1 << 21)
- #define HSR_WNR		(1 << 6)
- #define HSR_CV_SHIFT	(24)
--#define HSR_CV		(1U << HSR_CV_SHIFT)
-+#define HSR_CV		(_AC(1, UL) << HSR_CV_SHIFT)
- #define HSR_COND_SHIFT	(20)
--#define HSR_COND	(0xfU << HSR_COND_SHIFT)
-+#define HSR_COND	(_AC(0xf, UL) << HSR_COND_SHIFT)
- 
- #define FSC_FAULT	(0x04)
- #define FSC_ACCESS	(0x08)
-@@ -209,13 +210,13 @@
- #define HSR_EC_DABT	(0x24)
- #define HSR_EC_DABT_HYP	(0x25)
- 
--#define HSR_WFI_IS_WFE		(1U << 0)
-+#define HSR_WFI_IS_WFE		(_AC(1, UL) << 0)
- 
--#define HSR_HVC_IMM_MASK	((1UL << 16) - 1)
-+#define HSR_HVC_IMM_MASK	((_AC(1, UL) << 16) - 1)
- 
--#define HSR_DABT_S1PTW		(1U << 7)
--#define HSR_DABT_CM		(1U << 8)
--#define HSR_DABT_EA		(1U << 9)
-+#define HSR_DABT_S1PTW		(_AC(1, UL) << 7)
-+#define HSR_DABT_CM		(_AC(1, UL) << 8)
-+#define HSR_DABT_EA		(_AC(1, UL) << 9)
- 
- #define kvm_arm_exception_type	\
- 	{0, "RESET" }, 		\
+There is still a healthy dose of inline assembly (system register
+accessors, runtime code patching), but I've tried not to make it too
+invasive. The generated code, while not exactly brilliant, doesn't
+look too shaby. I do expect a small performance degradation, but I
+believe this is something we can improve over time (my initial
+measurements don't show any obvious regression).
+
+Eventually (and assuming people are happy with the general approach
+taken here), it should be possible to make the 32bit converge with
+this and reuse some parts of the code.
+
+Patches are against 4.4-rc1 (mostly), and I've pushed a branch out
+(kvm-arm64/wsinc). This has been tested on Juno, Seattle and the FVP
+model. I also have pushed out kvm-arm64/vhe-wsinc that implements VHE
+on top of these patches.
+	M.
+
+Marc Zyngier (20):
+  arm64: KVM: Add a HYP-specific header file
+  arm64: KVM: Implement vgic-v2 save/restore
+  arm64: KVM: Implement vgic-v3 save/restore
+  arm64: KVM: Implement timer save/restore
+  arm64: KVM: Implement system register save/restore
+  arm64: KVM: Implement 32bit system register save/restore
+  arm64: KVM: Implement debug save/restore
+  arm64: KVM: Implement guest entry
+  arm64: KVM: Add patchable function selector
+  arm64: KVM: Implement the core world switch
+  arm64: KVM: Implement fpsimd save/restore
+  arm64: KVM: Implement TLB handling
+  arm64: KVM: HYP mode entry points
+  arm64: KVM: Add panic handling
+  arm64: KVM: Add compatibility aliases
+  arm64: KVM: Map the kernel RO section into HYP
+  arm64: KVM: Move away from the assembly version of the world switch
+  arm64: KVM: Turn system register numbers to an enum
+  arm64: KVM: Cleanup asm-offset.c
+  arm64: KVM: Remove weak attributes
+
+Mark Rutland (1):
+  arm64: add macros to read/write system registers
+
+ arch/arm/kvm/arm.c                   |    7 +
+ arch/arm64/include/asm/kvm_asm.h     |   76 ---
+ arch/arm64/include/asm/kvm_emulate.h |    1 -
+ arch/arm64/include/asm/kvm_host.h    |   81 ++-
+ arch/arm64/include/asm/kvm_mmio.h    |    1 -
+ arch/arm64/include/asm/sysreg.h      |   17 +
+ arch/arm64/kernel/asm-offsets.c      |   40 +-
+ arch/arm64/kvm/Makefile              |    3 +-
+ arch/arm64/kvm/guest.c               |    1 -
+ arch/arm64/kvm/handle_exit.c         |    1 +
+ arch/arm64/kvm/hyp.S                 | 1071 +---------------------------------
+ arch/arm64/kvm/hyp/Makefile          |   14 +
+ arch/arm64/kvm/hyp/debug-sr.c        |  135 +++++
+ arch/arm64/kvm/hyp/entry.S           |  184 ++++++
+ arch/arm64/kvm/hyp/fpsimd.S          |   33 ++
+ arch/arm64/kvm/hyp/hyp-entry.S       |  198 +++++++
+ arch/arm64/kvm/hyp/hyp.h             |   80 +++
+ arch/arm64/kvm/hyp/switch.c          |  179 ++++++
+ arch/arm64/kvm/hyp/sysreg-sr.c       |  132 +++++
+ arch/arm64/kvm/hyp/timer-sr.c        |   68 +++
+ arch/arm64/kvm/hyp/tlb.c             |   79 +++
+ arch/arm64/kvm/hyp/vgic-v2-sr.c      |   85 +++
+ arch/arm64/kvm/hyp/vgic-v3-sr.c      |  224 +++++++
+ arch/arm64/kvm/sys_regs.c            |    1 +
+ arch/arm64/kvm/vgic-v2-switch.S      |  134 -----
+ arch/arm64/kvm/vgic-v3-switch.S      |  269 ---------
+ virt/kvm/arm/vgic-v3.c               |    1 +
+ 27 files changed, 1521 insertions(+), 1594 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/Makefile
+ create mode 100644 arch/arm64/kvm/hyp/debug-sr.c
+ create mode 100644 arch/arm64/kvm/hyp/entry.S
+ create mode 100644 arch/arm64/kvm/hyp/fpsimd.S
+ create mode 100644 arch/arm64/kvm/hyp/hyp-entry.S
+ create mode 100644 arch/arm64/kvm/hyp/hyp.h
+ create mode 100644 arch/arm64/kvm/hyp/switch.c
+ create mode 100644 arch/arm64/kvm/hyp/sysreg-sr.c
+ create mode 100644 arch/arm64/kvm/hyp/timer-sr.c
+ create mode 100644 arch/arm64/kvm/hyp/tlb.c
+ create mode 100644 arch/arm64/kvm/hyp/vgic-v2-sr.c
+ create mode 100644 arch/arm64/kvm/hyp/vgic-v3-sr.c
+ delete mode 100644 arch/arm64/kvm/vgic-v2-switch.S
+ delete mode 100644 arch/arm64/kvm/vgic-v3-switch.S
+
 -- 
-1.7.9.5
+2.1.4
+
