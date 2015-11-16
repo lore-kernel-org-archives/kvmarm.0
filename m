@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 21/21] arm64: KVM: Remove weak attributes
-Date: Mon, 16 Nov 2015 13:11:59 +0000
-Message-ID: <1447679519-17888-22-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 19/21] arm64: KVM: Turn system register numbers to an enum
+Date: Mon, 16 Nov 2015 13:11:57 +0000
+Message-ID: <1447679519-17888-20-git-send-email-marc.zyngier@arm.com>
 References: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A0BF49937
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2015 08:12:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B3BEC49A10
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2015 08:12:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3Y1KDy0ULDbu for <kvmarm@lists.cs.columbia.edu>;
- Mon, 16 Nov 2015 08:12:18 -0500 (EST)
+ with ESMTP id Xo0PyFzzSOyZ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Nov 2015 08:12:17 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8F2F149A04
- for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2015 08:12:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 980B0498D3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2015 08:12:14 -0500 (EST)
 In-Reply-To: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,142 +31,343 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Mark Rutland <marc.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we've now switched to the new world switch implementation,
-remove the weak attributes, as nobody is supposed to override
-it anymore.
+Having the system register numbers as #defines has been a pain
+since day one, as the ordering is pretty fragile, and moving
+things around leads to renumbering and epic conflict resolutions.
+
+Now that we're mostly acessing the sysreg file in C, an enum is
+a much better type to use, and we can clean things up a bit.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/debug-sr.c   |  5 ++---
- arch/arm64/kvm/hyp/hyp-entry.S  |  3 ---
- arch/arm64/kvm/hyp/switch.c     |  5 ++---
- arch/arm64/kvm/hyp/tlb.c        | 16 +++++++---------
- arch/arm64/kvm/hyp/vgic-v3-sr.c |  5 ++---
- 5 files changed, 13 insertions(+), 21 deletions(-)
+ arch/arm64/include/asm/kvm_asm.h     | 76 ---------------------------------
+ arch/arm64/include/asm/kvm_emulate.h |  1 -
+ arch/arm64/include/asm/kvm_host.h    | 81 +++++++++++++++++++++++++++++++++++-
+ arch/arm64/include/asm/kvm_mmio.h    |  1 -
+ arch/arm64/kernel/asm-offsets.c      |  1 +
+ arch/arm64/kvm/guest.c               |  1 -
+ arch/arm64/kvm/handle_exit.c         |  1 +
+ arch/arm64/kvm/hyp/debug-sr.c        |  1 +
+ arch/arm64/kvm/hyp/entry.S           |  3 +-
+ arch/arm64/kvm/hyp/sysreg-sr.c       |  1 +
+ arch/arm64/kvm/sys_regs.c            |  1 +
+ virt/kvm/arm/vgic-v3.c               |  1 +
+ 12 files changed, 87 insertions(+), 82 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 5e37710..52b777b 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -20,82 +20,6 @@
+ 
+ #include <asm/virt.h>
+ 
+-/*
+- * 0 is reserved as an invalid value.
+- * Order *must* be kept in sync with the hyp switch code.
+- */
+-#define	MPIDR_EL1	1	/* MultiProcessor Affinity Register */
+-#define	CSSELR_EL1	2	/* Cache Size Selection Register */
+-#define	SCTLR_EL1	3	/* System Control Register */
+-#define	ACTLR_EL1	4	/* Auxiliary Control Register */
+-#define	CPACR_EL1	5	/* Coprocessor Access Control */
+-#define	TTBR0_EL1	6	/* Translation Table Base Register 0 */
+-#define	TTBR1_EL1	7	/* Translation Table Base Register 1 */
+-#define	TCR_EL1		8	/* Translation Control Register */
+-#define	ESR_EL1		9	/* Exception Syndrome Register */
+-#define	AFSR0_EL1	10	/* Auxilary Fault Status Register 0 */
+-#define	AFSR1_EL1	11	/* Auxilary Fault Status Register 1 */
+-#define	FAR_EL1		12	/* Fault Address Register */
+-#define	MAIR_EL1	13	/* Memory Attribute Indirection Register */
+-#define	VBAR_EL1	14	/* Vector Base Address Register */
+-#define	CONTEXTIDR_EL1	15	/* Context ID Register */
+-#define	TPIDR_EL0	16	/* Thread ID, User R/W */
+-#define	TPIDRRO_EL0	17	/* Thread ID, User R/O */
+-#define	TPIDR_EL1	18	/* Thread ID, Privileged */
+-#define	AMAIR_EL1	19	/* Aux Memory Attribute Indirection Register */
+-#define	CNTKCTL_EL1	20	/* Timer Control Register (EL1) */
+-#define	PAR_EL1		21	/* Physical Address Register */
+-#define MDSCR_EL1	22	/* Monitor Debug System Control Register */
+-#define MDCCINT_EL1	23	/* Monitor Debug Comms Channel Interrupt Enable Reg */
+-
+-/* 32bit specific registers. Keep them at the end of the range */
+-#define	DACR32_EL2	24	/* Domain Access Control Register */
+-#define	IFSR32_EL2	25	/* Instruction Fault Status Register */
+-#define	FPEXC32_EL2	26	/* Floating-Point Exception Control Register */
+-#define	DBGVCR32_EL2	27	/* Debug Vector Catch Register */
+-#define	NR_SYS_REGS	28
+-
+-/* 32bit mapping */
+-#define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
+-#define c0_CSSELR	(CSSELR_EL1 * 2)/* Cache Size Selection Register */
+-#define c1_SCTLR	(SCTLR_EL1 * 2)	/* System Control Register */
+-#define c1_ACTLR	(ACTLR_EL1 * 2)	/* Auxiliary Control Register */
+-#define c1_CPACR	(CPACR_EL1 * 2)	/* Coprocessor Access Control */
+-#define c2_TTBR0	(TTBR0_EL1 * 2)	/* Translation Table Base Register 0 */
+-#define c2_TTBR0_high	(c2_TTBR0 + 1)	/* TTBR0 top 32 bits */
+-#define c2_TTBR1	(TTBR1_EL1 * 2)	/* Translation Table Base Register 1 */
+-#define c2_TTBR1_high	(c2_TTBR1 + 1)	/* TTBR1 top 32 bits */
+-#define c2_TTBCR	(TCR_EL1 * 2)	/* Translation Table Base Control R. */
+-#define c3_DACR		(DACR32_EL2 * 2)/* Domain Access Control Register */
+-#define c5_DFSR		(ESR_EL1 * 2)	/* Data Fault Status Register */
+-#define c5_IFSR		(IFSR32_EL2 * 2)/* Instruction Fault Status Register */
+-#define c5_ADFSR	(AFSR0_EL1 * 2)	/* Auxiliary Data Fault Status R */
+-#define c5_AIFSR	(AFSR1_EL1 * 2)	/* Auxiliary Instr Fault Status R */
+-#define c6_DFAR		(FAR_EL1 * 2)	/* Data Fault Address Register */
+-#define c6_IFAR		(c6_DFAR + 1)	/* Instruction Fault Address Register */
+-#define c7_PAR		(PAR_EL1 * 2)	/* Physical Address Register */
+-#define c7_PAR_high	(c7_PAR + 1)	/* PAR top 32 bits */
+-#define c10_PRRR	(MAIR_EL1 * 2)	/* Primary Region Remap Register */
+-#define c10_NMRR	(c10_PRRR + 1)	/* Normal Memory Remap Register */
+-#define c12_VBAR	(VBAR_EL1 * 2)	/* Vector Base Address Register */
+-#define c13_CID		(CONTEXTIDR_EL1 * 2)	/* Context ID Register */
+-#define c13_TID_URW	(TPIDR_EL0 * 2)	/* Thread ID, User R/W */
+-#define c13_TID_URO	(TPIDRRO_EL0 * 2)/* Thread ID, User R/O */
+-#define c13_TID_PRIV	(TPIDR_EL1 * 2)	/* Thread ID, Privileged */
+-#define c10_AMAIR0	(AMAIR_EL1 * 2)	/* Aux Memory Attr Indirection Reg */
+-#define c10_AMAIR1	(c10_AMAIR0 + 1)/* Aux Memory Attr Indirection Reg */
+-#define c14_CNTKCTL	(CNTKCTL_EL1 * 2) /* Timer Control Register (PL1) */
+-
+-#define cp14_DBGDSCRext	(MDSCR_EL1 * 2)
+-#define cp14_DBGBCR0	(DBGBCR0_EL1 * 2)
+-#define cp14_DBGBVR0	(DBGBVR0_EL1 * 2)
+-#define cp14_DBGBXVR0	(cp14_DBGBVR0 + 1)
+-#define cp14_DBGWCR0	(DBGWCR0_EL1 * 2)
+-#define cp14_DBGWVR0	(DBGWVR0_EL1 * 2)
+-#define cp14_DBGDCCINT	(MDCCINT_EL1 * 2)
+-
+-#define NR_COPRO_REGS	(NR_SYS_REGS * 2)
+-
+ #define ARM_EXCEPTION_IRQ	  0
+ #define ARM_EXCEPTION_TRAP	  1
+ 
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 17e92f0..e095872 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -26,7 +26,6 @@
+ 
+ #include <asm/esr.h>
+ #include <asm/kvm_arm.h>
+-#include <asm/kvm_asm.h>
+ #include <asm/kvm_mmio.h>
+ #include <asm/ptrace.h>
+ #include <asm/cputype.h>
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index a35ce72..2fae2d4 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -25,7 +25,6 @@
+ #include <linux/types.h>
+ #include <linux/kvm_types.h>
+ #include <asm/kvm.h>
+-#include <asm/kvm_asm.h>
+ #include <asm/kvm_mmio.h>
+ 
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+@@ -85,6 +84,86 @@ struct kvm_vcpu_fault_info {
+ 	u64 hpfar_el2;		/* Hyp IPA Fault Address Register */
+ };
+ 
++/*
++ * 0 is reserved as an invalid value.
++ * Order *must* be kept in sync with the hyp switch code.
++ */
++enum vcpu_sysreg {
++	__INVALID_SYSREG__,
++	MPIDR_EL1,	/* MultiProcessor Affinity Register */
++	CSSELR_EL1,	/* Cache Size Selection Register */
++	SCTLR_EL1,	/* System Control Register */
++	ACTLR_EL1,	/* Auxiliary Control Register */
++	CPACR_EL1,	/* Coprocessor Access Control */
++	TTBR0_EL1,	/* Translation Table Base Register 0 */
++	TTBR1_EL1,	/* Translation Table Base Register 1 */
++	TCR_EL1,	/* Translation Control Register */
++	ESR_EL1,	/* Exception Syndrome Register */
++	AFSR0_EL1,	/* Auxilary Fault Status Register 0 */
++	AFSR1_EL1,	/* Auxilary Fault Status Register 1 */
++	FAR_EL1,	/* Fault Address Register */
++	MAIR_EL1,	/* Memory Attribute Indirection Register */
++	VBAR_EL1,	/* Vector Base Address Register */
++	CONTEXTIDR_EL1,	/* Context ID Register */
++	TPIDR_EL0,	/* Thread ID, User R/W */
++	TPIDRRO_EL0,	/* Thread ID, User R/O */
++	TPIDR_EL1,	/* Thread ID, Privileged */
++	AMAIR_EL1,	/* Aux Memory Attribute Indirection Register */
++	CNTKCTL_EL1,	/* Timer Control Register (EL1) */
++	PAR_EL1,	/* Physical Address Register */
++	MDSCR_EL1,	/* Monitor Debug System Control Register */
++	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
++
++	/* 32bit specific registers. Keep them at the end of the range */
++	DACR32_EL2,	/* Domain Access Control Register */
++	IFSR32_EL2,	/* Instruction Fault Status Register */
++	FPEXC32_EL2,	/* Floating-Point Exception Control Register */
++	DBGVCR32_EL2,	/* Debug Vector Catch Register */
++
++	NR_SYS_REGS	/* Nothing after this line! */
++};
++
++/* 32bit mapping */
++#define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
++#define c0_CSSELR	(CSSELR_EL1 * 2)/* Cache Size Selection Register */
++#define c1_SCTLR	(SCTLR_EL1 * 2)	/* System Control Register */
++#define c1_ACTLR	(ACTLR_EL1 * 2)	/* Auxiliary Control Register */
++#define c1_CPACR	(CPACR_EL1 * 2)	/* Coprocessor Access Control */
++#define c2_TTBR0	(TTBR0_EL1 * 2)	/* Translation Table Base Register 0 */
++#define c2_TTBR0_high	(c2_TTBR0 + 1)	/* TTBR0 top 32 bits */
++#define c2_TTBR1	(TTBR1_EL1 * 2)	/* Translation Table Base Register 1 */
++#define c2_TTBR1_high	(c2_TTBR1 + 1)	/* TTBR1 top 32 bits */
++#define c2_TTBCR	(TCR_EL1 * 2)	/* Translation Table Base Control R. */
++#define c3_DACR		(DACR32_EL2 * 2)/* Domain Access Control Register */
++#define c5_DFSR		(ESR_EL1 * 2)	/* Data Fault Status Register */
++#define c5_IFSR		(IFSR32_EL2 * 2)/* Instruction Fault Status Register */
++#define c5_ADFSR	(AFSR0_EL1 * 2)	/* Auxiliary Data Fault Status R */
++#define c5_AIFSR	(AFSR1_EL1 * 2)	/* Auxiliary Instr Fault Status R */
++#define c6_DFAR		(FAR_EL1 * 2)	/* Data Fault Address Register */
++#define c6_IFAR		(c6_DFAR + 1)	/* Instruction Fault Address Register */
++#define c7_PAR		(PAR_EL1 * 2)	/* Physical Address Register */
++#define c7_PAR_high	(c7_PAR + 1)	/* PAR top 32 bits */
++#define c10_PRRR	(MAIR_EL1 * 2)	/* Primary Region Remap Register */
++#define c10_NMRR	(c10_PRRR + 1)	/* Normal Memory Remap Register */
++#define c12_VBAR	(VBAR_EL1 * 2)	/* Vector Base Address Register */
++#define c13_CID		(CONTEXTIDR_EL1 * 2)	/* Context ID Register */
++#define c13_TID_URW	(TPIDR_EL0 * 2)	/* Thread ID, User R/W */
++#define c13_TID_URO	(TPIDRRO_EL0 * 2)/* Thread ID, User R/O */
++#define c13_TID_PRIV	(TPIDR_EL1 * 2)	/* Thread ID, Privileged */
++#define c10_AMAIR0	(AMAIR_EL1 * 2)	/* Aux Memory Attr Indirection Reg */
++#define c10_AMAIR1	(c10_AMAIR0 + 1)/* Aux Memory Attr Indirection Reg */
++#define c14_CNTKCTL	(CNTKCTL_EL1 * 2) /* Timer Control Register (PL1) */
++
++#define cp14_DBGDSCRext	(MDSCR_EL1 * 2)
++#define cp14_DBGBCR0	(DBGBCR0_EL1 * 2)
++#define cp14_DBGBVR0	(DBGBVR0_EL1 * 2)
++#define cp14_DBGBXVR0	(cp14_DBGBVR0 + 1)
++#define cp14_DBGWCR0	(DBGWCR0_EL1 * 2)
++#define cp14_DBGWVR0	(DBGWVR0_EL1 * 2)
++#define cp14_DBGDCCINT	(MDCCINT_EL1 * 2)
++
++#define NR_COPRO_REGS	(NR_SYS_REGS * 2)
++
+ struct kvm_cpu_context {
+ 	struct kvm_regs	gp_regs;
+ 	union {
+diff --git a/arch/arm64/include/asm/kvm_mmio.h b/arch/arm64/include/asm/kvm_mmio.h
+index 889c908..fe612a9 100644
+--- a/arch/arm64/include/asm/kvm_mmio.h
++++ b/arch/arm64/include/asm/kvm_mmio.h
+@@ -19,7 +19,6 @@
+ #define __ARM64_KVM_MMIO_H__
+ 
+ #include <linux/kvm_host.h>
+-#include <asm/kvm_asm.h>
+ #include <asm/kvm_arm.h>
+ 
+ /*
+diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+index 25de8b2..4b72231 100644
+--- a/arch/arm64/kernel/asm-offsets.c
++++ b/arch/arm64/kernel/asm-offsets.c
+@@ -112,6 +112,7 @@ int main(void)
+   DEFINE(CPU_ELR_EL1,		offsetof(struct kvm_regs, elr_el1));
+   DEFINE(CPU_SPSR,		offsetof(struct kvm_regs, spsr));
+   DEFINE(CPU_SYSREGS,		offsetof(struct kvm_cpu_context, sys_regs));
++  DEFINE(VCPU_FPEXC32_EL2,	offsetof(struct kvm_vcpu, arch.ctxt.sys_regs[FPEXC32_EL2]));
+   DEFINE(VCPU_ESR_EL2,		offsetof(struct kvm_vcpu, arch.fault.esr_el2));
+   DEFINE(VCPU_FAR_EL2,		offsetof(struct kvm_vcpu, arch.fault.far_el2));
+   DEFINE(VCPU_HPFAR_EL2,	offsetof(struct kvm_vcpu, arch.fault.hpfar_el2));
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index d250160..88e59f2 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -28,7 +28,6 @@
+ #include <asm/cputype.h>
+ #include <asm/uaccess.h>
+ #include <asm/kvm.h>
+-#include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_coproc.h>
+ 
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 68a0759..4323627 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -23,6 +23,7 @@
+ #include <linux/kvm_host.h>
+ 
+ #include <asm/esr.h>
++#include <asm/kvm_asm.h>
+ #include <asm/kvm_coproc.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_mmu.h>
 diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-index c7da3ec..f8ec964 100644
+index 042d074..c7da3ec 100644
 --- a/arch/arm64/kvm/hyp/debug-sr.c
 +++ b/arch/arm64/kvm/hyp/debug-sr.c
-@@ -127,10 +127,9 @@ void __hyp_text __debug_clear_restore_state(struct kvm_vcpu *vcpu,
- 	}
- }
+@@ -18,6 +18,7 @@
+ #include <linux/compiler.h>
+ #include <linux/kvm_host.h>
  
--u32 __hyp_text __debug_read_mdcr_el2(void)
-+static u32 __hyp_text __debug_read_mdcr_el2(void)
- {
- 	return read_sysreg(mdcr_el2);
- }
- 
--__alias(__debug_read_mdcr_el2)
--u32 __weak __kvm_get_mdcr_el2(void);
-+__alias(__debug_read_mdcr_el2) u32 __kvm_get_mdcr_el2(void);
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 28de58f..658b9af 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -175,9 +175,7 @@ ENDPROC(\label)
- 
- 	.align 11
- 
--	.weak	__kvm_hyp_vector
- ENTRY(__kvm_hyp_vector)
--ENTRY(__hyp_vector)
- 	ventry	el2t_sync_invalid		// Synchronous EL2t
- 	ventry	el2t_irq_invalid		// IRQ EL2t
- 	ventry	el2t_fiq_invalid		// FIQ EL2t
-@@ -197,5 +195,4 @@ ENTRY(__hyp_vector)
- 	ventry	el1_irq				// IRQ 32-bit EL1
- 	ventry	el1_fiq_invalid			// FIQ 32-bit EL1
- 	ventry	el1_error_invalid		// Error 32-bit EL1
--ENDPROC(__hyp_vector)
- ENDPROC(__kvm_hyp_vector)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index ef58066..a2885f5 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -84,7 +84,7 @@ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
- 	__vgic_call_restore_state()(vcpu);
- }
- 
--int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
-+static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-@@ -141,8 +141,7 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
- 	return exit_code;
- }
- 
--__alias(__guest_run)
--int __weak __kvm_vcpu_run(struct kvm_vcpu *vcpu);
-+__alias(__guest_run) int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
- 
- static const char *__hyp_panic_string = "HYP panic:\nPS:%08x PC:%p ESR:%p\nFAR:%p HPFAR:%p PAR:%p\nVCPU:%p\n";
- 
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-index 2c279a8..250e06c 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/tlb.c
-@@ -17,7 +17,7 @@
++#include <asm/kvm_asm.h>
+ #include <asm/kvm_mmu.h>
  
  #include "hyp.h"
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index 7552922..599911c 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -27,7 +27,6 @@
  
--void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
-+static void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- {
- 	dsb(ishst);
+ #define CPU_GP_REG_OFFSET(x)	(CPU_GP_REGS + x)
+ #define CPU_XREG_OFFSET(x)	CPU_GP_REG_OFFSET(CPU_USER_PT_REGS + 8*x)
+-#define CPU_SYSREG_OFFSET(x)	(CPU_SYSREGS + 8*x)
  
-@@ -47,10 +47,10 @@ void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- 	write_sysreg(0, vttbr_el2);
- }
+ 	.text
+ 	.pushsection	.hyp.text, "ax"
+@@ -174,7 +173,7 @@ ENTRY(__fpsimd_guest_restore)
  
--__alias(__tlb_flush_vmid_ipa)
--void __weak __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
-+__alias(__tlb_flush_vmid_ipa) void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm,
-+							    phys_addr_t ipa);
+ 	mrs	x1, hcr_el2
+ 	tbnz	x1, #HCR_RW_SHIFT, 1f
+-	ldr	x4, [x2, #CPU_SYSREG_OFFSET(FPEXC32_EL2)]
++	ldr	x4, [x3, #VCPU_FPEXC32_EL2]
+ 	msr	fpexc32_el2, x4
+ 1:
+ 	pop	x4, lr
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 3f81a4d..15f6e42 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -18,6 +18,7 @@
+ #include <linux/compiler.h>
+ #include <linux/kvm_host.h>
  
--void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
-+static void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
- {
- 	dsb(ishst);
++#include <asm/kvm_asm.h>
+ #include <asm/kvm_mmu.h>
  
-@@ -66,10 +66,9 @@ void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
- 	write_sysreg(0, vttbr_el2);
- }
+ #include "hyp.h"
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 87a64e8..0db5311 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -29,6 +29,7 @@
+ #include <asm/debug-monitors.h>
+ #include <asm/esr.h>
+ #include <asm/kvm_arm.h>
++#include <asm/kvm_asm.h>
+ #include <asm/kvm_coproc.h>
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_host.h>
+diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
+index 487d635..c8506a2 100644
+--- a/virt/kvm/arm/vgic-v3.c
++++ b/virt/kvm/arm/vgic-v3.c
+@@ -28,6 +28,7 @@
  
--__alias(__tlb_flush_vmid)
--void __weak __kvm_tlb_flush_vmid(struct kvm *kvm);
-+__alias(__tlb_flush_vmid) void __kvm_tlb_flush_vmid(struct kvm *kvm);
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_arm.h>
++#include <asm/kvm_asm.h>
+ #include <asm/kvm_mmu.h>
  
--void __hyp_text __tlb_flush_vm_context(void)
-+static void __hyp_text __tlb_flush_vm_context(void)
- {
- 	dsb(ishst);
- 	asm volatile("tlbi alle1is	\n"
-@@ -77,5 +76,4 @@ void __hyp_text __tlb_flush_vm_context(void)
- 	dsb(ish);
- }
- 
--__alias(__tlb_flush_vm_context)
--void __weak __kvm_flush_vm_context(void);
-+__alias(__tlb_flush_vm_context) void __kvm_flush_vm_context(void);
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 0cf316c..9189f71 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -216,10 +216,9 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
- 	}
- }
- 
--u64 __hyp_text __vgic_v3_read_ich_vtr_el2(void)
-+static u64 __hyp_text __vgic_v3_read_ich_vtr_el2(void)
- {
- 	return read_gicreg(ICH_VTR_EL2);
- }
- 
--__alias(__vgic_v3_read_ich_vtr_el2)
--u64 __weak __vgic_v3_get_ich_vtr_el2(void);
-+__alias(__vgic_v3_read_ich_vtr_el2) u64 __vgic_v3_get_ich_vtr_el2(void);
+ /* These are for GICv2 emulation only */
 -- 
 2.1.4
