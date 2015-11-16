@@ -1,111 +1,64 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 00/21] arm64: KVM: world switch in C
-Date: Mon, 16 Nov 2015 13:11:38 +0000
-Message-ID: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 02/21] arm64: KVM: Add a HYP-specific header file
+Date: Mon, 16 Nov 2015 13:11:40 +0000
+Message-ID: <1447679519-17888-3-git-send-email-marc.zyngier@arm.com>
+References: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Mark Rutland <marc.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Once upon a time, the KVM/arm64 world switch was a nice, clean, lean
-and mean piece of hand-crafted assembly code. Over time, features have
-crept in, the code has become harder to maintain, and the smallest
-change is a pain to introduce. The VHE patches are a prime example of
-why this doesn't work anymore.
+In order to expose the various EL2 services that are private to
+the hypervisor, add a new hyp.h file.
 
-This series rewrites most of the existing assembly code in C, but keeps
-the existing code structure in place (most function names will look
-familiar to the reader). The biggest change is that we don't have to
-deal with a static register allocation (the compiler does it for us),
-we can easily follow structure and pointers, and only the lowest level
-is still in assembly code. Oh, and a negative diffstat.
+So far, it only contains mundane things such as section annotation
+and VA manipulation.
 
-There is still a healthy dose of inline assembly (system register
-accessors, runtime code patching), but I've tried not to make it too
-invasive. The generated code, while not exactly brilliant, doesn't
-look too shaby. I do expect a small performance degradation, but I
-believe this is something we can improve over time (my initial
-measurements don't show any obvious regression).
-
-Eventually (and assuming people are happy with the general approach
-taken here), it should be possible to make the 32bit converge with
-this and reuse some parts of the code.
-
-Patches are against 4.4-rc1 (mostly), and I've pushed a branch out
-(kvm-arm64/wsinc). This has been tested on Juno, Seattle and the FVP
-model. I also have pushed out kvm-arm64/vhe-wsinc that implements VHE
-on top of these patches.
-	M.
-
-Marc Zyngier (20):
-  arm64: KVM: Add a HYP-specific header file
-  arm64: KVM: Implement vgic-v2 save/restore
-  arm64: KVM: Implement vgic-v3 save/restore
-  arm64: KVM: Implement timer save/restore
-  arm64: KVM: Implement system register save/restore
-  arm64: KVM: Implement 32bit system register save/restore
-  arm64: KVM: Implement debug save/restore
-  arm64: KVM: Implement guest entry
-  arm64: KVM: Add patchable function selector
-  arm64: KVM: Implement the core world switch
-  arm64: KVM: Implement fpsimd save/restore
-  arm64: KVM: Implement TLB handling
-  arm64: KVM: HYP mode entry points
-  arm64: KVM: Add panic handling
-  arm64: KVM: Add compatibility aliases
-  arm64: KVM: Map the kernel RO section into HYP
-  arm64: KVM: Move away from the assembly version of the world switch
-  arm64: KVM: Turn system register numbers to an enum
-  arm64: KVM: Cleanup asm-offset.c
-  arm64: KVM: Remove weak attributes
-
-Mark Rutland (1):
-  arm64: add macros to read/write system registers
-
- arch/arm/kvm/arm.c                   |    7 +
- arch/arm64/include/asm/kvm_asm.h     |   76 ---
- arch/arm64/include/asm/kvm_emulate.h |    1 -
- arch/arm64/include/asm/kvm_host.h    |   81 ++-
- arch/arm64/include/asm/kvm_mmio.h    |    1 -
- arch/arm64/include/asm/sysreg.h      |   17 +
- arch/arm64/kernel/asm-offsets.c      |   40 +-
- arch/arm64/kvm/Makefile              |    3 +-
- arch/arm64/kvm/guest.c               |    1 -
- arch/arm64/kvm/handle_exit.c         |    1 +
- arch/arm64/kvm/hyp.S                 | 1071 +---------------------------------
- arch/arm64/kvm/hyp/Makefile          |   14 +
- arch/arm64/kvm/hyp/debug-sr.c        |  135 +++++
- arch/arm64/kvm/hyp/entry.S           |  184 ++++++
- arch/arm64/kvm/hyp/fpsimd.S          |   33 ++
- arch/arm64/kvm/hyp/hyp-entry.S       |  198 +++++++
- arch/arm64/kvm/hyp/hyp.h             |   80 +++
- arch/arm64/kvm/hyp/switch.c          |  179 ++++++
- arch/arm64/kvm/hyp/sysreg-sr.c       |  132 +++++
- arch/arm64/kvm/hyp/timer-sr.c        |   68 +++
- arch/arm64/kvm/hyp/tlb.c             |   79 +++
- arch/arm64/kvm/hyp/vgic-v2-sr.c      |   85 +++
- arch/arm64/kvm/hyp/vgic-v3-sr.c      |  224 +++++++
- arch/arm64/kvm/sys_regs.c            |    1 +
- arch/arm64/kvm/vgic-v2-switch.S      |  134 -----
- arch/arm64/kvm/vgic-v3-switch.S      |  269 ---------
- virt/kvm/arm/vgic-v3.c               |    1 +
- 27 files changed, 1521 insertions(+), 1594 deletions(-)
- create mode 100644 arch/arm64/kvm/hyp/Makefile
- create mode 100644 arch/arm64/kvm/hyp/debug-sr.c
- create mode 100644 arch/arm64/kvm/hyp/entry.S
- create mode 100644 arch/arm64/kvm/hyp/fpsimd.S
- create mode 100644 arch/arm64/kvm/hyp/hyp-entry.S
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/kvm/hyp/hyp.h | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
  create mode 100644 arch/arm64/kvm/hyp/hyp.h
- create mode 100644 arch/arm64/kvm/hyp/switch.c
- create mode 100644 arch/arm64/kvm/hyp/sysreg-sr.c
- create mode 100644 arch/arm64/kvm/hyp/timer-sr.c
- create mode 100644 arch/arm64/kvm/hyp/tlb.c
- create mode 100644 arch/arm64/kvm/hyp/vgic-v2-sr.c
- create mode 100644 arch/arm64/kvm/hyp/vgic-v3-sr.c
- delete mode 100644 arch/arm64/kvm/vgic-v2-switch.S
- delete mode 100644 arch/arm64/kvm/vgic-v3-switch.S
 
+diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
+new file mode 100644
+index 0000000..dac843e
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/hyp.h
+@@ -0,0 +1,31 @@
++/*
++ * Copyright (C) 2015 - ARM Ltd
++ * Author: Marc Zyngier <marc.zyngier@arm.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef __ARM64_KVM_HYP_H__
++#define __ARM64_KVM_HYP_H__
++
++#include <linux/compiler.h>
++#include <linux/kvm_host.h>
++#include <asm/kvm_mmu.h>
++#include <asm/sysreg.h>
++
++#define __hyp_text __section(.hyp.text) notrace
++
++#define kern_hyp_va(v) (typeof(v))((unsigned long)v & HYP_PAGE_OFFSET_MASK)
++
++#endif /* __ARM64_KVM_HYP_H__ */
++
 -- 
 2.1.4
 
