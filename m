@@ -1,155 +1,106 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 03/21] arm64: KVM: Implement vgic-v2 save/restore
-Date: Mon, 16 Nov 2015 13:11:41 +0000
-Message-ID: <1447679519-17888-4-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 07/21] arm64: KVM: Implement 32bit system register save/restore
+Date: Mon, 16 Nov 2015 13:11:45 +0000
+Message-ID: <1447679519-17888-8-git-send-email-marc.zyngier@arm.com>
 References: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 04C5749936
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2015 08:11:59 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id d5xcdNppOlIT for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 16 Nov 2015 08:11:58 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F02E1498A1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 16 Nov 2015 08:11:55 -0500 (EST)
 In-Reply-To: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Mark Rutland <marc.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Mark Rutland <marc.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Implement the vgic-v2 save restore as a direct translation of
-the assembly code version.
+Implement the 32bit system register save restore as a direct
+translation of the assembly code version.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/Makefile         |  1 +
- arch/arm64/kvm/hyp/Makefile     |  5 +++
- arch/arm64/kvm/hyp/hyp.h        |  3 ++
- arch/arm64/kvm/hyp/vgic-v2-sr.c | 85 +++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 94 insertions(+)
- create mode 100644 arch/arm64/kvm/hyp/Makefile
- create mode 100644 arch/arm64/kvm/hyp/vgic-v2-sr.c
+ arch/arm64/kvm/hyp/hyp.h       |  2 ++
+ arch/arm64/kvm/hyp/sysreg-sr.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
 
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 1949fe5..d31e4e5 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -10,6 +10,7 @@ KVM=../../../virt/kvm
- ARM=../../../arch/arm/kvm
- 
- obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
-+obj-$(CONFIG_KVM_ARM_HOST) += hyp/
- 
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/arm.o $(ARM)/mmu.o $(ARM)/mmio.o
-diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-new file mode 100644
-index 0000000..d8d5968
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/Makefile
-@@ -0,0 +1,5 @@
-+#
-+# Makefile for Kernel-based Virtual Machine module, HYP part
-+#
-+
-+obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
 diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-index dac843e..78f25c4 100644
+index 087d3a5..4639330 100644
 --- a/arch/arm64/kvm/hyp/hyp.h
 +++ b/arch/arm64/kvm/hyp/hyp.h
-@@ -27,5 +27,8 @@
+@@ -38,6 +38,8 @@ void __timer_restore_state(struct kvm_vcpu *vcpu);
  
- #define kern_hyp_va(v) (typeof(v))((unsigned long)v & HYP_PAGE_OFFSET_MASK)
+ void __sysreg_save_state(struct kvm_cpu_context *ctxt);
+ void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
++void __sysreg32_save_state(struct kvm_vcpu *vcpu);
++void __sysreg32_restore_state(struct kvm_vcpu *vcpu);
  
-+void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
-+void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
-+
  #endif /* __ARM64_KVM_HYP_H__ */
  
-diff --git a/arch/arm64/kvm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
-new file mode 100644
-index 0000000..1382d2e
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
-@@ -0,0 +1,85 @@
-+/*
-+ * Copyright (C) 2012-2015 - ARM Ltd
-+ * Author: Marc Zyngier <marc.zyngier@arm.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index add8fcb..3f81a4d 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -88,3 +88,44 @@ void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg(ctxt->gp_regs.elr_el1,	elr_el1);
+ 	write_sysreg(ctxt->gp_regs.spsr[KVM_SPSR_EL1], spsr_el1);
+ }
 +
-+#include <linux/compiler.h>
-+#include <linux/irqchip/arm-gic.h>
-+#include <linux/kvm_host.h>
-+
-+#include <asm/kvm_mmu.h>
-+
-+#include "hyp.h"
-+
-+/* vcpu is already in the HYP VA space */
-+void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
++void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
 +{
-+	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-+	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-+	struct vgic_dist *vgic = &kvm->arch.vgic;
-+	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
-+	u32 __iomem *lr_base;
-+	u32 eisr0, eisr1, elrsr0, elrsr1;
-+	int i = 0, nr_lr;
++	if (!(read_sysreg(hcr_el2) & HCR_RW)) {
++		u64 *spsr = vcpu->arch.ctxt.gp_regs.spsr;
++		u64 *sysreg = vcpu->arch.ctxt.sys_regs;
 +
-+	if (!base)
-+		return;
++		spsr[KVM_SPSR_ABT] = read_sysreg(spsr_abt);
++		spsr[KVM_SPSR_UND] = read_sysreg(spsr_und);
++		spsr[KVM_SPSR_IRQ] = read_sysreg(spsr_irq);
++		spsr[KVM_SPSR_FIQ] = read_sysreg(spsr_fiq);
 +
-+	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
-+	cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
-+	eisr0  = readl_relaxed(base + GICH_EISR0);
-+	eisr1  = readl_relaxed(base + GICH_EISR0);
-+	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
-+	elrsr1 = readl_relaxed(base + GICH_ELRSR1);
-+#ifdef CONFIG_CPU_BIG_ENDIAN
-+	cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
-+	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
-+#else
-+	cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
-+	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
-+#endif
-+	cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
++		sysreg[DACR32_EL2] = read_sysreg(dacr32_el2);
++		sysreg[IFSR32_EL2] = read_sysreg(ifsr32_el2);
 +
-+	writel_relaxed(0, base + GICH_HCR);
++		if (!(read_sysreg(cptr_el2) & CPTR_EL2_TFP))
++			sysreg[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
 +
-+	lr_base = base + GICH_LR0;
-+	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
-+	do {
-+		cpu_if->vgic_lr[i++] = readl_relaxed(lr_base++);
-+	} while (--nr_lr);
++		if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
++			sysreg[DBGVCR32_EL2] = read_sysreg(dbgvcr32_el2);
++	}
 +}
 +
-+void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
++void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
 +{
-+	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-+	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-+	struct vgic_dist *vgic = &kvm->arch.vgic;
-+	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
-+	u32 __iomem *lr_base;
-+	unsigned int i = 0, nr_lr;
++	if (!(read_sysreg(hcr_el2) & HCR_RW)) {
++		u64 *spsr = vcpu->arch.ctxt.gp_regs.spsr;
++		u64 *sysreg = vcpu->arch.ctxt.sys_regs;
 +
-+	if (!base)
-+		return;
++		write_sysreg(spsr[KVM_SPSR_ABT], spsr_abt);
++		write_sysreg(spsr[KVM_SPSR_UND], spsr_und);
++		write_sysreg(spsr[KVM_SPSR_IRQ], spsr_irq);
++		write_sysreg(spsr[KVM_SPSR_FIQ], spsr_fiq);
++			                         
++		write_sysreg(sysreg[DACR32_EL2], dacr32_el2);
++		write_sysreg(sysreg[IFSR32_EL2], ifsr32_el2);
 +
-+	writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
-+	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
-+	writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
-+
-+	lr_base = base + GICH_LR0;
-+	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
-+	do {
-+		writel_relaxed(cpu_if->vgic_lr[i++], lr_base++);
-+	} while (--nr_lr);
++		if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
++			write_sysreg(sysreg[DBGVCR32_EL2], dbgvcr32_el2);
++	}
 +}
 -- 
 2.1.4
-
