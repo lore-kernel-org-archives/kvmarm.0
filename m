@@ -1,98 +1,190 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 15/21] arm64: KVM: Add panic handling
-Date: Mon, 16 Nov 2015 16:57:32 +0000
-Message-ID: <564A0AFC.7070204@arm.com>
-References: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com>	<1447679519-17888-16-git-send-email-marc.zyngier@arm.com> <CAKv+Gu-4OCaoFp4myi3YNGNeoSmhw7pURqmgW_gb5kSQCGoFQA@mail.gmail.com>
+From: Steve Capper <steve.capper@linaro.org>
+Subject: Re: [PATCH 12/21] arm64: KVM: Implement fpsimd save/restore
+Date: Tue, 17 Nov 2015 11:13:18 +0000
+Message-ID: <CAPvkgC0wLpRShZkHQ3KcFU0omLoACcgJ0L37f3qPEZfkONy1iQ@mail.gmail.com>
+References: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com>
+	<1447679519-17888-13-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <CAKv+Gu-4OCaoFp4myi3YNGNeoSmhw7pURqmgW_gb5kSQCGoFQA@mail.gmail.com>
+In-Reply-To: <1447679519-17888-13-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <marc.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, KVM devel mailing list <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <marc.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 16/11/15 15:53, Ard Biesheuvel wrote:
-> On 16 November 2015 at 14:11, Marc Zyngier <marc.zyngier@arm.com> wrote:
->> Add the panic handler, together with the small bits of assembly
->> code to call the kernel's panic implementation.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm64/kvm/hyp/hyp-entry.S | 11 ++++++++++-
->>  arch/arm64/kvm/hyp/hyp.h       |  1 +
->>  arch/arm64/kvm/hyp/switch.c    | 35 +++++++++++++++++++++++++++++++++++
->>  3 files changed, 46 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
->> index e11a129..7218eed 100644
->> --- a/arch/arm64/kvm/hyp/hyp-entry.S
->> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
->> @@ -141,7 +141,16 @@ el1_irq:
->>         mov     x1, #ARM_EXCEPTION_IRQ
->>         b       __guest_exit
->>
->> -.macro invalid_vector  label, target = __kvm_hyp_panic
->> +ENTRY(__hyp_do_panic)
->> +       mov     lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
->> +                     PSR_MODE_EL1h)
->> +       msr     spsr_el2, lr
->> +       ldr     lr, =panic
->> +       msr     elr_el2, lr
->> +       eret
->> +ENDPROC(__hyp_do_panic)
->> +
->> +.macro invalid_vector  label, target = __hyp_panic
->>         .align  2
->>  \label:
->>         b \target
->> diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
->> index 240fb79..d5d500d 100644
->> --- a/arch/arm64/kvm/hyp/hyp.h
->> +++ b/arch/arm64/kvm/hyp/hyp.h
->> @@ -74,6 +74,7 @@ void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
->>  void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
->>
->>  u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
->> +void __noreturn __hyp_do_panic(unsigned long, ...);
->>
->>  #endif /* __ARM64_KVM_HYP_H__ */
->>
->> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
->> index 06d3e20..cdc2a96 100644
->> --- a/arch/arm64/kvm/hyp/switch.c
->> +++ b/arch/arm64/kvm/hyp/switch.c
->> @@ -140,3 +140,38 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
->>
->>         return exit_code;
->>  }
->> +
->> +static const char *__hyp_panic_string = "HYP panic:\nPS:%08x PC:%p ESR:%p\nFAR:%p HPFAR:%p PAR:%p\nVCPU:%p\n";
->> +
-> 
-> Re separating the HYP text from the kernel proper: this is exactly the
-> thing that is likely to cause trouble when you execute the kernel text
-> from HYP.
-> 
-> __hyp_panic_string is a non-const char pointer containing the absolute
-> address of the string in the initializer, as seen from the high kernel
-> virtual mapping.
-> Better use 'static const char __hyp_panic_string[]' instead.
+On 16 November 2015 at 13:11, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> Implement the fpsimd save restore, keeping the lazy part in
+> assembler (as returning to C would be overkill).
+>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/kvm/hyp/Makefile |  1 +
+>  arch/arm64/kvm/hyp/entry.S  | 32 +++++++++++++++++++++++++++++++-
+>  arch/arm64/kvm/hyp/fpsimd.S | 33 +++++++++++++++++++++++++++++++++
+>  arch/arm64/kvm/hyp/hyp.h    |  3 +++
+>  arch/arm64/kvm/hyp/switch.c |  8 ++++++++
+>  5 files changed, 76 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/arm64/kvm/hyp/fpsimd.S
+>
+> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> index 9c11b0f..56238d0 100644
+> --- a/arch/arm64/kvm/hyp/Makefile
+> +++ b/arch/arm64/kvm/hyp/Makefile
+> @@ -9,3 +9,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += entry.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += switch.o
+> +obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
+> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> index 2c4449a..7552922 100644
+> --- a/arch/arm64/kvm/hyp/entry.S
+> +++ b/arch/arm64/kvm/hyp/entry.S
+> @@ -27,6 +27,7 @@
+>
+>  #define CPU_GP_REG_OFFSET(x)   (CPU_GP_REGS + x)
+>  #define CPU_XREG_OFFSET(x)     CPU_GP_REG_OFFSET(CPU_USER_PT_REGS + 8*x)
+> +#define CPU_SYSREG_OFFSET(x)   (CPU_SYSREGS + 8*x)
+>
+>         .text
+>         .pushsection    .hyp.text, "ax"
+> @@ -152,4 +153,33 @@ ENTRY(__guest_exit)
+>         ret
+>  ENDPROC(__guest_exit)
+>
+> -       /* Insert fault handling here */
+> +ENTRY(__fpsimd_guest_restore)
+> +       push    x4, lr
+> +
+> +       mrs     x2, cptr_el2
+> +       bic     x2, x2, #CPTR_EL2_TFP
+> +       msr     cptr_el2, x2
+> +       isb
+> +
+> +       mrs     x3, tpidr_el2
+> +
+> +       ldr     x0, [x3, #VCPU_HOST_CONTEXT]
+> +       kern_hyp_va x0
+> +       add     x0, x0, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
+> +       bl      __fpsimd_save_state
+> +
+> +       add     x2, x3, #VCPU_CONTEXT
+> +       add     x0, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
+> +       bl      __fpsimd_restore_state
+> +
+> +       mrs     x1, hcr_el2
+> +       tbnz    x1, #HCR_RW_SHIFT, 1f
+> +       ldr     x4, [x2, #CPU_SYSREG_OFFSET(FPEXC32_EL2)]
+> +       msr     fpexc32_el2, x4
+> +1:
+> +       pop     x4, lr
+> +       pop     x2, x3
+> +       pop     x0, x1
+> +
+> +       eret
+> +ENDPROC(__fpsimd_guest_restore)
+> diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
+> new file mode 100644
+> index 0000000..da3f22c
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/fpsimd.S
+> @@ -0,0 +1,33 @@
+> +/*
+> + * Copyright (C) 2015 - ARM Ltd
+> + * Author: Marc Zyngier <marc.zyngier@arm.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include <linux/linkage.h>
+> +
+> +#include <asm/fpsimdmacros.h>
+> +
+> +       .text
+> +       .pushsection    .hyp.text, "ax"
+> +
+> +ENTRY(__fpsimd_save_state)
+> +       fpsimd_save     x0, 1
+> +       ret
+> +ENDPROC(__fpsimd_save_state)
+> +
+> +ENTRY(__fpsimd_restore_state)
+> +       fpsimd_restore  x0, 1
+> +       ret
+> +ENDPROC(__fpsimd_restore_state)
+> diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
+> index bf13238..240fb79 100644
+> --- a/arch/arm64/kvm/hyp/hyp.h
+> +++ b/arch/arm64/kvm/hyp/hyp.h
+> @@ -70,6 +70,9 @@ void __debug_clear_restore_state(struct kvm_vcpu *vcpu,
+>                                  struct kvm_guest_debug_arch *dbg,
+>                                  struct kvm_cpu_context *ctxt);
+>
+> +void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
+> +void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
+> +
+>  u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
+>
+>  #endif /* __ARM64_KVM_HYP_H__ */
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index a3af81a..06d3e20 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -88,6 +88,7 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+>  {
+>         struct kvm_cpu_context *host_ctxt;
+>         struct kvm_cpu_context *guest_ctxt;
+> +       bool fp_enabled;
+>         u64 exit_code;
+>
+>         vcpu = kern_hyp_va(vcpu);
+> @@ -117,6 +118,8 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+>         exit_code = __guest_enter(vcpu, host_ctxt);
+>         /* And we're baaack! */
+>
+> +       fp_enabled = !!(read_sysreg(cptr_el2) & CPTR_EL2_TFP);
 
-Definitely.
+Should this not be a single logical not?
+If CPTR_EL2_TFP is set then the floating point will trap in the guest,
+thus floating point hasn't been used by the guest?
 
-> (If it currenty works fine, it is only because the compiler optimizes
-> the entire variable away, and performs a relative access in the place
-> where the variable is referenced.)
+I am chasing some issues when running kvmtool on my system with this
+patch set applied.
+The above change stops NetworkManager crashing on my host.
 
-That, and the fact that only panic() gets passed a pointer to this
-string, so it doesn't really matter where it lives in this case.
+Unfortunately I am still chasing some problems with the guest (illegal
+instructions).
 
-But you do have a point here, and I'll address this for the next round.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> +
+>         __sysreg_save_state(guest_ctxt);
+>         __sysreg32_save_state(vcpu);
+>         __timer_save_state(vcpu);
+> @@ -127,6 +130,11 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+>
+>         __sysreg_restore_state(host_ctxt);
+>
+> +       if (fp_enabled) {
+> +               __fpsimd_save_state(&guest_ctxt->gp_regs.fp_regs);
+> +               __fpsimd_restore_state(&host_ctxt->gp_regs.fp_regs);
+> +       }
+> +
+>         __debug_save_state(vcpu, &vcpu->arch.vcpu_debug_state, guest_ctxt);
+>         __debug_clear_restore_state(vcpu, &vcpu->arch.host_debug_state, host_ctxt);
+>
+> --
+> 2.1.4
+>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
