@@ -1,24 +1,24 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v4 04/13] VFIO: platform: single handler using function pointer
-Date: Thu, 19 Nov 2015 14:53:54 +0000
-Message-ID: <1447944843-17731-5-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v4 01/13] KVM: arm/arm64: select IRQ_BYPASS_MANAGER
+Date: Thu, 19 Nov 2015 14:53:51 +0000
+Message-ID: <1447944843-17731-2-git-send-email-eric.auger@linaro.org>
 References: <1447944843-17731-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CF8AE499F2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2015 09:53:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 48897499E0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2015 09:53:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id kd5F-nom0uVp for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Nov 2015 09:53:38 -0500 (EST)
-Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6524649A08
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2015 09:53:37 -0500 (EST)
-Received: by wmdw130 with SMTP id w130so243637238wmd.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2015 06:54:16 -0800 (PST)
+ with ESMTP id hKR2U3gXBaYi for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 19 Nov 2015 09:53:32 -0500 (EST)
+Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 804304989E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2015 09:53:32 -0500 (EST)
+Received: by wmec201 with SMTP id c201so121297803wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2015 06:54:11 -0800 (PST)
 In-Reply-To: <1447944843-17731-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,91 +33,53 @@ To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, b.reyn
 Cc: andre.przywara@arm.com, linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-A single handler now is registered whatever the use case: automasked
-or not. A function pointer is set according to the wished behavior
-and the handler calls this function.
-
-The irq lock is taken/released in the root handler. eventfd_signal can
-be called in regions not allowed to sleep.
+Select IRQ_BYPASS_MANAGER when CONFIG_KVM is set
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
-
 ---
+ arch/arm/kvm/Kconfig   | 2 ++
+ arch/arm64/kvm/Kconfig | 2 ++
+ 2 files changed, 4 insertions(+)
 
-v4: creation
----
- drivers/vfio/platform/vfio_platform_irq.c     | 21 +++++++++++++++------
- drivers/vfio/platform/vfio_platform_private.h |  1 +
- 2 files changed, 16 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
-index d4462fd..c58e0ad 100644
---- a/drivers/vfio/platform/vfio_platform_irq.c
-+++ b/drivers/vfio/platform/vfio_platform_irq.c
-@@ -148,11 +148,8 @@ static int vfio_platform_set_irq_unmask(struct vfio_platform_device *vdev,
- static irqreturn_t vfio_automasked_irq_handler(int irq, void *dev_id)
- {
- 	struct vfio_platform_irq *irq_ctx = dev_id;
--	unsigned long flags;
- 	int ret = IRQ_NONE;
+diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+index 95a0005..73d7201 100644
+--- a/arch/arm/kvm/Kconfig
++++ b/arch/arm/kvm/Kconfig
+@@ -3,6 +3,7 @@
+ #
  
--	spin_lock_irqsave(&irq_ctx->lock, flags);
--
- 	if (!irq_ctx->masked) {
- 		ret = IRQ_HANDLED;
+ source "virt/kvm/Kconfig"
++source "virt/lib/Kconfig"
  
-@@ -161,8 +158,6 @@ static irqreturn_t vfio_automasked_irq_handler(int irq, void *dev_id)
- 		irq_ctx->masked = true;
- 	}
+ menuconfig VIRTUALIZATION
+ 	bool "Virtualization"
+@@ -32,6 +33,7 @@ config KVM
+ 	select KVM_VFIO
+ 	select HAVE_KVM_EVENTFD
+ 	select HAVE_KVM_IRQFD
++	select IRQ_BYPASS_MANAGER
+ 	depends on ARM_VIRT_EXT && ARM_LPAE && ARM_ARCH_TIMER
+ 	---help---
+ 	  Support hosting virtualized guest machines.
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index a5272c0..64f460d 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -3,6 +3,7 @@
+ #
  
--	spin_unlock_irqrestore(&irq_ctx->lock, flags);
--
- 	if (ret == IRQ_HANDLED)
- 		eventfd_signal(irq_ctx->trigger, 1);
+ source "virt/kvm/Kconfig"
++source "virt/lib/Kconfig"
  
-@@ -178,6 +173,19 @@ static irqreturn_t vfio_irq_handler(int irq, void *dev_id)
- 	return IRQ_HANDLED;
- }
- 
-+static irqreturn_t vfio_handler(int irq, void *dev_id)
-+{
-+	struct vfio_platform_irq *irq_ctx = dev_id;
-+	unsigned long flags;
-+	irqreturn_t ret;
-+
-+	spin_lock_irqsave(&irq_ctx->lock, flags);
-+	ret = irq_ctx->handler(irq, dev_id);
-+	spin_unlock_irqrestore(&irq_ctx->lock, flags);
-+
-+	return ret;
-+}
-+
- static void vfio_platform_irq_bypass_stop(struct irq_bypass_producer *prod)
- {
- }
-@@ -230,9 +238,10 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
- 	}
- 
- 	irq->trigger = trigger;
-+	irq->handler = handler;
- 
- 	irq_set_status_flags(irq->hwirq, IRQ_NOAUTOEN);
--	ret = request_irq(irq->hwirq, handler, 0, irq->name, irq);
-+	ret = request_irq(irq->hwirq, vfio_handler, 0, irq->name, irq);
- 	if (ret) {
- 		kfree(irq->name);
- 		eventfd_ctx_put(trigger);
-diff --git a/drivers/vfio/platform/vfio_platform_private.h b/drivers/vfio/platform/vfio_platform_private.h
-index 55e8043..8a8c050 100644
---- a/drivers/vfio/platform/vfio_platform_private.h
-+++ b/drivers/vfio/platform/vfio_platform_private.h
-@@ -40,6 +40,7 @@ struct vfio_platform_irq {
- 	struct virqfd		*mask;
- 	struct irq_bypass_producer producer;
- 	bool			forwarded;
-+	irqreturn_t (*handler)(int irq, void *dev_id);
- };
- 
- struct vfio_platform_region {
+ menuconfig VIRTUALIZATION
+ 	bool "Virtualization"
+@@ -36,6 +37,7 @@ config KVM
+ 	select HAVE_KVM_EVENTFD
+ 	select HAVE_KVM_IRQFD
+ 	select KVM_ARM_VGIC_V3
++	select IRQ_BYPASS_MANAGER
+ 	---help---
+ 	  Support hosting virtualized guest machines.
+ 	  We don't support KVM with 16K page tables yet, due to the multiple
 -- 
 1.9.1
