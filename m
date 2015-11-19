@@ -1,84 +1,96 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v4 06/13] VFIO: platform: add vfio_platform_irq_is_active
-Date: Thu, 19 Nov 2015 14:53:56 +0000
-Message-ID: <1447944843-17731-7-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v4 07/13] VFIO: platform: add irq bypass producer management
+Date: Thu, 19 Nov 2015 14:53:57 +0000
+Message-ID: <1447944843-17731-8-git-send-email-eric.auger@linaro.org>
 References: <1447944843-17731-1-git-send-email-eric.auger@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3792F49761
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2015 09:53:48 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VEyqnjauhWFS for <kvmarm@lists.cs.columbia.edu>;
- Thu, 19 Nov 2015 09:53:43 -0500 (EST)
-Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C91449A19
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2015 09:53:41 -0500 (EST)
-Received: by wmvv187 with SMTP id v187so29523571wmv.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 19 Nov 2015 06:54:21 -0800 (PST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1447944843-17731-1-git-send-email-eric.auger@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, b.reynal@virtualopensystems.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 Cc: andre.przywara@arm.com, linux-kernel@vger.kernel.org, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This function returns whether the IRQ is active at irqchip level or
-VFIO masked. If either is true, the IRQ is considered active.
-Currently there is no way to differentiate userspace masked IRQ from
-automasked IRQ. There might be false detection of activity. However
-it is currently acceptable to have false detection.
+This patch populates the IRQ bypass callacks:
+- stop/start producer simply consist in disabling/enabling the host irq
+- add/del consumer: basically set the automasked flag to false/true
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
 ---
-
 v3 -> v4:
-- rename vfio_platform_is_active into vfio_platform_irq_is_active
-- remove BUG_ON and return the error if irq_get_irqchip_state fails
+- use vfio_platform_set_forwarded in place of vfio_platform_set_automasked
+- use vfio_platform_irq_is_active and its returned value
+- reword comments related to auto/explicit VFIO masking
+
+v2 -> v3:
+- vfio_platform_irq_bypass_add_consumer now returns an error in case
+  the IRQ is recognized as active
+- active boolean not set anymore
+- do not VFIO mask the IRQ anymore on unforward
+
+v1 -> v2:
+- device handle caching in vfio_platform_device is introduced in a
+  separate patch
+- use container_of
 ---
- drivers/vfio/platform/vfio_platform_irq.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ drivers/vfio/platform/vfio_platform_irq.c | 28 +++++++++++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
-index 257200b..cb7d5e9 100644
+index cb7d5e9..e486c32 100644
 --- a/drivers/vfio/platform/vfio_platform_irq.c
 +++ b/drivers/vfio/platform/vfio_platform_irq.c
-@@ -203,6 +203,25 @@ static int vfio_platform_set_forwarded(struct vfio_platform_irq *irq,
- 	return 0;
- }
+@@ -224,23 +224,49 @@ out:
  
-+static int vfio_platform_irq_is_active(struct vfio_platform_irq *irq)
-+{
-+	unsigned long flags;
-+	bool active;
-+	int ret;
-+
-+	spin_lock_irqsave(&irq->lock, flags);
-+
-+	ret = irq_get_irqchip_state(irq->hwirq, IRQCHIP_STATE_ACTIVE, &active);
-+	if (ret)
-+		goto out;
-+
-+	ret = active || irq->masked;
-+
-+out:
-+	spin_unlock_irqrestore(&irq->lock, flags);
-+	return ret;
-+}
-+
  static void vfio_platform_irq_bypass_stop(struct irq_bypass_producer *prod)
  {
++	disable_irq(prod->irq);
  }
+ 
+ static void vfio_platform_irq_bypass_start(struct irq_bypass_producer *prod)
+ {
++	enable_irq(prod->irq);
+ }
+ 
+ static int vfio_platform_irq_bypass_add_consumer(
+ 			struct irq_bypass_producer *prod,
+ 			struct irq_bypass_consumer *cons)
+ {
+-	return 0;
++	struct vfio_platform_irq *irq =
++		container_of(prod, struct vfio_platform_irq, producer);
++	int ret;
++
++	/*
++	 * if the IRQ is active at irqchip level or masked by VFIO
++	 * this means the host IRQ may be under injection and
++	 * it is not safe to change the forwarding state at that time.
++	 * It is not possible to discriminate VFIO explicit masking
++	 * from VFIO auto-masking, leading to possible false detection of
++	 * IRQ activity. It is up to the user-space to avoid VFIO explicit
++	 * masking situation. In case of failure, no retry is attempted and
++	 * bypass setup simply fails.
++	 */
++	ret = vfio_platform_irq_is_active(irq);
++	if (ret < 0)
++		return ret;
++	else if (ret == 1)
++		return -EAGAIN;
++
++	return vfio_platform_set_forwarded(irq, true);
+ }
+ 
+ static void vfio_platform_irq_bypass_del_consumer(
+ 			struct irq_bypass_producer *prod,
+ 			struct irq_bypass_consumer *cons)
+ {
++	struct vfio_platform_irq *irq =
++		container_of(prod, struct vfio_platform_irq, producer);
++
++	vfio_platform_set_forwarded(irq, false);
+ }
+ 
+ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
 -- 
 1.9.1
+
