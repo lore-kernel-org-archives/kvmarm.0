@@ -1,133 +1,175 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 03/21] arm64: KVM: Implement vgic-v2 save/restore
-Date: Fri, 20 Nov 2015 15:54:38 +0000
-Message-ID: <564F423E.9050007@arm.com>
-References: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com> <1447679519-17888-4-git-send-email-marc.zyngier@arm.com> <20151120152215.GA24960@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v9 5/6] target-arm: kvm - re-inject guest debug exceptions
+Date: Fri, 20 Nov 2015 16:14:41 +0000
+Message-ID: <CAFEAcA9xXULtmcq7n353gZEyObUx+ZafsfNKUep8_CWNmLzdcA@mail.gmail.com>
+References: <1447345251-22625-1-git-send-email-alex.bennee@linaro.org> <1447345251-22625-6-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20151120152215.GA24960@linaro.org>
+In-Reply-To: <1447345251-22625-6-git-send-email-alex.bennee@linaro.org>
 Sender: kvm-owner@vger.kernel.org
-To: Steve Capper <steve.capper@linaro.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <marc.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm@nongnu.org, Christoffer Dall <christoffer.dall@linaro.org>, Zhichao Huang <zhichao.huang@linaro.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex@bennee.com>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Steve,
+On 12 November 2015 at 16:20, Alex Benn=C3=A9e <alex.bennee@linaro.org>=
+ wrote:
+> From: Alex Benn=C3=A9e <alex@bennee.com>
+>
+> If we can't find details for the debug exception in our debug state
+> then we can assume the exception is due to debugging inside the guest=
+=2E
+> To inject the exception into the guest state we re-use the TCG except=
+ion
+> code (do_interupt).
 
-On 20/11/15 15:22, Steve Capper wrote:
-> On Mon, Nov 16, 2015 at 01:11:41PM +0000, Marc Zyngier wrote:
->> > Implement the vgic-v2 save restore as a direct translation of
->> > the assembly code version.
-> Hi Marc,
-> I have one comment below:
-> 
-> Cheers,
-> -- Steve
->> > 
->> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> > ---
->> >  arch/arm64/kvm/Makefile         |  1 +
->> >  arch/arm64/kvm/hyp/Makefile     |  5 +++
->> >  arch/arm64/kvm/hyp/hyp.h        |  3 ++
->> >  arch/arm64/kvm/hyp/vgic-v2-sr.c | 85 +++++++++++++++++++++++++++++++++++++++++
->> >  4 files changed, 94 insertions(+)
->> >  create mode 100644 arch/arm64/kvm/hyp/Makefile
->> >  create mode 100644 arch/arm64/kvm/hyp/vgic-v2-sr.c
->> > 
->> > diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
->> > index 1949fe5..d31e4e5 100644
->> > --- a/arch/arm64/kvm/Makefile
->> > +++ b/arch/arm64/kvm/Makefile
->> > @@ -10,6 +10,7 @@ KVM=../../../virt/kvm
->> >  ARM=../../../arch/arm/kvm
->> >  
->> >  obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
->> > +obj-$(CONFIG_KVM_ARM_HOST) += hyp/
->> >  
->> >  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
->> >  kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/arm.o $(ARM)/mmu.o $(ARM)/mmio.o
->> > diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
->> > new file mode 100644
->> > index 0000000..d8d5968
->> > --- /dev/null
->> > +++ b/arch/arm64/kvm/hyp/Makefile
->> > @@ -0,0 +1,5 @@
->> > +#
->> > +# Makefile for Kernel-based Virtual Machine module, HYP part
->> > +#
->> > +
->> > +obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
->> > diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
->> > index dac843e..78f25c4 100644
->> > --- a/arch/arm64/kvm/hyp/hyp.h
->> > +++ b/arch/arm64/kvm/hyp/hyp.h
->> > @@ -27,5 +27,8 @@
->> >  
->> >  #define kern_hyp_va(v) (typeof(v))((unsigned long)v & HYP_PAGE_OFFSET_MASK)
->> >  
->> > +void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
->> > +void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
->> > +
->> >  #endif /* __ARM64_KVM_HYP_H__ */
->> >  
->> > diff --git a/arch/arm64/kvm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
->> > new file mode 100644
->> > index 0000000..1382d2e
->> > --- /dev/null
->> > +++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
->> > @@ -0,0 +1,85 @@
->> > +/*
->> > + * Copyright (C) 2012-2015 - ARM Ltd
->> > + * Author: Marc Zyngier <marc.zyngier@arm.com>
->> > + *
->> > + * This program is free software; you can redistribute it and/or modify
->> > + * it under the terms of the GNU General Public License version 2 as
->> > + * published by the Free Software Foundation.
->> > + *
->> > + * This program is distributed in the hope that it will be useful,
->> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> > + * GNU General Public License for more details.
->> > + *
->> > + * You should have received a copy of the GNU General Public License
->> > + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->> > + */
->> > +
->> > +#include <linux/compiler.h>
->> > +#include <linux/irqchip/arm-gic.h>
->> > +#include <linux/kvm_host.h>
->> > +
->> > +#include <asm/kvm_mmu.h>
->> > +
->> > +#include "hyp.h"
->> > +
->> > +/* vcpu is already in the HYP VA space */
->> > +void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
->> > +{
->> > +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
->> > +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
->> > +	struct vgic_dist *vgic = &kvm->arch.vgic;
->> > +	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
->> > +	u32 __iomem *lr_base;
->> > +	u32 eisr0, eisr1, elrsr0, elrsr1;
->> > +	int i = 0, nr_lr;
->> > +
->> > +	if (!base)
->> > +		return;
->> > +
->> > +	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
->> > +	cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
->> > +	eisr0  = readl_relaxed(base + GICH_EISR0);
->> > +	eisr1  = readl_relaxed(base + GICH_EISR0);
-> Not sure what this would affect, but should the RHS be:
-> "base + GICH_EISR1"?
+"do_interrupt".
 
--ECOPYPASTE. We're just lucky that we only have 4 list registers, and
-thus never look past the first word.
+>
+> However while guest debugging is in effect we currently can't handle =
+the
+> guest using single step which is heavily used by GDB.
 
-Thanks a lot for noticing this!
+Can you expand this to be clearer about what the problem is here?
+Is this a thing fixed by this commit or a remaining issue after it?
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> ---
+> v5:
+>   - new for v5
+> ---
+>  target-arm/helper-a64.c | 12 ++++++++++--
+>  target-arm/kvm.c        | 27 +++++++++++++++++++--------
+>  2 files changed, 29 insertions(+), 10 deletions(-)
+>
+> diff --git a/target-arm/helper-a64.c b/target-arm/helper-a64.c
+> index deb8dbe..fc3ccdf 100644
+> --- a/target-arm/helper-a64.c
+> +++ b/target-arm/helper-a64.c
+> @@ -25,6 +25,7 @@
+>  #include "qemu/bitops.h"
+>  #include "internals.h"
+>  #include "qemu/crc32c.h"
+> +#include "sysemu/kvm.h"
+>  #include <zlib.h> /* For crc32 */
+>
+>  /* C2.4.7 Multiply and divide */
+> @@ -469,7 +470,8 @@ void aarch64_cpu_do_interrupt(CPUState *cs)
+>                    new_el);
+>      if (qemu_loglevel_mask(CPU_LOG_INT)
+>          && !excp_is_internal(cs->exception_index)) {
+> -        qemu_log_mask(CPU_LOG_INT, "...with ESR 0x%" PRIx32 "\n",
+> +        qemu_log_mask(CPU_LOG_INT, "...with ESR %x/0x%" PRIx32 "\n",
+> +                      env->exception.syndrome >> ARM_EL_EC_SHIFT,
+>                        env->exception.syndrome);
+>      }
+>
+> @@ -535,6 +537,12 @@ void aarch64_cpu_do_interrupt(CPUState *cs)
+>      aarch64_restore_sp(env, new_el);
+>
+>      env->pc =3D addr;
+> -    cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
+> +
+> +    qemu_log_mask(CPU_LOG_INT, "...to EL%d PC 0x%" PRIx64 " PSTATE 0=
+x%x\n",
+> +                  new_el, env->pc, pstate_read(env));
+> +
+> +    if (!kvm_enabled()) {
+> +        cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
+> +    }
+>  }
+>  #endif
+> diff --git a/target-arm/kvm.c b/target-arm/kvm.c
+> index 1f57e92..4ac177a 100644
+> --- a/target-arm/kvm.c
+> +++ b/target-arm/kvm.c
+> @@ -529,9 +529,10 @@ static int kvm_handle_debug(CPUState *cs, struct=
+ kvm_run *run)
+>      struct kvm_debug_exit_arch *arch_info =3D &run->debug.arch;
+>      int hsr_ec =3D arch_info->hsr >> ARM_EL_EC_SHIFT;
+>      ARMCPU *cpu =3D ARM_CPU(cs);
+> +    CPUClass *cc =3D CPU_GET_CLASS(cs);
+>      CPUARMState *env =3D &cpu->env;
+>
+> -    /* Ensure PC is synchronised */
+> +    /* Ensure all state is synchronised */
+
+You might as well have just written the comment like that to start with=
+ :-)
+
+>      kvm_cpu_synchronize_state(cs);
+>
+>      switch (hsr_ec) {
+> @@ -539,7 +540,14 @@ static int kvm_handle_debug(CPUState *cs, struct=
+ kvm_run *run)
+>          if (cs->singlestep_enabled) {
+>              return true;
+>          } else {
+> -            error_report("Came out of SINGLE STEP when not enabled")=
+;
+> +            /*
+> +             * The kernel should have supressed the guests ability t=
+o
+
+"suppressed". "guest's".
+
+> +             * single step at this point so something has gone wrong=
+=2E
+> +             */
+> +            error_report("%s: guest single-step while debugging unsu=
+pported"
+> +                         " (%"PRIx64", %"PRIx32")\n",
+> +                         __func__, env->pc, arch_info->hsr);
+> +            return false;
+
+Why didn't we just write the error_report this way to start with?
+
+>          }
+>          break;
+>      case EC_AA64_BKPT:
+> @@ -564,14 +572,17 @@ static int kvm_handle_debug(CPUState *cs, struc=
+t kvm_run *run)
+>      default:
+>          error_report("%s: unhandled debug exit (%"PRIx32", %"PRIx64"=
+)\n",
+>                       __func__, arch_info->hsr, env->pc);
+> +        return false;
+
+Might as well put this "return false;" in the original code that
+adds the default case, rather than changing the control flow in this
+patch.
+
+>      }
+>
+> -    /* If we don't handle this it could be it really is for the
+> -       guest to handle */
+> -    qemu_log_mask(LOG_UNIMP,
+> -                  "%s: re-injecting exception not yet implemented"
+> -                  " (0x%"PRIx32", %"PRIx64")\n",
+> -                  __func__, hsr_ec, env->pc);
+> +    /* If we are not handling the debug exception it must belong to
+> +     * the guest. Let's re-use the existing TCG interrupt code to se=
+t
+> +     * everything up properly
+
+Missing trailing ".".
+
+> +     */
+> +    cs->exception_index =3D EXCP_BKPT;
+> +    env->exception.syndrome =3D arch_info->hsr;
+> +    env->exception.vaddress =3D arch_info->far;
+
+You need to set env->exception.target_el to 1 as well.
+
+> +    cc->do_interrupt(cs);
+>
+>      return false;
+>  }
+> --
+> 2.6.3
+>
+
+thanks
+-- PMM
