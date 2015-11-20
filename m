@@ -1,72 +1,177 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v9 1/6] target-arm: kvm64 - introduce kvm_arm_init_debug()
-Date: Fri, 20 Nov 2015 15:11:50 +0000
-Message-ID: <CAFEAcA8bdjYaDiCParJt8jVe+720+tzh4CuKD2YGfHeo2UJNcQ@mail.gmail.com>
-References: <1447345251-22625-1-git-send-email-alex.bennee@linaro.org>
- <1447345251-22625-2-git-send-email-alex.bennee@linaro.org>
- <CAFEAcA-u3ACj=99NkTRsEL=2KA6LETeAmEf+5Vo03gz0GMh5Zw@mail.gmail.com>
+From: Steve Capper <steve.capper@linaro.org>
+Subject: Re: [PATCH 03/21] arm64: KVM: Implement vgic-v2 save/restore
+Date: Fri, 20 Nov 2015 15:22:27 +0000
+Message-ID: <20151120152215.GA24960@linaro.org>
+References: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com>
+ <1447679519-17888-4-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A271E48531
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Nov 2015 10:11:40 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZmxVxx8onRQC for <kvmarm@lists.cs.columbia.edu>;
- Fri, 20 Nov 2015 10:11:38 -0500 (EST)
-Received: from mail-yk0-f174.google.com (mail-yk0-f174.google.com
- [209.85.160.174])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 91CED4852C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Nov 2015 10:11:38 -0500 (EST)
-Received: by ykba77 with SMTP id a77so166064750ykb.2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 20 Nov 2015 07:12:21 -0800 (PST)
-In-Reply-To: <CAFEAcA-u3ACj=99NkTRsEL=2KA6LETeAmEf+5Vo03gz0GMh5Zw@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm@nongnu.org, Zhichao Huang <zhichao.huang@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1447679519-17888-4-git-send-email-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <marc.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMjAgTm92ZW1iZXIgMjAxNSBhdCAxNTowNSwgUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIubWF5ZGVs
-bEBsaW5hcm8ub3JnPiB3cm90ZToKPiBPbiAxMiBOb3ZlbWJlciAyMDE1IGF0IDE2OjIwLCBBbGV4
-IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+IHdyb3RlOgo+PiBBcyB3ZSBoYXZlbid0
-IGFsd2F5cyBoYWQgZ3Vlc3QgZGVidWcgc3VwcG9ydCB3ZSBuZWVkIHRvIHByb2JlIGZvciBpdC4K
-Pj4gQWRkaXRpb25hbGx5IHdlIGRvbid0IGRvIHRoaXMgaW4gdGhlIHN0YXJ0LXVwIGNhcGFiaWxp
-dHkgY29kZSBzbyB3ZQo+PiBkb24ndCBmYWxsIG92ZXIgb24gb2xkIGtlcm5lbHMuCj4+Cj4+IFNp
-Z25lZC1vZmYtYnk6IEFsZXggQmVubsOpZSA8YWxleC5iZW5uZWVAbGluYXJvLm9yZz4KPj4gLS0t
-Cj4+ICB0YXJnZXQtYXJtL2t2bTY0LmMgfCAxOCArKysrKysrKysrKysrKysrKysKPj4gIDEgZmls
-ZSBjaGFuZ2VkLCAxOCBpbnNlcnRpb25zKCspCj4+Cj4+IGRpZmYgLS1naXQgYS90YXJnZXQtYXJt
-L2t2bTY0LmMgYi90YXJnZXQtYXJtL2t2bTY0LmMKPj4gaW5kZXggY2VlYmZlYi4uZDA4Nzc5NCAx
-MDA2NDQKPj4gLS0tIGEvdGFyZ2V0LWFybS9rdm02NC5jCj4+ICsrKyBiL3RhcmdldC1hcm0va3Zt
-NjQuYwo+PiBAQCAtMjUsNiArMjUsMjIgQEAKPj4gICNpbmNsdWRlICJpbnRlcm5hbHMuaCIKPj4g
-ICNpbmNsdWRlICJody9hcm0vYXJtLmgiCj4+Cj4+ICtzdGF0aWMgYm9vbCBoYXZlX2d1ZXN0X2Rl
-YnVnOwo+PiArCj4+ICsvKioKPj4gKyAqIGt2bV9hcm1faW5pdF9kZWJ1ZygpCj4+ICsgKiBAY3M6
-IENQVVN0YXRlCj4+ICsgKgo+PiArICogQ2hlY2sgZm9yIGd1ZXN0IGRlYnVnIGNhcGFiaWxpdGll
-cy4KPj4gKyAqCj4+ICsgKi8KPj4gK3N0YXRpYyB2b2lkIGt2bV9hcm1faW5pdF9kZWJ1ZyhDUFVT
-dGF0ZSAqY3MpCj4+ICt7Cj4+ICsgICAgaGF2ZV9ndWVzdF9kZWJ1ZyA9IGt2bV9jaGVja19leHRl
-bnNpb24oY3MtPmt2bV9zdGF0ZSwKPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBLVk1fQ0FQX1NFVF9HVUVTVF9ERUJVRyk7Cj4+ICsgICAgcmV0dXJuOwo+PiAr
-fQo+PiArCj4+ICBzdGF0aWMgaW5saW5lIHZvaWQgc2V0X2ZlYXR1cmUodWludDY0X3QgKmZlYXR1
-cmVzLCBpbnQgZmVhdHVyZSkKPj4gIHsKPj4gICAgICAqZmVhdHVyZXMgfD0gMVVMTCA8PCBmZWF0
-dXJlOwo+PiBAQCAtMTIxLDYgKzEzNyw4IEBAIGludCBrdm1fYXJjaF9pbml0X3ZjcHUoQ1BVU3Rh
-dGUgKmNzKQo+PiAgICAgIH0KPj4gICAgICBjcHUtPm1wX2FmZmluaXR5ID0gbXBpZHIgJiBBUk02
-NF9BRkZJTklUWV9NQVNLOwo+Pgo+PiArICAgIGt2bV9hcm1faW5pdF9kZWJ1Zyhjcyk7Cj4+ICsK
-Pj4gICAgICByZXR1cm4ga3ZtX2FybV9pbml0X2NwcmVnX2xpc3QoY3B1KTsKPj4gIH0KPgo+IEkg
-YXNzdW1lIGluIHByYWN0aWNlIHRoZSBrZXJuZWwgZ3VhcmFudGVlcyB0aGF0IGVpdGhlciBhbGwK
-PiBDUFVzIGhhdmUgdGhlIFNFVF9HVUVTVF9ERUJVRyBjYXAsIG9yIG5vbmUgZG8gOi0pCj4KPiBS
-ZXZpZXdlZC1ieTogUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPgoKLi4u
-ZXhjZXB0IEkndmUganVzdCBub3RpY2VkIHRoYXQgbm90aGluZyBlbHNlIGluIHRoaXMgcGF0Y2hz
-ZXQKZXZlciByZWFkcyB0aGUgaGF2ZV9ndWVzdF9kZWJ1ZyBib29sIHdlIGp1c3Qgc2V0LCBzbyB3
-aGF0IGlzCnRoZSBwdXJwb3NlIG9mIHRoaXMgcGF0Y2g/Cgp0aGFua3MKLS0gUE1NCl9fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxp
-c3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlh
-LmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
+On Mon, Nov 16, 2015 at 01:11:41PM +0000, Marc Zyngier wrote:
+> Implement the vgic-v2 save restore as a direct translation of
+> the assembly code version.
+
+Hi Marc,
+I have one comment below:
+
+Cheers,
+-- 
+Steve
+
+
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/kvm/Makefile         |  1 +
+>  arch/arm64/kvm/hyp/Makefile     |  5 +++
+>  arch/arm64/kvm/hyp/hyp.h        |  3 ++
+>  arch/arm64/kvm/hyp/vgic-v2-sr.c | 85 +++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 94 insertions(+)
+>  create mode 100644 arch/arm64/kvm/hyp/Makefile
+>  create mode 100644 arch/arm64/kvm/hyp/vgic-v2-sr.c
+> 
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 1949fe5..d31e4e5 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -10,6 +10,7 @@ KVM=../../../virt/kvm
+>  ARM=../../../arch/arm/kvm
+>  
+>  obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
+> +obj-$(CONFIG_KVM_ARM_HOST) += hyp/
+>  
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/arm.o $(ARM)/mmu.o $(ARM)/mmio.o
+> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> new file mode 100644
+> index 0000000..d8d5968
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/Makefile
+> @@ -0,0 +1,5 @@
+> +#
+> +# Makefile for Kernel-based Virtual Machine module, HYP part
+> +#
+> +
+> +obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
+> diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
+> index dac843e..78f25c4 100644
+> --- a/arch/arm64/kvm/hyp/hyp.h
+> +++ b/arch/arm64/kvm/hyp/hyp.h
+> @@ -27,5 +27,8 @@
+>  
+>  #define kern_hyp_va(v) (typeof(v))((unsigned long)v & HYP_PAGE_OFFSET_MASK)
+>  
+> +void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
+> +void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
+> +
+>  #endif /* __ARM64_KVM_HYP_H__ */
+>  
+> diff --git a/arch/arm64/kvm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> new file mode 100644
+> index 0000000..1382d2e
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> @@ -0,0 +1,85 @@
+> +/*
+> + * Copyright (C) 2012-2015 - ARM Ltd
+> + * Author: Marc Zyngier <marc.zyngier@arm.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include <linux/compiler.h>
+> +#include <linux/irqchip/arm-gic.h>
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/kvm_mmu.h>
+> +
+> +#include "hyp.h"
+> +
+> +/* vcpu is already in the HYP VA space */
+> +void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> +	struct vgic_dist *vgic = &kvm->arch.vgic;
+> +	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
+> +	u32 __iomem *lr_base;
+> +	u32 eisr0, eisr1, elrsr0, elrsr1;
+> +	int i = 0, nr_lr;
+> +
+> +	if (!base)
+> +		return;
+> +
+> +	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
+> +	cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
+> +	eisr0  = readl_relaxed(base + GICH_EISR0);
+> +	eisr1  = readl_relaxed(base + GICH_EISR0);
+
+Not sure what this would affect, but should the RHS be:
+"base + GICH_EISR1"?
+
+> +	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
+> +	elrsr1 = readl_relaxed(base + GICH_ELRSR1);
+> +#ifdef CONFIG_CPU_BIG_ENDIAN
+> +	cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
+> +	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
+> +#else
+> +	cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
+> +	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
+> +#endif
+> +	cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
+> +
+> +	writel_relaxed(0, base + GICH_HCR);
+> +
+> +	lr_base = base + GICH_LR0;
+> +	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
+> +	do {
+> +		cpu_if->vgic_lr[i++] = readl_relaxed(lr_base++);
+> +	} while (--nr_lr);
+> +}
+> +
+> +void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> +	struct vgic_dist *vgic = &kvm->arch.vgic;
+> +	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
+> +	u32 __iomem *lr_base;
+> +	unsigned int i = 0, nr_lr;
+> +
+> +	if (!base)
+> +		return;
+> +
+> +	writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
+> +	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
+> +	writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
+> +
+> +	lr_base = base + GICH_LR0;
+> +	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
+> +	do {
+> +		writel_relaxed(cpu_if->vgic_lr[i++], lr_base++);
+> +	} while (--nr_lr);
+> +}
+> -- 
+> 2.1.4
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
