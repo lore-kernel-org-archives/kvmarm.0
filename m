@@ -1,177 +1,89 @@
-From: Steve Capper <steve.capper@linaro.org>
-Subject: Re: [PATCH 03/21] arm64: KVM: Implement vgic-v2 save/restore
-Date: Fri, 20 Nov 2015 15:22:27 +0000
-Message-ID: <20151120152215.GA24960@linaro.org>
-References: <1447679519-17888-1-git-send-email-marc.zyngier@arm.com>
- <1447679519-17888-4-git-send-email-marc.zyngier@arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH v9 1/6] target-arm: kvm64 - introduce kvm_arm_init_debug()
+Date: Fri, 20 Nov 2015 15:23:24 +0000
+Message-ID: <877flcitjn.fsf@linaro.org>
+References: <1447345251-22625-1-git-send-email-alex.bennee@linaro.org> <1447345251-22625-2-git-send-email-alex.bennee@linaro.org> <CAFEAcA-u3ACj=99NkTRsEL=2KA6LETeAmEf+5Vo03gz0GMh5Zw@mail.gmail.com> <CAFEAcA8bdjYaDiCParJt8jVe+720+tzh4CuKD2YGfHeo2UJNcQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1447679519-17888-4-git-send-email-marc.zyngier@arm.com>
+In-reply-to: <CAFEAcA8bdjYaDiCParJt8jVe+720+tzh4CuKD2YGfHeo2UJNcQ@mail.gmail.com>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <marc.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm@nongnu.org, Christoffer Dall <christoffer.dall@linaro.org>, Zhichao Huang <zhichao.huang@linaro.org>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Nov 16, 2015 at 01:11:41PM +0000, Marc Zyngier wrote:
-> Implement the vgic-v2 save restore as a direct translation of
-> the assembly code version.
 
-Hi Marc,
-I have one comment below:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Cheers,
--- 
-Steve
+> On 20 November 2015 at 15:05, Peter Maydell <peter.maydell@linaro.org=
+> wrote:
+>> On 12 November 2015 at 16:20, Alex Benn=C3=A9e <alex.bennee@linaro.o=
+rg> wrote:
+>>> As we haven't always had guest debug support we need to probe for i=
+t.
+>>> Additionally we don't do this in the start-up capability code so we
+>>> don't fall over on old kernels.
+>>>
+>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>> ---
+>>>  target-arm/kvm64.c | 18 ++++++++++++++++++
+>>>  1 file changed, 18 insertions(+)
+>>>
+>>> diff --git a/target-arm/kvm64.c b/target-arm/kvm64.c
+>>> index ceebfeb..d087794 100644
+>>> --- a/target-arm/kvm64.c
+>>> +++ b/target-arm/kvm64.c
+>>> @@ -25,6 +25,22 @@
+>>>  #include "internals.h"
+>>>  #include "hw/arm/arm.h"
+>>>
+>>> +static bool have_guest_debug;
+>>> +
+>>> +/**
+>>> + * kvm_arm_init_debug()
+>>> + * @cs: CPUState
+>>> + *
+>>> + * Check for guest debug capabilities.
+>>> + *
+>>> + */
+>>> +static void kvm_arm_init_debug(CPUState *cs)
+>>> +{
+>>> +    have_guest_debug =3D kvm_check_extension(cs->kvm_state,
+>>> +                                           KVM_CAP_SET_GUEST_DEBUG=
+);
+>>> +    return;
+>>> +}
+>>> +
+>>>  static inline void set_feature(uint64_t *features, int feature)
+>>>  {
+>>>      *features |=3D 1ULL << feature;
+>>> @@ -121,6 +137,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>>      }
+>>>      cpu->mp_affinity =3D mpidr & ARM64_AFFINITY_MASK;
+>>>
+>>> +    kvm_arm_init_debug(cs);
+>>> +
+>>>      return kvm_arm_init_cpreg_list(cpu);
+>>>  }
+>>
+>> I assume in practice the kernel guarantees that either all
+>> CPUs have the SET_GUEST_DEBUG cap, or none do :-)
+>>
+>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>
+> ...except I've just noticed that nothing else in this patchset
+> ever reads the have_guest_debug bool we just set, so what is
+> the purpose of this patch?
+
+Oops, maybe to point out my stupidity ;-)
+
+But yes the SET_GUEST_DEBUG cap is kernel wide.
+
+>
+> thanks
+> -- PMM
 
 
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/kvm/Makefile         |  1 +
->  arch/arm64/kvm/hyp/Makefile     |  5 +++
->  arch/arm64/kvm/hyp/hyp.h        |  3 ++
->  arch/arm64/kvm/hyp/vgic-v2-sr.c | 85 +++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 94 insertions(+)
->  create mode 100644 arch/arm64/kvm/hyp/Makefile
->  create mode 100644 arch/arm64/kvm/hyp/vgic-v2-sr.c
-> 
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index 1949fe5..d31e4e5 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -10,6 +10,7 @@ KVM=../../../virt/kvm
->  ARM=../../../arch/arm/kvm
->  
->  obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
-> +obj-$(CONFIG_KVM_ARM_HOST) += hyp/
->  
->  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
->  kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/arm.o $(ARM)/mmu.o $(ARM)/mmio.o
-> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-> new file mode 100644
-> index 0000000..d8d5968
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/Makefile
-> @@ -0,0 +1,5 @@
-> +#
-> +# Makefile for Kernel-based Virtual Machine module, HYP part
-> +#
-> +
-> +obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
-> diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-> index dac843e..78f25c4 100644
-> --- a/arch/arm64/kvm/hyp/hyp.h
-> +++ b/arch/arm64/kvm/hyp/hyp.h
-> @@ -27,5 +27,8 @@
->  
->  #define kern_hyp_va(v) (typeof(v))((unsigned long)v & HYP_PAGE_OFFSET_MASK)
->  
-> +void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
-> +void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
-> +
->  #endif /* __ARM64_KVM_HYP_H__ */
->  
-> diff --git a/arch/arm64/kvm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
-> new file mode 100644
-> index 0000000..1382d2e
-> --- /dev/null
-> +++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
-> @@ -0,0 +1,85 @@
-> +/*
-> + * Copyright (C) 2012-2015 - ARM Ltd
-> + * Author: Marc Zyngier <marc.zyngier@arm.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include <linux/compiler.h>
-> +#include <linux/irqchip/arm-gic.h>
-> +#include <linux/kvm_host.h>
-> +
-> +#include <asm/kvm_mmu.h>
-> +
-> +#include "hyp.h"
-> +
-> +/* vcpu is already in the HYP VA space */
-> +void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-> +	struct vgic_dist *vgic = &kvm->arch.vgic;
-> +	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
-> +	u32 __iomem *lr_base;
-> +	u32 eisr0, eisr1, elrsr0, elrsr1;
-> +	int i = 0, nr_lr;
-> +
-> +	if (!base)
-> +		return;
-> +
-> +	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
-> +	cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
-> +	eisr0  = readl_relaxed(base + GICH_EISR0);
-> +	eisr1  = readl_relaxed(base + GICH_EISR0);
-
-Not sure what this would affect, but should the RHS be:
-"base + GICH_EISR1"?
-
-> +	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
-> +	elrsr1 = readl_relaxed(base + GICH_ELRSR1);
-> +#ifdef CONFIG_CPU_BIG_ENDIAN
-> +	cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
-> +	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
-> +#else
-> +	cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
-> +	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
-> +#endif
-> +	cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
-> +
-> +	writel_relaxed(0, base + GICH_HCR);
-> +
-> +	lr_base = base + GICH_LR0;
-> +	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
-> +	do {
-> +		cpu_if->vgic_lr[i++] = readl_relaxed(lr_base++);
-> +	} while (--nr_lr);
-> +}
-> +
-> +void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-> +	struct vgic_dist *vgic = &kvm->arch.vgic;
-> +	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
-> +	u32 __iomem *lr_base;
-> +	unsigned int i = 0, nr_lr;
-> +
-> +	if (!base)
-> +		return;
-> +
-> +	writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
-> +	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
-> +	writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
-> +
-> +	lr_base = base + GICH_LR0;
-> +	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
-> +	do {
-> +		writel_relaxed(cpu_if->vgic_lr[i++], lr_base++);
-> +	} while (--nr_lr);
-> +}
-> -- 
-> 2.1.4
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+--=20
+Alex Benn=C3=A9e
