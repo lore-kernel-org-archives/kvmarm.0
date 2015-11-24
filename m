@@ -1,27 +1,31 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: [PATCH v2 0/3] Introduce MSI hardware mapping for VFIO
-Date: Tue, 24 Nov 2015 16:50:53 +0300
-Message-ID: <cover.1448372839.git.p.fedin@samsung.com>
+Subject: [PATCH v2 2/3] gicv3, its: Introduce VFIO map and unmap operations
+Date: Tue, 24 Nov 2015 16:50:55 +0300
+Message-ID: <6b5aed2d9fd9b8678c07091e97a8d07f64cd584d.1448372839.git.p.fedin@samsung.com>
+References: <cover.1448372839.git.p.fedin@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BAD7249720
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2015 08:50:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DCE84155B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2015 08:50:07 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HChj2QXz-GIB for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Nov 2015 08:50:03 -0500 (EST)
-Received: from mailout3.w1.samsung.com (mailout3.w1.samsung.com
- [210.118.77.13])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D58BC4155B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2015 08:50:03 -0500 (EST)
-Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
- by mailout3.w1.samsung.com
+ with ESMTP id QjwI1zsTuF+D for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Nov 2015 08:50:05 -0500 (EST)
+Received: from mailout4.w1.samsung.com (mailout4.w1.samsung.com
+ [210.118.77.14])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C2ED04965E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2015 08:50:05 -0500 (EST)
+Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
+ by mailout4.w1.samsung.com
  (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NYB00D4GNT0ZD10@mailout3.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Tue, 24 Nov 2015 13:51:00 +0000 (GMT)
+ with ESMTP id <0NYB00C5HNT1NC10@mailout4.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Tue, 24 Nov 2015 13:51:01 +0000 (GMT)
+In-reply-to: <cover.1448372839.git.p.fedin@samsung.com>
+In-reply-to: <cover.1448372839.git.p.fedin@samsung.com>
+References: <cover.1448372839.git.p.fedin@samsung.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,29 +39,116 @@ To: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Alex Williamson <alex.williamson@redhat.com>, Manish Jaggi <mjaggi@caviumnetworks.com>, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On some architectures (e.g. ARM64) if the device is behind an IOMMU, and
-is being mapped by VFIO, it is necessary to also add mappings for MSI
-translation register for interrupts to work. This series implements the
-necessary API to do this, and makes use of this API for GICv3 ITS on
-ARM64.
+These new functions use the supplied IOMMU in order to map and unmap MSI
+translation register(s).
 
-v1 => v2:
-- Adde dependency on CONFIG_GENERIC_MSI_IRQ_DOMAIN in some parts of the
-  code, should fix build without this option
+Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+---
+ drivers/irqchip/irq-gic-v3-its.c   | 31 +++++++++++++++++++++++++++++++
+ include/linux/irqchip/arm-gic-v3.h |  2 ++
+ include/linux/msi.h                | 12 ++++++++++++
+ 3 files changed, 45 insertions(+)
 
-Pavel Fedin (3):
-  vfio: Introduce map and unmap operations
-  gicv3, its: Introduce VFIO map and unmap operations
-  vfio: Introduce generic MSI mapping operations
-
- drivers/irqchip/irq-gic-v3-its.c   |  31 ++++++++++
- drivers/vfio/pci/vfio_pci_intrs.c  |  11 ++++
- drivers/vfio/vfio.c                | 116 +++++++++++++++++++++++++++++++++++++
- drivers/vfio/vfio_iommu_type1.c    |  29 ++++++++++
- include/linux/irqchip/arm-gic-v3.h |   2 +
- include/linux/msi.h                |  12 ++++
- include/linux/vfio.h               |  17 +++++-
- 7 files changed, 217 insertions(+), 1 deletion(-)
-
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index e23d1d1..b97dfd7 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -29,6 +29,7 @@
+ #include <linux/of_platform.h>
+ #include <linux/percpu.h>
+ #include <linux/slab.h>
++#include <linux/vfio.h>
+ 
+ #include <linux/irqchip.h>
+ #include <linux/irqchip/arm-gic-v3.h>
+@@ -1257,8 +1258,38 @@ out:
+ 	return 0;
+ }
+ 
++#if IS_ENABLED(CONFIG_VFIO)
++
++static int its_vfio_map(struct irq_domain *domain,
++			const struct vfio_iommu_driver_ops *ops,
++			void *iommu_data)
++{
++	struct msi_domain_info *msi_info = msi_get_domain_info(domain);
++	struct its_node *its = msi_info->data;
++	u64 addr = its->phys_base + GIC_V3_ITS_CONTROL_SIZE;
++
++	return ops->map(iommu_data, addr, addr, 1, IOMMU_READ|IOMMU_WRITE);
++}
++
++static void its_vfio_unmap(struct irq_domain *domain,
++			   const struct vfio_iommu_driver_ops *ops,
++			   void *iommu_data)
++{
++	struct msi_domain_info *msi_info = msi_get_domain_info(domain);
++	struct its_node *its = msi_info->data;
++	u64 addr = its->phys_base + GIC_V3_ITS_CONTROL_SIZE;
++
++	ops->unmap(iommu_data, addr, 1);
++}
++
++#endif
++
+ static struct msi_domain_ops its_msi_domain_ops = {
+ 	.msi_prepare	= its_msi_prepare,
++#if IS_ENABLED(CONFIG_VFIO)
++	.vfio_map	= its_vfio_map,
++	.vfio_unmap	= its_vfio_unmap,
++#endif
+ };
+ 
+ static int its_irq_gic_domain_alloc(struct irq_domain *domain,
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index bff3eee..dfd2bed 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -241,6 +241,8 @@
+ #define GITS_BASER_TYPE_RESERVED6	6
+ #define GITS_BASER_TYPE_RESERVED7	7
+ 
++#define GIC_V3_ITS_CONTROL_SIZE		0x10000
++
+ /*
+  * ITS commands
+  */
+diff --git a/include/linux/msi.h b/include/linux/msi.h
+index f71a25e..48faea9 100644
+--- a/include/linux/msi.h
++++ b/include/linux/msi.h
+@@ -155,6 +155,8 @@ void arch_restore_msi_irqs(struct pci_dev *dev);
+ void default_teardown_msi_irqs(struct pci_dev *dev);
+ void default_restore_msi_irqs(struct pci_dev *dev);
+ 
++struct vfio_iommu_driver_ops;
++
+ struct msi_controller {
+ 	struct module *owner;
+ 	struct device *dev;
+@@ -189,6 +191,8 @@ struct msi_domain_info;
+  * @msi_finish:		Optional callbacl to finalize the allocation
+  * @set_desc:		Set the msi descriptor for an interrupt
+  * @handle_error:	Optional error handler if the allocation fails
++ * @vfio_map:		Map the MSI hardware for VFIO
++ * @vfio_unmap:		Unmap the MSI hardware for VFIO
+  *
+  * @get_hwirq, @msi_init and @msi_free are callbacks used by
+  * msi_create_irq_domain() and related interfaces
+@@ -218,6 +222,14 @@ struct msi_domain_ops {
+ 				    struct msi_desc *desc);
+ 	int		(*handle_error)(struct irq_domain *domain,
+ 					struct msi_desc *desc, int error);
++#if IS_ENABLED(CONFIG_VFIO)
++	int		(*vfio_map)(struct irq_domain *domain,
++				    const struct vfio_iommu_driver_ops *ops,
++				    void *iommu_data);
++	void		(*vfio_unmap)(struct irq_domain *domain,
++				      const struct vfio_iommu_driver_ops *ops,
++				      void *iommu_data);
++#endif
+ };
+ 
+ /**
 -- 
 2.4.4
