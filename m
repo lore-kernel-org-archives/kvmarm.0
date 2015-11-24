@@ -1,29 +1,29 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: [PATCH v6 1/7] KVM: arm/arm64: Add VGICv3 save/restore API
- documentation
-Date: Tue, 24 Nov 2015 12:14:35 +0300
-Message-ID: <619fb5a8be06fb4370d5422f1af9848aa2ebc818.1448356282.git.p.fedin@samsung.com>
+Subject: [PATCH v6 4/7] KVM: arm64: Implement vGICv3 distributor and
+ redistributor access from userspace
+Date: Tue, 24 Nov 2015 12:14:38 +0300
+Message-ID: <4597707faad370fa91b8ddc2d36454c534a65ee3.1448356282.git.p.fedin@samsung.com>
 References: <cover.1448356282.git.p.fedin@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 10F4549861
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2015 04:13:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F38449936
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2015 04:13:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NvPNV-uTYyTu for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Nov 2015 04:13:53 -0500 (EST)
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com
- [210.118.77.11])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A3E7D48531
+ with ESMTP id yNWUkzPb3sij for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Nov 2015 04:13:55 -0500 (EST)
+Received: from mailout3.w1.samsung.com (mailout3.w1.samsung.com
+ [210.118.77.13])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B586498A3
  for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2015 04:13:53 -0500 (EST)
 Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
- by mailout1.w1.samsung.com
+ by mailout3.w1.samsung.com
  (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NYB007R5B0OLT50@mailout1.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Tue, 24 Nov 2015 09:14:48 +0000 (GMT)
+ with ESMTP id <0NYB00CWPB0PJS50@mailout3.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Tue, 24 Nov 2015 09:14:49 +0000 (GMT)
 In-reply-to: <cover.1448356282.git.p.fedin@samsung.com>
 In-reply-to: <cover.1448356282.git.p.fedin@samsung.com>
 References: <cover.1448356282.git.p.fedin@samsung.com>
@@ -40,188 +40,240 @@ To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Christoffer Dall <christoffer.dall@linaro.org>
+The access is done similar to vGICv2, using
+KVM_DEV_ARM_VGIC_GRP_DIST_REGS and KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
+with KVM_SET_DEVICE_ATTR and KVM_GET_DEVICE_ATTR ioctls.
 
-Factor out the GICv3-specific documentation into a separate
-documentation file.  Add description for how to access distributor,
-redistributor, and CPU interface registers for GICv3 in this new file.
+Access size for vGICv3 is 64 bits, vgic_attr_regs_access() fixed to
+support this. The trick with vgic_v3_get_reg_size() is necessary because
+the major part of GICv3 registers is actually 32-bit, and their accessors
+do not distinguish between lower and upper words (offset & 3). Accessing
+these registers with len == 8 would cause rollover. For write operations
+this would overwrite lower word with the upper one (which would normally
+be 0), for read operations this would cause duplication of the same word
+in both halves.
 
-Acked-by: Peter Maydell <peter.maydell@linaro.org>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
 ---
- Documentation/virtual/kvm/devices/arm-vgic-v3.txt | 116 ++++++++++++++++++++++
- Documentation/virtual/kvm/devices/arm-vgic.txt    |  21 +---
- 2 files changed, 120 insertions(+), 17 deletions(-)
- create mode 100644 Documentation/virtual/kvm/devices/arm-vgic-v3.txt
+ arch/arm64/include/uapi/asm/kvm.h  |   1 +
+ include/linux/irqchip/arm-gic-v3.h |   1 +
+ virt/kvm/arm/vgic-v3-emul.c        | 112 ++++++++++++++++++++++++++++++++-----
+ virt/kvm/arm/vgic.c                |   4 +-
+ 4 files changed, 102 insertions(+), 16 deletions(-)
 
-diff --git a/Documentation/virtual/kvm/devices/arm-vgic-v3.txt b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-new file mode 100644
-index 0000000..24e2f6b
---- /dev/null
-+++ b/Documentation/virtual/kvm/devices/arm-vgic-v3.txt
-@@ -0,0 +1,116 @@
-+ARM Virtual Generic Interrupt Controller v3 and later (VGICv3)
-+==============================================================
-+
-+
-+Device types supported:
-+  KVM_DEV_TYPE_ARM_VGIC_V3     ARM Generic Interrupt Controller v3.0
-+
-+Only one VGIC instance may be instantiated through this API.  The created VGIC
-+will act as the VM interrupt controller, requiring emulated user-space devices
-+to inject interrupts to the VGIC instead of directly to CPUs.  It is not
-+possible to create both a GICv3 and GICv2 on the same VM.
-+
-+Creating a guest GICv3 device requires a host GICv3 as well.
-+
-+Groups:
-+  KVM_DEV_ARM_VGIC_GRP_ADDR
-+  Attributes:
-+    KVM_VGIC_V3_ADDR_TYPE_DIST (rw, 64-bit)
-+      Base address in the guest physical address space of the GICv3 distributor
-+      register mappings. Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
-+      This address needs to be 64K aligned and the region covers 64 KByte.
-+
-+    KVM_VGIC_V3_ADDR_TYPE_REDIST (rw, 64-bit)
-+      Base address in the guest physical address space of the GICv3
-+      redistributor register mappings. There are two 64K pages for each
-+      VCPU and all of the redistributor pages are contiguous.
-+      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
-+      This address needs to be 64K aligned.
-+
-+
-+  KVM_DEV_ARM_VGIC_GRP_DIST_REGS
-+  KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
-+  Attributes:
-+    The attr field of kvm_device_attr encodes two values:
-+    bits:     | 63   ....  32  |  31   ....    0 |
-+    values:   |      mpidr     |      offset     |
-+
-+    All distributor regs are (rw, 64-bit).
-+
-+    KVM_DEV_ARM_VGIC_GRP_DIST_REGS accesses the main distributor registers.
-+    KVM_DEV_ARM_VGIC_GRP_REDIST_REGS accesses the redistributor of the CPU
-+    specified by the mpidr.
-+
-+    The offset is relative to the "[Re]Distributor base address" as defined
-+    in the GICv3/4 specs.  Getting or setting such a register has the same
-+    effect as reading or writing the register on real hardware, and the mpidr
-+    field is used to specify which redistributor is accessed.  The mpidr is
-+    ignored for the distributor.
-+
-+    The mpidr encoding is based on the affinity information in the
-+    architecture defined MPIDR, and the field is encoded as follows:
-+      | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
-+      |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
-+
-+    Note that distributor fields are not banked, but return the same value
-+    regardless of the mpidr used to access the register.
-+  Limitations:
-+    - Priorities are not implemented, and registers are RAZ/WI
-+  Errors:
-+    -ENXIO: Getting or setting this register is not yet supported
-+    -EBUSY: One or more VCPUs are running
-+
-+
-+  KVM_DEV_ARM_VGIC_CPU_SYSREGS
-+  Attributes:
-+    The attr field of kvm_device_attr encodes two values:
-+    bits:     | 63      ....       32 | 31  ....  16 | 15  ....  0 |
-+    values:   |         mpidr         |      RES     |    instr    |
-+
-+    The mpidr field encodes the CPU ID based on the affinity information in the
-+    architecture defined MPIDR, and the field is encoded as follows:
-+      | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
-+      |    Aff3    |    Aff2    |    Aff1    |    Aff0   |
-+    KVM_DEV_ARM_VGIC_SYSREG() macro is provided for building register ID.
-+
-+    The instr field encodes the system register to access based on the fields
-+    defined in the A64 instruction set encoding for system register access
-+    (RES means the bits are reserved for future use and should be zero):
-+
-+      | 15 ... 14 | 13 ... 11 | 10 ... 7 | 6 ... 3 | 2 ... 0 |
-+      |   Op 0    |    Op1    |    CRn   |   CRm   |   Op2   |
-+
-+    All system regs accessed through this API are (rw, 64-bit).
-+
-+    KVM_DEV_ARM_VGIC_CPU_SYSREGS accesses the CPU interface registers for the
-+    CPU specified by the mpidr field.
-+
-+
-+  Limitations:
-+    - Priorities are not implemented, and registers are RAZ/WI
-+  Errors:
-+    -ENXIO: Getting or setting this register is not yet supported
-+    -EBUSY: VCPU is running
-+    -EINVAL: Invalid mpidr supplied
-+
-+
-+  KVM_DEV_ARM_VGIC_GRP_NR_IRQS
-+  Attributes:
-+    A value describing the number of interrupts (SGI, PPI and SPI) for
-+    this GIC instance, ranging from 64 to 1024, in increments of 32.
-+
-+  Errors:
-+    -EINVAL: Value set is out of the expected range
-+    -EBUSY: Value has already be set.
-+
-+
-+  KVM_DEV_ARM_VGIC_GRP_CTRL
-+  Attributes:
-+    KVM_DEV_ARM_VGIC_CTRL_INIT
-+      request the initialization of the VGIC, no additional parameter in
-+      kvm_device_attr.addr.
-+  Errors:
-+    -ENXIO: VGIC not properly configured as required prior to calling
-+     this attribute
-+    -ENODEV: no online VCPU
-+    -ENOMEM: memory shortage when allocating vgic internal data
-diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
-index 59541d4..257b854 100644
---- a/Documentation/virtual/kvm/devices/arm-vgic.txt
-+++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
-@@ -3,16 +3,16 @@ ARM Virtual Generic Interrupt Controller (VGIC)
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 2d4ca4b..98bd047 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -203,6 +203,7 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_GRP_NR_IRQS	3
+ #define KVM_DEV_ARM_VGIC_GRP_CTRL	4
+ #define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
++#define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
  
- Device types supported:
-   KVM_DEV_TYPE_ARM_VGIC_V2     ARM Generic Interrupt Controller v2.0
--  KVM_DEV_TYPE_ARM_VGIC_V3     ARM Generic Interrupt Controller v3.0
+ /* KVM_IRQ_LINE irq field index values */
+ #define KVM_ARM_IRQ_TYPE_SHIFT		24
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index 95388a7..7e9f9d5 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -43,6 +43,7 @@
+ #define GICD_IGRPMODR			0x0D00
+ #define GICD_NSACR			0x0E00
+ #define GICD_IROUTER			0x6000
++#define GICD_IROUTER1019		0x7FD8
+ #define GICD_IDREGS			0xFFD0
+ #define GICD_PIDR2			0xFFE8
  
- Only one VGIC instance may be instantiated through either this API or the
- legacy KVM_CREATE_IRQCHIP api.  The created VGIC will act as the VM interrupt
- controller, requiring emulated user-space devices to inject interrupts to the
- VGIC instead of directly to CPUs.
+diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+index e661e7f..d9d644c 100644
+--- a/virt/kvm/arm/vgic-v3-emul.c
++++ b/virt/kvm/arm/vgic-v3-emul.c
+@@ -39,6 +39,7 @@
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+ #include <linux/interrupt.h>
++#include <linux/uaccess.h>
  
--Creating a guest GICv3 device requires a host GICv3 as well.
--GICv3 implementations with hardware compatibility support allow a guest GICv2
--as well.
-+GICv3 implementations with hardware compatibility support allow creating a
-+guest GICv2 through this interface.  For information on creating a guest GICv3
-+device, see arm-vgic-v3.txt.  It is not possible to create both a GICv3 and
-+GICv2 device on the same VM.
+ #include <linux/irqchip/arm-gic-v3.h>
+ #include <kvm/arm_vgic.h>
+@@ -990,6 +991,77 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg)
+ 		vgic_kick_vcpus(vcpu->kvm);
+ }
  
- Groups:
-   KVM_DEV_ARM_VGIC_GRP_ADDR
-@@ -27,19 +27,6 @@ Groups:
-       interface register mappings. Only valid for KVM_DEV_TYPE_ARM_VGIC_V2.
-       This address needs to be 4K aligned and the region covers 4 KByte.
++static u32 vgic_v3_get_reg_size(u32 group, u32 offset)
++{
++	switch (group) {
++	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
++		if (offset >= GICD_IROUTER && offset <= GICD_IROUTER1019)
++			return 8;
++		else
++			return 4;
++		break;
++
++	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
++		if ((offset == GICR_TYPER) ||
++		    (offset >= GICR_SETLPIR && offset <= GICR_INVALLR))
++			return 8;
++		else
++			return 4;
++		break;
++
++	default:
++		BUG();
++	}
++}
++
++static int vgic_v3_attr_regs_access(struct kvm_device *dev,
++				    struct kvm_device_attr *attr,
++				    u64 *reg, bool is_write)
++{
++	const struct vgic_io_range *ranges;
++	phys_addr_t offset;
++	struct kvm_vcpu *vcpu;
++	u64 cpuid;
++	struct vgic_dist *vgic = &dev->kvm->arch.vgic;
++	struct kvm_exit_mmio mmio;
++	__le64 data;
++	int ret;
++
++	offset = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
++	cpuid = attr->attr >> KVM_DEV_ARM_VGIC_CPUID_SHIFT;
++
++	/* Convert affinity ID from our packed to normal form */
++	cpuid = (cpuid & 0x00ffffff) | ((cpuid & 0xff000000) << 8);
++	vcpu = kvm_mpidr_to_vcpu(dev->kvm, cpuid);
++	if (!vcpu)
++		return -EINVAL;
++
++	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
++		mmio.phys_addr = vgic->vgic_dist_base + offset;
++		ranges = vgic_v3_dist_ranges;
++		break;
++	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
++		mmio.phys_addr = vgic->vgic_redist_base + offset;
++		ranges = vgic_redist_ranges;
++		break;
++	default:
++		return -ENXIO;
++	}
++
++	data = cpu_to_le64(*reg);
++
++	mmio.len = vgic_v3_get_reg_size(attr->group, offset);
++	mmio.is_write = is_write;
++	mmio.data = &data;
++	mmio.private = vcpu; /* Redistributor handlers expect this */
++
++	ret = vgic_attr_regs_access(vcpu, ranges, &mmio, offset);
++
++	*reg = le64_to_cpu(data);
++	return ret;
++}
++
+ static int vgic_v3_create(struct kvm_device *dev, u32 type)
+ {
+ 	return kvm_vgic_create(dev->kvm, type);
+@@ -1003,42 +1075,45 @@ static void vgic_v3_destroy(struct kvm_device *dev)
+ static int vgic_v3_set_attr(struct kvm_device *dev,
+ 			    struct kvm_device_attr *attr)
+ {
++	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
++	u64 reg;
+ 	int ret;
  
--    KVM_VGIC_V3_ADDR_TYPE_DIST (rw, 64-bit)
--      Base address in the guest physical address space of the GICv3 distributor
--      register mappings. Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
--      This address needs to be 64K aligned and the region covers 64 KByte.
--
--    KVM_VGIC_V3_ADDR_TYPE_REDIST (rw, 64-bit)
--      Base address in the guest physical address space of the GICv3
--      redistributor register mappings. There are two 64K pages for each
--      VCPU and all of the redistributor pages are contiguous.
--      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
--      This address needs to be 64K aligned.
--
--
-   KVM_DEV_ARM_VGIC_GRP_DIST_REGS
-   Attributes:
-     The attr field of kvm_device_attr encodes two values:
+ 	ret = vgic_set_common_attr(dev, attr);
+ 	if (ret != -ENXIO)
+ 		return ret;
+ 
+-	switch (attr->group) {
+-	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+-	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
+-		return -ENXIO;
+-	}
++	if (get_user(reg, uaddr))
++		return -EFAULT;
+ 
+-	return -ENXIO;
++	return vgic_v3_attr_regs_access(dev, attr, &reg, true);
+ }
+ 
+ static int vgic_v3_get_attr(struct kvm_device *dev,
+ 			    struct kvm_device_attr *attr)
+ {
++	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
++	u64 reg = 0;
+ 	int ret;
+ 
+ 	ret = vgic_get_common_attr(dev, attr);
+ 	if (ret != -ENXIO)
+ 		return ret;
+ 
+-	switch (attr->group) {
+-	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+-	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
+-		return -ENXIO;
+-	}
++	ret = vgic_v3_attr_regs_access(dev, attr, &reg, false);
++	if (ret)
++		return ret;
+ 
+-	return -ENXIO;
++	return put_user(reg, uaddr);
+ }
+ 
+ static int vgic_v3_has_attr(struct kvm_device *dev,
+ 			    struct kvm_device_attr *attr)
+ {
++	phys_addr_t offset;
++	struct sys_reg_params params;
++	u64 regid;
++
+ 	switch (attr->group) {
+ 	case KVM_DEV_ARM_VGIC_GRP_ADDR:
+ 		switch (attr->attr) {
+@@ -1051,8 +1126,17 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+ 		}
+ 		break;
+ 	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+-	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
+-		return -ENXIO;
++		offset = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
++		return vgic_has_attr_regs(vgic_v3_dist_ranges, offset);
++	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
++		offset = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
++		return vgic_has_attr_regs(vgic_redist_ranges, offset);
++	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
++		regid = (attr->attr & KVM_DEV_ARM_VGIC_SYSREG_MASK) |
++			KVM_REG_SIZE_U64;
++		return find_reg_by_id(regid, &params, gic_v3_icc_reg_descs,
++				      ARRAY_SIZE(gic_v3_icc_reg_descs)) ?
++			0 : -ENXIO;
+ 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
+ 		return 0;
+ 	case KVM_DEV_ARM_VGIC_GRP_CTRL:
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 5e09629..d30fcb3 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -2374,7 +2374,7 @@ int vgic_attr_regs_access(struct kvm_vcpu *vcpu,
+ 	struct kvm_vcpu *tmp_vcpu;
+ 	struct vgic_dist *vgic;
+ 
+-	r = vgic_find_range(ranges, 4, offset);
++	r = vgic_find_range(ranges, mmio->len, offset);
+ 
+ 	if (unlikely(!r || !r->handle_mmio))
+ 		return -ENXIO;
+@@ -2412,7 +2412,7 @@ int vgic_attr_regs_access(struct kvm_vcpu *vcpu,
+ 		vgic_unqueue_irqs(tmp_vcpu);
+ 
+ 	offset -= r->base;
+-	r->handle_mmio(vcpu, mmio, offset);
++	call_range_handler(vcpu, mmio, offset, r);
+ 
+ 	ret = 0;
+ out_vgic_unlock:
 -- 
 2.4.4
