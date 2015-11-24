@@ -1,24 +1,24 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 8/8] arm64: kvm: report original PAR_EL1 upon panic
-Date: Tue, 24 Nov 2015 18:35:36 +0100
-Message-ID: <1448386536-30118-9-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 2/8] arm64: KVM: Fix AArch32 to AArch64 register mapping
+Date: Tue, 24 Nov 2015 18:35:30 +0100
+Message-ID: <1448386536-30118-3-git-send-email-christoffer.dall@linaro.org>
 References: <1448386536-30118-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DBA9412D0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2015 12:34:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 06E3A48912
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2015 12:34:22 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NzRtIfqAJyll for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Nov 2015 12:34:26 -0500 (EST)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3598649680
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2015 12:34:26 -0500 (EST)
-Received: by wmww144 with SMTP id w144so36432429wmw.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2015 09:35:24 -0800 (PST)
+ with ESMTP id 2nPf0OtIj8ah for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 24 Nov 2015 12:34:21 -0500 (EST)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 338BB4130A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2015 12:34:19 -0500 (EST)
+Received: by wmec201 with SMTP id c201so220445967wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2015 09:35:18 -0800 (PST)
 In-Reply-To: <1448386536-30118-1-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -30,50 +30,81 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Mark Rutland <mark.rutland@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
 
-If we call __kvm_hyp_panic while a guest context is active, we call
-__restore_sysregs before acquiring the system register values for the
-panic, in the process throwing away the PAR_EL1 value at the point of
-the panic.
+When running a 32bit guest under a 64bit hypervisor, the ARMv8
+architecture defines a mapping of the 32bit registers in the 64bit
+space. This includes banked registers that are being demultiplexed
+over the 64bit ones.
 
-This patch modifies __kvm_hyp_panic to stash the PAR_EL1 value prior to
-restoring host register values, enabling us to report the original
-values at the point of the panic.
+On exceptions caused by an operation involving a 32bit register, the
+HW exposes the register number in the ESR_EL2 register. It was so
+far understood that SW had to distinguish between AArch32 and AArch64
+accesses (based on the current AArch32 mode and register number).
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+It turns out that I misinterpreted the ARM ARM, and the clue is in
+D1.20.1: "For some exceptions, the exception syndrome given in the
+ESR_ELx identifies one or more register numbers from the issued
+instruction that generated the exception. Where the exception is
+taken from an Exception level using AArch32 these register numbers
+give the AArch64 view of the register."
+
+Which means that the HW is already giving us the translated version,
+and that we shouldn't try to interpret it at all (for example, doing
+an MMIO operation from the IRQ mode using the LR register leads to
+very unexpected behaviours).
+
+The fix is thus not to perform a call to vcpu_reg32() at all from
+vcpu_reg(), and use whatever register number is supplied directly.
+The only case we need to find out about the mapping is when we
+actively generate a register access, which only occurs when injecting
+a fault in a guest.
+
+Cc: stable@vger.kernel.org
+Reviewed-by: Robin Murphy <robin.murphy@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp.S | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_emulate.h | 8 +++++---
+ arch/arm64/kvm/inject_fault.c        | 2 +-
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-index ce70817..86c2898 100644
---- a/arch/arm64/kvm/hyp.S
-+++ b/arch/arm64/kvm/hyp.S
-@@ -864,6 +864,10 @@ ENTRY(__kvm_flush_vm_context)
- ENDPROC(__kvm_flush_vm_context)
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 17e92f0..3ca894e 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -99,11 +99,13 @@ static inline void vcpu_set_thumb(struct kvm_vcpu *vcpu)
+ 	*vcpu_cpsr(vcpu) |= COMPAT_PSR_T_BIT;
+ }
  
- __kvm_hyp_panic:
-+	// Stash PAR_EL1 before corrupting it in __restore_sysregs
-+	mrs	x0, par_el1
-+	push	x0, xzr
-+
- 	// Guess the context by looking at VTTBR:
- 	// If zero, then we're already a host.
- 	// Otherwise restore a minimal host context before panicing.
-@@ -898,7 +902,7 @@ __kvm_hyp_panic:
- 	mrs	x3, esr_el2
- 	mrs	x4, far_el2
- 	mrs	x5, hpfar_el2
--	mrs	x6, par_el1
-+	pop	x6, xzr		// active context PAR_EL1
- 	mrs	x7, tpidr_el2
++/*
++ * vcpu_reg should always be passed a register number coming from a
++ * read of ESR_EL2. Otherwise, it may give the wrong result on AArch32
++ * with banked registers.
++ */
+ static inline unsigned long *vcpu_reg(const struct kvm_vcpu *vcpu, u8 reg_num)
+ {
+-	if (vcpu_mode_is_32bit(vcpu))
+-		return vcpu_reg32(vcpu, reg_num);
+-
+ 	return (unsigned long *)&vcpu_gp_regs(vcpu)->regs.regs[reg_num];
+ }
  
- 	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index 85c5715..648112e 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -48,7 +48,7 @@ static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+ 
+ 	/* Note: These now point to the banked copies */
+ 	*vcpu_spsr(vcpu) = new_spsr_value;
+-	*vcpu_reg(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
++	*vcpu_reg32(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
+ 
+ 	/* Branch to exception vector */
+ 	if (sctlr & (1 << 13))
 -- 
 2.1.2.330.g565301e.dirty
