@@ -1,75 +1,63 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PATCH 1/3] KVM: arm/arm64: Fix preemptible timer active state
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH 1/3] KVM: arm/arm64: Fix preemptible timer active state
  crazyness
-Date: Tue, 24 Nov 2015 16:43:58 +0100
-Message-ID: <1448379840-17516-2-git-send-email-christoffer.dall@linaro.org>
+Date: Tue, 24 Nov 2015 15:51:14 +0000
+Message-ID: <20151124155114.2dcd18fb@arm.com>
 References: <1448379840-17516-1-git-send-email-christoffer.dall@linaro.org>
+	<1448379840-17516-2-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 44809412A2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2015 10:42:48 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wlbquhH6vO9e for <kvmarm@lists.cs.columbia.edu>;
- Tue, 24 Nov 2015 10:42:47 -0500 (EST)
-Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 27FE4412D0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2015 10:42:47 -0500 (EST)
-Received: by wmuu63 with SMTP id u63so101990462wmu.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 24 Nov 2015 07:43:45 -0800 (PST)
-In-Reply-To: <1448379840-17516-1-git-send-email-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvm@vger.kernel.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1448379840-17516-2-git-send-email-christoffer.dall@linaro.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Eric Auger <eric.auger@linaro.org>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We were setting the physical active state on the GIC distributor in a
-preemptible section, which could cause us to set the active state on
-different physical CPU from the one we were actually going to run on,
-hacoc ensues.
+On Tue, 24 Nov 2015 16:43:58 +0100
+Christoffer Dall <christoffer.dall@linaro.org> wrote:
 
-Since we are no longer descheduling/scheduling soft timers in the
-flush/sync timer functions, simply moving the timer flush into a
-non-preemptible section.
+> We were setting the physical active state on the GIC distributor in a
+> preemptible section, which could cause us to set the active state on
+> different physical CPU from the one we were actually going to run on,
+> hacoc ensues.
+> 
+> Since we are no longer descheduling/scheduling soft timers in the
+> flush/sync timer functions, simply moving the timer flush into a
+> non-preemptible section.
+> 
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> ---
+>  arch/arm/kvm/arm.c | 7 +------
+>  1 file changed, 1 insertion(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index eab83b2..e06fd29 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -564,17 +564,12 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  			vcpu_sleep(vcpu);
+>  
+>  		/*
+> -		 * Disarming the background timer must be done in a
+> -		 * preemptible context, as this call may sleep.
+> -		 */
+> -		kvm_timer_flush_hwstate(vcpu);
+> -
+> -		/*
+>  		 * Preparing the interrupts to be injected also
+>  		 * involves poking the GIC, which must be done in a
+>  		 * non-preemptible context.
+>  		 */
+>  		preempt_disable();
+> +		kvm_timer_flush_hwstate(vcpu);
+>  		kvm_vgic_flush_hwstate(vcpu);
+>  
+>  		local_irq_disable();
 
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- arch/arm/kvm/arm.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index eab83b2..e06fd29 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -564,17 +564,12 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 			vcpu_sleep(vcpu);
- 
- 		/*
--		 * Disarming the background timer must be done in a
--		 * preemptible context, as this call may sleep.
--		 */
--		kvm_timer_flush_hwstate(vcpu);
--
--		/*
- 		 * Preparing the interrupts to be injected also
- 		 * involves poking the GIC, which must be done in a
- 		 * non-preemptible context.
- 		 */
- 		preempt_disable();
-+		kvm_timer_flush_hwstate(vcpu);
- 		kvm_vgic_flush_hwstate(vcpu);
- 
- 		local_irq_disable();
+	M.
 -- 
-2.1.2.330.g565301e.dirty
+Jazz is not dead. It just smells funny.
