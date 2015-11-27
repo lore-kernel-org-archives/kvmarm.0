@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 07/21] arm64: KVM: Implement 32bit system register
- save/restore
-Date: Fri, 27 Nov 2015 18:50:01 +0000
-Message-ID: <1448650215-15218-8-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 17/21] arm64: KVM: Map the kernel RO section into HYP
+Date: Fri, 27 Nov 2015 18:50:11 +0000
+Message-ID: <1448650215-15218-18-git-send-email-marc.zyngier@arm.com>
 References: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E23E84852F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C4E3D48534
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wpUaep2OEXJR for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Nov 2015 13:49:30 -0500 (EST)
+ with ESMTP id Xp3GZyoWSmBZ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Nov 2015 13:49:52 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 08E734852E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:30 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E82949857
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:51 -0500 (EST)
 In-Reply-To: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,76 +31,38 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Implement the 32bit system register save restore as a direct
-translation of the assembly code version.
+In order to run C code in HYP, we must make sure that the kernel's
+RO section in mapped into HYP (otherwise things break badly).
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/hyp.h       |  2 ++
- arch/arm64/kvm/hyp/sysreg-sr.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 43 insertions(+)
+ arch/arm/kvm/arm.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-index 087d3a5..4639330 100644
---- a/arch/arm64/kvm/hyp/hyp.h
-+++ b/arch/arm64/kvm/hyp/hyp.h
-@@ -38,6 +38,8 @@ void __timer_restore_state(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index e06fd29..d80aefe 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -44,6 +44,7 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_coproc.h>
+ #include <asm/kvm_psci.h>
++#include <asm/sections.h>
  
- void __sysreg_save_state(struct kvm_cpu_context *ctxt);
- void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
-+void __sysreg32_save_state(struct kvm_vcpu *vcpu);
-+void __sysreg32_restore_state(struct kvm_vcpu *vcpu);
+ #ifdef REQUIRES_VIRT
+ __asm__(".arch_extension	virt");
+@@ -1067,6 +1068,12 @@ static int init_hyp_mode(void)
+ 		goto out_free_mappings;
+ 	}
  
- #endif /* __ARM64_KVM_HYP_H__ */
- 
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index add8fcb..3f81a4d 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -88,3 +88,44 @@ void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg(ctxt->gp_regs.elr_el1,	elr_el1);
- 	write_sysreg(ctxt->gp_regs.spsr[KVM_SPSR_EL1], spsr_el1);
- }
-+
-+void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
-+{
-+	if (!(read_sysreg(hcr_el2) & HCR_RW)) {
-+		u64 *spsr = vcpu->arch.ctxt.gp_regs.spsr;
-+		u64 *sysreg = vcpu->arch.ctxt.sys_regs;
-+
-+		spsr[KVM_SPSR_ABT] = read_sysreg(spsr_abt);
-+		spsr[KVM_SPSR_UND] = read_sysreg(spsr_und);
-+		spsr[KVM_SPSR_IRQ] = read_sysreg(spsr_irq);
-+		spsr[KVM_SPSR_FIQ] = read_sysreg(spsr_fiq);
-+
-+		sysreg[DACR32_EL2] = read_sysreg(dacr32_el2);
-+		sysreg[IFSR32_EL2] = read_sysreg(ifsr32_el2);
-+
-+		if (!(read_sysreg(cptr_el2) & CPTR_EL2_TFP))
-+			sysreg[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
-+
-+		if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
-+			sysreg[DBGVCR32_EL2] = read_sysreg(dbgvcr32_el2);
++	err = create_hyp_mappings(__start_rodata, __end_rodata);
++	if (err) {
++		kvm_err("Cannot map rodata section\n");
++		goto out_free_mappings;
 +	}
-+}
 +
-+void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
-+{
-+	if (!(read_sysreg(hcr_el2) & HCR_RW)) {
-+		u64 *spsr = vcpu->arch.ctxt.gp_regs.spsr;
-+		u64 *sysreg = vcpu->arch.ctxt.sys_regs;
-+
-+		write_sysreg(spsr[KVM_SPSR_ABT], spsr_abt);
-+		write_sysreg(spsr[KVM_SPSR_UND], spsr_und);
-+		write_sysreg(spsr[KVM_SPSR_IRQ], spsr_irq);
-+		write_sysreg(spsr[KVM_SPSR_FIQ], spsr_fiq);
-+			                         
-+		write_sysreg(sysreg[DACR32_EL2], dacr32_el2);
-+		write_sysreg(sysreg[IFSR32_EL2], ifsr32_el2);
-+
-+		if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
-+			write_sysreg(sysreg[DBGVCR32_EL2], dbgvcr32_el2);
-+	}
-+}
+ 	/*
+ 	 * Map the Hyp stack pages
+ 	 */
 -- 
 2.1.4
