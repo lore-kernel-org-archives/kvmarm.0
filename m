@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 03/21] arm64: KVM: Implement vgic-v2 save/restore
-Date: Fri, 27 Nov 2015 18:49:57 +0000
-Message-ID: <1448650215-15218-4-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 13/21] arm64: KVM: Implement TLB handling
+Date: Fri, 27 Nov 2015 18:50:07 +0000
+Message-ID: <1448650215-15218-14-git-send-email-marc.zyngier@arm.com>
 References: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EAE9412ED
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 629C448535
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id iQZz68N7DT1n for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Nov 2015 13:49:23 -0500 (EST)
+ with ESMTP id 443oudsOBel8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Nov 2015 13:49:44 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DE16E4130B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B901409A2
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:44 -0500 (EST)
 In-Reply-To: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,63 +31,33 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Implement the vgic-v2 save restore (mostly) as a direct translation
-of the assembly code version.
+Implement the TLB handling as a direct translation of the assembly
+code version.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/Makefile         |  1 +
- arch/arm64/kvm/hyp/Makefile     |  5 +++
- arch/arm64/kvm/hyp/hyp.h        |  3 ++
- arch/arm64/kvm/hyp/vgic-v2-sr.c | 89 +++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 98 insertions(+)
- create mode 100644 arch/arm64/kvm/hyp/Makefile
- create mode 100644 arch/arm64/kvm/hyp/vgic-v2-sr.c
+ arch/arm64/kvm/hyp/Makefile |  1 +
+ arch/arm64/kvm/hyp/tlb.c    | 72 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 73 insertions(+)
+ create mode 100644 arch/arm64/kvm/hyp/tlb.c
 
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index 1949fe5..d31e4e5 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -10,6 +10,7 @@ KVM=../../../virt/kvm
- ARM=../../../arch/arm/kvm
- 
- obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
-+obj-$(CONFIG_KVM_ARM_HOST) += hyp/
- 
- kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
- kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/arm.o $(ARM)/mmu.o $(ARM)/mmio.o
 diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-new file mode 100644
-index 0000000..d8d5968
---- /dev/null
+index 56238d0..1a529f5 100644
+--- a/arch/arm64/kvm/hyp/Makefile
 +++ b/arch/arm64/kvm/hyp/Makefile
-@@ -0,0 +1,5 @@
-+#
-+# Makefile for Kernel-based Virtual Machine module, HYP part
-+#
-+
-+obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
-diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-index dac843e..78f25c4 100644
---- a/arch/arm64/kvm/hyp/hyp.h
-+++ b/arch/arm64/kvm/hyp/hyp.h
-@@ -27,5 +27,8 @@
- 
- #define kern_hyp_va(v) (typeof(v))((unsigned long)v & HYP_PAGE_OFFSET_MASK)
- 
-+void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
-+void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
-+
- #endif /* __ARM64_KVM_HYP_H__ */
- 
-diff --git a/arch/arm64/kvm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+@@ -10,3 +10,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += entry.o
+ obj-$(CONFIG_KVM_ARM_HOST) += switch.o
+ obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
++obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
+diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
 new file mode 100644
-index 0000000..29a5c1d
+index 0000000..d4a07d0
 --- /dev/null
-+++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
-@@ -0,0 +1,89 @@
++++ b/arch/arm64/kvm/hyp/tlb.c
+@@ -0,0 +1,72 @@
 +/*
-+ * Copyright (C) 2012-2015 - ARM Ltd
++ * Copyright (C) 2015 - ARM Ltd
 + * Author: Marc Zyngier <marc.zyngier@arm.com>
 + *
 + * This program is free software; you can redistribute it and/or modify
@@ -103,77 +73,60 @@ index 0000000..29a5c1d
 + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#include <linux/compiler.h>
-+#include <linux/irqchip/arm-gic.h>
-+#include <linux/kvm_host.h>
-+
-+#include <asm/kvm_mmu.h>
-+
 +#include "hyp.h"
 +
-+/* vcpu is already in the HYP VA space */
-+void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
++void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
 +{
-+	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-+	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-+	struct vgic_dist *vgic = &kvm->arch.vgic;
-+	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
-+	u32 __iomem *lr_base;
-+	u32 eisr0, eisr1, elrsr0, elrsr1;
-+	int i = 0, nr_lr;
++	dsb(ishst);
 +
-+	if (!base)
-+		return;
++	/* Switch to requested VMID */
++	kvm = kern_hyp_va(kvm);
++	write_sysreg(kvm->arch.vttbr, vttbr_el2);
++	isb();
 +
-+	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
-+	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
-+	cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
-+	eisr0  = readl_relaxed(base + GICH_EISR0);
-+	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
-+	if (unlikely(nr_lr > 32)) {
-+		eisr1  = readl_relaxed(base + GICH_EISR1);
-+		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
-+	} else {
-+		eisr1 = elrsr1 = 0;
-+	}
-+#ifdef CONFIG_CPU_BIG_ENDIAN
-+	cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
-+	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
-+#else
-+	cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
-+	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
-+#endif
-+	cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
++	/*
++	 * We could do so much better if we had the VA as well.
++	 * Instead, we invalidate Stage-2 for this IPA, and the
++	 * whole of Stage-1. Weep...
++	 */
++	ipa >>= 12;
++	asm volatile("tlbi ipas2e1is, %0" : : "r" (ipa));
++	dsb(ish);
++	/*
++	 * We have to ensure completion of the invalidation at Stage-2,
++	 * since a table walk on another CPU could refill a TLB with a
++	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
++	 * the Stage-1 invalidation happened first.
++	 */
++	asm volatile("tlbi vmalle1is" : : );
++	dsb(ish);
++	isb();
 +
-+	writel_relaxed(0, base + GICH_HCR);
-+
-+	lr_base = base + GICH_LR0;
-+	do {
-+		cpu_if->vgic_lr[i++] = readl_relaxed(lr_base++);
-+	} while (--nr_lr);
++	write_sysreg(0, vttbr_el2);
 +}
 +
-+void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
++void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
 +{
-+	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-+	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-+	struct vgic_dist *vgic = &kvm->arch.vgic;
-+	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
-+	u32 __iomem *lr_base;
-+	unsigned int i = 0, nr_lr;
++	dsb(ishst);
 +
-+	if (!base)
-+		return;
++	/* Switch to requested VMID */
++	kvm = kern_hyp_va(kvm);
++	write_sysreg(kvm->arch.vttbr, vttbr_el2);
++	isb();
 +
-+	writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
-+	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
-+	writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
++	asm volatile("tlbi vmalls12e1is" : : );
++	dsb(ish);
++	isb();
 +
-+	lr_base = base + GICH_LR0;
-+	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
-+	do {
-+		writel_relaxed(cpu_if->vgic_lr[i++], lr_base++);
-+	} while (--nr_lr);
++	write_sysreg(0, vttbr_el2);
++}
++
++void __hyp_text __tlb_flush_vm_context(void)
++{
++	dsb(ishst);
++	asm volatile("tlbi alle1is	\n"
++		     "ic ialluis	  ": : );
++	dsb(ish);
 +}
 -- 
 2.1.4
