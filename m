@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 06/21] arm64: KVM: Implement system register save/restore
-Date: Fri, 27 Nov 2015 18:50:00 +0000
-Message-ID: <1448650215-15218-7-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 03/21] arm64: KVM: Implement vgic-v2 save/restore
+Date: Fri, 27 Nov 2015 18:49:57 +0000
+Message-ID: <1448650215-15218-4-git-send-email-marc.zyngier@arm.com>
 References: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 736F941280
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0EAE9412ED
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id MrEm6MRU1vt2 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Nov 2015 13:49:28 -0500 (EST)
+ with ESMTP id iQZz68N7DT1n for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Nov 2015 13:49:23 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D37C496AC
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE16E4130B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:22 -0500 (EST)
 In-Reply-To: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,45 +31,61 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Implement the system registe save restore as a direct translation of
-the assembly code version.
+Implement the vgic-v2 save restore (mostly) as a direct translation
+of the assembly code version.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/Makefile    |  1 +
- arch/arm64/kvm/hyp/hyp.h       |  3 ++
- arch/arm64/kvm/hyp/sysreg-sr.c | 90 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 94 insertions(+)
- create mode 100644 arch/arm64/kvm/hyp/sysreg-sr.c
+ arch/arm64/kvm/Makefile         |  1 +
+ arch/arm64/kvm/hyp/Makefile     |  5 +++
+ arch/arm64/kvm/hyp/hyp.h        |  3 ++
+ arch/arm64/kvm/hyp/vgic-v2-sr.c | 89 +++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 98 insertions(+)
+ create mode 100644 arch/arm64/kvm/hyp/Makefile
+ create mode 100644 arch/arm64/kvm/hyp/vgic-v2-sr.c
 
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 1949fe5..d31e4e5 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -10,6 +10,7 @@ KVM=../../../virt/kvm
+ ARM=../../../arch/arm/kvm
+ 
+ obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
++obj-$(CONFIG_KVM_ARM_HOST) += hyp/
+ 
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/arm.o $(ARM)/mmu.o $(ARM)/mmio.o
 diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-index 455dc0a..ec94200 100644
---- a/arch/arm64/kvm/hyp/Makefile
+new file mode 100644
+index 0000000..d8d5968
+--- /dev/null
 +++ b/arch/arm64/kvm/hyp/Makefile
-@@ -5,3 +5,4 @@
- obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += vgic-v3-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
-+obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
+@@ -0,0 +1,5 @@
++#
++# Makefile for Kernel-based Virtual Machine module, HYP part
++#
++
++obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
 diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-index 86aa5a2..087d3a5 100644
+index dac843e..78f25c4 100644
 --- a/arch/arm64/kvm/hyp/hyp.h
 +++ b/arch/arm64/kvm/hyp/hyp.h
-@@ -36,5 +36,8 @@ void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
- void __timer_save_state(struct kvm_vcpu *vcpu);
- void __timer_restore_state(struct kvm_vcpu *vcpu);
+@@ -27,5 +27,8 @@
  
-+void __sysreg_save_state(struct kvm_cpu_context *ctxt);
-+void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
+ #define kern_hyp_va(v) (typeof(v))((unsigned long)v & HYP_PAGE_OFFSET_MASK)
+ 
++void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
++void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
 +
  #endif /* __ARM64_KVM_HYP_H__ */
  
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+diff --git a/arch/arm64/kvm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
 new file mode 100644
-index 0000000..add8fcb
+index 0000000..29a5c1d
 --- /dev/null
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -0,0 +1,90 @@
++++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+@@ -0,0 +1,89 @@
 +/*
 + * Copyright (C) 2012-2015 - ARM Ltd
 + * Author: Marc Zyngier <marc.zyngier@arm.com>
@@ -88,77 +104,76 @@ index 0000000..add8fcb
 + */
 +
 +#include <linux/compiler.h>
++#include <linux/irqchip/arm-gic.h>
 +#include <linux/kvm_host.h>
 +
 +#include <asm/kvm_mmu.h>
 +
 +#include "hyp.h"
 +
-+/* ctxt is already in the HYP VA space */
-+void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
++/* vcpu is already in the HYP VA space */
++void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
 +{
-+	ctxt->sys_regs[MPIDR_EL1]	= read_sysreg(vmpidr_el2);
-+	ctxt->sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
-+	ctxt->sys_regs[SCTLR_EL1]	= read_sysreg(sctlr_el1);
-+	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
-+	ctxt->sys_regs[CPACR_EL1]	= read_sysreg(cpacr_el1);
-+	ctxt->sys_regs[TTBR0_EL1]	= read_sysreg(ttbr0_el1);
-+	ctxt->sys_regs[TTBR1_EL1]	= read_sysreg(ttbr1_el1);
-+	ctxt->sys_regs[TCR_EL1]		= read_sysreg(tcr_el1);
-+	ctxt->sys_regs[ESR_EL1]		= read_sysreg(esr_el1);
-+	ctxt->sys_regs[AFSR0_EL1]	= read_sysreg(afsr0_el1);
-+	ctxt->sys_regs[AFSR1_EL1]	= read_sysreg(afsr1_el1);
-+	ctxt->sys_regs[FAR_EL1]		= read_sysreg(far_el1);
-+	ctxt->sys_regs[MAIR_EL1]	= read_sysreg(mair_el1);
-+	ctxt->sys_regs[VBAR_EL1]	= read_sysreg(vbar_el1);
-+	ctxt->sys_regs[CONTEXTIDR_EL1]	= read_sysreg(contextidr_el1);
-+	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
-+	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
-+	ctxt->sys_regs[TPIDR_EL1]	= read_sysreg(tpidr_el1);
-+	ctxt->sys_regs[AMAIR_EL1]	= read_sysreg(amair_el1);
-+	ctxt->sys_regs[CNTKCTL_EL1]	= read_sysreg(cntkctl_el1);
-+	ctxt->sys_regs[PAR_EL1]		= read_sysreg(par_el1);
-+	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
++	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
++	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
++	struct vgic_dist *vgic = &kvm->arch.vgic;
++	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
++	u32 __iomem *lr_base;
++	u32 eisr0, eisr1, elrsr0, elrsr1;
++	int i = 0, nr_lr;
 +
-+	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
-+	ctxt->gp_regs.regs.pc		= read_sysreg(elr_el2);
-+	ctxt->gp_regs.regs.pstate	= read_sysreg(spsr_el2);
-+	ctxt->gp_regs.sp_el1		= read_sysreg(sp_el1);
-+	ctxt->gp_regs.elr_el1		= read_sysreg(elr_el1);
-+	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg(spsr_el1);
++	if (!base)
++		return;
++
++	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
++	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
++	cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
++	eisr0  = readl_relaxed(base + GICH_EISR0);
++	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
++	if (unlikely(nr_lr > 32)) {
++		eisr1  = readl_relaxed(base + GICH_EISR1);
++		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
++	} else {
++		eisr1 = elrsr1 = 0;
++	}
++#ifdef CONFIG_CPU_BIG_ENDIAN
++	cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
++	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
++#else
++	cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
++	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
++#endif
++	cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
++
++	writel_relaxed(0, base + GICH_HCR);
++
++	lr_base = base + GICH_LR0;
++	do {
++		cpu_if->vgic_lr[i++] = readl_relaxed(lr_base++);
++	} while (--nr_lr);
 +}
 +
-+void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
++void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
 +{
-+	write_sysreg(ctxt->sys_regs[MPIDR_EL1],	  vmpidr_el2);
-+	write_sysreg(ctxt->sys_regs[CSSELR_EL1],  csselr_el1);
-+	write_sysreg(ctxt->sys_regs[SCTLR_EL1],	  sctlr_el1);
-+	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  actlr_el1);
-+	write_sysreg(ctxt->sys_regs[CPACR_EL1],	  cpacr_el1);
-+	write_sysreg(ctxt->sys_regs[TTBR0_EL1],	  ttbr0_el1);
-+	write_sysreg(ctxt->sys_regs[TTBR1_EL1],	  ttbr1_el1);
-+	write_sysreg(ctxt->sys_regs[TCR_EL1],	  tcr_el1);
-+	write_sysreg(ctxt->sys_regs[ESR_EL1],	  esr_el1);
-+	write_sysreg(ctxt->sys_regs[AFSR0_EL1],	  afsr0_el1);
-+	write_sysreg(ctxt->sys_regs[AFSR1_EL1],	  afsr1_el1);
-+	write_sysreg(ctxt->sys_regs[FAR_EL1],	  far_el1);
-+	write_sysreg(ctxt->sys_regs[MAIR_EL1],	  mair_el1);
-+	write_sysreg(ctxt->sys_regs[VBAR_EL1],	  vbar_el1);
-+	write_sysreg(ctxt->sys_regs[CONTEXTIDR_EL1], contextidr_el1);
-+	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  tpidr_el0);
-+	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], tpidrro_el0);
-+	write_sysreg(ctxt->sys_regs[TPIDR_EL1],	  tpidr_el1);
-+	write_sysreg(ctxt->sys_regs[AMAIR_EL1],	  amair_el1);
-+	write_sysreg(ctxt->sys_regs[CNTKCTL_EL1], cntkctl_el1);
-+	write_sysreg(ctxt->sys_regs[PAR_EL1],	  par_el1);
-+	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
++	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
++	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
++	struct vgic_dist *vgic = &kvm->arch.vgic;
++	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
++	u32 __iomem *lr_base;
++	unsigned int i = 0, nr_lr;
 +
-+	write_sysreg(ctxt->gp_regs.regs.sp,	sp_el0);
-+	write_sysreg(ctxt->gp_regs.regs.pc,	elr_el2);
-+	write_sysreg(ctxt->gp_regs.regs.pstate,	spsr_el2);
-+	write_sysreg(ctxt->gp_regs.sp_el1,	sp_el1);
-+	write_sysreg(ctxt->gp_regs.elr_el1,	elr_el1);
-+	write_sysreg(ctxt->gp_regs.spsr[KVM_SPSR_EL1], spsr_el1);
++	if (!base)
++		return;
++
++	writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
++	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
++	writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
++
++	lr_base = base + GICH_LR0;
++	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
++	do {
++		writel_relaxed(cpu_if->vgic_lr[i++], lr_base++);
++	} while (--nr_lr);
 +}
 -- 
 2.1.4
