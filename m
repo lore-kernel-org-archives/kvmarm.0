@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 11/21] arm64: KVM: Implement the core world switch
-Date: Fri, 27 Nov 2015 18:50:05 +0000
-Message-ID: <1448650215-15218-12-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 07/21] arm64: KVM: Implement 32bit system register
+ save/restore
+Date: Fri, 27 Nov 2015 18:50:01 +0000
+Message-ID: <1448650215-15218-8-git-send-email-marc.zyngier@arm.com>
 References: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 486454968B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E23E84852F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id y43eqgFCr70x for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Nov 2015 13:49:37 -0500 (EST)
+ with ESMTP id wpUaep2OEXJR for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Nov 2015 13:49:30 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8030B409A2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 08E734852E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:30 -0500 (EST)
 In-Reply-To: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,166 +32,76 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Implement the core of the world switch in C. Not everything is there
-yet, and there is nothing to re-enter the world switch either.
-
-But this already outlines the code structure well enough.
+Implement the 32bit system register save restore as a direct
+translation of the assembly code version.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/Makefile |   1 +
- arch/arm64/kvm/hyp/switch.c | 134 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 135 insertions(+)
- create mode 100644 arch/arm64/kvm/hyp/switch.c
+ arch/arm64/kvm/hyp/hyp.h       |  2 ++
+ arch/arm64/kvm/hyp/sysreg-sr.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-index 1e1ff06..9c11b0f 100644
---- a/arch/arm64/kvm/hyp/Makefile
-+++ b/arch/arm64/kvm/hyp/Makefile
-@@ -8,3 +8,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += entry.o
-+obj-$(CONFIG_KVM_ARM_HOST) += switch.o
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-new file mode 100644
-index 0000000..d67ed9e
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -0,0 +1,134 @@
-+/*
-+ * Copyright (C) 2015 - ARM Ltd
-+ * Author: Marc Zyngier <marc.zyngier@arm.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
+diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
+index 087d3a5..4639330 100644
+--- a/arch/arm64/kvm/hyp/hyp.h
++++ b/arch/arm64/kvm/hyp/hyp.h
+@@ -38,6 +38,8 @@ void __timer_restore_state(struct kvm_vcpu *vcpu);
+ 
+ void __sysreg_save_state(struct kvm_cpu_context *ctxt);
+ void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
++void __sysreg32_save_state(struct kvm_vcpu *vcpu);
++void __sysreg32_restore_state(struct kvm_vcpu *vcpu);
+ 
+ #endif /* __ARM64_KVM_HYP_H__ */
+ 
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index add8fcb..3f81a4d 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -88,3 +88,44 @@ void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg(ctxt->gp_regs.elr_el1,	elr_el1);
+ 	write_sysreg(ctxt->gp_regs.spsr[KVM_SPSR_EL1], spsr_el1);
+ }
 +
-+#include "hyp.h"
-+
-+static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
++void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
 +{
-+	u64 val;
++	if (!(read_sysreg(hcr_el2) & HCR_RW)) {
++		u64 *spsr = vcpu->arch.ctxt.gp_regs.spsr;
++		u64 *sysreg = vcpu->arch.ctxt.sys_regs;
 +
-+	/*
-+	 * We are about to set CPTR_EL2.TFP to trap all floating point
-+	 * register accesses to EL2, however, the ARM ARM clearly states that
-+	 * traps are only taken to EL2 if the operation would not otherwise
-+	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
-+	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
-+	 */
-+	val = vcpu->arch.hcr_el2;
-+	if (!(val & HCR_RW)) {
-+		write_sysreg(1 << 30, fpexc32_el2);
-+		isb();
++		spsr[KVM_SPSR_ABT] = read_sysreg(spsr_abt);
++		spsr[KVM_SPSR_UND] = read_sysreg(spsr_und);
++		spsr[KVM_SPSR_IRQ] = read_sysreg(spsr_irq);
++		spsr[KVM_SPSR_FIQ] = read_sysreg(spsr_fiq);
++
++		sysreg[DACR32_EL2] = read_sysreg(dacr32_el2);
++		sysreg[IFSR32_EL2] = read_sysreg(ifsr32_el2);
++
++		if (!(read_sysreg(cptr_el2) & CPTR_EL2_TFP))
++			sysreg[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
++
++		if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
++			sysreg[DBGVCR32_EL2] = read_sysreg(dbgvcr32_el2);
 +	}
-+	write_sysreg(val, hcr_el2);
-+	write_sysreg(1 << 15, hstr_el2);
-+	write_sysreg(CPTR_EL2_TTA | CPTR_EL2_TFP, cptr_el2);
-+	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
 +}
 +
-+static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
++void __hyp_text __sysreg32_restore_state(struct kvm_vcpu *vcpu)
 +{
-+	write_sysreg(HCR_RW, hcr_el2);
-+	write_sysreg(0, hstr_el2);
-+	write_sysreg(read_sysreg(mdcr_el2) & MDCR_EL2_HPMN_MASK, mdcr_el2);
-+	write_sysreg(0, cptr_el2);
-+}
++	if (!(read_sysreg(hcr_el2) & HCR_RW)) {
++		u64 *spsr = vcpu->arch.ctxt.gp_regs.spsr;
++		u64 *sysreg = vcpu->arch.ctxt.sys_regs;
 +
-+static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-+	write_sysreg(kvm->arch.vttbr, vttbr_el2);
-+}
++		write_sysreg(spsr[KVM_SPSR_ABT], spsr_abt);
++		write_sysreg(spsr[KVM_SPSR_UND], spsr_und);
++		write_sysreg(spsr[KVM_SPSR_IRQ], spsr_irq);
++		write_sysreg(spsr[KVM_SPSR_FIQ], spsr_fiq);
++			                         
++		write_sysreg(sysreg[DACR32_EL2], dacr32_el2);
++		write_sysreg(sysreg[IFSR32_EL2], ifsr32_el2);
 +
-+static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
-+{
-+	write_sysreg(0, vttbr_el2);
-+}
-+
-+static hyp_alternate_select(__vgic_call_save_state,
-+			    __vgic_v2_save_state, __vgic_v3_save_state,
-+			    ARM64_HAS_SYSREG_GIC_CPUIF);
-+
-+static hyp_alternate_select(__vgic_call_restore_state,
-+			    __vgic_v2_restore_state, __vgic_v3_restore_state,
-+			    ARM64_HAS_SYSREG_GIC_CPUIF);
-+
-+static void __hyp_text __vgic_save_state(struct kvm_vcpu *vcpu)
-+{
-+	__vgic_call_save_state()(vcpu);
-+	write_sysreg(read_sysreg(hcr_el2) & ~HCR_INT_OVERRIDE, hcr_el2);
-+}
-+
-+static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
-+{
-+	u64 val;
-+
-+	val = read_sysreg(hcr_el2);
-+	val |= 	HCR_INT_OVERRIDE;
-+	val |= vcpu->arch.irq_lines;
-+	write_sysreg(val, hcr_el2);
-+
-+	__vgic_call_restore_state()(vcpu);
-+}
-+
-+int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_cpu_context *host_ctxt;
-+	struct kvm_cpu_context *guest_ctxt;
-+	u64 exit_code;
-+
-+	vcpu = kern_hyp_va(vcpu);
-+	write_sysreg(vcpu, tpidr_el2);
-+
-+	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	guest_ctxt = &vcpu->arch.ctxt;
-+
-+	__sysreg_save_state(host_ctxt);
-+	__debug_cond_save_host_state(vcpu);
-+
-+	__activate_traps(vcpu);
-+	__activate_vm(vcpu);
-+
-+	__vgic_restore_state(vcpu);
-+	__timer_restore_state(vcpu);
-+
-+	/*
-+	 * We must restore the 32-bit state before the sysregs, thanks
-+	 * to Cortex-A57 erratum #852523.
-+	 */
-+	__sysreg32_restore_state(vcpu);
-+	__sysreg_restore_state(guest_ctxt);
-+	__debug_restore_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
-+
-+	/* Jump in the fire! */
-+	exit_code = __guest_enter(vcpu, host_ctxt);
-+	/* And we're baaack! */
-+
-+	__sysreg_save_state(guest_ctxt);
-+	__sysreg32_save_state(vcpu);
-+	__timer_save_state(vcpu);
-+	__vgic_save_state(vcpu);
-+
-+	__deactivate_traps(vcpu);
-+	__deactivate_vm(vcpu);
-+
-+	__sysreg_restore_state(host_ctxt);
-+
-+	__debug_save_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
-+	__debug_cond_restore_host_state(vcpu);
-+
-+	return exit_code;
++		if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
++			write_sysreg(sysreg[DBGVCR32_EL2], dbgvcr32_el2);
++	}
 +}
 -- 
 2.1.4
