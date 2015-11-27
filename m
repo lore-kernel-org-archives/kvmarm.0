@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 04/21] arm64: KVM: Implement vgic-v3 save/restore
-Date: Fri, 27 Nov 2015 18:49:58 +0000
-Message-ID: <1448650215-15218-5-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 09/21] arm64: KVM: Implement guest entry
+Date: Fri, 27 Nov 2015 18:50:03 +0000
+Message-ID: <1448650215-15218-10-git-send-email-marc.zyngier@arm.com>
 References: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E557F41390
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF8D249630
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RH4xfe0AB56f for <kvmarm@lists.cs.columbia.edu>;
- Fri, 27 Nov 2015 13:49:24 -0500 (EST)
+ with ESMTP id aYq4Dp4AGdqG for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 27 Nov 2015 13:49:33 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A6AC94965E
- for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 90DC441267
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 27 Nov 2015 13:49:33 -0500 (EST)
 In-Reply-To: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,47 +31,35 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Implement the vgic-v3 save restore as a direct translation of
-the assembly code version.
+Contrary to the previous patch, the guest entry is fairly different
+from its assembly counterpart, mostly because it is only concerned
+with saving/restoring the GP registers, and nothing else.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/Makefile     |   1 +
- arch/arm64/kvm/hyp/hyp.h        |   3 +
- arch/arm64/kvm/hyp/vgic-v3-sr.c | 222 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 226 insertions(+)
- create mode 100644 arch/arm64/kvm/hyp/vgic-v3-sr.c
+ arch/arm64/kvm/hyp/Makefile |   1 +
+ arch/arm64/kvm/hyp/entry.S  | 155 ++++++++++++++++++++++++++++++++++++++++++++
+ arch/arm64/kvm/hyp/hyp.h    |   2 +
+ 3 files changed, 158 insertions(+)
+ create mode 100644 arch/arm64/kvm/hyp/entry.S
 
 diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-index d8d5968..d1e38ce 100644
+index ec14cac..1e1ff06 100644
 --- a/arch/arm64/kvm/hyp/Makefile
 +++ b/arch/arm64/kvm/hyp/Makefile
-@@ -3,3 +3,4 @@
- #
- 
- obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
-+obj-$(CONFIG_KVM_ARM_HOST) += vgic-v3-sr.o
-diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-index 78f25c4..a31cb6e 100644
---- a/arch/arm64/kvm/hyp/hyp.h
-+++ b/arch/arm64/kvm/hyp/hyp.h
-@@ -30,5 +30,8 @@
- void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
- void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
- 
-+void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
-+void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
-+
- #endif /* __ARM64_KVM_HYP_H__ */
- 
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -7,3 +7,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += vgic-v3-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
++obj-$(CONFIG_KVM_ARM_HOST) += entry.o
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
 new file mode 100644
-index 0000000..b490db5
+index 0000000..2c4449a
 --- /dev/null
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -0,0 +1,222 @@
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -0,0 +1,155 @@
 +/*
-+ * Copyright (C) 2012-2015 - ARM Ltd
++ * Copyright (C) 2015 - ARM Ltd
 + * Author: Marc Zyngier <marc.zyngier@arm.com>
 + *
 + * This program is free software; you can redistribute it and/or modify
@@ -87,210 +75,155 @@ index 0000000..b490db5
 + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#include <linux/compiler.h>
-+#include <linux/irqchip/arm-gic-v3.h>
-+#include <linux/kvm_host.h>
++#include <linux/linkage.h>
 +
++#include <asm/asm-offsets.h>
++#include <asm/assembler.h>
++#include <asm/fpsimdmacros.h>
++#include <asm/kvm.h>
++#include <asm/kvm_arm.h>
++#include <asm/kvm_asm.h>
 +#include <asm/kvm_mmu.h>
 +
-+#include "hyp.h"
++#define CPU_GP_REG_OFFSET(x)	(CPU_GP_REGS + x)
++#define CPU_XREG_OFFSET(x)	CPU_GP_REG_OFFSET(CPU_USER_PT_REGS + 8*x)
++
++	.text
++	.pushsection	.hyp.text, "ax"
++
++.macro save_common_regs ctxt
++	stp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
++	stp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
++	stp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
++	stp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
++	stp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
++	stp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
++.endm
++
++.macro restore_common_regs ctxt
++	ldp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
++	ldp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
++	ldp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
++	ldp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
++	ldp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
++	ldp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
++.endm
++
++.macro save_host_regs reg
++	save_common_regs \reg
++.endm
++
++.macro restore_host_regs reg
++	restore_common_regs \reg
++.endm
++
++.macro save_guest_regs
++	// x0 is the vcpu address
++	// x1 is the return code, do not corrupt!
++	// x2 is the cpu context
++	// x3 is a tmp register
++	// Guest's x0-x3 are on the stack
++
++	add	x2, x0, #VCPU_CONTEXT
++
++	// Compute base to save registers
++	stp	x4, x5,   [x2, #CPU_XREG_OFFSET(4)]
++	stp	x6, x7,   [x2, #CPU_XREG_OFFSET(6)]
++	stp	x8, x9,   [x2, #CPU_XREG_OFFSET(8)]
++	stp	x10, x11, [x2, #CPU_XREG_OFFSET(10)]
++	stp	x12, x13, [x2, #CPU_XREG_OFFSET(12)]
++	stp	x14, x15, [x2, #CPU_XREG_OFFSET(14)]
++	stp	x16, x17, [x2, #CPU_XREG_OFFSET(16)]
++	str	x18,      [x2, #CPU_XREG_OFFSET(18)]
++
++	pop	x6, x7			// x2, x3
++	pop	x4, x5			// x0, x1
++
++	stp	x4, x5, [x2, #CPU_XREG_OFFSET(0)]
++	stp	x6, x7, [x2, #CPU_XREG_OFFSET(2)]
++
++	save_common_regs x2
++.endm
++
++.macro restore_guest_regs
++	// Assume vcpu in x0, clobbers everything else
++
++	add	x2, x0, #VCPU_CONTEXT
++
++	// Prepare x0-x3 for later restore
++	ldp	x4, x5, [x2, #CPU_XREG_OFFSET(0)]
++	ldp	x6, x7, [x2, #CPU_XREG_OFFSET(2)]
++	push	x4, x5		// Push x0-x3 on the stack
++	push	x6, x7
++
++	// x4-x18
++	ldp	x4, x5,   [x2, #CPU_XREG_OFFSET(4)] 
++	ldp	x6, x7,   [x2, #CPU_XREG_OFFSET(6)] 
++	ldp	x8, x9,   [x2, #CPU_XREG_OFFSET(8)] 
++	ldp	x10, x11, [x2, #CPU_XREG_OFFSET(10)]
++	ldp	x12, x13, [x2, #CPU_XREG_OFFSET(12)]
++	ldp	x14, x15, [x2, #CPU_XREG_OFFSET(14)]
++	ldp	x16, x17, [x2, #CPU_XREG_OFFSET(16)]
++	ldr	x18,      [x2, #CPU_XREG_OFFSET(18)]
++
++	// x19-x29, lr
++	restore_common_regs x2
++
++	// Last bits of the 64bit state
++	pop	x2, x3
++	pop	x0, x1
++
++	// Do not touch any register after this!
++.endm
 +
 +/*
-+ * We store LRs in reverse order to let the CPU deal with streaming
-+ * access. Use this macro to make it look saner...
++ * u64 __guest_enter(struct kvm_vcpu *vcpu,
++ *		     struct kvm_cpu_context *host_ctxt);
 + */
-+#define LR_OFFSET(n)	(15 - n)
++ENTRY(__guest_enter)
++	// x0: vcpu
++	// x1: host_ctxt
++	// x2, x3: parameter registers
++	// x4-x18: clobbered by macros
 +
-+#define read_gicreg(r)							\
-+	({								\
-+		u64 reg;						\
-+		asm volatile("mrs_s %0, " __stringify(r) : "=r" (reg));	\
-+		reg;							\
-+	})
++	save_host_regs x1
 +
-+#define write_gicreg(v,r)						\
-+	do {								\
-+		u64 __val = (v);					\
-+		asm volatile("msr_s " __stringify(r) ", %0" : : "r" (__val));\
-+	} while (0)
++	// Preserve vcpu & host_ctxt for use at exit time
++	stp	x0, x1, [sp, #-16]!
 +
-+/* vcpu is already in the HYP VA space */
-+void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-+	u64 val;
-+	u32 nr_lr, nr_pri;
++	restore_guest_regs
++	eret
++ENDPROC(__guest_enter)
 +
-+	/*
-+	 * Make sure stores to the GIC via the memory mapped interface
-+	 * are now visible to the system register interface.
-+	 */
-+	dsb(st);
++ENTRY(__guest_exit)
++	// x0: vcpu
++	// x1: return code
++	// x2-x3: free
++	// x4-x29,lr: vcpu regs
++	// vcpu x0-x3 on the stack
++	save_guest_regs
 +
-+	cpu_if->vgic_vmcr  = read_gicreg(ICH_VMCR_EL2);
-+	cpu_if->vgic_misr  = read_gicreg(ICH_MISR_EL2);
-+	cpu_if->vgic_eisr  = read_gicreg(ICH_EISR_EL2);
-+	cpu_if->vgic_elrsr = read_gicreg(ICH_ELSR_EL2);
++	// Restore vcpu & host_ctxt from the stack
++	// (preserving return code in x1)
++	ldp	x0, x2, [sp], #16
++	restore_host_regs x2
 +
-+	write_gicreg(0, ICH_HCR_EL2);
-+	val = read_gicreg(ICH_VTR_EL2);
-+	nr_lr = val & 0xf;
-+	nr_pri = ((u32)val >> 29) + 1;
++	mov	x0, x1
++	ret
++ENDPROC(__guest_exit)
 +
-+	switch (nr_lr) {
-+	case 15:
-+		cpu_if->vgic_lr[LR_OFFSET(15)] = read_gicreg(ICH_LR15_EL2);
-+	case 14:
-+		cpu_if->vgic_lr[LR_OFFSET(14)] = read_gicreg(ICH_LR14_EL2);
-+	case 13:
-+		cpu_if->vgic_lr[LR_OFFSET(13)] = read_gicreg(ICH_LR13_EL2);
-+	case 12:
-+		cpu_if->vgic_lr[LR_OFFSET(12)] = read_gicreg(ICH_LR12_EL2);
-+	case 11:
-+		cpu_if->vgic_lr[LR_OFFSET(11)] = read_gicreg(ICH_LR11_EL2);
-+	case 10:
-+		cpu_if->vgic_lr[LR_OFFSET(10)] = read_gicreg(ICH_LR10_EL2);
-+	case 9:
-+		cpu_if->vgic_lr[LR_OFFSET(9)] = read_gicreg(ICH_LR9_EL2);
-+	case 8:
-+		cpu_if->vgic_lr[LR_OFFSET(8)] = read_gicreg(ICH_LR8_EL2);
-+	case 7:
-+		cpu_if->vgic_lr[LR_OFFSET(7)] = read_gicreg(ICH_LR7_EL2);
-+	case 6:
-+		cpu_if->vgic_lr[LR_OFFSET(6)] = read_gicreg(ICH_LR6_EL2);
-+	case 5:
-+		cpu_if->vgic_lr[LR_OFFSET(5)] = read_gicreg(ICH_LR5_EL2);
-+	case 4:
-+		cpu_if->vgic_lr[LR_OFFSET(4)] = read_gicreg(ICH_LR4_EL2);
-+	case 3:
-+		cpu_if->vgic_lr[LR_OFFSET(3)] = read_gicreg(ICH_LR3_EL2);
-+	case 2:
-+		cpu_if->vgic_lr[LR_OFFSET(2)] = read_gicreg(ICH_LR2_EL2);
-+	case 1:
-+		cpu_if->vgic_lr[LR_OFFSET(1)] = read_gicreg(ICH_LR1_EL2);
-+	case 0:
-+		cpu_if->vgic_lr[LR_OFFSET(0)] = read_gicreg(ICH_LR0_EL2);
-+	}
++	/* Insert fault handling here */
+diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
+index 2581232..7ac8e11 100644
+--- a/arch/arm64/kvm/hyp/hyp.h
++++ b/arch/arm64/kvm/hyp/hyp.h
+@@ -50,5 +50,7 @@ void __debug_restore_state(struct kvm_vcpu *vcpu,
+ void __debug_cond_save_host_state(struct kvm_vcpu *vcpu);
+ void __debug_cond_restore_host_state(struct kvm_vcpu *vcpu);
+ 
++u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
 +
-+	switch (nr_pri) {
-+	case 7:
-+		cpu_if->vgic_ap0r[3] = read_gicreg(ICH_AP0R3_EL2);
-+		cpu_if->vgic_ap0r[2] = read_gicreg(ICH_AP0R2_EL2);
-+	case 6:
-+		cpu_if->vgic_ap0r[1] = read_gicreg(ICH_AP0R1_EL2);
-+	default:
-+		cpu_if->vgic_ap0r[0] = read_gicreg(ICH_AP0R0_EL2);
-+	}
-+
-+	switch (nr_pri) {
-+	case 7:
-+		cpu_if->vgic_ap1r[3] = read_gicreg(ICH_AP1R3_EL2);
-+		cpu_if->vgic_ap1r[2] = read_gicreg(ICH_AP1R2_EL2);
-+	case 6:
-+		cpu_if->vgic_ap1r[1] = read_gicreg(ICH_AP1R1_EL2);
-+	default:
-+		cpu_if->vgic_ap1r[0] = read_gicreg(ICH_AP1R0_EL2);
-+	}
-+
-+	write_gicreg(read_gicreg(ICC_SRE_EL2) | ICC_SRE_EL2_ENABLE,
-+		     ICC_SRE_EL2);
-+	isb();
-+	write_gicreg(1, ICC_SRE_EL1);
-+}
-+
-+void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-+	u64 val;
-+	u32 nr_lr, nr_pri;
-+
-+	/* Make sure SRE is valid before writing the other registers */
-+	write_gicreg(cpu_if->vgic_sre, ICC_SRE_EL1);
-+	isb();
-+
-+	write_gicreg(cpu_if->vgic_hcr, ICH_HCR_EL2);
-+	write_gicreg(cpu_if->vgic_vmcr, ICH_VMCR_EL2);
-+
-+	val = read_gicreg(ICH_VTR_EL2);
-+	nr_lr = val & 0xf;
-+	nr_pri = ((u32)val >> 29) + 1;
-+
-+	switch (nr_pri) {
-+	case 7:
-+		 write_gicreg(cpu_if->vgic_ap1r[3], ICH_AP1R3_EL2);
-+		 write_gicreg(cpu_if->vgic_ap1r[2], ICH_AP1R2_EL2);
-+	case 6:	 	                           
-+		 write_gicreg(cpu_if->vgic_ap1r[1], ICH_AP1R1_EL2);
-+	default: 	       		    
-+		 write_gicreg(cpu_if->vgic_ap1r[0], ICH_AP1R0_EL2);
-+	}	 	                           
-+		 	                           
-+	switch (nr_pri) {
-+	case 7:	 	                           
-+		 write_gicreg(cpu_if->vgic_ap0r[3], ICH_AP0R3_EL2);
-+		 write_gicreg(cpu_if->vgic_ap0r[2], ICH_AP0R2_EL2);
-+	case 6:	 	                           
-+		 write_gicreg(cpu_if->vgic_ap0r[1], ICH_AP0R1_EL2);
-+	default: 	       		    
-+		 write_gicreg(cpu_if->vgic_ap0r[0], ICH_AP0R0_EL2);
-+	}
-+
-+	switch (nr_lr) {
-+	case 15:
-+		write_gicreg(cpu_if->vgic_lr[LR_OFFSET(15)], ICH_LR15_EL2);
-+	case 14:	      			      
-+		write_gicreg(cpu_if->vgic_lr[LR_OFFSET(14)], ICH_LR14_EL2);
-+	case 13:	      			      
-+		write_gicreg(cpu_if->vgic_lr[LR_OFFSET(13)], ICH_LR13_EL2);
-+	case 12:	      			      
-+		write_gicreg(cpu_if->vgic_lr[LR_OFFSET(12)], ICH_LR12_EL2);
-+	case 11:	      			      
-+		write_gicreg(cpu_if->vgic_lr[LR_OFFSET(11)], ICH_LR11_EL2);
-+	case 10:	      			      
-+		write_gicreg(cpu_if->vgic_lr[LR_OFFSET(10)], ICH_LR10_EL2);
-+	case 9:		                                    
-+		write_gicreg(cpu_if->vgic_lr[LR_OFFSET(9)], ICH_LR9_EL2);
-+	case 8:		                                    
-+		write_gicreg(cpu_if->vgic_lr[LR_OFFSET(8)], ICH_LR8_EL2);
-+	case 7:		                                    
-+		write_gicreg(cpu_if->vgic_lr[LR_OFFSET(7)], ICH_LR7_EL2);
-+	case 6:		                                    
-+		write_gicreg(cpu_if->vgic_lr[LR_OFFSET(6)], ICH_LR6_EL2);
-+	case 5:		                                    
-+		write_gicreg(cpu_if->vgic_lr[LR_OFFSET(5)], ICH_LR5_EL2);
-+	case 4:		                                    
-+		write_gicreg(cpu_if->vgic_lr[LR_OFFSET(4)], ICH_LR4_EL2);
-+	case 3:		                                    
-+		write_gicreg(cpu_if->vgic_lr[LR_OFFSET(3)], ICH_LR3_EL2);
-+	case 2:		                                    
-+		write_gicreg(cpu_if->vgic_lr[LR_OFFSET(2)], ICH_LR2_EL2);
-+	case 1:		                                    
-+		write_gicreg(cpu_if->vgic_lr[LR_OFFSET(1)], ICH_LR1_EL2);
-+	case 0:
-+		write_gicreg(cpu_if->vgic_lr[LR_OFFSET(0)], ICH_LR0_EL2);
-+	}
-+
-+	/*
-+	 * Ensure that the above will have reached the
-+	 * (re)distributors. This ensure the guest will read the
-+	 * correct values from the memory-mapped interface.
-+	 */
-+	isb();
-+	dsb(sy);
-+
-+	/*
-+	 * Prevent the guest from touching the GIC system registers if
-+	 * SRE isn't enabled for GICv3 emulation.
-+	 */
-+	if (!cpu_if->vgic_sre) {
-+		write_gicreg(read_gicreg(ICC_SRE_EL2) & ~ICC_SRE_EL2_ENABLE,
-+			     ICC_SRE_EL2);
-+	}
-+}
-+
-+u64 __hyp_text __vgic_v3_read_ich_vtr_el2(void)
-+{
-+	return read_gicreg(ICH_VTR_EL2);
-+}
+ #endif /* __ARM64_KVM_HYP_H__ */
+ 
 -- 
 2.1.4
