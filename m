@@ -1,101 +1,198 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 08/21] KVM: ARM64: Add reset and access handlers for
- PMXEVTYPER register
-Date: Mon, 30 Nov 2015 18:12:47 +0000
-Message-ID: <20151130181247.55649fc7@arm.com>
+Subject: Re: [PATCH v4 18/21] KVM: ARM64: Add PMU overflow interrupt routing
+Date: Mon, 30 Nov 2015 18:22:58 +0000
+Message-ID: <20151130182258.684c9df6@arm.com>
 References: <1446186123-11548-1-git-send-email-zhaoshenglong@huawei.com>
-	<1446186123-11548-9-git-send-email-zhaoshenglong@huawei.com>
+	<1446186123-11548-19-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1446186123-11548-9-git-send-email-zhaoshenglong@huawei.com>
+In-Reply-To: <1446186123-11548-19-git-send-email-zhaoshenglong@huawei.com>
 Sender: kvm-owner@vger.kernel.org
 To: Shannon Zhao <zhaoshenglong@huawei.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, christoffer.dall@linaro.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 30 Oct 2015 14:21:50 +0800
+On Fri, 30 Oct 2015 14:22:00 +0800
 Shannon Zhao <zhaoshenglong@huawei.com> wrote:
 
 > From: Shannon Zhao <shannon.zhao@linaro.org>
 > 
-> Since the reset value of PMXEVTYPER is UNKNOWN, use reset_unknown or
-> reset_unknown_cp15 for its reset handler. Add access handler which
-> emulates writing and reading PMXEVTYPER register. When writing to
-> PMXEVTYPER, call kvm_pmu_set_counter_event_type to create a perf_event
-> for the selected event type.
+> When calling perf_event_create_kernel_counter to create perf_event,
+> assign a overflow handler. Then when perf event overflows, set
+> irq_pending and call kvm_vcpu_kick() to sync the interrupt.
 > 
 > Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 > ---
->  arch/arm64/kvm/sys_regs.c | 26 ++++++++++++++++++++++++--
->  1 file changed, 24 insertions(+), 2 deletions(-)
+>  arch/arm/kvm/arm.c    |  4 +++
+>  include/kvm/arm_pmu.h |  4 +++
+>  virt/kvm/arm/pmu.c    | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  3 files changed, 83 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index cb82b15..4e606ea 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -491,6 +491,17 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index 78b2869..9c0fec4 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -28,6 +28,7 @@
+>  #include <linux/sched.h>
+>  #include <linux/kvm.h>
+>  #include <trace/events/kvm.h>
+> +#include <kvm/arm_pmu.h>
 >  
->  	if (p->is_write) {
->  		switch (r->reg) {
-> +		case PMXEVTYPER_EL0: {
-> +			val = vcpu_sys_reg(vcpu, PMSELR_EL0);
-> +			kvm_pmu_set_counter_event_type(vcpu,
-> +						       *vcpu_reg(vcpu, p->Rt),
-> +						       val);
-
-You are blindingly truncating 64bit values to u32. Is that intentional?
-
-> +			vcpu_sys_reg(vcpu, PMXEVTYPER_EL0) =
-> +							 *vcpu_reg(vcpu, p->Rt);
-> +			vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + val) =
-> +							 *vcpu_reg(vcpu, p->Rt);
-
-Please do not break assignments like this, it makes the code
-unreadable. I don't care what the 80-character police says... ;-)
-
-> +			break;
-> +		}
->  		case PMCR_EL0: {
->  			/* Only update writeable bits of PMCR */
->  			val = vcpu_sys_reg(vcpu, r->reg);
-> @@ -735,7 +746,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	  trap_raz_wi },
->  	/* PMXEVTYPER_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b001),
-> -	  trap_raz_wi },
-> +	  access_pmu_regs, reset_unknown, PMXEVTYPER_EL0 },
->  	/* PMXEVCNTR_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b010),
->  	  trap_raz_wi },
-> @@ -951,6 +962,16 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
+>  #define CREATE_TRACE_POINTS
+>  #include "trace.h"
+> @@ -551,6 +552,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
 >  
->  	if (p->is_write) {
->  		switch (r->reg) {
-> +		case c9_PMXEVTYPER: {
-> +			val = vcpu_cp15(vcpu, c9_PMSELR);
-> +			kvm_pmu_set_counter_event_type(vcpu,
-> +						       *vcpu_reg(vcpu, p->Rt),
-> +						       val);
-> +			vcpu_cp15(vcpu, c9_PMXEVTYPER) = *vcpu_reg(vcpu, p->Rt);
-> +			vcpu_cp15(vcpu, c14_PMEVTYPER0 + val) =
-> +							 *vcpu_reg(vcpu, p->Rt);
-> +			break;
+>  		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm)) {
+>  			local_irq_enable();
+> +			kvm_pmu_sync_hwstate(vcpu);
+
+This is very weird. Are you only injecting interrupts when a signal is
+pending? I don't understand how this works...
+
+>  			kvm_vgic_sync_hwstate(vcpu);
+>  			preempt_enable();
+>  			kvm_timer_sync_hwstate(vcpu);
+> @@ -598,6 +600,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  		kvm_guest_exit();
+>  		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
+>  
+> +		kvm_pmu_post_sync_hwstate(vcpu);
+> +
+>  		kvm_vgic_sync_hwstate(vcpu);
+>  
+>  		preempt_enable();
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index acd025a..5e7f943 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -39,6 +39,8 @@ struct kvm_pmu {
+>  };
+>  
+>  #ifdef CONFIG_KVM_ARM_PMU
+> +void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu);
+> +void kvm_pmu_post_sync_hwstate(struct kvm_vcpu *vcpu);
+
+Please follow the current terminology: _flush_ on VM entry, _sync_ on
+VM exit.
+
+>  unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx);
+>  void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val);
+>  void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u32 val, bool all_enable);
+> @@ -49,6 +51,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
+>  				    u32 select_idx);
+>  void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u32 val);
+>  #else
+> +void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu) {}
+> +void kvm_pmu_post_sync_hwstate(struct kvm_vcpu *vcpu) {}
+>  unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx)
+>  {
+>  	return 0;
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index 11d1bfb..6d48d9a 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -21,6 +21,7 @@
+>  #include <linux/perf_event.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <kvm/arm_pmu.h>
+> +#include <kvm/arm_vgic.h>
+>  
+>  /**
+>   * kvm_pmu_get_counter_value - get PMU counter value
+> @@ -69,6 +70,78 @@ static void kvm_pmu_stop_counter(struct kvm_pmc *pmc)
+>  }
+>  
+>  /**
+> + * kvm_pmu_sync_hwstate - sync pmu state for cpu
+> + * @vcpu: The vcpu pointer
+> + *
+> + * Inject virtual PMU IRQ if IRQ is pending for this cpu.
+> + */
+> +void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +	u32 overflow;
+> +
+> +	if (!vcpu_mode_is_32bit(vcpu))
+> +		overflow = vcpu_sys_reg(vcpu, PMOVSSET_EL0);
+> +	else
+> +		overflow = vcpu_cp15(vcpu, c9_PMOVSSET);
+> +
+> +	if ((pmu->irq_pending || overflow != 0) && (pmu->irq_num != -1))
+> +		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, 1);
+> +
+> +	pmu->irq_pending = false;
+> +}
+> +
+> +/**
+> + * kvm_pmu_post_sync_hwstate - post sync pmu state for cpu
+> + * @vcpu: The vcpu pointer
+> + *
+> + * Inject virtual PMU IRQ if IRQ is pending for this cpu when back from guest.
+> + */
+> +void kvm_pmu_post_sync_hwstate(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +
+> +	if (pmu->irq_pending && (pmu->irq_num != -1))
+> +		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, 1);
+> +
+> +	pmu->irq_pending = false;
+> +}
+> +
+> +/**
+> + * When perf event overflows, set irq_pending and call kvm_vcpu_kick() to inject
+> + * the interrupt.
+> + */
+> +static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
+> +				  struct perf_sample_data *data,
+> +				  struct pt_regs *regs)
+> +{
+> +	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
+> +	struct kvm_vcpu *vcpu = pmc->vcpu;
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +	int idx = pmc->idx;
+> +
+> +	if (!vcpu_mode_is_32bit(vcpu)) {
+> +		if ((vcpu_sys_reg(vcpu, PMINTENSET_EL1) >> idx) & 0x1) {
+> +			__set_bit(idx,
+> +			    (unsigned long *)&vcpu_sys_reg(vcpu, PMOVSSET_EL0));
+> +			__set_bit(idx,
+> +			    (unsigned long *)&vcpu_sys_reg(vcpu, PMOVSCLR_EL0));
+> +			pmu->irq_pending = true;
+> +			kvm_vcpu_kick(vcpu);
 > +		}
->  		case c9_PMCR: {
->  			/* Only update writeable bits of PMCR */
->  			val = vcpu_cp15(vcpu, r->reg);
-> @@ -1024,7 +1045,8 @@ static const struct sys_reg_desc cp15_regs[] = {
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmu_cp15_regs,
->  	  reset_pmceid, c9_PMCEID1 },
->  	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), trap_raz_wi },
-> -	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), trap_raz_wi },
-> +	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_cp15_regs,
-> +	  reset_unknown_cp15, c9_PMXEVTYPER },
->  	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), trap_raz_wi },
->  	{ Op1( 0), CRn( 9), CRm(14), Op2( 0), trap_raz_wi },
->  	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), trap_raz_wi },
+> +	} else {
+> +		if ((vcpu_cp15(vcpu, c9_PMINTENSET) >> idx) & 0x1) {
+> +			__set_bit(idx,
+> +				(unsigned long *)&vcpu_cp15(vcpu, c9_PMOVSSET));
+> +			__set_bit(idx,
+> +				(unsigned long *)&vcpu_cp15(vcpu, c9_PMOVSCLR));
+> +			pmu->irq_pending = true;
+> +			kvm_vcpu_kick(vcpu);
+
+There is some obvious code factorization that can be done here.
+
+> +		}
+> +	}
+> +}
+> +
+> +/**
+>   * kvm_pmu_enable_counter - enable selected PMU counter
+>   * @vcpu: The vcpu pointer
+>   * @val: the value guest writes to PMCNTENSET register
+> @@ -293,7 +366,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
+>  	/* The initial sample period (overflow count) of an event. */
+>  	attr.sample_period = (-counter) & pmc->bitmask;
+>  
+> -	event = perf_event_create_kernel_counter(&attr, -1, current, NULL, pmc);
+> +	event = perf_event_create_kernel_counter(&attr, -1, current,
+> +						 kvm_pmu_perf_overflow, pmc);
+>  	if (IS_ERR(event)) {
+>  		printk_once("kvm: pmu event creation failed %ld\n",
+>  			    PTR_ERR(event));
 
 Thanks,
 
