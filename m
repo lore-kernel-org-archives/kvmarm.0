@@ -1,198 +1,275 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 18/21] KVM: ARM64: Add PMU overflow interrupt routing
-Date: Mon, 30 Nov 2015 18:22:58 +0000
-Message-ID: <20151130182258.684c9df6@arm.com>
+Subject: Re: [PATCH v4 21/21] KVM: ARM64: Add a new kvm ARM PMU device
+Date: Mon, 30 Nov 2015 18:31:30 +0000
+Message-ID: <20151130183130.3e90a733@arm.com>
 References: <1446186123-11548-1-git-send-email-zhaoshenglong@huawei.com>
-	<1446186123-11548-19-git-send-email-zhaoshenglong@huawei.com>
+	<1446186123-11548-22-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1446186123-11548-19-git-send-email-zhaoshenglong@huawei.com>
+In-Reply-To: <1446186123-11548-22-git-send-email-zhaoshenglong@huawei.com>
 Sender: kvm-owner@vger.kernel.org
 To: Shannon Zhao <zhaoshenglong@huawei.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, christoffer.dall@linaro.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 30 Oct 2015 14:22:00 +0800
+On Fri, 30 Oct 2015 14:22:03 +0800
 Shannon Zhao <zhaoshenglong@huawei.com> wrote:
 
 > From: Shannon Zhao <shannon.zhao@linaro.org>
 > 
-> When calling perf_event_create_kernel_counter to create perf_event,
-> assign a overflow handler. Then when perf event overflows, set
-> irq_pending and call kvm_vcpu_kick() to sync the interrupt.
+> Add a new kvm device type KVM_DEV_TYPE_ARM_PMU_V3 for ARM PMU. Implement
+> the kvm_device_ops for it.
 > 
 > Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 > ---
->  arch/arm/kvm/arm.c    |  4 +++
->  include/kvm/arm_pmu.h |  4 +++
->  virt/kvm/arm/pmu.c    | 76 ++++++++++++++++++++++++++++++++++++++++++++++++++-
->  3 files changed, 83 insertions(+), 1 deletion(-)
+>  Documentation/virtual/kvm/devices/arm-pmu.txt | 15 +++++
+>  arch/arm64/include/uapi/asm/kvm.h             |  3 +
+>  include/linux/kvm_host.h                      |  1 +
+>  include/uapi/linux/kvm.h                      |  2 +
+>  virt/kvm/arm/pmu.c                            | 92 +++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic.c                           |  8 +++
+>  virt/kvm/arm/vgic.h                           |  1 +
+>  virt/kvm/kvm_main.c                           |  4 ++
+>  8 files changed, 126 insertions(+)
+>  create mode 100644 Documentation/virtual/kvm/devices/arm-pmu.txt
 > 
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index 78b2869..9c0fec4 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -28,6 +28,7 @@
->  #include <linux/sched.h>
->  #include <linux/kvm.h>
->  #include <trace/events/kvm.h>
-> +#include <kvm/arm_pmu.h>
->  
->  #define CREATE_TRACE_POINTS
->  #include "trace.h"
-> @@ -551,6 +552,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  
->  		if (ret <= 0 || need_new_vmid_gen(vcpu->kvm)) {
->  			local_irq_enable();
-> +			kvm_pmu_sync_hwstate(vcpu);
-
-This is very weird. Are you only injecting interrupts when a signal is
-pending? I don't understand how this works...
-
->  			kvm_vgic_sync_hwstate(vcpu);
->  			preempt_enable();
->  			kvm_timer_sync_hwstate(vcpu);
-> @@ -598,6 +600,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		kvm_guest_exit();
->  		trace_kvm_exit(kvm_vcpu_trap_get_class(vcpu), *vcpu_pc(vcpu));
->  
-> +		kvm_pmu_post_sync_hwstate(vcpu);
+> diff --git a/Documentation/virtual/kvm/devices/arm-pmu.txt b/Documentation/virtual/kvm/devices/arm-pmu.txt
+> new file mode 100644
+> index 0000000..49481c4
+> --- /dev/null
+> +++ b/Documentation/virtual/kvm/devices/arm-pmu.txt
+> @@ -0,0 +1,15 @@
+> +ARM Virtual Performance Monitor Unit (vPMU)
+> +===========================================
 > +
->  		kvm_vgic_sync_hwstate(vcpu);
+> +Device types supported:
+> +  KVM_DEV_TYPE_ARM_PMU_V3         ARM Performance Monitor Unit v3
+> +
+> +Instantiate one PMU instance for per VCPU through this API.
+> +
+> +Groups:
+> +  KVM_DEV_ARM_PMU_GRP_IRQ
+> +  Attributes:
+> +    A value describing the interrupt number of PMU overflow interrupt.
+> +
+> +  Errors:
+> +    -EINVAL: Value set is out of the expected range
+
+What is the expected range?
+
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 0cd7b59..1309a93 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -204,6 +204,9 @@ struct kvm_arch_memory_slot {
+>  #define KVM_DEV_ARM_VGIC_GRP_CTRL	4
+>  #define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
 >  
->  		preempt_enable();
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index acd025a..5e7f943 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -39,6 +39,8 @@ struct kvm_pmu {
+> +/* Device Control API: ARM PMU */
+> +#define KVM_DEV_ARM_PMU_GRP_IRQ		0
+> +
+>  /* KVM_IRQ_LINE irq field index values */
+>  #define KVM_ARM_IRQ_TYPE_SHIFT		24
+>  #define KVM_ARM_IRQ_TYPE_MASK		0xff
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 1bef9e2..f6be696 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1122,6 +1122,7 @@ extern struct kvm_device_ops kvm_mpic_ops;
+>  extern struct kvm_device_ops kvm_xics_ops;
+>  extern struct kvm_device_ops kvm_arm_vgic_v2_ops;
+>  extern struct kvm_device_ops kvm_arm_vgic_v3_ops;
+> +extern struct kvm_device_ops kvm_arm_pmu_ops;
+>  
+>  #ifdef CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT
+>  
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index a9256f0..f41e6b6 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1025,6 +1025,8 @@ enum kvm_device_type {
+>  #define KVM_DEV_TYPE_FLIC		KVM_DEV_TYPE_FLIC
+>  	KVM_DEV_TYPE_ARM_VGIC_V3,
+>  #define KVM_DEV_TYPE_ARM_VGIC_V3	KVM_DEV_TYPE_ARM_VGIC_V3
+> +	KVM_DEV_TYPE_ARM_PMU_V3,
+> +#define	KVM_DEV_TYPE_ARM_PMU_V3		KVM_DEV_TYPE_ARM_PMU_V3
+>  	KVM_DEV_TYPE_MAX,
 >  };
 >  
->  #ifdef CONFIG_KVM_ARM_PMU
-> +void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu);
-> +void kvm_pmu_post_sync_hwstate(struct kvm_vcpu *vcpu);
-
-Please follow the current terminology: _flush_ on VM entry, _sync_ on
-VM exit.
-
->  unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx);
->  void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val);
->  void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u32 val, bool all_enable);
-> @@ -49,6 +51,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
->  				    u32 select_idx);
->  void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u32 val);
->  #else
-> +void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu) {}
-> +void kvm_pmu_post_sync_hwstate(struct kvm_vcpu *vcpu) {}
->  unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx)
->  {
->  	return 0;
 > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> index 11d1bfb..6d48d9a 100644
+> index d78ce7b..0a00d04 100644
 > --- a/virt/kvm/arm/pmu.c
 > +++ b/virt/kvm/arm/pmu.c
-> @@ -21,6 +21,7 @@
+> @@ -19,10 +19,13 @@
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
 >  #include <linux/perf_event.h>
+> +#include <linux/uaccess.h>
 >  #include <asm/kvm_emulate.h>
 >  #include <kvm/arm_pmu.h>
-> +#include <kvm/arm_vgic.h>
+>  #include <kvm/arm_vgic.h>
 >  
+> +#include "vgic.h"
+> +
 >  /**
 >   * kvm_pmu_get_counter_value - get PMU counter value
-> @@ -69,6 +70,78 @@ static void kvm_pmu_stop_counter(struct kvm_pmc *pmc)
+>   * @vcpu: The vcpu pointer
+> @@ -416,3 +419,92 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
+>  
+>  	pmc->perf_event = event;
+>  }
+> +
+> +static int kvm_arm_pmu_set_irq(struct kvm *kvm, int irq)
+> +{
+> +	int j;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	kvm_for_each_vcpu(j, vcpu, kvm) {
+> +		struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +
+> +		kvm_debug("Set kvm ARM PMU irq: %d\n", irq);
+> +		pmu->irq_num = irq;
+> +		vgic_dist_irq_set_cfg(vcpu, irq, true);
+> +	}
+
+So obviously, the irq must be a PPI, since all vcpus are getting the
+same one. Worth documenting.
+
+> +
+> +	return 0;
+> +}
+> +
+> +static int kvm_arm_pmu_create(struct kvm_device *dev, u32 type)
+> +{
+> +	int i, j;
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm *kvm = dev->kvm;
+> +
+> +	kvm_for_each_vcpu(j, vcpu, kvm) {
+> +		struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +
+> +		memset(pmu, 0, sizeof(*pmu));
+> +		for (i = 0; i < ARMV8_MAX_COUNTERS; i++) {
+> +			pmu->pmc[i].idx = i;
+> +			pmu->pmc[i].vcpu = vcpu;
+> +			pmu->pmc[i].bitmask = 0xffffffffUL;
+> +		}
+> +		pmu->irq_num = -1;
+> +	}
+
+Surely this can be shared with the reset code?
+
+> +
+> +	return 0;
+> +}
+> +
+> +static void kvm_arm_pmu_destroy(struct kvm_device *dev)
+> +{
+> +	kfree(dev);
+> +}
+> +
+> +static int kvm_arm_pmu_set_attr(struct kvm_device *dev,
+> +				struct kvm_device_attr *attr)
+> +{
+> +	switch (attr->group) {
+> +	case KVM_DEV_ARM_PMU_GRP_IRQ: {
+> +		int __user *uaddr = (int __user *)(long)attr->addr;
+> +		int reg;
+> +
+> +		if (get_user(reg, uaddr))
+> +			return -EFAULT;
+> +
+> +		if (reg < VGIC_NR_SGIS || reg > dev->kvm->arch.vgic.nr_irqs)
+> +			return -EINVAL;
+
+On the other have, this doesn't prevent a SPI from being used.
+Something is wrong.
+
+> +
+> +		return kvm_arm_pmu_set_irq(dev->kvm, reg);
+> +	}
+> +	}
+> +
+> +	return -ENXIO;
+> +}
+> +
+> +static int kvm_arm_pmu_get_attr(struct kvm_device *dev,
+> +				struct kvm_device_attr *attr)
+> +{
+> +	return 0;
+> +}
+> +
+> +static int kvm_arm_pmu_has_attr(struct kvm_device *dev,
+> +				struct kvm_device_attr *attr)
+> +{
+> +	switch (attr->group) {
+> +	case KVM_DEV_ARM_PMU_GRP_IRQ:
+> +		return 0;
+> +	}
+> +
+> +	return -ENXIO;
+> +}
+> +
+> +struct kvm_device_ops kvm_arm_pmu_ops = {
+> +	.name = "kvm-arm-pmu",
+> +	.create = kvm_arm_pmu_create,
+> +	.destroy = kvm_arm_pmu_destroy,
+> +	.set_attr = kvm_arm_pmu_set_attr,
+> +	.get_attr = kvm_arm_pmu_get_attr,
+> +	.has_attr = kvm_arm_pmu_has_attr,
+> +};
+> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+> index 66c6616..8e00987 100644
+> --- a/virt/kvm/arm/vgic.c
+> +++ b/virt/kvm/arm/vgic.c
+> @@ -380,6 +380,14 @@ void vgic_dist_irq_clear_pending(struct kvm_vcpu *vcpu, int irq)
+>  	vgic_bitmap_set_irq_val(&dist->irq_pending, vcpu->vcpu_id, irq, 0);
 >  }
 >  
->  /**
-> + * kvm_pmu_sync_hwstate - sync pmu state for cpu
-> + * @vcpu: The vcpu pointer
-> + *
-> + * Inject virtual PMU IRQ if IRQ is pending for this cpu.
-> + */
-> +void kvm_pmu_sync_hwstate(struct kvm_vcpu *vcpu)
+> +void vgic_dist_irq_set_cfg(struct kvm_vcpu *vcpu, int irq, bool level)
 > +{
-> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +	u32 overflow;
+> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
 > +
-> +	if (!vcpu_mode_is_32bit(vcpu))
-> +		overflow = vcpu_sys_reg(vcpu, PMOVSSET_EL0);
-> +	else
-> +		overflow = vcpu_cp15(vcpu, c9_PMOVSSET);
-> +
-> +	if ((pmu->irq_pending || overflow != 0) && (pmu->irq_num != -1))
-> +		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, 1);
-> +
-> +	pmu->irq_pending = false;
+> +	vgic_bitmap_set_irq_val(&dist->irq_cfg, vcpu->vcpu_id, irq,
+> +				level ? VGIC_CFG_LEVEL : VGIC_CFG_EDGE);
 > +}
 > +
-> +/**
-> + * kvm_pmu_post_sync_hwstate - post sync pmu state for cpu
-> + * @vcpu: The vcpu pointer
-> + *
-> + * Inject virtual PMU IRQ if IRQ is pending for this cpu when back from guest.
-> + */
-> +void kvm_pmu_post_sync_hwstate(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +
-> +	if (pmu->irq_pending && (pmu->irq_num != -1))
-> +		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, 1);
-> +
-> +	pmu->irq_pending = false;
-> +}
-> +
-> +/**
-> + * When perf event overflows, set irq_pending and call kvm_vcpu_kick() to inject
-> + * the interrupt.
-> + */
-> +static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
-> +				  struct perf_sample_data *data,
-> +				  struct pt_regs *regs)
-> +{
-> +	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
-> +	struct kvm_vcpu *vcpu = pmc->vcpu;
-> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +	int idx = pmc->idx;
-> +
-> +	if (!vcpu_mode_is_32bit(vcpu)) {
-> +		if ((vcpu_sys_reg(vcpu, PMINTENSET_EL1) >> idx) & 0x1) {
-> +			__set_bit(idx,
-> +			    (unsigned long *)&vcpu_sys_reg(vcpu, PMOVSSET_EL0));
-> +			__set_bit(idx,
-> +			    (unsigned long *)&vcpu_sys_reg(vcpu, PMOVSCLR_EL0));
-> +			pmu->irq_pending = true;
-> +			kvm_vcpu_kick(vcpu);
-> +		}
-> +	} else {
-> +		if ((vcpu_cp15(vcpu, c9_PMINTENSET) >> idx) & 0x1) {
-> +			__set_bit(idx,
-> +				(unsigned long *)&vcpu_cp15(vcpu, c9_PMOVSSET));
-> +			__set_bit(idx,
-> +				(unsigned long *)&vcpu_cp15(vcpu, c9_PMOVSCLR));
-> +			pmu->irq_pending = true;
-> +			kvm_vcpu_kick(vcpu);
 
-There is some obvious code factorization that can be done here.
+This has nothing to do here. If the interrupt must be configured, it
+should be explicit, not hidden here.
 
-> +		}
-> +	}
-> +}
-> +
-> +/**
->   * kvm_pmu_enable_counter - enable selected PMU counter
->   * @vcpu: The vcpu pointer
->   * @val: the value guest writes to PMCNTENSET register
-> @@ -293,7 +366,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
->  	/* The initial sample period (overflow count) of an event. */
->  	attr.sample_period = (-counter) & pmc->bitmask;
+>  static void vgic_cpu_irq_set(struct kvm_vcpu *vcpu, int irq)
+>  {
+>  	if (irq < VGIC_NR_PRIVATE_IRQS)
+> diff --git a/virt/kvm/arm/vgic.h b/virt/kvm/arm/vgic.h
+> index 0df74cb..eb814f5 100644
+> --- a/virt/kvm/arm/vgic.h
+> +++ b/virt/kvm/arm/vgic.h
+> @@ -49,6 +49,7 @@ u32 *vgic_bytemap_get_reg(struct vgic_bytemap *x, int cpuid, u32 offset);
 >  
-> -	event = perf_event_create_kernel_counter(&attr, -1, current, NULL, pmc);
-> +	event = perf_event_create_kernel_counter(&attr, -1, current,
-> +						 kvm_pmu_perf_overflow, pmc);
->  	if (IS_ERR(event)) {
->  		printk_once("kvm: pmu event creation failed %ld\n",
->  			    PTR_ERR(event));
+>  void vgic_dist_irq_set_pending(struct kvm_vcpu *vcpu, int irq);
+>  void vgic_dist_irq_clear_pending(struct kvm_vcpu *vcpu, int irq);
+> +void vgic_dist_irq_set_cfg(struct kvm_vcpu *vcpu, int irq, bool level);
+>  void vgic_cpu_irq_clear(struct kvm_vcpu *vcpu, int irq);
+>  void vgic_bitmap_set_irq_val(struct vgic_bitmap *x, int cpuid,
+>  			     int irq, int val);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 8db1d93..5decfb5 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2641,6 +2641,10 @@ static struct kvm_device_ops *kvm_device_ops_table[KVM_DEV_TYPE_MAX] = {
+>  #ifdef CONFIG_KVM_XICS
+>  	[KVM_DEV_TYPE_XICS]		= &kvm_xics_ops,
+>  #endif
+> +
+> +#ifdef CONFIG_KVM_ARM_PMU
+> +	[KVM_DEV_TYPE_ARM_PMU_V3]	= &kvm_arm_pmu_ops,
+> +#endif
+>  };
+>  
+>  int kvm_register_device_ops(struct kvm_device_ops *ops, u32 type)
 
 Thanks,
 
