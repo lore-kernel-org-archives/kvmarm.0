@@ -1,78 +1,44 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH v5 2/2] KVM: Make KVM_CAP_IRQFD dependent on
- KVM_CAP_IRQCHIP
-Date: Mon, 30 Nov 2015 15:41:20 +0300
-Message-ID: <017801d12b6c$6a7c2c00$3f748400$@samsung.com>
-References: <cover.1448874023.git.p.fedin@samsung.com>
- <57888eef1c5c21337ddad384250bc5f55829ac67.1448874023.git.p.fedin@samsung.com>
- <20151130122627.12ceb244.cornelia.huck@de.ibm.com>
- <017101d12b66$2c8cf970$85a6ec50$@samsung.com>
- <20151130131331.78d98df5.cornelia.huck@de.ibm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 06/21] KVM: ARM64: Add reset and access handlers for
+ PMCEID0 and PMCEID1 register
+Date: Mon, 30 Nov 2015 13:19:22 +0000
+Message-ID: <20151130131922.0e8789b7@arm.com>
+References: <1446186123-11548-1-git-send-email-zhaoshenglong@huawei.com>
+	<1446186123-11548-7-git-send-email-zhaoshenglong@huawei.com>
+	<20151130114230.136abc6f@arm.com>
+	<565C3A39.5020600@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A9EE48535
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Nov 2015 07:40:05 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SjOqsj7apHjT for <kvmarm@lists.cs.columbia.edu>;
- Mon, 30 Nov 2015 07:40:03 -0500 (EST)
-Received: from mailout3.w1.samsung.com (mailout3.w1.samsung.com
- [210.118.77.13])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 68C6E496EC
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Nov 2015 07:40:02 -0500 (EST)
-Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
- by mailout3.w1.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NYM00AWEOKX8Q90@mailout3.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Mon, 30 Nov 2015 12:41:21 +0000 (GMT)
-In-reply-to: <20151130131331.78d98df5.cornelia.huck@de.ibm.com>
-Content-language: ru
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: 'Cornelia Huck' <cornelia.huck@de.ibm.com>
-Cc: kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>, 'Gleb Natapov' <gleb@kernel.org>, 'Paolo Bonzini' <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <565C3A39.5020600@huawei.com>
+Sender: kvm-owner@vger.kernel.org
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, christoffer.dall@linaro.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello!
+On Mon, 30 Nov 2015 19:59:53 +0800
+Shannon Zhao <zhaoshenglong@huawei.com> wrote:
 
-> >  Thank you for the note, i didn't know about irqchip-specific capability codes. There's the
-> > same issue with PowerPC, now i
-> > understand why there's no KVM_CAP_IRQCHIP for them. Because they have KVM_CAP_IRQ_MPIC and
-> > KVM_CAP_IRQ_XICS, similar to S390.
-> >  But isn't it just weird? I understand that perhaps we have some real need to distinguish
-> > between different irqchip types, but
-> > shouldn't the kernel also publish KVM_CAP_IRQCHIP, which stands just for "we support some
-> > irqchip virtualization"?
-> >  May be we should just add this for PowerPC and S390, to make things less ambiguous?
+> Hi Marc,
 > 
-> Note that we explicitly need to _enable_ the s390 cap (for
-> compatibility). I'd need to recall the exact details but I came to the
-> conclusion back than that I could not simply enable KVM_CAP_IRQCHIP for
-> s390 (and current qemu would fail to enable the s390 cap if we started
-> advertising KVM_CAP_IRQCHIP now).
+> On 2015/11/30 19:42, Marc Zyngier wrote:
+> >> +static void reset_pmceid(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> >> > +{
+> >> > +	u64 pmceid;
+> >> > +
+> >> > +	if (r->reg == PMCEID0_EL0 || r->reg == c9_PMCEID0)
+> > That feels wrong. We should only reset the 64bit view of the sysregs,
+> > as the 32bit view is directly mapped to it.
+> > 
+> Just to confirm, if guest access c9_PMCEID0, KVM will trap this register
+> with the register index as PMCEID0_EL0? Or still as c9_PMCEID0?
 
- OMG... I've looked at the code, what a mess...
- If i was implementing this, i'd simply introduce kvm_vm_enable_cap(s, KVM_CAP_IRQCHIP, 0),
-which would be allowed to fail with -ENOSYS, so that backwards compatibility is kept and an existing API is reused... But, well,
-it's already impossible to unscramble an egg... :)
- Ok, i think in current situation we could choose one of these ways (both are based on the fact that it's obvious that irqfd require
-IRQCHIP).
- a) I look for an alternate way to report KVM_CAP_IRQFD dynamically, and maybe PowerPC and S390 follow this way.
- b) I simply drop it as it is, because current qemu knows about the dependency and does not try to use irqfd without irqchip,
-because there's simply no use for them. But, well, perhaps there would be an exception in vhost, i don't remember testing it.
- So what shall we do?
+The traps are per execution mode (you'll get c9_PMCEID0 with a 32bit
+guest). But the reset function is only concerned with the 64bit view.
 
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny.
