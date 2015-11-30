@@ -1,25 +1,35 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 08/21] arm64: KVM: Implement debug save/restore
-Date: Mon, 30 Nov 2015 12:24:36 +0000
-Message-ID: <20151130122436.2d1515d2@arm.com>
-References: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com>
- <1448650215-15218-9-git-send-email-marc.zyngier@arm.com>
- <87d1urbstj.fsf@linaro.org>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH v5 2/2] KVM: Make KVM_CAP_IRQFD dependent on
+ KVM_CAP_IRQCHIP
+Date: Mon, 30 Nov 2015 15:41:20 +0300
+Message-ID: <017801d12b6c$6a7c2c00$3f748400$@samsung.com>
+References: <cover.1448874023.git.p.fedin@samsung.com>
+ <57888eef1c5c21337ddad384250bc5f55829ac67.1448874023.git.p.fedin@samsung.com>
+ <20151130122627.12ceb244.cornelia.huck@de.ibm.com>
+ <017101d12b66$2c8cf970$85a6ec50$@samsung.com>
+ <20151130131331.78d98df5.cornelia.huck@de.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F33E4130B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Nov 2015 07:23:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A9EE48535
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Nov 2015 07:40:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0VSKWeNEEm4F for <kvmarm@lists.cs.columbia.edu>;
- Mon, 30 Nov 2015 07:23:26 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DEFF9412ED
- for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Nov 2015 07:23:25 -0500 (EST)
-In-Reply-To: <87d1urbstj.fsf@linaro.org>
+ with ESMTP id SjOqsj7apHjT for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 30 Nov 2015 07:40:03 -0500 (EST)
+Received: from mailout3.w1.samsung.com (mailout3.w1.samsung.com
+ [210.118.77.13])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 68C6E496EC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Nov 2015 07:40:02 -0500 (EST)
+Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
+ by mailout3.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NYM00AWEOKX8Q90@mailout3.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Mon, 30 Nov 2015 12:41:21 +0000 (GMT)
+In-reply-to: <20151130131331.78d98df5.cornelia.huck@de.ibm.com>
+Content-language: ru
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,141 +39,40 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alex =?ISO-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: 'Cornelia Huck' <cornelia.huck@de.ibm.com>
+Cc: kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>, 'Gleb Natapov' <gleb@kernel.org>, 'Paolo Bonzini' <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gTW9uLCAzMCBOb3YgMjAxNSAxMjowMDoyNCArMDAwMApBbGV4IEJlbm7DqWUgPGFsZXguYmVu
-bmVlQGxpbmFyby5vcmc+IHdyb3RlOgoKPiAKPiBNYXJjIFp5bmdpZXIgPG1hcmMuenluZ2llckBh
-cm0uY29tPiB3cml0ZXM6Cj4gCj4gPiBJbXBsZW1lbnQgdGhlIGRlYnVnIHNhdmUgcmVzdG9yZSBh
-cyBhIGRpcmVjdCB0cmFuc2xhdGlvbiBvZgo+ID4gdGhlIGFzc2VtYmx5IGNvZGUgdmVyc2lvbi4K
-PiA+Cj4gPiBTaWduZWQtb2ZmLWJ5OiBNYXJjIFp5bmdpZXIgPG1hcmMuenluZ2llckBhcm0uY29t
-Pgo+ID4gLS0tCj4gPiAgYXJjaC9hcm02NC9rdm0vaHlwL01ha2VmaWxlICAgfCAgIDEgKwo+ID4g
-IGFyY2gvYXJtNjQva3ZtL2h5cC9kZWJ1Zy1zci5jIHwgMTMwICsrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKwo+ID4gIGFyY2gvYXJtNjQva3ZtL2h5cC9oeXAuaCAgICAg
-IHwgICA5ICsrKwo+ID4gIDMgZmlsZXMgY2hhbmdlZCwgMTQwIGluc2VydGlvbnMoKykKPiA+ICBj
-cmVhdGUgbW9kZSAxMDA2NDQgYXJjaC9hcm02NC9rdm0vaHlwL2RlYnVnLXNyLmMKPiA+Cj4gPiBk
-aWZmIC0tZ2l0IGEvYXJjaC9hcm02NC9rdm0vaHlwL01ha2VmaWxlIGIvYXJjaC9hcm02NC9rdm0v
-aHlwL01ha2VmaWxlCj4gPiBpbmRleCBlYzk0MjAwLi5lYzE0Y2FjIDEwMDY0NAo+ID4gLS0tIGEv
-YXJjaC9hcm02NC9rdm0vaHlwL01ha2VmaWxlCj4gPiArKysgYi9hcmNoL2FybTY0L2t2bS9oeXAv
-TWFrZWZpbGUKPiA+IEBAIC02LDMgKzYsNCBAQCBvYmotJChDT05GSUdfS1ZNX0FSTV9IT1NUKSAr
-PSB2Z2ljLXYyLXNyLm8KPiA+ICBvYmotJChDT05GSUdfS1ZNX0FSTV9IT1NUKSArPSB2Z2ljLXYz
-LXNyLm8KPiA+ICBvYmotJChDT05GSUdfS1ZNX0FSTV9IT1NUKSArPSB0aW1lci1zci5vCj4gPiAg
-b2JqLSQoQ09ORklHX0tWTV9BUk1fSE9TVCkgKz0gc3lzcmVnLXNyLm8KPiA+ICtvYmotJChDT05G
-SUdfS1ZNX0FSTV9IT1NUKSArPSBkZWJ1Zy1zci5vCj4gPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm02
-NC9rdm0vaHlwL2RlYnVnLXNyLmMgYi9hcmNoL2FybTY0L2t2bS9oeXAvZGVidWctc3IuYwo+ID4g
-bmV3IGZpbGUgbW9kZSAxMDA2NDQKPiA+IGluZGV4IDAwMDAwMDAuLmEwYjJiOTkKPiA+IC0tLSAv
-ZGV2L251bGwKPiA+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL2h5cC9kZWJ1Zy1zci5jCj4gPiBAQCAt
-MCwwICsxLDEzMCBAQAo+ID4gKy8qCj4gPiArICogQ29weXJpZ2h0IChDKSAyMDE1IC0gQVJNIEx0
-ZAo+ID4gKyAqIEF1dGhvcjogTWFyYyBaeW5naWVyIDxtYXJjLnp5bmdpZXJAYXJtLmNvbT4KPiA+
-ICsgKgo+ID4gKyAqIFRoaXMgcHJvZ3JhbSBpcyBmcmVlIHNvZnR3YXJlOyB5b3UgY2FuIHJlZGlz
-dHJpYnV0ZSBpdCBhbmQvb3IgbW9kaWZ5Cj4gPiArICogaXQgdW5kZXIgdGhlIHRlcm1zIG9mIHRo
-ZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSB2ZXJzaW9uIDIgYXMKPiA+ICsgKiBwdWJsaXNo
-ZWQgYnkgdGhlIEZyZWUgU29mdHdhcmUgRm91bmRhdGlvbi4KPiA+ICsgKgo+ID4gKyAqIFRoaXMg
-cHJvZ3JhbSBpcyBkaXN0cmlidXRlZCBpbiB0aGUgaG9wZSB0aGF0IGl0IHdpbGwgYmUgdXNlZnVs
-LAo+ID4gKyAqIGJ1dCBXSVRIT1VUIEFOWSBXQVJSQU5UWTsgd2l0aG91dCBldmVuIHRoZSBpbXBs
-aWVkIHdhcnJhbnR5IG9mCj4gPiArICogTUVSQ0hBTlRBQklMSVRZIG9yIEZJVE5FU1MgRk9SIEEg
-UEFSVElDVUxBUiBQVVJQT1NFLiAgU2VlIHRoZQo+ID4gKyAqIEdOVSBHZW5lcmFsIFB1YmxpYyBM
-aWNlbnNlIGZvciBtb3JlIGRldGFpbHMuCj4gPiArICoKPiA+ICsgKiBZb3Ugc2hvdWxkIGhhdmUg
-cmVjZWl2ZWQgYSBjb3B5IG9mIHRoZSBHTlUgR2VuZXJhbCBQdWJsaWMgTGljZW5zZQo+ID4gKyAq
-IGFsb25nIHdpdGggdGhpcyBwcm9ncmFtLiAgSWYgbm90LCBzZWUgPGh0dHA6Ly93d3cuZ251Lm9y
-Zy9saWNlbnNlcy8+Lgo+ID4gKyAqLwo+ID4gKwo+ID4gKyNpbmNsdWRlIDxsaW51eC9jb21waWxl
-ci5oPgo+ID4gKyNpbmNsdWRlIDxsaW51eC9rdm1faG9zdC5oPgo+ID4gKwo+ID4gKyNpbmNsdWRl
-IDxhc20va3ZtX21tdS5oPgo+ID4gKwo+ID4gKyNpbmNsdWRlICJoeXAuaCIKPiA+ICsKPiA+ICsj
-ZGVmaW5lIHJlYWRfZGVidWcocixuKQkJcmVhZF9zeXNyZWcociMjbiMjX2VsMSkKPiA+ICsjZGVm
-aW5lIHdyaXRlX2RlYnVnKHYscixuKQl3cml0ZV9zeXNyZWcodiwgciMjbiMjX2VsMSkKPiA+ICsK
-PiA+ICsjZGVmaW5lIHNhdmVfZGVidWcocHRyLHJlZyxucikJCQkJCQlcCj4gPiArCXN3aXRjaCAo
-bnIpIHsJCQkJCQkJXAo+ID4gKwljYXNlIDE1OglwdHJbMTVdID0gcmVhZF9kZWJ1ZyhyZWcsIDE1
-KTsJCQlcCj4gPiArCWNhc2UgMTQ6CXB0clsxNF0gPSByZWFkX2RlYnVnKHJlZywgMTQpOwkJCVwK
-PiA+ICsJY2FzZSAxMzoJcHRyWzEzXSA9IHJlYWRfZGVidWcocmVnLCAxMyk7CQkJXAo+ID4gKwlj
-YXNlIDEyOglwdHJbMTJdID0gcmVhZF9kZWJ1ZyhyZWcsIDEyKTsJCQlcCj4gPiArCWNhc2UgMTE6
-CXB0clsxMV0gPSByZWFkX2RlYnVnKHJlZywgMTEpOwkJCVwKPiA+ICsJY2FzZSAxMDoJcHRyWzEw
-XSA9IHJlYWRfZGVidWcocmVnLCAxMCk7CQkJXAo+ID4gKwljYXNlIDk6CQlwdHJbOV0gPSByZWFk
-X2RlYnVnKHJlZywgOSk7CQkJXAo+ID4gKwljYXNlIDg6CQlwdHJbOF0gPSByZWFkX2RlYnVnKHJl
-ZywgOCk7CQkJXAo+ID4gKwljYXNlIDc6CQlwdHJbN10gPSByZWFkX2RlYnVnKHJlZywgNyk7CQkJ
-XAo+ID4gKwljYXNlIDY6CQlwdHJbNl0gPSByZWFkX2RlYnVnKHJlZywgNik7CQkJXAo+ID4gKwlj
-YXNlIDU6CQlwdHJbNV0gPSByZWFkX2RlYnVnKHJlZywgNSk7CQkJXAo+ID4gKwljYXNlIDQ6CQlw
-dHJbNF0gPSByZWFkX2RlYnVnKHJlZywgNCk7CQkJXAo+ID4gKwljYXNlIDM6CQlwdHJbM10gPSBy
-ZWFkX2RlYnVnKHJlZywgMyk7CQkJXAo+ID4gKwljYXNlIDI6CQlwdHJbMl0gPSByZWFkX2RlYnVn
-KHJlZywgMik7CQkJXAo+ID4gKwljYXNlIDE6CQlwdHJbMV0gPSByZWFkX2RlYnVnKHJlZywgMSk7
-CQkJXAo+ID4gKwlkZWZhdWx0OglwdHJbMF0gPSByZWFkX2RlYnVnKHJlZywgMCk7CQkJXAo+ID4g
-Kwl9Cj4gPiArCj4gPiArI2RlZmluZSByZXN0b3JlX2RlYnVnKHB0cixyZWcsbnIpCQkJCQlcCj4g
-PiArCXN3aXRjaCAobnIpIHsJCQkJCQkJXAo+ID4gKwljYXNlIDE1Ogl3cml0ZV9kZWJ1ZyhwdHJb
-MTVdLCByZWcsIDE1KTsJCQlcCj4gPiArCWNhc2UgMTQ6CXdyaXRlX2RlYnVnKHB0clsxNF0sIHJl
-ZywgMTQpOwkJCVwKPiA+ICsJY2FzZSAxMzoJd3JpdGVfZGVidWcocHRyWzEzXSwgcmVnLCAxMyk7
-CQkJXAo+ID4gKwljYXNlIDEyOgl3cml0ZV9kZWJ1ZyhwdHJbMTJdLCByZWcsIDEyKTsJCQlcCj4g
-PiArCWNhc2UgMTE6CXdyaXRlX2RlYnVnKHB0clsxMV0sIHJlZywgMTEpOwkJCVwKPiA+ICsJY2Fz
-ZSAxMDoJd3JpdGVfZGVidWcocHRyWzEwXSwgcmVnLCAxMCk7CQkJXAo+ID4gKwljYXNlIDk6CQl3
-cml0ZV9kZWJ1ZyhwdHJbOV0sIHJlZywgOSk7CQkJXAo+ID4gKwljYXNlIDg6CQl3cml0ZV9kZWJ1
-ZyhwdHJbOF0sIHJlZywgOCk7CQkJXAo+ID4gKwljYXNlIDc6CQl3cml0ZV9kZWJ1ZyhwdHJbN10s
-IHJlZywgNyk7CQkJXAo+ID4gKwljYXNlIDY6CQl3cml0ZV9kZWJ1ZyhwdHJbNl0sIHJlZywgNik7
-CQkJXAo+ID4gKwljYXNlIDU6CQl3cml0ZV9kZWJ1ZyhwdHJbNV0sIHJlZywgNSk7CQkJXAo+ID4g
-KwljYXNlIDQ6CQl3cml0ZV9kZWJ1ZyhwdHJbNF0sIHJlZywgNCk7CQkJXAo+ID4gKwljYXNlIDM6
-CQl3cml0ZV9kZWJ1ZyhwdHJbM10sIHJlZywgMyk7CQkJXAo+ID4gKwljYXNlIDI6CQl3cml0ZV9k
-ZWJ1ZyhwdHJbMl0sIHJlZywgMik7CQkJXAo+ID4gKwljYXNlIDE6CQl3cml0ZV9kZWJ1ZyhwdHJb
-MV0sIHJlZywgMSk7CQkJXAo+ID4gKwlkZWZhdWx0Ogl3cml0ZV9kZWJ1ZyhwdHJbMF0sIHJlZywg
-MCk7CQkJXAo+ID4gKwl9Cj4gPiArCj4gPiArdm9pZCBfX2h5cF90ZXh0IF9fZGVidWdfc2F2ZV9z
-dGF0ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4gPiArCQkJCSAgIHN0cnVjdCBrdm1fZ3Vlc3Rf
-ZGVidWdfYXJjaCAqZGJnLAo+ID4gKwkJCQkgICBzdHJ1Y3Qga3ZtX2NwdV9jb250ZXh0ICpjdHh0
-KQo+ID4gK3sKPiA+ICsJaWYgKHZjcHUtPmFyY2guZGVidWdfZmxhZ3MgJiBLVk1fQVJNNjRfREVC
-VUdfRElSVFkpIHsKPiA+ICsJCXU2NCBhYTY0ZGZyMCA9IHJlYWRfc3lzcmVnKGlkX2FhNjRkZnIw
-X2VsMSk7Cj4gPiArCQlpbnQgYnJwcywgd3JwczsKPiA+ICsKPiA+ICsJCWJycHMgPSAoYWE2NGRm
-cjAgPj4gMTIpICYgMHhmOwo+ID4gKwkJd3JwcyA9IChhYTY0ZGZyMCA+PiAyMCkgJiAweGY7Cj4g
-Cj4gSSdtIHN1cmUgd2UgaGF2ZSB0aGF0IGRlZmluZWQgLSBnZXRfbnVtX2JycHMvd3JwcygpIC0g
-YnV0IEkgZG9uJ3Qga25vdwo+IGlmIHRoZSBjb21waWxlciB3b3VsZCBkbyBhIGJldHRlciBqb2Ig
-d2l0aCBpdC4KClRoZSBwcm9ibGVtIGlzIHRoYXQgaXQgbGl2ZXMgaW4gdGhlIG1haW4ga2VybmVs
-IHRleHQsIHdoaWNoIG1ha2VzIGl0CnVuYXZhaWxhYmxlIHRvIHRoZSBoeXAgY29kZS4KCj4gPiAr
-Cj4gPiArCQlzYXZlX2RlYnVnKGRiZy0+ZGJnX2JjciwgZGJnYmNyLCBicnBzKTsKPiA+ICsJCXNh
-dmVfZGVidWcoZGJnLT5kYmdfYnZyLCBkYmdidnIsIGJycHMpOwo+ID4gKwkJc2F2ZV9kZWJ1Zyhk
-YmctPmRiZ193Y3IsIGRiZ3djciwgd3Jwcyk7Cj4gPiArCQlzYXZlX2RlYnVnKGRiZy0+ZGJnX3d2
-ciwgZGJnd3ZyLCB3cnBzKTsKPiA+ICsKPiA+ICsJCWN0eHQtPnN5c19yZWdzW01EQ0NJTlRfRUwx
-XSA9IHJlYWRfc3lzcmVnKG1kY2NpbnRfZWwxKTsKPiA+ICsJfQo+ID4gK30KPiA+ICsKPiA+ICt2
-b2lkIF9faHlwX3RleHQgX19kZWJ1Z19yZXN0b3JlX3N0YXRlKHN0cnVjdCBrdm1fdmNwdSAqdmNw
-dSwKPiA+ICsJCQkJICAgICAgc3RydWN0IGt2bV9ndWVzdF9kZWJ1Z19hcmNoICpkYmcsCj4gPiAr
-CQkJCSAgICAgIHN0cnVjdCBrdm1fY3B1X2NvbnRleHQgKmN0eHQpCj4gPiArewo+ID4gKwlpZiAo
-dmNwdS0+YXJjaC5kZWJ1Z19mbGFncyAmIEtWTV9BUk02NF9ERUJVR19ESVJUWSkgewo+ID4gKwkJ
-dTY0IGFhNjRkZnIwID0gcmVhZF9zeXNyZWcoaWRfYWE2NGRmcjBfZWwxKTsKPiA+ICsJCWludCBi
-cnBzLCB3cnBzOwo+ID4gKwo+ID4gKwkJYnJwcyA9IChhYTY0ZGZyMCA+PiAxMikgJiAweGY7Cj4g
-PiArCQl3cnBzID0gKGFhNjRkZnIwID4+IDIwKSAmIDB4ZjsKPiA+ICsKPiA+ICsJCXJlc3RvcmVf
-ZGVidWcoZGJnLT5kYmdfYmNyLCBkYmdiY3IsIGJycHMpOwo+ID4gKwkJcmVzdG9yZV9kZWJ1Zyhk
-YmctPmRiZ19idnIsIGRiZ2J2ciwgYnJwcyk7Cj4gPiArCQlyZXN0b3JlX2RlYnVnKGRiZy0+ZGJn
-X3djciwgZGJnd2NyLCB3cnBzKTsKPiA+ICsJCXJlc3RvcmVfZGVidWcoZGJnLT5kYmdfd3ZyLCBk
-Ymd3dnIsIHdycHMpOwo+ID4gKwo+ID4gKwkJd3JpdGVfc3lzcmVnKGN0eHQtPnN5c19yZWdzW01E
-Q0NJTlRfRUwxXSwgbWRjY2ludF9lbDEpOwo+ID4gKwl9Cj4gPiArfQo+ID4gKwo+ID4gK3ZvaWQg
-X19oeXBfdGV4dCBfX2RlYnVnX2NvbmRfc2F2ZV9ob3N0X3N0YXRlKHN0cnVjdCBrdm1fdmNwdSAq
-dmNwdSkKPiA+ICt7Cj4gPiArCWlmICgodmNwdS0+YXJjaC5jdHh0LnN5c19yZWdzW01EU0NSX0VM
-MV0gJiBEQkdfTURTQ1JfS0RFKSB8fAo+ID4gKwkgICAgKHZjcHUtPmFyY2guY3R4dC5zeXNfcmVn
-c1tNRFNDUl9FTDFdICYgREJHX01EU0NSX0tERSkpCj4gPiArCQl2Y3B1LT5hcmNoLmRlYnVnX2Zs
-YWdzIHw9IEtWTV9BUk02NF9ERUJVR19ESVJUWTsKPiA+ICsKPiA+ICsJX19kZWJ1Z19zYXZlX3N0
-YXRlKHZjcHUsICZ2Y3B1LT5hcmNoLmhvc3RfZGVidWdfc3RhdGUsCj4gPiArCQkJICAga2Vybl9o
-eXBfdmEodmNwdS0+YXJjaC5ob3N0X2NwdV9jb250ZXh0KSk7Cj4gPiArfQo+ID4gKwo+ID4gK3Zv
-aWQgX19oeXBfdGV4dCBfX2RlYnVnX2NvbmRfcmVzdG9yZV9ob3N0X3N0YXRlKHN0cnVjdCBrdm1f
-dmNwdSAqdmNwdSkKPiA+ICt7Cj4gPiArCWlmICh2Y3B1LT5hcmNoLmRlYnVnX2ZsYWdzICYgS1ZN
-X0FSTTY0X0RFQlVHX0RJUlRZKSB7Cj4gPiArCQlfX2RlYnVnX3Jlc3RvcmVfc3RhdGUodmNwdSwg
-JnZjcHUtPmFyY2guaG9zdF9kZWJ1Z19zdGF0ZSwKPiA+ICsJCQkJICAgICAga2Vybl9oeXBfdmEo
-dmNwdS0+YXJjaC5ob3N0X2NwdV9jb250ZXh0KSk7Cj4gPiArCQl2Y3B1LT5hcmNoLmRlYnVnX2Zs
-YWdzICY9IH5LVk1fQVJNNjRfREVCVUdfRElSVFk7Cj4gPiArCX0KPiA+ICt9Cj4gPiArCj4gPiAr
-dTMyIF9faHlwX3RleHQgX19kZWJ1Z19yZWFkX21kY3JfZWwyKHZvaWQpCj4gPiArewo+ID4gKwly
-ZXR1cm4gcmVhZF9zeXNyZWcobWRjcl9lbDIpOwo+ID4gK30KPiA+IGRpZmYgLS1naXQgYS9hcmNo
-L2FybTY0L2t2bS9oeXAvaHlwLmggYi9hcmNoL2FybTY0L2t2bS9oeXAvaHlwLmgKPiA+IGluZGV4
-IDQ2MzkzMzAuLjI1ODEyMzIgMTAwNjQ0Cj4gPiAtLS0gYS9hcmNoL2FybTY0L2t2bS9oeXAvaHlw
-LmgKPiA+ICsrKyBiL2FyY2gvYXJtNjQva3ZtL2h5cC9oeXAuaAo+ID4gQEAgLTQxLDUgKzQxLDE0
-IEBAIHZvaWQgX19zeXNyZWdfcmVzdG9yZV9zdGF0ZShzdHJ1Y3Qga3ZtX2NwdV9jb250ZXh0ICpj
-dHh0KTsKPiA+ICB2b2lkIF9fc3lzcmVnMzJfc2F2ZV9zdGF0ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
-cHUpOwo+ID4gIHZvaWQgX19zeXNyZWczMl9yZXN0b3JlX3N0YXRlKHN0cnVjdCBrdm1fdmNwdSAq
-dmNwdSk7Cj4gPgo+ID4gK3ZvaWQgX19kZWJ1Z19zYXZlX3N0YXRlKHN0cnVjdCBrdm1fdmNwdSAq
-dmNwdSwKPiA+ICsJCQlzdHJ1Y3Qga3ZtX2d1ZXN0X2RlYnVnX2FyY2ggKmRiZywKPiA+ICsJCQlz
-dHJ1Y3Qga3ZtX2NwdV9jb250ZXh0ICpjdHh0KTsKPiA+ICt2b2lkIF9fZGVidWdfcmVzdG9yZV9z
-dGF0ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4gPiArCQkJICAgc3RydWN0IGt2bV9ndWVzdF9k
-ZWJ1Z19hcmNoICpkYmcsCj4gPiArCQkJICAgc3RydWN0IGt2bV9jcHVfY29udGV4dCAqY3R4dCk7
-Cj4gPiArdm9pZCBfX2RlYnVnX2NvbmRfc2F2ZV9ob3N0X3N0YXRlKHN0cnVjdCBrdm1fdmNwdSAq
-dmNwdSk7Cj4gPiArdm9pZCBfX2RlYnVnX2NvbmRfcmVzdG9yZV9ob3N0X3N0YXRlKHN0cnVjdCBr
-dm1fdmNwdSAqdmNwdSk7Cj4gPiArCj4gPiAgI2VuZGlmIC8qIF9fQVJNNjRfS1ZNX0hZUF9IX18g
-Ki8KPiAKPiBJIHNwdW4gaXQgdXAgYWdhaW5zdCBteSBLVk0gZGVidWcgdGVzdHMgYW5kIGV2ZXJ5
-dGhpbmcgd2FzIGZpbmUuIEhhdmUgYToKPiAKPiBUZXN0ZWQtYnk6IEFsZXggQmVubsOpZSA8YWxl
-eC5iZW5uZWVAbGluYXJvLm9yZz4KPiBSZXZpZXdlZC1ieTogQWxleCBCZW5uw6llIDxhbGV4LmJl
-bm5lZUBsaW5hcm8ub3JnPgoKQXdlc29tZS4gVGhhbmtzIEFsZXghCgoJTS4KLS0gCkphenogaXMg
-bm90IGRlYWQuIEl0IGp1c3Qgc21lbGxzIGZ1bm55LgpfX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5j
-cy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0
-aW5mby9rdm1hcm0K
+ Hello!
+
+> >  Thank you for the note, i didn't know about irqchip-specific capability codes. There's the
+> > same issue with PowerPC, now i
+> > understand why there's no KVM_CAP_IRQCHIP for them. Because they have KVM_CAP_IRQ_MPIC and
+> > KVM_CAP_IRQ_XICS, similar to S390.
+> >  But isn't it just weird? I understand that perhaps we have some real need to distinguish
+> > between different irqchip types, but
+> > shouldn't the kernel also publish KVM_CAP_IRQCHIP, which stands just for "we support some
+> > irqchip virtualization"?
+> >  May be we should just add this for PowerPC and S390, to make things less ambiguous?
+> 
+> Note that we explicitly need to _enable_ the s390 cap (for
+> compatibility). I'd need to recall the exact details but I came to the
+> conclusion back than that I could not simply enable KVM_CAP_IRQCHIP for
+> s390 (and current qemu would fail to enable the s390 cap if we started
+> advertising KVM_CAP_IRQCHIP now).
+
+ OMG... I've looked at the code, what a mess...
+ If i was implementing this, i'd simply introduce kvm_vm_enable_cap(s, KVM_CAP_IRQCHIP, 0),
+which would be allowed to fail with -ENOSYS, so that backwards compatibility is kept and an existing API is reused... But, well,
+it's already impossible to unscramble an egg... :)
+ Ok, i think in current situation we could choose one of these ways (both are based on the fact that it's obvious that irqfd require
+IRQCHIP).
+ a) I look for an alternate way to report KVM_CAP_IRQFD dynamically, and maybe PowerPC and S390 follow this way.
+ b) I simply drop it as it is, because current qemu knows about the dependency and does not try to use irqfd without irqchip,
+because there's simply no use for them. But, well, perhaps there would be an exception in vhost, i don't remember testing it.
+ So what shall we do?
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
