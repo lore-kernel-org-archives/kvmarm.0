@@ -1,57 +1,99 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 18/21] KVM: ARM64: Add PMU overflow interrupt routing
-Date: Tue, 01 Dec 2015 16:57:30 +0000
-Message-ID: <565DD17A.50009@arm.com>
-References: <1446186123-11548-1-git-send-email-zhaoshenglong@huawei.com>	<1446186123-11548-19-git-send-email-zhaoshenglong@huawei.com> <20151130182258.684c9df6@arm.com> <565DB021.3020901@huawei.com> <565DB3A5.3030701@arm.com> <565DB935.5040609@linaro.org> <565DBF8D.1070006@arm.com> <565DCA24.7000908@linaro.org>
+Subject: Re: [PATCH v2 00/21] arm64: KVM: world switch in C
+Date: Tue, 01 Dec 2015 17:51:46 +0000
+Message-ID: <565DDE32.6080500@arm.com>
+References: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com> <20151130203345.GI11704@cbox> <565D6F3F.5030700@arm.com> <20151201120025.GN11704@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <565DCA24.7000908@linaro.org>
+In-Reply-To: <20151201120025.GN11704@cbox>
 Sender: kvm-owner@vger.kernel.org
-To: Shannon Zhao <shannon.zhao@linaro.org>, Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, christoffer.dall@linaro.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, peter.huangpeng@huawei.com
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: =?windows-1252?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Steve Capper <Steve.Capper@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01/12/15 16:26, Shannon Zhao wrote:
-> 
-> 
-> On 2015/12/1 23:41, Marc Zyngier wrote:
->>> The reason is that when guest clear the overflow register, it will trap
->>>> to kvm and call kvm_pmu_sync_hwstate() as you see above. At this moment,
->>>> the overflow register is still overflowed(that is some bit is still 1).
->>>> So We need to use some flag to mark we already inject this interrupt.
->>>> And if during guest handling the overflow, there is a new overflow
->>>> happening, the pmu->irq_pending will be set ture by
->>>> kvm_pmu_perf_overflow(), then it needs to inject this new interrupt, right?
->> I don't think so. This is a level interrupt, so the level should stay
->> high as long as the guest hasn't cleared all possible sources for that
->> interrupt.
+On 01/12/15 12:00, Christoffer Dall wrote:
+> On Tue, Dec 01, 2015 at 09:58:23AM +0000, Marc Zyngier wrote:
+>> On 30/11/15 20:33, Christoffer Dall wrote:
+>>> On Fri, Nov 27, 2015 at 06:49:54PM +0000, Marc Zyngier wrote:
+>>>> Once upon a time, the KVM/arm64 world switch was a nice, clean, lean
+>>>> and mean piece of hand-crafted assembly code. Over time, features have
+>>>> crept in, the code has become harder to maintain, and the smallest
+>>>> change is a pain to introduce. The VHE patches are a prime example of
+>>>> why this doesn't work anymore.
+>>>>
+>>>> This series rewrites most of the existing assembly code in C, but keeps
+>>>> the existing code structure in place (most function names will look
+>>>> familiar to the reader). The biggest change is that we don't have to
+>>>> deal with a static register allocation (the compiler does it for us),
+>>>> we can easily follow structure and pointers, and only the lowest level
+>>>> is still in assembly code. Oh, and a negative diffstat.
+>>>>
+>>>> There is still a healthy dose of inline assembly (system register
+>>>> accessors, runtime code patching), but I've tried not to make it too
+>>>> invasive. The generated code, while not exactly brilliant, doesn't
+>>>> look too shaby. I do expect a small performance degradation, but I
+>>>> believe this is something we can improve over time (my initial
+>>>> measurements don't show any obvious regression though).
+>>>
+>>> I ran this through my experimental setup on m400 and got this:
 >>
->> For your example, the guest writes to PMOVSCLR to clear the overflow
->> caused by a given counter. If the status is now 0, the interrupt line
->> drops. If the status is still non zero, the line stays high. And I
->> believe that writing a 1 to PMOVSSET would actually trigger an
->> interrupt, or keep it high if it has already high.
+>> [...]
 >>
-> Right, writing 1 to PMOVSSET will trigger an interrupt.
+>>> What this tells me is that we do take a noticable hit on the
+>>> world-switch path, which shows up in the TCP_RR and hackbench workloads,
+>>> which have a high precision in their output.
+>>>
+>>> Note that the memcached number is well within its variability between
+>>> individual benchmark runs, where it varies to 12% of its average in over
+>>> 80% of the executions.
+>>>
+>>> I don't think this is a showstopper thought, but we could consider
+>>> looking more closely at a breakdown of the world-switch path and verify
+>>> if/where we are really taking a hit.
+>>
+>> Thanks for doing so, very interesting. As a data point, what compiler
+>> are you using? I'd expect some variability based on the compiler version...
+>>
+> I used the following (compiling natively on the m400):
 > 
->> In essence, do not try to maintain side state. I've been bitten.
-> 
-> So on VM entry, it check if PMOVSSET is zero. If not, call 
-> kvm_vgic_inject_irq to set the level high. If so, set the level low.
-> On VM exit, it seems there is nothing to do.
+> gcc version 4.8.2 (Ubuntu/Linaro 4.8.2-19ubuntu1)
 
-It is even simpler than that:
+For what it is worth, I've ran hackbench on my Seattle B0 (8xA57 2GHz),
+with a 4 vcpu VM and got the following results (10 runs per kernel
+version, same configuration):
 
-- When you get an overflow, you inject an interrupt with the level set to 1.
-- When the overflow register gets cleared, you inject the same interrupt
-with the level set to 0.
+v4.4-rc3-wsinc: Average 31.750
+32.459
+32.124
+32.435
+31.940
+31.085
+31.804
+31.862
+30.985
+31.450
+31.359
 
-I don't think you need to do anything else, and the world switch should
-be left untouched.
+v4.4-rc3: Average 31.954
+31.806
+31.598
+32.697
+31.472
+31.410
+32.562
+31.938
+31.932
+31.672
+32.459
 
-Thanks,
+This is with GCC as produced by Linaro:
+aarch64-linux-gnu-gcc (Linaro GCC 5.1-2015.08) 5.1.1 20150608
+
+It could well be that your compiler generates worse code than the one I
+use, or that the code it outputs is badly tuned for XGene. I guess I
+need to unearth my Mustang to find out...
 
 	M.
 -- 
