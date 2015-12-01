@@ -1,111 +1,142 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH v5 2/2] KVM: Make KVM_CAP_IRQFD dependent on KVM_CAP_IRQCHIP
-Date: Tue, 01 Dec 2015 14:07:58 +0300
-Message-ID: <014901d12c28$89c18490$9d448db0$@samsung.com>
-References: <cover.1448874023.git.p.fedin@samsung.com>
- <57888eef1c5c21337ddad384250bc5f55829ac67.1448874023.git.p.fedin@samsung.com>
- <20151130122627.12ceb244.cornelia.huck@de.ibm.com>
- <017101d12b66$2c8cf970$85a6ec50$@samsung.com>
- <20151130131331.78d98df5.cornelia.huck@de.ibm.com>
- <017801d12b6c$6a7c2c00$3f748400$@samsung.com>
- <20151130153807.1a2668e5.cornelia.huck@de.ibm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH v6] arm/arm64: KVM: Detect vGIC presence at runtime
+Date: Tue, 01 Dec 2015 14:11:44 +0300
+Message-ID: <1448968304-10128-1-git-send-email-p.fedin@samsung.com>
 Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <20151130153807.1a2668e5.cornelia.huck@de.ibm.com>
-Content-language: ru
 Sender: kvm-owner@vger.kernel.org
-To: 'Cornelia Huck' <cornelia.huck@de.ibm.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>, 'Christoffer Dall' <christoffer.dall@linaro.org>, 'Gleb Natapov' <gleb@kernel.org>, 'Paolo Bonzini' <pbonzini@redhat.com>
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello!
+Before commit 662d9715840aef44dcb573b0f9fab9e8319c868a
+("arm/arm64: KVM: Kill CONFIG_KVM_ARM_{VGIC,TIMER}") is was possible to
+compile the kernel without vGIC and vTimer support. Commit message says
+about possibility to detect vGIC support in runtime, but this has never
+been implemented.
 
-> >  b) I simply drop it as it is, because current qemu knows about the dependency and does not
-> try to use irqfd without irqchip,
-> > because there's simply no use for them. But, well, perhaps there would be an exception in
-> vhost, i don't remember testing it.
-> 
-> Wouldn't an irqfd emulation cover vhost?
+This patch introdices runtime check, restoring the lost functionality.
+It again allows to use KVM on hardware without vGIC. Interrupt
+controller has to be emulated in userspace in this case.
 
- I've just tested, and no, it does not cause any problems with qemu. It happens to correctly detect that the whole thing is not
-running and falls back to not using vhost. This is output from my qemu:
---- cut ---
-2015-12-01T11:03:16.135724Z qemu-system-arm: Error binding guest notifier: 11
-2015-12-01T11:03:16.135849Z qemu-system-arm: unable to start vhost net: 11: falling back on userspace virtio
---- cut ---
+-ENODEV return code from probe function means there's no GIC at all.
+-ENXIO happens when, for example, there is GIC node in the device tree,
+but it does not specify vGIC resources. Normally this means that vGIC
+hardware is defunct. Any other error code is still treated as full stop
+because it might mean some really serious problems.
 
- So, the resume is: we just drop this patch and only N1 remains.
+This patch does not touch any virtual timer code, suggesting that timer
+hardware is actually in place. Normally on boards in question it is true,
+however since vGIC is missing, it is impossible to correctly utilize
+interrupts from the virtual timer. Since virtual timer handling is in
+active redevelopment now, handling in it userspace is out of scope at
+the moment. The guest is currently suggested to use some memory-mapped
+timer which can be emulated in userspace.
 
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
+Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+---
+v5 => v6:
+- KVM_CAP_IRQFD patch also dropped, causing many problems on PowerPC and
+  S390
+- Rebased on top of 4.3-rc3
 
+v4 => v5:
+- Tested on top of kvmarm/next
+- Dropped already applied part
+- Fixed minor checkpatch issues
 
-> -----Original Message-----
-> From: kvm-owner@vger.kernel.org [mailto:kvm-owner@vger.kernel.org] On Behalf Of Cornelia Huck
-> Sent: Monday, November 30, 2015 5:38 PM
-> To: Pavel Fedin
-> Cc: kvmarm@lists.cs.columbia.edu; kvm@vger.kernel.org; 'Marc Zyngier'; 'Christoffer Dall';
-> 'Gleb Natapov'; 'Paolo Bonzini'
-> Subject: Re: [PATCH v5 2/2] KVM: Make KVM_CAP_IRQFD dependent on KVM_CAP_IRQCHIP
-> 
-> On Mon, 30 Nov 2015 15:41:20 +0300
-> Pavel Fedin <p.fedin@samsung.com> wrote:
-> 
-> >  Hello!
-> >
-> > > >  Thank you for the note, i didn't know about irqchip-specific capability codes. There's
-> the
-> > > > same issue with PowerPC, now i
-> > > > understand why there's no KVM_CAP_IRQCHIP for them. Because they have KVM_CAP_IRQ_MPIC
-> and
-> > > > KVM_CAP_IRQ_XICS, similar to S390.
-> > > >  But isn't it just weird? I understand that perhaps we have some real need to
-> distinguish
-> > > > between different irqchip types, but
-> > > > shouldn't the kernel also publish KVM_CAP_IRQCHIP, which stands just for "we support
-> some
-> > > > irqchip virtualization"?
-> > > >  May be we should just add this for PowerPC and S390, to make things less ambiguous?
-> > >
-> > > Note that we explicitly need to _enable_ the s390 cap (for
-> > > compatibility). I'd need to recall the exact details but I came to the
-> > > conclusion back than that I could not simply enable KVM_CAP_IRQCHIP for
-> > > s390 (and current qemu would fail to enable the s390 cap if we started
-> > > advertising KVM_CAP_IRQCHIP now).
-> >
-> >  OMG... I've looked at the code, what a mess...
-> >  If i was implementing this, i'd simply introduce kvm_vm_enable_cap(s, KVM_CAP_IRQCHIP, 0),
-> > which would be allowed to fail with -ENOSYS, so that backwards compatibility is kept and an
-> existing API is reused... But, well,
-> > it's already impossible to unscramble an egg... :)
-> >  Ok, i think in current situation we could choose one of these ways (both are based on the
-> fact that it's obvious that irqfd require
-> > IRQCHIP).
-> >  a) I look for an alternate way to report KVM_CAP_IRQFD dynamically, and maybe PowerPC and
-> S390 follow this way.
-> 
-> The thing is: _when_ can you report KVM_CAP_IRQFD? It obviously
-> requires an irqchip; but if you need some configuration/enablement
-> beforehand, you'll get different values depending on when you retrieve
-> the cap. So does KVM_CAP_IRQFD mean "irqfds are available in principle"
-> or "everything has been setup for usage of irqfds"? I'd assume the
-> former.
-> 
-> >  b) I simply drop it as it is, because current qemu knows about the dependency and does not
-> try to use irqfd without irqchip,
-> > because there's simply no use for them. But, well, perhaps there would be an exception in
-> vhost, i don't remember testing it.
-> 
-> Wouldn't an irqfd emulation cover vhost?
-> 
-> >  So what shall we do?
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+v3 => v4:
+- Revert back to using switch on kvm_vgic_hyp_init() return code. I decided
+  to leave 'vgic_present = false' statement because it helps to understand
+  the code.
+
+v2 => v3:
+- Improved commit messages, added references to commits where the respective
+  functionality was broken
+- Explicitly specify that the solution currently affects only vGIC and has
+  nothing to do with timer.
+- Fixed code style according to previous notes
+- Removed ARM64 save/restore patch introduced in v2 because it was already
+  obsolete for linux-next
+- Modify KVM_CAP_IRQFD handling in correct place
+
+v1 => v2:
+- Do not use defensive approach in patch 0001. Use correct conditions in
+  callers instead
+- Added ARM64-specific code, without which attempt to run a VM ends in a
+  HYP crash because of unset vGIC save/restore function pointers
+---
+ arch/arm/kvm/arm.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index e06fd29..66f90c1 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -61,6 +61,8 @@ static atomic64_t kvm_vmid_gen = ATOMIC64_INIT(1);
+ static u8 kvm_next_vmid;
+ static DEFINE_SPINLOCK(kvm_vmid_lock);
+ 
++static bool vgic_present;
++
+ static void kvm_arm_set_running_vcpu(struct kvm_vcpu *vcpu)
+ {
+ 	BUG_ON(preemptible());
+@@ -132,7 +134,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	kvm->arch.vmid_gen = 0;
+ 
+ 	/* The maximum number of VCPUs is limited by the host's GIC model */
+-	kvm->arch.max_vcpus = kvm_vgic_get_max_vcpus();
++	kvm->arch.max_vcpus = vgic_present ?
++				kvm_vgic_get_max_vcpus() : KVM_MAX_VCPUS;
+ 
+ 	return ret;
+ out_free_stage2_pgd:
+@@ -172,6 +175,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	int r;
+ 	switch (ext) {
+ 	case KVM_CAP_IRQCHIP:
++		r = vgic_present;
++		break;
+ 	case KVM_CAP_IOEVENTFD:
+ 	case KVM_CAP_DEVICE_CTRL:
+ 	case KVM_CAP_USER_MEMORY:
+@@ -913,6 +918,8 @@ static int kvm_vm_ioctl_set_device_addr(struct kvm *kvm,
+ 
+ 	switch (dev_id) {
+ 	case KVM_ARM_DEVICE_VGIC_V2:
++		if (!vgic_present)
++			return -ENXIO;
+ 		return kvm_vgic_addr(kvm, type, &dev_addr->addr, true);
+ 	default:
+ 		return -ENODEV;
+@@ -927,6 +934,8 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 
+ 	switch (ioctl) {
+ 	case KVM_CREATE_IRQCHIP: {
++		if (!vgic_present)
++			return -ENXIO;
+ 		return kvm_vgic_create(kvm, KVM_DEV_TYPE_ARM_VGIC_V2);
+ 	}
+ 	case KVM_ARM_SET_DEVICE_ADDR: {
+@@ -1111,8 +1120,17 @@ static int init_hyp_mode(void)
+ 	 * Init HYP view of VGIC
+ 	 */
+ 	err = kvm_vgic_hyp_init();
+-	if (err)
++	switch (err) {
++	case 0:
++		vgic_present = true;
++		break;
++	case -ENODEV:
++	case -ENXIO:
++		vgic_present = false;
++		break;
++	default:
+ 		goto out_free_context;
++	}
+ 
+ 	/*
+ 	 * Init HYP architected timer support
+-- 
+2.4.4
 
