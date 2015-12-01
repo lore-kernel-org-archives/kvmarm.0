@@ -1,41 +1,73 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: Re: [PATCH v4 00/21] KVM: ARM64: Add guest PMU support
-Date: Tue, 1 Dec 2015 09:52:15 +0800
-Message-ID: <565CFD4F.7090906@huawei.com>
-References: <1446186123-11548-1-git-send-email-zhaoshenglong@huawei.com> <20151130183419.471ec20f@arm.com>
+Subject: Re: [PATCH v4 08/21] KVM: ARM64: Add reset and access handlers for
+ PMXEVTYPER register
+Date: Tue, 1 Dec 2015 10:42:30 +0800
+Message-ID: <565D0916.5030300@huawei.com>
+References: <1446186123-11548-1-git-send-email-zhaoshenglong@huawei.com>	<1446186123-11548-9-git-send-email-zhaoshenglong@huawei.com>
+ <20151130181247.55649fc7@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20151130183419.471ec20f@arm.com>
-Sender: kvm-owner@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 11CE6498A1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Nov 2015 21:45:43 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id kRHqkSA80D3l for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 30 Nov 2015 21:45:41 -0500 (EST)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF5BF496EC
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 30 Nov 2015 21:45:40 -0500 (EST)
+In-Reply-To: <20151130181247.55649fc7@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, christoffer.dall@linaro.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com
+Cc: kvm@vger.kernel.org, shannon.zhao@linaro.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
 
-On 2015/12/1 2:34, Marc Zyngier wrote:
-> On Fri, 30 Oct 2015 14:21:42 +0800
+
+On 2015/12/1 2:12, Marc Zyngier wrote:
+> On Fri, 30 Oct 2015 14:21:50 +0800
 > Shannon Zhao <zhaoshenglong@huawei.com> wrote:
-> 
-> Hi Shannon,
 > 
 >> > From: Shannon Zhao <shannon.zhao@linaro.org>
 >> > 
->> > This patchset adds guest PMU support for KVM on ARM64. It takes
->> > trap-and-emulate approach. When guest wants to monitor one event, it
->> > will be trapped by KVM and KVM will call perf_event API to create a perf
->> > event and call relevant perf_event APIs to get the count value of event.
-> I've been through this whole series, and while this is shaping nicely,
-> there is still a number of things that are a bit odd (interrupt
-> injection is one, the whole CP15 reset is another).
+>> > Since the reset value of PMXEVTYPER is UNKNOWN, use reset_unknown or
+>> > reset_unknown_cp15 for its reset handler. Add access handler which
+>> > emulates writing and reading PMXEVTYPER register. When writing to
+>> > PMXEVTYPER, call kvm_pmu_set_counter_event_type to create a perf_event
+>> > for the selected event type.
+>> > 
+>> > Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+>> > ---
+>> >  arch/arm64/kvm/sys_regs.c | 26 ++++++++++++++++++++++++--
+>> >  1 file changed, 24 insertions(+), 2 deletions(-)
+>> > 
+>> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> > index cb82b15..4e606ea 100644
+>> > --- a/arch/arm64/kvm/sys_regs.c
+>> > +++ b/arch/arm64/kvm/sys_regs.c
+>> > @@ -491,6 +491,17 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+>> >  
+>> >  	if (p->is_write) {
+>> >  		switch (r->reg) {
+>> > +		case PMXEVTYPER_EL0: {
+>> > +			val = vcpu_sys_reg(vcpu, PMSELR_EL0);
+>> > +			kvm_pmu_set_counter_event_type(vcpu,
+>> > +						       *vcpu_reg(vcpu, p->Rt),
+>> > +						       val);
+> You are blindingly truncating 64bit values to u32. Is that intentional?
 > 
-> Can you please respin this soon? I'd really like to have this in for
-> 4.5...
-
-Thanks! I will respin it soon.
+Yeah, the register PMXEVTYPER_EL0 and PMSELR_EL0 are all 32bit.
 
 -- 
 Shannon
-
