@@ -1,272 +1,115 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 09/21] arm64: KVM: Implement guest entry
-Date: Tue, 01 Dec 2015 18:41:11 +0000
-Message-ID: <565DE9C7.5030601@arm.com>
-References: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com> <1448650215-15218-10-git-send-email-marc.zyngier@arm.com> <20151201152945.GS11704@cbox>
+Subject: Re: [PATCH v2 10/21] arm64: KVM: Add patchable function selector
+Date: Tue, 01 Dec 2015 18:51:00 +0000
+Message-ID: <565DEC14.8090206@arm.com>
+References: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com> <1448650215-15218-11-git-send-email-marc.zyngier@arm.com> <20151201153900.GT11704@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20151201152945.GS11704@cbox>
+In-Reply-To: <20151201153900.GT11704@cbox>
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: =?windows-1252?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Steve Capper <Steve.Capper@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01/12/15 15:29, Christoffer Dall wrote:
-> On Fri, Nov 27, 2015 at 06:50:03PM +0000, Marc Zyngier wrote:
->> Contrary to the previous patch, the guest entry is fairly different
->> from its assembly counterpart, mostly because it is only concerned
->> with saving/restoring the GP registers, and nothing else.
+On 01/12/15 15:39, Christoffer Dall wrote:
+> On Fri, Nov 27, 2015 at 06:50:04PM +0000, Marc Zyngier wrote:
+>> KVM so far relies on code patching, and is likely to use it more
+>> in the future. The main issue is that our alternative system works
+>> at the instruction level, while we'd like to have alternatives at
+>> the function level.
+>>
+>> In order to cope with this, add the "hyp_alternate_select" macro that
+>> outputs a brief sequence of code that in turn can be patched, allowing
+>> al alternative function to be selected.
+> 
+> s/al/an/ ?
+> 
 >>
 >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 >> ---
->>  arch/arm64/kvm/hyp/Makefile |   1 +
->>  arch/arm64/kvm/hyp/entry.S  | 155 ++++++++++++++++++++++++++++++++++++++++++++
->>  arch/arm64/kvm/hyp/hyp.h    |   2 +
->>  3 files changed, 158 insertions(+)
->>  create mode 100644 arch/arm64/kvm/hyp/entry.S
+>>  arch/arm64/kvm/hyp/hyp.h | 16 ++++++++++++++++
+>>  1 file changed, 16 insertions(+)
 >>
->> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
->> index ec14cac..1e1ff06 100644
->> --- a/arch/arm64/kvm/hyp/Makefile
->> +++ b/arch/arm64/kvm/hyp/Makefile
->> @@ -7,3 +7,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += vgic-v3-sr.o
->>  obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
->>  obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
->>  obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
->> +obj-$(CONFIG_KVM_ARM_HOST) += entry.o
->> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
->> new file mode 100644
->> index 0000000..2c4449a
->> --- /dev/null
->> +++ b/arch/arm64/kvm/hyp/entry.S
->> @@ -0,0 +1,155 @@
->> +/*
->> + * Copyright (C) 2015 - ARM Ltd
->> + * Author: Marc Zyngier <marc.zyngier@arm.com>
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License version 2 as
->> + * published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> + *
->> + * You should have received a copy of the GNU General Public License
->> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#include <linux/linkage.h>
->> +
->> +#include <asm/asm-offsets.h>
->> +#include <asm/assembler.h>
->> +#include <asm/fpsimdmacros.h>
->> +#include <asm/kvm.h>
->> +#include <asm/kvm_arm.h>
->> +#include <asm/kvm_asm.h>
->> +#include <asm/kvm_mmu.h>
->> +
->> +#define CPU_GP_REG_OFFSET(x)	(CPU_GP_REGS + x)
->> +#define CPU_XREG_OFFSET(x)	CPU_GP_REG_OFFSET(CPU_USER_PT_REGS + 8*x)
->> +
->> +	.text
->> +	.pushsection	.hyp.text, "ax"
->> +
->> +.macro save_common_regs ctxt
->> +	stp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
->> +	stp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
->> +	stp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
->> +	stp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
->> +	stp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
->> +	stp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
->> +.endm
->> +
->> +.macro restore_common_regs ctxt
->> +	ldp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
->> +	ldp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
->> +	ldp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
->> +	ldp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
->> +	ldp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
->> +	ldp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
->> +.endm
->> +
->> +.macro save_host_regs reg
->> +	save_common_regs \reg
->> +.endm
->> +
->> +.macro restore_host_regs reg
->> +	restore_common_regs \reg
->> +.endm
->> +
->> +.macro save_guest_regs
->> +	// x0 is the vcpu address
->> +	// x1 is the return code, do not corrupt!
->> +	// x2 is the cpu context
-> 
-> this is confusing because the caller says x2 is free, so are these the
-> inputs or invariants preserved in the function, or?
-> 
-> note that you'll avoid this kind of confusion by inlining this stuff in
-> __guest_exit.
-
-Indeed. I might just do that.
-
->> +	// x3 is a tmp register
->> +	// Guest's x0-x3 are on the stack
->> +
->> +	add	x2, x0, #VCPU_CONTEXT
->> +
->> +	// Compute base to save registers
-> 
-> misleading comment?
-
-Of course. Isn't that the very purpose of a comment? I'm confused... ;-)
-
->> +	stp	x4, x5,   [x2, #CPU_XREG_OFFSET(4)]
->> +	stp	x6, x7,   [x2, #CPU_XREG_OFFSET(6)]
->> +	stp	x8, x9,   [x2, #CPU_XREG_OFFSET(8)]
->> +	stp	x10, x11, [x2, #CPU_XREG_OFFSET(10)]
->> +	stp	x12, x13, [x2, #CPU_XREG_OFFSET(12)]
->> +	stp	x14, x15, [x2, #CPU_XREG_OFFSET(14)]
->> +	stp	x16, x17, [x2, #CPU_XREG_OFFSET(16)]
->> +	str	x18,      [x2, #CPU_XREG_OFFSET(18)]
->> +
->> +	pop	x6, x7			// x2, x3
->> +	pop	x4, x5			// x0, x1
-> 
-> hard to review when I haven't seen the code that calls this, but I'll
-> assume we store things in register order on the stack.
-
-Indeed. I've basically lifted that code from the previous version, so
-some things may have stuck...
-
->> +
->> +	stp	x4, x5, [x2, #CPU_XREG_OFFSET(0)]
->> +	stp	x6, x7, [x2, #CPU_XREG_OFFSET(2)]
->> +
->> +	save_common_regs x2
->> +.endm
->> +
->> +.macro restore_guest_regs
->> +	// Assume vcpu in x0, clobbers everything else
-> 
-> nit: clobbers everything (x0 gets nuked too)
-> 
->> +
->> +	add	x2, x0, #VCPU_CONTEXT
->> +
->> +	// Prepare x0-x3 for later restore
->> +	ldp	x4, x5, [x2, #CPU_XREG_OFFSET(0)]
->> +	ldp	x6, x7, [x2, #CPU_XREG_OFFSET(2)]
->> +	push	x4, x5		// Push x0-x3 on the stack
->> +	push	x6, x7
-> 
-> why do you need x2 and x3 later? can't you just make do with x0 and x1
-> and move the cpu context pointer to x1 ?
-
-Maybe I can optimize this a bit indeed.
-
->> +
->> +	// x4-x18
->> +	ldp	x4, x5,   [x2, #CPU_XREG_OFFSET(4)] 
->> +	ldp	x6, x7,   [x2, #CPU_XREG_OFFSET(6)] 
->> +	ldp	x8, x9,   [x2, #CPU_XREG_OFFSET(8)] 
->> +	ldp	x10, x11, [x2, #CPU_XREG_OFFSET(10)]
->> +	ldp	x12, x13, [x2, #CPU_XREG_OFFSET(12)]
->> +	ldp	x14, x15, [x2, #CPU_XREG_OFFSET(14)]
->> +	ldp	x16, x17, [x2, #CPU_XREG_OFFSET(16)]
->> +	ldr	x18,      [x2, #CPU_XREG_OFFSET(18)]
->> +
->> +	// x19-x29, lr
->> +	restore_common_regs x2
->> +
->> +	// Last bits of the 64bit state
->> +	pop	x2, x3
->> +	pop	x0, x1
->> +
->> +	// Do not touch any register after this!
->> +.endm
->> +
->> +/*
->> + * u64 __guest_enter(struct kvm_vcpu *vcpu,
->> + *		     struct kvm_cpu_context *host_ctxt);
->> + */
->> +ENTRY(__guest_enter)
->> +	// x0: vcpu
->> +	// x1: host_ctxt
->> +	// x2, x3: parameter registers
->> +	// x4-x18: clobbered by macros
->> +
->> +	save_host_regs x1
->> +
->> +	// Preserve vcpu & host_ctxt for use at exit time
->> +	stp	x0, x1, [sp, #-16]!
-> 
-> why is this not a simple push?
-
-This *is* a simple push. Catalin has been threatening me to remove
-push/pop from the convenience macros, and I've started toying with the
-idea. Maybe I'll should bite the bullet and convert them all.
-
-> 
->> +
->> +	restore_guest_regs
-> 
-> do we ever reuse any of the above macros?  If not, perhaps it's more
-> clear to simply inline them here?
-
-Yeah, that's clearly better.
-
->> +	eret
->> +ENDPROC(__guest_enter)
->> +
->> +ENTRY(__guest_exit)
->> +	// x0: vcpu
->> +	// x1: return code
->> +	// x2-x3: free
->> +	// x4-x29,lr: vcpu regs
->> +	// vcpu x0-x3 on the stack
->> +	save_guest_regs
->> +
->> +	// Restore vcpu & host_ctxt from the stack
->> +	// (preserving return code in x1)
->> +	ldp	x0, x2, [sp], #16
-> 
-> why is this not a regular pop?
-
-See above.
-
->> +	restore_host_regs x2
->> +
->> +	mov	x0, x1
->> +	ret
->> +ENDPROC(__guest_exit)
->> +
->> +	/* Insert fault handling here */
 >> diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
->> index 2581232..7ac8e11 100644
+>> index 7ac8e11..f0427ee 100644
 >> --- a/arch/arm64/kvm/hyp/hyp.h
 >> +++ b/arch/arm64/kvm/hyp/hyp.h
->> @@ -50,5 +50,7 @@ void __debug_restore_state(struct kvm_vcpu *vcpu,
->>  void __debug_cond_save_host_state(struct kvm_vcpu *vcpu);
->>  void __debug_cond_restore_host_state(struct kvm_vcpu *vcpu);
+>> @@ -27,6 +27,22 @@
 >>  
->> +u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
+>>  #define kern_hyp_va(v) (typeof(v))((unsigned long)v & HYP_PAGE_OFFSET_MASK)
+>>  
+>> +/*
+>> + * Generates patchable code sequences that are used to switch between
+>> + * two implementations of a function, depending on the availability of
+>> + * a feature.
+>> + */
+> 
+> This looks right to me, but I'm a bit unclear what the types of this is
+> and how to use it.
+> 
+> Are orig and alt function pointers and cond is a CONFIG_FOO ?  fname is
+> a symbol, which is defined as a prototype somewhere and then implemented
+> here, or?
+> 
+> Perhaps a Usage: part of the docs would be helpful.
+
+How about:
+
+@fname: a symbol name that will be defined as a function returning a
+function pointer whose type will match @orig and @alt
+@orig: A pointer to the default function, as returned by @fname when
+@cond doesn't hold
+@alt: A pointer to the alternate function, as returned by @fname when
+@cond holds
+@cond: a CPU feature (as described in asm/cpufeature.h)
+
+> 
+>> +#define hyp_alternate_select(fname, orig, alt, cond)			\
+>> +typeof(orig) * __hyp_text fname(void)					\
+>> +{									\
+>> +	typeof(alt) *val = orig;					\
+>> +	asm volatile(ALTERNATIVE("nop		\n",			\
+>> +				 "mov	%0, %1	\n",			\
+>> +				 cond)					\
+>> +		     : "+r" (val) : "r" (alt));				\
+>> +	return val;							\
+>> +}
 >> +
->>  #endif /* __ARM64_KVM_HYP_H__ */
+>>  void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
+>>  void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
 >>  
 >> -- 
 >> 2.1.4
 >>
 > 
-> Thanks,
-> -Christoffer
+> I haven't thought much about how all of this is implemented, but from my
+> point of views the ideal situation would be something like:
 > 
+> void foo(int a, int b)
+> {
+> 	ALTERNATIVE_IF_NOT CONFIG_BAR
+> 	foo_legacy(a, b);
+> 	ALTERNATIVE_ELSE
+> 	foo_new(a, b);
+> 	ALTERNATIVE_END
+> }
+> 
+> I realize this may be impossible because the C code could implement all
+> sort of fun stuff around the actual function calls, but would there be
+> some way to annotate the functions and find the actual branch statement
+> and change the target?
 
-Thanks,
+The main issue is that C doesn't give you any access to the branch
+function itself, except for the asm-goto statements. It also makes it
+very hard to preserve the return type. For your idea to work, we'd need
+some support in the compiler itself. I'm sure that it is doable, just
+not by me! ;-)
+
+This is why I've ended up creating something that returns a function
+*pointer*, because that's something that exists in the language (no new
+concept). I simply made sure I could return it at minimal cost.
 
 	M.
 -- 
