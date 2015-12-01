@@ -1,99 +1,218 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 00/21] arm64: KVM: world switch in C
-Date: Tue, 01 Dec 2015 17:51:46 +0000
-Message-ID: <565DDE32.6080500@arm.com>
-References: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com> <20151130203345.GI11704@cbox> <565D6F3F.5030700@arm.com> <20151201120025.GN11704@cbox>
+Subject: Re: [PATCH v2 08/21] arm64: KVM: Implement debug save/restore
+Date: Tue, 01 Dec 2015 18:34:19 +0000
+Message-ID: <565DE82B.1030100@arm.com>
+References: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com> <1448650215-15218-9-git-send-email-marc.zyngier@arm.com> <20151201125639.GP11704@cbox> <565D9B57.2080005@arm.com> <20151201144737.GQ11704@cbox> <565DB63C.6090508@arm.com> <20151201154152.GU11704@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20151201120025.GN11704@cbox>
+In-Reply-To: <20151201154152.GU11704@cbox>
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: =?windows-1252?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>, Steve Capper <Steve.Capper@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01/12/15 12:00, Christoffer Dall wrote:
-> On Tue, Dec 01, 2015 at 09:58:23AM +0000, Marc Zyngier wrote:
->> On 30/11/15 20:33, Christoffer Dall wrote:
->>> On Fri, Nov 27, 2015 at 06:49:54PM +0000, Marc Zyngier wrote:
->>>> Once upon a time, the KVM/arm64 world switch was a nice, clean, lean
->>>> and mean piece of hand-crafted assembly code. Over time, features have
->>>> crept in, the code has become harder to maintain, and the smallest
->>>> change is a pain to introduce. The VHE patches are a prime example of
->>>> why this doesn't work anymore.
+On 01/12/15 15:41, Christoffer Dall wrote:
+> On Tue, Dec 01, 2015 at 03:01:16PM +0000, Marc Zyngier wrote:
+>> On 01/12/15 14:47, Christoffer Dall wrote:
+>>> On Tue, Dec 01, 2015 at 01:06:31PM +0000, Marc Zyngier wrote:
+>>>> On 01/12/15 12:56, Christoffer Dall wrote:
+>>>>> On Fri, Nov 27, 2015 at 06:50:02PM +0000, Marc Zyngier wrote:
+>>>>>> Implement the debug save restore as a direct translation of
+>>>>>> the assembly code version.
+>>>>>>
+>>>>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>>>>>> ---
+>>>>>>  arch/arm64/kvm/hyp/Makefile   |   1 +
+>>>>>>  arch/arm64/kvm/hyp/debug-sr.c | 130 ++++++++++++++++++++++++++++++++++++++++++
+>>>>>>  arch/arm64/kvm/hyp/hyp.h      |   9 +++
+>>>>>>  3 files changed, 140 insertions(+)
+>>>>>>  create mode 100644 arch/arm64/kvm/hyp/debug-sr.c
+>>>>>>
+>>>>>> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+>>>>>> index ec94200..ec14cac 100644
+>>>>>> --- a/arch/arm64/kvm/hyp/Makefile
+>>>>>> +++ b/arch/arm64/kvm/hyp/Makefile
+>>>>>> @@ -6,3 +6,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
+>>>>>>  obj-$(CONFIG_KVM_ARM_HOST) += vgic-v3-sr.o
+>>>>>>  obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
+>>>>>>  obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
+>>>>>> +obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
+>>>>>> diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+>>>>>> new file mode 100644
+>>>>>> index 0000000..a0b2b99
+>>>>>> --- /dev/null
+>>>>>> +++ b/arch/arm64/kvm/hyp/debug-sr.c
+>>>>>> @@ -0,0 +1,130 @@
+>>>>>> +/*
+>>>>>> + * Copyright (C) 2015 - ARM Ltd
+>>>>>> + * Author: Marc Zyngier <marc.zyngier@arm.com>
+>>>>>> + *
+>>>>>> + * This program is free software; you can redistribute it and/or modify
+>>>>>> + * it under the terms of the GNU General Public License version 2 as
+>>>>>> + * published by the Free Software Foundation.
+>>>>>> + *
+>>>>>> + * This program is distributed in the hope that it will be useful,
+>>>>>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>>>>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>>>>>> + * GNU General Public License for more details.
+>>>>>> + *
+>>>>>> + * You should have received a copy of the GNU General Public License
+>>>>>> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>>>>>> + */
+>>>>>> +
+>>>>>> +#include <linux/compiler.h>
+>>>>>> +#include <linux/kvm_host.h>
+>>>>>> +
+>>>>>> +#include <asm/kvm_mmu.h>
+>>>>>> +
+>>>>>> +#include "hyp.h"
+>>>>>> +
+>>>>>> +#define read_debug(r,n)		read_sysreg(r##n##_el1)
+>>>>>> +#define write_debug(v,r,n)	write_sysreg(v, r##n##_el1)
+>>>>>> +
+>>>>>> +#define save_debug(ptr,reg,nr)						\
+>>>>>> +	switch (nr) {							\
+>>>>>> +	case 15:	ptr[15] = read_debug(reg, 15);			\
+>>>>>> +	case 14:	ptr[14] = read_debug(reg, 14);			\
+>>>>>> +	case 13:	ptr[13] = read_debug(reg, 13);			\
+>>>>>> +	case 12:	ptr[12] = read_debug(reg, 12);			\
+>>>>>> +	case 11:	ptr[11] = read_debug(reg, 11);			\
+>>>>>> +	case 10:	ptr[10] = read_debug(reg, 10);			\
+>>>>>> +	case 9:		ptr[9] = read_debug(reg, 9);			\
+>>>>>> +	case 8:		ptr[8] = read_debug(reg, 8);			\
+>>>>>> +	case 7:		ptr[7] = read_debug(reg, 7);			\
+>>>>>> +	case 6:		ptr[6] = read_debug(reg, 6);			\
+>>>>>> +	case 5:		ptr[5] = read_debug(reg, 5);			\
+>>>>>> +	case 4:		ptr[4] = read_debug(reg, 4);			\
+>>>>>> +	case 3:		ptr[3] = read_debug(reg, 3);			\
+>>>>>> +	case 2:		ptr[2] = read_debug(reg, 2);			\
+>>>>>> +	case 1:		ptr[1] = read_debug(reg, 1);			\
+>>>>>> +	default:	ptr[0] = read_debug(reg, 0);			\
+>>>>>> +	}
+>>>>>> +
+>>>>>> +#define restore_debug(ptr,reg,nr)					\
+>>>>>> +	switch (nr) {							\
+>>>>>> +	case 15:	write_debug(ptr[15], reg, 15);			\
+>>>>>> +	case 14:	write_debug(ptr[14], reg, 14);			\
+>>>>>> +	case 13:	write_debug(ptr[13], reg, 13);			\
+>>>>>> +	case 12:	write_debug(ptr[12], reg, 12);			\
+>>>>>> +	case 11:	write_debug(ptr[11], reg, 11);			\
+>>>>>> +	case 10:	write_debug(ptr[10], reg, 10);			\
+>>>>>> +	case 9:		write_debug(ptr[9], reg, 9);			\
+>>>>>> +	case 8:		write_debug(ptr[8], reg, 8);			\
+>>>>>> +	case 7:		write_debug(ptr[7], reg, 7);			\
+>>>>>> +	case 6:		write_debug(ptr[6], reg, 6);			\
+>>>>>> +	case 5:		write_debug(ptr[5], reg, 5);			\
+>>>>>> +	case 4:		write_debug(ptr[4], reg, 4);			\
+>>>>>> +	case 3:		write_debug(ptr[3], reg, 3);			\
+>>>>>> +	case 2:		write_debug(ptr[2], reg, 2);			\
+>>>>>> +	case 1:		write_debug(ptr[1], reg, 1);			\
+>>>>>> +	default:	write_debug(ptr[0], reg, 0);			\
+>>>>>> +	}
+>>>>>> +
+>>>>>> +void __hyp_text __debug_save_state(struct kvm_vcpu *vcpu,
+>>>>>> +				   struct kvm_guest_debug_arch *dbg,
+>>>>>> +				   struct kvm_cpu_context *ctxt)
+>>>>>> +{
+>>>>>> +	if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY) {
+>>>>>> +		u64 aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
+>>>>>> +		int brps, wrps;
+>>>>>> +
+>>>>>> +		brps = (aa64dfr0 >> 12) & 0xf;
+>>>>>> +		wrps = (aa64dfr0 >> 20) & 0xf;
+>>>>>> +
+>>>>>> +		save_debug(dbg->dbg_bcr, dbgbcr, brps);
+>>>>>> +		save_debug(dbg->dbg_bvr, dbgbvr, brps);
+>>>>>> +		save_debug(dbg->dbg_wcr, dbgwcr, wrps);
+>>>>>> +		save_debug(dbg->dbg_wvr, dbgwvr, wrps);
+>>>>>> +
+>>>>>> +		ctxt->sys_regs[MDCCINT_EL1] = read_sysreg(mdccint_el1);
+>>>>>> +	}
+>>>>>> +}
+>>>>>> +
+>>>>>> +void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
+>>>>>> +				      struct kvm_guest_debug_arch *dbg,
+>>>>>> +				      struct kvm_cpu_context *ctxt)
+>>>>>> +{
+>>>>>> +	if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY) {
+>>>>>> +		u64 aa64dfr0 = read_sysreg(id_aa64dfr0_el1);
+>>>>>> +		int brps, wrps;
+>>>>>> +
+>>>>>> +		brps = (aa64dfr0 >> 12) & 0xf;
+>>>>>> +		wrps = (aa64dfr0 >> 20) & 0xf;
+>>>>>> +
+>>>>>> +		restore_debug(dbg->dbg_bcr, dbgbcr, brps);
+>>>>>> +		restore_debug(dbg->dbg_bvr, dbgbvr, brps);
+>>>>>> +		restore_debug(dbg->dbg_wcr, dbgwcr, wrps);
+>>>>>> +		restore_debug(dbg->dbg_wvr, dbgwvr, wrps);
+>>>>>> +
+>>>>>> +		write_sysreg(ctxt->sys_regs[MDCCINT_EL1], mdccint_el1);
+>>>>>> +	}
+>>>>>> +}
+>>>>>> +
+>>>>>> +void __hyp_text __debug_cond_save_host_state(struct kvm_vcpu *vcpu)
+>>>>>> +{
+>>>>>> +	if ((vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_KDE) ||
+>>>>>> +	    (vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_KDE))
+>>>>>> +		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
+>>>>>> +
+>>>>>> +	__debug_save_state(vcpu, &vcpu->arch.host_debug_state,
+>>>>>> +			   kern_hyp_va(vcpu->arch.host_cpu_context));
+>>>>>
+>>>>> doesn't the assmebly code jump across saving this state neither bits are
+>>>>> set where this always saves the state?
 >>>>
->>>> This series rewrites most of the existing assembly code in C, but keeps
->>>> the existing code structure in place (most function names will look
->>>> familiar to the reader). The biggest change is that we don't have to
->>>> deal with a static register allocation (the compiler does it for us),
->>>> we can easily follow structure and pointers, and only the lowest level
->>>> is still in assembly code. Oh, and a negative diffstat.
->>>>
->>>> There is still a healthy dose of inline assembly (system register
->>>> accessors, runtime code patching), but I've tried not to make it too
->>>> invasive. The generated code, while not exactly brilliant, doesn't
->>>> look too shaby. I do expect a small performance degradation, but I
->>>> believe this is something we can improve over time (my initial
->>>> measurements don't show any obvious regression though).
+>>>> It doesn't. The save/restore functions are guarded by tests on
+>>>> KVM_ARM64_DEBUG_DIRTY, just like we have skip_debug_state on all actions
+>>>> involving the save/restore in the assembly version.
 >>>
->>> I ran this through my experimental setup on m400 and got this:
+>>> I think the confusing part is that the save function unconditionally
+>>> calls __debug_save_state where the restore function only calls it when
+>>> the dirty flag is set.  Plus I suck at reading assembly apparently.
 >>
->> [...]
+>> So the way I initially wrote it, I had the same 'if' statement as in the
+>> restore function, making them fairly symmetric. But it quickly became
+>> obvious that this double-if was a bit pointless.
 >>
->>> What this tells me is that we do take a noticable hit on the
->>> world-switch path, which shows up in the TCP_RR and hackbench workloads,
->>> which have a high precision in their output.
->>>
->>> Note that the memcached number is well within its variability between
->>> individual benchmark runs, where it varies to 12% of its average in over
->>> 80% of the executions.
->>>
->>> I don't think this is a showstopper thought, but we could consider
->>> looking more closely at a breakdown of the world-switch path and verify
->>> if/where we are really taking a hit.
+>> And actually, I wonder if I shouldn't drop it from the restore function,
+>> because it only save us a spurious clear of the dirty bit.
 >>
->> Thanks for doing so, very interesting. As a data point, what compiler
->> are you using? I'd expect some variability based on the compiler version...
->>
-> I used the following (compiling natively on the m400):
 > 
-> gcc version 4.8.2 (Ubuntu/Linaro 4.8.2-19ubuntu1)
+> I would just move the __debug_restore_state call above the conditional,
+> then they look more symmetric.  Does that work?
+> 
+>>>>> in any case, I feel some context is lost when this is moved away from
+>>>>> assembly and understanding this patch would be easier if the semantics
+>>>>> of these two _cond functions were documented.
+>>>>
+>>>> I can migrate the existing comments if you think that helps.
+>>>>
+>>> It just wasn't not quite clear to me exactly when
+>>> __debug_cond_save_host_state is called for example - is this going to be
+>>> called unconditionally on every entry - that's how I understand it now
+>>> anyway.
+>>
+>> On every entry, yes. I'm trying to have the guest_run function as simple
+>> as possible, with the various subsystems making their 'own' decisions.
+>>
+>> Not optimal (you get to branch for nothing), but clearer. At least for
+>> me, but I may be the odd duck out here. Any idea to make the flow look
+>> clearer?
+>>
+> 
+> For me, if you always make the call unconditionally on both paths and
+> then change the implementations to do 
+> 
+> 	if (!(vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY))
+> 		return;
+> 
+> then I think it's clear enough.
 
-For what it is worth, I've ran hackbench on my Seattle B0 (8xA57 2GHz),
-with a 4 vcpu VM and got the following results (10 runs per kernel
-version, same configuration):
+Fair enough. I'll rework it that way.
 
-v4.4-rc3-wsinc: Average 31.750
-32.459
-32.124
-32.435
-31.940
-31.085
-31.804
-31.862
-30.985
-31.450
-31.359
-
-v4.4-rc3: Average 31.954
-31.806
-31.598
-32.697
-31.472
-31.410
-32.562
-31.938
-31.932
-31.672
-32.459
-
-This is with GCC as produced by Linaro:
-aarch64-linux-gnu-gcc (Linaro GCC 5.1-2015.08) 5.1.1 20150608
-
-It could well be that your compiler generates worse code than the one I
-use, or that the code it outputs is badly tuned for XGene. I guess I
-need to unearth my Mustang to find out...
+Thanks,
 
 	M.
 -- 
