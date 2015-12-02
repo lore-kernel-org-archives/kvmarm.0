@@ -1,78 +1,41 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: Revert to old way of checking for device
- mapping in stage2_flush_ptes().
-Date: Wed, 2 Dec 2015 20:23:27 +0100
-Message-ID: <20151202192327.GU18376@cbox>
-References: <1448975032-7156-1-git-send-email-p.fedin@samsung.com>
- <20151202185040.GT18376@cbox>
- <CAKv+Gu8Lau1HEgR5ogMTB-5h53FkTbZeNWN4zgvCph=3mSTXpw@mail.gmail.com>
+From: Amit Tomer <amittomer25@gmail.com>
+Subject: Re: [PATCH v2] KVM: arm/arm64: Count guest exit due to various reasons
+Date: Thu, 3 Dec 2015 01:06:57 +0530
+Message-ID: <CABHD4K_TKthEo__9v+hDFWNM0a8TEdu2TxHP9bZEgoYDZbW+JA@mail.gmail.com>
+References: <1448532583-18715-1-git-send-email-amittomer25@gmail.com>
+ <20151202181228.GS18376@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu8Lau1HEgR5ogMTB-5h53FkTbZeNWN4zgvCph=3mSTXpw@mail.gmail.com>
-Sender: kvm-owner@vger.kernel.org
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Pavel Fedin <p.fedin@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, KVM devel mailing list <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, "stable@vger.kernel.org" <stable@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 56F0549630
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2015 14:35:29 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id mB-BSDH9AddK for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Dec 2015 14:35:28 -0500 (EST)
+Received: from mail-yk0-f180.google.com (mail-yk0-f180.google.com
+ [209.85.160.180])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 974C3412DD
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2015 14:35:28 -0500 (EST)
+Received: by ykdv3 with SMTP id v3so59445803ykd.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Dec 2015 11:36:57 -0800 (PST)
+In-Reply-To: <20151202181228.GS18376@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Dec 02, 2015 at 08:04:42PM +0100, Ard Biesheuvel wrote:
-> On 2 December 2015 at 19:50, Christoffer Dall
-> <christoffer.dall@linaro.org> wrote:
-> > On Tue, Dec 01, 2015 at 04:03:52PM +0300, Pavel Fedin wrote:
-> >> This function takes stage-II physical addresses (A.K.A. IPA), on input, not
-> >> real physical addresses. This causes kvm_is_device_pfn() to return wrong
-> >> values, depending on how much guest and host memory maps match. This
-> >> results in completely broken KVM on some boards. The problem has been
-> >> caught on Samsung proprietary hardware.
-> >>
-> >> Cc: stable@vger.kernel.org
-> >
-> > cc'ing stable doesn't make sense here as the bug was introduced in
-> > v4.4-rc3 and we didn't release v4.4 yet...
-> >
-> >> Fixes: e6fab5442345 ("ARM/arm64: KVM: test properly for a PTE's uncachedness")
-> >>
-> >> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-> >> ---
-> >>  arch/arm/kvm/mmu.c | 3 ++-
-> >>  1 file changed, 2 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> >> index 7dace90..51ad98f 100644
-> >> --- a/arch/arm/kvm/mmu.c
-> >> +++ b/arch/arm/kvm/mmu.c
-> >> @@ -310,7 +310,8 @@ static void stage2_flush_ptes(struct kvm *kvm, pmd_t *pmd,
-> >>
-> >>       pte = pte_offset_kernel(pmd, addr);
-> >>       do {
-> >> -             if (!pte_none(*pte) && !kvm_is_device_pfn(__phys_to_pfn(addr)))
-> >> +             if (!pte_none(*pte) &&
-> >> +                 (pte_val(*pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
-> >>                       kvm_flush_dcache_pte(*pte);
-> >>       } while (pte++, addr += PAGE_SIZE, addr != end);
-> >>  }
-> >
-> > You are right that there was a bug in the fix, but your fix is not the
-> > right one.
-> >
-> > Either we have to apply an actual mask and the compare against the value
-> > (yes, I know, because of the UXN bit we get lucky so far, but that's too
-> > brittle), or we should do a translation fo the gfn to a pfn.  Is there
-> > anything preventing us to do the following?
-> >
-> > if (!pte_none(*pte) && !kvm_is_device_pfn(pte_pfn(*pte)))
-> >
-> 
-> Yes, that looks better. I got confused by addr being a 'phys_addr_t'
+> I've applied this patch to queue with the naming changed.
+>
 
-Yeah, that's what I thought when I saw this.  Admittedly we could have a
-typedef for the IPA, but oh well...
-
-> but obviously, the address inside the PTE is the one we need to test
-> for device-ness, so I think we should replace both instances with this
-> 
-
-care to send a patch by any chance?
-
--Christoffer
+Ok, Thanks!
