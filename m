@@ -1,179 +1,205 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 10/21] arm64: KVM: Add patchable function selector
-Date: Wed, 2 Dec 2015 17:19:08 +0100
-Message-ID: <20151202161908.GL18376@cbox>
+Subject: Re: [PATCH v2 12/21] arm64: KVM: Implement fpsimd save/restore
+Date: Wed, 2 Dec 2015 17:19:56 +0100
+Message-ID: <20151202161956.GM18376@cbox>
 References: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com>
- <1448650215-15218-11-git-send-email-marc.zyngier@arm.com>
- <20151201153900.GT11704@cbox>
- <565DEC14.8090206@arm.com>
- <20151202092720.GX11704@cbox>
- <565EBE3F.2050708@arm.com>
- <20151202115325.GG18376@cbox>
- <565EEFDA.8040706@arm.com>
+ <1448650215-15218-13-git-send-email-marc.zyngier@arm.com>
+ <20151202115334.GH18376@cbox> <565F0E6E.7010707@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1020E49840
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2015 11:17:58 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ieNtLSiauFPI for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Dec 2015 11:17:57 -0500 (EST)
+Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BCD1A4981C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2015 11:17:56 -0500 (EST)
+Received: by wmec201 with SMTP id c201so65228605wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Dec 2015 08:19:24 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <565EEFDA.8040706@arm.com>
-Sender: kvm-owner@vger.kernel.org
+In-Reply-To: <565F0E6E.7010707@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Steve Capper <Steve.Capper@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Dec 02, 2015 at 01:19:22PM +0000, Marc Zyngier wrote:
+On Wed, Dec 02, 2015 at 03:29:50PM +0000, Marc Zyngier wrote:
 > On 02/12/15 11:53, Christoffer Dall wrote:
-> > On Wed, Dec 02, 2015 at 09:47:43AM +0000, Marc Zyngier wrote:
-> >> On 02/12/15 09:27, Christoffer Dall wrote:
-> >>> On Tue, Dec 01, 2015 at 06:51:00PM +0000, Marc Zyngier wrote:
-> >>>> On 01/12/15 15:39, Christoffer Dall wrote:
-> >>>>> On Fri, Nov 27, 2015 at 06:50:04PM +0000, Marc Zyngier wrote:
-> >>>>>> KVM so far relies on code patching, and is likely to use it more
-> >>>>>> in the future. The main issue is that our alternative system works
-> >>>>>> at the instruction level, while we'd like to have alternatives at
-> >>>>>> the function level.
-> >>>>>>
-> >>>>>> In order to cope with this, add the "hyp_alternate_select" macro that
-> >>>>>> outputs a brief sequence of code that in turn can be patched, allowing
-> >>>>>> al alternative function to be selected.
-> >>>>>
-> >>>>> s/al/an/ ?
-> >>>>>
-> >>>>>>
-> >>>>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> >>>>>> ---
-> >>>>>>  arch/arm64/kvm/hyp/hyp.h | 16 ++++++++++++++++
-> >>>>>>  1 file changed, 16 insertions(+)
-> >>>>>>
-> >>>>>> diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-> >>>>>> index 7ac8e11..f0427ee 100644
-> >>>>>> --- a/arch/arm64/kvm/hyp/hyp.h
-> >>>>>> +++ b/arch/arm64/kvm/hyp/hyp.h
-> >>>>>> @@ -27,6 +27,22 @@
-> >>>>>>  
-> >>>>>>  #define kern_hyp_va(v) (typeof(v))((unsigned long)v & HYP_PAGE_OFFSET_MASK)
-> >>>>>>  
-> >>>>>> +/*
-> >>>>>> + * Generates patchable code sequences that are used to switch between
-> >>>>>> + * two implementations of a function, depending on the availability of
-> >>>>>> + * a feature.
-> >>>>>> + */
-> >>>>>
-> >>>>> This looks right to me, but I'm a bit unclear what the types of this is
-> >>>>> and how to use it.
-> >>>>>
-> >>>>> Are orig and alt function pointers and cond is a CONFIG_FOO ?  fname is
-> >>>>> a symbol, which is defined as a prototype somewhere and then implemented
-> >>>>> here, or?
-> >>>>>
-> >>>>> Perhaps a Usage: part of the docs would be helpful.
-> >>>>
-> >>>> How about:
-> >>>>
-> >>>> @fname: a symbol name that will be defined as a function returning a
-> >>>> function pointer whose type will match @orig and @alt
-> >>>> @orig: A pointer to the default function, as returned by @fname when
-> >>>> @cond doesn't hold
-> >>>> @alt: A pointer to the alternate function, as returned by @fname when
-> >>>> @cond holds
-> >>>> @cond: a CPU feature (as described in asm/cpufeature.h)
-> >>>
-> >>> looks good.
-> >>>
-> >>>>
-> >>>>>
-> >>>>>> +#define hyp_alternate_select(fname, orig, alt, cond)			\
-> >>>>>> +typeof(orig) * __hyp_text fname(void)					\
-> >>>>>> +{									\
-> >>>>>> +	typeof(alt) *val = orig;					\
-> >>>>>> +	asm volatile(ALTERNATIVE("nop		\n",			\
-> >>>>>> +				 "mov	%0, %1	\n",			\
-> >>>>>> +				 cond)					\
-> >>>>>> +		     : "+r" (val) : "r" (alt));				\
-> >>>>>> +	return val;							\
-> >>>>>> +}
-> >>>>>> +
-> >>>>>>  void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
-> >>>>>>  void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
-> >>>>>>  
-> >>>>>> -- 
-> >>>>>> 2.1.4
-> >>>>>>
-> >>>>>
-> >>>>> I haven't thought much about how all of this is implemented, but from my
-> >>>>> point of views the ideal situation would be something like:
-> >>>>>
-> >>>>> void foo(int a, int b)
-> >>>>> {
-> >>>>> 	ALTERNATIVE_IF_NOT CONFIG_BAR
-> >>>>> 	foo_legacy(a, b);
-> >>>>> 	ALTERNATIVE_ELSE
-> >>>>> 	foo_new(a, b);
-> >>>>> 	ALTERNATIVE_END
-> >>>>> }
-> >>>>>
-> >>>>> I realize this may be impossible because the C code could implement all
-> >>>>> sort of fun stuff around the actual function calls, but would there be
-> >>>>> some way to annotate the functions and find the actual branch statement
-> >>>>> and change the target?
-> >>>>
-> >>>> The main issue is that C doesn't give you any access to the branch
-> >>>> function itself, except for the asm-goto statements. It also makes it
-> >>>> very hard to preserve the return type. For your idea to work, we'd need
-> >>>> some support in the compiler itself. I'm sure that it is doable, just
-> >>>> not by me! ;-)
-> >>>
-> >>> Not by me either, I'm just asking stupid questions - as always.
+> > On Fri, Nov 27, 2015 at 06:50:06PM +0000, Marc Zyngier wrote:
+> >> Implement the fpsimd save restore, keeping the lazy part in
+> >> assembler (as returning to C would be overkill).
 > >>
-> >> I don't find that stupid. Asking that kind of stuff is useful to put
-> >> things in perspective.
+> >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> >> ---
+> >>  arch/arm64/kvm/hyp/Makefile    |  1 +
+> >>  arch/arm64/kvm/hyp/entry.S     | 32 +++++++++++++++++++++++++++++++-
+> >>  arch/arm64/kvm/hyp/fpsimd.S    | 33 +++++++++++++++++++++++++++++++++
+> >>  arch/arm64/kvm/hyp/hyp.h       |  7 +++++++
+> >>  arch/arm64/kvm/hyp/switch.c    |  8 ++++++++
+> >>  arch/arm64/kvm/hyp/sysreg-sr.c |  2 +-
+> >>  6 files changed, 81 insertions(+), 2 deletions(-)
+> >>  create mode 100644 arch/arm64/kvm/hyp/fpsimd.S
 > >>
+> >> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> >> index 9c11b0f..56238d0 100644
+> >> --- a/arch/arm64/kvm/hyp/Makefile
+> >> +++ b/arch/arm64/kvm/hyp/Makefile
+> >> @@ -9,3 +9,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
+> >>  obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
+> >>  obj-$(CONFIG_KVM_ARM_HOST) += entry.o
+> >>  obj-$(CONFIG_KVM_ARM_HOST) += switch.o
+> >> +obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
+> >> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+> >> index 2c4449a..7552922 100644
+> >> --- a/arch/arm64/kvm/hyp/entry.S
+> >> +++ b/arch/arm64/kvm/hyp/entry.S
+> >> @@ -27,6 +27,7 @@
+> >>  
+> >>  #define CPU_GP_REG_OFFSET(x)	(CPU_GP_REGS + x)
+> >>  #define CPU_XREG_OFFSET(x)	CPU_GP_REG_OFFSET(CPU_USER_PT_REGS + 8*x)
+> >> +#define CPU_SYSREG_OFFSET(x)	(CPU_SYSREGS + 8*x)
+> >>  
+> >>  	.text
+> >>  	.pushsection	.hyp.text, "ax"
+> >> @@ -152,4 +153,33 @@ ENTRY(__guest_exit)
+> >>  	ret
+> >>  ENDPROC(__guest_exit)
+> >>  
+> >> -	/* Insert fault handling here */
+> >> +ENTRY(__fpsimd_guest_restore)
+> >> +	push	x4, lr
+> >> +
+> >> +	mrs	x2, cptr_el2
+> >> +	bic	x2, x2, #CPTR_EL2_TFP
+> >> +	msr	cptr_el2, x2
+> >> +	isb
+> >> +
+> >> +	mrs	x3, tpidr_el2
+> >> +
+> >> +	ldr	x0, [x3, #VCPU_HOST_CONTEXT]
+> >> +	kern_hyp_va x0
+> >> +	add	x0, x0, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
+> >> +	bl	__fpsimd_save_state
+> >> +
+> >> +	add	x2, x3, #VCPU_CONTEXT
+> >> +	add	x0, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
+> >> +	bl	__fpsimd_restore_state
+> >> +
+> >> +	mrs	x1, hcr_el2
+> >> +	tbnz	x1, #HCR_RW_SHIFT, 1f
 > > 
-> > Thanks!
+> > nit: Add a comment along the lines of:
+> > // Skip restoring fpexc32 for AArch64 guests
 > > 
-> >>>>
-> >>>> This is why I've ended up creating something that returns a function
-> >>>> *pointer*, because that's something that exists in the language (no new
-> >>>> concept). I simply made sure I could return it at minimal cost.
-> >>>>
-> >>>
-> >>> I don't have a problem with this either.  I'm curious though, how much
-> >>> of a performance improvement (and why) we get from doing this as opposed
-> >>> to a simple if-statement?
-> >>
-> >> An if statement will involve fetching some configuration from memory.
-> >> You can do that, but you are going to waste a cache line and memory
-> >> bandwidth (both which are scarce resources) for something that never
-> >> ever changes over the life of the system. These things tend to accumulate.
+> >> +	ldr	x4, [x2, #CPU_SYSREG_OFFSET(FPEXC32_EL2)]
+> >> +	msr	fpexc32_el2, x4
+> >> +1:
+> >> +	pop	x4, lr
+> >> +	pop	x2, x3
+> >> +	pop	x0, x1
+> >> +
+> >> +	eret
+> >> +ENDPROC(__fpsimd_guest_restore)
+> >> diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
+> >> new file mode 100644
+> >> index 0000000..da3f22c
+> >> --- /dev/null
+> >> +++ b/arch/arm64/kvm/hyp/fpsimd.S
+> >> @@ -0,0 +1,33 @@
+> >> +/*
+> >> + * Copyright (C) 2015 - ARM Ltd
+> >> + * Author: Marc Zyngier <marc.zyngier@arm.com>
+> >> + *
+> >> + * This program is free software; you can redistribute it and/or modify
+> >> + * it under the terms of the GNU General Public License version 2 as
+> >> + * published by the Free Software Foundation.
+> >> + *
+> >> + * This program is distributed in the hope that it will be useful,
+> >> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> >> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> >> + * GNU General Public License for more details.
+> >> + *
+> >> + * You should have received a copy of the GNU General Public License
+> >> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> >> + */
+> >> +
+> >> +#include <linux/linkage.h>
+> >> +
+> >> +#include <asm/fpsimdmacros.h>
+> >> +
+> >> +	.text
+> >> +	.pushsection	.hyp.text, "ax"
+> >> +
+> >> +ENTRY(__fpsimd_save_state)
+> >> +	fpsimd_save	x0, 1
+> >> +	ret
+> >> +ENDPROC(__fpsimd_save_state)
+> >> +
+> >> +ENTRY(__fpsimd_restore_state)
+> >> +	fpsimd_restore	x0, 1
+> >> +	ret
+> >> +ENDPROC(__fpsimd_restore_state)
+> >> diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
+> >> index f0427ee..18365dd 100644
+> >> --- a/arch/arm64/kvm/hyp/hyp.h
+> >> +++ b/arch/arm64/kvm/hyp/hyp.h
+> >> @@ -66,6 +66,13 @@ void __debug_restore_state(struct kvm_vcpu *vcpu,
+> >>  void __debug_cond_save_host_state(struct kvm_vcpu *vcpu);
+> >>  void __debug_cond_restore_host_state(struct kvm_vcpu *vcpu);
+> >>  
+> >> +void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
+> >> +void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
+> >> +static inline bool __fpsimd_enabled(void)
+> >> +{
+> >> +	return !(read_sysreg(cptr_el2) & CPTR_EL2_TFP);
+> >> +}
+> >> +
+> >>  u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
+> >>  
+> >>  #endif /* __ARM64_KVM_HYP_H__ */
+> >> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> >> index d67ed9e..8affc19 100644
+> >> --- a/arch/arm64/kvm/hyp/switch.c
+> >> +++ b/arch/arm64/kvm/hyp/switch.c
+> >> @@ -88,6 +88,7 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+> >>  {
+> >>  	struct kvm_cpu_context *host_ctxt;
+> >>  	struct kvm_cpu_context *guest_ctxt;
+> >> +	bool fp_enabled;
+> >>  	u64 exit_code;
+> >>  
+> >>  	vcpu = kern_hyp_va(vcpu);
+> >> @@ -117,6 +118,8 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+> >>  	exit_code = __guest_enter(vcpu, host_ctxt);
+> >>  	/* And we're baaack! */
+> >>  
+> >> +	fp_enabled = __fpsimd_enabled();
+> >> +
 > > 
-> > Sure, but won't you be fetching the function pointer from memory anyway?
+> > what does 'enabled' really mean here?  Isn't it really
+> > __fpsimd_is_dirty() or __fpsimd_is_guest() or something like that (I
+> > suck at naming too).
 > 
-> No, and that's the whole point of this patch: the function pointers are
-> loaded into registers as PC-relative constants (adrp+add), the selection
-> being done by a mov or a nop. For example:
+> It really means "the FP regs are accessible and won't explode in your
+> face". It doesn't necessary means dirty (though that's the way we use it
+> below.
 > 
-> ffffffc0007f1f60:       90000001        adrp    x1, ffffffc0007f1000
-> ffffffc0007f1f64:       90000000        adrp    x0, ffffffc0007f1000
-> ffffffc0007f1f68:       91036021        add     x1, x1, #0xd8
-> ffffffc0007f1f6c:       910b0000        add     x0, x0, #0x2c0
-> ffffffc0007f1f70:       d503201f        nop
-> ffffffc0007f1f74:       aa1303e0        mov     x0, x19
-> ffffffc0007f1f78:       d63f0020        blr     x1
-
-right, looking at the disassembly was a good idea.
-
+> Your call, really.
 > 
-> For the default condition (the above code), the CPU is likely to discard
-> the second adrp+add (because of the mov x0, x19). For the alternate, the
-> nop is replaced by a "mov x1, x0", which makes the first adrp+add
-> irrelevant (it will be eliminated in the pipeline of any decent CPU).
-> 
-> While this has a cost in terms of instruction footprint, the branch
-> predictor is quickly going to find out where we're branching. We also
-> avoid fetching both from the I and D sides, which could kill the branch
-> predictor if not speculated in time. In the end, we get something that
-> is a lot more predictable, even for simpler CPU designs.
-> 
-
-consider me convinced.  Thanks for the in-depth!
+meh, it's fine the way it is.  Enabled for the guest I suppose is valid
+enough :)
 
 -Christoffer
