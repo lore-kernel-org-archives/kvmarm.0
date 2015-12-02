@@ -1,97 +1,183 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 18/21] KVM: ARM64: Add PMU overflow interrupt routing
-Date: Wed, 02 Dec 2015 10:22:04 +0000
-Message-ID: <565EC64C.1090501@arm.com>
-References: <1446186123-11548-1-git-send-email-zhaoshenglong@huawei.com>	<1446186123-11548-19-git-send-email-zhaoshenglong@huawei.com> <20151130182258.684c9df6@arm.com> <565DB021.3020901@huawei.com> <565DB3A5.3030701@arm.com> <565DB935.5040609@linaro.org> <565DBF8D.1070006@arm.com> <565DCA24.7000908@linaro.org> <565DD17A.50009@arm.com> <565E5A13.2080706@huawei.com> <565EAFC4.2040301@arm.com> <565EBEA3.8080500@huawei.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v2 21/21] arm64: KVM: Remove weak attributes
+Date: Wed, 2 Dec 2015 12:47:32 +0100
+Message-ID: <20151202114732.GA18376@cbox>
+References: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com>
+ <1448650215-15218-22-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <565EBEA3.8080500@huawei.com>
-Sender: kvm-owner@vger.kernel.org
-To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, christoffer.dall@linaro.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, peter.huangpeng@huawei.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DFE3D49721
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2015 06:45:33 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id qR3jJcP7-UQU for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Dec 2015 06:45:32 -0500 (EST)
+Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BE76741AF6
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2015 06:45:32 -0500 (EST)
+Received: by wmuu63 with SMTP id u63so211191698wmu.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 02 Dec 2015 03:46:59 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <1448650215-15218-22-git-send-email-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 02/12/15 09:49, Shannon Zhao wrote:
+On Fri, Nov 27, 2015 at 06:50:15PM +0000, Marc Zyngier wrote:
+> As we've now switched to the new world switch implementation,
+> remove the weak attributes, as nobody is supposed to override
+> it anymore.
+
+Why not remove the aliases and change the callers?
+
+-Christoffer
+
 > 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/kvm/hyp/debug-sr.c   |  5 ++---
+>  arch/arm64/kvm/hyp/hyp-entry.S  |  3 ---
+>  arch/arm64/kvm/hyp/switch.c     |  5 ++---
+>  arch/arm64/kvm/hyp/tlb.c        | 16 +++++++---------
+>  arch/arm64/kvm/hyp/vgic-v3-sr.c |  5 ++---
+>  5 files changed, 13 insertions(+), 21 deletions(-)
 > 
-> On 2015/12/2 16:45, Marc Zyngier wrote:
->> On 02/12/15 02:40, Shannon Zhao wrote:
->>>>
->>>>
->>>> On 2015/12/2 0:57, Marc Zyngier wrote:
->>>>>> On 01/12/15 16:26, Shannon Zhao wrote:
->>>>>>>>
->>>>>>>>
->>>>>>>> On 2015/12/1 23:41, Marc Zyngier wrote:
->>>>>>>>>>>> The reason is that when guest clear the overflow register, it will trap
->>>>>>>>>>>>>> to kvm and call kvm_pmu_sync_hwstate() as you see above. At this moment,
->>>>>>>>>>>>>> the overflow register is still overflowed(that is some bit is still 1).
->>>>>>>>>>>>>> So We need to use some flag to mark we already inject this interrupt.
->>>>>>>>>>>>>> And if during guest handling the overflow, there is a new overflow
->>>>>>>>>>>>>> happening, the pmu->irq_pending will be set ture by
->>>>>>>>>>>>>> kvm_pmu_perf_overflow(), then it needs to inject this new interrupt, right?
->>>>>>>>>> I don't think so. This is a level interrupt, so the level should stay
->>>>>>>>>> high as long as the guest hasn't cleared all possible sources for that
->>>>>>>>>> interrupt.
->>>>>>>>>>
->>>>>>>>>> For your example, the guest writes to PMOVSCLR to clear the overflow
->>>>>>>>>> caused by a given counter. If the status is now 0, the interrupt line
->>>>>>>>>> drops. If the status is still non zero, the line stays high. And I
->>>>>>>>>> believe that writing a 1 to PMOVSSET would actually trigger an
->>>>>>>>>> interrupt, or keep it high if it has already high.
->>>>>>>>>>
->>>>>>>> Right, writing 1 to PMOVSSET will trigger an interrupt.
->>>>>>>>
->>>>>>>>>> In essence, do not try to maintain side state. I've been bitten.
->>>>>>>>
->>>>>>>> So on VM entry, it check if PMOVSSET is zero. If not, call 
->>>>>>>> kvm_vgic_inject_irq to set the level high. If so, set the level low.
->>>>>>>> On VM exit, it seems there is nothing to do.
->>>>>>
->>>>>> It is even simpler than that:
->>>>>>
->>>>>> - When you get an overflow, you inject an interrupt with the level set to 1.
->>>>>> - When the overflow register gets cleared, you inject the same interrupt
->>>>>> with the level set to 0.
->>>>>>
->>>>>> I don't think you need to do anything else, and the world switch should
->>>>>> be left untouched.
->>>>>>
->>>>
->>>> On 2015/7/17 23:28, Christoffer Dall wrote:>> > +		
->>>> kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
->>>>>>>>>> +					    pmu->irq_num, 1);
->>>>>> what context is this overflow handler function?  kvm_vgic_inject_irq
->>>>>> grabs a mutex, so it can sleep...
->>>>>>
->>>>>> from a quick glance at the perf core code, it looks like this is in
->>>>>> interrupt context, so that call to kvm_vgic_inject_irq looks bad.
->>>>>>
->>>>
->>>> But as Christoffer said before, it's not good to call
->>>> kvm_vgic_inject_irq directly in interrupt context. So if we just kick
->>>> the vcpu here and call kvm_vgic_inject_irq on VM entry, is this fine?
->> Possibly. I'm slightly worried that inject_irq itself is going to kick
->> the vcpu again for no good reason. 
-> Yes, this will introduce a extra kick. What's the impact of kicking a
-> kicked vcpu?
-
-As long as you only kick yourself, it shouldn't be much (trying to
-decipher vcpu_kick).
-
->> I guess we'll find out (and maybe
->> we'll add a kvm_vgic_inject_irq_no_kick_please() helper...).
-> And add a parameter "bool kick" for vgic_update_irq_pending ?
-
-Given that we're completely rewriting the thing, I'd rather not add more
-hacks to it if we can avoid it.
-
-Give it a go, and we'll find out!
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+> index 774a3f69..747546b 100644
+> --- a/arch/arm64/kvm/hyp/debug-sr.c
+> +++ b/arch/arm64/kvm/hyp/debug-sr.c
+> @@ -125,10 +125,9 @@ void __hyp_text __debug_cond_restore_host_state(struct kvm_vcpu *vcpu)
+>  	}
+>  }
+>  
+> -u32 __hyp_text __debug_read_mdcr_el2(void)
+> +static u32 __hyp_text __debug_read_mdcr_el2(void)
+>  {
+>  	return read_sysreg(mdcr_el2);
+>  }
+>  
+> -__alias(__debug_read_mdcr_el2)
+> -u32 __weak __kvm_get_mdcr_el2(void);
+> +__alias(__debug_read_mdcr_el2) u32 __kvm_get_mdcr_el2(void);
+> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+> index ace919b..bbc0be1 100644
+> --- a/arch/arm64/kvm/hyp/hyp-entry.S
+> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
+> @@ -184,9 +184,7 @@ ENDPROC(\label)
+>  
+>  	.align 11
+>  
+> -	.weak	__kvm_hyp_vector
+>  ENTRY(__kvm_hyp_vector)
+> -ENTRY(__hyp_vector)
+>  	ventry	el2t_sync_invalid		// Synchronous EL2t
+>  	ventry	el2t_irq_invalid		// IRQ EL2t
+>  	ventry	el2t_fiq_invalid		// FIQ EL2t
+> @@ -206,5 +204,4 @@ ENTRY(__hyp_vector)
+>  	ventry	el1_irq				// IRQ 32-bit EL1
+>  	ventry	el1_fiq_invalid			// FIQ 32-bit EL1
+>  	ventry	el1_error_invalid		// Error 32-bit EL1
+> -ENDPROC(__hyp_vector)
+>  ENDPROC(__kvm_hyp_vector)
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index c8ba370..1154d66 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -84,7 +84,7 @@ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
+>  	__vgic_call_restore_state()(vcpu);
+>  }
+>  
+> -int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+> +static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_cpu_context *host_ctxt;
+>  	struct kvm_cpu_context *guest_ctxt;
+> @@ -141,8 +141,7 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+>  	return exit_code;
+>  }
+>  
+> -__alias(__guest_run)
+> -int __weak __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+> +__alias(__guest_run) int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+>  
+>  static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
+>  
+> diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+> index 2c279a8..250e06c 100644
+> --- a/arch/arm64/kvm/hyp/tlb.c
+> +++ b/arch/arm64/kvm/hyp/tlb.c
+> @@ -17,7 +17,7 @@
+>  
+>  #include "hyp.h"
+>  
+> -void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+> +static void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+>  {
+>  	dsb(ishst);
+>  
+> @@ -47,10 +47,10 @@ void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+>  	write_sysreg(0, vttbr_el2);
+>  }
+>  
+> -__alias(__tlb_flush_vmid_ipa)
+> -void __weak __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
+> +__alias(__tlb_flush_vmid_ipa) void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm,
+> +							    phys_addr_t ipa);
+>  
+> -void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
+> +static void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
+>  {
+>  	dsb(ishst);
+>  
+> @@ -66,10 +66,9 @@ void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
+>  	write_sysreg(0, vttbr_el2);
+>  }
+>  
+> -__alias(__tlb_flush_vmid)
+> -void __weak __kvm_tlb_flush_vmid(struct kvm *kvm);
+> +__alias(__tlb_flush_vmid) void __kvm_tlb_flush_vmid(struct kvm *kvm);
+>  
+> -void __hyp_text __tlb_flush_vm_context(void)
+> +static void __hyp_text __tlb_flush_vm_context(void)
+>  {
+>  	dsb(ishst);
+>  	asm volatile("tlbi alle1is	\n"
+> @@ -77,5 +76,4 @@ void __hyp_text __tlb_flush_vm_context(void)
+>  	dsb(ish);
+>  }
+>  
+> -__alias(__tlb_flush_vm_context)
+> -void __weak __kvm_flush_vm_context(void);
+> +__alias(__tlb_flush_vm_context) void __kvm_flush_vm_context(void);
+> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> index 1b0eedb..82a4f4b 100644
+> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+> @@ -216,10 +216,9 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+>  	}
+>  }
+>  
+> -u64 __hyp_text __vgic_v3_read_ich_vtr_el2(void)
+> +static u64 __hyp_text __vgic_v3_read_ich_vtr_el2(void)
+>  {
+>  	return read_gicreg(ICH_VTR_EL2);
+>  }
+>  
+> -__alias(__vgic_v3_read_ich_vtr_el2)
+> -u64 __weak __vgic_v3_get_ich_vtr_el2(void);
+> +__alias(__vgic_v3_read_ich_vtr_el2) u64 __vgic_v3_get_ich_vtr_el2(void);
+> -- 
+> 2.1.4
+> 
