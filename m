@@ -1,58 +1,64 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: Revert to old way of checking for device
- mapping in stage2_flush_ptes().
-Date: Wed, 2 Dec 2015 18:41:59 +0100
-Message-ID: <CAKv+Gu-WhtTZoPEmRSa8Ypcc9SZ-d6NABDSfZ6tTx14Tyt+AdQ@mail.gmail.com>
-References: <1448975032-7156-1-git-send-email-p.fedin@samsung.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 21/21] arm64: KVM: Remove weak attributes
+Date: Wed, 02 Dec 2015 17:52:51 +0000
+Message-ID: <565F2FF3.2030804@arm.com>
+References: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com>
+ <1448650215-15218-22-git-send-email-marc.zyngier@arm.com>
+ <20151202114732.GA18376@cbox> <565F0C8D.9010505@arm.com>
+ <20151202162134.GN18376@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1448975032-7156-1-git-send-email-p.fedin@samsung.com>
-Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, KVM devel mailing list <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EA9604979C
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2015 12:51:26 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 4Y-5JOEYwfeh for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Dec 2015 12:51:25 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6F0D49630
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Dec 2015 12:51:25 -0500 (EST)
+In-Reply-To: <20151202162134.GN18376@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Pavel,
+On 02/12/15 16:21, Christoffer Dall wrote:
+> On Wed, Dec 02, 2015 at 03:21:49PM +0000, Marc Zyngier wrote:
+>> On 02/12/15 11:47, Christoffer Dall wrote:
+>>> On Fri, Nov 27, 2015 at 06:50:15PM +0000, Marc Zyngier wrote:
+>>>> As we've now switched to the new world switch implementation,
+>>>> remove the weak attributes, as nobody is supposed to override
+>>>> it anymore.
+>>>
+>>> Why not remove the aliases and change the callers?
+>>
+>> This is likely to be a bigger patch, and it would affect the 32bit as
+>> well. So far, I'm choosing to keep things the same. Another solution
+>> would be to completely drop the aliases, and just rename the new
+>> function to have the old names.
+>>
+>> I don't mind either way.
+>>
+> I didn't think of the 32-bit side.  I think eventually we should get rid
+> of the aliases and just have the funcitons named as they are called, but
+> there's no rush.  We can wait until we've the done the 32-bit side if
+> you prefer.
 
-Thanks for getting to the bottom of this.
+Probably safest. We're already changing a lot of things. Hopefully for
+4.6 I'll have the 32bit side sorted.
 
-On 1 December 2015 at 14:03, Pavel Fedin <p.fedin@samsung.com> wrote:
-> This function takes stage-II physical addresses (A.K.A. IPA), on input, not
-> real physical addresses. This causes kvm_is_device_pfn() to return wrong
-> values, depending on how much guest and host memory maps match. This
-> results in completely broken KVM on some boards. The problem has been
-> caught on Samsung proprietary hardware.
->
-> Cc: stable@vger.kernel.org
-> Fixes: e6fab5442345 ("ARM/arm64: KVM: test properly for a PTE's uncachedness")
->
-
-That commit is not in a release yet, so no need for cc stable
-
-> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-> ---
->  arch/arm/kvm/mmu.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> index 7dace90..51ad98f 100644
-> --- a/arch/arm/kvm/mmu.c
-> +++ b/arch/arm/kvm/mmu.c
-> @@ -310,7 +310,8 @@ static void stage2_flush_ptes(struct kvm *kvm, pmd_t *pmd,
->
->         pte = pte_offset_kernel(pmd, addr);
->         do {
-> -               if (!pte_none(*pte) && !kvm_is_device_pfn(__phys_to_pfn(addr)))
-> +               if (!pte_none(*pte) &&
-> +                   (pte_val(*pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
-
-I think your analysis is correct, but does that not apply to both instances?
-And instead of reverting, could we fix this properly instead?
-
->                         kvm_flush_dcache_pte(*pte);
->         } while (pte++, addr += PAGE_SIZE, addr != end);
->  }
-> --
-> 2.4.4
->
+	M.
+-- 
+Jazz is not dead. It just smells funny...
