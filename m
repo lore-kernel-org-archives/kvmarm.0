@@ -1,100 +1,67 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 0/3] Introduce MSI hardware mapping for VFIO
-Date: Thu, 3 Dec 2015 14:49:59 +0000
-Message-ID: <20151203144959.4b14f195@arm.com>
-References: <cover.1448372839.git.p.fedin@samsung.com>
- <1449091979.15753.134.camel@redhat.com>
- <00eb01d12dcc$e20df980$a629ec80$@samsung.com>
+Subject: Re: [PATCH v4 1/3] KVM/arm/arm64: add hooks for armv7 fp/simd lazy
+ switch support
+Date: Thu, 03 Dec 2015 15:46:06 +0000
+Message-ID: <566063BE.7080005@arm.com>
+References: <1447539130-4613-1-git-send-email-m.smarduch@samsung.com> <1447539130-4613-2-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D1C9499C3
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 09:48:35 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PSiMxe9BDTWm for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Dec 2015 09:48:34 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DEABE49958
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 09:48:33 -0500 (EST)
-In-Reply-To: <00eb01d12dcc$e20df980$a629ec80$@samsung.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: 'Jason Cooper' <jason@lakedaemon.net>, kvm@vger.kernel.org, 'Manish Jaggi' <mjaggi@caviumnetworks.com>, 'Alex Williamson' <alex.williamson@redhat.com>, 'Thomas Gleixner' <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1447539130-4613-2-git-send-email-m.smarduch@samsung.com>
+Sender: kvm-owner@vger.kernel.org
+To: Mario Smarduch <m.smarduch@samsung.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, antonios.motakis@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, 3 Dec 2015 16:16:54 +0300
-Pavel Fedin <p.fedin@samsung.com> wrote:
-
-Pavel,
-
->  Hello!
+On 14/11/15 22:12, Mario Smarduch wrote:
+> This patch adds vcpu fields to track lazy state, save host FPEXC, and
+> offsets to fields.
 > 
-> > I like that you're making this transparent
-> > for the user, but at the same time, directly calling function pointers
-> > through the msi_domain_ops is quite ugly.
+> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+> ---
+>  arch/arm/include/asm/kvm_host.h | 6 ++++++
+>  arch/arm/kernel/asm-offsets.c   | 2 ++
+>  2 files changed, 8 insertions(+)
 > 
->  Do you mean dereferencing info->ops->vfio_map() in .c code? I can introduce some wrappers in include/linux/msi.h like msi_domain_vfio_map()/msi_domain_vfio_unmap(), this would not conceptually change anything.
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index 3df1e97..f1bf551 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -107,6 +107,12 @@ struct kvm_vcpu_arch {
+>  	/* Interrupt related fields */
+>  	u32 irq_lines;		/* IRQ and FIQ levels */
+>  
+> +	/* fp/simd dirty flag true if guest accessed register file */
+> +	bool    vfp_dirty;
+
+I think we do not need this bool, because it is already represented by
+the state of the trapping bits.
+
+> +
+> +	/* Save host FPEXC register to later restore on vcpu put */
+> +	u32	host_fpexc;
+> +
+>  	/* Exception Information */
+>  	struct kvm_vcpu_fault_info fault;
+>  
+> diff --git a/arch/arm/kernel/asm-offsets.c b/arch/arm/kernel/asm-offsets.c
+> index 871b826..9f79712 100644
+> --- a/arch/arm/kernel/asm-offsets.c
+> +++ b/arch/arm/kernel/asm-offsets.c
+> @@ -186,6 +186,8 @@ int main(void)
+>    DEFINE(VCPU_CPSR,		offsetof(struct kvm_vcpu, arch.regs.usr_regs.ARM_cpsr));
+>    DEFINE(VCPU_HCR,		offsetof(struct kvm_vcpu, arch.hcr));
+>    DEFINE(VCPU_IRQ_LINES,	offsetof(struct kvm_vcpu, arch.irq_lines));
+> +  DEFINE(VCPU_VFP_DIRTY,	offsetof(struct kvm_vcpu, arch.vfp_dirty));
+> +  DEFINE(VCPU_VFP_HOST_FPEXC,	offsetof(struct kvm_vcpu, arch.host_fpexc));
+>    DEFINE(VCPU_HSR,		offsetof(struct kvm_vcpu, arch.fault.hsr));
+>    DEFINE(VCPU_HxFAR,		offsetof(struct kvm_vcpu, arch.fault.hxfar));
+>    DEFINE(VCPU_HPFAR,		offsetof(struct kvm_vcpu, arch.fault.hpfar));
 > 
-> >  There needs to be a real, interface there that isn't specific to vfio.
-> 
->  Hm... What else is going to use this?
->  Actually, in my implementation the only thing specific to vfio is
-> using struct vfio_iommu_driver_ops. This is because we have to
-> perform MSI mapping for all "vfio domains" registered for this
-> container. At least this is how original type1 driver works.
-
->  Can anybody explain me, what these "vfio domains" are? From the code
-> it looks like we can have several IOMMU instances belonging to one
-> VFIO container, and in this case one IOMMU == one "vfio domain". So
-> is my understanding correct that "vfio domain" is IOMMU instance?
-
->  And here come completely different ideas...
-
->  First of all, can anybody explain, why do i perform all mappings on
-> per-IOMMU basis, not on per-device basis? AFAIK at least ARM SMMU
-> knows about "stream IDs", and therefore it should be capable of
-> distinguishing between different devices. So can i have per-device
-> mapping? This would make things much simpler.
-
-Not exactly. You can have a a bunch of devices between a single
-StreamID (making them completely indistinguishable). This is a system
-integration decision.
-
->  So:
->  Idea 1: do per-device mappings. In this case i don't have to track
-> down which devices belong to which group and which IOMMU...
-
-As explained above, this doesn't work.
-
->  Idea 2: What if we indeed simply simulate x86 behavior? What if we
-> just do 1:1 mapping for MSI register when IOMMU is initialized and
-> forget about it, so that MSI messages are guaranteed to reach the
-> host? Or would this mean that we would have to do 1:1 mapping for the
-> whole address range? Looks like (1) tried to do something similar,
-> with address reservation.
-
-Neither. We want userspace to be in control of the memory map, and it
-is the kernel's job to tell us whether or not this matches the HW
-capabilities or not. A fixed mapping may completely clash with the
-memory map I want (think emulating HW x on platform y), and there is no
-reason why we should have the restrictions x86 has.
-
-My understanding is that userspace should be in charge here, and maybe
-obtain a range of acceptable IOVAs for the MSI doorbell to be mapped.
 
 Thanks,
 
 	M.
 -- 
-Jazz is not dead. It just smells funny.
+Jazz is not dead. It just smells funny...
