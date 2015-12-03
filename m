@@ -1,21 +1,22 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v5 03/21] KVM: ARM64: Add offset defines for PMU registers
-Date: Thu, 3 Dec 2015 14:11:13 +0800
-Message-ID: <1449123091-20252-4-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v5 06/21] KVM: ARM64: Add reset and access handlers for
+ PMCEID0 and PMCEID1 register
+Date: Thu, 3 Dec 2015 14:11:16 +0800
+Message-ID: <1449123091-20252-7-git-send-email-zhaoshenglong@huawei.com>
 References: <1449123091-20252-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B3F7498D9
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 01:11:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 732A44994F
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 01:11:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QQ-T6VmyLzmK for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Dec 2015 01:11:21 -0500 (EST)
+ with ESMTP id 2GK7pCXfwiMo for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Dec 2015 01:11:19 -0500 (EST)
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1392649906
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0ECAE498D9
  for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 01:11:18 -0500 (EST)
 In-Reply-To: <1449123091-20252-1-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -33,95 +34,83 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-We are about to trap and emulate acccesses to each PMU register
-individually. This adds the context offsets for the AArch64 PMU
-registers and their AArch32 counterparts.
+Add reset handler which gets host value of PMCEID0 or PMCEID1. Since
+write action to PMCEID0 or PMCEID1 is ignored, add a new case for this.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm64/include/asm/kvm_asm.h | 55 ++++++++++++++++++++++++++++++++++++----
- 1 file changed, 50 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 29 +++++++++++++++++++++++++----
+ 1 file changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 5e37710..4f804c1 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -48,12 +48,34 @@
- #define MDSCR_EL1	22	/* Monitor Debug System Control Register */
- #define MDCCINT_EL1	23	/* Monitor Debug Comms Channel Interrupt Enable Reg */
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 1f1f6a6..b0a8d88 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -460,6 +460,19 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	vcpu_sys_reg(vcpu, r->reg) = val;
+ }
  
-+/* Performance Monitors Registers */
-+#define PMCR_EL0	24	/* Control Register */
-+#define PMOVSSET_EL0	25	/* Overflow Flag Status Set Register */
-+#define PMOVSCLR_EL0	26	/* Overflow Flag Status Clear Register */
-+#define PMSELR_EL0	27	/* Event Counter Selection Register */
-+#define PMCEID0_EL0	28	/* Common Event Identification Register 0 */
-+#define PMCEID1_EL0	29	/* Common Event Identification Register 1 */
-+#define PMEVCNTR0_EL0	30	/* Event Counter Register (0-30) */
-+#define PMEVCNTR30_EL0	60
-+#define PMCCNTR_EL0	61	/* Cycle Counter Register */
-+#define PMEVTYPER0_EL0	62	/* Event Type Register (0-30) */
-+#define PMEVTYPER30_EL0	92
-+#define PMCCFILTR_EL0	93	/* Cycle Count Filter Register */
-+#define PMXEVCNTR_EL0	94	/* Selected Event Count Register */
-+#define PMXEVTYPER_EL0	95	/* Selected Event Type Register */
-+#define PMCNTENSET_EL0	96	/* Count Enable Set Register */
-+#define PMCNTENCLR_EL0	97	/* Count Enable Clear Register */
-+#define PMINTENSET_EL1	98	/* Interrupt Enable Set Register */
-+#define PMINTENCLR_EL1	99	/* Interrupt Enable Clear Register */
-+#define PMUSERENR_EL0	100	/* User Enable Register */
-+#define PMSWINC_EL0	101	/* Software Increment Register */
++static void reset_pmceid(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++{
++	u64 pmceid;
 +
- /* 32bit specific registers. Keep them at the end of the range */
--#define	DACR32_EL2	24	/* Domain Access Control Register */
--#define	IFSR32_EL2	25	/* Instruction Fault Status Register */
--#define	FPEXC32_EL2	26	/* Floating-Point Exception Control Register */
--#define	DBGVCR32_EL2	27	/* Debug Vector Catch Register */
--#define	NR_SYS_REGS	28
-+#define	DACR32_EL2	102	/* Domain Access Control Register */
-+#define	IFSR32_EL2	103	/* Instruction Fault Status Register */
-+#define	FPEXC32_EL2	104	/* Floating-Point Exception Control Register */
-+#define	DBGVCR32_EL2	105	/* Debug Vector Catch Register */
-+#define	NR_SYS_REGS	106
- 
- /* 32bit mapping */
- #define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
-@@ -75,6 +97,24 @@
- #define c6_IFAR		(c6_DFAR + 1)	/* Instruction Fault Address Register */
- #define c7_PAR		(PAR_EL1 * 2)	/* Physical Address Register */
- #define c7_PAR_high	(c7_PAR + 1)	/* PAR top 32 bits */
++	if (r->reg == PMCEID0_EL0)
++		asm volatile("mrs %0, pmceid0_el0\n" : "=r" (pmceid));
++	else
++		/* PMCEID1_EL0 */
++		asm volatile("mrs %0, pmceid1_el0\n" : "=r" (pmceid));
 +
-+/* Performance Monitors*/
-+#define c9_PMCR		(PMCR_EL0 * 2)
-+#define c9_PMOVSSET	(PMOVSSET_EL0 * 2)
-+#define c9_PMOVSCLR	(PMOVSCLR_EL0 * 2)
-+#define c9_PMCCNTR	(PMCCNTR_EL0 * 2)
-+#define c9_PMSELR	(PMSELR_EL0 * 2)
-+#define c9_PMCEID0	(PMCEID0_EL0 * 2)
-+#define c9_PMCEID1	(PMCEID1_EL0 * 2)
-+#define c9_PMXEVCNTR	(PMXEVCNTR_EL0 * 2)
-+#define c9_PMXEVTYPER	(PMXEVTYPER_EL0 * 2)
-+#define c9_PMCNTENSET	(PMCNTENSET_EL0 * 2)
-+#define c9_PMCNTENCLR	(PMCNTENCLR_EL0 * 2)
-+#define c9_PMINTENSET	(PMINTENSET_EL1 * 2)
-+#define c9_PMINTENCLR	(PMINTENCLR_EL1 * 2)
-+#define c9_PMUSERENR	(PMUSERENR_EL0 * 2)
-+#define c9_PMSWINC	(PMSWINC_EL0 * 2)
++	vcpu_sys_reg(vcpu, r->reg) = pmceid;
++}
 +
- #define c10_PRRR	(MAIR_EL1 * 2)	/* Primary Region Remap Register */
- #define c10_NMRR	(c10_PRRR + 1)	/* Normal Memory Remap Register */
- #define c12_VBAR	(VBAR_EL1 * 2)	/* Vector Base Address Register */
-@@ -86,6 +126,11 @@
- #define c10_AMAIR1	(c10_AMAIR0 + 1)/* Aux Memory Attr Indirection Reg */
- #define c14_CNTKCTL	(CNTKCTL_EL1 * 2) /* Timer Control Register (PL1) */
- 
-+/* Performance Monitors*/
-+#define c14_PMEVCNTR0	(PMEVCNTR0_EL0 * 2)
-+#define c14_PMEVTYPER0	(PMEVTYPER0_EL0 * 2)
-+#define c14_PMCCFILTR	(PMCCFILTR_EL0 * 2)
-+
- #define cp14_DBGDSCRext	(MDSCR_EL1 * 2)
- #define cp14_DBGBCR0	(DBGBCR0_EL1 * 2)
- #define cp14_DBGBVR0	(DBGBVR0_EL1 * 2)
+ /* PMU registers accessor. */
+ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+ 			    const struct sys_reg_params *p,
+@@ -477,6 +490,9 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+ 			vcpu_sys_reg(vcpu, r->reg) = val;
+ 			break;
+ 		}
++		case PMCEID0_EL0:
++		case PMCEID1_EL0:
++			return ignore_write(vcpu, p);
+ 		default:
+ 			vcpu_sys_reg(vcpu, r->reg) = *vcpu_reg(vcpu, p->Rt);
+ 			break;
+@@ -701,10 +717,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  access_pmu_regs, reset_unknown, PMSELR_EL0 },
+ 	/* PMCEID0_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b110),
+-	  trap_raz_wi },
++	  access_pmu_regs, reset_pmceid, PMCEID0_EL0 },
+ 	/* PMCEID1_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b111),
+-	  trap_raz_wi },
++	  access_pmu_regs, reset_pmceid, PMCEID1_EL0 },
+ 	/* PMCCNTR_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b000),
+ 	  trap_raz_wi },
+@@ -934,6 +950,9 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
+ 			vcpu_cp15(vcpu, r->reg) = val;
+ 			break;
+ 		}
++		case c9_PMCEID0:
++		case c9_PMCEID1:
++			return ignore_write(vcpu, p);
+ 		default:
+ 			vcpu_cp15(vcpu, r->reg) = *vcpu_reg(vcpu, p->Rt);
+ 			break;
+@@ -991,8 +1010,10 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmu_cp15_regs,
+ 	  NULL, c9_PMSELR },
+-	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), trap_raz_wi },
+-	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), trap_raz_wi },
++	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmu_cp15_regs,
++	  NULL, c9_PMCEID0 },
++	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmu_cp15_regs,
++	  NULL, c9_PMCEID1 },
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), trap_raz_wi },
 -- 
 2.0.4
