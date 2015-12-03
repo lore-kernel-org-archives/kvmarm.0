@@ -1,47 +1,47 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 10/21] arm64: KVM: Add patchable function selector
-Date: Thu, 3 Dec 2015 08:18:43 +0000
-Message-ID: <20151203081843.5905bebd@why.wild-wind.fr.eu.org>
-References: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com>
-	<1448650215-15218-11-git-send-email-marc.zyngier@arm.com>
-	<20151202223456.GK3233@hawk.localdomain>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH] KVM: arm/arm64: Revert to old way of checking for device
+ mapping in stage2_flush_ptes().
+Date: Thu, 03 Dec 2015 11:14:26 +0300
+Message-ID: <008401d12da2$a093d5d0$e1bb8170$@samsung.com>
+References: <1448975032-7156-1-git-send-email-p.fedin@samsung.com>
+ <CAKv+Gu-WhtTZoPEmRSa8Ypcc9SZ-d6NABDSfZ6tTx14Tyt+AdQ@mail.gmail.com>
+ <007c01d12d9a$36dd6eb0$a4984c10$@samsung.com>
+ <CAKv+Gu8qBy_aBC2ZUB5D3ZNMdkdy-Q+XTD2bOXfnM_g1239e7A@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20151202223456.GK3233@hawk.localdomain>
-Sender: kvm-owner@vger.kernel.org
-To: Andrew Jones <drjones@redhat.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Alex =?UTF-8?B?QmVu?= =?UTF-8?B?bsOpZQ==?= <alex.bennee@linaro.org>, Steve Capper <Steve.Capper@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Return-path: <stable-owner@vger.kernel.org>
+In-reply-to: <CAKv+Gu8qBy_aBC2ZUB5D3ZNMdkdy-Q+XTD2bOXfnM_g1239e7A@mail.gmail.com>
+Content-language: ru
+Sender: stable-owner@vger.kernel.org
+To: 'Ard Biesheuvel' <ard.biesheuvel@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, 'KVM devel mailing list' <kvm@vger.kernel.org>, 'Marc Zyngier' <marc.zyngier@arm.com>, 'Christoffer Dall' <christoffer.dall@linaro.org>, stable@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, 2 Dec 2015 16:34:56 -0600
-Andrew Jones <drjones@redhat.com> wrote:
+ Hello!
 
-> On Fri, Nov 27, 2015 at 06:50:04PM +0000, Marc Zyngier wrote:
-> > KVM so far relies on code patching, and is likely to use it more
-> > in the future. The main issue is that our alternative system works
-> > at the instruction level, while we'd like to have alternatives at
-> > the function level.
+> >> I think your analysis is correct, but does that not apply to both instances?
+> >
+> >  No no, another one is correct, since it operates on real PFN (at least looks like so). I
+> have verified my fix against the original problem (crash on Exynos5410 without generic timer),
+> and it still works fine there.
+> >
 > 
-> How about setting static-keys at hyp init time?
+> I don't think so. Regardless of whether you are manipulating HYP
+> mappings or stage-2 mappings, the physical address is always the
+> output, not the input of the translation, so addr is always either a
+> virtual address or a intermediate physical address, whereas
+> pfn_valid() operates on host physical addresses.
 
-That was an option I looked at. And while static keys would work to some
-extent, they also have some nasty side effects:
-- They create both a fast and a slow path. We don't want that - both
-  path should be equally fast, or at least have as little overhead as
-  possible
-- We do need code patching for some assembly code, and using static
-  keys on top creates a parallel mechanism that makes it hard to
-  follow/debug/maintain.
+ Yes, you are right. I have reviewed this more carefully, and indeed, unmap_range() is also called by unmap_stage2_range(), so it can be both IPA and real PA.
 
-You can view this alternative function call as a slightly different
-kind of static keys - one that can give you the capability to handle
-function calls instead of just jumping over code sequences. Both have
-their own merits.
+> OK. I will follow up with a patch, as Christoffer requested. I'd
+> appreciate it if you could test to see if it also fixes the current
+> issue, and the original arch timer issue.
 
-Thanks,
+ I have just made the same patch, and currently testing it on all my boards. Also i'll test it on my ARM64 too, just in case. I was about to finish the testing and send the patch in maybe one or two hours.
 
-	M.
--- 
-Without deviation from the norm, progress is not possible.
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
