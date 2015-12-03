@@ -1,30 +1,25 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH v2] ARM/arm64: KVM: correct PTE uncachedness check
-Date: Thu, 03 Dec 2015 11:45:49 +0300
-Message-ID: <008901d12da7$033469d0$099d3d70$@samsung.com>
-References: <1449131122-29186-1-git-send-email-ard.biesheuvel@linaro.org>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: arm64 sched_clock cpu accounting
+Date: Thu, 3 Dec 2015 09:29:47 +0000
+Message-ID: <20151203092947.GB7023@arm.com>
+References: <564CD5A7.8000007@samsung.com> <564D31D3.5040207@samsung.com>
+ <20151202180741.GR18376@cbox> <565F81D2.3060401@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 590EB498A1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 03:44:55 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BCC0498A1
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 04:28:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gbhg7hnFtj4L for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Dec 2015 03:44:53 -0500 (EST)
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com
- [210.118.77.11])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 866264989A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 03:44:53 -0500 (EST)
-Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
- by mailout1.w1.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NYR0003HXOF0A90@mailout1.w1.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Thu, 03 Dec 2015 08:45:51 +0000 (GMT)
-In-reply-to: <1449131122-29186-1-git-send-email-ard.biesheuvel@linaro.org>
-Content-language: ru
+ with ESMTP id UJZeVKamO9U9 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Dec 2015 04:28:16 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 74F164989A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 04:28:16 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <565F81D2.3060401@samsung.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,61 +29,37 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: 'Ard Biesheuvel' <ard.biesheuvel@linaro.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+To: Mario Smarduch <m.smarduch@samsung.com>
+Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>, Marc Zyngier <Marc.Zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Tested-by: Pavel Fedin <p.fedin@samsung.com>
+On Wed, Dec 02, 2015 at 03:42:10PM -0800, Mario Smarduch wrote:
+> On 12/2/2015 10:07 AM, Christoffer Dall wrote:
+> > On Wed, Nov 18, 2015 at 06:20:03PM -0800, Mario Smarduch wrote:
+> >> Also with tick accounting enabled, and periodic timer HZ set to 1000 no irq time
+> >> is reported. That's with running a ping flood - 1200 int/s, not sure why
+> >> wouldn't any irq time be reported? The other two modes report irq time as expected.
+> >>
+> >> On 11/18/2015 11:46 AM, Mario Smarduch wrote:
+> >>> Hello,
+> >>>   I noticed sched clock accounting can be enabled when arch-timer is
+> >>> initialized. But arm64 doesn't appear to have 'HAVE_IRQ_TIME_ACCOUNTING'
+> >>> selected (as of mainline 4.4-rc1) and IRQ_TIME_ACCOUNTING can't be selected.
+> >>> After adding it to arch/arm64/Kconfig, option appears to work fine. Depending on
+> >>> need all accounting options are fine, but irq time accounting appears to be most
+> >>> preferable.
+> >>>
+> >>> Any thoughts? Is it fine to enable it?
+> >>>
+> > Is any of this related to KVM?
+> 
+> Indirectly, given the guest should yield same results. To be on the safe side I
+> ran the guest in all combinations (7) to confirm that's the case.
+> 
+> Also verified that guest time on host appears fine in all these configurations.
+> It takes extra effort to get the guest time as opposed to other modes.
 
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
+I can take this via the arm64 tree (where it's queued, but I've not pushed
+anything yet).
 
-
-> -----Original Message-----
-> From: Ard Biesheuvel [mailto:ard.biesheuvel@linaro.org]
-> Sent: Thursday, December 03, 2015 11:25 AM
-> To: linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu;
-> christoffer.dall@linaro.org; p.fedin@samsung.com
-> Cc: Ard Biesheuvel
-> Subject: [PATCH v2] ARM/arm64: KVM: correct PTE uncachedness check
-> 
-> Commit e6fab5442345 ("ARM/arm64: KVM: test properly for a PTE's
-> uncachedness") modified the logic to test whether a HYP or stage-2
-> mapping needs flushing, from [incorrectly] interpreting the page table
-> attributes to [incorrectly] checking whether the PFN that backs the
-> mapping is covered by host system RAM. The PFN number is part of the
-> output of the translation, not the input, so we have to use pte_pfn()
-> on the contents of the PTE, not __phys_to_pfn() on the HYP virtual
-> address or stage-2 intermediate physical address.
-> 
-> Fixes: e6fab5442345 ("ARM/arm64: KVM: test properly for a PTE's uncachedness")
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  arch/arm/kvm/mmu.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> index 7dace909d5cf..61d96a645ff3 100644
-> --- a/arch/arm/kvm/mmu.c
-> +++ b/arch/arm/kvm/mmu.c
-> @@ -218,7 +218,7 @@ static void unmap_ptes(struct kvm *kvm, pmd_t *pmd,
->  			kvm_tlb_flush_vmid_ipa(kvm, addr);
-> 
->  			/* No need to invalidate the cache for device mappings */
-> -			if (!kvm_is_device_pfn(__phys_to_pfn(addr)))
-> +			if (!kvm_is_device_pfn(pte_pfn(old_pte)))
->  				kvm_flush_dcache_pte(old_pte);
-> 
->  			put_page(virt_to_page(pte));
-> @@ -310,7 +310,7 @@ static void stage2_flush_ptes(struct kvm *kvm, pmd_t *pmd,
-> 
->  	pte = pte_offset_kernel(pmd, addr);
->  	do {
-> -		if (!pte_none(*pte) && !kvm_is_device_pfn(__phys_to_pfn(addr)))
-> +		if (!pte_none(*pte) && !kvm_is_device_pfn(pte_pfn(*pte)))
->  			kvm_flush_dcache_pte(*pte);
->  	} while (pte++, addr += PAGE_SIZE, addr != end);
->  }
-> --
-> 1.9.1
+Will
