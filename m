@@ -1,47 +1,72 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH] KVM: arm/arm64: Revert to old way of checking for device
- mapping in stage2_flush_ptes().
-Date: Thu, 03 Dec 2015 11:14:26 +0300
-Message-ID: <008401d12da2$a093d5d0$e1bb8170$@samsung.com>
-References: <1448975032-7156-1-git-send-email-p.fedin@samsung.com>
- <CAKv+Gu-WhtTZoPEmRSa8Ypcc9SZ-d6NABDSfZ6tTx14Tyt+AdQ@mail.gmail.com>
- <007c01d12d9a$36dd6eb0$a4984c10$@samsung.com>
- <CAKv+Gu8qBy_aBC2ZUB5D3ZNMdkdy-Q+XTD2bOXfnM_g1239e7A@mail.gmail.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH] ARM/arm64: KVM: correct PTE uncachedness check
+Date: Thu,  3 Dec 2015 09:20:57 +0100
+Message-ID: <1449130857-21740-1-git-send-email-ard.biesheuvel@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-Return-path: <stable-owner@vger.kernel.org>
-In-reply-to: <CAKv+Gu8qBy_aBC2ZUB5D3ZNMdkdy-Q+XTD2bOXfnM_g1239e7A@mail.gmail.com>
-Content-language: ru
-Sender: stable-owner@vger.kernel.org
-To: 'Ard Biesheuvel' <ard.biesheuvel@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, 'KVM devel mailing list' <kvm@vger.kernel.org>, 'Marc Zyngier' <marc.zyngier@arm.com>, 'Christoffer Dall' <christoffer.dall@linaro.org>, stable@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DAAB498E9
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 03:19:36 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id KZqy9JKFoH5x for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Dec 2015 03:19:35 -0500 (EST)
+Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 19C4249723
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 03:19:33 -0500 (EST)
+Received: by wmuu63 with SMTP id u63so10528803wmu.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Dec 2015 00:21:04 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, p.fedin@samsung.com
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello!
+Commit e6fab5442345 ("ARM/arm64: KVM: test properly for a PTE's
+uncachedness") modified the logic to test whether a HYP or stage-2
+mapping needs flushing, from [incorrectly] interpreting the page table
+attributes to [incorrectly] checking whether the PFN that backs the
+mapping is covered by host system RAM. The PFN number is part of the
+output of the translation, not the input, so we have to use pte_pfn()
+on the contents of the PTE, not __phys_to_pfn() on the HYP virtual
+address or stage-2 intermediate physical address.
 
-> >> I think your analysis is correct, but does that not apply to both instances?
-> >
-> >  No no, another one is correct, since it operates on real PFN (at least looks like so). I
-> have verified my fix against the original problem (crash on Exynos5410 without generic timer),
-> and it still works fine there.
-> >
-> 
-> I don't think so. Regardless of whether you are manipulating HYP
-> mappings or stage-2 mappings, the physical address is always the
-> output, not the input of the translation, so addr is always either a
-> virtual address or a intermediate physical address, whereas
-> pfn_valid() operates on host physical addresses.
+Fixes: e6fab5442345 ("ARM/arm64: KVM: test properly for a PTE's uncachedness")
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ arch/arm/kvm/mmu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
- Yes, you are right. I have reviewed this more carefully, and indeed, unmap_range() is also called by unmap_stage2_range(), so it can be both IPA and real PA.
-
-> OK. I will follow up with a patch, as Christoffer requested. I'd
-> appreciate it if you could test to see if it also fixes the current
-> issue, and the original arch timer issue.
-
- I have just made the same patch, and currently testing it on all my boards. Also i'll test it on my ARM64 too, just in case. I was about to finish the testing and send the patch in maybe one or two hours.
-
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index 7dace909d5cf..9708c342795f 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -218,7 +218,7 @@ static void unmap_ptes(struct kvm *kvm, pmd_t *pmd,
+ 			kvm_tlb_flush_vmid_ipa(kvm, addr);
+ 
+ 			/* No need to invalidate the cache for device mappings */
+-			if (!kvm_is_device_pfn(__phys_to_pfn(addr)))
++			if (!kvm_is_device_pfn(pte_pfn(addr)))
+ 				kvm_flush_dcache_pte(old_pte);
+ 
+ 			put_page(virt_to_page(pte));
+@@ -310,7 +310,7 @@ static void stage2_flush_ptes(struct kvm *kvm, pmd_t *pmd,
+ 
+ 	pte = pte_offset_kernel(pmd, addr);
+ 	do {
+-		if (!pte_none(*pte) && !kvm_is_device_pfn(__phys_to_pfn(addr)))
++		if (!pte_none(*pte) && !kvm_is_device_pfn(pte_pfn(addr)))
+ 			kvm_flush_dcache_pte(*pte);
+ 	} while (pte++, addr += PAGE_SIZE, addr != end);
+ }
+-- 
+1.9.1
