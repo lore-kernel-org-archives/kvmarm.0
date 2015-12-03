@@ -1,121 +1,120 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: Correctly handle zero register during
- MMIO
-Date: Thu, 03 Dec 2015 10:51:53 +0000
-Message-ID: <56601EC9.3060706@arm.com>
-References: <cover.1449136209.git.p.fedin@samsung.com> <fa20bcbefc504924aca104cc1c851bd6058ce260.1449136209.git.p.fedin@samsung.com>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH 0/3] KVM: arm64: BUG FIX: Correctly handle zero register
+ transfers
+Date: Thu, 03 Dec 2015 13:53:14 +0300
+Message-ID: <00cb01d12db8$cf9e8580$6edb9080$@samsung.com>
+References: <cover.1449136209.git.p.fedin@samsung.com>
+ <56601407.7020407@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <fa20bcbefc504924aca104cc1c851bd6058ce260.1449136209.git.p.fedin@samsung.com>
-Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: christoffer.dall@linaro.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C15F5498E9
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 05:51:47 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Mn0plJ6YTTw1 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Dec 2015 05:51:46 -0500 (EST)
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com
+ [210.118.77.11])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0D300498CA
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 05:51:45 -0500 (EST)
+Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
+ by mailout1.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NYS00I1J3KROK20@mailout1.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Thu, 03 Dec 2015 10:53:15 +0000 (GMT)
+In-reply-to: <56601407.7020407@arm.com>
+Content-language: ru
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: 'Marc Zyngier' <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/12/15 09:58, Pavel Fedin wrote:
-> On ARM64 register index of 31 corresponds to both zero register and SP.
-> However, all memory access instructions, use ZR as transfer register. SP
-> is used only as a base register in indirect memory addressing, or by
-> register-register arithmetics, which cannot be trapped here.
-> 
-> Correct emulation is achieved by introducing new register accessor
-> functions, which can do special handling for reg_num == 31. These new
-> accessors intentionally do not rely on old vcpu_reg() on ARM64, because
-> it is to be removed. Since the affected code is shared by both ARM
-> flavours, implementations of these accessors are also added to ARM32 code.
-> 
-> This patch fixes setting MMIO register to a random value (actually SP)
-> instead of zero by something like:
-> 
->  *((volatile int *)reg) = 0;
-> 
-> compilers tend to generate "str wzr, [xx]" here
-> 
-> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-> ---
->  arch/arm/include/asm/kvm_emulate.h   | 12 ++++++++++++
->  arch/arm/kvm/mmio.c                  |  5 +++--
->  arch/arm64/include/asm/kvm_emulate.h | 13 +++++++++++++
->  3 files changed, 28 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-> index a9c80a2..b7ff32e 100644
-> --- a/arch/arm/include/asm/kvm_emulate.h
-> +++ b/arch/arm/include/asm/kvm_emulate.h
-> @@ -28,6 +28,18 @@
->  unsigned long *vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num);
->  unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu);
->  
-> +static inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
-> +					 u8 reg_num)
-> +{
-> +	return *vcpu_reg(vcpu, reg_num);
-> +}
-> +
-> +static inline void vcpu_set_reg(const struct kvm_vcpu *vcpu, u8 reg_num,
-> +				unsigned long val)
-> +{
-> +	*vcpu_reg(vcpu, reg_num) = val;
-> +}
-> +
->  bool kvm_condition_valid(struct kvm_vcpu *vcpu);
->  void kvm_skip_instr(struct kvm_vcpu *vcpu, bool is_wide_instr);
->  void kvm_inject_undefined(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-> index 974b1c6..3a10c9f 100644
-> --- a/arch/arm/kvm/mmio.c
-> +++ b/arch/arm/kvm/mmio.c
-> @@ -115,7 +115,7 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
->  			       data);
->  		data = vcpu_data_host_to_guest(vcpu, data, len);
-> -		*vcpu_reg(vcpu, vcpu->arch.mmio_decode.rt) = data;
-> +		vcpu_set_reg(vcpu, vcpu->arch.mmio_decode.rt, data);
->  	}
->  
->  	return 0;
-> @@ -186,7 +186,8 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  	rt = vcpu->arch.mmio_decode.rt;
->  
->  	if (is_write) {
-> -		data = vcpu_data_guest_to_host(vcpu, *vcpu_reg(vcpu, rt), len);
-> +		data = vcpu_data_guest_to_host(vcpu, vcpu_get_reg(vcpu, rt),
-> +					       len);
->  
->  		trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, len, fault_ipa, data);
->  		mmio_write_buf(data_buf, len, data);
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 3ca894e..5a182af 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -109,6 +109,19 @@ static inline unsigned long *vcpu_reg(const struct kvm_vcpu *vcpu, u8 reg_num)
->  	return (unsigned long *)&vcpu_gp_regs(vcpu)->regs.regs[reg_num];
->  }
->  
-> +static inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
-> +					 u8 reg_num)
-> +{
-> +	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)->regs.regs[reg_num];
-> +}
-> +
-> +static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
-> +				unsigned long val)
-> +{
-> +	if (reg_num != 31)
-> +		vcpu_gp_regs(vcpu)->regs.regs[reg_num] = val;
-> +}
-> +
->  /* Get vcpu SPSR for current mode */
->  static inline unsigned long *vcpu_spsr(const struct kvm_vcpu *vcpu)
->  {
-> 
+ Hello!
 
-Thanks for finding this nasty one.
+> > The problem has been discovered by performing an operation
+> >
+> >  *((volatile int *)reg) = 0;
+> >
+> > which compiles as "str xzr, [xx]", and resulted in strange values being
+> > written.
+> 
+> Interesting find. Which compiler is that?
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+$ aarch64-linux-gnu-gcc --version
+aarch64-linux-gnu-gcc (Linaro GCC 2014.11) 4.9.3 20141031 (prerelease)
+Copyright (C) 2014 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+ This is from my colleague who actually hit the bug by his driver. And i can reproduce the issue with different compiler version
+using the following small testcase:
+--- cut ---
+p.fedin@fedinw7x64 /cygdrive/d/Projects/Test
+$ cat test.c
+volatile int *addr;
+
+int test_val(int val)
+{
+    *addr = val;
+}
+
+int test_zero(void)
+{
+    *addr = 0;
+}
+
+p.fedin@fedinw7x64 /cygdrive/d/Projects/Test
+$ aarch64-unknown-linux-gnu-gcc -O2 -c test.c
+
+p.fedin@fedinw7x64 /cygdrive/d/Projects/Test
+$ aarch64-unknown-linux-gnu-objdump -d test.o
+
+test.o:     file format elf64-littleaarch64
+
+
+Disassembly of section .text:
+
+0000000000000000 <test_val>:
+   0:   2a0003e2        mov     w2, w0
+   4:   2a0103e0        mov     w0, w1
+   8:   90000001        adrp    x1, 8 <test_val+0x8>
+   c:   f9400021        ldr     x1, [x1]
+  10:   b9000022        str     w2, [x1]
+  14:   d65f03c0        ret
+
+0000000000000018 <test_zero>:
+  18:   90000001        adrp    x1, 8 <test_val+0x8>
+  1c:   f9400021        ldr     x1, [x1]
+  20:   b900003f        str     wzr, [x1]
+  24:   d65f03c0        ret
+
+p.fedin@fedinw7x64 /cygdrive/d/Projects/Test
+$ aarch64-unknown-linux-gnu-gcc --version
+aarch64-unknown-linux-gnu-gcc (GCC) 4.9.0
+Copyright (C) 2014 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+--- cut ---
+
+ Isn't it legitimate to write from ZR to MMIO register?
+ Another potential case is in our vgic-v3-switch.S:
+
+	msr_s	ICH_HCR_EL2, xzr
+
+ It's only because it is KVM code we have never discovered this problem yet. Somebody could write such a thing in some other place,
+with some other register, which would be executed by KVM, and... boo...
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
