@@ -1,326 +1,133 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 3/3] KVM/arm/arm64: enable enhanced armv8 fp/simd lazy
- switch
-Date: Thu, 03 Dec 2015 16:13:41 +0000
-Message-ID: <56606A35.9090904@arm.com>
-References: <1447539130-4613-1-git-send-email-m.smarduch@samsung.com> <1447539130-4613-4-git-send-email-m.smarduch@samsung.com>
+From: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v2 0/3] Introduce MSI hardware mapping for VFIO
+Date: Thu, 03 Dec 2015 10:05:52 -0700
+Message-ID: <1449162352.15753.192.camel@redhat.com>
+References: <cover.1448372839.git.p.fedin@samsung.com>
+	 <1449091979.15753.134.camel@redhat.com>
+	 <00eb01d12dcc$e20df980$a629ec80$@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1447539130-4613-4-git-send-email-m.smarduch@samsung.com>
+In-Reply-To: <00eb01d12dcc$e20df980$a629ec80$@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: Mario Smarduch <m.smarduch@samsung.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, antonios.motakis@huawei.com
+To: Pavel Fedin <p.fedin@samsung.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, 'Marc Zyngier' <marc.zyngier@arm.com>, 'Thomas Gleixner' <tglx@linutronix.de>, 'Jason Cooper' <jason@lakedaemon.net>, 'Manish Jaggi' <mjaggi@caviumnetworks.com>, 'Pranavkumar Sawargaonkar' <pranavkumar@linaro.org>, 'Bharat Bhushan' <Bharat.Bhushan@freescale.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 14/11/15 22:12, Mario Smarduch wrote:
-> This patch tracks armv7 and armv8 fp/simd hardware state with a vcpu lazy flag.
-> On vcpu_load for 32 bit guests enable FP access, and later enable fp/simd
-> trapping for 32 and 64 bit guests if lazy flag is not set. On first fp/simd 
-> access trap to handler to save host and restore guest context, disable 
-> trapping and set vcpu lazy flag. On vcpu_put if flag is set save guest and 
-> restore host context and also save guest fpexc register.
+On Thu, 2015-12-03 at 16:16 +0300, Pavel Fedin wrote:
+>  Hello!
 > 
-> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
-> ---
->  arch/arm/include/asm/kvm_host.h   |  3 ++
->  arch/arm/kvm/arm.c                | 18 +++++++--
->  arch/arm64/include/asm/kvm_asm.h  |  2 +
->  arch/arm64/include/asm/kvm_host.h | 17 +++++++-
->  arch/arm64/kernel/asm-offsets.c   |  1 +
->  arch/arm64/kvm/hyp.S              | 83 +++++++++++++++++++++++++--------------
->  6 files changed, 89 insertions(+), 35 deletions(-)
+> > I like that you're making this transparent
+> > for the user, but at the same time, directly calling function pointers
+> > through the msi_domain_ops is quite ugly.
 > 
-> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-> index 8fc7a59..6960ff2 100644
-> --- a/arch/arm/include/asm/kvm_host.h
-> +++ b/arch/arm/include/asm/kvm_host.h
-> @@ -40,6 +40,8 @@
->  
->  #define KVM_MAX_VCPUS VGIC_V2_MAX_CPUS
->  
-> +#define kvm_guest_is32bit(vcpu)	true
+>  Do you mean dereferencing info->ops->vfio_map() in .c code? I can
+> introduce some wrappers in include/linux/msi.h like
+> msi_domain_vfio_map()/msi_domain_vfio_unmap(), this would not
+> conceptually change anything.
 
-This should be defined as an inline function, and placed in
-asm/kvm_emulate.h, probably renamed as kvm_guest_vcpu_is_32bit.
+But otherwise we're parsing data structures that are possibly intended
+to be private.  An interface also abstracts the implementation from the
+caller.
 
-> +
->  /*
->   * Reads the host FPEXC register, saves to vcpu context and enables the
->   * FPEXC.
-> @@ -260,6 +262,7 @@ void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot);
->  
->  struct kvm_vcpu *kvm_mpidr_to_vcpu(struct kvm *kvm, unsigned long mpidr);
->  void kvm_restore_host_vfp_state(struct kvm_vcpu *);
-> +static inline void kvm_save_guest_fpexc(struct kvm_vcpu *vcpu) {}
->  
->  static inline void kvm_arch_hardware_disable(void) {}
->  static inline void kvm_arch_hardware_unsetup(void) {}
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index cfc348a..7a20530 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -292,8 +292,12 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  
->  	kvm_arm_set_running_vcpu(vcpu);
->  
-> -	/* Save and enable FPEXC before we load guest context */
-> -	kvm_enable_fpexc(vcpu);
-> +	/*
-> +	 * For 32bit guest executing on arm64, enable fp/simd access in
-> +	 * EL2. On arm32 save host fpexc and then enable fp/simd access.
-> +	 */
-> +	if (kvm_guest_is32bit(vcpu))
-> +		kvm_enable_fpexc(vcpu);
->  }
->  
->  void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-> @@ -301,10 +305,18 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  	/* If the fp/simd registers are dirty save guest, restore host. */
->  	if (vcpu->arch.vfp_dirty) {
->  		kvm_restore_host_vfp_state(vcpu);
-> +
-> +		/*
-> +		 * For 32bit guest on arm64 save the guest fpexc register
-> +		 * in EL2 mode.
-> +		 */
-> +		if (kvm_guest_is32bit(vcpu))
-> +			kvm_save_guest_fpexc(vcpu);
-> +
->  		vcpu->arch.vfp_dirty = 0;
->  	}
->  
-> -	/* Restore host FPEXC trashed in vcpu_load */
-> +	/* For arm32 restore host FPEXC trashed in vcpu_load. */
->  	kvm_restore_host_fpexc(vcpu);
->  
->  	/*
-> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-> index 5e37710..c589ca9 100644
-> --- a/arch/arm64/include/asm/kvm_asm.h
-> +++ b/arch/arm64/include/asm/kvm_asm.h
-> @@ -117,6 +117,8 @@ extern char __kvm_hyp_vector[];
->  extern void __kvm_flush_vm_context(void);
->  extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
->  extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
-> +extern void __kvm_enable_fpexc32(void);
-> +extern void __kvm_save_fpexc32(struct kvm_vcpu *vcpu);
->  
->  extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
->  
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 83e65dd..6e2d6b5 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -41,6 +41,8 @@
->  
->  #define KVM_VCPU_MAX_FEATURES 3
->  
-> +#define kvm_guest_is32bit(vcpu)	(!(vcpu->arch.hcr_el2 & HCR_RW))
-> +
->  int __attribute_const__ kvm_target_cpu(void);
->  int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
->  int kvm_arch_dev_ioctl_check_extension(long ext);
-> @@ -251,9 +253,20 @@ static inline void kvm_arch_hardware_unsetup(void) {}
->  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
->  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
->  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
-> -static inline void kvm_enable_fpexc(struct kvm_vcpu *vcpu) {}
-> -static inline void kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu) {}
-> +
-> +static inline void kvm_enable_fpexc(struct kvm_vcpu *vcpu)
-> +{
-> +	/* Enable FP/SIMD access from EL2 mode*/
-> +	kvm_call_hyp(__kvm_enable_fpexc32);
-> +}
-> +
-> +static inline void kvm_save_guest_fpexc(struct kvm_vcpu *vcpu)
-> +{
-> +	/* Save FPEXEC32_EL2 in EL2 mode */
-> +	kvm_call_hyp(__kvm_save_fpexc32, vcpu);
-> +}
->  static inline void kvm_restore_host_fpexc(struct kvm_vcpu *vcpu) {}
-> +void kvm_restore_host_vfp_state(struct kvm_vcpu *vcpu);
->  
->  void kvm_arm_init_debug(void);
->  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-> index 8d89cf8..c9c5242 100644
-> --- a/arch/arm64/kernel/asm-offsets.c
-> +++ b/arch/arm64/kernel/asm-offsets.c
-> @@ -124,6 +124,7 @@ int main(void)
->    DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
->    DEFINE(VCPU_MDCR_EL2,	offsetof(struct kvm_vcpu, arch.mdcr_el2));
->    DEFINE(VCPU_IRQ_LINES,	offsetof(struct kvm_vcpu, arch.irq_lines));
-> +  DEFINE(VCPU_VFP_DIRTY,	offsetof(struct kvm_vcpu, arch.vfp_dirty));
->    DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
->    DEFINE(VCPU_HOST_DEBUG_STATE, offsetof(struct kvm_vcpu, arch.host_debug_state));
->    DEFINE(VCPU_TIMER_CNTV_CTL,	offsetof(struct kvm_vcpu, arch.timer_cpu.cntv_ctl));
-> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-> index e583613..06efb93 100644
-> --- a/arch/arm64/kvm/hyp.S
-> +++ b/arch/arm64/kvm/hyp.S
-> @@ -36,6 +36,23 @@
->  #define CPU_SYSREG_OFFSET(x)	(CPU_SYSREGS + 8*x)
->  
->  	.text
-> +/**
-> + * void kvm_restore_host_vfp_state(struct vcpu *vcpu) -
-> + *	This function saves the guest, restores host, called from host.
-> + */
-> +ENTRY(kvm_restore_host_vfp_state)
-> +	push	xzr, lr
-> +
-> +	add	x2, x0, #VCPU_CONTEXT
-> +	bl __save_fpsimd
-> +
-> +	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
-> +	bl __restore_fpsimd
-> +
-> +	pop	xzr, lr
-> +	ret
-> +ENDPROC(kvm_restore_host_vfp_state)
-> +
-
-Same here. Don't mix HYP and non-HYP in the same file.
-
->  	.pushsection	.hyp.text, "ax"
->  	.align	PAGE_SHIFT
->  
-> @@ -385,14 +402,6 @@
->  	tbz	\tmp, #KVM_ARM64_DEBUG_DIRTY_SHIFT, \target
->  .endm
->  
-> -/*
-> - * Branch to target if CPTR_EL2.TFP bit is set (VFP/SIMD trapping enabled)
-> - */
-> -.macro skip_fpsimd_state tmp, target
-> -	mrs	\tmp, cptr_el2
-> -	tbnz	\tmp, #CPTR_EL2_TFP_SHIFT, \target
-> -.endm
-> -
->  .macro compute_debug_state target
->  	// Compute debug state: If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY
->  	// is set, we do a full save/restore cycle and disable trapping.
-> @@ -433,10 +442,6 @@
->  	mrs	x5, ifsr32_el2
->  	stp	x4, x5, [x3]
->  
-> -	skip_fpsimd_state x8, 2f
-> -	mrs	x6, fpexc32_el2
-> -	str	x6, [x3, #16]
-> -2:
->  	skip_debug_state x8, 1f
->  	mrs	x7, dbgvcr32_el2
->  	str	x7, [x3, #24]
-> @@ -468,21 +473,13 @@
->  .macro activate_traps
->  	ldr     x2, [x0, #VCPU_HCR_EL2]
->  
-> -	/*
-> -	 * We are about to set CPTR_EL2.TFP to trap all floating point
-> -	 * register accesses to EL2, however, the ARM ARM clearly states that
-> -	 * traps are only taken to EL2 if the operation would not otherwise
-> -	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
-> -	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
-> -	 */
-> -	tbnz	x2, #HCR_RW_SHIFT, 99f // open code skip_32bit_state
-> -	mov	x3, #(1 << 30)
-> -	msr	fpexc32_el2, x3
-> -	isb
-> -99:
->  	msr     hcr_el2, x2
->  	mov	x2, #CPTR_EL2_TTA
-> +
-> +	ldrb    w3, [x0, #VCPU_VFP_DIRTY]
-> +	tbnz    w3, #0, 98f
->  	orr     x2, x2, #CPTR_EL2_TFP
-> +98:
->  	msr	cptr_el2, x2
->  
->  	mov	x2, #(1 << 15)	// Trap CP15 Cr=15
-> @@ -669,14 +666,12 @@ __restore_debug:
->  	ret
->  
->  __save_fpsimd:
-> -	skip_fpsimd_state x3, 1f
->  	save_fpsimd
-> -1:	ret
-> +	ret
->  
->  __restore_fpsimd:
-> -	skip_fpsimd_state x3, 1f
->  	restore_fpsimd
-> -1:	ret
-> +	ret
->  
->  switch_to_guest_fpsimd:
->  	push	x4, lr
-> @@ -688,6 +683,9 @@ switch_to_guest_fpsimd:
->  
->  	mrs	x0, tpidr_el2
->  
-> +	mov	w2, #1
-> +	strb    w2, [x0, #VCPU_VFP_DIRTY]
-> +
->  	ldr	x2, [x0, #VCPU_HOST_CONTEXT]
->  	kern_hyp_va x2
->  	bl __save_fpsimd
-> @@ -763,7 +761,6 @@ __kvm_vcpu_return:
->  	add	x2, x0, #VCPU_CONTEXT
->  
->  	save_guest_regs
-> -	bl __save_fpsimd
->  	bl __save_sysregs
->  
->  	skip_debug_state x3, 1f
-> @@ -784,7 +781,6 @@ __kvm_vcpu_return:
->  	kern_hyp_va x2
->  
->  	bl __restore_sysregs
-> -	bl __restore_fpsimd
->  	/* Clear FPSIMD and Trace trapping */
->  	msr     cptr_el2, xzr
->  
-> @@ -863,6 +859,33 @@ ENTRY(__kvm_flush_vm_context)
->  	ret
->  ENDPROC(__kvm_flush_vm_context)
->  
-> +/**
-> + * void __kvm_enable_fpexc32(void) -
-> + *	We may be entering the guest and set CPTR_EL2.TFP to trap all floating
-> + *	point register accesses to EL2, however, the ARM manual clearly states
-> + *	that traps are only taken to EL2 if the operation would not otherwise
-> + *	trap to EL1.  Therefore, always make sure that for 32-bit guests,
-> + *	we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
-> + */
-> +ENTRY(__kvm_enable_fpexc32)
-> +	mov	x3, #(1 << 30)
-> +	msr	fpexc32_el2, x3
-> +	ret
-> +ENDPROC(__kvm_enable_fpexc32)
-> +
-> +/**
-> + * void __kvm_save_fpexc32(void) -
-> + *	This function restores guest FPEXC to its vcpu context, we call this
-> + *	function from vcpu_put.
-> + */
-> +ENTRY(__kvm_save_fpexc32)
-> +	kern_hyp_va x0
-> +	add     x2, x0, #VCPU_CONTEXT
-> +	mrs     x1, fpexc32_el2
-> +	str     x1, [x2, #CPU_SYSREG_OFFSET(FPEXC32_EL2)]
-> +	ret
-> +ENDPROC(__kvm_save_fpexc32)
-> +
->  __kvm_hyp_panic:
->  	// Guess the context by looking at VTTBR:
->  	// If zero, then we're already a host.
+> >  There needs to be a real, interface there that isn't specific to
+> vfio.
 > 
+>  Hm... What else is going to use this?
 
-Thanks,
+I don't know, but pushing vfio specific data structures and concepts
+into core kernel callbacks is clearly the wrong direction to go.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+>  Actually, in my implementation the only thing specific to vfio is
+> using struct vfio_iommu_driver_ops. This is because we have to perform
+> MSI mapping for all "vfio domains" registered for this container. At
+> least this is how original type1 driver works.
+>  Can anybody explain me, what these "vfio domains" are? From the code
+> it looks like we can have several IOMMU instances belonging to one
+> VFIO container, and in this case one IOMMU == one "vfio domain". So is
+> my understanding correct that "vfio domain" is IOMMU instance?
+
+There's no such thing as a vfio domain, I think you mean iommu domains.
+A vfio container represents a user iommu context.  All of the groups
+(and thus devices) within a container have the same iommu mappings.
+However, not all of the groups are necessarily behind iommu hardware
+units that support the same set of features.  We might therefore need to
+mirror the user iommu context for the container across multiple physical
+iommu contexts (aka domains).  When we walk the iommu->domain_list,
+we're mirroring mappings across these multiple iommu domains within the
+container.
+
+>  And here come completely different ideas...
+>  First of all, can anybody explain, why do i perform all mappings on
+> per-IOMMU basis, not on per-device basis? AFAIK at least ARM SMMU
+> knows about "stream IDs", and therefore it should be capable of
+> distinguishing between different devices. So can i have per-device
+> mapping? This would make things much simpler.
+
+vfio is built on iommu groups with the premise being that an iommu group
+represents the smallest set of devices that are isolated from all other
+devices both by iommu visibility and by DMA isolation (peer-to-peer).
+Therefore we base iommu mappings on an iommu group because we cannot
+enforce userspace isolation at a sub-group level.  In a system or
+topology that is well architected for device isolation, there will be a
+one-to-one mapping of iommu groups to devices.
+
+So, iommu mappings are always on a per-group basis, but the user may
+attach multiple groups to a single container, which as discussed above
+represents a single iommu context.  That single context may be backed by
+one or more iommu domains, depending on the capabilities of the iommu
+hardware.  You're therefore not performing all mappings on a per-iommu
+basis unless you have a user defined container spanning multiple iommus
+which are incompatible in a way that requires us to manage them with
+separate iommu domains.
+
+The iommu's ability to do per device mappings here is irrelevant.
+You're working within a user defined IOMMU context where they have
+decided that all of the devices should have the same context.
+
+>  So:
+>  Idea 1: do per-device mappings. In this case i don't have to track
+> down which devices belong to which group and which IOMMU...
+
+Nak, that doesn't solve anything.
+
+>  Idea 2: What if we indeed simply simulate x86 behavior? What if we
+> just do 1:1 mapping for MSI register when IOMMU is initialized and
+> forget about it, so that MSI messages are guaranteed to reach the
+> host? Or would this mean that we would have to do 1:1 mapping for the
+> whole address range? Looks like (1) tried to do something similar,
+> with address reservation.
+
+x86 isn't problem-free in this space.  An x86 VM is going to know that
+the 0xfee00000 address range is special, it won't be backed by RAM and
+won't be a DMA target, thus we'll never attempt to map it for an iova
+address.  However, if we run a non-x86 VM or a userspace driver, it
+doesn't necessarily know that there's anything special about that range
+of iovas.  I intend to resolve this with an extension to the iommu info
+ioctl that describes the available iova space for the iommu.  The
+interrupt region would simply be excluded.
+
+This may be an option for you too, but you need to consider whether it
+precludes things like hotplug.  Even in the x86 case, if we have a
+non-x86 VM and we try to hot-add a PCI device, we can't dynamically
+remove the RAM that would interfere with with the MSI vector block.  I
+don't know what that looks like on your platform, whether you can pick a
+fixed range for the VM and use it regardless of the devices attached
+later.
+
+>  Idea 3: Is single device guaranteed to correspond to a single "vfio
+> domain" (and, as a consequence, to a single IOMMU)? In this case it's
+> very easy to unlink interface introduced by 0002 of my series from
+> vfio, and pass just raw struct iommu_domain * without any driver_ops?
+> irqchip code would only need iommu_map() and iommu_unmap() then, no
+> calling back to vfio layer.
+
+Again, the context is per contain.  It would certainly be more correct
+to setup the mapping for each iommu domain than to introduce any vfio
+related concepts down at the MSI mapping level, but you're still
+imposing a mapping into the user's iommu context.  That needs to be
+dealt with.  Thanks,
+
+Alex
+
