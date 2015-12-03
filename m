@@ -1,25 +1,28 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: arm64 sched_clock cpu accounting
-Date: Thu, 3 Dec 2015 09:29:47 +0000
-Message-ID: <20151203092947.GB7023@arm.com>
-References: <564CD5A7.8000007@samsung.com> <564D31D3.5040207@samsung.com>
- <20151202180741.GR18376@cbox> <565F81D2.3060401@samsung.com>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: [PATCH 0/3] KVM: arm64: BUG FIX: Correctly handle zero register
+ transfers
+Date: Thu, 03 Dec 2015 12:58:39 +0300
+Message-ID: <cover.1449136209.git.p.fedin@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8BCC0498A1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 04:28:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 57B3B4999F
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 04:57:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UJZeVKamO9U9 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Dec 2015 04:28:16 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 74F164989A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 04:28:16 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <565F81D2.3060401@samsung.com>
+ with ESMTP id zU1EOS6gbnvI for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Dec 2015 04:57:17 -0500 (EST)
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com
+ [210.118.77.12])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 73EC349973
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 04:57:16 -0500 (EST)
+Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
+ by mailout2.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NYS00BH811YMP00@mailout2.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Thu, 03 Dec 2015 09:58:46 +0000 (GMT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,37 +32,36 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Mario Smarduch <m.smarduch@samsung.com>
-Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>, Marc Zyngier <Marc.Zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Dec 02, 2015 at 03:42:10PM -0800, Mario Smarduch wrote:
-> On 12/2/2015 10:07 AM, Christoffer Dall wrote:
-> > On Wed, Nov 18, 2015 at 06:20:03PM -0800, Mario Smarduch wrote:
-> >> Also with tick accounting enabled, and periodic timer HZ set to 1000 no irq time
-> >> is reported. That's with running a ping flood - 1200 int/s, not sure why
-> >> wouldn't any irq time be reported? The other two modes report irq time as expected.
-> >>
-> >> On 11/18/2015 11:46 AM, Mario Smarduch wrote:
-> >>> Hello,
-> >>>   I noticed sched clock accounting can be enabled when arch-timer is
-> >>> initialized. But arm64 doesn't appear to have 'HAVE_IRQ_TIME_ACCOUNTING'
-> >>> selected (as of mainline 4.4-rc1) and IRQ_TIME_ACCOUNTING can't be selected.
-> >>> After adding it to arch/arm64/Kconfig, option appears to work fine. Depending on
-> >>> need all accounting options are fine, but irq time accounting appears to be most
-> >>> preferable.
-> >>>
-> >>> Any thoughts? Is it fine to enable it?
-> >>>
-> > Is any of this related to KVM?
-> 
-> Indirectly, given the guest should yield same results. To be on the safe side I
-> ran the guest in all combinations (7) to confirm that's the case.
-> 
-> Also verified that guest time on host appears fine in all these configurations.
-> It takes extra effort to get the guest time as opposed to other modes.
+ARM64 CPU has zero register which is read-only, with a value of 0.
+However, KVM currently incorrectly recognizes it being SP (because
+Rt == 31, and in struct user_pt_regs 'regs' array is followed by SP),
+resulting in invalid value being read, or even SP corruption on write.
 
-I can take this via the arm64 tree (where it's queued, but I've not pushed
-anything yet).
+The problem has been discovered by performing an operation
 
-Will
+ *((volatile int *)reg) = 0;
+
+which compiles as "str xzr, [xx]", and resulted in strange values being
+written.
+
+Pavel Fedin (3):
+  KVM: arm64: Correctly handle zero register during MMIO
+  KVM: arm64: Correctly handle zero register in system register accesses
+  KVM: arm64: Get rid of old vcpu_reg()
+
+ arch/arm/include/asm/kvm_emulate.h   | 12 ++++++
+ arch/arm/kvm/mmio.c                  |  5 ++-
+ arch/arm/kvm/psci.c                  | 20 ++++-----
+ arch/arm64/include/asm/kvm_emulate.h | 18 +++++---
+ arch/arm64/kvm/handle_exit.c         |  2 +-
+ arch/arm64/kvm/sys_regs.c            | 79 ++++++++++++++++++++----------------
+ arch/arm64/kvm/sys_regs.h            |  4 +-
+ arch/arm64/kvm/sys_regs_generic_v8.c |  2 +-
+ 8 files changed, 85 insertions(+), 57 deletions(-)
+
+-- 
+2.4.4
