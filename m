@@ -1,21 +1,21 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v5 01/21] ARM64: Move PMU register related defines to asm/pmu.h
-Date: Thu, 3 Dec 2015 14:11:11 +0800
-Message-ID: <1449123091-20252-2-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v5 02/21] KVM: ARM64: Define PMU data structure for each vcpu
+Date: Thu, 3 Dec 2015 14:11:12 +0800
+Message-ID: <1449123091-20252-3-git-send-email-zhaoshenglong@huawei.com>
 References: <1449123091-20252-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DB4449938
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A51E44992F
  for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 01:11:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8PEH9K1N5SDN for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 5JgjzsluVQb8 for <kvmarm@lists.cs.columbia.edu>;
  Thu,  3 Dec 2015 01:11:19 -0500 (EST)
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15EC14992F
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C70849692
  for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 01:11:18 -0500 (EST)
 In-Reply-To: <1449123091-20252-1-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -33,25 +33,78 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-To use the ARMv8 PMU related register defines from the KVM code,
-we move the relevant definitions to asm/pmu.h header file.
+Here we plan to support virtual PMU for guest by full software
+emulation, so define some basic structs and functions preparing for
+futher steps. Define struct kvm_pmc for performance monitor counter and
+struct kvm_pmu for performance monitor unit for each vcpu. According to
+ARMv8 spec, the PMU contains at most 32(ARMV8_MAX_COUNTERS) counters.
 
-Signed-off-by: Anup Patel <anup.patel@linaro.org>
+Since this only supports ARM64 (or PMUv3), add a separate config symbol
+for it.
+
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm64/include/asm/pmu.h   | 64 ++++++++++++++++++++++++++++++++++++++++++
- arch/arm64/kernel/perf_event.c | 36 +-----------------------
- 2 files changed, 65 insertions(+), 35 deletions(-)
- create mode 100644 arch/arm64/include/asm/pmu.h
+ arch/arm64/include/asm/kvm_host.h |  2 ++
+ arch/arm64/kvm/Kconfig            |  8 ++++++++
+ include/kvm/arm_pmu.h             | 41 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 51 insertions(+)
+ create mode 100644 include/kvm/arm_pmu.h
 
-diff --git a/arch/arm64/include/asm/pmu.h b/arch/arm64/include/asm/pmu.h
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index a35ce72..42e15bb 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -37,6 +37,7 @@
+ 
+ #include <kvm/arm_vgic.h>
+ #include <kvm/arm_arch_timer.h>
++#include <kvm/arm_pmu.h>
+ 
+ #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
+ 
+@@ -132,6 +133,7 @@ struct kvm_vcpu_arch {
+ 	/* VGIC state */
+ 	struct vgic_cpu vgic_cpu;
+ 	struct arch_timer_cpu timer_cpu;
++	struct kvm_pmu pmu;
+ 
+ 	/*
+ 	 * Anything that is not used directly from assembly code goes
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index a5272c0..66da9a2 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -36,6 +36,7 @@ config KVM
+ 	select HAVE_KVM_EVENTFD
+ 	select HAVE_KVM_IRQFD
+ 	select KVM_ARM_VGIC_V3
++	select KVM_ARM_PMU
+ 	---help---
+ 	  Support hosting virtualized guest machines.
+ 	  We don't support KVM with 16K page tables yet, due to the multiple
+@@ -48,6 +49,13 @@ config KVM_ARM_HOST
+ 	---help---
+ 	  Provides host support for ARM processors.
+ 
++config KVM_ARM_PMU
++	bool
++	depends on KVM_ARM_HOST && HW_PERF_EVENTS
++	---help---
++	  Adds support for a virtual Performance Monitoring Unit (PMU) in
++	  virtual machines.
++
+ source drivers/vhost/Kconfig
+ 
+ endif # VIRTUALIZATION
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
 new file mode 100644
-index 0000000..4264ea0
+index 0000000..0c13470
 --- /dev/null
-+++ b/arch/arm64/include/asm/pmu.h
-@@ -0,0 +1,64 @@
++++ b/include/kvm/arm_pmu.h
+@@ -0,0 +1,41 @@
 +/*
-+ * Copyright (C) 2015 Linaro Ltd, Shannon Zhao
++ * Copyright (C) 2015 Linaro Ltd.
++ * Author: Shannon Zhao <shannon.zhao@linaro.org>
 + *
 + * This program is free software; you can redistribute it and/or modify
 + * it under the terms of the GNU General Public License version 2 as
@@ -65,115 +118,30 @@ index 0000000..4264ea0
 + * You should have received a copy of the GNU General Public License
 + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
-+#ifndef __ASM_PMU_H
-+#define __ASM_PMU_H
 +
-+#define ARMV8_MAX_COUNTERS      32
-+#define ARMV8_COUNTER_MASK      (ARMV8_MAX_COUNTERS - 1)
++#ifndef __ASM_ARM_KVM_PMU_H
++#define __ASM_ARM_KVM_PMU_H
 +
-+/*
-+ * Per-CPU PMCR: config reg
-+ */
-+#define ARMV8_PMCR_E		(1 << 0) /* Enable all counters */
-+#define ARMV8_PMCR_P		(1 << 1) /* Reset all counters */
-+#define ARMV8_PMCR_C		(1 << 2) /* Cycle counter reset */
-+#define ARMV8_PMCR_D		(1 << 3) /* CCNT counts every 64th cpu cycle */
-+#define ARMV8_PMCR_X		(1 << 4) /* Export to ETM */
-+#define ARMV8_PMCR_DP		(1 << 5) /* Disable CCNT if non-invasive debug*/
-+#define	ARMV8_PMCR_N_SHIFT	11	 /* Number of counters supported */
-+#define	ARMV8_PMCR_N_MASK	0x1f
-+#define	ARMV8_PMCR_MASK		0x3f	 /* Mask for writable bits */
-+
-+/*
-+ * PMCNTEN: counters enable reg
-+ */
-+#define	ARMV8_CNTEN_MASK	0xffffffff	/* Mask for writable bits */
-+
-+/*
-+ * PMINTEN: counters interrupt enable reg
-+ */
-+#define	ARMV8_INTEN_MASK	0xffffffff	/* Mask for writable bits */
-+
-+/*
-+ * PMOVSR: counters overflow flag status reg
-+ */
-+#define	ARMV8_OVSR_MASK		0xffffffff	/* Mask for writable bits */
-+#define	ARMV8_OVERFLOWED_MASK	ARMV8_OVSR_MASK
-+
-+/*
-+ * PMXEVTYPER: Event selection reg
-+ */
-+#define	ARMV8_EVTYPE_MASK	0xc80003ff	/* Mask for writable bits */
-+#define	ARMV8_EVTYPE_EVENT	0x3ff		/* Mask for EVENT bits */
-+
-+/*
-+ * Event filters for PMUv3
-+ */
-+#define	ARMV8_EXCLUDE_EL1	(1 << 31)
-+#define	ARMV8_EXCLUDE_EL0	(1 << 30)
-+#define	ARMV8_INCLUDE_EL2	(1 << 27)
-+
-+#endif /* __ASM_PMU_H */
-diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-index 5b1897e..7eca5dc 100644
---- a/arch/arm64/kernel/perf_event.c
-+++ b/arch/arm64/kernel/perf_event.c
-@@ -24,6 +24,7 @@
- #include <linux/of.h>
- #include <linux/perf/arm_pmu.h>
- #include <linux/platform_device.h>
++#include <linux/perf_event.h>
++#ifdef CONFIG_KVM_ARM_PMU
 +#include <asm/pmu.h>
- 
- /*
-  * ARMv8 PMUv3 Performance Events handling code.
-@@ -187,9 +188,6 @@ static const unsigned armv8_a57_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
- #define	ARMV8_IDX_COUNTER_LAST(cpu_pmu) \
- 	(ARMV8_IDX_CYCLE_COUNTER + cpu_pmu->num_events - 1)
- 
--#define	ARMV8_MAX_COUNTERS	32
--#define	ARMV8_COUNTER_MASK	(ARMV8_MAX_COUNTERS - 1)
--
- /*
-  * ARMv8 low level PMU access
-  */
-@@ -200,38 +198,6 @@ static const unsigned armv8_a57_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
- #define	ARMV8_IDX_TO_COUNTER(x)	\
- 	(((x) - ARMV8_IDX_COUNTER0) & ARMV8_COUNTER_MASK)
- 
--/*
-- * Per-CPU PMCR: config reg
-- */
--#define ARMV8_PMCR_E		(1 << 0) /* Enable all counters */
--#define ARMV8_PMCR_P		(1 << 1) /* Reset all counters */
--#define ARMV8_PMCR_C		(1 << 2) /* Cycle counter reset */
--#define ARMV8_PMCR_D		(1 << 3) /* CCNT counts every 64th cpu cycle */
--#define ARMV8_PMCR_X		(1 << 4) /* Export to ETM */
--#define ARMV8_PMCR_DP		(1 << 5) /* Disable CCNT if non-invasive debug*/
--#define	ARMV8_PMCR_N_SHIFT	11	 /* Number of counters supported */
--#define	ARMV8_PMCR_N_MASK	0x1f
--#define	ARMV8_PMCR_MASK		0x3f	 /* Mask for writable bits */
--
--/*
-- * PMOVSR: counters overflow flag status reg
-- */
--#define	ARMV8_OVSR_MASK		0xffffffff	/* Mask for writable bits */
--#define	ARMV8_OVERFLOWED_MASK	ARMV8_OVSR_MASK
--
--/*
-- * PMXEVTYPER: Event selection reg
-- */
--#define	ARMV8_EVTYPE_MASK	0xc80003ff	/* Mask for writable bits */
--#define	ARMV8_EVTYPE_EVENT	0x3ff		/* Mask for EVENT bits */
--
--/*
-- * Event filters for PMUv3
-- */
--#define	ARMV8_EXCLUDE_EL1	(1 << 31)
--#define	ARMV8_EXCLUDE_EL0	(1 << 30)
--#define	ARMV8_INCLUDE_EL2	(1 << 27)
--
- static inline u32 armv8pmu_pmcr_read(void)
- {
- 	u32 val;
++#endif
++
++struct kvm_pmc {
++	u8 idx;/* index into the pmu->pmc array */
++	struct perf_event *perf_event;
++	struct kvm_vcpu *vcpu;
++	u64 bitmask;
++};
++
++struct kvm_pmu {
++#ifdef CONFIG_KVM_ARM_PMU
++	/* PMU IRQ Number per VCPU */
++	int irq_num;
++	struct kvm_pmc pmc[ARMV8_MAX_COUNTERS];
++#endif
++};
++
++#endif
 -- 
 2.0.4
