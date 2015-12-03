@@ -1,23 +1,22 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v5 20/21] KVM: ARM64: Free perf event of PMU when destroying
- vcpu
-Date: Thu, 3 Dec 2015 14:11:30 +0800
-Message-ID: <1449123091-20252-21-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v5 17/21] KVM: ARM64: Add helper to handle PMCR register bits
+Date: Thu, 3 Dec 2015 14:11:27 +0800
+Message-ID: <1449123091-20252-18-git-send-email-zhaoshenglong@huawei.com>
 References: <1449123091-20252-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F3BD49906
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 01:11:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DEA3498A3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 01:14:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zIHHVqz3Qd7z for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Dec 2015 01:11:32 -0500 (EST)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [119.145.14.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 80E6849958
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 01:11:28 -0500 (EST)
+ with ESMTP id UXaKpRu1k+Im for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Dec 2015 01:14:39 -0500 (EST)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [119.145.14.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D0E9D496AC
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 01:14:38 -0500 (EST)
 In-Reply-To: <1449123091-20252-1-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,78 +33,120 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-When KVM frees VCPU, it needs to free the perf_event of PMU.
+According to ARMv8 spec, when writing 1 to PMCR.E, all counters are
+enabled by PMCNTENSET, while writing 0 to PMCR.E, all counters are
+disabled. When writing 1 to PMCR.P, reset all event counters, not
+including PMCCNTR, to zero. When writing 1 to PMCR.C, reset PMCCNTR to
+zero.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm/kvm/arm.c    |  1 +
- include/kvm/arm_pmu.h |  2 ++
- virt/kvm/arm/pmu.c    | 21 +++++++++++++++++++++
- 3 files changed, 24 insertions(+)
+ arch/arm64/kvm/sys_regs.c |  2 ++
+ include/kvm/arm_pmu.h     |  2 ++
+ virt/kvm/arm/pmu.c        | 51 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 55 insertions(+)
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index cd696ef..cea2176 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -259,6 +259,7 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
- 	kvm_mmu_free_memory_caches(vcpu);
- 	kvm_timer_vcpu_terminate(vcpu);
- 	kvm_vgic_vcpu_destroy(vcpu);
-+	kvm_pmu_vcpu_destroy(vcpu);
- 	kmem_cache_free(kvm_vcpu_cache, vcpu);
- }
- 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 9320277..405cf70 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -578,6 +578,7 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+ 			val &= ~ARMV8_PMCR_MASK;
+ 			val |= *vcpu_reg(vcpu, p->Rt) & ARMV8_PMCR_MASK;
+ 			vcpu_sys_reg(vcpu, r->reg) = val;
++			kvm_pmu_handle_pmcr(vcpu, val);
+ 			break;
+ 		}
+ 		case PMCEID0_EL0:
+@@ -1219,6 +1220,7 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
+ 			val &= ~ARMV8_PMCR_MASK;
+ 			val |= *vcpu_reg(vcpu, p->Rt) & ARMV8_PMCR_MASK;
+ 			vcpu_cp15(vcpu, r->reg) = val;
++			kvm_pmu_handle_pmcr(vcpu, val);
+ 			break;
+ 		}
+ 		case c9_PMCEID0:
 diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index fe8035a..53feebb 100644
+index a54c391..212a3de 100644
 --- a/include/kvm/arm_pmu.h
 +++ b/include/kvm/arm_pmu.h
-@@ -40,6 +40,7 @@ struct kvm_pmu {
- 
- #ifdef CONFIG_KVM_ARM_PMU
- void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
-+void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu);
- void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu);
- unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx);
- void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val);
-@@ -52,6 +53,7 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
- void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u32 val);
+@@ -47,6 +47,7 @@ void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u32 val);
+ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u32 val);
+ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
+ 				    u32 select_idx);
++void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u32 val);
  #else
- void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
-+void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu) {}
- void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu) {}
  unsigned long kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx)
  {
+@@ -59,6 +60,7 @@ void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u32 val) {}
+ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u32 val) {}
+ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
+ 				    u32 select_idx) {}
++void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u32 val) {}
+ #endif
+ 
+ #endif
 diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 4014831..bd2fece 100644
+index d133909..b81e35e 100644
 --- a/virt/kvm/arm/pmu.c
 +++ b/virt/kvm/arm/pmu.c
-@@ -98,6 +98,27 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
+@@ -140,6 +140,57 @@ static unsigned long kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
  }
  
  /**
-+ * kvm_pmu_vcpu_destroy - free perf event of PMU for cpu
++ * kvm_pmu_handle_pmcr - handle PMCR register
 + * @vcpu: The vcpu pointer
-+ *
++ * @val: the value guest writes to PMCR register
 + */
-+void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
++void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u32 val)
 +{
-+	int i;
 +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
++	struct kvm_pmc *pmc;
++	u32 enable;
++	int i;
 +
-+	for (i = 0; i < ARMV8_MAX_COUNTERS; i++) {
-+		struct kvm_pmc *pmc = &pmu->pmc[i];
++	if (val & ARMV8_PMCR_E) {
++		if (!vcpu_mode_is_32bit(vcpu))
++			enable = vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
++		else
++			enable = vcpu_cp15(vcpu, c9_PMCNTENSET);
 +
-+		if (pmc->perf_event) {
-+			perf_event_disable(pmc->perf_event);
-+			perf_event_release_kernel(pmc->perf_event);
-+			pmc->perf_event = NULL;
++		kvm_pmu_enable_counter(vcpu, enable, true);
++	} else {
++		kvm_pmu_disable_counter(vcpu, 0xffffffffUL);
++	}
++
++	if (val & ARMV8_PMCR_C) {
++		pmc = &pmu->pmc[ARMV8_MAX_COUNTERS - 1];
++		if (pmc->perf_event)
++			local64_set(&pmc->perf_event->count, 0);
++		if (!vcpu_mode_is_32bit(vcpu))
++			vcpu_sys_reg(vcpu, PMCCNTR_EL0) = 0;
++		else
++			vcpu_cp15(vcpu, c9_PMCCNTR) = 0;
++	}
++
++	if (val & ARMV8_PMCR_P) {
++		for (i = 0; i < ARMV8_MAX_COUNTERS - 1; i++) {
++			pmc = &pmu->pmc[i];
++			if (pmc->perf_event)
++				local64_set(&pmc->perf_event->count, 0);
++			if (!vcpu_mode_is_32bit(vcpu))
++				vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = 0;
++			else
++				vcpu_cp15(vcpu, c14_PMEVCNTR0 + i) = 0;
 +		}
++	}
++
++	if (val & ARMV8_PMCR_LC) {
++		pmc = &pmu->pmc[ARMV8_MAX_COUNTERS - 1];
++		pmc->bitmask = 0xffffffffffffffffUL;
 +	}
 +}
 +
 +/**
-  * kvm_pmu_flush_hwstate - flush pmu state to cpu
+  * kvm_pmu_overflow_clear - clear PMU overflow interrupt
   * @vcpu: The vcpu pointer
-  *
+  * @val: the value guest writes to PMOVSCLR register
 -- 
 2.0.4
