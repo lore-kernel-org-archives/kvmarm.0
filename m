@@ -1,21 +1,21 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v5 02/21] KVM: ARM64: Define PMU data structure for each vcpu
-Date: Thu, 3 Dec 2015 14:11:12 +0800
-Message-ID: <1449123091-20252-3-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v5 03/21] KVM: ARM64: Add offset defines for PMU registers
+Date: Thu, 3 Dec 2015 14:11:13 +0800
+Message-ID: <1449123091-20252-4-git-send-email-zhaoshenglong@huawei.com>
 References: <1449123091-20252-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A51E44992F
- for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 01:11:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B3F7498D9
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 01:11:23 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5JgjzsluVQb8 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  3 Dec 2015 01:11:19 -0500 (EST)
+ with ESMTP id QQ-T6VmyLzmK for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Dec 2015 01:11:21 -0500 (EST)
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C70849692
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1392649906
  for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Dec 2015 01:11:18 -0500 (EST)
 In-Reply-To: <1449123091-20252-1-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -33,115 +33,95 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-Here we plan to support virtual PMU for guest by full software
-emulation, so define some basic structs and functions preparing for
-futher steps. Define struct kvm_pmc for performance monitor counter and
-struct kvm_pmu for performance monitor unit for each vcpu. According to
-ARMv8 spec, the PMU contains at most 32(ARMV8_MAX_COUNTERS) counters.
-
-Since this only supports ARM64 (or PMUv3), add a separate config symbol
-for it.
+We are about to trap and emulate acccesses to each PMU register
+individually. This adds the context offsets for the AArch64 PMU
+registers and their AArch32 counterparts.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm64/include/asm/kvm_host.h |  2 ++
- arch/arm64/kvm/Kconfig            |  8 ++++++++
- include/kvm/arm_pmu.h             | 41 +++++++++++++++++++++++++++++++++++++++
- 3 files changed, 51 insertions(+)
- create mode 100644 include/kvm/arm_pmu.h
+ arch/arm64/include/asm/kvm_asm.h | 55 ++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 50 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index a35ce72..42e15bb 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -37,6 +37,7 @@
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 5e37710..4f804c1 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -48,12 +48,34 @@
+ #define MDSCR_EL1	22	/* Monitor Debug System Control Register */
+ #define MDCCINT_EL1	23	/* Monitor Debug Comms Channel Interrupt Enable Reg */
  
- #include <kvm/arm_vgic.h>
- #include <kvm/arm_arch_timer.h>
-+#include <kvm/arm_pmu.h>
++/* Performance Monitors Registers */
++#define PMCR_EL0	24	/* Control Register */
++#define PMOVSSET_EL0	25	/* Overflow Flag Status Set Register */
++#define PMOVSCLR_EL0	26	/* Overflow Flag Status Clear Register */
++#define PMSELR_EL0	27	/* Event Counter Selection Register */
++#define PMCEID0_EL0	28	/* Common Event Identification Register 0 */
++#define PMCEID1_EL0	29	/* Common Event Identification Register 1 */
++#define PMEVCNTR0_EL0	30	/* Event Counter Register (0-30) */
++#define PMEVCNTR30_EL0	60
++#define PMCCNTR_EL0	61	/* Cycle Counter Register */
++#define PMEVTYPER0_EL0	62	/* Event Type Register (0-30) */
++#define PMEVTYPER30_EL0	92
++#define PMCCFILTR_EL0	93	/* Cycle Count Filter Register */
++#define PMXEVCNTR_EL0	94	/* Selected Event Count Register */
++#define PMXEVTYPER_EL0	95	/* Selected Event Type Register */
++#define PMCNTENSET_EL0	96	/* Count Enable Set Register */
++#define PMCNTENCLR_EL0	97	/* Count Enable Clear Register */
++#define PMINTENSET_EL1	98	/* Interrupt Enable Set Register */
++#define PMINTENCLR_EL1	99	/* Interrupt Enable Clear Register */
++#define PMUSERENR_EL0	100	/* User Enable Register */
++#define PMSWINC_EL0	101	/* Software Increment Register */
++
+ /* 32bit specific registers. Keep them at the end of the range */
+-#define	DACR32_EL2	24	/* Domain Access Control Register */
+-#define	IFSR32_EL2	25	/* Instruction Fault Status Register */
+-#define	FPEXC32_EL2	26	/* Floating-Point Exception Control Register */
+-#define	DBGVCR32_EL2	27	/* Debug Vector Catch Register */
+-#define	NR_SYS_REGS	28
++#define	DACR32_EL2	102	/* Domain Access Control Register */
++#define	IFSR32_EL2	103	/* Instruction Fault Status Register */
++#define	FPEXC32_EL2	104	/* Floating-Point Exception Control Register */
++#define	DBGVCR32_EL2	105	/* Debug Vector Catch Register */
++#define	NR_SYS_REGS	106
  
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
+ /* 32bit mapping */
+ #define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
+@@ -75,6 +97,24 @@
+ #define c6_IFAR		(c6_DFAR + 1)	/* Instruction Fault Address Register */
+ #define c7_PAR		(PAR_EL1 * 2)	/* Physical Address Register */
+ #define c7_PAR_high	(c7_PAR + 1)	/* PAR top 32 bits */
++
++/* Performance Monitors*/
++#define c9_PMCR		(PMCR_EL0 * 2)
++#define c9_PMOVSSET	(PMOVSSET_EL0 * 2)
++#define c9_PMOVSCLR	(PMOVSCLR_EL0 * 2)
++#define c9_PMCCNTR	(PMCCNTR_EL0 * 2)
++#define c9_PMSELR	(PMSELR_EL0 * 2)
++#define c9_PMCEID0	(PMCEID0_EL0 * 2)
++#define c9_PMCEID1	(PMCEID1_EL0 * 2)
++#define c9_PMXEVCNTR	(PMXEVCNTR_EL0 * 2)
++#define c9_PMXEVTYPER	(PMXEVTYPER_EL0 * 2)
++#define c9_PMCNTENSET	(PMCNTENSET_EL0 * 2)
++#define c9_PMCNTENCLR	(PMCNTENCLR_EL0 * 2)
++#define c9_PMINTENSET	(PMINTENSET_EL1 * 2)
++#define c9_PMINTENCLR	(PMINTENCLR_EL1 * 2)
++#define c9_PMUSERENR	(PMUSERENR_EL0 * 2)
++#define c9_PMSWINC	(PMSWINC_EL0 * 2)
++
+ #define c10_PRRR	(MAIR_EL1 * 2)	/* Primary Region Remap Register */
+ #define c10_NMRR	(c10_PRRR + 1)	/* Normal Memory Remap Register */
+ #define c12_VBAR	(VBAR_EL1 * 2)	/* Vector Base Address Register */
+@@ -86,6 +126,11 @@
+ #define c10_AMAIR1	(c10_AMAIR0 + 1)/* Aux Memory Attr Indirection Reg */
+ #define c14_CNTKCTL	(CNTKCTL_EL1 * 2) /* Timer Control Register (PL1) */
  
-@@ -132,6 +133,7 @@ struct kvm_vcpu_arch {
- 	/* VGIC state */
- 	struct vgic_cpu vgic_cpu;
- 	struct arch_timer_cpu timer_cpu;
-+	struct kvm_pmu pmu;
- 
- 	/*
- 	 * Anything that is not used directly from assembly code goes
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index a5272c0..66da9a2 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -36,6 +36,7 @@ config KVM
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
- 	select KVM_ARM_VGIC_V3
-+	select KVM_ARM_PMU
- 	---help---
- 	  Support hosting virtualized guest machines.
- 	  We don't support KVM with 16K page tables yet, due to the multiple
-@@ -48,6 +49,13 @@ config KVM_ARM_HOST
- 	---help---
- 	  Provides host support for ARM processors.
- 
-+config KVM_ARM_PMU
-+	bool
-+	depends on KVM_ARM_HOST && HW_PERF_EVENTS
-+	---help---
-+	  Adds support for a virtual Performance Monitoring Unit (PMU) in
-+	  virtual machines.
++/* Performance Monitors*/
++#define c14_PMEVCNTR0	(PMEVCNTR0_EL0 * 2)
++#define c14_PMEVTYPER0	(PMEVTYPER0_EL0 * 2)
++#define c14_PMCCFILTR	(PMCCFILTR_EL0 * 2)
 +
- source drivers/vhost/Kconfig
- 
- endif # VIRTUALIZATION
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-new file mode 100644
-index 0000000..0c13470
---- /dev/null
-+++ b/include/kvm/arm_pmu.h
-@@ -0,0 +1,41 @@
-+/*
-+ * Copyright (C) 2015 Linaro Ltd.
-+ * Author: Shannon Zhao <shannon.zhao@linaro.org>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef __ASM_ARM_KVM_PMU_H
-+#define __ASM_ARM_KVM_PMU_H
-+
-+#include <linux/perf_event.h>
-+#ifdef CONFIG_KVM_ARM_PMU
-+#include <asm/pmu.h>
-+#endif
-+
-+struct kvm_pmc {
-+	u8 idx;/* index into the pmu->pmc array */
-+	struct perf_event *perf_event;
-+	struct kvm_vcpu *vcpu;
-+	u64 bitmask;
-+};
-+
-+struct kvm_pmu {
-+#ifdef CONFIG_KVM_ARM_PMU
-+	/* PMU IRQ Number per VCPU */
-+	int irq_num;
-+	struct kvm_pmc pmc[ARMV8_MAX_COUNTERS];
-+#endif
-+};
-+
-+#endif
+ #define cp14_DBGDSCRext	(MDSCR_EL1 * 2)
+ #define cp14_DBGBCR0	(DBGBCR0_EL1 * 2)
+ #define cp14_DBGBVR0	(DBGBVR0_EL1 * 2)
 -- 
 2.0.4
