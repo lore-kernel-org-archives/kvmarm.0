@@ -1,54 +1,47 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: Revert to old way of checking for device
- mapping in stage2_flush_ptes().
-Date: Thu, 3 Dec 2015 09:09:36 +0100
-Message-ID: <CAKv+Gu8qBy_aBC2ZUB5D3ZNMdkdy-Q+XTD2bOXfnM_g1239e7A@mail.gmail.com>
-References: <1448975032-7156-1-git-send-email-p.fedin@samsung.com>
-	<CAKv+Gu-WhtTZoPEmRSa8Ypcc9SZ-d6NABDSfZ6tTx14Tyt+AdQ@mail.gmail.com>
-	<007c01d12d9a$36dd6eb0$a4984c10$@samsung.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 10/21] arm64: KVM: Add patchable function selector
+Date: Thu, 3 Dec 2015 08:18:43 +0000
+Message-ID: <20151203081843.5905bebd@why.wild-wind.fr.eu.org>
+References: <1448650215-15218-1-git-send-email-marc.zyngier@arm.com>
+	<1448650215-15218-11-git-send-email-marc.zyngier@arm.com>
+	<20151202223456.GK3233@hawk.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <stable-owner@vger.kernel.org>
-In-Reply-To: <007c01d12d9a$36dd6eb0$a4984c10$@samsung.com>
-Sender: stable-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, KVM devel mailing list <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, "stable@vger.kernel.org" <stable@vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20151202223456.GK3233@hawk.localdomain>
+Sender: kvm-owner@vger.kernel.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Alex =?UTF-8?B?QmVu?= =?UTF-8?B?bsOpZQ==?= <alex.bennee@linaro.org>, Steve Capper <Steve.Capper@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 3 December 2015 at 08:14, Pavel Fedin <p.fedin@samsung.com> wrote:
->  Hello!
->
->> > diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
->> > index 7dace90..51ad98f 100644
->> > --- a/arch/arm/kvm/mmu.c
->> > +++ b/arch/arm/kvm/mmu.c
->> > @@ -310,7 +310,8 @@ static void stage2_flush_ptes(struct kvm *kvm, pmd_t *pmd,
->> >
->> >         pte = pte_offset_kernel(pmd, addr);
->> >         do {
->> > -               if (!pte_none(*pte) && !kvm_is_device_pfn(__phys_to_pfn(addr)))
->> > +               if (!pte_none(*pte) &&
->> > +                   (pte_val(*pte) & PAGE_S2_DEVICE) != PAGE_S2_DEVICE)
->>
->> I think your analysis is correct, but does that not apply to both instances?
->
->  No no, another one is correct, since it operates on real PFN (at least looks like so). I have verified my fix against the original problem (crash on Exynos5410 without generic timer), and it still works fine there.
->
+On Wed, 2 Dec 2015 16:34:56 -0600
+Andrew Jones <drjones@redhat.com> wrote:
 
-I don't think so. Regardless of whether you are manipulating HYP
-mappings or stage-2 mappings, the physical address is always the
-output, not the input of the translation, so addr is always either a
-virtual address or a intermediate physical address, whereas
-pfn_valid() operates on host physical addresses.
+> On Fri, Nov 27, 2015 at 06:50:04PM +0000, Marc Zyngier wrote:
+> > KVM so far relies on code patching, and is likely to use it more
+> > in the future. The main issue is that our alternative system works
+> > at the instruction level, while we'd like to have alternatives at
+> > the function level.
+> 
+> How about setting static-keys at hyp init time?
 
->> And instead of reverting, could we fix this properly instead?
->
->  Of course, i'm not against alternate approaches, feel free to. I've just suggested what i could, to fix things quickly. I'm indeed no expert in KVM memory management yet. After all, this is what mailing lists are for.
->
+That was an option I looked at. And while static keys would work to some
+extent, they also have some nasty side effects:
+- They create both a fast and a slow path. We don't want that - both
+  path should be equally fast, or at least have as little overhead as
+  possible
+- We do need code patching for some assembly code, and using static
+  keys on top creates a parallel mechanism that makes it hard to
+  follow/debug/maintain.
 
-OK. I will follow up with a patch, as Christoffer requested. I'd
-appreciate it if you could test to see if it also fixes the current
-issue, and the original arch timer issue.
+You can view this alternative function call as a slightly different
+kind of static keys - one that can give you the capability to handle
+function calls instead of just jumping over code sequences. Both have
+their own merits.
 
 Thanks,
-Ard.
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
