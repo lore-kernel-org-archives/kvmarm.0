@@ -1,23 +1,21 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 4/5] arm64: KVM: Get rid of old vcpu_reg()
-Date: Fri,  4 Dec 2015 17:17:19 +0000
-Message-ID: <1449249440-28878-5-git-send-email-marc.zyngier@arm.com>
-References: <1449249440-28878-1-git-send-email-marc.zyngier@arm.com>
+Subject: [GIT PULL] KVM/ARM fixes for 4.4-rc4
+Date: Fri,  4 Dec 2015 17:17:15 +0000
+Message-ID: <1449249440-28878-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D1FD499D4
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2015 12:16:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 967B649914
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2015 12:15:56 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oKIlYZEIOCwE for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Dec 2015 12:16:00 -0500 (EST)
+ with ESMTP id UFxNvCcKk6Qm for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Dec 2015 12:15:55 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 79F684993D
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2015 12:16:00 -0500 (EST)
-In-Reply-To: <1449249440-28878-1-git-send-email-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B2F2413E1
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2015 12:15:54 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,134 +29,57 @@ To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Pavel Fedin <p.fedin@samsung.com>
+Hi Paolo,
 
-Using oldstyle vcpu_reg() accessor is proven to be inappropriate and
-unsafe on ARM64. This patch converts the rest of use cases to new
-accessors and completely removes vcpu_reg() on ARM64.
+This pull request contains a number of fixes for 4.4-rc4 (or -rc5 if
+we already missed the boat).
 
-Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm/kvm/psci.c                  | 20 ++++++++++----------
- arch/arm64/include/asm/kvm_emulate.h | 11 +++--------
- arch/arm64/kvm/handle_exit.c         |  2 +-
- 3 files changed, 14 insertions(+), 19 deletions(-)
+The first part is a very nice catch from Pavel, who noticed that we
+were not dealing very well (if at all) with the aliasing between two
+registers.
 
-diff --git a/arch/arm/kvm/psci.c b/arch/arm/kvm/psci.c
-index 0b55696..a9b3b90 100644
---- a/arch/arm/kvm/psci.c
-+++ b/arch/arm/kvm/psci.c
-@@ -75,7 +75,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 	unsigned long context_id;
- 	phys_addr_t target_pc;
- 
--	cpu_id = *vcpu_reg(source_vcpu, 1) & MPIDR_HWID_BITMASK;
-+	cpu_id = vcpu_get_reg(source_vcpu, 1) & MPIDR_HWID_BITMASK;
- 	if (vcpu_mode_is_32bit(source_vcpu))
- 		cpu_id &= ~((u32) 0);
- 
-@@ -94,8 +94,8 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 			return PSCI_RET_INVALID_PARAMS;
- 	}
- 
--	target_pc = *vcpu_reg(source_vcpu, 2);
--	context_id = *vcpu_reg(source_vcpu, 3);
-+	target_pc = vcpu_get_reg(source_vcpu, 2);
-+	context_id = vcpu_get_reg(source_vcpu, 3);
- 
- 	kvm_reset_vcpu(vcpu);
- 
-@@ -114,7 +114,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
- 	 * NOTE: We always update r0 (or x0) because for PSCI v0.1
- 	 * the general puspose registers are undefined upon CPU_ON.
- 	 */
--	*vcpu_reg(vcpu, 0) = context_id;
-+	vcpu_set_reg(vcpu, 0, context_id);
- 	vcpu->arch.power_off = false;
- 	smp_mb();		/* Make sure the above is visible */
- 
-@@ -134,8 +134,8 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
- 	struct kvm *kvm = vcpu->kvm;
- 	struct kvm_vcpu *tmp;
- 
--	target_affinity = *vcpu_reg(vcpu, 1);
--	lowest_affinity_level = *vcpu_reg(vcpu, 2);
-+	target_affinity = vcpu_get_reg(vcpu, 1);
-+	lowest_affinity_level = vcpu_get_reg(vcpu, 2);
- 
- 	/* Determine target affinity mask */
- 	target_affinity_mask = psci_affinity_mask(lowest_affinity_level);
-@@ -209,7 +209,7 @@ int kvm_psci_version(struct kvm_vcpu *vcpu)
- static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
- {
- 	int ret = 1;
--	unsigned long psci_fn = *vcpu_reg(vcpu, 0) & ~((u32) 0);
-+	unsigned long psci_fn = vcpu_get_reg(vcpu, 0) & ~((u32) 0);
- 	unsigned long val;
- 
- 	switch (psci_fn) {
-@@ -273,13 +273,13 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
- 		break;
- 	}
- 
--	*vcpu_reg(vcpu, 0) = val;
-+	vcpu_set_reg(vcpu, 0, val);
- 	return ret;
- }
- 
- static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
- {
--	unsigned long psci_fn = *vcpu_reg(vcpu, 0) & ~((u32) 0);
-+	unsigned long psci_fn = vcpu_get_reg(vcpu, 0) & ~((u32) 0);
- 	unsigned long val;
- 
- 	switch (psci_fn) {
-@@ -295,7 +295,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
- 		break;
- 	}
- 
--	*vcpu_reg(vcpu, 0) = val;
-+	vcpu_set_reg(vcpu, 0, val);
- 	return 1;
- }
- 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 5a182af..25a4021 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -100,15 +100,10 @@ static inline void vcpu_set_thumb(struct kvm_vcpu *vcpu)
- }
- 
- /*
-- * vcpu_reg should always be passed a register number coming from a
-- * read of ESR_EL2. Otherwise, it may give the wrong result on AArch32
-- * with banked registers.
-+ * vcpu_get_reg and vcpu_set_reg should always be passed a register number
-+ * coming from a read of ESR_EL2. Otherwise, it may give the wrong result on
-+ * AArch32 with banked registers.
-  */
--static inline unsigned long *vcpu_reg(const struct kvm_vcpu *vcpu, u8 reg_num)
--{
--	return (unsigned long *)&vcpu_gp_regs(vcpu)->regs.regs[reg_num];
--}
--
- static inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
- 					 u8 reg_num)
- {
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 68a0759..15f0477 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -37,7 +37,7 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
- 	int ret;
- 
--	trace_kvm_hvc_arm64(*vcpu_pc(vcpu), *vcpu_reg(vcpu, 0),
-+	trace_kvm_hvc_arm64(*vcpu_pc(vcpu), vcpu_get_reg(vcpu, 0),
- 			    kvm_vcpu_hvc_get_imm(vcpu));
- 
- 	ret = kvm_psci_call(vcpu);
--- 
-2.1.4
+The last patch from Ard is a fix for a fix that was merged in
+-rc3. Hopefully we got it right this time.
+
+Please pull!
+
+       M.
+
+The following changes since commit fbb4574ce9a37e15a9872860bf202f2be5bdf6c4:
+
+  arm64: kvm: report original PAR_EL1 upon panic (2015-11-24 18:20:58 +0100)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-v4.4-rc4
+
+for you to fetch changes up to 0de58f852875a0f0dcfb120bb8433e4e73c7803b:
+
+  ARM/arm64: KVM: correct PTE uncachedness check (2015-12-04 16:30:17 +0000)
+
+----------------------------------------------------------------
+KVM/ARM fixes for v4.4-rc4
+
+- A series of fixes to deal with the aliasing between the sp and xzr register
+- A fix for the cache flush fix that went in -rc3
+
+----------------------------------------------------------------
+Ard Biesheuvel (1):
+      ARM/arm64: KVM: correct PTE uncachedness check
+
+Pavel Fedin (4):
+      arm64: KVM: Correctly handle zero register during MMIO
+      arm64: KVM: Remove const from struct sys_reg_params
+      arm64: KVM: Correctly handle zero register in system register accesses
+      arm64: KVM: Get rid of old vcpu_reg()
+
+ arch/arm/include/asm/kvm_emulate.h   |  12 ++++
+ arch/arm/kvm/mmio.c                  |   5 +-
+ arch/arm/kvm/mmu.c                   |   4 +-
+ arch/arm/kvm/psci.c                  |  20 +++---
+ arch/arm64/include/asm/kvm_emulate.h |  18 +++--
+ arch/arm64/kvm/handle_exit.c         |   2 +-
+ arch/arm64/kvm/sys_regs.c            | 123 +++++++++++++++++------------------
+ arch/arm64/kvm/sys_regs.h            |   8 +--
+ arch/arm64/kvm/sys_regs_generic_v8.c |   4 +-
+ 9 files changed, 107 insertions(+), 89 deletions(-)
