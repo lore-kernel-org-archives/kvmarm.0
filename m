@@ -1,116 +1,95 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 1/5] arm64: KVM: Correctly handle zero register during MMIO
-Date: Fri,  4 Dec 2015 17:17:16 +0000
-Message-ID: <1449249440-28878-2-git-send-email-marc.zyngier@arm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [GIT PULL] KVM/ARM fixes for 4.4-rc4
+Date: Fri, 4 Dec 2015 18:39:08 +0100
+Message-ID: <5661CFBC.3030601@redhat.com>
 References: <1449249440-28878-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C49A4985B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2015 12:37:46 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id MzSsOT71dwZK for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Dec 2015 12:37:44 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DACF049785
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2015 12:37:44 -0500 (EST)
 In-Reply-To: <1449249440-28878-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Pavel Fedin <p.fedin@samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Pavel Fedin <p.fedin@samsung.com>
 
-On ARM64 register index of 31 corresponds to both zero register and SP.
-However, all memory access instructions, use ZR as transfer register. SP
-is used only as a base register in indirect memory addressing, or by
-register-register arithmetics, which cannot be trapped here.
 
-Correct emulation is achieved by introducing new register accessor
-functions, which can do special handling for reg_num == 31. These new
-accessors intentionally do not rely on old vcpu_reg() on ARM64, because
-it is to be removed. Since the affected code is shared by both ARM
-flavours, implementations of these accessors are also added to ARM32 code.
+On 04/12/2015 18:17, Marc Zyngier wrote:
+> Hi Paolo,
+> 
+> This pull request contains a number of fixes for 4.4-rc4 (or -rc5 if
+> we already missed the boat).
+> 
+> The first part is a very nice catch from Pavel, who noticed that we
+> were not dealing very well (if at all) with the aliasing between two
+> registers.
+> 
+> The last patch from Ard is a fix for a fix that was merged in
+> -rc3. Hopefully we got it right this time.
+> 
+> Please pull!
+> 
+>        M.
+> 
+> The following changes since commit fbb4574ce9a37e15a9872860bf202f2be5bdf6c4:
+> 
+>   arm64: kvm: report original PAR_EL1 upon panic (2015-11-24 18:20:58 +0100)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-v4.4-rc4
+> 
+> for you to fetch changes up to 0de58f852875a0f0dcfb120bb8433e4e73c7803b:
+> 
+>   ARM/arm64: KVM: correct PTE uncachedness check (2015-12-04 16:30:17 +0000)
+> 
+> ----------------------------------------------------------------
+> KVM/ARM fixes for v4.4-rc4
+> 
+> - A series of fixes to deal with the aliasing between the sp and xzr register
+> - A fix for the cache flush fix that went in -rc3
+> 
+> ----------------------------------------------------------------
+> Ard Biesheuvel (1):
+>       ARM/arm64: KVM: correct PTE uncachedness check
+> 
+> Pavel Fedin (4):
+>       arm64: KVM: Correctly handle zero register during MMIO
+>       arm64: KVM: Remove const from struct sys_reg_params
+>       arm64: KVM: Correctly handle zero register in system register accesses
+>       arm64: KVM: Get rid of old vcpu_reg()
+> 
+>  arch/arm/include/asm/kvm_emulate.h   |  12 ++++
+>  arch/arm/kvm/mmio.c                  |   5 +-
+>  arch/arm/kvm/mmu.c                   |   4 +-
+>  arch/arm/kvm/psci.c                  |  20 +++---
+>  arch/arm64/include/asm/kvm_emulate.h |  18 +++--
+>  arch/arm64/kvm/handle_exit.c         |   2 +-
+>  arch/arm64/kvm/sys_regs.c            | 123 +++++++++++++++++------------------
+>  arch/arm64/kvm/sys_regs.h            |   8 +--
+>  arch/arm64/kvm/sys_regs_generic_v8.c |   4 +-
+>  9 files changed, 107 insertions(+), 89 deletions(-)
+> 
 
-This patch fixes setting MMIO register to a random value (actually SP)
-instead of zero by something like:
+Pulled, thanks.
 
- *((volatile int *)reg) = 0;
-
-compilers tend to generate "str wzr, [xx]" here
-
-[Marc: Fixed 32bit splat]
-
-Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm/include/asm/kvm_emulate.h   | 12 ++++++++++++
- arch/arm/kvm/mmio.c                  |  5 +++--
- arch/arm64/include/asm/kvm_emulate.h | 13 +++++++++++++
- 3 files changed, 28 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-index a9c80a2..3095df0 100644
---- a/arch/arm/include/asm/kvm_emulate.h
-+++ b/arch/arm/include/asm/kvm_emulate.h
-@@ -28,6 +28,18 @@
- unsigned long *vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num);
- unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu);
- 
-+static inline unsigned long vcpu_get_reg(struct kvm_vcpu *vcpu,
-+					 u8 reg_num)
-+{
-+	return *vcpu_reg(vcpu, reg_num);
-+}
-+
-+static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
-+				unsigned long val)
-+{
-+	*vcpu_reg(vcpu, reg_num) = val;
-+}
-+
- bool kvm_condition_valid(struct kvm_vcpu *vcpu);
- void kvm_skip_instr(struct kvm_vcpu *vcpu, bool is_wide_instr);
- void kvm_inject_undefined(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-index 974b1c6..3a10c9f 100644
---- a/arch/arm/kvm/mmio.c
-+++ b/arch/arm/kvm/mmio.c
-@@ -115,7 +115,7 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
- 			       data);
- 		data = vcpu_data_host_to_guest(vcpu, data, len);
--		*vcpu_reg(vcpu, vcpu->arch.mmio_decode.rt) = data;
-+		vcpu_set_reg(vcpu, vcpu->arch.mmio_decode.rt, data);
- 	}
- 
- 	return 0;
-@@ -186,7 +186,8 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	rt = vcpu->arch.mmio_decode.rt;
- 
- 	if (is_write) {
--		data = vcpu_data_guest_to_host(vcpu, *vcpu_reg(vcpu, rt), len);
-+		data = vcpu_data_guest_to_host(vcpu, vcpu_get_reg(vcpu, rt),
-+					       len);
- 
- 		trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, len, fault_ipa, data);
- 		mmio_write_buf(data_buf, len, data);
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 3ca894e..5a182af 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -109,6 +109,19 @@ static inline unsigned long *vcpu_reg(const struct kvm_vcpu *vcpu, u8 reg_num)
- 	return (unsigned long *)&vcpu_gp_regs(vcpu)->regs.regs[reg_num];
- }
- 
-+static inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
-+					 u8 reg_num)
-+{
-+	return (reg_num == 31) ? 0 : vcpu_gp_regs(vcpu)->regs.regs[reg_num];
-+}
-+
-+static inline void vcpu_set_reg(struct kvm_vcpu *vcpu, u8 reg_num,
-+				unsigned long val)
-+{
-+	if (reg_num != 31)
-+		vcpu_gp_regs(vcpu)->regs.regs[reg_num] = val;
-+}
-+
- /* Get vcpu SPSR for current mode */
- static inline unsigned long *vcpu_spsr(const struct kvm_vcpu *vcpu)
- {
--- 
-2.1.4
-
+Paolo
