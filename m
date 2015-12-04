@@ -1,252 +1,316 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 2/5] arm64: KVM: Remove const from struct sys_reg_params
-Date: Fri,  4 Dec 2015 17:17:17 +0000
-Message-ID: <1449249440-28878-3-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 3/5] arm64: KVM: Correctly handle zero register in system register accesses
+Date: Fri,  4 Dec 2015 17:17:18 +0000
+Message-ID: <1449249440-28878-4-git-send-email-marc.zyngier@arm.com>
 References: <1449249440-28878-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D8C0499BA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2015 12:15:58 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0RRXv0XXG8bS for <kvmarm@lists.cs.columbia.edu>;
- Fri,  4 Dec 2015 12:15:57 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DB5D49785
- for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2015 12:15:57 -0500 (EST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1449249440-28878-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Pavel Fedin <p.fedin@samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Pavel Fedin <p.fedin@samsung.com>
 
-Further rework is going to introduce a dedicated storage for transfer
-register value in struct sys_reg_params. Before doing this we have to
-remove 'const' modifiers from it in all accessor functions and their
-callers.
+System register accesses also use zero register for Rt == 31, and
+therefore using it will also result in getting SP value instead. This
+patch makes them also using new accessors, introduced by the previous
+patch. Since register value is no longer directly associated with storage
+inside vCPU context structure, we introduce a dedicated storage for it in
+struct sys_reg_params.
+
+This refactor also gets rid of "massive hack" in kvm_handle_cp_64().
 
 Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/sys_regs.c            | 36 ++++++++++++++++++------------------
- arch/arm64/kvm/sys_regs.h            |  4 ++--
+ arch/arm64/kvm/sys_regs.c            | 87 +++++++++++++++++-------------------
+ arch/arm64/kvm/sys_regs.h            |  4 +-
  arch/arm64/kvm/sys_regs_generic_v8.c |  2 +-
- 3 files changed, 21 insertions(+), 21 deletions(-)
+ 3 files changed, 45 insertions(+), 48 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 87a64e8..545a72a 100644
+index 545a72a..d2650e8 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -78,7 +78,7 @@ static u32 get_ccsidr(u32 csselr)
-  * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
-  */
- static bool access_dcsw(struct kvm_vcpu *vcpu,
--			const struct sys_reg_params *p,
-+			struct sys_reg_params *p,
- 			const struct sys_reg_desc *r)
- {
- 	if (!p->is_write)
-@@ -94,7 +94,7 @@ static bool access_dcsw(struct kvm_vcpu *vcpu,
-  * sys_regs and leave it in complete control of the caches.
-  */
- static bool access_vm_reg(struct kvm_vcpu *vcpu,
--			  const struct sys_reg_params *p,
-+			  struct sys_reg_params *p,
+@@ -97,18 +97,16 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
+ 			  struct sys_reg_params *p,
  			  const struct sys_reg_desc *r)
  {
- 	unsigned long val;
-@@ -122,7 +122,7 @@ static bool access_vm_reg(struct kvm_vcpu *vcpu,
-  * for both AArch64 and AArch32 accesses.
-  */
- static bool access_gic_sgi(struct kvm_vcpu *vcpu,
--			   const struct sys_reg_params *p,
-+			   struct sys_reg_params *p,
+-	unsigned long val;
+ 	bool was_enabled = vcpu_has_cache_enabled(vcpu);
+ 
+ 	BUG_ON(!p->is_write);
+ 
+-	val = *vcpu_reg(vcpu, p->Rt);
+ 	if (!p->is_aarch32) {
+-		vcpu_sys_reg(vcpu, r->reg) = val;
++		vcpu_sys_reg(vcpu, r->reg) = p->regval;
+ 	} else {
+ 		if (!p->is_32bit)
+-			vcpu_cp15_64_high(vcpu, r->reg) = val >> 32;
+-		vcpu_cp15_64_low(vcpu, r->reg) = val & 0xffffffffUL;
++			vcpu_cp15_64_high(vcpu, r->reg) = upper_32_bits(p->regval);
++		vcpu_cp15_64_low(vcpu, r->reg) = lower_32_bits(p->regval);
+ 	}
+ 
+ 	kvm_toggle_cache(vcpu, was_enabled);
+@@ -125,13 +123,10 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
+ 			   struct sys_reg_params *p,
  			   const struct sys_reg_desc *r)
  {
- 	u64 val;
-@@ -137,7 +137,7 @@ static bool access_gic_sgi(struct kvm_vcpu *vcpu,
- }
+-	u64 val;
+-
+ 	if (!p->is_write)
+ 		return read_from_write_only(vcpu, p);
  
- static bool trap_raz_wi(struct kvm_vcpu *vcpu,
--			const struct sys_reg_params *p,
-+			struct sys_reg_params *p,
- 			const struct sys_reg_desc *r)
- {
- 	if (p->is_write)
-@@ -147,7 +147,7 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
- }
+-	val = *vcpu_reg(vcpu, p->Rt);
+-	vgic_v3_dispatch_sgi(vcpu, val);
++	vgic_v3_dispatch_sgi(vcpu, p->regval);
  
- static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
--			   const struct sys_reg_params *p,
-+			   struct sys_reg_params *p,
- 			   const struct sys_reg_desc *r)
- {
+ 	return true;
+ }
+@@ -153,7 +148,7 @@ static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
  	if (p->is_write) {
-@@ -159,7 +159,7 @@ static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
+ 		return ignore_write(vcpu, p);
+ 	} else {
+-		*vcpu_reg(vcpu, p->Rt) = (1 << 3);
++		p->regval = (1 << 3);
+ 		return true;
+ 	}
  }
- 
- static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
--				   const struct sys_reg_params *p,
-+				   struct sys_reg_params *p,
- 				   const struct sys_reg_desc *r)
- {
- 	if (p->is_write) {
-@@ -200,7 +200,7 @@ static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
-  *   now use the debug registers.
-  */
- static bool trap_debug_regs(struct kvm_vcpu *vcpu,
--			    const struct sys_reg_params *p,
-+			    struct sys_reg_params *p,
+@@ -167,7 +162,7 @@ static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
+ 	} else {
+ 		u32 val;
+ 		asm volatile("mrs %0, dbgauthstatus_el1" : "=r" (val));
+-		*vcpu_reg(vcpu, p->Rt) = val;
++		p->regval = val;
+ 		return true;
+ 	}
+ }
+@@ -204,13 +199,13 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
  			    const struct sys_reg_desc *r)
  {
  	if (p->is_write) {
-@@ -225,7 +225,7 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
-  * hyp.S code switches between host and guest values in future.
-  */
- static inline void reg_to_dbg(struct kvm_vcpu *vcpu,
--			      const struct sys_reg_params *p,
-+			      struct sys_reg_params *p,
- 			      u64 *dbg_reg)
- {
- 	u64 val = *vcpu_reg(vcpu, p->Rt);
-@@ -240,7 +240,7 @@ static inline void reg_to_dbg(struct kvm_vcpu *vcpu,
- }
+-		vcpu_sys_reg(vcpu, r->reg) = *vcpu_reg(vcpu, p->Rt);
++		vcpu_sys_reg(vcpu, r->reg) = p->regval;
+ 		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
+ 	} else {
+-		*vcpu_reg(vcpu, p->Rt) = vcpu_sys_reg(vcpu, r->reg);
++		p->regval = vcpu_sys_reg(vcpu, r->reg);
+ 	}
  
- static inline void dbg_to_reg(struct kvm_vcpu *vcpu,
--			      const struct sys_reg_params *p,
-+			      struct sys_reg_params *p,
+-	trace_trap_reg(__func__, r->reg, p->is_write, *vcpu_reg(vcpu, p->Rt));
++	trace_trap_reg(__func__, r->reg, p->is_write, p->regval);
+ 
+ 	return true;
+ }
+@@ -228,7 +223,7 @@ static inline void reg_to_dbg(struct kvm_vcpu *vcpu,
+ 			      struct sys_reg_params *p,
  			      u64 *dbg_reg)
  {
- 	u64 val = *dbg_reg;
-@@ -252,7 +252,7 @@ static inline void dbg_to_reg(struct kvm_vcpu *vcpu,
+-	u64 val = *vcpu_reg(vcpu, p->Rt);
++	u64 val = p->regval;
+ 
+ 	if (p->is_32bit) {
+ 		val &= 0xffffffffUL;
+@@ -243,12 +238,9 @@ static inline void dbg_to_reg(struct kvm_vcpu *vcpu,
+ 			      struct sys_reg_params *p,
+ 			      u64 *dbg_reg)
+ {
+-	u64 val = *dbg_reg;
+-
++	p->regval = *dbg_reg;
+ 	if (p->is_32bit)
+-		val &= 0xffffffffUL;
+-
+-	*vcpu_reg(vcpu, p->Rt) = val;
++		p->regval &= 0xffffffffUL;
  }
  
  static inline bool trap_bvr(struct kvm_vcpu *vcpu,
--			    const struct sys_reg_params *p,
-+			    struct sys_reg_params *p,
- 			    const struct sys_reg_desc *rd)
- {
- 	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
-@@ -294,7 +294,7 @@ static inline void reset_bvr(struct kvm_vcpu *vcpu,
+@@ -697,10 +689,10 @@ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
+ 		u64 pfr = read_system_reg(SYS_ID_AA64PFR0_EL1);
+ 		u32 el3 = !!cpuid_feature_extract_field(pfr, ID_AA64PFR0_EL3_SHIFT);
+ 
+-		*vcpu_reg(vcpu, p->Rt) = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
+-					  (((dfr >> ID_AA64DFR0_BRPS_SHIFT) & 0xf) << 24) |
+-					  (((dfr >> ID_AA64DFR0_CTX_CMPS_SHIFT) & 0xf) << 20) |
+-					  (6 << 16) | (el3 << 14) | (el3 << 12));
++		p->regval = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
++			     (((dfr >> ID_AA64DFR0_BRPS_SHIFT) & 0xf) << 24) |
++			     (((dfr >> ID_AA64DFR0_CTX_CMPS_SHIFT) & 0xf) << 20)
++			     | (6 << 16) | (el3 << 14) | (el3 << 12));
+ 		return true;
+ 	}
  }
- 
- static inline bool trap_bcr(struct kvm_vcpu *vcpu,
--			    const struct sys_reg_params *p,
-+			    struct sys_reg_params *p,
- 			    const struct sys_reg_desc *rd)
- {
- 	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg];
-@@ -337,7 +337,7 @@ static inline void reset_bcr(struct kvm_vcpu *vcpu,
- }
- 
- static inline bool trap_wvr(struct kvm_vcpu *vcpu,
--			    const struct sys_reg_params *p,
-+			    struct sys_reg_params *p,
- 			    const struct sys_reg_desc *rd)
- {
- 	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg];
-@@ -380,7 +380,7 @@ static inline void reset_wvr(struct kvm_vcpu *vcpu,
- }
- 
- static inline bool trap_wcr(struct kvm_vcpu *vcpu,
--			    const struct sys_reg_params *p,
-+			    struct sys_reg_params *p,
- 			    const struct sys_reg_desc *rd)
- {
- 	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg];
-@@ -687,7 +687,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- };
- 
- static bool trap_dbgidr(struct kvm_vcpu *vcpu,
--			const struct sys_reg_params *p,
-+			struct sys_reg_params *p,
- 			const struct sys_reg_desc *r)
- {
- 	if (p->is_write) {
-@@ -706,7 +706,7 @@ static bool trap_dbgidr(struct kvm_vcpu *vcpu,
- }
- 
- static bool trap_debug32(struct kvm_vcpu *vcpu,
--			 const struct sys_reg_params *p,
-+			 struct sys_reg_params *p,
+@@ -710,10 +702,10 @@ static bool trap_debug32(struct kvm_vcpu *vcpu,
  			 const struct sys_reg_desc *r)
  {
  	if (p->is_write) {
-@@ -731,7 +731,7 @@ static bool trap_debug32(struct kvm_vcpu *vcpu,
-  */
+-		vcpu_cp14(vcpu, r->reg) = *vcpu_reg(vcpu, p->Rt);
++		vcpu_cp14(vcpu, r->reg) = p->regval;
+ 		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
+ 	} else {
+-		*vcpu_reg(vcpu, p->Rt) = vcpu_cp14(vcpu, r->reg);
++		p->regval = vcpu_cp14(vcpu, r->reg);
+ 	}
  
- static inline bool trap_xvr(struct kvm_vcpu *vcpu,
--			    const struct sys_reg_params *p,
-+			    struct sys_reg_params *p,
- 			    const struct sys_reg_desc *rd)
+ 	return true;
+@@ -740,12 +732,12 @@ static inline bool trap_xvr(struct kvm_vcpu *vcpu,
+ 		u64 val = *dbg_reg;
+ 
+ 		val &= 0xffffffffUL;
+-		val |= *vcpu_reg(vcpu, p->Rt) << 32;
++		val |= p->regval << 32;
+ 		*dbg_reg = val;
+ 
+ 		vcpu->arch.debug_flags |= KVM_ARM64_DEBUG_DIRTY;
+ 	} else {
+-		*vcpu_reg(vcpu, p->Rt) = *dbg_reg >> 32;
++		p->regval = *dbg_reg >> 32;
+ 	}
+ 
+ 	trace_trap_reg(__func__, rd->reg, p->is_write, *dbg_reg);
+@@ -1062,12 +1054,12 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
  {
- 	u64 *dbg_reg = &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
-@@ -991,7 +991,7 @@ int kvm_handle_cp14_load_store(struct kvm_vcpu *vcpu, struct kvm_run *run)
-  * Return 0 if the access has been handled, and -1 if not.
-  */
- static int emulate_cp(struct kvm_vcpu *vcpu,
--		      const struct sys_reg_params *params,
-+		      struct sys_reg_params *params,
- 		      const struct sys_reg_desc *table,
- 		      size_t num)
+ 	struct sys_reg_params params;
+ 	u32 hsr = kvm_vcpu_get_hsr(vcpu);
++	int Rt = (hsr >> 5) & 0xf;
+ 	int Rt2 = (hsr >> 10) & 0xf;
+ 
+ 	params.is_aarch32 = true;
+ 	params.is_32bit = false;
+ 	params.CRm = (hsr >> 1) & 0xf;
+-	params.Rt = (hsr >> 5) & 0xf;
+ 	params.is_write = ((hsr & 1) == 0);
+ 
+ 	params.Op0 = 0;
+@@ -1076,15 +1068,12 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+ 	params.CRn = 0;
+ 
+ 	/*
+-	 * Massive hack here. Store Rt2 in the top 32bits so we only
+-	 * have one register to deal with. As we use the same trap
++	 * Make a 64-bit value out of Rt and Rt2. As we use the same trap
+ 	 * backends between AArch32 and AArch64, we get away with it.
+ 	 */
+ 	if (params.is_write) {
+-		u64 val = *vcpu_reg(vcpu, params.Rt);
+-		val &= 0xffffffff;
+-		val |= *vcpu_reg(vcpu, Rt2) << 32;
+-		*vcpu_reg(vcpu, params.Rt) = val;
++		params.regval = vcpu_get_reg(vcpu, Rt) & 0xffffffff;
++		params.regval |= vcpu_get_reg(vcpu, Rt2) << 32;
+ 	}
+ 
+ 	if (!emulate_cp(vcpu, &params, target_specific, nr_specific))
+@@ -1095,11 +1084,10 @@ static int kvm_handle_cp_64(struct kvm_vcpu *vcpu,
+ 	unhandled_cp_access(vcpu, &params);
+ 
+ out:
+-	/* Do the opposite hack for the read side */
++	/* Split up the value between registers for the read side */
+ 	if (!params.is_write) {
+-		u64 val = *vcpu_reg(vcpu, params.Rt);
+-		val >>= 32;
+-		*vcpu_reg(vcpu, Rt2) = val;
++		vcpu_set_reg(vcpu, Rt, lower_32_bits(params.regval));
++		vcpu_set_reg(vcpu, Rt2, upper_32_bits(params.regval));
+ 	}
+ 
+ 	return 1;
+@@ -1118,21 +1106,24 @@ static int kvm_handle_cp_32(struct kvm_vcpu *vcpu,
  {
-@@ -1175,7 +1175,7 @@ int kvm_handle_cp14_32(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	struct sys_reg_params params;
+ 	u32 hsr = kvm_vcpu_get_hsr(vcpu);
++	int Rt  = (hsr >> 5) & 0xf;
+ 
+ 	params.is_aarch32 = true;
+ 	params.is_32bit = true;
+ 	params.CRm = (hsr >> 1) & 0xf;
+-	params.Rt  = (hsr >> 5) & 0xf;
++	params.regval = vcpu_get_reg(vcpu, Rt);
+ 	params.is_write = ((hsr & 1) == 0);
+ 	params.CRn = (hsr >> 10) & 0xf;
+ 	params.Op0 = 0;
+ 	params.Op1 = (hsr >> 14) & 0x7;
+ 	params.Op2 = (hsr >> 17) & 0x7;
+ 
+-	if (!emulate_cp(vcpu, &params, target_specific, nr_specific))
+-		return 1;
+-	if (!emulate_cp(vcpu, &params, global, nr_global))
++	if (!emulate_cp(vcpu, &params, target_specific, nr_specific) ||
++	    !emulate_cp(vcpu, &params, global, nr_global)) {
++		if (!params.is_write)
++			vcpu_set_reg(vcpu, Rt, params.regval);
+ 		return 1;
++	}
+ 
+ 	unhandled_cp_access(vcpu, &params);
+ 	return 1;
+@@ -1230,6 +1221,8 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ {
+ 	struct sys_reg_params params;
+ 	unsigned long esr = kvm_vcpu_get_hsr(vcpu);
++	int Rt = (esr >> 5) & 0x1f;
++	int ret;
+ 
+ 	trace_kvm_handle_sys_reg(esr);
+ 
+@@ -1240,10 +1233,14 @@ int kvm_handle_sys_reg(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	params.CRn = (esr >> 10) & 0xf;
+ 	params.CRm = (esr >> 1) & 0xf;
+ 	params.Op2 = (esr >> 17) & 0x7;
+-	params.Rt = (esr >> 5) & 0x1f;
++	params.regval = vcpu_get_reg(vcpu, Rt);
+ 	params.is_write = !(esr & 1);
+ 
+-	return emulate_sys_reg(vcpu, &params);
++	ret = emulate_sys_reg(vcpu, &params);
++
++	if (!params.is_write)
++		vcpu_set_reg(vcpu, Rt, params.regval);
++	return ret;
  }
  
- static int emulate_sys_reg(struct kvm_vcpu *vcpu,
--			   const struct sys_reg_params *params)
-+			   struct sys_reg_params *params)
- {
- 	size_t num;
- 	const struct sys_reg_desc *table, *r;
+ /******************************************************************************
 diff --git a/arch/arm64/kvm/sys_regs.h b/arch/arm64/kvm/sys_regs.h
-index eaa324e..953abfc 100644
+index 953abfc..dbbb01c 100644
 --- a/arch/arm64/kvm/sys_regs.h
 +++ b/arch/arm64/kvm/sys_regs.h
-@@ -44,7 +44,7 @@ struct sys_reg_desc {
- 
- 	/* Trapped access from guest, if non-NULL. */
- 	bool (*access)(struct kvm_vcpu *,
--		       const struct sys_reg_params *,
-+		       struct sys_reg_params *,
- 		       const struct sys_reg_desc *);
- 
- 	/* Initialization for vcpu. */
-@@ -77,7 +77,7 @@ static inline bool ignore_write(struct kvm_vcpu *vcpu,
+@@ -28,7 +28,7 @@ struct sys_reg_params {
+ 	u8	CRn;
+ 	u8	CRm;
+ 	u8	Op2;
+-	u8	Rt;
++	u64	regval;
+ 	bool	is_write;
+ 	bool	is_aarch32;
+ 	bool	is_32bit;	/* Only valid if is_aarch32 is true */
+@@ -79,7 +79,7 @@ static inline bool ignore_write(struct kvm_vcpu *vcpu,
+ static inline bool read_zero(struct kvm_vcpu *vcpu,
+ 			     struct sys_reg_params *p)
+ {
+-	*vcpu_reg(vcpu, p->Rt) = 0;
++	p->regval = 0;
+ 	return true;
  }
  
- static inline bool read_zero(struct kvm_vcpu *vcpu,
--			     const struct sys_reg_params *p)
-+			     struct sys_reg_params *p)
- {
- 	*vcpu_reg(vcpu, p->Rt) = 0;
- 	return true;
 diff --git a/arch/arm64/kvm/sys_regs_generic_v8.c b/arch/arm64/kvm/sys_regs_generic_v8.c
-index 1e45768..ccd3e35 100644
+index ccd3e35..ed90578 100644
 --- a/arch/arm64/kvm/sys_regs_generic_v8.c
 +++ b/arch/arm64/kvm/sys_regs_generic_v8.c
-@@ -31,7 +31,7 @@
- #include "sys_regs.h"
- 
- static bool access_actlr(struct kvm_vcpu *vcpu,
--			 const struct sys_reg_params *p,
-+			 struct sys_reg_params *p,
- 			 const struct sys_reg_desc *r)
- {
+@@ -37,7 +37,7 @@ static bool access_actlr(struct kvm_vcpu *vcpu,
  	if (p->is_write)
+ 		return ignore_write(vcpu, p);
+ 
+-	*vcpu_reg(vcpu, p->Rt) = vcpu_sys_reg(vcpu, ACTLR_EL1);
++	p->regval = vcpu_sys_reg(vcpu, ACTLR_EL1);
+ 	return true;
+ }
+ 
 -- 
 2.1.4
+
