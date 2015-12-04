@@ -1,46 +1,168 @@
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: Revert to old way of checking for device
- mapping in stage2_flush_ptes().
-Date: Fri, 4 Dec 2015 09:37:12 +0100
-Message-ID: <CAKv+Gu9TemWhgySjkb3-PAQNz=VZBW0E4Sn34H_K53r3zjGNfw@mail.gmail.com>
-References: <1448975032-7156-1-git-send-email-p.fedin@samsung.com>
-	<CAKv+Gu-WhtTZoPEmRSa8Ypcc9SZ-d6NABDSfZ6tTx14Tyt+AdQ@mail.gmail.com>
-	<1449194337.30642.69.camel@decadent.org.uk>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: [PATCH v2 4/4] KVM: arm64: Get rid of old vcpu_reg()
+Date: Fri, 04 Dec 2015 13:26:00 +0300
+Message-ID: <98601c9db3aac80d60e3cbbca1c567db359038f0.1449224339.git.p.fedin@samsung.com>
+References: <cover.1449224338.git.p.fedin@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1449194337.30642.69.camel@decadent.org.uk>
-Sender: kvm-owner@vger.kernel.org
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Pavel Fedin <p.fedin@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, KVM devel mailing list <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 38E61499FF
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2015 05:24:41 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id k1tPpgeNEBSP for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  4 Dec 2015 05:24:39 -0500 (EST)
+Received: from mailout3.w1.samsung.com (mailout3.w1.samsung.com
+ [210.118.77.13])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9F7A549995
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  4 Dec 2015 05:24:39 -0500 (EST)
+Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
+ by mailout3.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NYT00CUCWZQ4L80@mailout3.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Fri, 04 Dec 2015 10:26:14 +0000 (GMT)
+In-reply-to: <cover.1449224338.git.p.fedin@samsung.com>
+In-reply-to: <cover.1449224338.git.p.fedin@samsung.com>
+References: <cover.1449224338.git.p.fedin@samsung.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 4 December 2015 at 02:58, Ben Hutchings <ben@decadent.org.uk> wrote:
-> On Wed, 2015-12-02 at 18:41 +0100, Ard Biesheuvel wrote:
->> Hi Pavel,
->>
->> Thanks for getting to the bottom of this.
->>
->> On 1 December 2015 at 14:03, Pavel Fedin <p.fedin@samsung.com> wrote:
->> > This function takes stage-II physical addresses (A.K.A. IPA), on input, not
->> > real physical addresses. This causes kvm_is_device_pfn() to return wrong
->> > values, depending on how much guest and host memory maps match. This
->> > results in completely broken KVM on some boards. The problem has been
->> > caught on Samsung proprietary hardware.
->> >
->> > Cc: stable@vger.kernel.org
->> > Fixes: e6fab5442345 ("ARM/arm64: KVM: test properly for a PTE's uncachedness")
->> >
->>
->> That commit is not in a release yet, so no need for cc stable
-> [...]
->
-> But it is cc'd to stable, so unless it is going to be nacked at review
-> stage, any subsequent fixes should also be cc'd.
->
+Using oldstyle vcpu_reg() accessor is proven to be inappropriate and
+unsafe on ARM64. This patch converts the rest of use cases to new
+accessors and completely removes vcpu_reg() on ARM64.
 
-Ah yes, thanks for pointing that out.
+Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+---
+ arch/arm/kvm/psci.c                  | 20 ++++++++++----------
+ arch/arm64/include/asm/kvm_emulate.h | 11 +++--------
+ arch/arm64/kvm/handle_exit.c         |  2 +-
+ 3 files changed, 14 insertions(+), 19 deletions(-)
 
-But please, don't cc your proposed patches straight to
-stable@vger.kernel.org. I usually leave it up to the maintainer that
-merges the patch to add the Cc: line to the commit log.
+diff --git a/arch/arm/kvm/psci.c b/arch/arm/kvm/psci.c
+index 0b55696..a9b3b90 100644
+--- a/arch/arm/kvm/psci.c
++++ b/arch/arm/kvm/psci.c
+@@ -75,7 +75,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+ 	unsigned long context_id;
+ 	phys_addr_t target_pc;
+ 
+-	cpu_id = *vcpu_reg(source_vcpu, 1) & MPIDR_HWID_BITMASK;
++	cpu_id = vcpu_get_reg(source_vcpu, 1) & MPIDR_HWID_BITMASK;
+ 	if (vcpu_mode_is_32bit(source_vcpu))
+ 		cpu_id &= ~((u32) 0);
+ 
+@@ -94,8 +94,8 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+ 			return PSCI_RET_INVALID_PARAMS;
+ 	}
+ 
+-	target_pc = *vcpu_reg(source_vcpu, 2);
+-	context_id = *vcpu_reg(source_vcpu, 3);
++	target_pc = vcpu_get_reg(source_vcpu, 2);
++	context_id = vcpu_get_reg(source_vcpu, 3);
+ 
+ 	kvm_reset_vcpu(vcpu);
+ 
+@@ -114,7 +114,7 @@ static unsigned long kvm_psci_vcpu_on(struct kvm_vcpu *source_vcpu)
+ 	 * NOTE: We always update r0 (or x0) because for PSCI v0.1
+ 	 * the general puspose registers are undefined upon CPU_ON.
+ 	 */
+-	*vcpu_reg(vcpu, 0) = context_id;
++	vcpu_set_reg(vcpu, 0, context_id);
+ 	vcpu->arch.power_off = false;
+ 	smp_mb();		/* Make sure the above is visible */
+ 
+@@ -134,8 +134,8 @@ static unsigned long kvm_psci_vcpu_affinity_info(struct kvm_vcpu *vcpu)
+ 	struct kvm *kvm = vcpu->kvm;
+ 	struct kvm_vcpu *tmp;
+ 
+-	target_affinity = *vcpu_reg(vcpu, 1);
+-	lowest_affinity_level = *vcpu_reg(vcpu, 2);
++	target_affinity = vcpu_get_reg(vcpu, 1);
++	lowest_affinity_level = vcpu_get_reg(vcpu, 2);
+ 
+ 	/* Determine target affinity mask */
+ 	target_affinity_mask = psci_affinity_mask(lowest_affinity_level);
+@@ -209,7 +209,7 @@ int kvm_psci_version(struct kvm_vcpu *vcpu)
+ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+ {
+ 	int ret = 1;
+-	unsigned long psci_fn = *vcpu_reg(vcpu, 0) & ~((u32) 0);
++	unsigned long psci_fn = vcpu_get_reg(vcpu, 0) & ~((u32) 0);
+ 	unsigned long val;
+ 
+ 	switch (psci_fn) {
+@@ -273,13 +273,13 @@ static int kvm_psci_0_2_call(struct kvm_vcpu *vcpu)
+ 		break;
+ 	}
+ 
+-	*vcpu_reg(vcpu, 0) = val;
++	vcpu_set_reg(vcpu, 0, val);
+ 	return ret;
+ }
+ 
+ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+ {
+-	unsigned long psci_fn = *vcpu_reg(vcpu, 0) & ~((u32) 0);
++	unsigned long psci_fn = vcpu_get_reg(vcpu, 0) & ~((u32) 0);
+ 	unsigned long val;
+ 
+ 	switch (psci_fn) {
+@@ -295,7 +295,7 @@ static int kvm_psci_0_1_call(struct kvm_vcpu *vcpu)
+ 		break;
+ 	}
+ 
+-	*vcpu_reg(vcpu, 0) = val;
++	vcpu_set_reg(vcpu, 0, val);
+ 	return 1;
+ }
+ 
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 5a182af..25a4021 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -100,15 +100,10 @@ static inline void vcpu_set_thumb(struct kvm_vcpu *vcpu)
+ }
+ 
+ /*
+- * vcpu_reg should always be passed a register number coming from a
+- * read of ESR_EL2. Otherwise, it may give the wrong result on AArch32
+- * with banked registers.
++ * vcpu_get_reg and vcpu_set_reg should always be passed a register number
++ * coming from a read of ESR_EL2. Otherwise, it may give the wrong result on
++ * AArch32 with banked registers.
+  */
+-static inline unsigned long *vcpu_reg(const struct kvm_vcpu *vcpu, u8 reg_num)
+-{
+-	return (unsigned long *)&vcpu_gp_regs(vcpu)->regs.regs[reg_num];
+-}
+-
+ static inline unsigned long vcpu_get_reg(const struct kvm_vcpu *vcpu,
+ 					 u8 reg_num)
+ {
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index 68a0759..15f0477 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -37,7 +37,7 @@ static int handle_hvc(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ {
+ 	int ret;
+ 
+-	trace_kvm_hvc_arm64(*vcpu_pc(vcpu), *vcpu_reg(vcpu, 0),
++	trace_kvm_hvc_arm64(*vcpu_pc(vcpu), vcpu_get_reg(vcpu, 0),
+ 			    kvm_vcpu_hvc_get_imm(vcpu));
+ 
+ 	ret = kvm_psci_call(vcpu);
+-- 
+2.4.4
