@@ -1,31 +1,56 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH v2 0/4] KVM: arm64: BUG FIX: Correctly handle zero register
+Subject: [PATCH v4 0/4] KVM: arm64: BUG FIX: Correctly handle zero register
  transfers
-Date: Fri, 04 Dec 2015 14:58:10 +0300
-Message-ID: <00c301d12e8b$0c82b700$25882500$@samsung.com>
-References: <cover.1449224338.git.p.fedin@samsung.com>
- <566178C8.1070608@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Date: Fri, 04 Dec 2015 15:03:10 +0300
+Message-ID: <cover.1449230499.git.p.fedin@samsung.com>
 Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <566178C8.1070608@arm.com>
-Content-language: ru
 Sender: kvm-owner@vger.kernel.org
-To: 'Marc Zyngier' <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: 'Christoffer Dall' <christoffer.dall@linaro.org>
+To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello!
+ARM64 CPU has zero register which is read-only, with a value of 0.
+However, KVM currently incorrectly recognizes it being SP (because
+Rt == 31, and in struct user_pt_regs 'regs' array is followed by SP),
+resulting in invalid value being read, or even SP corruption on write.
 
-> Thanks a lot for respining this quickly. I just had a few minor
-> comments, so this is almost ready to go. If you can fix that
+The problem has been discovered by performing an operation
 
- Damn, the rest of reviews got stuck somewhere and arrived later, so i've just sent v3 without wrap fix. Will correct it.
+ *((volatile int *)reg) = 0;
 
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
+which compiles as "str xzr, [xx]", and resulted in strange values being
+written.
 
+v3 => v4:
+- Unwrapped assignment in patch 0003
+
+v2 => v3:
+- Brought back some const modifiers in unaffected functions
+
+v1 => v2:
+- Changed type of transfer value to u64 and store it directly in
+  struct sys_reg_params instead of a pointer
+- Use lower_32_bits()/upper_32_bits() where appropriate
+- Fixed wrong usage of 'Rt' instead of 'Rt2' in kvm_handle_cp_64(),
+  overlooked in v1
+- Do not write value back when reading
+
+Pavel Fedin (4):
+  KVM: arm64: Correctly handle zero register during MMIO
+  KVM: arm64: Remove const from struct sys_reg_params
+  KVM: arm64: Correctly handle zero register in system register accesses
+  KVM: arm64: Get rid of old vcpu_reg()
+
+ arch/arm/include/asm/kvm_emulate.h   |  12 ++++
+ arch/arm/kvm/mmio.c                  |   5 +-
+ arch/arm/kvm/psci.c                  |  20 +++---
+ arch/arm64/include/asm/kvm_emulate.h |  18 +++--
+ arch/arm64/kvm/handle_exit.c         |   2 +-
+ arch/arm64/kvm/sys_regs.c            | 123 +++++++++++++++++------------------
+ arch/arm64/kvm/sys_regs.h            |   8 +--
+ arch/arm64/kvm/sys_regs_generic_v8.c |   4 +-
+ 8 files changed, 105 insertions(+), 87 deletions(-)
+
+-- 
+2.4.4
 
