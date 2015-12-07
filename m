@@ -1,68 +1,55 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 10/22] arm64: KVM: Implement guest entry
-Date: Mon,  7 Dec 2015 10:53:26 +0000
-Message-ID: <1449485618-9443-11-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v3 09/22] arm64: KVM: Implement debug save/restore
+Date: Mon,  7 Dec 2015 10:53:25 +0000
+Message-ID: <1449485618-9443-10-git-send-email-marc.zyngier@arm.com>
 References: <1449485618-9443-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E17DD412A2
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 05:52:23 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Z+E2OhsQv3SZ for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Dec 2015 05:52:22 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 972AA48912
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 05:52:22 -0500 (EST)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1449485618-9443-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Steve Capper <Steve.Capper@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Contrary to the previous patch, the guest entry is fairly different
-from its assembly counterpart, mostly because it is only concerned
-with saving/restoring the GP registers, and nothing else.
+Implement the debug save restore as a direct translation of
+the assembly code version.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp/Makefile |   1 +
- arch/arm64/kvm/hyp/entry.S  | 131 ++++++++++++++++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/hyp.h    |   2 +
- 3 files changed, 134 insertions(+)
- create mode 100644 arch/arm64/kvm/hyp/entry.S
+ arch/arm64/kvm/hyp/Makefile   |   1 +
+ arch/arm64/kvm/hyp/debug-sr.c | 137 ++++++++++++++++++++++++++++++++++=
+++++++++
+ arch/arm64/kvm/hyp/hyp.h      |   9 +++
+ 3 files changed, 147 insertions(+)
+ create mode 100644 arch/arm64/kvm/hyp/debug-sr.c
 
 diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-index ec14cac..1e1ff06 100644
+index ec94200..ec14cac 100644
 --- a/arch/arm64/kvm/hyp/Makefile
 +++ b/arch/arm64/kvm/hyp/Makefile
-@@ -7,3 +7,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += vgic-v3-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
-+obj-$(CONFIG_KVM_ARM_HOST) += entry.o
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+@@ -6,3 +6,4 @@ obj-$(CONFIG_KVM_ARM_HOST) +=3D vgic-v2-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) +=3D vgic-v3-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) +=3D timer-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) +=3D sysreg-sr.o
++obj-$(CONFIG_KVM_ARM_HOST) +=3D debug-sr.o
+diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-s=
+r.c
 new file mode 100644
-index 0000000..47f3c69
+index 0000000..7848322
 --- /dev/null
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -0,0 +1,131 @@
++++ b/arch/arm64/kvm/hyp/debug-sr.c
+@@ -0,0 +1,137 @@
 +/*
 + * Copyright (C) 2015 - ARM Ltd
 + * Author: Marc Zyngier <marc.zyngier@arm.com>
 + *
-+ * This program is free software; you can redistribute it and/or modify
++ * This program is free software; you can redistribute it and/or modif=
+y
 + * it under the terms of the GNU General Public License version 2 as
 + * published by the Free Software Foundation.
 + *
@@ -72,134 +59,150 @@ index 0000000..47f3c69
 + * GNU General Public License for more details.
 + *
 + * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ * along with this program.  If not, see <http://www.gnu.org/licenses/=
+>.
 + */
 +
-+#include <linux/linkage.h>
++#include <linux/compiler.h>
++#include <linux/kvm_host.h>
 +
-+#include <asm/asm-offsets.h>
-+#include <asm/assembler.h>
-+#include <asm/fpsimdmacros.h>
-+#include <asm/kvm.h>
-+#include <asm/kvm_arm.h>
-+#include <asm/kvm_asm.h>
 +#include <asm/kvm_mmu.h>
 +
-+#define CPU_GP_REG_OFFSET(x)	(CPU_GP_REGS + x)
-+#define CPU_XREG_OFFSET(x)	CPU_GP_REG_OFFSET(CPU_USER_PT_REGS + 8*x)
++#include "hyp.h"
 +
-+	.text
-+	.pushsection	.hyp.text, "ax"
++#define read_debug(r,n)		read_sysreg(r##n##_el1)
++#define write_debug(v,r,n)	write_sysreg(v, r##n##_el1)
 +
-+.macro save_callee_saved_regs ctxt
-+	stp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
-+	stp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
-+	stp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
-+	stp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
-+	stp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
-+	stp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
-+.endm
++#define save_debug(ptr,reg,nr)						\
++	switch (nr) {							\
++	case 15:	ptr[15] =3D read_debug(reg, 15);			\
++	case 14:	ptr[14] =3D read_debug(reg, 14);			\
++	case 13:	ptr[13] =3D read_debug(reg, 13);			\
++	case 12:	ptr[12] =3D read_debug(reg, 12);			\
++	case 11:	ptr[11] =3D read_debug(reg, 11);			\
++	case 10:	ptr[10] =3D read_debug(reg, 10);			\
++	case 9:		ptr[9] =3D read_debug(reg, 9);			\
++	case 8:		ptr[8] =3D read_debug(reg, 8);			\
++	case 7:		ptr[7] =3D read_debug(reg, 7);			\
++	case 6:		ptr[6] =3D read_debug(reg, 6);			\
++	case 5:		ptr[5] =3D read_debug(reg, 5);			\
++	case 4:		ptr[4] =3D read_debug(reg, 4);			\
++	case 3:		ptr[3] =3D read_debug(reg, 3);			\
++	case 2:		ptr[2] =3D read_debug(reg, 2);			\
++	case 1:		ptr[1] =3D read_debug(reg, 1);			\
++	default:	ptr[0] =3D read_debug(reg, 0);			\
++	}
 +
-+.macro restore_callee_saved_regs ctxt
-+	ldp	x19, x20, [\ctxt, #CPU_XREG_OFFSET(19)]
-+	ldp	x21, x22, [\ctxt, #CPU_XREG_OFFSET(21)]
-+	ldp	x23, x24, [\ctxt, #CPU_XREG_OFFSET(23)]
-+	ldp	x25, x26, [\ctxt, #CPU_XREG_OFFSET(25)]
-+	ldp	x27, x28, [\ctxt, #CPU_XREG_OFFSET(27)]
-+	ldp	x29, lr,  [\ctxt, #CPU_XREG_OFFSET(29)]
-+.endm
++#define restore_debug(ptr,reg,nr)					\
++	switch (nr) {							\
++	case 15:	write_debug(ptr[15], reg, 15);			\
++	case 14:	write_debug(ptr[14], reg, 14);			\
++	case 13:	write_debug(ptr[13], reg, 13);			\
++	case 12:	write_debug(ptr[12], reg, 12);			\
++	case 11:	write_debug(ptr[11], reg, 11);			\
++	case 10:	write_debug(ptr[10], reg, 10);			\
++	case 9:		write_debug(ptr[9], reg, 9);			\
++	case 8:		write_debug(ptr[8], reg, 8);			\
++	case 7:		write_debug(ptr[7], reg, 7);			\
++	case 6:		write_debug(ptr[6], reg, 6);			\
++	case 5:		write_debug(ptr[5], reg, 5);			\
++	case 4:		write_debug(ptr[4], reg, 4);			\
++	case 3:		write_debug(ptr[3], reg, 3);			\
++	case 2:		write_debug(ptr[2], reg, 2);			\
++	case 1:		write_debug(ptr[1], reg, 1);			\
++	default:	write_debug(ptr[0], reg, 0);			\
++	}
 +
-+/*
-+ * u64 __guest_enter(struct kvm_vcpu *vcpu,
-+ *		     struct kvm_cpu_context *host_ctxt);
-+ */
-+ENTRY(__guest_enter)
-+	// x0: vcpu
-+	// x1: host/guest context
-+	// x2-x18: clobbered by macros
++void __hyp_text __debug_save_state(struct kvm_vcpu *vcpu,
++				   struct kvm_guest_debug_arch *dbg,
++				   struct kvm_cpu_context *ctxt)
++{
++	u64 aa64dfr0;
++	int brps, wrps;
 +
-+	// Store the host regs
-+	save_callee_saved_regs x1
++	if (!(vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY))
++		return;
 +
-+	// Preserve vcpu & host_ctxt for use at exit time
-+	stp	x0, x1, [sp, #-16]!
++	aa64dfr0 =3D read_sysreg(id_aa64dfr0_el1);
++	brps =3D (aa64dfr0 >> 12) & 0xf;
++	wrps =3D (aa64dfr0 >> 20) & 0xf;
 +
-+	add	x1, x0, #VCPU_CONTEXT
++	save_debug(dbg->dbg_bcr, dbgbcr, brps);
++	save_debug(dbg->dbg_bvr, dbgbvr, brps);
++	save_debug(dbg->dbg_wcr, dbgwcr, wrps);
++	save_debug(dbg->dbg_wvr, dbgwvr, wrps);
 +
-+	// Prepare x0-x1 for later restore by pushing them onto the stack
-+	ldp	x2, x3, [x1, #CPU_XREG_OFFSET(0)]
-+	stp	x2, x3, [sp, #-16]!
++	ctxt->sys_regs[MDCCINT_EL1] =3D read_sysreg(mdccint_el1);
++}
 +
-+	// x2-x18
-+	ldp	x2, x3,   [x1, #CPU_XREG_OFFSET(2)]
-+	ldp	x4, x5,   [x1, #CPU_XREG_OFFSET(4)]
-+	ldp	x6, x7,   [x1, #CPU_XREG_OFFSET(6)]
-+	ldp	x8, x9,   [x1, #CPU_XREG_OFFSET(8)]
-+	ldp	x10, x11, [x1, #CPU_XREG_OFFSET(10)]
-+	ldp	x12, x13, [x1, #CPU_XREG_OFFSET(12)]
-+	ldp	x14, x15, [x1, #CPU_XREG_OFFSET(14)]
-+	ldp	x16, x17, [x1, #CPU_XREG_OFFSET(16)]
-+	ldr	x18,      [x1, #CPU_XREG_OFFSET(18)]
++void __hyp_text __debug_restore_state(struct kvm_vcpu *vcpu,
++				      struct kvm_guest_debug_arch *dbg,
++				      struct kvm_cpu_context *ctxt)
++{
++	u64 aa64dfr0;
++	int brps, wrps;
 +
-+	// x19-x29, lr
-+	restore_callee_saved_regs x1
++	if (!(vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY))
++		return;
 +
-+	// Last bits of the 64bit state
-+	ldp	x0, x1, [sp], #16
++	aa64dfr0 =3D read_sysreg(id_aa64dfr0_el1);
 +
-+	// Do not touch any register after this!
-+	eret
-+ENDPROC(__guest_enter)
++	brps =3D (aa64dfr0 >> 12) & 0xf;
++	wrps =3D (aa64dfr0 >> 20) & 0xf;
 +
-+ENTRY(__guest_exit)
-+	// x0: vcpu
-+	// x1: return code
-+	// x2-x3: free
-+	// x4-x29,lr: vcpu regs
-+	// vcpu x0-x3 on the stack
++	restore_debug(dbg->dbg_bcr, dbgbcr, brps);
++	restore_debug(dbg->dbg_bvr, dbgbvr, brps);
++	restore_debug(dbg->dbg_wcr, dbgwcr, wrps);
++	restore_debug(dbg->dbg_wvr, dbgwvr, wrps);
 +
-+	add	x2, x0, #VCPU_CONTEXT
++	write_sysreg(ctxt->sys_regs[MDCCINT_EL1], mdccint_el1);
++}
 +
-+	// Compute base to save registers
-+	stp	x4, x5,   [x2, #CPU_XREG_OFFSET(4)]
-+	stp	x6, x7,   [x2, #CPU_XREG_OFFSET(6)]
-+	stp	x8, x9,   [x2, #CPU_XREG_OFFSET(8)]
-+	stp	x10, x11, [x2, #CPU_XREG_OFFSET(10)]
-+	stp	x12, x13, [x2, #CPU_XREG_OFFSET(12)]
-+	stp	x14, x15, [x2, #CPU_XREG_OFFSET(14)]
-+	stp	x16, x17, [x2, #CPU_XREG_OFFSET(16)]
-+	str	x18,      [x2, #CPU_XREG_OFFSET(18)]
++void __hyp_text __debug_cond_save_host_state(struct kvm_vcpu *vcpu)
++{
++	/* If any of KDE, MDE or KVM_ARM64_DEBUG_DIRTY is set, perform
++	 * a full save/restore cycle. */
++	if ((vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_KDE) ||
++	    (vcpu->arch.ctxt.sys_regs[MDSCR_EL1] & DBG_MDSCR_MDE))
++		vcpu->arch.debug_flags |=3D KVM_ARM64_DEBUG_DIRTY;
 +
-+	ldp	x6, x7, [sp], #16	// x2, x3
-+	ldp	x4, x5, [sp], #16	// x0, x1
++	__debug_save_state(vcpu, &vcpu->arch.host_debug_state,
++			   kern_hyp_va(vcpu->arch.host_cpu_context));
++}
 +
-+	stp	x4, x5, [x2, #CPU_XREG_OFFSET(0)]
-+	stp	x6, x7, [x2, #CPU_XREG_OFFSET(2)]
++void __hyp_text __debug_cond_restore_host_state(struct kvm_vcpu *vcpu)
++{
++	__debug_restore_state(vcpu, &vcpu->arch.host_debug_state,
++			      kern_hyp_va(vcpu->arch.host_cpu_context));
 +
-+	save_callee_saved_regs x2
++	if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
++		vcpu->arch.debug_flags &=3D ~KVM_ARM64_DEBUG_DIRTY;
++}
 +
-+	// Restore vcpu & host_ctxt from the stack
-+	// (preserving return code in x1)
-+	ldp	x0, x2, [sp], #16
-+	// Now restore the host regs
-+	restore_callee_saved_regs x2
-+
-+	mov	x0, x1
-+	ret
-+ENDPROC(__guest_exit)
-+
-+	/* Insert fault handling here */
++u32 __hyp_text __debug_read_mdcr_el2(void)
++{
++	return read_sysreg(mdcr_el2);
++}
 diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-index 454e46f..0809653 100644
+index bffd308..454e46f 100644
 --- a/arch/arm64/kvm/hyp/hyp.h
 +++ b/arch/arm64/kvm/hyp/hyp.h
-@@ -52,5 +52,7 @@ void __debug_restore_state(struct kvm_vcpu *vcpu,
- void __debug_cond_save_host_state(struct kvm_vcpu *vcpu);
- void __debug_cond_restore_host_state(struct kvm_vcpu *vcpu);
- 
-+u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
+@@ -43,5 +43,14 @@ void __sysreg_restore_state(struct kvm_cpu_context *=
+ctxt);
+ void __sysreg32_save_state(struct kvm_vcpu *vcpu);
+ void __sysreg32_restore_state(struct kvm_vcpu *vcpu);
+=20
++void __debug_save_state(struct kvm_vcpu *vcpu,
++			struct kvm_guest_debug_arch *dbg,
++			struct kvm_cpu_context *ctxt);
++void __debug_restore_state(struct kvm_vcpu *vcpu,
++			   struct kvm_guest_debug_arch *dbg,
++			   struct kvm_cpu_context *ctxt);
++void __debug_cond_save_host_state(struct kvm_vcpu *vcpu);
++void __debug_cond_restore_host_state(struct kvm_vcpu *vcpu);
 +
  #endif /* __ARM64_KVM_HYP_H__ */
- 
--- 
+=20
+--=20
 2.1.4
+
