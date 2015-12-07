@@ -1,148 +1,186 @@
 From: Pavel Fedin <p.fedin@samsung.com>
-Subject: [PATCH v7 3/6] KVM: arm/arm64: Refactor vGIC attributes handling code
-Date: Mon, 07 Dec 2015 15:29:33 +0300
-Message-ID: <528608aad19ff9ba73318e7a8c14df5d7cb04a89.1449491035.git.p.fedin@samsung.com>
+Subject: [PATCH v7 4/6] KVM: arm64: Implement vGICv3 distributor and
+ redistributor access from userspace
+Date: Mon, 07 Dec 2015 15:29:34 +0300
+Message-ID: <3704eb36ddb633e5910bf0a08c820bbb53890cee.1449491035.git.p.fedin@samsung.com>
 References: <cover.1449491035.git.p.fedin@samsung.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BD5C9496E4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 07:28:00 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id NuisE2+ol-kP for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Dec 2015 07:27:57 -0500 (EST)
+Received: from mailout4.w1.samsung.com (mailout4.w1.samsung.com
+ [210.118.77.14])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DAA5E419D1
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 07:27:57 -0500 (EST)
+Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
+ by mailout4.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NYZ0051YMPIBKB0@mailout4.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Mon, 07 Dec 2015 12:29:42 +0000 (GMT)
 In-reply-to: <cover.1449491035.git.p.fedin@samsung.com>
 In-reply-to: <cover.1449491035.git.p.fedin@samsung.com>
 References: <cover.1449491035.git.p.fedin@samsung.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Separate all implementation-independent code in vgic_attr_regs_access()
-and move it to vgic.c. This will allow to reuse this code for vGICv3
-implementation.
+The access is done similar to vGICv2, using
+KVM_DEV_ARM_VGIC_GRP_DIST_REGS and KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
+with KVM_SET_DEVICE_ATTR and KVM_GET_DEVICE_ATTR ioctls.
 
-vcpu lookup is left where it originally was, because vGICv3 API will
-expect affinity ID instead of vCPU index, therefore it will be done
-differently. Also, vcpu pointer has backpointer to kvm, so 'dev' was
-replaced with  'vcpu'.
+Access size for vGICv3 is 64 bits, vgic_attr_regs_access() fixed to
+support this. The trick with vgic_v3_get_reg_size() is necessary because
+the major part of GICv3 registers is actually 32-bit, and their accessors
+do not distinguish between lower and upper words (offset & 3). Accessing
+these registers with len == 8 would cause rollover. For write operations
+this would overwrite lower word with the upper one (which would normally
+be 0), for read operations this would cause duplication of the same word
+in both halves.
 
 Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
 ---
- virt/kvm/arm/vgic-v2-emul.c | 120 +++++++++++---------------------------------
- virt/kvm/arm/vgic.c         |  57 +++++++++++++++++++++
- virt/kvm/arm/vgic.h         |   3 ++
- 3 files changed, 88 insertions(+), 92 deletions(-)
+ arch/arm64/include/uapi/asm/kvm.h  |   1 +
+ include/linux/irqchip/arm-gic-v3.h |   1 +
+ virt/kvm/arm/vgic-v3-emul.c        | 112 ++++++++++++++++++++++++++++++++-----
+ virt/kvm/arm/vgic.c                |   4 +-
+ 4 files changed, 102 insertions(+), 16 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic-v2-emul.c b/virt/kvm/arm/vgic-v2-emul.c
-index 959b9c6..8e769c6 100644
---- a/virt/kvm/arm/vgic-v2-emul.c
-+++ b/virt/kvm/arm/vgic-v2-emul.c
-@@ -661,38 +661,24 @@ static const struct vgic_io_range vgic_cpu_ranges[] = {
- 	},
- };
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 2d4ca4b..98bd047 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -203,6 +203,7 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_GRP_NR_IRQS	3
+ #define KVM_DEV_ARM_VGIC_GRP_CTRL	4
+ #define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
++#define KVM_DEV_ARM_VGIC_GRP_REDIST_REGS 5
  
--static int vgic_attr_regs_access(struct kvm_device *dev,
--				 struct kvm_device_attr *attr,
--				 __le32 *data, bool is_write)
-+static int vgic_v2_attr_regs_access(struct kvm_device *dev,
-+				    struct kvm_device_attr *attr,
-+				    __le32 *data, bool is_write)
- {
--	const struct vgic_io_range *r = NULL, *ranges;
-+	const struct vgic_io_range *ranges;
- 	phys_addr_t offset;
--	int ret, cpuid, c;
--	struct kvm_vcpu *vcpu, *tmp_vcpu;
--	struct vgic_dist *vgic;
-+	struct kvm_vcpu *vcpu;
-+	int cpuid;
-+	struct vgic_dist *vgic = &dev->kvm->arch.vgic;
- 	struct kvm_exit_mmio mmio;
+ /* KVM_IRQ_LINE irq field index values */
+ #define KVM_ARM_IRQ_TYPE_SHIFT		24
+diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+index c9ae0c6..53fd894 100644
+--- a/include/linux/irqchip/arm-gic-v3.h
++++ b/include/linux/irqchip/arm-gic-v3.h
+@@ -43,6 +43,7 @@
+ #define GICD_IGRPMODR			0x0D00
+ #define GICD_NSACR			0x0E00
+ #define GICD_IROUTER			0x6000
++#define GICD_IROUTER1019		0x7FD8
+ #define GICD_IDREGS			0xFFD0
+ #define GICD_PIDR2			0xFFE8
  
- 	offset = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
- 	cpuid = (attr->attr & KVM_DEV_ARM_VGIC_CPUID_MASK) >>
- 		KVM_DEV_ARM_VGIC_CPUID_SHIFT;
+diff --git a/virt/kvm/arm/vgic-v3-emul.c b/virt/kvm/arm/vgic-v3-emul.c
+index e661e7f..d9d644c 100644
+--- a/virt/kvm/arm/vgic-v3-emul.c
++++ b/virt/kvm/arm/vgic-v3-emul.c
+@@ -39,6 +39,7 @@
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+ #include <linux/interrupt.h>
++#include <linux/uaccess.h>
  
--	mutex_lock(&dev->kvm->lock);
--
--	ret = vgic_init(dev->kvm);
--	if (ret)
--		goto out;
--
--	if (cpuid >= atomic_read(&dev->kvm->online_vcpus)) {
--		ret = -EINVAL;
--		goto out;
--	}
-+	if (cpuid >= atomic_read(&dev->kvm->online_vcpus))
-+		return -EINVAL;
- 
--	vcpu = kvm_get_vcpu(dev->kvm, cpuid);
--	vgic = &dev->kvm->arch.vgic;
--
--	mmio.len = 4;
--	mmio.is_write = is_write;
--	mmio.data = data;
- 	switch (attr->group) {
- 	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
- 		mmio.phys_addr = vgic->vgic_dist_base + offset;
-@@ -703,49 +689,16 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
- 		ranges = vgic_cpu_ranges;
- 		break;
- 	default:
--		BUG();
-+		return -ENXIO;
- 	}
--	r = vgic_find_range(ranges, 4, offset);
- 
--	if (unlikely(!r || !r->handle_mmio)) {
--		ret = -ENXIO;
--		goto out;
--	}
--
--
--	spin_lock(&vgic->lock);
--
--	/*
--	 * Ensure that no other VCPU is running by checking the vcpu->cpu
--	 * field.  If no other VPCUs are running we can safely access the VGIC
--	 * state, because even if another VPU is run after this point, that
--	 * VCPU will not touch the vgic state, because it will block on
--	 * getting the vgic->lock in kvm_vgic_sync_hwstate().
--	 */
--	kvm_for_each_vcpu(c, tmp_vcpu, dev->kvm) {
--		if (unlikely(tmp_vcpu->cpu != -1)) {
--			ret = -EBUSY;
--			goto out_vgic_unlock;
--		}
--	}
--
--	/*
--	 * Move all pending IRQs from the LRs on all VCPUs so the pending
--	 * state can be properly represented in the register state accessible
--	 * through this API.
--	 */
--	kvm_for_each_vcpu(c, tmp_vcpu, dev->kvm)
--		vgic_unqueue_irqs(tmp_vcpu);
-+	vcpu = kvm_get_vcpu(dev->kvm, cpuid);
- 
--	offset -= r->base;
--	r->handle_mmio(vcpu, &mmio, offset);
-+	mmio.len = 4;
-+	mmio.is_write = is_write;
-+	mmio.data = data;
- 
--	ret = 0;
--out_vgic_unlock:
--	spin_unlock(&vgic->lock);
--out:
--	mutex_unlock(&dev->kvm->lock);
--	return ret;
-+	return vgic_attr_regs_access(vcpu, ranges, &mmio, offset);
+ #include <linux/irqchip/arm-gic-v3.h>
+ #include <kvm/arm_vgic.h>
+@@ -990,6 +991,77 @@ void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg)
+ 		vgic_kick_vcpus(vcpu->kvm);
  }
  
- static int vgic_v2_create(struct kvm_device *dev, u32 type)
-@@ -761,55 +714,38 @@ static void vgic_v2_destroy(struct kvm_device *dev)
- static int vgic_v2_set_attr(struct kvm_device *dev,
++static u32 vgic_v3_get_reg_size(u32 group, u32 offset)
++{
++	switch (group) {
++	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
++		if (offset >= GICD_IROUTER && offset <= GICD_IROUTER1019)
++			return 8;
++		else
++			return 4;
++		break;
++
++	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
++		if ((offset == GICR_TYPER) ||
++		    (offset >= GICR_SETLPIR && offset <= GICR_INVALLR))
++			return 8;
++		else
++			return 4;
++		break;
++
++	default:
++		BUG();
++	}
++}
++
++static int vgic_v3_attr_regs_access(struct kvm_device *dev,
++				    struct kvm_device_attr *attr,
++				    u64 *reg, bool is_write)
++{
++	const struct vgic_io_range *ranges;
++	phys_addr_t offset;
++	struct kvm_vcpu *vcpu;
++	u64 cpuid;
++	struct vgic_dist *vgic = &dev->kvm->arch.vgic;
++	struct kvm_exit_mmio mmio;
++	__le64 data;
++	int ret;
++
++	offset = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
++	cpuid = attr->attr >> KVM_DEV_ARM_VGIC_CPUID_SHIFT;
++
++	/* Convert affinity ID from our packed to normal form */
++	cpuid = (cpuid & 0x00ffffff) | ((cpuid & 0xff000000) << 8);
++	vcpu = kvm_mpidr_to_vcpu(dev->kvm, cpuid);
++	if (!vcpu)
++		return -EINVAL;
++
++	switch (attr->group) {
++	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
++		mmio.phys_addr = vgic->vgic_dist_base + offset;
++		ranges = vgic_v3_dist_ranges;
++		break;
++	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
++		mmio.phys_addr = vgic->vgic_redist_base + offset;
++		ranges = vgic_redist_ranges;
++		break;
++	default:
++		return -ENXIO;
++	}
++
++	data = cpu_to_le64(*reg);
++
++	mmio.len = vgic_v3_get_reg_size(attr->group, offset);
++	mmio.is_write = is_write;
++	mmio.data = &data;
++	mmio.private = vcpu; /* Redistributor handlers expect this */
++
++	ret = vgic_attr_regs_access(vcpu, ranges, &mmio, offset);
++
++	*reg = le64_to_cpu(data);
++	return ret;
++}
++
+ static int vgic_v3_create(struct kvm_device *dev, u32 type)
+ {
+ 	return kvm_vgic_create(dev->kvm, type);
+@@ -1003,42 +1075,45 @@ static void vgic_v3_destroy(struct kvm_device *dev)
+ static int vgic_v3_set_attr(struct kvm_device *dev,
  			    struct kvm_device_attr *attr)
  {
-+	u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-+	u32 reg;
-+	__le32 data;
++	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
++	u64 reg;
  	int ret;
  
  	ret = vgic_set_common_attr(dev, attr);
@@ -151,32 +189,21 @@ index 959b9c6..8e769c6 100644
  
 -	switch (attr->group) {
 -	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
--	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
--		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
--		u32 reg;
--		__le32 data;
--
--		if (get_user(reg, uaddr))
--			return -EFAULT;
--
--		data = cpu_to_le32(reg);
--		return vgic_attr_regs_access(dev, attr, &data, true);
--	}
--
+-	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
+-		return -ENXIO;
 -	}
 +	if (get_user(reg, uaddr))
 +		return -EFAULT;
  
 -	return -ENXIO;
-+	data = cpu_to_le32(reg);
-+	return vgic_v2_attr_regs_access(dev, attr, &data, true);
++	return vgic_v3_attr_regs_access(dev, attr, &reg, true);
  }
  
- static int vgic_v2_get_attr(struct kvm_device *dev,
+ static int vgic_v3_get_attr(struct kvm_device *dev,
  			    struct kvm_device_attr *attr)
  {
-+	u32 __user *uaddr = (u32 __user *)(long)attr->addr;
-+	__le32 data = 0;
++	u64 __user *uaddr = (u64 __user *)(long)attr->addr;
++	u64 reg = 0;
  	int ret;
  
  	ret = vgic_get_common_attr(dev, attr);
@@ -185,108 +212,68 @@ index 959b9c6..8e769c6 100644
  
 -	switch (attr->group) {
 -	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
--	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS: {
--		u32 __user *uaddr = (u32 __user *)(long)attr->addr;
--		__le32 data = 0;
--
--		ret = vgic_attr_regs_access(dev, attr, &data, false);
--		if (ret)
--			return ret;
--		return put_user(le32_to_cpu(data), uaddr);
+-	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
+-		return -ENXIO;
 -	}
--
--	}
-+	ret = vgic_v2_attr_regs_access(dev, attr, &data, false);
++	ret = vgic_v3_attr_regs_access(dev, attr, &reg, false);
 +	if (ret)
 +		return ret;
  
 -	return -ENXIO;
-+	return put_user(le32_to_cpu(data), uaddr);
++	return put_user(reg, uaddr);
  }
  
- static int vgic_v2_has_attr(struct kvm_device *dev,
+ static int vgic_v3_has_attr(struct kvm_device *dev,
+ 			    struct kvm_device_attr *attr)
+ {
++	phys_addr_t offset;
++	struct sys_reg_params params;
++	u64 regid;
++
+ 	switch (attr->group) {
+ 	case KVM_DEV_ARM_VGIC_GRP_ADDR:
+ 		switch (attr->attr) {
+@@ -1051,8 +1126,17 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+ 		}
+ 		break;
+ 	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
+-	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
+-		return -ENXIO;
++		offset = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
++		return vgic_has_attr_regs(vgic_v3_dist_ranges, offset);
++	case KVM_DEV_ARM_VGIC_GRP_REDIST_REGS:
++		offset = attr->attr & KVM_DEV_ARM_VGIC_OFFSET_MASK;
++		return vgic_has_attr_regs(vgic_redist_ranges, offset);
++	case KVM_DEV_ARM_VGIC_GRP_CPU_SYSREGS:
++		regid = (attr->attr & KVM_DEV_ARM_VGIC_SYSREG_MASK) |
++			KVM_REG_SIZE_U64;
++		return find_reg_by_id(regid, &params, gic_v3_icc_reg_descs,
++				      ARRAY_SIZE(gic_v3_icc_reg_descs)) ?
++			0 : -ENXIO;
+ 	case KVM_DEV_ARM_VGIC_GRP_NR_IRQS:
+ 		return 0;
+ 	case KVM_DEV_ARM_VGIC_GRP_CTRL:
 diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 65461f8..b8148f2 100644
+index b8148f2..4047d0e 100644
 --- a/virt/kvm/arm/vgic.c
 +++ b/virt/kvm/arm/vgic.c
-@@ -2363,6 +2363,63 @@ int vgic_has_attr_regs(const struct vgic_io_range *ranges, phys_addr_t offset)
+@@ -2372,7 +2372,7 @@ int vgic_attr_regs_access(struct kvm_vcpu *vcpu,
+ 	struct kvm_vcpu *tmp_vcpu;
+ 	struct vgic_dist *vgic;
+ 
+-	r = vgic_find_range(ranges, 4, offset);
++	r = vgic_find_range(ranges, mmio->len, offset);
+ 
+ 	if (unlikely(!r || !r->handle_mmio))
  		return -ENXIO;
- }
+@@ -2410,7 +2410,7 @@ int vgic_attr_regs_access(struct kvm_vcpu *vcpu,
+ 		vgic_unqueue_irqs(tmp_vcpu);
  
-+int vgic_attr_regs_access(struct kvm_vcpu *vcpu,
-+			  const struct vgic_io_range *ranges,
-+			  struct kvm_exit_mmio *mmio, phys_addr_t offset)
-+{
-+	const struct vgic_io_range *r;
-+	int ret, c;
-+	struct kvm_vcpu *tmp_vcpu;
-+	struct vgic_dist *vgic;
-+
-+	r = vgic_find_range(ranges, 4, offset);
-+
-+	if (unlikely(!r || !r->handle_mmio))
-+		return -ENXIO;
-+
-+	mutex_lock(&vcpu->kvm->lock);
-+
-+	ret = vgic_init(vcpu->kvm);
-+	if (ret)
-+		goto out;
-+
-+	vgic = &vcpu->kvm->arch.vgic;
-+
-+	spin_lock(&vgic->lock);
-+
-+	/*
-+	 * Ensure that no other VCPU is running by checking the vcpu->cpu
-+	 * field.  If no other VPCUs are running we can safely access the VGIC
-+	 * state, because even if another VPU is run after this point, that
-+	 * VCPU will not touch the vgic state, because it will block on
-+	 * getting the vgic->lock in kvm_vgic_sync_hwstate().
-+	 */
-+	kvm_for_each_vcpu(c, tmp_vcpu, vcpu->kvm) {
-+		if (unlikely(tmp_vcpu->cpu != -1)) {
-+			ret = -EBUSY;
-+			goto out_vgic_unlock;
-+		}
-+	}
-+
-+	/*
-+	 * Move all pending IRQs from the LRs on all VCPUs so the pending
-+	 * state can be properly represented in the register state accessible
-+	 * through this API.
-+	 */
-+	kvm_for_each_vcpu(c, tmp_vcpu, vcpu->kvm)
-+		vgic_unqueue_irqs(tmp_vcpu);
-+
-+	offset -= r->base;
-+	r->handle_mmio(vcpu, mmio, offset);
-+
-+	ret = 0;
-+out_vgic_unlock:
-+	spin_unlock(&vgic->lock);
-+out:
-+	mutex_unlock(&vcpu->kvm->lock);
-+	return ret;
-+}
-+
- static void vgic_init_maintenance_interrupt(void *info)
- {
- 	enable_percpu_irq(vgic->maint_irq, 0);
-diff --git a/virt/kvm/arm/vgic.h b/virt/kvm/arm/vgic.h
-index 0df74cb..fca89b7 100644
---- a/virt/kvm/arm/vgic.h
-+++ b/virt/kvm/arm/vgic.h
-@@ -132,6 +132,9 @@ void vgic_kick_vcpus(struct kvm *kvm);
- int vgic_has_attr_regs(const struct vgic_io_range *ranges, phys_addr_t offset);
- int vgic_set_common_attr(struct kvm_device *dev, struct kvm_device_attr *attr);
- int vgic_get_common_attr(struct kvm_device *dev, struct kvm_device_attr *attr);
-+int vgic_attr_regs_access(struct kvm_vcpu *vcpu,
-+			  const struct vgic_io_range *ranges,
-+			  struct kvm_exit_mmio *mmio, phys_addr_t offset);
+ 	offset -= r->base;
+-	r->handle_mmio(vcpu, mmio, offset);
++	call_range_handler(vcpu, mmio, offset, r);
  
- int vgic_init(struct kvm *kvm);
- void vgic_v2_init_emulation(struct kvm *kvm);
+ 	ret = 0;
+ out_vgic_unlock:
 -- 
 2.4.4
-
