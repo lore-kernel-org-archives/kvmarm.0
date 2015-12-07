@@ -1,98 +1,147 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 16/22] arm64: KVM: Add panic handling
-Date: Mon,  7 Dec 2015 10:53:32 +0000
-Message-ID: <1449485618-9443-17-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v3 14/22] arm64: KVM: Implement TLB handling
+Date: Mon,  7 Dec 2015 10:53:30 +0000
+Message-ID: <1449485618-9443-15-git-send-email-marc.zyngier@arm.com>
 References: <1449485618-9443-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 15B3E49723
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 05:52:31 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3TUy1HzBxDfa for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Dec 2015 05:52:30 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E950412F3
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 05:52:30 -0500 (EST)
 In-Reply-To: <1449485618-9443-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Steve Capper <Steve.Capper@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add the panic handler, together with the small bits of assembly
-code to call the kernel's panic implementation.
+Implement the TLB handling as a direct translation of the assembly
+code version.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp/hyp-entry.S | 11 ++++++++++-
- arch/arm64/kvm/hyp/hyp.h       |  1 +
- arch/arm64/kvm/hyp/switch.c    | 30 ++++++++++++++++++++++++++++++
- 3 files changed, 41 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/Makefile |  1 +
+ arch/arm64/kvm/hyp/entry.S  |  1 +
+ arch/arm64/kvm/hyp/tlb.c    | 73 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 75 insertions(+)
+ create mode 100644 arch/arm64/kvm/hyp/tlb.c
 
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 818731a..8e58a3b 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -155,7 +155,16 @@ el1_irq:
- 	mov	x1, #ARM_EXCEPTION_IRQ
- 	b	__guest_exit
+diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+index 56238d0..1a529f5 100644
+--- a/arch/arm64/kvm/hyp/Makefile
++++ b/arch/arm64/kvm/hyp/Makefile
+@@ -10,3 +10,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += entry.o
+ obj-$(CONFIG_KVM_ARM_HOST) += switch.o
+ obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
++obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index 852ac12..cae59e5 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -148,6 +148,7 @@ ENTRY(__fpsimd_guest_restore)
+ 	add	x0, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
+ 	bl	__fpsimd_restore_state
  
--.macro invalid_vector	label, target = __kvm_hyp_panic
-+ENTRY(__hyp_do_panic)
-+	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
-+		      PSR_MODE_EL1h)
-+	msr	spsr_el2, lr
-+	ldr	lr, =panic
-+	msr	elr_el2, lr
-+	eret
-+ENDPROC(__hyp_do_panic)
++	// Skip restoring fpexc32 for AArch64 guests
+ 	mrs	x1, hcr_el2
+ 	tbnz	x1, #HCR_RW_SHIFT, 1f
+ 	ldr	x4, [x2, #CPU_SYSREG_OFFSET(FPEXC32_EL2)]
+diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+new file mode 100644
+index 0000000..6fcb93a
+--- /dev/null
++++ b/arch/arm64/kvm/hyp/tlb.c
+@@ -0,0 +1,73 @@
++/*
++ * Copyright (C) 2015 - ARM Ltd
++ * Author: Marc Zyngier <marc.zyngier@arm.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+.macro invalid_vector	label, target = __hyp_panic
- 	.align	2
- \label:
- 	b \target
-diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-index 70d4f69..fb27517 100644
---- a/arch/arm64/kvm/hyp/hyp.h
-+++ b/arch/arm64/kvm/hyp/hyp.h
-@@ -84,6 +84,7 @@ static inline bool __fpsimd_enabled(void)
- }
- 
- u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
-+void __noreturn __hyp_do_panic(unsigned long, ...);
- 
- #endif /* __ARM64_KVM_HYP_H__ */
- 
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 608155f..b012870 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -141,3 +141,33 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
- 
- 	return exit_code;
- }
++#include "hyp.h"
 +
-+static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
-+
-+void __hyp_text __noreturn __hyp_panic(void)
++void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
 +{
-+	unsigned long str_va = (unsigned long)__hyp_panic_string;
-+	u64 spsr = read_sysreg(spsr_el2);
-+	u64 elr = read_sysreg(elr_el2);
-+	u64 par = read_sysreg(par_el1);
++	dsb(ishst);
 +
-+	if (read_sysreg(vttbr_el2)) {
-+		struct kvm_vcpu *vcpu;
-+		struct kvm_cpu_context *host_ctxt;
++	/* Switch to requested VMID */
++	kvm = kern_hyp_va(kvm);
++	write_sysreg(kvm->arch.vttbr, vttbr_el2);
++	isb();
 +
-+		vcpu = (struct kvm_vcpu *)read_sysreg(tpidr_el2);
-+		host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+		__deactivate_traps(vcpu);
-+		__deactivate_vm(vcpu);
-+		__sysreg_restore_state(host_ctxt);
-+	}
++	/*
++	 * We could do so much better if we had the VA as well.
++	 * Instead, we invalidate Stage-2 for this IPA, and the
++	 * whole of Stage-1. Weep...
++	 */
++	ipa >>= 12;
++	asm volatile("tlbi ipas2e1is, %0" : : "r" (ipa));
 +
-+	/* Call panic for real */
-+	__hyp_do_panic(hyp_kern_va(str_va),
-+		       spsr,  elr,
-+		       read_sysreg(esr_el2),   read_sysreg(far_el2),
-+		       read_sysreg(hpfar_el2), par,
-+		       (void *)read_sysreg(tpidr_el2));
++	/*
++	 * We have to ensure completion of the invalidation at Stage-2,
++	 * since a table walk on another CPU could refill a TLB with a
++	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
++	 * the Stage-1 invalidation happened first.
++	 */
++	dsb(ish);
++	asm volatile("tlbi vmalle1is" : : );
++	dsb(ish);
++	isb();
 +
-+	unreachable();
++	write_sysreg(0, vttbr_el2);
++}
++
++void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
++{
++	dsb(ishst);
++
++	/* Switch to requested VMID */
++	kvm = kern_hyp_va(kvm);
++	write_sysreg(kvm->arch.vttbr, vttbr_el2);
++	isb();
++
++	asm volatile("tlbi vmalls12e1is" : : );
++	dsb(ish);
++	isb();
++
++	write_sysreg(0, vttbr_el2);
++}
++
++void __hyp_text __tlb_flush_vm_context(void)
++{
++	dsb(ishst);
++	asm volatile("tlbi alle1is	\n"
++		     "ic ialluis	  ": : );
++	dsb(ish);
 +}
 -- 
 2.1.4
-
