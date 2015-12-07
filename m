@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 12/22] arm64: KVM: Implement the core world switch
-Date: Mon,  7 Dec 2015 10:53:28 +0000
-Message-ID: <1449485618-9443-13-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v3 15/22] arm64: KVM: HYP mode entry points
+Date: Mon,  7 Dec 2015 10:53:31 +0000
+Message-ID: <1449485618-9443-16-git-send-email-marc.zyngier@arm.com>
 References: <1449485618-9443-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 739F849794
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 05:52:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0711A412ED
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 05:52:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8m4xRGkSF9Ye for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Dec 2015 05:52:27 -0500 (EST)
+ with ESMTP id uJPe0vo-VpnO for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Dec 2015 05:52:32 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 51F58496E4
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 05:52:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E2BD8412D6
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 05:52:31 -0500 (EST)
 In-Reply-To: <1449485618-9443-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,34 +31,32 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Implement the core of the world switch in C. Not everything is there
-yet, and there is nothing to re-enter the world switch either.
-
-But this already outlines the code structure well enough.
+Add the entry points for HYP mode (both for hypercalls and
+exception handling).
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp/Makefile |   1 +
- arch/arm64/kvm/hyp/switch.c | 135 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 136 insertions(+)
- create mode 100644 arch/arm64/kvm/hyp/switch.c
+ arch/arm64/kvm/hyp/Makefile    |   1 +
+ arch/arm64/kvm/hyp/hyp-entry.S | 203 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 204 insertions(+)
+ create mode 100644 arch/arm64/kvm/hyp/hyp-entry.S
 
 diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-index 1e1ff06..9c11b0f 100644
+index 1a529f5..826032b 100644
 --- a/arch/arm64/kvm/hyp/Makefile
 +++ b/arch/arm64/kvm/hyp/Makefile
-@@ -8,3 +8,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += entry.o
-+obj-$(CONFIG_KVM_ARM_HOST) += switch.o
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+@@ -11,3 +11,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += entry.o
+ obj-$(CONFIG_KVM_ARM_HOST) += switch.o
+ obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
+ obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
++obj-$(CONFIG_KVM_ARM_HOST) += hyp-entry.o
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
 new file mode 100644
-index 0000000..79f59c9
+index 0000000..818731a
 --- /dev/null
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -0,0 +1,135 @@
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -0,0 +1,203 @@
 +/*
 + * Copyright (C) 2015 - ARM Ltd
 + * Author: Marc Zyngier <marc.zyngier@arm.com>
@@ -76,123 +74,191 @@ index 0000000..79f59c9
 + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#include "hyp.h"
++#include <linux/linkage.h>
 +
-+static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
-+{
-+	u64 val;
++#include <asm/alternative.h>
++#include <asm/assembler.h>
++#include <asm/asm-offsets.h>
++#include <asm/cpufeature.h>
++#include <asm/kvm_arm.h>
++#include <asm/kvm_asm.h>
++#include <asm/kvm_mmu.h>
 +
-+	/*
-+	 * We are about to set CPTR_EL2.TFP to trap all floating point
-+	 * register accesses to EL2, however, the ARM ARM clearly states that
-+	 * traps are only taken to EL2 if the operation would not otherwise
-+	 * trap to EL1.  Therefore, always make sure that for 32-bit guests,
-+	 * we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
-+	 */
-+	val = vcpu->arch.hcr_el2;
-+	if (!(val & HCR_RW)) {
-+		write_sysreg(1 << 30, fpexc32_el2);
-+		isb();
-+	}
-+	write_sysreg(val, hcr_el2);
-+	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
-+	write_sysreg(1 << 15, hstr_el2);
-+	write_sysreg(CPTR_EL2_TTA | CPTR_EL2_TFP, cptr_el2);
-+	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
-+}
++	.text
++	.pushsection	.hyp.text, "ax"
 +
-+static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
-+{
-+	write_sysreg(HCR_RW, hcr_el2);
-+	write_sysreg(0, hstr_el2);
-+	write_sysreg(read_sysreg(mdcr_el2) & MDCR_EL2_HPMN_MASK, mdcr_el2);
-+	write_sysreg(0, cptr_el2);
-+}
++.macro	save_x0_to_x3
++	stp	x0, x1, [sp, #-16]!
++	stp	x2, x3, [sp, #-16]!
++.endm
 +
-+static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-+	write_sysreg(kvm->arch.vttbr, vttbr_el2);
-+}
++.macro	restore_x0_to_x3
++	ldp	x2, x3, [sp], #16
++	ldp	x0, x1, [sp], #16
++.endm
 +
-+static void __hyp_text __deactivate_vm(struct kvm_vcpu *vcpu)
-+{
-+	write_sysreg(0, vttbr_el2);
-+}
++el1_sync:				// Guest trapped into EL2
++	save_x0_to_x3
 +
-+static hyp_alternate_select(__vgic_call_save_state,
-+			    __vgic_v2_save_state, __vgic_v3_save_state,
-+			    ARM64_HAS_SYSREG_GIC_CPUIF);
++	mrs	x1, esr_el2
++	lsr	x2, x1, #ESR_ELx_EC_SHIFT
 +
-+static hyp_alternate_select(__vgic_call_restore_state,
-+			    __vgic_v2_restore_state, __vgic_v3_restore_state,
-+			    ARM64_HAS_SYSREG_GIC_CPUIF);
++	cmp	x2, #ESR_ELx_EC_HVC64
++	b.ne	el1_trap
 +
-+static void __hyp_text __vgic_save_state(struct kvm_vcpu *vcpu)
-+{
-+	__vgic_call_save_state()(vcpu);
-+	write_sysreg(read_sysreg(hcr_el2) & ~HCR_INT_OVERRIDE, hcr_el2);
-+}
++	mrs	x3, vttbr_el2		// If vttbr is valid, the 64bit guest
++	cbnz	x3, el1_trap		// called HVC
 +
-+static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
-+{
-+	u64 val;
++	/* Here, we're pretty sure the host called HVC. */
++	restore_x0_to_x3
 +
-+	val = read_sysreg(hcr_el2);
-+	val |= 	HCR_INT_OVERRIDE;
-+	val |= vcpu->arch.irq_lines;
-+	write_sysreg(val, hcr_el2);
++	/* Check for __hyp_get_vectors */
++	cbnz	x0, 1f
++	mrs	x0, vbar_el2
++	b	2f
 +
-+	__vgic_call_restore_state()(vcpu);
-+}
-+
-+int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_cpu_context *host_ctxt;
-+	struct kvm_cpu_context *guest_ctxt;
-+	u64 exit_code;
-+
-+	vcpu = kern_hyp_va(vcpu);
-+	write_sysreg(vcpu, tpidr_el2);
-+
-+	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+	guest_ctxt = &vcpu->arch.ctxt;
-+
-+	__sysreg_save_state(host_ctxt);
-+	__debug_cond_save_host_state(vcpu);
-+
-+	__activate_traps(vcpu);
-+	__activate_vm(vcpu);
-+
-+	__vgic_restore_state(vcpu);
-+	__timer_restore_state(vcpu);
++1:	stp	lr, xzr, [sp, #-16]!
 +
 +	/*
-+	 * We must restore the 32-bit state before the sysregs, thanks
-+	 * to Cortex-A57 erratum #852523.
++	 * Compute the function address in EL2, and shuffle the parameters.
 +	 */
-+	__sysreg32_restore_state(vcpu);
-+	__sysreg_restore_state(guest_ctxt);
-+	__debug_restore_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
++	kern_hyp_va	x0
++	mov	lr, x0
++	mov	x0, x1
++	mov	x1, x2
++	mov	x2, x3
++	blr	lr
 +
-+	/* Jump in the fire! */
-+	exit_code = __guest_enter(vcpu, host_ctxt);
-+	/* And we're baaack! */
++	ldp	lr, xzr, [sp], #16
++2:	eret
 +
-+	__sysreg_save_state(guest_ctxt);
-+	__sysreg32_save_state(vcpu);
-+	__timer_save_state(vcpu);
-+	__vgic_save_state(vcpu);
++el1_trap:
++	/*
++	 * x1: ESR
++	 * x2: ESR_EC
++	 */
 +
-+	__deactivate_traps(vcpu);
-+	__deactivate_vm(vcpu);
++	/* Guest accessed VFP/SIMD registers, save host, restore Guest */
++	cmp	x2, #ESR_ELx_EC_FP_ASIMD
++	b.eq	__fpsimd_guest_restore
 +
-+	__sysreg_restore_state(host_ctxt);
++	cmp	x2, #ESR_ELx_EC_DABT_LOW
++	mov	x0, #ESR_ELx_EC_IABT_LOW
++	ccmp	x2, x0, #4, ne
++	b.ne	1f		// Not an abort we care about
 +
-+	__debug_save_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
-+	__debug_cond_restore_host_state(vcpu);
++	/* This is an abort. Check for permission fault */
++alternative_if_not ARM64_WORKAROUND_834220
++	and	x2, x1, #ESR_ELx_FSC_TYPE
++	cmp	x2, #FSC_PERM
++	b.ne	1f		// Not a permission fault
++alternative_else
++	nop			// Use the permission fault path to
++	nop			// check for a valid S1 translation,
++	nop			// regardless of the ESR value.
++alternative_endif
 +
-+	return exit_code;
-+}
++	/*
++	 * Check for Stage-1 page table walk, which is guaranteed
++	 * to give a valid HPFAR_EL2.
++	 */
++	tbnz	x1, #7, 1f	// S1PTW is set
++
++	/* Preserve PAR_EL1 */
++	mrs	x3, par_el1
++	stp	x3, xzr, [sp, #-16]!
++
++	/*
++	 * Permission fault, HPFAR_EL2 is invalid.
++	 * Resolve the IPA the hard way using the guest VA.
++	 * Stage-1 translation already validated the memory access rights.
++	 * As such, we can use the EL1 translation regime, and don't have
++	 * to distinguish between EL0 and EL1 access.
++	 */
++	mrs	x2, far_el2
++	at	s1e1r, x2
++	isb
++
++	/* Read result */
++	mrs	x3, par_el1
++	ldp	x0, xzr, [sp], #16	// Restore PAR_EL1 from the stack
++	msr	par_el1, x0
++	tbnz	x3, #0, 3f		// Bail out if we failed the translation
++	ubfx	x3, x3, #12, #36	// Extract IPA
++	lsl	x3, x3, #4		// and present it like HPFAR
++	b	2f
++
++1:	mrs	x3, hpfar_el2
++	mrs	x2, far_el2
++
++2:	mrs	x0, tpidr_el2
++	str	w1, [x0, #VCPU_ESR_EL2]
++	str	x2, [x0, #VCPU_FAR_EL2]
++	str	x3, [x0, #VCPU_HPFAR_EL2]
++
++	mov	x1, #ARM_EXCEPTION_TRAP
++	b	__guest_exit
++
++	/*
++	 * Translation failed. Just return to the guest and
++	 * let it fault again. Another CPU is probably playing
++	 * behind our back.
++	 */
++3:	restore_x0_to_x3
++
++	eret
++
++el1_irq:
++	save_x0_to_x3
++	mrs	x0, tpidr_el2
++	mov	x1, #ARM_EXCEPTION_IRQ
++	b	__guest_exit
++
++.macro invalid_vector	label, target = __kvm_hyp_panic
++	.align	2
++\label:
++	b \target
++ENDPROC(\label)
++.endm
++
++	/* None of these should ever happen */
++	invalid_vector	el2t_sync_invalid
++	invalid_vector	el2t_irq_invalid
++	invalid_vector	el2t_fiq_invalid
++	invalid_vector	el2t_error_invalid
++	invalid_vector	el2h_sync_invalid
++	invalid_vector	el2h_irq_invalid
++	invalid_vector	el2h_fiq_invalid
++	invalid_vector	el2h_error_invalid
++	invalid_vector	el1_sync_invalid
++	invalid_vector	el1_irq_invalid
++	invalid_vector	el1_fiq_invalid
++	invalid_vector	el1_error_invalid
++
++	.ltorg
++
++	.align 11
++
++ENTRY(__hyp_vector)
++	ventry	el2t_sync_invalid		// Synchronous EL2t
++	ventry	el2t_irq_invalid		// IRQ EL2t
++	ventry	el2t_fiq_invalid		// FIQ EL2t
++	ventry	el2t_error_invalid		// Error EL2t
++
++	ventry	el2h_sync_invalid		// Synchronous EL2h
++	ventry	el2h_irq_invalid		// IRQ EL2h
++	ventry	el2h_fiq_invalid		// FIQ EL2h
++	ventry	el2h_error_invalid		// Error EL2h
++
++	ventry	el1_sync			// Synchronous 64-bit EL1
++	ventry	el1_irq				// IRQ 64-bit EL1
++	ventry	el1_fiq_invalid			// FIQ 64-bit EL1
++	ventry	el1_error_invalid		// Error 64-bit EL1
++
++	ventry	el1_sync			// Synchronous 32-bit EL1
++	ventry	el1_irq				// IRQ 32-bit EL1
++	ventry	el1_fiq_invalid			// FIQ 32-bit EL1
++	ventry	el1_error_invalid		// Error 32-bit EL1
++ENDPROC(__hyp_vector)
 -- 
 2.1.4
