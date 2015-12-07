@@ -1,135 +1,147 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v5 00/21] KVM: ARM64: Add guest PMU support
-Date: Mon, 07 Dec 2015 14:11:11 +0000
-Message-ID: <5665937F.90507@arm.com>
-References: <1449123091-20252-1-git-send-email-zhaoshenglong@huawei.com>
+From: Shannon Zhao <shannon.zhao@linaro.org>
+Subject: Re: [PATCH v5 03/21] KVM: ARM64: Add offset defines for PMU registers
+Date: Mon, 07 Dec 2015 22:31:43 +0800
+Message-ID: <5665984F.30102@linaro.org>
+References: <1449123091-20252-1-git-send-email-zhaoshenglong@huawei.com> <1449123091-20252-4-git-send-email-zhaoshenglong@huawei.com> <56659276.6060403@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D0284113E
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 09:09:29 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XdYZ-MMHZBmo for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Dec 2015 09:09:28 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6537C40FA6
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 09:09:28 -0500 (EST)
-In-Reply-To: <1449123091-20252-1-git-send-email-zhaoshenglong@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
-Cc: kvm@vger.kernel.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <56659276.6060403@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Shannon,
 
-On 03/12/15 06:11, Shannon Zhao wrote:
-> From: Shannon Zhao <shannon.zhao@linaro.org>
-> 
-> This patchset adds guest PMU support for KVM on ARM64. It takes
-> trap-and-emulate approach. When guest wants to monitor one event, it
-> will be trapped by KVM and KVM will call perf_event API to create a perf
-> event and call relevant perf_event APIs to get the count value of event.
-> 
-> Use perf to test this patchset in guest. When using "perf list", it
-> shows the list of the hardware events and hardware cache events perf
-> supports. Then use "perf stat -e EVENT" to monitor some event. For
-> example, use "perf stat -e cycles" to count cpu cycles and
-> "perf stat -e cache-misses" to count cache misses.
-> 
-> Below are the outputs of "perf stat -r 5 sleep 5" when running in host
-> and guest.
-> 
-> Host:
->  Performance counter stats for 'sleep 5' (5 runs):
-> 
->           0.510276      task-clock (msec)         #    0.000 CPUs utilized            ( +-  1.57% )
->                  1      context-switches          #    0.002 M/sec
->                  0      cpu-migrations            #    0.000 K/sec
->                 49      page-faults               #    0.096 M/sec                    ( +-  0.77% )
->            1064117      cycles                    #    2.085 GHz                      ( +-  1.56% )
->    <not supported>      stalled-cycles-frontend
->    <not supported>      stalled-cycles-backend
->             529051      instructions              #    0.50  insns per cycle          ( +-  0.55% )
->    <not supported>      branches
->               9894      branch-misses             #   19.390 M/sec                    ( +-  1.70% )
-> 
->        5.000853900 seconds time elapsed                                          ( +-  0.00% )
-> 
-> Guest:
->  Performance counter stats for 'sleep 5' (5 runs):
-> 
->           0.642456      task-clock (msec)         #    0.000 CPUs utilized            ( +-  1.81% )
->                  1      context-switches          #    0.002 M/sec
->                  0      cpu-migrations            #    0.000 K/sec
->                 49      page-faults               #    0.076 M/sec                    ( +-  1.64% )
->            1322717      cycles                    #    2.059 GHz                      ( +-  1.88% )
->    <not supported>      stalled-cycles-frontend
->    <not supported>      stalled-cycles-backend
->             640944      instructions              #    0.48  insns per cycle          ( +-  1.10% )
->    <not supported>      branches
->              10665      branch-misses             #   16.600 M/sec                    ( +-  2.23% )
-> 
->        5.001181452 seconds time elapsed                                          ( +-  0.00% )
-> 
-> Have a cycle counter read test like below in guest and host:
-> 
-> static void test(void)
-> {
-> 	unsigned long count, count1, count2;
-> 	count1 = read_cycles();
-> 	count++;
-> 	count2 = read_cycles();
-> }
-> 
-> Host:
-> count1: 3046186213
-> count2: 3046186347
-> delta: 134
-> 
-> Guest:
-> count1: 5645797121
-> count2: 5645797270
-> delta: 149
-> 
-> The gap between guest and host is very small. One reason for this I
-> think is that it doesn't count the cycles in EL2 and host since we add
-> exclude_hv = 1. So the cycles spent to store/restore registers which
-> happens at EL2 are not included.
-> 
-> This patchset can be fetched from [1] and the relevant QEMU version for
-> test can be fetched from [2].
-> 
-> The results of 'perf test' can be found from [3][4].
-> The results of perf_event_tests test suite can be found from [5][6].
-> 
-> Also, I have tested "perf top" in two VMs and host at the same time. It
-> works well.
 
-I've commented on more issues I've found. Hopefully you'll be able to
-respin this quickly enough, and end-up with a simpler code base (state
-duplication is a bit messy).
+On 2015/12/7 22:06, Marc Zyngier wrote:
+> On 03/12/15 06:11, Shannon Zhao wrote:
+>> From: Shannon Zhao <shannon.zhao@linaro.org>
+>>
+>> We are about to trap and emulate acccesses to each PMU register
+>
+> s/acccesses/accesses/
+>
+>> individually. This adds the context offsets for the AArch64 PMU
+>> registers and their AArch32 counterparts.
+>>
+>> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+>> ---
+>>   arch/arm64/include/asm/kvm_asm.h | 55 ++++++++++++++++++++++++++++++++++++----
+>>   1 file changed, 50 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+>> index 5e37710..4f804c1 100644
+>> --- a/arch/arm64/include/asm/kvm_asm.h
+>> +++ b/arch/arm64/include/asm/kvm_asm.h
+>> @@ -48,12 +48,34 @@
+>>   #define MDSCR_EL1	22	/* Monitor Debug System Control Register */
+>>   #define MDCCINT_EL1	23	/* Monitor Debug Comms Channel Interrupt Enable Reg */
+>>
+>
+> Coming back to this patch, it gives a clear view of where you have state
+> duplication.
+>
+>> +/* Performance Monitors Registers */
+>> +#define PMCR_EL0	24	/* Control Register */
+>> +#define PMOVSSET_EL0	25	/* Overflow Flag Status Set Register */
+>> +#define PMOVSCLR_EL0	26	/* Overflow Flag Status Clear Register */
+>
+> This should only be a single state. You don't even have to represent it
+> in the sysreg array, to be honest.
+>
+Yeah, I could store the state in one of them and drop one of them here.
 
-Another thing I have noticed is that you have dropped the vgic changes
-that were configuring the interrupt. It feels like they should be
-included, and configure the PPI as a LEVEL interrupt. Also, looking at
-your QEMU code, you seem to configure the interrupt as EDGE, which is
-now how yor emulated HW behaves.
+>> +#define PMSELR_EL0	27	/* Event Counter Selection Register */
+>> +#define PMCEID0_EL0	28	/* Common Event Identification Register 0 */
+>> +#define PMCEID1_EL0	29	/* Common Event Identification Register 1 */
+>> +#define PMEVCNTR0_EL0	30	/* Event Counter Register (0-30) */
+>> +#define PMEVCNTR30_EL0	60
+>> +#define PMCCNTR_EL0	61	/* Cycle Counter Register */
+>> +#define PMEVTYPER0_EL0	62	/* Event Type Register (0-30) */
+>> +#define PMEVTYPER30_EL0	92
+>> +#define PMCCFILTR_EL0	93	/* Cycle Count Filter Register */
+>> +#define PMXEVCNTR_EL0	94	/* Selected Event Count Register */
+>> +#define PMXEVTYPER_EL0	95	/* Selected Event Type Register */
+>
+> These "select" registers aren't real ones, but just a way to pick the
+> real register. They should be removed.
+>
+I think these two could be retained, since it's convenient to handle the 
+guest accessing by using "case PMXEVCNTR_EL0"
 
-Looking forward to reviewing the next version.
+>> +#define PMCNTENSET_EL0	96	/* Count Enable Set Register */
+>> +#define PMCNTENCLR_EL0	97	/* Count Enable Clear Register */
+>> +#define PMINTENSET_EL1	98	/* Interrupt Enable Set Register */
+>> +#define PMINTENCLR_EL1	99	/* Interrupt Enable Clear Register */
+>
+> Same for these. They are just convenient accessors for the HW register.
+>
+>> +#define PMUSERENR_EL0	100	/* User Enable Register */
+>> +#define PMSWINC_EL0	101	/* Software Increment Register */
+>> +
+>>   /* 32bit specific registers. Keep them at the end of the range */
+>> -#define	DACR32_EL2	24	/* Domain Access Control Register */
+>> -#define	IFSR32_EL2	25	/* Instruction Fault Status Register */
+>> -#define	FPEXC32_EL2	26	/* Floating-Point Exception Control Register */
+>> -#define	DBGVCR32_EL2	27	/* Debug Vector Catch Register */
+>> -#define	NR_SYS_REGS	28
+>> +#define	DACR32_EL2	102	/* Domain Access Control Register */
+>> +#define	IFSR32_EL2	103	/* Instruction Fault Status Register */
+>> +#define	FPEXC32_EL2	104	/* Floating-Point Exception Control Register */
+>> +#define	DBGVCR32_EL2	105	/* Debug Vector Catch Register */
+>> +#define	NR_SYS_REGS	106
+>>
+>>   /* 32bit mapping */
+>>   #define c0_MPIDR	(MPIDR_EL1 * 2)	/* MultiProcessor ID Register */
+>> @@ -75,6 +97,24 @@
+>>   #define c6_IFAR		(c6_DFAR + 1)	/* Instruction Fault Address Register */
+>>   #define c7_PAR		(PAR_EL1 * 2)	/* Physical Address Register */
+>>   #define c7_PAR_high	(c7_PAR + 1)	/* PAR top 32 bits */
+>> +
+>> +/* Performance Monitors*/
+>> +#define c9_PMCR		(PMCR_EL0 * 2)
+>> +#define c9_PMOVSSET	(PMOVSSET_EL0 * 2)
+>> +#define c9_PMOVSCLR	(PMOVSCLR_EL0 * 2)
+>> +#define c9_PMCCNTR	(PMCCNTR_EL0 * 2)
+>> +#define c9_PMSELR	(PMSELR_EL0 * 2)
+>> +#define c9_PMCEID0	(PMCEID0_EL0 * 2)
+>> +#define c9_PMCEID1	(PMCEID1_EL0 * 2)
+>> +#define c9_PMXEVCNTR	(PMXEVCNTR_EL0 * 2)
+>> +#define c9_PMXEVTYPER	(PMXEVTYPER_EL0 * 2)
+>> +#define c9_PMCNTENSET	(PMCNTENSET_EL0 * 2)
+>> +#define c9_PMCNTENCLR	(PMCNTENCLR_EL0 * 2)
+>> +#define c9_PMINTENSET	(PMINTENSET_EL1 * 2)
+>> +#define c9_PMINTENCLR	(PMINTENCLR_EL1 * 2)
+>> +#define c9_PMUSERENR	(PMUSERENR_EL0 * 2)
+>> +#define c9_PMSWINC	(PMSWINC_EL0 * 2)
+>> +
+>>   #define c10_PRRR	(MAIR_EL1 * 2)	/* Primary Region Remap Register */
+>>   #define c10_NMRR	(c10_PRRR + 1)	/* Normal Memory Remap Register */
+>>   #define c12_VBAR	(VBAR_EL1 * 2)	/* Vector Base Address Register */
+>> @@ -86,6 +126,11 @@
+>>   #define c10_AMAIR1	(c10_AMAIR0 + 1)/* Aux Memory Attr Indirection Reg */
+>>   #define c14_CNTKCTL	(CNTKCTL_EL1 * 2) /* Timer Control Register (PL1) */
+>>
+>> +/* Performance Monitors*/
+>> +#define c14_PMEVCNTR0	(PMEVCNTR0_EL0 * 2)
+>> +#define c14_PMEVTYPER0	(PMEVTYPER0_EL0 * 2)
+>> +#define c14_PMCCFILTR	(PMCCFILTR_EL0 * 2)
+>> +
+>>   #define cp14_DBGDSCRext	(MDSCR_EL1 * 2)
+>>   #define cp14_DBGBCR0	(DBGBCR0_EL1 * 2)
+>>   #define cp14_DBGBVR0	(DBGBVR0_EL1 * 2)
+>>
+>
+> In my branch, I've moved all of this to kvm_host.h since that's where
+> all the sysregs have moved with the new world-switch. Don't bother doing
+> that in your next version, I'll take care of the merging issues.
+>
+> Thanks,
+>
+> 	M.
+>
 
-Thanks,
-
-	M.
 -- 
-Jazz is not dead. It just smells funny...
+Shannon
