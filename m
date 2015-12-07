@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 21/22] arm64: KVM: Cleanup asm-offset.c
-Date: Mon,  7 Dec 2015 10:53:37 +0000
-Message-ID: <1449485618-9443-22-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v3 22/22] arm64: KVM: Remove weak attributes
+Date: Mon,  7 Dec 2015 10:53:38 +0000
+Message-ID: <1449485618-9443-23-git-send-email-marc.zyngier@arm.com>
 References: <1449485618-9443-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C0C4411F6
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2EB13410D7
  for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 05:52:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id phZgRMYmtRRT for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Dec 2015 05:52:43 -0500 (EST)
+ with ESMTP id O9kRxlILVnYO for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Dec 2015 05:52:45 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A31C40FA6
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 05:52:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AD811496AC
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 05:52:45 -0500 (EST)
 In-Reply-To: <1449485618-9443-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,69 +31,142 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we've now rewritten most of our code-base in C, most of the
-KVM-specific code in asm-offset.c is useless. Delete-time again!
+As we've now switched to the new world switch implementation,
+remove the weak attributes, as nobody is supposed to override
+it anymore.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kernel/asm-offsets.c | 39 ---------------------------------------
- 1 file changed, 39 deletions(-)
+ arch/arm64/kvm/hyp/debug-sr.c   |  5 ++---
+ arch/arm64/kvm/hyp/hyp-entry.S  |  3 ---
+ arch/arm64/kvm/hyp/switch.c     |  5 ++---
+ arch/arm64/kvm/hyp/tlb.c        | 16 +++++++---------
+ arch/arm64/kvm/hyp/vgic-v3-sr.c |  5 ++---
+ 5 files changed, 13 insertions(+), 21 deletions(-)
 
-diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-index 4b72231..94090a6 100644
---- a/arch/arm64/kernel/asm-offsets.c
-+++ b/arch/arm64/kernel/asm-offsets.c
-@@ -108,50 +108,11 @@ int main(void)
-   DEFINE(CPU_GP_REGS,		offsetof(struct kvm_cpu_context, gp_regs));
-   DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_regs, regs));
-   DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
--  DEFINE(CPU_SP_EL1,		offsetof(struct kvm_regs, sp_el1));
--  DEFINE(CPU_ELR_EL1,		offsetof(struct kvm_regs, elr_el1));
--  DEFINE(CPU_SPSR,		offsetof(struct kvm_regs, spsr));
--  DEFINE(CPU_SYSREGS,		offsetof(struct kvm_cpu_context, sys_regs));
-   DEFINE(VCPU_FPEXC32_EL2,	offsetof(struct kvm_vcpu, arch.ctxt.sys_regs[FPEXC32_EL2]));
-   DEFINE(VCPU_ESR_EL2,		offsetof(struct kvm_vcpu, arch.fault.esr_el2));
-   DEFINE(VCPU_FAR_EL2,		offsetof(struct kvm_vcpu, arch.fault.far_el2));
-   DEFINE(VCPU_HPFAR_EL2,	offsetof(struct kvm_vcpu, arch.fault.hpfar_el2));
--  DEFINE(VCPU_DEBUG_FLAGS,	offsetof(struct kvm_vcpu, arch.debug_flags));
--  DEFINE(VCPU_DEBUG_PTR,	offsetof(struct kvm_vcpu, arch.debug_ptr));
--  DEFINE(DEBUG_BCR, 		offsetof(struct kvm_guest_debug_arch, dbg_bcr));
--  DEFINE(DEBUG_BVR, 		offsetof(struct kvm_guest_debug_arch, dbg_bvr));
--  DEFINE(DEBUG_WCR, 		offsetof(struct kvm_guest_debug_arch, dbg_wcr));
--  DEFINE(DEBUG_WVR, 		offsetof(struct kvm_guest_debug_arch, dbg_wvr));
--  DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
--  DEFINE(VCPU_MDCR_EL2,	offsetof(struct kvm_vcpu, arch.mdcr_el2));
--  DEFINE(VCPU_IRQ_LINES,	offsetof(struct kvm_vcpu, arch.irq_lines));
-   DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
--  DEFINE(VCPU_HOST_DEBUG_STATE, offsetof(struct kvm_vcpu, arch.host_debug_state));
--  DEFINE(VCPU_TIMER_CNTV_CTL,	offsetof(struct kvm_vcpu, arch.timer_cpu.cntv_ctl));
--  DEFINE(VCPU_TIMER_CNTV_CVAL,	offsetof(struct kvm_vcpu, arch.timer_cpu.cntv_cval));
--  DEFINE(KVM_TIMER_CNTVOFF,	offsetof(struct kvm, arch.timer.cntvoff));
--  DEFINE(KVM_TIMER_ENABLED,	offsetof(struct kvm, arch.timer.enabled));
--  DEFINE(VCPU_KVM,		offsetof(struct kvm_vcpu, kvm));
--  DEFINE(VCPU_VGIC_CPU,		offsetof(struct kvm_vcpu, arch.vgic_cpu));
--  DEFINE(VGIC_V2_CPU_HCR,	offsetof(struct vgic_cpu, vgic_v2.vgic_hcr));
--  DEFINE(VGIC_V2_CPU_VMCR,	offsetof(struct vgic_cpu, vgic_v2.vgic_vmcr));
--  DEFINE(VGIC_V2_CPU_MISR,	offsetof(struct vgic_cpu, vgic_v2.vgic_misr));
--  DEFINE(VGIC_V2_CPU_EISR,	offsetof(struct vgic_cpu, vgic_v2.vgic_eisr));
--  DEFINE(VGIC_V2_CPU_ELRSR,	offsetof(struct vgic_cpu, vgic_v2.vgic_elrsr));
--  DEFINE(VGIC_V2_CPU_APR,	offsetof(struct vgic_cpu, vgic_v2.vgic_apr));
--  DEFINE(VGIC_V2_CPU_LR,	offsetof(struct vgic_cpu, vgic_v2.vgic_lr));
--  DEFINE(VGIC_V3_CPU_SRE,	offsetof(struct vgic_cpu, vgic_v3.vgic_sre));
--  DEFINE(VGIC_V3_CPU_HCR,	offsetof(struct vgic_cpu, vgic_v3.vgic_hcr));
--  DEFINE(VGIC_V3_CPU_VMCR,	offsetof(struct vgic_cpu, vgic_v3.vgic_vmcr));
--  DEFINE(VGIC_V3_CPU_MISR,	offsetof(struct vgic_cpu, vgic_v3.vgic_misr));
--  DEFINE(VGIC_V3_CPU_EISR,	offsetof(struct vgic_cpu, vgic_v3.vgic_eisr));
--  DEFINE(VGIC_V3_CPU_ELRSR,	offsetof(struct vgic_cpu, vgic_v3.vgic_elrsr));
--  DEFINE(VGIC_V3_CPU_AP0R,	offsetof(struct vgic_cpu, vgic_v3.vgic_ap0r));
--  DEFINE(VGIC_V3_CPU_AP1R,	offsetof(struct vgic_cpu, vgic_v3.vgic_ap1r));
--  DEFINE(VGIC_V3_CPU_LR,	offsetof(struct vgic_cpu, vgic_v3.vgic_lr));
--  DEFINE(VGIC_CPU_NR_LR,	offsetof(struct vgic_cpu, nr_lr));
--  DEFINE(KVM_VTTBR,		offsetof(struct kvm, arch.vttbr));
--  DEFINE(KVM_VGIC_VCTRL,	offsetof(struct kvm, arch.vgic.vctrl_base));
- #endif
- #ifdef CONFIG_CPU_PM
-   DEFINE(CPU_SUSPEND_SZ,	sizeof(struct cpu_suspend_ctx));
+diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+index 567a0d6..c9c1e97 100644
+--- a/arch/arm64/kvm/hyp/debug-sr.c
++++ b/arch/arm64/kvm/hyp/debug-sr.c
+@@ -132,10 +132,9 @@ void __hyp_text __debug_cond_restore_host_state(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.debug_flags &= ~KVM_ARM64_DEBUG_DIRTY;
+ }
+ 
+-u32 __hyp_text __debug_read_mdcr_el2(void)
++static u32 __hyp_text __debug_read_mdcr_el2(void)
+ {
+ 	return read_sysreg(mdcr_el2);
+ }
+ 
+-__alias(__debug_read_mdcr_el2)
+-u32 __weak __kvm_get_mdcr_el2(void);
++__alias(__debug_read_mdcr_el2) u32 __kvm_get_mdcr_el2(void);
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index 10d6d2a..93e8d983 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -189,9 +189,7 @@ ENDPROC(\label)
+ 
+ 	.align 11
+ 
+-	.weak	__kvm_hyp_vector
+ ENTRY(__kvm_hyp_vector)
+-ENTRY(__hyp_vector)
+ 	ventry	el2t_sync_invalid		// Synchronous EL2t
+ 	ventry	el2t_irq_invalid		// IRQ EL2t
+ 	ventry	el2t_fiq_invalid		// FIQ EL2t
+@@ -211,5 +209,4 @@ ENTRY(__hyp_vector)
+ 	ventry	el1_irq				// IRQ 32-bit EL1
+ 	ventry	el1_fiq_invalid			// FIQ 32-bit EL1
+ 	ventry	el1_error_invalid		// Error 32-bit EL1
+-ENDPROC(__hyp_vector)
+ ENDPROC(__kvm_hyp_vector)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 7457ae4..ca8f5a5 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -85,7 +85,7 @@ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
+ 	__vgic_call_restore_state()(vcpu);
+ }
+ 
+-int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
++static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_cpu_context *guest_ctxt;
+@@ -142,8 +142,7 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ 	return exit_code;
+ }
+ 
+-__alias(__guest_run)
+-int __weak __kvm_vcpu_run(struct kvm_vcpu *vcpu);
++__alias(__guest_run) int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+ 
+ static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
+ 
+diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+index 5f815cf..2a7e0d8 100644
+--- a/arch/arm64/kvm/hyp/tlb.c
++++ b/arch/arm64/kvm/hyp/tlb.c
+@@ -17,7 +17,7 @@
+ 
+ #include "hyp.h"
+ 
+-void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
++static void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+ {
+ 	dsb(ishst);
+ 
+@@ -48,10 +48,10 @@ void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+ 	write_sysreg(0, vttbr_el2);
+ }
+ 
+-__alias(__tlb_flush_vmid_ipa)
+-void __weak __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
++__alias(__tlb_flush_vmid_ipa) void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm,
++							    phys_addr_t ipa);
+ 
+-void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
++static void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
+ {
+ 	dsb(ishst);
+ 
+@@ -67,10 +67,9 @@ void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
+ 	write_sysreg(0, vttbr_el2);
+ }
+ 
+-__alias(__tlb_flush_vmid)
+-void __weak __kvm_tlb_flush_vmid(struct kvm *kvm);
++__alias(__tlb_flush_vmid) void __kvm_tlb_flush_vmid(struct kvm *kvm);
+ 
+-void __hyp_text __tlb_flush_vm_context(void)
++static void __hyp_text __tlb_flush_vm_context(void)
+ {
+ 	dsb(ishst);
+ 	asm volatile("tlbi alle1is	\n"
+@@ -78,5 +77,4 @@ void __hyp_text __tlb_flush_vm_context(void)
+ 	dsb(ish);
+ }
+ 
+-__alias(__tlb_flush_vm_context)
+-void __weak __kvm_flush_vm_context(void);
++__alias(__tlb_flush_vm_context) void __kvm_flush_vm_context(void);
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index a769458..9142e082 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -220,10 +220,9 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
+-u64 __hyp_text __vgic_v3_read_ich_vtr_el2(void)
++static u64 __hyp_text __vgic_v3_read_ich_vtr_el2(void)
+ {
+ 	return read_gicreg(ICH_VTR_EL2);
+ }
+ 
+-__alias(__vgic_v3_read_ich_vtr_el2)
+-u64 __weak __vgic_v3_get_ich_vtr_el2(void);
++__alias(__vgic_v3_read_ich_vtr_el2) u64 __vgic_v3_get_ich_vtr_el2(void);
 -- 
 2.1.4
