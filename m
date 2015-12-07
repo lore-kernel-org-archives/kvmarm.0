@@ -1,43 +1,77 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 0/3] arm64: KVM: Support 16-bit VMID
-Date: Mon, 07 Dec 2015 09:27:42 +0000
-Message-ID: <5665510E.3050800@arm.com>
-References: <1447673298-25503-1-git-send-email-vladimir.murzin@arm.com>
- <56654FCA.2080201@arm.com>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH v4 0/4] KVM: arm64: BUG FIX: Correctly handle zero register
+ transfers
+Date: Mon, 07 Dec 2015 12:48:12 +0300
+Message-ID: <013501d130d4$635722f0$2a0568d0$@samsung.com>
+References: <cover.1449230499.git.p.fedin@samsung.com>
+ <20151205003334.GB3117@hawk.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C3C26419D1
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 04:25:58 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fuPQE7B98bKT for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Dec 2015 04:25:58 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B031412F3
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 04:25:57 -0500 (EST)
-In-Reply-To: <56654FCA.2080201@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vladimir Murzin <vladimir.murzin@arm.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <20151205003334.GB3117@hawk.localdomain>
+Content-language: ru
+Sender: kvm-owner@vger.kernel.org
+To: 'Andrew Jones' <drjones@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/12/15 09:22, Vladimir Murzin wrote:
-> Gentle ping...
+ Hello!
 
-Yup, on my list for 4.5. I haven't forgotten it, just a tiny bit busy...
+> FYI, I tried writing test cases for this issue with kvm-unit-tests. The
+> issue didn't reproduce for me. It's quite possible my test cases are
+> flawed
 
-Thanks,
+ Indeed they are, a very little thing fell through again... :)
+ It's not just SP, it's SP_EL0. And you never initialize it to anything because your code always runs in kernel mode, so it's just
+zero, so you get your zero.
+ But if you add a little thing in the beginning of your main():
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+asm volatile("msr sp_el0, %0" : : "r" (0xDEADC0DE0BADC0DE));
+
+ then you have it:
+--- cut ---
+[root@thunderx-2 kvm-unit-tests]# ./arm-run arm/xzr-test.flat -smp 2
+qemu-system-aarch64 -machine virt,accel=kvm:tcg,gic-version=host -cpu host -device virtio-serial-device -device
+virtconsole,chardev=ctd -chardev testdev,id=ctd -display none -serial stdio -kernel arm/xzr-test.flat -smp 2
+PASS: mmio: sanity check: read 0x55555555
+FAIL: mmio: 'str wzr' check: read 0x0badc0de
+vm_setup_vq: virtqueue 0 already setup! base=0xa003e00
+chr_testdev_init: chr-testdev: can't init virtqueues
+--- cut ---
+
+ Here i run only MMIO test, because i could not compile sysreg one, so i simply commented it out.
+
+ P.S. Could you also apply something like the following to arm/run:
+--- cut ---
+arm/run | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/arm/run b/arm/run
+index 662a856..3890c8c 100755
+--- a/arm/run
++++ b/arm/run
+@@ -33,7 +33,11 @@ if $qemu $M -chardev testdev,id=id -initrd . 2>&1 \
+ 	exit 2
+ fi
+ 
+-M='-machine virt,accel=kvm:tcg'
++if $qemu $M,? 2>&1 | grep gic-version > /dev/null; then
++	GIC='gic-version=host,'
++fi
++
++M="-machine virt,${GIC}accel=kvm:tcg"
+ chr_testdev='-device virtio-serial-device'
+ chr_testdev+=' -device virtconsole,chardev=ctd -chardev testdev,id=ctd'
+--- cut ---
+
+ Without it qemu does not work on GICv3-only hardware, like my board, because it defaults to gic-version=2. I don't post the patch
+on the mailing lists, because in order to be able to post this 5-liner i'll need to go through the formal approval procedure at my
+company, and i just don't want to bother for a single small fix. :) Will do as a "Reported-by:".
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
+
+
