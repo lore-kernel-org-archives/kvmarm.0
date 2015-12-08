@@ -1,23 +1,21 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v6 18/21] KVM: ARM64: Add PMU overflow interrupt routing
-Date: Tue, 8 Dec 2015 20:47:37 +0800
-Message-ID: <1449578860-15808-19-git-send-email-zhaoshenglong@huawei.com>
-References: <1449578860-15808-1-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v6 00/21] KVM: ARM64: Add guest PMU support
+Date: Tue, 8 Dec 2015 20:47:19 +0800
+Message-ID: <1449578860-15808-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1757B412A2
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2015 07:47:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 96E31412D6
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2015 07:46:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2JayzGx+6w+N for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Dec 2015 07:47:11 -0500 (EST)
+ with ESMTP id MNzgKPkR7eqg for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Dec 2015 07:46:50 -0500 (EST)
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 47C4849794
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2015 07:47:07 -0500 (EST)
-In-Reply-To: <1449578860-15808-1-git-send-email-zhaoshenglong@huawei.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E85C148529
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2015 07:46:48 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,133 +31,188 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-When calling perf_event_create_kernel_counter to create perf_event,
-assign a overflow handler. Then when perf event overflows, call
-kvm_vcpu_kick() to sync the interrupt.
+This patchset adds guest PMU support for KVM on ARM64. It takes
+trap-and-emulate approach. When guest wants to monitor one event, it
+will be trapped by KVM and KVM will call perf_event API to create a perf
+event and call relevant perf_event APIs to get the count value of event.
 
-Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
----
- arch/arm/kvm/arm.c    |  2 ++
- include/kvm/arm_pmu.h |  2 ++
- virt/kvm/arm/pmu.c    | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 55 insertions(+), 1 deletion(-)
+Use perf to test this patchset in guest. When using "perf list", it
+shows the list of the hardware events and hardware cache events perf
+supports. Then use "perf stat -e EVENT" to monitor some event. For
+example, use "perf stat -e cycles" to count cpu cycles and
+"perf stat -e cache-misses" to count cache misses.
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index e06fd29..cd696ef 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -28,6 +28,7 @@
- #include <linux/sched.h>
- #include <linux/kvm.h>
- #include <trace/events/kvm.h>
-+#include <kvm/arm_pmu.h>
- 
- #define CREATE_TRACE_POINTS
- #include "trace.h"
-@@ -569,6 +570,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		 * non-preemptible context.
- 		 */
- 		preempt_disable();
-+		kvm_pmu_flush_hwstate(vcpu);
- 		kvm_timer_flush_hwstate(vcpu);
- 		kvm_vgic_flush_hwstate(vcpu);
- 
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index a131f76..c4041008 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -38,6 +38,7 @@ struct kvm_pmu {
- };
- 
- #ifdef CONFIG_KVM_ARM_PMU
-+void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu);
- u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx);
- void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val);
- void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u32 val, bool all_enable);
-@@ -48,6 +49,7 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
- 				    u32 select_idx);
- void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u32 val);
- #else
-+void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu) {}
- u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx)
- {
- 	return 0;
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 9b9c706..ff182d6 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -21,6 +21,7 @@
- #include <linux/perf_event.h>
- #include <asm/kvm_emulate.h>
- #include <kvm/arm_pmu.h>
-+#include <kvm/arm_vgic.h>
- 
- /**
-  * kvm_pmu_get_counter_value - get PMU counter value
-@@ -90,6 +91,54 @@ static void kvm_pmu_stop_counter(struct kvm_pmc *pmc)
- }
- 
- /**
-+ * kvm_pmu_flush_hwstate - flush pmu state to cpu
-+ * @vcpu: The vcpu pointer
-+ *
-+ * Inject virtual PMU IRQ if IRQ is pending for this cpu.
-+ */
-+void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-+	u32 overflow;
-+
-+	if (pmu->irq_num == -1)
-+		return;
-+
-+	if (!vcpu_mode_is_32bit(vcpu)) {
-+		if (!(vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMCR_E))
-+			return;
-+
-+		overflow = vcpu_sys_reg(vcpu, PMCNTENSET_EL0)
-+			   & vcpu_sys_reg(vcpu, PMINTENSET_EL1)
-+			   & vcpu_sys_reg(vcpu, PMOVSSET_EL0);
-+	} else {
-+		if (!(vcpu_cp15(vcpu, c9_PMCR) & ARMV8_PMCR_E))
-+			return;
-+
-+		overflow = vcpu_cp15(vcpu, c9_PMCNTENSET)
-+			   & vcpu_cp15(vcpu, c9_PMINTENSET)
-+			   & vcpu_cp15(vcpu, c9_PMOVSSET);
-+	}
-+
-+	kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num,
-+			    overflow ? 1 : 0);
-+}
-+
-+/**
-+ * When perf event overflows, call kvm_pmu_overflow_set to set overflow status.
-+ */
-+static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
-+				  struct perf_sample_data *data,
-+				  struct pt_regs *regs)
-+{
-+	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
-+	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
-+	int idx = pmc->idx;
-+
-+	kvm_pmu_overflow_set(vcpu, BIT(idx));
-+}
-+
-+/**
-  * kvm_pmu_enable_counter - enable selected PMU counter
-  * @vcpu: The vcpu pointer
-  * @val: the value guest writes to PMCNTENSET register
-@@ -341,7 +390,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
- 	/* The initial sample period (overflow count) of an event. */
- 	attr.sample_period = (-counter) & pmc->bitmask;
- 
--	event = perf_event_create_kernel_counter(&attr, -1, current, NULL, pmc);
-+	event = perf_event_create_kernel_counter(&attr, -1, current,
-+						 kvm_pmu_perf_overflow, pmc);
- 	if (IS_ERR(event)) {
- 		printk_once("kvm: pmu event creation failed %ld\n",
- 			    PTR_ERR(event));
+Below are the outputs of "perf stat -r 5 sleep 5" when running in host
+and guest.
+
+Host:
+ Performance counter stats for 'sleep 5' (5 runs):
+
+          0.510276      task-clock (msec)         #    0.000 CPUs utilized            ( +-  1.57% )
+                 1      context-switches          #    0.002 M/sec
+                 0      cpu-migrations            #    0.000 K/sec
+                49      page-faults               #    0.096 M/sec                    ( +-  0.77% )
+           1064117      cycles                    #    2.085 GHz                      ( +-  1.56% )
+   <not supported>      stalled-cycles-frontend
+   <not supported>      stalled-cycles-backend
+            529051      instructions              #    0.50  insns per cycle          ( +-  0.55% )
+   <not supported>      branches
+              9894      branch-misses             #   19.390 M/sec                    ( +-  1.70% )
+
+       5.000853900 seconds time elapsed                                          ( +-  0.00% )
+
+Guest:
+ Performance counter stats for 'sleep 5' (5 runs):
+
+          0.642456      task-clock (msec)         #    0.000 CPUs utilized            ( +-  1.81% )
+                 1      context-switches          #    0.002 M/sec
+                 0      cpu-migrations            #    0.000 K/sec
+                49      page-faults               #    0.076 M/sec                    ( +-  1.64% )
+           1322717      cycles                    #    2.059 GHz                      ( +-  1.88% )
+   <not supported>      stalled-cycles-frontend
+   <not supported>      stalled-cycles-backend
+            640944      instructions              #    0.48  insns per cycle          ( +-  1.10% )
+   <not supported>      branches
+             10665      branch-misses             #   16.600 M/sec                    ( +-  2.23% )
+
+       5.001181452 seconds time elapsed                                          ( +-  0.00% )
+
+Have a cycle counter read test like below in guest and host:
+
+static void test(void)
+{
+	unsigned long count, count1, count2;
+	count1 = read_cycles();
+	count++;
+	count2 = read_cycles();
+}
+
+Host:
+count1: 3046186213
+count2: 3046186347
+delta: 134
+
+Guest:
+count1: 5645797121
+count2: 5645797270
+delta: 149
+
+The gap between guest and host is very small. One reason for this I
+think is that it doesn't count the cycles in EL2 and host since we add
+exclude_hv = 1. So the cycles spent to store/restore registers which
+happens at EL2 are not included.
+
+This patchset can be fetched from [1] and the relevant QEMU version for
+test can be fetched from [2].
+
+The results of 'perf test' can be found from [3][4].
+The results of perf_event_tests test suite can be found from [5][6].
+
+Also, I have tested "perf top" in two VMs and host at the same time. It
+works well.
+
+Thanks,
+Shannon
+
+[1] https://git.linaro.org/people/shannon.zhao/linux-mainline.git  KVM_ARM64_PMU_v6
+[2] https://git.linaro.org/people/shannon.zhao/qemu.git  virtual_PMU
+[3] http://people.linaro.org/~shannon.zhao/PMU/perf-test-host.txt
+[4] http://people.linaro.org/~shannon.zhao/PMU/perf-test-guest.txt
+[5] http://people.linaro.org/~shannon.zhao/PMU/perf_event_tests-host.txt
+[6] http://people.linaro.org/~shannon.zhao/PMU/perf_event_tests-guest.txt
+
+Changes since v5:
+* Rebase on new linux kernel mainline
+* Remove state duplications and drop PMOVSCLR, PMCNTENCLR, PMINTENCLR,
+  PMXEVCNTR, PMXEVTYPER
+* Add a helper to check if vPMU is already initialized
+* remove kvm_vcpu from kvm_pmc
+
+Changes since v4:
+* Rebase on new linux kernel mainline 
+* Drop the reset handler of CP15 registers
+* Fix a compile failure on arch ARM due to lack of asm/pmu.h
+* Refactor the interrupt injecting flow according to Marc's suggestion
+* Check the value of PMSELR register
+* Calculate the attr.disabled according to PMCR.E and PMCNTENSET/CLR
+* Fix some coding style
+* Document the vPMU irq range
+
+Changes since v3:
+* Rebase on new linux kernel mainline 
+* Use ARMV8_MAX_COUNTERS instead of 32
+* Reset PMCR.E to zero.
+* Trigger overflow for software increment.
+* Optimize PMU interrupt inject logic.
+* Add handler for E,C,P bits of PMCR
+* Fix the overflow bug found by perf_event_tests
+* Run 'perf test', 'perf top' and perf_event_tests test suite
+* Add exclude_hv = 1 configuration to not count in EL2
+
+Changes since v2:
+* Directly use perf raw event type to create perf_event in KVM
+* Add a helper vcpu_sysreg_write
+* remove unrelated header file
+
+Changes since v1:
+* Use switch...case for registers access handler instead of adding
+  alone handler for each register
+* Try to use the sys_regs to store the register value instead of adding
+  new variables in struct kvm_pmc
+* Fix the handle of cp15 regs
+* Create a new kvm device vPMU, then userspace could choose whether to
+  create PMU
+* Fix the handle of PMU overflow interrupt
+
+Shannon Zhao (21):
+  ARM64: Move PMU register related defines to asm/pmu.h
+  KVM: ARM64: Define PMU data structure for each vcpu
+  KVM: ARM64: Add offset defines for PMU registers
+  KVM: ARM64: Add reset and access handlers for PMCR_EL0 register
+  KVM: ARM64: Add reset and access handlers for PMSELR register
+  KVM: ARM64: Add reset and access handlers for PMCEID0 and PMCEID1
+    register
+  KVM: ARM64: PMU: Add perf event map and introduce perf event creating
+    function
+  KVM: ARM64: Add access handler for PMEVTYPERn and PMCCFILTR register
+  KVM: ARM64: Add access handler for PMXEVTYPER register
+  KVM: ARM64: Add access handler for PMEVCNTRn and PMCCNTR register
+  KVM: ARM64: Add access handler for PMXEVCNTR register
+  KVM: ARM64: Add reset and access handlers for PMCNTENSET and
+    PMCNTENCLR register
+  KVM: ARM64: Add reset and access handlers for PMINTENSET and
+    PMINTENCLR register
+  KVM: ARM64: Add reset and access handlers for PMOVSSET and PMOVSCLR
+    register
+  KVM: ARM64: Add reset and access handlers for PMUSERENR register
+  KVM: ARM64: Add reset and access handlers for PMSWINC register
+  KVM: ARM64: Add helper to handle PMCR register bits
+  KVM: ARM64: Add PMU overflow interrupt routing
+  KVM: ARM64: Reset PMU state when resetting vcpu
+  KVM: ARM64: Free perf event of PMU when destroying vcpu
+  KVM: ARM64: Add a new kvm ARM PMU device
+
+ Documentation/virtual/kvm/devices/arm-pmu.txt |  16 +
+ arch/arm/kvm/arm.c                            |   3 +
+ arch/arm64/include/asm/kvm_asm.h              |  45 ++-
+ arch/arm64/include/asm/kvm_host.h             |   2 +
+ arch/arm64/include/asm/pmu.h                  |  66 +++
+ arch/arm64/include/uapi/asm/kvm.h             |   3 +
+ arch/arm64/kernel/perf_event.c                |  36 +-
+ arch/arm64/kvm/Kconfig                        |   8 +
+ arch/arm64/kvm/Makefile                       |   1 +
+ arch/arm64/kvm/reset.c                        |   3 +
+ arch/arm64/kvm/sys_regs.c                     | 552 ++++++++++++++++++++++++--
+ include/kvm/arm_pmu.h                         |  71 ++++
+ include/linux/kvm_host.h                      |   1 +
+ include/uapi/linux/kvm.h                      |   2 +
+ virt/kvm/arm/pmu.c                            | 533 +++++++++++++++++++++++++
+ virt/kvm/kvm_main.c                           |   4 +
+ 16 files changed, 1278 insertions(+), 68 deletions(-)
+ create mode 100644 Documentation/virtual/kvm/devices/arm-pmu.txt
+ create mode 100644 arch/arm64/include/asm/pmu.h
+ create mode 100644 include/kvm/arm_pmu.h
+ create mode 100644 virt/kvm/arm/pmu.c
+
 -- 
 2.0.4
