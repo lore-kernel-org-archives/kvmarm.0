@@ -1,42 +1,63 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v6 00/21] KVM: ARM64: Add guest PMU support
-Date: Tue, 08 Dec 2015 17:56:20 +0000
-Message-ID: <566719C4.9030305@arm.com>
-References: <1449578860-15808-1-git-send-email-zhaoshenglong@huawei.com>
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH v10 1/6] target-arm: kvm64 - introduce kvm_arm_init_debug()
+Date: Tue,  8 Dec 2015 18:32:28 +0000
+Message-ID: <1449599553-24713-2-git-send-email-alex.bennee@linaro.org>
+References: <1449599553-24713-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1449578860-15808-1-git-send-email-zhaoshenglong@huawei.com>
+In-Reply-To: <1449599553-24713-1-git-send-email-alex.bennee@linaro.org>
 Sender: kvm-owner@vger.kernel.org
-To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, christoffer.dall@linaro.org, zhichao.huang@linaro.org
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Shannon,
+As we haven't always had guest debug support we need to probe for it.
+Additionally we don't do this in the start-up capability code so we
+don't fall over on old kernels.
 
-On 08/12/15 12:47, Shannon Zhao wrote:
-> From: Shannon Zhao <shannon.zhao@linaro.org>
-> 
-> This patchset adds guest PMU support for KVM on ARM64. It takes
-> trap-and-emulate approach. When guest wants to monitor one event, it
-> will be trapped by KVM and KVM will call perf_event API to create a perf
-> event and call relevant perf_event APIs to get the count value of event.
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+---
+ target-arm/kvm64.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-There is still some work to do. A number of bugs, some design issues,
-and in general a lot of tidying up to do. If you want this in 4.5,
-you're going to have to address this quickly.
+diff --git a/target-arm/kvm64.c b/target-arm/kvm64.c
+index ceebfeb..d087794 100644
+--- a/target-arm/kvm64.c
++++ b/target-arm/kvm64.c
+@@ -25,6 +25,22 @@
+ #include "internals.h"
+ #include "hw/arm/arm.h"
+=20
++static bool have_guest_debug;
++
++/**
++ * kvm_arm_init_debug()
++ * @cs: CPUState
++ *
++ * Check for guest debug capabilities.
++ *
++ */
++static void kvm_arm_init_debug(CPUState *cs)
++{
++    have_guest_debug =3D kvm_check_extension(cs->kvm_state,
++                                           KVM_CAP_SET_GUEST_DEBUG);
++    return;
++}
++
+ static inline void set_feature(uint64_t *features, int feature)
+ {
+     *features |=3D 1ULL << feature;
+@@ -121,6 +137,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
+     }
+     cpu->mp_affinity =3D mpidr & ARM64_AFFINITY_MASK;
+=20
++    kvm_arm_init_debug(cs);
++
+     return kvm_arm_init_cpreg_list(cpu);
+ }
+=20
+--=20
+2.6.3
 
-But quickly doesn't mean rushing it, and I have the feeling that this is
-what you've done over the past week. Also, I've reviewed this series 3
-times during that time, and I feel a bit exhausted.
-
-So please do not send another one before the end of the week. take the
-time to address all the comments, ask questions if needed, and hopefully
-I can review it again next Monday.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
