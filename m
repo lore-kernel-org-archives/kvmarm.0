@@ -1,189 +1,73 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v6 06/21] KVM: ARM64: Add reset and access handlers for
- PMCEID0 and PMCEID1 register
-Date: Tue, 08 Dec 2015 14:23:16 +0000
-Message-ID: <5666E7D4.2070103@arm.com>
-References: <1449578860-15808-1-git-send-email-zhaoshenglong@huawei.com> <1449578860-15808-7-git-send-email-zhaoshenglong@huawei.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v4 0/4] KVM: arm64: BUG FIX: Correctly handle zero
+ register transfers
+Date: Tue, 8 Dec 2015 08:48:31 -0600
+Message-ID: <20151208144831.GD4453@hawk.localdomain>
+References: <cover.1449230499.git.p.fedin@samsung.com>
+ <20151205003334.GB3117@hawk.localdomain>
+ <011601d130ca$64cc9070$2e65b150$@samsung.com>
+ <20151207223631.GJ4402@hawk.localdomain>
+ <20151207234555.GA2980@hawk.localdomain>
+ <009501d13185$b02d1150$108733f0$@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1449578860-15808-7-git-send-email-zhaoshenglong@huawei.com>
+Content-Disposition: inline
+In-Reply-To: <009501d13185$b02d1150$108733f0$@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
+To: Pavel Fedin <p.fedin@samsung.com>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/12/15 12:47, Shannon Zhao wrote:
-> From: Shannon Zhao <shannon.zhao@linaro.org>
+On Tue, Dec 08, 2015 at 09:57:21AM +0300, Pavel Fedin wrote:
+>  Hello!
 > 
-> Add reset handler which gets host value of PMCEID0 or PMCEID1. Since
-> write action to PMCEID0 or PMCEID1 is ignored, add a new case for this.
+> > I messed up the "load into xzr" test royally in the last attached patch.
+> > It was quite wrong.
 > 
-> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 29 +++++++++++++++++++++++++----
->  1 file changed, 25 insertions(+), 4 deletions(-)
+>  Yes, because "mov %0, xzr" is not trapped.
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index d81f7ac..1bcb2b7 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -452,6 +452,19 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  	vcpu_sys_reg(vcpu, r->reg) = val;
->  }
->  
-> +static void reset_pmceid(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> +{
-> +	u64 pmceid;
-> +
-> +	if (r->reg == PMCEID0_EL0)
-> +		asm volatile("mrs %0, pmceid0_el0\n" : "=r" (pmceid));
-> +	else
-> +		/* PMCEID1_EL0 */
-> +		asm volatile("mrs %0, pmceid1_el0\n" : "=r" (pmceid));
-> +
-> +	vcpu_sys_reg(vcpu, r->reg) = pmceid;
-> +}
-> +
->  /* PMU registers accessor. */
->  static bool access_pmu_regs(struct kvm_vcpu *vcpu,
->  			    struct sys_reg_params *p,
-> @@ -469,6 +482,9 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
->  			vcpu_sys_reg(vcpu, r->reg) = val;
->  			break;
->  		}
-> +		case PMCEID0_EL0:
-> +		case PMCEID1_EL0:
-> +			return ignore_write(vcpu, p);
->  		default:
->  			vcpu_sys_reg(vcpu, r->reg) = p->regval;
->  			break;
-> @@ -693,10 +709,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	  access_pmu_regs, reset_unknown, PMSELR_EL0 },
->  	/* PMCEID0_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b110),
-> -	  trap_raz_wi },
-> +	  access_pmu_regs, reset_pmceid, PMCEID0_EL0 },
->  	/* PMCEID1_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b111),
-> -	  trap_raz_wi },
-> +	  access_pmu_regs, reset_pmceid, PMCEID1_EL0 },
->  	/* PMCCNTR_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b000),
->  	  trap_raz_wi },
-> @@ -926,6 +942,9 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
->  			vcpu_cp15(vcpu, r->reg) = val;
->  			break;
->  		}
-> +		case c9_PMCEID0:
-> +		case c9_PMCEID1:
-> +			return ignore_write(vcpu, p);
->  		default:
->  			vcpu_cp15(vcpu, r->reg) = p->regval;
->  			break;
-> @@ -983,8 +1002,10 @@ static const struct sys_reg_desc cp15_regs[] = {
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmu_cp15_regs,
->  	  NULL, c9_PMSELR },
-> -	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), trap_raz_wi },
-> -	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), trap_raz_wi },
-> +	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmu_cp15_regs,
-> +	  NULL, c9_PMCEID0 },
-> +	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmu_cp15_regs,
-> +	  NULL, c9_PMCEID1 },
->  	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), trap_raz_wi },
->  	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), trap_raz_wi },
->  	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), trap_raz_wi },
+> > I have now tested
+> > 
+> >  asm volatile(
+> >      "str %3, [%1]\n\t"
+> >      "ldr wzr, [%1]\n\t"
+> >      "str wzr, [%2]\n\t"
+> >      "ldr %0, [%2]\n\t"
+> >      :"=r"(val):"r"(addr), "r"(addr2), "r"(0x55555555):"memory");
+> > report("mmio: 'ldr wzr' check: read 0x%08lx", val != 0x55555555, val);
+> > 
+> > which passes
 > 
+>  I guess i forgot to mention that both addr and addr2 have to be MMIO registers. If they are plain memory, then of course everything
+> will work because they are not trapped.
 
-That's a lot of infrastructure for something that is essentially a
-constant that doesn't need to be stored in the sysreg array.
-I suggest you drop the constants for PMCEID{0,1}_EL0 and
-c9_PMCEID{0,1}, and turn the code into something like this:
+Yes, my round two (which still didn't fail) used mmio for both addr and
+addr2.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 251d517..09c38d0 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -453,17 +453,22 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	vcpu_sys_reg(vcpu, r->reg) = val;
- }
- 
--static void reset_pmceid(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+static bool access_pmceid(struct kvm_vcpu *vcpu,
-+			  struct sys_reg_params *p,
-+			  const struct sys_reg_desc *r)
- {
- 	u64 pmceid;
- 
--	if (r->reg == PMCEID0_EL0)
-+	if (p->is_write)
-+		return ignore_write(vcpu, p);
-+
-+	if (!(p->Op2 & 1))
- 		asm volatile("mrs %0, pmceid0_el0\n" : "=r" (pmceid));
- 	else
--		/* PMCEID1_EL0 */
- 		asm volatile("mrs %0, pmceid1_el0\n" : "=r" (pmceid));
- 
--	vcpu_sys_reg(vcpu, r->reg) = pmceid;
-+	p->regval = pmceid;
-+	return true;
- }
- 
- static bool pmu_counter_idx_valid(u64 pmcr, u64 idx)
-@@ -624,9 +629,6 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
- 			kvm_pmu_handle_pmcr(vcpu, val);
- 			break;
- 		}
--		case PMCEID0_EL0:
--		case PMCEID1_EL0:
--			return ignore_write(vcpu, p);
- 		default:
- 			vcpu_sys_reg(vcpu, r->reg) = p->regval;
- 			break;
-@@ -873,10 +875,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  access_pmu_regs, reset_unknown, PMSELR_EL0 },
- 	/* PMCEID0_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b110),
--	  access_pmu_regs, reset_pmceid, PMCEID0_EL0 },
-+	  access_pmceid },
- 	/* PMCEID1_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b111),
--	  access_pmu_regs, reset_pmceid, PMCEID1_EL0 },
-+	  access_pmceid },
- 	/* PMCCNTR_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b000),
- 	  access_pmu_regs, reset_unknown, PMCCNTR_EL0 },
-@@ -1223,9 +1225,6 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
- 			kvm_pmu_handle_pmcr(vcpu, val);
- 			break;
- 		}
--		case c9_PMCEID0:
--		case c9_PMCEID1:
--			return ignore_write(vcpu, p);
- 		default:
- 			vcpu_cp15(vcpu, r->reg) = p->regval;
- 			break;
-@@ -1310,10 +1309,8 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	  NULL, c9_PMSWINC },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmu_cp15_regs,
- 	  NULL, c9_PMSELR },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmu_cp15_regs,
--	  NULL, c9_PMCEID0 },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmu_cp15_regs,
--	  NULL, c9_PMCEID1 },
-+	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
-+	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmceid },
- 	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), access_pmu_cp15_regs,
- 	  NULL, c9_PMCCNTR },
- 	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_pmxevtyper },
+> 
+> > Anyway, I
+> > probably won't clean this test up and post it. I don't think we really
+> > need to add it as a regression test, unless others disagree and would
+> > like to see it added.
+> 
+>  Considering how difficult it was to find this problem, and how tricky and unobvious it is, i would ask to add this test. Especially
+> considering you've already written it. At least it will serve as a reminder about the problem.
 
-All we need is an accessor, nothing else.
+OK. I need to wrap up some other work right now, but then I'll clean
+this patch up and send it properly.
 
 Thanks,
+drew
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> 
+> Kind regards,
+> Pavel Fedin
+> Expert Engineer
+> Samsung Electronics Research center Russia
+> 
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe kvm" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
