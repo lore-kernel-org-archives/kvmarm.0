@@ -1,73 +1,252 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v4 0/4] KVM: arm64: BUG FIX: Correctly handle zero
- register transfers
-Date: Tue, 8 Dec 2015 08:48:31 -0600
-Message-ID: <20151208144831.GD4453@hawk.localdomain>
-References: <cover.1449230499.git.p.fedin@samsung.com>
- <20151205003334.GB3117@hawk.localdomain>
- <011601d130ca$64cc9070$2e65b150$@samsung.com>
- <20151207223631.GJ4402@hawk.localdomain>
- <20151207234555.GA2980@hawk.localdomain>
- <009501d13185$b02d1150$108733f0$@samsung.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v6 07/21] KVM: ARM64: PMU: Add perf event map and introduce
+ perf event creating function
+Date: Tue, 08 Dec 2015 15:43:50 +0000
+Message-ID: <5666FAB6.4070903@arm.com>
+References: <1449578860-15808-1-git-send-email-zhaoshenglong@huawei.com> <1449578860-15808-8-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <009501d13185$b02d1150$108733f0$@samsung.com>
+In-Reply-To: <1449578860-15808-8-git-send-email-zhaoshenglong@huawei.com>
 Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>
+To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Dec 08, 2015 at 09:57:21AM +0300, Pavel Fedin wrote:
->  Hello!
+On 08/12/15 12:47, Shannon Zhao wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
 > 
-> > I messed up the "load into xzr" test royally in the last attached patch.
-> > It was quite wrong.
+> When we use tools like perf on host, perf passes the event type and the
+> id of this event type category to kernel, then kernel will map them to
+> hardware event number and write this number to PMU PMEVTYPER<n>_EL0
+> register. When getting the event number in KVM, directly use raw event
+> type to create a perf_event for it.
 > 
->  Yes, because "mov %0, xzr" is not trapped.
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> ---
+>  arch/arm64/include/asm/pmu.h |   2 +
+>  arch/arm64/kvm/Makefile      |   1 +
+>  include/kvm/arm_pmu.h        |  13 ++++
+>  virt/kvm/arm/pmu.c           | 138 +++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 154 insertions(+)
+>  create mode 100644 virt/kvm/arm/pmu.c
 > 
-> > I have now tested
-> > 
-> >  asm volatile(
-> >      "str %3, [%1]\n\t"
-> >      "ldr wzr, [%1]\n\t"
-> >      "str wzr, [%2]\n\t"
-> >      "ldr %0, [%2]\n\t"
-> >      :"=r"(val):"r"(addr), "r"(addr2), "r"(0x55555555):"memory");
-> > report("mmio: 'ldr wzr' check: read 0x%08lx", val != 0x55555555, val);
-> > 
-> > which passes
-> 
->  I guess i forgot to mention that both addr and addr2 have to be MMIO registers. If they are plain memory, then of course everything
-> will work because they are not trapped.
+> diff --git a/arch/arm64/include/asm/pmu.h b/arch/arm64/include/asm/pmu.h
+> index 4264ea0..e3cb6b3 100644
+> --- a/arch/arm64/include/asm/pmu.h
+> +++ b/arch/arm64/include/asm/pmu.h
+> @@ -28,6 +28,8 @@
+>  #define ARMV8_PMCR_D		(1 << 3) /* CCNT counts every 64th cpu cycle */
+>  #define ARMV8_PMCR_X		(1 << 4) /* Export to ETM */
+>  #define ARMV8_PMCR_DP		(1 << 5) /* Disable CCNT if non-invasive debug*/
+> +/* Determines which PMCCNTR_EL0 bit generates an overflow */
+> +#define ARMV8_PMCR_LC		(1 << 6)
+>  #define	ARMV8_PMCR_N_SHIFT	11	 /* Number of counters supported */
+>  #define	ARMV8_PMCR_N_MASK	0x1f
+>  #define	ARMV8_PMCR_MASK		0x3f	 /* Mask for writable bits */
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 1949fe5..18d56d8 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -27,3 +27,4 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3-emul.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += vgic-v3-switch.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
+> +kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index dea78f8..36bde48 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -37,4 +37,17 @@ struct kvm_pmu {
+>  #endif
+>  };
+>  
+> +#ifdef CONFIG_KVM_ARM_PMU
+> +u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx);
+> +void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
+> +				    u32 select_idx);
+> +#else
+> +u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx)
+> +{
+> +	return 0;
+> +}
+> +void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
+> +				    u32 select_idx) {}
+> +#endif
+> +
+>  #endif
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> new file mode 100644
+> index 0000000..15babf1
+> --- /dev/null
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -0,0 +1,138 @@
+> +/*
+> + * Copyright (C) 2015 Linaro Ltd.
+> + * Author: Shannon Zhao <shannon.zhao@linaro.org>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include <linux/cpu.h>
+> +#include <linux/kvm.h>
+> +#include <linux/kvm_host.h>
+> +#include <linux/perf_event.h>
+> +#include <asm/kvm_emulate.h>
+> +#include <kvm/arm_pmu.h>
+> +
+> +/**
+> + * kvm_pmu_get_counter_value - get PMU counter value
+> + * @vcpu: The vcpu pointer
+> + * @select_idx: The counter index
+> + */
+> +u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx)
+> +{
+> +	u64 counter, enabled, running;
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> +
+> +	if (!vcpu_mode_is_32bit(vcpu))
+> +		counter = vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + select_idx);
+> +	else
+> +		counter = vcpu_cp15(vcpu, c14_PMEVCNTR0 + select_idx);
+> +
+> +	if (pmc->perf_event)
+> +		counter += perf_event_read_value(pmc->perf_event, &enabled,
+> +						 &running);
+> +
+> +	return counter & pmc->bitmask;
 
-Yes, my round two (which still didn't fail) used mmio for both addr and
-addr2.
+This one confused me for a while. Is it the case that you return
+whatever is in the vcpu view of the counter, plus anything that perf
+itself has counted? If so, I'd appreciate a comment here...
 
-> 
-> > Anyway, I
-> > probably won't clean this test up and post it. I don't think we really
-> > need to add it as a regression test, unless others disagree and would
-> > like to see it added.
-> 
->  Considering how difficult it was to find this problem, and how tricky and unobvious it is, i would ask to add this test. Especially
-> considering you've already written it. At least it will serve as a reminder about the problem.
+> +}
+> +
+> +static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u32 select_idx)
+> +{
+> +	if (!vcpu_mode_is_32bit(vcpu))
+> +		return (vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMCR_E) &
+> +		       (vcpu_sys_reg(vcpu, PMCNTENSET_EL0) >> select_idx);
 
-OK. I need to wrap up some other work right now, but then I'll clean
-this patch up and send it properly.
+This looks wrong. Shouldn't it be:
+
+return ((vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMCR_E) &&
+        (vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & (1 << select_idx)));
+
+> +	else
+> +		return (vcpu_sys_reg(vcpu, c9_PMCR) & ARMV8_PMCR_E) &
+> +		       (vcpu_sys_reg(vcpu, c9_PMCNTENSET) >> select_idx);
+> +}
+
+Also, I don't really see why we need to check the 32bit version, which
+has the exact same content.
+
+> +
+> +static inline struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
+> +{
+> +	struct kvm_pmu *pmu;
+> +	struct kvm_vcpu_arch *vcpu_arch;
+> +
+> +	pmc -= pmc->idx;
+> +	pmu = container_of(pmc, struct kvm_pmu, pmc[0]);
+> +	vcpu_arch = container_of(pmu, struct kvm_vcpu_arch, pmu);
+> +	return container_of(vcpu_arch, struct kvm_vcpu, arch);
+> +}
+> +
+> +/**
+> + * kvm_pmu_stop_counter - stop PMU counter
+> + * @pmc: The PMU counter pointer
+> + *
+> + * If this counter has been configured to monitor some event, release it here.
+> + */
+> +static void kvm_pmu_stop_counter(struct kvm_pmc *pmc)
+> +{
+> +	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+> +	u64 counter;
+> +
+> +	if (pmc->perf_event) {
+> +		counter = kvm_pmu_get_counter_value(vcpu, pmc->idx);
+> +		if (!vcpu_mode_is_32bit(vcpu))
+> +			vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + pmc->idx) = counter;
+> +		else
+> +			vcpu_cp15(vcpu, c14_PMEVCNTR0 + pmc->idx) = counter;
+
+Same thing - we don't need to make a difference between 32 and 64bit.
+
+> +
+> +		perf_event_release_kernel(pmc->perf_event);
+> +		pmc->perf_event = NULL;
+> +	}
+> +}
+> +
+> +/**
+> + * kvm_pmu_set_counter_event_type - set selected counter to monitor some event
+> + * @vcpu: The vcpu pointer
+> + * @data: The data guest writes to PMXEVTYPER_EL0
+> + * @select_idx: The number of selected counter
+> + *
+> + * When OS accesses PMXEVTYPER_EL0, that means it wants to set a PMC to count an
+> + * event with given hardware event number. Here we call perf_event API to
+> + * emulate this action and create a kernel perf event for it.
+> + */
+> +void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
+> +				    u32 select_idx)
+> +{
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> +	struct perf_event *event;
+> +	struct perf_event_attr attr;
+> +	u32 eventsel;
+> +	u64 counter;
+> +
+> +	kvm_pmu_stop_counter(pmc);
+
+Wait. I didn't realize this before, but you have the vcpu right here.
+Why don't you pass it as a parameter to kvm_pmu_stop_counter and avoid
+the kvm_pmc_to_vcpu thing altogether?
+
+> +	eventsel = data & ARMV8_EVTYPE_EVENT;
+> +
+> +	memset(&attr, 0, sizeof(struct perf_event_attr));
+> +	attr.type = PERF_TYPE_RAW;
+> +	attr.size = sizeof(attr);
+> +	attr.pinned = 1;
+> +	attr.disabled = kvm_pmu_counter_is_enabled(vcpu, select_idx);
+> +	attr.exclude_user = data & ARMV8_EXCLUDE_EL0 ? 1 : 0;
+> +	attr.exclude_kernel = data & ARMV8_EXCLUDE_EL1 ? 1 : 0;
+> +	attr.exclude_hv = 1; /* Don't count EL2 events */
+> +	attr.exclude_host = 1; /* Don't count host events */
+> +	attr.config = eventsel;
+> +
+> +	counter = kvm_pmu_get_counter_value(vcpu, select_idx);
+> +	/* The initial sample period (overflow count) of an event. */
+> +	attr.sample_period = (-counter) & pmc->bitmask;
+> +
+> +	event = perf_event_create_kernel_counter(&attr, -1, current, NULL, pmc);
+> +	if (IS_ERR(event)) {
+> +		printk_once("kvm: pmu event creation failed %ld\n",
+> +			    PTR_ERR(event));
+> +		return;
+> +	}
+> +
+> +	pmc->perf_event = event;
+> +}
+> 
 
 Thanks,
-drew
 
-> 
-> Kind regards,
-> Pavel Fedin
-> Expert Engineer
-> Samsung Electronics Research center Russia
-> 
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+	M.
+-- 
+Jazz is not dead. It just smells funny...
