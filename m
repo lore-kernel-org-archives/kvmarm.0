@@ -1,135 +1,141 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v10 5/6] target-arm: kvm - re-inject guest debug exceptions
-Date: Tue,  8 Dec 2015 18:32:32 +0000
-Message-ID: <1449599553-24713-6-git-send-email-alex.bennee@linaro.org>
+Subject: [PATCH v10 6/6] tests/guest-debug: introduce basic gdbstub tests
+Date: Tue,  8 Dec 2015 18:32:33 +0000
+Message-ID: <1449599553-24713-7-git-send-email-alex.bennee@linaro.org>
 References: <1449599553-24713-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 80BA1407A6
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2015 13:31:14 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 0HJu8196-aTZ for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Dec 2015 13:31:13 -0500 (EST)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C7C9412D0
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2015 13:31:10 -0500 (EST)
+Received: by wmuu63 with SMTP id u63so192174735wmu.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Dec 2015 10:33:01 -0800 (PST)
 In-Reply-To: <1449599553-24713-1-git-send-email-alex.bennee@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, christoffer.dall@linaro.org, zhichao.huang@linaro.org
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-If we can't find details for the debug exception in our debug state
-then we can assume the exception is due to debugging inside the guest.
-To inject the exception into the guest state we re-use the TCG exceptio=
-n
-code (do_interrupt).
-
-However while guest debugging is in effect we currently can't handle th=
-e
-guest using single step as we will keep trapping to back to userspace.
-GDB makes heavy use of single-step behind the scenes which effectively
-means the guests ability to debug itself is disabled while it is being
-debugged.
-
-Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
----
-v5:
-  - new for v5
-v10:
-  - fix arm32 compile
-  - add full stop at end of sentance
-  - attempted to expand on limitations in commit msg
----
- target-arm/helper-a64.c | 12 ++++++++++--
- target-arm/kvm64.c      | 24 +++++++++++++++++-------
- 2 files changed, 27 insertions(+), 9 deletions(-)
-
-diff --git a/target-arm/helper-a64.c b/target-arm/helper-a64.c
-index deb8dbe..fc3ccdf 100644
---- a/target-arm/helper-a64.c
-+++ b/target-arm/helper-a64.c
-@@ -25,6 +25,7 @@
- #include "qemu/bitops.h"
- #include "internals.h"
- #include "qemu/crc32c.h"
-+#include "sysemu/kvm.h"
- #include <zlib.h> /* For crc32 */
-=20
- /* C2.4.7 Multiply and divide */
-@@ -469,7 +470,8 @@ void aarch64_cpu_do_interrupt(CPUState *cs)
-                   new_el);
-     if (qemu_loglevel_mask(CPU_LOG_INT)
-         && !excp_is_internal(cs->exception_index)) {
--        qemu_log_mask(CPU_LOG_INT, "...with ESR 0x%" PRIx32 "\n",
-+        qemu_log_mask(CPU_LOG_INT, "...with ESR %x/0x%" PRIx32 "\n",
-+                      env->exception.syndrome >> ARM_EL_EC_SHIFT,
-                       env->exception.syndrome);
-     }
-=20
-@@ -535,6 +537,12 @@ void aarch64_cpu_do_interrupt(CPUState *cs)
-     aarch64_restore_sp(env, new_el);
-=20
-     env->pc =3D addr;
--    cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
-+
-+    qemu_log_mask(CPU_LOG_INT, "...to EL%d PC 0x%" PRIx64 " PSTATE 0x%=
-x\n",
-+                  new_el, env->pc, pstate_read(env));
-+
-+    if (!kvm_enabled()) {
-+        cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
-+    }
- }
- #endif
-diff --git a/target-arm/kvm64.c b/target-arm/kvm64.c
-index 771ecdb..8e6d044 100644
---- a/target-arm/kvm64.c
-+++ b/target-arm/kvm64.c
-@@ -871,6 +871,7 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_=
-debug_exit_arch *debug_exit)
- {
-     int hsr_ec =3D debug_exit->hsr >> ARM_EL_EC_SHIFT;
-     ARMCPU *cpu =3D ARM_CPU(cs);
-+    CPUClass *cc =3D CPU_GET_CLASS(cs);
-     CPUARMState *env =3D &cpu->env;
-=20
-     /* Ensure PC is synchronised */
-@@ -881,7 +882,14 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm=
-_debug_exit_arch *debug_exit)
-         if (cs->singlestep_enabled) {
-             return true;
-         } else {
--            error_report("Came out of SINGLE STEP when not enabled");
-+            /*
-+             * The kernel should have supressed the guests ability to
-+             * single step at this point so something has gone wrong.
-+             */
-+            error_report("%s: guest single-step while debugging unsupp=
-orted"
-+                         " (%"PRIx64", %"PRIx32")\n",
-+                         __func__, env->pc, debug_exit->hsr);
-+            return false;
-         }
-         break;
-     case EC_AA64_BKPT:
-@@ -908,12 +916,14 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kv=
-m_debug_exit_arch *debug_exit)
-                      __func__, debug_exit->hsr, env->pc);
-     }
-=20
--    /* If we don't handle this it could be it really is for the
--       guest to handle */
--    qemu_log_mask(LOG_UNIMP,
--                  "%s: re-injecting exception not yet implemented"
--                  " (0x%"PRIx32", %"PRIx64")\n",
--                  __func__, hsr_ec, env->pc);
-+    /* If we are not handling the debug exception it must belong to
-+     * the guest. Let's re-use the existing TCG interrupt code to set
-+     * everything up properly.
-+     */
-+    cs->exception_index =3D EXCP_BKPT;
-+    env->exception.syndrome =3D debug_exit->hsr;
-+    env->exception.vaddress =3D debug_exit->far;
-+    cc->do_interrupt(cs);
-=20
-     return false;
- }
---=20
-2.6.3
-
+VGhlIGFpbSBvZiB0aGVzZSB0ZXN0cyBpcyB0byBjb21iaW5lIHdpdGggYW4gYXBwcm9wcmlhdGUg
+a2VybmVsCmltYWdlICh3aXRoIHN5bWJvbC1maWxlIHZtbGludXgpIGFuZCBjaGVjayBpdCBiZWhh
+dmVzIGFzIGl0IHNob3VsZC4KR2l2ZW4gYSBrZXJuZWwgaXQgY2hlY2tzOgoKICAtIHNpbmdsZSBz
+dGVwCiAgLSBzb2Z0d2FyZSBicmVha3BvaW50CiAgLSBoYXJkd2FyZSBicmVha3BvaW50CiAgLSBh
+Y2Nlc3MsIHJlYWQgYW5kIHdyaXRlIHdhdGNocG9pbnRzCgpPbiBzdWNjZXNzIGl0IHJldHVybnMg
+MCB0byB0aGUgY2FsbGluZyBwcm9jZXNzLgoKSSd2ZSBub3QgcGx1bWJlZCB0aGlzIGludG8gdGhl
+ICJtYWtlIGNoZWNrIiBsb2dpYyB0aG91Z2ggYXMgd2UgbmVlZCBhCnNvbHV0aW9uIGZvciBwcm92
+aWRpbmcgbm9uLWhvc3QgYmluYXJpZXMgdG8gdGhlIHRlc3RzLiBIb3dldmVyIHRoZSB0ZXN0Cmlz
+IHN0cnVjdHVyZWQgdG8gd29yayB3aXRoIHByZXR0eSBtdWNoIGFueSBMaW51eCBrZXJuZWwgaW1h
+Z2UgYXMgaXQKdXNlcyB0aGUgYmFzaWMga2VybmVsX2luaXQgY29kZSB3aGljaCBpcyBjb21tb24g
+YWNyb3NzIGFyY2hpdGVjdHVyZXMuCgpTaWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXgu
+YmVubmVlQGxpbmFyby5vcmc+CgotLS0KdjEwOgogLSBmaXh1cCBmb3IgUHkyLzMgY2xlYW5saW5l
+c3MKIC0gZHJvcCB0byBzaGVsbCBvbiBleGNlcHRpb24KLS0tCiB0ZXN0cy9ndWVzdC1kZWJ1Zy90
+ZXN0LWdkYnN0dWIucHkgfCAxNzYgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysKIDEgZmlsZSBjaGFuZ2VkLCAxNzYgaW5zZXJ0aW9ucygrKQogY3JlYXRlIG1vZGUgMTAwNjQ0
+IHRlc3RzL2d1ZXN0LWRlYnVnL3Rlc3QtZ2Ric3R1Yi5weQoKZGlmZiAtLWdpdCBhL3Rlc3RzL2d1
+ZXN0LWRlYnVnL3Rlc3QtZ2Ric3R1Yi5weSBiL3Rlc3RzL2d1ZXN0LWRlYnVnL3Rlc3QtZ2Ric3R1
+Yi5weQpuZXcgZmlsZSBtb2RlIDEwMDY0NAppbmRleCAwMDAwMDAwLi4zMWJhNmM5Ci0tLSAvZGV2
+L251bGwKKysrIGIvdGVzdHMvZ3Vlc3QtZGVidWcvdGVzdC1nZGJzdHViLnB5CkBAIC0wLDAgKzEs
+MTc2IEBACisjCisjIFRoaXMgc2NyaXB0IG5lZWRzIHRvIGJlIHJ1biBvbiBzdGFydHVwCisjIHFl
+bXUgLWtlcm5lbCAke0tFUk5FTH0gLXMgLVMKKyMgYW5kIHRoZW46CisjIGdkYiAke0tFUk5FTH0u
+dm1saW51eCAteCAke1FFTVVfU1JDfS90ZXN0cy9ndWVzdC1kZWJ1Zy90ZXN0LWdkYnN0dWIucHkK
+KworaW1wb3J0IGdkYgorCitmYWlsY291bnQgPSAwCisKKworZGVmIHJlcG9ydChjb25kLCBtc2cp
+OgorICAgICJSZXBvcnQgc3VjY2Vzcy9mYWlsIG9mIHRlc3QiCisgICAgaWYgY29uZDoKKyAgICAg
+ICAgcHJpbnQgKCJQQVNTOiAlcyIgJSAobXNnKSkKKyAgICBlbHNlOgorICAgICAgICBwcmludCAo
+IkZBSUw6ICVzIiAlIChtc2cpKQorICAgICAgICBmYWlsY291bnQgKz0gMQorCisKK2RlZiBjaGVj
+a19zdGVwKCk6CisgICAgIlN0ZXAgYW4gaW5zdHJ1Y3Rpb24sIGNoZWNrIGl0IG1vdmVkLiIKKyAg
+ICBzdGFydF9wYyA9IGdkYi5wYXJzZV9hbmRfZXZhbCgnJHBjJykKKyAgICBnZGIuZXhlY3V0ZSgi
+c2kiKQorICAgIGVuZF9wYyA9IGdkYi5wYXJzZV9hbmRfZXZhbCgnJHBjJykKKworICAgIHJldHVy
+biBub3QgKHN0YXJ0X3BjID09IGVuZF9wYykKKworCitkZWYgY2hlY2tfYnJlYWsoc3ltX25hbWUp
+OgorICAgICJTZXR1cCBicmVha3BvaW50LCBjb250aW51ZSBhbmQgY2hlY2sgd2Ugc3RvcHBlZC4i
+CisgICAgc3ltLCBvayA9IGdkYi5sb29rdXBfc3ltYm9sKHN5bV9uYW1lKQorICAgIGJwID0gZ2Ri
+LkJyZWFrcG9pbnQoc3ltX25hbWUpCisKKyAgICBnZGIuZXhlY3V0ZSgiYyIpCisKKyAgICAjIGhv
+cGVmdWxseSB3ZSBjYW1lIGJhY2sKKyAgICBlbmRfcGMgPSBnZGIucGFyc2VfYW5kX2V2YWwoJyRw
+YycpCisgICAgcHJpbnQgKCIlcyA9PSAlcyAlZCIgJSAoZW5kX3BjLCBzeW0udmFsdWUoKSwgYnAu
+aGl0X2NvdW50KSkKKyAgICBicC5kZWxldGUoKQorCisgICAgIyBjYW4gd2UgdGVzdCB3ZSBoaXQg
+YnA/CisgICAgcmV0dXJuIGVuZF9wYyA9PSBzeW0udmFsdWUoKQorCisKKyMgV2UgbmVlZCB0byBk
+byBoYnJlYWsgbWFudWFsbHkgYXMgdGhlIHB5dGhvbiBpbnRlcmZhY2UgZG9lc24ndCBleHBvcnQg
+aXQKK2RlZiBjaGVja19oYnJlYWsoc3ltX25hbWUpOgorICAgICJTZXR1cCBoYXJkd2FyZSBicmVh
+a3BvaW50LCBjb250aW51ZSBhbmQgY2hlY2sgd2Ugc3RvcHBlZC4iCisgICAgc3ltLCBvayA9IGdk
+Yi5sb29rdXBfc3ltYm9sKHN5bV9uYW1lKQorICAgIGdkYi5leGVjdXRlKCJoYnJlYWsgJXMiICUg
+KHN5bV9uYW1lKSkKKyAgICBnZGIuZXhlY3V0ZSgiYyIpCisKKyAgICAjIGhvcGVmdWxseSB3ZSBj
+YW1lIGJhY2sKKyAgICBlbmRfcGMgPSBnZGIucGFyc2VfYW5kX2V2YWwoJyRwYycpCisgICAgcHJp
+bnQgKCIlcyA9PSAlcyIgJSAoZW5kX3BjLCBzeW0udmFsdWUoKSkpCisKKyAgICBpZiBlbmRfcGMg
+PT0gc3ltLnZhbHVlKCk6CisgICAgICAgIGdkYi5leGVjdXRlKCJkIDEiKQorICAgICAgICByZXR1
+cm4gVHJ1ZQorICAgIGVsc2U6CisgICAgICAgIHJldHVybiBGYWxzZQorCisKK2NsYXNzIFdhdGNo
+UG9pbnQoZ2RiLkJyZWFrcG9pbnQpOgorCisgICAgZGVmIGdldF93cHN0cihzZWxmLCBzeW1fbmFt
+ZSk6CisgICAgICAgICJTZXR1cCBzeW0gYW5kIHdwX3N0ciBmb3IgZ2l2ZW4gc3ltYm9sLiIKKyAg
+ICAgICAgc2VsZi5zeW0sIG9rID0gZ2RiLmxvb2t1cF9zeW1ib2woc3ltX25hbWUpCisgICAgICAg
+IHdwX2FkZHIgPSBnZGIucGFyc2VfYW5kX2V2YWwoc3ltX25hbWUpLmFkZHJlc3MKKyAgICAgICAg
+c2VsZi53cF9zdHIgPSAnKiglKHR5cGUpcykoJiUoYWRkcmVzcylzKScgJSBkaWN0KAorICAgICAg
+ICAgICAgdHlwZSA9IHdwX2FkZHIudHlwZSwgYWRkcmVzcyA9IHN5bV9uYW1lKQorCisgICAgICAg
+IHJldHVybihzZWxmLndwX3N0cikKKworICAgIGRlZiBfX2luaXRfXyhzZWxmLCBzeW1fbmFtZSwg
+dHlwZSk6CisgICAgICAgIHdwX3N0ciA9IHNlbGYuZ2V0X3dwc3RyKHN5bV9uYW1lKQorICAgICAg
+ICBzdXBlcihXYXRjaFBvaW50LCBzZWxmKS5fX2luaXRfXyh3cF9zdHIsIGdkYi5CUF9XQVRDSFBP
+SU5ULCB0eXBlKQorCisgICAgZGVmIHN0b3Aoc2VsZik6CisgICAgICAgIGVuZF9wYyA9IGdkYi5w
+YXJzZV9hbmRfZXZhbCgnJHBjJykKKyAgICAgICAgcHJpbnQgKCJISVQgV1AgQCAlcyIgJSAoZW5k
+X3BjKSkKKyAgICAgICAgcmV0dXJuIFRydWUKKworCitkZWYgZG9fb25lX3dhdGNoKHN5bSwgd3R5
+cGUsIHRleHQpOgorCisgICAgd3AgPSBXYXRjaFBvaW50KHN5bSwgd3R5cGUpCisgICAgZ2RiLmV4
+ZWN1dGUoImMiKQorICAgIHJlcG9ydF9zdHIgPSAiJXMgZm9yICVzICglcykiICUgKHRleHQsIHN5
+bSwgd3Auc3ltLnZhbHVlKCkpCisKKyAgICBpZiB3cC5oaXRfY291bnQgPiAwOgorICAgICAgICBy
+ZXBvcnQoVHJ1ZSwgcmVwb3J0X3N0cikKKyAgICAgICAgd3AuZGVsZXRlKCkKKyAgICBlbHNlOgor
+ICAgICAgICByZXBvcnQoRmFsc2UsIHJlcG9ydF9zdHIpCisKKworZGVmIGNoZWNrX3dhdGNoZXMo
+c3ltX25hbWUpOgorICAgICJXYXRjaCBhIHN5bWJvbCBmb3IgYW55IGFjY2Vzcy4iCisKKyAgICAj
+IFNob3VsZCBoaXQgZm9yIGFueSByZWFkCisgICAgZG9fb25lX3dhdGNoKHN5bV9uYW1lLCBnZGIu
+V1BfQUNDRVNTLCAiYXdhdGNoIikKKworICAgICMgQWdhaW4gc2hvdWxkIGhpdCBmb3IgcmVhZHMK
+KyAgICBkb19vbmVfd2F0Y2goc3ltX25hbWUsIGdkYi5XUF9SRUFELCAicndhdGNoIikKKworICAg
+ICMgRmluYWxseSB3aGVuIGl0IGlzIHdyaXR0ZW4KKyAgICBkb19vbmVfd2F0Y2goc3ltX25hbWUs
+IGdkYi5XUF9XUklURSwgIndhdGNoIikKKworCitjbGFzcyBDYXRjaEJyZWFrcG9pbnQoZ2RiLkJy
+ZWFrcG9pbnQpOgorICAgIGRlZiBfX2luaXRfXyhzZWxmLCBzeW1fbmFtZSk6CisgICAgICAgIHN1
+cGVyKENhdGNoQnJlYWtwb2ludCwgc2VsZikuX19pbml0X18oc3ltX25hbWUpCisgICAgICAgIHNl
+bGYuc3ltLCBvayA9IGdkYi5sb29rdXBfc3ltYm9sKHN5bV9uYW1lKQorCisgICAgZGVmIHN0b3Ao
+c2VsZik6CisgICAgICAgIGVuZF9wYyA9IGdkYi5wYXJzZV9hbmRfZXZhbCgnJHBjJykKKyAgICAg
+ICAgcHJpbnQgKCJDQjogJXMgPT0gJXMiICUgKGVuZF9wYywgc2VsZi5zeW0udmFsdWUoKSkpCisg
+ICAgICAgIGlmIGVuZF9wYyA9PSBzZWxmLnN5bS52YWx1ZSgpOgorICAgICAgICAgICAgcmVwb3J0
+KEZhbHNlLCAiSGl0IGZpbmFsIGNhdGNocG9pbnQiKQorCisKK2RlZiBydW5fdGVzdCgpOgorICAg
+ICJSdW4gdGhyb3VnaHQgdGhlIHRlc3RzIG9uZSBieSBvbmUiCisKKyAgICBwcmludCAoIkNoZWNr
+aW5nIHdlIGNhbiBzdGVwIHRoZSBmaXJzdCBmZXcgaW5zdHJ1Y3Rpb25zIikKKyAgICBzdGVwX29r
+ID0gMAorICAgIGZvciBpIGluIHJhbmdlKDMpOgorICAgICAgICBpZiBjaGVja19zdGVwKCk6Cisg
+ICAgICAgICAgICBzdGVwX29rICs9IDEKKworICAgIHJlcG9ydChzdGVwX29rID09IDMsICJzaW5n
+bGUgc3RlcCBpbiBib290IGNvZGUiKQorCisgICAgcHJpbnQgKCJDaGVja2luZyBIVyBicmVha3Bv
+aW50IHdvcmtzIikKKyAgICBicmVha19vayA9IGNoZWNrX2hicmVhaygia2VybmVsX2luaXQiKQor
+ICAgIHJlcG9ydChicmVha19vaywgImhicmVhayBAIGtlcm5lbF9pbml0IikKKworICAgICMgQ2Fu
+J3Qgc2V0IHRoaXMgdXAgdW50aWwgd2UgYXJlIGluIHRoZSBrZXJuZWwgcHJvcGVyCisgICAgIyBp
+ZiB3ZSBtYWtlIGl0IHRvIHJ1bl9pbml0X3Byb2Nlc3Mgd2UndmUgb3Zlci1ydW4gYW5kCisgICAg
+IyBvbmUgb2YgdGhlIHRlc3RzIGZhaWxlZAorICAgIHByaW50ICgiU2V0dXAgY2F0Y2gtYWxsIGZv
+ciBydW5faW5pdF9wcm9jZXNzIikKKyAgICBjYnAgPSBDYXRjaEJyZWFrcG9pbnQoInJ1bl9pbml0
+X3Byb2Nlc3MiKQorICAgIGNwYjIgPSBDYXRjaEJyZWFrcG9pbnQoInRyeV90b19ydW5faW5pdF9w
+cm9jZXNzIikKKworICAgIHByaW50ICgiQ2hlY2tpbmcgTm9ybWFsIGJyZWFrcG9pbnQgd29ya3Mi
+KQorICAgIGJyZWFrX29rID0gY2hlY2tfYnJlYWsoIndhaXRfZm9yX2NvbXBsZXRpb24iKQorICAg
+IHJlcG9ydChicmVha19vaywgImJyZWFrIEAgd2FpdF9mb3JfY29tcGxldGlvbiIpCisKKyAgICBw
+cmludCAoIkNoZWNraW5nIHdhdGNocG9pbnQgd29ya3MiKQorICAgIGNoZWNrX3dhdGNoZXMoInN5
+c3RlbV9zdGF0ZSIpCisKKyMKKyMgVGhpcyBydW5zIGFzIHRoZSBzY3JpcHQgaXQgc291cmNlZCAo
+dmlhIC14KQorIworCit0cnk6CisgICAgcHJpbnQgKCJDb25uZWN0aW5nIHRvIHJlbW90ZSIpCisg
+ICAgZ2RiLmV4ZWN1dGUoInRhcmdldCByZW1vdGUgbG9jYWxob3N0OjEyMzQiKQorCisgICAgIyBU
+aGVzZSBhcmUgbm90IHZlcnkgdXNlZnVsIGluIHNjcmlwdHMKKyAgICBnZGIuZXhlY3V0ZSgic2V0
+IHBhZ2luYXRpb24gb2ZmIikKKyAgICBnZGIuZXhlY3V0ZSgic2V0IGNvbmZpcm0gb2ZmIikKKwor
+ICAgICMgUnVuIHRoZSBhY3R1YWwgdGVzdHMKKyAgICBydW5fdGVzdCgpCisKK2V4Y2VwdDoKKyAg
+ICBwcmludCAoIkdEQiBFeGNlcHRpb246ICVzIiAlIChzeXMuZXhjX2luZm8oKVswXSkpCisgICAg
+ZmFpbGNvdW50ICs9IDEKKyAgICBpbXBvcnQgY29kZQorICAgIGNvZGUuSW50ZXJhY3RpdmVDb25z
+b2xlKGxvY2Fscz1nbG9iYWxzKCkpLmludGVyYWN0KCkKKyAgICByYWlzZQorCisjIEZpbmFsbHkg
+a2lsbCB0aGUgaW5mZXJpb3IgYW5kIGV4aXQgZ2RiIHdpdGggYSBjb3VudCBvZiBmYWlsdXJlcwor
+Z2RiLmV4ZWN1dGUoImtpbGwiKQorZXhpdChmYWlsY291bnQpCi0tIAoyLjYuMwoKX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlz
+dAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEu
+ZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
