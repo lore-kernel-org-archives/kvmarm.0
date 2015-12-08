@@ -1,91 +1,112 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v4 0/4] KVM: arm64: BUG FIX: Correctly handle zero
- register transfers
-Date: Mon, 7 Dec 2015 17:45:55 -0600
-Message-ID: <20151207234555.GA2980@hawk.localdomain>
-References: <cover.1449230499.git.p.fedin@samsung.com>
- <20151205003334.GB3117@hawk.localdomain>
- <011601d130ca$64cc9070$2e65b150$@samsung.com>
- <20151207223631.GJ4402@hawk.localdomain>
+From: Mario Smarduch <m.smarduch@samsung.com>
+Subject: Re: [PATCH v3 05/22] arm64: KVM: Implement vgic-v3 save/restore
+Date: Mon, 07 Dec 2015 18:14:36 -0800
+Message-ID: <56663D0C.1070500@samsung.com>
+References: <1449485618-9443-1-git-send-email-marc.zyngier@arm.com>
+ <1449485618-9443-6-git-send-email-marc.zyngier@arm.com>
+ <5665B663.8020705@samsung.com> <5665B940.7000601@arm.com>
+ <5665BF4D.7090103@samsung.com> <5665C3C7.9010600@arm.com>
+ <5665CA68.2000401@samsung.com> <5665CDDF.3090201@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <20151207223631.GJ4402@hawk.localdomain>
-Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 627BC409A2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 21:13:47 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id j9lfIjH6KJFg for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Dec 2015 21:13:45 -0500 (EST)
+Received: from usmailout1.samsung.com (mailout1.w2.samsung.com
+ [211.189.100.11])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8DB66407A6
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 21:13:45 -0500 (EST)
+Received: from uscpsbgm1.samsung.com
+ (u114.gpu85.samsung.co.kr [203.254.195.114]) by mailout1.w2.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0NZ000GYNOXXS680@mailout1.w2.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Mon, 07 Dec 2015 21:15:33 -0500 (EST)
+In-reply-to: <5665CDDF.3090201@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 07, 2015 at 04:36:31PM -0600, Andrew Jones wrote:
-> On Mon, Dec 07, 2015 at 11:36:28AM +0300, Pavel Fedin wrote:
-> >  Hello!
-> > 
-> > > FYI, I tried writing test cases for this issue with kvm-unit-tests. The
-> > > issue didn't reproduce for me. It's quite possible my test cases are
-> > > flawed, so I'm not making any claims about the validity of the series
-> > 
-> >  This is indeed very interesting, so i'll take a look at it.
-> >  For now i've just only took a quick glance at the code, and i have at least one suggestion. Could you happen to have sp == 0 in
-> > check_xzr_sysreg()? In this case it will magically work.
-> >  Also, you could try to write a test which tries to overwrite xzr. Something like:
-> > 
-> > volatile int *addr1;
-> > volatile int *addr2;
-> > 
-> > asm volatile("str %3, [%1]\n\t"
-> >              "ldr wzr, [%1]\n\t"
-> >              "str wzr, [%2]\n\t",
-> >              "ldr %0, [%2]\n\t"
-> >              :"=r"(res):"r"(addr1), "r"(addr2), "r"(some_nonzero_val):"memory");
-> > 
-> >  Then check for res == some_nonzero_val. If they are equal, you've got the bug :)
-> >
+
+
+On 12/7/2015 10:20 AM, Marc Zyngier wrote:
+> On 07/12/15 18:05, Mario Smarduch wrote:
+>>
+>>
+>> On 12/7/2015 9:37 AM, Marc Zyngier wrote:
+[...]
+>>>
+>>
+>> I was thinking something like 'current_lr[VGIC_V3_LR_INDEX(...)]'.
 > 
-> Besides the fixes mentioned in other mails, I did add this load to xzr
-> tests too. For mmio we get the expected failure. mrs seems to work
-> though, but maybe that's expected.
+> That doesn't change anything, the compiler is perfectly able to 
+> optimize something like this:
 > 
-> qemu-system-aarch64 -machine virt,accel=kvm -cpu host \
->   -device virtio-serial-device -device virtconsole,chardev=ctd \
->   -chardev testdev,id=ctd -display none -serial stdio \
->   -kernel arm/xzr-test.flat -smp 2
+> [...]
+> ffffffc0007f31ac:       38624862        ldrb    w2, [x3,w2,uxtw]
+> ffffffc0007f31b0:       10000063        adr     x3, ffffffc0007f31bc <__vgic_v3_save_state+0x64>
+> ffffffc0007f31b4:       8b228862        add     x2, x3, w2, sxtb #2
+> ffffffc0007f31b8:       d61f0040        br      x2
+> ffffffc0007f31bc:       d53ccde2        mrs     x2, s3_4_c12_c13_7
+> ffffffc0007f31c0:       f9001c02        str     x2, [x0,#56]
+> ffffffc0007f31c4:       d53ccdc2        mrs     x2, s3_4_c12_c13_6
+> ffffffc0007f31c8:       f9002002        str     x2, [x0,#64]
+> ffffffc0007f31cc:       d53ccda2        mrs     x2, s3_4_c12_c13_5
+> ffffffc0007f31d0:       f9002402        str     x2, [x0,#72]
+> ffffffc0007f31d4:       d53ccd82        mrs     x2, s3_4_c12_c13_4
+> ffffffc0007f31d8:       f9002802        str     x2, [x0,#80]
+> ffffffc0007f31dc:       d53ccd62        mrs     x2, s3_4_c12_c13_3
+> ffffffc0007f31e0:       f9002c02        str     x2, [x0,#88]
+> ffffffc0007f31e4:       d53ccd42        mrs     x2, s3_4_c12_c13_2
+> ffffffc0007f31e8:       f9003002        str     x2, [x0,#96]
+> ffffffc0007f31ec:       d53ccd22        mrs     x2, s3_4_c12_c13_1
+> ffffffc0007f31f0:       f9003402        str     x2, [x0,#104]
+> ffffffc0007f31f4:       d53ccd02        mrs     x2, s3_4_c12_c13_0
+> ffffffc0007f31f8:       f9003802        str     x2, [x0,#112]
+> ffffffc0007f31fc:       d53ccce2        mrs     x2, s3_4_c12_c12_7
+> ffffffc0007f3200:       f9003c02        str     x2, [x0,#120]
+> ffffffc0007f3204:       d53cccc2        mrs     x2, s3_4_c12_c12_6
+> ffffffc0007f3208:       f9004002        str     x2, [x0,#128]
+> ffffffc0007f320c:       d53ccca2        mrs     x2, s3_4_c12_c12_5
+> ffffffc0007f3210:       f9004402        str     x2, [x0,#136]
+> ffffffc0007f3214:       d53ccc82        mrs     x2, s3_4_c12_c12_4
+> ffffffc0007f3218:       f9004802        str     x2, [x0,#144]
+> ffffffc0007f321c:       d53ccc62        mrs     x2, s3_4_c12_c12_3
+> ffffffc0007f3220:       f9004c02        str     x2, [x0,#152]
+> ffffffc0007f3224:       d53ccc42        mrs     x2, s3_4_c12_c12_2
+> ffffffc0007f3228:       f9005002        str     x2, [x0,#160]
+> ffffffc0007f322c:       d53ccc22        mrs     x2, s3_4_c12_c12_1
+> ffffffc0007f3230:       f9005402        str     x2, [x0,#168]
+> ffffffc0007f3234:       d53ccc02        mrs     x2, s3_4_c12_c12_0
+> ffffffc0007f3238:       7100183f        cmp     w1, #0x6
+> ffffffc0007f323c:       f9005802        str     x2, [x0,#176]
 > 
-> PASS: mmio: sanity check: read 0x55555555
-> FAIL: mmio: 'str wzr' check: read 0x0badc0de
-> FAIL: mmio: 'ldr wzr' check: read 0x0badc0de
-> PASS: sysreg: sp = 0x00000000401affe0
-> FAIL: sysreg: from xzr check: read 0xffffc0de0badc0de
-> PASS: sysreg: to xzr check: read 0x0000000000000000
->
+> As you can see, this is as optimal as it gets, short of being able
+> to find a nice way to use more than one register...
 
-I messed up the "load into xzr" test royally in the last attached patch.
-It was quite wrong. I have now tested
+Interesting, thanks for the dump I'm no expert on pipeline optimizations but I'm
+wondering with these system register accesses can these be executed out of order
+provided you didn't have what I thinks are write after read dependencies?
+It's only 4 registers here, there are some other longer stretches in subsequent
+patches.
 
- asm volatile(
-     "str %3, [%1]\n\t"
-     "ldr wzr, [%1]\n\t"
-     "str wzr, [%2]\n\t"
-     "ldr %0, [%2]\n\t"
-     :"=r"(val):"r"(addr), "r"(addr2), "r"(0x55555555):"memory");
-report("mmio: 'ldr wzr' check: read 0x%08lx", val != 0x55555555, val);
-
-which passes and
-
- val = readl(addr);
- printf("addr = 0x%08lx\n", val);
- val = readl(addr2);
- printf("addr2 = 0x%08lx\n", val);
-
-gives
-
-addr = 0x55555555
-addr2 = 0x00000000
-
-So it looks like we don't "change" xzr somehow with loads. Anyway, I
-probably won't clean this test up and post it. I don't think we really
-need to add it as a regression test, unless others disagree and would
-like to see it added.
-
-Thanks,
-drew
+I minor note here is some white space in this patch.
+> 
+> Thanks,
+> 
+> 	M.
+> 
