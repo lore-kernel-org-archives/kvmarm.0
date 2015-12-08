@@ -1,165 +1,135 @@
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v10 2/6] target-arm: kvm - implement software breakpoints
-Date: Tue,  8 Dec 2015 18:32:29 +0000
-Message-ID: <1449599553-24713-3-git-send-email-alex.bennee@linaro.org>
+Subject: [PATCH v10 5/6] target-arm: kvm - re-inject guest debug exceptions
+Date: Tue,  8 Dec 2015 18:32:32 +0000
+Message-ID: <1449599553-24713-6-git-send-email-alex.bennee@linaro.org>
 References: <1449599553-24713-1-git-send-email-alex.bennee@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 04F6F40F90
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2015 13:31:14 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2h7GTjaON8bF for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Dec 2015 13:31:09 -0500 (EST)
-Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 81B4F412ED
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2015 13:31:09 -0500 (EST)
-Received: by wmvv187 with SMTP id v187so226457917wmv.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Dec 2015 10:33:00 -0800 (PST)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1449599553-24713-1-git-send-email-alex.bennee@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, christoffer.dall@linaro.org, zhichao.huang@linaro.org
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhlc2UgZG9uJ3QgaW52b2x2ZSBtZXNzaW5nIGFyb3VuZCB3aXRoIGRlYnVnIHJlZ2lzdGVycywg
-anVzdCBzZXR0aW5nCnRoZSBicmVha3BvaW50IGluc3RydWN0aW9uIGluIG1lbW9yeS4gR0RCIHdp
-bGwgbm90IHVzZSB0aGlzIG1lY2hhbmlzbSBpZgppdCBjYW4ndCBhY2Nlc3MgdGhlIG1lbW9yeSB0
-byB3cml0ZSB0aGUgYnJlYWtwb2ludC4KCkFsbCB0aGUga2VybmVsIGhhcyB0byBkbyBpcyBlbnN1
-cmUgdGhlIGh5cGVydmlzb3IgdHJhcHMgdGhlIGJyZWFrcG9pbnQKZXhjZXB0aW9ucyBhbmQgcmV0
-dXJucyB0byB1c2Vyc3BhY2UuCgpTaWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVu
-bmVlQGxpbmFyby5vcmc+CgotLQp2MgogIC0gaGFuZGxlIGRlYnVnIGV4aXQgd2l0aCBuZXcgaHNy
-IGV4Y2VwdGlvbiBpbmZvCiAgLSBhZGQgdmVyYm9zaXR5IHRvIFVOSU1QIG1lc3NhZ2UKdjMKICAt
-IHN5bmMgd2l0aCBrdm1fY3B1X3N5bmNocm9uaXplX3N0YXRlKCkgYmVmb3JlIGNoZWNraW5nIFBD
-LgogIC0gdXNlIGludGVybmFscy5oIGRlZmluZXMKICAtIHVzZSBlbnYtPnBjCiAgLSB1c2UgcHJv
-cGVyIGZvcm1hdCB0eXBlcwp2OQogIC0gYWRkIGluY2x1ZGUgZm9yIGVycm9yX3JlcG9ydAogIC0g
-ZGVmaW5lIGEgYnJrX2luc24gY29uc3RhbnQKdjEwCiAgLSBmaXggdXAgZm9yIGFybTMyIGNvbXBp
-bGUKICAtIG1vdmUgc3dfYnBfY29kZSB0byBrdm0zMiAoc3R1YnMpLzY0ICh3b3JraW5nKQogIC0g
-bW92ZSBrdm1faGFuZGxlX2RlYnVnIHRvIGt2bTMyLzY0IGFzIGt2bV9hcm1faGFuZGxlX2RlYnVn
-CiAgLSBkb24ndCBlbmFibGUgU1dfQlAgdW5sZXNzIHRoZSBkZWZpbmUgaXMgdGhlcmUKICAtIHdy
-YXAgaW4gaGF2ZV9ndWVzdF9kZWJ1ZyBjaGVjawotLS0KIHRhcmdldC1hcm0va3ZtLmMgICAgIHwg
-MzkgKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLQogdGFyZ2V0LWFybS9rdm0zMi5jICAgfCAx
-OCArKysrKysrKysrKysrCiB0YXJnZXQtYXJtL2t2bTY0LmMgICB8IDcyICsrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysKIHRhcmdldC1hcm0va3ZtX2Fy
-bS5oIHwgIDkgKysrKysrKwogNCBmaWxlcyBjaGFuZ2VkLCAxMjMgaW5zZXJ0aW9ucygrKSwgMTUg
-ZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvdGFyZ2V0LWFybS9rdm0uYyBiL3RhcmdldC1hcm0v
-a3ZtLmMKaW5kZXggNzllZjRjNi4uN2Y0NGUyMiAxMDA2NDQKLS0tIGEvdGFyZ2V0LWFybS9rdm0u
-YworKysgYi90YXJnZXQtYXJtL2t2bS5jCkBAIC0xNyw2ICsxNyw3IEBACiAKICNpbmNsdWRlICJx
-ZW11LWNvbW1vbi5oIgogI2luY2x1ZGUgInFlbXUvdGltZXIuaCIKKyNpbmNsdWRlICJxZW11L2Vy
-cm9yLXJlcG9ydC5oIgogI2luY2x1ZGUgInN5c2VtdS9zeXNlbXUuaCIKICNpbmNsdWRlICJzeXNl
-bXUva3ZtLmgiCiAjaW5jbHVkZSAia3ZtX2FybS5oIgpAQCAtNTE2LDkgKzUxNywyMyBAQCBNZW1U
-eEF0dHJzIGt2bV9hcmNoX3Bvc3RfcnVuKENQVVN0YXRlICpjcywgc3RydWN0IGt2bV9ydW4gKnJ1
-bikKICAgICByZXR1cm4gTUVNVFhBVFRSU19VTlNQRUNJRklFRDsKIH0KIAorCiBpbnQga3ZtX2Fy
-Y2hfaGFuZGxlX2V4aXQoQ1BVU3RhdGUgKmNzLCBzdHJ1Y3Qga3ZtX3J1biAqcnVuKQogewotICAg
-IHJldHVybiAwOworICAgIGludCByZXQgPSAwOworCisgICAgc3dpdGNoIChydW4tPmV4aXRfcmVh
-c29uKSB7CisgICAgY2FzZSBLVk1fRVhJVF9ERUJVRzoKKyAgICAgICAgaWYgKGt2bV9hcm1faGFu
-ZGxlX2RlYnVnKGNzLCAmcnVuLT5kZWJ1Zy5hcmNoKSkgeworICAgICAgICAgICAgcmV0ID0gRVhD
-UF9ERUJVRzsKKyAgICAgICAgfSAvKiBvdGhlcndpc2UgcmV0dXJuIHRvIGd1ZXN0ICovCisgICAg
-ICAgIGJyZWFrOworICAgIGRlZmF1bHQ6CisgICAgICAgIHFlbXVfbG9nX21hc2soTE9HX1VOSU1Q
-LCAiJXM6IHVuLWhhbmRsZWQgZXhpdCByZWFzb24gJWRcbiIsCisgICAgICAgICAgICAgICAgICAg
-ICAgX19mdW5jX18sIHJ1bi0+ZXhpdF9yZWFzb24pOworICAgICAgICBicmVhazsKKyAgICB9Cisg
-ICAgcmV0dXJuIHJldDsKIH0KIAogYm9vbCBrdm1fYXJjaF9zdG9wX29uX2VtdWxhdGlvbl9lcnJv
-cihDUFVTdGF0ZSAqY3MpCkBAIC01NDEsMTYgKzU1NiwxNiBAQCBpbnQga3ZtX2FyY2hfb25fc2ln
-YnVzKGludCBjb2RlLCB2b2lkICphZGRyKQogICAgIHJldHVybiAxOwogfQogCisvKiBUaGUgI2lm
-ZGVmIHByb3RlY3Rpb25zIGFyZSB1bnRpbCAzMmJpdCBoZWFkZXJzIGFyZSBpbXBvcnRlZCBhbmQg
-Y2FuCisgKiBiZSByZW1vdmVkIG9uY2UgYm90aCAzMiBhbmQgNjQgYml0IHJlYWNoIGZlYXR1cmUg
-cGFyaXR5LgorICovCiB2b2lkIGt2bV9hcmNoX3VwZGF0ZV9ndWVzdF9kZWJ1ZyhDUFVTdGF0ZSAq
-Y3MsIHN0cnVjdCBrdm1fZ3Vlc3RfZGVidWcgKmRiZykKIHsKLSAgICBxZW11X2xvZ19tYXNrKExP
-R19VTklNUCwgIiVzOiBub3QgaW1wbGVtZW50ZWRcbiIsIF9fZnVuY19fKTsKLX0KLQotaW50IGt2
-bV9hcmNoX2luc2VydF9zd19icmVha3BvaW50KENQVVN0YXRlICpjcywKLSAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBzdHJ1Y3Qga3ZtX3N3X2JyZWFrcG9pbnQgKmJwKQotewotICAg
-IHFlbXVfbG9nX21hc2soTE9HX1VOSU1QLCAiJXM6IG5vdCBpbXBsZW1lbnRlZFxuIiwgX19mdW5j
-X18pOwotICAgIHJldHVybiAtRUlOVkFMOworI2lmZGVmIEtWTV9HVUVTVERCR19VU0VfU1dfQlAK
-KyAgICBpZiAoa3ZtX3N3X2JyZWFrcG9pbnRzX2FjdGl2ZShjcykpIHsKKyAgICAgICAgZGJnLT5j
-b250cm9sIHw9IEtWTV9HVUVTVERCR19FTkFCTEUgfCBLVk1fR1VFU1REQkdfVVNFX1NXX0JQOwor
-ICAgIH0KKyNlbmRpZgogfQogCiBpbnQga3ZtX2FyY2hfaW5zZXJ0X2h3X2JyZWFrcG9pbnQodGFy
-Z2V0X3Vsb25nIGFkZHIsCkBAIC01NjcsMTIgKzU4Miw2IEBAIGludCBrdm1fYXJjaF9yZW1vdmVf
-aHdfYnJlYWtwb2ludCh0YXJnZXRfdWxvbmcgYWRkciwKICAgICByZXR1cm4gLUVJTlZBTDsKIH0K
-IAotaW50IGt2bV9hcmNoX3JlbW92ZV9zd19icmVha3BvaW50KENQVVN0YXRlICpjcywKLSAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzdHJ1Y3Qga3ZtX3N3X2JyZWFrcG9pbnQgKmJw
-KQotewotICAgIHFlbXVfbG9nX21hc2soTE9HX1VOSU1QLCAiJXM6IG5vdCBpbXBsZW1lbnRlZFxu
-IiwgX19mdW5jX18pOwotICAgIHJldHVybiAtRUlOVkFMOwotfQogCiB2b2lkIGt2bV9hcmNoX3Jl
-bW92ZV9hbGxfaHdfYnJlYWtwb2ludHModm9pZCkKIHsKZGlmZiAtLWdpdCBhL3RhcmdldC1hcm0v
-a3ZtMzIuYyBiL3RhcmdldC1hcm0va3ZtMzIuYwppbmRleCBkZjFlMmIwLi41Y2U5NjlmIDEwMDY0
-NAotLS0gYS90YXJnZXQtYXJtL2t2bTMyLmMKKysrIGIvdGFyZ2V0LWFybS9rdm0zMi5jCkBAIC00
-NzUsMyArNDc1LDIxIEBAIGludCBrdm1fYXJjaF9nZXRfcmVnaXN0ZXJzKENQVVN0YXRlICpjcykK
-IAogICAgIHJldHVybiAwOwogfQorCitpbnQga3ZtX2FyY2hfaW5zZXJ0X3N3X2JyZWFrcG9pbnQo
-Q1BVU3RhdGUgKmNzLCBzdHJ1Y3Qga3ZtX3N3X2JyZWFrcG9pbnQgKmJwKQoreworICAgIHFlbXVf
-bG9nX21hc2soTE9HX1VOSU1QLCAiJXM6IGd1ZXN0IGRlYnVnIG5vdCB5ZXQgaW1wbGVtZW50ZWRc
-biIsIF9fZnVuY19fKTsKKyAgICByZXR1cm4gLUVJTlZBTDsKK30KKworaW50IGt2bV9hcmNoX3Jl
-bW92ZV9zd19icmVha3BvaW50KENQVVN0YXRlICpjcywgc3RydWN0IGt2bV9zd19icmVha3BvaW50
-ICpicCkKK3sKKyAgICBxZW11X2xvZ19tYXNrKExPR19VTklNUCwgIiVzOiBndWVzdCBkZWJ1ZyBu
-b3QgeWV0IGltcGxlbWVudGVkXG4iLCBfX2Z1bmNfXyk7CisgICAgcmV0dXJuIC1FSU5WQUw7Cit9
-CisKK2Jvb2wga3ZtX2FybV9oYW5kbGVfZGVidWcoQ1BVU3RhdGUgKmNzLCBzdHJ1Y3Qga3ZtX2Rl
-YnVnX2V4aXRfYXJjaCAqZGVidWdfZXhpdCkKK3sKKyAgICBxZW11X2xvZ19tYXNrKExPR19VTklN
-UCwgIiVzOiBndWVzdCBkZWJ1ZyBub3QgeWV0IGltcGxlbWVudGVkXG4iLCBfX2Z1bmNfXyk7Cisg
-ICAgcmV0dXJuIGZhbHNlOworfQpkaWZmIC0tZ2l0IGEvdGFyZ2V0LWFybS9rdm02NC5jIGIvdGFy
-Z2V0LWFybS9rdm02NC5jCmluZGV4IGQwODc3OTQuLjNiMzkyOWQgMTAwNjQ0Ci0tLSBhL3Rhcmdl
-dC1hcm0va3ZtNjQuYworKysgYi90YXJnZXQtYXJtL2t2bTY0LmMKQEAgLTE4LDYgKzE4LDcgQEAK
-ICNpbmNsdWRlICJjb25maWctaG9zdC5oIgogI2luY2x1ZGUgInFlbXUtY29tbW9uLmgiCiAjaW5j
-bHVkZSAicWVtdS90aW1lci5oIgorI2luY2x1ZGUgInFlbXUvZXJyb3ItcmVwb3J0LmgiCiAjaW5j
-bHVkZSAic3lzZW11L3N5c2VtdS5oIgogI2luY2x1ZGUgInN5c2VtdS9rdm0uaCIKICNpbmNsdWRl
-ICJrdm1fYXJtLmgiCkBAIC00ODEsMyArNDgyLDc0IEBAIGludCBrdm1fYXJjaF9nZXRfcmVnaXN0
-ZXJzKENQVVN0YXRlICpjcykKICAgICAvKiBUT0RPOiBvdGhlciByZWdpc3RlcnMgKi8KICAgICBy
-ZXR1cm4gcmV0OwogfQorCisvKiBDNi42LjI5IEJSSyBpbnN0cnVjdGlvbiAqLworc3RhdGljIGNv
-bnN0IHVpbnQzMl90IGJya19pbnNuID0gMHhkNDIwMDAwMDsKKworaW50IGt2bV9hcmNoX2luc2Vy
-dF9zd19icmVha3BvaW50KENQVVN0YXRlICpjcywgc3RydWN0IGt2bV9zd19icmVha3BvaW50ICpi
-cCkKK3sKKyAgICBpZiAoaGF2ZV9ndWVzdF9kZWJ1ZykgeworICAgICAgICBpZiAoY3B1X21lbW9y
-eV9yd19kZWJ1ZyhjcywgYnAtPnBjLCAodWludDhfdCAqKSZicC0+c2F2ZWRfaW5zbiwgNCwgMCkg
-fHwKKyAgICAgICAgICAgIGNwdV9tZW1vcnlfcndfZGVidWcoY3MsIGJwLT5wYywgKHVpbnQ4X3Qg
-KikmYnJrX2luc24sIDQsIDEpKSB7CisgICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsKKyAgICAg
-ICAgfQorICAgICAgICByZXR1cm4gMDsKKyAgICB9IGVsc2UgeworICAgICAgICBlcnJvcl9yZXBv
-cnQoImd1ZXN0IGRlYnVnIG5vdCBzdXBwb3J0ZWQgb24gdGhpcyBrZXJuZWwiKTsKKyAgICAgICAg
-cmV0dXJuIC1FSU5WQUw7CisgICAgfQorfQorCitpbnQga3ZtX2FyY2hfcmVtb3ZlX3N3X2JyZWFr
-cG9pbnQoQ1BVU3RhdGUgKmNzLCBzdHJ1Y3Qga3ZtX3N3X2JyZWFrcG9pbnQgKmJwKQoreworICAg
-IHN0YXRpYyB1aW50MzJfdCBicms7CisKKyAgICBpZiAoaGF2ZV9ndWVzdF9kZWJ1ZykgeworICAg
-ICAgICBpZiAoY3B1X21lbW9yeV9yd19kZWJ1ZyhjcywgYnAtPnBjLCAodWludDhfdCAqKSZicmss
-IDQsIDApIHx8CisgICAgICAgICAgICBicmsgIT0gYnJrX2luc24gfHwKKyAgICAgICAgICAgIGNw
-dV9tZW1vcnlfcndfZGVidWcoY3MsIGJwLT5wYywgKHVpbnQ4X3QgKikmYnAtPnNhdmVkX2luc24s
-IDQsIDEpKSB7CisgICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsKKyAgICAgICAgfQorICAgICAg
-ICByZXR1cm4gMDsKKyAgICB9IGVsc2UgeworICAgICAgICBlcnJvcl9yZXBvcnQoImd1ZXN0IGRl
-YnVnIG5vdCBzdXBwb3J0ZWQgb24gdGhpcyBrZXJuZWwiKTsKKyAgICAgICAgcmV0dXJuIC1FSU5W
-QUw7CisgICAgfQorfQorCisvKiBTZWUgdjggQVJNIEFSTSBENy4yLjI3IEVTUl9FTHgsIEV4Y2Vw
-dGlvbiBTeW5kcm9tZSBSZWdpc3RlcgorICoKKyAqIFRvIG1pbmltaXNlIHRyYW5zbGF0aW5nIGJl
-dHdlZW4ga2VybmVsIGFuZCB1c2VyLXNwYWNlIHRoZSBrZXJuZWwKKyAqIEFCSSBqdXN0IHByb3Zp
-ZGVzIHVzZXItc3BhY2Ugd2l0aCB0aGUgZnVsbCBleGNlcHRpb24gc3luZHJvbWUKKyAqIHJlZ2lz
-dGVyIHZhbHVlIHRvIGJlIGRlY29kZWQgaW4gUUVNVS4KKyAqLworCitib29sIGt2bV9hcm1faGFu
-ZGxlX2RlYnVnKENQVVN0YXRlICpjcywgc3RydWN0IGt2bV9kZWJ1Z19leGl0X2FyY2ggKmRlYnVn
-X2V4aXQpCit7CisgICAgaW50IGhzcl9lYyA9IGRlYnVnX2V4aXQtPmhzciA+PiBBUk1fRUxfRUNf
-U0hJRlQ7CisgICAgQVJNQ1BVICpjcHUgPSBBUk1fQ1BVKGNzKTsKKyAgICBDUFVBUk1TdGF0ZSAq
-ZW52ID0gJmNwdS0+ZW52OworCisgICAgLyogRW5zdXJlIFBDIGlzIHN5bmNocm9uaXNlZCAqLwor
-ICAgIGt2bV9jcHVfc3luY2hyb25pemVfc3RhdGUoY3MpOworCisgICAgc3dpdGNoIChoc3JfZWMp
-IHsKKyAgICBjYXNlIEVDX0FBNjRfQktQVDoKKyAgICAgICAgaWYgKGt2bV9maW5kX3N3X2JyZWFr
-cG9pbnQoY3MsIGVudi0+cGMpKSB7CisgICAgICAgICAgICByZXR1cm4gdHJ1ZTsKKyAgICAgICAg
-fQorICAgICAgICBicmVhazsKKyAgICBkZWZhdWx0OgorICAgICAgICBlcnJvcl9yZXBvcnQoIiVz
-OiB1bmhhbmRsZWQgZGVidWcgZXhpdCAoJSJQUkl4MzIiLCAlIlBSSXg2NCIpXG4iLAorICAgICAg
-ICAgICAgICAgICAgICAgX19mdW5jX18sIGRlYnVnX2V4aXQtPmhzciwgZW52LT5wYyk7CisgICAg
-fQorCisgICAgLyogSWYgd2UgZG9uJ3QgaGFuZGxlIHRoaXMgaXQgY291bGQgYmUgaXQgcmVhbGx5
-IGlzIGZvciB0aGUKKyAgICAgICBndWVzdCB0byBoYW5kbGUgKi8KKyAgICBxZW11X2xvZ19tYXNr
-KExPR19VTklNUCwKKyAgICAgICAgICAgICAgICAgICIlczogcmUtaW5qZWN0aW5nIGV4Y2VwdGlv
-biBub3QgeWV0IGltcGxlbWVudGVkIgorICAgICAgICAgICAgICAgICAgIiAoMHglIlBSSXgzMiIs
-ICUiUFJJeDY0IilcbiIsCisgICAgICAgICAgICAgICAgICBfX2Z1bmNfXywgaHNyX2VjLCBlbnYt
-PnBjKTsKKworICAgIHJldHVybiBmYWxzZTsKK30KZGlmZiAtLWdpdCBhL3RhcmdldC1hcm0va3Zt
-X2FybS5oIGIvdGFyZ2V0LWFybS9rdm1fYXJtLmgKaW5kZXggYjUxNjA0MS4uODhmNWIzNyAxMDA2
-NDQKLS0tIGEvdGFyZ2V0LWFybS9rdm1fYXJtLmgKKysrIGIvdGFyZ2V0LWFybS9rdm1fYXJtLmgK
-QEAgLTIxNSw0ICsyMTUsMTMgQEAgc3RhdGljIGlubGluZSBjb25zdCBjaGFyICpnaWNfY2xhc3Nf
-bmFtZSh2b2lkKQogICovCiBjb25zdCBjaGFyICpnaWN2M19jbGFzc19uYW1lKHZvaWQpOwogCisv
-KioKKyAqIGt2bV9hcm1faGFuZGxlX2RlYnVnOgorICogQGNzOiBDUFVTdGF0ZQorICogQGRlYnVn
-X2V4aXQ6IGRlYnVnIHBhcnQgb2YgdGhlIEtWTSBleGl0IHN0cnVjdHVyZQorICoKKyAqIFJldHVy
-bnM6IFRSVUUgaXMgdGhlIGRlYnVnIGV4Y2VwdGlvbiB3YXMgaGFuZGxlZC4KKyAqLworYm9vbCBr
-dm1fYXJtX2hhbmRsZV9kZWJ1ZyhDUFVTdGF0ZSAqY3MsIHN0cnVjdCBrdm1fZGVidWdfZXhpdF9h
-cmNoICpkZWJ1Z19leGl0KTsKKwogI2VuZGlmCi0tIAoyLjYuMwoKX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1A
-bGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxt
-YW4vbGlzdGluZm8va3ZtYXJtCg==
+If we can't find details for the debug exception in our debug state
+then we can assume the exception is due to debugging inside the guest.
+To inject the exception into the guest state we re-use the TCG exceptio=
+n
+code (do_interrupt).
+
+However while guest debugging is in effect we currently can't handle th=
+e
+guest using single step as we will keep trapping to back to userspace.
+GDB makes heavy use of single-step behind the scenes which effectively
+means the guests ability to debug itself is disabled while it is being
+debugged.
+
+Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+---
+v5:
+  - new for v5
+v10:
+  - fix arm32 compile
+  - add full stop at end of sentance
+  - attempted to expand on limitations in commit msg
+---
+ target-arm/helper-a64.c | 12 ++++++++++--
+ target-arm/kvm64.c      | 24 +++++++++++++++++-------
+ 2 files changed, 27 insertions(+), 9 deletions(-)
+
+diff --git a/target-arm/helper-a64.c b/target-arm/helper-a64.c
+index deb8dbe..fc3ccdf 100644
+--- a/target-arm/helper-a64.c
++++ b/target-arm/helper-a64.c
+@@ -25,6 +25,7 @@
+ #include "qemu/bitops.h"
+ #include "internals.h"
+ #include "qemu/crc32c.h"
++#include "sysemu/kvm.h"
+ #include <zlib.h> /* For crc32 */
+=20
+ /* C2.4.7 Multiply and divide */
+@@ -469,7 +470,8 @@ void aarch64_cpu_do_interrupt(CPUState *cs)
+                   new_el);
+     if (qemu_loglevel_mask(CPU_LOG_INT)
+         && !excp_is_internal(cs->exception_index)) {
+-        qemu_log_mask(CPU_LOG_INT, "...with ESR 0x%" PRIx32 "\n",
++        qemu_log_mask(CPU_LOG_INT, "...with ESR %x/0x%" PRIx32 "\n",
++                      env->exception.syndrome >> ARM_EL_EC_SHIFT,
+                       env->exception.syndrome);
+     }
+=20
+@@ -535,6 +537,12 @@ void aarch64_cpu_do_interrupt(CPUState *cs)
+     aarch64_restore_sp(env, new_el);
+=20
+     env->pc =3D addr;
+-    cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
++
++    qemu_log_mask(CPU_LOG_INT, "...to EL%d PC 0x%" PRIx64 " PSTATE 0x%=
+x\n",
++                  new_el, env->pc, pstate_read(env));
++
++    if (!kvm_enabled()) {
++        cs->interrupt_request |=3D CPU_INTERRUPT_EXITTB;
++    }
+ }
+ #endif
+diff --git a/target-arm/kvm64.c b/target-arm/kvm64.c
+index 771ecdb..8e6d044 100644
+--- a/target-arm/kvm64.c
++++ b/target-arm/kvm64.c
+@@ -871,6 +871,7 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm_=
+debug_exit_arch *debug_exit)
+ {
+     int hsr_ec =3D debug_exit->hsr >> ARM_EL_EC_SHIFT;
+     ARMCPU *cpu =3D ARM_CPU(cs);
++    CPUClass *cc =3D CPU_GET_CLASS(cs);
+     CPUARMState *env =3D &cpu->env;
+=20
+     /* Ensure PC is synchronised */
+@@ -881,7 +882,14 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kvm=
+_debug_exit_arch *debug_exit)
+         if (cs->singlestep_enabled) {
+             return true;
+         } else {
+-            error_report("Came out of SINGLE STEP when not enabled");
++            /*
++             * The kernel should have supressed the guests ability to
++             * single step at this point so something has gone wrong.
++             */
++            error_report("%s: guest single-step while debugging unsupp=
+orted"
++                         " (%"PRIx64", %"PRIx32")\n",
++                         __func__, env->pc, debug_exit->hsr);
++            return false;
+         }
+         break;
+     case EC_AA64_BKPT:
+@@ -908,12 +916,14 @@ bool kvm_arm_handle_debug(CPUState *cs, struct kv=
+m_debug_exit_arch *debug_exit)
+                      __func__, debug_exit->hsr, env->pc);
+     }
+=20
+-    /* If we don't handle this it could be it really is for the
+-       guest to handle */
+-    qemu_log_mask(LOG_UNIMP,
+-                  "%s: re-injecting exception not yet implemented"
+-                  " (0x%"PRIx32", %"PRIx64")\n",
+-                  __func__, hsr_ec, env->pc);
++    /* If we are not handling the debug exception it must belong to
++     * the guest. Let's re-use the existing TCG interrupt code to set
++     * everything up properly.
++     */
++    cs->exception_index =3D EXCP_BKPT;
++    env->exception.syndrome =3D debug_exit->hsr;
++    env->exception.vaddress =3D debug_exit->far;
++    cc->do_interrupt(cs);
+=20
+     return false;
+ }
+--=20
+2.6.3
+
