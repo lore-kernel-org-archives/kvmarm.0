@@ -1,101 +1,189 @@
-From: Shannon Zhao <shannon.zhao@linaro.org>
-Subject: Re: [PATCH v6 02/21] KVM: ARM64: Define PMU data structure for each
- vcpu
-Date: Tue, 08 Dec 2015 22:14:29 +0800
-Message-ID: <5666E5C5.5040504@linaro.org>
-References: <1449578860-15808-1-git-send-email-zhaoshenglong@huawei.com>
- <1449578860-15808-3-git-send-email-zhaoshenglong@huawei.com>
- <5666DD0A.5060004@arm.com> <20151208135335.GK19612@arm.com>
- <5666E4E0.8050504@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v6 06/21] KVM: ARM64: Add reset and access handlers for
+ PMCEID0 and PMCEID1 register
+Date: Tue, 08 Dec 2015 14:23:16 +0000
+Message-ID: <5666E7D4.2070103@arm.com>
+References: <1449578860-15808-1-git-send-email-zhaoshenglong@huawei.com> <1449578860-15808-7-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 524A7412A6
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2015 09:12:52 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9gOnp+G24h-u for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Dec 2015 09:12:51 -0500 (EST)
-Received: from mail-pf0-f180.google.com (mail-pf0-f180.google.com
- [209.85.192.180])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3103740B40
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2015 09:12:50 -0500 (EST)
-Received: by pfnn128 with SMTP id n128so12826284pfn.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Dec 2015 06:14:41 -0800 (PST)
-In-Reply-To: <5666E4E0.8050504@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1449578860-15808-7-git-send-email-zhaoshenglong@huawei.com>
+Sender: kvm-owner@vger.kernel.org
+To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 08/12/15 12:47, Shannon Zhao wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
+> 
+> Add reset handler which gets host value of PMCEID0 or PMCEID1. Since
+> write action to PMCEID0 or PMCEID1 is ignored, add a new case for this.
+> 
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 29 +++++++++++++++++++++++++----
+>  1 file changed, 25 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index d81f7ac..1bcb2b7 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -452,6 +452,19 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>  	vcpu_sys_reg(vcpu, r->reg) = val;
+>  }
+>  
+> +static void reset_pmceid(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> +{
+> +	u64 pmceid;
+> +
+> +	if (r->reg == PMCEID0_EL0)
+> +		asm volatile("mrs %0, pmceid0_el0\n" : "=r" (pmceid));
+> +	else
+> +		/* PMCEID1_EL0 */
+> +		asm volatile("mrs %0, pmceid1_el0\n" : "=r" (pmceid));
+> +
+> +	vcpu_sys_reg(vcpu, r->reg) = pmceid;
+> +}
+> +
+>  /* PMU registers accessor. */
+>  static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+>  			    struct sys_reg_params *p,
+> @@ -469,6 +482,9 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+>  			vcpu_sys_reg(vcpu, r->reg) = val;
+>  			break;
+>  		}
+> +		case PMCEID0_EL0:
+> +		case PMCEID1_EL0:
+> +			return ignore_write(vcpu, p);
+>  		default:
+>  			vcpu_sys_reg(vcpu, r->reg) = p->regval;
+>  			break;
+> @@ -693,10 +709,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  	  access_pmu_regs, reset_unknown, PMSELR_EL0 },
+>  	/* PMCEID0_EL0 */
+>  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b110),
+> -	  trap_raz_wi },
+> +	  access_pmu_regs, reset_pmceid, PMCEID0_EL0 },
+>  	/* PMCEID1_EL0 */
+>  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b111),
+> -	  trap_raz_wi },
+> +	  access_pmu_regs, reset_pmceid, PMCEID1_EL0 },
+>  	/* PMCCNTR_EL0 */
+>  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b000),
+>  	  trap_raz_wi },
+> @@ -926,6 +942,9 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
+>  			vcpu_cp15(vcpu, r->reg) = val;
+>  			break;
+>  		}
+> +		case c9_PMCEID0:
+> +		case c9_PMCEID1:
+> +			return ignore_write(vcpu, p);
+>  		default:
+>  			vcpu_cp15(vcpu, r->reg) = p->regval;
+>  			break;
+> @@ -983,8 +1002,10 @@ static const struct sys_reg_desc cp15_regs[] = {
+>  	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
+>  	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmu_cp15_regs,
+>  	  NULL, c9_PMSELR },
+> -	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), trap_raz_wi },
+> -	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), trap_raz_wi },
+> +	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmu_cp15_regs,
+> +	  NULL, c9_PMCEID0 },
+> +	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmu_cp15_regs,
+> +	  NULL, c9_PMCEID1 },
+>  	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), trap_raz_wi },
+>  	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), trap_raz_wi },
+>  	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), trap_raz_wi },
+> 
 
+That's a lot of infrastructure for something that is essentially a
+constant that doesn't need to be stored in the sysreg array.
+I suggest you drop the constants for PMCEID{0,1}_EL0 and
+c9_PMCEID{0,1}, and turn the code into something like this:
 
-On 2015/12/8 22:10, Marc Zyngier wrote:
-> On 08/12/15 13:53, Will Deacon wrote:
->> On Tue, Dec 08, 2015 at 01:37:14PM +0000, Marc Zyngier wrote:
->>> On 08/12/15 12:47, Shannon Zhao wrote:
->>>> From: Shannon Zhao <shannon.zhao@linaro.org>
->>>>
->>>> Here we plan to support virtual PMU for guest by full software
->>>> emulation, so define some basic structs and functions preparing for
->>>> futher steps. Define struct kvm_pmc for performance monitor counter and
->>>> struct kvm_pmu for performance monitor unit for each vcpu. According to
->>>> ARMv8 spec, the PMU contains at most 32(ARMV8_MAX_COUNTERS) counters.
->>>>
->>>> Since this only supports ARM64 (or PMUv3), add a separate config symbol
->>>> for it.
->>>>
->>>> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
->>>> ---
->>>>   arch/arm64/include/asm/kvm_host.h |  2 ++
->>>>   arch/arm64/kvm/Kconfig            |  8 ++++++++
->>>>   include/kvm/arm_pmu.h             | 40 +++++++++++++++++++++++++++++++++++++++
->>>>   3 files changed, 50 insertions(+)
->>>>   create mode 100644 include/kvm/arm_pmu.h
->>
->> [...]
->>
->>>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
->>>> index a5272c0..66da9a2 100644
->>>> --- a/arch/arm64/kvm/Kconfig
->>>> +++ b/arch/arm64/kvm/Kconfig
->>>> @@ -36,6 +36,7 @@ config KVM
->>>>   	select HAVE_KVM_EVENTFD
->>>>   	select HAVE_KVM_IRQFD
->>>>   	select KVM_ARM_VGIC_V3
->>>> +	select KVM_ARM_PMU
->>>
->>> What if HW_PERF_EVENTS is not selected? Also, selecting HW_PERF_EVENTS
->>> is not enough, and you probably need PERF_EVENTS as well, So this should
->>> probably read:
->>>
->>> 	select KVM_ARM_PMU if (HW_PERF_EVENTS && PERF_EVENTS)
->>
->> HW_PERF_EVENTS depends on ARM_PMU which in turn depends on PERF_EVENTS.
->
-Yeah, this is the reason why I choose HW_PERF_EVENTS.
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 251d517..09c38d0 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -453,17 +453,22 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	vcpu_sys_reg(vcpu, r->reg) = val;
+ }
+ 
+-static void reset_pmceid(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
++static bool access_pmceid(struct kvm_vcpu *vcpu,
++			  struct sys_reg_params *p,
++			  const struct sys_reg_desc *r)
+ {
+ 	u64 pmceid;
+ 
+-	if (r->reg == PMCEID0_EL0)
++	if (p->is_write)
++		return ignore_write(vcpu, p);
++
++	if (!(p->Op2 & 1))
+ 		asm volatile("mrs %0, pmceid0_el0\n" : "=r" (pmceid));
+ 	else
+-		/* PMCEID1_EL0 */
+ 		asm volatile("mrs %0, pmceid1_el0\n" : "=r" (pmceid));
+ 
+-	vcpu_sys_reg(vcpu, r->reg) = pmceid;
++	p->regval = pmceid;
++	return true;
+ }
+ 
+ static bool pmu_counter_idx_valid(u64 pmcr, u64 idx)
+@@ -624,9 +629,6 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+ 			kvm_pmu_handle_pmcr(vcpu, val);
+ 			break;
+ 		}
+-		case PMCEID0_EL0:
+-		case PMCEID1_EL0:
+-			return ignore_write(vcpu, p);
+ 		default:
+ 			vcpu_sys_reg(vcpu, r->reg) = p->regval;
+ 			break;
+@@ -873,10 +875,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  access_pmu_regs, reset_unknown, PMSELR_EL0 },
+ 	/* PMCEID0_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b110),
+-	  access_pmu_regs, reset_pmceid, PMCEID0_EL0 },
++	  access_pmceid },
+ 	/* PMCEID1_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b111),
+-	  access_pmu_regs, reset_pmceid, PMCEID1_EL0 },
++	  access_pmceid },
+ 	/* PMCCNTR_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b000),
+ 	  access_pmu_regs, reset_unknown, PMCCNTR_EL0 },
+@@ -1223,9 +1225,6 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
+ 			kvm_pmu_handle_pmcr(vcpu, val);
+ 			break;
+ 		}
+-		case c9_PMCEID0:
+-		case c9_PMCEID1:
+-			return ignore_write(vcpu, p);
+ 		default:
+ 			vcpu_cp15(vcpu, r->reg) = p->regval;
+ 			break;
+@@ -1310,10 +1309,8 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	  NULL, c9_PMSWINC },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmu_cp15_regs,
+ 	  NULL, c9_PMSELR },
+-	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmu_cp15_regs,
+-	  NULL, c9_PMCEID0 },
+-	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmu_cp15_regs,
+-	  NULL, c9_PMCEID1 },
++	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
++	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmceid },
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), access_pmu_cp15_regs,
+ 	  NULL, c9_PMCCNTR },
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_pmxevtyper },
 
-> in which case, let's make it:
->
-> 	select KVM_ARM_PMU if HW_PERF_EVENTS
->
-Sure, will do.
+All we need is an accessor, nothing else.
 
-> which should give us the minimal chain. I hate the kernel config
-> language! ;-)
->
-> 	M.
->
+Thanks,
 
+	M.
 -- 
-Shannon
+Jazz is not dead. It just smells funny...
