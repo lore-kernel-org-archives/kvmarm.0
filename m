@@ -1,112 +1,153 @@
 From: Mario Smarduch <m.smarduch@samsung.com>
-Subject: Re: [PATCH v3 05/22] arm64: KVM: Implement vgic-v3 save/restore
-Date: Mon, 07 Dec 2015 18:14:36 -0800
-Message-ID: <56663D0C.1070500@samsung.com>
+Subject: Re: [PATCH v3 06/22] arm64: KVM: Implement timer save/restore
+Date: Mon, 07 Dec 2015 18:18:56 -0800
+Message-ID: <56663E10.2010108@samsung.com>
 References: <1449485618-9443-1-git-send-email-marc.zyngier@arm.com>
- <1449485618-9443-6-git-send-email-marc.zyngier@arm.com>
- <5665B663.8020705@samsung.com> <5665B940.7000601@arm.com>
- <5665BF4D.7090103@samsung.com> <5665C3C7.9010600@arm.com>
- <5665CA68.2000401@samsung.com> <5665CDDF.3090201@arm.com>
+ <1449485618-9443-7-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 627BC409A2
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 21:13:47 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id j9lfIjH6KJFg for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Dec 2015 21:13:45 -0500 (EST)
-Received: from usmailout1.samsung.com (mailout1.w2.samsung.com
- [211.189.100.11])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8DB66407A6
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Dec 2015 21:13:45 -0500 (EST)
-Received: from uscpsbgm1.samsung.com
- (u114.gpu85.samsung.co.kr [203.254.195.114]) by mailout1.w2.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
- with ESMTP id <0NZ000GYNOXXS680@mailout1.w2.samsung.com> for
- kvmarm@lists.cs.columbia.edu; Mon, 07 Dec 2015 21:15:33 -0500 (EST)
-In-reply-to: <5665CDDF.3090201@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <1449485618-9443-7-git-send-email-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
 
-On 12/7/2015 10:20 AM, Marc Zyngier wrote:
-> On 07/12/15 18:05, Mario Smarduch wrote:
->>
->>
->> On 12/7/2015 9:37 AM, Marc Zyngier wrote:
-[...]
->>>
->>
->> I was thinking something like 'current_lr[VGIC_V3_LR_INDEX(...)]'.
+On 12/7/2015 2:53 AM, Marc Zyngier wrote:
+> Implement the timer save restore as a direct translation of
+> the assembly code version.
 > 
-> That doesn't change anything, the compiler is perfectly able to 
-> optimize something like this:
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/kvm/hyp/Makefile          |  1 +
+>  arch/arm64/kvm/hyp/hyp.h             |  3 ++
+>  arch/arm64/kvm/hyp/timer-sr.c        | 72 ++++++++++++++++++++++++++++++++++++
+>  include/clocksource/arm_arch_timer.h |  6 +++
+>  4 files changed, 82 insertions(+)
+>  create mode 100644 arch/arm64/kvm/hyp/timer-sr.c
 > 
-> [...]
-> ffffffc0007f31ac:       38624862        ldrb    w2, [x3,w2,uxtw]
-> ffffffc0007f31b0:       10000063        adr     x3, ffffffc0007f31bc <__vgic_v3_save_state+0x64>
-> ffffffc0007f31b4:       8b228862        add     x2, x3, w2, sxtb #2
-> ffffffc0007f31b8:       d61f0040        br      x2
-> ffffffc0007f31bc:       d53ccde2        mrs     x2, s3_4_c12_c13_7
-> ffffffc0007f31c0:       f9001c02        str     x2, [x0,#56]
-> ffffffc0007f31c4:       d53ccdc2        mrs     x2, s3_4_c12_c13_6
-> ffffffc0007f31c8:       f9002002        str     x2, [x0,#64]
-> ffffffc0007f31cc:       d53ccda2        mrs     x2, s3_4_c12_c13_5
-> ffffffc0007f31d0:       f9002402        str     x2, [x0,#72]
-> ffffffc0007f31d4:       d53ccd82        mrs     x2, s3_4_c12_c13_4
-> ffffffc0007f31d8:       f9002802        str     x2, [x0,#80]
-> ffffffc0007f31dc:       d53ccd62        mrs     x2, s3_4_c12_c13_3
-> ffffffc0007f31e0:       f9002c02        str     x2, [x0,#88]
-> ffffffc0007f31e4:       d53ccd42        mrs     x2, s3_4_c12_c13_2
-> ffffffc0007f31e8:       f9003002        str     x2, [x0,#96]
-> ffffffc0007f31ec:       d53ccd22        mrs     x2, s3_4_c12_c13_1
-> ffffffc0007f31f0:       f9003402        str     x2, [x0,#104]
-> ffffffc0007f31f4:       d53ccd02        mrs     x2, s3_4_c12_c13_0
-> ffffffc0007f31f8:       f9003802        str     x2, [x0,#112]
-> ffffffc0007f31fc:       d53ccce2        mrs     x2, s3_4_c12_c12_7
-> ffffffc0007f3200:       f9003c02        str     x2, [x0,#120]
-> ffffffc0007f3204:       d53cccc2        mrs     x2, s3_4_c12_c12_6
-> ffffffc0007f3208:       f9004002        str     x2, [x0,#128]
-> ffffffc0007f320c:       d53ccca2        mrs     x2, s3_4_c12_c12_5
-> ffffffc0007f3210:       f9004402        str     x2, [x0,#136]
-> ffffffc0007f3214:       d53ccc82        mrs     x2, s3_4_c12_c12_4
-> ffffffc0007f3218:       f9004802        str     x2, [x0,#144]
-> ffffffc0007f321c:       d53ccc62        mrs     x2, s3_4_c12_c12_3
-> ffffffc0007f3220:       f9004c02        str     x2, [x0,#152]
-> ffffffc0007f3224:       d53ccc42        mrs     x2, s3_4_c12_c12_2
-> ffffffc0007f3228:       f9005002        str     x2, [x0,#160]
-> ffffffc0007f322c:       d53ccc22        mrs     x2, s3_4_c12_c12_1
-> ffffffc0007f3230:       f9005402        str     x2, [x0,#168]
-> ffffffc0007f3234:       d53ccc02        mrs     x2, s3_4_c12_c12_0
-> ffffffc0007f3238:       7100183f        cmp     w1, #0x6
-> ffffffc0007f323c:       f9005802        str     x2, [x0,#176]
-> 
-> As you can see, this is as optimal as it gets, short of being able
-> to find a nice way to use more than one register...
+> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> index d1e38ce..455dc0a 100644
+> --- a/arch/arm64/kvm/hyp/Makefile
+> +++ b/arch/arm64/kvm/hyp/Makefile
+> @@ -4,3 +4,4 @@
+>  
+>  obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
+>  obj-$(CONFIG_KVM_ARM_HOST) += vgic-v3-sr.o
+> +obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
+> diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
+> index 5759f9f..f213e46 100644
+> --- a/arch/arm64/kvm/hyp/hyp.h
+> +++ b/arch/arm64/kvm/hyp/hyp.h
+> @@ -35,5 +35,8 @@ void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
+>  void __vgic_v3_save_state(struct kvm_vcpu *vcpu);
+>  void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
+>  
+> +void __timer_save_state(struct kvm_vcpu *vcpu);
+> +void __timer_restore_state(struct kvm_vcpu *vcpu);
+> +
+>  #endif /* __ARM64_KVM_HYP_H__ */
+>  
+> diff --git a/arch/arm64/kvm/hyp/timer-sr.c b/arch/arm64/kvm/hyp/timer-sr.c
+> new file mode 100644
+> index 0000000..67292c0
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/timer-sr.c
+> @@ -0,0 +1,72 @@
+> +/*
+> + * Copyright (C) 2012-2015 - ARM Ltd
+> + * Author: Marc Zyngier <marc.zyngier@arm.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include <clocksource/arm_arch_timer.h>
+> +#include <linux/compiler.h>
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/kvm_mmu.h>
+> +
+> +#include "hyp.h"
+> +
+> +/* vcpu is already in the HYP VA space */
+> +void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+> +	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	u64 val;
+> +
+> +	if (kvm->arch.timer.enabled) {
+> +		timer->cntv_ctl = read_sysreg(cntv_ctl_el0);
+> +		isb();
 
-Interesting, thanks for the dump I'm no expert on pipeline optimizations but I'm
-wondering with these system register accesses can these be executed out of order
-provided you didn't have what I thinks are write after read dependencies?
-It's only 4 registers here, there are some other longer stretches in subsequent
-patches.
+Can you share the subtle insight why is the isb() needed here?
+B2.7.3 mentions changes to system registers only.
 
-I minor note here is some white space in this patch.
-> 
-> Thanks,
-> 
-> 	M.
+> +		timer->cntv_cval = read_sysreg(cntv_cval_el0);
+> +	}
+> +
+> +	/* Disable the virtual timer */
+> +	write_sysreg(0, cntv_ctl_el0);
+> +
+> +	/* Allow physical timer/counter access for the host */
+> +	val = read_sysreg(cnthctl_el2);
+> +	val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
+> +	write_sysreg(val, cnthctl_el2);
+> +
+> +	/* Clear cntvoff for the host */
+> +	write_sysreg(0, cntvoff_el2);
+> +}
+> +
+> +void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+> +	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> +	u64 val;
+> +
+> +	/*
+> +	 * Disallow physical timer access for the guest
+> +	 * Physical counter access is allowed
+> +	 */
+> +	val = read_sysreg(cnthctl_el2);
+> +	val &= ~CNTHCTL_EL1PCEN;
+> +	val |= CNTHCTL_EL1PCTEN;
+> +	write_sysreg(val, cnthctl_el2);
+> +
+> +	if (kvm->arch.timer.enabled) {
+> +		write_sysreg(kvm->arch.timer.cntvoff, cntvoff_el2);
+> +		write_sysreg(timer->cntv_cval, cntv_cval_el0);
+> +		isb();
+> +		write_sysreg(timer->cntv_ctl, cntv_ctl_el0);
+> +	}
+> +}
+> diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
+> index 9916d0e..25d0914 100644
+> --- a/include/clocksource/arm_arch_timer.h
+> +++ b/include/clocksource/arm_arch_timer.h
+> @@ -23,6 +23,12 @@
+>  #define ARCH_TIMER_CTRL_IT_MASK		(1 << 1)
+>  #define ARCH_TIMER_CTRL_IT_STAT		(1 << 2)
+>  
+> +#define CNTHCTL_EL1PCTEN		(1 << 0)
+> +#define CNTHCTL_EL1PCEN			(1 << 1)
+> +#define CNTHCTL_EVNTEN			(1 << 2)
+> +#define CNTHCTL_EVNTDIR			(1 << 3)
+> +#define CNTHCTL_EVNTI			(0xF << 4)
+> +
+>  enum arch_timer_reg {
+>  	ARCH_TIMER_REG_CTRL,
+>  	ARCH_TIMER_REG_TVAL,
 > 
