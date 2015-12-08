@@ -1,7 +1,7 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v6 08/21] KVM: ARM64: Add access handler for PMEVTYPERn and PMCCFILTR register
-Date: Tue, 8 Dec 2015 20:47:27 +0800
-Message-ID: <1449578860-15808-9-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v6 12/21] KVM: ARM64: Add reset and access handlers for PMCNTENSET and PMCNTENCLR register
+Date: Tue, 8 Dec 2015 20:47:31 +0800
+Message-ID: <1449578860-15808-13-git-send-email-zhaoshenglong@huawei.com>
 References: <1449578860-15808-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -14,160 +14,174 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-Add access handler which emulates writing and reading PMEVTYPERn or
-PMCCFILTR register. When writing to PMEVTYPERn or PMCCFILTR, call
-kvm_pmu_set_counter_event_type to create a perf_event for the selected
-event type.
+Since the reset value of PMCNTENSET and PMCNTENCLR is UNKNOWN, use
+reset_unknown for its reset handler. Add a new case to emulate writing
+PMCNTENSET or PMCNTENCLR register.
+
+When writing to PMCNTENSET, call perf_event_enable to enable the perf
+event. When writing to PMCNTENCLR, call perf_event_disable to disable
+the perf event.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm64/kvm/sys_regs.c | 98 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 98 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 39 +++++++++++++++++++++++++++++++++++----
+ include/kvm/arm_pmu.h     |  4 ++++
+ virt/kvm/arm/pmu.c        | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 86 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 1bcb2b7..2d8bd15 100644
+index 2304937..a780cb5 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -474,6 +474,12 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
- 
- 	if (p->is_write) {
- 		switch (r->reg) {
-+		case PMEVTYPER0_EL0 ... PMCCFILTR_EL0: {
-+			val = r->reg - PMEVTYPER0_EL0;
-+			kvm_pmu_set_counter_event_type(vcpu, p->regval, val);
-+			vcpu_sys_reg(vcpu, r->reg) = p->regval;
+@@ -577,6 +577,21 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+ 			vcpu_sys_reg(vcpu, r->reg) = p->regval;
+ 			break;
+ 		}
++		case PMCNTENSET_EL0: {
++			val = p->regval;
++			if (r->Op2 == 1) {
++				/* accessing PMCNTENSET_EL0 */
++				kvm_pmu_enable_counter(vcpu, val,
++				   vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMCR_E);
++				vcpu_sys_reg(vcpu, r->reg) |= val;
++			} else {
++
++				/* accessing PMCNTENCLR_EL0 */
++				kvm_pmu_disable_counter(vcpu, val);
++				vcpu_sys_reg(vcpu, r->reg) &= ~val;
++			}
 +			break;
 +		}
  		case PMCR_EL0: {
  			/* Only update writeable bits of PMCR */
  			val = vcpu_sys_reg(vcpu, r->reg);
-@@ -522,6 +528,13 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
- 	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b111),	\
- 	  trap_wcr, reset_wcr, n, 0,  get_wcr, set_wcr }
- 
-+/* Macro to expand the PMEVTYPERn_EL0 register */
-+#define PMU_PMEVTYPER_EL0(n)						\
-+	/* PMEVTYPERn_EL0 */						\
-+	{ Op0(0b11), Op1(0b011), CRn(0b1110),				\
-+	  CRm((0b1100 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
-+	  access_pmu_regs, reset_unknown, (PMEVTYPER0_EL0 + n), }
-+
- /*
-  * Architected system registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-@@ -736,6 +749,42 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ Op0(0b11), Op1(0b011), CRn(0b1101), CRm(0b0000), Op2(0b011),
- 	  NULL, reset_unknown, TPIDRRO_EL0 },
- 
-+	/* PMEVTYPERn_EL0 */
-+	PMU_PMEVTYPER_EL0(0),
-+	PMU_PMEVTYPER_EL0(1),
-+	PMU_PMEVTYPER_EL0(2),
-+	PMU_PMEVTYPER_EL0(3),
-+	PMU_PMEVTYPER_EL0(4),
-+	PMU_PMEVTYPER_EL0(5),
-+	PMU_PMEVTYPER_EL0(6),
-+	PMU_PMEVTYPER_EL0(7),
-+	PMU_PMEVTYPER_EL0(8),
-+	PMU_PMEVTYPER_EL0(9),
-+	PMU_PMEVTYPER_EL0(10),
-+	PMU_PMEVTYPER_EL0(11),
-+	PMU_PMEVTYPER_EL0(12),
-+	PMU_PMEVTYPER_EL0(13),
-+	PMU_PMEVTYPER_EL0(14),
-+	PMU_PMEVTYPER_EL0(15),
-+	PMU_PMEVTYPER_EL0(16),
-+	PMU_PMEVTYPER_EL0(17),
-+	PMU_PMEVTYPER_EL0(18),
-+	PMU_PMEVTYPER_EL0(19),
-+	PMU_PMEVTYPER_EL0(20),
-+	PMU_PMEVTYPER_EL0(21),
-+	PMU_PMEVTYPER_EL0(22),
-+	PMU_PMEVTYPER_EL0(23),
-+	PMU_PMEVTYPER_EL0(24),
-+	PMU_PMEVTYPER_EL0(25),
-+	PMU_PMEVTYPER_EL0(26),
-+	PMU_PMEVTYPER_EL0(27),
-+	PMU_PMEVTYPER_EL0(28),
-+	PMU_PMEVTYPER_EL0(29),
-+	PMU_PMEVTYPER_EL0(30),
-+	/* PMCCFILTR_EL0 */
-+	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b1111), Op2(0b111),
-+	  access_pmu_regs, reset_unknown, PMCCFILTR_EL0, },
-+
- 	/* DACR32_EL2 */
- 	{ Op0(0b11), Op1(0b100), CRn(0b0011), CRm(0b0000), Op2(0b000),
- 	  NULL, reset_unknown, DACR32_EL2 },
-@@ -934,6 +983,12 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
- 
- 	if (p->is_write) {
- 		switch (r->reg) {
-+		case c14_PMEVTYPER0 ... c14_PMCCFILTR: {
-+			val = r->reg - c14_PMEVTYPER0;
-+			kvm_pmu_set_counter_event_type(vcpu, p->regval, val);
-+			vcpu_cp15(vcpu, r->reg) = p->regval;
+@@ -817,10 +832,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  access_pmu_regs, reset_pmcr, PMCR_EL0, },
+ 	/* PMCNTENSET_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b001),
+-	  trap_raz_wi },
++	  access_pmu_regs, reset_unknown, PMCNTENSET_EL0 },
+ 	/* PMCNTENCLR_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b010),
+-	  trap_raz_wi },
++	  access_pmu_regs, reset_unknown, PMCNTENSET_EL0 },
+ 	/* PMOVSCLR_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b011),
+ 	  trap_raz_wi },
+@@ -1137,6 +1152,20 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
+ 			vcpu_cp15(vcpu, r->reg) = p->regval;
+ 			break;
+ 		}
++		case c9_PMCNTENSET: {
++			val = p->regval;
++			if (r->Op2 == 1) {
++				/* accessing c9_PMCNTENSET */
++				kvm_pmu_enable_counter(vcpu, val,
++				       vcpu_cp15(vcpu, c9_PMCR) & ARMV8_PMCR_E);
++				vcpu_cp15(vcpu, r->reg) |= val;
++			} else {
++				/* accessing c9_PMCNTENCLR */
++				kvm_pmu_disable_counter(vcpu, val);
++				vcpu_cp15(vcpu, r->reg) &= ~val;
++			}
 +			break;
 +		}
  		case c9_PMCR: {
  			/* Only update writeable bits of PMCR */
  			val = vcpu_cp15(vcpu, r->reg);
-@@ -967,6 +1022,13 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
- 	return true;
+@@ -1220,8 +1249,10 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	/* PMU */
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), access_pmu_cp15_regs,
+ 	  NULL, c9_PMCR },
+-	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), trap_raz_wi },
+-	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), trap_raz_wi },
++	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), access_pmu_cp15_regs,
++	  NULL, c9_PMCNTENSET },
++	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), access_pmu_cp15_regs,
++	  NULL, c9_PMCNTENSET },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmu_cp15_regs,
+ 	  NULL, c9_PMSELR },
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 36bde48..e731656 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -39,6 +39,8 @@ struct kvm_pmu {
+ 
+ #ifdef CONFIG_KVM_ARM_PMU
+ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx);
++void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val);
++void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u32 val, bool all_enable);
+ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
+ 				    u32 select_idx);
+ #else
+@@ -46,6 +48,8 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx)
+ {
+ 	return 0;
+ }
++void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val) {}
++void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u32 val, bool all_enable) {}
+ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
+ 				    u32 select_idx) {}
+ #endif
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index 15babf1..45586d2 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -90,6 +90,53 @@ static void kvm_pmu_stop_counter(struct kvm_pmc *pmc)
  }
  
-+/* Macro to expand the PMEVTYPERn register */
-+#define PMU_PMEVTYPER(n)						\
-+	/* PMEVTYPERn */						\
-+	{ Op1(0), CRn(0b1110),						\
-+	  CRm((0b1100 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
-+	  access_pmu_cp15_regs, NULL, (c14_PMEVTYPER0 + n), }
+ /**
++ * kvm_pmu_enable_counter - enable selected PMU counter
++ * @vcpu: The vcpu pointer
++ * @val: the value guest writes to PMCNTENSET register
++ * @all_enable: the value of PMCR.E
++ *
++ * Call perf_event_enable to start counting the perf event
++ */
++void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u32 val, bool all_enable)
++{
++	int i;
++	struct kvm_pmu *pmu = &vcpu->arch.pmu;
++	struct kvm_pmc *pmc;
 +
- /*
-  * Trapped cp15 registers. TTBR0/TTBR1 get a double encoding,
-  * depending on the way they are accessed (as a 32bit or a 64bit
-@@ -1022,6 +1084,42 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn(12), CRm(12), Op2( 5), trap_raz_wi },
- 
- 	{ Op1( 0), CRn(13), CRm( 0), Op2( 1), access_vm_reg, NULL, c13_CID },
++	if (!all_enable)
++		return;
 +
-+	/* PMEVTYPERn */
-+	PMU_PMEVTYPER(0),
-+	PMU_PMEVTYPER(1),
-+	PMU_PMEVTYPER(2),
-+	PMU_PMEVTYPER(3),
-+	PMU_PMEVTYPER(4),
-+	PMU_PMEVTYPER(5),
-+	PMU_PMEVTYPER(6),
-+	PMU_PMEVTYPER(7),
-+	PMU_PMEVTYPER(8),
-+	PMU_PMEVTYPER(9),
-+	PMU_PMEVTYPER(10),
-+	PMU_PMEVTYPER(11),
-+	PMU_PMEVTYPER(12),
-+	PMU_PMEVTYPER(13),
-+	PMU_PMEVTYPER(14),
-+	PMU_PMEVTYPER(15),
-+	PMU_PMEVTYPER(16),
-+	PMU_PMEVTYPER(17),
-+	PMU_PMEVTYPER(18),
-+	PMU_PMEVTYPER(19),
-+	PMU_PMEVTYPER(20),
-+	PMU_PMEVTYPER(21),
-+	PMU_PMEVTYPER(22),
-+	PMU_PMEVTYPER(23),
-+	PMU_PMEVTYPER(24),
-+	PMU_PMEVTYPER(25),
-+	PMU_PMEVTYPER(26),
-+	PMU_PMEVTYPER(27),
-+	PMU_PMEVTYPER(28),
-+	PMU_PMEVTYPER(29),
-+	PMU_PMEVTYPER(30),
-+	/* PMCCFILTR */
-+	{ Op1(0), CRn(14), CRm(15), Op2(7), access_pmu_cp15_regs,
-+	  NULL, c14_PMCCFILTR },
- };
- 
- static const struct sys_reg_desc cp15_64_regs[] = {
++	for_each_set_bit(i, (const unsigned long *)&val, ARMV8_MAX_COUNTERS) {
++		pmc = &pmu->pmc[i];
++		if (pmc->perf_event) {
++			perf_event_enable(pmc->perf_event);
++			if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
++				kvm_debug("fail to enable perf event\n");
++		}
++	}
++}
++
++/**
++ * kvm_pmu_disable_counter - disable selected PMU counter
++ * @vcpu: The vcpu pointer
++ * @val: the value guest writes to PMCNTENCLR register
++ *
++ * Call perf_event_disable to stop counting the perf event
++ */
++void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val)
++{
++	int i;
++	struct kvm_pmu *pmu = &vcpu->arch.pmu;
++	struct kvm_pmc *pmc;
++
++	for_each_set_bit(i, (const unsigned long *)&val, ARMV8_MAX_COUNTERS) {
++		pmc = &pmu->pmc[i];
++		if (pmc->perf_event)
++			perf_event_disable(pmc->perf_event);
++	}
++}
++
++/**
+  * kvm_pmu_set_counter_event_type - set selected counter to monitor some event
+  * @vcpu: The vcpu pointer
+  * @data: The data guest writes to PMXEVTYPER_EL0
 -- 
 2.0.4
 
