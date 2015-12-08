@@ -1,57 +1,73 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [PATCH v4 0/4] KVM: arm64: BUG FIX: Correctly handle zero register
- transfers
-Date: Tue, 08 Dec 2015 09:57:21 +0300
-Message-ID: <009501d13185$b02d1150$108733f0$@samsung.com>
-References: <cover.1449230499.git.p.fedin@samsung.com>
- <20151205003334.GB3117@hawk.localdomain>
- <011601d130ca$64cc9070$2e65b150$@samsung.com>
- <20151207223631.GJ4402@hawk.localdomain>
- <20151207234555.GA2980@hawk.localdomain>
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Subject: Re: [PATCH v5 03/21] KVM: ARM64: Add offset defines for PMU registers
+Date: Tue, 8 Dec 2015 16:09:26 +0800
+Message-ID: <56669036.9090606@huawei.com>
+References: <1449123091-20252-1-git-send-email-zhaoshenglong@huawei.com> <1449123091-20252-4-git-send-email-zhaoshenglong@huawei.com> <56659276.6060403@arm.com> <5665984F.30102@linaro.org> <56659DD8.6050109@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <20151207234555.GA2980@hawk.localdomain>
-Content-language: ru
+In-Reply-To: <56659DD8.6050109@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: 'Andrew Jones' <drjones@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, 'Marc Zyngier' <marc.zyngier@arm.com>
+To: Marc Zyngier <marc.zyngier@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello!
+Hi Marc,
 
-> I messed up the "load into xzr" test royally in the last attached patch.
-> It was quite wrong.
+On 2015/12/7 22:55, Marc Zyngier wrote:
+> On 07/12/15 14:31, Shannon Zhao wrote:
+>> > 
+>> > 
+>> > On 2015/12/7 22:06, Marc Zyngier wrote:
+>>> >> On 03/12/15 06:11, Shannon Zhao wrote:
+>>>> >>> From: Shannon Zhao <shannon.zhao@linaro.org>
+>>>> >>>
+>>>> >>> We are about to trap and emulate acccesses to each PMU register
+>>> >>
+>>> >> s/acccesses/accesses/
+>>> >>
+>>>> >>> individually. This adds the context offsets for the AArch64 PMU
+>>>> >>> registers and their AArch32 counterparts.
+>>>> >>>
+>>>> >>> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+>>>> >>> ---
+>>>> >>>   arch/arm64/include/asm/kvm_asm.h | 55 ++++++++++++++++++++++++++++++++++++----
+>>>> >>>   1 file changed, 50 insertions(+), 5 deletions(-)
+>>>> >>>
+>>>> >>> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+>>>> >>> index 5e37710..4f804c1 100644
+>>>> >>> --- a/arch/arm64/include/asm/kvm_asm.h
+>>>> >>> +++ b/arch/arm64/include/asm/kvm_asm.h
+>>>> >>> @@ -48,12 +48,34 @@
+>>>> >>>   #define MDSCR_EL1	22	/* Monitor Debug System Control Register */
+>>>> >>>   #define MDCCINT_EL1	23	/* Monitor Debug Comms Channel Interrupt Enable Reg */
+>>>> >>>
+>>> >>
+>>> >> Coming back to this patch, it gives a clear view of where you have state
+>>> >> duplication.
+>>> >>
+>>>> >>> +/* Performance Monitors Registers */
+>>>> >>> +#define PMCR_EL0	24	/* Control Register */
+>>>> >>> +#define PMOVSSET_EL0	25	/* Overflow Flag Status Set Register */
+>>>> >>> +#define PMOVSCLR_EL0	26	/* Overflow Flag Status Clear Register */
+>>> >>
+>>> >> This should only be a single state. You don't even have to represent it
+>>> >> in the sysreg array, to be honest.
+>>> >>
 
- Yes, because "mov %0, xzr" is not trapped.
+Re-think about this. Since there are different operates to SET/CLR
+registers, maybe it should keep both of them while only storing the
+state in one of them.
 
-> I have now tested
-> 
->  asm volatile(
->      "str %3, [%1]\n\t"
->      "ldr wzr, [%1]\n\t"
->      "str wzr, [%2]\n\t"
->      "ldr %0, [%2]\n\t"
->      :"=r"(val):"r"(addr), "r"(addr2), "r"(0x55555555):"memory");
-> report("mmio: 'ldr wzr' check: read 0x%08lx", val != 0x55555555, val);
-> 
-> which passes
+To SET:
+	vcpu_sys_reg(vcpu, r->reg) |= val;
+To CLR:
+	vcpu_sys_reg(vcpu, r->reg) &= ~val;
 
- I guess i forgot to mention that both addr and addr2 have to be MMIO registers. If they are plain memory, then of course everything
-will work because they are not trapped.
+Or keep one of them and within the access handler, according to the
+operates encoding value to judge whether it's SET or CLR.
 
-> Anyway, I
-> probably won't clean this test up and post it. I don't think we really
-> need to add it as a regression test, unless others disagree and would
-> like to see it added.
-
- Considering how difficult it was to find this problem, and how tricky and unobvious it is, i would ask to add this test. Especially
-considering you've already written it. At least it will serve as a reminder about the problem.
-
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
-
+-- 
+Shannon
 
