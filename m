@@ -1,188 +1,109 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v6 12/21] KVM: ARM64: Add reset and access handlers for PMCNTENSET and PMCNTENCLR register
-Date: Tue, 8 Dec 2015 20:47:31 +0800
-Message-ID: <1449578860-15808-13-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v6 13/21] KVM: ARM64: Add reset and access handlers for
+ PMINTENSET and PMINTENCLR register
+Date: Tue, 8 Dec 2015 20:47:32 +0800
+Message-ID: <1449578860-15808-14-git-send-email-zhaoshenglong@huawei.com>
 References: <1449578860-15808-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B54849852
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2015 07:47:03 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id lbJldLhSTdPV for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Dec 2015 07:47:02 -0500 (EST)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [119.145.14.65])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 55EFE48529
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2015 07:46:55 -0500 (EST)
 In-Reply-To: <1449578860-15808-1-git-send-email-zhaoshenglong@huawei.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com, zhaoshenglong@huawei.com
+Cc: kvm@vger.kernel.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-Since the reset value of PMCNTENSET and PMCNTENCLR is UNKNOWN, use
+Since the reset value of PMINTENSET and PMINTENCLR is UNKNOWN, use
 reset_unknown for its reset handler. Add a new case to emulate writing
-PMCNTENSET or PMCNTENCLR register.
-
-When writing to PMCNTENSET, call perf_event_enable to enable the perf
-event. When writing to PMCNTENCLR, call perf_event_disable to disable
-the perf event.
+PMINTENSET or PMINTENCLR register.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm64/kvm/sys_regs.c | 39 +++++++++++++++++++++++++++++++++++----
- include/kvm/arm_pmu.h     |  4 ++++
- virt/kvm/arm/pmu.c        | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 86 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 28 ++++++++++++++++++++++++----
+ 1 file changed, 24 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2304937..a780cb5 100644
+index a780cb5..c1dffb2 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -577,6 +577,21 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
- 			vcpu_sys_reg(vcpu, r->reg) = p->regval;
+@@ -592,6 +592,15 @@ static bool access_pmu_regs(struct kvm_vcpu *vcpu,
+ 			}
  			break;
  		}
-+		case PMCNTENSET_EL0: {
-+			val = p->regval;
-+			if (r->Op2 == 1) {
-+				/* accessing PMCNTENSET_EL0 */
-+				kvm_pmu_enable_counter(vcpu, val,
-+				   vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMCR_E);
-+				vcpu_sys_reg(vcpu, r->reg) |= val;
-+			} else {
-+
-+				/* accessing PMCNTENCLR_EL0 */
-+				kvm_pmu_disable_counter(vcpu, val);
-+				vcpu_sys_reg(vcpu, r->reg) &= ~val;
-+			}
++		case PMINTENSET_EL1: {
++			if (r->Op2 == 1)
++				/* accessing PMINTENSET_EL1 */
++				vcpu_sys_reg(vcpu, r->reg) |= p->regval;
++			else
++				/* accessing PMINTENCLR_EL1 */
++				vcpu_sys_reg(vcpu, r->reg) &= ~p->regval;
 +			break;
 +		}
  		case PMCR_EL0: {
  			/* Only update writeable bits of PMCR */
  			val = vcpu_sys_reg(vcpu, r->reg);
-@@ -817,10 +832,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  access_pmu_regs, reset_pmcr, PMCR_EL0, },
- 	/* PMCNTENSET_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b001),
+@@ -789,10 +798,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	/* PMINTENSET_EL1 */
+ 	{ Op0(0b11), Op1(0b000), CRn(0b1001), CRm(0b1110), Op2(0b001),
 -	  trap_raz_wi },
-+	  access_pmu_regs, reset_unknown, PMCNTENSET_EL0 },
- 	/* PMCNTENCLR_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b010),
++	  access_pmu_regs, reset_unknown, PMINTENSET_EL1 },
+ 	/* PMINTENCLR_EL1 */
+ 	{ Op0(0b11), Op1(0b000), CRn(0b1001), CRm(0b1110), Op2(0b010),
 -	  trap_raz_wi },
-+	  access_pmu_regs, reset_unknown, PMCNTENSET_EL0 },
- 	/* PMOVSCLR_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b011),
- 	  trap_raz_wi },
-@@ -1137,6 +1152,20 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
- 			vcpu_cp15(vcpu, r->reg) = p->regval;
++	  access_pmu_regs, reset_unknown, PMINTENSET_EL1 },
+ 
+ 	/* MAIR_EL1 */
+ 	{ Op0(0b11), Op1(0b000), CRn(0b1010), CRm(0b0010), Op2(0b000),
+@@ -1166,6 +1175,15 @@ static bool access_pmu_cp15_regs(struct kvm_vcpu *vcpu,
+ 			}
  			break;
  		}
-+		case c9_PMCNTENSET: {
-+			val = p->regval;
-+			if (r->Op2 == 1) {
++		case c9_PMINTENSET: {
++			if (r->Op2 == 1)
 +				/* accessing c9_PMCNTENSET */
-+				kvm_pmu_enable_counter(vcpu, val,
-+				       vcpu_cp15(vcpu, c9_PMCR) & ARMV8_PMCR_E);
-+				vcpu_cp15(vcpu, r->reg) |= val;
-+			} else {
++				vcpu_cp15(vcpu, r->reg) |= p->regval;
++			else
 +				/* accessing c9_PMCNTENCLR */
-+				kvm_pmu_disable_counter(vcpu, val);
-+				vcpu_cp15(vcpu, r->reg) &= ~val;
-+			}
++				vcpu_cp15(vcpu, r->reg) &= ~p->regval;
 +			break;
 +		}
  		case c9_PMCR: {
  			/* Only update writeable bits of PMCR */
  			val = vcpu_cp15(vcpu, r->reg);
-@@ -1220,8 +1249,10 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	/* PMU */
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), access_pmu_cp15_regs,
- 	  NULL, c9_PMCR },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), trap_raz_wi },
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), trap_raz_wi },
-+	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), access_pmu_cp15_regs,
-+	  NULL, c9_PMCNTENSET },
-+	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), access_pmu_cp15_regs,
-+	  NULL, c9_PMCNTENSET },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmu_cp15_regs,
- 	  NULL, c9_PMSELR },
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 36bde48..e731656 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -39,6 +39,8 @@ struct kvm_pmu {
+@@ -1265,8 +1283,10 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_pmxevtyper },
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), access_pmu_pmxevcntr },
+ 	{ Op1( 0), CRn( 9), CRm(14), Op2( 0), trap_raz_wi },
+-	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), trap_raz_wi },
+-	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), trap_raz_wi },
++	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), access_pmu_cp15_regs,
++	  NULL, c9_PMINTENSET },
++	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), access_pmu_cp15_regs,
++	  NULL, c9_PMINTENSET },
  
- #ifdef CONFIG_KVM_ARM_PMU
- u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx);
-+void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val);
-+void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u32 val, bool all_enable);
- void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
- 				    u32 select_idx);
- #else
-@@ -46,6 +48,8 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx)
- {
- 	return 0;
- }
-+void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val) {}
-+void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u32 val, bool all_enable) {}
- void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
- 				    u32 select_idx) {}
- #endif
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 15babf1..45586d2 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -90,6 +90,53 @@ static void kvm_pmu_stop_counter(struct kvm_pmc *pmc)
- }
- 
- /**
-+ * kvm_pmu_enable_counter - enable selected PMU counter
-+ * @vcpu: The vcpu pointer
-+ * @val: the value guest writes to PMCNTENSET register
-+ * @all_enable: the value of PMCR.E
-+ *
-+ * Call perf_event_enable to start counting the perf event
-+ */
-+void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u32 val, bool all_enable)
-+{
-+	int i;
-+	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-+	struct kvm_pmc *pmc;
-+
-+	if (!all_enable)
-+		return;
-+
-+	for_each_set_bit(i, (const unsigned long *)&val, ARMV8_MAX_COUNTERS) {
-+		pmc = &pmu->pmc[i];
-+		if (pmc->perf_event) {
-+			perf_event_enable(pmc->perf_event);
-+			if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
-+				kvm_debug("fail to enable perf event\n");
-+		}
-+	}
-+}
-+
-+/**
-+ * kvm_pmu_disable_counter - disable selected PMU counter
-+ * @vcpu: The vcpu pointer
-+ * @val: the value guest writes to PMCNTENCLR register
-+ *
-+ * Call perf_event_disable to stop counting the perf event
-+ */
-+void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u32 val)
-+{
-+	int i;
-+	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-+	struct kvm_pmc *pmc;
-+
-+	for_each_set_bit(i, (const unsigned long *)&val, ARMV8_MAX_COUNTERS) {
-+		pmc = &pmu->pmc[i];
-+		if (pmc->perf_event)
-+			perf_event_disable(pmc->perf_event);
-+	}
-+}
-+
-+/**
-  * kvm_pmu_set_counter_event_type - set selected counter to monitor some event
-  * @vcpu: The vcpu pointer
-  * @data: The data guest writes to PMXEVTYPER_EL0
+ 	{ Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, c10_PRRR },
+ 	{ Op1( 0), CRn(10), CRm( 2), Op2( 1), access_vm_reg, NULL, c10_NMRR },
 -- 
 2.0.4
-
-
