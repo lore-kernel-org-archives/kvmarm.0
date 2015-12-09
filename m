@@ -1,161 +1,71 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v6 07/21] KVM: ARM64: PMU: Add perf event map and
- introduce perf event creating function
-Date: Wed, 9 Dec 2015 08:23:18 +0000
-Message-ID: <20151209082318.0de1d861@arm.com>
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Subject: Re: [PATCH v6 12/21] KVM: ARM64: Add reset and access handlers for
+ PMCNTENSET and PMCNTENCLR register
+Date: Wed, 9 Dec 2015 16:35:58 +0800
+Message-ID: <5667E7EE.90908@huawei.com>
 References: <1449578860-15808-1-git-send-email-zhaoshenglong@huawei.com>
-	<1449578860-15808-8-git-send-email-zhaoshenglong@huawei.com>
-	<5666FAB6.4070903@arm.com>
-	<5667DA61.8080106@huawei.com>
+ <1449578860-15808-13-git-send-email-zhaoshenglong@huawei.com>
+ <56670865.2050705@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <5667DA61.8080106@huawei.com>
-Sender: kvm-owner@vger.kernel.org
-To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4C6D9410EB
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Dec 2015 03:35:08 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 0Kk-2omrIQuH for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Dec 2015 03:35:06 -0500 (EST)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C59ED40C9D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Dec 2015 03:35:05 -0500 (EST)
+In-Reply-To: <56670865.2050705@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: kvm@vger.kernel.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, 9 Dec 2015 15:38:09 +0800
-Shannon Zhao <zhaoshenglong@huawei.com> wrote:
-
-> 
-> 
-> On 2015/12/8 23:43, Marc Zyngier wrote:
-> > On 08/12/15 12:47, Shannon Zhao wrote:
-> >> From: Shannon Zhao <shannon.zhao@linaro.org>
-> >> +/**
-> >> + * kvm_pmu_get_counter_value - get PMU counter value
-> >> + * @vcpu: The vcpu pointer
-> >> + * @select_idx: The counter index
-> >> + */
-> >> +u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx)
-> >> +{
-> >> +	u64 counter, enabled, running;
-> >> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> >> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
-> >> +
-> >> +	if (!vcpu_mode_is_32bit(vcpu))
-> >> +		counter = vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + select_idx);
-> >> +	else
-> >> +		counter = vcpu_cp15(vcpu, c14_PMEVCNTR0 + select_idx);
-> >> +
-> >> +	if (pmc->perf_event)
-> >> +		counter += perf_event_read_value(pmc->perf_event, &enabled,
-> >> +						 &running);
-> >> +
-> >> +	return counter & pmc->bitmask;
-> > 
-> > This one confused me for a while. Is it the case that you return
-> > whatever is in the vcpu view of the counter, plus anything that perf
-> > itself has counted? If so, I'd appreciate a comment here...
-> > 
-> Yes, the real counter value is the current counter value plus the value
-> perf event counts. I'll add a comment.
-> 
-> >> +}
-> >> +
-> >> +static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u32 select_idx)
-> >> +{
-> >> +	if (!vcpu_mode_is_32bit(vcpu))
-> >> +		return (vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMCR_E) &
-> >> +		       (vcpu_sys_reg(vcpu, PMCNTENSET_EL0) >> select_idx);
-> > 
-> > This looks wrong. Shouldn't it be:
-> > 
-> > return ((vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMCR_E) &&
-> >         (vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & (1 << select_idx)));
-> > 
-> >> +	else
-> >> +		return (vcpu_sys_reg(vcpu, c9_PMCR) & ARMV8_PMCR_E) &
-> >> +		       (vcpu_sys_reg(vcpu, c9_PMCNTENSET) >> select_idx);
-> >> +}
-> > 
-> > Also, I don't really see why we need to check the 32bit version, which
-> > has the exact same content.
-> > 
-> >> +
-> >> +static inline struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
-> >> +{
-> >> +	struct kvm_pmu *pmu;
-> >> +	struct kvm_vcpu_arch *vcpu_arch;
-> >> +
-> >> +	pmc -= pmc->idx;
-> >> +	pmu = container_of(pmc, struct kvm_pmu, pmc[0]);
-> >> +	vcpu_arch = container_of(pmu, struct kvm_vcpu_arch, pmu);
-> >> +	return container_of(vcpu_arch, struct kvm_vcpu, arch);
-> >> +}
-> >> +
-> >> +/**
-> >> + * kvm_pmu_stop_counter - stop PMU counter
-> >> + * @pmc: The PMU counter pointer
-> >> + *
-> >> + * If this counter has been configured to monitor some event, release it here.
-> >> + */
-> >> +static void kvm_pmu_stop_counter(struct kvm_pmc *pmc)
-> >> +{
-> >> +	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
-> >> +	u64 counter;
-> >> +
-> >> +	if (pmc->perf_event) {
-> >> +		counter = kvm_pmu_get_counter_value(vcpu, pmc->idx);
-> >> +		if (!vcpu_mode_is_32bit(vcpu))
-> >> +			vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + pmc->idx) = counter;
-> >> +		else
-> >> +			vcpu_cp15(vcpu, c14_PMEVCNTR0 + pmc->idx) = counter;
-> > 
-> > Same thing - we don't need to make a difference between 32 and 64bit.
-> > 
-> So it's fine to drop all the vcpu_mode_is_32bit(vcpu) check of this
-> series? The only one we should take care is the PMCCNTR, right?
-
-Yes, mostly. As long as you only reason on the 64bit register set,
-you're pretty safe, and that in turn solves all kind of ugly endianness
-issues.
-
-> >> +
-> >> +		perf_event_release_kernel(pmc->perf_event);
-> >> +		pmc->perf_event = NULL;
-> >> +	}
-> >> +}
-> >> +
-> >> +/**
-> >> + * kvm_pmu_set_counter_event_type - set selected counter to monitor some event
-> >> + * @vcpu: The vcpu pointer
-> >> + * @data: The data guest writes to PMXEVTYPER_EL0
-> >> + * @select_idx: The number of selected counter
-> >> + *
-> >> + * When OS accesses PMXEVTYPER_EL0, that means it wants to set a PMC to count an
-> >> + * event with given hardware event number. Here we call perf_event API to
-> >> + * emulate this action and create a kernel perf event for it.
-> >> + */
-> >> +void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
-> >> +				    u32 select_idx)
-> >> +{
-> >> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> >> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
-> >> +	struct perf_event *event;
-> >> +	struct perf_event_attr attr;
-> >> +	u32 eventsel;
-> >> +	u64 counter;
-> >> +
-> >> +	kvm_pmu_stop_counter(pmc);
-> > 
-> > Wait. I didn't realize this before, but you have the vcpu right here.
-> > Why don't you pass it as a parameter to kvm_pmu_stop_counter and avoid
-> > the kvm_pmc_to_vcpu thing altogether?
-> > 
-> Yeah, we could pass vcpu as a parameter for this function. But the
-> kvm_pmc_to_vcpu helper is also used in kvm_pmu_perf_overflow() and
-> within kvm_pmu_perf_overflow it needs the pmc->idx, we couldn't pass
-> vcpu as a parameter, so this helper is necessary for kvm_pmu_perf_overflow.
-
-OK. Then keep the helper with kvm_pmu_perf_overflow, and pass the the
-vcpu as a parameter to the leaf functions.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny.
+CgpPbiAyMDE1LzEyLzkgMDo0MiwgTWFyYyBaeW5naWVyIHdyb3RlOgo+PiArdm9pZCBrdm1fcG11
+X2VuYWJsZV9jb3VudGVyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgdTMyIHZhbCwgYm9vbCBhbGxf
+ZW5hYmxlKQo+PiA+ICt7Cj4+ID4gKwlpbnQgaTsKPj4gPiArCXN0cnVjdCBrdm1fcG11ICpwbXUg
+PSAmdmNwdS0+YXJjaC5wbXU7Cj4+ID4gKwlzdHJ1Y3Qga3ZtX3BtYyAqcG1jOwo+PiA+ICsKPj4g
+PiArCWlmICghYWxsX2VuYWJsZSkKPj4gPiArCQlyZXR1cm47Cj4gWW91IGhhdmUgdGhlIHZjcHUu
+IENhbiB5b3UgbW92ZSB0aGUgY2hlY2sgZm9yIFBNQ1JfRUwwLkUgaGVyZSBpbnN0ZWFkIG9mCj4g
+aGF2aW5nIGl0IGluIGJvdGggb2YgdGhlIGNhbGxlcnM/Cj4gCkJ1dCBpdCBzdGlsbCBuZWVkcyB0
+byBjaGVjayBQTUNSX0VMMC5FIGluIGt2bV9wbXVfaGFuZGxlX3BtY3IoKS4gV2hlbgpQTUNSX0VM
+MC5FID09IDEsIGl0IGNhbGxzIGt2bV9wbXVfZW5hYmxlX2NvdW50ZXIoKSwgb3RoZXJ3aXNlIGl0
+IGNhbGxzCmt2bV9wbXVfZGlzYWJsZV9jb3VudGVyKCkuIFNvIGFzIGl0IGNoZWNrcyBhbHJlYWR5
+LCBqdXN0IHBhc3MgdGhlIHJlc3VsdAphcyBhIHBhcmFtZXRlci4KCj4+ID4gKwo+PiA+ICsJZm9y
+X2VhY2hfc2V0X2JpdChpLCAoY29uc3QgdW5zaWduZWQgbG9uZyAqKSZ2YWwsIEFSTVY4X01BWF9D
+T1VOVEVSUykgewo+IE5vbm9ub25vbm8uLi4gSWYgeW91IG11c3QgaGF2ZSB0byB1c2UgYSBsb25n
+LCB1c2UgYSBsb25nLiBEb24ndCBjYXN0IGl0Cj4gdG8gYSBkaWZmZXJlbnQgdHlwZSAoaGludDog
+YmlnIGVuZGlhbikuCj4gCj4+ID4gKwkJcG1jID0gJnBtdS0+cG1jW2ldOwo+PiA+ICsJCWlmIChw
+bWMtPnBlcmZfZXZlbnQpIHsKPj4gPiArCQkJcGVyZl9ldmVudF9lbmFibGUocG1jLT5wZXJmX2V2
+ZW50KTsKPj4gPiArCQkJaWYgKHBtYy0+cGVyZl9ldmVudC0+c3RhdGUgIT0gUEVSRl9FVkVOVF9T
+VEFURV9BQ1RJVkUpCj4+ID4gKwkJCQlrdm1fZGVidWcoImZhaWwgdG8gZW5hYmxlIHBlcmYgZXZl
+bnRcbiIpOwo+PiA+ICsJCX0KPj4gPiArCX0KPj4gPiArfQo+PiA+ICsKPj4gPiArLyoqCj4+ID4g
+KyAqIGt2bV9wbXVfZGlzYWJsZV9jb3VudGVyIC0gZGlzYWJsZSBzZWxlY3RlZCBQTVUgY291bnRl
+cgo+PiA+ICsgKiBAdmNwdTogVGhlIHZjcHUgcG9pbnRlcgo+PiA+ICsgKiBAdmFsOiB0aGUgdmFs
+dWUgZ3Vlc3Qgd3JpdGVzIHRvIFBNQ05URU5DTFIgcmVnaXN0ZXIKPj4gPiArICoKPj4gPiArICog
+Q2FsbCBwZXJmX2V2ZW50X2Rpc2FibGUgdG8gc3RvcCBjb3VudGluZyB0aGUgcGVyZiBldmVudAo+
+PiA+ICsgKi8KPj4gPiArdm9pZCBrdm1fcG11X2Rpc2FibGVfY291bnRlcihzdHJ1Y3Qga3ZtX3Zj
+cHUgKnZjcHUsIHUzMiB2YWwpCj4+ID4gK3sKPj4gPiArCWludCBpOwo+PiA+ICsJc3RydWN0IGt2
+bV9wbXUgKnBtdSA9ICZ2Y3B1LT5hcmNoLnBtdTsKPj4gPiArCXN0cnVjdCBrdm1fcG1jICpwbWM7
+Cj4+ID4gKwo+IFdoeSBhcmUgZW5hYmxlIGFuZCBkaXNhYmxlIGFzeW1tZXRyaWMgKGhhbmRsaW5n
+IG9mIFBNQ1IuRSk/Cj4gClRvIGVuYWJsZSBhIGNvdW50ZXIsIGl0IG5lZWRzIGJvdGggdGhlIFBN
+Q1JfRUwwLkUgYW5kIHRoZSBjb3JyZXNwb25kaW5nCmJpdCBvZiBQTUNOVEVOU0VUX0VMMCBzZXQg
+dG8gMS4gQnV0IHRvIGRpc2FibGUgYSBjb3VudGVyLCBpdCBvbmx5IG5lZWRzCm9uZSBvZiB0aGVt
+IGFuZCB3aGVuIFBNQ1JfRUwwLkUgPT0gMO+8jCBpdCBkaXNhYmxlcyBhbGwgdGhlIGNvdW50ZXJz
+LgoKVGhhbmtzLAotLSAKU2hhbm5vbgoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1i
+aWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3Zt
+YXJtCg==
