@@ -1,25 +1,26 @@
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v10 6/6] tests/guest-debug: introduce basic gdbstub tests
-Date: Tue,  8 Dec 2015 18:32:33 +0000
-Message-ID: <1449599553-24713-7-git-send-email-alex.bennee@linaro.org>
-References: <1449599553-24713-1-git-send-email-alex.bennee@linaro.org>
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Subject: Re: [PATCH v6 07/21] KVM: ARM64: PMU: Add perf event map and introduce
+ perf event creating function
+Date: Wed, 9 Dec 2015 15:38:09 +0800
+Message-ID: <5667DA61.8080106@huawei.com>
+References: <1449578860-15808-1-git-send-email-zhaoshenglong@huawei.com>
+ <1449578860-15808-8-git-send-email-zhaoshenglong@huawei.com>
+ <5666FAB6.4070903@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 80BA1407A6
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2015 13:31:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0860A410EB
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Dec 2015 02:37:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0HJu8196-aTZ for <kvmarm@lists.cs.columbia.edu>;
- Tue,  8 Dec 2015 13:31:13 -0500 (EST)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C7C9412D0
- for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Dec 2015 13:31:10 -0500 (EST)
-Received: by wmuu63 with SMTP id u63so192174735wmu.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 08 Dec 2015 10:33:01 -0800 (PST)
-In-Reply-To: <1449599553-24713-1-git-send-email-alex.bennee@linaro.org>
+ with ESMTP id 1Rhviw9DLb3s for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Dec 2015 02:37:00 -0500 (EST)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [119.145.14.66])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DC75A40FA2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Dec 2015 02:36:57 -0500 (EST)
+In-Reply-To: <5666FAB6.4070903@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,113 +30,137 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, christoffer.dall@linaro.org, zhichao.huang@linaro.org
-Cc: marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: kvm@vger.kernel.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhlIGFpbSBvZiB0aGVzZSB0ZXN0cyBpcyB0byBjb21iaW5lIHdpdGggYW4gYXBwcm9wcmlhdGUg
-a2VybmVsCmltYWdlICh3aXRoIHN5bWJvbC1maWxlIHZtbGludXgpIGFuZCBjaGVjayBpdCBiZWhh
-dmVzIGFzIGl0IHNob3VsZC4KR2l2ZW4gYSBrZXJuZWwgaXQgY2hlY2tzOgoKICAtIHNpbmdsZSBz
-dGVwCiAgLSBzb2Z0d2FyZSBicmVha3BvaW50CiAgLSBoYXJkd2FyZSBicmVha3BvaW50CiAgLSBh
-Y2Nlc3MsIHJlYWQgYW5kIHdyaXRlIHdhdGNocG9pbnRzCgpPbiBzdWNjZXNzIGl0IHJldHVybnMg
-MCB0byB0aGUgY2FsbGluZyBwcm9jZXNzLgoKSSd2ZSBub3QgcGx1bWJlZCB0aGlzIGludG8gdGhl
-ICJtYWtlIGNoZWNrIiBsb2dpYyB0aG91Z2ggYXMgd2UgbmVlZCBhCnNvbHV0aW9uIGZvciBwcm92
-aWRpbmcgbm9uLWhvc3QgYmluYXJpZXMgdG8gdGhlIHRlc3RzLiBIb3dldmVyIHRoZSB0ZXN0Cmlz
-IHN0cnVjdHVyZWQgdG8gd29yayB3aXRoIHByZXR0eSBtdWNoIGFueSBMaW51eCBrZXJuZWwgaW1h
-Z2UgYXMgaXQKdXNlcyB0aGUgYmFzaWMga2VybmVsX2luaXQgY29kZSB3aGljaCBpcyBjb21tb24g
-YWNyb3NzIGFyY2hpdGVjdHVyZXMuCgpTaWduZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXgu
-YmVubmVlQGxpbmFyby5vcmc+CgotLS0KdjEwOgogLSBmaXh1cCBmb3IgUHkyLzMgY2xlYW5saW5l
-c3MKIC0gZHJvcCB0byBzaGVsbCBvbiBleGNlcHRpb24KLS0tCiB0ZXN0cy9ndWVzdC1kZWJ1Zy90
-ZXN0LWdkYnN0dWIucHkgfCAxNzYgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysKIDEgZmlsZSBjaGFuZ2VkLCAxNzYgaW5zZXJ0aW9ucygrKQogY3JlYXRlIG1vZGUgMTAwNjQ0
-IHRlc3RzL2d1ZXN0LWRlYnVnL3Rlc3QtZ2Ric3R1Yi5weQoKZGlmZiAtLWdpdCBhL3Rlc3RzL2d1
-ZXN0LWRlYnVnL3Rlc3QtZ2Ric3R1Yi5weSBiL3Rlc3RzL2d1ZXN0LWRlYnVnL3Rlc3QtZ2Ric3R1
-Yi5weQpuZXcgZmlsZSBtb2RlIDEwMDY0NAppbmRleCAwMDAwMDAwLi4zMWJhNmM5Ci0tLSAvZGV2
-L251bGwKKysrIGIvdGVzdHMvZ3Vlc3QtZGVidWcvdGVzdC1nZGJzdHViLnB5CkBAIC0wLDAgKzEs
-MTc2IEBACisjCisjIFRoaXMgc2NyaXB0IG5lZWRzIHRvIGJlIHJ1biBvbiBzdGFydHVwCisjIHFl
-bXUgLWtlcm5lbCAke0tFUk5FTH0gLXMgLVMKKyMgYW5kIHRoZW46CisjIGdkYiAke0tFUk5FTH0u
-dm1saW51eCAteCAke1FFTVVfU1JDfS90ZXN0cy9ndWVzdC1kZWJ1Zy90ZXN0LWdkYnN0dWIucHkK
-KworaW1wb3J0IGdkYgorCitmYWlsY291bnQgPSAwCisKKworZGVmIHJlcG9ydChjb25kLCBtc2cp
-OgorICAgICJSZXBvcnQgc3VjY2Vzcy9mYWlsIG9mIHRlc3QiCisgICAgaWYgY29uZDoKKyAgICAg
-ICAgcHJpbnQgKCJQQVNTOiAlcyIgJSAobXNnKSkKKyAgICBlbHNlOgorICAgICAgICBwcmludCAo
-IkZBSUw6ICVzIiAlIChtc2cpKQorICAgICAgICBmYWlsY291bnQgKz0gMQorCisKK2RlZiBjaGVj
-a19zdGVwKCk6CisgICAgIlN0ZXAgYW4gaW5zdHJ1Y3Rpb24sIGNoZWNrIGl0IG1vdmVkLiIKKyAg
-ICBzdGFydF9wYyA9IGdkYi5wYXJzZV9hbmRfZXZhbCgnJHBjJykKKyAgICBnZGIuZXhlY3V0ZSgi
-c2kiKQorICAgIGVuZF9wYyA9IGdkYi5wYXJzZV9hbmRfZXZhbCgnJHBjJykKKworICAgIHJldHVy
-biBub3QgKHN0YXJ0X3BjID09IGVuZF9wYykKKworCitkZWYgY2hlY2tfYnJlYWsoc3ltX25hbWUp
-OgorICAgICJTZXR1cCBicmVha3BvaW50LCBjb250aW51ZSBhbmQgY2hlY2sgd2Ugc3RvcHBlZC4i
-CisgICAgc3ltLCBvayA9IGdkYi5sb29rdXBfc3ltYm9sKHN5bV9uYW1lKQorICAgIGJwID0gZ2Ri
-LkJyZWFrcG9pbnQoc3ltX25hbWUpCisKKyAgICBnZGIuZXhlY3V0ZSgiYyIpCisKKyAgICAjIGhv
-cGVmdWxseSB3ZSBjYW1lIGJhY2sKKyAgICBlbmRfcGMgPSBnZGIucGFyc2VfYW5kX2V2YWwoJyRw
-YycpCisgICAgcHJpbnQgKCIlcyA9PSAlcyAlZCIgJSAoZW5kX3BjLCBzeW0udmFsdWUoKSwgYnAu
-aGl0X2NvdW50KSkKKyAgICBicC5kZWxldGUoKQorCisgICAgIyBjYW4gd2UgdGVzdCB3ZSBoaXQg
-YnA/CisgICAgcmV0dXJuIGVuZF9wYyA9PSBzeW0udmFsdWUoKQorCisKKyMgV2UgbmVlZCB0byBk
-byBoYnJlYWsgbWFudWFsbHkgYXMgdGhlIHB5dGhvbiBpbnRlcmZhY2UgZG9lc24ndCBleHBvcnQg
-aXQKK2RlZiBjaGVja19oYnJlYWsoc3ltX25hbWUpOgorICAgICJTZXR1cCBoYXJkd2FyZSBicmVh
-a3BvaW50LCBjb250aW51ZSBhbmQgY2hlY2sgd2Ugc3RvcHBlZC4iCisgICAgc3ltLCBvayA9IGdk
-Yi5sb29rdXBfc3ltYm9sKHN5bV9uYW1lKQorICAgIGdkYi5leGVjdXRlKCJoYnJlYWsgJXMiICUg
-KHN5bV9uYW1lKSkKKyAgICBnZGIuZXhlY3V0ZSgiYyIpCisKKyAgICAjIGhvcGVmdWxseSB3ZSBj
-YW1lIGJhY2sKKyAgICBlbmRfcGMgPSBnZGIucGFyc2VfYW5kX2V2YWwoJyRwYycpCisgICAgcHJp
-bnQgKCIlcyA9PSAlcyIgJSAoZW5kX3BjLCBzeW0udmFsdWUoKSkpCisKKyAgICBpZiBlbmRfcGMg
-PT0gc3ltLnZhbHVlKCk6CisgICAgICAgIGdkYi5leGVjdXRlKCJkIDEiKQorICAgICAgICByZXR1
-cm4gVHJ1ZQorICAgIGVsc2U6CisgICAgICAgIHJldHVybiBGYWxzZQorCisKK2NsYXNzIFdhdGNo
-UG9pbnQoZ2RiLkJyZWFrcG9pbnQpOgorCisgICAgZGVmIGdldF93cHN0cihzZWxmLCBzeW1fbmFt
-ZSk6CisgICAgICAgICJTZXR1cCBzeW0gYW5kIHdwX3N0ciBmb3IgZ2l2ZW4gc3ltYm9sLiIKKyAg
-ICAgICAgc2VsZi5zeW0sIG9rID0gZ2RiLmxvb2t1cF9zeW1ib2woc3ltX25hbWUpCisgICAgICAg
-IHdwX2FkZHIgPSBnZGIucGFyc2VfYW5kX2V2YWwoc3ltX25hbWUpLmFkZHJlc3MKKyAgICAgICAg
-c2VsZi53cF9zdHIgPSAnKiglKHR5cGUpcykoJiUoYWRkcmVzcylzKScgJSBkaWN0KAorICAgICAg
-ICAgICAgdHlwZSA9IHdwX2FkZHIudHlwZSwgYWRkcmVzcyA9IHN5bV9uYW1lKQorCisgICAgICAg
-IHJldHVybihzZWxmLndwX3N0cikKKworICAgIGRlZiBfX2luaXRfXyhzZWxmLCBzeW1fbmFtZSwg
-dHlwZSk6CisgICAgICAgIHdwX3N0ciA9IHNlbGYuZ2V0X3dwc3RyKHN5bV9uYW1lKQorICAgICAg
-ICBzdXBlcihXYXRjaFBvaW50LCBzZWxmKS5fX2luaXRfXyh3cF9zdHIsIGdkYi5CUF9XQVRDSFBP
-SU5ULCB0eXBlKQorCisgICAgZGVmIHN0b3Aoc2VsZik6CisgICAgICAgIGVuZF9wYyA9IGdkYi5w
-YXJzZV9hbmRfZXZhbCgnJHBjJykKKyAgICAgICAgcHJpbnQgKCJISVQgV1AgQCAlcyIgJSAoZW5k
-X3BjKSkKKyAgICAgICAgcmV0dXJuIFRydWUKKworCitkZWYgZG9fb25lX3dhdGNoKHN5bSwgd3R5
-cGUsIHRleHQpOgorCisgICAgd3AgPSBXYXRjaFBvaW50KHN5bSwgd3R5cGUpCisgICAgZ2RiLmV4
-ZWN1dGUoImMiKQorICAgIHJlcG9ydF9zdHIgPSAiJXMgZm9yICVzICglcykiICUgKHRleHQsIHN5
-bSwgd3Auc3ltLnZhbHVlKCkpCisKKyAgICBpZiB3cC5oaXRfY291bnQgPiAwOgorICAgICAgICBy
-ZXBvcnQoVHJ1ZSwgcmVwb3J0X3N0cikKKyAgICAgICAgd3AuZGVsZXRlKCkKKyAgICBlbHNlOgor
-ICAgICAgICByZXBvcnQoRmFsc2UsIHJlcG9ydF9zdHIpCisKKworZGVmIGNoZWNrX3dhdGNoZXMo
-c3ltX25hbWUpOgorICAgICJXYXRjaCBhIHN5bWJvbCBmb3IgYW55IGFjY2Vzcy4iCisKKyAgICAj
-IFNob3VsZCBoaXQgZm9yIGFueSByZWFkCisgICAgZG9fb25lX3dhdGNoKHN5bV9uYW1lLCBnZGIu
-V1BfQUNDRVNTLCAiYXdhdGNoIikKKworICAgICMgQWdhaW4gc2hvdWxkIGhpdCBmb3IgcmVhZHMK
-KyAgICBkb19vbmVfd2F0Y2goc3ltX25hbWUsIGdkYi5XUF9SRUFELCAicndhdGNoIikKKworICAg
-ICMgRmluYWxseSB3aGVuIGl0IGlzIHdyaXR0ZW4KKyAgICBkb19vbmVfd2F0Y2goc3ltX25hbWUs
-IGdkYi5XUF9XUklURSwgIndhdGNoIikKKworCitjbGFzcyBDYXRjaEJyZWFrcG9pbnQoZ2RiLkJy
-ZWFrcG9pbnQpOgorICAgIGRlZiBfX2luaXRfXyhzZWxmLCBzeW1fbmFtZSk6CisgICAgICAgIHN1
-cGVyKENhdGNoQnJlYWtwb2ludCwgc2VsZikuX19pbml0X18oc3ltX25hbWUpCisgICAgICAgIHNl
-bGYuc3ltLCBvayA9IGdkYi5sb29rdXBfc3ltYm9sKHN5bV9uYW1lKQorCisgICAgZGVmIHN0b3Ao
-c2VsZik6CisgICAgICAgIGVuZF9wYyA9IGdkYi5wYXJzZV9hbmRfZXZhbCgnJHBjJykKKyAgICAg
-ICAgcHJpbnQgKCJDQjogJXMgPT0gJXMiICUgKGVuZF9wYywgc2VsZi5zeW0udmFsdWUoKSkpCisg
-ICAgICAgIGlmIGVuZF9wYyA9PSBzZWxmLnN5bS52YWx1ZSgpOgorICAgICAgICAgICAgcmVwb3J0
-KEZhbHNlLCAiSGl0IGZpbmFsIGNhdGNocG9pbnQiKQorCisKK2RlZiBydW5fdGVzdCgpOgorICAg
-ICJSdW4gdGhyb3VnaHQgdGhlIHRlc3RzIG9uZSBieSBvbmUiCisKKyAgICBwcmludCAoIkNoZWNr
-aW5nIHdlIGNhbiBzdGVwIHRoZSBmaXJzdCBmZXcgaW5zdHJ1Y3Rpb25zIikKKyAgICBzdGVwX29r
-ID0gMAorICAgIGZvciBpIGluIHJhbmdlKDMpOgorICAgICAgICBpZiBjaGVja19zdGVwKCk6Cisg
-ICAgICAgICAgICBzdGVwX29rICs9IDEKKworICAgIHJlcG9ydChzdGVwX29rID09IDMsICJzaW5n
-bGUgc3RlcCBpbiBib290IGNvZGUiKQorCisgICAgcHJpbnQgKCJDaGVja2luZyBIVyBicmVha3Bv
-aW50IHdvcmtzIikKKyAgICBicmVha19vayA9IGNoZWNrX2hicmVhaygia2VybmVsX2luaXQiKQor
-ICAgIHJlcG9ydChicmVha19vaywgImhicmVhayBAIGtlcm5lbF9pbml0IikKKworICAgICMgQ2Fu
-J3Qgc2V0IHRoaXMgdXAgdW50aWwgd2UgYXJlIGluIHRoZSBrZXJuZWwgcHJvcGVyCisgICAgIyBp
-ZiB3ZSBtYWtlIGl0IHRvIHJ1bl9pbml0X3Byb2Nlc3Mgd2UndmUgb3Zlci1ydW4gYW5kCisgICAg
-IyBvbmUgb2YgdGhlIHRlc3RzIGZhaWxlZAorICAgIHByaW50ICgiU2V0dXAgY2F0Y2gtYWxsIGZv
-ciBydW5faW5pdF9wcm9jZXNzIikKKyAgICBjYnAgPSBDYXRjaEJyZWFrcG9pbnQoInJ1bl9pbml0
-X3Byb2Nlc3MiKQorICAgIGNwYjIgPSBDYXRjaEJyZWFrcG9pbnQoInRyeV90b19ydW5faW5pdF9w
-cm9jZXNzIikKKworICAgIHByaW50ICgiQ2hlY2tpbmcgTm9ybWFsIGJyZWFrcG9pbnQgd29ya3Mi
-KQorICAgIGJyZWFrX29rID0gY2hlY2tfYnJlYWsoIndhaXRfZm9yX2NvbXBsZXRpb24iKQorICAg
-IHJlcG9ydChicmVha19vaywgImJyZWFrIEAgd2FpdF9mb3JfY29tcGxldGlvbiIpCisKKyAgICBw
-cmludCAoIkNoZWNraW5nIHdhdGNocG9pbnQgd29ya3MiKQorICAgIGNoZWNrX3dhdGNoZXMoInN5
-c3RlbV9zdGF0ZSIpCisKKyMKKyMgVGhpcyBydW5zIGFzIHRoZSBzY3JpcHQgaXQgc291cmNlZCAo
-dmlhIC14KQorIworCit0cnk6CisgICAgcHJpbnQgKCJDb25uZWN0aW5nIHRvIHJlbW90ZSIpCisg
-ICAgZ2RiLmV4ZWN1dGUoInRhcmdldCByZW1vdGUgbG9jYWxob3N0OjEyMzQiKQorCisgICAgIyBU
-aGVzZSBhcmUgbm90IHZlcnkgdXNlZnVsIGluIHNjcmlwdHMKKyAgICBnZGIuZXhlY3V0ZSgic2V0
-IHBhZ2luYXRpb24gb2ZmIikKKyAgICBnZGIuZXhlY3V0ZSgic2V0IGNvbmZpcm0gb2ZmIikKKwor
-ICAgICMgUnVuIHRoZSBhY3R1YWwgdGVzdHMKKyAgICBydW5fdGVzdCgpCisKK2V4Y2VwdDoKKyAg
-ICBwcmludCAoIkdEQiBFeGNlcHRpb246ICVzIiAlIChzeXMuZXhjX2luZm8oKVswXSkpCisgICAg
-ZmFpbGNvdW50ICs9IDEKKyAgICBpbXBvcnQgY29kZQorICAgIGNvZGUuSW50ZXJhY3RpdmVDb25z
-b2xlKGxvY2Fscz1nbG9iYWxzKCkpLmludGVyYWN0KCkKKyAgICByYWlzZQorCisjIEZpbmFsbHkg
-a2lsbCB0aGUgaW5mZXJpb3IgYW5kIGV4aXQgZ2RiIHdpdGggYSBjb3VudCBvZiBmYWlsdXJlcwor
-Z2RiLmV4ZWN1dGUoImtpbGwiKQorZXhpdChmYWlsY291bnQpCi0tIAoyLjYuMwoKX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlz
-dAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEu
-ZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+
+
+On 2015/12/8 23:43, Marc Zyngier wrote:
+> On 08/12/15 12:47, Shannon Zhao wrote:
+>> From: Shannon Zhao <shannon.zhao@linaro.org>
+>> +/**
+>> + * kvm_pmu_get_counter_value - get PMU counter value
+>> + * @vcpu: The vcpu pointer
+>> + * @select_idx: The counter index
+>> + */
+>> +u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u32 select_idx)
+>> +{
+>> +	u64 counter, enabled, running;
+>> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+>> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+>> +
+>> +	if (!vcpu_mode_is_32bit(vcpu))
+>> +		counter = vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + select_idx);
+>> +	else
+>> +		counter = vcpu_cp15(vcpu, c14_PMEVCNTR0 + select_idx);
+>> +
+>> +	if (pmc->perf_event)
+>> +		counter += perf_event_read_value(pmc->perf_event, &enabled,
+>> +						 &running);
+>> +
+>> +	return counter & pmc->bitmask;
+> 
+> This one confused me for a while. Is it the case that you return
+> whatever is in the vcpu view of the counter, plus anything that perf
+> itself has counted? If so, I'd appreciate a comment here...
+> 
+Yes, the real counter value is the current counter value plus the value
+perf event counts. I'll add a comment.
+
+>> +}
+>> +
+>> +static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u32 select_idx)
+>> +{
+>> +	if (!vcpu_mode_is_32bit(vcpu))
+>> +		return (vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMCR_E) &
+>> +		       (vcpu_sys_reg(vcpu, PMCNTENSET_EL0) >> select_idx);
+> 
+> This looks wrong. Shouldn't it be:
+> 
+> return ((vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMCR_E) &&
+>         (vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & (1 << select_idx)));
+> 
+>> +	else
+>> +		return (vcpu_sys_reg(vcpu, c9_PMCR) & ARMV8_PMCR_E) &
+>> +		       (vcpu_sys_reg(vcpu, c9_PMCNTENSET) >> select_idx);
+>> +}
+> 
+> Also, I don't really see why we need to check the 32bit version, which
+> has the exact same content.
+> 
+>> +
+>> +static inline struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
+>> +{
+>> +	struct kvm_pmu *pmu;
+>> +	struct kvm_vcpu_arch *vcpu_arch;
+>> +
+>> +	pmc -= pmc->idx;
+>> +	pmu = container_of(pmc, struct kvm_pmu, pmc[0]);
+>> +	vcpu_arch = container_of(pmu, struct kvm_vcpu_arch, pmu);
+>> +	return container_of(vcpu_arch, struct kvm_vcpu, arch);
+>> +}
+>> +
+>> +/**
+>> + * kvm_pmu_stop_counter - stop PMU counter
+>> + * @pmc: The PMU counter pointer
+>> + *
+>> + * If this counter has been configured to monitor some event, release it here.
+>> + */
+>> +static void kvm_pmu_stop_counter(struct kvm_pmc *pmc)
+>> +{
+>> +	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
+>> +	u64 counter;
+>> +
+>> +	if (pmc->perf_event) {
+>> +		counter = kvm_pmu_get_counter_value(vcpu, pmc->idx);
+>> +		if (!vcpu_mode_is_32bit(vcpu))
+>> +			vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + pmc->idx) = counter;
+>> +		else
+>> +			vcpu_cp15(vcpu, c14_PMEVCNTR0 + pmc->idx) = counter;
+> 
+> Same thing - we don't need to make a difference between 32 and 64bit.
+> 
+So it's fine to drop all the vcpu_mode_is_32bit(vcpu) check of this
+series? The only one we should take care is the PMCCNTR, right?
+
+>> +
+>> +		perf_event_release_kernel(pmc->perf_event);
+>> +		pmc->perf_event = NULL;
+>> +	}
+>> +}
+>> +
+>> +/**
+>> + * kvm_pmu_set_counter_event_type - set selected counter to monitor some event
+>> + * @vcpu: The vcpu pointer
+>> + * @data: The data guest writes to PMXEVTYPER_EL0
+>> + * @select_idx: The number of selected counter
+>> + *
+>> + * When OS accesses PMXEVTYPER_EL0, that means it wants to set a PMC to count an
+>> + * event with given hardware event number. Here we call perf_event API to
+>> + * emulate this action and create a kernel perf event for it.
+>> + */
+>> +void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u32 data,
+>> +				    u32 select_idx)
+>> +{
+>> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+>> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+>> +	struct perf_event *event;
+>> +	struct perf_event_attr attr;
+>> +	u32 eventsel;
+>> +	u64 counter;
+>> +
+>> +	kvm_pmu_stop_counter(pmc);
+> 
+> Wait. I didn't realize this before, but you have the vcpu right here.
+> Why don't you pass it as a parameter to kvm_pmu_stop_counter and avoid
+> the kvm_pmc_to_vcpu thing altogether?
+> 
+Yeah, we could pass vcpu as a parameter for this function. But the
+kvm_pmc_to_vcpu helper is also used in kvm_pmu_perf_overflow() and
+within kvm_pmu_perf_overflow it needs the pmc->idx, we couldn't pass
+vcpu as a parameter, so this helper is necessary for kvm_pmu_perf_overflow.
+
+Thanks,
+-- 
+Shannon
