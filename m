@@ -1,134 +1,165 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 07/22] arm64: KVM: Implement system register save/restore
-Date: Fri, 11 Dec 2015 18:29:01 +0000
-Message-ID: <566B15ED.5030906@arm.com>
-References: <1449485618-9443-1-git-send-email-marc.zyngier@arm.com> <1449485618-9443-8-git-send-email-marc.zyngier@arm.com> <566A420B.2080406@samsung.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v3 03/22] arm64: KVM: Implement vgic-v2 save/restore
+Date: Fri, 11 Dec 2015 21:55:20 +0100
+Message-ID: <20151211205520.GD27689@cbox>
+References: <1449485618-9443-1-git-send-email-marc.zyngier@arm.com>
+ <1449485618-9443-4-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <566A420B.2080406@samsung.com>
+Content-Disposition: inline
+In-Reply-To: <1449485618-9443-4-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Mario Smarduch <m.smarduch@samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Steve Capper <Steve.Capper@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Mario,
-
-On 11/12/15 03:24, Mario Smarduch wrote:
-> Hi Marc,
+On Mon, Dec 07, 2015 at 10:53:19AM +0000, Marc Zyngier wrote:
+> Implement the vgic-v2 save restore (mostly) as a direct translation
+> of the assembly code version.
 > 
-> On 12/7/2015 2:53 AM, Marc Zyngier wrote:
->> Implement the system register save/restore as a direct translation of
->> the assembly code version.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
->> ---
->>  arch/arm64/kvm/hyp/Makefile    |  1 +
->>  arch/arm64/kvm/hyp/hyp.h       |  3 ++
->>  arch/arm64/kvm/hyp/sysreg-sr.c | 90 ++++++++++++++++++++++++++++++++++++++++++
->>  3 files changed, 94 insertions(+)
->>  create mode 100644 arch/arm64/kvm/hyp/sysreg-sr.c
->>
->> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
->> index 455dc0a..ec94200 100644
->> --- a/arch/arm64/kvm/hyp/Makefile
->> +++ b/arch/arm64/kvm/hyp/Makefile
->> @@ -5,3 +5,4 @@
->>  obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
->>  obj-$(CONFIG_KVM_ARM_HOST) += vgic-v3-sr.o
->>  obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
->> +obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
->> diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
->> index f213e46..778d56d 100644
->> --- a/arch/arm64/kvm/hyp/hyp.h
->> +++ b/arch/arm64/kvm/hyp/hyp.h
->> @@ -38,5 +38,8 @@ void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
->>  void __timer_save_state(struct kvm_vcpu *vcpu);
->>  void __timer_restore_state(struct kvm_vcpu *vcpu);
->>  
->> +void __sysreg_save_state(struct kvm_cpu_context *ctxt);
->> +void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
->> +
->>  #endif /* __ARM64_KVM_HYP_H__ */
->>  
->> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
->> new file mode 100644
->> index 0000000..add8fcb
->> --- /dev/null
->> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
->> @@ -0,0 +1,90 @@
->> +/*
->> + * Copyright (C) 2012-2015 - ARM Ltd
->> + * Author: Marc Zyngier <marc.zyngier@arm.com>
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License version 2 as
->> + * published by the Free Software Foundation.
->> + *
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> + *
->> + * You should have received a copy of the GNU General Public License
->> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#include <linux/compiler.h>
->> +#include <linux/kvm_host.h>
->> +
->> +#include <asm/kvm_mmu.h>
->> +
->> +#include "hyp.h"
->> +
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/kvm/Makefile         |  1 +
+>  arch/arm64/kvm/hyp/Makefile     |  5 +++
+>  arch/arm64/kvm/hyp/hyp.h        |  3 ++
+>  arch/arm64/kvm/hyp/vgic-v2-sr.c | 84 +++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 93 insertions(+)
+>  create mode 100644 arch/arm64/kvm/hyp/Makefile
+>  create mode 100644 arch/arm64/kvm/hyp/vgic-v2-sr.c
 > 
-> I looked closer on some other ways to get better performance out of
-> the compiler. This code sequence performs about 35% faster for 
-> __sysreg_save_state(..) for 5000 exits you save about 500mS or 100nS
-> per exit. This is on Juno.
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 1949fe5..d31e4e5 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -10,6 +10,7 @@ KVM=../../../virt/kvm
+>  ARM=../../../arch/arm/kvm
+>  
+>  obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
+> +obj-$(CONFIG_KVM_ARM_HOST) += hyp/
+>  
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(ARM)/arm.o $(ARM)/mmu.o $(ARM)/mmio.o
+> diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+> new file mode 100644
+> index 0000000..d8d5968
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/Makefile
+> @@ -0,0 +1,5 @@
+> +#
+> +# Makefile for Kernel-based Virtual Machine module, HYP part
+> +#
+> +
+> +obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
+> diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
+> index 057f483..ac63553 100644
+> --- a/arch/arm64/kvm/hyp/hyp.h
+> +++ b/arch/arm64/kvm/hyp/hyp.h
+> @@ -29,5 +29,8 @@
+>  #define hyp_kern_va(v) (typeof(v))((unsigned long)(v) - HYP_PAGE_OFFSET \
+>  						      + PAGE_OFFSET)
+>  
+> +void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
+> +void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
+> +
+>  #endif /* __ARM64_KVM_HYP_H__ */
+>  
+> diff --git a/arch/arm64/kvm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> new file mode 100644
+> index 0000000..e717612
+> --- /dev/null
+> +++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> @@ -0,0 +1,84 @@
+> +/*
+> + * Copyright (C) 2012-2015 - ARM Ltd
+> + * Author: Marc Zyngier <marc.zyngier@arm.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#include <linux/compiler.h>
+> +#include <linux/irqchip/arm-gic.h>
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/kvm_mmu.h>
+> +
+> +#include "hyp.h"
+> +
+> +/* vcpu is already in the HYP VA space */
+> +void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> +	struct vgic_dist *vgic = &kvm->arch.vgic;
+> +	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
+> +	u32 eisr0, eisr1, elrsr0, elrsr1;
+> +	int i, nr_lr;
+> +
+> +	if (!base)
+> +		return;
+> +
+> +	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
+> +	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
+> +	cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
+> +	eisr0  = readl_relaxed(base + GICH_EISR0);
+> +	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
+> +	if (unlikely(nr_lr > 32)) {
+> +		eisr1  = readl_relaxed(base + GICH_EISR1);
+> +		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
+> +	} else {
+> +		eisr1 = elrsr1 = 0;
+> +	}
+> +#ifdef CONFIG_CPU_BIG_ENDIAN
+> +	cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
+> +	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
+> +#else
+> +	cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
+> +	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
+> +#endif
+> +	cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
+> +
+> +	writel_relaxed(0, base + GICH_HCR);
+> +
+> +	for (i = 0; i < nr_lr; i++)
+> +		cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
+> +}
+> +
+> +/* vcpu is already in the HYP VA space */
+> +void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
+> +	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+> +	struct vgic_dist *vgic = &kvm->arch.vgic;
+> +	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
+> +	int i, nr_lr;
+> +
+> +	if (!base)
+> +		return;
+> +
+> +	writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
+> +	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
+> +	writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
+> +
+> +	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
+> +	for (i = 0; i < nr_lr; i++)
 
-35% faster? Really? That's pretty crazy. Was that on the A57 or the A53?
+nit: why do you need the nr_lr variable?  it may make the code easier to
+read I guess.
 
+> +		writel_relaxed(cpu_if->vgic_lr[i], base + GICH_LR0 + (i * 4));
+> +}
+> -- 
+> 2.1.4
 > 
-> register int volatile count asm("r2") = 0;
 
-Does this even work on arm64? We don't have an "r2" register...
-
-> 
-> do {
-> ....
-> } while(count);
-> 
-> I didn't test the restore function (ran out of time) but I suspect it should be
-> the same. The assembler pretty much uses all the GPRs, (a little too many, using
-> stp to push 4 pairs on the stack and restore) looking at the assembler it all
-> should execute out of order.
-
-Are you talking about the original implementation here? or the generated
-code out of the compiler? The original implementation didn't push
-anything on the stack (apart from the prologue, but we have the same
-thing in the C implementation).
-
-Looking at the compiler output, we have a bunch of mrs/str, one after
-the other - pretty basic. Maybe that gives the CPU some "breathing"
-time, but I have no idea if that's more or less efficient.
-
-But the main thing is that we can now rely on the compiler to generate
-something that is more or less optimized for a given platform if there
-is such a requirement. We go from something that was cast in stone to
-something that has some degree of flexibility.
-
-> 
-> FWIW I gave this a try since compilers like to optimize loops. I used
-> 'cntpct_el0' counter register to measure the intervals.
-
-It'd be nice to have a measure in terms of cycle, but that's a good
-first approximation.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
