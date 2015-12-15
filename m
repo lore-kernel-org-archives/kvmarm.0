@@ -1,7 +1,7 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v7 18/19] KVM: ARM64: Free perf event of PMU when destroying vcpu
-Date: Tue, 15 Dec 2015 16:49:38 +0800
-Message-ID: <1450169379-12336-19-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v7 04/19] KVM: ARM64: Add access handler for PMCR register
+Date: Tue, 15 Dec 2015 16:49:24 +0800
+Message-ID: <1450169379-12336-5-git-send-email-zhaoshenglong@huawei.com>
 References: <1450169379-12336-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -14,79 +14,86 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-When KVM frees VCPU, it needs to free the perf_event of PMU.
+Add reset handler which gets host value of PMCR_EL0 and make writable
+bits architecturally UNKNOWN except PMCR.E which is zero. Add an access
+handler for PMCR.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm/kvm/arm.c    |  1 +
- include/kvm/arm_pmu.h |  2 ++
- virt/kvm/arm/pmu.c    | 21 +++++++++++++++++++++
- 3 files changed, 24 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 39 +++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 37 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index cd696ef..cea2176 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -259,6 +259,7 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
- 	kvm_mmu_free_memory_caches(vcpu);
- 	kvm_timer_vcpu_terminate(vcpu);
- 	kvm_vgic_vcpu_destroy(vcpu);
-+	kvm_pmu_vcpu_destroy(vcpu);
- 	kmem_cache_free(kvm_vcpu_cache, vcpu);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index d2650e8..9a06116 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -33,6 +33,7 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_host.h>
+ #include <asm/kvm_mmu.h>
++#include <asm/pmu.h>
+ 
+ #include <trace/events/kvm.h>
+ 
+@@ -438,6 +439,40 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	vcpu_sys_reg(vcpu, MPIDR_EL1) = (1ULL << 31) | mpidr;
  }
  
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 59cb53c..b1b63ac 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -36,6 +36,7 @@ struct kvm_pmu {
- };
- 
- void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
-+void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu);
- void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu);
- u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
- void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
-@@ -50,6 +51,7 @@ struct kvm_pmu {
- };
- 
- void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
-+void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu) {}
- void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu) {}
- u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
- {
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index c62e7f5..d113ee4 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -93,6 +93,27 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
- }
- 
- /**
-+ * kvm_pmu_vcpu_destroy - free perf event of PMU for cpu
-+ * @vcpu: The vcpu pointer
-+ *
-+ */
-+void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
++static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
 +{
-+	int i;
-+	struct kvm_pmu *pmu = &vcpu->arch.pmu;
++	u64 pmcr, val;
 +
-+	for (i = 0; i < ARMV8_MAX_COUNTERS; i++) {
-+		struct kvm_pmc *pmc = &pmu->pmc[i];
-+
-+		if (pmc->perf_event) {
-+			perf_event_disable(pmc->perf_event);
-+			perf_event_release_kernel(pmc->perf_event);
-+			pmc->perf_event = NULL;
-+		}
-+	}
++	asm volatile("mrs %0, pmcr_el0\n" : "=r" (pmcr));
++	/* Writable bits of PMCR_EL0 (ARMV8_PMCR_MASK) is reset to UNKNOWN
++	 * except PMCR.E resetting to zero.
++	 */
++	val = ((pmcr & ~ARMV8_PMCR_MASK) | (ARMV8_PMCR_MASK & 0xdecafbad))
++	      & (~ARMV8_PMCR_E);
++	vcpu_sys_reg(vcpu, r->reg) = val;
 +}
 +
-+/**
-  * kvm_pmu_flush_hwstate - flush pmu state to cpu
-  * @vcpu: The vcpu pointer
-  *
++static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			const struct sys_reg_desc *r)
++{
++	u64 val;
++
++	if (p->is_write) {
++		/* Only update writeable bits of PMCR */
++		val = vcpu_sys_reg(vcpu, r->reg);
++		val &= ~ARMV8_PMCR_MASK;
++		val |= p->regval & ARMV8_PMCR_MASK;
++		vcpu_sys_reg(vcpu, r->reg) = val;
++	} else {
++		/* PMCR.P & PMCR.C are RAZ */
++		val = vcpu_sys_reg(vcpu, r->reg)
++		      & ~(ARMV8_PMCR_P | ARMV8_PMCR_C);
++		p->regval = val;
++	}
++
++	return true;
++}
++
+ /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+ #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+ 	/* DBGBVRn_EL1 */						\
+@@ -622,7 +657,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 
+ 	/* PMCR_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b000),
+-	  trap_raz_wi },
++	  access_pmcr, reset_pmcr, PMCR_EL0, },
+ 	/* PMCNTENSET_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b001),
+ 	  trap_raz_wi },
+@@ -884,7 +919,7 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	{ Op1( 0), CRn( 7), CRm(14), Op2( 2), access_dcsw },
+ 
+ 	/* PMU */
+-	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), trap_raz_wi },
++	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), access_pmcr },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
 -- 
 2.0.4
 
