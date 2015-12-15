@@ -1,79 +1,80 @@
-From: Shannon Zhao <shannon.zhao@linaro.org>
-Subject: Re: [PATCH v7 01/19] ARM64: Move PMU register related defines to
- asm/pmu.h
-Date: Tue, 15 Dec 2015 19:44:56 +0800
-Message-ID: <566FFD38.7060803@linaro.org>
-References: <1450169379-12336-1-git-send-email-zhaoshenglong@huawei.com>
- <1450169379-12336-2-git-send-email-zhaoshenglong@huawei.com>
- <566FFAB6.8060604@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v7 08/19] KVM: ARM64: Add access handler for event typer
+ register
+Date: Tue, 15 Dec 2015 13:43:10 +0000
+Message-ID: <567018EE.6000605@arm.com>
+References: <1450169379-12336-1-git-send-email-zhaoshenglong@huawei.com> <1450169379-12336-9-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8925241252
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 06:42:50 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eK9fgo8yzylg for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Dec 2015 06:42:49 -0500 (EST)
-Received: from mail-pa0-f49.google.com (mail-pa0-f49.google.com
- [209.85.220.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A8595411F6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 06:42:49 -0500 (EST)
-Received: by mail-pa0-f49.google.com with SMTP id ur14so3686465pab.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 03:45:06 -0800 (PST)
-In-Reply-To: <566FFAB6.8060604@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
-Cc: kvm@vger.kernel.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1450169379-12336-9-git-send-email-zhaoshenglong@huawei.com>
+Sender: kvm-owner@vger.kernel.org
+To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 15/12/15 08:49, Shannon Zhao wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
+> 
+> These kind of registers include PMEVTYPERn, PMCCFILTR and PMXEVTYPER
+> which is mapped to PMEVTYPERn or PMCCFILTR.
+> 
+> The access handler translates all aarch32 register offsets to aarch64
+> ones and uses vcpu_sys_reg() to access their values to avoid taking care
+> of big endian.
+> 
+> When writing to these registers, create a perf_event for the selected
+> event type.
+> 
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 154 +++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 152 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index e043224..c52ff15 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -504,6 +504,68 @@ static bool access_pmceid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	return true;
+>  }
+>  
+> +static inline bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
+> +{
+> +	u64 pmcr, val;
+> +
+> +	pmcr = vcpu_sys_reg(vcpu, PMCR_EL0);
+> +	val = (pmcr >> ARMV8_PMCR_N_SHIFT) & ARMV8_PMCR_N_MASK;
+> +	if (idx >= val && idx != ARMV8_CYCLE_IDX)
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+> +static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> +			       const struct sys_reg_desc *r)
+> +{
+> +	u64 idx, reg;
+> +
+> +	if (r->CRn == 9) {
+> +		/* PMXEVTYPER_EL0 */
+> +		reg = 0;
+> +	} else {
+> +		if (!p->is_aarch32) {
+> +			/* PMEVTYPERn_EL0 or PMCCFILTR_EL0 */
+> +			reg = r->reg;
+> +		} else {
+> +			if (r->CRn == 14 && r->CRm == 15 && r->Op2 == 7) {
+> +				reg = PMCCFILTR_EL0;
+> +			} else {
+> +				reg = ((r->CRm & 3) << 3) & (r->Op2 & 7);
 
+Shouldn't that be "((r->CRm & 3) << 3) | (r->Op2 & 7)"? Otherwise reg is
+always 0.
 
-On 2015/12/15 19:34, Marc Zyngier wrote:
-> On 15/12/15 08:49, Shannon Zhao wrote:
->> From: Shannon Zhao <shannon.zhao@linaro.org>
->>
->> To use the ARMv8 PMU related register defines from the KVM code,
->> we move the relevant definitions to asm/pmu.h header file.
->>
->> Signed-off-by: Anup Patel <anup.patel@linaro.org>
->> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
->> ---
->>   arch/arm64/include/asm/pmu.h   | 64 ++++++++++++++++++++++++++++++++++++++++++
->>   arch/arm64/kernel/perf_event.c | 36 +-----------------------
->>   2 files changed, 65 insertions(+), 35 deletions(-)
->>   create mode 100644 arch/arm64/include/asm/pmu.h
->>
->> diff --git a/arch/arm64/include/asm/pmu.h b/arch/arm64/include/asm/pmu.h
->> new file mode 100644
->> index 0000000..4264ea0
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/pmu.h
->> @@ -0,0 +1,64 @@
->> +/*
->> + * Copyright (C) 2015 Linaro Ltd, Shannon Zhao
->
-> Erm, not quite. You're simply moving existing code from one file to
-> another. That doesn't change the copyright of said code, which reads:
->
->   * PMU support
->   *
->   * Copyright (C) 2012 ARM Limited
->   * Author: Will Deacon <will.deacon@arm.com>
->
-> Please keep this mention in place.
->
-Sure, will fix this. Thanks.
+Thanks,
 
+	M.
 -- 
-Shannon
+Jazz is not dead. It just smells funny...
