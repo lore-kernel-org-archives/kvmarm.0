@@ -1,23 +1,23 @@
-From: Bhushan Bharat <Bharat.Bhushan@freescale.com>
-Subject: ARM64/KVM: Bad page state in process iperf
-Date: Tue, 15 Dec 2015 03:46:03 +0000
-Message-ID: <DM2PR03MB557D3079ABFE7AF114A58A690EE0@DM2PR03MB557.namprd03.prod.outlook.com>
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Subject: [PATCH v7 16/19] KVM: ARM64: Add PMU overflow interrupt routing
+Date: Tue, 15 Dec 2015 16:49:36 +0800
+Message-ID: <1450169379-12336-17-git-send-email-zhaoshenglong@huawei.com>
+References: <1450169379-12336-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3603D41267
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Dec 2015 22:43:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B117412D0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 03:49:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nZm8cqzuYXgV for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Dec 2015 22:43:50 -0500 (EST)
-Received: from na01-by2-obe.outbound.protection.outlook.com
- (mail-by2on0137.outbound.protection.outlook.com [207.46.100.137])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id DDF2F41252
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Dec 2015 22:43:49 -0500 (EST)
-Content-Language: en-US
+ with ESMTP id 2pTPxk1FUxZj for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Dec 2015 03:49:11 -0500 (EST)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F8B64970D
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 03:49:09 -0500 (EST)
+In-Reply-To: <1450169379-12336-1-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,52 +27,147 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org
+Cc: kvm@vger.kernel.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+From: Shannon Zhao <shannon.zhao@linaro.org>
 
-Hi All,
+When calling perf_event_create_kernel_counter to create perf_event,
+assign a overflow handler. Then when the perf event overflows, set the
+corresponding bit of guest PMOVSSET register. If this counter is enabled
+and its interrupt is enabled as well, kick the vcpu to sync the
+interrupt.
 
-I am running "iperf" in KVM guest on ARM64 machine and observing below crash.
+On VM entry, if there is counter overflowed, inject the interrupt with
+the level set to 1. Otherwise, inject the interrupt with the level set
+to 0.
 
-=============================
-$iperf -c 3.3.3.3 -P 4 -t 0 -i 5 -w 90k
-------------------------------------------------------------
-Client connecting to 3.3.3.3, TCP port 5001
-TCP window size:  180 KByte (WARNING: requested 90.0 KByte)
-------------------------------------------------------------
-[  3] local 3.3.3.1 port 51131 connected with 3.3.3.3 port 5001
-[  6] local 3.3.3.1 port 51134 connected with 3.3.3.3 port 5001
-[  5] local 3.3.3.1 port 51133 connected with 3.3.3.3 port 5001
-[  4] local 3.3.3.1 port 51132 connected with 3.3.3.3 port 5001
-[   53.088567] random: nonblocking pool is initialized
-[ ID] Interval       Transfer     Bandwidth
-[  3]  0.0- 5.0 sec   638 MBytes  1.07 Gbits/sec
-[  4] 35.0-40.0 sec  1.66 GBytes  2.85 Gbits/sec
-[  5] 40.0-45.0 sec  1.11 GBytes  1.90 Gbits/sec
-[  4] 40.0-45.0 sec  1.16 GBytes  1.99 Gbits/sec
-[   98.895207] BUG: Bad page state in process iperf  pfn:0a584
-[   98.896164] page:ffff780000296100 count:-1 mapcount:0 mapping:          (null) index:0x0
-[   98.897436] flags: 0x0()
-[   98.897885] page dumped because: nonzero _count
-[   98.898640] Modules linked in:
-[   98.899178] CPU: 0 PID: 1639 Comm: iperf Not tainted 4.1.8-00461-ge5431ad #141
-[   98.900302] Hardware name: linux,dummy-virt (DT)
-[   98.901014] Call trace:
-[   98.901406] [<ffff800000096cac>] dump_backtrace+0x0/0x12c
-[   98.902522] [<ffff800000096de8>] show_stack+0x10/0x1c
-[   98.903441] [<ffff800000678dc8>] dump_stack+0x8c/0xdc
-[   98.904202] [<ffff800000145480>] bad_page+0xc4/0x114
-[   98.904945] [<ffff8000001487a4>] get_page_from_freelist+0x590/0x63c
-[   98.905871] [<ffff80000014893c>] __alloc_pages_nodemask+0xec/0x794
-[   98.906791] [<ffff80000059fc80>] skb_page_frag_refill+0x70/0xa8
-[   98.907678] [<ffff80000059fcd8>] sk_page_frag_refill+0x20/0xd0
-[   98.908550] [<ffff8000005edc04>] tcp_sendmsg+0x1f8/0x9a8
-[   98.909368] [<ffff80000061419c>] inet_sendmsg+0x5c/0xd0
-[   98.910178] [<ffff80000059bb44>] sock_sendmsg+0x14/0x58
-[   98.911027] [<ffff80000059bbec>] sock_write_iter+0x64/0xbc
-[   98.912119] [<ffff80000019b5b8>] __vfs_write+0xac/0x10c
-[   98.913126] [<ffff80000019bcb8>] vfs_write+0x90/0x1a0
-[   98.913963] [<ffff80000019c53c>] SyS_write+0x40/0xa0
+Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+---
+ arch/arm/kvm/arm.c    |  2 ++
+ include/kvm/arm_pmu.h |  2 ++
+ virt/kvm/arm/pmu.c    | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 57 insertions(+), 1 deletion(-)
 
------------
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index e06fd29..cd696ef 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -28,6 +28,7 @@
+ #include <linux/sched.h>
+ #include <linux/kvm.h>
+ #include <trace/events/kvm.h>
++#include <kvm/arm_pmu.h>
+ 
+ #define CREATE_TRACE_POINTS
+ #include "trace.h"
+@@ -569,6 +570,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		 * non-preemptible context.
+ 		 */
+ 		preempt_disable();
++		kvm_pmu_flush_hwstate(vcpu);
+ 		kvm_timer_flush_hwstate(vcpu);
+ 		kvm_vgic_flush_hwstate(vcpu);
+ 
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 25b5f98..732ccaf 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -35,6 +35,7 @@ struct kvm_pmu {
+ 	struct kvm_pmc pmc[ARMV8_MAX_COUNTERS];
+ };
+ 
++void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu);
+ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
+ void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
+ void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
+@@ -47,6 +48,7 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
+ struct kvm_pmu {
+ };
+ 
++void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu) {}
+ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
+ {
+ 	return 0;
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index e664721..eff5b19 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -21,6 +21,7 @@
+ #include <linux/perf_event.h>
+ #include <asm/kvm_emulate.h>
+ #include <kvm/arm_pmu.h>
++#include <kvm/arm_vgic.h>
+ 
+ /**
+  * kvm_pmu_get_counter_value - get PMU counter value
+@@ -75,6 +76,56 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
+ }
+ 
+ /**
++ * kvm_pmu_flush_hwstate - flush pmu state to cpu
++ * @vcpu: The vcpu pointer
++ *
++ * Inject virtual PMU IRQ if IRQ is pending for this cpu.
++ */
++void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu)
++{
++	struct kvm_pmu *pmu = &vcpu->arch.pmu;
++	u64 overflow;
++
++	if (pmu->irq_num == -1)
++		return;
++
++	if (!(vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMCR_E))
++		return;
++
++	overflow = vcpu_sys_reg(vcpu, PMCNTENSET_EL0)
++		   & vcpu_sys_reg(vcpu, PMINTENSET_EL1)
++		   & vcpu_sys_reg(vcpu, PMOVSSET_EL0);
++
++	kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num,
++			    overflow ? 1 : 0);
++}
++
++static inline struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
++{
++	struct kvm_pmu *pmu;
++	struct kvm_vcpu_arch *vcpu_arch;
++
++	pmc -= pmc->idx;
++	pmu = container_of(pmc, struct kvm_pmu, pmc[0]);
++	vcpu_arch = container_of(pmu, struct kvm_vcpu_arch, pmu);
++	return container_of(vcpu_arch, struct kvm_vcpu, arch);
++}
++
++/**
++ * When perf event overflows, call kvm_pmu_overflow_set to set overflow status.
++ */
++static void kvm_pmu_perf_overflow(struct perf_event *perf_event,
++				  struct perf_sample_data *data,
++				  struct pt_regs *regs)
++{
++	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
++	struct kvm_vcpu *vcpu = kvm_pmc_to_vcpu(pmc);
++	int idx = pmc->idx;
++
++	kvm_pmu_overflow_set(vcpu, BIT(idx));
++}
++
++/**
+  * kvm_pmu_enable_counter - enable selected PMU counter
+  * @vcpu: The vcpu pointer
+  * @val: the value guest writes to PMCNTENSET register
+@@ -258,7 +309,8 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+ 	/* The initial sample period (overflow count) of an event. */
+ 	attr.sample_period = (-counter) & pmc->bitmask;
+ 
+-	event = perf_event_create_kernel_counter(&attr, -1, current, NULL, pmc);
++	event = perf_event_create_kernel_counter(&attr, -1, current,
++						 kvm_pmu_perf_overflow, pmc);
+ 	if (IS_ERR(event)) {
+ 		printk_once("kvm: pmu event creation failed %ld\n",
+ 			    PTR_ERR(event));
+-- 
+2.0.4
