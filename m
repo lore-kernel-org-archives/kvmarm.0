@@ -1,79 +1,80 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v7 10/19] KVM: ARM64: Add access handler for PMCNTENSET
- and PMCNTENCLR register
-Date: Tue, 15 Dec 2015 13:56:04 +0000
-Message-ID: <56701BF4.2060204@arm.com>
+Subject: Re: [PATCH v7 11/19] KVM: ARM64: Add access handler for PMINTENSET
+ and PMINTENCLR register
+Date: Tue, 15 Dec 2015 14:02:40 +0000
+Message-ID: <56701D80.9010302@arm.com>
 References: <1450169379-12336-1-git-send-email-zhaoshenglong@huawei.com>
- <1450169379-12336-11-git-send-email-zhaoshenglong@huawei.com>
+ <1450169379-12336-12-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-In-Reply-To: <1450169379-12336-11-git-send-email-zhaoshenglong@huawei.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 714A841252
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 09:00:31 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id fGPXkP4gttO0 for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Dec 2015 09:00:27 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D539411F6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 09:00:27 -0500 (EST)
+In-Reply-To: <1450169379-12336-12-git-send-email-zhaoshenglong@huawei.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
-Cc: wei@redhat.com, hangaohuai@huawei.com, kvm@vger.kernel.org, will.deacon@arm.com, peter.huangpeng@huawei.com, cov@codeaurora.org, alex.bennee@linaro.org, linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org
+Cc: kvm@vger.kernel.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 15/12/15 08:49, Shannon Zhao wrote:
 > From: Shannon Zhao <shannon.zhao@linaro.org>
 > 
-> Since the reset value of PMCNTENSET and PMCNTENCLR is UNKNOWN, use
+> Since the reset value of PMINTENSET and PMINTENCLR is UNKNOWN, use
 > reset_unknown for its reset handler. Add a handler to emulate writing
-> PMCNTENSET or PMCNTENCLR register.
-> 
-> When writing to PMCNTENSET, call perf_event_enable to enable the perf
-> event. When writing to PMCNTENCLR, call perf_event_disable to disable
-> the perf event.
+> PMINTENSET or PMINTENCLR register.
 > 
 > Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 > ---
->  arch/arm64/kvm/sys_regs.c | 41 +++++++++++++++++++++++++++++++----
->  include/kvm/arm_pmu.h     |  4 ++++
->  virt/kvm/arm/pmu.c        | 55 +++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 96 insertions(+), 4 deletions(-)
+>  arch/arm64/kvm/sys_regs.c | 29 +++++++++++++++++++++++++----
+>  1 file changed, 25 insertions(+), 4 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index dc6bb26..f216da7 100644
+> index f216da7..594e53f 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -615,6 +615,39 @@ static bool access_pmu_evcntr(struct kvm_vcpu *vcpu,
+> @@ -648,6 +648,27 @@ static bool access_pmcntenset(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
 >  	return true;
 >  }
 >  
-> +static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 val = vcpu_sys_reg(vcpu, PMCR_EL0) >> ARMV8_PMCR_N_SHIFT;
-> +
-> +	val &= ARMV8_PMCR_N_MASK;
-> +	return GENMASK(val - 1, 0) | BIT(ARMV8_CYCLE_IDX);
-> +}
-> +
-> +static bool access_pmcntenset(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+> +static bool access_pmintenset(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
 > +			      const struct sys_reg_desc *r)
 > +{
-> +	u64 val, mask;
+> +	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
 > +
-> +	mask = kvm_pmu_valid_counter_mask(vcpu);
 > +	if (p->is_write) {
-> +		val = p->regval & mask;
 > +		if (r->Op2 & 0x1) {
-> +			/* accessing PMCNTENSET_EL0 */
-> +			vcpu_sys_reg(vcpu, r->reg) |= val;
-> +			kvm_pmu_enable_counter(vcpu, val);
+> +			/* accessing PMINTENSET_EL1 */
+> +			vcpu_sys_reg(vcpu, r->reg) |= (p->regval & mask);
 > +		} else {
-> +			/* accessing PMCNTENCLR_EL0 */
+> +			/* accessing PMINTENCLR_EL1 */
 > +			vcpu_sys_reg(vcpu, r->reg) &= mask;
-> +			vcpu_sys_reg(vcpu, r->reg) &= ~val;
-> +			kvm_pmu_disable_counter(vcpu, val);
+> +			vcpu_sys_reg(vcpu, r->reg) &= ~p->regval;
+
+This looks wrong. The first line doesn't have any effect (you shouldn't
+be able to set bits that are not in the mask the first place). I'd
+prefer something like:
+
+		vcpu_sys_reg(vcpu, r->reg) &= ~(p->regval & mask);
+
+which is symmetrical to the SET operator.
+
 > +		}
 > +	} else {
 > +		p->regval = vcpu_sys_reg(vcpu, r->reg) & mask;
@@ -85,124 +86,30 @@ On 15/12/15 08:49, Shannon Zhao wrote:
 >  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
 >  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
 >  	/* DBGBVRn_EL1 */						\
-> @@ -816,10 +849,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	  access_pmcr, reset_pmcr, PMCR_EL0, },
->  	/* PMCNTENSET_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b001),
+> @@ -806,10 +827,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  
+>  	/* PMINTENSET_EL1 */
+>  	{ Op0(0b11), Op1(0b000), CRn(0b1001), CRm(0b1110), Op2(0b001),
 > -	  trap_raz_wi },
-> +	  access_pmcntenset, reset_unknown, PMCNTENSET_EL0 },
->  	/* PMCNTENCLR_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b010),
+> +	  access_pmintenset, reset_unknown, PMINTENSET_EL1 },
+>  	/* PMINTENCLR_EL1 */
+>  	{ Op0(0b11), Op1(0b000), CRn(0b1001), CRm(0b1110), Op2(0b010),
 > -	  trap_raz_wi },
-> +	  access_pmcntenset, NULL, PMCNTENSET_EL0 },
->  	/* PMOVSCLR_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b011),
->  	  trap_raz_wi },
-> @@ -1161,8 +1194,8 @@ static const struct sys_reg_desc cp15_regs[] = {
+> +	  access_pmintenset, NULL, PMINTENSET_EL1 },
 >  
->  	/* PMU */
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), access_pmcr },
-> -	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), trap_raz_wi },
-> -	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), trap_raz_wi },
-> +	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), access_pmcntenset },
-> +	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), access_pmcntenset },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmselr },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 14bedb0..43c4117 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -36,6 +36,8 @@ struct kvm_pmu {
->  };
+>  	/* MAIR_EL1 */
+>  	{ Op0(0b11), Op1(0b000), CRn(0b1010), CRm(0b0010), Op2(0b000),
+> @@ -1204,8 +1225,8 @@ static const struct sys_reg_desc cp15_regs[] = {
+>  	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_evtyper },
+>  	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), access_pmu_evcntr },
+>  	{ Op1( 0), CRn( 9), CRm(14), Op2( 0), trap_raz_wi },
+> -	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), trap_raz_wi },
+> -	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), trap_raz_wi },
+> +	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), access_pmintenset },
+> +	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), access_pmintenset },
 >  
->  u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
-> +void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
-> +void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
->  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
->  				    u64 select_idx);
->  #else
-> @@ -46,6 +48,8 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
->  {
->  	return 0;
->  }
-> +void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val) {}
-> +void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val) {}
->  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
->  				    u64 select_idx) {}
->  #endif
-> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> index b107fb8..94bff0e 100644
-> --- a/virt/kvm/arm/pmu.c
-> +++ b/virt/kvm/arm/pmu.c
-> @@ -75,6 +75,61 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
->  }
->  
->  /**
-> + * kvm_pmu_enable_counter - enable selected PMU counter
-> + * @vcpu: The vcpu pointer
-> + * @val: the value guest writes to PMCNTENSET register
-> + *
-> + * Call perf_event_enable to start counting the perf event
-> + */
-> +void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val)
-> +{
-> +	int i;
-> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +	struct kvm_pmc *pmc;
-> +
-> +	if (!(vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMCR_E) || !val)
-> +		return;
-> +
-> +	for (i = 0; i < ARMV8_MAX_COUNTERS; i++) {
-> +		if (!((val >> i) & 0x1))
-> +			continue;
-
-nit: it is slightly more readable to have "if (!(val & (1 << i)))
-
-> +
-> +		pmc = &pmu->pmc[i];
-> +		if (pmc->perf_event) {
-> +			perf_event_enable(pmc->perf_event);
-> +			if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
-> +				kvm_debug("fail to enable perf event\n");
-> +		}
-> +	}
-> +}
-> +
-> +/**
-> + * kvm_pmu_disable_counter - disable selected PMU counter
-> + * @vcpu: The vcpu pointer
-> + * @val: the value guest writes to PMCNTENCLR register
-> + *
-> + * Call perf_event_disable to stop counting the perf event
-> + */
-> +void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val)
-> +{
-> +	int i;
-> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +	struct kvm_pmc *pmc;
-> +
-> +	if (!val)
-> +		return;
-> +
-> +	for (i = 0; i < ARMV8_MAX_COUNTERS; i++) {
-> +		if (!((val >> i) & 0x1))
-
-Same here.
-
-> +			continue;
-> +
-> +		pmc = &pmu->pmc[i];
-> +		if (pmc->perf_event)
-> +			perf_event_disable(pmc->perf_event);
-> +	}
-> +}
-> +
-> +/**
->   * kvm_pmu_set_counter_event_type - set selected counter to monitor some event
->   * @vcpu: The vcpu pointer
->   * @data: The data guest writes to PMXEVTYPER_EL0
+>  	{ Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, c10_PRRR },
+>  	{ Op1( 0), CRn(10), CRm( 2), Op2( 1), access_vm_reg, NULL, c10_NMRR },
 > 
 
 Thanks,
