@@ -1,23 +1,26 @@
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v7 13/19] KVM: ARM64: Add access handler for PMSWINC register
-Date: Tue, 15 Dec 2015 16:49:33 +0800
-Message-ID: <1450169379-12336-14-git-send-email-zhaoshenglong@huawei.com>
-References: <1450169379-12336-1-git-send-email-zhaoshenglong@huawei.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: ARM64/KVM: Bad page state in process iperf
+Date: Tue, 15 Dec 2015 10:29:15 +0100
+Message-ID: <20151215092915.GF4120@cbox>
+References: <DM2PR03MB557D3079ABFE7AF114A58A690EE0@DM2PR03MB557.namprd03.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 43FFF48912
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 03:56:07 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CDA66412D0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 04:27:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id jvTrK1mOyaqf for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Dec 2015 03:56:04 -0500 (EST)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A25BD411BE
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 03:56:03 -0500 (EST)
-In-Reply-To: <1450169379-12336-1-git-send-email-zhaoshenglong@huawei.com>
+ with ESMTP id vAT2b9CCq7Xv for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Dec 2015 04:27:00 -0500 (EST)
+Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DB747411F6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 04:26:59 -0500 (EST)
+Received: by mail-wm0-f41.google.com with SMTP id p66so100448291wmp.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 01:29:16 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <DM2PR03MB557D3079ABFE7AF114A58A690EE0@DM2PR03MB557.namprd03.prod.outlook.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,130 +30,65 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: kvm@vger.kernel.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org
+To: Bhushan Bharat <Bharat.Bhushan@freescale.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Shannon Zhao <shannon.zhao@linaro.org>
+On Tue, Dec 15, 2015 at 03:46:03AM +0000, Bhushan Bharat wrote:
+> 
+> Hi All,
+> 
+> I am running "iperf" in KVM guest on ARM64 machine and observing below crash.
 
-Add access handler which emulates writing and reading PMSWINC
-register and add support for creating software increment event.
+Which host/guest kernel version is this?
 
-Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
----
- arch/arm64/kvm/sys_regs.c | 14 +++++++++++++-
- include/kvm/arm_pmu.h     |  2 ++
- virt/kvm/arm/pmu.c        | 32 ++++++++++++++++++++++++++++++++
- 3 files changed, 47 insertions(+), 1 deletion(-)
+Which hardware?
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d1926c4..f09e500 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -690,6 +690,17 @@ static bool access_pmovsset(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	return true;
- }
- 
-+static bool access_pmswinc(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			   const struct sys_reg_desc *r)
-+{
-+	if (p->is_write) {
-+		kvm_pmu_software_increment(vcpu, p->regval);
-+		return true;
-+	} else {
-+		return read_zero(vcpu, p);
-+	}
-+}
-+
- /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
- #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
- 	/* DBGBVRn_EL1 */						\
-@@ -900,7 +911,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  access_pmovsset, NULL, PMOVSSET_EL0 },
- 	/* PMSWINC_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b100),
--	  trap_raz_wi },
-+	  access_pmswinc, reset_unknown, PMSWINC_EL0 },
- 	/* PMSELR_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b101),
- 	  access_pmselr, reset_unknown, PMSELR_EL0 },
-@@ -1239,6 +1250,7 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), access_pmcntenset },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), access_pmcntenset },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), access_pmovsset },
-+	{ Op1( 0), CRn( 9), CRm(12), Op2( 4), access_pmswinc },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmselr },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmceid },
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 93aea6a..f5888eb 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -39,6 +39,7 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
- void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val);
-+void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
- 				    u64 select_idx);
- #else
-@@ -52,6 +53,7 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx)
- void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val) {}
- void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val) {}
- void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val) {}
-+void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val) {}
- void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
- 				    u64 select_idx) {}
- #endif
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 861471d..01af727 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -150,6 +150,34 @@ void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val)
- }
- 
- /**
-+ * kvm_pmu_software_increment - do software increment
-+ * @vcpu: The vcpu pointer
-+ * @val: the value guest writes to PMSWINC register
-+ */
-+void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
-+{
-+	int i;
-+	u64 type, enable, reg;
-+
-+	if (val == 0)
-+		return;
-+
-+	for (i = 0; i < ARMV8_CYCLE_IDX; i++) {
-+		if (!((val >> i) & 0x1))
-+			continue;
-+		type = vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i)
-+		       & ARMV8_EVTYPE_EVENT;
-+		enable = vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
-+		if ((type == 0) && ((enable >> i) & 0x1)) {
-+			vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i)++;
-+			reg = vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i);
-+			if ((reg & 0xFFFFFFFF) == 0)
-+				kvm_pmu_overflow_set(vcpu, BIT(i));
-+		}
-+	}
-+}
-+
-+/**
-  * kvm_pmu_set_counter_event_type - set selected counter to monitor some event
-  * @vcpu: The vcpu pointer
-  * @data: The data guest writes to PMXEVTYPER_EL0
-@@ -171,6 +199,10 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
- 	kvm_pmu_stop_counter(vcpu, pmc);
- 	eventsel = data & ARMV8_EVTYPE_EVENT;
- 
-+	/* For software increment event it does't need to create perf event */
-+	if (eventsel == 0)
-+		return;
-+
- 	memset(&attr, 0, sizeof(struct perf_event_attr));
- 	attr.type = PERF_TYPE_RAW;
- 	attr.size = sizeof(attr);
--- 
-2.0.4
+-Christoffer
+
+> 
+> =============================
+> $iperf -c 3.3.3.3 -P 4 -t 0 -i 5 -w 90k
+> ------------------------------------------------------------
+> Client connecting to 3.3.3.3, TCP port 5001
+> TCP window size:  180 KByte (WARNING: requested 90.0 KByte)
+> ------------------------------------------------------------
+> [  3] local 3.3.3.1 port 51131 connected with 3.3.3.3 port 5001
+> [  6] local 3.3.3.1 port 51134 connected with 3.3.3.3 port 5001
+> [  5] local 3.3.3.1 port 51133 connected with 3.3.3.3 port 5001
+> [  4] local 3.3.3.1 port 51132 connected with 3.3.3.3 port 5001
+> [   53.088567] random: nonblocking pool is initialized
+> [ ID] Interval       Transfer     Bandwidth
+> [  3]  0.0- 5.0 sec   638 MBytes  1.07 Gbits/sec
+> [  4] 35.0-40.0 sec  1.66 GBytes  2.85 Gbits/sec
+> [  5] 40.0-45.0 sec  1.11 GBytes  1.90 Gbits/sec
+> [  4] 40.0-45.0 sec  1.16 GBytes  1.99 Gbits/sec
+> [   98.895207] BUG: Bad page state in process iperf  pfn:0a584
+> [   98.896164] page:ffff780000296100 count:-1 mapcount:0 mapping:          (null) index:0x0
+> [   98.897436] flags: 0x0()
+> [   98.897885] page dumped because: nonzero _count
+> [   98.898640] Modules linked in:
+> [   98.899178] CPU: 0 PID: 1639 Comm: iperf Not tainted 4.1.8-00461-ge5431ad #141
+> [   98.900302] Hardware name: linux,dummy-virt (DT)
+> [   98.901014] Call trace:
+> [   98.901406] [<ffff800000096cac>] dump_backtrace+0x0/0x12c
+> [   98.902522] [<ffff800000096de8>] show_stack+0x10/0x1c
+> [   98.903441] [<ffff800000678dc8>] dump_stack+0x8c/0xdc
+> [   98.904202] [<ffff800000145480>] bad_page+0xc4/0x114
+> [   98.904945] [<ffff8000001487a4>] get_page_from_freelist+0x590/0x63c
+> [   98.905871] [<ffff80000014893c>] __alloc_pages_nodemask+0xec/0x794
+> [   98.906791] [<ffff80000059fc80>] skb_page_frag_refill+0x70/0xa8
+> [   98.907678] [<ffff80000059fcd8>] sk_page_frag_refill+0x20/0xd0
+> [   98.908550] [<ffff8000005edc04>] tcp_sendmsg+0x1f8/0x9a8
+> [   98.909368] [<ffff80000061419c>] inet_sendmsg+0x5c/0xd0
+> [   98.910178] [<ffff80000059bb44>] sock_sendmsg+0x14/0x58
+> [   98.911027] [<ffff80000059bbec>] sock_write_iter+0x64/0xbc
+> [   98.912119] [<ffff80000019b5b8>] __vfs_write+0xac/0x10c
+> [   98.913126] [<ffff80000019bcb8>] vfs_write+0x90/0x1a0
+> [   98.913963] [<ffff80000019c53c>] SyS_write+0x40/0xa0
+> 
+> -----------
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
