@@ -1,25 +1,29 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: Shannon Zhao <shannon.zhao@linaro.org>
 Subject: Re: [PATCH v7 01/19] ARM64: Move PMU register related defines to
  asm/pmu.h
-Date: Tue, 15 Dec 2015 11:34:14 +0000
-Message-ID: <566FFAB6.8060604@arm.com>
+Date: Tue, 15 Dec 2015 19:44:56 +0800
+Message-ID: <566FFD38.7060803@linaro.org>
 References: <1450169379-12336-1-git-send-email-zhaoshenglong@huawei.com>
  <1450169379-12336-2-git-send-email-zhaoshenglong@huawei.com>
+ <566FFAB6.8060604@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B2AEF41252
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 06:32:02 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8925241252
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 06:42:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PARvMK8XuIWf for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Dec 2015 06:32:01 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 84561411F6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 06:32:01 -0500 (EST)
-In-Reply-To: <1450169379-12336-2-git-send-email-zhaoshenglong@huawei.com>
+ with ESMTP id eK9fgo8yzylg for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Dec 2015 06:42:49 -0500 (EST)
+Received: from mail-pa0-f49.google.com (mail-pa0-f49.google.com
+ [209.85.220.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A8595411F6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 06:42:49 -0500 (EST)
+Received: by mail-pa0-f49.google.com with SMTP id ur14so3686465pab.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Dec 2015 03:45:06 -0800 (PST)
+In-Reply-To: <566FFAB6.8060604@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,170 +33,47 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
-Cc: kvm@vger.kernel.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: kvm@vger.kernel.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 15/12/15 08:49, Shannon Zhao wrote:
-> From: Shannon Zhao <shannon.zhao@linaro.org>
-> 
-> To use the ARMv8 PMU related register defines from the KVM code,
-> we move the relevant definitions to asm/pmu.h header file.
-> 
-> Signed-off-by: Anup Patel <anup.patel@linaro.org>
-> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> ---
->  arch/arm64/include/asm/pmu.h   | 64 ++++++++++++++++++++++++++++++++++++++++++
->  arch/arm64/kernel/perf_event.c | 36 +-----------------------
->  2 files changed, 65 insertions(+), 35 deletions(-)
->  create mode 100644 arch/arm64/include/asm/pmu.h
-> 
-> diff --git a/arch/arm64/include/asm/pmu.h b/arch/arm64/include/asm/pmu.h
-> new file mode 100644
-> index 0000000..4264ea0
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/pmu.h
-> @@ -0,0 +1,64 @@
-> +/*
-> + * Copyright (C) 2015 Linaro Ltd, Shannon Zhao
 
-Erm, not quite. You're simply moving existing code from one file to
-another. That doesn't change the copyright of said code, which reads:
 
- * PMU support
- *
- * Copyright (C) 2012 ARM Limited
- * Author: Will Deacon <will.deacon@arm.com>
+On 2015/12/15 19:34, Marc Zyngier wrote:
+> On 15/12/15 08:49, Shannon Zhao wrote:
+>> From: Shannon Zhao <shannon.zhao@linaro.org>
+>>
+>> To use the ARMv8 PMU related register defines from the KVM code,
+>> we move the relevant definitions to asm/pmu.h header file.
+>>
+>> Signed-off-by: Anup Patel <anup.patel@linaro.org>
+>> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+>> ---
+>>   arch/arm64/include/asm/pmu.h   | 64 ++++++++++++++++++++++++++++++++++++++++++
+>>   arch/arm64/kernel/perf_event.c | 36 +-----------------------
+>>   2 files changed, 65 insertions(+), 35 deletions(-)
+>>   create mode 100644 arch/arm64/include/asm/pmu.h
+>>
+>> diff --git a/arch/arm64/include/asm/pmu.h b/arch/arm64/include/asm/pmu.h
+>> new file mode 100644
+>> index 0000000..4264ea0
+>> --- /dev/null
+>> +++ b/arch/arm64/include/asm/pmu.h
+>> @@ -0,0 +1,64 @@
+>> +/*
+>> + * Copyright (C) 2015 Linaro Ltd, Shannon Zhao
+>
+> Erm, not quite. You're simply moving existing code from one file to
+> another. That doesn't change the copyright of said code, which reads:
+>
+>   * PMU support
+>   *
+>   * Copyright (C) 2012 ARM Limited
+>   * Author: Will Deacon <will.deacon@arm.com>
+>
+> Please keep this mention in place.
+>
+Sure, will fix this. Thanks.
 
-Please keep this mention in place.
-
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +#ifndef __ASM_PMU_H
-> +#define __ASM_PMU_H
-> +
-> +#define ARMV8_MAX_COUNTERS      32
-> +#define ARMV8_COUNTER_MASK      (ARMV8_MAX_COUNTERS - 1)
-> +
-> +/*
-> + * Per-CPU PMCR: config reg
-> + */
-> +#define ARMV8_PMCR_E		(1 << 0) /* Enable all counters */
-> +#define ARMV8_PMCR_P		(1 << 1) /* Reset all counters */
-> +#define ARMV8_PMCR_C		(1 << 2) /* Cycle counter reset */
-> +#define ARMV8_PMCR_D		(1 << 3) /* CCNT counts every 64th cpu cycle */
-> +#define ARMV8_PMCR_X		(1 << 4) /* Export to ETM */
-> +#define ARMV8_PMCR_DP		(1 << 5) /* Disable CCNT if non-invasive debug*/
-> +#define	ARMV8_PMCR_N_SHIFT	11	 /* Number of counters supported */
-> +#define	ARMV8_PMCR_N_MASK	0x1f
-> +#define	ARMV8_PMCR_MASK		0x3f	 /* Mask for writable bits */
-> +
-> +/*
-> + * PMCNTEN: counters enable reg
-> + */
-> +#define	ARMV8_CNTEN_MASK	0xffffffff	/* Mask for writable bits */
-> +
-> +/*
-> + * PMINTEN: counters interrupt enable reg
-> + */
-> +#define	ARMV8_INTEN_MASK	0xffffffff	/* Mask for writable bits */
-> +
-> +/*
-> + * PMOVSR: counters overflow flag status reg
-> + */
-> +#define	ARMV8_OVSR_MASK		0xffffffff	/* Mask for writable bits */
-> +#define	ARMV8_OVERFLOWED_MASK	ARMV8_OVSR_MASK
-> +
-> +/*
-> + * PMXEVTYPER: Event selection reg
-> + */
-> +#define	ARMV8_EVTYPE_MASK	0xc80003ff	/* Mask for writable bits */
-> +#define	ARMV8_EVTYPE_EVENT	0x3ff		/* Mask for EVENT bits */
-> +
-> +/*
-> + * Event filters for PMUv3
-> + */
-> +#define	ARMV8_EXCLUDE_EL1	(1 << 31)
-> +#define	ARMV8_EXCLUDE_EL0	(1 << 30)
-> +#define	ARMV8_INCLUDE_EL2	(1 << 27)
-> +
-> +#endif /* __ASM_PMU_H */
-> diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-> index 5b1897e..7eca5dc 100644
-> --- a/arch/arm64/kernel/perf_event.c
-> +++ b/arch/arm64/kernel/perf_event.c
-> @@ -24,6 +24,7 @@
->  #include <linux/of.h>
->  #include <linux/perf/arm_pmu.h>
->  #include <linux/platform_device.h>
-> +#include <asm/pmu.h>
->  
->  /*
->   * ARMv8 PMUv3 Performance Events handling code.
-> @@ -187,9 +188,6 @@ static const unsigned armv8_a57_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
->  #define	ARMV8_IDX_COUNTER_LAST(cpu_pmu) \
->  	(ARMV8_IDX_CYCLE_COUNTER + cpu_pmu->num_events - 1)
->  
-> -#define	ARMV8_MAX_COUNTERS	32
-> -#define	ARMV8_COUNTER_MASK	(ARMV8_MAX_COUNTERS - 1)
-> -
->  /*
->   * ARMv8 low level PMU access
->   */
-> @@ -200,38 +198,6 @@ static const unsigned armv8_a57_perf_cache_map[PERF_COUNT_HW_CACHE_MAX]
->  #define	ARMV8_IDX_TO_COUNTER(x)	\
->  	(((x) - ARMV8_IDX_COUNTER0) & ARMV8_COUNTER_MASK)
->  
-> -/*
-> - * Per-CPU PMCR: config reg
-> - */
-> -#define ARMV8_PMCR_E		(1 << 0) /* Enable all counters */
-> -#define ARMV8_PMCR_P		(1 << 1) /* Reset all counters */
-> -#define ARMV8_PMCR_C		(1 << 2) /* Cycle counter reset */
-> -#define ARMV8_PMCR_D		(1 << 3) /* CCNT counts every 64th cpu cycle */
-> -#define ARMV8_PMCR_X		(1 << 4) /* Export to ETM */
-> -#define ARMV8_PMCR_DP		(1 << 5) /* Disable CCNT if non-invasive debug*/
-> -#define	ARMV8_PMCR_N_SHIFT	11	 /* Number of counters supported */
-> -#define	ARMV8_PMCR_N_MASK	0x1f
-> -#define	ARMV8_PMCR_MASK		0x3f	 /* Mask for writable bits */
-> -
-> -/*
-> - * PMOVSR: counters overflow flag status reg
-> - */
-> -#define	ARMV8_OVSR_MASK		0xffffffff	/* Mask for writable bits */
-> -#define	ARMV8_OVERFLOWED_MASK	ARMV8_OVSR_MASK
-> -
-> -/*
-> - * PMXEVTYPER: Event selection reg
-> - */
-> -#define	ARMV8_EVTYPE_MASK	0xc80003ff	/* Mask for writable bits */
-> -#define	ARMV8_EVTYPE_EVENT	0x3ff		/* Mask for EVENT bits */
-> -
-> -/*
-> - * Event filters for PMUv3
-> - */
-> -#define	ARMV8_EXCLUDE_EL1	(1 << 31)
-> -#define	ARMV8_EXCLUDE_EL0	(1 << 30)
-> -#define	ARMV8_INCLUDE_EL2	(1 << 27)
-> -
->  static inline u32 armv8pmu_pmcr_read(void)
->  {
->  	u32 val;
-> 
-
-Thanks,
-
-	M.
 -- 
-Jazz is not dead. It just smells funny...
+Shannon
