@@ -1,21 +1,23 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH] ARM: KVM: Cleanup exception injection
-Date: Mon, 14 Dec 2015 18:06:36 +0000
-Message-ID: <1450116396-11718-1-git-send-email-marc.zyngier@arm.com>
+From: Bhushan Bharat <Bharat.Bhushan@freescale.com>
+Subject: ARM64/KVM: Bad page state in process iperf
+Date: Tue, 15 Dec 2015 03:46:03 +0000
+Message-ID: <DM2PR03MB557D3079ABFE7AF114A58A690EE0@DM2PR03MB557.namprd03.prod.outlook.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4A4304130A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Dec 2015 13:04:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3603D41267
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Dec 2015 22:43:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Q6n2Or0mOcKX for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Dec 2015 13:04:44 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1990240F9B
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Dec 2015 13:04:43 -0500 (EST)
+ with ESMTP id nZm8cqzuYXgV for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Dec 2015 22:43:50 -0500 (EST)
+Received: from na01-by2-obe.outbound.protection.outlook.com
+ (mail-by2on0137.outbound.protection.outlook.com [207.46.100.137])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DDF2F41252
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Dec 2015 22:43:49 -0500 (EST)
+Content-Language: en-US
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -25,119 +27,52 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Cc: David Binderman <dcb314@hotmail.com>
+To: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-David Binderman reported that the exception injection code had a
-couple of unused variables lingering around.
 
-Upon examination, it looked like this code could do with an
-anticipated spring cleaning, which amounts to deduplicating
-the CPSR/SPSR update.
+Hi All,
 
-The spurious variables are removed in the process.
+I am running "iperf" in KVM guest on ARM64 machine and observing below crash.
 
-Reported-by: David Binderman <dcb314@hotmail.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm/kvm/emulate.c | 59 ++++++++++++++++++++------------------------------
- 1 file changed, 23 insertions(+), 36 deletions(-)
+=============================
+$iperf -c 3.3.3.3 -P 4 -t 0 -i 5 -w 90k
+------------------------------------------------------------
+Client connecting to 3.3.3.3, TCP port 5001
+TCP window size:  180 KByte (WARNING: requested 90.0 KByte)
+------------------------------------------------------------
+[  3] local 3.3.3.1 port 51131 connected with 3.3.3.3 port 5001
+[  6] local 3.3.3.1 port 51134 connected with 3.3.3.3 port 5001
+[  5] local 3.3.3.1 port 51133 connected with 3.3.3.3 port 5001
+[  4] local 3.3.3.1 port 51132 connected with 3.3.3.3 port 5001
+[   53.088567] random: nonblocking pool is initialized
+[ ID] Interval       Transfer     Bandwidth
+[  3]  0.0- 5.0 sec   638 MBytes  1.07 Gbits/sec
+[  4] 35.0-40.0 sec  1.66 GBytes  2.85 Gbits/sec
+[  5] 40.0-45.0 sec  1.11 GBytes  1.90 Gbits/sec
+[  4] 40.0-45.0 sec  1.16 GBytes  1.99 Gbits/sec
+[   98.895207] BUG: Bad page state in process iperf  pfn:0a584
+[   98.896164] page:ffff780000296100 count:-1 mapcount:0 mapping:          (null) index:0x0
+[   98.897436] flags: 0x0()
+[   98.897885] page dumped because: nonzero _count
+[   98.898640] Modules linked in:
+[   98.899178] CPU: 0 PID: 1639 Comm: iperf Not tainted 4.1.8-00461-ge5431ad #141
+[   98.900302] Hardware name: linux,dummy-virt (DT)
+[   98.901014] Call trace:
+[   98.901406] [<ffff800000096cac>] dump_backtrace+0x0/0x12c
+[   98.902522] [<ffff800000096de8>] show_stack+0x10/0x1c
+[   98.903441] [<ffff800000678dc8>] dump_stack+0x8c/0xdc
+[   98.904202] [<ffff800000145480>] bad_page+0xc4/0x114
+[   98.904945] [<ffff8000001487a4>] get_page_from_freelist+0x590/0x63c
+[   98.905871] [<ffff80000014893c>] __alloc_pages_nodemask+0xec/0x794
+[   98.906791] [<ffff80000059fc80>] skb_page_frag_refill+0x70/0xa8
+[   98.907678] [<ffff80000059fcd8>] sk_page_frag_refill+0x20/0xd0
+[   98.908550] [<ffff8000005edc04>] tcp_sendmsg+0x1f8/0x9a8
+[   98.909368] [<ffff80000061419c>] inet_sendmsg+0x5c/0xd0
+[   98.910178] [<ffff80000059bb44>] sock_sendmsg+0x14/0x58
+[   98.911027] [<ffff80000059bbec>] sock_write_iter+0x64/0xbc
+[   98.912119] [<ffff80000019b5b8>] __vfs_write+0xac/0x10c
+[   98.913126] [<ffff80000019bcb8>] vfs_write+0x90/0x1a0
+[   98.913963] [<ffff80000019c53c>] SyS_write+0x40/0xa0
 
-diff --git a/arch/arm/kvm/emulate.c b/arch/arm/kvm/emulate.c
-index d6c0052..245106e 100644
---- a/arch/arm/kvm/emulate.c
-+++ b/arch/arm/kvm/emulate.c
-@@ -275,6 +275,25 @@ static u32 exc_vector_base(struct kvm_vcpu *vcpu)
- 		return vbar;
- }
- 
-+/* Switch to an exception mode, updating both CPSR and SPSR */
-+static void kvm_update_psr(struct kvm_vcpu *vcpu, unsigned long mode)
-+{
-+	unsigned long cpsr = *vcpu_cpsr(vcpu);
-+	u32 sctlr = vcpu->arch.cp15[c1_SCTLR];
-+
-+	*vcpu_cpsr(vcpu) = (cpsr & ~MODE_MASK) | mode;
-+	*vcpu_cpsr(vcpu) |= PSR_I_BIT;
-+	*vcpu_cpsr(vcpu) &= ~(PSR_IT_MASK | PSR_J_BIT | PSR_E_BIT | PSR_T_BIT);
-+
-+	if (sctlr & SCTLR_TE)
-+		*vcpu_cpsr(vcpu) |= PSR_T_BIT;
-+	if (sctlr & SCTLR_EE)
-+		*vcpu_cpsr(vcpu) |= PSR_E_BIT;
-+
-+	/* Note: These now point to the mode banked copies */
-+	*vcpu_spsr(vcpu) = cpsr;
-+}
-+
- /**
-  * kvm_inject_undefined - inject an undefined exception into the guest
-  * @vcpu: The VCPU to receive the undefined exception
-@@ -286,29 +305,13 @@ static u32 exc_vector_base(struct kvm_vcpu *vcpu)
-  */
- void kvm_inject_undefined(struct kvm_vcpu *vcpu)
- {
--	unsigned long new_lr_value;
--	unsigned long new_spsr_value;
- 	unsigned long cpsr = *vcpu_cpsr(vcpu);
--	u32 sctlr = vcpu->arch.cp15[c1_SCTLR];
- 	bool is_thumb = (cpsr & PSR_T_BIT);
- 	u32 vect_offset = 4;
- 	u32 return_offset = (is_thumb) ? 2 : 4;
- 
--	new_spsr_value = cpsr;
--	new_lr_value = *vcpu_pc(vcpu) - return_offset;
--
--	*vcpu_cpsr(vcpu) = (cpsr & ~MODE_MASK) | UND_MODE;
--	*vcpu_cpsr(vcpu) |= PSR_I_BIT;
--	*vcpu_cpsr(vcpu) &= ~(PSR_IT_MASK | PSR_J_BIT | PSR_E_BIT | PSR_T_BIT);
--
--	if (sctlr & SCTLR_TE)
--		*vcpu_cpsr(vcpu) |= PSR_T_BIT;
--	if (sctlr & SCTLR_EE)
--		*vcpu_cpsr(vcpu) |= PSR_E_BIT;
--
--	/* Note: These now point to UND banked copies */
--	*vcpu_spsr(vcpu) = cpsr;
--	*vcpu_reg(vcpu, 14) = new_lr_value;
-+	kvm_update_psr(vcpu, UND_MODE);
-+	*vcpu_reg(vcpu, 14) = *vcpu_pc(vcpu) - return_offset;
- 
- 	/* Branch to exception vector */
- 	*vcpu_pc(vcpu) = exc_vector_base(vcpu) + vect_offset;
-@@ -320,30 +323,14 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
-  */
- static void inject_abt(struct kvm_vcpu *vcpu, bool is_pabt, unsigned long addr)
- {
--	unsigned long new_lr_value;
--	unsigned long new_spsr_value;
- 	unsigned long cpsr = *vcpu_cpsr(vcpu);
--	u32 sctlr = vcpu->arch.cp15[c1_SCTLR];
- 	bool is_thumb = (cpsr & PSR_T_BIT);
- 	u32 vect_offset;
- 	u32 return_offset = (is_thumb) ? 4 : 0;
- 	bool is_lpae;
- 
--	new_spsr_value = cpsr;
--	new_lr_value = *vcpu_pc(vcpu) + return_offset;
--
--	*vcpu_cpsr(vcpu) = (cpsr & ~MODE_MASK) | ABT_MODE;
--	*vcpu_cpsr(vcpu) |= PSR_I_BIT | PSR_A_BIT;
--	*vcpu_cpsr(vcpu) &= ~(PSR_IT_MASK | PSR_J_BIT | PSR_E_BIT | PSR_T_BIT);
--
--	if (sctlr & SCTLR_TE)
--		*vcpu_cpsr(vcpu) |= PSR_T_BIT;
--	if (sctlr & SCTLR_EE)
--		*vcpu_cpsr(vcpu) |= PSR_E_BIT;
--
--	/* Note: These now point to ABT banked copies */
--	*vcpu_spsr(vcpu) = cpsr;
--	*vcpu_reg(vcpu, 14) = new_lr_value;
-+	kvm_update_psr(vcpu, ABT_MODE);
-+	*vcpu_reg(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
- 
- 	if (is_pabt)
- 		vect_offset = 12;
--- 
-2.1.4
+-----------
