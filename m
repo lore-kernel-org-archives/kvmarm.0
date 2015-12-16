@@ -1,27 +1,30 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 2/3] kvm: arm: make kvm_arm.h friendly to assembly code
-Date: Wed, 16 Dec 2015 21:30:24 +0100
-Message-ID: <20151216203024.GD24889@cbox>
-References: <1447673298-25503-1-git-send-email-vladimir.murzin@arm.com>
- <1447673298-25503-3-git-send-email-vladimir.murzin@arm.com>
+Subject: Re: [PATCH v7 19/19] KVM: ARM64: Add a new kvm ARM PMU device
+Date: Wed, 16 Dec 2015 21:33:36 +0100
+Message-ID: <20151216203336.GE24889@cbox>
+References: <1450169379-12336-1-git-send-email-zhaoshenglong@huawei.com>
+ <1450169379-12336-20-git-send-email-zhaoshenglong@huawei.com>
+ <567032AD.8000206@arm.com> <567036DE.80605@linaro.org>
+ <567038E3.3010102@arm.com> <20151215204739.GK4120@cbox>
+ <56711348.6010406@huawei.com> <56711B99.1000608@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3315249723
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Dec 2015 15:28:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 748834852E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Dec 2015 15:31:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1WBbhDaoTn3z for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Dec 2015 15:28:00 -0500 (EST)
+ with ESMTP id dMTERYTWQoPw for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 16 Dec 2015 15:31:13 -0500 (EST)
 Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 641394972F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Dec 2015 15:28:00 -0500 (EST)
-Received: by mail-wm0-f45.google.com with SMTP id l126so57044768wml.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Dec 2015 12:30:22 -0800 (PST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5D83C41280
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Dec 2015 15:31:13 -0500 (EST)
+Received: by mail-wm0-f45.google.com with SMTP id l126so55362509wml.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Dec 2015 12:33:35 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1447673298-25503-3-git-send-email-vladimir.murzin@arm.com>
+In-Reply-To: <56711B99.1000608@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,16 +34,71 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Vladimir Murzin <vladimir.murzin@arm.com>
-Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, will.deacon@arm.com, Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Nov 16, 2015 at 11:28:17AM +0000, Vladimir Murzin wrote:
-> kvm_arm.h is included from both C code and assembly code; however some
-> definitions in this header supplied with U/UL/ULL suffixes which might
-> confuse assembly once they got evaluated.
-> We have _AC macro for such cases, so just wrap problem places with it.
+On Wed, Dec 16, 2015 at 04:06:49PM +0800, Shannon Zhao wrote:
+> Hi,
 > 
-> Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
+> On 2015/12/16 15:31, Shannon Zhao wrote:
+> >>>> >> > But in this case, you're returning an error if it is *not* initialized.
+> >>>> >> > I understand that in that case you cannot return an interrupt number (-1
+> >>>> >> > would be weird), but returning -EBUSY feels even more weird.
+> >>>> >> > 
+> >>>> >> > I'd settle for -ENOXIO, or something similar. Anyone having a better idea?
+> >>>> >> > 
+> >> > ENXIO or ENODEV would be my choice too, and add that to the
+> >> > Documentation clearly describing when this error code is used.
+> >> > 
+> >> > By the way, why do you loop over all VCPUS to set the same value when
+> >> > you can't do anything per VCPU anyway?  It seems to me it's either a
+> >> > per-VM property (that you can store on the VM data structure) or it's a
+> >> > true per-VCPU property?
+> > This is a per-VCPU property. PMU interrupt could be PPI or SPI. For PPI
+> > the interrupt numbers are same for each vcpu, while for SPI they are
+> > different, so it needs to set them separately. I planned to support both
+> > PPI and SPI. I think I should add support for SPI at this moment and let
+> > users (QEMU) to set these interrupts for each one.
+> 
+> How about below vPMU Documentation?
+> 
+> ARM Virtual Performance Monitor Unit (vPMU)
+> ===========================================
+> 
+> Device types supported:
+>   KVM_DEV_TYPE_ARM_PMU_V3         ARM Performance Monitor Unit v3
+> 
+> Instantiate one PMU instance for per VCPU through this API.
+> 
+> Groups:
+>   KVM_DEV_ARM_PMU_GRP_IRQ
+>   Attributes:
+>     The attr field of kvm_device_attr encodes two values:
+>     bits:     | 63 .... 32 | 31 .... 0 |
+>     values:   | vcpu_index |  irq_num  |
+>     The irq_num describes the PMU overflow interrupt number for the
+> specified
+>     vcpu_index vcpu. This interrupt could be a PPI or SPI, but for one
+> VM the
+>     interrupt type must be same for each vcpu.
 
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+some formatting snafus that I expect come from pasting the text in an
+e-mail client.
+
+> 
+>   Errors:
+>     -ENXIO: Getting or setting this attribute is not yet supported
+
+'not yet supported' as in something we'll implement later, or as in you
+need to call this other function before you can access this state?
+
+>     -ENODEV: Getting the PMU overflow interrupt number while it's not set
+>     -EBUSY: The PMU overflow interrupt is already set
+>     -EINVAL: Invalid vcpu_index or irq_num supplied
+> 
+> 
+Otherwise looks good.
+
+Thanks,
+-Christoffer
