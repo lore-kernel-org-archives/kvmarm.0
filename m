@@ -1,80 +1,164 @@
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: Re: [PATCH v7 19/19] KVM: ARM64: Add a new kvm ARM PMU device
-Date: Wed, 16 Dec 2015 17:29:59 +0800
-Message-ID: <56712F17.8000201@huawei.com>
-References: <1450169379-12336-1-git-send-email-zhaoshenglong@huawei.com> <1450169379-12336-20-git-send-email-zhaoshenglong@huawei.com> <567032AD.8000206@arm.com> <567036DE.80605@linaro.org> <567038E3.3010102@arm.com> <20151215204739.GK4120@cbox> <56711348.6010406@huawei.com> <56711B99.1000608@huawei.com> <56712928.8050409@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH] arm64: KVM: debug: Remove spurious inline attributes
+Date: Wed, 16 Dec 2015 15:49:23 +0000
+Message-ID: <1450280963-19985-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <56712928.8050409@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, alex.bennee@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+The debug trapping code is pretty heavy on the "inline" attribute,
+but most functions are actually referenced in the sysreg tables,
+making the inlining imposible.
 
+Removing the useless inline qualifier seems the right thing to do,
+having verified that the output code is similar.
 
-On 2015/12/16 17:04, Marc Zyngier wrote:
-> On 16/12/15 08:06, Shannon Zhao wrote:
->> > Hi,
->> > 
->> > On 2015/12/16 15:31, Shannon Zhao wrote:
->>>>>>>>> >>>>>>>> But in this case, you're returning an error if it is *not* initialized.
->>>>>>>>> >>>>>>>> I understand that in that case you cannot return an interrupt number (-1
->>>>>>>>> >>>>>>>> would be weird), but returning -EBUSY feels even more weird.
->>>>>>>>> >>>>>>>>
->>>>>>>>> >>>>>>>> I'd settle for -ENOXIO, or something similar. Anyone having a better idea?
->>>>>>>>> >>>>>>>>
->>>>> >>>> ENXIO or ENODEV would be my choice too, and add that to the
->>>>> >>>> Documentation clearly describing when this error code is used.
->>>>> >>>>
->>>>> >>>> By the way, why do you loop over all VCPUS to set the same value when
->>>>> >>>> you can't do anything per VCPU anyway?  It seems to me it's either a
->>>>> >>>> per-VM property (that you can store on the VM data structure) or it's a
->>>>> >>>> true per-VCPU property?
->>> >> This is a per-VCPU property. PMU interrupt could be PPI or SPI. For PPI
->>> >> the interrupt numbers are same for each vcpu, while for SPI they are
->>> >> different, so it needs to set them separately. I planned to support both
->>> >> PPI and SPI. I think I should add support for SPI at this moment and let
->>> >> users (QEMU) to set these interrupts for each one.
->> > 
->> > How about below vPMU Documentation?
->> > 
->> > ARM Virtual Performance Monitor Unit (vPMU)
->> > ===========================================
->> > 
->> > Device types supported:
->> >   KVM_DEV_TYPE_ARM_PMU_V3         ARM Performance Monitor Unit v3
->> > 
->> > Instantiate one PMU instance for per VCPU through this API.
->> > 
->> > Groups:
->> >   KVM_DEV_ARM_PMU_GRP_IRQ
->> >   Attributes:
->> >     The attr field of kvm_device_attr encodes two values:
->> >     bits:     | 63 .... 32 | 31 .... 0 |
->> >     values:   | vcpu_index |  irq_num  |
->> >     The irq_num describes the PMU overflow interrupt number for the
->> > specified
->> >     vcpu_index vcpu. This interrupt could be a PPI or SPI, but for one
->> > VM the
->> >     interrupt type must be same for each vcpu.
->> > 
->> >   Errors:
->> >     -ENXIO: Getting or setting this attribute is not yet supported
->> >     -ENODEV: Getting the PMU overflow interrupt number while it's not set
->> >     -EBUSY: The PMU overflow interrupt is already set
->> >     -EINVAL: Invalid vcpu_index or irq_num supplied
->> > 
->> > 
-> Let's add at least one comment that forbids two vcpus from getting the
-> same SPI. This is too common a mistake that we see in actual SoCs, and I
-> don't want to see it replicated in VMs...
+Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/kvm/sys_regs.c | 58 +++++++++++++++++++++++----------------=
+--------
+ 1 file changed, 29 insertions(+), 29 deletions(-)
 
-Ok, will add.
-
-Thanks,
--- 
-Shannon
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 88adebf..eec3598 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -220,9 +220,9 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu,
+  * All writes will set the KVM_ARM64_DEBUG_DIRTY flag to ensure the
+  * hyp.S code switches between host and guest values in future.
+  */
+-static inline void reg_to_dbg(struct kvm_vcpu *vcpu,
+-			      struct sys_reg_params *p,
+-			      u64 *dbg_reg)
++static void reg_to_dbg(struct kvm_vcpu *vcpu,
++		       struct sys_reg_params *p,
++		       u64 *dbg_reg)
+ {
+ 	u64 val =3D p->regval;
+=20
+@@ -235,18 +235,18 @@ static inline void reg_to_dbg(struct kvm_vcpu *vc=
+pu,
+ 	vcpu->arch.debug_flags |=3D KVM_ARM64_DEBUG_DIRTY;
+ }
+=20
+-static inline void dbg_to_reg(struct kvm_vcpu *vcpu,
+-			      struct sys_reg_params *p,
+-			      u64 *dbg_reg)
++static void dbg_to_reg(struct kvm_vcpu *vcpu,
++		       struct sys_reg_params *p,
++		       u64 *dbg_reg)
+ {
+ 	p->regval =3D *dbg_reg;
+ 	if (p->is_32bit)
+ 		p->regval &=3D 0xffffffffUL;
+ }
+=20
+-static inline bool trap_bvr(struct kvm_vcpu *vcpu,
+-			    struct sys_reg_params *p,
+-			    const struct sys_reg_desc *rd)
++static bool trap_bvr(struct kvm_vcpu *vcpu,
++		     struct sys_reg_params *p,
++		     const struct sys_reg_desc *rd)
+ {
+ 	u64 *dbg_reg =3D &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
+=20
+@@ -280,15 +280,15 @@ static int get_bvr(struct kvm_vcpu *vcpu, const s=
+truct sys_reg_desc *rd,
+ 	return 0;
+ }
+=20
+-static inline void reset_bvr(struct kvm_vcpu *vcpu,
+-			     const struct sys_reg_desc *rd)
++static void reset_bvr(struct kvm_vcpu *vcpu,
++		      const struct sys_reg_desc *rd)
+ {
+ 	vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg] =3D rd->val;
+ }
+=20
+-static inline bool trap_bcr(struct kvm_vcpu *vcpu,
+-			    struct sys_reg_params *p,
+-			    const struct sys_reg_desc *rd)
++static bool trap_bcr(struct kvm_vcpu *vcpu,
++		     struct sys_reg_params *p,
++		     const struct sys_reg_desc *rd)
+ {
+ 	u64 *dbg_reg =3D &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg];
+=20
+@@ -323,15 +323,15 @@ static int get_bcr(struct kvm_vcpu *vcpu, const s=
+truct sys_reg_desc *rd,
+ 	return 0;
+ }
+=20
+-static inline void reset_bcr(struct kvm_vcpu *vcpu,
+-			     const struct sys_reg_desc *rd)
++static void reset_bcr(struct kvm_vcpu *vcpu,
++		      const struct sys_reg_desc *rd)
+ {
+ 	vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg] =3D rd->val;
+ }
+=20
+-static inline bool trap_wvr(struct kvm_vcpu *vcpu,
+-			    struct sys_reg_params *p,
+-			    const struct sys_reg_desc *rd)
++static bool trap_wvr(struct kvm_vcpu *vcpu,
++		     struct sys_reg_params *p,
++		     const struct sys_reg_desc *rd)
+ {
+ 	u64 *dbg_reg =3D &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg];
+=20
+@@ -366,15 +366,15 @@ static int get_wvr(struct kvm_vcpu *vcpu, const s=
+truct sys_reg_desc *rd,
+ 	return 0;
+ }
+=20
+-static inline void reset_wvr(struct kvm_vcpu *vcpu,
+-			     const struct sys_reg_desc *rd)
++static void reset_wvr(struct kvm_vcpu *vcpu,
++		      const struct sys_reg_desc *rd)
+ {
+ 	vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg] =3D rd->val;
+ }
+=20
+-static inline bool trap_wcr(struct kvm_vcpu *vcpu,
+-			    struct sys_reg_params *p,
+-			    const struct sys_reg_desc *rd)
++static bool trap_wcr(struct kvm_vcpu *vcpu,
++		     struct sys_reg_params *p,
++		     const struct sys_reg_desc *rd)
+ {
+ 	u64 *dbg_reg =3D &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg];
+=20
+@@ -408,8 +408,8 @@ static int get_wcr(struct kvm_vcpu *vcpu, const str=
+uct sys_reg_desc *rd,
+ 	return 0;
+ }
+=20
+-static inline void reset_wcr(struct kvm_vcpu *vcpu,
+-			     const struct sys_reg_desc *rd)
++static void reset_wcr(struct kvm_vcpu *vcpu,
++		      const struct sys_reg_desc *rd)
+ {
+ 	vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg] =3D rd->val;
+ }
+@@ -723,9 +723,9 @@ static bool trap_debug32(struct kvm_vcpu *vcpu,
+  * system is in.
+  */
+=20
+-static inline bool trap_xvr(struct kvm_vcpu *vcpu,
+-			    struct sys_reg_params *p,
+-			    const struct sys_reg_desc *rd)
++static bool trap_xvr(struct kvm_vcpu *vcpu,
++		     struct sys_reg_params *p,
++		     const struct sys_reg_desc *rd)
+ {
+ 	u64 *dbg_reg =3D &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
+=20
+--=20
+2.1.4
 
