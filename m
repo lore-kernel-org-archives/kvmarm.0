@@ -1,96 +1,159 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v7 19/19] KVM: ARM64: Add a new kvm ARM PMU device
-Date: Thu, 17 Dec 2015 10:38:09 +0000
-Message-ID: <56729091.8000107@arm.com>
-References: <1450169379-12336-1-git-send-email-zhaoshenglong@huawei.com>	<1450169379-12336-20-git-send-email-zhaoshenglong@huawei.com>	<567032AD.8000206@arm.com>	<567036DE.80605@linaro.org>	<567038E3.3010102@arm.com>	<20151215204739.GK4120@cbox>	<56711348.6010406@huawei.com>	<56711B99.1000608@huawei.com>	<20151216203336.GE24889@cbox>	<567262CA.6050905@huawei.com> <20151217083314.2ed36f9f@why.wild-wind.fr.eu.org> <5672753A.8050006@huawei.com> <567282B1.7070105@arm.com> <56728A08.6040304@huawei.com>
+Subject: [PATCH v2] ARM: KVM: Cleanup exception injection
+Date: Thu, 17 Dec 2015 10:49:43 +0000
+Message-ID: <1450349383-19975-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <56728A08.6040304@huawei.com>
-Sender: kvm-owner@vger.kernel.org
-To: Shannon Zhao <zhaoshenglong@huawei.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, alex.bennee@linaro.org, wei@redhat.com, cov@codeaurora.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 02DA5412A2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Dec 2015 05:47:31 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id erp6EtCt1+mG for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Dec 2015 05:47:29 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9956841280
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Dec 2015 05:47:29 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: David Binderman <dcb314@hotmail.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17/12/15 10:10, Shannon Zhao wrote:
-> 
-> 
-> On 2015/12/17 17:38, Marc Zyngier wrote:
->> On 17/12/15 08:41, Shannon Zhao wrote:
->>>>
->>>>
->>>> On 2015/12/17 16:33, Marc Zyngier wrote:
->>>>>> On Thu, 17 Dec 2015 15:22:50 +0800
->>>>>> Shannon Zhao <zhaoshenglong@huawei.com> wrote:
->>>>>>
->>>>>>>>>>
->>>>>>>>>>
->>>>>>>>>> On 2015/12/17 4:33, Christoffer Dall wrote:
->>>>>>>>>>>>>> On Wed, Dec 16, 2015 at 04:06:49PM +0800, Shannon Zhao wrote:
->>>>>>>>>>>>>>>>>> Hi,
->>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>> On 2015/12/16 15:31, Shannon Zhao wrote:
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> But in this case, you're returning an error if it is *not* initialized.
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> I understand that in that case you cannot return an interrupt number (-1
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> would be weird), but returning -EBUSY feels even more weird.
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> I'd settle for -ENOXIO, or something similar. Anyone having a better idea?
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ENXIO or ENODEV would be my choice too, and add that to the
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Documentation clearly describing when this error code is used.
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>> By the way, why do you loop over all VCPUS to set the same value when
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>> you can't do anything per VCPU anyway?  It seems to me it's either a
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>> per-VM property (that you can store on the VM data structure) or it's a
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>> true per-VCPU property?
->>>>>>>>>>>>>>>>>>>>>> This is a per-VCPU property. PMU interrupt could be PPI or SPI. For PPI
->>>>>>>>>>>>>>>>>>>>>> the interrupt numbers are same for each vcpu, while for SPI they are
->>>>>>>>>>>>>>>>>>>>>> different, so it needs to set them separately. I planned to support both
->>>>>>>>>>>>>>>>>>>>>> PPI and SPI. I think I should add support for SPI at this moment and let
->>>>>>>>>>>>>>>>>>>>>> users (QEMU) to set these interrupts for each one.
->>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>> How about below vPMU Documentation?
->>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>> ARM Virtual Performance Monitor Unit (vPMU)
->>>>>>>>>>>>>>>>>> ===========================================
->>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>> Device types supported:
->>>>>>>>>>>>>>>>>>   KVM_DEV_TYPE_ARM_PMU_V3         ARM Performance Monitor Unit v3
->>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>> Instantiate one PMU instance for per VCPU through this API.
->>>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>>> Groups:
->>>>>>>>>>>>>>>>>>   KVM_DEV_ARM_PMU_GRP_IRQ
->>>>>>>>>>>>>>>>>>   Attributes:
->>>>>>>>>>>>>>>>>>     The attr field of kvm_device_attr encodes two values:
->>>>>>>>>>>>>>>>>>     bits:     | 63 .... 32 | 31 .... 0 |
->>>>>>>>>>>>>>>>>>     values:   | vcpu_index |  irq_num  |
->>>>>>>>>> BTW, I change this Attribute to below format and pass vcpu_index through
->>>>>>>>>> this Attribute while pass irq_num through kvm_device_attr.addr.
->>>>>>>>>> Is it fine?
->>>>>>>>>>
->>>>>>>>>>     bits:     | 63 .... 32 | 31 ....  0 |
->>>>>>>>>>     values:   |  reserved  | vcpu_index |
->>>>>> Using the .addr field for something that is clearly not an address is
->>>>>> rather odd. Is there any prior usage of that field for something that
->>>>>> is not an address?
->>>>
->>>> I see this usage in vgic_attr_regs_access(). But if you prefer previous
->>>> one, I'll use that.
->> Ah, you're using the .addr field to point to a userspace value, not to
->> carry the value itself! That'd be fine by me (even if I still prefer the
->> original one), but I'd like others to chime in (I'm quite bad at
->> defining userspace stuff...).
-> 
-> Another reason I think is that it needs to pass the irq_num to user
-> space when calling get_attr. It could be passed via kvm_device_attr.addr
-> while can't be passed via kvm_device_attr.attr within current framework.
+David Binderman reported that the exception injection code had a
+couple of unused variables lingering around.
 
-That's a very good reason. Go for it.
+Upon examination, it looked like this code could do with an
+anticipated spring cleaning, which amounts to deduplicating
+the CPSR/SPSR update, and making it look a bit more like
+the architecture spec.
 
-Thanks,
+The spurious variables are removed in the process.
 
-	M.
+Reported-by: David Binderman <dcb314@hotmail.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/kvm/emulate.c | 74 ++++++++++++++++++++++++++------------------------
+ 1 file changed, 38 insertions(+), 36 deletions(-)
+
+diff --git a/arch/arm/kvm/emulate.c b/arch/arm/kvm/emulate.c
+index d6c0052..dc99159 100644
+--- a/arch/arm/kvm/emulate.c
++++ b/arch/arm/kvm/emulate.c
+@@ -275,6 +275,40 @@ static u32 exc_vector_base(struct kvm_vcpu *vcpu)
+ 		return vbar;
+ }
+ 
++/*
++ * Switch to an exception mode, updating both CPSR and SPSR. Follow
++ * the logic described in AArch32.EnterMode() from the ARMv8 ARM.
++ */
++static void kvm_update_psr(struct kvm_vcpu *vcpu, unsigned long mode)
++{
++	unsigned long cpsr = *vcpu_cpsr(vcpu);
++	u32 sctlr = vcpu->arch.cp15[c1_SCTLR];
++
++	*vcpu_cpsr(vcpu) = (cpsr & ~MODE_MASK) | mode;
++
++	switch (mode) {
++	case FIQ_MODE:
++		*vcpu_cpsr(vcpu) |= PSR_F_BIT;
++		/* Fall through */
++	case ABT_MODE:
++	case IRQ_MODE:
++		*vcpu_cpsr(vcpu) |= PSR_A_BIT;
++		/* Fall through */
++	default:
++		*vcpu_cpsr(vcpu) |= PSR_I_BIT;
++	}
++
++	*vcpu_cpsr(vcpu) &= ~(PSR_IT_MASK | PSR_J_BIT | PSR_E_BIT | PSR_T_BIT);
++
++	if (sctlr & SCTLR_TE)
++		*vcpu_cpsr(vcpu) |= PSR_T_BIT;
++	if (sctlr & SCTLR_EE)
++		*vcpu_cpsr(vcpu) |= PSR_E_BIT;
++
++	/* Note: These now point to the mode banked copies */
++	*vcpu_spsr(vcpu) = cpsr;
++}
++
+ /**
+  * kvm_inject_undefined - inject an undefined exception into the guest
+  * @vcpu: The VCPU to receive the undefined exception
+@@ -286,29 +320,13 @@ static u32 exc_vector_base(struct kvm_vcpu *vcpu)
+  */
+ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+ {
+-	unsigned long new_lr_value;
+-	unsigned long new_spsr_value;
+ 	unsigned long cpsr = *vcpu_cpsr(vcpu);
+-	u32 sctlr = vcpu->arch.cp15[c1_SCTLR];
+ 	bool is_thumb = (cpsr & PSR_T_BIT);
+ 	u32 vect_offset = 4;
+ 	u32 return_offset = (is_thumb) ? 2 : 4;
+ 
+-	new_spsr_value = cpsr;
+-	new_lr_value = *vcpu_pc(vcpu) - return_offset;
+-
+-	*vcpu_cpsr(vcpu) = (cpsr & ~MODE_MASK) | UND_MODE;
+-	*vcpu_cpsr(vcpu) |= PSR_I_BIT;
+-	*vcpu_cpsr(vcpu) &= ~(PSR_IT_MASK | PSR_J_BIT | PSR_E_BIT | PSR_T_BIT);
+-
+-	if (sctlr & SCTLR_TE)
+-		*vcpu_cpsr(vcpu) |= PSR_T_BIT;
+-	if (sctlr & SCTLR_EE)
+-		*vcpu_cpsr(vcpu) |= PSR_E_BIT;
+-
+-	/* Note: These now point to UND banked copies */
+-	*vcpu_spsr(vcpu) = cpsr;
+-	*vcpu_reg(vcpu, 14) = new_lr_value;
++	kvm_update_psr(vcpu, UND_MODE);
++	*vcpu_reg(vcpu, 14) = *vcpu_pc(vcpu) - return_offset;
+ 
+ 	/* Branch to exception vector */
+ 	*vcpu_pc(vcpu) = exc_vector_base(vcpu) + vect_offset;
+@@ -320,30 +338,14 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
+  */
+ static void inject_abt(struct kvm_vcpu *vcpu, bool is_pabt, unsigned long addr)
+ {
+-	unsigned long new_lr_value;
+-	unsigned long new_spsr_value;
+ 	unsigned long cpsr = *vcpu_cpsr(vcpu);
+-	u32 sctlr = vcpu->arch.cp15[c1_SCTLR];
+ 	bool is_thumb = (cpsr & PSR_T_BIT);
+ 	u32 vect_offset;
+ 	u32 return_offset = (is_thumb) ? 4 : 0;
+ 	bool is_lpae;
+ 
+-	new_spsr_value = cpsr;
+-	new_lr_value = *vcpu_pc(vcpu) + return_offset;
+-
+-	*vcpu_cpsr(vcpu) = (cpsr & ~MODE_MASK) | ABT_MODE;
+-	*vcpu_cpsr(vcpu) |= PSR_I_BIT | PSR_A_BIT;
+-	*vcpu_cpsr(vcpu) &= ~(PSR_IT_MASK | PSR_J_BIT | PSR_E_BIT | PSR_T_BIT);
+-
+-	if (sctlr & SCTLR_TE)
+-		*vcpu_cpsr(vcpu) |= PSR_T_BIT;
+-	if (sctlr & SCTLR_EE)
+-		*vcpu_cpsr(vcpu) |= PSR_E_BIT;
+-
+-	/* Note: These now point to ABT banked copies */
+-	*vcpu_spsr(vcpu) = cpsr;
+-	*vcpu_reg(vcpu, 14) = new_lr_value;
++	kvm_update_psr(vcpu, ABT_MODE);
++	*vcpu_reg(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
+ 
+ 	if (is_pabt)
+ 		vect_offset = 12;
 -- 
-Jazz is not dead. It just smells funny...
+2.1.4
