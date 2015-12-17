@@ -1,181 +1,82 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: [PATCH] arm64: KVM: debug: Remove spurious inline attributes
-Date: Thu, 17 Dec 2015 16:28:10 +0000
-Message-ID: <87r3ilf3ad.fsf@linaro.org>
+Date: Thu, 17 Dec 2015 16:51:39 +0000
+Message-ID: <5672E81B.7010400@arm.com>
 References: <1450280963-19985-1-git-send-email-marc.zyngier@arm.com>
+ <87r3ilf3ad.fsf@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <1450280963-19985-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 19D0B49444
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Dec 2015 11:49:19 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id IrYVoCKGYa2h for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 17 Dec 2015 11:49:18 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DF461412F3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Dec 2015 11:49:17 -0500 (EST)
+In-Reply-To: <87r3ilf3ad.fsf@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-Marc Zyngier <marc.zyngier@arm.com> writes:
-
-> The debug trapping code is pretty heavy on the "inline" attribute,
-> but most functions are actually referenced in the sysreg tables,
-> making the inlining imposible.
->
-> Removing the useless inline qualifier seems the right thing to do,
-> having verified that the output code is similar.
->
-> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 58 +++++++++++++++++++++++--------------=
-----------
->  1 file changed, 29 insertions(+), 29 deletions(-)
->
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 88adebf..eec3598 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -220,9 +220,9 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu=
-,
->   * All writes will set the KVM_ARM64_DEBUG_DIRTY flag to ensure the
->   * hyp.S code switches between host and guest values in future.
->   */
-> -static inline void reg_to_dbg(struct kvm_vcpu *vcpu,
-> -			      struct sys_reg_params *p,
-> -			      u64 *dbg_reg)
-> +static void reg_to_dbg(struct kvm_vcpu *vcpu,
-> +		       struct sys_reg_params *p,
-> +		       u64 *dbg_reg)
->  {
->  	u64 val =3D p->regval;
->
-> @@ -235,18 +235,18 @@ static inline void reg_to_dbg(struct kvm_vcpu *=
-vcpu,
->  	vcpu->arch.debug_flags |=3D KVM_ARM64_DEBUG_DIRTY;
->  }
->
-> -static inline void dbg_to_reg(struct kvm_vcpu *vcpu,
-> -			      struct sys_reg_params *p,
-> -			      u64 *dbg_reg)
-> +static void dbg_to_reg(struct kvm_vcpu *vcpu,
-> +		       struct sys_reg_params *p,
-> +		       u64 *dbg_reg)
->  {
->  	p->regval =3D *dbg_reg;
->  	if (p->is_32bit)
->  		p->regval &=3D 0xffffffffUL;
->  }
-
-Christoffer's "register keyword" comments not-withstanding I'd prefer t=
-o
-keep the reg_to_dbg/dbg_to_reg functions as inline because they really
-are just boilerplate helpers I didn't want to repeat in the actual
-access functions - although if you've looked at the code I assume that
-means GCC has been smart about it.
-
->
-> -static inline bool trap_bvr(struct kvm_vcpu *vcpu,
-> -			    struct sys_reg_params *p,
-> -			    const struct sys_reg_desc *rd)
-> +static bool trap_bvr(struct kvm_vcpu *vcpu,
-> +		     struct sys_reg_params *p,
-> +		     const struct sys_reg_desc *rd)
->  {
->  	u64 *dbg_reg =3D &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
->
-> @@ -280,15 +280,15 @@ static int get_bvr(struct kvm_vcpu *vcpu, const=
- struct sys_reg_desc *rd,
->  	return 0;
->  }
->
-> -static inline void reset_bvr(struct kvm_vcpu *vcpu,
-> -			     const struct sys_reg_desc *rd)
-> +static void reset_bvr(struct kvm_vcpu *vcpu,
-> +		      const struct sys_reg_desc *rd)
->  {
->  	vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg] =3D rd->val;
->  }
->
-> -static inline bool trap_bcr(struct kvm_vcpu *vcpu,
-> -			    struct sys_reg_params *p,
-> -			    const struct sys_reg_desc *rd)
-> +static bool trap_bcr(struct kvm_vcpu *vcpu,
-> +		     struct sys_reg_params *p,
-> +		     const struct sys_reg_desc *rd)
->  {
->  	u64 *dbg_reg =3D &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg];
->
-> @@ -323,15 +323,15 @@ static int get_bcr(struct kvm_vcpu *vcpu, const=
- struct sys_reg_desc *rd,
->  	return 0;
->  }
->
-> -static inline void reset_bcr(struct kvm_vcpu *vcpu,
-> -			     const struct sys_reg_desc *rd)
-> +static void reset_bcr(struct kvm_vcpu *vcpu,
-> +		      const struct sys_reg_desc *rd)
->  {
->  	vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg] =3D rd->val;
->  }
->
-> -static inline bool trap_wvr(struct kvm_vcpu *vcpu,
-> -			    struct sys_reg_params *p,
-> -			    const struct sys_reg_desc *rd)
-> +static bool trap_wvr(struct kvm_vcpu *vcpu,
-> +		     struct sys_reg_params *p,
-> +		     const struct sys_reg_desc *rd)
->  {
->  	u64 *dbg_reg =3D &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg];
->
-> @@ -366,15 +366,15 @@ static int get_wvr(struct kvm_vcpu *vcpu, const=
- struct sys_reg_desc *rd,
->  	return 0;
->  }
->
-> -static inline void reset_wvr(struct kvm_vcpu *vcpu,
-> -			     const struct sys_reg_desc *rd)
-> +static void reset_wvr(struct kvm_vcpu *vcpu,
-> +		      const struct sys_reg_desc *rd)
->  {
->  	vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg] =3D rd->val;
->  }
->
-> -static inline bool trap_wcr(struct kvm_vcpu *vcpu,
-> -			    struct sys_reg_params *p,
-> -			    const struct sys_reg_desc *rd)
-> +static bool trap_wcr(struct kvm_vcpu *vcpu,
-> +		     struct sys_reg_params *p,
-> +		     const struct sys_reg_desc *rd)
->  {
->  	u64 *dbg_reg =3D &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg];
->
-> @@ -408,8 +408,8 @@ static int get_wcr(struct kvm_vcpu *vcpu, const s=
-truct sys_reg_desc *rd,
->  	return 0;
->  }
->
-> -static inline void reset_wcr(struct kvm_vcpu *vcpu,
-> -			     const struct sys_reg_desc *rd)
-> +static void reset_wcr(struct kvm_vcpu *vcpu,
-> +		      const struct sys_reg_desc *rd)
->  {
->  	vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg] =3D rd->val;
->  }
-> @@ -723,9 +723,9 @@ static bool trap_debug32(struct kvm_vcpu *vcpu,
->   * system is in.
->   */
->
-> -static inline bool trap_xvr(struct kvm_vcpu *vcpu,
-> -			    struct sys_reg_params *p,
-> -			    const struct sys_reg_desc *rd)
-> +static bool trap_xvr(struct kvm_vcpu *vcpu,
-> +		     struct sys_reg_params *p,
-> +		     const struct sys_reg_desc *rd)
->  {
->  	u64 *dbg_reg =3D &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
-
-The rest all make sense. I wonder why I was being so inline happy?
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---
-Alex Benn=C3=A9e
+T24gMTcvMTIvMTUgMTY6MjgsIEFsZXggQmVubsOpZSB3cm90ZToKPiAKPiBNYXJjIFp5bmdpZXIg
+PG1hcmMuenluZ2llckBhcm0uY29tPiB3cml0ZXM6Cj4gCj4+IFRoZSBkZWJ1ZyB0cmFwcGluZyBj
+b2RlIGlzIHByZXR0eSBoZWF2eSBvbiB0aGUgImlubGluZSIgYXR0cmlidXRlLAo+PiBidXQgbW9z
+dCBmdW5jdGlvbnMgYXJlIGFjdHVhbGx5IHJlZmVyZW5jZWQgaW4gdGhlIHN5c3JlZyB0YWJsZXMs
+Cj4+IG1ha2luZyB0aGUgaW5saW5pbmcgaW1wb3NpYmxlLgo+Pgo+PiBSZW1vdmluZyB0aGUgdXNl
+bGVzcyBpbmxpbmUgcXVhbGlmaWVyIHNlZW1zIHRoZSByaWdodCB0aGluZyB0byBkbywKPj4gaGF2
+aW5nIHZlcmlmaWVkIHRoYXQgdGhlIG91dHB1dCBjb2RlIGlzIHNpbWlsYXIuCj4+Cj4+IENjOiBB
+bGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+Cj4+IFNpZ25lZC1vZmYtYnk6IE1h
+cmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+Cj4+IC0tLQo+PiAgYXJjaC9hcm02NC9r
+dm0vc3lzX3JlZ3MuYyB8IDU4ICsrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tCj4+ICAxIGZpbGUgY2hhbmdlZCwgMjkgaW5zZXJ0aW9ucygrKSwgMjkgZGVsZXRp
+b25zKC0pCj4+Cj4+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jIGIvYXJj
+aC9hcm02NC9rdm0vc3lzX3JlZ3MuYwo+PiBpbmRleCA4OGFkZWJmLi5lZWMzNTk4IDEwMDY0NAo+
+PiAtLS0gYS9hcmNoL2FybTY0L2t2bS9zeXNfcmVncy5jCj4+ICsrKyBiL2FyY2gvYXJtNjQva3Zt
+L3N5c19yZWdzLmMKPj4gQEAgLTIyMCw5ICsyMjAsOSBAQCBzdGF0aWMgYm9vbCB0cmFwX2RlYnVn
+X3JlZ3Moc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAo+PiAgICogQWxsIHdyaXRlcyB3aWxsIHNldCB0
+aGUgS1ZNX0FSTTY0X0RFQlVHX0RJUlRZIGZsYWcgdG8gZW5zdXJlIHRoZQo+PiAgICogaHlwLlMg
+Y29kZSBzd2l0Y2hlcyBiZXR3ZWVuIGhvc3QgYW5kIGd1ZXN0IHZhbHVlcyBpbiBmdXR1cmUuCj4+
+ICAgKi8KPj4gLXN0YXRpYyBpbmxpbmUgdm9pZCByZWdfdG9fZGJnKHN0cnVjdCBrdm1fdmNwdSAq
+dmNwdSwKPj4gLQkJCSAgICAgIHN0cnVjdCBzeXNfcmVnX3BhcmFtcyAqcCwKPj4gLQkJCSAgICAg
+IHU2NCAqZGJnX3JlZykKPj4gK3N0YXRpYyB2b2lkIHJlZ190b19kYmcoc3RydWN0IGt2bV92Y3B1
+ICp2Y3B1LAo+PiArCQkgICAgICAgc3RydWN0IHN5c19yZWdfcGFyYW1zICpwLAo+PiArCQkgICAg
+ICAgdTY0ICpkYmdfcmVnKQo+PiAgewo+PiAgCXU2NCB2YWwgPSBwLT5yZWd2YWw7Cj4+Cj4+IEBA
+IC0yMzUsMTggKzIzNSwxOCBAQCBzdGF0aWMgaW5saW5lIHZvaWQgcmVnX3RvX2RiZyhzdHJ1Y3Qg
+a3ZtX3ZjcHUgKnZjcHUsCj4+ICAJdmNwdS0+YXJjaC5kZWJ1Z19mbGFncyB8PSBLVk1fQVJNNjRf
+REVCVUdfRElSVFk7Cj4+ICB9Cj4+Cj4+IC1zdGF0aWMgaW5saW5lIHZvaWQgZGJnX3RvX3JlZyhz
+dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4+IC0JCQkgICAgICBzdHJ1Y3Qgc3lzX3JlZ19wYXJhbXMg
+KnAsCj4+IC0JCQkgICAgICB1NjQgKmRiZ19yZWcpCj4+ICtzdGF0aWMgdm9pZCBkYmdfdG9fcmVn
+KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPj4gKwkJICAgICAgIHN0cnVjdCBzeXNfcmVnX3BhcmFt
+cyAqcCwKPj4gKwkJICAgICAgIHU2NCAqZGJnX3JlZykKPj4gIHsKPj4gIAlwLT5yZWd2YWwgPSAq
+ZGJnX3JlZzsKPj4gIAlpZiAocC0+aXNfMzJiaXQpCj4+ICAJCXAtPnJlZ3ZhbCAmPSAweGZmZmZm
+ZmZmVUw7Cj4+ICB9Cj4gCj4gQ2hyaXN0b2ZmZXIncyAicmVnaXN0ZXIga2V5d29yZCIgY29tbWVu
+dHMgbm90LXdpdGhzdGFuZGluZyBJJ2QgcHJlZmVyIHRvCj4ga2VlcCB0aGUgcmVnX3RvX2RiZy9k
+YmdfdG9fcmVnIGZ1bmN0aW9ucyBhcyBpbmxpbmUgYmVjYXVzZSB0aGV5IHJlYWxseQo+IGFyZSBq
+dXN0IGJvaWxlcnBsYXRlIGhlbHBlcnMgSSBkaWRuJ3Qgd2FudCB0byByZXBlYXQgaW4gdGhlIGFj
+dHVhbAo+IGFjY2VzcyBmdW5jdGlvbnMgLSBhbHRob3VnaCBpZiB5b3UndmUgbG9va2VkIGF0IHRo
+ZSBjb2RlIEkgYXNzdW1lIHRoYXQKPiBtZWFucyBHQ0MgaGFzIGJlZW4gc21hcnQgYWJvdXQgaXQu
+CgpJbmRlZWQsIEdDQyBpcyBzbWFydCBlbm91Z2ggdG8gZGlyZWN0bHkgaW5saW5lIGl0LiBJbiBn
+ZW5lcmFsLCBHQ0MgaXMKZG9pbmcgYSBwcmV0dHkgZ29vZCBqb2IgYXQgaW5saW5pbmcgc3RhdGlj
+IGZ1bmN0aW9ucyB0aGF0IGFyZSBzbWFsbAplbm91Z2ggbm90IHRvIGJlIHdvcnRoIGp1bXBpbmcg
+dG8uIFRoZXNlIGRheXMsICJzdGF0aWMgaW5saW5lIiBvbmx5CnJlYWxseSBtYWtlcyBzZW5zZSBp
+biBhbiBpbmNsdWRlIGZpbGUuCgo+IFRoZSByZXN0IGFsbCBtYWtlIHNlbnNlLiBJIHdvbmRlciB3
+aHkgSSB3YXMgYmVpbmcgc28gaW5saW5lIGhhcHB5Pwo+IAo+IFJldmlld2VkLWJ5OiBBbGV4IEJl
+bm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+CgpUaGFua3MsCgoJTS4KLS0gCkphenogaXMg
+bm90IGRlYWQuIEl0IGp1c3Qgc21lbGxzIGZ1bm55Li4uCl9fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3Rz
+LmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xp
+c3RpbmZvL2t2bWFybQo=
