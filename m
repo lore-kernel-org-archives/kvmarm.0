@@ -1,103 +1,181 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v7 07/19] KVM: ARM64: PMU: Add perf event map and introduce
- perf event creating function
-Date: Thu, 17 Dec 2015 15:30:46 +0000
-Message-ID: <5672D526.9070608@arm.com>
-References: <1450169379-12336-1-git-send-email-zhaoshenglong@huawei.com> <1450169379-12336-8-git-send-email-zhaoshenglong@huawei.com> <20151217152054.GB11796@leverpostej>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH] arm64: KVM: debug: Remove spurious inline attributes
+Date: Thu, 17 Dec 2015 16:28:10 +0000
+Message-ID: <87r3ilf3ad.fsf@linaro.org>
+References: <1450280963-19985-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20151217152054.GB11796@leverpostej>
+In-reply-to: <1450280963-19985-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Mark Rutland <mark.rutland@arm.com>, Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, kvm@vger.kernel.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 17/12/15 15:22, Mark Rutland wrote:
-> On Tue, Dec 15, 2015 at 04:49:27PM +0800, Shannon Zhao wrote:
->> From: Shannon Zhao <shannon.zhao@linaro.org>
->>
->> When we use tools like perf on host, perf passes the event type and the
->> id of this event type category to kernel, then kernel will map them to
->> hardware event number and write this number to PMU PMEVTYPER<n>_EL0
->> register. When getting the event number in KVM, directly use raw event
->> type to create a perf_event for it.
->>
->> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
->> ---
->>  arch/arm64/include/asm/pmu.h |   3 ++
->>  arch/arm64/kvm/Makefile      |   1 +
->>  include/kvm/arm_pmu.h        |  11 ++++
->>  virt/kvm/arm/pmu.c           | 122 +++++++++++++++++++++++++++++++++++++++++++
->>  4 files changed, 137 insertions(+)
->>  create mode 100644 virt/kvm/arm/pmu.c
-> 
-> [...]
-> 
->> +/**
->> + * kvm_pmu_set_counter_event_type - set selected counter to monitor some event
->> + * @vcpu: The vcpu pointer
->> + * @data: The data guest writes to PMXEVTYPER_EL0
->> + * @select_idx: The number of selected counter
->> + *
->> + * When OS accesses PMXEVTYPER_EL0, that means it wants to set a PMC to count an
->> + * event with given hardware event number. Here we call perf_event API to
->> + * emulate this action and create a kernel perf event for it.
->> + */
->> +void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
->> +				    u64 select_idx)
->> +{
->> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
->> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
->> +	struct perf_event *event;
->> +	struct perf_event_attr attr;
->> +	u64 eventsel, counter;
->> +
->> +	kvm_pmu_stop_counter(vcpu, pmc);
->> +	eventsel = data & ARMV8_EVTYPE_EVENT;
->> +
->> +	memset(&attr, 0, sizeof(struct perf_event_attr));
->> +	attr.type = PERF_TYPE_RAW;
->> +	attr.size = sizeof(attr);
->> +	attr.pinned = 1;
->> +	attr.disabled = kvm_pmu_counter_is_enabled(vcpu, select_idx);
->> +	attr.exclude_user = data & ARMV8_EXCLUDE_EL0 ? 1 : 0;
->> +	attr.exclude_kernel = data & ARMV8_EXCLUDE_EL1 ? 1 : 0;
->> +	attr.exclude_hv = 1; /* Don't count EL2 events */
->> +	attr.exclude_host = 1; /* Don't count host events */
->> +	attr.config = eventsel;
->> +
->> +	counter = kvm_pmu_get_counter_value(vcpu, select_idx);
->> +	/* The initial sample period (overflow count) of an event. */
->> +	attr.sample_period = (-counter) & pmc->bitmask;
->> +
->> +	event = perf_event_create_kernel_counter(&attr, -1, current, NULL, pmc);
-> 
-> As far as I can see, this is going to result in unreliable counts on a
-> big.LITTLE system, even if the VCPUs are constrained to one class of
-> core.
-> 
-> As this is a task-bound event (cpu == -1, task is current), the perf
-> core will stop as soon as one PMU driver agrees to handle the event. The
-> event will then only count on CPUs handled by that driver.
-> 
-> If you're unlucky, the set of CPUs handled by that driver is not the
-> same as the set of CPUs your VM is constrained to. e.g. your VM might be
-> on little cores, but the big PMU driver accepted the event, and only
-> counts on big cores.
-> 
-> I'm not sure how we can solve that.
 
-Yeah, another level of BL braindeadness. We should have some API to
-match the PMU we want on the CPU we're on at the moment that trap occurs.
+Marc Zyngier <marc.zyngier@arm.com> writes:
 
-I don't think this should block this series though - this is something
-we can improve on in parallel (a possible solution being to forbid KVM
-on BL platform altogether).
+> The debug trapping code is pretty heavy on the "inline" attribute,
+> but most functions are actually referenced in the sysreg tables,
+> making the inlining imposible.
+>
+> Removing the useless inline qualifier seems the right thing to do,
+> having verified that the output code is similar.
+>
+> Cc: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 58 +++++++++++++++++++++++--------------=
+----------
+>  1 file changed, 29 insertions(+), 29 deletions(-)
+>
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 88adebf..eec3598 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -220,9 +220,9 @@ static bool trap_debug_regs(struct kvm_vcpu *vcpu=
+,
+>   * All writes will set the KVM_ARM64_DEBUG_DIRTY flag to ensure the
+>   * hyp.S code switches between host and guest values in future.
+>   */
+> -static inline void reg_to_dbg(struct kvm_vcpu *vcpu,
+> -			      struct sys_reg_params *p,
+> -			      u64 *dbg_reg)
+> +static void reg_to_dbg(struct kvm_vcpu *vcpu,
+> +		       struct sys_reg_params *p,
+> +		       u64 *dbg_reg)
+>  {
+>  	u64 val =3D p->regval;
+>
+> @@ -235,18 +235,18 @@ static inline void reg_to_dbg(struct kvm_vcpu *=
+vcpu,
+>  	vcpu->arch.debug_flags |=3D KVM_ARM64_DEBUG_DIRTY;
+>  }
+>
+> -static inline void dbg_to_reg(struct kvm_vcpu *vcpu,
+> -			      struct sys_reg_params *p,
+> -			      u64 *dbg_reg)
+> +static void dbg_to_reg(struct kvm_vcpu *vcpu,
+> +		       struct sys_reg_params *p,
+> +		       u64 *dbg_reg)
+>  {
+>  	p->regval =3D *dbg_reg;
+>  	if (p->is_32bit)
+>  		p->regval &=3D 0xffffffffUL;
+>  }
 
-Thanks,
+Christoffer's "register keyword" comments not-withstanding I'd prefer t=
+o
+keep the reg_to_dbg/dbg_to_reg functions as inline because they really
+are just boilerplate helpers I didn't want to repeat in the actual
+access functions - although if you've looked at the code I assume that
+means GCC has been smart about it.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+>
+> -static inline bool trap_bvr(struct kvm_vcpu *vcpu,
+> -			    struct sys_reg_params *p,
+> -			    const struct sys_reg_desc *rd)
+> +static bool trap_bvr(struct kvm_vcpu *vcpu,
+> +		     struct sys_reg_params *p,
+> +		     const struct sys_reg_desc *rd)
+>  {
+>  	u64 *dbg_reg =3D &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
+>
+> @@ -280,15 +280,15 @@ static int get_bvr(struct kvm_vcpu *vcpu, const=
+ struct sys_reg_desc *rd,
+>  	return 0;
+>  }
+>
+> -static inline void reset_bvr(struct kvm_vcpu *vcpu,
+> -			     const struct sys_reg_desc *rd)
+> +static void reset_bvr(struct kvm_vcpu *vcpu,
+> +		      const struct sys_reg_desc *rd)
+>  {
+>  	vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg] =3D rd->val;
+>  }
+>
+> -static inline bool trap_bcr(struct kvm_vcpu *vcpu,
+> -			    struct sys_reg_params *p,
+> -			    const struct sys_reg_desc *rd)
+> +static bool trap_bcr(struct kvm_vcpu *vcpu,
+> +		     struct sys_reg_params *p,
+> +		     const struct sys_reg_desc *rd)
+>  {
+>  	u64 *dbg_reg =3D &vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg];
+>
+> @@ -323,15 +323,15 @@ static int get_bcr(struct kvm_vcpu *vcpu, const=
+ struct sys_reg_desc *rd,
+>  	return 0;
+>  }
+>
+> -static inline void reset_bcr(struct kvm_vcpu *vcpu,
+> -			     const struct sys_reg_desc *rd)
+> +static void reset_bcr(struct kvm_vcpu *vcpu,
+> +		      const struct sys_reg_desc *rd)
+>  {
+>  	vcpu->arch.vcpu_debug_state.dbg_bcr[rd->reg] =3D rd->val;
+>  }
+>
+> -static inline bool trap_wvr(struct kvm_vcpu *vcpu,
+> -			    struct sys_reg_params *p,
+> -			    const struct sys_reg_desc *rd)
+> +static bool trap_wvr(struct kvm_vcpu *vcpu,
+> +		     struct sys_reg_params *p,
+> +		     const struct sys_reg_desc *rd)
+>  {
+>  	u64 *dbg_reg =3D &vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg];
+>
+> @@ -366,15 +366,15 @@ static int get_wvr(struct kvm_vcpu *vcpu, const=
+ struct sys_reg_desc *rd,
+>  	return 0;
+>  }
+>
+> -static inline void reset_wvr(struct kvm_vcpu *vcpu,
+> -			     const struct sys_reg_desc *rd)
+> +static void reset_wvr(struct kvm_vcpu *vcpu,
+> +		      const struct sys_reg_desc *rd)
+>  {
+>  	vcpu->arch.vcpu_debug_state.dbg_wvr[rd->reg] =3D rd->val;
+>  }
+>
+> -static inline bool trap_wcr(struct kvm_vcpu *vcpu,
+> -			    struct sys_reg_params *p,
+> -			    const struct sys_reg_desc *rd)
+> +static bool trap_wcr(struct kvm_vcpu *vcpu,
+> +		     struct sys_reg_params *p,
+> +		     const struct sys_reg_desc *rd)
+>  {
+>  	u64 *dbg_reg =3D &vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg];
+>
+> @@ -408,8 +408,8 @@ static int get_wcr(struct kvm_vcpu *vcpu, const s=
+truct sys_reg_desc *rd,
+>  	return 0;
+>  }
+>
+> -static inline void reset_wcr(struct kvm_vcpu *vcpu,
+> -			     const struct sys_reg_desc *rd)
+> +static void reset_wcr(struct kvm_vcpu *vcpu,
+> +		      const struct sys_reg_desc *rd)
+>  {
+>  	vcpu->arch.vcpu_debug_state.dbg_wcr[rd->reg] =3D rd->val;
+>  }
+> @@ -723,9 +723,9 @@ static bool trap_debug32(struct kvm_vcpu *vcpu,
+>   * system is in.
+>   */
+>
+> -static inline bool trap_xvr(struct kvm_vcpu *vcpu,
+> -			    struct sys_reg_params *p,
+> -			    const struct sys_reg_desc *rd)
+> +static bool trap_xvr(struct kvm_vcpu *vcpu,
+> +		     struct sys_reg_params *p,
+> +		     const struct sys_reg_desc *rd)
+>  {
+>  	u64 *dbg_reg =3D &vcpu->arch.vcpu_debug_state.dbg_bvr[rd->reg];
+
+The rest all make sense. I wonder why I was being so inline happy?
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--
+Alex Benn=C3=A9e
