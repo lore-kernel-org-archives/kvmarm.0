@@ -1,159 +1,111 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2] ARM: KVM: Cleanup exception injection
-Date: Thu, 17 Dec 2015 10:49:43 +0000
-Message-ID: <1450349383-19975-1-git-send-email-marc.zyngier@arm.com>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v7 07/19] KVM: ARM64: PMU: Add perf event map and
+ introduce perf event creating function
+Date: Thu, 17 Dec 2015 15:22:27 +0000
+Message-ID: <20151217152054.GB11796@leverpostej>
+References: <1450169379-12336-1-git-send-email-zhaoshenglong@huawei.com>
+ <1450169379-12336-8-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 02DA5412A2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Dec 2015 05:47:31 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id erp6EtCt1+mG for <kvmarm@lists.cs.columbia.edu>;
- Thu, 17 Dec 2015 05:47:29 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9956841280
- for <kvmarm@lists.cs.columbia.edu>; Thu, 17 Dec 2015 05:47:29 -0500 (EST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: David Binderman <dcb314@hotmail.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1450169379-12336-8-git-send-email-zhaoshenglong@huawei.com>
+Sender: kvm-owner@vger.kernel.org
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org, kvm@vger.kernel.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-David Binderman reported that the exception injection code had a
-couple of unused variables lingering around.
+On Tue, Dec 15, 2015 at 04:49:27PM +0800, Shannon Zhao wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
+> 
+> When we use tools like perf on host, perf passes the event type and the
+> id of this event type category to kernel, then kernel will map them to
+> hardware event number and write this number to PMU PMEVTYPER<n>_EL0
+> register. When getting the event number in KVM, directly use raw event
+> type to create a perf_event for it.
+> 
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> ---
+>  arch/arm64/include/asm/pmu.h |   3 ++
+>  arch/arm64/kvm/Makefile      |   1 +
+>  include/kvm/arm_pmu.h        |  11 ++++
+>  virt/kvm/arm/pmu.c           | 122 +++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 137 insertions(+)
+>  create mode 100644 virt/kvm/arm/pmu.c
 
-Upon examination, it looked like this code could do with an
-anticipated spring cleaning, which amounts to deduplicating
-the CPSR/SPSR update, and making it look a bit more like
-the architecture spec.
+[...]
 
-The spurious variables are removed in the process.
+> +/**
+> + * kvm_pmu_set_counter_event_type - set selected counter to monitor some event
+> + * @vcpu: The vcpu pointer
+> + * @data: The data guest writes to PMXEVTYPER_EL0
+> + * @select_idx: The number of selected counter
+> + *
+> + * When OS accesses PMXEVTYPER_EL0, that means it wants to set a PMC to count an
+> + * event with given hardware event number. Here we call perf_event API to
+> + * emulate this action and create a kernel perf event for it.
+> + */
+> +void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+> +				    u64 select_idx)
+> +{
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +	struct kvm_pmc *pmc = &pmu->pmc[select_idx];
+> +	struct perf_event *event;
+> +	struct perf_event_attr attr;
+> +	u64 eventsel, counter;
+> +
+> +	kvm_pmu_stop_counter(vcpu, pmc);
+> +	eventsel = data & ARMV8_EVTYPE_EVENT;
+> +
+> +	memset(&attr, 0, sizeof(struct perf_event_attr));
+> +	attr.type = PERF_TYPE_RAW;
+> +	attr.size = sizeof(attr);
+> +	attr.pinned = 1;
+> +	attr.disabled = kvm_pmu_counter_is_enabled(vcpu, select_idx);
+> +	attr.exclude_user = data & ARMV8_EXCLUDE_EL0 ? 1 : 0;
+> +	attr.exclude_kernel = data & ARMV8_EXCLUDE_EL1 ? 1 : 0;
+> +	attr.exclude_hv = 1; /* Don't count EL2 events */
+> +	attr.exclude_host = 1; /* Don't count host events */
+> +	attr.config = eventsel;
+> +
+> +	counter = kvm_pmu_get_counter_value(vcpu, select_idx);
+> +	/* The initial sample period (overflow count) of an event. */
+> +	attr.sample_period = (-counter) & pmc->bitmask;
+> +
+> +	event = perf_event_create_kernel_counter(&attr, -1, current, NULL, pmc);
 
-Reported-by: David Binderman <dcb314@hotmail.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm/kvm/emulate.c | 74 ++++++++++++++++++++++++++------------------------
- 1 file changed, 38 insertions(+), 36 deletions(-)
+As far as I can see, this is going to result in unreliable counts on a
+big.LITTLE system, even if the VCPUs are constrained to one class of
+core.
 
-diff --git a/arch/arm/kvm/emulate.c b/arch/arm/kvm/emulate.c
-index d6c0052..dc99159 100644
---- a/arch/arm/kvm/emulate.c
-+++ b/arch/arm/kvm/emulate.c
-@@ -275,6 +275,40 @@ static u32 exc_vector_base(struct kvm_vcpu *vcpu)
- 		return vbar;
- }
- 
-+/*
-+ * Switch to an exception mode, updating both CPSR and SPSR. Follow
-+ * the logic described in AArch32.EnterMode() from the ARMv8 ARM.
-+ */
-+static void kvm_update_psr(struct kvm_vcpu *vcpu, unsigned long mode)
-+{
-+	unsigned long cpsr = *vcpu_cpsr(vcpu);
-+	u32 sctlr = vcpu->arch.cp15[c1_SCTLR];
-+
-+	*vcpu_cpsr(vcpu) = (cpsr & ~MODE_MASK) | mode;
-+
-+	switch (mode) {
-+	case FIQ_MODE:
-+		*vcpu_cpsr(vcpu) |= PSR_F_BIT;
-+		/* Fall through */
-+	case ABT_MODE:
-+	case IRQ_MODE:
-+		*vcpu_cpsr(vcpu) |= PSR_A_BIT;
-+		/* Fall through */
-+	default:
-+		*vcpu_cpsr(vcpu) |= PSR_I_BIT;
-+	}
-+
-+	*vcpu_cpsr(vcpu) &= ~(PSR_IT_MASK | PSR_J_BIT | PSR_E_BIT | PSR_T_BIT);
-+
-+	if (sctlr & SCTLR_TE)
-+		*vcpu_cpsr(vcpu) |= PSR_T_BIT;
-+	if (sctlr & SCTLR_EE)
-+		*vcpu_cpsr(vcpu) |= PSR_E_BIT;
-+
-+	/* Note: These now point to the mode banked copies */
-+	*vcpu_spsr(vcpu) = cpsr;
-+}
-+
- /**
-  * kvm_inject_undefined - inject an undefined exception into the guest
-  * @vcpu: The VCPU to receive the undefined exception
-@@ -286,29 +320,13 @@ static u32 exc_vector_base(struct kvm_vcpu *vcpu)
-  */
- void kvm_inject_undefined(struct kvm_vcpu *vcpu)
- {
--	unsigned long new_lr_value;
--	unsigned long new_spsr_value;
- 	unsigned long cpsr = *vcpu_cpsr(vcpu);
--	u32 sctlr = vcpu->arch.cp15[c1_SCTLR];
- 	bool is_thumb = (cpsr & PSR_T_BIT);
- 	u32 vect_offset = 4;
- 	u32 return_offset = (is_thumb) ? 2 : 4;
- 
--	new_spsr_value = cpsr;
--	new_lr_value = *vcpu_pc(vcpu) - return_offset;
--
--	*vcpu_cpsr(vcpu) = (cpsr & ~MODE_MASK) | UND_MODE;
--	*vcpu_cpsr(vcpu) |= PSR_I_BIT;
--	*vcpu_cpsr(vcpu) &= ~(PSR_IT_MASK | PSR_J_BIT | PSR_E_BIT | PSR_T_BIT);
--
--	if (sctlr & SCTLR_TE)
--		*vcpu_cpsr(vcpu) |= PSR_T_BIT;
--	if (sctlr & SCTLR_EE)
--		*vcpu_cpsr(vcpu) |= PSR_E_BIT;
--
--	/* Note: These now point to UND banked copies */
--	*vcpu_spsr(vcpu) = cpsr;
--	*vcpu_reg(vcpu, 14) = new_lr_value;
-+	kvm_update_psr(vcpu, UND_MODE);
-+	*vcpu_reg(vcpu, 14) = *vcpu_pc(vcpu) - return_offset;
- 
- 	/* Branch to exception vector */
- 	*vcpu_pc(vcpu) = exc_vector_base(vcpu) + vect_offset;
-@@ -320,30 +338,14 @@ void kvm_inject_undefined(struct kvm_vcpu *vcpu)
-  */
- static void inject_abt(struct kvm_vcpu *vcpu, bool is_pabt, unsigned long addr)
- {
--	unsigned long new_lr_value;
--	unsigned long new_spsr_value;
- 	unsigned long cpsr = *vcpu_cpsr(vcpu);
--	u32 sctlr = vcpu->arch.cp15[c1_SCTLR];
- 	bool is_thumb = (cpsr & PSR_T_BIT);
- 	u32 vect_offset;
- 	u32 return_offset = (is_thumb) ? 4 : 0;
- 	bool is_lpae;
- 
--	new_spsr_value = cpsr;
--	new_lr_value = *vcpu_pc(vcpu) + return_offset;
--
--	*vcpu_cpsr(vcpu) = (cpsr & ~MODE_MASK) | ABT_MODE;
--	*vcpu_cpsr(vcpu) |= PSR_I_BIT | PSR_A_BIT;
--	*vcpu_cpsr(vcpu) &= ~(PSR_IT_MASK | PSR_J_BIT | PSR_E_BIT | PSR_T_BIT);
--
--	if (sctlr & SCTLR_TE)
--		*vcpu_cpsr(vcpu) |= PSR_T_BIT;
--	if (sctlr & SCTLR_EE)
--		*vcpu_cpsr(vcpu) |= PSR_E_BIT;
--
--	/* Note: These now point to ABT banked copies */
--	*vcpu_spsr(vcpu) = cpsr;
--	*vcpu_reg(vcpu, 14) = new_lr_value;
-+	kvm_update_psr(vcpu, ABT_MODE);
-+	*vcpu_reg(vcpu, 14) = *vcpu_pc(vcpu) + return_offset;
- 
- 	if (is_pabt)
- 		vect_offset = 12;
--- 
-2.1.4
+As this is a task-bound event (cpu == -1, task is current), the perf
+core will stop as soon as one PMU driver agrees to handle the event. The
+event will then only count on CPUs handled by that driver.
+
+If you're unlucky, the set of CPUs handled by that driver is not the
+same as the set of CPUs your VM is constrained to. e.g. your VM might be
+on little cores, but the big PMU driver accepted the event, and only
+counts on big cores.
+
+I'm not sure how we can solve that.
+
+Thanks,
+Mark.
+
+> +	if (IS_ERR(event)) {
+> +		printk_once("kvm: pmu event creation failed %ld\n",
+> +			    PTR_ERR(event));
+> +		return;
+> +	}
+> +
+> +	pmc->perf_event = event;
+> +}
+> -- 
+> 2.0.4
+> 
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> 
