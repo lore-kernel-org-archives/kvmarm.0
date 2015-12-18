@@ -1,36 +1,46 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PULL] KVM/ARM fixes for v4.4-rc6
-Date: Fri, 18 Dec 2015 14:01:51 +0000
-Message-ID: <567411CF.9030808@arm.com>
-References: <1450443609-2233-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Subject: [PULL take #2] KVM/ARM fixes for v4.4-rc6
+Date: Fri, 18 Dec 2015 14:05:51 +0000
+Message-ID: <1450447552-3161-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1450443609-2233-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, Gleb Natapov <gleb@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Hi Paolo,
 
-Idiot alert, sending the wrong patch...
+We have a one line fix for the VGIC this time around, fixing a patch
+that went in -rc2. Oh well. Hopefully this is the last one for v4.4.
+And yes, the right patch is following the pull-request this time...
 
-On 18/12/15 13:00, Marc Zyngier wrote:
-> Hi Paolo,
-> 
-> We have a one line fix for the VGIC this time around, fixing a patch
-> that went in -rc2. Oh well. Hopefully this is the last one for v4.4.
-> 
-> Please pull!
-
-Or don't, actually.
-
-Sorry about the noise, the real one is coming in a minute, once I've
-collected a couple of brain cells...
+Please pull!
 
 Thanks,
 
 	M.
--- 
-Jazz is not dead. It just smells funny...
+
+The following changes since commit 0de58f852875a0f0dcfb120bb8433e4e73c7803b:
+
+  ARM/arm64: KVM: correct PTE uncachedness check (2015-12-04 16:30:17 +0000)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-v4.4-rc6
+
+for you to fetch changes up to fdec12c12ed4333afb49c9948c29fbd5fb52da97:
+
+  KVM: arm/arm64: vgic: Fix kvm_vgic_map_is_active's dist check (2015-12-11 16:33:31 +0000)
+
+----------------------------------------------------------------
+KVM/ARM fixes for v4.4-rc6
+
+- Fix for the active interrupt detection code, affecting
+  the timer interrupt injection.
+
+----------------------------------------------------------------
+Christoffer Dall (1):
+      KVM: arm/arm64: vgic: Fix kvm_vgic_map_is_active's dist check
+
+ virt/kvm/arm/vgic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
