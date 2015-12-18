@@ -1,45 +1,80 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PULL] KVM/ARM fixes for v4.4-rc6
-Date: Fri, 18 Dec 2015 13:00:08 +0000
-Message-ID: <1450443609-2233-1-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH] KVM: arm/arm64: vgic-new: Try to insert multi-source SGIs at once
+Date: Fri, 18 Dec 2015 13:00:09 +0000
+Message-ID: <1450443609-2233-2-git-send-email-marc.zyngier@arm.com>
+References: <1450443609-2233-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1450443609-2233-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, Gleb Natapov <gleb@kernel.org>
 Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Paolo,
+Improve handling of multi-source SGIs: instead of only inserting
+one source per SGI per run, try to insert them all at once.
 
-We have a one line fix for the VGIC this time around, fixing a patch
-that went in -rc2. Oh well. Hopefully this is the last one for v4.4.
+Hopefully this is a rare case.
 
-Please pull!
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ virt/kvm/arm/vgic/vgic.c | 30 ++++++++++++++++++++++++++----
+ 1 file changed, 26 insertions(+), 4 deletions(-)
 
-Thanks,
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index c6f04a1..052f917 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -371,15 +371,22 @@ static int compute_ap_list_depth(struct kvm_vcpu *vcpu)
+ 	struct vgic_irq *irq;
+ 	int count = 0;
+ 
+-	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list)
+-		count++;
+-
++	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
++		spin_lock(&irq->irq_lock);
++		/* GICv2 SGIs can count for more than one... */
++		if (irq->intid < VGIC_NR_SGIS && irq->source)
++			count += hweight8(irq->source);
++		else
++			count++;
++		spin_unlock(&irq->irq_lock);
++	}
+ 	return count;
+ }
+ 
+ static void vgic_populate_lrs(struct kvm_vcpu *vcpu)
+ {
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	u32 model = vcpu->kvm->arch.vgic.vgic_model;
+ 	struct vgic_irq *irq;
+ 	int count = 0;
+ 
+@@ -390,8 +397,23 @@ static void vgic_populate_lrs(struct kvm_vcpu *vcpu)
+ 
+ 	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+ 		spin_lock(&irq->irq_lock);
+-		if (vgic_target_oracle(irq) == vcpu)
++
++		if (unlikely(vgic_target_oracle(irq) != vcpu))
++			goto next;
++
++		/*
++		 * If we get an SGI with multiple sources, try to get
++		 * them in all at once.
++		 */
++		if (model == KVM_DEV_TYPE_ARM_VGIC_V2 &&
++		    irq->intid < VGIC_NR_SGIS) {
++			while(irq->source && count < vcpu->arch.vgic_cpu.nr_lr)
++				vgic_populate_lr(vcpu, irq, count++);
++		} else {
+ 			vgic_populate_lr(vcpu, irq, count++);
++		}
++
++	next:
+ 		spin_unlock(&irq->irq_lock);
+ 
+ 		if (count == vcpu->arch.vgic_cpu.nr_lr)
+-- 
+2.1.4
 
-	M.
-
-The following changes since commit 0de58f852875a0f0dcfb120bb8433e4e73c7803b:
-
-  ARM/arm64: KVM: correct PTE uncachedness check (2015-12-04 16:30:17 +0000)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-v4.4-rc6
-
-for you to fetch changes up to fdec12c12ed4333afb49c9948c29fbd5fb52da97:
-
-  KVM: arm/arm64: vgic: Fix kvm_vgic_map_is_active's dist check (2015-12-11 16:33:31 +0000)
-
-----------------------------------------------------------------
-KVM/ARM fixes for v4.4-rc6
-
-- Fix for the active interrupt detection code, affecting
-  the timer interrupt injection.
-
-----------------------------------------------------------------
-Christoffer Dall (1):
-      KVM: arm/arm64: vgic: Fix kvm_vgic_map_is_active's dist check
-
- virt/kvm/arm/vgic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
