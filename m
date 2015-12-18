@@ -1,43 +1,45 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v7] arm/arm64: KVM: Detect vGIC presence at runtime
-Date: Fri, 18 Dec 2015 12:34:08 +0000
-Message-ID: <20151218123408.77b0dd12@arm.com>
-References: <01b201d13988$a73a3400$f5ae9c00$@samsung.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Subject: [PULL] KVM/ARM fixes for v4.4-rc6
+Date: Fri, 18 Dec 2015 13:00:08 +0000
+Message-ID: <1450443609-2233-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <01b201d13988$a73a3400$f5ae9c00$@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>, Gleb Natapov <gleb@kernel.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 18 Dec 2015 14:38:43 +0300
-Pavel Fedin <p.fedin@samsung.com> wrote:
+Hi Paolo,
 
-> Before commit 662d9715840aef44dcb573b0f9fab9e8319c868a
-> ("arm/arm64: KVM: Kill CONFIG_KVM_ARM_{VGIC,TIMER}") is was possible to
-> compile the kernel without vGIC and vTimer support. Commit message says
-> about possibility to detect vGIC support in runtime, but this has never
-> been implemented.
-> 
-> This patch introduces runtime check, restoring the lost functionality.
-> It again allows to use KVM on hardware without vGIC. Interrupt
-> controller has to be emulated in userspace in this case.
-> 
-> -ENODEV return code from probe function means there's no GIC at all.
-> -ENXIO happens when, for example, there is GIC node in the device tree,
-> but it does not specify vGIC resources. Any other error code is still
-> treated as full stop because it might mean some really serious problems.
-> 
-> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
-> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+We have a one line fix for the VGIC this time around, fixing a patch
+that went in -rc2. Oh well. Hopefully this is the last one for v4.4.
 
-Applied.
+Please pull!
 
 Thanks,
 
 	M.
--- 
-Jazz is not dead. It just smells funny.
+
+The following changes since commit 0de58f852875a0f0dcfb120bb8433e4e73c7803b:
+
+  ARM/arm64: KVM: correct PTE uncachedness check (2015-12-04 16:30:17 +0000)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-v4.4-rc6
+
+for you to fetch changes up to fdec12c12ed4333afb49c9948c29fbd5fb52da97:
+
+  KVM: arm/arm64: vgic: Fix kvm_vgic_map_is_active's dist check (2015-12-11 16:33:31 +0000)
+
+----------------------------------------------------------------
+KVM/ARM fixes for v4.4-rc6
+
+- Fix for the active interrupt detection code, affecting
+  the timer interrupt injection.
+
+----------------------------------------------------------------
+Christoffer Dall (1):
+      KVM: arm/arm64: vgic: Fix kvm_vgic_map_is_active's dist check
+
+ virt/kvm/arm/vgic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
