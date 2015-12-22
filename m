@@ -1,7 +1,7 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v8 04/20] KVM: ARM64: Add access handler for PMCR register
-Date: Tue, 22 Dec 2015 16:07:59 +0800
-Message-ID: <1450771695-11948-5-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v8 16/20] KVM: ARM64: Add access handler for PMUSERENR register
+Date: Tue, 22 Dec 2015 16:08:11 +0800
+Message-ID: <1450771695-11948-17-git-send-email-zhaoshenglong@huawei.com>
 References: <1450771695-11948-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -14,60 +14,269 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-Add reset handler which gets host value of PMCR_EL0 and make writable
-bits architecturally UNKNOWN except PMCR.E which is zero. Add an access
-handler for PMCR.
+This register resets as unknown in 64bit mode while it resets as zero
+in 32bit mode. Here we choose to reset it as zero for consistency.
+
+PMUSERENR_EL0 holds some bits which decide whether PMU registers can be
+accessed from EL0. Add some check helpers to handle the access from EL0.
+
+When these bits are zero, only reading PMUSERENR will trap to EL2 and
+writing PMUSERENR or reading/writing other PMU registers will trap to
+EL1 other than EL2 when HCR.TGE==0. To current KVM configuration
+(HCR.TGE==0) there is no way to get these traps. Here we write 0xf to
+physical PMUSERENR register on VM entry, so that it will trap PMU access
+from EL0 to EL2. Within the register access handler we check the real
+value of guest PMUSERENR register to decide whether this access is
+allowed. If not allowed, forward this trap to EL1.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 ---
- arch/arm64/kvm/sys_regs.c | 39 +++++++++++++++++++++++++++++++++++++--
- 1 file changed, 37 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/pmu.h |   9 ++++
+ arch/arm64/kvm/hyp/switch.c  |   3 ++
+ arch/arm64/kvm/sys_regs.c    | 122 +++++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 129 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index e8bf374..c60047e 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -34,6 +34,7 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_host.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/pmu.h>
+diff --git a/arch/arm64/include/asm/pmu.h b/arch/arm64/include/asm/pmu.h
+index 2588f9c..1238ade 100644
+--- a/arch/arm64/include/asm/pmu.h
++++ b/arch/arm64/include/asm/pmu.h
+@@ -67,4 +67,13 @@
+ #define	ARMV8_EXCLUDE_EL0	(1 << 30)
+ #define	ARMV8_INCLUDE_EL2	(1 << 27)
  
- #include <trace/events/kvm.h>
- 
-@@ -439,6 +440,40 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	vcpu_sys_reg(vcpu, MPIDR_EL1) = (1ULL << 31) | mpidr;
++/*
++ * PMUSERENR: user enable reg
++ */
++#define ARMV8_USERENR_MASK	0xf		/* Mask for writable bits */
++#define ARMV8_USERENR_EN	(1 << 0) /* PMU regs can be accessed at EL0 */
++#define ARMV8_USERENR_SW	(1 << 1) /* PMSWINC can be written at EL0 */
++#define ARMV8_USERENR_CR	(1 << 2) /* Cycle counter can be read at EL0 */
++#define ARMV8_USERENR_ER	(1 << 3) /* Event counter can be read at EL0 */
++
+ #endif /* __ASM_PMU_H */
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index ca8f5a5..a85375f 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -37,6 +37,8 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+ 	write_sysreg(1 << 15, hstr_el2);
+ 	write_sysreg(CPTR_EL2_TTA | CPTR_EL2_TFP, cptr_el2);
++	/* Make sure we trap PMU access from EL0 to EL2 */
++	write_sysreg(15, pmuserenr_el0);
+ 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
  }
  
-+static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+@@ -45,6 +47,7 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+ 	write_sysreg(HCR_RW, hcr_el2);
+ 	write_sysreg(0, hstr_el2);
+ 	write_sysreg(read_sysreg(mdcr_el2) & MDCR_EL2_HPMN_MASK, mdcr_el2);
++	write_sysreg(0, pmuserenr_el0);
+ 	write_sysreg(0, cptr_el2);
+ }
+ 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 04281f1..ac0cbf8 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -453,11 +453,47 @@ static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	vcpu_sys_reg(vcpu, r->reg) = val;
+ }
+ 
++static inline bool pmu_access_el0_disabled(struct kvm_vcpu *vcpu)
 +{
-+	u64 pmcr, val;
++	u64 reg = vcpu_sys_reg(vcpu, PMUSERENR_EL0);
 +
-+	asm volatile("mrs %0, pmcr_el0\n" : "=r" (pmcr));
-+	/* Writable bits of PMCR_EL0 (ARMV8_PMCR_MASK) is reset to UNKNOWN
-+	 * except PMCR.E resetting to zero.
-+	 */
-+	val = ((pmcr & ~ARMV8_PMCR_MASK) | (ARMV8_PMCR_MASK & 0xdecafbad))
-+	      & (~ARMV8_PMCR_E);
-+	vcpu_sys_reg(vcpu, r->reg) = val;
++	return !((reg & ARMV8_USERENR_EN) || vcpu_mode_priv(vcpu));
 +}
 +
-+static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			const struct sys_reg_desc *r)
++static inline bool pmu_write_swinc_el0_disabled(struct kvm_vcpu *vcpu)
 +{
-+	u64 val;
++	u64 reg = vcpu_sys_reg(vcpu, PMUSERENR_EL0);
 +
++	return !((reg & (ARMV8_USERENR_SW | ARMV8_USERENR_EN))
++		 || vcpu_mode_priv(vcpu));
++}
++
++static inline bool pmu_access_cycle_counter_el0_disabled(struct kvm_vcpu *vcpu)
++{
++	u64 reg = vcpu_sys_reg(vcpu, PMUSERENR_EL0);
++
++	return !((reg & (ARMV8_USERENR_CR | ARMV8_USERENR_EN))
++		 || vcpu_mode_priv(vcpu));
++}
++
++static inline bool pmu_access_event_counter_el0_disabled(struct kvm_vcpu *vcpu)
++{
++	u64 reg = vcpu_sys_reg(vcpu, PMUSERENR_EL0);
++
++	return !((reg & (ARMV8_USERENR_ER | ARMV8_USERENR_EN))
++		 || vcpu_mode_priv(vcpu));
++}
++
+ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 			const struct sys_reg_desc *r)
+ {
+ 	u64 val;
+ 
++	if (pmu_access_el0_disabled(vcpu)) {
++		kvm_forward_trap_to_el1(vcpu);
++		return true;
++	}
++
+ 	if (p->is_write) {
+ 		/* Only update writeable bits of PMCR */
+ 		val = vcpu_sys_reg(vcpu, r->reg);
+@@ -478,6 +514,11 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ static bool access_pmselr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 			  const struct sys_reg_desc *r)
+ {
++	if (pmu_access_event_counter_el0_disabled(vcpu)) {
++		kvm_forward_trap_to_el1(vcpu);
++		return true;
++	}
++
+ 	if (p->is_write)
+ 		vcpu_sys_reg(vcpu, r->reg) = p->regval;
+ 	else
+@@ -492,6 +533,11 @@ static bool access_pmceid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ {
+ 	u64 pmceid;
+ 
++	if (pmu_access_el0_disabled(vcpu)) {
++		kvm_forward_trap_to_el1(vcpu);
++		return true;
++	}
++
+ 	if (p->is_write) {
+ 		kvm_inject_undefined(vcpu);
+ 	} else {
+@@ -523,6 +569,11 @@ static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ {
+ 	u64 idx, reg;
+ 
++	if (pmu_access_el0_disabled(vcpu)) {
++		kvm_forward_trap_to_el1(vcpu);
++		return true;
++	}
++
+ 	if (r->CRn == 9) {
+ 		/* PMXEVTYPER_EL0 */
+ 		reg = 0;
+@@ -594,15 +645,30 @@ static bool access_pmu_evcntr(struct kvm_vcpu *vcpu,
+ 
+ 	switch (reg) {
+ 	case PMEVCNTR0_EL0 ... PMEVCNTR30_EL0:
++		if (pmu_access_event_counter_el0_disabled(vcpu)) {
++			kvm_forward_trap_to_el1(vcpu);
++			return true;
++		}
++
+ 		idx = reg - PMEVCNTR0_EL0;
+ 		if (!pmu_counter_idx_valid(vcpu, idx))
+ 			return true;
+ 		break;
+ 	case PMCCNTR_EL0:
++		if (pmu_access_cycle_counter_el0_disabled(vcpu)) {
++			kvm_forward_trap_to_el1(vcpu);
++			return true;
++		}
++
+ 		idx = ARMV8_CYCLE_IDX;
+ 		break;
+ 	default:
+ 		/* PMXEVCNTR_EL0 */
++		if (pmu_access_event_counter_el0_disabled(vcpu)) {
++			kvm_forward_trap_to_el1(vcpu);
++			return true;
++		}
++
+ 		idx = vcpu_sys_reg(vcpu, PMSELR_EL0) & ARMV8_COUNTER_MASK;
+ 		if (!pmu_counter_idx_valid(vcpu, idx))
+ 			return true;
+@@ -613,10 +679,16 @@ static bool access_pmu_evcntr(struct kvm_vcpu *vcpu,
+ 	}
+ 
+ 	val = kvm_pmu_get_counter_value(vcpu, idx);
+-	if (p->is_write)
 +	if (p->is_write) {
-+		/* Only update writeable bits of PMCR */
-+		val = vcpu_sys_reg(vcpu, r->reg);
-+		val &= ~ARMV8_PMCR_MASK;
-+		val |= p->regval & ARMV8_PMCR_MASK;
-+		vcpu_sys_reg(vcpu, r->reg) = val;
++		if (pmu_access_el0_disabled(vcpu)) {
++			kvm_forward_trap_to_el1(vcpu);
++			return true;
++		}
++
+ 		vcpu_sys_reg(vcpu, reg) += (s64)p->regval - val;
+-	else
 +	} else {
-+		/* PMCR.P & PMCR.C are RAZ */
-+		val = vcpu_sys_reg(vcpu, r->reg)
-+		      & ~(ARMV8_PMCR_P | ARMV8_PMCR_C);
-+		p->regval = val;
+ 		p->regval = val;
++	}
+ 
+ 	return true;
+ }
+@@ -626,6 +698,11 @@ static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ {
+ 	u64 val, mask;
+ 
++	if (pmu_access_el0_disabled(vcpu)) {
++		kvm_forward_trap_to_el1(vcpu);
++		return true;
++	}
++
+ 	mask = kvm_pmu_valid_counter_mask(vcpu);
+ 	if (p->is_write) {
+ 		val = p->regval & mask;
+@@ -650,6 +727,11 @@ static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ {
+ 	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
+ 
++	if (!vcpu_mode_priv(vcpu)) {
++		kvm_inject_undefined(vcpu);
++		return true;
++	}
++
+ 	if (p->is_write) {
+ 		if (r->Op2 & 0x1)
+ 			/* accessing PMINTENSET_EL1 */
+@@ -669,6 +751,11 @@ static bool access_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ {
+ 	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
+ 
++	if (pmu_access_el0_disabled(vcpu)) {
++		kvm_forward_trap_to_el1(vcpu);
++		return true;
++	}
++
+ 	if (p->is_write) {
+ 		if (r->CRm & 0x2)
+ 			/* accessing PMOVSSET_EL0 */
+@@ -688,6 +775,11 @@ static bool access_pmswinc(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ {
+ 	u64 mask;
+ 
++	if (pmu_write_swinc_el0_disabled(vcpu)) {
++		kvm_forward_trap_to_el1(vcpu);
++		return true;
++	}
++
+ 	if (p->is_write) {
+ 		mask = kvm_pmu_valid_counter_mask(vcpu);
+ 		kvm_pmu_software_increment(vcpu, p->regval & mask);
+@@ -698,6 +790,23 @@ static bool access_pmswinc(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
+ }
+ 
++static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			     const struct sys_reg_desc *r)
++{
++	if (p->is_write) {
++		if (!vcpu_mode_priv(vcpu)) {
++			kvm_inject_undefined(vcpu);
++			return true;
++		}
++
++		vcpu_sys_reg(vcpu, r->reg) = p->regval & ARMV8_USERENR_MASK;
++	} else {
++		p->regval = vcpu_sys_reg(vcpu, r->reg) & ARMV8_USERENR_MASK;
 +	}
 +
 +	return true;
@@ -76,24 +285,30 @@ index e8bf374..c60047e 100644
  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
  	/* DBGBVRn_EL1 */						\
-@@ -623,7 +658,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 
- 	/* PMCR_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b000),
+@@ -927,9 +1036,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	/* PMXEVCNTR_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b010),
+ 	  access_pmu_evcntr },
+-	/* PMUSERENR_EL0 */
++	/* PMUSERENR_EL0
++	 * This register resets as unknown in 64bit mode while it resets as zero
++	 * in 32bit mode. Here we choose to reset it as zero for consistency.
++	 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1110), Op2(0b000),
 -	  trap_raz_wi },
-+	  access_pmcr, reset_pmcr, PMCR_EL0, },
- 	/* PMCNTENSET_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b001),
- 	  trap_raz_wi },
-@@ -885,7 +920,7 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn( 7), CRm(14), Op2( 2), access_dcsw },
- 
- 	/* PMU */
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), trap_raz_wi },
-+	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), access_pmcr },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), trap_raz_wi },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), trap_raz_wi },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
++	  access_pmuserenr, reset_val, PMUSERENR_EL0, 0 },
+ 	/* PMOVSSET_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1110), Op2(0b011),
+ 	  access_pmovs, reset_unknown, PMOVSSET_EL0 },
+@@ -1254,7 +1366,7 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), access_pmu_evcntr },
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_evtyper },
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), access_pmu_evcntr },
+-	{ Op1( 0), CRn( 9), CRm(14), Op2( 0), trap_raz_wi },
++	{ Op1( 0), CRn( 9), CRm(14), Op2( 0), access_pmuserenr },
+ 	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), access_pminten },
+ 	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), access_pminten },
+ 	{ Op1( 0), CRn( 9), CRm(14), Op2( 3), access_pmovs },
 -- 
 2.0.4
 
