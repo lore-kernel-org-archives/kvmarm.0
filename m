@@ -1,23 +1,21 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 1/2] Add a rudimentary manpage
-Date: Tue, 22 Dec 2015 14:00:46 +0000
-Message-ID: <1450792847-1783-2-git-send-email-andre.przywara@arm.com>
-References: <1450792847-1783-1-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH 0/2] kvmtool: replace documentations stubs with manpage
+Date: Tue, 22 Dec 2015 14:00:45 +0000
+Message-ID: <1450792847-1783-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D36664965E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Dec 2015 08:58:17 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1B9D549630
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Dec 2015 08:58:21 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 67JJIzCQ9CFo for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 6zSl3Oa66z7t for <kvmarm@lists.cs.columbia.edu>;
  Tue, 22 Dec 2015 08:58:15 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6790048912
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Dec 2015 08:58:15 -0500 (EST)
-In-Reply-To: <1450792847-1783-1-git-send-email-andre.przywara@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 22FFD411BE
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Dec 2015 08:58:14 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,246 +29,53 @@ To: will.deacon@arm.com
 Cc: dimitri.j.ledkov@intel.com, sasha.levin@oracle.com, penberg@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The kvmtool documentation is somewhat lacking, also it is not easily
-accessible when living in the source tree only.
-Add a good ol' manpage to document at least the basic commands and
-their options.
-This level of documentation matches the one that is already there in
-the Documentation directory and should be subject to extension.
+Hi,
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- Documentation/kvmtool.1 | 222 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 222 insertions(+)
+as I got annoyed with the availability and quality of the
+documentation and always wanted to write a manpage, I just took this
+first step by replacing the stub text files in the Documentation
+directory with a manpage.
+This is clearly only the beginning, there is more functionality which
+currently is not documented at all (networking comes to mind).
+
+Cheers,
+Andre.
+
+Andre Przywara (2):
+  Add a rudimentary manpage
+  Documentation: remove documentation stubs and common-cmds.h generation
+
+ .gitignore                    |   1 -
+ Documentation/kvm-balloon.txt |  24 -----
+ Documentation/kvm-debug.txt   |  16 ---
+ Documentation/kvm-list.txt    |  16 ---
+ Documentation/kvm-pause.txt   |  16 ---
+ Documentation/kvm-resume.txt  |  16 ---
+ Documentation/kvm-run.txt     |  62 ------------
+ Documentation/kvm-sandbox.txt |  16 ---
+ Documentation/kvm-setup.txt   |  15 ---
+ Documentation/kvm-stat.txt    |  19 ----
+ Documentation/kvm-stop.txt    |  16 ---
+ Documentation/kvm-version.txt |  21 ----
+ Documentation/kvmtool.1       | 222 ++++++++++++++++++++++++++++++++++++++++++
+ Makefile                      |  10 --
+ command-list.txt              |  15 ---
+ include/common-cmds.h         |  19 ++++
+ 16 files changed, 241 insertions(+), 263 deletions(-)
+ delete mode 100644 Documentation/kvm-balloon.txt
+ delete mode 100644 Documentation/kvm-debug.txt
+ delete mode 100644 Documentation/kvm-list.txt
+ delete mode 100644 Documentation/kvm-pause.txt
+ delete mode 100644 Documentation/kvm-resume.txt
+ delete mode 100644 Documentation/kvm-run.txt
+ delete mode 100644 Documentation/kvm-sandbox.txt
+ delete mode 100644 Documentation/kvm-setup.txt
+ delete mode 100644 Documentation/kvm-stat.txt
+ delete mode 100644 Documentation/kvm-stop.txt
+ delete mode 100644 Documentation/kvm-version.txt
  create mode 100644 Documentation/kvmtool.1
+ delete mode 100644 command-list.txt
+ create mode 100644 include/common-cmds.h
 
-diff --git a/Documentation/kvmtool.1 b/Documentation/kvmtool.1
-new file mode 100644
-index 0000000..aecb2dc
---- /dev/null
-+++ b/Documentation/kvmtool.1
-@@ -0,0 +1,222 @@
-+.\" Manpage for kvmtool
-+.\" Copyright (C) 2015 by Andre Przywara <andre.przywara@arm.com>
-+.TH kvmtool 1 "11 Nov 2015" "0.1" "kvmtool man page"
-+.SH NAME
-+kvmtool \- running KVM guests
-+.SH SYNOPSIS
-+lkvm COMMAND [ARGS]
-+.SH DESCRIPTION
-+kvmtool is a userland tool for creating and controlling KVM guests.
-+.SH "KVMTOOL COMMANDS"
-+.sp
-+.PP
-+.B run -k <kernel-image> ...
-+.RS 4
-+Run a guest.
-+.sp
-+.B \-k, \-\-kernel <image file>
-+.RS 4
-+The virtual machine kernel.
-+.RE
-+.sp
-+.B \-c, \-\-cpus <n>
-+.RS 4
-+The number of virtual CPUs to run.
-+.RE
-+.sp
-+.B \-m, \-\-mem <n>
-+.RS 4
-+Virtual machine memory size in MiB.
-+.RE
-+.sp
-+.B \-p, \-\-params <parameters>
-+.RS 4
-+Additional kernel command line arguments.
-+.RE
-+.sp
-+.B \-i, \-\-initrd <image file>
-+.RS 4
-+Initial RAM disk image.
-+.RE
-+.sp
-+.B \-d, \-\-disk <image file|directory>
-+.RS 4
-+A disk image file or a rootfs directory.
-+.RE
-+.sp
-+.B \-\-console serial|virtio|hv
-+.RS 4
-+Console to use.
-+.RE
-+.sp
-+.B \-\-dev <device node>
-+.RS 4
-+KVM device file (instead of the default /dev/kvm).
-+.RE
-+.sp
-+.B \-\-debug
-+.RS 4
-+Enable debug messages.
-+.RE
-+.sp
-+.B \-\-debug-single-step
-+.RS 4
-+Enable single stepping.
-+.RE
-+.sp
-+.B \-\-debug-ioport
-+.RS 4
-+Enable ioport debugging.
-+.RE
-+.RE
-+.PP
-+.B setup <name>
-+.RS 4
-+Setup a new virtual machine. This creates a new rootfs in the .lkvm
-+folder of your home directory.
-+.RE
-+.PP
-+.B pause \-\-all|\-\-name <name>
-+.RS 4
-+Pause a virtual machine.
-+.sp
-+.B \-a, \-\-all
-+.RS 4
-+Pause all running instances.
-+.RE
-+.sp
-+.B \-n, \-\-name <name>
-+.RS 4
-+Pause that specified instance. For a list of running instances, see \fI lkvm list\fR.
-+.RE
-+.RE
-+.PP
-+.B resume --all|--name <name>
-+.RS 4
-+Resume a previously paused virtual machine.
-+.sp
-+.B \-a, \-\-all
-+.RS 4
-+Resume all running instances.
-+.RE
-+.sp
-+.B \-n, \-\-name <name>
-+.RS 4
-+Resume that specified instance. For a list of running instances, see \fI lkvm list\fR.
-+.RE
-+.RE
-+.PP
-+.B list [\-i] [\-r]
-+.RS 4
-+Print a list of running instances on the host. This is restricted to instances
-+started by the current user, as it looks in the .lkvm folder in your home
-+directory to find the socket files.
-+.sp
-+.B \-i, \-\-run
-+.RS 4
-+List all running instances.
-+.RE
-+.sp
-+.B \-r, \-\-rootfs
-+.RS 4
-+List rootfs instances.
-+.RE
-+.RE
-+.PP
-+.B debug --all|--name <guest name> [--dump] [--nmi <n>] [--sysrq <rq>]
-+.RS 4
-+Print debug information from a running VM instance.
-+.sp
-+.B \-a, \-\-all
-+.RS 4
-+Debug all running instances.
-+.RE
-+.PP
-+.B \-n, \-\-name <guest name>
-+.RS 4
-+Debug the specified instance.
-+.RE
-+.sp
-+.B \-d, \-\-dump
-+.RS 4
-+Generate a debug dump from guest.
-+.RE
-+.PP
-+.B \-m, \-\-nmi <VCPU nr>
-+.RS 4
-+Generate an NMI on the specified virtual CPU.
-+.RE
-+.PP
-+.B \-s, \-\-sysrq <sysrq>
-+.RS 4
-+Inject a Linux sysrq into the guest.
-+.RE
-+.RE
-+.PP
-+.B balloon \-\-name <guest name> \-\-inflate|\-\-deflate <amount in MB>
-+.RS 4
-+This command inflates or deflates the virtio balloon located in the
-+specified instance.
-+\-\-inflate increases the size of the balloon, thus \fIdecreasing\fR the
-+amount of virtual RAM available for the guest. \-\-deflate returns previously
-+inflated memory back to the guest.
-+.sp
-+.B \-n, \-\-name <guest name>
-+.RS 4
-+Ballon the specified instance. For a list of all instances, see \fI"lkvm list"\fR.
-+.RE
-+.PP
-+.B \-i, \-\-inflate <n>
-+.RS 4
-+Inflates the ballon by the specified number of Megabytes. This decreases the
-+amount of usable memory in the guest.
-+.RE
-+.PP
-+.B \-d, \-\-deflate <n>
-+.RS 4
-+Deflates the ballon by the specified number of Megabytes. This increases the
-+amount of usable memory in the guest.
-+.RE
-+.RE
-+.PP
-+.B stop --all|--name <name>
-+.RS 4
-+Stop a running instance.
-+.sp
-+.B \-a, \-\-all
-+.RS 4
-+Stop all running instances.
-+.RE
-+.sp
-+.B \-n, \-\-name <name>
-+.RS 4
-+Stop the specified instance. For a list of running instances, see \fI lkvm list\fR.
-+.RE
-+.RE
-+.PP
-+.B stat \-\-all|\-\-name <name> [\-m]
-+.RS 4
-+Print statistics about a running instance.
-+.sp
-+.B \-m, \-\-memory
-+.RS 4
-+Display memory statistics.
-+.RE
-+.RE
-+.PP
-+.B sandbox (\fIlkvm run arguments\fR) \-\- [sandboxed command]
-+.RS 4
-+Run a command in a sandboxed guest. Kvmtool will inject a special init
-+binary which will do an initial setup of the guest Linux and then
-+lauch a shell script with the specified command. Upon this command ending,
-+the guest will be shutdown.
-+.RE
-+.SH EXAMPLES
-+.RS 4
-+\fB$\fR lkvm run -k bzImage
-+.RE
-+.SH SEE ALSO
-+qemu(1), kvm(4)
-+.SH BUGS
-+.SH AUTHOR
-+Andre Przywara <andre.przywara@arm.com>
 -- 
 2.5.1
