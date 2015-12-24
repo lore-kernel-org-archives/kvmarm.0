@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 27/31] arm/arm64: KVM: Remove unreferenced S2_PGD_ORDER
-Date: Thu, 24 Dec 2015 11:12:35 +0000
-Message-ID: <1450955559-15639-28-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 28/31] arm: KVM: Make kvm_arm.h friendly to assembly code
+Date: Thu, 24 Dec 2015 11:12:36 +0000
+Message-ID: <1450955559-15639-29-git-send-email-marc.zyngier@arm.com>
 References: <1450955559-15639-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CC5340FA2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Dec 2015 06:12:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 31C004852F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Dec 2015 06:12:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8DO+nYpmiDqM for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Dec 2015 06:12:24 -0500 (EST)
+ with ESMTP id eiHJmyY+6Wbg for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Dec 2015 06:12:28 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 83516498C6
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Dec 2015 06:12:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D13B9412F3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Dec 2015 06:12:27 -0500 (EST)
 In-Reply-To: <1450955559-15639-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,59 +33,97 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Vladimir Murzin <vladimir.murzin@arm.com>
 
-Since commit a987370 ("arm64: KVM: Fix stage-2 PGD allocation to have
-per-page refcounting") there is no reference to S2_PGD_ORDER, so kill it
-for the good.
+kvm_arm.h is included from both C code and assembly code; however some
+definitions in this header supplied with U/UL/ULL suffixes which might
+confuse assembly once they got evaluated.
+We have _AC macro for such cases, so just wrap problem places with it.
 
 Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Vladimir Murzin <vladimir.murzin@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_arm.h   | 1 -
- arch/arm/kvm/mmu.c               | 6 +++---
- arch/arm64/include/asm/kvm_mmu.h | 1 -
- 3 files changed, 3 insertions(+), 5 deletions(-)
+ arch/arm/include/asm/kvm_arm.h | 33 +++++++++++++++++----------------
+ 1 file changed, 17 insertions(+), 16 deletions(-)
 
 diff --git a/arch/arm/include/asm/kvm_arm.h b/arch/arm/include/asm/kvm_arm.h
-index dc641dd..b05bb5a 100644
+index b05bb5a..01d4d7a 100644
 --- a/arch/arm/include/asm/kvm_arm.h
 +++ b/arch/arm/include/asm/kvm_arm.h
-@@ -135,7 +135,6 @@
- #define KVM_PHYS_SIZE	(1ULL << KVM_PHYS_SHIFT)
- #define KVM_PHYS_MASK	(KVM_PHYS_SIZE - 1ULL)
- #define PTRS_PER_S2_PGD	(1ULL << (KVM_PHYS_SHIFT - 30))
--#define S2_PGD_ORDER	get_order(PTRS_PER_S2_PGD * sizeof(pgd_t))
+@@ -19,6 +19,7 @@
+ #ifndef __ARM_KVM_ARM_H__
+ #define __ARM_KVM_ARM_H__
+ 
++#include <linux/const.h>
+ #include <linux/types.h>
+ 
+ /* Hyp Configuration Register (HCR) bits */
+@@ -132,9 +133,9 @@
+  * space.
+  */
+ #define KVM_PHYS_SHIFT	(40)
+-#define KVM_PHYS_SIZE	(1ULL << KVM_PHYS_SHIFT)
+-#define KVM_PHYS_MASK	(KVM_PHYS_SIZE - 1ULL)
+-#define PTRS_PER_S2_PGD	(1ULL << (KVM_PHYS_SHIFT - 30))
++#define KVM_PHYS_SIZE	(_AC(1, ULL) << KVM_PHYS_SHIFT)
++#define KVM_PHYS_MASK	(KVM_PHYS_SIZE - _AC(1, ULL))
++#define PTRS_PER_S2_PGD	(_AC(1, ULL) << (KVM_PHYS_SHIFT - 30))
  
  /* Virtualization Translation Control Register (VTCR) bits */
  #define VTCR_SH0	(3 << 12)
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 61d96a6..22f7fa0 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -656,9 +656,9 @@ static void *kvm_alloc_hwpgd(void)
-  * kvm_alloc_stage2_pgd - allocate level-1 table for stage-2 translation.
-  * @kvm:	The KVM struct pointer for the VM.
-  *
-- * Allocates the 1st level table only of size defined by S2_PGD_ORDER (can
-- * support either full 40-bit input addresses or limited to 32-bit input
-- * addresses). Clears the allocated pages.
-+ * Allocates only the stage-2 HW PGD level table(s) (can support either full
-+ * 40-bit input addresses or limited to 32-bit input addresses). Clears the
-+ * allocated pages.
-  *
-  * Note we don't need locking here as this is only called when the VM is
-  * created, which can only be done once.
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index 6150567..54cba80 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -158,7 +158,6 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
- #define PTRS_PER_S2_PGD_SHIFT	(KVM_PHYS_SHIFT - PGDIR_SHIFT)
+@@ -161,17 +162,17 @@
+ #define VTTBR_X		(5 - KVM_T0SZ)
  #endif
- #define PTRS_PER_S2_PGD		(1 << PTRS_PER_S2_PGD_SHIFT)
--#define S2_PGD_ORDER		get_order(PTRS_PER_S2_PGD * sizeof(pgd_t))
+ #define VTTBR_BADDR_SHIFT (VTTBR_X - 1)
+-#define VTTBR_BADDR_MASK  (((1LLU << (40 - VTTBR_X)) - 1) << VTTBR_BADDR_SHIFT)
+-#define VTTBR_VMID_SHIFT  (48LLU)
+-#define VTTBR_VMID_MASK	  (0xffLLU << VTTBR_VMID_SHIFT)
++#define VTTBR_BADDR_MASK  (((_AC(1, ULL) << (40 - VTTBR_X)) - 1) << VTTBR_BADDR_SHIFT)
++#define VTTBR_VMID_SHIFT  _AC(48, ULL)
++#define VTTBR_VMID_MASK	  (_AC(0xff, ULL) << VTTBR_VMID_SHIFT)
  
- #define kvm_pgd_index(addr)	(((addr) >> PGDIR_SHIFT) & (PTRS_PER_S2_PGD - 1))
+ /* Hyp Syndrome Register (HSR) bits */
+ #define HSR_EC_SHIFT	(26)
+-#define HSR_EC		(0x3fU << HSR_EC_SHIFT)
+-#define HSR_IL		(1U << 25)
++#define HSR_EC		(_AC(0x3f, UL) << HSR_EC_SHIFT)
++#define HSR_IL		(_AC(1, UL) << 25)
+ #define HSR_ISS		(HSR_IL - 1)
+ #define HSR_ISV_SHIFT	(24)
+-#define HSR_ISV		(1U << HSR_ISV_SHIFT)
++#define HSR_ISV		(_AC(1, UL) << HSR_ISV_SHIFT)
+ #define HSR_SRT_SHIFT	(16)
+ #define HSR_SRT_MASK	(0xf << HSR_SRT_SHIFT)
+ #define HSR_FSC		(0x3f)
+@@ -179,9 +180,9 @@
+ #define HSR_SSE		(1 << 21)
+ #define HSR_WNR		(1 << 6)
+ #define HSR_CV_SHIFT	(24)
+-#define HSR_CV		(1U << HSR_CV_SHIFT)
++#define HSR_CV		(_AC(1, UL) << HSR_CV_SHIFT)
+ #define HSR_COND_SHIFT	(20)
+-#define HSR_COND	(0xfU << HSR_COND_SHIFT)
++#define HSR_COND	(_AC(0xf, UL) << HSR_COND_SHIFT)
  
+ #define FSC_FAULT	(0x04)
+ #define FSC_ACCESS	(0x08)
+@@ -209,13 +210,13 @@
+ #define HSR_EC_DABT	(0x24)
+ #define HSR_EC_DABT_HYP	(0x25)
+ 
+-#define HSR_WFI_IS_WFE		(1U << 0)
++#define HSR_WFI_IS_WFE		(_AC(1, UL) << 0)
+ 
+-#define HSR_HVC_IMM_MASK	((1UL << 16) - 1)
++#define HSR_HVC_IMM_MASK	((_AC(1, UL) << 16) - 1)
+ 
+-#define HSR_DABT_S1PTW		(1U << 7)
+-#define HSR_DABT_CM		(1U << 8)
+-#define HSR_DABT_EA		(1U << 9)
++#define HSR_DABT_S1PTW		(_AC(1, UL) << 7)
++#define HSR_DABT_CM		(_AC(1, UL) << 8)
++#define HSR_DABT_EA		(_AC(1, UL) << 9)
+ 
+ #define kvm_arm_exception_type	\
+ 	{0, "RESET" }, 		\
 -- 
 2.1.4
