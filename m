@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 26/31] arm64: KVM: debug: Remove spurious inline attributes
-Date: Thu, 24 Dec 2015 11:12:34 +0000
-Message-ID: <1450955559-15639-27-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 24/31] arm64: KVM: Remove weak attributes
+Date: Thu, 24 Dec 2015 11:12:32 +0000
+Message-ID: <1450955559-15639-25-git-send-email-marc.zyngier@arm.com>
 References: <1450955559-15639-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5D22A412F3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Dec 2015 06:12:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C0F4149767
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Dec 2015 06:12:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lAWSnhawYsd3 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Dec 2015 06:12:21 -0500 (EST)
+ with ESMTP id ffL6eTybo-ud for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Dec 2015 06:12:14 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 187AD498AB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Dec 2015 06:12:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EB06A497BD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Dec 2015 06:12:13 -0500 (EST)
 In-Reply-To: <1450955559-15639-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,89 +31,143 @@ To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Jisheng Zhang <jszhang@marvell.com>, kvm@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, David Binderman <dcb314@hotmail.com>, Fengguang Wu <fengguang.wu@intel.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VGhlIGRlYnVnIHRyYXBwaW5nIGNvZGUgaXMgcHJldHR5IGhlYXZ5IG9uIHRoZSAiaW5saW5lIiBh
-dHRyaWJ1dGUsCmJ1dCBtb3N0IGZ1bmN0aW9ucyBhcmUgYWN0dWFsbHkgcmVmZXJlbmNlZCBpbiB0
-aGUgc3lzcmVnIHRhYmxlcywKbWFraW5nIHRoZSBpbmxpbmluZyBpbXBvc2libGUuCgpSZW1vdmlu
-ZyB0aGUgdXNlbGVzcyBpbmxpbmUgcXVhbGlmaWVyIHNlZW1zIHRoZSByaWdodCB0aGluZyB0byBk
-bywKaGF2aW5nIHZlcmlmaWVkIHRoYXQgdGhlIG91dHB1dCBjb2RlIGlzIHNpbWlsYXIuCgpDYzog
-QWxleCBCZW5uw6llIDxhbGV4LmJlbm5lZUBsaW5hcm8ub3JnPgpBY2tlZC1ieTogQ2hyaXN0b2Zm
-ZXIgRGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPgpTaWduZWQtb2ZmLWJ5OiBNYXJj
-IFp5bmdpZXIgPG1hcmMuenluZ2llckBhcm0uY29tPgotLS0KIGFyY2gvYXJtNjQva3ZtL3N5c19y
-ZWdzLmMgfCA1OCArKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LQogMSBmaWxlIGNoYW5nZWQsIDI5IGluc2VydGlvbnMoKyksIDI5IGRlbGV0aW9ucygtKQoKZGlm
-ZiAtLWdpdCBhL2FyY2gvYXJtNjQva3ZtL3N5c19yZWdzLmMgYi9hcmNoL2FybTY0L2t2bS9zeXNf
-cmVncy5jCmluZGV4IDg4YWRlYmYuLmVlYzM1OTggMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtNjQva3Zt
-L3N5c19yZWdzLmMKKysrIGIvYXJjaC9hcm02NC9rdm0vc3lzX3JlZ3MuYwpAQCAtMjIwLDkgKzIy
-MCw5IEBAIHN0YXRpYyBib29sIHRyYXBfZGVidWdfcmVncyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUs
-CiAgKiBBbGwgd3JpdGVzIHdpbGwgc2V0IHRoZSBLVk1fQVJNNjRfREVCVUdfRElSVFkgZmxhZyB0
-byBlbnN1cmUgdGhlCiAgKiBoeXAuUyBjb2RlIHN3aXRjaGVzIGJldHdlZW4gaG9zdCBhbmQgZ3Vl
-c3QgdmFsdWVzIGluIGZ1dHVyZS4KICAqLwotc3RhdGljIGlubGluZSB2b2lkIHJlZ190b19kYmco
-c3RydWN0IGt2bV92Y3B1ICp2Y3B1LAotCQkJICAgICAgc3RydWN0IHN5c19yZWdfcGFyYW1zICpw
-LAotCQkJICAgICAgdTY0ICpkYmdfcmVnKQorc3RhdGljIHZvaWQgcmVnX3RvX2RiZyhzdHJ1Y3Qg
-a3ZtX3ZjcHUgKnZjcHUsCisJCSAgICAgICBzdHJ1Y3Qgc3lzX3JlZ19wYXJhbXMgKnAsCisJCSAg
-ICAgICB1NjQgKmRiZ19yZWcpCiB7CiAJdTY0IHZhbCA9IHAtPnJlZ3ZhbDsKIApAQCAtMjM1LDE4
-ICsyMzUsMTggQEAgc3RhdGljIGlubGluZSB2b2lkIHJlZ190b19kYmcoc3RydWN0IGt2bV92Y3B1
-ICp2Y3B1LAogCXZjcHUtPmFyY2guZGVidWdfZmxhZ3MgfD0gS1ZNX0FSTTY0X0RFQlVHX0RJUlRZ
-OwogfQogCi1zdGF0aWMgaW5saW5lIHZvaWQgZGJnX3RvX3JlZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
-cHUsCi0JCQkgICAgICBzdHJ1Y3Qgc3lzX3JlZ19wYXJhbXMgKnAsCi0JCQkgICAgICB1NjQgKmRi
-Z19yZWcpCitzdGF0aWMgdm9pZCBkYmdfdG9fcmVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKKwkJ
-ICAgICAgIHN0cnVjdCBzeXNfcmVnX3BhcmFtcyAqcCwKKwkJICAgICAgIHU2NCAqZGJnX3JlZykK
-IHsKIAlwLT5yZWd2YWwgPSAqZGJnX3JlZzsKIAlpZiAocC0+aXNfMzJiaXQpCiAJCXAtPnJlZ3Zh
-bCAmPSAweGZmZmZmZmZmVUw7CiB9CiAKLXN0YXRpYyBpbmxpbmUgYm9vbCB0cmFwX2J2cihzdHJ1
-Y3Qga3ZtX3ZjcHUgKnZjcHUsCi0JCQkgICAgc3RydWN0IHN5c19yZWdfcGFyYW1zICpwLAotCQkJ
-ICAgIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkKQorc3RhdGljIGJvb2wgdHJhcF9idnIo
-c3RydWN0IGt2bV92Y3B1ICp2Y3B1LAorCQkgICAgIHN0cnVjdCBzeXNfcmVnX3BhcmFtcyAqcCwK
-KwkJICAgICBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCkKIHsKIAl1NjQgKmRiZ19yZWcg
-PSAmdmNwdS0+YXJjaC52Y3B1X2RlYnVnX3N0YXRlLmRiZ19idnJbcmQtPnJlZ107CiAKQEAgLTI4
-MCwxNSArMjgwLDE1IEBAIHN0YXRpYyBpbnQgZ2V0X2J2cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUs
-IGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkLAogCXJldHVybiAwOwogfQogCi1zdGF0aWMg
-aW5saW5lIHZvaWQgcmVzZXRfYnZyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKLQkJCSAgICAgY29u
-c3Qgc3RydWN0IHN5c19yZWdfZGVzYyAqcmQpCitzdGF0aWMgdm9pZCByZXNldF9idnIoc3RydWN0
-IGt2bV92Y3B1ICp2Y3B1LAorCQkgICAgICBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCkK
-IHsKIAl2Y3B1LT5hcmNoLnZjcHVfZGVidWdfc3RhdGUuZGJnX2J2cltyZC0+cmVnXSA9IHJkLT52
-YWw7CiB9CiAKLXN0YXRpYyBpbmxpbmUgYm9vbCB0cmFwX2JjcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
-cHUsCi0JCQkgICAgc3RydWN0IHN5c19yZWdfcGFyYW1zICpwLAotCQkJICAgIGNvbnN0IHN0cnVj
-dCBzeXNfcmVnX2Rlc2MgKnJkKQorc3RhdGljIGJvb2wgdHJhcF9iY3Ioc3RydWN0IGt2bV92Y3B1
-ICp2Y3B1LAorCQkgICAgIHN0cnVjdCBzeXNfcmVnX3BhcmFtcyAqcCwKKwkJICAgICBjb25zdCBz
-dHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCkKIHsKIAl1NjQgKmRiZ19yZWcgPSAmdmNwdS0+YXJjaC52
-Y3B1X2RlYnVnX3N0YXRlLmRiZ19iY3JbcmQtPnJlZ107CiAKQEAgLTMyMywxNSArMzIzLDE1IEBA
-IHN0YXRpYyBpbnQgZ2V0X2JjcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNvbnN0IHN0cnVjdCBz
-eXNfcmVnX2Rlc2MgKnJkLAogCXJldHVybiAwOwogfQogCi1zdGF0aWMgaW5saW5lIHZvaWQgcmVz
-ZXRfYmNyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKLQkJCSAgICAgY29uc3Qgc3RydWN0IHN5c19y
-ZWdfZGVzYyAqcmQpCitzdGF0aWMgdm9pZCByZXNldF9iY3Ioc3RydWN0IGt2bV92Y3B1ICp2Y3B1
-LAorCQkgICAgICBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCkKIHsKIAl2Y3B1LT5hcmNo
-LnZjcHVfZGVidWdfc3RhdGUuZGJnX2JjcltyZC0+cmVnXSA9IHJkLT52YWw7CiB9CiAKLXN0YXRp
-YyBpbmxpbmUgYm9vbCB0cmFwX3d2cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCi0JCQkgICAgc3Ry
-dWN0IHN5c19yZWdfcGFyYW1zICpwLAotCQkJICAgIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2Mg
-KnJkKQorc3RhdGljIGJvb2wgdHJhcF93dnIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAorCQkgICAg
-IHN0cnVjdCBzeXNfcmVnX3BhcmFtcyAqcCwKKwkJICAgICBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19k
-ZXNjICpyZCkKIHsKIAl1NjQgKmRiZ19yZWcgPSAmdmNwdS0+YXJjaC52Y3B1X2RlYnVnX3N0YXRl
-LmRiZ193dnJbcmQtPnJlZ107CiAKQEAgLTM2NiwxNSArMzY2LDE1IEBAIHN0YXRpYyBpbnQgZ2V0
-X3d2cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJk
-LAogCXJldHVybiAwOwogfQogCi1zdGF0aWMgaW5saW5lIHZvaWQgcmVzZXRfd3ZyKHN0cnVjdCBr
-dm1fdmNwdSAqdmNwdSwKLQkJCSAgICAgY29uc3Qgc3RydWN0IHN5c19yZWdfZGVzYyAqcmQpCitz
-dGF0aWMgdm9pZCByZXNldF93dnIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAorCQkgICAgICBjb25z
-dCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCkKIHsKIAl2Y3B1LT5hcmNoLnZjcHVfZGVidWdfc3Rh
-dGUuZGJnX3d2cltyZC0+cmVnXSA9IHJkLT52YWw7CiB9CiAKLXN0YXRpYyBpbmxpbmUgYm9vbCB0
-cmFwX3djcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCi0JCQkgICAgc3RydWN0IHN5c19yZWdfcGFy
-YW1zICpwLAotCQkJICAgIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkKQorc3RhdGljIGJv
-b2wgdHJhcF93Y3Ioc3RydWN0IGt2bV92Y3B1ICp2Y3B1LAorCQkgICAgIHN0cnVjdCBzeXNfcmVn
-X3BhcmFtcyAqcCwKKwkJICAgICBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCkKIHsKIAl1
-NjQgKmRiZ19yZWcgPSAmdmNwdS0+YXJjaC52Y3B1X2RlYnVnX3N0YXRlLmRiZ193Y3JbcmQtPnJl
-Z107CiAKQEAgLTQwOCw4ICs0MDgsOCBAQCBzdGF0aWMgaW50IGdldF93Y3Ioc3RydWN0IGt2bV92
-Y3B1ICp2Y3B1LCBjb25zdCBzdHJ1Y3Qgc3lzX3JlZ19kZXNjICpyZCwKIAlyZXR1cm4gMDsKIH0K
-IAotc3RhdGljIGlubGluZSB2b2lkIHJlc2V0X3djcihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCi0J
-CQkgICAgIGNvbnN0IHN0cnVjdCBzeXNfcmVnX2Rlc2MgKnJkKQorc3RhdGljIHZvaWQgcmVzZXRf
-d2NyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKKwkJICAgICAgY29uc3Qgc3RydWN0IHN5c19yZWdf
-ZGVzYyAqcmQpCiB7CiAJdmNwdS0+YXJjaC52Y3B1X2RlYnVnX3N0YXRlLmRiZ193Y3JbcmQtPnJl
-Z10gPSByZC0+dmFsOwogfQpAQCAtNzIzLDkgKzcyMyw5IEBAIHN0YXRpYyBib29sIHRyYXBfZGVi
-dWczMihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCiAgKiBzeXN0ZW0gaXMgaW4uCiAgKi8KIAotc3Rh
-dGljIGlubGluZSBib29sIHRyYXBfeHZyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKLQkJCSAgICBz
-dHJ1Y3Qgc3lzX3JlZ19wYXJhbXMgKnAsCi0JCQkgICAgY29uc3Qgc3RydWN0IHN5c19yZWdfZGVz
-YyAqcmQpCitzdGF0aWMgYm9vbCB0cmFwX3h2cihzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCisJCSAg
-ICAgc3RydWN0IHN5c19yZWdfcGFyYW1zICpwLAorCQkgICAgIGNvbnN0IHN0cnVjdCBzeXNfcmVn
-X2Rlc2MgKnJkKQogewogCXU2NCAqZGJnX3JlZyA9ICZ2Y3B1LT5hcmNoLnZjcHVfZGVidWdfc3Rh
-dGUuZGJnX2J2cltyZC0+cmVnXTsKIAotLSAKMi4xLjQKCl9fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3Rz
-LmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xp
-c3RpbmZvL2t2bWFybQo=
+As we've now switched to the new world switch implementation,
+remove the weak attributes, as nobody is supposed to override
+it anymore.
+
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/kvm/hyp/debug-sr.c   |  5 ++---
+ arch/arm64/kvm/hyp/hyp-entry.S  |  3 ---
+ arch/arm64/kvm/hyp/switch.c     |  5 ++---
+ arch/arm64/kvm/hyp/tlb.c        | 16 +++++++---------
+ arch/arm64/kvm/hyp/vgic-v3-sr.c |  5 ++---
+ 5 files changed, 13 insertions(+), 21 deletions(-)
+
+diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+index 567a0d6..c9c1e97 100644
+--- a/arch/arm64/kvm/hyp/debug-sr.c
++++ b/arch/arm64/kvm/hyp/debug-sr.c
+@@ -132,10 +132,9 @@ void __hyp_text __debug_cond_restore_host_state(struct kvm_vcpu *vcpu)
+ 		vcpu->arch.debug_flags &= ~KVM_ARM64_DEBUG_DIRTY;
+ }
+ 
+-u32 __hyp_text __debug_read_mdcr_el2(void)
++static u32 __hyp_text __debug_read_mdcr_el2(void)
+ {
+ 	return read_sysreg(mdcr_el2);
+ }
+ 
+-__alias(__debug_read_mdcr_el2)
+-u32 __weak __kvm_get_mdcr_el2(void);
++__alias(__debug_read_mdcr_el2) u32 __kvm_get_mdcr_el2(void);
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index 10d6d2a..93e8d983 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -189,9 +189,7 @@ ENDPROC(\label)
+ 
+ 	.align 11
+ 
+-	.weak	__kvm_hyp_vector
+ ENTRY(__kvm_hyp_vector)
+-ENTRY(__hyp_vector)
+ 	ventry	el2t_sync_invalid		// Synchronous EL2t
+ 	ventry	el2t_irq_invalid		// IRQ EL2t
+ 	ventry	el2t_fiq_invalid		// FIQ EL2t
+@@ -211,5 +209,4 @@ ENTRY(__hyp_vector)
+ 	ventry	el1_irq				// IRQ 32-bit EL1
+ 	ventry	el1_fiq_invalid			// FIQ 32-bit EL1
+ 	ventry	el1_error_invalid		// Error 32-bit EL1
+-ENDPROC(__hyp_vector)
+ ENDPROC(__kvm_hyp_vector)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 7457ae4..ca8f5a5 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -85,7 +85,7 @@ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
+ 	__vgic_call_restore_state()(vcpu);
+ }
+ 
+-int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
++static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *host_ctxt;
+ 	struct kvm_cpu_context *guest_ctxt;
+@@ -142,8 +142,7 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ 	return exit_code;
+ }
+ 
+-__alias(__guest_run)
+-int __weak __kvm_vcpu_run(struct kvm_vcpu *vcpu);
++__alias(__guest_run) int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+ 
+ static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
+ 
+diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+index 5f815cf..2a7e0d8 100644
+--- a/arch/arm64/kvm/hyp/tlb.c
++++ b/arch/arm64/kvm/hyp/tlb.c
+@@ -17,7 +17,7 @@
+ 
+ #include "hyp.h"
+ 
+-void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
++static void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+ {
+ 	dsb(ishst);
+ 
+@@ -48,10 +48,10 @@ void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+ 	write_sysreg(0, vttbr_el2);
+ }
+ 
+-__alias(__tlb_flush_vmid_ipa)
+-void __weak __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
++__alias(__tlb_flush_vmid_ipa) void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm,
++							    phys_addr_t ipa);
+ 
+-void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
++static void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
+ {
+ 	dsb(ishst);
+ 
+@@ -67,10 +67,9 @@ void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
+ 	write_sysreg(0, vttbr_el2);
+ }
+ 
+-__alias(__tlb_flush_vmid)
+-void __weak __kvm_tlb_flush_vmid(struct kvm *kvm);
++__alias(__tlb_flush_vmid) void __kvm_tlb_flush_vmid(struct kvm *kvm);
+ 
+-void __hyp_text __tlb_flush_vm_context(void)
++static void __hyp_text __tlb_flush_vm_context(void)
+ {
+ 	dsb(ishst);
+ 	asm volatile("tlbi alle1is	\n"
+@@ -78,5 +77,4 @@ void __hyp_text __tlb_flush_vm_context(void)
+ 	dsb(ish);
+ }
+ 
+-__alias(__tlb_flush_vm_context)
+-void __weak __kvm_flush_vm_context(void);
++__alias(__tlb_flush_vm_context) void __kvm_flush_vm_context(void);
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index a769458..9142e08 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -220,10 +220,9 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
+-u64 __hyp_text __vgic_v3_read_ich_vtr_el2(void)
++static u64 __hyp_text __vgic_v3_read_ich_vtr_el2(void)
+ {
+ 	return read_gicreg(ICH_VTR_EL2);
+ }
+ 
+-__alias(__vgic_v3_read_ich_vtr_el2)
+-u64 __weak __vgic_v3_get_ich_vtr_el2(void);
++__alias(__vgic_v3_read_ich_vtr_el2) u64 __vgic_v3_get_ich_vtr_el2(void);
+-- 
+2.1.4
