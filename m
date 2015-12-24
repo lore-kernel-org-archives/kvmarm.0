@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 18/31] arm64: KVM: Add panic handling
-Date: Thu, 24 Dec 2015 11:12:26 +0000
-Message-ID: <1450955559-15639-19-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 19/31] arm64: KVM: Add compatibility aliases
+Date: Thu, 24 Dec 2015 11:12:27 +0000
+Message-ID: <1450955559-15639-20-git-send-email-marc.zyngier@arm.com>
 References: <1450955559-15639-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1450955559-15639-1-git-send-email-marc.zyngier@arm.com>
@@ -10,89 +10,114 @@ To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Christoffer Dall <christoffer.dall@linaro.org>, Gleb Natapov <gleb@kernel.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Amit Singh Tomar <amittomer25@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>, David Binderman <dcb314@hotmail.com>, Fengguang Wu <fengguang.wu@intel.com>, Jisheng Zhang <jszhang@marvell.com>, Mark Rutland <mark.rutland@arm.com>, Pavel Fedin <p.fedin@samsung.com>, Vladimir Murzin <vladimir.murzin@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add the panic handler, together with the small bits of assembly
-code to call the kernel's panic implementation.
+So far, we've implemented the new world switch with a completely
+different namespace, so that we could have both implementation
+compiled in.
+
+Let's take things one step further by adding weak aliases that
+have the same names as the original implementation. The weak
+attributes allows the new implementation to be overriden by the
+old one, and everything still work.
+
+At a later point, we'll be able to simply drop the old code, and
+everything will hopefully keep working, thanks to the aliases we
+have just added. This also saves us repainting all the callers.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp/hyp-entry.S | 11 ++++++++++-
- arch/arm64/kvm/hyp/hyp.h       |  1 +
- arch/arm64/kvm/hyp/switch.c    | 30 ++++++++++++++++++++++++++++++
- 3 files changed, 41 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/debug-sr.c   | 3 +++
+ arch/arm64/kvm/hyp/hyp-entry.S  | 3 +++
+ arch/arm64/kvm/hyp/switch.c     | 3 +++
+ arch/arm64/kvm/hyp/tlb.c        | 9 +++++++++
+ arch/arm64/kvm/hyp/vgic-v3-sr.c | 3 +++
+ 5 files changed, 21 insertions(+)
 
+diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
+index 7848322..d071f45 100644
+--- a/arch/arm64/kvm/hyp/debug-sr.c
++++ b/arch/arm64/kvm/hyp/debug-sr.c
+@@ -135,3 +135,6 @@ u32 __hyp_text __debug_read_mdcr_el2(void)
+ {
+ 	return read_sysreg(mdcr_el2);
+ }
++
++__alias(__debug_read_mdcr_el2)
++u32 __weak __kvm_get_mdcr_el2(void);
 diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 818731a..8e58a3b 100644
+index 8e58a3b..10d6d2a 100644
 --- a/arch/arm64/kvm/hyp/hyp-entry.S
 +++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -155,7 +155,16 @@ el1_irq:
- 	mov	x1, #ARM_EXCEPTION_IRQ
- 	b	__guest_exit
+@@ -189,6 +189,8 @@ ENDPROC(\label)
  
--.macro invalid_vector	label, target = __kvm_hyp_panic
-+ENTRY(__hyp_do_panic)
-+	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
-+		      PSR_MODE_EL1h)
-+	msr	spsr_el2, lr
-+	ldr	lr, =panic
-+	msr	elr_el2, lr
-+	eret
-+ENDPROC(__hyp_do_panic)
-+
-+.macro invalid_vector	label, target = __hyp_panic
- 	.align	2
- \label:
- 	b \target
-diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-index 70d4f69..fb27517 100644
---- a/arch/arm64/kvm/hyp/hyp.h
-+++ b/arch/arm64/kvm/hyp/hyp.h
-@@ -84,6 +84,7 @@ static inline bool __fpsimd_enabled(void)
- }
+ 	.align 11
  
- u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
-+void __noreturn __hyp_do_panic(unsigned long, ...);
- 
- #endif /* __ARM64_KVM_HYP_H__ */
- 
++	.weak	__kvm_hyp_vector
++ENTRY(__kvm_hyp_vector)
+ ENTRY(__hyp_vector)
+ 	ventry	el2t_sync_invalid		// Synchronous EL2t
+ 	ventry	el2t_irq_invalid		// IRQ EL2t
+@@ -210,3 +212,4 @@ ENTRY(__hyp_vector)
+ 	ventry	el1_fiq_invalid			// FIQ 32-bit EL1
+ 	ventry	el1_error_invalid		// Error 32-bit EL1
+ ENDPROC(__hyp_vector)
++ENDPROC(__kvm_hyp_vector)
 diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 608155f..b012870 100644
+index b012870..7457ae4 100644
 --- a/arch/arm64/kvm/hyp/switch.c
 +++ b/arch/arm64/kvm/hyp/switch.c
-@@ -141,3 +141,33 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
- 
+@@ -142,6 +142,9 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
  	return exit_code;
  }
+ 
++__alias(__guest_run)
++int __weak __kvm_vcpu_run(struct kvm_vcpu *vcpu);
 +
-+static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
+ static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
+ 
+ void __hyp_text __noreturn __hyp_panic(void)
+diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
+index 6fcb93a..5f815cf 100644
+--- a/arch/arm64/kvm/hyp/tlb.c
++++ b/arch/arm64/kvm/hyp/tlb.c
+@@ -48,6 +48,9 @@ void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+ 	write_sysreg(0, vttbr_el2);
+ }
+ 
++__alias(__tlb_flush_vmid_ipa)
++void __weak __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
 +
-+void __hyp_text __noreturn __hyp_panic(void)
-+{
-+	unsigned long str_va = (unsigned long)__hyp_panic_string;
-+	u64 spsr = read_sysreg(spsr_el2);
-+	u64 elr = read_sysreg(elr_el2);
-+	u64 par = read_sysreg(par_el1);
+ void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
+ {
+ 	dsb(ishst);
+@@ -64,6 +67,9 @@ void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
+ 	write_sysreg(0, vttbr_el2);
+ }
+ 
++__alias(__tlb_flush_vmid)
++void __weak __kvm_tlb_flush_vmid(struct kvm *kvm);
 +
-+	if (read_sysreg(vttbr_el2)) {
-+		struct kvm_vcpu *vcpu;
-+		struct kvm_cpu_context *host_ctxt;
+ void __hyp_text __tlb_flush_vm_context(void)
+ {
+ 	dsb(ishst);
+@@ -71,3 +77,6 @@ void __hyp_text __tlb_flush_vm_context(void)
+ 		     "ic ialluis	  ": : );
+ 	dsb(ish);
+ }
 +
-+		vcpu = (struct kvm_vcpu *)read_sysreg(tpidr_el2);
-+		host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+		__deactivate_traps(vcpu);
-+		__deactivate_vm(vcpu);
-+		__sysreg_restore_state(host_ctxt);
-+	}
++__alias(__tlb_flush_vm_context)
++void __weak __kvm_flush_vm_context(void);
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index 78d05f3..a769458 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -224,3 +224,6 @@ u64 __hyp_text __vgic_v3_read_ich_vtr_el2(void)
+ {
+ 	return read_gicreg(ICH_VTR_EL2);
+ }
 +
-+	/* Call panic for real */
-+	__hyp_do_panic(hyp_kern_va(str_va),
-+		       spsr,  elr,
-+		       read_sysreg(esr_el2),   read_sysreg(far_el2),
-+		       read_sysreg(hpfar_el2), par,
-+		       (void *)read_sysreg(tpidr_el2));
-+
-+	unreachable();
-+}
++__alias(__vgic_v3_read_ich_vtr_el2)
++u64 __weak __vgic_v3_get_ich_vtr_el2(void);
 -- 
 2.1.4
 
