@@ -1,113 +1,54 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 15/31] arm64: KVM: Implement fpsimd save/restore
-Date: Thu, 24 Dec 2015 11:12:23 +0000
-Message-ID: <1450955559-15639-16-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 16/31] arm64: KVM: Implement TLB handling
+Date: Thu, 24 Dec 2015 11:12:24 +0000
+Message-ID: <1450955559-15639-17-git-send-email-marc.zyngier@arm.com>
 References: <1450955559-15639-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E1AAB409A2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Dec 2015 06:11:43 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gmf6F9R-YMs3 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Dec 2015 06:11:42 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CF09E40FA2
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Dec 2015 06:11:41 -0500 (EST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1450955559-15639-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Jisheng Zhang <jszhang@marvell.com>, kvm@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org, David Binderman <dcb314@hotmail.com>, Fengguang Wu <fengguang.wu@intel.com>, kvmarm@lists.cs.columbia.edu
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Gleb Natapov <gleb@kernel.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Amit Singh Tomar <amittomer25@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>, David Binderman <dcb314@hotmail.com>, Fengguang Wu <fengguang.wu@intel.com>, Jisheng Zhang <jszhang@marvell.com>, Mark Rutland <mark.rutland@arm.com>, Pavel Fedin <p.fedin@samsung.com>, Vladimir Murzin <vladimir.murzin@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Implement the fpsimd save restore, keeping the lazy part in
-assembler (as returning to C would be overkill).
+Implement the TLB handling as a direct translation of the assembly
+code version.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp/Makefile    |  1 +
- arch/arm64/kvm/hyp/entry.S     | 32 +++++++++++++++++++++++++++++++-
- arch/arm64/kvm/hyp/fpsimd.S    | 33 +++++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/hyp.h       |  7 +++++++
- arch/arm64/kvm/hyp/switch.c    |  8 ++++++++
- arch/arm64/kvm/hyp/sysreg-sr.c |  2 +-
- 6 files changed, 81 insertions(+), 2 deletions(-)
- create mode 100644 arch/arm64/kvm/hyp/fpsimd.S
+ arch/arm64/kvm/hyp/Makefile |  1 +
+ arch/arm64/kvm/hyp/entry.S  |  1 +
+ arch/arm64/kvm/hyp/tlb.c    | 73 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 75 insertions(+)
+ create mode 100644 arch/arm64/kvm/hyp/tlb.c
 
 diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-index 9c11b0f..56238d0 100644
+index 56238d0..1a529f5 100644
 --- a/arch/arm64/kvm/hyp/Makefile
 +++ b/arch/arm64/kvm/hyp/Makefile
-@@ -9,3 +9,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += sysreg-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
+@@ -10,3 +10,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += debug-sr.o
  obj-$(CONFIG_KVM_ARM_HOST) += entry.o
  obj-$(CONFIG_KVM_ARM_HOST) += switch.o
-+obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
+ obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
++obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
 diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index ff19695..90cbf0f 100644
+index 90cbf0f..1050b2b 100644
 --- a/arch/arm64/kvm/hyp/entry.S
 +++ b/arch/arm64/kvm/hyp/entry.S
-@@ -27,6 +27,7 @@
+@@ -147,6 +147,7 @@ ENTRY(__fpsimd_guest_restore)
+ 	add	x0, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
+ 	bl	__fpsimd_restore_state
  
- #define CPU_GP_REG_OFFSET(x)	(CPU_GP_REGS + x)
- #define CPU_XREG_OFFSET(x)	CPU_GP_REG_OFFSET(CPU_USER_PT_REGS + 8*x)
-+#define CPU_SYSREG_OFFSET(x)	(CPU_SYSREGS + 8*x)
- 
- 	.text
- 	.pushsection	.hyp.text, "ax"
-@@ -127,4 +128,33 @@ ENTRY(__guest_exit)
- 	ret
- ENDPROC(__guest_exit)
- 
--	/* Insert fault handling here */
-+ENTRY(__fpsimd_guest_restore)
-+	stp	x4, lr, [sp, #-16]!
-+
-+	mrs	x2, cptr_el2
-+	bic	x2, x2, #CPTR_EL2_TFP
-+	msr	cptr_el2, x2
-+	isb
-+
-+	mrs	x3, tpidr_el2
-+
-+	ldr	x0, [x3, #VCPU_HOST_CONTEXT]
-+	kern_hyp_va x0
-+	add	x0, x0, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
-+	bl	__fpsimd_save_state
-+
-+	add	x2, x3, #VCPU_CONTEXT
-+	add	x0, x2, #CPU_GP_REG_OFFSET(CPU_FP_REGS)
-+	bl	__fpsimd_restore_state
-+
-+	mrs	x1, hcr_el2
-+	tbnz	x1, #HCR_RW_SHIFT, 1f
-+	ldr	x4, [x2, #CPU_SYSREG_OFFSET(FPEXC32_EL2)]
-+	msr	fpexc32_el2, x4
-+1:
-+	ldp	x4, lr, [sp], #16
-+	ldp	x2, x3, [sp], #16
-+	ldp	x0, x1, [sp], #16
-+
-+	eret
-+ENDPROC(__fpsimd_guest_restore)
-diff --git a/arch/arm64/kvm/hyp/fpsimd.S b/arch/arm64/kvm/hyp/fpsimd.S
++	// Skip restoring fpexc32 for AArch64 guests
+ 	mrs	x1, hcr_el2
+ 	tbnz	x1, #HCR_RW_SHIFT, 1f
+ 	ldr	x4, [x2, #CPU_SYSREG_OFFSET(FPEXC32_EL2)]
+diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
 new file mode 100644
-index 0000000..da3f22c
+index 0000000..6fcb93a
 --- /dev/null
-+++ b/arch/arm64/kvm/hyp/fpsimd.S
-@@ -0,0 +1,33 @@
++++ b/arch/arm64/kvm/hyp/tlb.c
+@@ -0,0 +1,73 @@
 +/*
 + * Copyright (C) 2015 - ARM Ltd
 + * Author: Marc Zyngier <marc.zyngier@arm.com>
@@ -125,85 +66,62 @@ index 0000000..da3f22c
 + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#include <linux/linkage.h>
++#include "hyp.h"
 +
-+#include <asm/fpsimdmacros.h>
-+
-+	.text
-+	.pushsection	.hyp.text, "ax"
-+
-+ENTRY(__fpsimd_save_state)
-+	fpsimd_save	x0, 1
-+	ret
-+ENDPROC(__fpsimd_save_state)
-+
-+ENTRY(__fpsimd_restore_state)
-+	fpsimd_restore	x0, 1
-+	ret
-+ENDPROC(__fpsimd_restore_state)
-diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-index 73419a7..70d4f69 100644
---- a/arch/arm64/kvm/hyp/hyp.h
-+++ b/arch/arm64/kvm/hyp/hyp.h
-@@ -76,6 +76,13 @@ void __debug_restore_state(struct kvm_vcpu *vcpu,
- void __debug_cond_save_host_state(struct kvm_vcpu *vcpu);
- void __debug_cond_restore_host_state(struct kvm_vcpu *vcpu);
- 
-+void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
-+void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
-+static inline bool __fpsimd_enabled(void)
++void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
 +{
-+	return !(read_sysreg(cptr_el2) & CPTR_EL2_TFP);
++	dsb(ishst);
++
++	/* Switch to requested VMID */
++	kvm = kern_hyp_va(kvm);
++	write_sysreg(kvm->arch.vttbr, vttbr_el2);
++	isb();
++
++	/*
++	 * We could do so much better if we had the VA as well.
++	 * Instead, we invalidate Stage-2 for this IPA, and the
++	 * whole of Stage-1. Weep...
++	 */
++	ipa >>= 12;
++	asm volatile("tlbi ipas2e1is, %0" : : "r" (ipa));
++
++	/*
++	 * We have to ensure completion of the invalidation at Stage-2,
++	 * since a table walk on another CPU could refill a TLB with a
++	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
++	 * the Stage-1 invalidation happened first.
++	 */
++	dsb(ish);
++	asm volatile("tlbi vmalle1is" : : );
++	dsb(ish);
++	isb();
++
++	write_sysreg(0, vttbr_el2);
 +}
 +
- u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
- 
- #endif /* __ARM64_KVM_HYP_H__ */
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 79f59c9..608155f 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -89,6 +89,7 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpu_context *host_ctxt;
- 	struct kvm_cpu_context *guest_ctxt;
-+	bool fp_enabled;
- 	u64 exit_code;
- 
- 	vcpu = kern_hyp_va(vcpu);
-@@ -118,6 +119,8 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
- 	exit_code = __guest_enter(vcpu, host_ctxt);
- 	/* And we're baaack! */
- 
-+	fp_enabled = __fpsimd_enabled();
++void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
++{
++	dsb(ishst);
 +
- 	__sysreg_save_state(guest_ctxt);
- 	__sysreg32_save_state(vcpu);
- 	__timer_save_state(vcpu);
-@@ -128,6 +131,11 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
- 
- 	__sysreg_restore_state(host_ctxt);
- 
-+	if (fp_enabled) {
-+		__fpsimd_save_state(&guest_ctxt->gp_regs.fp_regs);
-+		__fpsimd_restore_state(&host_ctxt->gp_regs.fp_regs);
-+	}
++	/* Switch to requested VMID */
++	kvm = kern_hyp_va(kvm);
++	write_sysreg(kvm->arch.vttbr, vttbr_el2);
++	isb();
 +
- 	__debug_save_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
- 	__debug_cond_restore_host_state(vcpu);
- 
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index eb05afb..3603541 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -107,7 +107,7 @@ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
- 	sysreg[DACR32_EL2] = read_sysreg(dacr32_el2);
- 	sysreg[IFSR32_EL2] = read_sysreg(ifsr32_el2);
- 
--	if (!(read_sysreg(cptr_el2) & CPTR_EL2_TFP))
-+	if (__fpsimd_enabled())
- 		sysreg[FPEXC32_EL2] = read_sysreg(fpexc32_el2);
- 
- 	if (vcpu->arch.debug_flags & KVM_ARM64_DEBUG_DIRTY)
++	asm volatile("tlbi vmalls12e1is" : : );
++	dsb(ish);
++	isb();
++
++	write_sysreg(0, vttbr_el2);
++}
++
++void __hyp_text __tlb_flush_vm_context(void)
++{
++	dsb(ishst);
++	asm volatile("tlbi alle1is	\n"
++		     "ic ialluis	  ": : );
++	dsb(ish);
++}
 -- 
 2.1.4
+
