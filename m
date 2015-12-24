@@ -1,7 +1,7 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 19/31] arm64: KVM: Add compatibility aliases
-Date: Thu, 24 Dec 2015 11:12:27 +0000
-Message-ID: <1450955559-15639-20-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 20/31] arm64: KVM: Map the kernel RO section into HYP
+Date: Thu, 24 Dec 2015 11:12:28 +0000
+Message-ID: <1450955559-15639-21-git-send-email-marc.zyngier@arm.com>
 References: <1450955559-15639-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1450955559-15639-1-git-send-email-marc.zyngier@arm.com>
@@ -10,114 +10,40 @@ To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Christoffer Dall <christoffer.dall@linaro.org>, Gleb Natapov <gleb@kernel.org>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Amit Singh Tomar <amittomer25@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>, David Binderman <dcb314@hotmail.com>, Fengguang Wu <fengguang.wu@intel.com>, Jisheng Zhang <jszhang@marvell.com>, Mark Rutland <mark.rutland@arm.com>, Pavel Fedin <p.fedin@samsung.com>, Vladimir Murzin <vladimir.murzin@arm.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-So far, we've implemented the new world switch with a completely
-different namespace, so that we could have both implementation
-compiled in.
-
-Let's take things one step further by adding weak aliases that
-have the same names as the original implementation. The weak
-attributes allows the new implementation to be overriden by the
-old one, and everything still work.
-
-At a later point, we'll be able to simply drop the old code, and
-everything will hopefully keep working, thanks to the aliases we
-have just added. This also saves us repainting all the callers.
+In order to run C code in HYP, we must make sure that the kernel's
+RO section is mapped into HYP (otherwise things break badly).
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/kvm/hyp/debug-sr.c   | 3 +++
- arch/arm64/kvm/hyp/hyp-entry.S  | 3 +++
- arch/arm64/kvm/hyp/switch.c     | 3 +++
- arch/arm64/kvm/hyp/tlb.c        | 9 +++++++++
- arch/arm64/kvm/hyp/vgic-v3-sr.c | 3 +++
- 5 files changed, 21 insertions(+)
+ arch/arm/kvm/arm.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/debug-sr.c b/arch/arm64/kvm/hyp/debug-sr.c
-index 7848322..d071f45 100644
---- a/arch/arm64/kvm/hyp/debug-sr.c
-+++ b/arch/arm64/kvm/hyp/debug-sr.c
-@@ -135,3 +135,6 @@ u32 __hyp_text __debug_read_mdcr_el2(void)
- {
- 	return read_sysreg(mdcr_el2);
- }
-+
-+__alias(__debug_read_mdcr_el2)
-+u32 __weak __kvm_get_mdcr_el2(void);
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 8e58a3b..10d6d2a 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -189,6 +189,8 @@ ENDPROC(\label)
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 8a79a57..6e35d1d 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -44,6 +44,7 @@
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_coproc.h>
+ #include <asm/kvm_psci.h>
++#include <asm/sections.h>
  
- 	.align 11
+ #ifdef REQUIRES_VIRT
+ __asm__(".arch_extension	virt");
+@@ -1068,6 +1069,12 @@ static int init_hyp_mode(void)
+ 		goto out_free_mappings;
+ 	}
  
-+	.weak	__kvm_hyp_vector
-+ENTRY(__kvm_hyp_vector)
- ENTRY(__hyp_vector)
- 	ventry	el2t_sync_invalid		// Synchronous EL2t
- 	ventry	el2t_irq_invalid		// IRQ EL2t
-@@ -210,3 +212,4 @@ ENTRY(__hyp_vector)
- 	ventry	el1_fiq_invalid			// FIQ 32-bit EL1
- 	ventry	el1_error_invalid		// Error 32-bit EL1
- ENDPROC(__hyp_vector)
-+ENDPROC(__kvm_hyp_vector)
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index b012870..7457ae4 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -142,6 +142,9 @@ int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
- 	return exit_code;
- }
- 
-+__alias(__guest_run)
-+int __weak __kvm_vcpu_run(struct kvm_vcpu *vcpu);
++	err = create_hyp_mappings(__start_rodata, __end_rodata);
++	if (err) {
++		kvm_err("Cannot map rodata section\n");
++		goto out_free_mappings;
++	}
 +
- static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
- 
- void __hyp_text __noreturn __hyp_panic(void)
-diff --git a/arch/arm64/kvm/hyp/tlb.c b/arch/arm64/kvm/hyp/tlb.c
-index 6fcb93a..5f815cf 100644
---- a/arch/arm64/kvm/hyp/tlb.c
-+++ b/arch/arm64/kvm/hyp/tlb.c
-@@ -48,6 +48,9 @@ void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- 	write_sysreg(0, vttbr_el2);
- }
- 
-+__alias(__tlb_flush_vmid_ipa)
-+void __weak __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
-+
- void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
- {
- 	dsb(ishst);
-@@ -64,6 +67,9 @@ void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
- 	write_sysreg(0, vttbr_el2);
- }
- 
-+__alias(__tlb_flush_vmid)
-+void __weak __kvm_tlb_flush_vmid(struct kvm *kvm);
-+
- void __hyp_text __tlb_flush_vm_context(void)
- {
- 	dsb(ishst);
-@@ -71,3 +77,6 @@ void __hyp_text __tlb_flush_vm_context(void)
- 		     "ic ialluis	  ": : );
- 	dsb(ish);
- }
-+
-+__alias(__tlb_flush_vm_context)
-+void __weak __kvm_flush_vm_context(void);
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 78d05f3..a769458 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -224,3 +224,6 @@ u64 __hyp_text __vgic_v3_read_ich_vtr_el2(void)
- {
- 	return read_gicreg(ICH_VTR_EL2);
- }
-+
-+__alias(__vgic_v3_read_ich_vtr_el2)
-+u64 __weak __vgic_v3_get_ich_vtr_el2(void);
+ 	/*
+ 	 * Map the Hyp stack pages
+ 	 */
 -- 
 2.1.4
 
