@@ -1,27 +1,21 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: kvmarm tags kvm-arm-for-4.2, 4.3, and v4.4-rc6 does not boot on
- Mustang
-Date: Mon, 4 Jan 2016 15:31:56 +0100
-Message-ID: <20160104143156.GB6731@hawk.localdomain>
-References: <567918E6.8020001@riken.jp> <20151222144135.GB5631@cbox>
- <567D1F65.5040008@riken.jp> <20151227143303.GA8044@cbox>
- <5680671D.5070408@riken.jp>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH 0/2] arm: configs: improve KVM support
+Date: Mon,  4 Jan 2016 14:50:32 +0000
+Message-ID: <1451919034-12846-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A837497F4
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2016 09:28:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D174498D0
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2016 09:47:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wIOPPrVfSN4p for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Jan 2016 09:28:29 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 821E2497BD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2016 09:28:29 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <5680671D.5070408@riken.jp>
+ with ESMTP id Qprj56yWaFyJ for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Jan 2016 09:47:29 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 36A6F497BD
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2016 09:47:28 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,46 +25,50 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Itaru Kitayama <itaru.kitayama@riken.jp>
-Cc: kvmarm@lists.cs.columbia.edu
+To: Russell King <linux@arm.linux.org.uk>, arnd@arndb.de
+Cc: alison.wang@freescale.com, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Dec 28, 2015 at 07:33:01AM +0900, Itaru Kitayama wrote:
-> Does your Mustang boot via UEFI? Mine does. Mainline v4.4-rc6ish
-> seems to have an issue with libstub.
+Hi,
 
-FWIW, 4.4.0-0.rc6.git1.1.fc24.aarch64 boots fine for me (with f23 userspace)
-My firmware is a pretty old build though
+there doesn't seem to be a good generic defconfig which includes
+KVM support, so this config tends to get less testing.
+This mini-series addresses this with a two-fold approach:
 
-TianoCore 1.1.0 UEFI 2.4.0 Apr 22 2015 11:30:25
-CPU: APM ARM 64-bit Potenza Rev A3 2400MHz PCP 2400MHz
-     32 KB ICACHE, 32 KB DCACHE
-     SOC 2000MHz IOBAXI 400MHz AXI 250MHz AHB 200MHz GFC 125MHz
-Board: X-Gene Mustang Board
-Slimpro FW:
-        Ver: 2.1
+Patch 1/2 introduces VIRTIO drivers to the existing multi_v7_defconfig,
+so those kernels can be easily used as guest kernels in KVM.
+This goes with the arm64 defconfig, which has those drivers compiled
+in as well.
 
-Thanks,
-drew
+Patch 2/2 adds a new kvm_defconfig, which includes LPAE and KVM host
+capability on top of the said multi_v7_defconfig. This should help to
+find compatibility issues with LPAE configs on the way.
+I didn't bother to deselect platforms that are not LPAE capable, as:
+a) some platforms may include LPAE capable cores in the future
+b) compile testing drivers is part of this exercise.
+I guess with LPAE capable machines adding some KBytes to the
+kernel image is not really an issue, so let's just keep those
+platforms in. Also that makes the diff to multi_v7_defconfig pretty
+small.
 
-> 
-> On 12/27/15 11:33 PM, Christoffer Dall wrote:
-> >On Fri, Dec 25, 2015 at 07:50:13PM +0900, Itaru Kitayama wrote:
-> >>Hi Christoffer,
-> >>After some investigations, it seems newer kernels does not boot on the
-> >>Mustang board which I have access (in the Linaro Server Lab).
-> >>
-> >>I am using the Fedora 23 userland, 4.2.x Fedora kernels do boot, but
-> >>4.4.x Fedora kernels do not (they are downloaded from the Koji site or
-> >>own-built ones using fedpkg). I am not sure at this moment, the F/W
-> >>is too old or not.
-> >>
-> >I don't know anything about distro kernels, I only follow mainline and
-> >just booted mainline just fine on my mustang.
-> >
-> >-Christoffer
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Alison, the last patch comes pretty close to your:
+"[RFC PATCH] ARM: add v7 LPAE multi-platform defconfig" from early
+November, though with a slightly different focus. If you have a new
+version of your patch in the queue, I am happy to withdraw mine and
+rather help to get yours merged, possibly with the KVM options added.
+What is your take on this?
+
+Cheers,
+Andre.
+
+Andre Przywara (2):
+  arm: multi_v7_defconfig: Add virtio drivers
+  arm: configs: add kvm_defconfig
+
+ arch/arm/configs/{multi_v7_defconfig => kvm_defconfig} | 14 ++++++++++++++
+ arch/arm/configs/multi_v7_defconfig                    |  8 ++++++++
+ 2 files changed, 22 insertions(+)
+ copy arch/arm/configs/{multi_v7_defconfig => kvm_defconfig} (98%)
+
+-- 
+2.6.4
