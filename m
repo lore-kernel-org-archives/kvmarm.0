@@ -1,74 +1,69 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 0/2] arm: configs: improve KVM support
-Date: Mon,  4 Jan 2016 14:50:32 +0000
-Message-ID: <1451919034-12846-1-git-send-email-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D174498D0
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2016 09:47:30 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Qprj56yWaFyJ for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Jan 2016 09:47:29 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 36A6F497BD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2016 09:47:28 -0500 (EST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Subject: [PATCH 2/2] arm: configs: add kvm_defconfig
+Date: Mon,  4 Jan 2016 14:50:34 +0000
+Message-ID: <1451919034-12846-3-git-send-email-andre.przywara@arm.com>
+References: <1451919034-12846-1-git-send-email-andre.przywara@arm.com>
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <1451919034-12846-1-git-send-email-andre.przywara@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
 To: Russell King <linux@arm.linux.org.uk>, arnd@arndb.de
-Cc: alison.wang@freescale.com, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: alison.wang@freescale.com, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+This new config enables KVM (and thus LPAE) on top of
+multi_v7_defconfig. This creates a kernel that can _host_ KVM guests,
+for guests a multi_v7_defconfig with virtio drivers is sufficient.
+Since LPAE kernels are not compatible with non-LPAE capable hardware,
+this has to be separate from the existing multi_v7_defconfig.
 
-there doesn't seem to be a good generic defconfig which includes
-KVM support, so this config tends to get less testing.
-This mini-series addresses this with a two-fold approach:
+The purpose of this new defconfig is both to simplify creation of KVM
+host kernels as well as to give the LPAE option some better testing
+coverage, as the enlarged dma_addr_t and phys_addr_t types create some
+headache to some drivers.
 
-Patch 1/2 introduces VIRTIO drivers to the existing multi_v7_defconfig,
-so those kernels can be easily used as guest kernels in KVM.
-This goes with the arm64 defconfig, which has those drivers compiled
-in as well.
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ arch/arm/configs/{multi_v7_defconfig => kvm_defconfig} | 6 ++++++
+ 1 file changed, 6 insertions(+)
+ copy arch/arm/configs/{multi_v7_defconfig => kvm_defconfig} (99%)
 
-Patch 2/2 adds a new kvm_defconfig, which includes LPAE and KVM host
-capability on top of the said multi_v7_defconfig. This should help to
-find compatibility issues with LPAE configs on the way.
-I didn't bother to deselect platforms that are not LPAE capable, as:
-a) some platforms may include LPAE capable cores in the future
-b) compile testing drivers is part of this exercise.
-I guess with LPAE capable machines adding some KBytes to the
-kernel image is not really an issue, so let's just keep those
-platforms in. Also that makes the diff to multi_v7_defconfig pretty
-small.
-
-Alison, the last patch comes pretty close to your:
-"[RFC PATCH] ARM: add v7 LPAE multi-platform defconfig" from early
-November, though with a slightly different focus. If you have a new
-version of your patch in the queue, I am happy to withdraw mine and
-rather help to get yours merged, possibly with the KVM options added.
-What is your take on this?
-
-Cheers,
-Andre.
-
-Andre Przywara (2):
-  arm: multi_v7_defconfig: Add virtio drivers
-  arm: configs: add kvm_defconfig
-
- arch/arm/configs/{multi_v7_defconfig => kvm_defconfig} | 14 ++++++++++++++
- arch/arm/configs/multi_v7_defconfig                    |  8 ++++++++
- 2 files changed, 22 insertions(+)
- copy arch/arm/configs/{multi_v7_defconfig => kvm_defconfig} (98%)
-
+diff --git a/arch/arm/configs/multi_v7_defconfig b/arch/arm/configs/kvm_defconfig
+similarity index 99%
+copy from arch/arm/configs/multi_v7_defconfig
+copy to arch/arm/configs/kvm_defconfig
+index 4ee2f36..2a3d81a 100644
+--- a/arch/arm/configs/multi_v7_defconfig
++++ b/arch/arm/configs/kvm_defconfig
+@@ -24,6 +24,7 @@ CONFIG_ARCH_AT91=y
+ CONFIG_SOC_SAMA5D2=y
+ CONFIG_SOC_SAMA5D3=y
+ CONFIG_SOC_SAMA5D4=y
++CONFIG_ARCH_AXXIA=y
+ CONFIG_ARCH_BCM=y
+ CONFIG_ARCH_BCM_CYGNUS=y
+ CONFIG_ARCH_BCM_NSP=y
+@@ -105,6 +106,8 @@ CONFIG_ARCH_VEXPRESS_CA9X4=y
+ CONFIG_ARCH_VEXPRESS_TC2_PM=y
+ CONFIG_ARCH_WM8850=y
+ CONFIG_ARCH_ZYNQ=y
++CONFIG_ARM_LPAE=y
++CONFIG_TRANSPARENT_HUGEPAGE=y
+ CONFIG_TRUSTED_FOUNDATIONS=y
+ CONFIG_PCI=y
+ CONFIG_PCI_HOST_GENERIC=y
+@@ -204,6 +207,7 @@ CONFIG_SATA_MV=y
+ CONFIG_SATA_RCAR=y
+ CONFIG_NETDEVICES=y
+ CONFIG_VIRTIO_NET=y
++CONFIG_VHOST_NET=y
+ CONFIG_HIX5HD2_GMAC=y
+ CONFIG_SUN4I_EMAC=y
+ CONFIG_MACB=y
+@@ -753,3 +757,5 @@ CONFIG_VIRTIO=y
+ CONFIG_VIRTIO_PCI=y
+ CONFIG_VIRTIO_PCI_LEGACY=y
+ CONFIG_VIRTIO_MMIO=y
++CONFIG_VIRTUALIZATION=y
++CONFIG_KVM=y
 -- 
 2.6.4
