@@ -1,65 +1,148 @@
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH 2/2] arm: configs: add kvm_defconfig
-Date: Mon, 04 Jan 2016 16:15:32 +0100
-Message-ID: <4522790.HLBFMYIalT@wuerfel>
-References: <1451919034-12846-1-git-send-email-andre.przywara@arm.com>
- <1451919034-12846-3-git-send-email-andre.przywara@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v6 1/6] arm/arm64: KVM: Introduce armv7 fp/simd vcpu
+ fields and helpers
+Date: Tue, 5 Jan 2016 16:00:40 +0100
+Message-ID: <20160105150040.GF28354@cbox>
+References: <1451166900-3711-1-git-send-email-m.smarduch@samsung.com>
+ <1451166900-3711-2-git-send-email-m.smarduch@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8304F497F8
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2016 10:12:20 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SDlM2VUaN9RU for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Jan 2016 10:12:19 -0500 (EST)
-Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.75])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8CDD0497BD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Jan 2016 10:12:19 -0500 (EST)
-In-Reply-To: <1451919034-12846-3-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: linux-arm-kernel@lists.infradead.org
-Cc: Russell King <linux@arm.linux.org.uk>, alison.wang@freescale.com, marc.zyngier@arm.com, Andre Przywara <andre.przywara@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1451166900-3711-2-git-send-email-m.smarduch@samsung.com>
+Sender: kvm-owner@vger.kernel.org
+To: Mario Smarduch <m.smarduch@samsung.com>
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Monday 04 January 2016 14:50:34 Andre Przywara wrote:
-> This new config enables KVM (and thus LPAE) on top of
-> multi_v7_defconfig. This creates a kernel that can _host_ KVM guests,
-> for guests a multi_v7_defconfig with virtio drivers is sufficient.
-> Since LPAE kernels are not compatible with non-LPAE capable hardware,
-> this has to be separate from the existing multi_v7_defconfig.
+On Sat, Dec 26, 2015 at 01:54:55PM -0800, Mario Smarduch wrote:
+> Add helper functions to enable access to fp/smid on guest entry and save host
+> fpexc on vcpu put, check if fp/simd registers are dirty and add new vcpu
+> fields.
 > 
-> The purpose of this new defconfig is both to simplify creation of KVM
-> host kernels as well as to give the LPAE option some better testing
-> coverage, as the enlarged dma_addr_t and phys_addr_t types create some
-> headache to some drivers.
+> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+> ---
+>  arch/arm/include/asm/kvm_emulate.h   | 42 ++++++++++++++++++++++++++++++++++++
+>  arch/arm/include/asm/kvm_host.h      |  6 ++++++
+>  arch/arm64/include/asm/kvm_emulate.h |  8 +++++++
+>  3 files changed, 56 insertions(+)
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+> index 3095df0..d4d9da1 100644
+> --- a/arch/arm/include/asm/kvm_emulate.h
+> +++ b/arch/arm/include/asm/kvm_emulate.h
+> @@ -24,6 +24,8 @@
+>  #include <asm/kvm_mmio.h>
+>  #include <asm/kvm_arm.h>
+>  #include <asm/cputype.h>
+> +#include <asm/vfp.h>
+> +#include "../vfp/vfpinstr.h"
+
+this looks dodgy...
+
+can you move vfpinstr.h instead?
+
+>  
+>  unsigned long *vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num);
+>  unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu);
+> @@ -255,4 +257,44 @@ static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
+>  	}
+>  }
+>  
+> +#ifdef CONFIG_VFPv3
+> +/* Called from vcpu_load - save fpexc and enable guest access to fp/simd unit */
+
+the comment is misleading, you're not enabling guest access to the
+fp/simd unit, you're just setting the enabled bit to ensure guest
+accesses trap.
+
+> +static inline void vcpu_trap_vfp_enable(struct kvm_vcpu *vcpu)
+> +{
+> +	u32 fpexc;
+> +
+> +	/* Save host fpexc, and enable guest access to fp unit */
+> +	fpexc = fmrx(FPEXC);
+> +	vcpu->arch.host_fpexc = fpexc;
+> +	fpexc |= FPEXC_EN;
+> +	fmxr(FPEXC, fpexc);
+> +
+> +	/* Configure HCPTR to trap on tracing and fp/simd access */
+> +	vcpu->arch.hcptr = HCPTR_TTA | HCPTR_TCP(10)  | HCPTR_TCP(11);
+> +}
+> +
+> +/* Called from vcpu_put - restore host fpexc */
+
+I would probably get rid of the "Called from" stuff and just describe
+what these functions do locally.  Comments like this are likely to be
+out of date soon'ish.
+
+> +static inline void vcpu_restore_host_fpexc(struct kvm_vcpu *vcpu)
+> +{
+> +	fmxr(FPEXC, vcpu->arch.host_fpexc);
+> +}
+> +
+> +/* If trap bits are reset then fp/simd registers are dirty */
+> +static inline bool vcpu_vfp_isdirty(struct kvm_vcpu *vcpu)
+> +{
+> +	return !(vcpu->arch.hcptr & (HCPTR_TCP(10) | HCPTR_TCP(11)));
+> +}
+> +#else
+> +static inline void vcpu_trap_vfp_enable(struct kvm_vcpu *vcpu)
+> +{
+> +	vcpu->arch.hcptr = HCPTR_TTA;
+> +}
+> +
+> +static inline void vcpu_restore_host_fpexc(struct kvm_vcpu *vcpu) {}
+> +static inline bool vcpu_vfp_isdirty(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +#endif
+
+this kind of feels like it belongs in its own C-file instead of a header
+file, perhaps arch/arm/kvm/vfp.C.
+
+Marc, what do you think?
+
+> +
+>  #endif /* __ARM_KVM_EMULATE_H__ */
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index f9f2779..d3ef58a 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -105,6 +105,12 @@ struct kvm_vcpu_arch {
+>  	/* HYP trapping configuration */
+>  	u32 hcr;
+>  
+> +	/* HYP Co-processor fp/simd and trace trapping configuration */
+> +	u32 hcptr;
+> +
+> +	/* Save host FPEXC register to later restore on vcpu put */
+> +	u32 host_fpexc;
+> +
+>  	/* Interrupt related fields */
+>  	u32 irq_lines;		/* IRQ and FIQ levels */
+>  
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 3066328..ffe8ccf 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -299,4 +299,12 @@ static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
+>  	return data;		/* Leave LE untouched */
+>  }
+>  
+> +static inline void vcpu_trap_vfp_enable(struct kvm_vcpu *vcpu) {}
+> +static inline void vcpu_restore_host_fpexc(struct kvm_vcpu *vcpu) {}
+> +
+> +static inline bool vcpu_vfp_isdirty(struct kvm_vcpu *vcpu)
+> +{
+> +	return false;
+> +}
+> +
+>  #endif /* __ARM64_KVM_EMULATE_H__ */
+> -- 
+> 1.9.1
 > 
 
-I agree about the purpose, but I want something better here:
-
-* Use config fragments to just set the few extra options that
-  we can't enable otherwise, and have a shared config file
-  with the normal multi_v7. There is still an ongoing question
-  about big-endian defconfig, which has exactly the same problem,
-  and we should have a common approach for all combinations.
-
-  We might also want to do this in a way that lets us build
-  v6/v6k/v7/v7ve/v8 kernels in big-endian and little-endian
-  all from the same defconfig file, with the set of platforms
-  getting smaller as we go to higher arch levels.
-
-* I really want to see the ARMv7VE dependencies sorted out.
-
-	Arnd
+Thanks,
+-Christoffer
