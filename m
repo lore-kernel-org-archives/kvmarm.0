@@ -1,107 +1,142 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v8 20/20] KVM: ARM64: Add a new kvm ARM PMU device
-Date: Thu, 7 Jan 2016 14:56:15 +0000
-Message-ID: <CAFEAcA-Qcda7TSFLSeykLHqZYdP6tYdEjPe2uHN6f_+omqWFZg@mail.gmail.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v8 02/20] KVM: ARM64: Define PMU data structure for each
+ vcpu
+Date: Thu, 7 Jan 2016 20:07:49 +0100
+Message-ID: <20160107190749.GG6199@hawk.localdomain>
 References: <1450771695-11948-1-git-send-email-zhaoshenglong@huawei.com>
- <1450771695-11948-21-git-send-email-zhaoshenglong@huawei.com>
- <CAFEAcA_MDiOphseZ7RGNE3G=4ZDF5SFV5krOjanPbVuhgg9gnQ@mail.gmail.com> <568E7AF1.9040103@huawei.com>
+ <1450771695-11948-3-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <568E7AF1.9040103@huawei.com>
+Content-Disposition: inline
+In-Reply-To: <1450771695-11948-3-git-send-email-zhaoshenglong@huawei.com>
 Sender: kvm-owner@vger.kernel.org
 To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, kvm-devel <kvm@vger.kernel.org>, Will Deacon <will.deacon@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 7 January 2016 at 14:49, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
->
->
-> On 2016/1/7 22:36, Peter Maydell wrote:
->> On 22 December 2015 at 08:08, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
->>> From: Shannon Zhao <shannon.zhao@linaro.org>
->>>
->>> Add a new kvm device type KVM_DEV_TYPE_ARM_PMU_V3 for ARM PMU. Implement
->>> the kvm_device_ops for it.
->>>
->>> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
->>> ---
->>>  Documentation/virtual/kvm/devices/arm-pmu.txt |  24 +++++
->>>  arch/arm64/include/uapi/asm/kvm.h             |   4 +
->>>  include/linux/kvm_host.h                      |   1 +
->>>  include/uapi/linux/kvm.h                      |   2 +
->>>  virt/kvm/arm/pmu.c                            | 128 ++++++++++++++++++++++++++
->>>  virt/kvm/kvm_main.c                           |   4 +
->>>  6 files changed, 163 insertions(+)
->>>  create mode 100644 Documentation/virtual/kvm/devices/arm-pmu.txt
->>>
->>> diff --git a/Documentation/virtual/kvm/devices/arm-pmu.txt b/Documentation/virtual/kvm/devices/arm-pmu.txt
->>> new file mode 100644
->>> index 0000000..dda864e
->>> --- /dev/null
->>> +++ b/Documentation/virtual/kvm/devices/arm-pmu.txt
->>> @@ -0,0 +1,24 @@
->>> +ARM Virtual Performance Monitor Unit (vPMU)
->>> +===========================================
->>> +
->>> +Device types supported:
->>> +  KVM_DEV_TYPE_ARM_PMU_V3         ARM Performance Monitor Unit v3
->>> +
->>> +Instantiate one PMU instance for per VCPU through this API.
->>
->> Do you mean that userspace has to call this API once per vCPU to
->> create each PMU, or that calling the device create ioctl once makes
->> the kernel instantiate a PMU for each vCPU?
->>
-> Call the device create ioctl once and kvm will create a PMU for each
-> vCPU. But userspace should set the irqs for each PMU since for SPI they
-> are different.
->
->> (It's a little bit confusing that we say "this API" to mean
->> "not the API documented in this file at all but actually
->> the KVM_CREATE_DEVICE ioctl", but I see we do that in the GIC
->> API docs too.)
->>
->>> +
->>> +Groups:
->>> +  KVM_DEV_ARM_PMU_GRP_IRQ
->>> +  Attributes:
->>> +    The attr field of kvm_device_attr encodes one value:
->>> +    bits:     | 63 .... 32 | 31 ....  0 |
->>> +    values:   |  reserved  | vcpu_index |
->>> +    A value describing the PMU overflow interrupt number for the specified
->>> +    vcpu_index vcpu. This interrupt could be a PPI or SPI, but for one VM the
->>> +    interrupt type must be same for each vcpu. As a PPI, the interrupt number is
->>> +    same for all vcpus, while as a SPI it must be different for each vcpu.
->>
->> I see we're using vcpu_index rather than MPIDR affinity value
->> for specifying which CPU we're configuring. Is this in line with
->> our planned API for GICv3 configuration?
->>
-> Here vcpu_index is used to indexing the vCPU, no special use.
+On Tue, Dec 22, 2015 at 04:07:57PM +0800, Shannon Zhao wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
+> 
+> Here we plan to support virtual PMU for guest by full software
+> emulation, so define some basic structs and functions preparing for
+> futher steps. Define struct kvm_pmc for performance monitor counter and
+> struct kvm_pmu for performance monitor unit for each vcpu. According to
+> ARMv8 spec, the PMU contains at most 32(ARMV8_MAX_COUNTERS) counters.
+> 
+> Since this only supports ARM64 (or PMUv3), add a separate config symbol
+> for it.
+> 
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  2 ++
+>  arch/arm64/kvm/Kconfig            |  7 +++++++
+>  include/kvm/arm_pmu.h             | 42 +++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 51 insertions(+)
+>  create mode 100644 include/kvm/arm_pmu.h
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 689d4c9..6f0241f 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -36,6 +36,7 @@
+>  
+>  #include <kvm/arm_vgic.h>
+>  #include <kvm/arm_arch_timer.h>
+> +#include <kvm/arm_pmu.h>
+>  
+>  #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
+>  
+> @@ -211,6 +212,7 @@ struct kvm_vcpu_arch {
+>  	/* VGIC state */
+>  	struct vgic_cpu vgic_cpu;
+>  	struct arch_timer_cpu timer_cpu;
+> +	struct kvm_pmu pmu;
+>  
+>  	/*
+>  	 * Anything that is not used directly from assembly code goes
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index a5272c0..de7450d 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -36,6 +36,7 @@ config KVM
+>  	select HAVE_KVM_EVENTFD
+>  	select HAVE_KVM_IRQFD
+>  	select KVM_ARM_VGIC_V3
+> +	select KVM_ARM_PMU if HW_PERF_EVENTS
+>  	---help---
+>  	  Support hosting virtualized guest machines.
+>  	  We don't support KVM with 16K page tables yet, due to the multiple
+> @@ -48,6 +49,12 @@ config KVM_ARM_HOST
+>  	---help---
+>  	  Provides host support for ARM processors.
+>  
+> +config KVM_ARM_PMU
+> +	bool
+> +	---help---
+> +	  Adds support for a virtual Performance Monitoring Unit (PMU) in
+> +	  virtual machines.
+> +
+>  source drivers/vhost/Kconfig
+>  
+>  endif # VIRTUALIZATION
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> new file mode 100644
+> index 0000000..ddcb5b2
+> --- /dev/null
+> +++ b/include/kvm/arm_pmu.h
+> @@ -0,0 +1,42 @@
+> +/*
+> + * Copyright (C) 2015 Linaro Ltd.
+> + * Author: Shannon Zhao <shannon.zhao@linaro.org>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
+> +
+> +#ifndef __ASM_ARM_KVM_PMU_H
+> +#define __ASM_ARM_KVM_PMU_H
+> +
+> +#ifdef CONFIG_KVM_ARM_PMU
+> +
+> +#include <linux/perf_event.h>
+> +#include <asm/pmu.h>
+> +
+> +struct kvm_pmc {
+> +	u8 idx;/* index into the pmu->pmc array */
+> +	struct perf_event *perf_event;
+> +	u64 bitmask;
+> +};
+> +
+> +struct kvm_pmu {
+> +	/* PMU IRQ Number per VCPU */
 
-Yes, but you can identify the CPU by index, or by its MPIDR.
-We had a discussion about which was the best way for doing
-the VGIC API, and I can't remember which way round we ended up
-going for. Whichever we chose, we should do the same thing here.
+This whole structure is per vcpu, so I find the above comment
+unnecessary, and even a bit confusing.
 
->>> +  Errors:
->>> +    -ENXIO: Unsupported attribute group
->>> +    -EBUSY: The PMU overflow interrupt is already set
->>> +    -ENODEV: Getting the PMU overflow interrupt number while it's not set
->>> +    -EINVAL: Invalid vcpu_index or PMU overflow interrupt number supplied
->>
->> What happens if you create a PMU but then never set the IRQ number?
->> Is there a default or does the VM refuse to run or something?
->>
-> If userspace doesn't specify the irq number, the guest will not receive
-> the PMU interrupt because we check if the irq is initialized when we
-> inject the interrupt. But guest could still use the vPMU if QEMU
-> generates a proper DTB or ACPI.
-
-So is it a valid use case to create a PMU with the interrupt not wired
-up to anything? (If it's never valid it would be nice to diagnose it
-rather than just silently letting the guest run but not work right.)
-
-thanks
--- PMM
+> +	int irq_num;
+> +	struct kvm_pmc pmc[ARMV8_MAX_COUNTERS];
+> +};
+> +#else
+> +struct kvm_pmu {
+> +};
+> +#endif
+> +
+> +#endif
+> -- 
+> 2.0.4
+> 
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe kvm" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
