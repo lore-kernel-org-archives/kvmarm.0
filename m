@@ -1,277 +1,319 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v8 08/20] KVM: ARM64: Add access handler for event typer
- register
-Date: Thu, 7 Jan 2016 20:17:04 +0100
-Message-ID: <20160107191704.GH6199@hawk.localdomain>
+Subject: Re: [PATCH v8 20/20] KVM: ARM64: Add a new kvm ARM PMU device
+Date: Thu, 7 Jan 2016 21:18:59 +0100
+Message-ID: <20160107201859.GI6199@hawk.localdomain>
 References: <1450771695-11948-1-git-send-email-zhaoshenglong@huawei.com>
- <1450771695-11948-9-git-send-email-zhaoshenglong@huawei.com>
+ <1450771695-11948-21-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CDFDC496A4
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jan 2016 14:13:27 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id gi0cb0vV99Fj for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Jan 2016 14:13:26 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9629F48535
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jan 2016 14:13:26 -0500 (EST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1450771695-11948-9-git-send-email-zhaoshenglong@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <1450771695-11948-21-git-send-email-zhaoshenglong@huawei.com>
+Sender: kvm-owner@vger.kernel.org
 To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, shannon.zhao@linaro.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-patch summary nit: s/typer/type/
-
-Thanks,
-drew
-
-On Tue, Dec 22, 2015 at 04:08:03PM +0800, Shannon Zhao wrote:
+On Tue, Dec 22, 2015 at 04:08:15PM +0800, Shannon Zhao wrote:
 > From: Shannon Zhao <shannon.zhao@linaro.org>
 > 
-> These kind of registers include PMEVTYPERn, PMCCFILTR and PMXEVTYPER
-> which is mapped to PMEVTYPERn or PMCCFILTR.
-> 
-> The access handler translates all aarch32 register offsets to aarch64
-> ones and uses vcpu_sys_reg() to access their values to avoid taking care
-> of big endian.
-> 
-> When writing to these registers, create a perf_event for the selected
-> event type.
+> Add a new kvm device type KVM_DEV_TYPE_ARM_PMU_V3 for ARM PMU. Implement
+> the kvm_device_ops for it.
 > 
 > Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 > ---
->  arch/arm64/kvm/sys_regs.c | 156 +++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 154 insertions(+), 2 deletions(-)
+>  Documentation/virtual/kvm/devices/arm-pmu.txt |  24 +++++
+>  arch/arm64/include/uapi/asm/kvm.h             |   4 +
+>  include/linux/kvm_host.h                      |   1 +
+>  include/uapi/linux/kvm.h                      |   2 +
+>  virt/kvm/arm/pmu.c                            | 128 ++++++++++++++++++++++++++
+>  virt/kvm/kvm_main.c                           |   4 +
+>  6 files changed, 163 insertions(+)
+>  create mode 100644 Documentation/virtual/kvm/devices/arm-pmu.txt
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 2552db1..ed2939b 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -505,6 +505,70 @@ static bool access_pmceid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  	return true;
+> diff --git a/Documentation/virtual/kvm/devices/arm-pmu.txt b/Documentation/virtual/kvm/devices/arm-pmu.txt
+> new file mode 100644
+> index 0000000..dda864e
+> --- /dev/null
+> +++ b/Documentation/virtual/kvm/devices/arm-pmu.txt
+> @@ -0,0 +1,24 @@
+> +ARM Virtual Performance Monitor Unit (vPMU)
+> +===========================================
+> +
+> +Device types supported:
+> +  KVM_DEV_TYPE_ARM_PMU_V3         ARM Performance Monitor Unit v3
+> +
+> +Instantiate one PMU instance for per VCPU through this API.
+                                ^^ don't need this 'for' here
+
+> +
+> +Groups:
+> +  KVM_DEV_ARM_PMU_GRP_IRQ
+> +  Attributes:
+> +    The attr field of kvm_device_attr encodes one value:
+> +    bits:     | 63 .... 32 | 31 ....  0 |
+> +    values:   |  reserved  | vcpu_index |
+
+Everywhere else in kvm documentation a vcpu_index is 8 bits. I'm not
+saying that that's good, but expanding it to 32 bits here is
+inconsistent. (A side note is that I think we should s/vcpu_index/vcpu_id/
+in order to keep the parameter name consistent with what's used by
+KVM_CREATE_VCPU)
+
+> +    A value describing the PMU overflow interrupt number for the specified
+> +    vcpu_index vcpu. This interrupt could be a PPI or SPI, but for one VM the
+> +    interrupt type must be same for each vcpu. As a PPI, the interrupt number is
+> +    same for all vcpus, while as a SPI it must be different for each vcpu.
+> +
+> +  Errors:
+> +    -ENXIO: Unsupported attribute group
+
+Do we need to specify ENXIO here? It's already specified in
+Documentation/virtual/kvm/api.txt for SET/GET_DEVICE_ATTR
+
+> +    -EBUSY: The PMU overflow interrupt is already set
+> +    -ENODEV: Getting the PMU overflow interrupt number while it's not set
+> +    -EINVAL: Invalid vcpu_index or PMU overflow interrupt number supplied
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 2d4ca4b..cbb9022 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -204,6 +204,10 @@ struct kvm_arch_memory_slot {
+>  #define KVM_DEV_ARM_VGIC_GRP_CTRL	4
+>  #define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
+>  
+> +/* Device Control API: ARM PMU */
+> +#define KVM_DEV_ARM_PMU_GRP_IRQ		0
+> +#define   KVM_DEV_ARM_PMU_CPUID_MASK	0xffffffffULL
+
+I don't think we should need a mask like this, at least not in the uapi.
+The documentation says to use a vcpu-index [really a vcpu-id], and users
+should know how to convert their vcpu handle (whatever that may be) to
+a vcpu-id using whatever transformation is necessary. They may already
+have a "vcpu id mask" defined (this is one reason why I don't think we
+should use a 32-bit vcpu-index here, instead of the 8-bit vcpu-index used
+everywhere else). Likewise, kvm should know how to do it's transformation.
+Maybe, to aid in the attr field construction, we should supply a shift,
+allowing both sides to do something like
+
+int pmu_attr_extract_vcpu_id(u64 attr)
+{
+    return (attr >> KVM_DEV_ARM_PMU_VCPUID_SHIFT) & VCPU_ID_MASK;
+}
+
+u64 pmu_attr_create(int vcpu_id)
+{
+    return vcpu_id << KVM_DEV_ARM_PMU_VCPUID_SHIFT;
+}
+
+But, in this case the shift is zero, so it's not really necessary. In
+any case, please add the 'V' for VCPU.
+
+> +
+>  /* KVM_IRQ_LINE irq field index values */
+>  #define KVM_ARM_IRQ_TYPE_SHIFT		24
+>  #define KVM_ARM_IRQ_TYPE_MASK		0xff
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index c923350..608dea6 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1161,6 +1161,7 @@ extern struct kvm_device_ops kvm_mpic_ops;
+>  extern struct kvm_device_ops kvm_xics_ops;
+>  extern struct kvm_device_ops kvm_arm_vgic_v2_ops;
+>  extern struct kvm_device_ops kvm_arm_vgic_v3_ops;
+> +extern struct kvm_device_ops kvm_arm_pmu_ops;
+>  
+>  #ifdef CONFIG_HAVE_KVM_CPU_RELAX_INTERCEPT
+>  
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 03f3618..4ba6fdd 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1032,6 +1032,8 @@ enum kvm_device_type {
+>  #define KVM_DEV_TYPE_FLIC		KVM_DEV_TYPE_FLIC
+>  	KVM_DEV_TYPE_ARM_VGIC_V3,
+>  #define KVM_DEV_TYPE_ARM_VGIC_V3	KVM_DEV_TYPE_ARM_VGIC_V3
+> +	KVM_DEV_TYPE_ARM_PMU_V3,
+> +#define	KVM_DEV_TYPE_ARM_PMU_V3		KVM_DEV_TYPE_ARM_PMU_V3
+>  	KVM_DEV_TYPE_MAX,
+>  };
+>  
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index 3ec3cdd..5518308 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -19,6 +19,7 @@
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/perf_event.h>
+> +#include <linux/uaccess.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <kvm/arm_pmu.h>
+>  #include <kvm/arm_vgic.h>
+> @@ -374,3 +375,130 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+>  
+>  	pmc->perf_event = event;
 >  }
->  
-> +static inline bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
+> +
+> +static inline bool kvm_arm_pmu_initialized(struct kvm_vcpu *vcpu)
 > +{
-> +	u64 pmcr, val;
-> +
-> +	pmcr = vcpu_sys_reg(vcpu, PMCR_EL0);
-> +	val = (pmcr >> ARMV8_PMCR_N_SHIFT) & ARMV8_PMCR_N_MASK;
-> +	if (idx >= val && idx != ARMV8_CYCLE_IDX)
-> +		return false;
-> +
-> +	return true;
+> +	return vcpu->arch.pmu.irq_num != -1;
 > +}
 > +
-> +static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			       const struct sys_reg_desc *r)
+> +static int kvm_arm_pmu_irq_access(struct kvm *kvm, struct kvm_device_attr *attr,
+> +				  int *irq, bool is_set)
 > +{
-> +	u64 idx, reg;
+> +	int cpuid;
+
+please call this vcpu_id
+
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm_pmu *pmu;
 > +
-> +	if (r->CRn == 9) {
-> +		/* PMXEVTYPER_EL0 */
-> +		reg = 0;
+> +	cpuid = attr->attr & KVM_DEV_ARM_PMU_CPUID_MASK;
+> +	if (cpuid >= atomic_read(&kvm->online_vcpus))
+> +		return -EINVAL;
+> +
+> +	vcpu = kvm_get_vcpu(kvm, cpuid);
+> +	if (!vcpu)
+> +		return -EINVAL;
+> +
+> +	pmu = &vcpu->arch.pmu;
+> +	if (!is_set) {
+> +		if (!kvm_arm_pmu_initialized(vcpu))
+> +			return -ENODEV;
+> +
+> +		*irq = pmu->irq_num;
 > +	} else {
-> +		if (!p->is_aarch32) {
-> +			/* PMEVTYPERn_EL0 or PMCCFILTR_EL0 */
-> +			reg = r->reg;
-> +		} else {
-> +			if (r->CRn == 14 && r->CRm == 15 && r->Op2 == 7) {
-> +				reg = PMCCFILTR_EL0;
-> +			} else {
-> +				reg = ((r->CRm & 3) << 3) | (r->Op2 & 7);
-> +				reg += PMEVTYPER0_EL0;
-> +			}
-> +		}
+> +		if (kvm_arm_pmu_initialized(vcpu))
+> +			return -EBUSY;
+> +
+> +		kvm_debug("Set kvm ARM PMU irq: %d\n", *irq);
+> +		pmu->irq_num = *irq;
 > +	}
 > +
-> +	switch (reg) {
-> +	case PMEVTYPER0_EL0 ... PMEVTYPER30_EL0:
-> +		idx = reg - PMEVTYPER0_EL0;
-> +		if (!pmu_counter_idx_valid(vcpu, idx))
-> +			return true;
-> +		break;
-> +	case PMCCFILTR_EL0:
-> +		idx = ARMV8_CYCLE_IDX;
-> +		break;
-> +	default:
-> +		/* PMXEVTYPER_EL0 */
-> +		idx = vcpu_sys_reg(vcpu, PMSELR_EL0) & ARMV8_COUNTER_MASK;
-> +		if (!pmu_counter_idx_valid(vcpu, idx))
-> +			return true;
-> +
-> +		reg = (idx == ARMV8_CYCLE_IDX) ? PMCCFILTR_EL0
-> +						 : PMEVTYPER0_EL0 + idx;
-> +		break;
-> +	}
-> +
-> +	if (p->is_write) {
-> +		kvm_pmu_set_counter_event_type(vcpu, p->regval, idx);
-> +		vcpu_sys_reg(vcpu, reg) = p->regval & ARMV8_EVTYPE_MASK;
-> +	} else {
-> +		p->regval = vcpu_sys_reg(vcpu, reg) & ARMV8_EVTYPE_MASK;
-> +	}
-> +
-> +	return true;
+> +	return 0;
 > +}
 > +
->  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
->  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
->  	/* DBGBVRn_EL1 */						\
-> @@ -520,6 +584,13 @@ static bool access_pmceid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b111),	\
->  	  trap_wcr, reset_wcr, n, 0,  get_wcr, set_wcr }
->  
-> +/* Macro to expand the PMEVTYPERn_EL0 register */
-> +#define PMU_PMEVTYPER_EL0(n)						\
-> +	/* PMEVTYPERn_EL0 */						\
-> +	{ Op0(0b11), Op1(0b011), CRn(0b1110),				\
-> +	  CRm((0b1100 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
-> +	  access_pmu_evtyper, reset_unknown, (PMEVTYPER0_EL0 + n), }
+> +static int kvm_arm_pmu_create(struct kvm_device *dev, u32 type)
+> +{
+> +	int i;
+> +	struct kvm_vcpu *vcpu;
+> +	struct kvm *kvm = dev->kvm;
 > +
->  /*
->   * Architected system registers.
->   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-> @@ -716,7 +787,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	  trap_raz_wi },
->  	/* PMXEVTYPER_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b001),
-> -	  trap_raz_wi },
-> +	  access_pmu_evtyper },
->  	/* PMXEVCNTR_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b010),
->  	  trap_raz_wi },
-> @@ -734,6 +805,45 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ Op0(0b11), Op1(0b011), CRn(0b1101), CRm(0b0000), Op2(0b011),
->  	  NULL, reset_unknown, TPIDRRO_EL0 },
->  
-> +	/* PMEVTYPERn_EL0 */
-> +	PMU_PMEVTYPER_EL0(0),
-> +	PMU_PMEVTYPER_EL0(1),
-> +	PMU_PMEVTYPER_EL0(2),
-> +	PMU_PMEVTYPER_EL0(3),
-> +	PMU_PMEVTYPER_EL0(4),
-> +	PMU_PMEVTYPER_EL0(5),
-> +	PMU_PMEVTYPER_EL0(6),
-> +	PMU_PMEVTYPER_EL0(7),
-> +	PMU_PMEVTYPER_EL0(8),
-> +	PMU_PMEVTYPER_EL0(9),
-> +	PMU_PMEVTYPER_EL0(10),
-> +	PMU_PMEVTYPER_EL0(11),
-> +	PMU_PMEVTYPER_EL0(12),
-> +	PMU_PMEVTYPER_EL0(13),
-> +	PMU_PMEVTYPER_EL0(14),
-> +	PMU_PMEVTYPER_EL0(15),
-> +	PMU_PMEVTYPER_EL0(16),
-> +	PMU_PMEVTYPER_EL0(17),
-> +	PMU_PMEVTYPER_EL0(18),
-> +	PMU_PMEVTYPER_EL0(19),
-> +	PMU_PMEVTYPER_EL0(20),
-> +	PMU_PMEVTYPER_EL0(21),
-> +	PMU_PMEVTYPER_EL0(22),
-> +	PMU_PMEVTYPER_EL0(23),
-> +	PMU_PMEVTYPER_EL0(24),
-> +	PMU_PMEVTYPER_EL0(25),
-> +	PMU_PMEVTYPER_EL0(26),
-> +	PMU_PMEVTYPER_EL0(27),
-> +	PMU_PMEVTYPER_EL0(28),
-> +	PMU_PMEVTYPER_EL0(29),
-> +	PMU_PMEVTYPER_EL0(30),
-> +	/* PMCCFILTR_EL0
-> +	 * This register resets as unknown in 64bit mode while it resets as zero
-> +	 * in 32bit mode. Here we choose to reset it as zero for consistency.
-> +	 */
-> +	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b1111), Op2(0b111),
-> +	  access_pmu_evtyper, reset_val, PMCCFILTR_EL0, 0 },
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		struct kvm_pmu *pmu = &vcpu->arch.pmu;
 > +
->  	/* DACR32_EL2 */
->  	{ Op0(0b11), Op1(0b100), CRn(0b0011), CRm(0b0000), Op2(0b000),
->  	  NULL, reset_unknown, DACR32_EL2 },
-> @@ -923,6 +1033,13 @@ static const struct sys_reg_desc cp14_64_regs[] = {
->  	{ Op1( 0), CRm( 2), .access = trap_raz_wi },
+> +		memset(pmu, 0, sizeof(*pmu));
+
+I don't think we want this memset. If we can only create the pmu
+once, then it's unnecessary (we zalloc vcpus). And, if we can
+recreate pmus with this call, then it'll create a memory leak, as
+we'll be zero-ing out all the perf_event pointers, and then won't
+be able to free them on the call to kvm_pmu_vcpu_reset. Naturally
+we need to make sure we're NULL-ing them after each free instead.
+
+> +		kvm_pmu_vcpu_reset(vcpu);
+> +		pmu->irq_num = -1;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void kvm_arm_pmu_destroy(struct kvm_device *dev)
+> +{
+> +	kfree(dev);
+> +}
+> +
+> +static int kvm_arm_pmu_set_attr(struct kvm_device *dev,
+> +				struct kvm_device_attr *attr)
+> +{
+> +	switch (attr->group) {
+> +	case KVM_DEV_ARM_PMU_GRP_IRQ: {
+> +		int __user *uaddr = (int __user *)(long)attr->addr;
+> +		int reg;
+> +
+> +		if (get_user(reg, uaddr))
+> +			return -EFAULT;
+> +
+> +		/*
+> +		 * The PMU overflow interrupt could be a PPI or SPI, but for one
+> +		 * VM the interrupt type must be same for each vcpu. As a PPI,
+> +		 * the interrupt number is same for all vcpus, while as a SPI it
+> +		 * must be different for each vcpu.
+> +		 */
+> +		if (reg < VGIC_NR_SGIS || reg >= dev->kvm->arch.vgic.nr_irqs)
+> +			return -EINVAL;
+> +
+> +		return kvm_arm_pmu_irq_access(dev->kvm, attr, &reg, true);
+> +	}
+> +	}
+> +
+> +	return -ENXIO;
+> +}
+> +
+> +static int kvm_arm_pmu_get_attr(struct kvm_device *dev,
+> +				struct kvm_device_attr *attr)
+> +{
+> +	int ret;
+> +
+> +	switch (attr->group) {
+> +	case KVM_DEV_ARM_PMU_GRP_IRQ: {
+> +		int __user *uaddr = (int __user *)(long)attr->addr;
+> +		int reg = -1;
+> +
+> +
+> +		ret = kvm_arm_pmu_irq_access(dev->kvm, attr, &reg, false);
+> +		if (ret)
+> +			return ret;
+> +		return put_user(reg, uaddr);
+> +	}
+> +	}
+> +
+> +	return -ENXIO;
+> +}
+> +
+> +static int kvm_arm_pmu_has_attr(struct kvm_device *dev,
+> +				struct kvm_device_attr *attr)
+> +{
+> +	switch (attr->group) {
+> +	case KVM_DEV_ARM_PMU_GRP_IRQ:
+> +		return 0;
+> +	}
+> +
+> +	return -ENXIO;
+> +}
+> +
+> +struct kvm_device_ops kvm_arm_pmu_ops = {
+> +	.name = "kvm-arm-pmu",
+> +	.create = kvm_arm_pmu_create,
+> +	.destroy = kvm_arm_pmu_destroy,
+> +	.set_attr = kvm_arm_pmu_set_attr,
+> +	.get_attr = kvm_arm_pmu_get_attr,
+> +	.has_attr = kvm_arm_pmu_has_attr,
+> +};
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 484079e..81a42cc 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2647,6 +2647,10 @@ static struct kvm_device_ops *kvm_device_ops_table[KVM_DEV_TYPE_MAX] = {
+>  #ifdef CONFIG_KVM_XICS
+>  	[KVM_DEV_TYPE_XICS]		= &kvm_xics_ops,
+>  #endif
+> +
+> +#ifdef CONFIG_KVM_ARM_PMU
+> +	[KVM_DEV_TYPE_ARM_PMU_V3]	= &kvm_arm_pmu_ops,
+
+Shouldn't we specify 'v3' in the kvm_arm_pmu_ops name, as we do with the
+device type name?
+
+> +#endif
 >  };
 >  
-> +/* Macro to expand the PMEVTYPERn register */
-> +#define PMU_PMEVTYPER(n)						\
-> +	/* PMEVTYPERn */						\
-> +	{ Op1(0), CRn(0b1110),						\
-> +	  CRm((0b1100 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
-> +	  access_pmu_evtyper }
-> +
->  /*
->   * Trapped cp15 registers. TTBR0/TTBR1 get a double encoding,
->   * depending on the way they are accessed (as a 32bit or a 64bit
-> @@ -959,7 +1076,7 @@ static const struct sys_reg_desc cp15_regs[] = {
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmceid },
->  	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), trap_raz_wi },
-> -	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), trap_raz_wi },
-> +	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_evtyper },
->  	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), trap_raz_wi },
->  	{ Op1( 0), CRn( 9), CRm(14), Op2( 0), trap_raz_wi },
->  	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), trap_raz_wi },
-> @@ -974,6 +1091,41 @@ static const struct sys_reg_desc cp15_regs[] = {
->  	{ Op1( 0), CRn(12), CRm(12), Op2( 5), trap_raz_wi },
->  
->  	{ Op1( 0), CRn(13), CRm( 0), Op2( 1), access_vm_reg, NULL, c13_CID },
-> +
-> +	/* PMEVTYPERn */
-> +	PMU_PMEVTYPER(0),
-> +	PMU_PMEVTYPER(1),
-> +	PMU_PMEVTYPER(2),
-> +	PMU_PMEVTYPER(3),
-> +	PMU_PMEVTYPER(4),
-> +	PMU_PMEVTYPER(5),
-> +	PMU_PMEVTYPER(6),
-> +	PMU_PMEVTYPER(7),
-> +	PMU_PMEVTYPER(8),
-> +	PMU_PMEVTYPER(9),
-> +	PMU_PMEVTYPER(10),
-> +	PMU_PMEVTYPER(11),
-> +	PMU_PMEVTYPER(12),
-> +	PMU_PMEVTYPER(13),
-> +	PMU_PMEVTYPER(14),
-> +	PMU_PMEVTYPER(15),
-> +	PMU_PMEVTYPER(16),
-> +	PMU_PMEVTYPER(17),
-> +	PMU_PMEVTYPER(18),
-> +	PMU_PMEVTYPER(19),
-> +	PMU_PMEVTYPER(20),
-> +	PMU_PMEVTYPER(21),
-> +	PMU_PMEVTYPER(22),
-> +	PMU_PMEVTYPER(23),
-> +	PMU_PMEVTYPER(24),
-> +	PMU_PMEVTYPER(25),
-> +	PMU_PMEVTYPER(26),
-> +	PMU_PMEVTYPER(27),
-> +	PMU_PMEVTYPER(28),
-> +	PMU_PMEVTYPER(29),
-> +	PMU_PMEVTYPER(30),
-> +	/* PMCCFILTR */
-> +	{ Op1(0), CRn(14), CRm(15), Op2(7), access_pmu_evtyper },
->  };
->  
->  static const struct sys_reg_desc cp15_64_regs[] = {
+>  int kvm_register_device_ops(struct kvm_device_ops *ops, u32 type)
 > -- 
 > 2.0.4
 > 
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Thanks,
+drew
