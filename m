@@ -1,36 +1,48 @@
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: Re: [PATCH v8 07/20] KVM: ARM64: PMU: Add perf event map and introduce
- perf event creating function
-Date: Thu, 7 Jan 2016 22:00:11 +0800
-Message-ID: <568E6F6B.3060500@huawei.com>
-References: <1450771695-11948-1-git-send-email-zhaoshenglong@huawei.com>	<1450771695-11948-8-git-send-email-zhaoshenglong@huawei.com> <20160107134857.2c18d752@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v8 00/20] KVM: ARM64: Add guest PMU support
+Date: Thu, 07 Jan 2016 14:10:38 +0000
+Message-ID: <568E71DE.9030905@arm.com>
+References: <1450771695-11948-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160107134857.2c18d752@arm.com>
+In-Reply-To: <1450771695-11948-1-git-send-email-zhaoshenglong@huawei.com>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
+To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+On 22/12/15 08:07, Shannon Zhao wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
+> 
+> This patchset adds guest PMU support for KVM on ARM64. It takes
+> trap-and-emulate approach. When guest wants to monitor one event, it
+> will be trapped by KVM and KVM will call perf_event API to create a perf
+> event and call relevant perf_event APIs to get the count value of event.
+> 
+> Use perf to test this patchset in guest. When using "perf list", it
+> shows the list of the hardware events and hardware cache events perf
+> supports. Then use "perf stat -e EVENT" to monitor some event. For
+> example, use "perf stat -e cycles" to count cpu cycles and
+> "perf stat -e cache-misses" to count cache misses.
 
+I finally feel like we're pretty close to something we could merge. My
+current concerns are:
 
-On 2016/1/7 21:48, Marc Zyngier wrote:
->> +	if (pmc->perf_event) {
->> > +		counter = kvm_pmu_get_counter_value(vcpu, pmc->idx);
->> > +		reg = (pmc->idx == ARMV8_CYCLE_IDX)
->> > +		       ? PMCCNTR_EL0 : PMEVCNTR0_EL0 + pmc->idx;
->> > +		vcpu_sys_reg(vcpu, reg) = counter;
->> > +		perf_event_release_kernel(pmc->perf_event);
-> I'm having second thoughts about this one. Don't you need to first
-> disable the event? You seem to be doing it on the destroy path, and it
-> worries me that we're not doing the same thing on both paths.
+- the 32bit bugs, and the fact that it has obviously not been tested
+with a 32bit guest. It would be good to give it a go (you'll probably
+have to lie about the nature of the PMU in your QEMU code by pretending
+it is a Cortex-A15 PMU, for example).
 
-I didn't find the limitation to use perf_event_release_kernel, but it's
-better to disable it before release. Will add.
+- The UNDEF path and the patch I've posted today. I've quickly tested
+it, and it seems to do the right thing, but this warrant a thorough review.
+
+- I'd like Peter Maydell (cc'd) to give his Ack to the last patch, as we
+need the userspace ABI to be agreed upon.
 
 Thanks,
--- 
-Shannon
 
+	M.
+-- 
+Jazz is not dead. It just smells funny...
