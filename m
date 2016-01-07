@@ -1,66 +1,88 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v8 00/20] KVM: ARM64: Add guest PMU support
-Date: Thu, 07 Jan 2016 14:21:48 +0000
-Message-ID: <568E747C.9060405@arm.com>
-References: <1450771695-11948-1-git-send-email-zhaoshenglong@huawei.com>
- <568E71DE.9030905@arm.com> <20160107141227.GE23028@arm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v8 20/20] KVM: ARM64: Add a new kvm ARM PMU device
+Date: Thu, 7 Jan 2016 14:36:18 +0000
+Message-ID: <CAFEAcA_MDiOphseZ7RGNE3G=4ZDF5SFV5krOjanPbVuhgg9gnQ@mail.gmail.com>
+References: <1450771695-11948-1-git-send-email-zhaoshenglong@huawei.com> <1450771695-11948-21-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 30DDB40FA6
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jan 2016 09:18:10 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ZSg1EvK+t-x7 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Jan 2016 09:18:09 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 11176407A6
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jan 2016 09:18:08 -0500 (EST)
-In-Reply-To: <20160107141227.GE23028@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>
-Cc: kvm@vger.kernel.org, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=UTF-8
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1450771695-11948-21-git-send-email-zhaoshenglong@huawei.com>
+Sender: kvm-owner@vger.kernel.org
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, kvm-devel <kvm@vger.kernel.org>, Will Deacon <will.deacon@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 07/01/16 14:12, Will Deacon wrote:
-> On Thu, Jan 07, 2016 at 02:10:38PM +0000, Marc Zyngier wrote:
->> On 22/12/15 08:07, Shannon Zhao wrote:
->>> From: Shannon Zhao <shannon.zhao@linaro.org>
->>>
->>> This patchset adds guest PMU support for KVM on ARM64. It takes
->>> trap-and-emulate approach. When guest wants to monitor one event, it
->>> will be trapped by KVM and KVM will call perf_event API to create a perf
->>> event and call relevant perf_event APIs to get the count value of event.
->>>
->>> Use perf to test this patchset in guest. When using "perf list", it
->>> shows the list of the hardware events and hardware cache events perf
->>> supports. Then use "perf stat -e EVENT" to monitor some event. For
->>> example, use "perf stat -e cycles" to count cpu cycles and
->>> "perf stat -e cache-misses" to count cache misses.
->>
->> I finally feel like we're pretty close to something we could merge. My
->> current concerns are:
-> 
-> The merge window opens on Monday and I'm not prepared to take further
-> PMU changes at this point (unless they're bug fixes, of course).
-> 
-> This needs to wait until 4.6.
+On 22 December 2015 at 08:08, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
+>
+> Add a new kvm device type KVM_DEV_TYPE_ARM_PMU_V3 for ARM PMU. Implement
+> the kvm_device_ops for it.
+>
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> ---
+>  Documentation/virtual/kvm/devices/arm-pmu.txt |  24 +++++
+>  arch/arm64/include/uapi/asm/kvm.h             |   4 +
+>  include/linux/kvm_host.h                      |   1 +
+>  include/uapi/linux/kvm.h                      |   2 +
+>  virt/kvm/arm/pmu.c                            | 128 ++++++++++++++++++++++++++
+>  virt/kvm/kvm_main.c                           |   4 +
+>  6 files changed, 163 insertions(+)
+>  create mode 100644 Documentation/virtual/kvm/devices/arm-pmu.txt
+>
+> diff --git a/Documentation/virtual/kvm/devices/arm-pmu.txt b/Documentation/virtual/kvm/devices/arm-pmu.txt
+> new file mode 100644
+> index 0000000..dda864e
+> --- /dev/null
+> +++ b/Documentation/virtual/kvm/devices/arm-pmu.txt
+> @@ -0,0 +1,24 @@
+> +ARM Virtual Performance Monitor Unit (vPMU)
+> +===========================================
+> +
+> +Device types supported:
+> +  KVM_DEV_TYPE_ARM_PMU_V3         ARM Performance Monitor Unit v3
+> +
+> +Instantiate one PMU instance for per VCPU through this API.
 
-Fair enough. I guess I'll continue the review process and queue that
-early in the next cycle.
+Do you mean that userspace has to call this API once per vCPU to
+create each PMU, or that calling the device create ioctl once makes
+the kernel instantiate a PMU for each vCPU?
 
-Thanks,
+(It's a little bit confusing that we say "this API" to mean
+"not the API documented in this file at all but actually
+the KVM_CREATE_DEVICE ioctl", but I see we do that in the GIC
+API docs too.)
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> +
+> +Groups:
+> +  KVM_DEV_ARM_PMU_GRP_IRQ
+> +  Attributes:
+> +    The attr field of kvm_device_attr encodes one value:
+> +    bits:     | 63 .... 32 | 31 ....  0 |
+> +    values:   |  reserved  | vcpu_index |
+> +    A value describing the PMU overflow interrupt number for the specified
+> +    vcpu_index vcpu. This interrupt could be a PPI or SPI, but for one VM the
+> +    interrupt type must be same for each vcpu. As a PPI, the interrupt number is
+> +    same for all vcpus, while as a SPI it must be different for each vcpu.
+
+I see we're using vcpu_index rather than MPIDR affinity value
+for specifying which CPU we're configuring. Is this in line with
+our planned API for GICv3 configuration?
+
+> +  Errors:
+> +    -ENXIO: Unsupported attribute group
+> +    -EBUSY: The PMU overflow interrupt is already set
+> +    -ENODEV: Getting the PMU overflow interrupt number while it's not set
+> +    -EINVAL: Invalid vcpu_index or PMU overflow interrupt number supplied
+
+What happens if you create a PMU but then never set the IRQ number?
+Is there a default or does the VM refuse to run or something?
+
+Do we want an attribute like KVM_DEV_ARM_VGIC_CTRL_INIT so userspace
+can say "I have definitely completed configuration of this device now" ?
+
+We wound up with a fair amount of legacy mess to deal with in the
+GIC code because we didn't put one of those in from the start.
+(Perhaps we should aim to standardize on all kvm devices having one?)
+
+thanks
+-- PMM
