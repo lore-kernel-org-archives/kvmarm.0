@@ -1,102 +1,68 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH] arm64: KVM: Fix AArch64 guest userspace exception injection
-Date: Thu,  7 Jan 2016 09:03:36 +0000
-Message-ID: <1452157416-9435-1-git-send-email-marc.zyngier@arm.com>
+Subject: Re: [PATCH 1/2] arm: KVM: Do not update PC if the trap handler has
+ updated it
+Date: Thu, 07 Jan 2016 09:05:06 +0000
+Message-ID: <568E2A42.7040606@arm.com>
+References: <1450778118-12715-1-git-send-email-marc.zyngier@arm.com> <1450778118-12715-2-git-send-email-marc.zyngier@arm.com> <CAFEAcA8F2TJuRR5ELvit0FPa3XFMJ847S8WK25i5aVdGBU=PUA@mail.gmail.com> <20151222143947.GA5631@cbox> <CAFEAcA9dALQv8Xcyg5FLAvRaJfH5UT2u4jrLjofLh5Ff2yo=8Q@mail.gmail.com> <568E26CD.8020500@arm.com> <568E28F0.9010405@huawei.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <568E28F0.9010405@huawei.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, Shannon Zhao <shannon.zhao@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: Shannon Zhao <zhaoshenglong@huawei.com>, Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: arm-mail-list <linux-arm-kernel@lists.infradead.org>, Shannon Zhao <shannon.zhao@linaro.org>, kvm-devel <kvm@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-At the moment, our fault injection is pretty limited. We always
-generate a SYNC exception into EL1, as if the fault was actually
-from EL1h, no matter how it was generated.
+On 07/01/16 08:59, Shannon Zhao wrote:
+> 
+> 
+> On 2016/1/7 16:50, Marc Zyngier wrote:
+>> On 22/12/15 14:50, Peter Maydell wrote:
+>>> On 22 December 2015 at 14:39, Christoffer Dall
+>>> <christoffer.dall@linaro.org> wrote:
+>>>> On Tue, Dec 22, 2015 at 11:08:10AM +0000, Peter Maydell wrote:
+>>>>> Won't this result in our incorrectly skipping the first insn
+>>>>> in the fault handler if the original offending instruction
+>>>>> was itself the first insn in the fault handler?
+>>>>>
+>>>> Wouldn't that then loop with the exception forever?
+>>>
+>>> Yes, but so would real hardware...
+>>
+>> Indeed. As it is, this patch is not doing what it should. On the other
+>> hand, I came to the conclusion that we do not need to fix this just yet,
+>> as long as we only let KVM inject an UNDEF, and that's what the PMU code
+>> requires.
+>>
+>> I'll comment on the PMU thread, but the gist of it is:
+>> 1) fix the arm64 UNDEF/PABRT/DABRT code to properly account for the the
+>> source EL (Table D1-7 of the ARMv8 ARM).
+> This looks like something we add in the PMU patch set.
+> 
+> +		switch (cpsr & (PSR_MODE_MASK | PSR_MODE32_BIT)) {
+> +		case PSR_MODE_EL0t:
+> +			exc_offset = EL0_EXCEPT_SYNC_OFFSET_64;
+> +			break;
+> +		case PSR_MODE_EL1t:
+> +			exc_offset = EL1_EXCEPT_BAD_SYNC_OFFSET;
+> +			break;
+> +		case PSR_MODE_EL1h:
+> +			exc_offset = EL1_EXCEPT_SYNC_OFFSET;
+> +			break;
+> +		default:
+> +			exc_offset = EL0_EXCEPT_SYNC_OFFSET_32;
+> +		}
+> +
 
-This is obviously wrong, as EL0 can generate faults of its own
-(not to mention the pretty-much unused EL1t mode).
+Indeed, plus some additional code to select the actual vector and not be
+limited to a Synchronous exception (even if that's the only thing we use
+today).
 
-This patch fixes it by implementing section D1.10.2 of the ARMv8 ARM,
-and in particular table D1-7 ("Vector offsets from vector table base
-address"), which describes which vector to use depending on the source
-exception level and type (synchronous, IRQ, FIQ or SError).
+See the patch I've just posted for more details.
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm64/kvm/inject_fault.c | 38 +++++++++++++++++++++++++++++++++++---
- 1 file changed, 35 insertions(+), 3 deletions(-)
+Thanks,
 
-diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
-index 648112e..4d1ac81 100644
---- a/arch/arm64/kvm/inject_fault.c
-+++ b/arch/arm64/kvm/inject_fault.c
-@@ -27,7 +27,11 @@
- 
- #define PSTATE_FAULT_BITS_64 	(PSR_MODE_EL1h | PSR_A_BIT | PSR_F_BIT | \
- 				 PSR_I_BIT | PSR_D_BIT)
--#define EL1_EXCEPT_SYNC_OFFSET	0x200
-+
-+#define CURRENT_EL_SP_EL0_VECTOR	0x0
-+#define CURRENT_EL_SP_ELx_VECTOR	0x200
-+#define LOWER_EL_AArch64_VECTOR		0x400
-+#define LOWER_EL_AArch32_VECTOR		0x600
- 
- static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
- {
-@@ -97,6 +101,34 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
- 		*fsr = 0x14;
- }
- 
-+enum exception_type {
-+	except_type_sync	= 0,
-+	except_type_irq		= 0x80,
-+	except_type_fiq		= 0x100,
-+	except_type_serror	= 0x180,
-+};
-+
-+static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
-+{
-+	u64 exc_offset;
-+
-+	switch (*vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT)) {
-+	case PSR_MODE_EL1t:
-+		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
-+		break;
-+	case PSR_MODE_EL1h:
-+		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
-+		break;
-+	case PSR_MODE_EL0t:
-+		exc_offset = LOWER_EL_AArch64_VECTOR;
-+		break;
-+	default:
-+		exc_offset = LOWER_EL_AArch32_VECTOR;
-+	}
-+
-+	return vcpu_sys_reg(vcpu, VBAR_EL1) + exc_offset + type;
-+}
-+
- static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
- {
- 	unsigned long cpsr = *vcpu_cpsr(vcpu);
-@@ -108,8 +140,8 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
- 	*vcpu_spsr(vcpu) = cpsr;
- 	*vcpu_elr_el1(vcpu) = *vcpu_pc(vcpu);
- 
-+	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
- 	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
--	*vcpu_pc(vcpu) = vcpu_sys_reg(vcpu, VBAR_EL1) + EL1_EXCEPT_SYNC_OFFSET;
- 
- 	vcpu_sys_reg(vcpu, FAR_EL1) = addr;
- 
-@@ -143,8 +175,8 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
- 	*vcpu_spsr(vcpu) = cpsr;
- 	*vcpu_elr_el1(vcpu) = *vcpu_pc(vcpu);
- 
-+	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
- 	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
--	*vcpu_pc(vcpu) = vcpu_sys_reg(vcpu, VBAR_EL1) + EL1_EXCEPT_SYNC_OFFSET;
- 
- 	/*
- 	 * Build an unknown exception, depending on the instruction
+	M.
 -- 
-2.1.4
-
+Jazz is not dead. It just smells funny...
