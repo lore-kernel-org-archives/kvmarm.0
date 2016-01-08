@@ -1,62 +1,116 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: Re: [PATCH v8 20/20] KVM: ARM64: Add a new kvm ARM PMU device
-Date: Fri, 8 Jan 2016 11:06:16 +0800
-Message-ID: <568F27A8.80808@huawei.com>
-References: <1450771695-11948-1-git-send-email-zhaoshenglong@huawei.com>
- <1450771695-11948-21-git-send-email-zhaoshenglong@huawei.com>
- <CAFEAcA_MDiOphseZ7RGNE3G=4ZDF5SFV5krOjanPbVuhgg9gnQ@mail.gmail.com>
- <568E7AF1.9040103@huawei.com>
- <CAFEAcA-Qcda7TSFLSeykLHqZYdP6tYdEjPe2uHN6f_+omqWFZg@mail.gmail.com>
+Subject: Re: [PATCH] arm64: KVM: Fix AArch64 guest userspace exception injection
+Date: Fri, 8 Jan 2016 16:36:16 +0800
+Message-ID: <568F7500.5020502@huawei.com>
+References: <1452157416-9435-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F1CA149803
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jan 2016 22:03:52 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1aSNFKjp6lsI for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Jan 2016 22:03:51 -0500 (EST)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9B95B497F8
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Jan 2016 22:03:49 -0500 (EST)
-In-Reply-To: <CAFEAcA-Qcda7TSFLSeykLHqZYdP6tYdEjPe2uHN6f_+omqWFZg@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: arm-mail-list <linux-arm-kernel@lists.infradead.org>, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1452157416-9435-1-git-send-email-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Shannon Zhao <shannon.zhao@linaro.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
 
-On 2016/1/7 22:56, Peter Maydell wrote:
->>>> +  Errors:
->>>> >>> +    -ENXIO: Unsupported attribute group
->>>> >>> +    -EBUSY: The PMU overflow interrupt is already set
->>>> >>> +    -ENODEV: Getting the PMU overflow interrupt number while it's not set
->>>> >>> +    -EINVAL: Invalid vcpu_index or PMU overflow interrupt number supplied
->>> >>
->>> >> What happens if you create a PMU but then never set the IRQ number?
->>> >> Is there a default or does the VM refuse to run or something?
->>> >>
->> > If userspace doesn't specify the irq number, the guest will not receive
->> > the PMU interrupt because we check if the irq is initialized when we
->> > inject the interrupt. But guest could still use the vPMU if QEMU
->> > generates a proper DTB or ACPI.
-> So is it a valid use case to create a PMU with the interrupt not wired
-> up to anything? (If it's never valid it would be nice to diagnose it
-> rather than just silently letting the guest run but not work right.)
-So how about adding a helper to check if the PMU is completely
-initialized and if not, return trap_raz_wi when guest access PMU registers?
+On 2016/1/7 17:03, Marc Zyngier wrote:
+> At the moment, our fault injection is pretty limited. We always
+> generate a SYNC exception into EL1, as if the fault was actually
+> from EL1h, no matter how it was generated.
+> 
+> This is obviously wrong, as EL0 can generate faults of its own
+> (not to mention the pretty-much unused EL1t mode).
+> 
+> This patch fixes it by implementing section D1.10.2 of the ARMv8 ARM,
+> and in particular table D1-7 ("Vector offsets from vector table base
+> address"), which describes which vector to use depending on the source
+> exception level and type (synchronous, IRQ, FIQ or SError).
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/kvm/inject_fault.c | 38 +++++++++++++++++++++++++++++++++++---
+>  1 file changed, 35 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> index 648112e..4d1ac81 100644
+> --- a/arch/arm64/kvm/inject_fault.c
+> +++ b/arch/arm64/kvm/inject_fault.c
+> @@ -27,7 +27,11 @@
+>  
+>  #define PSTATE_FAULT_BITS_64 	(PSR_MODE_EL1h | PSR_A_BIT | PSR_F_BIT | \
+>  				 PSR_I_BIT | PSR_D_BIT)
+> -#define EL1_EXCEPT_SYNC_OFFSET	0x200
+> +
+> +#define CURRENT_EL_SP_EL0_VECTOR	0x0
+> +#define CURRENT_EL_SP_ELx_VECTOR	0x200
+> +#define LOWER_EL_AArch64_VECTOR		0x400
+> +#define LOWER_EL_AArch32_VECTOR		0x600
+>  
+>  static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+>  {
+> @@ -97,6 +101,34 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+>  		*fsr = 0x14;
+>  }
+>  
+> +enum exception_type {
+> +	except_type_sync	= 0,
+> +	except_type_irq		= 0x80,
+> +	except_type_fiq		= 0x100,
+> +	except_type_serror	= 0x180,
+> +};
+> +
+> +static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
+> +{
+> +	u64 exc_offset;
+> +
+> +	switch (*vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT)) {
+> +	case PSR_MODE_EL1t:
+> +		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
+> +		break;
+> +	case PSR_MODE_EL1h:
+> +		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
+> +		break;
+> +	case PSR_MODE_EL0t:
+> +		exc_offset = LOWER_EL_AArch64_VECTOR;
+> +		break;
+> +	default:
+> +		exc_offset = LOWER_EL_AArch32_VECTOR;
+> +	}
+> +
+> +	return vcpu_sys_reg(vcpu, VBAR_EL1) + exc_offset + type;
+> +}
+> +
+>  static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
+>  {
+>  	unsigned long cpsr = *vcpu_cpsr(vcpu);
+> @@ -108,8 +140,8 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+>  	*vcpu_spsr(vcpu) = cpsr;
+>  	*vcpu_elr_el1(vcpu) = *vcpu_pc(vcpu);
+>  
+> +	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
+>  	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
+> -	*vcpu_pc(vcpu) = vcpu_sys_reg(vcpu, VBAR_EL1) + EL1_EXCEPT_SYNC_OFFSET;
+>  
+>  	vcpu_sys_reg(vcpu, FAR_EL1) = addr;
+>  
+> @@ -143,8 +175,8 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+>  	*vcpu_spsr(vcpu) = cpsr;
+>  	*vcpu_elr_el1(vcpu) = *vcpu_pc(vcpu);
+>  
+> +	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
+>  	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
+> -	*vcpu_pc(vcpu) = vcpu_sys_reg(vcpu, VBAR_EL1) + EL1_EXCEPT_SYNC_OFFSET;
+>  
+>  	/*
+>  	 * Build an unknown exception, depending on the instruction
+> 
+I test this patch based on PMU patch set. It works as expected. I just
+have a question that here it sets EC with ESR_ELx_EC_UNKNOWN by default,
+not set it with the value of esr_el2. Does this matter?
 
 Thanks,
 -- 
 Shannon
+
