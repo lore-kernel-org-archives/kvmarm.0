@@ -1,27 +1,26 @@
 From: Alexander Gordeev <agordeev@redhat.com>
-Subject: [kvm-unit-tests PATCH 05/11] arm/pci: Add pci_find_dev() and
- pci_bar_addr() functions
-Date: Sat,  9 Jan 2016 13:22:52 +0100
-Message-ID: <306d836398fe72935b25068bb9df58f1fa8deec4.1452341807.git.agordeev@redhat.com>
+Subject: [kvm-unit-tests PATCH 09/11] arm/pci: PCI host bridge info printing
+Date: Sat,  9 Jan 2016 13:22:56 +0100
+Message-ID: <c82448afa4642ddb782990d75d0ff14eaff8e804.1452341807.git.agordeev@redhat.com>
 References: <cover.1452341807.git.agordeev@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5424A49969
- for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 07:19:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C507497F8
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 07:19:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1TujETLkiheZ for <kvmarm@lists.cs.columbia.edu>;
- Sat,  9 Jan 2016 07:19:18 -0500 (EST)
+ with ESMTP id j3a98STgoEUY for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  9 Jan 2016 07:19:23 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 66225499DE
- for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 07:19:18 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4979A49969
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 07:19:23 -0500 (EST)
 Received: from int-mx09.intmail.prod.int.phx2.redhat.com
  (int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
- by mx1.redhat.com (Postfix) with ESMTPS id 1FCB78DFED
- for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 12:23:09 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 0528DC0B73E5
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 12:23:14 +0000 (UTC)
 In-Reply-To: <cover.1452341807.git.agordeev@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -36,121 +35,74 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Alexander Gordeev <agordeev@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This updat is a reminiscence of x86 implementation - to
-provision a possible future common PCI interface.
-
-Make pcidevaddr_t as int, not u16. There is no good reason
-to limit it to u16 while omitting properly adjusted bit fields.
-
 Cc: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
 ---
- lib/pci-host-generic.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++
- lib/pci.h              | 18 +++++++++++++++++
- 2 files changed, 72 insertions(+)
+ lib/pci-host-generic.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
 diff --git a/lib/pci-host-generic.c b/lib/pci-host-generic.c
-index f3161f8..3d9c271 100644
+index 3d9c271..2d218a4 100644
 --- a/lib/pci-host-generic.c
 +++ b/lib/pci-host-generic.c
-@@ -29,6 +29,11 @@ static u8 pci_config_readb(const void *conf, int off)
- 	return readb(conf + off);
- }
+@@ -19,6 +19,15 @@
+ 	     dev >= 0;					\
+ 	     dev = find_next_dev(pci, dev, &conf))
  
-+static u16 pci_config_readw(const void *conf, int off)
-+{
-+	return readw(conf + off);
-+}
++static char *addr_space_desc[] = {
++	[PCI_RES_TYPE_CONF]		= "CONF",
++	[PCI_RES_TYPE_IO]		= "IO",
++	[PCI_RES_TYPE_MEM32]		= "MEM32",
++	[PCI_RES_TYPE_MEM64]		= "MEM64",
++	[PCI_RES_TYPE_PREFMEM32]	= "MEM32/p",
++	[PCI_RES_TYPE_PREFMEM64]	= "MEM64/p"
++};
 +
- static u32 pci_config_readl(const void *conf, int off)
+ static pci_res_type_t flags_to_type(u32 of_flags)
  {
- 	return readl(conf + off);
-@@ -351,6 +356,55 @@ int pci_bus_scan(struct pci *pci)
- 	return nr_dev;
+ 	return ((of_flags & 0x40000000) >> 28) | ((of_flags >> 24) & 0x03);
+@@ -105,6 +114,28 @@ static void pci_host_addr_space_init(struct pci_addr_space as[], int nr_as,
+ 	}
  }
  
-+static pcidevaddr_t encode_addr(int bus, int dev, int fn)
++static void pci_host_bridge_print(struct pci_host_bridge *host)
 +{
-+	assert(bus < 256 && dev < 32 && fn < 8);
-+	return bus << 16 | dev << 11 | fn;
++	printf("PCIe start %016llx size %016llx "
++	       "bus %02x bus_max %02x #spaces %d\n\n",
++		host->cpu_range.start, host->cpu_range.size,
++		host->bus, host->bus_max, host->nr_addr_spaces);
 +}
 +
-+static void decode_addr(pcidevaddr_t bdf, int *bus, int *dev, int *fn)
++static void pci_address_spaces_print(struct pci_addr_space as[], int nr_as)
 +{
-+	*bus = (bdf >> 16) & 0xff;
-+	*dev = (bdf >> 11) & 0x1f;
-+	*fn  = (bdf >>  8) & 0x03;
-+}
++	int i;
 +
-+pcidevaddr_t pci_find_dev(struct pci *pci, u16 vendor_id, u16 device_id)
-+{
-+	void *conf;
-+	int dev;
-+
-+	for_each_pci_dev(pci, dev, conf) {
-+		if (vendor_id == pci_config_readw(conf, PCI_VENDOR_ID) &&
-+		    device_id == pci_config_readw(conf, PCI_DEVICE_ID))
-+			return encode_addr(0, dev, 0);
++	for (i = 0; i < nr_as; i++, as++) {
++		printf("%s address space:\n"
++		       "CPU: start %016llx size %016llx\n"
++		       "PCI: start %016llx size %016llx\n\n",
++			addr_space_desc[flags_to_type(as->of_flags)],
++			as->cpu_range.start, as->cpu_range.size,
++		        as->pci_range.start, as->pci_range.size);
 +	}
-+
-+	return PCIDEVADDR_INVALID;
 +}
 +
-+phys_addr_t pci_bar_addr(struct pci *pci, pcidevaddr_t bdf, int bar)
-+{
-+	void *conf;
-+	struct pci_addr_space *res;
-+	pci_res_type_t type;
-+	phys_addr_t addr;
-+	bool is64;
-+	int bus, dev, fn;
-+
-+	decode_addr(bdf, &bus, &dev, &fn);
-+	assert(!bus && !fn);	/* We support bus 0 and function 0 only */
-+
-+	conf = dev_conf(pci, dev);
-+	assert(pci_config_readb(conf, PCI_HEADER_TYPE) ==
-+				      PCI_HEADER_TYPE_NORMAL);
-+
-+	assert(pci_get_bar(conf, bar, &type, &addr, NULL, &is64));
-+	assert(res = pci_find_res(pci->sysdata, type));
-+
-+	return res->cpu_range.start + (addr - res->pci_range.start);
-+}
-+
- struct pci *pci_dt_probe(void)
- {
- 	struct pci_host_bridge *host;
-diff --git a/lib/pci.h b/lib/pci.h
-index bc4f2d2..7d9baad 100644
---- a/lib/pci.h
-+++ b/lib/pci.h
-@@ -7,8 +7,26 @@ struct pci {
- 	void *sysdata;
- };
+ /*
+  * Probe DT for a generic PCI host controller
+  * See kernel Documentation/devicetree/bindings/pci/host-generic-pci.txt
+@@ -180,9 +211,13 @@ static struct pci_host_bridge *pci_host_bridge_probe(void)
+ 	host->bus_max		= bus_max;
+ 	host->nr_addr_spaces	= nr_addr_spaces;
  
-+/*
-+ * Make it a reminiscence of x86 implementation - to provision a possible
-+ * future merge.
-+ *
-+ * Unlike x86, PCIDEVADDR_INVALID is -1, not 0. PCI bus-device-function
-+ * of 00.00:0 is a legitimate PCI address, so x86 needs a fix.
-+ *
-+ * Also, make pcidevaddr_t int, not u16. There is no good reason to limit
-+ * it to u16 while omitting properly adjusted bit fields.
-+ *
-+ */
-+typedef enum {
-+	PCIDEVADDR_INVALID = -1
-+} pcidevaddr_t;
++	pci_host_bridge_print(host);
 +
- extern struct pci *pci_dt_probe(void);
- extern int pci_bus_scan(struct pci *pci);
- extern void pci_shutdown(struct pci *pci);
+ 	pci_host_addr_space_init(&host->addr_space[0], nr_addr_spaces,
+ 				 (u32*)prop->data, nr_range_cells);
  
-+extern pcidevaddr_t pci_find_dev(struct pci *pci, u16 vendor_id, u16 device_id);
-+extern phys_addr_t pci_bar_addr(struct pci *pci, pcidevaddr_t bdf, int bar_nr);
++	pci_address_spaces_print(&host->addr_space[0], host->nr_addr_spaces);
 +
- #endif
+ 	return host;
+ }
+ 
 -- 
 1.8.3.1
