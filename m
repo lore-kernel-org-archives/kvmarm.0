@@ -1,26 +1,27 @@
 From: Alexander Gordeev <agordeev@redhat.com>
-Subject: [kvm-unit-tests PATCH 01/11] arm/pci: Device tree PCI probing
-Date: Sat,  9 Jan 2016 13:22:48 +0100
-Message-ID: <06ff365af0d7579d0e4e431fad2492379533c290.1452341807.git.agordeev@redhat.com>
+Subject: [kvm-unit-tests PATCH 04/11] arm/pci: Allocate and assign memory/io
+ space resources
+Date: Sat,  9 Jan 2016 13:22:51 +0100
+Message-ID: <3fdf8892b958b323a8cbf38c079b08855d372038.1452341807.git.agordeev@redhat.com>
 References: <cover.1452341807.git.agordeev@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 882A5497F8
- for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 07:19:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F1F7C497F8
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 07:19:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EhV292U+4z5o for <kvmarm@lists.cs.columbia.edu>;
- Sat,  9 Jan 2016 07:19:13 -0500 (EST)
+ with ESMTP id 8+f7TRbZUnIt for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  9 Jan 2016 07:19:17 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6908E4993D
- for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 07:19:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1FB7549997
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 07:19:17 -0500 (EST)
 Received: from int-mx09.intmail.prod.int.phx2.redhat.com
  (int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
- by mx1.redhat.com (Postfix) with ESMTPS id 12AAEC09FA89
- for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 12:23:04 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id D0F1214CAB3
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 12:23:07 +0000 (UTC)
 In-Reply-To: <cover.1452341807.git.agordeev@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -38,314 +39,114 @@ List-Id: kvmarm@lists.cs.columbia.edu
 Cc: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
 ---
- arm/pci-test.c               |  25 +++++++
- config/config-arm-common.mak |   5 +-
- lib/alloc.c                  |   3 -
- lib/libcflat.h               |   3 +
- lib/pci-host-generic.c       | 155 +++++++++++++++++++++++++++++++++++++++++++
- lib/pci-host-generic.h       |  26 ++++++++
- lib/pci.h                    |  13 ++++
- 7 files changed, 226 insertions(+), 4 deletions(-)
- create mode 100644 arm/pci-test.c
- create mode 100644 lib/pci-host-generic.c
- create mode 100644 lib/pci-host-generic.h
- create mode 100644 lib/pci.h
+ lib/pci-host-generic.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 69 insertions(+), 2 deletions(-)
 
-diff --git a/arm/pci-test.c b/arm/pci-test.c
-new file mode 100644
-index 0000000..8629c89
---- /dev/null
-+++ b/arm/pci-test.c
-@@ -0,0 +1,25 @@
-+/*
-+ * PCI bus operation test
-+ *
-+ * Copyright (C) 2015, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-+ * Copyright (C) 2015, Red Hat Inc, Alexander Gordeev <agordeev@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#include <pci.h>
-+
-+int main(void)
-+{
-+	struct pci *pci;
-+
-+	pci = pci_dt_probe();
-+
-+	report("PCI device tree probing", pci);
-+	if (!pci)
-+		goto done;
-+
-+	pci_shutdown(pci);
-+
-+done:
-+	return report_summary();
-+}
-diff --git a/config/config-arm-common.mak b/config/config-arm-common.mak
-index 698555d..06ad346 100644
---- a/config/config-arm-common.mak
-+++ b/config/config-arm-common.mak
-@@ -11,7 +11,8 @@ endif
- 
- tests-common = \
- 	$(TEST_DIR)/selftest.flat \
--	$(TEST_DIR)/spinlock-test.flat
-+	$(TEST_DIR)/spinlock-test.flat \
-+	$(TEST_DIR)/pci-test.flat
- 
- all: test_cases
- 
-@@ -29,6 +30,7 @@ include config/asm-offsets.mak
- 
- cflatobjs += lib/alloc.o
- cflatobjs += lib/devicetree.o
-+cflatobjs += lib/pci-host-generic.o
- cflatobjs += lib/virtio.o
- cflatobjs += lib/virtio-mmio.o
- cflatobjs += lib/chr-testdev.o
-@@ -70,3 +72,4 @@ test_cases: $(generated_files) $(tests-common) $(tests)
- 
- $(TEST_DIR)/selftest.elf: $(cstart.o) $(TEST_DIR)/selftest.o
- $(TEST_DIR)/spinlock-test.elf: $(cstart.o) $(TEST_DIR)/spinlock-test.o
-+$(TEST_DIR)/pci-test.elf: $(cstart.o) $(TEST_DIR)/pci-test.o
-diff --git a/lib/alloc.c b/lib/alloc.c
-index ad67614..2f60145 100644
---- a/lib/alloc.c
-+++ b/lib/alloc.c
-@@ -7,9 +7,6 @@
- #include "asm/spinlock.h"
- #include "asm/io.h"
- 
--#define MIN(a, b)		((a) < (b) ? (a) : (b))
--#define MAX(a, b)		((a) > (b) ? (a) : (b))
--
- #define PHYS_ALLOC_NR_REGIONS	256
- 
- struct phys_alloc_region {
-diff --git a/lib/libcflat.h b/lib/libcflat.h
-index 9747ccd..2cb167c 100644
---- a/lib/libcflat.h
-+++ b/lib/libcflat.h
-@@ -76,4 +76,7 @@ do {									\
- 		abort();						\
- } while (0)
- 
-+#define MIN(a, b)		((a) < (b) ? (a) : (b))
-+#define MAX(a, b)		((a) > (b) ? (a) : (b))
-+
- #endif
 diff --git a/lib/pci-host-generic.c b/lib/pci-host-generic.c
-new file mode 100644
-index 0000000..62b5662
---- /dev/null
+index b783d29..f3161f8 100644
+--- a/lib/pci-host-generic.c
 +++ b/lib/pci-host-generic.c
-@@ -0,0 +1,155 @@
-+/*
-+ * Adapated from
-+ *   drivers/pci/host/pci-host-generic.c
-+ *
-+ * Copyright (C) 2015, Red Hat Inc, Andrew Jones <drjones@redhat.com>
-+ * Copyright (C) 2016, Red Hat Inc, Alexander Gordeev <agordeev@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#include "libcflat.h"
-+#include "devicetree.h"
-+#include "asm/io.h"
-+#include "pci.h"
-+#include "pci-host-generic.h"
-+#include <linux/pci_regs.h>
-+
-+static void pci_host_addr_space_init(struct pci_addr_space as[], int nr_as,
-+				     u32 cells[], int nr_range_cells)
+@@ -19,6 +19,11 @@
+ 	     dev >= 0;					\
+ 	     dev = find_next_dev(pci, dev, &conf))
+ 
++static pci_res_type_t flags_to_type(u32 of_flags)
 +{
++	return ((of_flags & 0x40000000) >> 28) | ((of_flags >> 24) & 0x03);
++}
++
+ static u8 pci_config_readb(const void *conf, int off)
+ {
+ 	return readb(conf + off);
+@@ -255,11 +260,66 @@ static bool pci_get_bar(void *conf, int bar, pci_res_type_t *type,
+ 	return true;
+ }
+ 
++static void pci_set_bar(void *conf, int bar, phys_addr_t addr, bool is64)
++{
++	int off = PCI_BASE_ADDRESS_0 + (bar * 4);
++
++	pci_config_writel(addr, conf, off);
++	if (is64)
++		pci_config_writel(addr >> 32, conf, off + 4);
++}
++
++static struct pci_addr_space *pci_find_res(struct pci_host_bridge *host,
++					   pci_res_type_t type)
++{
++	struct pci_addr_space *as = &host->addr_space[0];
 +	int i;
 +
-+	/*
-+	 * The PCI binding claims the numerical representation of a PCI
-+	 * address consists of three cells, encoded as follows:
-+	 *
-+	 * phys.hi  cell: npt000ss bbbbbbbb dddddfff rrrrrrrr
-+	 * phys.mid cell: hhhhhhhh hhhhhhhh hhhhhhhh hhhhhhhh
-+	 * phys.lo  cell: llllllll llllllll llllllll llllllll
-+	 *
-+	 * PCI device bus address and flags are encoded into phys.high
-+	 * PCI 64 bit address is encoded into phys.mid and phys.low
-+	 */
-+
-+	for (i = 0; i < nr_as; i++, as++) {
-+		as->of_flags = fdt32_to_cpu(cells[0]);
-+		as->pci_range.start = fdt64_to_cpu(*((fdt64_t*)&cells[1]));
-+
-+		if (nr_range_cells == 6) {
-+			as->cpu_range.start = fdt32_to_cpu(cells[3]);
-+			as->cpu_range.size =
-+				fdt64_to_cpu(*((fdt64_t*)&cells[4]));
-+		} else {
-+			as->cpu_range.start =
-+				fdt64_to_cpu(*((fdt64_t*)&cells[3]));;
-+			as->cpu_range.size =
-+				fdt64_to_cpu(*((fdt64_t*)&cells[5]));
-+		}
-+
-+		as->pci_range.size = as->cpu_range.size;
-+
-+		cells += nr_range_cells;
++	for (i = 0; i < host->nr_addr_spaces; i++, as++) {
++		if (flags_to_type(as->of_flags) == type)
++			return as;
 +	}
++
++	return NULL;
 +}
 +
-+/*
-+ * Probe DT for a generic PCI host controller
-+ * See kernel Documentation/devicetree/bindings/pci/host-generic-pci.txt
-+ */
-+static struct pci_host_bridge *pci_host_bridge_probe(void)
++static phys_addr_t pci_align_res_size(phys_addr_t size, pci_res_type_t type)
 +{
-+	struct pci_host_bridge *host;
-+	const void *fdt = dt_fdt();
-+	const struct fdt_property *prop;
-+	struct dt_pbus_reg base;
-+	struct dt_device dt_dev;
-+	struct dt_bus dt_bus;
-+	u32 bus, bus_max;
-+	u32 nac, nsc, nac_root, nsc_root;
-+	u32 nr_range_cells, nr_addr_spaces;
-+	int ret, node, len;
++	phys_addr_t mask;
 +
-+	if (!dt_available())
-+		return NULL;
++	if (type == PCI_RES_TYPE_IO)
++		mask = PCI_BASE_ADDRESS_IO_MASK;
++	else
++		mask = PCI_BASE_ADDRESS_MEM_MASK;
 +
-+	dt_bus_init_defaults(&dt_bus);
-+	dt_device_init(&dt_dev, &dt_bus, NULL);
-+
-+	node = fdt_path_offset(fdt, "/");
-+	assert(node >= 0);
-+
-+	assert(dt_get_nr_cells(node, &nac_root, &nsc_root) == 0);
-+	assert(nac_root == 1 || nac_root == 2);
-+
-+	node = fdt_subnode_offset(fdt, node, "pcie");
-+	if (node == -FDT_ERR_NOTFOUND)
-+		return NULL;
-+	assert(node >= 0);
-+
-+	prop = fdt_get_property(fdt, node, "device_type", &len);
-+	if (!prop || strcmp((char*)prop->data, "pci"))
-+		return NULL;
-+
-+	ret = fdt_node_check_compatible(fdt, node, "pci-host-ecam-generic");
-+	assert(ret >= 0);
-+	if (ret != 0)
-+		return NULL;
-+
-+	dt_device_bind_node(&dt_dev, node);
-+	assert(dt_pbus_get_base(&dt_dev, &base) == 0);
-+
-+	prop = fdt_get_property(fdt, node, "bus-range", &len);
-+	if (prop == NULL) {
-+		assert(len != 0);
-+		bus		= 0x00;
-+		bus_max		= 0xff;
-+	} else {
-+		u32 *data	= (u32*)prop->data;
-+		bus		= fdt32_to_cpu(data[0]);
-+		bus_max		= fdt32_to_cpu(data[1]);
-+	}
-+	bus_max = MIN(bus_max, (base.size / PCI_ECAM_BUS_SIZE) - 1);
-+
-+	assert(dt_get_nr_cells(node, &nac, &nsc) == 0);
-+	assert(nac == 3 && nsc == 2);
-+
-+	assert(prop = fdt_get_property(fdt, node, "ranges", &len));
-+
-+	nr_range_cells = nac + nsc + nac_root;
-+	nr_addr_spaces = (len / 4) / nr_range_cells;
-+
-+	assert(host = malloc(sizeof(*host) +
-+			     sizeof(host->addr_space[0]) * nr_addr_spaces));
-+
-+	host->cpu_range.start	= base.addr;
-+	host->cpu_range.size	= base.size;
-+	host->bus		= bus;
-+	host->bus_max		= bus_max;
-+	host->nr_addr_spaces	= nr_addr_spaces;
-+
-+	pci_host_addr_space_init(&host->addr_space[0], nr_addr_spaces,
-+				 (u32*)prop->data, nr_range_cells);
-+
-+	return host;
++	return (size + ~mask) & mask;
 +}
 +
-+struct pci *pci_dt_probe(void)
++static phys_addr_t pci_alloc_res(struct pci_host_bridge *host,
++				 pci_res_type_t type, u64 size)
 +{
-+	struct pci_host_bridge *host;
-+	struct pci *pci;
++	struct pci_addr_space *res;
++	phys_addr_t addr;
 +
-+	host = pci_host_bridge_probe();
-+	if (!host)
-+		return NULL;
++	assert(res = pci_find_res(host, type));
 +
-+	assert(pci = calloc(1, sizeof(*pci)));
-+	pci->sysdata = host;
++	size = pci_align_res_size(size, type);
++	assert(res->alloc + size <= res->pci_range.size);
 +
-+	return pci;
++	addr = res->pci_range.start + res->alloc;
++	res->alloc += size;
++
++	return addr;
 +}
 +
-+void pci_shutdown(struct pci *pci)
-+{
-+	free(pci->sysdata);
-+	free(pci);
-+}
-diff --git a/lib/pci-host-generic.h b/lib/pci-host-generic.h
-new file mode 100644
-index 0000000..097ac2d
---- /dev/null
-+++ b/lib/pci-host-generic.h
-@@ -0,0 +1,26 @@
-+#ifndef PCI_HOST_GENERIC_H
-+#define PCI_HOST_GENERIC_H
+ int pci_bus_scan(struct pci *pci)
+ {
+ 	void *conf;
++	phys_addr_t addr;
++	u64 size;
+ 	pci_res_type_t type;
+ 	bool is64;
++	u32 cmd = PCI_COMMAND_SERR;
+ 	int bar;
+ 	int dev;
+ 	int nr_dev = 0;
+@@ -271,13 +331,20 @@ int pci_bus_scan(struct pci *pci)
+ 			continue;
+ 
+ 		for (bar = 0; bar < PCI_HEADER_TYPE_NORMAL_NUM_BARS; bar++) {
+-			if (!pci_get_bar(conf, bar, &type, NULL, NULL, &is64))
++			if (!pci_get_bar(conf, bar, &type, NULL, &size, &is64))
+ 				break;
++			addr = pci_alloc_res(pci->sysdata, type, size);
++			pci_set_bar(conf, bar, addr, is64);
+ 			if (is64)
+ 				bar++;
 +
-+struct pci_addr_range {
-+	phys_addr_t			start;
-+	phys_addr_t			size;
-+};
-+
-+struct pci_addr_space {
-+	struct pci_addr_range		cpu_range;
-+	struct pci_addr_range		pci_range;
-+	phys_addr_t			alloc;
-+	u32				of_flags;
-+};
-+
-+struct pci_host_bridge {
-+	struct pci_addr_range		cpu_range;
-+	int				bus;
-+	int				bus_max;
-+	int				nr_addr_spaces;
-+	struct pci_addr_space		addr_space[];
-+};
-+
-+#define PCI_ECAM_BUS_SIZE		(1 << 20)
-+
-+#endif
-diff --git a/lib/pci.h b/lib/pci.h
-new file mode 100644
-index 0000000..22b8e31
---- /dev/null
-+++ b/lib/pci.h
-@@ -0,0 +1,13 @@
-+#ifndef PCI_H
-+#define PCI_H
-+
-+#include "alloc.h"
-+
-+struct pci {
-+	void *sysdata;
-+};
-+
-+extern struct pci *pci_dt_probe(void);
-+extern void pci_shutdown(struct pci *pci);
-+
-+#endif
++			if (type == PCI_RES_TYPE_IO)
++				cmd |= PCI_COMMAND_IO;
++			else
++				cmd |= PCI_COMMAND_MEMORY;
+ 		}
+ 
+-		pci_config_writel(PCI_COMMAND_SERR, conf, PCI_COMMAND);
++		pci_config_writel(cmd, conf, PCI_COMMAND);
+ 		nr_dev++;
+ 	}
+ 
 -- 
 1.8.3.1
