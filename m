@@ -1,26 +1,26 @@
 From: Alexander Gordeev <agordeev@redhat.com>
-Subject: [kvm-unit-tests PATCH 06/11] arm/pci: PCI testdev existence test
-Date: Sat,  9 Jan 2016 13:22:53 +0100
-Message-ID: <a22ed67ab7d062005a11a1174f7e44d2a747b49f.1452341807.git.agordeev@redhat.com>
+Subject: [kvm-unit-tests PATCH 02/11] arm/pci: PCI bus scanning
+Date: Sat,  9 Jan 2016 13:22:49 +0100
+Message-ID: <c135546bfd13a2e7655cf10a68181503ec9f5ee5.1452341807.git.agordeev@redhat.com>
 References: <cover.1452341807.git.agordeev@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 377AF4993D
- for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 07:19:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 837204993D
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 07:19:15 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1eWsRlKeY1-G for <kvmarm@lists.cs.columbia.edu>;
- Sat,  9 Jan 2016 07:19:19 -0500 (EST)
+ with ESMTP id xEH9N6vDf5Kf for <kvmarm@lists.cs.columbia.edu>;
+ Sat,  9 Jan 2016 07:19:14 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7AA1E49969
- for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 07:19:19 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A684449969
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 07:19:14 -0500 (EST)
 Received: from int-mx09.intmail.prod.int.phx2.redhat.com
  (int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
- by mx1.redhat.com (Postfix) with ESMTPS id 36EC4C0B73E5
- for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 12:23:10 +0000 (UTC)
+ by mx1.redhat.com (Postfix) with ESMTPS id 52599558D3
+ for <kvmarm@lists.cs.columbia.edu>; Sat,  9 Jan 2016 12:23:05 +0000 (UTC)
 In-Reply-To: <cover.1452341807.git.agordeev@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -35,90 +35,153 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: Alexander Gordeev <agordeev@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+Scan bus 0 and function 0 only for now
+
 Cc: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
 ---
- arm/pci-test.c               |  3 +++
- config/config-arm-common.mak |  1 +
- lib/pci-testdev.c            | 31 +++++++++++++++++++++++++++++++
- lib/pci.h                    |  1 +
- 4 files changed, 36 insertions(+)
- create mode 100644 lib/pci-testdev.c
+ arm/pci-test.c         |  4 +++
+ lib/pci-host-generic.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ lib/pci-host-generic.h |  1 +
+ lib/pci.h              |  1 +
+ 4 files changed, 73 insertions(+)
 
 diff --git a/arm/pci-test.c b/arm/pci-test.c
-index 1539d3e..695acf9 100644
+index 8629c89..1539d3e 100644
 --- a/arm/pci-test.c
 +++ b/arm/pci-test.c
-@@ -22,6 +22,9 @@ int main(void)
- 	ret = pci_bus_scan(pci);
- 	report("PCI bus scanning detected %d devices", true, ret);
+@@ -11,6 +11,7 @@
+ int main(void)
+ {
+ 	struct pci *pci;
++	int ret;
  
-+	ret = pci_testdev(pci);
-+	report("PCI test device", ret);
+ 	pci = pci_dt_probe();
+ 
+@@ -18,6 +19,9 @@ int main(void)
+ 	if (!pci)
+ 		goto done;
+ 
++	ret = pci_bus_scan(pci);
++	report("PCI bus scanning detected %d devices", true, ret);
 +
  	pci_shutdown(pci);
  
  done:
-diff --git a/config/config-arm-common.mak b/config/config-arm-common.mak
-index 06ad346..f2e0ad1 100644
---- a/config/config-arm-common.mak
-+++ b/config/config-arm-common.mak
-@@ -31,6 +31,7 @@ include config/asm-offsets.mak
- cflatobjs += lib/alloc.o
- cflatobjs += lib/devicetree.o
- cflatobjs += lib/pci-host-generic.o
-+cflatobjs += lib/pci-testdev.o
- cflatobjs += lib/virtio.o
- cflatobjs += lib/virtio-mmio.o
- cflatobjs += lib/chr-testdev.o
-diff --git a/lib/pci-testdev.c b/lib/pci-testdev.c
-new file mode 100644
-index 0000000..a7e0995
---- /dev/null
-+++ b/lib/pci-testdev.c
-@@ -0,0 +1,31 @@
-+/*
-+ * QEMU "pci-testdev" PCI test device
-+ *
-+ * Copyright (C) 2015, Red Hat Inc, Alexander Gordeev <agordeev@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
-+ */
-+#include "pci.h"
-+#include "asm/io.h"
+diff --git a/lib/pci-host-generic.c b/lib/pci-host-generic.c
+index 62b5662..e479989 100644
+--- a/lib/pci-host-generic.c
++++ b/lib/pci-host-generic.c
+@@ -14,6 +14,49 @@
+ #include "pci-host-generic.h"
+ #include <linux/pci_regs.h>
+ 
++#define for_each_pci_dev(pci, dev, conf)		\
++	for (dev = find_next_dev(pci, -1, &conf);	\
++	     dev >= 0;					\
++	     dev = find_next_dev(pci, dev, &conf))
 +
-+#define PCI_VENDOR_ID_REDHAT		0x1b36
-+#define PCI_DEVICE_ID_REDHAT_TEST	0x0005
-+
-+bool pci_testdev(struct pci *pci)
++static u8 pci_config_readb(const void *conf, int off)
 +{
-+	phys_addr_t addr;
-+	pcidevaddr_t dev = pci_find_dev(pci,
-+					PCI_VENDOR_ID_REDHAT,
-+					PCI_DEVICE_ID_REDHAT_TEST);
-+
-+	if (dev == PCIDEVADDR_INVALID)
-+		return false;
-+
-+	addr = pci_bar_addr(pci, dev, 0);
-+	assert(addr);
-+
-+	addr = pci_bar_addr(pci, dev, 1);
-+	assert(addr);
-+
-+	return true;
++	return readb(conf + off);
 +}
++
++static u32 pci_config_readl(const void *conf, int off)
++{
++	return readl(conf + off);
++}
++
++static void pci_config_writel(u32 val, void *conf, int off)
++{
++	writel(val, conf + off);
++}
++
++static void* dev_conf(struct pci *pci, int dev)
++{
++	struct pci_host_bridge *host = pci->sysdata;
++	return (void*)host->cpu_range.start + (dev * 8) * PCI_ECAM_CONFIG_SIZE;
++}
++
++/* We scan bus 0 only for now */
++static int find_next_dev(struct pci *pci, int dev, void **pconf)
++{
++	struct pci_host_bridge *host = pci->sysdata;
++	int limit = MIN(32u, host->cpu_range.size / PCI_ECAM_CONFIG_SIZE);
++
++	for (dev++; dev < limit; dev++) {
++		void *conf = dev_conf(pci, dev);
++		if (pci_config_readl(conf, PCI_VENDOR_ID) != ((u32)~0)) {
++			*pconf = conf;
++			return dev;
++		}
++	}
++
++	return -1;
++}
++
+ static void pci_host_addr_space_init(struct pci_addr_space as[], int nr_as,
+ 				     u32 cells[], int nr_range_cells)
+ {
+@@ -133,6 +176,24 @@ static struct pci_host_bridge *pci_host_bridge_probe(void)
+ 	return host;
+ }
+ 
++int pci_bus_scan(struct pci *pci)
++{
++	void *conf;
++	int dev;
++	int nr_dev = 0;
++
++	for_each_pci_dev(pci, dev, conf) {
++		/* We are only interested in normal PCI devices */
++		if (pci_config_readb(conf, PCI_HEADER_TYPE) !=
++					   PCI_HEADER_TYPE_NORMAL)
++			continue;
++		pci_config_writel(PCI_COMMAND_SERR, conf, PCI_COMMAND);
++		nr_dev++;
++	}
++
++	return nr_dev;
++}
++
+ struct pci *pci_dt_probe(void)
+ {
+ 	struct pci_host_bridge *host;
+@@ -150,6 +211,12 @@ struct pci *pci_dt_probe(void)
+ 
+ void pci_shutdown(struct pci *pci)
+ {
++	void *conf;
++	int dev;
++
++	for_each_pci_dev(pci, dev, conf)
++		pci_config_writel(PCI_COMMAND_INTX_DISABLE, conf, PCI_COMMAND);
++
+ 	free(pci->sysdata);
+ 	free(pci);
+ }
+diff --git a/lib/pci-host-generic.h b/lib/pci-host-generic.h
+index 097ac2d..c14d32d 100644
+--- a/lib/pci-host-generic.h
++++ b/lib/pci-host-generic.h
+@@ -22,5 +22,6 @@ struct pci_host_bridge {
+ };
+ 
+ #define PCI_ECAM_BUS_SIZE		(1 << 20)
++#define PCI_ECAM_CONFIG_SIZE		(1 << 12)
+ 
+ #endif
 diff --git a/lib/pci.h b/lib/pci.h
-index 7d9baad..6af5599 100644
+index 22b8e31..bc4f2d2 100644
 --- a/lib/pci.h
 +++ b/lib/pci.h
-@@ -24,6 +24,7 @@ typedef enum {
+@@ -8,6 +8,7 @@ struct pci {
+ };
  
  extern struct pci *pci_dt_probe(void);
- extern int pci_bus_scan(struct pci *pci);
-+extern bool pci_testdev(struct pci *pci);
++extern int pci_bus_scan(struct pci *pci);
  extern void pci_shutdown(struct pci *pci);
  
- extern pcidevaddr_t pci_find_dev(struct pci *pci, u16 vendor_id, u16 device_id);
+ #endif
 -- 
 1.8.3.1
