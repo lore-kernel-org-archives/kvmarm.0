@@ -1,48 +1,118 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] KVM: arm/arm64: Output Guest cntvoff value
-Date: Sun, 10 Jan 2016 20:26:23 +0100
-Message-ID: <20160110192623.GA13541@cbox>
-References: <1451674709-31074-1-git-send-email-amittomer25@gmail.com>
- <20160104142321.GB28354@cbox>
- <CABHD4K-5CvP+JK=74Z0=v42GTWOMwXU8Hw6R4H01hXiBs+AO5w@mail.gmail.com>
+Subject: Re: [PATCH] arm64: KVM: Fix AArch64 guest userspace exception
+ injection
+Date: Sun, 10 Jan 2016 20:45:26 +0100
+Message-ID: <20160110194526.GB13541@cbox>
+References: <1452157416-9435-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C8C64993B
- for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Jan 2016 14:21:51 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1k1SkiGuy2MH for <kvmarm@lists.cs.columbia.edu>;
- Sun, 10 Jan 2016 14:21:50 -0500 (EST)
-Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id BE8FA49937
- for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Jan 2016 14:21:50 -0500 (EST)
-Received: by mail-wm0-f45.google.com with SMTP id u188so191573034wmu.1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 10 Jan 2016 11:25:46 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <CABHD4K-5CvP+JK=74Z0=v42GTWOMwXU8Hw6R4H01hXiBs+AO5w@mail.gmail.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Amit Tomer <amittomer25@gmail.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <1452157416-9435-1-git-send-email-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Shannon Zhao <shannon.zhao@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sun, Jan 10, 2016 at 10:55:32PM +0530, Amit Tomer wrote:
-> > Out of curiosity, what is the value of having this?
+On Thu, Jan 07, 2016 at 09:03:36AM +0000, Marc Zyngier wrote:
+> At the moment, our fault injection is pretty limited. We always
+> generate a SYNC exception into EL1, as if the fault was actually
+> from EL1h, no matter how it was generated.
 > 
-> As we know that host and guest clocks are not in sync(Running at a
-> difference of CNTVOFF value initialized in guest). This value can be
-> used to correlate the trace event between host and guest.
+> This is obviously wrong, as EL0 can generate faults of its own
+> (not to mention the pretty-much unused EL1t mode).
 > 
-ok, I'm fine with this patch.
+> This patch fixes it by implementing section D1.10.2 of the ARMv8 ARM,
+> and in particular table D1-7 ("Vector offsets from vector table base
+> address"), which describes which vector to use depending on the source
+> exception level and type (synchronous, IRQ, FIQ or SError).
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/kvm/inject_fault.c | 38 +++++++++++++++++++++++++++++++++++---
+>  1 file changed, 35 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+> index 648112e..4d1ac81 100644
+> --- a/arch/arm64/kvm/inject_fault.c
+> +++ b/arch/arm64/kvm/inject_fault.c
+> @@ -27,7 +27,11 @@
+>  
+>  #define PSTATE_FAULT_BITS_64 	(PSR_MODE_EL1h | PSR_A_BIT | PSR_F_BIT | \
+>  				 PSR_I_BIT | PSR_D_BIT)
+> -#define EL1_EXCEPT_SYNC_OFFSET	0x200
+> +
+> +#define CURRENT_EL_SP_EL0_VECTOR	0x0
+> +#define CURRENT_EL_SP_ELx_VECTOR	0x200
+> +#define LOWER_EL_AArch64_VECTOR		0x400
+> +#define LOWER_EL_AArch32_VECTOR		0x600
+>  
+>  static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
+>  {
+> @@ -97,6 +101,34 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+>  		*fsr = 0x14;
+>  }
+>  
+> +enum exception_type {
+> +	except_type_sync	= 0,
+> +	except_type_irq		= 0x80,
+> +	except_type_fiq		= 0x100,
+> +	except_type_serror	= 0x180,
+> +};
+> +
+> +static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
+> +{
+> +	u64 exc_offset;
+> +
+> +	switch (*vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT)) {
+> +	case PSR_MODE_EL1t:
+> +		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
+> +		break;
+> +	case PSR_MODE_EL1h:
+> +		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
+> +		break;
+> +	case PSR_MODE_EL0t:
+> +		exc_offset = LOWER_EL_AArch64_VECTOR;
+> +		break;
+> +	default:
+> +		exc_offset = LOWER_EL_AArch32_VECTOR;
+
+so this catches any EL0 32-bit state, right?
+
+If so:
+
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 
 -Christoffer
+
+> +	}
+> +
+> +	return vcpu_sys_reg(vcpu, VBAR_EL1) + exc_offset + type;
+> +}
+> +
+>  static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
+>  {
+>  	unsigned long cpsr = *vcpu_cpsr(vcpu);
+> @@ -108,8 +140,8 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+>  	*vcpu_spsr(vcpu) = cpsr;
+>  	*vcpu_elr_el1(vcpu) = *vcpu_pc(vcpu);
+>  
+> +	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
+>  	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
+> -	*vcpu_pc(vcpu) = vcpu_sys_reg(vcpu, VBAR_EL1) + EL1_EXCEPT_SYNC_OFFSET;
+>  
+>  	vcpu_sys_reg(vcpu, FAR_EL1) = addr;
+>  
+> @@ -143,8 +175,8 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+>  	*vcpu_spsr(vcpu) = cpsr;
+>  	*vcpu_elr_el1(vcpu) = *vcpu_pc(vcpu);
+>  
+> +	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
+>  	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
+> -	*vcpu_pc(vcpu) = vcpu_sys_reg(vcpu, VBAR_EL1) + EL1_EXCEPT_SYNC_OFFSET;
+>  
+>  	/*
+>  	 * Build an unknown exception, depending on the instruction
+> -- 
+> 2.1.4
+> 
