@@ -1,39 +1,42 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v8 20/20] KVM: ARM64: Add a new kvm ARM PMU device
-Date: Mon, 11 Jan 2016 17:48:45 +0100
-Message-ID: <20160111164845.GI3924@hawk.localdomain>
-References: <CAFEAcA_MDiOphseZ7RGNE3G=4ZDF5SFV5krOjanPbVuhgg9gnQ@mail.gmail.com>
- <568E7AF1.9040103@huawei.com>
- <CAFEAcA-Qcda7TSFLSeykLHqZYdP6tYdEjPe2uHN6f_+omqWFZg@mail.gmail.com>
- <20160107203647.GJ6199@hawk.localdomain>
- <20160109122956.GA30867@cbox>
- <20160109150339.10576e81@arm.com>
- <20160111140717.GD3924@hawk.localdomain>
- <20160111150929.GB15554@cbox>
- <20160111160927.GF3924@hawk.localdomain>
- <CAFEAcA8ayUEoH7zX+cGrOcT7kCWnLzMfgo2NFTbPt3aSPwt-+Q@mail.gmail.com>
+From: Amit Tomer <amittomer25@gmail.com>
+Subject: Re: [PATCH] KVM: arm/arm64: Output Guest cntvoff value
+Date: Tue, 12 Jan 2016 00:49:04 +0530
+Message-ID: <CABHD4K-SPM61QPJ-GENczLWeKshfh39W8tz2Y9YZjN=qNtC+vg@mail.gmail.com>
+References: <1451674709-31074-1-git-send-email-amittomer25@gmail.com>
+ <20160104142321.GB28354@cbox>
+ <CABHD4K-5CvP+JK=74Z0=v42GTWOMwXU8Hw6R4H01hXiBs+AO5w@mail.gmail.com>
+ <20160110192623.GA13541@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8ayUEoH7zX+cGrOcT7kCWnLzMfgo2NFTbPt3aSPwt-+Q@mail.gmail.com>
-Sender: kvm-owner@vger.kernel.org
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Shannon Zhao <zhaoshenglong@huawei.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>, Will Deacon <will.deacon@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D24EB49BA0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2016 14:15:05 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id uC8-dxIfUfad for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Jan 2016 14:15:05 -0500 (EST)
+Received: from mail-yk0-f171.google.com (mail-yk0-f171.google.com
+ [209.85.160.171])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2150F49B91
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2016 14:15:04 -0500 (EST)
+Received: by mail-yk0-f171.google.com with SMTP id a85so364692065ykb.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Jan 2016 11:19:04 -0800 (PST)
+In-Reply-To: <20160110192623.GA13541@cbox>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 11, 2016 at 04:13:12PM +0000, Peter Maydell wrote:
-> On 11 January 2016 at 16:09, Andrew Jones <drjones@redhat.com> wrote:
-> > I think the save/restore case is where I always flip to seeing it as a
-> > bunch of separate per cpu devices. It would feel better to me to
-> > save/restore the cpu-gic registers the same way we do all other cpu
-> > registers.
-> 
-> From QEMU's point of view this would be extremely awkward, which
-> is one reason I'm happy with the GICv3 API we came up with
-> and reviewed last year...
+> ok, I'm fine with this patch.
 
-OK, I'll shut up about this. As I didn't speak then, I shall now forever
-hold my peace :)
-
-drew
+ok, Thanks.
