@@ -1,29 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v6 1/6] arm/arm64: KVM: Introduce armv7 fp/simd vcpu
+Subject: Re: [PATCH v6 5/6] arm/arm64: KVM: Introduce armv8 fp/simd vcpu
  fields and helpers
-Date: Tue, 12 Jan 2016 15:12:07 +0100
-Message-ID: <20160112141207.GF15554@cbox>
-References: <1451166900-3711-1-git-send-email-m.smarduch@samsung.com>
- <1451166900-3711-2-git-send-email-m.smarduch@samsung.com>
- <20160110163204.GD30867@cbox> <56943D29.3000002@samsung.com>
+Date: Tue, 12 Jan 2016 15:13:09 +0100
+Message-ID: <20160112141309.GG15554@cbox>
+References: <1451166989-3754-1-git-send-email-m.smarduch@samsung.com>
+ <20160110163217.GG30867@cbox> <56944947.2080707@samsung.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B2AF49B96
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2016 09:07:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DDA0349B96
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2016 09:08:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7rLZyajdbMsI for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Jan 2016 09:07:25 -0500 (EST)
-Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1649D49B54
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2016 09:07:24 -0500 (EST)
-Received: by mail-wm0-f42.google.com with SMTP id f206so254279580wmf.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2016 06:11:27 -0800 (PST)
+ with ESMTP id RzRpA8-3vZni for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Jan 2016 09:08:26 -0500 (EST)
+Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 720AD49B54
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2016 09:08:26 -0500 (EST)
+Received: by mail-wm0-f52.google.com with SMTP id f206so254317957wmf.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Jan 2016 06:12:29 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <56943D29.3000002@samsung.com>
+In-Reply-To: <56944947.2080707@samsung.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,88 +36,200 @@ To: Mario Smarduch <m.smarduch@samsung.com>
 Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 11, 2016 at 03:39:21PM -0800, Mario Smarduch wrote:
-> 
-> 
+On Mon, Jan 11, 2016 at 04:31:03PM -0800, Mario Smarduch wrote:
 > On 1/10/2016 8:32 AM, Christoffer Dall wrote:
-> > Hi Mario,
-> > 
-> > I spotted one more potential issue...
-> > 
-> > On Sat, Dec 26, 2015 at 01:54:55PM -0800, Mario Smarduch wrote:
-> >> Add helper functions to enable access to fp/smid on guest entry and save host
-> >> fpexc on vcpu put, check if fp/simd registers are dirty and add new vcpu
-> >> fields.
+> > On Sat, Dec 26, 2015 at 01:56:29PM -0800, Mario Smarduch wrote:
+> >> Similar to armv7 add helper functions to enable access to fp/smid registers on 
+> >> guest entry. Save guest fpexc32_el2 on vcpu_put, check if guest is 32 bit.
+> >> Save guest and restore host registers from host kernel, and check 
+> >> if fp/simd registers are dirty, lastly add cptr_el2 vcpu field.
 > >>
 > >> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
 > >> ---
-> >>  arch/arm/include/asm/kvm_emulate.h   | 42 ++++++++++++++++++++++++++++++++++++
-> >>  arch/arm/include/asm/kvm_host.h      |  6 ++++++
-> >>  arch/arm64/include/asm/kvm_emulate.h |  8 +++++++
-> >>  3 files changed, 56 insertions(+)
+> >>  arch/arm/include/asm/kvm_emulate.h   | 12 ++++++++++++
+> >>  arch/arm64/include/asm/kvm_asm.h     |  5 +++++
+> >>  arch/arm64/include/asm/kvm_emulate.h | 26 ++++++++++++++++++++++++--
+> >>  arch/arm64/include/asm/kvm_host.h    | 12 +++++++++++-
+> >>  arch/arm64/kvm/hyp/hyp-entry.S       | 26 ++++++++++++++++++++++++++
+> >>  5 files changed, 78 insertions(+), 3 deletions(-)
 > >>
 > >> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-> >> index 3095df0..d4d9da1 100644
+> >> index d4d9da1..a434dc5 100644
 > >> --- a/arch/arm/include/asm/kvm_emulate.h
 > >> +++ b/arch/arm/include/asm/kvm_emulate.h
-> >> @@ -24,6 +24,8 @@
-> >>  #include <asm/kvm_mmio.h>
-> >>  #include <asm/kvm_arm.h>
-> >>  #include <asm/cputype.h>
-> >> +#include <asm/vfp.h>
-> >> +#include "../vfp/vfpinstr.h"
+> >> @@ -284,6 +284,12 @@ static inline bool vcpu_vfp_isdirty(struct kvm_vcpu *vcpu)
+> >>  {
+> >>  	return !(vcpu->arch.hcptr & (HCPTR_TCP(10) | HCPTR_TCP(11)));
+> >>  }
+> >> +
+> >> +static inline bool vcpu_guest_is_32bit(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +	return true;
+> >> +}
+> >> +static inline void vcpu_save_fpexc(struct kvm_vcpu *vcpu) {}
+> >>  #else
+> >>  static inline void vcpu_trap_vfp_enable(struct kvm_vcpu *vcpu)
+> >>  {
+> >> @@ -295,6 +301,12 @@ static inline bool vcpu_vfp_isdirty(struct kvm_vcpu *vcpu)
+> >>  {
+> >>  	return false;
+> >>  }
+> >> +
+> >> +static inline bool vcpu_guest_is_32bit(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +	return true;
+> >> +}
+> >> +static inline void vcpu_save_fpexc(struct kvm_vcpu *vcpu) {}
+> >>  #endif
 > >>  
-> >>  unsigned long *vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num);
-> >>  unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu);
-> >> @@ -255,4 +257,44 @@ static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
-> >>  	}
+> >>  #endif /* __ARM_KVM_EMULATE_H__ */
+> >> diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+> >> index 52b777b..ddae814 100644
+> >> --- a/arch/arm64/include/asm/kvm_asm.h
+> >> +++ b/arch/arm64/include/asm/kvm_asm.h
+> >> @@ -48,6 +48,11 @@ extern u64 __vgic_v3_get_ich_vtr_el2(void);
+> >>  
+> >>  extern u32 __kvm_get_mdcr_el2(void);
+> >>  
+> >> +extern void __fpsimd_prepare_fpexc32(void);
+> >> +extern void __fpsimd_save_fpexc32(struct kvm_vcpu *vcpu);
+> >> +extern void __fpsimd_save_state(struct user_fpsimd_state *);
+> >> +extern void __fpsimd_restore_state(struct user_fpsimd_state *);
+> >> +
+> >>  #endif
+> >>  
+> >>  #endif /* __ARM_KVM_ASM_H__ */
+> >> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> >> index ffe8ccf..f8203c7 100644
+> >> --- a/arch/arm64/include/asm/kvm_emulate.h
+> >> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> >> @@ -299,12 +299,34 @@ static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
+> >>  	return data;		/* Leave LE untouched */
 > >>  }
 > >>  
-> >> +#ifdef CONFIG_VFPv3
-> >> +/* Called from vcpu_load - save fpexc and enable guest access to fp/simd unit */
+> >> -static inline void vcpu_trap_vfp_enable(struct kvm_vcpu *vcpu) {}
+> >> +static inline bool vcpu_guest_is_32bit(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +	return !(vcpu->arch.hcr_el2 & HCR_RW);
+> >> +}
+> >> +
 > >> +static inline void vcpu_trap_vfp_enable(struct kvm_vcpu *vcpu)
 > >> +{
-> >> +	u32 fpexc;
+> >> +	/* For 32 bit guest enable access to fp/simd registers */
+> >> +	if (vcpu_guest_is_32bit(vcpu))
+> >> +		vcpu_prepare_fpexc();
 > >> +
-> >> +	/* Save host fpexc, and enable guest access to fp unit */
-> >> +	fpexc = fmrx(FPEXC);
-> >> +	vcpu->arch.host_fpexc = fpexc;
-> >> +	fpexc |= FPEXC_EN;
-> >> +	fmxr(FPEXC, fpexc);
-> >> +
-> >> +	/* Configure HCPTR to trap on tracing and fp/simd access */
-> >> +	vcpu->arch.hcptr = HCPTR_TTA | HCPTR_TCP(10)  | HCPTR_TCP(11);
+> >> +	vcpu->arch.cptr_el2 = CPTR_EL2_TTA | CPTR_EL2_TFP;
 > >> +}
 > >> +
-> >> +/* Called from vcpu_put - restore host fpexc */
-> >> +static inline void vcpu_restore_host_fpexc(struct kvm_vcpu *vcpu)
-> >> +{
-> >> +	fmxr(FPEXC, vcpu->arch.host_fpexc);
+> >>  static inline void vcpu_restore_host_fpexc(struct kvm_vcpu *vcpu) {}
+> >>  
+> >>  static inline bool vcpu_vfp_isdirty(struct kvm_vcpu *vcpu)
+> >>  {
+> >> -	return false;
+> >> +	return !(vcpu->arch.cptr_el2 & CPTR_EL2_TFP);
 > >> +}
 > >> +
-> >> +/* If trap bits are reset then fp/simd registers are dirty */
-> >> +static inline bool vcpu_vfp_isdirty(struct kvm_vcpu *vcpu)
+> >> +static inline void vcpu_restore_host_vfp_state(struct kvm_vcpu *vcpu)
 > >> +{
-> >> +	return !(vcpu->arch.hcptr & (HCPTR_TCP(10) | HCPTR_TCP(11)));
+> >> +	struct kvm_cpu_context *host_ctxt = vcpu->arch.host_cpu_context;
+> >> +	struct kvm_cpu_context *guest_ctxt = &vcpu->arch.ctxt;
+> >> +
+> >> +	__fpsimd_save_state(&guest_ctxt->gp_regs.fp_regs);
+> >> +	__fpsimd_restore_state(&host_ctxt->gp_regs.fp_regs);
+> >>  }
+> >>  
+> >>  #endif /* __ARM64_KVM_EMULATE_H__ */
+> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> >> index bfe4d4e..5d0c256 100644
+> >> --- a/arch/arm64/include/asm/kvm_host.h
+> >> +++ b/arch/arm64/include/asm/kvm_host.h
+> >> @@ -26,6 +26,7 @@
+> >>  #include <linux/kvm_types.h>
+> >>  #include <asm/kvm.h>
+> >>  #include <asm/kvm_mmio.h>
+> >> +#include <asm/kvm_asm.h>
+> >>  
+> >>  #define __KVM_HAVE_ARCH_INTC_INITIALIZED
+> >>  
+> >> @@ -180,6 +181,7 @@ struct kvm_vcpu_arch {
+> >>  	/* HYP configuration */
+> >>  	u64 hcr_el2;
+> >>  	u32 mdcr_el2;
+> >> +	u32 cptr_el2;
+> >>  
+> >>  	/* Exception Information */
+> >>  	struct kvm_vcpu_fault_info fault;
+> >> @@ -338,7 +340,15 @@ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+> >>  static inline void kvm_arch_vcpu_uninit(struct kvm_vcpu *vcpu) {}
+> >>  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+> >>  
+> >> -static inline void vcpu_restore_host_vfp_state(struct kvm_vcpu *vcpu) {}
+> >> +static inline void vcpu_prepare_fpexc(void)
+> >> +{
+> >> +	kvm_call_hyp(__fpsimd_prepare_fpexc32);
 > >> +}
-> >> +#else
-> >> +static inline void vcpu_trap_vfp_enable(struct kvm_vcpu *vcpu)
+> >> +
+> >> +static inline void vcpu_save_fpexc(struct kvm_vcpu *vcpu)
 > >> +{
-> >> +	vcpu->arch.hcptr = HCPTR_TTA;
+> >> +	kvm_call_hyp(__fpsimd_save_fpexc32, vcpu);
+> >> +}
+> >>  
+> >>  void kvm_arm_init_debug(void);
+> >>  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+> >> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+> >> index 93e8d983..a9235e2 100644
+> >> --- a/arch/arm64/kvm/hyp/hyp-entry.S
+> >> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
+> >> @@ -164,6 +164,32 @@ ENTRY(__hyp_do_panic)
+> >>  	eret
+> >>  ENDPROC(__hyp_do_panic)
+> >>  
+> >> +/**
+> >> +  * void __fpsimd_prepare_fpexc32(void) -
+> >> +  *	We may be entering the guest and set CPTR_EL2.TFP to trap all floating
+> >> +  *	point register accesses to EL2, however, the ARM manual clearly states
+> >> +  *	that traps are only taken to EL2 if the operation would not otherwise
+> >> +  *	trap to EL1.  Therefore, always make sure that for 32-bit guests,
+> >> +  *	we set FPEXC.EN to prevent traps to EL1, when setting the TFP bit.
+> >> +  */
+> >> +ENTRY(__fpsimd_prepare_fpexc32)
+> >> +	mov	x2, #(1 << 30)
+> >> +	msr	fpexc32_el2, x2
+> >> +	ret
+> >> +ENDPROC(__fpsimd_prepare_fpexc32)
 > > 
-> > Is it correct not to trap VFP registers when the host kernel does not
-> > have CONFIG_VFPv3?  I think this is a change in functionality compared
-> > to the current kernels is it not?
+> > Why is this code in assembly?
+> > 
+> > It feels like you should be able to stick this in switch.c or something?
+> Yeah you're right just reusing code and not integrating into the new structure.
+> > 
+> > Also, it's strange to review this patch as duplicating an entire comment
+> > from elsewhere and expecting it to get removed in the next patch, but
+> > ok...
 > 
-> With CPU_V7 VFPv3 gets selected, without it fp should be emulated,
-> with exceptions taken in guest kernel. I don't see a reason why
-> fp hcptr access should be enabled in that case.
+> Not sure what to do here, the comment is required. Maybe this is a
+> one off you could overlook :)
+
+It is related to how the patches are split, but yes, I'll overlook it.
+Assuming the patches are bisectable, I'll live with it.
+
+> > 
+> >> +
+> >> +/**
+> >> + * void __fpsimd_save_fpexc32(void) -
+> >> + *	This function restores guest FPEXC to its vcpu context, we call this
+> >> + *	function from vcpu_put.
+> >> + */
+> >> +ENTRY(__fpsimd_save_fpexc32)
+> >> +	kern_hyp_va x0
+> > 
+> > the C prototype for this function indicates you don't take any
+> > parameters, but you seem to rely on the vcpu pointer being in x0 for
+> > this?
 > 
+> Yes right again should have spotted it.
 
-If you have to guests with CONFIG_VFPV3 but your host doesn't have
-CONFIG_VFPV3, you will never context-switch the VFP registers between
-the two VMs, and mayhem will ensue.
 
-Unless I'm missing something very obvious?
-
+Thanks,
 -Christoffer
