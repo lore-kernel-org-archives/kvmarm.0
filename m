@@ -1,23 +1,21 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH 1/3] KVM: ARM64: Fix wrong use of the CPSR MODE mask
-Date: Wed, 13 Jan 2016 17:16:39 +0800
-Message-ID: <1452676601-14796-2-git-send-email-zhaoshenglong@huawei.com>
-References: <1452676601-14796-1-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH 0/3] Three fixes for KVM ARM64
+Date: Wed, 13 Jan 2016 17:16:38 +0800
+Message-ID: <1452676601-14796-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 90EDF49B17
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jan 2016 04:16:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D470949B32
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jan 2016 04:16:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id npgwQAEPmXxN for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Jan 2016 04:16:34 -0500 (EST)
+ with ESMTP id CScN322p1L34 for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Jan 2016 04:16:46 -0500 (EST)
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2967849B2E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jan 2016 04:16:32 -0500 (EST)
-In-Reply-To: <1452676601-14796-1-git-send-email-zhaoshenglong@huawei.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C351949B17
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jan 2016 04:16:45 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,34 +30,16 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-The values of CPSR MODE mask are different between aarch32 and aarch64.
-It should use the right one according to the execution state.
+These bugs are found when I test the 32 bit part of guest PMU patch set.
 
-Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
----
+Shannon Zhao (3):
+  KVM: ARM64: Fix wrong use of the CPSR MODE mask
+  KVM: ARM64: Fix comments of the CP handler
+  KVM: ARM64: Fix guest dead loop when register accessor returns false
+
  arch/arm64/include/asm/kvm_emulate.h | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c            | 9 ++++-----
+ 2 files changed, 10 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 3066328..779a587 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -127,10 +127,14 @@ static inline unsigned long *vcpu_spsr(const struct kvm_vcpu *vcpu)
- 
- static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
- {
--	u32 mode = *vcpu_cpsr(vcpu) & PSR_MODE_MASK;
-+	u32 mode;
- 
--	if (vcpu_mode_is_32bit(vcpu))
-+	if (vcpu_mode_is_32bit(vcpu)) {
-+		mode = *vcpu_cpsr(vcpu) & COMPAT_PSR_MODE_MASK;
- 		return mode > COMPAT_PSR_MODE_USR;
-+	}
-+
-+	mode = *vcpu_cpsr(vcpu) & PSR_MODE_MASK;
- 
- 	return mode != PSR_MODE_EL0t;
- }
 -- 
 2.0.4
