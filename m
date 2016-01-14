@@ -1,83 +1,141 @@
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: Re: [PATCH 1/3] KVM: ARM64: Fix wrong use of the CPSR MODE mask
-Date: Thu, 14 Jan 2016 09:27:34 +0800
-Message-ID: <5696F986.8010401@huawei.com>
-References: <1452676601-14796-1-git-send-email-zhaoshenglong@huawei.com>
- <1452676601-14796-2-git-send-email-zhaoshenglong@huawei.com>
- <56961989.9080404@arm.com>
+From: Mario Smarduch <m.smarduch@samsung.com>
+Subject: Re: [PATCH v6 1/6] arm/arm64: KVM: Introduce armv7 fp/simd vcpu fields
+ and helpers
+Date: Wed, 13 Jan 2016 19:03:04 -0800
+Message-ID: <56970FE8.4020805@samsung.com>
+References: <1451166900-3711-1-git-send-email-m.smarduch@samsung.com>
+ <1451166900-3711-2-git-send-email-m.smarduch@samsung.com>
+ <20160110163204.GD30867@cbox> <56943D29.3000002@samsung.com>
+ <20160112141207.GF15554@cbox> <5695A0EB.5020609@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D08149ADA
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jan 2016 20:27:09 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HX5m+-888usT for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Jan 2016 20:27:07 -0500 (EST)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8306F49A04
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Jan 2016 20:27:05 -0500 (EST)
-In-Reply-To: <56961989.9080404@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-reply-to: <5695A0EB.5020609@samsung.com>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Russell King - ARM Linux <linux@arm.linux.org.uk>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 
 
-On 2016/1/13 17:31, Marc Zyngier wrote:
-> On 13/01/16 09:16, Shannon Zhao wrote:
->> From: Shannon Zhao <shannon.zhao@linaro.org>
->>
->> The values of CPSR MODE mask are different between aarch32 and aarch64.
->> It should use the right one according to the execution state.
->>
->> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
->> ---
->>  arch/arm64/include/asm/kvm_emulate.h | 8 ++++++--
->>  1 file changed, 6 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
->> index 3066328..779a587 100644
->> --- a/arch/arm64/include/asm/kvm_emulate.h
->> +++ b/arch/arm64/include/asm/kvm_emulate.h
->> @@ -127,10 +127,14 @@ static inline unsigned long *vcpu_spsr(const struct kvm_vcpu *vcpu)
->>  
->>  static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
->>  {
->> -	u32 mode = *vcpu_cpsr(vcpu) & PSR_MODE_MASK;
->> +	u32 mode;
->>  
->> -	if (vcpu_mode_is_32bit(vcpu))
->> +	if (vcpu_mode_is_32bit(vcpu)) {
->> +		mode = *vcpu_cpsr(vcpu) & COMPAT_PSR_MODE_MASK;
->>  		return mode > COMPAT_PSR_MODE_USR;
->> +	}
->> +
->> +	mode = *vcpu_cpsr(vcpu) & PSR_MODE_MASK;
->>  
->>  	return mode != PSR_MODE_EL0t;
->>  }
->>
+On 1/12/2016 4:57 PM, Mario Smarduch wrote:
 > 
-> Nice catch. At the moment, it will only affect perf's is_user_mode()
-> with a 32bit guest (always reporting the guest as running in kernel
-> mode), so that's not a big deal with mainline (but it clearly has a much
-> bigger implication with the PMU support).
 > 
-> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-> 
-Thanks, maybe this should backport to stable kernel. Sorry I forgot to
-CC stable.
+> On 1/12/2016 6:12 AM, Christoffer Dall wrote:
+>> On Mon, Jan 11, 2016 at 03:39:21PM -0800, Mario Smarduch wrote:
+>>>
+>>>
+>>> On 1/10/2016 8:32 AM, Christoffer Dall wrote:
+>>>> Hi Mario,
+>>>>
+>>>> I spotted one more potential issue...
+>>>>
+>>>> On Sat, Dec 26, 2015 at 01:54:55PM -0800, Mario Smarduch wrote:
+>>>>> Add helper functions to enable access to fp/smid on guest entry and save host
+>>>>> fpexc on vcpu put, check if fp/simd registers are dirty and add new vcpu
+>>>>> fields.
+>>>>>
+>>>>> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+>>>>> ---
+>>>>>  arch/arm/include/asm/kvm_emulate.h   | 42 ++++++++++++++++++++++++++++++++++++
+>>>>>  arch/arm/include/asm/kvm_host.h      |  6 ++++++
+>>>>>  arch/arm64/include/asm/kvm_emulate.h |  8 +++++++
+>>>>>  3 files changed, 56 insertions(+)
+>>>>>
+>>>>> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+>>>>> index 3095df0..d4d9da1 100644
+>>>>> --- a/arch/arm/include/asm/kvm_emulate.h
+>>>>> +++ b/arch/arm/include/asm/kvm_emulate.h
+>>>>> @@ -24,6 +24,8 @@
+>>>>>  #include <asm/kvm_mmio.h>
+>>>>>  #include <asm/kvm_arm.h>
+>>>>>  #include <asm/cputype.h>
+>>>>> +#include <asm/vfp.h>
+>>>>> +#include "../vfp/vfpinstr.h"
+>>>>>  
+>>>>>  unsigned long *vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num);
+>>>>>  unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu);
+>>>>> @@ -255,4 +257,44 @@ static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
+>>>>>  	}
+>>>>>  }
+>>>>>  
+>>>>> +#ifdef CONFIG_VFPv3
+>>>>> +/* Called from vcpu_load - save fpexc and enable guest access to fp/simd unit */
+>>>>> +static inline void vcpu_trap_vfp_enable(struct kvm_vcpu *vcpu)
+>>>>> +{
+>>>>> +	u32 fpexc;
+>>>>> +
+>>>>> +	/* Save host fpexc, and enable guest access to fp unit */
+>>>>> +	fpexc = fmrx(FPEXC);
+>>>>> +	vcpu->arch.host_fpexc = fpexc;
+>>>>> +	fpexc |= FPEXC_EN;
+>>>>> +	fmxr(FPEXC, fpexc);
+>>>>> +
+>>>>> +	/* Configure HCPTR to trap on tracing and fp/simd access */
+>>>>> +	vcpu->arch.hcptr = HCPTR_TTA | HCPTR_TCP(10)  | HCPTR_TCP(11);
+>>>>> +}
+>>>>> +
+>>>>> +/* Called from vcpu_put - restore host fpexc */
+>>>>> +static inline void vcpu_restore_host_fpexc(struct kvm_vcpu *vcpu)
+>>>>> +{
+>>>>> +	fmxr(FPEXC, vcpu->arch.host_fpexc);
+>>>>> +}
+>>>>> +
+>>>>> +/* If trap bits are reset then fp/simd registers are dirty */
+>>>>> +static inline bool vcpu_vfp_isdirty(struct kvm_vcpu *vcpu)
+>>>>> +{
+>>>>> +	return !(vcpu->arch.hcptr & (HCPTR_TCP(10) | HCPTR_TCP(11)));
+>>>>> +}
+>>>>> +#else
+>>>>> +static inline void vcpu_trap_vfp_enable(struct kvm_vcpu *vcpu)
+>>>>> +{
+>>>>> +	vcpu->arch.hcptr = HCPTR_TTA;
+>>>>
+>>>> Is it correct not to trap VFP registers when the host kernel does not
+>>>> have CONFIG_VFPv3?  I think this is a change in functionality compared
+>>>> to the current kernels is it not?
+>>>
+>>> With CPU_V7 VFPv3 gets selected, without it fp should be emulated,
+>>> with exceptions taken in guest kernel. I don't see a reason why
+>>> fp hcptr access should be enabled in that case.
+>>>
+>>
+>> If you have to guests with CONFIG_VFPV3 but your host doesn't have
+>> CONFIG_VFPV3, you will never context-switch the VFP registers between
+>> the two VMs, and mayhem will ensue.
+>>
+>> Unless I'm missing something very obvious?
 
--- 
-Shannon
+Did more testing on this enabling OABI_COMPAT and selecting
+NWFPE/FastFPE breaks the boot. So far can't find a way to boot host
+without VFP/VFPv3 enabled on ARMv7. CPU_V7 defaults to VFPv3
+selection. I'm wondering if !VFPv3 path should be removed from
+the patches?
+
+- Mario
+
+> 
+> Hi Christoffer,
+>    - on host I disabled VFP/VFPv3 and got a lot of Illegal instructions
+>      and many other problems. Perhaps disabling for armv7 this option may need
+>      re-evaluation.
+>    - Enabling VFPv3 on host and running guest with no vfpv3 appears
+>      to work with few glitches.
+>    - and vpfv3 host/guest works just fine.
+> 
+> Appears disabling vfpv3 on armv7 requires another investigation (atleast
+> on my end).
+> 
+> BTW this is on fast models.
+> 
+> - Mario
+> 
+>>
+>> -Christoffer
+>>
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> 
