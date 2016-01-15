@@ -1,50 +1,452 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: ARM KVM guest virtual address to host virtual address Look up
-Date: Fri, 15 Jan 2016 12:17:54 +0000
-Message-ID: <CAFEAcA_cSpFSZX02PJTCvQV6uB75_SbhBkLb1_2Z3uyy+BhBxA@mail.gmail.com>
-References: <911dda08e570d71c948d7f9dad3e3e04.squirrel@mail.derytech.com.tw>
- <CAFEAcA-rOAGxVrEs5q--z5BFq2YR0ExK8cmQn2PX1s+cCo27hA@mail.gmail.com>
- <q70d9pc1o02g0mosm9n96cvw.1452856464824@email.android.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [PATCH v9 21/21] KVM: ARM64: Add a new vcpu device control group
+ for PMUv3
+Date: Fri, 15 Jan 2016 14:28:50 +0100
+Message-ID: <20160115132850.GG3915@hawk.localdomain>
+References: <1452839275-19368-1-git-send-email-zhaoshenglong@huawei.com>
+ <1452839275-19368-22-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE0C049A19
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 07:14:01 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6PycHNG3ZA-v for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jan 2016 07:14:00 -0500 (EST)
-Received: from mail-vk0-f52.google.com (mail-vk0-f52.google.com
- [209.85.213.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C13849A0B
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 07:14:00 -0500 (EST)
-Received: by mail-vk0-f52.google.com with SMTP id a123so267402055vkh.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 04:18:14 -0800 (PST)
-In-Reply-To: <q70d9pc1o02g0mosm9n96cvw.1452856464824@email.android.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: hiwu <hiwu@derytech.com.tw>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1452839275-19368-22-git-send-email-zhaoshenglong@huawei.com>
+Sender: kvm-owner@vger.kernel.org
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 15 January 2016 at 11:14, hiwu <hiwu@derytech.com.tw> wrote:
-> I want to trap some ldr,str instruction in guest VM for debug. Therefore, I
-> have to emulate guest ldr,str in host. Without guest VA to host VA, I cannot
-> emulate ldr,str instruction in host.
+On Fri, Jan 15, 2016 at 02:27:55PM +0800, Shannon Zhao wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
+> 
+> To configure the virtual PMUv3 overflow interrupt number, we use the
+> vcpu kvm_device ioctl, encapsulating the KVM_ARM_VCPU_PMU_V3_IRQ
+> attribute within the KVM_ARM_VCPU_PMU_V3_CTRL group.
+> 
+> After configuring the PMUv3, call the vcpu iotcl with attribute
+                                             ^ ioctl
 
-That sounds like you want "load/store value from guest VA", not "translate
-guest VA to host VA". Try cpu_ldl_data and friends (though note that
-if you use them to access an invalid address they'll cause a guest
-exception).
+> KVM_ARM_VCPU_PMU_V3_INIT to initialize the PMUv3.
+> 
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> ---
+> CC: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  Documentation/virtual/kvm/devices/vcpu.txt |  24 ++++++
+>  arch/arm/include/asm/kvm_host.h            |  15 ++++
+>  arch/arm/kvm/arm.c                         |   3 +
+>  arch/arm64/include/asm/kvm_host.h          |   6 ++
+>  arch/arm64/include/uapi/asm/kvm.h          |   5 ++
+>  arch/arm64/kvm/guest.c                     |  51 ++++++++++++
+>  include/kvm/arm_pmu.h                      |  23 ++++++
+>  virt/kvm/arm/pmu.c                         | 128 +++++++++++++++++++++++++++++
+>  8 files changed, 255 insertions(+)
+> 
+> diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
+> index 3cc59c5..60cbac8 100644
+> --- a/Documentation/virtual/kvm/devices/vcpu.txt
+> +++ b/Documentation/virtual/kvm/devices/vcpu.txt
+> @@ -6,3 +6,27 @@ KVM_GET_DEVICE_ATTR, and KVM_HAS_DEVICE_ATTR. The interface uses the same struct
+>  kvm_device_attr as other devices, but targets VCPU-wide settings and controls.
+>  
+>  The groups and attributes per virtual cpu, if any, are architecture specific.
+> +
+> +1. GROUP: KVM_ARM_VCPU_PMU_V3_CTRL
+> +Architectures: ARM64
+> +
+> +1.1. ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_IRQ
+> +Parameters: in kvm_device_attr.addr the address for PMU overflow interrupt
+> +Returns: -EBUSY: The PMU overflow interrupt is already set
+> +         -ENODEV: Not set the corresponding vcpu feature bit or getting the PMU
+> +                  overflow interrupt number while it's not set
 
-thanks
--- PMM
+I think we should have two separate error numbers. One for "PMUv3 not
+supported" and another for the overflow interrupt not set when
+attempting to get it (ENXIO?). In any case, please rephrase.
+
+> +         -EINVAL: Invalid PMU overflow interrupt number supplied
+> +
+> +A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
+> +number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
+> +type must be same for each vcpu. As a PPI, the interrupt number is same for all
+> +vcpus, while as a SPI it must be different for each vcpu.
+
+/as a/as an/
+
+> +
+> +1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
+> +Parameters: no additional parameter in kvm_device_attr.addr
+> +Returns: -ENODEV: No PMUv3 supported
+
+"PMUv3 not supported"
+
+> +         -ENXIO: PMUv3 not properly configured as required prior to calling this
+> +                 attribute
+> +         -EBUSY: PMUv3 already initialized
+> +
+> +Request the initialization of the PMUv3.
+> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+> index f9f2779..6dd0992 100644
+> --- a/arch/arm/include/asm/kvm_host.h
+> +++ b/arch/arm/include/asm/kvm_host.h
+> @@ -242,5 +242,20 @@ static inline void kvm_arm_init_debug(void) {}
+>  static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
+> +static inline int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+> +					     struct kvm_device_attr *attr)
+> +{
+> +	return -ENXIO;
+> +}
+> +static inline int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+> +					     struct kvm_device_attr *attr)
+> +{
+> +	return -ENXIO;
+> +}
+> +static inline int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+> +					     struct kvm_device_attr *attr)
+> +{
+> +	return -ENXIO;
+> +}
+>  
+>  #endif /* __ARM_KVM_HOST_H__ */
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index 34d7395..dc8644f 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -833,6 +833,7 @@ static int kvm_arm_vcpu_set_attr(struct kvm_vcpu *vcpu,
+>  
+>  	switch (attr->group) {
+>  	default:
+> +		ret = kvm_arm_vcpu_arch_set_attr(vcpu, attr);
+>  		break;
+>  	}
+>  
+> @@ -846,6 +847,7 @@ static int kvm_arm_vcpu_get_attr(struct kvm_vcpu *vcpu,
+>  
+>  	switch (attr->group) {
+>  	default:
+> +		ret = kvm_arm_vcpu_arch_get_attr(vcpu, attr);
+>  		break;
+>  	}
+>  
+> @@ -859,6 +861,7 @@ static int kvm_arm_vcpu_has_attr(struct kvm_vcpu *vcpu,
+>  
+>  	switch (attr->group) {
+>  	default:
+> +		ret = kvm_arm_vcpu_arch_has_attr(vcpu, attr);
+>  		break;
+>  	}
+>  
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index cb220b7..a855a30 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -359,5 +359,11 @@ void kvm_arm_init_debug(void);
+>  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+>  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
+> +int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+> +			       struct kvm_device_attr *attr);
+> +int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+> +			       struct kvm_device_attr *attr);
+> +int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+> +			       struct kvm_device_attr *attr);
+>  
+>  #endif /* __ARM64_KVM_HOST_H__ */
+> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+> index 6aedbe3..dc69037 100644
+> --- a/arch/arm64/include/uapi/asm/kvm.h
+> +++ b/arch/arm64/include/uapi/asm/kvm.h
+> @@ -205,6 +205,11 @@ struct kvm_arch_memory_slot {
+>  #define KVM_DEV_ARM_VGIC_GRP_CTRL	4
+>  #define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
+>  
+> +/* Device Control API on vcpu fd */
+> +#define KVM_ARM_VCPU_PMU_V3_CTRL		0
+> +#define   KVM_ARM_VCPU_PMU_V3_IRQ		0
+> +#define   KVM_ARM_VCPU_PMU_V3_INIT		1
+
+too many spaces
+
+> +
+>  /* KVM_IRQ_LINE irq field index values */
+>  #define KVM_ARM_IRQ_TYPE_SHIFT		24
+>  #define KVM_ARM_IRQ_TYPE_MASK		0xff
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index fcb7788..dbe45c3 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -380,3 +380,54 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+>  	}
+>  	return 0;
+>  }
+> +
+> +int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+> +			       struct kvm_device_attr *attr)
+> +{
+> +	int ret;
+> +
+> +	switch (attr->group) {
+> +	case KVM_ARM_VCPU_PMU_V3_CTRL:
+> +		ret = kvm_arm_pmu_v3_set_attr(vcpu, attr);
+> +		break;
+> +	default:
+> +		ret = -ENXIO;
+> +		break;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+> +			       struct kvm_device_attr *attr)
+> +{
+> +	int ret;
+> +
+> +	switch (attr->group) {
+> +	case KVM_ARM_VCPU_PMU_V3_CTRL:
+> +		ret = kvm_arm_pmu_v3_get_attr(vcpu, attr);
+> +		break;
+> +	default:
+> +		ret = -ENXIO;
+> +		break;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+> +			       struct kvm_device_attr *attr)
+> +{
+> +	int ret;
+> +
+> +	switch (attr->group) {
+> +	case KVM_ARM_VCPU_PMU_V3_CTRL:
+> +		ret = kvm_arm_pmu_v3_has_attr(vcpu, attr);
+> +		break;
+> +	default:
+> +		ret = -ENXIO;
+> +		break;
+> +	}
+> +
+> +	return ret;
+> +}
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index c35b11d..5351109 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -36,6 +36,7 @@ struct kvm_pmu {
+>  };
+>  
+>  #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
+> +#define kvm_arm_pmu_irq_initialized(v)	((v)->arch.pmu.irq_num >= VGIC_NR_SGIS)
+>  u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
+>  u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
+>  void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
+> @@ -49,11 +50,18 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
+>  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+>  				    u64 select_idx);
+>  int kvm_arm_support_pmu_v3(void);
+> +int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
+> +			    struct kvm_device_attr *attr);
+> +int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu,
+> +			    struct kvm_device_attr *attr);
+> +int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu,
+> +			    struct kvm_device_attr *attr);
+>  #else
+>  struct kvm_pmu {
+>  };
+>  
+>  #define kvm_arm_pmu_v3_ready(v)		(false)
+> +#define kvm_arm_pmu_irq_initialized(v)  (false)
+
+should tab the false over
+
+>  static inline u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu,
+>  					    u64 select_idx)
+>  {
+> @@ -74,6 +82,21 @@ static inline void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val) {}
+>  static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
+>  						  u64 data, u64 select_idx) {}
+>  static inline int kvm_arm_support_pmu_v3(void) { return 0; }
+> +static inline int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
+> +					  struct kvm_device_attr *attr)
+> +{
+> +	return -ENXIO;
+> +}
+> +static inline int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu,
+> +					  struct kvm_device_attr *attr)
+> +{
+> +	return -ENXIO;
+> +}
+> +static inline int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu,
+> +					  struct kvm_device_attr *attr)
+> +{
+> +	return -ENXIO;
+> +}
+>  #endif
+>  
+>  #endif
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index cb373d4..99a6e8a 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -19,6 +19,7 @@
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/perf_event.h>
+> +#include <linux/uaccess.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <kvm/arm_pmu.h>
+>  #include <kvm/arm_vgic.h>
+> @@ -383,3 +384,130 @@ int kvm_arm_support_pmu_v3(void)
+>  	 */
+>  	return perf_num_counters();
+>  }
+> +
+> +static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+> +{
+> +	if (kvm_arm_pmu_v3_ready(vcpu))
+> +		return -EBUSY;
+> +
+> +	if (kvm_arm_support_pmu_v3 <= 0)
+> +		return -ENODEV;
+> +
+> +	if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features) ||
+> +	    !kvm_arm_pmu_irq_initialized(vcpu))
+> +		return -ENXIO;
+
+Would seem more logical for these checks to be in the following order,
+  if supported
+  if enabled (has-feature-bit)
+  if ready
+
+> +
+> +	kvm_pmu_vcpu_reset(vcpu);
+> +	vcpu->arch.pmu.ready = true;
+> +
+> +	return 0;
+> +}
+> +
+> +static int kvm_arm_pmu_irq_access(struct kvm_vcpu *vcpu,
+> +				  struct kvm_device_attr *attr,
+> +				  int *irq, bool is_set)
+> +{
+> +	if (!is_set) {
+> +		if (!kvm_arm_pmu_irq_initialized(vcpu))
+> +			return -ENODEV;
+> +
+> +		*irq = vcpu->arch.pmu.irq_num;
+> +	} else {
+> +		if (kvm_arm_pmu_irq_initialized(vcpu))
+> +			return -EBUSY;
+
+I didn't look at earlier reviews about this one, but I'm curious why we
+can't change an irq for a vcpu? Can't we change it, even if it requires
+a pmu reset? Actually, if we did do a reset and a ready=true here, then
+could we completely drop KVM_ARM_VCPU_PMU_V3_INIT?
+
+> +
+> +		kvm_debug("Set kvm ARM PMU irq: %d\n", *irq);
+> +		vcpu->arch.pmu.irq_num = *irq;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static bool irq_is_invalid(struct kvm *kvm, int irq, bool is_ppi)
+
+personally I prefer positive checks, i.e. irq_is_valid
+
+> +{
+> +	int i;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		if (!kvm_arm_pmu_irq_initialized(vcpu))
+> +			continue;
+> +
+> +		if (is_ppi) {
+> +			if (vcpu->arch.pmu.irq_num != irq)
+> +				return true;
+> +		} else {
+> +			if (vcpu->arch.pmu.irq_num == irq)
+> +				return true;
+> +		}
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +
+> +int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+> +{
+> +	switch (attr->attr) {
+> +	case KVM_ARM_VCPU_PMU_V3_IRQ: {
+> +		int __user *uaddr = (int __user *)(long)attr->addr;
+> +		int reg;
+> +
+> +		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+> +			return -ENODEV;
+> +
+> +		if (get_user(reg, uaddr))
+> +			return -EFAULT;
+> +
+> +		/*
+> +		 * The PMU overflow interrupt could be a PPI or SPI, but for one
+> +		 * VM the interrupt type must be same for each vcpu. As a PPI,
+> +		 * the interrupt number is same for all vcpus, while as a SPI it
+> +		 * must be different for each vcpu.
+> +		 */
+> +		if (reg < VGIC_NR_SGIS || reg >= vcpu->kvm->arch.vgic.nr_irqs ||
+> +		    irq_is_invalid(vcpu->kvm, reg, reg < VGIC_NR_PRIVATE_IRQS))
+> +			return -EINVAL;
+> +
+> +		return kvm_arm_pmu_irq_access(vcpu, attr, &reg, true);
+> +	}
+> +	case KVM_ARM_VCPU_PMU_V3_INIT:
+> +		return kvm_arm_pmu_v3_init(vcpu);
+> +	}
+> +
+> +	return -ENXIO;
+> +}
+> +
+> +int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+> +{
+> +	int ret;
+> +
+> +	switch (attr->attr) {
+> +	case KVM_ARM_VCPU_PMU_V3_IRQ: {
+> +		int __user *uaddr = (int __user *)(long)attr->addr;
+> +		int reg = -1;
+> +
+> +		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+> +			return -ENODEV;
+> +
+> +		ret = kvm_arm_pmu_irq_access(vcpu, attr, &reg, false);
+> +		if (ret)
+> +			return ret;
+> +		return put_user(reg, uaddr);
+> +	}
+> +	}
+> +
+> +	return -ENXIO;
+> +}
+> +
+> +int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+> +{
+> +	switch (attr->attr) {
+> +	case KVM_ARM_VCPU_PMU_V3_IRQ:
+> +	case KVM_ARM_VCPU_PMU_V3_INIT:
+> +		if (kvm_arm_support_pmu_v3() > 0 &&
+> +		    test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+> +			return 0;
+> +	}
+> +
+> +	return -ENXIO;
+> +}
+> -- 
+> 2.0.4
+
+Thanks,
+drew
