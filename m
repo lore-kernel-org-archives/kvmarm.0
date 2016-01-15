@@ -1,22 +1,22 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v9 19/21] KVM: ARM64: Add a new feature bit for PMUv3
-Date: Fri, 15 Jan 2016 14:27:53 +0800
-Message-ID: <1452839275-19368-20-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v9 14/21] KVM: ARM64: Add helper to handle PMCR register bits
+Date: Fri, 15 Jan 2016 14:27:48 +0800
+Message-ID: <1452839275-19368-15-git-send-email-zhaoshenglong@huawei.com>
 References: <1452839275-19368-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E49F49A21
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 01:25:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 80AAA49A9C
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 01:25:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id udNb7jaEc3UO for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jan 2016 01:25:32 -0500 (EST)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [119.145.14.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id CFC2649A31
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 01:25:24 -0500 (EST)
+ with ESMTP id nHEp3V1QiN+f for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jan 2016 01:25:31 -0500 (EST)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 610C449A84
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 01:25:25 -0500 (EST)
 In-Reply-To: <1452839275-19368-1-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,123 +33,104 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-To support guest PMUv3, use one bit of the VCPU INIT feature array.
-Initialize the PMU when initialzing the vcpu with that bit and PMU
-overflow interrupt set.
+According to ARMv8 spec, when writing 1 to PMCR.E, all counters are
+enabled by PMCNTENSET, while writing 0 to PMCR.E, all counters are
+disabled. When writing 1 to PMCR.P, reset all event counters, not
+including PMCCNTR, to zero. When writing 1 to PMCR.C, reset PMCCNTR to
+zero.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
-CC: Peter Maydell <peter.maydell@linaro.org>
----
- Documentation/virtual/kvm/api.txt | 2 ++
- arch/arm64/include/asm/kvm_host.h | 2 +-
- arch/arm64/include/uapi/asm/kvm.h | 1 +
- arch/arm64/kvm/reset.c            | 3 +++
- include/kvm/arm_pmu.h             | 2 ++
- include/uapi/linux/kvm.h          | 1 +
- virt/kvm/arm/pmu.c                | 9 +++++++++
- 7 files changed, 19 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c |  1 +
+ include/kvm/arm_pmu.h     |  2 ++
+ virt/kvm/arm/pmu.c        | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 45 insertions(+)
 
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index 053f613..e51fa04 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -2577,6 +2577,8 @@ Possible features:
- 	  Depends on KVM_CAP_ARM_EL1_32BIT (arm64 only).
- 	- KVM_ARM_VCPU_PSCI_0_2: Emulate PSCI v0.2 for the CPU.
- 	  Depends on KVM_CAP_ARM_PSCI_0_2.
-+	- KVM_ARM_VCPU_PMU_V3: Emulate PMUv3 for the CPU.
-+	  Depends on KVM_CAP_ARM_PMU_V3.
- 
- 
- 4.83 KVM_ARM_PREFERRED_TARGET
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 6bab7fb..cb220b7 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -40,7 +40,7 @@
- 
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
- 
--#define KVM_VCPU_MAX_FEATURES 3
-+#define KVM_VCPU_MAX_FEATURES 4
- 
- int __attribute_const__ kvm_target_cpu(void);
- int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 2d4ca4b..6aedbe3 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -94,6 +94,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
- #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
- #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
-+#define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
- 
- struct kvm_vcpu_init {
- 	__u32 target;
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index dfbce78..cf4f28a 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -77,6 +77,9 @@ int kvm_arch_dev_ioctl_check_extension(long ext)
- 	case KVM_CAP_GUEST_DEBUG_HW_WPS:
- 		r = get_num_wrps();
- 		break;
-+	case KVM_CAP_ARM_PMU_V3:
-+		r = kvm_arm_support_pmu_v3();
-+		break;
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 		r = 1;
- 		break;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index f45c227..eefc60a 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -467,6 +467,7 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 		val &= ~ARMV8_PMCR_MASK;
+ 		val |= p->regval & ARMV8_PMCR_MASK;
+ 		vcpu_sys_reg(vcpu, PMCR_EL0) = val;
++		kvm_pmu_handle_pmcr(vcpu, val);
+ 	} else {
+ 		/* PMCR.P & PMCR.C are RAZ */
+ 		val = vcpu_sys_reg(vcpu, PMCR_EL0)
 diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index d90fc65..c35b11d 100644
+index caa706e..5bed00c 100644
 --- a/include/kvm/arm_pmu.h
 +++ b/include/kvm/arm_pmu.h
-@@ -48,6 +48,7 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
+@@ -42,6 +42,7 @@ void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
+ void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
+ void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val);
+ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val);
++void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
  				    u64 select_idx);
-+int kvm_arm_support_pmu_v3(void);
  #else
- struct kvm_pmu {
- };
-@@ -72,6 +73,7 @@ static inline void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val) {}
+@@ -62,6 +63,7 @@ static inline void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val) {}
+ static inline void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val) {}
+ static inline void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val) {}
+ static inline void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val) {}
++static inline void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val) {}
  static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
  						  u64 data, u64 select_idx) {}
-+static inline int kvm_arm_support_pmu_v3(void) { return 0; }
  #endif
- 
- #endif
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 9da9051..dc16d30 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -850,6 +850,7 @@ struct kvm_ppc_smmu_info {
- #define KVM_CAP_IOEVENTFD_ANY_LENGTH 122
- #define KVM_CAP_HYPERV_SYNIC 123
- #define KVM_CAP_S390_RI 124
-+#define KVM_CAP_ARM_PMU_V3 125
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
 diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 45d4d91..cb373d4 100644
+index 706c935..d411f3f 100644
 --- a/virt/kvm/arm/pmu.c
 +++ b/virt/kvm/arm/pmu.c
-@@ -374,3 +374,12 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
- 
- 	pmc->perf_event = event;
+@@ -190,6 +190,48 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
+ 	}
  }
-+
-+int kvm_arm_support_pmu_v3(void)
+ 
++/**
++ * kvm_pmu_handle_pmcr - handle PMCR register
++ * @vcpu: The vcpu pointer
++ * @val: the value guest writes to PMCR register
++ */
++void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
 +{
-+	/* Check if HW_PERF_EVENTS are supported by checking the number of
-+	 * hardware performance counters. This could ensure physical PMU and
-+	 * PERF_EVENT driver existing.
-+	 */
-+	return perf_num_counters();
++	struct kvm_pmu *pmu = &vcpu->arch.pmu;
++	struct kvm_pmc *pmc;
++	u64 mask;
++	int i;
++
++	mask = kvm_pmu_valid_counter_mask(vcpu);
++	if (val & ARMV8_PMCR_E) {
++		kvm_pmu_enable_counter(vcpu,
++				     vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask);
++	} else {
++		kvm_pmu_disable_counter(vcpu, mask);
++	}
++
++	if (val & ARMV8_PMCR_C) {
++		pmc = &pmu->pmc[ARMV8_CYCLE_IDX];
++		if (pmc->perf_event)
++			local64_set(&pmc->perf_event->count, 0);
++		vcpu_sys_reg(vcpu, PMCCNTR_EL0) = 0;
++	}
++
++	if (val & ARMV8_PMCR_P) {
++		for (i = 0; i < ARMV8_CYCLE_IDX; i++) {
++			pmc = &pmu->pmc[i];
++			if (pmc->perf_event)
++				local64_set(&pmc->perf_event->count, 0);
++			vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = 0;
++		}
++	}
++
++	if (val & ARMV8_PMCR_LC) {
++		pmc = &pmu->pmc[ARMV8_CYCLE_IDX];
++		pmc->bitmask = 0xffffffffffffffffUL;
++	}
 +}
++
+ static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
+ {
+ 	return (vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMCR_E) &&
 -- 
 2.0.4
