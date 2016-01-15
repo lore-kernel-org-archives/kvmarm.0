@@ -1,26 +1,30 @@
-From: hiwu <hiwu@derytech.com.tw>
-Subject: Re: ARM KVM guest virtual address to host virtual address Look up
-Date: Fri, 15 Jan 2016 23:35:24 +0800
-Message-ID: <569911BC.3090102@derytech.com.tw>
-References: <911dda08e570d71c948d7f9dad3e3e04.squirrel@mail.derytech.com.tw>
- <CAFEAcA-rOAGxVrEs5q--z5BFq2YR0ExK8cmQn2PX1s+cCo27hA@mail.gmail.com>
- <q70d9pc1o02g0mosm9n96cvw.1452856464824@email.android.com>
- <CAFEAcA_cSpFSZX02PJTCvQV6uB75_SbhBkLb1_2Z3uyy+BhBxA@mail.gmail.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 09/11] arm/pci: PCI host bridge info
+ printing
+Date: Fri, 15 Jan 2016 16:35:59 +0100
+Message-ID: <20160115153559.GO3915@hawk.localdomain>
+References: <cover.1452341807.git.agordeev@redhat.com>
+ <c82448afa4642ddb782990d75d0ff14eaff8e804.1452341807.git.agordeev@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2E00149A18
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 10:31:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79F5949A12
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 10:31:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5MHMpOlW6Ch8 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jan 2016 10:31:22 -0500 (EST)
-Received: from msr5.hinet.net (msr5.hinet.net [168.95.4.105])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 89DC149A11
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 10:31:20 -0500 (EST)
-In-Reply-To: <CAFEAcA_cSpFSZX02PJTCvQV6uB75_SbhBkLb1_2Z3uyy+BhBxA@mail.gmail.com>
+ with ESMTP id gjyloXd3Kt7b for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jan 2016 10:31:49 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id ABE9C49A11
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 10:31:49 -0500 (EST)
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+ (int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ by mx1.redhat.com (Postfix) with ESMTPS id 655F3552E6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 15:36:03 +0000 (UTC)
+Content-Disposition: inline
+In-Reply-To: <c82448afa4642ddb782990d75d0ff14eaff8e804.1452341807.git.agordeev@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,26 +34,80 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Alexander Gordeev <agordeev@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-SGkgUGV0ZXI6CgpUaGUgZ3Vlc3QncyBsb2FkL3N0b3JlIGluc3RydWN0aW9ucywgd2hpY2ggSSB3
-YW50IHRvIGRlYnVnLCBkbyBub3QgY2F1c2UgCmEgZ3Vlc3QgZXhjZXB0aW9uLgpBUk0gS1ZNIG9u
-bHkgcHJvdmlkZXMgdGhlIGd1ZXN0JyByMTUgcmVnaXN0ZXIgKHBjKSB2YWx1ZS4gIFRvIGdldCB0
-aGUgCmd1ZXN0IGluc3RydWN0aW9uIGZvcgplbXVsYXRpbmcgaW4gaG9zdCwgInRyYW5zbGF0ZSBn
-dWVzdCBWQSB0byBob3N0IFZBIiBpcyByZXF1aXJlZC4gSG93IHRvIAppbXBsZW1lbnQKInRyYW5z
-bGF0ZSBndWVzdCBWQSB0byBob3N0IFZBIiBpbiBob3N0ID8KClRoYW5rIHlvdQoKLUphY2sKCgpQ
-ZXRlciBNYXlkZWxsIOaWvCAyMDE2LzEvMTUg5LiL5Y2IIDA4OjE3IOWvq+mBkzoKPiBPbiAxNSBK
-YW51YXJ5IDIwMTYgYXQgMTE6MTQsIGhpd3UgPGhpd3VAZGVyeXRlY2guY29tLnR3PiB3cm90ZToK
-Pj4gSSB3YW50IHRvIHRyYXAgc29tZSBsZHIsc3RyIGluc3RydWN0aW9uIGluIGd1ZXN0IFZNIGZv
-ciBkZWJ1Zy4gVGhlcmVmb3JlLCBJCj4+IGhhdmUgdG8gZW11bGF0ZSBndWVzdCBsZHIsc3RyIGlu
-IGhvc3QuIFdpdGhvdXQgZ3Vlc3QgVkEgdG8gaG9zdCBWQSwgSSBjYW5ub3QKPj4gZW11bGF0ZSBs
-ZHIsc3RyIGluc3RydWN0aW9uIGluIGhvc3QuCj4gVGhhdCBzb3VuZHMgbGlrZSB5b3Ugd2FudCAi
-bG9hZC9zdG9yZSB2YWx1ZSBmcm9tIGd1ZXN0IFZBIiwgbm90ICJ0cmFuc2xhdGUKPiBndWVzdCBW
-QSB0byBob3N0IFZBIi4gVHJ5IGNwdV9sZGxfZGF0YSBhbmQgZnJpZW5kcyAodGhvdWdoIG5vdGUg
-dGhhdAo+IGlmIHlvdSB1c2UgdGhlbSB0byBhY2Nlc3MgYW4gaW52YWxpZCBhZGRyZXNzIHRoZXkn
-bGwgY2F1c2UgYSBndWVzdAo+IGV4Y2VwdGlvbikuCj4KPiB0aGFua3MKPiAtLSBQTU0KCgpfX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwprdm1hcm0gbWFpbGlu
-ZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKaHR0cHM6Ly9saXN0cy5jcy5jb2x1
-bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
+On Sat, Jan 09, 2016 at 01:22:56PM +0100, Alexander Gordeev wrote:
+> Cc: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
+> ---
+>  lib/pci-host-generic.c | 35 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 35 insertions(+)
+> 
+> diff --git a/lib/pci-host-generic.c b/lib/pci-host-generic.c
+> index 3d9c271..2d218a4 100644
+> --- a/lib/pci-host-generic.c
+> +++ b/lib/pci-host-generic.c
+> @@ -19,6 +19,15 @@
+>  	     dev >= 0;					\
+>  	     dev = find_next_dev(pci, dev, &conf))
+>  
+> +static char *addr_space_desc[] = {
+> +	[PCI_RES_TYPE_CONF]		= "CONF",
+> +	[PCI_RES_TYPE_IO]		= "IO",
+> +	[PCI_RES_TYPE_MEM32]		= "MEM32",
+> +	[PCI_RES_TYPE_MEM64]		= "MEM64",
+> +	[PCI_RES_TYPE_PREFMEM32]	= "MEM32/p",
+> +	[PCI_RES_TYPE_PREFMEM64]	= "MEM64/p"
+> +};
+> +
+>  static pci_res_type_t flags_to_type(u32 of_flags)
+>  {
+>  	return ((of_flags & 0x40000000) >> 28) | ((of_flags >> 24) & 0x03);
+> @@ -105,6 +114,28 @@ static void pci_host_addr_space_init(struct pci_addr_space as[], int nr_as,
+>  	}
+>  }
+>  
+> +static void pci_host_bridge_print(struct pci_host_bridge *host)
+> +{
+> +	printf("PCIe start %016llx size %016llx "
+> +	       "bus %02x bus_max %02x #spaces %d\n\n",
+> +		host->cpu_range.start, host->cpu_range.size,
+> +		host->bus, host->bus_max, host->nr_addr_spaces);
+> +}
+> +
+> +static void pci_address_spaces_print(struct pci_addr_space as[], int nr_as)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < nr_as; i++, as++) {
+> +		printf("%s address space:\n"
+> +		       "CPU: start %016llx size %016llx\n"
+> +		       "PCI: start %016llx size %016llx\n\n",
+> +			addr_space_desc[flags_to_type(as->of_flags)],
+> +			as->cpu_range.start, as->cpu_range.size,
+> +		        as->pci_range.start, as->pci_range.size);
+> +	}
+> +}
+> +
+>  /*
+>   * Probe DT for a generic PCI host controller
+>   * See kernel Documentation/devicetree/bindings/pci/host-generic-pci.txt
+> @@ -180,9 +211,13 @@ static struct pci_host_bridge *pci_host_bridge_probe(void)
+>  	host->bus_max		= bus_max;
+>  	host->nr_addr_spaces	= nr_addr_spaces;
+>  
+> +	pci_host_bridge_print(host);
+> +
+>  	pci_host_addr_space_init(&host->addr_space[0], nr_addr_spaces,
+>  				 (u32*)prop->data, nr_range_cells);
+>  
+> +	pci_address_spaces_print(&host->addr_space[0], host->nr_addr_spaces);
+> +
+>  	return host;
+>  }
+
+Looks good
+
+drew
