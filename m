@@ -1,94 +1,116 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH V12 3/7] dma: add Qualcomm Technologies HIDMA management
- driver
-Date: Fri, 15 Jan 2016 15:36:56 +0000
-Message-ID: <20160115153656.GM3262@leverpostej>
-References: <1452523550-8920-1-git-send-email-okaya@codeaurora.org>
- <1452523550-8920-4-git-send-email-okaya@codeaurora.org>
- <20160115145629.GI3262@leverpostej>
- <56990CD4.6020405@arm.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 10/11] arm/pci: PCI devices basic info
+ printing
+Date: Fri, 15 Jan 2016 16:38:02 +0100
+Message-ID: <20160115153802.GP3915@hawk.localdomain>
+References: <cover.1452341807.git.agordeev@redhat.com>
+ <9122dc5a32fc248e2cde597f02fa8efb9cb21591.1452341807.git.agordeev@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 30F9249A36
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 10:33:54 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id c76fvdgGFjLt for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jan 2016 10:33:52 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7A3CD49A11
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 10:33:52 -0500 (EST)
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+ (int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+ by mx1.redhat.com (Postfix) with ESMTPS id DC14DB5E9A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 15:38:05 +0000 (UTC)
 Content-Disposition: inline
-In-Reply-To: <56990CD4.6020405@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Sinan Kaya <okaya@codeaurora.org>, dmaengine@vger.kernel.org, timur@codeaurora.org, devicetree@vger.kernel.org, cov@codeaurora.org, vinod.koul@intel.com, jcm@redhat.com, agross@codeaurora.org, arnd@arndb.de, linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+In-Reply-To: <9122dc5a32fc248e2cde597f02fa8efb9cb21591.1452341807.git.agordeev@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Alexander Gordeev <agordeev@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 15, 2016 at 03:14:28PM +0000, Marc Zyngier wrote:
-> On 15/01/16 14:56, Mark Rutland wrote:
-> > Hi,
-> > 
-> > [adding KVM people, given this is meant for virtualization]
-> > 
-> > On Mon, Jan 11, 2016 at 09:45:43AM -0500, Sinan Kaya wrote:
-> >> The Qualcomm Technologies HIDMA device has been designed to support
-> >> virtualization technology. The driver has been divided into two to follow
-> >> the hardware design.
-> >>
-> >> 1. HIDMA Management driver
-> >> 2. HIDMA Channel driver
-> >>
-> >> Each HIDMA HW consists of multiple channels. These channels share some set
-> >> of common parameters. These parameters are initialized by the management
-> >> driver during power up. Same management driver is used for monitoring the
-> >> execution of the channels. Management driver can change the performance
-> >> behavior dynamically such as bandwidth allocation and prioritization.
-> >>
-> >> The management driver is executed in hypervisor context and is the main
-> >> management entity for all channels provided by the device.
-> > 
-> > You mention repeatedly that this is designed for virtualization, but
-> > looking at the series as it stands today I can't see how this operates
-> > from the host side.
+On Sat, Jan 09, 2016 at 01:22:57PM +0100, Alexander Gordeev wrote:
+> Cc: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
+> ---
+>  lib/pci-host-generic.c | 34 ++++++++++++++++++++++++++++++++++
+>  1 file changed, 34 insertions(+)
 > 
-> Nor the guest's, TBH. How do host and guest communicate, what is the
-> infrastructure, how is it meant to be used? A lot of questions, and no
-> answer whatsoever in this series.
+> diff --git a/lib/pci-host-generic.c b/lib/pci-host-generic.c
+> index 2d218a4..50cf09a 100644
+> --- a/lib/pci-host-generic.c
+> +++ b/lib/pci-host-generic.c
+> @@ -352,6 +352,35 @@ static phys_addr_t pci_alloc_res(struct pci_host_bridge *host,
+>  	return addr;
+>  }
+>  
+> +static void pci_dev_print(void *conf)
+> +{
+> +	u16 vendor_id = pci_config_readw(conf, PCI_VENDOR_ID);
+> +	u16 device_id = pci_config_readw(conf, PCI_DEVICE_ID);
+> +	u8 header = pci_config_readb(conf, PCI_HEADER_TYPE);
+> +	u8 progif = pci_config_readb(conf, PCI_CLASS_PROG);
+> +	u8 subcl = pci_config_readb(conf, PCI_CLASS_DEVICE);
+> +	u8 class = pci_config_readb(conf, PCI_CLASS_DEVICE + 1);
+> +
+> +	printf("conf %p vendor_id %04x device_id %04x type %d "
+> +	       "progif %02x class %02x subcl %02x\n",
+> +	       conf, vendor_id, device_id, header,
+> +	       progif, class, subcl);
+> +}
+> +
+> +static void pci_dev_bar_print(int bar, pci_res_type_t type,
+> +			      phys_addr_t addr, u64 size, bool is64)
+> +{
+> +	const char *desc = addr_space_desc[type];
+> +
+> +	if (is64) {
+> +		printf("\tBAR#%d,%d [%-7s %02x-%02x]\n",
+> +			bar, bar + 1, desc, addr, addr + size - 1);
+> +	} else {
+> +		printf("\tBAR#%d    [%-7s %02x-%02x]\n",
+> +			bar, desc, addr, addr + size - 1);
+> +	}
+> +}
+> +
+>  int pci_bus_scan(struct pci *pci)
+>  {
+>  	void *conf;
+> @@ -365,6 +394,8 @@ int pci_bus_scan(struct pci *pci)
+>  	int nr_dev = 0;
+>  
+>  	for_each_pci_dev(pci, dev, conf) {
+> +		pci_dev_print(conf);
+> +
+>  		/* We are only interested in normal PCI devices */
+>  		if (pci_config_readb(conf, PCI_HEADER_TYPE) !=
+>  					   PCI_HEADER_TYPE_NORMAL)
+> @@ -375,6 +406,9 @@ int pci_bus_scan(struct pci *pci)
+>  				break;
+>  			addr = pci_alloc_res(pci->sysdata, type, size);
+>  			pci_set_bar(conf, bar, addr, is64);
+> +
+> +			pci_dev_bar_print(bar, type, addr, size, is64);
+> +
+>  			if (is64)
+>  				bar++;
+>  
+> -- 
+> 1.8.3.1
+>
 
-I think the guest's PoV is fairly simple and understood. The DMA channel
-is pased in as with any passthrough of any other platform device.
+I don't think we'll want to print on every bus scan. We should have a
+special pci_dump_devices or something that can be called if needed.
 
-No communication with the host is necessary -- an isolated channel is
-usable.
+Otherwise looks good
 
-The larger concern is isolation, given the lack of IOMMU, or anything
-obvious w.r.t. pinning of pages.
-
-> > This doesn't seem to tie into KVM or VFIO, and as far as I can tell
-> > there's no mechanism for associating channels with a particular virtual
-> > address space (i.e. no configuration of an external or internal IOMMU),
-> > nor pinning of guest pages to allow for DMA to occur safely.
-> > 
-> > Given that, I'm at a loss as to how this would be used in a hypervisor
-> > context. What am I missing?
-> > 
-> > Are there additional patches, or do you have some userspace that works
-> > with this in some limited configuration?
-> 
-> Well, this looks so far like a code dumping exercise. I'd very much
-> appreciate a HIDMA101 crash course:
-> 
-> - How do host and guest communicate?
-> - How is the integration performed in the hypervisor?
-> - Does the HYP side requires any context switch (and how is that done)?
-
-I don't believe this requires any context-switch -- it's the same as
-assigning any other platform device other than additional proeprties
-being controlled in the managament interface.
-
-> - What makes it safe?
-
-I'm concerned with how this is safe, and with the userspace interface.
-e.g. if the user wants to up the QoS for a VM, how to they find the
-right channel in sysfs  to alter?
-
-> Without any of this information (and pointer to the code to back it up),
-> I'm very reluctant to take any of this.
-
-Likewise.
-
-Thanks,
-Mark.
+drew
