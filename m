@@ -1,7 +1,7 @@
 From: Andrew Jones <drjones@redhat.com>
 Subject: Re: [kvm-unit-tests PATCH 08/11] arm/pci: PCI device read/write test
-Date: Fri, 15 Jan 2016 16:33:50 +0100
-Message-ID: <20160115153350.GM3915@hawk.localdomain>
+Date: Fri, 15 Jan 2016 16:34:36 +0100
+Message-ID: <20160115153436.GN3915@hawk.localdomain>
 References: <cover.1452341807.git.agordeev@redhat.com>
  <9da79ee47b7ad328c9ba04af0a2ff4697555b007.1452341807.git.agordeev@redhat.com>
 Mime-Version: 1.0
@@ -9,19 +9,19 @@ Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B1B9649A23
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 10:29:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CE89949A18
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 10:30:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bZfmR2mYObWR for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jan 2016 10:29:40 -0500 (EST)
+ with ESMTP id OHAXYpo8+7tY for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jan 2016 10:30:26 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EEE2D49A21
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 10:29:39 -0500 (EST)
-Received: from int-mx13.intmail.prod.int.phx2.redhat.com
- (int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
- by mx1.redhat.com (Postfix) with ESMTPS id 7EA948E221
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 15:33:53 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0C25949A11
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 10:30:26 -0500 (EST)
+Received: from int-mx09.intmail.prod.int.phx2.redhat.com
+ (int-mx09.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ by mx1.redhat.com (Postfix) with ESMTPS id C9E571837
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 15:34:39 +0000 (UTC)
 Content-Disposition: inline
 In-Reply-To: <9da79ee47b7ad328c9ba04af0a2ff4697555b007.1452341807.git.agordeev@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -74,14 +74,11 @@ On Sat, Jan 09, 2016 at 01:22:55PM +0100, Alexander Gordeev wrote:
 > +	}
 > +
 > +	assert((int)ops->read32(&test->count) == nr_writes);
-
-Are you sure we want to assert here? What about outputting a message and
-then returning false instead?
-
 > +
 >  	return true;
 >  }
->  
-> -- 
-> 1.8.3.1
-> 
+
+Forgot to mention that this could also be squashed into the last two
+patches.
+
+drew
