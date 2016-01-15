@@ -1,78 +1,180 @@
-From: Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [PATCH V12 3/7] dma: add Qualcomm Technologies HIDMA management
- driver
-Date: Fri, 15 Jan 2016 15:14:28 +0000
-Message-ID: <56990CD4.6020405@arm.com>
-References: <1452523550-8920-1-git-send-email-okaya@codeaurora.org> <1452523550-8920-4-git-send-email-okaya@codeaurora.org> <20160115145629.GI3262@leverpostej>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 05/11] arm/pci: Add pci_find_dev() and
+ pci_bar_addr() functions
+Date: Fri, 15 Jan 2016 16:17:33 +0100
+Message-ID: <20160115151733.GJ3915@hawk.localdomain>
+References: <cover.1452341807.git.agordeev@redhat.com>
+ <306d836398fe72935b25068bb9df58f1fa8deec4.1452341807.git.agordeev@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-In-Reply-To: <20160115145629.GI3262@leverpostej>
-Sender: devicetree-owner-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-To: Mark Rutland <mark.rutland-5wv7dgnIgG8@public.gmane.org>, Sinan Kaya <okaya-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org>
-Cc: dmaengine-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, timur-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, devicetree-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, cov-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, vinod.koul-ral2JQCrhuEAvxtiuMwx3w@public.gmane.org, jcm-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, agross-sgV2jX0FEOL9JmXXK+q4OQ@public.gmane.org, arnd-r2nGTMty4D4@public.gmane.org, linux-arm-msm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E000049A34
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 10:13:25 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id BJkaCU3MOr7O for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jan 2016 10:13:24 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 42EBC49A11
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 10:13:24 -0500 (EST)
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+ (int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ by mx1.redhat.com (Postfix) with ESMTPS id 841BF3BF55D
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 15:17:37 +0000 (UTC)
+Content-Disposition: inline
+In-Reply-To: <306d836398fe72935b25068bb9df58f1fa8deec4.1452341807.git.agordeev@redhat.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Alexander Gordeev <agordeev@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 15/01/16 14:56, Mark Rutland wrote:
-> Hi,
-> 
-> [adding KVM people, given this is meant for virtualization]
-> 
-> On Mon, Jan 11, 2016 at 09:45:43AM -0500, Sinan Kaya wrote:
->> The Qualcomm Technologies HIDMA device has been designed to support
->> virtualization technology. The driver has been divided into two to follow
->> the hardware design.
->>
->> 1. HIDMA Management driver
->> 2. HIDMA Channel driver
->>
->> Each HIDMA HW consists of multiple channels. These channels share some set
->> of common parameters. These parameters are initialized by the management
->> driver during power up. Same management driver is used for monitoring the
->> execution of the channels. Management driver can change the performance
->> behavior dynamically such as bandwidth allocation and prioritization.
->>
->> The management driver is executed in hypervisor context and is the main
->> management entity for all channels provided by the device.
-> 
-> You mention repeatedly that this is designed for virtualization, but
-> looking at the series as it stands today I can't see how this operates
-> from the host side.
+On Sat, Jan 09, 2016 at 01:22:52PM +0100, Alexander Gordeev wrote:
+> This updat is a reminiscence of x86 implementation - to
+> provision a possible future common PCI interface.
 
-Nor the guest's, TBH. How do host and guest communicate, what is the
-infrastructure, how is it meant to be used? A lot of questions, and no
-answer whatsoever in this series.
+This comment inspired me to refactor the x86 code into common code.
+I'll post that series in a few minutes for you to review. If x86
+people are OK with it, then I think we should rebase your series on
+it. I'm particular interested in learning if the last two patches
+of this series can be greatly simplified by pretty much just
+implementing the DT pcie-host-bridge discovery and a
+lib/arm/asm/pci.h:pci_config_read() function.
 
 > 
-> This doesn't seem to tie into KVM or VFIO, and as far as I can tell
-> there's no mechanism for associating channels with a particular virtual
-> address space (i.e. no configuration of an external or internal IOMMU),
-> nor pinning of guest pages to allow for DMA to occur safely.
+> Make pcidevaddr_t as int, not u16. There is no good reason
+> to limit it to u16 while omitting properly adjusted bit fields.
+
+pcidevaddr_t is OK as a u16, afaict it's just a device index
+for a single bus (bus=0). So it has a max of 256. You could
+redefine it to include the bus number too, but I'm not sure it's
+necessary for simple kvm-unit-tests.
+
 > 
-> Given that, I'm at a loss as to how this would be used in a hypervisor
-> context. What am I missing?
+> Cc: Andrew Jones <drjones@redhat.com>
+> Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
+> ---
+>  lib/pci-host-generic.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  lib/pci.h              | 18 +++++++++++++++++
+>  2 files changed, 72 insertions(+)
 > 
-> Are there additional patches, or do you have some userspace that works
-> with this in some limited configuration?
+> diff --git a/lib/pci-host-generic.c b/lib/pci-host-generic.c
+> index f3161f8..3d9c271 100644
+> --- a/lib/pci-host-generic.c
+> +++ b/lib/pci-host-generic.c
+> @@ -29,6 +29,11 @@ static u8 pci_config_readb(const void *conf, int off)
+>  	return readb(conf + off);
+>  }
+>  
+> +static u16 pci_config_readw(const void *conf, int off)
+> +{
+> +	return readw(conf + off);
+> +}
+> +
+>  static u32 pci_config_readl(const void *conf, int off)
+>  {
+>  	return readl(conf + off);
+> @@ -351,6 +356,55 @@ int pci_bus_scan(struct pci *pci)
+>  	return nr_dev;
+>  }
+>  
+> +static pcidevaddr_t encode_addr(int bus, int dev, int fn)
+> +{
+> +	assert(bus < 256 && dev < 32 && fn < 8);
+> +	return bus << 16 | dev << 11 | fn;
+> +}
+> +
+> +static void decode_addr(pcidevaddr_t bdf, int *bus, int *dev, int *fn)
+> +{
+> +	*bus = (bdf >> 16) & 0xff;
+> +	*dev = (bdf >> 11) & 0x1f;
+> +	*fn  = (bdf >>  8) & 0x03;
+> +}
+> +
+> +pcidevaddr_t pci_find_dev(struct pci *pci, u16 vendor_id, u16 device_id)
+> +{
+> +	void *conf;
+> +	int dev;
+> +
+> +	for_each_pci_dev(pci, dev, conf) {
+> +		if (vendor_id == pci_config_readw(conf, PCI_VENDOR_ID) &&
+> +		    device_id == pci_config_readw(conf, PCI_DEVICE_ID))
+> +			return encode_addr(0, dev, 0);
+> +	}
+> +
+> +	return PCIDEVADDR_INVALID;
+> +}
+> +
+> +phys_addr_t pci_bar_addr(struct pci *pci, pcidevaddr_t bdf, int bar)
+> +{
+> +	void *conf;
+> +	struct pci_addr_space *res;
+> +	pci_res_type_t type;
+> +	phys_addr_t addr;
+> +	bool is64;
+> +	int bus, dev, fn;
+> +
+> +	decode_addr(bdf, &bus, &dev, &fn);
+> +	assert(!bus && !fn);	/* We support bus 0 and function 0 only */
+> +
+> +	conf = dev_conf(pci, dev);
+> +	assert(pci_config_readb(conf, PCI_HEADER_TYPE) ==
+> +				      PCI_HEADER_TYPE_NORMAL);
+> +
+> +	assert(pci_get_bar(conf, bar, &type, &addr, NULL, &is64));
+> +	assert(res = pci_find_res(pci->sysdata, type));
+> +
+> +	return res->cpu_range.start + (addr - res->pci_range.start);
+> +}
+> +
+>  struct pci *pci_dt_probe(void)
+>  {
+>  	struct pci_host_bridge *host;
+> diff --git a/lib/pci.h b/lib/pci.h
+> index bc4f2d2..7d9baad 100644
+> --- a/lib/pci.h
+> +++ b/lib/pci.h
+> @@ -7,8 +7,26 @@ struct pci {
+>  	void *sysdata;
+>  };
+>  
+> +/*
+> + * Make it a reminiscence of x86 implementation - to provision a possible
+> + * future merge.
+> + *
+> + * Unlike x86, PCIDEVADDR_INVALID is -1, not 0. PCI bus-device-function
+> + * of 00.00:0 is a legitimate PCI address, so x86 needs a fix.
 
-Well, this looks so far like a code dumping exercise. I'd very much
-appreciate a HIDMA101 crash course:
+x86 gets away with this because the pci-testdev is never at addr 00.0,
+that's where its host bridge is. I agree that it would be cleaner to use
+an invalid dev-addr (unsigned > 255) for "INVALID" though. How about 0xffff?
 
-- How do host and guest communicate?
-- How is the integration performed in the hypervisor?
-- Does the HYP side requires any context switch (and how is that done)?
-- What makes it safe?
-
-Without any of this information (and pointer to the code to back it up),
-I'm very reluctant to take any of this.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
---
-To unsubscribe from this list: send the line "unsubscribe devicetree" in
-the body of a message to majordomo-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> + *
+> + * Also, make pcidevaddr_t int, not u16. There is no good reason to limit
+> + * it to u16 while omitting properly adjusted bit fields.
+> + *
+> + */
+> +typedef enum {
+> +	PCIDEVADDR_INVALID = -1
+> +} pcidevaddr_t;
+> +
+>  extern struct pci *pci_dt_probe(void);
+>  extern int pci_bus_scan(struct pci *pci);
+>  extern void pci_shutdown(struct pci *pci);
+>  
+> +extern pcidevaddr_t pci_find_dev(struct pci *pci, u16 vendor_id, u16 device_id);
+> +extern phys_addr_t pci_bar_addr(struct pci *pci, pcidevaddr_t bdf, int bar_nr);
+> +
+>  #endif
+> -- 
+> 1.8.3.1
+> 
