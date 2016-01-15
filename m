@@ -1,143 +1,99 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v9 19/21] KVM: ARM64: Add a new feature bit for PMUv3
-Date: Fri, 15 Jan 2016 12:08:16 +0100
-Message-ID: <20160115110816.GE3915@hawk.localdomain>
-References: <1452839275-19368-1-git-send-email-zhaoshenglong@huawei.com>
- <1452839275-19368-20-git-send-email-zhaoshenglong@huawei.com>
+From: hiwu <hiwu@derytech.com.tw>
+Subject: Re: ARM KVM guest virtual address to host virtual address Look up
+Date: Fri, 15 Jan 2016 19:14:24 +0800
+Message-ID: <q70d9pc1o02g0mosm9n96cvw.1452856464824@email.android.com>
+References: <911dda08e570d71c948d7f9dad3e3e04.squirrel@mail.derytech.com.tw>
+ <CAFEAcA-rOAGxVrEs5q--z5BFq2YR0ExK8cmQn2PX1s+cCo27hA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1452839275-19368-20-git-send-email-zhaoshenglong@huawei.com>
-Sender: kvm-owner@vger.kernel.org
-To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com, Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/mixed; boundary="===============1272856498371830552=="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 965D749A0A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 06:11:16 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Ic8cAXoWGg1m for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jan 2016 06:11:15 -0500 (EST)
+Received: from msr5.hinet.net (msr5.hinet.net [168.95.4.105])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1AC8949444
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 06:11:14 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 15, 2016 at 02:27:53PM +0800, Shannon Zhao wrote:
-> From: Shannon Zhao <shannon.zhao@linaro.org>
-> 
-> To support guest PMUv3, use one bit of the VCPU INIT feature array.
-> Initialize the PMU when initialzing the vcpu with that bit and PMU
-> overflow interrupt set.
-> 
-> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> ---
-> CC: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  Documentation/virtual/kvm/api.txt | 2 ++
->  arch/arm64/include/asm/kvm_host.h | 2 +-
->  arch/arm64/include/uapi/asm/kvm.h | 1 +
->  arch/arm64/kvm/reset.c            | 3 +++
->  include/kvm/arm_pmu.h             | 2 ++
->  include/uapi/linux/kvm.h          | 1 +
->  virt/kvm/arm/pmu.c                | 9 +++++++++
->  7 files changed, 19 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-> index 053f613..e51fa04 100644
-> --- a/Documentation/virtual/kvm/api.txt
-> +++ b/Documentation/virtual/kvm/api.txt
-> @@ -2577,6 +2577,8 @@ Possible features:
->  	  Depends on KVM_CAP_ARM_EL1_32BIT (arm64 only).
->  	- KVM_ARM_VCPU_PSCI_0_2: Emulate PSCI v0.2 for the CPU.
->  	  Depends on KVM_CAP_ARM_PSCI_0_2.
-> +	- KVM_ARM_VCPU_PMU_V3: Emulate PMUv3 for the CPU.
-> +	  Depends on KVM_CAP_ARM_PMU_V3.
->  
->  
->  4.83 KVM_ARM_PREFERRED_TARGET
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 6bab7fb..cb220b7 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -40,7 +40,7 @@
->  
->  #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
->  
-> -#define KVM_VCPU_MAX_FEATURES 3
-> +#define KVM_VCPU_MAX_FEATURES 4
->  
->  int __attribute_const__ kvm_target_cpu(void);
->  int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index 2d4ca4b..6aedbe3 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -94,6 +94,7 @@ struct kvm_regs {
->  #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
->  #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
->  #define KVM_ARM_VCPU_PSCI_0_2		2 /* CPU uses PSCI v0.2 */
-> +#define KVM_ARM_VCPU_PMU_V3		3 /* Support guest PMUv3 */
->  
->  struct kvm_vcpu_init {
->  	__u32 target;
-> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-> index dfbce78..cf4f28a 100644
-> --- a/arch/arm64/kvm/reset.c
-> +++ b/arch/arm64/kvm/reset.c
-> @@ -77,6 +77,9 @@ int kvm_arch_dev_ioctl_check_extension(long ext)
->  	case KVM_CAP_GUEST_DEBUG_HW_WPS:
->  		r = get_num_wrps();
->  		break;
-> +	case KVM_CAP_ARM_PMU_V3:
-> +		r = kvm_arm_support_pmu_v3();
-> +		break;
->  	case KVM_CAP_SET_GUEST_DEBUG:
->  		r = 1;
->  		break;
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index d90fc65..c35b11d 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -48,6 +48,7 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val);
->  void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
->  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
->  				    u64 select_idx);
-> +int kvm_arm_support_pmu_v3(void);
->  #else
->  struct kvm_pmu {
->  };
-> @@ -72,6 +73,7 @@ static inline void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val) {}
->  static inline void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val) {}
->  static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
->  						  u64 data, u64 select_idx) {}
-> +static inline int kvm_arm_support_pmu_v3(void) { return 0; }
->  #endif
->  
->  #endif
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 9da9051..dc16d30 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -850,6 +850,7 @@ struct kvm_ppc_smmu_info {
->  #define KVM_CAP_IOEVENTFD_ANY_LENGTH 122
->  #define KVM_CAP_HYPERV_SYNIC 123
->  #define KVM_CAP_S390_RI 124
-> +#define KVM_CAP_ARM_PMU_V3 125
->  
->  #ifdef KVM_CAP_IRQ_ROUTING
->  
-> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> index 45d4d91..cb373d4 100644
-> --- a/virt/kvm/arm/pmu.c
-> +++ b/virt/kvm/arm/pmu.c
-> @@ -374,3 +374,12 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
->  
->  	pmc->perf_event = event;
->  }
-> +
-> +int kvm_arm_support_pmu_v3(void)
-> +{
-> +	/* Check if HW_PERF_EVENTS are supported by checking the number of
-> +	 * hardware performance counters. This could ensure physical PMU and
-> +	 * PERF_EVENT driver existing.
-> +	 */
-> +	return perf_num_counters();
+--===============1272856498371830552==
+Content-Type: multipart/alternative; boundary="--_com.asus.email_552075371984660"
 
-This returns the number of counters, but the CAP name and function name imply
-a true/false response. Is it useful to userspace to return the number of
-counters? Or should this just be a bool function and instead return
-perf_num_counters() != 0
+----_com.asus.email_552075371984660
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: base64
 
-drew
+SGkgUGV0ZXI6CgpJIHdhbnQgdG8gdHJhcCBzb21lIGxkcixzdHIgaW5zdHJ1Y3Rpb24gaW4gZ3Vl
+c3QgVk0gZm9yIGRlYnVnLiBUaGVyZWZvcmUsIEkgaGF2ZSB0byBlbXVsYXRlIGd1ZXN0IGxkcixz
+dHIgaW4gaG9zdC4gV2l0aG91dCBndWVzdCBWQSB0byBob3N0IFZBLCBJIGNhbm5vdCBlbXVsYXRl
+IGxkcixzdHIgaW5zdHJ1Y3Rpb24gaW4gaG9zdC4KClRoYW5rIHlvdQotSmFjawoKLS0tLS0tLS0g
+5Y6f5aeL6YO15Lu2IC0tLS0tLS0tCuWvhOS7tuiAhe+8mlBldGVyIE1heWRlbGwgPHBldGVyLm1h
+eWRlbGxAbGluYXJvLm9yZz4K5YKz6YCB5pel5pyf77yaRnJpLCAxNSBKYW4gMjAxNiAxODowMjoy
+MyArMDgwMArmlLbku7bogIXvvJpoaXd1QGRlcnl0ZWNoLmNvbS50dwrlia/mnKzvvJprdm1hcm1A
+bGlzdHMuY3MuY29sdW1iaWEuZWR1CuS4u+aXqDpSZTogQVJNIEtWTSBndWVzdCB2aXJ0dWFsIGFk
+ZHJlc3MgdG8gaG9zdCB2aXJ0dWFsIGFkZHJlc3MgTG9vayB1cAoKPk9uIDE1IEphbnVhcnkgMjAx
+NiBhdCAwOTozMywgIDxoaXd1QGRlcnl0ZWNoLmNvbS50dz4gd3JvdGU6Cj4+IEhvdyB0byBsb29r
+dXAgaG9zdCB2aXJ0dWFsIGFkZHJlc3MgYnkgZ3Vlc3QgdmlydHVhbCBhZGRyZXNzID8KPj4gSXMg
+dGhlcmUgYW55IGZ1bmN0aW9uIHRvIGRvIGd1ZXN0IHBhZ2UgdGFibGUgd2Fsaz8KPgo+VGhlcmUg
+aXMgbm8gc2luZ2xlIGZ1bmN0aW9uIHRvIGRvIHRoaXMgKGRlcGVuZGluZyBvbiB3aGF0Cj5iaXQg
+b2YgUUVNVSB0aGlzIGlzLCB3ZSBtaWdodCBlaXRoZXIgdHJ5IGEgVExCIGFjY2VzcyB0bwo+c2Vl
+IGlmIHdlIGNhbiBnZXQgZ3Vlc3QtdmlydHVhbCB0byBob3N0LXZpcnR1YWwsIHdpdGggYQo+c2xv
+dy1wYXRoIGZhbGxiYWNrIGZvciBUTEIgbWlzc2VzLCBvciB3ZSBtaWdodCBkbyBndWVzdAo+dmly
+dHVhbCB0byBndWVzdCBwaHlzaWNhbCBhbmQgdGhlbiBsb29rIHVwIHdoZXRoZXIgdGhhdAo+aXMg
+UkFNIG9yIGEgZGV2aWNlIGFuZCBiZWhhdmUgYWNjb3JkaW5nbHkpLiBXaGF0IGFyZSB5b3UKPmFj
+dHVhbGx5IHRyeWluZyB0byBkbz8KPgo+dGhhbmtzCj4tLSBQTU0K
+----_com.asus.email_552075371984660
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: base64
+
+PHNwYW4gc3R5bGU9ImZvbnQtZmFtaWx5OiBBcmlhbDsgZm9udC1zaXplOjEycHQiPkhpIFBldGVy
+Ojxicj48YnI+SSB3YW50IHRvIHRyYXAgc29tZSBsZHIsc3RyIGluc3RydWN0aW9uIGluIGd1ZXN0
+IFZNIGZvciBkZWJ1Zy4gVGhlcmVmb3JlLCBJIGhhdmUgdG8gZW11bGF0ZSBndWVzdCBsZHIsc3Ry
+IGluIGhvc3QuIFdpdGhvdXQgZ3Vlc3QgVkEgdG8gaG9zdCBWQSwgSSBjYW5ub3QgZW11bGF0ZSBs
+ZHIsc3RyIGluc3RydWN0aW9uIGluIGhvc3QuPGJyPjxicj5UaGFuayB5b3U8YnI+LUphY2s8L3Nw
+YW4+PHNwYW4gc3R5bGU9ImZvbnQtZmFtaWx5OiBBcmlhbDsiPjxicj48YnI+LS0tLS0tLS0g5Y6f
+5aeL6YO15Lu2IC0tLS0tLS0tPGJyPuWvhOS7tuiAhe+8mlBldGVyIE1heWRlbGwgPHBldGVyLm1h
+eWRlbGxAbGluYXJvLm9yZz48YnI+5YKz6YCB5pel5pyf77yaRnJpLCAxNSBKYW4gMjAxNiAxODow
+MjoyMyArMDgwMDxicj7mlLbku7bogIXvvJpoaXd1QGRlcnl0ZWNoLmNvbS50dzxicj7lia/mnKzv
+vJprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1PGJyPuS4u+aXqDpSZTogQVJNIEtWTSBndWVz
+dCB2aXJ0dWFsIGFkZHJlc3MgdG8gaG9zdCB2aXJ0dWFsIGFkZHJlc3MgTG9vayB1cDxicj48YnI+
+PC9zcGFuPk9uIDE1IEphbnVhcnkgMjAxNiBhdCAwOTozMywgIDxoaXd1QGRlcnl0ZWNoLmNvbS50
+dz4gd3JvdGU6PGJyPj4gSG93IHRvIGxvb2t1cCBob3N0IHZpcnR1YWwgYWRkcmVzcyBieSBndWVz
+dCB2aXJ0dWFsIGFkZHJlc3MgPzxicj4+IElzIHRoZXJlIGFueSBmdW5jdGlvbiB0byBkbyBndWVz
+dCBwYWdlIHRhYmxlIHdhbGs/PGJyPjxicj5UaGVyZSBpcyBubyBzaW5nbGUgZnVuY3Rpb24gdG8g
+ZG8gdGhpcyAoZGVwZW5kaW5nIG9uIHdoYXQ8YnI+Yml0IG9mIFFFTVUgdGhpcyBpcywgd2UgbWln
+aHQgZWl0aGVyIHRyeSBhIFRMQiBhY2Nlc3MgdG88YnI+c2VlIGlmIHdlIGNhbiBnZXQgZ3Vlc3Qt
+dmlydHVhbCB0byBob3N0LXZpcnR1YWwsIHdpdGggYTxicj5zbG93LXBhdGggZmFsbGJhY2sgZm9y
+IFRMQiBtaXNzZXMsIG9yIHdlIG1pZ2h0IGRvIGd1ZXN0PGJyPnZpcnR1YWwgdG8gZ3Vlc3QgcGh5
+c2ljYWwgYW5kIHRoZW4gbG9vayB1cCB3aGV0aGVyIHRoYXQ8YnI+aXMgUkFNIG9yIGEgZGV2aWNl
+IGFuZCBiZWhhdmUgYWNjb3JkaW5nbHkpLiBXaGF0IGFyZSB5b3U8YnI+YWN0dWFsbHkgdHJ5aW5n
+IHRvIGRvPzxicj48YnI+dGhhbmtzPGJyPi0tIFBNTTxicj4=
+----_com.asus.email_552075371984660--
+
+
+--===============1272856498371830552==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============1272856498371830552==--
