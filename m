@@ -1,20 +1,26 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: Mario Smarduch <m.smarduch@samsung.com>
 Subject: Re: [PATCH v6 1/6] arm/arm64: KVM: Introduce armv7 fp/simd vcpu fields
  and helpers
-Date: Thu, 14 Jan 2016 13:55:21 +0000
-Message-ID: <5697A8C9.7080204@arm.com>
-References: <1451166900-3711-1-git-send-email-m.smarduch@samsung.com> <1451166900-3711-2-git-send-email-m.smarduch@samsung.com> <20160110163204.GD30867@cbox> <56943D29.3000002@samsung.com> <20160112141207.GF15554@cbox> <5695A0EB.5020609@samsung.com> <56970FE8.4020805@samsung.com> <20160114132718.GA4329@cbox>
+Date: Thu, 14 Jan 2016 18:02:06 -0800
+Message-ID: <5698531E.1090606@samsung.com>
+References: <1451166900-3711-1-git-send-email-m.smarduch@samsung.com>
+ <1451166900-3711-2-git-send-email-m.smarduch@samsung.com>
+ <20160110163204.GD30867@cbox> <56943D29.3000002@samsung.com>
+ <20160112141207.GF15554@cbox> <5695A0EB.5020609@samsung.com>
+ <56970FE8.4020805@samsung.com> <20160114132718.GA4329@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160114132718.GA4329@cbox>
+In-reply-to: <20160114132718.GA4329@cbox>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, Mario Smarduch <m.smarduch@samsung.com>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Russell King - ARM Linux <linux@arm.linux.org.uk>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Russell King - ARM Linux <linux@arm.linux.org.uk>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 14/01/16 13:27, Christoffer Dall wrote:
+
+
+On 1/14/2016 5:27 AM, Christoffer Dall wrote:
 > On Wed, Jan 13, 2016 at 07:03:04PM -0800, Mario Smarduch wrote:
 >>
 >>
@@ -112,23 +118,27 @@ On 14/01/16 13:27, Christoffer Dall wrote:
 >> selection. I'm wondering if !VFPv3 path should be removed from
 >> the patches?
 >>
-> I think this is related to your particular choice of userspace.  I think
+> I think this is related to your particular choice of userspace. 
+
+It appears like there are two soft float implementations.
+
+FastFPE - but that's missing arch/arm/fastfpe directory, the option
+can still be selected but nothing is built.
+
+And the Netwidner FPE arch/arm/nwfpe, that doesn't appear to be
+hooked into the kernel. The hook nwfpe_enter is not referenced
+anywhere.
+
+I could make this change but have no way to bring the host up to
+test it.
+
+- Mario
+
+> I think
 > it's fair to assume VFP is enabled for a KVM host, but I don't have
 > enough familiarity with this to be sure.
 > 
 > Marc, any thoughts?
-
-I'm not so sure about the host kernel configuration - after all, you
-could have a very specialized host that doesn't use VFP at all
-(softfloat), and yet offers VFP support to guests.
-
-But what I'm worried about is the case where someone has built an
-ARMv7+VE without VFP. We may end-up exploding in that case. What we
-could do is to probe for the VFP HW, and not enable KVM if absent. This
-would give us the freedom to remove the #ifdefery.
-
-What do you think?
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> 
+> -Christoffer
+> 
