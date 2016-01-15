@@ -1,413 +1,151 @@
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v9 21/21] KVM: ARM64: Add a new vcpu device control group for PMUv3
-Date: Fri, 15 Jan 2016 14:27:55 +0800
-Message-ID: <1452839275-19368-22-git-send-email-zhaoshenglong@huawei.com>
-References: <1452839275-19368-1-git-send-email-zhaoshenglong@huawei.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v6 1/6] arm/arm64: KVM: Introduce armv7 fp/simd vcpu fields
+ and helpers
+Date: Fri, 15 Jan 2016 09:03:05 +0000
+Message-ID: <5698B5C9.4030404@arm.com>
+References: <1451166900-3711-1-git-send-email-m.smarduch@samsung.com> <1451166900-3711-2-git-send-email-m.smarduch@samsung.com> <20160110163204.GD30867@cbox> <56943D29.3000002@samsung.com> <20160112141207.GF15554@cbox> <5695A0EB.5020609@samsung.com> <56970FE8.4020805@samsung.com> <20160114132718.GA4329@cbox> <5698531E.1090606@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1452839275-19368-1-git-send-email-zhaoshenglong@huawei.com>
+In-Reply-To: <5698531E.1090606@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, drjones@redhat.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com, zhaoshenglong@huawei.com, Peter Maydell <peter.maydell@linaro.org>
+To: Mario Smarduch <m.smarduch@samsung.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Russell King - ARM Linux <linux@arm.linux.org.uk>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Shannon Zhao <shannon.zhao@linaro.org>
+On 15/01/16 02:02, Mario Smarduch wrote:
+> 
+> 
+> On 1/14/2016 5:27 AM, Christoffer Dall wrote:
+>> On Wed, Jan 13, 2016 at 07:03:04PM -0800, Mario Smarduch wrote:
+>>>
+>>>
+>>> On 1/12/2016 4:57 PM, Mario Smarduch wrote:
+>>>>
+>>>>
+>>>> On 1/12/2016 6:12 AM, Christoffer Dall wrote:
+>>>>> On Mon, Jan 11, 2016 at 03:39:21PM -0800, Mario Smarduch wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 1/10/2016 8:32 AM, Christoffer Dall wrote:
+>>>>>>> Hi Mario,
+>>>>>>>
+>>>>>>> I spotted one more potential issue...
+>>>>>>>
+>>>>>>> On Sat, Dec 26, 2015 at 01:54:55PM -0800, Mario Smarduch wrote:
+>>>>>>>> Add helper functions to enable access to fp/smid on guest entry and save host
+>>>>>>>> fpexc on vcpu put, check if fp/simd registers are dirty and add new vcpu
+>>>>>>>> fields.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Mario Smarduch <m.smarduch@samsung.com>
+>>>>>>>> ---
+>>>>>>>>  arch/arm/include/asm/kvm_emulate.h   | 42 ++++++++++++++++++++++++++++++++++++
+>>>>>>>>  arch/arm/include/asm/kvm_host.h      |  6 ++++++
+>>>>>>>>  arch/arm64/include/asm/kvm_emulate.h |  8 +++++++
+>>>>>>>>  3 files changed, 56 insertions(+)
+>>>>>>>>
+>>>>>>>> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
+>>>>>>>> index 3095df0..d4d9da1 100644
+>>>>>>>> --- a/arch/arm/include/asm/kvm_emulate.h
+>>>>>>>> +++ b/arch/arm/include/asm/kvm_emulate.h
+>>>>>>>> @@ -24,6 +24,8 @@
+>>>>>>>>  #include <asm/kvm_mmio.h>
+>>>>>>>>  #include <asm/kvm_arm.h>
+>>>>>>>>  #include <asm/cputype.h>
+>>>>>>>> +#include <asm/vfp.h>
+>>>>>>>> +#include "../vfp/vfpinstr.h"
+>>>>>>>>  
+>>>>>>>>  unsigned long *vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num);
+>>>>>>>>  unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu);
+>>>>>>>> @@ -255,4 +257,44 @@ static inline unsigned long vcpu_data_host_to_guest(struct kvm_vcpu *vcpu,
+>>>>>>>>  	}
+>>>>>>>>  }
+>>>>>>>>  
+>>>>>>>> +#ifdef CONFIG_VFPv3
+>>>>>>>> +/* Called from vcpu_load - save fpexc and enable guest access to fp/simd unit */
+>>>>>>>> +static inline void vcpu_trap_vfp_enable(struct kvm_vcpu *vcpu)
+>>>>>>>> +{
+>>>>>>>> +	u32 fpexc;
+>>>>>>>> +
+>>>>>>>> +	/* Save host fpexc, and enable guest access to fp unit */
+>>>>>>>> +	fpexc = fmrx(FPEXC);
+>>>>>>>> +	vcpu->arch.host_fpexc = fpexc;
+>>>>>>>> +	fpexc |= FPEXC_EN;
+>>>>>>>> +	fmxr(FPEXC, fpexc);
+>>>>>>>> +
+>>>>>>>> +	/* Configure HCPTR to trap on tracing and fp/simd access */
+>>>>>>>> +	vcpu->arch.hcptr = HCPTR_TTA | HCPTR_TCP(10)  | HCPTR_TCP(11);
+>>>>>>>> +}
+>>>>>>>> +
+>>>>>>>> +/* Called from vcpu_put - restore host fpexc */
+>>>>>>>> +static inline void vcpu_restore_host_fpexc(struct kvm_vcpu *vcpu)
+>>>>>>>> +{
+>>>>>>>> +	fmxr(FPEXC, vcpu->arch.host_fpexc);
+>>>>>>>> +}
+>>>>>>>> +
+>>>>>>>> +/* If trap bits are reset then fp/simd registers are dirty */
+>>>>>>>> +static inline bool vcpu_vfp_isdirty(struct kvm_vcpu *vcpu)
+>>>>>>>> +{
+>>>>>>>> +	return !(vcpu->arch.hcptr & (HCPTR_TCP(10) | HCPTR_TCP(11)));
+>>>>>>>> +}
+>>>>>>>> +#else
+>>>>>>>> +static inline void vcpu_trap_vfp_enable(struct kvm_vcpu *vcpu)
+>>>>>>>> +{
+>>>>>>>> +	vcpu->arch.hcptr = HCPTR_TTA;
+>>>>>>>
+>>>>>>> Is it correct not to trap VFP registers when the host kernel does not
+>>>>>>> have CONFIG_VFPv3?  I think this is a change in functionality compared
+>>>>>>> to the current kernels is it not?
+>>>>>>
+>>>>>> With CPU_V7 VFPv3 gets selected, without it fp should be emulated,
+>>>>>> with exceptions taken in guest kernel. I don't see a reason why
+>>>>>> fp hcptr access should be enabled in that case.
+>>>>>>
+>>>>>
+>>>>> If you have to guests with CONFIG_VFPV3 but your host doesn't have
+>>>>> CONFIG_VFPV3, you will never context-switch the VFP registers between
+>>>>> the two VMs, and mayhem will ensue.
+>>>>>
+>>>>> Unless I'm missing something very obvious?
+>>>
+>>> Did more testing on this enabling OABI_COMPAT and selecting
+>>> NWFPE/FastFPE breaks the boot. So far can't find a way to boot host
+>>> without VFP/VFPv3 enabled on ARMv7. CPU_V7 defaults to VFPv3
+>>> selection. I'm wondering if !VFPv3 path should be removed from
+>>> the patches?
+>>>
+>> I think this is related to your particular choice of userspace. 
+> 
+> It appears like there are two soft float implementations.
+> 
+> FastFPE - but that's missing arch/arm/fastfpe directory, the option
+> can still be selected but nothing is built.
+> 
+> And the Netwidner FPE arch/arm/nwfpe, that doesn't appear to be
+> hooked into the kernel. The hook nwfpe_enter is not referenced
+> anywhere.
 
-To configure the virtual PMUv3 overflow interrupt number, we use the
-vcpu kvm_device ioctl, encapsulating the KVM_ARM_VCPU_PMU_V3_IRQ
-attribute within the KVM_ARM_VCPU_PMU_V3_CTRL group.
+It is:
 
-After configuring the PMUv3, call the vcpu iotcl with attribute
-KVM_ARM_VCPU_PMU_V3_INIT to initialize the PMUv3.
+arch/arm/nwfpe/entry.S: .globl  nwfpe_enter
+arch/arm/nwfpe/entry.S:nwfpe_enter:
+arch/arm/nwfpe/fpmodule.c:extern void nwfpe_enter(void);
+arch/arm/nwfpe/fpmodule.c:      kern_fp_enter = nwfpe_enter;
 
-Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
----
-CC: Peter Maydell <peter.maydell@linaro.org>
----
- Documentation/virtual/kvm/devices/vcpu.txt |  24 ++++++
- arch/arm/include/asm/kvm_host.h            |  15 ++++
- arch/arm/kvm/arm.c                         |   3 +
- arch/arm64/include/asm/kvm_host.h          |   6 ++
- arch/arm64/include/uapi/asm/kvm.h          |   5 ++
- arch/arm64/kvm/guest.c                     |  51 ++++++++++++
- include/kvm/arm_pmu.h                      |  23 ++++++
- virt/kvm/arm/pmu.c                         | 128 +++++++++++++++++++++++++++++
- 8 files changed, 255 insertions(+)
+> I could make this change but have no way to bring the host up to
+> test it.
 
-diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
-index 3cc59c5..60cbac8 100644
---- a/Documentation/virtual/kvm/devices/vcpu.txt
-+++ b/Documentation/virtual/kvm/devices/vcpu.txt
-@@ -6,3 +6,27 @@ KVM_GET_DEVICE_ATTR, and KVM_HAS_DEVICE_ATTR. The interface uses the same struct
- kvm_device_attr as other devices, but targets VCPU-wide settings and controls.
- 
- The groups and attributes per virtual cpu, if any, are architecture specific.
-+
-+1. GROUP: KVM_ARM_VCPU_PMU_V3_CTRL
-+Architectures: ARM64
-+
-+1.1. ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_IRQ
-+Parameters: in kvm_device_attr.addr the address for PMU overflow interrupt
-+Returns: -EBUSY: The PMU overflow interrupt is already set
-+         -ENODEV: Not set the corresponding vcpu feature bit or getting the PMU
-+                  overflow interrupt number while it's not set
-+         -EINVAL: Invalid PMU overflow interrupt number supplied
-+
-+A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
-+number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
-+type must be same for each vcpu. As a PPI, the interrupt number is same for all
-+vcpus, while as a SPI it must be different for each vcpu.
-+
-+1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
-+Parameters: no additional parameter in kvm_device_attr.addr
-+Returns: -ENODEV: No PMUv3 supported
-+         -ENXIO: PMUv3 not properly configured as required prior to calling this
-+                 attribute
-+         -EBUSY: PMUv3 already initialized
-+
-+Request the initialization of the PMUv3.
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index f9f2779..6dd0992 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -242,5 +242,20 @@ static inline void kvm_arm_init_debug(void) {}
- static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
- static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
-+static inline int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
-+					     struct kvm_device_attr *attr)
-+{
-+	return -ENXIO;
-+}
-+static inline int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
-+					     struct kvm_device_attr *attr)
-+{
-+	return -ENXIO;
-+}
-+static inline int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
-+					     struct kvm_device_attr *attr)
-+{
-+	return -ENXIO;
-+}
- 
- #endif /* __ARM_KVM_HOST_H__ */
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 34d7395..dc8644f 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -833,6 +833,7 @@ static int kvm_arm_vcpu_set_attr(struct kvm_vcpu *vcpu,
- 
- 	switch (attr->group) {
- 	default:
-+		ret = kvm_arm_vcpu_arch_set_attr(vcpu, attr);
- 		break;
- 	}
- 
-@@ -846,6 +847,7 @@ static int kvm_arm_vcpu_get_attr(struct kvm_vcpu *vcpu,
- 
- 	switch (attr->group) {
- 	default:
-+		ret = kvm_arm_vcpu_arch_get_attr(vcpu, attr);
- 		break;
- 	}
- 
-@@ -859,6 +861,7 @@ static int kvm_arm_vcpu_has_attr(struct kvm_vcpu *vcpu,
- 
- 	switch (attr->group) {
- 	default:
-+		ret = kvm_arm_vcpu_arch_has_attr(vcpu, attr);
- 		break;
- 	}
- 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index cb220b7..a855a30 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -359,5 +359,11 @@ void kvm_arm_init_debug(void);
- void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
- void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
- void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
-+int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
-+			       struct kvm_device_attr *attr);
-+int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
-+			       struct kvm_device_attr *attr);
-+int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
-+			       struct kvm_device_attr *attr);
- 
- #endif /* __ARM64_KVM_HOST_H__ */
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 6aedbe3..dc69037 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -205,6 +205,11 @@ struct kvm_arch_memory_slot {
- #define KVM_DEV_ARM_VGIC_GRP_CTRL	4
- #define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
- 
-+/* Device Control API on vcpu fd */
-+#define KVM_ARM_VCPU_PMU_V3_CTRL		0
-+#define   KVM_ARM_VCPU_PMU_V3_IRQ		0
-+#define   KVM_ARM_VCPU_PMU_V3_INIT		1
-+
- /* KVM_IRQ_LINE irq field index values */
- #define KVM_ARM_IRQ_TYPE_SHIFT		24
- #define KVM_ARM_IRQ_TYPE_MASK		0xff
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index fcb7788..dbe45c3 100644
---- a/arch/arm64/kvm/guest.c
-+++ b/arch/arm64/kvm/guest.c
-@@ -380,3 +380,54 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
- 	}
- 	return 0;
- }
-+
-+int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
-+			       struct kvm_device_attr *attr)
-+{
-+	int ret;
-+
-+	switch (attr->group) {
-+	case KVM_ARM_VCPU_PMU_V3_CTRL:
-+		ret = kvm_arm_pmu_v3_set_attr(vcpu, attr);
-+		break;
-+	default:
-+		ret = -ENXIO;
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
-+int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
-+			       struct kvm_device_attr *attr)
-+{
-+	int ret;
-+
-+	switch (attr->group) {
-+	case KVM_ARM_VCPU_PMU_V3_CTRL:
-+		ret = kvm_arm_pmu_v3_get_attr(vcpu, attr);
-+		break;
-+	default:
-+		ret = -ENXIO;
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
-+int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
-+			       struct kvm_device_attr *attr)
-+{
-+	int ret;
-+
-+	switch (attr->group) {
-+	case KVM_ARM_VCPU_PMU_V3_CTRL:
-+		ret = kvm_arm_pmu_v3_has_attr(vcpu, attr);
-+		break;
-+	default:
-+		ret = -ENXIO;
-+		break;
-+	}
-+
-+	return ret;
-+}
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index c35b11d..5351109 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -36,6 +36,7 @@ struct kvm_pmu {
- };
- 
- #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
-+#define kvm_arm_pmu_irq_initialized(v)	((v)->arch.pmu.irq_num >= VGIC_NR_SGIS)
- u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
- u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
- void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
-@@ -49,11 +50,18 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
- 				    u64 select_idx);
- int kvm_arm_support_pmu_v3(void);
-+int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
-+			    struct kvm_device_attr *attr);
-+int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu,
-+			    struct kvm_device_attr *attr);
-+int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu,
-+			    struct kvm_device_attr *attr);
- #else
- struct kvm_pmu {
- };
- 
- #define kvm_arm_pmu_v3_ready(v)		(false)
-+#define kvm_arm_pmu_irq_initialized(v)  (false)
- static inline u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu,
- 					    u64 select_idx)
- {
-@@ -74,6 +82,21 @@ static inline void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
- 						  u64 data, u64 select_idx) {}
- static inline int kvm_arm_support_pmu_v3(void) { return 0; }
-+static inline int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
-+					  struct kvm_device_attr *attr)
-+{
-+	return -ENXIO;
-+}
-+static inline int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu,
-+					  struct kvm_device_attr *attr)
-+{
-+	return -ENXIO;
-+}
-+static inline int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu,
-+					  struct kvm_device_attr *attr)
-+{
-+	return -ENXIO;
-+}
- #endif
- 
- #endif
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index cb373d4..99a6e8a 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -19,6 +19,7 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- #include <linux/perf_event.h>
-+#include <linux/uaccess.h>
- #include <asm/kvm_emulate.h>
- #include <kvm/arm_pmu.h>
- #include <kvm/arm_vgic.h>
-@@ -383,3 +384,130 @@ int kvm_arm_support_pmu_v3(void)
- 	 */
- 	return perf_num_counters();
- }
-+
-+static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
-+{
-+	if (kvm_arm_pmu_v3_ready(vcpu))
-+		return -EBUSY;
-+
-+	if (kvm_arm_support_pmu_v3 <= 0)
-+		return -ENODEV;
-+
-+	if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features) ||
-+	    !kvm_arm_pmu_irq_initialized(vcpu))
-+		return -ENXIO;
-+
-+	kvm_pmu_vcpu_reset(vcpu);
-+	vcpu->arch.pmu.ready = true;
-+
-+	return 0;
-+}
-+
-+static int kvm_arm_pmu_irq_access(struct kvm_vcpu *vcpu,
-+				  struct kvm_device_attr *attr,
-+				  int *irq, bool is_set)
-+{
-+	if (!is_set) {
-+		if (!kvm_arm_pmu_irq_initialized(vcpu))
-+			return -ENODEV;
-+
-+		*irq = vcpu->arch.pmu.irq_num;
-+	} else {
-+		if (kvm_arm_pmu_irq_initialized(vcpu))
-+			return -EBUSY;
-+
-+		kvm_debug("Set kvm ARM PMU irq: %d\n", *irq);
-+		vcpu->arch.pmu.irq_num = *irq;
-+	}
-+
-+	return 0;
-+}
-+
-+static bool irq_is_invalid(struct kvm *kvm, int irq, bool is_ppi)
-+{
-+	int i;
-+	struct kvm_vcpu *vcpu;
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		if (!kvm_arm_pmu_irq_initialized(vcpu))
-+			continue;
-+
-+		if (is_ppi) {
-+			if (vcpu->arch.pmu.irq_num != irq)
-+				return true;
-+		} else {
-+			if (vcpu->arch.pmu.irq_num == irq)
-+				return true;
-+		}
-+	}
-+
-+	return false;
-+}
-+
-+
-+int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-+{
-+	switch (attr->attr) {
-+	case KVM_ARM_VCPU_PMU_V3_IRQ: {
-+		int __user *uaddr = (int __user *)(long)attr->addr;
-+		int reg;
-+
-+		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
-+			return -ENODEV;
-+
-+		if (get_user(reg, uaddr))
-+			return -EFAULT;
-+
-+		/*
-+		 * The PMU overflow interrupt could be a PPI or SPI, but for one
-+		 * VM the interrupt type must be same for each vcpu. As a PPI,
-+		 * the interrupt number is same for all vcpus, while as a SPI it
-+		 * must be different for each vcpu.
-+		 */
-+		if (reg < VGIC_NR_SGIS || reg >= vcpu->kvm->arch.vgic.nr_irqs ||
-+		    irq_is_invalid(vcpu->kvm, reg, reg < VGIC_NR_PRIVATE_IRQS))
-+			return -EINVAL;
-+
-+		return kvm_arm_pmu_irq_access(vcpu, attr, &reg, true);
-+	}
-+	case KVM_ARM_VCPU_PMU_V3_INIT:
-+		return kvm_arm_pmu_v3_init(vcpu);
-+	}
-+
-+	return -ENXIO;
-+}
-+
-+int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-+{
-+	int ret;
-+
-+	switch (attr->attr) {
-+	case KVM_ARM_VCPU_PMU_V3_IRQ: {
-+		int __user *uaddr = (int __user *)(long)attr->addr;
-+		int reg = -1;
-+
-+		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
-+			return -ENODEV;
-+
-+		ret = kvm_arm_pmu_irq_access(vcpu, attr, &reg, false);
-+		if (ret)
-+			return ret;
-+		return put_user(reg, uaddr);
-+	}
-+	}
-+
-+	return -ENXIO;
-+}
-+
-+int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
-+{
-+	switch (attr->attr) {
-+	case KVM_ARM_VCPU_PMU_V3_IRQ:
-+	case KVM_ARM_VCPU_PMU_V3_INIT:
-+		if (kvm_arm_support_pmu_v3() > 0 &&
-+		    test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
-+			return 0;
-+	}
-+
-+	return -ENXIO;
-+}
+None of these are relevant - they are emulation for the FPA (Floating
+Point Accelerator). Most of the time, nobody uses this but instead a
+userspace softfloat implementation, which saves the trap to kernel space
+for emulation.
+
+You can try Debian armel (as opposed to armhf, which mandates VFP) for
+example, which is a softfloat-based distribution.
+
+Thanks,
+
+	M.
 -- 
-2.0.4
-
-
+Jazz is not dead. It just smells funny...
