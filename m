@@ -1,29 +1,29 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 07/11] arm/pci: PCI device operation test
-Date: Fri, 15 Jan 2016 16:32:11 +0100
-Message-ID: <20160115153211.GL3915@hawk.localdomain>
+Subject: Re: [kvm-unit-tests PATCH 08/11] arm/pci: PCI device read/write test
+Date: Fri, 15 Jan 2016 16:33:50 +0100
+Message-ID: <20160115153350.GM3915@hawk.localdomain>
 References: <cover.1452341807.git.agordeev@redhat.com>
- <597fba0ba6cdc84495acd7dd2119d9c785a76548.1452341807.git.agordeev@redhat.com>
+ <9da79ee47b7ad328c9ba04af0a2ff4697555b007.1452341807.git.agordeev@redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E681C49A18
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 10:28:03 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B1B9649A23
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 10:29:40 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BoTnSguAKTyH for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jan 2016 10:28:02 -0500 (EST)
+ with ESMTP id bZfmR2mYObWR for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jan 2016 10:29:40 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5035149A11
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 10:28:02 -0500 (EST)
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
- (int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
- by mx1.redhat.com (Postfix) with ESMTPS id 7C90A744
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 15:32:15 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EEE2D49A21
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 10:29:39 -0500 (EST)
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+ (int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+ by mx1.redhat.com (Postfix) with ESMTPS id 7EA948E221
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 15:33:53 +0000 (UTC)
 Content-Disposition: inline
-In-Reply-To: <597fba0ba6cdc84495acd7dd2119d9c785a76548.1452341807.git.agordeev@redhat.com>
+In-Reply-To: <9da79ee47b7ad328c9ba04af0a2ff4697555b007.1452341807.git.agordeev@redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,211 +37,51 @@ To: Alexander Gordeev <agordeev@redhat.com>
 Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sat, Jan 09, 2016 at 01:22:54PM +0100, Alexander Gordeev wrote:
+On Sat, Jan 09, 2016 at 01:22:55PM +0100, Alexander Gordeev wrote:
 > Cc: Andrew Jones <drjones@redhat.com>
 > Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
 > ---
->  arm/pci-test.c    |   2 +-
->  lib/pci-testdev.c | 139 ++++++++++++++++++++++++++++++++++++++++++++++++++++--
->  lib/pci.h         |   2 +-
->  3 files changed, 138 insertions(+), 5 deletions(-)
+>  lib/pci-testdev.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
 > 
-> diff --git a/arm/pci-test.c b/arm/pci-test.c
-> index 695acf9..44e2857 100644
-> --- a/arm/pci-test.c
-> +++ b/arm/pci-test.c
-> @@ -23,7 +23,7 @@ int main(void)
->  	report("PCI bus scanning detected %d devices", true, ret);
->  
->  	ret = pci_testdev(pci);
-> -	report("PCI test device", ret);
-> +	report("PCI test device passed %d tests", (ret >= 6), ret);
->  
->  	pci_shutdown(pci);
->  
 > diff --git a/lib/pci-testdev.c b/lib/pci-testdev.c
-> index a7e0995..de97f82 100644
+> index de97f82..dd6a5ac 100644
 > --- a/lib/pci-testdev.c
 > +++ b/lib/pci-testdev.c
-> @@ -11,21 +11,154 @@
->  #define PCI_VENDOR_ID_REDHAT		0x1b36
->  #define PCI_DEVICE_ID_REDHAT_TEST	0x0005
->  
-> -bool pci_testdev(struct pci *pci)
-> +struct pci_test_dev_hdr {
-> +	u8 test;
-> +	u8 width;
-> +	u8 pad0[2];
-> +	u32 offset;
-> +	u32 data;
-> +	u32 count;
-> +	u8 name[];
-> +};
-> +
-> +struct pci_testdev_ops {
-> +	u8 (*read8)(const volatile void *addr);
-> +	u16 (*read16)(const volatile void *addr);
-> +	u32 (*read32)(const volatile void *addr);
-> +	void (*write8)(u8 value, volatile void *addr);
-> +	void (*write16)(u16 value, volatile void *addr);
-> +	void (*write32)(u32 value, volatile void *addr);
-
-Please use the standard 'b', 'w', 'l' in these names.
-
-> +};
-> +
-> +static u8 ioread8(const volatile void *addr)
-> +{
-> +	return readb(addr);
-> +}
-> +
-> +static u16 ioread16(const volatile void *addr)
-> +{
-> +	return readw(addr);
-> +}
-> +
-> +static u32 ioread32(const volatile void *addr)
-> +{
-> +	return readl(addr);
-> +}
-> +
-> +static void iowrite8(u8 value, volatile void *addr)
-> +{
-> +	writeb(value, addr);
-> +}
-> +
-> +static void iowrite16(u16 value, volatile void *addr)
-> +{
-> +	writew(value, addr);
-> +}
-> +
-> +static void iowrite32(u32 value, volatile void *addr)
-> +{
-> +	writel(value, addr);
-> +}
-> +
-> +static struct pci_testdev_ops pci_testdev_io_ops = {
-> +	.read8		= ioread8,
-> +	.read16		= ioread16,
-> +	.read32		= ioread32,
-> +	.write8		= iowrite8,
-> +	.write16	= iowrite16,
-> +	.write32	= iowrite32
-> +};
-> +
-> +static u8 memread8(const volatile void *addr)
-> +{
-> +	return *(const volatile u8 __force *)addr;
-> +}
-> +
-> +static u16 memread16(const volatile void *addr)
-> +{
-> +	return *(const volatile u16 __force *)addr;
-> +}
-> +
-> +static u32 memread32(const volatile void *addr)
-> +{
-> +	return *(const volatile u32 __force *)addr;
-> +}
-> +
-> +static void memwrite8(u8 value, volatile void *addr)
-> +{
-> +	*(volatile u8 __force *)addr = value;
-> +}
-> +
-> +static void memwrite16(u16 value, volatile void *addr)
-> +{
-> +	*(volatile u16 __force *)addr = value;
-> +}
-> +
-> +static void memwrite32(u32 value, volatile void *addr)
-> +{
-> +	*(volatile u32 __force *)addr = value;
-> +}
-> +
-> +static struct pci_testdev_ops pci_testdev_mem_ops = {
-> +	.read8		= memread8,
-> +	.read16		= memread16,
-> +	.read32		= memread32,
-> +	.write8		= memwrite8,
-> +	.write16	= memwrite16,
-> +	.write32	= memwrite32
-> +};
-> +
-> +static bool pci_testdev_one(struct pci_test_dev_hdr *test,
-> +			    int test_nr,
-> +			    struct pci_testdev_ops *ops)
-> +{
-> +	u8 width;
-> +
-> +	ops->write8(test_nr, &test->test);
-> +	assert(ops->read32(&test->count) == 0);
-> +
-> +	width = ops->read8(&test->width);
-> +	if ((width != 1) && (width != 2) && (width != 4))
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
-> +static int pci_testdev_all(struct pci_test_dev_hdr *test,
-> +			   struct pci_testdev_ops *ops)
-> +{
+> @@ -113,6 +113,9 @@ static bool pci_testdev_one(struct pci_test_dev_hdr *test,
+>  			    struct pci_testdev_ops *ops)
+>  {
+>  	u8 width;
+> +	u32 sig, off;
+> +	const int nr_writes = 16;
 > +	int i;
+>  
+>  	ops->write8(test_nr, &test->test);
+>  	assert(ops->read32(&test->count) == 0);
+> @@ -121,6 +124,19 @@ static bool pci_testdev_one(struct pci_test_dev_hdr *test,
+>  	if ((width != 1) && (width != 2) && (width != 4))
+>  		return false;
+>  
+> +	sig = ops->read32(&test->data);
+> +	off = ops->read32(&test->offset);
 > +
-> +	for (i = 0;; i++) {
-> +		if (!pci_testdev_one(test, i, ops))
-> +			break;
+> +	for (i = 0; i < nr_writes; i++) {
+> +		switch (width) {
+> +			case 1: ops->write8 (sig, (void*)test + off); break;
+> +			case 2: ops->write16(sig, (void*)test + off); break;
+> +			case 4: ops->write32(sig, (void*)test + off); break;
+> +		}
 > +	}
 > +
-> +	return i;
-> +}
+> +	assert((int)ops->read32(&test->count) == nr_writes);
+
+Are you sure we want to assert here? What about outputting a message and
+then returning false instead?
+
 > +
-> +int pci_testdev(struct pci *pci)
->  {
->  	phys_addr_t addr;
-> +	void __iomem *mem, *io;
-> +	int nr_tests = 0;
->  	pcidevaddr_t dev = pci_find_dev(pci,
->  					PCI_VENDOR_ID_REDHAT,
->  					PCI_DEVICE_ID_REDHAT_TEST);
->  
->  	if (dev == PCIDEVADDR_INVALID)
-> -		return false;
-> +		return 0;
->  
->  	addr = pci_bar_addr(pci, dev, 0);
->  	assert(addr);
-> +	mem = ioremap(addr, 0);
->  
->  	addr = pci_bar_addr(pci, dev, 1);
->  	assert(addr);
-> +	io = (void*)addr;
->  
-> -	return true;
-> +	nr_tests += pci_testdev_all(mem, &pci_testdev_mem_ops);
-> +	nr_tests += pci_testdev_all(io, &pci_testdev_io_ops);
-> +
-> +	return nr_tests;
+>  	return true;
 >  }
-> diff --git a/lib/pci.h b/lib/pci.h
-> index 6af5599..0cb0e27 100644
-> --- a/lib/pci.h
-> +++ b/lib/pci.h
-> @@ -24,7 +24,7 @@ typedef enum {
 >  
->  extern struct pci *pci_dt_probe(void);
->  extern int pci_bus_scan(struct pci *pci);
-> -extern bool pci_testdev(struct pci *pci);
-> +extern int pci_testdev(struct pci *pci);
->  extern void pci_shutdown(struct pci *pci);
->  
->  extern pcidevaddr_t pci_find_dev(struct pci *pci, u16 vendor_id, u16 device_id);
 > -- 
 > 1.8.3.1
->
-
-This patch can be squashed into the last one.
-
-Thanks,
-drew
+> 
