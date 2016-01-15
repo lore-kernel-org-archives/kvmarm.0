@@ -1,22 +1,22 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v9 02/21] KVM: ARM64: Define PMU data structure for each vcpu
-Date: Fri, 15 Jan 2016 14:27:36 +0800
-Message-ID: <1452839275-19368-3-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v9 17/21] KVM: ARM64: Reset PMU state when resetting vcpu
+Date: Fri, 15 Jan 2016 14:27:51 +0800
+Message-ID: <1452839275-19368-18-git-send-email-zhaoshenglong@huawei.com>
 References: <1452839275-19368-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FD9A49A59
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 01:25:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 39A2149B37
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 01:25:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NnM7RRHccUMD for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Jan 2016 01:25:23 -0500 (EST)
+ with ESMTP id sxfRx+Eu+6Uz for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Jan 2016 01:25:27 -0500 (EST)
 Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [119.145.14.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B83949A52
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 01:25:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8E2F849A23
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Jan 2016 01:25:23 -0500 (EST)
 In-Reply-To: <1452839275-19368-1-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,116 +33,77 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-Here we plan to support virtual PMU for guest by full software
-emulation, so define some basic structs and functions preparing for
-futher steps. Define struct kvm_pmc for performance monitor counter and
-struct kvm_pmu for performance monitor unit for each vcpu. According to
-ARMv8 spec, the PMU contains at most 32(ARMV8_MAX_COUNTERS) counters.
-
-Since this only supports ARM64 (or PMUv3), add a separate config symbol
-for it.
+When resetting vcpu, it needs to reset the PMU state to initial status.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  2 ++
- arch/arm64/kvm/Kconfig            |  7 +++++++
- include/kvm/arm_pmu.h             | 42 +++++++++++++++++++++++++++++++++++++++
- 3 files changed, 51 insertions(+)
- create mode 100644 include/kvm/arm_pmu.h
+ arch/arm64/kvm/reset.c |  3 +++
+ include/kvm/arm_pmu.h  |  2 ++
+ virt/kvm/arm/pmu.c     | 17 +++++++++++++++++
+ 3 files changed, 22 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 689d4c9..6f0241f 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -36,6 +36,7 @@
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index f34745c..dfbce78 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -120,6 +120,9 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	/* Reset system registers */
+ 	kvm_reset_sys_regs(vcpu);
  
- #include <kvm/arm_vgic.h>
- #include <kvm/arm_arch_timer.h>
-+#include <kvm/arm_pmu.h>
- 
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
- 
-@@ -211,6 +212,7 @@ struct kvm_vcpu_arch {
- 	/* VGIC state */
- 	struct vgic_cpu vgic_cpu;
- 	struct arch_timer_cpu timer_cpu;
-+	struct kvm_pmu pmu;
- 
- 	/*
- 	 * Anything that is not used directly from assembly code goes
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index a5272c0..de7450d 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -36,6 +36,7 @@ config KVM
- 	select HAVE_KVM_EVENTFD
- 	select HAVE_KVM_IRQFD
- 	select KVM_ARM_VGIC_V3
-+	select KVM_ARM_PMU if HW_PERF_EVENTS
- 	---help---
- 	  Support hosting virtualized guest machines.
- 	  We don't support KVM with 16K page tables yet, due to the multiple
-@@ -48,6 +49,12 @@ config KVM_ARM_HOST
- 	---help---
- 	  Provides host support for ARM processors.
- 
-+config KVM_ARM_PMU
-+	bool
-+	---help---
-+	  Adds support for a virtual Performance Monitoring Unit (PMU) in
-+	  virtual machines.
++	/* Reset PMU */
++	kvm_pmu_vcpu_reset(vcpu);
 +
- source drivers/vhost/Kconfig
- 
- endif # VIRTUALIZATION
+ 	/* Reset timer */
+ 	return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
+ }
 diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-new file mode 100644
-index 0000000..be220ee
---- /dev/null
+index fbc42fd..4394e0c 100644
+--- a/include/kvm/arm_pmu.h
 +++ b/include/kvm/arm_pmu.h
-@@ -0,0 +1,42 @@
-+/*
-+ * Copyright (C) 2015 Linaro Ltd.
-+ * Author: Shannon Zhao <shannon.zhao@linaro.org>
+@@ -38,6 +38,7 @@ struct kvm_pmu {
+ #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
+ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
+ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
++void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
+ void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
+ void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
+ void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val);
+@@ -60,6 +61,7 @@ static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+ {
+ 	return 0;
+ }
++static inline void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val) {}
+ static inline void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val) {}
+ static inline void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val) {}
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index 644f2dc..8142921 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -69,6 +69,23 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
+ 	}
+ }
+ 
++/**
++ * kvm_pmu_vcpu_reset - reset pmu state for cpu
++ * @vcpu: The vcpu pointer
 + *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
++void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
++{
++	int i;
++	struct kvm_pmu *pmu = &vcpu->arch.pmu;
 +
-+#ifndef __ASM_ARM_KVM_PMU_H
-+#define __ASM_ARM_KVM_PMU_H
++	for (i = 0; i < ARMV8_MAX_COUNTERS; i++) {
++		kvm_pmu_stop_counter(vcpu, &pmu->pmc[i]);
++		pmu->pmc[i].idx = i;
++		pmu->pmc[i].bitmask = 0xffffffffUL;
++	}
++}
 +
-+#ifdef CONFIG_KVM_ARM_PMU
-+
-+#include <linux/perf_event.h>
-+#include <asm/pmu.h>
-+
-+struct kvm_pmc {
-+	u8 idx;/* index into the pmu->pmc array */
-+	struct perf_event *perf_event;
-+	u64 bitmask;
-+};
-+
-+struct kvm_pmu {
-+	int irq_num;
-+	struct kvm_pmc pmc[ARMV8_MAX_COUNTERS];
-+	bool ready;
-+};
-+#else
-+struct kvm_pmu {
-+};
-+#endif
-+
-+#endif
+ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+ {
+ 	u64 val = vcpu_sys_reg(vcpu, PMCR_EL0) >> ARMV8_PMCR_N_SHIFT;
 -- 
 2.0.4
