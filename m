@@ -1,28 +1,25 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v9 21/21] KVM: ARM64: Add a new vcpu device control group
- for PMUv3
-Date: Mon, 25 Jan 2016 16:53:02 +0000
-Message-ID: <CAFEAcA-rVDLajQ7s5KcwkVsACtRtEqN+wkpR6RWMkvBBPJY8fA@mail.gmail.com>
-References: <1452839275-19368-1-git-send-email-zhaoshenglong@huawei.com>
- <1452839275-19368-22-git-send-email-zhaoshenglong@huawei.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 00/21] arm64: Virtualization Host Extension support
+Date: Mon, 25 Jan 2016 19:16:55 +0000
+Message-ID: <56A674A7.9010208@arm.com>
+References: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
+ <20160125162613.GD22927@arm.com> <56A64F53.4000201@arm.com>
+ <20160125164435.GG22927@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8AD1140C9D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:48:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6ADAD40BDA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 14:12:08 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id czjHUxTilL8y for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2016 11:48:30 -0500 (EST)
-Received: from mail-vk0-f42.google.com (mail-vk0-f42.google.com
- [209.85.213.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 81F56407A0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:48:30 -0500 (EST)
-Received: by mail-vk0-f42.google.com with SMTP id e185so76865403vkb.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 08:53:22 -0800 (PST)
-In-Reply-To: <1452839275-19368-22-git-send-email-zhaoshenglong@huawei.com>
+ with ESMTP id DIpJkvNzccKh for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2016 14:12:07 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F37BF40B40
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 14:12:06 -0500 (EST)
+In-Reply-To: <20160125164435.GG22927@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,77 +29,90 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, Will Deacon <will.deacon@arm.com>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Will Deacon <will.deacon@arm.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 15 January 2016 at 06:27, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
-> From: Shannon Zhao <shannon.zhao@linaro.org>
->
-> To configure the virtual PMUv3 overflow interrupt number, we use the
-> vcpu kvm_device ioctl, encapsulating the KVM_ARM_VCPU_PMU_V3_IRQ
-> attribute within the KVM_ARM_VCPU_PMU_V3_CTRL group.
->
-> After configuring the PMUv3, call the vcpu iotcl with attribute
-> KVM_ARM_VCPU_PMU_V3_INIT to initialize the PMUv3.
->
-> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> ---
-> CC: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  Documentation/virtual/kvm/devices/vcpu.txt |  24 ++++++
->  arch/arm/include/asm/kvm_host.h            |  15 ++++
->  arch/arm/kvm/arm.c                         |   3 +
->  arch/arm64/include/asm/kvm_host.h          |   6 ++
->  arch/arm64/include/uapi/asm/kvm.h          |   5 ++
->  arch/arm64/kvm/guest.c                     |  51 ++++++++++++
->  include/kvm/arm_pmu.h                      |  23 ++++++
->  virt/kvm/arm/pmu.c                         | 128 +++++++++++++++++++++++++++++
->  8 files changed, 255 insertions(+)
->
-> diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
-> index 3cc59c5..60cbac8 100644
-> --- a/Documentation/virtual/kvm/devices/vcpu.txt
-> +++ b/Documentation/virtual/kvm/devices/vcpu.txt
-> @@ -6,3 +6,27 @@ KVM_GET_DEVICE_ATTR, and KVM_HAS_DEVICE_ATTR. The interface uses the same struct
->  kvm_device_attr as other devices, but targets VCPU-wide settings and controls.
->
->  The groups and attributes per virtual cpu, if any, are architecture specific.
-> +
-> +1. GROUP: KVM_ARM_VCPU_PMU_V3_CTRL
-> +Architectures: ARM64
-> +
-> +1.1. ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_IRQ
-> +Parameters: in kvm_device_attr.addr the address for PMU overflow interrupt
-> +Returns: -EBUSY: The PMU overflow interrupt is already set
-> +         -ENODEV: Not set the corresponding vcpu feature bit or getting the PMU
-> +                  overflow interrupt number while it's not set
-> +         -EINVAL: Invalid PMU overflow interrupt number supplied
-> +
-> +A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
-> +number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
-> +type must be same for each vcpu. As a PPI, the interrupt number is same for all
-> +vcpus, while as a SPI it must be different for each vcpu.
-> +
-> +1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
-> +Parameters: no additional parameter in kvm_device_attr.addr
-> +Returns: -ENODEV: No PMUv3 supported
-> +         -ENXIO: PMUv3 not properly configured as required prior to calling this
-> +                 attribute
-> +         -EBUSY: PMUv3 already initialized
-> +
-> +Request the initialization of the PMUv3.
+On 25/01/16 16:44, Will Deacon wrote:
+> On Mon, Jan 25, 2016 at 04:37:39PM +0000, Marc Zyngier wrote:
+>> On 25/01/16 16:26, Will Deacon wrote:
+>>> On Mon, Jan 25, 2016 at 03:53:34PM +0000, Marc Zyngier wrote:
+>>>> ARMv8.1 comes with the "Virtualization Host Extension" (VHE for
+>>>> short), which enables simpler support of Type-2 hypervisors.
+>>>>
+>>>> This extension allows the kernel to directly run at EL2, and
+>>>> significantly reduces the number of system registers shared between
+>>>> host and guest, reducing the overhead of virtualization.
+>>>>
+>>>> In order to have the same kernel binary running on all versions of the
+>>>> architecture, this series makes heavy use of runtime code patching.
+>>>>
+>>>> The first 20 patches massage the KVM code to deal with VHE and enable
+>>>> Linux to run at EL2. The last patch catches an ugly case when VHE
+>>>> capable CPUs are paired with some of their less capable siblings. This
+>>>> should never happen, but hey...
+>>>>
+>>>> I have deliberately left out some of the more "advanced"
+>>>> optimizations, as they are likely to distract the reviewer from the
+>>>> core infrastructure, which is what I care about at the moment.
+>>>>
+>>>> A few things to note:
+>>>>
+>>>> - Given that the code has been almost entierely rewritten, I've
+>>>>   dropped all Acks from the new patches
+>>>>
+>>>> - GDB is currently busted on VHE systems, as it checks for version 6
+>>>>   on the debug architecture, while VHE is version 7. The binutils
+>>>>   people are on the case.
+>>>
+>>> [...]
+>>>
+>>>>  arch/arm/include/asm/virt.h          |   5 ++
+>>>>  arch/arm/kvm/arm.c                   | 151 +++++++++++++++++++------------
+>>>>  arch/arm/kvm/mmu.c                   |   7 ++
+>>>>  arch/arm64/Kconfig                   |  13 +++
+>>>>  arch/arm64/include/asm/cpufeature.h  |   3 +-
+>>>>  arch/arm64/include/asm/kvm_arm.h     |   1 +
+>>>>  arch/arm64/include/asm/kvm_emulate.h |   3 +
+>>>>  arch/arm64/include/asm/kvm_mmu.h     |  34 ++++++-
+>>>>  arch/arm64/include/asm/virt.h        |  27 ++++++
+>>>>  arch/arm64/kernel/asm-offsets.c      |   3 -
+>>>>  arch/arm64/kernel/cpufeature.c       |  15 +++-
+>>>>  arch/arm64/kernel/head.S             |  51 ++++++++++-
+>>>>  arch/arm64/kernel/smp.c              |   3 +
+>>>>  arch/arm64/kvm/hyp-init.S            |  18 +---
+>>>>  arch/arm64/kvm/hyp.S                 |   7 ++
+>>>>  arch/arm64/kvm/hyp/entry.S           |   6 ++
+>>>>  arch/arm64/kvm/hyp/hyp-entry.S       | 107 +++++++---------------
+>>>>  arch/arm64/kvm/hyp/hyp.h             | 119 ++++++++++++++++++++++--
+>>>>  arch/arm64/kvm/hyp/switch.c          | 170 +++++++++++++++++++++++++++++++----
+>>>>  arch/arm64/kvm/hyp/sysreg-sr.c       | 147 ++++++++++++++++++++----------
+>>>>  arch/arm64/kvm/hyp/timer-sr.c        |  10 +--
+>>>>  drivers/clocksource/arm_arch_timer.c |  96 ++++++++++++--------
+>>>>  22 files changed, 724 insertions(+), 272 deletions(-)
+>>>
+>>> Have you tried hw_breakpoint/perf/ptrace with these changes? I was under
+>>> the impression that the debug architecture was aware of E2H and did need
+>>> some changes made. I know you say that GDB is broken anyway, but we should
+>>> check that the kernel does the right thing if userspace pokes it the
+>>> right way.
+>>
+>> I did use HW breakpoints on the model by hacking the host kernel to
+>> return Debug Version 6 instead of 7, and things seem to work as
+>> expected. strace also works out of the box.
+>>
+>> As for perf, did you have something precise in mind?
+> 
+> It would be worth trying things like the filter options on perf events
+> (perf stat -e cycles:k to count cycles in kernel space) and also
+> breakpoints (perf stat -e mem:<addr>:rwx on kernel addresses).
 
-The other thing we could do here (now the PMU is part of the vCPU 'device'
-rather than its own thing) is to have a single INIT ioctl that says
-"we're done doing all the SET_DEVICE_ATTR calls to configure the vCPU".
-But I'm fine with this way too.
+So indeed these didn't work (perf reported 0 for kernel accesses). The
+fixes are pretty trivial, and I've put them on top of my kvm-arm64/vhe
+branch, for those who want to have a look.
 
-You can have my
-Acked-by: Peter Maydell <peter.maydell@linaro.org>
+Thanks,
 
-for the userspace API parts of patches 19, 20 and 21 (with the minor typo
-fixes etc Andrew has posted).
-
-thanks
--- PMM
+	M.
+-- 
+Jazz is not dead. It just smells funny...
