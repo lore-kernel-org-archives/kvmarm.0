@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 09/27] ARM: KVM: Add CP15 save/restore code
-Date: Mon, 25 Jan 2016 16:38:25 +0000
-Message-ID: <1453739923-17846-10-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 08/27] ARM: KVM: Add TLB invalidation code
+Date: Mon, 25 Jan 2016 16:38:24 +0000
+Message-ID: <1453739923-17846-9-git-send-email-marc.zyngier@arm.com>
 References: <1453739923-17846-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F25540FA2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E152F40FA2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LAHlQ+96AUW8 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id nqhvZf8eQGq6 for <kvmarm@lists.cs.columbia.edu>;
  Mon, 25 Jan 2016 11:34:08 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4DB3C412F3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:08 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 509424852E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:07 -0500 (EST)
 In-Reply-To: <1453739923-17846-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,31 +31,62 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Concert the CP15 save/restore code to C.
+Convert the TLB invalidation code to C, hooking it into the
+build system whilst we're at it.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/hyp/Makefile  |  1 +
- arch/arm/kvm/hyp/cp15-sr.c | 84 ++++++++++++++++++++++++++++++++++++++++++++++
- arch/arm/kvm/hyp/hyp.h     | 28 ++++++++++++++++
- 3 files changed, 113 insertions(+)
- create mode 100644 arch/arm/kvm/hyp/cp15-sr.c
+ arch/arm/kvm/Makefile     |  1 +
+ arch/arm/kvm/hyp/Makefile |  5 ++++
+ arch/arm/kvm/hyp/hyp.h    |  5 ++++
+ arch/arm/kvm/hyp/tlb.c    | 71 +++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 82 insertions(+)
+ create mode 100644 arch/arm/kvm/hyp/Makefile
+ create mode 100644 arch/arm/kvm/hyp/tlb.c
 
-diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
-index 36c760d..9f96fcb 100644
---- a/arch/arm/kvm/hyp/Makefile
-+++ b/arch/arm/kvm/hyp/Makefile
-@@ -3,3 +3,4 @@
- #
+diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+index c5eef02c..eb1bf43 100644
+--- a/arch/arm/kvm/Makefile
++++ b/arch/arm/kvm/Makefile
+@@ -17,6 +17,7 @@ AFLAGS_interrupts.o := -Wa,-march=armv7-a$(plus_virt)
+ KVM := ../../../virt/kvm
+ kvm-arm-y = $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
  
- obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
-+obj-$(CONFIG_KVM_ARM_HOST) += cp15-sr.o
-diff --git a/arch/arm/kvm/hyp/cp15-sr.c b/arch/arm/kvm/hyp/cp15-sr.c
++obj-$(CONFIG_KVM_ARM_HOST) += hyp/
+ obj-y += kvm-arm.o init.o interrupts.o
+ obj-y += arm.o handle_exit.o guest.o mmu.o emulate.o reset.o
+ obj-y += coproc.o coproc_a15.o coproc_a7.o mmio.o psci.o perf.o
+diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
 new file mode 100644
-index 0000000..732abbc
+index 0000000..36c760d
 --- /dev/null
-+++ b/arch/arm/kvm/hyp/cp15-sr.c
-@@ -0,0 +1,84 @@
++++ b/arch/arm/kvm/hyp/Makefile
+@@ -0,0 +1,5 @@
++#
++# Makefile for Kernel-based Virtual Machine module, HYP part
++#
++
++obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
+diff --git a/arch/arm/kvm/hyp/hyp.h b/arch/arm/kvm/hyp/hyp.h
+index 727089f..5808bbd 100644
+--- a/arch/arm/kvm/hyp/hyp.h
++++ b/arch/arm/kvm/hyp/hyp.h
+@@ -42,4 +42,9 @@
+ })
+ #define read_sysreg(...)		__read_sysreg(__VA_ARGS__)
+ 
++#define VTTBR		__ACCESS_CP15_64(6, c2)
++#define ICIALLUIS	__ACCESS_CP15(c7, 0, c1, 0)
++#define TLBIALLIS	__ACCESS_CP15(c8, 0, c3, 0)
++#define TLBIALLNSNHIS	__ACCESS_CP15(c8, 4, c3, 4)
++
+ #endif /* __ARM_KVM_HYP_H__ */
+diff --git a/arch/arm/kvm/hyp/tlb.c b/arch/arm/kvm/hyp/tlb.c
+new file mode 100644
+index 0000000..993fe89
+--- /dev/null
++++ b/arch/arm/kvm/hyp/tlb.c
+@@ -0,0 +1,71 @@
 +/*
 + * Original code:
 + * Copyright (C) 2012 - Virtual Open Systems and Columbia University
@@ -78,109 +109,54 @@ index 0000000..732abbc
 +
 +#include "hyp.h"
 +
-+static u64 *cp15_64(struct kvm_cpu_context *ctxt, int idx)
++/**
++ * Flush per-VMID TLBs
++ *
++ * __kvm_tlb_flush_vmid(struct kvm *kvm);
++ *
++ * We rely on the hardware to broadcast the TLB invalidation to all CPUs
++ * inside the inner-shareable domain (which is the case for all v7
++ * implementations).  If we come across a non-IS SMP implementation, we'll
++ * have to use an IPI based mechanism. Until then, we stick to the simple
++ * hardware assisted version.
++ *
++ * As v7 does not support flushing per IPA, just nuke the whole TLB
++ * instead, ignoring the ipa value.
++ */
++static void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
 +{
-+	return (u64 *)(ctxt->cp15 + idx);
++	dsb(ishst);
++
++	/* Switch to requested VMID */
++	kvm = kern_hyp_va(kvm);
++	write_sysreg(kvm->arch.vttbr, VTTBR);
++	isb();
++
++	write_sysreg(0, TLBIALLIS);
++	dsb(ish);
++	isb();
++
++	write_sysreg(0, VTTBR);
 +}
 +
-+void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
++__alias(__tlb_flush_vmid) void __weak __kvm_tlb_flush_vmid(struct kvm *kvm);
++
++static void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
 +{
-+	ctxt->cp15[c0_MPIDR]		= read_sysreg(VMPIDR);
-+	ctxt->cp15[c0_CSSELR]		= read_sysreg(CSSELR);
-+	ctxt->cp15[c1_SCTLR]		= read_sysreg(SCTLR);
-+	ctxt->cp15[c1_CPACR]		= read_sysreg(CPACR);
-+	*cp15_64(ctxt, c2_TTBR0)	= read_sysreg(TTBR0);
-+	*cp15_64(ctxt, c2_TTBR1)	= read_sysreg(TTBR1);
-+	ctxt->cp15[c2_TTBCR]		= read_sysreg(TTBCR);
-+	ctxt->cp15[c3_DACR]		= read_sysreg(DACR);
-+	ctxt->cp15[c5_DFSR]		= read_sysreg(DFSR);
-+	ctxt->cp15[c5_IFSR]		= read_sysreg(IFSR);
-+	ctxt->cp15[c5_ADFSR]		= read_sysreg(ADFSR);
-+	ctxt->cp15[c5_AIFSR]		= read_sysreg(AIFSR);
-+	ctxt->cp15[c6_DFAR]		= read_sysreg(DFAR);
-+	ctxt->cp15[c6_IFAR]		= read_sysreg(IFAR);
-+	*cp15_64(ctxt, c7_PAR)		= read_sysreg(PAR);
-+	ctxt->cp15[c10_PRRR]		= read_sysreg(PRRR);
-+	ctxt->cp15[c10_NMRR]		= read_sysreg(NMRR);
-+	ctxt->cp15[c10_AMAIR0]		= read_sysreg(AMAIR0);
-+	ctxt->cp15[c10_AMAIR1]		= read_sysreg(AMAIR1);
-+	ctxt->cp15[c12_VBAR]		= read_sysreg(VBAR);
-+	ctxt->cp15[c13_CID]		= read_sysreg(CID);
-+	ctxt->cp15[c13_TID_URW]		= read_sysreg(TID_URW);
-+	ctxt->cp15[c13_TID_URO]		= read_sysreg(TID_URO);
-+	ctxt->cp15[c13_TID_PRIV]	= read_sysreg(TID_PRIV);
-+	ctxt->cp15[c14_CNTKCTL]		= read_sysreg(CNTKCTL);
++	__tlb_flush_vmid(kvm);
 +}
 +
-+void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
-+{
-+	write_sysreg(ctxt->cp15[c0_MPIDR],	VMPIDR);
-+	write_sysreg(ctxt->cp15[c0_CSSELR],	CSSELR);
-+	write_sysreg(ctxt->cp15[c1_SCTLR],	SCTLR);
-+	write_sysreg(ctxt->cp15[c1_CPACR],	CPACR);
-+	write_sysreg(*cp15_64(ctxt, c2_TTBR0),	TTBR0);
-+	write_sysreg(*cp15_64(ctxt, c2_TTBR1),	TTBR1);
-+	write_sysreg(ctxt->cp15[c2_TTBCR],	TTBCR);
-+	write_sysreg(ctxt->cp15[c3_DACR],	DACR);
-+	write_sysreg(ctxt->cp15[c5_DFSR],	DFSR);
-+	write_sysreg(ctxt->cp15[c5_IFSR],	IFSR);
-+	write_sysreg(ctxt->cp15[c5_ADFSR],	ADFSR);
-+	write_sysreg(ctxt->cp15[c5_AIFSR],	AIFSR);
-+	write_sysreg(ctxt->cp15[c6_DFAR],	DFAR);
-+	write_sysreg(ctxt->cp15[c6_IFAR],	IFAR);
-+	write_sysreg(*cp15_64(ctxt, c7_PAR),	PAR);
-+	write_sysreg(ctxt->cp15[c10_PRRR],	PRRR);
-+	write_sysreg(ctxt->cp15[c10_NMRR],	NMRR);
-+	write_sysreg(ctxt->cp15[c10_AMAIR0],	AMAIR0);
-+	write_sysreg(ctxt->cp15[c10_AMAIR1],	AMAIR1);
-+	write_sysreg(ctxt->cp15[c12_VBAR],	VBAR);
-+	write_sysreg(ctxt->cp15[c13_CID],	CID);
-+	write_sysreg(ctxt->cp15[c13_TID_URW],	TID_URW);
-+	write_sysreg(ctxt->cp15[c13_TID_URO],	TID_URO);
-+	write_sysreg(ctxt->cp15[c13_TID_PRIV],	TID_PRIV);
-+	write_sysreg(ctxt->cp15[c14_CNTKCTL],	CNTKCTL);
-+}
-diff --git a/arch/arm/kvm/hyp/hyp.h b/arch/arm/kvm/hyp/hyp.h
-index 5808bbd..ab2cb82 100644
---- a/arch/arm/kvm/hyp/hyp.h
-+++ b/arch/arm/kvm/hyp/hyp.h
-@@ -42,9 +42,37 @@
- })
- #define read_sysreg(...)		__read_sysreg(__VA_ARGS__)
- 
-+#define TTBR0		__ACCESS_CP15_64(0, c2)
-+#define TTBR1		__ACCESS_CP15_64(1, c2)
- #define VTTBR		__ACCESS_CP15_64(6, c2)
-+#define PAR		__ACCESS_CP15_64(0, c7)
-+#define CSSELR		__ACCESS_CP15(c0, 2, c0, 0)
-+#define VMPIDR		__ACCESS_CP15(c0, 4, c0, 5)
-+#define SCTLR		__ACCESS_CP15(c1, 0, c0, 0)
-+#define CPACR		__ACCESS_CP15(c1, 0, c0, 2)
-+#define TTBCR		__ACCESS_CP15(c2, 0, c0, 2)
-+#define DACR		__ACCESS_CP15(c3, 0, c0, 0)
-+#define DFSR		__ACCESS_CP15(c5, 0, c0, 0)
-+#define IFSR		__ACCESS_CP15(c5, 0, c0, 1)
-+#define ADFSR		__ACCESS_CP15(c5, 0, c1, 0)
-+#define AIFSR		__ACCESS_CP15(c5, 0, c1, 1)
-+#define DFAR		__ACCESS_CP15(c6, 0, c0, 0)
-+#define IFAR		__ACCESS_CP15(c6, 0, c0, 2)
- #define ICIALLUIS	__ACCESS_CP15(c7, 0, c1, 0)
- #define TLBIALLIS	__ACCESS_CP15(c8, 0, c3, 0)
- #define TLBIALLNSNHIS	__ACCESS_CP15(c8, 4, c3, 4)
-+#define PRRR		__ACCESS_CP15(c10, 0, c2, 0)
-+#define NMRR		__ACCESS_CP15(c10, 0, c2, 1)
-+#define AMAIR0		__ACCESS_CP15(c10, 0, c3, 0)
-+#define AMAIR1		__ACCESS_CP15(c10, 0, c3, 1)
-+#define VBAR		__ACCESS_CP15(c12, 0, c0, 0)
-+#define CID		__ACCESS_CP15(c13, 0, c0, 1)
-+#define TID_URW		__ACCESS_CP15(c13, 0, c0, 2)
-+#define TID_URO		__ACCESS_CP15(c13, 0, c0, 3)
-+#define TID_PRIV	__ACCESS_CP15(c13, 0, c0, 4)
-+#define CNTKCTL		__ACCESS_CP15(c14, 0, c1, 0)
++__alias(__tlb_flush_vmid_ipa) void __weak __kvm_tlb_flush_vmid_ipa(struct kvm *kvm,
++							    phys_addr_t ipa);
 +
-+void __sysreg_save_state(struct kvm_cpu_context *ctxt);
-+void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
- 
- #endif /* __ARM_KVM_HYP_H__ */
++static void __hyp_text __tlb_flush_vm_context(void)
++{
++	dsb(ishst);
++	write_sysreg(0, TLBIALLNSNHIS);
++	write_sysreg(0, ICIALLUIS);
++	dsb(ish);
++}
++
++__alias(__tlb_flush_vm_context) void __weak __kvm_flush_vm_context(void);
 -- 
 2.1.4
