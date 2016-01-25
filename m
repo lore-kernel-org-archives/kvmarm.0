@@ -1,82 +1,91 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 25/27] ARM: KVM: Remove unused hyp_pc field
-Date: Mon, 25 Jan 2016 16:38:41 +0000
-Message-ID: <1453739923-17846-26-git-send-email-marc.zyngier@arm.com>
-References: <1453739923-17846-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1453739923-17846-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v2 00/21] arm64: Virtualization Host Extension support
+Date: Mon, 25 Jan 2016 16:44:36 +0000
+Message-ID: <20160125164435.GG22927@arm.com>
+References: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
+ <20160125162613.GD22927@arm.com>
+ <56A64F53.4000201@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Return-path: <linux-kernel-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <56A64F53.4000201@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This field was never populated, and the panic code already
-does something similar. Delete the related code.
+On Mon, Jan 25, 2016 at 04:37:39PM +0000, Marc Zyngier wrote:
+> On 25/01/16 16:26, Will Deacon wrote:
+> > On Mon, Jan 25, 2016 at 03:53:34PM +0000, Marc Zyngier wrote:
+> >> ARMv8.1 comes with the "Virtualization Host Extension" (VHE for
+> >> short), which enables simpler support of Type-2 hypervisors.
+> >>
+> >> This extension allows the kernel to directly run at EL2, and
+> >> significantly reduces the number of system registers shared between
+> >> host and guest, reducing the overhead of virtualization.
+> >>
+> >> In order to have the same kernel binary running on all versions of the
+> >> architecture, this series makes heavy use of runtime code patching.
+> >>
+> >> The first 20 patches massage the KVM code to deal with VHE and enable
+> >> Linux to run at EL2. The last patch catches an ugly case when VHE
+> >> capable CPUs are paired with some of their less capable siblings. This
+> >> should never happen, but hey...
+> >>
+> >> I have deliberately left out some of the more "advanced"
+> >> optimizations, as they are likely to distract the reviewer from the
+> >> core infrastructure, which is what I care about at the moment.
+> >>
+> >> A few things to note:
+> >>
+> >> - Given that the code has been almost entierely rewritten, I've
+> >>   dropped all Acks from the new patches
+> >>
+> >> - GDB is currently busted on VHE systems, as it checks for version 6
+> >>   on the debug architecture, while VHE is version 7. The binutils
+> >>   people are on the case.
+> > 
+> > [...]
+> > 
+> >>  arch/arm/include/asm/virt.h          |   5 ++
+> >>  arch/arm/kvm/arm.c                   | 151 +++++++++++++++++++------------
+> >>  arch/arm/kvm/mmu.c                   |   7 ++
+> >>  arch/arm64/Kconfig                   |  13 +++
+> >>  arch/arm64/include/asm/cpufeature.h  |   3 +-
+> >>  arch/arm64/include/asm/kvm_arm.h     |   1 +
+> >>  arch/arm64/include/asm/kvm_emulate.h |   3 +
+> >>  arch/arm64/include/asm/kvm_mmu.h     |  34 ++++++-
+> >>  arch/arm64/include/asm/virt.h        |  27 ++++++
+> >>  arch/arm64/kernel/asm-offsets.c      |   3 -
+> >>  arch/arm64/kernel/cpufeature.c       |  15 +++-
+> >>  arch/arm64/kernel/head.S             |  51 ++++++++++-
+> >>  arch/arm64/kernel/smp.c              |   3 +
+> >>  arch/arm64/kvm/hyp-init.S            |  18 +---
+> >>  arch/arm64/kvm/hyp.S                 |   7 ++
+> >>  arch/arm64/kvm/hyp/entry.S           |   6 ++
+> >>  arch/arm64/kvm/hyp/hyp-entry.S       | 107 +++++++---------------
+> >>  arch/arm64/kvm/hyp/hyp.h             | 119 ++++++++++++++++++++++--
+> >>  arch/arm64/kvm/hyp/switch.c          | 170 +++++++++++++++++++++++++++++++----
+> >>  arch/arm64/kvm/hyp/sysreg-sr.c       | 147 ++++++++++++++++++++----------
+> >>  arch/arm64/kvm/hyp/timer-sr.c        |  10 +--
+> >>  drivers/clocksource/arm_arch_timer.c |  96 ++++++++++++--------
+> >>  22 files changed, 724 insertions(+), 272 deletions(-)
+> > 
+> > Have you tried hw_breakpoint/perf/ptrace with these changes? I was under
+> > the impression that the debug architecture was aware of E2H and did need
+> > some changes made. I know you say that GDB is broken anyway, but we should
+> > check that the kernel does the right thing if userspace pokes it the
+> > right way.
+> 
+> I did use HW breakpoints on the model by hacking the host kernel to
+> return Debug Version 6 instead of 7, and things seem to work as
+> expected. strace also works out of the box.
+> 
+> As for perf, did you have something precise in mind?
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm/include/asm/kvm_emulate.h | 5 -----
- arch/arm/include/asm/kvm_host.h    | 1 -
- arch/arm/kernel/asm-offsets.c      | 1 -
- arch/arm/kvm/handle_exit.c         | 5 -----
- 4 files changed, 12 deletions(-)
+It would be worth trying things like the filter options on perf events
+(perf stat -e cycles:k to count cycles in kernel space) and also
+breakpoints (perf stat -e mem:<addr>:rwx on kernel addresses).
 
-diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-index f710616..8a8c6de 100644
---- a/arch/arm/include/asm/kvm_emulate.h
-+++ b/arch/arm/include/asm/kvm_emulate.h
-@@ -108,11 +108,6 @@ static inline phys_addr_t kvm_vcpu_get_fault_ipa(struct kvm_vcpu *vcpu)
- 	return ((phys_addr_t)vcpu->arch.fault.hpfar & HPFAR_MASK) << 8;
- }
- 
--static inline unsigned long kvm_vcpu_get_hyp_pc(struct kvm_vcpu *vcpu)
--{
--	return vcpu->arch.fault.hyp_pc;
--}
--
- static inline bool kvm_vcpu_dabt_isvalid(struct kvm_vcpu *vcpu)
- {
- 	return kvm_vcpu_get_hsr(vcpu) & HSR_ISV;
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index eec701d..703eea7 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -85,7 +85,6 @@ struct kvm_vcpu_fault_info {
- 	u32 hsr;		/* Hyp Syndrome Register */
- 	u32 hxfar;		/* Hyp Data/Inst. Fault Address Register */
- 	u32 hpfar;		/* Hyp IPA Fault Address Register */
--	u32 hyp_pc;		/* PC when exception was taken from Hyp mode */
- };
- 
- /*
-diff --git a/arch/arm/kernel/asm-offsets.c b/arch/arm/kernel/asm-offsets.c
-index 1f24c32..27d0581 100644
---- a/arch/arm/kernel/asm-offsets.c
-+++ b/arch/arm/kernel/asm-offsets.c
-@@ -175,7 +175,6 @@ int main(void)
-   DEFINE(CPU_CTXT_VFP,		offsetof(struct kvm_cpu_context, vfp));
-   DEFINE(CPU_CTXT_GP_REGS,	offsetof(struct kvm_cpu_context, gp_regs));
-   DEFINE(GP_REGS_USR,		offsetof(struct kvm_regs, usr_regs));
--  DEFINE(VCPU_HYP_PC,		offsetof(struct kvm_vcpu, arch.fault.hyp_pc));
- #endif
-   BLANK();
- #ifdef CONFIG_VDSO
-diff --git a/arch/arm/kvm/handle_exit.c b/arch/arm/kvm/handle_exit.c
-index 3ede90d..5377d753 100644
---- a/arch/arm/kvm/handle_exit.c
-+++ b/arch/arm/kvm/handle_exit.c
-@@ -147,11 +147,6 @@ int handle_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	switch (exception_index) {
- 	case ARM_EXCEPTION_IRQ:
- 		return 1;
--	case ARM_EXCEPTION_UNDEFINED:
--		kvm_err("Undefined exception in Hyp mode at: %#08lx\n",
--			kvm_vcpu_get_hyp_pc(vcpu));
--		BUG();
--		panic("KVM: Hypervisor undefined exception!\n");
- 	case ARM_EXCEPTION_DATA_ABORT:
- 	case ARM_EXCEPTION_PREF_ABORT:
- 	case ARM_EXCEPTION_HVC:
--- 
-2.1.4
-
+Will
