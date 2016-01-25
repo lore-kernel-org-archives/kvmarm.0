@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 13/21] arm64: KVM: VHE: Make __fpsimd_enabled VHE aware
-Date: Mon, 25 Jan 2016 15:53:47 +0000
-Message-ID: <1453737235-16522-14-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 06/21] arm64: KVM: VHE: Patch out use of HVC
+Date: Mon, 25 Jan 2016 15:53:40 +0000
+Message-ID: <1453737235-16522-7-git-send-email-marc.zyngier@arm.com>
 References: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E7DF549616
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92780410B5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:34 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dnMjndkx3StX for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2016 10:49:43 -0500 (EST)
+ with ESMTP id DAtNIvU3XLF3 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2016 10:49:33 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C90C4970A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CAB2540B58
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:32 -0500 (EST)
 In-Reply-To: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,61 +31,102 @@ To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As non-VHE and VHE have different ways to express the trapping of
-FPSIMD registers to EL2, make __fpsimd_enabled a patchable predicate
-and provide a VHE implementation.
+With VHE, the host never issues an HVC instruction to get into the
+KVM code, as we can simply branch there.
+
+Use runtime code patching to simplify things a bit.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/hyp.h    |  5 +----
- arch/arm64/kvm/hyp/switch.c | 19 +++++++++++++++++++
- 2 files changed, 20 insertions(+), 4 deletions(-)
+ arch/arm64/kvm/hyp.S           |  7 +++++++
+ arch/arm64/kvm/hyp/hyp-entry.S | 38 +++++++++++++++++++++++++++++---------
+ 2 files changed, 36 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-index 5dfa883..44eaff7 100644
---- a/arch/arm64/kvm/hyp/hyp.h
-+++ b/arch/arm64/kvm/hyp/hyp.h
-@@ -171,10 +171,7 @@ void __debug_cond_restore_host_state(struct kvm_vcpu *vcpu);
+diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+index 0ccdcbb..0689a74 100644
+--- a/arch/arm64/kvm/hyp.S
++++ b/arch/arm64/kvm/hyp.S
+@@ -17,7 +17,9 @@
  
- void __fpsimd_save_state(struct user_fpsimd_state *fp_regs);
- void __fpsimd_restore_state(struct user_fpsimd_state *fp_regs);
--static inline bool __fpsimd_enabled(void)
--{
--	return !(read_sysreg(cptr_el2) & CPTR_EL2_TFP);
--}
-+bool __fpsimd_enabled(void);
+ #include <linux/linkage.h>
  
- u64 __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host_ctxt);
- void __noreturn __hyp_do_panic(unsigned long, ...);
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 9071dee..6f264dc 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -17,6 +17,25 @@
++#include <asm/alternative.h>
+ #include <asm/assembler.h>
++#include <asm/cpufeature.h>
  
- #include "hyp.h"
+ /*
+  * u64 kvm_call_hyp(void *hypfn, ...);
+@@ -38,6 +40,11 @@
+  * arch/arm64/kernel/hyp_stub.S.
+  */
+ ENTRY(kvm_call_hyp)
++alternative_if_not ARM64_HAS_VIRT_HOST_EXTN	
+ 	hvc	#0
+ 	ret
++alternative_else
++	b	__vhe_hyp_call
++	nop
++alternative_endif
+ ENDPROC(kvm_call_hyp)
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index 93e8d983..9e0683f 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -38,6 +38,32 @@
+ 	ldp	x0, x1, [sp], #16
+ .endm
  
-+static bool __hyp_text __fpsimd_enabled_nvhe(void)
-+{
-+	return !(read_sysreg(cptr_el2) & CPTR_EL2_TFP);
-+}
++.macro do_el2_call
++	/*
++	 * Shuffle the parameters before calling the function
++	 * pointed to in x0. Assumes parameters in x[1,2,3].
++	 */
++	stp	lr, xzr, [sp, #-16]!
++	mov	lr, x0
++	mov	x0, x1
++	mov	x1, x2
++	mov	x2, x3
++	blr	lr
++	ldp	lr, xzr, [sp], #16
++.endm
 +
-+static bool __hyp_text __fpsimd_enabled_vhe(void)
-+{
-+	return !!(read_sysreg(cpacr_el1) & (3 << 20));
-+}
-+
-+static hyp_alternate_select(__fpsimd_is_enabled,
-+			    __fpsimd_enabled_nvhe, __fpsimd_enabled_vhe,
-+			    ARM64_HAS_VIRT_HOST_EXTN);
-+
-+bool __hyp_text __fpsimd_enabled(void)
-+{
-+	return __fpsimd_is_enabled()();
-+}
-+
- static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
++ENTRY(__vhe_hyp_call)
++	do_el2_call
++	/*
++	 * We used to rely on having an exception return to get
++	 * an implicit isb. In the E2H case, we don't have it anymore.
++	 * rather than changing all the leaf functions, just do it here
++	 * before returning to the rest of the kernel.
++	 */
++	isb
++	ret
++ENDPROC(__vhe_hyp_call)
++	
+ el1_sync:				// Guest trapped into EL2
+ 	save_x0_to_x3
+ 
+@@ -58,19 +84,13 @@ el1_sync:				// Guest trapped into EL2
+ 	mrs	x0, vbar_el2
+ 	b	2f
+ 
+-1:	stp	lr, xzr, [sp, #-16]!
+-
++1:
+ 	/*
+-	 * Compute the function address in EL2, and shuffle the parameters.
++	 * Perform the EL2 call
+ 	 */
+ 	kern_hyp_va	x0
+-	mov	lr, x0
+-	mov	x0, x1
+-	mov	x1, x2
+-	mov	x2, x3
+-	blr	lr
++	do_el2_call
+ 
+-	ldp	lr, xzr, [sp], #16
+ 2:	eret
+ 
+ el1_trap:
 -- 
 2.1.4
