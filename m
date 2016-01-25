@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 10/27] ARM: KVM: Add timer save/restore
-Date: Mon, 25 Jan 2016 16:38:26 +0000
-Message-ID: <1453739923-17846-11-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 11/27] ARM: KVM: Add vgic v2 save/restore
+Date: Mon, 25 Jan 2016 16:38:27 +0000
+Message-ID: <1453739923-17846-12-git-send-email-marc.zyngier@arm.com>
 References: <1453739923-17846-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CAFB412E6
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2741D40FA6
  for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:14 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ENomt1qXI+z5 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id dWexZUsU4Jnm for <kvmarm@lists.cs.columbia.edu>;
  Mon, 25 Jan 2016 11:34:12 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7055340FA6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:09 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 79153410D7
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:10 -0500 (EST)
 In-Reply-To: <1453739923-17846-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,57 +33,45 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 This patch shouldn't exist, as we should be able to reuse the
 arm64 version for free. I'll get there eventually, but in the
-meantime I need a timer ticking.
+meantime I need an interrupt controller.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/hyp/Makefile   |  1 +
- arch/arm/kvm/hyp/hyp.h      |  8 +++++
- arch/arm/kvm/hyp/timer-sr.c | 71 +++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 80 insertions(+)
- create mode 100644 arch/arm/kvm/hyp/timer-sr.c
+ arch/arm/kvm/hyp/Makefile     |  1 +
+ arch/arm/kvm/hyp/hyp.h        |  3 ++
+ arch/arm/kvm/hyp/vgic-v2-sr.c | 84 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 88 insertions(+)
+ create mode 100644 arch/arm/kvm/hyp/vgic-v2-sr.c
 
 diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
-index 9f96fcb..9241ae8 100644
+index 9241ae8..d8acbb6 100644
 --- a/arch/arm/kvm/hyp/Makefile
 +++ b/arch/arm/kvm/hyp/Makefile
-@@ -4,3 +4,4 @@
- 
+@@ -5,3 +5,4 @@
  obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
  obj-$(CONFIG_KVM_ARM_HOST) += cp15-sr.o
-+obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
++obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
 diff --git a/arch/arm/kvm/hyp/hyp.h b/arch/arm/kvm/hyp/hyp.h
-index ab2cb82..4924418 100644
+index 4924418..7eb1c21 100644
 --- a/arch/arm/kvm/hyp/hyp.h
 +++ b/arch/arm/kvm/hyp/hyp.h
-@@ -46,6 +46,9 @@
- #define TTBR1		__ACCESS_CP15_64(1, c2)
- #define VTTBR		__ACCESS_CP15_64(6, c2)
- #define PAR		__ACCESS_CP15_64(0, c7)
-+#define CNTV_CVAL	__ACCESS_CP15_64(3, c14)
-+#define CNTVOFF		__ACCESS_CP15_64(4, c14)
-+
- #define CSSELR		__ACCESS_CP15(c0, 2, c0, 0)
- #define VMPIDR		__ACCESS_CP15(c0, 4, c0, 5)
- #define SCTLR		__ACCESS_CP15(c1, 0, c0, 0)
-@@ -71,6 +74,11 @@
- #define TID_URO		__ACCESS_CP15(c13, 0, c0, 3)
- #define TID_PRIV	__ACCESS_CP15(c13, 0, c0, 4)
- #define CNTKCTL		__ACCESS_CP15(c14, 0, c1, 0)
-+#define CNTV_CTL	__ACCESS_CP15(c14, 0, c3, 1)
-+#define CNTHCTL		__ACCESS_CP15(c14, 4, c1, 0)
-+
-+void __timer_save_state(struct kvm_vcpu *vcpu);
-+void __timer_restore_state(struct kvm_vcpu *vcpu);
+@@ -80,6 +80,9 @@
+ void __timer_save_state(struct kvm_vcpu *vcpu);
+ void __timer_restore_state(struct kvm_vcpu *vcpu);
  
++void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
++void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
++
  void __sysreg_save_state(struct kvm_cpu_context *ctxt);
  void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
-diff --git a/arch/arm/kvm/hyp/timer-sr.c b/arch/arm/kvm/hyp/timer-sr.c
+ 
+diff --git a/arch/arm/kvm/hyp/vgic-v2-sr.c b/arch/arm/kvm/hyp/vgic-v2-sr.c
 new file mode 100644
-index 0000000..d7535fd
+index 0000000..e717612
 --- /dev/null
-+++ b/arch/arm/kvm/hyp/timer-sr.c
-@@ -0,0 +1,71 @@
++++ b/arch/arm/kvm/hyp/vgic-v2-sr.c
+@@ -0,0 +1,84 @@
 +/*
 + * Copyright (C) 2012-2015 - ARM Ltd
 + * Author: Marc Zyngier <marc.zyngier@arm.com>
@@ -101,8 +89,8 @@ index 0000000..d7535fd
 + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#include <clocksource/arm_arch_timer.h>
 +#include <linux/compiler.h>
++#include <linux/irqchip/arm-gic.h>
 +#include <linux/kvm_host.h>
 +
 +#include <asm/kvm_mmu.h>
@@ -110,50 +98,63 @@ index 0000000..d7535fd
 +#include "hyp.h"
 +
 +/* vcpu is already in the HYP VA space */
-+void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
++void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
 +{
 +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-+	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	u64 val;
++	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
++	struct vgic_dist *vgic = &kvm->arch.vgic;
++	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
++	u32 eisr0, eisr1, elrsr0, elrsr1;
++	int i, nr_lr;
 +
-+	if (kvm->arch.timer.enabled) {
-+		timer->cntv_ctl = read_sysreg(CNTV_CTL);
-+		timer->cntv_cval = read_sysreg(CNTV_CVAL);
++	if (!base)
++		return;
++
++	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
++	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
++	cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
++	eisr0  = readl_relaxed(base + GICH_EISR0);
++	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
++	if (unlikely(nr_lr > 32)) {
++		eisr1  = readl_relaxed(base + GICH_EISR1);
++		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
++	} else {
++		eisr1 = elrsr1 = 0;
 +	}
++#ifdef CONFIG_CPU_BIG_ENDIAN
++	cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
++	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
++#else
++	cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
++	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
++#endif
++	cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
 +
-+	/* Disable the virtual timer */
-+	write_sysreg(0, CNTV_CTL);
++	writel_relaxed(0, base + GICH_HCR);
 +
-+	/* Allow physical timer/counter access for the host */
-+	val = read_sysreg(CNTHCTL);
-+	val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
-+	write_sysreg(val, CNTHCTL);
-+
-+	/* Clear cntvoff for the host */
-+	write_sysreg(0, CNTVOFF);
++	for (i = 0; i < nr_lr; i++)
++		cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
 +}
 +
-+void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
++/* vcpu is already in the HYP VA space */
++void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
 +{
 +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-+	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
-+	u64 val;
++	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
++	struct vgic_dist *vgic = &kvm->arch.vgic;
++	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
++	int i, nr_lr;
 +
-+	/*
-+	 * Disallow physical timer access for the guest
-+	 * Physical counter access is allowed
-+	 */
-+	val = read_sysreg(CNTHCTL);
-+	val &= ~CNTHCTL_EL1PCEN;
-+	val |= CNTHCTL_EL1PCTEN;
-+	write_sysreg(val, CNTHCTL);
++	if (!base)
++		return;
 +
-+	if (kvm->arch.timer.enabled) {
-+		write_sysreg(kvm->arch.timer.cntvoff, CNTVOFF);
-+		write_sysreg(timer->cntv_cval, CNTV_CVAL);
-+		isb();
-+		write_sysreg(timer->cntv_ctl, CNTV_CTL);
-+	}
++	writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
++	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
++	writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
++
++	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
++	for (i = 0; i < nr_lr; i++)
++		writel_relaxed(cpu_if->vgic_lr[i], base + GICH_LR0 + (i * 4));
 +}
 -- 
 2.1.4
