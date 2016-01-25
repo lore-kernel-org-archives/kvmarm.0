@@ -1,23 +1,21 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 02/21] arm64: Allow the arch timer to use the HYP timer
-Date: Mon, 25 Jan 2016 15:53:36 +0000
-Message-ID: <1453737235-16522-3-git-send-email-marc.zyngier@arm.com>
-References: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 00/21] arm64: Virtualization Host Extension support
+Date: Mon, 25 Jan 2016 15:53:34 +0000
+Message-ID: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8568240C9D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 99F6E40C9D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Yn15O6LvSAOJ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2016 10:49:26 -0500 (EST)
+ with ESMTP id P441pcastxkl for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2016 10:49:24 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1BD3F40B40
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:26 -0500 (EST)
-In-Reply-To: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 31EB840B40
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:23 -0500 (EST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,209 +29,90 @@ To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-With the ARMv8.1 VHE, the kernel can run in HYP mode, and thus
-use the HYP timer instead of the normal guest timer in a mostly
-transparent way, except for the interrupt line.
+ARMv8.1 comes with the "Virtualization Host Extension" (VHE for
+short), which enables simpler support of Type-2 hypervisors.
 
-This patch reworks the arch timer code to allow the selection of
-the HYP PPI, possibly falling back to the guest timer if not
-available.
+This extension allows the kernel to directly run at EL2, and
+significantly reduces the number of system registers shared between
+host and guest, reducing the overhead of virtualization.
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- drivers/clocksource/arm_arch_timer.c | 96 ++++++++++++++++++++++--------------
- 1 file changed, 59 insertions(+), 37 deletions(-)
+In order to have the same kernel binary running on all versions of the
+architecture, this series makes heavy use of runtime code patching.
 
-diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-index c64d543..ffe9d1c 100644
---- a/drivers/clocksource/arm_arch_timer.c
-+++ b/drivers/clocksource/arm_arch_timer.c
-@@ -67,7 +67,7 @@ static int arch_timer_ppi[MAX_TIMER_PPI];
- 
- static struct clock_event_device __percpu *arch_timer_evt;
- 
--static bool arch_timer_use_virtual = true;
-+static enum ppi_nr arch_timer_uses_ppi = VIRT_PPI;
- static bool arch_timer_c3stop;
- static bool arch_timer_mem_use_virtual;
- 
-@@ -263,14 +263,20 @@ static void __arch_timer_setup(unsigned type,
- 		clk->name = "arch_sys_timer";
- 		clk->rating = 450;
- 		clk->cpumask = cpumask_of(smp_processor_id());
--		if (arch_timer_use_virtual) {
--			clk->irq = arch_timer_ppi[VIRT_PPI];
-+		clk->irq = arch_timer_ppi[arch_timer_uses_ppi];
-+		switch (arch_timer_uses_ppi) {
-+		case VIRT_PPI:
- 			clk->set_state_shutdown = arch_timer_shutdown_virt;
- 			clk->set_next_event = arch_timer_set_next_event_virt;
--		} else {
--			clk->irq = arch_timer_ppi[PHYS_SECURE_PPI];
-+			break;
-+		case PHYS_SECURE_PPI:
-+		case PHYS_NONSECURE_PPI:
-+		case HYP_PPI:
- 			clk->set_state_shutdown = arch_timer_shutdown_phys;
- 			clk->set_next_event = arch_timer_set_next_event_phys;
-+			break;
-+		default:
-+			BUG();
- 		}
- 	} else {
- 		clk->features |= CLOCK_EVT_FEAT_DYNIRQ;
-@@ -338,17 +344,20 @@ static void arch_counter_set_user_access(void)
- 	arch_timer_set_cntkctl(cntkctl);
- }
- 
-+static bool arch_timer_has_nonsecure_ppi(void)
-+{
-+	return (arch_timer_uses_ppi == PHYS_SECURE_PPI &&
-+		arch_timer_ppi[PHYS_NONSECURE_PPI]);
-+}
-+
- static int arch_timer_setup(struct clock_event_device *clk)
- {
- 	__arch_timer_setup(ARCH_CP15_TIMER, clk);
- 
--	if (arch_timer_use_virtual)
--		enable_percpu_irq(arch_timer_ppi[VIRT_PPI], 0);
--	else {
--		enable_percpu_irq(arch_timer_ppi[PHYS_SECURE_PPI], 0);
--		if (arch_timer_ppi[PHYS_NONSECURE_PPI])
--			enable_percpu_irq(arch_timer_ppi[PHYS_NONSECURE_PPI], 0);
--	}
-+	enable_percpu_irq(arch_timer_ppi[arch_timer_uses_ppi], 0);
-+
-+	if (arch_timer_has_nonsecure_ppi())
-+		enable_percpu_irq(arch_timer_ppi[PHYS_NONSECURE_PPI], 0);
- 
- 	arch_counter_set_user_access();
- 	if (IS_ENABLED(CONFIG_ARM_ARCH_TIMER_EVTSTREAM))
-@@ -390,7 +399,7 @@ static void arch_timer_banner(unsigned type)
- 		     (unsigned long)arch_timer_rate / 1000000,
- 		     (unsigned long)(arch_timer_rate / 10000) % 100,
- 		     type & ARCH_CP15_TIMER ?
--			arch_timer_use_virtual ? "virt" : "phys" :
-+		     (arch_timer_uses_ppi == VIRT_PPI) ? "virt" : "phys" :
- 			"",
- 		     type == (ARCH_CP15_TIMER | ARCH_MEM_TIMER) ?  "/" : "",
- 		     type & ARCH_MEM_TIMER ?
-@@ -460,7 +469,7 @@ static void __init arch_counter_register(unsigned type)
- 
- 	/* Register the CP15 based counter if we have one */
- 	if (type & ARCH_CP15_TIMER) {
--		if (IS_ENABLED(CONFIG_ARM64) || arch_timer_use_virtual)
-+		if (IS_ENABLED(CONFIG_ARM64) || arch_timer_uses_ppi == VIRT_PPI)
- 			arch_timer_read_counter = arch_counter_get_cntvct;
- 		else
- 			arch_timer_read_counter = arch_counter_get_cntpct;
-@@ -490,13 +499,9 @@ static void arch_timer_stop(struct clock_event_device *clk)
- 	pr_debug("arch_timer_teardown disable IRQ%d cpu #%d\n",
- 		 clk->irq, smp_processor_id());
- 
--	if (arch_timer_use_virtual)
--		disable_percpu_irq(arch_timer_ppi[VIRT_PPI]);
--	else {
--		disable_percpu_irq(arch_timer_ppi[PHYS_SECURE_PPI]);
--		if (arch_timer_ppi[PHYS_NONSECURE_PPI])
--			disable_percpu_irq(arch_timer_ppi[PHYS_NONSECURE_PPI]);
--	}
-+	disable_percpu_irq(arch_timer_ppi[arch_timer_uses_ppi]);
-+	if (arch_timer_has_nonsecure_ppi())
-+		disable_percpu_irq(arch_timer_ppi[PHYS_NONSECURE_PPI]);
- 
- 	clk->set_state_shutdown(clk);
- }
-@@ -562,12 +567,14 @@ static int __init arch_timer_register(void)
- 		goto out;
- 	}
- 
--	if (arch_timer_use_virtual) {
--		ppi = arch_timer_ppi[VIRT_PPI];
-+	ppi = arch_timer_ppi[arch_timer_uses_ppi];
-+	switch (arch_timer_uses_ppi) {
-+	case VIRT_PPI:
- 		err = request_percpu_irq(ppi, arch_timer_handler_virt,
- 					 "arch_timer", arch_timer_evt);
--	} else {
--		ppi = arch_timer_ppi[PHYS_SECURE_PPI];
-+		break;
-+	case PHYS_SECURE_PPI:
-+	case PHYS_NONSECURE_PPI:
- 		err = request_percpu_irq(ppi, arch_timer_handler_phys,
- 					 "arch_timer", arch_timer_evt);
- 		if (!err && arch_timer_ppi[PHYS_NONSECURE_PPI]) {
-@@ -578,6 +585,13 @@ static int __init arch_timer_register(void)
- 				free_percpu_irq(arch_timer_ppi[PHYS_SECURE_PPI],
- 						arch_timer_evt);
- 		}
-+		break;
-+	case HYP_PPI:
-+		err = request_percpu_irq(ppi, arch_timer_handler_phys,
-+					 "arch_timer", arch_timer_evt);
-+		break;
-+	default:
-+		BUG();
- 	}
- 
- 	if (err) {
-@@ -602,15 +616,10 @@ static int __init arch_timer_register(void)
- out_unreg_notify:
- 	unregister_cpu_notifier(&arch_timer_cpu_nb);
- out_free_irq:
--	if (arch_timer_use_virtual)
--		free_percpu_irq(arch_timer_ppi[VIRT_PPI], arch_timer_evt);
--	else {
--		free_percpu_irq(arch_timer_ppi[PHYS_SECURE_PPI],
-+	free_percpu_irq(arch_timer_ppi[arch_timer_uses_ppi], arch_timer_evt);
-+	if (arch_timer_has_nonsecure_ppi())
-+		free_percpu_irq(arch_timer_ppi[PHYS_NONSECURE_PPI],
- 				arch_timer_evt);
--		if (arch_timer_ppi[PHYS_NONSECURE_PPI])
--			free_percpu_irq(arch_timer_ppi[PHYS_NONSECURE_PPI],
--					arch_timer_evt);
--	}
- 
- out_free:
- 	free_percpu(arch_timer_evt);
-@@ -697,12 +706,25 @@ static void __init arch_timer_init(void)
- 	 *
- 	 * If no interrupt provided for virtual timer, we'll have to
- 	 * stick to the physical timer. It'd better be accessible...
-+	 *
-+	 * On ARMv8.1 with VH extensions, the kernel runs in HYP. VHE
-+	 * accesses to CNTP_*_EL1 registers are silently redirected to
-+	 * their CNTHP_*_EL2 counterparts, and use a different PPI
-+	 * number.
- 	 */
- 	if (is_hyp_mode_available() || !arch_timer_ppi[VIRT_PPI]) {
--		arch_timer_use_virtual = false;
-+		bool has_ppi;
-+
-+		if (is_kernel_in_hyp_mode()) {
-+			arch_timer_uses_ppi = HYP_PPI;
-+			has_ppi = !!arch_timer_ppi[HYP_PPI];
-+		} else {
-+			arch_timer_uses_ppi = PHYS_SECURE_PPI;
-+			has_ppi = (!!arch_timer_ppi[PHYS_SECURE_PPI] ||
-+				   !!arch_timer_ppi[PHYS_NONSECURE_PPI]);
-+		}
- 
--		if (!arch_timer_ppi[PHYS_SECURE_PPI] ||
--		    !arch_timer_ppi[PHYS_NONSECURE_PPI]) {
-+		if (!has_ppi) {
- 			pr_warn("arch_timer: No interrupt available, giving up\n");
- 			return;
- 		}
-@@ -735,7 +757,7 @@ static void __init arch_timer_of_init(struct device_node *np)
- 	 */
- 	if (IS_ENABLED(CONFIG_ARM) &&
- 	    of_property_read_bool(np, "arm,cpu-registers-not-fw-configured"))
--			arch_timer_use_virtual = false;
-+		arch_timer_uses_ppi = PHYS_SECURE_PPI;
- 
- 	arch_timer_init();
- }
+The first 20 patches massage the KVM code to deal with VHE and enable
+Linux to run at EL2. The last patch catches an ugly case when VHE
+capable CPUs are paired with some of their less capable siblings. This
+should never happen, but hey...
+
+I have deliberately left out some of the more "advanced"
+optimizations, as they are likely to distract the reviewer from the
+core infrastructure, which is what I care about at the moment.
+
+A few things to note:
+
+- Given that the code has been almost entierely rewritten, I've
+  dropped all Acks from the new patches
+
+- GDB is currently busted on VHE systems, as it checks for version 6
+  on the debug architecture, while VHE is version 7. The binutils
+  people are on the case.
+
+This has been tested on the FVP_Base_SLV-V8-A model, and based on
+v4.5-rc1. I've put a branch out on:
+
+git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/vhe
+
+* From v1:
+  - Full rewrite now that the World Switch is written in C code.
+  - Dropped the "early IRQ handling" for the moment.
+
+Marc Zyngier (21):
+  arm/arm64: Add new is_kernel_in_hyp_mode predicate
+  arm64: Allow the arch timer to use the HYP timer
+  arm64: Add ARM64_HAS_VIRT_HOST_EXTN feature
+  arm64: KVM: Skip HYP setup when already running in HYP
+  arm64: KVM: VHE: Turn VTCR_EL2 setup into a reusable macro
+  arm64: KVM: VHE: Patch out use of HVC
+  arm64: KVM: VHE: Patch out kern_hyp_va
+  arm64: KVM: VHE: Introduce unified system register accessors
+  arm64: KVM: VHE: Differenciate host/guest sysreg save/restore
+  arm64: KVM: VHE: Split save/restore of sysregs shared between EL1 and
+    EL2
+  arm64: KVM: VHE: Use unified system register accessors
+  arm64: KVM: VHE: Enable minimal sysreg save/restore
+  arm64: KVM: VHE: Make __fpsimd_enabled VHE aware
+  arm64: KVM: VHE: Implement VHE activate/deactivate_traps
+  arm64: KVM: VHE: Use unified sysreg accessors for timer
+  arm64: KVM: VHE: Add fpsimd enabling on guest access
+  arm64: KVM: VHE: Add alternative panic handling
+  arm64: KVM: Introduce hyp_alternate_value helper
+  arm64: KVM: Move most of the fault decoding to C
+  arm64: VHE: Add support for running Linux in EL2 mode
+  arm64: Panic when VHE and non VHE CPUs coexist
+
+ arch/arm/include/asm/virt.h          |   5 ++
+ arch/arm/kvm/arm.c                   | 151 +++++++++++++++++++------------
+ arch/arm/kvm/mmu.c                   |   7 ++
+ arch/arm64/Kconfig                   |  13 +++
+ arch/arm64/include/asm/cpufeature.h  |   3 +-
+ arch/arm64/include/asm/kvm_arm.h     |   1 +
+ arch/arm64/include/asm/kvm_emulate.h |   3 +
+ arch/arm64/include/asm/kvm_mmu.h     |  34 ++++++-
+ arch/arm64/include/asm/virt.h        |  27 ++++++
+ arch/arm64/kernel/asm-offsets.c      |   3 -
+ arch/arm64/kernel/cpufeature.c       |  15 +++-
+ arch/arm64/kernel/head.S             |  51 ++++++++++-
+ arch/arm64/kernel/smp.c              |   3 +
+ arch/arm64/kvm/hyp-init.S            |  18 +---
+ arch/arm64/kvm/hyp.S                 |   7 ++
+ arch/arm64/kvm/hyp/entry.S           |   6 ++
+ arch/arm64/kvm/hyp/hyp-entry.S       | 107 +++++++---------------
+ arch/arm64/kvm/hyp/hyp.h             | 119 ++++++++++++++++++++++--
+ arch/arm64/kvm/hyp/switch.c          | 170 +++++++++++++++++++++++++++++++----
+ arch/arm64/kvm/hyp/sysreg-sr.c       | 147 ++++++++++++++++++++----------
+ arch/arm64/kvm/hyp/timer-sr.c        |  10 +--
+ drivers/clocksource/arm_arch_timer.c |  96 ++++++++++++--------
+ 22 files changed, 724 insertions(+), 272 deletions(-)
+
 -- 
 2.1.4
