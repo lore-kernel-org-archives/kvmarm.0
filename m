@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 22/27] ARM: KVM: Remove __weak attributes
-Date: Mon, 25 Jan 2016 16:38:38 +0000
-Message-ID: <1453739923-17846-23-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 19/27] ARM: KVM: Add panic handling code
+Date: Mon, 25 Jan 2016 16:38:35 +0000
+Message-ID: <1453739923-17846-20-git-send-email-marc.zyngier@arm.com>
 References: <1453739923-17846-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E7B164972F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 300F540C9D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NJbqy5J+Mjbl for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2016 11:34:26 -0500 (EST)
+ with ESMTP id HjTvs4syixh2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2016 11:34:24 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C0556496F5
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A53474969A
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:18 -0500 (EST)
 In-Reply-To: <1453739923-17846-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,71 +31,103 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that the old code is long gone, we can remove all the weak
-attributes, as there is only one version of the code.
+Instead of spinning forever, let's "properly" handle any unexpected
+exception ("properly" meaning "print a spat on the console and die").
+
+This has proved useful quite a few times...
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/hyp/hyp-entry.S | 4 +---
- arch/arm/kvm/hyp/switch.c    | 2 +-
- arch/arm/kvm/hyp/tlb.c       | 6 +++---
- 3 files changed, 5 insertions(+), 7 deletions(-)
+ arch/arm/kvm/hyp/hyp-entry.S | 28 +++++++++++++++++++++-------
+ arch/arm/kvm/hyp/switch.c    | 38 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 59 insertions(+), 7 deletions(-)
 
 diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
-index ca412ad..e2a45b8 100644
+index 44bc11f..ca412ad 100644
 --- a/arch/arm/kvm/hyp/hyp-entry.S
 +++ b/arch/arm/kvm/hyp/hyp-entry.S
-@@ -58,10 +58,8 @@
-  */
+@@ -75,15 +75,29 @@ __kvm_hyp_vector:
  
- 	.align 5
--__hyp_vector:
--	.global	__hyp_vector
- __kvm_hyp_vector:
--	.weak __kvm_hyp_vector
-+	.global __kvm_hyp_vector
+ .macro invalid_vector label, cause
+ 	.align
+-\label:	b	.
++\label:	mov	r0, #\cause
++	b	__hyp_panic
+ .endm
  
- 	@ Hyp-mode exception vector
- 	W(b)	hyp_reset
+-	invalid_vector	hyp_reset
+-	invalid_vector	hyp_undef
+-	invalid_vector	hyp_svc
+-	invalid_vector	hyp_pabt
+-	invalid_vector	hyp_dabt
+-	invalid_vector	hyp_fiq
++	invalid_vector	hyp_reset	ARM_EXCEPTION_RESET
++	invalid_vector	hyp_undef	ARM_EXCEPTION_UNDEFINED
++	invalid_vector	hyp_svc		ARM_EXCEPTION_SOFTWARE
++	invalid_vector	hyp_pabt	ARM_EXCEPTION_PREF_ABORT
++	invalid_vector	hyp_dabt	ARM_EXCEPTION_DATA_ABORT
++	invalid_vector	hyp_fiq		ARM_EXCEPTION_FIQ
++
++ENTRY(__hyp_do_panic)
++	mrs	lr, cpsr
++	bic	lr, lr, #MODE_MASK
++	orr	lr, lr, #SVC_MODE
++THUMB(	orr	lr, lr, #PSR_T_BIT	)
++	msr	spsr_cxsf, lr
++	ldr	lr, =panic
++	msr	ELR_hyp, lr
++	ldr	lr, =kvm_call_hyp
++	clrex
++	eret
++ENDPROC(__hyp_do_panic)
+ 
+ hyp_hvc:
+ 	/*
 diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
-index 67f3944..7325ad3 100644
+index 8bfd729..67f3944 100644
 --- a/arch/arm/kvm/hyp/switch.c
 +++ b/arch/arm/kvm/hyp/switch.c
-@@ -187,7 +187,7 @@ again:
- 	return exit_code;
+@@ -188,3 +188,41 @@ again:
  }
  
--__alias(__guest_run) int __weak __kvm_vcpu_run(struct kvm_vcpu *vcpu);
-+__alias(__guest_run) int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
- 
- static const char * const __hyp_panic_string[] = {
- 	[ARM_EXCEPTION_RESET]      = "\nHYP panic: RST?? PC:%08x CPSR:%08x",
-diff --git a/arch/arm/kvm/hyp/tlb.c b/arch/arm/kvm/hyp/tlb.c
-index 993fe89..3854e31 100644
---- a/arch/arm/kvm/hyp/tlb.c
-+++ b/arch/arm/kvm/hyp/tlb.c
-@@ -50,14 +50,14 @@ static void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
- 	write_sysreg(0, VTTBR);
- }
- 
--__alias(__tlb_flush_vmid) void __weak __kvm_tlb_flush_vmid(struct kvm *kvm);
-+__alias(__tlb_flush_vmid) void __kvm_tlb_flush_vmid(struct kvm *kvm);
- 
- static void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- {
- 	__tlb_flush_vmid(kvm);
- }
- 
--__alias(__tlb_flush_vmid_ipa) void __weak __kvm_tlb_flush_vmid_ipa(struct kvm *kvm,
-+__alias(__tlb_flush_vmid_ipa) void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm,
- 							    phys_addr_t ipa);
- 
- static void __hyp_text __tlb_flush_vm_context(void)
-@@ -68,4 +68,4 @@ static void __hyp_text __tlb_flush_vm_context(void)
- 	dsb(ish);
- }
- 
--__alias(__tlb_flush_vm_context) void __weak __kvm_flush_vm_context(void);
-+__alias(__tlb_flush_vm_context) void __kvm_flush_vm_context(void);
+ __alias(__guest_run) int __weak __kvm_vcpu_run(struct kvm_vcpu *vcpu);
++
++static const char * const __hyp_panic_string[] = {
++	[ARM_EXCEPTION_RESET]      = "\nHYP panic: RST?? PC:%08x CPSR:%08x",
++	[ARM_EXCEPTION_UNDEFINED]  = "\nHYP panic: UNDEF PC:%08x CPSR:%08x",
++	[ARM_EXCEPTION_SOFTWARE]   = "\nHYP panic: SVC?? PC:%08x CPSR:%08x",
++	[ARM_EXCEPTION_PREF_ABORT] = "\nHYP panic: PABRT PC:%08x CPSR:%08x",
++	[ARM_EXCEPTION_DATA_ABORT] = "\nHYP panic: DABRT PC:%08x ADDR:%08x",
++	[ARM_EXCEPTION_IRQ]        = "\nHYP panic: IRQ?? PC:%08x CPSR:%08x",
++	[ARM_EXCEPTION_FIQ]        = "\nHYP panic: FIQ?? PC:%08x CPSR:%08x",
++	[ARM_EXCEPTION_HVC]        = "\nHYP panic: HVC?? PC:%08x CPSR:%08x",
++};
++
++void __hyp_text __noreturn __hyp_panic(int cause)
++{
++	u32 elr = read_special(ELR_hyp);
++	u32 val;
++
++	if (cause == ARM_EXCEPTION_DATA_ABORT)
++		val = read_sysreg(HDFAR);
++	else
++		val = read_special(SPSR);
++
++	if (read_sysreg(VTTBR)) {
++		struct kvm_vcpu *vcpu;
++		struct kvm_cpu_context *host_ctxt;
++
++		vcpu = (struct kvm_vcpu *)read_sysreg(HTPIDR);
++		host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
++		__deactivate_traps(vcpu);
++		__deactivate_vm(vcpu);
++		__sysreg_restore_state(host_ctxt);
++	}
++
++	/* Call panic for real */
++	__hyp_do_panic(__hyp_panic_string[cause], elr, val);
++
++	unreachable();
++}
 -- 
 2.1.4
