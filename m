@@ -1,21 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 00/21] arm64: Virtualization Host Extension support
-Date: Mon, 25 Jan 2016 15:53:34 +0000
-Message-ID: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 01/21] arm/arm64: Add new is_kernel_in_hyp_mode predicate
+Date: Mon, 25 Jan 2016 15:53:35 +0000
+Message-ID: <1453737235-16522-2-git-send-email-marc.zyngier@arm.com>
+References: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 99F6E40C9D
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C627540B40
  for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id P441pcastxkl for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id wIi2rSiEO5qz for <kvmarm@lists.cs.columbia.edu>;
  Mon, 25 Jan 2016 10:49:24 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31EB840B40
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A1FF140B58
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:24 -0500 (EST)
+In-Reply-To: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,90 +31,64 @@ To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-ARMv8.1 comes with the "Virtualization Host Extension" (VHE for
-short), which enables simpler support of Type-2 hypervisors.
+With ARMv8.1 VHE extension, it will be possible to run the kernel
+at EL2 (aka HYP mode). In order for the kernel to easily find out
+where it is running, add a new predicate that returns whether or
+not the kernel is in HYP mode.
 
-This extension allows the kernel to directly run at EL2, and
-significantly reduces the number of system registers shared between
-host and guest, reducing the overhead of virtualization.
+For completeness, the 32bit code also get such a predicate (always
+returning false) so that code common to both architecture (timers,
+KVM) can use it transparently.
 
-In order to have the same kernel binary running on all versions of the
-architecture, this series makes heavy use of runtime code patching.
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/include/asm/virt.h   |  5 +++++
+ arch/arm64/include/asm/virt.h | 10 ++++++++++
+ 2 files changed, 15 insertions(+)
 
-The first 20 patches massage the KVM code to deal with VHE and enable
-Linux to run at EL2. The last patch catches an ugly case when VHE
-capable CPUs are paired with some of their less capable siblings. This
-should never happen, but hey...
-
-I have deliberately left out some of the more "advanced"
-optimizations, as they are likely to distract the reviewer from the
-core infrastructure, which is what I care about at the moment.
-
-A few things to note:
-
-- Given that the code has been almost entierely rewritten, I've
-  dropped all Acks from the new patches
-
-- GDB is currently busted on VHE systems, as it checks for version 6
-  on the debug architecture, while VHE is version 7. The binutils
-  people are on the case.
-
-This has been tested on the FVP_Base_SLV-V8-A model, and based on
-v4.5-rc1. I've put a branch out on:
-
-git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/vhe
-
-* From v1:
-  - Full rewrite now that the World Switch is written in C code.
-  - Dropped the "early IRQ handling" for the moment.
-
-Marc Zyngier (21):
-  arm/arm64: Add new is_kernel_in_hyp_mode predicate
-  arm64: Allow the arch timer to use the HYP timer
-  arm64: Add ARM64_HAS_VIRT_HOST_EXTN feature
-  arm64: KVM: Skip HYP setup when already running in HYP
-  arm64: KVM: VHE: Turn VTCR_EL2 setup into a reusable macro
-  arm64: KVM: VHE: Patch out use of HVC
-  arm64: KVM: VHE: Patch out kern_hyp_va
-  arm64: KVM: VHE: Introduce unified system register accessors
-  arm64: KVM: VHE: Differenciate host/guest sysreg save/restore
-  arm64: KVM: VHE: Split save/restore of sysregs shared between EL1 and
-    EL2
-  arm64: KVM: VHE: Use unified system register accessors
-  arm64: KVM: VHE: Enable minimal sysreg save/restore
-  arm64: KVM: VHE: Make __fpsimd_enabled VHE aware
-  arm64: KVM: VHE: Implement VHE activate/deactivate_traps
-  arm64: KVM: VHE: Use unified sysreg accessors for timer
-  arm64: KVM: VHE: Add fpsimd enabling on guest access
-  arm64: KVM: VHE: Add alternative panic handling
-  arm64: KVM: Introduce hyp_alternate_value helper
-  arm64: KVM: Move most of the fault decoding to C
-  arm64: VHE: Add support for running Linux in EL2 mode
-  arm64: Panic when VHE and non VHE CPUs coexist
-
- arch/arm/include/asm/virt.h          |   5 ++
- arch/arm/kvm/arm.c                   | 151 +++++++++++++++++++------------
- arch/arm/kvm/mmu.c                   |   7 ++
- arch/arm64/Kconfig                   |  13 +++
- arch/arm64/include/asm/cpufeature.h  |   3 +-
- arch/arm64/include/asm/kvm_arm.h     |   1 +
- arch/arm64/include/asm/kvm_emulate.h |   3 +
- arch/arm64/include/asm/kvm_mmu.h     |  34 ++++++-
- arch/arm64/include/asm/virt.h        |  27 ++++++
- arch/arm64/kernel/asm-offsets.c      |   3 -
- arch/arm64/kernel/cpufeature.c       |  15 +++-
- arch/arm64/kernel/head.S             |  51 ++++++++++-
- arch/arm64/kernel/smp.c              |   3 +
- arch/arm64/kvm/hyp-init.S            |  18 +---
- arch/arm64/kvm/hyp.S                 |   7 ++
- arch/arm64/kvm/hyp/entry.S           |   6 ++
- arch/arm64/kvm/hyp/hyp-entry.S       | 107 +++++++---------------
- arch/arm64/kvm/hyp/hyp.h             | 119 ++++++++++++++++++++++--
- arch/arm64/kvm/hyp/switch.c          | 170 +++++++++++++++++++++++++++++++----
- arch/arm64/kvm/hyp/sysreg-sr.c       | 147 ++++++++++++++++++++----------
- arch/arm64/kvm/hyp/timer-sr.c        |  10 +--
- drivers/clocksource/arm_arch_timer.c |  96 ++++++++++++--------
- 22 files changed, 724 insertions(+), 272 deletions(-)
-
+diff --git a/arch/arm/include/asm/virt.h b/arch/arm/include/asm/virt.h
+index 4371f45..b6a3cef 100644
+--- a/arch/arm/include/asm/virt.h
++++ b/arch/arm/include/asm/virt.h
+@@ -74,6 +74,11 @@ static inline bool is_hyp_mode_mismatched(void)
+ {
+ 	return !!(__boot_cpu_mode & BOOT_CPU_MODE_MISMATCH);
+ }
++
++static inline bool is_kernel_in_hyp_mode(void)
++{
++	return false;
++}
+ #endif
+ 
+ #endif /* __ASSEMBLY__ */
+diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
+index 7a5df52..9f22dd6 100644
+--- a/arch/arm64/include/asm/virt.h
++++ b/arch/arm64/include/asm/virt.h
+@@ -23,6 +23,8 @@
+ 
+ #ifndef __ASSEMBLY__
+ 
++#include <asm/ptrace.h>
++
+ /*
+  * __boot_cpu_mode records what mode CPUs were booted in.
+  * A correctly-implemented bootloader must start all CPUs in the same mode:
+@@ -50,6 +52,14 @@ static inline bool is_hyp_mode_mismatched(void)
+ 	return __boot_cpu_mode[0] != __boot_cpu_mode[1];
+ }
+ 
++static inline bool is_kernel_in_hyp_mode(void)
++{
++	u64 el;
++
++	asm("mrs %0, CurrentEL" : "=r" (el));
++	return el == CurrentEL_EL2;
++}
++
+ /* The section containing the hypervisor text */
+ extern char __hyp_text_start[];
+ extern char __hyp_text_end[];
 -- 
 2.1.4
