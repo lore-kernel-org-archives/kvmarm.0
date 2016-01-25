@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 12/21] arm64: KVM: VHE: Enable minimal sysreg save/restore
-Date: Mon, 25 Jan 2016 15:53:46 +0000
-Message-ID: <1453737235-16522-13-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 15/21] arm64: KVM: VHE: Use unified sysreg accessors for
+ timer
+Date: Mon, 25 Jan 2016 15:53:49 +0000
+Message-ID: <1453737235-16522-16-git-send-email-marc.zyngier@arm.com>
 References: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D01B6412ED
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4AC8840B40
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LcV0xMdcICuQ for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2016 10:49:43 -0500 (EST)
+ with ESMTP id b1oIT+6Ea+oI for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2016 10:49:46 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 942D3410D7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EABF14113E
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:45 -0500 (EST)
 In-Reply-To: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,60 +32,43 @@ To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We're now in a position where we can introduce VHE's minimal
-save/restore, which is limited to the handful of shared sysregs.
-
-Add the required alternative function calls that result in a
-"do nothing" call on VHE, and the normal save/restore for non-VHE.
+Switch the timer code to the unified sysreg accessors.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/sysreg-sr.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/timer-sr.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-index 7d7d757..36bbdec 100644
---- a/arch/arm64/kvm/hyp/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-@@ -23,6 +23,9 @@
+diff --git a/arch/arm64/kvm/hyp/timer-sr.c b/arch/arm64/kvm/hyp/timer-sr.c
+index 1051e5d..f276d9e 100644
+--- a/arch/arm64/kvm/hyp/timer-sr.c
++++ b/arch/arm64/kvm/hyp/timer-sr.c
+@@ -31,12 +31,12 @@ void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
+ 	u64 val;
  
- #include "hyp.h"
+ 	if (kvm->arch.timer.enabled) {
+-		timer->cntv_ctl = read_sysreg(cntv_ctl_el0);
+-		timer->cntv_cval = read_sysreg(cntv_cval_el0);
++		timer->cntv_ctl = read_sysreg_el0(cntv_ctl);
++		timer->cntv_cval = read_sysreg_el0(cntv_cval);
+ 	}
  
-+/* Yes, this does nothing, on purpose */
-+static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
-+
- /*
-  * Non-VHE: Both host and guest must save everything.
-  *
-@@ -67,9 +70,13 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
- 	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg_el1(spsr);
+ 	/* Disable the virtual timer */
+-	write_sysreg(0, cntv_ctl_el0);
++	write_sysreg_el0(0, cntv_ctl);
+ 
+ 	/* Allow physical timer/counter access for the host */
+ 	val = read_sysreg(cnthctl_el2);
+@@ -64,8 +64,8 @@ void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
+ 
+ 	if (kvm->arch.timer.enabled) {
+ 		write_sysreg(kvm->arch.timer.cntvoff, cntvoff_el2);
+-		write_sysreg(timer->cntv_cval, cntv_cval_el0);
++		write_sysreg_el0(timer->cntv_cval, cntv_cval);
+ 		isb();
+-		write_sysreg(timer->cntv_ctl, cntv_ctl_el0);
++		write_sysreg_el0(timer->cntv_ctl, cntv_ctl);
+ 	}
  }
- 
-+static hyp_alternate_select(__sysreg_call_save_state,
-+			    __sysreg_save_state, __sysreg_do_nothing,
-+			    ARM64_HAS_VIRT_HOST_EXTN);
-+
- void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
- {
--	__sysreg_save_state(ctxt);
-+	__sysreg_call_save_state()(ctxt);
- 	__sysreg_save_common_state(ctxt);
- }
- 
-@@ -116,9 +123,13 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],spsr);
- }
- 
-+static hyp_alternate_select(__sysreg_call_restore_host_state,
-+			    __sysreg_restore_state, __sysreg_do_nothing,
-+			    ARM64_HAS_VIRT_HOST_EXTN);
-+
- void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
- {
--	__sysreg_restore_state(ctxt);
-+	__sysreg_call_restore_host_state()(ctxt);
- 	__sysreg_restore_common_state(ctxt);
- }
- 
 -- 
 2.1.4
