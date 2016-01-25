@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 08/21] arm64: KVM: VHE: Introduce unified system register
- accessors
-Date: Mon, 25 Jan 2016 15:53:42 +0000
-Message-ID: <1453737235-16522-9-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 07/21] arm64: KVM: VHE: Patch out kern_hyp_va
+Date: Mon, 25 Jan 2016 15:53:41 +0000
+Message-ID: <1453737235-16522-8-git-send-email-marc.zyngier@arm.com>
 References: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4157640FA2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 97A1441AF6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9vHV2JkSjebB for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2016 10:49:36 -0500 (EST)
+ with ESMTP id komwgdEk7YRu for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2016 10:49:34 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C12B8412F3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:35 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 458B1413E1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:34 -0500 (EST)
 In-Reply-To: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,114 +31,97 @@ To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VHE brings its own bag of new system registers, or rather system
-register accessors, as it define new ways to access both guest
-and host system registers. For example, from the host:
+The kern_hyp_va macro is pretty meaninless with VHE, as there is
+only one mapping - the kernel one.
 
-- The host TCR_EL2 register is accessed using the TCR_EL1 accessor
-- The guest TCR_EL1 register is accessed using the TCR_EL12 accessor
-
-Obviously, this is confusing. A way to somehow reduce the complexity
-of writing code for both ARMv8 and ARMv8.1 is to use a set of unified
-accessors that will generate the right sysreg, depending on the mode
-the CPU is running in. For example:
-
-- read_sysreg_el1(tcr) will use TCR_EL1 on ARMv8, and TCR_EL12 on
-  ARMv8.1 with VHE.
-- read_sysreg_el2(tcr) will use TCR_EL2 on ARMv8, and TCR_EL1 on
-  ARMv8.1 with VHE.
-
-We end up with three sets of accessors ({read,write}_sysreg_el[012])
-that can be directly used from C code. We take this opportunity to
-also add the definition for the new VHE sysregs.(
+In order to keep the code readable and efficient, use runtime
+patching to replace the 'and' instruction used to compute the VA
+with a 'nop'.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/hyp.h | 72 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 72 insertions(+)
+ arch/arm64/include/asm/kvm_mmu.h | 11 ++++++++++-
+ arch/arm64/kvm/hyp/hyp.h         | 25 ++++++++++++++++++++++---
+ 2 files changed, 32 insertions(+), 4 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index d3e6d7b..62f0d14 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -23,13 +23,16 @@
+ #include <asm/cpufeature.h>
+ 
+ /*
+- * As we only have the TTBR0_EL2 register, we cannot express
++ * As ARMv8.0 only has the TTBR0_EL2 register, we cannot express
+  * "negative" addresses. This makes it impossible to directly share
+  * mappings with the kernel.
+  *
+  * Instead, give the HYP mode its own VA region at a fixed offset from
+  * the kernel by just masking the top bits (which are all ones for a
+  * kernel address).
++ *
++ * ARMv8.1 (using VHE) does have a TTBR1_EL2, and doesn't use these
++ * macros (the entire kernel runs at EL2).
+  */
+ #define HYP_PAGE_OFFSET_SHIFT	VA_BITS
+ #define HYP_PAGE_OFFSET_MASK	((UL(1) << HYP_PAGE_OFFSET_SHIFT) - 1)
+@@ -56,6 +59,8 @@
+ 
+ #ifdef __ASSEMBLY__
+ 
++#include <asm/alternative.h>
++#include <asm/cpufeature.h>
+ #include <asm/kvm_arm.h>
+ 
+ .macro setup_vtcr tmp1, tmp2
+@@ -84,7 +89,11 @@
+  * reg: VA to be converted.
+  */
+ .macro kern_hyp_va	reg
++alternative_if_not ARM64_HAS_VIRT_HOST_EXTN	
+ 	and	\reg, \reg, #HYP_PAGE_OFFSET_MASK
++alternative_else
++	nop
++alternative_endif
+ .endm
+ 
+ #else
 diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-index fc502f3..744c919 100644
+index fb27517..fc502f3 100644
 --- a/arch/arm64/kvm/hyp/hyp.h
 +++ b/arch/arm64/kvm/hyp/hyp.h
-@@ -48,6 +48,78 @@ static inline unsigned long __hyp_kern_va(unsigned long v)
+@@ -25,9 +25,28 @@
  
- #define hyp_kern_va(v) (typeof(v))(__hyp_kern_va((unsigned long)(v)))
+ #define __hyp_text __section(.hyp.text) notrace
  
-+#define read_sysreg_elx(r,nvh,vh)					\
-+	({								\
-+		u64 reg;						\
-+		asm volatile(ALTERNATIVE("mrs %0, " __stringify(r##nvh),\
-+					 "mrs_s %0, " __stringify(r##vh),\
-+					 ARM64_HAS_VIRT_HOST_EXTN)	\
-+			     : "=r" (reg));				\
-+		reg;							\
-+	})
+-#define kern_hyp_va(v) (typeof(v))((unsigned long)(v) & HYP_PAGE_OFFSET_MASK)
+-#define hyp_kern_va(v) (typeof(v))((unsigned long)(v) - HYP_PAGE_OFFSET \
+-						      + PAGE_OFFSET)
++static inline unsigned long __kern_hyp_va(unsigned long v)
++{
++	asm volatile(ALTERNATIVE("and %0, %0, %1",
++				 "nop",
++				 ARM64_HAS_VIRT_HOST_EXTN)
++		     : "+r" (v) : "i" (HYP_PAGE_OFFSET_MASK));
++	return v;
++}
 +
-+#define write_sysreg_elx(v,r,nvh,vh)					\
-+	do {								\
-+		u64 __val = (u64)(v);					\
-+		asm volatile(ALTERNATIVE("msr " __stringify(r##nvh) ", %x0",\
-+					 "msr_s " __stringify(r##vh) ", %x0",\
-+					 ARM64_HAS_VIRT_HOST_EXTN)	\
-+					 : : "rZ" (__val));		\
-+	} while (0)
++#define kern_hyp_va(v) (typeof(v))(__kern_hyp_va((unsigned long)(v)))
 +
-+/*
-+ * Unified accessors for registers that have a different encoding
-+ * between VHE and non-VHE. They must be specified without their "ELx"
-+ * encoding.
-+ */
-+#define read_sysreg_el2(r)						\
-+	({								\
-+		u64 reg;						\
-+		asm volatile(ALTERNATIVE("mrs %0, " __stringify(r##_EL2),\
-+					 "mrs %0, " __stringify(r##_EL1),\
-+					 ARM64_HAS_VIRT_HOST_EXTN)	\
-+			     : "=r" (reg));				\
-+		reg;							\
-+	})
++static inline unsigned long __hyp_kern_va(unsigned long v)
++{
++	u64 offset = PAGE_OFFSET - HYP_PAGE_OFFSET;
++	asm volatile(ALTERNATIVE("add %0, %0, %1",
++				 "nop",
++				 ARM64_HAS_VIRT_HOST_EXTN)
++		     : "+r" (v) : "r" (offset));
++	return v;
++}
 +
-+#define write_sysreg_el2(v,r)						\
-+	do {								\
-+		u64 __val = (u64)(v);					\
-+		asm volatile(ALTERNATIVE("msr " __stringify(r##_EL2) ", %x0",\
-+					 "msr " __stringify(r##_EL1) ", %x0",\
-+					 ARM64_HAS_VIRT_HOST_EXTN)	\
-+					 : : "rZ" (__val));		\
-+	} while (0)
-+
-+#define read_sysreg_el0(r)	read_sysreg_elx(r, _EL0, _EL02)
-+#define write_sysreg_el0(v,r)	write_sysreg_elx(v, r, _EL0, _EL02)
-+#define read_sysreg_el1(r)	read_sysreg_elx(r, _EL1, _EL12)
-+#define write_sysreg_el1(v,r)	write_sysreg_elx(v, r, _EL1, _EL12)
-+
-+/* The VHE specific system registers and their encoding */
-+#define sctlr_EL12              sys_reg(3, 5, 1, 0, 0)
-+#define cpacr_EL12              sys_reg(3, 5, 1, 0, 2)
-+#define ttbr0_EL12              sys_reg(3, 5, 2, 0, 0)
-+#define ttbr1_EL12              sys_reg(3, 5, 2, 0, 1)
-+#define tcr_EL12                sys_reg(3, 5, 2, 0, 2)
-+#define afsr0_EL12              sys_reg(3, 5, 5, 1, 0)
-+#define afsr1_EL12              sys_reg(3, 5, 5, 1, 1)
-+#define esr_EL12                sys_reg(3, 5, 5, 2, 0)
-+#define far_EL12                sys_reg(3, 5, 6, 0, 0)
-+#define mair_EL12               sys_reg(3, 5, 10, 2, 0)
-+#define amair_EL12              sys_reg(3, 5, 10, 3, 0)
-+#define vbar_EL12               sys_reg(3, 5, 12, 0, 0)
-+#define contextidr_EL12         sys_reg(3, 5, 13, 0, 1)
-+#define cntkctl_EL12            sys_reg(3, 5, 14, 1, 0)
-+#define cntp_tval_EL02          sys_reg(3, 5, 14, 2, 0)
-+#define cntp_ctl_EL02           sys_reg(3, 5, 14, 2, 1)
-+#define cntp_cval_EL02          sys_reg(3, 5, 14, 2, 2)
-+#define cntv_tval_EL02          sys_reg(3, 5, 14, 3, 0)
-+#define cntv_ctl_EL02           sys_reg(3, 5, 14, 3, 1)
-+#define cntv_cval_EL02          sys_reg(3, 5, 14, 3, 2)
-+#define spsr_EL12               sys_reg(3, 5, 4, 0, 0)
-+#define elr_EL12                sys_reg(3, 5, 4, 0, 1)
-+
++#define hyp_kern_va(v) (typeof(v))(__hyp_kern_va((unsigned long)(v)))
+ 
  /**
   * hyp_alternate_select - Generates patchable code sequences that are
-  * used to switch between two implementations of a function, depending
 -- 
 2.1.4
