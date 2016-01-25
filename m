@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 11/27] ARM: KVM: Add vgic v2 save/restore
-Date: Mon, 25 Jan 2016 16:38:27 +0000
-Message-ID: <1453739923-17846-12-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 17/27] ARM: KVM: Add populating of fault data structure
+Date: Mon, 25 Jan 2016 16:38:33 +0000
+Message-ID: <1453739923-17846-18-git-send-email-marc.zyngier@arm.com>
 References: <1453739923-17846-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2741D40FA6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:14 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C7C2B40FA6
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dWexZUsU4Jnm for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2016 11:34:12 -0500 (EST)
+ with ESMTP id q7sr020Gubob for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2016 11:34:20 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 79153410D7
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A02D148536
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:16 -0500 (EST)
 In-Reply-To: <1453739923-17846-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,130 +31,110 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch shouldn't exist, as we should be able to reuse the
-arm64 version for free. I'll get there eventually, but in the
-meantime I need an interrupt controller.
+On guest exit, we must take care of populating our fault data
+structure so that the host code can handle it. This includes
+resolving the IPA for permission faults, which can result in
+restarting the guest.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/hyp/Makefile     |  1 +
- arch/arm/kvm/hyp/hyp.h        |  3 ++
- arch/arm/kvm/hyp/vgic-v2-sr.c | 84 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 88 insertions(+)
- create mode 100644 arch/arm/kvm/hyp/vgic-v2-sr.c
+ arch/arm/kvm/hyp/hyp.h    |  4 ++++
+ arch/arm/kvm/hyp/switch.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 58 insertions(+)
 
-diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
-index 9241ae8..d8acbb6 100644
---- a/arch/arm/kvm/hyp/Makefile
-+++ b/arch/arm/kvm/hyp/Makefile
-@@ -5,3 +5,4 @@
- obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
- obj-$(CONFIG_KVM_ARM_HOST) += cp15-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
-+obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
 diff --git a/arch/arm/kvm/hyp/hyp.h b/arch/arm/kvm/hyp/hyp.h
-index 4924418..7eb1c21 100644
+index 2ca651f..7ddca54 100644
 --- a/arch/arm/kvm/hyp/hyp.h
 +++ b/arch/arm/kvm/hyp/hyp.h
-@@ -80,6 +80,9 @@
- void __timer_save_state(struct kvm_vcpu *vcpu);
- void __timer_restore_state(struct kvm_vcpu *vcpu);
+@@ -76,10 +76,14 @@
+ #define IFSR		__ACCESS_CP15(c5, 0, c0, 1)
+ #define ADFSR		__ACCESS_CP15(c5, 0, c1, 0)
+ #define AIFSR		__ACCESS_CP15(c5, 0, c1, 1)
++#define HSR		__ACCESS_CP15(c5, 4, c2, 0)
+ #define DFAR		__ACCESS_CP15(c6, 0, c0, 0)
+ #define IFAR		__ACCESS_CP15(c6, 0, c0, 2)
+ #define HDFAR		__ACCESS_CP15(c6, 4, c0, 0)
++#define HIFAR		__ACCESS_CP15(c6, 4, c0, 2)
++#define HPFAR		__ACCESS_CP15(c6, 4, c0, 4)
+ #define ICIALLUIS	__ACCESS_CP15(c7, 0, c1, 0)
++#define ATS1CPR		__ACCESS_CP15(c7, 0, c8, 0)
+ #define TLBIALLIS	__ACCESS_CP15(c8, 0, c3, 0)
+ #define TLBIALLNSNHIS	__ACCESS_CP15(c8, 4, c3, 4)
+ #define PRRR		__ACCESS_CP15(c10, 0, c2, 0)
+diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
+index f715b0d..8bfd729 100644
+--- a/arch/arm/kvm/hyp/switch.c
++++ b/arch/arm/kvm/hyp/switch.c
+@@ -80,6 +80,56 @@ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
+ 	__vgic_v2_restore_state(vcpu);
+ }
  
-+void __vgic_v2_save_state(struct kvm_vcpu *vcpu);
-+void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
-+
- void __sysreg_save_state(struct kvm_cpu_context *ctxt);
- void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
- 
-diff --git a/arch/arm/kvm/hyp/vgic-v2-sr.c b/arch/arm/kvm/hyp/vgic-v2-sr.c
-new file mode 100644
-index 0000000..e717612
---- /dev/null
-+++ b/arch/arm/kvm/hyp/vgic-v2-sr.c
-@@ -0,0 +1,84 @@
-+/*
-+ * Copyright (C) 2012-2015 - ARM Ltd
-+ * Author: Marc Zyngier <marc.zyngier@arm.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include <linux/compiler.h>
-+#include <linux/irqchip/arm-gic.h>
-+#include <linux/kvm_host.h>
-+
-+#include <asm/kvm_mmu.h>
-+
-+#include "hyp.h"
-+
-+/* vcpu is already in the HYP VA space */
-+void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
++static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
 +{
-+	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-+	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-+	struct vgic_dist *vgic = &kvm->arch.vgic;
-+	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
-+	u32 eisr0, eisr1, elrsr0, elrsr1;
-+	int i, nr_lr;
++	u32 hsr = read_sysreg(HSR);
++	u8 ec = hsr >> HSR_EC_SHIFT;
++	u32 hpfar, far;
 +
-+	if (!base)
-+		return;
++	vcpu->arch.fault.hsr = hsr;
 +
-+	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
-+	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
-+	cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
-+	eisr0  = readl_relaxed(base + GICH_EISR0);
-+	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
-+	if (unlikely(nr_lr > 32)) {
-+		eisr1  = readl_relaxed(base + GICH_EISR1);
-+		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
++	if (ec == HSR_EC_IABT)
++		far = read_sysreg(HIFAR);
++	else if (ec == HSR_EC_DABT)
++		far = read_sysreg(HDFAR);
++	else
++		return true;
++
++	/*
++	 * B3.13.5 Reporting exceptions taken to the Non-secure PL2 mode:
++	 *
++	 * Abort on the stage 2 translation for a memory access from a
++	 * Non-secure PL1 or PL0 mode:
++	 *
++	 * For any Access flag fault or Translation fault, and also for any
++	 * Permission fault on the stage 2 translation of a memory access
++	 * made as part of a translation table walk for a stage 1 translation,
++	 * the HPFAR holds the IPA that caused the fault. Otherwise, the HPFAR
++	 * is UNKNOWN.
++	 */
++	if (!(hsr & HSR_DABT_S1PTW) && (hsr & HSR_FSC_TYPE) == FSC_PERM) {
++		u64 par, tmp;
++
++		par = read_sysreg(PAR);
++		write_sysreg(far, ATS1CPR);
++		isb();
++
++		tmp = read_sysreg(PAR);
++		write_sysreg(par, PAR);
++
++		if (unlikely(tmp & 1))
++			return false; /* Translation failed, back to guest */
++
++		hpfar = ((tmp >> 12) & ((1UL << 28) - 1)) << 4;
 +	} else {
-+		eisr1 = elrsr1 = 0;
++		hpfar = read_sysreg(HPFAR);
 +	}
-+#ifdef CONFIG_CPU_BIG_ENDIAN
-+	cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
-+	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
-+#else
-+	cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
-+	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
-+#endif
-+	cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
 +
-+	writel_relaxed(0, base + GICH_HCR);
-+
-+	for (i = 0; i < nr_lr; i++)
-+		cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
++	vcpu->arch.fault.hxfar = far;
++	vcpu->arch.fault.hpfar = hpfar;
++	return true;
 +}
 +
-+/* vcpu is already in the HYP VA space */
-+void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
-+	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
-+	struct vgic_dist *vgic = &kvm->arch.vgic;
-+	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
-+	int i, nr_lr;
+ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *host_ctxt;
+@@ -107,9 +157,13 @@ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ 	__banked_restore_state(guest_ctxt);
+ 
+ 	/* Jump in the fire! */
++again:
+ 	exit_code = __guest_enter(vcpu, host_ctxt);
+ 	/* And we're baaack! */
+ 
++	if (exit_code == ARM_EXCEPTION_HVC && !__populate_fault_info(vcpu))
++		goto again;
 +
-+	if (!base)
-+		return;
-+
-+	writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
-+	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
-+	writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
-+
-+	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
-+	for (i = 0; i < nr_lr; i++)
-+		writel_relaxed(cpu_if->vgic_lr[i], base + GICH_LR0 + (i * 4));
-+}
+ 	fp_enabled = __vfp_enabled();
+ 
+ 	__banked_save_state(guest_ctxt);
 -- 
 2.1.4
