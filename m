@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 01/21] arm/arm64: Add new is_kernel_in_hyp_mode predicate
-Date: Mon, 25 Jan 2016 15:53:35 +0000
-Message-ID: <1453737235-16522-2-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 03/21] arm64: Add ARM64_HAS_VIRT_HOST_EXTN feature
+Date: Mon, 25 Jan 2016 15:53:37 +0000
+Message-ID: <1453737235-16522-4-git-send-email-marc.zyngier@arm.com>
 References: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C627540B40
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B362F410EB
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id wIi2rSiEO5qz for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2016 10:49:24 -0500 (EST)
+ with ESMTP id BPh-dyNaDliM for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2016 10:49:29 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A1FF140B58
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1717540BDA
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 10:49:28 -0500 (EST)
 In-Reply-To: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,64 +31,78 @@ To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-With ARMv8.1 VHE extension, it will be possible to run the kernel
-at EL2 (aka HYP mode). In order for the kernel to easily find out
-where it is running, add a new predicate that returns whether or
-not the kernel is in HYP mode.
+Add a new ARM64_HAS_VIRT_HOST_EXTN features to indicate that the
+CPU has the ARMv8.1 VHE capability.
 
-For completeness, the 32bit code also get such a predicate (always
-returning false) so that code common to both architecture (timers,
-KVM) can use it transparently.
+This will be used to trigger kernel patching in KVM.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/virt.h   |  5 +++++
- arch/arm64/include/asm/virt.h | 10 ++++++++++
- 2 files changed, 15 insertions(+)
+ arch/arm64/include/asm/cpufeature.h |  3 ++-
+ arch/arm64/kernel/cpufeature.c      | 15 +++++++++++++--
+ 2 files changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm/include/asm/virt.h b/arch/arm/include/asm/virt.h
-index 4371f45..b6a3cef 100644
---- a/arch/arm/include/asm/virt.h
-+++ b/arch/arm/include/asm/virt.h
-@@ -74,6 +74,11 @@ static inline bool is_hyp_mode_mismatched(void)
- {
- 	return !!(__boot_cpu_mode & BOOT_CPU_MODE_MISMATCH);
- }
-+
-+static inline bool is_kernel_in_hyp_mode(void)
-+{
-+	return false;
-+}
- #endif
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 8f271b8..c705d6a 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -30,8 +30,9 @@
+ #define ARM64_HAS_LSE_ATOMICS			5
+ #define ARM64_WORKAROUND_CAVIUM_23154		6
+ #define ARM64_WORKAROUND_834220			7
++#define ARM64_HAS_VIRT_HOST_EXTN		8
  
- #endif /* __ASSEMBLY__ */
-diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-index 7a5df52..9f22dd6 100644
---- a/arch/arm64/include/asm/virt.h
-+++ b/arch/arm64/include/asm/virt.h
-@@ -23,6 +23,8 @@
+-#define ARM64_NCAPS				8
++#define ARM64_NCAPS				9
  
  #ifndef __ASSEMBLY__
  
-+#include <asm/ptrace.h>
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 5c90aa4..8d3961e 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -26,6 +26,9 @@
+ #include <asm/cpu_ops.h>
+ #include <asm/processor.h>
+ #include <asm/sysreg.h>
++#include <asm/virt.h>
 +
- /*
-  * __boot_cpu_mode records what mode CPUs were booted in.
-  * A correctly-implemented bootloader must start all CPUs in the same mode:
-@@ -50,6 +52,14 @@ static inline bool is_hyp_mode_mismatched(void)
- 	return __boot_cpu_mode[0] != __boot_cpu_mode[1];
++#include <linux/irqchip/arm-gic-v3.h>
+ 
+ unsigned long elf_hwcap __read_mostly;
+ EXPORT_SYMBOL_GPL(elf_hwcap);
+@@ -587,8 +590,6 @@ u64 read_system_reg(u32 id)
+ 	return regp->sys_val;
  }
  
-+static inline bool is_kernel_in_hyp_mode(void)
+-#include <linux/irqchip/arm-gic-v3.h>
+-
+ static bool
+ feature_matches(u64 reg, const struct arm64_cpu_capabilities *entry)
+ {
+@@ -621,6 +622,11 @@ static bool has_useable_gicv3_cpuif(const struct arm64_cpu_capabilities *entry)
+ 	return has_sre;
+ }
+ 
++static bool runs_at_el2(const struct arm64_cpu_capabilities *entry)
 +{
-+	u64 el;
-+
-+	asm("mrs %0, CurrentEL" : "=r" (el));
-+	return el == CurrentEL_EL2;
++	return is_kernel_in_hyp_mode();
 +}
 +
- /* The section containing the hypervisor text */
- extern char __hyp_text_start[];
- extern char __hyp_text_end[];
+ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 	{
+ 		.desc = "GIC system register CPU interface",
+@@ -651,6 +657,11 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.min_field_value = 2,
+ 	},
+ #endif /* CONFIG_AS_LSE && CONFIG_ARM64_LSE_ATOMICS */
++	{
++		.desc = "Virtualization Host Extensions",
++		.capability = ARM64_HAS_VIRT_HOST_EXTN,
++		.matches = runs_at_el2,
++	},
+ 	{},
+ };
+ 
 -- 
 2.1.4
