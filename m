@@ -1,107 +1,101 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 00/21] arm64: Virtualization Host Extension support
-Date: Mon, 25 Jan 2016 16:37:39 +0000
-Message-ID: <56A64F53.4000201@arm.com>
-References: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
- <20160125162613.GD22927@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0213F40BDA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:32:52 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7pETVR-RhsYx for <kvmarm@lists.cs.columbia.edu>;
- Mon, 25 Jan 2016 11:32:50 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A045040F90
- for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:32:50 -0500 (EST)
-In-Reply-To: <20160125162613.GD22927@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 00/27] ARM: KVM: Rewrite the world switch in C (mostly)
+Date: Mon, 25 Jan 2016 16:38:16 +0000
+Message-ID: <1453739923-17846-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 25/01/16 16:26, Will Deacon wrote:
-> On Mon, Jan 25, 2016 at 03:53:34PM +0000, Marc Zyngier wrote:
->> ARMv8.1 comes with the "Virtualization Host Extension" (VHE for
->> short), which enables simpler support of Type-2 hypervisors.
->>
->> This extension allows the kernel to directly run at EL2, and
->> significantly reduces the number of system registers shared between
->> host and guest, reducing the overhead of virtualization.
->>
->> In order to have the same kernel binary running on all versions of the
->> architecture, this series makes heavy use of runtime code patching.
->>
->> The first 20 patches massage the KVM code to deal with VHE and enable
->> Linux to run at EL2. The last patch catches an ugly case when VHE
->> capable CPUs are paired with some of their less capable siblings. This
->> should never happen, but hey...
->>
->> I have deliberately left out some of the more "advanced"
->> optimizations, as they are likely to distract the reviewer from the
->> core infrastructure, which is what I care about at the moment.
->>
->> A few things to note:
->>
->> - Given that the code has been almost entierely rewritten, I've
->>   dropped all Acks from the new patches
->>
->> - GDB is currently busted on VHE systems, as it checks for version 6
->>   on the debug architecture, while VHE is version 7. The binutils
->>   people are on the case.
-> 
-> [...]
-> 
->>  arch/arm/include/asm/virt.h          |   5 ++
->>  arch/arm/kvm/arm.c                   | 151 +++++++++++++++++++------------
->>  arch/arm/kvm/mmu.c                   |   7 ++
->>  arch/arm64/Kconfig                   |  13 +++
->>  arch/arm64/include/asm/cpufeature.h  |   3 +-
->>  arch/arm64/include/asm/kvm_arm.h     |   1 +
->>  arch/arm64/include/asm/kvm_emulate.h |   3 +
->>  arch/arm64/include/asm/kvm_mmu.h     |  34 ++++++-
->>  arch/arm64/include/asm/virt.h        |  27 ++++++
->>  arch/arm64/kernel/asm-offsets.c      |   3 -
->>  arch/arm64/kernel/cpufeature.c       |  15 +++-
->>  arch/arm64/kernel/head.S             |  51 ++++++++++-
->>  arch/arm64/kernel/smp.c              |   3 +
->>  arch/arm64/kvm/hyp-init.S            |  18 +---
->>  arch/arm64/kvm/hyp.S                 |   7 ++
->>  arch/arm64/kvm/hyp/entry.S           |   6 ++
->>  arch/arm64/kvm/hyp/hyp-entry.S       | 107 +++++++---------------
->>  arch/arm64/kvm/hyp/hyp.h             | 119 ++++++++++++++++++++++--
->>  arch/arm64/kvm/hyp/switch.c          | 170 +++++++++++++++++++++++++++++++----
->>  arch/arm64/kvm/hyp/sysreg-sr.c       | 147 ++++++++++++++++++++----------
->>  arch/arm64/kvm/hyp/timer-sr.c        |  10 +--
->>  drivers/clocksource/arm_arch_timer.c |  96 ++++++++++++--------
->>  22 files changed, 724 insertions(+), 272 deletions(-)
-> 
-> Have you tried hw_breakpoint/perf/ptrace with these changes? I was under
-> the impression that the debug architecture was aware of E2H and did need
-> some changes made. I know you say that GDB is broken anyway, but we should
-> check that the kernel does the right thing if userspace pokes it the
-> right way.
+Now that the arm64 rewrite is in mainline, I've taken a stab at fixing
+the 32bit code the same way. This is fairly straightforward (once
+you've been through it once...), with a few patches that adapt the
+code to be similar to the 64bit version.
 
-I did use HW breakpoints on the model by hacking the host kernel to
-return Debug Version 6 instead of 7, and things seem to work as
-expected. strace also works out of the box.
+Note that the timer and GIC code should be made common between the two
+architectures, as this is litterally the exact same code. I'm opened
+to suggestionsin that area, as we've never shared code that runs at
+HYP so far.
 
-As for perf, did you have something precise in mind?
+This has been tested on a Dual A7, and the code is pushed on a branch:
 
-Thanks,
+git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm/wsinc
 
 	M.
+
+Marc Zyngier (27):
+  ARM: KVM: Move the  HYP code to its own section
+  ARM: KVM: Remove __kvm_hyp_code_start/__kvm_hyp_code_end
+  ARM: KVM: Move VFP registers to a CPU context structure
+  ARM: KVM: Move CP15 array into the CPU context structure
+  ARM: KVM: Move GP registers into the CPU context structure
+  ARM: KVM: Add a HYP-specific header file
+  ARM: KVM: Add system register accessor macros
+  ARM: KVM: Add TLB invalidation code
+  ARM: KVM: Add CP15 save/restore code
+  ARM: KVM: Add timer save/restore
+  ARM: KVM: Add vgic v2 save/restore
+  ARM: KVM: Add VFP save/restore
+  ARM: KVM: Add banked registers save/restore
+  ARM: KVM: Add guest entry code
+  ARM: KVM: Add VFP lazy save/restore handler
+  ARM: KVM: Add the new world switch implementation
+  ARM: KVM: Add populating of fault data structure
+  ARM: KVM: Add HYP mode entry code
+  ARM: KVM: Add panic handling code
+  ARM: KVM: Change kvm_call_hyp return type to unsigned long
+  ARM: KVM: Remove the old world switch
+  ARM: KVM: Remove __weak attributes
+  ARM: KVM: Turn CP15 defines to an enum
+  ARM: KVM: Cleanup asm-offsets.c
+  ARM: KVM: Remove unused hyp_pc field
+  ARM: KVM: Remove handling of ARM_EXCEPTION_DATA/PREF_ABORT
+  ARM: KVM: Remove __kvm_hyp_exit/__kvm_hyp_exit_end
+
+ arch/arm/include/asm/kvm_asm.h     |  39 +--
+ arch/arm/include/asm/kvm_emulate.h |  15 +-
+ arch/arm/include/asm/kvm_host.h    |  60 +++-
+ arch/arm/include/asm/kvm_mmu.h     |   2 +-
+ arch/arm/include/asm/virt.h        |   4 +
+ arch/arm/kernel/asm-offsets.c      |  40 +--
+ arch/arm/kernel/vmlinux.lds.S      |   6 +
+ arch/arm/kvm/Makefile              |   1 +
+ arch/arm/kvm/arm.c                 |   2 +-
+ arch/arm/kvm/coproc.c              |  52 +--
+ arch/arm/kvm/coproc.h              |  16 +-
+ arch/arm/kvm/emulate.c             |  34 +-
+ arch/arm/kvm/guest.c               |   5 +-
+ arch/arm/kvm/handle_exit.c         |   7 -
+ arch/arm/kvm/hyp/Makefile          |  13 +
+ arch/arm/kvm/hyp/banked-sr.c       |  77 +++++
+ arch/arm/kvm/hyp/cp15-sr.c         |  84 +++++
+ arch/arm/kvm/hyp/entry.S           | 101 ++++++
+ arch/arm/kvm/hyp/hyp-entry.S       | 169 ++++++++++
+ arch/arm/kvm/hyp/hyp.h             | 128 ++++++++
+ arch/arm/kvm/hyp/switch.c          | 228 +++++++++++++
+ arch/arm/kvm/hyp/timer-sr.c        |  71 ++++
+ arch/arm/kvm/hyp/tlb.c             |  71 ++++
+ arch/arm/kvm/hyp/vfp.S             |  68 ++++
+ arch/arm/kvm/hyp/vgic-v2-sr.c      |  84 +++++
+ arch/arm/kvm/interrupts.S          | 480 +--------------------------
+ arch/arm/kvm/interrupts_head.S     | 648 -------------------------------------
+ arch/arm/kvm/reset.c               |   2 +-
+ arch/arm64/include/asm/kvm_asm.h   |   3 -
+ 29 files changed, 1225 insertions(+), 1285 deletions(-)
+ create mode 100644 arch/arm/kvm/hyp/Makefile
+ create mode 100644 arch/arm/kvm/hyp/banked-sr.c
+ create mode 100644 arch/arm/kvm/hyp/cp15-sr.c
+ create mode 100644 arch/arm/kvm/hyp/entry.S
+ create mode 100644 arch/arm/kvm/hyp/hyp-entry.S
+ create mode 100644 arch/arm/kvm/hyp/hyp.h
+ create mode 100644 arch/arm/kvm/hyp/switch.c
+ create mode 100644 arch/arm/kvm/hyp/timer-sr.c
+ create mode 100644 arch/arm/kvm/hyp/tlb.c
+ create mode 100644 arch/arm/kvm/hyp/vfp.S
+ create mode 100644 arch/arm/kvm/hyp/vgic-v2-sr.c
+ delete mode 100644 arch/arm/kvm/interrupts_head.S
+
 -- 
-Jazz is not dead. It just smells funny...
+2.1.4
+
