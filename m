@@ -1,37 +1,145 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 27/27] ARM: KVM: Remove __kvm_hyp_exit/__kvm_hyp_exit_end
-Date: Mon, 25 Jan 2016 16:38:43 +0000
-Message-ID: <1453739923-17846-28-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 14/27] ARM: KVM: Add guest entry code
+Date: Mon, 25 Jan 2016 16:38:30 +0000
+Message-ID: <1453739923-17846-15-git-send-email-marc.zyngier@arm.com>
 References: <1453739923-17846-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D0E7540B58
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:17 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id V4WP0FryO4yf for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2016 11:34:16 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B42941145
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:13 -0500 (EST)
 In-Reply-To: <1453739923-17846-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-I have no idea what these were for - probably a leftover from an
-early implementation. Good bye!
+Add the very minimal piece of code that is now required to jump
+into the guest (and return from it). This code is only concerned
+with save/restoring the USR registers (r0-r12+lr for the guest,
+r4-r12+lr for the host), as everything else is dealt with in C
+(VFP is another matter though).
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_asm.h | 3 ---
- 1 file changed, 3 deletions(-)
+ arch/arm/kvm/hyp/Makefile |  1 +
+ arch/arm/kvm/hyp/entry.S  | 70 +++++++++++++++++++++++++++++++++++++++++++++++
+ arch/arm/kvm/hyp/hyp.h    |  2 ++
+ 3 files changed, 73 insertions(+)
+ create mode 100644 arch/arm/kvm/hyp/entry.S
 
-diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
-index 0895f5b..80f4e4a 100644
---- a/arch/arm/include/asm/kvm_asm.h
-+++ b/arch/arm/include/asm/kvm_asm.h
-@@ -55,9 +55,6 @@ struct kvm_vcpu;
- extern char __kvm_hyp_init[];
- extern char __kvm_hyp_init_end[];
+diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
+index 173bd1d..c779690 100644
+--- a/arch/arm/kvm/hyp/Makefile
++++ b/arch/arm/kvm/hyp/Makefile
+@@ -8,3 +8,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += vfp.o
+ obj-$(CONFIG_KVM_ARM_HOST) += banked-sr.o
++obj-$(CONFIG_KVM_ARM_HOST) += entry.o
+diff --git a/arch/arm/kvm/hyp/entry.S b/arch/arm/kvm/hyp/entry.S
+new file mode 100644
+index 0000000..32f79b0
+--- /dev/null
++++ b/arch/arm/kvm/hyp/entry.S
+@@ -0,0 +1,70 @@
++/*
++ * Copyright (C) 2016 - ARM Ltd
++ * Author: Marc Zyngier <marc.zyngier@arm.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++*/
++
++#include <linux/linkage.h>
++#include <asm/asm-offsets.h>
++#include <asm/kvm_arm.h>
++
++	.arch_extension     virt
++
++	.text
++	.pushsection	.hyp.text, "ax"
++
++#define USR_REGS_OFFSET		(CPU_CTXT_GP_REGS + GP_REGS_USR)
++
++/* int __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host) */
++ENTRY(__guest_enter)
++	@ Save host registers
++	add	r1, r1, #(USR_REGS_OFFSET + S_R4)
++	stm	r1!, {r4-r12}
++	str	lr, [r1, #4]	@ Skip SP_usr (already saved)
++
++	@ Restore guest registers
++	add	r0, r0,  #(VCPU_GUEST_CTXT + USR_REGS_OFFSET + S_R0)
++	ldr	lr, [r0, #S_LR]
++	ldm	r0, {r0-r12}
++
++	clrex
++	eret
++ENDPROC(__guest_enter)
++
++ENTRY(__guest_exit)
++	/*
++	 * return convention:
++	 * guest r0, r1, r2 saved on the stack
++	 * r0: vcpu pointer
++	 * r1: exception code
++	 */
++
++	add	r2, r0, #(VCPU_GUEST_CTXT + USR_REGS_OFFSET + S_R3)
++	stm	r2!, {r3-r12}
++	str	lr, [r2, #4]
++	add	r2, r0, #(VCPU_GUEST_CTXT + USR_REGS_OFFSET + S_R0)
++	pop	{r3, r4, r5}		@ r0, r1, r2
++	stm	r2, {r3-r5}
++
++	ldr	r0, [r0, #VCPU_HOST_CTXT]
++	add	r0, r0, #(USR_REGS_OFFSET + S_R4)
++	ldm	r0!, {r4-r12}
++	ldr	lr, [r0, #4]
++
++	mov	r0, r1
++	bx	lr
++ENDPROC(__guest_exit)
++
++	.popsection
++
+diff --git a/arch/arm/kvm/hyp/hyp.h b/arch/arm/kvm/hyp/hyp.h
+index 278eb1f..b3f6ed2 100644
+--- a/arch/arm/kvm/hyp/hyp.h
++++ b/arch/arm/kvm/hyp/hyp.h
+@@ -110,4 +110,6 @@ static inline bool __vfp_enabled(void)
+ void __hyp_text __banked_save_state(struct kvm_cpu_context *ctxt);
+ void __hyp_text __banked_restore_state(struct kvm_cpu_context *ctxt);
  
--extern char __kvm_hyp_exit[];
--extern char __kvm_hyp_exit_end[];
--
- extern char __kvm_hyp_vector[];
- 
- extern void __kvm_flush_vm_context(void);
++int asmlinkage __guest_enter(struct kvm_vcpu *vcpu,
++			     struct kvm_cpu_context *host);
+ #endif /* __ARM_KVM_HYP_H__ */
 -- 
 2.1.4
-
