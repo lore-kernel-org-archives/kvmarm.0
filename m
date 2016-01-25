@@ -1,67 +1,157 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 02/27] ARM: KVM: Remove __kvm_hyp_code_start/__kvm_hyp_code_end
-Date: Mon, 25 Jan 2016 16:38:18 +0000
-Message-ID: <1453739923-17846-3-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 01/27] ARM: KVM: Move the  HYP code to its own section
+Date: Mon, 25 Jan 2016 16:38:17 +0000
+Message-ID: <1453739923-17846-2-git-send-email-marc.zyngier@arm.com>
 References: <1453739923-17846-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 80E0140F90
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:01 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id CJInzkxgO+nj for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2016 11:34:00 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B93540B58
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:34:00 -0500 (EST)
 In-Reply-To: <1453739923-17846-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that we've unified the way we refer to the HYP text between
-arm and arm64, drop __kvm_hyp_code_start/end, and just use the
-__hyp_text_start/end symbols.
+In order to be able to spread the HYP code into multiple compilation
+units, adopt a layout similar to that of arm64:
+- the HYP text is emited in its own section (.hyp.text)
+- two linker generated symbols are use to identify the boundaries
+  of that section
+
+No functionnal change.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_asm.h   | 3 ---
- arch/arm/kvm/arm.c               | 2 +-
- arch/arm64/include/asm/kvm_asm.h | 3 ---
- 3 files changed, 1 insertion(+), 7 deletions(-)
+ arch/arm/include/asm/kvm_asm.h |  6 ++++--
+ arch/arm/include/asm/virt.h    |  4 ++++
+ arch/arm/kernel/vmlinux.lds.S  |  6 ++++++
+ arch/arm/kvm/interrupts.S      | 13 +++++--------
+ 4 files changed, 19 insertions(+), 10 deletions(-)
 
 diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
-index fa2fd25..4841225 100644
+index 194c91b..fa2fd25 100644
 --- a/arch/arm/include/asm/kvm_asm.h
 +++ b/arch/arm/include/asm/kvm_asm.h
-@@ -93,9 +93,6 @@ extern char __kvm_hyp_exit_end[];
+@@ -19,6 +19,8 @@
+ #ifndef __ARM_KVM_ASM_H__
+ #define __ARM_KVM_ASM_H__
+ 
++#include <asm/virt.h>
++
+ /* 0 is reserved as an invalid value. */
+ #define c0_MPIDR	1	/* MultiProcessor ID Register */
+ #define c0_CSSELR	2	/* Cache Size Selection Register */
+@@ -91,8 +93,8 @@ extern char __kvm_hyp_exit_end[];
  
  extern char __kvm_hyp_vector[];
  
--#define	__kvm_hyp_code_start	__hyp_text_start
--#define __kvm_hyp_code_end	__hyp_text_end
--
+-extern char __kvm_hyp_code_start[];
+-extern char __kvm_hyp_code_end[];
++#define	__kvm_hyp_code_start	__hyp_text_start
++#define __kvm_hyp_code_end	__hyp_text_end
+ 
  extern void __kvm_flush_vm_context(void);
  extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
- extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index dda1959..0a26d20 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -1074,7 +1074,7 @@ static int init_hyp_mode(void)
- 	/*
- 	 * Map the Hyp-code called directly from the host
- 	 */
--	err = create_hyp_mappings(__kvm_hyp_code_start, __kvm_hyp_code_end);
-+	err = create_hyp_mappings(__hyp_text_start, __hyp_text_end);
- 	if (err) {
- 		kvm_err("Cannot map world-switch code\n");
- 		goto out_free_mappings;
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 52b777b..2ad8930 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -35,9 +35,6 @@ extern char __kvm_hyp_init_end[];
+diff --git a/arch/arm/include/asm/virt.h b/arch/arm/include/asm/virt.h
+index 4371f45..5fdbfea 100644
+--- a/arch/arm/include/asm/virt.h
++++ b/arch/arm/include/asm/virt.h
+@@ -74,6 +74,10 @@ static inline bool is_hyp_mode_mismatched(void)
+ {
+ 	return !!(__boot_cpu_mode & BOOT_CPU_MODE_MISMATCH);
+ }
++
++/* The section containing the hypervisor text */
++extern char __hyp_text_start[];
++extern char __hyp_text_end[];
+ #endif
  
- extern char __kvm_hyp_vector[];
+ #endif /* __ASSEMBLY__ */
+diff --git a/arch/arm/kernel/vmlinux.lds.S b/arch/arm/kernel/vmlinux.lds.S
+index 8b60fde..b4139cb 100644
+--- a/arch/arm/kernel/vmlinux.lds.S
++++ b/arch/arm/kernel/vmlinux.lds.S
+@@ -18,6 +18,11 @@
+ 	*(.proc.info.init)						\
+ 	VMLINUX_SYMBOL(__proc_info_end) = .;
  
--#define	__kvm_hyp_code_start	__hyp_text_start
--#define	__kvm_hyp_code_end	__hyp_text_end
++#define HYPERVISOR_TEXT							\
++	VMLINUX_SYMBOL(__hyp_text_start) = .;				\
++	*(.hyp.text)							\
++	VMLINUX_SYMBOL(__hyp_text_end) = .;
++
+ #define IDMAP_TEXT							\
+ 	ALIGN_FUNCTION();						\
+ 	VMLINUX_SYMBOL(__idmap_text_start) = .;				\
+@@ -108,6 +113,7 @@ SECTIONS
+ 			TEXT_TEXT
+ 			SCHED_TEXT
+ 			LOCK_TEXT
++			HYPERVISOR_TEXT
+ 			KPROBES_TEXT
+ 			*(.gnu.warning)
+ 			*(.glue_7)
+diff --git a/arch/arm/kvm/interrupts.S b/arch/arm/kvm/interrupts.S
+index 900ef6d..9d9cb71 100644
+--- a/arch/arm/kvm/interrupts.S
++++ b/arch/arm/kvm/interrupts.S
+@@ -28,9 +28,7 @@
+ #include "interrupts_head.S"
+ 
+ 	.text
 -
- extern void __kvm_flush_vm_context(void);
- extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
- extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
+-__kvm_hyp_code_start:
+-	.globl __kvm_hyp_code_start
++	.pushsection	.hyp.text, "ax"
+ 
+ /********************************************************************
+  * Flush per-VMID TLBs
+@@ -314,8 +312,6 @@ THUMB(	orr	r2, r2, #PSR_T_BIT	)
+ 	eret
+ .endm
+ 
+-	.text
+-
+ 	.align 5
+ __kvm_hyp_vector:
+ 	.globl __kvm_hyp_vector
+@@ -511,10 +507,9 @@ hyp_fiq:
+ 
+ 	.ltorg
+ 
+-__kvm_hyp_code_end:
+-	.globl	__kvm_hyp_code_end
++	.popsection
+ 
+-	.section ".rodata"
++	.pushsection ".rodata"
+ 
+ und_die_str:
+ 	.ascii	"unexpected undefined exception in Hyp mode at: %#08x\n"
+@@ -524,3 +519,5 @@ dabt_die_str:
+ 	.ascii	"unexpected data abort in Hyp mode at: %#08x\n"
+ svc_die_str:
+ 	.ascii	"unexpected HVC/SVC trap in Hyp mode at: %#08x\n"
++
++	.popsection
 -- 
 2.1.4
-
