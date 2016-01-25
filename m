@@ -1,91 +1,50 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v2 00/21] arm64: Virtualization Host Extension support
-Date: Mon, 25 Jan 2016 16:44:36 +0000
-Message-ID: <20160125164435.GG22927@arm.com>
-References: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
- <20160125162613.GD22927@arm.com>
- <56A64F53.4000201@arm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v9 19/21] KVM: ARM64: Add a new feature bit for PMUv3
+Date: Mon, 25 Jan 2016 16:47:29 +0000
+Message-ID: <CAFEAcA_fyEp3tihjbCyQBzU6vex4273Sp78J4Kg1UXkkyX+1Pg@mail.gmail.com>
+References: <1452839275-19368-1-git-send-email-zhaoshenglong@huawei.com>
+ <1452839275-19368-20-git-send-email-zhaoshenglong@huawei.com>
+ <20160115110816.GE3915@hawk.localdomain> <569DE171.1070602@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <56A64F53.4000201@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 752C340C9D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:42:59 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id oCC7qJM1NPO2 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 25 Jan 2016 11:42:57 -0500 (EST)
+Received: from mail-vk0-f45.google.com (mail-vk0-f45.google.com
+ [209.85.213.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8836340B58
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 11:42:57 -0500 (EST)
+Received: by mail-vk0-f45.google.com with SMTP id e185so76769797vkb.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 25 Jan 2016 08:47:49 -0800 (PST)
+In-Reply-To: <569DE171.1070602@huawei.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, Will Deacon <will.deacon@arm.com>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Jan 25, 2016 at 04:37:39PM +0000, Marc Zyngier wrote:
-> On 25/01/16 16:26, Will Deacon wrote:
-> > On Mon, Jan 25, 2016 at 03:53:34PM +0000, Marc Zyngier wrote:
-> >> ARMv8.1 comes with the "Virtualization Host Extension" (VHE for
-> >> short), which enables simpler support of Type-2 hypervisors.
-> >>
-> >> This extension allows the kernel to directly run at EL2, and
-> >> significantly reduces the number of system registers shared between
-> >> host and guest, reducing the overhead of virtualization.
-> >>
-> >> In order to have the same kernel binary running on all versions of the
-> >> architecture, this series makes heavy use of runtime code patching.
-> >>
-> >> The first 20 patches massage the KVM code to deal with VHE and enable
-> >> Linux to run at EL2. The last patch catches an ugly case when VHE
-> >> capable CPUs are paired with some of their less capable siblings. This
-> >> should never happen, but hey...
-> >>
-> >> I have deliberately left out some of the more "advanced"
-> >> optimizations, as they are likely to distract the reviewer from the
-> >> core infrastructure, which is what I care about at the moment.
-> >>
-> >> A few things to note:
-> >>
-> >> - Given that the code has been almost entierely rewritten, I've
-> >>   dropped all Acks from the new patches
-> >>
-> >> - GDB is currently busted on VHE systems, as it checks for version 6
-> >>   on the debug architecture, while VHE is version 7. The binutils
-> >>   people are on the case.
-> > 
-> > [...]
-> > 
-> >>  arch/arm/include/asm/virt.h          |   5 ++
-> >>  arch/arm/kvm/arm.c                   | 151 +++++++++++++++++++------------
-> >>  arch/arm/kvm/mmu.c                   |   7 ++
-> >>  arch/arm64/Kconfig                   |  13 +++
-> >>  arch/arm64/include/asm/cpufeature.h  |   3 +-
-> >>  arch/arm64/include/asm/kvm_arm.h     |   1 +
-> >>  arch/arm64/include/asm/kvm_emulate.h |   3 +
-> >>  arch/arm64/include/asm/kvm_mmu.h     |  34 ++++++-
-> >>  arch/arm64/include/asm/virt.h        |  27 ++++++
-> >>  arch/arm64/kernel/asm-offsets.c      |   3 -
-> >>  arch/arm64/kernel/cpufeature.c       |  15 +++-
-> >>  arch/arm64/kernel/head.S             |  51 ++++++++++-
-> >>  arch/arm64/kernel/smp.c              |   3 +
-> >>  arch/arm64/kvm/hyp-init.S            |  18 +---
-> >>  arch/arm64/kvm/hyp.S                 |   7 ++
-> >>  arch/arm64/kvm/hyp/entry.S           |   6 ++
-> >>  arch/arm64/kvm/hyp/hyp-entry.S       | 107 +++++++---------------
-> >>  arch/arm64/kvm/hyp/hyp.h             | 119 ++++++++++++++++++++++--
-> >>  arch/arm64/kvm/hyp/switch.c          | 170 +++++++++++++++++++++++++++++++----
-> >>  arch/arm64/kvm/hyp/sysreg-sr.c       | 147 ++++++++++++++++++++----------
-> >>  arch/arm64/kvm/hyp/timer-sr.c        |  10 +--
-> >>  drivers/clocksource/arm_arch_timer.c |  96 ++++++++++++--------
-> >>  22 files changed, 724 insertions(+), 272 deletions(-)
-> > 
-> > Have you tried hw_breakpoint/perf/ptrace with these changes? I was under
-> > the impression that the debug architecture was aware of E2H and did need
-> > some changes made. I know you say that GDB is broken anyway, but we should
-> > check that the kernel does the right thing if userspace pokes it the
-> > right way.
-> 
-> I did use HW breakpoints on the model by hacking the host kernel to
-> return Debug Version 6 instead of 7, and things seem to work as
-> expected. strace also works out of the box.
-> 
-> As for perf, did you have something precise in mind?
+On 19 January 2016 at 07:10, Shannon Zhao <zhaoshenglong@huawei.com> wrote:
+> Yes, for checking the CAP true/false is enough. Maybe I think the number
+> of host counters could be useful for QEMU to know the number and for
+> supporting cross-type vcpu, but I'm not sure. If someone else has no
+> other suggestion, I will change it to what you suggest.
 
-It would be worth trying things like the filter options on perf events
-(perf stat -e cycles:k to count cycles in kernel space) and also
-breakpoints (perf stat -e mem:<addr>:rwx on kernel addresses).
+Do we care about the number of host counters? We might want to
+know how many counters the guest sees, but we can do that by
+using KVM_GET_ONE_REG to look at the guest PMCR_EL0, right?
 
-Will
+thanks
+-- PMM
