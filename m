@@ -1,24 +1,24 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH 01/10] iommu: Add DOMAIN_ATTR_MSI_MAPPING attribute
-Date: Tue, 26 Jan 2016 13:12:39 +0000
-Message-ID: <1453813968-2024-2-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH 04/10] vfio: introduce VFIO_IOVA_RESERVED vfio_dma type
+Date: Tue, 26 Jan 2016 13:12:42 +0000
+Message-ID: <1453813968-2024-5-git-send-email-eric.auger@linaro.org>
 References: <1453813968-2024-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 28A3340B58
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2016 08:08:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F15A40FA2
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2016 08:08:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zBmJF-ku6pOp for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Jan 2016 08:08:28 -0500 (EST)
-Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 16E25409A2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2016 08:08:27 -0500 (EST)
-Received: by mail-wm0-f43.google.com with SMTP id 123so105328151wmz.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2016 05:13:23 -0800 (PST)
+ with ESMTP id W09QWtQsHRMm for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 26 Jan 2016 08:08:36 -0500 (EST)
+Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9A4DB412A6
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2016 08:08:36 -0500 (EST)
+Received: by mail-wm0-f45.google.com with SMTP id u188so105678791wmu.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2016 05:13:31 -0800 (PST)
 In-Reply-To: <1453813968-2024-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,72 +33,64 @@ To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, will.d
 Cc: patches@linaro.org, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Introduce new DOMAIN_ATTR_MSI_MAPPING domain attribute. If supported,
-this means the MSI addresses need to be mapped in the IOMMU. ARM SMMUS
-and FSL PAMU, at least expose this attribute.
+We introduce a vfio_dma type since we will need to discriminate
+legacy vfio_dma's from new reserved ones. Since those latter are
+not mapped at registration, some handlings must be unplugged:
+removal, replay. They will be enhanced later on.
 
-x86 IOMMUs typically don't expose the attribute since on x86 MSI write
-transaction addresses always are within the 1MB PA region [FEE0_0000h -
-FEF0_000h] window which directly targets the APIC configuration space and
-hence bypass the sMMU.
-
-Signed-off-by: Bharat Bhushan <Bharat.Bhushan@freescale.com>
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
-
 ---
+ drivers/vfio/vfio_iommu_type1.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-to be honest I wonder whether this is property of the sMMU? Isn't it
-a platform property?
-
-RFC v1 -> RFC v2:
-- the data field is not used
-- for this attribute domain_get_attr simply returns 0 if the MSI_MAPPING
-  capability if needed or <0 if not.
-- removed struct iommu_domain_msi_maps
----
- drivers/iommu/arm-smmu.c        | 2 ++
- drivers/iommu/fsl_pamu_domain.c | 3 +++
- include/linux/iommu.h           | 1 +
- 3 files changed, 6 insertions(+)
-
-diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
-index 59ee4b8..c8b7e71 100644
---- a/drivers/iommu/arm-smmu.c
-+++ b/drivers/iommu/arm-smmu.c
-@@ -1409,6 +1409,8 @@ static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
- 	case DOMAIN_ATTR_NESTING:
- 		*(int *)data = (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED);
- 		return 0;
-+	case DOMAIN_ATTR_MSI_MAPPING:
-+		return 0;
- 	default:
- 		return -ENODEV;
- 	}
-diff --git a/drivers/iommu/fsl_pamu_domain.c b/drivers/iommu/fsl_pamu_domain.c
-index da0e1e3..dd2e0d6 100644
---- a/drivers/iommu/fsl_pamu_domain.c
-+++ b/drivers/iommu/fsl_pamu_domain.c
-@@ -856,6 +856,9 @@ static int fsl_pamu_get_domain_attr(struct iommu_domain *domain,
- 	case DOMAIN_ATTR_FSL_PAMUV1:
- 		*(int *)data = DOMAIN_ATTR_FSL_PAMUV1;
- 		break;
-+	case DOMAIN_ATTR_MSI_MAPPING:
-+		ret = 0;
-+		break;
- 	default:
- 		pr_debug("Unsupported attribute type\n");
- 		ret = -EINVAL;
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index f28dff3..3ae2fb6 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -112,6 +112,7 @@ enum iommu_attr {
- 	DOMAIN_ATTR_FSL_PAMU_ENABLE,
- 	DOMAIN_ATTR_FSL_PAMUV1,
- 	DOMAIN_ATTR_NESTING,	/* two stages of translation */
-+	DOMAIN_ATTR_MSI_MAPPING, /* Require MSIs mapping in iommu */
- 	DOMAIN_ATTR_MAX,
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 32438d9..33a9ce4 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -53,6 +53,15 @@ module_param_named(disable_hugepages,
+ MODULE_PARM_DESC(disable_hugepages,
+ 		 "Disable VFIO IOMMU support for IOMMU hugepages.");
+ 
++enum vfio_iova_type {
++	VFIO_IOVA_USER = 0, /* standard IOVA used to map user vaddr */
++	/*
++	 * IOVA reserved to map special host physical addresses,
++	 * MSI frames for instance
++	 */
++	VFIO_IOVA_RESERVED,
++};
++
+ struct vfio_iommu {
+ 	struct list_head	domain_list;
+ 	struct mutex		lock;
+@@ -78,6 +87,7 @@ struct vfio_dma {
+ 	unsigned long		vaddr;		/* Process virtual addr */
+ 	size_t			size;		/* Map size (bytes) */
+ 	int			prot;		/* IOMMU_READ/WRITE */
++	enum vfio_iova_type	type;		/* type of IOVA */
  };
  
+ struct vfio_reserved_binding {
+@@ -480,7 +490,8 @@ static void vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma)
+ 
+ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+ {
+-	vfio_unmap_unpin(iommu, dma);
++	if (likely(dma->type != VFIO_IOVA_RESERVED))
++		vfio_unmap_unpin(iommu, dma);
+ 	vfio_unlink_dma(iommu, dma);
+ 	kfree(dma);
+ }
+@@ -756,6 +767,10 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
+ 		dma_addr_t iova;
+ 
+ 		dma = rb_entry(n, struct vfio_dma, node);
++
++		if (unlikely(dma->type == VFIO_IOVA_RESERVED))
++			continue;
++
+ 		iova = dma->iova;
+ 
+ 		while (iova < dma->iova + dma->size) {
 -- 
 1.9.1
