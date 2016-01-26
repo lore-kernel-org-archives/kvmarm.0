@@ -1,96 +1,144 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH 04/10] vfio: introduce VFIO_IOVA_RESERVED vfio_dma type
-Date: Tue, 26 Jan 2016 13:12:42 +0000
-Message-ID: <1453813968-2024-5-git-send-email-eric.auger@linaro.org>
+From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: [PATCH 03/10] vfio_iommu_type1: add reserved binding RB tree
+	management
+Date: Tue, 26 Jan 2016 13:12:41 +0000
+Message-ID: <1453813968-2024-4-git-send-email-eric.auger@linaro.org>
 References: <1453813968-2024-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F15A40FA2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2016 08:08:37 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id W09QWtQsHRMm for <kvmarm@lists.cs.columbia.edu>;
- Tue, 26 Jan 2016 08:08:36 -0500 (EST)
-Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9A4DB412A6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2016 08:08:36 -0500 (EST)
-Received: by mail-wm0-f45.google.com with SMTP id u188so105678791wmu.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2016 05:13:31 -0800 (PST)
-In-Reply-To: <1453813968-2024-1-git-send-email-eric.auger@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, will.deacon@arm.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: patches@linaro.org, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <1453813968-2024-1-git-send-email-eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: eric.auger-qxv4g6HH51o@public.gmane.org, eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We introduce a vfio_dma type since we will need to discriminate
-legacy vfio_dma's from new reserved ones. Since those latter are
-not mapped at registration, some handlings must be unplugged:
-removal, replay. They will be enhanced later on.
+Legacy dma_list is just used to insert the reserved iova region and
+check mapping of reserved iova happens in this window. As opposed to
+other vfio_dma slots, the reserved one is not necessarily mapped.
 
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
+We will need to track which host physical addresses are mapped to
+reserved IOVA. In that prospect we introduce a new RB tree indexed
+by physical address. This reverse RB tree only is used for reserved
+IOVA bindings. It belongs to a given iommu domain.
+
+It is expected this RB tree will contain very few bindings. Those
+generally correspond to single page mapping one MSI frame (at least
+for ARM, containing the GICv2m frame or ITS GITS_TRANSLATER frame.
+
+Signed-off-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 ---
- drivers/vfio/vfio_iommu_type1.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ drivers/vfio/vfio_iommu_type1.c | 63 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 63 insertions(+)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 32438d9..33a9ce4 100644
+index c5b57e1..32438d9 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -53,6 +53,15 @@ module_param_named(disable_hugepages,
- MODULE_PARM_DESC(disable_hugepages,
- 		 "Disable VFIO IOMMU support for IOMMU hugepages.");
- 
-+enum vfio_iova_type {
-+	VFIO_IOVA_USER = 0, /* standard IOVA used to map user vaddr */
-+	/*
-+	 * IOVA reserved to map special host physical addresses,
-+	 * MSI frames for instance
-+	 */
-+	VFIO_IOVA_RESERVED,
-+};
-+
+@@ -56,6 +56,7 @@ MODULE_PARM_DESC(disable_hugepages,
  struct vfio_iommu {
  	struct list_head	domain_list;
  	struct mutex		lock;
-@@ -78,6 +87,7 @@ struct vfio_dma {
- 	unsigned long		vaddr;		/* Process virtual addr */
- 	size_t			size;		/* Map size (bytes) */
++	/* rb tree indexed by IOVA */
+ 	struct rb_root		dma_list;
+ 	bool			v2;
+ 	bool			nesting;
+@@ -65,6 +66,8 @@ struct vfio_domain {
+ 	struct iommu_domain	*domain;
+ 	struct list_head	next;
+ 	struct list_head	group_list;
++	/* rb tree indexed by PA, for reserved bindings only */
++	struct rb_root		reserved_binding_list;
+ 	int			prot;		/* IOMMU_CACHE */
+ 	bool			fgsp;		/* Fine-grained super pages */
+ };
+@@ -77,11 +80,70 @@ struct vfio_dma {
  	int			prot;		/* IOMMU_READ/WRITE */
-+	enum vfio_iova_type	type;		/* type of IOVA */
  };
  
- struct vfio_reserved_binding {
-@@ -480,7 +490,8 @@ static void vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma)
- 
- static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
- {
--	vfio_unmap_unpin(iommu, dma);
-+	if (likely(dma->type != VFIO_IOVA_RESERVED))
-+		vfio_unmap_unpin(iommu, dma);
- 	vfio_unlink_dma(iommu, dma);
- 	kfree(dma);
- }
-@@ -756,6 +767,10 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 		dma_addr_t iova;
- 
- 		dma = rb_entry(n, struct vfio_dma, node);
++struct vfio_reserved_binding {
++	struct kref 		kref;
++	struct rb_node		node;
++	struct vfio_domain	*domain;
++	phys_addr_t		addr;
++	dma_addr_t		iova;
++	size_t			size;
++};
 +
-+		if (unlikely(dma->type == VFIO_IOVA_RESERVED))
-+			continue;
-+
- 		iova = dma->iova;
+ struct vfio_group {
+ 	struct iommu_group	*iommu_group;
+ 	struct list_head	next;
+ };
  
- 		while (iova < dma->iova + dma->size) {
++/* Reserved binding RB-tree manipulation */
++
++static struct vfio_reserved_binding *vfio_find_reserved_binding(
++				    struct vfio_domain *d,
++				    phys_addr_t start, size_t size)
++{
++	struct rb_node *node = d->reserved_binding_list.rb_node;
++
++	while (node) {
++		struct vfio_reserved_binding *binding =
++			rb_entry(node, struct vfio_reserved_binding, node);
++
++		if (start + size <= binding->addr)
++			node = node->rb_left;
++		else if (start >= binding->addr + binding->size)
++			node = node->rb_right;
++		else
++			return binding;
++	}
++
++	return NULL;
++}
++
++static void vfio_link_reserved_binding(struct vfio_domain *d,
++				       struct vfio_reserved_binding *new)
++{
++	struct rb_node **link = &d->reserved_binding_list.rb_node;
++	struct rb_node *parent = NULL;
++	struct vfio_reserved_binding *binding;
++
++	while (*link) {
++		parent = *link;
++		binding = rb_entry(parent, struct vfio_reserved_binding, node);
++
++		if (new->addr + new->size <= binding->addr)
++			link = &(*link)->rb_left;
++		else
++			link = &(*link)->rb_right;
++	}
++
++	rb_link_node(&new->node, parent, link);
++	rb_insert_color(&new->node, &d->reserved_binding_list);
++}
++
++static void vfio_unlink_reserved_binding(struct vfio_domain *d,
++					 struct vfio_reserved_binding *old)
++{
++	rb_erase(&old->node, &d->reserved_binding_list);
++}
++
+ /*
+  * This code handles mapping and unmapping of user data buffers
+  * into DMA'ble space using the IOMMU
+@@ -784,6 +846,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 		ret = -ENOMEM;
+ 		goto out_free;
+ 	}
++	domain->reserved_binding_list = RB_ROOT;
+ 
+ 	group->iommu_group = iommu_group;
+ 
 -- 
 1.9.1
