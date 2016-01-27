@@ -1,22 +1,21 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v10 18/21] KVM: ARM64: Free perf event of PMU when destroying
- vcpu
-Date: Wed, 27 Jan 2016 11:51:46 +0800
-Message-ID: <1453866709-20324-19-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v10 17/21] KVM: ARM64: Reset PMU state when resetting vcpu
+Date: Wed, 27 Jan 2016 11:51:45 +0800
+Message-ID: <1453866709-20324-18-git-send-email-zhaoshenglong@huawei.com>
 References: <1453866709-20324-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 93F8B40FA2
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BA8A407A6
  for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2016 22:48:05 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eHcrv0OBedR7 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id 4HzwHjMBoIgm for <kvmarm@lists.cs.columbia.edu>;
  Tue, 26 Jan 2016 22:48:03 -0500 (EST)
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [119.145.14.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 618DB407A6
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 61887407A0
  for <kvmarm@lists.cs.columbia.edu>; Tue, 26 Jan 2016 22:48:01 -0500 (EST)
 In-Reply-To: <1453866709-20324-1-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -34,74 +33,72 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-When KVM frees VCPU, it needs to free the perf_event of PMU.
+When resetting vcpu, it needs to reset the PMU state to initial status.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/arm.c    |  1 +
- include/kvm/arm_pmu.h |  2 ++
- virt/kvm/arm/pmu.c    | 21 +++++++++++++++++++++
- 3 files changed, 24 insertions(+)
+ arch/arm64/kvm/reset.c |  3 +++
+ include/kvm/arm_pmu.h  |  2 ++
+ virt/kvm/arm/pmu.c     | 17 +++++++++++++++++
+ 3 files changed, 22 insertions(+)
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index f54264c..d2c2cc3 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -266,6 +266,7 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
- 	kvm_mmu_free_memory_caches(vcpu);
- 	kvm_timer_vcpu_terminate(vcpu);
- 	kvm_vgic_vcpu_destroy(vcpu);
-+	kvm_pmu_vcpu_destroy(vcpu);
- 	kmem_cache_free(kvm_vcpu_cache, vcpu);
- }
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index f34745c..dfbce78 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -120,6 +120,9 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	/* Reset system registers */
+ 	kvm_reset_sys_regs(vcpu);
  
++	/* Reset PMU */
++	kvm_pmu_vcpu_reset(vcpu);
++
+ 	/* Reset timer */
+ 	return kvm_timer_vcpu_reset(vcpu, cpu_vtimer_irq);
+ }
 diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 4394e0c..d90fc65 100644
+index fbc42fd..4394e0c 100644
 --- a/include/kvm/arm_pmu.h
 +++ b/include/kvm/arm_pmu.h
-@@ -39,6 +39,7 @@ struct kvm_pmu {
+@@ -38,6 +38,7 @@ struct kvm_pmu {
+ #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
  u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
  u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
- void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
-+void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu);
++void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
  void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
  void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
  void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val);
-@@ -62,6 +63,7 @@ static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+@@ -60,6 +61,7 @@ static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+ {
  	return 0;
  }
- static inline void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
-+static inline void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu) {}
++static inline void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
  static inline void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val) {}
  static inline void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val) {}
  static inline void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val) {}
 diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 8142921..45d4d91 100644
+index 644f2dc..8142921 100644
 --- a/virt/kvm/arm/pmu.c
 +++ b/virt/kvm/arm/pmu.c
-@@ -86,6 +86,27 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
+@@ -69,6 +69,23 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
  	}
  }
  
 +/**
-+ * kvm_pmu_vcpu_destroy - free perf event of PMU for cpu
++ * kvm_pmu_vcpu_reset - reset pmu state for cpu
 + * @vcpu: The vcpu pointer
 + *
 + */
-+void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
++void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
 +{
 +	int i;
 +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
 +
 +	for (i = 0; i < ARMV8_MAX_COUNTERS; i++) {
-+		struct kvm_pmc *pmc = &pmu->pmc[i];
-+
-+		if (pmc->perf_event) {
-+			perf_event_disable(pmc->perf_event);
-+			perf_event_release_kernel(pmc->perf_event);
-+			pmc->perf_event = NULL;
-+		}
++		kvm_pmu_stop_counter(vcpu, &pmu->pmc[i]);
++		pmu->pmc[i].idx = i;
++		pmu->pmc[i].bitmask = 0xffffffffUL;
 +	}
 +}
 +
