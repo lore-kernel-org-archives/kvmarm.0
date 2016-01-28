@@ -1,24 +1,31 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] help guest boot up on AArch64 host with GICv2
-Date: Wed, 27 Jan 2016 09:12:46 +0000
-Message-ID: <56A88A0E.40002@arm.com>
-References: <56995068.9050207@ezchip.com> <569CB034.1060307@arm.com>
- <56A7DA7C.8090202@ezchip.com>
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: RE: [PATCH 00/10] KVM PCIe/MSI passthrough on ARM/ARM64
+Date: Thu, 28 Jan 2016 10:13:21 +0300
+Message-ID: <00aa01d1599b$5fd3bd10$1f7b3730$@samsung.com>
+References: <1453813968-2024-1-git-send-email-eric.auger@linaro.org>
+ <000001d1585e$8097d7e0$81c787a0$@samsung.com> <56A8854F.3030209@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 744E740C9D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2016 04:07:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B09234053F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2016 02:08:26 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yiTScVaIRQnG for <kvmarm@lists.cs.columbia.edu>;
- Wed, 27 Jan 2016 04:07:52 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 218F440F90
- for <kvmarm@lists.cs.columbia.edu>; Wed, 27 Jan 2016 04:07:51 -0500 (EST)
-In-Reply-To: <56A7DA7C.8090202@ezchip.com>
+ with ESMTP id U6ZdKcubBddg for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Jan 2016 02:08:24 -0500 (EST)
+Received: from mailout4.w1.samsung.com (mailout4.w1.samsung.com
+ [210.118.77.14])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id C4C6040402
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2016 02:08:24 -0500 (EST)
+Received: from eucpsbgm2.samsung.com (unknown [203.254.199.245])
+ by mailout4.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
+ with ESMTP id <0O1N0067BIQB6X00@mailout4.w1.samsung.com> for
+ kvmarm@lists.cs.columbia.edu; Thu, 28 Jan 2016 07:13:23 +0000 (GMT)
+In-reply-to: <56A8854F.3030209@linaro.org>
+Content-language: ru
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,104 +35,26 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Chris Metcalf <cmetcalf@ezchip.com>, Christoffer Dall <christoffer.dall@linaro.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: 'Eric Auger' <eric.auger@linaro.org>, eric.auger@st.com, alex.williamson@redhat.com, will.deacon@arm.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: patches@linaro.org, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 26/01/16 20:43, Chris Metcalf wrote:
-> On 01/18/2016 04:28 AM, Marc Zyngier wrote:
->> Hi Chris,
->>
->> On 15/01/16 20:02, Chris Metcalf wrote:
->>> We are using GICv2 compatibility mode in the Fast Models/Foundation
->>> Models simulations we are running because the boot code (ATF/UEFI)
->>> doesn't support GICv3 in our system at the moment.
->>>
->>> However, starting with kernel 4.2, the guest couldn't boot up because it
->>> wasn't getting timer interrupts.  I tracked this down to a kernel commit
->>> that switched to using the "alternatives" mechanism -- rather than
->>> seeing either a GICv2 or GICv3 and configuring appropriately, the KVM
->>> code just configured the code that saves/restores the vgic state based
->>> on the presence of the system register interface to the GIC CPU
->>> interface.  See the attached patch for a fix that manages this
->>> differently and allows me to boot up the guest in this configuration.
->>>
->>> However, even assuming this patch can be taken into an upstream tree, I
->>> still have a couple of additional problems:
->>>
->>> - I can boot up with the Foundation Models using this change, but not
->>> with the Fast Models (again, using a v3 GIC but in v2 compatibility mode
->>> in the device tree).  The Fast Models dts looks like it has the same
->>> configuration for the GIC and the timers so I'm not sure what's going on
->>> here.  Any suggestions appreciated.
->>>
->>> - Without this change, I could only boot kernels up to 4.1.  With the
->>> change, I can boot kernels up to 4.3.  But 4.4 won't boot for me either;
->>> I haven't bisected it down yet.  So any suggestions on what might be
->>> going wrong here would also be appreciated.
->>>
->>> We are planning to eventually use GICv3 mode in our software stack but
->>> for the time being I assume it is interesting to resolve issues with GIC
->>> v2 compatibility mode on GIC v3.
->>>
->> I'm afraid that this is the wrong approach. Whilst 4.2 was a bit too
->> eager to use GICv3 (only checking the CPU capability and ignoring the
->> actual state of the EL2/EL3 SRE bits), the fact that 4.4 doesn't boot is
->> probably the sign of a broken firmware that enables the system register
->> interface at EL3, letting the rest of the software stack to use GICv3 in
->> native mode, and yet providing a GICv2 DT.
->>
->> This combination is unpredictable, and is likely to  cause issues on
->> some HW implementations.
->>
->> Could you please point me to the firmware you're using?
->>
->> Also, please check the following patches:
->>
->> 6d32ab2 arm64: Update booting requirements for GICv3 in GICv2 mode
->> 76e52dd irqchip/gic: Warn if GICv3 system registers are enabled
->> 963fcd4 arm64: cpufeatures: Check ICC_EL1_SRE.SRE before enabling
->> ARM64_HAS_SYSREG_GIC_CPUIF
->> 7cabd00 irqchip/gic-v3: Make gic_enable_sre an inline function
->> d271976 arm64: el2_setup: Make sure ICC_SRE_EL2.SRE sticks before using
->> GICv3 sysregs
->>
->> Can you point me to the one that prevents you from booting?
-> 
-> The problematic commit is 963fcd4, because it calls gic_enable_sre()
-> in the host kernel even with a GICv2 DT specified, and this seems to
-> put things in a state such that we don't receive virtual timer
-> interrupts in the guest when we boot it up.  (I'm not that familiar with
-> the QEMU DT but it is providing a GIC v2 to the guest.)
-> 
-> With a v4.5-rc1 host, if I "return false" before the code in gic_enable_sre()
-> that tries to actually enable the SRE, and then hardcode the
-> __vgic_v2_XXX_state() save/restore calls into the __vgic_XXX_state()
-> routines, then my guest boots up OK.
+ Hello!
 
-What if you just do the "return false"? I bet that it will work as well...
+> x86 isn't problem-free in this space.  An x86 VM is going to know that
+> the 0xfee00000 address range is special, it won't be backed by RAM and
+> won't be a DMA target, thus we'll never attempt to map it for an iova
+> address.  However, if we run a non-x86 VM or a userspace driver, it
+> doesn't necessarily know that there's anything special about that range
+> of iovas.  I intend to resolve this with an extension to the iommu info
+> ioctl that describes the available iova space for the iommu.  The
+> interrupt region would simply be excluded.
 
-> We are using a modified ARM version of EDK v3.0-rc0, and a modified
-> ARM Trusted Firmware based on commit 963fcd4 (between v1.1 and 1.2).
+ I see now, but i still don't understand how it would work. How can we tell the guest OS that we cannot do DMA to this particular
+area? Just exclude it from RAM at all? But this means we would have to modify machine's model...
+ I know that this is a bit different story from what we are implementing now. Just curious.
 
-Are you sure of that commit? It looks suspiciously like the ID ftom the
-kernel tree...
-
-> We certainly haven't touched any of the GIC code in either one.
-> 
-> I tried to modify the host DT to enable GICv3, but then the host itself
-> hangs on boot, so clearly more is needed.  (To be fair I've only tested
-> v4.4 in that configuration, not v4.5-rc1.)  The firmware isn't yet using
-> GICv3 so perhaps that is part of the problem.
-
-That's indeed part of the problem. The firmware running at EL3 insists
-on using GICv2, but still let EL2 (and EL1) use GICv3 system registers.
-Could you please dump the content of ICC_SRE_EL3 just before entering
-the kernel at EL2? If you see ICC_SRE_EL3.SRE being set, then this would
-indicate a firmware bug (and leave the system in an unpredictable
-configuration).
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Kind regards,
+Pavel Fedin
+Senior Engineer
+Samsung Electronics Research center Russia
