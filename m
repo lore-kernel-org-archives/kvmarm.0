@@ -1,234 +1,36 @@
 From: Andrew Jones <drjones@redhat.com>
 Subject: Re: [PATCH v10 10/21] KVM: ARM64: Add access handler for PMCNTENSET
  and PMCNTENCLR register
-Date: Thu, 28 Jan 2016 19:08:56 +0100
-Message-ID: <20160128180856.GA16453@hawk.localdomain>
+Date: Thu, 28 Jan 2016 19:12:25 +0100
+Message-ID: <20160128181225.GB16453@hawk.localdomain>
 References: <1453866709-20324-1-git-send-email-zhaoshenglong@huawei.com>
  <1453866709-20324-11-git-send-email-zhaoshenglong@huawei.com>
+ <20160128180856.GA16453@hawk.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EF6F4407A0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2016 13:04:01 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7nzlqUPAmye0 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Jan 2016 13:04:00 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F0F74400E9
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2016 13:03:59 -0500 (EST)
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1453866709-20324-11-git-send-email-zhaoshenglong@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+In-Reply-To: <20160128180856.GA16453@hawk.localdomain>
+Sender: kvm-owner@vger.kernel.org
 To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, shannon.zhao@linaro.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jan 27, 2016 at 11:51:38AM +0800, Shannon Zhao wrote:
-> From: Shannon Zhao <shannon.zhao@linaro.org>
+On Thu, Jan 28, 2016 at 07:08:56PM +0100, Andrew Jones wrote:
+> On Wed, Jan 27, 2016 at 11:51:38AM +0800, Shannon Zhao wrote:
+> > @@ -804,10 +831,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> >  	  access_pmcr, reset_pmcr, },
+> >  	/* PMCNTENSET_EL0 */
+> >  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b001),
+> > -	  trap_raz_wi },
+> > +	  access_pmcnten, reset_unknown, PMCNTENSET_EL0 },
+> >  	/* PMCNTENCLR_EL0 */
+> >  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b010),
+> > -	  trap_raz_wi },
+> > +	  access_pmcnten, NULL, PMCNTENSET_EL0 },
 > 
-> Since the reset value of PMCNTENSET and PMCNTENCLR is UNKNOWN, use
-> reset_unknown for its reset handler. Add a handler to emulate writing
-> PMCNTENSET or PMCNTENCLR register.
-> 
-> When writing to PMCNTENSET, call perf_event_enable to enable the perf
-> event. When writing to PMCNTENCLR, call perf_event_disable to disable
-> the perf event.
-> 
-> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 35 +++++++++++++++++++++++---
->  include/kvm/arm_pmu.h     |  9 +++++++
->  virt/kvm/arm/pmu.c        | 63 +++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 103 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 6a50262..d43a9a4 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -603,6 +603,33 @@ static bool access_pmu_evcntr(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> +static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			   const struct sys_reg_desc *r)
-> +{
-> +	u64 val, mask;
-> +
-> +	if (!kvm_arm_pmu_v3_ready(vcpu))
-> +		return trap_raz_wi(vcpu, p, r);
-> +
-> +	mask = kvm_pmu_valid_counter_mask(vcpu);
-> +	if (p->is_write) {
-> +		val = p->regval & mask;
-> +		if (r->Op2 & 0x1) {
-> +			/* accessing PMCNTENSET_EL0 */
-> +			vcpu_sys_reg(vcpu, PMCNTENSET_EL0) |= val;
-> +			kvm_pmu_enable_counter(vcpu, val);
-> +		} else {
-> +			/* accessing PMCNTENCLR_EL0 */
-> +			vcpu_sys_reg(vcpu, PMCNTENSET_EL0) &= ~val;
-> +			kvm_pmu_disable_counter(vcpu, val);
-> +		}
-> +	} else {
-> +		p->regval = vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask;
-> +	}
-> +
-> +	return true;
-> +}
-> +
->  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
->  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
->  	/* DBGBVRn_EL1 */						\
-> @@ -804,10 +831,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	  access_pmcr, reset_pmcr, },
->  	/* PMCNTENSET_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b001),
-> -	  trap_raz_wi },
-> +	  access_pmcnten, reset_unknown, PMCNTENSET_EL0 },
->  	/* PMCNTENCLR_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b010),
-> -	  trap_raz_wi },
-> +	  access_pmcnten, NULL, PMCNTENSET_EL0 },
+> I don't think the reg field is needed, as the reset handler isn't
+> defined and the access handler doesn't use it. Oh, and shouldn't it be
+> PMCNTENCLR_EL0 anyway?
 
-I don't think the reg field is needed, as the reset handler isn't
-defined and the access handler doesn't use it. Oh, and shouldn't it be
-PMCNTENCLR_EL0 anyway?
-
->  	/* PMOVSCLR_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b011),
->  	  trap_raz_wi },
-> @@ -1149,8 +1176,8 @@ static const struct sys_reg_desc cp15_regs[] = {
->  
->  	/* PMU */
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), access_pmcr },
-> -	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), trap_raz_wi },
-> -	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), trap_raz_wi },
-> +	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), access_pmcnten },
-> +	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), access_pmcnten },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmselr },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index ee4b15c..a7e5485 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -37,6 +37,9 @@ struct kvm_pmu {
->  
->  #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
->  u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
-> +u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
-> +void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
-> +void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
->  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
->  				    u64 select_idx);
->  #else
-> @@ -49,6 +52,12 @@ static inline u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu,
->  {
->  	return 0;
->  }
-> +static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
-> +{
-> +	return 0;
-> +}
-> +static inline void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val) {}
-> +static inline void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val) {}
->  static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
->  						  u64 data, u64 select_idx) {}
->  #endif
-> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> index 673ec55..0873977 100644
-> --- a/virt/kvm/arm/pmu.c
-> +++ b/virt/kvm/arm/pmu.c
-> @@ -68,6 +68,69 @@ static void kvm_pmu_stop_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
->  	}
->  }
->  
-> +u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
-> +{
-> +	u64 val = vcpu_sys_reg(vcpu, PMCR_EL0) >> ARMV8_PMCR_N_SHIFT;
-> +
-> +	val &= ARMV8_PMCR_N_MASK;
-> +	return GENMASK(val - 1, 0) | BIT(ARMV8_CYCLE_IDX);
-
-val can be zero if PMCR.N is zero (meaning only the cycle counter is
-implemented). We should confirm it's not zero before calling GENMASK.
-
-> +}
-> +
-> +/**
-> + * kvm_pmu_enable_counter - enable selected PMU counter
-> + * @vcpu: The vcpu pointer
-> + * @val: the value guest writes to PMCNTENSET register
-> + *
-> + * Call perf_event_enable to start counting the perf event
-> + */
-> +void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val)
-> +{
-> +	int i;
-> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +	struct kvm_pmc *pmc;
-> +
-> +	if (!(vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMCR_E) || !val)
-> +		return;
-> +
-> +	for (i = 0; i < ARMV8_MAX_COUNTERS; i++) {
-> +		if (!(val & BIT(i)))
-> +			continue;
-> +
-> +		pmc = &pmu->pmc[i];
-> +		if (pmc->perf_event) {
-> +			perf_event_enable(pmc->perf_event);
-> +			if (pmc->perf_event->state != PERF_EVENT_STATE_ACTIVE)
-> +				kvm_debug("fail to enable perf event\n");
-> +		}
-> +	}
-> +}
-> +
-> +/**
-> + * kvm_pmu_disable_counter - disable selected PMU counter
-> + * @vcpu: The vcpu pointer
-> + * @val: the value guest writes to PMCNTENCLR register
-> + *
-> + * Call perf_event_disable to stop counting the perf event
-> + */
-> +void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val)
-> +{
-> +	int i;
-> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> +	struct kvm_pmc *pmc;
-> +
-> +	if (!val)
-> +		return;
-> +
-> +	for (i = 0; i < ARMV8_MAX_COUNTERS; i++) {
-> +		if (!(val & BIT(i)))
-> +			continue;
-> +
-> +		pmc = &pmu->pmc[i];
-> +		if (pmc->perf_event)
-> +			perf_event_disable(pmc->perf_event);
-> +	}
-> +}
-> +
->  static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
->  {
->  	return (vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMCR_E) &&
-> -- 
-> 2.0.4
-> 
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+eh.. nevermind. Of course we just have the one sys_reg for both set/clr...
