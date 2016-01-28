@@ -1,166 +1,135 @@
 From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v10 13/21] KVM: ARM64: Add access handler for PMSWINC
- register
-Date: Thu, 28 Jan 2016 19:37:52 +0100
-Message-ID: <20160128183752.GD16453@hawk.localdomain>
+Subject: Re: [PATCH v10 14/21] KVM: ARM64: Add helper to handle PMCR register
+ bits
+Date: Thu, 28 Jan 2016 20:15:40 +0100
+Message-ID: <20160128191540.GE16453@hawk.localdomain>
 References: <1453866709-20324-1-git-send-email-zhaoshenglong@huawei.com>
- <1453866709-20324-14-git-send-email-zhaoshenglong@huawei.com>
+ <1453866709-20324-15-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1453866709-20324-14-git-send-email-zhaoshenglong@huawei.com>
+In-Reply-To: <1453866709-20324-15-git-send-email-zhaoshenglong@huawei.com>
 Sender: kvm-owner@vger.kernel.org
 To: Shannon Zhao <zhaoshenglong@huawei.com>
 Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jan 27, 2016 at 11:51:41AM +0800, Shannon Zhao wrote:
+On Wed, Jan 27, 2016 at 11:51:42AM +0800, Shannon Zhao wrote:
 > From: Shannon Zhao <shannon.zhao@linaro.org>
 > 
-> Add access handler which emulates writing and reading PMSWINC
-> register and add support for creating software increment event.
+> According to ARMv8 spec, when writing 1 to PMCR.E, all counters are
+> enabled by PMCNTENSET, while writing 0 to PMCR.E, all counters are
+> disabled. When writing 1 to PMCR.P, reset all event counters, not
+> including PMCCNTR, to zero. When writing 1 to PMCR.C, reset PMCCNTR to
+> zero.
 > 
 > Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm64/include/asm/pmu.h |  2 ++
->  arch/arm64/kvm/sys_regs.c    | 20 +++++++++++++++++++-
->  include/kvm/arm_pmu.h        |  2 ++
->  virt/kvm/arm/pmu.c           | 33 +++++++++++++++++++++++++++++++++
->  4 files changed, 56 insertions(+), 1 deletion(-)
+>  arch/arm64/kvm/sys_regs.c |  1 +
+>  include/kvm/arm_pmu.h     |  2 ++
+>  virt/kvm/arm/pmu.c        | 42 ++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 45 insertions(+)
 > 
-> diff --git a/arch/arm64/include/asm/pmu.h b/arch/arm64/include/asm/pmu.h
-> index 2588f9c..6f14a01 100644
-> --- a/arch/arm64/include/asm/pmu.h
-> +++ b/arch/arm64/include/asm/pmu.h
-> @@ -60,6 +60,8 @@
->  #define	ARMV8_EVTYPE_MASK	0xc80003ff	/* Mask for writable bits */
->  #define	ARMV8_EVTYPE_EVENT	0x3ff		/* Mask for EVENT bits */
->  
-> +#define ARMV8_EVTYPE_EVENT_SW_INCR	0	/* Software increment event */
-> +
->  /*
->   * Event filters for PMUv3
->   */
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 60b24ea..f45c227 100644
+> index f45c227..eefc60a 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -676,6 +676,23 @@ static bool access_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  	return true;
->  }
->  
-> +static bool access_pmswinc(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			   const struct sys_reg_desc *r)
-> +{
-> +	u64 mask;
-> +
-> +	if (!kvm_arm_pmu_v3_ready(vcpu))
-> +		return trap_raz_wi(vcpu, p, r);
-> +
-> +	if (p->is_write) {
-> +		mask = kvm_pmu_valid_counter_mask(vcpu);
-> +		kvm_pmu_software_increment(vcpu, p->regval & mask);
-> +		return true;
-> +	}
-> +
-> +	return false;
-> +}
-> +
->  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
->  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
->  	/* DBGBVRn_EL1 */						\
-> @@ -886,7 +903,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	  access_pmovs, NULL, PMOVSSET_EL0 },
->  	/* PMSWINC_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b100),
-> -	  trap_raz_wi },
-> +	  access_pmswinc, reset_unknown, PMSWINC_EL0 },
->  	/* PMSELR_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b101),
->  	  access_pmselr, reset_unknown, PMSELR_EL0 },
-> @@ -1225,6 +1242,7 @@ static const struct sys_reg_desc cp15_regs[] = {
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), access_pmcnten },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), access_pmcnten },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), access_pmovs },
-> +	{ Op1( 0), CRn( 9), CRm(12), Op2( 4), access_pmswinc },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmselr },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmceid },
+> @@ -467,6 +467,7 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  		val &= ~ARMV8_PMCR_MASK;
+>  		val |= p->regval & ARMV8_PMCR_MASK;
+>  		vcpu_sys_reg(vcpu, PMCR_EL0) = val;
+> +		kvm_pmu_handle_pmcr(vcpu, val);
+>  	} else {
+>  		/* PMCR.P & PMCR.C are RAZ */
+>  		val = vcpu_sys_reg(vcpu, PMCR_EL0)
 > diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 4f8409d..caa706e 100644
+> index caa706e..5bed00c 100644
 > --- a/include/kvm/arm_pmu.h
 > +++ b/include/kvm/arm_pmu.h
-> @@ -41,6 +41,7 @@ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
->  void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
+> @@ -42,6 +42,7 @@ void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
 >  void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
 >  void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val);
-> +void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val);
+>  void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val);
+> +void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
 >  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
 >  				    u64 select_idx);
 >  #else
-> @@ -60,6 +61,7 @@ static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
->  static inline void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val) {}
+> @@ -62,6 +63,7 @@ static inline void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val) {}
 >  static inline void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val) {}
 >  static inline void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val) {}
-> +static inline void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val) {}
+>  static inline void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val) {}
+> +static inline void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val) {}
 >  static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
 >  						  u64 data, u64 select_idx) {}
 >  #endif
 > diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> index ee75fac..706c935 100644
+> index 706c935..d411f3f 100644
 > --- a/virt/kvm/arm/pmu.c
 > +++ b/virt/kvm/arm/pmu.c
-> @@ -161,6 +161,35 @@ void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val)
->  		kvm_vcpu_kick(vcpu);
+> @@ -190,6 +190,48 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
+>  	}
 >  }
 >  
 > +/**
-> + * kvm_pmu_software_increment - do software increment
+> + * kvm_pmu_handle_pmcr - handle PMCR register
 > + * @vcpu: The vcpu pointer
-> + * @val: the value guest writes to PMSWINC register
+> + * @val: the value guest writes to PMCR register
 > + */
-> +void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
+> +void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
 > +{
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +	struct kvm_pmc *pmc;
+> +	u64 mask;
 > +	int i;
-> +	u64 type, enable, reg;
 > +
-> +	if (val == 0)
-> +		return;
+> +	mask = kvm_pmu_valid_counter_mask(vcpu);
+> +	if (val & ARMV8_PMCR_E) {
+> +		kvm_pmu_enable_counter(vcpu,
+> +				     vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask);
+
+nit: sort of an ugly indentation. I don't think the vcpu_sys_reg needs
+to line up with the vcpu.
+
+> +	} else {
+> +		kvm_pmu_disable_counter(vcpu, mask);
+> +	}
 > +
-> +	for (i = 0; i < ARMV8_CYCLE_IDX; i++) {
-> +		if (!(val & BIT(i)))
-> +			continue;
-> +		type = vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i)
-> +		       & ARMV8_EVTYPE_EVENT;
-> +		enable = vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
-
-The PMCNTENSET_EL0 read can be moved outside the loop.
-
-> +		if ((type == ARMV8_EVTYPE_EVENT_SW_INCR) && (enable & BIT(i))) {
-> +			reg = vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) + 1;
-> +			reg = lower_32_bits(reg);
-> +			vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
-> +			if (!reg)
-> +				kvm_pmu_overflow_set(vcpu, BIT(i));
+> +	if (val & ARMV8_PMCR_C) {
+> +		pmc = &pmu->pmc[ARMV8_CYCLE_IDX];
+> +		if (pmc->perf_event)
+> +			local64_set(&pmc->perf_event->count, 0);
+> +		vcpu_sys_reg(vcpu, PMCCNTR_EL0) = 0;
+> +	}
+> +
+> +	if (val & ARMV8_PMCR_P) {
+> +		for (i = 0; i < ARMV8_CYCLE_IDX; i++) {
+> +			pmc = &pmu->pmc[i];
+> +			if (pmc->perf_event)
+> +				local64_set(&pmc->perf_event->count, 0);
+> +			vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = 0;
 > +		}
+> +	}
+
+The local64_set's surprise me. Patch 9/21 seems to go out of its way to
+allow the perf_event count to be whatever it happens to be, but then
+calculate the appropriate base to modify it with when the register is
+written by the guest. Here we're just simply setting both the perf_event
+counter and the register to zero. Shouldn't we be going through some perf
+API for the zeroing of its counter, and then do the same thing as patch
+9/21 does to set the register?
+
+> +
+> +	if (val & ARMV8_PMCR_LC) {
+> +		pmc = &pmu->pmc[ARMV8_CYCLE_IDX];
+> +		pmc->bitmask = 0xffffffffffffffffUL;
 > +	}
 > +}
 > +
 >  static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
 >  {
 >  	return (vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMCR_E) &&
-> @@ -189,6 +218,10 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
->  	kvm_pmu_stop_counter(vcpu, pmc);
->  	eventsel = data & ARMV8_EVTYPE_EVENT;
->  
-> +	/* Software increment event does't need to be backed by a perf event */
-> +	if (eventsel == ARMV8_EVTYPE_EVENT_SW_INCR)
-> +		return;
-> +
->  	memset(&attr, 0, sizeof(struct perf_event_attr));
->  	attr.type = PERF_TYPE_RAW;
->  	attr.size = sizeof(attr);
 > -- 
 > 2.0.4
 > 
