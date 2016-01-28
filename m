@@ -1,62 +1,94 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [GIT PULL] KVM/ARM updates for 4.5-rc2
-Date: Thu, 28 Jan 2016 10:30:33 +0000
-Message-ID: <1453977038-13516-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
+Subject: [PATCH 2/5] arm64: KVM: Obey RES0/1 reserved bits when setting
+ CPTR_EL2
+Date: Thu, 28 Jan 2016 10:30:35 +0000
+Message-ID: <1453977038-13516-3-git-send-email-marc.zyngier@arm.com>
+References: <1453977038-13516-1-git-send-email-marc.zyngier@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E4E5407A0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2016 05:25:52 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 4WSDVai6dW2a for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Jan 2016 05:25:51 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FAC8407A6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2016 05:25:51 -0500 (EST)
+In-Reply-To: <1453977038-13516-1-git-send-email-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Dave Martin <Dave.Martin@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Gleb Natapov <gleb@kernel.org>
+Cc: kvm@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, Dave Martin <Dave.Martin@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Shannon Zhao <shannon.zhao@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Paolo,
+From: Dave Martin <Dave.Martin@arm.com>
 
-Please find below the KVM/ARM updates for 4.5-rc2. Mostly fixes as a
-result of Shannon's work on PMU emulation, which has outlined a few
-nits here and there, plus a correctness fix from Dave.
+Some bits in CPTR are defined as RES1 in the architecture.  Setting
+these bits to zero may unintentionally enable future architecture
+extensions, allowing guests to use them without supervision by the host.
 
-Please pull!
+This would be bad: for forwards compatibility, this patch makes
+sure the affected bits are always written with 1, not 0.
 
-Thanks,
+This patch only addresses CPTR_EL2.  Initialisation of other system
+registers may still need review.
 
-	M.
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Dave Martin <Dave.Martin@arm.com>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm64/include/asm/kvm_arm.h | 1 +
+ arch/arm64/kvm/hyp/switch.c      | 8 ++++++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-The following changes since commit 92e963f50fc74041b5e9e744c330dca48e04f08d:
-
-  Linux 4.5-rc1 (2016-01-24 13:06:47 -0800)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-4.5-rc2
-
-for you to fetch changes up to 6327f35a2010c06a3bc2bfb14202a38764fb9920:
-
-  arm64: KVM: Fix guest dead loop when register accessor returns false (2016-01-24 21:56:01 +0000)
-
-----------------------------------------------------------------
-KVM/ARM fixes for v4.5-rc2
-
-A few random fixes, mostly coming from the PMU work by Shannon:
-
-- fix for injecting faults coming from the guest's userspace
-- cleanup for our CPTR_EL2 accessors (reserved bits)
-- fix for a bug impacting perf (user/kernel discrimination)
-- fix for a 32bit sysreg handling bug
-
-----------------------------------------------------------------
-Dave Martin (1):
-      arm64: KVM: Obey RES0/1 reserved bits when setting CPTR_EL2
-
-Marc Zyngier (1):
-      arm64: KVM: Fix AArch64 guest userspace exception injection
-
-Shannon Zhao (3):
-      arm64: KVM: Fix wrong use of the CPSR MODE mask for 32bit guests
-      arm64: KVM: Fix comments of the CP handler
-      arm64: KVM: Fix guest dead loop when register accessor returns false
-
- arch/arm64/include/asm/kvm_arm.h     |  1 +
- arch/arm64/include/asm/kvm_emulate.h |  8 ++++++--
- arch/arm64/kvm/hyp/switch.c          |  8 ++++++--
- arch/arm64/kvm/inject_fault.c        | 38 +++++++++++++++++++++++++++++++++---
- arch/arm64/kvm/sys_regs.c            |  9 ++++-----
- 5 files changed, 52 insertions(+), 12 deletions(-)
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 738a95f..bef6e92 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -182,6 +182,7 @@
+ #define CPTR_EL2_TCPAC	(1 << 31)
+ #define CPTR_EL2_TTA	(1 << 20)
+ #define CPTR_EL2_TFP	(1 << CPTR_EL2_TFP_SHIFT)
++#define CPTR_EL2_DEFAULT	0x000033ff
+ 
+ /* Hyp Debug Configuration Register bits */
+ #define MDCR_EL2_TDRA		(1 << 11)
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index ca8f5a5..f0e7bdf 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -36,7 +36,11 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
+ 	write_sysreg(val, hcr_el2);
+ 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
+ 	write_sysreg(1 << 15, hstr_el2);
+-	write_sysreg(CPTR_EL2_TTA | CPTR_EL2_TFP, cptr_el2);
++
++	val = CPTR_EL2_DEFAULT;
++	val |= CPTR_EL2_TTA | CPTR_EL2_TFP;
++	write_sysreg(val, cptr_el2);
++
+ 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
+ }
+ 
+@@ -45,7 +49,7 @@ static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
+ 	write_sysreg(HCR_RW, hcr_el2);
+ 	write_sysreg(0, hstr_el2);
+ 	write_sysreg(read_sysreg(mdcr_el2) & MDCR_EL2_HPMN_MASK, mdcr_el2);
+-	write_sysreg(0, cptr_el2);
++	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
+ }
+ 
+ static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
+-- 
+2.1.4
