@@ -1,152 +1,63 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v10 04/21] KVM: ARM64: Add access handler for PMCR register
-Date: Thu, 28 Jan 2016 16:36:35 +0100
-Message-ID: <20160128153635.GB3807@hawk.localdomain>
-References: <1453866709-20324-1-git-send-email-zhaoshenglong@huawei.com>
- <1453866709-20324-5-git-send-email-zhaoshenglong@huawei.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F0630407A0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2016 10:31:41 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SUFyAdAN1Ifh for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Jan 2016 10:31:40 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 654FF40B40
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2016 10:31:40 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <1453866709-20324-5-git-send-email-zhaoshenglong@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, shannon.zhao@linaro.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [RFC PATCH 0/5] arm/arm64: Making HYP vgic/timer save/restore common
+Date: Thu, 28 Jan 2016 15:56:00 +0000
+Message-ID: <1453996565-19666-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jan 27, 2016 at 11:51:32AM +0800, Shannon Zhao wrote:
-> From: Shannon Zhao <shannon.zhao@linaro.org>
-> 
-> Add reset handler which gets host value of PMCR_EL0 and make writable
-> bits architecturally UNKNOWN except PMCR.E which is zero. Add an access
-> handler for PMCR.
-> 
-> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 42 ++++++++++++++++++++++++++++++++++++++++--
->  include/kvm/arm_pmu.h     |  4 ++++
->  2 files changed, 44 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index eec3598..97fea84 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -34,6 +34,7 @@
->  #include <asm/kvm_emulate.h>
->  #include <asm/kvm_host.h>
->  #include <asm/kvm_mmu.h>
-> +#include <asm/pmu.h>
->  
->  #include <trace/events/kvm.h>
->  
-> @@ -439,6 +440,43 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  	vcpu_sys_reg(vcpu, MPIDR_EL1) = (1ULL << 31) | mpidr;
->  }
->  
-> +static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-> +{
-> +	u64 pmcr, val;
-> +
-> +	asm volatile("mrs %0, pmcr_el0\n" : "=r" (pmcr));
-> +	/* Writable bits of PMCR_EL0 (ARMV8_PMCR_MASK) is reset to UNKNOWN
-> +	 * except PMCR.E resetting to zero.
-> +	 */
-> +	val = ((pmcr & ~ARMV8_PMCR_MASK) | (ARMV8_PMCR_MASK & 0xdecafbad))
-> +	      & (~ARMV8_PMCR_E);
-> +	vcpu_sys_reg(vcpu, PMCR_EL0) = val;
-> +}
-> +
-> +static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			const struct sys_reg_desc *r)
-> +{
-> +	u64 val;
-> +
-> +	if (!kvm_arm_pmu_v3_ready(vcpu))
-> +		return trap_raz_wi(vcpu, p, r);
-> +
-> +	if (p->is_write) {
-> +		/* Only update writeable bits of PMCR */
-> +		val = vcpu_sys_reg(vcpu, PMCR_EL0);
-> +		val &= ~ARMV8_PMCR_MASK;
-> +		val |= p->regval & ARMV8_PMCR_MASK;
-> +		vcpu_sys_reg(vcpu, PMCR_EL0) = val;
-> +	} else {
-> +		/* PMCR.P & PMCR.C are RAZ */
-> +		val = vcpu_sys_reg(vcpu, PMCR_EL0)
-> +		      & ~(ARMV8_PMCR_P | ARMV8_PMCR_C);
-> +		p->regval = val;
+With the current state of the C conversion of arm and arm64 world
+switches, we are still unable to share some of the most obvious
+candidates (GIC and timer save/restore). In order to reduce the bloat,
+let's move these files to a common location (virt/kvm/arm/hyp).
 
-Should we also be setting the IMP, IDCODE, and N fields here to the
-values of the host PE?
+The changes are extremely mechanical, with a small hack to deal with
+system register names on the 32bit side (I've decided to align on the
+64bit names).
 
-> +	}
-> +
-> +	return true;
-> +}
-> +
->  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
->  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
->  	/* DBGBVRn_EL1 */						\
-> @@ -623,7 +661,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  
->  	/* PMCR_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b000),
-> -	  trap_raz_wi },
-> +	  access_pmcr, reset_pmcr, },
->  	/* PMCNTENSET_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b001),
->  	  trap_raz_wi },
-> @@ -885,7 +923,7 @@ static const struct sys_reg_desc cp15_regs[] = {
->  	{ Op1( 0), CRn( 7), CRm(14), Op2( 2), access_dcsw },
->  
->  	/* PMU */
-> -	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), trap_raz_wi },
-> +	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), access_pmcr },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), trap_raz_wi },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), trap_raz_wi },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index be220ee..32fee2d 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -34,9 +34,13 @@ struct kvm_pmu {
->  	struct kvm_pmc pmc[ARMV8_MAX_COUNTERS];
->  	bool ready;
->  };
-> +
-> +#define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
->  #else
->  struct kvm_pmu {
->  };
-> +
-> +#define kvm_arm_pmu_v3_ready(v)		(false)
->  #endif
->  
->  #endif
-> -- 
-> 2.0.4
-> 
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+I'd like to know what people think of the common location. Does it
+makes sense to have a "hyp" subdirectory to indicate that this is not
+"normal" kernel code?
+
+These patches are on top of 4.5-rc1, plus the VHE and 32bit WS rewrite
+patches, and I've pushed out a branch at
+
+git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/mov-hyp
+
+Marc Zyngier (5):
+  arm64: KVM: Move kvm/hyp/hyp.h to include/asm/kvm_hyp.h
+  arm64: KVM: Move vgic-v2 and timer save/restore to virt/kvm/arm/hyp
+  ARM: KVM: Move kvm/hyp/hyp.h to include/asm/kvm_hyp.h
+  ARM: KVM: Use common version of vgic-v2-sr.c
+  ARM: KVM: Use common version of timer-sr.c
+
+ arch/arm/{kvm/hyp/hyp.h => include/asm/kvm_hyp.h}  |  9 +++
+ arch/arm/kvm/hyp/Makefile                          |  7 +-
+ arch/arm/kvm/hyp/banked-sr.c                       |  2 +-
+ arch/arm/kvm/hyp/cp15-sr.c                         |  2 +-
+ arch/arm/kvm/hyp/switch.c                          |  2 +-
+ arch/arm/kvm/hyp/timer-sr.c                        | 71 ------------------
+ arch/arm/kvm/hyp/tlb.c                             |  2 +-
+ arch/arm/kvm/hyp/vgic-v2-sr.c                      | 84 ----------------------
+ .../arm64/{kvm/hyp/hyp.h => include/asm/kvm_hyp.h} |  0
+ arch/arm64/kvm/hyp/Makefile                        |  7 +-
+ arch/arm64/kvm/hyp/debug-sr.c                      |  4 +-
+ arch/arm64/kvm/hyp/switch.c                        |  3 +-
+ arch/arm64/kvm/hyp/sysreg-sr.c                     |  4 +-
+ arch/arm64/kvm/hyp/tlb.c                           |  2 +-
+ arch/arm64/kvm/hyp/vgic-v3-sr.c                    |  4 +-
+ {arch/arm64/kvm => virt/kvm/arm}/hyp/timer-sr.c    |  4 +-
+ {arch/arm64/kvm => virt/kvm/arm}/hyp/vgic-v2-sr.c  |  4 +-
+ 17 files changed, 30 insertions(+), 181 deletions(-)
+ rename arch/arm/{kvm/hyp/hyp.h => include/asm/kvm_hyp.h} (93%)
+ delete mode 100644 arch/arm/kvm/hyp/timer-sr.c
+ delete mode 100644 arch/arm/kvm/hyp/vgic-v2-sr.c
+ rename arch/arm64/{kvm/hyp/hyp.h => include/asm/kvm_hyp.h} (100%)
+ rename {arch/arm64/kvm => virt/kvm/arm}/hyp/timer-sr.c (97%)
+ rename {arch/arm64/kvm => virt/kvm/arm}/hyp/vgic-v2-sr.c (98%)
+
+-- 
+2.1.4
+
