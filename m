@@ -1,240 +1,153 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v10 08/21] KVM: ARM64: Add access handler for event type
- register
-Date: Thu, 28 Jan 2016 21:11:59 +0100
-Message-ID: <20160128201159.GH16453@hawk.localdomain>
-References: <1453866709-20324-1-git-send-email-zhaoshenglong@huawei.com>
- <1453866709-20324-9-git-send-email-zhaoshenglong@huawei.com>
+From: Chris Metcalf <cmetcalf@ezchip.com>
+Subject: Re: [PATCH] help guest boot up on AArch64 host with GICv2
+Date: Thu, 28 Jan 2016 15:12:08 -0500
+Message-ID: <56AA7618.8030406@ezchip.com>
+References: <56995068.9050207@ezchip.com> <569CB034.1060307@arm.com>
+ <56A7DA7C.8090202@ezchip.com> <56A88A0E.40002@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1453866709-20324-9-git-send-email-zhaoshenglong@huawei.com>
-Sender: kvm-owner@vger.kernel.org
-To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6F0D040FA6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2016 15:07:24 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id CL2rovw8ApM9 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Jan 2016 15:07:22 -0500 (EST)
+Received: from emea01-db3-obe.outbound.protection.outlook.com
+ (mail-db3on0056.outbound.protection.outlook.com [157.55.234.56])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 609EC407A6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2016 15:07:22 -0500 (EST)
+In-Reply-To: <56A88A0E.40002@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Jan 27, 2016 at 11:51:36AM +0800, Shannon Zhao wrote:
-> From: Shannon Zhao <shannon.zhao@linaro.org>
-> 
-> These kind of registers include PMEVTYPERn, PMCCFILTR and PMXEVTYPER
-> which is mapped to PMEVTYPERn or PMCCFILTR.
-> 
-> The access handler translates all aarch32 register offsets to aarch64
-> ones and uses vcpu_sys_reg() to access their values to avoid taking care
-> of big endian.
-> 
-> When writing to these registers, create a perf_event for the selected
-> event type.
-> 
-> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 140 +++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 138 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 06257e2..298ae94 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -513,6 +513,54 @@ static bool access_pmceid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  	return true;
->  }
->  
-> +static bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
-> +{
-> +	u64 pmcr, val;
-> +
-> +	pmcr = vcpu_sys_reg(vcpu, PMCR_EL0);
-> +	val = (pmcr >> ARMV8_PMCR_N_SHIFT) & ARMV8_PMCR_N_MASK;
-> +	if (idx >= val && idx != ARMV8_CYCLE_IDX)
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
-> +static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> +			       const struct sys_reg_desc *r)
-> +{
-> +	u64 idx, reg;
-> +
-> +	if (!kvm_arm_pmu_v3_ready(vcpu))
-> +		return trap_raz_wi(vcpu, p, r);
-> +
-> +	if (r->CRn == 9 && r->CRm == 13 && r->Op2 == 1) {
-> +		/* PMXEVTYPER_EL0 */
-> +		idx = vcpu_sys_reg(vcpu, PMSELR_EL0) & ARMV8_COUNTER_MASK;
-> +		reg = PMEVTYPER0_EL0 + idx;
-> +	} else if (r->CRn == 14 && (r->CRm & 12) == 12) {
-> +		idx = ((r->CRm & 3) << 3) | (r->Op2 & 7);
-> +		if (idx == ARMV8_CYCLE_IDX)
-> +			reg = PMCCFILTR_EL0;
-> +		else
-> +			/* PMEVTYPERn_EL0 */
-> +			reg = PMEVTYPER0_EL0 + idx;
-> +	} else {
-> +		BUG();
-> +	}
-> +
-> +	if (!pmu_counter_idx_valid(vcpu, idx))
-> +		return false;
-> +
-> +	if (p->is_write) {
-> +		kvm_pmu_set_counter_event_type(vcpu, p->regval, idx);
-> +		vcpu_sys_reg(vcpu, reg) = p->regval & ARMV8_EVTYPE_MASK;
-> +	} else {
-> +		p->regval = vcpu_sys_reg(vcpu, reg) & ARMV8_EVTYPE_MASK;
+On 01/27/2016 04:12 AM, Marc Zyngier wrote:
+> On 26/01/16 20:43, Chris Metcalf wrote:
+>> On 01/18/2016 04:28 AM, Marc Zyngier wrote:
+>>> Hi Chris,
+>>>
+>>> On 15/01/16 20:02, Chris Metcalf wrote:
+>>>> We are using GICv2 compatibility mode in the Fast Models/Foundation
+>>>> Models simulations we are running because the boot code (ATF/UEFI)
+>>>> doesn't support GICv3 in our system at the moment.
+>>>>
+>>>> However, starting with kernel 4.2, the guest couldn't boot up because it
+>>>> wasn't getting timer interrupts.  I tracked this down to a kernel commit
+>>>> that switched to using the "alternatives" mechanism -- rather than
+>>>> seeing either a GICv2 or GICv3 and configuring appropriately, the KVM
+>>>> code just configured the code that saves/restores the vgic state based
+>>>> on the presence of the system register interface to the GIC CPU
+>>>> interface.  See the attached patch for a fix that manages this
+>>>> differently and allows me to boot up the guest in this configuration.
+>>>>
+>>>> However, even assuming this patch can be taken into an upstream tree, I
+>>>> still have a couple of additional problems:
+>>>>
+>>>> - I can boot up with the Foundation Models using this change, but not
+>>>> with the Fast Models (again, using a v3 GIC but in v2 compatibility mode
+>>>> in the device tree).  The Fast Models dts looks like it has the same
+>>>> configuration for the GIC and the timers so I'm not sure what's going on
+>>>> here.  Any suggestions appreciated.
+>>>>
+>>>> - Without this change, I could only boot kernels up to 4.1.  With the
+>>>> change, I can boot kernels up to 4.3.  But 4.4 won't boot for me either;
+>>>> I haven't bisected it down yet.  So any suggestions on what might be
+>>>> going wrong here would also be appreciated.
+>>>>
+>>>> We are planning to eventually use GICv3 mode in our software stack but
+>>>> for the time being I assume it is interesting to resolve issues with GIC
+>>>> v2 compatibility mode on GIC v3.
+>>>>
+>>> I'm afraid that this is the wrong approach. Whilst 4.2 was a bit too
+>>> eager to use GICv3 (only checking the CPU capability and ignoring the
+>>> actual state of the EL2/EL3 SRE bits), the fact that 4.4 doesn't boot is
+>>> probably the sign of a broken firmware that enables the system register
+>>> interface at EL3, letting the rest of the software stack to use GICv3 in
+>>> native mode, and yet providing a GICv2 DT.
+>>>
+>>> This combination is unpredictable, and is likely to  cause issues on
+>>> some HW implementations.
+>>>
+>>> Could you please point me to the firmware you're using?
+>>>
+>>> Also, please check the following patches:
+>>>
+>>> 6d32ab2 arm64: Update booting requirements for GICv3 in GICv2 mode
+>>> 76e52dd irqchip/gic: Warn if GICv3 system registers are enabled
+>>> 963fcd4 arm64: cpufeatures: Check ICC_EL1_SRE.SRE before enabling
+>>> ARM64_HAS_SYSREG_GIC_CPUIF
+>>> 7cabd00 irqchip/gic-v3: Make gic_enable_sre an inline function
+>>> d271976 arm64: el2_setup: Make sure ICC_SRE_EL2.SRE sticks before using
+>>> GICv3 sysregs
+>>>
+>>> Can you point me to the one that prevents you from booting?
+>> The problematic commit is 963fcd4, because it calls gic_enable_sre()
+>> in the host kernel even with a GICv2 DT specified, and this seems to
+>> put things in a state such that we don't receive virtual timer
+>> interrupts in the guest when we boot it up.  (I'm not that familiar with
+>> the QEMU DT but it is providing a GIC v2 to the guest.)
+>>
+>> With a v4.5-rc1 host, if I "return false" before the code in gic_enable_sre()
+>> that tries to actually enable the SRE, and then hardcode the
+>> __vgic_v2_XXX_state() save/restore calls into the __vgic_XXX_state()
+>> routines, then my guest boots up OK.
+> What if you just do the "return false"? I bet that it will work as well...
 
-Related to my comment in 5/21. Why should we need to mask it here when
-reading it, since it was masked on writing?
+Yes, that also works for my case.
 
-> +	}
-> +
-> +	return true;
-> +}
-> +
->  /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
->  #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
->  	/* DBGBVRn_EL1 */						\
-> @@ -528,6 +576,13 @@ static bool access_pmceid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
->  	{ Op0(0b10), Op1(0b000), CRn(0b0000), CRm((n)), Op2(0b111),	\
->  	  trap_wcr, reset_wcr, n, 0,  get_wcr, set_wcr }
->  
-> +/* Macro to expand the PMEVTYPERn_EL0 register */
-> +#define PMU_PMEVTYPER_EL0(n)						\
-> +	/* PMEVTYPERn_EL0 */						\
-> +	{ Op0(0b11), Op1(0b011), CRn(0b1110),				\
-> +	  CRm((0b1100 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
-> +	  access_pmu_evtyper, reset_unknown, (PMEVTYPER0_EL0 + n), }
-> +
->  /*
->   * Architected system registers.
->   * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-> @@ -724,7 +779,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	  trap_raz_wi },
->  	/* PMXEVTYPER_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b001),
-> -	  trap_raz_wi },
-> +	  access_pmu_evtyper },
->  	/* PMXEVCNTR_EL0 */
->  	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b010),
->  	  trap_raz_wi },
-> @@ -742,6 +797,45 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	{ Op0(0b11), Op1(0b011), CRn(0b1101), CRm(0b0000), Op2(0b011),
->  	  NULL, reset_unknown, TPIDRRO_EL0 },
->  
-> +	/* PMEVTYPERn_EL0 */
-> +	PMU_PMEVTYPER_EL0(0),
-> +	PMU_PMEVTYPER_EL0(1),
-> +	PMU_PMEVTYPER_EL0(2),
-> +	PMU_PMEVTYPER_EL0(3),
-> +	PMU_PMEVTYPER_EL0(4),
-> +	PMU_PMEVTYPER_EL0(5),
-> +	PMU_PMEVTYPER_EL0(6),
-> +	PMU_PMEVTYPER_EL0(7),
-> +	PMU_PMEVTYPER_EL0(8),
-> +	PMU_PMEVTYPER_EL0(9),
-> +	PMU_PMEVTYPER_EL0(10),
-> +	PMU_PMEVTYPER_EL0(11),
-> +	PMU_PMEVTYPER_EL0(12),
-> +	PMU_PMEVTYPER_EL0(13),
-> +	PMU_PMEVTYPER_EL0(14),
-> +	PMU_PMEVTYPER_EL0(15),
-> +	PMU_PMEVTYPER_EL0(16),
-> +	PMU_PMEVTYPER_EL0(17),
-> +	PMU_PMEVTYPER_EL0(18),
-> +	PMU_PMEVTYPER_EL0(19),
-> +	PMU_PMEVTYPER_EL0(20),
-> +	PMU_PMEVTYPER_EL0(21),
-> +	PMU_PMEVTYPER_EL0(22),
-> +	PMU_PMEVTYPER_EL0(23),
-> +	PMU_PMEVTYPER_EL0(24),
-> +	PMU_PMEVTYPER_EL0(25),
-> +	PMU_PMEVTYPER_EL0(26),
-> +	PMU_PMEVTYPER_EL0(27),
-> +	PMU_PMEVTYPER_EL0(28),
-> +	PMU_PMEVTYPER_EL0(29),
-> +	PMU_PMEVTYPER_EL0(30),
-> +	/* PMCCFILTR_EL0
-> +	 * This register resets as unknown in 64bit mode while it resets as zero
-> +	 * in 32bit mode. Here we choose to reset it as zero for consistency.
-> +	 */
-> +	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b1111), Op2(0b111),
-> +	  access_pmu_evtyper, reset_val, PMCCFILTR_EL0, 0 },
-> +
->  	/* DACR32_EL2 */
->  	{ Op0(0b11), Op1(0b100), CRn(0b0011), CRm(0b0000), Op2(0b000),
->  	  NULL, reset_unknown, DACR32_EL2 },
-> @@ -931,6 +1025,13 @@ static const struct sys_reg_desc cp14_64_regs[] = {
->  	{ Op1( 0), CRm( 2), .access = trap_raz_wi },
->  };
->  
-> +/* Macro to expand the PMEVTYPERn register */
-> +#define PMU_PMEVTYPER(n)						\
-> +	/* PMEVTYPERn */						\
-> +	{ Op1(0), CRn(0b1110),						\
-> +	  CRm((0b1100 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
-> +	  access_pmu_evtyper }
-> +
->  /*
->   * Trapped cp15 registers. TTBR0/TTBR1 get a double encoding,
->   * depending on the way they are accessed (as a 32bit or a 64bit
-> @@ -967,7 +1068,7 @@ static const struct sys_reg_desc cp15_regs[] = {
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
->  	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmceid },
->  	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), trap_raz_wi },
-> -	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), trap_raz_wi },
-> +	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_evtyper },
->  	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), trap_raz_wi },
->  	{ Op1( 0), CRn( 9), CRm(14), Op2( 0), trap_raz_wi },
->  	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), trap_raz_wi },
-> @@ -982,6 +1083,41 @@ static const struct sys_reg_desc cp15_regs[] = {
->  	{ Op1( 0), CRn(12), CRm(12), Op2( 5), trap_raz_wi },
->  
->  	{ Op1( 0), CRn(13), CRm( 0), Op2( 1), access_vm_reg, NULL, c13_CID },
-> +
-> +	/* PMEVTYPERn */
-> +	PMU_PMEVTYPER(0),
-> +	PMU_PMEVTYPER(1),
-> +	PMU_PMEVTYPER(2),
-> +	PMU_PMEVTYPER(3),
-> +	PMU_PMEVTYPER(4),
-> +	PMU_PMEVTYPER(5),
-> +	PMU_PMEVTYPER(6),
-> +	PMU_PMEVTYPER(7),
-> +	PMU_PMEVTYPER(8),
-> +	PMU_PMEVTYPER(9),
-> +	PMU_PMEVTYPER(10),
-> +	PMU_PMEVTYPER(11),
-> +	PMU_PMEVTYPER(12),
-> +	PMU_PMEVTYPER(13),
-> +	PMU_PMEVTYPER(14),
-> +	PMU_PMEVTYPER(15),
-> +	PMU_PMEVTYPER(16),
-> +	PMU_PMEVTYPER(17),
-> +	PMU_PMEVTYPER(18),
-> +	PMU_PMEVTYPER(19),
-> +	PMU_PMEVTYPER(20),
-> +	PMU_PMEVTYPER(21),
-> +	PMU_PMEVTYPER(22),
-> +	PMU_PMEVTYPER(23),
-> +	PMU_PMEVTYPER(24),
-> +	PMU_PMEVTYPER(25),
-> +	PMU_PMEVTYPER(26),
-> +	PMU_PMEVTYPER(27),
-> +	PMU_PMEVTYPER(28),
-> +	PMU_PMEVTYPER(29),
-> +	PMU_PMEVTYPER(30),
-> +	/* PMCCFILTR */
-> +	{ Op1(0), CRn(14), CRm(15), Op2(7), access_pmu_evtyper },
->  };
->  
->  static const struct sys_reg_desc cp15_64_regs[] = {
-> -- 
-> 2.0.4
-> 
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe kvm" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> We are using a modified ARM version of EDK v3.0-rc0, and a modified
+>> ARM Trusted Firmware based on commit 963fcd4 (between v1.1 and 1.2).
+> Are you sure of that commit? It looks suspiciously like the ID ftom the
+> kernel tree...
+
+Hah, good catch!  The double-click-to-copy behavior is kind of flakey
+on RHEL 6's default terminal, and I bet that bit me.  It's 41099f4e.
+
+>> We certainly haven't touched any of the GIC code in either one.
+>>
+>> I tried to modify the host DT to enable GICv3, but then the host itself
+>> hangs on boot, so clearly more is needed.  (To be fair I've only tested
+>> v4.4 in that configuration, not v4.5-rc1.)  The firmware isn't yet using
+>> GICv3 so perhaps that is part of the problem.
+> That's indeed part of the problem. The firmware running at EL3 insists
+> on using GICv2, but still let EL2 (and EL1) use GICv3 system registers.
+> Could you please dump the content of ICC_SRE_EL3 just before entering
+> the kernel at EL2? If you see ICC_SRE_EL3.SRE being set, then this would
+> indicate a firmware bug (and leave the system in an unpredictable
+> configuration).
+
+Well, the firmware clearly does this intentionally.  In ATF's
+drivers/arm/giv/arm_gic.c, the gicv3_cpuif_setup() function has
+a comment that reads:
+
+/*******************************************************************************
+  * This function does some minimal GICv3 configuration. The Firmware itself does
+  * not fully support GICv3 at this time and relies on GICv2 emulation as
+  * provided by GICv3. This function allows software (like Linux) in later stages
+  * to use full GICv3 features.
+  ******************************************************************************/
+
+and the function ends with:
+
+	val = read_icc_sre_el3();
+	write_icc_sre_el3(val | ICC_SRE_EN | ICC_SRE_SRE);
+
+In our build environment, if I comment out those two lines, that
+fixes the guest boot problem (without any hacking on the Linux side),
+so that's good anyway.  With this change it works for me in the
+Fast Models as well as Foundation Models, too.
+
+-- 
+Chris Metcalf, EZChip Semiconductor
+http://www.ezchip.com
