@@ -1,48 +1,106 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 3/5] arm64: KVM: Fix wrong use of the CPSR MODE mask for 32bit guests
-Date: Thu, 28 Jan 2016 10:30:36 +0000
-Message-ID: <1453977038-13516-4-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 1/5] arm64: KVM: Fix AArch64 guest userspace exception injection
+Date: Thu, 28 Jan 2016 10:30:34 +0000
+Message-ID: <1453977038-13516-2-git-send-email-marc.zyngier@arm.com>
 References: <1453977038-13516-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1453977038-13516-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Shannon Zhao <shannon.zhao@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Gleb Natapov <gleb@kernel.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Shannon Zhao <shannon.zhao@linaro.org>, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Gleb Natapov <gleb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Shannon Zhao <shannon.zhao@linaro.org>
+At the moment, our fault injection is pretty limited. We always
+generate a SYNC exception into EL1, as if the fault was actually
+from EL1h, no matter how it was generated.
 
-The values of CPSR MODE mask are different between aarch32 and aarch64.
-It should use the right one according to the execution state.
+This is obviously wrong, as EL0 can generate faults of its own
+(not to mention the pretty-much unused EL1t mode).
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+This patch fixes it by implementing section D1.10.2 of the ARMv8 ARM,
+and in particular table D1-7 ("Vector offsets from vector table base
+address"), which describes which vector to use depending on the source
+exception level and type (synchronous, IRQ, FIQ or SError).
+
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Tested-by: Shannon Zhao <shannon.zhao@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/inject_fault.c | 38 +++++++++++++++++++++++++++++++++++---
+ 1 file changed, 35 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 3066328..779a587 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -127,10 +127,14 @@ static inline unsigned long *vcpu_spsr(const struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/inject_fault.c b/arch/arm64/kvm/inject_fault.c
+index 648112e..4d1ac81 100644
+--- a/arch/arm64/kvm/inject_fault.c
++++ b/arch/arm64/kvm/inject_fault.c
+@@ -27,7 +27,11 @@
  
- static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
+ #define PSTATE_FAULT_BITS_64 	(PSR_MODE_EL1h | PSR_A_BIT | PSR_F_BIT | \
+ 				 PSR_I_BIT | PSR_D_BIT)
+-#define EL1_EXCEPT_SYNC_OFFSET	0x200
++
++#define CURRENT_EL_SP_EL0_VECTOR	0x0
++#define CURRENT_EL_SP_ELx_VECTOR	0x200
++#define LOWER_EL_AArch64_VECTOR		0x400
++#define LOWER_EL_AArch32_VECTOR		0x600
+ 
+ static void prepare_fault32(struct kvm_vcpu *vcpu, u32 mode, u32 vect_offset)
  {
--	u32 mode = *vcpu_cpsr(vcpu) & PSR_MODE_MASK;
-+	u32 mode;
+@@ -97,6 +101,34 @@ static void inject_abt32(struct kvm_vcpu *vcpu, bool is_pabt,
+ 		*fsr = 0x14;
+ }
  
--	if (vcpu_mode_is_32bit(vcpu))
-+	if (vcpu_mode_is_32bit(vcpu)) {
-+		mode = *vcpu_cpsr(vcpu) & COMPAT_PSR_MODE_MASK;
- 		return mode > COMPAT_PSR_MODE_USR;
++enum exception_type {
++	except_type_sync	= 0,
++	except_type_irq		= 0x80,
++	except_type_fiq		= 0x100,
++	except_type_serror	= 0x180,
++};
++
++static u64 get_except_vector(struct kvm_vcpu *vcpu, enum exception_type type)
++{
++	u64 exc_offset;
++
++	switch (*vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT)) {
++	case PSR_MODE_EL1t:
++		exc_offset = CURRENT_EL_SP_EL0_VECTOR;
++		break;
++	case PSR_MODE_EL1h:
++		exc_offset = CURRENT_EL_SP_ELx_VECTOR;
++		break;
++	case PSR_MODE_EL0t:
++		exc_offset = LOWER_EL_AArch64_VECTOR;
++		break;
++	default:
++		exc_offset = LOWER_EL_AArch32_VECTOR;
 +	}
 +
-+	mode = *vcpu_cpsr(vcpu) & PSR_MODE_MASK;
++	return vcpu_sys_reg(vcpu, VBAR_EL1) + exc_offset + type;
++}
++
+ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr)
+ {
+ 	unsigned long cpsr = *vcpu_cpsr(vcpu);
+@@ -108,8 +140,8 @@ static void inject_abt64(struct kvm_vcpu *vcpu, bool is_iabt, unsigned long addr
+ 	*vcpu_spsr(vcpu) = cpsr;
+ 	*vcpu_elr_el1(vcpu) = *vcpu_pc(vcpu);
  
- 	return mode != PSR_MODE_EL0t;
- }
++	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
+ 	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
+-	*vcpu_pc(vcpu) = vcpu_sys_reg(vcpu, VBAR_EL1) + EL1_EXCEPT_SYNC_OFFSET;
+ 
+ 	vcpu_sys_reg(vcpu, FAR_EL1) = addr;
+ 
+@@ -143,8 +175,8 @@ static void inject_undef64(struct kvm_vcpu *vcpu)
+ 	*vcpu_spsr(vcpu) = cpsr;
+ 	*vcpu_elr_el1(vcpu) = *vcpu_pc(vcpu);
+ 
++	*vcpu_pc(vcpu) = get_except_vector(vcpu, except_type_sync);
+ 	*vcpu_cpsr(vcpu) = PSTATE_FAULT_BITS_64;
+-	*vcpu_pc(vcpu) = vcpu_sys_reg(vcpu, VBAR_EL1) + EL1_EXCEPT_SYNC_OFFSET;
+ 
+ 	/*
+ 	 * Build an unknown exception, depending on the instruction
 -- 
 2.1.4
 
