@@ -1,68 +1,62 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 4/5] arm64: KVM: Fix comments of the CP handler
-Date: Thu, 28 Jan 2016 10:30:37 +0000
-Message-ID: <1453977038-13516-5-git-send-email-marc.zyngier@arm.com>
-References: <1453977038-13516-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B5B2740C9D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2016 05:25:55 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id e7QRTg9Jg44n for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Jan 2016 05:25:54 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9E72F40FA7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2016 05:25:54 -0500 (EST)
-In-Reply-To: <1453977038-13516-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Subject: [GIT PULL] KVM/ARM updates for 4.5-rc2
+Date: Thu, 28 Jan 2016 10:30:33 +0000
+Message-ID: <1453977038-13516-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, Dave Martin <Dave.Martin@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Dave Martin <Dave.Martin@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Gleb Natapov <gleb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Shannon Zhao <shannon.zhao@linaro.org>
+Hi Paolo,
 
-Make sure the documentation reflects the actual name of the functions.
+Please find below the KVM/ARM updates for 4.5-rc2. Mostly fixes as a
+result of Shannon's work on PMU emulation, which has outlined a few
+nits here and there, plus a correctness fix from Dave.
 
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm64/kvm/sys_regs.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Please pull!
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index eec3598..4048934 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1043,7 +1043,7 @@ static void unhandled_cp_access(struct kvm_vcpu *vcpu,
- }
- 
- /**
-- * kvm_handle_cp_64 -- handles a mrrc/mcrr trap on a guest CP15 access
-+ * kvm_handle_cp_64 -- handles a mrrc/mcrr trap on a guest CP14/CP15 access
-  * @vcpu: The VCPU pointer
-  * @run:  The kvm_run struct
-  */
-@@ -1095,7 +1095,7 @@ out:
- }
- 
- /**
-- * kvm_handle_cp15_32 -- handles a mrc/mcr trap on a guest CP15 access
-+ * kvm_handle_cp_32 -- handles a mrc/mcr trap on a guest CP14/CP15 access
-  * @vcpu: The VCPU pointer
-  * @run:  The kvm_run struct
-  */
--- 
-2.1.4
+Thanks,
+
+	M.
+
+The following changes since commit 92e963f50fc74041b5e9e744c330dca48e04f08d:
+
+  Linux 4.5-rc1 (2016-01-24 13:06:47 -0800)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-4.5-rc2
+
+for you to fetch changes up to 6327f35a2010c06a3bc2bfb14202a38764fb9920:
+
+  arm64: KVM: Fix guest dead loop when register accessor returns false (2016-01-24 21:56:01 +0000)
+
+----------------------------------------------------------------
+KVM/ARM fixes for v4.5-rc2
+
+A few random fixes, mostly coming from the PMU work by Shannon:
+
+- fix for injecting faults coming from the guest's userspace
+- cleanup for our CPTR_EL2 accessors (reserved bits)
+- fix for a bug impacting perf (user/kernel discrimination)
+- fix for a 32bit sysreg handling bug
+
+----------------------------------------------------------------
+Dave Martin (1):
+      arm64: KVM: Obey RES0/1 reserved bits when setting CPTR_EL2
+
+Marc Zyngier (1):
+      arm64: KVM: Fix AArch64 guest userspace exception injection
+
+Shannon Zhao (3):
+      arm64: KVM: Fix wrong use of the CPSR MODE mask for 32bit guests
+      arm64: KVM: Fix comments of the CP handler
+      arm64: KVM: Fix guest dead loop when register accessor returns false
+
+ arch/arm64/include/asm/kvm_arm.h     |  1 +
+ arch/arm64/include/asm/kvm_emulate.h |  8 ++++++--
+ arch/arm64/kvm/hyp/switch.c          |  8 ++++++--
+ arch/arm64/kvm/inject_fault.c        | 38 +++++++++++++++++++++++++++++++++---
+ arch/arm64/kvm/sys_regs.c            |  9 ++++-----
+ 5 files changed, 52 insertions(+), 12 deletions(-)
