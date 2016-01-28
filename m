@@ -1,45 +1,53 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 5/5] arm64: KVM: Fix guest dead loop when register accessor returns false
-Date: Thu, 28 Jan 2016 10:30:38 +0000
-Message-ID: <1453977038-13516-6-git-send-email-marc.zyngier@arm.com>
-References: <1453977038-13516-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1453977038-13516-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Shannon Zhao <shannon.zhao@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>, Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Gleb Natapov <gleb@kernel.org>
+From: Alexander Gordeev <agordeev@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 01/11] arm/pci: Device tree PCI probing
+Date: Thu, 28 Jan 2016 16:17:19 +0100
+Message-ID: <20160128151719.GA26275@dhcp-27-118.brq.redhat.com>
+References: <cover.1452341807.git.agordeev@redhat.com>
+ <06ff365af0d7579d0e4e431fad2492379533c290.1452341807.git.agordeev@redhat.com>
+ <20160113151307.GA10709@hawk.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AC8A7407A0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2016 10:12:22 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id OpdHYJ78KfO0 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Jan 2016 10:12:21 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7DEF340402
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2016 10:12:21 -0500 (EST)
+Received: from int-mx10.intmail.prod.int.phx2.redhat.com
+ (int-mx10.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ by mx1.redhat.com (Postfix) with ESMTPS id 388DBC0A9CC3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Jan 2016 15:17:23 +0000 (UTC)
+Content-Disposition: inline
+In-Reply-To: <20160113151307.GA10709@hawk.localdomain>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Shannon Zhao <shannon.zhao@linaro.org>
+On Wed, Jan 13, 2016 at 04:13:07PM +0100, Andrew Jones wrote:
+> > +	assert(dt_get_nr_cells(node, &nac_root, &nsc_root) == 0);
+> 
+> Sorry the starter code I sent you had statements inside asserts().
+> We avoid those now, see commit 18ab6cadf
 
-Currently emulate_cp will return 0 (Handled) no matter what the accessor
-returns. If register accessor returns false, it will not skip current PC
-while emulate_cp return handled. Then guest will stuck in a dead loop.
+Hmm.. the commit does not appear addressing the described
+in changelog condition '...if somebody introduces a switch to
+"#define assert(...) /*nothing*/"...' as to-be-void asserts
+are not followed by return value checks (even when seemingly
+possible). If it worth following this pattern?
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm64/kvm/sys_regs.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 4048934..2e90371 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1007,10 +1007,9 @@ static int emulate_cp(struct kvm_vcpu *vcpu,
- 		if (likely(r->access(vcpu, params, r))) {
- 			/* Skip instruction, since it was emulated */
- 			kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-+			/* Handled */
-+			return 0;
- 		}
--
--		/* Handled */
--		return 0;
- 	}
- 
- 	/* Not handled */
--- 
-2.1.4
-
+Thanks!
