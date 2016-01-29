@@ -1,8 +1,8 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
 Subject: Re: [PATCH v10 07/21] KVM: ARM64: PMU: Add perf event map and introduce
  perf event creating function
-Date: Fri, 29 Jan 2016 14:14:25 +0800
-Message-ID: <56AB0341.2000203@huawei.com>
+Date: Fri, 29 Jan 2016 14:26:31 +0800
+Message-ID: <56AB0617.5060902@huawei.com>
 References: <1453866709-20324-1-git-send-email-zhaoshenglong@huawei.com> <1453866709-20324-8-git-send-email-zhaoshenglong@huawei.com> <20160128163115.GC3807@hawk.localdomain> <56AA45B0.3060205@arm.com> <20160128180638.GO775@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="ISO-8859-1"
@@ -64,7 +64,11 @@ On 2016/1/29 2:06, Will Deacon wrote:
 >> > don't know the rational. Will?
 > It was years ago, but I suspect that the cycle counter is index zero
 > because its mandated, whilst the number of event counters is IMPDEF.
-So does it need to change the cycle counter index to zero in this patch set?
+
+Since PMCNTENSET/CLR, PMINTENSET/CLR, PMOVSSET/CLR and PMSWINC are using
+bit 31 to stands the state of cycle counter, if we make cycle counter
+index to zero, we always need to do translation between the idx and bit
+31 when we access these registers.
 
 Thanks,
 -- 
