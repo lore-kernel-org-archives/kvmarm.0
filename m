@@ -1,103 +1,121 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [PATCH v10 08/21] KVM: ARM64: Add access handler for event type
- register
-Date: Fri, 29 Jan 2016 12:25:32 +0100
-Message-ID: <20160129112532.GB4340@hawk.localdomain>
+From: Shannon Zhao <shannon.zhao@linaro.org>
+Subject: Re: [PATCH v10 07/21] KVM: ARM64: PMU: Add perf event map and
+ introduce perf event creating function
+Date: Fri, 29 Jan 2016 21:11:10 +0800
+Message-ID: <56AB64EE.5080305@linaro.org>
 References: <1453866709-20324-1-git-send-email-zhaoshenglong@huawei.com>
- <1453866709-20324-9-git-send-email-zhaoshenglong@huawei.com>
- <20160128201159.GH16453@hawk.localdomain>
- <56AAC368.8020605@huawei.com>
+ <1453866709-20324-8-git-send-email-zhaoshenglong@huawei.com>
+ <20160128163115.GC3807@hawk.localdomain> <56AA45B0.3060205@arm.com>
+ <20160128180638.GO775@arm.com> <56AB0617.5060902@huawei.com>
+ <20160129101812.GB4541@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <56AAC368.8020605@huawei.com>
-Sender: kvm-owner@vger.kernel.org
-To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 561A64053F
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jan 2016 08:05:45 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Jp+ITcSwQhXh for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 Jan 2016 08:05:44 -0500 (EST)
+Received: from mail-pf0-f177.google.com (mail-pf0-f177.google.com
+ [209.85.192.177])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 068F140402
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jan 2016 08:05:43 -0500 (EST)
+Received: by mail-pf0-f177.google.com with SMTP id o185so37444970pfb.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Jan 2016 05:10:50 -0800 (PST)
+In-Reply-To: <20160129101812.GB4541@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Will Deacon <will.deacon@arm.com>, Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 29, 2016 at 09:42:00AM +0800, Shannon Zhao wrote:
-> 
-> 
-> On 2016/1/29 4:11, Andrew Jones wrote:
-> > On Wed, Jan 27, 2016 at 11:51:36AM +0800, Shannon Zhao wrote:
-> >> > From: Shannon Zhao <shannon.zhao@linaro.org>
-> >> > 
-> >> > These kind of registers include PMEVTYPERn, PMCCFILTR and PMXEVTYPER
-> >> > which is mapped to PMEVTYPERn or PMCCFILTR.
-> >> > 
-> >> > The access handler translates all aarch32 register offsets to aarch64
-> >> > ones and uses vcpu_sys_reg() to access their values to avoid taking care
-> >> > of big endian.
-> >> > 
-> >> > When writing to these registers, create a perf_event for the selected
-> >> > event type.
-> >> > 
-> >> > Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> >> > ---
-> >> >  arch/arm64/kvm/sys_regs.c | 140 +++++++++++++++++++++++++++++++++++++++++++++-
-> >> >  1 file changed, 138 insertions(+), 2 deletions(-)
-> >> > 
-> >> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> >> > index 06257e2..298ae94 100644
-> >> > --- a/arch/arm64/kvm/sys_regs.c
-> >> > +++ b/arch/arm64/kvm/sys_regs.c
-> >> > @@ -513,6 +513,54 @@ static bool access_pmceid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> >> >  	return true;
-> >> >  }
-> >> >  
-> >> > +static bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
-> >> > +{
-> >> > +	u64 pmcr, val;
-> >> > +
-> >> > +	pmcr = vcpu_sys_reg(vcpu, PMCR_EL0);
-> >> > +	val = (pmcr >> ARMV8_PMCR_N_SHIFT) & ARMV8_PMCR_N_MASK;
-> >> > +	if (idx >= val && idx != ARMV8_CYCLE_IDX)
-> >> > +		return false;
-> >> > +
-> >> > +	return true;
-> >> > +}
-> >> > +
-> >> > +static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-> >> > +			       const struct sys_reg_desc *r)
-> >> > +{
-> >> > +	u64 idx, reg;
-> >> > +
-> >> > +	if (!kvm_arm_pmu_v3_ready(vcpu))
-> >> > +		return trap_raz_wi(vcpu, p, r);
-> >> > +
-> >> > +	if (r->CRn == 9 && r->CRm == 13 && r->Op2 == 1) {
-> >> > +		/* PMXEVTYPER_EL0 */
-> >> > +		idx = vcpu_sys_reg(vcpu, PMSELR_EL0) & ARMV8_COUNTER_MASK;
-> >> > +		reg = PMEVTYPER0_EL0 + idx;
-> >> > +	} else if (r->CRn == 14 && (r->CRm & 12) == 12) {
-> >> > +		idx = ((r->CRm & 3) << 3) | (r->Op2 & 7);
-> >> > +		if (idx == ARMV8_CYCLE_IDX)
-> >> > +			reg = PMCCFILTR_EL0;
-> >> > +		else
-> >> > +			/* PMEVTYPERn_EL0 */
-> >> > +			reg = PMEVTYPER0_EL0 + idx;
-> >> > +	} else {
-> >> > +		BUG();
-> >> > +	}
-> >> > +
-> >> > +	if (!pmu_counter_idx_valid(vcpu, idx))
-> >> > +		return false;
-> >> > +
-> >> > +	if (p->is_write) {
-> >> > +		kvm_pmu_set_counter_event_type(vcpu, p->regval, idx);
-> >> > +		vcpu_sys_reg(vcpu, reg) = p->regval & ARMV8_EVTYPE_MASK;
-> >> > +	} else {
-> >> > +		p->regval = vcpu_sys_reg(vcpu, reg) & ARMV8_EVTYPE_MASK;
-> > Related to my comment in 5/21. Why should we need to mask it here when
-> > reading it, since it was masked on writing?
-> > 
-> But what if guest reads this register before writing to it?
 
-Oh, I see. The need comes from the use of the reset_unknown reset function.
-It might be nice to have a reset_unknown_mask function that uses r->val
-as the mask, as there are many registers that have RES0/1 and/or RO fields.
+
+On 2016/1/29 18:18, Will Deacon wrote:
+> On Fri, Jan 29, 2016 at 02:26:31PM +0800, Shannon Zhao wrote:
+>> >
+>> >
+>> >On 2016/1/29 2:06, Will Deacon wrote:
+>>> > >On Thu, Jan 28, 2016 at 04:45:36PM +0000, Marc Zyngier wrote:
+>>>>> > >> >On 28/01/16 16:31, Andrew Jones wrote:
+>>>>>>> > >>> > >On Wed, Jan 27, 2016 at 11:51:35AM +0800, Shannon Zhao wrote:
+>>>>>>>>> > >>>> > >>From: Shannon Zhao<shannon.zhao@linaro.org>
+>>>>>>>>> > >>>> > >>
+>>>>>>>>> > >>>> > >>When we use tools like perf on host, perf passes the event type and the
+>>>>>>>>> > >>>> > >>id of this event type category to kernel, then kernel will map them to
+>>>>>>>>> > >>>> > >>hardware event number and write this number to PMU PMEVTYPER<n>_EL0
+>>>>>>>>> > >>>> > >>register. When getting the event number in KVM, directly use raw event
+>>>>>>>>> > >>>> > >>type to create a perf_event for it.
+>>>>>>>>> > >>>> > >>
+>>>>>>>>> > >>>> > >>Signed-off-by: Shannon Zhao<shannon.zhao@linaro.org>
+>>>>>>>>> > >>>> > >>Reviewed-by: Marc Zyngier<marc.zyngier@arm.com>
+>>>>>>>>> > >>>> > >>---
+>>>>>>>>> > >>>> > >>  arch/arm64/include/asm/pmu.h |   3 ++
+>>>>>>>>> > >>>> > >>  arch/arm64/kvm/Makefile      |   1 +
+>>>>>>>>> > >>>> > >>  include/kvm/arm_pmu.h        |  10 ++++
+>>>>>>>>> > >>>> > >>  virt/kvm/arm/pmu.c           | 122 +++++++++++++++++++++++++++++++++++++++++++
+>>>>>>>>> > >>>> > >>  4 files changed, 136 insertions(+)
+>>>>>>>>> > >>>> > >>  create mode 100644 virt/kvm/arm/pmu.c
+>>>>>>>>> > >>>> > >>
+>>>>>>>>> > >>>> > >>diff --git a/arch/arm64/include/asm/pmu.h b/arch/arm64/include/asm/pmu.h
+>>>>>>>>> > >>>> > >>index 4406184..2588f9c 100644
+>>>>>>>>> > >>>> > >>--- a/arch/arm64/include/asm/pmu.h
+>>>>>>>>> > >>>> > >>+++ b/arch/arm64/include/asm/pmu.h
+>>>>>>>>> > >>>> > >>@@ -21,6 +21,7 @@
+>>>>>>>>> > >>>> > >>
+>>>>>>>>> > >>>> > >>  #define ARMV8_MAX_COUNTERS      32
+>>>>>>>>> > >>>> > >>  #define ARMV8_COUNTER_MASK      (ARMV8_MAX_COUNTERS - 1)
+>>>>>>>>> > >>>> > >>+#define ARMV8_CYCLE_IDX         (ARMV8_MAX_COUNTERS - 1)
+>>>>>>> > >>> > >
+>>>>>>> > >>> > >I'm not sure we want to add this. It's name is wrong, as it's really
+>>>>>>> > >>> > >PMCNTENSET_EL0.C, and just a few lines above we have the idx defined
+>>>>>>> > >>> > >already (ARMV8_IDX_CYCLE_COUNTER), but as zero, because
+>>>>>>> > >>> > >arch/arm64/kernel/perf_event.c maps it that way.
+>>>>>>> > >>> > >
+>>>>>>> > >>> > >I think we should do the same with the pmc array, i.e. map the cycle
+>>>>>>> > >>> > >counter to idx zero.
+>>>>> > >> >
+>>>>> > >> >I tend to have the opposite view. Not for the sake of it, but because I
+>>>>> > >> >find it helpful to directly map the code to the architecture
+>>>>> > >> >documentation without having to bend another handful of neurons.
+>>>>> > >> >
+>>>>> > >> >Will probably had some good reasons to structure it that way, but I
+>>>>> > >> >don't know the rational. Will?
+>>> > >It was years ago, but I suspect that the cycle counter is index zero
+>>> > >because its mandated, whilst the number of event counters is IMPDEF.
+>> >
+>> >Since PMCNTENSET/CLR, PMINTENSET/CLR, PMOVSSET/CLR and PMSWINC are using
+>> >bit 31 to stands the state of cycle counter, if we make cycle counter
+>> >index to zero, we always need to do translation between the idx and bit
+>> >31 when we access these registers.
+> Conversely, if you stick the cycle counter right at the top, then you'll
+> need to rework a bunch of the perf code that iterates from
+> ARMV7_IDX_COUNTER0 to pmu->num_events.
+
+But actually this doesn't affect the perf code now because it's just a 
+internal PMC array index of kvm arm guest pmu codes.
+And having a look at the ARMv8 SPEC, it says
+"
+PMCCFILTR_EL0 can also be accessed by using PMXEVTYPER_EL0 with 
+PMSELR_EL0.SEL set to 0b11111.
+"
+Apparently it treats the index of cycle counter as 31 not zero. Also 
+regarding the PMCR.N field my understanding is that it just stands the 
+number of counters not the counter's order or index. Looking at the 
+description of PMSEL.SEL field, it says "This field can take any value 
+from 0 (0b00000) to (PMCR.N)-1, or 31 (0b11111)." while it's not "This 
+field can take any value from 1 (0b00001) to (PMCR.N), or 0."
 
 Thanks,
-drew
+-- 
+Shannon
