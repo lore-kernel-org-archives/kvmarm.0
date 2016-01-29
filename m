@@ -1,89 +1,97 @@
-From: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH 00/10] KVM PCIe/MSI passthrough on ARM/ARM64
-Date: Thu, 28 Jan 2016 14:51:39 -0700
-Message-ID: <1454017899.23148.0.camel@redhat.com>
-References: <1453813968-2024-1-git-send-email-eric.auger@linaro.org>
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Subject: Re: [PATCH v10 08/21] KVM: ARM64: Add access handler for event type
+ register
+Date: Fri, 29 Jan 2016 09:42:00 +0800
+Message-ID: <56AAC368.8020605@huawei.com>
+References: <1453866709-20324-1-git-send-email-zhaoshenglong@huawei.com> <1453866709-20324-9-git-send-email-zhaoshenglong@huawei.com> <20160128201159.GH16453@hawk.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <1453813968-2024-1-git-send-email-eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, eric.auger-qxv4g6HH51o@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Cc: patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20160128201159.GH16453@hawk.localdomain>
+Sender: kvm-owner@vger.kernel.org
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gVHVlLCAyMDE2LTAxLTI2IGF0IDEzOjEyICswMDAwLCBFcmljIEF1Z2VyIHdyb3RlOgo+IFRo
-aXMgc2VyaWVzIGFkZHJlc3NlcyBLVk0gUENJZSBwYXNzdGhyb3VnaCB3aXRoIE1TSSBlbmFibGVk
-IG9uIEFSTS9BUk02NC4KPiBJdCBwdXJzdWVzIHRoZSBlZmZvcnRzIGRvbmUgb24gWzFdLCBbMl0s
-IFszXS4gSXQgYWxzbyBhaW1zIGF0IGNvdmVyaW5nIHRoZQo+IHNhbWUgbmVlZCBvbiBzb21lIFBv
-d2VyUEMgcGxhdGZvcm1zLgo+wqAKPiBPbiB4ODYgYWxsIGFjY2Vzc2VzIHRvIHRoZSAxTUIgUEEg
-cmVnaW9uIFtGRUUwXzAwMDBoIC0gRkVGMF8wMDBoXSBhcmUgZGlyZWN0ZWQKPiBhcyBpbnRlcnJ1
-cHQgbWVzc2FnZXM6IGFjY2Vzc2VzIHRvIHRoaXMgc3BlY2lhbCBQQSB3aW5kb3cgZGlyZWN0bHkg
-dGFyZ2V0IHRoZQo+IEFQSUMgY29uZmlndXJhdGlvbiBzcGFjZSBhbmQgbm90IERSQU0sIG1lYW5p
-bmcgdGhlIGRvd25zdHJlYW0gSU9NTVUgaXMgYnlwYXNzZWQuCj7CoAo+IFRoaXMgaXMgbm90IHRo
-ZSBjYXNlIG9uIGFib3ZlIG1lbnRpb25uZWQgcGxhdGZvcm1zIHdoZXJlIE1TSSBtZXNzYWdlcyBl
-bWl0dGVkCj4gYnkgZGV2aWNlcyBhcmUgY29udmV5ZWQgdGhyb3VnaCB0aGUgSU9NTVUuIFRoaXMg
-bWVhbnMgYW4gSU9WQS9ob3N0IFBBIG1hcHBpbmcKPiBtdXN0IGV4aXN0IGZvciB0aGUgTVNJIHRv
-IHJlYWNoIHRoZSBNU0kgY29udHJvbGxlci4gTm9ybWFsIHdheSB0byBjcmVhdGUKPiBJT1ZBIGJp
-bmRpbmdzIGNvbnNpc3RzIGluIHVzaW5nIFZGSU8gRE1BIE1BUCBBUEkuIEhvd2V2ZXIgaW4gdGhp
-cyBjYXNlCj4gdGhlIE1TSSBJT1ZBIGlzIG5vdCBtYXBwZWQgb250byBndWVzdCBSQU0gYnV0IG9u
-IGhvc3QgcGh5c2ljYWwgcGFnZSAodGhlIE1TSQo+IGNvbnRyb2xsZXIgZnJhbWUpLgo+wqAKPiBG
-b2xsb3dpbmcgZmlyc3QgY29tbWVudHMsIHRoZSBzcGlyaXQgb2YgWzJdIGlzIGtlcHQ6IHRoZSBn
-dWVzdCByZWdpc3RlcnMKPiBhbiBJT1ZBIHJhbmdlIHJlc2VydmVkIGZvciBNU0kgbWFwcGluZy4g
-V2hlbiB0aGUgVkZJTy1QQ0llIGRyaXZlciBhbGxvY2F0ZXMKPiBpdHMgTVNJIHZlY3RvcnMsIGl0
-IG92ZXJ3cml0ZXMgdGhlIE1TSSBjb250cm9sbGVyIHBoeXNpY2FsIGFkZHJlc3Mgd2l0aCBhbiBJ
-T1ZBLAo+IGFsbG9jYXRlZCB3aXRoaW4gdGhlIHdpbmRvdyBwcm92aWRlZCBieSB0aGUgdXNlcnNw
-YWNlLiBUaGlzIElPVkEgaXMgbWFwcGVkCj4gb250byB0aGUgTVNJIGNvbnRyb2xsZXIgZnJhbWUg
-cGh5c2ljYWwgcGFnZS4KPsKgCj4gVGhlIHNlcmllcyBkb2VzIG5vdCBhZGRyZXNzIHlldCB0aGUg
-cHJvYmxlbWF0aWMgb2YgdGVsbGluZyB0aGUgdXNlcnNwYWNlIGhvdwo+IG11Y2ggSU9WQSBoZSBz
-aG91bGQgcHJvdmlzaW9uLgoKSSdtIHNvcnQgb2Ygb24gYSB0aGluay1kaWZmZXJlbnQgYXBwcm9h
-Y2ggdG9kYXksIHNvIGJlYXIgd2l0aCBtZTsgaG93IGlzCml0IHRoYXQgeDg2IGNhbiBtYWtlIGlu
-dGVycnVwdCByZW1hcHBpbmcgc28gdHJhbnNwYXJlbnQgdG8gZHJpdmVycyBsaWtlCnZmaW8tcGNp
-IHdoaWxlIGZvciBBUk0gYW5kIHBwYyB3ZSBzZWVtIHRvIGJlIHN0dWNrIHdpdGggZG9pbmcgdGhl
-c2UKZml4dXBzIG9mIHRoZSBwaHlzaWNhbCB2ZWN0b3Igb3Vyc2VsdmVzLCBpbXBseWluZyB1Z2x5
-IChubyBvZmZlbnNlKQpwYXRocyBib3VuY2luZyB0aHJvdWdoIHZmaW8gdG8gY29ubmVjdCB0aGUg
-ZHJpdmVyIGFuZCBpb21tdSBiYWNrZW5kcz8KCldlIGtub3cgdGhhdCB4ODYgaGFuZGxlcyBNU0kg
-dmVjdG9ycyBzcGVjaWFsbHksIHNvIHRoZXJlIGlzIHNvbWUKaGFyZHdhcmUgdGhhdCBoZWxwcyB0
-aGUgc2l0dWF0aW9uLsKgwqBJdCdzIG5vdCBqdXN0IHRoYXQgeDg2IGhhcyBhIGZpeGVkCnJhbmdl
-IGZvciBNU0ksIGl0J3MgaG93IGl0IG1hbmFnZXMgdGhhdCByYW5nZSB3aGVuIGludGVycnVwdCBy
-ZW1hcHBpbmcKaGFyZHdhcmUgaXMgZW5hYmxlZC7CoMKgQSBkZXZpY2UgdGFibGUgaW5kZXhlZCBi
-eSBzb3VyY2UtSUQgcmVmZXJlbmNlcyBhCnBlciBkZXZpY2UgdGFibGUgaW5kZXhlZCBieSBkYXRh
-IGZyb20gdGhlIE1TSSB3cml0ZSBpdHNlbGYuwqDCoFNvIHdlIGdldAptdWNoLCBtdWNoIGZpbmVy
-IGdyYW51bGFyaXR5LCBidXQgdGhlcmUncyBzdGlsbCBlZmZlY3RpdmVseSBhbiBpbnRlcnJ1cHQK
-ZG9tYWluIHBlciBkZXZpY2UgdGhhdCdzIGJlaW5nIHRyYW5zcGFyZW50bHkgbWFuYWdlZCB1bmRl
-ciB0aGUgY292ZXJzCndoZW5ldmVyIHdlIHJlcXVlc3QgYW4gTVNJIHZlY3RvciBmb3IgYSBkZXZp
-Y2UuCgpTbyB3aHkgY2FuJ3Qgd2UgZG8gc29tZXRoaW5nIG1vcmUgbGlrZSB0aGF0IGhlcmU/wqDC
-oFRoZXJlJ3Mgbm8gcHJlZGVmaW5lZApNU0kgdmVjdG9yIHJhbmdlLCBzbyBkZWZpbmluZyBhbiBp
-bnRlcmZhY2UgZm9yIHRoZSB1c2VyIHRvIHNwZWNpZnkgdGhhdAppcyB1bmF2b2lkYWJsZS7CoMKg
-QnV0IHdoeSBzaG91bGRuJ3QgZXZlcnl0aGluZyBlbHNlIGJlIHRyYW5zcGFyZW50P8KgwqBXZQpj
-b3VsZCBhZGQgYW4gaW50ZXJmYWNlIHRvIHRoZSBJT01NVSBBUEkgdGhhdCBhbGxvd3MgdXMgdG8g
-cmVnaXN0ZXIgdGhhdApyZXNlcnZlZCByYW5nZSBmb3IgdGhlIElPTU1VIGRvbWFpbi7CoMKgSU9N
-TVUtY29yZSAob3IgbWF5YmUgaW50ZXJydXB0CnJlbWFwcGluZykgY29kZSBtaWdodCBhbGxvY2F0
-ZSBhbiBJT1ZBIGRvbWFpbiBmb3IgdGhpcyBqdXN0IGFzIHlvdSd2ZQpkb25lIGluIHRoZSB0eXBl
-MSBjb2RlIGhlcmUuwqDCoEJ1dCByYXRoZXIgdGhhbiBoYXZpbmcgYW55IGludGVyYWN0aW9uCndp
-dGggdmZpby1wY2ksIHdoeSBub3QgZG8gdGhpcyBhdCBsb3dlciBsZXZlbHMgc3VjaCB0aGF0IHRo
-ZSBwbGF0Zm9ybQppbnRlcnJ1cHQgdmVjdG9yIGFsbG9jYXRpb24gY29kZSBhdXRvbWF0aWNhbGx5
-IHVzZXMgb25lIG9mIHRob3NlIElPVkEKcmFuZ2VzIGFuZCByZXR1cm5zIHRoZSBJT1ZBIHJhdGhl
-ciB0aGFuIHRoZSBwaHlzaWNhbCBhZGRyZXNzIGZvciB0aGUgUENJCmNvZGUgdG8gcHJvZ3JhbSBp
-bnRvIHRoZSBkZXZpY2U/wqDCoEkgdGhpbmsgd2Uga25vdyB3aGF0IG5lZWRzIHRvIGJlIGRvbmUs
-CmJ1dCB3ZSdyZSB0YWtpbmcgdGhlIGFwcHJvYWNoIG9mIG1hbmFnaW5nIHRoZSBzcGFjZSBvdXJz
-ZWx2ZXMgYW5kIGRvaW5nCmEgZml4dXAgb2YgdGhlIGRldmljZSBhZnRlciB0aGUgY29yZSBjb2Rl
-IGhhcyBkb25lIGl0cyBqb2Igd2hlbiB3ZQpyZWFsbHkgb3VnaHQgdG8gYmUgbGV0dGluZyB0aGUg
-Y29yZSBjb2RlIG1hbmFnZSBhIHNwYWNlIHRoYXQgd2UgZGVmaW5lCmFuZCBwcm9ncmFtbWluZyB0
-aGUgZGV2aWNlIHNvIHRoYXQgaXQgZG9lc24ndCBuZWVkIGEgZml4dXAgaW4gdGhlCnZmaW8tcGNp
-IGNvZGUuwqDCoFdvdWxkbid0IGl0IGJlIG5pY2VyIGlmIHBjaV9lbmFibGVfbXNpeF9yYW5nZSgp
-IHJldHVybmVkCndpdGggdGhlIGRldmljZSBwcm9wZXJseSBwcm9ncmFtbWVkIG9yIGdlbmVyYXRl
-IGFuIGVycm9yIGlmIHRoZXJlJ3Mgbm90CmVub3VnaCByZXNlcnZlZCBtYXBwaW5nIHNwYWNlIGlu
-IElPTU1VIGRvbWFpbj8gIENhbiBpdCBiZSBkb25lP8KgwqBUaGFua3MsCgpBbGV4CgpfX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXwppb21tdSBtYWlsaW5nIGxp
-c3QKaW9tbXVAbGlzdHMubGludXgtZm91bmRhdGlvbi5vcmcKaHR0cHM6Ly9saXN0cy5saW51eGZv
-dW5kYXRpb24ub3JnL21haWxtYW4vbGlzdGluZm8vaW9tbXU=
+
+
+On 2016/1/29 4:11, Andrew Jones wrote:
+> On Wed, Jan 27, 2016 at 11:51:36AM +0800, Shannon Zhao wrote:
+>> > From: Shannon Zhao <shannon.zhao@linaro.org>
+>> > 
+>> > These kind of registers include PMEVTYPERn, PMCCFILTR and PMXEVTYPER
+>> > which is mapped to PMEVTYPERn or PMCCFILTR.
+>> > 
+>> > The access handler translates all aarch32 register offsets to aarch64
+>> > ones and uses vcpu_sys_reg() to access their values to avoid taking care
+>> > of big endian.
+>> > 
+>> > When writing to these registers, create a perf_event for the selected
+>> > event type.
+>> > 
+>> > Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+>> > ---
+>> >  arch/arm64/kvm/sys_regs.c | 140 +++++++++++++++++++++++++++++++++++++++++++++-
+>> >  1 file changed, 138 insertions(+), 2 deletions(-)
+>> > 
+>> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> > index 06257e2..298ae94 100644
+>> > --- a/arch/arm64/kvm/sys_regs.c
+>> > +++ b/arch/arm64/kvm/sys_regs.c
+>> > @@ -513,6 +513,54 @@ static bool access_pmceid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>> >  	return true;
+>> >  }
+>> >  
+>> > +static bool pmu_counter_idx_valid(struct kvm_vcpu *vcpu, u64 idx)
+>> > +{
+>> > +	u64 pmcr, val;
+>> > +
+>> > +	pmcr = vcpu_sys_reg(vcpu, PMCR_EL0);
+>> > +	val = (pmcr >> ARMV8_PMCR_N_SHIFT) & ARMV8_PMCR_N_MASK;
+>> > +	if (idx >= val && idx != ARMV8_CYCLE_IDX)
+>> > +		return false;
+>> > +
+>> > +	return true;
+>> > +}
+>> > +
+>> > +static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>> > +			       const struct sys_reg_desc *r)
+>> > +{
+>> > +	u64 idx, reg;
+>> > +
+>> > +	if (!kvm_arm_pmu_v3_ready(vcpu))
+>> > +		return trap_raz_wi(vcpu, p, r);
+>> > +
+>> > +	if (r->CRn == 9 && r->CRm == 13 && r->Op2 == 1) {
+>> > +		/* PMXEVTYPER_EL0 */
+>> > +		idx = vcpu_sys_reg(vcpu, PMSELR_EL0) & ARMV8_COUNTER_MASK;
+>> > +		reg = PMEVTYPER0_EL0 + idx;
+>> > +	} else if (r->CRn == 14 && (r->CRm & 12) == 12) {
+>> > +		idx = ((r->CRm & 3) << 3) | (r->Op2 & 7);
+>> > +		if (idx == ARMV8_CYCLE_IDX)
+>> > +			reg = PMCCFILTR_EL0;
+>> > +		else
+>> > +			/* PMEVTYPERn_EL0 */
+>> > +			reg = PMEVTYPER0_EL0 + idx;
+>> > +	} else {
+>> > +		BUG();
+>> > +	}
+>> > +
+>> > +	if (!pmu_counter_idx_valid(vcpu, idx))
+>> > +		return false;
+>> > +
+>> > +	if (p->is_write) {
+>> > +		kvm_pmu_set_counter_event_type(vcpu, p->regval, idx);
+>> > +		vcpu_sys_reg(vcpu, reg) = p->regval & ARMV8_EVTYPE_MASK;
+>> > +	} else {
+>> > +		p->regval = vcpu_sys_reg(vcpu, reg) & ARMV8_EVTYPE_MASK;
+> Related to my comment in 5/21. Why should we need to mask it here when
+> reading it, since it was masked on writing?
+> 
+But what if guest reads this register before writing to it?
+
+Thanks,
+-- 
+Shannon
+
