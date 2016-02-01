@@ -1,29 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 05/21] arm64: KVM: VHE: Turn VTCR_EL2 setup into a
- reusable macro
-Date: Mon, 1 Feb 2016 16:38:14 +0100
-Message-ID: <20160201153814.GC1478@cbox>
+Subject: Re: [PATCH v2 06/21] arm64: KVM: VHE: Patch out use of HVC
+Date: Mon, 1 Feb 2016 16:39:12 +0100
+Message-ID: <20160201153912.GD1478@cbox>
 References: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
- <1453737235-16522-6-git-send-email-marc.zyngier@arm.com>
- <20160201131300.GH1478@cbox> <56AF6A05.5020501@arm.com>
+ <1453737235-16522-7-git-send-email-marc.zyngier@arm.com>
+ <20160201131634.GI1478@cbox> <56AF5ED8.7010303@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D71440F9B
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2016 10:32:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 27C5840F9B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2016 10:33:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IML3dAxOzvIS for <kvmarm@lists.cs.columbia.edu>;
- Mon,  1 Feb 2016 10:32:31 -0500 (EST)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1515A40BDA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2016 10:32:30 -0500 (EST)
-Received: by mail-wm0-f50.google.com with SMTP id l66so76099164wml.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 01 Feb 2016 07:37:49 -0800 (PST)
+ with ESMTP id BDANVQzmqBup for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  1 Feb 2016 10:33:29 -0500 (EST)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2AF4A40BDA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2016 10:33:28 -0500 (EST)
+Received: by mail-wm0-f42.google.com with SMTP id p63so76465694wmp.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 01 Feb 2016 07:38:47 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <56AF6A05.5020501@arm.com>
+In-Reply-To: <56AF5ED8.7010303@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -37,72 +36,96 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Feb 01, 2016 at 02:21:57PM +0000, Marc Zyngier wrote:
-> On 01/02/16 13:13, Christoffer Dall wrote:
-> > On Mon, Jan 25, 2016 at 03:53:39PM +0000, Marc Zyngier wrote:
-> >> On a VHE-capable system, there is no point in setting VTCR_EL2
-> >> at KVM init time. We can perfectly set it up when the kernel
-> >> boots, removing the need for a more complicated configuration.
-> > 
-> > what's the complicated configuration which is avoided?
-> 
-> With VHE, there is no hyp-init at all, so what we avoid is a weird init
-> sequence where we have to execute part of this hyp-init, but not all of it.
-> 
+On Mon, Feb 01, 2016 at 01:34:16PM +0000, Marc Zyngier wrote:
+> On 01/02/16 13:16, Christoffer Dall wrote:
+> > On Mon, Jan 25, 2016 at 03:53:40PM +0000, Marc Zyngier wrote:
+> >> With VHE, the host never issues an HVC instruction to get into the
+> >> KVM code, as we can simply branch there.
 > >>
-> >> In order to allow this, turn VTCR_EL2 setup into a macro that
-> >> we'll be able to reuse at boot time.
+> >> Use runtime code patching to simplify things a bit.
 > >>
 > >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > >> ---
-> >>  arch/arm64/include/asm/kvm_mmu.h | 23 +++++++++++++++++++++++
-> >>  arch/arm64/kvm/hyp-init.S        | 18 +-----------------
-> >>  2 files changed, 24 insertions(+), 17 deletions(-)
+> >>  arch/arm64/kvm/hyp.S           |  7 +++++++
+> >>  arch/arm64/kvm/hyp/hyp-entry.S | 38 +++++++++++++++++++++++++++++---------
+> >>  2 files changed, 36 insertions(+), 9 deletions(-)
 > >>
-> >> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> >> index 7364339..d3e6d7b 100644
-> >> --- a/arch/arm64/include/asm/kvm_mmu.h
-> >> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> >> @@ -56,6 +56,29 @@
+> >> diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+> >> index 0ccdcbb..0689a74 100644
+> >> --- a/arch/arm64/kvm/hyp.S
+> >> +++ b/arch/arm64/kvm/hyp.S
+> >> @@ -17,7 +17,9 @@
 > >>  
-> >>  #ifdef __ASSEMBLY__
+> >>  #include <linux/linkage.h>
 > >>  
-> >> +#include <asm/kvm_arm.h>
-> >> +
-> >> +.macro setup_vtcr tmp1, tmp2
-> >> +	mov	\tmp1, #(VTCR_EL2_FLAGS & 0xffff)
-> >> +	movk	\tmp1, #(VTCR_EL2_FLAGS >> 16), lsl #16
+> >> +#include <asm/alternative.h>
+> >>  #include <asm/assembler.h>
+> >> +#include <asm/cpufeature.h>
+> >>  
+> >>  /*
+> >>   * u64 kvm_call_hyp(void *hypfn, ...);
+> >> @@ -38,6 +40,11 @@
+> >>   * arch/arm64/kernel/hyp_stub.S.
+> >>   */
+> >>  ENTRY(kvm_call_hyp)
+> >> +alternative_if_not ARM64_HAS_VIRT_HOST_EXTN	
+> >>  	hvc	#0
+> >>  	ret
+> >> +alternative_else
+> >> +	b	__vhe_hyp_call
+> >> +	nop
+> >> +alternative_endif
+> >>  ENDPROC(kvm_call_hyp)
+> >> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+> >> index 93e8d983..9e0683f 100644
+> >> --- a/arch/arm64/kvm/hyp/hyp-entry.S
+> >> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
+> >> @@ -38,6 +38,32 @@
+> >>  	ldp	x0, x1, [sp], #16
+> >>  .endm
+> >>  
+> >> +.macro do_el2_call
 > >> +	/*
-> >> +	 * Read the PARange bits from ID_AA64MMFR0_EL1 and set the PS bits in
-> >> +	 * VTCR_EL2.
+> >> +	 * Shuffle the parameters before calling the function
+> >> +	 * pointed to in x0. Assumes parameters in x[1,2,3].
 > >> +	 */
-> >> +	mrs	\tmp2, id_aa64mmfr0_el1
-> >> +	bfi	\tmp1, \tmp2, #16, #3
-> >> +	/*
-> >> +	 * Read the VMIDBits bits from ID_AA64MMFR1_EL1 and set the VS bit in
-> >> +	 * VTCR_EL2.
-> >> +	 */
-> >> +	mrs	\tmp2, ID_AA64MMFR1_EL1
-> >> +	ubfx	\tmp2, \tmp2, #5, #1
-> >> +	lsl	\tmp2, \tmp2, #VTCR_EL2_VS
-> >> +	orr	\tmp1, \tmp1, \tmp2
-> >> +
-> >> +	msr	vtcr_el2, \tmp1
-> >> +	isb
-> >> +.endm
+> >> +	stp	lr, xzr, [sp, #-16]!
 > > 
-> > this feels like an awful lot of code in a header file.
+> > remind me why this pair isn't just doing "str" instead of "stp" with the
+> > xzr ?
 > 
-> interrupt_head.S respectfully disagrees with you ;-).
+> Because SP has to be aligned on a 16 bytes boundary at all times.
 > 
-> > Is it crazy to imagine wanting to have different T0SZ for different VMs
-> > in the future?  In that case, the T0SZ stuff should stay in KVM...
-> 
-> That's a rather compelling argument indeed. I'll see if I can turn the
-> thing around in a slightly nicer way. How about moving it out of
-> hyp-init.S altogether, and into C code?
 
-That sounds better to me.
+right, duh.
 
-Thanks,
+> > 
+> >> +	mov	lr, x0
+> >> +	mov	x0, x1
+> >> +	mov	x1, x2
+> >> +	mov	x2, x3
+> >> +	blr	lr
+> >> +	ldp	lr, xzr, [sp], #16
+> >> +.endm
+> >> +
+> >> +ENTRY(__vhe_hyp_call)
+> >> +	do_el2_call
+> >> +	/*
+> >> +	 * We used to rely on having an exception return to get
+> >> +	 * an implicit isb. In the E2H case, we don't have it anymore.
+> >> +	 * rather than changing all the leaf functions, just do it here
+> >> +	 * before returning to the rest of the kernel.
+> >> +	 */
+> > 
+> > why is this not the case with an ISB before do_el2_call then?
+> 
+> That's a good point. I guess the safest thing to do would be to add one,
+> but looking at the various functions we call, I don't see any that could
+> go wrong by not having a ISB in their prologue.
+> 
+> Or maybe you've identified such a case?
+> 
+I think I argued on Mario's VFP patches that we could rely on an ISB
+before the hyp call, but they're not merged yet, so, hey...
+
 -Christoffer
