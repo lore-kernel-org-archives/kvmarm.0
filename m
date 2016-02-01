@@ -1,25 +1,28 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 02/21] arm64: Allow the arch timer to use the HYP timer
-Date: Mon, 1 Feb 2016 13:42:34 +0000
-Message-ID: <56AF60CA.6040709@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v2 08/21] arm64: KVM: VHE: Introduce unified system
+ register accessors
+Date: Mon, 1 Feb 2016 14:47:32 +0100
+Message-ID: <20160201134732.GK1478@cbox>
 References: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
- <1453737235-16522-3-git-send-email-marc.zyngier@arm.com>
- <20160201122907.GD1478@cbox>
+ <1453737235-16522-9-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 737B840FA2
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2016 08:37:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5770840FA2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2016 08:41:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id q91xXD050Xz6 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  1 Feb 2016 08:37:20 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 10AAB40BDA
- for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2016 08:37:19 -0500 (EST)
-In-Reply-To: <20160201122907.GD1478@cbox>
+ with ESMTP id p-TltfzbJ9SE for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  1 Feb 2016 08:41:49 -0500 (EST)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 4059B40BDA
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  1 Feb 2016 08:41:49 -0500 (EST)
+Received: by mail-wm0-f44.google.com with SMTP id l66so72002689wml.0
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 01 Feb 2016 05:47:06 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <1453737235-16522-9-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,210 +32,138 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
+To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01/02/16 12:29, Christoffer Dall wrote:
-> On Mon, Jan 25, 2016 at 03:53:36PM +0000, Marc Zyngier wrote:
->> With the ARMv8.1 VHE, the kernel can run in HYP mode, and thus
->> use the HYP timer instead of the normal guest timer in a mostly
->> transparent way, except for the interrupt line.
->>
->> This patch reworks the arch timer code to allow the selection of
->> the HYP PPI, possibly falling back to the guest timer if not
->> available.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  drivers/clocksource/arm_arch_timer.c | 96 ++++++++++++++++++++++--------------
->>  1 file changed, 59 insertions(+), 37 deletions(-)
->>
->> diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
->> index c64d543..ffe9d1c 100644
->> --- a/drivers/clocksource/arm_arch_timer.c
->> +++ b/drivers/clocksource/arm_arch_timer.c
->> @@ -67,7 +67,7 @@ static int arch_timer_ppi[MAX_TIMER_PPI];
->>  
->>  static struct clock_event_device __percpu *arch_timer_evt;
->>  
->> -static bool arch_timer_use_virtual = true;
->> +static enum ppi_nr arch_timer_uses_ppi = VIRT_PPI;
->>  static bool arch_timer_c3stop;
->>  static bool arch_timer_mem_use_virtual;
->>  
->> @@ -263,14 +263,20 @@ static void __arch_timer_setup(unsigned type,
->>  		clk->name = "arch_sys_timer";
->>  		clk->rating = 450;
->>  		clk->cpumask = cpumask_of(smp_processor_id());
->> -		if (arch_timer_use_virtual) {
->> -			clk->irq = arch_timer_ppi[VIRT_PPI];
->> +		clk->irq = arch_timer_ppi[arch_timer_uses_ppi];
->> +		switch (arch_timer_uses_ppi) {
->> +		case VIRT_PPI:
->>  			clk->set_state_shutdown = arch_timer_shutdown_virt;
->>  			clk->set_next_event = arch_timer_set_next_event_virt;
->> -		} else {
->> -			clk->irq = arch_timer_ppi[PHYS_SECURE_PPI];
->> +			break;
->> +		case PHYS_SECURE_PPI:
->> +		case PHYS_NONSECURE_PPI:
->> +		case HYP_PPI:
->>  			clk->set_state_shutdown = arch_timer_shutdown_phys;
->>  			clk->set_next_event = arch_timer_set_next_event_phys;
->> +			break;
->> +		default:
->> +			BUG();
->>  		}
->>  	} else {
->>  		clk->features |= CLOCK_EVT_FEAT_DYNIRQ;
->> @@ -338,17 +344,20 @@ static void arch_counter_set_user_access(void)
->>  	arch_timer_set_cntkctl(cntkctl);
->>  }
->>  
->> +static bool arch_timer_has_nonsecure_ppi(void)
->> +{
->> +	return (arch_timer_uses_ppi == PHYS_SECURE_PPI &&
->> +		arch_timer_ppi[PHYS_NONSECURE_PPI]);
->> +}
->> +
->>  static int arch_timer_setup(struct clock_event_device *clk)
->>  {
->>  	__arch_timer_setup(ARCH_CP15_TIMER, clk);
->>  
->> -	if (arch_timer_use_virtual)
->> -		enable_percpu_irq(arch_timer_ppi[VIRT_PPI], 0);
->> -	else {
->> -		enable_percpu_irq(arch_timer_ppi[PHYS_SECURE_PPI], 0);
->> -		if (arch_timer_ppi[PHYS_NONSECURE_PPI])
->> -			enable_percpu_irq(arch_timer_ppi[PHYS_NONSECURE_PPI], 0);
->> -	}
->> +	enable_percpu_irq(arch_timer_ppi[arch_timer_uses_ppi], 0);
->> +
->> +	if (arch_timer_has_nonsecure_ppi())
->> +		enable_percpu_irq(arch_timer_ppi[PHYS_NONSECURE_PPI], 0);
->>  
->>  	arch_counter_set_user_access();
->>  	if (IS_ENABLED(CONFIG_ARM_ARCH_TIMER_EVTSTREAM))
->> @@ -390,7 +399,7 @@ static void arch_timer_banner(unsigned type)
->>  		     (unsigned long)arch_timer_rate / 1000000,
->>  		     (unsigned long)(arch_timer_rate / 10000) % 100,
->>  		     type & ARCH_CP15_TIMER ?
->> -			arch_timer_use_virtual ? "virt" : "phys" :
->> +		     (arch_timer_uses_ppi == VIRT_PPI) ? "virt" : "phys" :
->>  			"",
->>  		     type == (ARCH_CP15_TIMER | ARCH_MEM_TIMER) ?  "/" : "",
->>  		     type & ARCH_MEM_TIMER ?
->> @@ -460,7 +469,7 @@ static void __init arch_counter_register(unsigned type)
->>  
->>  	/* Register the CP15 based counter if we have one */
->>  	if (type & ARCH_CP15_TIMER) {
->> -		if (IS_ENABLED(CONFIG_ARM64) || arch_timer_use_virtual)
->> +		if (IS_ENABLED(CONFIG_ARM64) || arch_timer_uses_ppi == VIRT_PPI)
->>  			arch_timer_read_counter = arch_counter_get_cntvct;
->>  		else
->>  			arch_timer_read_counter = arch_counter_get_cntpct;
->> @@ -490,13 +499,9 @@ static void arch_timer_stop(struct clock_event_device *clk)
->>  	pr_debug("arch_timer_teardown disable IRQ%d cpu #%d\n",
->>  		 clk->irq, smp_processor_id());
->>  
->> -	if (arch_timer_use_virtual)
->> -		disable_percpu_irq(arch_timer_ppi[VIRT_PPI]);
->> -	else {
->> -		disable_percpu_irq(arch_timer_ppi[PHYS_SECURE_PPI]);
->> -		if (arch_timer_ppi[PHYS_NONSECURE_PPI])
->> -			disable_percpu_irq(arch_timer_ppi[PHYS_NONSECURE_PPI]);
->> -	}
->> +	disable_percpu_irq(arch_timer_ppi[arch_timer_uses_ppi]);
->> +	if (arch_timer_has_nonsecure_ppi())
->> +		disable_percpu_irq(arch_timer_ppi[PHYS_NONSECURE_PPI]);
->>  
->>  	clk->set_state_shutdown(clk);
->>  }
->> @@ -562,12 +567,14 @@ static int __init arch_timer_register(void)
->>  		goto out;
->>  	}
->>  
->> -	if (arch_timer_use_virtual) {
->> -		ppi = arch_timer_ppi[VIRT_PPI];
->> +	ppi = arch_timer_ppi[arch_timer_uses_ppi];
->> +	switch (arch_timer_uses_ppi) {
->> +	case VIRT_PPI:
->>  		err = request_percpu_irq(ppi, arch_timer_handler_virt,
->>  					 "arch_timer", arch_timer_evt);
->> -	} else {
->> -		ppi = arch_timer_ppi[PHYS_SECURE_PPI];
->> +		break;
->> +	case PHYS_SECURE_PPI:
->> +	case PHYS_NONSECURE_PPI:
->>  		err = request_percpu_irq(ppi, arch_timer_handler_phys,
->>  					 "arch_timer", arch_timer_evt);
->>  		if (!err && arch_timer_ppi[PHYS_NONSECURE_PPI]) {
->> @@ -578,6 +585,13 @@ static int __init arch_timer_register(void)
->>  				free_percpu_irq(arch_timer_ppi[PHYS_SECURE_PPI],
->>  						arch_timer_evt);
->>  		}
->> +		break;
->> +	case HYP_PPI:
->> +		err = request_percpu_irq(ppi, arch_timer_handler_phys,
->> +					 "arch_timer", arch_timer_evt);
->> +		break;
->> +	default:
->> +		BUG();
->>  	}
->>  
->>  	if (err) {
->> @@ -602,15 +616,10 @@ static int __init arch_timer_register(void)
->>  out_unreg_notify:
->>  	unregister_cpu_notifier(&arch_timer_cpu_nb);
->>  out_free_irq:
->> -	if (arch_timer_use_virtual)
->> -		free_percpu_irq(arch_timer_ppi[VIRT_PPI], arch_timer_evt);
->> -	else {
->> -		free_percpu_irq(arch_timer_ppi[PHYS_SECURE_PPI],
->> +	free_percpu_irq(arch_timer_ppi[arch_timer_uses_ppi], arch_timer_evt);
->> +	if (arch_timer_has_nonsecure_ppi())
->> +		free_percpu_irq(arch_timer_ppi[PHYS_NONSECURE_PPI],
->>  				arch_timer_evt);
->> -		if (arch_timer_ppi[PHYS_NONSECURE_PPI])
->> -			free_percpu_irq(arch_timer_ppi[PHYS_NONSECURE_PPI],
->> -					arch_timer_evt);
->> -	}
->>  
->>  out_free:
->>  	free_percpu(arch_timer_evt);
->> @@ -697,12 +706,25 @@ static void __init arch_timer_init(void)
->>  	 *
->>  	 * If no interrupt provided for virtual timer, we'll have to
->>  	 * stick to the physical timer. It'd better be accessible...
->> +	 *
->> +	 * On ARMv8.1 with VH extensions, the kernel runs in HYP. VHE
->> +	 * accesses to CNTP_*_EL1 registers are silently redirected to
->> +	 * their CNTHP_*_EL2 counterparts, and use a different PPI
->> +	 * number.
->>  	 */
->>  	if (is_hyp_mode_available() || !arch_timer_ppi[VIRT_PPI]) {
->> -		arch_timer_use_virtual = false;
->> +		bool has_ppi;
->> +
->> +		if (is_kernel_in_hyp_mode()) {
->> +			arch_timer_uses_ppi = HYP_PPI;
->> +			has_ppi = !!arch_timer_ppi[HYP_PPI];
->> +		} else {
->> +			arch_timer_uses_ppi = PHYS_SECURE_PPI;
->> +			has_ppi = (!!arch_timer_ppi[PHYS_SECURE_PPI] ||
->> +				   !!arch_timer_ppi[PHYS_NONSECURE_PPI]);
+On Mon, Jan 25, 2016 at 03:53:42PM +0000, Marc Zyngier wrote:
+> VHE brings its own bag of new system registers, or rather system
+> register accessors, as it define new ways to access both guest
+> and host system registers. For example, from the host:
 > 
-> shouldn't this simply test the PHYS_SECURE_PPI since otherwise you could
-> potentially have the PHYS_NONSECURE_PPI but not PHYS_SECURE_PPI and
-> you'll try to request IRQ 0 for this later... ?
+> - The host TCR_EL2 register is accessed using the TCR_EL1 accessor
+> - The guest TCR_EL1 register is accessed using the TCR_EL12 accessor
+> 
+> Obviously, this is confusing. A way to somehow reduce the complexity
+> of writing code for both ARMv8 and ARMv8.1 is to use a set of unified
+> accessors that will generate the right sysreg, depending on the mode
+> the CPU is running in. For example:
+> 
+> - read_sysreg_el1(tcr) will use TCR_EL1 on ARMv8, and TCR_EL12 on
+>   ARMv8.1 with VHE.
+> - read_sysreg_el2(tcr) will use TCR_EL2 on ARMv8, and TCR_EL1 on
+>   ARMv8.1 with VHE.
+> 
+> We end up with three sets of accessors ({read,write}_sysreg_el[012])
+> that can be directly used from C code. We take this opportunity to
+> also add the definition for the new VHE sysregs.(
 
-I don't really see how you could have the non-secure PPI, but not the
-secure one, as the binding doesn't give you opportunity to do so (the
-first interrupt is the secure one, then the non-secure one...).
+weird closing parenthesis.
+
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/kvm/hyp/hyp.h | 72 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 72 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
+> index fc502f3..744c919 100644
+> --- a/arch/arm64/kvm/hyp/hyp.h
+> +++ b/arch/arm64/kvm/hyp/hyp.h
+> @@ -48,6 +48,78 @@ static inline unsigned long __hyp_kern_va(unsigned long v)
+>  
+>  #define hyp_kern_va(v) (typeof(v))(__hyp_kern_va((unsigned long)(v)))
+>  
+> +#define read_sysreg_elx(r,nvh,vh)					\
+> +	({								\
+> +		u64 reg;						\
+> +		asm volatile(ALTERNATIVE("mrs %0, " __stringify(r##nvh),\
+> +					 "mrs_s %0, " __stringify(r##vh),\
+> +					 ARM64_HAS_VIRT_HOST_EXTN)	\
+> +			     : "=r" (reg));				\
+> +		reg;							\
+> +	})
+> +
+> +#define write_sysreg_elx(v,r,nvh,vh)					\
+> +	do {								\
+> +		u64 __val = (u64)(v);					\
+> +		asm volatile(ALTERNATIVE("msr " __stringify(r##nvh) ", %x0",\
+> +					 "msr_s " __stringify(r##vh) ", %x0",\
+> +					 ARM64_HAS_VIRT_HOST_EXTN)	\
+> +					 : : "rZ" (__val));		\
+
+what is rZ ?
+(complete Google-fu failure misery)
+
+> +	} while (0)
+> +
+> +/*
+> + * Unified accessors for registers that have a different encoding
+> + * between VHE and non-VHE. They must be specified without their "ELx"
+> + * encoding.
+> + */
+> +#define read_sysreg_el2(r)						\
+> +	({								\
+> +		u64 reg;						\
+> +		asm volatile(ALTERNATIVE("mrs %0, " __stringify(r##_EL2),\
+> +					 "mrs %0, " __stringify(r##_EL1),\
+> +					 ARM64_HAS_VIRT_HOST_EXTN)	\
+> +			     : "=r" (reg));				\
+> +		reg;							\
+> +	})
+> +
+> +#define write_sysreg_el2(v,r)						\
+> +	do {								\
+> +		u64 __val = (u64)(v);					\
+> +		asm volatile(ALTERNATIVE("msr " __stringify(r##_EL2) ", %x0",\
+> +					 "msr " __stringify(r##_EL1) ", %x0",\
+> +					 ARM64_HAS_VIRT_HOST_EXTN)	\
+> +					 : : "rZ" (__val));		\
+> +	} while (0)
+> +
+> +#define read_sysreg_el0(r)	read_sysreg_elx(r, _EL0, _EL02)
+> +#define write_sysreg_el0(v,r)	write_sysreg_elx(v, r, _EL0, _EL02)
+> +#define read_sysreg_el1(r)	read_sysreg_elx(r, _EL1, _EL12)
+> +#define write_sysreg_el1(v,r)	write_sysreg_elx(v, r, _EL1, _EL12)
+> +
+> +/* The VHE specific system registers and their encoding */
+> +#define sctlr_EL12              sys_reg(3, 5, 1, 0, 0)
+> +#define cpacr_EL12              sys_reg(3, 5, 1, 0, 2)
+> +#define ttbr0_EL12              sys_reg(3, 5, 2, 0, 0)
+> +#define ttbr1_EL12              sys_reg(3, 5, 2, 0, 1)
+> +#define tcr_EL12                sys_reg(3, 5, 2, 0, 2)
+> +#define afsr0_EL12              sys_reg(3, 5, 5, 1, 0)
+> +#define afsr1_EL12              sys_reg(3, 5, 5, 1, 1)
+> +#define esr_EL12                sys_reg(3, 5, 5, 2, 0)
+> +#define far_EL12                sys_reg(3, 5, 6, 0, 0)
+> +#define mair_EL12               sys_reg(3, 5, 10, 2, 0)
+> +#define amair_EL12              sys_reg(3, 5, 10, 3, 0)
+> +#define vbar_EL12               sys_reg(3, 5, 12, 0, 0)
+> +#define contextidr_EL12         sys_reg(3, 5, 13, 0, 1)
+> +#define cntkctl_EL12            sys_reg(3, 5, 14, 1, 0)
+> +#define cntp_tval_EL02          sys_reg(3, 5, 14, 2, 0)
+> +#define cntp_ctl_EL02           sys_reg(3, 5, 14, 2, 1)
+> +#define cntp_cval_EL02          sys_reg(3, 5, 14, 2, 2)
+> +#define cntv_tval_EL02          sys_reg(3, 5, 14, 3, 0)
+> +#define cntv_ctl_EL02           sys_reg(3, 5, 14, 3, 1)
+> +#define cntv_cval_EL02          sys_reg(3, 5, 14, 3, 2)
+
+as always, fun stuff to review.
+
+> +#define spsr_EL12               sys_reg(3, 5, 4, 0, 0)
+> +#define elr_EL12                sys_reg(3, 5, 4, 0, 1)
+> +
+
+I couldn't quite decipher the spec as to how these are the right
+instruction encodings, so I'm going to trust the testing that this is
+done right.
+
+>  /**
+>   * hyp_alternate_select - Generates patchable code sequences that are
+>   * used to switch between two implementations of a function, depending
+> -- 
+> 2.1.4
+> 
 
 Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+-Christoffer
