@@ -1,7 +1,7 @@
 From: fu.wei@linaro.org
-Subject: [PATCH v3 4/6] clocksource: move some enums to arm_arch_timer.h
-Date: Tue,  2 Feb 2016 04:26:56 +0800
-Message-ID: <1454358418-5157-5-git-send-email-fu.wei@linaro.org>
+Subject: [PATCH v3 5/6] kvm: arm64: wrapping DT support for virt arch timer
+Date: Tue,  2 Feb 2016 04:26:57 +0800
+Message-ID: <1454358418-5157-6-git-send-email-fu.wei@linaro.org>
 References: <1454358418-5157-1-git-send-email-fu.wei@linaro.org>
 Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1454358418-5157-1-git-send-email-fu.wei@linaro.org>
@@ -10,73 +10,106 @@ To: rjw@rjwysocki.net, lenb@kernel.org, daniel.lezcano@linaro.org, tglx@linutron
 Cc: linaro-acpi@lists.linaro.org, linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, al.stone@linaro.org, graeme.gregory@linaro.org, davem@davemloft.net, jeffrey.t.kirsher@intel.com, richardcochran@gmail.com, arnd@arndb.de, wim@iguana.be, jcm@redhat.com, leo.duran@amd.com, mark.rutland@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, Suravee.Suthikulpanit@amd.com, robherring2@gmail.com, Fu Wei <fu.wei@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Fu Wei <fu.wei@linaro.org>
+From: Wei Huang <wei@redhat.com>
 
-The patch move enum ppi_nr from arm_arch_timer.c
-to arm_arch_timer.h, and add enum spi_nr.
+This patches wrapping DT support for virt arch timer into a function.
 
+[Fu Wei: improve the DT support, and separate ACPI support]
+
+Signed-off-by: Alexander Spyridaki <a.spyridakis@virtualopensystems.com>
+Signed-off-by: Wei Huang <wei@redhat.com>
+Signed-off-by: Graeme Gregory <graeme.gregory@linaro.org>
 Signed-off-by: Fu Wei <fu.wei@linaro.org>
 ---
- drivers/clocksource/arm_arch_timer.c | 13 ++-----------
- include/clocksource/arm_arch_timer.h | 14 ++++++++++++++
- 2 files changed, 16 insertions(+), 11 deletions(-)
+ virt/kvm/arm/arch_timer.c | 49 +++++++++++++++++++++++++++++++----------------
+ 1 file changed, 32 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-index 3792fd6..90d17ef 100644
---- a/drivers/clocksource/arm_arch_timer.c
-+++ b/drivers/clocksource/arm_arch_timer.c
-@@ -52,15 +52,6 @@ struct arch_timer {
- #define to_arch_timer(e) container_of(e, struct arch_timer, evt)
- 
- static u32 arch_timer_rate;
--
--enum ppi_nr {
--	PHYS_SECURE_PPI,
--	PHYS_NONSECURE_PPI,
--	VIRT_PPI,
--	HYP_PPI,
--	MAX_TIMER_PPI
--};
--
- static int arch_timer_ppi[MAX_TIMER_PPI];
- 
- static struct clock_event_device __percpu *arch_timer_evt;
-@@ -798,9 +789,9 @@ static void __init arch_timer_mem_init(struct device_node *np)
- 	}
- 
- 	if (arch_timer_mem_use_virtual)
--		irq = irq_of_parse_and_map(best_frame, 1);
-+		irq = irq_of_parse_and_map(best_frame, VIRT_SPI);
- 	else
--		irq = irq_of_parse_and_map(best_frame, 0);
-+		irq = irq_of_parse_and_map(best_frame, PHYS_SPI);
- 	of_node_put(best_frame);
- 	if (!irq) {
- 		pr_err("arch_timer: Frame missing %s irq",
-diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
-index 7a6d6dc..7bb5c1e 100644
---- a/include/clocksource/arm_arch_timer.h
-+++ b/include/clocksource/arm_arch_timer.h
-@@ -32,6 +32,20 @@ enum arch_timer_reg {
- 	ARCH_TIMER_REG_TVAL,
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index 69bca185..0a279d3 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -381,9 +381,30 @@ static const struct of_device_id arch_timer_of_match[] = {
+ 	{},
  };
  
-+enum ppi_nr {
-+	PHYS_SECURE_PPI,
-+	PHYS_NONSECURE_PPI,
-+	VIRT_PPI,
-+	HYP_PPI,
-+	MAX_TIMER_PPI
-+};
+-int kvm_timer_hyp_init(void)
++static int kvm_timer_get_ppi(unsigned int *ppi)
+ {
+ 	struct device_node *np;
++	int ret = -EINVAL;
 +
-+enum spi_nr {
-+	PHYS_SPI,
-+	VIRT_SPI,
-+	MAX_TIMER_SPI
-+};
++	np = of_find_matching_node(NULL, arch_timer_of_match);
++	if (!np) {
++		ret = -ENODEV;
++		*ppi = 0;
++		goto skip_of;
++	}
 +
- #define ARCH_TIMER_PHYS_ACCESS		0
- #define ARCH_TIMER_VIRT_ACCESS		1
- #define ARCH_TIMER_MEM_PHYS_ACCESS	2
++	*ppi = irq_of_parse_and_map(np, VIRT_PPI);
++	of_node_put(np);
++
++skip_of:
++	if (*ppi)
++		return 0;
++
++	return ret;
++}
++
++int kvm_timer_hyp_init(void)
++{
+ 	unsigned int ppi;
+ 	int err;
+ 
+@@ -391,17 +412,11 @@ int kvm_timer_hyp_init(void)
+ 	if (!timecounter)
+ 		return -ENODEV;
+ 
+-	np = of_find_matching_node(NULL, arch_timer_of_match);
+-	if (!np) {
+-		kvm_err("kvm_arch_timer: can't find DT node\n");
+-		return -ENODEV;
+-	}
+-
+-	ppi = irq_of_parse_and_map(np, 2);
+-	if (!ppi) {
+-		kvm_err("kvm_arch_timer: no virtual timer interrupt\n");
+-		err = -EINVAL;
+-		goto out;
++	err = kvm_timer_get_ppi(&ppi);
++	if (err) {
++		kvm_err("kvm_arch_timer: can't find virtual timer info or "
++			"config virtual timer interrupt.\n");
++		return err;
+ 	}
+ 
+ 	err = request_percpu_irq(ppi, kvm_arch_timer_handler,
+@@ -409,7 +424,7 @@ int kvm_timer_hyp_init(void)
+ 	if (err) {
+ 		kvm_err("kvm_arch_timer: can't request interrupt %d (%d)\n",
+ 			ppi, err);
+-		goto out;
++		return err;
+ 	}
+ 
+ 	host_vtimer_irq = ppi;
+@@ -426,14 +441,14 @@ int kvm_timer_hyp_init(void)
+ 		goto out_free;
+ 	}
+ 
+-	kvm_info("%s IRQ%d\n", np->name, ppi);
++	kvm_info("timer IRQ%d.\n", ppi);
+ 	on_each_cpu(kvm_timer_init_interrupt, NULL, 1);
+ 
+-	goto out;
++	return 0;
++
+ out_free:
+ 	free_percpu_irq(ppi, kvm_get_running_vcpus());
+-out:
+-	of_node_put(np);
++
+ 	return err;
+ }
+ 
 -- 
 2.5.0
