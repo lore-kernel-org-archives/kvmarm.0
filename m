@@ -1,123 +1,75 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 21/21] arm64: Panic when VHE and non VHE CPUs coexist
-Date: Tue, 2 Feb 2016 15:32:04 +0000
-Message-ID: <56B0CBF4.9030507@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v2 06/21] arm64: KVM: VHE: Patch out use of HVC
+Date: Tue, 2 Feb 2016 16:42:12 +0100
+Message-ID: <20160202154212.GD6190@cbox>
 References: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
- <1453737235-16522-22-git-send-email-marc.zyngier@arm.com>
- <20160201153605.GA1478@cbox>
+ <1453737235-16522-7-git-send-email-marc.zyngier@arm.com>
+ <20160201131634.GI1478@cbox>
+ <56AF5ED8.7010303@arm.com>
+ <20160201153635.GH15514@e104818-lin.cambridge.arm.com>
+ <56AF85D8.7080907@arm.com>
+ <CAKv+Gu9_KG7Zss3g1OMzcnRKQFhCcYtbSDEk-gwwgqPP-R6DOA@mail.gmail.com>
+ <56AF95C0.3080006@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20160201153605.GA1478@cbox>
+Content-Disposition: inline
+In-Reply-To: <56AF95C0.3080006@arm.com>
 Sender: linux-kernel-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, KVM devel mailing list <kvm@vger.kernel.org>, Will Deacon <will.deacon@arm.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01/02/16 15:36, Christoffer Dall wrote:
-> On Mon, Jan 25, 2016 at 03:53:55PM +0000, Marc Zyngier wrote:
->> Having both VHE and non-VHE capable CPUs in the same system
->> is likely to be a recipe for disaster.
->>
->> If the boot CPU has VHE, but a secondary is not, we won't be
->> able to downgrade and run the kernel at EL1. Add CPU hotplug
->> to the mix, and this produces a terrifying mess.
->>
->> Let's solve the problem once and for all. If you mix VHE and
->> non-VHE CPUs in the same system, you deserve to loose, and this
->> patch makes sure you don't get a chance.
->>
->> This is implemented by storing the kernel execution level in
->> a global variable. Secondaries will park themselves in a
->> WFI loop if they observe a mismatch. Also, the primary CPU
->> will detect that the secondary CPU has died on a mismatched
->> execution level. Panic will follow.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm64/include/asm/virt.h | 17 +++++++++++++++++
->>  arch/arm64/kernel/head.S      | 19 +++++++++++++++++++
->>  arch/arm64/kernel/smp.c       |  3 +++
->>  3 files changed, 39 insertions(+)
->>
->> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
->> index 9f22dd6..f81a345 100644
->> --- a/arch/arm64/include/asm/virt.h
->> +++ b/arch/arm64/include/asm/virt.h
->> @@ -36,6 +36,11 @@
->>   */
->>  extern u32 __boot_cpu_mode[2];
->>  
->> +/*
->> + * __run_cpu_mode records the mode the boot CPU uses for the kernel.
->> + */
->> +extern u32 __run_cpu_mode[2];
->> +
->>  void __hyp_set_vectors(phys_addr_t phys_vector_base);
->>  phys_addr_t __hyp_get_vectors(void);
->>  
->> @@ -60,6 +65,18 @@ static inline bool is_kernel_in_hyp_mode(void)
->>  	return el == CurrentEL_EL2;
->>  }
->>  
->> +static inline bool is_kernel_mode_mismatched(void)
->> +{
->> +	/*
->> +	 * A mismatched CPU will have written its own CurrentEL in
->> +	 * __run_cpu_mode[1] (initially set to zero) after failing to
->> +	 * match the value in __run_cpu_mode[0]. Thus, a non-zero
->> +	 * value in __run_cpu_mode[1] is enough to detect the
->> +	 * pathological case.
->> +	 */
->> +	return !!ACCESS_ONCE(__run_cpu_mode[1]);
->> +}
->> +
->>  /* The section containing the hypervisor text */
->>  extern char __hyp_text_start[];
->>  extern char __hyp_text_end[];
->> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
->> index 2a7134c..bc44cf8 100644
->> --- a/arch/arm64/kernel/head.S
->> +++ b/arch/arm64/kernel/head.S
->> @@ -577,7 +577,23 @@ ENTRY(set_cpu_boot_mode_flag)
->>  1:	str	w20, [x1]			// This CPU has booted in EL1
->>  	dmb	sy
->>  	dc	ivac, x1			// Invalidate potentially stale cache line
->> +	adr_l	x1, __run_cpu_mode
->> +	ldr	w0, [x1]
->> +	mrs	x20, CurrentEL
->> +	cbz	x0, skip_el_check
->> +	cmp	x0, x20
->> +	bne	mismatched_el
+On Mon, Feb 01, 2016 at 05:28:32PM +0000, Marc Zyngier wrote:
+> On 01/02/16 17:08, Ard Biesheuvel wrote:
+> > On 1 February 2016 at 17:20, Marc Zyngier <marc.zyngier@arm.com> wrote:
+> >> On 01/02/16 15:36, Catalin Marinas wrote:
+> >>> On Mon, Feb 01, 2016 at 01:34:16PM +0000, Marc Zyngier wrote:
+> >>>> On 01/02/16 13:16, Christoffer Dall wrote:
+> >>>>> On Mon, Jan 25, 2016 at 03:53:40PM +0000, Marc Zyngier wrote:
+> >>>>>> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+> >>>>>> index 93e8d983..9e0683f 100644
+> >>>>>> --- a/arch/arm64/kvm/hyp/hyp-entry.S
+> >>>>>> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
+> >>>>>> @@ -38,6 +38,32 @@
+> >>>>>>    ldp     x0, x1, [sp], #16
+> >>>>>>  .endm
+> >>>>>>
+> >>>>>> +.macro do_el2_call
+> >>>>>> +  /*
+> >>>>>> +   * Shuffle the parameters before calling the function
+> >>>>>> +   * pointed to in x0. Assumes parameters in x[1,2,3].
+> >>>>>> +   */
+> >>>>>> +  stp     lr, xzr, [sp, #-16]!
+> >>>>>
+> >>>>> remind me why this pair isn't just doing "str" instead of "stp" with the
+> >>>>> xzr ?
+> >>>>
+> >>>> Because SP has to be aligned on a 16 bytes boundary at all times.
+> >>>
+> >>> You could do something like:
+> >>>
+> >>>       sub     sp, sp, #16
+> >>>       str     lr, [sp]
+> >>>
+> >>
+> >> Ah, fair enough. I'll fold that in.
+> >>
+> > 
+> > Since we're micro-reviewing: what's wrong with
+> > 
+> > str lr, [sp, #-16]!
+> > 
+> > ?
+> > 
 > 
-> can't you do a ret here instead of writing the same value and flushing
-> caches etc.?
-
-Yes, good point.
-
+> I suspect that on most micro-architectures, a register writeback is
+> going to be slower than doing the sub independently.
 > 
->> +skip_el_check:			// Only the first CPU gets to set the rule
->> +	str	w20, [x1]
->> +	dmb	sy
->> +	dc	ivac, x1	// Invalidate potentially stale cache line
->>  	ret
->> +mismatched_el:
->> +	str	w20, [x1, #4]
->> +	dmb	sy
->> +	dc	ivac, x1	// Invalidate potentially stale cache line
->> +1:	wfi
+> I may be wrong, though.
 > 
-> I'm no expert on SMP bringup, but doesn't this prevent the CPU from
-> signaling completion and thus you'll never actually reach the checking
-> code in __cpu_up?
+For the record, I don't mind it the way it was in the original patch
+either, I was just curious about the store of xzr and had forgottten the
+stack alignment thing.
 
-Indeed, and that's the whole point. The primary CPU will notice that the
-secondary CPU has failed to boot (timeout), and will find the reason in
-__run_cpu_mode.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+-Christoffer
