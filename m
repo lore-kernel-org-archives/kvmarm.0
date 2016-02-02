@@ -1,26 +1,31 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 10/21] arm64: KVM: VHE: Split save/restore of sysregs
- shared between EL1 and EL2
-Date: Tue, 2 Feb 2016 09:46:05 +0000
-Message-ID: <56B07ADD.60300@arm.com>
-References: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
- <1453737235-16522-11-git-send-email-marc.zyngier@arm.com>
- <20160201135438.GL1478@cbox>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 02/11] arm/pci: PCI bus scanning
+Date: Tue, 2 Feb 2016 12:20:06 +0100
+Message-ID: <20160202112006.GD3688@hawk.localdomain>
+References: <cover.1452341807.git.agordeev@redhat.com>
+ <c135546bfd13a2e7655cf10a68181503ec9f5ee5.1452341807.git.agordeev@redhat.com>
+ <20160113155846.GB10709@hawk.localdomain>
+ <20160202093400.GA27102@dhcp-27-118.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD0F040F9B
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2016 04:40:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6D5E940F9B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2016 06:14:53 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s56Ii+uYDcR9 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  2 Feb 2016 04:40:47 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 91AB640BDA
- for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2016 04:40:47 -0500 (EST)
-In-Reply-To: <20160201135438.GL1478@cbox>
+ with ESMTP id x5iAncxm+NHc for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  2 Feb 2016 06:14:51 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id AEAD640BDA
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2016 06:14:50 -0500 (EST)
+Received: from int-mx13.intmail.prod.int.phx2.redhat.com
+ (int-mx13.intmail.prod.int.phx2.redhat.com [10.5.11.26])
+ by mx1.redhat.com (Postfix) with ESMTPS id 78B7F8EA20
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  2 Feb 2016 11:20:11 +0000 (UTC)
+Content-Disposition: inline
+In-Reply-To: <20160202093400.GA27102@dhcp-27-118.brq.redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,45 +35,273 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Alexander Gordeev <agordeev@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 01/02/16 13:54, Christoffer Dall wrote:
-> On Mon, Jan 25, 2016 at 03:53:44PM +0000, Marc Zyngier wrote:
->> A handful of system registers are still shared between EL1 and EL2,
->> even while using VHE. These are tpidr*_el[01], actlr_el1, sp0, elr,
->> and spsr.
+On Tue, Feb 02, 2016 at 10:34:01AM +0100, Alexander Gordeev wrote:
+> On Wed, Jan 13, 2016 at 04:58:46PM +0100, Andrew Jones wrote:
+> > On Sat, Jan 09, 2016 at 01:22:49PM +0100, Alexander Gordeev wrote:
+> > > Scan bus 0 and function 0 only for now
+> > > 
+> > > Cc: Andrew Jones <drjones@redhat.com>
+> > > Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
+> > > ---
+> > >  arm/pci-test.c         |  4 +++
+> > >  lib/pci-host-generic.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++
+> > >  lib/pci-host-generic.h |  1 +
+> > >  lib/pci.h              |  1 +
+> > >  4 files changed, 73 insertions(+)
+> > > 
+> > > diff --git a/arm/pci-test.c b/arm/pci-test.c
+> > > index 8629c89..1539d3e 100644
+> > > --- a/arm/pci-test.c
+> > > +++ b/arm/pci-test.c
+> > > @@ -11,6 +11,7 @@
+> > >  int main(void)
+> > >  {
+> > >  	struct pci *pci;
+> > > +	int ret;
+> > >  
+> > >  	pci = pci_dt_probe();
+> > >  
+> > > @@ -18,6 +19,9 @@ int main(void)
+> > >  	if (!pci)
+> > >  		goto done;
+> > >  
+> > > +	ret = pci_bus_scan(pci);
+> > > +	report("PCI bus scanning detected %d devices", true, ret);
+> > 
+> > How many devices are expected in this test? You can pass the expected
+> > number in on the command line, and then make this a "real" test report
+> > with
+> > 
+> >   report(..., ret == atol(argv[0]), ret)
 > 
-> So by shared registers you mean registers that do both have an EL0/1
-> version as well as an EL2 version, but where accesses aren't rewritten
-> transparently?
+> What if a machine's PCI hierarchy changed? Such test would break then.
 
-No, I mean that these registers do *not* have a separate banked version.
-There is only a single set of registers, which have to be save/restored
-the old way.
+How would the number *of* detected devices change if we never pass more
+or less devices on the qemu command line? I realize the PCI addresses
+may change.
 
 > 
-> also, by sp0 do you mean sp_el0, and by elr you mean elr_el1, and by
-> spsr you mean spsr_el1 ?
+> Also, this report is not entirely dummy. It ensures PCI configuration
+> space access operates, devices do respond and generally the bus is fine.
+> 
+> > > +
+> > >  	pci_shutdown(pci);
+> > >  
+> > >  done:
+> > > diff --git a/lib/pci-host-generic.c b/lib/pci-host-generic.c
+> > > index 62b5662..e479989 100644
+> > > --- a/lib/pci-host-generic.c
+> > > +++ b/lib/pci-host-generic.c
+> > > @@ -14,6 +14,49 @@
+> > >  #include "pci-host-generic.h"
+> > >  #include <linux/pci_regs.h>
+> > >  
+> > > +#define for_each_pci_dev(pci, dev, conf)		\
+> > > +	for (dev = find_next_dev(pci, -1, &conf);	\
+> > > +	     dev >= 0;					\
+> > > +	     dev = find_next_dev(pci, dev, &conf))
+> > 
+> > Why do we need to pass both a dev index and a conf
+> > pointer? I see below you can get the later from the
+> > former easily enough.
+> 
+> No particular reason apart from the fact each for_each_pci_dev()
+> would be followed by dev_conf() call - so I paired it to save
+> few lines. I have no preference here, though.
 
-sp0 -> sp_el0 indeed. elr and spsr really are the guest PC and PSTATE,
-so I should really reword this commit message, it is utterly confusing.
+Then please drop one or the other.
 
 > 
->>
->> In order to facilitate the introduction of a VHE-specific sysreg
->> save/restore, make move the access to these registers to their
->> own save/restore functions.
->>
->> No functionnal change.
+> > > +
+> > > +static u8 pci_config_readb(const void *conf, int off)
+> > > +{
+> > > +	return readb(conf + off);
+> > > +}
+> > > +
+> > > +static u32 pci_config_readl(const void *conf, int off)
+> > > +{
+> > > +	return readl(conf + off);
+> > > +}
+> > > +
+> > > +static void pci_config_writel(u32 val, void *conf, int off)
+> > > +{
+> > > +	writel(val, conf + off);
+> > > +}
+> > 
+> > These read/write wrappers don't look all that useful to me. They would
+> > be more useful if they took a 'struct pci[_dev] like Linux's
+> > pci_read_config_byte/word/dword do. In fact, stealing those from Linux
+> > makes sense.
 > 
-> Otherwise:
+> I put those ones only to emphasize PCI reads/writes as opposed to
+> direct read*/write* accesses. Matching the Linux names is probably
+> confusing.
 > 
-> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Bringing Linux-like pci_read_config_byte/word/dword seems as an
+> overkill to me as it entails pulling the whole data hierarchy
+> pci_host_bridge->pci_bus->pci_dev.
+> 
+> By contrast, if we do not pull the whole hierarchy then we could
+> introduce our own minimalistic data structure(s) and get off with
+> it easily.
 
-Thanks,
+Yes, that's what I was thinking. We already do have our own minimalistic
+data structure 'struct pci[_dev]'. However, now that I've made x86 pci
+code common you'll either just need to create a lib/arm/asm/pci.h with
+a pci_config_read like in lib/x86/asm/pci.h, or perhaps expand on that
+if you need to read different sizes, by adding the _byte/word/...
+variants.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> 
+> > > +
+> > > +static void* dev_conf(struct pci *pci, int dev)
+> > > +{
+> > > +	struct pci_host_bridge *host = pci->sysdata;
+> > > +	return (void*)host->cpu_range.start + (dev * 8) * PCI_ECAM_CONFIG_SIZE;
+> > > +}
+> > > +
+> > > +/* We scan bus 0 only for now */
+> > > +static int find_next_dev(struct pci *pci, int dev, void **pconf)
+> > > +{
+> > > +	struct pci_host_bridge *host = pci->sysdata;
+> > > +	int limit = MIN(32u, host->cpu_range.size / PCI_ECAM_CONFIG_SIZE);
+> > 
+> > 32 is the pci max devices per bus limit, right? Assuming a sane DT, is it
+> > possible to have host->cpu_range.size/PCI_ECAM_CONFIG_SIZE > 32?
+> 
+> The point here is not host->cpu_range.size/PCI_ECAM_CONFIG_SIZE > 32
+> but rather host->cpu_range.size/PCI_ECAM_CONFIG_SIZE < 32.
+> 
+> But you are right - a bus with less than 32 device slots is likely
+> insane.
+> 
+> > > +
+> > > +	for (dev++; dev < limit; dev++) {
+> > > +		void *conf = dev_conf(pci, dev);
+> > > +		if (pci_config_readl(conf, PCI_VENDOR_ID) != ((u32)~0)) {
+> > > +			*pconf = conf;
+> > > +			return dev;
+> > > +		}
+> > > +	}
+> > > +
+> > > +	return -1;
+> > > +}
+> > > +
+> > >  static void pci_host_addr_space_init(struct pci_addr_space as[], int nr_as,
+> > >  				     u32 cells[], int nr_range_cells)
+> > >  {
+> > > @@ -133,6 +176,24 @@ static struct pci_host_bridge *pci_host_bridge_probe(void)
+> > >  	return host;
+> > >  }
+> > >  
+> > > +int pci_bus_scan(struct pci *pci)
+> > > +{
+> > > +	void *conf;
+> > > +	int dev;
+> > > +	int nr_dev = 0;
+> > > +
+> > > +	for_each_pci_dev(pci, dev, conf) {
+> > > +		/* We are only interested in normal PCI devices */
+> > > +		if (pci_config_readb(conf, PCI_HEADER_TYPE) !=
+> > > +					   PCI_HEADER_TYPE_NORMAL)
+> > > +			continue;
+> > > +		pci_config_writel(PCI_COMMAND_SERR, conf, PCI_COMMAND);
+> > 
+> > Shouldn't the driver (unit test) be the one that writes SERR? Also,
+> > doesn't this clear everything in the Command register except SERR?
+> 
+> I do not thing a driver is in charge. It is a minimal devices
+> initialization that is expected from firmware/BIOS AFAICT. A driver
+> should inherit the properly initialized bus with allocated io/memory
+> buffers to use.
+
+OK, does QEMU not provide that already?
+
+> 
+> > If a scan gets run again after driver/unittest has started using a device
+> > then this write may mess things up.
+> 
+> PCI bus scan is normally done once to initialize hierarchy. I am
+> struggling to imagine a usecase when it is called repeatedly,
+> especially in such a small framework.
+
+A unit test can do whatever it likes. I'd like the initial setup to be
+useful, but minimal, and easily modifiable.
+
+> 
+> > > +		nr_dev++;
+> > > +	}
+> > > +
+> > > +	return nr_dev;
+> > > +}
+> > > +
+> > >  struct pci *pci_dt_probe(void)
+> > >  {
+> > >  	struct pci_host_bridge *host;
+> > > @@ -150,6 +211,12 @@ struct pci *pci_dt_probe(void)
+> > >  
+> > >  void pci_shutdown(struct pci *pci)
+> > >  {
+> > > +	void *conf;
+> > > +	int dev;
+> > > +
+> > > +	for_each_pci_dev(pci, dev, conf)
+> > > +		pci_config_writel(PCI_COMMAND_INTX_DISABLE, conf, PCI_COMMAND);
+> > 
+> > I think I know why this is here, but I don't think that kvm-unit-tests
+> > needs to bother with it.
+> 
+> Well, it is not about interrupts, rather about disabling devices
+> access to access io/memory buffers, which is writing 0 to the
+> command regiester. PCI_COMMAND_INTX_DISABLE is just a good one
+> to write as well.
+> 
+> BTW, this is the reason I named this routine pci_shutdown(), not
+> pci_free().
+
+I'm currently thinking any sort of shutdown is overkill for
+kvm-unit-tests, but I'll accept anything you can make a good
+case for :-)
+
+> 
+> > > +
+> > >  	free(pci->sysdata);
+> > >  	free(pci);
+> > >  }
+> > > diff --git a/lib/pci-host-generic.h b/lib/pci-host-generic.h
+> > > index 097ac2d..c14d32d 100644
+> > > --- a/lib/pci-host-generic.h
+> > > +++ b/lib/pci-host-generic.h
+> > > @@ -22,5 +22,6 @@ struct pci_host_bridge {
+> > >  };
+> > >  
+> > >  #define PCI_ECAM_BUS_SIZE		(1 << 20)
+> > > +#define PCI_ECAM_CONFIG_SIZE		(1 << 12)
+> > 
+> > Are these also defined in the Linux kernel? I'm too lazy to pull up the
+> > PCI spec right now, so I'd rather confirm the sizes by looking them up
+> > in Linux. If they are defined there somewhere, then please use the same
+> > names here. Otherwise, I guess references to some documentation or
+> > something would be nice for pci dummies like me.
+> > 
+> > >  
+> > >  #endif
+> > > diff --git a/lib/pci.h b/lib/pci.h
+> > > index 22b8e31..bc4f2d2 100644
+> > > --- a/lib/pci.h
+> > > +++ b/lib/pci.h
+> > > @@ -8,6 +8,7 @@ struct pci {
+> > >  };
+> > >  
+> > >  extern struct pci *pci_dt_probe(void);
+> > > +extern int pci_bus_scan(struct pci *pci);
+> > >  extern void pci_shutdown(struct pci *pci);
+> > >  
+> > >  #endif
+> > > -- 
+> > > 1.8.3.1
+> > > 
