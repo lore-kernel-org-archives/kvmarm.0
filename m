@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 21/23] arm64: hw_breakpoint: Allow EL2 breakpoints if
- running in HYP
-Date: Wed,  3 Feb 2016 18:00:14 +0000
-Message-ID: <1454522416-6874-22-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v3 18/23] arm64: KVM: VHE: Add alternative panic handling
+Date: Wed,  3 Feb 2016 18:00:11 +0000
+Message-ID: <1454522416-6874-19-git-send-email-marc.zyngier@arm.com>
 References: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 502B54972F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C32E49630
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:36 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QZU3ZQjO4RB3 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Feb 2016 12:55:33 -0500 (EST)
+ with ESMTP id v9rTHdaV+zkK for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Feb 2016 12:55:30 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A808349720
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D7D4B4972F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:24 -0500 (EST)
 In-Reply-To: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,90 +31,72 @@ To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-With VHE, we place kernel {watch,break}-points at EL2 to get things
-like kgdb and "perf -e mem:..." working.
+As the kernel fully runs in HYP when VHE is enabled, we can
+directly branch to the kernel's panic() implementation, and
+not perform an exception return.
 
-This requires a bit of repainting in the low-level encore/decode,
-but is otherwise pretty simple.
+Add the alternative code to deal with this.
 
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/hw_breakpoint.h | 49 +++++++++++++++++++++-------------
- 1 file changed, 31 insertions(+), 18 deletions(-)
+ arch/arm64/kvm/hyp/switch.c | 35 +++++++++++++++++++++++++++--------
+ 1 file changed, 27 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/include/asm/hw_breakpoint.h b/arch/arm64/include/asm/hw_breakpoint.h
-index 9732908..0da0272 100644
---- a/arch/arm64/include/asm/hw_breakpoint.h
-+++ b/arch/arm64/include/asm/hw_breakpoint.h
-@@ -18,6 +18,7 @@
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index 686ca35..e90683a 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -206,11 +206,34 @@ __alias(__guest_run) int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
  
- #include <asm/cputype.h>
- #include <asm/cpufeature.h>
-+#include <asm/virt.h>
+ static const char __hyp_panic_string[] = "HYP panic:\nPS:%08llx PC:%016llx ESR:%08llx\nFAR:%016llx HPFAR:%016llx PAR:%016llx\nVCPU:%p\n";
  
- #ifdef __KERNEL__
- 
-@@ -35,24 +36,6 @@ struct arch_hw_breakpoint {
- 	struct arch_hw_breakpoint_ctrl ctrl;
- };
- 
--static inline u32 encode_ctrl_reg(struct arch_hw_breakpoint_ctrl ctrl)
--{
--	return (ctrl.len << 5) | (ctrl.type << 3) | (ctrl.privilege << 1) |
--		ctrl.enabled;
--}
--
--static inline void decode_ctrl_reg(u32 reg,
--				   struct arch_hw_breakpoint_ctrl *ctrl)
--{
--	ctrl->enabled	= reg & 0x1;
--	reg >>= 1;
--	ctrl->privilege	= reg & 0x3;
--	reg >>= 2;
--	ctrl->type	= reg & 0x3;
--	reg >>= 2;
--	ctrl->len	= reg & 0xff;
--}
--
- /* Breakpoint */
- #define ARM_BREAKPOINT_EXECUTE	0
- 
-@@ -76,6 +59,36 @@ static inline void decode_ctrl_reg(u32 reg,
- #define ARM_KERNEL_STEP_ACTIVE	1
- #define ARM_KERNEL_STEP_SUSPEND	2
- 
-+#define DBG_HMC_HYP		(1 << 13)
-+#define DBG_SSC_HYP		(3 << 14)
+-void __hyp_text __noreturn __hyp_panic(void)
++static void __hyp_text __hyp_call_panic_nvhe(u64 spsr, u64 elr, u64 par)
+ {
+ 	unsigned long str_va = (unsigned long)__hyp_panic_string;
+-	u64 spsr = read_sysreg(spsr_el2);
+-	u64 elr = read_sysreg(elr_el2);
 +
-+static inline u32 encode_ctrl_reg(struct arch_hw_breakpoint_ctrl ctrl)
-+{
-+	u32 val = (ctrl.len << 5) | (ctrl.type << 3) | ctrl.enabled;
-+
-+	if (is_kernel_in_hyp_mode() && ctrl.privilege == AARCH64_BREAKPOINT_EL1)
-+		val |= DBG_HMC_HYP | DBG_SSC_HYP;
-+	else
-+		val |= ctrl.privilege << 1;
-+
-+	return val;
++	__hyp_do_panic(hyp_kern_va(str_va),
++		       spsr,  elr,
++		       read_sysreg(esr_el2),   read_sysreg_el2(far),
++		       read_sysreg(hpfar_el2), par,
++		       (void *)read_sysreg(tpidr_el2));
 +}
 +
-+static inline void decode_ctrl_reg(u32 reg,
-+				   struct arch_hw_breakpoint_ctrl *ctrl)
++static void __hyp_text __hyp_call_panic_vhe(u64 spsr, u64 elr, u64 par)
 +{
-+	ctrl->enabled	= reg & 0x1;
-+	reg >>= 1;
-+	if (is_kernel_in_hyp_mode())
-+		ctrl->privilege = !!(reg & (DBG_HMC_HYP >> 1));
-+	else
-+		ctrl->privilege	= reg & 0x3;
-+	reg >>= 2;
-+	ctrl->type	= reg & 0x3;
-+	reg >>= 2;
-+	ctrl->len	= reg & 0xff;
++	panic(__hyp_panic_string,
++	      spsr,  elr,
++	      read_sysreg_el2(esr),   read_sysreg_el2(far),
++	      read_sysreg(hpfar_el2), par,
++	      (void *)read_sysreg(tpidr_el2));
 +}
 +
- /*
-  * Limits.
-  * Changing these will require modifications to the register accessors.
++static hyp_alternate_select(__hyp_call_panic,
++			    __hyp_call_panic_nvhe, __hyp_call_panic_vhe,
++			    ARM64_HAS_VIRT_HOST_EXTN);
++
++void __hyp_text __noreturn __hyp_panic(void)
++{
++	u64 spsr = read_sysreg_el2(spsr);
++	u64 elr = read_sysreg_el2(elr);
+ 	u64 par = read_sysreg(par_el1);
+ 
+ 	if (read_sysreg(vttbr_el2)) {
+@@ -225,11 +248,7 @@ void __hyp_text __noreturn __hyp_panic(void)
+ 	}
+ 
+ 	/* Call panic for real */
+-	__hyp_do_panic(hyp_kern_va(str_va),
+-		       spsr,  elr,
+-		       read_sysreg(esr_el2),   read_sysreg(far_el2),
+-		       read_sysreg(hpfar_el2), par,
+-		       (void *)read_sysreg(tpidr_el2));
++	__hyp_call_panic()(spsr, elr, par);
+ 
+ 	unreachable();
+ }
 -- 
 2.1.4
