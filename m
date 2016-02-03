@@ -1,26 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 21/21] arm64: Panic when VHE and non VHE CPUs coexist
-Date: Wed, 3 Feb 2016 17:45:47 +0000
-Message-ID: <56B23CCB.4000009@arm.com>
-References: <1453737235-16522-1-git-send-email-marc.zyngier@arm.com>
- <1453737235-16522-22-git-send-email-marc.zyngier@arm.com>
- <20160201153605.GA1478@cbox> <56B0CBF4.9030507@arm.com>
- <20160203084913.GA13974@cbox>
+Subject: [PATCH v3 01/23] arm/arm64: KVM: Add hook for C-based stage2 init
+Date: Wed,  3 Feb 2016 17:59:54 +0000
+Message-ID: <1454522416-6874-2-git-send-email-marc.zyngier@arm.com>
+References: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 487CD412D0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:40:26 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B7D41412ED
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rxEt+PYb7kVK for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Feb 2016 12:40:24 -0500 (EST)
+ with ESMTP id UYpnYJOnen2d for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Feb 2016 12:54:59 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CAF34412A6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:40:24 -0500 (EST)
-In-Reply-To: <20160203084913.GA13974@cbox>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A41B4412D0
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:54:59 -0500 (EST)
+In-Reply-To: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,145 +27,58 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/02/16 08:49, Christoffer Dall wrote:
-> On Tue, Feb 02, 2016 at 03:32:04PM +0000, Marc Zyngier wrote:
->> On 01/02/16 15:36, Christoffer Dall wrote:
->>> On Mon, Jan 25, 2016 at 03:53:55PM +0000, Marc Zyngier wrote:
->>>> Having both VHE and non-VHE capable CPUs in the same system
->>>> is likely to be a recipe for disaster.
->>>>
->>>> If the boot CPU has VHE, but a secondary is not, we won't be
->>>> able to downgrade and run the kernel at EL1. Add CPU hotplug
->>>> to the mix, and this produces a terrifying mess.
->>>>
->>>> Let's solve the problem once and for all. If you mix VHE and
->>>> non-VHE CPUs in the same system, you deserve to loose, and this
->>>> patch makes sure you don't get a chance.
->>>>
->>>> This is implemented by storing the kernel execution level in
->>>> a global variable. Secondaries will park themselves in a
->>>> WFI loop if they observe a mismatch. Also, the primary CPU
->>>> will detect that the secondary CPU has died on a mismatched
->>>> execution level. Panic will follow.
->>>>
->>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>>> ---
->>>>  arch/arm64/include/asm/virt.h | 17 +++++++++++++++++
->>>>  arch/arm64/kernel/head.S      | 19 +++++++++++++++++++
->>>>  arch/arm64/kernel/smp.c       |  3 +++
->>>>  3 files changed, 39 insertions(+)
->>>>
->>>> diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
->>>> index 9f22dd6..f81a345 100644
->>>> --- a/arch/arm64/include/asm/virt.h
->>>> +++ b/arch/arm64/include/asm/virt.h
->>>> @@ -36,6 +36,11 @@
->>>>   */
->>>>  extern u32 __boot_cpu_mode[2];
->>>>  
->>>> +/*
->>>> + * __run_cpu_mode records the mode the boot CPU uses for the kernel.
->>>> + */
->>>> +extern u32 __run_cpu_mode[2];
->>>> +
->>>>  void __hyp_set_vectors(phys_addr_t phys_vector_base);
->>>>  phys_addr_t __hyp_get_vectors(void);
->>>>  
->>>> @@ -60,6 +65,18 @@ static inline bool is_kernel_in_hyp_mode(void)
->>>>  	return el == CurrentEL_EL2;
->>>>  }
->>>>  
->>>> +static inline bool is_kernel_mode_mismatched(void)
->>>> +{
->>>> +	/*
->>>> +	 * A mismatched CPU will have written its own CurrentEL in
->>>> +	 * __run_cpu_mode[1] (initially set to zero) after failing to
->>>> +	 * match the value in __run_cpu_mode[0]. Thus, a non-zero
->>>> +	 * value in __run_cpu_mode[1] is enough to detect the
->>>> +	 * pathological case.
->>>> +	 */
->>>> +	return !!ACCESS_ONCE(__run_cpu_mode[1]);
->>>> +}
->>>> +
->>>>  /* The section containing the hypervisor text */
->>>>  extern char __hyp_text_start[];
->>>>  extern char __hyp_text_end[];
->>>> diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
->>>> index 2a7134c..bc44cf8 100644
->>>> --- a/arch/arm64/kernel/head.S
->>>> +++ b/arch/arm64/kernel/head.S
->>>> @@ -577,7 +577,23 @@ ENTRY(set_cpu_boot_mode_flag)
->>>>  1:	str	w20, [x1]			// This CPU has booted in EL1
->>>>  	dmb	sy
->>>>  	dc	ivac, x1			// Invalidate potentially stale cache line
->>>> +	adr_l	x1, __run_cpu_mode
->>>> +	ldr	w0, [x1]
->>>> +	mrs	x20, CurrentEL
->>>> +	cbz	x0, skip_el_check
->>>> +	cmp	x0, x20
->>>> +	bne	mismatched_el
->>>
->>> can't you do a ret here instead of writing the same value and flushing
->>> caches etc.?
->>
->> Yes, good point.
->>
->>>
->>>> +skip_el_check:			// Only the first CPU gets to set the rule
->>>> +	str	w20, [x1]
->>>> +	dmb	sy
->>>> +	dc	ivac, x1	// Invalidate potentially stale cache line
->>>>  	ret
->>>> +mismatched_el:
->>>> +	str	w20, [x1, #4]
->>>> +	dmb	sy
->>>> +	dc	ivac, x1	// Invalidate potentially stale cache line
->>>> +1:	wfi
->>>
->>> I'm no expert on SMP bringup, but doesn't this prevent the CPU from
->>> signaling completion and thus you'll never actually reach the checking
->>> code in __cpu_up?
->>
->> Indeed, and that's the whole point. The primary CPU will notice that the
->> secondary CPU has failed to boot (timeout), and will find the reason in
->> __run_cpu_mode.
->>
-> That wasn't exactly my point.  If I understand correctly and __cpu_up is
-> the primary CPU executing a function to bring up a secondary core, then
-> it will wait for the cpu_running completion which should be signalled by
-> the secondary core, but because the secondary core never makes any
-> progress it will timeout the wait for completion and you will see that
-> error "..failed to come online" instead of the "incompatible execution
-> level".
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/include/asm/kvm_host.h   | 4 ++++
+ arch/arm/kvm/arm.c                | 1 +
+ arch/arm64/include/asm/kvm_host.h | 4 ++++
+ 3 files changed, 9 insertions(+)
 
-It will actually do both. Here's an example on the model configured for
-such a braindead case:
-
-CPU4: failed to come online
-Kernel panic - not syncing: CPU4: incompatible execution level
-CPU: 0 PID: 1 Comm: swapper/0 Not tainted 4.5.0-rc2+ #5459
-Hardware name: FVP Base (DT)
-Call trace:
-[<ffffffc0000899e0>] dump_backtrace+0x0/0x180
-[<ffffffc000089b74>] show_stack+0x14/0x20
-[<ffffffc000333b08>] dump_stack+0x90/0xc8
-[<ffffffc00014d424>] panic+0x10c/0x250
-[<ffffffc00008ef24>] __cpu_up+0xfc/0x100
-[<ffffffc0000b7a9c>] _cpu_up+0x154/0x188
-[<ffffffc0000b7b54>] cpu_up+0x84/0xa8
-[<ffffffc0009e9d00>] smp_init+0xbc/0xc0
-[<ffffffc0009dca10>] kernel_init_freeable+0x94/0x1ec
-[<ffffffc000712f90>] kernel_init+0x10/0xe0
-[<ffffffc000085cd0>] ret_from_fork+0x10/0x40
-
-Am I missing something *really* obvious?
-
-Thanks,
-
-	M.
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index f9f2779..f1e86f1 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -220,6 +220,10 @@ static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
+ 	kvm_call_hyp((void*)hyp_stack_ptr, vector_ptr, pgd_ptr);
+ }
+ 
++static inline void __cpu_init_stage2(void)
++{
++}
++
+ static inline int kvm_arch_dev_ioctl_check_extension(long ext)
+ {
+ 	return 0;
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index dda1959..6b76e01 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -985,6 +985,7 @@ static void cpu_init_hyp_mode(void *dummy)
+ 	vector_ptr = (unsigned long)__kvm_hyp_vector;
+ 
+ 	__cpu_init_hyp_mode(boot_pgd_ptr, pgd_ptr, hyp_stack_ptr, vector_ptr);
++	__cpu_init_stage2();
+ 
+ 	kvm_arm_init_debug();
+ }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 689d4c9..fe86cf9 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -332,6 +332,10 @@ static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
+ 		     hyp_stack_ptr, vector_ptr);
+ }
+ 
++static inline void __cpu_init_stage2(void)
++{
++}
++
+ static inline void kvm_arch_hardware_disable(void) {}
+ static inline void kvm_arch_hardware_unsetup(void) {}
+ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
 -- 
-Jazz is not dead. It just smells funny...
+2.1.4
