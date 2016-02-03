@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 23/23] arm64: Panic when VHE and non VHE CPUs coexist
-Date: Wed,  3 Feb 2016 18:00:16 +0000
-Message-ID: <1454522416-6874-24-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v3 19/23] arm64: KVM: Move most of the fault decoding to C
+Date: Wed,  3 Feb 2016 18:00:12 +0000
+Message-ID: <1454522416-6874-20-git-send-email-marc.zyngier@arm.com>
 References: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CE49496E4
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1790C48536
  for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:37 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bQlxlBWBlcMb for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Feb 2016 12:55:35 -0500 (EST)
+ with ESMTP id iECqIh8KJ8y7 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Feb 2016 12:55:31 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A6FA648534
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:32 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5BF54496E4
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:26 -0500 (EST)
 In-Reply-To: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,117 +31,246 @@ To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Having both VHE and non-VHE capable CPUs in the same system
-is likely to be a recipe for disaster.
+The fault decoding process (including computing the IPA in the case
+of a permission fault) would be much better done in C code, as we
+have a reasonable infrastructure to deal with the VHE/non-VHE
+differences.
 
-If the boot CPU has VHE, but a secondary is not, we won't be
-able to downgrade and run the kernel at EL1. Add CPU hotplug
-to the mix, and this produces a terrifying mess.
-
-Let's solve the problem once and for all. If you mix VHE and
-non-VHE CPUs in the same system, you deserve to loose, and this
-patch makes sure you don't get a chance.
-
-This is implemented by storing the kernel execution level in
-a global variable. Secondaries will park themselves in a
-WFI loop if they observe a mismatch. Also, the primary CPU
-will detect that the secondary CPU has died on a mismatched
-execution level. Panic will follow.
+Let's move the whole thing to C, including the workaround for
+erratum 834220, and just patch the odd ESR_EL2 access remaining
+in hyp-entry.S.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/virt.h | 17 +++++++++++++++++
- arch/arm64/kernel/head.S      | 20 ++++++++++++++++++++
- arch/arm64/kernel/smp.c       |  3 +++
- 3 files changed, 40 insertions(+)
+ arch/arm64/kernel/asm-offsets.c |  3 --
+ arch/arm64/kvm/hyp/hyp-entry.S  | 69 +++------------------------------
+ arch/arm64/kvm/hyp/switch.c     | 85 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 90 insertions(+), 67 deletions(-)
 
-diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-index 9f22dd6..f81a345 100644
---- a/arch/arm64/include/asm/virt.h
-+++ b/arch/arm64/include/asm/virt.h
-@@ -36,6 +36,11 @@
+diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+index fffa4ac6..b0ab4e9 100644
+--- a/arch/arm64/kernel/asm-offsets.c
++++ b/arch/arm64/kernel/asm-offsets.c
+@@ -110,9 +110,6 @@ int main(void)
+   DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_regs, regs));
+   DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
+   DEFINE(VCPU_FPEXC32_EL2,	offsetof(struct kvm_vcpu, arch.ctxt.sys_regs[FPEXC32_EL2]));
+-  DEFINE(VCPU_ESR_EL2,		offsetof(struct kvm_vcpu, arch.fault.esr_el2));
+-  DEFINE(VCPU_FAR_EL2,		offsetof(struct kvm_vcpu, arch.fault.far_el2));
+-  DEFINE(VCPU_HPFAR_EL2,	offsetof(struct kvm_vcpu, arch.fault.hpfar_el2));
+   DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
+ #endif
+ #ifdef CONFIG_CPU_PM
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index 1bdeee7..3488894 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -19,7 +19,6 @@
+ 
+ #include <asm/alternative.h>
+ #include <asm/assembler.h>
+-#include <asm/asm-offsets.h>
+ #include <asm/cpufeature.h>
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_asm.h>
+@@ -69,7 +68,11 @@ ENDPROC(__vhe_hyp_call)
+ el1_sync:				// Guest trapped into EL2
+ 	save_x0_to_x3
+ 
++alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+ 	mrs	x1, esr_el2
++alternative_else
++	mrs	x1, esr_el1
++alternative_endif
+ 	lsr	x2, x1, #ESR_ELx_EC_SHIFT
+ 
+ 	cmp	x2, #ESR_ELx_EC_HVC64
+@@ -105,72 +108,10 @@ el1_trap:
+ 	cmp	x2, #ESR_ELx_EC_FP_ASIMD
+ 	b.eq	__fpsimd_guest_restore
+ 
+-	cmp	x2, #ESR_ELx_EC_DABT_LOW
+-	mov	x0, #ESR_ELx_EC_IABT_LOW
+-	ccmp	x2, x0, #4, ne
+-	b.ne	1f		// Not an abort we care about
+-
+-	/* This is an abort. Check for permission fault */
+-alternative_if_not ARM64_WORKAROUND_834220
+-	and	x2, x1, #ESR_ELx_FSC_TYPE
+-	cmp	x2, #FSC_PERM
+-	b.ne	1f		// Not a permission fault
+-alternative_else
+-	nop			// Use the permission fault path to
+-	nop			// check for a valid S1 translation,
+-	nop			// regardless of the ESR value.
+-alternative_endif
+-
+-	/*
+-	 * Check for Stage-1 page table walk, which is guaranteed
+-	 * to give a valid HPFAR_EL2.
+-	 */
+-	tbnz	x1, #7, 1f	// S1PTW is set
+-
+-	/* Preserve PAR_EL1 */
+-	mrs	x3, par_el1
+-	stp	x3, xzr, [sp, #-16]!
+-
+-	/*
+-	 * Permission fault, HPFAR_EL2 is invalid.
+-	 * Resolve the IPA the hard way using the guest VA.
+-	 * Stage-1 translation already validated the memory access rights.
+-	 * As such, we can use the EL1 translation regime, and don't have
+-	 * to distinguish between EL0 and EL1 access.
+-	 */
+-	mrs	x2, far_el2
+-	at	s1e1r, x2
+-	isb
+-
+-	/* Read result */
+-	mrs	x3, par_el1
+-	ldp	x0, xzr, [sp], #16	// Restore PAR_EL1 from the stack
+-	msr	par_el1, x0
+-	tbnz	x3, #0, 3f		// Bail out if we failed the translation
+-	ubfx	x3, x3, #12, #36	// Extract IPA
+-	lsl	x3, x3, #4		// and present it like HPFAR
+-	b	2f
+-
+-1:	mrs	x3, hpfar_el2
+-	mrs	x2, far_el2
+-
+-2:	mrs	x0, tpidr_el2
+-	str	w1, [x0, #VCPU_ESR_EL2]
+-	str	x2, [x0, #VCPU_FAR_EL2]
+-	str	x3, [x0, #VCPU_HPFAR_EL2]
+-
++	mrs	x0, tpidr_el2
+ 	mov	x1, #ARM_EXCEPTION_TRAP
+ 	b	__guest_exit
+ 
+-	/*
+-	 * Translation failed. Just return to the guest and
+-	 * let it fault again. Another CPU is probably playing
+-	 * behind our back.
+-	 */
+-3:	restore_x0_to_x3
+-
+-	eret
+-
+ el1_irq:
+ 	save_x0_to_x3
+ 	mrs	x0, tpidr_el2
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index e90683a..a192357 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -15,6 +15,7 @@
+  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
   */
- extern u32 __boot_cpu_mode[2];
  
-+/*
-+ * __run_cpu_mode records the mode the boot CPU uses for the kernel.
-+ */
-+extern u32 __run_cpu_mode[2];
-+
- void __hyp_set_vectors(phys_addr_t phys_vector_base);
- phys_addr_t __hyp_get_vectors(void);
++#include <linux/types.h>
+ #include <asm/kvm_asm.h>
  
-@@ -60,6 +65,18 @@ static inline bool is_kernel_in_hyp_mode(void)
- 	return el == CurrentEL_EL2;
+ #include "hyp.h"
+@@ -145,6 +146,86 @@ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
+ 	__vgic_call_restore_state()(vcpu);
  }
  
-+static inline bool is_kernel_mode_mismatched(void)
++static bool __hyp_text __true_value(void)
 +{
-+	/*
-+	 * A mismatched CPU will have written its own CurrentEL in
-+	 * __run_cpu_mode[1] (initially set to zero) after failing to
-+	 * match the value in __run_cpu_mode[0]. Thus, a non-zero
-+	 * value in __run_cpu_mode[1] is enough to detect the
-+	 * pathological case.
-+	 */
-+	return !!ACCESS_ONCE(__run_cpu_mode[1]);
++	return true;
 +}
 +
- /* The section containing the hypervisor text */
- extern char __hyp_text_start[];
- extern char __hyp_text_end[];
-diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-index 6f2f377..f9b6a5b 100644
---- a/arch/arm64/kernel/head.S
-+++ b/arch/arm64/kernel/head.S
-@@ -578,7 +578,24 @@ ENTRY(set_cpu_boot_mode_flag)
- 1:	str	w20, [x1]			// This CPU has booted in EL1
- 	dmb	sy
- 	dc	ivac, x1			// Invalidate potentially stale cache line
-+	adr_l	x1, __run_cpu_mode
-+	ldr	w0, [x1]
-+	mrs	x20, CurrentEL
-+	cbz	x0, skip_el_check
-+	cmp	x0, x20
-+	bne	mismatched_el
- 	ret
-+skip_el_check:			// Only the first CPU gets to set the rule
-+	str	w20, [x1]
-+	dmb	sy
-+	dc	ivac, x1	// Invalidate potentially stale cache line
-+	ret
-+mismatched_el:
-+	str	w20, [x1, #4]
-+	dmb	sy
-+	dc	ivac, x1	// Invalidate potentially stale cache line
-+1:	wfi
-+	b	1b
- ENDPROC(set_cpu_boot_mode_flag)
- 
- /*
-@@ -593,6 +610,9 @@ ENDPROC(set_cpu_boot_mode_flag)
- ENTRY(__boot_cpu_mode)
- 	.long	BOOT_CPU_MODE_EL2
- 	.long	BOOT_CPU_MODE_EL1
-+ENTRY(__run_cpu_mode)
-+	.long	0
-+	.long	0
- 	.popsection
- 
- 	/*
-diff --git a/arch/arm64/kernel/smp.c b/arch/arm64/kernel/smp.c
-index b1adc51..bc7650a 100644
---- a/arch/arm64/kernel/smp.c
-+++ b/arch/arm64/kernel/smp.c
-@@ -113,6 +113,9 @@ int __cpu_up(unsigned int cpu, struct task_struct *idle)
- 			pr_crit("CPU%u: failed to come online\n", cpu);
- 			ret = -EIO;
- 		}
++static bool __hyp_text __false_value(void)
++{
++	return false;
++}
 +
-+		if (is_kernel_mode_mismatched())
-+			panic("CPU%u: incompatible execution level", cpu);
- 	} else {
- 		pr_err("CPU%u: failed to boot: %d\n", cpu, ret);
- 	}
++static hyp_alternate_select(__check_arm_834220,
++			    __false_value, __true_value,
++			    ARM64_WORKAROUND_834220);
++
++static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
++{
++	u64 par, tmp;
++
++	/*
++	 * Resolve the IPA the hard way using the guest VA.
++	 *
++	 * Stage-1 translation already validated the memory access
++	 * rights. As such, we can use the EL1 translation regime, and
++	 * don't have to distinguish between EL0 and EL1 access.
++	 *
++	 * We do need to save/restore PAR_EL1 though, as we haven't
++	 * saved the guest context yet, and we may return early...
++	 */
++	par = read_sysreg(par_el1);
++	asm volatile("at s1e1r, %0" : : "r" (far));
++	isb();
++
++	tmp = read_sysreg(par_el1);
++	write_sysreg(par, par_el1);
++
++	if (unlikely(tmp & 1))
++		return false; /* Translation failed, back to guest */
++
++	/* Convert PAR to HPFAR format */
++	*hpfar = ((tmp >> 12) & ((1UL << 36) - 1)) << 4;
++	return true;
++}
++
++static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
++{
++	u64 esr = read_sysreg_el2(esr);
++	u8 ec = esr >> ESR_ELx_EC_SHIFT;
++	u64 hpfar, far;
++
++	vcpu->arch.fault.esr_el2 = esr;
++
++	if (ec != ESR_ELx_EC_DABT_LOW && ec != ESR_ELx_EC_IABT_LOW)
++		return true;
++
++	far = read_sysreg_el2(far);
++
++	/*
++	 * The HPFAR can be invalid if the stage 2 fault did not
++	 * happen during a stage 1 page table walk (the ESR_EL2.S1PTW
++	 * bit is clear) and one of the two following cases are true:
++	 *   1. The fault was due to a permission fault
++	 *   2. The processor carries errata 834220
++	 *
++	 * Therefore, for all non S1PTW faults where we either have a
++	 * permission fault or the errata workaround is enabled, we
++	 * resolve the IPA using the AT instruction.
++	 */
++	if (!(esr & ESR_ELx_S1PTW) &&
++	    (__check_arm_834220()() || (esr & ESR_ELx_FSC_TYPE) == FSC_PERM)) {
++		if (!__translate_far_to_hpfar(far, &hpfar))
++			return false;
++	} else {
++		hpfar = read_sysreg(hpfar_el2);
++	}
++
++	vcpu->arch.fault.far_el2 = far;
++	vcpu->arch.fault.hpfar_el2 = hpfar;
++	return true;
++}
++
+ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *host_ctxt;
+@@ -176,9 +257,13 @@ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ 	__debug_restore_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
+ 
+ 	/* Jump in the fire! */
++again:
+ 	exit_code = __guest_enter(vcpu, host_ctxt);
+ 	/* And we're baaack! */
+ 
++	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
++		goto again;
++
+ 	fp_enabled = __fpsimd_enabled();
+ 
+ 	__sysreg_save_guest_state(guest_ctxt);
 -- 
 2.1.4
