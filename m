@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 05/23] arm64: Add ARM64_HAS_VIRT_HOST_EXTN feature
-Date: Wed,  3 Feb 2016 17:59:58 +0000
-Message-ID: <1454522416-6874-6-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v3 06/23] arm64: KVM: Skip HYP setup when already running in
+ HYP
+Date: Wed,  3 Feb 2016 17:59:59 +0000
+Message-ID: <1454522416-6874-7-git-send-email-marc.zyngier@arm.com>
 References: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BA70413E1
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 813E24968B
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:09 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id rpVUmsZcWneb for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Feb 2016 12:55:05 -0500 (EST)
+ with ESMTP id tRcEYbwulJ0p for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Feb 2016 12:55:08 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9139441E71
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:05 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 14DCA412DD
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:07 -0500 (EST)
 In-Reply-To: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,68 +32,311 @@ To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a new ARM64_HAS_VIRT_HOST_EXTN features to indicate that the
-CPU has the ARMv8.1 VHE capability.
+With the kernel running at EL2, there is no point trying to
+configure page tables for HYP, as the kernel is already mapped.
 
-This will be used to trigger kernel patching in KVM.
+Take this opportunity to refactor the whole init a bit, allowing
+the various parts of the hypervisor bringup to be split across
+multiple functions.
 
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/cpufeature.h |  3 ++-
- arch/arm64/kernel/cpufeature.c      | 11 +++++++++++
- 2 files changed, 13 insertions(+), 1 deletion(-)
+ arch/arm/kvm/arm.c | 173 +++++++++++++++++++++++++++++++++++------------------
+ arch/arm/kvm/mmu.c |   7 +++
+ 2 files changed, 121 insertions(+), 59 deletions(-)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 8f271b8..c705d6a 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -30,8 +30,9 @@
- #define ARM64_HAS_LSE_ATOMICS			5
- #define ARM64_WORKAROUND_CAVIUM_23154		6
- #define ARM64_WORKAROUND_834220			7
-+#define ARM64_HAS_VIRT_HOST_EXTN		8
- 
--#define ARM64_NCAPS				8
-+#define ARM64_NCAPS				9
- 
- #ifndef __ASSEMBLY__
- 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 5c90aa4..ba74519 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -26,6 +26,7 @@
- #include <asm/cpu_ops.h>
- #include <asm/processor.h>
- #include <asm/sysreg.h>
-+#include <asm/virt.h>
- 
- unsigned long elf_hwcap __read_mostly;
- EXPORT_SYMBOL_GPL(elf_hwcap);
-@@ -621,6 +622,11 @@ static bool has_useable_gicv3_cpuif(const struct arm64_cpu_capabilities *entry)
- 	return has_sre;
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 6b76e01..58f89e3 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -967,6 +967,11 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 	}
  }
  
-+static bool runs_at_el2(const struct arm64_cpu_capabilities *entry)
++static void cpu_init_stage2(void *dummy)
 +{
-+	return is_kernel_in_hyp_mode();
++	__cpu_init_stage2();
 +}
 +
- static const struct arm64_cpu_capabilities arm64_features[] = {
- 	{
- 		.desc = "GIC system register CPU interface",
-@@ -651,6 +657,11 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.min_field_value = 2,
- 	},
- #endif /* CONFIG_AS_LSE && CONFIG_ARM64_LSE_ATOMICS */
-+	{
-+		.desc = "Virtualization Host Extensions",
-+		.capability = ARM64_HAS_VIRT_HOST_EXTN,
-+		.matches = runs_at_el2,
-+	},
- 	{},
- };
+ static void cpu_init_hyp_mode(void *dummy)
+ {
+ 	phys_addr_t boot_pgd_ptr;
+@@ -1036,6 +1041,82 @@ static inline void hyp_cpu_pm_init(void)
+ }
+ #endif
  
++static void teardown_common_resources(void)
++{
++	free_percpu(kvm_host_cpu_state);
++}
++
++static int init_common_resources(void)
++{
++	kvm_host_cpu_state = alloc_percpu(kvm_cpu_context_t);
++	if (!kvm_host_cpu_state) {
++		kvm_err("Cannot allocate host CPU state\n");
++		return -ENOMEM;
++	}
++
++	return 0;
++}
++
++static int init_subsystems(void)
++{
++	int err;
++
++	/*
++	 * Init HYP view of VGIC
++	 */
++	err = kvm_vgic_hyp_init();
++	switch (err) {
++	case 0:
++		vgic_present = true;
++		break;
++	case -ENODEV:
++	case -ENXIO:
++		vgic_present = false;
++		break;
++	default:
++		return err;
++	}
++
++	/*
++	 * Init HYP architected timer support
++	 */
++	err = kvm_timer_hyp_init();
++	if (err)
++		return err;
++
++	kvm_perf_init();
++	kvm_coproc_table_init();
++
++	return 0;
++}
++
++static void teardown_hyp_mode(void)
++{
++	int cpu;
++
++	if (is_kernel_in_hyp_mode())
++		return;
++
++	free_hyp_pgds();
++	for_each_possible_cpu(cpu)
++		free_page(per_cpu(kvm_arm_hyp_stack_page, cpu));
++}
++
++static int init_vhe_mode(void)
++{
++	/*
++	 * Execute the init code on each CPU.
++	 */
++	on_each_cpu(cpu_init_stage2, NULL, 1);
++
++	/* set size of VMID supported by CPU */
++	kvm_vmid_bits = kvm_get_vmid_bits();
++	kvm_info("%d-bit VMID\n", kvm_vmid_bits);
++
++	kvm_info("VHE mode initialized successfully\n");
++	return 0;
++}
++
+ /**
+  * Inits Hyp-mode on all online CPUs
+  */
+@@ -1066,7 +1147,7 @@ static int init_hyp_mode(void)
+ 		stack_page = __get_free_page(GFP_KERNEL);
+ 		if (!stack_page) {
+ 			err = -ENOMEM;
+-			goto out_free_stack_pages;
++			goto out_err;
+ 		}
+ 
+ 		per_cpu(kvm_arm_hyp_stack_page, cpu) = stack_page;
+@@ -1078,13 +1159,13 @@ static int init_hyp_mode(void)
+ 	err = create_hyp_mappings(__kvm_hyp_code_start, __kvm_hyp_code_end);
+ 	if (err) {
+ 		kvm_err("Cannot map world-switch code\n");
+-		goto out_free_mappings;
++		goto out_err;
+ 	}
+ 
+ 	err = create_hyp_mappings(__start_rodata, __end_rodata);
+ 	if (err) {
+ 		kvm_err("Cannot map rodata section\n");
+-		goto out_free_mappings;
++		goto out_err;
+ 	}
+ 
+ 	/*
+@@ -1096,20 +1177,10 @@ static int init_hyp_mode(void)
+ 
+ 		if (err) {
+ 			kvm_err("Cannot map hyp stack\n");
+-			goto out_free_mappings;
++			goto out_err;
+ 		}
+ 	}
+ 
+-	/*
+-	 * Map the host CPU structures
+-	 */
+-	kvm_host_cpu_state = alloc_percpu(kvm_cpu_context_t);
+-	if (!kvm_host_cpu_state) {
+-		err = -ENOMEM;
+-		kvm_err("Cannot allocate host CPU state\n");
+-		goto out_free_mappings;
+-	}
+-
+ 	for_each_possible_cpu(cpu) {
+ 		kvm_cpu_context_t *cpu_ctxt;
+ 
+@@ -1118,7 +1189,7 @@ static int init_hyp_mode(void)
+ 
+ 		if (err) {
+ 			kvm_err("Cannot map host CPU state: %d\n", err);
+-			goto out_free_context;
++			goto out_err;
+ 		}
+ 	}
+ 
+@@ -1127,34 +1198,22 @@ static int init_hyp_mode(void)
+ 	 */
+ 	on_each_cpu(cpu_init_hyp_mode, NULL, 1);
+ 
+-	/*
+-	 * Init HYP view of VGIC
+-	 */
+-	err = kvm_vgic_hyp_init();
+-	switch (err) {
+-	case 0:
+-		vgic_present = true;
+-		break;
+-	case -ENODEV:
+-	case -ENXIO:
+-		vgic_present = false;
+-		break;
+-	default:
+-		goto out_free_context;
+-	}
+-
+-	/*
+-	 * Init HYP architected timer support
+-	 */
+-	err = kvm_timer_hyp_init();
+-	if (err)
+-		goto out_free_context;
+-
+ #ifndef CONFIG_HOTPLUG_CPU
+ 	free_boot_hyp_pgd();
+ #endif
+ 
+-	kvm_perf_init();
++	cpu_notifier_register_begin();
++
++	err = __register_cpu_notifier(&hyp_init_cpu_nb);
++
++	cpu_notifier_register_done();
++
++	if (err) {
++		kvm_err("Cannot register HYP init CPU notifier (%d)\n", err);
++		goto out_err;
++	}
++
++	hyp_cpu_pm_init();
+ 
+ 	/* set size of VMID supported by CPU */
+ 	kvm_vmid_bits = kvm_get_vmid_bits();
+@@ -1163,14 +1222,9 @@ static int init_hyp_mode(void)
+ 	kvm_info("Hyp mode initialized successfully\n");
+ 
+ 	return 0;
+-out_free_context:
+-	free_percpu(kvm_host_cpu_state);
+-out_free_mappings:
+-	free_hyp_pgds();
+-out_free_stack_pages:
+-	for_each_possible_cpu(cpu)
+-		free_page(per_cpu(kvm_arm_hyp_stack_page, cpu));
++
+ out_err:
++	teardown_hyp_mode();
+ 	kvm_err("error initializing Hyp mode: %d\n", err);
+ 	return err;
+ }
+@@ -1214,26 +1268,27 @@ int kvm_arch_init(void *opaque)
+ 		}
+ 	}
+ 
+-	cpu_notifier_register_begin();
+-
+-	err = init_hyp_mode();
++	err = init_common_resources();
+ 	if (err)
+-		goto out_err;
++		return err;
+ 
+-	err = __register_cpu_notifier(&hyp_init_cpu_nb);
+-	if (err) {
+-		kvm_err("Cannot register HYP init CPU notifier (%d)\n", err);
++	if (is_kernel_in_hyp_mode())
++		err = init_vhe_mode();
++	else
++		err = init_hyp_mode();
++	if (err)
+ 		goto out_err;
+-	}
+-
+-	cpu_notifier_register_done();
+ 
+-	hyp_cpu_pm_init();
++	err = init_subsystems();
++	if (err)
++		goto out_hyp;
+ 
+-	kvm_coproc_table_init();
+ 	return 0;
++
++out_hyp:
++	teardown_hyp_mode();
+ out_err:
+-	cpu_notifier_register_done();
++	teardown_common_resources();
+ 	return err;
+ }
+ 
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index aba61fd..920d0c3 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -28,6 +28,7 @@
+ #include <asm/kvm_mmio.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_emulate.h>
++#include <asm/virt.h>
+ 
+ #include "trace.h"
+ 
+@@ -598,6 +599,9 @@ int create_hyp_mappings(void *from, void *to)
+ 	unsigned long start = KERN_TO_HYP((unsigned long)from);
+ 	unsigned long end = KERN_TO_HYP((unsigned long)to);
+ 
++	if (is_kernel_in_hyp_mode())
++		return 0;
++
+ 	start = start & PAGE_MASK;
+ 	end = PAGE_ALIGN(end);
+ 
+@@ -630,6 +634,9 @@ int create_hyp_io_mappings(void *from, void *to, phys_addr_t phys_addr)
+ 	unsigned long start = KERN_TO_HYP((unsigned long)from);
+ 	unsigned long end = KERN_TO_HYP((unsigned long)to);
+ 
++	if (is_kernel_in_hyp_mode())
++		return 0;
++
+ 	/* Check for a valid kernel IO mapping */
+ 	if (!is_vmalloc_addr(from) || !is_vmalloc_addr(to - 1))
+ 		return -EINVAL;
 -- 
 2.1.4
