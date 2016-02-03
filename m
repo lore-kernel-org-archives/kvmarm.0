@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 15/23] arm64: KVM: VHE: Implement VHE
- activate/deactivate_traps
-Date: Wed,  3 Feb 2016 18:00:08 +0000
-Message-ID: <1454522416-6874-16-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v3 08/23] arm64: KVM: VHE: Patch out kern_hyp_va
+Date: Wed,  3 Feb 2016 18:00:01 +0000
+Message-ID: <1454522416-6874-9-git-send-email-marc.zyngier@arm.com>
 References: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 65356412C2
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 286E548535
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:13 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id P52BAKKsBoMy for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Feb 2016 12:55:22 -0500 (EST)
+ with ESMTP id 959LFaZYGj0j for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Feb 2016 12:55:12 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6E75B4852C
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 101F94130A
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:10 -0500 (EST)
 In-Reply-To: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,143 +31,96 @@ To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Running the kernel in HYP mode requires the HCR_E2H bit to be set
-at all times, and the HCR_TGE bit to be set when running as a host
-(and cleared when running as a guest). At the same time, the vector
- must be set to the current role of the kernel (either host or
-hypervisor), and a couple of system registers differ between VHE
-and non-VHE.
+The kern_hyp_va macro is pretty meaninless with VHE, as there is
+only one mapping - the kernel one.
 
-We implement these by using another set of alternate functions
-that get dynamically patched.
+In order to keep the code readable and efficient, use runtime
+patching to replace the 'and' instruction used to compute the VA
+with a 'nop'.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_arm.h     |  3 ++-
- arch/arm64/include/asm/kvm_emulate.h |  3 +++
- arch/arm64/kvm/hyp/switch.c          | 47 +++++++++++++++++++++++++++++++++---
- 3 files changed, 49 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/kvm_mmu.h | 12 +++++++++++-
+ arch/arm64/kvm/hyp/hyp.h         | 25 ++++++++++++++++++++++---
+ 2 files changed, 33 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 498335e..100cbec 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -23,6 +23,7 @@
- #include <asm/types.h>
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 7364339..9a9318a 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -23,13 +23,16 @@
+ #include <asm/cpufeature.h>
  
- /* Hyp Configuration Register (HCR) bits */
-+#define HCR_E2H		(UL(1) << 34)
- #define HCR_ID		(UL(1) << 33)
- #define HCR_CD		(UL(1) << 32)
- #define HCR_RW_SHIFT	31
-@@ -81,7 +82,7 @@
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW)
- #define HCR_VIRT_EXCP_MASK (HCR_VA | HCR_VI | HCR_VF)
- #define HCR_INT_OVERRIDE   (HCR_FMO | HCR_IMO)
--
-+#define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
- 
- /* Hyp System Control Register (SCTLR_EL2) bits */
- #define SCTLR_EL2_EE	(1 << 25)
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 3066328..5ae0c69 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -29,6 +29,7 @@
- #include <asm/kvm_mmio.h>
- #include <asm/ptrace.h>
- #include <asm/cputype.h>
-+#include <asm/virt.h>
- 
- unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num);
- unsigned long *vcpu_spsr32(const struct kvm_vcpu *vcpu);
-@@ -43,6 +44,8 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
- static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- {
- 	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
-+	if (is_kernel_in_hyp_mode())
-+		vcpu->arch.hcr_el2 |= HCR_E2H;
- 	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
- 		vcpu->arch.hcr_el2 &= ~HCR_RW;
- }
-diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 0db161e..686ca35 100644
---- a/arch/arm64/kvm/hyp/switch.c
-+++ b/arch/arm64/kvm/hyp/switch.c
-@@ -15,6 +15,8 @@
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ /*
+- * As we only have the TTBR0_EL2 register, we cannot express
++ * As ARMv8.0 only has the TTBR0_EL2 register, we cannot express
+  * "negative" addresses. This makes it impossible to directly share
+  * mappings with the kernel.
+  *
+  * Instead, give the HYP mode its own VA region at a fixed offset from
+  * the kernel by just masking the top bits (which are all ones for a
+  * kernel address).
++ *
++ * ARMv8.1 (using VHE) does have a TTBR1_EL2, and doesn't use these
++ * macros (the entire kernel runs at EL2).
   */
+ #define HYP_PAGE_OFFSET_SHIFT	VA_BITS
+ #define HYP_PAGE_OFFSET_MASK	((UL(1) << HYP_PAGE_OFFSET_SHIFT) - 1)
+@@ -56,12 +59,19 @@
  
-+#include <asm/kvm_asm.h>
+ #ifdef __ASSEMBLY__
+ 
++#include <asm/alternative.h>
++#include <asm/cpufeature.h>
 +
- #include "hyp.h"
+ /*
+  * Convert a kernel VA into a HYP VA.
+  * reg: VA to be converted.
+  */
+ .macro kern_hyp_va	reg
++alternative_if_not ARM64_HAS_VIRT_HOST_EXTN	
+ 	and	\reg, \reg, #HYP_PAGE_OFFSET_MASK
++alternative_else
++	nop
++alternative_endif
+ .endm
  
- static bool __hyp_text __fpsimd_enabled_nvhe(void)
-@@ -36,6 +38,27 @@ bool __hyp_text __fpsimd_enabled(void)
- 	return __fpsimd_is_enabled()();
- }
+ #else
+diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
+index fb27517..fc502f3 100644
+--- a/arch/arm64/kvm/hyp/hyp.h
++++ b/arch/arm64/kvm/hyp/hyp.h
+@@ -25,9 +25,28 @@
  
-+static void __hyp_text __activate_traps_vhe(void)
+ #define __hyp_text __section(.hyp.text) notrace
+ 
+-#define kern_hyp_va(v) (typeof(v))((unsigned long)(v) & HYP_PAGE_OFFSET_MASK)
+-#define hyp_kern_va(v) (typeof(v))((unsigned long)(v) - HYP_PAGE_OFFSET \
+-						      + PAGE_OFFSET)
++static inline unsigned long __kern_hyp_va(unsigned long v)
 +{
-+	u64 val;
-+
-+	val = read_sysreg(cpacr_el1);
-+	val |= CPACR_EL1_TTA;
-+	val &= ~CPACR_EL1_FPEN;
-+	write_sysreg(val, cpacr_el1);
-+
-+	write_sysreg(__kvm_hyp_vector, vbar_el1);
++	asm volatile(ALTERNATIVE("and %0, %0, %1",
++				 "nop",
++				 ARM64_HAS_VIRT_HOST_EXTN)
++		     : "+r" (v) : "i" (HYP_PAGE_OFFSET_MASK));
++	return v;
 +}
 +
-+static void __hyp_text __activate_traps_nvhe(void)
++#define kern_hyp_va(v) (typeof(v))(__kern_hyp_va((unsigned long)(v)))
++
++static inline unsigned long __hyp_kern_va(unsigned long v)
 +{
-+	write_sysreg(CPTR_EL2_TTA | CPTR_EL2_TFP, cptr_el2);
++	u64 offset = PAGE_OFFSET - HYP_PAGE_OFFSET;
++	asm volatile(ALTERNATIVE("add %0, %0, %1",
++				 "nop",
++				 ARM64_HAS_VIRT_HOST_EXTN)
++		     : "+r" (v) : "r" (offset));
++	return v;
 +}
 +
-+static hyp_alternate_select(__activate_traps_arch,
-+			    __activate_traps_nvhe, __activate_traps_vhe,
-+			    ARM64_HAS_VIRT_HOST_EXTN);
-+
- static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
-@@ -55,16 +78,34 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- 	write_sysreg(val, hcr_el2);
- 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
- 	write_sysreg(1 << 15, hstr_el2);
--	write_sysreg(CPTR_EL2_TTA | CPTR_EL2_TFP, cptr_el2);
- 	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
-+	__activate_traps_arch()();
- }
++#define hyp_kern_va(v) (typeof(v))(__hyp_kern_va((unsigned long)(v)))
  
--static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
-+static void __hyp_text __deactivate_traps_vhe(void)
-+{
-+	extern char vectors[];	/* kernel exception vectors */
-+
-+	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
-+	write_sysreg(CPACR_EL1_FPEN, cpacr_el1);
-+	write_sysreg(vectors, vbar_el1);
-+}
-+
-+static void __hyp_text __deactivate_traps_nvhe(void)
- {
- 	write_sysreg(HCR_RW, hcr_el2);
-+	write_sysreg(0, cptr_el2);
-+}
-+
-+static hyp_alternate_select(__deactivate_traps_arch,
-+			    __deactivate_traps_nvhe, __deactivate_traps_vhe,
-+			    ARM64_HAS_VIRT_HOST_EXTN);
-+
-+static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
-+{
-+	__deactivate_traps_arch()();
- 	write_sysreg(0, hstr_el2);
- 	write_sysreg(read_sysreg(mdcr_el2) & MDCR_EL2_HPMN_MASK, mdcr_el2);
--	write_sysreg(0, cptr_el2);
- }
- 
- static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
+ /**
+  * hyp_alternate_select - Generates patchable code sequences that are
 -- 
 2.1.4
