@@ -1,66 +1,105 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 17/23] arm64: KVM: VHE: Add fpsimd enabling on guest access
-Date: Wed,  3 Feb 2016 18:00:10 +0000
-Message-ID: <1454522416-6874-18-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v3 22/23] arm64: VHE: Add support for running Linux in EL2 mode
+Date: Wed,  3 Feb 2016 18:00:15 +0000
+Message-ID: <1454522416-6874-23-git-send-email-marc.zyngier@arm.com>
 References: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C09CD412A6
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:28 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 89ZqqRXAWt2a for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Feb 2016 12:55:27 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 608CC4985B
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:23 -0500 (EST)
+Return-path: <linux-kernel-owner@vger.kernel.org>
 In-Reply-To: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: linux-kernel-owner@vger.kernel.org
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Despite the fact that a VHE enabled kernel runs at EL2, it uses
-CPACR_EL1 to trap FPSIMD access. Add the required alternative
-code to re-enable guest FPSIMD access when it has trapped to
-EL2.
+With ARMv8.1 VHE, the architecture is able to (almost) transparently
+run the kernel at EL2, despite being written for EL1.
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+This patch takes care of the "almost" part, mostly preventing the kernel
+from dropping from EL2 to EL1, and setting up the HYP configuration.
+
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/entry.S | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/arm64/Kconfig       | 13 +++++++++++++
+ arch/arm64/kernel/head.S | 28 +++++++++++++++++++++++++++-
+ 2 files changed, 40 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-index fd0fbe9..ce9e5e5 100644
---- a/arch/arm64/kvm/hyp/entry.S
-+++ b/arch/arm64/kvm/hyp/entry.S
-@@ -130,9 +130,15 @@ ENDPROC(__guest_exit)
- ENTRY(__fpsimd_guest_restore)
- 	stp	x4, lr, [sp, #-16]!
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 8cc6228..cf118d9 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -750,6 +750,19 @@ config ARM64_LSE_ATOMICS
+ 	  not support these instructions and requires the kernel to be
+ 	  built with binutils >= 2.25.
  
-+alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
- 	mrs	x2, cptr_el2
- 	bic	x2, x2, #CPTR_EL2_TFP
- 	msr	cptr_el2, x2
-+alternative_else
-+	mrs	x2, cpacr_el1
-+	orr	x2, x2, #CPACR_EL1_FPEN
-+	msr	cpacr_el1, x2
-+alternative_endif
++config ARM64_VHE
++	bool "Enable support for Virtualization Host Extensions (VHE)"
++	default y
++	help
++	  Virtualization Host Extensions (VHE) allow the kernel to run
++	  directly at EL2 (instead of EL1) on processors that support
++	  it. This leads to better performance for KVM, as they reduce
++	  the cost of the world switch.
++
++	  Selecting this option allows the VHE feature to be detected
++	  at runtime, and does not affect processors that do not
++	  implement this feature.
++
+ endmenu
+ 
+ endmenu
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index 917d981..6f2f377 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -30,6 +30,7 @@
+ #include <asm/cache.h>
+ #include <asm/cputype.h>
+ #include <asm/kernel-pgtable.h>
++#include <asm/kvm_arm.h>
+ #include <asm/memory.h>
+ #include <asm/pgtable-hwdef.h>
+ #include <asm/pgtable.h>
+@@ -464,9 +465,27 @@ CPU_LE(	bic	x0, x0, #(3 << 24)	)	// Clear the EE and E0E bits for EL1
  	isb
+ 	ret
  
- 	mrs	x3, tpidr_el2
++2:
++#ifdef CONFIG_ARM64_VHE
++	/*
++	 * Check for VHE being present. For the rest of the EL2 setup,
++	 * x2 being non-zero indicates that we do have VHE, and that the
++	 * kernel is intended to run at EL2.
++	 */
++	mrs	x2, id_aa64mmfr1_el1
++	ubfx	x2, x2, #8, #4
++#else
++	mov	x2, xzr
++#endif
++
+ 	/* Hyp configuration. */
+-2:	mov	x0, #(1 << 31)			// 64-bit EL1
++	mov	x0, #HCR_RW			// 64-bit EL1
++	cbz	x2, set_hcr
++	orr	x0, x0, #HCR_TGE		// Enable Host Extensions
++	orr	x0, x0, #HCR_E2H
++set_hcr:
+ 	msr	hcr_el2, x0
++	isb
+ 
+ 	/* Generic timers. */
+ 	mrs	x0, cnthctl_el2
+@@ -526,6 +545,13 @@ CPU_LE(	movk	x0, #0x30d0, lsl #16	)	// Clear EE and E0E on LE systems
+ 	/* Stage-2 translation */
+ 	msr	vttbr_el2, xzr
+ 
++	cbz	x2, install_el2_stub
++
++	mov	w20, #BOOT_CPU_MODE_EL2		// This CPU booted in EL2
++	isb
++	ret
++
++install_el2_stub:
+ 	/* Hypervisor stub */
+ 	adrp	x0, __hyp_stub_vectors
+ 	add	x0, x0, #:lo12:__hyp_stub_vectors
 -- 
 2.1.4
