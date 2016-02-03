@@ -1,82 +1,52 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH] KVM: arm/arm64: fix reference to uninitialised VGIC
-Date: Wed,  3 Feb 2016 16:56:51 +0000
-Message-ID: <1454518611-15694-1-git-send-email-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: fix reference to uninitialised VGIC
+Date: Wed, 3 Feb 2016 17:33:54 +0000
+Message-ID: <56B23A02.7070804@arm.com>
+References: <1454518611-15694-1-git-send-email-andre.przywara@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <stable-owner@vger.kernel.org>
+In-Reply-To: <1454518611-15694-1-git-send-email-andre.przywara@arm.com>
+Sender: stable-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Cosmin Gorgovan <cosmin@linux-geek.org>, stable@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Commit 4b4b4512da2a ("arm/arm64: KVM: Rework the arch timer to use
-level-triggered semantics") brought the virtual architected timer
-closer to the VGIC. There is one occasion were we don't properly
-check for the VGIC actually having been initialized before, but
-instead go on to check the active state of some IRQ number.
-If userland hasn't instantiated a virtual GIC, we end up with a
-kernel NULL pointer dereference:
-=========
-Unable to handle kernel NULL pointer dereference at virtual address 00000000
-pgd = ffffffc9745c5000
-[00000000] *pgd=00000009f631e003, *pud=00000009f631e003, *pmd=0000000000000000
-Internal error: Oops: 96000006 [#2] PREEMPT SMP
-Modules linked in:
-CPU: 0 PID: 2144 Comm: kvm_simplest-ar Tainted: G      D 4.5.0-rc2+ #1300
-Hardware name: ARM Juno development board (r1) (DT)
-task: ffffffc976da8000 ti: ffffffc976e28000 task.ti: ffffffc976e28000
-PC is at vgic_bitmap_get_irq_val+0x78/0x90
-LR is at kvm_vgic_map_is_active+0xac/0xc8
-pc : [<ffffffc0000b7e28>] lr : [<ffffffc0000b972c>] pstate: 20000145
-....
-=========
+On 03/02/16 16:56, Andre Przywara wrote:
+> Commit 4b4b4512da2a ("arm/arm64: KVM: Rework the arch timer to use
+> level-triggered semantics") brought the virtual architected timer
+> closer to the VGIC. There is one occasion were we don't properly
+> check for the VGIC actually having been initialized before, but
+> instead go on to check the active state of some IRQ number.
+> If userland hasn't instantiated a virtual GIC, we end up with a
+> kernel NULL pointer dereference:
+> =========
+> Unable to handle kernel NULL pointer dereference at virtual address 00000000
+> pgd = ffffffc9745c5000
+> [00000000] *pgd=00000009f631e003, *pud=00000009f631e003, *pmd=0000000000000000
+> Internal error: Oops: 96000006 [#2] PREEMPT SMP
+> Modules linked in:
+> CPU: 0 PID: 2144 Comm: kvm_simplest-ar Tainted: G      D 4.5.0-rc2+ #1300
+> Hardware name: ARM Juno development board (r1) (DT)
+> task: ffffffc976da8000 ti: ffffffc976e28000 task.ti: ffffffc976e28000
+> PC is at vgic_bitmap_get_irq_val+0x78/0x90
+> LR is at kvm_vgic_map_is_active+0xac/0xc8
+> pc : [<ffffffc0000b7e28>] lr : [<ffffffc0000b972c>] pstate: 20000145
+> ....
+> =========
+> 
+> Fix this by bailing out early of kvm_timer_flush_hwstate() if we don't
+> have a VGIC at all.
+> 
+> Reported-by: Cosmin Gorgovan <cosmin@linux-geek.org>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Cc: <stable@vger.kernel.org> # 4.4.x
 
-Fix this by bailing out early of kvm_timer_flush_hwstate() if we don't
-have a VGIC at all.
+Nice catch, thanks.
 
-Reported-by: Cosmin Gorgovan <cosmin@linux-geek.org>
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Cc: <stable@vger.kernel.org> # 4.4.x
----
- virt/kvm/arm/arch_timer.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 69bca18..ea60646 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -143,7 +143,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level)
-  * Check if there was a change in the timer state (should we raise or lower
-  * the line level to the GIC).
-  */
--static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
-+static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
- 
-@@ -154,10 +154,12 @@ static void kvm_timer_update_state(struct kvm_vcpu *vcpu)
- 	 * until we call this function from kvm_timer_flush_hwstate.
- 	 */
- 	if (!vgic_initialized(vcpu->kvm))
--	    return;
-+		return -ENODEV;
- 
- 	if (kvm_timer_should_fire(vcpu) != timer->irq.level)
- 		kvm_timer_update_irq(vcpu, !timer->irq.level);
-+
-+	return 0;
- }
- 
- /*
-@@ -218,7 +220,8 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
- 	bool phys_active;
- 	int ret;
- 
--	kvm_timer_update_state(vcpu);
-+	if (kvm_timer_update_state(vcpu))
-+		return;
- 
- 	/*
- 	* If we enter the guest with the virtual input level to the VGIC
+	M.
 -- 
-2.6.4
-
+Jazz is not dead. It just smells funny...
