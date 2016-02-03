@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 02/23] arm64: KVM: Switch to C-based stage2 init
-Date: Wed,  3 Feb 2016 17:59:55 +0000
-Message-ID: <1454522416-6874-3-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v3 05/23] arm64: Add ARM64_HAS_VIRT_HOST_EXTN feature
+Date: Wed,  3 Feb 2016 17:59:58 +0000
+Message-ID: <1454522416-6874-6-git-send-email-marc.zyngier@arm.com>
 References: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 97926412D0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:06 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9BA70413E1
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:11 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id W39f-TfHuIJm for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Feb 2016 12:55:01 -0500 (EST)
+ with ESMTP id rpVUmsZcWneb for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Feb 2016 12:55:05 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DA3D412DD
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9139441E71
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:05 -0500 (EST)
 In-Reply-To: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,142 +31,68 @@ To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-There is no real need to leave the stage2 initialization as part
-of the early HYP bootstrap, and we can easily postpone it to
-the point where we can safely run C code.
+Add a new ARM64_HAS_VIRT_HOST_EXTN features to indicate that the
+CPU has the ARMv8.1 VHE capability.
 
-This will help VHE, which doesn't need any of this bootstrap.
+This will be used to trigger kernel patching in KVM.
 
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_asm.h  |  2 ++
- arch/arm64/include/asm/kvm_host.h |  2 ++
- arch/arm64/kvm/hyp-init.S         | 18 ----------------
- arch/arm64/kvm/hyp/Makefile       |  1 +
- arch/arm64/kvm/hyp/s2-setup.c     | 44 +++++++++++++++++++++++++++++++++++++++
- 5 files changed, 49 insertions(+), 18 deletions(-)
- create mode 100644 arch/arm64/kvm/hyp/s2-setup.c
+ arch/arm64/include/asm/cpufeature.h |  3 ++-
+ arch/arm64/kernel/cpufeature.c      | 11 +++++++++++
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 52b777b..67ac580 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -48,6 +48,8 @@ extern u64 __vgic_v3_get_ich_vtr_el2(void);
+diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+index 8f271b8..c705d6a 100644
+--- a/arch/arm64/include/asm/cpufeature.h
++++ b/arch/arm64/include/asm/cpufeature.h
+@@ -30,8 +30,9 @@
+ #define ARM64_HAS_LSE_ATOMICS			5
+ #define ARM64_WORKAROUND_CAVIUM_23154		6
+ #define ARM64_WORKAROUND_834220			7
++#define ARM64_HAS_VIRT_HOST_EXTN		8
  
- extern u32 __kvm_get_mdcr_el2(void);
+-#define ARM64_NCAPS				8
++#define ARM64_NCAPS				9
  
-+extern void __init_stage2_translation(void);
-+
- #endif
+ #ifndef __ASSEMBLY__
  
- #endif /* __ARM_KVM_ASM_H__ */
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index fe86cf9..43688d9 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -25,6 +25,7 @@
- #include <linux/types.h>
- #include <linux/kvm_types.h>
- #include <asm/kvm.h>
-+#include <asm/kvm_asm.h>
- #include <asm/kvm_mmio.h>
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 5c90aa4..ba74519 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -26,6 +26,7 @@
+ #include <asm/cpu_ops.h>
+ #include <asm/processor.h>
+ #include <asm/sysreg.h>
++#include <asm/virt.h>
  
- #define __KVM_HAVE_ARCH_INTC_INITIALIZED
-@@ -334,6 +335,7 @@ static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
- 
- static inline void __cpu_init_stage2(void)
- {
-+	kvm_call_hyp(__init_stage2_translation);
+ unsigned long elf_hwcap __read_mostly;
+ EXPORT_SYMBOL_GPL(elf_hwcap);
+@@ -621,6 +622,11 @@ static bool has_useable_gicv3_cpuif(const struct arm64_cpu_capabilities *entry)
+ 	return has_sre;
  }
  
- static inline void kvm_arch_hardware_disable(void) {}
-diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
-index 3e568dc..80fda7e 100644
---- a/arch/arm64/kvm/hyp-init.S
-+++ b/arch/arm64/kvm/hyp-init.S
-@@ -87,24 +87,6 @@ __do_hyp_init:
- #endif
- 	msr	tcr_el2, x4
- 
--	ldr	x4, =VTCR_EL2_FLAGS
--	/*
--	 * Read the PARange bits from ID_AA64MMFR0_EL1 and set the PS bits in
--	 * VTCR_EL2.
--	 */
--	mrs	x5, ID_AA64MMFR0_EL1
--	bfi	x4, x5, #16, #3
--	/*
--	 * Read the VMIDBits bits from ID_AA64MMFR1_EL1 and set the VS bit in
--	 * VTCR_EL2.
--	 */
--	mrs	x5, ID_AA64MMFR1_EL1
--	ubfx	x5, x5, #5, #1
--	lsl	x5, x5, #VTCR_EL2_VS
--	orr	x4, x4, x5
--
--	msr	vtcr_el2, x4
--
- 	mrs	x4, mair_el1
- 	msr	mair_el2, x4
- 	isb
-diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
-index 826032b..5326e66 100644
---- a/arch/arm64/kvm/hyp/Makefile
-+++ b/arch/arm64/kvm/hyp/Makefile
-@@ -12,3 +12,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += switch.o
- obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
- obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
- obj-$(CONFIG_KVM_ARM_HOST) += hyp-entry.o
-+obj-$(CONFIG_KVM_ARM_HOST) += s2-setup.o
-diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
-new file mode 100644
-index 0000000..17e8cc0
---- /dev/null
-+++ b/arch/arm64/kvm/hyp/s2-setup.c
-@@ -0,0 +1,44 @@
-+/*
-+ * Copyright (C) 2016 - ARM Ltd
-+ * Author: Marc Zyngier <marc.zyngier@arm.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include <linux/types.h>
-+#include <asm/kvm_arm.h>
-+#include <asm/kvm_asm.h>
-+
-+#include "hyp.h"
-+
-+void __hyp_text __init_stage2_translation(void)
++static bool runs_at_el2(const struct arm64_cpu_capabilities *entry)
 +{
-+	u64 val = VTCR_EL2_FLAGS;
-+	u64 tmp;
-+
-+	/*
-+	 * Read the PARange bits from ID_AA64MMFR0_EL1 and set the PS
-+	 * bits in VTCR_EL2. Amusingly, the PARange is 4 bits, while
-+	 * PS is only 3. Fortunately, bit 19 is RES0 in VTCR_EL2...
-+	 */
-+	val |= (read_sysreg(id_aa64mmfr0_el1) & 7) << 16;
-+
-+	/*
-+	 * Read the VMIDBits bits from ID_AA64MMFR1_EL1 and set the VS
-+	 * bit in VTCR_EL2.
-+	 */
-+	tmp = (read_sysreg(id_aa64mmfr1_el1) >> 4) & 0xf;
-+	val |= (tmp == 2) ? VTCR_EL2_VS : 0;
-+
-+	write_sysreg(val, vtcr_el2);
++	return is_kernel_in_hyp_mode();
 +}
++
+ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 	{
+ 		.desc = "GIC system register CPU interface",
+@@ -651,6 +657,11 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.min_field_value = 2,
+ 	},
+ #endif /* CONFIG_AS_LSE && CONFIG_ARM64_LSE_ATOMICS */
++	{
++		.desc = "Virtualization Host Extensions",
++		.capability = ARM64_HAS_VIRT_HOST_EXTN,
++		.matches = runs_at_el2,
++	},
+ 	{},
+ };
+ 
 -- 
 2.1.4
