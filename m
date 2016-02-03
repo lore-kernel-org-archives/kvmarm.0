@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 09/23] arm64: KVM: VHE: Introduce unified system register
- accessors
-Date: Wed,  3 Feb 2016 18:00:02 +0000
-Message-ID: <1454522416-6874-10-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v3 07/23] arm64: KVM: VHE: Patch out use of HVC
+Date: Wed,  3 Feb 2016 18:00:00 +0000
+Message-ID: <1454522416-6874-8-git-send-email-marc.zyngier@arm.com>
 References: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 985AA48535
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C1EF248535
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GWeewZmmTzAe for <kvmarm@lists.cs.columbia.edu>;
- Wed,  3 Feb 2016 12:55:14 -0500 (EST)
+ with ESMTP id LCqIFKF0qruE for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  3 Feb 2016 12:55:11 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E94049786
- for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:11 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 90CDD49695
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  3 Feb 2016 12:55:08 -0500 (EST)
 In-Reply-To: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,114 +31,104 @@ To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VHE brings its own bag of new system registers, or rather system
-register accessors, as it define new ways to access both guest
-and host system registers. For example, from the host:
+With VHE, the host never issues an HVC instruction to get into the
+KVM code, as we can simply branch there.
 
-- The host TCR_EL2 register is accessed using the TCR_EL1 accessor
-- The guest TCR_EL1 register is accessed using the TCR_EL12 accessor
-
-Obviously, this is confusing. A way to somehow reduce the complexity
-of writing code for both ARMv8 and ARMv8.1 is to use a set of unified
-accessors that will generate the right sysreg, depending on the mode
-the CPU is running in. For example:
-
-- read_sysreg_el1(tcr) will use TCR_EL1 on ARMv8, and TCR_EL12 on
-  ARMv8.1 with VHE.
-- read_sysreg_el2(tcr) will use TCR_EL2 on ARMv8, and TCR_EL1 on
-  ARMv8.1 with VHE.
-
-We end up with three sets of accessors ({read,write}_sysreg_el[012])
-that can be directly used from C code. We take this opportunity to
-also add the definition for the new VHE sysregs.
+Use runtime code patching to simplify things a bit.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/hyp.h | 72 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 72 insertions(+)
+ arch/arm64/kvm/hyp.S           |  7 +++++++
+ arch/arm64/kvm/hyp/hyp-entry.S | 40 +++++++++++++++++++++++++++++++---------
+ 2 files changed, 38 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-index fc502f3..744c919 100644
---- a/arch/arm64/kvm/hyp/hyp.h
-+++ b/arch/arm64/kvm/hyp/hyp.h
-@@ -48,6 +48,78 @@ static inline unsigned long __hyp_kern_va(unsigned long v)
+diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+index 0ccdcbb..0689a74 100644
+--- a/arch/arm64/kvm/hyp.S
++++ b/arch/arm64/kvm/hyp.S
+@@ -17,7 +17,9 @@
  
- #define hyp_kern_va(v) (typeof(v))(__hyp_kern_va((unsigned long)(v)))
+ #include <linux/linkage.h>
  
-+#define read_sysreg_elx(r,nvh,vh)					\
-+	({								\
-+		u64 reg;						\
-+		asm volatile(ALTERNATIVE("mrs %0, " __stringify(r##nvh),\
-+					 "mrs_s %0, " __stringify(r##vh),\
-+					 ARM64_HAS_VIRT_HOST_EXTN)	\
-+			     : "=r" (reg));				\
-+		reg;							\
-+	})
++#include <asm/alternative.h>
+ #include <asm/assembler.h>
++#include <asm/cpufeature.h>
+ 
+ /*
+  * u64 kvm_call_hyp(void *hypfn, ...);
+@@ -38,6 +40,11 @@
+  * arch/arm64/kernel/hyp_stub.S.
+  */
+ ENTRY(kvm_call_hyp)
++alternative_if_not ARM64_HAS_VIRT_HOST_EXTN	
+ 	hvc	#0
+ 	ret
++alternative_else
++	b	__vhe_hyp_call
++	nop
++alternative_endif
+ ENDPROC(kvm_call_hyp)
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index 93e8d983..1bdeee7 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -38,6 +38,34 @@
+ 	ldp	x0, x1, [sp], #16
+ .endm
+ 
++.macro do_el2_call
++	/*
++	 * Shuffle the parameters before calling the function
++	 * pointed to in x0. Assumes parameters in x[1,2,3].
++	 */
++	sub	sp, sp, #16
++	str	lr, [sp]
++	mov	lr, x0
++	mov	x0, x1
++	mov	x1, x2
++	mov	x2, x3
++	blr	lr
++	ldr	lr, [sp]
++	add	sp, sp, #16
++.endm
 +
-+#define write_sysreg_elx(v,r,nvh,vh)					\
-+	do {								\
-+		u64 __val = (u64)(v);					\
-+		asm volatile(ALTERNATIVE("msr " __stringify(r##nvh) ", %x0",\
-+					 "msr_s " __stringify(r##vh) ", %x0",\
-+					 ARM64_HAS_VIRT_HOST_EXTN)	\
-+					 : : "rZ" (__val));		\
-+	} while (0)
-+
-+/*
-+ * Unified accessors for registers that have a different encoding
-+ * between VHE and non-VHE. They must be specified without their "ELx"
-+ * encoding.
-+ */
-+#define read_sysreg_el2(r)						\
-+	({								\
-+		u64 reg;						\
-+		asm volatile(ALTERNATIVE("mrs %0, " __stringify(r##_EL2),\
-+					 "mrs %0, " __stringify(r##_EL1),\
-+					 ARM64_HAS_VIRT_HOST_EXTN)	\
-+			     : "=r" (reg));				\
-+		reg;							\
-+	})
-+
-+#define write_sysreg_el2(v,r)						\
-+	do {								\
-+		u64 __val = (u64)(v);					\
-+		asm volatile(ALTERNATIVE("msr " __stringify(r##_EL2) ", %x0",\
-+					 "msr " __stringify(r##_EL1) ", %x0",\
-+					 ARM64_HAS_VIRT_HOST_EXTN)	\
-+					 : : "rZ" (__val));		\
-+	} while (0)
-+
-+#define read_sysreg_el0(r)	read_sysreg_elx(r, _EL0, _EL02)
-+#define write_sysreg_el0(v,r)	write_sysreg_elx(v, r, _EL0, _EL02)
-+#define read_sysreg_el1(r)	read_sysreg_elx(r, _EL1, _EL12)
-+#define write_sysreg_el1(v,r)	write_sysreg_elx(v, r, _EL1, _EL12)
-+
-+/* The VHE specific system registers and their encoding */
-+#define sctlr_EL12              sys_reg(3, 5, 1, 0, 0)
-+#define cpacr_EL12              sys_reg(3, 5, 1, 0, 2)
-+#define ttbr0_EL12              sys_reg(3, 5, 2, 0, 0)
-+#define ttbr1_EL12              sys_reg(3, 5, 2, 0, 1)
-+#define tcr_EL12                sys_reg(3, 5, 2, 0, 2)
-+#define afsr0_EL12              sys_reg(3, 5, 5, 1, 0)
-+#define afsr1_EL12              sys_reg(3, 5, 5, 1, 1)
-+#define esr_EL12                sys_reg(3, 5, 5, 2, 0)
-+#define far_EL12                sys_reg(3, 5, 6, 0, 0)
-+#define mair_EL12               sys_reg(3, 5, 10, 2, 0)
-+#define amair_EL12              sys_reg(3, 5, 10, 3, 0)
-+#define vbar_EL12               sys_reg(3, 5, 12, 0, 0)
-+#define contextidr_EL12         sys_reg(3, 5, 13, 0, 1)
-+#define cntkctl_EL12            sys_reg(3, 5, 14, 1, 0)
-+#define cntp_tval_EL02          sys_reg(3, 5, 14, 2, 0)
-+#define cntp_ctl_EL02           sys_reg(3, 5, 14, 2, 1)
-+#define cntp_cval_EL02          sys_reg(3, 5, 14, 2, 2)
-+#define cntv_tval_EL02          sys_reg(3, 5, 14, 3, 0)
-+#define cntv_ctl_EL02           sys_reg(3, 5, 14, 3, 1)
-+#define cntv_cval_EL02          sys_reg(3, 5, 14, 3, 2)
-+#define spsr_EL12               sys_reg(3, 5, 4, 0, 0)
-+#define elr_EL12                sys_reg(3, 5, 4, 0, 1)
-+
- /**
-  * hyp_alternate_select - Generates patchable code sequences that are
-  * used to switch between two implementations of a function, depending
++ENTRY(__vhe_hyp_call)
++	do_el2_call
++	/*
++	 * We used to rely on having an exception return to get
++	 * an implicit isb. In the E2H case, we don't have it anymore.
++	 * rather than changing all the leaf functions, just do it here
++	 * before returning to the rest of the kernel.
++	 */
++	isb
++	ret
++ENDPROC(__vhe_hyp_call)
++	
+ el1_sync:				// Guest trapped into EL2
+ 	save_x0_to_x3
+ 
+@@ -58,19 +86,13 @@ el1_sync:				// Guest trapped into EL2
+ 	mrs	x0, vbar_el2
+ 	b	2f
+ 
+-1:	stp	lr, xzr, [sp, #-16]!
+-
++1:
+ 	/*
+-	 * Compute the function address in EL2, and shuffle the parameters.
++	 * Perform the EL2 call
+ 	 */
+ 	kern_hyp_va	x0
+-	mov	lr, x0
+-	mov	x0, x1
+-	mov	x1, x2
+-	mov	x2, x3
+-	blr	lr
++	do_el2_call
+ 
+-	ldp	lr, xzr, [sp], #16
+ 2:	eret
+ 
+ el1_trap:
 -- 
 2.1.4
