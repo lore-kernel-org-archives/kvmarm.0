@@ -1,28 +1,27 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 11/23] arm64: KVM: VHE: Split save/restore of
- registers shared between guest and host
-Date: Thu, 4 Feb 2016 20:15:09 +0100
-Message-ID: <20160204191509.GE13974@cbox>
+Subject: Re: [PATCH v3 19/23] arm64: KVM: Move most of the fault decoding to C
+Date: Thu, 4 Feb 2016 20:20:59 +0100
+Message-ID: <20160204192059.GF13974@cbox>
 References: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
- <1454522416-6874-12-git-send-email-marc.zyngier@arm.com>
+ <1454522416-6874-20-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D991848535
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 14:09:10 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B31E3407A0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 14:15:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id bufhsT1t1b2j for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Feb 2016 14:09:09 -0500 (EST)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8AC7248531
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 14:09:09 -0500 (EST)
-Received: by mail-wm0-f50.google.com with SMTP id g62so19042106wme.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Feb 2016 11:14:39 -0800 (PST)
+ with ESMTP id Bi1zXBDSypVf for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2016 14:15:00 -0500 (EST)
+Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 15310400E9
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 14:14:59 -0500 (EST)
+Received: by mail-wm0-f51.google.com with SMTP id g62so19269866wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Feb 2016 11:20:29 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1454522416-6874-12-git-send-email-marc.zyngier@arm.com>
+In-Reply-To: <1454522416-6874-20-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,147 +35,254 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 03, 2016 at 06:00:04PM +0000, Marc Zyngier wrote:
-> A handful of system registers are still shared between host and guest,
-> even while using VHE (tpidr*_el[01] and actlr_el1).
+On Wed, Feb 03, 2016 at 06:00:12PM +0000, Marc Zyngier wrote:
+> The fault decoding process (including computing the IPA in the case
+> of a permission fault) would be much better done in C code, as we
+> have a reasonable infrastructure to deal with the VHE/non-VHE
+> differences.
 > 
-> Also, some of the vcpu state (sp_el0, PC and PSTATE) must be
-> save/restored on entry/exit, as they are used on the host as well.
+> Let's move the whole thing to C, including the workaround for
+> erratum 834220, and just patch the odd ESR_EL2 access remaining
+> in hyp-entry.S.
 > 
-> In order to facilitate the introduction of a VHE-specific sysreg
-> save/restore, make move the access to these registers to their
-> own save/restore functions.
-> 
-> No functionnal change.
-
-uber nit: s/functionnal/functional/
-
-> 
-> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  arch/arm64/kvm/hyp/sysreg-sr.c | 48 +++++++++++++++++++++++++++++-------------
->  1 file changed, 33 insertions(+), 15 deletions(-)
+>  arch/arm64/kernel/asm-offsets.c |  3 --
+>  arch/arm64/kvm/hyp/hyp-entry.S  | 69 +++------------------------------
+>  arch/arm64/kvm/hyp/switch.c     | 85 +++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 90 insertions(+), 67 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
-> index bd5b543..61bad17 100644
-> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
-> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
-> @@ -23,13 +23,29 @@
+> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+> index fffa4ac6..b0ab4e9 100644
+> --- a/arch/arm64/kernel/asm-offsets.c
+> +++ b/arch/arm64/kernel/asm-offsets.c
+> @@ -110,9 +110,6 @@ int main(void)
+>    DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_regs, regs));
+>    DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
+>    DEFINE(VCPU_FPEXC32_EL2,	offsetof(struct kvm_vcpu, arch.ctxt.sys_regs[FPEXC32_EL2]));
+> -  DEFINE(VCPU_ESR_EL2,		offsetof(struct kvm_vcpu, arch.fault.esr_el2));
+> -  DEFINE(VCPU_FAR_EL2,		offsetof(struct kvm_vcpu, arch.fault.far_el2));
+> -  DEFINE(VCPU_HPFAR_EL2,	offsetof(struct kvm_vcpu, arch.fault.hpfar_el2));
+>    DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
+>  #endif
+>  #ifdef CONFIG_CPU_PM
+> diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+> index 1bdeee7..3488894 100644
+> --- a/arch/arm64/kvm/hyp/hyp-entry.S
+> +++ b/arch/arm64/kvm/hyp/hyp-entry.S
+> @@ -19,7 +19,6 @@
+>  
+>  #include <asm/alternative.h>
+>  #include <asm/assembler.h>
+> -#include <asm/asm-offsets.h>
+>  #include <asm/cpufeature.h>
+>  #include <asm/kvm_arm.h>
+>  #include <asm/kvm_asm.h>
+> @@ -69,7 +68,11 @@ ENDPROC(__vhe_hyp_call)
+>  el1_sync:				// Guest trapped into EL2
+>  	save_x0_to_x3
+>  
+> +alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+>  	mrs	x1, esr_el2
+> +alternative_else
+> +	mrs	x1, esr_el1
+> +alternative_endif
+>  	lsr	x2, x1, #ESR_ELx_EC_SHIFT
+>  
+>  	cmp	x2, #ESR_ELx_EC_HVC64
+> @@ -105,72 +108,10 @@ el1_trap:
+>  	cmp	x2, #ESR_ELx_EC_FP_ASIMD
+>  	b.eq	__fpsimd_guest_restore
+>  
+> -	cmp	x2, #ESR_ELx_EC_DABT_LOW
+> -	mov	x0, #ESR_ELx_EC_IABT_LOW
+> -	ccmp	x2, x0, #4, ne
+> -	b.ne	1f		// Not an abort we care about
+> -
+> -	/* This is an abort. Check for permission fault */
+> -alternative_if_not ARM64_WORKAROUND_834220
+> -	and	x2, x1, #ESR_ELx_FSC_TYPE
+> -	cmp	x2, #FSC_PERM
+> -	b.ne	1f		// Not a permission fault
+> -alternative_else
+> -	nop			// Use the permission fault path to
+> -	nop			// check for a valid S1 translation,
+> -	nop			// regardless of the ESR value.
+> -alternative_endif
+> -
+> -	/*
+> -	 * Check for Stage-1 page table walk, which is guaranteed
+> -	 * to give a valid HPFAR_EL2.
+> -	 */
+> -	tbnz	x1, #7, 1f	// S1PTW is set
+> -
+> -	/* Preserve PAR_EL1 */
+> -	mrs	x3, par_el1
+> -	stp	x3, xzr, [sp, #-16]!
+> -
+> -	/*
+> -	 * Permission fault, HPFAR_EL2 is invalid.
+> -	 * Resolve the IPA the hard way using the guest VA.
+> -	 * Stage-1 translation already validated the memory access rights.
+> -	 * As such, we can use the EL1 translation regime, and don't have
+> -	 * to distinguish between EL0 and EL1 access.
+> -	 */
+> -	mrs	x2, far_el2
+> -	at	s1e1r, x2
+> -	isb
+> -
+> -	/* Read result */
+> -	mrs	x3, par_el1
+> -	ldp	x0, xzr, [sp], #16	// Restore PAR_EL1 from the stack
+> -	msr	par_el1, x0
+> -	tbnz	x3, #0, 3f		// Bail out if we failed the translation
+> -	ubfx	x3, x3, #12, #36	// Extract IPA
+> -	lsl	x3, x3, #4		// and present it like HPFAR
+> -	b	2f
+> -
+> -1:	mrs	x3, hpfar_el2
+> -	mrs	x2, far_el2
+> -
+> -2:	mrs	x0, tpidr_el2
+> -	str	w1, [x0, #VCPU_ESR_EL2]
+> -	str	x2, [x0, #VCPU_FAR_EL2]
+> -	str	x3, [x0, #VCPU_HPFAR_EL2]
+> -
+> +	mrs	x0, tpidr_el2
+>  	mov	x1, #ARM_EXCEPTION_TRAP
+>  	b	__guest_exit
+>  
+> -	/*
+> -	 * Translation failed. Just return to the guest and
+> -	 * let it fault again. Another CPU is probably playing
+> -	 * behind our back.
+> -	 */
+> -3:	restore_x0_to_x3
+> -
+> -	eret
+> -
+>  el1_irq:
+>  	save_x0_to_x3
+>  	mrs	x0, tpidr_el2
+> diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+> index e90683a..a192357 100644
+> --- a/arch/arm64/kvm/hyp/switch.c
+> +++ b/arch/arm64/kvm/hyp/switch.c
+> @@ -15,6 +15,7 @@
+>   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>   */
+>  
+> +#include <linux/types.h>
+>  #include <asm/kvm_asm.h>
 >  
 >  #include "hyp.h"
+> @@ -145,6 +146,86 @@ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
+>  	__vgic_call_restore_state()(vcpu);
+>  }
 >  
-> -/* ctxt is already in the HYP VA space */
-> +/*
-> + * Non-VHE: Both host and guest must save everything.
-> + *
-> + * VHE: Host must save tpidr*_el[01], actlr_el1, sp0, pc, pstate, and
-> + * guest must save everything.
-> + */
-> +
-> +static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+> +static bool __hyp_text __true_value(void)
 > +{
-> +	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
-> +	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
-> +	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
-> +	ctxt->sys_regs[TPIDR_EL1]	= read_sysreg(tpidr_el1);
-> +	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
-> +	ctxt->gp_regs.regs.pc		= read_sysreg(elr_el2);
-> +	ctxt->gp_regs.regs.pstate	= read_sysreg(spsr_el2);
+> +	return true;
 > +}
 > +
->  static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
->  {
->  	ctxt->sys_regs[MPIDR_EL1]	= read_sysreg(vmpidr_el2);
->  	ctxt->sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
->  	ctxt->sys_regs[SCTLR_EL1]	= read_sysreg(sctlr_el1);
-> -	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
->  	ctxt->sys_regs[CPACR_EL1]	= read_sysreg(cpacr_el1);
->  	ctxt->sys_regs[TTBR0_EL1]	= read_sysreg(ttbr0_el1);
->  	ctxt->sys_regs[TTBR1_EL1]	= read_sysreg(ttbr1_el1);
-> @@ -41,17 +57,11 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
->  	ctxt->sys_regs[MAIR_EL1]	= read_sysreg(mair_el1);
->  	ctxt->sys_regs[VBAR_EL1]	= read_sysreg(vbar_el1);
->  	ctxt->sys_regs[CONTEXTIDR_EL1]	= read_sysreg(contextidr_el1);
-> -	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
-> -	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
-> -	ctxt->sys_regs[TPIDR_EL1]	= read_sysreg(tpidr_el1);
->  	ctxt->sys_regs[AMAIR_EL1]	= read_sysreg(amair_el1);
->  	ctxt->sys_regs[CNTKCTL_EL1]	= read_sysreg(cntkctl_el1);
->  	ctxt->sys_regs[PAR_EL1]		= read_sysreg(par_el1);
->  	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
->  
-> -	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
-> -	ctxt->gp_regs.regs.pc		= read_sysreg(elr_el2);
-> -	ctxt->gp_regs.regs.pstate	= read_sysreg(spsr_el2);
->  	ctxt->gp_regs.sp_el1		= read_sysreg(sp_el1);
->  	ctxt->gp_regs.elr_el1		= read_sysreg(elr_el1);
->  	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg(spsr_el1);
-> @@ -60,11 +70,24 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
->  void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
->  {
->  	__sysreg_save_state(ctxt);
-> +	__sysreg_save_common_state(ctxt);
->  }
->  
->  void __hyp_text __sysreg_save_guest_state(struct kvm_cpu_context *ctxt)
->  {
->  	__sysreg_save_state(ctxt);
-> +	__sysreg_save_common_state(ctxt);
+> +static bool __hyp_text __false_value(void)
+> +{
+> +	return false;
 > +}
 > +
-> +static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+> +static hyp_alternate_select(__check_arm_834220,
+> +			    __false_value, __true_value,
+> +			    ARM64_WORKAROUND_834220);
+> +
+> +static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
 > +{
-> +	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  actlr_el1);
-> +	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  tpidr_el0);
-> +	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], tpidrro_el0);
-> +	write_sysreg(ctxt->sys_regs[TPIDR_EL1],	  tpidr_el1);
-> +	write_sysreg(ctxt->gp_regs.regs.sp,	  sp_el0);
-> +	write_sysreg(ctxt->gp_regs.regs.pc,	  elr_el2);
-> +	write_sysreg(ctxt->gp_regs.regs.pstate,	  spsr_el2);
->  }
->  
->  static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
-> @@ -72,7 +95,6 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
->  	write_sysreg(ctxt->sys_regs[MPIDR_EL1],	  vmpidr_el2);
->  	write_sysreg(ctxt->sys_regs[CSSELR_EL1],  csselr_el1);
->  	write_sysreg(ctxt->sys_regs[SCTLR_EL1],	  sctlr_el1);
-> -	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  actlr_el1);
->  	write_sysreg(ctxt->sys_regs[CPACR_EL1],	  cpacr_el1);
->  	write_sysreg(ctxt->sys_regs[TTBR0_EL1],	  ttbr0_el1);
->  	write_sysreg(ctxt->sys_regs[TTBR1_EL1],	  ttbr1_el1);
-> @@ -84,17 +106,11 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
->  	write_sysreg(ctxt->sys_regs[MAIR_EL1],	  mair_el1);
->  	write_sysreg(ctxt->sys_regs[VBAR_EL1],	  vbar_el1);
->  	write_sysreg(ctxt->sys_regs[CONTEXTIDR_EL1], contextidr_el1);
-> -	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  tpidr_el0);
-> -	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], tpidrro_el0);
-> -	write_sysreg(ctxt->sys_regs[TPIDR_EL1],	  tpidr_el1);
->  	write_sysreg(ctxt->sys_regs[AMAIR_EL1],	  amair_el1);
->  	write_sysreg(ctxt->sys_regs[CNTKCTL_EL1], cntkctl_el1);
->  	write_sysreg(ctxt->sys_regs[PAR_EL1],	  par_el1);
->  	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
->  
-> -	write_sysreg(ctxt->gp_regs.regs.sp,	sp_el0);
-> -	write_sysreg(ctxt->gp_regs.regs.pc,	elr_el2);
-> -	write_sysreg(ctxt->gp_regs.regs.pstate,	spsr_el2);
->  	write_sysreg(ctxt->gp_regs.sp_el1,	sp_el1);
->  	write_sysreg(ctxt->gp_regs.elr_el1,	elr_el1);
->  	write_sysreg(ctxt->gp_regs.spsr[KVM_SPSR_EL1], spsr_el1);
-> @@ -103,11 +119,13 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
->  void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
+> +	u64 par, tmp;
+> +
+> +	/*
+> +	 * Resolve the IPA the hard way using the guest VA.
+> +	 *
+> +	 * Stage-1 translation already validated the memory access
+> +	 * rights. As such, we can use the EL1 translation regime, and
+> +	 * don't have to distinguish between EL0 and EL1 access.
+> +	 *
+> +	 * We do need to save/restore PAR_EL1 though, as we haven't
+> +	 * saved the guest context yet, and we may return early...
+> +	 */
+> +	par = read_sysreg(par_el1);
+> +	asm volatile("at s1e1r, %0" : : "r" (far));
+> +	isb();
+> +
+> +	tmp = read_sysreg(par_el1);
+> +	write_sysreg(par, par_el1);
+> +
+> +	if (unlikely(tmp & 1))
+> +		return false; /* Translation failed, back to guest */
+> +
+> +	/* Convert PAR to HPFAR format */
+> +	*hpfar = ((tmp >> 12) & ((1UL << 36) - 1)) << 4;
+> +	return true;
+> +}
+> +
+> +static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
+> +{
+> +	u64 esr = read_sysreg_el2(esr);
+> +	u8 ec = esr >> ESR_ELx_EC_SHIFT;
+> +	u64 hpfar, far;
+> +
+> +	vcpu->arch.fault.esr_el2 = esr;
+> +
+> +	if (ec != ESR_ELx_EC_DABT_LOW && ec != ESR_ELx_EC_IABT_LOW)
+> +		return true;
+> +
+> +	far = read_sysreg_el2(far);
+> +
+> +	/*
+> +	 * The HPFAR can be invalid if the stage 2 fault did not
+> +	 * happen during a stage 1 page table walk (the ESR_EL2.S1PTW
+> +	 * bit is clear) and one of the two following cases are true:
+> +	 *   1. The fault was due to a permission fault
+> +	 *   2. The processor carries errata 834220
+> +	 *
+> +	 * Therefore, for all non S1PTW faults where we either have a
+> +	 * permission fault or the errata workaround is enabled, we
+> +	 * resolve the IPA using the AT instruction.
+> +	 */
+> +	if (!(esr & ESR_ELx_S1PTW) &&
+> +	    (__check_arm_834220()() || (esr & ESR_ELx_FSC_TYPE) == FSC_PERM)) {
+> +		if (!__translate_far_to_hpfar(far, &hpfar))
+> +			return false;
+> +	} else {
+> +		hpfar = read_sysreg(hpfar_el2);
+> +	}
+> +
+> +	vcpu->arch.fault.far_el2 = far;
+> +	vcpu->arch.fault.hpfar_el2 = hpfar;
+> +	return true;
+> +}
+> +
+>  static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
 >  {
->  	__sysreg_restore_state(ctxt);
-> +	__sysreg_restore_common_state(ctxt);
->  }
+>  	struct kvm_cpu_context *host_ctxt;
+> @@ -176,9 +257,13 @@ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+>  	__debug_restore_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
 >  
->  void __hyp_text __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt)
->  {
->  	__sysreg_restore_state(ctxt);
-> +	__sysreg_restore_common_state(ctxt);
->  }
+>  	/* Jump in the fire! */
+> +again:
+>  	exit_code = __guest_enter(vcpu, host_ctxt);
+>  	/* And we're baaack! */
 >  
->  void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+> +	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
+> +		goto again;
+> +
+>  	fp_enabled = __fpsimd_enabled();
+>  
+>  	__sysreg_save_guest_state(guest_ctxt);
 > -- 
 > 2.1.4
 > 
+
+Thanks for the rewrite, I find this code really nice now, especially
+comparing to the confusing job-security-creating stuff we had in
+assembly before.
+
+-Christoffer
