@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 23/28] ARM: KVM: Remove __weak attributes
-Date: Thu,  4 Feb 2016 11:00:40 +0000
-Message-ID: <1454583645-10144-24-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 15/28] ARM: KVM: Add VFP lazy save/restore handler
+Date: Thu,  4 Feb 2016 11:00:32 +0000
+Message-ID: <1454583645-10144-16-git-send-email-marc.zyngier@arm.com>
 References: <1454583645-10144-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3449C49899
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 83BFD49708
  for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 05:55:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zhIuOAlp9ofv for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Feb 2016 05:55:53 -0500 (EST)
+ with ESMTP id 204Dt3XPG8gj for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2016 05:55:48 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 90E1549852
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 05:55:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 86CB249803
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 05:55:38 -0500 (EST)
 In-Reply-To: <1454583645-10144-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,71 +31,54 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that the old code is long gone, we can remove all the weak
-attributes, as there is only one version of the code.
+Similar to the arm64 version, add the code that deals with VFP traps,
+re-enabling VFP, save/restoring the registers and resuming the guest.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/hyp/hyp-entry.S | 4 +---
- arch/arm/kvm/hyp/switch.c    | 2 +-
- arch/arm/kvm/hyp/tlb.c       | 6 +++---
- 3 files changed, 5 insertions(+), 7 deletions(-)
+ arch/arm/kvm/hyp/entry.S | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
-index ca412ad..e2a45b8 100644
---- a/arch/arm/kvm/hyp/hyp-entry.S
-+++ b/arch/arm/kvm/hyp/hyp-entry.S
-@@ -58,10 +58,8 @@
-  */
+diff --git a/arch/arm/kvm/hyp/entry.S b/arch/arm/kvm/hyp/entry.S
+index 32f79b0..21c2388 100644
+--- a/arch/arm/kvm/hyp/entry.S
++++ b/arch/arm/kvm/hyp/entry.S
+@@ -66,5 +66,36 @@ ENTRY(__guest_exit)
+ 	bx	lr
+ ENDPROC(__guest_exit)
  
- 	.align 5
--__hyp_vector:
--	.global	__hyp_vector
- __kvm_hyp_vector:
--	.weak __kvm_hyp_vector
-+	.global __kvm_hyp_vector
++/*
++ * If VFPv3 support is not available, then we will not switch the VFP
++ * registers; however cp10 and cp11 accesses will still trap and fallback
++ * to the regular coprocessor emulation code, which currently will
++ * inject an undefined exception to the guest.
++ */
++#ifdef CONFIG_VFPv3
++ENTRY(__vfp_guest_restore)
++	push	{r3, r4, lr}
++
++	@ NEON/VFP used.  Turn on VFP access.
++	mrc	p15, 4, r1, c1, c1, 2		@ HCPTR
++	bic	r1, r1, #(HCPTR_TCP(10) | HCPTR_TCP(11))
++	mcr	p15, 4, r1, c1, c1, 2		@ HCPTR
++	isb
++
++	@ Switch VFP/NEON hardware state to the guest's
++	mov	r4, r0
++	ldr	r0, [r0, #VCPU_HOST_CTXT]
++	add	r0, r0, #CPU_CTXT_VFP
++	bl	__vfp_save_state
++	add	r0, r4, #(VCPU_GUEST_CTXT + CPU_CTXT_VFP)
++	bl	__vfp_restore_state
++
++	pop	{r3, r4, lr}
++	pop	{r0, r1, r2}
++	clrex
++	eret
++ENDPROC(__vfp_guest_restore)
++#endif
++
+ 	.popsection
  
- 	@ Hyp-mode exception vector
- 	W(b)	hyp_reset
-diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
-index 67f3944..7325ad3 100644
---- a/arch/arm/kvm/hyp/switch.c
-+++ b/arch/arm/kvm/hyp/switch.c
-@@ -187,7 +187,7 @@ again:
- 	return exit_code;
- }
- 
--__alias(__guest_run) int __weak __kvm_vcpu_run(struct kvm_vcpu *vcpu);
-+__alias(__guest_run) int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
- 
- static const char * const __hyp_panic_string[] = {
- 	[ARM_EXCEPTION_RESET]      = "\nHYP panic: RST?? PC:%08x CPSR:%08x",
-diff --git a/arch/arm/kvm/hyp/tlb.c b/arch/arm/kvm/hyp/tlb.c
-index 993fe89..3854e31 100644
---- a/arch/arm/kvm/hyp/tlb.c
-+++ b/arch/arm/kvm/hyp/tlb.c
-@@ -50,14 +50,14 @@ static void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
- 	write_sysreg(0, VTTBR);
- }
- 
--__alias(__tlb_flush_vmid) void __weak __kvm_tlb_flush_vmid(struct kvm *kvm);
-+__alias(__tlb_flush_vmid) void __kvm_tlb_flush_vmid(struct kvm *kvm);
- 
- static void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- {
- 	__tlb_flush_vmid(kvm);
- }
- 
--__alias(__tlb_flush_vmid_ipa) void __weak __kvm_tlb_flush_vmid_ipa(struct kvm *kvm,
-+__alias(__tlb_flush_vmid_ipa) void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm,
- 							    phys_addr_t ipa);
- 
- static void __hyp_text __tlb_flush_vm_context(void)
-@@ -68,4 +68,4 @@ static void __hyp_text __tlb_flush_vm_context(void)
- 	dsb(ish);
- }
- 
--__alias(__tlb_flush_vm_context) void __weak __kvm_flush_vm_context(void);
-+__alias(__tlb_flush_vm_context) void __kvm_flush_vm_context(void);
 -- 
 2.1.4
