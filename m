@@ -1,23 +1,30 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 28/28] ARM: KVM: Remove __kvm_hyp_exit/__kvm_hyp_exit_end
-Date: Thu,  4 Feb 2016 11:00:45 +0000
-Message-ID: <1454583645-10144-29-git-send-email-marc.zyngier@arm.com>
-References: <1454583645-10144-1-git-send-email-marc.zyngier@arm.com>
+From: Alexander Gordeev <agordeev@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 08/11] arm/pci: PCI device read/write test
+Date: Thu, 4 Feb 2016 13:03:13 +0100
+Message-ID: <20160204120313.GA15617@dhcp-27-118.brq.redhat.com>
+References: <cover.1452341807.git.agordeev@redhat.com>
+ <9da79ee47b7ad328c9ba04af0a2ff4697555b007.1452341807.git.agordeev@redhat.com>
+ <20160115153350.GM3915@hawk.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8CA2A49731
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 05:55:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C8D9C412F3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 06:57:50 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aKH-PP4xWyhm for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Feb 2016 05:55:58 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DF2549857
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 05:55:51 -0500 (EST)
-In-Reply-To: <1454583645-10144-1-git-send-email-marc.zyngier@arm.com>
+ with ESMTP id P0AbmUwG4H7R for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2016 06:57:49 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 80C73412DD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 06:57:49 -0500 (EST)
+Received: from int-mx11.intmail.prod.int.phx2.redhat.com
+ (int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
+ by mx1.redhat.com (Postfix) with ESMTPS id 515E63C88E6
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 12:03:17 +0000 (UTC)
+Content-Disposition: inline
+In-Reply-To: <20160115153350.GM3915@hawk.localdomain>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,31 +34,58 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-I have no idea what these were for - probably a leftover from an
-early implementation. Good bye!
+On Fri, Jan 15, 2016 at 04:33:50PM +0100, Andrew Jones wrote:
+> On Sat, Jan 09, 2016 at 01:22:55PM +0100, Alexander Gordeev wrote:
+> > Cc: Andrew Jones <drjones@redhat.com>
+> > Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
+> > ---
+> >  lib/pci-testdev.c | 16 ++++++++++++++++
+> >  1 file changed, 16 insertions(+)
+> > 
+> > diff --git a/lib/pci-testdev.c b/lib/pci-testdev.c
+> > index de97f82..dd6a5ac 100644
+> > --- a/lib/pci-testdev.c
+> > +++ b/lib/pci-testdev.c
+> > @@ -113,6 +113,9 @@ static bool pci_testdev_one(struct pci_test_dev_hdr *test,
+> >  			    struct pci_testdev_ops *ops)
+> >  {
+> >  	u8 width;
+> > +	u32 sig, off;
+> > +	const int nr_writes = 16;
+> > +	int i;
+> >  
+> >  	ops->write8(test_nr, &test->test);
+> >  	assert(ops->read32(&test->count) == 0);
+> > @@ -121,6 +124,19 @@ static bool pci_testdev_one(struct pci_test_dev_hdr *test,
+> >  	if ((width != 1) && (width != 2) && (width != 4))
+> >  		return false;
+> >  
+> > +	sig = ops->read32(&test->data);
+> > +	off = ops->read32(&test->offset);
+> > +
+> > +	for (i = 0; i < nr_writes; i++) {
+> > +		switch (width) {
+> > +			case 1: ops->write8 (sig, (void*)test + off); break;
+> > +			case 2: ops->write16(sig, (void*)test + off); break;
+> > +			case 4: ops->write32(sig, (void*)test + off); break;
+> > +		}
+> > +	}
+> > +
+> > +	assert((int)ops->read32(&test->count) == nr_writes);
+> 
+> Are you sure we want to assert here? What about outputting a message and
+> then returning false instead?
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm/include/asm/kvm_asm.h | 3 ---
- 1 file changed, 3 deletions(-)
+Nice catch.
 
-diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
-index 083825f..15d58b4 100644
---- a/arch/arm/include/asm/kvm_asm.h
-+++ b/arch/arm/include/asm/kvm_asm.h
-@@ -55,9 +55,6 @@ struct kvm_vcpu;
- extern char __kvm_hyp_init[];
- extern char __kvm_hyp_init_end[];
- 
--extern char __kvm_hyp_exit[];
--extern char __kvm_hyp_exit_end[];
--
- extern char __kvm_hyp_vector[];
- 
- extern void __kvm_flush_vm_context(void);
--- 
-2.1.4
+> > +
+> >  	return true;
+> >  }
+> >  
+> > -- 
+> > 1.8.3.1
+> > 
