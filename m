@@ -1,23 +1,28 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: MPIDR Aff0 question
-Date: Thu, 4 Feb 2016 18:51:06 +0000
-Message-ID: <56B39D9A.7000008@arm.com>
-References: <20160204183801.GF3890@hawk.localdomain>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v3 11/23] arm64: KVM: VHE: Split save/restore of
+ registers shared between guest and host
+Date: Thu, 4 Feb 2016 20:15:09 +0100
+Message-ID: <20160204191509.GE13974@cbox>
+References: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
+ <1454522416-6874-12-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 025DC48529
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 13:45:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D991848535
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 14:09:10 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id b3ICkhWNL882 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Feb 2016 13:45:40 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9392D419D1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 13:45:39 -0500 (EST)
-In-Reply-To: <20160204183801.GF3890@hawk.localdomain>
+ with ESMTP id bufhsT1t1b2j for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2016 14:09:09 -0500 (EST)
+Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8AC7248531
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 14:09:09 -0500 (EST)
+Received: by mail-wm0-f50.google.com with SMTP id g62so19042106wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Feb 2016 11:14:39 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <1454522416-6874-12-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,62 +32,151 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>, andre.przywara@arm.com
-Cc: qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Drew,
-
-On 04/02/16 18:38, Andrew Jones wrote:
+On Wed, Feb 03, 2016 at 06:00:04PM +0000, Marc Zyngier wrote:
+> A handful of system registers are still shared between host and guest,
+> even while using VHE (tpidr*_el[01] and actlr_el1).
 > 
-> Hi Marc and Andre,
+> Also, some of the vcpu state (sp_el0, PC and PSTATE) must be
+> save/restored on entry/exit, as they are used on the host as well.
 > 
-> I completely understand why reset_mpidr() limits Aff0 to 16, thanks
-> to Andre's nice comment about ICC_SGIxR. Now, here's my question;
-> it seems that the Cortex-A{53,57,72} manuals want to further limit
-> Aff0 to 4, going so far as to say bits 7:2 are RES0. I'm looking
-> at userspace dictating the MPIDR for KVM. QEMU tries to model the
-> A57 right now, so to be true to the manual, Aff0 should only address
-> four PEs, but that would generate a higher trap cost for SGI broadcasts
-> when using KVM. Sigh... what to do?
-
-There are two things to consider:
-
-- The GICv3 architecture is perfectly happy to address 16 CPUs at Aff0.
-- ARM cores are designed to be grouped in clusters of at most 4, but
-other implementations may have very different layouts.
-
-If you want to model something matches reality, then you have to follow
-what Cortex-A cores do, assuming you are exposing Cortex-A cores. But
-absolutely nothing forces you to (after all, we're not exposing the
-intricacies of L2 caches, which is the actual reason why we have
-clusters of 4 cores).
-
-> Additionally I'm looking at adding support to represent more complex
-> topologies in the guest MPIDR (sockets/cores/threads). I see Linux
-> currently expects Aff2:socket, Aff1:core, Aff0:thread when threads
-> are in use, and Aff1:socket, Aff0:core, when they're not. Assuming
-> there are never more than 4 threads to a core makes the first
-> expectation fine, but the second one would easily blow the 2 Aff0
-> bits alloted, and maybe even a 4 Aff0 bit allotment.
+> In order to facilitate the introduction of a VHE-specific sysreg
+> save/restore, make move the access to these registers to their
+> own save/restore functions.
 > 
-> So my current thinking is that always using Aff2:socket, Aff1:cluster,
-> Aff0:core (no threads allowed) would be nice for KVM, and allowing up
-> to 16 cores to be addressed in Aff0. As it seems there's no standard
-> for MPIDR, then that could be the KVM guest "standard".
+> No functionnal change.
+
+uber nit: s/functionnal/functional/
+
 > 
-> TCG note: I suppose threads could be allowed there, using
-> Aff2:socket, Aff1:core, Aff0:thread (no more than 4 threads)
-
-I'm not sure why you'd want to map a given topology to a guest (other
-than to give the illusion of a particular system). The affinity register
-does not define any of this (as you noticed). And what would Aff3 be in
-your design? Shelve? Rack? ;-)
-
-What would the benefit of defining a "socket"?
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/kvm/hyp/sysreg-sr.c | 48 +++++++++++++++++++++++++++++-------------
+>  1 file changed, 33 insertions(+), 15 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+> index bd5b543..61bad17 100644
+> --- a/arch/arm64/kvm/hyp/sysreg-sr.c
+> +++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+> @@ -23,13 +23,29 @@
+>  
+>  #include "hyp.h"
+>  
+> -/* ctxt is already in the HYP VA space */
+> +/*
+> + * Non-VHE: Both host and guest must save everything.
+> + *
+> + * VHE: Host must save tpidr*_el[01], actlr_el1, sp0, pc, pstate, and
+> + * guest must save everything.
+> + */
+> +
+> +static void __hyp_text __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
+> +{
+> +	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
+> +	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
+> +	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
+> +	ctxt->sys_regs[TPIDR_EL1]	= read_sysreg(tpidr_el1);
+> +	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
+> +	ctxt->gp_regs.regs.pc		= read_sysreg(elr_el2);
+> +	ctxt->gp_regs.regs.pstate	= read_sysreg(spsr_el2);
+> +}
+> +
+>  static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+>  {
+>  	ctxt->sys_regs[MPIDR_EL1]	= read_sysreg(vmpidr_el2);
+>  	ctxt->sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
+>  	ctxt->sys_regs[SCTLR_EL1]	= read_sysreg(sctlr_el1);
+> -	ctxt->sys_regs[ACTLR_EL1]	= read_sysreg(actlr_el1);
+>  	ctxt->sys_regs[CPACR_EL1]	= read_sysreg(cpacr_el1);
+>  	ctxt->sys_regs[TTBR0_EL1]	= read_sysreg(ttbr0_el1);
+>  	ctxt->sys_regs[TTBR1_EL1]	= read_sysreg(ttbr1_el1);
+> @@ -41,17 +57,11 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+>  	ctxt->sys_regs[MAIR_EL1]	= read_sysreg(mair_el1);
+>  	ctxt->sys_regs[VBAR_EL1]	= read_sysreg(vbar_el1);
+>  	ctxt->sys_regs[CONTEXTIDR_EL1]	= read_sysreg(contextidr_el1);
+> -	ctxt->sys_regs[TPIDR_EL0]	= read_sysreg(tpidr_el0);
+> -	ctxt->sys_regs[TPIDRRO_EL0]	= read_sysreg(tpidrro_el0);
+> -	ctxt->sys_regs[TPIDR_EL1]	= read_sysreg(tpidr_el1);
+>  	ctxt->sys_regs[AMAIR_EL1]	= read_sysreg(amair_el1);
+>  	ctxt->sys_regs[CNTKCTL_EL1]	= read_sysreg(cntkctl_el1);
+>  	ctxt->sys_regs[PAR_EL1]		= read_sysreg(par_el1);
+>  	ctxt->sys_regs[MDSCR_EL1]	= read_sysreg(mdscr_el1);
+>  
+> -	ctxt->gp_regs.regs.sp		= read_sysreg(sp_el0);
+> -	ctxt->gp_regs.regs.pc		= read_sysreg(elr_el2);
+> -	ctxt->gp_regs.regs.pstate	= read_sysreg(spsr_el2);
+>  	ctxt->gp_regs.sp_el1		= read_sysreg(sp_el1);
+>  	ctxt->gp_regs.elr_el1		= read_sysreg(elr_el1);
+>  	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg(spsr_el1);
+> @@ -60,11 +70,24 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+>  void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
+>  {
+>  	__sysreg_save_state(ctxt);
+> +	__sysreg_save_common_state(ctxt);
+>  }
+>  
+>  void __hyp_text __sysreg_save_guest_state(struct kvm_cpu_context *ctxt)
+>  {
+>  	__sysreg_save_state(ctxt);
+> +	__sysreg_save_common_state(ctxt);
+> +}
+> +
+> +static void __hyp_text __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
+> +{
+> +	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  actlr_el1);
+> +	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  tpidr_el0);
+> +	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], tpidrro_el0);
+> +	write_sysreg(ctxt->sys_regs[TPIDR_EL1],	  tpidr_el1);
+> +	write_sysreg(ctxt->gp_regs.regs.sp,	  sp_el0);
+> +	write_sysreg(ctxt->gp_regs.regs.pc,	  elr_el2);
+> +	write_sysreg(ctxt->gp_regs.regs.pstate,	  spsr_el2);
+>  }
+>  
+>  static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+> @@ -72,7 +95,6 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+>  	write_sysreg(ctxt->sys_regs[MPIDR_EL1],	  vmpidr_el2);
+>  	write_sysreg(ctxt->sys_regs[CSSELR_EL1],  csselr_el1);
+>  	write_sysreg(ctxt->sys_regs[SCTLR_EL1],	  sctlr_el1);
+> -	write_sysreg(ctxt->sys_regs[ACTLR_EL1],	  actlr_el1);
+>  	write_sysreg(ctxt->sys_regs[CPACR_EL1],	  cpacr_el1);
+>  	write_sysreg(ctxt->sys_regs[TTBR0_EL1],	  ttbr0_el1);
+>  	write_sysreg(ctxt->sys_regs[TTBR1_EL1],	  ttbr1_el1);
+> @@ -84,17 +106,11 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+>  	write_sysreg(ctxt->sys_regs[MAIR_EL1],	  mair_el1);
+>  	write_sysreg(ctxt->sys_regs[VBAR_EL1],	  vbar_el1);
+>  	write_sysreg(ctxt->sys_regs[CONTEXTIDR_EL1], contextidr_el1);
+> -	write_sysreg(ctxt->sys_regs[TPIDR_EL0],	  tpidr_el0);
+> -	write_sysreg(ctxt->sys_regs[TPIDRRO_EL0], tpidrro_el0);
+> -	write_sysreg(ctxt->sys_regs[TPIDR_EL1],	  tpidr_el1);
+>  	write_sysreg(ctxt->sys_regs[AMAIR_EL1],	  amair_el1);
+>  	write_sysreg(ctxt->sys_regs[CNTKCTL_EL1], cntkctl_el1);
+>  	write_sysreg(ctxt->sys_regs[PAR_EL1],	  par_el1);
+>  	write_sysreg(ctxt->sys_regs[MDSCR_EL1],	  mdscr_el1);
+>  
+> -	write_sysreg(ctxt->gp_regs.regs.sp,	sp_el0);
+> -	write_sysreg(ctxt->gp_regs.regs.pc,	elr_el2);
+> -	write_sysreg(ctxt->gp_regs.regs.pstate,	spsr_el2);
+>  	write_sysreg(ctxt->gp_regs.sp_el1,	sp_el1);
+>  	write_sysreg(ctxt->gp_regs.elr_el1,	elr_el1);
+>  	write_sysreg(ctxt->gp_regs.spsr[KVM_SPSR_EL1], spsr_el1);
+> @@ -103,11 +119,13 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+>  void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
+>  {
+>  	__sysreg_restore_state(ctxt);
+> +	__sysreg_restore_common_state(ctxt);
+>  }
+>  
+>  void __hyp_text __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt)
+>  {
+>  	__sysreg_restore_state(ctxt);
+> +	__sysreg_restore_common_state(ctxt);
+>  }
+>  
+>  void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+> -- 
+> 2.1.4
+> 
