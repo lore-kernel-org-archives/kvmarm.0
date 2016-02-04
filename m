@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 18/28] ARM: KVM: Add HYP mode entry code
-Date: Thu,  4 Feb 2016 11:00:35 +0000
-Message-ID: <1454583645-10144-19-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 17/28] ARM: KVM: Add populating of fault data structure
+Date: Thu,  4 Feb 2016 11:00:34 +0000
+Message-ID: <1454583645-10144-18-git-send-email-marc.zyngier@arm.com>
 References: <1454583645-10144-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CAF6348537
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A2EF49857
  for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 05:55:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 8KQhlj36gbM8 for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id Pcf5sQHZtzqP for <kvmarm@lists.cs.columbia.edu>;
  Thu,  4 Feb 2016 05:55:50 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 87A494130A
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 05:55:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92B03498C2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 05:55:40 -0500 (EST)
 In-Reply-To: <1454583645-10144-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,201 +31,110 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This part is almost entierely borrowed from the existing code, just
-slightly simplifying the HYP function call (as we now save SPSR_hyp
-in the world switch).
+On guest exit, we must take care of populating our fault data
+structure so that the host code can handle it. This includes
+resolving the IPA for permission faults, which can result in
+restarting the guest.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/hyp/Makefile    |   1 +
- arch/arm/kvm/hyp/hyp-entry.S | 157 +++++++++++++++++++++++++++++++++++++++++++
- arch/arm/kvm/hyp/hyp.h       |   2 +
- 3 files changed, 160 insertions(+)
- create mode 100644 arch/arm/kvm/hyp/hyp-entry.S
+ arch/arm/kvm/hyp/hyp.h    |  4 ++++
+ arch/arm/kvm/hyp/switch.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 58 insertions(+)
 
-diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
-index cfab402..a7d3a7e 100644
---- a/arch/arm/kvm/hyp/Makefile
-+++ b/arch/arm/kvm/hyp/Makefile
-@@ -9,4 +9,5 @@ obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += vfp.o
- obj-$(CONFIG_KVM_ARM_HOST) += banked-sr.o
- obj-$(CONFIG_KVM_ARM_HOST) += entry.o
-+obj-$(CONFIG_KVM_ARM_HOST) += hyp-entry.o
- obj-$(CONFIG_KVM_ARM_HOST) += switch.o
-diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
-new file mode 100644
-index 0000000..44bc11f
---- /dev/null
-+++ b/arch/arm/kvm/hyp/hyp-entry.S
-@@ -0,0 +1,157 @@
-+/*
-+ * Copyright (C) 2012 - Virtual Open Systems and Columbia University
-+ * Author: Christoffer Dall <c.dall@virtualopensystems.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License, version 2, as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-+ */
-+
-+#include <linux/linkage.h>
-+#include <asm/kvm_arm.h>
-+#include <asm/kvm_asm.h>
-+
-+	.arch_extension     virt
-+
-+	.text
-+	.pushsection	.hyp.text, "ax"
-+
-+.macro load_vcpu	reg
-+	mrc	p15, 4, \reg, c13, c0, 2	@ HTPIDR
-+.endm
-+
-+/********************************************************************
-+ * Hypervisor exception vector and handlers
-+ *
-+ *
-+ * The KVM/ARM Hypervisor ABI is defined as follows:
-+ *
-+ * Entry to Hyp mode from the host kernel will happen _only_ when an HVC
-+ * instruction is issued since all traps are disabled when running the host
-+ * kernel as per the Hyp-mode initialization at boot time.
-+ *
-+ * HVC instructions cause a trap to the vector page + offset 0x14 (see hyp_hvc
-+ * below) when the HVC instruction is called from SVC mode (i.e. a guest or the
-+ * host kernel) and they cause a trap to the vector page + offset 0x8 when HVC
-+ * instructions are called from within Hyp-mode.
-+ *
-+ * Hyp-ABI: Calling HYP-mode functions from host (in SVC mode):
-+ *    Switching to Hyp mode is done through a simple HVC #0 instruction. The
-+ *    exception vector code will check that the HVC comes from VMID==0.
-+ *    - r0 contains a pointer to a HYP function
-+ *    - r1, r2, and r3 contain arguments to the above function.
-+ *    - The HYP function will be called with its arguments in r0, r1 and r2.
-+ *    On HYP function return, we return directly to SVC.
-+ *
-+ * Note that the above is used to execute code in Hyp-mode from a host-kernel
-+ * point of view, and is a different concept from performing a world-switch and
-+ * executing guest code SVC mode (with a VMID != 0).
-+ */
-+
-+	.align 5
-+__hyp_vector:
-+	.global	__hyp_vector
-+__kvm_hyp_vector:
-+	.weak __kvm_hyp_vector
-+
-+	@ Hyp-mode exception vector
-+	W(b)	hyp_reset
-+	W(b)	hyp_undef
-+	W(b)	hyp_svc
-+	W(b)	hyp_pabt
-+	W(b)	hyp_dabt
-+	W(b)	hyp_hvc
-+	W(b)	hyp_irq
-+	W(b)	hyp_fiq
-+
-+.macro invalid_vector label, cause
-+	.align
-+\label:	b	.
-+.endm
-+
-+	invalid_vector	hyp_reset
-+	invalid_vector	hyp_undef
-+	invalid_vector	hyp_svc
-+	invalid_vector	hyp_pabt
-+	invalid_vector	hyp_dabt
-+	invalid_vector	hyp_fiq
-+
-+hyp_hvc:
-+	/*
-+	 * Getting here is either because of a trap from a guest,
-+	 * or from executing HVC from the host kernel, which means
-+	 * "do something in Hyp mode".
-+	 */
-+	push	{r0, r1, r2}
-+
-+	@ Check syndrome register
-+	mrc	p15, 4, r1, c5, c2, 0	@ HSR
-+	lsr	r0, r1, #HSR_EC_SHIFT
-+	cmp	r0, #HSR_EC_HVC
-+	bne	guest_trap		@ Not HVC instr.
-+
-+	/*
-+	 * Let's check if the HVC came from VMID 0 and allow simple
-+	 * switch to Hyp mode
-+	 */
-+	mrrc    p15, 6, r0, r2, c2
-+	lsr     r2, r2, #16
-+	and     r2, r2, #0xff
-+	cmp     r2, #0
-+	bne	guest_trap		@ Guest called HVC
-+
-+	/*
-+	 * Getting here means host called HVC, we shift parameters and branch
-+	 * to Hyp function.
-+	 */
-+	pop	{r0, r1, r2}
-+
-+	/* Check for __hyp_get_vectors */
-+	cmp	r0, #-1
-+	mrceq	p15, 4, r0, c12, c0, 0	@ get HVBAR
-+	beq	1f
-+
-+	push	{lr}
-+
-+	mov	lr, r0
-+	mov	r0, r1
-+	mov	r1, r2
-+	mov	r2, r3
-+
-+THUMB(	orr	lr, #1)
-+	blx	lr			@ Call the HYP function
-+
-+	pop	{lr}
-+1:	eret
-+
-+guest_trap:
-+	load_vcpu r0			@ Load VCPU pointer to r0
-+
-+	@ Check if we need the fault information
-+	lsr	r1, r1, #HSR_EC_SHIFT
-+#ifdef CONFIG_VFPv3
-+	cmp	r1, #HSR_EC_CP_0_13
-+	beq	__vfp_guest_restore
-+#endif
-+
-+	mov	r1, #ARM_EXCEPTION_HVC
-+	b	__guest_exit
-+
-+hyp_irq:
-+	push	{r0, r1, r2}
-+	mov	r1, #ARM_EXCEPTION_IRQ
-+	load_vcpu r0			@ Load VCPU pointer to r0
-+	b	__guest_exit
-+
-+	.ltorg
-+
-+	.popsection
 diff --git a/arch/arm/kvm/hyp/hyp.h b/arch/arm/kvm/hyp/hyp.h
-index 7ddca54..8bbd2a7 100644
+index 2ca651f..7ddca54 100644
 --- a/arch/arm/kvm/hyp/hyp.h
 +++ b/arch/arm/kvm/hyp/hyp.h
-@@ -123,4 +123,6 @@ void __hyp_text __banked_restore_state(struct kvm_cpu_context *ctxt);
+@@ -76,10 +76,14 @@
+ #define IFSR		__ACCESS_CP15(c5, 0, c0, 1)
+ #define ADFSR		__ACCESS_CP15(c5, 0, c1, 0)
+ #define AIFSR		__ACCESS_CP15(c5, 0, c1, 1)
++#define HSR		__ACCESS_CP15(c5, 4, c2, 0)
+ #define DFAR		__ACCESS_CP15(c6, 0, c0, 0)
+ #define IFAR		__ACCESS_CP15(c6, 0, c0, 2)
+ #define HDFAR		__ACCESS_CP15(c6, 4, c0, 0)
++#define HIFAR		__ACCESS_CP15(c6, 4, c0, 2)
++#define HPFAR		__ACCESS_CP15(c6, 4, c0, 4)
+ #define ICIALLUIS	__ACCESS_CP15(c7, 0, c1, 0)
++#define ATS1CPR		__ACCESS_CP15(c7, 0, c8, 0)
+ #define TLBIALLIS	__ACCESS_CP15(c8, 0, c3, 0)
+ #define TLBIALLNSNHIS	__ACCESS_CP15(c8, 4, c3, 4)
+ #define PRRR		__ACCESS_CP15(c10, 0, c2, 0)
+diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
+index f715b0d..8bfd729 100644
+--- a/arch/arm/kvm/hyp/switch.c
++++ b/arch/arm/kvm/hyp/switch.c
+@@ -80,6 +80,56 @@ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
+ 	__vgic_v2_restore_state(vcpu);
+ }
  
- int asmlinkage __guest_enter(struct kvm_vcpu *vcpu,
- 			     struct kvm_cpu_context *host);
-+int asmlinkage __hyp_do_panic(const char *, int, u32);
++static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
++{
++	u32 hsr = read_sysreg(HSR);
++	u8 ec = hsr >> HSR_EC_SHIFT;
++	u32 hpfar, far;
 +
- #endif /* __ARM_KVM_HYP_H__ */
++	vcpu->arch.fault.hsr = hsr;
++
++	if (ec == HSR_EC_IABT)
++		far = read_sysreg(HIFAR);
++	else if (ec == HSR_EC_DABT)
++		far = read_sysreg(HDFAR);
++	else
++		return true;
++
++	/*
++	 * B3.13.5 Reporting exceptions taken to the Non-secure PL2 mode:
++	 *
++	 * Abort on the stage 2 translation for a memory access from a
++	 * Non-secure PL1 or PL0 mode:
++	 *
++	 * For any Access flag fault or Translation fault, and also for any
++	 * Permission fault on the stage 2 translation of a memory access
++	 * made as part of a translation table walk for a stage 1 translation,
++	 * the HPFAR holds the IPA that caused the fault. Otherwise, the HPFAR
++	 * is UNKNOWN.
++	 */
++	if (!(hsr & HSR_DABT_S1PTW) && (hsr & HSR_FSC_TYPE) == FSC_PERM) {
++		u64 par, tmp;
++
++		par = read_sysreg(PAR);
++		write_sysreg(far, ATS1CPR);
++		isb();
++
++		tmp = read_sysreg(PAR);
++		write_sysreg(par, PAR);
++
++		if (unlikely(tmp & 1))
++			return false; /* Translation failed, back to guest */
++
++		hpfar = ((tmp >> 12) & ((1UL << 28) - 1)) << 4;
++	} else {
++		hpfar = read_sysreg(HPFAR);
++	}
++
++	vcpu->arch.fault.hxfar = far;
++	vcpu->arch.fault.hpfar = hpfar;
++	return true;
++}
++
+ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpu_context *host_ctxt;
+@@ -107,9 +157,13 @@ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ 	__banked_restore_state(guest_ctxt);
+ 
+ 	/* Jump in the fire! */
++again:
+ 	exit_code = __guest_enter(vcpu, host_ctxt);
+ 	/* And we're baaack! */
+ 
++	if (exit_code == ARM_EXCEPTION_HVC && !__populate_fault_info(vcpu))
++		goto again;
++
+ 	fp_enabled = __vfp_enabled();
+ 
+ 	__banked_save_state(guest_ctxt);
 -- 
 2.1.4
