@@ -1,31 +1,36 @@
-From: Andrew Jones <drjones@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 07/11] arm/pci: PCI device operation test
-Date: Thu, 4 Feb 2016 16:31:17 +0100
-Message-ID: <20160204153117.GE3890@hawk.localdomain>
-References: <cover.1452341807.git.agordeev@redhat.com>
- <597fba0ba6cdc84495acd7dd2119d9c785a76548.1452341807.git.agordeev@redhat.com>
- <20160115153211.GL3915@hawk.localdomain>
- <20160204121837.GB15617@dhcp-27-118.brq.redhat.com>
+From: Edward Cragg <edward.cragg@codethink.co.uk>
+Subject: PCIe passthrough support on ARM
+Date: Thu, 4 Feb 2016 16:53:56 +0000
+Message-ID: <20160204165355.GA10442@codethink.co.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 466B0412DD
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 10:25:54 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 10C3648532
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 11:48:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6zQtUz6Uemoe for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Feb 2016 10:25:53 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A407412C2
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 10:25:52 -0500 (EST)
-Received: from int-mx14.intmail.prod.int.phx2.redhat.com
- (int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
- by mx1.redhat.com (Postfix) with ESMTPS id 26B35C0A8469
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 15:31:21 +0000 (UTC)
+ with ESMTP id 5rmOSIyzCPSu for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2016 11:48:30 -0500 (EST)
+Received: from ducie-dc1.codethink.co.uk (ducie-dc1.codethink.co.uk
+ [185.25.241.215])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D83D148531
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 11:48:30 -0500 (EST)
+Received: from localhost (localhost [127.0.0.1])
+ by ducie-dc1.codethink.co.uk (Postfix) with ESMTP id ABA1C46174E
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 16:53:58 +0000 (GMT)
+Received: from ducie-dc1.codethink.co.uk ([127.0.0.1])
+ by localhost (ducie-dc1.codethink.co.uk [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id fIsj78Bia49Z for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2016 16:53:57 +0000 (GMT)
+Received: from pomo (unknown [10.24.2.122])
+ by ducie-dc1.codethink.co.uk (Postfix) with ESMTPSA id D89B1460855
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 16:53:56 +0000 (GMT)
+Received: from ed by pomo with local (Exim 4.86)
+ (envelope-from <edward.cragg@codethink.co.uk>) id 1aRNAK-0004e8-8F
+ for kvmarm@lists.cs.columbia.edu; Thu, 04 Feb 2016 16:53:56 +0000
 Content-Disposition: inline
-In-Reply-To: <20160204121837.GB15617@dhcp-27-118.brq.redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,27 +40,20 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Alexander Gordeev <agordeev@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 04, 2016 at 01:18:38PM +0100, Alexander Gordeev wrote:
-> On Fri, Jan 15, 2016 at 04:32:11PM +0100, Andrew Jones wrote:
-> > > +struct pci_testdev_ops {
-> > > +	u8 (*read8)(const volatile void *addr);
-> > > +	u16 (*read16)(const volatile void *addr);
-> > > +	u32 (*read32)(const volatile void *addr);
-> > > +	void (*write8)(u8 value, volatile void *addr);
-> > > +	void (*write16)(u16 value, volatile void *addr);
-> > > +	void (*write32)(u32 value, volatile void *addr);
-> > 
-> > Please use the standard 'b', 'w', 'l' in these names.
-> 
-> I did not use in the first place as it conflicts with standard
-> read*/write* macros. Would [read|write]_[byte|word|long] work
-> for you?
+Hi,
 
-Oh yeah... dang macros. _byte/word/dword like the pci_config_read/write
-function in Linux would work.
+I'm involved in planning a project for which there is a requirement for PCIe
+passthrough in KVM on ARMv8. We have no hardware to test on at the moment.
 
-drew
+I understand that virtualisation support for ARM is quite young, and it seems
+like support is trickling in at the moment for this sort of thing.
+
+Is anyone working on PCIe passthrough on ARM platforms who might be able to
+share some insight into what would be required to support this?
+
+Thanks,
+
+Ed
