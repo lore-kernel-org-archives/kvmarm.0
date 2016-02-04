@@ -1,31 +1,22 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: PCIe passthrough support on ARM
-Date: Thu, 4 Feb 2016 18:30:34 +0100
-Message-ID: <56B38ABA.3090403@linaro.org>
-References: <20160204165355.GA10442@codethink.co.uk>
+From: Andrew Jones <drjones@redhat.com>
+Subject: MPIDR Aff0 question
+Date: Thu, 4 Feb 2016 19:38:01 +0100
+Message-ID: <20160204183801.GF3890@hawk.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DFF3D48532
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 12:25:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6768848531
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 13:32:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UxeZfNY4V2jb for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Feb 2016 12:25:28 -0500 (EST)
-Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D7CAE48531
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 12:25:27 -0500 (EST)
-Received: by mail-wm0-f51.google.com with SMTP id 128so37702048wmz.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 04 Feb 2016 09:30:57 -0800 (PST)
-Received: from [192.168.2.12] (LMontsouris-657-1-37-90.w80-11.abo.wanadoo.fr.
- [80.11.198.90])
- by smtp.googlemail.com with ESMTPSA id gt7sm12287800wjc.1.2016.02.04.09.30.54
- for <kvmarm@lists.cs.columbia.edu>
- (version=TLSv1/SSLv3 cipher=OTHER);
- Thu, 04 Feb 2016 09:30:54 -0800 (PST)
-In-Reply-To: <20160204165355.GA10442@codethink.co.uk>
+ with ESMTP id UR44J-QN5xm4 for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2016 13:32:37 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7F7B4419D1
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 13:32:37 -0500 (EST)
+Content-Disposition: inline
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,56 +26,37 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
+To: marc.zyngier@arm.com, andre.przywara@arm.com
+Cc: qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Edward,
-On 02/04/2016 05:53 PM, Edward Cragg wrote:
-> Hi,
-> 
-> I'm involved in planning a project for which there is a requirement for PCIe
-> passthrough in KVM on ARMv8. We have no hardware to test on at the moment.
-> 
-> I understand that virtualisation support for ARM is quite young, and it seems
-> like support is trickling in at the moment for this sort of thing.
-> 
-> Is anyone working on PCIe passthrough on ARM platforms who might be able to
-> share some insight into what would be required to support this?
-Yes I am currently working on this topic at the moment and especially on
-ARM PCIe passthrough with MSI enabled. I did not test PCIe passthrough
-with legacy INTx (MSI disabled) but this should work already with
-upstreamed QEMU and kernel.
 
-With MSI enabled, the code is not upstreamed yet.
+Hi Marc and Andre,
 
-I have a QEMU series:
+I completely understand why reset_mpidr() limits Aff0 to 16, thanks
+to Andre's nice comment about ICC_SGIxR. Now, here's my question;
+it seems that the Cortex-A{53,57,72} manuals want to further limit
+Aff0 to 4, going so far as to say bits 7:2 are RES0. I'm looking
+at userspace dictating the MPIDR for KVM. QEMU tries to model the
+A57 right now, so to be true to the manual, Aff0 should only address
+four PEs, but that would generate a higher trap cost for SGI broadcasts
+when using KVM. Sigh... what to do?
 
-[RFC v2 0/8] KVM PCI/MSI passthrough with mach-virt
-(https://www.mail-archive.com/qemu-devel@nongnu.org/msg349574.html)
+Additionally I'm looking at adding support to represent more complex
+topologies in the guest MPIDR (sockets/cores/threads). I see Linux
+currently expects Aff2:socket, Aff1:core, Aff0:thread when threads
+are in use, and Aff1:socket, Aff0:core, when they're not. Assuming
+there are never more than 4 threads to a core makes the first
+expectation fine, but the second one would easily blow the 2 Aff0
+bits alloted, and maybe even a 4 Aff0 bit allotment.
 
-and a kernel series:
-[PATCH 00/10] KVM PCIe/MSI passthrough on ARM/ARM64"
-  (https://lkml.org/lkml/2016/1/26/371)
+So my current thinking is that always using Aff2:socket, Aff1:cluster,
+Aff0:core (no threads allowed) would be nice for KVM, and allowing up
+to 16 cores to be addressed in Aff0. As it seems there's no standard
+for MPIDR, then that could be the KVM guest "standard".
 
-This is functional, tested on v8 AMD HW with a GICv2M (single MSI frame).
+TCG note: I suppose threads could be allowed there, using
+Aff2:socket, Aff1:core, Aff0:thread (no more than 4 threads)
 
-This is in an early stage, especially on kernel side since lots of
-issues still need to be addressed, especially handling proper IRQ isolation.
-
-What kind of MSI controller do you plan to use?
-
-Hope this helps
-
-Best Regards
-
-Eric
-
-> 
-> Thanks,
-> 
-> Ed
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
+Thanks,
+drew
