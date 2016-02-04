@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 19/28] ARM: KVM: Add panic handling code
-Date: Thu,  4 Feb 2016 11:00:36 +0000
-Message-ID: <1454583645-10144-20-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 12/28] ARM: KVM: Add VFP save/restore
+Date: Thu,  4 Feb 2016 11:00:29 +0000
+Message-ID: <1454583645-10144-13-git-send-email-marc.zyngier@arm.com>
 References: <1454583645-10144-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 01E9C419D1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 05:55:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D1D1240C9D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 05:55:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WKToi+wYxqNE for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Feb 2016 05:55:50 -0500 (EST)
+ with ESMTP id HX6KYH+8lzBx for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2016 05:55:39 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 86EF1413E1
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 05:55:42 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A3524497E0
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 05:55:35 -0500 (EST)
 In-Reply-To: <1454583645-10144-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,103 +31,154 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Instead of spinning forever, let's "properly" handle any unexpected
-exception ("properly" meaning "print a spat on the console and die").
+This is almost a copy/paste of the existing version, with a couple
+of subtle differences:
+- Only write to FPEXC once on the save path
+- Add an isb when enabling VFP access
 
-This has proved useful quite a few times...
+The patch also defines a few sysreg accessors and a __vfp_enabled
+predicate that test the VFP trapping state.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/hyp/hyp-entry.S | 28 +++++++++++++++++++++-------
- arch/arm/kvm/hyp/switch.c    | 38 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 59 insertions(+), 7 deletions(-)
+ arch/arm/kvm/hyp/Makefile |  1 +
+ arch/arm/kvm/hyp/hyp.h    | 13 +++++++++
+ arch/arm/kvm/hyp/vfp.S    | 68 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 82 insertions(+)
+ create mode 100644 arch/arm/kvm/hyp/vfp.S
 
-diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
-index 44bc11f..ca412ad 100644
---- a/arch/arm/kvm/hyp/hyp-entry.S
-+++ b/arch/arm/kvm/hyp/hyp-entry.S
-@@ -75,15 +75,29 @@ __kvm_hyp_vector:
+diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
+index d8acbb6..5a45f4c 100644
+--- a/arch/arm/kvm/hyp/Makefile
++++ b/arch/arm/kvm/hyp/Makefile
+@@ -6,3 +6,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
+ obj-$(CONFIG_KVM_ARM_HOST) += cp15-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
+ obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
++obj-$(CONFIG_KVM_ARM_HOST) += vfp.o
+diff --git a/arch/arm/kvm/hyp/hyp.h b/arch/arm/kvm/hyp/hyp.h
+index 7eb1c21..dce0f73 100644
+--- a/arch/arm/kvm/hyp/hyp.h
++++ b/arch/arm/kvm/hyp/hyp.h
+@@ -21,6 +21,7 @@
+ #include <linux/compiler.h>
+ #include <linux/kvm_host.h>
+ #include <asm/kvm_mmu.h>
++#include <asm/vfp.h>
  
- .macro invalid_vector label, cause
- 	.align
--\label:	b	.
-+\label:	mov	r0, #\cause
-+	b	__hyp_panic
- .endm
+ #define __hyp_text __section(.hyp.text) notrace
  
--	invalid_vector	hyp_reset
--	invalid_vector	hyp_undef
--	invalid_vector	hyp_svc
--	invalid_vector	hyp_pabt
--	invalid_vector	hyp_dabt
--	invalid_vector	hyp_fiq
-+	invalid_vector	hyp_reset	ARM_EXCEPTION_RESET
-+	invalid_vector	hyp_undef	ARM_EXCEPTION_UNDEFINED
-+	invalid_vector	hyp_svc		ARM_EXCEPTION_SOFTWARE
-+	invalid_vector	hyp_pabt	ARM_EXCEPTION_PREF_ABORT
-+	invalid_vector	hyp_dabt	ARM_EXCEPTION_DATA_ABORT
-+	invalid_vector	hyp_fiq		ARM_EXCEPTION_FIQ
+@@ -31,6 +32,8 @@
+ 	"mrc", "mcr", __stringify(p15, Op1, %0, CRn, CRm, Op2), u32
+ #define __ACCESS_CP15_64(Op1, CRm)		\
+ 	"mrrc", "mcrr", __stringify(p15, Op1, %Q0, %R0, CRm), u64
++#define __ACCESS_VFP(CRn)			\
++	"mrc", "mcr", __stringify(p10, 7, %0, CRn, cr0, 0), u32
+ 
+ #define __write_sysreg(v, r, w, c, t)	asm volatile(w " " c : : "r" ((t)(v)))
+ #define write_sysreg(v, ...)		__write_sysreg(v, __VA_ARGS__)
+@@ -53,6 +56,7 @@
+ #define VMPIDR		__ACCESS_CP15(c0, 4, c0, 5)
+ #define SCTLR		__ACCESS_CP15(c1, 0, c0, 0)
+ #define CPACR		__ACCESS_CP15(c1, 0, c0, 2)
++#define HCPTR		__ACCESS_CP15(c1, 4, c1, 2)
+ #define TTBCR		__ACCESS_CP15(c2, 0, c0, 2)
+ #define DACR		__ACCESS_CP15(c3, 0, c0, 0)
+ #define DFSR		__ACCESS_CP15(c5, 0, c0, 0)
+@@ -77,6 +81,8 @@
+ #define CNTV_CTL	__ACCESS_CP15(c14, 0, c3, 1)
+ #define CNTHCTL		__ACCESS_CP15(c14, 4, c1, 0)
+ 
++#define VFP_FPEXC	__ACCESS_VFP(FPEXC)
 +
-+ENTRY(__hyp_do_panic)
-+	mrs	lr, cpsr
-+	bic	lr, lr, #MODE_MASK
-+	orr	lr, lr, #SVC_MODE
-+THUMB(	orr	lr, lr, #PSR_T_BIT	)
-+	msr	spsr_cxsf, lr
-+	ldr	lr, =panic
-+	msr	ELR_hyp, lr
-+	ldr	lr, =kvm_call_hyp
-+	clrex
-+	eret
-+ENDPROC(__hyp_do_panic)
+ void __timer_save_state(struct kvm_vcpu *vcpu);
+ void __timer_restore_state(struct kvm_vcpu *vcpu);
  
- hyp_hvc:
- 	/*
-diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
-index 8bfd729..67f3944 100644
---- a/arch/arm/kvm/hyp/switch.c
-+++ b/arch/arm/kvm/hyp/switch.c
-@@ -188,3 +188,41 @@ again:
- }
+@@ -86,4 +92,11 @@ void __vgic_v2_restore_state(struct kvm_vcpu *vcpu);
+ void __sysreg_save_state(struct kvm_cpu_context *ctxt);
+ void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
  
- __alias(__guest_run) int __weak __kvm_vcpu_run(struct kvm_vcpu *vcpu);
-+
-+static const char * const __hyp_panic_string[] = {
-+	[ARM_EXCEPTION_RESET]      = "\nHYP panic: RST?? PC:%08x CPSR:%08x",
-+	[ARM_EXCEPTION_UNDEFINED]  = "\nHYP panic: UNDEF PC:%08x CPSR:%08x",
-+	[ARM_EXCEPTION_SOFTWARE]   = "\nHYP panic: SVC?? PC:%08x CPSR:%08x",
-+	[ARM_EXCEPTION_PREF_ABORT] = "\nHYP panic: PABRT PC:%08x CPSR:%08x",
-+	[ARM_EXCEPTION_DATA_ABORT] = "\nHYP panic: DABRT PC:%08x ADDR:%08x",
-+	[ARM_EXCEPTION_IRQ]        = "\nHYP panic: IRQ?? PC:%08x CPSR:%08x",
-+	[ARM_EXCEPTION_FIQ]        = "\nHYP panic: FIQ?? PC:%08x CPSR:%08x",
-+	[ARM_EXCEPTION_HVC]        = "\nHYP panic: HVC?? PC:%08x CPSR:%08x",
-+};
-+
-+void __hyp_text __noreturn __hyp_panic(int cause)
++void asmlinkage __vfp_save_state(struct vfp_hard_struct *vfp);
++void asmlinkage __vfp_restore_state(struct vfp_hard_struct *vfp);
++static inline bool __vfp_enabled(void)
 +{
-+	u32 elr = read_special(ELR_hyp);
-+	u32 val;
-+
-+	if (cause == ARM_EXCEPTION_DATA_ABORT)
-+		val = read_sysreg(HDFAR);
-+	else
-+		val = read_special(SPSR);
-+
-+	if (read_sysreg(VTTBR)) {
-+		struct kvm_vcpu *vcpu;
-+		struct kvm_cpu_context *host_ctxt;
-+
-+		vcpu = (struct kvm_vcpu *)read_sysreg(HTPIDR);
-+		host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
-+		__deactivate_traps(vcpu);
-+		__deactivate_vm(vcpu);
-+		__sysreg_restore_state(host_ctxt);
-+	}
-+
-+	/* Call panic for real */
-+	__hyp_do_panic(__hyp_panic_string[cause], elr, val);
-+
-+	unreachable();
++	return !(read_sysreg(HCPTR) & (HCPTR_TCP(11) | HCPTR_TCP(10)));
 +}
++
+ #endif /* __ARM_KVM_HYP_H__ */
+diff --git a/arch/arm/kvm/hyp/vfp.S b/arch/arm/kvm/hyp/vfp.S
+new file mode 100644
+index 0000000..7c297e8
+--- /dev/null
++++ b/arch/arm/kvm/hyp/vfp.S
+@@ -0,0 +1,68 @@
++/*
++ * Copyright (C) 2012 - Virtual Open Systems and Columbia University
++ * Author: Christoffer Dall <c.dall@virtualopensystems.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <linux/linkage.h>
++#include <asm/vfpmacros.h>
++
++	.text
++	.pushsection	.hyp.text, "ax"
++
++/* void __vfp_save_state(struct vfp_hard_struct *vfp); */
++ENTRY(__vfp_save_state)
++	push	{r4, r5}
++	VFPFMRX	r1, FPEXC
++
++	@ Make sure *really* VFP is enabled so we can touch the registers.
++	orr	r5, r1, #FPEXC_EN
++	tst	r5, #FPEXC_EX		@ Check for VFP Subarchitecture
++	bic	r5, r5, #FPEXC_EX	@ FPEXC_EX disable
++	VFPFMXR	FPEXC, r5
++	isb
++
++	VFPFMRX	r2, FPSCR
++	beq	1f
++
++	@ If FPEXC_EX is 0, then FPINST/FPINST2 reads are upredictable, so
++	@ we only need to save them if FPEXC_EX is set.
++	VFPFMRX r3, FPINST
++	tst	r5, #FPEXC_FP2V
++	VFPFMRX r4, FPINST2, ne		@ vmrsne
++1:
++	VFPFSTMIA r0, r5		@ Save VFP registers
++	stm	r0, {r1-r4}		@ Save FPEXC, FPSCR, FPINST, FPINST2
++	pop	{r4, r5}
++	bx	lr
++ENDPROC(__vfp_save_state)
++
++/* void __vfp_restore_state(struct vfp_hard_struct *vfp);
++ * Assume FPEXC_EN is on and FPEXC_EX is off */
++ENTRY(__vfp_restore_state)
++	VFPFLDMIA r0, r1		@ Load VFP registers
++	ldm	r0, {r0-r3}		@ Load FPEXC, FPSCR, FPINST, FPINST2
++
++	VFPFMXR FPSCR, r1
++	tst	r0, #FPEXC_EX		@ Check for VFP Subarchitecture
++	beq	1f
++	VFPFMXR FPINST, r2
++	tst	r0, #FPEXC_FP2V
++	VFPFMXR FPINST2, r3, ne
++1:
++	VFPFMXR FPEXC, r0		@ FPEXC	(last, in case !EN)
++	bx	lr
++ENDPROC(__vfp_restore_state)
++
++	.popsection
 -- 
 2.1.4
