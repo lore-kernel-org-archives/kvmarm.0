@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 05/28] ARM: KVM: Move GP registers into the CPU context
- structure
-Date: Thu,  4 Feb 2016 11:00:22 +0000
-Message-ID: <1454583645-10144-6-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 09/28] ARM: KVM: Add CP15 save/restore code
+Date: Thu,  4 Feb 2016 11:00:26 +0000
+Message-ID: <1454583645-10144-10-git-send-email-marc.zyngier@arm.com>
 References: <1454583645-10144-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 57D24496A4
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 05:55:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B291D4130A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 05:55:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AW9Z5n9B1rwI for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Feb 2016 05:55:32 -0500 (EST)
+ with ESMTP id SXSJPYBpi6qe for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2016 05:55:33 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 89ABF412DD
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 05:55:28 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 85B6C41E71
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 05:55:32 -0500 (EST)
 In-Reply-To: <1454583645-10144-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,195 +31,156 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Continuing our rework of the CPU context, we now move the GP
-registers into the CPU context structure.
+Concert the CP15 save/restore code to C.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_emulate.h |  8 ++++----
- arch/arm/include/asm/kvm_host.h    |  3 +--
- arch/arm/kernel/asm-offsets.c      | 18 +++++++++---------
- arch/arm/kvm/emulate.c             | 12 ++++++------
- arch/arm/kvm/guest.c               |  4 ++--
- arch/arm/kvm/interrupts_head.S     | 11 +++++++++++
- arch/arm/kvm/reset.c               |  2 +-
- 7 files changed, 34 insertions(+), 24 deletions(-)
+ arch/arm/kvm/hyp/Makefile  |  1 +
+ arch/arm/kvm/hyp/cp15-sr.c | 84 ++++++++++++++++++++++++++++++++++++++++++++++
+ arch/arm/kvm/hyp/hyp.h     | 28 ++++++++++++++++
+ 3 files changed, 113 insertions(+)
+ create mode 100644 arch/arm/kvm/hyp/cp15-sr.c
 
-diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-index 32bb52a..f710616 100644
---- a/arch/arm/include/asm/kvm_emulate.h
-+++ b/arch/arm/include/asm/kvm_emulate.h
-@@ -68,12 +68,12 @@ static inline bool vcpu_mode_is_32bit(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
+index 36c760d..9f96fcb 100644
+--- a/arch/arm/kvm/hyp/Makefile
++++ b/arch/arm/kvm/hyp/Makefile
+@@ -3,3 +3,4 @@
+ #
  
- static inline unsigned long *vcpu_pc(struct kvm_vcpu *vcpu)
- {
--	return &vcpu->arch.regs.usr_regs.ARM_pc;
-+	return &vcpu->arch.ctxt.gp_regs.usr_regs.ARM_pc;
- }
- 
- static inline unsigned long *vcpu_cpsr(struct kvm_vcpu *vcpu)
- {
--	return &vcpu->arch.regs.usr_regs.ARM_cpsr;
-+	return &vcpu->arch.ctxt.gp_regs.usr_regs.ARM_cpsr;
- }
- 
- static inline void vcpu_set_thumb(struct kvm_vcpu *vcpu)
-@@ -83,13 +83,13 @@ static inline void vcpu_set_thumb(struct kvm_vcpu *vcpu)
- 
- static inline bool mode_has_spsr(struct kvm_vcpu *vcpu)
- {
--	unsigned long cpsr_mode = vcpu->arch.regs.usr_regs.ARM_cpsr & MODE_MASK;
-+	unsigned long cpsr_mode = vcpu->arch.ctxt.gp_regs.usr_regs.ARM_cpsr & MODE_MASK;
- 	return (cpsr_mode > USR_MODE && cpsr_mode < SYSTEM_MODE);
- }
- 
- static inline bool vcpu_mode_priv(struct kvm_vcpu *vcpu)
- {
--	unsigned long cpsr_mode = vcpu->arch.regs.usr_regs.ARM_cpsr & MODE_MASK;
-+	unsigned long cpsr_mode = vcpu->arch.ctxt.gp_regs.usr_regs.ARM_cpsr & MODE_MASK;
- 	return cpsr_mode > USR_MODE;;
- }
- 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index 4203701..02932ba 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -89,6 +89,7 @@ struct kvm_vcpu_fault_info {
- };
- 
- struct kvm_cpu_context {
-+	struct kvm_regs	gp_regs;
- 	struct vfp_hard_struct vfp;
- 	u32 cp15[NR_CP15_REGS];
- };
-@@ -98,8 +99,6 @@ typedef struct kvm_cpu_context kvm_cpu_context_t;
- struct kvm_vcpu_arch {
- 	struct kvm_cpu_context ctxt;
- 
--	struct kvm_regs regs;
--
- 	int target; /* Processor target */
- 	DECLARE_BITMAP(features, KVM_VCPU_MAX_FEATURES);
- 
-diff --git a/arch/arm/kernel/asm-offsets.c b/arch/arm/kernel/asm-offsets.c
-index 43f8b01..2f3e0b0 100644
---- a/arch/arm/kernel/asm-offsets.c
-+++ b/arch/arm/kernel/asm-offsets.c
-@@ -176,15 +176,15 @@ int main(void)
-   DEFINE(VCPU_HOST_CTXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
-   DEFINE(CPU_CTXT_VFP,		offsetof(struct kvm_cpu_context, vfp));
-   DEFINE(CPU_CTXT_CP15,		offsetof(struct kvm_cpu_context, cp15));
--  DEFINE(VCPU_REGS,		offsetof(struct kvm_vcpu, arch.regs));
--  DEFINE(VCPU_USR_REGS,		offsetof(struct kvm_vcpu, arch.regs.usr_regs));
--  DEFINE(VCPU_SVC_REGS,		offsetof(struct kvm_vcpu, arch.regs.svc_regs));
--  DEFINE(VCPU_ABT_REGS,		offsetof(struct kvm_vcpu, arch.regs.abt_regs));
--  DEFINE(VCPU_UND_REGS,		offsetof(struct kvm_vcpu, arch.regs.und_regs));
--  DEFINE(VCPU_IRQ_REGS,		offsetof(struct kvm_vcpu, arch.regs.irq_regs));
--  DEFINE(VCPU_FIQ_REGS,		offsetof(struct kvm_vcpu, arch.regs.fiq_regs));
--  DEFINE(VCPU_PC,		offsetof(struct kvm_vcpu, arch.regs.usr_regs.ARM_pc));
--  DEFINE(VCPU_CPSR,		offsetof(struct kvm_vcpu, arch.regs.usr_regs.ARM_cpsr));
-+  DEFINE(CPU_CTXT_GP_REGS,	offsetof(struct kvm_cpu_context, gp_regs));
-+  DEFINE(GP_REGS_USR,		offsetof(struct kvm_regs, usr_regs));
-+  DEFINE(GP_REGS_SVC,		offsetof(struct kvm_regs, svc_regs));
-+  DEFINE(GP_REGS_ABT,		offsetof(struct kvm_regs, abt_regs));
-+  DEFINE(GP_REGS_UND,		offsetof(struct kvm_regs, und_regs));
-+  DEFINE(GP_REGS_IRQ,		offsetof(struct kvm_regs, irq_regs));
-+  DEFINE(GP_REGS_FIQ,		offsetof(struct kvm_regs, fiq_regs));
-+  DEFINE(GP_REGS_PC,		offsetof(struct kvm_regs, usr_regs.ARM_pc));
-+  DEFINE(GP_REGS_CPSR,		offsetof(struct kvm_regs, usr_regs.ARM_cpsr));
-   DEFINE(VCPU_HCR,		offsetof(struct kvm_vcpu, arch.hcr));
-   DEFINE(VCPU_IRQ_LINES,	offsetof(struct kvm_vcpu, arch.irq_lines));
-   DEFINE(VCPU_HSR,		offsetof(struct kvm_vcpu, arch.fault.hsr));
-diff --git a/arch/arm/kvm/emulate.c b/arch/arm/kvm/emulate.c
-index ee161b1..a494def 100644
---- a/arch/arm/kvm/emulate.c
-+++ b/arch/arm/kvm/emulate.c
-@@ -112,7 +112,7 @@ static const unsigned long vcpu_reg_offsets[VCPU_NR_MODES][15] = {
-  */
- unsigned long *vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num)
- {
--	unsigned long *reg_array = (unsigned long *)&vcpu->arch.regs;
-+	unsigned long *reg_array = (unsigned long *)&vcpu->arch.ctxt.gp_regs;
- 	unsigned long mode = *vcpu_cpsr(vcpu) & MODE_MASK;
- 
- 	switch (mode) {
-@@ -147,15 +147,15 @@ unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu)
- 	unsigned long mode = *vcpu_cpsr(vcpu) & MODE_MASK;
- 	switch (mode) {
- 	case SVC_MODE:
--		return &vcpu->arch.regs.KVM_ARM_SVC_spsr;
-+		return &vcpu->arch.ctxt.gp_regs.KVM_ARM_SVC_spsr;
- 	case ABT_MODE:
--		return &vcpu->arch.regs.KVM_ARM_ABT_spsr;
-+		return &vcpu->arch.ctxt.gp_regs.KVM_ARM_ABT_spsr;
- 	case UND_MODE:
--		return &vcpu->arch.regs.KVM_ARM_UND_spsr;
-+		return &vcpu->arch.ctxt.gp_regs.KVM_ARM_UND_spsr;
- 	case IRQ_MODE:
--		return &vcpu->arch.regs.KVM_ARM_IRQ_spsr;
-+		return &vcpu->arch.ctxt.gp_regs.KVM_ARM_IRQ_spsr;
- 	case FIQ_MODE:
--		return &vcpu->arch.regs.KVM_ARM_FIQ_spsr;
-+		return &vcpu->arch.ctxt.gp_regs.KVM_ARM_FIQ_spsr;
- 	default:
- 		BUG();
- 	}
-diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
-index 5fa69d7..86e26fb 100644
---- a/arch/arm/kvm/guest.c
-+++ b/arch/arm/kvm/guest.c
-@@ -55,7 +55,7 @@ static u64 core_reg_offset_from_id(u64 id)
- static int get_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- {
- 	u32 __user *uaddr = (u32 __user *)(long)reg->addr;
--	struct kvm_regs *regs = &vcpu->arch.regs;
-+	struct kvm_regs *regs = &vcpu->arch.ctxt.gp_regs;
- 	u64 off;
- 
- 	if (KVM_REG_SIZE(reg->id) != 4)
-@@ -72,7 +72,7 @@ static int get_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- {
- 	u32 __user *uaddr = (u32 __user *)(long)reg->addr;
--	struct kvm_regs *regs = &vcpu->arch.regs;
-+	struct kvm_regs *regs = &vcpu->arch.ctxt.gp_regs;
- 	u64 off, val;
- 
- 	if (KVM_REG_SIZE(reg->id) != 4)
-diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
-index b9d9531..e0943cb8 100644
---- a/arch/arm/kvm/interrupts_head.S
-+++ b/arch/arm/kvm/interrupts_head.S
-@@ -1,6 +1,17 @@
- #include <linux/irqchip/arm-gic.h>
- #include <asm/assembler.h>
- 
-+/* Compat macro, until we get rid of this file entierely */
-+#define VCPU_GP_REGS		(VCPU_GUEST_CTXT + CPU_CTXT_GP_REGS)
-+#define VCPU_USR_REGS		(VCPU_GP_REGS + GP_REGS_USR)
-+#define VCPU_SVC_REGS		(VCPU_GP_REGS + GP_REGS_SVC)
-+#define VCPU_ABT_REGS		(VCPU_GP_REGS + GP_REGS_ABT)
-+#define VCPU_UND_REGS		(VCPU_GP_REGS + GP_REGS_UND)
-+#define VCPU_IRQ_REGS		(VCPU_GP_REGS + GP_REGS_IRQ)
-+#define VCPU_FIQ_REGS		(VCPU_GP_REGS + GP_REGS_FIQ)
-+#define VCPU_PC			(VCPU_GP_REGS + GP_REGS_PC)
-+#define VCPU_CPSR		(VCPU_GP_REGS + GP_REGS_CPSR)
+ obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
++obj-$(CONFIG_KVM_ARM_HOST) += cp15-sr.o
+diff --git a/arch/arm/kvm/hyp/cp15-sr.c b/arch/arm/kvm/hyp/cp15-sr.c
+new file mode 100644
+index 0000000..732abbc
+--- /dev/null
++++ b/arch/arm/kvm/hyp/cp15-sr.c
+@@ -0,0 +1,84 @@
++/*
++ * Original code:
++ * Copyright (C) 2012 - Virtual Open Systems and Columbia University
++ * Author: Christoffer Dall <c.dall@virtualopensystems.com>
++ *
++ * Mostly rewritten in C by Marc Zyngier <marc.zyngier@arm.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
 +
- #define VCPU_USR_REG(_reg_nr)	(VCPU_USR_REGS + (_reg_nr * 4))
- #define VCPU_USR_SP		(VCPU_USR_REG(13))
- #define VCPU_USR_LR		(VCPU_USR_REG(14))
-diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
-index eeb85858..0048b5a 100644
---- a/arch/arm/kvm/reset.c
-+++ b/arch/arm/kvm/reset.c
-@@ -71,7 +71,7 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 	}
++#include "hyp.h"
++
++static u64 *cp15_64(struct kvm_cpu_context *ctxt, int idx)
++{
++	return (u64 *)(ctxt->cp15 + idx);
++}
++
++void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
++{
++	ctxt->cp15[c0_MPIDR]		= read_sysreg(VMPIDR);
++	ctxt->cp15[c0_CSSELR]		= read_sysreg(CSSELR);
++	ctxt->cp15[c1_SCTLR]		= read_sysreg(SCTLR);
++	ctxt->cp15[c1_CPACR]		= read_sysreg(CPACR);
++	*cp15_64(ctxt, c2_TTBR0)	= read_sysreg(TTBR0);
++	*cp15_64(ctxt, c2_TTBR1)	= read_sysreg(TTBR1);
++	ctxt->cp15[c2_TTBCR]		= read_sysreg(TTBCR);
++	ctxt->cp15[c3_DACR]		= read_sysreg(DACR);
++	ctxt->cp15[c5_DFSR]		= read_sysreg(DFSR);
++	ctxt->cp15[c5_IFSR]		= read_sysreg(IFSR);
++	ctxt->cp15[c5_ADFSR]		= read_sysreg(ADFSR);
++	ctxt->cp15[c5_AIFSR]		= read_sysreg(AIFSR);
++	ctxt->cp15[c6_DFAR]		= read_sysreg(DFAR);
++	ctxt->cp15[c6_IFAR]		= read_sysreg(IFAR);
++	*cp15_64(ctxt, c7_PAR)		= read_sysreg(PAR);
++	ctxt->cp15[c10_PRRR]		= read_sysreg(PRRR);
++	ctxt->cp15[c10_NMRR]		= read_sysreg(NMRR);
++	ctxt->cp15[c10_AMAIR0]		= read_sysreg(AMAIR0);
++	ctxt->cp15[c10_AMAIR1]		= read_sysreg(AMAIR1);
++	ctxt->cp15[c12_VBAR]		= read_sysreg(VBAR);
++	ctxt->cp15[c13_CID]		= read_sysreg(CID);
++	ctxt->cp15[c13_TID_URW]		= read_sysreg(TID_URW);
++	ctxt->cp15[c13_TID_URO]		= read_sysreg(TID_URO);
++	ctxt->cp15[c13_TID_PRIV]	= read_sysreg(TID_PRIV);
++	ctxt->cp15[c14_CNTKCTL]		= read_sysreg(CNTKCTL);
++}
++
++void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
++{
++	write_sysreg(ctxt->cp15[c0_MPIDR],	VMPIDR);
++	write_sysreg(ctxt->cp15[c0_CSSELR],	CSSELR);
++	write_sysreg(ctxt->cp15[c1_SCTLR],	SCTLR);
++	write_sysreg(ctxt->cp15[c1_CPACR],	CPACR);
++	write_sysreg(*cp15_64(ctxt, c2_TTBR0),	TTBR0);
++	write_sysreg(*cp15_64(ctxt, c2_TTBR1),	TTBR1);
++	write_sysreg(ctxt->cp15[c2_TTBCR],	TTBCR);
++	write_sysreg(ctxt->cp15[c3_DACR],	DACR);
++	write_sysreg(ctxt->cp15[c5_DFSR],	DFSR);
++	write_sysreg(ctxt->cp15[c5_IFSR],	IFSR);
++	write_sysreg(ctxt->cp15[c5_ADFSR],	ADFSR);
++	write_sysreg(ctxt->cp15[c5_AIFSR],	AIFSR);
++	write_sysreg(ctxt->cp15[c6_DFAR],	DFAR);
++	write_sysreg(ctxt->cp15[c6_IFAR],	IFAR);
++	write_sysreg(*cp15_64(ctxt, c7_PAR),	PAR);
++	write_sysreg(ctxt->cp15[c10_PRRR],	PRRR);
++	write_sysreg(ctxt->cp15[c10_NMRR],	NMRR);
++	write_sysreg(ctxt->cp15[c10_AMAIR0],	AMAIR0);
++	write_sysreg(ctxt->cp15[c10_AMAIR1],	AMAIR1);
++	write_sysreg(ctxt->cp15[c12_VBAR],	VBAR);
++	write_sysreg(ctxt->cp15[c13_CID],	CID);
++	write_sysreg(ctxt->cp15[c13_TID_URW],	TID_URW);
++	write_sysreg(ctxt->cp15[c13_TID_URO],	TID_URO);
++	write_sysreg(ctxt->cp15[c13_TID_PRIV],	TID_PRIV);
++	write_sysreg(ctxt->cp15[c14_CNTKCTL],	CNTKCTL);
++}
+diff --git a/arch/arm/kvm/hyp/hyp.h b/arch/arm/kvm/hyp/hyp.h
+index 5808bbd..ab2cb82 100644
+--- a/arch/arm/kvm/hyp/hyp.h
++++ b/arch/arm/kvm/hyp/hyp.h
+@@ -42,9 +42,37 @@
+ })
+ #define read_sysreg(...)		__read_sysreg(__VA_ARGS__)
  
- 	/* Reset core registers */
--	memcpy(&vcpu->arch.regs, reset_regs, sizeof(vcpu->arch.regs));
-+	memcpy(&vcpu->arch.ctxt.gp_regs, reset_regs, sizeof(vcpu->arch.ctxt.gp_regs));
++#define TTBR0		__ACCESS_CP15_64(0, c2)
++#define TTBR1		__ACCESS_CP15_64(1, c2)
+ #define VTTBR		__ACCESS_CP15_64(6, c2)
++#define PAR		__ACCESS_CP15_64(0, c7)
++#define CSSELR		__ACCESS_CP15(c0, 2, c0, 0)
++#define VMPIDR		__ACCESS_CP15(c0, 4, c0, 5)
++#define SCTLR		__ACCESS_CP15(c1, 0, c0, 0)
++#define CPACR		__ACCESS_CP15(c1, 0, c0, 2)
++#define TTBCR		__ACCESS_CP15(c2, 0, c0, 2)
++#define DACR		__ACCESS_CP15(c3, 0, c0, 0)
++#define DFSR		__ACCESS_CP15(c5, 0, c0, 0)
++#define IFSR		__ACCESS_CP15(c5, 0, c0, 1)
++#define ADFSR		__ACCESS_CP15(c5, 0, c1, 0)
++#define AIFSR		__ACCESS_CP15(c5, 0, c1, 1)
++#define DFAR		__ACCESS_CP15(c6, 0, c0, 0)
++#define IFAR		__ACCESS_CP15(c6, 0, c0, 2)
+ #define ICIALLUIS	__ACCESS_CP15(c7, 0, c1, 0)
+ #define TLBIALLIS	__ACCESS_CP15(c8, 0, c3, 0)
+ #define TLBIALLNSNHIS	__ACCESS_CP15(c8, 4, c3, 4)
++#define PRRR		__ACCESS_CP15(c10, 0, c2, 0)
++#define NMRR		__ACCESS_CP15(c10, 0, c2, 1)
++#define AMAIR0		__ACCESS_CP15(c10, 0, c3, 0)
++#define AMAIR1		__ACCESS_CP15(c10, 0, c3, 1)
++#define VBAR		__ACCESS_CP15(c12, 0, c0, 0)
++#define CID		__ACCESS_CP15(c13, 0, c0, 1)
++#define TID_URW		__ACCESS_CP15(c13, 0, c0, 2)
++#define TID_URO		__ACCESS_CP15(c13, 0, c0, 3)
++#define TID_PRIV	__ACCESS_CP15(c13, 0, c0, 4)
++#define CNTKCTL		__ACCESS_CP15(c14, 0, c1, 0)
++
++void __sysreg_save_state(struct kvm_cpu_context *ctxt);
++void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
  
- 	/* Reset CP15 registers */
- 	kvm_reset_coprocs(vcpu);
+ #endif /* __ARM_KVM_HYP_H__ */
 -- 
 2.1.4
