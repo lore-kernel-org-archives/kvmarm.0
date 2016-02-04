@@ -1,103 +1,57 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v13 01/20] ARM64: Move PMU register related defines to
- asm/perf_event.h
-Date: Mon, 29 Feb 2016 19:03:10 +0000
-Message-ID: <56D495EE.7060006@arm.com>
-References: <1456290520-10012-1-git-send-email-zhaoshenglong@huawei.com>
- <1456290520-10012-2-git-send-email-zhaoshenglong@huawei.com>
- <20160224175247.GE12471@arm.com> <56CE6098.8070001@huawei.com>
- <56D4428B.5000505@arm.com> <56D492E5.4040709@huawei.com>
+From: Alexander Gordeev <agordeev@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 07/11] arm/pci: PCI device operation test
+Date: Thu, 4 Feb 2016 13:18:38 +0100
+Message-ID: <20160204121837.GB15617@dhcp-27-118.brq.redhat.com>
+References: <cover.1452341807.git.agordeev@redhat.com>
+ <597fba0ba6cdc84495acd7dd2119d9c785a76548.1452341807.git.agordeev@redhat.com>
+ <20160115153211.GL3915@hawk.localdomain>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <56D492E5.4040709@huawei.com>
-Sender: kvm-owner@vger.kernel.org
-To: Shannon Zhao <zhaoshenglong@huawei.com>, Will Deacon <will.deacon@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4D63D412F3
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 07:13:16 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ZOw7p42TprYm for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2016 07:13:15 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 23417412DD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 07:13:14 -0500 (EST)
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+ (int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+ by mx1.redhat.com (Postfix) with ESMTPS id 0FFEA8DFE9
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 12:18:42 +0000 (UTC)
+Content-Disposition: inline
+In-Reply-To: <20160115153211.GL3915@hawk.localdomain>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andrew Jones <drjones@redhat.com>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 29/02/16 18:50, Shannon Zhao wrote:
+On Fri, Jan 15, 2016 at 04:32:11PM +0100, Andrew Jones wrote:
+> > +struct pci_testdev_ops {
+> > +	u8 (*read8)(const volatile void *addr);
+> > +	u16 (*read16)(const volatile void *addr);
+> > +	u32 (*read32)(const volatile void *addr);
+> > +	void (*write8)(u8 value, volatile void *addr);
+> > +	void (*write16)(u16 value, volatile void *addr);
+> > +	void (*write32)(u32 value, volatile void *addr);
 > 
-> 
-> On 2016/2/29 21:07, Marc Zyngier wrote:
->> Shannon,
->>
->> On 25/02/16 02:02, Shannon Zhao wrote:
->>>
->>>
->>> On 2016/2/25 1:52, Will Deacon wrote:
->>>> On Wed, Feb 24, 2016 at 01:08:21PM +0800, Shannon Zhao wrote:
->>>>> From: Shannon Zhao <shannon.zhao@linaro.org>
->>>>>
->>>>> To use the ARMv8 PMU related register defines from the KVM code, we move
->>>>> the relevant definitions to asm/perf_event.h header file and rename them
->>>>> with prefix ARMV8_PMU_.
->>>>>
->>>>> Signed-off-by: Anup Patel <anup.patel@linaro.org>
->>>>> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
->>>>> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
->>>>> Reviewed-by: Andrew Jones <drjones@redhat.com>
->>>>> ---
->>>>>  arch/arm64/include/asm/perf_event.h | 35 +++++++++++++++++++
->>>>>  arch/arm64/kernel/perf_event.c      | 68 ++++++++++---------------------------
->>>>>  2 files changed, 52 insertions(+), 51 deletions(-)
->>>>
->>>> Looks fine to me, but we're going to get some truly horrible conflicts
->>>> in -next.
->>>>
->>>> I'm open to suggestions on the best way to handle this, but one way
->>>> would be:
->>>>
->>>>   1. Duplicate all the #defines privately in KVM (queue via kvm tree)
->>> This way seems not proper I think.
->>>
->>>>   2. Rebase this patch onto my perf/updates branch [1] (queue via me)
->>> While to this series, it really relies on the perf_event.h to compile
->>> and test, so maybe for KVM-ARM and KVM maintainers it's not proper.
->>>
->>>>   3. Patch at -rc1 dropping the #defines from (1) and moving to the new
->>>>      perf_event.h stuff
->>>>
->>> I vote for this way. Since the patch in [1] is small and nothing else
->>> relies on them, I think it would be simple to rebase them onto this series.
->>>
->>>> Thoughts?
->>>>
->>> Anyway, there are only 3 lines which have conflicts. I'm not sure
->>> whether we could handle this when we merge them.
->>
->> I think you're missing the point:
->>
->> - We want both the arm64 perf and KVM trees to be easy to merge
->> - The conflicts are not that simple to resolve
->> - We want these conflicts to be solved before it hits Linus' tree
->>
-> Ah, sorry. I realized this later.
-> 
->> With that in mind, here's what I'm suggesting we merge as a first patch:
->>
->> https://git.kernel.org/cgit/linux/kernel/git/kvmarm/kvmarm.git/commit/?h=queue&id=2029b4b02691ec6ebba3d281068e783353d7e108
->>
->> Once this and the perf/updates branch are merged, we can add one last
->> patch reverting this hack and actually doing the renaming work (Will has
->> posted a resolution for most of the new things).
->>
->> Thoughts?
->>
-> It's fine I think. (It's first time to me to face this kind of problem.
-> :)). Thanks for your help.
+> Please use the standard 'b', 'w', 'l' in these names.
 
-No worries. I've taken this patch plus most of your v14 series and the
-v15 patch that you posted here, and applied the whole thing on top of
-kvmarm/next (having rejigged a couple of things there). I've also fixed
-the definition of ARMV8_PMU_PMCR_MASK to take PMCR_EL0.LC into account.
+I did not use in the first place as it conflicts with standard
+read*/write* macros. Would [read|write]_[byte|word|long] work
+for you?
 
-Please give it a go. Any fix will should now come as a patch on top of
-this branch.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+> Thanks,
+> drew
