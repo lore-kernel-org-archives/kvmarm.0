@@ -1,30 +1,31 @@
-From: Alexander Gordeev <agordeev@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 08/11] arm/pci: PCI device read/write test
-Date: Thu, 4 Feb 2016 13:03:13 +0100
-Message-ID: <20160204120313.GA15617@dhcp-27-118.brq.redhat.com>
+From: Andrew Jones <drjones@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 07/11] arm/pci: PCI device operation test
+Date: Thu, 4 Feb 2016 16:31:17 +0100
+Message-ID: <20160204153117.GE3890@hawk.localdomain>
 References: <cover.1452341807.git.agordeev@redhat.com>
- <9da79ee47b7ad328c9ba04af0a2ff4697555b007.1452341807.git.agordeev@redhat.com>
- <20160115153350.GM3915@hawk.localdomain>
+ <597fba0ba6cdc84495acd7dd2119d9c785a76548.1452341807.git.agordeev@redhat.com>
+ <20160115153211.GL3915@hawk.localdomain>
+ <20160204121837.GB15617@dhcp-27-118.brq.redhat.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C8D9C412F3
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 06:57:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 466B0412DD
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 10:25:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id P0AbmUwG4H7R for <kvmarm@lists.cs.columbia.edu>;
- Thu,  4 Feb 2016 06:57:49 -0500 (EST)
+ with ESMTP id 6zQtUz6Uemoe for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  4 Feb 2016 10:25:53 -0500 (EST)
 Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 80C73412DD
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 06:57:49 -0500 (EST)
-Received: from int-mx11.intmail.prod.int.phx2.redhat.com
- (int-mx11.intmail.prod.int.phx2.redhat.com [10.5.11.24])
- by mx1.redhat.com (Postfix) with ESMTPS id 515E63C88E6
- for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 12:03:17 +0000 (UTC)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A407412C2
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 10:25:52 -0500 (EST)
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com
+ (int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+ by mx1.redhat.com (Postfix) with ESMTPS id 26B35C0A8469
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  4 Feb 2016 15:31:21 +0000 (UTC)
 Content-Disposition: inline
-In-Reply-To: <20160115153350.GM3915@hawk.localdomain>
+In-Reply-To: <20160204121837.GB15617@dhcp-27-118.brq.redhat.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,58 +35,27 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andrew Jones <drjones@redhat.com>
+To: Alexander Gordeev <agordeev@redhat.com>
 Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Jan 15, 2016 at 04:33:50PM +0100, Andrew Jones wrote:
-> On Sat, Jan 09, 2016 at 01:22:55PM +0100, Alexander Gordeev wrote:
-> > Cc: Andrew Jones <drjones@redhat.com>
-> > Signed-off-by: Alexander Gordeev <agordeev@redhat.com>
-> > ---
-> >  lib/pci-testdev.c | 16 ++++++++++++++++
-> >  1 file changed, 16 insertions(+)
+On Thu, Feb 04, 2016 at 01:18:38PM +0100, Alexander Gordeev wrote:
+> On Fri, Jan 15, 2016 at 04:32:11PM +0100, Andrew Jones wrote:
+> > > +struct pci_testdev_ops {
+> > > +	u8 (*read8)(const volatile void *addr);
+> > > +	u16 (*read16)(const volatile void *addr);
+> > > +	u32 (*read32)(const volatile void *addr);
+> > > +	void (*write8)(u8 value, volatile void *addr);
+> > > +	void (*write16)(u16 value, volatile void *addr);
+> > > +	void (*write32)(u32 value, volatile void *addr);
 > > 
-> > diff --git a/lib/pci-testdev.c b/lib/pci-testdev.c
-> > index de97f82..dd6a5ac 100644
-> > --- a/lib/pci-testdev.c
-> > +++ b/lib/pci-testdev.c
-> > @@ -113,6 +113,9 @@ static bool pci_testdev_one(struct pci_test_dev_hdr *test,
-> >  			    struct pci_testdev_ops *ops)
-> >  {
-> >  	u8 width;
-> > +	u32 sig, off;
-> > +	const int nr_writes = 16;
-> > +	int i;
-> >  
-> >  	ops->write8(test_nr, &test->test);
-> >  	assert(ops->read32(&test->count) == 0);
-> > @@ -121,6 +124,19 @@ static bool pci_testdev_one(struct pci_test_dev_hdr *test,
-> >  	if ((width != 1) && (width != 2) && (width != 4))
-> >  		return false;
-> >  
-> > +	sig = ops->read32(&test->data);
-> > +	off = ops->read32(&test->offset);
-> > +
-> > +	for (i = 0; i < nr_writes; i++) {
-> > +		switch (width) {
-> > +			case 1: ops->write8 (sig, (void*)test + off); break;
-> > +			case 2: ops->write16(sig, (void*)test + off); break;
-> > +			case 4: ops->write32(sig, (void*)test + off); break;
-> > +		}
-> > +	}
-> > +
-> > +	assert((int)ops->read32(&test->count) == nr_writes);
+> > Please use the standard 'b', 'w', 'l' in these names.
 > 
-> Are you sure we want to assert here? What about outputting a message and
-> then returning false instead?
+> I did not use in the first place as it conflicts with standard
+> read*/write* macros. Would [read|write]_[byte|word|long] work
+> for you?
 
-Nice catch.
+Oh yeah... dang macros. _byte/word/dword like the pci_config_read/write
+function in Linux would work.
 
-> > +
-> >  	return true;
-> >  }
-> >  
-> > -- 
-> > 1.8.3.1
-> > 
+drew
