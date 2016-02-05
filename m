@@ -1,180 +1,135 @@
 From: Wei Huang <wei@redhat.com>
-Subject: [PATCH V1 4/7] KVM: GICv2: Extract the common code from DT
-Date: Fri,  5 Feb 2016 12:07:31 -0500
-Message-ID: <1454692054-8984-5-git-send-email-wei@redhat.com>
+Subject: [PATCH V1 5/7] KVM: GICv2: Add ACPI probing function
+Date: Fri,  5 Feb 2016 12:07:32 -0500
+Message-ID: <1454692054-8984-6-git-send-email-wei@redhat.com>
 References: <1454692054-8984-1-git-send-email-wei@redhat.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 063624992F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2016 12:02:15 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id FdUrTLtpHn12 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Feb 2016 12:02:11 -0500 (EST)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A5F4498A4
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2016 12:02:10 -0500 (EST)
 In-Reply-To: <1454692054-8984-1-git-send-email-wei@redhat.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: marc.zyngier@arm.com, christoffer.dall@linaro.org, kvm@vger.kernel.org, hanjun.guo@linaro.org, fu.wei@linaro.org, drjones@redhat.com, wei@redhat.com, al.stone@linaro.org
+Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, fu.wei@linaro.org, hanjun.guo@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch extracts the common code from the DT probe function. With
-this patch the DT function only fills out the following info in *vgic.
-  - maint_irq (mapped)
-  - GICH resource
-  - GICV resource
-Note that vgic->vctrl_base io-remapping is now moved to vgic_v2_probe().
+This patch implements ACPI probing for GICv2.
 
 Signed-off-by: Wei Huang <wei@redhat.com>
 ---
- virt/kvm/arm/vgic-v2.c | 92 ++++++++++++++++++++++++--------------------------
- 1 file changed, 44 insertions(+), 48 deletions(-)
+ virt/kvm/arm/vgic-v2.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 68 insertions(+)
 
 diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
-index 7dd5fb3..b60e73a 100644
+index b60e73a..7de2a1f 100644
 --- a/virt/kvm/arm/vgic-v2.c
 +++ b/virt/kvm/arm/vgic-v2.c
-@@ -188,7 +188,7 @@ static const struct of_device_id vgic_v2_ids[] = {
-  */
- static int vgic_v2_dt_probe(struct vgic_params *vgic)
- {
--	int ret;
-+	int ret = 0;
- 	struct resource vctrl_res;
- 	struct resource vcpu_res;
- 	struct device_node *vgic_node;
-@@ -201,24 +201,55 @@ static int vgic_v2_dt_probe(struct vgic_params *vgic)
+@@ -23,6 +23,7 @@
+ #include <linux/of.h>
+ #include <linux/of_address.h>
+ #include <linux/of_irq.h>
++#include <linux/acpi.h>
  
- 	vgic->maint_irq = irq_of_parse_and_map(vgic_node, 0);
- 	if (!vgic->maint_irq) {
--		kvm_err("error getting vgic maintenance irq from DT\n");
-+		kvm_err("Cannot get vgic maintenance irq from DT\n");
- 		ret = -ENXIO;
- 		goto out;
- 	}
+ #include <linux/irqchip/arm-gic.h>
  
- 	ret = of_address_to_resource(vgic_node, 2, &vctrl_res);
- 	if (ret) {
--		kvm_err("Cannot obtain GICH resource\n");
-+		kvm_err("Cannot obtain GICH resource from DT\n");
- 		goto out;
- 	}
- 	vgic->vctrl_phys_base = vctrl_res.start;
- 	vgic->vctrl_size = resource_size(&vctrl_res);
+@@ -226,6 +227,71 @@ out:
+ 	return ret;
+ }
  
--	vgic->vctrl_base = of_iomap(vgic_node, 2);
-+	if (of_address_to_resource(vgic_node, 3, &vcpu_res)) {
-+		kvm_err("Cannot obtain GICV resource\n");
++#ifdef CONFIG_ACPI
++static struct acpi_madt_generic_interrupt *vgic_acpi;
++static void gic_get_acpi_header(struct acpi_subtable_header *header)
++{
++	vgic_acpi = (struct acpi_madt_generic_interrupt *)header;
++}
++
++static struct acpi_madt_generic_distributor *dist_acpi;
++static void gic_get_dist_header(struct acpi_subtable_header *header)
++{
++	dist_acpi = (struct acpi_madt_generic_distributor *)header;
++}
++
++static int vgic_v2_acpi_probe(struct vgic_params *vgic)
++{
++	int irq_mode, ret = 0;
++
++	ret = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_INTERRUPT,
++			(acpi_tbl_entry_handler)gic_get_acpi_header, 0);
++	if (!ret) {
++		ret = -ENODEV;
++		goto out;
++	}
++
++	ret = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_DISTRIBUTOR,
++			(acpi_tbl_entry_handler)gic_get_dist_header, 0);
++	if (!ret) {
++		kvm_err("Cannot get distributor entry from ACPI\n");
++		ret = -ENODEV;
++		goto out;
++	}
++
++	if (dist_acpi->version >= ACPI_MADT_GIC_VERSION_V3) {
++		ret = -ENODEV;
++		goto out;
++	}
++
++	irq_mode = (vgic_acpi->flags & ACPI_MADT_VGIC_IRQ_MODE) ?
++		ACPI_EDGE_SENSITIVE : ACPI_LEVEL_SENSITIVE;
++	/* According to GIC-400 manual, PPIs are active-LOW, level-sensative.
++	 * We register IRQ as active-low.
++	 */
++	vgic->maint_irq = acpi_register_gsi(NULL, vgic_acpi->vgic_interrupt,
++					    irq_mode, ACPI_ACTIVE_LOW);
++	if (!vgic->maint_irq) {
++		kvm_err("Cannot register vgic maintenance irq from ACPI\n");
 +		ret = -ENXIO;
 +		goto out;
 +	}
-+	vgic->vcpu_phys_base = vcpu_res.start;
-+	vgic->vcpu_size = resource_size(&vcpu_res);
++
++	vgic->vctrl_phys_base = vgic_acpi->gich_base_address;
++	vgic->vctrl_size = SZ_8K;
++
++	vgic->vcpu_phys_base = vgic_acpi->gicv_base_address;
++	vgic->vcpu_size = 0; /* unavailable in ACPI, set to 0 */
 +out:
-+	of_node_put(vgic_node);
 +	return ret;
 +}
-+
-+/**
-+ * vgic_v2_probe - probe for a GICv2 compatible interrupt controller
-+ * @ops:	address of a pointer to the GICv2 operations
-+ * @params:	address of a pointer to HW-specific parameters
-+ *
-+ * Returns 0 if a GICv2 has been found, with the low level operations
-+ * in *ops and the HW parameters in *params. Returns an error code
-+ * otherwise.
-+ */
-+int vgic_v2_probe(const struct vgic_ops **ops,
-+		  const struct vgic_params **params)
++#else
++static inline int vgic_v2_acpi_probe(struct vgic_params *vgic)
 +{
-+	int ret;
-+	struct vgic_params *vgic = &vgic_v2_params;
++	return -ENODEV;
++}
++#endif /* CONFIG_ACPI */
 +
-+	ret = vgic_v2_dt_probe(vgic);
-+	if (ret)
-+		goto err_out;
-+
-+	vgic->vctrl_base = ioremap(vgic->vctrl_phys_base, vgic->vctrl_size);
- 	if (!vgic->vctrl_base) {
- 		kvm_err("Cannot ioremap GICH\n");
- 		ret = -ENOMEM;
--		goto out;
-+		goto err_out;
- 	}
+ /**
+  * vgic_v2_probe - probe for a GICv2 compatible interrupt controller
+  * @ops:	address of a pointer to the GICv2 operations
+@@ -242,6 +308,8 @@ int vgic_v2_probe(const struct vgic_ops **ops,
+ 	struct vgic_params *vgic = &vgic_v2_params;
  
- 	vgic->nr_lr = readl_relaxed(vgic->vctrl_base + GICH_VTR);
-@@ -229,71 +260,36 @@ static int vgic_v2_dt_probe(struct vgic_params *vgic)
- 				     vgic->vctrl_phys_base);
- 	if (ret) {
- 		kvm_err("Cannot map VCTRL into hyp\n");
--		goto out_unmap;
--	}
--
--	if (of_address_to_resource(vgic_node, 3, &vcpu_res)) {
--		kvm_err("Cannot obtain GICV resource\n");
--		ret = -ENXIO;
--		goto out_unmap;
-+		goto err_out;
- 	}
--	vgic->vcpu_phys_base = vcpu_res.start;
--	vgic->vcpu_size = resource_size(&vcpu_res);
+ 	ret = vgic_v2_dt_probe(vgic);
++	if (ret && !acpi_disabled)
++		ret = vgic_v2_acpi_probe(vgic);
+ 	if (ret)
+ 		goto err_out;
  
- 	if (!PAGE_ALIGNED(vgic->vcpu_phys_base)) {
- 		kvm_err("GICV physical address 0x%llx not page aligned\n",
--			(unsigned long long)vcpu_res.start);
-+			(unsigned long long)vgic->vcpu_phys_base);
- 		ret = -ENXIO;
--		goto out_unmap;
-+		goto err_out;
- 	}
- 
- 	if (!PAGE_ALIGNED(vgic->vcpu_size)) {
- 		kvm_err("GICV size 0x%llx not a multiple of page size 0x%lx\n",
- 			(unsigned long long)vgic->vcpu_size, PAGE_SIZE);
- 		ret = -ENXIO;
--		goto out_unmap;
-+		goto err_out;
- 	}
- 
--	vgic->can_emulate_gicv2 = true;
- 	kvm_register_device_ops(&kvm_arm_vgic_v2_ops, KVM_DEV_TYPE_ARM_VGIC_V2);
--
--	kvm_info("%s@%llx IRQ%d\n", vgic_node->name,
--		 vgic->vctrl_phys_base, vgic->maint_irq);
--
-+	vgic->can_emulate_gicv2 = true;
- 	vgic->type = VGIC_V2;
- 	vgic->max_gic_vcpus = VGIC_V2_MAX_CPUS;
--	goto out;
- 
--out_unmap:
--	iounmap(vgic->vctrl_base);
--out:
--	of_node_put(vgic_node);
--	return ret;
--}
--
--/**
-- * vgic_v2_probe - probe for a GICv2 compatible interrupt controller
-- * @ops:	address of a pointer to the GICv2 operations
-- * @params:	address of a pointer to HW-specific parameters
-- *
-- * Returns 0 if a GICv2 has been found, with the low level operations
-- * in *ops and the HW parameters in *params. Returns an error code
-- * otherwise.
-- */
--int vgic_v2_probe(const struct vgic_ops **ops,
--		  const struct vgic_params **params)
--{
--	int ret;
--	struct vgic_params *vgic = &vgic_v2_params;
--
--	ret = vgic_v2_dt_probe(vgic);
--	if (ret)
--		goto err_out;
-+	kvm_info("GICv2@%llx IRQ%d\n", vgic->vctrl_phys_base, vgic->maint_irq);
- 
- 	*ops = &vgic_v2_ops;
- 	*params = vgic;
- 
- 	return 0;
- err_out:
-+	if (vgic->vctrl_base)
-+		iounmap(vgic->vctrl_base);
- 	return ret;
- }
 -- 
 1.8.3.1
-
