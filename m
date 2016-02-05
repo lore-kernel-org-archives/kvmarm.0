@@ -1,135 +1,76 @@
-From: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: ARM PCI/MSI KVM passthrough with GICv2M
-Date: Fri, 5 Feb 2016 11:17:00 -0700
-Message-ID: <20160205111700.726ac061@t450s.home>
-References: <1453813968-2024-1-git-send-email-eric.auger@linaro.org>
-	<1454017899.23148.0.camel@redhat.com> <56AB78B1.2030202@linaro.org>
-	<1454096004.9301.1.camel@redhat.com> <56ABD8E0.6080409@linaro.org>
-	<20160201140351.GE6828@arm.com> <20160203125047.GB13974@cbox>
-	<20160203131057.GA20217@arm.com> <20160203153606.GC13974@cbox>
-	<56B4DC97.60904@linaro.org>
+From: <tchalamarla@caviumnetworks.com>
+Subject: [PATCH] arm64: KVM: Add 48bit PA support for EL2  translations
+Date: Fri, 5 Feb 2016 11:28:16 -0800
+Message-ID: <1454700496-21221-1-git-send-email-tchalamarla@caviumnetworks.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <56B4DC97.60904-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Cc: eric.auger-qxv4g6HH51o@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 63E95497F8
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2016 14:22:57 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 5Ni-TDXHMCHe for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Feb 2016 14:22:56 -0500 (EST)
+Received: from na01-bl2-obe.outbound.protection.outlook.com
+ (mail-bl2on0098.outbound.protection.outlook.com [65.55.169.98])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EABD9497F4
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2016 14:22:55 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: christoffer.dall@linaro.org
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 5 Feb 2016 18:32:07 +0100
-Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
+From: Tirumalesh Chalamarla <tchalamarla@caviumnetworks.com>
 
-> Hi Alex,
-> 
-> I tried to sketch a proposal for guaranteeing the IRQ integrity when
-> doing ARM PCI/MSI passthrough with ARM GICv2M msi-controller. This is
-> based on extended VFIO group viability control, as detailed below.
-> 
-> As opposed to ARM GICv3 ITS, this MSI controller does *not* support IRQ
-> remapping. It can expose 1 or more 4kB MSI frame. Each frame contains a
-> single register where the msi data is written.
-> 
-> I would be grateful to you if you could tell me whether it makes any sense.
-> 
-> Thanks in advance
-> 
-> Best Regards
-> 
-> Eric
-> 
-> 
-> 1) GICv2m with a single 4kB single frame
->    all devices having this msi-controller as msi-parent share this
->    single MSI frame. Those devices can work on behalf of the host
->    or work on behalf of 1 or more guests (KVM assigned devices). We
->    must make sure either the host only or 1 single VM can access to the
->    single frame to guarantee interrupt integrity: a device assigned
->    to 1 VM should not be able to trigger MSI targeted to the host
->    or another VM.
-> 
->    I would propose to extend the VFIO notion of group viability.
->    Currently a VFIO group is viable if:
->    all devices belonging to the same group are bound to a VFIO driver
->    or unbound.
-> 
->    Let's imagine we extend the viability check as follows:
-> 
->    0) keep the current viable check: all the devices belonging to
->       the group must be vfio bound or unbound.
->    1) retrieve the MSI parent of the device and list all the
->       other devices using that MSI controller as MSI-parent (does not
->       look straightforward):
->    2) they must be VFIO driver bound or unbound as well (meaning
->       they are not used by the host). If not, reject device attachment
->    - in case they are VFIO bound (a VFIO group is set):
->      x if all VFIO containers are the same as the one of the device's
->        we try to attach, that's OK. This means the other devices
->        use different IOMMU mappings, eventually will target the
->        MSI frame but they all work for the same user space client/VM.
->      x 1 or more devices has a different container than the device
->        under attachment:
->        It works on behalf of a different user space client/VM,
->        we can't attach the new device. I think there is a case however
->        where severals containers can be opened by a single QEMU.
-> 
-> Of course the dynamic aspects, ie a new device showing up or an unbind
-> event bring significant complexity.
-> 
-> 2) GICv2M with multiple 4kB frames
->    Each msi-frame is enumerated as msi-controller. The device tree
->    statically defines which device is attached to each msi frame.
->    In case devices are assigned we cannot change this attachment
->    anyway since there might be physical contraints behind.
->    So devices likely to be assigned to guests should be linked to a
->    different MSI frame than devices that are not.
-> 
->    I think extended viability concept can be used as well.
-> 
->    This model still is not ideal: in case we have a SR-IOV device
->    plugged onto an host bridge attached to a single MSI parent you won't
->    be able anyway to have 1 Virtual Function working for host and 1 VF
->    working for a guest. Only Interrupt translation (ITS) will bring that
->    feature.
-> 
-> 3) GICv3 ITS
->    This one supports interrupt translation service ~ Intel
->    IRQ remapping.
->    This means a single frame can be used by all devices. A deviceID is
->    used exclusively by the host or a guest. I assume the ITS driver
->    allocates/populates deviceid interrupt translation table featuring
->    separate LPI spaces ie by construction different ITT cannot feature
->    same LPIs. So no need to do the extended viability test.
-> 
->    The MSI controller should have a property telling whether
->    it supports interrupt translation. This kind of property currently
->    exists on IOMMU side for INTEL remapping.
-> 
+Systems where RAM is at higher address and MultiNode systems
+whith higher address RAM, 39 bit max PA for EL2 translations
+is not sufficient.
 
-Hi Eric,
+This patch sets max possible PA(48bit) for EL2 translations.
 
-Would anyone be terribly upset if we simply assume the worst case
-scenario on GICv2m/M, have the IOMMU not claim IOMMU_CAP_INTR_REMAP, and
-require the user to opt-in via the allow_unsafe_interrupts on the
-vfio_iommu_type1 module?  That would make it very compatible with what
-we already do on x86, where it really is all or nothing.  My assumption
-is that GICv2 would be phased out in favor of GICv3, so there's always
-a hardware upgrade path to having more complete isolation, but the
-return on investment for figuring out whether a given device really has
-this sort of isolation seems pretty low.  Often users already have some
-degree of trust in the VMs they use for device assignment anyway.  An
-especially prudent user can still look at the hardware specs for their
-specific system to understand whether any devices are fully isolated
-and only make use of those for device assignment.  Does that seem like
-a reasonable alternative?  Thanks,
+Signed-off-by: Tirumalesh Chalamarla <tchalamarla@caviumnetworks.com>
+---
+ arch/arm64/include/asm/kvm_arm.h | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-Alex
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 738a95f..3fc38a4 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -98,7 +98,12 @@
+ #define TCR_EL2_RES1	((1 << 31) | (1 << 23))
+ #define TCR_EL2_TBI	(1 << 20)
+ #define TCR_EL2_PS	(7 << 16)
++#define TCR_EL2_PS_32B	(0 << 16)
++#define TCR_EL2_PS_36B	(1 << 16)
+ #define TCR_EL2_PS_40B	(2 << 16)
++#define TCR_EL2_PS_42B	(3 << 16)
++#define TCR_EL2_PS_44B	(4 << 16)
++#define TCR_EL2_PS_48B	(5 << 16)
+ #define TCR_EL2_TG0	(1 << 14)
+ #define TCR_EL2_SH0	(3 << 12)
+ #define TCR_EL2_ORGN0	(3 << 10)
+@@ -107,7 +112,10 @@
+ #define TCR_EL2_MASK	(TCR_EL2_TG0 | TCR_EL2_SH0 | \
+ 			 TCR_EL2_ORGN0 | TCR_EL2_IRGN0 | TCR_EL2_T0SZ)
+ 
+-#define TCR_EL2_FLAGS	(TCR_EL2_RES1 | TCR_EL2_PS_40B)
++/*
++ * Assign the highest possible PS.
++ */
++#define TCR_EL2_FLAGS	(TCR_EL2_RES1 | TCR_EL2_PS_48B)
+ 
+ /* VTCR_EL2 Registers bits */
+ #define VTCR_EL2_RES1		(1 << 31)
+-- 
+2.1.0
