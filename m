@@ -1,23 +1,29 @@
-From: Wei Huang <wei@redhat.com>
-Subject: [PATCH V1 5/7] KVM: GICv2: Add ACPI probing function
-Date: Fri,  5 Feb 2016 12:07:32 -0500
-Message-ID: <1454692054-8984-6-git-send-email-wei@redhat.com>
-References: <1454692054-8984-1-git-send-email-wei@redhat.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: ARM PCI/MSI KVM passthrough with GICv2M
+Date: Fri, 5 Feb 2016 18:32:07 +0100
+Message-ID: <56B4DC97.60904@linaro.org>
+References: <1453813968-2024-1-git-send-email-eric.auger@linaro.org>
+ <1454017899.23148.0.camel@redhat.com> <56AB78B1.2030202@linaro.org>
+ <1454096004.9301.1.camel@redhat.com> <56ABD8E0.6080409@linaro.org>
+ <20160201140351.GE6828@arm.com> <20160203125047.GB13974@cbox>
+ <20160203131057.GA20217@arm.com> <20160203153606.GC13974@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 063624992F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2016 12:02:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 13696497F8
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2016 12:27:00 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FdUrTLtpHn12 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Feb 2016 12:02:11 -0500 (EST)
-Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A5F4498A4
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2016 12:02:10 -0500 (EST)
-In-Reply-To: <1454692054-8984-1-git-send-email-wei@redhat.com>
+ with ESMTP id IQJ1J7GKZkIb for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Feb 2016 12:26:59 -0500 (EST)
+Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E2DBC497E5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2016 12:26:58 -0500 (EST)
+Received: by mail-wm0-f50.google.com with SMTP id 128so80171109wmz.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 05 Feb 2016 09:32:32 -0800 (PST)
+In-Reply-To: <20160203153606.GC13974@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,109 +33,91 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, fu.wei@linaro.org, hanjun.guo@linaro.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, Will Deacon <will.deacon@arm.com>
+Cc: eric.auger@st.com, kvm@vger.kernel.org, patches@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, Alex Williamson <alex.williamson@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch implements ACPI probing for GICv2.
+Hi Alex,
 
-Signed-off-by: Wei Huang <wei@redhat.com>
----
- virt/kvm/arm/vgic-v2.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
+I tried to sketch a proposal for guaranteeing the IRQ integrity when
+doing ARM PCI/MSI passthrough with ARM GICv2M msi-controller. This is
+based on extended VFIO group viability control, as detailed below.
 
-diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
-index b60e73a..7de2a1f 100644
---- a/virt/kvm/arm/vgic-v2.c
-+++ b/virt/kvm/arm/vgic-v2.c
-@@ -23,6 +23,7 @@
- #include <linux/of.h>
- #include <linux/of_address.h>
- #include <linux/of_irq.h>
-+#include <linux/acpi.h>
- 
- #include <linux/irqchip/arm-gic.h>
- 
-@@ -226,6 +227,71 @@ out:
- 	return ret;
- }
- 
-+#ifdef CONFIG_ACPI
-+static struct acpi_madt_generic_interrupt *vgic_acpi;
-+static void gic_get_acpi_header(struct acpi_subtable_header *header)
-+{
-+	vgic_acpi = (struct acpi_madt_generic_interrupt *)header;
-+}
-+
-+static struct acpi_madt_generic_distributor *dist_acpi;
-+static void gic_get_dist_header(struct acpi_subtable_header *header)
-+{
-+	dist_acpi = (struct acpi_madt_generic_distributor *)header;
-+}
-+
-+static int vgic_v2_acpi_probe(struct vgic_params *vgic)
-+{
-+	int irq_mode, ret = 0;
-+
-+	ret = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_INTERRUPT,
-+			(acpi_tbl_entry_handler)gic_get_acpi_header, 0);
-+	if (!ret) {
-+		ret = -ENODEV;
-+		goto out;
-+	}
-+
-+	ret = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_DISTRIBUTOR,
-+			(acpi_tbl_entry_handler)gic_get_dist_header, 0);
-+	if (!ret) {
-+		kvm_err("Cannot get distributor entry from ACPI\n");
-+		ret = -ENODEV;
-+		goto out;
-+	}
-+
-+	if (dist_acpi->version >= ACPI_MADT_GIC_VERSION_V3) {
-+		ret = -ENODEV;
-+		goto out;
-+	}
-+
-+	irq_mode = (vgic_acpi->flags & ACPI_MADT_VGIC_IRQ_MODE) ?
-+		ACPI_EDGE_SENSITIVE : ACPI_LEVEL_SENSITIVE;
-+	/* According to GIC-400 manual, PPIs are active-LOW, level-sensative.
-+	 * We register IRQ as active-low.
-+	 */
-+	vgic->maint_irq = acpi_register_gsi(NULL, vgic_acpi->vgic_interrupt,
-+					    irq_mode, ACPI_ACTIVE_LOW);
-+	if (!vgic->maint_irq) {
-+		kvm_err("Cannot register vgic maintenance irq from ACPI\n");
-+		ret = -ENXIO;
-+		goto out;
-+	}
-+
-+	vgic->vctrl_phys_base = vgic_acpi->gich_base_address;
-+	vgic->vctrl_size = SZ_8K;
-+
-+	vgic->vcpu_phys_base = vgic_acpi->gicv_base_address;
-+	vgic->vcpu_size = 0; /* unavailable in ACPI, set to 0 */
-+out:
-+	return ret;
-+}
-+#else
-+static inline int vgic_v2_acpi_probe(struct vgic_params *vgic)
-+{
-+	return -ENODEV;
-+}
-+#endif /* CONFIG_ACPI */
-+
- /**
-  * vgic_v2_probe - probe for a GICv2 compatible interrupt controller
-  * @ops:	address of a pointer to the GICv2 operations
-@@ -242,6 +308,8 @@ int vgic_v2_probe(const struct vgic_ops **ops,
- 	struct vgic_params *vgic = &vgic_v2_params;
- 
- 	ret = vgic_v2_dt_probe(vgic);
-+	if (ret && !acpi_disabled)
-+		ret = vgic_v2_acpi_probe(vgic);
- 	if (ret)
- 		goto err_out;
- 
--- 
-1.8.3.1
+As opposed to ARM GICv3 ITS, this MSI controller does *not* support IRQ
+remapping. It can expose 1 or more 4kB MSI frame. Each frame contains a
+single register where the msi data is written.
+
+I would be grateful to you if you could tell me whether it makes any sense.
+
+Thanks in advance
+
+Best Regards
+
+Eric
+
+
+1) GICv2m with a single 4kB single frame
+   all devices having this msi-controller as msi-parent share this
+   single MSI frame. Those devices can work on behalf of the host
+   or work on behalf of 1 or more guests (KVM assigned devices). We
+   must make sure either the host only or 1 single VM can access to the
+   single frame to guarantee interrupt integrity: a device assigned
+   to 1 VM should not be able to trigger MSI targeted to the host
+   or another VM.
+
+   I would propose to extend the VFIO notion of group viability.
+   Currently a VFIO group is viable if:
+   all devices belonging to the same group are bound to a VFIO driver
+   or unbound.
+
+   Let's imagine we extend the viability check as follows:
+
+   0) keep the current viable check: all the devices belonging to
+      the group must be vfio bound or unbound.
+   1) retrieve the MSI parent of the device and list all the
+      other devices using that MSI controller as MSI-parent (does not
+      look straightforward):
+   2) they must be VFIO driver bound or unbound as well (meaning
+      they are not used by the host). If not, reject device attachment
+   - in case they are VFIO bound (a VFIO group is set):
+     x if all VFIO containers are the same as the one of the device's
+       we try to attach, that's OK. This means the other devices
+       use different IOMMU mappings, eventually will target the
+       MSI frame but they all work for the same user space client/VM.
+     x 1 or more devices has a different container than the device
+       under attachment:
+       It works on behalf of a different user space client/VM,
+       we can't attach the new device. I think there is a case however
+       where severals containers can be opened by a single QEMU.
+
+Of course the dynamic aspects, ie a new device showing up or an unbind
+event bring significant complexity.
+
+2) GICv2M with multiple 4kB frames
+   Each msi-frame is enumerated as msi-controller. The device tree
+   statically defines which device is attached to each msi frame.
+   In case devices are assigned we cannot change this attachment
+   anyway since there might be physical contraints behind.
+   So devices likely to be assigned to guests should be linked to a
+   different MSI frame than devices that are not.
+
+   I think extended viability concept can be used as well.
+
+   This model still is not ideal: in case we have a SR-IOV device
+   plugged onto an host bridge attached to a single MSI parent you won't
+   be able anyway to have 1 Virtual Function working for host and 1 VF
+   working for a guest. Only Interrupt translation (ITS) will bring that
+   feature.
+
+3) GICv3 ITS
+   This one supports interrupt translation service ~ Intel
+   IRQ remapping.
+   This means a single frame can be used by all devices. A deviceID is
+   used exclusively by the host or a guest. I assume the ITS driver
+   allocates/populates deviceid interrupt translation table featuring
+   separate LPI spaces ie by construction different ITT cannot feature
+   same LPIs. So no need to do the extended viability test.
+
+   The MSI controller should have a property telling whether
+   it supports interrupt translation. This kind of property currently
+   exists on IOMMU side for INTEL remapping.
