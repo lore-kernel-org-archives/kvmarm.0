@@ -1,24 +1,26 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 00/23] arm64: Virtualization Host Extension support
-Date: Fri, 5 Feb 2016 08:56:00 +0000
-Message-ID: <56B463A0.7010801@arm.com>
+Subject: Re: [PATCH v3 20/23] arm64: perf: Count EL2 events if the kernel is
+ running in HYP
+Date: Fri, 5 Feb 2016 09:02:39 +0000
+Message-ID: <56B4652F.4030407@arm.com>
 References: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
- <20160204192641.GJ13974@cbox>
+ <1454522416-6874-21-git-send-email-marc.zyngier@arm.com>
+ <20160204192301.GG13974@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CD47E48529
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2016 03:50:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E3F014965E
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2016 03:57:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CYF7XnrAagmU for <kvmarm@lists.cs.columbia.edu>;
- Fri,  5 Feb 2016 03:50:32 -0500 (EST)
+ with ESMTP id i6IYaoTjgt74 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  5 Feb 2016 03:57:10 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6633241AF6
- for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2016 03:50:32 -0500 (EST)
-In-Reply-To: <20160204192641.GJ13974@cbox>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE4BA48529
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  5 Feb 2016 03:57:10 -0500 (EST)
+In-Reply-To: <20160204192301.GG13974@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,48 +34,54 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 04/02/16 19:26, Christoffer Dall wrote:
-> On Wed, Feb 03, 2016 at 05:59:53PM +0000, Marc Zyngier wrote:
->> ARMv8.1 comes with the "Virtualization Host Extension" (VHE for
->> short), which enables simpler support of Type-2 hypervisors.
+On 04/02/16 19:23, Christoffer Dall wrote:
+> On Wed, Feb 03, 2016 at 06:00:13PM +0000, Marc Zyngier wrote:
+>> When the kernel is running in HYP (with VHE), it is necessary to
+>> include EL2 events if the user requests counting kernel or
+>> hypervisor events.
 >>
->> This extension allows the kernel to directly run at EL2, and
->> significantly reduces the number of system registers shared between
->> host and guest, reducing the overhead of virtualization.
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  arch/arm64/kernel/perf_event.c | 14 ++++++++++----
+>>  1 file changed, 10 insertions(+), 4 deletions(-)
 >>
->> In order to have the same kernel binary running on all versions of the
->> architecture, this series makes heavy use of runtime code patching.
->>
->> The first 22 patches massage the KVM code to deal with VHE and enable
->> Linux to run at EL2. The last patch catches an ugly case when VHE
->> capable CPUs are paired with some of their less capable siblings. This
->> should never happen, but hey...
->>
->> I have deliberately left out some of the more "advanced"
->> optimizations, as they are likely to distract the reviewer from the
->> core infrastructure, which is what I care about at the moment.
->>
->> Note: GDB is currently busted on VHE systems, as it checks for version
->>       6 on the debug architecture, while VHE is version 7. The
->>       binutils people are on the case.
->>
->> This has been tested on the FVP_Base_SLV-V8-A model, and based on
->> v4.5-rc2. I've put a branch out on:
->>
->> git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/vhe
->>
+>> diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
+>> index f7ab14c..6013a38 100644
+>> --- a/arch/arm64/kernel/perf_event.c
+>> +++ b/arch/arm64/kernel/perf_event.c
+>> @@ -20,6 +20,7 @@
+>>   */
+>>  
+>>  #include <asm/irq_regs.h>
+>> +#include <asm/virt.h>
+>>  
+>>  #include <linux/of.h>
+>>  #include <linux/perf/arm_pmu.h>
+>> @@ -693,10 +694,15 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
+>>  		return -EPERM;
+>>  	if (attr->exclude_user)
+>>  		config_base |= ARMV8_EXCLUDE_EL0;
+>> -	if (attr->exclude_kernel)
+>> -		config_base |= ARMV8_EXCLUDE_EL1;
+>> -	if (!attr->exclude_hv)
+>> -		config_base |= ARMV8_INCLUDE_EL2;
+>> +	if (is_kernel_in_hyp_mode()) {
+>> +		if (!attr->exclude_kernel || !attr->exclude_hv)
+>> +			config_base |= ARMV8_INCLUDE_EL2;
 > 
-> You can have my reviewed-by on all patches that I didn't already review
-> or ack explicitly.
+> is exclude_hv a perf generic construct?
 
-Thanks for the review, much appreciated.
+Yes. It seems to be universally used on all architectures.
 
-> Only exception is the debug stuff where I didn't manage to page in the
-> context, so hopefully familiar with that code can have a look.
+> is it really correct to count everything the host kernel does (even
+> unrelated to running VMs) when counting hypervisor events?
 
-I think this will have to be Mr Deacon.
+With VHE, the roles are blurred, and the PMU can only count events
+occurring when at a given exception level. It has no notion of context.
 
-Thanks again,
+> Other than my ignorance in this area, this patch looks fine to me.
+
+Thanks,
 
 	M.
 -- 
