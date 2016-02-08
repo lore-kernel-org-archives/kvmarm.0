@@ -1,151 +1,82 @@
-From: Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: ARM PCI/MSI KVM passthrough with GICv2M
-Date: Mon, 8 Feb 2016 10:48:26 +0100
-Message-ID: <20160208094826.GA620@cbox>
-References: <1454017899.23148.0.camel@redhat.com> <56AB78B1.2030202@linaro.org>
-	<1454096004.9301.1.camel@redhat.com> <56ABD8E0.6080409@linaro.org>
-	<20160201140351.GE6828@arm.com> <20160203125047.GB13974@cbox>
-	<20160203131057.GA20217@arm.com> <20160203153606.GC13974@cbox>
-	<56B4DC97.60904@linaro.org> <20160205111700.726ac061@t450s.home>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH V1 0/7] Enable ACPI support for ARM KVM GIC
+Date: Mon, 8 Feb 2016 09:59:25 +0000
+Message-ID: <56B866FD.4070104@arm.com>
+References: <1454692054-8984-1-git-send-email-wei@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <20160205111700.726ac061-1yVPhWWZRC1BDLzU/O5InQ@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Cc: eric.auger-qxv4g6HH51o@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, marc.zyngier-5wv7dgnIgG8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1454692054-8984-1-git-send-email-wei@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Wei Huang <wei@redhat.com>, kvmarm@lists.cs.columbia.edu
+Cc: christoffer.dall@linaro.org, kvm@vger.kernel.org, hanjun.guo@linaro.org, fu.wei@linaro.org, drjones@redhat.com, al.stone@linaro.org, Julien Grall <Julien.Grall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Feb 05, 2016 at 11:17:00AM -0700, Alex Williamson wrote:
-> On Fri, 5 Feb 2016 18:32:07 +0100
-> Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
+Wei,
+
+On 05/02/16 17:07, Wei Huang wrote:
+> This patch set enables ACPI support for KVM GIC. Note that the patches
+> are in fact the V3 of previously submitted patches (search "Enable ACPI
+> support for KVM ARM"). But because Fu Wei includes the arch_timer part
+> in his series [1] and I have substantially re-written the GIC code in this
+> revision, the version number is reset to v1. 
 > 
-> > Hi Alex,
-> > 
-> > I tried to sketch a proposal for guaranteeing the IRQ integrity when
-> > doing ARM PCI/MSI passthrough with ARM GICv2M msi-controller. This is
-> > based on extended VFIO group viability control, as detailed below.
-> > 
-> > As opposed to ARM GICv3 ITS, this MSI controller does *not* support IRQ
-> > remapping. It can expose 1 or more 4kB MSI frame. Each frame contains a
-> > single register where the msi data is written.
-> > 
-> > I would be grateful to you if you could tell me whether it makes any sense.
-> > 
-> > Thanks in advance
-> > 
-> > Best Regards
-> > 
-> > Eric
-> > 
-> > 
-> > 1) GICv2m with a single 4kB single frame
-> >    all devices having this msi-controller as msi-parent share this
-> >    single MSI frame. Those devices can work on behalf of the host
-> >    or work on behalf of 1 or more guests (KVM assigned devices). We
-> >    must make sure either the host only or 1 single VM can access to the
-> >    single frame to guarantee interrupt integrity: a device assigned
-> >    to 1 VM should not be able to trigger MSI targeted to the host
-> >    or another VM.
-> > 
-> >    I would propose to extend the VFIO notion of group viability.
-> >    Currently a VFIO group is viable if:
-> >    all devices belonging to the same group are bound to a VFIO driver
-> >    or unbound.
-> > 
-> >    Let's imagine we extend the viability check as follows:
-> > 
-> >    0) keep the current viable check: all the devices belonging to
-> >       the group must be vfio bound or unbound.
-> >    1) retrieve the MSI parent of the device and list all the
-> >       other devices using that MSI controller as MSI-parent (does not
-> >       look straightforward):
-> >    2) they must be VFIO driver bound or unbound as well (meaning
-> >       they are not used by the host). If not, reject device attachment
-> >    - in case they are VFIO bound (a VFIO group is set):
-> >      x if all VFIO containers are the same as the one of the device's
-> >        we try to attach, that's OK. This means the other devices
-> >        use different IOMMU mappings, eventually will target the
-> >        MSI frame but they all work for the same user space client/VM.
-> >      x 1 or more devices has a different container than the device
-> >        under attachment:
-> >        It works on behalf of a different user space client/VM,
-> >        we can't attach the new device. I think there is a case however
-> >        where severals containers can be opened by a single QEMU.
-> > 
-> > Of course the dynamic aspects, ie a new device showing up or an unbind
-> > event bring significant complexity.
-> > 
-> > 2) GICv2M with multiple 4kB frames
-> >    Each msi-frame is enumerated as msi-controller. The device tree
-> >    statically defines which device is attached to each msi frame.
-> >    In case devices are assigned we cannot change this attachment
-> >    anyway since there might be physical contraints behind.
-> >    So devices likely to be assigned to guests should be linked to a
-> >    different MSI frame than devices that are not.
-> > 
-> >    I think extended viability concept can be used as well.
-> > 
-> >    This model still is not ideal: in case we have a SR-IOV device
-> >    plugged onto an host bridge attached to a single MSI parent you won't
-> >    be able anyway to have 1 Virtual Function working for host and 1 VF
-> >    working for a guest. Only Interrupt translation (ITS) will bring that
-> >    feature.
-> > 
-> > 3) GICv3 ITS
-> >    This one supports interrupt translation service ~ Intel
-> >    IRQ remapping.
-> >    This means a single frame can be used by all devices. A deviceID is
-> >    used exclusively by the host or a guest. I assume the ITS driver
-> >    allocates/populates deviceid interrupt translation table featuring
-> >    separate LPI spaces ie by construction different ITT cannot feature
-> >    same LPIs. So no need to do the extended viability test.
-> > 
-> >    The MSI controller should have a property telling whether
-> >    it supports interrupt translation. This kind of property currently
-> >    exists on IOMMU side for INTEL remapping.
-> > 
+> By following Marc's prior comments, the main design idea is to let DT or
+> ACPI code to fill out the "struct vgic_params" which are extended to
+> include all GIC related info.
+
+I think you misread the comments I gave back in June (!), where I said:
+
+<quote>
+[...]
+
+Simply making available a global structure containing the base addresses
+and interrupt should be enough, and could be shared with both DT and
+ACPI. You could start your series by letting both GIC drivers expose
+that information obtained through DT, convert KVM to use this structure,
+and later on let ACPI fill in this structure too.
+
+> Anyway the difficulty is to find a common place to store and share info
+> between other modules & KVM.
+
+Indeed. As a rule of thumb, I want to minimize the amount of gratuitous
+divergence between DT and ACPI. So the sooner we extract the required
+information from whatever firmware we have, the better.
+</quote>
+
 > 
-> Hi Eric,
+> [1] https://lkml.org/lkml/2016/2/1/658
 > 
-> Would anyone be terribly upset if we simply assume the worst case
-> scenario on GICv2m/M, have the IOMMU not claim IOMMU_CAP_INTR_REMAP, and
-> require the user to opt-in via the allow_unsafe_interrupts on the
-> vfio_iommu_type1 module?  That would make it very compatible with what
-> we already do on x86, where it really is all or nothing.  
-
-meaning either you allow unsafe multiplexing with passthrough in every
-flavor (unsafely) or you don't allow it at all?
-
-I didn't know such on option existed, but it seems to me that this fits
-the bill exactly.
-
-
-> My assumption
-> is that GICv2 would be phased out in favor of GICv3, so there's always
-> a hardware upgrade path to having more complete isolation, but the
-> return on investment for figuring out whether a given device really has
-> this sort of isolation seems pretty low.  Often users already have some
-> degree of trust in the VMs they use for device assignment anyway.  An
-> especially prudent user can still look at the hardware specs for their
-> specific system to understand whether any devices are fully isolated
-> and only make use of those for device assignment.  Does that seem like
-> a reasonable alternative?
+> Thanks,
+> -Wei
+> 
+> Wei Huang (7):
+>   KVM: GIC: Move GIC DT probing code to GICv2 and GICv3 files
+>   KVM: GIC: Add extra fields to store GICH and GICV resource info
+>   KVM: GIC: Create a common probe function for GIC
+>   KVM: GICv2: Extract the common code from DT
+>   KVM: GICv2: Add ACPI probing function
+>   KVM: GICv3: Extract the common code from DT
+>   KVM: GICv3: Add ACPI probing function
+> 
+>  include/kvm/arm_vgic.h      |  14 ++--
+>  virt/kvm/arm/vgic-v2-emul.c |   4 +-
+>  virt/kvm/arm/vgic-v2.c      | 186 +++++++++++++++++++++++++++++++++-----------
+>  virt/kvm/arm/vgic-v3.c      | 159 ++++++++++++++++++++++++++++---------
+>  virt/kvm/arm/vgic.c         |  22 +-----
+>  5 files changed, 277 insertions(+), 108 deletions(-)
 > 
 
-It sounds good to me, that would allow us to release a GICv2m-based
-solution for MSI passthrough on currently available hardware like the
-Seattle.
+So when I see this diffstat and the patches that follow, I cannot help
+but think that we do have a disconnect here. You do add a bunch of ACPI
+probing in KVM, to which I've already said no.
+
+I want to see the probing code in the GIC drivers, exported through a
+common structure that KVM can then use. That's it. Nothing else.
 
 Thanks,
--Christoffer
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
