@@ -1,82 +1,105 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH V1 0/7] Enable ACPI support for ARM KVM GIC
-Date: Mon, 8 Feb 2016 09:59:25 +0000
-Message-ID: <56B866FD.4070104@arm.com>
-References: <1454692054-8984-1-git-send-email-wei@redhat.com>
+From: Edward Cragg <edward.cragg@codethink.co.uk>
+Subject: Re: PCIe passthrough support on ARM
+Date: Mon, 8 Feb 2016 11:13:54 +0000
+Message-ID: <20160208111354.GB31029@codethink.co.uk>
+References: <20160204165355.GA10442@codethink.co.uk>
+ <56B38ABA.3090403@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1454692054-8984-1-git-send-email-wei@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Wei Huang <wei@redhat.com>, kvmarm@lists.cs.columbia.edu
-Cc: christoffer.dall@linaro.org, kvm@vger.kernel.org, hanjun.guo@linaro.org, fu.wei@linaro.org, drjones@redhat.com, al.stone@linaro.org, Julien Grall <Julien.Grall@arm.com>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D62F48529
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 06:08:20 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 4LmAAD5o9K5t for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Feb 2016 06:08:15 -0500 (EST)
+Received: from ducie-dc1.codethink.co.uk (ducie-dc1.codethink.co.uk
+ [185.25.241.215])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 434EA41AF6
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 06:08:15 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <56B38ABA.3090403@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Eric Auger <eric.auger@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Wei,
+Hi Eric,
 
-On 05/02/16 17:07, Wei Huang wrote:
-> This patch set enables ACPI support for KVM GIC. Note that the patches
-> are in fact the V3 of previously submitted patches (search "Enable ACPI
-> support for KVM ARM"). But because Fu Wei includes the arch_timer part
-> in his series [1] and I have substantially re-written the GIC code in this
-> revision, the version number is reset to v1. 
+On Thu, Feb 04, 2016 at 06:30:34PM +0100, Eric Auger wrote:
+> Hi Edward,
+> On 02/04/2016 05:53 PM, Edward Cragg wrote:
+> > Hi,
+> > 
+> > I'm involved in planning a project for which there is a requirement for PCIe
+> > passthrough in KVM on ARMv8. We have no hardware to test on at the moment.
+> > 
+> > I understand that virtualisation support for ARM is quite young, and it seems
+> > like support is trickling in at the moment for this sort of thing.
+> > 
+> > Is anyone working on PCIe passthrough on ARM platforms who might be able to
+> > share some insight into what would be required to support this?
+> Yes I am currently working on this topic at the moment and especially on
+> ARM PCIe passthrough with MSI enabled. I did not test PCIe passthrough
+> with legacy INTx (MSI disabled) but this should work already with
+> upstreamed QEMU and kernel.
 > 
-> By following Marc's prior comments, the main design idea is to let DT or
-> ACPI code to fill out the "struct vgic_params" which are extended to
-> include all GIC related info.
-
-I think you misread the comments I gave back in June (!), where I said:
-
-<quote>
-[...]
-
-Simply making available a global structure containing the base addresses
-and interrupt should be enough, and could be shared with both DT and
-ACPI. You could start your series by letting both GIC drivers expose
-that information obtained through DT, convert KVM to use this structure,
-and later on let ACPI fill in this structure too.
-
-> Anyway the difficulty is to find a common place to store and share info
-> between other modules & KVM.
-
-Indeed. As a rule of thumb, I want to minimize the amount of gratuitous
-divergence between DT and ACPI. So the sooner we extract the required
-information from whatever firmware we have, the better.
-</quote>
-
+> With MSI enabled, the code is not upstreamed yet.
 > 
-> [1] https://lkml.org/lkml/2016/2/1/658
+> I have a QEMU series:
 > 
-> Thanks,
-> -Wei
+> [RFC v2 0/8] KVM PCI/MSI passthrough with mach-virt
+> (https://www.mail-archive.com/qemu-devel@nongnu.org/msg349574.html)
 > 
-> Wei Huang (7):
->   KVM: GIC: Move GIC DT probing code to GICv2 and GICv3 files
->   KVM: GIC: Add extra fields to store GICH and GICV resource info
->   KVM: GIC: Create a common probe function for GIC
->   KVM: GICv2: Extract the common code from DT
->   KVM: GICv2: Add ACPI probing function
->   KVM: GICv3: Extract the common code from DT
->   KVM: GICv3: Add ACPI probing function
+> and a kernel series:
+> [PATCH 00/10] KVM PCIe/MSI passthrough on ARM/ARM64"
+>   (https://lkml.org/lkml/2016/1/26/371)
 > 
->  include/kvm/arm_vgic.h      |  14 ++--
->  virt/kvm/arm/vgic-v2-emul.c |   4 +-
->  virt/kvm/arm/vgic-v2.c      | 186 +++++++++++++++++++++++++++++++++-----------
->  virt/kvm/arm/vgic-v3.c      | 159 ++++++++++++++++++++++++++++---------
->  virt/kvm/arm/vgic.c         |  22 +-----
->  5 files changed, 277 insertions(+), 108 deletions(-)
+> This is functional, tested on v8 AMD HW with a GICv2M (single MSI frame).
 > 
+> This is in an early stage, especially on kernel side since lots of
+> issues still need to be addressed, especially handling proper IRQ isolation.
 
-So when I see this diffstat and the patches that follow, I cannot help
-but think that we do have a disconnect here. You do add a bunch of ACPI
-probing in KVM, to which I've already said no.
+Thank you, this is good to know.
 
-I want to see the probing code in the GIC drivers, exported through a
-common structure that KVM can then use. That's it. Nothing else.
+> What kind of MSI controller do you plan to use?
+
+Do you mean the GIC itself? From registers, it appears to be a standard ARM
+GIC, though i'm not sure exactly which one yet. However, it's stated in the
+processor's datasheet that legacy interrupts aren't supported. It's one of the
+newer Samsung Exynos processors.
 
 Thanks,
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Ed
+
+> Hope this helps
+> 
+> Best Regards
+> 
+> Eric
+> 
+> > 
+> > Thanks,
+> > 
+> > Ed
+> > _______________________________________________
+> > kvmarm mailing list
+> > kvmarm@lists.cs.columbia.edu
+> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> > 
+> 
+> _______________________________________________
+> kvmarm mailing list
+> kvmarm@lists.cs.columbia.edu
+> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
