@@ -1,144 +1,90 @@
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [PATCH v3 23/23] arm64: Panic when VHE and non VHE CPUs coexist
-Date: Mon, 8 Feb 2016 16:24:03 +0000
-Message-ID: <20160208162402.GC14146@leverpostej>
-References: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
- <1454522416-6874-24-git-send-email-marc.zyngier@arm.com>
- <20160208160445.GS6076@e104818-lin.cambridge.arm.com>
+From: Wei Huang <wei@redhat.com>
+Subject: Re: [PATCH V1 0/7] Enable ACPI support for ARM KVM GIC
+Date: Mon, 8 Feb 2016 10:35:20 -0600
+Message-ID: <56B8C3C8.2070204@redhat.com>
+References: <1454692054-8984-1-git-send-email-wei@redhat.com>
+ <56B866FD.4070104@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 86C6A49958
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 11:18:49 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DkpRSfPsmx7Z for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Feb 2016 11:18:48 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0F34149954
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 11:18:47 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <20160208160445.GS6076@e104818-lin.cambridge.arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <56B866FD.4070104@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: christoffer.dall@linaro.org, kvm@vger.kernel.org, hanjun.guo@linaro.org, fu.wei@linaro.org, drjones@redhat.com, al.stone@linaro.org, Julien Grall <Julien.Grall@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Feb 08, 2016 at 04:04:46PM +0000, Catalin Marinas wrote:
-> On Wed, Feb 03, 2016 at 06:00:16PM +0000, Marc Zyngier wrote:
-> > Having both VHE and non-VHE capable CPUs in the same system
-> > is likely to be a recipe for disaster.
-> > 
-> > If the boot CPU has VHE, but a secondary is not, we won't be
-> > able to downgrade and run the kernel at EL1. Add CPU hotplug
-> > to the mix, and this produces a terrifying mess.
-> > 
-> > Let's solve the problem once and for all. If you mix VHE and
-> > non-VHE CPUs in the same system, you deserve to loose, and this
-> > patch makes sure you don't get a chance.
-> > 
-> > This is implemented by storing the kernel execution level in
-> > a global variable. Secondaries will park themselves in a
-> > WFI loop if they observe a mismatch. Also, the primary CPU
-> > will detect that the secondary CPU has died on a mismatched
-> > execution level. Panic will follow.
-> > 
-> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> > ---
-> >  arch/arm64/include/asm/virt.h | 17 +++++++++++++++++
-> >  arch/arm64/kernel/head.S      | 20 ++++++++++++++++++++
-> >  arch/arm64/kernel/smp.c       |  3 +++
-> >  3 files changed, 40 insertions(+)
-> > 
-> > diff --git a/arch/arm64/include/asm/virt.h b/arch/arm64/include/asm/virt.h
-> > index 9f22dd6..f81a345 100644
-> > --- a/arch/arm64/include/asm/virt.h
-> > +++ b/arch/arm64/include/asm/virt.h
-> > @@ -36,6 +36,11 @@
-> >   */
-> >  extern u32 __boot_cpu_mode[2];
-> >  
-> > +/*
-> > + * __run_cpu_mode records the mode the boot CPU uses for the kernel.
-> > + */
-> > +extern u32 __run_cpu_mode[2];
-> > +
-> >  void __hyp_set_vectors(phys_addr_t phys_vector_base);
-> >  phys_addr_t __hyp_get_vectors(void);
-> >  
-> > @@ -60,6 +65,18 @@ static inline bool is_kernel_in_hyp_mode(void)
-> >  	return el == CurrentEL_EL2;
-> >  }
-> >  
-> > +static inline bool is_kernel_mode_mismatched(void)
-> > +{
-> > +	/*
-> > +	 * A mismatched CPU will have written its own CurrentEL in
-> > +	 * __run_cpu_mode[1] (initially set to zero) after failing to
-> > +	 * match the value in __run_cpu_mode[0]. Thus, a non-zero
-> > +	 * value in __run_cpu_mode[1] is enough to detect the
-> > +	 * pathological case.
-> > +	 */
-> > +	return !!ACCESS_ONCE(__run_cpu_mode[1]);
-> > +}
-> > +
-> >  /* The section containing the hypervisor text */
-> >  extern char __hyp_text_start[];
-> >  extern char __hyp_text_end[];
-> > diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
-> > index 6f2f377..f9b6a5b 100644
-> > --- a/arch/arm64/kernel/head.S
-> > +++ b/arch/arm64/kernel/head.S
-> > @@ -578,7 +578,24 @@ ENTRY(set_cpu_boot_mode_flag)
-> >  1:	str	w20, [x1]			// This CPU has booted in EL1
-> >  	dmb	sy
-> >  	dc	ivac, x1			// Invalidate potentially stale cache line
-> > +	adr_l	x1, __run_cpu_mode
-> > +	ldr	w0, [x1]
-> > +	mrs	x20, CurrentEL
-> > +	cbz	x0, skip_el_check
-> > +	cmp	x0, x20
-> > +	bne	mismatched_el
-> >  	ret
-> > +skip_el_check:			// Only the first CPU gets to set the rule
-> > +	str	w20, [x1]
-> > +	dmb	sy
-> > +	dc	ivac, x1	// Invalidate potentially stale cache line
-> > +	ret
-> > +mismatched_el:
-> > +	str	w20, [x1, #4]
-> > +	dmb	sy
-> > +	dc	ivac, x1	// Invalidate potentially stale cache line
-> > +1:	wfi
-> > +	b	1b
-> >  ENDPROC(set_cpu_boot_mode_flag)
+
+
+On 2/8/16 03:59, Marc Zyngier wrote:
+> Wei,
 > 
-> Do we need to wait for the D-cache maintenance completion before
-> entering WFI (like issuing a DSB)? Same for the skip_el_check path
-> before the RET.
+> On 05/02/16 17:07, Wei Huang wrote:
+>> This patch set enables ACPI support for KVM GIC. Note that the patches
+>> are in fact the V3 of previously submitted patches (search "Enable ACPI
+>> support for KVM ARM"). But because Fu Wei includes the arch_timer part
+>> in his series [1] and I have substantially re-written the GIC code in this
+>> revision, the version number is reset to v1. 
+>>
+>> By following Marc's prior comments, the main design idea is to let DT or
+>> ACPI code to fill out the "struct vgic_params" which are extended to
+>> include all GIC related info.
+> 
+> I think you misread the comments I gave back in June (!), where I said:
+> 
+> <quote>
+> [...]
+> 
+> Simply making available a global structure containing the base addresses
+> and interrupt should be enough, and could be shared with both DT and
+> ACPI. You could start your series by letting both GIC drivers expose
+> that information obtained through DT, convert KVM to use this structure,
+> and later on let ACPI fill in this structure too.
+> 
+>> Anyway the difficulty is to find a common place to store and share info
+>> between other modules & KVM.
+> 
+> Indeed. As a rule of thumb, I want to minimize the amount of gratuitous
+> divergence between DT and ACPI. So the sooner we extract the required
+> information from whatever firmware we have, the better.
+> </quote>
+> 
+>>
+>> [1] https://lkml.org/lkml/2016/2/1/658
+>>
+>> Thanks,
+>> -Wei
+>>
+>> Wei Huang (7):
+>>   KVM: GIC: Move GIC DT probing code to GICv2 and GICv3 files
+>>   KVM: GIC: Add extra fields to store GICH and GICV resource info
+>>   KVM: GIC: Create a common probe function for GIC
+>>   KVM: GICv2: Extract the common code from DT
+>>   KVM: GICv2: Add ACPI probing function
+>>   KVM: GICv3: Extract the common code from DT
+>>   KVM: GICv3: Add ACPI probing function
+>>
+>>  include/kvm/arm_vgic.h      |  14 ++--
+>>  virt/kvm/arm/vgic-v2-emul.c |   4 +-
+>>  virt/kvm/arm/vgic-v2.c      | 186 +++++++++++++++++++++++++++++++++-----------
+>>  virt/kvm/arm/vgic-v3.c      | 159 ++++++++++++++++++++++++++++---------
+>>  virt/kvm/arm/vgic.c         |  22 +-----
+>>  5 files changed, 277 insertions(+), 108 deletions(-)
+>>
+> 
+> So when I see this diffstat and the patches that follow, I cannot help
+> but think that we do have a disconnect here. You do add a bunch of ACPI
+> probing in KVM, to which I've already said no.
+> 
+> I want to see the probing code in the GIC drivers, exported through a
+> common structure that KVM can then use. That's it. Nothing else.
 
-We would need that to complete the maintenance, yes.
+OK. I will create a V2 based on that idea.
 
-However, given we're going into WFI immediately afterwards, and not
-signalling completion to other CPUs, what we gain is somewhat
-questionable.
+-Wei
 
-Perhaps it's always better to do the maintenance on the read side (for
-consistency with [1]).
-
-Regardless, we'd probably want a DSB to ensure the write had
-completed...
-
-Mark.
-
-[1] http://lists.infradead.org/pipermail/linux-arm-kernel/2016-February/404661.html
+> 
+> Thanks,
+> 
+> 	M.
+> 
