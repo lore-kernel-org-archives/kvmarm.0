@@ -1,23 +1,22 @@
 From: Julien Grall <julien.grall@arm.com>
-Subject: [PATCH 1/5] KVM: arm/arm64: arch_timer: Gather KVM specific
- information in a structure
-Date: Mon,  8 Feb 2016 16:47:25 +0000
-Message-ID: <1454950049-741-2-git-send-email-julien.grall@arm.com>
+Subject: [PATCH 4/5] irqchip/gic-v3: Parse and export virtual GIC information
+Date: Mon,  8 Feb 2016 16:47:28 +0000
+Message-ID: <1454950049-741-5-git-send-email-julien.grall@arm.com>
 References: <1454950049-741-1-git-send-email-julien.grall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 589A549954
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 11:42:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0A9DF498A4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 11:42:33 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5lvlu+zBQjZ1 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Feb 2016 11:42:26 -0500 (EST)
+ with ESMTP id B5W9tLw4RAGe for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Feb 2016 11:42:31 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 43D2149937
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 11:42:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C547A49A12
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 11:42:31 -0500 (EST)
 In-Reply-To: <1454950049-741-1-git-send-email-julien.grall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,116 +28,108 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, Daniel Lezcano <daniel.lezcano@linaro.org>, linux-kernel@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, fu.wei@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org
+Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, fu.wei@linaro.org, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Introduce a structure which are filled up by the arch timer driver and
-used by the virtual timer in KVM.
-
-The first member of this structure will be the timecounter. More members
-will be added later.
-
-This is also dropping arch_timer_get_timecounter as it was only used by
-the KVM code. Furthermore, a stub for the new helper hasn't been
-introduced because KVM is requiring the arch timer for both ARM64 and
-ARM32.
+Fill up the recently introduced gic_kvm_info with the virtual GIC
+information.
 
 Signed-off-by: Julien Grall <julien.grall@arm.com>
 ---
-
-Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
 Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Jason Cooper <jason@lakedaemon.net>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Gleb Natapov <gleb@kernel.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
 
- drivers/clocksource/arm_arch_timer.c |  9 +++++----
- include/clocksource/arm_arch_timer.h | 12 ++++++------
- virt/kvm/arm/arch_timer.c            |  6 +++---
- 3 files changed, 14 insertions(+), 13 deletions(-)
+ drivers/irqchip/irq-gic-v3.c           | 43 ++++++++++++++++++++++++++++++++++
+ include/linux/irqchip/arm-gic-common.h |  1 +
+ 2 files changed, 44 insertions(+)
 
-diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-index c64d543..6eb2c5d 100644
---- a/drivers/clocksource/arm_arch_timer.c
-+++ b/drivers/clocksource/arm_arch_timer.c
-@@ -447,11 +447,11 @@ static struct cyclecounter cyclecounter = {
- 	.mask	= CLOCKSOURCE_MASK(56),
+diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+index d7be6dd..35f11ce 100644
+--- a/drivers/irqchip/irq-gic-v3.c
++++ b/drivers/irqchip/irq-gic-v3.c
+@@ -26,6 +26,7 @@
+ #include <linux/slab.h>
+ 
+ #include <linux/irqchip.h>
++#include <linux/irqchip/arm-gic-common.h>
+ #include <linux/irqchip/arm-gic-v3.h>
+ 
+ #include <asm/cputype.h>
+@@ -53,6 +54,8 @@ struct gic_chip_data {
+ static struct gic_chip_data gic_data __read_mostly;
+ static struct static_key supports_deactivate = STATIC_KEY_INIT_TRUE;
+ 
++static struct gic_kvm_info gic_v3_kvm_info;
++
+ #define gic_data_rdist()		(this_cpu_ptr(gic_data.rdists.rdist))
+ #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+ #define gic_data_rdist_sgi_base()	(gic_data_rdist_rd_base() + SZ_64K)
+@@ -811,6 +814,44 @@ static void gicv3_enable_quirks(void)
+ #endif
+ }
+ 
++static void __init gic_of_setup_kvm_info(struct device_node *node)
++{
++	int ret;
++	struct resource r;
++	u32 gicv_idx;
++	unsigned int irq;
++
++	gic_v3_kvm_info.type = GIC_V3;
++
++	irq = irq_of_parse_and_map(node, 0);
++	if (!irq)
++		gic_v3_kvm_info.maint_irq = -1;
++	else
++		gic_v3_kvm_info.maint_irq = irq;
++
++	if (of_property_read_u32(node, "#redistributor-regions",
++				 &gicv_idx))
++		gicv_idx = 1;
++
++	gicv_idx += 3;	/* Also skip GICD, GICC, GICH */
++	ret = of_address_to_resource(node, gicv_idx, &r);
++	if (!ret) {
++		if (!PAGE_ALIGNED(r.start))
++			pr_warn("GICV physical address 0x%llx not page aligned\n",
++				(unsigned long long)r.start);
++		else if (!PAGE_ALIGNED(resource_size(&r)))
++			pr_warn("GICV size 0x%llx not a multiple of page size 0x%lx\n",
++				(unsigned long long)resource_size(&r),
++				PAGE_SIZE);
++		else {
++			gic_v3_kvm_info.vcpu_base = r.start;
++			gic_v3_kvm_info.vcpu_size = resource_size(&r);
++		}
++	}
++
++	gic_set_kvm_info(&gic_v3_kvm_info);
++}
++
+ static int __init gic_of_init(struct device_node *node, struct device_node *parent)
+ {
+ 	void __iomem *dist_base;
+@@ -908,6 +949,8 @@ static int __init gic_of_init(struct device_node *node, struct device_node *pare
+ 	gic_cpu_init();
+ 	gic_cpu_pm_init();
+ 
++	gic_of_setup_kvm_info(node);
++
+ 	return 0;
+ 
+ out_free:
+diff --git a/include/linux/irqchip/arm-gic-common.h b/include/linux/irqchip/arm-gic-common.h
+index 30972b1..bfb10d0 100644
+--- a/include/linux/irqchip/arm-gic-common.h
++++ b/include/linux/irqchip/arm-gic-common.h
+@@ -14,6 +14,7 @@
+ 
+ enum gic_type {
+ 	GIC_V2,
++	GIC_V3,
  };
  
--static struct timecounter timecounter;
-+static struct arch_timer_kvm_info arch_timer_kvm_info;
- 
--struct timecounter *arch_timer_get_timecounter(void)
-+struct arch_timer_kvm_info *arch_timer_get_kvm_info(void)
- {
--	return &timecounter;
-+	return &arch_timer_kvm_info;
- }
- 
- static void __init arch_counter_register(unsigned type)
-@@ -479,7 +479,8 @@ static void __init arch_counter_register(unsigned type)
- 	clocksource_register_hz(&clocksource_counter, arch_timer_rate);
- 	cyclecounter.mult = clocksource_counter.mult;
- 	cyclecounter.shift = clocksource_counter.shift;
--	timecounter_init(&timecounter, &cyclecounter, start_count);
-+	timecounter_init(&arch_timer_kvm_info.timecounter,
-+			 &cyclecounter, start_count);
- 
- 	/* 56 bits minimum, so we assume worst case rollover */
- 	sched_clock_register(arch_timer_read_counter, 56, arch_timer_rate);
-diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
-index 25d0914..4d487f8 100644
---- a/include/clocksource/arm_arch_timer.h
-+++ b/include/clocksource/arm_arch_timer.h
-@@ -49,11 +49,16 @@ enum arch_timer_reg {
- 
- #define ARCH_TIMER_EVT_STREAM_FREQ	10000	/* 100us */
- 
-+struct arch_timer_kvm_info {
-+	struct timecounter timecounter;
-+};
-+
- #ifdef CONFIG_ARM_ARCH_TIMER
- 
- extern u32 arch_timer_get_rate(void);
- extern u64 (*arch_timer_read_counter)(void);
--extern struct timecounter *arch_timer_get_timecounter(void);
-+
-+extern struct arch_timer_kvm_info *arch_timer_get_kvm_info(void);
- 
- #else
- 
-@@ -67,11 +72,6 @@ static inline u64 arch_timer_read_counter(void)
- 	return 0;
- }
- 
--static inline struct timecounter *arch_timer_get_timecounter(void)
--{
--	return NULL;
--}
--
- #endif
- 
- #endif
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index 69bca18..a669c6a 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -385,11 +385,11 @@ int kvm_timer_hyp_init(void)
- {
- 	struct device_node *np;
- 	unsigned int ppi;
-+	struct arch_timer_kvm_info *info;
- 	int err;
- 
--	timecounter = arch_timer_get_timecounter();
--	if (!timecounter)
--		return -ENODEV;
-+	info = arch_timer_get_kvm_info();
-+	timecounter = &info->timecounter;
- 
- 	np = of_find_matching_node(NULL, arch_timer_of_match);
- 	if (!np) {
+ struct gic_kvm_info {
 -- 
 1.9.1
