@@ -1,82 +1,76 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH v3 21/23] arm64: hw_breakpoint: Allow EL2 breakpoints if
- running in HYP
-Date: Mon, 8 Feb 2016 16:52:15 +0000
-Message-ID: <20160208165214.GV6076@e104818-lin.cambridge.arm.com>
-References: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
- <1454522416-6874-22-git-send-email-marc.zyngier@arm.com>
- <20160208155625.GQ6076@e104818-lin.cambridge.arm.com>
- <56B8C638.2010402@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH V1 0/7] Enable ACPI support for ARM KVM GIC
+Date: Mon, 8 Feb 2016 16:56:49 +0000
+Message-ID: <56B8C8D1.60707@arm.com>
+References: <1454692054-8984-1-git-send-email-wei@redhat.com>
+ <56B866FD.4070104@arm.com> <56B8C4D2.3070702@arm.com>
+ <56B8C684.6060501@redhat.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <56B8C638.2010402@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, Christoffer Dall <christoffer.dall@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <56B8C684.6060501@redhat.com>
+Sender: kvm-owner@vger.kernel.org
+To: Wei Huang <wei@redhat.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: christoffer.dall@linaro.org, kvm@vger.kernel.org, hanjun.guo@linaro.org, fu.wei@linaro.org, drjones@redhat.com, al.stone@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Feb 08, 2016 at 04:45:44PM +0000, Marc Zyngier wrote:
-> I was being overzealous, and your solution is clearly better. I ended up with the following:
+On 08/02/16 16:47, Wei Huang wrote:
 > 
-> diff --git a/arch/arm64/include/asm/hw_breakpoint.h b/arch/arm64/include/asm/hw_breakpoint.h
-> index 9732908..c872b2f 100644
-> --- a/arch/arm64/include/asm/hw_breakpoint.h
-> +++ b/arch/arm64/include/asm/hw_breakpoint.h
-[...]
-> @@ -62,6 +45,7 @@ static inline void decode_ctrl_reg(u32 reg,
->  #define AARCH64_ESR_ACCESS_MASK	(1 << 6)
->  
->  /* Privilege Levels */
-> +#define AARCH64_BREAKPOINT_EL2	0
->  #define AARCH64_BREAKPOINT_EL1	1
->  #define AARCH64_BREAKPOINT_EL0	2
->  
-> @@ -76,6 +60,35 @@ static inline void decode_ctrl_reg(u32 reg,
->  #define ARM_KERNEL_STEP_ACTIVE	1
->  #define ARM_KERNEL_STEP_SUSPEND	2
->  
-> +#define DBG_HMC_HYP		(1 << 13)
-> +#define DBG_SSC_HYP		(3 << 14)
-> +
-> +static inline u32 encode_ctrl_reg(struct arch_hw_breakpoint_ctrl ctrl)
-> +{
-> +	u32 val = (ctrl.len << 5) | (ctrl.type << 3) | ctrl.enabled;
-> +
-> +	if (is_kernel_in_hyp_mode() && ctrl.privilege == AARCH64_BREAKPOINT_EL1)
-> +		val |= DBG_HMC_HYP | DBG_SSC_HYP;
-
-Nitpick, for completeness:
-
-		val |= DBG_HMC_HYP | DBG_SSC_HYP | (AARCH64_BREAKPOINT_EL2 << 1);
-
-> +	else
-> +		val |= ctrl.privilege << 1;
-> +
-> +	return val;
-> +}
-> +
-> +static inline void decode_ctrl_reg(u32 reg,
-> +				   struct arch_hw_breakpoint_ctrl *ctrl)
-> +{
-> +	ctrl->enabled	= reg & 0x1;
-> +	reg >>= 1;
-> +	ctrl->privilege	= reg & 0x3;
-> +	if (ctrl->privilege == AARCH64_BREAKPOINT_EL2)
-> +		ctrl->privilege	= AARCH64_BREAKPOINT_EL1;
-> +	reg >>= 2;
-> +	ctrl->type	= reg & 0x3;
-> +	reg >>= 2;
-> +	ctrl->len	= reg & 0xff;
-> +}
-> +
->  /*
->   * Limits.
->   * Changing these will require modifications to the register accessors.
 > 
-> Was that what you had in mind?
+> On 2/8/16 10:39, Julien Grall wrote:
+>> Hi,
+>>
+>> On 08/02/16 09:59, Marc Zyngier wrote:
+>>> On 05/02/16 17:07, Wei Huang wrote:
+>>>> Wei Huang (7):
+>>>>    KVM: GIC: Move GIC DT probing code to GICv2 and GICv3 files
+>>>>    KVM: GIC: Add extra fields to store GICH and GICV resource info
+>>>>    KVM: GIC: Create a common probe function for GIC
+>>>>    KVM: GICv2: Extract the common code from DT
+>>>>    KVM: GICv2: Add ACPI probing function
+>>>>    KVM: GICv3: Extract the common code from DT
+>>>>    KVM: GICv3: Add ACPI probing function
+>>>>
+>>>>   include/kvm/arm_vgic.h      |  14 ++--
+>>>>   virt/kvm/arm/vgic-v2-emul.c |   4 +-
+>>>>   virt/kvm/arm/vgic-v2.c      | 186
+>>>> +++++++++++++++++++++++++++++++++-----------
+>>>>   virt/kvm/arm/vgic-v3.c      | 159
+>>>> ++++++++++++++++++++++++++++---------
+>>>>   virt/kvm/arm/vgic.c         |  22 +-----
+>>>>   5 files changed, 277 insertions(+), 108 deletions(-)
+>>>>
+>>>
+>>> So when I see this diffstat and the patches that follow, I cannot help
+>>> but think that we do have a disconnect here. You do add a bunch of ACPI
+>>> probing in KVM, to which I've already said no.
+>>>
+>>> I want to see the probing code in the GIC drivers, exported through a
+>>> common structure that KVM can then use. That's it. Nothing else.
+>>
+>> I've been working on a patch series which rely on the GIC and arch timer
+>> drivers to get the necessary information to initialize the different KVM
+>> components (vGIC + vtimer).
+>>
+>> I think this achieves the goal you have in mind. I will post the series
+>> in a few minutes.
+>>
+> 
+> Julien,
+> 
+> Regarding arch_timer, there is an effort going on by Linaro. It has
+> impact on KVM arch_timer init. See https://lkml.org/lkml/2016/2/1/658.
 
-Looks fine:
+The KVM changes in this series are slightly pointless, and should be
+addressed the same way the GIC should be addressed:
 
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+- Collect the information in the low-level code
+- Expose it through a common infrastructure.
+
+If you have different code paths for ACPI and DT outside of the core
+probing code, then you are doing it wrong. ACPI is not "different".
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
