@@ -1,92 +1,79 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 3/8] ARM: KVM: Enforce sorting of all CP tables
-Date: Mon,  8 Feb 2016 11:40:17 +0000
-Message-ID: <1454931622-14902-4-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 4/8] ARM: KVM: Rename struct coproc_reg::is_64 to is_64bit
+Date: Mon,  8 Feb 2016 11:40:18 +0000
+Message-ID: <1454931622-14902-5-git-send-email-marc.zyngier@arm.com>
 References: <1454931622-14902-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F8BD41390
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 06:34:47 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X5bWinGVoEG8 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Feb 2016 06:34:46 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 35AB748531
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 06:34:46 -0500 (EST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1454931622-14902-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Since we're obviously terrible at sorting the CP tables, make sure
-we're going to do it properly (or fail to boot). arm64 has had the
-same mechanism for a while, and nobody ever broke it...
+As we're going to play some tricks on the struct coproc_reg,
+make sure its 64bit indicator field matches that of coproc_params.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/coproc.c | 25 +++++++++++++++++--------
- 1 file changed, 17 insertions(+), 8 deletions(-)
+ arch/arm/kvm/coproc.c | 4 ++--
+ arch/arm/kvm/coproc.h | 8 ++++----
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-index 16c74f8..03f5d14 100644
+index 03f5d14..2a67f00 100644
 --- a/arch/arm/kvm/coproc.c
 +++ b/arch/arm/kvm/coproc.c
-@@ -381,17 +381,26 @@ static const struct coproc_reg cp15_regs[] = {
- 	{ CRn(15), CRm( 0), Op1( 4), Op2( 0), is32, access_cbar},
- };
+@@ -423,7 +423,7 @@ static const struct coproc_reg *find_reg(const struct coproc_params *params,
+ 	for (i = 0; i < num; i++) {
+ 		const struct coproc_reg *r = &table[i];
  
-+static int check_reg_table(const struct coproc_reg *table, unsigned int n)
-+{
-+	unsigned int i;
-+
-+	for (i = 1; i < n; i++) {
-+		if (cmp_reg(&table[i-1], &table[i]) >= 0) {
-+			kvm_err("reg table %p out of order (%d)\n", table, i - 1);
-+			return 1;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- /* Target specific emulation tables */
- static struct kvm_coproc_target_table *target_tables[KVM_ARM_NUM_TARGETS];
- 
- void kvm_register_target_coproc_table(struct kvm_coproc_target_table *table)
+-		if (params->is_64bit != r->is_64)
++		if (params->is_64bit != r->is_64bit)
+ 			continue;
+ 		if (params->CRn != r->CRn)
+ 			continue;
+@@ -1105,7 +1105,7 @@ static int write_demux_regids(u64 __user *uindices)
+ static u64 cp15_to_index(const struct coproc_reg *reg)
  {
--	unsigned int i;
--
--	for (i = 1; i < table->num; i++)
--		BUG_ON(cmp_reg(&table->table[i-1],
--			       &table->table[i]) >= 0);
--
-+	BUG_ON(check_reg_table(table->table, table->num));
- 	target_tables[table->target] = table;
+ 	u64 val = KVM_REG_ARM | (15 << KVM_REG_ARM_COPROC_SHIFT);
+-	if (reg->is_64) {
++	if (reg->is_64bit) {
+ 		val |= KVM_REG_SIZE_U64;
+ 		val |= (reg->Op1 << KVM_REG_ARM_OPC1_SHIFT);
+ 		/*
+diff --git a/arch/arm/kvm/coproc.h b/arch/arm/kvm/coproc.h
+index 88d24a3..5acd097 100644
+--- a/arch/arm/kvm/coproc.h
++++ b/arch/arm/kvm/coproc.h
+@@ -37,7 +37,7 @@ struct coproc_reg {
+ 	unsigned long Op1;
+ 	unsigned long Op2;
+ 
+-	bool is_64;
++	bool is_64bit;
+ 
+ 	/* Trapped access from guest, if non-NULL. */
+ 	bool (*access)(struct kvm_vcpu *,
+@@ -141,7 +141,7 @@ static inline int cmp_reg(const struct coproc_reg *i1,
+ 		return i1->Op1 - i2->Op1;
+ 	if (i1->Op2 != i2->Op2)
+ 		return i1->Op2 - i2->Op2;
+-	return i2->is_64 - i1->is_64;
++	return i2->is_64bit - i1->is_64bit;
  }
  
-@@ -1210,8 +1219,8 @@ void kvm_coproc_table_init(void)
- 	unsigned int i;
  
- 	/* Make sure tables are unique and in order. */
--	for (i = 1; i < ARRAY_SIZE(cp15_regs); i++)
--		BUG_ON(cmp_reg(&cp15_regs[i-1], &cp15_regs[i]) >= 0);
-+	BUG_ON(check_reg_table(cp15_regs, ARRAY_SIZE(cp15_regs)));
-+	BUG_ON(check_reg_table(invariant_cp15, ARRAY_SIZE(invariant_cp15)));
+@@ -150,8 +150,8 @@ static inline int cmp_reg(const struct coproc_reg *i1,
+ #define CRm64(_x)       .CRn = _x, .CRm = 0
+ #define Op1(_x) 	.Op1 = _x
+ #define Op2(_x) 	.Op2 = _x
+-#define is64		.is_64 = true
+-#define is32		.is_64 = false
++#define is64		.is_64bit = true
++#define is32		.is_64bit = false
  
- 	/* We abuse the reset function to overwrite the table itself. */
- 	for (i = 0; i < ARRAY_SIZE(invariant_cp15); i++)
+ bool access_vm_reg(struct kvm_vcpu *vcpu,
+ 		   const struct coproc_params *p,
 -- 
 2.1.4
+
