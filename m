@@ -1,76 +1,55 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH V1 0/7] Enable ACPI support for ARM KVM GIC
-Date: Mon, 8 Feb 2016 16:56:49 +0000
-Message-ID: <56B8C8D1.60707@arm.com>
-References: <1454692054-8984-1-git-send-email-wei@redhat.com>
- <56B866FD.4070104@arm.com> <56B8C4D2.3070702@arm.com>
- <56B8C684.6060501@redhat.com>
+From: Edward Cragg <edward.cragg@codethink.co.uk>
+Subject: Re: PCIe passthrough support on ARM
+Date: Mon, 8 Feb 2016 17:01:58 +0000
+Message-ID: <20160208170158.GD31029@codethink.co.uk>
+References: <20160204165355.GA10442@codethink.co.uk>
+ <56B38ABA.3090403@linaro.org>
+ <20160208111354.GB31029@codethink.co.uk>
+ <56B89082.5010804@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <56B8C684.6060501@redhat.com>
-Sender: kvm-owner@vger.kernel.org
-To: Wei Huang <wei@redhat.com>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: christoffer.dall@linaro.org, kvm@vger.kernel.org, hanjun.guo@linaro.org, fu.wei@linaro.org, drjones@redhat.com, al.stone@linaro.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7292A4998E
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 11:56:21 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id BgAiW1wi0HsT for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Feb 2016 11:56:20 -0500 (EST)
+Received: from ducie-dc1.codethink.co.uk (ducie-dc1.codethink.co.uk
+ [185.25.241.215])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6162D4995C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 11:56:19 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <56B89082.5010804@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Eric Auger <eric.auger@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/02/16 16:47, Wei Huang wrote:
-> 
-> 
-> On 2/8/16 10:39, Julien Grall wrote:
->> Hi,
->>
->> On 08/02/16 09:59, Marc Zyngier wrote:
->>> On 05/02/16 17:07, Wei Huang wrote:
->>>> Wei Huang (7):
->>>>    KVM: GIC: Move GIC DT probing code to GICv2 and GICv3 files
->>>>    KVM: GIC: Add extra fields to store GICH and GICV resource info
->>>>    KVM: GIC: Create a common probe function for GIC
->>>>    KVM: GICv2: Extract the common code from DT
->>>>    KVM: GICv2: Add ACPI probing function
->>>>    KVM: GICv3: Extract the common code from DT
->>>>    KVM: GICv3: Add ACPI probing function
->>>>
->>>>   include/kvm/arm_vgic.h      |  14 ++--
->>>>   virt/kvm/arm/vgic-v2-emul.c |   4 +-
->>>>   virt/kvm/arm/vgic-v2.c      | 186
->>>> +++++++++++++++++++++++++++++++++-----------
->>>>   virt/kvm/arm/vgic-v3.c      | 159
->>>> ++++++++++++++++++++++++++++---------
->>>>   virt/kvm/arm/vgic.c         |  22 +-----
->>>>   5 files changed, 277 insertions(+), 108 deletions(-)
->>>>
->>>
->>> So when I see this diffstat and the patches that follow, I cannot help
->>> but think that we do have a disconnect here. You do add a bunch of ACPI
->>> probing in KVM, to which I've already said no.
->>>
->>> I want to see the probing code in the GIC drivers, exported through a
->>> common structure that KVM can then use. That's it. Nothing else.
->>
->> I've been working on a patch series which rely on the GIC and arch timer
->> drivers to get the necessary information to initialize the different KVM
->> components (vGIC + vtimer).
->>
->> I think this achieves the goal you have in mind. I will post the series
->> in a few minutes.
->>
-> 
-> Julien,
-> 
-> Regarding arch_timer, there is an effort going on by Linaro. It has
-> impact on KVM arch_timer init. See https://lkml.org/lkml/2016/2/1/658.
+On Mon, Feb 08, 2016 at 01:56:34PM +0100, Eric Auger wrote:
+> > Do you mean the GIC itself? From registers, it appears to be a standard ARM
+> > GIC, though i'm not sure exactly which one yet. However, it's stated in the
+> > processor's datasheet that legacy interrupts aren't supported. It's one of the
+> > newer Samsung Exynos processors.
+> I meant GICv2m (featuring single or multiple MSI frames) or GICv3 ITS or
+> any other proprietary interrupt controller IP supporting MSIs.
 
-The KVM changes in this series are slightly pointless, and should be
-addressed the same way the GIC should be addressed:
+>From the manual, it seems from the reset values for the identification
+registers that it is most likely a GICv2.
 
-- Collect the information in the low-level code
-- Expose it through a common infrastructure.
+If we continue with this project, and once we get access to hardware, we'd be
+very interested in helping you with testing this.
 
-If you have different code paths for ACPI and DT outside of the core
-probing code, then you are doing it wrong. ACPI is not "different".
+Thanks,
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Ed
