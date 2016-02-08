@@ -1,113 +1,174 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: PCIe passthrough support on ARM
-Date: Mon, 8 Feb 2016 13:56:34 +0100
-Message-ID: <56B89082.5010804@linaro.org>
-References: <20160204165355.GA10442@codethink.co.uk>
- <56B38ABA.3090403@linaro.org> <20160208111354.GB31029@codethink.co.uk>
+From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: ARM PCI/MSI KVM passthrough with GICv2M
+Date: Mon, 8 Feb 2016 14:27:41 +0100
+Message-ID: <56B897CD.1000402@linaro.org>
+References: <1454017899.23148.0.camel@redhat.com>
+	<56AB78B1.2030202@linaro.org> <1454096004.9301.1.camel@redhat.com>
+	<56ABD8E0.6080409@linaro.org> <20160201140351.GE6828@arm.com>
+	<20160203125047.GB13974@cbox> <20160203131057.GA20217@arm.com>
+	<20160203153606.GC13974@cbox> <56B4DC97.60904@linaro.org>
+	<20160205111700.726ac061@t450s.home> <20160208094826.GA620@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A6B87498A2
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 07:51:16 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IxTTbWkCbdeI for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Feb 2016 07:51:15 -0500 (EST)
-Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D63949899
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 07:51:15 -0500 (EST)
-Received: by mail-wm0-f50.google.com with SMTP id c200so14217979wme.0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 08 Feb 2016 04:56:59 -0800 (PST)
-In-Reply-To: <20160208111354.GB31029@codethink.co.uk>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Edward Cragg <edward.cragg@codethink.co.uk>
-Cc: kvmarm@lists.cs.columbia.edu
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20160208094826.GA620@cbox>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Christoffer Dall <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: eric.auger-qxv4g6HH51o@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, Will Deacon <will.deacon-5wv7dgnIgG8@public.gmane.org>, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Edward,
-On 02/08/2016 12:13 PM, Edward Cragg wrote:
-> Hi Eric,
-> 
-> On Thu, Feb 04, 2016 at 06:30:34PM +0100, Eric Auger wrote:
->> Hi Edward,
->> On 02/04/2016 05:53 PM, Edward Cragg wrote:
->>> Hi,
+Hi Alex, Christoffer,
+On 02/08/2016 10:48 AM, Christoffer Dall wrote:
+> On Fri, Feb 05, 2016 at 11:17:00AM -0700, Alex Williamson wrote:
+>> On Fri, 5 Feb 2016 18:32:07 +0100
+>> Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
+>>
+>>> Hi Alex,
 >>>
->>> I'm involved in planning a project for which there is a requirement for PCIe
->>> passthrough in KVM on ARMv8. We have no hardware to test on at the moment.
+>>> I tried to sketch a proposal for guaranteeing the IRQ integrity when
+>>> doing ARM PCI/MSI passthrough with ARM GICv2M msi-controller. This is
+>>> based on extended VFIO group viability control, as detailed below.
 >>>
->>> I understand that virtualisation support for ARM is quite young, and it seems
->>> like support is trickling in at the moment for this sort of thing.
+>>> As opposed to ARM GICv3 ITS, this MSI controller does *not* support IRQ
+>>> remapping. It can expose 1 or more 4kB MSI frame. Each frame contains a
+>>> single register where the msi data is written.
 >>>
->>> Is anyone working on PCIe passthrough on ARM platforms who might be able to
->>> share some insight into what would be required to support this?
->> Yes I am currently working on this topic at the moment and especially on
->> ARM PCIe passthrough with MSI enabled. I did not test PCIe passthrough
->> with legacy INTx (MSI disabled) but this should work already with
->> upstreamed QEMU and kernel.
+>>> I would be grateful to you if you could tell me whether it makes any sense.
+>>>
+>>> Thanks in advance
+>>>
+>>> Best Regards
+>>>
+>>> Eric
+>>>
+>>>
+>>> 1) GICv2m with a single 4kB single frame
+>>>    all devices having this msi-controller as msi-parent share this
+>>>    single MSI frame. Those devices can work on behalf of the host
+>>>    or work on behalf of 1 or more guests (KVM assigned devices). We
+>>>    must make sure either the host only or 1 single VM can access to the
+>>>    single frame to guarantee interrupt integrity: a device assigned
+>>>    to 1 VM should not be able to trigger MSI targeted to the host
+>>>    or another VM.
+>>>
+>>>    I would propose to extend the VFIO notion of group viability.
+>>>    Currently a VFIO group is viable if:
+>>>    all devices belonging to the same group are bound to a VFIO driver
+>>>    or unbound.
+>>>
+>>>    Let's imagine we extend the viability check as follows:
+>>>
+>>>    0) keep the current viable check: all the devices belonging to
+>>>       the group must be vfio bound or unbound.
+>>>    1) retrieve the MSI parent of the device and list all the
+>>>       other devices using that MSI controller as MSI-parent (does not
+>>>       look straightforward):
+>>>    2) they must be VFIO driver bound or unbound as well (meaning
+>>>       they are not used by the host). If not, reject device attachment
+>>>    - in case they are VFIO bound (a VFIO group is set):
+>>>      x if all VFIO containers are the same as the one of the device's
+>>>        we try to attach, that's OK. This means the other devices
+>>>        use different IOMMU mappings, eventually will target the
+>>>        MSI frame but they all work for the same user space client/VM.
+>>>      x 1 or more devices has a different container than the device
+>>>        under attachment:
+>>>        It works on behalf of a different user space client/VM,
+>>>        we can't attach the new device. I think there is a case however
+>>>        where severals containers can be opened by a single QEMU.
+>>>
+>>> Of course the dynamic aspects, ie a new device showing up or an unbind
+>>> event bring significant complexity.
+>>>
+>>> 2) GICv2M with multiple 4kB frames
+>>>    Each msi-frame is enumerated as msi-controller. The device tree
+>>>    statically defines which device is attached to each msi frame.
+>>>    In case devices are assigned we cannot change this attachment
+>>>    anyway since there might be physical contraints behind.
+>>>    So devices likely to be assigned to guests should be linked to a
+>>>    different MSI frame than devices that are not.
+>>>
+>>>    I think extended viability concept can be used as well.
+>>>
+>>>    This model still is not ideal: in case we have a SR-IOV device
+>>>    plugged onto an host bridge attached to a single MSI parent you won't
+>>>    be able anyway to have 1 Virtual Function working for host and 1 VF
+>>>    working for a guest. Only Interrupt translation (ITS) will bring that
+>>>    feature.
+>>>
+>>> 3) GICv3 ITS
+>>>    This one supports interrupt translation service ~ Intel
+>>>    IRQ remapping.
+>>>    This means a single frame can be used by all devices. A deviceID is
+>>>    used exclusively by the host or a guest. I assume the ITS driver
+>>>    allocates/populates deviceid interrupt translation table featuring
+>>>    separate LPI spaces ie by construction different ITT cannot feature
+>>>    same LPIs. So no need to do the extended viability test.
+>>>
+>>>    The MSI controller should have a property telling whether
+>>>    it supports interrupt translation. This kind of property currently
+>>>    exists on IOMMU side for INTEL remapping.
+>>>
 >>
->> With MSI enabled, the code is not upstreamed yet.
+>> Hi Eric,
 >>
->> I have a QEMU series:
->>
->> [RFC v2 0/8] KVM PCI/MSI passthrough with mach-virt
->> (https://www.mail-archive.com/qemu-devel@nongnu.org/msg349574.html)
->>
->> and a kernel series:
->> [PATCH 00/10] KVM PCIe/MSI passthrough on ARM/ARM64"
->>   (https://lkml.org/lkml/2016/1/26/371)
->>
->> This is functional, tested on v8 AMD HW with a GICv2M (single MSI frame).
->>
->> This is in an early stage, especially on kernel side since lots of
->> issues still need to be addressed, especially handling proper IRQ isolation.
+>> Would anyone be terribly upset if we simply assume the worst case
+>> scenario on GICv2m/M, have the IOMMU not claim IOMMU_CAP_INTR_REMAP, and
+>> require the user to opt-in via the allow_unsafe_interrupts on the
+>> vfio_iommu_type1 module?  That would make it very compatible with what
+>> we already do on x86, where it really is all or nothing.  
 > 
-> Thank you, this is good to know.
+> meaning either you allow unsafe multiplexing with passthrough in every
+> flavor (unsafely) or you don't allow it at all?
+that's my understanding. if the iommu does not expose
+IOMMU_CAP_INTR_REMAP, the end-user must explicitly turn
+allow_unsafe_interrupts on. On ARM we will have the handle the fact the
+interrupt translation is handled on interrupt controller side and not on
+iommu side though;
+>
+> I didn't know such on option existed, but it seems to me that this fits
+> the bill exactly.
+well I think the support of multiple GICv2m MSI frames was devised to
+allow safe interrupts but extending the VFIO viability notion as
+described above effectively seems a huge work with small benefits since
+we don't have much HW featuring multiple frames I am afraid. So I think
+it is a good compromise to have a minimal integration with GICv2m and
+full feature with best fitted HW, ie. GICv3 ITS.
 > 
->> What kind of MSI controller do you plan to use?
 > 
-> Do you mean the GIC itself? From registers, it appears to be a standard ARM
-> GIC, though i'm not sure exactly which one yet. However, it's stated in the
-> processor's datasheet that legacy interrupts aren't supported. It's one of the
-> newer Samsung Exynos processors.
-I meant GICv2m (featuring single or multiple MSI frames) or GICv3 ITS or
-any other proprietary interrupt controller IP supporting MSIs.
+>> My assumption
+>> is that GICv2 would be phased out in favor of GICv3, so there's always
+>> a hardware upgrade path to having more complete isolation, but the
+>> return on investment for figuring out whether a given device really has
+>> this sort of isolation seems pretty low.  Often users already have some
+>> degree of trust in the VMs they use for device assignment anyway.  An
+>> especially prudent user can still look at the hardware specs for their
+>> specific system to understand whether any devices are fully isolated
+>> and only make use of those for device assignment.  Does that seem like
+>> a reasonable alternative?
+>>
+> 
+> It sounds good to me, that would allow us to release a GICv2m-based
+> solution for MSI passthrough on currently available hardware like the
+> Seattle.
+
+Sounds good to me too. I am going to respin the kernel series according
+to this discussion and previous comments.
+
+Thanks for your comments!
 
 Best Regards
 
 Eric
 > 
 > Thanks,
+> -Christoffer
 > 
-> Ed
-> 
->> Hope this helps
->>
->> Best Regards
->>
->> Eric
->>
->>>
->>> Thanks,
->>>
->>> Ed
->>> _______________________________________________
->>> kvmarm mailing list
->>> kvmarm@lists.cs.columbia.edu
->>> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
->>>
->>
->> _______________________________________________
->> kvmarm mailing list
->> kvmarm@lists.cs.columbia.edu
->> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
