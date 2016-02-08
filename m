@@ -1,26 +1,23 @@
-From: Edward Cragg <edward.cragg@codethink.co.uk>
-Subject: Re: PCIe passthrough support on ARM
-Date: Mon, 8 Feb 2016 11:13:54 +0000
-Message-ID: <20160208111354.GB31029@codethink.co.uk>
-References: <20160204165355.GA10442@codethink.co.uk>
- <56B38ABA.3090403@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH 3/8] ARM: KVM: Enforce sorting of all CP tables
+Date: Mon,  8 Feb 2016 11:40:17 +0000
+Message-ID: <1454931622-14902-4-git-send-email-marc.zyngier@arm.com>
+References: <1454931622-14902-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D62F48529
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 06:08:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F8BD41390
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 06:34:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4LmAAD5o9K5t for <kvmarm@lists.cs.columbia.edu>;
- Mon,  8 Feb 2016 06:08:15 -0500 (EST)
-Received: from ducie-dc1.codethink.co.uk (ducie-dc1.codethink.co.uk
- [185.25.241.215])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 434EA41AF6
- for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 06:08:15 -0500 (EST)
-Content-Disposition: inline
-In-Reply-To: <56B38ABA.3090403@linaro.org>
+ with ESMTP id X5bWinGVoEG8 for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  8 Feb 2016 06:34:46 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 35AB748531
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  8 Feb 2016 06:34:46 -0500 (EST)
+In-Reply-To: <1454931622-14902-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,76 +27,66 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
+Since we're obviously terrible at sorting the CP tables, make sure
+we're going to do it properly (or fail to boot). arm64 has had the
+same mechanism for a while, and nobody ever broke it...
 
-On Thu, Feb 04, 2016 at 06:30:34PM +0100, Eric Auger wrote:
-> Hi Edward,
-> On 02/04/2016 05:53 PM, Edward Cragg wrote:
-> > Hi,
-> > 
-> > I'm involved in planning a project for which there is a requirement for PCIe
-> > passthrough in KVM on ARMv8. We have no hardware to test on at the moment.
-> > 
-> > I understand that virtualisation support for ARM is quite young, and it seems
-> > like support is trickling in at the moment for this sort of thing.
-> > 
-> > Is anyone working on PCIe passthrough on ARM platforms who might be able to
-> > share some insight into what would be required to support this?
-> Yes I am currently working on this topic at the moment and especially on
-> ARM PCIe passthrough with MSI enabled. I did not test PCIe passthrough
-> with legacy INTx (MSI disabled) but this should work already with
-> upstreamed QEMU and kernel.
-> 
-> With MSI enabled, the code is not upstreamed yet.
-> 
-> I have a QEMU series:
-> 
-> [RFC v2 0/8] KVM PCI/MSI passthrough with mach-virt
-> (https://www.mail-archive.com/qemu-devel@nongnu.org/msg349574.html)
-> 
-> and a kernel series:
-> [PATCH 00/10] KVM PCIe/MSI passthrough on ARM/ARM64"
->   (https://lkml.org/lkml/2016/1/26/371)
-> 
-> This is functional, tested on v8 AMD HW with a GICv2M (single MSI frame).
-> 
-> This is in an early stage, especially on kernel side since lots of
-> issues still need to be addressed, especially handling proper IRQ isolation.
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/kvm/coproc.c | 25 +++++++++++++++++--------
+ 1 file changed, 17 insertions(+), 8 deletions(-)
 
-Thank you, this is good to know.
-
-> What kind of MSI controller do you plan to use?
-
-Do you mean the GIC itself? From registers, it appears to be a standard ARM
-GIC, though i'm not sure exactly which one yet. However, it's stated in the
-processor's datasheet that legacy interrupts aren't supported. It's one of the
-newer Samsung Exynos processors.
-
-Thanks,
-
-Ed
-
-> Hope this helps
-> 
-> Best Regards
-> 
-> Eric
-> 
-> > 
-> > Thanks,
-> > 
-> > Ed
-> > _______________________________________________
-> > kvmarm mailing list
-> > kvmarm@lists.cs.columbia.edu
-> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> > 
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+index 16c74f8..03f5d14 100644
+--- a/arch/arm/kvm/coproc.c
++++ b/arch/arm/kvm/coproc.c
+@@ -381,17 +381,26 @@ static const struct coproc_reg cp15_regs[] = {
+ 	{ CRn(15), CRm( 0), Op1( 4), Op2( 0), is32, access_cbar},
+ };
+ 
++static int check_reg_table(const struct coproc_reg *table, unsigned int n)
++{
++	unsigned int i;
++
++	for (i = 1; i < n; i++) {
++		if (cmp_reg(&table[i-1], &table[i]) >= 0) {
++			kvm_err("reg table %p out of order (%d)\n", table, i - 1);
++			return 1;
++		}
++	}
++
++	return 0;
++}
++
+ /* Target specific emulation tables */
+ static struct kvm_coproc_target_table *target_tables[KVM_ARM_NUM_TARGETS];
+ 
+ void kvm_register_target_coproc_table(struct kvm_coproc_target_table *table)
+ {
+-	unsigned int i;
+-
+-	for (i = 1; i < table->num; i++)
+-		BUG_ON(cmp_reg(&table->table[i-1],
+-			       &table->table[i]) >= 0);
+-
++	BUG_ON(check_reg_table(table->table, table->num));
+ 	target_tables[table->target] = table;
+ }
+ 
+@@ -1210,8 +1219,8 @@ void kvm_coproc_table_init(void)
+ 	unsigned int i;
+ 
+ 	/* Make sure tables are unique and in order. */
+-	for (i = 1; i < ARRAY_SIZE(cp15_regs); i++)
+-		BUG_ON(cmp_reg(&cp15_regs[i-1], &cp15_regs[i]) >= 0);
++	BUG_ON(check_reg_table(cp15_regs, ARRAY_SIZE(cp15_regs)));
++	BUG_ON(check_reg_table(invariant_cp15, ARRAY_SIZE(invariant_cp15)));
+ 
+ 	/* We abuse the reset function to overwrite the table itself. */
+ 	for (i = 0; i < ARRAY_SIZE(invariant_cp15); i++)
+-- 
+2.1.4
