@@ -1,27 +1,27 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 23/28] ARM: KVM: Remove __weak attributes
-Date: Tue, 9 Feb 2016 19:45:17 +0100
-Message-ID: <20160209184517.GY5171@cbox>
+Subject: Re: [PATCH v2 22/28] ARM: KVM: Switch to C-based stage2 init
+Date: Tue, 9 Feb 2016 19:45:13 +0100
+Message-ID: <20160209184513.GX5171@cbox>
 References: <1454583645-10144-1-git-send-email-marc.zyngier@arm.com>
- <1454583645-10144-24-git-send-email-marc.zyngier@arm.com>
+ <1454583645-10144-23-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F3CAE499E8
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2016 13:38:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0CC69499E8
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2016 13:38:48 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 495nEL-Dxvdm for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Feb 2016 13:38:51 -0500 (EST)
-Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 277F9499DE
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2016 13:38:51 -0500 (EST)
-Received: by mail-wm0-f47.google.com with SMTP id 128so208552596wmz.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 09 Feb 2016 10:44:39 -0800 (PST)
+ with ESMTP id lSicGJu-+2QP for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Feb 2016 13:38:47 -0500 (EST)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B7FF496AC
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2016 13:38:47 -0500 (EST)
+Received: by mail-wm0-f53.google.com with SMTP id p63so171381332wmp.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 09 Feb 2016 10:44:35 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1454583645-10144-24-git-send-email-marc.zyngier@arm.com>
+In-Reply-To: <1454583645-10144-23-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,10 +35,10 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 04, 2016 at 11:00:40AM +0000, Marc Zyngier wrote:
-> Now that the old code is long gone, we can remove all the weak
-> attributes, as there is only one version of the code.
-> 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+Mising (sarcastic) commit message?
 
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+On Thu, Feb 04, 2016 at 11:00:39AM +0000, Marc Zyngier wrote:
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
