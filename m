@@ -1,26 +1,27 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 3/5] irqchip/gic-v2: Parse and export virtual GIC
- information
-Date: Tue, 9 Feb 2016 11:31:55 +0000
-Message-ID: <56B9CE2B.4040709@arm.com>
-References: <1454950049-741-1-git-send-email-julien.grall@arm.com>
- <1454950049-741-4-git-send-email-julien.grall@arm.com>
- <56B8DEB8.4010509@arm.com> <56B9CC4B.90403@arm.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v3 23/23] arm64: Panic when VHE and non VHE CPUs coexist
+Date: Tue, 9 Feb 2016 12:02:17 +0000
+Message-ID: <20160209120217.GE16122@e104818-lin.cambridge.arm.com>
+References: <1454522416-6874-1-git-send-email-marc.zyngier@arm.com>
+ <1454522416-6874-24-git-send-email-marc.zyngier@arm.com>
+ <20160208160445.GS6076@e104818-lin.cambridge.arm.com>
+ <20160208162402.GC14146@leverpostej>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 64C3F499FE
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2016 06:26:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C7FC499FF
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2016 06:56:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id X5ai1d51gH4U for <kvmarm@lists.cs.columbia.edu>;
- Tue,  9 Feb 2016 06:26:12 -0500 (EST)
+ with ESMTP id 5Jwj2r+at9Ca for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  9 Feb 2016 06:56:34 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 12185499E8
- for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2016 06:26:11 -0500 (EST)
-In-Reply-To: <56B9CC4B.90403@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5945B499FE
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  9 Feb 2016 06:56:33 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20160208162402.GC14146@leverpostej>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,95 +31,60 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: al.stone@linaro.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, fu.wei@linaro.org, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org, Jason Cooper <jason@lakedaemon.net>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 09/02/16 11:23, Julien Grall wrote:
-> On 08/02/16 18:30, Marc Zyngier wrote:
->> Julien,
+On Mon, Feb 08, 2016 at 04:24:03PM +0000, Mark Rutland wrote:
+> On Mon, Feb 08, 2016 at 04:04:46PM +0000, Catalin Marinas wrote:
+> > On Wed, Feb 03, 2016 at 06:00:16PM +0000, Marc Zyngier wrote:
+> > > diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+> > > index 6f2f377..f9b6a5b 100644
+> > > --- a/arch/arm64/kernel/head.S
+> > > +++ b/arch/arm64/kernel/head.S
+> > > @@ -578,7 +578,24 @@ ENTRY(set_cpu_boot_mode_flag)
+> > >  1:	str	w20, [x1]			// This CPU has booted in EL1
+> > >  	dmb	sy
+> > >  	dc	ivac, x1			// Invalidate potentially stale cache line
+> > > +	adr_l	x1, __run_cpu_mode
+> > > +	ldr	w0, [x1]
+> > > +	mrs	x20, CurrentEL
+> > > +	cbz	x0, skip_el_check
+> > > +	cmp	x0, x20
+> > > +	bne	mismatched_el
+> > >  	ret
+> > > +skip_el_check:			// Only the first CPU gets to set the rule
+> > > +	str	w20, [x1]
+> > > +	dmb	sy
+> > > +	dc	ivac, x1	// Invalidate potentially stale cache line
+> > > +	ret
+> > > +mismatched_el:
+> > > +	str	w20, [x1, #4]
+> > > +	dmb	sy
+> > > +	dc	ivac, x1	// Invalidate potentially stale cache line
+> > > +1:	wfi
+> > > +	b	1b
+> > >  ENDPROC(set_cpu_boot_mode_flag)
+> > 
+> > Do we need to wait for the D-cache maintenance completion before
+> > entering WFI (like issuing a DSB)? Same for the skip_el_check path
+> > before the RET.
 > 
-> Hi Marc,
+> We would need that to complete the maintenance, yes.
 > 
->> On 08/02/16 16:47, Julien Grall wrote:
+> However, given we're going into WFI immediately afterwards, and not
+> signalling completion to other CPUs, what we gain is somewhat
+> questionable.
 > 
-> [...]
+> Perhaps it's always better to do the maintenance on the read side (for
+> consistency with [1]).
 > 
->>> +static void __init gic_of_setup_kvm_info(struct device_node *node)
->>> +{
->>> +	int ret;
->>> +	struct resource r;
->>> +	unsigned int irq;
->>> +
->>> +	gic_v2_kvm_info.type = GIC_V2;
->>> +
->>> +	irq = irq_of_parse_and_map(node, 0);
->>> +	if (!irq)
->>> +		gic_v2_kvm_info.maint_irq = -1;
->>
->> Please don't do that. 0 *is* the value for an invalid interrupt, and
->> this is what you should expose here. Same for GICv3.
-> 
-> I decided to use -1, because the function acpi_register_gsi is returning 
-> a negative value when an error occurred.
-> 
-> AFAICT, returning 0 would be a valid value for acpi_register_gsi.
+> [1] http://lists.infradead.org/pipermail/linux-arm-kernel/2016-February/404661.html
 
-No really. It either returns -EINVAL, or the result of
-irq_create_fwspec_mapping, which is either going to return a virtual
-interrupt number (strictly positive), or zero if the mapping was impossible.
+While [1] looks clearer to me, it seems that it is not consistent with
+the rest of the head.S file. Maybe we can clean them up as a separate
+patch and leave the dc ivac here. We also seem to miss barriers in other
+similar situations in head.S.
 
-So anything <= 0 is an error, and you can use 0 to indicate it. In
-general, there is no such thing as IRQ0 (if you're not convinced, please
-argue with Linus: http://yarchive.net/comp/linux/zero.html).
-
->>> +	else
->>> +		gic_v2_kvm_info.maint_irq = irq;
->>> +
->>> +	ret = of_address_to_resource(node, 2, &r);
->>> +	if (!ret) {
->>> +		gic_v2_kvm_info.vctrl_base = r.start;
->>> +		gic_v2_kvm_info.vctrl_size = resource_size(&r);
->>> +	}
->>> +
->>> +	ret = of_address_to_resource(node, 3, &r);
->>> +	if (!ret) {
->>> +		if (!PAGE_ALIGNED(r.start))
->>> +			pr_warn("GICV physical address 0x%llx not page aligned\n",
->>> +				(unsigned long long)r.start);
->>> +		else if (!PAGE_ALIGNED(resource_size(&r)))
->>> +			pr_warn("GICV size 0x%llx not a multiple of page size 0x%lx\n",
->>> +				(unsigned long long)resource_size(&r),
->>> +				PAGE_SIZE);
->>> +		else {
->>> +			gic_v2_kvm_info.vcpu_base = r.start;
->>> +			gic_v2_kvm_info.vcpu_size = resource_size(&r);
->>
->> This tends to make me think that this should actually be a proper
->> resource, and not a set of arbitrary fields.
-> 
-> I will give a look.
-> 
-> [..]
-> 
->>> @@ -1270,6 +1338,12 @@ gic_acpi_parse_madt_cpu(struct acpi_subtable_header *header,
->>>   		return -EINVAL;
->>>
->>>   	cpu_phy_base = gic_cpu_base;
->>> +	acpi_data.maint_irq = processor->vgic_interrupt;
->>> +	acpi_data.maint_irq_mode = (processor->flags & ACPI_MADT_VGIC_IRQ_MODE) ?
->>> +				    ACPI_EDGE_SENSITIVE : ACPI_LEVEL_SENSITIVE;
->>> +	acpi_data.vctrl_base = processor->gich_base_address;
->>> +	acpi_data.vcpu_base = processor->gicv_base_address;
->>> +
->>
->> Maybe you can now move all the ACPI data into this acpi_data structure?
->> This would allow for slightly less clutter...
-> 
-> Good idea, I will do it in the next version.
-
-Thanks,
-
-	M.
 -- 
-Jazz is not dead. It just smells funny...
+Catalin
