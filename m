@@ -1,27 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 3/8] ARM: KVM: Enforce sorting of all CP tables
-Date: Wed, 10 Feb 2016 13:44:42 +0100
-Message-ID: <20160210124442.GJ5171@cbox>
+Subject: Re: [PATCH 5/8] ARM: KVM: Switch the CP reg search to be a binary
+ search
+Date: Wed, 10 Feb 2016 13:44:47 +0100
+Message-ID: <20160210124447.GK5171@cbox>
 References: <1454931622-14902-1-git-send-email-marc.zyngier@arm.com>
- <1454931622-14902-4-git-send-email-marc.zyngier@arm.com>
+ <1454931622-14902-6-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7491049AE6
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 07:38:13 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8D20849AD4
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 07:38:18 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id PHDIG9Jvj+Bj for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Feb 2016 07:38:12 -0500 (EST)
-Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E29349AE3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 07:38:12 -0500 (EST)
-Received: by mail-wm0-f54.google.com with SMTP id 128so25173253wmz.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 04:44:03 -0800 (PST)
+ with ESMTP id yFK8YC810xno for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Feb 2016 07:38:17 -0500 (EST)
+Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B812249B0C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 07:38:17 -0500 (EST)
+Received: by mail-wm0-f50.google.com with SMTP id g62so25077602wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 04:44:09 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1454931622-14902-4-git-send-email-marc.zyngier@arm.com>
+In-Reply-To: <1454931622-14902-6-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,10 +36,10 @@ To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Feb 08, 2016 at 11:40:17AM +0000, Marc Zyngier wrote:
-> Since we're obviously terrible at sorting the CP tables, make sure
-> we're going to do it properly (or fail to boot). arm64 has had the
-> same mechanism for a while, and nobody ever broke it...
+On Mon, Feb 08, 2016 at 11:40:19AM +0000, Marc Zyngier wrote:
+> Doing a linear search is a bit silly when we can do a binary search.
+> Not that we trap that so many things that it has become a burden yet,
+> but it makes sense to align it with the arm64 code.
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
