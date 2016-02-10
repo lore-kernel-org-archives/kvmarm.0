@@ -1,70 +1,160 @@
-From: Julien Grall <julien.grall@arm.com>
-Subject: Re: [PATCH 3/5] irqchip/gic-v2: Parse and export virtual GIC
- information
-Date: Wed, 10 Feb 2016 15:22:12 +0000
-Message-ID: <56BB55A4.5020608@arm.com>
-References: <1454950049-741-1-git-send-email-julien.grall@arm.com>
- <1454950049-741-4-git-send-email-julien.grall@arm.com>
- <20160209204914.GE5171@cbox> <56BB46DC.7080202@arm.com>
- <56BB4D2A.1030903@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 08/28] ARM: KVM: Add TLB invalidation code
+Date: Wed, 10 Feb 2016 15:32:52 +0000
+Message-ID: <56BB5824.2010502@arm.com>
+References: <1454583645-10144-1-git-send-email-marc.zyngier@arm.com>
+ <1454583645-10144-9-git-send-email-marc.zyngier@arm.com>
+ <20160209184228.GL5171@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <56BB4D2A.1030903@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, wei@redhat.com, al.stone@linaro.org, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20160209184228.GL5171@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc,
-
-On 10/02/16 14:46, Marc Zyngier wrote:
-> On 10/02/16 14:19, Julien Grall wrote:
->> On 09/02/16 20:49, Christoffer Dall wrote:
->>>> +static void __init gic_acpi_setup_kvm_info(void)
->>>> +{
->>>> +	gic_v2_kvm_info.type = GIC_V2;
->>>> +
->>>> +	gic_v2_kvm_info.maint_irq = acpi_register_gsi(NULL,
->>>> +						      acpi_data.maint_irq,
->>>> +						      acpi_data.maint_irq_mode,
->>>> +						      ACPI_ACTIVE_HIGH);
->>>> +	gic_v2_kvm_info.vctrl_base = acpi_data.vctrl_base;
->>>> +	if (gic_v2_kvm_info.vctrl_base)
->>>> +		gic_v2_kvm_info.vctrl_size = SZ_8K;
->>>> +
->>>> +	gic_v2_kvm_info.vcpu_base = acpi_data.vcpu_base;
->>>> +	if (gic_v2_kvm_info.vcpu_base)
->>>> +		gic_v2_kvm_info.vcpu_size = SZ_8K;
->>>
->>> why are the sizes hard-coded to 8K in this case?
+On 09/02/16 18:42, Christoffer Dall wrote:
+> On Thu, Feb 04, 2016 at 11:00:25AM +0000, Marc Zyngier wrote:
+>> Convert the TLB invalidation code to C, hooking it into the
+>> build system whilst we're at it.
 >>
->> The MADT only provides the base addresses and not the size. The default
->> value has been chosen based on the GICv2 spec (ARM IHI 0048B.b)
->> 	* GICV: See 5.5
->> 	* GICH: I can't find again the section about it. But the example
->> bindings in
->> Documents/devicetree/bindings/interrupt-controller/arm,gic.txt uses 8K.
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>  arch/arm/kvm/Makefile     |  1 +
+>>  arch/arm/kvm/hyp/Makefile |  5 ++++
+>>  arch/arm/kvm/hyp/hyp.h    |  5 ++++
+>>  arch/arm/kvm/hyp/tlb.c    | 71 +++++++++++++++++++++++++++++++++++++++++++++++
+>>  4 files changed, 82 insertions(+)
+>>  create mode 100644 arch/arm/kvm/hyp/Makefile
+>>  create mode 100644 arch/arm/kvm/hyp/tlb.c
 >>
->> I will add a comment in the code explaining where the 8K come from.
->
-> The GICH size can be found in the GIC400 TRM:
->
-> http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0471b/CHDBJDCB.html
->
-> The first 4kB are banked per CPU, while the next 4kB are exposing all
-> CPUs, each in a 512 bytes window. We don't give a damn about the second
-> page, but hey, it is there...
->
-> Of course, this is GIC400, not the architecture spec. So maybe
-> considering a 4kB size would be better, just in case someone is
-> braindead enough to produce another GICv2 implementation without the
-> aliases...
+>> diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+>> index c5eef02c..eb1bf43 100644
+>> --- a/arch/arm/kvm/Makefile
+>> +++ b/arch/arm/kvm/Makefile
+>> @@ -17,6 +17,7 @@ AFLAGS_interrupts.o := -Wa,-march=armv7-a$(plus_virt)
+>>  KVM := ../../../virt/kvm
+>>  kvm-arm-y = $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o $(KVM)/eventfd.o $(KVM)/vfio.o
+>>  
+>> +obj-$(CONFIG_KVM_ARM_HOST) += hyp/
+>>  obj-y += kvm-arm.o init.o interrupts.o
+>>  obj-y += arm.o handle_exit.o guest.o mmu.o emulate.o reset.o
+>>  obj-y += coproc.o coproc_a15.o coproc_a7.o mmio.o psci.o perf.o
+>> diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
+>> new file mode 100644
+>> index 0000000..36c760d
+>> --- /dev/null
+>> +++ b/arch/arm/kvm/hyp/Makefile
+>> @@ -0,0 +1,5 @@
+>> +#
+>> +# Makefile for Kernel-based Virtual Machine module, HYP part
+>> +#
+>> +
+>> +obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
+>> diff --git a/arch/arm/kvm/hyp/hyp.h b/arch/arm/kvm/hyp/hyp.h
+>> index 727089f..5808bbd 100644
+>> --- a/arch/arm/kvm/hyp/hyp.h
+>> +++ b/arch/arm/kvm/hyp/hyp.h
+>> @@ -42,4 +42,9 @@
+>>  })
+>>  #define read_sysreg(...)		__read_sysreg(__VA_ARGS__)
+>>  
+>> +#define VTTBR		__ACCESS_CP15_64(6, c2)
+>> +#define ICIALLUIS	__ACCESS_CP15(c7, 0, c1, 0)
+>> +#define TLBIALLIS	__ACCESS_CP15(c8, 0, c3, 0)
+>> +#define TLBIALLNSNHIS	__ACCESS_CP15(c8, 4, c3, 4)
+>> +
+>>  #endif /* __ARM_KVM_HYP_H__ */
+>> diff --git a/arch/arm/kvm/hyp/tlb.c b/arch/arm/kvm/hyp/tlb.c
+>> new file mode 100644
+>> index 0000000..993fe89
+>> --- /dev/null
+>> +++ b/arch/arm/kvm/hyp/tlb.c
+>> @@ -0,0 +1,71 @@
+>> +/*
+>> + * Original code:
+>> + * Copyright (C) 2012 - Virtual Open Systems and Columbia University
+>> + * Author: Christoffer Dall <c.dall@virtualopensystems.com>
+>> + *
+>> + * Mostly rewritten in C by Marc Zyngier <marc.zyngier@arm.com>
+>> + *
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License version 2 as
+>> + * published by the Free Software Foundation.
+>> + *
+>> + * This program is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> + * GNU General Public License for more details.
+>> + *
+>> + * You should have received a copy of the GNU General Public License
+>> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>> + */
+>> +
+>> +#include "hyp.h"
+>> +
+>> +/**
+>> + * Flush per-VMID TLBs
+>> + *
+>> + * __kvm_tlb_flush_vmid(struct kvm *kvm);
+>> + *
+>> + * We rely on the hardware to broadcast the TLB invalidation to all CPUs
+>> + * inside the inner-shareable domain (which is the case for all v7
+>> + * implementations).  If we come across a non-IS SMP implementation, we'll
+>> + * have to use an IPI based mechanism. Until then, we stick to the simple
+>> + * hardware assisted version.
+>> + *
+>> + * As v7 does not support flushing per IPA, just nuke the whole TLB
+>> + * instead, ignoring the ipa value.
+>> + */
+>> +static void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
+>> +{
+>> +	dsb(ishst);
+>> +
+>> +	/* Switch to requested VMID */
+>> +	kvm = kern_hyp_va(kvm);
+>> +	write_sysreg(kvm->arch.vttbr, VTTBR);
+>> +	isb();
+>> +
+>> +	write_sysreg(0, TLBIALLIS);
+>> +	dsb(ish);
+>> +	isb();
+>> +
+>> +	write_sysreg(0, VTTBR);
+>> +}
+>> +
+>> +__alias(__tlb_flush_vmid) void __weak __kvm_tlb_flush_vmid(struct kvm *kvm);
+>> +
+>> +static void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+>> +{
+>> +	__tlb_flush_vmid(kvm);
+>> +}
+>> +
+>> +__alias(__tlb_flush_vmid_ipa) void __weak __kvm_tlb_flush_vmid_ipa(struct kvm *kvm,
+>> +							    phys_addr_t ipa);
+>> +
+>> +static void __hyp_text __tlb_flush_vm_context(void)
+>> +{
+>> +	dsb(ishst);
+> 
+> do we need this initial dsb?
 
-Ok, I will change the GICH to 4KB in the next version.
+I'm a copy-paste muppet. I'll drop that.
 
-Cheers,
+>> +	write_sysreg(0, TLBIALLNSNHIS);
+>> +	write_sysreg(0, ICIALLUIS);
+>> +	dsb(ish);
+> 
+> we used to have an isb here, but we got rid of this because it's always
+> followed by eret?
 
+Indeed. We were super extra cautious in the old code, and eret does the
+right thing.
+
+Thanks,
+
+	M.
 -- 
-Julien Grall
+Jazz is not dead. It just smells funny...
