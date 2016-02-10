@@ -1,179 +1,103 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 7/8] KVM: arm/arm64: Avoid accessing GICH registers
-Date: Wed, 10 Feb 2016 17:43:54 +0000
-Message-ID: <56BB76DA.4080905@arm.com>
-References: <1454931622-14902-1-git-send-email-marc.zyngier@arm.com>
- <1454931622-14902-8-git-send-email-marc.zyngier@arm.com>
- <20160210124506.GN5171@cbox> <56BB3C74.9000105@arm.com>
- <20160210173054.GR5171@cbox>
+From: <tchalamarla@caviumnetworks.com>
+Subject: [PATCH] arm64: KVM: Configure TCR_EL2.PS at runtime
+Date: Wed, 10 Feb 2016 10:46:53 -0800
+Message-ID: <1455130013-28644-1-git-send-email-tchalamarla@caviumnetworks.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160210173054.GR5171@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EE4E49B7F
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 13:41:15 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id FyInN4GXrtHT for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Feb 2016 13:41:14 -0500 (EST)
+Received: from na01-bl2-obe.outbound.protection.outlook.com
+ (mail-bl2on0079.outbound.protection.outlook.com [65.55.169.79])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 37CEC49B79
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 13:41:13 -0500 (EST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: christoffer.dall@linaro.org, marc.zyngier@arm.com
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/02/16 17:30, Christoffer Dall wrote:
-> On Wed, Feb 10, 2016 at 01:34:44PM +0000, Marc Zyngier wrote:
->> On 10/02/16 12:45, Christoffer Dall wrote:
->>> On Mon, Feb 08, 2016 at 11:40:21AM +0000, Marc Zyngier wrote:
->>>> GICv2 registers are *slow*. As in "terrifyingly slow". Which is bad.
->>>> But we're equaly bad, as we make a point in accessing them even if
->>>> we don't have any interrupt in flight.
->>>>
->>>> A good solution is to first find out if we have anything useful to
->>>> write into the GIC, and if we don't, to simply not do it. This
->>>> involves tracking which LRs actually have something valid there.
->>>>
->>>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>>> ---
->>>>  arch/arm64/kvm/hyp/vgic-v2-sr.c | 71 ++++++++++++++++++++++++++++-------------
->>>>  include/kvm/arm_vgic.h          |  2 ++
->>>>  2 files changed, 51 insertions(+), 22 deletions(-)
->>>>
->>>> diff --git a/arch/arm64/kvm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
->>>> index e717612..874a08d 100644
->>>> --- a/arch/arm64/kvm/hyp/vgic-v2-sr.c
->>>> +++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
->>>> @@ -38,28 +38,40 @@ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
->>>>  
->>>>  	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
->>>>  	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
->>>> -	cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
->>>> -	eisr0  = readl_relaxed(base + GICH_EISR0);
->>>> -	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
->>>> -	if (unlikely(nr_lr > 32)) {
->>>> -		eisr1  = readl_relaxed(base + GICH_EISR1);
->>>> -		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
->>>> -	} else {
->>>> -		eisr1 = elrsr1 = 0;
->>>> -	}
->>>> +
->>>> +	if (vcpu->arch.vgic_cpu.live_lrs) {
->>>> +		eisr0  = readl_relaxed(base + GICH_EISR0);
->>>> +		elrsr0 = readl_relaxed(base + GICH_ELRSR0);
->>>> +		cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
->>>> +		cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
->>>> +
->>>> +		if (unlikely(nr_lr > 32)) {
->>>> +			eisr1  = readl_relaxed(base + GICH_EISR1);
->>>> +			elrsr1 = readl_relaxed(base + GICH_ELRSR1);
->>>> +		} else {
->>>> +			eisr1 = elrsr1 = 0;
->>>> +		}
->>>> +
->>>>  #ifdef CONFIG_CPU_BIG_ENDIAN
->>>> -	cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
->>>> -	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
->>>> +		cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
->>>> +		cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
->>>>  #else
->>>> -	cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
->>>> -	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
->>>> +		cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
->>>> +		cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
->>>>  #endif
->>>> -	cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
->>>>  
->>>> -	writel_relaxed(0, base + GICH_HCR);
->>>> +		for (i = 0; i < nr_lr; i++)
->>>> +			if (vcpu->arch.vgic_cpu.live_lrs & (1UL << i))
->>>> +				cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
->>>>  
->>>> -	for (i = 0; i < nr_lr; i++)
->>>> -		cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
->>>> +		writel_relaxed(0, base + GICH_HCR);
->>>> +
->>>> +		vcpu->arch.vgic_cpu.live_lrs = 0;
->>>> +	} else {
->>>> +		cpu_if->vgic_eisr = 0;
->>>> +		cpu_if->vgic_elrsr = ~0UL;
->>>> +		cpu_if->vgic_misr = 0;
->>>> +	}
->>>>  }
->>>>  
->>>>  /* vcpu is already in the HYP VA space */
->>>> @@ -70,15 +82,30 @@ void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
->>>>  	struct vgic_dist *vgic = &kvm->arch.vgic;
->>>>  	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
->>>>  	int i, nr_lr;
->>>> +	u64 live_lrs = 0;
->>>>  
->>>>  	if (!base)
->>>>  		return;
->>>>  
->>>> -	writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
->>>> -	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
->>>> -	writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
->>>> -
->>>>  	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
->>>> +
->>>>  	for (i = 0; i < nr_lr; i++)
->>>> -		writel_relaxed(cpu_if->vgic_lr[i], base + GICH_LR0 + (i * 4));
->>>> +		if (cpu_if->vgic_lr[i] & GICH_LR_STATE)
->>>> +			live_lrs |= 1UL << i;
->>>> +
->>>> +	if (live_lrs) {
->>>> +		writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
->>>> +		writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
->>>> +		for (i = 0; i < nr_lr; i++) {
->>>> +			u32 val = 0;
->>>> +
->>>> +			if (live_lrs & (1UL << i))
->>>> +				val = cpu_if->vgic_lr[i];
->>>> +
->>>> +			writel_relaxed(val, base + GICH_LR0 + (i * 4));
->>>> +		}
->>>> +	}
->>>> +
->>>> +	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
->>>
->>> couldn't you optimize this out by storing the last read value and
->>> compare if anything changed?  (you'd have to invalidate the cached value
->>> on vcpu_put obviously).
->>
->> Yeah, very good point. Only the guest can update this, so we could even
->> move it to vcpu_load/vcpu_put entirely, and never save/restore it inside
->> the run loop.
-> 
-> If vcpu_load is called *after* loading incoming state on migration, this
-> should work, yes.
+From: Tirumalesh Chalamarla <tchalamarla@caviumnetworks.com>
 
-Hmmm. That could be an issue, actually. I need to check if we do a
-vcpu_load on SET_ONE_REG access. If we do, then vcpu_put will overwrite
-the value we've written in the shadow copies by reading back the old
-value from the HW.
+Setting TCR_EL2.PS to 40 bits is wrong on systems with PS size is
+less than 40 bits. and with systems where RAM is at higher address,
+this will break KVM.
 
-I'll investigate when I get the time.
+This patch sets TCR_EL2.PS at runtime similar to VTCR_EL2.PS
 
->>
->> I'll keep that for a further patch, as it requires a bit of infrastructure.
->>
-> Sounds good.
-> 
-> We can probably also optimize the writing of the LRs further, but I
-> figure it's not worth it as the interrupt delivery path is the slow path
-> anyway and we should care about optimizing the common case.
-> 
-> I wouldn't think saving 2-3 writes to some LRs would be measurable for
-> interrupt delivery anyhow.
+changes form V2:
+	- Modified subject line and commit message.
+	- Removed TCR_EL2_FLAGS.
 
-I found out that some other simple optimizations did save about 800
-cycles for a single interrupt injection, which is about 10% of the
-complete exit/enter path.
+changes from V1:
+        - Moved to dynamic configuration.
 
-Guilty ones are the maintenance interrupt status registers (MISR, EISR),
-and zeroing of LRs. That's with GICv2 though, and GICv3 seems less
-sensitive to that kind of thing...
+Signed-off-by: Tirumalesh Chalamarla <tchalamarla@caviumnetworks.com>
+---
+ arch/arm64/include/asm/kvm_arm.h |  2 --
+ arch/arm64/kvm/hyp-init.S        | 12 +++++++-----
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-But I agree with you: this is a fairly slow path overall, and we'll
-quickly approach the point of diminishing returns.
-
-Thanks,
-
-	M.
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 738a95f..3776db0 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -107,8 +107,6 @@
+ #define TCR_EL2_MASK	(TCR_EL2_TG0 | TCR_EL2_SH0 | \
+ 			 TCR_EL2_ORGN0 | TCR_EL2_IRGN0 | TCR_EL2_T0SZ)
+ 
+-#define TCR_EL2_FLAGS	(TCR_EL2_RES1 | TCR_EL2_PS_40B)
+-
+ /* VTCR_EL2 Registers bits */
+ #define VTCR_EL2_RES1		(1 << 31)
+ #define VTCR_EL2_PS_MASK	(7 << 16)
+diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
+index 3e568dc..b5ab1b0 100644
+--- a/arch/arm64/kvm/hyp-init.S
++++ b/arch/arm64/kvm/hyp-init.S
+@@ -64,7 +64,7 @@ __do_hyp_init:
+ 	mrs	x4, tcr_el1
+ 	ldr	x5, =TCR_EL2_MASK
+ 	and	x4, x4, x5
+-	ldr	x5, =TCR_EL2_FLAGS
++	ldr	x5, =TCR_EL2_RES1
+ 	orr	x4, x4, x5
+ 
+ #ifndef CONFIG_ARM64_VA_BITS_48
+@@ -85,15 +85,17 @@ __do_hyp_init:
+ 	ldr_l	x5, idmap_t0sz
+ 	bfi	x4, x5, TCR_T0SZ_OFFSET, TCR_TxSZ_WIDTH
+ #endif
+-	msr	tcr_el2, x4
+-
+-	ldr	x4, =VTCR_EL2_FLAGS
+ 	/*
+ 	 * Read the PARange bits from ID_AA64MMFR0_EL1 and set the PS bits in
+-	 * VTCR_EL2.
++	 * TCR_EL2 and VTCR_EL2.
+ 	 */
+ 	mrs	x5, ID_AA64MMFR0_EL1
+ 	bfi	x4, x5, #16, #3
++
++	msr	tcr_el2, x4
++
++	ldr	x4, =VTCR_EL2_FLAGS
++	bfi	x4, x5, #16, #3
+ 	/*
+ 	 * Read the VMIDBits bits from ID_AA64MMFR1_EL1 and set the VS bit in
+ 	 * VTCR_EL2.
 -- 
-Jazz is not dead. It just smells funny...
+2.1.0
