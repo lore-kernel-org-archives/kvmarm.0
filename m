@@ -1,103 +1,42 @@
-From: <tchalamarla@caviumnetworks.com>
-Subject: [PATCH] arm64: KVM: Configure TCR_EL2.PS at runtime
-Date: Wed, 10 Feb 2016 10:46:53 -0800
-Message-ID: <1455130013-28644-1-git-send-email-tchalamarla@caviumnetworks.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH 0/8] KVM/ARM: Guest Entry/Exit optimizations
+Date: Wed, 10 Feb 2016 21:40:12 +0100
+Message-ID: <20160210204012.GS5171@cbox>
+References: <1454931622-14902-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8EE4E49B7F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 13:41:15 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FyInN4GXrtHT for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Feb 2016 13:41:14 -0500 (EST)
-Received: from na01-bl2-obe.outbound.protection.outlook.com
- (mail-bl2on0079.outbound.protection.outlook.com [65.55.169.79])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 37CEC49B79
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 13:41:13 -0500 (EST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: christoffer.dall@linaro.org, marc.zyngier@arm.com
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1454931622-14902-1-git-send-email-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Tirumalesh Chalamarla <tchalamarla@caviumnetworks.com>
+On Mon, Feb 08, 2016 at 11:40:14AM +0000, Marc Zyngier wrote:
+> I've recently been looking at our entry/exit costs, and profiling
+> figures did show some very low hanging fruits.
+> 
+> The most obvious cost is that accessing the GIC HW is slow. As in
+> "deadly slow", specially when GICv2 is involved. So not hammering the
+> HW when there is nothing to write is immediately beneficial, as this
+> is the most common cases (whatever people seem to think, interrupts
+> are a *rare* event).
+> 
+> Another easy thing to fix is the way we handle trapped system
+> registers. We do insist on (mostly) sorting them, but we do perform a
+> linear search on trap. We can switch to a binary search for free, and
+> get immediate benefits (the PMU code, being extremely trap-happy,
+> benefits immediately from this).
+> 
+> With these in place, I see an improvement of 20 to 30% (depending on
+> the platform) on our world-switch cycle count when running a set of
+> hand-crafted guests that are designed to only perform traps.
+> 
 
-Setting TCR_EL2.PS to 40 bits is wrong on systems with PS size is
-less than 40 bits. and with systems where RAM is at higher address,
-this will break KVM.
+By the way, I took this whole stack of changes (wsinc, vhe, and
+optimizations) and ran it on Mustang and fired up UEFI and did a reboot
+and things seem to work, so that's a small shallow
+'tested-by-something-else-than-a-linux-guest' statement from me.
 
-This patch sets TCR_EL2.PS at runtime similar to VTCR_EL2.PS
-
-changes form V2:
-	- Modified subject line and commit message.
-	- Removed TCR_EL2_FLAGS.
-
-changes from V1:
-        - Moved to dynamic configuration.
-
-Signed-off-by: Tirumalesh Chalamarla <tchalamarla@caviumnetworks.com>
----
- arch/arm64/include/asm/kvm_arm.h |  2 --
- arch/arm64/kvm/hyp-init.S        | 12 +++++++-----
- 2 files changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 738a95f..3776db0 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -107,8 +107,6 @@
- #define TCR_EL2_MASK	(TCR_EL2_TG0 | TCR_EL2_SH0 | \
- 			 TCR_EL2_ORGN0 | TCR_EL2_IRGN0 | TCR_EL2_T0SZ)
- 
--#define TCR_EL2_FLAGS	(TCR_EL2_RES1 | TCR_EL2_PS_40B)
--
- /* VTCR_EL2 Registers bits */
- #define VTCR_EL2_RES1		(1 << 31)
- #define VTCR_EL2_PS_MASK	(7 << 16)
-diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
-index 3e568dc..b5ab1b0 100644
---- a/arch/arm64/kvm/hyp-init.S
-+++ b/arch/arm64/kvm/hyp-init.S
-@@ -64,7 +64,7 @@ __do_hyp_init:
- 	mrs	x4, tcr_el1
- 	ldr	x5, =TCR_EL2_MASK
- 	and	x4, x4, x5
--	ldr	x5, =TCR_EL2_FLAGS
-+	ldr	x5, =TCR_EL2_RES1
- 	orr	x4, x4, x5
- 
- #ifndef CONFIG_ARM64_VA_BITS_48
-@@ -85,15 +85,17 @@ __do_hyp_init:
- 	ldr_l	x5, idmap_t0sz
- 	bfi	x4, x5, TCR_T0SZ_OFFSET, TCR_TxSZ_WIDTH
- #endif
--	msr	tcr_el2, x4
--
--	ldr	x4, =VTCR_EL2_FLAGS
- 	/*
- 	 * Read the PARange bits from ID_AA64MMFR0_EL1 and set the PS bits in
--	 * VTCR_EL2.
-+	 * TCR_EL2 and VTCR_EL2.
- 	 */
- 	mrs	x5, ID_AA64MMFR0_EL1
- 	bfi	x4, x5, #16, #3
-+
-+	msr	tcr_el2, x4
-+
-+	ldr	x4, =VTCR_EL2_FLAGS
-+	bfi	x4, x5, #16, #3
- 	/*
- 	 * Read the VMIDBits bits from ID_AA64MMFR1_EL1 and set the VS bit in
- 	 * VTCR_EL2.
--- 
-2.1.0
+-Christoffer
