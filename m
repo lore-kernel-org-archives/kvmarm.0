@@ -1,95 +1,53 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 10/28] ARM: KVM: Add timer save/restore
-Date: Wed, 10 Feb 2016 15:36:40 +0000
-Message-ID: <56BB5908.2030904@arm.com>
+Subject: Re: [PATCH v2 14/28] ARM: KVM: Add guest entry code
+Date: Wed, 10 Feb 2016 15:48:35 +0000
+Message-ID: <56BB5BD3.8020600@arm.com>
 References: <1454583645-10144-1-git-send-email-marc.zyngier@arm.com>
- <1454583645-10144-11-git-send-email-marc.zyngier@arm.com>
- <20160209184242.GN5171@cbox>
+ <1454583645-10144-15-git-send-email-marc.zyngier@arm.com>
+ <20160209184445.GR5171@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D7FE249B2B
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 10:30:53 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HeJOdo6fmxQ6 for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Feb 2016 10:30:52 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5C7A149B28
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 10:30:51 -0500 (EST)
-In-Reply-To: <20160209184242.GN5171@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20160209184445.GR5171@cbox>
+Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 09/02/16 18:42, Christoffer Dall wrote:
-> On Thu, Feb 04, 2016 at 11:00:27AM +0000, Marc Zyngier wrote:
->> This patch shouldn't exist, as we should be able to reuse the
->> arm64 version for free. I'll get there eventually, but in the
->> meantime I need a timer ticking.
+On 09/02/16 18:44, Christoffer Dall wrote:
+> On Thu, Feb 04, 2016 at 11:00:31AM +0000, Marc Zyngier wrote:
+>> Add the very minimal piece of code that is now required to jump
+>> into the guest (and return from it). This code is only concerned
+>> with save/restoring the USR registers (r0-r12+lr for the guest,
+>> r4-r12+lr for the host), as everything else is dealt with in C
+>> (VFP is another matter though).
 >>
 >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 >> ---
->>  arch/arm/kvm/hyp/Makefile   |  1 +
->>  arch/arm/kvm/hyp/hyp.h      |  8 +++++
->>  arch/arm/kvm/hyp/timer-sr.c | 71 +++++++++++++++++++++++++++++++++++++++++++++
->>  3 files changed, 80 insertions(+)
->>  create mode 100644 arch/arm/kvm/hyp/timer-sr.c
+>>  arch/arm/kvm/hyp/Makefile |  1 +
+>>  arch/arm/kvm/hyp/entry.S  | 70 +++++++++++++++++++++++++++++++++++++++++++++++
+>>  arch/arm/kvm/hyp/hyp.h    |  2 ++
+>>  3 files changed, 73 insertions(+)
+>>  create mode 100644 arch/arm/kvm/hyp/entry.S
 >>
 >> diff --git a/arch/arm/kvm/hyp/Makefile b/arch/arm/kvm/hyp/Makefile
->> index 9f96fcb..9241ae8 100644
+>> index 173bd1d..c779690 100644
 >> --- a/arch/arm/kvm/hyp/Makefile
 >> +++ b/arch/arm/kvm/hyp/Makefile
->> @@ -4,3 +4,4 @@
->>  
->>  obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
->>  obj-$(CONFIG_KVM_ARM_HOST) += cp15-sr.o
->> +obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
->> diff --git a/arch/arm/kvm/hyp/hyp.h b/arch/arm/kvm/hyp/hyp.h
->> index ab2cb82..4924418 100644
->> --- a/arch/arm/kvm/hyp/hyp.h
->> +++ b/arch/arm/kvm/hyp/hyp.h
->> @@ -46,6 +46,9 @@
->>  #define TTBR1		__ACCESS_CP15_64(1, c2)
->>  #define VTTBR		__ACCESS_CP15_64(6, c2)
->>  #define PAR		__ACCESS_CP15_64(0, c7)
->> +#define CNTV_CVAL	__ACCESS_CP15_64(3, c14)
->> +#define CNTVOFF		__ACCESS_CP15_64(4, c14)
->> +
->>  #define CSSELR		__ACCESS_CP15(c0, 2, c0, 0)
->>  #define VMPIDR		__ACCESS_CP15(c0, 4, c0, 5)
->>  #define SCTLR		__ACCESS_CP15(c1, 0, c0, 0)
->> @@ -71,6 +74,11 @@
->>  #define TID_URO		__ACCESS_CP15(c13, 0, c0, 3)
->>  #define TID_PRIV	__ACCESS_CP15(c13, 0, c0, 4)
->>  #define CNTKCTL		__ACCESS_CP15(c14, 0, c1, 0)
->> +#define CNTV_CTL	__ACCESS_CP15(c14, 0, c3, 1)
->> +#define CNTHCTL		__ACCESS_CP15(c14, 4, c1, 0)
->> +
->> +void __timer_save_state(struct kvm_vcpu *vcpu);
->> +void __timer_restore_state(struct kvm_vcpu *vcpu);
->>  
->>  void __sysreg_save_state(struct kvm_cpu_context *ctxt);
->>  void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
->> diff --git a/arch/arm/kvm/hyp/timer-sr.c b/arch/arm/kvm/hyp/timer-sr.c
+>> @@ -8,3 +8,4 @@ obj-$(CONFIG_KVM_ARM_HOST) += timer-sr.o
+>>  obj-$(CONFIG_KVM_ARM_HOST) += vgic-v2-sr.o
+>>  obj-$(CONFIG_KVM_ARM_HOST) += vfp.o
+>>  obj-$(CONFIG_KVM_ARM_HOST) += banked-sr.o
+>> +obj-$(CONFIG_KVM_ARM_HOST) += entry.o
+>> diff --git a/arch/arm/kvm/hyp/entry.S b/arch/arm/kvm/hyp/entry.S
 >> new file mode 100644
->> index 0000000..d7535fd
+>> index 0000000..32f79b0
 >> --- /dev/null
->> +++ b/arch/arm/kvm/hyp/timer-sr.c
->> @@ -0,0 +1,71 @@
+>> +++ b/arch/arm/kvm/hyp/entry.S
+>> @@ -0,0 +1,70 @@
 >> +/*
->> + * Copyright (C) 2012-2015 - ARM Ltd
+>> + * Copyright (C) 2016 - ARM Ltd
 >> + * Author: Marc Zyngier <marc.zyngier@arm.com>
 >> + *
 >> + * This program is free software; you can redistribute it and/or modify
@@ -103,76 +61,88 @@ On 09/02/16 18:42, Christoffer Dall wrote:
 >> + *
 >> + * You should have received a copy of the GNU General Public License
 >> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->> + */
+>> +*/
 >> +
->> +#include <clocksource/arm_arch_timer.h>
->> +#include <linux/compiler.h>
->> +#include <linux/kvm_host.h>
+>> +#include <linux/linkage.h>
+>> +#include <asm/asm-offsets.h>
+>> +#include <asm/kvm_arm.h>
 >> +
->> +#include <asm/kvm_mmu.h>
+>> +	.arch_extension     virt
 >> +
->> +#include "hyp.h"
+>> +	.text
+>> +	.pushsection	.hyp.text, "ax"
 >> +
->> +/* vcpu is already in the HYP VA space */
->> +void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
->> +{
->> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
->> +	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
->> +	u64 val;
+>> +#define USR_REGS_OFFSET		(CPU_CTXT_GP_REGS + GP_REGS_USR)
 >> +
->> +	if (kvm->arch.timer.enabled) {
->> +		timer->cntv_ctl = read_sysreg(CNTV_CTL);
->> +		timer->cntv_cval = read_sysreg(CNTV_CVAL);
->> +	}
+>> +/* int __guest_enter(struct kvm_vcpu *vcpu, struct kvm_cpu_context *host) */
+>> +ENTRY(__guest_enter)
+>> +	@ Save host registers
+>> +	add	r1, r1, #(USR_REGS_OFFSET + S_R4)
+>> +	stm	r1!, {r4-r12}
+>> +	str	lr, [r1, #4]	@ Skip SP_usr (already saved)
 >> +
->> +	/* Disable the virtual timer */
->> +	write_sysreg(0, CNTV_CTL);
->> +
->> +	/* Allow physical timer/counter access for the host */
->> +	val = read_sysreg(CNTHCTL);
->> +	val |= CNTHCTL_EL1PCTEN | CNTHCTL_EL1PCEN;
->> +	write_sysreg(val, CNTHCTL);
->> +
->> +	/* Clear cntvoff for the host */
->> +	write_sysreg(0, CNTVOFF);
+>> +	@ Restore guest registers
+>> +	add	r0, r0,  #(VCPU_GUEST_CTXT + USR_REGS_OFFSET + S_R0)
 > 
-> in the asm version we only did this if the timer was enabled, probably
-> the theory being that only in that case did we mody the offset.  But it
-> should be safe to just clear the cntvoff in any case, right?
+> this really relies on offsetof(struct pt_regs, ARM_r0) == 0, which I
+> guess will likely never change, but given there's both a kernel and uapi
+> version of struct pt_regs, are we sure about this?
 
-It is indeed perfectly safe. I've copied the arm64 code into the 32bit
-tree, so we get this cntvoff reset (arm64 requires it since it the
-virtual counter is used in the vdso), but this doesn't hurt on 32bit either.
+If they did diverge, a lot of things would just break. arm64 does have
+different types between user and kernel, but the userspace version is
+guaranteed to be a strict prefix of the kernel one. I believe arm would
+have to enforce the same thing if it changed.
 
 > 
->> +}
+>> +	ldr	lr, [r0, #S_LR]
+>> +	ldm	r0, {r0-r12}
 >> +
->> +void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
->> +{
->> +	struct kvm *kvm = kern_hyp_va(vcpu->kvm);
->> +	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
->> +	u64 val;
+>> +	clrex
+>> +	eret
+>> +ENDPROC(__guest_enter)
 >> +
+>> +ENTRY(__guest_exit)
 >> +	/*
->> +	 * Disallow physical timer access for the guest
->> +	 * Physical counter access is allowed
+>> +	 * return convention:
+>> +	 * guest r0, r1, r2 saved on the stack
+>> +	 * r0: vcpu pointer
+>> +	 * r1: exception code
 >> +	 */
->> +	val = read_sysreg(CNTHCTL);
->> +	val &= ~CNTHCTL_EL1PCEN;
->> +	val |= CNTHCTL_EL1PCTEN;
->> +	write_sysreg(val, CNTHCTL);
 >> +
->> +	if (kvm->arch.timer.enabled) {
->> +		write_sysreg(kvm->arch.timer.cntvoff, CNTVOFF);
->> +		write_sysreg(timer->cntv_cval, CNTV_CVAL);
->> +		isb();
->> +		write_sysreg(timer->cntv_ctl, CNTV_CTL);
->> +	}
->> +}
+>> +	add	r2, r0, #(VCPU_GUEST_CTXT + USR_REGS_OFFSET + S_R3)
+>> +	stm	r2!, {r3-r12}
+>> +	str	lr, [r2, #4]
+>> +	add	r2, r0, #(VCPU_GUEST_CTXT + USR_REGS_OFFSET + S_R0)
+>> +	pop	{r3, r4, r5}		@ r0, r1, r2
+>> +	stm	r2, {r3-r5}
+>> +
+>> +	ldr	r0, [r0, #VCPU_HOST_CTXT]
+>> +	add	r0, r0, #(USR_REGS_OFFSET + S_R4)
+>> +	ldm	r0!, {r4-r12}
+>> +	ldr	lr, [r0, #4]
+>> +
+>> +	mov	r0, r1
+>> +	bx	lr
+>> +ENDPROC(__guest_exit)
+>> +
+>> +	.popsection
+>> +
+>> diff --git a/arch/arm/kvm/hyp/hyp.h b/arch/arm/kvm/hyp/hyp.h
+>> index 278eb1f..b3f6ed2 100644
+>> --- a/arch/arm/kvm/hyp/hyp.h
+>> +++ b/arch/arm/kvm/hyp/hyp.h
+>> @@ -110,4 +110,6 @@ static inline bool __vfp_enabled(void)
+>>  void __hyp_text __banked_save_state(struct kvm_cpu_context *ctxt);
+>>  void __hyp_text __banked_restore_state(struct kvm_cpu_context *ctxt);
+>>  
+>> +int asmlinkage __guest_enter(struct kvm_vcpu *vcpu,
+>> +			     struct kvm_cpu_context *host);
+>>  #endif /* __ARM_KVM_HYP_H__ */
 >> -- 
 >> 2.1.4
 >>
 > 
+> Otherwise:
 > Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 > 
 
