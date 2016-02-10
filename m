@@ -1,25 +1,27 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 7/8] KVM: arm/arm64: Avoid accessing GICH registers
-Date: Wed, 10 Feb 2016 13:34:44 +0000
-Message-ID: <56BB3C74.9000105@arm.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: [PATCH 1/8] arm64: KVM: Switch the sys_reg search to be a binary
+ search
+Date: Wed, 10 Feb 2016 13:49:14 +0000
+Message-ID: <87ziv8vfol.fsf@linaro.org>
 References: <1454931622-14902-1-git-send-email-marc.zyngier@arm.com>
- <1454931622-14902-8-git-send-email-marc.zyngier@arm.com>
- <20160210124506.GN5171@cbox>
+ <1454931622-14902-2-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC25749B07
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 08:28:58 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A582E49B21
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 08:43:27 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id s33hUj4MVBdQ for <kvmarm@lists.cs.columbia.edu>;
- Wed, 10 Feb 2016 08:28:57 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7ABB749AE3
- for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 08:28:57 -0500 (EST)
-In-Reply-To: <20160210124506.GN5171@cbox>
+ with ESMTP id GmcoMPyjiG8M for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 10 Feb 2016 08:43:26 -0500 (EST)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 869BC49B07
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 08:43:26 -0500 (EST)
+Received: by mail-wm0-f53.google.com with SMTP id 128so27551352wmz.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 10 Feb 2016 05:49:18 -0800 (PST)
+In-reply-to: <1454931622-14902-2-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,135 +31,22 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/02/16 12:45, Christoffer Dall wrote:
-> On Mon, Feb 08, 2016 at 11:40:21AM +0000, Marc Zyngier wrote:
->> GICv2 registers are *slow*. As in "terrifyingly slow". Which is bad.
->> But we're equaly bad, as we make a point in accessing them even if
->> we don't have any interrupt in flight.
->>
->> A good solution is to first find out if we have anything useful to
->> write into the GIC, and if we don't, to simply not do it. This
->> involves tracking which LRs actually have something valid there.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm64/kvm/hyp/vgic-v2-sr.c | 71 ++++++++++++++++++++++++++++-------------
->>  include/kvm/arm_vgic.h          |  2 ++
->>  2 files changed, 51 insertions(+), 22 deletions(-)
->>
->> diff --git a/arch/arm64/kvm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
->> index e717612..874a08d 100644
->> --- a/arch/arm64/kvm/hyp/vgic-v2-sr.c
->> +++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
->> @@ -38,28 +38,40 @@ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
->>  
->>  	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
->>  	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
->> -	cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
->> -	eisr0  = readl_relaxed(base + GICH_EISR0);
->> -	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
->> -	if (unlikely(nr_lr > 32)) {
->> -		eisr1  = readl_relaxed(base + GICH_EISR1);
->> -		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
->> -	} else {
->> -		eisr1 = elrsr1 = 0;
->> -	}
->> +
->> +	if (vcpu->arch.vgic_cpu.live_lrs) {
->> +		eisr0  = readl_relaxed(base + GICH_EISR0);
->> +		elrsr0 = readl_relaxed(base + GICH_ELRSR0);
->> +		cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
->> +		cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
->> +
->> +		if (unlikely(nr_lr > 32)) {
->> +			eisr1  = readl_relaxed(base + GICH_EISR1);
->> +			elrsr1 = readl_relaxed(base + GICH_ELRSR1);
->> +		} else {
->> +			eisr1 = elrsr1 = 0;
->> +		}
->> +
->>  #ifdef CONFIG_CPU_BIG_ENDIAN
->> -	cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
->> -	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
->> +		cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
->> +		cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
->>  #else
->> -	cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
->> -	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
->> +		cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
->> +		cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
->>  #endif
->> -	cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
->>  
->> -	writel_relaxed(0, base + GICH_HCR);
->> +		for (i = 0; i < nr_lr; i++)
->> +			if (vcpu->arch.vgic_cpu.live_lrs & (1UL << i))
->> +				cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
->>  
->> -	for (i = 0; i < nr_lr; i++)
->> -		cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
->> +		writel_relaxed(0, base + GICH_HCR);
->> +
->> +		vcpu->arch.vgic_cpu.live_lrs = 0;
->> +	} else {
->> +		cpu_if->vgic_eisr = 0;
->> +		cpu_if->vgic_elrsr = ~0UL;
->> +		cpu_if->vgic_misr = 0;
->> +	}
->>  }
->>  
->>  /* vcpu is already in the HYP VA space */
->> @@ -70,15 +82,30 @@ void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
->>  	struct vgic_dist *vgic = &kvm->arch.vgic;
->>  	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
->>  	int i, nr_lr;
->> +	u64 live_lrs = 0;
->>  
->>  	if (!base)
->>  		return;
->>  
->> -	writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
->> -	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
->> -	writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
->> -
->>  	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
->> +
->>  	for (i = 0; i < nr_lr; i++)
->> -		writel_relaxed(cpu_if->vgic_lr[i], base + GICH_LR0 + (i * 4));
->> +		if (cpu_if->vgic_lr[i] & GICH_LR_STATE)
->> +			live_lrs |= 1UL << i;
->> +
->> +	if (live_lrs) {
->> +		writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
->> +		writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
->> +		for (i = 0; i < nr_lr; i++) {
->> +			u32 val = 0;
->> +
->> +			if (live_lrs & (1UL << i))
->> +				val = cpu_if->vgic_lr[i];
->> +
->> +			writel_relaxed(val, base + GICH_LR0 + (i * 4));
->> +		}
->> +	}
->> +
->> +	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
-> 
-> couldn't you optimize this out by storing the last read value and
-> compare if anything changed?  (you'd have to invalidate the cached value
-> on vcpu_put obviously).
-
-Yeah, very good point. Only the guest can update this, so we could even
-move it to vcpu_load/vcpu_put entirely, and never save/restore it inside
-the run loop.
-
-I'll keep that for a further patch, as it requires a bit of infrastructure.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Ck1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+IHdyaXRlczoKCj4gT3VyIDY0Yml0
+IHN5c19yZWcgdGFibGUgaXMgYWJvdXQgOTAgZW50cmllcyBsb25nIChzbyBmYXIsIGFuZCB0aGUK
+PiBQTVUgc3VwcG9ydCBpcyBsaWtlbHkgdG8gaW5jcmVhc2UgdGhpcykuIFRoaXMgbWVhbnMgdGhh
+dCBvbiBhdmVyYWdlLAo+IGl0IHRha2VzIDQ1IGNvbXBhcmFpc29ucyB0byBmaW5kIHRoZSByaWdo
+dCBlbnRyeSAoYW5kIGFjdHVhbGx5IHRoZQo+IGZ1bGwgOTAgaWYgd2UgaGF2ZSB0byBzZWFyY2gg
+dGhlIGludmFyaWFudCB0YWJsZSkuCj4KPiBOb3QgdGhlIG1vc3QgZWZmaWNpZW50IHRoaW5nLiBT
+cGVjaWFsbHkgd2hlbiB5b3UgdGhpbmsgdGhhdCB0aGlzCj4gdGFibGUgaXMgYWxyZWFkeSBzb3J0
+ZWQuIFN3aXRjaGluZyB0byBhIGJpbmFyeSBzZWFyY2ggZWZmZWN0aXZlbHkKPiByZWR1Y2VzIHRo
+ZSBzZWFyY2ggdG8gYWJvdXQgNyBjb21wYXJhaXNvbnMuIFNsaWdodGx5IGJldHRlciEKCklzIHRo
+ZXJlIGFuIGFyZ3VtZW50IGZvciBtYWtpbmcgdGhpcyBhIGhhc2ggdGFibGUgaW5zdGVhZCBvciBp
+cyB0aGlzIG5vdApwb3NzaWJsZSBhcyB5b3Ugd291bGQgaGF2ZSB0byB1c2UgZHluYW1pY2FsbHkg
+YWxsb2NhdGVkIGluc3RlYWQ/CgotLQpBbGV4IEJlbm7DqWUKX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlz
+dHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4v
+bGlzdGluZm8va3ZtYXJtCg==
