@@ -1,7 +1,8 @@
 From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: [RFC v2 08/15] iommu/arm-smmu: implement iommu_get/put_single_reserved
-Date: Thu, 11 Feb 2016 14:34:15 +0000
-Message-ID: <1455201262-5259-9-git-send-email-eric.auger@linaro.org>
+Subject: [RFC v2 09/15] iommu/arm-smmu: relinquish reserved resources on
+	domain deletion
+Date: Thu, 11 Feb 2016 14:34:16 +0000
+Message-ID: <1455201262-5259-10-git-send-email-eric.auger@linaro.org>
 References: <1455201262-5259-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -21,152 +22,88 @@ To: eric.auger-qxv4g6HH51o@public.gmane.org, eric.auger-QSEj5FYQhm4dnm+yROfE0A@p
 Cc: Thomas.Lendacky-5C7GfCeVMHo@public.gmane.org, brijesh.singh-5C7GfCeVMHo@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, sherry.hurwitz-5C7GfCeVMHo@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Implement the iommu_get/put_single_reserved API in arm-smmu.
-
-In order to track which physical address is already mapped we
-use the RB tree indexed by PA.
+arm_smmu_unmap_reserved releases all reserved binding resources:
+destroy all bindings, free iova, free iova_domain. This happens
+on domain deletion.
 
 Signed-off-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-
 ---
-
-v1 -> v2:
-- previously in vfio_iommu_type1.c
----
- drivers/iommu/arm-smmu.c | 114 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 114 insertions(+)
+ drivers/iommu/arm-smmu.c | 34 +++++++++++++++++++++++++++++-----
+ 1 file changed, 29 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
-index 729a4c6..9961bfd 100644
+index 9961bfd..ae8a97d 100644
 --- a/drivers/iommu/arm-smmu.c
 +++ b/drivers/iommu/arm-smmu.c
-@@ -1563,6 +1563,118 @@ static void arm_smmu_free_reserved_iova_domain(struct iommu_domain *domain)
+@@ -363,6 +363,7 @@ struct arm_smmu_reserved_binding {
+ 	dma_addr_t		iova;
+ 	size_t			size;
+ };
++static void arm_smmu_unmap_reserved(struct iommu_domain *domain);
+ 
+ static struct iommu_ops arm_smmu_ops;
+ 
+@@ -1057,6 +1058,7 @@ static void arm_smmu_domain_free(struct iommu_domain *domain)
+ 	 * already been detached.
+ 	 */
+ 	arm_smmu_destroy_domain_context(domain);
++	arm_smmu_unmap_reserved(domain);
+ 	kfree(smmu_domain);
+ }
+ 
+@@ -1547,19 +1549,23 @@ unlock:
+ 	return ret;
+ }
+ 
+-static void arm_smmu_free_reserved_iova_domain(struct iommu_domain *domain)
++static void __arm_smmu_free_reserved_iova_domain(struct arm_smmu_domain *sd)
+ {
+-	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
+-	struct iova_domain *iovad = smmu_domain->reserved_iova_domain;
++	struct iova_domain *iovad = sd->reserved_iova_domain;
+ 
+ 	if (!iovad)
+ 		return;
+ 
+-	mutex_lock(&smmu_domain->reserved_mutex);
+-
+ 	put_iova_domain(iovad);
+ 	kfree(iovad);
++}
+ 
++static void arm_smmu_free_reserved_iova_domain(struct iommu_domain *domain)
++{
++	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
++
++	mutex_lock(&smmu_domain->reserved_mutex);
++	__arm_smmu_free_reserved_iova_domain(smmu_domain);
  	mutex_unlock(&smmu_domain->reserved_mutex);
  }
  
-+static int arm_smmu_get_single_reserved(struct iommu_domain *domain,
-+					phys_addr_t addr, int prot,
-+					dma_addr_t *iova)
+@@ -1675,6 +1681,24 @@ unlock:
+ 	mutex_unlock(&smmu_domain->reserved_mutex);
+ }
+ 
++static void arm_smmu_unmap_reserved(struct iommu_domain *domain)
 +{
 +	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-+	unsigned long order = __ffs(domain->ops->pgsize_bitmap);
-+	size_t page_size = 1 << order;
-+	phys_addr_t mask = page_size - 1;
-+	phys_addr_t aligned_addr = addr & ~mask;
-+	phys_addr_t offset  = addr - aligned_addr;
-+	struct arm_smmu_reserved_binding *b;
-+	struct iova *p_iova;
-+	struct iova_domain *iovad = smmu_domain->reserved_iova_domain;
-+	int ret;
-+
-+	if (!iovad)
-+		return -EINVAL;
++	struct rb_node *node;
 +
 +	mutex_lock(&smmu_domain->reserved_mutex);
++	while ((node = rb_first(&smmu_domain->reserved_binding_list))) {
++		struct arm_smmu_reserved_binding *b =
++			rb_entry(node, struct arm_smmu_reserved_binding, node);
 +
-+	b = find_reserved_binding(smmu_domain, aligned_addr, page_size);
-+	if (b) {
-+		*iova = b->iova + offset;
-+		kref_get(&b->kref);
-+		ret = 0;
-+		goto unlock;
++		while (!kref_put(&b->kref, reserved_binding_release))
++			;
 +	}
-+
-+	/* there is no existing reserved iova for this pa */
-+	p_iova = alloc_iova(iovad, 1, iovad->dma_32bit_pfn, true);
-+	if (!p_iova) {
-+		ret = -ENOMEM;
-+		goto unlock;
-+	}
-+	*iova = p_iova->pfn_lo << order;
-+
-+	b = kzalloc(sizeof(*b), GFP_KERNEL);
-+	if (!b) {
-+		ret = -ENOMEM;
-+		goto free_iova_unlock;
-+	}
-+
-+	ret = arm_smmu_map(domain, *iova, aligned_addr, page_size, prot);
-+	if (ret)
-+		goto free_binding_iova_unlock;
-+
-+	kref_init(&b->kref);
-+	kref_get(&b->kref);
-+	b->domain = smmu_domain;
-+	b->addr = aligned_addr;
-+	b->iova = *iova;
-+	b->size = page_size;
-+
-+	link_reserved_binding(smmu_domain, b);
-+
-+	*iova += offset;
-+	goto unlock;
-+
-+free_binding_iova_unlock:
-+	kfree(b);
-+free_iova_unlock:
-+	free_iova(smmu_domain->reserved_iova_domain, *iova >> order);
-+unlock:
-+	mutex_unlock(&smmu_domain->reserved_mutex);
-+	return ret;
-+}
-+
-+/* called with reserved_mutex locked */
-+static void reserved_binding_release(struct kref *kref)
-+{
-+	struct arm_smmu_reserved_binding *b =
-+		container_of(kref, struct arm_smmu_reserved_binding, kref);
-+	struct arm_smmu_domain *smmu_domain = b->domain;
-+	struct iommu_domain *d = &smmu_domain->domain;
-+	unsigned long order = __ffs(b->size);
-+
-+
-+	arm_smmu_unmap(d, b->iova, b->size);
-+	free_iova(smmu_domain->reserved_iova_domain, b->iova >> order);
-+	unlink_reserved_binding(smmu_domain, b);
-+	kfree(b);
-+}
-+
-+static void arm_smmu_put_single_reserved(struct iommu_domain *domain,
-+					 dma_addr_t iova)
-+{
-+	unsigned long order;
-+	phys_addr_t aligned_addr;
-+	dma_addr_t aligned_iova, page_size, mask, offset;
-+	struct arm_smmu_reserved_binding *b;
-+	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-+
-+	order = __ffs(domain->ops->pgsize_bitmap);
-+	page_size = (uint64_t)1 << order;
-+	mask = page_size - 1;
-+
-+	aligned_iova = iova & ~mask;
-+	offset = iova - aligned_iova;
-+
-+	aligned_addr = iommu_iova_to_phys(domain, aligned_iova);
-+
-+	mutex_lock(&smmu_domain->reserved_mutex);
-+
-+	b = find_reserved_binding(smmu_domain, aligned_addr, page_size);
-+	if (!b)
-+		goto unlock;
-+	kref_put(&b->kref, reserved_binding_release);
-+
-+unlock:
++	smmu_domain->reserved_binding_list = RB_ROOT;
++	__arm_smmu_free_reserved_iova_domain(smmu_domain);
 +	mutex_unlock(&smmu_domain->reserved_mutex);
 +}
 +
  static struct iommu_ops arm_smmu_ops = {
  	.capable			= arm_smmu_capable,
  	.domain_alloc			= arm_smmu_domain_alloc,
-@@ -1580,6 +1692,8 @@ static struct iommu_ops arm_smmu_ops = {
- 	.domain_set_attr		= arm_smmu_domain_set_attr,
- 	.alloc_reserved_iova_domain	= arm_smmu_alloc_reserved_iova_domain,
- 	.free_reserved_iova_domain	= arm_smmu_free_reserved_iova_domain,
-+	.get_single_reserved		= arm_smmu_get_single_reserved,
-+	.put_single_reserved		= arm_smmu_put_single_reserved,
- 	/* Page size bitmap, restricted during device attach */
- 	.pgsize_bitmap			= -1UL,
- };
 -- 
 1.9.1
