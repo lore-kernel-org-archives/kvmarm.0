@@ -1,160 +1,158 @@
-From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: [RFC v2 05/15] iommu/arm-smmu: implement
-	alloc/free_reserved_iova_domain
-Date: Thu, 11 Feb 2016 14:34:12 +0000
-Message-ID: <1455201262-5259-6-git-send-email-eric.auger@linaro.org>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [RFC v2 07/15] iommu: iommu_get/put_single_reserved
+Date: Thu, 11 Feb 2016 14:34:14 +0000
+Message-ID: <1455201262-5259-8-git-send-email-eric.auger@linaro.org>
 References: <1455201262-5259-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <1455201262-5259-1-git-send-email-eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: eric.auger-qxv4g6HH51o@public.gmane.org, eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Cc: Thomas.Lendacky-5C7GfCeVMHo@public.gmane.org, brijesh.singh-5C7GfCeVMHo@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, sherry.hurwitz-5C7GfCeVMHo@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 89F3249B9F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 09:29:27 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id bXwdmxR8s2i5 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Feb 2016 09:29:26 -0500 (EST)
+Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6B6A549BCB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 09:29:26 -0500 (EST)
+Received: by mail-wm0-f46.google.com with SMTP id g62so71548099wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 06:35:21 -0800 (PST)
+In-Reply-To: <1455201262-5259-1-git-send-email-eric.auger@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Thomas.Lendacky@amd.com, brijesh.singh@amd.com, patches@linaro.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, leo.duran@amd.com, sherry.hurwitz@amd.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Implement alloc/free_reserved_iova_domain for arm-smmu. we use
-the iova allocator (iova.c). The iova_domain is attached to the
-arm_smmu_domain struct. A mutex is introduced to protect it.
+This patch introduces iommu_get/put_single_reserved.
 
-Signed-off-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+iommu_get_single_reserved allows to allocate a new reserved iova page
+and map it onto the physical page that contains a given physical address.
+It returns the iova that is mapped onto the provided physical address.
+Hence the physical address passed in argument does not need to be aligned.
+
+In case a mapping already exists between both pages, the IOVA mapped
+to the PA is directly returned.
+
+Each time an iova is successfully returned a binding ref count is
+incremented.
+
+iommu_put_single_reserved decrements the ref count and when this latter
+is null, the mapping is destroyed and the iova is released.
+
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
+Signed-off-by: Ankit Jindal <ajindal@apm.com>
+Signed-off-by: Pranavkumar Sawargaonkar <pranavkumar@linaro.org>
+Signed-off-by: Bharat Bhushan <Bharat.Bhushan@freescale.com>
 
 ---
+
+Currently the ref counting is does not really used. All bindings will be
+destroyed when the domain is killed.
 
 v1 -> v2:
-- formerly implemented in vfio_iommu_type1
+- previously a VFIO API, named vfio_alloc_map/unmap_free_reserved_iova
 ---
- drivers/iommu/arm-smmu.c | 87 +++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 72 insertions(+), 15 deletions(-)
+ drivers/iommu/iommu.c | 21 +++++++++++++++++++++
+ include/linux/iommu.h | 31 +++++++++++++++++++++++++++++++
+ 2 files changed, 52 insertions(+)
 
-diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
-index c8b7e71..f42341d 100644
---- a/drivers/iommu/arm-smmu.c
-+++ b/drivers/iommu/arm-smmu.c
-@@ -42,6 +42,7 @@
- #include <linux/platform_device.h>
- #include <linux/slab.h>
- #include <linux/spinlock.h>
-+#include <linux/iova.h>
- 
- #include <linux/amba/bus.h>
- 
-@@ -347,6 +348,9 @@ struct arm_smmu_domain {
- 	enum arm_smmu_domain_stage	stage;
- 	struct mutex			init_mutex; /* Protects smmu pointer */
- 	struct iommu_domain		domain;
-+	struct iova_domain		*reserved_iova_domain;
-+	/* protects reserved domain manipulation */
-+	struct mutex			reserved_mutex;
- };
- 
- static struct iommu_ops arm_smmu_ops;
-@@ -975,6 +979,7 @@ static struct iommu_domain *arm_smmu_domain_alloc(unsigned type)
- 		return NULL;
- 
- 	mutex_init(&smmu_domain->init_mutex);
-+	mutex_init(&smmu_domain->reserved_mutex);
- 	spin_lock_init(&smmu_domain->pgtbl_lock);
- 
- 	return &smmu_domain->domain;
-@@ -1446,22 +1451,74 @@ out_unlock:
- 	return ret;
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index a994f34..14ebde1 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -1415,6 +1415,27 @@ size_t iommu_unmap(struct iommu_domain *domain, unsigned long iova, size_t size)
+ 	return unmapped;
  }
- 
-+static int arm_smmu_alloc_reserved_iova_domain(struct iommu_domain *domain,
-+					       dma_addr_t iova, size_t size,
-+					       unsigned long order)
+ EXPORT_SYMBOL_GPL(iommu_unmap);
++int iommu_get_single_reserved(struct iommu_domain *domain,
++			      phys_addr_t addr, int prot,
++			      dma_addr_t *iova)
 +{
-+	unsigned long granule, mask;
-+	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-+	int ret = 0;
++	if (!domain->ops->get_single_reserved)
++		return  -ENODEV;
 +
-+	granule = 1UL << order;
-+	mask = granule - 1;
-+	if (iova & mask || (!size) || (size & mask))
-+		return -EINVAL;
++	return domain->ops->get_single_reserved(domain, addr, prot, iova);
 +
-+	if (smmu_domain->reserved_iova_domain)
-+		return -EEXIST;
-+
-+	mutex_lock(&smmu_domain->reserved_mutex);
-+
-+	smmu_domain->reserved_iova_domain =
-+		kzalloc(sizeof(struct iova_domain), GFP_KERNEL);
-+	if (!smmu_domain->reserved_iova_domain) {
-+		ret = -ENOMEM;
-+		goto unlock;
-+	}
-+
-+	init_iova_domain(smmu_domain->reserved_iova_domain,
-+			 granule, iova >> order, (iova + size - 1) >> order);
-+
-+unlock:
-+	mutex_unlock(&smmu_domain->reserved_mutex);
-+	return ret;
 +}
++EXPORT_SYMBOL_GPL(iommu_get_single_reserved);
 +
-+static void arm_smmu_free_reserved_iova_domain(struct iommu_domain *domain)
++void iommu_put_single_reserved(struct iommu_domain *domain,
++			       dma_addr_t iova)
 +{
-+	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
-+	struct iova_domain *iovad = smmu_domain->reserved_iova_domain;
-+
-+	if (!iovad)
++	if (!domain->ops->put_single_reserved)
 +		return;
 +
-+	mutex_lock(&smmu_domain->reserved_mutex);
-+
-+	put_iova_domain(iovad);
-+	kfree(iovad);
-+
-+	mutex_unlock(&smmu_domain->reserved_mutex);
++	domain->ops->put_single_reserved(domain, iova);
++}
++EXPORT_SYMBOL_GPL(iommu_put_single_reserved);
+ 
+ size_t default_iommu_map_sg(struct iommu_domain *domain, unsigned long iova,
+ 			 struct scatterlist *sg, unsigned int nents, int prot)
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index 32c1a4e..148465b8 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -201,6 +201,21 @@ struct iommu_ops {
+ 					  unsigned long order);
+ 	/* frees the reserved iova domain */
+ 	void (*free_reserved_iova_domain)(struct iommu_domain *domain);
++	/**
++	 * allocate a reserved iova page and bind it onto the page that
++	 * contains a physical address (@addr), returns the @iova bound to
++	 * @addr. In case the 2 pages already are bound simply return @iova
++	 * and increment a ref count.
++	 */
++	int (*get_single_reserved)(struct iommu_domain *domain,
++					 phys_addr_t addr, int prot,
++					 dma_addr_t *iova);
++	/**
++	 * decrement a ref count of the iova page. If null, unmap the iova page
++	 * and release the iova
++	 */
++	void (*put_single_reserved)(struct iommu_domain *domain,
++					   dma_addr_t iova);
+ 
+ #ifdef CONFIG_OF_IOMMU
+ 	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
+@@ -276,6 +291,11 @@ extern int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
+ 					    dma_addr_t iova, size_t size,
+ 					    unsigned long order);
+ extern void iommu_free_reserved_iova_domain(struct iommu_domain *domain);
++extern int iommu_get_single_reserved(struct iommu_domain *domain,
++				     phys_addr_t paddr, int prot,
++				     dma_addr_t *iova);
++extern void iommu_put_single_reserved(struct iommu_domain *domain,
++				      dma_addr_t iova);
+ struct device *iommu_device_create(struct device *parent, void *drvdata,
+ 				   const struct attribute_group **groups,
+ 				   const char *fmt, ...) __printf(4, 5);
+@@ -562,6 +582,17 @@ static void iommu_free_reserved_iova_domain(struct iommu_domain *domain)
+ {
+ }
+ 
++static int iommu_get_single_reserved(struct iommu_domain *domain,
++				     phys_addr_t paddr, int prot,
++				     dma_addr_t *iova)
++{
++	return -EINVAL;
++}
++static void iommu_put_single_reserved(struct iommu_domain *domain,
++				      dma_addr_t iova)
++{
 +}
 +
- static struct iommu_ops arm_smmu_ops = {
--	.capable		= arm_smmu_capable,
--	.domain_alloc		= arm_smmu_domain_alloc,
--	.domain_free		= arm_smmu_domain_free,
--	.attach_dev		= arm_smmu_attach_dev,
--	.detach_dev		= arm_smmu_detach_dev,
--	.map			= arm_smmu_map,
--	.unmap			= arm_smmu_unmap,
--	.map_sg			= default_iommu_map_sg,
--	.iova_to_phys		= arm_smmu_iova_to_phys,
--	.add_device		= arm_smmu_add_device,
--	.remove_device		= arm_smmu_remove_device,
--	.device_group		= arm_smmu_device_group,
--	.domain_get_attr	= arm_smmu_domain_get_attr,
--	.domain_set_attr	= arm_smmu_domain_set_attr,
--	.pgsize_bitmap		= -1UL, /* Restricted during device attach */
-+	.capable			= arm_smmu_capable,
-+	.domain_alloc			= arm_smmu_domain_alloc,
-+	.domain_free			= arm_smmu_domain_free,
-+	.attach_dev			= arm_smmu_attach_dev,
-+	.detach_dev			= arm_smmu_detach_dev,
-+	.map				= arm_smmu_map,
-+	.unmap				= arm_smmu_unmap,
-+	.map_sg				= default_iommu_map_sg,
-+	.iova_to_phys			= arm_smmu_iova_to_phys,
-+	.add_device			= arm_smmu_add_device,
-+	.remove_device			= arm_smmu_remove_device,
-+	.device_group			= arm_smmu_device_group,
-+	.domain_get_attr		= arm_smmu_domain_get_attr,
-+	.domain_set_attr		= arm_smmu_domain_set_attr,
-+	.alloc_reserved_iova_domain	= arm_smmu_alloc_reserved_iova_domain,
-+	.free_reserved_iova_domain	= arm_smmu_free_reserved_iova_domain,
-+	/* Page size bitmap, restricted during device attach */
-+	.pgsize_bitmap			= -1UL,
- };
+ #endif /* CONFIG_IOMMU_API */
  
- static void arm_smmu_device_reset(struct arm_smmu_device *smmu)
+ #endif /* __LINUX_IOMMU_H */
 -- 
 1.9.1
