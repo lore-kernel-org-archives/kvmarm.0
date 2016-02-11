@@ -1,24 +1,25 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC v2 12/15] msi: export msi_get_domain_info
-Date: Thu, 11 Feb 2016 14:34:19 +0000
-Message-ID: <1455201262-5259-13-git-send-email-eric.auger@linaro.org>
+Subject: [RFC v2 13/15] vfio/type1: also check IRQ remapping capability at msi
+ domain
+Date: Thu, 11 Feb 2016 14:34:20 +0000
+Message-ID: <1455201262-5259-14-git-send-email-eric.auger@linaro.org>
 References: <1455201262-5259-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E0B2C49AAF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 09:29:47 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D46149AAF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 09:29:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nbY8jA-aoPoZ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Feb 2016 09:29:47 -0500 (EST)
-Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id EBEDE499E8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 09:29:46 -0500 (EST)
-Received: by mail-wm0-f43.google.com with SMTP id g62so23927792wme.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 06:35:42 -0800 (PST)
+ with ESMTP id vMefo2DxXzXw for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Feb 2016 09:29:51 -0500 (EST)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3D16149A0C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 09:29:50 -0500 (EST)
+Received: by mail-wm0-f53.google.com with SMTP id g62so23930418wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 06:35:46 -0800 (PST)
 In-Reply-To: <1455201262-5259-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,39 +34,99 @@ To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, will.d
 Cc: Thomas.Lendacky@amd.com, brijesh.singh@amd.com, patches@linaro.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, leo.duran@amd.com, sherry.hurwitz@amd.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We plan to use msi_get_domain_info in VFIO module so let's export it.
+On x86 IRQ remapping is abstracted by the IOMMU. On ARM this is abstracted
+by the msi controller. vfio_msi_parent_irq_remapping_capable allows to
+check whether interrupts are "safe" for a given device. There are if the device
+does not use MSI or if the device uses MSI and the msi-parent controller
+supports IRQ remapping.
+
+Then we check at group level if all devices have safe interrupts: if not
+only allow the group to be attached if allow_unsafe_interrupts is set.
+
+At this point ARM sMMU still advertises IOMMU_CAP_INTR_REMAP. This is
+changed in next patch.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 ---
- include/linux/msi.h | 4 ++++
- kernel/irq/msi.c    | 1 +
- 2 files changed, 5 insertions(+)
+ drivers/vfio/vfio_iommu_type1.c | 38 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 36 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/msi.h b/include/linux/msi.h
-index 03eda72..df19315 100644
---- a/include/linux/msi.h
-+++ b/include/linux/msi.h
-@@ -323,6 +323,10 @@ static inline struct irq_domain *pci_msi_get_device_domain(struct pci_dev *pdev)
- {
- 	return NULL;
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index c5d3b48..080321b 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -36,6 +36,8 @@
+ #include <linux/uaccess.h>
+ #include <linux/vfio.h>
+ #include <linux/workqueue.h>
++#include <linux/irqdomain.h>
++#include <linux/msi.h>
+ 
+ #define DRIVER_VERSION  "0.2"
+ #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
+@@ -754,6 +756,31 @@ static int vfio_bus_type(struct device *dev, void *data)
+ 	return 0;
  }
-+static struct msi_domain_info *msi_get_domain_info(struct irq_domain *domain)
+ 
++/**
++ * vfio_msi_parent_irq_remapping_capable: returns whether the device msi-parent
++ * controller supports IRQ remapping, aka interrupt translation
++ *
++ * @dev: device handle
++ * @data: unused
++ * returns 0 if irq remapping is supported or -1 if not supported.
++ */
++static int vfio_msi_parent_irq_remapping_capable(struct device *dev, void *data)
 +{
-+	return NULL;
++	struct irq_domain *domain;
++	struct msi_domain_info *info;
++
++	domain = dev_get_msi_domain(dev);
++	if (!domain)
++		return 0;
++
++	info = msi_get_domain_info(domain);
++
++	if (!(info->flags & MSI_FLAG_IRQ_REMAPPING))
++		return -1;
++
++	return 0;
 +}
- #endif /* CONFIG_PCI_MSI_IRQ_DOMAIN */
- 
- #endif /* LINUX_MSI_H */
-diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
-index 38e89ce..9b0ba4a 100644
---- a/kernel/irq/msi.c
-+++ b/kernel/irq/msi.c
-@@ -400,5 +400,6 @@ struct msi_domain_info *msi_get_domain_info(struct irq_domain *domain)
++
+ static int vfio_iommu_replay(struct vfio_iommu *iommu,
+ 			     struct vfio_domain *domain)
  {
- 	return (struct msi_domain_info *)domain->host_data;
- }
-+EXPORT_SYMBOL_GPL(msi_get_domain_info);
+@@ -848,7 +875,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 	struct vfio_group *group, *g;
+ 	struct vfio_domain *domain, *d;
+ 	struct bus_type *bus = NULL;
+-	int ret;
++	int ret, irq_remapping;
  
- #endif /* CONFIG_GENERIC_MSI_IRQ_DOMAIN */
+ 	mutex_lock(&iommu->lock);
+ 
+@@ -871,6 +898,13 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 
+ 	group->iommu_group = iommu_group;
+ 
++	/*
++	 * Determine if all the devices of the group has an MSI-parent that
++	 * supports irq remapping
++	 */
++	irq_remapping = !iommu_group_for_each_dev(iommu_group, &bus,
++				       vfio_msi_parent_irq_remapping_capable);
++
+ 	/* Determine bus_type in order to allocate a domain */
+ 	ret = iommu_group_for_each_dev(iommu_group, &bus, vfio_bus_type);
+ 	if (ret)
+@@ -899,7 +933,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 	list_add(&group->next, &domain->group_list);
+ 
+ 	if (!allow_unsafe_interrupts &&
+-	    !iommu_capable(bus, IOMMU_CAP_INTR_REMAP)) {
++	    (!iommu_capable(bus, IOMMU_CAP_INTR_REMAP) && !irq_remapping)) {
+ 		pr_warn("%s: No interrupt remapping support.  Use the module param \"allow_unsafe_interrupts\" to enable VFIO IOMMU support on this platform\n",
+ 		       __func__);
+ 		ret = -EPERM;
 -- 
 1.9.1
