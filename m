@@ -1,54 +1,66 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 16/23] arm64: KVM: VHE: Use unified sysreg accessors for timer
-Date: Thu, 11 Feb 2016 18:39:57 +0000
-Message-ID: <1455216004-19499-17-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v4 17/23] arm64: KVM: VHE: Add fpsimd enabling on guest access
+Date: Thu, 11 Feb 2016 18:39:58 +0000
+Message-ID: <1455216004-19499-18-git-send-email-marc.zyngier@arm.com>
 References: <1455216004-19499-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D7CF549B66
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 13:34:43 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id MZxTQ7TI7QkG for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Feb 2016 13:34:42 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 93ABC49C00
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 13:34:40 -0500 (EST)
 In-Reply-To: <1455216004-19499-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Switch the timer code to the unified sysreg accessors.
+Despite the fact that a VHE enabled kernel runs at EL2, it uses
+CPACR_EL1 to trap FPSIMD access. Add the required alternative
+code to re-enable guest FPSIMD access when it has trapped to
+EL2.
 
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/timer-sr.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ arch/arm64/kvm/hyp/entry.S | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/timer-sr.c b/arch/arm64/kvm/hyp/timer-sr.c
-index 1051e5d..f276d9e 100644
---- a/arch/arm64/kvm/hyp/timer-sr.c
-+++ b/arch/arm64/kvm/hyp/timer-sr.c
-@@ -31,12 +31,12 @@ void __hyp_text __timer_save_state(struct kvm_vcpu *vcpu)
- 	u64 val;
+diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
+index fd0fbe9..ce9e5e5 100644
+--- a/arch/arm64/kvm/hyp/entry.S
++++ b/arch/arm64/kvm/hyp/entry.S
+@@ -130,9 +130,15 @@ ENDPROC(__guest_exit)
+ ENTRY(__fpsimd_guest_restore)
+ 	stp	x4, lr, [sp, #-16]!
  
- 	if (kvm->arch.timer.enabled) {
--		timer->cntv_ctl = read_sysreg(cntv_ctl_el0);
--		timer->cntv_cval = read_sysreg(cntv_cval_el0);
-+		timer->cntv_ctl = read_sysreg_el0(cntv_ctl);
-+		timer->cntv_cval = read_sysreg_el0(cntv_cval);
- 	}
++alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+ 	mrs	x2, cptr_el2
+ 	bic	x2, x2, #CPTR_EL2_TFP
+ 	msr	cptr_el2, x2
++alternative_else
++	mrs	x2, cpacr_el1
++	orr	x2, x2, #CPACR_EL1_FPEN
++	msr	cpacr_el1, x2
++alternative_endif
+ 	isb
  
- 	/* Disable the virtual timer */
--	write_sysreg(0, cntv_ctl_el0);
-+	write_sysreg_el0(0, cntv_ctl);
- 
- 	/* Allow physical timer/counter access for the host */
- 	val = read_sysreg(cnthctl_el2);
-@@ -64,8 +64,8 @@ void __hyp_text __timer_restore_state(struct kvm_vcpu *vcpu)
- 
- 	if (kvm->arch.timer.enabled) {
- 		write_sysreg(kvm->arch.timer.cntvoff, cntvoff_el2);
--		write_sysreg(timer->cntv_cval, cntv_cval_el0);
-+		write_sysreg_el0(timer->cntv_cval, cntv_cval);
- 		isb();
--		write_sysreg(timer->cntv_ctl, cntv_ctl_el0);
-+		write_sysreg_el0(timer->cntv_ctl, cntv_ctl);
- 	}
- }
+ 	mrs	x3, tpidr_el2
 -- 
 2.1.4
-
