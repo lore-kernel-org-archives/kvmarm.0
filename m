@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 07/23] arm64: KVM: VHE: Patch out use of HVC
-Date: Thu, 11 Feb 2016 18:39:48 +0000
-Message-ID: <1455216004-19499-8-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v4 01/23] arm/arm64: KVM: Add hook for C-based stage2 init
+Date: Thu, 11 Feb 2016 18:39:42 +0000
+Message-ID: <1455216004-19499-2-git-send-email-marc.zyngier@arm.com>
 References: <1455216004-19499-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BEA8249C05
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 13:34:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EAEA749BE8
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 13:34:16 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mABd19sobQGS for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Feb 2016 13:34:26 -0500 (EST)
+ with ESMTP id wrVBWwPunY63 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Feb 2016 13:34:15 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2473449BED
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 13:34:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DB23249BEA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 13:34:15 -0500 (EST)
 In-Reply-To: <1455216004-19499-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,105 +31,58 @@ To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-With VHE, the host never issues an HVC instruction to get into the
-KVM code, as we can simply branch there.
-
-Use runtime code patching to simplify things a bit.
+As we're about to move the stage2 init to C code, introduce some
+C hooks that will later be populated with arch-specific implementations.
 
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp.S           |  7 +++++++
- arch/arm64/kvm/hyp/hyp-entry.S | 40 +++++++++++++++++++++++++++++++---------
- 2 files changed, 38 insertions(+), 9 deletions(-)
+ arch/arm/include/asm/kvm_host.h   | 4 ++++
+ arch/arm/kvm/arm.c                | 1 +
+ arch/arm64/include/asm/kvm_host.h | 4 ++++
+ 3 files changed, 9 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-index 0ccdcbb..0689a74 100644
---- a/arch/arm64/kvm/hyp.S
-+++ b/arch/arm64/kvm/hyp.S
-@@ -17,7 +17,9 @@
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index f9f2779..f1e86f1 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -220,6 +220,10 @@ static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
+ 	kvm_call_hyp((void*)hyp_stack_ptr, vector_ptr, pgd_ptr);
+ }
  
- #include <linux/linkage.h>
- 
-+#include <asm/alternative.h>
- #include <asm/assembler.h>
-+#include <asm/cpufeature.h>
- 
- /*
-  * u64 kvm_call_hyp(void *hypfn, ...);
-@@ -38,6 +40,11 @@
-  * arch/arm64/kernel/hyp_stub.S.
-  */
- ENTRY(kvm_call_hyp)
-+alternative_if_not ARM64_HAS_VIRT_HOST_EXTN	
- 	hvc	#0
- 	ret
-+alternative_else
-+	b	__vhe_hyp_call
-+	nop
-+alternative_endif
- ENDPROC(kvm_call_hyp)
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 93e8d983..1bdeee7 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -38,6 +38,34 @@
- 	ldp	x0, x1, [sp], #16
- .endm
- 
-+.macro do_el2_call
-+	/*
-+	 * Shuffle the parameters before calling the function
-+	 * pointed to in x0. Assumes parameters in x[1,2,3].
-+	 */
-+	sub	sp, sp, #16
-+	str	lr, [sp]
-+	mov	lr, x0
-+	mov	x0, x1
-+	mov	x1, x2
-+	mov	x2, x3
-+	blr	lr
-+	ldr	lr, [sp]
-+	add	sp, sp, #16
-+.endm
++static inline void __cpu_init_stage2(void)
++{
++}
 +
-+ENTRY(__vhe_hyp_call)
-+	do_el2_call
-+	/*
-+	 * We used to rely on having an exception return to get
-+	 * an implicit isb. In the E2H case, we don't have it anymore.
-+	 * rather than changing all the leaf functions, just do it here
-+	 * before returning to the rest of the kernel.
-+	 */
-+	isb
-+	ret
-+ENDPROC(__vhe_hyp_call)
-+	
- el1_sync:				// Guest trapped into EL2
- 	save_x0_to_x3
+ static inline int kvm_arch_dev_ioctl_check_extension(long ext)
+ {
+ 	return 0;
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index dda1959..6b76e01 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -985,6 +985,7 @@ static void cpu_init_hyp_mode(void *dummy)
+ 	vector_ptr = (unsigned long)__kvm_hyp_vector;
  
-@@ -58,19 +86,13 @@ el1_sync:				// Guest trapped into EL2
- 	mrs	x0, vbar_el2
- 	b	2f
+ 	__cpu_init_hyp_mode(boot_pgd_ptr, pgd_ptr, hyp_stack_ptr, vector_ptr);
++	__cpu_init_stage2();
  
--1:	stp	lr, xzr, [sp, #-16]!
--
-+1:
- 	/*
--	 * Compute the function address in EL2, and shuffle the parameters.
-+	 * Perform the EL2 call
- 	 */
- 	kern_hyp_va	x0
--	mov	lr, x0
--	mov	x0, x1
--	mov	x1, x2
--	mov	x2, x3
--	blr	lr
-+	do_el2_call
+ 	kvm_arm_init_debug();
+ }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 689d4c9..fe86cf9 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -332,6 +332,10 @@ static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
+ 		     hyp_stack_ptr, vector_ptr);
+ }
  
--	ldp	lr, xzr, [sp], #16
- 2:	eret
- 
- el1_trap:
++static inline void __cpu_init_stage2(void)
++{
++}
++
+ static inline void kvm_arch_hardware_disable(void) {}
+ static inline void kvm_arch_hardware_unsetup(void) {}
+ static inline void kvm_arch_sync_events(struct kvm *kvm) {}
 -- 
 2.1.4
