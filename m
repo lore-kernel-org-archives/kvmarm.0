@@ -1,137 +1,116 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] arm/arm64: KVM: Handle out-of-RAM cache maintenance as a
- NOP
-Date: Thu, 11 Feb 2016 10:49:03 +0000
-Message-ID: <56BC671F.2070108@arm.com>
-References: <1454942245-18452-1-git-send-email-marc.zyngier@arm.com>
- <20160211084347.GT5171@cbox>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH] arm64: KVM: Configure TCR_EL2.PS at runtime
+Date: Thu, 11 Feb 2016 14:27:08 +0100
+Message-ID: <20160211132708.GU5171@cbox>
+References: <1455130013-28644-1-git-send-email-tchalamarla@caviumnetworks.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160211084347.GT5171@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C9C549B8F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 08:20:36 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id qrLXth60FxIe for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Feb 2016 08:20:34 -0500 (EST)
+Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E7B6349B6D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 08:20:33 -0500 (EST)
+Received: by mail-wm0-f44.google.com with SMTP id g62so68832598wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 05:26:28 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <1455130013-28644-1-git-send-email-tchalamarla@caviumnetworks.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: tchalamarla@caviumnetworks.com
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 11/02/16 08:43, Christoffer Dall wrote:
-> On Mon, Feb 08, 2016 at 02:37:25PM +0000, Marc Zyngier wrote:
->> So far, our handling of cache maintenance by VA has been pretty
->> simple: Either the access is in the guest RAM and generates a S2
->> fault, which results in the page being mapped RW, or we go down
->> the io_mem_abort() path, and nuke the guest.
->>
->> The first one is fine, but the second one is extremely weird.
->> Treating the CM as an I/O is wrong, and nothing in the ARM ARM
->> indicates that we should generate a fault for something that
->> cannot end-up in the cache anyway (even if the guest maps it,
->> it will keep on faulting at stage-2 for emulation).
->>
->> So let's just skip this instruction, and let the guest get away
->> with it.
->>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  arch/arm/include/asm/kvm_emulate.h   |  5 +++++
->>  arch/arm/kvm/mmu.c                   | 17 +++++++++++++++++
->>  arch/arm64/include/asm/kvm_emulate.h |  5 +++++
->>  3 files changed, 27 insertions(+)
->>
->> diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
->> index 3095df0..f768797 100644
->> --- a/arch/arm/include/asm/kvm_emulate.h
->> +++ b/arch/arm/include/asm/kvm_emulate.h
->> @@ -143,6 +143,11 @@ static inline bool kvm_vcpu_dabt_iss1tw(struct kvm_vcpu *vcpu)
->>  	return kvm_vcpu_get_hsr(vcpu) & HSR_DABT_S1PTW;
->>  }
->>  
->> +static inline bool kvm_vcpu_dabt_iscm(struct kvm_vcpu *vcpu)
->> +{
->> +	return !!(kvm_vcpu_get_hsr(vcpu) & HSR_DABT_CM);
->> +}
->> +
->>  /* Get Access Size from a data abort */
->>  static inline int kvm_vcpu_dabt_get_as(struct kvm_vcpu *vcpu)
->>  {
->> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
->> index aba61fd..1a5f2ea 100644
->> --- a/arch/arm/kvm/mmu.c
->> +++ b/arch/arm/kvm/mmu.c
->> @@ -1431,6 +1431,23 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>  		}
->>  
->>  		/*
->> +		 * Check for a cache maintenance operation. Since we
->> +		 * ended-up here, we know it is outside of any memory
->> +		 * slot. But we can't find out if that is for a device,
->> +		 * or if the guest is just being stupid (going all the
->> +		 * way to userspace is not an option - what would you
->> +		 * write?).
+On Wed, Feb 10, 2016 at 10:46:53AM -0800, tchalamarla@caviumnetworks.com wrote:
+> From: Tirumalesh Chalamarla <tchalamarla@caviumnetworks.com>
 > 
-> I'm not sure what the stuff about "what would you write?" means, I'm
-> assuming it means that the ISV bit is clear.
-
-What I was trying to say that is that if you really wanted to find out
-whether the range the guest is trying to access is a device or just a
-non-existent address, you'd have to go all the way to userspace to check
-that there is actually a device there. But then, what should the access
-be? Read or Write? We don't have a non-destructive "check access" operation.
-
-> I think the point is more that if there's no S2 mapping, then there
-> could never be any cache entries as a result of memory accesses using
-> the GVA in question, so there's nothing to invalidate (like you state in
-> your commit message).
-
-Agreed. I may just write that instead.
-
+> Setting TCR_EL2.PS to 40 bits is wrong on systems with PS size is
+> less than 40 bits. and with systems where RAM is at higher address,
+> this will break KVM.
 > 
->> +		 *
->> +		 * So let's assume that the guest is just being
->> +		 * cautious, and skip the instruction.
->> +		 */
->> +		if (kvm_vcpu_dabt_iscm(vcpu)) {
->> +			kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
->> +			ret = 1;
->> +			goto out_unlock;
->> +		}
->> +
->> +		/*
->>  		 * The IPA is reported as [MAX:12], so we need to
->>  		 * complement it with the bottom 12 bits from the
->>  		 * faulting VA. This is always 12 bits, irrespective
->> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
->> index 3066328..01cdf5f 100644
->> --- a/arch/arm64/include/asm/kvm_emulate.h
->> +++ b/arch/arm64/include/asm/kvm_emulate.h
->> @@ -185,6 +185,11 @@ static inline bool kvm_vcpu_dabt_iss1tw(const struct kvm_vcpu *vcpu)
->>  	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_S1PTW);
->>  }
->>  
->> +static inline bool kvm_vcpu_dabt_iscm(const struct kvm_vcpu *vcpu)
->> +{
->> +	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_CM);
->> +}
->> +
->>  static inline int kvm_vcpu_dabt_get_as(const struct kvm_vcpu *vcpu)
->>  {
->>  	return 1 << ((kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
->> -- 
->> 2.1.4
->>
+> This patch sets TCR_EL2.PS at runtime similar to VTCR_EL2.PS
 > 
-> some nitpicking: if you modify anything here, I think is_cm is more clear than iscm.
-
-Fair enough, I'll amend it.
-
+> changes form V2:
+> 	- Modified subject line and commit message.
+> 	- Removed TCR_EL2_FLAGS.
 > 
-> But besides the cosmetics:
+> changes from V1:
+>         - Moved to dynamic configuration.
 > 
-> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Tirumalesh Chalamarla <tchalamarla@caviumnetworks.com>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h |  2 --
+>  arch/arm64/kvm/hyp-init.S        | 12 +++++++-----
+>  2 files changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 738a95f..3776db0 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -107,8 +107,6 @@
+>  #define TCR_EL2_MASK	(TCR_EL2_TG0 | TCR_EL2_SH0 | \
+>  			 TCR_EL2_ORGN0 | TCR_EL2_IRGN0 | TCR_EL2_T0SZ)
+>  
+> -#define TCR_EL2_FLAGS	(TCR_EL2_RES1 | TCR_EL2_PS_40B)
+> -
+>  /* VTCR_EL2 Registers bits */
+>  #define VTCR_EL2_RES1		(1 << 31)
+>  #define VTCR_EL2_PS_MASK	(7 << 16)
+> diff --git a/arch/arm64/kvm/hyp-init.S b/arch/arm64/kvm/hyp-init.S
+> index 3e568dc..b5ab1b0 100644
+> --- a/arch/arm64/kvm/hyp-init.S
+> +++ b/arch/arm64/kvm/hyp-init.S
+> @@ -64,7 +64,7 @@ __do_hyp_init:
+>  	mrs	x4, tcr_el1
+>  	ldr	x5, =TCR_EL2_MASK
+>  	and	x4, x4, x5
+> -	ldr	x5, =TCR_EL2_FLAGS
+> +	ldr	x5, =TCR_EL2_RES1
+>  	orr	x4, x4, x5
+>  
+>  #ifndef CONFIG_ARM64_VA_BITS_48
+> @@ -85,15 +85,17 @@ __do_hyp_init:
+>  	ldr_l	x5, idmap_t0sz
+>  	bfi	x4, x5, TCR_T0SZ_OFFSET, TCR_TxSZ_WIDTH
+>  #endif
+> -	msr	tcr_el2, x4
+> -
+> -	ldr	x4, =VTCR_EL2_FLAGS
+>  	/*
+>  	 * Read the PARange bits from ID_AA64MMFR0_EL1 and set the PS bits in
+> -	 * VTCR_EL2.
+> +	 * TCR_EL2 and VTCR_EL2.
+>  	 */
+>  	mrs	x5, ID_AA64MMFR0_EL1
+>  	bfi	x4, x5, #16, #3
+> +
+> +	msr	tcr_el2, x4
+> +
+> +	ldr	x4, =VTCR_EL2_FLAGS
+> +	bfi	x4, x5, #16, #3
+>  	/*
+>  	 * Read the VMIDBits bits from ID_AA64MMFR1_EL1 and set the VS bit in
+>  	 * VTCR_EL2.
+> -- 
+> 2.1.0
 > 
 
-Thanks!
+This looks reasonable enough for me.  Did we limit Linux to PS=40 bits
+in the past and have lifted this restriction, or why did we have this
+limitation for EL2 translations in the past?
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Thanks,
+-Christoffer
