@@ -1,144 +1,172 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC v2 06/15] iommu/arm-smmu: add a reserved binding RB tree
-Date: Thu, 11 Feb 2016 14:34:13 +0000
-Message-ID: <1455201262-5259-7-git-send-email-eric.auger@linaro.org>
+From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: [RFC v2 08/15] iommu/arm-smmu: implement iommu_get/put_single_reserved
+Date: Thu, 11 Feb 2016 14:34:15 +0000
+Message-ID: <1455201262-5259-9-git-send-email-eric.auger@linaro.org>
 References: <1455201262-5259-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 39C1449BCF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 09:29:23 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6r2pzrp0xuzw for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Feb 2016 09:29:22 -0500 (EST)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 49F0749B9C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 09:29:22 -0500 (EST)
-Received: by mail-wm0-f44.google.com with SMTP id c200so76072676wme.0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 06:35:17 -0800 (PST)
-In-Reply-To: <1455201262-5259-1-git-send-email-eric.auger@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: Thomas.Lendacky@amd.com, brijesh.singh@amd.com, patches@linaro.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, leo.duran@amd.com, sherry.hurwitz@amd.com
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <1455201262-5259-1-git-send-email-eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: eric.auger-qxv4g6HH51o@public.gmane.org, eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: Thomas.Lendacky-5C7GfCeVMHo@public.gmane.org, brijesh.singh-5C7GfCeVMHo@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, sherry.hurwitz-5C7GfCeVMHo@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-we will need to track which host physical addresses are mapped to
-reserved IOVA. In that prospect we introduce a new RB tree indexed
-by physical address. This RB tree only is used for reserved IOVA
-bindings.
+Implement the iommu_get/put_single_reserved API in arm-smmu.
 
-It is expected this RB tree will contain very few bindings. Those
-generally correspond to single page mapping one MSI frame (GICv2m
-frame or ITS GITS_TRANSLATER frame).
+In order to track which physical address is already mapped we
+use the RB tree indexed by PA.
 
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
+Signed-off-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+
 ---
- drivers/iommu/arm-smmu.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 64 insertions(+), 1 deletion(-)
+
+v1 -> v2:
+- previously in vfio_iommu_type1.c
+---
+ drivers/iommu/arm-smmu.c | 114 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 114 insertions(+)
 
 diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
-index f42341d..729a4c6 100644
+index 729a4c6..9961bfd 100644
 --- a/drivers/iommu/arm-smmu.c
 +++ b/drivers/iommu/arm-smmu.c
-@@ -349,10 +349,21 @@ struct arm_smmu_domain {
- 	struct mutex			init_mutex; /* Protects smmu pointer */
- 	struct iommu_domain		domain;
- 	struct iova_domain		*reserved_iova_domain;
--	/* protects reserved domain manipulation */
-+	/* rb tree indexed by PA, for reserved bindings only */
-+	struct rb_root			reserved_binding_list;
-+	/* protects reserved domain and rbtree manipulation */
- 	struct mutex			reserved_mutex;
+@@ -1563,6 +1563,118 @@ static void arm_smmu_free_reserved_iova_domain(struct iommu_domain *domain)
+ 	mutex_unlock(&smmu_domain->reserved_mutex);
+ }
+ 
++static int arm_smmu_get_single_reserved(struct iommu_domain *domain,
++					phys_addr_t addr, int prot,
++					dma_addr_t *iova)
++{
++	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
++	unsigned long order = __ffs(domain->ops->pgsize_bitmap);
++	size_t page_size = 1 << order;
++	phys_addr_t mask = page_size - 1;
++	phys_addr_t aligned_addr = addr & ~mask;
++	phys_addr_t offset  = addr - aligned_addr;
++	struct arm_smmu_reserved_binding *b;
++	struct iova *p_iova;
++	struct iova_domain *iovad = smmu_domain->reserved_iova_domain;
++	int ret;
++
++	if (!iovad)
++		return -EINVAL;
++
++	mutex_lock(&smmu_domain->reserved_mutex);
++
++	b = find_reserved_binding(smmu_domain, aligned_addr, page_size);
++	if (b) {
++		*iova = b->iova + offset;
++		kref_get(&b->kref);
++		ret = 0;
++		goto unlock;
++	}
++
++	/* there is no existing reserved iova for this pa */
++	p_iova = alloc_iova(iovad, 1, iovad->dma_32bit_pfn, true);
++	if (!p_iova) {
++		ret = -ENOMEM;
++		goto unlock;
++	}
++	*iova = p_iova->pfn_lo << order;
++
++	b = kzalloc(sizeof(*b), GFP_KERNEL);
++	if (!b) {
++		ret = -ENOMEM;
++		goto free_iova_unlock;
++	}
++
++	ret = arm_smmu_map(domain, *iova, aligned_addr, page_size, prot);
++	if (ret)
++		goto free_binding_iova_unlock;
++
++	kref_init(&b->kref);
++	kref_get(&b->kref);
++	b->domain = smmu_domain;
++	b->addr = aligned_addr;
++	b->iova = *iova;
++	b->size = page_size;
++
++	link_reserved_binding(smmu_domain, b);
++
++	*iova += offset;
++	goto unlock;
++
++free_binding_iova_unlock:
++	kfree(b);
++free_iova_unlock:
++	free_iova(smmu_domain->reserved_iova_domain, *iova >> order);
++unlock:
++	mutex_unlock(&smmu_domain->reserved_mutex);
++	return ret;
++}
++
++/* called with reserved_mutex locked */
++static void reserved_binding_release(struct kref *kref)
++{
++	struct arm_smmu_reserved_binding *b =
++		container_of(kref, struct arm_smmu_reserved_binding, kref);
++	struct arm_smmu_domain *smmu_domain = b->domain;
++	struct iommu_domain *d = &smmu_domain->domain;
++	unsigned long order = __ffs(b->size);
++
++
++	arm_smmu_unmap(d, b->iova, b->size);
++	free_iova(smmu_domain->reserved_iova_domain, b->iova >> order);
++	unlink_reserved_binding(smmu_domain, b);
++	kfree(b);
++}
++
++static void arm_smmu_put_single_reserved(struct iommu_domain *domain,
++					 dma_addr_t iova)
++{
++	unsigned long order;
++	phys_addr_t aligned_addr;
++	dma_addr_t aligned_iova, page_size, mask, offset;
++	struct arm_smmu_reserved_binding *b;
++	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
++
++	order = __ffs(domain->ops->pgsize_bitmap);
++	page_size = (uint64_t)1 << order;
++	mask = page_size - 1;
++
++	aligned_iova = iova & ~mask;
++	offset = iova - aligned_iova;
++
++	aligned_addr = iommu_iova_to_phys(domain, aligned_iova);
++
++	mutex_lock(&smmu_domain->reserved_mutex);
++
++	b = find_reserved_binding(smmu_domain, aligned_addr, page_size);
++	if (!b)
++		goto unlock;
++	kref_put(&b->kref, reserved_binding_release);
++
++unlock:
++	mutex_unlock(&smmu_domain->reserved_mutex);
++}
++
+ static struct iommu_ops arm_smmu_ops = {
+ 	.capable			= arm_smmu_capable,
+ 	.domain_alloc			= arm_smmu_domain_alloc,
+@@ -1580,6 +1692,8 @@ static struct iommu_ops arm_smmu_ops = {
+ 	.domain_set_attr		= arm_smmu_domain_set_attr,
+ 	.alloc_reserved_iova_domain	= arm_smmu_alloc_reserved_iova_domain,
+ 	.free_reserved_iova_domain	= arm_smmu_free_reserved_iova_domain,
++	.get_single_reserved		= arm_smmu_get_single_reserved,
++	.put_single_reserved		= arm_smmu_put_single_reserved,
+ 	/* Page size bitmap, restricted during device attach */
+ 	.pgsize_bitmap			= -1UL,
  };
- 
-+struct arm_smmu_reserved_binding {
-+	struct kref		kref;
-+	struct rb_node		node;
-+	struct arm_smmu_domain	*domain;
-+	phys_addr_t		addr;
-+	dma_addr_t		iova;
-+	size_t			size;
-+};
-+
- static struct iommu_ops arm_smmu_ops;
- 
- static DEFINE_SPINLOCK(arm_smmu_devices_lock);
-@@ -400,6 +411,57 @@ static struct device_node *dev_get_dev_node(struct device *dev)
- 	return dev->of_node;
- }
- 
-+/* Reserved binding RB-tree manipulation */
-+
-+static struct arm_smmu_reserved_binding *find_reserved_binding(
-+				    struct arm_smmu_domain *d,
-+				    phys_addr_t start, size_t size)
-+{
-+	struct rb_node *node = d->reserved_binding_list.rb_node;
-+
-+	while (node) {
-+		struct arm_smmu_reserved_binding *binding =
-+			rb_entry(node, struct arm_smmu_reserved_binding, node);
-+
-+		if (start + size <= binding->addr)
-+			node = node->rb_left;
-+		else if (start >= binding->addr + binding->size)
-+			node = node->rb_right;
-+		else
-+			return binding;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void link_reserved_binding(struct arm_smmu_domain *d,
-+				  struct arm_smmu_reserved_binding *new)
-+{
-+	struct rb_node **link = &d->reserved_binding_list.rb_node;
-+	struct rb_node *parent = NULL;
-+	struct arm_smmu_reserved_binding *binding;
-+
-+	while (*link) {
-+		parent = *link;
-+		binding = rb_entry(parent, struct arm_smmu_reserved_binding,
-+				   node);
-+
-+		if (new->addr + new->size <= binding->addr)
-+			link = &(*link)->rb_left;
-+		else
-+			link = &(*link)->rb_right;
-+	}
-+
-+	rb_link_node(&new->node, parent, link);
-+	rb_insert_color(&new->node, &d->reserved_binding_list);
-+}
-+
-+static void unlink_reserved_binding(struct arm_smmu_domain *d,
-+				    struct arm_smmu_reserved_binding *old)
-+{
-+	rb_erase(&old->node, &d->reserved_binding_list);
-+}
-+
- static struct arm_smmu_master *find_smmu_master(struct arm_smmu_device *smmu,
- 						struct device_node *dev_node)
- {
-@@ -981,6 +1043,7 @@ static struct iommu_domain *arm_smmu_domain_alloc(unsigned type)
- 	mutex_init(&smmu_domain->init_mutex);
- 	mutex_init(&smmu_domain->reserved_mutex);
- 	spin_lock_init(&smmu_domain->pgtbl_lock);
-+	smmu_domain->reserved_binding_list = RB_ROOT;
- 
- 	return &smmu_domain->domain;
- }
 -- 
 1.9.1
