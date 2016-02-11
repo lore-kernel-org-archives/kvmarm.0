@@ -1,23 +1,25 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC v2 00/15] KVM PCIe/MSI passthrough on ARM/ARM64
-Date: Thu, 11 Feb 2016 14:34:07 +0000
-Message-ID: <1455201262-5259-1-git-send-email-eric.auger@linaro.org>
+Subject: [RFC v2 01/15] iommu: Add DOMAIN_ATTR_MSI_MAPPING attribute
+Date: Thu, 11 Feb 2016 14:34:08 +0000
+Message-ID: <1455201262-5259-2-git-send-email-eric.auger@linaro.org>
+References: <1455201262-5259-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id EC2BF49BA0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 09:28:57 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ADACB49BAF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 09:29:01 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1DtStEDDdzBy for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Feb 2016 09:28:56 -0500 (EST)
-Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7231549B9C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 09:28:56 -0500 (EST)
-Received: by mail-wm0-f48.google.com with SMTP id p63so70980945wmp.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 06:34:51 -0800 (PST)
+ with ESMTP id juuYafsGh7Ik for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Feb 2016 09:29:00 -0500 (EST)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BE0B849BA4
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 09:29:00 -0500 (EST)
+Received: by mail-wm0-f53.google.com with SMTP id g62so23896367wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 06:34:56 -0800 (PST)
+In-Reply-To: <1455201262-5259-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,124 +33,68 @@ To: eric.auger@st.com, eric.auger@linaro.org, alex.williamson@redhat.com, will.d
 Cc: Thomas.Lendacky@amd.com, brijesh.singh@amd.com, patches@linaro.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, leo.duran@amd.com, sherry.hurwitz@amd.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series addresses KVM PCIe passthrough with MSI enabled on ARM/ARM64.
-It pursues the efforts done on [1], [2], [3]. It also aims at covering the
-same need on PowerPC platforms although the same kind of integration
-should be carried out.
+Introduce new DOMAIN_ATTR_MSI_MAPPING domain attribute. If supported,
+this means the MSI addresses need to be mapped in the IOMMU. ARM SMMUS
+and FSL PAMU, at least expose this attribute.
 
-On x86 all accesses to the 1MB PA region [FEE0_0000h - FEF0_000h] are directed
-as interrupt messages: accesses to this special PA window directly target the
-APIC configuration space and not DRAM, meaning the downstream IOMMU is bypassed.
+x86 IOMMUs typically don't expose the attribute since on x86, MSI write
+transaction addresses always are within the 1MB PA region [FEE0_0000h -
+FEF0_000h] window which directly targets the APIC configuration space and
+hence bypass the sMMU.
 
-This is not the case on above mentionned platforms where MSI messages emitted
-by devices are conveyed through the IOMMU. This means an IOVA/host PA mapping
-must exist for the MSI to reach the MSI controller. Normal way to create
-IOVA bindings consists in using VFIO DMA MAP API. However in this case
-the MSI IOVA is not mapped onto guest RAM but on host physical page (the MSI
-controller frame).
+Signed-off-by: Bharat Bhushan <Bharat.Bhushan@freescale.com>
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
-In a nutshell, this series does:
-- introduce an IOMMU API to register a IOVA window usable for reserved mapping
-- reuse VFIO DMA MAP ioctl with a new flag to plug onto that new API
-- check if the device MSI-parent controllers allow IRQ remapping
-  (allow unsafe interrupt modality) for a given group
-- introduce a new IOMMU API to allocate reserved IOVAs and bind them onto
-  a physical address
-- allow the GICv2M and GICv3-ITS PCI irqchip to map/unmap the MSI frame
-  on irq_write_msi_msg
+---
 
-Best Regards
+RFC v1 -> v1:
+- the data field is not used
+- for this attribute domain_get_attr simply returns 0 if the MSI_MAPPING
+  capability if needed or <0 if not.
+- removed struct iommu_domain_msi_maps
+---
+ drivers/iommu/arm-smmu.c        | 2 ++
+ drivers/iommu/fsl_pamu_domain.c | 2 ++
+ include/linux/iommu.h           | 1 +
+ 3 files changed, 5 insertions(+)
 
-Eric
-
-Testing:
-- functional on ARM64 AMD Overdrive HW (single GICv2m frame) with an e1000e
-  PCIe card.
-- tested there is no regresion on
-  x non assigned PCIe driver
-  x platform device passthrough
-- Not tested: ARM with SR-IOV, ARM GICv3 ITS
-
-References:
-[1] [RFC 0/2] VFIO: Add virtual MSI doorbell support
-    (https://lkml.org/lkml/2015/7/24/135)
-[2] [RFC PATCH 0/6] vfio: Add interface to map MSI pages
-    (https://lists.cs.columbia.edu/pipermail/kvmarm/2015-September/016607.html)
-[3] [PATCH v2 0/3] Introduce MSI hardware mapping for VFIO
-    (http://permalink.gmane.org/gmane.comp.emulators.kvm.arm.devel/3858)
-
-Git:
-https://git.linaro.org/people/eric.auger/linux.git/shortlog/refs/heads/v4.5-rc3-pcie-passthrough-rfcv2
-
-previous version at
-https://git.linaro.org/people/eric.auger/linux.git/shortlog/refs/heads/v4.5-rc1-pcie-passthrough-v1
-
-QEMU Integration:
-[RFC v2 0/8] KVM PCI/MSI passthrough with mach-virt
-(http://lists.gnu.org/archive/html/qemu-arm/2016-01/msg00444.html)
-https://git.linaro.org/people/eric.auger/qemu.git/shortlog/refs/heads/v2.5.0-pci-passthrough-rfc-v2
-
-User Hints:
-To allow PCI/MSI passthrough with GICv2M, compile VFIO as a module and
-load the vfio_iommu_type1 module with allow_unsafe_interrupts param:
-sudo modprobe -v vfio_iommu_type1 allow_unsafe_interrupts=1
-sudo modprobe -v vfio-pci
-
-History:
-
-PATCH v1 -> RFC v2:
-- reverted to RFC since it looks more reasonable ;-) the code is split
-  between VFIO, IOMMU, MSI controller and I am not sure I did the right
-  choices. Also API need to be further discussed.
-- iova API usage in arm-smmu.c.
-- MSI controller natively programs the MSI addr with either the PA or IOVA.
-  This is not done anymore in vfio-pci driver as suggested by Alex.
-- check irq remapping capability of the group
-
-RFC v1 [2] -> PATCH v1:
-- use the existing dma map/unmap ioctl interface with a flag to register a
-  reserved IOVA range. Use the legacy Rb to store this special vfio_dma.
-- a single reserved IOVA contiguous region now is allowed
-- use of an RB tree indexed by PA to store allocated reserved slots
-- use of a vfio_domain iova_domain to manage iova allocation within the
-  window provided by the userspace
-- vfio alloc_map/unmap_free take a vfio_group handle
-- vfio_group handle is cached in vfio_pci_device
-- add ref counting to bindings
-- user modality enabled at the end of the series
-
-
-Eric Auger (15):
-  iommu: Add DOMAIN_ATTR_MSI_MAPPING attribute
-  vfio: expose MSI mapping requirement through VFIO_IOMMU_GET_INFO
-  vfio: introduce VFIO_IOVA_RESERVED vfio_dma type
-  iommu: add alloc/free_reserved_iova_domain
-  iommu/arm-smmu: implement alloc/free_reserved_iova_domain
-  iommu/arm-smmu: add a reserved binding RB tree
-  iommu: iommu_get/put_single_reserved
-  iommu/arm-smmu: implement iommu_get/put_single_reserved
-  iommu/arm-smmu: relinquish reserved resources on domain deletion
-  vfio: allow the user to register reserved iova range for MSI mapping
-  msi: Add a new MSI_FLAG_IRQ_REMAPPING flag
-  msi: export msi_get_domain_info
-  vfio/type1: also check IRQ remapping capability at msi domain
-  iommu/arm-smmu: do not advertise IOMMU_CAP_INTR_REMAP
-  irqchip/gicv2m/v3-its-pci-msi: IOMMU map the MSI frame when needed
-
- drivers/iommu/arm-smmu.c                 | 292 +++++++++++++++++++++++++++++--
- drivers/iommu/fsl_pamu_domain.c          |   2 +
- drivers/iommu/iommu.c                    |  43 +++++
- drivers/irqchip/irq-gic-common.c         |  60 +++++++
- drivers/irqchip/irq-gic-common.h         |   5 +
- drivers/irqchip/irq-gic-v2m.c            |   3 +-
- drivers/irqchip/irq-gic-v3-its-pci-msi.c |   3 +-
- drivers/irqchip/irq-gic-v3-its.c         |   1 +
- drivers/vfio/vfio_iommu_type1.c          | 156 ++++++++++++++++-
- include/linux/iommu.h                    |  53 ++++++
- include/linux/msi.h                      |   6 +
- include/uapi/linux/vfio.h                |  10 ++
- kernel/irq/msi.c                         |   1 +
- 13 files changed, 613 insertions(+), 22 deletions(-)
-
+diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
+index 59ee4b8..c8b7e71 100644
+--- a/drivers/iommu/arm-smmu.c
++++ b/drivers/iommu/arm-smmu.c
+@@ -1409,6 +1409,8 @@ static int arm_smmu_domain_get_attr(struct iommu_domain *domain,
+ 	case DOMAIN_ATTR_NESTING:
+ 		*(int *)data = (smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED);
+ 		return 0;
++	case DOMAIN_ATTR_MSI_MAPPING:
++		return 0;
+ 	default:
+ 		return -ENODEV;
+ 	}
+diff --git a/drivers/iommu/fsl_pamu_domain.c b/drivers/iommu/fsl_pamu_domain.c
+index da0e1e3..46d5c6a 100644
+--- a/drivers/iommu/fsl_pamu_domain.c
++++ b/drivers/iommu/fsl_pamu_domain.c
+@@ -856,6 +856,8 @@ static int fsl_pamu_get_domain_attr(struct iommu_domain *domain,
+ 	case DOMAIN_ATTR_FSL_PAMUV1:
+ 		*(int *)data = DOMAIN_ATTR_FSL_PAMUV1;
+ 		break;
++	case DOMAIN_ATTR_MSI_MAPPING:
++		break;
+ 	default:
+ 		pr_debug("Unsupported attribute type\n");
+ 		ret = -EINVAL;
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index a5c539f..a4fe04a 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -112,6 +112,7 @@ enum iommu_attr {
+ 	DOMAIN_ATTR_FSL_PAMU_ENABLE,
+ 	DOMAIN_ATTR_FSL_PAMUV1,
+ 	DOMAIN_ATTR_NESTING,	/* two stages of translation */
++	DOMAIN_ATTR_MSI_MAPPING, /* Require MSIs mapping in iommu */
+ 	DOMAIN_ATTR_MAX,
+ };
+ 
 -- 
 1.9.1
