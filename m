@@ -1,23 +1,23 @@
 From: Julien Grall <julien.grall@arm.com>
-Subject: [PATCH v2 4/6] irqchip/gic-v2: Parse and export virtual GIC
- information
-Date: Thu, 11 Feb 2016 15:33:22 +0000
-Message-ID: <1455204804-31830-5-git-send-email-julien.grall@arm.com>
+Subject: [PATCH v2 6/6] KVM: arm/arm64: vgic: Rely on the GIC driver to parse
+ the firmware tables
+Date: Thu, 11 Feb 2016 15:33:24 +0000
+Message-ID: <1455204804-31830-7-git-send-email-julien.grall@arm.com>
 References: <1455204804-31830-1-git-send-email-julien.grall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0FB6249BBF
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 10:27:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6DE6649BDE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 10:27:52 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1vW9jlWbe788 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Feb 2016 10:27:45 -0500 (EST)
+ with ESMTP id wr5Koi-okmD8 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Feb 2016 10:27:50 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2DC4749BDA
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 10:27:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B9A449BFF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 10:27:49 -0500 (EST)
 In-Reply-To: <1455204804-31830-1-git-send-email-julien.grall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,251 +29,376 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, fu.wei@linaro.org, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org, Jason Cooper <jason@lakedaemon.net>
+Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, fu.wei@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 For now, the firmware tables are parsed 2 times: once in the GIC
-drivers, the other timer when initializing the vGIC. It means code
+drivers, the other time when initializing the vGIC. It means code
 duplication and make more tedious to add the support for another
 firmware table (like ACPI).
 
-Introduce a new structure and set of helpers to get/set the virtual GIC
-information. Also fill up the structure for GICv2.
+Use the recently introduced helper gic_get_kvm_info() to retrieve
+information about the virtual GIC.
+
+With this change, the virtual GIC becomes agnostic to the firmware
+table and KVM will be able to initialize the vGIC on ACPI.
 
 Signed-off-by: Julien Grall <julien.grall@arm.com>
 
 ---
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Jason Cooper <jason@lakedaemon.net>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Gleb Natapov <gleb@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
     Changes in v2:
         - Use 0 rather than a negative value to know when the maintenance IRQ
         is not present.
         - Use resource for vcpu and vctrl
 ---
- drivers/irqchip/irq-gic-common.c       | 13 ++++++
- drivers/irqchip/irq-gic-common.h       |  3 ++
- drivers/irqchip/irq-gic.c              | 80 +++++++++++++++++++++++++++++++++-
- include/linux/irqchip/arm-gic-common.h | 33 ++++++++++++++
- 4 files changed, 128 insertions(+), 1 deletion(-)
- create mode 100644 include/linux/irqchip/arm-gic-common.h
+ include/kvm/arm_vgic.h |  7 +++---
+ virt/kvm/arm/vgic-v2.c | 67 ++++++++++++++++++--------------------------------
+ virt/kvm/arm/vgic-v3.c | 45 ++++++++++-----------------------
+ virt/kvm/arm/vgic.c    | 50 ++++++++++++++++++++-----------------
+ 4 files changed, 68 insertions(+), 101 deletions(-)
 
-diff --git a/drivers/irqchip/irq-gic-common.c b/drivers/irqchip/irq-gic-common.c
-index f174ce0..704caf4 100644
---- a/drivers/irqchip/irq-gic-common.c
-+++ b/drivers/irqchip/irq-gic-common.c
-@@ -21,6 +21,19 @@
- 
- #include "irq-gic-common.h"
- 
-+static const struct gic_kvm_info *gic_kvm_info;
-+
-+const struct gic_kvm_info *gic_get_kvm_info(void)
-+{
-+	return gic_kvm_info;
-+}
-+
-+void gic_set_kvm_info(const struct gic_kvm_info *info)
-+{
-+	WARN(gic_kvm_info != NULL, "gic_kvm_info already set\n");
-+	gic_kvm_info = info;
-+}
-+
- void gic_enable_quirks(u32 iidr, const struct gic_quirk *quirks,
- 		void *data)
- {
-diff --git a/drivers/irqchip/irq-gic-common.h b/drivers/irqchip/irq-gic-common.h
-index fff697d..205e5fd 100644
---- a/drivers/irqchip/irq-gic-common.h
-+++ b/drivers/irqchip/irq-gic-common.h
-@@ -19,6 +19,7 @@
- 
- #include <linux/of.h>
- #include <linux/irqdomain.h>
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 13a3d53..ed62772 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -25,6 +25,7 @@
+ #include <linux/spinlock.h>
+ #include <linux/types.h>
+ #include <kvm/iodev.h>
 +#include <linux/irqchip/arm-gic-common.h>
  
- struct gic_quirk {
- 	const char *desc;
-@@ -35,4 +36,6 @@ void gic_cpu_config(void __iomem *base, void (*sync_access)(void));
- void gic_enable_quirks(u32 iidr, const struct gic_quirk *quirks,
- 		void *data);
+ #define VGIC_NR_IRQS_LEGACY	256
+ #define VGIC_NR_SGIS		16
+@@ -357,15 +358,15 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
+ #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
+ #define vgic_ready(k)		((k)->arch.vgic.ready)
  
-+void gic_set_kvm_info(const struct gic_kvm_info *info);
-+
- #endif /* _IRQ_GIC_COMMON_H */
-diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-index d6131c4..b794fd0 100644
---- a/drivers/irqchip/irq-gic.c
-+++ b/drivers/irqchip/irq-gic.c
-@@ -102,6 +102,8 @@ static struct static_key supports_deactivate = STATIC_KEY_INIT_TRUE;
- 
- static struct gic_chip_data gic_data[CONFIG_ARM_GIC_MAX_NR] __read_mostly;
- 
-+static struct gic_kvm_info gic_v2_kvm_info;
-+
- #ifdef CONFIG_GIC_NON_BANKED
- static void __iomem *gic_get_percpu_base(union gic_base *base)
+-int vgic_v2_probe(struct device_node *vgic_node,
++int vgic_v2_probe(const struct gic_kvm_info *gic_kvm_info,
+ 		  const struct vgic_ops **ops,
+ 		  const struct vgic_params **params);
+ #ifdef CONFIG_KVM_ARM_VGIC_V3
+-int vgic_v3_probe(struct device_node *vgic_node,
++int vgic_v3_probe(const struct gic_kvm_info *gic_kvm_info,
+ 		  const struct vgic_ops **ops,
+ 		  const struct vgic_params **params);
+ #else
+-static inline int vgic_v3_probe(struct device_node *vgic_node,
++static inline int vgic_v3_probe(const struct gic_kvm_info *gic_kvm_info,
+ 				const struct vgic_ops **ops,
+ 				const struct vgic_params **params)
  {
-@@ -1190,6 +1192,35 @@ static bool gic_check_eoimode(struct device_node *node, void __iomem **base)
- 	return true;
- }
+diff --git a/virt/kvm/arm/vgic-v2.c b/virt/kvm/arm/vgic-v2.c
+index ff02f08..3598cd4 100644
+--- a/virt/kvm/arm/vgic-v2.c
++++ b/virt/kvm/arm/vgic-v2.c
+@@ -20,9 +20,6 @@
+ #include <linux/kvm_host.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
+-#include <linux/of.h>
+-#include <linux/of_address.h>
+-#include <linux/of_irq.h>
  
-+static void __init gic_of_setup_kvm_info(struct device_node *node)
+ #include <linux/irqchip/arm-gic.h>
+ 
+@@ -177,38 +174,38 @@ static const struct vgic_ops vgic_v2_ops = {
+ static struct vgic_params vgic_v2_params;
+ 
+ /**
+- * vgic_v2_probe - probe for a GICv2 compatible interrupt controller in DT
+- * @node:	pointer to the DT node
+- * @ops: 	address of a pointer to the GICv2 operations
+- * @params:	address of a pointer to HW-specific parameters
++ * vgic_v2_probe - probe for a GICv2 compatible interrupt controller
++ * @gic_kvm_info:	pointer to the GIC description
++ * @ops:		address of a pointer to the GICv2 operations
++ * @params:		address of a pointer to HW-specific parameters
+  *
+  * Returns 0 if a GICv2 has been found, with the low level operations
+  * in *ops and the HW parameters in *params. Returns an error code
+  * otherwise.
+  */
+-int vgic_v2_probe(struct device_node *vgic_node,
+-		  const struct vgic_ops **ops,
+-		  const struct vgic_params **params)
++int vgic_v2_probe(const struct gic_kvm_info *gic_kvm_info,
++		   const struct vgic_ops **ops,
++		   const struct vgic_params **params)
+ {
+ 	int ret;
+-	struct resource vctrl_res;
+-	struct resource vcpu_res;
+ 	struct vgic_params *vgic = &vgic_v2_params;
++	resource_size_t vctrl_size = resource_size(&gic_kvm_info->vctrl);
+ 
+-	vgic->maint_irq = irq_of_parse_and_map(vgic_node, 0);
+-	if (!vgic->maint_irq) {
+-		kvm_err("error getting vgic maintenance irq from DT\n");
++	if (!gic_kvm_info->maint_irq) {
++		kvm_err("error getting vgic maintenance irq\n");
+ 		ret = -ENXIO;
+ 		goto out;
+ 	}
++	vgic->maint_irq = gic_kvm_info->maint_irq;
+ 
+-	ret = of_address_to_resource(vgic_node, 2, &vctrl_res);
+-	if (ret) {
+-		kvm_err("Cannot obtain GICH resource\n");
++	if (!gic_kvm_info->vctrl.start) {
++		kvm_err("GICH not present in the firmware table\n");
++		ret = -ENXIO;
+ 		goto out;
+ 	}
+ 
+-	vgic->vctrl_base = of_iomap(vgic_node, 2);
++	vgic->vctrl_base = ioremap(gic_kvm_info->vctrl.start,
++				   resource_size(&gic_kvm_info->vctrl));
+ 	if (!vgic->vctrl_base) {
+ 		kvm_err("Cannot ioremap GICH\n");
+ 		ret = -ENOMEM;
+@@ -219,30 +216,15 @@ int vgic_v2_probe(struct device_node *vgic_node,
+ 	vgic->nr_lr = (vgic->nr_lr & 0x3f) + 1;
+ 
+ 	ret = create_hyp_io_mappings(vgic->vctrl_base,
+-				     vgic->vctrl_base + resource_size(&vctrl_res),
+-				     vctrl_res.start);
++				     vgic->vctrl_base + vctrl_size,
++				     gic_kvm_info->vctrl.start);
+ 	if (ret) {
+-		kvm_err("Cannot map VCTRL into hyp\n");
+-		goto out_unmap;
+-	}
+-
+-	if (of_address_to_resource(vgic_node, 3, &vcpu_res)) {
+-		kvm_err("Cannot obtain GICV resource\n");
+-		ret = -ENXIO;
+-		goto out_unmap;
+-	}
+-
+-	if (!PAGE_ALIGNED(vcpu_res.start)) {
+-		kvm_err("GICV physical address 0x%llx not page aligned\n",
+-			(unsigned long long)vcpu_res.start);
+-		ret = -ENXIO;
++		kvm_err("Cannot map VCTLR into hyp\n");
+ 		goto out_unmap;
+ 	}
+ 
+-	if (!PAGE_ALIGNED(resource_size(&vcpu_res))) {
+-		kvm_err("GICV size 0x%llx not a multiple of page size 0x%lx\n",
+-			(unsigned long long)resource_size(&vcpu_res),
+-			PAGE_SIZE);
++	if (!gic_kvm_info->vcpu.start) {
++		kvm_err("GICV not present in the firmware table\n");
+ 		ret = -ENXIO;
+ 		goto out_unmap;
+ 	}
+@@ -250,10 +232,10 @@ int vgic_v2_probe(struct device_node *vgic_node,
+ 	vgic->can_emulate_gicv2 = true;
+ 	kvm_register_device_ops(&kvm_arm_vgic_v2_ops, KVM_DEV_TYPE_ARM_VGIC_V2);
+ 
+-	vgic->vcpu_base = vcpu_res.start;
++	vgic->vcpu_base = gic_kvm_info->vcpu.start;
+ 
+-	kvm_info("%s@%llx IRQ%d\n", vgic_node->name,
+-		 vctrl_res.start, vgic->maint_irq);
++	kvm_info("GICH base=0x%llx, GICV base=0x%llx, IRQ=%d\n",
++		 gic_kvm_info->vctrl.start, vgic->vcpu_base, vgic->maint_irq);
+ 
+ 	vgic->type = VGIC_V2;
+ 	vgic->max_gic_vcpus = VGIC_V2_MAX_CPUS;
+@@ -264,6 +246,5 @@ int vgic_v2_probe(struct device_node *vgic_node,
+ out_unmap:
+ 	iounmap(vgic->vctrl_base);
+ out:
+-	of_node_put(vgic_node);
+ 	return ret;
+ }
+diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
+index 453eafd..92c1f04 100644
+--- a/virt/kvm/arm/vgic-v3.c
++++ b/virt/kvm/arm/vgic-v3.c
+@@ -20,11 +20,9 @@
+ #include <linux/kvm_host.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
+-#include <linux/of.h>
+-#include <linux/of_address.h>
+-#include <linux/of_irq.h>
+ 
+ #include <linux/irqchip/arm-gic-v3.h>
++#include <linux/irqchip/arm-gic-common.h>
+ 
+ #include <asm/kvm_emulate.h>
+ #include <asm/kvm_arm.h>
+@@ -217,30 +215,28 @@ static const struct vgic_ops vgic_v3_ops = {
+ static struct vgic_params vgic_v3_params;
+ 
+ /**
+- * vgic_v3_probe - probe for a GICv3 compatible interrupt controller in DT
+- * @node:	pointer to the DT node
+- * @ops: 	address of a pointer to the GICv3 operations
+- * @params:	address of a pointer to HW-specific parameters
++ * vgic_v3_probe - probe for a GICv3 compatible interrupt controller
++ * @gic_kvm_info:	pointer to the GIC description
++ * @ops:		address of a pointer to the GICv3 operations
++ * @params:		address of a pointer to HW-specific parameters
+  *
+  * Returns 0 if a GICv3 has been found, with the low level operations
+  * in *ops and the HW parameters in *params. Returns an error code
+  * otherwise.
+  */
+-int vgic_v3_probe(struct device_node *vgic_node,
++int vgic_v3_probe(const struct gic_kvm_info *gic_kvm_info,
+ 		  const struct vgic_ops **ops,
+ 		  const struct vgic_params **params)
+ {
+ 	int ret = 0;
+-	u32 gicv_idx;
+-	struct resource vcpu_res;
+ 	struct vgic_params *vgic = &vgic_v3_params;
+ 
+-	vgic->maint_irq = irq_of_parse_and_map(vgic_node, 0);
+-	if (!vgic->maint_irq) {
+-		kvm_err("error getting vgic maintenance irq from DT\n");
++	if (!gic_kvm_info->maint_irq) {
++		kvm_err("error getting vgic maintenance irq\n");
+ 		ret = -ENXIO;
+ 		goto out;
+ 	}
++	vgic->maint_irq = gic_kvm_info->maint_irq;
+ 
+ 	ich_vtr_el2 = kvm_call_hyp(__vgic_v3_get_ich_vtr_el2);
+ 
+@@ -251,24 +247,11 @@ int vgic_v3_probe(struct device_node *vgic_node,
+ 	vgic->nr_lr = (ich_vtr_el2 & 0xf) + 1;
+ 	vgic->can_emulate_gicv2 = false;
+ 
+-	if (of_property_read_u32(vgic_node, "#redistributor-regions", &gicv_idx))
+-		gicv_idx = 1;
+-
+-	gicv_idx += 3; /* Also skip GICD, GICC, GICH */
+-	if (of_address_to_resource(vgic_node, gicv_idx, &vcpu_res)) {
++	if (!gic_kvm_info->vcpu.start) {
+ 		kvm_info("GICv3: no GICV resource entry\n");
+ 		vgic->vcpu_base = 0;
+-	} else if (!PAGE_ALIGNED(vcpu_res.start)) {
+-		pr_warn("GICV physical address 0x%llx not page aligned\n",
+-			(unsigned long long)vcpu_res.start);
+-		vgic->vcpu_base = 0;
+-	} else if (!PAGE_ALIGNED(resource_size(&vcpu_res))) {
+-		pr_warn("GICV size 0x%llx not a multiple of page size 0x%lx\n",
+-			(unsigned long long)resource_size(&vcpu_res),
+-			PAGE_SIZE);
+-		vgic->vcpu_base = 0;
+ 	} else {
+-		vgic->vcpu_base = vcpu_res.start;
++		vgic->vcpu_base = gic_kvm_info->vcpu.start;
+ 		vgic->can_emulate_gicv2 = true;
+ 		kvm_register_device_ops(&kvm_arm_vgic_v2_ops,
+ 					KVM_DEV_TYPE_ARM_VGIC_V2);
+@@ -281,13 +264,11 @@ int vgic_v3_probe(struct device_node *vgic_node,
+ 	vgic->type = VGIC_V3;
+ 	vgic->max_gic_vcpus = VGIC_V3_MAX_CPUS;
+ 
+-	kvm_info("%s@%llx IRQ%d\n", vgic_node->name,
+-		 vcpu_res.start, vgic->maint_irq);
+-
++	kvm_info("GICV base=0x%llx, IRQ=%d\n",
++		 vgic->vcpu_base, vgic->maint_irq);
+ 	*ops = &vgic_v3_ops;
+ 	*params = vgic;
+ 
+ out:
+-	of_node_put(vgic_node);
+ 	return ret;
+ }
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 043032c..748cb2f 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -21,9 +21,7 @@
+ #include <linux/kvm_host.h>
+ #include <linux/interrupt.h>
+ #include <linux/io.h>
+-#include <linux/of.h>
+-#include <linux/of_address.h>
+-#include <linux/of_irq.h>
++#include <linux/irq.h>
+ #include <linux/rculist.h>
+ #include <linux/uaccess.h>
+ 
+@@ -33,6 +31,7 @@
+ #include <trace/events/kvm.h>
+ #include <asm/kvm.h>
+ #include <kvm/iodev.h>
++#include <linux/irqchip/arm-gic-common.h>
+ 
+ #define CREATE_TRACE_POINTS
+ #include "trace.h"
+@@ -2389,33 +2388,38 @@ static struct notifier_block vgic_cpu_nb = {
+ 	.notifier_call = vgic_cpu_notify,
+ };
+ 
+-static const struct of_device_id vgic_ids[] = {
+-	{ .compatible = "arm,cortex-a15-gic",	.data = vgic_v2_probe, },
+-	{ .compatible = "arm,cortex-a7-gic",	.data = vgic_v2_probe, },
+-	{ .compatible = "arm,gic-400",		.data = vgic_v2_probe, },
+-	{ .compatible = "arm,gic-v3",		.data = vgic_v3_probe, },
+-	{},
+-};
+-
+-int kvm_vgic_hyp_init(void)
++static int kvm_vgic_probe(void)
+ {
+-	const struct of_device_id *matched_id;
+-	const int (*vgic_probe)(struct device_node *,const struct vgic_ops **,
+-				const struct vgic_params **);
+-	struct device_node *vgic_node;
++	const struct gic_kvm_info *gic_kvm_info;
+ 	int ret;
+ 
+-	vgic_node = of_find_matching_node_and_match(NULL,
+-						    vgic_ids, &matched_id);
+-	if (!vgic_node) {
+-		kvm_err("error: no compatible GIC node found\n");
++	gic_kvm_info = gic_get_kvm_info();
++	if (!gic_kvm_info)
+ 		return -ENODEV;
++
++	switch (gic_kvm_info->type) {
++	case GIC_V2:
++		ret = vgic_v2_probe(gic_kvm_info, &vgic_ops, &vgic);
++		break;
++	case GIC_V3:
++		ret = vgic_v3_probe(gic_kvm_info, &vgic_ops, &vgic);
++		break;
++	default:
++		ret = -ENODEV;
+ 	}
+ 
+-	vgic_probe = matched_id->data;
+-	ret = vgic_probe(vgic_node, &vgic_ops, &vgic);
+-	if (ret)
++	return ret;
++}
++
++int kvm_vgic_hyp_init(void)
 +{
 +	int ret;
-+	struct resource r;
 +
-+	gic_v2_kvm_info.type = GIC_V2;
-+
-+	gic_v2_kvm_info.maint_irq = irq_of_parse_and_map(node, 0);
-+
-+	ret = of_address_to_resource(node, 2, &r);
-+	if (!ret)
-+		gic_v2_kvm_info.vctrl = r;
-+
-+	ret = of_address_to_resource(node, 3, &r);
-+	if (!ret) {
-+		if (!PAGE_ALIGNED(r.start))
-+			pr_warn("GICV physical address 0x%llx not page aligned\n",
-+				(unsigned long long)r.start);
-+		else if (!PAGE_ALIGNED(resource_size(&r)))
-+			pr_warn("GICV size 0x%llx not a multiple of page size 0x%lx\n",
-+				(unsigned long long)resource_size(&r),
-+				PAGE_SIZE);
-+		else
-+			gic_v2_kvm_info.vcpu = r;
-+	}
-+
-+	gic_set_kvm_info(&gic_v2_kvm_info);
-+}
-+
- int __init
- gic_of_init(struct device_node *node, struct device_node *parent)
- {
-@@ -1219,8 +1250,10 @@ gic_of_init(struct device_node *node, struct device_node *parent)
- 
- 	__gic_init_bases(gic_cnt, -1, dist_base, cpu_base, percpu_offset,
- 			 &node->fwnode);
--	if (!gic_cnt)
-+	if (!gic_cnt) {
- 		gic_init_physaddr(node);
-+		gic_of_setup_kvm_info(node);
++	ret = kvm_vgic_probe();
++	if (ret) {
++		kvm_err("error: KVM vGIC probing failed\n");
+ 		return ret;
 +	}
  
- 	if (parent) {
- 		irq = irq_of_parse_and_map(node, 0);
-@@ -1249,6 +1282,10 @@ IRQCHIP_DECLARE(pl390, "arm,pl390", gic_of_init);
- static struct
- {
- 	phys_addr_t cpu_phy_base;
-+	u32 maint_irq;
-+	int maint_irq_mode;
-+	phys_addr_t vctrl_base;
-+	phys_addr_t vcpu_base;
- } acpi_data __initdata;
- 
- static int __init
-@@ -1273,6 +1310,12 @@ gic_acpi_parse_madt_cpu(struct acpi_subtable_header *header,
- 		return -EINVAL;
- 
- 	acpi_data.cpu_phy_base = gic_cpu_base;
-+	acpi_data.maint_irq = processor->vgic_interrupt;
-+	acpi_data.maint_irq_mode = (processor->flags & ACPI_MADT_VGIC_IRQ_MODE) ?
-+				    ACPI_EDGE_SENSITIVE : ACPI_LEVEL_SENSITIVE;
-+	acpi_data.vctrl_base = processor->gich_base_address;
-+	acpi_data.vcpu_base = processor->gicv_base_address;
-+
- 	cpu_base_assigned = 1;
- 	return 0;
- }
-@@ -1303,6 +1346,39 @@ static bool __init gic_validate_dist(struct acpi_subtable_header *header,
- 
- #define ACPI_GICV2_DIST_MEM_SIZE	(SZ_4K)
- #define ACPI_GIC_CPU_IF_MEM_SIZE	(SZ_8K)
-+#define ACPI_GICV2_VCTRL_MEM_SIZE	(SZ_4K)
-+#define ACPI_GICV2_VCPU_MEM_SIZE	(SZ_8K)
-+
-+static void __init gic_acpi_setup_kvm_info(void)
-+{
-+	int irq;
-+
-+	gic_v2_kvm_info.type = GIC_V2;
-+
-+	irq = acpi_register_gsi(NULL, acpi_data.maint_irq,
-+				acpi_data.maint_irq_mode,
-+				ACPI_ACTIVE_HIGH);
-+	if (irq > 0)
-+		gic_v2_kvm_info.maint_irq = irq;
-+
-+	if (acpi_data.vctrl_base) {
-+		struct resource *vctrl = &gic_v2_kvm_info.vctrl;
-+
-+		vctrl->flags = IORESOURCE_MEM;
-+		vctrl->start = acpi_data.vctrl_base;
-+		vctrl->end = vctrl->start + ACPI_GICV2_VCTRL_MEM_SIZE - 1;
-+	}
-+
-+	if (acpi_data.vcpu_base) {
-+		struct resource *vcpu = &gic_v2_kvm_info.vcpu;
-+
-+		vcpu->flags = IORESOURCE_MEM;
-+		vcpu->start = acpi_data.vcpu_base;
-+		vcpu->end = vcpu->start + ACPI_GICV2_VCPU_MEM_SIZE - 1;
-+	}
-+
-+	gic_set_kvm_info(&gic_v2_kvm_info);
-+}
- 
- static int __init gic_v2_acpi_init(struct acpi_subtable_header *header,
- 				   const unsigned long end)
-@@ -1360,6 +1436,8 @@ static int __init gic_v2_acpi_init(struct acpi_subtable_header *header,
- 	if (IS_ENABLED(CONFIG_ARM_GIC_V2M))
- 		gicv2m_init(NULL, gic_data[0].domain);
- 
-+	gic_acpi_setup_kvm_info();
-+
- 	return 0;
- }
- IRQCHIP_ACPI_DECLARE(gic_v2, ACPI_MADT_TYPE_GENERIC_DISTRIBUTOR,
-diff --git a/include/linux/irqchip/arm-gic-common.h b/include/linux/irqchip/arm-gic-common.h
-new file mode 100644
-index 0000000..f7723b9
---- /dev/null
-+++ b/include/linux/irqchip/arm-gic-common.h
-@@ -0,0 +1,33 @@
-+/*
-+ * include/linux/irqchip/arm-gic-common.h
-+ *
-+ * Copyright (C) 2016 ARM Limited, All Rights Reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+#ifndef __LINUX_IRQCHIP_ARM_GIC_COMMON_H
-+#define __LINUX_IRQCHIP_ARM_GIC_COMMON_H
-+
-+#include <linux/types.h>
-+#include <linux/ioport.h>
-+
-+enum gic_type {
-+	GIC_V2,
-+};
-+
-+struct gic_kvm_info {
-+	/* GIC type */
-+	enum gic_type	type;
-+	/* Physical address & size of virtual cpu interface */
-+	struct resource vcpu;
-+	/* Interrupt number */
-+	unsigned int	maint_irq;
-+	/* Physical address & size of virtual control interface */
-+	struct resource vctrl;
-+};
-+
-+const struct gic_kvm_info *gic_get_kvm_info(void);
-+
-+#endif /* __LINUX_IRQCHIP_ARM_GIC_COMMON_H */
+ 	ret = request_percpu_irq(vgic->maint_irq, vgic_maintenance_handler,
+ 				 "vgic", kvm_get_running_vcpus());
 -- 
 1.9.1
