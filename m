@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 05/23] arm64: Add ARM64_HAS_VIRT_HOST_EXTN feature
-Date: Thu, 11 Feb 2016 18:39:46 +0000
-Message-ID: <1455216004-19499-6-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v4 10/23] arm64: KVM: VHE: Differenciate host/guest sysreg
+ save/restore
+Date: Thu, 11 Feb 2016 18:39:51 +0000
+Message-ID: <1455216004-19499-11-git-send-email-marc.zyngier@arm.com>
 References: <1455216004-19499-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 794D849C0F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 13:34:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 917CE49ADF
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 13:34:32 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0dcK90LmyeNU for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Feb 2016 13:34:22 -0500 (EST)
+ with ESMTP id j5+ZZrGFkn6q for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Feb 2016 13:34:31 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B12B49C0A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 13:34:22 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C344249AC1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 13:34:29 -0500 (EST)
 In-Reply-To: <1455216004-19499-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,69 +32,136 @@ To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a new ARM64_HAS_VIRT_HOST_EXTN features to indicate that the
-CPU has the ARMv8.1 VHE capability.
+With ARMv8, host and guest share the same system register file,
+making the save/restore procedure completely symetrical.
+With VHE, host and guest now have different requirements, as they
+use different sysregs.
 
-This will be used to trigger kernel patching in KVM.
+In order to prepare for this, add split sysreg save/restore functions
+for both host and guest. No functional changes yet.
 
 Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/cpufeature.h |  3 ++-
- arch/arm64/kernel/cpufeature.c      | 11 +++++++++++
- 2 files changed, 13 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/hyp.h       |  6 ++++--
+ arch/arm64/kvm/hyp/switch.c    | 10 +++++-----
+ arch/arm64/kvm/hyp/sysreg-sr.c | 24 ++++++++++++++++++++++--
+ 3 files changed, 31 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 8f271b8..c705d6a 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -30,8 +30,9 @@
- #define ARM64_HAS_LSE_ATOMICS			5
- #define ARM64_WORKAROUND_CAVIUM_23154		6
- #define ARM64_WORKAROUND_834220			7
-+#define ARM64_HAS_VIRT_HOST_EXTN		8
+diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
+index 744c919..5dfa883 100644
+--- a/arch/arm64/kvm/hyp/hyp.h
++++ b/arch/arm64/kvm/hyp/hyp.h
+@@ -153,8 +153,10 @@ void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
+ void __timer_save_state(struct kvm_vcpu *vcpu);
+ void __timer_restore_state(struct kvm_vcpu *vcpu);
  
--#define ARM64_NCAPS				8
-+#define ARM64_NCAPS				9
+-void __sysreg_save_state(struct kvm_cpu_context *ctxt);
+-void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
++void __sysreg_save_host_state(struct kvm_cpu_context *ctxt);
++void __sysreg_restore_host_state(struct kvm_cpu_context *ctxt);
++void __sysreg_save_guest_state(struct kvm_cpu_context *ctxt);
++void __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt);
+ void __sysreg32_save_state(struct kvm_vcpu *vcpu);
+ void __sysreg32_restore_state(struct kvm_vcpu *vcpu);
  
- #ifndef __ASSEMBLY__
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index f0e7bdf..68f3cba 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -102,7 +102,7 @@ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ 	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+ 	guest_ctxt = &vcpu->arch.ctxt;
  
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 5c90aa4..ba74519 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -26,6 +26,7 @@
- #include <asm/cpu_ops.h>
- #include <asm/processor.h>
- #include <asm/sysreg.h>
-+#include <asm/virt.h>
+-	__sysreg_save_state(host_ctxt);
++	__sysreg_save_host_state(host_ctxt);
+ 	__debug_cond_save_host_state(vcpu);
  
- unsigned long elf_hwcap __read_mostly;
- EXPORT_SYMBOL_GPL(elf_hwcap);
-@@ -621,6 +622,11 @@ static bool has_useable_gicv3_cpuif(const struct arm64_cpu_capabilities *entry)
- 	return has_sre;
+ 	__activate_traps(vcpu);
+@@ -116,7 +116,7 @@ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ 	 * to Cortex-A57 erratum #852523.
+ 	 */
+ 	__sysreg32_restore_state(vcpu);
+-	__sysreg_restore_state(guest_ctxt);
++	__sysreg_restore_guest_state(guest_ctxt);
+ 	__debug_restore_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
+ 
+ 	/* Jump in the fire! */
+@@ -125,7 +125,7 @@ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ 
+ 	fp_enabled = __fpsimd_enabled();
+ 
+-	__sysreg_save_state(guest_ctxt);
++	__sysreg_save_guest_state(guest_ctxt);
+ 	__sysreg32_save_state(vcpu);
+ 	__timer_save_state(vcpu);
+ 	__vgic_save_state(vcpu);
+@@ -133,7 +133,7 @@ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ 	__deactivate_traps(vcpu);
+ 	__deactivate_vm(vcpu);
+ 
+-	__sysreg_restore_state(host_ctxt);
++	__sysreg_restore_host_state(host_ctxt);
+ 
+ 	if (fp_enabled) {
+ 		__fpsimd_save_state(&guest_ctxt->gp_regs.fp_regs);
+@@ -165,7 +165,7 @@ void __hyp_text __noreturn __hyp_panic(void)
+ 		host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+ 		__deactivate_traps(vcpu);
+ 		__deactivate_vm(vcpu);
+-		__sysreg_restore_state(host_ctxt);
++		__sysreg_restore_host_state(host_ctxt);
+ 	}
+ 
+ 	/* Call panic for real */
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 42563098..bd5b543 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -24,7 +24,7 @@
+ #include "hyp.h"
+ 
+ /* ctxt is already in the HYP VA space */
+-void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
++static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+ {
+ 	ctxt->sys_regs[MPIDR_EL1]	= read_sysreg(vmpidr_el2);
+ 	ctxt->sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
+@@ -57,7 +57,17 @@ void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg(spsr_el1);
  }
  
-+static bool runs_at_el2(const struct arm64_cpu_capabilities *entry)
+-void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
++void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
 +{
-+	return is_kernel_in_hyp_mode();
++	__sysreg_save_state(ctxt);
 +}
 +
- static const struct arm64_cpu_capabilities arm64_features[] = {
- 	{
- 		.desc = "GIC system register CPU interface",
-@@ -651,6 +657,11 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.min_field_value = 2,
- 	},
- #endif /* CONFIG_AS_LSE && CONFIG_ARM64_LSE_ATOMICS */
-+	{
-+		.desc = "Virtualization Host Extensions",
-+		.capability = ARM64_HAS_VIRT_HOST_EXTN,
-+		.matches = runs_at_el2,
-+	},
- 	{},
- };
++void __hyp_text __sysreg_save_guest_state(struct kvm_cpu_context *ctxt)
++{
++	__sysreg_save_state(ctxt);
++}
++
++static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ {
+ 	write_sysreg(ctxt->sys_regs[MPIDR_EL1],	  vmpidr_el2);
+ 	write_sysreg(ctxt->sys_regs[CSSELR_EL1],  csselr_el1);
+@@ -90,6 +100,16 @@ void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg(ctxt->gp_regs.spsr[KVM_SPSR_EL1], spsr_el1);
+ }
  
++void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
++{
++	__sysreg_restore_state(ctxt);
++}
++
++void __hyp_text __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt)
++{
++	__sysreg_restore_state(ctxt);
++}
++
+ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+ {
+ 	u64 *spsr, *sysreg;
 -- 
 2.1.4
