@@ -1,23 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4 15/23] arm64: KVM: VHE: Implement VHE
- activate/deactivate_traps
-Date: Thu, 11 Feb 2016 18:39:56 +0000
-Message-ID: <1455216004-19499-16-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v4 19/23] arm64: KVM: Move most of the fault decoding to C
+Date: Thu, 11 Feb 2016 18:40:00 +0000
+Message-ID: <1455216004-19499-20-git-send-email-marc.zyngier@arm.com>
 References: <1455216004-19499-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C44D749C02
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 13:34:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D0F8949B36
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 13:34:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Nc-cm5K6xC0s for <kvmarm@lists.cs.columbia.edu>;
- Thu, 11 Feb 2016 13:34:40 -0500 (EST)
+ with ESMTP id Lz+RbioTLfQt for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 11 Feb 2016 13:34:44 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E94049C17
- for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 13:34:37 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A9C5049BF3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 11 Feb 2016 13:34:43 -0500 (EST)
 In-Reply-To: <1455216004-19499-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,151 +31,248 @@ To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Running the kernel in HYP mode requires the HCR_E2H bit to be set
-at all times, and the HCR_TGE bit to be set when running as a host
-(and cleared when running as a guest). At the same time, the vector
- must be set to the current role of the kernel (either host or
-hypervisor), and a couple of system registers differ between VHE
-and non-VHE.
+The fault decoding process (including computing the IPA in the case
+of a permission fault) would be much better done in C code, as we
+have a reasonable infrastructure to deal with the VHE/non-VHE
+differences.
 
-We implement these by using another set of alternate functions
-that get dynamically patched.
+Let's move the whole thing to C, including the workaround for
+erratum 834220, and just patch the odd ESR_EL2 access remaining
+in hyp-entry.S.
 
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_arm.h     |  3 +-
- arch/arm64/include/asm/kvm_emulate.h |  3 ++
- arch/arm64/kvm/hyp/switch.c          | 53 ++++++++++++++++++++++++++++++++----
- 3 files changed, 52 insertions(+), 7 deletions(-)
+ arch/arm64/kernel/asm-offsets.c |  3 --
+ arch/arm64/kvm/hyp/hyp-entry.S  | 69 +++------------------------------
+ arch/arm64/kvm/hyp/switch.c     | 85 +++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 90 insertions(+), 67 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index f416714..95ee31e 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -23,6 +23,7 @@
- #include <asm/types.h>
+diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
+index fffa4ac6..b0ab4e9 100644
+--- a/arch/arm64/kernel/asm-offsets.c
++++ b/arch/arm64/kernel/asm-offsets.c
+@@ -110,9 +110,6 @@ int main(void)
+   DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_regs, regs));
+   DEFINE(CPU_FP_REGS,		offsetof(struct kvm_regs, fp_regs));
+   DEFINE(VCPU_FPEXC32_EL2,	offsetof(struct kvm_vcpu, arch.ctxt.sys_regs[FPEXC32_EL2]));
+-  DEFINE(VCPU_ESR_EL2,		offsetof(struct kvm_vcpu, arch.fault.esr_el2));
+-  DEFINE(VCPU_FAR_EL2,		offsetof(struct kvm_vcpu, arch.fault.far_el2));
+-  DEFINE(VCPU_HPFAR_EL2,	offsetof(struct kvm_vcpu, arch.fault.hpfar_el2));
+   DEFINE(VCPU_HOST_CONTEXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
+ #endif
+ #ifdef CONFIG_CPU_PM
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index 1bdeee7..3488894 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -19,7 +19,6 @@
  
- /* Hyp Configuration Register (HCR) bits */
-+#define HCR_E2H		(UL(1) << 34)
- #define HCR_ID		(UL(1) << 33)
- #define HCR_CD		(UL(1) << 32)
- #define HCR_RW_SHIFT	31
-@@ -81,7 +82,7 @@
- 			 HCR_AMO | HCR_SWIO | HCR_TIDCP | HCR_RW)
- #define HCR_VIRT_EXCP_MASK (HCR_VA | HCR_VI | HCR_VF)
- #define HCR_INT_OVERRIDE   (HCR_FMO | HCR_IMO)
+ #include <asm/alternative.h>
+ #include <asm/assembler.h>
+-#include <asm/asm-offsets.h>
+ #include <asm/cpufeature.h>
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_asm.h>
+@@ -69,7 +68,11 @@ ENDPROC(__vhe_hyp_call)
+ el1_sync:				// Guest trapped into EL2
+ 	save_x0_to_x3
+ 
++alternative_if_not ARM64_HAS_VIRT_HOST_EXTN
+ 	mrs	x1, esr_el2
++alternative_else
++	mrs	x1, esr_el1
++alternative_endif
+ 	lsr	x2, x1, #ESR_ELx_EC_SHIFT
+ 
+ 	cmp	x2, #ESR_ELx_EC_HVC64
+@@ -105,72 +108,10 @@ el1_trap:
+ 	cmp	x2, #ESR_ELx_EC_FP_ASIMD
+ 	b.eq	__fpsimd_guest_restore
+ 
+-	cmp	x2, #ESR_ELx_EC_DABT_LOW
+-	mov	x0, #ESR_ELx_EC_IABT_LOW
+-	ccmp	x2, x0, #4, ne
+-	b.ne	1f		// Not an abort we care about
 -
-+#define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
+-	/* This is an abort. Check for permission fault */
+-alternative_if_not ARM64_WORKAROUND_834220
+-	and	x2, x1, #ESR_ELx_FSC_TYPE
+-	cmp	x2, #FSC_PERM
+-	b.ne	1f		// Not a permission fault
+-alternative_else
+-	nop			// Use the permission fault path to
+-	nop			// check for a valid S1 translation,
+-	nop			// regardless of the ESR value.
+-alternative_endif
+-
+-	/*
+-	 * Check for Stage-1 page table walk, which is guaranteed
+-	 * to give a valid HPFAR_EL2.
+-	 */
+-	tbnz	x1, #7, 1f	// S1PTW is set
+-
+-	/* Preserve PAR_EL1 */
+-	mrs	x3, par_el1
+-	stp	x3, xzr, [sp, #-16]!
+-
+-	/*
+-	 * Permission fault, HPFAR_EL2 is invalid.
+-	 * Resolve the IPA the hard way using the guest VA.
+-	 * Stage-1 translation already validated the memory access rights.
+-	 * As such, we can use the EL1 translation regime, and don't have
+-	 * to distinguish between EL0 and EL1 access.
+-	 */
+-	mrs	x2, far_el2
+-	at	s1e1r, x2
+-	isb
+-
+-	/* Read result */
+-	mrs	x3, par_el1
+-	ldp	x0, xzr, [sp], #16	// Restore PAR_EL1 from the stack
+-	msr	par_el1, x0
+-	tbnz	x3, #0, 3f		// Bail out if we failed the translation
+-	ubfx	x3, x3, #12, #36	// Extract IPA
+-	lsl	x3, x3, #4		// and present it like HPFAR
+-	b	2f
+-
+-1:	mrs	x3, hpfar_el2
+-	mrs	x2, far_el2
+-
+-2:	mrs	x0, tpidr_el2
+-	str	w1, [x0, #VCPU_ESR_EL2]
+-	str	x2, [x0, #VCPU_FAR_EL2]
+-	str	x3, [x0, #VCPU_HPFAR_EL2]
+-
++	mrs	x0, tpidr_el2
+ 	mov	x1, #ARM_EXCEPTION_TRAP
+ 	b	__guest_exit
  
- /* Hyp System Control Register (SCTLR_EL2) bits */
- #define SCTLR_EL2_EE	(1 << 25)
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 779a587..ae7cdac 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -29,6 +29,7 @@
- #include <asm/kvm_mmio.h>
- #include <asm/ptrace.h>
- #include <asm/cputype.h>
-+#include <asm/virt.h>
- 
- unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num);
- unsigned long *vcpu_spsr32(const struct kvm_vcpu *vcpu);
-@@ -43,6 +44,8 @@ void kvm_inject_pabt(struct kvm_vcpu *vcpu, unsigned long addr);
- static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- {
- 	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
-+	if (is_kernel_in_hyp_mode())
-+		vcpu->arch.hcr_el2 |= HCR_E2H;
- 	if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features))
- 		vcpu->arch.hcr_el2 &= ~HCR_RW;
- }
+-	/*
+-	 * Translation failed. Just return to the guest and
+-	 * let it fault again. Another CPU is probably playing
+-	 * behind our back.
+-	 */
+-3:	restore_x0_to_x3
+-
+-	eret
+-
+ el1_irq:
+ 	save_x0_to_x3
+ 	mrs	x0, tpidr_el2
 diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
-index 0d82ae9..e609942 100644
+index 731f0a2..ecf5b05 100644
 --- a/arch/arm64/kvm/hyp/switch.c
 +++ b/arch/arm64/kvm/hyp/switch.c
-@@ -15,6 +15,8 @@
+@@ -15,6 +15,7 @@
   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
   */
  
-+#include <asm/kvm_asm.h>
-+
++#include <linux/types.h>
+ #include <asm/kvm_asm.h>
+ 
  #include "hyp.h"
- 
- static bool __hyp_text __fpsimd_enabled_nvhe(void)
-@@ -36,6 +38,31 @@ bool __hyp_text __fpsimd_enabled(void)
- 	return __fpsimd_is_enabled()();
+@@ -149,6 +150,86 @@ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
+ 	__vgic_call_restore_state()(vcpu);
  }
  
-+static void __hyp_text __activate_traps_vhe(void)
++static bool __hyp_text __true_value(void)
 +{
-+	u64 val;
-+
-+	val = read_sysreg(cpacr_el1);
-+	val |= CPACR_EL1_TTA;
-+	val &= ~CPACR_EL1_FPEN;
-+	write_sysreg(val, cpacr_el1);
-+
-+	write_sysreg(__kvm_hyp_vector, vbar_el1);
++	return true;
 +}
 +
-+static void __hyp_text __activate_traps_nvhe(void)
++static bool __hyp_text __false_value(void)
 +{
-+	u64 val;
-+
-+	val = CPTR_EL2_DEFAULT;
-+	val |= CPTR_EL2_TTA | CPTR_EL2_TFP;
-+	write_sysreg(val, cptr_el2);
++	return false;
 +}
 +
-+static hyp_alternate_select(__activate_traps_arch,
-+			    __activate_traps_nvhe, __activate_traps_vhe,
-+			    ARM64_HAS_VIRT_HOST_EXTN);
++static hyp_alternate_select(__check_arm_834220,
++			    __false_value, __true_value,
++			    ARM64_WORKAROUND_834220);
 +
- static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
++static bool __hyp_text __translate_far_to_hpfar(u64 far, u64 *hpfar)
++{
++	u64 par, tmp;
++
++	/*
++	 * Resolve the IPA the hard way using the guest VA.
++	 *
++	 * Stage-1 translation already validated the memory access
++	 * rights. As such, we can use the EL1 translation regime, and
++	 * don't have to distinguish between EL0 and EL1 access.
++	 *
++	 * We do need to save/restore PAR_EL1 though, as we haven't
++	 * saved the guest context yet, and we may return early...
++	 */
++	par = read_sysreg(par_el1);
++	asm volatile("at s1e1r, %0" : : "r" (far));
++	isb();
++
++	tmp = read_sysreg(par_el1);
++	write_sysreg(par, par_el1);
++
++	if (unlikely(tmp & 1))
++		return false; /* Translation failed, back to guest */
++
++	/* Convert PAR to HPFAR format */
++	*hpfar = ((tmp >> 12) & ((1UL << 36) - 1)) << 4;
++	return true;
++}
++
++static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
++{
++	u64 esr = read_sysreg_el2(esr);
++	u8 ec = esr >> ESR_ELx_EC_SHIFT;
++	u64 hpfar, far;
++
++	vcpu->arch.fault.esr_el2 = esr;
++
++	if (ec != ESR_ELx_EC_DABT_LOW && ec != ESR_ELx_EC_IABT_LOW)
++		return true;
++
++	far = read_sysreg_el2(far);
++
++	/*
++	 * The HPFAR can be invalid if the stage 2 fault did not
++	 * happen during a stage 1 page table walk (the ESR_EL2.S1PTW
++	 * bit is clear) and one of the two following cases are true:
++	 *   1. The fault was due to a permission fault
++	 *   2. The processor carries errata 834220
++	 *
++	 * Therefore, for all non S1PTW faults where we either have a
++	 * permission fault or the errata workaround is enabled, we
++	 * resolve the IPA using the AT instruction.
++	 */
++	if (!(esr & ESR_ELx_S1PTW) &&
++	    (__check_arm_834220()() || (esr & ESR_ELx_FSC_TYPE) == FSC_PERM)) {
++		if (!__translate_far_to_hpfar(far, &hpfar))
++			return false;
++	} else {
++		hpfar = read_sysreg(hpfar_el2);
++	}
++
++	vcpu->arch.fault.far_el2 = far;
++	vcpu->arch.fault.hpfar_el2 = hpfar;
++	return true;
++}
++
+ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
  {
- 	u64 val;
-@@ -55,20 +82,34 @@ static void __hyp_text __activate_traps(struct kvm_vcpu *vcpu)
- 	write_sysreg(val, hcr_el2);
- 	/* Trap on AArch32 cp15 c15 accesses (EL1 or EL0) */
- 	write_sysreg(1 << 15, hstr_el2);
-+	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
-+	__activate_traps_arch()();
-+}
+ 	struct kvm_cpu_context *host_ctxt;
+@@ -180,9 +261,13 @@ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ 	__debug_restore_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
  
--	val = CPTR_EL2_DEFAULT;
--	val |= CPTR_EL2_TTA | CPTR_EL2_TFP;
--	write_sysreg(val, cptr_el2);
-+static void __hyp_text __deactivate_traps_vhe(void)
-+{
-+	extern char vectors[];	/* kernel exception vectors */
+ 	/* Jump in the fire! */
++again:
+ 	exit_code = __guest_enter(vcpu, host_ctxt);
+ 	/* And we're baaack! */
  
--	write_sysreg(vcpu->arch.mdcr_el2, mdcr_el2);
-+	write_sysreg(HCR_HOST_VHE_FLAGS, hcr_el2);
-+	write_sysreg(CPACR_EL1_FPEN, cpacr_el1);
-+	write_sysreg(vectors, vbar_el1);
- }
- 
--static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
-+static void __hyp_text __deactivate_traps_nvhe(void)
- {
- 	write_sysreg(HCR_RW, hcr_el2);
-+	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
-+}
++	if (exit_code == ARM_EXCEPTION_TRAP && !__populate_fault_info(vcpu))
++		goto again;
 +
-+static hyp_alternate_select(__deactivate_traps_arch,
-+			    __deactivate_traps_nvhe, __deactivate_traps_vhe,
-+			    ARM64_HAS_VIRT_HOST_EXTN);
-+
-+static void __hyp_text __deactivate_traps(struct kvm_vcpu *vcpu)
-+{
-+	__deactivate_traps_arch()();
- 	write_sysreg(0, hstr_el2);
- 	write_sysreg(read_sysreg(mdcr_el2) & MDCR_EL2_HPMN_MASK, mdcr_el2);
--	write_sysreg(CPTR_EL2_DEFAULT, cptr_el2);
- }
+ 	fp_enabled = __fpsimd_enabled();
  
- static void __hyp_text __activate_vm(struct kvm_vcpu *vcpu)
+ 	__sysreg_save_guest_state(guest_ctxt);
 -- 
 2.1.4
