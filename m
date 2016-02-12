@@ -1,7 +1,7 @@
 From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: [RFC v3 03/15] vfio: introduce VFIO_IOVA_RESERVED vfio_dma type
-Date: Fri, 12 Feb 2016 08:13:05 +0000
-Message-ID: <1455264797-2334-4-git-send-email-eric.auger@linaro.org>
+Subject: [RFC v3 04/15] iommu: add alloc/free_reserved_iova_domain
+Date: Fri, 12 Feb 2016 08:13:06 +0000
+Message-ID: <1455264797-2334-5-git-send-email-eric.auger@linaro.org>
 References: <1455264797-2334-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -21,65 +21,90 @@ To: eric.auger-qxv4g6HH51o@public.gmane.org, eric.auger-QSEj5FYQhm4dnm+yROfE0A@p
 Cc: Thomas.Lendacky-5C7GfCeVMHo@public.gmane.org, brijesh.singh-5C7GfCeVMHo@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, sherry.hurwitz-5C7GfCeVMHo@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We introduce a vfio_dma type since we will need to discriminate
-legacy vfio_dma's from new reserved ones. Since those latter are
-not mapped at registration, some treatments need to be reworked:
-removal, replay. Currently they are unplugged. In subsequent patches
-they will be reworked.
+Introduce alloc/free_reserved_iova_domain in the IOMMU API.
+alloc_reserved_iova_domain initializes an iova domain at a given
+iova base address and with a given size. This iova domain will
+be used to allocate iova within that window. Those IOVAs will be reserved
+for special purpose, typically MSI frame binding. Allocation function
+within the reserved iova domain will be introduced in subsequent patches.
+
+This is the responsability of the API user to make sure any IOVA
+belonging to that domain are allocated with those allocation functions.
 
 Signed-off-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
----
- drivers/vfio/vfio_iommu_type1.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index c5b57e1..b9326c9 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -53,6 +53,15 @@ module_param_named(disable_hugepages,
- MODULE_PARM_DESC(disable_hugepages,
- 		 "Disable VFIO IOMMU support for IOMMU hugepages.");
- 
-+enum vfio_iova_type {
-+	VFIO_IOVA_USER = 0, /* standard IOVA used to map user vaddr */
-+	/*
-+	 * IOVA reserved to map special host physical addresses,
-+	 * MSI frames for instance
-+	 */
-+	VFIO_IOVA_RESERVED,
-+};
-+
- struct vfio_iommu {
- 	struct list_head	domain_list;
- 	struct mutex		lock;
-@@ -75,6 +84,7 @@ struct vfio_dma {
- 	unsigned long		vaddr;		/* Process virtual addr */
- 	size_t			size;		/* Map size (bytes) */
- 	int			prot;		/* IOMMU_READ/WRITE */
-+	enum vfio_iova_type	type;		/* type of IOVA */
- };
- 
- struct vfio_group {
-@@ -418,7 +428,8 @@ static void vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma)
- 
- static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
- {
--	vfio_unmap_unpin(iommu, dma);
-+	if (likely(dma->type != VFIO_IOVA_RESERVED))
-+		vfio_unmap_unpin(iommu, dma);
- 	vfio_unlink_dma(iommu, dma);
- 	kfree(dma);
+---
+v2 -> v3:
+- remove iommu_alloc_reserved_iova_domain & iommu_free_reserved_iova_domain
+  static implementation in case CONFIG_IOMMU_API is not set
+
+v1 -> v2:
+- moved from vfio API to IOMMU API
+---
+ drivers/iommu/iommu.c | 22 ++++++++++++++++++++++
+ include/linux/iommu.h | 10 ++++++++++
+ 2 files changed, 32 insertions(+)
+
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index 0e3b009..a994f34 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -1557,6 +1557,28 @@ int iommu_domain_set_attr(struct iommu_domain *domain,
  }
-@@ -694,6 +705,10 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 		dma_addr_t iova;
+ EXPORT_SYMBOL_GPL(iommu_domain_set_attr);
  
- 		dma = rb_entry(n, struct vfio_dma, node);
++int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
++				     dma_addr_t iova, size_t size,
++				     unsigned long order)
++{
++	int ret;
 +
-+		if (unlikely(dma->type == VFIO_IOVA_RESERVED))
-+			continue;
++	if (!domain->ops->alloc_reserved_iova_domain)
++		return -EINVAL;
++	ret = domain->ops->alloc_reserved_iova_domain(domain, iova,
++						      size, order);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(iommu_alloc_reserved_iova_domain);
 +
- 		iova = dma->iova;
++void iommu_free_reserved_iova_domain(struct iommu_domain *domain)
++{
++	if (!domain->ops->free_reserved_iova_domain)
++		return;
++	domain->ops->free_reserved_iova_domain(domain);
++}
++EXPORT_SYMBOL_GPL(iommu_free_reserved_iova_domain);
++
+ void iommu_get_dm_regions(struct device *dev, struct list_head *list)
+ {
+ 	const struct iommu_ops *ops = dev->bus->iommu_ops;
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index a4fe04a..2d1f155 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -195,6 +195,12 @@ struct iommu_ops {
+ 	int (*domain_set_windows)(struct iommu_domain *domain, u32 w_count);
+ 	/* Get the number of windows per domain */
+ 	u32 (*domain_get_windows)(struct iommu_domain *domain);
++	/* allocates the reserved iova domain */
++	int (*alloc_reserved_iova_domain)(struct iommu_domain *domain,
++					  dma_addr_t iova, size_t size,
++					  unsigned long order);
++	/* frees the reserved iova domain */
++	void (*free_reserved_iova_domain)(struct iommu_domain *domain);
  
- 		while (iova < dma->iova + dma->size) {
+ #ifdef CONFIG_OF_IOMMU
+ 	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
+@@ -266,6 +272,10 @@ extern int iommu_domain_get_attr(struct iommu_domain *domain, enum iommu_attr,
+ 				 void *data);
+ extern int iommu_domain_set_attr(struct iommu_domain *domain, enum iommu_attr,
+ 				 void *data);
++extern int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
++					    dma_addr_t iova, size_t size,
++					    unsigned long order);
++extern void iommu_free_reserved_iova_domain(struct iommu_domain *domain);
+ struct device *iommu_device_create(struct device *parent, void *drvdata,
+ 				   const struct attribute_group **groups,
+ 				   const char *fmt, ...) __printf(4, 5);
 -- 
 1.9.1
