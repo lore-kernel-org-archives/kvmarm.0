@@ -1,7 +1,8 @@
 From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: [RFC v3 04/15] iommu: add alloc/free_reserved_iova_domain
-Date: Fri, 12 Feb 2016 08:13:06 +0000
-Message-ID: <1455264797-2334-5-git-send-email-eric.auger@linaro.org>
+Subject: [RFC v3 05/15] iommu/arm-smmu: implement
+	alloc/free_reserved_iova_domain
+Date: Fri, 12 Feb 2016 08:13:07 +0000
+Message-ID: <1455264797-2334-6-git-send-email-eric.auger@linaro.org>
 References: <1455264797-2334-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
@@ -21,90 +22,162 @@ To: eric.auger-qxv4g6HH51o@public.gmane.org, eric.auger-QSEj5FYQhm4dnm+yROfE0A@p
 Cc: Thomas.Lendacky-5C7GfCeVMHo@public.gmane.org, brijesh.singh-5C7GfCeVMHo@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, sherry.hurwitz-5C7GfCeVMHo@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Introduce alloc/free_reserved_iova_domain in the IOMMU API.
-alloc_reserved_iova_domain initializes an iova domain at a given
-iova base address and with a given size. This iova domain will
-be used to allocate iova within that window. Those IOVAs will be reserved
-for special purpose, typically MSI frame binding. Allocation function
-within the reserved iova domain will be introduced in subsequent patches.
-
-This is the responsability of the API user to make sure any IOVA
-belonging to that domain are allocated with those allocation functions.
+Implement alloc/free_reserved_iova_domain for arm-smmu. we use
+the iova allocator (iova.c). The iova_domain is attached to the
+arm_smmu_domain struct. A mutex is introduced to protect it.
 
 Signed-off-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 
 ---
 v2 -> v3:
-- remove iommu_alloc_reserved_iova_domain & iommu_free_reserved_iova_domain
-  static implementation in case CONFIG_IOMMU_API is not set
+- select IOMMU_IOVA when ARM_SMMU or ARM_SMMU_V3 is set
 
 v1 -> v2:
-- moved from vfio API to IOMMU API
+- formerly implemented in vfio_iommu_type1
 ---
- drivers/iommu/iommu.c | 22 ++++++++++++++++++++++
- include/linux/iommu.h | 10 ++++++++++
- 2 files changed, 32 insertions(+)
+ drivers/iommu/Kconfig    |  2 ++
+ drivers/iommu/arm-smmu.c | 87 +++++++++++++++++++++++++++++++++++++++---------
+ 2 files changed, 74 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 0e3b009..a994f34 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -1557,6 +1557,28 @@ int iommu_domain_set_attr(struct iommu_domain *domain,
- }
- EXPORT_SYMBOL_GPL(iommu_domain_set_attr);
+diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
+index a1e75cb..1106528 100644
+--- a/drivers/iommu/Kconfig
++++ b/drivers/iommu/Kconfig
+@@ -289,6 +289,7 @@ config ARM_SMMU
+ 	bool "ARM Ltd. System MMU (SMMU) Support"
+ 	depends on (ARM64 || ARM) && MMU
+ 	select IOMMU_API
++	select IOMMU_IOVA
+ 	select IOMMU_IO_PGTABLE_LPAE
+ 	select ARM_DMA_USE_IOMMU if ARM
+ 	help
+@@ -302,6 +303,7 @@ config ARM_SMMU_V3
+ 	bool "ARM Ltd. System MMU Version 3 (SMMUv3) Support"
+ 	depends on ARM64 && PCI
+ 	select IOMMU_API
++	select IOMMU_IOVA
+ 	select IOMMU_IO_PGTABLE_LPAE
+ 	select GENERIC_MSI_IRQ_DOMAIN
+ 	help
+diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
+index c8b7e71..f42341d 100644
+--- a/drivers/iommu/arm-smmu.c
++++ b/drivers/iommu/arm-smmu.c
+@@ -42,6 +42,7 @@
+ #include <linux/platform_device.h>
+ #include <linux/slab.h>
+ #include <linux/spinlock.h>
++#include <linux/iova.h>
  
-+int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
-+				     dma_addr_t iova, size_t size,
-+				     unsigned long order)
+ #include <linux/amba/bus.h>
+ 
+@@ -347,6 +348,9 @@ struct arm_smmu_domain {
+ 	enum arm_smmu_domain_stage	stage;
+ 	struct mutex			init_mutex; /* Protects smmu pointer */
+ 	struct iommu_domain		domain;
++	struct iova_domain		*reserved_iova_domain;
++	/* protects reserved domain manipulation */
++	struct mutex			reserved_mutex;
+ };
+ 
+ static struct iommu_ops arm_smmu_ops;
+@@ -975,6 +979,7 @@ static struct iommu_domain *arm_smmu_domain_alloc(unsigned type)
+ 		return NULL;
+ 
+ 	mutex_init(&smmu_domain->init_mutex);
++	mutex_init(&smmu_domain->reserved_mutex);
+ 	spin_lock_init(&smmu_domain->pgtbl_lock);
+ 
+ 	return &smmu_domain->domain;
+@@ -1446,22 +1451,74 @@ out_unlock:
+ 	return ret;
+ }
+ 
++static int arm_smmu_alloc_reserved_iova_domain(struct iommu_domain *domain,
++					       dma_addr_t iova, size_t size,
++					       unsigned long order)
 +{
-+	int ret;
++	unsigned long granule, mask;
++	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
++	int ret = 0;
 +
-+	if (!domain->ops->alloc_reserved_iova_domain)
++	granule = 1UL << order;
++	mask = granule - 1;
++	if (iova & mask || (!size) || (size & mask))
 +		return -EINVAL;
-+	ret = domain->ops->alloc_reserved_iova_domain(domain, iova,
-+						      size, order);
++
++	if (smmu_domain->reserved_iova_domain)
++		return -EEXIST;
++
++	mutex_lock(&smmu_domain->reserved_mutex);
++
++	smmu_domain->reserved_iova_domain =
++		kzalloc(sizeof(struct iova_domain), GFP_KERNEL);
++	if (!smmu_domain->reserved_iova_domain) {
++		ret = -ENOMEM;
++		goto unlock;
++	}
++
++	init_iova_domain(smmu_domain->reserved_iova_domain,
++			 granule, iova >> order, (iova + size - 1) >> order);
++
++unlock:
++	mutex_unlock(&smmu_domain->reserved_mutex);
 +	return ret;
 +}
-+EXPORT_SYMBOL_GPL(iommu_alloc_reserved_iova_domain);
 +
-+void iommu_free_reserved_iova_domain(struct iommu_domain *domain)
++static void arm_smmu_free_reserved_iova_domain(struct iommu_domain *domain)
 +{
-+	if (!domain->ops->free_reserved_iova_domain)
-+		return;
-+	domain->ops->free_reserved_iova_domain(domain);
-+}
-+EXPORT_SYMBOL_GPL(iommu_free_reserved_iova_domain);
++	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
++	struct iova_domain *iovad = smmu_domain->reserved_iova_domain;
 +
- void iommu_get_dm_regions(struct device *dev, struct list_head *list)
- {
- 	const struct iommu_ops *ops = dev->bus->iommu_ops;
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index a4fe04a..2d1f155 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -195,6 +195,12 @@ struct iommu_ops {
- 	int (*domain_set_windows)(struct iommu_domain *domain, u32 w_count);
- 	/* Get the number of windows per domain */
- 	u32 (*domain_get_windows)(struct iommu_domain *domain);
-+	/* allocates the reserved iova domain */
-+	int (*alloc_reserved_iova_domain)(struct iommu_domain *domain,
-+					  dma_addr_t iova, size_t size,
-+					  unsigned long order);
-+	/* frees the reserved iova domain */
-+	void (*free_reserved_iova_domain)(struct iommu_domain *domain);
++	if (!iovad)
++		return;
++
++	mutex_lock(&smmu_domain->reserved_mutex);
++
++	put_iova_domain(iovad);
++	kfree(iovad);
++
++	mutex_unlock(&smmu_domain->reserved_mutex);
++}
++
+ static struct iommu_ops arm_smmu_ops = {
+-	.capable		= arm_smmu_capable,
+-	.domain_alloc		= arm_smmu_domain_alloc,
+-	.domain_free		= arm_smmu_domain_free,
+-	.attach_dev		= arm_smmu_attach_dev,
+-	.detach_dev		= arm_smmu_detach_dev,
+-	.map			= arm_smmu_map,
+-	.unmap			= arm_smmu_unmap,
+-	.map_sg			= default_iommu_map_sg,
+-	.iova_to_phys		= arm_smmu_iova_to_phys,
+-	.add_device		= arm_smmu_add_device,
+-	.remove_device		= arm_smmu_remove_device,
+-	.device_group		= arm_smmu_device_group,
+-	.domain_get_attr	= arm_smmu_domain_get_attr,
+-	.domain_set_attr	= arm_smmu_domain_set_attr,
+-	.pgsize_bitmap		= -1UL, /* Restricted during device attach */
++	.capable			= arm_smmu_capable,
++	.domain_alloc			= arm_smmu_domain_alloc,
++	.domain_free			= arm_smmu_domain_free,
++	.attach_dev			= arm_smmu_attach_dev,
++	.detach_dev			= arm_smmu_detach_dev,
++	.map				= arm_smmu_map,
++	.unmap				= arm_smmu_unmap,
++	.map_sg				= default_iommu_map_sg,
++	.iova_to_phys			= arm_smmu_iova_to_phys,
++	.add_device			= arm_smmu_add_device,
++	.remove_device			= arm_smmu_remove_device,
++	.device_group			= arm_smmu_device_group,
++	.domain_get_attr		= arm_smmu_domain_get_attr,
++	.domain_set_attr		= arm_smmu_domain_set_attr,
++	.alloc_reserved_iova_domain	= arm_smmu_alloc_reserved_iova_domain,
++	.free_reserved_iova_domain	= arm_smmu_free_reserved_iova_domain,
++	/* Page size bitmap, restricted during device attach */
++	.pgsize_bitmap			= -1UL,
+ };
  
- #ifdef CONFIG_OF_IOMMU
- 	int (*of_xlate)(struct device *dev, struct of_phandle_args *args);
-@@ -266,6 +272,10 @@ extern int iommu_domain_get_attr(struct iommu_domain *domain, enum iommu_attr,
- 				 void *data);
- extern int iommu_domain_set_attr(struct iommu_domain *domain, enum iommu_attr,
- 				 void *data);
-+extern int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
-+					    dma_addr_t iova, size_t size,
-+					    unsigned long order);
-+extern void iommu_free_reserved_iova_domain(struct iommu_domain *domain);
- struct device *iommu_device_create(struct device *parent, void *drvdata,
- 				   const struct attribute_group **groups,
- 				   const char *fmt, ...) __printf(4, 5);
+ static void arm_smmu_device_reset(struct arm_smmu_device *smmu)
 -- 
 1.9.1
