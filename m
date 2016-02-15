@@ -1,103 +1,72 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v4 21/23] arm64: hw_breakpoint: Allow EL2 breakpoints if
- running in HYP
-Date: Mon, 15 Feb 2016 17:46:56 +0000
-Message-ID: <20160215174656.GN6298@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 23/23] arm64: Panic when VHE and non VHE CPUs coexist
+Date: Mon, 15 Feb 2016 18:14:25 +0000
+Message-ID: <56C21581.5030003@arm.com>
 References: <1455216004-19499-1-git-send-email-marc.zyngier@arm.com>
- <1455216004-19499-22-git-send-email-marc.zyngier@arm.com>
+ <1455216004-19499-24-git-send-email-marc.zyngier@arm.com>
+ <20160215172653.GM6298@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1455216004-19499-22-git-send-email-marc.zyngier@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F418749731
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Feb 2016 13:08:18 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ORR8B+uPuwmI for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 15 Feb 2016 13:08:17 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 86E8E49695
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 15 Feb 2016 13:08:17 -0500 (EST)
+In-Reply-To: <20160215172653.GM6298@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Will Deacon <will.deacon@arm.com>
+Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 11, 2016 at 06:40:02PM +0000, Marc Zyngier wrote:
-> With VHE, we place kernel {watch,break}-points at EL2 to get things
-> like kgdb and "perf -e mem:..." working.
+On 15/02/16 17:26, Will Deacon wrote:
+> On Thu, Feb 11, 2016 at 06:40:04PM +0000, Marc Zyngier wrote:
+>> Having both VHE and non-VHE capable CPUs in the same system
+>> is likely to be a recipe for disaster.
+>>
+>> If the boot CPU has VHE, but a secondary is not, we won't be
+>> able to downgrade and run the kernel at EL1. Add CPU hotplug
+>> to the mix, and this produces a terrifying mess.
+>>
+>> Let's solve the problem once and for all. If you mix VHE and
+>> non-VHE CPUs in the same system, you deserve to loose, and this
+>> patch makes sure you don't get a chance.
+>>
+>> This is implemented by storing the kernel execution level in
+>> a global variable. Secondaries will park themselves in a
+>> WFI loop if they observe a mismatch. Also, the primary CPU
+>> will detect that the secondary CPU has died on a mismatched
+>> execution level. Panic will follow.
 > 
-> This requires a bit of repainting in the low-level encore/decode,
-> but is otherwise pretty simple.
+> This should really be based on Suzuki's series for handling generic
+> mismatches:
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> ---
->  arch/arm64/include/asm/hw_breakpoint.h | 49 +++++++++++++++++++++-------------
->  1 file changed, 31 insertions(+), 18 deletions(-)
+> http://lists.infradead.org/pipermail/linux-arm-kernel/2016-January/401727.html
 > 
-> diff --git a/arch/arm64/include/asm/hw_breakpoint.h b/arch/arm64/include/asm/hw_breakpoint.h
-> index 9732908..4d8d5a8 100644
-> --- a/arch/arm64/include/asm/hw_breakpoint.h
-> +++ b/arch/arm64/include/asm/hw_breakpoint.h
-> @@ -18,6 +18,7 @@
->  
->  #include <asm/cputype.h>
->  #include <asm/cpufeature.h>
-> +#include <asm/virt.h>
->  
->  #ifdef __KERNEL__
->  
-> @@ -35,24 +36,6 @@ struct arch_hw_breakpoint {
->  	struct arch_hw_breakpoint_ctrl ctrl;
->  };
->  
-> -static inline u32 encode_ctrl_reg(struct arch_hw_breakpoint_ctrl ctrl)
-> -{
-> -	return (ctrl.len << 5) | (ctrl.type << 3) | (ctrl.privilege << 1) |
-> -		ctrl.enabled;
-> -}
-> -
-> -static inline void decode_ctrl_reg(u32 reg,
-> -				   struct arch_hw_breakpoint_ctrl *ctrl)
-> -{
-> -	ctrl->enabled	= reg & 0x1;
-> -	reg >>= 1;
-> -	ctrl->privilege	= reg & 0x3;
-> -	reg >>= 2;
-> -	ctrl->type	= reg & 0x3;
-> -	reg >>= 2;
-> -	ctrl->len	= reg & 0xff;
-> -}
-> -
->  /* Breakpoint */
->  #define ARM_BREAKPOINT_EXECUTE	0
->  
-> @@ -62,6 +45,7 @@ static inline void decode_ctrl_reg(u32 reg,
->  #define AARCH64_ESR_ACCESS_MASK	(1 << 6)
->  
->  /* Privilege Levels */
-> +#define AARCH64_BREAKPOINT_EL2	0
->  #define AARCH64_BREAKPOINT_EL1	1
->  #define AARCH64_BREAKPOINT_EL0	2
->  
-> @@ -76,6 +60,35 @@ static inline void decode_ctrl_reg(u32 reg,
->  #define ARM_KERNEL_STEP_ACTIVE	1
->  #define ARM_KERNEL_STEP_SUSPEND	2
->  
-> +#define DBG_HMC_HYP		(1 << 13)
-> +#define DBG_SSC_HYP		(3 << 14)
+> To avoid growing a dependency on something that's unlikely to make it
+> for 4.6, I'd be inclined to drop your homegrown checks altogether amd
+> help Suzuki with his series as a separate activity (i.e. it needn't be
+> a blocker imo).
 
-Why do we need to touch the SSC field at all?
+That's fine, I'll drop that one - we can revisit it and fold it into
+Suzuki's series.
 
-> +
-> +static inline u32 encode_ctrl_reg(struct arch_hw_breakpoint_ctrl ctrl)
-> +{
-> +	u32 val = (ctrl.len << 5) | (ctrl.type << 3) | ctrl.enabled;
-> +
-> +	if (is_kernel_in_hyp_mode() && ctrl.privilege == AARCH64_BREAKPOINT_EL1)
-> +		val |= DBG_HMC_HYP | DBG_SSC_HYP | (AARCH64_BREAKPOINT_EL2 << 1);
+Thanks,
 
-I don't think this is correct. We want to allow, for example, a userspace
-watchpoint to fire thanks to something like put_user, so the encoding
-really needs to build up the PMC field (like we do already), then orr in
-the HMC field.
-
-The "gotcha", which is similar to the PMU stuff, is that you can't have
-HMC==1 (EL2) and PMC==2 (i.e. EL2 and EL0, but not EL1).
-
-I *think* the conclusion is that you need AARCH64_BREAKPOINT_EL2 to look
-like DBG_HMC_HYP | AARCH64_BREAKPOINT_EL1.
-
-Will
+	M.
+-- 
+Jazz is not dead. It just smells funny...
