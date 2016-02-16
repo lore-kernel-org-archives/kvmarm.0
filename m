@@ -1,176 +1,95 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 21/23] arm64: hw_breakpoint: Allow EL2 breakpoints if
- running in HYP
-Date: Tue, 16 Feb 2016 09:55:41 +0000
-Message-ID: <56C2F21D.90205@arm.com>
-References: <1455216004-19499-1-git-send-email-marc.zyngier@arm.com>
- <1455216004-19499-22-git-send-email-marc.zyngier@arm.com>
- <20160215174656.GN6298@arm.com> <20160215190747.GR6298@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C3F748912
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Feb 2016 04:49:33 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ICF5ncb4kjtm for <kvmarm@lists.cs.columbia.edu>;
- Tue, 16 Feb 2016 04:49:31 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C8BAB48536
- for <kvmarm@lists.cs.columbia.edu>; Tue, 16 Feb 2016 04:49:31 -0500 (EST)
-In-Reply-To: <20160215190747.GR6298@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCH] KVM: arm/arm64: vgic: ensure bitmaps are long enough
+Date: Tue, 16 Feb 2016 14:47:31 +0000
+Message-ID: <1455634051-1860-1-git-send-email-mark.rutland@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 15/02/16 19:07, Will Deacon wrote:
-> On Mon, Feb 15, 2016 at 05:46:56PM +0000, Will Deacon wrote:
->> On Thu, Feb 11, 2016 at 06:40:02PM +0000, Marc Zyngier wrote:
->>> With VHE, we place kernel {watch,break}-points at EL2 to get things
->>> like kgdb and "perf -e mem:..." working.
->>>
->>> This requires a bit of repainting in the low-level encore/decode,
->>> but is otherwise pretty simple.
->>>
->>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->>> ---
->>>  arch/arm64/include/asm/hw_breakpoint.h | 49 +++++++++++++++++++++-------------
->>>  1 file changed, 31 insertions(+), 18 deletions(-)
->>>
->>> diff --git a/arch/arm64/include/asm/hw_breakpoint.h b/arch/arm64/include/asm/hw_breakpoint.h
->>> index 9732908..4d8d5a8 100644
->>> --- a/arch/arm64/include/asm/hw_breakpoint.h
->>> +++ b/arch/arm64/include/asm/hw_breakpoint.h
->>> @@ -18,6 +18,7 @@
->>>  
->>>  #include <asm/cputype.h>
->>>  #include <asm/cpufeature.h>
->>> +#include <asm/virt.h>
->>>  
->>>  #ifdef __KERNEL__
->>>  
->>> @@ -35,24 +36,6 @@ struct arch_hw_breakpoint {
->>>  	struct arch_hw_breakpoint_ctrl ctrl;
->>>  };
->>>  
->>> -static inline u32 encode_ctrl_reg(struct arch_hw_breakpoint_ctrl ctrl)
->>> -{
->>> -	return (ctrl.len << 5) | (ctrl.type << 3) | (ctrl.privilege << 1) |
->>> -		ctrl.enabled;
->>> -}
->>> -
->>> -static inline void decode_ctrl_reg(u32 reg,
->>> -				   struct arch_hw_breakpoint_ctrl *ctrl)
->>> -{
->>> -	ctrl->enabled	= reg & 0x1;
->>> -	reg >>= 1;
->>> -	ctrl->privilege	= reg & 0x3;
->>> -	reg >>= 2;
->>> -	ctrl->type	= reg & 0x3;
->>> -	reg >>= 2;
->>> -	ctrl->len	= reg & 0xff;
->>> -}
->>> -
->>>  /* Breakpoint */
->>>  #define ARM_BREAKPOINT_EXECUTE	0
->>>  
->>> @@ -62,6 +45,7 @@ static inline void decode_ctrl_reg(u32 reg,
->>>  #define AARCH64_ESR_ACCESS_MASK	(1 << 6)
->>>  
->>>  /* Privilege Levels */
->>> +#define AARCH64_BREAKPOINT_EL2	0
->>>  #define AARCH64_BREAKPOINT_EL1	1
->>>  #define AARCH64_BREAKPOINT_EL0	2
->>>  
->>> @@ -76,6 +60,35 @@ static inline void decode_ctrl_reg(u32 reg,
->>>  #define ARM_KERNEL_STEP_ACTIVE	1
->>>  #define ARM_KERNEL_STEP_SUSPEND	2
->>>  
->>> +#define DBG_HMC_HYP		(1 << 13)
->>> +#define DBG_SSC_HYP		(3 << 14)
->>
->> Why do we need to touch the SSC field at all?
->>
->>> +
->>> +static inline u32 encode_ctrl_reg(struct arch_hw_breakpoint_ctrl ctrl)
->>> +{
->>> +	u32 val = (ctrl.len << 5) | (ctrl.type << 3) | ctrl.enabled;
->>> +
->>> +	if (is_kernel_in_hyp_mode() && ctrl.privilege == AARCH64_BREAKPOINT_EL1)
->>> +		val |= DBG_HMC_HYP | DBG_SSC_HYP | (AARCH64_BREAKPOINT_EL2 << 1);
->>
->> I don't think this is correct. We want to allow, for example, a userspace
->> watchpoint to fire thanks to something like put_user, so the encoding
->> really needs to build up the PMC field (like we do already), then orr in
->> the HMC field.
-> 
-> Hmm, I got my arm and my arm64 mixed up here. For the latter, we don't
-> actually support EL0+EL1 watchpoints, but I still think that the
-> {HMC,SSC,PMC} encoding of {1,00,xx} is cleaner.
+When we allocate bitmaps in vgic_vcpu_init_maps, we divide the number of
+bits we need by 8 to figure out how many bytes to allocate. However,
+bitmap elements are always accessed as unsigned longs, and if we didn't
+happen to allocate a size such that size % sizeof(unsigned long) == 0,
+bitmap accesses may go past the end of the allocation.
 
-Indeed. So with that in mind, I ended up with the following patch, which is much simpler than the previous one:
+When using KASAN (which does byte-granular access checks), this results
+in a continuous stream of BUGs whenever these bitmaps are accessed:
 
-diff --git a/arch/arm64/include/asm/hw_breakpoint.h b/arch/arm64/include/asm/hw_breakpoint.h
-index 9732908..115ea2a 100644
---- a/arch/arm64/include/asm/hw_breakpoint.h
-+++ b/arch/arm64/include/asm/hw_breakpoint.h
-@@ -18,6 +18,7 @@
- 
- #include <asm/cputype.h>
- #include <asm/cpufeature.h>
-+#include <asm/virt.h>
- 
- #ifdef __KERNEL__
- 
-@@ -35,10 +36,21 @@ struct arch_hw_breakpoint {
- 	struct arch_hw_breakpoint_ctrl ctrl;
- };
- 
-+/* Privilege Levels */
-+#define AARCH64_BREAKPOINT_EL1	1
-+#define AARCH64_BREAKPOINT_EL0	2
-+
-+#define DBG_HMC_HYP		(1 << 13)
-+
- static inline u32 encode_ctrl_reg(struct arch_hw_breakpoint_ctrl ctrl)
+=============================================================================
+BUG kmalloc-128 (Tainted: G    B          ): kasan: bad access detected
+-----------------------------------------------------------------------------
+
+INFO: Allocated in vgic_init.part.25+0x55c/0x990 age=7493 cpu=3 pid=1730
+INFO: Slab 0xffffffbde6d5da40 objects=16 used=15 fp=0xffffffc935769700 flags=0x4000000000000080
+INFO: Object 0xffffffc935769500 @offset=1280 fp=0x          (null)
+
+Bytes b4 ffffffc9357694f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+Object ffffffc935769500: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+Object ffffffc935769510: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+Object ffffffc935769520: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+Object ffffffc935769530: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+Object ffffffc935769540: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+Object ffffffc935769550: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+Object ffffffc935769560: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+Object ffffffc935769570: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+Padding ffffffc9357695b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+Padding ffffffc9357695c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+Padding ffffffc9357695d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+Padding ffffffc9357695e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+Padding ffffffc9357695f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+CPU: 3 PID: 1740 Comm: kvm-vcpu-0 Tainted: G    B           4.4.0+ #17
+Hardware name: ARM Juno development board (r1) (DT)
+Call trace:
+[<ffffffc00008e770>] dump_backtrace+0x0/0x280
+[<ffffffc00008ea04>] show_stack+0x14/0x20
+[<ffffffc000726360>] dump_stack+0x100/0x188
+[<ffffffc00030d324>] print_trailer+0xfc/0x168
+[<ffffffc000312294>] object_err+0x3c/0x50
+[<ffffffc0003140fc>] kasan_report_error+0x244/0x558
+[<ffffffc000314548>] __asan_report_load8_noabort+0x48/0x50
+[<ffffffc000745688>] __bitmap_or+0xc0/0xc8
+[<ffffffc0000d9e44>] kvm_vgic_flush_hwstate+0x1bc/0x650
+[<ffffffc0000c514c>] kvm_arch_vcpu_ioctl_run+0x2ec/0xa60
+[<ffffffc0000b9a6c>] kvm_vcpu_ioctl+0x474/0xa68
+[<ffffffc00036b7b0>] do_vfs_ioctl+0x5b8/0xcb0
+[<ffffffc00036bf34>] SyS_ioctl+0x8c/0xa0
+[<ffffffc000086cb0>] el0_svc_naked+0x24/0x28
+Memory state around the buggy address:
+ ffffffc935769400: 00 00 fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffffffc935769480: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffffffc935769500: 04 fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+                   ^
+ ffffffc935769580: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffffffc935769600: 00 00 00 00 fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
+
+Fix the issue by always allocating a multiple of sizeof(unsigned long),
+as we do elsewhere in the vgic code.
+
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ virt/kvm/arm/vgic.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 7a2f449..5d10f10 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -1875,8 +1875,8 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
+ static int vgic_vcpu_init_maps(struct kvm_vcpu *vcpu, int nr_irqs)
  {
--	return (ctrl.len << 5) | (ctrl.type << 3) | (ctrl.privilege << 1) |
-+	u32 val = (ctrl.len << 5) | (ctrl.type << 3) | (ctrl.privilege << 1) |
- 		ctrl.enabled;
-+
-+	if (is_kernel_in_hyp_mode() && ctrl.privilege == AARCH64_BREAKPOINT_EL1)
-+		val |= DBG_HMC_HYP;
-+
-+	return val;
- }
- 
- static inline void decode_ctrl_reg(u32 reg,
-@@ -61,10 +73,6 @@ static inline void decode_ctrl_reg(u32 reg,
- #define ARM_BREAKPOINT_STORE	2
- #define AARCH64_ESR_ACCESS_MASK	(1 << 6)
- 
--/* Privilege Levels */
--#define AARCH64_BREAKPOINT_EL1	1
--#define AARCH64_BREAKPOINT_EL0	2
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
 -
- /* Lengths */
- #define ARM_BREAKPOINT_LEN_1	0x1
- #define ARM_BREAKPOINT_LEN_2	0x3
-
-
-Thanks,
-	
-	M.
+-	int sz = (nr_irqs - VGIC_NR_PRIVATE_IRQS) / 8;
++	int nr_longs = BITS_TO_LONGS(nr_irqs - VGIC_NR_PRIVATE_IRQS);
++	int sz = nr_longs * sizeof(unsigned long);
+ 	vgic_cpu->pending_shared = kzalloc(sz, GFP_KERNEL);
+ 	vgic_cpu->active_shared = kzalloc(sz, GFP_KERNEL);
+ 	vgic_cpu->pend_act_shared = kzalloc(sz, GFP_KERNEL);
 -- 
-Jazz is not dead. It just smells funny...
+1.9.1
+
