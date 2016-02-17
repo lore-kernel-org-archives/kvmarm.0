@@ -1,86 +1,48 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH] arm64: KVM: vgic-v3: Restore ICH_APR0Rn_EL2 before
- ICH_APR0Rn_EL2
-Date: Wed, 17 Feb 2016 15:35:12 +0000
-Message-ID: <1455723312-23896-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4142C4992F
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Feb 2016 10:29:02 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BrnR0zyPQH9r for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Feb 2016 10:29:01 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 31B264992D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Feb 2016 10:29:01 -0500 (EST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Subject: [PATCH v2 02/17] ARM: KVM: Properly sort the invariant table
+Date: Wed, 17 Feb 2016 16:40:34 +0000
+Message-ID: <1455727249-24752-3-git-send-email-marc.zyngier@arm.com>
+References: <1455727249-24752-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1455727249-24752-1-git-send-email-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Andrew Jones <drjones@redhat.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The GICv3 architecture spec says:
+Not having the invariant table properly sorted is an oddity, and
+may get in the way of future optimisations. Let's fix it.
 
-Writing to the active priority registers in any order other than
-the following order will result in UNPREDICTABLE behavior:
-- ICH_AP0R<n>_EL2.
-- ICH_AP1R<n>_EL2.
-
-So let's not pointlessly go against the rule...
-
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/vgic-v3-sr.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ arch/arm/kvm/coproc.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 9142e082..93f6c5c 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -149,16 +149,6 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
+index f3d88dc..16c74f8 100644
+--- a/arch/arm/kvm/coproc.c
++++ b/arch/arm/kvm/coproc.c
+@@ -645,6 +645,9 @@ static struct coproc_reg invariant_cp15[] = {
+ 	{ CRn( 0), CRm( 0), Op1( 0), Op2( 3), is32, NULL, get_TLBTR },
+ 	{ CRn( 0), CRm( 0), Op1( 0), Op2( 6), is32, NULL, get_REVIDR },
  
- 	switch (nr_pri_bits) {
- 	case 7:
--		 write_gicreg(cpu_if->vgic_ap1r[3], ICH_AP1R3_EL2);
--		 write_gicreg(cpu_if->vgic_ap1r[2], ICH_AP1R2_EL2);
--	case 6:
--		 write_gicreg(cpu_if->vgic_ap1r[1], ICH_AP1R1_EL2);
--	default:
--		 write_gicreg(cpu_if->vgic_ap1r[0], ICH_AP1R0_EL2);
--	}	 	                           
--		 	                           
--	switch (nr_pri_bits) {
--	case 7:
- 		 write_gicreg(cpu_if->vgic_ap0r[3], ICH_AP0R3_EL2);
- 		 write_gicreg(cpu_if->vgic_ap0r[2], ICH_AP0R2_EL2);
- 	case 6:
-@@ -167,6 +157,16 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
- 		 write_gicreg(cpu_if->vgic_ap0r[0], ICH_AP0R0_EL2);
- 	}
++	{ CRn( 0), CRm( 0), Op1( 1), Op2( 1), is32, NULL, get_CLIDR },
++	{ CRn( 0), CRm( 0), Op1( 1), Op2( 7), is32, NULL, get_AIDR },
++
+ 	{ CRn( 0), CRm( 1), Op1( 0), Op2( 0), is32, NULL, get_ID_PFR0 },
+ 	{ CRn( 0), CRm( 1), Op1( 0), Op2( 1), is32, NULL, get_ID_PFR1 },
+ 	{ CRn( 0), CRm( 1), Op1( 0), Op2( 2), is32, NULL, get_ID_DFR0 },
+@@ -660,9 +663,6 @@ static struct coproc_reg invariant_cp15[] = {
+ 	{ CRn( 0), CRm( 2), Op1( 0), Op2( 3), is32, NULL, get_ID_ISAR3 },
+ 	{ CRn( 0), CRm( 2), Op1( 0), Op2( 4), is32, NULL, get_ID_ISAR4 },
+ 	{ CRn( 0), CRm( 2), Op1( 0), Op2( 5), is32, NULL, get_ID_ISAR5 },
+-
+-	{ CRn( 0), CRm( 0), Op1( 1), Op2( 1), is32, NULL, get_CLIDR },
+-	{ CRn( 0), CRm( 0), Op1( 1), Op2( 7), is32, NULL, get_AIDR },
+ };
  
-+	switch (nr_pri_bits) {
-+	case 7:
-+		 write_gicreg(cpu_if->vgic_ap1r[3], ICH_AP1R3_EL2);
-+		 write_gicreg(cpu_if->vgic_ap1r[2], ICH_AP1R2_EL2);
-+	case 6:
-+		 write_gicreg(cpu_if->vgic_ap1r[1], ICH_AP1R1_EL2);
-+	default:
-+		 write_gicreg(cpu_if->vgic_ap1r[0], ICH_AP1R0_EL2);
-+	}	 	                           
-+		 	                           
- 	switch (max_lr_idx) {
- 	case 15:
- 		write_gicreg(cpu_if->vgic_lr[VGIC_V3_LR_INDEX(15)], ICH_LR15_EL2);
+ /*
 -- 
 2.1.4
+
