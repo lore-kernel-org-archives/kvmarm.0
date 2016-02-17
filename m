@@ -1,40 +1,49 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH] arm/arm64: KVM: Feed initialized memory to MMIO accesses
-Date: Wed, 17 Feb 2016 15:34:20 +0000
-Message-ID: <1455723260-23793-1-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH] arm/arm64: KVM: vgic: Handle out-of-bound MMIO access
+Date: Wed, 17 Feb 2016 15:34:41 +0000
+Message-ID: <1455723281-23846-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On an MMIO access, we always copy the on-stack buffer info
-the shared "run" structure, even if this is a read access.
-This ends up leaking up to 8 bytes of uninitialized memory
-into userspace.
+When performing a MMIO access via a KVM IO bus, it is possible
+that the access will actually be out-of-bounds (the redistributor
+handlers do not cover the whole device, for example). In this case,
+we return an error code, which leads to escaping to userspace
+to handle it. Not that good.
 
-An obvious fix for this one is to only perform the copy if
-this is an actual write.
+Instead, let's just treat it like any other OOB access, by either
+ignoring the write, or by returning a bunch of zeroes.
+
+And let's keep the code quiet while we're at it, as nobody likes
+it when a guest can generate zillions on messages on the host's
+console...
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/mmio.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-index 7f33b20..0f6600f 100644
---- a/arch/arm/kvm/mmio.c
-+++ b/arch/arm/kvm/mmio.c
-@@ -206,7 +206,8 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	run->mmio.is_write	= is_write;
- 	run->mmio.phys_addr	= fault_ipa;
- 	run->mmio.len		= len;
--	memcpy(run->mmio.data, data_buf, len);
-+	if (is_write)
-+		memcpy(run->mmio.data, data_buf, len);
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 043032c..2358272 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -830,8 +830,11 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
+ 	offset = addr - iodev->addr;
+ 	range = vgic_find_range(iodev->reg_ranges, len, offset);
+ 	if (unlikely(!range || !range->handle_mmio)) {
+-		pr_warn("Unhandled access %d %08llx %d\n", is_write, addr, len);
+-		return -ENXIO;
++		/* Treat an OOR access as RAZ/WI. */
++		if (!is_write)
++			memset(val, 0, len);
++		pr_debug("Unhandled access %d %08llx %d\n", is_write, addr, len);
++		return 0;
+ 	}
  
- 	if (!ret) {
- 		/* We handled the access successfully in the kernel. */
+ 	mmio.phys_addr = addr;
 -- 
 2.1.4
 
