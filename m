@@ -1,94 +1,103 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v2 14/17] arm64: KVM: vgic-v3: Save maintenance interrupt state only if required
-Date: Wed, 17 Feb 2016 16:40:46 +0000
-Message-ID: <1455727249-24752-15-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v2 10/17] arm64: KVM: vgic-v2: Do not save an LR known to be
+ empty
+Date: Wed, 17 Feb 2016 16:40:42 +0000
+Message-ID: <1455727249-24752-11-git-send-email-marc.zyngier@arm.com>
 References: <1455727249-24752-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 10BBF49947
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Feb 2016 11:35:01 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id iD6qWhOXDzAk for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 17 Feb 2016 11:35:00 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CF654998C
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Feb 2016 11:34:55 -0500 (EST)
 In-Reply-To: <1455727249-24752-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Andrew Jones <drjones@redhat.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Next on our list of useless accesses is the maintenance interrupt
-status registers (ICH_MISR_EL2, ICH_EISR_EL2).
+On exit, any empty LR will be signaled in GICH_ELRSR*. Which
+means that we do not have to save it, and we can just clear
+its state in the in-memory copy.
 
-It is pointless to save them if we haven't asked for a maintenance
-interrupt the first place, which can only happen for two reasons:
-- Underflow: ICH_HCR_UIE will be set,
-- EOI: ICH_LR_EOI will be set.
-
-These conditions can be checked on the in-memory copies of the regs.
-Should any of these two condition be valid, we must read GICH_MISR.
-We can then check for ICH_MISR_EOI, and only when set read
-ICH_EISR_EL2.
-
-This means that in most case, we don't have to save them at all.
+Take this opportunity to move the LR saving code into its
+own function.
 
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/vgic-v3-sr.c | 34 ++++++++++++++++++++++++++++++++--
- 1 file changed, 32 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/hyp/vgic-v2-sr.c | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index b62c923..3463c0a 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -133,6 +133,36 @@ static void __hyp_text __gic_v3_set_lr(u64 val, int lr)
- 	}
+diff --git a/arch/arm64/kvm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+index c281374..3dbbc6b 100644
+--- a/arch/arm64/kvm/hyp/vgic-v2-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+@@ -85,6 +85,25 @@ static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
+ #endif
  }
  
-+static void __hyp_text save_maint_int_state(struct kvm_vcpu *vcpu, int nr_lr)
++static void __hyp_text save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
 +{
-+	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
++	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
++	int nr_lr = vcpu->arch.vgic_cpu.nr_lr;
 +	int i;
-+	bool expect_mi;
-+
-+	expect_mi = !!(cpu_if->vgic_hcr & ICH_HCR_UIE);
 +
 +	for (i = 0; i < nr_lr; i++) {
 +		if (!(vcpu->arch.vgic_cpu.live_lrs & (1UL << i)))
-+				continue;
++			continue;
 +
-+		expect_mi |= (!(cpu_if->vgic_lr[i] & ICH_LR_HW) &&
-+			      (cpu_if->vgic_lr[i] & ICH_LR_EOI));
-+	}
-+
-+	if (expect_mi) {
-+		cpu_if->vgic_misr  = read_gicreg(ICH_MISR_EL2);
-+
-+		if (cpu_if->vgic_misr & ICH_MISR_EOI) {
-+			cpu_if->vgic_eisr = read_gicreg(ICH_EISR_EL2);
-+		} else {
-+			cpu_if->vgic_eisr = 0;
++		if (cpu_if->vgic_elrsr & (1UL << i)) {
++			cpu_if->vgic_lr[i] &= ~GICH_LR_STATE;
++			continue;
 +		}
-+	} else {
-+		cpu_if->vgic_misr = 0;
-+		cpu_if->vgic_eisr = 0;
++
++		cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
 +	}
 +}
 +
- void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+ /* vcpu is already in the HYP VA space */
+ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
  {
- 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
-@@ -150,8 +180,6 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
- 		int i;
- 		u32 max_lr_idx, nr_pri_bits;
+@@ -92,12 +111,10 @@ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
+ 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+ 	struct vgic_dist *vgic = &kvm->arch.vgic;
+ 	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
+-	int i, nr_lr;
  
--		cpu_if->vgic_misr  = read_gicreg(ICH_MISR_EL2);
--		cpu_if->vgic_eisr  = read_gicreg(ICH_EISR_EL2);
- 		cpu_if->vgic_elrsr = read_gicreg(ICH_ELSR_EL2);
+ 	if (!base)
+ 		return;
  
- 		write_gicreg(0, ICH_HCR_EL2);
-@@ -159,6 +187,8 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
- 		max_lr_idx = vtr_to_max_lr_idx(val);
- 		nr_pri_bits = vtr_to_nr_pri_bits(val);
+-	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
+ 	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
  
-+		save_maint_int_state(vcpu, max_lr_idx + 1);
-+
- 		for (i = 0; i <= max_lr_idx; i++) {
- 			if (vcpu->arch.vgic_cpu.live_lrs & (1UL << i))
- 				cpu_if->vgic_lr[i] = __gic_v3_get_lr(i);
+ 	if (vcpu->arch.vgic_cpu.live_lrs) {
+@@ -105,10 +122,7 @@ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
+ 
+ 		save_maint_int_state(vcpu, base);
+ 		save_elrsr(vcpu, base);
+- 
+-		for (i = 0; i < nr_lr; i++)
+-			if (vcpu->arch.vgic_cpu.live_lrs & (1UL << i))
+-				cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
++		save_lrs(vcpu, base);
+ 
+ 		writel_relaxed(0, base + GICH_HCR);
+ 
 -- 
 2.1.4
-
