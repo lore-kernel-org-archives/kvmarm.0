@@ -1,93 +1,117 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v4.1] arm64: hw_breakpoint: Allow EL2 breakpoints if running
- in HYP
-Date: Wed, 17 Feb 2016 17:58:43 +0000
-Message-ID: <1455731923-26768-1-git-send-email-marc.zyngier@arm.com>
-References: <1455216004-19499-23-git-send-email-marc.zyngier@arm.com>
+From: Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [RFC v3 02/15] vfio: expose MSI mapping requirement through
+	VFIO_IOMMU_GET_INFO
+Date: Thu, 18 Feb 2016 09:34:54 +0000
+Message-ID: <20160218093454.660b20c6@arm.com>
+References: <1455264797-2334-1-git-send-email-eric.auger@linaro.org>
+	<1455264797-2334-3-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C26549936
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Feb 2016 12:52:34 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id oSNGCCyLG3zV for <kvmarm@lists.cs.columbia.edu>;
- Wed, 17 Feb 2016 12:52:33 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1F6644992D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 17 Feb 2016 12:52:32 -0500 (EST)
-In-Reply-To: <1455216004-19499-23-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <1455264797-2334-3-git-send-email-eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Cc: eric.auger-qxv4g6HH51o@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, brijesh.singh-5C7GfCeVMHo@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, Thomas.Lendacky-5C7GfCeVMHo@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, sherry.hurwitz-5C7GfCeVMHo@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-With VHE, we place kernel {watch,break}-points at EL2 to get things
-like kgdb and "perf -e mem:..." working.
+On Fri, 12 Feb 2016 08:13:04 +0000
+Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
 
-This requires a bit of repainting in the low-level encore/decode,
-but is otherwise pretty simple.
+> This patch allows the user-space to retrieve whether msi write
+> transaction addresses must be mapped. This is returned through the
+> VFIO_IOMMU_GET_INFO API and its new flag: VFIO_IOMMU_INFO_REQUIRE_MSI_MAP.
+> 
+> Signed-off-by: Bharat Bhushan <Bharat.Bhushan-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
+> Signed-off-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+> 
+> ---
+> 
+> RFC v1 -> v1:
+> - derived from
+>   [RFC PATCH 3/6] vfio: Extend iommu-info to return MSIs automap state
+> - renamed allow_msi_reconfig into require_msi_mapping
+> - fixed VFIO_IOMMU_GET_INFO
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 26 ++++++++++++++++++++++++++
+>  include/uapi/linux/vfio.h       |  1 +
+>  2 files changed, 27 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 6f1ea3d..c5b57e1 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -255,6 +255,29 @@ static int vaddr_get_pfn(unsigned long vaddr, int prot, unsigned long *pfn)
+>  }
+>  
+>  /*
+> + * vfio_domains_require_msi_mapping: indicates whether MSI write transaction
+> + * addresses must be mapped
+> + *
+> + * returns true if it does
+> + */
+> +static bool vfio_domains_require_msi_mapping(struct vfio_iommu *iommu)
+> +{
+> +	struct vfio_domain *d;
+> +	bool ret;
+> +
+> +	mutex_lock(&iommu->lock);
+> +	/* All domains have same require_msi_map property, pick first */
+> +	d = list_first_entry(&iommu->domain_list, struct vfio_domain, next);
+> +	if (iommu_domain_get_attr(d->domain, DOMAIN_ATTR_MSI_MAPPING, NULL) < 0)
+> +		ret = false;
+> +	else
+> +		ret = true;
 
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- arch/arm64/include/asm/hw_breakpoint.h | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+nit: this could be simplified as:
 
-diff --git a/arch/arm64/include/asm/hw_breakpoint.h b/arch/arm64/include/asm/hw_breakpoint.h
-index 9732908..115ea2a 100644
---- a/arch/arm64/include/asm/hw_breakpoint.h
-+++ b/arch/arm64/include/asm/hw_breakpoint.h
-@@ -18,6 +18,7 @@
- 
- #include <asm/cputype.h>
- #include <asm/cpufeature.h>
-+#include <asm/virt.h>
- 
- #ifdef __KERNEL__
- 
-@@ -35,10 +36,21 @@ struct arch_hw_breakpoint {
- 	struct arch_hw_breakpoint_ctrl ctrl;
- };
- 
-+/* Privilege Levels */
-+#define AARCH64_BREAKPOINT_EL1	1
-+#define AARCH64_BREAKPOINT_EL0	2
-+
-+#define DBG_HMC_HYP		(1 << 13)
-+
- static inline u32 encode_ctrl_reg(struct arch_hw_breakpoint_ctrl ctrl)
- {
--	return (ctrl.len << 5) | (ctrl.type << 3) | (ctrl.privilege << 1) |
-+	u32 val = (ctrl.len << 5) | (ctrl.type << 3) | (ctrl.privilege << 1) |
- 		ctrl.enabled;
-+
-+	if (is_kernel_in_hyp_mode() && ctrl.privilege == AARCH64_BREAKPOINT_EL1)
-+		val |= DBG_HMC_HYP;
-+
-+	return val;
- }
- 
- static inline void decode_ctrl_reg(u32 reg,
-@@ -61,10 +73,6 @@ static inline void decode_ctrl_reg(u32 reg,
- #define ARM_BREAKPOINT_STORE	2
- #define AARCH64_ESR_ACCESS_MASK	(1 << 6)
- 
--/* Privilege Levels */
--#define AARCH64_BREAKPOINT_EL1	1
--#define AARCH64_BREAKPOINT_EL0	2
--
- /* Lengths */
- #define ARM_BREAKPOINT_LEN_1	0x1
- #define ARM_BREAKPOINT_LEN_2	0x3
+ret = (iommu_domain_get_attr(d->domain, DOMAIN_ATTR_MSI_MAPPING, NULL) == 0);
+
+> +	mutex_unlock(&iommu->lock);
+> +
+> +	return ret;
+> +}
+> +
+> +/*
+>   * Attempt to pin pages.  We really don't want to track all the pfns and
+>   * the iommu can only map chunks of consecutive pfns anyway, so get the
+>   * first page and all consecutive pages with the same locking.
+> @@ -997,6 +1020,9 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>  
+>  		info.flags = VFIO_IOMMU_INFO_PGSIZES;
+>  
+> +		if (vfio_domains_require_msi_mapping(iommu))
+> +			info.flags |= VFIO_IOMMU_INFO_REQUIRE_MSI_MAP;
+> +
+>  		info.iova_pgsizes = vfio_pgsize_bitmap(iommu);
+>  
+>  		return copy_to_user((void __user *)arg, &info, minsz);
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index 7d7a4c6..43e183b 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -400,6 +400,7 @@ struct vfio_iommu_type1_info {
+>  	__u32	argsz;
+>  	__u32	flags;
+>  #define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info */
+> +#define VFIO_IOMMU_INFO_REQUIRE_MSI_MAP (1 << 1)/* MSI must be mapped */
+>  	__u64	iova_pgsizes;		/* Bitmap of supported page sizes */
+>  };
+>  
+
+
+FWIW:
+
+Acked-by: Marc Zyngier <marc.zyngier-5wv7dgnIgG8@public.gmane.org>
+
+	M.
 -- 
-2.1.4
+Jazz is not dead. It just smells funny.
