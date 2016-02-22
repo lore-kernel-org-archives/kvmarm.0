@@ -1,22 +1,22 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v12 20/21] KVM: ARM: Introduce per-vcpu kvm device controls
-Date: Mon, 22 Feb 2016 17:37:56 +0800
-Message-ID: <1456133877-9584-21-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v12 05/21] KVM: ARM64: Add access handler for PMSELR register
+Date: Mon, 22 Feb 2016 17:37:41 +0800
+Message-ID: <1456133877-9584-6-git-send-email-zhaoshenglong@huawei.com>
 References: <1456133877-9584-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2571A48536
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2016 04:33:46 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 395B148537
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2016 04:33:47 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id SrQWSFyTI1hR for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Feb 2016 04:33:44 -0500 (EST)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [119.145.14.66])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id D98BB41AF6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2016 04:33:43 -0500 (EST)
+ with ESMTP id t1u6ODXfLmWR for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 22 Feb 2016 04:33:45 -0500 (EST)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DFBF14852F
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2016 04:33:44 -0500 (EST)
 In-Reply-To: <1456133877-9584-1-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,167 +33,60 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-In some cases it needs to get/set attributes specific to a vcpu and so
-needs something else than ONE_REG.
-
-Let's copy the KVM_DEVICE approach, and define the respective ioctls
-for the vcpu file descriptor.
+Since the reset value of PMSELR_EL0 is UNKNOWN, use reset_unknown for
+its reset handler. When reading PMSELR, return the PMSELR.SEL field to
+guest.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
-Acked-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- Documentation/virtual/kvm/api.txt          | 10 +++---
- Documentation/virtual/kvm/devices/vcpu.txt |  8 +++++
- arch/arm/kvm/arm.c                         | 55 ++++++++++++++++++++++++++++++
- arch/arm64/kvm/reset.c                     |  1 +
- include/uapi/linux/kvm.h                   |  1 +
- 5 files changed, 71 insertions(+), 4 deletions(-)
- create mode 100644 Documentation/virtual/kvm/devices/vcpu.txt
+ arch/arm64/kvm/sys_regs.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index 9684f8d..cb2ef0b 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -2507,8 +2507,9 @@ struct kvm_create_device {
- 
- 4.80 KVM_SET_DEVICE_ATTR/KVM_GET_DEVICE_ATTR
- 
--Capability: KVM_CAP_DEVICE_CTRL, KVM_CAP_VM_ATTRIBUTES for vm device
--Type: device ioctl, vm ioctl
-+Capability: KVM_CAP_DEVICE_CTRL, KVM_CAP_VM_ATTRIBUTES for vm device,
-+  KVM_CAP_VCPU_ATTRIBUTES for vcpu device
-+Type: device ioctl, vm ioctl, vcpu ioctl
- Parameters: struct kvm_device_attr
- Returns: 0 on success, -1 on error
- Errors:
-@@ -2533,8 +2534,9 @@ struct kvm_device_attr {
- 
- 4.81 KVM_HAS_DEVICE_ATTR
- 
--Capability: KVM_CAP_DEVICE_CTRL, KVM_CAP_VM_ATTRIBUTES for vm device
--Type: device ioctl, vm ioctl
-+Capability: KVM_CAP_DEVICE_CTRL, KVM_CAP_VM_ATTRIBUTES for vm device,
-+  KVM_CAP_VCPU_ATTRIBUTES for vcpu device
-+Type: device ioctl, vm ioctl, vcpu ioctl
- Parameters: struct kvm_device_attr
- Returns: 0 on success, -1 on error
- Errors:
-diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
-new file mode 100644
-index 0000000..3cc59c5
---- /dev/null
-+++ b/Documentation/virtual/kvm/devices/vcpu.txt
-@@ -0,0 +1,8 @@
-+Generic vcpu interface
-+====================================
-+
-+The virtual cpu "device" also accepts the ioctls KVM_SET_DEVICE_ATTR,
-+KVM_GET_DEVICE_ATTR, and KVM_HAS_DEVICE_ATTR. The interface uses the same struct
-+kvm_device_attr as other devices, but targets VCPU-wide settings and controls.
-+
-+The groups and attributes per virtual cpu, if any, are architecture specific.
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index d2c2cc3..34d7395 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -826,11 +826,51 @@ static int kvm_arch_vcpu_ioctl_vcpu_init(struct kvm_vcpu *vcpu,
- 	return 0;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 7ee4d5e..65f5f00 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -477,6 +477,22 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
  }
  
-+static int kvm_arm_vcpu_set_attr(struct kvm_vcpu *vcpu,
-+				 struct kvm_device_attr *attr)
++static bool access_pmselr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			  const struct sys_reg_desc *r)
 +{
-+	int ret = -ENXIO;
++	if (!kvm_arm_pmu_v3_ready(vcpu))
++		return trap_raz_wi(vcpu, p, r);
 +
-+	switch (attr->group) {
-+	default:
-+		break;
-+	}
++	if (p->is_write)
++		vcpu_sys_reg(vcpu, PMSELR_EL0) = p->regval;
++	else
++		/* return PMSELR.SEL field */
++		p->regval = vcpu_sys_reg(vcpu, PMSELR_EL0)
++			    & ARMV8_PMU_COUNTER_MASK;
 +
-+	return ret;
++	return true;
 +}
 +
-+static int kvm_arm_vcpu_get_attr(struct kvm_vcpu *vcpu,
-+				 struct kvm_device_attr *attr)
-+{
-+	int ret = -ENXIO;
-+
-+	switch (attr->group) {
-+	default:
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
-+static int kvm_arm_vcpu_has_attr(struct kvm_vcpu *vcpu,
-+				 struct kvm_device_attr *attr)
-+{
-+	int ret = -ENXIO;
-+
-+	switch (attr->group) {
-+	default:
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
- long kvm_arch_vcpu_ioctl(struct file *filp,
- 			 unsigned int ioctl, unsigned long arg)
- {
- 	struct kvm_vcpu *vcpu = filp->private_data;
- 	void __user *argp = (void __user *)arg;
-+	struct kvm_device_attr attr;
- 
- 	switch (ioctl) {
- 	case KVM_ARM_VCPU_INIT: {
-@@ -873,6 +913,21 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 			return -E2BIG;
- 		return kvm_arm_copy_reg_indices(vcpu, user_list->reg);
- 	}
-+	case KVM_SET_DEVICE_ATTR: {
-+		if (copy_from_user(&attr, argp, sizeof(attr)))
-+			return -EFAULT;
-+		return kvm_arm_vcpu_set_attr(vcpu, &attr);
-+	}
-+	case KVM_GET_DEVICE_ATTR: {
-+		if (copy_from_user(&attr, argp, sizeof(attr)))
-+			return -EFAULT;
-+		return kvm_arm_vcpu_get_attr(vcpu, &attr);
-+	}
-+	case KVM_HAS_DEVICE_ATTR: {
-+		if (copy_from_user(&attr, argp, sizeof(attr)))
-+			return -EFAULT;
-+		return kvm_arm_vcpu_has_attr(vcpu, &attr);
-+	}
- 	default:
- 		return -EINVAL;
- 	}
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index cf4f28a..9677bf0 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -81,6 +81,7 @@ int kvm_arch_dev_ioctl_check_extension(long ext)
- 		r = kvm_arm_support_pmu_v3();
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG:
-+	case KVM_CAP_VCPU_ATTRIBUTES:
- 		r = 1;
- 		break;
- 	default:
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index dc16d30..50f44a2 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -851,6 +851,7 @@ struct kvm_ppc_smmu_info {
- #define KVM_CAP_HYPERV_SYNIC 123
- #define KVM_CAP_S390_RI 124
- #define KVM_CAP_ARM_PMU_V3 125
-+#define KVM_CAP_VCPU_ATTRIBUTES 126
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
+ /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+ #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+ 	/* DBGBVRn_EL1 */						\
+@@ -676,7 +692,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  trap_raz_wi },
+ 	/* PMSELR_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b101),
+-	  trap_raz_wi },
++	  access_pmselr, reset_unknown, PMSELR_EL0 },
+ 	/* PMCEID0_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b110),
+ 	  trap_raz_wi },
+@@ -927,7 +943,7 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
+-	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), trap_raz_wi },
++	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmselr },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), trap_raz_wi },
 -- 
 2.0.4
