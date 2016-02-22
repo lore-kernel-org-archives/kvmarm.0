@@ -1,119 +1,450 @@
-From: Fu Wei <fu.wei@linaro.org>
-Subject: Re: [PATCH v3 6/6] kvm: arm64: Add ACPI support for virt arch timer
-Date: Mon, 22 Feb 2016 00:35:46 +0800
-Message-ID: <CADyBb7uPxV0DUwsqpq5fBeZSU6JXRzh6kNeHy-vmpq+f0+q1FQ@mail.gmail.com>
-References: <1454358418-5157-1-git-send-email-fu.wei@linaro.org>
- <1454358418-5157-7-git-send-email-fu.wei@linaro.org>
- <56B8CBE8.7020305@arm.com>
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Subject: Re: [PATCH v11 21/21] KVM: ARM64: Add a new vcpu device control group
+ for PMUv3
+Date: Mon, 22 Feb 2016 15:45:25 +0800
+Message-ID: <56CABC95.90700@huawei.com>
+References: <1454656456-11640-1-git-send-email-zhaoshenglong@huawei.com> <1454656456-11640-22-git-send-email-zhaoshenglong@huawei.com> <20160208125247.GG620@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C458F495BD
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Feb 2016 11:29:14 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pbnTL2UybZ9k for <kvmarm@lists.cs.columbia.edu>;
- Sun, 21 Feb 2016 11:29:13 -0500 (EST)
-Received: from mail-oi0-f49.google.com (mail-oi0-f49.google.com
- [209.85.218.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7E8E849444
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Feb 2016 11:29:13 -0500 (EST)
-Received: by mail-oi0-f49.google.com with SMTP id m82so41331010oif.1
- for <kvmarm@lists.cs.columbia.edu>; Sun, 21 Feb 2016 08:35:46 -0800 (PST)
-In-Reply-To: <56B8CBE8.7020305@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Linaro ACPI Mailman List <linaro-acpi@lists.linaro.org>, Will Deacon <will.deacon@arm.com>, Wim Van Sebroeck <wim@iguana.be>, kvmarm@lists.cs.columbia.edu, Al Stone <al.stone@linaro.org>, Daniel Lezcano <daniel.lezcano@linaro.org>, linux-acpi@vger.kernel.org, Rob Herring <robherring2@gmail.com>, jeffrey.t.kirsher@intel.com, Catalin Marinas <catalin.marinas@arm.com>, Len Brown <lenb@kernel.org>, Arnd Bergmann <arnd@arndb.de>, gleb@kernel.org, Jon Masters <jcm@redhat.com>, richardcochran@gmail.com, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org, G Gregory <graeme.gregory@linaro.org>, Rafael Wysocki <rjw@rjwysocki.net>, LKML <linux-kernel@vger.kernel.org>, Leo Duran <leo.duran@amd.com>, Hanjun Guo <hanjun.guo@linaro.org>, pbonzini@redhat.com, davem@davemloft.net
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20160208125247.GG620@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com, Peter Maydell <peter.maydell@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Marc
 
-On 9 February 2016 at 01:10, Marc Zyngier <marc.zyngier@arm.com> wrote:
-> On 01/02/16 20:26, fu.wei@linaro.org wrote:
->> From: Fu Wei <fu.wei@linaro.org>
+
+On 2016/2/8 20:52, Christoffer Dall wrote:
+> On Fri, Feb 05, 2016 at 03:14:16PM +0800, Shannon Zhao wrote:
+>> From: Shannon Zhao <shannon.zhao@linaro.org>
 >>
->> This patch adds ACPI/GTDT support for virt arch timer
->> using the API in GTDT driver.
+>> To configure the virtual PMUv3 overflow interrupt number, we use the
+>> vcpu kvm_device ioctl, encapsulating the KVM_ARM_VCPU_PMU_V3_IRQ
+>> attribute within the KVM_ARM_VCPU_PMU_V3_CTRL group.
 >>
->> Signed-off-by: Fu Wei <fu.wei@linaro.org>
+>> After configuring the PMUv3, call the vcpu ioctl with attribute
+>> KVM_ARM_VCPU_PMU_V3_INIT to initialize the PMUv3.
+>>
+>> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+>> Acked-by: Peter Maydell <peter.maydell@linaro.org>
+>> Reviewed-by: Andrew Jones <drjones@redhat.com>
 >> ---
->>  virt/kvm/arm/arch_timer.c | 8 ++++++++
->>  1 file changed, 8 insertions(+)
+>> CC: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>  Documentation/virtual/kvm/devices/vcpu.txt |  24 ++++++
+>>  arch/arm/include/asm/kvm_host.h            |  15 ++++
+>>  arch/arm/kvm/arm.c                         |   3 +
+>>  arch/arm64/include/asm/kvm_host.h          |   6 ++
+>>  arch/arm64/include/uapi/asm/kvm.h          |   5 ++
+>>  arch/arm64/kvm/guest.c                     |  51 ++++++++++++
+>>  include/kvm/arm_pmu.h                      |  23 ++++++
+>>  virt/kvm/arm/pmu.c                         | 128 +++++++++++++++++++++++++++++
+>>  8 files changed, 255 insertions(+)
 >>
->> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
->> index 0a279d3..4077347 100644
->> --- a/virt/kvm/arm/arch_timer.c
->> +++ b/virt/kvm/arm/arch_timer.c
->> @@ -385,6 +385,9 @@ static int kvm_timer_get_ppi(unsigned int *ppi)
->>  {
->>       struct device_node *np;
->>       int ret = -EINVAL;
->> +#ifdef CONFIG_ACPI_GTDT
->> +     struct arch_timer_data data;
->> +#endif
->>
->>       np = of_find_matching_node(NULL, arch_timer_of_match);
->>       if (!np) {
->> @@ -397,6 +400,11 @@ static int kvm_timer_get_ppi(unsigned int *ppi)
->>       of_node_put(np);
->>
->>  skip_of:
->> +#ifdef CONFIG_ACPI_GTDT
->> +     if (!*ppi && !gtdt_arch_timer_data_init(NULL, &data))
->> +             *ppi = data.virt_ppi;
->> +#endif
+>> diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
+>> index 3cc59c5..d626237 100644
+>> --- a/Documentation/virtual/kvm/devices/vcpu.txt
+>> +++ b/Documentation/virtual/kvm/devices/vcpu.txt
+>> @@ -6,3 +6,27 @@ KVM_GET_DEVICE_ATTR, and KVM_HAS_DEVICE_ATTR. The interface uses the same struct
+>>  kvm_device_attr as other devices, but targets VCPU-wide settings and controls.
+>>  
+>>  The groups and attributes per virtual cpu, if any, are architecture specific.
 >> +
->>       if (*ppi)
->>               return 0;
+>> +1. GROUP: KVM_ARM_VCPU_PMU_V3_CTRL
+>> +Architectures: ARM64
+>> +
+>> +1.1. ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_IRQ
+>> +Parameters: in kvm_device_attr.addr the address for PMU overflow interrupt
+> 
+> so kvm_device_attr.addr is a pointer to an unsigned long or an int, or?
+> 
+int
+
+>> +Returns: -EBUSY: The PMU overflow interrupt is already set
+>> +         -ENXIO: The overflow interrupt not set when attempting to get it
+>> +         -ENODEV: PMUv3 not supported
+>> +         -EINVAL: Invalid PMU overflow interrupt number supplied
+>> +
+>> +A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
+>> +number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
+>> +type must be same for each vcpu. As a PPI, the interrupt number is same for all
+> 
+> nit: s/is same/is the same/
+> 
+>> +vcpus, while as an SPI it must be different for each vcpu.
+> 
+> nit: s/it must be different for each vcpu/
+>        it must be a separate number per vcpu/
+> 
+>> +
+>> +1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
+>> +Parameters: no additional parameter in kvm_device_attr.addr
+>> +Returns: -ENODEV: PMUv3 not supported
+>> +         -ENXIO: PMUv3 not properly configured as required prior to calling this
+>> +                 attribute
+>> +         -EBUSY: PMUv3 already initialized
+>> +
+>> +Request the initialization of the PMUv3.
+>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+>> index f9f2779..6dd0992 100644
+>> --- a/arch/arm/include/asm/kvm_host.h
+>> +++ b/arch/arm/include/asm/kvm_host.h
+>> @@ -242,5 +242,20 @@ static inline void kvm_arm_init_debug(void) {}
+>>  static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
+>>  static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
+>>  static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
+>> +static inline int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+>> +					     struct kvm_device_attr *attr)
+>> +{
+>> +	return -ENXIO;
+>> +}
+>> +static inline int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+>> +					     struct kvm_device_attr *attr)
+>> +{
+>> +	return -ENXIO;
+>> +}
+>> +static inline int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>> +					     struct kvm_device_attr *attr)
+>> +{
+>> +	return -ENXIO;
+>> +}
+>>  
+>>  #endif /* __ARM_KVM_HOST_H__ */
+>> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+>> index 34d7395..dc8644f 100644
+>> --- a/arch/arm/kvm/arm.c
+>> +++ b/arch/arm/kvm/arm.c
+>> @@ -833,6 +833,7 @@ static int kvm_arm_vcpu_set_attr(struct kvm_vcpu *vcpu,
+>>  
+>>  	switch (attr->group) {
+>>  	default:
+>> +		ret = kvm_arm_vcpu_arch_set_attr(vcpu, attr);
+>>  		break;
+>>  	}
+>>  
+>> @@ -846,6 +847,7 @@ static int kvm_arm_vcpu_get_attr(struct kvm_vcpu *vcpu,
+>>  
+>>  	switch (attr->group) {
+>>  	default:
+>> +		ret = kvm_arm_vcpu_arch_get_attr(vcpu, attr);
+>>  		break;
+>>  	}
+>>  
+>> @@ -859,6 +861,7 @@ static int kvm_arm_vcpu_has_attr(struct kvm_vcpu *vcpu,
+>>  
+>>  	switch (attr->group) {
+>>  	default:
+>> +		ret = kvm_arm_vcpu_arch_has_attr(vcpu, attr);
+>>  		break;
+>>  	}
+>>  
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index cb220b7..a855a30 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -359,5 +359,11 @@ void kvm_arm_init_debug(void);
+>>  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+>>  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+>>  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
+>> +int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+>> +			       struct kvm_device_attr *attr);
+>> +int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+>> +			       struct kvm_device_attr *attr);
+>> +int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>> +			       struct kvm_device_attr *attr);
+>>  
+>>  #endif /* __ARM64_KVM_HOST_H__ */
+>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+>> index 6aedbe3..f209ea1 100644
+>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>> @@ -205,6 +205,11 @@ struct kvm_arch_memory_slot {
+>>  #define KVM_DEV_ARM_VGIC_GRP_CTRL	4
+>>  #define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
+>>  
+>> +/* Device Control API on vcpu fd */
+>> +#define KVM_ARM_VCPU_PMU_V3_CTRL	0
+>> +#define   KVM_ARM_VCPU_PMU_V3_IRQ	0
+>> +#define   KVM_ARM_VCPU_PMU_V3_INIT	1
+>> +
+>>  /* KVM_IRQ_LINE irq field index values */
+>>  #define KVM_ARM_IRQ_TYPE_SHIFT		24
+>>  #define KVM_ARM_IRQ_TYPE_MASK		0xff
+>> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+>> index fcb7788..dbe45c3 100644
+>> --- a/arch/arm64/kvm/guest.c
+>> +++ b/arch/arm64/kvm/guest.c
+>> @@ -380,3 +380,54 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+>>  	}
+>>  	return 0;
+>>  }
+>> +
+>> +int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+>> +			       struct kvm_device_attr *attr)
+>> +{
+>> +	int ret;
+>> +
+>> +	switch (attr->group) {
+>> +	case KVM_ARM_VCPU_PMU_V3_CTRL:
+>> +		ret = kvm_arm_pmu_v3_set_attr(vcpu, attr);
+>> +		break;
+>> +	default:
+>> +		ret = -ENXIO;
+>> +		break;
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+>> +			       struct kvm_device_attr *attr)
+>> +{
+>> +	int ret;
+>> +
+>> +	switch (attr->group) {
+>> +	case KVM_ARM_VCPU_PMU_V3_CTRL:
+>> +		ret = kvm_arm_pmu_v3_get_attr(vcpu, attr);
+>> +		break;
+>> +	default:
+>> +		ret = -ENXIO;
+>> +		break;
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+>> +			       struct kvm_device_attr *attr)
+>> +{
+>> +	int ret;
+>> +
+>> +	switch (attr->group) {
+>> +	case KVM_ARM_VCPU_PMU_V3_CTRL:
+>> +		ret = kvm_arm_pmu_v3_has_attr(vcpu, attr);
+>> +		break;
+>> +	default:
+>> +		ret = -ENXIO;
+>> +		break;
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+>> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+>> index 5f86e1d..f09abf6 100644
+>> --- a/include/kvm/arm_pmu.h
+>> +++ b/include/kvm/arm_pmu.h
+>> @@ -38,6 +38,7 @@ struct kvm_pmu {
+>>  };
+>>  
+>>  #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
+>> +#define kvm_arm_pmu_irq_initialized(v)	((v)->arch.pmu.irq_num >= VGIC_NR_SGIS)
+>>  u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
+>>  void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
+>>  u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
+>> @@ -52,11 +53,18 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
+>>  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+>>  				    u64 select_idx);
+>>  bool kvm_arm_support_pmu_v3(void);
+>> +int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
+>> +			    struct kvm_device_attr *attr);
+>> +int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu,
+>> +			    struct kvm_device_attr *attr);
+>> +int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu,
+>> +			    struct kvm_device_attr *attr);
+>>  #else
+>>  struct kvm_pmu {
+>>  };
+>>  
+>>  #define kvm_arm_pmu_v3_ready(v)		(false)
+>> +#define kvm_arm_pmu_irq_initialized(v)	(false)
+>>  static inline u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu,
+>>  					    u64 select_idx)
+>>  {
+>> @@ -79,6 +87,21 @@ static inline void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val) {}
+>>  static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
+>>  						  u64 data, u64 select_idx) {}
+>>  static inline bool kvm_arm_support_pmu_v3(void) { return false; }
+>> +static inline int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
+>> +					  struct kvm_device_attr *attr)
+>> +{
+>> +	return -ENXIO;
+>> +}
+>> +static inline int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu,
+>> +					  struct kvm_device_attr *attr)
+>> +{
+>> +	return -ENXIO;
+>> +}
+>> +static inline int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu,
+>> +					  struct kvm_device_attr *attr)
+>> +{
+>> +	return -ENXIO;
+>> +}
+>>  #endif
+>>  
+>>  #endif
+>> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+>> index 2467d62..06b7cb3 100644
+>> --- a/virt/kvm/arm/pmu.c
+>> +++ b/virt/kvm/arm/pmu.c
+>> @@ -19,6 +19,7 @@
+>>  #include <linux/kvm.h>
+>>  #include <linux/kvm_host.h>
+>>  #include <linux/perf_event.h>
+>> +#include <linux/uaccess.h>
+>>  #include <asm/kvm_emulate.h>
+>>  #include <kvm/arm_pmu.h>
+>>  #include <kvm/arm_vgic.h>
+>> @@ -393,3 +394,130 @@ bool kvm_arm_support_pmu_v3(void)
+>>  	 */
+>>  	return (perf_num_counters() > 0);
+>>  }
+>> +
+>> +static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+>> +{
+>> +	if (!kvm_arm_support_pmu_v3())
+>> +		return -ENODEV;
+>> +
+>> +	if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features) ||
+>> +	    !kvm_arm_pmu_irq_initialized(vcpu))
+>> +		return -ENXIO;
+>> +
+>> +	if (kvm_arm_pmu_v3_ready(vcpu))
+>> +		return -EBUSY;
+>> +
+>> +	kvm_pmu_vcpu_reset(vcpu);
+>> +	vcpu->arch.pmu.ready = true;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int kvm_arm_pmu_irq_access(struct kvm_vcpu *vcpu,
+>> +				  struct kvm_device_attr *attr,
+>> +				  int *irq, bool is_set)
+>> +{
+>> +	if (!is_set) {
+>> +		if (!kvm_arm_pmu_irq_initialized(vcpu))
+>> +			return -ENXIO;
+>> +
+>> +		*irq = vcpu->arch.pmu.irq_num;
+>> +	} else {
+>> +		if (kvm_arm_pmu_irq_initialized(vcpu))
+>> +			return -EBUSY;
+>> +
+>> +		kvm_debug("Set kvm ARM PMU irq: %d\n", *irq);
+>> +		vcpu->arch.pmu.irq_num = *irq;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+> 
+> are you going to be reusing this function in later patches?  If not, I
+> don't see the benefit of having this indirection over simply including
+> it directly in the callers below.
+> 
+Oh, right. Will drop this function.
+
+>> +
+>> +static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
+>> +{
+>> +	int i;
+>> +	struct kvm_vcpu *vcpu;
+>> +
+>> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+>> +		if (!kvm_arm_pmu_irq_initialized(vcpu))
+>> +			continue;
+>> +
+>> +		if (is_ppi) {
+>> +			if (vcpu->arch.pmu.irq_num != irq)
+>> +				return false;
+>> +		} else {
+>> +			if (vcpu->arch.pmu.irq_num == irq)
+>> +				return false;
+>> +		}
+>> +	}
+>> +
+>> +	return true;
+>> +}
+>> +
+>> +
+>> +int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>> +{
+>> +	switch (attr->attr) {
+>> +	case KVM_ARM_VCPU_PMU_V3_IRQ: {
+>> +		int __user *uaddr = (int __user *)(long)attr->addr;
+>> +		int reg;
+>> +
+>> +		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+>> +			return -ENODEV;
+>> +
+>> +		if (get_user(reg, uaddr))
+>> +			return -EFAULT;
+>> +
+>> +		/*
+>> +		 * The PMU overflow interrupt could be a PPI or SPI, but for one
+>> +		 * VM the interrupt type must be same for each vcpu. As a PPI,
+>> +		 * the interrupt number is same for all vcpus, while as an SPI
+>> +		 * it must be different for each vcpu.
+>> +		 */
+>> +		if (reg < VGIC_NR_SGIS || reg >= vcpu->kvm->arch.vgic.nr_irqs ||
+>> +		    !irq_is_valid(vcpu->kvm, reg, reg < VGIC_NR_PRIVATE_IRQS))
+>> +			return -EINVAL;
+>> +
+>> +		return kvm_arm_pmu_irq_access(vcpu, attr, &reg, true);
+>> +	}
+>> +	case KVM_ARM_VCPU_PMU_V3_INIT:
+>> +		return kvm_arm_pmu_v3_init(vcpu);
+>> +	}
+>> +
+>> +	return -ENXIO;
+>> +}
+>> +
+>> +int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>> +{
+>> +	int ret;
+>> +
+>> +	switch (attr->attr) {
+>> +	case KVM_ARM_VCPU_PMU_V3_IRQ: {
+>> +		int __user *uaddr = (int __user *)(long)attr->addr;
+>> +		int reg = -1;
+>> +
+>> +		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+>> +			return -ENODEV;
+>> +
+>> +		ret = kvm_arm_pmu_irq_access(vcpu, attr, &reg, false);
+>> +		if (ret)
+>> +			return ret;
+>> +		return put_user(reg, uaddr);
+>> +	}
+>> +	}
+>> +
+>> +	return -ENXIO;
+>> +}
+>> +
+>> +int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+>> +{
+>> +	switch (attr->attr) {
+>> +	case KVM_ARM_VCPU_PMU_V3_IRQ:
+>> +	case KVM_ARM_VCPU_PMU_V3_INIT:
+>> +		if (kvm_arm_support_pmu_v3() &&
+>> +		    test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
+>> +			return 0;
+>> +	}
+>> +
+>> +	return -ENXIO;
+>> +}
+>> -- 
+>> 2.0.4
 >>
 >>
->
-> As I already pointed out in another thread hacking some KVM ACPI stuff,
-> this is the wrong approach.
->
-> We should have a *common* accessor in the timer code that exports the
-> relevant information, whatever the firmware "du jour" is.
->
-> See Julien's series, which seems to address the issue in a much more
-> convincing way:
->
-> https://lists.cs.columbia.edu/pipermail/kvmarm/2016-February/018531.html
->
-
-Thanks for your info, I have read through Julien's patchset in mailing list.
-This patch is a improvement from Wei Huang's patch using my GTDT driver,
-because his approach is getting info from DTB or ACPI directly.
-
-But It seems Wei Huang is helping Julien on his patchset and trying to
-provide Tested-by,
-So I will delete these two patches(about kvm), and test Julien's patch also.
-
-> Thanks,
->
->         M.
-> --
-> Jazz is not dead. It just smells funny...
-
-
+> 
+> Besides the style and wording comments:
+> 
+> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> 
+Thanks!
 
 -- 
-Best regards,
+Shannon
 
-Fu Wei
-Software Engineer
-Red Hat Software (Beijing) Co.,Ltd.Shanghai Branch
-Ph: +86 21 61221326(direct)
-Ph: +86 186 2020 4684 (mobile)
-Room 1512, Regus One Corporate Avenue,Level 15,
-One Corporate Avenue,222 Hubin Road,Huangpu District,
-Shanghai,China 200021
