@@ -1,113 +1,84 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v12 18/21] KVM: ARM64: Free perf event of PMU when destroying
- vcpu
-Date: Mon, 22 Feb 2016 17:37:54 +0800
-Message-ID: <1456133877-9584-19-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v12 06/21] KVM: ARM64: Add access handler for PMCEID0 and PMCEID1 register
+Date: Mon, 22 Feb 2016 17:37:42 +0800
+Message-ID: <1456133877-9584-7-git-send-email-zhaoshenglong@huawei.com>
 References: <1456133877-9584-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4B59C4852F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2016 04:34:34 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vTwO4rTiji-E for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Feb 2016 04:34:32 -0500 (EST)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [58.251.152.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 25F3B41AF6
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2016 04:34:30 -0500 (EST)
+Content-Type: text/plain
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1456133877-9584-1-git-send-email-zhaoshenglong@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: kvm@vger.kernel.org, will.deacon@arm.com, shannon.zhao@linaro.org, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com, zhaoshenglong@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-When KVM frees VCPU, it needs to free the perf_event of PMU.
+Add access handler which gets host value of PMCEID0 or PMCEID1 when
+guest access these registers. Writing action to PMCEID0 or PMCEID1 is
+UNDEFINED.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- arch/arm/kvm/arm.c    |  1 +
- include/kvm/arm_pmu.h |  2 ++
- virt/kvm/arm/pmu.c    | 21 +++++++++++++++++++++
- 3 files changed, 24 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 28 ++++++++++++++++++++++++----
+ 1 file changed, 24 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index f54264c..d2c2cc3 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -266,6 +266,7 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
- 	kvm_mmu_free_memory_caches(vcpu);
- 	kvm_timer_vcpu_terminate(vcpu);
- 	kvm_vgic_vcpu_destroy(vcpu);
-+	kvm_pmu_vcpu_destroy(vcpu);
- 	kmem_cache_free(kvm_vcpu_cache, vcpu);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 65f5f00..27afa0b 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -493,6 +493,26 @@ static bool access_pmselr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
  }
  
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 46b773e..9cebf03 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -42,6 +42,7 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
- void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
- u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
- void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
-+void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu);
- void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val);
-@@ -67,6 +68,7 @@ static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- static inline void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
-+static inline void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu) {}
- static inline void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val) {}
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 92fff9a..0427af8 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -101,6 +101,27 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
- 	}
- }
- 
-+/**
-+ * kvm_pmu_vcpu_destroy - free perf event of PMU for cpu
-+ * @vcpu: The vcpu pointer
-+ *
-+ */
-+void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
++static bool access_pmceid(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			  const struct sys_reg_desc *r)
 +{
-+	int i;
-+	struct kvm_pmu *pmu = &vcpu->arch.pmu;
++	u64 pmceid;
 +
-+	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
-+		struct kvm_pmc *pmc = &pmu->pmc[i];
++	if (!kvm_arm_pmu_v3_ready(vcpu))
++		return trap_raz_wi(vcpu, p, r);
 +
-+		if (pmc->perf_event) {
-+			perf_event_disable(pmc->perf_event);
-+			perf_event_release_kernel(pmc->perf_event);
-+			pmc->perf_event = NULL;
-+		}
-+	}
++	BUG_ON(p->is_write);
++
++	if (!(p->Op2 & 1))
++		asm volatile("mrs %0, pmceid0_el0\n" : "=r" (pmceid));
++	else
++		asm volatile("mrs %0, pmceid1_el0\n" : "=r" (pmceid));
++
++	p->regval = pmceid;
++
++	return true;
 +}
 +
- u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
- {
- 	u64 val = vcpu_sys_reg(vcpu, PMCR_EL0) >> ARMV8_PMU_PMCR_N_SHIFT;
+ /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+ #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+ 	/* DBGBVRn_EL1 */						\
+@@ -695,10 +715,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  access_pmselr, reset_unknown, PMSELR_EL0 },
+ 	/* PMCEID0_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b110),
+-	  trap_raz_wi },
++	  access_pmceid },
+ 	/* PMCEID1_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b111),
+-	  trap_raz_wi },
++	  access_pmceid },
+ 	/* PMCCNTR_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b000),
+ 	  trap_raz_wi },
+@@ -944,8 +964,8 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmselr },
+-	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), trap_raz_wi },
+-	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), trap_raz_wi },
++	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
++	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmceid },
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), trap_raz_wi },
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), trap_raz_wi },
 -- 
 2.0.4
+
+
