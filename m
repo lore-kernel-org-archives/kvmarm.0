@@ -1,7 +1,7 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v12 14/21] KVM: ARM64: Add helper to handle PMCR register bits
-Date: Mon, 22 Feb 2016 17:37:50 +0800
-Message-ID: <1456133877-9584-15-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v12 03/21] KVM: ARM64: Add offset defines for PMU registers
+Date: Mon, 22 Feb 2016 17:37:39 +0800
+Message-ID: <1456133877-9584-4-git-send-email-zhaoshenglong@huawei.com>
 References: <1456133877-9584-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain
@@ -14,97 +14,43 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-According to ARMv8 spec, when writing 1 to PMCR.E, all counters are
-enabled by PMCNTENSET, while writing 0 to PMCR.E, all counters are
-disabled. When writing 1 to PMCR.P, reset all event counters, not
-including PMCCNTR, to zero. When writing 1 to PMCR.C, reset PMCCNTR to
-zero.
+We are about to trap and emulate accesses to each PMU register
+individually. This adds the context offsets for the AArch64 PMU
+registers.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 ---
- arch/arm64/kvm/sys_regs.c |  1 +
- include/kvm/arm_pmu.h     |  2 ++
- virt/kvm/arm/pmu.c        | 34 ++++++++++++++++++++++++++++++++++
- 3 files changed, 37 insertions(+)
+ arch/arm64/include/asm/kvm_host.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index f31023b..f1866c3 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -467,6 +467,7 @@ static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 		val &= ~ARMV8_PMU_PMCR_MASK;
- 		val |= p->regval & ARMV8_PMU_PMCR_MASK;
- 		vcpu_sys_reg(vcpu, PMCR_EL0) = val;
-+		kvm_pmu_handle_pmcr(vcpu, val);
- 	} else {
- 		/* PMCR.P & PMCR.C are RAZ */
- 		val = vcpu_sys_reg(vcpu, PMCR_EL0)
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 348c4c9..8bc92d1 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -45,6 +45,7 @@ void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val);
-+void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
- void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
- 				    u64 select_idx);
- #else
-@@ -67,6 +68,7 @@ static inline void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val) {}
-+static inline void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val) {}
- static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
- 						  u64 data, u64 select_idx) {}
- #endif
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 9fc775e..cda869c 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -210,6 +210,40 @@ void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
- 	}
- }
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 6f0241f..6bab7fb 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -115,6 +115,21 @@ enum vcpu_sysreg {
+ 	MDSCR_EL1,	/* Monitor Debug System Control Register */
+ 	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
  
-+/**
-+ * kvm_pmu_handle_pmcr - handle PMCR register
-+ * @vcpu: The vcpu pointer
-+ * @val: the value guest writes to PMCR register
-+ */
-+void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val)
-+{
-+	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-+	struct kvm_pmc *pmc;
-+	u64 mask;
-+	int i;
++	/* Performance Monitors Registers */
++	PMCR_EL0,	/* Control Register */
++	PMOVSSET_EL0,	/* Overflow Flag Status Set Register */
++	PMSELR_EL0,	/* Event Counter Selection Register */
++	PMEVCNTR0_EL0,	/* Event Counter Register (0-30) */
++	PMEVCNTR30_EL0 = PMEVCNTR0_EL0 + 30,
++	PMCCNTR_EL0,	/* Cycle Counter Register */
++	PMEVTYPER0_EL0,	/* Event Type Register (0-30) */
++	PMEVTYPER30_EL0 = PMEVTYPER0_EL0 + 30,
++	PMCCFILTR_EL0,	/* Cycle Count Filter Register */
++	PMCNTENSET_EL0,	/* Count Enable Set Register */
++	PMINTENSET_EL1,	/* Interrupt Enable Set Register */
++	PMUSERENR_EL0,	/* User Enable Register */
++	PMSWINC_EL0,	/* Software Increment Register */
 +
-+	mask = kvm_pmu_valid_counter_mask(vcpu);
-+	if (val & ARMV8_PMU_PMCR_E) {
-+		kvm_pmu_enable_counter(vcpu,
-+				vcpu_sys_reg(vcpu, PMCNTENSET_EL0) & mask);
-+	} else {
-+		kvm_pmu_disable_counter(vcpu, mask);
-+	}
-+
-+	if (val & ARMV8_PMU_PMCR_C)
-+		kvm_pmu_set_counter_value(vcpu, ARMV8_PMU_CYCLE_IDX, 0);
-+
-+	if (val & ARMV8_PMU_PMCR_P) {
-+		for (i = 0; i < ARMV8_PMU_CYCLE_IDX; i++)
-+			kvm_pmu_set_counter_value(vcpu, i, 0);
-+	}
-+
-+	if (val & ARMV8_PMU_PMCR_LC) {
-+		pmc = &pmu->pmc[ARMV8_PMU_CYCLE_IDX];
-+		pmc->bitmask = 0xffffffffffffffffUL;
-+	}
-+}
-+
- static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
- {
- 	return (vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) &&
+ 	/* 32bit specific registers. Keep them at the end of the range */
+ 	DACR32_EL2,	/* Domain Access Control Register */
+ 	IFSR32_EL2,	/* Instruction Fault Status Register */
 -- 
 2.0.4
 
