@@ -1,279 +1,399 @@
 From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: [PATCH v12 01/21] ARM64: Move PMU register related defines to
- asm/perf_event.h
-Date: Mon, 22 Feb 2016 17:37:37 +0800
-Message-ID: <1456133877-9584-2-git-send-email-zhaoshenglong@huawei.com>
+Subject: [PATCH v12 21/21] KVM: ARM64: Add a new vcpu device control group for PMUv3
+Date: Mon, 22 Feb 2016 17:37:57 +0800
+Message-ID: <1456133877-9584-22-git-send-email-zhaoshenglong@huawei.com>
 References: <1456133877-9584-1-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1E257413E1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2016 04:42:27 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3yN+QO4KRkBg for <kvmarm@lists.cs.columbia.edu>;
- Mon, 22 Feb 2016 04:42:25 -0500 (EST)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [119.145.14.65])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5E670412D0
- for <kvmarm@lists.cs.columbia.edu>; Mon, 22 Feb 2016 04:42:23 -0500 (EST)
+Content-Type: text/plain
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1456133877-9584-1-git-send-email-zhaoshenglong@huawei.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: kvm@vger.kernel.org, will.deacon@arm.com, shannon.zhao@linaro.org, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com, zhaoshenglong@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-To use the ARMv8 PMU related register defines from the KVM code, we move
-the relevant definitions to asm/perf_event.h header file and rename them
-with prefix ARMV8_PMU_.
+To configure the virtual PMUv3 overflow interrupt number, we use the
+vcpu kvm_device ioctl, encapsulating the KVM_ARM_VCPU_PMU_V3_IRQ
+attribute within the KVM_ARM_VCPU_PMU_V3_CTRL group.
 
-Signed-off-by: Anup Patel <anup.patel@linaro.org>
+After configuring the PMUv3, call the vcpu ioctl with attribute
+KVM_ARM_VCPU_PMU_V3_INIT to initialize the PMUv3.
+
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+Acked-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm64/include/asm/perf_event.h | 35 +++++++++++++++++++
- arch/arm64/kernel/perf_event.c      | 68 ++++++++++---------------------------
- 2 files changed, 52 insertions(+), 51 deletions(-)
+ Documentation/virtual/kvm/devices/vcpu.txt |  25 +++++++
+ arch/arm/include/asm/kvm_host.h            |  15 ++++
+ arch/arm/kvm/arm.c                         |   3 +
+ arch/arm64/include/asm/kvm_host.h          |   6 ++
+ arch/arm64/include/uapi/asm/kvm.h          |   5 ++
+ arch/arm64/kvm/guest.c                     |  51 +++++++++++++
+ include/kvm/arm_pmu.h                      |  23 ++++++
+ virt/kvm/arm/pmu.c                         | 112 +++++++++++++++++++++++++++++
+ 8 files changed, 240 insertions(+)
 
-diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
-index 7bd3cdb..5c77ef8 100644
---- a/arch/arm64/include/asm/perf_event.h
-+++ b/arch/arm64/include/asm/perf_event.h
-@@ -17,6 +17,41 @@
- #ifndef __ASM_PERF_EVENT_H
- #define __ASM_PERF_EVENT_H
+diff --git a/Documentation/virtual/kvm/devices/vcpu.txt b/Documentation/virtual/kvm/devices/vcpu.txt
+index 3cc59c5..c041658 100644
+--- a/Documentation/virtual/kvm/devices/vcpu.txt
++++ b/Documentation/virtual/kvm/devices/vcpu.txt
+@@ -6,3 +6,28 @@ KVM_GET_DEVICE_ATTR, and KVM_HAS_DEVICE_ATTR. The interface uses the same struct
+ kvm_device_attr as other devices, but targets VCPU-wide settings and controls.
  
-+#define	ARMV8_PMU_MAX_COUNTERS	32
-+#define	ARMV8_PMU_COUNTER_MASK	(ARMV8_PMU_MAX_COUNTERS - 1)
+ The groups and attributes per virtual cpu, if any, are architecture specific.
 +
-+/*
-+ * Per-CPU PMCR: config reg
-+ */
-+#define ARMV8_PMU_PMCR_E	(1 << 0) /* Enable all counters */
-+#define ARMV8_PMU_PMCR_P	(1 << 1) /* Reset all counters */
-+#define ARMV8_PMU_PMCR_C	(1 << 2) /* Cycle counter reset */
-+#define ARMV8_PMU_PMCR_D	(1 << 3) /* CCNT counts every 64th cpu cycle */
-+#define ARMV8_PMU_PMCR_X	(1 << 4) /* Export to ETM */
-+#define ARMV8_PMU_PMCR_DP	(1 << 5) /* Disable CCNT if non-invasive debug*/
-+#define	ARMV8_PMU_PMCR_N_SHIFT	11	 /* Number of counters supported */
-+#define	ARMV8_PMU_PMCR_N_MASK	0x1f
-+#define	ARMV8_PMU_PMCR_MASK	0x3f	 /* Mask for writable bits */
++1. GROUP: KVM_ARM_VCPU_PMU_V3_CTRL
++Architectures: ARM64
 +
-+/*
-+ * PMOVSR: counters overflow flag status reg
-+ */
-+#define	ARMV8_PMU_OVSR_MASK		0xffffffff	/* Mask for writable bits */
-+#define	ARMV8_PMU_OVERFLOWED_MASK	ARMV8_PMU_OVSR_MASK
++1.1. ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_IRQ
++Parameters: in kvm_device_attr.addr the address for PMU overflow interrupt is a
++            pointer to an int
++Returns: -EBUSY: The PMU overflow interrupt is already set
++         -ENXIO: The overflow interrupt not set when attempting to get it
++         -ENODEV: PMUv3 not supported
++         -EINVAL: Invalid PMU overflow interrupt number supplied
 +
-+/*
-+ * PMXEVTYPER: Event selection reg
-+ */
-+#define	ARMV8_PMU_EVTYPE_MASK	0xc80003ff	/* Mask for writable bits */
-+#define	ARMV8_PMU_EVTYPE_EVENT	0x3ff		/* Mask for EVENT bits */
++A value describing the PMUv3 (Performance Monitor Unit v3) overflow interrupt
++number for this vcpu. This interrupt could be a PPI or SPI, but the interrupt
++type must be same for each vcpu. As a PPI, the interrupt number is the same for
++all vcpus, while as an SPI it must be a separate number per vcpu.
 +
-+/*
-+ * Event filters for PMUv3
-+ */
-+#define	ARMV8_PMU_EXCLUDE_EL1	(1 << 31)
-+#define	ARMV8_PMU_EXCLUDE_EL0	(1 << 30)
-+#define	ARMV8_PMU_INCLUDE_EL2	(1 << 27)
++1.2 ATTRIBUTE: KVM_ARM_VCPU_PMU_V3_INIT
++Parameters: no additional parameter in kvm_device_attr.addr
++Returns: -ENODEV: PMUv3 not supported
++         -ENXIO: PMUv3 not properly configured as required prior to calling this
++                 attribute
++         -EBUSY: PMUv3 already initialized
 +
- #ifdef CONFIG_PERF_EVENTS
- struct pt_regs;
- extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
-diff --git a/arch/arm64/kernel/perf_event.c b/arch/arm64/kernel/perf_event.c
-index f7ab14c..212c9fc4 100644
---- a/arch/arm64/kernel/perf_event.c
-+++ b/arch/arm64/kernel/perf_event.c
-@@ -24,6 +24,7 @@
- #include <linux/of.h>
- #include <linux/perf/arm_pmu.h>
- #include <linux/platform_device.h>
-+#include <asm/perf_event.h>
++Request the initialization of the PMUv3.
+diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+index f9f2779..6dd0992 100644
+--- a/arch/arm/include/asm/kvm_host.h
++++ b/arch/arm/include/asm/kvm_host.h
+@@ -242,5 +242,20 @@ static inline void kvm_arm_init_debug(void) {}
+ static inline void kvm_arm_setup_debug(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_arm_clear_debug(struct kvm_vcpu *vcpu) {}
+ static inline void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu) {}
++static inline int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
++					     struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++static inline int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
++					     struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++static inline int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
++					     struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
  
- /*
-  * ARMv8 PMUv3 Performance Events handling code.
-@@ -333,9 +334,6 @@ static const struct attribute_group *armv8_pmuv3_attr_groups[] = {
- #define	ARMV8_IDX_COUNTER_LAST(cpu_pmu) \
- 	(ARMV8_IDX_CYCLE_COUNTER + cpu_pmu->num_events - 1)
+ #endif /* __ARM_KVM_HOST_H__ */
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 34d7395..dc8644f 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -833,6 +833,7 @@ static int kvm_arm_vcpu_set_attr(struct kvm_vcpu *vcpu,
  
--#define	ARMV8_MAX_COUNTERS	32
--#define	ARMV8_COUNTER_MASK	(ARMV8_MAX_COUNTERS - 1)
--
- /*
-  * ARMv8 low level PMU access
-  */
-@@ -344,39 +342,7 @@ static const struct attribute_group *armv8_pmuv3_attr_groups[] = {
-  * Perf Event to low level counters mapping
-  */
- #define	ARMV8_IDX_TO_COUNTER(x)	\
--	(((x) - ARMV8_IDX_COUNTER0) & ARMV8_COUNTER_MASK)
--
--/*
-- * Per-CPU PMCR: config reg
-- */
--#define ARMV8_PMCR_E		(1 << 0) /* Enable all counters */
--#define ARMV8_PMCR_P		(1 << 1) /* Reset all counters */
--#define ARMV8_PMCR_C		(1 << 2) /* Cycle counter reset */
--#define ARMV8_PMCR_D		(1 << 3) /* CCNT counts every 64th cpu cycle */
--#define ARMV8_PMCR_X		(1 << 4) /* Export to ETM */
--#define ARMV8_PMCR_DP		(1 << 5) /* Disable CCNT if non-invasive debug*/
--#define	ARMV8_PMCR_N_SHIFT	11	 /* Number of counters supported */
--#define	ARMV8_PMCR_N_MASK	0x1f
--#define	ARMV8_PMCR_MASK		0x3f	 /* Mask for writable bits */
--
--/*
-- * PMOVSR: counters overflow flag status reg
-- */
--#define	ARMV8_OVSR_MASK		0xffffffff	/* Mask for writable bits */
--#define	ARMV8_OVERFLOWED_MASK	ARMV8_OVSR_MASK
--
--/*
-- * PMXEVTYPER: Event selection reg
-- */
--#define	ARMV8_EVTYPE_MASK	0xc80003ff	/* Mask for writable bits */
--#define	ARMV8_EVTYPE_EVENT	0x3ff		/* Mask for EVENT bits */
--
--/*
-- * Event filters for PMUv3
-- */
--#define	ARMV8_EXCLUDE_EL1	(1 << 31)
--#define	ARMV8_EXCLUDE_EL0	(1 << 30)
--#define	ARMV8_INCLUDE_EL2	(1 << 27)
-+	(((x) - ARMV8_IDX_COUNTER0) & ARMV8_PMU_COUNTER_MASK)
- 
- static inline u32 armv8pmu_pmcr_read(void)
- {
-@@ -387,14 +353,14 @@ static inline u32 armv8pmu_pmcr_read(void)
- 
- static inline void armv8pmu_pmcr_write(u32 val)
- {
--	val &= ARMV8_PMCR_MASK;
-+	val &= ARMV8_PMU_PMCR_MASK;
- 	isb();
- 	asm volatile("msr pmcr_el0, %0" :: "r" (val));
- }
- 
- static inline int armv8pmu_has_overflowed(u32 pmovsr)
- {
--	return pmovsr & ARMV8_OVERFLOWED_MASK;
-+	return pmovsr & ARMV8_PMU_OVERFLOWED_MASK;
- }
- 
- static inline int armv8pmu_counter_valid(struct arm_pmu *cpu_pmu, int idx)
-@@ -453,7 +419,7 @@ static inline void armv8pmu_write_counter(struct perf_event *event, u32 value)
- static inline void armv8pmu_write_evtype(int idx, u32 val)
- {
- 	if (armv8pmu_select_counter(idx) == idx) {
--		val &= ARMV8_EVTYPE_MASK;
-+		val &= ARMV8_PMU_EVTYPE_MASK;
- 		asm volatile("msr pmxevtyper_el0, %0" :: "r" (val));
- 	}
- }
-@@ -499,7 +465,7 @@ static inline u32 armv8pmu_getreset_flags(void)
- 	asm volatile("mrs %0, pmovsclr_el0" : "=r" (value));
- 
- 	/* Write to clear flags */
--	value &= ARMV8_OVSR_MASK;
-+	value &= ARMV8_PMU_OVSR_MASK;
- 	asm volatile("msr pmovsclr_el0, %0" :: "r" (value));
- 
- 	return value;
-@@ -637,7 +603,7 @@ static void armv8pmu_start(struct arm_pmu *cpu_pmu)
- 
- 	raw_spin_lock_irqsave(&events->pmu_lock, flags);
- 	/* Enable all counters */
--	armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMCR_E);
-+	armv8pmu_pmcr_write(armv8pmu_pmcr_read() | ARMV8_PMU_PMCR_E);
- 	raw_spin_unlock_irqrestore(&events->pmu_lock, flags);
- }
- 
-@@ -648,7 +614,7 @@ static void armv8pmu_stop(struct arm_pmu *cpu_pmu)
- 
- 	raw_spin_lock_irqsave(&events->pmu_lock, flags);
- 	/* Disable all counters */
--	armv8pmu_pmcr_write(armv8pmu_pmcr_read() & ~ARMV8_PMCR_E);
-+	armv8pmu_pmcr_write(armv8pmu_pmcr_read() & ~ARMV8_PMU_PMCR_E);
- 	raw_spin_unlock_irqrestore(&events->pmu_lock, flags);
- }
- 
-@@ -658,7 +624,7 @@ static int armv8pmu_get_event_idx(struct pmu_hw_events *cpuc,
- 	int idx;
- 	struct arm_pmu *cpu_pmu = to_arm_pmu(event->pmu);
- 	struct hw_perf_event *hwc = &event->hw;
--	unsigned long evtype = hwc->config_base & ARMV8_EVTYPE_EVENT;
-+	unsigned long evtype = hwc->config_base & ARMV8_PMU_EVTYPE_EVENT;
- 
- 	/* Always place a cycle counter into the cycle counter. */
- 	if (evtype == ARMV8_PMUV3_PERFCTR_CLOCK_CYCLES) {
-@@ -692,11 +658,11 @@ static int armv8pmu_set_event_filter(struct hw_perf_event *event,
- 	if (attr->exclude_idle)
- 		return -EPERM;
- 	if (attr->exclude_user)
--		config_base |= ARMV8_EXCLUDE_EL0;
-+		config_base |= ARMV8_PMU_EXCLUDE_EL0;
- 	if (attr->exclude_kernel)
--		config_base |= ARMV8_EXCLUDE_EL1;
-+		config_base |= ARMV8_PMU_EXCLUDE_EL1;
- 	if (!attr->exclude_hv)
--		config_base |= ARMV8_INCLUDE_EL2;
-+		config_base |= ARMV8_PMU_INCLUDE_EL2;
- 
- 	/*
- 	 * Install the filter into config_base as this is used to
-@@ -719,28 +685,28 @@ static void armv8pmu_reset(void *info)
+ 	switch (attr->group) {
+ 	default:
++		ret = kvm_arm_vcpu_arch_set_attr(vcpu, attr);
+ 		break;
  	}
  
- 	/* Initialize & Reset PMNC: C and P bits. */
--	armv8pmu_pmcr_write(ARMV8_PMCR_P | ARMV8_PMCR_C);
-+	armv8pmu_pmcr_write(ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C);
- }
+@@ -846,6 +847,7 @@ static int kvm_arm_vcpu_get_attr(struct kvm_vcpu *vcpu,
  
- static int armv8_pmuv3_map_event(struct perf_event *event)
+ 	switch (attr->group) {
+ 	default:
++		ret = kvm_arm_vcpu_arch_get_attr(vcpu, attr);
+ 		break;
+ 	}
+ 
+@@ -859,6 +861,7 @@ static int kvm_arm_vcpu_has_attr(struct kvm_vcpu *vcpu,
+ 
+ 	switch (attr->group) {
+ 	default:
++		ret = kvm_arm_vcpu_arch_has_attr(vcpu, attr);
+ 		break;
+ 	}
+ 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index cb220b7..a855a30 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -359,5 +359,11 @@ void kvm_arm_init_debug(void);
+ void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+ void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+ void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
++int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
++			       struct kvm_device_attr *attr);
++int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
++			       struct kvm_device_attr *attr);
++int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
++			       struct kvm_device_attr *attr);
+ 
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+index 6aedbe3..f209ea1 100644
+--- a/arch/arm64/include/uapi/asm/kvm.h
++++ b/arch/arm64/include/uapi/asm/kvm.h
+@@ -205,6 +205,11 @@ struct kvm_arch_memory_slot {
+ #define KVM_DEV_ARM_VGIC_GRP_CTRL	4
+ #define   KVM_DEV_ARM_VGIC_CTRL_INIT	0
+ 
++/* Device Control API on vcpu fd */
++#define KVM_ARM_VCPU_PMU_V3_CTRL	0
++#define   KVM_ARM_VCPU_PMU_V3_IRQ	0
++#define   KVM_ARM_VCPU_PMU_V3_INIT	1
++
+ /* KVM_IRQ_LINE irq field index values */
+ #define KVM_ARM_IRQ_TYPE_SHIFT		24
+ #define KVM_ARM_IRQ_TYPE_MASK		0xff
+diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+index fcb7788..dbe45c3 100644
+--- a/arch/arm64/kvm/guest.c
++++ b/arch/arm64/kvm/guest.c
+@@ -380,3 +380,54 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
+ 	}
+ 	return 0;
+ }
++
++int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
++			       struct kvm_device_attr *attr)
++{
++	int ret;
++
++	switch (attr->group) {
++	case KVM_ARM_VCPU_PMU_V3_CTRL:
++		ret = kvm_arm_pmu_v3_set_attr(vcpu, attr);
++		break;
++	default:
++		ret = -ENXIO;
++		break;
++	}
++
++	return ret;
++}
++
++int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
++			       struct kvm_device_attr *attr)
++{
++	int ret;
++
++	switch (attr->group) {
++	case KVM_ARM_VCPU_PMU_V3_CTRL:
++		ret = kvm_arm_pmu_v3_get_attr(vcpu, attr);
++		break;
++	default:
++		ret = -ENXIO;
++		break;
++	}
++
++	return ret;
++}
++
++int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
++			       struct kvm_device_attr *attr)
++{
++	int ret;
++
++	switch (attr->group) {
++	case KVM_ARM_VCPU_PMU_V3_CTRL:
++		ret = kvm_arm_pmu_v3_has_attr(vcpu, attr);
++		break;
++	default:
++		ret = -ENXIO;
++		break;
++	}
++
++	return ret;
++}
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index c7595d6..176913f 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -38,6 +38,7 @@ struct kvm_pmu {
+ };
+ 
+ #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
++#define kvm_arm_pmu_irq_initialized(v)	((v)->arch.pmu.irq_num >= VGIC_NR_SGIS)
+ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
+ void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
+ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
+@@ -52,11 +53,18 @@ void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
+ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+ 				    u64 select_idx);
+ bool kvm_arm_support_pmu_v3(void);
++int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
++			    struct kvm_device_attr *attr);
++int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu,
++			    struct kvm_device_attr *attr);
++int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu,
++			    struct kvm_device_attr *attr);
+ #else
+ struct kvm_pmu {
+ };
+ 
+ #define kvm_arm_pmu_v3_ready(v)		(false)
++#define kvm_arm_pmu_irq_initialized(v)	(false)
+ static inline u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu,
+ 					    u64 select_idx)
  {
- 	return armpmu_map_event(event, &armv8_pmuv3_perf_map,
- 				&armv8_pmuv3_perf_cache_map,
--				ARMV8_EVTYPE_EVENT);
-+				ARMV8_PMU_EVTYPE_EVENT);
+@@ -79,6 +87,21 @@ static inline void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val) {}
+ static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
+ 						  u64 data, u64 select_idx) {}
+ static inline bool kvm_arm_support_pmu_v3(void) { return false; }
++static inline int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu,
++					  struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++static inline int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu,
++					  struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++static inline int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu,
++					  struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
+ #endif
+ 
+ #endif
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index d5b6eb4..904617e 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -19,6 +19,7 @@
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+ #include <linux/perf_event.h>
++#include <linux/uaccess.h>
+ #include <asm/kvm_emulate.h>
+ #include <kvm/arm_pmu.h>
+ #include <kvm/arm_vgic.h>
+@@ -393,3 +394,114 @@ bool kvm_arm_support_pmu_v3(void)
+ 	 */
+ 	return (perf_num_counters() > 0);
  }
- 
- static int armv8_a53_map_event(struct perf_event *event)
- {
- 	return armpmu_map_event(event, &armv8_a53_perf_map,
- 				&armv8_a53_perf_cache_map,
--				ARMV8_EVTYPE_EVENT);
-+				ARMV8_PMU_EVTYPE_EVENT);
- }
- 
- static int armv8_a57_map_event(struct perf_event *event)
- {
- 	return armpmu_map_event(event, &armv8_a57_perf_map,
- 				&armv8_a57_perf_cache_map,
--				ARMV8_EVTYPE_EVENT);
-+				ARMV8_PMU_EVTYPE_EVENT);
- }
- 
- static void armv8pmu_read_num_pmnc_events(void *info)
-@@ -748,7 +714,7 @@ static void armv8pmu_read_num_pmnc_events(void *info)
- 	int *nb_cnt = info;
- 
- 	/* Read the nb of CNTx counters supported from PMNC */
--	*nb_cnt = (armv8pmu_pmcr_read() >> ARMV8_PMCR_N_SHIFT) & ARMV8_PMCR_N_MASK;
-+	*nb_cnt = (armv8pmu_pmcr_read() >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
- 
- 	/* Add the CPU cycles counter */
- 	*nb_cnt += 1;
++
++static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
++{
++	if (!kvm_arm_support_pmu_v3())
++		return -ENODEV;
++
++	if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features) ||
++	    !kvm_arm_pmu_irq_initialized(vcpu))
++		return -ENXIO;
++
++	if (kvm_arm_pmu_v3_ready(vcpu))
++		return -EBUSY;
++
++	kvm_pmu_vcpu_reset(vcpu);
++	vcpu->arch.pmu.ready = true;
++
++	return 0;
++}
++
++static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
++{
++	int i;
++	struct kvm_vcpu *vcpu;
++
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		if (!kvm_arm_pmu_irq_initialized(vcpu))
++			continue;
++
++		if (is_ppi) {
++			if (vcpu->arch.pmu.irq_num != irq)
++				return false;
++		} else {
++			if (vcpu->arch.pmu.irq_num == irq)
++				return false;
++		}
++	}
++
++	return true;
++}
++
++
++int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
++{
++	switch (attr->attr) {
++	case KVM_ARM_VCPU_PMU_V3_IRQ: {
++		int __user *uaddr = (int __user *)(long)attr->addr;
++		int irq;
++
++		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
++			return -ENODEV;
++
++		if (get_user(irq, uaddr))
++			return -EFAULT;
++
++		/*
++		 * The PMU overflow interrupt could be a PPI or SPI, but for one
++		 * VM the interrupt type must be same for each vcpu. As a PPI,
++		 * the interrupt number is the same for all vcpus, while as an
++		 * SPI it must be a separate number per vcpu.
++		 */
++		if (irq < VGIC_NR_SGIS || irq >= vcpu->kvm->arch.vgic.nr_irqs ||
++		    !irq_is_valid(vcpu->kvm, irq, irq < VGIC_NR_PRIVATE_IRQS))
++			return -EINVAL;
++
++		if (kvm_arm_pmu_irq_initialized(vcpu))
++			return -EBUSY;
++
++		kvm_debug("Set kvm ARM PMU irq: %d\n", irq);
++		vcpu->arch.pmu.irq_num = irq;
++		return 0;
++	}
++	case KVM_ARM_VCPU_PMU_V3_INIT:
++		return kvm_arm_pmu_v3_init(vcpu);
++	}
++
++	return -ENXIO;
++}
++
++int kvm_arm_pmu_v3_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
++{
++	switch (attr->attr) {
++	case KVM_ARM_VCPU_PMU_V3_IRQ: {
++		int __user *uaddr = (int __user *)(long)attr->addr;
++		int irq;
++
++		if (!test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
++			return -ENODEV;
++
++		if (!kvm_arm_pmu_irq_initialized(vcpu))
++			return -ENXIO;
++
++		irq = vcpu->arch.pmu.irq_num;
++		return put_user(irq, uaddr);
++	}
++	}
++
++	return -ENXIO;
++}
++
++int kvm_arm_pmu_v3_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
++{
++	switch (attr->attr) {
++	case KVM_ARM_VCPU_PMU_V3_IRQ:
++	case KVM_ARM_VCPU_PMU_V3_INIT:
++		if (kvm_arm_support_pmu_v3() &&
++		    test_bit(KVM_ARM_VCPU_PMU_V3, vcpu->arch.features))
++			return 0;
++	}
++
++	return -ENXIO;
++}
 -- 
 2.0.4
+
+
