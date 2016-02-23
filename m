@@ -1,28 +1,24 @@
-From: Shannon Zhao <shannon.zhao@linaro.org>
-Subject: Re: [PATCH v12 03/21] KVM: ARM64: Add offset defines for PMU registers
-Date: Tue, 23 Feb 2016 17:29:01 +0800
-Message-ID: <56CC265D.9000406@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v12 16/21] KVM: ARM64: Add PMU overflow interrupt routing
+Date: Tue, 23 Feb 2016 14:14:54 +0000
+Message-ID: <56CC695E.4010805@arm.com>
 References: <1456133877-9584-1-git-send-email-zhaoshenglong@huawei.com>
- <1456133877-9584-4-git-send-email-zhaoshenglong@huawei.com>
- <56CB4A98.2020403@arm.com> <56CBBA06.4040902@huawei.com>
+ <1456133877-9584-17-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 445C34852E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2016 04:22:31 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 040CF4852E
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2016 09:08:20 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fbP-OUOI3eE3 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Feb 2016 04:22:30 -0500 (EST)
-Received: from mail-pf0-f176.google.com (mail-pf0-f176.google.com
- [209.85.192.176])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 1635748529
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2016 04:22:29 -0500 (EST)
-Received: by mail-pf0-f176.google.com with SMTP id x65so109292626pfb.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2016 01:29:09 -0800 (PST)
-In-Reply-To: <56CBBA06.4040902@huawei.com>
+ with ESMTP id O37sZVLkfB7D for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 23 Feb 2016 09:08:18 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 77BCE410D7
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2016 09:08:18 -0500 (EST)
+In-Reply-To: <1456133877-9584-17-git-send-email-zhaoshenglong@huawei.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,63 +28,163 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shannon Zhao <zhaoshenglong@huawei.com>, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
-Cc: kvm@vger.kernel.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org
+To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: kvm@vger.kernel.org, will.deacon@arm.com, shannon.zhao@linaro.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-
-
-On 2016/2/23 9:46, Shannon Zhao wrote:
+On 22/02/16 09:37, Shannon Zhao wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
 > 
-> On 2016/2/23 1:51, Marc Zyngier wrote:
->> > On 22/02/16 09:37, Shannon Zhao wrote:
->>> >> From: Shannon Zhao <shannon.zhao@linaro.org>
->>> >>
->>> >> We are about to trap and emulate accesses to each PMU register
->>> >> individually. This adds the context offsets for the AArch64 PMU
->>> >> registers.
->>> >>
->>> >> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
->>> >> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
->>> >> Reviewed-by: Andrew Jones <drjones@redhat.com>
->>> >> ---
->>> >>  arch/arm64/include/asm/kvm_host.h | 15 +++++++++++++++
->>> >>  1 file changed, 15 insertions(+)
->>> >>
->>> >> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->>> >> index 6f0241f..6bab7fb 100644
->>> >> --- a/arch/arm64/include/asm/kvm_host.h
->>> >> +++ b/arch/arm64/include/asm/kvm_host.h
->>> >> @@ -115,6 +115,21 @@ enum vcpu_sysreg {
->>> >>  	MDSCR_EL1,	/* Monitor Debug System Control Register */
->>> >>  	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
->>> >>  
->>> >> +	/* Performance Monitors Registers */
->>> >> +	PMCR_EL0,	/* Control Register */
->>> >> +	PMOVSSET_EL0,	/* Overflow Flag Status Set Register */
->>> >> +	PMSELR_EL0,	/* Event Counter Selection Register */
->>> >> +	PMEVCNTR0_EL0,	/* Event Counter Register (0-30) */
->>> >> +	PMEVCNTR30_EL0 = PMEVCNTR0_EL0 + 30,
->>> >> +	PMCCNTR_EL0,	/* Cycle Counter Register */
->>> >> +	PMEVTYPER0_EL0,	/* Event Type Register (0-30) */
->>> >> +	PMEVTYPER30_EL0 = PMEVTYPER0_EL0 + 30,
->>> >> +	PMCCFILTR_EL0,	/* Cycle Count Filter Register */
->>> >> +	PMCNTENSET_EL0,	/* Count Enable Set Register */
->>> >> +	PMINTENSET_EL1,	/* Interrupt Enable Set Register */
->>> >> +	PMUSERENR_EL0,	/* User Enable Register */
->>> >> +	PMSWINC_EL0,	/* Software Increment Register */
->>> >> +
->> > 
->> > I've just noticed a rather fundamental issue with this: this makes it
->> > impossible to bisect the whole series.
->> > 
-> Ah, sorry. Will fix this.
+> When calling perf_event_create_kernel_counter to create perf_event,
+> assign a overflow handler. Then when the perf event overflows, set the
+> corresponding bit of guest PMOVSSET register. If this counter is enabled
+> and its interrupt is enabled as well, kick the vcpu to sync the
+> interrupt.
 > 
-I've fixed this problem and pushed this series to below place. You can
-fetch it from there.
+> On VM entry, if there is counter overflowed, inject the interrupt with
+> the level set to 1. Otherwise, inject the interrupt with the level set
+> to 0.
+> 
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
 
-https://git.linaro.org/people/shannon.zhao/linux-mainline.git/shortlog/refs/heads/KVM_ARM64_PMU_v13
+As I mentioned yesterday, I was trying to pinpoint a performance drop, so I added PMU support to kvmtool (and made it an optional flag). This allowed be to find this:
+
+> ---
+>  arch/arm/kvm/arm.c    |  2 ++
+>  include/kvm/arm_pmu.h |  2 ++
+>  virt/kvm/arm/pmu.c    | 47 ++++++++++++++++++++++++++++++++++++++++++++++-
+>  3 files changed, 50 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+> index dda1959..f54264c 100644
+> --- a/arch/arm/kvm/arm.c
+> +++ b/arch/arm/kvm/arm.c
+> @@ -28,6 +28,7 @@
+>  #include <linux/sched.h>
+>  #include <linux/kvm.h>
+>  #include <trace/events/kvm.h>
+> +#include <kvm/arm_pmu.h>
+>  
+>  #define CREATE_TRACE_POINTS
+>  #include "trace.h"
+> @@ -577,6 +578,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  		 * non-preemptible context.
+>  		 */
+>  		preempt_disable();
+> +		kvm_pmu_flush_hwstate(vcpu);
+>  		kvm_timer_flush_hwstate(vcpu);
+>  		kvm_vgic_flush_hwstate(vcpu);
+>  
+> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+> index 8bc92d1..cf68f9a 100644
+> --- a/include/kvm/arm_pmu.h
+> +++ b/include/kvm/arm_pmu.h
+> @@ -44,6 +44,7 @@ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
+>  void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
+>  void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
+>  void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val);
+> +void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu);
+>  void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val);
+>  void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
+>  void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+> @@ -67,6 +68,7 @@ static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+>  static inline void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val) {}
+>  static inline void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val) {}
+>  static inline void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val) {}
+> +static inline void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu) {}
+>  static inline void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val) {}
+>  static inline void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val) {}
+>  static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
+> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+> index cda869c..6ac52ce 100644
+> --- a/virt/kvm/arm/pmu.c
+> +++ b/virt/kvm/arm/pmu.c
+> @@ -21,6 +21,7 @@
+>  #include <linux/perf_event.h>
+>  #include <asm/kvm_emulate.h>
+>  #include <kvm/arm_pmu.h>
+> +#include <kvm/arm_vgic.h>
+>  
+>  /**
+>   * kvm_pmu_get_counter_value - get PMU counter value
+> @@ -181,6 +182,49 @@ void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val)
+>  }
+>  
+>  /**
+> + * kvm_pmu_flush_hwstate - flush pmu state to cpu
+> + * @vcpu: The vcpu pointer
+> + *
+> + * Inject virtual PMU IRQ if IRQ is pending for this cpu.
+> + */
+> +void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+> +	u64 overflow;
+> +
+> +	if (!kvm_arm_pmu_v3_ready(vcpu))
+> +		return;
+> +
+> +	overflow = kvm_pmu_overflow_status(vcpu);
+> +	kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, !!overflow);
+
+It turns out that this single line costs us about 400 cycles on each entry:
+
+maz@flakes:~/kvm-ws-tests$ make LKVM=~/kvmtool/lkvm LKVM_ARGS=--pmu PERF=perf_4.3 tests-gicv2
+GICv2:
+do_hvc.bin:5690.17
+do_sgi.bin:9395.05
+do_sysreg.bin:5912.6
+maz@flakes:~/kvm-ws-tests$ make LKVM=~/kvmtool/lkvm PERF=perf_4.3 tests-gicv2
+GICv2:
+do_hvc.bin:5285.02
+do_sgi.bin:9131.24
+do_sysreg.bin:5563.7
+
+Caching the irq state and only injecting it if it has changed (just like we do for the timer) brings performance back to its previous level:
+
+diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
+index 176913f..b23e636 100644
+--- a/include/kvm/arm_pmu.h
++++ b/include/kvm/arm_pmu.h
+@@ -35,6 +35,7 @@ struct kvm_pmu {
+ 	int irq_num;
+ 	struct kvm_pmc pmc[ARMV8_PMU_MAX_COUNTERS];
+ 	bool ready;
++	bool irq_level;
+ };
+ 
+ #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index 904617e..7156f8b 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -229,13 +229,17 @@ void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val)
+ void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_pmu *pmu = &vcpu->arch.pmu;
+-	u64 overflow;
++	bool overflow;
+ 
+ 	if (!kvm_arm_pmu_v3_ready(vcpu))
+ 		return;
+ 
+-	overflow = kvm_pmu_overflow_status(vcpu);
+-	kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, !!overflow);
++	overflow = !!kvm_pmu_overflow_status(vcpu);
++	if (pmu->irq_level != overflow) {
++		pmu->irq_level = overflow;
++		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
++				    pmu->irq_num, overflow);
++	}
+ }
+ 
+ static inline struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
+
 
 Thanks,
+
+	M.
 -- 
-Shannon
+Jazz is not dead. It just smells funny...
