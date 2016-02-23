@@ -1,60 +1,85 @@
-From: Huang Shijie <shijie.huang@arm.com>
-Subject: Re: [PATCH v2 0/6] arm64: Add support of KVM with ACPI
-Date: Tue, 23 Feb 2016 10:31:57 +0800
-Message-ID: <20160223023156.GA11645@sha-win-210.asiapac.arm.com>
-References: <1455204804-31830-1-git-send-email-julien.grall@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v12 03/21] KVM: ARM64: Add offset defines for PMU
+ registers
+Date: Tue, 23 Feb 2016 08:33:13 +0000
+Message-ID: <56CC1949.2020907@arm.com>
+References: <1456133877-9584-1-git-send-email-zhaoshenglong@huawei.com>
+ <1456133877-9584-4-git-send-email-zhaoshenglong@huawei.com>
+ <56CB4A98.2020403@arm.com> <56CBBA06.4040902@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: 8BIT
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1455204804-31830-1-git-send-email-julien.grall@arm.com>
-Content-Disposition: inline
-Sender: linux-kernel-owner@vger.kernel.org
-To: Julien Grall <julien.grall@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, marc.zyngier@arm.com, fu.wei@linaro.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, wei@redhat.com, al.stone@linaro.org
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <56CBBA06.4040902@huawei.com>
+Sender: kvm-owner@vger.kernel.org
+To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 11, 2016 at 03:33:18PM +0000, Julien Grall wrote:
-> Hello,
->
-> This small series allows an ARM64 ACPI based platform to use KVM.
->
-> Currently the KVM code has to parse the firmware table to get the necessary
-> information to setup the virtual timer and virtual GIC.
->
-> However the parsing of those tables are already done in the GIC and arch
-> timer drivers.
->
-> This patch series introduces different helpers to retrieve the information
-> from different drivers avoiding to duplicate the parsing code.
->
-> Note there is patch series ([1] and [2]) adding support of KVM on ACPI,
-> although the approach chosen is completely different. The code to parse
-> the firmware tables are duplicated which I think make more complex to
-> support new firmware tables.
->
-> See the changes since v1 in the different patches.
->
-> Regards,
->
-> [1] https://lists.cs.columbia.edu/pipermail/kvmarm/2016-February/018482.html
-> [2] https://lists.cs.columbia.edu/pipermail/kvmarm/2016-February/018355.html
->
-> Julien Grall (6):
->   KVM: arm/arm64: arch_timer: Gather KVM specific information in a
->     structure
->   KVM: arm/arm64: arch_timer: Rely on the arch timer to parse the
->     firmware tables
->   irqchip/gic-v2: Gather ACPI specific data in a single structure
->   irqchip/gic-v2: Parse and export virtual GIC information
->   irqchip/gic-v3: Parse and export virtual GIC information
-Beside this patch (I do not have the gic-v3 hardware now), I tested this patch set with my JUNo-r1 board
-with kvmtool. It works fine.
+On 23/02/16 01:46, Shannon Zhao wrote:
+> 
+> 
+> On 2016/2/23 1:51, Marc Zyngier wrote:
+>> On 22/02/16 09:37, Shannon Zhao wrote:
+>>> From: Shannon Zhao <shannon.zhao@linaro.org>
+>>>
+>>> We are about to trap and emulate accesses to each PMU register
+>>> individually. This adds the context offsets for the AArch64 PMU
+>>> registers.
+>>>
+>>> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+>>> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+>>> Reviewed-by: Andrew Jones <drjones@redhat.com>
+>>> ---
+>>>  arch/arm64/include/asm/kvm_host.h | 15 +++++++++++++++
+>>>  1 file changed, 15 insertions(+)
+>>>
+>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>> index 6f0241f..6bab7fb 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -115,6 +115,21 @@ enum vcpu_sysreg {
+>>>  	MDSCR_EL1,	/* Monitor Debug System Control Register */
+>>>  	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
+>>>  
+>>> +	/* Performance Monitors Registers */
+>>> +	PMCR_EL0,	/* Control Register */
+>>> +	PMOVSSET_EL0,	/* Overflow Flag Status Set Register */
+>>> +	PMSELR_EL0,	/* Event Counter Selection Register */
+>>> +	PMEVCNTR0_EL0,	/* Event Counter Register (0-30) */
+>>> +	PMEVCNTR30_EL0 = PMEVCNTR0_EL0 + 30,
+>>> +	PMCCNTR_EL0,	/* Cycle Counter Register */
+>>> +	PMEVTYPER0_EL0,	/* Event Type Register (0-30) */
+>>> +	PMEVTYPER30_EL0 = PMEVTYPER0_EL0 + 30,
+>>> +	PMCCFILTR_EL0,	/* Cycle Count Filter Register */
+>>> +	PMCNTENSET_EL0,	/* Count Enable Set Register */
+>>> +	PMINTENSET_EL1,	/* Interrupt Enable Set Register */
+>>> +	PMUSERENR_EL0,	/* User Enable Register */
+>>> +	PMSWINC_EL0,	/* Software Increment Register */
+>>> +
+>>
+>> I've just noticed a rather fundamental issue with this: this makes it
+>> impossible to bisect the whole series.
+>>
+> Ah, sorry. Will fix this.
 
-Tested-by: Huang Shijie <shijie.huang@arm.com>
+Thanks.
 
+> 
+>> I was trying to pinpoint a performance regression with this series, and
+>> started bisecting.
+> You mean this series introduce a performance regression? Is there any
+> method to measure that? Then I can have a look too.
 
+I'm not quite sure this is related to this series. What I'm observing is
+that hackbench runs faster in a VM spawned with kvmtool than the same VM
+run with qemu. As in significantly faster (62 vs 55 seconds - 2 vcpus,
+1GB memory).
 
->   KVM: arm/arm64: vgic: Rely on the GIC driver to parse the firmware
->     tables
-IMPORTANT NOTICE: The contents of this email and any attachments are confidential and may also be privileged. If you are not the intended recipient, please notify the sender immediately and do not disclose the contents to any other person, use it for any purpose, or store or copy the information in any medium. Thank you.
+Given that hackbench doesn't do any IO, I don't really see why we should
+see a difference. I'll add support for the PMU to kvmtool today, and
+I'll be able to see if that has any impact.
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
