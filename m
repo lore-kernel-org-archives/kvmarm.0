@@ -1,203 +1,260 @@
-From: Shannon Zhao <shannon.zhao@linaro.org>
-Subject: Re: [PATCH v12 16/21] KVM: ARM64: Add PMU overflow interrupt routing
-Date: Tue, 23 Feb 2016 22:52:16 +0800
-Message-ID: <56CC7220.3020807@linaro.org>
-References: <1456133877-9584-1-git-send-email-zhaoshenglong@huawei.com>
- <1456133877-9584-17-git-send-email-zhaoshenglong@huawei.com>
- <56CC695E.4010805@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BB96F412F3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2016 09:45:55 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9Orl9bh1h3S8 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Feb 2016 09:45:53 -0500 (EST)
-Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 75DF3412DD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2016 09:45:53 -0500 (EST)
-Received: by mail-wm0-f54.google.com with SMTP id b205so203055283wmb.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2016 06:52:33 -0800 (PST)
-In-Reply-To: <56CC695E.4010805@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
-Cc: kvm@vger.kernel.org, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH v2 1/2] Add a rudimentary manpage
+Date: Tue, 23 Feb 2016 17:41:04 +0000
+Message-ID: <1456249265-13751-2-git-send-email-andre.przywara@arm.com>
+References: <1456249265-13751-1-git-send-email-andre.przywara@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1456249265-13751-1-git-send-email-andre.przywara@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: Dimitri John Ledkov <dimitri.j.ledkov@intel.com>, Sasha Levin <sasha.levin@oracle.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+The kvmtool documentation is somewhat lacking, also it is not easily
+accessible when living in the source tree only.
+Add a good ol' manpage to document at least the basic commands and
+their options.
+This level of documentation matches the one that is already there in
+the Documentation directory and should be subject to extension.
 
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+ Documentation/kvmtool.1 | 226 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 226 insertions(+)
+ create mode 100644 Documentation/kvmtool.1
 
-On 2016/2/23 22:14, Marc Zyngier wrote:
-> On 22/02/16 09:37, Shannon Zhao wrote:
->> From: Shannon Zhao <shannon.zhao@linaro.org>
->>
->> When calling perf_event_create_kernel_counter to create perf_event,
->> assign a overflow handler. Then when the perf event overflows, set the
->> corresponding bit of guest PMOVSSET register. If this counter is enabled
->> and its interrupt is enabled as well, kick the vcpu to sync the
->> interrupt.
->>
->> On VM entry, if there is counter overflowed, inject the interrupt with
->> the level set to 1. Otherwise, inject the interrupt with the level set
->> to 0.
->>
->> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
->> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
->> Reviewed-by: Andrew Jones <drjones@redhat.com>
->
-> As I mentioned yesterday, I was trying to pinpoint a performance drop, so I added PMU support to kvmtool (and made it an optional flag). This allowed be to find this:
->
->> ---
->>   arch/arm/kvm/arm.c    |  2 ++
->>   include/kvm/arm_pmu.h |  2 ++
->>   virt/kvm/arm/pmu.c    | 47 ++++++++++++++++++++++++++++++++++++++++++++++-
->>   3 files changed, 50 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
->> index dda1959..f54264c 100644
->> --- a/arch/arm/kvm/arm.c
->> +++ b/arch/arm/kvm/arm.c
->> @@ -28,6 +28,7 @@
->>   #include <linux/sched.h>
->>   #include <linux/kvm.h>
->>   #include <trace/events/kvm.h>
->> +#include <kvm/arm_pmu.h>
->>
->>   #define CREATE_TRACE_POINTS
->>   #include "trace.h"
->> @@ -577,6 +578,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>   		 * non-preemptible context.
->>   		 */
->>   		preempt_disable();
->> +		kvm_pmu_flush_hwstate(vcpu);
->>   		kvm_timer_flush_hwstate(vcpu);
->>   		kvm_vgic_flush_hwstate(vcpu);
->>
->> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
->> index 8bc92d1..cf68f9a 100644
->> --- a/include/kvm/arm_pmu.h
->> +++ b/include/kvm/arm_pmu.h
->> @@ -44,6 +44,7 @@ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
->>   void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
->>   void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
->>   void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val);
->> +void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu);
->>   void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val);
->>   void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val);
->>   void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
->> @@ -67,6 +68,7 @@ static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
->>   static inline void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val) {}
->>   static inline void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val) {}
->>   static inline void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val) {}
->> +static inline void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu) {}
->>   static inline void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val) {}
->>   static inline void kvm_pmu_handle_pmcr(struct kvm_vcpu *vcpu, u64 val) {}
->>   static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
->> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
->> index cda869c..6ac52ce 100644
->> --- a/virt/kvm/arm/pmu.c
->> +++ b/virt/kvm/arm/pmu.c
->> @@ -21,6 +21,7 @@
->>   #include <linux/perf_event.h>
->>   #include <asm/kvm_emulate.h>
->>   #include <kvm/arm_pmu.h>
->> +#include <kvm/arm_vgic.h>
->>
->>   /**
->>    * kvm_pmu_get_counter_value - get PMU counter value
->> @@ -181,6 +182,49 @@ void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val)
->>   }
->>
->>   /**
->> + * kvm_pmu_flush_hwstate - flush pmu state to cpu
->> + * @vcpu: The vcpu pointer
->> + *
->> + * Inject virtual PMU IRQ if IRQ is pending for this cpu.
->> + */
->> +void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu)
->> +{
->> +	struct kvm_pmu *pmu = &vcpu->arch.pmu;
->> +	u64 overflow;
->> +
->> +	if (!kvm_arm_pmu_v3_ready(vcpu))
->> +		return;
->> +
->> +	overflow = kvm_pmu_overflow_status(vcpu);
->> +	kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, !!overflow);
->
-> It turns out that this single line costs us about 400 cycles on each entry:
->
-Oh, it's really a time-consuming function.
-
-> maz@flakes:~/kvm-ws-tests$ make LKVM=~/kvmtool/lkvm LKVM_ARGS=--pmu PERF=perf_4.3 tests-gicv2
-> GICv2:
-> do_hvc.bin:5690.17
-> do_sgi.bin:9395.05
-> do_sysreg.bin:5912.6
-> maz@flakes:~/kvm-ws-tests$ make LKVM=~/kvmtool/lkvm PERF=perf_4.3 tests-gicv2
-> GICv2:
-> do_hvc.bin:5285.02
-> do_sgi.bin:9131.24
-> do_sysreg.bin:5563.7
->
-> Caching the irq state and only injecting it if it has changed (just like we do for the timer) brings performance back to its previous level:
->
-Marc, thanks a lot for finding out this. I'll merge below changes into 
-this series and send out v13 tomorrow.
-
-> diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-> index 176913f..b23e636 100644
-> --- a/include/kvm/arm_pmu.h
-> +++ b/include/kvm/arm_pmu.h
-> @@ -35,6 +35,7 @@ struct kvm_pmu {
->   	int irq_num;
->   	struct kvm_pmc pmc[ARMV8_PMU_MAX_COUNTERS];
->   	bool ready;
-> +	bool irq_level;
->   };
->
->   #define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
-> diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-> index 904617e..7156f8b 100644
-> --- a/virt/kvm/arm/pmu.c
-> +++ b/virt/kvm/arm/pmu.c
-> @@ -229,13 +229,17 @@ void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val)
->   void kvm_pmu_flush_hwstate(struct kvm_vcpu *vcpu)
->   {
->   	struct kvm_pmu *pmu = &vcpu->arch.pmu;
-> -	u64 overflow;
-> +	bool overflow;
->
->   	if (!kvm_arm_pmu_v3_ready(vcpu))
->   		return;
->
-> -	overflow = kvm_pmu_overflow_status(vcpu);
-> -	kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id, pmu->irq_num, !!overflow);
-> +	overflow = !!kvm_pmu_overflow_status(vcpu);
-> +	if (pmu->irq_level != overflow) {
-> +		pmu->irq_level = overflow;
-> +		kvm_vgic_inject_irq(vcpu->kvm, vcpu->vcpu_id,
-> +				    pmu->irq_num, overflow);
-> +	}
->   }
->
->   static inline struct kvm_vcpu *kvm_pmc_to_vcpu(struct kvm_pmc *pmc)
->
->
-> Thanks,
->
-> 	M.
->
-
+diff --git a/Documentation/kvmtool.1 b/Documentation/kvmtool.1
+new file mode 100644
+index 0000000..2b8c274
+--- /dev/null
++++ b/Documentation/kvmtool.1
+@@ -0,0 +1,226 @@
++.\" Manpage for kvmtool
++.\" Copyright (C) 2015 by Andre Przywara <andre.przywara@arm.com>
++.TH kvmtool 1 "11 Nov 2015" "0.1" "kvmtool man page"
++.SH NAME
++kvmtool \- running KVM guests
++.SH SYNOPSIS
++lkvm COMMAND [ARGS]
++.SH DESCRIPTION
++kvmtool is a userland tool for creating and controlling KVM guests.
++.SH "KVMTOOL COMMANDS"
++.sp
++.PP
++.B run -k <kernel\-image> [\-c <cores>] [\-m <MiB>] [\-p <command line>]
++.br
++.B [\-i <initrd>] [\-d <image file>] [\-\-console serial|virtio|hv]
++.br
++.B [\-\-dev <node>] [\-\-debug] [\-\-debug\-single\-step] [\-\-debug\-ioport]
++.RS 4
++Run a guest.
++.sp
++.B \-k, \-\-kernel <image file>
++.RS 4
++The virtual machine kernel.
++.RE
++.sp
++.B \-c, \-\-cpus <n>
++.RS 4
++The number of virtual CPUs to run.
++.RE
++.sp
++.B \-m, \-\-mem <n>
++.RS 4
++Virtual machine memory size in MiB.
++.RE
++.sp
++.B \-p, \-\-params <parameters>
++.RS 4
++Additional kernel command line arguments.
++.RE
++.sp
++.B \-i, \-\-initrd <image file>
++.RS 4
++Initial RAM disk image.
++.RE
++.sp
++.B \-d, \-\-disk <image file|directory>
++.RS 4
++A disk image file or a rootfs directory.
++.RE
++.sp
++.B \-\-console serial|virtio|hv
++.RS 4
++Console to use.
++.RE
++.sp
++.B \-\-dev <device node>
++.RS 4
++KVM device file (instead of the default /dev/kvm).
++.RE
++.sp
++.B \-\-debug
++.RS 4
++Enable debug messages.
++.RE
++.sp
++.B \-\-debug-single-step
++.RS 4
++Enable single stepping.
++.RE
++.sp
++.B \-\-debug-ioport
++.RS 4
++Enable ioport debugging.
++.RE
++.RE
++.PP
++.B setup <name>
++.RS 4
++Setup a new virtual machine. This creates a new rootfs in the .lkvm
++folder of your home directory.
++.RE
++.PP
++.B pause \-\-all|\-\-name <name>
++.RS 4
++Pause a virtual machine.
++.sp
++.B \-a, \-\-all
++.RS 4
++Pause all running instances.
++.RE
++.sp
++.B \-n, \-\-name <name>
++.RS 4
++Pause that specified instance. For a list of running instances, see \fI lkvm list\fR.
++.RE
++.RE
++.PP
++.B resume --all|--name <name>
++.RS 4
++Resume a previously paused virtual machine.
++.sp
++.B \-a, \-\-all
++.RS 4
++Resume all running instances.
++.RE
++.sp
++.B \-n, \-\-name <name>
++.RS 4
++Resume that specified instance. For a list of running instances, see \fI lkvm list\fR.
++.RE
++.RE
++.PP
++.B list [\-i] [\-r]
++.RS 4
++Print a list of running instances on the host. This is restricted to instances
++started by the current user, as it looks in the .lkvm folder in your home
++directory to find the socket files.
++.sp
++.B \-i, \-\-run
++.RS 4
++List all running instances.
++.RE
++.sp
++.B \-r, \-\-rootfs
++.RS 4
++List rootfs instances.
++.RE
++.RE
++.PP
++.B debug --all|--name <guest name> [--dump] [--nmi <n>] [--sysrq <rq>]
++.RS 4
++Print debug information from a running VM instance.
++.sp
++.B \-a, \-\-all
++.RS 4
++Debug all running instances.
++.RE
++.PP
++.B \-n, \-\-name <guest name>
++.RS 4
++Debug the specified instance.
++.RE
++.sp
++.B \-d, \-\-dump
++.RS 4
++Generate a debug dump from guest.
++.RE
++.PP
++.B \-m, \-\-nmi <VCPU nr>
++.RS 4
++Generate an NMI on the specified virtual CPU.
++.RE
++.PP
++.B \-s, \-\-sysrq <sysrq>
++.RS 4
++Inject a Linux sysrq into the guest.
++.RE
++.RE
++.PP
++.B balloon \-\-name <guest name> \-\-inflate|\-\-deflate <amount in MB>
++.RS 4
++This command inflates or deflates the virtio balloon located in the
++specified instance.
++\-\-inflate increases the size of the balloon, thus \fIdecreasing\fR the
++amount of virtual RAM available for the guest. \-\-deflate returns previously
++inflated memory back to the guest.
++.sp
++.B \-n, \-\-name <guest name>
++.RS 4
++Ballon the specified instance. For a list of all instances, see \fI"lkvm list"\fR.
++.RE
++.PP
++.B \-i, \-\-inflate <n>
++.RS 4
++Inflates the ballon by the specified number of Megabytes. This decreases the
++amount of usable memory in the guest.
++.RE
++.PP
++.B \-d, \-\-deflate <n>
++.RS 4
++Deflates the ballon by the specified number of Megabytes. This increases the
++amount of usable memory in the guest.
++.RE
++.RE
++.PP
++.B stop --all|--name <name>
++.RS 4
++Stop a running instance.
++.sp
++.B \-a, \-\-all
++.RS 4
++Stop all running instances.
++.RE
++.sp
++.B \-n, \-\-name <name>
++.RS 4
++Stop the specified instance. For a list of running instances, see \fI lkvm list\fR.
++.RE
++.RE
++.PP
++.B stat \-\-all|\-\-name <name> [\-m]
++.RS 4
++Print statistics about a running instance.
++.sp
++.B \-m, \-\-memory
++.RS 4
++Display memory statistics.
++.RE
++.RE
++.PP
++.B sandbox (\fIlkvm run arguments\fR) \-\- [sandboxed command]
++.RS 4
++Run a command in a sandboxed guest. Kvmtool will inject a special init
++binary which will do an initial setup of the guest Linux and then
++lauch a shell script with the specified command. Upon this command ending,
++the guest will be shutdown.
++.RE
++.SH EXAMPLES
++.RS 4
++\fB$\fR lkvm run -k bzImage
++.RE
++.SH SEE ALSO
++qemu(1), kvm(4)
++.SH BUGS
++.SH AUTHOR
++Andre Przywara <andre.przywara@arm.com>
 -- 
-Shannon
+2.6.4
+
