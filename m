@@ -1,84 +1,59 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v2 0/2] kvmtool: replace documentations stubs with manpage
-Date: Tue, 23 Feb 2016 17:41:03 +0000
-Message-ID: <1456249265-13751-1-git-send-email-andre.przywara@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v12 07/21] KVM: ARM64: PMU: Add perf event map and
+ introduce perf event creating function
+Date: Tue, 23 Feb 2016 17:42:42 +0000
+Message-ID: <56CC9A12.6040001@arm.com>
+References: <1456133877-9584-1-git-send-email-zhaoshenglong@huawei.com>
+ <1456133877-9584-8-git-send-email-zhaoshenglong@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 63E37412F3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2016 12:34:31 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QbogyVumoLlH for <kvmarm@lists.cs.columbia.edu>;
- Tue, 23 Feb 2016 12:34:30 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1D522412E6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 23 Feb 2016 12:34:29 -0500 (EST)
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Will Deacon <will.deacon@arm.com>
-Cc: Sasha Levin <sasha.levin@oracle.com>, kvmarm@lists.cs.columbia.edu, Dimitri John Ledkov <dimitri.j.ledkov@intel.com>, kvm@vger.kernel.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1456133877-9584-8-git-send-email-zhaoshenglong@huawei.com>
+Sender: kvm-owner@vger.kernel.org
+To: Shannon Zhao <zhaoshenglong@huawei.com>, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org
+Cc: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, will.deacon@arm.com, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Hi Shannon,
 
-an update fixing the missing option enumeration for the run command
-that Will complained about.
-----------
-As I got annoyed with the availability and quality of the
-documentation and always wanted to write a manpage, I just took this
-first step by replacing the stub text files in the Documentation
-directory with a manpage.
-This is clearly only the beginning, there is more functionality which
-currently is not documented at all (networking comes to mind).
+Still picking up on details...
 
-Cheers,
-Andre.
+On 22/02/16 09:37, Shannon Zhao wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
+> 
+> When we use tools like perf on host, perf passes the event type and the
+> id of this event type category to kernel, then kernel will map them to
+> hardware event number and write this number to PMU PMEVTYPER<n>_EL0
+> register. When getting the event number in KVM, directly use raw event
+> type to create a perf_event for it.
+> 
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+> ---
+>  arch/arm64/include/asm/perf_event.h |   2 +
+>  arch/arm64/kvm/Makefile             |   1 +
+>  include/kvm/arm_pmu.h               |  12 ++++
+>  virt/kvm/arm/pmu.c                  | 122 ++++++++++++++++++++++++++++++++++++
+>  4 files changed, 137 insertions(+)
+>  create mode 100644 virt/kvm/arm/pmu.c
+> 
+> diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
+> index 5c77ef8..867140d 100644
+> --- a/arch/arm64/include/asm/perf_event.h
+> +++ b/arch/arm64/include/asm/perf_event.h
+> @@ -29,6 +29,8 @@
+>  #define ARMV8_PMU_PMCR_D	(1 << 3) /* CCNT counts every 64th cpu cycle */
+>  #define ARMV8_PMU_PMCR_X	(1 << 4) /* Export to ETM */
+>  #define ARMV8_PMU_PMCR_DP	(1 << 5) /* Disable CCNT if non-invasive debug*/
+> +/* Determines which bit of PMCCNTR_EL0 generates an overflow */
+> +#define ARMV8_PMU_PMCR_LC	(1 << 6)
 
-Andre Przywara (2):
-  Add a rudimentary manpage
-  Documentation: remove documentation stubs and common-cmds.h generation
+nit: this #define is only being used in patch #14. Consider moving it
+there...
 
- .gitignore                    |   1 -
- Documentation/kvm-balloon.txt |  24 -----
- Documentation/kvm-debug.txt   |  16 ---
- Documentation/kvm-list.txt    |  16 ---
- Documentation/kvm-pause.txt   |  16 ---
- Documentation/kvm-resume.txt  |  16 ---
- Documentation/kvm-run.txt     |  62 ------------
- Documentation/kvm-sandbox.txt |  16 ---
- Documentation/kvm-setup.txt   |  15 ---
- Documentation/kvm-stat.txt    |  19 ----
- Documentation/kvm-stop.txt    |  16 ---
- Documentation/kvm-version.txt |  21 ----
- Documentation/kvmtool.1       | 226 ++++++++++++++++++++++++++++++++++++++++++
- Makefile                      |  10 --
- command-list.txt              |  15 ---
- include/common-cmds.h         |  19 ++++
- 16 files changed, 245 insertions(+), 263 deletions(-)
- delete mode 100644 Documentation/kvm-balloon.txt
- delete mode 100644 Documentation/kvm-debug.txt
- delete mode 100644 Documentation/kvm-list.txt
- delete mode 100644 Documentation/kvm-pause.txt
- delete mode 100644 Documentation/kvm-resume.txt
- delete mode 100644 Documentation/kvm-run.txt
- delete mode 100644 Documentation/kvm-sandbox.txt
- delete mode 100644 Documentation/kvm-setup.txt
- delete mode 100644 Documentation/kvm-stat.txt
- delete mode 100644 Documentation/kvm-stop.txt
- delete mode 100644 Documentation/kvm-version.txt
- create mode 100644 Documentation/kvmtool.1
- delete mode 100644 command-list.txt
- create mode 100644 include/common-cmds.h
+Thanks,
 
+	M.
 -- 
-2.6.4
+Jazz is not dead. It just smells funny...
