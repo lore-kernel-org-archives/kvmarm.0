@@ -1,102 +1,49 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 1/3] KVM: arm/arm64: vgic: Ensure bitmaps are long enough
-Date: Wed, 24 Feb 2016 17:33:42 +0000
-Message-ID: <1456335224-20603-2-git-send-email-marc.zyngier@arm.com>
-References: <1456335224-20603-1-git-send-email-marc.zyngier@arm.com>
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v13 01/20] ARM64: Move PMU register related defines to
+ asm/perf_event.h
+Date: Wed, 24 Feb 2016 17:52:48 +0000
+Message-ID: <20160224175247.GE12471@arm.com>
+References: <1456290520-10012-1-git-send-email-zhaoshenglong@huawei.com>
+ <1456290520-10012-2-git-send-email-zhaoshenglong@huawei.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1456335224-20603-1-git-send-email-marc.zyngier@arm.com>
+Content-Disposition: inline
+In-Reply-To: <1456290520-10012-2-git-send-email-zhaoshenglong@huawei.com>
 Sender: kvm-owner@vger.kernel.org
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Mark Rutland <mark.rutland@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Gleb Natapov <gleb@kernel.org>
+To: Shannon Zhao <zhaoshenglong@huawei.com>
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Mark Rutland <mark.rutland@arm.com>
+On Wed, Feb 24, 2016 at 01:08:21PM +0800, Shannon Zhao wrote:
+> From: Shannon Zhao <shannon.zhao@linaro.org>
+> 
+> To use the ARMv8 PMU related register defines from the KVM code, we move
+> the relevant definitions to asm/perf_event.h header file and rename them
+> with prefix ARMV8_PMU_.
+> 
+> Signed-off-by: Anup Patel <anup.patel@linaro.org>
+> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> Reviewed-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  arch/arm64/include/asm/perf_event.h | 35 +++++++++++++++++++
+>  arch/arm64/kernel/perf_event.c      | 68 ++++++++++---------------------------
+>  2 files changed, 52 insertions(+), 51 deletions(-)
 
-When we allocate bitmaps in vgic_vcpu_init_maps, we divide the number of
-bits we need by 8 to figure out how many bytes to allocate. However,
-bitmap elements are always accessed as unsigned longs, and if we didn't
-happen to allocate a size such that size % sizeof(unsigned long) == 0,
-bitmap accesses may go past the end of the allocation.
+Looks fine to me, but we're going to get some truly horrible conflicts
+in -next.
 
-When using KASAN (which does byte-granular access checks), this results
-in a continuous stream of BUGs whenever these bitmaps are accessed:
+I'm open to suggestions on the best way to handle this, but one way
+would be:
 
-=============================================================================
-BUG kmalloc-128 (Tainted: G    B          ): kasan: bad access detected
------------------------------------------------------------------------------
+  1. Duplicate all the #defines privately in KVM (queue via kvm tree)
+  2. Rebase this patch onto my perf/updates branch [1] (queue via me)
+  3. Patch at -rc1 dropping the #defines from (1) and moving to the new
+     perf_event.h stuff
 
-INFO: Allocated in vgic_init.part.25+0x55c/0x990 age=7493 cpu=3 pid=1730
-INFO: Slab 0xffffffbde6d5da40 objects=16 used=15 fp=0xffffffc935769700 flags=0x4000000000000080
-INFO: Object 0xffffffc935769500 @offset=1280 fp=0x          (null)
+Thoughts?
 
-Bytes b4 ffffffc9357694f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-Object ffffffc935769500: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-Object ffffffc935769510: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-Object ffffffc935769520: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-Object ffffffc935769530: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-Object ffffffc935769540: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-Object ffffffc935769550: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-Object ffffffc935769560: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-Object ffffffc935769570: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-Padding ffffffc9357695b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-Padding ffffffc9357695c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-Padding ffffffc9357695d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-Padding ffffffc9357695e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-Padding ffffffc9357695f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-CPU: 3 PID: 1740 Comm: kvm-vcpu-0 Tainted: G    B           4.4.0+ #17
-Hardware name: ARM Juno development board (r1) (DT)
-Call trace:
-[<ffffffc00008e770>] dump_backtrace+0x0/0x280
-[<ffffffc00008ea04>] show_stack+0x14/0x20
-[<ffffffc000726360>] dump_stack+0x100/0x188
-[<ffffffc00030d324>] print_trailer+0xfc/0x168
-[<ffffffc000312294>] object_err+0x3c/0x50
-[<ffffffc0003140fc>] kasan_report_error+0x244/0x558
-[<ffffffc000314548>] __asan_report_load8_noabort+0x48/0x50
-[<ffffffc000745688>] __bitmap_or+0xc0/0xc8
-[<ffffffc0000d9e44>] kvm_vgic_flush_hwstate+0x1bc/0x650
-[<ffffffc0000c514c>] kvm_arch_vcpu_ioctl_run+0x2ec/0xa60
-[<ffffffc0000b9a6c>] kvm_vcpu_ioctl+0x474/0xa68
-[<ffffffc00036b7b0>] do_vfs_ioctl+0x5b8/0xcb0
-[<ffffffc00036bf34>] SyS_ioctl+0x8c/0xa0
-[<ffffffc000086cb0>] el0_svc_naked+0x24/0x28
-Memory state around the buggy address:
- ffffffc935769400: 00 00 fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffffffc935769480: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffffffc935769500: 04 fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-                   ^
- ffffffc935769580: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffffffc935769600: 00 00 00 00 fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
+Will
 
-Fix the issue by always allocating a multiple of sizeof(unsigned long),
-as we do elsewhere in the vgic code.
-
-Fixes: c1bfb577a ("arm/arm64: KVM: vgic: switch to dynamic allocation")
-Cc: stable@vger.kernel.org
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Mark Rutland <mark.rutland@arm.com>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
----
- virt/kvm/arm/vgic.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 043032c..00429b3 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -1875,8 +1875,8 @@ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu)
- static int vgic_vcpu_init_maps(struct kvm_vcpu *vcpu, int nr_irqs)
- {
- 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
--
--	int sz = (nr_irqs - VGIC_NR_PRIVATE_IRQS) / 8;
-+	int nr_longs = BITS_TO_LONGS(nr_irqs - VGIC_NR_PRIVATE_IRQS);
-+	int sz = nr_longs * sizeof(unsigned long);
- 	vgic_cpu->pending_shared = kzalloc(sz, GFP_KERNEL);
- 	vgic_cpu->active_shared = kzalloc(sz, GFP_KERNEL);
- 	vgic_cpu->pend_act_shared = kzalloc(sz, GFP_KERNEL);
--- 
-2.1.4
-
+[1] git://git.kernel.org/pub/scm/linux/kernel/git/will/linux.git perf/updates
