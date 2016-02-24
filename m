@@ -1,42 +1,68 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 1/4] pre_init: rename x86/init.S to x86/init64.S
-Date: Wed, 24 Feb 2016 15:33:05 +0000
-Message-ID: <1456327988-31568-2-git-send-email-andre.przywara@arm.com>
-References: <1456327988-31568-1-git-send-email-andre.przywara@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: [PATCH 3/3] arm64: KVM: vgic-v3: Restore ICH_APR0Rn_EL2 before ICH_APR1Rn_EL2
+Date: Wed, 24 Feb 2016 17:33:44 +0000
+Message-ID: <1456335224-20603-4-git-send-email-marc.zyngier@arm.com>
+References: <1456335224-20603-1-git-send-email-marc.zyngier@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1456327988-31568-1-git-send-email-andre.przywara@arm.com>
+In-Reply-To: <1456335224-20603-1-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Will Deacon <will.deacon@arm.com>
-Cc: Oleg Nesterov <oleg@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Mark Rutland <mark.rutland@arm.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Gleb Natapov <gleb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-To make room for the 32-bit implementation of that assembly stub,
-rename it.
+The GICv3 architecture spec says:
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Writing to the active priority registers in any order other than
+the following order will result in UNPREDICTABLE behavior:
+- ICH_AP0R<n>_EL2.
+- ICH_AP1R<n>_EL2.
+
+So let's not pointlessly go against the rule...
+
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- Makefile                 | 2 +-
- x86/{init.S => init64.S} | 0
- 2 files changed, 1 insertion(+), 1 deletion(-)
- rename x86/{init.S => init64.S} (100%)
+ arch/arm64/kvm/hyp/vgic-v3-sr.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 19eb7e5..e26afa3 100644
---- a/Makefile
-+++ b/Makefile
-@@ -110,7 +110,7 @@ endif
- ifeq ($(ARCH),x86_64)
- 	ARCH         := x86
- 	DEFINES      += -DCONFIG_X86_64
--	ARCH_PRE_INIT = x86/init.S
-+	ARCH_PRE_INIT = x86/init64.S
- endif
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index 9142e082..5dd2a26 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -149,16 +149,6 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
  
- ### Arch-specific stuff
-diff --git a/x86/init.S b/x86/init64.S
-similarity index 100%
-rename from x86/init.S
-rename to x86/init64.S
+ 	switch (nr_pri_bits) {
+ 	case 7:
+-		 write_gicreg(cpu_if->vgic_ap1r[3], ICH_AP1R3_EL2);
+-		 write_gicreg(cpu_if->vgic_ap1r[2], ICH_AP1R2_EL2);
+-	case 6:
+-		 write_gicreg(cpu_if->vgic_ap1r[1], ICH_AP1R1_EL2);
+-	default:
+-		 write_gicreg(cpu_if->vgic_ap1r[0], ICH_AP1R0_EL2);
+-	}	 	                           
+-		 	                           
+-	switch (nr_pri_bits) {
+-	case 7:
+ 		 write_gicreg(cpu_if->vgic_ap0r[3], ICH_AP0R3_EL2);
+ 		 write_gicreg(cpu_if->vgic_ap0r[2], ICH_AP0R2_EL2);
+ 	case 6:
+@@ -167,6 +157,16 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+ 		 write_gicreg(cpu_if->vgic_ap0r[0], ICH_AP0R0_EL2);
+ 	}
+ 
++	switch (nr_pri_bits) {
++	case 7:
++		 write_gicreg(cpu_if->vgic_ap1r[3], ICH_AP1R3_EL2);
++		 write_gicreg(cpu_if->vgic_ap1r[2], ICH_AP1R2_EL2);
++	case 6:
++		 write_gicreg(cpu_if->vgic_ap1r[1], ICH_AP1R1_EL2);
++	default:
++		 write_gicreg(cpu_if->vgic_ap1r[0], ICH_AP1R0_EL2);
++	}
++
+ 	switch (max_lr_idx) {
+ 	case 15:
+ 		write_gicreg(cpu_if->vgic_lr[VGIC_V3_LR_INDEX(15)], ICH_LR15_EL2);
 -- 
-2.6.4
+2.1.4
 
