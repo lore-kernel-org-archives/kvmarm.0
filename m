@@ -1,134 +1,100 @@
-From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH v13 01/20] ARM64: Move PMU register related defines to
- asm/perf_event.h
-Date: Thu, 25 Feb 2016 10:48:18 +0000
-Message-ID: <20160225104818.GB12784@arm.com>
-References: <1456290520-10012-1-git-send-email-zhaoshenglong@huawei.com>
- <1456290520-10012-2-git-send-email-zhaoshenglong@huawei.com>
- <20160224175247.GE12471@arm.com>
- <56CE6098.8070001@huawei.com>
+From: xu mike <upennmike@gmail.com>
+Subject: [Question] Can KVM run on Freescale IMX6 SABRE board?
+Date: Thu, 25 Feb 2016 10:17:18 -0500
+Message-ID: <CAPSnSYoxmmDm--vuigyHb2xPr1GpSf22meO59kDQh1s2HFySiA@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <56CE6098.8070001@huawei.com>
-Sender: kvm-owner@vger.kernel.org
-To: Shannon Zhao <zhaoshenglong@huawei.com>
-Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
+Content-Type: multipart/mixed; boundary="===============8309639251725582970=="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C8DE4852F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Feb 2016 10:10:32 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ktzh490VAE1u for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Feb 2016 10:10:30 -0500 (EST)
+Received: from mail-yw0-f169.google.com (mail-yw0-f169.google.com
+ [209.85.161.169])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DE68248529
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Feb 2016 10:10:30 -0500 (EST)
+Received: by mail-yw0-f169.google.com with SMTP id e63so44687521ywc.3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Feb 2016 07:17:19 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Feb 25, 2016 at 10:02:00AM +0800, Shannon Zhao wrote:
-> On 2016/2/25 1:52, Will Deacon wrote:
-> > On Wed, Feb 24, 2016 at 01:08:21PM +0800, Shannon Zhao wrote:
-> >> From: Shannon Zhao <shannon.zhao@linaro.org>
-> >>
-> >> To use the ARMv8 PMU related register defines from the KVM code, we move
-> >> the relevant definitions to asm/perf_event.h header file and rename them
-> >> with prefix ARMV8_PMU_.
-> >>
-> >> Signed-off-by: Anup Patel <anup.patel@linaro.org>
-> >> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-> >> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-> >> Reviewed-by: Andrew Jones <drjones@redhat.com>
-> >> ---
-> >>  arch/arm64/include/asm/perf_event.h | 35 +++++++++++++++++++
-> >>  arch/arm64/kernel/perf_event.c      | 68 ++++++++++---------------------------
-> >>  2 files changed, 52 insertions(+), 51 deletions(-)
-> > 
-> > Looks fine to me, but we're going to get some truly horrible conflicts
-> > in -next.
-> > 
-> > I'm open to suggestions on the best way to handle this, but one way
-> > would be:
-> > 
-> >   1. Duplicate all the #defines privately in KVM (queue via kvm tree)
-> This way seems not proper I think.
-> 
-> >   2. Rebase this patch onto my perf/updates branch [1] (queue via me)
-> While to this series, it really relies on the perf_event.h to compile
-> and test, so maybe for KVM-ARM and KVM maintainers it's not proper.
-> 
-> >   3. Patch at -rc1 dropping the #defines from (1) and moving to the new
-> >      perf_event.h stuff
-> > 
-> I vote for this way. Since the patch in [1] is small and nothing else
-> relies on them, I think it would be simple to rebase them onto this series.
+--===============8309639251725582970==
+Content-Type: multipart/alternative; boundary=001a114e4598a60333052c99ad83
 
-That was supposed to be a sequence of actions... :/
+--001a114e4598a60333052c99ad83
+Content-Type: text/plain; charset=UTF-8
 
-> > Thoughts?
-> > 
-> Anyway, there are only 3 lines which have conflicts. I'm not sure
-> whether we could handle this when we merge them.
+Hi,
 
-I think we're looking at different conflicts. I resolved it (see below),
-but I'd really rather this didn't happen at the point where perf/updates
-hits kvm-arm (i.e. torvalds).
+I'm a student from the University of Pennsylvania. I want to try KVM on ARM
+boards.
 
-Will
+I have a Freescale IMX6 board [1] which has ARM Cortex A9 processors.
+I'm wondering if KVM can run on the Freescale IMX6 board? or
+Can KVM run on any ARM board with ARM Cortex A9 processors?
 
---->8
+I noticed at [2] that " KVM/ARM is designed specifically to work on ARM
+processors with the virtualization extensions enabled to run unmodified
+guest operating systems."
+I'm wondering if this statement is still true?
 
-diff --cc arch/arm64/kernel/perf_event.c
-index 1cc61fc321d9,212c9fc44141..000000000000
---- a/arch/arm64/kernel/perf_event.c
-+++ b/arch/arm64/kernel/perf_event.c
-@@@ -776,11 -684,8 +741,12 @@@ static void armv8pmu_reset(void *info
-                armv8pmu_disable_intens(idx);
-        }
-  
- -      /* Initialize & Reset PMNC: C and P bits. */
- -      armv8pmu_pmcr_write(ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C);
- +      /*
- +       * Initialize & Reset PMNC. Request overflow interrupt for
- +       * 64 bit cycle counter but cheat in armv8pmu_write_counter().
- +       */
--       armv8pmu_pmcr_write(ARMV8_PMCR_P | ARMV8_PMCR_C | ARMV8_PMCR_LC);
-++      armv8pmu_pmcr_write(ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C |
-++                          ARMV8_PMU_PMCR_LC);
-  }
-  
-  static int armv8_pmuv3_map_event(struct perf_event *event)
-@@@ -801,16 -706,9 +767,16 @@@ static int armv8_a57_map_event(struct p
-  {
-        return armpmu_map_event(event, &armv8_a57_perf_map,
-                                &armv8_a57_perf_cache_map,
--                               ARMV8_EVTYPE_EVENT);
-+                               ARMV8_PMU_EVTYPE_EVENT);
-  }
-  
- +static int armv8_thunder_map_event(struct perf_event *event)
- +{
- +      return armpmu_map_event(event, &armv8_thunder_perf_map,
- +                              &armv8_thunder_perf_cache_map,
--                               ARMV8_EVTYPE_EVENT);
-++                              ARMV8_PMU_EVTYPE_EVENT);
- +}
- +
-  static void armv8pmu_read_num_pmnc_events(void *info)
-  {
-        int *nb_cnt = info;
-diff --git a/arch/arm64/include/asm/perf_event.h b/arch/arm64/include/asm/perf_event.h
-index 5c77ef8bf5b5..152ad9cb9bb0 100644
---- a/arch/arm64/include/asm/perf_event.h
-+++ b/arch/arm64/include/asm/perf_event.h
-@@ -29,6 +29,7 @@
- #define ARMV8_PMU_PMCR_D       (1 << 3) /* CCNT counts every 64th cpu cycle */
- #define ARMV8_PMU_PMCR_X       (1 << 4) /* Export to ETM */
- #define ARMV8_PMU_PMCR_DP      (1 << 5) /* Disable CCNT if non-invasive debug*/
-+#define ARMV8_PMU_PMCR_LC      (1 << 6) /* Overflow on 64 bit cycle counter */
- #define        ARMV8_PMU_PMCR_N_SHIFT  11       /* Number of counters supported */
- #define        ARMV8_PMU_PMCR_N_MASK   0x1f
- #define        ARMV8_PMU_PMCR_MASK     0x3f     /* Mask for writable bits */
-@@ -42,8 +43,8 @@
- /*
-  * PMXEVTYPER: Event selection reg
-  */
--#define        ARMV8_PMU_EVTYPE_MASK   0xc80003ff      /* Mask for writable bits */
--#define        ARMV8_PMU_EVTYPE_EVENT  0x3ff           /* Mask for EVENT bits */
-+#define        ARMV8_PMU_EVTYPE_MASK   0xc800ffff      /* Mask for writable bits */
-+#define        ARMV8_PMU_EVTYPE_EVENT  0xffff          /* Mask for EVENT bits */
- 
- /*
-  * Event filters for PMUv3
 
+ [1]
+http://www.nxp.com/products/microcontrollers-and-processors/arm-processors/i.mx-applications-processors-based-on-arm-cores/i.mx-6-processors/i.mx6qp/sabre-board-for-smart-devices-reference-design-based-on-the-i.mx-6-series:RDIMX6SABREBRD
+[2] https://lwn.net/Articles/557132/
+
+Thank you very much for your time and help!
+
+Best regards,
+
+Mike
+
+--001a114e4598a60333052c99ad83
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Hi,<br><br>I&#39;m a student from the University of Pennsy=
+lvania. I want to try KVM on ARM boards.<br><br>I have a Freescale IMX6 boa=
+rd [1] which has ARM Cortex A9 processors. <br>I&#39;m wondering if KVM can=
+ run on the Freescale IMX6 board? or<br>Can KVM run on any ARM board with A=
+RM Cortex A9 processors?<br><br>I noticed at [2] that &quot; KVM/ARM is des=
+igned specifically to work on ARM processors with the virtualization extens=
+ions enabled to run unmodified guest operating systems.&quot;<div>I&#39;m w=
+ondering if this statement is still true?=C2=A0<br><br><br>=C2=A0[1] <a hre=
+f=3D"http://www.nxp.com/products/microcontrollers-and-processors/arm-proces=
+sors/i.mx-applications-processors-based-on-arm-cores/i.mx-6-processors/i.mx=
+6qp/sabre-board-for-smart-devices-reference-design-based-on-the-i.mx-6-seri=
+es:RDIMX6SABREBRD">http://www.nxp.com/products/microcontrollers-and-process=
+ors/arm-processors/i.mx-applications-processors-based-on-arm-cores/i.mx-6-p=
+rocessors/i.mx6qp/sabre-board-for-smart-devices-reference-design-based-on-t=
+he-i.mx-6-series:RDIMX6SABREBRD</a><br>[2] <a href=3D"https://lwn.net/Artic=
+les/557132/">https://lwn.net/Articles/557132/</a></div><div><br></div><div>=
+Thank you very much for your time and help!</div><div><br></div><div>Best r=
+egards,</div><div><br></div><div>Mike</div></div>
+
+--001a114e4598a60333052c99ad83--
+
+--===============8309639251725582970==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============8309639251725582970==--
