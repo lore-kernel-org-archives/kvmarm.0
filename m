@@ -1,22 +1,22 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 4/8] arm64: cpufeature: Check availability of AArch32
-Date: Thu, 25 Feb 2016 09:52:44 +0000
-Message-ID: <1456393968-17386-5-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH v2 8/8] arm64: kvm: Check support for AArch32 for 32bit guests
+Date: Thu, 25 Feb 2016 09:52:48 +0000
+Message-ID: <1456393968-17386-9-git-send-email-suzuki.poulose@arm.com>
 References: <1456393968-17386-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B2FB1496A4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Feb 2016 04:46:25 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8E8DD49861
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Feb 2016 04:46:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1wcmzk46jpk5 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 25 Feb 2016 04:46:21 -0500 (EST)
+ with ESMTP id 9JDabd1vAS7B for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 25 Feb 2016 04:46:28 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 06836496EC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Feb 2016 04:46:20 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B803E4969A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 25 Feb 2016 04:46:27 -0500 (EST)
 In-Reply-To: <1456393968-17386-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,192 +31,59 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, ynorov@caviumnetworks.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On ARMv8 support for AArch32 state is optional. Hence it is
-not safe to check the AArch32 ID registers for sanity, which
-could lead to false warnings. This patch makes sure that the
-AArch32 state is implemented before we keep track of the 32bit
-ID registers.
-
-As per ARM ARM (D.1.21.2 - Support for Exception Levels and
-Execution States, DDI0487A.h), checking the support for AArch32
-at EL0 is good enough to check the support for AArch32 (i.e,
-AArch32 at EL1 => AArch32 at EL0, but not vice versa).
-
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- arch/arm64/kernel/cpufeature.c |   86 ++++++++++++++++++++++------------------
- arch/arm64/kernel/cpuinfo.c    |   37 +++++++++--------
- 2 files changed, 67 insertions(+), 56 deletions(-)
-
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index b88cbef..853e575 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -423,22 +423,26 @@ void __init init_cpu_features(struct cpuinfo_arm64 *info)
- 	init_cpu_ftr_reg(SYS_ID_AA64MMFR1_EL1, info->reg_id_aa64mmfr1);
- 	init_cpu_ftr_reg(SYS_ID_AA64PFR0_EL1, info->reg_id_aa64pfr0);
- 	init_cpu_ftr_reg(SYS_ID_AA64PFR1_EL1, info->reg_id_aa64pfr1);
--	init_cpu_ftr_reg(SYS_ID_DFR0_EL1, info->reg_id_dfr0);
--	init_cpu_ftr_reg(SYS_ID_ISAR0_EL1, info->reg_id_isar0);
--	init_cpu_ftr_reg(SYS_ID_ISAR1_EL1, info->reg_id_isar1);
--	init_cpu_ftr_reg(SYS_ID_ISAR2_EL1, info->reg_id_isar2);
--	init_cpu_ftr_reg(SYS_ID_ISAR3_EL1, info->reg_id_isar3);
--	init_cpu_ftr_reg(SYS_ID_ISAR4_EL1, info->reg_id_isar4);
--	init_cpu_ftr_reg(SYS_ID_ISAR5_EL1, info->reg_id_isar5);
--	init_cpu_ftr_reg(SYS_ID_MMFR0_EL1, info->reg_id_mmfr0);
--	init_cpu_ftr_reg(SYS_ID_MMFR1_EL1, info->reg_id_mmfr1);
--	init_cpu_ftr_reg(SYS_ID_MMFR2_EL1, info->reg_id_mmfr2);
--	init_cpu_ftr_reg(SYS_ID_MMFR3_EL1, info->reg_id_mmfr3);
--	init_cpu_ftr_reg(SYS_ID_PFR0_EL1, info->reg_id_pfr0);
--	init_cpu_ftr_reg(SYS_ID_PFR1_EL1, info->reg_id_pfr1);
--	init_cpu_ftr_reg(SYS_MVFR0_EL1, info->reg_mvfr0);
--	init_cpu_ftr_reg(SYS_MVFR1_EL1, info->reg_mvfr1);
--	init_cpu_ftr_reg(SYS_MVFR2_EL1, info->reg_mvfr2);
-+
-+	if (id_aa64pfr0_32bit_el0(info->reg_id_aa64pfr0)) {
-+		init_cpu_ftr_reg(SYS_ID_DFR0_EL1, info->reg_id_dfr0);
-+		init_cpu_ftr_reg(SYS_ID_ISAR0_EL1, info->reg_id_isar0);
-+		init_cpu_ftr_reg(SYS_ID_ISAR1_EL1, info->reg_id_isar1);
-+		init_cpu_ftr_reg(SYS_ID_ISAR2_EL1, info->reg_id_isar2);
-+		init_cpu_ftr_reg(SYS_ID_ISAR3_EL1, info->reg_id_isar3);
-+		init_cpu_ftr_reg(SYS_ID_ISAR4_EL1, info->reg_id_isar4);
-+		init_cpu_ftr_reg(SYS_ID_ISAR5_EL1, info->reg_id_isar5);
-+		init_cpu_ftr_reg(SYS_ID_MMFR0_EL1, info->reg_id_mmfr0);
-+		init_cpu_ftr_reg(SYS_ID_MMFR1_EL1, info->reg_id_mmfr1);
-+		init_cpu_ftr_reg(SYS_ID_MMFR2_EL1, info->reg_id_mmfr2);
-+		init_cpu_ftr_reg(SYS_ID_MMFR3_EL1, info->reg_id_mmfr3);
-+		init_cpu_ftr_reg(SYS_ID_PFR0_EL1, info->reg_id_pfr0);
-+		init_cpu_ftr_reg(SYS_ID_PFR1_EL1, info->reg_id_pfr1);
-+		init_cpu_ftr_reg(SYS_MVFR0_EL1, info->reg_mvfr0);
-+		init_cpu_ftr_reg(SYS_MVFR1_EL1, info->reg_mvfr1);
-+		init_cpu_ftr_reg(SYS_MVFR2_EL1, info->reg_mvfr2);
-+	}
-+
- }
- 
- static void update_cpu_ftr_reg(struct arm64_ftr_reg *reg, u64 new)
-@@ -541,47 +545,51 @@ void update_cpu_features(int cpu,
- 				      info->reg_id_aa64pfr1, boot->reg_id_aa64pfr1);
- 
- 	/*
--	 * If we have AArch32, we care about 32-bit features for compat. These
--	 * registers should be RES0 otherwise.
-+	 * If we have AArch32, we care about 32-bit features for compat.
-+	 * If the system doesn't support AArch32, don't update them.
- 	 */
--	taint |= check_update_ftr_reg(SYS_ID_DFR0_EL1, cpu,
-+	if (id_aa64pfr0_32bit_el0(read_system_reg(SYS_ID_AA64PFR0_EL1)) &&
-+		id_aa64pfr0_32bit_el0(info->reg_id_aa64pfr0)) {
-+
-+		taint |= check_update_ftr_reg(SYS_ID_DFR0_EL1, cpu,
- 					info->reg_id_dfr0, boot->reg_id_dfr0);
--	taint |= check_update_ftr_reg(SYS_ID_ISAR0_EL1, cpu,
-+		taint |= check_update_ftr_reg(SYS_ID_ISAR0_EL1, cpu,
- 					info->reg_id_isar0, boot->reg_id_isar0);
--	taint |= check_update_ftr_reg(SYS_ID_ISAR1_EL1, cpu,
-+		taint |= check_update_ftr_reg(SYS_ID_ISAR1_EL1, cpu,
- 					info->reg_id_isar1, boot->reg_id_isar1);
--	taint |= check_update_ftr_reg(SYS_ID_ISAR2_EL1, cpu,
-+		taint |= check_update_ftr_reg(SYS_ID_ISAR2_EL1, cpu,
- 					info->reg_id_isar2, boot->reg_id_isar2);
--	taint |= check_update_ftr_reg(SYS_ID_ISAR3_EL1, cpu,
-+		taint |= check_update_ftr_reg(SYS_ID_ISAR3_EL1, cpu,
- 					info->reg_id_isar3, boot->reg_id_isar3);
--	taint |= check_update_ftr_reg(SYS_ID_ISAR4_EL1, cpu,
-+		taint |= check_update_ftr_reg(SYS_ID_ISAR4_EL1, cpu,
- 					info->reg_id_isar4, boot->reg_id_isar4);
--	taint |= check_update_ftr_reg(SYS_ID_ISAR5_EL1, cpu,
-+		taint |= check_update_ftr_reg(SYS_ID_ISAR5_EL1, cpu,
- 					info->reg_id_isar5, boot->reg_id_isar5);
- 
--	/*
--	 * Regardless of the value of the AuxReg field, the AIFSR, ADFSR, and
--	 * ACTLR formats could differ across CPUs and therefore would have to
--	 * be trapped for virtualization anyway.
--	 */
--	taint |= check_update_ftr_reg(SYS_ID_MMFR0_EL1, cpu,
-+		/*
-+		 * Regardless of the value of the AuxReg field, the AIFSR, ADFSR, and
-+		 * ACTLR formats could differ across CPUs and therefore would have to
-+		 * be trapped for virtualization anyway.
-+		 */
-+		taint |= check_update_ftr_reg(SYS_ID_MMFR0_EL1, cpu,
- 					info->reg_id_mmfr0, boot->reg_id_mmfr0);
--	taint |= check_update_ftr_reg(SYS_ID_MMFR1_EL1, cpu,
-+		taint |= check_update_ftr_reg(SYS_ID_MMFR1_EL1, cpu,
- 					info->reg_id_mmfr1, boot->reg_id_mmfr1);
--	taint |= check_update_ftr_reg(SYS_ID_MMFR2_EL1, cpu,
-+		taint |= check_update_ftr_reg(SYS_ID_MMFR2_EL1, cpu,
- 					info->reg_id_mmfr2, boot->reg_id_mmfr2);
--	taint |= check_update_ftr_reg(SYS_ID_MMFR3_EL1, cpu,
-+		taint |= check_update_ftr_reg(SYS_ID_MMFR3_EL1, cpu,
- 					info->reg_id_mmfr3, boot->reg_id_mmfr3);
--	taint |= check_update_ftr_reg(SYS_ID_PFR0_EL1, cpu,
-+		taint |= check_update_ftr_reg(SYS_ID_PFR0_EL1, cpu,
- 					info->reg_id_pfr0, boot->reg_id_pfr0);
--	taint |= check_update_ftr_reg(SYS_ID_PFR1_EL1, cpu,
-+		taint |= check_update_ftr_reg(SYS_ID_PFR1_EL1, cpu,
- 					info->reg_id_pfr1, boot->reg_id_pfr1);
--	taint |= check_update_ftr_reg(SYS_MVFR0_EL1, cpu,
-+		taint |= check_update_ftr_reg(SYS_MVFR0_EL1, cpu,
- 					info->reg_mvfr0, boot->reg_mvfr0);
--	taint |= check_update_ftr_reg(SYS_MVFR1_EL1, cpu,
-+		taint |= check_update_ftr_reg(SYS_MVFR1_EL1, cpu,
- 					info->reg_mvfr1, boot->reg_mvfr1);
--	taint |= check_update_ftr_reg(SYS_MVFR2_EL1, cpu,
-+		taint |= check_update_ftr_reg(SYS_MVFR2_EL1, cpu,
- 					info->reg_mvfr2, boot->reg_mvfr2);
-+	}
- 
- 	/*
- 	 * Mismatched CPU features are a recipe for disaster. Don't even
-diff --git a/arch/arm64/kernel/cpuinfo.c b/arch/arm64/kernel/cpuinfo.c
-index 212ae63..8cc2a86 100644
---- a/arch/arm64/kernel/cpuinfo.c
-+++ b/arch/arm64/kernel/cpuinfo.c
-@@ -213,23 +213,26 @@ static void __cpuinfo_store_cpu(struct cpuinfo_arm64 *info)
- 	info->reg_id_aa64pfr0 = read_cpuid(ID_AA64PFR0_EL1);
- 	info->reg_id_aa64pfr1 = read_cpuid(ID_AA64PFR1_EL1);
- 
--	info->reg_id_dfr0 = read_cpuid(ID_DFR0_EL1);
--	info->reg_id_isar0 = read_cpuid(ID_ISAR0_EL1);
--	info->reg_id_isar1 = read_cpuid(ID_ISAR1_EL1);
--	info->reg_id_isar2 = read_cpuid(ID_ISAR2_EL1);
--	info->reg_id_isar3 = read_cpuid(ID_ISAR3_EL1);
--	info->reg_id_isar4 = read_cpuid(ID_ISAR4_EL1);
--	info->reg_id_isar5 = read_cpuid(ID_ISAR5_EL1);
--	info->reg_id_mmfr0 = read_cpuid(ID_MMFR0_EL1);
--	info->reg_id_mmfr1 = read_cpuid(ID_MMFR1_EL1);
--	info->reg_id_mmfr2 = read_cpuid(ID_MMFR2_EL1);
--	info->reg_id_mmfr3 = read_cpuid(ID_MMFR3_EL1);
--	info->reg_id_pfr0 = read_cpuid(ID_PFR0_EL1);
--	info->reg_id_pfr1 = read_cpuid(ID_PFR1_EL1);
--
--	info->reg_mvfr0 = read_cpuid(MVFR0_EL1);
--	info->reg_mvfr1 = read_cpuid(MVFR1_EL1);
--	info->reg_mvfr2 = read_cpuid(MVFR2_EL1);
-+	/* Update the 32bit ID registers only if AArch32 is implemented */
-+	if (id_aa64pfr0_32bit_el0(info->reg_id_aa64pfr0)) {
-+		info->reg_id_dfr0 = read_cpuid(ID_DFR0_EL1);
-+		info->reg_id_isar0 = read_cpuid(ID_ISAR0_EL1);
-+		info->reg_id_isar1 = read_cpuid(ID_ISAR1_EL1);
-+		info->reg_id_isar2 = read_cpuid(ID_ISAR2_EL1);
-+		info->reg_id_isar3 = read_cpuid(ID_ISAR3_EL1);
-+		info->reg_id_isar4 = read_cpuid(ID_ISAR4_EL1);
-+		info->reg_id_isar5 = read_cpuid(ID_ISAR5_EL1);
-+		info->reg_id_mmfr0 = read_cpuid(ID_MMFR0_EL1);
-+		info->reg_id_mmfr1 = read_cpuid(ID_MMFR1_EL1);
-+		info->reg_id_mmfr2 = read_cpuid(ID_MMFR2_EL1);
-+		info->reg_id_mmfr3 = read_cpuid(ID_MMFR3_EL1);
-+		info->reg_id_pfr0 = read_cpuid(ID_PFR0_EL1);
-+		info->reg_id_pfr1 = read_cpuid(ID_PFR1_EL1);
-+
-+		info->reg_mvfr0 = read_cpuid(MVFR0_EL1);
-+		info->reg_mvfr1 = read_cpuid(MVFR1_EL1);
-+		info->reg_mvfr2 = read_cpuid(MVFR2_EL1);
-+	}
- 
- 	cpuinfo_detect_icache_policy(info);
- 
--- 
-1.7.9.5
+QWRkIGEgY2hlY2sgdG8gbWFrZSBzdXJlIHRoZSBzeXN0ZW0gc3VwcG9ydHMgQUFyY2gzMiBzdGF0
+ZQpiZWZvcmUgaW5pdGlhbGlzaW5nIGEgMzJiaXQgZ3Vlc3QuCgpDYzogQ2hyaXN0b2ZmZXIgRGFs
+bCA8Y2hyaXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPgpDYzogTWFyYyBaeW5naWVyIDxtYXJjLnp5
+bmdpZXJAYXJtLmNvbT4KQ2M6IGt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUKU2lnbmVkLW9m
+Zi1ieTogU3V6dWtpIEsgUG91bG9zZSA8c3V6dWtpLnBvdWxvc2VAYXJtLmNvbT4KCi0tLQoKSSBy
+ZWFsbHkgd2FudGVkIHRvIHBhc3Mga3ZtX3ZjcHUgZG93biB0byB0aGUgaGVscGVycy4gQnV0IHRo
+ZW4sIEkgY2FuJ3QKZGVmaW5lIHRoZSBhcmNoIHNwZWNpZmljIGhlbHBlciBpbiBhc20va3ZtX2hv
+c3QuaCBkdWUgdG8gbGFjayBvZiBrdm1fdmNwdSdzCmRlZmluaXRpb24geWV0OgoKIEluIGZpbGUg
+aW5jbHVkZWQgZnJvbSBpbmNsdWRlL2xpbnV4L2t2bV9ob3N0Lmg6MzU6MCwKICAgICAgICAgICAg
+ICAgICAgZnJvbSBhcmNoL2FybTY0L2tlcm5lbC9hc20tb2Zmc2V0cy5jOjI0OgogLi9hcmNoL2Fy
+bTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0Lmg6IEluIGZ1bmN0aW9uIOKAmGt2bV9hcmNoX3ZjcHVf
+dmFsaWRhdGVfZmVhdHVyZXPigJk6CiAuL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3Qu
+aDozNDQ6NDg6IGVycm9yOiBkZXJlZmVyZW5jaW5nIHBvaW50ZXIgdG8gaW5jb21wbGV0ZSB0eXBl
+CiAgIHJldHVybiAgIXRlc3RfYml0KEtWTV9BUk1fVkNQVV9FTDFfMzJCSVQsIHZjcHUtPmFyY2gu
+ZmVhdHVyZXMpIHx8Ci0tLQogYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaCAgIHwgICAg
+NSArKysrKwogYXJjaC9hcm0va3ZtL2FybS5jICAgICAgICAgICAgICAgIHwgICAgMyArKysKIGFy
+Y2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaCB8ICAgIDggKysrKysrKysKIDMgZmlsZXMg
+Y2hhbmdlZCwgMTYgaW5zZXJ0aW9ucygrKQoKZGlmZiAtLWdpdCBhL2FyY2gvYXJtL2luY2x1ZGUv
+YXNtL2t2bV9ob3N0LmggYi9hcmNoL2FybS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCmluZGV4IGY5
+ZjI3NzkuLjk0NWMyM2EgMTAwNjQ0Ci0tLSBhL2FyY2gvYXJtL2luY2x1ZGUvYXNtL2t2bV9ob3N0
+LmgKKysrIGIvYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaApAQCAtMjM4LDYgKzIzOCwx
+MSBAQCBzdGF0aWMgaW5saW5lIHZvaWQga3ZtX2FyY2hfc3luY19ldmVudHMoc3RydWN0IGt2bSAq
+a3ZtKSB7fQogc3RhdGljIGlubGluZSB2b2lkIGt2bV9hcmNoX3ZjcHVfdW5pbml0KHN0cnVjdCBr
+dm1fdmNwdSAqdmNwdSkge30KIHN0YXRpYyBpbmxpbmUgdm9pZCBrdm1fYXJjaF9zY2hlZF9pbihz
+dHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGludCBjcHUpIHt9CiAKK3N0YXRpYyBpbmxpbmUgYm9vbCBr
+dm1fYXJjaF92Y3B1X3ZhbGlkYXRlX2ZlYXR1cmVzKHN0cnVjdCBrdm1fdmNwdV9hcmNoICphcmNo
+X3ZjcHUpCit7CisJcmV0dXJuIHRydWU7Cit9CisKIHN0YXRpYyBpbmxpbmUgdm9pZCBrdm1fYXJt
+X2luaXRfZGVidWcodm9pZCkge30KIHN0YXRpYyBpbmxpbmUgdm9pZCBrdm1fYXJtX3NldHVwX2Rl
+YnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkge30KIHN0YXRpYyBpbmxpbmUgdm9pZCBrdm1fYXJt
+X2NsZWFyX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkge30KZGlmZiAtLWdpdCBhL2FyY2gv
+YXJtL2t2bS9hcm0uYyBiL2FyY2gvYXJtL2t2bS9hcm0uYwppbmRleCBkZGExOTU5Li5mYzRlYTM3
+IDEwMDY0NAotLS0gYS9hcmNoL2FybS9rdm0vYXJtLmMKKysrIGIvYXJjaC9hcm0va3ZtL2FybS5j
+CkBAIC03ODcsNiArNzg3LDkgQEAgc3RhdGljIGludCBrdm1fdmNwdV9zZXRfdGFyZ2V0KHN0cnVj
+dCBrdm1fdmNwdSAqdmNwdSwKIAkJCXNldF9iaXQoaSwgdmNwdS0+YXJjaC5mZWF0dXJlcyk7CiAJ
+fQogCisJaWYgKCFrdm1fYXJjaF92Y3B1X3ZhbGlkYXRlX2ZlYXR1cmVzKCZ2Y3B1LT5hcmNoKSkK
+KwkJcmV0dXJuIC1FSU5WQUw7CisKIAl2Y3B1LT5hcmNoLnRhcmdldCA9IHBoeXNfdGFyZ2V0Owog
+CiAJLyogTm93IHdlIGtub3cgd2hhdCBpdCBpcywgd2UgY2FuIHJlc2V0IGl0LiAqLwpkaWZmIC0t
+Z2l0IGEvYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIGIvYXJjaC9hcm02NC9pbmNs
+dWRlL2FzbS9rdm1faG9zdC5oCmluZGV4IDY4OWQ0YzkuLjlkNjBhNmMgMTAwNjQ0Ci0tLSBhL2Fy
+Y2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAorKysgYi9hcmNoL2FybTY0L2luY2x1ZGUv
+YXNtL2t2bV9ob3N0LmgKQEAgLTI0LDYgKzI0LDggQEAKIAogI2luY2x1ZGUgPGxpbnV4L3R5cGVz
+Lmg+CiAjaW5jbHVkZSA8bGludXgva3ZtX3R5cGVzLmg+CisjaW5jbHVkZSA8YXNtL2NwdWZlYXR1
+cmUuaD4KKyNpbmNsdWRlIDxhc20va3ZtX2FybS5oPgogI2luY2x1ZGUgPGFzbS9rdm0uaD4KICNp
+bmNsdWRlIDxhc20va3ZtX21taW8uaD4KIApAQCAtMzM4LDYgKzM0MCwxMiBAQCBzdGF0aWMgaW5s
+aW5lIHZvaWQga3ZtX2FyY2hfc3luY19ldmVudHMoc3RydWN0IGt2bSAqa3ZtKSB7fQogc3RhdGlj
+IGlubGluZSB2b2lkIGt2bV9hcmNoX3ZjcHVfdW5pbml0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkg
+e30KIHN0YXRpYyBpbmxpbmUgdm9pZCBrdm1fYXJjaF9zY2hlZF9pbihzdHJ1Y3Qga3ZtX3ZjcHUg
+KnZjcHUsIGludCBjcHUpIHt9CiAKK3N0YXRpYyBpbmxpbmUgYm9vbCBrdm1fYXJjaF92Y3B1X3Zh
+bGlkYXRlX2ZlYXR1cmVzKHN0cnVjdCBrdm1fdmNwdV9hcmNoICphcmNoX3ZjcHUpCit7CisJcmV0
+dXJuICAhdGVzdF9iaXQoS1ZNX0FSTV9WQ1BVX0VMMV8zMkJJVCwgYXJjaF92Y3B1LT5mZWF0dXJl
+cykgfHwKKwkJc3lzdGVtX3N1cHBvcnRzXzMyYml0X2VsMCgpOworfQorCiB2b2lkIGt2bV9hcm1f
+aW5pdF9kZWJ1Zyh2b2lkKTsKIHZvaWQga3ZtX2FybV9zZXR1cF9kZWJ1ZyhzdHJ1Y3Qga3ZtX3Zj
+cHUgKnZjcHUpOwogdm9pZCBrdm1fYXJtX2NsZWFyX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNw
+dSk7Ci0tIAoxLjcuOS41CgpfX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fXwprdm1hcm0gbWFpbGluZyBsaXN0Cmt2bWFybUBsaXN0cy5jcy5jb2x1bWJpYS5lZHUK
+aHR0cHM6Ly9saXN0cy5jcy5jb2x1bWJpYS5lZHUvbWFpbG1hbi9saXN0aW5mby9rdm1hcm0K
