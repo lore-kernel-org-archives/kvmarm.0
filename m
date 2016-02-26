@@ -1,29 +1,23 @@
-From: xu mike <upennmike@gmail.com>
-Subject: Re: [Question] Can KVM run on Freescale IMX6 SABRE board?
-Date: Fri, 26 Feb 2016 10:53:44 -0500
-Message-ID: <CAPSnSYqNAYVSve8KeEkAGH3iwf1tbNntTfp5MwEAG-QSfRg8FA@mail.gmail.com>
-References: <CAPSnSYoxmmDm--vuigyHb2xPr1GpSf22meO59kDQh1s2HFySiA@mail.gmail.com>
- <CAFEAcA_Dt=swYzqmLMyok5SHWhfFP5Lsj42GnNg0tEg-JjGEyQ@mail.gmail.com>
- <CAPSnSYooB+QiTq9t1n_wXevsMZFVQbtsmAd2jERff05aFn+oYw@mail.gmail.com>
- <20160226075441.GA9352@cbox>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [RFC v4 00/14] KVM PCIe/MSI passthrough on ARM/ARM64
+Date: Fri, 26 Feb 2016 17:35:40 +0000
+Message-ID: <1456508154-2253-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5159B410B5
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 10:46:54 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4063D411F6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:12 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BZN-UTFxdwe7 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Feb 2016 10:46:53 -0500 (EST)
-Received: from mail-yw0-f172.google.com (mail-yw0-f172.google.com
- [209.85.161.172])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5F65640FA6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 10:46:52 -0500 (EST)
-Received: by mail-yw0-f172.google.com with SMTP id e63so71819340ywc.3
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 07:53:45 -0800 (PST)
-In-Reply-To: <20160226075441.GA9352@cbox>
+ with ESMTP id IIDRxoeBz0Sv for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Feb 2016 12:29:11 -0500 (EST)
+Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BF1C8410D7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:10 -0500 (EST)
+Received: by mail-wm0-f54.google.com with SMTP id g62so79652147wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 09:36:02 -0800 (PST)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,78 +27,149 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: eric.auger@st.com, eric.auger@linaro.org, robin.murphy@arm.com, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: patches@linaro.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-2016-02-26 2:54 GMT-05:00 Christoffer Dall <christoffer.dall@linaro.org>:
-> On Thu, Feb 25, 2016 at 12:45:45PM -0500, xu mike wrote:
->> Hi Peter,
->>
->> 2016-02-25 10:30 GMT-05:00 Peter Maydell <peter.maydell@linaro.org>:
->> >
->> > On 25 February 2016 at 15:17, xu mike <upennmike@gmail.com> wrote:
->> > > I'm a student from the University of Pennsylvania. I want to try KVM on ARM
->> > > boards.
->> > >
->> > > I have a Freescale IMX6 board [1] which has ARM Cortex A9 processors.
->> > > I'm wondering if KVM can run on the Freescale IMX6 board? or
->> > > Can KVM run on any ARM board with ARM Cortex A9 processors?
->> > >
->> > > I noticed at [2] that " KVM/ARM is designed specifically to work on ARM
->> > > processors with the virtualization extensions enabled to run unmodified
->> > > guest operating systems."
->> > > I'm wondering if this statement is still true?
->> >
->> > Yes, it is. You need a CPU with the virtualization extensions,
->> > and the A9 does not have them. You want (for instance) an A15
->> > or an A7. There are cheap A7-based development boards out there,
->> > for instance the CubieTruck (which is not very fast but can run
->> > a mainline Linux kernel and KVM so is a reasonable getting-started
->> > development platform).
->>
->>
->> Thank you very much for your quick reply!
->>
->> I'm wondering if KVM community has any plan to make KVM compatible
->> with Cortex A9 processors?
->>
->
-> Not that I'm aware, no.
->
->> If someone, with linux scheduler development experiment but without
->> porting experiment, wants to port KVM to Cortex A9,  how hard could it
->> be to port KVM onto Cortex A9 processor?
->
-> As Peter said, ARM is not a virtualizable architecture, so you need
-> hardware support for virtualization to run hypervisors on an ARM system.
->
-> Cortex-A9 does not have this support.
->
-> You could implement something using either binary translation or
-> paravirtualization, but neither is something we're immediately
-> interested in accepting in mainline Linux.
+This series addresses KVM PCIe passthrough with MSI enabled on ARM/ARM64.
+It pursues the efforts done on [1], [2], [3]. It also aims at covering the
+same need on PowerPC platforms although the same kind of integration
+should be carried out.
 
-Right. I couldn't estimate how hard it will be to achieve the
-paravirtualization/binary translation in KVM.. Probably it may involve
-a lot of (assembly) code, since it requires to de-privilege those
-privileged instructions. :-(
+On x86 all accesses to the 1MB PA region [FEE0_0000h - FEF0_000h] are directed
+as interrupt messages: accesses to this special PA window directly target the
+APIC configuration space and not DRAM, meaning the downstream IOMMU is bypassed.
 
->
-> What is your use-case for running on A9 specifically, as opposed to a
-> CPU with virt support?
+This is not the case on above mentionned platforms where MSI messages emitted
+by devices are conveyed through the IOMMU. This means an IOVA/host PA mapping
+must exist for the MSI to reach the MSI controller. Normal way to create
+IOVA bindings consists in using VFIO DMA MAP API. However in this case
+the MSI IOVA is not mapped onto guest RAM but on host physical page (the MSI
+controller frame).
 
-The reason why I have to use A9 is because A9 has the special cache
-controller, called PL310 cache controller, which is not supported in
-A7 or A15. I want to use the special cache controller in
-virtualization environment. That's why I'm so addicted to A9. :-(
-If there is some latest ARM processor that has the PL310 cache
-controller and virtulaizaiton extension support, that will be awesome!
-However, I'm unaware of the ideal ARM processors. :-( Do you happen to
-know?
+In a nutshell, this series does:
+- introduce a new DMA-RESERVED-IOMMU API to register a IOVA window usable for
+  reserved mapping and allocate/bind IOVA to host physical addresses
+- reuse VFIO DMA MAP ioctl with a new flag to plug onto that new API
+- check if the MSI mapping is safe when attaching the vfio group to the
+  container
+- allow the MSI subsystem to map/unmap the doorbell on MSI message composition
+- allow the user-space to know how many IOVA pages are requested
 
-Thank you so much for your time and help in this question!
+Best Regards
 
-Best,
+Eric
 
-Mike
+Testing:
+- functional on ARM64 AMD Overdrive HW (single GICv2m frame) with
+  x Intel e1000e PCIe card
+  x Intel X540-T2 (SR-IOV capable)
+- Not tested: ARM GICv3 ITS
+
+References:
+[1] [RFC 0/2] VFIO: Add virtual MSI doorbell support
+    (https://lkml.org/lkml/2015/7/24/135)
+[2] [RFC PATCH 0/6] vfio: Add interface to map MSI pages
+    (https://lists.cs.columbia.edu/pipermail/kvmarm/2015-September/016607.html)
+[3] [PATCH v2 0/3] Introduce MSI hardware mapping for VFIO
+    (http://permalink.gmane.org/gmane.comp.emulators.kvm.arm.devel/3858)
+
+Git:
+https://git.linaro.org/people/eric.auger/linux.git/shortlog/refs/heads/v4.5-rc5-pcie-passthrough-rfcv4
+
+previous version at
+v3: https://git.linaro.org/people/eric.auger/linux.git/shortlog/refs/heads/v4.5-rc3-pcie-passthrough-rfcv3
+
+QEMU Integration:
+[RFC v2 0/8] KVM PCI/MSI passthrough with mach-virt
+(http://lists.gnu.org/archive/html/qemu-arm/2016-01/msg00444.html)
+https://git.linaro.org/people/eric.auger/qemu.git/shortlog/refs/heads/v2.5.0-pci-passthrough-rfc-v2
+
+User Hints:
+To allow PCI/MSI passthrough with GICv2M, compile VFIO as a module and
+load the vfio_iommu_type1 module with allow_unsafe_interrupts param:
+sudo modprobe -v vfio-pci
+sudo modprobe -r vfio_iommu_type1
+sudo modprobe -v vfio_iommu_type1 allow_unsafe_interrupts=1
+
+History:
+
+RFC v3 -> v4:
+- Move doorbell mapping/unmapping in msi.c
+- fix ref count issue on set_affinity: in case of a change in the address
+  the previous address is decremented
+- doorbell map/unmap now is done on msi composition. Should allow the use
+  case for platform MSI controllers
+- create dma-reserved-iommu.h/c exposing/implementing a new API dedicated
+  to reserved IOVA management (looking like dma-iommu glue)
+- series reordering to ease the review:
+  - first part is related to IOMMU
+  - second related to MSI sub-system
+  - third related to VFIO (except arm-smmu IOMMU_CAP_INTR_REMAP removal)
+- expose the number of requested IOVA pages through VFIO_IOMMU_GET_INFO
+  [this partially addresses Marc's comments on iommu_get/put_single_reserved
+   size/alignment problematic - which I did not ignore - but I don't know
+   how much I can do at the moment]
+
+RFC v2 -> RFC v3:
+- should fix wrong handling of some CONFIG combinations:
+  CONFIG_IOVA, CONFIG_IOMMU_API, CONFIG_PCI_MSI_IRQ_DOMAIN
+- fix MSI_FLAG_IRQ_REMAPPING setting in GICv3 ITS (although not tested)
+
+PATCH v1 -> RFC v2:
+- reverted to RFC since it looks more reasonable ;-) the code is split
+  between VFIO, IOMMU, MSI controller and I am not sure I did the right
+  choices. Also API need to be further discussed.
+- iova API usage in arm-smmu.c.
+- MSI controller natively programs the MSI addr with either the PA or IOVA.
+  This is not done anymore in vfio-pci driver as suggested by Alex.
+- check irq remapping capability of the group
+
+RFC v1 [2] -> PATCH v1:
+- use the existing dma map/unmap ioctl interface with a flag to register a
+  reserved IOVA range. Use the legacy Rb to store this special vfio_dma.
+- a single reserved IOVA contiguous region now is allowed
+- use of an RB tree indexed by PA to store allocated reserved slots
+- use of a vfio_domain iova_domain to manage iova allocation within the
+  window provided by the userspace
+- vfio alloc_map/unmap_free take a vfio_group handle
+- vfio_group handle is cached in vfio_pci_device
+- add ref counting to bindings
+- user modality enabled at the end of the series
+
+
+Eric Auger (14):
+  iommu: Add DOMAIN_ATTR_MSI_MAPPING attribute
+  iommu: introduce a reserved iova cookie
+  dma-reserved-iommu: alloc/free_reserved_iova_domain
+  dma-reserved-iommu: reserved binding rb-tree and helpers
+  dma-reserved-iommu: iommu_get/put_single_reserved
+  dma-reserved-iommu: iommu_unmap_reserved
+  msi: Add a new MSI_FLAG_IRQ_REMAPPING flag
+  msi: export msi_get_domain_info
+  msi: IOMMU map the doorbell address when needed
+  vfio: introduce VFIO_IOVA_RESERVED vfio_dma type
+  vfio: allow the user to register reserved iova range for MSI mapping
+  vfio/type1: also check IRQ remapping capability at msi domain
+  iommu/arm-smmu: do not advertise IOMMU_CAP_INTR_REMAP
+  vfio/type1: return MSI mapping requirements with VFIO_IOMMU_GET_INFO
+
+ drivers/iommu/Kconfig                    |   8 +
+ drivers/iommu/Makefile                   |   1 +
+ drivers/iommu/arm-smmu.c                 |   4 +-
+ drivers/iommu/dma-reserved-iommu.c       | 270 ++++++++++++++++++++++++
+ drivers/iommu/fsl_pamu_domain.c          |   2 +
+ drivers/iommu/iommu.c                    |   1 +
+ drivers/irqchip/irq-gic-v3-its-pci-msi.c |   3 +-
+ drivers/vfio/vfio_iommu_type1.c          | 348 ++++++++++++++++++++++++++++++-
+ include/linux/dma-reserved-iommu.h       |  78 +++++++
+ include/linux/iommu.h                    |   6 +
+ include/linux/msi.h                      |   2 +
+ include/uapi/linux/vfio.h                |  14 +-
+ kernel/irq/msi.c                         | 113 +++++++++-
+ 13 files changed, 839 insertions(+), 11 deletions(-)
+ create mode 100644 drivers/iommu/dma-reserved-iommu.c
+ create mode 100644 include/linux/dma-reserved-iommu.h
+
+-- 
+1.9.1
