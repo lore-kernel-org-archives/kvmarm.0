@@ -1,24 +1,24 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC v4 09/14] msi: IOMMU map the doorbell address when needed
-Date: Fri, 26 Feb 2016 17:35:49 +0000
-Message-ID: <1456508154-2253-10-git-send-email-eric.auger@linaro.org>
+Subject: [RFC v4 05/14] dma-reserved-iommu: iommu_get/put_single_reserved
+Date: Fri, 26 Feb 2016 17:35:45 +0000
+Message-ID: <1456508154-2253-6-git-send-email-eric.auger@linaro.org>
 References: <1456508154-2253-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5198D410D7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DAEF6410D7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:25 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 7LDkdozmHnE0 for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Feb 2016 12:29:38 -0500 (EST)
+ with ESMTP id uV71cDa-Bgh7 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Feb 2016 12:29:24 -0500 (EST)
 Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 59B44411F6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:38 -0500 (EST)
-Received: by mail-wm0-f41.google.com with SMTP id g62so82767630wme.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 09:36:30 -0800 (PST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 9E6304968B
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:24 -0500 (EST)
+Received: by mail-wm0-f41.google.com with SMTP id c200so82105390wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 09:36:16 -0800 (PST)
 In-Reply-To: <1456508154-2253-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,185 +33,210 @@ To: eric.auger@st.com, eric.auger@linaro.org, robin.murphy@arm.com, alex.william
 Cc: patches@linaro.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In case the msi_desc references a device attached to an iommu
-domain and this iommu domain requires MSI mapping, the msi
-address (aka doorbell) needs to be mapped in the IOMMU. Else any
-MSI write transaction will cause a fault.
+This patch introduces iommu_get/put_single_reserved.
 
-We perform this action at msi message composition time. We
-need to track when the doorbell address changes. On domain deactivate,
-we now also call the composition function with a new erase parameter.
+iommu_get_single_reserved allows to allocate a new reserved iova page
+and map it onto the physical page that contains a given physical address.
+Page size is the IOMMU page one. It is the responsability of the
+system integrator to make sure the in use IOMMU page size corresponds
+to the granularity of the MSI frame.
 
-In case the mapping fails we just WARN_ON.
+It returns the iova that is mapped onto the provided physical address.
+Hence the physical address passed in argument does not need to be aligned.
+
+In case a mapping already exists between both pages, the IOVA mapped
+to the PA is directly returned.
+
+Each time an iova is successfully returned a binding ref count is
+incremented.
+
+iommu_put_single_reserved decrements the ref count and when this latter
+is null, the mapping is destroyed and the iova is released.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
+Signed-off-by: Ankit Jindal <ajindal@apm.com>
+Signed-off-by: Pranavkumar Sawargaonkar <pranavkumar@linaro.org>
+Signed-off-by: Bharat Bhushan <Bharat.Bhushan@freescale.com>
 
 ---
+
 v3 -> v4:
-- that code was formely in irq-gic-common.c
-  "irqchip/gicv2m/v3-its-pci-msi: IOMMU map the MSI frame when needed"
-  also the [un]mapping was done in irq_write_msi_msg; now done on compose
+- formerly in iommu: iommu_get/put_single_reserved &
+  iommu/arm-smmu: implement iommu_get/put_single_reserved
+- Attempted to address Marc's doubts about missing size/alignment
+  at VFIO level (user-space knows the IOMMU page size and the number
+  of IOVA pages to provision)
 
 v2 -> v3:
-- protect iova/addr manipulation with CONFIG_ARCH_DMA_ADDR_T_64BIT and
-  CONFIG_PHYS_ADDR_T_64BIT
-- only expose gic_pci_msi_domain_write_msg in case CONFIG_IOMMU_API &
-  CONFIG_PCI_MSI_IRQ_DOMAIN are set.
-- gic_set/unset_msi_addr duly become static
----
- kernel/irq/msi.c | 112 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 109 insertions(+), 3 deletions(-)
+- remove static implementation of iommu_get_single_reserved &
+  iommu_put_single_reserved when CONFIG_IOMMU_API is not set
 
-diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
-index 9b0ba4a..93bd861 100644
---- a/kernel/irq/msi.c
-+++ b/kernel/irq/msi.c
-@@ -17,6 +17,8 @@
- 
- /* Temparory solution for building, will be removed later */
- #include <linux/pci.h>
-+#include <linux/iommu.h>
-+#include <linux/dma-reserved-iommu.h>
- 
- struct msi_desc *alloc_msi_entry(struct device *dev)
- {
-@@ -55,6 +57,110 @@ static inline void irq_chip_write_msi_msg(struct irq_data *data,
- 	data->chip->irq_write_msi_msg(data, msg);
+v1 -> v2:
+- previously a VFIO API, named vfio_alloc_map/unmap_free_reserved_iova
+---
+ drivers/iommu/dma-reserved-iommu.c | 115 +++++++++++++++++++++++++++++++++++++
+ include/linux/dma-reserved-iommu.h |  26 +++++++++
+ 2 files changed, 141 insertions(+)
+
+diff --git a/drivers/iommu/dma-reserved-iommu.c b/drivers/iommu/dma-reserved-iommu.c
+index 30d54d0..537c83e 100644
+--- a/drivers/iommu/dma-reserved-iommu.c
++++ b/drivers/iommu/dma-reserved-iommu.c
+@@ -132,3 +132,118 @@ void iommu_free_reserved_iova_domain(struct iommu_domain *domain)
+ 	mutex_unlock(&domain->reserved_mutex);
  }
- 
-+static int msi_map_doorbell(struct iommu_domain *d, struct msi_msg *msg)
+ EXPORT_SYMBOL_GPL(iommu_free_reserved_iova_domain);
++
++int iommu_get_single_reserved(struct iommu_domain *domain,
++			      phys_addr_t addr, int prot,
++			      dma_addr_t *iova)
 +{
-+#ifdef CONFIG_IOMMU_DMA_RESERVED
-+	dma_addr_t iova;
-+	phys_addr_t addr;
++	unsigned long order = __ffs(domain->ops->pgsize_bitmap);
++	size_t page_size = 1 << order;
++	phys_addr_t mask = page_size - 1;
++	phys_addr_t aligned_addr = addr & ~mask;
++	phys_addr_t offset  = addr - aligned_addr;
++	struct iommu_reserved_binding *b;
++	struct iova *p_iova;
++	struct iova_domain *iovad =
++		(struct iova_domain *)domain->reserved_iova_cookie;
 +	int ret;
 +
-+#ifdef CONFIG_PHYS_ADDR_T_64BIT
-+	addr = ((phys_addr_t)(msg->address_hi) << 32) | msg->address_lo;
-+#else
-+	addr = msg->address_lo;
-+#endif
++	if (!iovad)
++		return -EINVAL;
 +
-+	ret = iommu_get_single_reserved(d, addr, IOMMU_WRITE, &iova);
-+	if (!ret) {
-+		msg->address_lo = lower_32_bits(iova);
-+		msg->address_hi = upper_32_bits(iova);
++	mutex_lock(&domain->reserved_mutex);
++
++	b = find_reserved_binding(domain, aligned_addr, page_size);
++	if (b) {
++		*iova = b->iova + offset;
++		kref_get(&b->kref);
++		ret = 0;
++		goto unlock;
 +	}
-+	return ret;
-+#else
-+	return -ENODEV;
-+#endif
-+}
 +
-+static void msi_unmap_doorbell(struct iommu_domain *d, struct msi_msg *msg)
-+{
-+#ifdef CONFIG_IOMMU_DMA_RESERVED
-+	dma_addr_t iova;
++	/* there is no existing reserved iova for this pa */
++	p_iova = alloc_iova(iovad, 1, iovad->dma_32bit_pfn, true);
++	if (!p_iova) {
++		ret = -ENOMEM;
++		goto unlock;
++	}
++	*iova = p_iova->pfn_lo << order;
 +
-+#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-+	iova = ((dma_addr_t)(msg->address_hi) << 32) | msg->address_lo;
-+#else
-+	iova = msg->address_lo;
-+#endif
++	b = kzalloc(sizeof(*b), GFP_KERNEL);
++	if (!b) {
++		ret = -ENOMEM;
++		goto free_iova_unlock;
++	}
 +
-+	iommu_put_single_reserved(d, iova);
-+#endif
-+}
++	ret = iommu_map(domain, *iova, aligned_addr, page_size, prot);
++	if (ret)
++		goto free_binding_iova_unlock;
 +
-+#ifdef CONFIG_IOMMU_API
-+static struct iommu_domain *
-+	irq_data_to_msi_mapping_domain(struct irq_data *irq_data)
-+{
++	kref_init(&b->kref);
++	kref_get(&b->kref);
++	b->domain = domain;
++	b->addr = aligned_addr;
++	b->iova = *iova;
++	b->size = page_size;
 +
-+	struct msi_desc *desc;
-+	struct device *dev;
-+	struct iommu_domain *d;
-+	int ret;
++	link_reserved_binding(domain, b);
 +
-+	desc = irq_data_get_msi_desc(irq_data);
-+	if (!desc)
-+		return NULL;
++	*iova += offset;
++	goto unlock;
 +
-+	dev = msi_desc_to_dev(desc);
-+
-+	d = iommu_get_domain_for_dev(dev);
-+	if (!d)
-+		return NULL;
-+
-+	ret = iommu_domain_get_attr(d, DOMAIN_ATTR_MSI_MAPPING, NULL);
-+	if (!ret)
-+		return d;
-+	else
-+		return NULL;
-+}
-+#else
-+static inline iommu_domain *
-+		irq_data_to_msi_mapping_domain(struct irq_data *irq_data)
-+{
-+	return NULL;
-+}
-+#endif /* CONFIG_IOMMU_API */
-+
-+static int msi_compose(struct irq_data *irq_data,
-+		       struct msi_msg *msg, bool erase)
-+{
-+	struct msi_msg old_msg;
-+	struct iommu_domain *d;
-+	int ret = 0;
-+
-+	d = irq_data_to_msi_mapping_domain(irq_data);
-+	if (unlikely(d))
-+		get_cached_msi_msg(irq_data->irq, &old_msg);
-+
-+	if (erase)
-+		memset(msg, 0, sizeof(*msg));
-+	else
-+		ret = irq_chip_compose_msi_msg(irq_data, msg);
-+
-+	if (!d)
-+		goto out;
-+
-+	/* handle (re-)mapping of MSI doorbell */
-+	if ((old_msg.address_lo != msg->address_lo) ||
-+	    (old_msg.address_hi != msg->address_hi))
-+		msi_unmap_doorbell(d, &old_msg);
-+
-+	if (!erase)
-+		WARN_ON(msi_map_doorbell(d, msg));
-+
-+out:
++free_binding_iova_unlock:
++	kfree(b);
++free_iova_unlock:
++	free_iova(iovad, *iova >> order);
++unlock:
++	mutex_unlock(&domain->reserved_mutex);
 +	return ret;
 +}
++EXPORT_SYMBOL_GPL(iommu_get_single_reserved);
 +
- /**
-  * msi_domain_set_affinity - Generic affinity setter function for MSI domains
-  * @irq_data:	The irq data associated to the interrupt
-@@ -73,7 +179,7 @@ int msi_domain_set_affinity(struct irq_data *irq_data,
++/* called with reserved_mutex locked */
++static void reserved_binding_release(struct kref *kref)
++{
++	struct iommu_reserved_binding *b =
++		container_of(kref, struct iommu_reserved_binding, kref);
++	struct iommu_domain *d = b->domain;
++	struct iova_domain *iovad =
++		(struct iova_domain *)d->reserved_iova_cookie;
++	unsigned long order = __ffs(b->size);
++
++	iommu_unmap(d, b->iova, b->size);
++	free_iova(iovad, b->iova >> order);
++	unlink_reserved_binding(d, b);
++	kfree(b);
++}
++
++void iommu_put_single_reserved(struct iommu_domain *domain, dma_addr_t iova)
++{
++	unsigned long order;
++	phys_addr_t aligned_addr;
++	dma_addr_t aligned_iova, page_size, mask, offset;
++	struct iommu_reserved_binding *b;
++
++	order = __ffs(domain->ops->pgsize_bitmap);
++	page_size = (uint64_t)1 << order;
++	mask = page_size - 1;
++
++	aligned_iova = iova & ~mask;
++	offset = iova - aligned_iova;
++
++	aligned_addr = iommu_iova_to_phys(domain, aligned_iova);
++
++	mutex_lock(&domain->reserved_mutex);
++
++	b = find_reserved_binding(domain, aligned_addr, page_size);
++	if (!b)
++		goto unlock;
++	kref_put(&b->kref, reserved_binding_release);
++
++unlock:
++	mutex_unlock(&domain->reserved_mutex);
++}
++EXPORT_SYMBOL_GPL(iommu_put_single_reserved);
++
++
++
+diff --git a/include/linux/dma-reserved-iommu.h b/include/linux/dma-reserved-iommu.h
+index 5bf863b..71ec800 100644
+--- a/include/linux/dma-reserved-iommu.h
++++ b/include/linux/dma-reserved-iommu.h
+@@ -40,6 +40,32 @@ int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
+  */
+ void iommu_free_reserved_iova_domain(struct iommu_domain *domain);
  
- 	ret = parent->chip->irq_set_affinity(parent, mask, force);
- 	if (ret >= 0 && ret != IRQ_SET_MASK_OK_DONE) {
--		BUG_ON(irq_chip_compose_msi_msg(irq_data, &msg));
-+		BUG_ON(msi_compose(irq_data, &msg, false));
- 		irq_chip_write_msi_msg(irq_data, &msg);
- 	}
- 
-@@ -85,7 +191,7 @@ static void msi_domain_activate(struct irq_domain *domain,
- {
- 	struct msi_msg msg;
- 
--	BUG_ON(irq_chip_compose_msi_msg(irq_data, &msg));
-+	BUG_ON(msi_compose(irq_data, &msg, false));
- 	irq_chip_write_msi_msg(irq_data, &msg);
- }
- 
-@@ -94,7 +200,7 @@ static void msi_domain_deactivate(struct irq_domain *domain,
- {
- 	struct msi_msg msg;
- 
--	memset(&msg, 0, sizeof(msg));
-+	msi_compose(irq_data, &msg, true);
- 	irq_chip_write_msi_msg(irq_data, &msg);
- }
- 
++/**
++ * iommu_get_single_reserved: allocate a reserved iova page and bind
++ * it onto the page that contains a physical address (@addr)
++ *
++ * @domain: iommu domain handle
++ * @addr: physical address to bind
++ * @prot: mapping protection attribute
++ * @iova: returned iova
++ *
++ * In case the 2 pages already are bound simply return @iova and
++ * increment a ref count
++ */
++int iommu_get_single_reserved(struct iommu_domain *domain,
++			      phys_addr_t addr, int prot,
++			      dma_addr_t *iova);
++
++/**
++ * iommu_put_single_reserved: decrement a ref count of the iova page
++ *
++ * @domain: iommu domain handle
++ * @iova: iova whose binding ref count is decremented
++ *
++ * if the binding ref count is null, unmap the iova page and release the iova
++ */
++void iommu_put_single_reserved(struct iommu_domain *domain, dma_addr_t iova);
++
+ #endif	/* CONFIG_IOMMU_DMA_RESERVED */
+ #endif	/* __KERNEL__ */
+ #endif	/* __DMA_RESERVED_IOMMU_H */
 -- 
 1.9.1
