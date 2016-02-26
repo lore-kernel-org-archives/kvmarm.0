@@ -1,25 +1,24 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC v4 04/14] dma-reserved-iommu: reserved binding rb-tree and
- helpers
-Date: Fri, 26 Feb 2016 17:35:44 +0000
-Message-ID: <1456508154-2253-5-git-send-email-eric.auger@linaro.org>
+Subject: [RFC v4 02/14] iommu: introduce a reserved iova cookie
+Date: Fri, 26 Feb 2016 17:35:42 +0000
+Message-ID: <1456508154-2253-3-git-send-email-eric.auger@linaro.org>
 References: <1456508154-2253-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0526E411AA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:23 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ACDCA412ED
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:17 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HiBngk1VrxEh for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Feb 2016 12:29:22 -0500 (EST)
-Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 14D78410D7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:21 -0500 (EST)
-Received: by mail-wm0-f52.google.com with SMTP id b205so80967314wmb.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 09:36:14 -0800 (PST)
+ with ESMTP id FWEdomTObIME for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Feb 2016 12:29:16 -0500 (EST)
+Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CB183412E6
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:16 -0500 (EST)
+Received: by mail-wm0-f46.google.com with SMTP id g62so82756154wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 09:36:09 -0800 (PST)
 In-Reply-To: <1456508154-2253-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,95 +33,56 @@ To: eric.auger@st.com, eric.auger@linaro.org, robin.murphy@arm.com, alex.william
 Cc: patches@linaro.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-we will need to track which host physical addresses are mapped to
-reserved IOVA. In that prospect we introduce a new RB tree indexed
-by physical address. This RB tree only is used for reserved IOVA
-bindings.
+This patch introduces some new fields in the iommu_domain struct,
+dedicated to reserved iova management.
 
-It is expected this RB tree will contain very few bindings. Those
-generally correspond to single page mapping one MSI frame (GICv2m
-frame or ITS GITS_TRANSLATER frame).
+In a similar way as DMA mapping IOVA window, we need to store
+information related to a reserved IOVA window.
+
+The reserved_iova_cookie will store the reserved iova_domain
+handle. An RB tree indexed by physical address is introduced to
+store the host physical addresses bound to reserved IOVAs.
+
+Those physical addresses will correspond to MSI frame base
+addresses, also referred to as doorbells. Their number should be
+quite limited per domain.
+
+Also a mutex is introduced to protect accesses to the iova_domain
+and RB tree.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
-
 ---
+ drivers/iommu/iommu.c | 1 +
+ include/linux/iommu.h | 5 +++++
+ 2 files changed, 6 insertions(+)
 
-v3 -> v4:
-- that code was formerly in "iommu/arm-smmu: add a reserved binding RB tree"
----
- drivers/iommu/dma-reserved-iommu.c | 60 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
-
-diff --git a/drivers/iommu/dma-reserved-iommu.c b/drivers/iommu/dma-reserved-iommu.c
-index 41a1add..30d54d0 100644
---- a/drivers/iommu/dma-reserved-iommu.c
-+++ b/drivers/iommu/dma-reserved-iommu.c
-@@ -20,6 +20,66 @@
- #include <linux/iommu.h>
- #include <linux/iova.h>
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index 0e3b009..7b2bb94 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -1072,6 +1072,7 @@ static struct iommu_domain *__iommu_domain_alloc(struct bus_type *bus,
  
-+struct iommu_reserved_binding {
-+	struct kref		kref;
-+	struct rb_node		node;
-+	struct iommu_domain	*domain;
-+	phys_addr_t		addr;
-+	dma_addr_t		iova;
-+	size_t			size;
-+};
-+
-+/* Reserved binding RB-tree manipulation */
-+
-+static struct iommu_reserved_binding *find_reserved_binding(
-+				    struct iommu_domain *d,
-+				    phys_addr_t start, size_t size)
-+{
-+	struct rb_node *node = d->reserved_binding_list.rb_node;
-+
-+	while (node) {
-+		struct iommu_reserved_binding *binding =
-+			rb_entry(node, struct iommu_reserved_binding, node);
-+
-+		if (start + size <= binding->addr)
-+			node = node->rb_left;
-+		else if (start >= binding->addr + binding->size)
-+			node = node->rb_right;
-+		else
-+			return binding;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void link_reserved_binding(struct iommu_domain *d,
-+				  struct iommu_reserved_binding *new)
-+{
-+	struct rb_node **link = &d->reserved_binding_list.rb_node;
-+	struct rb_node *parent = NULL;
-+	struct iommu_reserved_binding *binding;
-+
-+	while (*link) {
-+		parent = *link;
-+		binding = rb_entry(parent, struct iommu_reserved_binding,
-+				   node);
-+
-+		if (new->addr + new->size <= binding->addr)
-+			link = &(*link)->rb_left;
-+		else
-+			link = &(*link)->rb_right;
-+	}
-+
-+	rb_link_node(&new->node, parent, link);
-+	rb_insert_color(&new->node, &d->reserved_binding_list);
-+}
-+
-+static void unlink_reserved_binding(struct iommu_domain *d,
-+				    struct iommu_reserved_binding *old)
-+{
-+	rb_erase(&old->node, &d->reserved_binding_list);
-+}
-+
- int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
- 				     dma_addr_t iova, size_t size,
- 				     unsigned long order)
+ 	domain->ops  = bus->iommu_ops;
+ 	domain->type = type;
++	mutex_init(&domain->reserved_mutex);
+ 
+ 	return domain;
+ }
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index a4fe04a..0189144 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -82,6 +82,11 @@ struct iommu_domain {
+ 	void *handler_token;
+ 	struct iommu_domain_geometry geometry;
+ 	void *iova_cookie;
++	void *reserved_iova_cookie;
++	/* rb tree indexed by PA, for reserved bindings only */
++	struct rb_root reserved_binding_list;
++	/* protects reserved cookie and rbtree manipulation */
++	struct mutex reserved_mutex;
+ };
+ 
+ enum iommu_cap {
 -- 
 1.9.1
