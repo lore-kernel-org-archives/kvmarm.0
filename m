@@ -1,25 +1,24 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC v4 12/14] vfio/type1: also check IRQ remapping capability at msi
- domain
-Date: Fri, 26 Feb 2016 17:35:52 +0000
-Message-ID: <1456508154-2253-13-git-send-email-eric.auger@linaro.org>
+Subject: [RFC v4 13/14] iommu/arm-smmu: do not advertise IOMMU_CAP_INTR_REMAP
+Date: Fri, 26 Feb 2016 17:35:53 +0000
+Message-ID: <1456508154-2253-14-git-send-email-eric.auger@linaro.org>
 References: <1456508154-2253-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 11D19412A2
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:48 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 42D51410D7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UaahqXUOUxVL for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Feb 2016 12:29:47 -0500 (EST)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A16B411F6
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:46 -0500 (EST)
-Received: by mail-wm0-f44.google.com with SMTP id b205so80981349wmb.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 09:36:39 -0800 (PST)
+ with ESMTP id EVyi6HY3scwf for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Feb 2016 12:29:50 -0500 (EST)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id D002C48912
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:49 -0500 (EST)
+Received: by mail-wm0-f42.google.com with SMTP id a4so79239287wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 09:36:42 -0800 (PST)
 In-Reply-To: <1456508154-2253-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,115 +33,34 @@ To: eric.auger@st.com, eric.auger@linaro.org, robin.murphy@arm.com, alex.william
 Cc: patches@linaro.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On x86 IRQ remapping is abstracted by the IOMMU. On ARM this is abstracted
-by the msi controller. vfio_safe_irq_domain allows to check whether
-interrupts are "safe" for a given device. They are if the device does
-not use MSI or if the device uses MSI and the msi-parent controller
-supports IRQ remapping.
+Do not advertise IOMMU_CAP_INTR_REMAP for arm-smmu. Indeed the
+irq_remapping capability is abstracted on irqchip side for ARM as
+opposed to Intel IOMMU featuring IRQ remapping HW.
 
-Then we check at group level if all devices have safe interrupts: if not,
-we only allow the group to be attached if allow_unsafe_interrupts is set.
+So to check IRQ remapping capability, the msi domain needs to be
+checked instead.
 
-At this point ARM sMMU still advertises IOMMU_CAP_INTR_REMAP. This is
-changed in next patch.
+This commit needs to be applied after "vfio/type1: also check IRQ
+remapping capability at msi domain" else the legacy interrupt
+assignment gets broken with arm-smmu.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
-
 ---
-v3 -> v4:
-- rename vfio_msi_parent_irq_remapping_capable into vfio_safe_irq_domain
-  and irq_remapping into safe_irq_domains
+ drivers/iommu/arm-smmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-v2 -> v3:
-- protect vfio_msi_parent_irq_remapping_capable with
-  CONFIG_GENERIC_MSI_IRQ_DOMAIN
----
- drivers/vfio/vfio_iommu_type1.c | 44 +++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 42 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 4e01ebe..88a40f1 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -37,6 +37,8 @@
- #include <linux/vfio.h>
- #include <linux/workqueue.h>
- #include <linux/dma-reserved-iommu.h>
-+#include <linux/irqdomain.h>
-+#include <linux/msi.h>
- 
- #define DRIVER_VERSION  "0.2"
- #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
-@@ -788,6 +790,33 @@ static int vfio_bus_type(struct device *dev, void *data)
- 	return 0;
- }
- 
-+/**
-+ * vfio_safe_irq_domain: returns whether the irq domain
-+ * the device is attached to is safe with respect to MSI isolation.
-+ * If the irq domain is not an MSI domain, we return it is safe.
-+ *
-+ * @dev: device handle
-+ * @data: unused
-+ * returns 0 if the irq domain is safe, -1 if not.
-+ */
-+static int vfio_safe_irq_domain(struct device *dev, void *data)
-+{
-+#ifdef CONFIG_GENERIC_MSI_IRQ_DOMAIN
-+	struct irq_domain *domain;
-+	struct msi_domain_info *info;
-+
-+	domain = dev_get_msi_domain(dev);
-+	if (!domain)
-+		return 0;
-+
-+	info = msi_get_domain_info(domain);
-+
-+	if (!(info->flags & MSI_FLAG_IRQ_REMAPPING))
-+		return -1;
-+#endif
-+	return 0;
-+}
-+
- static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 			     struct vfio_domain *domain)
- {
-@@ -882,7 +911,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 	struct vfio_group *group, *g;
- 	struct vfio_domain *domain, *d;
- 	struct bus_type *bus = NULL;
--	int ret;
-+	int ret, safe_irq_domains;
- 
- 	mutex_lock(&iommu->lock);
- 
-@@ -905,6 +934,13 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 
- 	group->iommu_group = iommu_group;
- 
-+	/*
-+	 * Determine if all the devices of the group have a safe irq domain
-+	 * with respect to MSI isolation
-+	 */
-+	safe_irq_domains = !iommu_group_for_each_dev(iommu_group, &bus,
-+				       vfio_safe_irq_domain);
-+
- 	/* Determine bus_type in order to allocate a domain */
- 	ret = iommu_group_for_each_dev(iommu_group, &bus, vfio_bus_type);
- 	if (ret)
-@@ -932,8 +968,12 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 	INIT_LIST_HEAD(&domain->group_list);
- 	list_add(&group->next, &domain->group_list);
- 
-+	/*
-+	 * to advertise safe interrupts either the IOMMU or the MSI controllers
-+	 * must support IRQ remapping/interrupt translation
-+	 */
- 	if (!allow_unsafe_interrupts &&
--	    !iommu_capable(bus, IOMMU_CAP_INTR_REMAP)) {
-+	    (!iommu_capable(bus, IOMMU_CAP_INTR_REMAP) && !safe_irq_domains)) {
- 		pr_warn("%s: No interrupt remapping support.  Use the module param \"allow_unsafe_interrupts\" to enable VFIO IOMMU support on this platform\n",
- 		       __func__);
- 		ret = -EPERM;
+diff --git a/drivers/iommu/arm-smmu.c b/drivers/iommu/arm-smmu.c
+index c8b7e71..ce988fb 100644
+--- a/drivers/iommu/arm-smmu.c
++++ b/drivers/iommu/arm-smmu.c
+@@ -1284,7 +1284,7 @@ static bool arm_smmu_capable(enum iommu_cap cap)
+ 		 */
+ 		return true;
+ 	case IOMMU_CAP_INTR_REMAP:
+-		return true; /* MSIs are just memory writes */
++		return false; /* interrupt translation handled at MSI controller level */
+ 	case IOMMU_CAP_NOEXEC:
+ 		return true;
+ 	default:
 -- 
 1.9.1
