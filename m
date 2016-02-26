@@ -1,24 +1,25 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC v4 10/14] vfio: introduce VFIO_IOVA_RESERVED vfio_dma type
-Date: Fri, 26 Feb 2016 17:35:50 +0000
-Message-ID: <1456508154-2253-11-git-send-email-eric.auger@linaro.org>
+Subject: [RFC v4 11/14] vfio: allow the user to register reserved iova range
+ for MSI mapping
+Date: Fri, 26 Feb 2016 17:35:51 +0000
+Message-ID: <1456508154-2253-12-git-send-email-eric.auger@linaro.org>
 References: <1456508154-2253-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BE0BA4852F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B680410D7
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EMOKJy8zqRVb for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Feb 2016 12:29:41 -0500 (EST)
-Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C9256410D7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:40 -0500 (EST)
-Received: by mail-wm0-f41.google.com with SMTP id c200so82114766wme.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 09:36:33 -0800 (PST)
+ with ESMTP id jMGoc2OLvWB4 for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 26 Feb 2016 12:29:44 -0500 (EST)
+Received: from mail-wm0-f52.google.com (mail-wm0-f52.google.com [74.125.82.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EC003412F3
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 12:29:43 -0500 (EST)
+Received: by mail-wm0-f52.google.com with SMTP id a4so79235910wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 09:36:36 -0800 (PST)
 In-Reply-To: <1456508154-2253-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,65 +34,291 @@ To: eric.auger@st.com, eric.auger@linaro.org, robin.murphy@arm.com, alex.william
 Cc: patches@linaro.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We introduce a vfio_dma type since we will need to discriminate
-legacy vfio_dma's from new reserved ones. Since those latter are
-not mapped at registration, some treatments need to be reworked:
-removal, replay. Currently they are unplugged. In subsequent patches
-they will be reworked.
+The user is allowed to [un]register a reserved IOVA range by using the
+DMA MAP API and setting the new flag: VFIO_DMA_MAP_FLAG_MSI_RESERVED_IOVA.
+It provides the base address and the size. This region is stored in the
+vfio_dma rb tree. At that point the iova range is not mapped to any target
+address yet. The host kernel will use those iova when needed, typically
+when the VFIO-PCI device allocates its MSIs.
+
+This patch also handles the destruction of the reserved binding RB-tree and
+domain's iova_domains.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
+Signed-off-by: Bharat Bhushan <Bharat.Bhushan@freescale.com>
+
 ---
- drivers/vfio/vfio_iommu_type1.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+v3 -> v4:
+- use iommu_alloc/free_reserved_iova_domain exported by dma-reserved-iommu
+- protect vfio_register_reserved_iova_range implementation with
+  CONFIG_IOMMU_DMA_RESERVED
+- handle unregistration by user-space and on vfio_iommu_type1 release
+
+v1 -> v2:
+- set returned value according to alloc_reserved_iova_domain result
+- free the iova domains in case any error occurs
+
+RFC v1 -> v1:
+- takes into account Alex comments, based on
+  [RFC PATCH 1/6] vfio: Add interface for add/del reserved iova region:
+- use the existing dma map/unmap ioctl interface with a flag to register
+  a reserved IOVA range. A single reserved iova region is allowed.
+---
+ drivers/vfio/vfio_iommu_type1.c | 141 +++++++++++++++++++++++++++++++++++++++-
+ include/uapi/linux/vfio.h       |  12 +++-
+ 2 files changed, 150 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 6f1ea3d..692e9a2 100644
+index 692e9a2..4e01ebe 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -53,6 +53,15 @@ module_param_named(disable_hugepages,
- MODULE_PARM_DESC(disable_hugepages,
- 		 "Disable VFIO IOMMU support for IOMMU hugepages.");
+@@ -36,6 +36,7 @@
+ #include <linux/uaccess.h>
+ #include <linux/vfio.h>
+ #include <linux/workqueue.h>
++#include <linux/dma-reserved-iommu.h>
  
-+enum vfio_iova_type {
-+	VFIO_IOVA_USER = 0, /* standard IOVA used to map user vaddr */
-+	/*
-+	 * IOVA reserved to map special host physical addresses,
-+	 * MSI frames for instance
-+	 */
-+	VFIO_IOVA_RESERVED,
-+};
+ #define DRIVER_VERSION  "0.2"
+ #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
+@@ -403,10 +404,22 @@ static void vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma)
+ 	vfio_lock_acct(-unlocked);
+ }
+ 
++static void vfio_unmap_reserved(struct vfio_iommu *iommu)
++{
++#ifdef CONFIG_IOMMU_DMA_RESERVED
++	struct vfio_domain *d;
 +
- struct vfio_iommu {
- 	struct list_head	domain_list;
- 	struct mutex		lock;
-@@ -75,6 +84,7 @@ struct vfio_dma {
- 	unsigned long		vaddr;		/* Process virtual addr */
- 	size_t			size;		/* Map size (bytes) */
- 	int			prot;		/* IOMMU_READ/WRITE */
-+	enum vfio_iova_type	type;		/* type of IOVA */
- };
- 
- struct vfio_group {
-@@ -395,7 +405,8 @@ static void vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma)
- 
++	list_for_each_entry(d, &iommu->domain_list, next)
++		iommu_unmap_reserved(d->domain);
++#endif
++}
++
  static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
  {
--	vfio_unmap_unpin(iommu, dma);
-+	if (likely(dma->type != VFIO_IOVA_RESERVED))
-+		vfio_unmap_unpin(iommu, dma);
+ 	if (likely(dma->type != VFIO_IOVA_RESERVED))
+ 		vfio_unmap_unpin(iommu, dma);
++	else
++		vfio_unmap_reserved(iommu);
  	vfio_unlink_dma(iommu, dma);
  	kfree(dma);
  }
-@@ -671,6 +682,10 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 		dma_addr_t iova;
+@@ -489,7 +502,8 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+ 	 */
+ 	if (iommu->v2) {
+ 		dma = vfio_find_dma(iommu, unmap->iova, 0);
+-		if (dma && dma->iova != unmap->iova) {
++		if (dma && (dma->iova != unmap->iova ||
++			   (dma->type == VFIO_IOVA_RESERVED))) {
+ 			ret = -EINVAL;
+ 			goto unlock;
+ 		}
+@@ -501,6 +515,10 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+ 	}
  
- 		dma = rb_entry(n, struct vfio_dma, node);
-+
-+		if (unlikely(dma->type == VFIO_IOVA_RESERVED))
-+			continue;
-+
- 		iova = dma->iova;
+ 	while ((dma = vfio_find_dma(iommu, unmap->iova, unmap->size))) {
++		if (dma->type == VFIO_IOVA_RESERVED) {
++			ret = -EINVAL;
++			goto unlock;
++		}
+ 		if (!iommu->v2 && unmap->iova > dma->iova)
+ 			break;
+ 		unmapped += dma->size;
+@@ -650,6 +668,114 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+ 	return ret;
+ }
  
- 		while (iova < dma->iova + dma->size) {
++static int vfio_register_reserved_iova_range(struct vfio_iommu *iommu,
++			   struct vfio_iommu_type1_dma_map *map)
++{
++#ifdef CONFIG_IOMMU_DMA_RESERVED
++	dma_addr_t iova = map->iova;
++	size_t size = map->size;
++	uint64_t mask;
++	struct vfio_dma *dma;
++	int ret = 0;
++	struct vfio_domain *d;
++	unsigned long order;
++
++	/* Verify that none of our __u64 fields overflow */
++	if (map->size != size || map->iova != iova)
++		return -EINVAL;
++
++	order =  __ffs(vfio_pgsize_bitmap(iommu));
++	mask = ((uint64_t)1 << order) - 1;
++
++	WARN_ON(mask & PAGE_MASK);
++
++	if (!size || (size | iova) & mask)
++		return -EINVAL;
++
++	/* Don't allow IOVA address wrap */
++	if (iova + size - 1 < iova)
++		return -EINVAL;
++
++	mutex_lock(&iommu->lock);
++
++	if (vfio_find_dma(iommu, iova, size)) {
++		ret =  -EEXIST;
++		goto out;
++	}
++
++	dma = kzalloc(sizeof(*dma), GFP_KERNEL);
++	if (!dma) {
++		ret = -ENOMEM;
++		goto out;
++	}
++
++	dma->iova = iova;
++	dma->size = size;
++	dma->type = VFIO_IOVA_RESERVED;
++
++	list_for_each_entry(d, &iommu->domain_list, next)
++		ret |= iommu_alloc_reserved_iova_domain(d->domain, iova,
++							size, order);
++
++	if (ret) {
++		list_for_each_entry(d, &iommu->domain_list, next)
++			iommu_free_reserved_iova_domain(d->domain);
++		goto out;
++	}
++
++	vfio_link_dma(iommu, dma);
++
++out:
++	mutex_unlock(&iommu->lock);
++	return ret;
++#else /* CONFIG_IOMMU_DMA_RESERVED */
++	return -ENODEV;
++#endif
++}
++
++static void vfio_unregister_reserved_iova_range(struct vfio_iommu *iommu,
++				struct vfio_iommu_type1_dma_unmap *unmap)
++{
++#ifdef CONFIG_IOMMU_DMA_RESERVED
++	dma_addr_t iova = unmap->iova;
++	struct vfio_dma *dma;
++	size_t size = unmap->size;
++	uint64_t mask;
++	unsigned long order;
++
++	/* Verify that none of our __u64 fields overflow */
++	if (unmap->size != size || unmap->iova != iova)
++		return;
++
++	order =  __ffs(vfio_pgsize_bitmap(iommu));
++	mask = ((uint64_t)1 << order) - 1;
++
++	WARN_ON(mask & PAGE_MASK);
++
++	if (!size || (size | iova) & mask)
++		return;
++
++	/* Don't allow IOVA address wrap */
++	if (iova + size - 1 < iova)
++		return;
++
++	mutex_lock(&iommu->lock);
++
++	dma = vfio_find_dma(iommu, iova, size);
++
++	if (!dma || (dma->type != VFIO_IOVA_RESERVED)) {
++		unmap->size = 0;
++		goto out;
++	}
++
++	unmap->size =  dma->size;
++	vfio_remove_dma(iommu, dma);
++
++out:
++	mutex_unlock(&iommu->lock);
++#endif
++}
++
+ static int vfio_bus_type(struct device *dev, void *data)
+ {
+ 	struct bus_type **bus = data;
+@@ -946,6 +1072,7 @@ static void vfio_iommu_type1_release(void *iommu_data)
+ 	struct vfio_group *group, *group_tmp;
+ 
+ 	vfio_iommu_unmap_unpin_all(iommu);
++	vfio_unmap_reserved(iommu);
+ 
+ 	list_for_each_entry_safe(domain, domain_tmp,
+ 				 &iommu->domain_list, next) {
+@@ -1019,7 +1146,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 	} else if (cmd == VFIO_IOMMU_MAP_DMA) {
+ 		struct vfio_iommu_type1_dma_map map;
+ 		uint32_t mask = VFIO_DMA_MAP_FLAG_READ |
+-				VFIO_DMA_MAP_FLAG_WRITE;
++				VFIO_DMA_MAP_FLAG_WRITE |
++				VFIO_DMA_MAP_FLAG_MSI_RESERVED_IOVA;
+ 
+ 		minsz = offsetofend(struct vfio_iommu_type1_dma_map, size);
+ 
+@@ -1029,6 +1157,9 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 		if (map.argsz < minsz || map.flags & ~mask)
+ 			return -EINVAL;
+ 
++		if (map.flags & VFIO_DMA_MAP_FLAG_MSI_RESERVED_IOVA)
++			return vfio_register_reserved_iova_range(iommu, &map);
++
+ 		return vfio_dma_do_map(iommu, &map);
+ 
+ 	} else if (cmd == VFIO_IOMMU_UNMAP_DMA) {
+@@ -1043,10 +1174,16 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 		if (unmap.argsz < minsz || unmap.flags)
+ 			return -EINVAL;
+ 
++		if (unmap.flags & VFIO_DMA_MAP_FLAG_MSI_RESERVED_IOVA) {
++			vfio_unregister_reserved_iova_range(iommu, &unmap);
++			goto out;
++		}
++
+ 		ret = vfio_dma_do_unmap(iommu, &unmap);
+ 		if (ret)
+ 			return ret;
+ 
++out:
+ 		return copy_to_user((void __user *)arg, &unmap, minsz);
+ 	}
+ 
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 7d7a4c6..d5a48e7 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -410,12 +410,21 @@ struct vfio_iommu_type1_info {
+  *
+  * Map process virtual addresses to IO virtual addresses using the
+  * provided struct vfio_dma_map. Caller sets argsz. READ &/ WRITE required.
++ *
++ * In case MSI_RESERVED_IOVA flag is set, the API only aims at registering an
++ * IOVA region which will be used on some platforms to map the host MSI frame.
++ * in that specific case, vaddr and prot are ignored. The requirement for
++ * provisioning such IOVA range can be checked by calling VFIO_IOMMU_GET_INFO
++ * with the VFIO_IOMMU_INFO_REQUIRE_MSI_MAP attribute. A single
++ * MSI_RESERVED_IOVA region can be registered
+  */
+ struct vfio_iommu_type1_dma_map {
+ 	__u32	argsz;
+ 	__u32	flags;
+ #define VFIO_DMA_MAP_FLAG_READ (1 << 0)		/* readable from device */
+ #define VFIO_DMA_MAP_FLAG_WRITE (1 << 1)	/* writable from device */
++/* reserved iova for MSI vectors*/
++#define VFIO_DMA_MAP_FLAG_MSI_RESERVED_IOVA (1 << 2)
+ 	__u64	vaddr;				/* Process virtual address */
+ 	__u64	iova;				/* IO virtual address */
+ 	__u64	size;				/* Size of mapping (bytes) */
+@@ -431,7 +440,8 @@ struct vfio_iommu_type1_dma_map {
+  * Caller sets argsz.  The actual unmapped size is returned in the size
+  * field.  No guarantee is made to the user that arbitrary unmaps of iova
+  * or size different from those used in the original mapping call will
+- * succeed.
++ * succeed. A Reserved DMA region must be unmapped with MSI_RESERVED_IOVA
++ * flag set.
+  */
+ struct vfio_iommu_type1_dma_unmap {
+ 	__u32	argsz;
 -- 
 1.9.1
