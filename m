@@ -1,24 +1,30 @@
-From: Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [RFC v4 09/14] msi: IOMMU map the doorbell address when needed
-Date: Fri, 26 Feb 2016 19:19:45 +0100 (CET)
-Message-ID: <alpine.DEB.2.11.1602261907050.3638@nanos>
-References: <1456508154-2253-1-git-send-email-eric.auger@linaro.org>
- <1456508154-2253-10-git-send-email-eric.auger@linaro.org>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [Question] Can KVM run on Freescale IMX6 SABRE board?
+Date: Sat, 27 Feb 2016 13:06:21 +0100
+Message-ID: <20160227120621.GA32621@cbox>
+References: <CAPSnSYoxmmDm--vuigyHb2xPr1GpSf22meO59kDQh1s2HFySiA@mail.gmail.com>
+ <CAFEAcA_Dt=swYzqmLMyok5SHWhfFP5Lsj42GnNg0tEg-JjGEyQ@mail.gmail.com>
+ <CAPSnSYooB+QiTq9t1n_wXevsMZFVQbtsmAd2jERff05aFn+oYw@mail.gmail.com>
+ <20160226075441.GA9352@cbox>
+ <CAPSnSYqNAYVSve8KeEkAGH3iwf1tbNntTfp5MwEAG-QSfRg8FA@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0C73C411AA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 13:14:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D70BD40FA7
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Feb 2016 06:58:24 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6Qxs5YWEnpVw for <kvmarm@lists.cs.columbia.edu>;
- Fri, 26 Feb 2016 13:14:20 -0500 (EST)
-Received: from Galois.linutronix.de (www.linutronix.de [62.245.132.108])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 25246410D7
- for <kvmarm@lists.cs.columbia.edu>; Fri, 26 Feb 2016 13:14:19 -0500 (EST)
-In-Reply-To: <1456508154-2253-10-git-send-email-eric.auger@linaro.org>
+ with ESMTP id uPKl-LsfXDCe for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 27 Feb 2016 06:58:23 -0500 (EST)
+Received: from mail-wm0-f46.google.com (mail-wm0-f46.google.com [74.125.82.46])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B200240FA2
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Feb 2016 06:58:23 -0500 (EST)
+Received: by mail-wm0-f46.google.com with SMTP id g62so102157768wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 27 Feb 2016 04:05:19 -0800 (PST)
+Content-Disposition: inline
+In-Reply-To: <CAPSnSYqNAYVSve8KeEkAGH3iwf1tbNntTfp5MwEAG-QSfRg8FA@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,140 +34,94 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>
-Cc: eric.auger@st.com, jason@lakedaemon.net, kvm@vger.kernel.org, patches@linaro.org, marc.zyngier@arm.com, joro@8bytes.org, will.deacon@arm.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org, Manish.Jaggi@caviumnetworks.com, alex.williamson@redhat.com, linux-arm-kernel@lists.infradead.org, robin.murphy@arm.com, kvmarm@lists.cs.columbia.edu
+To: xu mike <upennmike@gmail.com>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, 26 Feb 2016, Eric Auger wrote:
-> +static int msi_map_doorbell(struct iommu_domain *d, struct msi_msg *msg)
-> +{
-> +#ifdef CONFIG_IOMMU_DMA_RESERVED
-> +	dma_addr_t iova;
-> +	phys_addr_t addr;
-> +	int ret;
-> +
-> +#ifdef CONFIG_PHYS_ADDR_T_64BIT
-> +	addr = ((phys_addr_t)(msg->address_hi) << 32) | msg->address_lo;
-> +#else
-> +	addr = msg->address_lo;
-> +#endif
-> +
-> +	ret = iommu_get_single_reserved(d, addr, IOMMU_WRITE, &iova);
-> +	if (!ret) {
-> +		msg->address_lo = lower_32_bits(iova);
-> +		msg->address_hi = upper_32_bits(iova);
-> +	}
-> +	return ret;
-> +#else
-> +	return -ENODEV;
-> +#endif
+On Fri, Feb 26, 2016 at 10:53:44AM -0500, xu mike wrote:
+> 2016-02-26 2:54 GMT-05:00 Christoffer Dall <christoffer.dall@linaro.org>:
+> > On Thu, Feb 25, 2016 at 12:45:45PM -0500, xu mike wrote:
+> >> Hi Peter,
+> >>
+> >> 2016-02-25 10:30 GMT-05:00 Peter Maydell <peter.maydell@linaro.org>:
+> >> >
+> >> > On 25 February 2016 at 15:17, xu mike <upennmike@gmail.com> wrote:
+> >> > > I'm a student from the University of Pennsylvania. I want to try KVM on ARM
+> >> > > boards.
+> >> > >
+> >> > > I have a Freescale IMX6 board [1] which has ARM Cortex A9 processors.
+> >> > > I'm wondering if KVM can run on the Freescale IMX6 board? or
+> >> > > Can KVM run on any ARM board with ARM Cortex A9 processors?
+> >> > >
+> >> > > I noticed at [2] that " KVM/ARM is designed specifically to work on ARM
+> >> > > processors with the virtualization extensions enabled to run unmodified
+> >> > > guest operating systems."
+> >> > > I'm wondering if this statement is still true?
+> >> >
+> >> > Yes, it is. You need a CPU with the virtualization extensions,
+> >> > and the A9 does not have them. You want (for instance) an A15
+> >> > or an A7. There are cheap A7-based development boards out there,
+> >> > for instance the CubieTruck (which is not very fast but can run
+> >> > a mainline Linux kernel and KVM so is a reasonable getting-started
+> >> > development platform).
+> >>
+> >>
+> >> Thank you very much for your quick reply!
+> >>
+> >> I'm wondering if KVM community has any plan to make KVM compatible
+> >> with Cortex A9 processors?
+> >>
+> >
+> > Not that I'm aware, no.
+> >
+> >> If someone, with linux scheduler development experiment but without
+> >> porting experiment, wants to port KVM to Cortex A9,  how hard could it
+> >> be to port KVM onto Cortex A9 processor?
+> >
+> > As Peter said, ARM is not a virtualizable architecture, so you need
+> > hardware support for virtualization to run hypervisors on an ARM system.
+> >
+> > Cortex-A9 does not have this support.
+> >
+> > You could implement something using either binary translation or
+> > paravirtualization, but neither is something we're immediately
+> > interested in accepting in mainline Linux.
+> 
+> Right. I couldn't estimate how hard it will be to achieve the
+> paravirtualization/binary translation in KVM.. Probably it may involve
+> a lot of (assembly) code, since it requires to de-privilege those
+> privileged instructions. :-(
+> 
 
-This is completely unreadable. Please make this in a way which is parseable.
-A few small inline functions do the trick.
+I don't think you'd have to write a lot of assembly code, but writing an
+in-kernel binary translator is simply beyond the scope of what KVM was
+designed for, and making a binary translator efficient and adding
+support for shadow page tables will be non-trivial.
 
-> +static void msi_unmap_doorbell(struct iommu_domain *d, struct msi_msg *msg)
-> +{
-> +#ifdef CONFIG_IOMMU_DMA_RESERVED
-> +	dma_addr_t iova;
-> +
-> +#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-> +	iova = ((dma_addr_t)(msg->address_hi) << 32) | msg->address_lo;
-> +#else
-> +	iova = msg->address_lo;
-> +#endif
-> +
-> +	iommu_put_single_reserved(d, iova);
-> +#endif
+If anything, but again, I stress that I would *not* accept this upstream,
+you could build something that was paravirtualized with shadow page
+table support.
 
-Ditto.
+> >
+> > What is your use-case for running on A9 specifically, as opposed to a
+> > CPU with virt support?
+> 
+> The reason why I have to use A9 is because A9 has the special cache
+> controller, called PL310 cache controller, which is not supported in
+> A7 or A15. I want to use the special cache controller in
+> virtualization environment. That's why I'm so addicted to A9. :-(
+> If there is some latest ARM processor that has the PL310 cache
+> controller and virtulaizaiton extension support, that will be awesome!
+> However, I'm unaware of the ideal ARM processors. :-( Do you happen to
+> know?
+> 
 
-> +}
-> +
-> +#ifdef CONFIG_IOMMU_API
-> +static struct iommu_domain *
-> +	irq_data_to_msi_mapping_domain(struct irq_data *irq_data)
+I have no idea, no.  I'm curious, why is it important for you to have a
+PL310 cache controller in a VM?
 
-If you split lines, then the function name starts at the beginning of the line
-and not at some randome place.
+Is this research or product oriented?
 
-> +{
-> +
-> +	struct msi_desc *desc;
-> +	struct device *dev;
-> +	struct iommu_domain *d;
-> +	int ret;
+In any case, I would give up on A9 virtualization and use a proper piece
+of hardware for virtualization on ARM.
 
-Please order variables by descending length
-
-> +	desc = irq_data_get_msi_desc(irq_data);
-> +	if (!desc)
-> +		return NULL;
-> +
-> +	dev = msi_desc_to_dev(desc);
-> +
-> +	d = iommu_get_domain_for_dev(dev);
-> +	if (!d)
-> +		return NULL;
-> +
-> +	ret = iommu_domain_get_attr(d, DOMAIN_ATTR_MSI_MAPPING, NULL);
-> +	if (!ret)
-> +		return d;
-> +	else
-> +		return NULL;
-
-Does anyone except you understand the purpose of the function? Comments have
-been invented for a reason.
-
-> +}
-> +#else
-> +static inline iommu_domain *
-> +		irq_data_to_msi_mapping_domain(struct irq_data *irq_data)
-> +{
-> +	return NULL;
-> +}
-> +#endif /* CONFIG_IOMMU_API */
-> +
-> +static int msi_compose(struct irq_data *irq_data,
-> +		       struct msi_msg *msg, bool erase)
-> +{
-> +	struct msi_msg old_msg;
-> +	struct iommu_domain *d;
-> +	int ret = 0;
-> +
-> +	d = irq_data_to_msi_mapping_domain(irq_data);
-> +	if (unlikely(d))
-> +		get_cached_msi_msg(irq_data->irq, &old_msg);
-> +
-> +	if (erase)
-> +		memset(msg, 0, sizeof(*msg));
-> +	else
-> +		ret = irq_chip_compose_msi_msg(irq_data, msg);
-> +
-> +	if (!d)
-> +		goto out;
-> +
-> +	/* handle (re-)mapping of MSI doorbell */
-> +	if ((old_msg.address_lo != msg->address_lo) ||
-> +	    (old_msg.address_hi != msg->address_hi))
-> +		msi_unmap_doorbell(d, &old_msg);
-> +
-> +	if (!erase)
-> +		WARN_ON(msi_map_doorbell(d, msg));
-> +
-> +out:
-> +	return ret;
-> +}
-
-No, this is not the way we do this. You replace existing functionality by some
-new fangled thing. which behaves differently.
-
-This wants to be seperate patches, which first create a wrapper for
-irq_chip_compose_msi_msg() and then adds the new functionality to it including
-a proper explanation.
-
-I have no idea how the above is supposed to be the same as the existing code
-for the non iommu case.
-
-Thanks,
-
-	tglx
+-Christoffer
