@@ -1,30 +1,55 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH for-4.5] arm/kvm: fix ioctl error handling
-Date: Mon, 29 Feb 2016 09:29:14 +0100
-Message-ID: <20160229082914.GA3471@cbox>
-References: <1456673397-23625-1-git-send-email-mst@redhat.com>
+From: Mihai Claudiu Caraman <mike.caraman@nxp.com>
+Subject: RE: [PATCH v2 00/17] KVM/ARM: Guest Entry/Exit optimizations
+Date: Mon, 29 Feb 2016 10:43:29 +0000
+Message-ID: <AM2PR04MB0739F13F5F6CBBCB45F2071784BA0@AM2PR04MB0739.eurprd04.prod.outlook.com>
+References: <1455727249-24752-1-git-send-email-marc.zyngier@arm.com>
+ <AM2PR04MB073947192D0A7015739689EF84BA0@AM2PR04MB0739.eurprd04.prod.outlook.com>
+ <56D400A4.3020904@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <stable-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <1456673397-23625-1-git-send-email-mst@redhat.com>
-Sender: stable-owner@vger.kernel.org
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Dan Carpenter <dan.carpenter@oracle.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <56D400A4.3020904@arm.com>
+Content-Language: en-US
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Sun, Feb 28, 2016 at 05:32:07PM +0200, Michael S. Tsirkin wrote:
-> Calling return copy_to_user(...) in an ioctl will not
-> do the right thing if there's a pagefault:
-> copy_to_user returns the number of bytes not copied
-> in this case.
+> -----Original Message-----
+> From: Marc Zyngier [mailto:marc.zyngier@arm.com] 
+> Sent: Monday, February 29, 2016 10:26 AM
+> To: Mihai Claudiu Caraman <mike.caraman@nxp.com>; Christoffer Dall <christoffer.dall@linaro.org>
+> Cc: kvm@vger.kernel.org; linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu
+> Subject: Re: [PATCH v2 00/17] KVM/ARM: Guest Entry/Exit optimizations
 > 
-> Fix up kvm to do
-> 	return copy_to_user(...)) ?  -EFAULT : 0;
+> On 29/02/16 00:57, Mihai Claudiu Caraman wrote:
+> > Reported-by: Mihai Caraman <mihai.caraman@freescale.com>
 > 
-> everywhere.
-> 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> Reported-by? Where? Did I miss an email (wouldn't surprise me)?
 
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Private meeting between ARM and Freescale/NXP, it was me.
+
+> 
+> > Tested-by: Mihai Caraman <mihai.caraman@freescale.com>
+> > 
+> > 40% improvements here and there will make the difference. 
+> 
+> I'm sceptical that you will see a significant improvement
+
+1% improvement with this patch is good enough.
+
+> on any *realistic* workload
+
+You will hear about this sooner than you think ;-)
+
+> , but thanks for testing!
+
+Thanks for the patch, we plan to contribute as well.
+
+> 
+> 	M.
+> -- 
+> Jazz is not dead. It just smells funny...
+
+-Mike
