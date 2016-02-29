@@ -1,130 +1,89 @@
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v4 00/23] arm64: Virtualization Host Extension support
-Date: Mon, 29 Feb 2016 17:43:28 +0000
-Message-ID: <871t7vjttr.fsf@linaro.org>
-References: <1455216004-19499-1-git-send-email-marc.zyngier@arm.com>
+From: Shannon Zhao <zhaoshenglong@huawei.com>
+Subject: Re: [PATCH v13 01/20] ARM64: Move PMU register related defines to
+ asm/perf_event.h
+Date: Tue, 1 Mar 2016 02:50:13 +0800
+Message-ID: <56D492E5.4040709@huawei.com>
+References: <1456290520-10012-1-git-send-email-zhaoshenglong@huawei.com> <1456290520-10012-2-git-send-email-zhaoshenglong@huawei.com> <20160224175247.GE12471@arm.com> <56CE6098.8070001@huawei.com> <56D4428B.5000505@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 837AA411E3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Feb 2016 12:36:30 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vVIt3FVH2tHA for <kvmarm@lists.cs.columbia.edu>;
- Mon, 29 Feb 2016 12:36:29 -0500 (EST)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 39929410EB
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Feb 2016 12:36:27 -0500 (EST)
-Received: by mail-wm0-f44.google.com with SMTP id n186so61030109wmn.1
- for <kvmarm@lists.cs.columbia.edu>; Mon, 29 Feb 2016 09:43:31 -0800 (PST)
-In-reply-to: <1455216004-19499-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <56D4428B.5000505@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Ck1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+IHdyaXRlczoKCj4gQVJNdjguMSBj
-b21lcyB3aXRoIHRoZSAiVmlydHVhbGl6YXRpb24gSG9zdCBFeHRlbnNpb24iIChWSEUgZm9yCj4g
-c2hvcnQpLCB3aGljaCBlbmFibGVzIHNpbXBsZXIgc3VwcG9ydCBvZiBUeXBlLTIgaHlwZXJ2aXNv
-cnMuCj4KPiBUaGlzIGV4dGVuc2lvbiBhbGxvd3MgdGhlIGtlcm5lbCB0byBkaXJlY3RseSBydW4g
-YXQgRUwyLCBhbmQKPiBzaWduaWZpY2FudGx5IHJlZHVjZXMgdGhlIG51bWJlciBvZiBzeXN0ZW0g
-cmVnaXN0ZXJzIHNoYXJlZCBiZXR3ZWVuCj4gaG9zdCBhbmQgZ3Vlc3QsIHJlZHVjaW5nIHRoZSBv
-dmVyaGVhZCBvZiB2aXJ0dWFsaXphdGlvbi4KPgo+IEluIG9yZGVyIHRvIGhhdmUgdGhlIHNhbWUg
-a2VybmVsIGJpbmFyeSBydW5uaW5nIG9uIGFsbCB2ZXJzaW9ucyBvZiB0aGUKPiBhcmNoaXRlY3R1
-cmUsIHRoaXMgc2VyaWVzIG1ha2VzIGhlYXZ5IHVzZSBvZiBydW50aW1lIGNvZGUgcGF0Y2hpbmcu
-Cj4KPiBUaGUgZmlyc3QgMjIgcGF0Y2hlcyBtYXNzYWdlIHRoZSBLVk0gY29kZSB0byBkZWFsIHdp
-dGggVkhFIGFuZCBlbmFibGUKPiBMaW51eCB0byBydW4gYXQgRUwyLiBUaGUgbGFzdCBwYXRjaCBj
-YXRjaGVzIGFuIHVnbHkgY2FzZSB3aGVuIFZIRQo+IGNhcGFibGUgQ1BVcyBhcmUgcGFpcmVkIHdp
-dGggc29tZSBvZiB0aGVpciBsZXNzIGNhcGFibGUgc2libGluZ3MuIFRoaXMKPiBzaG91bGQgbmV2
-ZXIgaGFwcGVuLCBidXQgaGV5Li4uCj4KPiBJIGhhdmUgZGVsaWJlcmF0ZWx5IGxlZnQgb3V0IHNv
-bWUgb2YgdGhlIG1vcmUgImFkdmFuY2VkIgo+IG9wdGltaXphdGlvbnMsIGFzIHRoZXkgYXJlIGxp
-a2VseSB0byBkaXN0cmFjdCB0aGUgcmV2aWV3ZXIgZnJvbSB0aGUKPiBjb3JlIGluZnJhc3RydWN0
-dXJlLCB3aGljaCBpcyB3aGF0IEkgY2FyZSBhYm91dCBhdCB0aGUgbW9tZW50Lgo+Cj4gTm90ZTog
-R0RCIGlzIGN1cnJlbnRseSBidXN0ZWQgb24gVkhFIHN5c3RlbXMsIGFzIGl0IGNoZWNrcyBmb3Ig
-dmVyc2lvbgo+ICAgICAgIDYgb24gdGhlIGRlYnVnIGFyY2hpdGVjdHVyZSwgd2hpbGUgVkhFIGlz
-IHZlcnNpb24gNy4gVGhlCj4gICAgICAgYmludXRpbHMgcGVvcGxlIGFyZSBvbiB0aGUgY2FzZS4K
-CkkgYXNzdW1lIHlvdSBhcmUgdGFsa2luZyBhYm91dCBwdHJhY2UgZGVidWcgaGVyZSByYXRoZXIg
-dGhhbiBndWVzdApkZWJ1Zz8KCkFueXdheSBmcm9tIGEgY3Vyc29yeSBpbnNwZWN0aW9uIEkgZGlk
-bid0IHNlZSBhbnl0aGluZyB0byB3b3JyeSBhYm91dApmcm9tIHRoZSBndWVzdCBkZWJ1ZyBzaWRl
-IHdoaWNoIGlzIHVuY2hhbmdlZC4KCkFja2VkLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVl
-QGxpbmFyby5vcmc+Cgo+Cj4gVGhpcyBoYXMgYmVlbiB0ZXN0ZWQgb24gdGhlIEZWUF9CYXNlX1NM
-Vi1WOC1BIG1vZGVsLCBhbmQgYmFzZWQgb24KPiB2NC41LXJjMyArIGt2bWFybS9tYXN0ZXIuIEkn
-dmUgcHV0IGEgYnJhbmNoIG91dCBvbjoKPgo+IGdpdDovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20v
-bGludXgva2VybmVsL2dpdC9tYXovYXJtLXBsYXRmb3Jtcy5naXQga3ZtLWFybTY0L3ZoZQo+Cj4g
-KiBGcm9tIHYzOgo+ICAgLSBDbGVhbmVkIGRlYnVnIGhhbmRsaW5nIGFmdGVyIGNvbW1lbnRzIGZy
-b20gQ2F0YWxpbgo+ICAgLSBBZGRlZCBtaXNzaW5nIGJhcnJpZXJzIGluIHRoZSBwYW5pYyBwYXRj
-aAo+ICAgLSBDb2xsZWN0ZWQgUmIgYW5kIEFja3MgZnJvbSBDaHJpc3RvZmZlciBhbmQgQ2F0YWxp
-bgo+Cj4gKiBGcm9tIHYyOgo+ICAgLSBBZGRlZCBzdXBwb3J0IGZvciBwZXJmIHRvIGNvdW50IGtl
-cm5lbCBldmVudHMgaW4gRUwyCj4gICAtIEFkZGVkIHN1cHBvcnQgZm9yIEVMMiBicmVha3BvaW50
-cwo+ICAgLSBNb3ZlZCB0aGUgVlRDUl9FTDIgc2V0dXAgZnJvbSBhc3NlbWJseSB0byBDCj4gICAt
-IE1hZGUgdGhlIGZhdWx0IGhhbmRsaW5nIGVhc2llciB0byB1bmRlcnN0YW5kIChob3BlZnVseSkK
-PiAgIC0gUGxlbnR5IG9mIHNtYWxsZXIgZml4dXBzCj4KPiAqIEZyb20gdjE6Cj4gICAtIEZ1bGwg
-cmV3cml0ZSBub3cgdGhhdCB0aGUgV29ybGQgU3dpdGNoIGlzIHdyaXR0ZW4gaW4gQyBjb2RlLgo+
-ICAgLSBEcm9wcGVkIHRoZSAiZWFybHkgSVJRIGhhbmRsaW5nIiBmb3IgdGhlIG1vbWVudC4KPgo+
-IE1hcmMgWnluZ2llciAoMjMpOgo+ICAgYXJtL2FybTY0OiBLVk06IEFkZCBob29rIGZvciBDLWJh
-c2VkIHN0YWdlMiBpbml0Cj4gICBhcm02NDogS1ZNOiBTd2l0Y2ggdG8gQy1iYXNlZCBzdGFnZTIg
-aW5pdAo+ICAgYXJtL2FybTY0OiBBZGQgbmV3IGlzX2tlcm5lbF9pbl9oeXBfbW9kZSBwcmVkaWNh
-dGUKPiAgIGFybTY0OiBBbGxvdyB0aGUgYXJjaCB0aW1lciB0byB1c2UgdGhlIEhZUCB0aW1lcgo+
-ICAgYXJtNjQ6IEFkZCBBUk02NF9IQVNfVklSVF9IT1NUX0VYVE4gZmVhdHVyZQo+ICAgYXJtNjQ6
-IEtWTTogU2tpcCBIWVAgc2V0dXAgd2hlbiBhbHJlYWR5IHJ1bm5pbmcgaW4gSFlQCj4gICBhcm02
-NDogS1ZNOiBWSEU6IFBhdGNoIG91dCB1c2Ugb2YgSFZDCj4gICBhcm02NDogS1ZNOiBWSEU6IFBh
-dGNoIG91dCBrZXJuX2h5cF92YQo+ICAgYXJtNjQ6IEtWTTogVkhFOiBJbnRyb2R1Y2UgdW5pZmll
-ZCBzeXN0ZW0gcmVnaXN0ZXIgYWNjZXNzb3JzCj4gICBhcm02NDogS1ZNOiBWSEU6IERpZmZlcmVu
-Y2lhdGUgaG9zdC9ndWVzdCBzeXNyZWcgc2F2ZS9yZXN0b3JlCj4gICBhcm02NDogS1ZNOiBWSEU6
-IFNwbGl0IHNhdmUvcmVzdG9yZSBvZiByZWdpc3RlcnMgc2hhcmVkIGJldHdlZW4gZ3Vlc3QKPiAg
-ICAgYW5kIGhvc3QKPiAgIGFybTY0OiBLVk06IFZIRTogVXNlIHVuaWZpZWQgc3lzdGVtIHJlZ2lz
-dGVyIGFjY2Vzc29ycwo+ICAgYXJtNjQ6IEtWTTogVkhFOiBFbmFibGUgbWluaW1hbCBzeXNyZWcg
-c2F2ZS9yZXN0b3JlCj4gICBhcm02NDogS1ZNOiBWSEU6IE1ha2UgX19mcHNpbWRfZW5hYmxlZCBW
-SEUgYXdhcmUKPiAgIGFybTY0OiBLVk06IFZIRTogSW1wbGVtZW50IFZIRSBhY3RpdmF0ZS9kZWFj
-dGl2YXRlX3RyYXBzCj4gICBhcm02NDogS1ZNOiBWSEU6IFVzZSB1bmlmaWVkIHN5c3JlZyBhY2Nl
-c3NvcnMgZm9yIHRpbWVyCj4gICBhcm02NDogS1ZNOiBWSEU6IEFkZCBmcHNpbWQgZW5hYmxpbmcg
-b24gZ3Vlc3QgYWNjZXNzCj4gICBhcm02NDogS1ZNOiBWSEU6IEFkZCBhbHRlcm5hdGl2ZSBwYW5p
-YyBoYW5kbGluZwo+ICAgYXJtNjQ6IEtWTTogTW92ZSBtb3N0IG9mIHRoZSBmYXVsdCBkZWNvZGlu
-ZyB0byBDCj4gICBhcm02NDogcGVyZjogQ291bnQgRUwyIGV2ZW50cyBpZiB0aGUga2VybmVsIGlz
-IHJ1bm5pbmcgaW4gSFlQCj4gICBhcm02NDogaHdfYnJlYWtwb2ludDogQWxsb3cgRUwyIGJyZWFr
-cG9pbnRzIGlmIHJ1bm5pbmcgaW4gSFlQCj4gICBhcm02NDogVkhFOiBBZGQgc3VwcG9ydCBmb3Ig
-cnVubmluZyBMaW51eCBpbiBFTDIgbW9kZQo+ICAgYXJtNjQ6IFBhbmljIHdoZW4gVkhFIGFuZCBu
-b24gVkhFIENQVXMgY29leGlzdAo+Cj4gIGFyY2gvYXJtL2luY2x1ZGUvYXNtL2t2bV9ob3N0Lmgg
-ICAgICAgIHwgICA0ICsKPiAgYXJjaC9hcm0vaW5jbHVkZS9hc20vdmlydC5oICAgICAgICAgICAg
-fCAgIDUgKwo+ICBhcmNoL2FybS9rdm0vYXJtLmMgICAgICAgICAgICAgICAgICAgICB8IDE3NCAr
-KysrKysrKysrKysrKysrKystLS0tLS0tLS0tCj4gIGFyY2gvYXJtL2t2bS9tbXUuYyAgICAgICAg
-ICAgICAgICAgICAgIHwgICA3ICsrCj4gIGFyY2gvYXJtNjQvS2NvbmZpZyAgICAgICAgICAgICAg
-ICAgICAgIHwgIDEzICsrKwo+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2NwdWZlYXR1cmUuaCAg
-ICB8ICAgMyArLQo+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2h3X2JyZWFrcG9pbnQuaCB8ICA0
-OSArKysrKy0tLQo+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9hcm0uaCAgICAgICB8ICAg
-NiArLQo+ICBhcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9hc20uaCAgICAgICB8ICAgMiArCj4g
-IGFyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2VtdWxhdGUuaCAgIHwgICAzICsKPiAgYXJjaC9h
-cm02NC9pbmNsdWRlL2FzbS9rdm1faG9zdC5oICAgICAgfCAgIDYgKwo+ICBhcmNoL2FybTY0L2lu
-Y2x1ZGUvYXNtL2t2bV9tbXUuaCAgICAgICB8ICAxMiArLQo+ICBhcmNoL2FybTY0L2luY2x1ZGUv
-YXNtL3ZpcnQuaCAgICAgICAgICB8ICAyNyArKysrKwo+ICBhcmNoL2FybTY0L2tlcm5lbC9hc20t
-b2Zmc2V0cy5jICAgICAgICB8ICAgMyAtCj4gIGFyY2gvYXJtNjQva2VybmVsL2NwdWZlYXR1cmUu
-YyAgICAgICAgIHwgIDExICsrCj4gIGFyY2gvYXJtNjQva2VybmVsL2hlYWQuUyAgICAgICAgICAg
-ICAgIHwgIDUwICsrKysrKystCj4gIGFyY2gvYXJtNjQva2VybmVsL3BlcmZfZXZlbnQuYyAgICAg
-ICAgIHwgIDE0ICsrLQo+ICBhcmNoL2FybTY0L2tlcm5lbC9zbXAuYyAgICAgICAgICAgICAgICB8
-ICAgMyArCj4gIGFyY2gvYXJtNjQva3ZtL2h5cC1pbml0LlMgICAgICAgICAgICAgIHwgIDE4IC0t
-LQo+ICBhcmNoL2FybTY0L2t2bS9oeXAuUyAgICAgICAgICAgICAgICAgICB8ICAgNyArKwo+ICBh
-cmNoL2FybTY0L2t2bS9oeXAvTWFrZWZpbGUgICAgICAgICAgICB8ICAgMSArCj4gIGFyY2gvYXJt
-NjQva3ZtL2h5cC9lbnRyeS5TICAgICAgICAgICAgIHwgICA2ICsKPiAgYXJjaC9hcm02NC9rdm0v
-aHlwL2h5cC1lbnRyeS5TICAgICAgICAgfCAxMDkgKysrKysrLS0tLS0tLS0tLS0tCj4gIGFyY2gv
-YXJtNjQva3ZtL2h5cC9oeXAuaCAgICAgICAgICAgICAgIHwgMTA4ICsrKysrKysrKysrKysrKyst
-LQo+ICBhcmNoL2FybTY0L2t2bS9oeXAvczItc2V0dXAuYyAgICAgICAgICB8ICA0NCArKysrKysr
-Cj4gIGFyY2gvYXJtNjQva3ZtL2h5cC9zd2l0Y2guYyAgICAgICAgICAgIHwgMjAyICsrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrLS0tLQo+ICBhcmNoL2FybTY0L2t2bS9oeXAvc3lzcmVnLXNy
-LmMgICAgICAgICB8IDE0NyArKysrKysrKysrKysrKysrLS0tLS0tLS0KPiAgYXJjaC9hcm02NC9r
-dm0vaHlwL3RpbWVyLXNyLmMgICAgICAgICAgfCAgMTAgKy0KPiAgZHJpdmVycy9jbG9ja3NvdXJj
-ZS9hcm1fYXJjaF90aW1lci5jICAgfCAgOTYgKysrKysrKysrKy0tLS0tLQo+ICAyOSBmaWxlcyBj
-aGFuZ2VkLCA4NDIgaW5zZXJ0aW9ucygrKSwgMjk4IGRlbGV0aW9ucygtKQo+ICBjcmVhdGUgbW9k
-ZSAxMDA2NDQgYXJjaC9hcm02NC9rdm0vaHlwL3MyLXNldHVwLmMKCgotLQpBbGV4IEJlbm7DqWUK
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1h
-aWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3Mu
-Y29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8va3ZtYXJtCg==
+
+
+On 2016/2/29 21:07, Marc Zyngier wrote:
+> Shannon,
+> 
+> On 25/02/16 02:02, Shannon Zhao wrote:
+>>
+>>
+>> On 2016/2/25 1:52, Will Deacon wrote:
+>>> On Wed, Feb 24, 2016 at 01:08:21PM +0800, Shannon Zhao wrote:
+>>>> From: Shannon Zhao <shannon.zhao@linaro.org>
+>>>>
+>>>> To use the ARMv8 PMU related register defines from the KVM code, we move
+>>>> the relevant definitions to asm/perf_event.h header file and rename them
+>>>> with prefix ARMV8_PMU_.
+>>>>
+>>>> Signed-off-by: Anup Patel <anup.patel@linaro.org>
+>>>> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+>>>> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+>>>> Reviewed-by: Andrew Jones <drjones@redhat.com>
+>>>> ---
+>>>>  arch/arm64/include/asm/perf_event.h | 35 +++++++++++++++++++
+>>>>  arch/arm64/kernel/perf_event.c      | 68 ++++++++++---------------------------
+>>>>  2 files changed, 52 insertions(+), 51 deletions(-)
+>>>
+>>> Looks fine to me, but we're going to get some truly horrible conflicts
+>>> in -next.
+>>>
+>>> I'm open to suggestions on the best way to handle this, but one way
+>>> would be:
+>>>
+>>>   1. Duplicate all the #defines privately in KVM (queue via kvm tree)
+>> This way seems not proper I think.
+>>
+>>>   2. Rebase this patch onto my perf/updates branch [1] (queue via me)
+>> While to this series, it really relies on the perf_event.h to compile
+>> and test, so maybe for KVM-ARM and KVM maintainers it's not proper.
+>>
+>>>   3. Patch at -rc1 dropping the #defines from (1) and moving to the new
+>>>      perf_event.h stuff
+>>>
+>> I vote for this way. Since the patch in [1] is small and nothing else
+>> relies on them, I think it would be simple to rebase them onto this series.
+>>
+>>> Thoughts?
+>>>
+>> Anyway, there are only 3 lines which have conflicts. I'm not sure
+>> whether we could handle this when we merge them.
+> 
+> I think you're missing the point:
+> 
+> - We want both the arm64 perf and KVM trees to be easy to merge
+> - The conflicts are not that simple to resolve
+> - We want these conflicts to be solved before it hits Linus' tree
+> 
+Ah, sorry. I realized this later.
+
+> With that in mind, here's what I'm suggesting we merge as a first patch:
+> 
+> https://git.kernel.org/cgit/linux/kernel/git/kvmarm/kvmarm.git/commit/?h=queue&id=2029b4b02691ec6ebba3d281068e783353d7e108
+> 
+> Once this and the perf/updates branch are merged, we can add one last
+> patch reverting this hack and actually doing the renaming work (Will has
+> posted a resolution for most of the new things).
+> 
+> Thoughts?
+> 
+It's fine I think. (It's first time to me to face this kind of problem.
+:)). Thanks for your help.
+
+-- 
+Shannon
+
