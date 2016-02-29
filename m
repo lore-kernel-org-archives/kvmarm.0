@@ -1,55 +1,83 @@
-From: Mihai Claudiu Caraman <mike.caraman@nxp.com>
-Subject: RE: [PATCH v2 00/17] KVM/ARM: Guest Entry/Exit optimizations
-Date: Mon, 29 Feb 2016 10:43:29 +0000
-Message-ID: <AM2PR04MB0739F13F5F6CBBCB45F2071784BA0@AM2PR04MB0739.eurprd04.prod.outlook.com>
-References: <1455727249-24752-1-git-send-email-marc.zyngier@arm.com>
- <AM2PR04MB073947192D0A7015739689EF84BA0@AM2PR04MB0739.eurprd04.prod.outlook.com>
- <56D400A4.3020904@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v13 01/20] ARM64: Move PMU register related defines to
+ asm/perf_event.h
+Date: Mon, 29 Feb 2016 13:07:23 +0000
+Message-ID: <56D4428B.5000505@arm.com>
+References: <1456290520-10012-1-git-send-email-zhaoshenglong@huawei.com>
+ <1456290520-10012-2-git-send-email-zhaoshenglong@huawei.com>
+ <20160224175247.GE12471@arm.com> <56CE6098.8070001@huawei.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <56D400A4.3020904@arm.com>
-Content-Language: en-US
+In-Reply-To: <56CE6098.8070001@huawei.com>
 Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+To: Shannon Zhao <zhaoshenglong@huawei.com>, Will Deacon <will.deacon@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, wei@redhat.com, cov@codeaurora.org, shannon.zhao@linaro.org, peter.huangpeng@huawei.com, hangaohuai@huawei.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-> -----Original Message-----
-> From: Marc Zyngier [mailto:marc.zyngier@arm.com] 
-> Sent: Monday, February 29, 2016 10:26 AM
-> To: Mihai Claudiu Caraman <mike.caraman@nxp.com>; Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: kvm@vger.kernel.org; linux-arm-kernel@lists.infradead.org; kvmarm@lists.cs.columbia.edu
-> Subject: Re: [PATCH v2 00/17] KVM/ARM: Guest Entry/Exit optimizations
+Shannon,
+
+On 25/02/16 02:02, Shannon Zhao wrote:
 > 
-> On 29/02/16 00:57, Mihai Claudiu Caraman wrote:
-> > Reported-by: Mihai Caraman <mihai.caraman@freescale.com>
 > 
-> Reported-by? Where? Did I miss an email (wouldn't surprise me)?
-
-Private meeting between ARM and Freescale/NXP, it was me.
-
+> On 2016/2/25 1:52, Will Deacon wrote:
+>> On Wed, Feb 24, 2016 at 01:08:21PM +0800, Shannon Zhao wrote:
+>>> From: Shannon Zhao <shannon.zhao@linaro.org>
+>>>
+>>> To use the ARMv8 PMU related register defines from the KVM code, we move
+>>> the relevant definitions to asm/perf_event.h header file and rename them
+>>> with prefix ARMV8_PMU_.
+>>>
+>>> Signed-off-by: Anup Patel <anup.patel@linaro.org>
+>>> Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
+>>> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+>>> Reviewed-by: Andrew Jones <drjones@redhat.com>
+>>> ---
+>>>  arch/arm64/include/asm/perf_event.h | 35 +++++++++++++++++++
+>>>  arch/arm64/kernel/perf_event.c      | 68 ++++++++++---------------------------
+>>>  2 files changed, 52 insertions(+), 51 deletions(-)
+>>
+>> Looks fine to me, but we're going to get some truly horrible conflicts
+>> in -next.
+>>
+>> I'm open to suggestions on the best way to handle this, but one way
+>> would be:
+>>
+>>   1. Duplicate all the #defines privately in KVM (queue via kvm tree)
+> This way seems not proper I think.
 > 
-> > Tested-by: Mihai Caraman <mihai.caraman@freescale.com>
-> > 
-> > 40% improvements here and there will make the difference. 
+>>   2. Rebase this patch onto my perf/updates branch [1] (queue via me)
+> While to this series, it really relies on the perf_event.h to compile
+> and test, so maybe for KVM-ARM and KVM maintainers it's not proper.
 > 
-> I'm sceptical that you will see a significant improvement
-
-1% improvement with this patch is good enough.
-
-> on any *realistic* workload
-
-You will hear about this sooner than you think ;-)
-
-> , but thanks for testing!
-
-Thanks for the patch, we plan to contribute as well.
-
+>>   3. Patch at -rc1 dropping the #defines from (1) and moving to the new
+>>      perf_event.h stuff
+>>
+> I vote for this way. Since the patch in [1] is small and nothing else
+> relies on them, I think it would be simple to rebase them onto this series.
 > 
-> 	M.
-> -- 
-> Jazz is not dead. It just smells funny...
+>> Thoughts?
+>>
+> Anyway, there are only 3 lines which have conflicts. I'm not sure
+> whether we could handle this when we merge them.
 
--Mike
+I think you're missing the point:
+
+- We want both the arm64 perf and KVM trees to be easy to merge
+- The conflicts are not that simple to resolve
+- We want these conflicts to be solved before it hits Linus' tree
+
+With that in mind, here's what I'm suggesting we merge as a first patch:
+
+https://git.kernel.org/cgit/linux/kernel/git/kvmarm/kvmarm.git/commit/?h=queue&id=2029b4b02691ec6ebba3d281068e783353d7e108
+
+Once this and the perf/updates branch are merged, we can add one last
+patch reverting this hack and actually doing the renaming work (Will has
+posted a resolution for most of the new things).
+
+Thoughts?
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
