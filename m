@@ -1,24 +1,24 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC v5 08/17] msi: Add a new MSI_FLAG_IRQ_REMAPPING flag
-Date: Tue,  1 Mar 2016 18:27:48 +0000
-Message-ID: <1456856877-4817-9-git-send-email-eric.auger@linaro.org>
+Subject: [RFC v5 10/17] msi: export msi_get_domain_info
+Date: Tue,  1 Mar 2016 18:27:50 +0000
+Message-ID: <1456856877-4817-11-git-send-email-eric.auger@linaro.org>
 References: <1456856877-4817-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0835A411E3
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 13:21:33 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AAA1412C2
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 13:21:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id mOC-C0+LKYiS for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Mar 2016 13:21:32 -0500 (EST)
-Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2087941267
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 13:21:32 -0500 (EST)
-Received: by mail-wm0-f51.google.com with SMTP id l68so50620268wml.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Mar 2016 10:28:39 -0800 (PST)
+ with ESMTP id Visx9IQoP2TU for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Mar 2016 13:21:38 -0500 (EST)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 39BF7411BE
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 13:21:37 -0500 (EST)
+Received: by mail-wm0-f42.google.com with SMTP id l68so50624341wml.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Mar 2016 10:28:45 -0800 (PST)
 In-Reply-To: <1456856877-4817-1-git-send-email-eric.auger@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,35 +33,28 @@ To: eric.auger@st.com, eric.auger@linaro.org, robin.murphy@arm.com, alex.william
 Cc: patches@linaro.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Let's introduce a new msi_domain_info flag value, MSI_FLAG_IRQ_REMAPPING
-meant to tell the domain supports IRQ REMAPPING, also known as Interrupt
-Translation Service. On Intel HW this IRQ remapping capability is
-abstracted on IOMMU side while on ARM it is abstracted on MSI controller
-side. This flag will be used to know whether the MSI passthrough is
-safe.
+We plan to use msi_get_domain_info in VFIO module so let's export it.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
 ---
 
-v4 -> v5:
-- seperate flag introduction from first user addition (ITS)
+v2 -> v3:
+- remove static implementation in case CONFIG_PCI_MSI_IRQ_DOMAIN is not set
 ---
- include/linux/msi.h | 2 ++
- 1 file changed, 2 insertions(+)
+ kernel/irq/msi.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/linux/msi.h b/include/linux/msi.h
-index a2a0068..03eda72 100644
---- a/include/linux/msi.h
-+++ b/include/linux/msi.h
-@@ -261,6 +261,8 @@ enum {
- 	MSI_FLAG_MULTI_PCI_MSI		= (1 << 3),
- 	/* Support PCI MSIX interrupts */
- 	MSI_FLAG_PCI_MSIX		= (1 << 4),
-+	/* Support MSI IRQ remapping service */
-+	MSI_FLAG_IRQ_REMAPPING		= (1 << 5),
- };
+diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
+index 38e89ce..9b0ba4a 100644
+--- a/kernel/irq/msi.c
++++ b/kernel/irq/msi.c
+@@ -400,5 +400,6 @@ struct msi_domain_info *msi_get_domain_info(struct irq_domain *domain)
+ {
+ 	return (struct msi_domain_info *)domain->host_data;
+ }
++EXPORT_SYMBOL_GPL(msi_get_domain_info);
  
- int msi_domain_set_affinity(struct irq_data *data, const struct cpumask *mask,
+ #endif /* CONFIG_GENERIC_MSI_IRQ_DOMAIN */
 -- 
 1.9.1
