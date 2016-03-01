@@ -1,212 +1,148 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC v5 12/17] msi: IOMMU map the doorbell address when needed
-Date: Tue,  1 Mar 2016 18:27:52 +0000
-Message-ID: <1456856877-4817-13-git-send-email-eric.auger@linaro.org>
+Subject: [RFC v5 15/17] vfio/type1: also check IRQ remapping capability at msi
+ domain
+Date: Tue,  1 Mar 2016 18:27:55 +0000
+Message-ID: <1456856877-4817-16-git-send-email-eric.auger@linaro.org>
 References: <1456856877-4817-1-git-send-email-eric.auger@linaro.org>
-Return-path: <linux-kernel-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 526AE4130A
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 13:21:54 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id Lhpvg2AWXIYF for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Mar 2016 13:21:53 -0500 (EST)
+Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 63692419D1
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 13:21:53 -0500 (EST)
+Received: by mail-wm0-f41.google.com with SMTP id l68so48105328wml.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Mar 2016 10:29:00 -0800 (PST)
 In-Reply-To: <1456856877-4817-1-git-send-email-eric.auger@linaro.org>
-Sender: linux-kernel-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger@st.com, eric.auger@linaro.org, robin.murphy@arm.com, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: suravee.suthikulpanit@amd.com, patches@linaro.org, linux-kernel@vger.kernel.org, Manish.Jaggi@caviumnetworks.com, Bharat.Bhushan@freescale.com, pranav.sawargaonkar@gmail.com, p.fedin@samsung.com, iommu@lists.linux-foundation.org
+Cc: patches@linaro.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In case the msi is emitted by a device attached to an iommu
-domain and this iommu domain requires MSI mapping, the msi
-address (aka doorbell) must be mapped in the IOMMU. Else
-MSI write transaction will cause a fault.
+On x86 IRQ remapping is abstracted by the IOMMU. On ARM this is abstracted
+by the msi controller. vfio_safe_irq_domain allows to check whether
+interrupts are "safe" for a given device. They are if the device does
+not use MSI or if the device uses MSI and the msi-parent controller
+supports IRQ remapping.
 
-We perform this action at msi message composition time. On any
-MSI address change and MSI message erasure we decrement the reference
-counter to the IOMMU binding.
+Then we check at group level if all devices have safe interrupts: if not,
+we only allow the group to be attached if allow_unsafe_interrupts is set.
 
-In case the mapping fails we just WARN_ON.
+At this point ARM sMMU still advertises IOMMU_CAP_INTR_REMAP. This is
+changed in next patch.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
 ---
+v3 -> v4:
+- rename vfio_msi_parent_irq_remapping_capable into vfio_safe_irq_domain
+  and irq_remapping into safe_irq_domains
 
-v5:
-- use macros to increase the readability
-- add comments
-- fix a typo that caused a compilation error if CONFIG_IOMMU_API
-  is not set
+v2 -> v3:
+- protect vfio_msi_parent_irq_remapping_capable with
+  CONFIG_GENERIC_MSI_IRQ_DOMAIN
 ---
- include/linux/msi.h |  15 +++++++
- kernel/irq/msi.c    | 119 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 134 insertions(+)
+ drivers/vfio/vfio_iommu_type1.c | 44 +++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 42 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/msi.h b/include/linux/msi.h
-index 03eda72..b920cac 100644
---- a/include/linux/msi.h
-+++ b/include/linux/msi.h
-@@ -10,6 +10,21 @@ struct msi_msg {
- 	u32	data;		/* 16 bits of msi message data */
- };
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 4e01ebe..88a40f1 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -37,6 +37,8 @@
+ #include <linux/vfio.h>
+ #include <linux/workqueue.h>
+ #include <linux/dma-reserved-iommu.h>
++#include <linux/irqdomain.h>
++#include <linux/msi.h>
  
-+/* Helpers to convert the msi message address to a an iova/physical address */
-+#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
-+#define msg_to_dma_addr(msg) \
-+	(((dma_addr_t)((msg)->address_hi) << 32) | (msg)->address_lo)
-+#else
-+#define msg_to_dma_addr(msg) ((msg)->address_lo)
-+#endif
-+
-+#ifdef CONFIG_PHYS_ADDR_T_64BIT
-+#define msg_to_phys_addr(msg) \
-+	(((phys_addr_t)((msg)->address_hi) << 32) | (msg)->address_lo)
-+#else
-+#define msg_to_phys_addr(msg)	((msg)->address_lo)
-+#endif
-+
- extern int pci_msi_ignore_mask;
- /* Helper functions */
- struct irq_data;
-diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
-index 72bf4d6..8ddbe57 100644
---- a/kernel/irq/msi.c
-+++ b/kernel/irq/msi.c
-@@ -17,6 +17,8 @@
- 
- /* Temparory solution for building, will be removed later */
- #include <linux/pci.h>
-+#include <linux/iommu.h>
-+#include <linux/dma-reserved-iommu.h>
- 
- struct msi_desc *alloc_msi_entry(struct device *dev)
- {
-@@ -55,16 +57,133 @@ static inline void irq_chip_write_msi_msg(struct irq_data *data,
- 	data->chip->irq_write_msi_msg(data, msg);
+ #define DRIVER_VERSION  "0.2"
+ #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
+@@ -788,6 +790,33 @@ static int vfio_bus_type(struct device *dev, void *data)
+ 	return 0;
  }
  
 +/**
-+ * msi_map_doorbell: make sure an IOMMU mapping exists on domain @d
-+ * for the message physical address (aka. doorbell)
++ * vfio_safe_irq_domain: returns whether the irq domain
++ * the device is attached to is safe with respect to MSI isolation.
++ * If the irq domain is not an MSI domain, we return it is safe.
 + *
-+ * Either allocate an IOVA and create a mapping or simply increment
-+ * a reference count on the existing IOMMU mapping
-+ * @d: iommu domain handle the mapping belongs to
-+ * @msg: msi message handle
++ * @dev: device handle
++ * @data: unused
++ * returns 0 if the irq domain is safe, -1 if not.
 + */
-+static int msi_map_doorbell(struct iommu_domain *d, struct msi_msg *msg)
++static int vfio_safe_irq_domain(struct device *dev, void *data)
 +{
-+#ifdef CONFIG_IOMMU_DMA_RESERVED
-+	phys_addr_t addr;
-+	dma_addr_t iova;
-+	int ret;
++#ifdef CONFIG_GENERIC_MSI_IRQ_DOMAIN
++	struct irq_domain *domain;
++	struct msi_domain_info *info;
 +
-+	addr = msg_to_phys_addr(msg);
-+	ret = iommu_get_single_reserved(d, addr, IOMMU_WRITE, &iova);
-+	if (!ret) {
-+		msg->address_lo = lower_32_bits(iova);
-+		msg->address_hi = upper_32_bits(iova);
-+	}
-+	return ret;
-+#else
-+	return -ENODEV;
++	domain = dev_get_msi_domain(dev);
++	if (!domain)
++		return 0;
++
++	info = msi_get_domain_info(domain);
++
++	if (!(info->flags & MSI_FLAG_IRQ_REMAPPING))
++		return -1;
 +#endif
++	return 0;
 +}
 +
-+/**
-+ * msi_unmap_doorbell: decrements the reference count on an existing
-+ * doorbell IOMMU mapping
-+ *
-+ * @d: iommu domain the mapping is attached to
-+ * @msg: msi message containing the doorbell IOVA to unbind
-+ */
-+static void msi_unmap_doorbell(struct iommu_domain *d, struct msi_msg *msg)
-+{
-+#ifdef CONFIG_IOMMU_DMA_RESERVED
-+	dma_addr_t iova;
-+
-+	iova = msg_to_dma_addr(msg);
-+	iommu_put_single_reserved(d, iova);
-+#endif
-+}
-+
-+#ifdef CONFIG_IOMMU_API
-+/**
-+ * irq_data_to_msi_mapping_domain: checks if an irq corresponds to
-+ * an MSI whose write address must be mapped in an IOMMU domain
-+ *
-+ * determine whether the irq corresponds to an MSI emitted by a device,
-+ * upstream to an IOMMU, and if this IOMMU requires a binding of the
-+ * MSI address
-+ *
-+ * @irq_data: irq data handle
-+ */
-+static struct iommu_domain *
-+irq_data_to_msi_mapping_domain(struct irq_data *irq_data)
-+{
-+	struct iommu_domain *d;
-+	struct msi_desc *desc;
-+	struct device *dev;
-+	int ret;
-+
-+	desc = irq_data_get_msi_desc(irq_data);
-+	if (!desc)
-+		return NULL;
-+
-+	dev = msi_desc_to_dev(desc);
-+
-+	d = iommu_get_domain_for_dev(dev);
-+	if (!d)
-+		return NULL;
-+
-+	ret = iommu_domain_get_attr(d, DOMAIN_ATTR_MSI_MAPPING, NULL);
-+	if (!ret)
-+		return d;
-+	else
-+		return NULL;
-+}
-+#else
-+static inline struct iommu_domain *
-+irq_data_to_msi_mapping_domain(struct irq_data *irq_data)
-+{
-+	return NULL;
-+}
-+#endif /* CONFIG_IOMMU_API */
-+
- static int msi_compose(struct irq_data *irq_data,
- 		       struct msi_msg *msg, bool erase)
+ static int vfio_iommu_replay(struct vfio_iommu *iommu,
+ 			     struct vfio_domain *domain)
  {
-+	struct msi_msg old_msg;
-+	struct iommu_domain *d;
- 	int ret = 0;
+@@ -882,7 +911,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 	struct vfio_group *group, *g;
+ 	struct vfio_domain *domain, *d;
+ 	struct bus_type *bus = NULL;
+-	int ret;
++	int ret, safe_irq_domains;
+ 
+ 	mutex_lock(&iommu->lock);
+ 
+@@ -905,6 +934,13 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 
+ 	group->iommu_group = iommu_group;
  
 +	/*
-+	 * Does this IRQ require an MSI address mapping in an IOMMU?
-+	 * If it does, read the existing cached message. This will allow
-+	 * to check if the IOMMU mapping needs an update
++	 * Determine if all the devices of the group have a safe irq domain
++	 * with respect to MSI isolation
 +	 */
-+	d = irq_data_to_msi_mapping_domain(irq_data);
-+	if (unlikely(d))
-+		get_cached_msi_msg(irq_data->irq, &old_msg);
++	safe_irq_domains = !iommu_group_for_each_dev(iommu_group, &bus,
++				       vfio_safe_irq_domain);
 +
- 	if (erase)
- 		memset(msg, 0, sizeof(*msg));
- 	else
- 		ret = irq_chip_compose_msi_msg(irq_data, msg);
+ 	/* Determine bus_type in order to allocate a domain */
+ 	ret = iommu_group_for_each_dev(iommu_group, &bus, vfio_bus_type);
+ 	if (ret)
+@@ -932,8 +968,12 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 	INIT_LIST_HEAD(&domain->group_list);
+ 	list_add(&group->next, &domain->group_list);
  
-+	if (!d)
-+		goto out;
-+
 +	/*
-+	 * An MSI address IOMMU binding needs to be handled.
-+	 * In case we have a change in the MSI address or an MSI
-+	 * message erasure, destroy the existing binding.
-+	 * In case we have an actual MSI message composition
-+	 * bind the new MSI address
++	 * to advertise safe interrupts either the IOMMU or the MSI controllers
++	 * must support IRQ remapping/interrupt translation
 +	 */
-+	if ((old_msg.address_lo != msg->address_lo) ||
-+	    (old_msg.address_hi != msg->address_hi))
-+		msi_unmap_doorbell(d, &old_msg);
-+
-+	if (!erase)
-+		WARN_ON(msi_map_doorbell(d, msg));
-+
-+out:
- 	return ret;
- }
- 
+ 	if (!allow_unsafe_interrupts &&
+-	    !iommu_capable(bus, IOMMU_CAP_INTR_REMAP)) {
++	    (!iommu_capable(bus, IOMMU_CAP_INTR_REMAP) && !safe_irq_domains)) {
+ 		pr_warn("%s: No interrupt remapping support.  Use the module param \"allow_unsafe_interrupts\" to enable VFIO IOMMU support on this platform\n",
+ 		       __func__);
+ 		ret = -EPERM;
 -- 
 1.9.1
