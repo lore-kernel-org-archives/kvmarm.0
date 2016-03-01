@@ -1,22 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 3/3] virtio: fix endianness check for vhost support
-Date: Tue,  1 Mar 2016 16:49:38 +0000
-Message-ID: <1456850978-14091-4-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH 1/3] irq: move IRQ routing into irq.c
+Date: Tue,  1 Mar 2016 16:49:36 +0000
+Message-ID: <1456850978-14091-2-git-send-email-andre.przywara@arm.com>
 References: <1456850978-14091-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8B87941267
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 11:42:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C0EDC41252
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 11:42:39 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 2bfjT6CxK5sg for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Mar 2016 11:42:40 -0500 (EST)
+ with ESMTP id B+YuAD-5hQZv for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Mar 2016 11:42:38 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A6420411E3
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 11:42:40 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 17127410EB
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 11:42:37 -0500 (EST)
 In-Reply-To: <1456850978-14091-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,66 +31,373 @@ To: Will Deacon <will.deacon@arm.com>, Sasha Levin <sasha.levin@oracle.com>
 Cc: Pekka Enberg <penberg@kernel.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Currently we deny any VHOST_* functionality if the architecture
-supports guests with different endianness than the host. Most of the
-time even on those architectures the endianness of guest and host are
-the same, though, so we are denying the glory of VHOST needlessly.
-Switch from compile time determination to a run time scheme, which
-takes the actual endianness of the guest into account.
-For this we change the semantics of VIRTIO_ENDIAN_HOST to return the
-actual endianness of the host (the endianness of kvmtool at compile
-time, really). The actual check in vhost_net now compares this against
-the guest endianness.
-This enables vhost support on ARM and ARM64.
+The current IRQ routing code in x86/irq.c is mostly implementing a
+generic KVM interface which other architectures may use too.
+Move the code to set up an MSI route into the generic irq.c file and
+guard it with the KVM_CAP_IRQ_ROUTING capability to return an error
+if the kernel does not support interrupt routing.
+This also removes the dummy implementations for all other
+architectures and only leaves the x86 specific code in x86/irq.c.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- include/kvm/virtio.h | 9 +++++++--
- virtio/net.c         | 2 +-
- 2 files changed, 8 insertions(+), 3 deletions(-)
+ Makefile          |  4 +--
+ arm/irq.c         |  9 ------
+ hw/pci-shmem.c    |  2 ++
+ include/kvm/irq.h |  5 ++++
+ irq.c             | 83 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ mips/irq.c        | 10 -------
+ powerpc/irq.c     | 31 ---------------------
+ virtio/pci.c      | 18 ++++++++----
+ x86/irq.c         | 45 ++++--------------------------
+ 9 files changed, 108 insertions(+), 99 deletions(-)
+ delete mode 100644 arm/irq.c
+ delete mode 100644 mips/irq.c
+ delete mode 100644 powerpc/irq.c
 
-diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
-index 768ee96..66530fd 100644
---- a/include/kvm/virtio.h
-+++ b/include/kvm/virtio.h
-@@ -17,10 +17,15 @@
- #define VIRTIO_PCI_O_CONFIG	0
- #define VIRTIO_PCI_O_MSIX	1
+diff --git a/Makefile b/Makefile
+index 59622c3..bed0714 100644
+--- a/Makefile
++++ b/Makefile
+@@ -137,7 +137,6 @@ ifeq ($(ARCH), powerpc)
+ 	DEFINES += -DCONFIG_PPC
+ 	OBJS	+= powerpc/boot.o
+ 	OBJS	+= powerpc/ioport.o
+-	OBJS	+= powerpc/irq.o
+ 	OBJS	+= powerpc/kvm.o
+ 	OBJS	+= powerpc/cpu_info.o
+ 	OBJS	+= powerpc/kvm-cpu.o
+@@ -152,7 +151,7 @@ ifeq ($(ARCH), powerpc)
+ endif
  
--#define VIRTIO_ENDIAN_HOST	0
- #define VIRTIO_ENDIAN_LE	(1 << 0)
- #define VIRTIO_ENDIAN_BE	(1 << 1)
+ # ARM
+-OBJS_ARM_COMMON		:= arm/fdt.o arm/gic.o arm/ioport.o arm/irq.o \
++OBJS_ARM_COMMON		:= arm/fdt.o arm/gic.o arm/ioport.o \
+ 			   arm/kvm.o arm/kvm-cpu.o arm/pci.o arm/timer.o
+ HDRS_ARM_COMMON		:= arm/include
+ ifeq ($(ARCH), arm)
+@@ -184,7 +183,6 @@ ifeq ($(ARCH),mips)
+ 	ARCH_INCLUDE	:= mips/include
+ 	OBJS		+= mips/kvm.o
+ 	OBJS		+= mips/kvm-cpu.o
+-	OBJS		+= mips/irq.o
+ endif
+ ###
  
-+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-+#define VIRTIO_ENDIAN_HOST VIRTIO_ENDIAN_LE
-+#else
-+#define VIRTIO_ENDIAN_HOST VIRTIO_ENDIAN_BE
-+#endif
+diff --git a/arm/irq.c b/arm/irq.c
+deleted file mode 100644
+index d8f44df..0000000
+--- a/arm/irq.c
++++ /dev/null
+@@ -1,9 +0,0 @@
+-#include "kvm/irq.h"
+-#include "kvm/kvm.h"
+-#include "kvm/util.h"
+-
+-int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
+-{
+-	die(__FUNCTION__);
+-	return 0;
+-}
+diff --git a/hw/pci-shmem.c b/hw/pci-shmem.c
+index a1c5ab7..7ce98cb 100644
+--- a/hw/pci-shmem.c
++++ b/hw/pci-shmem.c
+@@ -136,6 +136,8 @@ int pci_shmem__get_local_irqfd(struct kvm *kvm)
+ 
+ 		if (pci_shmem_pci_device.msix.ctrl & cpu_to_le16(PCI_MSIX_FLAGS_ENABLE)) {
+ 			gsi = irq__add_msix_route(kvm, &msix_table[0].msg);
++			if (gsi < 0)
++				return gsi;
+ 		} else {
+ 			gsi = pci_shmem_pci_device.irq_line;
+ 		}
+diff --git a/include/kvm/irq.h b/include/kvm/irq.h
+index 8a78e43..bb71521 100644
+--- a/include/kvm/irq.h
++++ b/include/kvm/irq.h
+@@ -10,11 +10,16 @@
+ 
+ struct kvm;
+ 
++extern struct kvm_irq_routing *irq_routing;
++extern int next_gsi;
 +
- struct virt_queue {
- 	struct vring	vring;
- 	u32		pfn;
-@@ -40,7 +45,7 @@ struct virt_queue {
- #define VIRTIO_RING_ENDIAN VIRTIO_ENDIAN_HOST
+ int irq__alloc_line(void);
+ int irq__get_nr_allocated_lines(void);
+ 
+ int irq__init(struct kvm *kvm);
+ int irq__exit(struct kvm *kvm);
++
++int irq__allocate_routing_entry(void);
+ int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg);
+ 
  #endif
+diff --git a/irq.c b/irq.c
+index 71eaa05..1aee478 100644
+--- a/irq.c
++++ b/irq.c
+@@ -1,7 +1,19 @@
++#include <stdlib.h>
++#include <sys/ioctl.h>
++#include <linux/types.h>
++#include <linux/kvm.h>
++#include <errno.h>
++
++#include "kvm/kvm.h"
+ #include "kvm/irq.h"
+ #include "kvm/kvm-arch.h"
  
--#if (VIRTIO_RING_ENDIAN & (VIRTIO_ENDIAN_LE | VIRTIO_ENDIAN_BE))
-+#if VIRTIO_RING_ENDIAN != VIRTIO_ENDIAN_HOST
+ static u8 next_line = KVM_IRQ_OFFSET;
++static int allocated_gsis = 0;
++
++int next_gsi;
++
++struct kvm_irq_routing *irq_routing = NULL;
  
- static inline __u16 __virtio_g2h_u16(u16 endian, __u16 val)
+ int irq__alloc_line(void)
  {
-diff --git a/virtio/net.c b/virtio/net.c
-index 6d1be65..e94e37a 100644
---- a/virtio/net.c
-+++ b/virtio/net.c
-@@ -531,7 +531,7 @@ static int init_vq(struct kvm *kvm, void *dev, u32 vq, u32 page_size, u32 align,
+@@ -12,3 +24,74 @@ int irq__get_nr_allocated_lines(void)
+ {
+ 	return next_line - KVM_IRQ_OFFSET;
+ }
++
++int irq__allocate_routing_entry(void)
++{
++	size_t table_size = sizeof(struct kvm_irq_routing);
++	int nr_entries = 0;
++
++	if (irq_routing)
++		nr_entries = irq_routing->nr;
++
++	if (nr_entries < allocated_gsis)
++		return 0;
++
++	allocated_gsis = ALIGN(nr_entries + 1, 32);
++	table_size += sizeof(struct kvm_irq_routing_entry) * allocated_gsis;
++	irq_routing = realloc(irq_routing, table_size);
++
++	if (irq_routing == NULL)
++		return ENOMEM;
++
++	irq_routing->nr = nr_entries;
++
++	return 0;
++}
++
++static bool check_for_irq_routing(struct kvm *kvm)
++{
++	static int has_irq_routing = 0;
++
++	if (has_irq_routing == 0) {
++		if (kvm__supports_extension(kvm, KVM_CAP_IRQ_ROUTING))
++			has_irq_routing = 1;
++		else
++			has_irq_routing = -1;
++	}
++
++	return has_irq_routing > 0;
++}
++
++int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
++{
++	int r;
++
++	if (!check_for_irq_routing(kvm))
++		return -EINVAL;
++
++	r = irq__allocate_routing_entry();
++	if (r)
++		return r;
++
++	irq_routing->entries[irq_routing->nr++] =
++		(struct kvm_irq_routing_entry) {
++			.gsi = next_gsi,
++			.type = KVM_IRQ_ROUTING_MSI,
++			.u.msi.address_hi = msg->address_hi,
++			.u.msi.address_lo = msg->address_lo,
++			.u.msi.data = msg->data,
++		};
++
++	r = ioctl(kvm->vm_fd, KVM_SET_GSI_ROUTING, irq_routing);
++	if (r)
++		return r;
++
++	return next_gsi++;
++}
++
++int __attribute__((weak)) irq__exit(struct kvm *kvm)
++{
++	free(irq_routing);
++	return 0;
++}
++dev_base_exit(irq__exit);
+diff --git a/mips/irq.c b/mips/irq.c
+deleted file mode 100644
+index c1ff6bb..0000000
+--- a/mips/irq.c
++++ /dev/null
+@@ -1,10 +0,0 @@
+-#include "kvm/irq.h"
+-#include "kvm/kvm.h"
+-
+-#include <stdlib.h>
+-
+-int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
+-{
+-	pr_warning("irq__add_msix_route");
+-	return 1;
+-}
+diff --git a/powerpc/irq.c b/powerpc/irq.c
+deleted file mode 100644
+index 03f2fe7..0000000
+--- a/powerpc/irq.c
++++ /dev/null
+@@ -1,31 +0,0 @@
+-/*
+- * PPC64 IRQ routines
+- *
+- * Copyright 2011 Matt Evans <matt@ozlabs.org>, IBM Corporation.
+- *
+- * This program is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License version 2 as published
+- * by the Free Software Foundation.
+- */
+-
+-#include "kvm/devices.h"
+-#include "kvm/irq.h"
+-#include "kvm/kvm.h"
+-#include "kvm/util.h"
+-
+-#include <linux/types.h>
+-#include <linux/rbtree.h>
+-#include <linux/list.h>
+-#include <linux/kvm.h>
+-#include <sys/ioctl.h>
+-
+-#include <stddef.h>
+-#include <stdlib.h>
+-
+-#include "kvm/pci.h"
+-
+-int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
+-{
+-	die(__FUNCTION__);
+-	return 0;
+-}
+diff --git a/virtio/pci.c b/virtio/pci.c
+index 90fcd64..70c93ce 100644
+--- a/virtio/pci.c
++++ b/virtio/pci.c
+@@ -166,21 +166,27 @@ static bool virtio_pci__specific_io_out(struct kvm *kvm, struct virtio_device *v
+ 			if (vec == VIRTIO_MSI_NO_VECTOR)
+ 				break;
+ 
+-			gsi = irq__add_msix_route(kvm, &vpci->msix_table[vec].msg);
+-
+-			vpci->config_gsi = gsi;
++			gsi = irq__add_msix_route(kvm,
++						  &vpci->msix_table[vec].msg);
++			if (gsi >= 0)
++				vpci->config_gsi = gsi;
+ 			break;
+ 		case VIRTIO_MSI_QUEUE_VECTOR:
+-			vec = vpci->vq_vector[vpci->queue_selector] = ioport__read16(data);
++			vec = ioport__read16(data);
++			vpci->vq_vector[vpci->queue_selector] = vec;
+ 
+ 			if (vec == VIRTIO_MSI_NO_VECTOR)
+ 				break;
+ 
+-			gsi = irq__add_msix_route(kvm, &vpci->msix_table[vec].msg);
++			gsi = irq__add_msix_route(kvm,
++						  &vpci->msix_table[vec].msg);
++			if (gsi < 0)
++				break;
+ 			vpci->gsis[vpci->queue_selector] = gsi;
+ 			if (vdev->ops->notify_vq_gsi)
+ 				vdev->ops->notify_vq_gsi(kvm, vpci->dev,
+-							vpci->queue_selector, gsi);
++							 vpci->queue_selector,
++							 gsi);
+ 			break;
+ 		};
+ 
+diff --git a/x86/irq.c b/x86/irq.c
+index 72177e7..49b2e90 100644
+--- a/x86/irq.c
++++ b/x86/irq.c
+@@ -11,20 +11,15 @@
+ #include <stddef.h>
+ #include <stdlib.h>
+ 
+-#define IRQ_MAX_GSI			64
+ #define IRQCHIP_MASTER			0
+ #define IRQCHIP_SLAVE			1
+ #define IRQCHIP_IOAPIC			2
+ 
+-/* First 24 GSIs are routed between IRQCHIPs and IOAPICs */
+-static u32 gsi = 24;
+-
+-struct kvm_irq_routing *irq_routing;
+-
+ static int irq__add_routing(u32 gsi, u32 type, u32 irqchip, u32 pin)
+ {
+-	if (gsi >= IRQ_MAX_GSI)
+-		return -ENOSPC;
++	int r = irq__allocate_routing_entry();
++	if (r)
++		return r;
+ 
+ 	irq_routing->entries[irq_routing->nr++] =
+ 		(struct kvm_irq_routing_entry) {
+@@ -41,11 +36,6 @@ int irq__init(struct kvm *kvm)
+ {
+ 	int i, r;
+ 
+-	irq_routing = calloc(sizeof(struct kvm_irq_routing) +
+-			IRQ_MAX_GSI * sizeof(struct kvm_irq_routing_entry), 1);
+-	if (irq_routing == NULL)
+-		return -ENOMEM;
+-
+ 	/* Hook first 8 GSIs to master IRQCHIP */
+ 	for (i = 0; i < 8; i++)
+ 		if (i != 2)
+@@ -69,33 +59,8 @@ int irq__init(struct kvm *kvm)
+ 		return errno;
  	}
  
- 	if (queue->endian != VIRTIO_ENDIAN_HOST)
--		die_perror("VHOST requires VIRTIO_ENDIAN_HOST");
-+		die_perror("VHOST requires the same endianness in guest and host");
+-	return 0;
+-}
+-dev_base_init(irq__init);
++	next_gsi = 24;
  
- 	state.num = queue->vring.num;
- 	r = ioctl(ndev->vhost_fd, VHOST_SET_VRING_NUM, &state);
+-int irq__exit(struct kvm *kvm)
+-{
+-	free(irq_routing);
+ 	return 0;
+ }
+-dev_base_exit(irq__exit);
+-
+-int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
+-{
+-	int r;
+-
+-	irq_routing->entries[irq_routing->nr++] =
+-		(struct kvm_irq_routing_entry) {
+-			.gsi = gsi,
+-			.type = KVM_IRQ_ROUTING_MSI,
+-			.u.msi.address_hi = msg->address_hi,
+-			.u.msi.address_lo = msg->address_lo,
+-			.u.msi.data = msg->data,
+-		};
+-
+-	r = ioctl(kvm->vm_fd, KVM_SET_GSI_ROUTING, irq_routing);
+-	if (r)
+-		return r;
+-
+-	return gsi++;
+-}
++dev_base_init(irq__init);
 -- 
 2.6.4
