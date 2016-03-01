@@ -1,128 +1,230 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: [RFC v5 05/17] dma-reserved-iommu: reserved binding rb-tree and
- helpers
-Date: Tue,  1 Mar 2016 18:27:45 +0000
-Message-ID: <1456856877-4817-6-git-send-email-eric.auger@linaro.org>
+From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: [RFC v5 06/17] dma-reserved-iommu: iommu_get/put_single_reserved
+Date: Tue,  1 Mar 2016 18:27:46 +0000
+Message-ID: <1456856877-4817-7-git-send-email-eric.auger@linaro.org>
 References: <1456856877-4817-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BFD1341390
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 13:21:21 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Nx8ggDMFWctA for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Mar 2016 13:21:21 -0500 (EST)
-Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 394FE412A6
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 13:21:20 -0500 (EST)
-Received: by mail-wm0-f45.google.com with SMTP id p65so47894291wmp.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 01 Mar 2016 10:28:27 -0800 (PST)
-In-Reply-To: <1456856877-4817-1-git-send-email-eric.auger@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@st.com, eric.auger@linaro.org, robin.murphy@arm.com, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: patches@linaro.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <1456856877-4817-1-git-send-email-eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: eric.auger-qxv4g6HH51o@public.gmane.org, eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+Cc: patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-we will need to track which host physical addresses are mapped to
-reserved IOVA. In that prospect we introduce a new RB tree indexed
-by physical address. This RB tree only is used for reserved IOVA
-bindings.
+This patch introduces iommu_get/put_single_reserved.
 
-It is expected this RB tree will contain very few bindings. Those
-generally correspond to single page mapping one MSI frame (GICv2m
-frame or ITS GITS_TRANSLATER frame).
+iommu_get_single_reserved allows to allocate a new reserved iova page
+and map it onto the physical page that contains a given physical address.
+Page size is the IOMMU page one. It is the responsability of the
+system integrator to make sure the in use IOMMU page size corresponds
+to the granularity of the MSI frame.
 
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
+It returns the iova that is mapped onto the provided physical address.
+Hence the physical address passed in argument does not need to be aligned.
+
+In case a mapping already exists between both pages, the IOVA mapped
+to the PA is directly returned.
+
+Each time an iova is successfully returned a binding ref count is
+incremented.
+
+iommu_put_single_reserved decrements the ref count and when this latter
+is null, the mapping is destroyed and the iova is released.
+
+Signed-off-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Signed-off-by: Ankit Jindal <ajindal-qTEPVZfXA3Y@public.gmane.org>
+Signed-off-by: Pranavkumar Sawargaonkar <pranavkumar-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Signed-off-by: Bharat Bhushan <Bharat.Bhushan-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
 
 ---
 
 v3 -> v4:
-- that code was formerly in "iommu/arm-smmu: add a reserved binding RB tree"
+- formerly in iommu: iommu_get/put_single_reserved &
+  iommu/arm-smmu: implement iommu_get/put_single_reserved
+- Attempted to address Marc's doubts about missing size/alignment
+  at VFIO level (user-space knows the IOMMU page size and the number
+  of IOVA pages to provision)
+
+v2 -> v3:
+- remove static implementation of iommu_get_single_reserved &
+  iommu_put_single_reserved when CONFIG_IOMMU_API is not set
+
+v1 -> v2:
+- previously a VFIO API, named vfio_alloc_map/unmap_free_reserved_iova
 ---
- drivers/iommu/dma-reserved-iommu.c | 60 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+ drivers/iommu/dma-reserved-iommu.c | 115 +++++++++++++++++++++++++++++++++++++
+ include/linux/dma-reserved-iommu.h |  26 +++++++++
+ 2 files changed, 141 insertions(+)
 
 diff --git a/drivers/iommu/dma-reserved-iommu.c b/drivers/iommu/dma-reserved-iommu.c
-index 41a1add..30d54d0 100644
+index 30d54d0..537c83e 100644
 --- a/drivers/iommu/dma-reserved-iommu.c
 +++ b/drivers/iommu/dma-reserved-iommu.c
-@@ -20,6 +20,66 @@
- #include <linux/iommu.h>
- #include <linux/iova.h>
+@@ -132,3 +132,118 @@ void iommu_free_reserved_iova_domain(struct iommu_domain *domain)
+ 	mutex_unlock(&domain->reserved_mutex);
+ }
+ EXPORT_SYMBOL_GPL(iommu_free_reserved_iova_domain);
++
++int iommu_get_single_reserved(struct iommu_domain *domain,
++			      phys_addr_t addr, int prot,
++			      dma_addr_t *iova)
++{
++	unsigned long order = __ffs(domain->ops->pgsize_bitmap);
++	size_t page_size = 1 << order;
++	phys_addr_t mask = page_size - 1;
++	phys_addr_t aligned_addr = addr & ~mask;
++	phys_addr_t offset  = addr - aligned_addr;
++	struct iommu_reserved_binding *b;
++	struct iova *p_iova;
++	struct iova_domain *iovad =
++		(struct iova_domain *)domain->reserved_iova_cookie;
++	int ret;
++
++	if (!iovad)
++		return -EINVAL;
++
++	mutex_lock(&domain->reserved_mutex);
++
++	b = find_reserved_binding(domain, aligned_addr, page_size);
++	if (b) {
++		*iova = b->iova + offset;
++		kref_get(&b->kref);
++		ret = 0;
++		goto unlock;
++	}
++
++	/* there is no existing reserved iova for this pa */
++	p_iova = alloc_iova(iovad, 1, iovad->dma_32bit_pfn, true);
++	if (!p_iova) {
++		ret = -ENOMEM;
++		goto unlock;
++	}
++	*iova = p_iova->pfn_lo << order;
++
++	b = kzalloc(sizeof(*b), GFP_KERNEL);
++	if (!b) {
++		ret = -ENOMEM;
++		goto free_iova_unlock;
++	}
++
++	ret = iommu_map(domain, *iova, aligned_addr, page_size, prot);
++	if (ret)
++		goto free_binding_iova_unlock;
++
++	kref_init(&b->kref);
++	kref_get(&b->kref);
++	b->domain = domain;
++	b->addr = aligned_addr;
++	b->iova = *iova;
++	b->size = page_size;
++
++	link_reserved_binding(domain, b);
++
++	*iova += offset;
++	goto unlock;
++
++free_binding_iova_unlock:
++	kfree(b);
++free_iova_unlock:
++	free_iova(iovad, *iova >> order);
++unlock:
++	mutex_unlock(&domain->reserved_mutex);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(iommu_get_single_reserved);
++
++/* called with reserved_mutex locked */
++static void reserved_binding_release(struct kref *kref)
++{
++	struct iommu_reserved_binding *b =
++		container_of(kref, struct iommu_reserved_binding, kref);
++	struct iommu_domain *d = b->domain;
++	struct iova_domain *iovad =
++		(struct iova_domain *)d->reserved_iova_cookie;
++	unsigned long order = __ffs(b->size);
++
++	iommu_unmap(d, b->iova, b->size);
++	free_iova(iovad, b->iova >> order);
++	unlink_reserved_binding(d, b);
++	kfree(b);
++}
++
++void iommu_put_single_reserved(struct iommu_domain *domain, dma_addr_t iova)
++{
++	unsigned long order;
++	phys_addr_t aligned_addr;
++	dma_addr_t aligned_iova, page_size, mask, offset;
++	struct iommu_reserved_binding *b;
++
++	order = __ffs(domain->ops->pgsize_bitmap);
++	page_size = (uint64_t)1 << order;
++	mask = page_size - 1;
++
++	aligned_iova = iova & ~mask;
++	offset = iova - aligned_iova;
++
++	aligned_addr = iommu_iova_to_phys(domain, aligned_iova);
++
++	mutex_lock(&domain->reserved_mutex);
++
++	b = find_reserved_binding(domain, aligned_addr, page_size);
++	if (!b)
++		goto unlock;
++	kref_put(&b->kref, reserved_binding_release);
++
++unlock:
++	mutex_unlock(&domain->reserved_mutex);
++}
++EXPORT_SYMBOL_GPL(iommu_put_single_reserved);
++
++
++
+diff --git a/include/linux/dma-reserved-iommu.h b/include/linux/dma-reserved-iommu.h
+index 5bf863b..71ec800 100644
+--- a/include/linux/dma-reserved-iommu.h
++++ b/include/linux/dma-reserved-iommu.h
+@@ -40,6 +40,32 @@ int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
+  */
+ void iommu_free_reserved_iova_domain(struct iommu_domain *domain);
  
-+struct iommu_reserved_binding {
-+	struct kref		kref;
-+	struct rb_node		node;
-+	struct iommu_domain	*domain;
-+	phys_addr_t		addr;
-+	dma_addr_t		iova;
-+	size_t			size;
-+};
++/**
++ * iommu_get_single_reserved: allocate a reserved iova page and bind
++ * it onto the page that contains a physical address (@addr)
++ *
++ * @domain: iommu domain handle
++ * @addr: physical address to bind
++ * @prot: mapping protection attribute
++ * @iova: returned iova
++ *
++ * In case the 2 pages already are bound simply return @iova and
++ * increment a ref count
++ */
++int iommu_get_single_reserved(struct iommu_domain *domain,
++			      phys_addr_t addr, int prot,
++			      dma_addr_t *iova);
 +
-+/* Reserved binding RB-tree manipulation */
++/**
++ * iommu_put_single_reserved: decrement a ref count of the iova page
++ *
++ * @domain: iommu domain handle
++ * @iova: iova whose binding ref count is decremented
++ *
++ * if the binding ref count is null, unmap the iova page and release the iova
++ */
++void iommu_put_single_reserved(struct iommu_domain *domain, dma_addr_t iova);
 +
-+static struct iommu_reserved_binding *find_reserved_binding(
-+				    struct iommu_domain *d,
-+				    phys_addr_t start, size_t size)
-+{
-+	struct rb_node *node = d->reserved_binding_list.rb_node;
-+
-+	while (node) {
-+		struct iommu_reserved_binding *binding =
-+			rb_entry(node, struct iommu_reserved_binding, node);
-+
-+		if (start + size <= binding->addr)
-+			node = node->rb_left;
-+		else if (start >= binding->addr + binding->size)
-+			node = node->rb_right;
-+		else
-+			return binding;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void link_reserved_binding(struct iommu_domain *d,
-+				  struct iommu_reserved_binding *new)
-+{
-+	struct rb_node **link = &d->reserved_binding_list.rb_node;
-+	struct rb_node *parent = NULL;
-+	struct iommu_reserved_binding *binding;
-+
-+	while (*link) {
-+		parent = *link;
-+		binding = rb_entry(parent, struct iommu_reserved_binding,
-+				   node);
-+
-+		if (new->addr + new->size <= binding->addr)
-+			link = &(*link)->rb_left;
-+		else
-+			link = &(*link)->rb_right;
-+	}
-+
-+	rb_link_node(&new->node, parent, link);
-+	rb_insert_color(&new->node, &d->reserved_binding_list);
-+}
-+
-+static void unlink_reserved_binding(struct iommu_domain *d,
-+				    struct iommu_reserved_binding *old)
-+{
-+	rb_erase(&old->node, &d->reserved_binding_list);
-+}
-+
- int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
- 				     dma_addr_t iova, size_t size,
- 				     unsigned long order)
+ #endif	/* CONFIG_IOMMU_DMA_RESERVED */
+ #endif	/* __KERNEL__ */
+ #endif	/* __DMA_RESERVED_IOMMU_H */
 -- 
 1.9.1
