@@ -1,26 +1,25 @@
 From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH 2/3] MSI-X: update GSI routing after changed MSI-X
- configuration
-Date: Wed, 2 Mar 2016 01:16:10 +0000
-Message-ID: <20160302011610.GE14022@arm.com>
+Subject: Re: [PATCH 3/3] virtio: fix endianness check for vhost support
+Date: Wed, 2 Mar 2016 01:27:54 +0000
+Message-ID: <20160302012753.GF14022@arm.com>
 References: <1456850978-14091-1-git-send-email-andre.przywara@arm.com>
- <1456850978-14091-3-git-send-email-andre.przywara@arm.com>
+ <1456850978-14091-4-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E1719410EB
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 20:08:51 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7D4F941145
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 20:20:35 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sPXghqA1K1rg for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Mar 2016 20:08:51 -0500 (EST)
+ with ESMTP id dwGl2skcoskq for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Mar 2016 20:20:34 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 08CF0411BE
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 20:08:50 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 94804410EB
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 20:20:34 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <1456850978-14091-3-git-send-email-andre.przywara@arm.com>
+In-Reply-To: <1456850978-14091-4-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,78 +33,44 @@ To: Andre Przywara <andre.przywara@arm.com>
 Cc: Pekka Enberg <penberg@kernel.org>, Sasha Levin <sasha.levin@oracle.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 01, 2016 at 04:49:37PM +0000, Andre Przywara wrote:
-> When we set up GSI routing to map MSIs to KVM's GSI numbers, we
-> write the current device's MSI setup into the kernel routing table.
-> However the device driver in the guest can use PCI configuration space
-> accesses to change the MSI configuration (address and/or payload data).
-> Whenever this happens after we have setup the routing table already,
-> we must amend the previously sent data.
-> So when MSI-X PCI config space accesses write address or payload,
-> find the associated GSI number and the matching routing table entry
-> and update the kernel routing table (only if the data has changed).
-> 
-> This fixes vhost-net, where the queue's IRQFD was setup before the
-> MSI vectors.
+On Tue, Mar 01, 2016 at 04:49:38PM +0000, Andre Przywara wrote:
+> Currently we deny any VHOST_* functionality if the architecture
+> supports guests with different endianness than the host. Most of the
+> time even on those architectures the endianness of guest and host are
+> the same, though, so we are denying the glory of VHOST needlessly.
+> Switch from compile time determination to a run time scheme, which
+> takes the actual endianness of the guest into account.
+> For this we change the semantics of VIRTIO_ENDIAN_HOST to return the
+> actual endianness of the host (the endianness of kvmtool at compile
+> time, really). The actual check in vhost_net now compares this against
+> the guest endianness.
+> This enables vhost support on ARM and ARM64.
 > 
 > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
->  include/kvm/irq.h |  1 +
->  irq.c             | 31 +++++++++++++++++++++++++++++++
->  virtio/pci.c      | 36 +++++++++++++++++++++++++++++++++---
->  3 files changed, 65 insertions(+), 3 deletions(-)
+>  include/kvm/virtio.h | 9 +++++++--
+>  virtio/net.c         | 2 +-
+>  2 files changed, 8 insertions(+), 3 deletions(-)
 > 
-> diff --git a/include/kvm/irq.h b/include/kvm/irq.h
-> index bb71521..f35eb7e 100644
-> --- a/include/kvm/irq.h
-> +++ b/include/kvm/irq.h
-> @@ -21,5 +21,6 @@ int irq__exit(struct kvm *kvm);
+> diff --git a/include/kvm/virtio.h b/include/kvm/virtio.h
+> index 768ee96..66530fd 100644
+> --- a/include/kvm/virtio.h
+> +++ b/include/kvm/virtio.h
+> @@ -17,10 +17,15 @@
+>  #define VIRTIO_PCI_O_CONFIG	0
+>  #define VIRTIO_PCI_O_MSIX	1
 >  
->  int irq__allocate_routing_entry(void);
->  int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg);
-> +void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg);
+> -#define VIRTIO_ENDIAN_HOST	0
+>  #define VIRTIO_ENDIAN_LE	(1 << 0)
+>  #define VIRTIO_ENDIAN_BE	(1 << 1)
 >  
->  #endif
-> diff --git a/irq.c b/irq.c
-> index 1aee478..25ac8d7 100644
-> --- a/irq.c
-> +++ b/irq.c
-> @@ -89,6 +89,37 @@ int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
->  	return next_gsi++;
->  }
->  
-> +static bool update_data(u32 *ptr, u32 newdata)
-> +{
-> +	if (*ptr == newdata)
-> +		return false;
-> +
-> +	*ptr = newdata;
-> +	return true;
-> +}
-> +
-> +void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg)
-> +{
-> +	struct kvm_irq_routing_msi *entry;
-> +	unsigned int i;
-> +	bool changed;
-> +
-> +	for (i = 0; i < irq_routing->nr; i++)
-> +		if (gsi == irq_routing->entries[i].gsi)
-> +			break;
-> +	if (i == irq_routing->nr)
-> +		return;
-> +
-> +	entry = &irq_routing->entries[i].u.msi;
-> +
-> +	changed  = update_data(&entry->address_hi, msg->address_hi);
-> +	changed |= update_data(&entry->address_lo, msg->address_lo);
-> +	changed |= update_data(&entry->data, msg->data);
-> +
-> +	if (changed)
-> +		ioctl(kvm->vm_fd, KVM_SET_GSI_ROUTING, irq_routing);
-> +}
+> +#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+> +#define VIRTIO_ENDIAN_HOST VIRTIO_ENDIAN_LE
+> +#else
+> +#define VIRTIO_ENDIAN_HOST VIRTIO_ENDIAN_BE
+> +#endif
 
-What goes wrong if you just call the ioctl every time? Is this actually
-a fast path in practice?
+pci.h already uses __BYTE_ORDER and __LITTLE_ENDIAN, so we should at least
+be consistent here.
 
 Will
