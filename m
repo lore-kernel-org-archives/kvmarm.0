@@ -1,110 +1,154 @@
-From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Subject: Re: [PATCH 2/3] MSI-X: update GSI routing after changed MSI-X
- configuration
-Date: Wed, 2 Mar 2016 22:20:21 +0000
-Message-ID: <56D76725.8090006@arm.com>
-References: <1456850978-14091-1-git-send-email-andre.przywara@arm.com>
- <1456850978-14091-3-git-send-email-andre.przywara@arm.com>
- <20160302011610.GE14022@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v2 07/17] arm64: KVM: vgic-v2: Avoid accessing GICH
+ registers
+Date: Thu, 3 Mar 2016 00:08:01 +0100
+Message-ID: <20160302230801.GA9634@cbox>
+References: <1455727249-24752-1-git-send-email-marc.zyngier@arm.com>
+ <1455727249-24752-8-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <20160302011610.GE14022@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Will Deacon <will.deacon@arm.com>
-Cc: Sasha Levin <sasha.levin@oracle.com>, Pekka Enberg <penberg@kernel.org>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <1455727249-24752-8-git-send-email-marc.zyngier@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Andrew Jones <drjones@redhat.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 02/03/16 01:16, Will Deacon wrote:
-> On Tue, Mar 01, 2016 at 04:49:37PM +0000, Andre Przywara wrote:
->> When we set up GSI routing to map MSIs to KVM's GSI numbers, we
->> write the current device's MSI setup into the kernel routing table.
->> However the device driver in the guest can use PCI configuration space
->> accesses to change the MSI configuration (address and/or payload data).
->> Whenever this happens after we have setup the routing table already,
->> we must amend the previously sent data.
->> So when MSI-X PCI config space accesses write address or payload,
->> find the associated GSI number and the matching routing table entry
->> and update the kernel routing table (only if the data has changed).
->>
->> This fixes vhost-net, where the queue's IRQFD was setup before the
->> MSI vectors.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> ---
->>  include/kvm/irq.h |  1 +
->>  irq.c             | 31 +++++++++++++++++++++++++++++++
->>  virtio/pci.c      | 36 +++++++++++++++++++++++++++++++++---
->>  3 files changed, 65 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/kvm/irq.h b/include/kvm/irq.h
->> index bb71521..f35eb7e 100644
->> --- a/include/kvm/irq.h
->> +++ b/include/kvm/irq.h
->> @@ -21,5 +21,6 @@ int irq__exit(struct kvm *kvm);
->>  
->>  int irq__allocate_routing_entry(void);
->>  int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg);
->> +void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg);
->>  
->>  #endif
->> diff --git a/irq.c b/irq.c
->> index 1aee478..25ac8d7 100644
->> --- a/irq.c
->> +++ b/irq.c
->> @@ -89,6 +89,37 @@ int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
->>  	return next_gsi++;
->>  }
->>  
->> +static bool update_data(u32 *ptr, u32 newdata)
->> +{
->> +	if (*ptr == newdata)
->> +		return false;
->> +
->> +	*ptr = newdata;
->> +	return true;
->> +}
->> +
->> +void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg)
->> +{
->> +	struct kvm_irq_routing_msi *entry;
->> +	unsigned int i;
->> +	bool changed;
->> +
->> +	for (i = 0; i < irq_routing->nr; i++)
->> +		if (gsi == irq_routing->entries[i].gsi)
->> +			break;
->> +	if (i == irq_routing->nr)
->> +		return;
->> +
->> +	entry = &irq_routing->entries[i].u.msi;
->> +
->> +	changed  = update_data(&entry->address_hi, msg->address_hi);
->> +	changed |= update_data(&entry->address_lo, msg->address_lo);
->> +	changed |= update_data(&entry->data, msg->data);
->> +
->> +	if (changed)
->> +		ioctl(kvm->vm_fd, KVM_SET_GSI_ROUTING, irq_routing);
->> +}
+On Wed, Feb 17, 2016 at 04:40:39PM +0000, Marc Zyngier wrote:
+> GICv2 registers are *slow*. As in "terrifyingly slow". Which is bad.
+> But we're equaly bad, as we make a point in accessing them even if
+> we don't have any interrupt in flight.
 > 
-> What goes wrong if you just call the ioctl every time? Is this actually
-> a fast path in practice?
+> A good solution is to first find out if we have anything useful to
+> write into the GIC, and if we don't, to simply not do it. This
+> involves tracking which LRs actually have something valid there.
+> 
+> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
-I guess nothing, it's just a lot of needless churn in the kernel. We
-trap on every word access to the MSI data region and I have seen so many
-non-updates in there. For instance if the guest updates the 	payload, it
-writes the unchanged address parts also and we trap that.
-Also please note that this ioctl updates the _whole table_ every time.
-If you now look at what virt/kvm/kvm_main.c actually does (kmalloc,
-copy_from_user, kmalloc again, update each entry (with kmallocs), RCU
-switch over to the new table, free the old table, free, free), I hope
-you agree that his little extra code in userland is
-surely worth the effort. I had debug messages in the kernel to chase the
-bug and the output was huge every time for actually no change at all
-most of the times.
+nice find with the APR in this one, my review-by is still valid here.
 
-Cheers,
-Andre.
+Thanks,
+-Christoffer
+
+> ---
+>  arch/arm64/kvm/hyp/vgic-v2-sr.c | 72 ++++++++++++++++++++++++++++-------------
+>  include/kvm/arm_vgic.h          |  2 ++
+>  2 files changed, 52 insertions(+), 22 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> index e717612..5ab8d63 100644
+> --- a/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> +++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> @@ -38,28 +38,41 @@ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
+>  
+>  	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
+>  	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
+> -	cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
+> -	eisr0  = readl_relaxed(base + GICH_EISR0);
+> -	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
+> -	if (unlikely(nr_lr > 32)) {
+> -		eisr1  = readl_relaxed(base + GICH_EISR1);
+> -		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
+> -	} else {
+> -		eisr1 = elrsr1 = 0;
+> -	}
+> +
+> +	if (vcpu->arch.vgic_cpu.live_lrs) {
+> +		eisr0  = readl_relaxed(base + GICH_EISR0);
+> +		elrsr0 = readl_relaxed(base + GICH_ELRSR0);
+> +		cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
+> +		cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
+> +
+> +		if (unlikely(nr_lr > 32)) {
+> +			eisr1  = readl_relaxed(base + GICH_EISR1);
+> +			elrsr1 = readl_relaxed(base + GICH_ELRSR1);
+> +		} else {
+> +			eisr1 = elrsr1 = 0;
+> +		}
+> +
+>  #ifdef CONFIG_CPU_BIG_ENDIAN
+> -	cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
+> -	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
+> +		cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
+> +		cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
+>  #else
+> -	cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
+> -	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
+> +		cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
+> +		cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
+>  #endif
+> -	cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
+>  
+> -	writel_relaxed(0, base + GICH_HCR);
+> +		for (i = 0; i < nr_lr; i++)
+> +			if (vcpu->arch.vgic_cpu.live_lrs & (1UL << i))
+> +				cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
+>  
+> -	for (i = 0; i < nr_lr; i++)
+> -		cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
+> +		writel_relaxed(0, base + GICH_HCR);
+> +
+> +		vcpu->arch.vgic_cpu.live_lrs = 0;
+> +	} else {
+> +		cpu_if->vgic_eisr = 0;
+> +		cpu_if->vgic_elrsr = ~0UL;
+> +		cpu_if->vgic_misr = 0;
+> +		cpu_if->vgic_apr = 0;
+> +	}
+>  }
+>  
+>  /* vcpu is already in the HYP VA space */
+> @@ -70,15 +83,30 @@ void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
+>  	struct vgic_dist *vgic = &kvm->arch.vgic;
+>  	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
+>  	int i, nr_lr;
+> +	u64 live_lrs = 0;
+>  
+>  	if (!base)
+>  		return;
+>  
+> -	writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
+> -	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
+> -	writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
+> -
+>  	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
+> +
+>  	for (i = 0; i < nr_lr; i++)
+> -		writel_relaxed(cpu_if->vgic_lr[i], base + GICH_LR0 + (i * 4));
+> +		if (cpu_if->vgic_lr[i] & GICH_LR_STATE)
+> +			live_lrs |= 1UL << i;
+> +
+> +	if (live_lrs) {
+> +		writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
+> +		writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
+> +		for (i = 0; i < nr_lr; i++) {
+> +			u32 val = 0;
+> +
+> +			if (live_lrs & (1UL << i))
+> +				val = cpu_if->vgic_lr[i];
+> +
+> +			writel_relaxed(val, base + GICH_LR0 + (i * 4));
+> +		}
+> +	}
+> +
+> +	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
+> +	vcpu->arch.vgic_cpu.live_lrs = live_lrs;
+>  }
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 13a3d53..f473fd6 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -321,6 +321,8 @@ struct vgic_cpu {
+>  
+>  	/* Protected by the distributor's irq_phys_map_lock */
+>  	struct list_head	irq_phys_map_list;
+> +
+> +	u64		live_lrs;
+>  };
+>  
+>  #define LR_EMPTY	0xff
+> -- 
+> 2.1.4
+> 
