@@ -1,25 +1,26 @@
 From: Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH 1/3] irq: move IRQ routing into irq.c
-Date: Wed, 2 Mar 2016 00:37:02 +0000
-Message-ID: <20160302003702.GD14022@arm.com>
+Subject: Re: [PATCH 2/3] MSI-X: update GSI routing after changed MSI-X
+ configuration
+Date: Wed, 2 Mar 2016 01:16:10 +0000
+Message-ID: <20160302011610.GE14022@arm.com>
 References: <1456850978-14091-1-git-send-email-andre.przywara@arm.com>
- <1456850978-14091-2-git-send-email-andre.przywara@arm.com>
+ <1456850978-14091-3-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DBE9941145
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 19:29:45 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E1719410EB
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 20:08:51 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9HKqJ5dS4gGK for <kvmarm@lists.cs.columbia.edu>;
- Tue,  1 Mar 2016 19:29:44 -0500 (EST)
+ with ESMTP id sPXghqA1K1rg for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  1 Mar 2016 20:08:51 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 69913410EB
- for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 19:29:44 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 08CF0411BE
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  1 Mar 2016 20:08:50 -0500 (EST)
 Content-Disposition: inline
-In-Reply-To: <1456850978-14091-2-git-send-email-andre.przywara@arm.com>
+In-Reply-To: <1456850978-14091-3-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,86 +34,78 @@ To: Andre Przywara <andre.przywara@arm.com>
 Cc: Pekka Enberg <penberg@kernel.org>, Sasha Levin <sasha.levin@oracle.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
-
-On Tue, Mar 01, 2016 at 04:49:36PM +0000, Andre Przywara wrote:
-> The current IRQ routing code in x86/irq.c is mostly implementing a
-> generic KVM interface which other architectures may use too.
-> Move the code to set up an MSI route into the generic irq.c file and
-> guard it with the KVM_CAP_IRQ_ROUTING capability to return an error
-> if the kernel does not support interrupt routing.
-> This also removes the dummy implementations for all other
-> architectures and only leaves the x86 specific code in x86/irq.c.
+On Tue, Mar 01, 2016 at 04:49:37PM +0000, Andre Przywara wrote:
+> When we set up GSI routing to map MSIs to KVM's GSI numbers, we
+> write the current device's MSI setup into the kernel routing table.
+> However the device driver in the guest can use PCI configuration space
+> accesses to change the MSI configuration (address and/or payload data).
+> Whenever this happens after we have setup the routing table already,
+> we must amend the previously sent data.
+> So when MSI-X PCI config space accesses write address or payload,
+> find the associated GSI number and the matching routing table entry
+> and update the kernel routing table (only if the data has changed).
+> 
+> This fixes vhost-net, where the queue's IRQFD was setup before the
+> MSI vectors.
 > 
 > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
->  Makefile          |  4 +--
->  arm/irq.c         |  9 ------
->  hw/pci-shmem.c    |  2 ++
->  include/kvm/irq.h |  5 ++++
->  irq.c             | 83 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  mips/irq.c        | 10 -------
->  powerpc/irq.c     | 31 ---------------------
->  virtio/pci.c      | 18 ++++++++----
->  x86/irq.c         | 45 ++++--------------------------
->  9 files changed, 108 insertions(+), 99 deletions(-)
->  delete mode 100644 arm/irq.c
->  delete mode 100644 mips/irq.c
->  delete mode 100644 powerpc/irq.c
+>  include/kvm/irq.h |  1 +
+>  irq.c             | 31 +++++++++++++++++++++++++++++++
+>  virtio/pci.c      | 36 +++++++++++++++++++++++++++++++++---
+>  3 files changed, 65 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/kvm/irq.h b/include/kvm/irq.h
+> index bb71521..f35eb7e 100644
+> --- a/include/kvm/irq.h
+> +++ b/include/kvm/irq.h
+> @@ -21,5 +21,6 @@ int irq__exit(struct kvm *kvm);
+>  
+>  int irq__allocate_routing_entry(void);
+>  int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg);
+> +void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg);
+>  
+>  #endif
+> diff --git a/irq.c b/irq.c
+> index 1aee478..25ac8d7 100644
+> --- a/irq.c
+> +++ b/irq.c
+> @@ -89,6 +89,37 @@ int irq__add_msix_route(struct kvm *kvm, struct msi_msg *msg)
+>  	return next_gsi++;
+>  }
+>  
+> +static bool update_data(u32 *ptr, u32 newdata)
+> +{
+> +	if (*ptr == newdata)
+> +		return false;
+> +
+> +	*ptr = newdata;
+> +	return true;
+> +}
+> +
+> +void irq__update_msix_route(struct kvm *kvm, u32 gsi, struct msi_msg *msg)
+> +{
+> +	struct kvm_irq_routing_msi *entry;
+> +	unsigned int i;
+> +	bool changed;
+> +
+> +	for (i = 0; i < irq_routing->nr; i++)
+> +		if (gsi == irq_routing->entries[i].gsi)
+> +			break;
+> +	if (i == irq_routing->nr)
+> +		return;
+> +
+> +	entry = &irq_routing->entries[i].u.msi;
+> +
+> +	changed  = update_data(&entry->address_hi, msg->address_hi);
+> +	changed |= update_data(&entry->address_lo, msg->address_lo);
+> +	changed |= update_data(&entry->data, msg->data);
+> +
+> +	if (changed)
+> +		ioctl(kvm->vm_fd, KVM_SET_GSI_ROUTING, irq_routing);
+> +}
 
-[...]
-
-> diff --git a/x86/irq.c b/x86/irq.c
-> index 72177e7..49b2e90 100644
-> --- a/x86/irq.c
-> +++ b/x86/irq.c
-> @@ -11,20 +11,15 @@
->  #include <stddef.h>
->  #include <stdlib.h>
->  
-> -#define IRQ_MAX_GSI			64
->  #define IRQCHIP_MASTER			0
->  #define IRQCHIP_SLAVE			1
->  #define IRQCHIP_IOAPIC			2
->  
-> -/* First 24 GSIs are routed between IRQCHIPs and IOAPICs */
-> -static u32 gsi = 24;
-> -
-> -struct kvm_irq_routing *irq_routing;
-> -
->  static int irq__add_routing(u32 gsi, u32 type, u32 irqchip, u32 pin)
->  {
-> -	if (gsi >= IRQ_MAX_GSI)
-> -		return -ENOSPC;
-> +	int r = irq__allocate_routing_entry();
-> +	if (r)
-> +		return r;
->  
->  	irq_routing->entries[irq_routing->nr++] =
->  		(struct kvm_irq_routing_entry) {
-> @@ -41,11 +36,6 @@ int irq__init(struct kvm *kvm)
->  {
->  	int i, r;
->  
-> -	irq_routing = calloc(sizeof(struct kvm_irq_routing) +
-> -			IRQ_MAX_GSI * sizeof(struct kvm_irq_routing_entry), 1);
-> -	if (irq_routing == NULL)
-> -		return -ENOMEM;
-> -
->  	/* Hook first 8 GSIs to master IRQCHIP */
->  	for (i = 0; i < 8; i++)
->  		if (i != 2)
-> @@ -69,33 +59,8 @@ int irq__init(struct kvm *kvm)
->  		return errno;
->  	}
->  
-> -	return 0;
-> -}
-> -dev_base_init(irq__init);
-> +	next_gsi = 24;
-
-Can we not just have an arch-specific initialiser that defaults to zero,
-like we do for wired interrupts? (e.g. KVM_MSI_OFFSET). That way, we can
-keep next_gsi private to the common irq routing code.
+What goes wrong if you just call the ioctl every time? Is this actually
+a fast path in practice?
 
 Will
