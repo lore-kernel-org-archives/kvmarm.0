@@ -1,24 +1,26 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: Intermittent guest kernel crashes with v4.5-rc6.
-Date: Wed, 2 Mar 2016 15:09:48 +0000
-Message-ID: <56D7023C.7050309@arm.com>
-References: <56D6F113.9020605@codeaurora.org> <56D6F5CC.5020101@arm.com>
- <56D6FFDE.9050704@codeaurora.org>
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH v2 0/8] arm64: Support for systems without AArch32 state
+Date: Wed, 2 Mar 2016 15:24:30 +0000
+Message-ID: <20160302152429.GE11670@leverpostej>
+References: <1456393968-17386-1-git-send-email-suzuki.poulose@arm.com>
+ <20160301211923.GA1325@yury-N73SV>
+ <20160302150721.GA16286@yury-N73SV>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 743E141145
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2016 10:02:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D253E41145
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2016 10:17:30 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pMyFU9CJZnwi for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Mar 2016 10:02:40 -0500 (EST)
+ with ESMTP id OhvkF6f24ZM1 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  2 Mar 2016 10:17:28 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E156410EB
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2016 10:02:39 -0500 (EST)
-In-Reply-To: <56D6FFDE.9050704@codeaurora.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ECF50410EB
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2016 10:17:27 -0500 (EST)
+Content-Disposition: inline
+In-Reply-To: <20160302150721.GA16286@yury-N73SV>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,105 +30,26 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shanker Donthineni <shankerd@codeaurora.org>, kvmarm@lists.cs.columbia.edu
+To: Yury Norov <ynorov@caviumnetworks.com>
+Cc: marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 02/03/16 14:59, Shanker Donthineni wrote:
-> Hi Marc,
+On Wed, Mar 02, 2016 at 06:07:21PM +0300, Yury Norov wrote:
+> ubuntu@arm64:~$ uname -a
+> Linux arm64 4.5.0-rc5-00019-g3e330b9 #76 SMP PREEMPT Wed Mar 2 17:46:57 MSK 2016 aarch64 aarch64 aarch64 GNU/Linux
 > 
-> Thanks for your quick reply.
-> 
-> On 03/02/2016 08:16 AM, Marc Zyngier wrote:
->> On 02/03/16 13:56, Shanker Donthineni wrote:
->>> For some reason v4.5-rc6 kernel is not stable for guest machines on
->>> Qualcomm server platforms.
->>> We are getting IABT translation faults while booting the guest kernel.
->>> The problem disappears with
->>> the following code snippet (insert "dsb ish" instruction just before
->>> switching to EL1 guest). I am
->>> using v4.5-rc6 kernel for both host and guest machines.
->>>
->>> Please let me know if you have any thoughts or ideas for tracing this
->>> problem.
->>>
->>> --- a/arch/arm64/kvm/hyp/entry.S
->>> +++ b/arch/arm64/kvm/hyp/entry.S
->>> @@ -88,6 +88,7 @@ ENTRY(__guest_enter)
->>>           ldp     x0, x1, [sp], #16
->>>
->>>           // Do not touch any register after this!
->>> +       dsb ish
->>>           eret
->>>    ENDPROC(__guest_enter)
->>>
->>>
->>> Using below QEMU command for launching guest machine:
->>>
->>> qemu-system-aarch64 -machine type=virt,accel=kvm,gic-version=3  \
->>> -cpu "host" -smp cpus=1,maxcpus=1 -m 256M -serial stdio \
->>> -kernel /boot/Image -initrd /boot/rootfs.cpio.gz \
->>> -append 'earlycon=earlycon=pl011,0x09000000  \
->>> console=ttyAMA0,115200 root=/dev/ram'
->>>
->>>
->>> Guest machine crash log messages:
->>>
->>> [    0.000000] Booting Linux on physical CPU 0x0
->>> [    0.000000] Boot CPU: AArch64 Processor [510f2811]
->>> [    0.000000] Bad mode in Synchronous Abort handler detected, code
->>> 0x8600000f -- IABT (current EL)
->>> [    0.000000] CPU: 0 PID: 0 Comm: swapper Not tainted 4.5.rc6+
->>> [    0.000000] task: ffffffc000d52200 ti: ffffffc000d44000 task.ti:
->>> ffffffc000d44000
->>> [    0.000000] PC is at early_init_dt_scan_root+0x28/0x94
->>> [    0.000000] LR is at of_scan_flat_dt+0x9c/0xd0
->>> [    0.000000] pc : [<ffffffc000cb32e8>] lr : [<ffffffc000cb3248>]
->>> pstate: 800003c5
->>> [    0.000000] sp : ffffffc000d47e80
->>> [    0.000000] x29: ffffffc000d47e80 x28: 0000000000000000
->>>
->> If you're getting a prefetch abort, it would be interesting to find out
->> what instruction is there, whether the page is mapped at stage-2 or not,
->> what are the stage-2 permissions... Basically, a full description of the
->> memory state.
->>
->> Also, does it work if you do a "dsb ishst" instead?
->>
->> Thanks,
->>
->> 	M.
-> 
-> Most of the times it is faulting at ldr/str instructions. I have 
-> verified stage-1 page and  the
-> the corresponding stage-2 page attributes (SH, AP, PERM), PA etc. after 
-> IABT, everything
-> perfectly matches. I am very confident that stage-1/stage-2 MMU page 
-> tables are correct.
-> 
-> Instruction "dsb ishst" also fixing the problem.
-> 
-> One more Interesting observation, if retry an instruction fetch that 
-> caused IABT, second
-> time fetch is successful and I don't see IABT.  I used below 
-> experimental code to test.
-> 
-> --- a/arch/arm64/kernel/entry.S
-> +++ b/arch/arm64/kernel/entry.S
-> @@ -346,6 +346,7 @@ el1_sync:
->          b.eq    el1_undef
->          cmp     x24, #ESR_ELx_EC_BREAKPT_CUR    // debug exception in EL1
->          b.ge    el1_dbg
-> +       kernel_exit 1
->          b       el1_inv
->   el1_da:
-> 
-> 
+> ubuntu@arm64:~$ cat /proc/cpuinfo
+> processor       : 0-47
+> BogoMIPS        : 200.00
+> Features        : fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics
+> CPU implementer : 0x43
+> CPU architecture: 8
+> CPU variant     : 0x1
+> CPU part        : 0x0a1
+> CPU revision    : 0
 
-OK, that's pretty scary, specially considering that we don't have a DSB
-on that path. Do you ever see it exploding at EL0?
+As an aside, please do not hack up custom /proc/cpuinfo formats.
 
-Thanks,
+It is a compatibility nightmare for everyone.
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Mark.
