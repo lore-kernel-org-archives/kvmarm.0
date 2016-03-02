@@ -1,104 +1,43 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 8/8] arm64: kvm: Check support for AArch32 for 32bit
- guests
-Date: Wed, 2 Mar 2016 09:08:02 +0000
-Message-ID: <56D6AD72.8010108@arm.com>
-References: <1456393968-17386-1-git-send-email-suzuki.poulose@arm.com>
- <1456393968-17386-9-git-send-email-suzuki.poulose@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 10B8B411BE
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2016 04:00:59 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BXEek+2XcNGn for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Mar 2016 04:00:57 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 593CF410EB
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2016 04:00:56 -0500 (EST)
-In-Reply-To: <1456393968-17386-9-git-send-email-suzuki.poulose@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, ynorov@caviumnetworks.com, kvmarm@lists.cs.columbia.edu
+Subject: [PULL] KVM/ARM updates for 4.5-rc7
+Date: Wed,  2 Mar 2016 09:27:28 +0000
+Message-ID: <1456910849-16049-1-git-send-email-marc.zyngier@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, "Michael S. Tsirkin" <mst@redhat.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Gleb Natapov <gleb@kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMjUvMDIvMTYgMDk6NTIsIFN1enVraSBLIFBvdWxvc2Ugd3JvdGU6Cj4gQWRkIGEgY2hlY2sg
-dG8gbWFrZSBzdXJlIHRoZSBzeXN0ZW0gc3VwcG9ydHMgQUFyY2gzMiBzdGF0ZQo+IGJlZm9yZSBp
-bml0aWFsaXNpbmcgYSAzMmJpdCBndWVzdC4KPiAKPiBDYzogQ2hyaXN0b2ZmZXIgRGFsbCA8Y2hy
-aXN0b2ZmZXIuZGFsbEBsaW5hcm8ub3JnPgo+IENjOiBNYXJjIFp5bmdpZXIgPG1hcmMuenluZ2ll
-ckBhcm0uY29tPgo+IENjOiBrdm1hcm1AbGlzdHMuY3MuY29sdW1iaWEuZWR1Cj4gU2lnbmVkLW9m
-Zi1ieTogU3V6dWtpIEsgUG91bG9zZSA8c3V6dWtpLnBvdWxvc2VAYXJtLmNvbT4KPiAKPiAtLS0K
-PiAKPiBJIHJlYWxseSB3YW50ZWQgdG8gcGFzcyBrdm1fdmNwdSBkb3duIHRvIHRoZSBoZWxwZXJz
-LiBCdXQgdGhlbiwgSSBjYW4ndAo+IGRlZmluZSB0aGUgYXJjaCBzcGVjaWZpYyBoZWxwZXIgaW4g
-YXNtL2t2bV9ob3N0LmggZHVlIHRvIGxhY2sgb2Yga3ZtX3ZjcHUncwo+IGRlZmluaXRpb24geWV0
-Ogo+IAo+ICBJbiBmaWxlIGluY2x1ZGVkIGZyb20gaW5jbHVkZS9saW51eC9rdm1faG9zdC5oOjM1
-OjAsCj4gICAgICAgICAgICAgICAgICAgZnJvbSBhcmNoL2FybTY0L2tlcm5lbC9hc20tb2Zmc2V0
-cy5jOjI0Ogo+ICAuL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3QuaDogSW4gZnVuY3Rp
-b24g4oCYa3ZtX2FyY2hfdmNwdV92YWxpZGF0ZV9mZWF0dXJlc+KAmToKPiAgLi9hcmNoL2FybTY0
-L2luY2x1ZGUvYXNtL2t2bV9ob3N0Lmg6MzQ0OjQ4OiBlcnJvcjogZGVyZWZlcmVuY2luZyBwb2lu
-dGVyIHRvIGluY29tcGxldGUgdHlwZQo+ICAgIHJldHVybiAgIXRlc3RfYml0KEtWTV9BUk1fVkNQ
-VV9FTDFfMzJCSVQsIHZjcHUtPmFyY2guZmVhdHVyZXMpIHx8CgpXaHkgZG9uJ3QgeW91IGp1c3Qg
-aGF2ZSB0aGUgcHJvdG90eXBlIGluIGt2bV9ob3N0LmgsIGFuZCBtb3ZlIHRoZSBhY3R1YWwKaW1w
-bGVtZW50YXRpb24gdG8gc29tZXRoaW5nIGxpa2UgZ3Vlc3QuYz8gQnV0IEkgdGhpbmsgdGhlcmUg
-aXMgYSBiZXR0ZXIKYXBwcm9hY2gsIHNlZSBiZWxvdy4KCj4gLS0tCj4gIGFyY2gvYXJtL2luY2x1
-ZGUvYXNtL2t2bV9ob3N0LmggICB8ICAgIDUgKysrKysKPiAgYXJjaC9hcm0va3ZtL2FybS5jICAg
-ICAgICAgICAgICAgIHwgICAgMyArKysKPiAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9rdm1faG9z
-dC5oIHwgICAgOCArKysrKysrKwo+ICAzIGZpbGVzIGNoYW5nZWQsIDE2IGluc2VydGlvbnMoKykK
-PiAKPiBkaWZmIC0tZ2l0IGEvYXJjaC9hcm0vaW5jbHVkZS9hc20va3ZtX2hvc3QuaCBiL2FyY2gv
-YXJtL2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPiBpbmRleCBmOWYyNzc5Li45NDVjMjNhIDEwMDY0
-NAo+IC0tLSBhL2FyY2gvYXJtL2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPiArKysgYi9hcmNoL2Fy
-bS9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4gQEAgLTIzOCw2ICsyMzgsMTEgQEAgc3RhdGljIGlu
-bGluZSB2b2lkIGt2bV9hcmNoX3N5bmNfZXZlbnRzKHN0cnVjdCBrdm0gKmt2bSkge30KPiAgc3Rh
-dGljIGlubGluZSB2b2lkIGt2bV9hcmNoX3ZjcHVfdW5pbml0KHN0cnVjdCBrdm1fdmNwdSAqdmNw
-dSkge30KPiAgc3RhdGljIGlubGluZSB2b2lkIGt2bV9hcmNoX3NjaGVkX2luKHN0cnVjdCBrdm1f
-dmNwdSAqdmNwdSwgaW50IGNwdSkge30KPiAgCj4gK3N0YXRpYyBpbmxpbmUgYm9vbCBrdm1fYXJj
-aF92Y3B1X3ZhbGlkYXRlX2ZlYXR1cmVzKHN0cnVjdCBrdm1fdmNwdV9hcmNoICphcmNoX3ZjcHUp
-Cj4gK3sKPiArCXJldHVybiB0cnVlOwo+ICt9Cj4gKwo+ICBzdGF0aWMgaW5saW5lIHZvaWQga3Zt
-X2FybV9pbml0X2RlYnVnKHZvaWQpIHt9Cj4gIHN0YXRpYyBpbmxpbmUgdm9pZCBrdm1fYXJtX3Nl
-dHVwX2RlYnVnKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkge30KPiAgc3RhdGljIGlubGluZSB2b2lk
-IGt2bV9hcm1fY2xlYXJfZGVidWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KSB7fQo+IGRpZmYgLS1n
-aXQgYS9hcmNoL2FybS9rdm0vYXJtLmMgYi9hcmNoL2FybS9rdm0vYXJtLmMKPiBpbmRleCBkZGEx
-OTU5Li5mYzRlYTM3IDEwMDY0NAo+IC0tLSBhL2FyY2gvYXJtL2t2bS9hcm0uYwo+ICsrKyBiL2Fy
-Y2gvYXJtL2t2bS9hcm0uYwo+IEBAIC03ODcsNiArNzg3LDkgQEAgc3RhdGljIGludCBrdm1fdmNw
-dV9zZXRfdGFyZ2V0KHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwKPiAgCQkJc2V0X2JpdChpLCB2Y3B1
-LT5hcmNoLmZlYXR1cmVzKTsKPiAgCX0KPiAgCj4gKwlpZiAoIWt2bV9hcmNoX3ZjcHVfdmFsaWRh
-dGVfZmVhdHVyZXMoJnZjcHUtPmFyY2gpKQo+ICsJCXJldHVybiAtRUlOVkFMOwo+ICsKPiAgCXZj
-cHUtPmFyY2gudGFyZ2V0ID0gcGh5c190YXJnZXQ7Cj4gIAo+ICAJLyogTm93IHdlIGtub3cgd2hh
-dCBpdCBpcywgd2UgY2FuIHJlc2V0IGl0LiAqLwo+IGRpZmYgLS1naXQgYS9hcmNoL2FybTY0L2lu
-Y2x1ZGUvYXNtL2t2bV9ob3N0LmggYi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgK
-PiBpbmRleCA2ODlkNGM5Li45ZDYwYTZjIDEwMDY0NAo+IC0tLSBhL2FyY2gvYXJtNjQvaW5jbHVk
-ZS9hc20va3ZtX2hvc3QuaAo+ICsrKyBiL2FyY2gvYXJtNjQvaW5jbHVkZS9hc20va3ZtX2hvc3Qu
-aAo+IEBAIC0yNCw2ICsyNCw4IEBACj4gIAo+ICAjaW5jbHVkZSA8bGludXgvdHlwZXMuaD4KPiAg
-I2luY2x1ZGUgPGxpbnV4L2t2bV90eXBlcy5oPgo+ICsjaW5jbHVkZSA8YXNtL2NwdWZlYXR1cmUu
-aD4KPiArI2luY2x1ZGUgPGFzbS9rdm1fYXJtLmg+Cj4gICNpbmNsdWRlIDxhc20va3ZtLmg+Cj4g
-ICNpbmNsdWRlIDxhc20va3ZtX21taW8uaD4KPiAgCj4gQEAgLTMzOCw2ICszNDAsMTIgQEAgc3Rh
-dGljIGlubGluZSB2b2lkIGt2bV9hcmNoX3N5bmNfZXZlbnRzKHN0cnVjdCBrdm0gKmt2bSkge30K
-PiAgc3RhdGljIGlubGluZSB2b2lkIGt2bV9hcmNoX3ZjcHVfdW5pbml0KHN0cnVjdCBrdm1fdmNw
-dSAqdmNwdSkge30KPiAgc3RhdGljIGlubGluZSB2b2lkIGt2bV9hcmNoX3NjaGVkX2luKHN0cnVj
-dCBrdm1fdmNwdSAqdmNwdSwgaW50IGNwdSkge30KPiAgCj4gK3N0YXRpYyBpbmxpbmUgYm9vbCBr
-dm1fYXJjaF92Y3B1X3ZhbGlkYXRlX2ZlYXR1cmVzKHN0cnVjdCBrdm1fdmNwdV9hcmNoICphcmNo
-X3ZjcHUpCj4gK3sKPiArCXJldHVybiAgIXRlc3RfYml0KEtWTV9BUk1fVkNQVV9FTDFfMzJCSVQs
-IGFyY2hfdmNwdS0+ZmVhdHVyZXMpIHx8Cj4gKwkJc3lzdGVtX3N1cHBvcnRzXzMyYml0X2VsMCgp
-Owo+ICt9Cj4gKwoKVGhpcyBpcyByZWFsbHkgY29udm9sdXRlZCAoaXQgdG9vayBtZSA1IG1pbnV0
-ZXMgc3RhcmluZyBhdCB0aGUKZXhwcmVzc2lvbiBhbmQgcmVtZW1iZXJpbmcgdGhhdCBBQXJjaDMy
-IEVMMSBpbXBsaWVzIEFBcmNoMzIgRUwwIHRvIGdldCBpdCkuCgpOb3csIHdlIGFscmVhZHkgaGF2
-ZSBrdm1fcmVzZXRfdmNwdSgpIHRoYXQgdmFsaWRhdGVzIEFBcmNoMzIgc3VwcG9ydC4gSXQKd291
-bGQgcHJvYmFibHkgYmUgYmV0dGVyIHRvIG1vdmUgdGhpbmdzIHRoZXJlLiBUaG91Z2h0cz8KCj4g
-IHZvaWQga3ZtX2FybV9pbml0X2RlYnVnKHZvaWQpOwo+ICB2b2lkIGt2bV9hcm1fc2V0dXBfZGVi
-dWcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KTsKPiAgdm9pZCBrdm1fYXJtX2NsZWFyX2RlYnVnKHN0
-cnVjdCBrdm1fdmNwdSAqdmNwdSk7Cj4gCgpUaGFua3MsCgoJTS4KLS0gCkphenogaXMgbm90IGRl
-YWQuIEl0IGp1c3Qgc21lbGxzIGZ1bm55Li4uCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNv
-bHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZv
-L2t2bWFybQo=
+Hi Paolo,
+
+I really thought that the previous PR was the last for this release,
+but Michael rightly decided to prove me wrong. Oh well.
+
+Please pull!
+
+       M.
+
+The following changes since commit fd451b90e78c4178bcfc5072f2b2b637500c109a:
+
+  arm64: KVM: vgic-v3: Restore ICH_APR0Rn_EL2 before ICH_APR1Rn_EL2 (2016-02-24 17:25:58 +0000)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-4.5-rc7
+
+for you to fetch changes up to 4cad67fca3fc952d6f2ed9e799621f07666a560f:
+
+  arm/arm64: KVM: Fix ioctl error handling (2016-02-29 09:56:40 +0000)
+
+----------------------------------------------------------------
+KVM/ARM fixes for 4.5-rc7
+
+- Fix ioctl error handling on the timer path
+
+----------------------------------------------------------------
+Michael S. Tsirkin (1):
+      arm/arm64: KVM: Fix ioctl error handling
+
+ arch/arm/kvm/guest.c   | 2 +-
+ arch/arm64/kvm/guest.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
