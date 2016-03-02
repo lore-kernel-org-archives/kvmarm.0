@@ -1,77 +1,128 @@
-From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: [RFC v5 00/17] KVM PCIe/MSI passthrough on ARM/ARM64
-Date: Wed, 2 Mar 2016 13:30:11 +0100
-Message-ID: <56D6DCD3.7070004@linaro.org>
-References: <1456856877-4817-1-git-send-email-eric.auger@linaro.org>
-	<BY1PR0701MB1594168E79366B507B7C8A16E1BC0@BY1PR0701MB1594.namprd07.prod.outlook.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v7 1/6] KVM: arm/arm64: Add VGICv3 save/restore API
+ documentation
+Date: Wed, 2 Mar 2016 13:48:25 +0100
+Message-ID: <20160302124825.GA4169@cbox>
+References: <cover.1449491035.git.p.fedin@samsung.com>
+ <204d6b178e611ee0b5aede2b945516e0a6048c3c.1449491035.git.p.fedin@samsung.com>
+ <CAFEAcA-VVKawQkup2ymiujvQnint1bEmm65XeSU9TL+LH5XoqQ@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <BY1PR0701MB1594168E79366B507B7C8A16E1BC0-vsFp3N3nJ9josxbTuffl3E5OhdzP3rhOnBOFsp37pqbUKgpGm//BTAC/G2K4zDHf@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: "Jaggi, Manish" <Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>, "eric.auger-qxv4g6HH51o@public.gmane.org" <eric.auger-qxv4g6HH51o@public.gmane.org>, "robin.murphy-5wv7dgnIgG8@public.gmane.org" <robin.murphy-5wv7dgnIgG8@public.gmane.org>, "alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "will.deacon-5wv7dgnIgG8@public.gmane.org" <will.deacon-5wv7dgnIgG8@public.gmane.org>, "joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org" <joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>, "tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org" <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, "jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org" <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>, "marc.zyngier-5wv7dgnIgG8@public.gmane.org" <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, "christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org" <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org" <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, "kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
-Cc: "patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org" <patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, "p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org" <p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>, "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-VVKawQkup2ymiujvQnint1bEmm65XeSU9TL+LH5XoqQ@mail.gmail.com>
+Sender: kvm-owner@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Pavel Fedin <p.fedin@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Manish,
-On 03/02/2016 09:11 AM, Jaggi, Manish wrote:
+On Fri, Feb 26, 2016 at 03:01:56PM +0000, Peter Maydell wrote:
+> On 7 December 2015 at 12:29, Pavel Fedin <p.fedin@samsung.com> wrote:
+> > From: Christoffer Dall <christoffer.dall@linaro.org>
+> >
+> > Factor out the GICv3-specific documentation into a separate
+> > documentation file.  Add description for how to access distributor,
+> > redistributor, and CPU interface registers for GICv3 in this new file.
+> >
+> > Acked-by: Peter Maydell <peter.maydell@linaro.org>
+> > Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> > Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
 > 
+> I was rereading this API doc this week, and I realised we missed
+> something when we wrote it:
 > 
->>> From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
->>> Sent: Tuesday, March 1, 2016 11:57 PM
->>> To: eric.auger-qxv4g6HH51o@public.gmane.org; eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org; robin.murphy-5wv7dgnIgG8@public.gmane.org; alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org; will.deacon-5wv7dgnIgG8@public.gmane.org; joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org; tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org; >>jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org; marc.zyngier-5wv7dgnIgG8@public.gmane.org; christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org; linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org; kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org; kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
->>> Cc: suravee.suthikulpanit-5C7GfCeVMHo@public.gmane.org; patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org; linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; Jaggi, Manish; Bharat.Bhushan-KZfg59tc24xl57MIdRCFDg@public.gmane.org; >>pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org; p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org; iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
->>> Subject: [RFC v5 00/17] KVM PCIe/MSI passthrough on ARM/ARM64
+> > +  KVM_DEV_ARM_VGIC_GRP_DIST_REGS
+> > +  KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
+> > +  Attributes:
+> > +    The attr field of kvm_device_attr encodes two values:
+> > +    bits:     | 63   ....  32  |  31   ....    0 |
+> > +    values:   |      mpidr     |      offset     |
+> > +
+> > +    All distributor regs are (rw, 64-bit).
 > 
->>> This series addresses KVM PCIe passthrough with MSI enabled on ARM/ARM64.
->>> It pursues the efforts done on [1], [2], [3]. It also aims at covering the
->>> same need on PowerPC platforms although the same kind of integration
->>> .should be carried out.
->>>
-> [snip]
->>> - Not tested: ARM GICv3 ITS
-> 
-> [snip]
->>> QEMU Integration:
->>> [RFC v2 0/8] KVM PCI/MSI passthrough with mach-virt
->>> (http://lists.gnu.org/archive/html/qemu-arm/2016-01/msg00444.html)
->>> https://git.linaro.org/people/eric.auger/qemu.git/shortlog/refs/heads/v2.5.0-pci-passthrough-rfc-v2
-> 
-> For gicv3 its, I believe, the below series for qemu and kernel is required for gicv3-its
-> 
-> [RFC PATCH v3 0/5] vITS support
-> https://lists.gnu.org/archive/html/qemu-devel/2015-11/msg05197.html
-> 
-> and in kernel CONFIG_HAVE_KVM_MSI must be enabled so that qemu sees MSI capability KVM_CAP_SIGNAL_MSI
-> 
-> This has a dependency on gsi routing support
-> KVM: arm/arm64: gsi routing support
-> https://lkml.org/lkml/2015/6/29/290
+> It's a bit odd to claim that distributor (or redistributor)
+> registers are all 64-bit, because in the hardware most of them
+> are really 32-bit, and at 32-bit offsets from each other.
+> We didn't mean to imply that you could do a 64-bit access
+> at offset 0 of the distributor and get both of GICD_CTLR and
+> GICD_TYPER at once, for instance.
 
-which has a dependency on Andre's ITS emulation series too.
+no we didn't, and I think this was just an oversight on my side.
 
-The Kernel series will be resent soon on top on new vgic design.
-> 
-> I had both the above series in 4.2 in my local 4.2 tree. 
-
-Did you have a chance to test with GICv3 ITS already?
-
-Best Regards
-
-Eric
-
+Perhaps what I meant was the userspace should just provide a pointer to
+a 64-bit value.
 
 > 
-> BR
-> -Manish
+> I'm not quite sure what we want to say in the documentation,
+> though I think our general intent was clear:
 > 
+>  * you access a particular register at its relevant offset,
+>    and you only get that register
+>  * no support for reading half a register
+>  * if the register (as documented in the GICv3 architecture
+>    specification) is less than 64 bits wide then the returned
+>    result is zero-extended to 64 bits on read, and high bits
+>    are ignored on write
+>    (Only a couple of registers are really 64-bits, notably
+>    GICD_IROUTER<n>. The rest are 32-bits. We could probably explicitly
+>    list all the 64-bit regs in this doc if we didn't want to defer
+>    to the arch spec.)
 > 
+> Do we want to forbid accesses to registers which the architecture
+> says can be byte-accessed, like GICD_IPRIORITYR<n>? I think we have
+> to, because the kernel API we have here doesn't have any way to
+> specify access width, and it would be weird for addresses X+1,
+> X+2, X+3 to give you 8 bits of data when X+0 gave you 32.
+
+yes, for the gicv2 API we only allow accesses on 32-bit aligned
+boundaries and always assume a 32-bit access.
+
+> 
+> What do we mean by the "rw" part? Some registers really are
+> architecturally RO, so does this mean "writes to architecturally
+> RO registers will succeed but be ignored rather than returning an
+> errno" ?
+
+I think my intention was that this would work like the invariant
+sysregs, where if you write anything else than what the kernel has
+defined, then you get an error.  Not sure if this is something we'd want
+to do here though.  Seems like the GICv2 implementation just ignores
+writes in line with the architecture.
+
+> 
+> > +
+> > +    KVM_DEV_ARM_VGIC_GRP_DIST_REGS accesses the main distributor registers.
+> > +    KVM_DEV_ARM_VGIC_GRP_REDIST_REGS accesses the redistributor of the CPU
+> > +    specified by the mpidr.
+> > +
+> > +    The offset is relative to the "[Re]Distributor base address" as defined
+> > +    in the GICv3/4 specs.  Getting or setting such a register has the same
+> > +    effect as reading or writing the register on real hardware, and the mpidr
+> > +    field is used to specify which redistributor is accessed.  The mpidr is
+> > +    ignored for the distributor.
+> > +
+> > +    The mpidr encoding is based on the affinity information in the
+> > +    architecture defined MPIDR, and the field is encoded as follows:
+> > +      | 63 .... 56 | 55 .... 48 | 47 .... 40 | 39 .... 32 |
+> > +      |    Aff3    |    Aff2    |    Aff1    |    Aff0    |
+> > +
+> > +    Note that distributor fields are not banked, but return the same value
+> > +    regardless of the mpidr used to access the register.
+> > +  Limitations:
+> > +    - Priorities are not implemented, and registers are RAZ/WI
+> > +  Errors:
+> > +    -ENXIO: Getting or setting this register is not yet supported
+> > +    -EBUSY: One or more VCPUs are running
+> > +
+> > +
+> > +  KVM_DEV_ARM_VGIC_CPU_SYSREGS
+> 
+> In contrast it's fine for sysregs to be all 64-bit, because they correspond
+> to CPU system registers which are architecturally 64-bits.
+> 
+
+Right, perhaps this was my confusion.
+
+Thanks,
+-Christoffer
