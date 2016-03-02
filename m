@@ -1,62 +1,73 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 12/17] arm64: KVM: vgic-v2: Make GICD_SGIR quicker to
- hit
-Date: Thu, 3 Mar 2016 00:08:23 +0100
-Message-ID: <20160302230823.GF9634@cbox>
+Subject: Re: [PATCH v2 11/17] arm64: KVM: vgic-v2: Only wipe LRs on vcpu exit
+Date: Thu, 3 Mar 2016 00:08:19 +0100
+Message-ID: <20160302230819.GE9634@cbox>
 References: <1455727249-24752-1-git-send-email-marc.zyngier@arm.com>
- <1455727249-24752-13-git-send-email-marc.zyngier@arm.com>
+ <1455727249-24752-12-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1455727249-24752-13-git-send-email-marc.zyngier@arm.com>
+In-Reply-To: <1455727249-24752-12-git-send-email-marc.zyngier@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Andrew Jones <drjones@redhat.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 17, 2016 at 04:40:44PM +0000, Marc Zyngier wrote:
-> The GICD_SGIR register lives a long way from the beginning of
-> the handler array, which is searched linearly. As this is hit
-> pretty often, let's move it up. This saves us some precious
-> cycles when the guest is generating IPIs.
+On Wed, Feb 17, 2016 at 04:40:43PM +0000, Marc Zyngier wrote:
+> So far, we're always writing all possible LRs, setting the empty
+> ones with a zero value. This is obvious doing a low of work for
+
+s/low/lot/
+
+> nothing, and we're better off clearing those we've actually
+> dirtied on the exit path (it is very rare to inject more than one
+> interrupt at a time anyway).
 > 
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-
 > ---
->  virt/kvm/arm/vgic-v2-emul.c | 10 +++++-----
+>  arch/arm64/kvm/hyp/vgic-v2-sr.c | 10 +++++-----
 >  1 file changed, 5 insertions(+), 5 deletions(-)
 > 
-> diff --git a/virt/kvm/arm/vgic-v2-emul.c b/virt/kvm/arm/vgic-v2-emul.c
-> index 1390797..1b0bee0 100644
-> --- a/virt/kvm/arm/vgic-v2-emul.c
-> +++ b/virt/kvm/arm/vgic-v2-emul.c
-> @@ -321,6 +321,11 @@ static bool handle_mmio_sgi_clear(struct kvm_vcpu *vcpu,
+> diff --git a/arch/arm64/kvm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> index 3dbbc6b..e53f131 100644
+> --- a/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> +++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> @@ -101,6 +101,7 @@ static void __hyp_text save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
+>  		}
 >  
->  static const struct vgic_io_range vgic_dist_ranges[] = {
->  	{
-> +		.base		= GIC_DIST_SOFTINT,
-> +		.len		= 4,
-> +		.handle_mmio	= handle_mmio_sgi_reg,
-> +	},
-> +	{
->  		.base		= GIC_DIST_CTRL,
->  		.len		= 12,
->  		.bits_per_irq	= 0,
-> @@ -387,11 +392,6 @@ static const struct vgic_io_range vgic_dist_ranges[] = {
->  		.handle_mmio	= handle_mmio_cfg_reg,
->  	},
->  	{
-> -		.base		= GIC_DIST_SOFTINT,
-> -		.len		= 4,
-> -		.handle_mmio	= handle_mmio_sgi_reg,
-> -	},
-> -	{
->  		.base		= GIC_DIST_SGI_PENDING_CLEAR,
->  		.len		= VGIC_NR_SGIS,
->  		.handle_mmio	= handle_mmio_sgi_clear,
+>  		cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
+> +		writel_relaxed(0, base + GICH_LR0 + (i * 4));
+>  	}
+>  }
+>  
+> @@ -158,12 +159,11 @@ void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
+>  		writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
+>  		writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
+>  		for (i = 0; i < nr_lr; i++) {
+> -			u32 val = 0;
+> -
+> -			if (live_lrs & (1UL << i))
+> -				val = cpu_if->vgic_lr[i];
+> +			if (!(live_lrs & (1UL << i)))
+> +				continue;
+
+how can we be sure that the LRs are clear when we launch our first VM on
+a given physical CPU?  Don't we need to flush the LRs during VGIC init
+time?
+
+>  
+> -			writel_relaxed(val, base + GICH_LR0 + (i * 4));
+> +			writel_relaxed(cpu_if->vgic_lr[i],
+> +				       base + GICH_LR0 + (i * 4));
+>  		}
+>  	}
+>  
 > -- 
 > 2.1.4
 > 
+
+otherwie LGTM.
+
+Thanks,
+-Christoffer
