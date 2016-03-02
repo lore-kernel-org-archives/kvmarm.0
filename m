@@ -1,63 +1,77 @@
-From: "Suzuki K. Poulose" <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v2 8/8] arm64: kvm: Check support for AArch32 for 32bit
- guests
-Date: Wed, 2 Mar 2016 10:22:39 +0000
-Message-ID: <56D6BEEF.3000208@arm.com>
-References: <1456393968-17386-1-git-send-email-suzuki.poulose@arm.com>
- <1456393968-17386-9-git-send-email-suzuki.poulose@arm.com>
- <56D6AD72.8010108@arm.com>
+From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: [RFC v5 00/17] KVM PCIe/MSI passthrough on ARM/ARM64
+Date: Wed, 2 Mar 2016 13:30:11 +0100
+Message-ID: <56D6DCD3.7070004@linaro.org>
+References: <1456856877-4817-1-git-send-email-eric.auger@linaro.org>
+	<BY1PR0701MB1594168E79366B507B7C8A16E1BC0@BY1PR0701MB1594.namprd07.prod.outlook.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 79F1341145
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2016 05:15:36 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 6dJn5zFUlCwN for <kvmarm@lists.cs.columbia.edu>;
- Wed,  2 Mar 2016 05:15:34 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3DA41410EB
- for <kvmarm@lists.cs.columbia.edu>; Wed,  2 Mar 2016 05:15:33 -0500 (EST)
-In-Reply-To: <56D6AD72.8010108@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, ynorov@caviumnetworks.com, kvmarm@lists.cs.columbia.edu
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <BY1PR0701MB1594168E79366B507B7C8A16E1BC0-vsFp3N3nJ9josxbTuffl3E5OhdzP3rhOnBOFsp37pqbUKgpGm//BTAC/G2K4zDHf@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: "Jaggi, Manish" <Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org>, "eric.auger-qxv4g6HH51o@public.gmane.org" <eric.auger-qxv4g6HH51o@public.gmane.org>, "robin.murphy-5wv7dgnIgG8@public.gmane.org" <robin.murphy-5wv7dgnIgG8@public.gmane.org>, "alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org" <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>, "will.deacon-5wv7dgnIgG8@public.gmane.org" <will.deacon-5wv7dgnIgG8@public.gmane.org>, "joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org" <joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org>, "tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org" <tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org>, "jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org" <jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org>, "marc.zyngier-5wv7dgnIgG8@public.gmane.org" <marc.zyngier-5wv7dgnIgG8@public.gmane.org>, "christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org" <christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, "linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org" <linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org>, "kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org" <kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org>, "kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>
+Cc: "patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org" <patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>, "p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org" <p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org>, "linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org" <linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org>, "iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org" <iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>, "pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org" <pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMDIvMDMvMTYgMDk6MDgsIE1hcmMgWnluZ2llciB3cm90ZToKPiBPbiAyNS8wMi8xNiAwOTo1
-MiwgU3V6dWtpIEsgUG91bG9zZSB3cm90ZToKCj4+IEkgcmVhbGx5IHdhbnRlZCB0byBwYXNzIGt2
-bV92Y3B1IGRvd24gdG8gdGhlIGhlbHBlcnMuIEJ1dCB0aGVuLCBJIGNhbid0Cj4+IGRlZmluZSB0
-aGUgYXJjaCBzcGVjaWZpYyBoZWxwZXIgaW4gYXNtL2t2bV9ob3N0LmggZHVlIHRvIGxhY2sgb2Yg
-a3ZtX3ZjcHUncwo+PiBkZWZpbml0aW9uIHlldDoKPj4KPj4gICBJbiBmaWxlIGluY2x1ZGVkIGZy
-b20gaW5jbHVkZS9saW51eC9rdm1faG9zdC5oOjM1OjAsCj4+ICAgICAgICAgICAgICAgICAgICBm
-cm9tIGFyY2gvYXJtNjQva2VybmVsL2FzbS1vZmZzZXRzLmM6MjQ6Cj4+ICAgLi9hcmNoL2FybTY0
-L2luY2x1ZGUvYXNtL2t2bV9ob3N0Lmg6IEluIGZ1bmN0aW9uIOKAmGt2bV9hcmNoX3ZjcHVfdmFs
-aWRhdGVfZmVhdHVyZXPigJk6Cj4+ICAgLi9hcmNoL2FybTY0L2luY2x1ZGUvYXNtL2t2bV9ob3N0
-Lmg6MzQ0OjQ4OiBlcnJvcjogZGVyZWZlcmVuY2luZyBwb2ludGVyIHRvIGluY29tcGxldGUgdHlw
-ZQo+PiAgICAgcmV0dXJuICAhdGVzdF9iaXQoS1ZNX0FSTV9WQ1BVX0VMMV8zMkJJVCwgdmNwdS0+
-YXJjaC5mZWF0dXJlcykgfHwKPgo+IFdoeSBkb24ndCB5b3UganVzdCBoYXZlIHRoZSBwcm90b3R5
-cGUgaW4ga3ZtX2hvc3QuaCwgYW5kIG1vdmUgdGhlIGFjdHVhbAo+IGltcGxlbWVudGF0aW9uIHRv
-IHNvbWV0aGluZyBsaWtlIGd1ZXN0LmM/IEJ1dCBJIHRoaW5rIHRoZXJlIGlzIGEgYmV0dGVyCj4g
-YXBwcm9hY2gsIHNlZSBiZWxvdy4KCkkgdGhvdWdodCBpdCB3b3VsZCBiZXR0ZXIgYmUgYSBzdGF0
-aWMgaW5saW5lLiBCdXQsIHRoZSBHQ0MgY2FuIGRvIHRoYXQsIHNpbGx5IG1lIDopCgo+Cj4gVGhp
-cyBpcyByZWFsbHkgY29udm9sdXRlZCAoaXQgdG9vayBtZSA1IG1pbnV0ZXMgc3RhcmluZyBhdCB0
-aGUKPiBleHByZXNzaW9uIGFuZCByZW1lbWJlcmluZyB0aGF0IEFBcmNoMzIgRUwxIGltcGxpZXMg
-QUFyY2gzMiBFTDAgdG8gZ2V0IGl0KS4KPgo+IE5vdywgd2UgYWxyZWFkeSBoYXZlIGt2bV9yZXNl
-dF92Y3B1KCkgdGhhdCB2YWxpZGF0ZXMgQUFyY2gzMiBzdXBwb3J0LiBJdAo+IHdvdWxkIHByb2Jh
-Ymx5IGJlIGJldHRlciB0byBtb3ZlIHRoaW5ncyB0aGVyZS4gVGhvdWdodHM/CgpEZWZpbml0ZWx5
-LiBJIG92ZXJsb29rZWQgdGhlIGZ1bmN0aW9uIG5hbWUgdG8gZG8gc29tZXRoaW5nCnNwZWNpZmlj
-IHRvIHJlc2V0dGluZyB0aGUgQ1BVIHRoYW4gZG9pbmcgc29tZSBjaGVja3MgOiguCkkgd2lsbCBy
-ZXNwaW4gaXQuCgpDaGVlcnMKU3V6dWtpCl9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QKa3ZtYXJtQGxpc3RzLmNzLmNvbHVt
-YmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVkdS9tYWlsbWFuL2xpc3RpbmZvL2t2
-bWFybQo=
+Hi Manish,
+On 03/02/2016 09:11 AM, Jaggi, Manish wrote:
+> 
+> 
+>>> From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+>>> Sent: Tuesday, March 1, 2016 11:57 PM
+>>> To: eric.auger-qxv4g6HH51o@public.gmane.org; eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org; robin.murphy-5wv7dgnIgG8@public.gmane.org; alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org; will.deacon-5wv7dgnIgG8@public.gmane.org; joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org; tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org; >>jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org; marc.zyngier-5wv7dgnIgG8@public.gmane.org; christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org; linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org; kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org; kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
+>>> Cc: suravee.suthikulpanit-5C7GfCeVMHo@public.gmane.org; patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org; linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org; Jaggi, Manish; Bharat.Bhushan-KZfg59tc24xl57MIdRCFDg@public.gmane.org; >>pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org; p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org; iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+>>> Subject: [RFC v5 00/17] KVM PCIe/MSI passthrough on ARM/ARM64
+> 
+>>> This series addresses KVM PCIe passthrough with MSI enabled on ARM/ARM64.
+>>> It pursues the efforts done on [1], [2], [3]. It also aims at covering the
+>>> same need on PowerPC platforms although the same kind of integration
+>>> .should be carried out.
+>>>
+> [snip]
+>>> - Not tested: ARM GICv3 ITS
+> 
+> [snip]
+>>> QEMU Integration:
+>>> [RFC v2 0/8] KVM PCI/MSI passthrough with mach-virt
+>>> (http://lists.gnu.org/archive/html/qemu-arm/2016-01/msg00444.html)
+>>> https://git.linaro.org/people/eric.auger/qemu.git/shortlog/refs/heads/v2.5.0-pci-passthrough-rfc-v2
+> 
+> For gicv3 its, I believe, the below series for qemu and kernel is required for gicv3-its
+> 
+> [RFC PATCH v3 0/5] vITS support
+> https://lists.gnu.org/archive/html/qemu-devel/2015-11/msg05197.html
+> 
+> and in kernel CONFIG_HAVE_KVM_MSI must be enabled so that qemu sees MSI capability KVM_CAP_SIGNAL_MSI
+> 
+> This has a dependency on gsi routing support
+> KVM: arm/arm64: gsi routing support
+> https://lkml.org/lkml/2015/6/29/290
+
+which has a dependency on Andre's ITS emulation series too.
+
+The Kernel series will be resent soon on top on new vgic design.
+> 
+> I had both the above series in 4.2 in my local 4.2 tree. 
+
+Did you have a chance to test with GICv3 ITS already?
+
+Best Regards
+
+Eric
+
+
+> 
+> BR
+> -Manish
+> 
+> 
