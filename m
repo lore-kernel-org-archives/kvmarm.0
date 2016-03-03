@@ -1,65 +1,191 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v2 17/17] arm64: KVM: vgic-v3: Do not save ICH_AP0Rn_EL2
- for GICv2 emulation
-Date: Thu, 3 Mar 2016 20:21:54 +0100
-Message-ID: <20160303192154.GJ9634@cbox>
-References: <1455727249-24752-1-git-send-email-marc.zyngier@arm.com>
- <1455727249-24752-18-git-send-email-marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 2/6] KVM: arm/arm64: arch_timer: Rely on the arch
+ timer to parse the firmware tables
+Date: Thu, 3 Mar 2016 20:38:08 +0100
+Message-ID: <20160303193808.GK9634@cbox>
+References: <1455204804-31830-1-git-send-email-julien.grall@arm.com>
+ <1455204804-31830-3-git-send-email-julien.grall@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BDDA241E71
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Mar 2016 14:30:54 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id cnAm4jOVyp2R for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  3 Mar 2016 14:30:53 -0500 (EST)
+Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 74EF5410B5
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  3 Mar 2016 14:30:53 -0500 (EST)
+Received: by mail-wm0-f48.google.com with SMTP id l68so49729470wml.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 03 Mar 2016 11:38:08 -0800 (PST)
 Content-Disposition: inline
-In-Reply-To: <1455727249-24752-18-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Andrew Jones <drjones@redhat.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+In-Reply-To: <1455204804-31830-3-git-send-email-julien.grall@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Julien Grall <julien.grall@arm.com>
+Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, Daniel Lezcano <daniel.lezcano@linaro.org>, linux-kernel@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, fu.wei@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Feb 17, 2016 at 04:40:49PM +0000, Marc Zyngier wrote:
-> The GICv3 specification mandates that ICH_AP0Rn_EL2 are set to
-> zero when running guests that use the memory mapped registers.
+On Thu, Feb 11, 2016 at 03:33:20PM +0000, Julien Grall wrote:
+> The firmware table is currently parsed by the virt timer code in order
+> to retrieve the virtual interrupt. However, this is already done by the
+> arch timer driver and therefore make the parsing code duplicated twice.
 > 
-> This is fine, as we initialize all ICH_AP0Rn_EL2 registers to
-> zero, and restore them on entry. But it also means that we
-> do not need to save these registers on exit. Profit!
+> Introduce an helper to get the virtual interrupt number and use it in
+> the virtual timer code.
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> With this changes, the support for ACPI is coming free.
+> 
+> Signed-off-by: Julien Grall <julien.grall@arm.com>
+> 
 > ---
->  arch/arm64/kvm/hyp/vgic-v3-sr.c | 19 +++++++++++--------
->  1 file changed, 11 insertions(+), 8 deletions(-)
+> Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Gleb Natapov <gleb@kernel.org>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  drivers/clocksource/arm_arch_timer.c |  2 ++
+>  include/clocksource/arm_arch_timer.h |  1 +
+>  virt/kvm/arm/arch_timer.c            | 33 +++++++--------------------------
+>  3 files changed, 10 insertions(+), 26 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> index 5f12c57..c2f173d 100644
-> --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-> @@ -202,14 +202,17 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
->  			__gic_v3_set_lr(0, i);
->  		}
+> diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+> index 6eb2c5d..3cdbefd 100644
+> --- a/drivers/clocksource/arm_arch_timer.c
+> +++ b/drivers/clocksource/arm_arch_timer.c
+> @@ -451,6 +451,8 @@ static struct arch_timer_kvm_info arch_timer_kvm_info;
 >  
-> -		switch (nr_pri_bits) {
-> -		case 7:
-> -			cpu_if->vgic_ap0r[3] = read_gicreg(ICH_AP0R3_EL2);
-> -			cpu_if->vgic_ap0r[2] = read_gicreg(ICH_AP0R2_EL2);
-> -		case 6:
-> -			cpu_if->vgic_ap0r[1] = read_gicreg(ICH_AP0R1_EL2);
-> -		default:
-> -			cpu_if->vgic_ap0r[0] = read_gicreg(ICH_AP0R0_EL2);
-> +		/* ICH_AP0Rn is only valid for SRE==1 */
-> +		if (cpu_if->vgic_sre & ICC_SRE_EL1_SRE) {
-> +			switch (nr_pri_bits) {
-> +			case 7:
-> +				cpu_if->vgic_ap0r[3] = read_gicreg(ICH_AP0R3_EL2);
-> +				cpu_if->vgic_ap0r[2] = read_gicreg(ICH_AP0R2_EL2);
-> +			case 6:
-> +				cpu_if->vgic_ap0r[1] = read_gicreg(ICH_AP0R1_EL2);
-> +			default:
-> +				cpu_if->vgic_ap0r[0] = read_gicreg(ICH_AP0R0_EL2);
-> +			}
->  		}
+>  struct arch_timer_kvm_info *arch_timer_get_kvm_info(void)
+>  {
+> +	arch_timer_kvm_info.virtual_irq = arch_timer_ppi[VIRT_PPI];
+> +
+
+it feels weird that we set this member on every retrieval of the pointer
+to the struct?
+
+wouldn't it be more natural to intialize the struct somewhere during
+init and then this function just returns a pointer to the struct?
+
+>  	return &arch_timer_kvm_info;
+>  }
 >  
->  		switch (nr_pri_bits) {
+> diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
+> index 4d487f8..8890552 100644
+> --- a/include/clocksource/arm_arch_timer.h
+> +++ b/include/clocksource/arm_arch_timer.h
+> @@ -51,6 +51,7 @@ enum arch_timer_reg {
+>  
+>  struct arch_timer_kvm_info {
+>  	struct timecounter timecounter;
+> +	int virtual_irq;
+>  };
+>  
+>  #ifdef CONFIG_ARM_ARCH_TIMER
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index a669c6a..e4de549 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -17,7 +17,6 @@
+>   */
+>  
+>  #include <linux/cpu.h>
+> -#include <linux/of_irq.h>
+>  #include <linux/kvm.h>
+>  #include <linux/kvm_host.h>
+>  #include <linux/interrupt.h>
+> @@ -375,45 +374,28 @@ static struct notifier_block kvm_timer_cpu_nb = {
+>  	.notifier_call = kvm_timer_cpu_notify,
+>  };
+>  
+> -static const struct of_device_id arch_timer_of_match[] = {
+> -	{ .compatible	= "arm,armv7-timer",	},
+> -	{ .compatible	= "arm,armv8-timer",	},
+> -	{},
+> -};
+> -
+>  int kvm_timer_hyp_init(void)
+>  {
+> -	struct device_node *np;
+> -	unsigned int ppi;
+>  	struct arch_timer_kvm_info *info;
+>  	int err;
+>  
+>  	info = arch_timer_get_kvm_info();
+>  	timecounter = &info->timecounter;
+>  
+> -	np = of_find_matching_node(NULL, arch_timer_of_match);
+> -	if (!np) {
+> -		kvm_err("kvm_arch_timer: can't find DT node\n");
+> +	host_vtimer_irq = info->virtual_irq;
+> +	if (host_vtimer_irq <= 0) {
+> +		kvm_err("kvm_arch_timer: can't find virtual timer info or config virtual timer interrupt\n");
+
+I don't understand the difference between the two cases in this error
+message.
+
+How about: "Invalid virtual timer IRQ: %d\n" ?
+
+>  		return -ENODEV;
+>  	}
+>  
+> -	ppi = irq_of_parse_and_map(np, 2);
+> -	if (!ppi) {
+> -		kvm_err("kvm_arch_timer: no virtual timer interrupt\n");
+> -		err = -EINVAL;
+> -		goto out;
+> -	}
+> -
+> -	err = request_percpu_irq(ppi, kvm_arch_timer_handler,
+> +	err = request_percpu_irq(host_vtimer_irq, kvm_arch_timer_handler,
+>  				 "kvm guest timer", kvm_get_running_vcpus());
+>  	if (err) {
+>  		kvm_err("kvm_arch_timer: can't request interrupt %d (%d)\n",
+> -			ppi, err);
+> +			host_vtimer_irq, err);
+>  		goto out;
+>  	}
+>  
+> -	host_vtimer_irq = ppi;
+> -
+>  	err = __register_cpu_notifier(&kvm_timer_cpu_nb);
+>  	if (err) {
+>  		kvm_err("Cannot register timer CPU notifier\n");
+> @@ -426,14 +408,13 @@ int kvm_timer_hyp_init(void)
+>  		goto out_free;
+>  	}
+>  
+> -	kvm_info("%s IRQ%d\n", np->name, ppi);
+> +	kvm_info("vtimer IRQ%d\n", host_vtimer_irq);
+
+is "vtimer" a known concept anywhere?  If not, can you use some known
+terms intead?
+
+>  	on_each_cpu(kvm_timer_init_interrupt, NULL, 1);
+>  
+>  	goto out;
+>  out_free:
+> -	free_percpu_irq(ppi, kvm_get_running_vcpus());
+> +	free_percpu_irq(host_vtimer_irq, kvm_get_running_vcpus());
+>  out:
+> -	of_node_put(np);
+>  	return err;
+>  }
+>  
 > -- 
-> 2.1.4
+> 1.9.1
 > 
 
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Thanks,
+-Christoffer
