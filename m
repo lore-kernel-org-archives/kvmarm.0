@@ -1,60 +1,74 @@
-From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
-Subject: Re: [PATCH 4/4] pre_init: add ARM implementations
-Date: Wed, 2 Mar 2016 23:38:34 +0000
-Message-ID: <56D7797A.5040008@arm.com>
-References: <1456327988-31568-1-git-send-email-andre.przywara@arm.com>
- <1456327988-31568-5-git-send-email-andre.przywara@arm.com>
- <20160302030009.GB7637@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v2 11/17] arm64: KVM: vgic-v2: Only wipe LRs on vcpu
+ exit
+Date: Thu, 3 Mar 2016 08:14:19 +0000
+Message-ID: <20160303081419.40a4df1a@arm.com>
+References: <1455727249-24752-1-git-send-email-marc.zyngier@arm.com>
+	<1455727249-24752-12-git-send-email-marc.zyngier@arm.com>
+	<20160302230819.GE9634@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160302030009.GB7637@arm.com>
+In-Reply-To: <20160302230819.GE9634@cbox>
 Sender: kvm-owner@vger.kernel.org
-To: Will Deacon <will.deacon@arm.com>
-Cc: Oleg Nesterov <oleg@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Andrew Jones <drjones@redhat.com>, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+On Thu, 3 Mar 2016 00:08:19 +0100
+Christoffer Dall <christoffer.dall@linaro.org> wrote:
 
-On 02/03/16 03:00, Will Deacon wrote:
-> On Wed, Feb 24, 2016 at 03:33:08PM +0000, Andre Przywara wrote:
->> The pre_init stub consists of two syscalls mouting the host's FS
->> via 9pfs and then calling the actual init binary, which can now
->> use normal dynamic linking.
->> Based on the x86 code provide an ARM and ARM64 implementation of
->> that. Beside removing the need for static linkage it reduces the
->> size of the kvmtool binary by quite a lot (numbers for aarch64):
->>
->> -rwxr-xr-x 1 root root     9952 Nov 16 14:37 guest/init
->> -rwxr-xr-x 1 root root      512 Nov 16 14:37 guest/pre_init
->> -rwxr-xr-x 2 root root  1284704 Nov 16 14:37 lkvm
->> vs. the old version:
->> -rwxr-xr-x 1 root root   776024 Nov 16 14:38 guest/init
->> -rwxr-xr-x 2 root root  2050112 Nov 16 14:38 lkvm
->>
->> Tested on Midway and Juno.
+> On Wed, Feb 17, 2016 at 04:40:43PM +0000, Marc Zyngier wrote:
+> > So far, we're always writing all possible LRs, setting the empty
+> > ones with a zero value. This is obvious doing a low of work for
 > 
-> Hmm, I'm not super keen on switching behaviour like this on arm, where
-> it's not uncommon to build a static lkvm and transfer it to a remote
-> target and expect init to work.
+> s/low/lot/
+> 
+> > nothing, and we're better off clearing those we've actually
+> > dirtied on the exit path (it is very rare to inject more than one
+> > interrupt at a time anyway).
+> > 
+> > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+> > ---
+> >  arch/arm64/kvm/hyp/vgic-v2-sr.c | 10 +++++-----
+> >  1 file changed, 5 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/vgic-v2-sr.c b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> > index 3dbbc6b..e53f131 100644
+> > --- a/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> > +++ b/arch/arm64/kvm/hyp/vgic-v2-sr.c
+> > @@ -101,6 +101,7 @@ static void __hyp_text save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
+> >  		}
+> >  
+> >  		cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
+> > +		writel_relaxed(0, base + GICH_LR0 + (i * 4));
+> >  	}
+> >  }
+> >  
+> > @@ -158,12 +159,11 @@ void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
+> >  		writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
+> >  		writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
+> >  		for (i = 0; i < nr_lr; i++) {
+> > -			u32 val = 0;
+> > -
+> > -			if (live_lrs & (1UL << i))
+> > -				val = cpu_if->vgic_lr[i];
+> > +			if (!(live_lrs & (1UL << i)))
+> > +				continue;
+> 
+> how can we be sure that the LRs are clear when we launch our first VM on
+> a given physical CPU?  Don't we need to flush the LRs during VGIC init
+> time?
 
-So are you concerned about a fully static root file system on the host,
-which does not provide libc.so and/or ld-linux.so at all? Is that really
-a use case? I had the impression that people use a statically linked
-kvmtool to avoid dependencies like to libfdt.so.
-In this case I am wondering if we should provide some switch to build a
-static lkvm with a static init if people are concerned, or we should
-ship a guest/init binary statically linked against musl libc, for
-instance: this is only 29K compared to the above multi-100 KB gcc version.
-Or is there some trick to build small static binaries linked against glibc?
-Actually by just looking at init.c: Should we code the whole of it in
-assembly? Apart from printf it only consists of syscalls.
+Very good point. The registers reset to zero, but there is indeed no
+guarantee that we don't get something clobbered by EL3, or some earlier
+crash.
 
-> Perhaps we could only do this when building a dynamic executable?
+I'll add a patch to that effect.
 
-This is of course an option as well.
+Thanks,
 
-Cheers,
-Andre
-
+	M.
+-- 
+Jazz is not dead. It just smells funny.
