@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 11/12] arm64: KVM: vgic-v3: Reset LRs at boot time
-Date: Mon,  7 Mar 2016 09:33:33 +0000
-Message-ID: <1457343214-19547-12-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH v3 12/12] arm64: KVM: vgic-v3: Only wipe LRs on vcpu exit
+Date: Mon,  7 Mar 2016 09:33:34 +0000
+Message-ID: <1457343214-19547-13-git-send-email-marc.zyngier@arm.com>
 References: <1457343214-19547-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 428A749B1D
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Mar 2016 04:26:39 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 92B7249B34
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Mar 2016 04:26:41 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BSqib9HkGeFE for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Mar 2016 04:26:38 -0500 (EST)
+ with ESMTP id dXA6epqSyn5Q for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Mar 2016 04:26:40 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2CDF849B30
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Mar 2016 04:26:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 178D749B30
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Mar 2016 04:26:40 -0500 (EST)
 In-Reply-To: <1457343214-19547-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,75 +31,45 @@ To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-In order to let the GICv3 code be more lazy in the way it
-accesses the LRs, it is necessary to start with a clean slate.
+So far, we're always writing all possible LRs, setting the empty
+ones with a zero value. This is obvious doing a low of work for
+nothing, and we're better off clearing those we've actually
+dirtied on the exit path (it is very rare to inject more than one
+interrupt at a time anyway).
 
-Let's reset the LRs on each CPU when the vgic is probed (which
-includes a round trip to EL2...).
-
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_asm.h | 1 +
- arch/arm64/kvm/hyp/vgic-v3-sr.c  | 9 +++++++++
- virt/kvm/arm/vgic-v3.c           | 7 +++++++
- 3 files changed, 17 insertions(+)
+ arch/arm64/kvm/hyp/vgic-v3-sr.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 1037392..2d02ba6 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -42,6 +42,7 @@ extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
- extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
- 
- extern u64 __vgic_v3_get_ich_vtr_el2(void);
-+extern void __vgic_v3_init_lrs(void);
- 
- extern u32 __kvm_get_mdcr_el2(void);
- 
 diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 0db426e..8134947 100644
+index 8134947..fff7cd4 100644
 --- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
 +++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -321,6 +321,15 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+@@ -196,6 +196,7 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
+ 			}
+ 
+ 			cpu_if->vgic_lr[i] = __gic_v3_get_lr(i);
++			__gic_v3_set_lr(0, i);
+ 		}
+ 
+ 		switch (nr_pri_bits) {
+@@ -293,12 +294,10 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
+ 		}
+ 
+ 		for (i = 0; i <= max_lr_idx; i++) {
+-			val = 0;
+-
+-			if (live_lrs & (1 << i))
+-				val = cpu_if->vgic_lr[i];
++			if (!(live_lrs & (1 << i)))
++				continue;
+ 
+-			__gic_v3_set_lr(val, i);
++			__gic_v3_set_lr(cpu_if->vgic_lr[i], i);
+ 		}
  	}
- }
- 
-+void __hyp_text __vgic_v3_init_lrs(void)
-+{
-+	int max_lr_idx = vtr_to_max_lr_idx(read_gicreg(ICH_VTR_EL2));
-+	int i;
-+
-+	for (i = 0; i <= max_lr_idx; i++)
-+		__gic_v3_set_lr(0, i);
-+}
-+
- static u64 __hyp_text __vgic_v3_read_ich_vtr_el2(void)
- {
- 	return read_gicreg(ICH_VTR_EL2);
-diff --git a/virt/kvm/arm/vgic-v3.c b/virt/kvm/arm/vgic-v3.c
-index 11b5ff6..999bdc6 100644
---- a/virt/kvm/arm/vgic-v3.c
-+++ b/virt/kvm/arm/vgic-v3.c
-@@ -216,6 +216,11 @@ static const struct vgic_ops vgic_v3_ops = {
- 
- static struct vgic_params vgic_v3_params;
- 
-+static void vgic_cpu_init_lrs(void *params)
-+{
-+	kvm_call_hyp(__vgic_v3_init_lrs);
-+}
-+
- /**
-  * vgic_v3_probe - probe for a GICv3 compatible interrupt controller in DT
-  * @node:	pointer to the DT node
-@@ -284,6 +289,8 @@ int vgic_v3_probe(struct device_node *vgic_node,
- 	kvm_info("%s@%llx IRQ%d\n", vgic_node->name,
- 		 vcpu_res.start, vgic->maint_irq);
- 
-+	on_each_cpu(vgic_cpu_init_lrs, vgic, 1);
-+
- 	*ops = &vgic_v3_ops;
- 	*params = vgic;
  
 -- 
 2.1.4
