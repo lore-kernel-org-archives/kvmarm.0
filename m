@@ -1,216 +1,163 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 00/12] Virtual GIC save/restore optimization
-Date: Mon,  7 Mar 2016 09:33:22 +0000
-Message-ID: <1457343214-19547-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
+Subject: [PATCH v3 01/12] KVM: arm/arm64: vgic-v2: Avoid accessing GICH
+ registers
+Date: Mon,  7 Mar 2016 09:33:23 +0000
+Message-ID: <1457343214-19547-2-git-send-email-marc.zyngier@arm.com>
+References: <1457343214-19547-1-git-send-email-marc.zyngier@arm.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 933CF412ED
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Mar 2016 04:26:18 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id kqZuYlyfXQvu for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  7 Mar 2016 04:26:17 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EC67A4998D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Mar 2016 04:26:16 -0500 (EST)
+In-Reply-To: <1457343214-19547-1-git-send-email-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-I've recently been looking at our entry/exit costs, and profiling
-figures did show some very low hanging fruits.
+GICv2 registers are *slow*. As in "terrifyingly slow". Which is bad.
+But we're equaly bad, as we make a point in accessing them even if
+we don't have any interrupt in flight.
 
-The most obvious cost is that accessing the GIC HW is slow. As in
-"deadly slow", specially when GICv2 is involved. So not hammering the
-HW when there is nothing to write (and even to read) is immediately
-beneficial, as this is the most common cases (whatever people seem to
-think, interrupts are a *rare* event). Similar work has also been done
-for GICv3, with a reduced impact (it was less "bad" to start with).
+A good solution is to first find out if we have anything useful to
+write into the GIC, and if we don't, to simply not do it. This
+involves tracking which LRs actually have something valid there.
 
-Another easy thing to fix is the way we handle trapped system
-registers. We do insist on (mostly) sorting them, but we do perform a
-linear search on trap. We can switch to a binary search for free, and
-get immediate benefits (the PMU code, being extremely trap-happy,
-benefits immediately from this).
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ include/kvm/arm_vgic.h        |  2 ++
+ virt/kvm/arm/hyp/vgic-v2-sr.c | 72 ++++++++++++++++++++++++++++++-------------
+ 2 files changed, 52 insertions(+), 22 deletions(-)
 
-With these in place, I see an improvement of 10 to 40% (depending on
-the platform) on our world-switch cycle count when running a set of
-hand-crafted guests that are designed to only perform traps.
-
-Please note that VM exits are actually a rare event on ARM. So don't
-expect your guest to be 40% faster, this will hardly make a noticable
-difference.
-
-Methodology:
-
-* NULL-hypercall guest: Perform 2^20 PSCI_0_2_FN_PSCI_VERSION calls,
-and then a power-off:
-
-__start:
-	mov	x19, #(1 << 20)
-1:	mov	x0, #0x84000000
-	hvc	#0
-	sub	x19, x19, #1
-	cbnz	x19, 1b
-	mov	x0, #0x84000000
-	add	x0, x0, #9
-	hvc	#0
-	b	.
-
-* Self IPI guest: Inject and handle 2^20 SGI0 using GICv2 or GICv3,
-and then power-off:
-
-__start:
-	mov	x19, #(1 << 20)
-
-	mrs	x0, id_aa64pfr0_el1
-	ubfx	x0, x0, #24, #4
-	and	x0, x0, #0xf
-	cbz	x0, do_v2
-
-	mrs	x0, s3_0_c12_c12_5	// ICC_SRE_EL1
-	and	x0, x0, #1		// SRE bit
-	cbnz	x0, do_v3
-
-do_v2:
-	mov	x0, #0x3fff0000		// Dist
-	mov	x1, #0x3ffd0000		// CPU
-	mov	w2, #1
-	str	w2, [x0]		// Enable Group0
-	ldr	w2, =0xa0a0a0a0
-	str	w2, [x0, 0x400]		// A0 priority for SGI0-3
-	mov	w2, #0x0f
-	str	w2, [x0, #0x100]	// Enable SGI0-3
-	mov	w2, #0xf0
-	str	w2, [x1, #4]		// PMR
-	mov	w2, #1
-	str	w2, [x1]		// Enable CPU interface
-	
-1:
-	mov	w2, #(2 << 24)		// Interrupt self with SGI0
-	str	w2, [x0, #0xf00]
-
-2:	ldr	w2, [x1, #0x0c]		// GICC_IAR
-	cmp	w2, #0x3ff
-	b.ne	3f
-
-	wfi
-	b	2b
-
-3:	str	w2, [x1, #0x10]		// EOI
-
-	sub	x19, x19, #1
-	cbnz	x19, 1b
-
-die:
-	mov	x0, #0x84000000
-	add	x0, x0, #9
-	hvc	#0
-	b	.
-
-do_v3:
-	mov	x0, #0x3fff0000		// Dist
-	mov	x1, #0x3fbf0000		// Redist 0
-	mov	x2, #0x10000
-	add	x1, x1, x2		// SGI page
-	mov	w2, #2
-	str	w2, [x0]		// Enable Group1
-	ldr	w2, =0xa0a0a0a0
-	str	w2, [x1, 0x400]		// A0 priority for SGI0-3
-	mov	w2, #0x0f
-	str	w2, [x1, #0x100]	// Enable SGI0-3
-	mov	w2, #0xf0
-	msr	S3_0_c4_c6_0, x2	// PMR
-	mov	w2, #1
-	msr	S3_0_C12_C12_7, x2	// Enable Group1
-
-1:
-	mov	x2, #1
-	msr	S3_0_c12_c11_5, x2	// Self SGI0
-
-2:	mrs	x2, S3_0_c12_c12_0	// Read IAR1
-	cmp	w2, #0x3ff
-	b.ne	3f
-
-	wfi
-	b	2b
-
-3:	msr	S3_0_c12_c12_1, x2	// EOI
-
-	sub	x19, x19, #1
-	cbnz	x19, 1b
-
-	b	die
-
-* sysreg trap guest: Perform 2^20 PMSELR_EL0 accesses, and power-off:
-
-__start:
-	mov	x19, #(1 << 20)
-1:	mrs	x0, PMSELR_EL0
-	sub	x19, x19, #1
-	cbnz	x19, 1b
-	mov	x0, #0x84000000
-	add	x0, x0, #9
-	hvc	#0
-	b	.
-
-* These guests are profiled using perf and kvmtool:
-
-taskset -c 1 perf stat -e cycles:kh lkvm run -c1 --kernel do_sysreg.bin 2>&1 >/dev/null| grep cycles
-
-The result is then divided by the number of iterations (2^20).
-
-These tests have been run on three different platform (two GICv2
-based, and one with GICv3 and legacy mode) and shown significant
-improvements in all cases. I've only touched the arm64 GIC code, but
-obviously the 32bit code should use it as well once we've migrated it
-to C.
-
-Vanilla v4.5-rc4
-	     A             B            C-v2         C-v3
-Null HVC:   8462          6566          6572         6505
-Self SGI:  11961          8690          9541         8629
-SysReg:     8952          6979          7212         7180
-
-Patched v4.5-rc4
-	     A             B            C-v2         C-v3
-Null HVC:   5219  -38%    3957  -39%    5175  -21%   5158  -20%
-Self SGI:   8946  -25%    6658  -23%    8547  -10%   7299  -15%
-SysReg:     5314  -40%    4190  -40%    5417  -25%   5414  -24%
-
-Thanks,
-
-	M.
-
-* From v2:
-  - Added early init of LRs to make sure we don't get any stale value
-    at runtime
-  - Dropped the first few patche that have already been merged
-  - Dropped the GICv3 ICH_AP0Rn_EL2 optimization as it breaks on the ARMv8
-    model
-  - Collected RBs and Acks from Christoffer
-
-* From v1:
-  - Fixed a nasty bug dealing with the active Priority Register
-  - Maintenance interrupt lazy saving
-  - More LR hackery
-  - Adapted most of the series for GICv3 as well
-
-Marc Zyngier (12):
-  KVM: arm/arm64: vgic-v2: Avoid accessing GICH registers
-  KVM: arm/arm64: vgic-v2: Save maintenance interrupt state only if
-    required
-  KVM: arm/arm64: vgic-v2: Move GICH_ELRSR saving to its own function
-  KVM: arm/arm64: vgic-v2: Do not save an LR known to be empty
-  KVM: arm/arm64: vgic-v2: Reset LRs at boot time
-  KVM: arm/arm64: vgic-v2: Only wipe LRs on vcpu exit
-  KVM: arm/arm64: vgic-v2: Make GICD_SGIR quicker to hit
-  arm64: KVM: vgic-v3: Avoid accessing ICH registers
-  arm64: KVM: vgic-v3: Save maintenance interrupt state only if required
-  arm64: KVM: vgic-v3: Do not save an LR known to be empty
-  arm64: KVM: vgic-v3: Reset LRs at boot time
-  arm64: KVM: vgic-v3: Only wipe LRs on vcpu exit
-
- arch/arm64/include/asm/kvm_asm.h |   1 +
- arch/arm64/kvm/hyp/vgic-v3-sr.c  | 337 ++++++++++++++++++++++++++-------------
- include/kvm/arm_vgic.h           |   8 +-
- virt/kvm/arm/hyp/vgic-v2-sr.c    | 144 +++++++++++++----
- virt/kvm/arm/vgic-v2-emul.c      |  10 +-
- virt/kvm/arm/vgic-v2.c           |  12 ++
- virt/kvm/arm/vgic-v3.c           |  11 +-
- 7 files changed, 369 insertions(+), 154 deletions(-)
-
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 13a3d53..f473fd6 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -321,6 +321,8 @@ struct vgic_cpu {
+ 
+ 	/* Protected by the distributor's irq_phys_map_lock */
+ 	struct list_head	irq_phys_map_list;
++
++	u64		live_lrs;
+ };
+ 
+ #define LR_EMPTY	0xff
+diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
+index 9514a7d..aa0fdb8 100644
+--- a/virt/kvm/arm/hyp/vgic-v2-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
+@@ -36,28 +36,41 @@ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
+ 
+ 	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
+ 	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
+-	cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
+-	eisr0  = readl_relaxed(base + GICH_EISR0);
+-	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
+-	if (unlikely(nr_lr > 32)) {
+-		eisr1  = readl_relaxed(base + GICH_EISR1);
+-		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
+-	} else {
+-		eisr1 = elrsr1 = 0;
+-	}
++
++	if (vcpu->arch.vgic_cpu.live_lrs) {
++		eisr0  = readl_relaxed(base + GICH_EISR0);
++		elrsr0 = readl_relaxed(base + GICH_ELRSR0);
++		cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
++		cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
++
++		if (unlikely(nr_lr > 32)) {
++			eisr1  = readl_relaxed(base + GICH_EISR1);
++			elrsr1 = readl_relaxed(base + GICH_ELRSR1);
++		} else {
++			eisr1 = elrsr1 = 0;
++		}
++
+ #ifdef CONFIG_CPU_BIG_ENDIAN
+-	cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
+-	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
++		cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
++		cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
+ #else
+-	cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
+-	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
++		cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
++		cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
+ #endif
+-	cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
+ 
+-	writel_relaxed(0, base + GICH_HCR);
++		for (i = 0; i < nr_lr; i++)
++			if (vcpu->arch.vgic_cpu.live_lrs & (1UL << i))
++				cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
+ 
+-	for (i = 0; i < nr_lr; i++)
+-		cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
++		writel_relaxed(0, base + GICH_HCR);
++
++		vcpu->arch.vgic_cpu.live_lrs = 0;
++	} else {
++		cpu_if->vgic_eisr = 0;
++		cpu_if->vgic_elrsr = ~0UL;
++		cpu_if->vgic_misr = 0;
++		cpu_if->vgic_apr = 0;
++	}
+ }
+ 
+ /* vcpu is already in the HYP VA space */
+@@ -68,15 +81,30 @@ void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
+ 	struct vgic_dist *vgic = &kvm->arch.vgic;
+ 	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
+ 	int i, nr_lr;
++	u64 live_lrs = 0;
+ 
+ 	if (!base)
+ 		return;
+ 
+-	writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
+-	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
+-	writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
+-
+ 	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
++
+ 	for (i = 0; i < nr_lr; i++)
+-		writel_relaxed(cpu_if->vgic_lr[i], base + GICH_LR0 + (i * 4));
++		if (cpu_if->vgic_lr[i] & GICH_LR_STATE)
++			live_lrs |= 1UL << i;
++
++	if (live_lrs) {
++		writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
++		writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
++		for (i = 0; i < nr_lr; i++) {
++			u32 val = 0;
++
++			if (live_lrs & (1UL << i))
++				val = cpu_if->vgic_lr[i];
++
++			writel_relaxed(val, base + GICH_LR0 + (i * 4));
++		}
++	}
++
++	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
++	vcpu->arch.vgic_cpu.live_lrs = live_lrs;
+ }
 -- 
 2.1.4
-
