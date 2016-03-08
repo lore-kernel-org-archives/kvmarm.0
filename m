@@ -1,23 +1,24 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH v3 12/12] arm64: KVM: vgic-v3: Only wipe LRs on vcpu exit
-Date: Mon,  7 Mar 2016 09:33:34 +0000
-Message-ID: <1457343214-19547-13-git-send-email-marc.zyngier@arm.com>
-References: <1457343214-19547-1-git-send-email-marc.zyngier@arm.com>
+From: Julien Grall <julien.grall@arm.com>
+Subject: [PATCH v3 2/9] clocksource: arm_arch_timer: Extend
+ arch_timer_kvm_info to get the virtual IRQ
+Date: Tue,  8 Mar 2016 11:29:26 +0000
+Message-ID: <1457436573-6180-3-git-send-email-julien.grall@arm.com>
+References: <1457436573-6180-1-git-send-email-julien.grall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 92B7249B34
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Mar 2016 04:26:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F28249AF5
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Mar 2016 06:30:19 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dXA6epqSyn5Q for <kvmarm@lists.cs.columbia.edu>;
- Mon,  7 Mar 2016 04:26:40 -0500 (EST)
+ with ESMTP id o-8fcuhJoT1E for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  8 Mar 2016 06:30:18 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 178D749B30
- for <kvmarm@lists.cs.columbia.edu>; Mon,  7 Mar 2016 04:26:40 -0500 (EST)
-In-Reply-To: <1457343214-19547-1-git-send-email-marc.zyngier@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EF2D49B3B
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  8 Mar 2016 06:30:18 -0500 (EST)
+In-Reply-To: <1457436573-6180-1-git-send-email-julien.grall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,49 +28,59 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: kvmarm@lists.cs.columbia.edu
+Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, Daniel Lezcano <daniel.lezcano@linaro.org>, linux-kernel@vger.kernel.org, fu.wei@linaro.org, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-So far, we're always writing all possible LRs, setting the empty
-ones with a zero value. This is obvious doing a low of work for
-nothing, and we're better off clearing those we've actually
-dirtied on the exit path (it is very rare to inject more than one
-interrupt at a time anyway).
+Currently, the firmware table is parsed by the virtual timer code in
+order to retrieve the virtual timer interrupt. However, this is already
+done by the arch timer driver.
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+To avoid code duplication, extend arch_timer_kvm_info to get the virtual
+IRQ.
+
+Note that the KVM code will be modified in a subsequent patch.
+
+Signed-off-by: Julien Grall <julien.grall@arm.com>
+
 ---
- arch/arm64/kvm/hyp/vgic-v3-sr.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
 
-diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-index 8134947..fff7cd4 100644
---- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
-+++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
-@@ -196,6 +196,7 @@ void __hyp_text __vgic_v3_save_state(struct kvm_vcpu *vcpu)
- 			}
+    Changes in v3:
+        - Move the KVM changes in a separate patch and rename the patch
+        - Move the initialization of the virtual_irq to
+        arch_timer_common_init
+---
+ drivers/clocksource/arm_arch_timer.c | 2 ++
+ include/clocksource/arm_arch_timer.h | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+index b7ab588..d8887f3 100644
+--- a/drivers/clocksource/arm_arch_timer.c
++++ b/drivers/clocksource/arm_arch_timer.c
+@@ -701,6 +701,8 @@ static void __init arch_timer_common_init(void)
+ 	arch_timer_banner(arch_timers_present);
+ 	arch_counter_register(arch_timers_present);
+ 	arch_timer_arch_init();
++
++	arch_timer_kvm_info.virtual_irq = arch_timer_ppi[VIRT_PPI];
+ }
  
- 			cpu_if->vgic_lr[i] = __gic_v3_get_lr(i);
-+			__gic_v3_set_lr(0, i);
- 		}
+ static void __init arch_timer_init(void)
+diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
+index 9101ed6b..9dd996a 100644
+--- a/include/clocksource/arm_arch_timer.h
++++ b/include/clocksource/arm_arch_timer.h
+@@ -51,6 +51,7 @@ enum arch_timer_reg {
  
- 		switch (nr_pri_bits) {
-@@ -293,12 +294,10 @@ void __hyp_text __vgic_v3_restore_state(struct kvm_vcpu *vcpu)
- 		}
+ struct arch_timer_kvm_info {
+ 	struct timecounter timecounter;
++	int virtual_irq;
+ };
  
- 		for (i = 0; i <= max_lr_idx; i++) {
--			val = 0;
--
--			if (live_lrs & (1 << i))
--				val = cpu_if->vgic_lr[i];
-+			if (!(live_lrs & (1 << i)))
-+				continue;
- 
--			__gic_v3_set_lr(val, i);
-+			__gic_v3_set_lr(cpu_if->vgic_lr[i], i);
- 		}
- 	}
- 
+ #ifdef CONFIG_ARM_ARCH_TIMER
 -- 
-2.1.4
+1.9.1
