@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 34/95] arm64: Add ARM64_HAS_VIRT_HOST_EXTN feature
-Date: Wed,  9 Mar 2016 07:30:28 +0000
-Message-ID: <1457508689-19672-35-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 36/95] arm64: KVM: VHE: Patch out use of HVC
+Date: Wed,  9 Mar 2016 07:30:30 +0000
+Message-ID: <1457508689-19672-37-git-send-email-marc.zyngier@arm.com>
 References: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 63D3C41145
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:33:24 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DB9344998D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:33:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4WS8gkOc7lzJ for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Mar 2016 02:33:22 -0500 (EST)
+ with ESMTP id zl+Ku02P0iIN for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Mar 2016 02:33:28 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B84549B44
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:33:21 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0299B49B43
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:33:27 -0500 (EST)
 In-Reply-To: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,72 +31,105 @@ To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Add a new ARM64_HAS_VIRT_HOST_EXTN features to indicate that the
-CPU has the ARMv8.1 VHE capability.
+With VHE, the host never issues an HVC instruction to get into the
+KVM code, as we can simply branch there.
 
-This will be used to trigger kernel patching in KVM.
+Use runtime code patching to simplify things a bit.
 
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/cpufeature.h |  6 +++++-
- arch/arm64/kernel/cpufeature.c      | 11 +++++++++++
- 2 files changed, 16 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp.S           |  7 +++++++
+ arch/arm64/kvm/hyp/hyp-entry.S | 40 +++++++++++++++++++++++++++++++---------
+ 2 files changed, 38 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-index 8f271b8..a5c769b 100644
---- a/arch/arm64/include/asm/cpufeature.h
-+++ b/arch/arm64/include/asm/cpufeature.h
-@@ -30,8 +30,12 @@
- #define ARM64_HAS_LSE_ATOMICS			5
- #define ARM64_WORKAROUND_CAVIUM_23154		6
- #define ARM64_WORKAROUND_834220			7
-+/* #define ARM64_HAS_NO_HW_PREFETCH		8 */
-+/* #define ARM64_HAS_UAO			9 */
-+/* #define ARM64_ALT_PAN_NOT_UAO		10 */
-+#define ARM64_HAS_VIRT_HOST_EXTN		11
+diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
+index 0ccdcbb..0689a74 100644
+--- a/arch/arm64/kvm/hyp.S
++++ b/arch/arm64/kvm/hyp.S
+@@ -17,7 +17,9 @@
  
--#define ARM64_NCAPS				8
-+#define ARM64_NCAPS				12
+ #include <linux/linkage.h>
  
- #ifndef __ASSEMBLY__
++#include <asm/alternative.h>
+ #include <asm/assembler.h>
++#include <asm/cpufeature.h>
  
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 5c90aa4..ba74519 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -26,6 +26,7 @@
- #include <asm/cpu_ops.h>
- #include <asm/processor.h>
- #include <asm/sysreg.h>
-+#include <asm/virt.h>
+ /*
+  * u64 kvm_call_hyp(void *hypfn, ...);
+@@ -38,6 +40,11 @@
+  * arch/arm64/kernel/hyp_stub.S.
+  */
+ ENTRY(kvm_call_hyp)
++alternative_if_not ARM64_HAS_VIRT_HOST_EXTN	
+ 	hvc	#0
+ 	ret
++alternative_else
++	b	__vhe_hyp_call
++	nop
++alternative_endif
+ ENDPROC(kvm_call_hyp)
+diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
+index 93e8d983..1bdeee7 100644
+--- a/arch/arm64/kvm/hyp/hyp-entry.S
++++ b/arch/arm64/kvm/hyp/hyp-entry.S
+@@ -38,6 +38,34 @@
+ 	ldp	x0, x1, [sp], #16
+ .endm
  
- unsigned long elf_hwcap __read_mostly;
- EXPORT_SYMBOL_GPL(elf_hwcap);
-@@ -621,6 +622,11 @@ static bool has_useable_gicv3_cpuif(const struct arm64_cpu_capabilities *entry)
- 	return has_sre;
- }
- 
-+static bool runs_at_el2(const struct arm64_cpu_capabilities *entry)
-+{
-+	return is_kernel_in_hyp_mode();
-+}
++.macro do_el2_call
++	/*
++	 * Shuffle the parameters before calling the function
++	 * pointed to in x0. Assumes parameters in x[1,2,3].
++	 */
++	sub	sp, sp, #16
++	str	lr, [sp]
++	mov	lr, x0
++	mov	x0, x1
++	mov	x1, x2
++	mov	x2, x3
++	blr	lr
++	ldr	lr, [sp]
++	add	sp, sp, #16
++.endm
 +
- static const struct arm64_cpu_capabilities arm64_features[] = {
- 	{
- 		.desc = "GIC system register CPU interface",
-@@ -651,6 +657,11 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
- 		.min_field_value = 2,
- 	},
- #endif /* CONFIG_AS_LSE && CONFIG_ARM64_LSE_ATOMICS */
-+	{
-+		.desc = "Virtualization Host Extensions",
-+		.capability = ARM64_HAS_VIRT_HOST_EXTN,
-+		.matches = runs_at_el2,
-+	},
- 	{},
- };
++ENTRY(__vhe_hyp_call)
++	do_el2_call
++	/*
++	 * We used to rely on having an exception return to get
++	 * an implicit isb. In the E2H case, we don't have it anymore.
++	 * rather than changing all the leaf functions, just do it here
++	 * before returning to the rest of the kernel.
++	 */
++	isb
++	ret
++ENDPROC(__vhe_hyp_call)
++	
+ el1_sync:				// Guest trapped into EL2
+ 	save_x0_to_x3
  
+@@ -58,19 +86,13 @@ el1_sync:				// Guest trapped into EL2
+ 	mrs	x0, vbar_el2
+ 	b	2f
+ 
+-1:	stp	lr, xzr, [sp, #-16]!
+-
++1:
+ 	/*
+-	 * Compute the function address in EL2, and shuffle the parameters.
++	 * Perform the EL2 call
+ 	 */
+ 	kern_hyp_va	x0
+-	mov	lr, x0
+-	mov	x0, x1
+-	mov	x1, x2
+-	mov	x2, x3
+-	blr	lr
++	do_el2_call
+ 
+-	ldp	lr, xzr, [sp], #16
+ 2:	eret
+ 
+ el1_trap:
 -- 
 2.1.4
