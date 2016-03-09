@@ -1,96 +1,58 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 30/95] arm/arm64: KVM: Handle out-of-RAM cache maintenance as a NOP
-Date: Wed,  9 Mar 2016 07:30:24 +0000
-Message-ID: <1457508689-19672-31-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 29/95] ARM: KVM: Remove __kvm_hyp_exit/__kvm_hyp_exit_end
+Date: Wed,  9 Mar 2016 07:30:23 +0000
+Message-ID: <1457508689-19672-30-git-send-email-marc.zyngier@arm.com>
 References: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 65CF448531
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:33:08 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 01iu5WH4BCty for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Mar 2016 02:33:07 -0500 (EST)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 21CDD49B3D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:33:07 -0500 (EST)
 In-Reply-To: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-So far, our handling of cache maintenance by VA has been pretty
-simple: Either the access is in the guest RAM and generates a S2
-fault, which results in the page being mapped RW, or we go down
-the io_mem_abort() path, and nuke the guest.
+I have no idea what these were for - probably a leftover from an
+early implementation. Good bye!
 
-The first one is fine, but the second one is extremely weird.
-Treating the CM as an I/O is wrong, and nothing in the ARM ARM
-indicates that we should generate a fault for something that
-cannot end-up in the cache anyway (even if the guest maps it,
-it will keep on faulting at stage-2 for emulation).
-
-So let's just skip this instruction, and let the guest get away
-with it.
-
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_emulate.h   |  5 +++++
- arch/arm/kvm/mmu.c                   | 16 ++++++++++++++++
- arch/arm64/include/asm/kvm_emulate.h |  5 +++++
- 3 files changed, 26 insertions(+)
+ arch/arm/include/asm/kvm_asm.h | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-index 8a8c6de..ee5328f 100644
---- a/arch/arm/include/asm/kvm_emulate.h
-+++ b/arch/arm/include/asm/kvm_emulate.h
-@@ -138,6 +138,11 @@ static inline bool kvm_vcpu_dabt_iss1tw(struct kvm_vcpu *vcpu)
- 	return kvm_vcpu_get_hsr(vcpu) & HSR_DABT_S1PTW;
- }
+diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+index 083825f..15d58b4 100644
+--- a/arch/arm/include/asm/kvm_asm.h
++++ b/arch/arm/include/asm/kvm_asm.h
+@@ -55,9 +55,6 @@ struct kvm_vcpu;
+ extern char __kvm_hyp_init[];
+ extern char __kvm_hyp_init_end[];
  
-+static inline bool kvm_vcpu_dabt_is_cm(struct kvm_vcpu *vcpu)
-+{
-+	return !!(kvm_vcpu_get_hsr(vcpu) & HSR_DABT_CM);
-+}
-+
- /* Get Access Size from a data abort */
- static inline int kvm_vcpu_dabt_get_as(struct kvm_vcpu *vcpu)
- {
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index aba61fd..c3eb10e 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -1431,6 +1431,22 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu, struct kvm_run *run)
- 		}
+-extern char __kvm_hyp_exit[];
+-extern char __kvm_hyp_exit_end[];
+-
+ extern char __kvm_hyp_vector[];
  
- 		/*
-+		 * Check for a cache maintenance operation. Since we
-+		 * ended-up here, we know it is outside of any memory
-+		 * slot. But we can't find out if that is for a device,
-+		 * or if the guest is just being stupid. The only thing
-+		 * we know for sure is that this range cannot be cached.
-+		 *
-+		 * So let's assume that the guest is just being
-+		 * cautious, and skip the instruction.
-+		 */
-+		if (kvm_vcpu_dabt_is_cm(vcpu)) {
-+			kvm_skip_instr(vcpu, kvm_vcpu_trap_il_is32bit(vcpu));
-+			ret = 1;
-+			goto out_unlock;
-+		}
-+
-+		/*
- 		 * The IPA is reported as [MAX:12], so we need to
- 		 * complement it with the bottom 12 bits from the
- 		 * faulting VA. This is always 12 bits, irrespective
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 779a587..4df8e7a 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -189,6 +189,11 @@ static inline bool kvm_vcpu_dabt_iss1tw(const struct kvm_vcpu *vcpu)
- 	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_S1PTW);
- }
- 
-+static inline bool kvm_vcpu_dabt_is_cm(const struct kvm_vcpu *vcpu)
-+{
-+	return !!(kvm_vcpu_get_hsr(vcpu) & ESR_ELx_CM);
-+}
-+
- static inline int kvm_vcpu_dabt_get_as(const struct kvm_vcpu *vcpu)
- {
- 	return 1 << ((kvm_vcpu_get_hsr(vcpu) & ESR_ELx_SAS) >> ESR_ELx_SAS_SHIFT);
+ extern void __kvm_flush_vm_context(void);
 -- 
 2.1.4
-
