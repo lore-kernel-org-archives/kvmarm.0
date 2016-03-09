@@ -1,88 +1,68 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 01/95] arm/arm64: KVM: Add hook for C-based stage2 init
-Date: Wed,  9 Mar 2016 07:29:55 +0000
-Message-ID: <1457508689-19672-2-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 03/95] ARM: KVM: Remove __kvm_hyp_code_start/__kvm_hyp_code_end
+Date: Wed,  9 Mar 2016 07:29:57 +0000
+Message-ID: <1457508689-19672-4-git-send-email-marc.zyngier@arm.com>
 References: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2F1B3412D0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:31:49 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id sr8IOy3iZSK3 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Mar 2016 02:31:48 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D574410D7
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:31:48 -0500 (EST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we're about to move the stage2 init to C code, introduce some
-C hooks that will later be populated with arch-specific implementations.
+Now that we've unified the way we refer to the HYP text between
+arm and arm64, drop __kvm_hyp_code_start/end, and just use the
+__hyp_text_start/end symbols.
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_host.h   | 4 ++++
- arch/arm/kvm/arm.c                | 1 +
- arch/arm64/include/asm/kvm_host.h | 4 ++++
- 3 files changed, 9 insertions(+)
+ arch/arm/include/asm/kvm_asm.h   | 3 ---
+ arch/arm/kvm/arm.c               | 2 +-
+ arch/arm64/include/asm/kvm_asm.h | 3 ---
+ 3 files changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index f9f2779..f1e86f1 100644
---- a/arch/arm/include/asm/kvm_host.h
-+++ b/arch/arm/include/asm/kvm_host.h
-@@ -220,6 +220,10 @@ static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
- 	kvm_call_hyp((void*)hyp_stack_ptr, vector_ptr, pgd_ptr);
- }
+diff --git a/arch/arm/include/asm/kvm_asm.h b/arch/arm/include/asm/kvm_asm.h
+index fa2fd25..4841225 100644
+--- a/arch/arm/include/asm/kvm_asm.h
++++ b/arch/arm/include/asm/kvm_asm.h
+@@ -93,9 +93,6 @@ extern char __kvm_hyp_exit_end[];
  
-+static inline void __cpu_init_stage2(void)
-+{
-+}
-+
- static inline int kvm_arch_dev_ioctl_check_extension(long ext)
- {
- 	return 0;
+ extern char __kvm_hyp_vector[];
+ 
+-#define	__kvm_hyp_code_start	__hyp_text_start
+-#define __kvm_hyp_code_end	__hyp_text_end
+-
+ extern void __kvm_flush_vm_context(void);
+ extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
+ extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
 diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index dda1959..6b76e01 100644
+index 6b76e01..fcf6c13 100644
 --- a/arch/arm/kvm/arm.c
 +++ b/arch/arm/kvm/arm.c
-@@ -985,6 +985,7 @@ static void cpu_init_hyp_mode(void *dummy)
- 	vector_ptr = (unsigned long)__kvm_hyp_vector;
+@@ -1075,7 +1075,7 @@ static int init_hyp_mode(void)
+ 	/*
+ 	 * Map the Hyp-code called directly from the host
+ 	 */
+-	err = create_hyp_mappings(__kvm_hyp_code_start, __kvm_hyp_code_end);
++	err = create_hyp_mappings(__hyp_text_start, __hyp_text_end);
+ 	if (err) {
+ 		kvm_err("Cannot map world-switch code\n");
+ 		goto out_free_mappings;
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 52b777b..2ad8930 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -35,9 +35,6 @@ extern char __kvm_hyp_init_end[];
  
- 	__cpu_init_hyp_mode(boot_pgd_ptr, pgd_ptr, hyp_stack_ptr, vector_ptr);
-+	__cpu_init_stage2();
+ extern char __kvm_hyp_vector[];
  
- 	kvm_arm_init_debug();
- }
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 689d4c9..fe86cf9 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -332,6 +332,10 @@ static inline void __cpu_init_hyp_mode(phys_addr_t boot_pgd_ptr,
- 		     hyp_stack_ptr, vector_ptr);
- }
- 
-+static inline void __cpu_init_stage2(void)
-+{
-+}
-+
- static inline void kvm_arch_hardware_disable(void) {}
- static inline void kvm_arch_hardware_unsetup(void) {}
- static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+-#define	__kvm_hyp_code_start	__hyp_text_start
+-#define	__kvm_hyp_code_end	__hyp_text_end
+-
+ extern void __kvm_flush_vm_context(void);
+ extern void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa);
+ extern void __kvm_tlb_flush_vmid(struct kvm *kvm);
 -- 
 2.1.4
+
