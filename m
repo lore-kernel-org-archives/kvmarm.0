@@ -1,146 +1,146 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 38/95] arm64: KVM: VHE: Introduce unified system register
- accessors
-Date: Wed,  9 Mar 2016 07:30:32 +0000
-Message-ID: <1457508689-19672-39-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 39/95] arm64: KVM: VHE: Differenciate host/guest sysreg save/restore
+Date: Wed,  9 Mar 2016 07:30:33 +0000
+Message-ID: <1457508689-19672-40-git-send-email-marc.zyngier@arm.com>
 References: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0055948531
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:33:34 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LqIH7DreVKPW for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Mar 2016 02:33:32 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A652349B34
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:33:32 -0500 (EST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-VHE brings its own bag of new system registers, or rather system
-register accessors, as it define new ways to access both guest
-and host system registers. For example, from the host:
+With ARMv8, host and guest share the same system register file,
+making the save/restore procedure completely symetrical.
+With VHE, host and guest now have different requirements, as they
+use different sysregs.
 
-- The host TCR_EL2 register is accessed using the TCR_EL1 accessor
-- The guest TCR_EL1 register is accessed using the TCR_EL12 accessor
+In order to prepare for this, add split sysreg save/restore functions
+for both host and guest. No functional changes yet.
 
-Obviously, this is confusing. A way to somehow reduce the complexity
-of writing code for both ARMv8 and ARMv8.1 is to use a set of unified
-accessors that will generate the right sysreg, depending on the mode
-the CPU is running in. For example:
-
-- read_sysreg_el1(tcr) will use TCR_EL1 on ARMv8, and TCR_EL12 on
-  ARMv8.1 with VHE.
-- read_sysreg_el2(tcr) will use TCR_EL2 on ARMv8, and TCR_EL1 on
-  ARMv8.1 with VHE.
-
-We end up with three sets of accessors ({read,write}_sysreg_el[012])
-that can be directly used from C code. We take this opportunity to
-also add the definition for the new VHE sysregs.
-
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp/hyp.h | 72 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 72 insertions(+)
+ arch/arm64/kvm/hyp/hyp.h       |  6 ++++--
+ arch/arm64/kvm/hyp/switch.c    | 10 +++++-----
+ arch/arm64/kvm/hyp/sysreg-sr.c | 24 ++++++++++++++++++++++--
+ 3 files changed, 31 insertions(+), 9 deletions(-)
 
 diff --git a/arch/arm64/kvm/hyp/hyp.h b/arch/arm64/kvm/hyp/hyp.h
-index fc502f3..744c919 100644
+index 744c919..5dfa883 100644
 --- a/arch/arm64/kvm/hyp/hyp.h
 +++ b/arch/arm64/kvm/hyp/hyp.h
-@@ -48,6 +48,78 @@ static inline unsigned long __hyp_kern_va(unsigned long v)
+@@ -153,8 +153,10 @@ void __vgic_v3_restore_state(struct kvm_vcpu *vcpu);
+ void __timer_save_state(struct kvm_vcpu *vcpu);
+ void __timer_restore_state(struct kvm_vcpu *vcpu);
  
- #define hyp_kern_va(v) (typeof(v))(__hyp_kern_va((unsigned long)(v)))
+-void __sysreg_save_state(struct kvm_cpu_context *ctxt);
+-void __sysreg_restore_state(struct kvm_cpu_context *ctxt);
++void __sysreg_save_host_state(struct kvm_cpu_context *ctxt);
++void __sysreg_restore_host_state(struct kvm_cpu_context *ctxt);
++void __sysreg_save_guest_state(struct kvm_cpu_context *ctxt);
++void __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt);
+ void __sysreg32_save_state(struct kvm_vcpu *vcpu);
+ void __sysreg32_restore_state(struct kvm_vcpu *vcpu);
  
-+#define read_sysreg_elx(r,nvh,vh)					\
-+	({								\
-+		u64 reg;						\
-+		asm volatile(ALTERNATIVE("mrs %0, " __stringify(r##nvh),\
-+					 "mrs_s %0, " __stringify(r##vh),\
-+					 ARM64_HAS_VIRT_HOST_EXTN)	\
-+			     : "=r" (reg));				\
-+		reg;							\
-+	})
+diff --git a/arch/arm64/kvm/hyp/switch.c b/arch/arm64/kvm/hyp/switch.c
+index f0e7bdf..68f3cba 100644
+--- a/arch/arm64/kvm/hyp/switch.c
++++ b/arch/arm64/kvm/hyp/switch.c
+@@ -102,7 +102,7 @@ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ 	host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+ 	guest_ctxt = &vcpu->arch.ctxt;
+ 
+-	__sysreg_save_state(host_ctxt);
++	__sysreg_save_host_state(host_ctxt);
+ 	__debug_cond_save_host_state(vcpu);
+ 
+ 	__activate_traps(vcpu);
+@@ -116,7 +116,7 @@ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ 	 * to Cortex-A57 erratum #852523.
+ 	 */
+ 	__sysreg32_restore_state(vcpu);
+-	__sysreg_restore_state(guest_ctxt);
++	__sysreg_restore_guest_state(guest_ctxt);
+ 	__debug_restore_state(vcpu, kern_hyp_va(vcpu->arch.debug_ptr), guest_ctxt);
+ 
+ 	/* Jump in the fire! */
+@@ -125,7 +125,7 @@ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ 
+ 	fp_enabled = __fpsimd_enabled();
+ 
+-	__sysreg_save_state(guest_ctxt);
++	__sysreg_save_guest_state(guest_ctxt);
+ 	__sysreg32_save_state(vcpu);
+ 	__timer_save_state(vcpu);
+ 	__vgic_save_state(vcpu);
+@@ -133,7 +133,7 @@ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+ 	__deactivate_traps(vcpu);
+ 	__deactivate_vm(vcpu);
+ 
+-	__sysreg_restore_state(host_ctxt);
++	__sysreg_restore_host_state(host_ctxt);
+ 
+ 	if (fp_enabled) {
+ 		__fpsimd_save_state(&guest_ctxt->gp_regs.fp_regs);
+@@ -165,7 +165,7 @@ void __hyp_text __noreturn __hyp_panic(void)
+ 		host_ctxt = kern_hyp_va(vcpu->arch.host_cpu_context);
+ 		__deactivate_traps(vcpu);
+ 		__deactivate_vm(vcpu);
+-		__sysreg_restore_state(host_ctxt);
++		__sysreg_restore_host_state(host_ctxt);
+ 	}
+ 
+ 	/* Call panic for real */
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 42563098..bd5b543 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -24,7 +24,7 @@
+ #include "hyp.h"
+ 
+ /* ctxt is already in the HYP VA space */
+-void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
++static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+ {
+ 	ctxt->sys_regs[MPIDR_EL1]	= read_sysreg(vmpidr_el2);
+ 	ctxt->sys_regs[CSSELR_EL1]	= read_sysreg(csselr_el1);
+@@ -57,7 +57,17 @@ void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg(spsr_el1);
+ }
+ 
+-void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
++void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
++{
++	__sysreg_save_state(ctxt);
++}
 +
-+#define write_sysreg_elx(v,r,nvh,vh)					\
-+	do {								\
-+		u64 __val = (u64)(v);					\
-+		asm volatile(ALTERNATIVE("msr " __stringify(r##nvh) ", %x0",\
-+					 "msr_s " __stringify(r##vh) ", %x0",\
-+					 ARM64_HAS_VIRT_HOST_EXTN)	\
-+					 : : "rZ" (__val));		\
-+	} while (0)
++void __hyp_text __sysreg_save_guest_state(struct kvm_cpu_context *ctxt)
++{
++	__sysreg_save_state(ctxt);
++}
 +
-+/*
-+ * Unified accessors for registers that have a different encoding
-+ * between VHE and non-VHE. They must be specified without their "ELx"
-+ * encoding.
-+ */
-+#define read_sysreg_el2(r)						\
-+	({								\
-+		u64 reg;						\
-+		asm volatile(ALTERNATIVE("mrs %0, " __stringify(r##_EL2),\
-+					 "mrs %0, " __stringify(r##_EL1),\
-+					 ARM64_HAS_VIRT_HOST_EXTN)	\
-+			     : "=r" (reg));				\
-+		reg;							\
-+	})
++static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ {
+ 	write_sysreg(ctxt->sys_regs[MPIDR_EL1],	  vmpidr_el2);
+ 	write_sysreg(ctxt->sys_regs[CSSELR_EL1],  csselr_el1);
+@@ -90,6 +100,16 @@ void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg(ctxt->gp_regs.spsr[KVM_SPSR_EL1], spsr_el1);
+ }
+ 
++void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
++{
++	__sysreg_restore_state(ctxt);
++}
 +
-+#define write_sysreg_el2(v,r)						\
-+	do {								\
-+		u64 __val = (u64)(v);					\
-+		asm volatile(ALTERNATIVE("msr " __stringify(r##_EL2) ", %x0",\
-+					 "msr " __stringify(r##_EL1) ", %x0",\
-+					 ARM64_HAS_VIRT_HOST_EXTN)	\
-+					 : : "rZ" (__val));		\
-+	} while (0)
++void __hyp_text __sysreg_restore_guest_state(struct kvm_cpu_context *ctxt)
++{
++	__sysreg_restore_state(ctxt);
++}
 +
-+#define read_sysreg_el0(r)	read_sysreg_elx(r, _EL0, _EL02)
-+#define write_sysreg_el0(v,r)	write_sysreg_elx(v, r, _EL0, _EL02)
-+#define read_sysreg_el1(r)	read_sysreg_elx(r, _EL1, _EL12)
-+#define write_sysreg_el1(v,r)	write_sysreg_elx(v, r, _EL1, _EL12)
-+
-+/* The VHE specific system registers and their encoding */
-+#define sctlr_EL12              sys_reg(3, 5, 1, 0, 0)
-+#define cpacr_EL12              sys_reg(3, 5, 1, 0, 2)
-+#define ttbr0_EL12              sys_reg(3, 5, 2, 0, 0)
-+#define ttbr1_EL12              sys_reg(3, 5, 2, 0, 1)
-+#define tcr_EL12                sys_reg(3, 5, 2, 0, 2)
-+#define afsr0_EL12              sys_reg(3, 5, 5, 1, 0)
-+#define afsr1_EL12              sys_reg(3, 5, 5, 1, 1)
-+#define esr_EL12                sys_reg(3, 5, 5, 2, 0)
-+#define far_EL12                sys_reg(3, 5, 6, 0, 0)
-+#define mair_EL12               sys_reg(3, 5, 10, 2, 0)
-+#define amair_EL12              sys_reg(3, 5, 10, 3, 0)
-+#define vbar_EL12               sys_reg(3, 5, 12, 0, 0)
-+#define contextidr_EL12         sys_reg(3, 5, 13, 0, 1)
-+#define cntkctl_EL12            sys_reg(3, 5, 14, 1, 0)
-+#define cntp_tval_EL02          sys_reg(3, 5, 14, 2, 0)
-+#define cntp_ctl_EL02           sys_reg(3, 5, 14, 2, 1)
-+#define cntp_cval_EL02          sys_reg(3, 5, 14, 2, 2)
-+#define cntv_tval_EL02          sys_reg(3, 5, 14, 3, 0)
-+#define cntv_ctl_EL02           sys_reg(3, 5, 14, 3, 1)
-+#define cntv_cval_EL02          sys_reg(3, 5, 14, 3, 2)
-+#define spsr_EL12               sys_reg(3, 5, 4, 0, 0)
-+#define elr_EL12                sys_reg(3, 5, 4, 0, 1)
-+
- /**
-  * hyp_alternate_select - Generates patchable code sequences that are
-  * used to switch between two implementations of a function, depending
+ void __hyp_text __sysreg32_save_state(struct kvm_vcpu *vcpu)
+ {
+ 	u64 *spsr, *sysreg;
 -- 
 2.1.4
+
