@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 05/95] ARM: KVM: Move CP15 array into the CPU context structure
-Date: Wed,  9 Mar 2016 07:29:59 +0000
-Message-ID: <1457508689-19672-6-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 06/95] ARM: KVM: Move GP registers into the CPU context
+ structure
+Date: Wed,  9 Mar 2016 07:30:00 +0000
+Message-ID: <1457508689-19672-7-git-send-email-marc.zyngier@arm.com>
 References: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7A248412D0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:32:01 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CD803412ED
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:32:03 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YvrK-FxyYKVv for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Mar 2016 02:31:59 -0500 (EST)
+ with ESMTP id yQjMPZmos-Ki for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Mar 2016 02:32:02 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 972914998D
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:31:59 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5AFA84998D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:32:02 -0500 (EST)
 In-Reply-To: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,332 +32,196 @@ To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Continuing our rework of the CPU context, we now move the CP15
-array into the CPU context structure. As this causes quite a bit
-of churn, we introduce the vcpu_cp15() macro that abstract the
-location of the actual array. This will probably help next time
-we have to revisit that code.
+Continuing our rework of the CPU context, we now move the GP
+registers into the CPU context structure.
 
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/include/asm/kvm_emulate.h |  2 +-
- arch/arm/include/asm/kvm_host.h    |  6 +++---
- arch/arm/include/asm/kvm_mmu.h     |  2 +-
- arch/arm/kernel/asm-offsets.c      |  2 +-
- arch/arm/kvm/coproc.c              | 32 ++++++++++++++++----------------
- arch/arm/kvm/coproc.h              | 16 ++++++++--------
- arch/arm/kvm/emulate.c             | 22 +++++++++++-----------
- arch/arm/kvm/interrupts_head.S     |  3 ++-
- 8 files changed, 43 insertions(+), 42 deletions(-)
+ arch/arm/include/asm/kvm_emulate.h |  8 ++++----
+ arch/arm/include/asm/kvm_host.h    |  3 +--
+ arch/arm/kernel/asm-offsets.c      | 18 +++++++++---------
+ arch/arm/kvm/emulate.c             | 12 ++++++------
+ arch/arm/kvm/guest.c               |  4 ++--
+ arch/arm/kvm/interrupts_head.S     | 11 +++++++++++
+ arch/arm/kvm/reset.c               |  2 +-
+ 7 files changed, 34 insertions(+), 24 deletions(-)
 
 diff --git a/arch/arm/include/asm/kvm_emulate.h b/arch/arm/include/asm/kvm_emulate.h
-index 3095df0..32bb52a 100644
+index 32bb52a..f710616 100644
 --- a/arch/arm/include/asm/kvm_emulate.h
 +++ b/arch/arm/include/asm/kvm_emulate.h
-@@ -192,7 +192,7 @@ static inline u32 kvm_vcpu_hvc_get_imm(struct kvm_vcpu *vcpu)
+@@ -68,12 +68,12 @@ static inline bool vcpu_mode_is_32bit(struct kvm_vcpu *vcpu)
  
- static inline unsigned long kvm_vcpu_get_mpidr_aff(struct kvm_vcpu *vcpu)
+ static inline unsigned long *vcpu_pc(struct kvm_vcpu *vcpu)
  {
--	return vcpu->arch.cp15[c0_MPIDR] & MPIDR_HWID_BITMASK;
-+	return vcpu_cp15(vcpu, c0_MPIDR) & MPIDR_HWID_BITMASK;
+-	return &vcpu->arch.regs.usr_regs.ARM_pc;
++	return &vcpu->arch.ctxt.gp_regs.usr_regs.ARM_pc;
  }
  
- static inline void kvm_vcpu_set_be(struct kvm_vcpu *vcpu)
+ static inline unsigned long *vcpu_cpsr(struct kvm_vcpu *vcpu)
+ {
+-	return &vcpu->arch.regs.usr_regs.ARM_cpsr;
++	return &vcpu->arch.ctxt.gp_regs.usr_regs.ARM_cpsr;
+ }
+ 
+ static inline void vcpu_set_thumb(struct kvm_vcpu *vcpu)
+@@ -83,13 +83,13 @@ static inline void vcpu_set_thumb(struct kvm_vcpu *vcpu)
+ 
+ static inline bool mode_has_spsr(struct kvm_vcpu *vcpu)
+ {
+-	unsigned long cpsr_mode = vcpu->arch.regs.usr_regs.ARM_cpsr & MODE_MASK;
++	unsigned long cpsr_mode = vcpu->arch.ctxt.gp_regs.usr_regs.ARM_cpsr & MODE_MASK;
+ 	return (cpsr_mode > USR_MODE && cpsr_mode < SYSTEM_MODE);
+ }
+ 
+ static inline bool vcpu_mode_priv(struct kvm_vcpu *vcpu)
+ {
+-	unsigned long cpsr_mode = vcpu->arch.regs.usr_regs.ARM_cpsr & MODE_MASK;
++	unsigned long cpsr_mode = vcpu->arch.ctxt.gp_regs.usr_regs.ARM_cpsr & MODE_MASK;
+ 	return cpsr_mode > USR_MODE;;
+ }
+ 
 diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
-index b64ac8e..4203701 100644
+index 4203701..02932ba 100644
 --- a/arch/arm/include/asm/kvm_host.h
 +++ b/arch/arm/include/asm/kvm_host.h
-@@ -90,6 +90,7 @@ struct kvm_vcpu_fault_info {
- 
- struct kvm_cpu_context {
- 	struct vfp_hard_struct vfp;
-+	u32 cp15[NR_CP15_REGS];
+@@ -89,6 +89,7 @@ struct kvm_vcpu_fault_info {
  };
  
- typedef struct kvm_cpu_context kvm_cpu_context_t;
-@@ -102,9 +103,6 @@ struct kvm_vcpu_arch {
+ struct kvm_cpu_context {
++	struct kvm_regs	gp_regs;
+ 	struct vfp_hard_struct vfp;
+ 	u32 cp15[NR_CP15_REGS];
+ };
+@@ -98,8 +99,6 @@ typedef struct kvm_cpu_context kvm_cpu_context_t;
+ struct kvm_vcpu_arch {
+ 	struct kvm_cpu_context ctxt;
+ 
+-	struct kvm_regs regs;
+-
  	int target; /* Processor target */
  	DECLARE_BITMAP(features, KVM_VCPU_MAX_FEATURES);
  
--	/* System control coprocessor (cp15) */
--	u32 cp15[NR_CP15_REGS];
--
- 	/* The CPU type we expose to the VM */
- 	u32 midr;
- 
-@@ -161,6 +159,8 @@ struct kvm_vcpu_stat {
- 	u64 exits;
- };
- 
-+#define vcpu_cp15(v,r)	(v)->arch.ctxt.cp15[r]
-+
- int kvm_vcpu_preferred_target(struct kvm_vcpu_init *init);
- unsigned long kvm_arm_num_regs(struct kvm_vcpu *vcpu);
- int kvm_arm_copy_reg_indices(struct kvm_vcpu *vcpu, u64 __user *indices);
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index a520b79..da44be9 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -179,7 +179,7 @@ struct kvm;
- 
- static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
- {
--	return (vcpu->arch.cp15[c1_SCTLR] & 0b101) == 0b101;
-+	return (vcpu_cp15(vcpu, c1_SCTLR) & 0b101) == 0b101;
- }
- 
- static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu,
 diff --git a/arch/arm/kernel/asm-offsets.c b/arch/arm/kernel/asm-offsets.c
-index 346bfca..43f8b01 100644
+index 43f8b01..2f3e0b0 100644
 --- a/arch/arm/kernel/asm-offsets.c
 +++ b/arch/arm/kernel/asm-offsets.c
-@@ -172,10 +172,10 @@ int main(void)
- #ifdef CONFIG_KVM_ARM_HOST
-   DEFINE(VCPU_KVM,		offsetof(struct kvm_vcpu, kvm));
-   DEFINE(VCPU_MIDR,		offsetof(struct kvm_vcpu, arch.midr));
--  DEFINE(VCPU_CP15,		offsetof(struct kvm_vcpu, arch.cp15));
-   DEFINE(VCPU_GUEST_CTXT,	offsetof(struct kvm_vcpu, arch.ctxt));
+@@ -176,15 +176,15 @@ int main(void)
    DEFINE(VCPU_HOST_CTXT,	offsetof(struct kvm_vcpu, arch.host_cpu_context));
    DEFINE(CPU_CTXT_VFP,		offsetof(struct kvm_cpu_context, vfp));
-+  DEFINE(CPU_CTXT_CP15,		offsetof(struct kvm_cpu_context, cp15));
-   DEFINE(VCPU_REGS,		offsetof(struct kvm_vcpu, arch.regs));
-   DEFINE(VCPU_USR_REGS,		offsetof(struct kvm_vcpu, arch.regs.usr_regs));
-   DEFINE(VCPU_SVC_REGS,		offsetof(struct kvm_vcpu, arch.regs.svc_regs));
-diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-index 1a643f3..e3e86c4 100644
---- a/arch/arm/kvm/coproc.c
-+++ b/arch/arm/kvm/coproc.c
-@@ -54,8 +54,8 @@ static inline void vcpu_cp15_reg64_set(struct kvm_vcpu *vcpu,
- 				       const struct coproc_reg *r,
- 				       u64 val)
- {
--	vcpu->arch.cp15[r->reg] = val & 0xffffffff;
--	vcpu->arch.cp15[r->reg + 1] = val >> 32;
-+	vcpu_cp15(vcpu, r->reg) = val & 0xffffffff;
-+	vcpu_cp15(vcpu, r->reg + 1) = val >> 32;
- }
- 
- static inline u64 vcpu_cp15_reg64_get(struct kvm_vcpu *vcpu,
-@@ -63,9 +63,9 @@ static inline u64 vcpu_cp15_reg64_get(struct kvm_vcpu *vcpu,
- {
- 	u64 val;
- 
--	val = vcpu->arch.cp15[r->reg + 1];
-+	val = vcpu_cp15(vcpu, r->reg + 1);
- 	val = val << 32;
--	val = val | vcpu->arch.cp15[r->reg];
-+	val = val | vcpu_cp15(vcpu, r->reg);
- 	return val;
- }
- 
-@@ -104,7 +104,7 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct coproc_reg *r)
- 	 * vcpu_id, but we read the 'U' bit from the underlying
- 	 * hardware directly.
- 	 */
--	vcpu->arch.cp15[c0_MPIDR] = ((read_cpuid_mpidr() & MPIDR_SMP_BITMASK) |
-+	vcpu_cp15(vcpu, c0_MPIDR) = ((read_cpuid_mpidr() & MPIDR_SMP_BITMASK) |
- 				     ((vcpu->vcpu_id >> 2) << MPIDR_LEVEL_BITS) |
- 				     (vcpu->vcpu_id & 3));
- }
-@@ -117,7 +117,7 @@ static bool access_actlr(struct kvm_vcpu *vcpu,
- 	if (p->is_write)
- 		return ignore_write(vcpu, p);
- 
--	*vcpu_reg(vcpu, p->Rt1) = vcpu->arch.cp15[c1_ACTLR];
-+	*vcpu_reg(vcpu, p->Rt1) = vcpu_cp15(vcpu, c1_ACTLR);
- 	return true;
- }
- 
-@@ -139,7 +139,7 @@ static bool access_l2ctlr(struct kvm_vcpu *vcpu,
- 	if (p->is_write)
- 		return ignore_write(vcpu, p);
- 
--	*vcpu_reg(vcpu, p->Rt1) = vcpu->arch.cp15[c9_L2CTLR];
-+	*vcpu_reg(vcpu, p->Rt1) = vcpu_cp15(vcpu, c9_L2CTLR);
- 	return true;
- }
- 
-@@ -156,7 +156,7 @@ static void reset_l2ctlr(struct kvm_vcpu *vcpu, const struct coproc_reg *r)
- 	ncores = min(ncores, 3U);
- 	l2ctlr |= (ncores & 3) << 24;
- 
--	vcpu->arch.cp15[c9_L2CTLR] = l2ctlr;
-+	vcpu_cp15(vcpu, c9_L2CTLR) = l2ctlr;
- }
- 
- static void reset_actlr(struct kvm_vcpu *vcpu, const struct coproc_reg *r)
-@@ -171,7 +171,7 @@ static void reset_actlr(struct kvm_vcpu *vcpu, const struct coproc_reg *r)
- 	else
- 		actlr &= ~(1U << 6);
- 
--	vcpu->arch.cp15[c1_ACTLR] = actlr;
-+	vcpu_cp15(vcpu, c1_ACTLR) = actlr;
- }
- 
- /*
-@@ -218,9 +218,9 @@ bool access_vm_reg(struct kvm_vcpu *vcpu,
- 
- 	BUG_ON(!p->is_write);
- 
--	vcpu->arch.cp15[r->reg] = *vcpu_reg(vcpu, p->Rt1);
-+	vcpu_cp15(vcpu, r->reg) = *vcpu_reg(vcpu, p->Rt1);
- 	if (p->is_64bit)
--		vcpu->arch.cp15[r->reg + 1] = *vcpu_reg(vcpu, p->Rt2);
-+		vcpu_cp15(vcpu, r->reg + 1) = *vcpu_reg(vcpu, p->Rt2);
- 
- 	kvm_toggle_cache(vcpu, was_enabled);
- 	return true;
-@@ -1030,7 +1030,7 @@ int kvm_arm_coproc_get_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 		val = vcpu_cp15_reg64_get(vcpu, r);
- 		ret = reg_to_user(uaddr, &val, reg->id);
- 	} else if (KVM_REG_SIZE(reg->id) == 4) {
--		ret = reg_to_user(uaddr, &vcpu->arch.cp15[r->reg], reg->id);
-+		ret = reg_to_user(uaddr, &vcpu_cp15(vcpu, r->reg), reg->id);
- 	}
- 
- 	return ret;
-@@ -1060,7 +1060,7 @@ int kvm_arm_coproc_set_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
- 		if (!ret)
- 			vcpu_cp15_reg64_set(vcpu, r, val);
- 	} else if (KVM_REG_SIZE(reg->id) == 4) {
--		ret = reg_from_user(&vcpu->arch.cp15[r->reg], uaddr, reg->id);
-+		ret = reg_from_user(&vcpu_cp15(vcpu, r->reg), uaddr, reg->id);
- 	}
- 
- 	return ret;
-@@ -1248,7 +1248,7 @@ void kvm_reset_coprocs(struct kvm_vcpu *vcpu)
- 	const struct coproc_reg *table;
- 
- 	/* Catch someone adding a register without putting in reset entry. */
--	memset(vcpu->arch.cp15, 0x42, sizeof(vcpu->arch.cp15));
-+	memset(vcpu->arch.ctxt.cp15, 0x42, sizeof(vcpu->arch.ctxt.cp15));
- 
- 	/* Generic chip reset first (so target could override). */
- 	reset_coproc_regs(vcpu, cp15_regs, ARRAY_SIZE(cp15_regs));
-@@ -1257,6 +1257,6 @@ void kvm_reset_coprocs(struct kvm_vcpu *vcpu)
- 	reset_coproc_regs(vcpu, table, num);
- 
- 	for (num = 1; num < NR_CP15_REGS; num++)
--		if (vcpu->arch.cp15[num] == 0x42424242)
--			panic("Didn't reset vcpu->arch.cp15[%zi]", num);
-+		if (vcpu_cp15(vcpu, num) == 0x42424242)
-+			panic("Didn't reset vcpu_cp15(vcpu, %zi)", num);
- }
-diff --git a/arch/arm/kvm/coproc.h b/arch/arm/kvm/coproc.h
-index 88d24a3..2735132 100644
---- a/arch/arm/kvm/coproc.h
-+++ b/arch/arm/kvm/coproc.h
-@@ -47,7 +47,7 @@ struct coproc_reg {
- 	/* Initialization for vcpu. */
- 	void (*reset)(struct kvm_vcpu *, const struct coproc_reg *);
- 
--	/* Index into vcpu->arch.cp15[], or 0 if we don't need to save it. */
-+	/* Index into vcpu_cp15(vcpu, ...), or 0 if we don't need to save it. */
- 	unsigned long reg;
- 
- 	/* Value (usually reset value) */
-@@ -104,25 +104,25 @@ static inline void reset_unknown(struct kvm_vcpu *vcpu,
- 				 const struct coproc_reg *r)
- {
- 	BUG_ON(!r->reg);
--	BUG_ON(r->reg >= ARRAY_SIZE(vcpu->arch.cp15));
--	vcpu->arch.cp15[r->reg] = 0xdecafbad;
-+	BUG_ON(r->reg >= ARRAY_SIZE(vcpu->arch.ctxt.cp15));
-+	vcpu_cp15(vcpu, r->reg) = 0xdecafbad;
- }
- 
- static inline void reset_val(struct kvm_vcpu *vcpu, const struct coproc_reg *r)
- {
- 	BUG_ON(!r->reg);
--	BUG_ON(r->reg >= ARRAY_SIZE(vcpu->arch.cp15));
--	vcpu->arch.cp15[r->reg] = r->val;
-+	BUG_ON(r->reg >= ARRAY_SIZE(vcpu->arch.ctxt.cp15));
-+	vcpu_cp15(vcpu, r->reg) = r->val;
- }
- 
- static inline void reset_unknown64(struct kvm_vcpu *vcpu,
- 				   const struct coproc_reg *r)
- {
- 	BUG_ON(!r->reg);
--	BUG_ON(r->reg + 1 >= ARRAY_SIZE(vcpu->arch.cp15));
-+	BUG_ON(r->reg + 1 >= ARRAY_SIZE(vcpu->arch.ctxt.cp15));
- 
--	vcpu->arch.cp15[r->reg] = 0xdecafbad;
--	vcpu->arch.cp15[r->reg+1] = 0xd0c0ffee;
-+	vcpu_cp15(vcpu, r->reg) = 0xdecafbad;
-+	vcpu_cp15(vcpu, r->reg+1) = 0xd0c0ffee;
- }
- 
- static inline int cmp_reg(const struct coproc_reg *i1,
+   DEFINE(CPU_CTXT_CP15,		offsetof(struct kvm_cpu_context, cp15));
+-  DEFINE(VCPU_REGS,		offsetof(struct kvm_vcpu, arch.regs));
+-  DEFINE(VCPU_USR_REGS,		offsetof(struct kvm_vcpu, arch.regs.usr_regs));
+-  DEFINE(VCPU_SVC_REGS,		offsetof(struct kvm_vcpu, arch.regs.svc_regs));
+-  DEFINE(VCPU_ABT_REGS,		offsetof(struct kvm_vcpu, arch.regs.abt_regs));
+-  DEFINE(VCPU_UND_REGS,		offsetof(struct kvm_vcpu, arch.regs.und_regs));
+-  DEFINE(VCPU_IRQ_REGS,		offsetof(struct kvm_vcpu, arch.regs.irq_regs));
+-  DEFINE(VCPU_FIQ_REGS,		offsetof(struct kvm_vcpu, arch.regs.fiq_regs));
+-  DEFINE(VCPU_PC,		offsetof(struct kvm_vcpu, arch.regs.usr_regs.ARM_pc));
+-  DEFINE(VCPU_CPSR,		offsetof(struct kvm_vcpu, arch.regs.usr_regs.ARM_cpsr));
++  DEFINE(CPU_CTXT_GP_REGS,	offsetof(struct kvm_cpu_context, gp_regs));
++  DEFINE(GP_REGS_USR,		offsetof(struct kvm_regs, usr_regs));
++  DEFINE(GP_REGS_SVC,		offsetof(struct kvm_regs, svc_regs));
++  DEFINE(GP_REGS_ABT,		offsetof(struct kvm_regs, abt_regs));
++  DEFINE(GP_REGS_UND,		offsetof(struct kvm_regs, und_regs));
++  DEFINE(GP_REGS_IRQ,		offsetof(struct kvm_regs, irq_regs));
++  DEFINE(GP_REGS_FIQ,		offsetof(struct kvm_regs, fiq_regs));
++  DEFINE(GP_REGS_PC,		offsetof(struct kvm_regs, usr_regs.ARM_pc));
++  DEFINE(GP_REGS_CPSR,		offsetof(struct kvm_regs, usr_regs.ARM_cpsr));
+   DEFINE(VCPU_HCR,		offsetof(struct kvm_vcpu, arch.hcr));
+   DEFINE(VCPU_IRQ_LINES,	offsetof(struct kvm_vcpu, arch.irq_lines));
+   DEFINE(VCPU_HSR,		offsetof(struct kvm_vcpu, arch.fault.hsr));
 diff --git a/arch/arm/kvm/emulate.c b/arch/arm/kvm/emulate.c
-index dc99159..ee161b1 100644
+index ee161b1..a494def 100644
 --- a/arch/arm/kvm/emulate.c
 +++ b/arch/arm/kvm/emulate.c
-@@ -266,8 +266,8 @@ void kvm_skip_instr(struct kvm_vcpu *vcpu, bool is_wide_instr)
- 
- static u32 exc_vector_base(struct kvm_vcpu *vcpu)
+@@ -112,7 +112,7 @@ static const unsigned long vcpu_reg_offsets[VCPU_NR_MODES][15] = {
+  */
+ unsigned long *vcpu_reg(struct kvm_vcpu *vcpu, u8 reg_num)
  {
--	u32 sctlr = vcpu->arch.cp15[c1_SCTLR];
--	u32 vbar = vcpu->arch.cp15[c12_VBAR];
-+	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
-+	u32 vbar = vcpu_cp15(vcpu, c12_VBAR);
+-	unsigned long *reg_array = (unsigned long *)&vcpu->arch.regs;
++	unsigned long *reg_array = (unsigned long *)&vcpu->arch.ctxt.gp_regs;
+ 	unsigned long mode = *vcpu_cpsr(vcpu) & MODE_MASK;
  
- 	if (sctlr & SCTLR_V)
- 		return 0xffff0000;
-@@ -282,7 +282,7 @@ static u32 exc_vector_base(struct kvm_vcpu *vcpu)
- static void kvm_update_psr(struct kvm_vcpu *vcpu, unsigned long mode)
- {
- 	unsigned long cpsr = *vcpu_cpsr(vcpu);
--	u32 sctlr = vcpu->arch.cp15[c1_SCTLR];
-+	u32 sctlr = vcpu_cp15(vcpu, c1_SCTLR);
- 
- 	*vcpu_cpsr(vcpu) = (cpsr & ~MODE_MASK) | mode;
- 
-@@ -357,22 +357,22 @@ static void inject_abt(struct kvm_vcpu *vcpu, bool is_pabt, unsigned long addr)
- 
- 	if (is_pabt) {
- 		/* Set IFAR and IFSR */
--		vcpu->arch.cp15[c6_IFAR] = addr;
--		is_lpae = (vcpu->arch.cp15[c2_TTBCR] >> 31);
-+		vcpu_cp15(vcpu, c6_IFAR) = addr;
-+		is_lpae = (vcpu_cp15(vcpu, c2_TTBCR) >> 31);
- 		/* Always give debug fault for now - should give guest a clue */
- 		if (is_lpae)
--			vcpu->arch.cp15[c5_IFSR] = 1 << 9 | 0x22;
-+			vcpu_cp15(vcpu, c5_IFSR) = 1 << 9 | 0x22;
- 		else
--			vcpu->arch.cp15[c5_IFSR] = 2;
-+			vcpu_cp15(vcpu, c5_IFSR) = 2;
- 	} else { /* !iabt */
- 		/* Set DFAR and DFSR */
--		vcpu->arch.cp15[c6_DFAR] = addr;
--		is_lpae = (vcpu->arch.cp15[c2_TTBCR] >> 31);
-+		vcpu_cp15(vcpu, c6_DFAR) = addr;
-+		is_lpae = (vcpu_cp15(vcpu, c2_TTBCR) >> 31);
- 		/* Always give debug fault for now - should give guest a clue */
- 		if (is_lpae)
--			vcpu->arch.cp15[c5_DFSR] = 1 << 9 | 0x22;
-+			vcpu_cp15(vcpu, c5_DFSR) = 1 << 9 | 0x22;
- 		else
--			vcpu->arch.cp15[c5_DFSR] = 2;
-+			vcpu_cp15(vcpu, c5_DFSR) = 2;
+ 	switch (mode) {
+@@ -147,15 +147,15 @@ unsigned long *vcpu_spsr(struct kvm_vcpu *vcpu)
+ 	unsigned long mode = *vcpu_cpsr(vcpu) & MODE_MASK;
+ 	switch (mode) {
+ 	case SVC_MODE:
+-		return &vcpu->arch.regs.KVM_ARM_SVC_spsr;
++		return &vcpu->arch.ctxt.gp_regs.KVM_ARM_SVC_spsr;
+ 	case ABT_MODE:
+-		return &vcpu->arch.regs.KVM_ARM_ABT_spsr;
++		return &vcpu->arch.ctxt.gp_regs.KVM_ARM_ABT_spsr;
+ 	case UND_MODE:
+-		return &vcpu->arch.regs.KVM_ARM_UND_spsr;
++		return &vcpu->arch.ctxt.gp_regs.KVM_ARM_UND_spsr;
+ 	case IRQ_MODE:
+-		return &vcpu->arch.regs.KVM_ARM_IRQ_spsr;
++		return &vcpu->arch.ctxt.gp_regs.KVM_ARM_IRQ_spsr;
+ 	case FIQ_MODE:
+-		return &vcpu->arch.regs.KVM_ARM_FIQ_spsr;
++		return &vcpu->arch.ctxt.gp_regs.KVM_ARM_FIQ_spsr;
+ 	default:
+ 		BUG();
  	}
+diff --git a/arch/arm/kvm/guest.c b/arch/arm/kvm/guest.c
+index 5fa69d7..86e26fb 100644
+--- a/arch/arm/kvm/guest.c
++++ b/arch/arm/kvm/guest.c
+@@ -55,7 +55,7 @@ static u64 core_reg_offset_from_id(u64 id)
+ static int get_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ {
+ 	u32 __user *uaddr = (u32 __user *)(long)reg->addr;
+-	struct kvm_regs *regs = &vcpu->arch.regs;
++	struct kvm_regs *regs = &vcpu->arch.ctxt.gp_regs;
+ 	u64 off;
  
- }
+ 	if (KVM_REG_SIZE(reg->id) != 4)
+@@ -72,7 +72,7 @@ static int get_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ static int set_core_reg(struct kvm_vcpu *vcpu, const struct kvm_one_reg *reg)
+ {
+ 	u32 __user *uaddr = (u32 __user *)(long)reg->addr;
+-	struct kvm_regs *regs = &vcpu->arch.regs;
++	struct kvm_regs *regs = &vcpu->arch.ctxt.gp_regs;
+ 	u64 off, val;
+ 
+ 	if (KVM_REG_SIZE(reg->id) != 4)
 diff --git a/arch/arm/kvm/interrupts_head.S b/arch/arm/kvm/interrupts_head.S
-index 51a5950..b9d9531 100644
+index b9d9531..e0943cb 100644
 --- a/arch/arm/kvm/interrupts_head.S
 +++ b/arch/arm/kvm/interrupts_head.S
-@@ -4,7 +4,8 @@
+@@ -1,6 +1,17 @@
+ #include <linux/irqchip/arm-gic.h>
+ #include <asm/assembler.h>
+ 
++/* Compat macro, until we get rid of this file entierely */
++#define VCPU_GP_REGS		(VCPU_GUEST_CTXT + CPU_CTXT_GP_REGS)
++#define VCPU_USR_REGS		(VCPU_GP_REGS + GP_REGS_USR)
++#define VCPU_SVC_REGS		(VCPU_GP_REGS + GP_REGS_SVC)
++#define VCPU_ABT_REGS		(VCPU_GP_REGS + GP_REGS_ABT)
++#define VCPU_UND_REGS		(VCPU_GP_REGS + GP_REGS_UND)
++#define VCPU_IRQ_REGS		(VCPU_GP_REGS + GP_REGS_IRQ)
++#define VCPU_FIQ_REGS		(VCPU_GP_REGS + GP_REGS_FIQ)
++#define VCPU_PC			(VCPU_GP_REGS + GP_REGS_PC)
++#define VCPU_CPSR		(VCPU_GP_REGS + GP_REGS_CPSR)
++
  #define VCPU_USR_REG(_reg_nr)	(VCPU_USR_REGS + (_reg_nr * 4))
  #define VCPU_USR_SP		(VCPU_USR_REG(13))
  #define VCPU_USR_LR		(VCPU_USR_REG(14))
--#define CP15_OFFSET(_cp15_reg_idx) (VCPU_CP15 + (_cp15_reg_idx * 4))
-+#define VCPU_CP15_BASE		(VCPU_GUEST_CTXT + CPU_CTXT_CP15)
-+#define CP15_OFFSET(_cp15_reg_idx) (VCPU_CP15_BASE + (_cp15_reg_idx * 4))
+diff --git a/arch/arm/kvm/reset.c b/arch/arm/kvm/reset.c
+index eeb8585..0048b5a 100644
+--- a/arch/arm/kvm/reset.c
++++ b/arch/arm/kvm/reset.c
+@@ -71,7 +71,7 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+ 	}
  
- /*
-  * Many of these macros need to access the VCPU structure, which is always
+ 	/* Reset core registers */
+-	memcpy(&vcpu->arch.regs, reset_regs, sizeof(vcpu->arch.regs));
++	memcpy(&vcpu->arch.ctxt.gp_regs, reset_regs, sizeof(vcpu->arch.ctxt.gp_regs));
+ 
+ 	/* Reset CP15 registers */
+ 	kvm_reset_coprocs(vcpu);
 -- 
 2.1.4
