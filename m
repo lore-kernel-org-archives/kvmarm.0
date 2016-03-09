@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 36/95] arm64: KVM: VHE: Patch out use of HVC
-Date: Wed,  9 Mar 2016 07:30:30 +0000
-Message-ID: <1457508689-19672-37-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 42/95] arm64: KVM: VHE: Enable minimal sysreg save/restore
+Date: Wed,  9 Mar 2016 07:30:36 +0000
+Message-ID: <1457508689-19672-43-git-send-email-marc.zyngier@arm.com>
 References: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DB9344998D
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:33:29 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF8DE412ED
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:33:45 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zl+Ku02P0iIN for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Mar 2016 02:33:28 -0500 (EST)
+ with ESMTP id iwFW6iym+w47 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Mar 2016 02:33:44 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0299B49B43
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:33:27 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6AF6949B49
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:33:44 -0500 (EST)
 In-Reply-To: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,105 +31,61 @@ To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-With VHE, the host never issues an HVC instruction to get into the
-KVM code, as we can simply branch there.
+We're now in a position where we can introduce VHE's minimal
+save/restore, which is limited to the handful of shared sysregs.
 
-Use runtime code patching to simplify things a bit.
+Add the required alternative function calls that result in a
+"do nothing" call on VHE, and the normal save/restore for non-VHE.
 
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/kvm/hyp.S           |  7 +++++++
- arch/arm64/kvm/hyp/hyp-entry.S | 40 +++++++++++++++++++++++++++++++---------
- 2 files changed, 38 insertions(+), 9 deletions(-)
+ arch/arm64/kvm/hyp/sysreg-sr.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp.S b/arch/arm64/kvm/hyp.S
-index 0ccdcbb..0689a74 100644
---- a/arch/arm64/kvm/hyp.S
-+++ b/arch/arm64/kvm/hyp.S
-@@ -17,7 +17,9 @@
+diff --git a/arch/arm64/kvm/hyp/sysreg-sr.c b/arch/arm64/kvm/hyp/sysreg-sr.c
+index 7d7d757..74b5f81 100644
+--- a/arch/arm64/kvm/hyp/sysreg-sr.c
++++ b/arch/arm64/kvm/hyp/sysreg-sr.c
+@@ -23,6 +23,9 @@
  
- #include <linux/linkage.h>
+ #include "hyp.h"
  
-+#include <asm/alternative.h>
- #include <asm/assembler.h>
-+#include <asm/cpufeature.h>
- 
- /*
-  * u64 kvm_call_hyp(void *hypfn, ...);
-@@ -38,6 +40,11 @@
-  * arch/arm64/kernel/hyp_stub.S.
-  */
- ENTRY(kvm_call_hyp)
-+alternative_if_not ARM64_HAS_VIRT_HOST_EXTN	
- 	hvc	#0
- 	ret
-+alternative_else
-+	b	__vhe_hyp_call
-+	nop
-+alternative_endif
- ENDPROC(kvm_call_hyp)
-diff --git a/arch/arm64/kvm/hyp/hyp-entry.S b/arch/arm64/kvm/hyp/hyp-entry.S
-index 93e8d983..1bdeee7 100644
---- a/arch/arm64/kvm/hyp/hyp-entry.S
-+++ b/arch/arm64/kvm/hyp/hyp-entry.S
-@@ -38,6 +38,34 @@
- 	ldp	x0, x1, [sp], #16
- .endm
- 
-+.macro do_el2_call
-+	/*
-+	 * Shuffle the parameters before calling the function
-+	 * pointed to in x0. Assumes parameters in x[1,2,3].
-+	 */
-+	sub	sp, sp, #16
-+	str	lr, [sp]
-+	mov	lr, x0
-+	mov	x0, x1
-+	mov	x1, x2
-+	mov	x2, x3
-+	blr	lr
-+	ldr	lr, [sp]
-+	add	sp, sp, #16
-+.endm
++/* Yes, this does nothing, on purpose */
++static void __hyp_text __sysreg_do_nothing(struct kvm_cpu_context *ctxt) { }
 +
-+ENTRY(__vhe_hyp_call)
-+	do_el2_call
-+	/*
-+	 * We used to rely on having an exception return to get
-+	 * an implicit isb. In the E2H case, we don't have it anymore.
-+	 * rather than changing all the leaf functions, just do it here
-+	 * before returning to the rest of the kernel.
-+	 */
-+	isb
-+	ret
-+ENDPROC(__vhe_hyp_call)
-+	
- el1_sync:				// Guest trapped into EL2
- 	save_x0_to_x3
+ /*
+  * Non-VHE: Both host and guest must save everything.
+  *
+@@ -67,9 +70,13 @@ static void __hyp_text __sysreg_save_state(struct kvm_cpu_context *ctxt)
+ 	ctxt->gp_regs.spsr[KVM_SPSR_EL1]= read_sysreg_el1(spsr);
+ }
  
-@@ -58,19 +86,13 @@ el1_sync:				// Guest trapped into EL2
- 	mrs	x0, vbar_el2
- 	b	2f
++static hyp_alternate_select(__sysreg_call_save_host_state,
++			    __sysreg_save_state, __sysreg_do_nothing,
++			    ARM64_HAS_VIRT_HOST_EXTN);
++
+ void __hyp_text __sysreg_save_host_state(struct kvm_cpu_context *ctxt)
+ {
+-	__sysreg_save_state(ctxt);
++	__sysreg_call_save_host_state()(ctxt);
+ 	__sysreg_save_common_state(ctxt);
+ }
  
--1:	stp	lr, xzr, [sp, #-16]!
--
-+1:
- 	/*
--	 * Compute the function address in EL2, and shuffle the parameters.
-+	 * Perform the EL2 call
- 	 */
- 	kern_hyp_va	x0
--	mov	lr, x0
--	mov	x0, x1
--	mov	x1, x2
--	mov	x2, x3
--	blr	lr
-+	do_el2_call
+@@ -116,9 +123,13 @@ static void __hyp_text __sysreg_restore_state(struct kvm_cpu_context *ctxt)
+ 	write_sysreg_el1(ctxt->gp_regs.spsr[KVM_SPSR_EL1],spsr);
+ }
  
--	ldp	lr, xzr, [sp], #16
- 2:	eret
++static hyp_alternate_select(__sysreg_call_restore_host_state,
++			    __sysreg_restore_state, __sysreg_do_nothing,
++			    ARM64_HAS_VIRT_HOST_EXTN);
++
+ void __hyp_text __sysreg_restore_host_state(struct kvm_cpu_context *ctxt)
+ {
+-	__sysreg_restore_state(ctxt);
++	__sysreg_call_restore_host_state()(ctxt);
+ 	__sysreg_restore_common_state(ctxt);
+ }
  
- el1_trap:
 -- 
 2.1.4
