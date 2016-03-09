@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 81/95] ARM: KVM: Rename struct coproc_reg::is_64 to is_64bit
-Date: Wed,  9 Mar 2016 07:31:15 +0000
-Message-ID: <1457508689-19672-82-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 84/95] KVM: arm/arm64: vgic-v2: Avoid accessing GICH registers
+Date: Wed,  9 Mar 2016 07:31:18 +0000
+Message-ID: <1457508689-19672-85-git-send-email-marc.zyngier@arm.com>
 References: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6874A49BA8
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:35:38 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DCAA412A6
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:35:46 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AoEuISlAo-wx for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Mar 2016 02:35:37 -0500 (EST)
+ with ESMTP id x9QH30akUQha for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Mar 2016 02:35:44 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5487949BB0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:35:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B8DCF49B30
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:35:44 -0500 (EST)
 In-Reply-To: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,70 +31,132 @@ To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As we're going to play some tricks on the struct coproc_reg,
-make sure its 64bit indicator field matches that of coproc_params.
+GICv2 registers are *slow*. As in "terrifyingly slow". Which is bad.
+But we're equaly bad, as we make a point in accessing them even if
+we don't have any interrupt in flight.
 
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+A good solution is to first find out if we have anything useful to
+write into the GIC, and if we don't, to simply not do it. This
+involves tracking which LRs actually have something valid there.
+
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/coproc.c | 4 ++--
- arch/arm/kvm/coproc.h | 8 ++++----
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ include/kvm/arm_vgic.h        |  2 ++
+ virt/kvm/arm/hyp/vgic-v2-sr.c | 72 ++++++++++++++++++++++++++++++-------------
+ 2 files changed, 52 insertions(+), 22 deletions(-)
 
-diff --git a/arch/arm/kvm/coproc.c b/arch/arm/kvm/coproc.c
-index 40d6db1..bb06902 100644
---- a/arch/arm/kvm/coproc.c
-+++ b/arch/arm/kvm/coproc.c
-@@ -423,7 +423,7 @@ static const struct coproc_reg *find_reg(const struct coproc_params *params,
- 	for (i = 0; i < num; i++) {
- 		const struct coproc_reg *r = &table[i];
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 13a3d53..f473fd6 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -321,6 +321,8 @@ struct vgic_cpu {
  
--		if (params->is_64bit != r->is_64)
-+		if (params->is_64bit != r->is_64bit)
- 			continue;
- 		if (params->CRn != r->CRn)
- 			continue;
-@@ -1105,7 +1105,7 @@ static int write_demux_regids(u64 __user *uindices)
- static u64 cp15_to_index(const struct coproc_reg *reg)
- {
- 	u64 val = KVM_REG_ARM | (15 << KVM_REG_ARM_COPROC_SHIFT);
--	if (reg->is_64) {
-+	if (reg->is_64bit) {
- 		val |= KVM_REG_SIZE_U64;
- 		val |= (reg->Op1 << KVM_REG_ARM_OPC1_SHIFT);
- 		/*
-diff --git a/arch/arm/kvm/coproc.h b/arch/arm/kvm/coproc.h
-index 2735132..eef1759 100644
---- a/arch/arm/kvm/coproc.h
-+++ b/arch/arm/kvm/coproc.h
-@@ -37,7 +37,7 @@ struct coproc_reg {
- 	unsigned long Op1;
- 	unsigned long Op2;
+ 	/* Protected by the distributor's irq_phys_map_lock */
+ 	struct list_head	irq_phys_map_list;
++
++	u64		live_lrs;
+ };
  
--	bool is_64;
-+	bool is_64bit;
+ #define LR_EMPTY	0xff
+diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
+index 9514a7d..aa0fdb8 100644
+--- a/virt/kvm/arm/hyp/vgic-v2-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
+@@ -36,28 +36,41 @@ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
  
- 	/* Trapped access from guest, if non-NULL. */
- 	bool (*access)(struct kvm_vcpu *,
-@@ -141,7 +141,7 @@ static inline int cmp_reg(const struct coproc_reg *i1,
- 		return i1->Op1 - i2->Op1;
- 	if (i1->Op2 != i2->Op2)
- 		return i1->Op2 - i2->Op2;
--	return i2->is_64 - i1->is_64;
-+	return i2->is_64bit - i1->is_64bit;
+ 	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
+ 	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
+-	cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
+-	eisr0  = readl_relaxed(base + GICH_EISR0);
+-	elrsr0 = readl_relaxed(base + GICH_ELRSR0);
+-	if (unlikely(nr_lr > 32)) {
+-		eisr1  = readl_relaxed(base + GICH_EISR1);
+-		elrsr1 = readl_relaxed(base + GICH_ELRSR1);
+-	} else {
+-		eisr1 = elrsr1 = 0;
+-	}
++
++	if (vcpu->arch.vgic_cpu.live_lrs) {
++		eisr0  = readl_relaxed(base + GICH_EISR0);
++		elrsr0 = readl_relaxed(base + GICH_ELRSR0);
++		cpu_if->vgic_misr = readl_relaxed(base + GICH_MISR);
++		cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
++
++		if (unlikely(nr_lr > 32)) {
++			eisr1  = readl_relaxed(base + GICH_EISR1);
++			elrsr1 = readl_relaxed(base + GICH_ELRSR1);
++		} else {
++			eisr1 = elrsr1 = 0;
++		}
++
+ #ifdef CONFIG_CPU_BIG_ENDIAN
+-	cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
+-	cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
++		cpu_if->vgic_eisr  = ((u64)eisr0 << 32) | eisr1;
++		cpu_if->vgic_elrsr = ((u64)elrsr0 << 32) | elrsr1;
+ #else
+-	cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
+-	cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
++		cpu_if->vgic_eisr  = ((u64)eisr1 << 32) | eisr0;
++		cpu_if->vgic_elrsr = ((u64)elrsr1 << 32) | elrsr0;
+ #endif
+-	cpu_if->vgic_apr    = readl_relaxed(base + GICH_APR);
+ 
+-	writel_relaxed(0, base + GICH_HCR);
++		for (i = 0; i < nr_lr; i++)
++			if (vcpu->arch.vgic_cpu.live_lrs & (1UL << i))
++				cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
+ 
+-	for (i = 0; i < nr_lr; i++)
+-		cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
++		writel_relaxed(0, base + GICH_HCR);
++
++		vcpu->arch.vgic_cpu.live_lrs = 0;
++	} else {
++		cpu_if->vgic_eisr = 0;
++		cpu_if->vgic_elrsr = ~0UL;
++		cpu_if->vgic_misr = 0;
++		cpu_if->vgic_apr = 0;
++	}
  }
  
+ /* vcpu is already in the HYP VA space */
+@@ -68,15 +81,30 @@ void __hyp_text __vgic_v2_restore_state(struct kvm_vcpu *vcpu)
+ 	struct vgic_dist *vgic = &kvm->arch.vgic;
+ 	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
+ 	int i, nr_lr;
++	u64 live_lrs = 0;
  
-@@ -150,8 +150,8 @@ static inline int cmp_reg(const struct coproc_reg *i1,
- #define CRm64(_x)       .CRn = _x, .CRm = 0
- #define Op1(_x) 	.Op1 = _x
- #define Op2(_x) 	.Op2 = _x
--#define is64		.is_64 = true
--#define is32		.is_64 = false
-+#define is64		.is_64bit = true
-+#define is32		.is_64bit = false
+ 	if (!base)
+ 		return;
  
- bool access_vm_reg(struct kvm_vcpu *vcpu,
- 		   const struct coproc_params *p,
+-	writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
+-	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
+-	writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
+-
+ 	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
++
+ 	for (i = 0; i < nr_lr; i++)
+-		writel_relaxed(cpu_if->vgic_lr[i], base + GICH_LR0 + (i * 4));
++		if (cpu_if->vgic_lr[i] & GICH_LR_STATE)
++			live_lrs |= 1UL << i;
++
++	if (live_lrs) {
++		writel_relaxed(cpu_if->vgic_hcr, base + GICH_HCR);
++		writel_relaxed(cpu_if->vgic_apr, base + GICH_APR);
++		for (i = 0; i < nr_lr; i++) {
++			u32 val = 0;
++
++			if (live_lrs & (1UL << i))
++				val = cpu_if->vgic_lr[i];
++
++			writel_relaxed(val, base + GICH_LR0 + (i * 4));
++		}
++	}
++
++	writel_relaxed(cpu_if->vgic_vmcr, base + GICH_VMCR);
++	vcpu->arch.vgic_cpu.live_lrs = live_lrs;
+ }
 -- 
 2.1.4
