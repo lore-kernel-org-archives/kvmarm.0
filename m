@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 60/95] arm64: KVM: Add access handler for PMCR register
-Date: Wed,  9 Mar 2016 07:30:54 +0000
-Message-ID: <1457508689-19672-61-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 58/95] arm64: KVM: Add temporary kvm_perf_event.h
+Date: Wed,  9 Mar 2016 07:30:52 +0000
+Message-ID: <1457508689-19672-59-git-send-email-marc.zyngier@arm.com>
 References: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D816349B66
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:34:36 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E6ABF49B32
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:34:29 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zc2MaZnOFBWx for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Mar 2016 02:34:35 -0500 (EST)
+ with ESMTP id Cb4Usc8JJFuU for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Mar 2016 02:34:28 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A8E66412D0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:34:34 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8DC9149B68
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:34:28 -0500 (EST)
 In-Reply-To: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -28,129 +28,93 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Shannon Zhao <shannon.zhao@linaro.org>
+In order to merge the KVM/ARM PMU patches without creating a
+conflict mess, let's have a temporary include file that won't
+conflict with anything. Subsequent patches will clean that up.
 
-Add reset handler which gets host value of PMCR_EL0 and make writable
-bits architecturally UNKNOWN except PMCR.E which is zero. Add an access
-handler for PMCR.
-
-Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+Acked-by: Will Deacon <will.deacon@arm.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h |  3 +++
- arch/arm64/kvm/sys_regs.c         | 42 +++++++++++++++++++++++++++++++++++++--
- include/kvm/arm_pmu.h             |  4 ++++
- 3 files changed, 47 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_host.h       |  1 +
+ arch/arm64/include/asm/kvm_perf_event.h | 55 +++++++++++++++++++++++++++++++++
+ 2 files changed, 56 insertions(+)
+ create mode 100644 arch/arm64/include/asm/kvm_perf_event.h
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index fb57fdc..5def605 100644
+index 31fe7d6..15851f5 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -117,6 +117,9 @@ enum vcpu_sysreg {
- 	MDSCR_EL1,	/* Monitor Debug System Control Register */
- 	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
+@@ -27,6 +27,7 @@
+ #include <asm/kvm.h>
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_mmio.h>
++#include <asm/kvm_perf_event.h>
  
-+	/* Performance Monitors Registers */
-+	PMCR_EL0,	/* Control Register */
-+
- 	/* 32bit specific registers. Keep them at the end of the range */
- 	DACR32_EL2,	/* Domain Access Control Register */
- 	IFSR32_EL2,	/* Instruction Fault Status Register */
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 2e90371..e88ae2d 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -34,6 +34,7 @@
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_host.h>
- #include <asm/kvm_mmu.h>
-+#include <asm/perf_event.h>
+ #define __KVM_HAVE_ARCH_INTC_INITIALIZED
  
- #include <trace/events/kvm.h>
- 
-@@ -439,6 +440,43 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	vcpu_sys_reg(vcpu, MPIDR_EL1) = (1ULL << 31) | mpidr;
- }
- 
-+static void reset_pmcr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+{
-+	u64 pmcr, val;
+diff --git a/arch/arm64/include/asm/kvm_perf_event.h b/arch/arm64/include/asm/kvm_perf_event.h
+new file mode 100644
+index 0000000..d1c9d50
+--- /dev/null
++++ b/arch/arm64/include/asm/kvm_perf_event.h
+@@ -0,0 +1,55 @@
++/*
++ * Copyright (C) 2012 ARM Ltd.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
 +
-+	asm volatile("mrs %0, pmcr_el0\n" : "=r" (pmcr));
-+	/* Writable bits of PMCR_EL0 (ARMV8_PMU_PMCR_MASK) is reset to UNKNOWN
-+	 * except PMCR.E resetting to zero.
-+	 */
-+	val = ((pmcr & ~ARMV8_PMU_PMCR_MASK)
-+	       | (ARMV8_PMU_PMCR_MASK & 0xdecafbad)) & (~ARMV8_PMU_PMCR_E);
-+	vcpu_sys_reg(vcpu, PMCR_EL0) = val;
-+}
++#ifndef __ASM_KVM_PERF_EVENT_H
++#define __ASM_KVM_PERF_EVENT_H
 +
-+static bool access_pmcr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			const struct sys_reg_desc *r)
-+{
-+	u64 val;
++#define	ARMV8_PMU_MAX_COUNTERS	32
++#define	ARMV8_PMU_COUNTER_MASK	(ARMV8_PMU_MAX_COUNTERS - 1)
 +
-+	if (!kvm_arm_pmu_v3_ready(vcpu))
-+		return trap_raz_wi(vcpu, p, r);
++/*
++ * Per-CPU PMCR: config reg
++ */
++#define ARMV8_PMU_PMCR_E	(1 << 0) /* Enable all counters */
++#define ARMV8_PMU_PMCR_P	(1 << 1) /* Reset all counters */
++#define ARMV8_PMU_PMCR_C	(1 << 2) /* Cycle counter reset */
++#define ARMV8_PMU_PMCR_D	(1 << 3) /* CCNT counts every 64th cpu cycle */
++#define ARMV8_PMU_PMCR_X	(1 << 4) /* Export to ETM */
++#define ARMV8_PMU_PMCR_DP	(1 << 5) /* Disable CCNT if non-invasive debug*/
++#define	ARMV8_PMU_PMCR_N_SHIFT	11	 /* Number of counters supported */
++#define	ARMV8_PMU_PMCR_N_MASK	0x1f
++#define	ARMV8_PMU_PMCR_MASK	0x3f	 /* Mask for writable bits */
 +
-+	if (p->is_write) {
-+		/* Only update writeable bits of PMCR */
-+		val = vcpu_sys_reg(vcpu, PMCR_EL0);
-+		val &= ~ARMV8_PMU_PMCR_MASK;
-+		val |= p->regval & ARMV8_PMU_PMCR_MASK;
-+		vcpu_sys_reg(vcpu, PMCR_EL0) = val;
-+	} else {
-+		/* PMCR.P & PMCR.C are RAZ */
-+		val = vcpu_sys_reg(vcpu, PMCR_EL0)
-+		      & ~(ARMV8_PMU_PMCR_P | ARMV8_PMU_PMCR_C);
-+		p->regval = val;
-+	}
++/*
++ * PMOVSR: counters overflow flag status reg
++ */
++#define	ARMV8_PMU_OVSR_MASK		0xffffffff	/* Mask for writable bits */
++#define	ARMV8_PMU_OVERFLOWED_MASK	ARMV8_PMU_OVSR_MASK
 +
-+	return true;
-+}
++/*
++ * PMXEVTYPER: Event selection reg
++ */
++#define	ARMV8_PMU_EVTYPE_MASK	0xc80003ff	/* Mask for writable bits */
++#define	ARMV8_PMU_EVTYPE_EVENT	0x3ff		/* Mask for EVENT bits */
 +
- /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
- #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
- 	/* DBGBVRn_EL1 */						\
-@@ -623,7 +661,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 
- 	/* PMCR_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b000),
--	  trap_raz_wi },
-+	  access_pmcr, reset_pmcr, },
- 	/* PMCNTENSET_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b001),
- 	  trap_raz_wi },
-@@ -885,7 +923,7 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn( 7), CRm(14), Op2( 2), access_dcsw },
- 
- 	/* PMU */
--	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), trap_raz_wi },
-+	{ Op1( 0), CRn( 9), CRm(12), Op2( 0), access_pmcr },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), trap_raz_wi },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), trap_raz_wi },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), trap_raz_wi },
-diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index 3c2fd56..8157fe5 100644
---- a/include/kvm/arm_pmu.h
-+++ b/include/kvm/arm_pmu.h
-@@ -34,9 +34,13 @@ struct kvm_pmu {
- 	struct kvm_pmc pmc[ARMV8_PMU_MAX_COUNTERS];
- 	bool ready;
- };
++/*
++ * Event filters for PMUv3
++ */
++#define	ARMV8_PMU_EXCLUDE_EL1	(1 << 31)
++#define	ARMV8_PMU_EXCLUDE_EL0	(1 << 30)
++#define	ARMV8_PMU_INCLUDE_EL2	(1 << 27)
 +
-+#define kvm_arm_pmu_v3_ready(v)		((v)->arch.pmu.ready)
- #else
- struct kvm_pmu {
- };
-+
-+#define kvm_arm_pmu_v3_ready(v)		(false)
- #endif
- 
- #endif
++#endif
 -- 
 2.1.4
