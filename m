@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 83/95] KVM: arm/arm64: timer: Add active state caching
-Date: Wed,  9 Mar 2016 07:31:17 +0000
-Message-ID: <1457508689-19672-84-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 87/95] KVM: arm/arm64: vgic-v2: Do not save an LR known to be
+ empty
+Date: Wed,  9 Mar 2016 07:31:21 +0000
+Message-ID: <1457508689-19672-88-git-send-email-marc.zyngier@arm.com>
 References: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E361149B30
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:35:43 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5EE5249BE4
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:35:54 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id q7cOcEdtvBbV for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Mar 2016 02:35:42 -0500 (EST)
+ with ESMTP id X7UW1-gyNDc6 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Mar 2016 02:35:53 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D3BB649BBF
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:35:41 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1FA8349BDB
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:35:53 -0500 (EST)
 In-Reply-To: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,122 +32,73 @@ To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Programming the active state in the (re)distributor can be an
-expensive operation so it makes some sense to try and reduce
-the number of accesses as much as possible. So far, we
-program the active state on each VM entry, but there is some
-opportunity to do less.
+On exit, any empty LR will be signaled in GICH_ELRSR*. Which
+means that we do not have to save it, and we can just clear
+its state in the in-memory copy.
 
-An obvious solution is to cache the active state in memory,
-and only program it in the HW when conditions change. But
-because the HW can also change things under our feet (the active
-state can transition from 1 to 0 when the guest does an EOI),
-some precautions have to be taken, which amount to only caching
-an "inactive" state, and always programing it otherwise.
-
-With this in place, we observe a reduction of around 700 cycles
-on a 2GHz GICv2 platform for a NULL hypercall.
+Take this opportunity to move the LR saving code into its
+own function.
 
 Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/arm.c           |  1 +
- include/kvm/arm_arch_timer.h |  5 +++++
- virt/kvm/arm/arch_timer.c    | 31 +++++++++++++++++++++++++++++++
- 3 files changed, 37 insertions(+)
+ virt/kvm/arm/hyp/vgic-v2-sr.c | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 75c7fed..9ca653e 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -322,6 +322,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- 	vcpu->cpu = -1;
- 
- 	kvm_arm_set_running_vcpu(NULL);
-+	kvm_timer_vcpu_put(vcpu);
+diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
+index c576228..6d4dd78 100644
+--- a/virt/kvm/arm/hyp/vgic-v2-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
+@@ -83,6 +83,25 @@ static void __hyp_text save_elrsr(struct kvm_vcpu *vcpu, void __iomem *base)
+ #endif
  }
  
- int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
-diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-index 1800227..b651aed 100644
---- a/include/kvm/arm_arch_timer.h
-+++ b/include/kvm/arm_arch_timer.h
-@@ -55,6 +55,9 @@ struct arch_timer_cpu {
- 
- 	/* VGIC mapping */
- 	struct irq_phys_map		*map;
-+
-+	/* Active IRQ state caching */
-+	bool				active_cleared_last;
- };
- 
- int kvm_timer_hyp_init(void);
-@@ -74,4 +77,6 @@ bool kvm_timer_should_fire(struct kvm_vcpu *vcpu);
- void kvm_timer_schedule(struct kvm_vcpu *vcpu);
- void kvm_timer_unschedule(struct kvm_vcpu *vcpu);
- 
-+void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu);
-+
- #endif
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index ea60646..a9ad4fe 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -34,6 +34,11 @@ static struct timecounter *timecounter;
- static struct workqueue_struct *wqueue;
- static unsigned int host_vtimer_irq;
- 
-+void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
++static void __hyp_text save_lrs(struct kvm_vcpu *vcpu, void __iomem *base)
 +{
-+	vcpu->arch.timer_cpu.active_cleared_last = false;
++	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
++	int nr_lr = vcpu->arch.vgic_cpu.nr_lr;
++	int i;
++
++	for (i = 0; i < nr_lr; i++) {
++		if (!(vcpu->arch.vgic_cpu.live_lrs & (1UL << i)))
++			continue;
++
++		if (cpu_if->vgic_elrsr & (1UL << i)) {
++			cpu_if->vgic_lr[i] &= ~GICH_LR_STATE;
++			continue;
++		}
++
++		cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
++	}
 +}
 +
- static cycle_t kvm_phys_timer_read(void)
+ /* vcpu is already in the HYP VA space */
+ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
  {
- 	return timecounter->cc->read(timecounter->cc);
-@@ -130,6 +135,7 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level)
+@@ -90,12 +109,10 @@ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
+ 	struct vgic_v2_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v2;
+ 	struct vgic_dist *vgic = &kvm->arch.vgic;
+ 	void __iomem *base = kern_hyp_va(vgic->vctrl_base);
+-	int i, nr_lr;
  
- 	BUG_ON(!vgic_initialized(vcpu->kvm));
+ 	if (!base)
+ 		return;
  
-+	timer->active_cleared_last = false;
- 	timer->irq.level = new_level;
- 	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer->map->virt_irq,
- 				   timer->irq.level);
-@@ -245,10 +251,35 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
- 	else
- 		phys_active = false;
+-	nr_lr = vcpu->arch.vgic_cpu.nr_lr;
+ 	cpu_if->vgic_vmcr = readl_relaxed(base + GICH_VMCR);
  
-+	/*
-+	 * We want to avoid hitting the (re)distributor as much as
-+	 * possible, as this is a potentially expensive MMIO access
-+	 * (not to mention locks in the irq layer), and a solution for
-+	 * this is to cache the "active" state in memory.
-+	 *
-+	 * Things to consider: we cannot cache an "active set" state,
-+	 * because the HW can change this behind our back (it becomes
-+	 * "clear" in the HW). We must then restrict the caching to
-+	 * the "clear" state.
-+	 *
-+	 * The cache is invalidated on:
-+	 * - vcpu put, indicating that the HW cannot be trusted to be
-+	 *   in a sane state on the next vcpu load,
-+	 * - any change in the interrupt state
-+	 *
-+	 * Usage conditions:
-+	 * - cached value is "active clear"
-+	 * - value to be programmed is "active clear"
-+	 */
-+	if (timer->active_cleared_last && !phys_active)
-+		return;
-+
- 	ret = irq_set_irqchip_state(timer->map->irq,
- 				    IRQCHIP_STATE_ACTIVE,
- 				    phys_active);
- 	WARN_ON(ret);
-+
-+	timer->active_cleared_last = !phys_active;
- }
+ 	if (vcpu->arch.vgic_cpu.live_lrs) {
+@@ -103,10 +120,7 @@ void __hyp_text __vgic_v2_save_state(struct kvm_vcpu *vcpu)
  
- /**
+ 		save_maint_int_state(vcpu, base);
+ 		save_elrsr(vcpu, base);
+- 
+-		for (i = 0; i < nr_lr; i++)
+-			if (vcpu->arch.vgic_cpu.live_lrs & (1UL << i))
+-				cpu_if->vgic_lr[i] = readl_relaxed(base + GICH_LR0 + (i * 4));
++		save_lrs(vcpu, base);
+ 
+ 		writel_relaxed(0, base + GICH_HCR);
+ 
 -- 
 2.1.4
