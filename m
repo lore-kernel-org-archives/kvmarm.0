@@ -1,141 +1,82 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 18/95] ARM: KVM: Add populating of fault data structure
-Date: Wed,  9 Mar 2016 07:30:12 +0000
-Message-ID: <1457508689-19672-19-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 24/95] ARM: KVM: Remove __weak attributes
+Date: Wed,  9 Mar 2016 07:30:18 +0000
+Message-ID: <1457508689-19672-25-git-send-email-marc.zyngier@arm.com>
 References: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6FA20410B5
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:32:37 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FLlhbcQIO9Fg for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Mar 2016 02:32:36 -0500 (EST)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D909841145
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:32:35 -0500 (EST)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvmarm@lists.cs.columbia.edu
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Gleb Natapov <gleb@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Shannon Zhao <shannon.zhao@linaro.org>, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On guest exit, we must take care of populating our fault data
-structure so that the host code can handle it. This includes
-resolving the IPA for permission faults, which can result in
-restarting the guest.
+Now that the old code is long gone, we can remove all the weak
+attributes, as there is only one version of the code.
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/hyp/hyp.h    |  4 ++++
- arch/arm/kvm/hyp/switch.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 58 insertions(+)
+ arch/arm/kvm/hyp/hyp-entry.S | 4 +---
+ arch/arm/kvm/hyp/switch.c    | 2 +-
+ arch/arm/kvm/hyp/tlb.c       | 6 +++---
+ 3 files changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/arch/arm/kvm/hyp/hyp.h b/arch/arm/kvm/hyp/hyp.h
-index ef582c9..8b1156b 100644
---- a/arch/arm/kvm/hyp/hyp.h
-+++ b/arch/arm/kvm/hyp/hyp.h
-@@ -76,10 +76,14 @@
- #define IFSR		__ACCESS_CP15(c5, 0, c0, 1)
- #define ADFSR		__ACCESS_CP15(c5, 0, c1, 0)
- #define AIFSR		__ACCESS_CP15(c5, 0, c1, 1)
-+#define HSR		__ACCESS_CP15(c5, 4, c2, 0)
- #define DFAR		__ACCESS_CP15(c6, 0, c0, 0)
- #define IFAR		__ACCESS_CP15(c6, 0, c0, 2)
- #define HDFAR		__ACCESS_CP15(c6, 4, c0, 0)
-+#define HIFAR		__ACCESS_CP15(c6, 4, c0, 2)
-+#define HPFAR		__ACCESS_CP15(c6, 4, c0, 4)
- #define ICIALLUIS	__ACCESS_CP15(c7, 0, c1, 0)
-+#define ATS1CPR		__ACCESS_CP15(c7, 0, c8, 0)
- #define TLBIALLIS	__ACCESS_CP15(c8, 0, c3, 0)
- #define TLBIALLNSNHIS	__ACCESS_CP15(c8, 4, c3, 4)
- #define PRRR		__ACCESS_CP15(c10, 0, c2, 0)
+diff --git a/arch/arm/kvm/hyp/hyp-entry.S b/arch/arm/kvm/hyp/hyp-entry.S
+index 54a8d67..7809138 100644
+--- a/arch/arm/kvm/hyp/hyp-entry.S
++++ b/arch/arm/kvm/hyp/hyp-entry.S
+@@ -58,10 +58,8 @@
+  */
+ 
+ 	.align 5
+-__hyp_vector:
+-	.global	__hyp_vector
+ __kvm_hyp_vector:
+-	.weak __kvm_hyp_vector
++	.global __kvm_hyp_vector
+ 
+ 	@ Hyp-mode exception vector
+ 	W(b)	hyp_reset
 diff --git a/arch/arm/kvm/hyp/switch.c b/arch/arm/kvm/hyp/switch.c
-index a1f3c1c..0dd0ba3 100644
+index abbe90b..f11ede1 100644
 --- a/arch/arm/kvm/hyp/switch.c
 +++ b/arch/arm/kvm/hyp/switch.c
-@@ -84,6 +84,56 @@ static void __hyp_text __vgic_restore_state(struct kvm_vcpu *vcpu)
- 	__vgic_v2_restore_state(vcpu);
+@@ -191,7 +191,7 @@ again:
+ 	return exit_code;
  }
  
-+static bool __hyp_text __populate_fault_info(struct kvm_vcpu *vcpu)
-+{
-+	u32 hsr = read_sysreg(HSR);
-+	u8 ec = hsr >> HSR_EC_SHIFT;
-+	u32 hpfar, far;
-+
-+	vcpu->arch.fault.hsr = hsr;
-+
-+	if (ec == HSR_EC_IABT)
-+		far = read_sysreg(HIFAR);
-+	else if (ec == HSR_EC_DABT)
-+		far = read_sysreg(HDFAR);
-+	else
-+		return true;
-+
-+	/*
-+	 * B3.13.5 Reporting exceptions taken to the Non-secure PL2 mode:
-+	 *
-+	 * Abort on the stage 2 translation for a memory access from a
-+	 * Non-secure PL1 or PL0 mode:
-+	 *
-+	 * For any Access flag fault or Translation fault, and also for any
-+	 * Permission fault on the stage 2 translation of a memory access
-+	 * made as part of a translation table walk for a stage 1 translation,
-+	 * the HPFAR holds the IPA that caused the fault. Otherwise, the HPFAR
-+	 * is UNKNOWN.
-+	 */
-+	if (!(hsr & HSR_DABT_S1PTW) && (hsr & HSR_FSC_TYPE) == FSC_PERM) {
-+		u64 par, tmp;
-+
-+		par = read_sysreg(PAR);
-+		write_sysreg(far, ATS1CPR);
-+		isb();
-+
-+		tmp = read_sysreg(PAR);
-+		write_sysreg(par, PAR);
-+
-+		if (unlikely(tmp & 1))
-+			return false; /* Translation failed, back to guest */
-+
-+		hpfar = ((tmp >> 12) & ((1UL << 28) - 1)) << 4;
-+	} else {
-+		hpfar = read_sysreg(HPFAR);
-+	}
-+
-+	vcpu->arch.fault.hxfar = far;
-+	vcpu->arch.fault.hpfar = hpfar;
-+	return true;
-+}
-+
- static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
+-__alias(__guest_run) int __weak __kvm_vcpu_run(struct kvm_vcpu *vcpu);
++__alias(__guest_run) int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
+ 
+ static const char * const __hyp_panic_string[] = {
+ 	[ARM_EXCEPTION_RESET]      = "\nHYP panic: RST   PC:%08x CPSR:%08x",
+diff --git a/arch/arm/kvm/hyp/tlb.c b/arch/arm/kvm/hyp/tlb.c
+index aaa44bb..82958b8 100644
+--- a/arch/arm/kvm/hyp/tlb.c
++++ b/arch/arm/kvm/hyp/tlb.c
+@@ -50,14 +50,14 @@ static void __hyp_text __tlb_flush_vmid(struct kvm *kvm)
+ 	write_sysreg(0, VTTBR);
+ }
+ 
+-__alias(__tlb_flush_vmid) void __weak __kvm_tlb_flush_vmid(struct kvm *kvm);
++__alias(__tlb_flush_vmid) void __kvm_tlb_flush_vmid(struct kvm *kvm);
+ 
+ static void __hyp_text __tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
  {
- 	struct kvm_cpu_context *host_ctxt;
-@@ -111,9 +161,13 @@ static int __hyp_text __guest_run(struct kvm_vcpu *vcpu)
- 	__banked_restore_state(guest_ctxt);
+ 	__tlb_flush_vmid(kvm);
+ }
  
- 	/* Jump in the fire! */
-+again:
- 	exit_code = __guest_enter(vcpu, host_ctxt);
- 	/* And we're baaack! */
+-__alias(__tlb_flush_vmid_ipa) void __weak __kvm_tlb_flush_vmid_ipa(struct kvm *kvm,
++__alias(__tlb_flush_vmid_ipa) void __kvm_tlb_flush_vmid_ipa(struct kvm *kvm,
+ 							    phys_addr_t ipa);
  
-+	if (exit_code == ARM_EXCEPTION_HVC && !__populate_fault_info(vcpu))
-+		goto again;
-+
- 	fp_enabled = __vfp_enabled();
+ static void __hyp_text __tlb_flush_vm_context(void)
+@@ -67,4 +67,4 @@ static void __hyp_text __tlb_flush_vm_context(void)
+ 	dsb(ish);
+ }
  
- 	__banked_save_state(guest_ctxt);
+-__alias(__tlb_flush_vm_context) void __weak __kvm_flush_vm_context(void);
++__alias(__tlb_flush_vm_context) void __kvm_flush_vm_context(void);
 -- 
 2.1.4
+
