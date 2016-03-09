@@ -1,22 +1,23 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 66/95] arm64: KVM: Add access handler for event type register
-Date: Wed,  9 Mar 2016 07:31:00 +0000
-Message-ID: <1457508689-19672-67-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 67/95] arm64: KVM: Add access handler for PMINTENSET and
+ PMINTENCLR register
+Date: Wed,  9 Mar 2016 07:31:01 +0000
+Message-ID: <1457508689-19672-68-git-send-email-marc.zyngier@arm.com>
 References: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A75A249B93
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:34:53 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CC4C549B93
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:34:57 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qVoxpOEhzTvC for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Mar 2016 02:34:52 -0500 (EST)
+ with ESMTP id AjTBRiv6sLY9 for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Mar 2016 02:34:56 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3895B49B34
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:34:52 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5603E49B34
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:34:56 -0500 (EST)
 In-Reply-To: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,216 +34,88 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-These kind of registers include PMEVTYPERn, PMCCFILTR and PMXEVTYPER
-which is mapped to PMEVTYPERn or PMCCFILTR.
-
-The access handler translates all aarch32 register offsets to aarch64
-ones and uses vcpu_sys_reg() to access their values to avoid taking care
-of big endian.
-
-When writing to these registers, create a perf_event for the selected
-event type.
+Since the reset value of PMINTENSET and PMINTENCLR is UNKNOWN, use
+reset_unknown for its reset handler. Add a handler to emulate writing
+PMINTENSET or PMINTENCLR register.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm64/include/asm/kvm_host.h |   3 +
- arch/arm64/kvm/sys_regs.c         | 126 +++++++++++++++++++++++++++++++++++++-
- 2 files changed, 127 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/kvm/sys_regs.c         | 32 ++++++++++++++++++++++++++++----
+ 2 files changed, 29 insertions(+), 4 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 993793b..121182d 100644
+index 121182d..da59f44 100644
 --- a/arch/arm64/include/asm/kvm_host.h
 +++ b/arch/arm64/include/asm/kvm_host.h
-@@ -123,6 +123,9 @@ enum vcpu_sysreg {
- 	PMEVCNTR0_EL0,	/* Event Counter Register (0-30) */
- 	PMEVCNTR30_EL0 = PMEVCNTR0_EL0 + 30,
- 	PMCCNTR_EL0,	/* Cycle Counter Register */
-+	PMEVTYPER0_EL0,	/* Event Type Register (0-30) */
-+	PMEVTYPER30_EL0 = PMEVTYPER0_EL0 + 30,
-+	PMCCFILTR_EL0,	/* Cycle Count Filter Register */
+@@ -127,6 +127,7 @@ enum vcpu_sysreg {
+ 	PMEVTYPER30_EL0 = PMEVTYPER0_EL0 + 30,
+ 	PMCCFILTR_EL0,	/* Cycle Count Filter Register */
  	PMCNTENSET_EL0,	/* Count Enable Set Register */
++	PMINTENSET_EL1,	/* Interrupt Enable Set Register */
  
  	/* 32bit specific registers. Keep them at the end of the range */
+ 	DACR32_EL2,	/* Domain Access Control Register */
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index d4b6ae3..4faf324 100644
+index 4faf324..bfc70b2 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -563,6 +563,42 @@ static bool access_pmu_evcntr(struct kvm_vcpu *vcpu,
+@@ -626,6 +626,30 @@ static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
  	return true;
  }
  
-+static bool access_pmu_evtyper(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+			       const struct sys_reg_desc *r)
++static bool access_pminten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			   const struct sys_reg_desc *r)
 +{
-+	u64 idx, reg;
++	u64 mask = kvm_pmu_valid_counter_mask(vcpu);
 +
 +	if (!kvm_arm_pmu_v3_ready(vcpu))
 +		return trap_raz_wi(vcpu, p, r);
 +
-+	if (r->CRn == 9 && r->CRm == 13 && r->Op2 == 1) {
-+		/* PMXEVTYPER_EL0 */
-+		idx = vcpu_sys_reg(vcpu, PMSELR_EL0) & ARMV8_PMU_COUNTER_MASK;
-+		reg = PMEVTYPER0_EL0 + idx;
-+	} else if (r->CRn == 14 && (r->CRm & 12) == 12) {
-+		idx = ((r->CRm & 3) << 3) | (r->Op2 & 7);
-+		if (idx == ARMV8_PMU_CYCLE_IDX)
-+			reg = PMCCFILTR_EL0;
-+		else
-+			/* PMEVTYPERn_EL0 */
-+			reg = PMEVTYPER0_EL0 + idx;
-+	} else {
-+		BUG();
-+	}
-+
-+	if (!pmu_counter_idx_valid(vcpu, idx))
-+		return false;
-+
 +	if (p->is_write) {
-+		kvm_pmu_set_counter_event_type(vcpu, p->regval, idx);
-+		vcpu_sys_reg(vcpu, reg) = p->regval & ARMV8_PMU_EVTYPE_MASK;
++		u64 val = p->regval & mask;
++
++		if (r->Op2 & 0x1)
++			/* accessing PMINTENSET_EL1 */
++			vcpu_sys_reg(vcpu, PMINTENSET_EL1) |= val;
++		else
++			/* accessing PMINTENCLR_EL1 */
++			vcpu_sys_reg(vcpu, PMINTENSET_EL1) &= ~val;
 +	} else {
-+		p->regval = vcpu_sys_reg(vcpu, reg) & ARMV8_PMU_EVTYPE_MASK;
++		p->regval = vcpu_sys_reg(vcpu, PMINTENSET_EL1) & mask;
 +	}
 +
 +	return true;
 +}
 +
- static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 			   const struct sys_reg_desc *r)
- {
-@@ -612,6 +648,13 @@ static bool access_pmcnten(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	  CRm((0b1000 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
- 	  access_pmu_evcntr, reset_unknown, (PMEVCNTR0_EL0 + n), }
+ /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+ #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+ 	/* DBGBVRn_EL1 */						\
+@@ -784,10 +808,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
  
-+/* Macro to expand the PMEVTYPERn_EL0 register */
-+#define PMU_PMEVTYPER_EL0(n)						\
-+	/* PMEVTYPERn_EL0 */						\
-+	{ Op0(0b11), Op1(0b011), CRn(0b1110),				\
-+	  CRm((0b1100 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
-+	  access_pmu_evtyper, reset_unknown, (PMEVTYPER0_EL0 + n), }
-+
- /*
-  * Architected system registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-@@ -808,7 +851,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	  access_pmu_evcntr, reset_unknown, PMCCNTR_EL0 },
- 	/* PMXEVTYPER_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b001),
+ 	/* PMINTENSET_EL1 */
+ 	{ Op0(0b11), Op1(0b000), CRn(0b1001), CRm(0b1110), Op2(0b001),
 -	  trap_raz_wi },
-+	  access_pmu_evtyper },
- 	/* PMXEVCNTR_EL0 */
- 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1101), Op2(0b010),
- 	  access_pmu_evcntr },
-@@ -858,6 +901,44 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	PMU_PMEVCNTR_EL0(28),
- 	PMU_PMEVCNTR_EL0(29),
- 	PMU_PMEVCNTR_EL0(30),
-+	/* PMEVTYPERn_EL0 */
-+	PMU_PMEVTYPER_EL0(0),
-+	PMU_PMEVTYPER_EL0(1),
-+	PMU_PMEVTYPER_EL0(2),
-+	PMU_PMEVTYPER_EL0(3),
-+	PMU_PMEVTYPER_EL0(4),
-+	PMU_PMEVTYPER_EL0(5),
-+	PMU_PMEVTYPER_EL0(6),
-+	PMU_PMEVTYPER_EL0(7),
-+	PMU_PMEVTYPER_EL0(8),
-+	PMU_PMEVTYPER_EL0(9),
-+	PMU_PMEVTYPER_EL0(10),
-+	PMU_PMEVTYPER_EL0(11),
-+	PMU_PMEVTYPER_EL0(12),
-+	PMU_PMEVTYPER_EL0(13),
-+	PMU_PMEVTYPER_EL0(14),
-+	PMU_PMEVTYPER_EL0(15),
-+	PMU_PMEVTYPER_EL0(16),
-+	PMU_PMEVTYPER_EL0(17),
-+	PMU_PMEVTYPER_EL0(18),
-+	PMU_PMEVTYPER_EL0(19),
-+	PMU_PMEVTYPER_EL0(20),
-+	PMU_PMEVTYPER_EL0(21),
-+	PMU_PMEVTYPER_EL0(22),
-+	PMU_PMEVTYPER_EL0(23),
-+	PMU_PMEVTYPER_EL0(24),
-+	PMU_PMEVTYPER_EL0(25),
-+	PMU_PMEVTYPER_EL0(26),
-+	PMU_PMEVTYPER_EL0(27),
-+	PMU_PMEVTYPER_EL0(28),
-+	PMU_PMEVTYPER_EL0(29),
-+	PMU_PMEVTYPER_EL0(30),
-+	/* PMCCFILTR_EL0
-+	 * This register resets as unknown in 64bit mode while it resets as zero
-+	 * in 32bit mode. Here we choose to reset it as zero for consistency.
-+	 */
-+	{ Op0(0b11), Op1(0b011), CRn(0b1110), CRm(0b1111), Op2(0b111),
-+	  access_pmu_evtyper, reset_val, PMCCFILTR_EL0, 0 },
++	  access_pminten, reset_unknown, PMINTENSET_EL1 },
+ 	/* PMINTENCLR_EL1 */
+ 	{ Op0(0b11), Op1(0b000), CRn(0b1001), CRm(0b1110), Op2(0b010),
+-	  trap_raz_wi },
++	  access_pminten, NULL, PMINTENSET_EL1 },
  
- 	/* DACR32_EL2 */
- 	{ Op0(0b11), Op1(0b100), CRn(0b0011), CRm(0b0000), Op2(0b000),
-@@ -1055,6 +1136,13 @@ static const struct sys_reg_desc cp14_64_regs[] = {
- 	  CRm((0b1000 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
- 	  access_pmu_evcntr }
- 
-+/* Macro to expand the PMEVTYPERn register */
-+#define PMU_PMEVTYPER(n)						\
-+	/* PMEVTYPERn */						\
-+	{ Op1(0), CRn(0b1110),						\
-+	  CRm((0b1100 | (((n) >> 3) & 0x3))), Op2(((n) & 0x7)),		\
-+	  access_pmu_evtyper }
-+
- /*
-  * Trapped cp15 registers. TTBR0/TTBR1 get a double encoding,
-  * depending on the way they are accessed (as a 32bit or a 64bit
-@@ -1091,7 +1179,7 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
- 	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmceid },
- 	{ Op1( 0), CRn( 9), CRm(13), Op2( 0), access_pmu_evcntr },
--	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), trap_raz_wi },
-+	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_evtyper },
+ 	/* MAIR_EL1 */
+ 	{ Op0(0b11), Op1(0b000), CRn(0b1010), CRm(0b0010), Op2(0b000),
+@@ -1182,8 +1206,8 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	{ Op1( 0), CRn( 9), CRm(13), Op2( 1), access_pmu_evtyper },
  	{ Op1( 0), CRn( 9), CRm(13), Op2( 2), access_pmu_evcntr },
  	{ Op1( 0), CRn( 9), CRm(14), Op2( 0), trap_raz_wi },
- 	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), trap_raz_wi },
-@@ -1139,6 +1227,40 @@ static const struct sys_reg_desc cp15_regs[] = {
- 	PMU_PMEVCNTR(28),
- 	PMU_PMEVCNTR(29),
- 	PMU_PMEVCNTR(30),
-+	/* PMEVTYPERn */
-+	PMU_PMEVTYPER(0),
-+	PMU_PMEVTYPER(1),
-+	PMU_PMEVTYPER(2),
-+	PMU_PMEVTYPER(3),
-+	PMU_PMEVTYPER(4),
-+	PMU_PMEVTYPER(5),
-+	PMU_PMEVTYPER(6),
-+	PMU_PMEVTYPER(7),
-+	PMU_PMEVTYPER(8),
-+	PMU_PMEVTYPER(9),
-+	PMU_PMEVTYPER(10),
-+	PMU_PMEVTYPER(11),
-+	PMU_PMEVTYPER(12),
-+	PMU_PMEVTYPER(13),
-+	PMU_PMEVTYPER(14),
-+	PMU_PMEVTYPER(15),
-+	PMU_PMEVTYPER(16),
-+	PMU_PMEVTYPER(17),
-+	PMU_PMEVTYPER(18),
-+	PMU_PMEVTYPER(19),
-+	PMU_PMEVTYPER(20),
-+	PMU_PMEVTYPER(21),
-+	PMU_PMEVTYPER(22),
-+	PMU_PMEVTYPER(23),
-+	PMU_PMEVTYPER(24),
-+	PMU_PMEVTYPER(25),
-+	PMU_PMEVTYPER(26),
-+	PMU_PMEVTYPER(27),
-+	PMU_PMEVTYPER(28),
-+	PMU_PMEVTYPER(29),
-+	PMU_PMEVTYPER(30),
-+	/* PMCCFILTR */
-+	{ Op1(0), CRn(14), CRm(15), Op2(7), access_pmu_evtyper },
- };
+-	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), trap_raz_wi },
+-	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), trap_raz_wi },
++	{ Op1( 0), CRn( 9), CRm(14), Op2( 1), access_pminten },
++	{ Op1( 0), CRn( 9), CRm(14), Op2( 2), access_pminten },
  
- static const struct sys_reg_desc cp15_64_regs[] = {
+ 	{ Op1( 0), CRn(10), CRm( 2), Op2( 0), access_vm_reg, NULL, c10_PRRR },
+ 	{ Op1( 0), CRn(10), CRm( 2), Op2( 1), access_vm_reg, NULL, c10_NMRR },
 -- 
 2.1.4
