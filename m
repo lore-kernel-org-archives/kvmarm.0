@@ -1,22 +1,22 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: [PATCH 74/95] arm64: KVM: Free perf event of PMU when destroying vcpu
-Date: Wed,  9 Mar 2016 07:31:08 +0000
-Message-ID: <1457508689-19672-75-git-send-email-marc.zyngier@arm.com>
+Subject: [PATCH 69/95] arm64: KVM: Add access handler for PMSWINC register
+Date: Wed,  9 Mar 2016 07:31:03 +0000
+Message-ID: <1457508689-19672-70-git-send-email-marc.zyngier@arm.com>
 References: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E4DD948529
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:35:16 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E8E3049B9D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:35:02 -0500 (EST)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yJbLZin6jOZY for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Mar 2016 02:35:15 -0500 (EST)
+ with ESMTP id Ix5Gmhb89+bX for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  9 Mar 2016 02:35:01 -0500 (EST)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B112049B9E
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:35:15 -0500 (EST)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 677EA413E1
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 02:35:01 -0500 (EST)
 In-Reply-To: <1457508689-19672-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -33,81 +33,161 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Shannon Zhao <shannon.zhao@linaro.org>
 
-When KVM frees VCPU, it needs to free the perf_event of PMU.
+Add access handler which emulates writing and reading PMSWINC
+register and add support for creating software increment event.
 
 Signed-off-by: Shannon Zhao <shannon.zhao@linaro.org>
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
 Reviewed-by: Andrew Jones <drjones@redhat.com>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 ---
- arch/arm/kvm/arm.c    |  1 +
- include/kvm/arm_pmu.h |  2 ++
- virt/kvm/arm/pmu.c    | 21 +++++++++++++++++++++
- 3 files changed, 24 insertions(+)
+ arch/arm64/include/asm/kvm_host.h       |  1 +
+ arch/arm64/include/asm/kvm_perf_event.h |  2 ++
+ arch/arm64/kvm/sys_regs.c               | 20 ++++++++++++++++++-
+ include/kvm/arm_pmu.h                   |  2 ++
+ virt/kvm/arm/pmu.c                      | 34 +++++++++++++++++++++++++++++++++
+ 5 files changed, 58 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index c5e9591..9d133df 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -266,6 +266,7 @@ void kvm_arch_vcpu_free(struct kvm_vcpu *vcpu)
- 	kvm_mmu_free_memory_caches(vcpu);
- 	kvm_timer_vcpu_terminate(vcpu);
- 	kvm_vgic_vcpu_destroy(vcpu);
-+	kvm_pmu_vcpu_destroy(vcpu);
- 	kmem_cache_free(kvm_vcpu_cache, vcpu);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 6c61a2b..4001e85 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -129,6 +129,7 @@ enum vcpu_sysreg {
+ 	PMCNTENSET_EL0,	/* Count Enable Set Register */
+ 	PMINTENSET_EL1,	/* Interrupt Enable Set Register */
+ 	PMOVSSET_EL0,	/* Overflow Flag Status Set Register */
++	PMSWINC_EL0,	/* Software Increment Register */
+ 
+ 	/* 32bit specific registers. Keep them at the end of the range */
+ 	DACR32_EL2,	/* Domain Access Control Register */
+diff --git a/arch/arm64/include/asm/kvm_perf_event.h b/arch/arm64/include/asm/kvm_perf_event.h
+index d1c9d50..62fa60f 100644
+--- a/arch/arm64/include/asm/kvm_perf_event.h
++++ b/arch/arm64/include/asm/kvm_perf_event.h
+@@ -45,6 +45,8 @@
+ #define	ARMV8_PMU_EVTYPE_MASK	0xc80003ff	/* Mask for writable bits */
+ #define	ARMV8_PMU_EVTYPE_EVENT	0x3ff		/* Mask for EVENT bits */
+ 
++#define ARMV8_PMU_EVTYPE_EVENT_SW_INCR	0	/* Software increment event */
++
+ /*
+  * Event filters for PMUv3
+  */
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 6a774f9..10e5379 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -672,6 +672,23 @@ static bool access_pmovs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	return true;
  }
  
++static bool access_pmswinc(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			   const struct sys_reg_desc *r)
++{
++	u64 mask;
++
++	if (!kvm_arm_pmu_v3_ready(vcpu))
++		return trap_raz_wi(vcpu, p, r);
++
++	if (p->is_write) {
++		mask = kvm_pmu_valid_counter_mask(vcpu);
++		kvm_pmu_software_increment(vcpu, p->regval & mask);
++		return true;
++	}
++
++	return false;
++}
++
+ /* Silly macro to expand the DBG{BCR,BVR,WVR,WCR}n_EL1 registers in one go */
+ #define DBG_BCR_BVR_WCR_WVR_EL1(n)					\
+ 	/* DBGBVRn_EL1 */						\
+@@ -882,7 +899,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	  access_pmovs, NULL, PMOVSSET_EL0 },
+ 	/* PMSWINC_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b100),
+-	  trap_raz_wi },
++	  access_pmswinc, reset_unknown, PMSWINC_EL0 },
+ 	/* PMSELR_EL0 */
+ 	{ Op0(0b11), Op1(0b011), CRn(0b1001), CRm(0b1100), Op2(0b101),
+ 	  access_pmselr, reset_unknown, PMSELR_EL0 },
+@@ -1221,6 +1238,7 @@ static const struct sys_reg_desc cp15_regs[] = {
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 1), access_pmcnten },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 2), access_pmcnten },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 3), access_pmovs },
++	{ Op1( 0), CRn( 9), CRm(12), Op2( 4), access_pmswinc },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 5), access_pmselr },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 6), access_pmceid },
+ 	{ Op1( 0), CRn( 9), CRm(12), Op2( 7), access_pmceid },
 diff --git a/include/kvm/arm_pmu.h b/include/kvm/arm_pmu.h
-index b4993eb..9f87d71 100644
+index 60061da..348c4c9 100644
 --- a/include/kvm/arm_pmu.h
 +++ b/include/kvm/arm_pmu.h
-@@ -43,6 +43,7 @@ u64 kvm_pmu_get_counter_value(struct kvm_vcpu *vcpu, u64 select_idx);
- void kvm_pmu_set_counter_value(struct kvm_vcpu *vcpu, u64 select_idx, u64 val);
- u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
- void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu);
-+void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu);
+@@ -44,6 +44,7 @@ u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu);
  void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val);
  void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val);
  void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val);
-@@ -69,6 +70,7 @@ static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- static inline void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu) {}
-+static inline void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu) {}
++void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val);
+ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+ 				    u64 select_idx);
+ #else
+@@ -65,6 +66,7 @@ static inline u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
  static inline void kvm_pmu_disable_counter(struct kvm_vcpu *vcpu, u64 val) {}
  static inline void kvm_pmu_enable_counter(struct kvm_vcpu *vcpu, u64 val) {}
  static inline void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val) {}
++static inline void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val) {}
+ static inline void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu,
+ 						  u64 data, u64 select_idx) {}
+ #endif
 diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 1dbbc2c..9b83857 100644
+index 0232861..9fc775e 100644
 --- a/virt/kvm/arm/pmu.c
 +++ b/virt/kvm/arm/pmu.c
-@@ -101,6 +101,27 @@ void kvm_pmu_vcpu_reset(struct kvm_vcpu *vcpu)
- 	}
+@@ -180,6 +180,36 @@ void kvm_pmu_overflow_set(struct kvm_vcpu *vcpu, u64 val)
+ 		kvm_vcpu_kick(vcpu);
  }
  
 +/**
-+ * kvm_pmu_vcpu_destroy - free perf event of PMU for cpu
++ * kvm_pmu_software_increment - do software increment
 + * @vcpu: The vcpu pointer
-+ *
++ * @val: the value guest writes to PMSWINC register
 + */
-+void kvm_pmu_vcpu_destroy(struct kvm_vcpu *vcpu)
++void kvm_pmu_software_increment(struct kvm_vcpu *vcpu, u64 val)
 +{
 +	int i;
-+	struct kvm_pmu *pmu = &vcpu->arch.pmu;
++	u64 type, enable, reg;
 +
-+	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++) {
-+		struct kvm_pmc *pmc = &pmu->pmc[i];
++	if (val == 0)
++		return;
 +
-+		if (pmc->perf_event) {
-+			perf_event_disable(pmc->perf_event);
-+			perf_event_release_kernel(pmc->perf_event);
-+			pmc->perf_event = NULL;
++	enable = vcpu_sys_reg(vcpu, PMCNTENSET_EL0);
++	for (i = 0; i < ARMV8_PMU_CYCLE_IDX; i++) {
++		if (!(val & BIT(i)))
++			continue;
++		type = vcpu_sys_reg(vcpu, PMEVTYPER0_EL0 + i)
++		       & ARMV8_PMU_EVTYPE_EVENT;
++		if ((type == ARMV8_PMU_EVTYPE_EVENT_SW_INCR)
++		    && (enable & BIT(i))) {
++			reg = vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) + 1;
++			reg = lower_32_bits(reg);
++			vcpu_sys_reg(vcpu, PMEVCNTR0_EL0 + i) = reg;
++			if (!reg)
++				kvm_pmu_overflow_set(vcpu, BIT(i));
 +		}
 +	}
 +}
 +
- u64 kvm_pmu_valid_counter_mask(struct kvm_vcpu *vcpu)
+ static bool kvm_pmu_counter_is_enabled(struct kvm_vcpu *vcpu, u64 select_idx)
  {
- 	u64 val = vcpu_sys_reg(vcpu, PMCR_EL0) >> ARMV8_PMU_PMCR_N_SHIFT;
+ 	return (vcpu_sys_reg(vcpu, PMCR_EL0) & ARMV8_PMU_PMCR_E) &&
+@@ -208,6 +238,10 @@ void kvm_pmu_set_counter_event_type(struct kvm_vcpu *vcpu, u64 data,
+ 	kvm_pmu_stop_counter(vcpu, pmc);
+ 	eventsel = data & ARMV8_PMU_EVTYPE_EVENT;
+ 
++	/* Software increment event does't need to be backed by a perf event */
++	if (eventsel == ARMV8_PMU_EVTYPE_EVENT_SW_INCR)
++		return;
++
+ 	memset(&attr, 0, sizeof(struct perf_event_attr));
+ 	attr.type = PERF_TYPE_RAW;
+ 	attr.size = sizeof(attr);
 -- 
 2.1.4
