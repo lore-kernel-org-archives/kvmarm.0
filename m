@@ -1,48 +1,118 @@
-From: Tomasz Nowicki <tn@semihalf.com>
-Subject: Re: [PATCH v3 00/16] KVM: arm64: GICv3 ITS emulation
-Date: Wed, 9 Mar 2016 12:35:26 +0100
-Message-ID: <56E00A7E.4080101@semihalf.com>
-References: <1444229726-31559-1-git-send-email-andre.przywara@arm.com>
+From: Jean-Philippe Brucker <Jean-Philippe.Brucker-5wv7dgnIgG8@public.gmane.org>
+Subject: Re: [RFC v5 06/17] dma-reserved-iommu: iommu_get/put_single_reserved
+Date: Thu, 10 Mar 2016 11:52:54 +0000
+Message-ID: <20160310115253.GA14609@e106794-lin.cambridge.arm.com>
+References: <1456856877-4817-1-git-send-email-eric.auger@linaro.org>
+	<1456856877-4817-7-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E767C41390
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 06:35:32 -0500 (EST)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id NtNrs+Ph1oi8 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  9 Mar 2016 06:35:32 -0500 (EST)
-Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E0DDB412C2
- for <kvmarm@lists.cs.columbia.edu>; Wed,  9 Mar 2016 06:35:31 -0500 (EST)
-Received: by mail-wm0-f45.google.com with SMTP id l68so188434954wml.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 09 Mar 2016 03:35:36 -0800 (PST)
-In-Reply-To: <1444229726-31559-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, marc.zyngier@arm.com, christoffer.dall@linaro.org
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+Content-Disposition: inline
+In-Reply-To: <1456856877-4817-7-git-send-email-eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Cc: eric.auger-qxv4g6HH51o@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
+Hi Eric,
 
-Forgive me if anybody already asked this question for previous series 
-versions.
+On Tue, Mar 01, 2016 at 06:27:46PM +0000, Eric Auger wrote:
+>[...]
+> +
+> +int iommu_get_single_reserved(struct iommu_domain *domain,
+> +			      phys_addr_t addr, int prot,
+> +			      dma_addr_t *iova)
+> +{
+> +	unsigned long order = __ffs(domain->ops->pgsize_bitmap);
+> +	size_t page_size = 1 << order;
+> +	phys_addr_t mask = page_size - 1;
+> +	phys_addr_t aligned_addr = addr & ~mask;
+> +	phys_addr_t offset  = addr - aligned_addr;
+> +	struct iommu_reserved_binding *b;
+> +	struct iova *p_iova;
+> +	struct iova_domain *iovad =
+> +		(struct iova_domain *)domain->reserved_iova_cookie;
+> +	int ret;
+> +
+> +	if (!iovad)
+> +		return -EINVAL;
+> +
+> +	mutex_lock(&domain->reserved_mutex);
 
-The review is still pending so it is worth to ask. What is your idea for 
-saving and restoring vITS state? I notice device, itte and collection 
-linked lists which are essential for vITS state. Of course it is not 
-feasible to transfer these list to e.g. QEMU using 
-KVM_{GET|SET}_DEVICE_ATTR.
+I believe this function could get called from the chunk of __setup_irq
+that is executed atomically:
 
-Regards,
-Tomasz
+    * request_threaded_irq
+    * __setup_irq
+    * irq_startup
+    * irq_domain_activate_irq
+    * msi_domain_activate
+    * msi_compose
+    * iommu_get_single_reserved
+
+If this is the case, we should probably use a spinlock to protect the
+iova_domain...
+
+> +
+> +	b = find_reserved_binding(domain, aligned_addr, page_size);
+> +	if (b) {
+> +		*iova = b->iova + offset;
+> +		kref_get(&b->kref);
+> +		ret = 0;
+> +		goto unlock;
+> +	}
+> +
+> +	/* there is no existing reserved iova for this pa */
+> +	p_iova = alloc_iova(iovad, 1, iovad->dma_32bit_pfn, true);
+> +	if (!p_iova) {
+> +		ret = -ENOMEM;
+> +		goto unlock;
+> +	}
+> +	*iova = p_iova->pfn_lo << order;
+> +
+> +	b = kzalloc(sizeof(*b), GFP_KERNEL);
+
+... and GFP_ATOMIC here.
+
+Thanks,
+Jean-Philippe
+
+> +	if (!b) {
+> +		ret = -ENOMEM;
+> +		goto free_iova_unlock;
+> +	}
+> +
+> +	ret = iommu_map(domain, *iova, aligned_addr, page_size, prot);
+> +	if (ret)
+> +		goto free_binding_iova_unlock;
+> +
+> +	kref_init(&b->kref);
+> +	kref_get(&b->kref);
+> +	b->domain = domain;
+> +	b->addr = aligned_addr;
+> +	b->iova = *iova;
+> +	b->size = page_size;
+> +
+> +	link_reserved_binding(domain, b);
+> +
+> +	*iova += offset;
+> +	goto unlock;
+> +
+> +free_binding_iova_unlock:
+> +	kfree(b);
+> +free_iova_unlock:
+> +	free_iova(iovad, *iova >> order);
+> +unlock:
+> +	mutex_unlock(&domain->reserved_mutex);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_get_single_reserved);
