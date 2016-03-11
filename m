@@ -1,118 +1,53 @@
-From: Jean-Philippe Brucker <Jean-Philippe.Brucker-5wv7dgnIgG8@public.gmane.org>
-Subject: Re: [RFC v5 06/17] dma-reserved-iommu: iommu_get/put_single_reserved
-Date: Thu, 10 Mar 2016 11:52:54 +0000
-Message-ID: <20160310115253.GA14609@e106794-lin.cambridge.arm.com>
-References: <1456856877-4817-1-git-send-email-eric.auger@linaro.org>
-	<1456856877-4817-7-git-send-email-eric.auger@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-Content-Disposition: inline
-In-Reply-To: <1456856877-4817-7-git-send-email-eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Cc: eric.auger-qxv4g6HH51o@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH] kvmtool: arm: move PMU support into arm64 only
+Date: Fri, 11 Mar 2016 06:28:12 +0000
+Message-ID: <1457677692-23009-1-git-send-email-andre.przywara@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Will Deacon <will.deacon@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Riku Voipoi <riku.voipio@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
+We only support the PMU emulation for arm64 at the moment, so lets
+only compile the support there.
+This fixes compilation for arm.
 
-On Tue, Mar 01, 2016 at 06:27:46PM +0000, Eric Auger wrote:
->[...]
-> +
-> +int iommu_get_single_reserved(struct iommu_domain *domain,
-> +			      phys_addr_t addr, int prot,
-> +			      dma_addr_t *iova)
-> +{
-> +	unsigned long order = __ffs(domain->ops->pgsize_bitmap);
-> +	size_t page_size = 1 << order;
-> +	phys_addr_t mask = page_size - 1;
-> +	phys_addr_t aligned_addr = addr & ~mask;
-> +	phys_addr_t offset  = addr - aligned_addr;
-> +	struct iommu_reserved_binding *b;
-> +	struct iova *p_iova;
-> +	struct iova_domain *iovad =
-> +		(struct iova_domain *)domain->reserved_iova_cookie;
-> +	int ret;
-> +
-> +	if (!iovad)
-> +		return -EINVAL;
-> +
-> +	mutex_lock(&domain->reserved_mutex);
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Reported-by: Riku Voipoi <riku.voipio@linaro.org>
+---
+Hi Will,
 
-I believe this function could get called from the chunk of __setup_irq
-that is executed atomically:
+this is one solution of the problem, not sure we should rather fix
+this probably by making it work for arm too.
 
-    * request_threaded_irq
-    * __setup_irq
-    * irq_startup
-    * irq_domain_activate_irq
-    * msi_domain_activate
-    * msi_compose
-    * iommu_get_single_reserved
+Cheers,
+Andre
 
-If this is the case, we should probably use a spinlock to protect the
-iova_domain...
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> +
-> +	b = find_reserved_binding(domain, aligned_addr, page_size);
-> +	if (b) {
-> +		*iova = b->iova + offset;
-> +		kref_get(&b->kref);
-> +		ret = 0;
-> +		goto unlock;
-> +	}
-> +
-> +	/* there is no existing reserved iova for this pa */
-> +	p_iova = alloc_iova(iovad, 1, iovad->dma_32bit_pfn, true);
-> +	if (!p_iova) {
-> +		ret = -ENOMEM;
-> +		goto unlock;
-> +	}
-> +	*iova = p_iova->pfn_lo << order;
-> +
-> +	b = kzalloc(sizeof(*b), GFP_KERNEL);
+diff --git a/Makefile b/Makefile
+index 1f0196f..8f3477a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -153,8 +153,7 @@ endif
+ 
+ # ARM
+ OBJS_ARM_COMMON		:= arm/fdt.o arm/gic.o arm/ioport.o arm/irq.o \
+-			   arm/kvm.o arm/kvm-cpu.o arm/pci.o arm/timer.o \
+-			   arm/pmu.o
++			   arm/kvm.o arm/kvm-cpu.o arm/pci.o arm/timer.o
+ HDRS_ARM_COMMON		:= arm/include
+ ifeq ($(ARCH), arm)
+ 	DEFINES		+= -DCONFIG_ARM
+@@ -174,6 +173,7 @@ ifeq ($(ARCH), arm64)
+ 	OBJS		+= $(OBJS_ARM_COMMON)
+ 	OBJS		+= arm/aarch64/arm-cpu.o
+ 	OBJS		+= arm/aarch64/kvm-cpu.o
++	OBJS		+= arm/pmu.o
+ 	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
+ 	ARCH_INCLUDE	+= -Iarm/aarch64/include
+ 
+-- 
+2.6.4
 
-... and GFP_ATOMIC here.
-
-Thanks,
-Jean-Philippe
-
-> +	if (!b) {
-> +		ret = -ENOMEM;
-> +		goto free_iova_unlock;
-> +	}
-> +
-> +	ret = iommu_map(domain, *iova, aligned_addr, page_size, prot);
-> +	if (ret)
-> +		goto free_binding_iova_unlock;
-> +
-> +	kref_init(&b->kref);
-> +	kref_get(&b->kref);
-> +	b->domain = domain;
-> +	b->addr = aligned_addr;
-> +	b->iova = *iova;
-> +	b->size = page_size;
-> +
-> +	link_reserved_binding(domain, b);
-> +
-> +	*iova += offset;
-> +	goto unlock;
-> +
-> +free_binding_iova_unlock:
-> +	kfree(b);
-> +free_iova_unlock:
-> +	free_iova(iovad, *iova >> order);
-> +unlock:
-> +	mutex_unlock(&domain->reserved_mutex);
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(iommu_get_single_reserved);
