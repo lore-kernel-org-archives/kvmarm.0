@@ -1,53 +1,84 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH] kvmtool: arm: move PMU support into arm64 only
-Date: Fri, 11 Mar 2016 06:28:12 +0000
-Message-ID: <1457677692-23009-1-git-send-email-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
-Sender: kvm-owner@vger.kernel.org
-To: Will Deacon <will.deacon@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, Riku Voipoi <riku.voipio@linaro.org>
+From: Fernando Endo <fernando.endo2@gmail.com>
+Subject: [Question] Linux 3.10 supporting AArch64 KVM
+Date: Sat, 12 Mar 2016 12:22:17 +0100
+Message-ID: <CAG=tD+-ChHd4c+f0Y8PGcJUpb32nWSv34yfNDwY3JEU7AV+KQg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: multipart/mixed; boundary="===============1325801373717811695=="
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 96D9140FA2
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Mar 2016 06:22:07 -0500 (EST)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id qUJhrkIm6dDq for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 12 Mar 2016 06:22:05 -0500 (EST)
+Received: from mail-oi0-f53.google.com (mail-oi0-f53.google.com
+ [209.85.218.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 88EE840F90
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Mar 2016 06:22:05 -0500 (EST)
+Received: by mail-oi0-f53.google.com with SMTP id c203so103597619oia.2
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 12 Mar 2016 03:22:17 -0800 (PST)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We only support the PMU emulation for arm64 at the moment, so lets
-only compile the support there.
-This fixes compilation for arm.
+--===============1325801373717811695==
+Content-Type: multipart/alternative; boundary=001a113ceea699c9ee052dd84262
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reported-by: Riku Voipoi <riku.voipio@linaro.org>
----
-Hi Will,
+--001a113ceea699c9ee052dd84262
+Content-Type: text/plain; charset=UTF-8
 
-this is one solution of the problem, not sure we should rather fix
-this probably by making it work for arm too.
+Hello,
 
-Cheers,
-Andre
+I'd like to know what kernel versions KVM is known to work for AArch64.
+More specifically, if the Linux 3.10 of the Nvidia Tegra TX1 could support
+KVM.
 
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The released 3.10 kernel does not have the KVM flags enabled, so I suspect
+that this version does not actually support KVM for AArch64.
 
-diff --git a/Makefile b/Makefile
-index 1f0196f..8f3477a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -153,8 +153,7 @@ endif
- 
- # ARM
- OBJS_ARM_COMMON		:= arm/fdt.o arm/gic.o arm/ioport.o arm/irq.o \
--			   arm/kvm.o arm/kvm-cpu.o arm/pci.o arm/timer.o \
--			   arm/pmu.o
-+			   arm/kvm.o arm/kvm-cpu.o arm/pci.o arm/timer.o
- HDRS_ARM_COMMON		:= arm/include
- ifeq ($(ARCH), arm)
- 	DEFINES		+= -DCONFIG_ARM
-@@ -174,6 +173,7 @@ ifeq ($(ARCH), arm64)
- 	OBJS		+= $(OBJS_ARM_COMMON)
- 	OBJS		+= arm/aarch64/arm-cpu.o
- 	OBJS		+= arm/aarch64/kvm-cpu.o
-+	OBJS		+= arm/pmu.o
- 	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
- 	ARCH_INCLUDE	+= -Iarm/aarch64/include
- 
--- 
-2.6.4
+Thanks in advance,
 
+--
+Fernando A. Endo, Post-doc
+
+INRIA Rennes-Bretagne Atlantique
+France
+
+--001a113ceea699c9ee052dd84262
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Hello,</div><div><br></div><div>I&#39;d like to know =
+what kernel versions KVM is known to work for AArch64. More specifically, i=
+f the Linux 3.10 of the Nvidia Tegra TX1 could support KVM.</div><div><br><=
+/div><div>The released 3.10 kernel does not have the KVM flags enabled, so =
+I suspect that this version does not actually support KVM for AArch64.</div=
+><div><br></div><div>Thanks in advance,</div><br clear=3D"all"><div><div cl=
+ass=3D"gmail_signature"><div dir=3D"ltr"><div>--<br>Fernando A. Endo, Post-=
+doc<br><br>INRIA Rennes-Bretagne Atlantique<br>France<br><br></div></div></=
+div></div>
+</div>
+
+--001a113ceea699c9ee052dd84262--
+
+--===============1325801373717811695==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+_______________________________________________
+kvmarm mailing list
+kvmarm@lists.cs.columbia.edu
+https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+
+--===============1325801373717811695==--
