@@ -1,41 +1,58 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 00/16] KVM: arm64: GICv3 ITS emulation
-Date: Sun, 13 Mar 2016 19:16:08 +0100
-Message-ID: <20160313181608.GA15988@cbox>
-References: <1444229726-31559-1-git-send-email-andre.przywara@arm.com>
- <56E00A7E.4080101@semihalf.com>
+Subject: Re: [Question] Linux 3.10 supporting AArch64 KVM
+Date: Sun, 13 Mar 2016 19:18:52 +0100
+Message-ID: <20160313181852.GB15988@cbox>
+References: <CAG=tD+-ChHd4c+f0Y8PGcJUpb32nWSv34yfNDwY3JEU7AV+KQg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DBFFE40FA7
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Mar 2016 14:18:23 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id dLXo0rfD7fd8 for <kvmarm@lists.cs.columbia.edu>;
+ Sun, 13 Mar 2016 14:18:22 -0400 (EDT)
+Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A52C540FA2
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Mar 2016 14:18:22 -0400 (EDT)
+Received: by mail-wm0-f49.google.com with SMTP id p65so76174222wmp.0
+ for <kvmarm@lists.cs.columbia.edu>; Sun, 13 Mar 2016 11:18:38 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <56E00A7E.4080101@semihalf.com>
-Sender: kvm-owner@vger.kernel.org
-To: Tomasz Nowicki <tn@semihalf.com>
-Cc: Andre Przywara <andre.przywara@arm.com>, marc.zyngier@arm.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+In-Reply-To: <CAG=tD+-ChHd4c+f0Y8PGcJUpb32nWSv34yfNDwY3JEU7AV+KQg@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Fernando Endo <fernando.endo2@gmail.com>
+Cc: kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Mar 09, 2016 at 12:35:26PM +0100, Tomasz Nowicki wrote:
-> Hi Andre,
+On Sat, Mar 12, 2016 at 12:22:17PM +0100, Fernando Endo wrote:
+> Hello,
 > 
-> Forgive me if anybody already asked this question for previous
-> series versions.
+> I'd like to know what kernel versions KVM is known to work for AArch64.
+> More specifically, if the Linux 3.10 of the Nvidia Tegra TX1 could support
+> KVM.
 > 
-> The review is still pending so it is worth to ask. What is your idea
-> for saving and restoring vITS state? I notice device, itte and
-> collection linked lists which are essential for vITS state. Of
-> course it is not feasible to transfer these list to e.g. QEMU using
-> KVM_{GET|SET}_DEVICE_ATTR.
-> 
-If I recall correctly these items are the ones stored in memory on real
-hardware, and not in hardware registers.
+> The released 3.10 kernel does not have the KVM flags enabled, so I suspect
+> that this version does not actually support KVM for AArch64.
 
-We had an idea where userspace asks the kernel vgic to flush its
-internal cache into the memory allocated by the guest driver for the
-vITS data structures and then the state would be transferred across to
-the new VM via the memory transfer mechanism.
+I believe KVM for AArch64 was merged in 3.9, but it was a very early
+version of the code, so I wouldn't recommend basing anything off that.
 
-Only caveat there I think was that we had to decide on a storage format
-in those memory regions, to allow QEMU to understand the state and to
-ensure back/forwards compatibility between KVM versions.
+You could look at the backports for LSK 3.10
+(https://git.linaro.org/?p=kernel/linux-linaro-stable.git;a=shortlog;h=refs/heads/linux-linaro-lsk-v3.10)
+but I can't make any promises of the quality of that code.
+
+Does the Tegra TX1 board you have even boot Linux in EL2 or haven an
+open bootloader?  If not, I would expect this to be your biggest
+troubles.
 
 -Christoffer
