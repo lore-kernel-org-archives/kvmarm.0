@@ -1,22 +1,22 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [RFC PATCH 11/12] kvm-arm: Cleanup stage2 pgd handling
-Date: Mon, 14 Mar 2016 16:53:10 +0000
-Message-ID: <1457974391-28456-12-git-send-email-suzuki.poulose@arm.com>
+Subject: [RFC PATCH 05/12] kvm-arm: Move kvm_pud_huge to arch specific headers
+Date: Mon, 14 Mar 2016 16:53:04 +0000
+Message-ID: <1457974391-28456-6-git-send-email-suzuki.poulose@arm.com>
 References: <1457974391-28456-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8114E49B59
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Mar 2016 12:53:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2650749B3D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Mar 2016 12:53:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fUEWHhYEL7LK for <kvmarm@lists.cs.columbia.edu>;
- Mon, 14 Mar 2016 12:53:24 -0400 (EDT)
+ with ESMTP id YSFNpks-bfQQ for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 14 Mar 2016 12:53:11 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B011949B2F
- for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Mar 2016 12:53:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DAB049B53
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 14 Mar 2016 12:53:11 -0400 (EDT)
 In-Reply-To: <1457974391-28456-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,147 +31,52 @@ To: christoffer.dall@linaro.org, marc.zyngier@arm.com
 Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that we don't have any fake page table levels for arm64,
-cleanup the common code to get rid of the dead code.
+Move the kvm_pud_huge to asm/kvm_mmu.h, as on arm64, it would really
+depend on the number of page table levels on the table it deals with
+(hyp vs. stage2).
 
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm/include/asm/kvm_mmu.h   |   20 --------------------
- arch/arm/kvm/arm.c               |    2 +-
- arch/arm/kvm/mmu.c               |   25 ++++++++-----------------
- arch/arm64/include/asm/kvm_mmu.h |   18 ------------------
- 4 files changed, 9 insertions(+), 56 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h   |    1 +
+ arch/arm/kvm/mmu.c               |    1 -
+ arch/arm64/include/asm/kvm_mmu.h |    1 +
+ 3 files changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index e670afa..02b2b3d 100644
+index e2b2a5a..4448e77 100644
 --- a/arch/arm/include/asm/kvm_mmu.h
 +++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -254,26 +254,6 @@ static inline bool kvm_pud_table_empty(struct kvm *kvm, pud_t *pudp)
- 	return 0;
+@@ -135,6 +135,7 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
+ 	return (pmd_val(*pmd) & L_PMD_S2_RDWR) == L_PMD_S2_RDONLY;
  }
  
--
--static inline void *kvm_get_hwpgd(struct kvm *kvm)
--{
--	return kvm->arch.pgd;
--}
--
--static inline unsigned int kvm_get_hwpgd_size(void)
--{
--	return PTRS_PER_S2_PGD * sizeof(pgd_t);
--}
--
--static inline pgd_t *kvm_setup_fake_pgd(pgd_t *hwpgd)
--{
--	return hwpgd;
--}
--
--static inline void kvm_free_fake_pgd(pgd_t *pgd)
--{
--}
--
- struct kvm;
++#define kvm_pud_huge(_x)	pud_huge(_x)
  
- #define kvm_flush_dcache_to_poc(a,l)	__cpuc_flush_dcache_area((a), (l))
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index dda1959..a1443ef 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -443,7 +443,7 @@ static void update_vttbr(struct kvm *kvm)
- 	kvm_next_vmid &= (1 << kvm_vmid_bits) - 1;
- 
- 	/* update vttbr to be used with the new vmid */
--	pgd_phys = virt_to_phys(kvm_get_hwpgd(kvm));
-+	pgd_phys = virt_to_phys(kvm->arch.pgd);
- 	BUG_ON(pgd_phys & ~VTTBR_BADDR_MASK);
- 	vmid = ((u64)(kvm->arch.vmid) << VTTBR_VMID_SHIFT) & VTTBR_VMID_MASK(kvm_vmid_bits);
- 	kvm->arch.vttbr = pgd_phys | vmid;
+ /* Open coded p*d_addr_end that can deal with 64bit addresses */
+ #define kvm_pgd_addr_end(addr, end)					\
 diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 8568790..a283e7b 100644
+index 3b038bb..d1e9a71 100644
 --- a/arch/arm/kvm/mmu.c
 +++ b/arch/arm/kvm/mmu.c
-@@ -637,6 +637,11 @@ int create_hyp_io_mappings(void *from, void *to, phys_addr_t phys_addr)
- 				     __phys_to_pfn(phys_addr), PAGE_HYP_DEVICE);
- }
+@@ -45,7 +45,6 @@ static phys_addr_t hyp_idmap_vector;
+ #define hyp_pgd_order get_order(PTRS_PER_PGD * sizeof(pgd_t))
  
-+static inline unsigned int kvm_get_hwpgd_size(void)
-+{
-+	return PTRS_PER_S2_PGD * sizeof(pgd_t);
-+}
-+
- /* Free the HW pgd, one page at a time */
- static void kvm_free_hwpgd(void *hwpgd)
- {
-@@ -665,29 +670,16 @@ static void *kvm_alloc_hwpgd(void)
- int kvm_alloc_stage2_pgd(struct kvm *kvm)
- {
- 	pgd_t *pgd;
--	void *hwpgd;
+ #define huge_pmd(_x)		(pmd_huge(_x) || pmd_trans_huge(_x))
+-#define kvm_pud_huge(_x)	pud_huge(_x)
  
- 	if (kvm->arch.pgd != NULL) {
- 		kvm_err("kvm_arch already initialized?\n");
- 		return -EINVAL;
- 	}
- 
--	hwpgd = kvm_alloc_hwpgd();
--	if (!hwpgd)
-+	pgd = kvm_alloc_hwpgd();
-+	if (!pgd)
- 		return -ENOMEM;
- 
--	/*
--	 * When the kernel uses more levels of page tables than the
--	 * guest, we allocate a fake PGD and pre-populate it to point
--	 * to the next-level page table, which will be the real
--	 * initial page table pointed to by the VTTBR.
--	 */
--	pgd = kvm_setup_fake_pgd(hwpgd);
--	if (IS_ERR(pgd)) {
--		kvm_free_hwpgd(hwpgd);
--		return PTR_ERR(pgd);
--	}
--
- 	kvm_clean_pgd(pgd);
- 	kvm->arch.pgd = pgd;
- 	return 0;
-@@ -791,8 +783,7 @@ void kvm_free_stage2_pgd(struct kvm *kvm)
- 		return;
- 
- 	unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
--	kvm_free_hwpgd(kvm_get_hwpgd(kvm));
--	kvm_free_fake_pgd(kvm->arch.pgd);
-+	kvm_free_hwpgd(kvm->arch.pgd);
- 	kvm->arch.pgd = NULL;
- }
- 
+ #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
+ #define KVM_S2_FLAG_LOGGING_ACTIVE	(1UL << 1)
 diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index a6f9846..e998f63 100644
+index 07a09b2..a01d87d 100644
 --- a/arch/arm64/include/asm/kvm_mmu.h
 +++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -242,24 +242,6 @@ static inline phys_addr_t kvm_pgd_index(struct kvm *kvm, phys_addr_t addr)
- 	return kvm ? stage2_pgd_index(addr) : pgd_index(addr);
+@@ -141,6 +141,7 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
+ 	return (pmd_val(*pmd) & PMD_S2_RDWR) == PMD_S2_RDONLY;
  }
  
--static inline void *kvm_get_hwpgd(struct kvm *kvm)
--{
--	return kvm->arch.pgd;
--}
--
--static inline unsigned int kvm_get_hwpgd_size(void)
--{
--	return PTRS_PER_S2_PGD * sizeof(pgd_t);
--}
--
--static inline pgd_t *kvm_setup_fake_pgd(pgd_t *hwpgd)
--{
--	return hwpgd;
--}
--
--static inline void kvm_free_fake_pgd(pgd_t *pgd)
--{
--}
- static inline bool kvm_page_empty(void *ptr)
- {
- 	struct page *ptr_page = virt_to_page(ptr);
++#define kvm_pud_huge(_x)	pud_huge(_x)
+ 
+ #define kvm_pgd_addr_end(addr, end)	pgd_addr_end(addr, end)
+ #define kvm_pud_addr_end(addr, end)	pud_addr_end(addr, end)
 -- 
 1.7.9.5
