@@ -1,24 +1,26 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [Question] Linux 3.10 supporting AArch64 KVM
-Date: Tue, 15 Mar 2016 11:43:12 +0000
-Message-ID: <56E7F550.4030501@arm.com>
-References: <CAG=tD+-ChHd4c+f0Y8PGcJUpb32nWSv34yfNDwY3JEU7AV+KQg@mail.gmail.com>
- <20160313181852.GB15988@cbox>
+From: Julien Grall <julien.grall@arm.com>
+Subject: Re: [PATCH v3 5/9] irqchip/gic-v3: Gather all ACPI specific data in a
+ single structure
+Date: Tue, 15 Mar 2016 12:26:29 +0000
+Message-ID: <56E7FF75.7060701@arm.com>
+References: <1457436573-6180-1-git-send-email-julien.grall@arm.com>
+ <1457436573-6180-6-git-send-email-julien.grall@arm.com>
+ <20160309053930.GH26583@lvm>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B5A3C49B2E
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2016 07:42:56 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E37049AF5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2016 08:26:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KZpB1qR2vN3Q for <kvmarm@lists.cs.columbia.edu>;
- Tue, 15 Mar 2016 07:42:55 -0400 (EDT)
+ with ESMTP id xmgapVB5RY1L for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 15 Mar 2016 08:26:13 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6159949B2C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2016 07:42:54 -0400 (EDT)
-In-Reply-To: <20160313181852.GB15988@cbox>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 08DEE413E1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 15 Mar 2016 08:26:12 -0400 (EDT)
+In-Reply-To: <20160309053930.GH26583@lvm>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,45 +30,41 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, Fernando Endo <fernando.endo2@gmail.com>
-Cc: kvmarm@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, fu.wei@linaro.org, Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 13/03/16 18:18, Christoffer Dall wrote:
-> On Sat, Mar 12, 2016 at 12:22:17PM +0100, Fernando Endo wrote:
->> Hello,
->>
->> I'd like to know what kernel versions KVM is known to work for AArch64.
->> More specifically, if the Linux 3.10 of the Nvidia Tegra TX1 could support
->> KVM.
->>
->> The released 3.10 kernel does not have the KVM flags enabled, so I suspect
->> that this version does not actually support KVM for AArch64.
-> 
-> I believe KVM for AArch64 was merged in 3.9, but it was a very early
-> version of the code, so I wouldn't recommend basing anything off that.
+Hi Christoffer,
 
-That was KVM for AArch32. AArch64 support was merged in 3.11 IIRC. But I
-wouldn't want to run anything based on this indeed. We've fixed so many
-bugs it's not even funny!
+On 09/03/16 05:39, Christoffer Dall wrote:
+> On Tue, Mar 08, 2016 at 11:29:29AM +0000, Julien Grall wrote:
+>> Even though all the variables aren't marked with __initdata, they are
+>> only used during initialization. So the structure is marked with
+>> __initdata.
+>
+> Not sure I understand this commit message.
+>
+> As I see it, this commit includes two changes:
+>
+> 1. Mark the variables only used during init with __initdata
+>
+> 2. Move the variables into a structure
+>
+> If I get that right, can you argue for both changes?
 
-> 
-> You could look at the backports for LSK 3.10
-> (https://git.linaro.org/?p=kernel/linux-linaro-stable.git;a=shortlog;h=refs/heads/linux-linaro-lsk-v3.10)
-> but I can't make any promises of the quality of that code.
-> 
-> Does the Tegra TX1 board you have even boot Linux in EL2 or haven an
-> open bootloader?  If not, I would expect this to be your biggest
-> troubles.
+What about:
 
-I have seen traces indicating that the kernel is indeed entered at EL2.
-Also, mainline seems to run on TX1, at least to some extent.
+"The ACPI code requires to use global variables in order to collect 
+information from the tables.
 
-Fernando: if you're eager to try KVM on this system, mainline might be a
-much better option (assuming you don't need any of the fancy stuff).
+To make clear those variables are ACPI specific, gather all of them in a 
+single structure.
 
-Thanks,
+Furthermore, even if some of the variables are not marked with 
+__initdata, they are all only used during the initialization. Therefore, 
+the new variable, which hold the structure, can be marked __initdata."
 
-	M.
+Cheers,
+
 -- 
-Jazz is not dead. It just smells funny...
+Julien Grall
