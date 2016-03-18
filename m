@@ -1,25 +1,29 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC PATCH 03/12] arm64: kvm: Cleanup VTCR_EL2/VTTBR computation
-Date: Wed, 16 Mar 2016 15:45:07 +0000
-Message-ID: <20160316154507.1281dc25@arm.com>
-References: <1457974391-28456-1-git-send-email-suzuki.poulose@arm.com>
- <1457974391-28456-4-git-send-email-suzuki.poulose@arm.com>
- <56E9755C.9090701@arm.com> <56E97DAE.2030704@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v3 00/16] KVM: arm64: GICv3 ITS emulation
+Date: Fri, 18 Mar 2016 10:38:19 +0100
+Message-ID: <20160318093819.GB10806@cbox>
+References: <1444229726-31559-1-git-send-email-andre.przywara@arm.com>
+ <56E00A7E.4080101@semihalf.com> <20160313181608.GA15988@cbox>
+ <56E69CCA.5070407@arm.com>
+ <CAFEAcA8r5LDbNG0XVnHnsoYcrfcpfnR3FQ_u=-L7Dop1HFVgxw@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 472B749B61
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2016 11:44:54 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B5AA49B56
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2016 05:37:32 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 5FMFmlKSED5p for <kvmarm@lists.cs.columbia.edu>;
- Wed, 16 Mar 2016 11:44:48 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 72A8549B56
- for <kvmarm@lists.cs.columbia.edu>; Wed, 16 Mar 2016 11:44:48 -0400 (EDT)
-In-Reply-To: <56E97DAE.2030704@arm.com>
+ with ESMTP id eJeQM-ddnG+S for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 18 Mar 2016 05:37:31 -0400 (EDT)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id DD21549B4E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2016 05:37:30 -0400 (EDT)
+Received: by mail-wm0-f53.google.com with SMTP id l68so60249877wml.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 18 Mar 2016 02:37:59 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8r5LDbNG0XVnHnsoYcrfcpfnR3FQ_u=-L7Dop1HFVgxw@mail.gmail.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,48 +33,38 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "Suzuki K. Poulose" <Suzuki.Poulose@arm.com>
-Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, 16 Mar 2016 15:37:18 +0000
-"Suzuki K. Poulose" <Suzuki.Poulose@arm.com> wrote:
+On Mon, Mar 14, 2016 at 05:29:44PM +0000, Peter Maydell wrote:
+> On 14 March 2016 at 11:13, Andre Przywara <andre.przywara@arm.com> wrote:
+> > So I see two ways to fix this:
+> > 1.) we find a KVM specific way of letting userland save and restore the
+> > ITS tables directly
+> > 2.) we implement the BASER<n> registers, but still use our "cache" for
+> > normal operations. On demand we would serialize KVM's virtual ITS data
+> > structures and put them into the guest's memory, so they could be
+> > saved/restored from there.
+> 
+> I feel like we're rehashing a bunch of design choices we talked
+> through way back in the last-but-one Connect. I don't suppose
+> anybody wrote down our rationales from back then?
 
-> On 16/03/16 15:01, Marc Zyngier wrote:
-> > On 14/03/16 16:53, Suzuki K Poulose wrote:
-> >> No functional changes. Group the common bits for VCTR_EL2
-> >> initialisation for better readability. The granule size
-> >> and the entry level are controlled by the page size.
-> 
-> >>
-> >> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> >> index b7d61e4..d49dd50 100644
-> >> --- a/arch/arm64/include/asm/kvm_arm.h
-> >> +++ b/arch/arm64/include/asm/kvm_arm.h
-> >> @@ -139,32 +139,30 @@
-> >>    * The magic numbers used for VTTBR_X in this patch can be found in Tables
-> >>    * D4-23 and D4-25 in ARM DDI 0487A.b.
-> >>    */
-> 
-> ...
-> 
-> >>
-> >> +#define VTCR_EL2_FLAGS		(VTCR_EL2_TGRAN_FLAGS | VTCR_EL2_COMMON_BITS)
-> >> +#define VTTBR_X			((VTTBR_X_TGRAN_MAGIC) - VTCR_EL2_T0SZ_40B)
-> >
-> > Nit: spurious brackets.
->   
-> Will remove them.
-> 
-> > It would be nice to add an ARMv8 ARM reference to where the "magic"
-> > value is coming from.
-> 
-> That reference already exists in the code, see above.
+Someone (not me) had the task to write it down, I don't recall if that
+happened or not :)
 
-Ah, good point!
+> 
+> (In particular I forget whether we decided the ITS tables were
+> large enough to need to allow some sort of before-the-VM-stops
+> migration of the data, which would be relatively doable with
+> option 2 but painful under option 1.)
 
-Thanks,
+I think we concluded that it's not so much data that applying dirty
+bitmaps stuff on there is strictly necessary, but that being able to do
+this was probably a plus, and not very hard to do.
 
-	M.
--- 
-Jazz is not dead. It just smells funny.
+I am quite sure that we dismissed option 1, and were decided on option 2
+though.
+
+-Christoffer
