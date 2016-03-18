@@ -1,84 +1,56 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 00/16] KVM: arm64: GICv3 ITS emulation
-Date: Fri, 18 Mar 2016 10:40:29 +0100
-Message-ID: <20160318094029.GC10806@cbox>
-References: <1444229726-31559-1-git-send-email-andre.przywara@arm.com>
- <56E00A7E.4080101@semihalf.com>
- <20160313181608.GA15988@cbox>
- <56E69CCA.5070407@arm.com>
- <CAFEAcA8r5LDbNG0XVnHnsoYcrfcpfnR3FQ_u=-L7Dop1HFVgxw@mail.gmail.com>
- <56E6FAEB.1090306@arm.com>
- <56E700F4.4060308@arm.com>
+Subject: Re: [PATCH v3 5/9] irqchip/gic-v3: Gather all ACPI specific data in
+ a single structure
+Date: Fri, 18 Mar 2016 10:42:06 +0100
+Message-ID: <20160318094206.GD10806@cbox>
+References: <1457436573-6180-1-git-send-email-julien.grall@arm.com>
+ <1457436573-6180-6-git-send-email-julien.grall@arm.com>
+ <20160309053930.GH26583@lvm>
+ <56E7FF75.7060701@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <56E700F4.4060308@arm.com>
+In-Reply-To: <56E7FF75.7060701@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Peter Maydell <peter.maydell@linaro.org>, Tomasz Nowicki <tn@semihalf.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
+To: Julien Grall <julien.grall@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, fu.wei@linaro.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, wei@redhat.com, al.stone@linaro.org, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Mar 14, 2016 at 06:20:36PM +0000, Andre Przywara wrote:
-> Hi,
+On Tue, Mar 15, 2016 at 12:26:29PM +0000, Julien Grall wrote:
+> Hi Christoffer,
 > 
-> On 14/03/16 17:54, Marc Zyngier wrote:
-> > On 14/03/16 17:29, Peter Maydell wrote:
-> >> On 14 March 2016 at 11:13, Andre Przywara <andre.przywara@arm.com> wrote:
-> >>> So I see two ways to fix this:
-> >>> 1.) we find a KVM specific way of letting userland save and restore the
-> >>> ITS tables directly
-> >>> 2.) we implement the BASER<n> registers, but still use our "cache" for
-> >>> normal operations. On demand we would serialize KVM's virtual ITS data
-> >>> structures and put them into the guest's memory, so they could be
-> >>> saved/restored from there.
-> >>
-> >> I feel like we're rehashing a bunch of design choices we talked
-> >> through way back in the last-but-one Connect. I don't suppose
-> >> anybody wrote down our rationales from back then?
-> >>
-> >> (In particular I forget whether we decided the ITS tables were
-> >> large enough to need to allow some sort of before-the-VM-stops
-> >> migration of the data, which would be relatively doable with
-> >> option 2 but painful under option 1.)
-> > 
-> > I think only option 2 is valid here, and we must be able to shove most
-> > of the routing information in the device/collection/IT tables. Common HW
-> > seems to use 64bit of data per entry per table, so we should be able to
-> > do the same with KVM.
+> On 09/03/16 05:39, Christoffer Dall wrote:
+> >On Tue, Mar 08, 2016 at 11:29:29AM +0000, Julien Grall wrote:
+> >>Even though all the variables aren't marked with __initdata, they are
+> >>only used during initialization. So the structure is marked with
+> >>__initdata.
+> >
+> >Not sure I understand this commit message.
+> >
+> >As I see it, this commit includes two changes:
+> >
+> >1. Mark the variables only used during init with __initdata
+> >
+> >2. Move the variables into a structure
+> >
+> >If I get that right, can you argue for both changes?
 > 
-> All right, just skimmed over this and it looks doable.
-> For the collection table we will most likely even get away with 32 bits
-> per entry (compressed MPIDR or even VCPUIDs).
-> Would the IPA of the ITTE suffice for each device table entry?
+> What about:
 > 
-> I will work out the details later.
+> "The ACPI code requires to use global variables in order to collect
+> information from the tables.
 > 
-> >>>> Only caveat there I think was that we had to decide on a storage format
-> >>>> in those memory regions, to allow QEMU to understand the state and to
-> >>>> ensure back/forwards compatibility between KVM versions.
-> >>>
-> >>> Do we need QEMU to actually understand this? Can't we just leave this
-> >>> all to the kernel and QEMU just passes on the data? That would still
-> >>> require some ABI stability between kernel versions in this respect, but
-> >>> it's less problematic than exposing the data format to userland at all.
-> >>
-> >> This would preclude ever being able to migrate a VM from KVM to
-> >> TCG QEMU, which seems a shame. (That doesn't work right now, but
-> >> I'm a bit wary of shutting the door to it forever.)
-> > 
-> > If the format of the migrated tables becomes ABI for KVM, it also
-> > becomes ABI for userspace (anything that comes out of the kernel *is*
-> > ABI). Andre, can you please explain what you mean?
+> To make clear those variables are ACPI specific, gather all of them
+> in a single structure.
 > 
-> Well, probably there is not so much difference. I was just wondering if
-> it would be easier to treat that data as an opaque blob.
-> But you are probably right that it would just mean the difference
-> between documenting the format or not.
+> Furthermore, even if some of the variables are not marked with
+> __initdata, they are all only used during the initialization.
+> Therefore, the new variable, which hold the structure, can be marked
+> __initdata."
 > 
+Looks ok (the part about some of the variables not marked with
+__initdata is confusing but I think I understand what you mean).
 
-Even ignoring the migrate-to-TCG case, you cannot treat it as a blob,
-because you want to be able to migrate between KVM on kernel version X
-and version Y.
-
+Thanks,
 -Christoffer
