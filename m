@@ -1,56 +1,35 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 5/9] irqchip/gic-v3: Gather all ACPI specific data in
- a single structure
-Date: Fri, 18 Mar 2016 10:42:06 +0100
-Message-ID: <20160318094206.GD10806@cbox>
-References: <1457436573-6180-1-git-send-email-julien.grall@arm.com>
- <1457436573-6180-6-git-send-email-julien.grall@arm.com>
- <20160309053930.GH26583@lvm>
- <56E7FF75.7060701@arm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v3 00/16] KVM: arm64: GICv3 ITS emulation
+Date: Fri, 18 Mar 2016 17:14:24 +0000
+Message-ID: <CAFEAcA95vZD0NvvE5WOKjEdYtebY+gjhDxk+PH5KSG9A8GgRiw@mail.gmail.com>
+References: <1444229726-31559-1-git-send-email-andre.przywara@arm.com>
+ <56E00A7E.4080101@semihalf.com> <20160313181608.GA15988@cbox>
+ <56E69CCA.5070407@arm.com> <CAFEAcA8r5LDbNG0XVnHnsoYcrfcpfnR3FQ_u=-L7Dop1HFVgxw@mail.gmail.com>
+ <56E6FAEB.1090306@arm.com> <56E700F4.4060308@arm.com> <20160318094029.GC10806@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
 Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <56E7FF75.7060701@arm.com>
+In-Reply-To: <20160318094029.GC10806@cbox>
 Sender: kvm-owner@vger.kernel.org
-To: Julien Grall <julien.grall@arm.com>
-Cc: kvmarm@lists.cs.columbia.edu, marc.zyngier@arm.com, fu.wei@linaro.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, wei@redhat.com, al.stone@linaro.org, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Andre Przywara <andre.przywara@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Tomasz Nowicki <tn@semihalf.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 15, 2016 at 12:26:29PM +0000, Julien Grall wrote:
-> Hi Christoffer,
-> 
-> On 09/03/16 05:39, Christoffer Dall wrote:
-> >On Tue, Mar 08, 2016 at 11:29:29AM +0000, Julien Grall wrote:
-> >>Even though all the variables aren't marked with __initdata, they are
-> >>only used during initialization. So the structure is marked with
-> >>__initdata.
-> >
-> >Not sure I understand this commit message.
-> >
-> >As I see it, this commit includes two changes:
-> >
-> >1. Mark the variables only used during init with __initdata
-> >
-> >2. Move the variables into a structure
-> >
-> >If I get that right, can you argue for both changes?
-> 
-> What about:
-> 
-> "The ACPI code requires to use global variables in order to collect
-> information from the tables.
-> 
-> To make clear those variables are ACPI specific, gather all of them
-> in a single structure.
-> 
-> Furthermore, even if some of the variables are not marked with
-> __initdata, they are all only used during the initialization.
-> Therefore, the new variable, which hold the structure, can be marked
-> __initdata."
-> 
-Looks ok (the part about some of the variables not marked with
-__initdata is confusing but I think I understand what you mean).
+On 18 March 2016 at 09:40, Christoffer Dall <christoffer.dall@linaro.org> wrote:
+> On Mon, Mar 14, 2016 at 06:20:36PM +0000, Andre Przywara wrote:
+>> Well, probably there is not so much difference. I was just wondering if
+>> it would be easier to treat that data as an opaque blob.
+>> But you are probably right that it would just mean the difference
+>> between documenting the format or not.
 
-Thanks,
--Christoffer
+> Even ignoring the migrate-to-TCG case, you cannot treat it as a blob,
+> because you want to be able to migrate between KVM on kernel version X
+> and version Y.
+
+You could require userspace to treat it as an opaque blob, and
+transparently handle any version-upgrade within the kernel.
+I think having it be documented-to-userspace ABI makes it
+clearer that any format changes are a Big Deal, though.
+
+thanks
+-- PMM
