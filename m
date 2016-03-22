@@ -1,26 +1,23 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 1/3] KVM: arm/arm64: disable preemption when calling
- smp_call_function_many
-Date: Tue, 22 Mar 2016 09:19:34 +0100
-Message-ID: <1458634776-18388-2-git-send-email-christoffer.dall@linaro.org>
-References: <1458634776-18388-1-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 0/3] KVM/ARM Fixes for v4.6-rc1
+Date: Tue, 22 Mar 2016 09:19:33 +0100
+Message-ID: <1458634776-18388-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 66BD940FA6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 04:18:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B9ED40B40
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 04:18:37 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zToooluSronO for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Mar 2016 04:18:40 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6C2BB407AD
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 04:18:39 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id p65so151942097wmp.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 01:19:18 -0700 (PDT)
-In-Reply-To: <1458634776-18388-1-git-send-email-christoffer.dall@linaro.org>
+ with ESMTP id FbLgZYPdE5ko for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Mar 2016 04:18:36 -0400 (EDT)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 92D30407A5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 04:18:36 -0400 (EDT)
+Received: by mail-wm0-f42.google.com with SMTP id p65so151940527wmp.0
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 01:19:16 -0700 (PDT)
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,33 +28,41 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Eric Auger <eric.auger@linaro.org>
+The following changes since commit 643ad15d47410d37d43daf3ef1c8ac52c281efa5:
 
-Preemption must be disabled when calling smp_call_function_many
+  Merge branch 'mm-pkeys-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip (2016-03-20 19:08:56 -0700)
 
-Reported-by: bartosz.wawrzyniak@tieto.com
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- arch/arm/kvm/arm.c | 2 ++
- 1 file changed, 2 insertions(+)
+are available in the git repository at:
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 3e0fb66..6accd66 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -373,7 +373,9 @@ static void exit_vm_noop(void *info)
- 
- void force_vm_exit(const cpumask_t *mask)
- {
-+	preempt_disable();
- 	smp_call_function_many(mask, exit_vm_noop, NULL, true);
-+	preempt_enable();
- }
- 
- /**
--- 
-2.1.2.330.g565301e.dirty
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-4.6-rc1
+
+for you to fetch changes up to a6cdf1c08cbfe0818a3d8042844d75bf74fd82bd:
+
+  kvm: arm64: Disable compiler instrumentation for hypervisor code (2016-03-21 14:02:17 +0100)
+
+----------------------------------------------------------------
+KVM/ARM Changes for v4.6-rc1
+
+Second round of patches for v4.6-rc1, fixing a small handful of issue:
+ - disable preemption when calling smp_call_function_many
+ - Make kvm_ksym_ref work on VHE systems again after KASRL breakage
+ - Disable compiler instrumentation for hypervisor code that could make
+   KVM/arm64 blow up.
+
+----------------------------------------------------------------
+Catalin Marinas (1):
+      kvm: arm64: Disable compiler instrumentation for hypervisor code
+
+Eric Auger (1):
+      KVM: arm/arm64: disable preemption when calling smp_call_function_many
+
+Marc Zyngier (1):
+      arm64: KVM: Turn kvm_ksym_ref into a NOP on VHE
+
+ arch/arm/kvm/arm.c               | 2 ++
+ arch/arm64/include/asm/kvm_asm.h | 8 +++++++-
+ arch/arm64/kvm/hyp/Makefile      | 4 ++++
+ 3 files changed, 13 insertions(+), 1 deletion(-)
