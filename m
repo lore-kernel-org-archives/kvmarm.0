@@ -1,23 +1,26 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 0/3] KVM/ARM Fixes for v4.6-rc1
-Date: Tue, 22 Mar 2016 09:19:33 +0100
-Message-ID: <1458634776-18388-1-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 3/3] kvm: arm64: Disable compiler instrumentation for
+ hypervisor code
+Date: Tue, 22 Mar 2016 09:19:36 +0100
+Message-ID: <1458634776-18388-4-git-send-email-christoffer.dall@linaro.org>
+References: <1458634776-18388-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B9ED40B40
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 04:18:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 358FB40C9A
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 04:18:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id FbLgZYPdE5ko for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Mar 2016 04:18:36 -0400 (EDT)
-Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 92D30407A5
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 04:18:36 -0400 (EDT)
-Received: by mail-wm0-f42.google.com with SMTP id p65so151940527wmp.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 01:19:16 -0700 (PDT)
+ with ESMTP id g55qk2+luWxK for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Mar 2016 04:18:48 -0400 (EDT)
+Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5FAD040B40
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 04:18:48 -0400 (EDT)
+Received: by mail-wm0-f47.google.com with SMTP id r129so81032031wmr.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 01:19:27 -0700 (PDT)
+In-Reply-To: <1458634776-18388-1-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,41 +31,39 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The following changes since commit 643ad15d47410d37d43daf3ef1c8ac52c281efa5:
+From: Catalin Marinas <catalin.marinas@arm.com>
 
-  Merge branch 'mm-pkeys-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip (2016-03-20 19:08:56 -0700)
+With the recent rewrite of the arm64 KVM hypervisor code in C, enabling
+certain options like KASAN would allow the compiler to generate memory
+accesses or function calls to addresses not mapped at EL2. This patch
+disables the compiler instrumentation on the arm64 hypervisor code for
+gcov-based profiling (GCOV_KERNEL), undefined behaviour sanity checker
+(UBSAN) and kernel address sanitizer (KASAN).
 
-are available in the git repository at:
+Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: <stable@vger.kernel.org> # 4.5+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+---
+ arch/arm64/kvm/hyp/Makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-4.6-rc1
-
-for you to fetch changes up to a6cdf1c08cbfe0818a3d8042844d75bf74fd82bd:
-
-  kvm: arm64: Disable compiler instrumentation for hypervisor code (2016-03-21 14:02:17 +0100)
-
-----------------------------------------------------------------
-KVM/ARM Changes for v4.6-rc1
-
-Second round of patches for v4.6-rc1, fixing a small handful of issue:
- - disable preemption when calling smp_call_function_many
- - Make kvm_ksym_ref work on VHE systems again after KASRL breakage
- - Disable compiler instrumentation for hypervisor code that could make
-   KVM/arm64 blow up.
-
-----------------------------------------------------------------
-Catalin Marinas (1):
-      kvm: arm64: Disable compiler instrumentation for hypervisor code
-
-Eric Auger (1):
-      KVM: arm/arm64: disable preemption when calling smp_call_function_many
-
-Marc Zyngier (1):
-      arm64: KVM: Turn kvm_ksym_ref into a NOP on VHE
-
- arch/arm/kvm/arm.c               | 2 ++
- arch/arm64/include/asm/kvm_asm.h | 8 +++++++-
- arch/arm64/kvm/hyp/Makefile      | 4 ++++
- 3 files changed, 13 insertions(+), 1 deletion(-)
+diff --git a/arch/arm64/kvm/hyp/Makefile b/arch/arm64/kvm/hyp/Makefile
+index b6a8fc5..778d0ef 100644
+--- a/arch/arm64/kvm/hyp/Makefile
++++ b/arch/arm64/kvm/hyp/Makefile
+@@ -16,3 +16,7 @@ obj-$(CONFIG_KVM_ARM_HOST) += fpsimd.o
+ obj-$(CONFIG_KVM_ARM_HOST) += tlb.o
+ obj-$(CONFIG_KVM_ARM_HOST) += hyp-entry.o
+ obj-$(CONFIG_KVM_ARM_HOST) += s2-setup.o
++
++GCOV_PROFILE	:= n
++KASAN_SANITIZE	:= n
++UBSAN_SANITIZE	:= n
+-- 
+2.1.2.330.g565301e.dirty
