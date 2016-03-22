@@ -1,29 +1,23 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH 06/12] kvm-arm: Pass kvm parameter for pagetable
- helpers
-Date: Tue, 22 Mar 2016 11:30:07 +0100
-Message-ID: <20160322103007.GA21613@cbox>
-References: <1457974391-28456-1-git-send-email-suzuki.poulose@arm.com>
- <1457974391-28456-7-git-send-email-suzuki.poulose@arm.com>
- <20160322093037.GD21047@cbox> <56F11B2F.2080007@arm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PULL 0/3] KVM/ARM Fixes for v4.6-rc1
+Date: Tue, 22 Mar 2016 11:48:13 +0100
+Message-ID: <56F122ED.3000105@redhat.com>
+References: <1458634776-18388-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 063A740F9B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 06:29:02 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id AE5EB40F9B
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 06:47:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WifJTthBYOZ3 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 22 Mar 2016 06:29:01 -0400 (EDT)
-Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E7182409A2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 06:29:00 -0400 (EDT)
-Received: by mail-wm0-f54.google.com with SMTP id p65so185601381wmp.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 03:29:40 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <56F11B2F.2080007@arm.com>
+ with ESMTP id 1HlRa9MpG2Zf for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 22 Mar 2016 06:47:40 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 77BBB40BDA
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 22 Mar 2016 06:47:39 -0400 (EDT)
+In-Reply-To: <1458634776-18388-1-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,52 +27,50 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "Suzuki K. Poulose" <Suzuki.Poulose@arm.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Mar 22, 2016 at 10:15:11AM +0000, Suzuki K. Poulose wrote:
-> On 22/03/16 09:30, Christoffer Dall wrote:
-> >On Mon, Mar 14, 2016 at 04:53:05PM +0000, Suzuki K Poulose wrote:
-> >>Pass 'kvm' to existing kvm_p.d_* page table wrappers to prepare
-> >>them to choose between hyp and stage2 page table. No functional
-> >>changes yet. Also while at it, convert them to static inline
-> >>functions.
-> >
-> >I have to say that I'm not really crazy about the idea of having common
-> >hyp and stage2 code and having the pgtable macros change behavior
-> >depending on the type.
-> >
-> >Is it not so that that host pgtable macros will always be valid for the
-> >hyp mappings, because we have the same VA space available etc.?  It's
-> >just a matter of different page table entry attributes.
-> 
-> Yes, host pgtable macros are still used for hyp mappings, when kvm == NULL.
-> and we do use explicit accessors (stage2_xxx wherever possible with this series).
-> 
-> >
-> >Looking at arch/arm/kvm/mmu.c, it looks to me like we would get the
-> >cleanest separation by separating stuff that touches hyp page tables
-> >from stuff that touches stage2 page tables.
-> 
-> OK. Here are the routines which deal with both types:
-> 
-> unmap_range, unmap_p{u,m}ds, unmap_ptes, clear_p{g,u,m}_entry
-> 
-> Duplicating them won't be that much of trouble.
-> 
-> >Then you can get rid of the whole kvm_ prefix and directly use stage2
-> >accessors (which you may want to consider renaming to s2_) directly.
-> 
-> Right.
-> 
-> >
-> >I think we've seen in the past that the confusion from functions
-> >potentially touching both hyp and stage2 page tables is a bad thing and
-> >we should seek to avoid it.
-> 
-> OK, I will respin the series with the proposed changes.
-> 
-Great, thanks a lot!!
 
--Christoffer
+
+On 22/03/2016 09:19, Christoffer Dall wrote:
+> The following changes since commit 643ad15d47410d37d43daf3ef1c8ac52c281efa5:
+> 
+>   Merge branch 'mm-pkeys-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip (2016-03-20 19:08:56 -0700)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-4.6-rc1
+> 
+> for you to fetch changes up to a6cdf1c08cbfe0818a3d8042844d75bf74fd82bd:
+> 
+>   kvm: arm64: Disable compiler instrumentation for hypervisor code (2016-03-21 14:02:17 +0100)
+> 
+> ----------------------------------------------------------------
+> KVM/ARM Changes for v4.6-rc1
+> 
+> Second round of patches for v4.6-rc1, fixing a small handful of issue:
+>  - disable preemption when calling smp_call_function_many
+>  - Make kvm_ksym_ref work on VHE systems again after KASRL breakage
+>  - Disable compiler instrumentation for hypervisor code that could make
+>    KVM/arm64 blow up.
+> 
+> ----------------------------------------------------------------
+> Catalin Marinas (1):
+>       kvm: arm64: Disable compiler instrumentation for hypervisor code
+> 
+> Eric Auger (1):
+>       KVM: arm/arm64: disable preemption when calling smp_call_function_many
+> 
+> Marc Zyngier (1):
+>       arm64: KVM: Turn kvm_ksym_ref into a NOP on VHE
+> 
+>  arch/arm/kvm/arm.c               | 2 ++
+>  arch/arm64/include/asm/kvm_asm.h | 8 +++++++-
+>  arch/arm64/kvm/hyp/Makefile      | 4 ++++
+>  3 files changed, 13 insertions(+), 1 deletion(-)
+> 
+
+Pulled, thanks.
+
+Paolo
