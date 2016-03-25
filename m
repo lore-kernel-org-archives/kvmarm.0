@@ -1,23 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [RFC PATCH 37/45] KVM: arm/arm64: vgic-new: Add userland GIC CPU
- interface access
-Date: Fri, 25 Mar 2016 02:05:00 +0000
-Message-ID: <1458871508-17279-38-git-send-email-andre.przywara@arm.com>
+Subject: [RFC PATCH 39/45] KVM: arm/arm64: vgic-new: vgic_init: implement
+ vgic_create
+Date: Fri, 25 Mar 2016 02:05:02 +0000
+Message-ID: <1458871508-17279-40-git-send-email-andre.przywara@arm.com>
 References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3E578412D0
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2016 22:05:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7894749AFA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2016 22:05:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Q9EmHskE4SXn for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Mar 2016 22:05:21 -0400 (EDT)
+ with ESMTP id zHkv5etJSMhj for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Mar 2016 22:05:23 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C32B49B7C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2016 22:05:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8FA5F412DD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2016 22:05:23 -0400 (EDT)
 In-Reply-To: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,109 +32,124 @@ To: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@a
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
+From: Eric Auger <eric.auger@linaro.org>
+
+This patch implements the vgic_creation function which is
+called on CREATE_IRQCHIP VM IOCTL (v2 only) or KVM_CREATE_DEVICE
+
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- virt/kvm/arm/vgic/vgic_kvm_device.c | 72 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 71 insertions(+), 1 deletion(-)
+ include/kvm/vgic/vgic.h       |  1 +
+ virt/kvm/arm/vgic/vgic_init.c | 84 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 85 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic_kvm_device.c b/virt/kvm/arm/vgic/vgic_kvm_device.c
-index 2e2f8b6..7f78a16 100644
---- a/virt/kvm/arm/vgic/vgic_kvm_device.c
-+++ b/virt/kvm/arm/vgic/vgic_kvm_device.c
-@@ -17,8 +17,11 @@
- #include <kvm/vgic/vgic.h>
- #include <linux/uaccess.h>
+diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+index 1bc7b66..536582b 100644
+--- a/include/kvm/vgic/vgic.h
++++ b/include/kvm/vgic/vgic.h
+@@ -195,6 +195,7 @@ struct vgic_cpu {
+ };
+ 
+ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
++int kvm_vgic_create(struct kvm *kvm, u32 type);
+ int kvm_vgic_hyp_init(void);
+ 
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+diff --git a/virt/kvm/arm/vgic/vgic_init.c b/virt/kvm/arm/vgic/vgic_init.c
+index d7c50bb..80bf283 100644
+--- a/virt/kvm/arm/vgic/vgic_init.c
++++ b/virt/kvm/arm/vgic/vgic_init.c
+@@ -24,6 +24,90 @@
  #include <asm/kvm_mmu.h>
-+#include <linux/irqchip/arm-gic.h>
  #include "vgic.h"
  
-+#define GICC_ARCH_VERSION_V2		0x2
++/* CREATION */
 +
- /* common helpers */
- 
- static int vgic_ioaddr_overlap(struct kvm *kvm)
-@@ -252,6 +255,69 @@ void kvm_register_vgic_device(unsigned long type)
- 	}
- }
- 
-+static u32 vgic_read_vcpuif(struct kvm_vcpu *vcpu, int offset)
++/**
++ * kvm_vgic_create: triggered by the instantiation of the VGIC device by
++ * user space, either through the legacy ARM specific VM IOCTL (CREATE_IRQCHIP)
++ * or through the generic VM IOCTL, KVM_CREATE_DEVICE API.
++ * Completion can be tested by irqchip_in_kernel
++ */
++int kvm_vgic_create(struct kvm *kvm, u32 type)
 +{
-+	struct vgic_vmcr vmcr;
-+	u32 *field;
++	int i, vcpu_lock_idx = -1, ret;
++	struct kvm_vcpu *vcpu;
 +
-+	switch (offset) {
-+	case GIC_CPU_CTRL:
-+		field = &vmcr.ctlr;
-+		break;
-+	case GIC_CPU_PRIMASK:
-+		field = &vmcr.pmr;
-+		break;
-+	case GIC_CPU_BINPOINT:
-+		field = &vmcr.bpr;
-+		break;
-+	case GIC_CPU_ALIAS_BINPOINT:
-+		field = &vmcr.abpr;
-+		break;
-+	case GIC_CPU_IDENT:
-+		return (PRODUCT_ID_KVM << 20) |
-+		       (GICC_ARCH_VERSION_V2 << 16) |
-+		       (IMPLEMENTER_ARM << 0);
-+	default:
-+		return 0;
++	mutex_lock(&kvm->lock);
++
++	if (irqchip_in_kernel(kvm)) {
++		ret = -EEXIST;
++		goto out;
 +	}
 +
-+	vgic_get_vmcr(vcpu, &vmcr);
-+
-+	return *field;
-+}
-+
-+static bool vgic_write_vcpuif(struct kvm_vcpu *vcpu, int offset, u32 value)
-+{
-+	struct vgic_vmcr vmcr;
-+	u32 *field;
-+
-+	switch (offset) {
-+	case GIC_CPU_CTRL:
-+		field = &vmcr.ctlr;
-+		break;
-+	case GIC_CPU_PRIMASK:
-+		field = &vmcr.pmr;
-+		break;
-+	case GIC_CPU_BINPOINT:
-+		field = &vmcr.bpr;
-+		break;
-+	case GIC_CPU_ALIAS_BINPOINT:
-+		field = &vmcr.abpr;
-+		break;
-+	default:
-+		return false;
++	/*
++	 * This function is also called by the KVM_CREATE_IRQCHIP handler,
++	 * which had no chance yet to check the availability of the GICv2
++	 * emulation. So check this here again. KVM_CREATE_DEVICE does
++	 * the proper checks already.
++	 */
++	if (type == KVM_DEV_TYPE_ARM_VGIC_V2 &&
++		!kvm_vgic_global_state.can_emulate_gicv2) {
++		ret = -ENODEV;
++		goto out;
 +	}
 +
-+	vgic_get_vmcr(vcpu, &vmcr);
-+	if (*field == value)
-+		return false;
++	/*
++	 * Any time a vcpu is run, vcpu_load is called which tries to grab the
++	 * vcpu->mutex.  By grabbing the vcpu->mutex of all VCPUs we ensure
++	 * that no other VCPUs are run while we create the vgic.
++	 */
++	ret = -EBUSY;
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		if (!mutex_trylock(&vcpu->mutex))
++			goto out_unlock;
++		vcpu_lock_idx = i;
++	}
 +
-+	*field = value;
-+	vgic_set_vmcr(vcpu, &vmcr);
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		if (vcpu->arch.has_run_once)
++			goto out_unlock;
++	}
++	ret = 0;
 +
-+	return true;
++	if (type == KVM_DEV_TYPE_ARM_VGIC_V2)
++		kvm->arch.max_vcpus = VGIC_V2_MAX_CPUS;
++	else
++		kvm->arch.max_vcpus = VGIC_V3_MAX_CPUS;
++
++	if (atomic_read(&kvm->online_vcpus) > kvm->arch.max_vcpus) {
++		ret = -E2BIG;
++		goto out_unlock;
++	}
++
++	kvm->arch.vgic.in_kernel = true;
++	kvm->arch.vgic.vgic_model = type;
++
++	/*
++	 * kvm_vgic_global_state.vctrl_base is set on vgic probe (kvm_arch_init)
++	 * it is stored in distributor struct for asm save/restore purpose
++	 */
++	kvm->arch.vgic.vctrl_base = kvm_vgic_global_state.vctrl_base;
++
++	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
++	kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
++	kvm->arch.vgic.vgic_redist_base = VGIC_ADDR_UNDEF;
++
++out_unlock:
++	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
++		vcpu = kvm_get_vcpu(kvm, vcpu_lock_idx);
++		mutex_unlock(&vcpu->mutex);
++	}
++
++out:
++	mutex_unlock(&kvm->lock);
++	return ret;
 +}
 +
- /** vgic_attr_regs_access: allows user space to read/write VGIC registers
-  *
-  * @dev: kvm device handle
-@@ -300,7 +366,11 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
+ /* GENERIC PROBE */
  
- 	switch (attr->group) {
- 	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
--		ret = -EINVAL;
-+		ret = 0;
-+		if (is_write)
-+			vgic_write_vcpuif(vcpu, addr, *reg);
-+		else
-+			*reg = vgic_read_vcpuif(vcpu, addr);
- 		break;
- 	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
- 		ret = vgic_v2_dist_access(vcpu, is_write, addr, 4, reg);
+ static void vgic_init_maintenance_interrupt(void *info)
 -- 
 2.7.3
