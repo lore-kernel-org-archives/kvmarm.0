@@ -1,23 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [RFC PATCH 10/45] KVM: arm/arm64: vgic-new: Add GICv3 world switch
- backend
-Date: Fri, 25 Mar 2016 02:04:33 +0000
-Message-ID: <1458871508-17279-11-git-send-email-andre.przywara@arm.com>
+Subject: [RFC PATCH 14/45] KVM: arm/arm64: vgic-new: Add CTLR,
+ TYPER and IIDR handlers
+Date: Fri, 25 Mar 2016 02:04:37 +0000
+Message-ID: <1458871508-17279-15-git-send-email-andre.przywara@arm.com>
 References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2446440B40
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2016 22:04:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0612D410EB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2016 22:04:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yuRMEDcfr+Xt for <kvmarm@lists.cs.columbia.edu>;
- Thu, 24 Mar 2016 22:04:41 -0400 (EDT)
+ with ESMTP id qRB3ryv1Vw8G for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 24 Mar 2016 22:04:48 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5042A49AF5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2016 22:04:40 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B04549B55
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 24 Mar 2016 22:04:46 -0400 (EDT)
 In-Reply-To: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,300 +32,87 @@ To: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@a
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Marc Zyngier <marc.zyngier@arm.com>
-
-As the GICv3 virtual interface registers differ from their GICv2
-siblings, we need different handlers for processing maintenance
-interrupts and reading/writing to the LRs.
-Also as we store an IRQ's affinity directly as a MPIDR, we need a
-separate change_affinity() implementation too.
-Implement the respective handler functions and connect them to
-existing code to be called if the host is using a GICv3.
-
-Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-v3.c | 191 ++++++++++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.c    |   8 +-
- virt/kvm/arm/vgic/vgic.h    |  30 +++++++
- 3 files changed, 225 insertions(+), 4 deletions(-)
- create mode 100644 virt/kvm/arm/vgic/vgic-v3.c
+ virt/kvm/arm/vgic/vgic.h      |  3 +++
+ virt/kvm/arm/vgic/vgic_mmio.c | 49 ++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 51 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-new file mode 100644
-index 0000000..71b4bad
---- /dev/null
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -0,0 +1,191 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include <linux/irqchip/arm-gic-v3.h>
-+#include <linux/kvm.h>
-+#include <linux/kvm_host.h>
-+#include <linux/irqchip/arm-gic.h>
-+
-+#include "vgic.h"
-+
-+void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
-+	u32 model = vcpu->kvm->arch.vgic.vgic_model;
-+
-+	if (cpuif->vgic_misr & ICH_MISR_EOI) {
-+		unsigned long eisr_bmap = cpuif->vgic_eisr;
-+		int lr;
-+
-+		for_each_set_bit(lr, &eisr_bmap, vcpu->arch.vgic_cpu.nr_lr) {
-+			u32 intid;
-+			u64 val = cpuif->vgic_lr[lr];
-+
-+			if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
-+				intid = val & ICH_LR_VIRTUAL_ID_MASK;
-+			else
-+				intid = val & GICH_LR_VIRTUALID;
-+
-+			/*
-+			 * kvm_notify_acked_irq calls kvm_set_irq()
-+			 * to reset the IRQ level, which grabs the dist->lock
-+			 * so we call this before taking the dist->lock.
-+			 */
-+			kvm_notify_acked_irq(vcpu->kvm, 0,
-+					     intid - VGIC_NR_PRIVATE_IRQS);
-+
-+			cpuif->vgic_lr[lr] &= ~ICH_LR_STATE; /* Useful?? */
-+			cpuif->vgic_elrsr |= 1ULL << lr;
-+		}
-+
-+		/*
-+		 * In the next iterations of the vcpu loop, if we sync
-+		 * the vgic state after flushing it, but before
-+		 * entering the guest (this happens for pending
-+		 * signals and vmid rollovers), then make sure we
-+		 * don't pick up any old maintenance interrupts here.
-+		 */
-+		cpuif->vgic_eisr = 0;
-+	}
-+
-+	cpuif->vgic_hcr &= ~ICH_HCR_UIE;
-+}
-+
-+void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
-+
-+	cpuif->vgic_hcr |= ICH_HCR_UIE;
-+}
-+
-+void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
-+	u32 model = vcpu->kvm->arch.vgic.vgic_model;
-+	int lr;
-+
-+	/* Assumes ap_list_lock held */
-+
-+	for (lr = 0; lr < vcpu->arch.vgic_cpu.used_lrs; lr++) {
-+		u64 val = cpuif->vgic_lr[lr];
-+		u32 intid;
-+		struct vgic_irq *irq;
-+
-+		if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
-+			intid = val & ICH_LR_VIRTUAL_ID_MASK;
-+		else
-+			intid = val & GICH_LR_VIRTUALID;
-+		irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
-+
-+		spin_lock(&irq->irq_lock);
-+
-+		/* Always preserve the active bit */
-+		irq->active = !!(val & ICH_LR_ACTIVE_BIT);
-+
-+		/* Edge is the only case where we preserve the pending bit */
-+		if (irq->config == VGIC_CONFIG_EDGE &&
-+		    (val & ICH_LR_PENDING_BIT)) {
-+			irq->pending = true;
-+
-+			if (intid < VGIC_NR_SGIS &&
-+			    model == KVM_DEV_TYPE_ARM_VGIC_V2) {
-+				u32 cpuid = val & GICH_LR_PHYSID_CPUID;
-+
-+				cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
-+				irq->source |= (1 << cpuid);
-+			}
-+		}
-+
-+		/* Clear soft pending state when level irqs have been acked */
-+		if (irq->config == VGIC_CONFIG_LEVEL &&
-+		    !(val & ICH_LR_PENDING_BIT)) {
-+			irq->soft_pending = false;
-+			irq->pending = irq->line_level;
-+		}
-+
-+		spin_unlock(&irq->irq_lock);
-+	}
-+}
-+
-+/* Requires the irq to be locked already */
-+void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
-+{
-+	u32 model = vcpu->kvm->arch.vgic.vgic_model;
-+	u64 val;
-+
-+	if (!irq) {
-+		val = 0;
-+		goto out;
-+	}
-+
-+	val = irq->intid;
-+
-+	if (irq->pending) {
-+		val |= ICH_LR_PENDING_BIT;
-+
-+		if (irq->config == VGIC_CONFIG_EDGE)
-+			irq->pending = false;
-+
-+		if (irq->intid < VGIC_NR_SGIS &&
-+		    model == KVM_DEV_TYPE_ARM_VGIC_V2) {
-+			u32 src = ffs(irq->source);
-+
-+			BUG_ON(!src);
-+			val |= (src - 1) << GICH_LR_PHYSID_CPUID_SHIFT;
-+			irq->source &= ~(1 << (src - 1));
-+			if (irq->source)
-+				irq->pending = true;
-+		}
-+	}
-+
-+	if (irq->active)
-+		val |= ICH_LR_ACTIVE_BIT;
-+
-+	if (irq->hw) {
-+		val |= ICH_LR_HW;
-+		val |= ((u64)irq->hwintid) << ICH_LR_PHYS_ID_SHIFT;
-+	} else {
-+		if (irq->config == VGIC_CONFIG_LEVEL)
-+			val |= ICH_LR_EOI;
-+	}
-+
-+	/*
-+	 * Currently all guest IRQs are Group1, as Group0 would result
-+	 * in a FIQ in the guest, which it wouldn't expect.
-+	 * Eventually we want to make this configurable, so we may
-+	 * revisit this in the future.
-+	 */
-+	if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
-+		val |= ICH_LR_GROUP;
-+
-+out:
-+	vcpu->arch.vgic_cpu.vgic_v3.vgic_lr[lr] = val;
-+}
-+
-+void vgic_v3_irq_change_affinity(struct kvm *kvm, u32 intid, u64 mpidr)
-+{
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+	struct vgic_irq *irq;
-+	struct kvm_vcpu *vcpu;
-+
-+	BUG_ON(intid <= VGIC_MAX_PRIVATE || intid > 1019);
-+	BUG_ON(dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3);
-+
-+	irq = vgic_get_irq(kvm, NULL, intid);
-+	vcpu = kvm_mpidr_to_vcpu(kvm, mpidr);
-+
-+	spin_lock(&irq->irq_lock);
-+	irq->target_vcpu = vcpu;
-+	spin_unlock(&irq->irq_lock);
-+}
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 90a85bf..9eb031e8 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -368,7 +368,7 @@ static inline void vgic_process_maintenance_interrupt(struct kvm_vcpu *vcpu)
- 	if (kvm_vgic_global_state.type == VGIC_V2)
- 		vgic_v2_process_maintenance(vcpu);
- 	else
--		WARN(1, "GICv3 Not Implemented\n");
-+		vgic_v3_process_maintenance(vcpu);
- }
- 
- static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
-@@ -376,7 +376,7 @@ static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
- 	if (kvm_vgic_global_state.type == VGIC_V2)
- 		vgic_v2_fold_lr_state(vcpu);
- 	else
--		WARN(1, "GICv3 Not Implemented\n");
-+		vgic_v3_fold_lr_state(vcpu);
- }
- 
- /*
-@@ -390,7 +390,7 @@ static inline void vgic_populate_lr(struct kvm_vcpu *vcpu,
- 	if (kvm_vgic_global_state.type == VGIC_V2)
- 		vgic_v2_populate_lr(vcpu, irq, lr);
- 	else
--		WARN(1, "GICv3 Not Implemented\n");
-+		vgic_v3_populate_lr(vcpu, irq, lr);
- }
- 
- static inline void vgic_set_underflow(struct kvm_vcpu *vcpu)
-@@ -398,7 +398,7 @@ static inline void vgic_set_underflow(struct kvm_vcpu *vcpu)
- 	if (kvm_vgic_global_state.type == VGIC_V2)
- 		vgic_v2_set_underflow(vcpu);
- 	else
--		WARN(1, "GICv3 Not Implemented\n");
-+		vgic_v3_set_underflow(vcpu);
- }
- 
- static int compute_ap_list_depth(struct kvm_vcpu *vcpu)
 diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 95ef3cf..53730ba 100644
+index a462e2b..57aea8f 100644
 --- a/virt/kvm/arm/vgic/vgic.h
 +++ b/virt/kvm/arm/vgic/vgic.h
-@@ -26,4 +26,34 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
- void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
- void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
+@@ -16,6 +16,9 @@
+ #ifndef __KVM_ARM_VGIC_NEW_H__
+ #define __KVM_ARM_VGIC_NEW_H__
  
-+#ifdef CONFIG_KVM_ARM_VGIC_V3
-+void vgic_v3_irq_change_affinity(struct kvm *kvm, u32 intid, u64 mpidr);
-+void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu);
-+void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu);
-+void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
-+void vgic_v3_set_underflow(struct kvm_vcpu *vcpu);
-+#else
-+static inline void vgic_v3_irq_change_affinity(struct kvm *kvm, u32 intid,
-+					       u64 mpidr)
++#define PRODUCT_ID_KVM		0x4b	/* ASCII code K */
++#define IMPLEMENTER_ARM		0x43b
++
+ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+ 			      u32 intid);
+ bool vgic_queue_irq(struct kvm *kvm, struct vgic_irq *irq);
+diff --git a/virt/kvm/arm/vgic/vgic_mmio.c b/virt/kvm/arm/vgic/vgic_mmio.c
+index e1fd17f..e62366e 100644
+--- a/virt/kvm/arm/vgic/vgic_mmio.c
++++ b/virt/kvm/arm/vgic/vgic_mmio.c
+@@ -82,9 +82,56 @@ static int vgic_mmio_write_nyi(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+ 
++static int vgic_mmio_read_v2_misc(struct kvm_vcpu *vcpu,
++				  struct kvm_io_device *this,
++				  gpa_t addr, int len, void *val)
 +{
++	struct vgic_io_device *iodev = container_of(this,
++						    struct vgic_io_device, dev);
++	u32 value;
++
++	switch ((addr - iodev->base_addr) & ~3) {
++	case 0x0:
++		value = vcpu->kvm->arch.vgic.enabled ? GICD_ENABLE : 0;
++		break;
++	case 0x4:
++		value = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
++		value = (value >> 5) - 1;
++		value |= (atomic_read(&vcpu->kvm->online_vcpus) - 1) << 5;
++		break;
++	case 0x8:
++		value = (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
++		break;
++	default:
++		return 0;
++	}
++
++	write_mask32(value, addr & 3, len, val);
++	return 0;
 +}
 +
-+static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
++static int vgic_mmio_write_v2_misc(struct kvm_vcpu *vcpu,
++				   struct kvm_io_device *this,
++				   gpa_t addr, int len, const void *val)
 +{
++	struct vgic_io_device *iodev = container_of(this,
++						    struct vgic_io_device, dev);
++	/*
++	 * GICD_TYPER and GICD_IIDR are read-only, the upper three bytes of
++	 * GICD_CTLR are reserved.
++	 */
++	if (addr - iodev->base_addr >= 1)
++		return 0;
++
++	vcpu->kvm->arch.vgic.enabled = (*(u32 *)val) ? true : false;
++	/* TODO: is there anything to trigger at this point? */
++
++	return 0;
 +}
 +
-+static inline void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
-+{
-+}
-+
-+static inline void vgic_v3_populate_lr(struct kvm_vcpu *vcpu,
-+				       struct vgic_irq *irq, int lr)
-+{
-+}
-+
-+static inline void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
-+{
-+}
-+#endif
-+
- #endif
+ struct vgic_register_region vgic_v2_dist_registers[] = {
+ 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
+-		vgic_mmio_read_nyi, vgic_mmio_write_nyi, 12),
++		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_IGROUP,
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 1),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_SET,
 -- 
 2.7.3
