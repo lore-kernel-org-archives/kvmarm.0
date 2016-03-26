@@ -1,38 +1,37 @@
-From: Diana Madalina Craciun <diana.craciun@nxp.com>
+From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
 Subject: Re: [RFC PATCH 00/45] KVM: arm/arm64: Rework virtual GIC emulation
-Date: Fri, 25 Mar 2016 15:58:13 +0000
-Message-ID: <HE1PR04MB13211E8AB3115786E0245746FF830@HE1PR04MB1321.eurprd04.prod.outlook.com>
+Date: Sat, 26 Mar 2016 02:11:26 +0000
+Message-ID: <56F5EFCE.1040307@arm.com>
 References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Language: en-US
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Eric
- Auger <eric.auger@linaro.org>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Diana Madalina Craciun <diana.craciun@nxp.com>, lkp@intel.com
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
-
-On which kernel version should I apply these series ?
-
-Thanks,
-
-Diana
-
-On 03/25/2016 04:05 AM, Andre Przywara wrote:
+On 25/03/16 02:04, Andre Przywara wrote:
 > This series is a joint effort to re-implement KVM's GIC emulation.
->
+
+Forgot to mention:
+This series is based on an older version of kvmarm.git/next, which is
+roughly the pull request that got merged into 4.6-rc0. It applies to the
+current master, so I suggest people use 4.6-rc1 as a base once this is
+released.
+
+A git tree containing this series and the prerequisites can be found on
+linux-arm.org:
+
+git://linux-arm.org/linux-ap.git
+http://www.linux-arm.org/git?p=linux-ap.git;a=log;h=refs/heads/vgic-new/rfc
+
+Cheers,
+Andre.
+
+> 
 > While the current implementation is centered around providing
 > efficient MMIO emulation, the hot path for most guests is actually
 > the guest entry and exit, which currently is rather costly.
@@ -42,7 +41,7 @@ On 03/25/2016 04:05 AM, Andre Przywara wrote:
 > GICv3 ITS emulation support to this proved to be rather painful.
 > Last, but not least the existing code became less and less
 > maintainable, with many special cases handled explicitly.
->
+> 
 > The new implementation is build around a struct vgic_irq data data
 > structure, which holds all information about a virtual interrupt.
 > Interruts which should be injected are hold in a per-VCPU list, this
@@ -51,7 +50,7 @@ On 03/25/2016 04:05 AM, Andre Przywara wrote:
 > getting rid of the global distributor lock.
 > As a result of the new design ITS emulation fits in more nicely, the
 > respective code will be provided as a follow-up series.
->
+> 
 > This series implements the same feature set as the existing emulation,
 > as a goodie we now implement priorities correctly.
 > To allow an easy transition with good test coverage, but still maintain
@@ -59,13 +58,13 @@ On 03/25/2016 04:05 AM, Andre Przywara wrote:
 > Kconfig option. The default is the new implementation.
 > If this code proves to be reliable, we will later remove the current
 > implementation with an extra patch set.
->
+> 
 > Please have a look at the series, review it and give the code some
 > serious testing (and possibly debugging). All feedback is appreciated.
->
+> 
 > Cheers,
 > Andre.
->
+> 
 > Andre Przywara (26):
 >   KVM: arm/arm64: add missing MMIO data write-back
 >   KVM: arm/arm64: pmu: abstract access to number of SPIs
@@ -93,7 +92,7 @@ On 03/25/2016 04:05 AM, Andre Przywara wrote:
 >   KVM: arm/arm64: vgic-new: implement mapped IRQ handling
 >   KVM: arm/arm64: vgic-new: Add dummy MSI implementation
 >   KVM: arm/arm64: vgic-new: enable build
->
+> 
 > Christoffer Dall (5):
 >   KVM: arm/arm64: vgic-new: Add data structure definitions
 >   KVM: arm/arm64: vgic-new: Add acccessor to new struct vgic_irq
@@ -101,7 +100,7 @@ On 03/25/2016 04:05 AM, Andre Przywara wrote:
 >   KVM: arm/arm64: vgic-new: Implement virtual IRQ injection
 >   KVM: arm/arm64: vgic-new: Add vgic GICv2 change_affinity
 >   KVM: arm/arm64: vgic-new: Add IRQ sorting
->
+> 
 > Eric Auger (12):
 >   KVM: arm/arm64: vgic-new: Implement kvm_vgic_vcpu_pending_irq
 >   KVM: arm/arm64: vgic-new: vgic_kvm_device: KVM device ops registration
@@ -116,11 +115,11 @@ On 03/25/2016 04:05 AM, Andre Przywara wrote:
 >   KVM: arm/arm64: vgic-new: vgic_init: implement vgic_init
 >   KVM: arm/arm64: vgic-new: vgic_init: implement map_resources
 >   KVM: arm/arm64: vgic-new: Add vgic_v2/v3_enable
->
+> 
 > Marc Zyngier (2):
 >   KVM: arm/arm64: vgic-new: Add GICv2 IRQ sync/flush
 >   KVM: arm/arm64: vgic-new: Add GICv3 world switch backend
->
+> 
 >  arch/arm/kvm/Kconfig                |    7 +
 >  arch/arm/kvm/Makefile               |   10 +
 >  arch/arm/kvm/mmio.c                 |    2 +-
@@ -151,4 +150,5 @@ On 03/25/2016 04:05 AM, Andre Przywara wrote:
 >  create mode 100644 virt/kvm/arm/vgic/vgic_kvm_device.c
 >  create mode 100644 virt/kvm/arm/vgic/vgic_mmio.c
 >  create mode 100644 virt/kvm/arm/vgic/vgic_mmio.h
->
+> 
+
