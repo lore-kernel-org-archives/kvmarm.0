@@ -1,23 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v4 03/12] KVM: arm64: Introduce new MMIO region for the ITS
- base address
-Date: Sat, 26 Mar 2016 02:14:01 +0000
-Message-ID: <1458958450-19662-4-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v4 07/12] KVM: arm64: add data structures to model ITS
+ interrupt translation
+Date: Sat, 26 Mar 2016 02:14:05 +0000
+Message-ID: <1458958450-19662-8-git-send-email-andre.przywara@arm.com>
 References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B23E848529
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Mar 2016 22:13:25 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 027E540F77
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Mar 2016 22:13:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JcbD8v6nqPrY for <kvmarm@lists.cs.columbia.edu>;
- Fri, 25 Mar 2016 22:13:24 -0400 (EDT)
+ with ESMTP id 73iLU1E-hmey for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 25 Mar 2016 22:13:30 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id F334048531
- for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Mar 2016 22:13:23 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id EB73649B37
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 25 Mar 2016 22:13:29 -0400 (EDT)
 In-Reply-To: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,133 +32,155 @@ To: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@a
 Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The ARM GICv3 ITS controller requires a separate register frame to
-cover ITS specific registers. Add a new VGIC address type and store
-the address in a field in the vgic_dist structure.
-Provide a function to check whether userland has provided the address,
-so ITS functionality can be guarded by that check.
+The GICv3 Interrupt Translation Service (ITS) uses tables in memory
+to allow a sophisticated interrupt routing. It features device tables,
+an interrupt table per device and a table connecting "collections" to
+actual CPUs (aka. redistributors in the GICv3 lingo).
+Since the interrupt numbers for the LPIs are allocated quite sparsely
+and the range can be quite huge (8192 LPIs being the minimum), using
+bitmaps or arrays for storing information is a waste of memory.
+We use linked lists instead, which we iterate linearily. This works
+very well with the actual number of LPIs/MSIs in the guest being
+quite low. Should the number of LPIs exceed the number where iterating
+through lists seems acceptable, we can later revisit this and use more
+efficient data structures.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- Documentation/virtual/kvm/devices/arm-vgic.txt |  9 +++++++++
- arch/arm64/include/uapi/asm/kvm.h              |  2 ++
- include/kvm/vgic/vgic.h                        |  5 +++++
- virt/kvm/arm/vgic/vgic.c                       | 10 ++++++++++
- virt/kvm/arm/vgic/vgic_init.c                  |  1 +
- virt/kvm/arm/vgic/vgic_kvm_device.c            |  7 +++++++
- 6 files changed, 34 insertions(+)
+ include/kvm/vgic/vgic.h      |  3 ++
+ virt/kvm/arm/vgic/its-emul.c | 66 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 69 insertions(+)
 
-diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
-index 59541d4..087e2d9 100644
---- a/Documentation/virtual/kvm/devices/arm-vgic.txt
-+++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
-@@ -39,6 +39,15 @@ Groups:
-       Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
-       This address needs to be 64K aligned.
- 
-+    KVM_VGIC_V3_ADDR_TYPE_ITS (rw, 64-bit)
-+      Base address in the guest physical address space of the GICv3 ITS
-+      control register frame. The ITS allows MSI(-X) interrupts to be
-+      injected into guests. This extension is optional, if the kernel
-+      does not support the ITS, the call returns -ENODEV.
-+      This memory is solely for the guest to access the ITS control
-+      registers and does not cover the ITS translation register.
-+      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
-+      This address needs to be 64K aligned and the region covers 64 KByte.
- 
-   KVM_DEV_ARM_VGIC_GRP_DIST_REGS
-   Attributes:
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index f209ea1..c2b257d 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -87,9 +87,11 @@ struct kvm_regs {
- /* Supported VGICv3 address types  */
- #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
- #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
-+#define KVM_VGIC_V3_ADDR_TYPE_ITS	4
- 
- #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
- #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
-+#define KVM_VGIC_V3_ITS_SIZE		SZ_64K
- 
- #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
- #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
 diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-index 7c1d145..11344e6 100644
+index bafea11..ecf3260 100644
 --- a/include/kvm/vgic/vgic.h
 +++ b/include/kvm/vgic/vgic.h
-@@ -135,6 +135,9 @@ struct vgic_dist {
- 		gpa_t			vgic_redist_base;
- 	};
+@@ -22,6 +22,7 @@
+ #include <linux/spinlock.h>
+ #include <linux/types.h>
+ #include <kvm/iodev.h>
++#include <linux/list.h>
  
-+	/* The base address of the ITS control register frame */
-+	gpa_t			vgic_its_base;
+ #define VGIC_V3_MAX_CPUS	255
+ #define VGIC_V2_MAX_CPUS	8
+@@ -118,6 +119,8 @@ struct vgic_its {
+ 	u64			cbaser;
+ 	int			creadr;
+ 	int			cwriter;
++	struct list_head	device_list;
++	struct list_head	collection_list;
+ };
+ 
+ struct vgic_dist {
+diff --git a/virt/kvm/arm/vgic/its-emul.c b/virt/kvm/arm/vgic/its-emul.c
+index de8d360..c0334ff 100644
+--- a/virt/kvm/arm/vgic/its-emul.c
++++ b/virt/kvm/arm/vgic/its-emul.c
+@@ -21,6 +21,7 @@
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+ #include <linux/interrupt.h>
++#include <linux/list.h>
+ 
+ #include <linux/irqchip/arm-gic-v3.h>
+ 
+@@ -31,6 +32,34 @@
+ #include "vgic.h"
+ #include "vgic_mmio.h"
+ 
++struct its_device {
++	struct list_head dev_list;
 +
- 	/* distributor enabled */
- 	u32			enabled;
++	/* the head for the list of ITTEs */
++	struct list_head itt;
++	u32 device_id;
++};
++
++#define COLLECTION_NOT_MAPPED ((u32)-1)
++
++struct its_collection {
++	struct list_head coll_list;
++
++	u32 collection_id;
++	u32 target_addr;
++};
++
++#define its_is_collection_mapped(coll) ((coll) && \
++				((coll)->target_addr != COLLECTION_NOT_MAPPED))
++
++struct its_itte {
++	struct list_head itte_list;
++
++	struct its_collection *collection;
++	u32 lpi;
++	u32 event_id;
++};
++
+ #define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
  
-@@ -253,4 +256,6 @@ static inline int kvm_vgic_get_max_vcpus(void)
- 	return kvm_vgic_global_state.max_gic_vcpus;
+ static int vgic_mmio_read_its_ctlr(struct kvm_vcpu *vcpu,
+@@ -137,6 +166,12 @@ static int vgic_mmio_read_its_idregs(struct kvm_vcpu *vcpu,
+ 	return 0;
  }
  
-+bool vgic_has_its(struct kvm *kvm);
-+
- #endif /* __ASM_ARM_KVM_VGIC_VGIC_H */
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 65395af..1de2478 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -612,3 +612,13 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, u32 intid)
- 
- 	return map_is_active;
- }
-+
-+bool vgic_has_its(struct kvm *kvm)
++static void its_free_itte(struct its_itte *itte)
 +{
-+	struct vgic_dist *dist = &kvm->arch.vgic;
-+
-+	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
-+		return false;
-+
-+	return !IS_VGIC_ADDR_UNDEF(dist->vgic_its_base);
++	list_del(&itte->itte_list);
++	kfree(itte);
 +}
-diff --git a/virt/kvm/arm/vgic/vgic_init.c b/virt/kvm/arm/vgic/vgic_init.c
-index ac655b5..2301e03 100644
---- a/virt/kvm/arm/vgic/vgic_init.c
-+++ b/virt/kvm/arm/vgic/vgic_init.c
-@@ -132,6 +132,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
- 	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
- 	kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
- 	kvm->arch.vgic.vgic_redist_base = VGIC_ADDR_UNDEF;
-+	kvm->arch.vgic.vgic_its_base = VGIC_ADDR_UNDEF;
++
+ /*
+  * This function is called with both the ITS and the distributor lock dropped,
+  * so the actual command handlers must take the respective locks when needed.
+@@ -309,6 +344,9 @@ int vits_init(struct kvm *kvm)
  
- out_unlock:
- 	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
-diff --git a/virt/kvm/arm/vgic/vgic_kvm_device.c b/virt/kvm/arm/vgic/vgic_kvm_device.c
-index 7f78a16..3ec2ac3 100644
---- a/virt/kvm/arm/vgic/vgic_kvm_device.c
-+++ b/virt/kvm/arm/vgic/vgic_kvm_device.c
-@@ -109,6 +109,12 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
- 		block_size = KVM_VGIC_V3_REDIST_SIZE;
- 		alignment = SZ_64K;
- 		break;
-+	case KVM_VGIC_V3_ADDR_TYPE_ITS:
-+		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
-+		addr_ptr = &vgic->vgic_its_base;
-+		block_size = KVM_VGIC_V3_ITS_SIZE;
-+		alignment = SZ_64K;
-+		break;
- #endif
- 	default:
- 		r = -ENODEV;
-@@ -495,6 +501,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
- 		switch (attr->attr) {
- 		case KVM_VGIC_V3_ADDR_TYPE_DIST:
- 		case KVM_VGIC_V3_ADDR_TYPE_REDIST:
-+		case KVM_VGIC_V3_ADDR_TYPE_ITS:
- 			return 0;
- 		}
- 		break;
+ 	spin_lock_init(&its->lock);
+ 
++	INIT_LIST_HEAD(&its->device_list);
++	INIT_LIST_HEAD(&its->collection_list);
++
+ 	regions = kmalloc_array(ARRAY_SIZE(its_registers),
+ 				sizeof(struct vgic_io_device), GFP_KERNEL);
+ 
+@@ -332,11 +370,39 @@ void vits_destroy(struct kvm *kvm)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	struct vgic_its *its = &dist->its;
++	struct its_device *dev;
++	struct its_itte *itte;
++	struct list_head *dev_cur, *dev_temp;
++	struct list_head *cur, *temp;
+ 
+ 	if (!vgic_has_its(kvm))
+ 		return;
+ 
++	/*
++	 * We may end up here without the lists ever having been initialized.
++	 * Check this and bail out early to avoid dereferencing a NULL pointer.
++	 */
++	if (!its->device_list.next)
++		return;
++
++	spin_lock(&its->lock);
++	list_for_each_safe(dev_cur, dev_temp, &its->device_list) {
++		dev = container_of(dev_cur, struct its_device, dev_list);
++		list_for_each_safe(cur, temp, &dev->itt) {
++			itte = (container_of(cur, struct its_itte, itte_list));
++			its_free_itte(itte);
++		}
++		list_del(dev_cur);
++		kfree(dev);
++	}
++
++	list_for_each_safe(cur, temp, &its->collection_list) {
++		list_del(cur);
++		kfree(container_of(cur, struct its_collection, coll_list));
++	}
++
+ 	kfree(dist->pendbaser);
+ 
+ 	its->enabled = false;
++	spin_unlock(&its->lock);
+ }
 -- 
 2.7.3
