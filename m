@@ -1,50 +1,46 @@
-From: Daniel Lezcano <daniel.lezcano@linaro.org>
+From: Julien Grall <julien.grall@arm.com>
 Subject: Re: [PATCH v4 9/9] clocksource: arm_arch_timer: Remove
  arch_timer_get_timecounter
-Date: Tue, 29 Mar 2016 16:39:13 +0200
-Message-ID: <56FA9391.1040007@linaro.org>
+Date: Tue, 29 Mar 2016 17:04:49 +0100
+Message-ID: <56FAA7A1.2020507@arm.com>
 References: <1458842023-31853-1-git-send-email-julien.grall@arm.com>
  <1458842023-31853-10-git-send-email-julien.grall@arm.com>
+ <56FA9391.1040007@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CDBED40FA6
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2016 10:38:17 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id KmNW2Lhz3v2D for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Mar 2016 10:38:16 -0400 (EDT)
-Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A4B1640F9B
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2016 10:38:16 -0400 (EDT)
-Received: by mail-wm0-f47.google.com with SMTP id r72so59927915wmg.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2016 07:39:16 -0700 (PDT)
-In-Reply-To: <1458842023-31853-10-git-send-email-julien.grall@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, fu.wei@linaro.org, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org, gg@slimlogic.co.uk
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <56FA9391.1040007@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Daniel Lezcano <daniel.lezcano@linaro.org>, kvmarm@lists.cs.columbia.edu
+Cc: christoffer.dall@linaro.org, marc.zyngier@arm.com, fu.wei@linaro.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, wei@redhat.com, al.stone@linaro.org, gg@slimlogic.co.uk, Thomas Gleixner <tglx@linutronix.de>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMDMvMjQvMjAxNiAwNjo1MyBQTSwgSnVsaWVuIEdyYWxsIHdyb3RlOgo+IFRoZSBvbmx5IGNh
-bGwgb2YgYXJjaF90aW1lcl9nZXRfdGltZWNvdW50ZXIgKGluIEtWTSkgaGFzIGJlZW4gcmVtb3Zl
-ZC4KPgo+IFNpZ25lZC1vZmYtYnk6IEp1bGllbiBHcmFsbCA8anVsaWVuLmdyYWxsQGFybS5jb20+
-Cj4gQWNrZWQtYnk6IENocmlzdG9mZmVyIERhbGwgPGNocmlzdG9mZmVyLmRhbGxAbGluYXJvLm9y
-Zz4KCkhpIEp1bGllbiwKCmRvIHlvdSB3YW50IG1lIHRvIHRha2UgdGhpcyBwYXRjaCB0aHJvdWdo
-IG15IHRyZWUgPwoKICAgLS0gRGFuaWVsCgoKLS0gCiAgPGh0dHA6Ly93d3cubGluYXJvLm9yZy8+
-IExpbmFyby5vcmcg4pSCIE9wZW4gc291cmNlIHNvZnR3YXJlIGZvciBBUk0gU29DcwoKRm9sbG93
-IExpbmFybzogIDxodHRwOi8vd3d3LmZhY2Vib29rLmNvbS9wYWdlcy9MaW5hcm8+IEZhY2Vib29r
-IHwKPGh0dHA6Ly90d2l0dGVyLmNvbS8jIS9saW5hcm9vcmc+IFR3aXR0ZXIgfAo8aHR0cDovL3d3
-dy5saW5hcm8ub3JnL2xpbmFyby1ibG9nLz4gQmxvZwoKX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMu
-Y3MuY29sdW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlz
-dGluZm8va3ZtYXJtCg==
+On 29/03/16 15:39, Daniel Lezcano wrote:
+> On 03/24/2016 06:53 PM, Julien Grall wrote:
+>> The only call of arch_timer_get_timecounter (in KVM) has been removed.
+>>
+>> Signed-off-by: Julien Grall <julien.grall@arm.com>
+>> Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+>
+> Hi Julien,
+
+Hi Daniel,
+
+> do you want me to take this patch through my tree ?
+
+This patch depends on patch #7, so it's not possible to merge for now.
+
+The plan suggested to merge the series is divided in 3 steps:
+
+   1) Patch #1-#2 are merged via your tree
+      Patch #2-#6 are merged via the irqchip-tree
+   2) Patch #7-#8 are merged via the KVM tree
+   3) Patch #9 (this patch) is merge via your tree
+
+I can ping you when the steps 1 and 2 are completed.
+
+Regards,
+
+-- 
+Julien Grall
