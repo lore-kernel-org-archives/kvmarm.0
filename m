@@ -1,105 +1,45 @@
-From: Daniel Lezcano <daniel.lezcano@linaro.org>
-Subject: Re: [PATCH v4 1/9] clocksource: arm_arch_timer: Gather KVM specific
- information in a structure
-Date: Tue, 29 Mar 2016 19:13:54 +0200
-Message-ID: <56FAB7D2.1000508@linaro.org>
-References: <1458842023-31853-1-git-send-email-julien.grall@arm.com>
- <1458842023-31853-2-git-send-email-julien.grall@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [RFC v5 03/17] iommu: introduce a reserved iova cookie
+Date: Tue, 29 Mar 2016 19:26:25 +0200
+Message-ID: <56FABAC1.1020506@linaro.org>
+References: <1456856877-4817-1-git-send-email-eric.auger@linaro.org>
+ <1456856877-4817-4-git-send-email-eric.auger@linaro.org>
+ <56D865B7.7000404@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; Format="flowed"
-Content-Transfer-Encoding: base64
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9B9D1410EB
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2016 13:13:06 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qH6dTx7MVG-f for <kvmarm@lists.cs.columbia.edu>;
- Tue, 29 Mar 2016 13:13:04 -0400 (EDT)
-Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 816EC40C9D
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2016 13:13:04 -0400 (EDT)
-Received: by mail-wm0-f43.google.com with SMTP id p65so36640573wmp.0
- for <kvmarm@lists.cs.columbia.edu>; Tue, 29 Mar 2016 10:14:04 -0700 (PDT)
-In-Reply-To: <1458842023-31853-2-git-send-email-julien.grall@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, fu.wei@linaro.org, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org, gg@slimlogic.co.uk
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-kernel-owner@vger.kernel.org>
+In-Reply-To: <56D865B7.7000404@arm.com>
+Sender: linux-kernel-owner@vger.kernel.org
+To: Julien Grall <julien.grall@arm.com>, eric.auger@st.com, robin.murphy@arm.com, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: patches@linaro.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-T24gMDMvMjQvMjAxNiAwNjo1MyBQTSwgSnVsaWVuIEdyYWxsIHdyb3RlOgo+IEludHJvZHVjZSBh
-IHN0cnVjdHVyZSB3aGljaCBhcmUgZmlsbGVkIHVwIGJ5IHRoZSBhcmNoIHRpbWVyIGRyaXZlciBh
-bmQKPiB1c2VkIGJ5IHRoZSB2aXJ0dWFsIHRpbWVyIGluIEtWTS4KPgo+IFRoZSBmaXJzdCBtZW1i
-ZXIgb2YgdGhpcyBzdHJ1Y3R1cmUgd2lsbCBiZSB0aGUgdGltZWNvdW50ZXIuIE1vcmUgbWVtYmVy
-cwo+IHdpbGwgYmUgYWRkZWQgbGF0ZXIuCj4KPiBBIHN0dWIgZm9yIHRoZSBuZXcgaGVscGVyIGlz
-bid0IGludHJvZHVjZWQgYmVjYXVzZSBLVk0gcmVxdWlyZXMgdGhlIGFyY2gKPiB0aW1lciBmb3Ig
-Ym90aCBBUk02NCBhbmQgQVJNMzIuCj4KPiBUaGUgZnVuY3Rpb24gYXJjaF90aW1lcl9nZXRfdGlt
-ZWNvdW50ZXIgaXMga2VwdCBmb3IgdGhlIHRpbWUgYmVpbmcgYW5kCj4gd2lsbCBiZSBkcm9wcGVk
-IGluIGEgc3Vic2VxdWVudCBwYXRjaC4KPgo+IFNpZ25lZC1vZmYtYnk6IEp1bGllbiBHcmFsbCA8
-anVsaWVuLmdyYWxsQGFybS5jb20+Cgo+IENjOiBEYW5pZWwgTGV6Y2FubyA8ZGFuaWVsLmxlemNh
-bm9AbGluYXJvLm9yZz4KPiBDYzogVGhvbWFzIEdsZWl4bmVyIDx0Z2x4QGxpbnV0cm9uaXguZGU+
-Cj4gQ2M6IE1hcmMgWnluZ2llciA8bWFyYy56eW5naWVyQGFybS5jb20+Cj4KPiAgICAgIENoYW5n
-ZXMgaW4gdjM6Cj4gICAgICAgICAgLSBSZW5hbWUgdGhlIHBhdGNoCj4gICAgICAgICAgLSBNb3Zl
-IHRoZSBLVk0gY2hhbmdlcyBhbmQgcmVtb3ZhbCBvZiBhcmNoX3RpbWVyX2dldF90aW1lY291bnRl
-cgo+ICAgICAgICAgIGluIHNlcGFyYXRlIHBhdGNoZXMuCj4gLS0tCj4gICBkcml2ZXJzL2Nsb2Nr
-c291cmNlL2FybV9hcmNoX3RpbWVyLmMgfCAxMiArKysrKysrKystLS0KPiAgIGluY2x1ZGUvY2xv
-Y2tzb3VyY2UvYXJtX2FyY2hfdGltZXIuaCB8ICA1ICsrKysrCj4gICAyIGZpbGVzIGNoYW5nZWQs
-IDE0IGluc2VydGlvbnMoKyksIDMgZGVsZXRpb25zKC0pCj4KPiBkaWZmIC0tZ2l0IGEvZHJpdmVy
-cy9jbG9ja3NvdXJjZS9hcm1fYXJjaF90aW1lci5jIGIvZHJpdmVycy9jbG9ja3NvdXJjZS9hcm1f
-YXJjaF90aW1lci5jCj4gaW5kZXggNTE1MmIzOC4uNjJiZGZlNyAxMDA2NDQKPiAtLS0gYS9kcml2
-ZXJzL2Nsb2Nrc291cmNlL2FybV9hcmNoX3RpbWVyLmMKPiArKysgYi9kcml2ZXJzL2Nsb2Nrc291
-cmNlL2FybV9hcmNoX3RpbWVyLmMKPiBAQCAtNDY4LDExICs0NjgsMTYgQEAgc3RhdGljIHN0cnVj
-dCBjeWNsZWNvdW50ZXIgY3ljbGVjb3VudGVyID0gewo+ICAgCS5tYXNrCT0gQ0xPQ0tTT1VSQ0Vf
-TUFTSyg1NiksCj4gICB9Owo+Cj4gLXN0YXRpYyBzdHJ1Y3QgdGltZWNvdW50ZXIgdGltZWNvdW50
-ZXI7Cj4gK3N0YXRpYyBzdHJ1Y3QgYXJjaF90aW1lcl9rdm1faW5mbyBhcmNoX3RpbWVyX2t2bV9p
-bmZvOwoKVGhpcyBzdHJ1Y3R1cmUgaXMgc3RhdGljYWxseSBkZWZpbmVkIGluIHRoaXMgc3Vic3lz
-dGVtIGJ1dCBub3QgdXNlZCBpbiAKdGhpcyBmaWxlIGFuZCBhIGNvdXBsZSBvZiBhIGFjY2Vzc29y
-cyBpcyBhZGRlZCB0byBsZXQgYW5vdGhlciBzdWJzeXN0ZW0gCnRvIGFjY2VzcyBpdC4KClRoYXQg
-c291bmRzIHRoZXJlIGlzIHNvbWV0aGluZyB3cm9uZyBoZXJlIHdpdGggdGhlIGRlc2lnbiBvZiB0
-aGUgY3VycmVudCAKY29kZSwgdmlydC9waHlzIGFyZSBtaXhlZC4KCkl0IGlzbid0IHBvc3NpYmxl
-IHRvIHNwbGl0IHRoZSB2aXJ0L3BoeXMgdGltZXIgY29kZSByZXNwZWN0aXZlbHkgaW4gCnZpcnQv
-a3ZtL2FybS9hcmNoX3RpbWVyLmMgYW5kIGRyaXZlcnMvY2xvY2tzb3VyY2UvYXJtX2FyY2hfdGlt
-ZXIuYyA/CgpBdCBsZWFzdCwgJ3N0cnVjdCBhcmNoX3RpbWVyX2t2bV9pbmZvJyBzaG91bGQgYmVs
-b25nIHRvIAp2aXJ0L2t2bS9hcm0vYXJjaF90aW1lci5jLgoKPiArc3RydWN0IGFyY2hfdGltZXJf
-a3ZtX2luZm8gKmFyY2hfdGltZXJfZ2V0X2t2bV9pbmZvKHZvaWQpCj4gK3sKPiArCXJldHVybiAm
-YXJjaF90aW1lcl9rdm1faW5mbzsKPiArfQo+Cj4gICBzdHJ1Y3QgdGltZWNvdW50ZXIgKmFyY2hf
-dGltZXJfZ2V0X3RpbWVjb3VudGVyKHZvaWQpCj4gICB7Cj4gLQlyZXR1cm4gJnRpbWVjb3VudGVy
-Owo+ICsJcmV0dXJuICZhcmNoX3RpbWVyX2t2bV9pbmZvLnRpbWVjb3VudGVyOwo+ICAgfQo+Cj4g
-ICBzdGF0aWMgdm9pZCBfX2luaXQgYXJjaF9jb3VudGVyX3JlZ2lzdGVyKHVuc2lnbmVkIHR5cGUp
-Cj4gQEAgLTUwMCw3ICs1MDUsOCBAQCBzdGF0aWMgdm9pZCBfX2luaXQgYXJjaF9jb3VudGVyX3Jl
-Z2lzdGVyKHVuc2lnbmVkIHR5cGUpCj4gICAJY2xvY2tzb3VyY2VfcmVnaXN0ZXJfaHooJmNsb2Nr
-c291cmNlX2NvdW50ZXIsIGFyY2hfdGltZXJfcmF0ZSk7Cj4gICAJY3ljbGVjb3VudGVyLm11bHQg
-PSBjbG9ja3NvdXJjZV9jb3VudGVyLm11bHQ7Cj4gICAJY3ljbGVjb3VudGVyLnNoaWZ0ID0gY2xv
-Y2tzb3VyY2VfY291bnRlci5zaGlmdDsKPiAtCXRpbWVjb3VudGVyX2luaXQoJnRpbWVjb3VudGVy
-LCAmY3ljbGVjb3VudGVyLCBzdGFydF9jb3VudCk7Cj4gKwl0aW1lY291bnRlcl9pbml0KCZhcmNo
-X3RpbWVyX2t2bV9pbmZvLnRpbWVjb3VudGVyLAo+ICsJCQkgJmN5Y2xlY291bnRlciwgc3RhcnRf
-Y291bnQpOwo+Cj4gICAJLyogNTYgYml0cyBtaW5pbXVtLCBzbyB3ZSBhc3N1bWUgd29yc3QgY2Fz
-ZSByb2xsb3ZlciAqLwo+ICAgCXNjaGVkX2Nsb2NrX3JlZ2lzdGVyKGFyY2hfdGltZXJfcmVhZF9j
-b3VudGVyLCA1NiwgYXJjaF90aW1lcl9yYXRlKTsKPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9jbG9j
-a3NvdXJjZS9hcm1fYXJjaF90aW1lci5oIGIvaW5jbHVkZS9jbG9ja3NvdXJjZS9hcm1fYXJjaF90
-aW1lci5oCj4gaW5kZXggMjVkMDkxNC4uOTEwMWVkNmIgMTAwNjQ0Cj4gLS0tIGEvaW5jbHVkZS9j
-bG9ja3NvdXJjZS9hcm1fYXJjaF90aW1lci5oCj4gKysrIGIvaW5jbHVkZS9jbG9ja3NvdXJjZS9h
-cm1fYXJjaF90aW1lci5oCj4gQEAgLTQ5LDExICs0OSwxNiBAQCBlbnVtIGFyY2hfdGltZXJfcmVn
-IHsKPgo+ICAgI2RlZmluZSBBUkNIX1RJTUVSX0VWVF9TVFJFQU1fRlJFUQkxMDAwMAkvKiAxMDB1
-cyAqLwo+Cj4gK3N0cnVjdCBhcmNoX3RpbWVyX2t2bV9pbmZvIHsKPiArCXN0cnVjdCB0aW1lY291
-bnRlciB0aW1lY291bnRlcjsKPiArfTsKPiArCj4gICAjaWZkZWYgQ09ORklHX0FSTV9BUkNIX1RJ
-TUVSCj4KPiAgIGV4dGVybiB1MzIgYXJjaF90aW1lcl9nZXRfcmF0ZSh2b2lkKTsKPiAgIGV4dGVy
-biB1NjQgKCphcmNoX3RpbWVyX3JlYWRfY291bnRlcikodm9pZCk7Cj4gICBleHRlcm4gc3RydWN0
-IHRpbWVjb3VudGVyICphcmNoX3RpbWVyX2dldF90aW1lY291bnRlcih2b2lkKTsKPiArZXh0ZXJu
-IHN0cnVjdCBhcmNoX3RpbWVyX2t2bV9pbmZvICphcmNoX3RpbWVyX2dldF9rdm1faW5mbyh2b2lk
-KTsKPgo+ICAgI2Vsc2UKPgo+CgoKLS0gCiAgPGh0dHA6Ly93d3cubGluYXJvLm9yZy8+IExpbmFy
-by5vcmcg4pSCIE9wZW4gc291cmNlIHNvZnR3YXJlIGZvciBBUk0gU29DcwoKRm9sbG93IExpbmFy
-bzogIDxodHRwOi8vd3d3LmZhY2Vib29rLmNvbS9wYWdlcy9MaW5hcm8+IEZhY2Vib29rIHwKPGh0
-dHA6Ly90d2l0dGVyLmNvbS8jIS9saW5hcm9vcmc+IFR3aXR0ZXIgfAo8aHR0cDovL3d3dy5saW5h
-cm8ub3JnL2xpbmFyby1ibG9nLz4gQmxvZwoKX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX18Ka3ZtYXJtIG1haWxpbmcgbGlzdAprdm1hcm1AbGlzdHMuY3MuY29s
-dW1iaWEuZWR1Cmh0dHBzOi8vbGlzdHMuY3MuY29sdW1iaWEuZWR1L21haWxtYW4vbGlzdGluZm8v
-a3ZtYXJtCg==
+Hi Julien,
+On 03/03/2016 05:26 PM, Julien Grall wrote:
+> Hi Eric,
+> 
+> On 01/03/16 18:27, Eric Auger wrote:
+>> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+>> index 0e3b009..7b2bb94 100644
+>> --- a/drivers/iommu/iommu.c
+>> +++ b/drivers/iommu/iommu.c
+>> @@ -1072,6 +1072,7 @@ static struct iommu_domain
+>> *__iommu_domain_alloc(struct bus_type *bus,
+>>
+>>       domain->ops  = bus->iommu_ops;
+>>       domain->type = type;
+>> +    mutex_init(&domain->reserved_mutex);
+> 
+> For consistency, the RB-tree reserved_binding_list should be initialized
+> too:
+> 
+> domain->reserved_binding_list = RB_ROOT;
+Sure
+
+Thank you
+
+Eric
+> 
+> Cheers,
+> 
