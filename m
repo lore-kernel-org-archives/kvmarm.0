@@ -1,104 +1,131 @@
-From: Vladimir Murzin <vladimir.murzin@arm.com>
-Subject: Re: [RFC PATCH 00/45] KVM: arm/arm64: Rework virtual GIC emulation
-Date: Wed, 30 Mar 2016 15:13:20 +0100
-Message-ID: <56FBDF00.3010505@arm.com>
-References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
- <56FA7F29.4060005@arm.com> <56FBBBC2.6010602@arm.com>
- <56FBBDFB.7080308@arm.com> <20160330135651.GJ4126@cbox>
+From: James Morse <james.morse@arm.com>
+Subject: [PATCH] arm64: KVM: Register CPU notifiers when the kernel runs at HYP
+Date: Wed, 30 Mar 2016 16:56:10 +0100
+Message-ID: <1459353370-589-1-git-send-email-james.morse@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160330135651.GJ4126@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Andre Przywara <andre.przywara@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 125CB412DD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2016 11:56:51 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id MXX9akLjPTcJ for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Mar 2016 11:56:49 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BECE5407AD
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2016 11:56:49 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 30/03/16 14:56, Christoffer Dall wrote:
-> Hi Vladimir,
-> 
-> On Wed, Mar 30, 2016 at 12:52:27PM +0100, Vladimir Murzin wrote:
->> On 30/03/16 12:42, Vladimir Murzin wrote:
->>> On 29/03/16 14:12, Vladimir Murzin wrote:
->>>> Hi Andre,
->>>>
->>>> On 25/03/16 02:04, Andre Przywara wrote:
->>>>> Please have a look at the series, review it and give the code some
->>>>> serious testing (and possibly debugging). All feedback is appreciated.
->>>>
->>>> I see that with the new vgic implementation kvmtool starts throwing:
->>>>
->>>> kvm [1273]: Unable to register VGICv3 redist MMIO regions
->>>>
->>>
->>> It comes from kvm_io_bus_register_dev()
->>>
->>> if (bus->dev_count - bus->ioeventfd_count > NR_IOBUS_DEVS - 1)
->>> 	return -ENOSPC;
->>>
->>> with bus->dev_count being 1000
->>>
->>> [<ffffffc00009f93c>] kvm_io_bus_register_dev+0x130/0x148
->>> [<ffffffc0000ad274>] kvm_vgic_register_mmio_region+0xac/0xdc
->>> [<ffffffc0000ad4d4>] vgic_register_redist_regions+0xb8/0x158
->>> [<ffffffc0000abb90>] vgic_v3_map_resources+0x5c/0xf0
->>> [<ffffffc0000aae04>] kvm_vgic_map_resources+0x40/0x84
->>> [<ffffffc0000a23d0>] kvm_arch_vcpu_ioctl_run+0x3f0/0x400
->>> [<ffffffc00009d484>] kvm_vcpu_ioctl+0x2d4/0x6ec
->>> [<ffffffc0001c4eec>] do_vfs_ioctl+0xb4/0x760
->>> [<ffffffc0001c561c>] SyS_ioctl+0x84/0x98
->>> [<ffffffc000085d30>] el0_svc_naked+0x24/0x28
->>>
->>
->> and one more thing I've forgotten to mention... something odd happens on
->> destroy path
->>
->> INFO: task kvm-vcpu-0:1123 blocked for more than 120 seconds.
->>       Tainted: G        W       4.5.0-rc6+ #432
->> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
->> kvm-vcpu-0      D ffffffc000086bcc     0  1123   1114 0x00000008
->> Call trace:
->> [<ffffffc000086bcc>] __switch_to+0x90/0xa4
->> [<ffffffc0006c4390>] __schedule+0x188/0x59c
->> [<ffffffc0006c47e0>] schedule+0x3c/0xa0
->> [<ffffffc0006c4bf4>] schedule_preempt_disabled+0x20/0x38
->> [<ffffffc0006c618c>] __mutex_lock_slowpath+0xc4/0x148
->> [<ffffffc0006c6254>] mutex_lock+0x44/0x5c
->> [<ffffffc0000aacb8>] kvm_vgic_destroy+0x20/0xb0
->> [<ffffffc0000abbdc>] vgic_v3_map_resources+0xa8/0xf0
->> [<ffffffc0000aae04>] kvm_vgic_map_resources+0x40/0x84
->> [<ffffffc0000a23d0>] kvm_arch_vcpu_ioctl_run+0x3f0/0x400
->> [<ffffffc00009d484>] kvm_vcpu_ioctl+0x2d4/0x6ec
->> [<ffffffc0001c4eec>] do_vfs_ioctl+0xb4/0x760
->> [<ffffffc0001c561c>] SyS_ioctl+0x84/0x98
->> [<ffffffc000085d30>] el0_svc_naked+0x24/0x28
->>
-> 
-> Is this also with many many VCPUs or in general?
-> 
+When the kernel is running at EL2, it doesn't need init_hyp_mode() to
+configure page tables for HYP. This function also registers the CPU
+hotplug and lower power notifiers that cause HYP to be re-initialised
+after the CPU has been reset.
 
-It's seen with many many VCPUs. Basically, I see
+To avoid losing the register state that controls stage2 translation, move
+the registering of these notifiers into init_subsystems(), and add an
+is_kernel_in_hyp_mode() path to each callback.
 
-kvm [1273]: Unable to register VGICv3 redist MMIO regions
+Fixes: 1e947bad0b6 ("arm64: KVM: Skip HYP setup when already running in HYP")
+Signed-off-by: James Morse <james.morse@arm.com>
+---
+ arch/arm/kvm/arm.c | 51 +++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 33 insertions(+), 18 deletions(-)
 
-and then (if I'm patient enough) I see that backtrace. So the flow looks
-like:
-
-el0_svc_naked
-...
-vgic_v3_map_resources
-   vgic_register_redist_regions
-       kvm_vgic_register_mmio_region
-           kvm_io_bus_register_dev	// return -ENOSPC
-   kvm_vgic_destroy
-       mutex_lock
-
-Cheers
-Vladimir
-
-> Thanks,
-> -Christoffer
-> 
-> 
-
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 6accd66d26f0..cf0184edf4f5 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -1067,8 +1067,16 @@ static int hyp_init_cpu_notify(struct notifier_block *self,
+ 	switch (action) {
+ 	case CPU_STARTING:
+ 	case CPU_STARTING_FROZEN:
+-		if (__hyp_get_vectors() == hyp_default_vectors)
+-			cpu_init_hyp_mode(NULL);
++		if (is_kernel_in_hyp_mode()) {
++			/*
++			 * cpu_init_stage2() is safe to call even if the PM
++			 * event was cancelled before the CPU was reset.
++			 */
++			cpu_init_stage2(NULL);
++		} else {
++			if (__hyp_get_vectors() == hyp_default_vectors)
++				cpu_init_hyp_mode(NULL);
++		}
+ 		break;
+ 	}
+ 
+@@ -1084,9 +1092,13 @@ static int hyp_init_cpu_pm_notifier(struct notifier_block *self,
+ 				    unsigned long cmd,
+ 				    void *v)
+ {
+-	if (cmd == CPU_PM_EXIT &&
+-	    __hyp_get_vectors() == hyp_default_vectors) {
+-		cpu_init_hyp_mode(NULL);
++	if (cmd == CPU_PM_EXIT) {
++		if (is_kernel_in_hyp_mode()) {
++			cpu_init_stage2(NULL);
++		} else {
++			if (__hyp_get_vectors() == hyp_default_vectors)
++				cpu_init_hyp_mode(NULL);
++		}
+ 		return NOTIFY_OK;
+ 	}
+ 
+@@ -1128,6 +1140,22 @@ static int init_subsystems(void)
+ 	int err;
+ 
+ 	/*
++	 * Register CPU Hotplug notifier
++	 */
++	cpu_notifier_register_begin();
++	err = __register_cpu_notifier(&hyp_init_cpu_nb);
++	cpu_notifier_register_done();
++	if (err) {
++		kvm_err("Cannot register KVM init CPU notifier (%d)\n", err);
++		return err;
++	}
++
++	/*
++	 * Register CPU lower-power notifier
++	 */
++	hyp_cpu_pm_init();
++
++	/*
+ 	 * Init HYP view of VGIC
+ 	 */
+ 	err = kvm_vgic_hyp_init();
+@@ -1270,19 +1298,6 @@ static int init_hyp_mode(void)
+ 	free_boot_hyp_pgd();
+ #endif
+ 
+-	cpu_notifier_register_begin();
+-
+-	err = __register_cpu_notifier(&hyp_init_cpu_nb);
+-
+-	cpu_notifier_register_done();
+-
+-	if (err) {
+-		kvm_err("Cannot register HYP init CPU notifier (%d)\n", err);
+-		goto out_err;
+-	}
+-
+-	hyp_cpu_pm_init();
+-
+ 	/* set size of VMID supported by CPU */
+ 	kvm_vmid_bits = kvm_get_vmid_bits();
+ 	kvm_info("%d-bit VMID\n", kvm_vmid_bits);
+-- 
+2.8.0.rc3
