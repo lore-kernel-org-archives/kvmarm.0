@@ -1,51 +1,107 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH 00/45] KVM: arm/arm64: Rework virtual GIC emulation
-Date: Wed, 30 Mar 2016 21:55:55 +0200
-Message-ID: <20160330195555.GL4126@cbox>
-References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
- <56FA7F29.4060005@arm.com>
- <56FBBBC2.6010602@arm.com>
- <56FBC16A.7040404@arm.com>
+Subject: Re: [PATCH] arm64: kvm: 4.6-rc1: Fix VTCR_EL2 VS setting
+Date: Wed, 30 Mar 2016 22:09:00 +0200
+Message-ID: <20160330200900.GM4126@cbox>
+References: <1459344839-14397-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E91E8412ED
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2016 16:08:00 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 8OK9cQQp5SOW for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 30 Mar 2016 16:07:59 -0400 (EDT)
+Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id B4084410D7
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2016 16:07:58 -0400 (EDT)
+Received: by mail-wm0-f49.google.com with SMTP id 20so86015213wmh.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 30 Mar 2016 13:09:01 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <56FBC16A.7040404@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Vladimir Murzin <vladimir.murzin@arm.com>, Andre Przywara <andre.przywara@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+In-Reply-To: <1459344839-14397-1-git-send-email-suzuki.poulose@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Mar 30, 2016 at 01:07:06PM +0100, Marc Zyngier wrote:
-> On 30/03/16 12:42, Vladimir Murzin wrote:
-> > On 29/03/16 14:12, Vladimir Murzin wrote:
-> >> Hi Andre,
-> >>
-> >> On 25/03/16 02:04, Andre Przywara wrote:
-> >>> Please have a look at the series, review it and give the code some
-> >>> serious testing (and possibly debugging). All feedback is appreciated.
-> >>
-> >> I see that with the new vgic implementation kvmtool starts throwing:
-> >>
-> >> kvm [1273]: Unable to register VGICv3 redist MMIO regions
-> >>
-> > 
-> > It comes from kvm_io_bus_register_dev()
-> > 
-> > if (bus->dev_count - bus->ioeventfd_count > NR_IOBUS_DEVS - 1)
-> > 	return -ENOSPC;
-> > 
-> > with bus->dev_count being 1000
+On Wed, Mar 30, 2016 at 02:33:59PM +0100, Suzuki K Poulose wrote:
+> When we detect support for 16bit VMID in ID_AA64MMFR1, we set the
+> VTCR_EL2_VS field to 1 to make use of 16bit vmids. But, with
+> commit 3a3604bc5eb4 ("arm64: KVM: Switch to C-based stage2 init")
+> this is broken and we corrupt VTCR_EL2:T0SZ instead of updating the VS
+> field. VTCR_EL2_VS was actually defined to the field shift (19) and
+> not the real value for VS. This patch fixes the issue.
 > 
-> Ouch. That's a consequence of having one "device" per actual register
-> set, I believe. So either we bump this limit up by a factor 10 (at
-> least), or we switch back to the old way of handling access to the GIC
-> regions (big "catch-all", and further demuxing).
-> 
-> Thoughts?
-> 
-Since we have to have code to iterate through the individual register
-regions for the userland MMIO accesses anyway, I think we should just
-revert back to the old way.
+> Fixes: commit 3a3604bc5eb4 ("arm64: KVM: Switch to C-based stage2 init")
+> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Acked-by: Marc Zyngier <marc.zyngier@arm.com>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 
--Christoffer
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+
+> ---
+>  arch/arm64/include/asm/kvm_arm.h |    4 +++-
+>  arch/arm64/include/asm/sysreg.h  |    3 +++
+>  arch/arm64/kvm/hyp/s2-setup.c    |    6 ++++--
+>  3 files changed, 10 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index 0e391db..4150fd8 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -124,7 +124,9 @@
+>  #define VTCR_EL2_SL0_LVL1	(1 << 6)
+>  #define VTCR_EL2_T0SZ_MASK	0x3f
+>  #define VTCR_EL2_T0SZ_40B	24
+> -#define VTCR_EL2_VS		19
+> +#define VTCR_EL2_VS_SHIFT	19
+> +#define VTCR_EL2_VS_8BIT	(0 << VTCR_EL2_VS_SHIFT)
+> +#define VTCR_EL2_VS_16BIT	(1 << VTCR_EL2_VS_SHIFT)
+>  
+>  /*
+>   * We configure the Stage-2 page tables to always restrict the IPA space to be
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 1a78d6e..1287416 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -141,6 +141,9 @@
+>  #define ID_AA64MMFR1_VMIDBITS_SHIFT	4
+>  #define ID_AA64MMFR1_HADBS_SHIFT	0
+>  
+> +#define ID_AA64MMFR1_VMIDBITS_8		0
+> +#define ID_AA64MMFR1_VMIDBITS_16	2
+> +
+>  /* id_aa64mmfr2 */
+>  #define ID_AA64MMFR2_UAO_SHIFT		4
+>  
+> diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
+> index bfc54fd..5a9f3bf 100644
+> --- a/arch/arm64/kvm/hyp/s2-setup.c
+> +++ b/arch/arm64/kvm/hyp/s2-setup.c
+> @@ -36,8 +36,10 @@ void __hyp_text __init_stage2_translation(void)
+>  	 * Read the VMIDBits bits from ID_AA64MMFR1_EL1 and set the VS
+>  	 * bit in VTCR_EL2.
+>  	 */
+> -	tmp = (read_sysreg(id_aa64mmfr1_el1) >> 4) & 0xf;
+> -	val |= (tmp == 2) ? VTCR_EL2_VS : 0;
+> +	tmp = (read_sysreg(id_aa64mmfr1_el1) >> ID_AA64MMFR1_VMIDBITS_SHIFT) & 0xf;
+> +	val |= (tmp == ID_AA64MMFR1_VMIDBITS_16) ?
+> +			VTCR_EL2_VS_16BIT :
+> +			VTCR_EL2_VS_8BIT;
+>  
+>  	write_sysreg(val, vtcr_el2);
+>  }
+> -- 
+> 1.7.9.5
+> 
