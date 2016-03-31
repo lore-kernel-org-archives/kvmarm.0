@@ -1,19 +1,38 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
 Subject: Re: [RFC PATCH 00/45] KVM: arm/arm64: Rework virtual GIC emulation
-Date: Thu, 31 Mar 2016 20:28:42 +0200
-Message-ID: <20160331182842.GJ4126@cbox>
+Date: Thu, 31 Mar 2016 20:30:19 +0200
+Message-ID: <20160331183019.GK4126@cbox>
 References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 05D2640F9B
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2016 14:29:15 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id oUYruKJFG4td for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 31 Mar 2016 14:29:13 -0400 (EDT)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EE6A440C9D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2016 14:29:12 -0400 (EDT)
+Received: by mail-wm0-f53.google.com with SMTP id 127so143695747wmu.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2016 11:30:18 -0700 (PDT)
 Content-Disposition: inline
 In-Reply-To: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
-
-Hi Andre,
 
 On Fri, Mar 25, 2016 at 02:04:23AM +0000, Andre Przywara wrote:
 > This series is a joint effort to re-implement KVM's GIC emulation.
@@ -49,24 +68,11 @@ On Fri, Mar 25, 2016 at 02:04:23AM +0000, Andre Przywara wrote:
 > serious testing (and possibly debugging). All feedback is appreciated.
 > 
 
-Huge thanks for all the hard work in putting this together, I'm sure it
-hasn't been easy.
+Hmph, starting a guest a couple of times and running hackbench inside
+the guest actually gave me (twice) the following error:
 
-I have gone through this series and I think we're overall in pretty good
-shape.  I haven't reviewed the code in detail, checked every bitfield
-etc., but focused on the overall design choices, locking correctness
-etc.
+NMI watchdog: BUG: soft lockup - CPU#0 stuck for 23s! [kworker/0:0:4]
 
-A number of patches don't have have commit message and some commit
-messages could be clarified, but it is what it is.
+(that is using your branch on Mustang).
 
-I've given this a quick test on Mustang and on TC2, and it builds and
-appears to run decently stable.  Obviously we should give this some more
-rigorous testing, but I will wait until v2 with that.
-
-I'll probably send the timer/vgic interface changes bits as patches for
-you to base the next series on, assuming you and the others agreed with
-my comments and suggestions on that part here.
-
-Thanks,
 -Christoffer
