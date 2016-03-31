@@ -1,96 +1,130 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH 44/45] KVM: arm/arm64: vgic-new: Add dummy MSI
- implementation
-Date: Thu, 31 Mar 2016 20:16:56 +0200
-Message-ID: <20160331181656.GH4126@cbox>
+Subject: Re: [RFC PATCH 45/45] KVM: arm/arm64: vgic-new: enable build
+Date: Thu, 31 Mar 2016 20:18:50 +0200
+Message-ID: <20160331181850.GI4126@cbox>
 References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
- <1458871508-17279-45-git-send-email-andre.przywara@arm.com>
+ <1458871508-17279-46-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <1458871508-17279-45-git-send-email-andre.przywara@arm.com>
+In-Reply-To: <1458871508-17279-46-git-send-email-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Andre Przywara <andre.przywara@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Mar 25, 2016 at 02:05:07AM +0000, Andre Przywara wrote:
-> Although we don't provide any virtual MSI functionality yet, we
-> need to implement the functions required by the KVM interface.
+On Fri, Mar 25, 2016 at 02:05:08AM +0000, Andre Przywara wrote:
+> Now that the new VGIC implementation has reached feature parity with
+> the old one, add the new files to the build system and add a Kconfig
+> option to switch between the two versions.
+> We set the default to the new version to get maximum test coverage,
+> in case people experience problems they can switch back to the old
+> behaviour if needed.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  arch/arm/kvm/Kconfig    |  7 +++++++
+>  arch/arm/kvm/Makefile   | 10 ++++++++++
+>  arch/arm64/kvm/Kconfig  |  7 +++++++
+>  arch/arm64/kvm/Makefile | 10 ++++++++++
+>  4 files changed, 34 insertions(+)
+> 
+> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+> index 95a0005..02abfff 100644
+> --- a/arch/arm/kvm/Kconfig
+> +++ b/arch/arm/kvm/Kconfig
+> @@ -46,6 +46,13 @@ config KVM_ARM_HOST
+>  	---help---
+>  	  Provides host support for ARM processors.
+>  
+> +config KVM_NEW_VGIC
+> +	bool "New VGIC implementation"
+> +	depends on KVM
+> +	default y
+> +	---help---
+> +	  uses the new VGIC implementation
+> +
 
-I don't feel like this commit text accurately describes what's happening
-in the code?
-
-This seems to be about irqfds which work just fine on a GICv2m guest?
+I had imagined we'd name it in the reverse, so the option would have
+been CONFIG_KVM_VGIC_LEGACY, but I guess the net effect should be the
+same, assuming most people just go with the default anyway.
 
 Thanks,
 -Christoffer
 
-> 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  virt/kvm/arm/vgic/vgic_irqfd.c | 51 ++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 51 insertions(+)
->  create mode 100644 virt/kvm/arm/vgic/vgic_irqfd.c
-> 
-> diff --git a/virt/kvm/arm/vgic/vgic_irqfd.c b/virt/kvm/arm/vgic/vgic_irqfd.c
-> new file mode 100644
-> index 0000000..3eee1bd
-> --- /dev/null
-> +++ b/virt/kvm/arm/vgic/vgic_irqfd.c
-> @@ -0,0 +1,51 @@
-> +/*
-> + * Copyright (C) 2015, 2016 ARM Ltd.
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
+>  source drivers/vhost/Kconfig
+>  
+>  endif # VIRTUALIZATION
+> diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+> index eb1bf43..aa7d724 100644
+> --- a/arch/arm/kvm/Makefile
+> +++ b/arch/arm/kvm/Makefile
+> @@ -21,7 +21,17 @@ obj-$(CONFIG_KVM_ARM_HOST) += hyp/
+>  obj-y += kvm-arm.o init.o interrupts.o
+>  obj-y += arm.o handle_exit.o guest.o mmu.o emulate.o reset.o
+>  obj-y += coproc.o coproc_a15.o coproc_a7.o mmio.o psci.o perf.o
 > +
-> +#include <linux/kvm.h>
-> +#include <linux/kvm_host.h>
-> +#include <trace/events/kvm.h>
+> +ifeq ($(CONFIG_KVM_NEW_VGIC),y)
+> +obj-y += $(KVM)/arm/vgic/vgic.o
+> +obj-y += $(KVM)/arm/vgic/vgic_init.o
+> +obj-y += $(KVM)/arm/vgic/vgic_irqfd.o
+> +obj-y += $(KVM)/arm/vgic/vgic-v2.o
+> +obj-y += $(KVM)/arm/vgic/vgic_mmio.o
+> +obj-y += $(KVM)/arm/vgic/vgic_kvm_device.o
+> +else
+>  obj-y += $(KVM)/arm/vgic.o
+>  obj-y += $(KVM)/arm/vgic-v2.o
+>  obj-y += $(KVM)/arm/vgic-v2-emul.o
+> +endif
+>  obj-y += $(KVM)/arm/arch_timer.o
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index de7450d..3f0e1ce 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -55,6 +55,13 @@ config KVM_ARM_PMU
+>  	  Adds support for a virtual Performance Monitoring Unit (PMU) in
+>  	  virtual machines.
+>  
+> +config KVM_NEW_VGIC
+> +	bool "New VGIC implementation"
+> +	depends on KVM
+> +	default y
+> +        ---help---
+> +          uses the new VGIC implementation
 > +
-> +int kvm_irq_map_gsi(struct kvm *kvm,
-> +		    struct kvm_kernel_irq_routing_entry *entries,
-> +		    int gsi)
-> +{
-> +	return 0;
-> +}
-> +
-> +int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned irqchip, unsigned pin)
-> +{
-> +	return pin;
-> +}
-> +
-> +int kvm_set_irq(struct kvm *kvm, int irq_source_id,
-> +		u32 irq, int level, bool line_status)
-> +{
-> +	unsigned int spi = irq + VGIC_NR_PRIVATE_IRQS;
-> +
-> +	trace_kvm_set_irq(irq, level, irq_source_id);
-> +
-> +	BUG_ON(!vgic_initialized(kvm));
-> +
-> +	return kvm_vgic_inject_irq(kvm, 0, spi, level);
-> +}
-> +
-> +/* MSI not implemented yet */
-> +int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
-> +		struct kvm *kvm, int irq_source_id,
-> +		int level, bool line_status)
-> +{
-> +	return 0;
-> +}
+>  source drivers/vhost/Kconfig
+>  
+>  endif # VIRTUALIZATION
+> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+> index 122cff4..2f5d431 100644
+> --- a/arch/arm64/kvm/Makefile
+> +++ b/arch/arm64/kvm/Makefile
+> @@ -20,10 +20,20 @@ kvm-$(CONFIG_KVM_ARM_HOST) += emulate.o inject_fault.o regmap.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
+>  
+> +ifeq ($(CONFIG_KVM_NEW_VGIC),y)
+> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic.o
+> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic_init.o
+> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic_irqfd.o
+> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-v2.o
+> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-v3.o
+> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic_mmio.o
+> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic_kvm_device.o
+> +else
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v2.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v2-emul.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3.o
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3-emul.o
+> +endif
+>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
+>  kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
 > -- 
 > 2.7.3
 > 
+> --
+> To unsubscribe from this list: send the line "unsubscribe kvm" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
