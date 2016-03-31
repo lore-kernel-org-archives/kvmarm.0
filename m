@@ -1,28 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH 14/45] KVM: arm/arm64: vgic-new: Add CTLR, TYPER and
- IIDR handlers
-Date: Thu, 31 Mar 2016 11:27:27 +0200
-Message-ID: <20160331092727.GT4126@cbox>
+Subject: Re: [RFC PATCH 15/45] KVM: arm/arm64: vgic-new: Add ENABLE registers
+ handlers
+Date: Thu, 31 Mar 2016 11:33:02 +0200
+Message-ID: <20160331093302.GU4126@cbox>
 References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
- <1458871508-17279-15-git-send-email-andre.przywara@arm.com>
+ <1458871508-17279-16-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BB2F540C9D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2016 05:26:24 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 80F0540C9D
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2016 05:31:59 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id GeQ6qv7vzOUE for <kvmarm@lists.cs.columbia.edu>;
- Thu, 31 Mar 2016 05:26:23 -0400 (EDT)
-Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8670B40C9A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2016 05:26:23 -0400 (EDT)
-Received: by mail-wm0-f41.google.com with SMTP id 127so126988734wmu.1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2016 02:27:27 -0700 (PDT)
+ with ESMTP id 5v75YpYelLra for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 31 Mar 2016 05:31:58 -0400 (EDT)
+Received: from mail-wm0-f50.google.com (mail-wm0-f50.google.com [74.125.82.50])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 25A9240C9A
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2016 05:31:57 -0400 (EDT)
+Received: by mail-wm0-f50.google.com with SMTP id 191so119328553wmq.0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 31 Mar 2016 02:33:02 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1458871508-17279-15-git-send-email-andre.przywara@arm.com>
+In-Reply-To: <1458871508-17279-16-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,98 +36,119 @@ To: Andre Przywara <andre.przywara@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Mar 25, 2016 at 02:04:37AM +0000, Andre Przywara wrote:
+On Fri, Mar 25, 2016 at 02:04:38AM +0000, Andre Przywara wrote:
 > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
->  virt/kvm/arm/vgic/vgic.h      |  3 +++
->  virt/kvm/arm/vgic/vgic_mmio.c | 49 ++++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 51 insertions(+), 1 deletion(-)
+>  virt/kvm/arm/vgic/vgic_mmio.c | 81 +++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 79 insertions(+), 2 deletions(-)
 > 
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index a462e2b..57aea8f 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -16,6 +16,9 @@
->  #ifndef __KVM_ARM_VGIC_NEW_H__
->  #define __KVM_ARM_VGIC_NEW_H__
->  
-> +#define PRODUCT_ID_KVM		0x4b	/* ASCII code K */
-> +#define IMPLEMENTER_ARM		0x43b
-> +
->  struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
->  			      u32 intid);
->  bool vgic_queue_irq(struct kvm *kvm, struct vgic_irq *irq);
 > diff --git a/virt/kvm/arm/vgic/vgic_mmio.c b/virt/kvm/arm/vgic/vgic_mmio.c
-> index e1fd17f..e62366e 100644
+> index e62366e..0688a69 100644
 > --- a/virt/kvm/arm/vgic/vgic_mmio.c
 > +++ b/virt/kvm/arm/vgic/vgic_mmio.c
-> @@ -82,9 +82,56 @@ static int vgic_mmio_write_nyi(struct kvm_vcpu *vcpu,
+> @@ -129,15 +129,92 @@ static int vgic_mmio_write_v2_misc(struct kvm_vcpu *vcpu,
 >  	return 0;
 >  }
 >  
-> +static int vgic_mmio_read_v2_misc(struct kvm_vcpu *vcpu,
-> +				  struct kvm_io_device *this,
-> +				  gpa_t addr, int len, void *val)
+> +/*
+> + * Read accesses to both GICD_ICENABLER and GICD_ISENABLER return the value
+> + * of the enabled bit, so there is only one function for both here.
+> + */
+> +static int vgic_mmio_read_enable(struct kvm_vcpu *vcpu,
+> +				 struct kvm_io_device *this,
+> +				 gpa_t addr, int len, void *val)
 > +{
 > +	struct vgic_io_device *iodev = container_of(this,
 > +						    struct vgic_io_device, dev);
-> +	u32 value;
+> +	u32 intid = (addr - iodev->base_addr) * 8;
+> +	u32 value = 0;
+> +	int i;
 > +
-> +	switch ((addr - iodev->base_addr) & ~3) {
-> +	case 0x0:
-> +		value = vcpu->kvm->arch.vgic.enabled ? GICD_ENABLE : 0;
-> +		break;
-> +	case 0x4:
-> +		value = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
-> +		value = (value >> 5) - 1;
-> +		value |= (atomic_read(&vcpu->kvm->online_vcpus) - 1) << 5;
-> +		break;
-> +	case 0x8:
-> +		value = (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
-> +		break;
-> +	default:
-> +		return 0;
+> +	if (iodev->redist_vcpu)
+> +		vcpu = iodev->redist_vcpu;
+> +
+> +	/* Loop over all IRQs affected by this read */
+> +	for (i = 0; i < len * 8; i++) {
+> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+> +
+> +		if (irq->enabled)
+> +			value |= (1U << i);
 > +	}
 > +
 > +	write_mask32(value, addr & 3, len, val);
 > +	return 0;
 > +}
 > +
-> +static int vgic_mmio_write_v2_misc(struct kvm_vcpu *vcpu,
+> +static int vgic_mmio_write_senable(struct kvm_vcpu *vcpu,
 > +				   struct kvm_io_device *this,
 > +				   gpa_t addr, int len, const void *val)
 > +{
 > +	struct vgic_io_device *iodev = container_of(this,
 > +						    struct vgic_io_device, dev);
-> +	/*
-> +	 * GICD_TYPER and GICD_IIDR are read-only, the upper three bytes of
-> +	 * GICD_CTLR are reserved.
-> +	 */
-> +	if (addr - iodev->base_addr >= 1)
-> +		return 0;
+> +	u32 intid = (addr - iodev->base_addr) * 8;
+> +	int i;
 > +
-> +	vcpu->kvm->arch.vgic.enabled = (*(u32 *)val) ? true : false;
-> +	/* TODO: is there anything to trigger at this point? */
+> +	if (iodev->redist_vcpu)
+> +		vcpu = iodev->redist_vcpu;
+> +
+> +	for_each_set_bit(i, val, len * 8) {
+> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+> +
+> +		spin_lock(&irq->irq_lock);
+> +		irq->enabled = true;
+> +		vgic_queue_irq(vcpu->kvm, irq);
 
-I guess we should actually check if the vgic is enabled in PATH 11, and
-we should kick all VCPUs (or at least those with something pending) if
-we went from disabled to enabled?
+this makes me feel like we should rename this to vgic_queue_irq_unlock
 
-We should probably also check this in the sync function...
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int vgic_mmio_write_cenable(struct kvm_vcpu *vcpu,
+> +				   struct kvm_io_device *this,
+> +				   gpa_t addr, int len, const void *val)
+> +{
+> +	struct vgic_io_device *iodev = container_of(this,
+> +						    struct vgic_io_device, dev);
+> +	u32 intid = (addr - iodev->base_addr) * 8;
+> +	int i;
+> +
+> +	if (iodev->redist_vcpu)
+> +		vcpu = iodev->redist_vcpu;
+> +
+> +	for_each_set_bit(i, val, len * 8) {
+> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+> +
+> +		spin_lock(&irq->irq_lock);
+> +
+> +		irq->enabled = false;
+> +		/* TODO: Does the exit/entry code take care of "unqueuing"? */
 
-Or do we enforce this enabled bool somewhere else that I missed?
+yes it does, the sync calls prune_ap_list, which calls the Oracle, which
+returns null if the IRQ is no longer enabled, so the prune function
+removes the IRQ from the list.
 
 > +
+> +		spin_unlock(&irq->irq_lock);
+> +	}
 > +	return 0;
 > +}
 > +
 >  struct vgic_register_region vgic_v2_dist_registers[] = {
 >  	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
-> -		vgic_mmio_read_nyi, vgic_mmio_write_nyi, 12),
-> +		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12),
+>  		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12),
 >  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_IGROUP,
 >  		vgic_mmio_read_raz, vgic_mmio_write_wi, 1),
 >  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_SET,
+> -		vgic_mmio_read_nyi, vgic_mmio_write_nyi, 1),
+> +		vgic_mmio_read_enable, vgic_mmio_write_senable, 1),
+>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ENABLE_CLEAR,
+> -		vgic_mmio_read_nyi, vgic_mmio_write_nyi, 1),
+> +		vgic_mmio_read_enable, vgic_mmio_write_cenable, 1),
+>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_SET,
+>  		vgic_mmio_read_nyi, vgic_mmio_write_nyi, 1),
+>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_CLEAR,
 > -- 
 > 2.7.3
 > 
