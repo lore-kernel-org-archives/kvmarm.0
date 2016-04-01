@@ -1,125 +1,104 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 2/2] arm64: KVM: Register CPU notifiers when the kernel runs at HYP
-Date: Fri,  1 Apr 2016 11:07:27 +0200
-Message-ID: <1459501647-20726-3-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 1/2] arm64: kvm: 4.6-rc1: Fix VTCR_EL2 VS setting
+Date: Fri,  1 Apr 2016 11:07:26 +0200
+Message-ID: <1459501647-20726-2-git-send-email-christoffer.dall@linaro.org>
 References: <1459501647-20726-1-git-send-email-christoffer.dall@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2087A410D7
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2016 05:06:26 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 3g8-ZNMCtVjj for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Apr 2016 05:06:25 -0400 (EDT)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F0F5141390
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2016 05:06:24 -0400 (EDT)
+Received: by mail-wm0-f53.google.com with SMTP id 20so14614003wmh.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Apr 2016 02:07:32 -0700 (PDT)
 In-Reply-To: <1459501647-20726-1-git-send-email-christoffer.dall@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, James Morse <james.morse@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: James Morse <james.morse@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-When the kernel is running at EL2, it doesn't need init_hyp_mode() to
-configure page tables for HYP. This function also registers the CPU
-hotplug and lower power notifiers that cause HYP to be re-initialised
-after the CPU has been reset.
+When we detect support for 16bit VMID in ID_AA64MMFR1, we set the
+VTCR_EL2_VS field to 1 to make use of 16bit vmids. But, with
+commit 3a3604bc5eb4 ("arm64: KVM: Switch to C-based stage2 init")
+this is broken and we corrupt VTCR_EL2:T0SZ instead of updating the VS
+field. VTCR_EL2_VS was actually defined to the field shift (19) and
+not the real value for VS. This patch fixes the issue.
 
-To avoid losing the register state that controls stage2 translation, move
-the registering of these notifiers into init_subsystems(), and add a
-is_kernel_in_hyp_mode() path to each callback.
-
+Fixes: commit 3a3604bc5eb4 ("arm64: KVM: Switch to C-based stage2 init")
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-Fixes: 1e947bad0b6 ("arm64: KVM: Skip HYP setup when already running in HYP")
-Signed-off-by: James Morse <james.morse@arm.com>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- arch/arm/kvm/arm.c | 52 +++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 33 insertions(+), 19 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h | 4 +++-
+ arch/arm64/include/asm/sysreg.h  | 3 +++
+ arch/arm64/kvm/hyp/s2-setup.c    | 6 ++++--
+ 3 files changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index 6accd66..b538431 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -1061,15 +1061,27 @@ static void cpu_init_hyp_mode(void *dummy)
- 	kvm_arm_init_debug();
- }
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 0e391db..4150fd8 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -124,7 +124,9 @@
+ #define VTCR_EL2_SL0_LVL1	(1 << 6)
+ #define VTCR_EL2_T0SZ_MASK	0x3f
+ #define VTCR_EL2_T0SZ_40B	24
+-#define VTCR_EL2_VS		19
++#define VTCR_EL2_VS_SHIFT	19
++#define VTCR_EL2_VS_8BIT	(0 << VTCR_EL2_VS_SHIFT)
++#define VTCR_EL2_VS_16BIT	(1 << VTCR_EL2_VS_SHIFT)
  
-+static void cpu_hyp_reinit(void)
-+{
-+	if (is_kernel_in_hyp_mode()) {
-+		/*
-+		 * cpu_init_stage2() is safe to call even if the PM
-+		 * event was cancelled before the CPU was reset.
-+		 */
-+		cpu_init_stage2(NULL);
-+	} else {
-+		if (__hyp_get_vectors() == hyp_default_vectors)
-+			cpu_init_hyp_mode(NULL);
-+	}
-+}
+ /*
+  * We configure the Stage-2 page tables to always restrict the IPA space to be
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 1a78d6e..1287416 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -141,6 +141,9 @@
+ #define ID_AA64MMFR1_VMIDBITS_SHIFT	4
+ #define ID_AA64MMFR1_HADBS_SHIFT	0
+ 
++#define ID_AA64MMFR1_VMIDBITS_8		0
++#define ID_AA64MMFR1_VMIDBITS_16	2
 +
- static int hyp_init_cpu_notify(struct notifier_block *self,
- 			       unsigned long action, void *cpu)
- {
- 	switch (action) {
- 	case CPU_STARTING:
- 	case CPU_STARTING_FROZEN:
--		if (__hyp_get_vectors() == hyp_default_vectors)
--			cpu_init_hyp_mode(NULL);
--		break;
-+		cpu_hyp_reinit();
- 	}
+ /* id_aa64mmfr2 */
+ #define ID_AA64MMFR2_UAO_SHIFT		4
  
- 	return NOTIFY_OK;
-@@ -1084,9 +1096,8 @@ static int hyp_init_cpu_pm_notifier(struct notifier_block *self,
- 				    unsigned long cmd,
- 				    void *v)
- {
--	if (cmd == CPU_PM_EXIT &&
--	    __hyp_get_vectors() == hyp_default_vectors) {
--		cpu_init_hyp_mode(NULL);
-+	if (cmd == CPU_PM_EXIT) {
-+		cpu_hyp_reinit();
- 		return NOTIFY_OK;
- 	}
- 
-@@ -1128,6 +1139,22 @@ static int init_subsystems(void)
- 	int err;
- 
- 	/*
-+	 * Register CPU Hotplug notifier
-+	 */
-+	cpu_notifier_register_begin();
-+	err = __register_cpu_notifier(&hyp_init_cpu_nb);
-+	cpu_notifier_register_done();
-+	if (err) {
-+		kvm_err("Cannot register KVM init CPU notifier (%d)\n", err);
-+		return err;
-+	}
-+
-+	/*
-+	 * Register CPU lower-power notifier
-+	 */
-+	hyp_cpu_pm_init();
-+
-+	/*
- 	 * Init HYP view of VGIC
+diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
+index bfc54fd..5a9f3bf 100644
+--- a/arch/arm64/kvm/hyp/s2-setup.c
++++ b/arch/arm64/kvm/hyp/s2-setup.c
+@@ -36,8 +36,10 @@ void __hyp_text __init_stage2_translation(void)
+ 	 * Read the VMIDBits bits from ID_AA64MMFR1_EL1 and set the VS
+ 	 * bit in VTCR_EL2.
  	 */
- 	err = kvm_vgic_hyp_init();
-@@ -1270,19 +1297,6 @@ static int init_hyp_mode(void)
- 	free_boot_hyp_pgd();
- #endif
+-	tmp = (read_sysreg(id_aa64mmfr1_el1) >> 4) & 0xf;
+-	val |= (tmp == 2) ? VTCR_EL2_VS : 0;
++	tmp = (read_sysreg(id_aa64mmfr1_el1) >> ID_AA64MMFR1_VMIDBITS_SHIFT) & 0xf;
++	val |= (tmp == ID_AA64MMFR1_VMIDBITS_16) ?
++			VTCR_EL2_VS_16BIT :
++			VTCR_EL2_VS_8BIT;
  
--	cpu_notifier_register_begin();
--
--	err = __register_cpu_notifier(&hyp_init_cpu_nb);
--
--	cpu_notifier_register_done();
--
--	if (err) {
--		kvm_err("Cannot register HYP init CPU notifier (%d)\n", err);
--		goto out_err;
--	}
--
--	hyp_cpu_pm_init();
--
- 	/* set size of VMID supported by CPU */
- 	kvm_vmid_bits = kvm_get_vmid_bits();
- 	kvm_info("%d-bit VMID\n", kvm_vmid_bits);
+ 	write_sysreg(val, vtcr_el2);
+ }
 -- 
 2.1.2.330.g565301e.dirty
-
