@@ -1,25 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 1/2] arm64: kvm: 4.6-rc1: Fix VTCR_EL2 VS setting
-Date: Fri,  1 Apr 2016 11:07:26 +0200
-Message-ID: <1459501647-20726-2-git-send-email-christoffer.dall@linaro.org>
-References: <1459501647-20726-1-git-send-email-christoffer.dall@linaro.org>
+Subject: Re: [PATCH v4 6/9] irqchip/gic-v3: Parse and export virtual GIC
+ information
+Date: Fri, 1 Apr 2016 12:13:08 +0200
+Message-ID: <20160401101308.GB20224@cbox>
+References: <1458842023-31853-1-git-send-email-julien.grall@arm.com>
+ <1458842023-31853-7-git-send-email-julien.grall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2087A410D7
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2016 05:06:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 34F1349AF5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2016 06:12:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 3g8-ZNMCtVjj for <kvmarm@lists.cs.columbia.edu>;
- Fri,  1 Apr 2016 05:06:25 -0400 (EDT)
-Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F0F5141390
- for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2016 05:06:24 -0400 (EDT)
-Received: by mail-wm0-f53.google.com with SMTP id 20so14614003wmh.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Apr 2016 02:07:32 -0700 (PDT)
-In-Reply-To: <1459501647-20726-1-git-send-email-christoffer.dall@linaro.org>
+ with ESMTP id dK7PT6zRUMa9 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  1 Apr 2016 06:12:00 -0400 (EDT)
+Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 11CD741390
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  1 Apr 2016 06:11:59 -0400 (EDT)
+Received: by mail-wm0-f45.google.com with SMTP id p65so16806701wmp.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 01 Apr 2016 03:13:07 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1458842023-31853-7-git-send-email-julien.grall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,76 +32,256 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+To: Julien Grall <julien.grall@arm.com>
+Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, Jason Cooper <jason@lakedaemon.net>, linux-kernel@vger.kernel.org, fu.wei@linaro.org, Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, gg@slimlogic.co.uk
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
+On Thu, Mar 24, 2016 at 05:53:40PM +0000, Julien Grall wrote:
+> Fill up the recently introduced gic_kvm_info with the hardware
+> information used for virtualization.
+> 
+> Signed-off-by: Julien Grall <julien.grall@arm.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Jason Cooper <jason@lakedaemon.net>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> 
+> ---
+>     Changes in v4:
+>         - Change the flow to call gic_kvm_set_info only when all the
+>         mandatory information are valid.
+>         - Remove unecessary code in ACPI parsing (the virtual control
+>         interface doesn't exist for GICv3).
+>         - Rework commit message
+>         - Rework the ACPI support as it didn't collect hardware info for
+>         virtualization when there is more than 1 redistributor region
+> 
+>     Changes in v3:
+>         - Add ACPI support
+> 
+>     Changes in v2:
+>         - Use 0 rather than a negative value to know when the maintenance IRQ
+>         is not present.
+>         - Use resource for vcpu and vctrl
+> ---
+>  drivers/irqchip/irq-gic-v3.c           | 123 ++++++++++++++++++++++++++++++++-
+>  include/linux/irqchip/arm-gic-common.h |   1 +
+>  2 files changed, 123 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+> index 50e87e6..b5ed8be 100644
+> --- a/drivers/irqchip/irq-gic-v3.c
+> +++ b/drivers/irqchip/irq-gic-v3.c
+> @@ -28,6 +28,7 @@
+>  #include <linux/slab.h>
+>  
+>  #include <linux/irqchip.h>
+> +#include <linux/irqchip/arm-gic-common.h>
+>  #include <linux/irqchip/arm-gic-v3.h>
+>  
+>  #include <asm/cputype.h>
+> @@ -56,6 +57,8 @@ struct gic_chip_data {
+>  static struct gic_chip_data gic_data __read_mostly;
+>  static struct static_key supports_deactivate = STATIC_KEY_INIT_TRUE;
+>  
+> +static struct gic_kvm_info gic_v3_kvm_info;
+> +
+>  #define gic_data_rdist()		(this_cpu_ptr(gic_data.rdists.rdist))
+>  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+>  #define gic_data_rdist_sgi_base()	(gic_data_rdist_rd_base() + SZ_64K)
+> @@ -901,6 +904,39 @@ static int __init gic_validate_dist_version(void __iomem *dist_base)
+>  	return 0;
+>  }
+>  
+> +static void __init gic_of_setup_kvm_info(struct device_node *node)
+> +{
+> +	int ret;
+> +	struct resource r;
+> +	u32 gicv_idx;
+> +
+> +	gic_v3_kvm_info.type = GIC_V3;
+> +
+> +	gic_v3_kvm_info.maint_irq = irq_of_parse_and_map(node, 0);
+> +	if (!gic_v3_kvm_info.maint_irq)
+> +		return;
+> +
+> +	if (of_property_read_u32(node, "#redistributor-regions",
+> +				 &gicv_idx))
+> +		gicv_idx = 1;
+> +
+> +	gicv_idx += 3;	/* Also skip GICD, GICC, GICH */
+> +	ret = of_address_to_resource(node, gicv_idx, &r);
+> +	if (!ret) {
+> +		if (!PAGE_ALIGNED(r.start))
+> +			pr_warn("GICV physical address 0x%llx not page aligned\n",
+> +				(unsigned long long)r.start);
+> +		else if (!PAGE_ALIGNED(resource_size(&r)))
+> +			pr_warn("GICV size 0x%llx not a multiple of page size 0x%lx\n",
+> +				(unsigned long long)resource_size(&r),
+> +				PAGE_SIZE);
+> +		else
 
-When we detect support for 16bit VMID in ID_AA64MMFR1, we set the
-VTCR_EL2_VS field to 1 to make use of 16bit vmids. But, with
-commit 3a3604bc5eb4 ("arm64: KVM: Switch to C-based stage2 init")
-this is broken and we corrupt VTCR_EL2:T0SZ instead of updating the VS
-field. VTCR_EL2_VS was actually defined to the field shift (19) and
-not the real value for VS. This patch fixes the issue.
+it seems like you're also checking the above items in the KVM code
+itself, so I still don't understand why we have to do this twice.
 
-Fixes: commit 3a3604bc5eb4 ("arm64: KVM: Switch to C-based stage2 init")
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Acked-by: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
----
- arch/arm64/include/asm/kvm_arm.h | 4 +++-
- arch/arm64/include/asm/sysreg.h  | 3 +++
- arch/arm64/kvm/hyp/s2-setup.c    | 6 ++++--
- 3 files changed, 10 insertions(+), 3 deletions(-)
+My feeling here is that you want to just lookup if you have the proper
+resources to fill in the struct in the GIC driver, and fill in the
+struct with data if the firmware gave you something.
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 0e391db..4150fd8 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -124,7 +124,9 @@
- #define VTCR_EL2_SL0_LVL1	(1 << 6)
- #define VTCR_EL2_T0SZ_MASK	0x3f
- #define VTCR_EL2_T0SZ_40B	24
--#define VTCR_EL2_VS		19
-+#define VTCR_EL2_VS_SHIFT	19
-+#define VTCR_EL2_VS_8BIT	(0 << VTCR_EL2_VS_SHIFT)
-+#define VTCR_EL2_VS_16BIT	(1 << VTCR_EL2_VS_SHIFT)
- 
- /*
-  * We configure the Stage-2 page tables to always restrict the IPA space to be
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 1a78d6e..1287416 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -141,6 +141,9 @@
- #define ID_AA64MMFR1_VMIDBITS_SHIFT	4
- #define ID_AA64MMFR1_HADBS_SHIFT	0
- 
-+#define ID_AA64MMFR1_VMIDBITS_8		0
-+#define ID_AA64MMFR1_VMIDBITS_16	2
-+
- /* id_aa64mmfr2 */
- #define ID_AA64MMFR2_UAO_SHIFT		4
- 
-diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
-index bfc54fd..5a9f3bf 100644
---- a/arch/arm64/kvm/hyp/s2-setup.c
-+++ b/arch/arm64/kvm/hyp/s2-setup.c
-@@ -36,8 +36,10 @@ void __hyp_text __init_stage2_translation(void)
- 	 * Read the VMIDBits bits from ID_AA64MMFR1_EL1 and set the VS
- 	 * bit in VTCR_EL2.
- 	 */
--	tmp = (read_sysreg(id_aa64mmfr1_el1) >> 4) & 0xf;
--	val |= (tmp == 2) ? VTCR_EL2_VS : 0;
-+	tmp = (read_sysreg(id_aa64mmfr1_el1) >> ID_AA64MMFR1_VMIDBITS_SHIFT) & 0xf;
-+	val |= (tmp == ID_AA64MMFR1_VMIDBITS_16) ?
-+			VTCR_EL2_VS_16BIT :
-+			VTCR_EL2_VS_8BIT;
- 
- 	write_sysreg(val, vtcr_el2);
- }
--- 
-2.1.2.330.g565301e.dirty
+It's then up to KVM to deal with its constraints, such as the resources
+being page-aligned etc.  But I suppose you could also argue that the GIC
+code knows how this hardware resource can or cannot be used and
+therefore should check it.
+
+But in any case, I don't understand why we check it more than one place?
+
+Thanks,
+-Christoffer
+
+> +			gic_v3_kvm_info.vcpu = r;
+> +	}
+> +
+> +	gic_set_kvm_info(&gic_v3_kvm_info);
+> +}
+> +
+>  static int __init gic_of_init(struct device_node *node, struct device_node *parent)
+>  {
+>  	void __iomem *dist_base;
+> @@ -952,8 +988,10 @@ static int __init gic_of_init(struct device_node *node, struct device_node *pare
+>  
+>  	err = gic_init_bases(dist_base, rdist_regs, nr_redist_regions,
+>  			     redist_stride, &node->fwnode);
+> -	if (!err)
+> +	if (!err) {
+> +		gic_of_setup_kvm_info(node);
+>  		return 0;
+> +	}
+>  
+>  out_unmap_rdist:
+>  	for (i = 0; i < nr_redist_regions; i++)
+> @@ -974,6 +1012,9 @@ static struct
+>  	struct redist_region *redist_regs;
+>  	u32 nr_redist_regions;
+>  	bool single_redist;
+> +	u32 maint_irq;
+> +	int maint_irq_mode;
+> +	phys_addr_t vcpu_base;
+>  } acpi_data __initdata;
+>  
+>  static void __init
+> @@ -1020,6 +1061,7 @@ gic_acpi_parse_madt_gicc(struct acpi_subtable_header *header,
+>  		return -ENOMEM;
+>  
+>  	gic_acpi_register_redist(gicc->gicr_base_address, redist_base);
+> +
+>  	return 0;
+>  }
+>  
+> @@ -1110,7 +1152,84 @@ static bool __init acpi_validate_gic_table(struct acpi_subtable_header *header,
+>  	return true;
+>  }
+>  
+> +static int __init gic_acpi_parse_virt_madt_gicc(struct acpi_subtable_header *header,
+> +						const unsigned long end)
+> +{
+> +	struct acpi_madt_generic_interrupt *gicc =
+> +		(struct acpi_madt_generic_interrupt *)header;
+> +	int maint_irq_mode;
+> +	static int first_madt = false;
+> +
+> +
+> +	maint_irq_mode = (gicc->flags & ACPI_MADT_VGIC_IRQ_MODE) ?
+> +		ACPI_EDGE_SENSITIVE : ACPI_LEVEL_SENSITIVE;
+> +
+> +	if (first_madt) {
+> +		first_madt = false;
+> +
+> +		acpi_data.maint_irq = gicc->vgic_interrupt;
+> +		acpi_data.maint_irq_mode = maint_irq_mode;
+> +		acpi_data.vcpu_base = gicc->gicv_base_address;
+> +
+> +		return 0;
+> +	}
+> +
+> +	/*
+> +	 * The maintenance interrupt and GICV should be the same for every CPU
+> +	 */
+> +	if ((acpi_data.maint_irq != gicc->vgic_interrupt) ||
+> +	    (acpi_data.maint_irq_mode != maint_irq_mode) ||
+> +	    (acpi_data.vcpu_base != gicc->gicv_base_address))
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+> +static bool __init gic_acpi_collect_virt_info(void)
+> +{
+> +	int count;
+> +
+> +	count = acpi_table_parse_madt(ACPI_MADT_TYPE_GENERIC_INTERRUPT,
+> +				      gic_acpi_parse_virt_madt_gicc, 0);
+> +
+> +	return false;
+> +}
+> +
+>  #define ACPI_GICV3_DIST_MEM_SIZE (SZ_64K)
+> +#define ACPI_GICV2_VCTRL_MEM_SIZE	(SZ_4K)
+> +#define ACPI_GICV2_VCPU_MEM_SIZE	(SZ_8K)
+> +
+> +static void __init gic_acpi_setup_kvm_info(void)
+> +{
+> +	int irq;
+> +
+> +	if (!gic_acpi_collect_virt_info()) {
+> +		pr_warn("Unable to get hardware information used for virtualization\n");
+> +		return;
+> +	}
+> +
+> +	gic_acpi_collect_virt_info();
+> +
+> +	gic_v3_kvm_info.type = GIC_V3;
+> +
+> +	irq = acpi_register_gsi(NULL, acpi_data.maint_irq,
+> +				acpi_data.maint_irq_mode,
+> +				ACPI_ACTIVE_HIGH);
+> +	if (irq <= 0)
+> +		return;
+> +
+> +	gic_v3_kvm_info.maint_irq = irq;
+> +
+> +	if (acpi_data.vcpu_base) {
+> +		struct resource *vcpu = &gic_v3_kvm_info.vcpu;
+> +
+> +		vcpu->flags = IORESOURCE_MEM;
+> +		vcpu->start = acpi_data.vcpu_base;
+> +		vcpu->end = vcpu->start + ACPI_GICV2_VCPU_MEM_SIZE - 1;
+> +	}
+> +
+> +	gic_set_kvm_info(&gic_v3_kvm_info);
+> +}
+>  
+>  static int __init
+>  gic_acpi_init(struct acpi_subtable_header *header, const unsigned long end)
+> @@ -1159,6 +1278,8 @@ gic_acpi_init(struct acpi_subtable_header *header, const unsigned long end)
+>  		goto out_fwhandle_free;
+>  
+>  	acpi_set_irq_model(ACPI_IRQ_MODEL_GIC, domain_handle);
+> +	gic_acpi_setup_kvm_info();
+> +
+>  	return 0;
+>  
+>  out_fwhandle_free:
+> diff --git a/include/linux/irqchip/arm-gic-common.h b/include/linux/irqchip/arm-gic-common.h
+> index ef34f6f..c647b05 100644
+> --- a/include/linux/irqchip/arm-gic-common.h
+> +++ b/include/linux/irqchip/arm-gic-common.h
+> @@ -15,6 +15,7 @@
+>  
+>  enum gic_type {
+>  	GIC_V2,
+> +	GIC_V3,
+>  };
+>  
+>  struct gic_kvm_info {
+> -- 
+> 1.9.1
+> 
