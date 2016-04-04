@@ -1,22 +1,22 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 10/17] kvm-arm: arm64: Introduce hyp page table empty checks
-Date: Mon,  4 Apr 2016 17:26:10 +0100
-Message-ID: <1459787177-12767-11-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH 17/17] arm64: kvm: Add support for 16K pages
+Date: Mon,  4 Apr 2016 17:26:17 +0100
+Message-ID: <1459787177-12767-18-git-send-email-suzuki.poulose@arm.com>
 References: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 81407412DD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:25:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E52FB49B43
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:26:00 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xfMVDboPXVL7 for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Apr 2016 12:25:46 -0400 (EDT)
+ with ESMTP id RwtHSppW+xUB for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2016 12:26:00 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C44E849B44
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:25:46 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BF08649B56
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:25:59 -0400 (EDT)
 In-Reply-To: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,41 +31,65 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Introduce hyp_pxx_table_empty helpers for checking whether
-a given table entry is empty. This will be used explicitly
-once we switch to explicit routines for hyp page table walk.
+Now that we can handle stage-2 page tables independent
+of the host page table levels, wire up the 16K page
+support.
 
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h |   14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ arch/arm64/include/asm/kvm_arm.h |   11 ++++++++++-
+ arch/arm64/kvm/Kconfig           |    1 -
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index e3f53e3..edf3c62 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -249,6 +249,20 @@ static inline bool kvm_page_empty(void *ptr)
- #endif
- 
- 
-+#define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
-+
-+#ifdef __PAGETABLE_PMD_FOLDED
-+#define hyp_pmd_table_empty(pmdp) (0)
-+#else
-+#define hyp_pmd_table_empty(pmdp) kvm_page_empty(pmdp)
-+#endif
-+
-+#ifdef __PAGETABLE_PUD_FOLDED
-+#define hyp_pud_table_empty(pudp) (0)
-+#else
-+#define hyp_pud_table_empty(pudp) kvm_page_empty(pudp)
-+#endif
-+
- struct kvm;
- 
- #define kvm_flush_dcache_to_poc(a,l)	__flush_dcache_area((a), (l))
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index d5d5fdf..3d830a3 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -114,6 +114,7 @@
+ #define VTCR_EL2_PS_MASK	TCR_EL2_PS_MASK
+ #define VTCR_EL2_TG0_MASK	TCR_TG0_MASK
+ #define VTCR_EL2_TG0_4K		TCR_TG0_4K
++#define VTCR_EL2_TG0_16K	TCR_TG0_16K
+ #define VTCR_EL2_TG0_64K	TCR_TG0_64K
+ #define VTCR_EL2_SH0_MASK	TCR_SH0_MASK
+ #define VTCR_EL2_SH0_INNER	TCR_SH0_INNER
+@@ -139,7 +140,7 @@
+  * (see hyp-init.S).
+  *
+  * Note that when using 4K pages, we concatenate two first level page tables
+- * together.
++ * together. With 16K pages, we concatenate 16 first level page tables.
+  *
+  * The magic numbers used for VTTBR_X in this patch can be found in Tables
+  * D4-23 and D4-25 in ARM DDI 0487A.b.
+@@ -156,6 +157,14 @@
+  */
+ #define VTCR_EL2_TGRAN_FLAGS	(VTCR_EL2_TG0_64K | VTCR_EL2_SL0_LVL1)
+ #define VTTBR_X_TGRAN_MAGIC		38
++#elif defined(CONFIG_ARM64_16K_PAGES)
++/*
++ * Stage2 translation configuration:
++ * 16kB pages (TG0 = 2)
++ * 2 level page tables (SL = 1)
++ */
++#define VTCR_EL2_TGRAN_FLAGS	(VTCR_EL2_TG0_16K | VTCR_EL2_SL0_LVL1)
++#define VTTBR_X_TGRAN_MAGIC	42
+ #else
+ /*
+  * Stage2 translation configuration:
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index de7450d..aa2e34e 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -22,7 +22,6 @@ config KVM_ARM_VGIC_V3
+ config KVM
+ 	bool "Kernel-based Virtual Machine (KVM) support"
+ 	depends on OF
+-	depends on !ARM64_16K_PAGES
+ 	select MMU_NOTIFIER
+ 	select PREEMPT_NOTIFIERS
+ 	select ANON_INODES
 -- 
 1.7.9.5
