@@ -1,238 +1,134 @@
-From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: [PATCH v6 4/7] dma-reserved-iommu: alloc/free_reserved_iova_domain
-Date: Mon,  4 Apr 2016 08:06:59 +0000
-Message-ID: <1459757222-2668-5-git-send-email-eric.auger@linaro.org>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [PATCH v6 5/7] dma-reserved-iommu: reserved binding rb-tree and
+ helpers
+Date: Mon,  4 Apr 2016 08:07:00 +0000
+Message-ID: <1459757222-2668-6-git-send-email-eric.auger@linaro.org>
 References: <1459757222-2668-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <1459757222-2668-1-git-send-email-eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: eric.auger-qxv4g6HH51o@public.gmane.org, eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Cc: julien.grall-5wv7dgnIgG8@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 470CC407A5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 04:06:17 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id xB-tTGF6mLYy for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2016 04:06:12 -0400 (EDT)
+Received: from mail-lf0-f52.google.com (mail-lf0-f52.google.com
+ [209.85.215.52])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6E65D40402
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 04:06:12 -0400 (EDT)
+Received: by mail-lf0-f52.google.com with SMTP id c62so157245605lfc.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Apr 2016 01:07:27 -0700 (PDT)
+In-Reply-To: <1459757222-2668-1-git-send-email-eric.auger@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: eric.auger@st.com, eric.auger@linaro.org, robin.murphy@arm.com, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: patches@linaro.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Introduce alloc/free_reserved_iova_domain in the IOMMU API.
-alloc_reserved_iova_domain initializes an iova domain at a given
-iova base address and with a given size. This iova domain will
-be used to allocate iova within that window. Those IOVAs will be reserved
-for special purpose, typically MSI frame binding. Allocation function
-within the reserved iova domain will be introduced in subsequent patches.
+we will need to track which host physical addresses are mapped to
+reserved IOVA. In that prospect we introduce a new RB tree indexed
+by physical address. This RB tree only is used for reserved IOVA
+bindings.
 
-Those functions are implemented and exposed if CONFIG_IOMMU_DMA_RESERVED
-is seta.
+It is expected this RB tree will contain very few bindings. Those
+generally correspond to single page mapping one MSI frame (GICv2m
+frame or ITS GITS_TRANSLATER frame).
 
-Signed-off-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
 ---
-
 v5 -> v6:
-- use spin lock instead of mutex
+- add comment about @d->reserved_lock to be held
 
 v3 -> v4:
-- formerly in "iommu/arm-smmu: implement alloc/free_reserved_iova_domain" &
-  "iommu: add alloc/free_reserved_iova_domain"
-
-v2 -> v3:
-- remove iommu_alloc_reserved_iova_domain & iommu_free_reserved_iova_domain
-  static implementation in case CONFIG_IOMMU_API is not set
-
-v1 -> v2:
-- moved from vfio API to IOMMU API
+- that code was formerly in "iommu/arm-smmu: add a reserved binding RB tree"
 ---
- drivers/iommu/Kconfig              |  8 ++++
- drivers/iommu/Makefile             |  1 +
- drivers/iommu/dma-reserved-iommu.c | 75 ++++++++++++++++++++++++++++++++++++++
- include/linux/dma-reserved-iommu.h | 45 +++++++++++++++++++++++
- 4 files changed, 129 insertions(+)
- create mode 100644 drivers/iommu/dma-reserved-iommu.c
- create mode 100644 include/linux/dma-reserved-iommu.h
+ drivers/iommu/dma-reserved-iommu.c | 63 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 63 insertions(+)
 
-diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
-index dd1dc39..a5a1530 100644
---- a/drivers/iommu/Kconfig
-+++ b/drivers/iommu/Kconfig
-@@ -74,6 +74,12 @@ config IOMMU_DMA
- 	select IOMMU_IOVA
- 	select NEED_SG_DMA_LENGTH
- 
-+# IOMMU reserved IOVA mapping (MSI doorbell)
-+config IOMMU_DMA_RESERVED
-+	bool
-+	select IOMMU_API
-+	select IOMMU_IOVA
-+
- config FSL_PAMU
- 	bool "Freescale IOMMU support"
- 	depends on PPC32
-@@ -307,6 +313,7 @@ config SPAPR_TCE_IOMMU
- config ARM_SMMU
- 	bool "ARM Ltd. System MMU (SMMU) Support"
- 	depends on (ARM64 || ARM) && MMU
-+	select IOMMU_DMA_RESERVED
- 	select IOMMU_API
- 	select IOMMU_IO_PGTABLE_LPAE
- 	select ARM_DMA_USE_IOMMU if ARM
-@@ -320,6 +327,7 @@ config ARM_SMMU
- config ARM_SMMU_V3
- 	bool "ARM Ltd. System MMU Version 3 (SMMUv3) Support"
- 	depends on ARM64 && PCI
-+	select IOMMU_DMA_RESERVED
- 	select IOMMU_API
- 	select IOMMU_IO_PGTABLE_LPAE
- 	select GENERIC_MSI_IRQ_DOMAIN
-diff --git a/drivers/iommu/Makefile b/drivers/iommu/Makefile
-index c6edb31..6c9ae99 100644
---- a/drivers/iommu/Makefile
-+++ b/drivers/iommu/Makefile
-@@ -2,6 +2,7 @@ obj-$(CONFIG_IOMMU_API) += iommu.o
- obj-$(CONFIG_IOMMU_API) += iommu-traces.o
- obj-$(CONFIG_IOMMU_API) += iommu-sysfs.o
- obj-$(CONFIG_IOMMU_DMA) += dma-iommu.o
-+obj-$(CONFIG_IOMMU_DMA_RESERVED) += dma-reserved-iommu.o
- obj-$(CONFIG_IOMMU_IO_PGTABLE) += io-pgtable.o
- obj-$(CONFIG_IOMMU_IO_PGTABLE_ARMV7S) += io-pgtable-arm-v7s.o
- obj-$(CONFIG_IOMMU_IO_PGTABLE_LPAE) += io-pgtable-arm.o
 diff --git a/drivers/iommu/dma-reserved-iommu.c b/drivers/iommu/dma-reserved-iommu.c
-new file mode 100644
-index 0000000..a461482
---- /dev/null
+index a461482..f592118 100644
+--- a/drivers/iommu/dma-reserved-iommu.c
 +++ b/drivers/iommu/dma-reserved-iommu.c
-@@ -0,0 +1,75 @@
-+/*
-+ * Reserved IOVA Management
-+ *
-+ * Copyright (c) 2015 Linaro Ltd.
-+ *              www.linaro.org
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ */
+@@ -18,6 +18,69 @@
+ #include <linux/iommu.h>
+ #include <linux/iova.h>
+ 
++struct iommu_reserved_binding {
++	struct kref		kref;
++	struct rb_node		node;
++	struct iommu_domain	*domain;
++	phys_addr_t		addr;
++	dma_addr_t		iova;
++	size_t			size;
++};
 +
-+#include <linux/iommu.h>
-+#include <linux/iova.h>
++/* Reserved binding RB-tree manipulation */
 +
-+int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
-+				     dma_addr_t iova, size_t size,
-+				     unsigned long order)
++/* @d->reserved_lock must be held */
++static struct iommu_reserved_binding *find_reserved_binding(
++				    struct iommu_domain *d,
++				    phys_addr_t start, size_t size)
 +{
-+	unsigned long granule, mask;
-+	struct iova_domain *iovad;
-+	unsigned long flags;
-+	int ret = 0;
++	struct rb_node *node = d->reserved_binding_list.rb_node;
 +
-+	granule = 1UL << order;
-+	mask = granule - 1;
-+	if (iova & mask || (!size) || (size & mask))
-+		return -EINVAL;
++	while (node) {
++		struct iommu_reserved_binding *binding =
++			rb_entry(node, struct iommu_reserved_binding, node);
 +
-+	iovad = kzalloc(sizeof(struct iova_domain), GFP_KERNEL);
-+	if (!iovad)
-+		return -ENOMEM;
-+
-+	spin_lock_irqsave(&domain->reserved_lock, flags);
-+
-+	if (domain->reserved_iova_cookie) {
-+		ret = -EEXIST;
-+		goto free_unlock;
++		if (start + size <= binding->addr)
++			node = node->rb_left;
++		else if (start >= binding->addr + binding->size)
++			node = node->rb_right;
++		else
++			return binding;
 +	}
 +
-+	init_iova_domain(iovad, granule,
-+			 iova >> order, (iova + size - 1) >> order);
-+	domain->reserved_iova_cookie = iovad;
-+	goto unlock;
-+
-+free_unlock:
-+	kfree(iovad);
-+unlock:
-+	spin_unlock_irqrestore(&domain->reserved_lock, flags);
-+	return ret;
++	return NULL;
 +}
-+EXPORT_SYMBOL_GPL(iommu_alloc_reserved_iova_domain);
 +
-+void iommu_free_reserved_iova_domain(struct iommu_domain *domain)
++/* @d->reserved_lock must be held */
++static void link_reserved_binding(struct iommu_domain *d,
++				  struct iommu_reserved_binding *new)
 +{
-+	struct iova_domain *iovad =
-+		(struct iova_domain *)domain->reserved_iova_cookie;
-+	unsigned long flags;
++	struct rb_node **link = &d->reserved_binding_list.rb_node;
++	struct rb_node *parent = NULL;
++	struct iommu_reserved_binding *binding;
 +
-+	if (!iovad)
-+		return;
++	while (*link) {
++		parent = *link;
++		binding = rb_entry(parent, struct iommu_reserved_binding,
++				   node);
 +
-+	spin_lock_irqsave(&domain->reserved_lock, flags);
++		if (new->addr + new->size <= binding->addr)
++			link = &(*link)->rb_left;
++		else
++			link = &(*link)->rb_right;
++	}
 +
-+	put_iova_domain(iovad);
-+	kfree(iovad);
-+
-+	spin_unlock_irqrestore(&domain->reserved_lock, flags);
++	rb_link_node(&new->node, parent, link);
++	rb_insert_color(&new->node, &d->reserved_binding_list);
 +}
-+EXPORT_SYMBOL_GPL(iommu_free_reserved_iova_domain);
-diff --git a/include/linux/dma-reserved-iommu.h b/include/linux/dma-reserved-iommu.h
-new file mode 100644
-index 0000000..5bf863b
---- /dev/null
-+++ b/include/linux/dma-reserved-iommu.h
-@@ -0,0 +1,45 @@
-+/*
-+ * Copyright (c) 2015 Linaro Ltd.
-+ *              www.linaro.org
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ */
-+#ifndef __DMA_RESERVED_IOMMU_H
-+#define __DMA_RESERVED_IOMMU_H
 +
-+#ifdef __KERNEL__
-+#include <asm/errno.h>
++/* @d->reserved_lock must be held */
++static void unlink_reserved_binding(struct iommu_domain *d,
++				    struct iommu_reserved_binding *old)
++{
++	rb_erase(&old->node, &d->reserved_binding_list);
++}
 +
-+#ifdef CONFIG_IOMMU_DMA_RESERVED
-+#include <linux/iommu.h>
-+
-+/**
-+ * iommu_alloc_reserved_iova_domain: allocate the reserved iova domain
-+ *
-+ * @domain: iommu domain handle
-+ * @iova: base iova address
-+ * @size: iova window size
-+ * @order: page order
-+ */
-+int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
-+				     dma_addr_t iova, size_t size,
-+				     unsigned long order);
-+
-+/**
-+ * iommu_free_reserved_iova_domain: free the reserved iova domain
-+ *
-+ * @domain: iommu domain handle
-+ */
-+void iommu_free_reserved_iova_domain(struct iommu_domain *domain);
-+
-+#endif	/* CONFIG_IOMMU_DMA_RESERVED */
-+#endif	/* __KERNEL__ */
-+#endif	/* __DMA_RESERVED_IOMMU_H */
+ int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
+ 				     dma_addr_t iova, size_t size,
+ 				     unsigned long order)
 -- 
 1.9.1
