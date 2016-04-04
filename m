@@ -1,23 +1,23 @@
 From: Julien Grall <julien.grall@arm.com>
-Subject: [PATCH v5 3/9] irqchip/gic-v2: Gather ACPI specific data in a single
- structure
-Date: Mon,  4 Apr 2016 12:37:34 +0100
-Message-ID: <1459769860-6629-4-git-send-email-julien.grall@arm.com>
+Subject: [PATCH v5 9/9] clocksource: arm_arch_timer: Remove
+ arch_timer_get_timecounter
+Date: Mon,  4 Apr 2016 12:37:40 +0100
+Message-ID: <1459769860-6629-10-git-send-email-julien.grall@arm.com>
 References: <1459769860-6629-1-git-send-email-julien.grall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF892400E9
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 07:36:53 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EE324011D
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 07:37:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XDvsd4QpvSkk for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Apr 2016 07:36:52 -0400 (EDT)
+ with ESMTP id X8cdl4t63yoN for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2016 07:37:07 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D3441410EB
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 07:36:52 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 14F13410B5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 07:37:07 -0400 (EDT)
 In-Reply-To: <1459769860-6629-1-git-send-email-julien.grall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -29,72 +29,67 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: kvmarm@lists.cs.columbia.edu
-Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, fu.wei@linaro.org, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, linux-arm-kernel@lists.infradead.org, gg@slimlogic.co.uk
+Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, Daniel Lezcano <daniel.lezcano@linaro.org>, linux-kernel@vger.kernel.org, fu.wei@linaro.org, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org, gg@slimlogic.co.uk
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The ACPI code requires to use global variables in order to collect
-information from the tables.
-
-For now, a single global variable is used, but more will be added in a
-subsequent patch. To make clear they are ACPI specific, gather all the
-information in a single structure.
+The only call of arch_timer_get_timecounter (in KVM) has been removed.
 
 Signed-off-by: Julien Grall <julien.grall@arm.com>
-Acked-by: Christofer Dall <christoffer.dall@linaro.org>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 
 ---
+Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
 Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Jason Cooper <jason@lakedaemon.net>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
 
     Changes in v4:
-        - Update commit message
-        - Rename cpu_phy_base to cpu_phys_base
-        - Add Christopher's acked-by
+        - Add Christoffer's acked-by
 
-    Changes in v2:
+    Changes in v3:
         - Patch added
 ---
- drivers/irqchip/irq-gic.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ drivers/clocksource/arm_arch_timer.c | 5 -----
+ include/clocksource/arm_arch_timer.h | 6 ------
+ 2 files changed, 11 deletions(-)
 
-diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-index 282344b..7a73786 100644
---- a/drivers/irqchip/irq-gic.c
-+++ b/drivers/irqchip/irq-gic.c
-@@ -1245,7 +1245,10 @@ IRQCHIP_DECLARE(pl390, "arm,pl390", gic_of_init);
- #endif
+diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
+index bb58224..4814446 100644
+--- a/drivers/clocksource/arm_arch_timer.c
++++ b/drivers/clocksource/arm_arch_timer.c
+@@ -475,11 +475,6 @@ struct arch_timer_kvm_info *arch_timer_get_kvm_info(void)
+ 	return &arch_timer_kvm_info;
+ }
  
- #ifdef CONFIG_ACPI
--static phys_addr_t cpu_phy_base __initdata;
-+static struct
-+{
-+	phys_addr_t cpu_phys_base;
-+} acpi_data __initdata;
+-struct timecounter *arch_timer_get_timecounter(void)
+-{
+-	return &arch_timer_kvm_info.timecounter;
+-}
+-
+ static void __init arch_counter_register(unsigned type)
+ {
+ 	u64 start_count;
+diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
+index 9dd996a..caedb74 100644
+--- a/include/clocksource/arm_arch_timer.h
++++ b/include/clocksource/arm_arch_timer.h
+@@ -58,7 +58,6 @@ struct arch_timer_kvm_info {
  
- static int __init
- gic_acpi_parse_madt_cpu(struct acpi_subtable_header *header,
-@@ -1265,10 +1268,10 @@ gic_acpi_parse_madt_cpu(struct acpi_subtable_header *header,
- 	 * All CPU interface addresses have to be the same.
- 	 */
- 	gic_cpu_base = processor->base_address;
--	if (cpu_base_assigned && gic_cpu_base != cpu_phy_base)
-+	if (cpu_base_assigned && gic_cpu_base != acpi_data.cpu_phys_base)
- 		return -EINVAL;
+ extern u32 arch_timer_get_rate(void);
+ extern u64 (*arch_timer_read_counter)(void);
+-extern struct timecounter *arch_timer_get_timecounter(void);
+ extern struct arch_timer_kvm_info *arch_timer_get_kvm_info(void);
  
--	cpu_phy_base = gic_cpu_base;
-+	acpi_data.cpu_phys_base = gic_cpu_base;
- 	cpu_base_assigned = 1;
+ #else
+@@ -73,11 +72,6 @@ static inline u64 arch_timer_read_counter(void)
  	return 0;
  }
-@@ -1316,7 +1319,7 @@ static int __init gic_v2_acpi_init(struct acpi_subtable_header *header,
- 		return -EINVAL;
- 	}
  
--	cpu_base = ioremap(cpu_phy_base, ACPI_GIC_CPU_IF_MEM_SIZE);
-+	cpu_base = ioremap(acpi_data.cpu_phys_base, ACPI_GIC_CPU_IF_MEM_SIZE);
- 	if (!cpu_base) {
- 		pr_err("Unable to map GICC registers\n");
- 		return -ENOMEM;
+-static inline struct timecounter *arch_timer_get_timecounter(void)
+-{
+-	return NULL;
+-}
+-
+ #endif
+ 
+ #endif
 -- 
 1.9.1
