@@ -1,175 +1,96 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [RFC v4 0/7] KVM: arm/arm64: gsi routing support
-Date: Mon, 4 Apr 2016 14:12:54 +0200
-Message-ID: <57025A46.80901@linaro.org>
-References: <1459759657-7402-1-git-send-email-eric.auger@linaro.org>
- <007601d18e5a$e7ca7120$b75f5360$@samsung.com>
+From: Sudeep Holla <sudeep.holla@arm.com>
+Subject: [PATCH] arm64: KVM: unregister notifiers in hyp mode teardown path
+Date: Mon,  4 Apr 2016 14:46:51 +0100
+Message-ID: <1459777611-22592-1-git-send-email-sudeep.holla@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <007601d18e5a$e7ca7120$b75f5360$@samsung.com>
-Sender: kvm-owner@vger.kernel.org
-To: Pavel Fedin <p.fedin@samsung.com>, eric.auger@st.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: patches@linaro.org, pbonzini@redhat.com, Manish.Jaggi@caviumnetworks.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 38FCD409A2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 09:45:53 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id eZhO1gNTeMOt for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2016 09:45:50 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CC962400E9
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 09:45:50 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Sudeep Holla <sudeep.holla@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Pavel,
-On 04/04/2016 12:15 PM, Pavel Fedin wrote:
->  Hello!
-> 
->  I'd like to remind that this will break with current vITS code and VFIO. 
->  The problem is short path for raising MSIs via routed GSI. There is a code
-> which directly calls IRQ injection instead of triggering irqfd. With VFIO
-> this code is called from within interrupt context. This will cause random
-> lockups in vits_inject_msi(), which does not use irq-save spin-locking.
->  I hit this several times and I had to rework ITS emulation in my local
-> tree.
-Thank you for the reminder. We will sync with Andre and fix that in the
-next ITS emulation version.
+Commit 1e947bad0b63 ("arm64: KVM: Skip HYP setup when already running
+in HYP") re-organized the hyp init code and ended up leaving the CPU
+hotplug and PM notifier even if hyp mode initialization fails.
 
-Best Regards
+Since KVM is not yet supported with ACPI, the above mentioned commit
+breaks CPU hotplug in ACPI boot.
 
-Eric
-> 
-> Kind regards,
-> Pavel Fedin
-> Senior Engineer
-> Samsung Electronics Research center Russia
-> 
-> 
-> -----Original Message-----
-> From: Eric Auger [mailto:eric.auger@linaro.org] 
-> Sent: Monday, April 04, 2016 11:48 AM
-> To: eric.auger@st.com; eric.auger@linaro.org; christoffer.dall@linaro.org;
-> marc.zyngier@arm.com; andre.przywara@arm.com; kvmarm@lists.cs.columbia.edu;
-> kvm@vger.kernel.org
-> Cc: patches@linaro.org; pbonzini@redhat.com; p.fedin@samsung.com;
-> Manish.Jaggi@caviumnetworks.com
-> Subject: [RFC v4 0/7] KVM: arm/arm64: gsi routing support
-> 
-> With the advent of GICv3 ITS in-kernel emulation, KVM MSI routing
-> becomes mandated for proper VIRTIO-PCI vhost integration.
-> 
-> In QEMU, when the VIRTIO-PCI device is programmed with the MSI message,
-> we previously used direct_mapping trick: this consists in extracting the
-> SPI ID found in the MSI message and associating an irqfd to that SPI ID.
-> When vhost worker thread gets a new buffer it signals the irqfd and kvm
-> then injects this SPI ID on guest. That way although the guest uses MSIs,
-> no MSI emulation is used.
-> 
-> This worked fine with GICv2m but does not work anymore with GICV3 ITS.
-> Indeed this latter implements IRQ translation: what is found in the MSI
-> message no more is the target SPI ID but is an intermediate event ID used
-> in the translation process.
-> 
-> Hence true MSI routing is needed so that the vhost back channel irqfd is
-> associated to a dummy gsi ID, routed towards the programmed MSI. When KVM
-> injects the MSI through the in-kernel ITS emulation, the MSI is properly
-> translated and eventually the SPI ID associated to the event ID is injected
-> on guest.
-> 
-> irqchip routing does not sound to be really useful on arm but usage of
-> MSI routing also mandates to integrate irqchip routing. The initial
-> implementation of irqfd on arm must be upgraded with the integration
-> of kvm irqchip.c code and the implementation of its standard hooks
-> in the architecture specific part.
-> 
-> In case KVM_SET_GSI_ROUTING ioctl is not called, a default routing
-> table with flat irqchip routing entries is built enabling to inject gsi
-> corresponding to the SPI indexes seen by the guest.
-> 
-> As soon as KVM_SET_GSI_ROUTING is called, user-space overwrites this
-> default routing table and is responsible for building the whole routing
-> table.
-> 
-> for arm/arm64 KVM_SET_GSI_ROUTING has a limited support:
-> - only applies to KVM_IRQFD and not to KVM_IRQ_LINE
-> 
-> - irqchip routing was tested on Calxeda midway (VFIO with irqfd)
->   with and without explicit routing
-> - MSI routing without GICv3 ITS was tested using APM Xgene-I
->   (qemu VIRTIO-PCI vhost-net without gsi_direct_mapping).
-> - MSI routing with GICv3 ITS is *NOT* tested.
-> 
-> Code can be found at
-> https://git.linaro.org/people/eric.auger/linux.git/shortlog/refs/heads/v4.5-
-> rc6-its-emul-v4-gsi-routing-v4
-> 
-> The series applies on top of Andre's branch featuring NEW-VGIC and in-kernel
-> ITS emulation series:
-> http://www.linux-arm.org/git?p=linux-ap.git;a=log;h=refs/heads/its-emul/v4
-> 
-> [1]: [PATCH v4 00/12] KVM: arm64: GICv3 ITS emulation
->      http://www.spinics.net/lists/arm-kernel/msg492770.html
-> [2]: [RFC PATCH 00/45] KVM: arm/arm64: Rework virtual GIC emulation
->      http://www.spinics.net/lists/arm-kernel/msg492639.html
-> 
-> GSI flat routing setup on QEMU can be found at:
-> https://lists.nongnu.org/archive/html/qemu-devel/2015-07/msg06262.html
-> 
-> History:
-> v3 -> v4:
-> - rebase on top of NEW-VGIC RFC and ITS emulation series v4. This is not
->   a stable foundation yet. Hence the revert to RFC. This v4 mostly is a
->   reflesh/reminder.
-> - rewrite the cover letter
-> 
-> v2 -> v3:
-> - don't use KVM_IRQ_ROUTING_EXTENDED_MSI type at uapi and kernel level
-> anymore;
->   use KVM_MSI_VALID_DEVID flag instead
-> - propagate user flags downto the kernel to make sure the userspace
->   correctly set devid in GICv3 ITS case (still under discussion)
-> 
-> v1 -> v2:
-> - user API changed:
->   x devid id passed in kvm_irq_routing_msi
->   x kept the new routing entry type: KVM_IRQ_ROUTING_EXTENDED_MSI
-> - kvm_host.h: adopt Andre's proposal to replace the msi_msg by a struct
->   composed of the msi_msg and devid in kvm_kernel_irq_routing_entry
-> - Fix bug reported by Pavel: Added KVM_IRQ_ROUTING_EXTENDED_MSI handling
->   in eventfd.c
-> - added vgic_v2m_inject_msi in vgic-v2-emul.c as suggested by Andre
-> - fix bug reported by Andre: bad setting of msi.flags and msi.devid
->   in kvm_send_userspace_msi
-> - avoid injecting reserved IRQ numbers in vgic_irqfd_set_irq
-> 
-> RFC -> PATCH:
-> - clearly state limited support on arm/arm64:
->   KVM_IRQ_LINE not impacted by GSI routing
-> - add default routing table feature (new patch file)
-> - changed uapi to use padding field area
-> - reword api.txt
-> 
-> 
-> 
-> Eric Auger (7):
->   KVM: api: pass the devid in the msi routing entry
->   KVM: kvm_host: add devid in kvm_kernel_irq_routing_entry
->   KVM: irqchip: convey devid to kvm_set_msi
->   KVM: arm/arm64: enable irqchip routing
->   KVM: arm/arm64: build a default routing table
->   KVM: arm/arm64: enable MSI routing
->   KVM: arm: enable KVM_SIGNAL_MSI and MSI routing
-> 
->  Documentation/virtual/kvm/api.txt | 35 ++++++++++++---
->  arch/arm/include/asm/kvm_host.h   |  2 +
->  arch/arm/kvm/Kconfig              |  3 ++
->  arch/arm/kvm/Makefile             |  1 +
->  arch/arm64/include/asm/kvm_host.h |  1 +
->  arch/arm64/kvm/Kconfig            |  3 ++
->  arch/arm64/kvm/Makefile           |  1 +
->  include/kvm/vgic/vgic.h           |  2 -
->  include/linux/kvm_host.h          |  8 +++-
->  include/uapi/linux/kvm.h          |  5 ++-
->  virt/kvm/arm/vgic/vgic-v2.c       | 15 +++++++
->  virt/kvm/arm/vgic/vgic.c          |  7 ---
->  virt/kvm/arm/vgic/vgic.h          |  1 +
->  virt/kvm/arm/vgic/vgic_init.c     | 24 +++++++++++
->  virt/kvm/arm/vgic/vgic_irqfd.c    | 91
-> +++++++++++++++++++++++++++++++--------
->  virt/kvm/irqchip.c                |  8 +++-
->  16 files changed, 170 insertions(+), 37 deletions(-)
-> 
+This patch fixes teardown_hyp_mode to properly unregister both CPU
+hotplug and PM notifiers in the teardown path.
 
+Fixes: 1e947bad0b63 ("arm64: KVM: Skip HYP setup when already running in HYP")
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+---
+ arch/arm/kvm/arm.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
+index 6accd66d26f0..42b3a1f83271 100644
+--- a/arch/arm/kvm/arm.c
++++ b/arch/arm/kvm/arm.c
+@@ -1101,10 +1101,17 @@ static void __init hyp_cpu_pm_init(void)
+ {
+ 	cpu_pm_register_notifier(&hyp_init_cpu_pm_nb);
+ }
++static void __init hyp_cpu_pm_exit(void)
++{
++	cpu_pm_unregister_notifier(&hyp_init_cpu_pm_nb);
++}
+ #else
+ static inline void hyp_cpu_pm_init(void)
+ {
+ }
++static inline void hyp_cpu_pm_exit(void)
++{
++}
+ #endif
+ 
+ static void teardown_common_resources(void)
+@@ -1166,6 +1173,8 @@ static void teardown_hyp_mode(void)
+ 	free_hyp_pgds();
+ 	for_each_possible_cpu(cpu)
+ 		free_page(per_cpu(kvm_arm_hyp_stack_page, cpu));
++	unregister_cpu_notifier(&hyp_init_cpu_nb);
++	hyp_cpu_pm_exit();
+ }
+ 
+ static int init_vhe_mode(void)
+@@ -1270,12 +1279,7 @@ static int init_hyp_mode(void)
+ 	free_boot_hyp_pgd();
+ #endif
+ 
+-	cpu_notifier_register_begin();
+-
+-	err = __register_cpu_notifier(&hyp_init_cpu_nb);
+-
+-	cpu_notifier_register_done();
+-
++	err = register_cpu_notifier(&hyp_init_cpu_nb);
+ 	if (err) {
+ 		kvm_err("Cannot register HYP init CPU notifier (%d)\n", err);
+ 		goto out_err;
+-- 
+1.9.1
