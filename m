@@ -1,23 +1,21 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 01/17] arm64: Reuse TCR field definitions for EL1 and EL2
-Date: Mon,  4 Apr 2016 17:26:01 +0100
-Message-ID: <1459787177-12767-2-git-send-email-suzuki.poulose@arm.com>
-References: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH 00/17] kvm-arm: Add stage2 page table walker
+Date: Mon,  4 Apr 2016 17:26:00 +0100
+Message-ID: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ED1F5409A2
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C4DAF40B58
  for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:25:31 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yEQldui5kKQK for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id D+D5cn4Za7+X for <kvmarm@lists.cs.columbia.edu>;
  Mon,  4 Apr 2016 12:25:30 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 56E24400E9
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 58131409A2
  for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:25:29 -0400 (EDT)
-In-Reply-To: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -31,177 +29,78 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-TCR_EL1, TCR_EL2 and VTCR_EL2, all share some field positions
-(TG0, ORGN0, IRGN0 and SH0) and their corresponding value definitions.
+This series adds support for stage2 page table helpers and makes
+the core kvm-arm MMU code make use of it. At the moment we assume
+that the host/hyp and the stage2 page tables have same number of
+levels and hence use the host level accessors (except for some
+hooks, e.g kvm_p.d_addr_end) and shares the routines for unmapping
+the page table ranges.
 
-This patch makes the TCR_EL1 definitions reusable and uses them for TCR_EL2
-and VTCR_EL2 fields.
+On arm32, the only change w.r.t the page tables is dealing
+with > 32bit physical addresses.
 
-This also fixes a bug where TG0 in {V}TCR_EL2 was treated as 1bit field.
+However on arm64, the hardware supports concatenation of tables (upto 16)
+at the entry level, which could affect :
+ 1) number of entries in the PGD table (upto 16 * PTRS_PER_PTE)
+ 2) number of page table levels (reduced number of page table levels).
 
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
----
- arch/arm64/include/asm/kvm_arm.h       |   48 ++++++++++---------
- arch/arm64/include/asm/pgtable-hwdef.h |   80 +++++++++++++++++++++++++-------
- 2 files changed, 88 insertions(+), 40 deletions(-)
+Also depending on the VA_BITS for the host kernel, the number of page table
+levels for both host and stage2(40bit IPA) could differ. At present, we insert
+(upto) one fake software page table(as the hardware is not aware of it and is
+only used by the OS to walk the table) level to bring the number of levels to
+that of the host/hyp table. However, with 16K + 48bit, and 40bit IPA, we could
+end up in 2 fake levels, which complicates the code.
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 4150fd8..c460cfe 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -96,32 +96,34 @@
- 			 SCTLR_EL2_SA | SCTLR_EL2_I)
- 
- /* TCR_EL2 Registers bits */
--#define TCR_EL2_RES1	((1 << 31) | (1 << 23))
--#define TCR_EL2_TBI	(1 << 20)
--#define TCR_EL2_PS	(7 << 16)
--#define TCR_EL2_PS_40B	(2 << 16)
--#define TCR_EL2_TG0	(1 << 14)
--#define TCR_EL2_SH0	(3 << 12)
--#define TCR_EL2_ORGN0	(3 << 10)
--#define TCR_EL2_IRGN0	(3 << 8)
--#define TCR_EL2_T0SZ	0x3f
--#define TCR_EL2_MASK	(TCR_EL2_TG0 | TCR_EL2_SH0 | \
--			 TCR_EL2_ORGN0 | TCR_EL2_IRGN0 | TCR_EL2_T0SZ)
-+#define TCR_EL2_RES1		((1 << 31) | (1 << 23))
-+#define TCR_EL2_TBI		(1 << 20)
-+#define TCR_EL2_PS_SHIFT	16
-+#define TCR_EL2_PS_MASK		(7 << TCR_EL2_PS_SHIFT)
-+#define TCR_EL2_PS_40B		(2 << TCR_EL2_PS_SHIFT)
-+#define TCR_EL2_TG0_MASK	TCR_TG0_MASK
-+#define TCR_EL2_SH0_MASK	TCR_SH0_MASK
-+#define TCR_EL2_ORGN0_MASK	TCR_ORGN0_MASK
-+#define TCR_EL2_IRGN0_MASK	TCR_IRGN0_MASK
-+#define TCR_EL2_T0SZ_MASK	0x3f
-+#define TCR_EL2_MASK	(TCR_EL2_TG0_MASK | TCR_EL2_SH0_MASK | \
-+			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK | TCR_EL2_T0SZ_MASK)
- 
- /* VTCR_EL2 Registers bits */
- #define VTCR_EL2_RES1		(1 << 31)
--#define VTCR_EL2_PS_MASK	(7 << 16)
--#define VTCR_EL2_TG0_MASK	(1 << 14)
--#define VTCR_EL2_TG0_4K		(0 << 14)
--#define VTCR_EL2_TG0_64K	(1 << 14)
--#define VTCR_EL2_SH0_MASK	(3 << 12)
--#define VTCR_EL2_SH0_INNER	(3 << 12)
--#define VTCR_EL2_ORGN0_MASK	(3 << 10)
--#define VTCR_EL2_ORGN0_WBWA	(1 << 10)
--#define VTCR_EL2_IRGN0_MASK	(3 << 8)
--#define VTCR_EL2_IRGN0_WBWA	(1 << 8)
--#define VTCR_EL2_SL0_MASK	(3 << 6)
--#define VTCR_EL2_SL0_LVL1	(1 << 6)
-+#define VTCR_EL2_PS_MASK	TCR_EL2_PS_MASK
-+#define VTCR_EL2_TG0_MASK	TCR_TG0_MASK
-+#define VTCR_EL2_TG0_4K		TCR_TG0_4K
-+#define VTCR_EL2_TG0_64K	TCR_TG0_64K
-+#define VTCR_EL2_SH0_MASK	TCR_SH0_MASK
-+#define VTCR_EL2_SH0_INNER	TCR_SH0_INNER
-+#define VTCR_EL2_ORGN0_MASK	TCR_ORGN0_MASK
-+#define VTCR_EL2_ORGN0_WBWA	TCR_ORGN0_WBWA
-+#define VTCR_EL2_IRGN0_MASK	TCR_IRGN0_MASK
-+#define VTCR_EL2_IRGN0_WBWA	TCR_IRGN0_WBWA
-+#define VTCR_EL2_SL0_SHIFT	6
-+#define VTCR_EL2_SL0_MASK	(3 << VTCR_EL2_SL0_SHIFT)
-+#define VTCR_EL2_SL0_LVL1	(1 << VTCR_EL2_SL0_SHIFT)
- #define VTCR_EL2_T0SZ_MASK	0x3f
- #define VTCR_EL2_T0SZ_40B	24
- #define VTCR_EL2_VS_SHIFT	19
-diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-index 5c25b83..936f173 100644
---- a/arch/arm64/include/asm/pgtable-hwdef.h
-+++ b/arch/arm64/include/asm/pgtable-hwdef.h
-@@ -208,23 +208,69 @@
- #define TCR_T1SZ(x)		((UL(64) - (x)) << TCR_T1SZ_OFFSET)
- #define TCR_TxSZ(x)		(TCR_T0SZ(x) | TCR_T1SZ(x))
- #define TCR_TxSZ_WIDTH		6
--#define TCR_IRGN_NC		((UL(0) << 8) | (UL(0) << 24))
--#define TCR_IRGN_WBWA		((UL(1) << 8) | (UL(1) << 24))
--#define TCR_IRGN_WT		((UL(2) << 8) | (UL(2) << 24))
--#define TCR_IRGN_WBnWA		((UL(3) << 8) | (UL(3) << 24))
--#define TCR_IRGN_MASK		((UL(3) << 8) | (UL(3) << 24))
--#define TCR_ORGN_NC		((UL(0) << 10) | (UL(0) << 26))
--#define TCR_ORGN_WBWA		((UL(1) << 10) | (UL(1) << 26))
--#define TCR_ORGN_WT		((UL(2) << 10) | (UL(2) << 26))
--#define TCR_ORGN_WBnWA		((UL(3) << 10) | (UL(3) << 26))
--#define TCR_ORGN_MASK		((UL(3) << 10) | (UL(3) << 26))
--#define TCR_SHARED		((UL(3) << 12) | (UL(3) << 28))
--#define TCR_TG0_4K		(UL(0) << 14)
--#define TCR_TG0_64K		(UL(1) << 14)
--#define TCR_TG0_16K		(UL(2) << 14)
--#define TCR_TG1_16K		(UL(1) << 30)
--#define TCR_TG1_4K		(UL(2) << 30)
--#define TCR_TG1_64K		(UL(3) << 30)
-+
-+#define TCR_IRGN0_SHIFT		8
-+#define TCR_IRGN0_MASK		(UL(3) << TCR_IRGN0_SHIFT)
-+#define TCR_IRGN0_NC		(UL(0) << TCR_IRGN0_SHIFT)
-+#define TCR_IRGN0_WBWA		(UL(1) << TCR_IRGN0_SHIFT)
-+#define TCR_IRGN0_WT		(UL(2) << TCR_IRGN0_SHIFT)
-+#define TCR_IRGN0_WBnWA		(UL(3) << TCR_IRGN0_SHIFT)
-+
-+#define TCR_IRGN1_SHIFT		24
-+#define TCR_IRGN1_MASK		(UL(3) << TCR_IRGN1_SHIFT)
-+#define TCR_IRGN1_NC		(UL(0) << TCR_IRGN1_SHIFT)
-+#define TCR_IRGN1_WBWA		(UL(1) << TCR_IRGN1_SHIFT)
-+#define TCR_IRGN1_WT		(UL(2) << TCR_IRGN1_SHIFT)
-+#define TCR_IRGN1_WBnWA		(UL(3) << TCR_IRGN1_SHIFT)
-+
-+#define TCR_IRGN_NC		(TCR_IRGN0_NC | TCR_IRGN1_NC)
-+#define TCR_IRGN_WBWA		(TCR_IRGN0_WBWA | TCR_IRGN1_WBWA)
-+#define TCR_IRGN_WT		(TCR_IRGN0_WT | TCR_IRGN1_WT)
-+#define TCR_IRGN_WBnWA		(TCR_IRGN0_WBnWA | TCR_IRGN1_WBnWA)
-+#define TCR_IRGN_MASK		(TCR_IRGN0_MASK | TCR_IRGN1_MASK)
-+
-+
-+#define TCR_ORGN0_SHIFT		10
-+#define TCR_ORGN0_MASK		(UL(3) << TCR_ORGN0_SHIFT)
-+#define TCR_ORGN0_NC		(UL(0) << TCR_ORGN0_SHIFT)
-+#define TCR_ORGN0_WBWA		(UL(1) << TCR_ORGN0_SHIFT)
-+#define TCR_ORGN0_WT		(UL(2) << TCR_ORGN0_SHIFT)
-+#define TCR_ORGN0_WBnWA		(UL(3) << TCR_ORGN0_SHIFT)
-+
-+#define TCR_ORGN1_SHIFT		26
-+#define TCR_ORGN1_MASK		(UL(3) << TCR_ORGN1_SHIFT)
-+#define TCR_ORGN1_NC		(UL(0) << TCR_ORGN1_SHIFT)
-+#define TCR_ORGN1_WBWA		(UL(1) << TCR_ORGN1_SHIFT)
-+#define TCR_ORGN1_WT		(UL(2) << TCR_ORGN1_SHIFT)
-+#define TCR_ORGN1_WBnWA		(UL(3) << TCR_ORGN1_SHIFT)
-+
-+#define TCR_ORGN_NC		(TCR_ORGN0_NC | TCR_ORGN1_NC)
-+#define TCR_ORGN_WBWA		(TCR_ORGN0_WBWA | TCR_ORGN1_WBWA)
-+#define TCR_ORGN_WT		(TCR_ORGN0_WT | TCR_ORGN1_WT)
-+#define TCR_ORGN_WBnWA		(TCR_ORGN0_WBnWA | TCR_ORGN1_WBnWA)
-+#define TCR_ORGN_MASK		(TCR_ORGN0_MASK | TCR_ORGN1_MASK)
-+
-+#define TCR_SH0_SHIFT		12
-+#define TCR_SH0_MASK		(UL(3) << TCR_SH0_SHIFT)
-+#define TCR_SH0_INNER		(UL(3) << TCR_SH0_SHIFT)
-+
-+#define TCR_SH1_SHIFT		28
-+#define TCR_SH1_MASK		(UL(3) << TCR_SH1_SHIFT)
-+#define TCR_SH1_INNER		(UL(3) << TCR_SH1_SHIFT)
-+#define TCR_SHARED		(TCR_SH0_INNER | TCR_SH1_INNER)
-+
-+#define TCR_TG0_SHIFT		14
-+#define TCR_TG0_MASK		(UL(3) << TCR_TG0_SHIFT)
-+#define TCR_TG0_4K		(UL(0) << TCR_TG0_SHIFT)
-+#define TCR_TG0_64K		(UL(1) << TCR_TG0_SHIFT)
-+#define TCR_TG0_16K		(UL(2) << TCR_TG0_SHIFT)
-+
-+#define TCR_TG1_SHIFT		30
-+#define TCR_TG1_MASK		(UL(3) << TCR_TG1_SHIFT)
-+#define TCR_TG1_16K		(UL(1) << TCR_TG1_SHIFT)
-+#define TCR_TG1_4K		(UL(2) << TCR_TG1_SHIFT)
-+#define TCR_TG1_64K		(UL(3) << TCR_TG1_SHIFT)
-+
- #define TCR_ASID16		(UL(1) << 36)
- #define TCR_TBI0		(UL(1) << 37)
- #define TCR_HA			(UL(1) << 39)
+This series introduces explicit stage2 page table helpers and also defines
+separate set of routines for unmapping hyp and stage2 tables.
+
+On arm64 stage2 page table helpers are defined based on the number of levels
+required to map the IPA bits. See patch 15 for more details.
+
+Tested on TC2 (arm32), Fast models(with VHE) and real hardwares.
+
+Changes since RFC:
+ * Rebased to rc2
+ * Use explicit routines for modifying the hyp/stage2 page tables
+ * Add pmd_thp_or_huge() for arm64 and use that for KVM
+ * Reuse TCR_EL definitions
+
+Suzuki K Poulose (17):
+  arm64: Reuse TCR field definitions for EL1 and EL2
+  arm64: Cleanup VTCR_EL2 and VTTBR field values
+  kvm arm: Move fake PGD handling to arch specific files
+  arm64: Introduce pmd_thp_or_huge
+  kvm-arm: Replace kvm_pmd_huge with pmd_thp_or_huge
+  kvm-arm: Remove kvm_pud_huge()
+  kvm-arm: arm32: Introduce stage2 page table helpers
+  kvm-arm: arm: Introduce hyp page table empty checks
+  kvm-arm: arm64: Introduce stage2 page table helpers
+  kvm-arm: arm64: Introduce hyp page table empty checks
+  kvm-arm: Use explicit stage2 helper routines
+  kvm-arm: Add explicit hyp page table modifiers
+  kvm-arm: Add stage2 page table modifiers
+  kvm-arm: Cleanup kvm_* wrappers
+  kvm: arm64: Get rid of fake page table levels
+  kvm-arm: Cleanup stage2 pgd handling
+  arm64: kvm: Add support for 16K pages
+
+ arch/arm/include/asm/kvm_mmu.h                |   35 +--
+ arch/arm/include/asm/stage2_pgtable.h         |   59 +++++
+ arch/arm/kvm/arm.c                            |    2 +-
+ arch/arm/kvm/mmu.c                            |  354 ++++++++++++++-----------
+ arch/arm64/include/asm/kvm_arm.h              |   82 +++---
+ arch/arm64/include/asm/kvm_mmu.h              |   84 +-----
+ arch/arm64/include/asm/pgtable-hwdef.h        |   80 ++++--
+ arch/arm64/include/asm/pgtable.h              |    2 +
+ arch/arm64/include/asm/stage2_pgtable-nopmd.h |   42 +++
+ arch/arm64/include/asm/stage2_pgtable-nopud.h |   39 +++
+ arch/arm64/include/asm/stage2_pgtable.h       |  133 ++++++++++
+ arch/arm64/kvm/Kconfig                        |    1 -
+ 12 files changed, 599 insertions(+), 314 deletions(-)
+ create mode 100644 arch/arm/include/asm/stage2_pgtable.h
+ create mode 100644 arch/arm64/include/asm/stage2_pgtable-nopmd.h
+ create mode 100644 arch/arm64/include/asm/stage2_pgtable-nopud.h
+ create mode 100644 arch/arm64/include/asm/stage2_pgtable.h
+
 -- 
 1.7.9.5
