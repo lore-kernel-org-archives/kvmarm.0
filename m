@@ -1,23 +1,24 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
+From: Sudeep Holla <sudeep.holla@arm.com>
 Subject: Re: [PATCH] arm64: KVM: unregister notifiers in hyp mode teardown path
-Date: Mon, 4 Apr 2016 14:55:57 +0100
-Message-ID: <5702726D.7000505@arm.com>
+Date: Mon, 4 Apr 2016 15:22:28 +0100
+Message-ID: <570278A4.9060600@arm.com>
 References: <1459777611-22592-1-git-send-email-sudeep.holla@arm.com>
+ <5702726D.7000505@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A67F8407A5
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 09:54:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 61929407A5
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 10:21:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ILNj61bMulZl for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Apr 2016 09:54:44 -0400 (EDT)
+ with ESMTP id 6TGxycl8FVGg for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2016 10:21:16 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BBEE140402
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 09:54:44 -0400 (EDT)
-In-Reply-To: <1459777611-22592-1-git-send-email-sudeep.holla@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9DA7A400E9
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 10:21:15 -0400 (EDT)
+In-Reply-To: <5702726D.7000505@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -27,83 +28,47 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Sudeep Holla <sudeep.holla@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Sudeep Holla <sudeep.holla@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Sudeep,
 
-On 04/04/16 14:46, Sudeep Holla wrote:
-> Commit 1e947bad0b63 ("arm64: KVM: Skip HYP setup when already running
-> in HYP") re-organized the hyp init code and ended up leaving the CPU
-> hotplug and PM notifier even if hyp mode initialization fails.
-> 
-> Since KVM is not yet supported with ACPI, the above mentioned commit
-> breaks CPU hotplug in ACPI boot.
-> 
-> This patch fixes teardown_hyp_mode to properly unregister both CPU
-> hotplug and PM notifiers in the teardown path.
-> 
-> Fixes: 1e947bad0b63 ("arm64: KVM: Skip HYP setup when already running in HYP")
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
 
-This looks OK to me, with a question below though:
+On 04/04/16 14:55, Marc Zyngier wrote:
+> Hi Sudeep,
+>
+> On 04/04/16 14:46, Sudeep Holla wrote:
 
-> ---
->  arch/arm/kvm/arm.c | 16 ++++++++++------
->  1 file changed, 10 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index 6accd66d26f0..42b3a1f83271 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -1101,10 +1101,17 @@ static void __init hyp_cpu_pm_init(void)
->  {
->  	cpu_pm_register_notifier(&hyp_init_cpu_pm_nb);
->  }
-> +static void __init hyp_cpu_pm_exit(void)
-> +{
-> +	cpu_pm_unregister_notifier(&hyp_init_cpu_pm_nb);
-> +}
->  #else
->  static inline void hyp_cpu_pm_init(void)
->  {
->  }
-> +static inline void hyp_cpu_pm_exit(void)
-> +{
-> +}
->  #endif
->  
->  static void teardown_common_resources(void)
-> @@ -1166,6 +1173,8 @@ static void teardown_hyp_mode(void)
->  	free_hyp_pgds();
->  	for_each_possible_cpu(cpu)
->  		free_page(per_cpu(kvm_arm_hyp_stack_page, cpu));
-> +	unregister_cpu_notifier(&hyp_init_cpu_nb);
-> +	hyp_cpu_pm_exit();
->  }
->  
->  static int init_vhe_mode(void)
-> @@ -1270,12 +1279,7 @@ static int init_hyp_mode(void)
->  	free_boot_hyp_pgd();
->  #endif
->  
-> -	cpu_notifier_register_begin();
-> -
-> -	err = __register_cpu_notifier(&hyp_init_cpu_nb);
-> -
-> -	cpu_notifier_register_done();
-> -
-> +	err = register_cpu_notifier(&hyp_init_cpu_nb);
+[...]
 
-We went from something like this to the cpu_notifier_register_begin/end
-with 8146875de ("arm, kvm: Fix CPU hotplug callback registration").
+>> @@ -1270,12 +1279,7 @@ static int init_hyp_mode(void)
+>>   	free_boot_hyp_pgd();
+>>   #endif
+>>
+>> -	cpu_notifier_register_begin();
+>> -
+>> -	err = __register_cpu_notifier(&hyp_init_cpu_nb);
+>> -
+>> -	cpu_notifier_register_done();
+>> -
+>> +	err = register_cpu_notifier(&hyp_init_cpu_nb);
+>
+> We went from something like this to the cpu_notifier_register_begin/end
+> with 8146875de ("arm, kvm: Fix CPU hotplug callback registration").
+>
+> What makes it more acceptable now?
+>
 
-What makes it more acceptable now?
+Correct, but in the initial code even init_hyp_mode was protected under
+cpu_notifier_register_begin, but IIUC recent re-org eliminated the need
+for that and the above code exactly resembles what register_cpu_notifier
+does.
 
-Thanks,
+If that's not the case then we need to move cpu_notifier_register_begin
+further up and retain __register_cpu_notifier
 
-	M.
+I mainly changed it to keep it consistent with unregister call.
+
 -- 
-Jazz is not dead. It just smells funny...
+Regards,
+Sudeep
