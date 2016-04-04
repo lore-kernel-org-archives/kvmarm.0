@@ -1,22 +1,22 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 05/17] kvm-arm: Replace kvm_pmd_huge with pmd_thp_or_huge
-Date: Mon,  4 Apr 2016 17:26:05 +0100
-Message-ID: <1459787177-12767-6-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH 13/17] kvm-arm: Add stage2 page table modifiers
+Date: Mon,  4 Apr 2016 17:26:13 +0100
+Message-ID: <1459787177-12767-14-git-send-email-suzuki.poulose@arm.com>
 References: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 56310409A2
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:25:39 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 93FC5412ED
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:25:53 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id OGQrx0O3OHxp for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Apr 2016 12:25:38 -0400 (EDT)
+ with ESMTP id LVfTkGm9LyAh for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2016 12:25:52 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8853E410D7
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:25:37 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5777640F9B
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:25:52 -0400 (EDT)
 In-Reply-To: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,101 +31,202 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Both arm and arm64 now provides a helper, pmd_thp_or_huge()
-to check if the given pmd represents a huge page. Use that
-instead of our own custom check.
+Now that the hyp page table is handled by different set of
+routines, rename the original shared routines to stage2 handlers.
+Also make explicit use of the stage2 page table helpers.
 
-Suggested-by: Mark Rutland <mark.rutland@arm.com>
+unmap_range has been merged to existing unmap_stage2_range.
+
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm/kvm/mmu.c |   17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ arch/arm/kvm/mmu.c |   97 ++++++++++++++++++++++++----------------------------
+ 1 file changed, 44 insertions(+), 53 deletions(-)
 
 diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index 774d00b..7837f0a 100644
+index 2b491e5..0009a24 100644
 --- a/arch/arm/kvm/mmu.c
 +++ b/arch/arm/kvm/mmu.c
-@@ -45,7 +45,6 @@ static phys_addr_t hyp_idmap_vector;
+@@ -152,26 +152,26 @@ static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
+ 	return p;
+ }
  
- #define hyp_pgd_order get_order(PTRS_PER_PGD * sizeof(pgd_t))
- 
--#define kvm_pmd_huge(_x)	(pmd_huge(_x) || pmd_trans_huge(_x))
- #define kvm_pud_huge(_x)	pud_huge(_x)
- 
- #define KVM_S2PTE_FLAG_IS_IOMAP		(1UL << 0)
-@@ -115,7 +114,7 @@ static bool kvm_is_device_pfn(unsigned long pfn)
-  */
- static void stage2_dissolve_pmd(struct kvm *kvm, phys_addr_t addr, pmd_t *pmd)
+-static void clear_pgd_entry(struct kvm *kvm, pgd_t *pgd, phys_addr_t addr)
++static void clear_stage2_pgd_entry(struct kvm *kvm, pgd_t *pgd, phys_addr_t addr)
  {
--	if (!kvm_pmd_huge(*pmd))
-+	if (!pmd_thp_or_huge(*pmd))
- 		return;
+-	pud_t *pud_table __maybe_unused = pud_offset(pgd, 0);
+-	pgd_clear(pgd);
++	pud_t *pud_table __maybe_unused = stage2_pud_offset(pgd, 0UL);
++	stage2_pgd_clear(pgd);
+ 	kvm_tlb_flush_vmid_ipa(kvm, addr);
+-	pud_free(NULL, pud_table);
++	stage2_pud_free(NULL, pud_table);
+ 	put_page(virt_to_page(pgd));
+ }
  
- 	pmd_clear(pmd);
-@@ -177,7 +176,7 @@ static void clear_pud_entry(struct kvm *kvm, pud_t *pud, phys_addr_t addr)
- static void clear_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr)
+-static void clear_pud_entry(struct kvm *kvm, pud_t *pud, phys_addr_t addr)
++static void clear_stage2_pud_entry(struct kvm *kvm, pud_t *pud, phys_addr_t addr)
+ {
+-	pmd_t *pmd_table = pmd_offset(pud, 0);
+-	VM_BUG_ON(pud_huge(*pud));
+-	pud_clear(pud);
++	pmd_t *pmd_table __maybe_unused = stage2_pmd_offset(pud, 0);
++	VM_BUG_ON(stage2_pud_huge(*pud));
++	stage2_pud_clear(pud);
+ 	kvm_tlb_flush_vmid_ipa(kvm, addr);
+-	pmd_free(NULL, pmd_table);
++	stage2_pmd_free(NULL, pmd_table);
+ 	put_page(virt_to_page(pud));
+ }
+ 
+-static void clear_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr)
++static void clear_stage2_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr)
  {
  	pte_t *pte_table = pte_offset_kernel(pmd, 0);
--	VM_BUG_ON(kvm_pmd_huge(*pmd));
-+	VM_BUG_ON(pmd_thp_or_huge(*pmd));
- 	pmd_clear(pmd);
- 	kvm_tlb_flush_vmid_ipa(kvm, addr);
- 	pte_free_kernel(NULL, pte_table);
-@@ -240,7 +239,7 @@ static void unmap_pmds(struct kvm *kvm, pud_t *pud,
+ 	VM_BUG_ON(pmd_thp_or_huge(*pmd));
+@@ -201,7 +201,7 @@ static void clear_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr)
+  * the corresponding TLBs, we call kvm_flush_dcache_p*() to make sure
+  * the IO subsystem will never hit in the cache.
+  */
+-static void unmap_ptes(struct kvm *kvm, pmd_t *pmd,
++static void unmap_stage2_ptes(struct kvm *kvm, pmd_t *pmd,
+ 		       phys_addr_t addr, phys_addr_t end)
+ {
+ 	phys_addr_t start_addr = addr;
+@@ -223,19 +223,19 @@ static void unmap_ptes(struct kvm *kvm, pmd_t *pmd,
+ 		}
+ 	} while (pte++, addr += PAGE_SIZE, addr != end);
+ 
+-	if (kvm_pte_table_empty(kvm, start_pte))
+-		clear_pmd_entry(kvm, pmd, start_addr);
++	if (stage2_pte_table_empty(start_pte))
++		clear_stage2_pmd_entry(kvm, pmd, start_addr);
+ }
+ 
+-static void unmap_pmds(struct kvm *kvm, pud_t *pud,
++static void unmap_stage2_pmds(struct kvm *kvm, pud_t *pud,
+ 		       phys_addr_t addr, phys_addr_t end)
+ {
+ 	phys_addr_t next, start_addr = addr;
+ 	pmd_t *pmd, *start_pmd;
+ 
+-	start_pmd = pmd = pmd_offset(pud, addr);
++	start_pmd = pmd = stage2_pmd_offset(pud, addr);
  	do {
- 		next = kvm_pmd_addr_end(addr, end);
+-		next = kvm_pmd_addr_end(addr, end);
++		next = stage2_pmd_addr_end(addr, end);
  		if (!pmd_none(*pmd)) {
--			if (kvm_pmd_huge(*pmd)) {
-+			if (pmd_thp_or_huge(*pmd)) {
+ 			if (pmd_thp_or_huge(*pmd)) {
  				pmd_t old_pmd = *pmd;
+@@ -247,57 +247,64 @@ static void unmap_pmds(struct kvm *kvm, pud_t *pud,
  
- 				pmd_clear(pmd);
-@@ -326,7 +325,7 @@ static void stage2_flush_pmds(struct kvm *kvm, pud_t *pud,
- 	do {
- 		next = kvm_pmd_addr_end(addr, end);
- 		if (!pmd_none(*pmd)) {
--			if (kvm_pmd_huge(*pmd))
-+			if (pmd_thp_or_huge(*pmd))
- 				kvm_flush_dcache_pmd(*pmd);
- 			else
- 				stage2_flush_ptes(kvm, pmd, addr, next);
-@@ -1050,7 +1049,7 @@ static void stage2_wp_pmds(pud_t *pud, phys_addr_t addr, phys_addr_t end)
- 	do {
- 		next = kvm_pmd_addr_end(addr, end);
- 		if (!pmd_none(*pmd)) {
--			if (kvm_pmd_huge(*pmd)) {
-+			if (pmd_thp_or_huge(*pmd)) {
- 				if (!kvm_s2pmd_readonly(pmd))
- 					kvm_set_s2pmd_readonly(pmd);
+ 				put_page(virt_to_page(pmd));
  			} else {
-@@ -1331,7 +1330,7 @@ static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 	if (!pmd || pmd_none(*pmd))	/* Nothing there */
- 		goto out;
+-				unmap_ptes(kvm, pmd, addr, next);
++				unmap_stage2_ptes(kvm, pmd, addr, next);
+ 			}
+ 		}
+ 	} while (pmd++, addr = next, addr != end);
  
--	if (kvm_pmd_huge(*pmd)) {	/* THP, HugeTLB */
-+	if (pmd_thp_or_huge(*pmd)) {	/* THP, HugeTLB */
- 		*pmd = pmd_mkyoung(*pmd);
- 		pfn = pmd_pfn(*pmd);
- 		pfn_valid = true;
-@@ -1555,7 +1554,7 @@ static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
- 	if (!pmd || pmd_none(*pmd))	/* Nothing there */
- 		return 0;
+-	if (kvm_pmd_table_empty(kvm, start_pmd))
+-		clear_pud_entry(kvm, pud, start_addr);
++	if (stage2_pmd_table_empty(start_pmd))
++		clear_stage2_pud_entry(kvm, pud, start_addr);
+ }
  
--	if (kvm_pmd_huge(*pmd)) {	/* THP, HugeTLB */
-+	if (pmd_thp_or_huge(*pmd)) {	/* THP, HugeTLB */
- 		if (pmd_young(*pmd)) {
- 			*pmd = pmd_mkold(*pmd);
- 			return 1;
-@@ -1585,7 +1584,7 @@ static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
- 	if (!pmd || pmd_none(*pmd))	/* Nothing there */
- 		return 0;
+-static void unmap_puds(struct kvm *kvm, pgd_t *pgd,
++static void unmap_stage2_puds(struct kvm *kvm, pgd_t *pgd,
+ 		       phys_addr_t addr, phys_addr_t end)
+ {
+ 	phys_addr_t next, start_addr = addr;
+ 	pud_t *pud, *start_pud;
  
--	if (kvm_pmd_huge(*pmd))		/* THP, HugeTLB */
-+	if (pmd_thp_or_huge(*pmd))		/* THP, HugeTLB */
- 		return pmd_young(*pmd);
+-	start_pud = pud = pud_offset(pgd, addr);
++	start_pud = pud = stage2_pud_offset(pgd, addr);
+ 	do {
+-		next = kvm_pud_addr_end(addr, end);
+-		if (!pud_none(*pud)) {
+-			if (pud_huge(*pud)) {
++		next = stage2_pud_addr_end(addr, end);
++		if (!stage2_pud_none(*pud)) {
++			if (stage2_pud_huge(*pud)) {
+ 				pud_t old_pud = *pud;
  
- 	pte = pte_offset_kernel(pmd, gpa);
+-				pud_clear(pud);
++				stage2_pud_clear(pud);
+ 				kvm_tlb_flush_vmid_ipa(kvm, addr);
+-
+ 				kvm_flush_dcache_pud(old_pud);
+-
+ 				put_page(virt_to_page(pud));
+ 			} else {
+-				unmap_pmds(kvm, pud, addr, next);
++				unmap_stage2_pmds(kvm, pud, addr, next);
+ 			}
+ 		}
+ 	} while (pud++, addr = next, addr != end);
+ 
+-	if (kvm_pud_table_empty(kvm, start_pud))
+-		clear_pgd_entry(kvm, pgd, start_addr);
++	if (stage2_pud_table_empty(start_pud))
++		clear_stage2_pgd_entry(kvm, pgd, start_addr);
+ }
+ 
+-
+-static void unmap_range(struct kvm *kvm, pgd_t *pgdp,
+-			phys_addr_t start, u64 size)
++/**
++ * unmap_stage2_range -- Clear stage2 page table entries to unmap a range
++ * @kvm:   The VM pointer
++ * @start: The intermediate physical base address of the range to unmap
++ * @size:  The size of the area to unmap
++ *
++ * Clear a range of stage-2 mappings, lowering the various ref-counts.  Must
++ * be called while holding mmu_lock (unless for freeing the stage2 pgd before
++ * destroying the VM), otherwise another faulting VCPU may come in and mess
++ * with things behind our backs.
++ */
++static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
+ {
+ 	pgd_t *pgd;
+ 	phys_addr_t addr = start, end = start + size;
+ 	phys_addr_t next;
+ 
+-	pgd = pgdp + kvm_pgd_index(addr);
++	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
+ 	do {
+-		next = kvm_pgd_addr_end(addr, end);
+-		if (!pgd_none(*pgd))
+-			unmap_puds(kvm, pgd, addr, next);
++		next = stage2_pgd_addr_end(addr, end);
++		if (!stage2_pgd_none(*pgd))
++			unmap_stage2_puds(kvm, pgd, addr, next);
+ 	} while (pgd++, addr = next, addr != end);
+ }
+ 
+@@ -811,22 +818,6 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
+ 	return 0;
+ }
+ 
+-/**
+- * unmap_stage2_range -- Clear stage2 page table entries to unmap a range
+- * @kvm:   The VM pointer
+- * @start: The intermediate physical base address of the range to unmap
+- * @size:  The size of the area to unmap
+- *
+- * Clear a range of stage-2 mappings, lowering the various ref-counts.  Must
+- * be called while holding mmu_lock (unless for freeing the stage2 pgd before
+- * destroying the VM), otherwise another faulting VCPU may come in and mess
+- * with things behind our backs.
+- */
+-static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
+-{
+-	unmap_range(kvm, kvm->arch.pgd, start, size);
+-}
+-
+ static void stage2_unmap_memslot(struct kvm *kvm,
+ 				 struct kvm_memory_slot *memslot)
+ {
 -- 
 1.7.9.5
