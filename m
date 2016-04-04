@@ -1,149 +1,133 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v6 3/5] vfio/type1: also check IRQ remapping capability at msi
- domain
-Date: Mon,  4 Apr 2016 08:30:09 +0000
-Message-ID: <1459758611-2972-4-git-send-email-eric.auger@linaro.org>
-References: <1459758611-2972-1-git-send-email-eric.auger@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2377840B58
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 04:29:16 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LFZ58fMwlEIC for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Apr 2016 04:29:15 -0400 (EDT)
-Received: from mail-lf0-f45.google.com (mail-lf0-f45.google.com
- [209.85.215.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A78E409A2
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 04:29:14 -0400 (EDT)
-Received: by mail-lf0-f45.google.com with SMTP id g184so83822965lfb.3
- for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Apr 2016 01:30:30 -0700 (PDT)
-In-Reply-To: <1459758611-2972-1-git-send-email-eric.auger@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: eric.auger@st.com, eric.auger@linaro.org, robin.murphy@arm.com, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: patches@linaro.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
+Subject: [RFC v4 0/7] KVM: arm/arm64: gsi routing support
+Date: Mon,  4 Apr 2016 10:47:30 +0200
+Message-ID: <1459759657-7402-1-git-send-email-eric.auger@linaro.org>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: eric.auger@st.com, eric.auger@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: patches@linaro.org, pbonzini@redhat.com, p.fedin@samsung.com, Manish.Jaggi@caviumnetworks.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On x86 IRQ remapping is abstracted by the IOMMU. On ARM this is abstracted
-by the msi controller. vfio_safe_irq_domain allows to check whether
-interrupts are "safe" for a given device. They are if the device does
-not use MSI or if the device uses MSI and the msi-parent controller
-supports IRQ remapping.
+With the advent of GICv3 ITS in-kernel emulation, KVM MSI routing
+becomes mandated for proper VIRTIO-PCI vhost integration.
 
-Then we check at group level if all devices have safe interrupts: if not,
-we only allow the group to be attached if allow_unsafe_interrupts is set.
+In QEMU, when the VIRTIO-PCI device is programmed with the MSI message,
+we previously used direct_mapping trick: this consists in extracting the
+SPI ID found in the MSI message and associating an irqfd to that SPI ID.
+When vhost worker thread gets a new buffer it signals the irqfd and kvm
+then injects this SPI ID on guest. That way although the guest uses MSIs,
+no MSI emulation is used.
 
-At this point ARM sMMU still advertises IOMMU_CAP_INTR_REMAP. This is
-changed in next patch.
+This worked fine with GICv2m but does not work anymore with GICV3 ITS.
+Indeed this latter implements IRQ translation: what is found in the MSI
+message no more is the target SPI ID but is an intermediate event ID used
+in the translation process.
 
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
+Hence true MSI routing is needed so that the vhost back channel irqfd is
+associated to a dummy gsi ID, routed towards the programmed MSI. When KVM
+injects the MSI through the in-kernel ITS emulation, the MSI is properly
+translated and eventually the SPI ID associated to the event ID is injected
+on guest.
 
----
+irqchip routing does not sound to be really useful on arm but usage of
+MSI routing also mandates to integrate irqchip routing. The initial
+implementation of irqfd on arm must be upgraded with the integration
+of kvm irqchip.c code and the implementation of its standard hooks
+in the architecture specific part.
+
+In case KVM_SET_GSI_ROUTING ioctl is not called, a default routing
+table with flat irqchip routing entries is built enabling to inject gsi
+corresponding to the SPI indexes seen by the guest.
+
+As soon as KVM_SET_GSI_ROUTING is called, user-space overwrites this
+default routing table and is responsible for building the whole routing
+table.
+
+for arm/arm64 KVM_SET_GSI_ROUTING has a limited support:
+- only applies to KVM_IRQFD and not to KVM_IRQ_LINE
+
+- irqchip routing was tested on Calxeda midway (VFIO with irqfd)
+  with and without explicit routing
+- MSI routing without GICv3 ITS was tested using APM Xgene-I
+  (qemu VIRTIO-PCI vhost-net without gsi_direct_mapping).
+- MSI routing with GICv3 ITS is *NOT* tested.
+
+Code can be found at https://git.linaro.org/people/eric.auger/linux.git/shortlog/refs/heads/v4.5-rc6-its-emul-v4-gsi-routing-v4
+
+The series applies on top of Andre's branch featuring NEW-VGIC and in-kernel
+ITS emulation series:
+http://www.linux-arm.org/git?p=linux-ap.git;a=log;h=refs/heads/its-emul/v4
+
+[1]: [PATCH v4 00/12] KVM: arm64: GICv3 ITS emulation
+     http://www.spinics.net/lists/arm-kernel/msg492770.html
+[2]: [RFC PATCH 00/45] KVM: arm/arm64: Rework virtual GIC emulation
+     http://www.spinics.net/lists/arm-kernel/msg492639.html
+
+GSI flat routing setup on QEMU can be found at:
+https://lists.nongnu.org/archive/html/qemu-devel/2015-07/msg06262.html
+
+History:
 v3 -> v4:
-- rename vfio_msi_parent_irq_remapping_capable into vfio_safe_irq_domain
-  and irq_remapping into safe_irq_domains
+- rebase on top of NEW-VGIC RFC and ITS emulation series v4. This is not
+  a stable foundation yet. Hence the revert to RFC. This v4 mostly is a
+  reflesh/reminder.
+- rewrite the cover letter
 
 v2 -> v3:
-- protect vfio_msi_parent_irq_remapping_capable with
-  CONFIG_GENERIC_MSI_IRQ_DOMAIN
----
- drivers/vfio/vfio_iommu_type1.c | 44 +++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 42 insertions(+), 2 deletions(-)
+- don't use KVM_IRQ_ROUTING_EXTENDED_MSI type at uapi and kernel level anymore;
+  use KVM_MSI_VALID_DEVID flag instead
+- propagate user flags downto the kernel to make sure the userspace
+  correctly set devid in GICv3 ITS case (still under discussion)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 4497b20..b330b81 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -37,6 +37,8 @@
- #include <linux/vfio.h>
- #include <linux/workqueue.h>
- #include <linux/dma-reserved-iommu.h>
-+#include <linux/irqdomain.h>
-+#include <linux/msi.h>
- 
- #define DRIVER_VERSION  "0.2"
- #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
-@@ -788,6 +790,33 @@ static int vfio_bus_type(struct device *dev, void *data)
- 	return 0;
- }
- 
-+/**
-+ * vfio_safe_irq_domain: returns whether the irq domain
-+ * the device is attached to is safe with respect to MSI isolation.
-+ * If the irq domain is not an MSI domain, we return it is safe.
-+ *
-+ * @dev: device handle
-+ * @data: unused
-+ * returns 0 if the irq domain is safe, -1 if not.
-+ */
-+static int vfio_safe_irq_domain(struct device *dev, void *data)
-+{
-+#ifdef CONFIG_GENERIC_MSI_IRQ_DOMAIN
-+	struct irq_domain *domain;
-+	struct msi_domain_info *info;
-+
-+	domain = dev_get_msi_domain(dev);
-+	if (!domain)
-+		return 0;
-+
-+	info = msi_get_domain_info(domain);
-+
-+	if (!(info->flags & MSI_FLAG_IRQ_REMAPPING))
-+		return -1;
-+#endif
-+	return 0;
-+}
-+
- static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 			     struct vfio_domain *domain)
- {
-@@ -882,7 +911,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 	struct vfio_group *group, *g;
- 	struct vfio_domain *domain, *d;
- 	struct bus_type *bus = NULL;
--	int ret;
-+	int ret, safe_irq_domains;
- 
- 	mutex_lock(&iommu->lock);
- 
-@@ -905,6 +934,13 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 
- 	group->iommu_group = iommu_group;
- 
-+	/*
-+	 * Determine if all the devices of the group have a safe irq domain
-+	 * with respect to MSI isolation
-+	 */
-+	safe_irq_domains = !iommu_group_for_each_dev(iommu_group, &bus,
-+				       vfio_safe_irq_domain);
-+
- 	/* Determine bus_type in order to allocate a domain */
- 	ret = iommu_group_for_each_dev(iommu_group, &bus, vfio_bus_type);
- 	if (ret)
-@@ -932,8 +968,12 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 	INIT_LIST_HEAD(&domain->group_list);
- 	list_add(&group->next, &domain->group_list);
- 
-+	/*
-+	 * to advertise safe interrupts either the IOMMU or the MSI controllers
-+	 * must support IRQ remapping/interrupt translation
-+	 */
- 	if (!allow_unsafe_interrupts &&
--	    !iommu_capable(bus, IOMMU_CAP_INTR_REMAP)) {
-+	    (!iommu_capable(bus, IOMMU_CAP_INTR_REMAP) && !safe_irq_domains)) {
- 		pr_warn("%s: No interrupt remapping support.  Use the module param \"allow_unsafe_interrupts\" to enable VFIO IOMMU support on this platform\n",
- 		       __func__);
- 		ret = -EPERM;
+v1 -> v2:
+- user API changed:
+  x devid id passed in kvm_irq_routing_msi
+  x kept the new routing entry type: KVM_IRQ_ROUTING_EXTENDED_MSI
+- kvm_host.h: adopt Andre's proposal to replace the msi_msg by a struct
+  composed of the msi_msg and devid in kvm_kernel_irq_routing_entry
+- Fix bug reported by Pavel: Added KVM_IRQ_ROUTING_EXTENDED_MSI handling
+  in eventfd.c
+- added vgic_v2m_inject_msi in vgic-v2-emul.c as suggested by Andre
+- fix bug reported by Andre: bad setting of msi.flags and msi.devid
+  in kvm_send_userspace_msi
+- avoid injecting reserved IRQ numbers in vgic_irqfd_set_irq
+
+RFC -> PATCH:
+- clearly state limited support on arm/arm64:
+  KVM_IRQ_LINE not impacted by GSI routing
+- add default routing table feature (new patch file)
+- changed uapi to use padding field area
+- reword api.txt
+
+
+
+Eric Auger (7):
+  KVM: api: pass the devid in the msi routing entry
+  KVM: kvm_host: add devid in kvm_kernel_irq_routing_entry
+  KVM: irqchip: convey devid to kvm_set_msi
+  KVM: arm/arm64: enable irqchip routing
+  KVM: arm/arm64: build a default routing table
+  KVM: arm/arm64: enable MSI routing
+  KVM: arm: enable KVM_SIGNAL_MSI and MSI routing
+
+ Documentation/virtual/kvm/api.txt | 35 ++++++++++++---
+ arch/arm/include/asm/kvm_host.h   |  2 +
+ arch/arm/kvm/Kconfig              |  3 ++
+ arch/arm/kvm/Makefile             |  1 +
+ arch/arm64/include/asm/kvm_host.h |  1 +
+ arch/arm64/kvm/Kconfig            |  3 ++
+ arch/arm64/kvm/Makefile           |  1 +
+ include/kvm/vgic/vgic.h           |  2 -
+ include/linux/kvm_host.h          |  8 +++-
+ include/uapi/linux/kvm.h          |  5 ++-
+ virt/kvm/arm/vgic/vgic-v2.c       | 15 +++++++
+ virt/kvm/arm/vgic/vgic.c          |  7 ---
+ virt/kvm/arm/vgic/vgic.h          |  1 +
+ virt/kvm/arm/vgic/vgic_init.c     | 24 +++++++++++
+ virt/kvm/arm/vgic/vgic_irqfd.c    | 91 +++++++++++++++++++++++++++++++--------
+ virt/kvm/irqchip.c                |  8 +++-
+ 16 files changed, 170 insertions(+), 37 deletions(-)
+
 -- 
 1.9.1
+
