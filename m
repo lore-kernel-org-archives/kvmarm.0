@@ -1,22 +1,22 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 17/17] arm64: kvm: Add support for 16K pages
-Date: Mon,  4 Apr 2016 17:26:17 +0100
-Message-ID: <1459787177-12767-18-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH 14/17] kvm-arm: Cleanup kvm_* wrappers
+Date: Mon,  4 Apr 2016 17:26:14 +0100
+Message-ID: <1459787177-12767-15-git-send-email-suzuki.poulose@arm.com>
 References: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E52FB49B43
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:26:00 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 398BC407A0
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:25:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RwtHSppW+xUB for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Apr 2016 12:26:00 -0400 (EDT)
+ with ESMTP id EScS5fSho1ka for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2016 12:25:54 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BF08649B56
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:25:59 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 3B9D0411BE
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:25:54 -0400 (EDT)
 In-Reply-To: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,65 +31,119 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that we can handle stage-2 page tables independent
-of the host page table levels, wire up the 16K page
-support.
+Now that we have switched to explicit page table routines,
+get rid of the obsolete kvm_* wrappers.
+
+Also, kvm_tlb_flush_vmid_by_ipa is now called only on stage2
+page tables, hence get rid of the redundant check.
 
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/include/asm/kvm_arm.h |   11 ++++++++++-
- arch/arm64/kvm/Kconfig           |    1 -
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ arch/arm/include/asm/kvm_mmu.h   |   20 --------------------
+ arch/arm/kvm/mmu.c               |    9 +--------
+ arch/arm64/include/asm/kvm_mmu.h |   24 ------------------------
+ 3 files changed, 1 insertion(+), 52 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index d5d5fdf..3d830a3 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -114,6 +114,7 @@
- #define VTCR_EL2_PS_MASK	TCR_EL2_PS_MASK
- #define VTCR_EL2_TG0_MASK	TCR_TG0_MASK
- #define VTCR_EL2_TG0_4K		TCR_TG0_4K
-+#define VTCR_EL2_TG0_16K	TCR_TG0_16K
- #define VTCR_EL2_TG0_64K	TCR_TG0_64K
- #define VTCR_EL2_SH0_MASK	TCR_SH0_MASK
- #define VTCR_EL2_SH0_INNER	TCR_SH0_INNER
-@@ -139,7 +140,7 @@
-  * (see hyp-init.S).
-  *
-  * Note that when using 4K pages, we concatenate two first level page tables
-- * together.
-+ * together. With 16K pages, we concatenate 16 first level page tables.
-  *
-  * The magic numbers used for VTTBR_X in this patch can be found in Tables
-  * D4-23 and D4-25 in ARM DDI 0487A.b.
-@@ -156,6 +157,14 @@
-  */
- #define VTCR_EL2_TGRAN_FLAGS	(VTCR_EL2_TG0_64K | VTCR_EL2_SL0_LVL1)
- #define VTTBR_X_TGRAN_MAGIC		38
-+#elif defined(CONFIG_ARM64_16K_PAGES)
-+/*
-+ * Stage2 translation configuration:
-+ * 16kB pages (TG0 = 2)
-+ * 2 level page tables (SL = 1)
-+ */
-+#define VTCR_EL2_TGRAN_FLAGS	(VTCR_EL2_TG0_16K | VTCR_EL2_SL0_LVL1)
-+#define VTTBR_X_TGRAN_MAGIC	42
- #else
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index 901c1ea..50aa901 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -136,32 +136,12 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
+ 	return (pmd_val(*pmd) & L_PMD_S2_RDWR) == L_PMD_S2_RDONLY;
+ }
+ 
+-
+-/* Open coded p*d_addr_end that can deal with 64bit addresses */
+-#define kvm_pgd_addr_end(addr, end)					\
+-({	u64 __boundary = ((addr) + PGDIR_SIZE) & PGDIR_MASK;		\
+-	(__boundary - 1 < (end) - 1)? __boundary: (end);		\
+-})
+-
+-#define kvm_pud_addr_end(addr,end)		(end)
+-
+-#define kvm_pmd_addr_end(addr, end)					\
+-({	u64 __boundary = ((addr) + PMD_SIZE) & PMD_MASK;		\
+-	(__boundary - 1 < (end) - 1)? __boundary: (end);		\
+-})
+-
+-#define kvm_pgd_index(addr)			pgd_index(addr)
+-
+ static inline bool kvm_page_empty(void *ptr)
+ {
+ 	struct page *ptr_page = virt_to_page(ptr);
+ 	return page_count(ptr_page) == 1;
+ }
+ 
+-#define kvm_pte_table_empty(kvm, ptep) kvm_page_empty(ptep)
+-#define kvm_pmd_table_empty(kvm, pmdp) kvm_page_empty(pmdp)
+-#define kvm_pud_table_empty(kvm, pudp) (0)
+-
+ #define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
+ #define hyp_pmd_table_empty(pmdp) kvm_page_empty(pmdp)
+ #define hyp_pud_table_empty(pudp) (0)
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index 0009a24..dda60fc 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -66,14 +66,7 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+ 
+ static void kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
+ {
+-	/*
+-	 * This function also gets called when dealing with HYP page
+-	 * tables. As HYP doesn't have an associated struct kvm (and
+-	 * the HYP page tables are fairly static), we don't do
+-	 * anything there.
+-	 */
+-	if (kvm)
+-		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, kvm, ipa);
++	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, kvm, ipa);
+ }
+ 
  /*
-  * Stage2 translation configuration:
-diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-index de7450d..aa2e34e 100644
---- a/arch/arm64/kvm/Kconfig
-+++ b/arch/arm64/kvm/Kconfig
-@@ -22,7 +22,6 @@ config KVM_ARM_VGIC_V3
- config KVM
- 	bool "Kernel-based Virtual Machine (KVM) support"
- 	depends on OF
--	depends on !ARM64_16K_PAGES
- 	select MMU_NOTIFIER
- 	select PREEMPT_NOTIFIERS
- 	select ANON_INODES
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index edf3c62..a3c0d05 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -153,13 +153,6 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
+ 	return (pmd_val(*pmd) & PMD_S2_RDWR) == PMD_S2_RDONLY;
+ }
+ 
+-
+-#define kvm_pgd_addr_end(addr, end)	pgd_addr_end(addr, end)
+-#define kvm_pud_addr_end(addr, end)	pud_addr_end(addr, end)
+-#define kvm_pmd_addr_end(addr, end)	pmd_addr_end(addr, end)
+-
+-#define kvm_pgd_index(addr)	(((addr) >> PGDIR_SHIFT) & (PTRS_PER_S2_PGD - 1))
+-
+ static inline void *kvm_get_hwpgd(struct kvm *kvm)
+ {
+ 	pgd_t *pgd = kvm->arch.pgd;
+@@ -232,23 +225,6 @@ static inline bool kvm_page_empty(void *ptr)
+ 	return page_count(ptr_page) == 1;
+ }
+ 
+-#define kvm_pte_table_empty(kvm, ptep) kvm_page_empty(ptep)
+-
+-#ifdef __PAGETABLE_PMD_FOLDED
+-#define kvm_pmd_table_empty(kvm, pmdp) (0)
+-#else
+-#define kvm_pmd_table_empty(kvm, pmdp) \
+-	(kvm_page_empty(pmdp) && (!(kvm) || KVM_PREALLOC_LEVEL < 2))
+-#endif
+-
+-#ifdef __PAGETABLE_PUD_FOLDED
+-#define kvm_pud_table_empty(kvm, pudp) (0)
+-#else
+-#define kvm_pud_table_empty(kvm, pudp) \
+-	(kvm_page_empty(pudp) && (!(kvm) || KVM_PREALLOC_LEVEL < 1))
+-#endif
+-
+-
+ #define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
+ 
+ #ifdef __PAGETABLE_PMD_FOLDED
 -- 
 1.7.9.5
