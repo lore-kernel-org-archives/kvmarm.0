@@ -1,256 +1,149 @@
-From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: [PATCH v6 5/5] vfio/type1: return MSI mapping requirements with
-	VFIO_IOMMU_GET_INFO
-Date: Mon,  4 Apr 2016 08:30:11 +0000
-Message-ID: <1459758611-2972-6-git-send-email-eric.auger@linaro.org>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: [PATCH v6 3/5] vfio/type1: also check IRQ remapping capability at msi
+ domain
+Date: Mon,  4 Apr 2016 08:30:09 +0000
+Message-ID: <1459758611-2972-4-git-send-email-eric.auger@linaro.org>
 References: <1459758611-2972-1-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <1459758611-2972-1-git-send-email-eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: eric.auger-qxv4g6HH51o@public.gmane.org, eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, robin.murphy-5wv7dgnIgG8@public.gmane.org, alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, joro-zLv9SwRftAIdnm+yROfE0A@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org
-Cc: julien.grall-5wv7dgnIgG8@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2377840B58
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 04:29:16 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id LFZ58fMwlEIC for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2016 04:29:15 -0400 (EDT)
+Received: from mail-lf0-f45.google.com (mail-lf0-f45.google.com
+ [209.85.215.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0A78E409A2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 04:29:14 -0400 (EDT)
+Received: by mail-lf0-f45.google.com with SMTP id g184so83822965lfb.3
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Apr 2016 01:30:30 -0700 (PDT)
+In-Reply-To: <1459758611-2972-1-git-send-email-eric.auger@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: eric.auger@st.com, eric.auger@linaro.org, robin.murphy@arm.com, alex.williamson@redhat.com, will.deacon@arm.com, joro@8bytes.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, christoffer.dall@linaro.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: patches@linaro.org, Manish.Jaggi@caviumnetworks.com, linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This patch allows the user-space to know whether MSI addresses need to
-be mapped in the IOMMU. The user-space uses VFIO_IOMMU_GET_INFO ioctl and
-IOMMU_INFO_REQUIRE_MSI_MAP gets set if they need to.
+On x86 IRQ remapping is abstracted by the IOMMU. On ARM this is abstracted
+by the msi controller. vfio_safe_irq_domain allows to check whether
+interrupts are "safe" for a given device. They are if the device does
+not use MSI or if the device uses MSI and the msi-parent controller
+supports IRQ remapping.
 
-Also the number of IOMMU pages requested to map those is returned in
-msi_iova_pages field. User-space must use this information to allocate an
-IOVA contiguous region of size msi_iova_pages * ffs(iova_pgsizes) and pass
-it with VFIO_IOMMU_MAP_DMA iotcl (VFIO_DMA_MAP_FLAG_MSI_RESERVED_IOVA set).
+Then we check at group level if all devices have safe interrupts: if not,
+we only allow the group to be attached if allow_unsafe_interrupts is set.
 
-Signed-off-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+At this point ARM sMMU still advertises IOMMU_CAP_INTR_REMAP. This is
+changed in next patch.
+
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
 ---
-
-Currently it is assumed a single doorbell page is used per MSI controller.
-This is the case for known ARM MSI controllers (GICv2M, GICv3 ITS, ...).
-If an MSI controller were to expose more doorbells it could implement a
-new callback at irq_chip interface.
-
-v4 -> v5:
-- move msi_info and ret declaration within the conditional code
-
 v3 -> v4:
-- replace former vfio_domains_require_msi_mapping by
-  more complex computation of MSI mapping requirements, especially the
-  number of pages to be provided by the user-space.
-- reword patch title
+- rename vfio_msi_parent_irq_remapping_capable into vfio_safe_irq_domain
+  and irq_remapping into safe_irq_domains
 
-RFC v1 -> v1:
-- derived from
-  [RFC PATCH 3/6] vfio: Extend iommu-info to return MSIs automap state
-- renamed allow_msi_reconfig into require_msi_mapping
-- fixed VFIO_IOMMU_GET_INFO
+v2 -> v3:
+- protect vfio_msi_parent_irq_remapping_capable with
+  CONFIG_GENERIC_MSI_IRQ_DOMAIN
 ---
- drivers/vfio/vfio_iommu_type1.c | 147 ++++++++++++++++++++++++++++++++++++++++
- include/uapi/linux/vfio.h       |   2 +
- 2 files changed, 149 insertions(+)
+ drivers/vfio/vfio_iommu_type1.c | 44 +++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 42 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index b330b81..f1def50 100644
+index 4497b20..b330b81 100644
 --- a/drivers/vfio/vfio_iommu_type1.c
 +++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -39,6 +39,7 @@
+@@ -37,6 +37,8 @@
+ #include <linux/vfio.h>
+ #include <linux/workqueue.h>
  #include <linux/dma-reserved-iommu.h>
- #include <linux/irqdomain.h>
- #include <linux/msi.h>
-+#include <linux/irq.h>
++#include <linux/irqdomain.h>
++#include <linux/msi.h>
  
  #define DRIVER_VERSION  "0.2"
- #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>"
-@@ -95,6 +96,17 @@ struct vfio_group {
- 	struct list_head	next;
- };
- 
-+struct vfio_irq_chip {
-+	struct list_head next;
-+	struct irq_chip *chip;
-+};
-+
-+struct vfio_msi_map_info {
-+	bool mapping_required;
-+	unsigned int iova_pages;
-+	struct list_head irq_chip_list;
-+};
-+
- /*
-  * This code handles mapping and unmapping of user data buffers
-  * into DMA'ble space using the IOMMU
-@@ -267,6 +279,127 @@ static int vaddr_get_pfn(unsigned long vaddr, int prot, unsigned long *pfn)
- 	return ret;
+ #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson@redhat.com>"
+@@ -788,6 +790,33 @@ static int vfio_bus_type(struct device *dev, void *data)
+ 	return 0;
  }
  
-+#if defined(CONFIG_GENERIC_MSI_IRQ_DOMAIN) && defined(CONFIG_IOMMU_DMA_RESERVED)
 +/**
-+ * vfio_dev_compute_msi_map_info: augment MSI mapping info (@data) with
-+ * the @dev device requirements.
++ * vfio_safe_irq_domain: returns whether the irq domain
++ * the device is attached to is safe with respect to MSI isolation.
++ * If the irq domain is not an MSI domain, we return it is safe.
 + *
 + * @dev: device handle
-+ * @data: opaque pointing to a struct vfio_msi_map_info
-+ *
-+ * returns 0 upon success or -ENOMEM
++ * @data: unused
++ * returns 0 if the irq domain is safe, -1 if not.
 + */
-+static int vfio_dev_compute_msi_map_info(struct device *dev, void *data)
++static int vfio_safe_irq_domain(struct device *dev, void *data)
 +{
++#ifdef CONFIG_GENERIC_MSI_IRQ_DOMAIN
 +	struct irq_domain *domain;
 +	struct msi_domain_info *info;
-+	struct vfio_msi_map_info *msi_info = (struct vfio_msi_map_info *)data;
-+	struct irq_chip *chip;
-+	struct vfio_irq_chip *iter, *new;
 +
 +	domain = dev_get_msi_domain(dev);
 +	if (!domain)
 +		return 0;
 +
-+	/* Let's compute the needs for the MSI domain */
 +	info = msi_get_domain_info(domain);
-+	chip = info->chip;
-+	list_for_each_entry(iter, &msi_info->irq_chip_list, next) {
-+		if (iter->chip == chip)
-+			return 0;
-+	}
 +
-+	new = kzalloc(sizeof(*new), GFP_KERNEL);
-+	if (!new)
-+		return -ENOMEM;
-+
-+	new->chip = chip;
-+
-+	list_add(&new->next, &msi_info->irq_chip_list);
-+
-+	/*
-+	 * new irq_chip to be taken into account; we currently assume
-+	 * a single iova doorbell by irq chip requesting MSI mapping
-+	 */
-+	msi_info->iova_pages += 1;
++	if (!(info->flags & MSI_FLAG_IRQ_REMAPPING))
++		return -1;
++#endif
 +	return 0;
 +}
 +
-+/**
-+ * vfio_domain_compute_msi_map_info: compute MSI mapping requirements (@data)
-+ * for vfio_domain @d
-+ *
-+ * @d: vfio domain handle
-+ * @data: opaque pointing to a struct vfio_msi_map_info
-+ *
-+ * returns 0 upon success or -ENOMEM
-+ */
-+static int vfio_domain_compute_msi_map_info(struct vfio_domain *d, void *data)
-+{
-+	int ret = 0;
-+	struct vfio_msi_map_info *msi_info = (struct vfio_msi_map_info *)data;
-+	struct vfio_irq_chip *iter, *tmp;
-+	struct vfio_group *g;
-+
-+	msi_info->iova_pages = 0;
-+	INIT_LIST_HEAD(&msi_info->irq_chip_list);
-+
-+	if (iommu_domain_get_attr(d->domain,
-+				   DOMAIN_ATTR_MSI_MAPPING, NULL))
-+		return 0;
-+	msi_info->mapping_required = true;
-+	list_for_each_entry(g, &d->group_list, next) {
-+		ret = iommu_group_for_each_dev(g->iommu_group, msi_info,
-+			   vfio_dev_compute_msi_map_info);
-+		if (ret)
-+			goto out;
-+	}
-+out:
-+	list_for_each_entry_safe(iter, tmp, &msi_info->irq_chip_list, next) {
-+		list_del(&iter->next);
-+		kfree(iter);
-+	}
-+	return ret;
-+}
-+
-+/**
-+ * vfio_compute_msi_map_info: compute MSI mapping requirements
-+ *
-+ * Do some MSI addresses need to be mapped? IOMMU page size?
-+ * Max number of IOVA pages needed by any domain to map MSI
-+ *
-+ * @iommu: iommu handle
-+ * @info: msi map info handle
-+ *
-+ * returns 0 upon success or -ENOMEM
-+ */
-+static int vfio_compute_msi_map_info(struct vfio_iommu *iommu,
-+				 struct vfio_msi_map_info *msi_info)
-+{
-+	int ret = 0;
-+	struct vfio_domain *d;
-+	unsigned long bitmap = ULONG_MAX;
-+	unsigned int iova_pages = 0;
-+
-+	msi_info->mapping_required = false;
-+
-+	mutex_lock(&iommu->lock);
-+	list_for_each_entry(d, &iommu->domain_list, next) {
-+		bitmap &= d->domain->ops->pgsize_bitmap;
-+		ret = vfio_domain_compute_msi_map_info(d, msi_info);
-+		if (ret)
-+			goto out;
-+		if (msi_info->iova_pages > iova_pages)
-+			iova_pages = msi_info->iova_pages;
-+	}
-+out:
-+	msi_info->iova_pages = iova_pages;
-+	mutex_unlock(&iommu->lock);
-+	return ret;
-+}
-+
-+#endif
-+
- /*
-  * Attempt to pin pages.  We really don't want to track all the pfns and
-  * the iommu can only map chunks of consecutive pfns anyway, so get the
-@@ -1179,6 +1312,20 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ static int vfio_iommu_replay(struct vfio_iommu *iommu,
+ 			     struct vfio_domain *domain)
+ {
+@@ -882,7 +911,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 	struct vfio_group *group, *g;
+ 	struct vfio_domain *domain, *d;
+ 	struct bus_type *bus = NULL;
+-	int ret;
++	int ret, safe_irq_domains;
  
- 		info.flags = VFIO_IOMMU_INFO_PGSIZES;
+ 	mutex_lock(&iommu->lock);
  
-+#if defined(CONFIG_GENERIC_MSI_IRQ_DOMAIN) && defined(CONFIG_IOMMU_DMA_RESERVED)
-+		{
-+			struct vfio_msi_map_info msi_info;
-+			int ret;
+@@ -905,6 +934,13 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 
+ 	group->iommu_group = iommu_group;
+ 
++	/*
++	 * Determine if all the devices of the group have a safe irq domain
++	 * with respect to MSI isolation
++	 */
++	safe_irq_domains = !iommu_group_for_each_dev(iommu_group, &bus,
++				       vfio_safe_irq_domain);
 +
-+			ret = vfio_compute_msi_map_info(iommu, &msi_info);
-+			if (ret)
-+				return ret;
-+
-+			if (msi_info.mapping_required)
-+				info.flags |= VFIO_IOMMU_INFO_REQUIRE_MSI_MAP;
-+			info.msi_iova_pages = msi_info.iova_pages;
-+		}
-+#endif
- 		info.iova_pgsizes = vfio_pgsize_bitmap(iommu);
+ 	/* Determine bus_type in order to allocate a domain */
+ 	ret = iommu_group_for_each_dev(iommu_group, &bus, vfio_bus_type);
+ 	if (ret)
+@@ -932,8 +968,12 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+ 	INIT_LIST_HEAD(&domain->group_list);
+ 	list_add(&group->next, &domain->group_list);
  
- 		return copy_to_user((void __user *)arg, &info, minsz) ?
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index a49be8a..e3e501c 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -488,7 +488,9 @@ struct vfio_iommu_type1_info {
- 	__u32	argsz;
- 	__u32	flags;
- #define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info */
-+#define VFIO_IOMMU_INFO_REQUIRE_MSI_MAP (1 << 1)/* MSI must be mapped */
- 	__u64	iova_pgsizes;		/* Bitmap of supported page sizes */
-+	__u32   msi_iova_pages;	/* number of IOVA pages needed to map MSIs */
- };
- 
- #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
++	/*
++	 * to advertise safe interrupts either the IOMMU or the MSI controllers
++	 * must support IRQ remapping/interrupt translation
++	 */
+ 	if (!allow_unsafe_interrupts &&
+-	    !iommu_capable(bus, IOMMU_CAP_INTR_REMAP)) {
++	    (!iommu_capable(bus, IOMMU_CAP_INTR_REMAP) && !safe_irq_domains)) {
+ 		pr_warn("%s: No interrupt remapping support.  Use the module param \"allow_unsafe_interrupts\" to enable VFIO IOMMU support on this platform\n",
+ 		       __func__);
+ 		ret = -EPERM;
 -- 
 1.9.1
