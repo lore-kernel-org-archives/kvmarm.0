@@ -1,22 +1,22 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH 07/17] kvm-arm: arm32: Introduce stage2 page table helpers
-Date: Mon,  4 Apr 2016 17:26:07 +0100
-Message-ID: <1459787177-12767-8-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH 08/17] kvm-arm: arm: Introduce hyp page table empty checks
+Date: Mon,  4 Apr 2016 17:26:08 +0100
+Message-ID: <1459787177-12767-9-git-send-email-suzuki.poulose@arm.com>
 References: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6841440B40
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:25:42 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E50A541267
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:25:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id nMi9-E3Sth6L for <kvmarm@lists.cs.columbia.edu>;
- Mon,  4 Apr 2016 12:25:41 -0400 (EDT)
+ with ESMTP id Pq7JX+vjbQ8K for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2016 12:25:43 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3F7D9412DD
- for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:25:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1103840B40
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 12:25:43 -0400 (EDT)
 In-Reply-To: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,99 +31,31 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Define the page table helpers for walking the stage2 pagetable
-for arm. Since both hyp and stage2 have the same number of levels,
-as that of the host we reuse the host helpers.
-
-The exceptions are the p.d_addr_end routines which have to deal
-with IPA > 32bit, hence we use the open coded version of their host helpers
-which supports 64bit.
+Introduce hyp_pxx_table_empty helpers for checking whether
+a given table entry is empty. This will be used explicitly
+once we switch to explicit routines for hyp page table walk.
 
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm/include/asm/kvm_mmu.h        |    1 +
- arch/arm/include/asm/stage2_pgtable.h |   59 +++++++++++++++++++++++++++++++++
- 2 files changed, 60 insertions(+)
- create mode 100644 arch/arm/include/asm/stage2_pgtable.h
+ arch/arm/include/asm/kvm_mmu.h |    4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index c2b2b27..7d207b4 100644
+index 7d207b4..901c1ea 100644
 --- a/arch/arm/include/asm/kvm_mmu.h
 +++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -47,6 +47,7 @@
- #include <linux/highmem.h>
- #include <asm/cacheflush.h>
- #include <asm/pgalloc.h>
-+#include <asm/stage2_pgtable.h>
+@@ -162,6 +162,10 @@ static inline bool kvm_page_empty(void *ptr)
+ #define kvm_pmd_table_empty(kvm, pmdp) kvm_page_empty(pmdp)
+ #define kvm_pud_table_empty(kvm, pudp) (0)
  
- int create_hyp_mappings(void *from, void *to);
- int create_hyp_io_mappings(void *from, void *to, phys_addr_t);
-diff --git a/arch/arm/include/asm/stage2_pgtable.h b/arch/arm/include/asm/stage2_pgtable.h
-new file mode 100644
-index 0000000..7633b0a
---- /dev/null
-+++ b/arch/arm/include/asm/stage2_pgtable.h
-@@ -0,0 +1,59 @@
-+/*
-+ * Copyright (C) 2016 - ARM Ltd
-+ *
-+ * stage2 page table helpers
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
++#define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
++#define hyp_pmd_table_empty(pmdp) kvm_page_empty(pmdp)
++#define hyp_pud_table_empty(pudp) (0)
 +
-+#ifndef __ARM_S2_PGTABLE_H_
-+#define __ARM_S2_PGTABLE_H_
-+
-+#define stage2_pgd_none(pgd)				pgd_none(pgd)
-+#define stage2_pgd_clear(pgd)				pgd_clear(pgd)
-+#define stage2_pgd_present(pgd)				pgd_present(pgd)
-+#define stage2_pgd_populate(mm, pgd, pud)		pgd_populate(mm, pgd, pud)
-+#define stage2_pud_offset(pgd, address)			pud_offset(pgd, address)
-+#define stage2_pud_free(mm, pud)			pud_free(mm, pud)
-+
-+#define stage2_pud_none(pud)				pud_none(pud)
-+#define stage2_pud_clear(pud)				pud_clear(pud)
-+#define stage2_pud_present(pud)				pud_present(pud)
-+#define stage2_pud_populate(mm, pud, pmd)		pud_populate(mm, pud, pmd)
-+#define stage2_pmd_offset(pud, address)			pmd_offset(pud, address)
-+#define stage2_pmd_free(mm, pmd)			pmd_free(mm, pmd)
-+
-+#define stage2_pud_huge(pud)				pud_huge(pud)
-+
-+/* Open coded p*d_addr_end that can deal with 64bit addresses */
-+static inline phys_addr_t stage2_pgd_addr_end(phys_addr_t addr, phys_addr_t end)
-+{
-+	phys_addr_t boundary = (addr + PGDIR_SIZE) & PGDIR_MASK;
-+	return (boundary - 1 < end - 1) ? boundary : end;
-+}
-+
-+#define stage2_pud_addr_end(addr, end)		(end)
-+
-+static inline phys_addr_t stage2_pmd_addr_end(phys_addr_t addr, phys_addr_t end)
-+{
-+	phys_addr_t boundary = (addr + PMD_SIZE) & PMD_MASK;
-+	return (boundary - 1 < end - 1) ? boundary : end;
-+}
-+
-+#define stage2_pgd_index(addr)				pgd_index(addr)
-+
-+#define stage2_pte_table_empty(ptep)			kvm_page_empty(ptep)
-+#define stage2_pmd_table_empty(pmdp)			kvm_page_empty(pmdp)
-+#define stage2_pud_table_empty(pudp)			0
-+
-+#endif	/* __ARM_S2_PGTABLE_H_ */
+ static inline void *kvm_get_hwpgd(struct kvm *kvm)
+ {
+ 	return kvm->arch.pgd;
 -- 
 1.7.9.5
