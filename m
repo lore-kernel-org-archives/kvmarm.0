@@ -1,170 +1,145 @@
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: RE: [RFC v4 0/7] KVM: arm/arm64: gsi routing support
-Date: Mon, 04 Apr 2016 13:15:23 +0300
-Message-ID: <007601d18e5a$e7ca7120$b75f5360$@samsung.com>
-References: <1459759657-7402-1-git-send-email-eric.auger@linaro.org>
+From: Julien Grall <julien.grall@arm.com>
+Subject: [PATCH v5 7/9] KVM: arm/arm64: arch_timer: Rely on the arch timer to
+ parse the firmware tables
+Date: Mon,  4 Apr 2016 12:37:38 +0100
+Message-ID: <1459769860-6629-8-git-send-email-julien.grall@arm.com>
+References: <1459769860-6629-1-git-send-email-julien.grall@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-reply-to: <1459759657-7402-1-git-send-email-eric.auger@linaro.org>
-Content-language: en-us
-Sender: kvm-owner@vger.kernel.org
-To: 'Eric Auger' <eric.auger@linaro.org>, eric.auger@st.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: patches@linaro.org, pbonzini@redhat.com, Manish.Jaggi@caviumnetworks.com
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A25A412ED
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 07:37:03 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 0lF3KLeoG4oY for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2016 07:37:02 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7278740FA2
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 07:37:02 -0400 (EDT)
+In-Reply-To: <1459769860-6629-1-git-send-email-julien.grall@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: kvmarm@lists.cs.columbia.edu
+Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, Gleb Natapov <gleb@kernel.org>, fu.wei@linaro.org, Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, gg@slimlogic.co.uk
 List-Id: kvmarm@lists.cs.columbia.edu
 
- Hello!
+The firmware table is currently parsed by the virtual timer code in
+order to retrieve the virtual timer interrupt. However, this is already
+done by the arch timer driver.
 
- I'd like to remind that this will break with current vITS code and VFIO. 
- The problem is short path for raising MSIs via routed GSI. There is a code
-which directly calls IRQ injection instead of triggering irqfd. With VFIO
-this code is called from within interrupt context. This will cause random
-lockups in vits_inject_msi(), which does not use irq-save spin-locking.
- I hit this several times and I had to rework ITS emulation in my local
-tree.
+To avoid code duplication, use the newly function arch_timer_get_kvm_info()
+which return all the information required by the virtual timer code.
 
-Kind regards,
-Pavel Fedin
-Senior Engineer
-Samsung Electronics Research center Russia
+Signed-off-by: Julien Grall <julien.grall@arm.com>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 
+---
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Gleb Natapov <gleb@kernel.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
------Original Message-----
-From: Eric Auger [mailto:eric.auger@linaro.org] 
-Sent: Monday, April 04, 2016 11:48 AM
-To: eric.auger@st.com; eric.auger@linaro.org; christoffer.dall@linaro.org;
-marc.zyngier@arm.com; andre.przywara@arm.com; kvmarm@lists.cs.columbia.edu;
-kvm@vger.kernel.org
-Cc: patches@linaro.org; pbonzini@redhat.com; p.fedin@samsung.com;
-Manish.Jaggi@caviumnetworks.com
-Subject: [RFC v4 0/7] KVM: arm/arm64: gsi routing support
+    Changes in v4:
+        - Add Christoffer's acked-by
 
-With the advent of GICv3 ITS in-kernel emulation, KVM MSI routing
-becomes mandated for proper VIRTIO-PCI vhost integration.
+    Changes in v3:
+        - Patch added
+---
+ virt/kvm/arm/arch_timer.c | 40 +++++++++++-----------------------------
+ 1 file changed, 11 insertions(+), 29 deletions(-)
 
-In QEMU, when the VIRTIO-PCI device is programmed with the MSI message,
-we previously used direct_mapping trick: this consists in extracting the
-SPI ID found in the MSI message and associating an irqfd to that SPI ID.
-When vhost worker thread gets a new buffer it signals the irqfd and kvm
-then injects this SPI ID on guest. That way although the guest uses MSIs,
-no MSI emulation is used.
-
-This worked fine with GICv2m but does not work anymore with GICV3 ITS.
-Indeed this latter implements IRQ translation: what is found in the MSI
-message no more is the target SPI ID but is an intermediate event ID used
-in the translation process.
-
-Hence true MSI routing is needed so that the vhost back channel irqfd is
-associated to a dummy gsi ID, routed towards the programmed MSI. When KVM
-injects the MSI through the in-kernel ITS emulation, the MSI is properly
-translated and eventually the SPI ID associated to the event ID is injected
-on guest.
-
-irqchip routing does not sound to be really useful on arm but usage of
-MSI routing also mandates to integrate irqchip routing. The initial
-implementation of irqfd on arm must be upgraded with the integration
-of kvm irqchip.c code and the implementation of its standard hooks
-in the architecture specific part.
-
-In case KVM_SET_GSI_ROUTING ioctl is not called, a default routing
-table with flat irqchip routing entries is built enabling to inject gsi
-corresponding to the SPI indexes seen by the guest.
-
-As soon as KVM_SET_GSI_ROUTING is called, user-space overwrites this
-default routing table and is responsible for building the whole routing
-table.
-
-for arm/arm64 KVM_SET_GSI_ROUTING has a limited support:
-- only applies to KVM_IRQFD and not to KVM_IRQ_LINE
-
-- irqchip routing was tested on Calxeda midway (VFIO with irqfd)
-  with and without explicit routing
-- MSI routing without GICv3 ITS was tested using APM Xgene-I
-  (qemu VIRTIO-PCI vhost-net without gsi_direct_mapping).
-- MSI routing with GICv3 ITS is *NOT* tested.
-
-Code can be found at
-https://git.linaro.org/people/eric.auger/linux.git/shortlog/refs/heads/v4.5-
-rc6-its-emul-v4-gsi-routing-v4
-
-The series applies on top of Andre's branch featuring NEW-VGIC and in-kernel
-ITS emulation series:
-http://www.linux-arm.org/git?p=linux-ap.git;a=log;h=refs/heads/its-emul/v4
-
-[1]: [PATCH v4 00/12] KVM: arm64: GICv3 ITS emulation
-     http://www.spinics.net/lists/arm-kernel/msg492770.html
-[2]: [RFC PATCH 00/45] KVM: arm/arm64: Rework virtual GIC emulation
-     http://www.spinics.net/lists/arm-kernel/msg492639.html
-
-GSI flat routing setup on QEMU can be found at:
-https://lists.nongnu.org/archive/html/qemu-devel/2015-07/msg06262.html
-
-History:
-v3 -> v4:
-- rebase on top of NEW-VGIC RFC and ITS emulation series v4. This is not
-  a stable foundation yet. Hence the revert to RFC. This v4 mostly is a
-  reflesh/reminder.
-- rewrite the cover letter
-
-v2 -> v3:
-- don't use KVM_IRQ_ROUTING_EXTENDED_MSI type at uapi and kernel level
-anymore;
-  use KVM_MSI_VALID_DEVID flag instead
-- propagate user flags downto the kernel to make sure the userspace
-  correctly set devid in GICv3 ITS case (still under discussion)
-
-v1 -> v2:
-- user API changed:
-  x devid id passed in kvm_irq_routing_msi
-  x kept the new routing entry type: KVM_IRQ_ROUTING_EXTENDED_MSI
-- kvm_host.h: adopt Andre's proposal to replace the msi_msg by a struct
-  composed of the msi_msg and devid in kvm_kernel_irq_routing_entry
-- Fix bug reported by Pavel: Added KVM_IRQ_ROUTING_EXTENDED_MSI handling
-  in eventfd.c
-- added vgic_v2m_inject_msi in vgic-v2-emul.c as suggested by Andre
-- fix bug reported by Andre: bad setting of msi.flags and msi.devid
-  in kvm_send_userspace_msi
-- avoid injecting reserved IRQ numbers in vgic_irqfd_set_irq
-
-RFC -> PATCH:
-- clearly state limited support on arm/arm64:
-  KVM_IRQ_LINE not impacted by GSI routing
-- add default routing table feature (new patch file)
-- changed uapi to use padding field area
-- reword api.txt
-
-
-
-Eric Auger (7):
-  KVM: api: pass the devid in the msi routing entry
-  KVM: kvm_host: add devid in kvm_kernel_irq_routing_entry
-  KVM: irqchip: convey devid to kvm_set_msi
-  KVM: arm/arm64: enable irqchip routing
-  KVM: arm/arm64: build a default routing table
-  KVM: arm/arm64: enable MSI routing
-  KVM: arm: enable KVM_SIGNAL_MSI and MSI routing
-
- Documentation/virtual/kvm/api.txt | 35 ++++++++++++---
- arch/arm/include/asm/kvm_host.h   |  2 +
- arch/arm/kvm/Kconfig              |  3 ++
- arch/arm/kvm/Makefile             |  1 +
- arch/arm64/include/asm/kvm_host.h |  1 +
- arch/arm64/kvm/Kconfig            |  3 ++
- arch/arm64/kvm/Makefile           |  1 +
- include/kvm/vgic/vgic.h           |  2 -
- include/linux/kvm_host.h          |  8 +++-
- include/uapi/linux/kvm.h          |  5 ++-
- virt/kvm/arm/vgic/vgic-v2.c       | 15 +++++++
- virt/kvm/arm/vgic/vgic.c          |  7 ---
- virt/kvm/arm/vgic/vgic.h          |  1 +
- virt/kvm/arm/vgic/vgic_init.c     | 24 +++++++++++
- virt/kvm/arm/vgic/vgic_irqfd.c    | 91
-+++++++++++++++++++++++++++++++--------
- virt/kvm/irqchip.c                |  8 +++-
- 16 files changed, 170 insertions(+), 37 deletions(-)
-
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index a9ad4fe..c6a6f8e 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -17,7 +17,6 @@
+  */
+ 
+ #include <linux/cpu.h>
+-#include <linux/of_irq.h>
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+ #include <linux/interrupt.h>
+@@ -409,45 +408,29 @@ static struct notifier_block kvm_timer_cpu_nb = {
+ 	.notifier_call = kvm_timer_cpu_notify,
+ };
+ 
+-static const struct of_device_id arch_timer_of_match[] = {
+-	{ .compatible	= "arm,armv7-timer",	},
+-	{ .compatible	= "arm,armv8-timer",	},
+-	{},
+-};
+-
+ int kvm_timer_hyp_init(void)
+ {
+-	struct device_node *np;
+-	unsigned int ppi;
++	struct arch_timer_kvm_info *info;
+ 	int err;
+ 
+-	timecounter = arch_timer_get_timecounter();
+-	if (!timecounter)
+-		return -ENODEV;
++	info = arch_timer_get_kvm_info();
++	timecounter = &info->timecounter;
+ 
+-	np = of_find_matching_node(NULL, arch_timer_of_match);
+-	if (!np) {
+-		kvm_err("kvm_arch_timer: can't find DT node\n");
++	if (info->virtual_irq <= 0) {
++		kvm_err("kvm_arch_timer: invalid virtual timer IRQ: %d\n",
++			info->virtual_irq);
+ 		return -ENODEV;
+ 	}
++	host_vtimer_irq = info->virtual_irq;
+ 
+-	ppi = irq_of_parse_and_map(np, 2);
+-	if (!ppi) {
+-		kvm_err("kvm_arch_timer: no virtual timer interrupt\n");
+-		err = -EINVAL;
+-		goto out;
+-	}
+-
+-	err = request_percpu_irq(ppi, kvm_arch_timer_handler,
++	err = request_percpu_irq(host_vtimer_irq, kvm_arch_timer_handler,
+ 				 "kvm guest timer", kvm_get_running_vcpus());
+ 	if (err) {
+ 		kvm_err("kvm_arch_timer: can't request interrupt %d (%d)\n",
+-			ppi, err);
++			host_vtimer_irq, err);
+ 		goto out;
+ 	}
+ 
+-	host_vtimer_irq = ppi;
+-
+ 	err = __register_cpu_notifier(&kvm_timer_cpu_nb);
+ 	if (err) {
+ 		kvm_err("Cannot register timer CPU notifier\n");
+@@ -460,14 +443,13 @@ int kvm_timer_hyp_init(void)
+ 		goto out_free;
+ 	}
+ 
+-	kvm_info("%s IRQ%d\n", np->name, ppi);
++	kvm_info("virtual timer IRQ%d\n", host_vtimer_irq);
+ 	on_each_cpu(kvm_timer_init_interrupt, NULL, 1);
+ 
+ 	goto out;
+ out_free:
+-	free_percpu_irq(ppi, kvm_get_running_vcpus());
++	free_percpu_irq(host_vtimer_irq, kvm_get_running_vcpus());
+ out:
+-	of_node_put(np);
+ 	return err;
+ }
+ 
 -- 
 1.9.1
-
-
