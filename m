@@ -1,107 +1,131 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: [PATCH v4 6/7] KVM: arm/arm64: enable MSI routing
-Date: Mon,  4 Apr 2016 10:47:36 +0200
-Message-ID: <1459759657-7402-7-git-send-email-eric.auger@linaro.org>
+Subject: [PATCH v4 7/7] KVM: arm: enable KVM_SIGNAL_MSI and MSI routing
+Date: Mon,  4 Apr 2016 10:47:37 +0200
+Message-ID: <1459759657-7402-8-git-send-email-eric.auger@linaro.org>
 References: <1459759657-7402-1-git-send-email-eric.auger@linaro.org>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D987040F77
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 04:48:02 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id dycQZ8BOGvqs for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  4 Apr 2016 04:48:02 -0400 (EDT)
+Received: from mail-lf0-f48.google.com (mail-lf0-f48.google.com
+ [209.85.215.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3A69F40F90
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  4 Apr 2016 04:47:59 -0400 (EDT)
+Received: by mail-lf0-f48.google.com with SMTP id c62so158944351lfc.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 04 Apr 2016 01:49:15 -0700 (PDT)
 In-Reply-To: <1459759657-7402-1-git-send-email-eric.auger@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: eric.auger@st.com, eric.auger@linaro.org, christoffer.dall@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: patches@linaro.org, pbonzini@redhat.com, p.fedin@samsung.com, Manish.Jaggi@caviumnetworks.com
+Cc: pbonzini@redhat.com, Manish.Jaggi@caviumnetworks.com, patches@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Up to now, only irqchip routing entries could be set. This patch
-adds the capability to insert MSI routing entries.
+If the ITS modality is not available, let's simply support MSI
+injection by transforming the MSI.data into an SPI ID.
 
-For ARM64, let's also increase KVM_MAX_IRQ_ROUTES to 4096: this
-include SPI irqchip routes plus MSI routes. In the future this
-might be extended.
+This becomes possible to use KVM_SIGNAL_MSI ioctl and MSI
+routing for arm too.
 
 Signed-off-by: Eric Auger <eric.auger@linaro.org>
 
 ---
+
 v2 -> v3:
-- remove any reference to KVM_IRQ_ROUTING_EXTENDED_MSI type
-- unconditionnaly uapi flags and devid downto the kernel
-  routing entry struct
-- handle KVM_MSI_VALID_DEVID flag in kvm_set_irq_routing
-- note about KVM_CAP_MSI_DEVID moved in the first patch file
-  of the series
+- reword the commit message
+- add sanity check about devid provision
 
 v1 -> v2:
-- adapt to new routing entry types
+- introduce vgic_v2m_inject_msi in vgic-v2-emul.c following Andre's
+  advice
 
-RFC -> PATCH:
-- move api MSI routing updates into that patch file
-- use new devid field of user api struct
+Conflicts:
+	arch/arm/kvm/Kconfig
+
+Conflicts:
+	arch/arm/kvm/Kconfig
 ---
- Documentation/virtual/kvm/api.txt | 5 +++++
- include/linux/kvm_host.h          | 2 ++
- virt/kvm/arm/vgic/vgic_irqfd.c    | 8 ++++++++
- virt/kvm/irqchip.c                | 2 +-
- 4 files changed, 16 insertions(+), 1 deletion(-)
+ arch/arm/kvm/Kconfig           |  1 +
+ virt/kvm/arm/vgic/vgic-v2.c    | 15 +++++++++++++++
+ virt/kvm/arm/vgic/vgic.h       |  1 +
+ virt/kvm/arm/vgic/vgic_irqfd.c |  2 +-
+ 4 files changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-index 61f8f27..217b460 100644
---- a/Documentation/virtual/kvm/api.txt
-+++ b/Documentation/virtual/kvm/api.txt
-@@ -2368,6 +2368,11 @@ On arm/arm64, gsi routing being supported, the following can happen:
- - in case no routing entry is associated to this gsi, injection fails
- - in case the gsi is associated to an irqchip routing entry,
-   irqchip.pin + 32 corresponds to the injected SPI ID.
-+- in case the gsi is associated to an MSI routing entry,
-+  * without GICv3 ITS in-kernel emulation, MSI data matches the SPI ID
-+    of the injected SPI
-+  * with GICv3 ITS in-kernel emulation, the MSI message and device ID
-+    are translated into an LPI.
+diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+index 92c3aec..67019e5 100644
+--- a/arch/arm/kvm/Kconfig
++++ b/arch/arm/kvm/Kconfig
+@@ -50,6 +50,7 @@ config KVM_NEW_VGIC
+ 	bool "New VGIC implementation"
+ 	depends on KVM
+ 	default y
++	select HAVE_KVM_MSI
+ 	select HAVE_KVM_IRQCHIP
+ 	select HAVE_KVM_IRQ_ROUTING
+ 	---help---
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index 5f7c289..7400af0 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -248,6 +248,21 @@ void vgic_v2_enable(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.vgic_cpu.vgic_v2.vgic_hcr = GICH_HCR_EN;
+ }
  
- 4.76 KVM_PPC_ALLOCATE_HTAB
++/**
++ * vgic_v2m_inject_msi: emulates GICv2M MSI injection by injecting
++ * the SPI ID matching the msi data
++ *
++ * @kvm: pointer to the kvm struct
++ * @msi: the msi struct handle
++ */
++int vgic_v2m_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
++{
++	if (msi->flags & KVM_MSI_VALID_DEVID)
++		return -EINVAL;
++
++	return kvm_vgic_inject_irq(kvm, 0, msi->data, 1);
++}
++
+ int vgic_v2_map_resources(struct kvm *kvm)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 223c778..354a865 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -44,6 +44,7 @@ int vgic_v2_probe(struct device_node *vgic_node);
+ int vgic_v2_map_resources(struct kvm *kvm);
+ int vgic_register_dist_regions(struct kvm *kvm, gpa_t dist_base_address,
+ 			       enum vgic_type);
++int vgic_v2m_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
  
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 461e480..f25613d 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1021,6 +1021,8 @@ static inline int mmu_notifier_retry(struct kvm *kvm, unsigned long mmu_seq)
- 
- #ifdef CONFIG_S390
- #define KVM_MAX_IRQ_ROUTES 4096 //FIXME: we can have more than that...
-+#elif defined(CONFIG_ARM64)
-+#define KVM_MAX_IRQ_ROUTES 4096
- #else
- #define KVM_MAX_IRQ_ROUTES 1024
- #endif
+ #ifdef CONFIG_KVM_ARM_VGIC_V3
+ void vgic_v3_irq_change_affinity(struct kvm *kvm, u32 intid, u64 mpidr);
 diff --git a/virt/kvm/arm/vgic/vgic_irqfd.c b/virt/kvm/arm/vgic/vgic_irqfd.c
-index a76994f..a3a7f02 100644
+index a3a7f02..588cdd6 100644
 --- a/virt/kvm/arm/vgic/vgic_irqfd.c
 +++ b/virt/kvm/arm/vgic/vgic_irqfd.c
-@@ -64,6 +64,14 @@ int kvm_set_routing_entry(struct kvm_kernel_irq_routing_entry *e,
- 		    (e->irqchip.irqchip >= KVM_NR_IRQCHIPS))
- 			goto out;
- 		break;
-+	case KVM_IRQ_ROUTING_MSI:
-+		e->set = kvm_set_msi;
-+		e->msi.address_lo = ue->u.msi.address_lo;
-+		e->msi.address_hi = ue->u.msi.address_hi;
-+		e->msi.data = ue->u.msi.data;
-+		e->flags = ue->flags;
-+		e->devid = ue->u.msi.devid;
-+		break;
- 	default:
- 		goto out;
- 	}
-diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-index b4222d6..269d949 100644
---- a/virt/kvm/irqchip.c
-+++ b/virt/kvm/irqchip.c
-@@ -211,7 +211,7 @@ int kvm_set_irq_routing(struct kvm *kvm,
- 			goto out;
+@@ -100,7 +100,7 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+ 	msi.devid = e->devid;
  
- 		r = -EINVAL;
--		if (ue->flags) {
-+		if (ue->flags & ~KVM_MSI_VALID_DEVID) {
- 			kfree(e);
- 			goto out;
- 		}
+ 	if (!vgic_has_its(kvm))
+-		return -ENODEV;
++		return vgic_v2m_inject_msi(kvm, &msi);
+ 
+ 	return vits_inject_msi(kvm, &msi);
+ }
 -- 
 1.9.1
-
