@@ -1,26 +1,28 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [RFC PATCH 01/45] KVM: arm/arm64: add missing MMIO data write-back
-Date: Tue, 5 Apr 2016 13:12:04 +0100
-Message-ID: <5703AB94.1080206@arm.com>
-References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
- <1458871508-17279-2-git-send-email-andre.przywara@arm.com>
- <20160329123308.GC4126@cbox>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v4 03/12] KVM: arm64: Introduce new MMIO region for the
+ ITS base address
+Date: Tue, 5 Apr 2016 14:47:51 +0200
+Message-ID: <5703B3F7.7060401@linaro.org>
+References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
+ <1458958450-19662-4-git-send-email-andre.przywara@arm.com>
+ <20160403100837.GD5261@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B697E40402
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Apr 2016 08:10:36 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B9CDE40B40
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Apr 2016 08:47:48 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id pPXcrtjxh6xZ for <kvmarm@lists.cs.columbia.edu>;
- Tue,  5 Apr 2016 08:10:34 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 85F934011D
- for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Apr 2016 08:10:33 -0400 (EDT)
-In-Reply-To: <20160329123308.GC4126@cbox>
+ with ESMTP id OGGPdpPDwBu6 for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  5 Apr 2016 08:47:46 -0400 (EDT)
+Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7172F40402
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  5 Apr 2016 08:47:46 -0400 (EDT)
+Received: by mail-wm0-f47.google.com with SMTP id 127so23374730wmu.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 05 Apr 2016 05:49:04 -0700 (PDT)
+In-Reply-To: <20160403100837.GD5261@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,106 +32,157 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Eric Auger <eric.auger@st.com>, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 29/03/16 13:33, Christoffer Dall wrote:
-> On Fri, Mar 25, 2016 at 02:04:24AM +0000, Andre Przywara wrote:
->> When the kernel was handling a guest MMIO access internally, we need
->> to copy the emulation result into the run->mmio structure in order
->> for the kvm_handle_mmio_return() function to pick it up and inject
->> the result back into the guest.
->> Currently the only user of kvm_io_bus for ARM is the VGIC, which did
->> this copying itself, so this was not causing issues so far.
->> But with upcoming kvm_io_bus users we need to do the copying here.
+Hi Andre,
+On 04/03/2016 12:08 PM, Christoffer Dall wrote:
+> On Sat, Mar 26, 2016 at 02:14:01AM +0000, Andre Przywara wrote:
+>> The ARM GICv3 ITS controller requires a separate register frame to
+>> cover ITS specific registers. Add a new VGIC address type and store
+>> the address in a field in the vgic_dist structure.
+>> Provide a function to check whether userland has provided the address,
+>> so ITS functionality can be guarded by that check.
 >>
 >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 >> ---
->>  arch/arm/kvm/mmio.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>  Documentation/virtual/kvm/devices/arm-vgic.txt |  9 +++++++++
+>>  arch/arm64/include/uapi/asm/kvm.h              |  2 ++
+>>  include/kvm/vgic/vgic.h                        |  5 +++++
+>>  virt/kvm/arm/vgic/vgic.c                       | 10 ++++++++++
+>>  virt/kvm/arm/vgic/vgic_init.c                  |  1 +
+>>  virt/kvm/arm/vgic/vgic_kvm_device.c            |  7 +++++++
+>>  6 files changed, 34 insertions(+)
 >>
->> diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
->> index 0f6600f..d5c2727 100644
->> --- a/arch/arm/kvm/mmio.c
->> +++ b/arch/arm/kvm/mmio.c
->> @@ -206,7 +206,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
->>  	run->mmio.is_write	= is_write;
->>  	run->mmio.phys_addr	= fault_ipa;
->>  	run->mmio.len		= len;
->> -	if (is_write)
->> +	if (is_write || !ret)
->>  		memcpy(run->mmio.data, data_buf, len);
+>> diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
+>> index 59541d4..087e2d9 100644
+>> --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
+>> +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
+>> @@ -39,6 +39,15 @@ Groups:
+>>        Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+>>        This address needs to be 64K aligned.
+>>  
+>> +    KVM_VGIC_V3_ADDR_TYPE_ITS (rw, 64-bit)
+>> +      Base address in the guest physical address space of the GICv3 ITS
+>> +      control register frame. The ITS allows MSI(-X) interrupts to be
+>> +      injected into guests. This extension is optional, if the kernel
 > 
-> I had a really hard time understanding this, how about this instead:
-
-Admittedly this is the shortest possible fix. I also had a rework closer
-to your version, which also avoided copying the arguments in some cases,
-but I thought a smaller diff would be more suitable, since this is
-actually a fix.
-
-Shall I add a comment here or post my version of the fix instead?
-
-Cheers,
-Andre.
-
-> diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-> index 0f6600f..0158e9e 100644
-> --- a/arch/arm/kvm/mmio.c
-> +++ b/arch/arm/kvm/mmio.c
-> @@ -87,11 +87,10 @@ static unsigned long mmio_read_buf(char *buf, unsigned int len)
->  
->  /**
->   * kvm_handle_mmio_return -- Handle MMIO loads after user space emulation
-> + *			     or in-kernel IO emulation
-> + *
->   * @vcpu: The VCPU pointer
->   * @run:  The VCPU run struct containing the mmio data
-> - *
-> - * This should only be called after returning from userspace for MMIO load
-> - * emulation.
->   */
->  int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  {
-> @@ -206,18 +205,19 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  	run->mmio.is_write	= is_write;
->  	run->mmio.phys_addr	= fault_ipa;
->  	run->mmio.len		= len;
-> -	if (is_write)
-> -		memcpy(run->mmio.data, data_buf, len);
->  
->  	if (!ret) {
->  		/* We handled the access successfully in the kernel. */
-> +		if (!is_write)
-> +			memcpy(run->mmio.data, data_buf, len);
->  		vcpu->stat.mmio_exit_kernel++;
->  		kvm_handle_mmio_return(vcpu, run);
->  		return 1;
-> -	} else {
-> -		vcpu->stat.mmio_exit_user++;
->  	}
->  
-> +	if (is_write)
-> +		memcpy(run->mmio.data, data_buf, len);
-> +	vcpu->stat.mmio_exit_user++;
->  	run->exit_reason	= KVM_EXIT_MMIO;
->  	return 0;
->  }
-> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> index 00429b3..63e99cb 100644
-> --- a/virt/kvm/arm/vgic.c
-> +++ b/virt/kvm/arm/vgic.c
-> @@ -850,12 +850,6 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
->  		updated_state = false;
->  	}
->  	spin_unlock(&dist->lock);
-> -	run->mmio.is_write	= is_write;
-> -	run->mmio.len		= len;
-> -	run->mmio.phys_addr	= addr;
-> -	memcpy(run->mmio.data, val, len);
-> -
-> -	kvm_handle_mmio_return(vcpu, run);
->  
->  	if (updated_state)
->  		vgic_kick_vcpus(vcpu->kvm);
+> s/optional, if/optional. If/
 > 
+>> +      does not support the ITS, the call returns -ENODEV.
+>> +      This memory is solely for the guest to access the ITS control
+> 
+> s/memory/address region/ ?
+> 
+>> +      registers and does not cover the ITS translation register.
+>> +      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+>> +      This address needs to be 64K aligned and the region covers 64 KByte.
+> 
+> s/KByte/KBytes/
+> ...or you could you 64K both places in this line.
+> 
+>>  
+>>    KVM_DEV_ARM_VGIC_GRP_DIST_REGS
+>>    Attributes:
+>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+>> index f209ea1..c2b257d 100644
+>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>> @@ -87,9 +87,11 @@ struct kvm_regs {
+>>  /* Supported VGICv3 address types  */
+>>  #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
+>>  #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
+>> +#define KVM_VGIC_V3_ADDR_TYPE_ITS	4
+>>  
+>>  #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
+>>  #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
+>> +#define KVM_VGIC_V3_ITS_SIZE		SZ_64K
+>>  
+>>  #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
+>>  #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
+>> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+>> index 7c1d145..11344e6 100644
+>> --- a/include/kvm/vgic/vgic.h
+>> +++ b/include/kvm/vgic/vgic.h
+>> @@ -135,6 +135,9 @@ struct vgic_dist {
+>>  		gpa_t			vgic_redist_base;
+>>  	};
+>>  
+>> +	/* The base address of the ITS control register frame */
+>> +	gpa_t			vgic_its_base;
+>> +
+>>  	/* distributor enabled */
+>>  	u32			enabled;
+>>  
+>> @@ -253,4 +256,6 @@ static inline int kvm_vgic_get_max_vcpus(void)
+>>  	return kvm_vgic_global_state.max_gic_vcpus;
+>>  }
+>>  
+>> +bool vgic_has_its(struct kvm *kvm);
+is it mandated to expose this function outside of the vgic subsystem?
+why not declaring it in /virt/kvm/arm/vgic/vgic.h?
+>> +
+>>  #endif /* __ASM_ARM_KVM_VGIC_VGIC_H */
+>> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+>> index 65395af..1de2478 100644
+>> --- a/virt/kvm/arm/vgic/vgic.c
+>> +++ b/virt/kvm/arm/vgic/vgic.c
+>> @@ -612,3 +612,13 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, u32 intid)
+>>  
+>>  	return map_is_active;
+>>  }
+>> +
+>> +bool vgic_has_its(struct kvm *kvm)
+I would implement this function vgic_init.c or vgic_kvm_device.c leaving
+vgic.c for pure vgic state mgt.
+
+Eric
+>> +{
+>> +	struct vgic_dist *dist = &kvm->arch.vgic;
+>> +
+>> +	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
+>> +		return false;
+>> +
+>> +	return !IS_VGIC_ADDR_UNDEF(dist->vgic_its_base);
+>> +}
+>> diff --git a/virt/kvm/arm/vgic/vgic_init.c b/virt/kvm/arm/vgic/vgic_init.c
+>> index ac655b5..2301e03 100644
+>> --- a/virt/kvm/arm/vgic/vgic_init.c
+>> +++ b/virt/kvm/arm/vgic/vgic_init.c
+>> @@ -132,6 +132,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>>  	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
+>>  	kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+>>  	kvm->arch.vgic.vgic_redist_base = VGIC_ADDR_UNDEF;
+>> +	kvm->arch.vgic.vgic_its_base = VGIC_ADDR_UNDEF;
+>>  
+>>  out_unlock:
+>>  	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
+>> diff --git a/virt/kvm/arm/vgic/vgic_kvm_device.c b/virt/kvm/arm/vgic/vgic_kvm_device.c
+>> index 7f78a16..3ec2ac3 100644
+>> --- a/virt/kvm/arm/vgic/vgic_kvm_device.c
+>> +++ b/virt/kvm/arm/vgic/vgic_kvm_device.c
+>> @@ -109,6 +109,12 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
+>>  		block_size = KVM_VGIC_V3_REDIST_SIZE;
+>>  		alignment = SZ_64K;
+>>  		break;
+>> +	case KVM_VGIC_V3_ADDR_TYPE_ITS:
+>> +		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
+>> +		addr_ptr = &vgic->vgic_its_base;
+>> +		block_size = KVM_VGIC_V3_ITS_SIZE;
+>> +		alignment = SZ_64K;
+>> +		break;
+>>  #endif
+>>  	default:
+>>  		r = -ENODEV;
+>> @@ -495,6 +501,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+>>  		switch (attr->attr) {
+>>  		case KVM_VGIC_V3_ADDR_TYPE_DIST:
+>>  		case KVM_VGIC_V3_ADDR_TYPE_REDIST:
+>> +		case KVM_VGIC_V3_ADDR_TYPE_ITS:
+>>  			return 0;
+>>  		}
+>>  		break;
+>> -- 
+>> 2.7.3
+>>
