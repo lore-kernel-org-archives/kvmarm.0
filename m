@@ -1,129 +1,122 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v4 04/12] KVM: arm64: handle ITS related GICv3
- redistributor registers
-Date: Tue, 5 Apr 2016 14:55:35 +0200
-Message-ID: <5703B5C7.6000802@linaro.org>
-References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
- <1458958450-19662-5-git-send-email-andre.przywara@arm.com>
- <20160403100845.GE5261@cbox>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [RFC PATCH 01/45] KVM: arm/arm64: add missing MMIO data
+ write-back
+Date: Tue, 5 Apr 2016 14:58:30 +0200
+Message-ID: <20160405125830.GA16004@cbox>
+References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
+ <1458871508-17279-2-git-send-email-andre.przywara@arm.com>
+ <20160329123308.GC4126@cbox>
+ <5703AB94.1080206@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160403100845.GE5261@cbox>
+Content-Disposition: inline
+In-Reply-To: <5703AB94.1080206@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>, Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Eric Auger <eric.auger@st.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Christoffer,
-On 04/03/2016 12:08 PM, Christoffer Dall wrote:
-> On Sat, Mar 26, 2016 at 02:14:02AM +0000, Andre Przywara wrote:
->> In the GICv3 redistributor there are the PENDBASER and PROPBASER
->> registers which we did not emulate so far, as they only make sense
->> when having an ITS. In preparation for that emulate those MMIO
->> accesses by storing the 64-bit data written into it into a variable
->> which we later read in the ITS emulation.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> ---
->>  include/kvm/vgic/vgic.h       |  8 ++++++++
->>  virt/kvm/arm/vgic/vgic_mmio.c | 26 ++++++++++++++++++++++----
->>  2 files changed, 30 insertions(+), 4 deletions(-)
->>
->> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
->> index 11344e6..8ea5dd7 100644
->> --- a/include/kvm/vgic/vgic.h
->> +++ b/include/kvm/vgic/vgic.h
->> @@ -145,6 +145,14 @@ struct vgic_dist {
->>  
->>  	struct vgic_io_device	*dist_iodevs;
->>  	struct vgic_io_device	*redist_iodevs;
->> +
->> +	/* Address of LPI configuration table shared by all redistributors */
->> +	u64			propbaser;
+On Tue, Apr 05, 2016 at 01:12:04PM +0100, Andre Przywara wrote:
+> On 29/03/16 13:33, Christoffer Dall wrote:
+> > On Fri, Mar 25, 2016 at 02:04:24AM +0000, Andre Przywara wrote:
+> >> When the kernel was handling a guest MMIO access internally, we need
+> >> to copy the emulation result into the run->mmio structure in order
+> >> for the kvm_handle_mmio_return() function to pick it up and inject
+> >> the result back into the guest.
+> >> Currently the only user of kvm_io_bus for ARM is the VGIC, which did
+> >> this copying itself, so this was not causing issues so far.
+> >> But with upcoming kvm_io_bus users we need to do the copying here.
+> >>
+> >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> >> ---
+> >>  arch/arm/kvm/mmio.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
+> >> index 0f6600f..d5c2727 100644
+> >> --- a/arch/arm/kvm/mmio.c
+> >> +++ b/arch/arm/kvm/mmio.c
+> >> @@ -206,7 +206,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+> >>  	run->mmio.is_write	= is_write;
+> >>  	run->mmio.phys_addr	= fault_ipa;
+> >>  	run->mmio.len		= len;
+> >> -	if (is_write)
+> >> +	if (is_write || !ret)
+> >>  		memcpy(run->mmio.data, data_buf, len);
+> > 
+> > I had a really hard time understanding this, how about this instead:
 > 
-> is this an architectural requirement or an implementation decision?
-Looks like it is an architectural requirement:
-GIC archi spec, 4.8.9 Configuring the Configuration and Pending Tables
-for  states:
-"Each redistributor shares a table containing the LPI configuration
-(group, priority and enables) and has a separate table containing the
-pending state for each LPI."
+> Admittedly this is the shortest possible fix. I also had a rework closer
+> to your version, which also avoided copying the arguments in some cases,
+> but I thought a smaller diff would be more suitable, since this is
+> actually a fix.
+> 
+> Shall I add a comment here or post my version of the fix instead?
+> 
+Let me test what I have below more thoroughly and send that as a patch.
 
-Eric
-> 
->> +
->> +	/* Addresses of LPI pending tables per redistributor */
->> +	u64			*pendbaser;
-> 
-> have we considered having an array of redistributors and putting the
-> field in each one of those instead?
-> 
->> +
->> +	bool			lpis_enabled;
->>  };
->>  
->>  struct vgic_v2_cpu_if {
->> diff --git a/virt/kvm/arm/vgic/vgic_mmio.c b/virt/kvm/arm/vgic/vgic_mmio.c
->> index 7d5d630..252b9aff 100644
->> --- a/virt/kvm/arm/vgic/vgic_mmio.c
->> +++ b/virt/kvm/arm/vgic/vgic_mmio.c
->> @@ -771,7 +771,9 @@ static int vgic_mmio_read_v3r_propbase(struct kvm_vcpu *vcpu,
->>  				       struct kvm_io_device *this,
->>  				       gpa_t addr, int len, void *val)
->>  {
->> -	/* TODO: implement */
->> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->> +
->> +	write_mask64(dist->propbaser, addr & 7, len, val);
->>  	return 0;
->>  }
->>  
->> @@ -779,7 +781,11 @@ static int vgic_mmio_write_v3r_propbase(struct kvm_vcpu *vcpu,
->>  				        struct kvm_io_device *this,
->>  				        gpa_t addr, int len, const void *val)
->>  {
->> -	/* TODO: implement */
->> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->> +
->> +	/* Storing a value with LPIs already enabled is undefined */
->> +	if (!dist->lpis_enabled)
->> +		dist->propbaser = mask64(dist->propbaser, addr & 7, len, val);
->>  	return 0;
->>  }
->>  
->> @@ -787,7 +793,12 @@ static int vgic_mmio_read_v3r_pendbase(struct kvm_vcpu *vcpu,
->>  				       struct kvm_io_device *this,
->>  				       gpa_t addr, int len, void *val)
->>  {
->> -	/* TODO: implement */
->> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->> +	struct vgic_io_device *iodev = container_of(this,
->> +						    struct vgic_io_device, dev);
->> +	u64 pendbaser = dist->pendbaser[iodev->redist_vcpu->vcpu_id];
->> +
->> +	write_mask64(pendbaser, addr & 7, len, val);
->>  	return 0;
->>  }
->>  
->> @@ -795,7 +806,14 @@ static int vgic_mmio_write_v3r_pendbase(struct kvm_vcpu *vcpu,
->>  				        struct kvm_io_device *this,
->>  				        gpa_t addr, int len, const void *val)
->>  {
->> -	/* TODO: implement */
->> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->> +	struct vgic_io_device *iodev = container_of(this,
->> +						    struct vgic_io_device, dev);
->> +	u64 *pendbaser = &dist->pendbaser[iodev->redist_vcpu->vcpu_id];
->> +
->> +	/* Storing a value with LPIs already enabled is undefined */
->> +	if (!dist->lpis_enabled)
->> +		*pendbaser = mask64(*pendbaser, addr & 7, len, val);
->>  	return 0;
->>  }
->>  
->> -- 
->> 2.7.3
->>
+-Christoffer
 
+> 
+> > diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
+> > index 0f6600f..0158e9e 100644
+> > --- a/arch/arm/kvm/mmio.c
+> > +++ b/arch/arm/kvm/mmio.c
+> > @@ -87,11 +87,10 @@ static unsigned long mmio_read_buf(char *buf, unsigned int len)
+> >  
+> >  /**
+> >   * kvm_handle_mmio_return -- Handle MMIO loads after user space emulation
+> > + *			     or in-kernel IO emulation
+> > + *
+> >   * @vcpu: The VCPU pointer
+> >   * @run:  The VCPU run struct containing the mmio data
+> > - *
+> > - * This should only be called after returning from userspace for MMIO load
+> > - * emulation.
+> >   */
+> >  int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> >  {
+> > @@ -206,18 +205,19 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+> >  	run->mmio.is_write	= is_write;
+> >  	run->mmio.phys_addr	= fault_ipa;
+> >  	run->mmio.len		= len;
+> > -	if (is_write)
+> > -		memcpy(run->mmio.data, data_buf, len);
+> >  
+> >  	if (!ret) {
+> >  		/* We handled the access successfully in the kernel. */
+> > +		if (!is_write)
+> > +			memcpy(run->mmio.data, data_buf, len);
+> >  		vcpu->stat.mmio_exit_kernel++;
+> >  		kvm_handle_mmio_return(vcpu, run);
+> >  		return 1;
+> > -	} else {
+> > -		vcpu->stat.mmio_exit_user++;
+> >  	}
+> >  
+> > +	if (is_write)
+> > +		memcpy(run->mmio.data, data_buf, len);
+> > +	vcpu->stat.mmio_exit_user++;
+> >  	run->exit_reason	= KVM_EXIT_MMIO;
+> >  	return 0;
+> >  }
+> > diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+> > index 00429b3..63e99cb 100644
+> > --- a/virt/kvm/arm/vgic.c
+> > +++ b/virt/kvm/arm/vgic.c
+> > @@ -850,12 +850,6 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
+> >  		updated_state = false;
+> >  	}
+> >  	spin_unlock(&dist->lock);
+> > -	run->mmio.is_write	= is_write;
+> > -	run->mmio.len		= len;
+> > -	run->mmio.phys_addr	= addr;
+> > -	memcpy(run->mmio.data, val, len);
+> > -
+> > -	kvm_handle_mmio_return(vcpu, run);
+> >  
+> >  	if (updated_state)
+> >  		vgic_kick_vcpus(vcpu->kvm);
+> > 
+> 
