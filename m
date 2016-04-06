@@ -1,251 +1,262 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v4 09/12] KVM: arm64: sync LPI configuration and pending
- tables
-Date: Wed, 6 Apr 2016 15:41:14 +0200
-Message-ID: <570511FA.7010906@linaro.org>
-References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
- <1458958450-19662-10-git-send-email-andre.przywara@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [RFC PATCH 04/45] KVM: arm/arm64: vgic-new: Add data structure
+ definitions
+Date: Wed, 6 Apr 2016 15:57:53 +0200
+Message-ID: <20160406135753.GE16355@cbox>
+References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
+ <1458871508-17279-5-git-send-email-andre.przywara@arm.com>
+ <20160329130922.GE4126@cbox>
+ <5703BEF2.7090507@arm.com>
+ <20160405201009.GA10522@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1458958450-19662-10-git-send-email-andre.przywara@arm.com>
+Content-Disposition: inline
+In-Reply-To: <20160405201009.GA10522@cbox>
 Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>, G@cbox
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Andre,
-On 03/26/2016 03:14 AM, Andre Przywara wrote:
-> The LPI configuration and pending tables of the GICv3 LPIs are held
-> in tables in (guest) memory. To achieve reasonable performance, we
-> cache this data in our own data structures, so we need to sync those
-> two views from time to time. This behaviour is well described in the
-> GICv3 spec and is also exercised by hardware, so the sync points are
-> well known.
+On Tue, Apr 05, 2016 at 10:10:09PM +0200, Christoffer Dall wrote:
+> On Tue, Apr 05, 2016 at 02:34:42PM +0100, Andre Przywara wrote:
+> > Hi,
+> > 
+> > On 29/03/16 14:09, Christoffer Dall wrote:
+> > > On Fri, Mar 25, 2016 at 02:04:27AM +0000, Andre Przywara wrote:
+> > >> From: Christoffer Dall <christoffer.dall@linaro.org>
+> > >>
+> > >> Add a new header file for the new and improved GIC implementation.
+> > >> The big change is that we now have a struct vgic_irq per IRQ instead
+> > >> of spreading all the information over various bitmaps.
+> > >>
+> > >> We include this new header conditionally from within the old header
+> > >> file for the time being to avoid touching all the users.
+> > >>
+> > >> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> > >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > >> ---
+> > >>  include/kvm/arm_vgic.h  |   5 ++
+> > >>  include/kvm/vgic/vgic.h | 198 ++++++++++++++++++++++++++++++++++++++++++++++++
+> > >>  2 files changed, 203 insertions(+)
+> > >>  create mode 100644 include/kvm/vgic/vgic.h
+> > >>
+> > >> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> > >> index 7656a46..db289a2 100644
+> > >> --- a/include/kvm/arm_vgic.h
+> > >> +++ b/include/kvm/arm_vgic.h
+> > >> @@ -19,6 +19,10 @@
+> > >>  #ifndef __ASM_ARM_KVM_VGIC_H
+> > >>  #define __ASM_ARM_KVM_VGIC_H
+> > >>  
+> > >> +#ifdef CONFIG_KVM_NEW_VGIC
+> > >> +#include <kvm/vgic/vgic.h>
+> > >> +#else
+> > >> +
+> > >>  #include <linux/kernel.h>
+> > >>  #include <linux/kvm.h>
+> > >>  #include <linux/irqreturn.h>
+> > >> @@ -376,4 +380,5 @@ static inline int vgic_v3_probe(struct device_node *vgic_node,
+> > >>  }
+> > >>  #endif
+> > >>  
+> > >> +#endif	/* old VGIC include */
+> > >>  #endif
+> > >> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+> > >> new file mode 100644
+> > >> index 0000000..659f8b1
+> > >> --- /dev/null
+> > >> +++ b/include/kvm/vgic/vgic.h
+> > >> @@ -0,0 +1,198 @@
+> > >> +/*
+> > >> + * Copyright (C) 2015, 2016 ARM Ltd.
+> > >> + *
+> > >> + * This program is free software; you can redistribute it and/or modify
+> > >> + * it under the terms of the GNU General Public License version 2 as
+> > >> + * published by the Free Software Foundation.
+> > >> + *
+> > >> + * This program is distributed in the hope that it will be useful,
+> > >> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > >> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> > >> + * GNU General Public License for more details.
+> > >> + *
+> > >> + * You should have received a copy of the GNU General Public License
+> > >> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> > >> + */
+> > >> +#ifndef __ASM_ARM_KVM_VGIC_VGIC_H
+> > >> +#define __ASM_ARM_KVM_VGIC_VGIC_H
+> > >> +
+> > >> +#include <linux/kernel.h>
+> > >> +#include <linux/kvm.h>
+> > >> +#include <linux/irqreturn.h>
+> > >> +#include <linux/spinlock.h>
+> > >> +#include <linux/types.h>
+> > >> +#include <kvm/iodev.h>
+> > >> +
+> > >> +#define VGIC_V3_MAX_CPUS	255
+> > >> +#define VGIC_V2_MAX_CPUS	8
+> > >> +#define VGIC_NR_IRQS_LEGACY     256
+> > >> +#define VGIC_NR_SGIS		16
+> > >> +#define VGIC_NR_PPIS		16
+> > >> +#define VGIC_NR_PRIVATE_IRQS	(VGIC_NR_SGIS + VGIC_NR_PPIS)
+> > >> +#define VGIC_MAX_PRIVATE	(VGIC_NR_PRIVATE_IRQS - 1)
+> > >> +#define VGIC_MAX_SPI		1019
+> > >> +#define VGIC_MAX_RESERVED	1023
+> > >> +#define VGIC_MIN_LPI		8192
+> > >> +
+> > >> +enum vgic_type {
+> > >> +	VGIC_V2,		/* Good ol' GICv2 */
+> > >> +	VGIC_V3,		/* New fancy GICv3 */
+> > >> +};
+> > >> +
+> > >> +/* same for all guests, as depending only on the _host's_ GIC model */
+> > >> +struct vgic_global {
+> > >> +	/* type of the host GIC */
+> > >> +	enum vgic_type		type;
+> > >> +
+> > >> +	/* Physical address of vgic virtual cpu interface */
+> > >> +	phys_addr_t		vcpu_base;
+> > >> +
+> > >> +	/* virtual control interface mapping */
+> > >> +	void __iomem		*vctrl_base;
+> > >> +
+> > >> +	/* Number of implemented list registers */
+> > >> +	int			nr_lr;
+> > >> +
+> > >> +	/* Maintenance IRQ number */
+> > >> +	unsigned int		maint_irq;
+> > >> +
+> > >> +	/* maximum number of VCPUs allowed (GICv2 limits us to 8) */
+> > >> +	int			max_gic_vcpus;
+> > >> +
+> > >> +	/* Only needed for the legacy KVM_CREATE_IRQCHIP */
+> > >> +	bool			can_emulate_gicv2;
+> > >> +};
+> > >> +
+> > >> +extern struct vgic_global kvm_vgic_global_state;
+> > >> +
+> > >> +#define VGIC_V2_MAX_LRS		(1 << 6)
+> > >> +#define VGIC_V3_MAX_LRS		16
+> > >> +#define VGIC_V3_LR_INDEX(lr)	(VGIC_V3_MAX_LRS - 1 - lr)
+> > >> +
+> > >> +enum vgic_irq_config {
+> > >> +	VGIC_CONFIG_EDGE = 0,
+> > >> +	VGIC_CONFIG_LEVEL
+> > >> +};
+> > >> +
+> > >> +struct vgic_irq {
+> > >> +	spinlock_t irq_lock;		/* Protects the content of the struct */
+> > >> +	struct list_head ap_list;
+> > >> +
+> > >> +	struct kvm_vcpu *vcpu;		/* SGIs and PPIs: The VCPU
+> > >> +					 * SPIs and LPIs: The VCPU whose ap_list
+> > >> +					 * on which this is queued.
+> > >> +					 */
+> > >> +
+> > >> +	struct kvm_vcpu *target_vcpu;	/* The VCPU that this interrupt should
+> > >> +					 * be send to, as a result of the
+> > >> +					 * targets reg (v2) or the
+> > >> +					 * affinity reg (v3).
+> > >> +					 */
+> > >> +
+> > >> +	u32 intid;			/* Guest visible INTID */
+> > >> +	bool pending;
+> > >> +	bool line_level;		/* Level only */
+> > >> +	bool soft_pending;		/* Level only */
+> > >> +	bool active;			/* not used for LPIs */
+> > >> +	bool enabled;
+> > >> +	bool hw;			/* Tied to HW IRQ */
+> > >> +	u32 hwintid;			/* HW INTID number */
+> > >> +	union {
+> > >> +		u8 targets;			/* GICv2 target VCPUs mask */
+> > >> +		u32 mpidr;			/* GICv3 target VCPU */
+> > >> +	};
+> > >> +	u8 source;			/* GICv2 SGIs only */
+> > >> +	u8 priority;
+> > >> +	enum vgic_irq_config config;	/* Level or edge */
+> > >> +};
+> > >> +
+> > >> +struct vgic_dist {
+> > >> +	bool			in_kernel;
+> > >> +	bool			ready;
+> > >> +
+> > >> +	/* vGIC model the kernel emulates for the guest (GICv2 or GICv3) */
+> > >> +	u32			vgic_model;
+> > >> +
+> > >> +	int			nr_spis;
+> > >> +
+> > >> +	/* TODO: Consider moving to global state */
+> > >> +	/* Virtual control interface mapping */
+> > >> +	void __iomem		*vctrl_base;
+> > >> +
+> > >> +	/* base addresses in guest physical address space: */
+> > >> +	gpa_t			vgic_dist_base;		/* distributor */
+> > >> +	union {
+> > >> +		/* either a GICv2 CPU interface */
+> > >> +		gpa_t			vgic_cpu_base;
+> > >> +		/* or a number of GICv3 redistributor regions */
+> > >> +		gpa_t			vgic_redist_base;
+> > >> +	};
+> > >> +
+> > >> +	/* distributor enabled */
+> > >> +	u32			enabled;
+> > >> +
+> > >> +	struct vgic_irq		*spis;
+> > >> +};
+> > >> +
+> > >> +struct vgic_v2_cpu_if {
+> > >> +	u32		vgic_hcr;
+> > >> +	u32		vgic_vmcr;
+> > >> +	u32		vgic_misr;	/* Saved only */
+> > >> +	u64		vgic_eisr;	/* Saved only */
+> > >> +	u64		vgic_elrsr;	/* Saved only */
+> > >> +	u32		vgic_apr;
+> > >> +	u32		vgic_lr[VGIC_V2_MAX_LRS];
+> > >> +};
+> > >> +
+> > >> +struct vgic_v3_cpu_if {
+> > >> +#ifdef CONFIG_KVM_ARM_VGIC_V3
+> > >> +	u32		vgic_hcr;
+> > >> +	u32		vgic_vmcr;
+> > >> +	u32		vgic_sre;	/* Restored only, change ignored */
+> > >> +	u32		vgic_misr;	/* Saved only */
+> > >> +	u32		vgic_eisr;	/* Saved only */
+> > >> +	u32		vgic_elrsr;	/* Saved only */
+> > >> +	u32		vgic_ap0r[4];
+> > >> +	u32		vgic_ap1r[4];
+> > >> +	u64		vgic_lr[VGIC_V3_MAX_LRS];
+> > >> +#endif
+> > >> +};
+> > >> +
+> > >> +struct vgic_cpu {
+> > >> +	/* CPU vif control registers for world switch */
+> > >> +	union {
+> > >> +		struct vgic_v2_cpu_if	vgic_v2;
+> > >> +		struct vgic_v3_cpu_if	vgic_v3;
+> > >> +	};
+> > >> +
+> > >> +	/* TODO: Move nr_lr to a global state */
+> > > 
+> > > what is our current plan and status about this TODO?
+> > 
+> > The point is that the current HYP code is accessing this field. We do
+> > have this field in the current "global" struct vgic_params there as
+> > well, but this struct is (more or less) private to vgic-v2.c, so not
+> > easily accessible from virt/kvm/arm/hyp/*.c.
+> > So I suggest we keep this in here for the time being and eventually
+> > remove it (and rework the save/restore code) once we get rid of the old
+> > VGIC code.
+> > 
+> Hmmm, I haven't tried it, but I don't understand why moving it now is
+> difficult.  I'd really like to avoid having a bunch of todo's lingering
+> around and having duplicated state in the new code.
 > 
-> Provide functions that read the guest memory and store the
-> information from the configuration and pending tables in the kernel.
+> I think I noticed a number of places in this patch series which refers
+> tot he vgic_cpu->nr_lr instead of the global place already...
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  include/kvm/vgic/vgic.h      |   2 +
->  virt/kvm/arm/vgic/its-emul.c | 135 +++++++++++++++++++++++++++++++++++++++++++
->  virt/kvm/arm/vgic/vgic.h     |   1 +
->  3 files changed, 138 insertions(+)
-> 
-> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-> index ecf3260..ea98133 100644
-> --- a/include/kvm/vgic/vgic.h
-> +++ b/include/kvm/vgic/vgic.h
-> @@ -121,6 +121,8 @@ struct vgic_its {
->  	int			cwriter;
->  	struct list_head	device_list;
->  	struct list_head	collection_list;
-> +	/* memory used for buffering guest's memory */
-> +	void			*buffer_page;
->  };
->  
->  struct vgic_dist {
-> diff --git a/virt/kvm/arm/vgic/its-emul.c b/virt/kvm/arm/vgic/its-emul.c
-> index 1188e9a..d82ba9b 100644
-> --- a/virt/kvm/arm/vgic/its-emul.c
-> +++ b/virt/kvm/arm/vgic/its-emul.c
-> @@ -78,8 +78,130 @@ static struct its_itte *find_itte_by_lpi(struct kvm *kvm, int lpi)
->  	return NULL;
->  }
->  
-> +#define LPI_PROP_ENABLE_BIT(p)	((p) & LPI_PROP_ENABLED)
-> +#define LPI_PROP_PRIORITY(p)	((p) & 0xfc)
-> +
-> +/* stores the priority and enable bit for a given LPI */
-> +static void update_lpi_config(struct kvm *kvm, struct its_itte *itte, u8 prop)
-> +{
-> +	spin_lock(&itte->irq.irq_lock);
-> +	itte->irq.priority = LPI_PROP_PRIORITY(prop);
-> +	itte->irq.enabled = LPI_PROP_ENABLE_BIT(prop);
-> +
-would put a comment saying that vgic_queue_irq is unlocking since it
-looks weird.
-> +	vgic_queue_irq(kvm, &itte->irq);
-> +}
-> +
-> +#define GIC_LPI_OFFSET 8192
-> +
-> +/* We scan the table in chunks the size of the smallest page size */
-> +#define CHUNK_SIZE 4096U
-> +
->  #define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
->  
-> +static int nr_idbits_propbase(u64 propbaser)
-> +{
-> +	int nr_idbits = (1U << (propbaser & 0x1f)) + 1;
-> +
-> +	return max(nr_idbits, INTERRUPT_ID_BITS_ITS);
-don't get this.
-don't you want to take the min of INTERRUPT_ID_BITS_ITS  (16) and
-propbaser & 0x1f +1.
+So I wrote a patch for this and it doesn't really look that bad.  I'll
+send it as part of a little prerequisite series later.
 
-Spec says IDbits should not exceed GICD_TYPER.IDbit ==
-INTERRUPT_ID_BITS_ITS - 1 = 15.
+-Christoffer
 
-and in case the purpose of the function is to return the size of the
-table, which is not obvious given its name ;-), we should return 1U <<
-min(), no?
-> +}
-> +
-> +/*
-> + * Scan the whole LPI configuration table and put the LPI configuration
-> + * data in our own data structures. This relies on the LPI being
-> + * mapped before.
-> + */
-> +static bool its_update_lpis_configuration(struct kvm *kvm, u64 prop_base_reg)
-> +{
-> +	struct vgic_dist *dist = &kvm->arch.vgic;
-> +	u8 *prop = dist->its.buffer_page;
-> +	u32 tsize;
-> +	gpa_t propbase;
-> +	int lpi = GIC_LPI_OFFSET;
-> +	struct its_itte *itte;
-> +	struct its_device *device;
-> +	int ret;
-> +
-> +	propbase = BASER_BASE_ADDRESS(prop_base_reg);
-> +	tsize = nr_idbits_propbase(prop_base_reg);
-> +
-> +	while (tsize > 0) {
-> +		int chunksize = min(tsize, CHUNK_SIZE);
-> +
-> +		ret = kvm_read_guest(kvm, propbase, prop, chunksize);
-> +		if (ret)
-> +			return false;
-> +
-> +		spin_lock(&dist->its.lock);
-as we start holding several locks maybe worth to comment somewhere about
-order lock: its lock > vcpu lock > irq lock
-> +		/*
-> +		 * Updating the status for all allocated LPIs. We catch
-> +		 * those LPIs that get disabled. We really don't care
-> +		 * about unmapped LPIs, as they need to be updated
-> +		 * later manually anyway once they get mapped.
-> +		 */
-> +		for_each_lpi(device, itte, kvm) {
-> +			if (itte->lpi < lpi || itte->lpi >= lpi + chunksize)
-> +				continue;
-> +
-> +			update_lpi_config(kvm, itte, prop[itte->lpi - lpi]);
-> +		}
-> +		spin_unlock(&dist->its.lock);
-> +		tsize -= chunksize;
-> +		lpi += chunksize;
-> +		propbase += chunksize;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +/*
-> + * Scan the whole LPI pending table and sync the pending bit in there
-> + * with our own data structures. This relies on the LPI being
-> + * mapped before.
-> + */
-> +static bool its_sync_lpi_pending_table(struct kvm_vcpu *vcpu, u64 base_addr_reg)
-> +{
-> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> +	unsigned long *pendmask = dist->its.buffer_page;
-> +	u32 nr_lpis = 1U << INTERRUPT_ID_BITS_ITS;
-shouldn't we use value computed as in nr_idbits_propbase instead?
-> +	gpa_t pendbase;
-> +	int lpi = 0;
-> +	struct its_itte *itte;
-> +	struct its_device *device;
-> +	int ret;
-> +	int lpi_bit, nr_bits;
-> +
-> +	pendbase = BASER_BASE_ADDRESS(base_addr_reg);
-> +
-I understand we should start reading at pendbase + 1KB. (4.8.5 pending
-tables)
-
-Eric
-> +	while (nr_lpis > 0) {
-> +		nr_bits = min(nr_lpis, CHUNK_SIZE * 8);
-> +
-> +		ret = kvm_read_guest(vcpu->kvm, pendbase, pendmask,
-> +				     nr_bits / 8);
-> +		if (ret)
-> +			return false;
-> +
-> +		spin_lock(&dist->its.lock);
-> +		for_each_lpi(device, itte, vcpu->kvm) {
-> +			lpi_bit = itte->lpi - lpi;
-> +			if (lpi_bit < 0 || lpi_bit >= nr_bits)
-> +				continue;
-> +
-> +			if (!test_bit(lpi_bit, pendmask))
-> +				continue;
-> +
-> +			spin_lock(&itte->irq.irq_lock);
-> +			itte->irq.pending = true;
-> +			vgic_queue_irq(vcpu->kvm, &itte->irq);
-> +		}
-> +		spin_unlock(&dist->its.lock);
-> +		nr_lpis -= nr_bits;
-> +		lpi += nr_bits;
-> +		pendbase += nr_bits / 8;
-> +	}
-> +
-> +	return true;
-> +}
-> +
->  static int vgic_mmio_read_its_ctlr(struct kvm_vcpu *vcpu,
->  				   struct kvm_io_device *this,
->  				   gpa_t addr, int len, void *val)
-> @@ -357,6 +479,14 @@ struct vgic_register_region its_registers[] = {
->  /* This is called on setting the LPI enable bit in the redistributor. */
->  void vgic_enable_lpis(struct kvm_vcpu *vcpu)
->  {
-> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> +	u64 prop_base_reg, pend_base_reg;
-> +
-> +	pend_base_reg = dist->pendbaser[vcpu->vcpu_id];
-> +	prop_base_reg = dist->propbaser;
-> +
-> +	its_update_lpis_configuration(vcpu->kvm, prop_base_reg);
-> +	its_sync_lpi_pending_table(vcpu, pend_base_reg);
->  }
->  
->  int vits_init(struct kvm *kvm)
-> @@ -371,6 +501,10 @@ int vits_init(struct kvm *kvm)
->  	if (!dist->pendbaser)
->  		return -ENOMEM;
->  
-> +	its->buffer_page = kmalloc(CHUNK_SIZE, GFP_KERNEL);
-> +	if (!its->buffer_page)
-> +		return -ENOMEM;
-> +
->  	spin_lock_init(&its->lock);
->  
->  	INIT_LIST_HEAD(&its->device_list);
-> @@ -430,6 +564,7 @@ void vits_destroy(struct kvm *kvm)
->  		kfree(container_of(cur, struct its_collection, coll_list));
->  	}
->  
-> +	kfree(its->buffer_page);
->  	kfree(dist->pendbaser);
->  
->  	its->enabled = false;
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index 160c511..a7218b0 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -23,6 +23,7 @@
->  #define IS_VGIC_ADDR_UNDEF(_x)  ((_x) == VGIC_ADDR_UNDEF)
->  
->  #define INTERRUPT_ID_BITS_SPIS	10
-> +#define INTERRUPT_ID_BITS_ITS	16
->  
->  struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
->  			      u32 intid);
-> 
 
