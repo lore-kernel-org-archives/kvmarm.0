@@ -1,26 +1,26 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] arm64: KVM: unregister notifiers in hyp mode teardown path
-Date: Wed, 6 Apr 2016 13:52:50 +0200
-Message-ID: <20160406115250.GC16355@cbox>
-References: <1459777611-22592-1-git-send-email-sudeep.holla@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v4 08/12] KVM: arm64: connect LPIs to the VGIC emulation
+Date: Wed, 6 Apr 2016 14:00:23 +0200
+Message-ID: <5704FA57.7040106@linaro.org>
+References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
+ <1458958450-19662-9-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 41AE6407A0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 07:51:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E6DBB4053F
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 08:00:23 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TITXV+U7xfSV for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Apr 2016 07:51:20 -0400 (EDT)
-Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id A953940402
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 07:51:20 -0400 (EDT)
-Received: by mail-wm0-f41.google.com with SMTP id n3so59417478wmn.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 06 Apr 2016 04:52:41 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <1459777611-22592-1-git-send-email-sudeep.holla@arm.com>
+ with ESMTP id QJ2jun9omthu for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Apr 2016 08:00:18 -0400 (EDT)
+Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 02A8F407A0
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 08:00:17 -0400 (EDT)
+Received: by mail-wm0-f48.google.com with SMTP id u206so42262998wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 06 Apr 2016 05:01:38 -0700 (PDT)
+In-Reply-To: <1458958450-19662-9-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,86 +30,114 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Sudeep Holla <sudeep.holla@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Sudeep,
-
-
-On Mon, Apr 04, 2016 at 02:46:51PM +0100, Sudeep Holla wrote:
-> Commit 1e947bad0b63 ("arm64: KVM: Skip HYP setup when already running
-> in HYP") re-organized the hyp init code and ended up leaving the CPU
-> hotplug and PM notifier even if hyp mode initialization fails.
+Hi Andre,
+On 03/26/2016 03:14 AM, Andre Przywara wrote:
+> LPIs are dynamically created (mapped) at guest runtime and their
+> actual numbers can be quite high, but is mostly assigned using a very
+> sparse allocation scheme. So arrays are not an ideal data structure
+> to hold the information. We use our equivalent of the "Interrupt
+> Translation Table Entry" (ITTE) to hold the vgic_irq struct for a
+> virtual LPI embedded in in the ITTE.
+> Connect the VGIC core code via an accessor function to help it get the
+> struct vgic_irq for a certain LPI.
 > 
-> Since KVM is not yet supported with ACPI, the above mentioned commit
-> breaks CPU hotplug in ACPI boot.
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Looks OK to me
+Reviewed-by: Eric Auger <eric.auger@linaro.org>
+
+Eric
+> ---
+>  virt/kvm/arm/vgic/its-emul.c | 29 +++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic.h     |  8 +++++++-
+>  2 files changed, 36 insertions(+), 1 deletion(-)
 > 
-> This patch fixes teardown_hyp_mode to properly unregister both CPU
-> hotplug and PM notifiers in the teardown path.
+> diff --git a/virt/kvm/arm/vgic/its-emul.c b/virt/kvm/arm/vgic/its-emul.c
+> index c0334ff..1188e9a 100644
+> --- a/virt/kvm/arm/vgic/its-emul.c
+> +++ b/virt/kvm/arm/vgic/its-emul.c
+> @@ -55,11 +55,29 @@ struct its_collection {
+>  struct its_itte {
+>  	struct list_head itte_list;
+>  
+> +	struct vgic_irq irq;
+>  	struct its_collection *collection;
+>  	u32 lpi;
+>  	u32 event_id;
+>  };
+>  
+> +/* To be used as an iterator this macro misses the enclosing parentheses */
+> +#define for_each_lpi(dev, itte, kvm) \
+> +	list_for_each_entry(dev, &(kvm)->arch.vgic.its.device_list, dev_list) \
+> +		list_for_each_entry(itte, &(dev)->itt, itte_list)
+> +
+> +static struct its_itte *find_itte_by_lpi(struct kvm *kvm, int lpi)
+> +{
+> +	struct its_device *device;
+> +	struct its_itte *itte;
+> +
+> +	for_each_lpi(device, itte, kvm) {
+> +		if (itte->lpi == lpi)
+> +			return itte;
+> +	}
+> +	return NULL;
+> +}
+> +
+>  #define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
+>  
+>  static int vgic_mmio_read_its_ctlr(struct kvm_vcpu *vcpu,
+> @@ -166,6 +184,17 @@ static int vgic_mmio_read_its_idregs(struct kvm_vcpu *vcpu,
+>  	return 0;
+>  }
+>  
+> +struct vgic_irq *vgic_its_get_lpi(struct kvm *kvm, u32 intid)
+> +{
+> +	struct its_itte *itte;
+> +
+> +	itte = find_itte_by_lpi(kvm, intid);
+> +	if (!itte)
+> +		return NULL;
+> +
+> +	return &itte->irq;
+> +}
+> +
+>  static void its_free_itte(struct its_itte *itte)
+>  {
+>  	list_del(&itte->itte_list);
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index 08f97d1..160c511 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -63,6 +63,7 @@ int vgic_register_redist_regions(struct kvm *kvm, gpa_t dist_base_address);
+>  
+>  int vits_init(struct kvm *kvm);
+>  void vgic_enable_lpis(struct kvm_vcpu *vcpu);
+> +struct vgic_irq *vgic_its_get_lpi(struct kvm *kvm, u32 intid);
+>  void vits_destroy(struct kvm *kvm);
+>  #else
+>  static inline void vgic_v3_irq_change_affinity(struct kvm *kvm, u32 intid,
+> @@ -129,7 +130,7 @@ static inline int vgic_register_redist_regions(struct kvm *kvm,
+>  	return -ENODEV;
+>  }
+>  
+> -int vits_init(struct kvm *kvm)
+> +static inline int vits_init(struct kvm *kvm)
+>  {
+>  	return 0;
+>  }
+> @@ -139,6 +140,11 @@ static inline void vgic_enable_lpis(struct kvm_vcpu *vcpu)
+>  	return;
+>  }
+>  
+> +static inline struct vgic_irq *vgic_its_get_lpi(struct kvm *kvm, u32 intid)
+> +{
+> +	return NULL;
+> +}
+> +
+>  static inline void vits_destroy(struct kvm *kvm)
+>  {
+>  	return;
 > 
-> Fixes: 1e947bad0b63 ("arm64: KVM: Skip HYP setup when already running in HYP")
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-
-I fixed up your patch to apply after James' patch:
-5f5560b (arm64: KVM: Register CPU notifiers when the kernel runs at HYP, 2016-03-30)
-
-My only concern with this approach is that we're not checking the return
-values from the cpu_pm_register_notifier calls, and we're potentially
-calling unregister_cpu_notifier even if the original registration
-failed.
-
-I know this can't happen given current implementations, but if any of
-these functions ever start returning error values, then we're silently
-ignoring them.  What is our policy on these things?
-
-Let me know if the following revised version of your patch looks ok to
-you (against kvmarm/master):
-
-diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index b538431..dded1b7 100644
---- a/arch/arm/kvm/arm.c
-+++ b/arch/arm/kvm/arm.c
-@@ -1112,10 +1112,17 @@ static void __init hyp_cpu_pm_init(void)
- {
- 	cpu_pm_register_notifier(&hyp_init_cpu_pm_nb);
- }
-+static void __init hyp_cpu_pm_exit(void)
-+{
-+	cpu_pm_unregister_notifier(&hyp_init_cpu_pm_nb);
-+}
- #else
- static inline void hyp_cpu_pm_init(void)
- {
- }
-+static inline void hyp_cpu_pm_exit(void)
-+{
-+}
- #endif
- 
- static void teardown_common_resources(void)
-@@ -1141,9 +1148,7 @@ static int init_subsystems(void)
- 	/*
- 	 * Register CPU Hotplug notifier
- 	 */
--	cpu_notifier_register_begin();
--	err = __register_cpu_notifier(&hyp_init_cpu_nb);
--	cpu_notifier_register_done();
-+	err = register_cpu_notifier(&hyp_init_cpu_nb);
- 	if (err) {
- 		kvm_err("Cannot register KVM init CPU notifier (%d)\n", err);
- 		return err;
-@@ -1193,6 +1198,8 @@ static void teardown_hyp_mode(void)
- 	free_hyp_pgds();
- 	for_each_possible_cpu(cpu)
- 		free_page(per_cpu(kvm_arm_hyp_stack_page, cpu));
-+	unregister_cpu_notifier(&hyp_init_cpu_nb);
-+	hyp_cpu_pm_exit();
- }
- 
- static int init_vhe_mode(void)
-
-Thanks,
--Christoffer
