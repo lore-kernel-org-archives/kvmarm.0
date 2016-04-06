@@ -1,15 +1,14 @@
 From: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v6 5/5] vfio/type1: return MSI mapping requirements with
-	VFIO_IOMMU_GET_INFO
-Date: Wed, 6 Apr 2016 16:32:25 -0600
-Message-ID: <20160406163225.1cbadeb6@t450s.home>
-References: <1459758611-2972-1-git-send-email-eric.auger@linaro.org>
-	<1459758611-2972-6-git-send-email-eric.auger@linaro.org>
+Subject: Re: [PATCH v6 4/7] dma-reserved-iommu: alloc/free_reserved_iova_domain
+Date: Wed, 6 Apr 2016 17:00:21 -0600
+Message-ID: <20160406170021.4087a955@t450s.home>
+References: <1459757222-2668-1-git-send-email-eric.auger@linaro.org>
+	<1459757222-2668-5-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <1459758611-2972-6-git-send-email-eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+In-Reply-To: <1459757222-2668-5-git-send-email-eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
 	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
 List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
@@ -23,250 +22,230 @@ To: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 Cc: julien.grall-5wv7dgnIgG8@public.gmane.org, eric.auger-qxv4g6HH51o@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon,  4 Apr 2016 08:30:11 +0000
+On Mon,  4 Apr 2016 08:06:59 +0000
 Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
 
-> This patch allows the user-space to know whether MSI addresses need to
-> be mapped in the IOMMU. The user-space uses VFIO_IOMMU_GET_INFO ioctl and
-> IOMMU_INFO_REQUIRE_MSI_MAP gets set if they need to.
+> Introduce alloc/free_reserved_iova_domain in the IOMMU API.
+> alloc_reserved_iova_domain initializes an iova domain at a given
+> iova base address and with a given size. This iova domain will
+> be used to allocate iova within that window. Those IOVAs will be reserved
+> for special purpose, typically MSI frame binding. Allocation function
+> within the reserved iova domain will be introduced in subsequent patches.
 > 
-> Also the number of IOMMU pages requested to map those is returned in
-> msi_iova_pages field. User-space must use this information to allocate an
-> IOVA contiguous region of size msi_iova_pages * ffs(iova_pgsizes) and pass
-> it with VFIO_IOMMU_MAP_DMA iotcl (VFIO_DMA_MAP_FLAG_MSI_RESERVED_IOVA set).
+> Those functions are implemented and exposed if CONFIG_IOMMU_DMA_RESERVED
+> is seta.
 > 
 > Signed-off-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 > 
 > ---
 > 
-> Currently it is assumed a single doorbell page is used per MSI controller.
-> This is the case for known ARM MSI controllers (GICv2M, GICv3 ITS, ...).
-> If an MSI controller were to expose more doorbells it could implement a
-> new callback at irq_chip interface.
-> 
-> v4 -> v5:
-> - move msi_info and ret declaration within the conditional code
+> v5 -> v6:
+> - use spin lock instead of mutex
 > 
 > v3 -> v4:
-> - replace former vfio_domains_require_msi_mapping by
->   more complex computation of MSI mapping requirements, especially the
->   number of pages to be provided by the user-space.
-> - reword patch title
+> - formerly in "iommu/arm-smmu: implement alloc/free_reserved_iova_domain" &
+>   "iommu: add alloc/free_reserved_iova_domain"
 > 
-> RFC v1 -> v1:
-> - derived from
->   [RFC PATCH 3/6] vfio: Extend iommu-info to return MSIs automap state
-> - renamed allow_msi_reconfig into require_msi_mapping
-> - fixed VFIO_IOMMU_GET_INFO
+> v2 -> v3:
+> - remove iommu_alloc_reserved_iova_domain & iommu_free_reserved_iova_domain
+>   static implementation in case CONFIG_IOMMU_API is not set
+> 
+> v1 -> v2:
+> - moved from vfio API to IOMMU API
 > ---
->  drivers/vfio/vfio_iommu_type1.c | 147 ++++++++++++++++++++++++++++++++++++++++
->  include/uapi/linux/vfio.h       |   2 +
->  2 files changed, 149 insertions(+)
+>  drivers/iommu/Kconfig              |  8 ++++
+>  drivers/iommu/Makefile             |  1 +
+>  drivers/iommu/dma-reserved-iommu.c | 75 ++++++++++++++++++++++++++++++++++++++
+>  include/linux/dma-reserved-iommu.h | 45 +++++++++++++++++++++++
+>  4 files changed, 129 insertions(+)
+>  create mode 100644 drivers/iommu/dma-reserved-iommu.c
+>  create mode 100644 include/linux/dma-reserved-iommu.h
 > 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index b330b81..f1def50 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -39,6 +39,7 @@
->  #include <linux/dma-reserved-iommu.h>
->  #include <linux/irqdomain.h>
->  #include <linux/msi.h>
-> +#include <linux/irq.h>
+> diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
+> index dd1dc39..a5a1530 100644
+> --- a/drivers/iommu/Kconfig
+> +++ b/drivers/iommu/Kconfig
+> @@ -74,6 +74,12 @@ config IOMMU_DMA
+>  	select IOMMU_IOVA
+>  	select NEED_SG_DMA_LENGTH
 >  
->  #define DRIVER_VERSION  "0.2"
->  #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>"
-> @@ -95,6 +96,17 @@ struct vfio_group {
->  	struct list_head	next;
->  };
->  
-> +struct vfio_irq_chip {
-> +	struct list_head next;
-> +	struct irq_chip *chip;
-> +};
+> +# IOMMU reserved IOVA mapping (MSI doorbell)
+> +config IOMMU_DMA_RESERVED
+> +	bool
+> +	select IOMMU_API
+> +	select IOMMU_IOVA
 > +
-> +struct vfio_msi_map_info {
-> +	bool mapping_required;
-> +	unsigned int iova_pages;
-> +	struct list_head irq_chip_list;
-> +};
-> +
->  /*
->   * This code handles mapping and unmapping of user data buffers
->   * into DMA'ble space using the IOMMU
-> @@ -267,6 +279,127 @@ static int vaddr_get_pfn(unsigned long vaddr, int prot, unsigned long *pfn)
->  	return ret;
->  }
->  
-> +#if defined(CONFIG_GENERIC_MSI_IRQ_DOMAIN) && defined(CONFIG_IOMMU_DMA_RESERVED)
-> +/**
-> + * vfio_dev_compute_msi_map_info: augment MSI mapping info (@data) with
-> + * the @dev device requirements.
+>  config FSL_PAMU
+>  	bool "Freescale IOMMU support"
+>  	depends on PPC32
+> @@ -307,6 +313,7 @@ config SPAPR_TCE_IOMMU
+>  config ARM_SMMU
+>  	bool "ARM Ltd. System MMU (SMMU) Support"
+>  	depends on (ARM64 || ARM) && MMU
+> +	select IOMMU_DMA_RESERVED
+>  	select IOMMU_API
+>  	select IOMMU_IO_PGTABLE_LPAE
+>  	select ARM_DMA_USE_IOMMU if ARM
+> @@ -320,6 +327,7 @@ config ARM_SMMU
+>  config ARM_SMMU_V3
+>  	bool "ARM Ltd. System MMU Version 3 (SMMUv3) Support"
+>  	depends on ARM64 && PCI
+> +	select IOMMU_DMA_RESERVED
+>  	select IOMMU_API
+>  	select IOMMU_IO_PGTABLE_LPAE
+>  	select GENERIC_MSI_IRQ_DOMAIN
+> diff --git a/drivers/iommu/Makefile b/drivers/iommu/Makefile
+> index c6edb31..6c9ae99 100644
+> --- a/drivers/iommu/Makefile
+> +++ b/drivers/iommu/Makefile
+> @@ -2,6 +2,7 @@ obj-$(CONFIG_IOMMU_API) += iommu.o
+>  obj-$(CONFIG_IOMMU_API) += iommu-traces.o
+>  obj-$(CONFIG_IOMMU_API) += iommu-sysfs.o
+>  obj-$(CONFIG_IOMMU_DMA) += dma-iommu.o
+> +obj-$(CONFIG_IOMMU_DMA_RESERVED) += dma-reserved-iommu.o
+>  obj-$(CONFIG_IOMMU_IO_PGTABLE) += io-pgtable.o
+>  obj-$(CONFIG_IOMMU_IO_PGTABLE_ARMV7S) += io-pgtable-arm-v7s.o
+>  obj-$(CONFIG_IOMMU_IO_PGTABLE_LPAE) += io-pgtable-arm.o
+> diff --git a/drivers/iommu/dma-reserved-iommu.c b/drivers/iommu/dma-reserved-iommu.c
+> new file mode 100644
+> index 0000000..a461482
+> --- /dev/null
+> +++ b/drivers/iommu/dma-reserved-iommu.c
+> @@ -0,0 +1,75 @@
+> +/*
+> + * Reserved IOVA Management
 > + *
-> + * @dev: device handle
-> + * @data: opaque pointing to a struct vfio_msi_map_info
+> + * Copyright (c) 2015 Linaro Ltd.
+> + *              www.linaro.org
 > + *
-> + * returns 0 upon success or -ENOMEM
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
 > + */
-> +static int vfio_dev_compute_msi_map_info(struct device *dev, void *data)
+> +
+> +#include <linux/iommu.h>
+> +#include <linux/iova.h>
+> +
+> +int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
+> +				     dma_addr_t iova, size_t size,
+> +				     unsigned long order)
 > +{
-> +	struct irq_domain *domain;
-> +	struct msi_domain_info *info;
-> +	struct vfio_msi_map_info *msi_info = (struct vfio_msi_map_info *)data;
-> +	struct irq_chip *chip;
-> +	struct vfio_irq_chip *iter, *new;
+> +	unsigned long granule, mask;
+> +	struct iova_domain *iovad;
+> +	unsigned long flags;
+> +	int ret = 0;
 > +
-> +	domain = dev_get_msi_domain(dev);
-> +	if (!domain)
-> +		return 0;
+> +	granule = 1UL << order;
+> +	mask = granule - 1;
+> +	if (iova & mask || (!size) || (size & mask))
+> +		return -EINVAL;
 > +
-> +	/* Let's compute the needs for the MSI domain */
-> +	info = msi_get_domain_info(domain);
-> +	chip = info->chip;
-> +	list_for_each_entry(iter, &msi_info->irq_chip_list, next) {
-> +		if (iter->chip == chip)
-> +			return 0;
-> +	}
-> +
-> +	new = kzalloc(sizeof(*new), GFP_KERNEL);
-> +	if (!new)
+> +	iovad = kzalloc(sizeof(struct iova_domain), GFP_KERNEL);
+> +	if (!iovad)
 > +		return -ENOMEM;
 > +
-> +	new->chip = chip;
+> +	spin_lock_irqsave(&domain->reserved_lock, flags);
 > +
-> +	list_add(&new->next, &msi_info->irq_chip_list);
-> +
-> +	/*
-> +	 * new irq_chip to be taken into account; we currently assume
-> +	 * a single iova doorbell by irq chip requesting MSI mapping
-> +	 */
-> +	msi_info->iova_pages += 1;
-> +	return 0;
-> +}
-> +
-> +/**
-> + * vfio_domain_compute_msi_map_info: compute MSI mapping requirements (@data)
-> + * for vfio_domain @d
-> + *
-> + * @d: vfio domain handle
-> + * @data: opaque pointing to a struct vfio_msi_map_info
-> + *
-> + * returns 0 upon success or -ENOMEM
-> + */
-> +static int vfio_domain_compute_msi_map_info(struct vfio_domain *d, void *data)
-> +{
-> +	int ret = 0;
-> +	struct vfio_msi_map_info *msi_info = (struct vfio_msi_map_info *)data;
-> +	struct vfio_irq_chip *iter, *tmp;
-> +	struct vfio_group *g;
-> +
-> +	msi_info->iova_pages = 0;
-> +	INIT_LIST_HEAD(&msi_info->irq_chip_list);
-> +
-> +	if (iommu_domain_get_attr(d->domain,
-> +				   DOMAIN_ATTR_MSI_MAPPING, NULL))
-> +		return 0;
-> +	msi_info->mapping_required = true;
-> +	list_for_each_entry(g, &d->group_list, next) {
-> +		ret = iommu_group_for_each_dev(g->iommu_group, msi_info,
-> +			   vfio_dev_compute_msi_map_info);
-> +		if (ret)
-> +			goto out;
+> +	if (domain->reserved_iova_cookie) {
+> +		ret = -EEXIST;
+> +		goto free_unlock;
 > +	}
-> +out:
-> +	list_for_each_entry_safe(iter, tmp, &msi_info->irq_chip_list, next) {
-> +		list_del(&iter->next);
-> +		kfree(iter);
-> +	}
+> +
+> +	init_iova_domain(iovad, granule,
+> +			 iova >> order, (iova + size - 1) >> order);
+> +	domain->reserved_iova_cookie = iovad;
+> +	goto unlock;
+> +
+> +free_unlock:
+> +	kfree(iovad);
+> +unlock:
+> +	spin_unlock_irqrestore(&domain->reserved_lock, flags);
 > +	return ret;
 > +}
+> +EXPORT_SYMBOL_GPL(iommu_alloc_reserved_iova_domain);
 > +
-> +/**
-> + * vfio_compute_msi_map_info: compute MSI mapping requirements
-> + *
-> + * Do some MSI addresses need to be mapped? IOMMU page size?
-> + * Max number of IOVA pages needed by any domain to map MSI
-> + *
-> + * @iommu: iommu handle
-> + * @info: msi map info handle
-> + *
-> + * returns 0 upon success or -ENOMEM
-> + */
-> +static int vfio_compute_msi_map_info(struct vfio_iommu *iommu,
-> +				 struct vfio_msi_map_info *msi_info)
+> +void iommu_free_reserved_iova_domain(struct iommu_domain *domain)
 > +{
-> +	int ret = 0;
-> +	struct vfio_domain *d;
-> +	unsigned long bitmap = ULONG_MAX;
-> +	unsigned int iova_pages = 0;
+> +	struct iova_domain *iovad =
+> +		(struct iova_domain *)domain->reserved_iova_cookie;
+> +	unsigned long flags;
 > +
-> +	msi_info->mapping_required = false;
+> +	if (!iovad)
+> +		return;
 > +
-> +	mutex_lock(&iommu->lock);
-> +	list_for_each_entry(d, &iommu->domain_list, next) {
-> +		bitmap &= d->domain->ops->pgsize_bitmap;
-> +		ret = vfio_domain_compute_msi_map_info(d, msi_info);
-> +		if (ret)
-> +			goto out;
-> +		if (msi_info->iova_pages > iova_pages)
-> +			iova_pages = msi_info->iova_pages;
-> +	}
-> +out:
-> +	msi_info->iova_pages = iova_pages;
-> +	mutex_unlock(&iommu->lock);
-> +	return ret;
+> +	spin_lock_irqsave(&domain->reserved_lock, flags);
+> +
+> +	put_iova_domain(iovad);
+> +	kfree(iovad);
+> +
+> +	spin_unlock_irqrestore(&domain->reserved_lock, flags);
 > +}
-> +
-> +#endif
-> +
->  /*
->   * Attempt to pin pages.  We really don't want to track all the pfns and
->   * the iommu can only map chunks of consecutive pfns anyway, so get the
-> @@ -1179,6 +1312,20 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
->  
->  		info.flags = VFIO_IOMMU_INFO_PGSIZES;
->  
-> +#if defined(CONFIG_GENERIC_MSI_IRQ_DOMAIN) && defined(CONFIG_IOMMU_DMA_RESERVED)
-> +		{
-> +			struct vfio_msi_map_info msi_info;
-> +			int ret;
-> +
-> +			ret = vfio_compute_msi_map_info(iommu, &msi_info);
-> +			if (ret)
-> +				return ret;
-> +
-> +			if (msi_info.mapping_required)
-> +				info.flags |= VFIO_IOMMU_INFO_REQUIRE_MSI_MAP;
-> +			info.msi_iova_pages = msi_info.iova_pages;
-> +		}
-> +#endif
->  		info.iova_pgsizes = vfio_pgsize_bitmap(iommu);
->  
->  		return copy_to_user((void __user *)arg, &info, minsz) ?
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index a49be8a..e3e501c 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -488,7 +488,9 @@ struct vfio_iommu_type1_info {
->  	__u32	argsz;
->  	__u32	flags;
->  #define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info */
-> +#define VFIO_IOMMU_INFO_REQUIRE_MSI_MAP (1 << 1)/* MSI must be mapped */
->  	__u64	iova_pgsizes;		/* Bitmap of supported page sizes */
-> +	__u32   msi_iova_pages;	/* number of IOVA pages needed to map MSIs */
->  };
->  
->  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
 
-Take a look at the capability chain extensions I used for adding some
-new capabilities for vfio regions and let me know why we shouldn't do
-something similar for this info ioctl.  A fixed structure gets messy
-almost instantly when we start adding new fields to it.  Thanks,
+The locking here looks wrong, reserved_iova_cookie needs to be read and
+cleared (currently missing) within the lock, the put and free can
+probably happen outside the lock.  Likewise the init_iova_domain() in
+the alloc path probably doesn't need to iccur under spinlock, but
+testing and setting reserved_iova_cookie does.  Seems like a mutex
+would do for locking here, but maybe the rb-tree manipulation has
+reasons for using a spinlock.  Thanks,
 
 Alex
 
-c84982a vfio: Define capability chains
-d7a8d5e vfio: Add capability chain helpers
-ff63eb6 vfio: Define sparse mmap capability for regions
-188ad9d vfio/pci: Include sparse mmap capability for MSI-X table regions
-c7bb4cb vfio: Define device specific region type capability
-28541d4 vfio/pci: Add infrastructure for additional device specific regions
+> +EXPORT_SYMBOL_GPL(iommu_free_reserved_iova_domain);
+> diff --git a/include/linux/dma-reserved-iommu.h b/include/linux/dma-reserved-iommu.h
+> new file mode 100644
+> index 0000000..5bf863b
+> --- /dev/null
+> +++ b/include/linux/dma-reserved-iommu.h
+> @@ -0,0 +1,45 @@
+> +/*
+> + * Copyright (c) 2015 Linaro Ltd.
+> + *              www.linaro.org
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + */
+> +#ifndef __DMA_RESERVED_IOMMU_H
+> +#define __DMA_RESERVED_IOMMU_H
+> +
+> +#ifdef __KERNEL__
+> +#include <asm/errno.h>
+> +
+> +#ifdef CONFIG_IOMMU_DMA_RESERVED
+> +#include <linux/iommu.h>
+> +
+> +/**
+> + * iommu_alloc_reserved_iova_domain: allocate the reserved iova domain
+> + *
+> + * @domain: iommu domain handle
+> + * @iova: base iova address
+> + * @size: iova window size
+> + * @order: page order
+> + */
+> +int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
+> +				     dma_addr_t iova, size_t size,
+> +				     unsigned long order);
+> +
+> +/**
+> + * iommu_free_reserved_iova_domain: free the reserved iova domain
+> + *
+> + * @domain: iommu domain handle
+> + */
+> +void iommu_free_reserved_iova_domain(struct iommu_domain *domain);
+> +
+> +#endif	/* CONFIG_IOMMU_DMA_RESERVED */
+> +#endif	/* __KERNEL__ */
+> +#endif	/* __DMA_RESERVED_IOMMU_H */
