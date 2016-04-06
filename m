@@ -1,33 +1,16 @@
 From: Alexander Graf <agraf@suse.de>
 Subject: Re: [PATCH] KVM: arm/arm64: Handle forward time correction gracefully
-Date: Wed, 6 Apr 2016 11:14:15 +0200
-Message-ID: <5704D367.5040500@suse.de>
+Date: Wed, 6 Apr 2016 11:14:42 +0200
+Message-ID: <5704D382.7010309@suse.de>
 References: <1459931842-29465-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C9E1840B58
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 05:12:57 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JUC+955AQJni for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Apr 2016 05:12:56 -0400 (EDT)
-Received: from mx2.suse.de (mx2.suse.de [195.135.220.15])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id C3CA040402
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 05:12:56 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1459931842-29465-1-git-send-email-marc.zyngier@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 04/06/2016 10:37 AM, Marc Zyngier wrote:
@@ -56,9 +39,8 @@ On 04/06/2016 10:37 AM, Marc Zyngier wrote:
 > Reported-by: Alexander Graf <agraf@suse.de>
 > Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
-Looks good, I can give it a test run later as well, but for now
-
-Reviewed-by: Alexander Graf <agraf@suse.de>
+Oh - before I forget. This should go out with CC stable :)
 
 
 Alex
+
