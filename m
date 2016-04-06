@@ -1,431 +1,660 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH 06/45] KVM: arm/arm64: vgic-new: Implement virtual
- IRQ injection
-Date: Wed, 6 Apr 2016 16:23:58 +0200
-Message-ID: <20160406142358.GA26026@cbox>
+Subject: Re: [RFC PATCH 09/45] KVM: arm/arm64: vgic-new: Add GICv2 IRQ
+ sync/flush
+Date: Wed, 6 Apr 2016 16:34:50 +0200
+Message-ID: <20160406143450.GF16355@cbox>
 References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
- <1458871508-17279-7-git-send-email-andre.przywara@arm.com>
- <20160329211650.GF4126@cbox>
- <5703F5D7.5060803@arm.com>
+ <1458871508-17279-10-git-send-email-andre.przywara@arm.com>
+ <20160330135330.GI4126@cbox> <5703FCA5.5020409@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C6A82407AD
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 10:33:21 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id p5dOr8i9wmcW for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Apr 2016 10:33:20 -0400 (EDT)
+Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id BAE9C40402
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 10:33:19 -0400 (EDT)
+Received: by mail-wm0-f49.google.com with SMTP id f198so76508080wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 06 Apr 2016 07:34:41 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <5703F5D7.5060803@arm.com>
-Sender: kvm-owner@vger.kernel.org
+In-Reply-To: <5703FCA5.5020409@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 05, 2016 at 06:28:55PM +0100, Andre Przywara wrote:
+On Tue, Apr 05, 2016 at 06:57:57PM +0100, Andre Przywara wrote:
 > Hi,
 > 
-> On 29/03/16 22:16, Christoffer Dall wrote:
-> > On Fri, Mar 25, 2016 at 02:04:29AM +0000, Andre Przywara wrote:
-> >> From: Christoffer Dall <christoffer.dall@linaro.org>
+> On 30/03/16 14:53, Christoffer Dall wrote:
+> > On Fri, Mar 25, 2016 at 02:04:32AM +0000, Andre Przywara wrote:
+> >> From: Marc Zyngier <marc.zyngier@arm.com>
 > >>
-> >> Provide a vgic_queue_irq() function which decides whether a given
-> >> IRQ needs to be queued to a VCPU's ap_list.
-> >> This should be called whenever an IRQ became pending or got enabled,
+> >> Implement the functionality for syncing IRQs between our emulation
+> >> and the list registers, which represent the guest's view of IRQs.
+> >> This is done in kvm_vgic_flush_hwstate and kvm_vgic_sync_hwstate,
+> >> which gets called on guest entry and exit.
 > > 
-> > becomes pending or enabled,
-> > 
-> >> either as a result of userspace injection, from in-kernel emulated
-> >> devices like the architected timer or from MMIO accesses to the
-> >> distributor emulation.
-> >> Also provides the necessary functions to allow userland to inject an
-> >> IRQ to a guest.
-> > 
-> > Since this is the first code that starts using our locking mechanism, we
-> > add some (hopefully) clear documentation of our locking strategy and
-> > requirements along with this patch.
-> > 
-> >> [Andre: refactor out vgic_queue_irq()]
+> > I thought we agreed to split this up in a generic part and then GICv2
+> > and GICv3 parts following, but ok, I'll look through this code, but I
+> > strongly suggest splitting it up for the next posting.
+> 
+> Right, I guess I missed this one. I abandoned the idea of splitting the
+> patch _series_ between a v2 and a v3 series (to avoid agreeing on the v2
+> implementation too early without taking the v3 requirements into
+> account), so I guess I skipped the comment about this patch split.
+> I will try to split off the generic part of the code.
+> 
+
+It still just feels a bit messy and random at places when you go trough
+the initial part of the patch series (once we get to the MMIO stuff,
+it's all well-structured) so that's the background for my comment.  Oh
+well.
+
 > >>
+> >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > >> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+> >> Signed-off-by: Eric Auger <eric.auger@linaro.org>
 > >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > >> ---
-> >>  include/kvm/vgic/vgic.h  |   3 +
-> >>  virt/kvm/arm/vgic/vgic.c | 181 +++++++++++++++++++++++++++++++++++++++++++++++
-> >>  virt/kvm/arm/vgic/vgic.h |   1 +
-> >>  3 files changed, 185 insertions(+)
+> >>  include/kvm/vgic/vgic.h     |   4 +
+> >>  virt/kvm/arm/vgic/vgic-v2.c | 161 ++++++++++++++++++++++++++++++++++
+> >>  virt/kvm/arm/vgic/vgic.c    | 204 ++++++++++++++++++++++++++++++++++++++++++++
+> >>  virt/kvm/arm/vgic/vgic.h    |   4 +
+> >>  4 files changed, 373 insertions(+)
 > >>
 > >> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-> >> index 659f8b1..f32b284 100644
+> >> index f32b284..986f23f 100644
 > >> --- a/include/kvm/vgic/vgic.h
 > >> +++ b/include/kvm/vgic/vgic.h
-> >> @@ -178,6 +178,9 @@ struct vgic_cpu {
-> >>  	struct list_head ap_list_head;
-> >>  };
+> >> @@ -187,6 +187,10 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+> >>  #define vgic_valid_spi(k,i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
+> >>  			((i) < (k)->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS))
 > >>  
-> >> +int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
-> >> +			bool level);
+> >> +bool kvm_vcpu_has_pending_irqs(struct kvm_vcpu *vcpu);
+> >> +void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
+> >> +void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
 > >> +
-> >>  #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
-> >>  #define vgic_initialized(k)	(false)
-> >>  #define vgic_ready(k)		((k)->arch.vgic.ready)
-> >> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-> >> index 8e34916..a95aabc 100644
-> >> --- a/virt/kvm/arm/vgic/vgic.c
-> >> +++ b/virt/kvm/arm/vgic/vgic.c
-> >> @@ -19,8 +19,25 @@
+> >>  /**
+> >>   * kvm_vgic_get_max_vcpus - Get the maximum number of VCPUs allowed by HW
+> >>   *
+> >> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+> >> index 0bf6f27..1cec423 100644
+> >> --- a/virt/kvm/arm/vgic/vgic-v2.c
+> >> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+> >> @@ -14,11 +14,172 @@
+> >>   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> >>   */
+> >>  
+> >> +#include <linux/irqchip/arm-gic.h>
+> >>  #include <linux/kvm.h>
+> >>  #include <linux/kvm_host.h>
 > >>  
 > >>  #include "vgic.h"
 > >>  
-> >> +#define CREATE_TRACE_POINTS
-> >> +#include "../trace.h"
-> >> +
-> >>  struct vgic_global kvm_vgic_global_state;
-> >>  
 > >> +/*
-> >> + * Locking order is always:
-> >> + *   vgic_cpu->ap_list_lock
-> >> + *     vgic_irq->irq_lock
+> >> + * Call this function to convert a u64 value to an unsigned long * bitmask
+> >> + * in a way that works on both 32-bit and 64-bit LE and BE platforms.
 > >> + *
-> >> + * (that is, always take the ap_list_lock before the struct vgic_irq lock).
-> >> + *
-> >> + * When taking more than one ap_list_lock at the same time, always take the
-> >> + * lowest numbered VCPU's ap_list_lock first, so:
-> >> + *   vcpuX->vcpu_id < vcpuY->vcpu_id:
-> >> + *     spin_lock(vcpuX->arch.vgic_cpu.ap_list_lock);
-> >> + *     spin_lock(vcpuY->arch.vgic_cpu.ap_list_lock);
+> >> + * Warning: Calling this function may modify *val.
 > >> + */
+> >> +static unsigned long *u64_to_bitmask(u64 *val)
+> >> +{
+> >> +#if defined(CONFIG_CPU_BIG_ENDIAN) && BITS_PER_LONG == 32
+> >> +	*val = (*val >> 32) | (*val << 32);
+> >> +#endif
+> >> +	return (unsigned long *)val;
+> >> +}
 > >> +
-> >>  struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
-> >>  			      u32 intid)
+> >> +void vgic_v2_process_maintenance(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
+> >> +
+> >> +	if (cpuif->vgic_misr & GICH_MISR_EOI) {
+> >> +		u64 eisr = cpuif->vgic_eisr;
+> >> +		unsigned long *eisr_bmap = u64_to_bitmask(&eisr);
+> >> +		int lr;
+> >> +
+> >> +		for_each_set_bit(lr, eisr_bmap, vcpu->arch.vgic_cpu.nr_lr) {
+> >> +			struct vgic_irq *irq;
+> >> +			u32 intid = cpuif->vgic_lr[lr] & GICH_LR_VIRTUALID;
+> >> +
+> >> +			irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
+> >> +
+> >> +			WARN_ON(irq->config == VGIC_CONFIG_EDGE);
+> >> +			WARN_ON(cpuif->vgic_lr[lr] & GICH_LR_STATE);
+> >> +
+> >> +			kvm_notify_acked_irq(vcpu->kvm, 0,
+> >> +					     intid - VGIC_NR_PRIVATE_IRQS);
+> >> +
+> >> +			cpuif->vgic_lr[lr] &= ~GICH_LR_STATE; /* Useful?? */
+> > 
+> > we just had a warning above if the LR state was set, so how do we
+> > expect this to be modified in the mean time?
+> 
+> I guess the warning is just a warning, so code execution continues in
+> this case, right?
+> 
+
+yeah, but it's a warning saying "you're VM is messed up, you're probably
+in lala land now", so I think you can just get rid of this.
+
+The WARN_ON really means that (a) we have a software BUG, (b) hardware
+is broken, or (c) we misread the architecture.  In either case, it's not
+about trying to recover gracefully, our job is just to tell the user
+that your VM is busted without bringing the whole system down with a
+BUG_ON.
+
+> > The following line caters for the famous hardware race, right?  If so, I think it deserved a comment:
+> > 
+> > /*
+> >  * The hardware doesn't guarantee that the LR's bit is set in the ELRSR
+> >  * despite the virtual interrupt being EOIed and generating a
+> >  * maintenance interrupt.  Force the bit to be set.
+> >  */
+> > 
+> >> +			cpuif->vgic_elrsr |= 1ULL << lr;
+> >> +		}
+> >> +	}
+> >> +
+> >> +	/* check and disable underflow maintenance IRQ */
+> > 
+> > s/check and d/D/
+> > 
+> >> +	cpuif->vgic_hcr &= ~GICH_HCR_UIE;
+> > 
+> > I think the above should be moved to fold_lr_state
+> > 
+> >> +
+> >> +	/*
+> >> +	 * In the next iterations of the vcpu loop, if we sync the
+> >> +	 * vgic state after flushing it, but before entering the guest
+> >> +	 * (this happens for pending signals and vmid rollovers), then
+> >> +	 * make sure we don't pick up any old maintenance interrupts
+> >> +	 * here.
+> >> +	 */
+> >> +	cpuif->vgic_eisr = 0;
+> >> +}
+> >> +
+> >> +void vgic_v2_set_underflow(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
+> >> +
+> >> +	cpuif->vgic_hcr |= GICH_HCR_UIE;
+> >> +}
+> >> +
+> >> +/*
+> >> + * transfer the content of the LRs back into the corresponding ap_list:
+> >> + * - active bit is transferred as is
+> >> + * - pending bit is
+> >> + *   - transferred as is in case of edge sensitive IRQs
+> >> + *   - set to the line-level (resample time) for level sensitive IRQs
+> >> + */
+> >> +void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +	struct vgic_v2_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v2;
+> >> +	int lr;
+> >> +
+> >> +	for (lr = 0; lr < vcpu->arch.vgic_cpu.used_lrs; lr++) {
+> >> +		u32 val = cpuif->vgic_lr[lr];
+> >> +		u32 intid = val & GICH_LR_VIRTUALID;
+> >> +		struct vgic_irq *irq;
+> >> +
+> >> +		irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
+> >> +
+> >> +		spin_lock(&irq->irq_lock);
+> >> +
+> >> +		/* Always preserve the active bit */
+> >> +		irq->active = !!(val & GICH_LR_ACTIVE_BIT);
+> >> +
+> >> +		/* Edge is the only case where we preserve the pending bit */
+> >> +		if (irq->config == VGIC_CONFIG_EDGE &&
+> >> +		    (val & GICH_LR_PENDING_BIT)) {
+> >> +			irq->pending = true;
+> >> +
+> >> +			if (intid < VGIC_NR_SGIS) {
+> >> +				u32 cpuid = val & GICH_LR_PHYSID_CPUID;
+> >> +
+> >> +				cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
+> > 
+> > Are we happy with relying on all the remaining bits being 0 here or
+> > should we define a proper CPUID mask?
+> 
+> Not sure which remaining bits you mean? GICH_LR_PHYSID_CPUID is a mask
+> (admittedly a bit misnamed).
+> Or what do I miss here?
+
+The mask covers more bits than the CPUID field, but I think they're RES0
+in the spec, and I guess we rely on that here?
+
+> 
+> >> +				irq->source |= (1 << cpuid);
+> >> +			}
+> >> +		}
+> >> +
+> >> +		/* Clear soft pending state when level IRQs have been acked */
+> >> +		if (irq->config == VGIC_CONFIG_LEVEL &&
+> >> +		    !(val & GICH_LR_PENDING_BIT)) {
+> >> +			irq->soft_pending = false;
+> >> +			irq->pending = irq->line_level;
+> >> +		}
+> >> +
+> >> +		spin_unlock(&irq->irq_lock);
+> >> +	}
+> >> +}
+> >> +
+> >> +/*
+> >> + * Populates the particular LR with the state of a given IRQ:
+> >> + * - for an edge sensitive IRQ the pending state is reset in the struct
+> > 
+> > s/reset/cleared/
+> > s/the struct/the vgic_irq struct/
+> > 
+> >> + * - for a level sensitive IRQ the pending state value is unchanged;
+> >> + *   it will be resampled on deactivation
+> > 
+> > s/
+> > it will be resampled on deactivation/
+> > it is dictated directly by the input level/
+> > 
+> >> + *
+> >> + * If irq is not NULL, the irq_lock must be hold already by the caller.
+> > 
+> > s/hold/held/
+> > 
+> >> + * If irq is NULL, the respective LR gets cleared.
+> > 
+> > If @irq describes an SGI with multiple sources, we choose the
+> > lowest-numbered source VCPU and clear that bit in the source bitmap.
+> > 
+> >> + */
+> >> +void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
+> >> +{
+> >> +	u32 val;
+> >> +
+> >> +	if (!irq) {
+> >> +		val = 0;
+> >> +		goto out;
+> >> +	}
+> > 
+> > I'm not convinced about keeping this functionality in this function.
+> > 
+> > Wouldn't it be much more clear to have vgic_clear_lr() as a separate
+> > function?
+> 
+> Yeah, I agree. Also found it cumbersome to explicitly call this function
+> with a NULL argument to clear it.
+> 
+> >> +
+> >> +	val = irq->intid;
+> >> +
+> >> +	if (irq->pending) {
+> >> +		val |= GICH_LR_PENDING_BIT;
+> >> +
+> >> +		if (irq->config == VGIC_CONFIG_EDGE)
+> >> +			irq->pending = false;
+> >> +
+> >> +		if (irq->intid < VGIC_NR_SGIS) {
+> >> +			u32 src = ffs(irq->source);
+> > 
+> > can't you do src = __ffs(irq->source) here to avoid the (src - 1) below?
+> > 
+> >> +
+> >> +			BUG_ON(!src);
+> >> +			val |= (src - 1) << GICH_LR_PHYSID_CPUID_SHIFT;
+> >> +			irq->source &= ~(1 << (src - 1));
+> >> +			if (irq->source)
+> >> +				irq->pending = true;
+> >> +		}
+> >> +	}
+> >> +
+> >> +	if (irq->active)
+> >> +		val |= GICH_LR_ACTIVE_BIT;
+> >> +
+> >> +	if (irq->hw) {
+> >> +		val |= GICH_LR_HW;
+> >> +		val |= irq->hwintid << GICH_LR_PHYSID_CPUID_SHIFT;
+> >> +	} else {
+> >> +		if (irq->config == VGIC_CONFIG_LEVEL)
+> >> +			val |= GICH_LR_EOI;
+> >> +	}
+> >> +
+> >> +out:
+> >> +	vcpu->arch.vgic_cpu.vgic_v2.vgic_lr[lr] = val;
+> >> +}
+> >> +
+> >>  void vgic_v2_irq_change_affinity(struct kvm *kvm, u32 intid, u8 new_targets)
 > >>  {
-> >> @@ -39,3 +56,167 @@ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
-> >>  	WARN(1, "Looking up struct vgic_irq for reserved INTID");
-> >>  	return NULL;
+> >>  	struct vgic_dist *dist = &kvm->arch.vgic;
+> >> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> >> index 29c753e..90a85bf 100644
+> >> --- a/virt/kvm/arm/vgic/vgic.c
+> >> +++ b/virt/kvm/arm/vgic/vgic.c
+> >> @@ -273,3 +273,207 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+> >>  	vgic_update_irq_pending(kvm, vcpu, intid, level);
+> >>  	return 0;
 > >>  }
 > >> +
 > >> +/**
-> >> + * kvm_vgic_target_oracle - compute the target vcpu for an irq
+> >> + * vgic_prune_ap_list - Remove non-relevant interrupts from the list
 > >> + *
-> >> + * @irq:	The irq to route. Must be already locked.
-> 
->                                   ^^^^^^^^^^^^^^^^^^^^^^
-> 
+> >> + * @vcpu: The VCPU pointer
 > >> + *
-> >> + * Based on the current state of the interrupt (enabled, pending,
-> >> + * active, vcpu and target_vcpu), compute the next vcpu this should be
-> >> + * given to. Return NULL if this shouldn't be injected at all.
+> >> + * Go over the list of "interesting" interrupts, and prune those that we
+> >> + * won't have to consider in the near future.
 > >> + */
-> >> +static struct kvm_vcpu *vgic_target_oracle(struct vgic_irq *irq)
+> >> +static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
 > >> +{
-> >> +	/* If the interrupt is active, it must stay on the current vcpu */
-> >> +	if (irq->active)
-> >> +		return irq->vcpu;
-> > 
-> > we are not taking a lock here.  What are the locking expectations?  If
-> > the expectarions are that the IRQ is locked when calling this function,
-> > can we have a BIG FAT COMMENT saying that then?
-> 
-> Do you mean really BIG FAT or is the above sufficient? (I guess not).
-> I will make it more prominent.
-
-well, maybe it doesn't have to be BIG FAT.  But I did miss the existing
-comment.  I think it would be preferred to have a separate paragraph
-explaining the locking expectaions, but perhaps I'm just
-being stupid.
-
-> 
-> > It seems to me that we are somehow expecting irq->active and irq->vcpu
-> > to be in sync, but that's not necessarily the case if the IRQ is not
-> > locked.
-> > 
+> >> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> >> +	struct vgic_irq *irq, *tmp;
 > >> +
-> >> +	/* If enabled and pending, it can migrate to a new one */
-> > 
-> > I think this comment should be rewritten to:
-> > 
-> > If the IRQ is not active but enabled and pending, we should direct it to
-> > its configured target VCPU.
-> > 
-> >> +	if (irq->enabled && irq->pending)
-> >> +		return irq->target_vcpu;
-> >> +
-> >> +	/* Otherwise, it is considered idle */
-> > 
-> > not sure what idle means here, I suggest something like:
-> > 
-> > If neither active nor pending and enabled, then this IRQ should not be
-> > queued to any VCPU.
-> > 
-> >> +	return NULL;
-> >> +}
-> >> +
-> >> +/*
-> >> + * Only valid injection if changing level for level-triggered IRQs or for a
-> >> + * rising edge.
-> >> + */
-> >> +static bool vgic_validate_injection(struct vgic_irq *irq, bool level)
-> >> +{
-> >> +	switch (irq->config) {
-> >> +	case VGIC_CONFIG_LEVEL:
-> >> +		return irq->line_level != level;
-> >> +	case VGIC_CONFIG_EDGE:
-> >> +		return level;
-> >> +	default:
-> >> +		BUG();
-> > 
-> > is the default case there for making the compiler happy or can we just
-> > get rid of it?
-> 
-> Just removing it was fine (for GCC 5.3.0, at least).
-> 
-> >> +	}
-> >> +}
-> >> +
-> >> +/*
-> >> + * Check whether an IRQ needs to (and can) be queued to a VCPU's ap list.
-> >> + * Do the queuing if necessary, taking the right locks in the right order.
-> >> + * Returns true when the IRQ was queued, false otherwise.
-> >> + *
-> >> + * Needs to be entered with the IRQ lock already held, but will return
-> >> + * with all locks dropped.
-> >> + */
-> >> +bool vgic_queue_irq(struct kvm *kvm, struct vgic_irq *irq)
-> > 
-> > should we name this vgic_try_queue_irq_locked ?
-> 
-> Mmh, since it (re-)tries quite hard I am not sure _try_ would be
-> misleading. Basically it queues the IRQ whenever possible and/or
-> sensible. Having _unlock in it like you suggested in another reply makes
-> more sense, I think.
-
-agreed
-
-> 
-> >> +{
-> >> +	struct kvm_vcpu *vcpu = vgic_target_oracle(irq);
-> > 
-> > should we have something like BUG_ON(!spin_is_locked(irq->irq_lock));
-> > here?
-> > 
-> > Not sure if there's some bug checking here which is only emitted if a
-> > user select CONFIG_CHECK_SOME_LOCKING_THINGS that we could use...?
-> 
-> There is CONFIG_DEBUG_SPINLOCK, but I couldn't find some conditional
-> debug macro suitable for the purpose. I defined one now for the file
-> only (since we have quite some users here).
-> 
-> >> +
-> >> +	if (irq->vcpu || !(irq->pending && irq->enabled) || !vcpu) {
-> >> +		/*
-> >> +		 * If this IRQ is already on a VCPU's ap_list, then it
-> >> +		 * cannot be moved or modified and there is no more work for
-> >> +		 * us to do.
-> >> +		 *
-> >> +		 * Otherwise, if the irq is not pending and enabled, it does
-> >> +		 * not need to be inserted into an ap_list and there is also
-> >> +		 * no more work for us to do.
-> >> +		 */
-> > 
-> > is the !vcpu check here not redundant because if you ever get to
-> > evaluating it, then irq->vcpu is null, and pending and enabled are set,
-> > which means the oracle couldn't have returned null, could it?
-> 
-> In this case vcpu is always irq->target_vcpu, if I did the math
-> correctly. So can this be NULL?
-> Even if this is correct reasoning, I wonder if we optimize something
-> prematurely here and rely on the current implementation of
-> vgic_target_oracle(). I think the check for "!vcpu" is here to avoid a
-> NULL pointer deference below (in the first spin_lock after the retry:
-> label), so I'd rather keep this explicit check in here.
-
-I'm really not a fan of building the correctness of one of the most
-crucial parts of our code based on "let's add a few extra checks which
-may not be necessary, just in case" kind of logic.
-
-So let's be clear on why we have an if-statement here exactly:
-
-As the comment says, if we can't move the IRQ, because it's already
-assigned to somebody or if this IRQ is not pending or active, then it's
-shouldn't be queued.
-
-So the simple and all-encompassing check here is simply:
-
-	if (irq->vcpu || !vcpu) {
-		spin_unlock(&irq->irq_lock);
-		return false;
-	}
-
-The only requirement for this to be correct is that the MMIO handler for
-ISACTIVER to both set the active bit and the irq->vcpu pointer (and put
-it on the AP list), without calling this function...).  That was my
-quesiton below.
-
-Because if that's not the case, you could end up here with irq->active
-set, but irq->vcpu == NULL and !(pending && enabled) and you'd error
-out, which means you would have to check explicitly for the active state
-here as well, but I think that just becomes too messy.
-
-So, just change this to what I propose and we can deal with the active
-state MMIO handler separately.
-
-> 
-> > that would also explain why we don't have to re-check the same
-> > conditions below...
-> > 
-> > or am I getting this wrong, because you could also have someone
-> > explicitly setting the IRQ to active via trapped MMIO, in which case we
-> > should be able to queue it without it being pending && enabled, which
-> > would indicate that it's the other way around, you should only evaluate
-> > !vcpu and kup the !(pending && enabled) part....?
-> 
-> You lost me here, which hints at the fragility of this optimization ;-)
-> 
-> >> +		spin_unlock(&irq->irq_lock);
-> >> +		return false;
-> >> +	}
-> >> +
-> >> +	/*
-> >> +	 * We must unlock the irq lock to take the ap_list_lock where
-> >> +	 * we are going to insert this new pending interrupt.
-> >> +	 */
-> >> +	spin_unlock(&irq->irq_lock);
-> >> +
-> >> +	/* someone can do stuff here, which we re-check below */
 > >> +retry:
-> >> +	spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
-> >> +	spin_lock(&irq->irq_lock);
+> >> +	spin_lock(&vgic_cpu->ap_list_lock);
 > >> +
-> >> +	/*
-> >> +	 * Did something change behind our backs?
-> >> +	 *
-> >> +	 * There are two cases:
-> >> +	 * 1) The irq became pending or active behind our backs and/or
-> >> +	 *    the irq->vcpu field was set correspondingly when putting
-> >> +	 *    the irq on an ap_list. Then drop the locks and return.
-> >> +	 * 2) Someone changed the affinity on this irq behind our
-> >> +	 *    backs and we are now holding the wrong ap_list_lock.
-> >> +	 *    Then drop the locks and try the new VCPU.
-> >> +	 */
-> >> +	if (irq->vcpu || !(irq->pending && irq->enabled)) {
+> >> +	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
+> >> +		struct kvm_vcpu *target_vcpu, *vcpuA, *vcpuB;
+> >> +
+> >> +		spin_lock(&irq->irq_lock);
+> >> +
+> >> +		BUG_ON(vcpu != irq->vcpu);
+> >> +
+> >> +		target_vcpu = vgic_target_oracle(irq);
+> >> +
+> >> +		if (!target_vcpu) {
+> >> +			/*
+> >> +			 * We don't need to process this interrupt any
+> >> +			 * further, move it off the list.
+> >> +			 */
+> >> +			list_del_init(&irq->ap_list);
 > > 
-> > here I'm concerned about the active state again.
+> > why list_del_init and not list_del here?  do we ever do list_empty() on
+> > the &irq->ap_list ?
 > 
-> Mmmh, can you elaborate and sketch a case where the active state would
-> cause trouble? This check is just here to avoid iterating on a no longer
-> pending or enabled IRQ. I wonder if an active IRQ can really sneak into
-> this function here in the first place?
+> Why not? I think we discussed the usage of list_empty() for determining
+> if the VCPU is ready to run.
 
-After having gone through the series I think we should deal with
-the active state queing directly in the vgic_mmio_write_sactive()
-function.
+yeah, on the head of the list in the vcpu structure, not on the
+individual IRQ structs.
 
-But I still prefer to move the retry label to the very top of this
-function, and simplify these two statemtns to the condition I suggested:
-
-	if (unlinkely(irq->vcpu || vcpu != vgic_target_oracle(irq)))
-		goto retry;
-
-The cost is that we perform a few additional checks at runtime in the
-case where the IRQ was migrated while we released a lock (rare), but I
-think it simplifies the code.
-
+> What is your concern about list_del_init? Is that too costly?
 > 
-> > I feel like something more similar to my initial version of this patch
-> > is what we really want:
-> > 
-> >        if (irq->vcpu || vcpu != vgic_target_oracle(irq))
-> >            goto real_retry;
-> > 
-> > and read_retry is then a label at the very top of this function, before
-> > the initial call to vgic_target_oracle()....
-> > 
-> >> +		spin_unlock(&irq->irq_lock);
-> >> +		spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
-> >> +		return false;
-> >> +	}
+
+I'm not sure if it's measurable, but I generally don't have a feeling
+that we have CPU cycles to spare that we need to get rid of:)
+
+
+> >> +			irq->vcpu = NULL;
+> >> +			spin_unlock(&irq->irq_lock);
+> >> +			continue;
+> >> +		}
 > >> +
-> >> +	if (irq->target_vcpu != vcpu) {
-> >> +		spin_unlock(&irq->irq_lock);
-> >> +		spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
+> >> +		if (target_vcpu == vcpu) {
+> >> +			/* We're on the right CPU */
+> >> +			spin_unlock(&irq->irq_lock);
+> >> +			continue;
+> >> +		}
 > >> +
-> >> +		vcpu = irq->target_vcpu;
+> >> +		/* This interrupt looks like it has to be migrated. */
+> >> +
+> >> +		spin_unlock(&irq->irq_lock);
+> >> +		spin_unlock(&vgic_cpu->ap_list_lock);
+> >> +
+> >> +		/*
+> >> +		 * Ensure locking order by always locking the smallest
+> >> +		 * ID first.
+> >> +		 */
+> >> +		if (vcpu->vcpu_id < target_vcpu->vcpu_id) {
+> >> +			vcpuA = vcpu;
+> >> +			vcpuB = target_vcpu;
+> >> +		} else {
+> >> +			vcpuA = target_vcpu;
+> >> +			vcpuB = vcpu;
+> >> +		}
+> >> +
+> >> +		spin_lock(&vcpuA->arch.vgic_cpu.ap_list_lock);
+> >> +		spin_lock(&vcpuB->arch.vgic_cpu.ap_list_lock);
+> >> +		spin_lock(&irq->irq_lock);
+> >> +
+> >> +		/*
+> >> +		 * If the affinity has been preserved, move the
+> >> +		 * interrupt around. Otherwise, it means things have
+> >> +		 * changed while the interrupt was unlocked, and we
+> >> +		 * need to replay this.
+> >> +		 *
+> >> +		 * In all cases, we cannot trust the list not to have
+> >> +		 * changed, so we restart from the beginning.
+> >> +		 */
+> >> +		if (target_vcpu == vgic_target_oracle(irq)) {
+> >> +			struct vgic_cpu *new_cpu = &target_vcpu->arch.vgic_cpu;
+> >> +
+> >> +			list_del_init(&irq->ap_list);
+> > 
+> > again, why list_del_init and not just list_del ?
+> > 
+> >> +			irq->vcpu = target_vcpu;
+> >> +			list_add_tail(&irq->ap_list, &new_cpu->ap_list_head);
+> >> +		}
+> >> +
+> >> +		spin_unlock(&irq->irq_lock);
+> >> +		spin_unlock(&vcpuB->arch.vgic_cpu.ap_list_lock);
+> >> +		spin_unlock(&vcpuA->arch.vgic_cpu.ap_list_lock);
 > >> +		goto retry;
 > >> +	}
 > >> +
-> >> +	list_add_tail(&irq->ap_list, &vcpu->arch.vgic_cpu.ap_list_head);
-> >> +	irq->vcpu = vcpu;
-> >> +
-> >> +	spin_unlock(&irq->irq_lock);
-> >> +	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
-> >> +
-> >> +	kvm_vcpu_kick(vcpu);
-> >> +
-> >> +	return true;
+> >> +	spin_unlock(&vgic_cpu->ap_list_lock);
 > >> +}
 > >> +
-> >> +static void vgic_update_irq_pending(struct kvm *kvm, struct kvm_vcpu *vcpu,
-> >> +				    u32 intid, bool level)
+> >> +static inline void vgic_process_maintenance_interrupt(struct kvm_vcpu *vcpu)
 > >> +{
-> >> +	struct vgic_irq *irq = vgic_get_irq(kvm, vcpu, intid);
-> >> +
-> >> +	trace_vgic_update_irq_pending(vcpu->vcpu_id, intid, level);
-> >> +
-> >> +	BUG_ON(in_interrupt());
-> > 
-> > I don't remember why we thought it was a good idea to have this BUG_ON()
-> > anymore.  Anyone?
-> 
-> Me neither. Is that because of the case where "kvm_notify_acked_irq
-> calls kvm_set_irq" (which in turn may call this function)?
-> I am happy to remove it, also as the old VGIC doesn't seem to have it.
-
-ok, nuke it.
-
-> 
-> >> +
-> >> +	spin_lock(&irq->irq_lock);
-> >> +
-> >> +	if (!vgic_validate_injection(irq, level)) {
-> >> +		/* Nothing to see here, move along... */
-> >> +		spin_unlock(&irq->irq_lock);
-> >> +		return;
-> >> +	}
-> >> +
-> >> +	if (irq->config == VGIC_CONFIG_LEVEL) {
-> >> +		irq->line_level = level;
-> >> +		irq->pending = level || irq->soft_pending;
-> >> +	} else {
-> >> +		irq->pending = true;
-> >> +	}
-> >> +
-> >> +	vgic_queue_irq(kvm, irq);
+> >> +	if (kvm_vgic_global_state.type == VGIC_V2)
+> >> +		vgic_v2_process_maintenance(vcpu);
+> >> +	else
+> >> +		WARN(1, "GICv3 Not Implemented\n");
 > >> +}
 > >> +
-> >> +/**
-> >> + * kvm_vgic_inject_irq - Inject an IRQ from a device to the vgic
-> >> + * @kvm:     The VM structure pointer
-> >> + * @cpuid:   The CPU for PPIs
-> >> + * @intid:   The INTID to inject a new state to.
-> >> + *           must not be mapped to a HW interrupt.
+> >> +static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +	if (kvm_vgic_global_state.type == VGIC_V2)
+> >> +		vgic_v2_fold_lr_state(vcpu);
+> >> +	else
+> >> +		WARN(1, "GICv3 Not Implemented\n");
+> >> +}
+> >> +
+> >> +/*
+> >> + * Requires the ap_lock to be held.
+> >> + * If irq is not NULL, requires the IRQ lock to be held as well.
+> >> + * If irq is NULL, the list register gets cleared.
+> >> + */
+> >> +static inline void vgic_populate_lr(struct kvm_vcpu *vcpu,
+> >> +				    struct vgic_irq *irq, int lr)
+> >> +{
+> >> +	if (kvm_vgic_global_state.type == VGIC_V2)
+> >> +		vgic_v2_populate_lr(vcpu, irq, lr);
+> >> +	else
+> >> +		WARN(1, "GICv3 Not Implemented\n");
+> >> +}
+> >> +
+> >> +static inline void vgic_set_underflow(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +	if (kvm_vgic_global_state.type == VGIC_V2)
+> >> +		vgic_v2_set_underflow(vcpu);
+> >> +	else
+> >> +		WARN(1, "GICv3 Not Implemented\n");
+> >> +}
+> >> +
+> >> +static int compute_ap_list_depth(struct kvm_vcpu *vcpu)
+> >> +{
+> >> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> >> +	struct vgic_irq *irq;
+> >> +	int count = 0;
+> >> +
+> >> +	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+> >> +		spin_lock(&irq->irq_lock);
+> >> +		/* GICv2 SGIs can count for more than one... */
+> >> +		if (irq->intid < VGIC_NR_SGIS && irq->source)
 > > 
-> > stray line here?  I don't understand this bit about 'must not be mapped'
-> > and I think that should be moved to the explanation below with some
-> > rationale, and if important, perhaps guarded with a BUG_ON() ?
+> > how can we have an SGI on an AP list without the irq->source field set?
+> > 
+> > Is the irq->source check to cater for GICv3?
 > 
-> I think this is a copy&paste leftover from the old VGIC with the old way
-> of handling mapped IRQs. Actually the implementations of
-> kvm_vgic_inject_irq() and kvm_vgic_inject_mapped_irq() are now
-> identical, so the former differentiation does not apply anymore. I will
-> #define the latter to the former for the new VGIC and we should schedule
-> the removal of the the "mapped" version when the old VGIC gets removed.
-
-sounds good.
-
-> 
-> Btw: Are we OK with marking those cases which deserve some rework after
-> the old VGIC is gone with some kind of TODO comments?
+> Yes, in the v3 case irq->source is 0, so the hweight is zero as well.
 > 
 
-I really think we should avoid merging TODOs as much as possible, but in
-this case it's an exported interface function which could be hard to
-work around with the current vgic, so it may be an exception to the
-rule.
+ah right, missed that.
 
-Thanks,
+> >> +			count += hweight8(irq->source);
+> >> +		else
+> >> +			count++;
+> >> +		spin_unlock(&irq->irq_lock);
+> >> +	}
+> >> +	return count;
+> > 
+> > this does feel like an awful lot of code on each entry.
+> 
+> Is this really a lot of code? I count two comparisons and an inc, or the
+> hweight8 in case of SGIs. The latter implementation doesn't look to bad
+> either (given that it all happens in a register).
+> Or is there some code I missed?
+
+The spin_lock inside the loop is what scared me, but you're right that
+by far the common case is that the list is empty, so this is most likely
+premature.
+
+> 
+> > I'm wondering
+> > if we should have a count on each vgic_cpu containing the length of the
+> > AP list which is then adjusted via the queue and removal functions?
+> 
+> That sounds like some work to make sure we cover all the cases. Also we
+> would need to care about the consistency of this.
+
+Not too scared of that, using an atomic counter and given that we have
+the queue function, it's one place plus some MMIO handlers that need the
+attention.  But yes, we can just fix that later if it makes a
+difference, you can leave it for now.
+
+> 
+> >> +}
+> >> +
+> >> +/* requires the vcpu ap_lock to be held */
+> > 
+> > s/ap_lock/ap_list_lock/
+> > 
+> >> +static void vgic_populate_lrs(struct kvm_vcpu *vcpu)
+> > 
+> > I'm not in love with the fact that we have two separate functions named:
+> > 
+> >   vgic_populate_lrs  and
+> >   vgic_populate_lr
+> > 
+> > perhaps this could be changed to 'vgic_flush_ap_list' ?
+> 
+> Agreed.
+> 
+> > 
+> >> +{
+> >> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> >> +	u32 model = vcpu->kvm->arch.vgic.vgic_model;
+> >> +	struct vgic_irq *irq;
+> >> +	int count = 0;
+> >> +
+> >> +	if (compute_ap_list_depth(vcpu) > vcpu->arch.vgic_cpu.nr_lr) {
+> >> +		vgic_set_underflow(vcpu);
+> >> +		vgic_sort_ap_list(vcpu);
+> >> +	}
+> >> +
+> >> +	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+> >> +		spin_lock(&irq->irq_lock);
+> >> +
+> >> +		if (unlikely(vgic_target_oracle(irq) != vcpu))
+> >> +			goto next;
+> >> +
+> >> +		/*
+> >> +		 * If we get an SGI with multiple sources, try to get
+> >> +		 * them in all at once.
+> >> +		 */
+> >> +		if (model == KVM_DEV_TYPE_ARM_VGIC_V2 &&
+> >> +		    irq->intid < VGIC_NR_SGIS) {
+> > 
+> > I wonder if a lot of this code would be more readable if we added and
+> > used the following primitives:
+> > vgic_irq_is_sgi()
+> > vgic_irq_is_ppi()
+> > vgic_irq_is_spi()
+> 
+> If that doesn't break 80 characters ... ;-)
+> 
+
+eh, it's already on its own line...
+
+> >> +			while (irq->source && count < vcpu->arch.vgic_cpu.nr_lr)
+> >> +				vgic_populate_lr(vcpu, irq, count++);
+> >> +		} else {
+> >> +			vgic_populate_lr(vcpu, irq, count++);
+> >> +		}
+> > 
+> > this stuff about the SGIs is really dense, so I'm wondering if it's more
+> > clean to make it even more dense and rewrite the whole if-statement to:
+> > 
+> > 	do {
+> > 		vgic_populate(vcpu, irq, count++);
+> > 	} while (irq->source && count < vgic.nr_lr);
+> > 
+> > (btw. I believe all these places referencing the nr_lr in the vgic_cpu
+> > struct could use the global state structure instead).
+> 
+> Good point. We should convert all the places where this is easily doable
+> already.
+> 
+> > 
+> >> +
+> >> +next:
+> >> +		spin_unlock(&irq->irq_lock);
+> >> +
+> >> +		if (count == vcpu->arch.vgic_cpu.nr_lr)
+> >> +			break;
+> >> +	}
+> >> +
+> >> +	vcpu->arch.vgic_cpu.used_lrs = count;
+> >> +
+> >> +	/* Nuke remaining LRs */
+> >> +	for ( ; count < vcpu->arch.vgic_cpu.nr_lr; count++)
+> >> +		vgic_populate_lr(vcpu, NULL, count);
+> > 
+> > should we not change this to adhere to the optimizations Marc
+> > implemented for the current VGIC (i.e. clear the LRs on sync+init, and
+> > only write what you need here)?
+> 
+> Those optimizations were not in the branch I based this series on.
+> I will take a look with the new series being based on 4.6-rc (added
+> live_lrs already).
+> 
+
+Thinking about this some more, probably we just want to respin the
+series as it is currently, and then apply optimizations similar to what
+we have for the legacy code on top of it.
+
+Someone else than you could do that as well.
+
+> 
+> BTW: Thanks for the thorough review. I agree and will change all your
+> comments I didn't explicitly replied on.
+> 
+
+Thanks for doing all the heavy lifting on this one!
+
 -Christoffer
