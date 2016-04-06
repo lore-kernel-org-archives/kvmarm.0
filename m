@@ -1,32 +1,28 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH 04/45] KVM: arm/arm64: vgic-new: Add data structure
- definitions
-Date: Wed, 6 Apr 2016 16:57:17 +0200
-Message-ID: <CAMJs5B805nsnqczrCWqO9LLSt=i8wQsPWCi5qLatcZX_hHvALA@mail.gmail.com>
-References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
- <1458871508-17279-5-git-send-email-andre.przywara@arm.com>
- <20160329130922.GE4126@cbox> <5703BEF2.7090507@arm.com>
- <20160405201009.GA10522@cbox> <20160406135753.GE16355@cbox>
- <570518AE.7010107@arm.com> <20160406144629.GA8961@cbox>
- <570522D2.7010508@arm.com>
+Subject: Re: [PATCH v5 4/9] irqchip/gic-v2: Parse and export virtual GIC
+ information
+Date: Wed, 6 Apr 2016 19:04:32 +0200
+Message-ID: <20160406170432.GD8961@cbox>
+References: <1459769860-6629-1-git-send-email-julien.grall@arm.com>
+ <1459769860-6629-5-git-send-email-julien.grall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5F67F407A5
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 10:55:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id F1731409A2
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 13:03:02 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id BFJ5tGrnYEoH for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Apr 2016 10:55:56 -0400 (EDT)
-Received: from mail-yw0-f169.google.com (mail-yw0-f169.google.com
- [209.85.161.169])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 78A79407A0
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 10:55:56 -0400 (EDT)
-Received: by mail-yw0-f169.google.com with SMTP id i84so53522827ywc.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 06 Apr 2016 07:57:17 -0700 (PDT)
-In-Reply-To: <570522D2.7010508@arm.com>
+ with ESMTP id y2DTH4mFgkDF for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Apr 2016 13:03:01 -0400 (EDT)
+Received: from mail-wm0-f41.google.com (mail-wm0-f41.google.com [74.125.82.41])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 672D5407A5
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 13:03:01 -0400 (EDT)
+Received: by mail-wm0-f41.google.com with SMTP id 191so65275558wmq.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 06 Apr 2016 10:04:23 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1459769860-6629-5-git-send-email-julien.grall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,275 +32,264 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: Julien Grall <julien.grall@arm.com>
+Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, Jason Cooper <jason@lakedaemon.net>, linux-kernel@vger.kernel.org, fu.wei@linaro.org, Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, gg@slimlogic.co.uk
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Apr 6, 2016 at 4:53 PM, Andre Przywara <andre.przywara@arm.com> wrote:
-> Hej Christoffer,
->
-> On 06/04/16 15:46, Christoffer Dall wrote:
->> On Wed, Apr 06, 2016 at 03:09:50PM +0100, Andre Przywara wrote:
->>>
->>>
->>> On 06/04/16 14:57, Christoffer Dall wrote:
->>>> On Tue, Apr 05, 2016 at 10:10:09PM +0200, Christoffer Dall wrote:
->>>>> On Tue, Apr 05, 2016 at 02:34:42PM +0100, Andre Przywara wrote:
->>>>>> Hi,
->>>>>>
->>>>>> On 29/03/16 14:09, Christoffer Dall wrote:
->>>>>>> On Fri, Mar 25, 2016 at 02:04:27AM +0000, Andre Przywara wrote:
->>>>>>>> From: Christoffer Dall <christoffer.dall@linaro.org>
->>>>>>>>
->>>>>>>> Add a new header file for the new and improved GIC implementation.
->>>>>>>> The big change is that we now have a struct vgic_irq per IRQ instead
->>>>>>>> of spreading all the information over various bitmaps.
->>>>>>>>
->>>>>>>> We include this new header conditionally from within the old header
->>>>>>>> file for the time being to avoid touching all the users.
->>>>>>>>
->>>>>>>> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
->>>>>>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>>>>>>> ---
->>>>>>>>  include/kvm/arm_vgic.h  |   5 ++
->>>>>>>>  include/kvm/vgic/vgic.h | 198 ++++++++++++++++++++++++++++++++++++++++++++++++
->>>>>>>>  2 files changed, 203 insertions(+)
->>>>>>>>  create mode 100644 include/kvm/vgic/vgic.h
->>>>>>>>
->>>>>>>> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
->>>>>>>> index 7656a46..db289a2 100644
->>>>>>>> --- a/include/kvm/arm_vgic.h
->>>>>>>> +++ b/include/kvm/arm_vgic.h
->>>>>>>> @@ -19,6 +19,10 @@
->>>>>>>>  #ifndef __ASM_ARM_KVM_VGIC_H
->>>>>>>>  #define __ASM_ARM_KVM_VGIC_H
->>>>>>>>
->>>>>>>> +#ifdef CONFIG_KVM_NEW_VGIC
->>>>>>>> +#include <kvm/vgic/vgic.h>
->>>>>>>> +#else
->>>>>>>> +
->>>>>>>>  #include <linux/kernel.h>
->>>>>>>>  #include <linux/kvm.h>
->>>>>>>>  #include <linux/irqreturn.h>
->>>>>>>> @@ -376,4 +380,5 @@ static inline int vgic_v3_probe(struct device_node *vgic_node,
->>>>>>>>  }
->>>>>>>>  #endif
->>>>>>>>
->>>>>>>> +#endif   /* old VGIC include */
->>>>>>>>  #endif
->>>>>>>> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
->>>>>>>> new file mode 100644
->>>>>>>> index 0000000..659f8b1
->>>>>>>> --- /dev/null
->>>>>>>> +++ b/include/kvm/vgic/vgic.h
->>>>>>>> @@ -0,0 +1,198 @@
->>>>>>>> +/*
->>>>>>>> + * Copyright (C) 2015, 2016 ARM Ltd.
->>>>>>>> + *
->>>>>>>> + * This program is free software; you can redistribute it and/or modify
->>>>>>>> + * it under the terms of the GNU General Public License version 2 as
->>>>>>>> + * published by the Free Software Foundation.
->>>>>>>> + *
->>>>>>>> + * This program is distributed in the hope that it will be useful,
->>>>>>>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->>>>>>>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->>>>>>>> + * GNU General Public License for more details.
->>>>>>>> + *
->>>>>>>> + * You should have received a copy of the GNU General Public License
->>>>>>>> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->>>>>>>> + */
->>>>>>>> +#ifndef __ASM_ARM_KVM_VGIC_VGIC_H
->>>>>>>> +#define __ASM_ARM_KVM_VGIC_VGIC_H
->>>>>>>> +
->>>>>>>> +#include <linux/kernel.h>
->>>>>>>> +#include <linux/kvm.h>
->>>>>>>> +#include <linux/irqreturn.h>
->>>>>>>> +#include <linux/spinlock.h>
->>>>>>>> +#include <linux/types.h>
->>>>>>>> +#include <kvm/iodev.h>
->>>>>>>> +
->>>>>>>> +#define VGIC_V3_MAX_CPUS 255
->>>>>>>> +#define VGIC_V2_MAX_CPUS 8
->>>>>>>> +#define VGIC_NR_IRQS_LEGACY     256
->>>>>>>> +#define VGIC_NR_SGIS             16
->>>>>>>> +#define VGIC_NR_PPIS             16
->>>>>>>> +#define VGIC_NR_PRIVATE_IRQS     (VGIC_NR_SGIS + VGIC_NR_PPIS)
->>>>>>>> +#define VGIC_MAX_PRIVATE (VGIC_NR_PRIVATE_IRQS - 1)
->>>>>>>> +#define VGIC_MAX_SPI             1019
->>>>>>>> +#define VGIC_MAX_RESERVED        1023
->>>>>>>> +#define VGIC_MIN_LPI             8192
->>>>>>>> +
->>>>>>>> +enum vgic_type {
->>>>>>>> + VGIC_V2,                /* Good ol' GICv2 */
->>>>>>>> + VGIC_V3,                /* New fancy GICv3 */
->>>>>>>> +};
->>>>>>>> +
->>>>>>>> +/* same for all guests, as depending only on the _host's_ GIC model */
->>>>>>>> +struct vgic_global {
->>>>>>>> + /* type of the host GIC */
->>>>>>>> + enum vgic_type          type;
->>>>>>>> +
->>>>>>>> + /* Physical address of vgic virtual cpu interface */
->>>>>>>> + phys_addr_t             vcpu_base;
->>>>>>>> +
->>>>>>>> + /* virtual control interface mapping */
->>>>>>>> + void __iomem            *vctrl_base;
->>>>>>>> +
->>>>>>>> + /* Number of implemented list registers */
->>>>>>>> + int                     nr_lr;
->>>>>>>> +
->>>>>>>> + /* Maintenance IRQ number */
->>>>>>>> + unsigned int            maint_irq;
->>>>>>>> +
->>>>>>>> + /* maximum number of VCPUs allowed (GICv2 limits us to 8) */
->>>>>>>> + int                     max_gic_vcpus;
->>>>>>>> +
->>>>>>>> + /* Only needed for the legacy KVM_CREATE_IRQCHIP */
->>>>>>>> + bool                    can_emulate_gicv2;
->>>>>>>> +};
->>>>>>>> +
->>>>>>>> +extern struct vgic_global kvm_vgic_global_state;
->>>>>>>> +
->>>>>>>> +#define VGIC_V2_MAX_LRS          (1 << 6)
->>>>>>>> +#define VGIC_V3_MAX_LRS          16
->>>>>>>> +#define VGIC_V3_LR_INDEX(lr)     (VGIC_V3_MAX_LRS - 1 - lr)
->>>>>>>> +
->>>>>>>> +enum vgic_irq_config {
->>>>>>>> + VGIC_CONFIG_EDGE = 0,
->>>>>>>> + VGIC_CONFIG_LEVEL
->>>>>>>> +};
->>>>>>>> +
->>>>>>>> +struct vgic_irq {
->>>>>>>> + spinlock_t irq_lock;            /* Protects the content of the struct */
->>>>>>>> + struct list_head ap_list;
->>>>>>>> +
->>>>>>>> + struct kvm_vcpu *vcpu;          /* SGIs and PPIs: The VCPU
->>>>>>>> +                                  * SPIs and LPIs: The VCPU whose ap_list
->>>>>>>> +                                  * on which this is queued.
->>>>>>>> +                                  */
->>>>>>>> +
->>>>>>>> + struct kvm_vcpu *target_vcpu;   /* The VCPU that this interrupt should
->>>>>>>> +                                  * be send to, as a result of the
->>>>>>>> +                                  * targets reg (v2) or the
->>>>>>>> +                                  * affinity reg (v3).
->>>>>>>> +                                  */
->>>>>>>> +
->>>>>>>> + u32 intid;                      /* Guest visible INTID */
->>>>>>>> + bool pending;
->>>>>>>> + bool line_level;                /* Level only */
->>>>>>>> + bool soft_pending;              /* Level only */
->>>>>>>> + bool active;                    /* not used for LPIs */
->>>>>>>> + bool enabled;
->>>>>>>> + bool hw;                        /* Tied to HW IRQ */
->>>>>>>> + u32 hwintid;                    /* HW INTID number */
->>>>>>>> + union {
->>>>>>>> +         u8 targets;                     /* GICv2 target VCPUs mask */
->>>>>>>> +         u32 mpidr;                      /* GICv3 target VCPU */
->>>>>>>> + };
->>>>>>>> + u8 source;                      /* GICv2 SGIs only */
->>>>>>>> + u8 priority;
->>>>>>>> + enum vgic_irq_config config;    /* Level or edge */
->>>>>>>> +};
->>>>>>>> +
->>>>>>>> +struct vgic_dist {
->>>>>>>> + bool                    in_kernel;
->>>>>>>> + bool                    ready;
->>>>>>>> +
->>>>>>>> + /* vGIC model the kernel emulates for the guest (GICv2 or GICv3) */
->>>>>>>> + u32                     vgic_model;
->>>>>>>> +
->>>>>>>> + int                     nr_spis;
->>>>>>>> +
->>>>>>>> + /* TODO: Consider moving to global state */
->>>>>>>> + /* Virtual control interface mapping */
->>>>>>>> + void __iomem            *vctrl_base;
->>>>>>>> +
->>>>>>>> + /* base addresses in guest physical address space: */
->>>>>>>> + gpa_t                   vgic_dist_base;         /* distributor */
->>>>>>>> + union {
->>>>>>>> +         /* either a GICv2 CPU interface */
->>>>>>>> +         gpa_t                   vgic_cpu_base;
->>>>>>>> +         /* or a number of GICv3 redistributor regions */
->>>>>>>> +         gpa_t                   vgic_redist_base;
->>>>>>>> + };
->>>>>>>> +
->>>>>>>> + /* distributor enabled */
->>>>>>>> + u32                     enabled;
->>>>>>>> +
->>>>>>>> + struct vgic_irq         *spis;
->>>>>>>> +};
->>>>>>>> +
->>>>>>>> +struct vgic_v2_cpu_if {
->>>>>>>> + u32             vgic_hcr;
->>>>>>>> + u32             vgic_vmcr;
->>>>>>>> + u32             vgic_misr;      /* Saved only */
->>>>>>>> + u64             vgic_eisr;      /* Saved only */
->>>>>>>> + u64             vgic_elrsr;     /* Saved only */
->>>>>>>> + u32             vgic_apr;
->>>>>>>> + u32             vgic_lr[VGIC_V2_MAX_LRS];
->>>>>>>> +};
->>>>>>>> +
->>>>>>>> +struct vgic_v3_cpu_if {
->>>>>>>> +#ifdef CONFIG_KVM_ARM_VGIC_V3
->>>>>>>> + u32             vgic_hcr;
->>>>>>>> + u32             vgic_vmcr;
->>>>>>>> + u32             vgic_sre;       /* Restored only, change ignored */
->>>>>>>> + u32             vgic_misr;      /* Saved only */
->>>>>>>> + u32             vgic_eisr;      /* Saved only */
->>>>>>>> + u32             vgic_elrsr;     /* Saved only */
->>>>>>>> + u32             vgic_ap0r[4];
->>>>>>>> + u32             vgic_ap1r[4];
->>>>>>>> + u64             vgic_lr[VGIC_V3_MAX_LRS];
->>>>>>>> +#endif
->>>>>>>> +};
->>>>>>>> +
->>>>>>>> +struct vgic_cpu {
->>>>>>>> + /* CPU vif control registers for world switch */
->>>>>>>> + union {
->>>>>>>> +         struct vgic_v2_cpu_if   vgic_v2;
->>>>>>>> +         struct vgic_v3_cpu_if   vgic_v3;
->>>>>>>> + };
->>>>>>>> +
->>>>>>>> + /* TODO: Move nr_lr to a global state */
->>>>>>>
->>>>>>> what is our current plan and status about this TODO?
->>>>>>
->>>>>> The point is that the current HYP code is accessing this field. We do
->>>>>> have this field in the current "global" struct vgic_params there as
->>>>>> well, but this struct is (more or less) private to vgic-v2.c, so not
->>>>>> easily accessible from virt/kvm/arm/hyp/*.c.
->>>>>> So I suggest we keep this in here for the time being and eventually
->>>>>> remove it (and rework the save/restore code) once we get rid of the old
->>>>>> VGIC code.
->>>>>>
->>>>> Hmmm, I haven't tried it, but I don't understand why moving it now is
->>>>> difficult.  I'd really like to avoid having a bunch of todo's lingering
->>>>> around and having duplicated state in the new code.
->>>>>
->>>>> I think I noticed a number of places in this patch series which refers
->>>>> tot he vgic_cpu->nr_lr instead of the global place already...
->>>>>
->>>> So I wrote a patch for this and it doesn't really look that bad.  I'll
->>>> send it as part of a little prerequisite series later.
->>>
->>> I just fixed it as well - the private new VGIC part is trivial indeed.
->>> But how did you solve the reference to the vgic_cpu.nr_lr in
->>> virt/kvm/arm/hyp/vgic-v2-sr.c? With #ifdef .. #else? Or passing in the
->>> number as in vgic-v3-sr.c?
->>>
->>
->> I sent you a couple of patches as I said I would.
->>
->> I just used an extern with the kern_hyp_va() macro trickery applied.
->> Not the prettiest thing in the world, but hey.  It should serve just
->> fine for moving on with this, and then we can worry about the finesses
->> as the vgic series progresses.
->
-> Agreed, thanks for those patches. I think I will just cherry-pick 2/3
-> and 3/3.
-> I am tempted to post my version of what you did in 1/3, which goes a bit
-> further and avoids some copying between different kind of structs.
->
-ok, if you think you have a better solution, then that's fine.
+On Mon, Apr 04, 2016 at 12:37:35PM +0100, Julien Grall wrote:
+> For now, the firmware tables are parsed 2 times: once in the GIC
+> drivers, the other timer when initializing the vGIC. It means code
+> duplication and make more tedious to add the support for another
+> firmware table (like ACPI).
+> 
+> Introduce a new structure and set of helpers to get/set the virtual GIC
+> information. Also fill up the structure for GICv2.
+> 
+> Signed-off-by: Julien Grall <julien.grall@arm.com>
+> 
+> ---
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Jason Cooper <jason@lakedaemon.net>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> 
+>     Changes in v4:
+>         - Change the flow to call gic_set_kvm_info when all the
+>         information are present.
+>         - Rework comments in arm-gic-common.h
+>         - Replace WARN_ON with BUG_ON in gic_set_kvm_info
+> 
+>     Changes in v2:
+>         - Use 0 rather than a negative value to know when the maintenance IRQ
+>         is not present.
+>         - Use resource for vcpu and vctrl
+> ---
+>  drivers/irqchip/irq-gic-common.c       | 13 ++++++
+>  drivers/irqchip/irq-gic-common.h       |  3 ++
+>  drivers/irqchip/irq-gic.c              | 76 +++++++++++++++++++++++++++++++++-
+>  include/linux/irqchip/arm-gic-common.h | 33 +++++++++++++++
+>  4 files changed, 124 insertions(+), 1 deletion(-)
+>  create mode 100644 include/linux/irqchip/arm-gic-common.h
+> 
+> diff --git a/drivers/irqchip/irq-gic-common.c b/drivers/irqchip/irq-gic-common.c
+> index f174ce0..2e9443b 100644
+> --- a/drivers/irqchip/irq-gic-common.c
+> +++ b/drivers/irqchip/irq-gic-common.c
+> @@ -21,6 +21,19 @@
+>  
+>  #include "irq-gic-common.h"
+>  
+> +static const struct gic_kvm_info *gic_kvm_info;
+> +
+> +const struct gic_kvm_info *gic_get_kvm_info(void)
+> +{
+> +	return gic_kvm_info;
+> +}
+> +
+> +void gic_set_kvm_info(const struct gic_kvm_info *info)
+> +{
+> +	BUG_ON(gic_kvm_info != NULL);
+> +	gic_kvm_info = info;
+> +}
+> +
+>  void gic_enable_quirks(u32 iidr, const struct gic_quirk *quirks,
+>  		void *data)
+>  {
+> diff --git a/drivers/irqchip/irq-gic-common.h b/drivers/irqchip/irq-gic-common.h
+> index fff697d..205e5fd 100644
+> --- a/drivers/irqchip/irq-gic-common.h
+> +++ b/drivers/irqchip/irq-gic-common.h
+> @@ -19,6 +19,7 @@
+>  
+>  #include <linux/of.h>
+>  #include <linux/irqdomain.h>
+> +#include <linux/irqchip/arm-gic-common.h>
+>  
+>  struct gic_quirk {
+>  	const char *desc;
+> @@ -35,4 +36,6 @@ void gic_cpu_config(void __iomem *base, void (*sync_access)(void));
+>  void gic_enable_quirks(u32 iidr, const struct gic_quirk *quirks,
+>  		void *data);
+>  
+> +void gic_set_kvm_info(const struct gic_kvm_info *info);
+> +
+>  #endif /* _IRQ_GIC_COMMON_H */
+> diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
+> index 7a73786..24c05f3 100644
+> --- a/drivers/irqchip/irq-gic.c
+> +++ b/drivers/irqchip/irq-gic.c
+> @@ -102,6 +102,8 @@ static struct static_key supports_deactivate = STATIC_KEY_INIT_TRUE;
+>  
+>  static struct gic_chip_data gic_data[CONFIG_ARM_GIC_MAX_NR] __read_mostly;
+>  
+> +static struct gic_kvm_info gic_v2_kvm_info;
+> +
+>  #ifdef CONFIG_GIC_NON_BANKED
+>  static void __iomem *gic_get_percpu_base(union gic_base *base)
+>  {
+> @@ -1189,6 +1191,29 @@ static bool gic_check_eoimode(struct device_node *node, void __iomem **base)
+>  	return true;
+>  }
+>  
+> +static void __init gic_of_setup_kvm_info(struct device_node *node)
+> +{
+> +	int ret;
+> +	struct resource *vctrl_res = &gic_v2_kvm_info.vctrl;
+> +	struct resource *vcpu_res = &gic_v2_kvm_info.vcpu;
+> +
+> +	gic_v2_kvm_info.type = GIC_V2;
+> +
+> +	gic_v2_kvm_info.maint_irq = irq_of_parse_and_map(node, 0);
+> +	if (!gic_v2_kvm_info.maint_irq)
+> +		return;
+> +
+> +	ret = of_address_to_resource(node, 2, vctrl_res);
+> +	if (ret)
+> +		return;
+> +
+> +	ret = of_address_to_resource(node, 3, vcpu_res);
+> +	if (ret)
+> +		return;
+> +
+> +	gic_set_kvm_info(&gic_v2_kvm_info);
+> +}
+> +
+>  int __init
+>  gic_of_init(struct device_node *node, struct device_node *parent)
+>  {
+> @@ -1218,8 +1243,10 @@ gic_of_init(struct device_node *node, struct device_node *parent)
+>  
+>  	__gic_init_bases(gic_cnt, -1, dist_base, cpu_base, percpu_offset,
+>  			 &node->fwnode);
+> -	if (!gic_cnt)
+> +	if (!gic_cnt) {
+>  		gic_init_physaddr(node);
+> +		gic_of_setup_kvm_info(node);
+> +	}
+>  
+>  	if (parent) {
+>  		irq = irq_of_parse_and_map(node, 0);
+> @@ -1248,6 +1275,10 @@ IRQCHIP_DECLARE(pl390, "arm,pl390", gic_of_init);
+>  static struct
+>  {
+>  	phys_addr_t cpu_phys_base;
+> +	u32 maint_irq;
+> +	int maint_irq_mode;
+> +	phys_addr_t vctrl_base;
+> +	phys_addr_t vcpu_base;
+>  } acpi_data __initdata;
+>  
+>  static int __init
+> @@ -1272,6 +1303,12 @@ gic_acpi_parse_madt_cpu(struct acpi_subtable_header *header,
+>  		return -EINVAL;
+>  
+>  	acpi_data.cpu_phys_base = gic_cpu_base;
+> +	acpi_data.maint_irq = processor->vgic_interrupt;
+> +	acpi_data.maint_irq_mode = (processor->flags & ACPI_MADT_VGIC_IRQ_MODE) ?
+> +				    ACPI_EDGE_SENSITIVE : ACPI_LEVEL_SENSITIVE;
+> +	acpi_data.vctrl_base = processor->gich_base_address;
+> +	acpi_data.vcpu_base = processor->gicv_base_address;
+> +
+>  	cpu_base_assigned = 1;
+>  	return 0;
+>  }
+> @@ -1302,6 +1339,41 @@ static bool __init gic_validate_dist(struct acpi_subtable_header *header,
+>  
+>  #define ACPI_GICV2_DIST_MEM_SIZE	(SZ_4K)
+>  #define ACPI_GIC_CPU_IF_MEM_SIZE	(SZ_8K)
+> +#define ACPI_GICV2_VCTRL_MEM_SIZE	(SZ_4K)
+> +#define ACPI_GICV2_VCPU_MEM_SIZE	(SZ_8K)
+> +
+> +static void __init gic_acpi_setup_kvm_info(void)
+> +{
+> +	int irq;
+> +	struct resource *vctrl_res = &gic_v2_kvm_info.vctrl;
+> +	struct resource *vcpu_res = &gic_v2_kvm_info.vcpu;
+> +
+> +	gic_v2_kvm_info.type = GIC_V2;
+> +
+> +	irq = acpi_register_gsi(NULL, acpi_data.maint_irq,
+> +				acpi_data.maint_irq_mode,
+> +				ACPI_ACTIVE_HIGH);
+> +	if (irq <= 0)
+> +		return;
+> +
+> +	gic_v2_kvm_info.maint_irq = irq;
+> +
+> +	if (!acpi_data.vctrl_base)
+> +		return;
+> +
+> +	vctrl_res->flags = IORESOURCE_MEM;
+> +	vctrl_res->start = acpi_data.vctrl_base;
+> +	vctrl_res->end = vctrl_res->start + ACPI_GICV2_VCTRL_MEM_SIZE - 1;
+> +
+> +	if (!acpi_data.vcpu_base)
+> +		return;
+> +
+> +	vcpu_res->flags = IORESOURCE_MEM;
+> +	vcpu_res->start = acpi_data.vcpu_base;
+> +	vcpu_res->end = vcpu_res->start + ACPI_GICV2_VCPU_MEM_SIZE - 1;
+> +
+> +	gic_set_kvm_info(&gic_v2_kvm_info);
+> +}
+>  
+>  static int __init gic_v2_acpi_init(struct acpi_subtable_header *header,
+>  				   const unsigned long end)
+> @@ -1359,6 +1431,8 @@ static int __init gic_v2_acpi_init(struct acpi_subtable_header *header,
+>  	if (IS_ENABLED(CONFIG_ARM_GIC_V2M))
+>  		gicv2m_init(NULL, gic_data[0].domain);
+>  
+> +	gic_acpi_setup_kvm_info();
+> +
+>  	return 0;
+>  }
+>  IRQCHIP_ACPI_DECLARE(gic_v2, ACPI_MADT_TYPE_GENERIC_DISTRIBUTOR,
+> diff --git a/include/linux/irqchip/arm-gic-common.h b/include/linux/irqchip/arm-gic-common.h
+> new file mode 100644
+> index 0000000..ef34f6f
+> --- /dev/null
+> +++ b/include/linux/irqchip/arm-gic-common.h
+
+just out of curiosity, why is include/linux/irqchip/arm-gic.h not
+suitable?
+
+> @@ -0,0 +1,33 @@
+> +/*
+> + * include/linux/irqchip/arm-gic-common.h
+> + *
+> + * Copyright (C) 2016 ARM Limited, All Rights Reserved.
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + */
+> +#ifndef __LINUX_IRQCHIP_ARM_GIC_COMMON_H
+> +#define __LINUX_IRQCHIP_ARM_GIC_COMMON_H
+> +
+> +#include <linux/types.h>
+> +#include <linux/ioport.h>
+> +
+> +enum gic_type {
+> +	GIC_V2,
+> +};
+> +
+> +struct gic_kvm_info {
+> +	/* GIC type */
+> +	enum gic_type	type;
+> +	/* Virtual CPU interface */
+> +	struct resource vcpu;
+> +	/* Interrupt number */
+> +	unsigned int	maint_irq;
+> +	/* Virtual control interface */
+> +	struct resource vctrl;
+> +};
+> +
+> +const struct gic_kvm_info *gic_get_kvm_info(void);
+> +
+> +#endif /* __LINUX_IRQCHIP_ARM_GIC_COMMON_H */
+> -- 
+> 1.9.1
+> 
+
+Otherwise this looks good to me.
 
 -Christoffer
