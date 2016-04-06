@@ -1,98 +1,251 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] arm64: KVM: unregister notifiers in hyp mode teardown path
-Date: Wed, 6 Apr 2016 15:15:25 +0200
-Message-ID: <20160406131525.GD16355@cbox>
-References: <1459777611-22592-1-git-send-email-sudeep.holla@arm.com>
- <20160406115250.GC16355@cbox> <57050A82.7030905@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v4 09/12] KVM: arm64: sync LPI configuration and pending
+ tables
+Date: Wed, 6 Apr 2016 15:41:14 +0200
+Message-ID: <570511FA.7010906@linaro.org>
+References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
+ <1458958450-19662-10-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 63C724053F
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 09:14:01 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Sk9ELaQoOEcn for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Apr 2016 09:13:55 -0400 (EDT)
-Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5CE5C40402
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 09:13:54 -0400 (EDT)
-Received: by mail-wm0-f45.google.com with SMTP id 191so57706106wmq.0
- for <kvmarm@lists.cs.columbia.edu>; Wed, 06 Apr 2016 06:15:16 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <57050A82.7030905@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Sudeep Holla <sudeep.holla@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <1458958450-19662-10-git-send-email-andre.przywara@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Apr 06, 2016 at 02:09:22PM +0100, Sudeep Holla wrote:
-> Hi Christoffer,
+Hi Andre,
+On 03/26/2016 03:14 AM, Andre Przywara wrote:
+> The LPI configuration and pending tables of the GICv3 LPIs are held
+> in tables in (guest) memory. To achieve reasonable performance, we
+> cache this data in our own data structures, so we need to sync those
+> two views from time to time. This behaviour is well described in the
+> GICv3 spec and is also exercised by hardware, so the sync points are
+> well known.
 > 
-> On 06/04/16 12:52, Christoffer Dall wrote:
-> >Hi Sudeep,
-> >
-> >
-> >On Mon, Apr 04, 2016 at 02:46:51PM +0100, Sudeep Holla wrote:
-> >>Commit 1e947bad0b63 ("arm64: KVM: Skip HYP setup when already running
-> >>in HYP") re-organized the hyp init code and ended up leaving the CPU
-> >>hotplug and PM notifier even if hyp mode initialization fails.
-> >>
-> >>Since KVM is not yet supported with ACPI, the above mentioned commit
-> >>breaks CPU hotplug in ACPI boot.
-> >>
-> >>This patch fixes teardown_hyp_mode to properly unregister both CPU
-> >>hotplug and PM notifiers in the teardown path.
-> >>
-> >>Fixes: 1e947bad0b63 ("arm64: KVM: Skip HYP setup when already running in HYP")
-> >>Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> >>Cc: Marc Zyngier <marc.zyngier@arm.com>
-> >>Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-> >
-> >I fixed up your patch to apply after James' patch:
-> >5f5560b (arm64: KVM: Register CPU notifiers when the kernel runs at HYP, 2016-03-30)
-> >
+> Provide functions that read the guest memory and store the
+> information from the configuration and pending tables in the kernel.
 > 
-> Thanks for that, sorry I didn't realize it would conflict with that change.
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
+>  include/kvm/vgic/vgic.h      |   2 +
+>  virt/kvm/arm/vgic/its-emul.c | 135 +++++++++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic.h     |   1 +
+>  3 files changed, 138 insertions(+)
 > 
-> >My only concern with this approach is that we're not checking the return
-> >values from the cpu_pm_register_notifier calls, and we're potentially
-> >calling unregister_cpu_notifier even if the original registration
-> >failed.
-> >
-> 
-> I agree with your concern and I had the same when I first wrote the
-> patch. But considering the return values makes it unnecessarily ugly, so
-> I dropped it and kept it simple.
-> 
-> >I know this can't happen given current implementations, but if any of
-> >these functions ever start returning error values, then we're silently
-> >ignoring them.  What is our policy on these things?
-> >
-> 
-> I am fine to handle that, but as you mentioned it's not really needed.
-> May be we can add some error message if that's really required.
+> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+> index ecf3260..ea98133 100644
+> --- a/include/kvm/vgic/vgic.h
+> +++ b/include/kvm/vgic/vgic.h
+> @@ -121,6 +121,8 @@ struct vgic_its {
+>  	int			cwriter;
+>  	struct list_head	device_list;
+>  	struct list_head	collection_list;
+> +	/* memory used for buffering guest's memory */
+> +	void			*buffer_page;
+>  };
+>  
+>  struct vgic_dist {
+> diff --git a/virt/kvm/arm/vgic/its-emul.c b/virt/kvm/arm/vgic/its-emul.c
+> index 1188e9a..d82ba9b 100644
+> --- a/virt/kvm/arm/vgic/its-emul.c
+> +++ b/virt/kvm/arm/vgic/its-emul.c
+> @@ -78,8 +78,130 @@ static struct its_itte *find_itte_by_lpi(struct kvm *kvm, int lpi)
+>  	return NULL;
+>  }
+>  
+> +#define LPI_PROP_ENABLE_BIT(p)	((p) & LPI_PROP_ENABLED)
+> +#define LPI_PROP_PRIORITY(p)	((p) & 0xfc)
+> +
+> +/* stores the priority and enable bit for a given LPI */
+> +static void update_lpi_config(struct kvm *kvm, struct its_itte *itte, u8 prop)
+> +{
+> +	spin_lock(&itte->irq.irq_lock);
+> +	itte->irq.priority = LPI_PROP_PRIORITY(prop);
+> +	itte->irq.enabled = LPI_PROP_ENABLE_BIT(prop);
+> +
+would put a comment saying that vgic_queue_irq is unlocking since it
+looks weird.
+> +	vgic_queue_irq(kvm, &itte->irq);
+> +}
+> +
+> +#define GIC_LPI_OFFSET 8192
+> +
+> +/* We scan the table in chunks the size of the smallest page size */
+> +#define CHUNK_SIZE 4096U
+> +
+>  #define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
+>  
+> +static int nr_idbits_propbase(u64 propbaser)
+> +{
+> +	int nr_idbits = (1U << (propbaser & 0x1f)) + 1;
+> +
+> +	return max(nr_idbits, INTERRUPT_ID_BITS_ITS);
+don't get this.
+don't you want to take the min of INTERRUPT_ID_BITS_ITS  (16) and
+propbaser & 0x1f +1.
+
+Spec says IDbits should not exceed GICD_TYPER.IDbit ==
+INTERRUPT_ID_BITS_ITS - 1 = 15.
+
+and in case the purpose of the function is to return the size of the
+table, which is not obvious given its name ;-), we should return 1U <<
+min(), no?
+> +}
+> +
+> +/*
+> + * Scan the whole LPI configuration table and put the LPI configuration
+> + * data in our own data structures. This relies on the LPI being
+> + * mapped before.
+> + */
+> +static bool its_update_lpis_configuration(struct kvm *kvm, u64 prop_base_reg)
+> +{
+> +	struct vgic_dist *dist = &kvm->arch.vgic;
+> +	u8 *prop = dist->its.buffer_page;
+> +	u32 tsize;
+> +	gpa_t propbase;
+> +	int lpi = GIC_LPI_OFFSET;
+> +	struct its_itte *itte;
+> +	struct its_device *device;
+> +	int ret;
+> +
+> +	propbase = BASER_BASE_ADDRESS(prop_base_reg);
+> +	tsize = nr_idbits_propbase(prop_base_reg);
+> +
+> +	while (tsize > 0) {
+> +		int chunksize = min(tsize, CHUNK_SIZE);
+> +
+> +		ret = kvm_read_guest(kvm, propbase, prop, chunksize);
+> +		if (ret)
+> +			return false;
+> +
+> +		spin_lock(&dist->its.lock);
+as we start holding several locks maybe worth to comment somewhere about
+order lock: its lock > vcpu lock > irq lock
+> +		/*
+> +		 * Updating the status for all allocated LPIs. We catch
+> +		 * those LPIs that get disabled. We really don't care
+> +		 * about unmapped LPIs, as they need to be updated
+> +		 * later manually anyway once they get mapped.
+> +		 */
+> +		for_each_lpi(device, itte, kvm) {
+> +			if (itte->lpi < lpi || itte->lpi >= lpi + chunksize)
+> +				continue;
+> +
+> +			update_lpi_config(kvm, itte, prop[itte->lpi - lpi]);
+> +		}
+> +		spin_unlock(&dist->its.lock);
+> +		tsize -= chunksize;
+> +		lpi += chunksize;
+> +		propbase += chunksize;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +/*
+> + * Scan the whole LPI pending table and sync the pending bit in there
+> + * with our own data structures. This relies on the LPI being
+> + * mapped before.
+> + */
+> +static bool its_sync_lpi_pending_table(struct kvm_vcpu *vcpu, u64 base_addr_reg)
+> +{
+> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +	unsigned long *pendmask = dist->its.buffer_page;
+> +	u32 nr_lpis = 1U << INTERRUPT_ID_BITS_ITS;
+shouldn't we use value computed as in nr_idbits_propbase instead?
+> +	gpa_t pendbase;
+> +	int lpi = 0;
+> +	struct its_itte *itte;
+> +	struct its_device *device;
+> +	int ret;
+> +	int lpi_bit, nr_bits;
+> +
+> +	pendbase = BASER_BASE_ADDRESS(base_addr_reg);
+> +
+I understand we should start reading at pendbase + 1KB. (4.8.5 pending
+tables)
+
+Eric
+> +	while (nr_lpis > 0) {
+> +		nr_bits = min(nr_lpis, CHUNK_SIZE * 8);
+> +
+> +		ret = kvm_read_guest(vcpu->kvm, pendbase, pendmask,
+> +				     nr_bits / 8);
+> +		if (ret)
+> +			return false;
+> +
+> +		spin_lock(&dist->its.lock);
+> +		for_each_lpi(device, itte, vcpu->kvm) {
+> +			lpi_bit = itte->lpi - lpi;
+> +			if (lpi_bit < 0 || lpi_bit >= nr_bits)
+> +				continue;
+> +
+> +			if (!test_bit(lpi_bit, pendmask))
+> +				continue;
+> +
+> +			spin_lock(&itte->irq.irq_lock);
+> +			itte->irq.pending = true;
+> +			vgic_queue_irq(vcpu->kvm, &itte->irq);
+> +		}
+> +		spin_unlock(&dist->its.lock);
+> +		nr_lpis -= nr_bits;
+> +		lpi += nr_bits;
+> +		pendbase += nr_bits / 8;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+>  static int vgic_mmio_read_its_ctlr(struct kvm_vcpu *vcpu,
+>  				   struct kvm_io_device *this,
+>  				   gpa_t addr, int len, void *val)
+> @@ -357,6 +479,14 @@ struct vgic_register_region its_registers[] = {
+>  /* This is called on setting the LPI enable bit in the redistributor. */
+>  void vgic_enable_lpis(struct kvm_vcpu *vcpu)
+>  {
+> +	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+> +	u64 prop_base_reg, pend_base_reg;
+> +
+> +	pend_base_reg = dist->pendbaser[vcpu->vcpu_id];
+> +	prop_base_reg = dist->propbaser;
+> +
+> +	its_update_lpis_configuration(vcpu->kvm, prop_base_reg);
+> +	its_sync_lpi_pending_table(vcpu, pend_base_reg);
+>  }
+>  
+>  int vits_init(struct kvm *kvm)
+> @@ -371,6 +501,10 @@ int vits_init(struct kvm *kvm)
+>  	if (!dist->pendbaser)
+>  		return -ENOMEM;
+>  
+> +	its->buffer_page = kmalloc(CHUNK_SIZE, GFP_KERNEL);
+> +	if (!its->buffer_page)
+> +		return -ENOMEM;
+> +
+>  	spin_lock_init(&its->lock);
+>  
+>  	INIT_LIST_HEAD(&its->device_list);
+> @@ -430,6 +564,7 @@ void vits_destroy(struct kvm *kvm)
+>  		kfree(container_of(cur, struct its_collection, coll_list));
+>  	}
+>  
+> +	kfree(its->buffer_page);
+>  	kfree(dist->pendbaser);
+>  
+>  	its->enabled = false;
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index 160c511..a7218b0 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -23,6 +23,7 @@
+>  #define IS_VGIC_ADDR_UNDEF(_x)  ((_x) == VGIC_ADDR_UNDEF)
+>  
+>  #define INTERRUPT_ID_BITS_SPIS	10
+> +#define INTERRUPT_ID_BITS_ITS	16
+>  
+>  struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+>  			      u32 intid);
 > 
 
-Hopefully we're not the only ones taking a slight shortcut here, so
-anyone modifying those functions will notice it when doing so...
-
-> >Let me know if the following revised version of your patch looks ok to
-> >you (against kvmarm/master):
-> >
-> 
-> Looks fine and tested kvmarm/master with this patch on top.
-> 
-
-Thanks, will queue it then.
-
--Christoffer
