@@ -1,26 +1,26 @@
 From: Julien Grall <julien.grall@arm.com>
-Subject: Re: [PATCH v5 4/9] irqchip/gic-v2: Parse and export virtual GIC
+Subject: Re: [PATCH v5 6/9] irqchip/gic-v3: Parse and export virtual GIC
  information
-Date: Wed, 6 Apr 2016 18:40:41 +0100
-Message-ID: <57054A19.1090208@arm.com>
+Date: Wed, 6 Apr 2016 18:45:19 +0100
+Message-ID: <57054B2F.8040907@arm.com>
 References: <1459769860-6629-1-git-send-email-julien.grall@arm.com>
- <1459769860-6629-5-git-send-email-julien.grall@arm.com>
- <20160406170432.GD8961@cbox>
+ <1459769860-6629-7-git-send-email-julien.grall@arm.com>
+ <20160406172228.GE8961@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9A6A440B58
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 13:39:26 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 327C540BDA
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 13:44:04 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DW7Qlutc6YZ1 for <kvmarm@lists.cs.columbia.edu>;
- Wed,  6 Apr 2016 13:39:25 -0400 (EDT)
+ with ESMTP id KUuVBdob5QHE for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Apr 2016 13:44:03 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8C41E40B40
- for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 13:39:24 -0400 (EDT)
-In-Reply-To: <20160406170432.GD8961@cbox>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7DC2140B58
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 13:44:02 -0400 (EDT)
+In-Reply-To: <20160406172228.GE8961@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,22 +36,27 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Christoffer,
 
-On 06/04/2016 18:04, Christoffer Dall wrote:
-> On Mon, Apr 04, 2016 at 12:37:35PM +0100, Julien Grall wrote:
->> diff --git a/include/linux/irqchip/arm-gic-common.h b/include/linux/irqchip/arm-gic-common.h
->> new file mode 100644
->> index 0000000..ef34f6f
->> --- /dev/null
->> +++ b/include/linux/irqchip/arm-gic-common.h
+On 06/04/2016 18:22, Christoffer Dall wrote:
+> On Mon, Apr 04, 2016 at 12:37:37PM +0100, Julien Grall wrote:
+>> +static void __init gic_acpi_setup_kvm_info(void)
+>> +{
+>> +	int irq;
+>> +
+>> +	if (!gic_acpi_collect_virt_info()) {
+>> +		pr_warn("Unable to get hardware information used for virtualization\n");
 >
-> just out of curiosity, why is include/linux/irqchip/arm-gic.h not
-> suitable?
+> perhaps this should say something about gicv3 as well?
 
-Because arm-gic.h contains the definitions for GICv2 only. At least one 
-of them is clashing with the GICv3 ones.
+Actually, none of the pr_* call contain GICv3 and there is no pr_fmt.
 
-For instance, the function gic_send_sgi is defined statically the in 
-GICv3 code, but exported for GICv2.
+I'm thinking to send a patch to add pr_fmt in the GICv3 driver.
+
+>
+> Otherwise (with my extremely limited acpi understanding):
+>
+> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+
+Thank you!
 
 Regards,
 
