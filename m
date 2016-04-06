@@ -1,174 +1,172 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v4 07/12] KVM: arm64: add data structures to model ITS
- interrupt translation
-Date: Wed, 6 Apr 2016 11:53:47 +0200
-Message-ID: <5704DCAB.7040207@linaro.org>
-References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
- <1458958450-19662-8-git-send-email-andre.przywara@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH] KVM: arm/arm64: Handle forward time correction gracefully
+Date: Wed, 6 Apr 2016 12:33:44 +0200
+Message-ID: <20160406103344.GA17975@cbox>
+References: <1459931842-29465-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1458958450-19662-8-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 78C9C40BDA
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 06:32:16 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id mftrvswAYLqy for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Apr 2016 06:32:15 -0400 (EDT)
+Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 510D94011D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 06:32:14 -0400 (EDT)
+Received: by mail-wm0-f49.google.com with SMTP id f198so67166811wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 06 Apr 2016 03:33:35 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1459931842-29465-1-git-send-email-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 03/26/2016 03:14 AM, Andre Przywara wrote:
-> The GICv3 Interrupt Translation Service (ITS) uses tables in memory
-> to allow a sophisticated interrupt routing. It features device tables,
-> an interrupt table per device and a table connecting "collections" to
-> actual CPUs (aka. redistributors in the GICv3 lingo).
-> Since the interrupt numbers for the LPIs are allocated quite sparsely
-> and the range can be quite huge (8192 LPIs being the minimum), using
-> bitmaps or arrays for storing information is a waste of memory.
-> We use linked lists instead, which we iterate linearily. This works
-> very well with the actual number of LPIs/MSIs in the guest being
-> quite low. Should the number of LPIs exceed the number where iterating
-> through lists seems acceptable, we can later revisit this and use more
-> efficient data structures.
+On Wed, Apr 06, 2016 at 09:37:22AM +0100, Marc Zyngier wrote:
+> On a host that runs NTP, corrections can have a direct impact on
+> the background timer that we program on the behalf of a vcpu.
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> In particular, NTP performing a forward correction will result in
+> a timer expiring sooner than expected from a guest point of view.
+> Not a big deal, we kick the vcpu anyway.
+> 
+> But on wake-up, the vcpu thread is going to perform a check to
+> find out whether or not it should block. And at that point, the
+> timer check is going to say "timer has not expired yet, go back
+> to sleep". This results in the timer event being lost forever.
+> 
+> There are multiple ways to handle this. One would be record that
+> the timer has expired and let kvm_cpu_has_pending_timer return
+> true in that case, but that would be fairly invasive. Another is
+> to check for the "short sleep" condition in the hrtimer callback,
+> and restart the timer for the remaining time when the condition
+> is detected.
+> 
+> This patch implements the latter, with a bit of refactoring in
+> order to avoid too much code duplication.
+> 
+> Reported-by: Alexander Graf <agraf@suse.de>
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 > ---
->  include/kvm/vgic/vgic.h      |  3 ++
->  virt/kvm/arm/vgic/its-emul.c | 66 ++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 69 insertions(+)
+>  virt/kvm/arm/arch_timer.c | 47 +++++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 37 insertions(+), 10 deletions(-)
 > 
-> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-> index bafea11..ecf3260 100644
-> --- a/include/kvm/vgic/vgic.h
-> +++ b/include/kvm/vgic/vgic.h
-> @@ -22,6 +22,7 @@
->  #include <linux/spinlock.h>
->  #include <linux/types.h>
->  #include <kvm/iodev.h>
-> +#include <linux/list.h>
->  
->  #define VGIC_V3_MAX_CPUS	255
->  #define VGIC_V2_MAX_CPUS	8
-> @@ -118,6 +119,8 @@ struct vgic_its {
->  	u64			cbaser;
->  	int			creadr;
->  	int			cwriter;
-> +	struct list_head	device_list;
-> +	struct list_head	collection_list;
->  };
->  
->  struct vgic_dist {
-> diff --git a/virt/kvm/arm/vgic/its-emul.c b/virt/kvm/arm/vgic/its-emul.c
-> index de8d360..c0334ff 100644
-> --- a/virt/kvm/arm/vgic/its-emul.c
-> +++ b/virt/kvm/arm/vgic/its-emul.c
-> @@ -21,6 +21,7 @@
->  #include <linux/kvm.h>
->  #include <linux/kvm_host.h>
->  #include <linux/interrupt.h>
-> +#include <linux/list.h>
->  
->  #include <linux/irqchip/arm-gic-v3.h>
->  
-> @@ -31,6 +32,34 @@
->  #include "vgic.h"
->  #include "vgic_mmio.h"
->  
-> +struct its_device {
-> +	struct list_head dev_list;
-> +
-> +	/* the head for the list of ITTEs */
-> +	struct list_head itt;
-> +	u32 device_id;
-> +};
-> +
-> +#define COLLECTION_NOT_MAPPED ((u32)-1)
-> +
-> +struct its_collection {
-> +	struct list_head coll_list;
-> +
-> +	u32 collection_id;
-> +	u32 target_addr;
-> +};
-> +
-> +#define its_is_collection_mapped(coll) ((coll) && \
-> +				((coll)->target_addr != COLLECTION_NOT_MAPPED))
-> +
-> +struct its_itte {
-> +	struct list_head itte_list;
-> +
-> +	struct its_collection *collection;
-> +	u32 lpi;
-> +	u32 event_id;
-> +};
-> +
->  #define BASER_BASE_ADDRESS(x) ((x) & 0xfffffffff000ULL)
->  
->  static int vgic_mmio_read_its_ctlr(struct kvm_vcpu *vcpu,
-> @@ -137,6 +166,12 @@ static int vgic_mmio_read_its_idregs(struct kvm_vcpu *vcpu,
->  	return 0;
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index a9ad4fe..4d0e77a 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -98,10 +98,46 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
+>  	kvm_vcpu_kick(vcpu);
 >  }
 >  
-> +static void its_free_itte(struct its_itte *itte)
+> +static u64 kvm_timer_compute_delta(struct kvm_vcpu *vcpu)
 > +{
-> +	list_del(&itte->itte_list);
-> +	kfree(itte);
+> +	cycle_t cval, now;
+> +
+> +	cval = vcpu->arch.timer_cpu.cntv_cval;
+> +	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
+> +
+> +	if (now < cval) {
+> +		u64 ns;
+> +
+> +		ns = cyclecounter_cyc2ns(timecounter->cc,
+> +					 cval - now,
+> +					 timecounter->mask,
+> +					 &timecounter->frac);
+> +		return ns;
+> +	}
+> +
+> +	return 0;
 > +}
 > +
->  /*
->   * This function is called with both the ITS and the distributor lock dropped,
->   * so the actual command handlers must take the respective locks when needed.
-> @@ -309,6 +344,9 @@ int vits_init(struct kvm *kvm)
->  
->  	spin_lock_init(&its->lock);
->  
-> +	INIT_LIST_HEAD(&its->device_list);
-> +	INIT_LIST_HEAD(&its->collection_list);
-> +
->  	regions = kmalloc_array(ARRAY_SIZE(its_registers),
->  				sizeof(struct vgic_io_device), GFP_KERNEL);
->  
-> @@ -332,11 +370,39 @@ void vits_destroy(struct kvm *kvm)
+>  static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
 >  {
->  	struct vgic_dist *dist = &kvm->arch.vgic;
->  	struct vgic_its *its = &dist->its;
-> +	struct its_device *dev;
-> +	struct its_itte *itte;
-> +	struct list_head *dev_cur, *dev_temp;
-> +	struct list_head *cur, *temp;
+>  	struct arch_timer_cpu *timer;
+> +	struct kvm_vcpu *vcpu;
+> +	u64 ns;
+> +
+>  	timer = container_of(hrt, struct arch_timer_cpu, timer);
+> +	vcpu = container_of(timer, struct kvm_vcpu, arch.timer_cpu);
+> +
+> +	/*
+> +	 * Check that the timer has really expired from the guest's
+> +	 * PoV (NTP on the host may have forced it to expire
+> +	 * early). If we should have slept longer, restart it.
+> +	 */
+> +	ns = kvm_timer_compute_delta(vcpu);
+> +	if (unlikely(ns)) {
+> +		hrtimer_forward_now(hrt, ns_to_ktime(ns));
+> +		return HRTIMER_RESTART;
+> +	}
+> +
+>  	queue_work(wqueue, &timer->expired);
+>  	return HRTIMER_NORESTART;
+>  }
+> @@ -176,8 +212,6 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
+>  void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+>  {
+>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+> -	u64 ns;
+> -	cycle_t cval, now;
 >  
->  	if (!vgic_has_its(kvm))
+>  	BUG_ON(timer_is_armed(timer));
+>  
+> @@ -197,14 +231,7 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
 >  		return;
 >  
-> +	/*
-> +	 * We may end up here without the lists ever having been initialized.
-> +	 * Check this and bail out early to avoid dereferencing a NULL pointer.
-> +	 */
-> +	if (!its->device_list.next)
-> +		return;
-don't you check collection_list in a similar way then?
-> +
-> +	spin_lock(&its->lock);
-> +	list_for_each_safe(dev_cur, dev_temp, &its->device_list) {
-> +		dev = container_of(dev_cur, struct its_device, dev_list);
-> +		list_for_each_safe(cur, temp, &dev->itt) {
-use list_for_each_safe_entry instead?
-
-Eric
-> +			itte = (container_of(cur, struct its_itte, itte_list));
-> +			its_free_itte(itte);
-> +		}
-> +		list_del(dev_cur);
-> +		kfree(dev);
-> +	}
-> +
-> +	list_for_each_safe(cur, temp, &its->collection_list) {
-> +		list_del(cur);
-> +		kfree(container_of(cur, struct its_collection, coll_list));
-> +	}
-> +
->  	kfree(dist->pendbaser);
->  
->  	its->enabled = false;
-> +	spin_unlock(&its->lock);
+>  	/*  The timer has not yet expired, schedule a background timer */
+> -	cval = timer->cntv_cval;
+> -	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
+> -
+> -	ns = cyclecounter_cyc2ns(timecounter->cc,
+> -				 cval - now,
+> -				 timecounter->mask,
+> -				 &timecounter->frac);
+> -	timer_arm(timer, ns);
+> +	timer_arm(timer, kvm_timer_compute_delta(vcpu));
 >  }
+>  
+>  void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
+> -- 
+> 2.1.4
 > 
 
+How do you guys feel about adding this to the patch for improved sleep
+at night (pun intended):
+
+diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+index a9ad4fe..230f720 100644
+--- a/virt/kvm/arm/arch_timer.c
++++ b/virt/kvm/arm/arch_timer.c
+@@ -91,6 +91,8 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
+ 	vcpu = container_of(work, struct kvm_vcpu, arch.timer_cpu.expired);
+ 	vcpu->arch.timer_cpu.armed = false;
+ 
++	BUG_ON(!kvm_timer_should_fire(vcpu));
++
+ 	/*
+ 	 * If the vcpu is blocked we want to wake it up so that it will see
+ 	 * the timer has expired when entering the guest.
+
+
+Otherwise:
+
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+
+And I can queue this with CC to stable, but I would like Alex's
+tested-by if possible.
+
+Thanks,
+-Christoffer
