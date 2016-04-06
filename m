@@ -1,161 +1,56 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH] KVM: arm/arm64: Handle forward time correction gracefully
-Date: Wed, 6 Apr 2016 11:58:36 +0100
-Message-ID: <5704EBDC.9000206@arm.com>
-References: <1459931842-29465-1-git-send-email-marc.zyngier@arm.com>
- <20160406103344.GA17975@cbox>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH] arm64: KVM: Warn when PARange is less than 40 bits
+Date: Wed, 6 Apr 2016 13:32:13 +0200
+Message-ID: <20160406113213.GB16355@cbox>
+References: <1459869107-6367-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160406103344.GA17975@cbox>
-Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Alexander Graf <agraf@suse.de>
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DAD4040BDA
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 07:30:45 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 4LrRlXtPYpQH for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  6 Apr 2016 07:30:44 -0400 (EDT)
+Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A40F640402
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  6 Apr 2016 07:30:43 -0400 (EDT)
+Received: by mail-wm0-f45.google.com with SMTP id u206so41248090wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 06 Apr 2016 04:32:04 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1459869107-6367-1-git-send-email-marc.zyngier@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 06/04/16 11:33, Christoffer Dall wrote:
-> On Wed, Apr 06, 2016 at 09:37:22AM +0100, Marc Zyngier wrote:
->> On a host that runs NTP, corrections can have a direct impact on
->> the background timer that we program on the behalf of a vcpu.
->>
->> In particular, NTP performing a forward correction will result in
->> a timer expiring sooner than expected from a guest point of view.
->> Not a big deal, we kick the vcpu anyway.
->>
->> But on wake-up, the vcpu thread is going to perform a check to
->> find out whether or not it should block. And at that point, the
->> timer check is going to say "timer has not expired yet, go back
->> to sleep". This results in the timer event being lost forever.
->>
->> There are multiple ways to handle this. One would be record that
->> the timer has expired and let kvm_cpu_has_pending_timer return
->> true in that case, but that would be fairly invasive. Another is
->> to check for the "short sleep" condition in the hrtimer callback,
->> and restart the timer for the remaining time when the condition
->> is detected.
->>
->> This patch implements the latter, with a bit of refactoring in
->> order to avoid too much code duplication.
->>
->> Reported-by: Alexander Graf <agraf@suse.de>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>  virt/kvm/arm/arch_timer.c | 47 +++++++++++++++++++++++++++++++++++++----------
->>  1 file changed, 37 insertions(+), 10 deletions(-)
->>
->> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
->> index a9ad4fe..4d0e77a 100644
->> --- a/virt/kvm/arm/arch_timer.c
->> +++ b/virt/kvm/arm/arch_timer.c
->> @@ -98,10 +98,46 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
->>  	kvm_vcpu_kick(vcpu);
->>  }
->>  
->> +static u64 kvm_timer_compute_delta(struct kvm_vcpu *vcpu)
->> +{
->> +	cycle_t cval, now;
->> +
->> +	cval = vcpu->arch.timer_cpu.cntv_cval;
->> +	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
->> +
->> +	if (now < cval) {
->> +		u64 ns;
->> +
->> +		ns = cyclecounter_cyc2ns(timecounter->cc,
->> +					 cval - now,
->> +					 timecounter->mask,
->> +					 &timecounter->frac);
->> +		return ns;
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->>  static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
->>  {
->>  	struct arch_timer_cpu *timer;
->> +	struct kvm_vcpu *vcpu;
->> +	u64 ns;
->> +
->>  	timer = container_of(hrt, struct arch_timer_cpu, timer);
->> +	vcpu = container_of(timer, struct kvm_vcpu, arch.timer_cpu);
->> +
->> +	/*
->> +	 * Check that the timer has really expired from the guest's
->> +	 * PoV (NTP on the host may have forced it to expire
->> +	 * early). If we should have slept longer, restart it.
->> +	 */
->> +	ns = kvm_timer_compute_delta(vcpu);
->> +	if (unlikely(ns)) {
->> +		hrtimer_forward_now(hrt, ns_to_ktime(ns));
->> +		return HRTIMER_RESTART;
->> +	}
->> +
->>  	queue_work(wqueue, &timer->expired);
->>  	return HRTIMER_NORESTART;
->>  }
->> @@ -176,8 +212,6 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
->>  void kvm_timer_schedule(struct kvm_vcpu *vcpu)
->>  {
->>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
->> -	u64 ns;
->> -	cycle_t cval, now;
->>  
->>  	BUG_ON(timer_is_armed(timer));
->>  
->> @@ -197,14 +231,7 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
->>  		return;
->>  
->>  	/*  The timer has not yet expired, schedule a background timer */
->> -	cval = timer->cntv_cval;
->> -	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
->> -
->> -	ns = cyclecounter_cyc2ns(timecounter->cc,
->> -				 cval - now,
->> -				 timecounter->mask,
->> -				 &timecounter->frac);
->> -	timer_arm(timer, ns);
->> +	timer_arm(timer, kvm_timer_compute_delta(vcpu));
->>  }
->>  
->>  void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
->> -- 
->> 2.1.4
->>
+On Tue, Apr 05, 2016 at 04:11:47PM +0100, Marc Zyngier wrote:
+> We always thought that 40bits of PA range would be the minimum people
+> would actually build. Anything less is terrifyingly small.
 > 
-> How do you guys feel about adding this to the patch for improved sleep
-> at night (pun intended):
+> Turns out that we were both right and wrong. Nobody has ever built
+> such a system, but the ARM Foundation Model has a PARange set to 36bits.
+> Just because we can. Oh well. Now, the KVM API explicitely says that
+> we offer a 40bit PA space to the VM, so we shouldn't run KVM on
+> the Foundation Model at all.
 > 
-> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> index a9ad4fe..230f720 100644
-> --- a/virt/kvm/arm/arch_timer.c
-> +++ b/virt/kvm/arm/arch_timer.c
-> @@ -91,6 +91,8 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
->  	vcpu = container_of(work, struct kvm_vcpu, arch.timer_cpu.expired);
->  	vcpu->arch.timer_cpu.armed = false;
->  
-> +	BUG_ON(!kvm_timer_should_fire(vcpu));
-> +
+> That being said, this patch offers a less agressive alternative, and
+> loudly warns about the configuration being unsupported. You'll still
+> be able to run VMs (at your own risks, though).
+> 
+> This is just a workaround until we have a proper userspace API where
+> we report the PARange to userspace.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
-I would probably turn this into a WARN_ON() rather than bringing the
-whole system down (keeping it alive would help debugging), but otherwise
-looks good to me.
-
->  	/*
->  	 * If the vcpu is blocked we want to wake it up so that it will see
->  	 * the timer has expired when entering the guest.
-> 
-> 
-> Otherwise:
-> 
-> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-> 
-> And I can queue this with CC to stable, but I would like Alex's
-> tested-by if possible.
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
