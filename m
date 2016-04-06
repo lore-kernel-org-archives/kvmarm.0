@@ -1,14 +1,14 @@
 From: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Subject: Re: [PATCH v6 4/7] dma-reserved-iommu: alloc/free_reserved_iova_domain
-Date: Wed, 6 Apr 2016 17:00:21 -0600
-Message-ID: <20160406170021.4087a955@t450s.home>
+Subject: Re: [PATCH v6 6/7] dma-reserved-iommu: iommu_get/put_single_reserved
+Date: Wed, 6 Apr 2016 17:12:07 -0600
+Message-ID: <20160406171207.750f1224@t450s.home>
 References: <1459757222-2668-1-git-send-email-eric.auger@linaro.org>
-	<1459757222-2668-5-git-send-email-eric.auger@linaro.org>
+	<1459757222-2668-7-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <1459757222-2668-5-git-send-email-eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+In-Reply-To: <1459757222-2668-7-git-send-email-eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
 	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
 List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
@@ -22,230 +22,258 @@ To: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
 Cc: julien.grall-5wv7dgnIgG8@public.gmane.org, eric.auger-qxv4g6HH51o@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon,  4 Apr 2016 08:06:59 +0000
+On Mon,  4 Apr 2016 08:07:01 +0000
 Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
 
-> Introduce alloc/free_reserved_iova_domain in the IOMMU API.
-> alloc_reserved_iova_domain initializes an iova domain at a given
-> iova base address and with a given size. This iova domain will
-> be used to allocate iova within that window. Those IOVAs will be reserved
-> for special purpose, typically MSI frame binding. Allocation function
-> within the reserved iova domain will be introduced in subsequent patches.
+> This patch introduces iommu_get/put_single_reserved.
 > 
-> Those functions are implemented and exposed if CONFIG_IOMMU_DMA_RESERVED
-> is seta.
+> iommu_get_single_reserved allows to allocate a new reserved iova page
+> and map it onto the physical page that contains a given physical address.
+> Page size is the IOMMU page one. It is the responsability of the
+> system integrator to make sure the in use IOMMU page size corresponds
+> to the granularity of the MSI frame.
+> 
+> It returns the iova that is mapped onto the provided physical address.
+> Hence the physical address passed in argument does not need to be aligned.
+> 
+> In case a mapping already exists between both pages, the IOVA mapped
+> to the PA is directly returned.
+> 
+> Each time an iova is successfully returned a binding ref count is
+> incremented.
+> 
+> iommu_put_single_reserved decrements the ref count and when this latter
+> is null, the mapping is destroyed and the iova is released.
 > 
 > Signed-off-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+> Signed-off-by: Ankit Jindal <ajindal-qTEPVZfXA3Y@public.gmane.org>
+> Signed-off-by: Pranavkumar Sawargaonkar <pranavkumar-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+> Signed-off-by: Bharat Bhushan <Bharat.Bhushan-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
 > 
 > ---
 > 
 > v5 -> v6:
-> - use spin lock instead of mutex
+> - revisit locking with spin_lock instead of mutex
+> - do not kref_get on 1st get
+> - add size parameter to the get function following Marc's request
+> - use the iova domain shift instead of using the smallest supported page size
 > 
 > v3 -> v4:
-> - formerly in "iommu/arm-smmu: implement alloc/free_reserved_iova_domain" &
->   "iommu: add alloc/free_reserved_iova_domain"
+> - formerly in iommu: iommu_get/put_single_reserved &
+>   iommu/arm-smmu: implement iommu_get/put_single_reserved
+> - Attempted to address Marc's doubts about missing size/alignment
+>   at VFIO level (user-space knows the IOMMU page size and the number
+>   of IOVA pages to provision)
 > 
 > v2 -> v3:
-> - remove iommu_alloc_reserved_iova_domain & iommu_free_reserved_iova_domain
->   static implementation in case CONFIG_IOMMU_API is not set
+> - remove static implementation of iommu_get_single_reserved &
+>   iommu_put_single_reserved when CONFIG_IOMMU_API is not set
 > 
 > v1 -> v2:
-> - moved from vfio API to IOMMU API
+> - previously a VFIO API, named vfio_alloc_map/unmap_free_reserved_iova
 > ---
->  drivers/iommu/Kconfig              |  8 ++++
->  drivers/iommu/Makefile             |  1 +
->  drivers/iommu/dma-reserved-iommu.c | 75 ++++++++++++++++++++++++++++++++++++++
->  include/linux/dma-reserved-iommu.h | 45 +++++++++++++++++++++++
->  4 files changed, 129 insertions(+)
->  create mode 100644 drivers/iommu/dma-reserved-iommu.c
->  create mode 100644 include/linux/dma-reserved-iommu.h
+>  drivers/iommu/dma-reserved-iommu.c | 146 +++++++++++++++++++++++++++++++++++++
+>  include/linux/dma-reserved-iommu.h |  28 +++++++
+>  2 files changed, 174 insertions(+)
 > 
-> diff --git a/drivers/iommu/Kconfig b/drivers/iommu/Kconfig
-> index dd1dc39..a5a1530 100644
-> --- a/drivers/iommu/Kconfig
-> +++ b/drivers/iommu/Kconfig
-> @@ -74,6 +74,12 @@ config IOMMU_DMA
->  	select IOMMU_IOVA
->  	select NEED_SG_DMA_LENGTH
->  
-> +# IOMMU reserved IOVA mapping (MSI doorbell)
-> +config IOMMU_DMA_RESERVED
-> +	bool
-> +	select IOMMU_API
-> +	select IOMMU_IOVA
-> +
->  config FSL_PAMU
->  	bool "Freescale IOMMU support"
->  	depends on PPC32
-> @@ -307,6 +313,7 @@ config SPAPR_TCE_IOMMU
->  config ARM_SMMU
->  	bool "ARM Ltd. System MMU (SMMU) Support"
->  	depends on (ARM64 || ARM) && MMU
-> +	select IOMMU_DMA_RESERVED
->  	select IOMMU_API
->  	select IOMMU_IO_PGTABLE_LPAE
->  	select ARM_DMA_USE_IOMMU if ARM
-> @@ -320,6 +327,7 @@ config ARM_SMMU
->  config ARM_SMMU_V3
->  	bool "ARM Ltd. System MMU Version 3 (SMMUv3) Support"
->  	depends on ARM64 && PCI
-> +	select IOMMU_DMA_RESERVED
->  	select IOMMU_API
->  	select IOMMU_IO_PGTABLE_LPAE
->  	select GENERIC_MSI_IRQ_DOMAIN
-> diff --git a/drivers/iommu/Makefile b/drivers/iommu/Makefile
-> index c6edb31..6c9ae99 100644
-> --- a/drivers/iommu/Makefile
-> +++ b/drivers/iommu/Makefile
-> @@ -2,6 +2,7 @@ obj-$(CONFIG_IOMMU_API) += iommu.o
->  obj-$(CONFIG_IOMMU_API) += iommu-traces.o
->  obj-$(CONFIG_IOMMU_API) += iommu-sysfs.o
->  obj-$(CONFIG_IOMMU_DMA) += dma-iommu.o
-> +obj-$(CONFIG_IOMMU_DMA_RESERVED) += dma-reserved-iommu.o
->  obj-$(CONFIG_IOMMU_IO_PGTABLE) += io-pgtable.o
->  obj-$(CONFIG_IOMMU_IO_PGTABLE_ARMV7S) += io-pgtable-arm-v7s.o
->  obj-$(CONFIG_IOMMU_IO_PGTABLE_LPAE) += io-pgtable-arm.o
 > diff --git a/drivers/iommu/dma-reserved-iommu.c b/drivers/iommu/dma-reserved-iommu.c
-> new file mode 100644
-> index 0000000..a461482
-> --- /dev/null
+> index f592118..3c759d9 100644
+> --- a/drivers/iommu/dma-reserved-iommu.c
 > +++ b/drivers/iommu/dma-reserved-iommu.c
-> @@ -0,0 +1,75 @@
-> +/*
-> + * Reserved IOVA Management
-> + *
-> + * Copyright (c) 2015 Linaro Ltd.
-> + *              www.linaro.org
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + */
+> @@ -136,3 +136,149 @@ void iommu_free_reserved_iova_domain(struct iommu_domain *domain)
+>  	spin_unlock_irqrestore(&domain->reserved_lock, flags);
+>  }
+>  EXPORT_SYMBOL_GPL(iommu_free_reserved_iova_domain);
 > +
-> +#include <linux/iommu.h>
-> +#include <linux/iova.h>
-> +
-> +int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
-> +				     dma_addr_t iova, size_t size,
-> +				     unsigned long order)
-> +{
-> +	unsigned long granule, mask;
-> +	struct iova_domain *iovad;
-> +	unsigned long flags;
-> +	int ret = 0;
-> +
-> +	granule = 1UL << order;
-> +	mask = granule - 1;
-> +	if (iova & mask || (!size) || (size & mask))
-> +		return -EINVAL;
-> +
-> +	iovad = kzalloc(sizeof(struct iova_domain), GFP_KERNEL);
-> +	if (!iovad)
-> +		return -ENOMEM;
-> +
-> +	spin_lock_irqsave(&domain->reserved_lock, flags);
-> +
-> +	if (domain->reserved_iova_cookie) {
-> +		ret = -EEXIST;
-> +		goto free_unlock;
-> +	}
-> +
-> +	init_iova_domain(iovad, granule,
-> +			 iova >> order, (iova + size - 1) >> order);
-> +	domain->reserved_iova_cookie = iovad;
-> +	goto unlock;
-> +
-> +free_unlock:
-> +	kfree(iovad);
-> +unlock:
-> +	spin_unlock_irqrestore(&domain->reserved_lock, flags);
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(iommu_alloc_reserved_iova_domain);
-> +
-> +void iommu_free_reserved_iova_domain(struct iommu_domain *domain)
+> +static void delete_reserved_binding(struct iommu_domain *domain,
+> +				    struct iommu_reserved_binding *b)
 > +{
 > +	struct iova_domain *iovad =
 > +		(struct iova_domain *)domain->reserved_iova_cookie;
+> +	unsigned long order = iova_shift(iovad);
+> +
+> +	iommu_unmap(domain, b->iova, b->size);
+> +	free_iova(iovad, b->iova >> order);
+> +	kfree(b);
+> +}
+> +
+> +int iommu_get_reserved_iova(struct iommu_domain *domain,
+> +			      phys_addr_t addr, size_t size, int prot,
+> +			      dma_addr_t *iova)
+> +{
+> +	struct iova_domain *iovad =
+> +		(struct iova_domain *)domain->reserved_iova_cookie;
+> +	unsigned long order = iova_shift(iovad);
+> +	unsigned long  base_pfn, end_pfn, nb_iommu_pages;
+> +	size_t iommu_page_size = 1 << order, binding_size;
+> +	phys_addr_t aligned_base, offset;
+> +	struct iommu_reserved_binding *b, *newb;
 > +	unsigned long flags;
+> +	struct iova *p_iova;
+> +	bool unmap = false;
+> +	int ret;
+> +
+> +	base_pfn = addr >> order;
+> +	end_pfn = (addr + size - 1) >> order;
+> +	nb_iommu_pages = end_pfn - base_pfn + 1;
+> +	aligned_base = base_pfn << order;
+> +	offset = addr - aligned_base;
+> +	binding_size = nb_iommu_pages * iommu_page_size;
 > +
 > +	if (!iovad)
-> +		return;
+> +		return -EINVAL;
 > +
 > +	spin_lock_irqsave(&domain->reserved_lock, flags);
 > +
-> +	put_iova_domain(iovad);
-> +	kfree(iovad);
+> +	b = find_reserved_binding(domain, aligned_base, binding_size);
+> +	if (b) {
+> +		*iova = b->iova + offset;
+> +		kref_get(&b->kref);
+> +		ret = 0;
+> +		goto unlock;
+> +	}
 > +
 > +	spin_unlock_irqrestore(&domain->reserved_lock, flags);
+> +
+> +	/*
+> +	 * no reserved IOVA was found for this PA, start allocating and
+> +	 * registering one while the spin-lock is not held. iommu_map/unmap
+> +	 * are not supposed to be atomic
+> +	 */
+> +
+> +	p_iova = alloc_iova(iovad, nb_iommu_pages, iovad->dma_32bit_pfn, true);
+> +	if (!p_iova)
+> +		return -ENOMEM;
+
+Here we're using iovad, which was the reserved_iova_cookie outside of
+the locking, which makes the locking ineffective.  Isn't this lock also
+protecting our iova domain, I'm confused.
+
+> +
+> +	*iova = iova_dma_addr(iovad, p_iova);
+> +
+> +	newb = kzalloc(sizeof(*b), GFP_KERNEL);
+> +	if (!newb) {
+> +		free_iova(iovad, p_iova->pfn_lo);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	ret = iommu_map(domain, *iova, aligned_base, binding_size, prot);
+> +	if (ret) {
+> +		kfree(newb);
+> +		free_iova(iovad, p_iova->pfn_lo);
+> +		return ret;
+> +	}
+> +
+> +	spin_lock_irqsave(&domain->reserved_lock, flags);
+> +
+> +	/* re-check the PA was not mapped in our back when lock was not held */
+> +	b = find_reserved_binding(domain, aligned_base, binding_size);
+> +	if (b) {
+> +		*iova = b->iova + offset;
+> +		kref_get(&b->kref);
+> +		ret = 0;
+> +		unmap = true;
+> +		goto unlock;
+> +	}
+> +
+> +	kref_init(&newb->kref);
+> +	newb->domain = domain;
+> +	newb->addr = aligned_base;
+> +	newb->iova = *iova;
+> +	newb->size = binding_size;
+> +
+> +	link_reserved_binding(domain, newb);
+> +
+> +	*iova += offset;
+> +	goto unlock;
+
+??
+
+> +
+> +unlock:
+> +	spin_unlock_irqrestore(&domain->reserved_lock, flags);
+> +	if (unmap)
+> +		delete_reserved_binding(domain, newb);
+> +	return ret;
 > +}
-
-The locking here looks wrong, reserved_iova_cookie needs to be read and
-cleared (currently missing) within the lock, the put and free can
-probably happen outside the lock.  Likewise the init_iova_domain() in
-the alloc path probably doesn't need to iccur under spinlock, but
-testing and setting reserved_iova_cookie does.  Seems like a mutex
-would do for locking here, but maybe the rb-tree manipulation has
-reasons for using a spinlock.  Thanks,
-
-Alex
-
-> +EXPORT_SYMBOL_GPL(iommu_free_reserved_iova_domain);
+> +EXPORT_SYMBOL_GPL(iommu_get_reserved_iova);
+> +
+> +void iommu_put_reserved_iova(struct iommu_domain *domain, dma_addr_t iova)
+> +{
+> +	struct iova_domain *iovad =
+> +		(struct iova_domain *)domain->reserved_iova_cookie;
+> +	unsigned long order;
+> +	phys_addr_t aligned_addr;
+> +	dma_addr_t aligned_iova, page_size, mask, offset;
+> +	struct iommu_reserved_binding *b;
+> +	unsigned long flags;
+> +	bool unmap = false;
+> +
+> +	order = iova_shift(iovad);
+> +	page_size = (uint64_t)1 << order;
+> +	mask = page_size - 1;
+> +
+> +	aligned_iova = iova & ~mask;
+> +	offset = iova - aligned_iova;
+> +
+> +	aligned_addr = iommu_iova_to_phys(domain, aligned_iova);
+> +
+> +	spin_lock_irqsave(&domain->reserved_lock, flags);
+> +	b = find_reserved_binding(domain, aligned_addr, page_size);
+> +	if (!b)
+> +		goto unlock;
+> +
+> +	if (atomic_sub_and_test(1, &b->kref.refcount)) {
+> +		unlink_reserved_binding(domain, b);
+> +		unmap = true;
+> +	}
+> +
+> +unlock:
+> +	spin_unlock_irqrestore(&domain->reserved_lock, flags);
+> +	if (unmap)
+> +		delete_reserved_binding(domain, b);
+> +}
+> +EXPORT_SYMBOL_GPL(iommu_put_reserved_iova);
+> +
+> +
+> +
 > diff --git a/include/linux/dma-reserved-iommu.h b/include/linux/dma-reserved-iommu.h
-> new file mode 100644
-> index 0000000..5bf863b
-> --- /dev/null
+> index 5bf863b..dedea56 100644
+> --- a/include/linux/dma-reserved-iommu.h
 > +++ b/include/linux/dma-reserved-iommu.h
-> @@ -0,0 +1,45 @@
-> +/*
-> + * Copyright (c) 2015 Linaro Ltd.
-> + *              www.linaro.org
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + */
-> +#ifndef __DMA_RESERVED_IOMMU_H
-> +#define __DMA_RESERVED_IOMMU_H
-> +
-> +#ifdef __KERNEL__
-> +#include <asm/errno.h>
-> +
-> +#ifdef CONFIG_IOMMU_DMA_RESERVED
-> +#include <linux/iommu.h>
-> +
+> @@ -40,6 +40,34 @@ int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
+>   */
+>  void iommu_free_reserved_iova_domain(struct iommu_domain *domain);
+>  
 > +/**
-> + * iommu_alloc_reserved_iova_domain: allocate the reserved iova domain
+> + * iommu_get_reserved_iova: allocate a contiguous set of iova pages and
+> + * map them to the physical range defined by @addr and @size.
 > + *
 > + * @domain: iommu domain handle
-> + * @iova: base iova address
-> + * @size: iova window size
-> + * @order: page order
+> + * @addr: physical address to bind
+> + * @size: size of the binding
+> + * @prot: mapping protection attribute
+> + * @iova: returned iova
+> + *
+> + * Mapped physical pfns are within [@addr >> order, (@addr + size -1) >> order]
+> + * where order corresponds to the iova domain order.
+> + * This mapping is reference counted as a whole and cannot by split.
 > + */
-> +int iommu_alloc_reserved_iova_domain(struct iommu_domain *domain,
-> +				     dma_addr_t iova, size_t size,
-> +				     unsigned long order);
+> +int iommu_get_reserved_iova(struct iommu_domain *domain,
+> +			      phys_addr_t addr, size_t size, int prot,
+> +			      dma_addr_t *iova);
 > +
 > +/**
-> + * iommu_free_reserved_iova_domain: free the reserved iova domain
+> + * iommu_put_reserved_iova: decrement a ref count of the reserved mapping
 > + *
 > + * @domain: iommu domain handle
+> + * @iova: reserved iova whose binding ref count is decremented
+> + *
+> + * if the binding ref count is null, destroy the reserved mapping
 > + */
-> +void iommu_free_reserved_iova_domain(struct iommu_domain *domain);
+> +void iommu_put_reserved_iova(struct iommu_domain *domain, dma_addr_t iova);
 > +
-> +#endif	/* CONFIG_IOMMU_DMA_RESERVED */
-> +#endif	/* __KERNEL__ */
-> +#endif	/* __DMA_RESERVED_IOMMU_H */
+>  #endif	/* CONFIG_IOMMU_DMA_RESERVED */
+>  #endif	/* __KERNEL__ */
+>  #endif	/* __DMA_RESERVED_IOMMU_H */
