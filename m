@@ -1,15 +1,16 @@
 From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH v6 0/7] KVM PCIe/MSI passthrough on ARM/ARM64: kernel part
-	1/3: iommu changes
-Date: Thu, 7 Apr 2016 14:28:59 +0200
-Message-ID: <5706528B.2010906@linaro.org>
-References: <1459757222-2668-1-git-send-email-eric.auger@linaro.org>
-	<20160406171534.794c6824@t450s.home>
+Subject: Re: [PATCH v6 2/5] vfio: allow the user to register reserved iova
+	range for MSI mapping
+Date: Thu, 7 Apr 2016 15:43:29 +0200
+Message-ID: <57066401.7060406@linaro.org>
+References: <1459758611-2972-1-git-send-email-eric.auger@linaro.org>
+	<1459758611-2972-3-git-send-email-eric.auger@linaro.org>
+	<20160406160709.1d208b45@t450s.home>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <20160406171534.794c6824-1yVPhWWZRC1BDLzU/O5InQ@public.gmane.org>
+In-Reply-To: <20160406160709.1d208b45-1yVPhWWZRC1BDLzU/O5InQ@public.gmane.org>
 List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
 	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
 List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
@@ -24,145 +25,363 @@ Cc: julien.grall-5wv7dgnIgG8@public.gmane.org, eric.auger-qxv4g6HH51o@public.gma
 List-Id: kvmarm@lists.cs.columbia.edu
 
 Hi Alex,
-On 04/07/2016 01:15 AM, Alex Williamson wrote:
-> On Mon,  4 Apr 2016 08:06:55 +0000
+On 04/07/2016 12:07 AM, Alex Williamson wrote:
+> On Mon,  4 Apr 2016 08:30:08 +0000
 > Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
 > 
->> This series introduces the dma-reserved-iommu api used to:
->> - create/destroy an iova domain dedicated to reserved iova bindings
->> - map/unmap physical addresses onto reserved IOVAs.
->> - unmap and destroy all IOVA reserved bindings
+>> The user is allowed to [un]register a reserved IOVA range by using the
+>> DMA MAP API and setting the new flag: VFIO_DMA_MAP_FLAG_MSI_RESERVED_IOVA.
+>> It provides the base address and the size. This region is stored in the
+>> vfio_dma rb tree. At that point the iova range is not mapped to any target
+>> address yet. The host kernel will use those iova when needed, typically
+>> when the VFIO-PCI device allocates its MSIs.
+>>
+>> This patch also handles the destruction of the reserved binding RB-tree and
+>> domain's iova_domains.
+>>
+>> Signed-off-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+>> Signed-off-by: Bharat Bhushan <Bharat.Bhushan-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
+>>
+>> ---
+>> v3 -> v4:
+>> - use iommu_alloc/free_reserved_iova_domain exported by dma-reserved-iommu
+>> - protect vfio_register_reserved_iova_range implementation with
+>>   CONFIG_IOMMU_DMA_RESERVED
+>> - handle unregistration by user-space and on vfio_iommu_type1 release
+>>
+>> v1 -> v2:
+>> - set returned value according to alloc_reserved_iova_domain result
+>> - free the iova domains in case any error occurs
+>>
+>> RFC v1 -> v1:
+>> - takes into account Alex comments, based on
+>>   [RFC PATCH 1/6] vfio: Add interface for add/del reserved iova region:
+>> - use the existing dma map/unmap ioctl interface with a flag to register
+>>   a reserved IOVA range. A single reserved iova region is allowed.
+>>
+>> Conflicts:
+>> 	drivers/vfio/vfio_iommu_type1.c
+>> ---
+>>  drivers/vfio/vfio_iommu_type1.c | 141 +++++++++++++++++++++++++++++++++++++++-
+>>  include/uapi/linux/vfio.h       |  12 +++-
+>>  2 files changed, 150 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index c9ddbde..4497b20 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -36,6 +36,7 @@
+>>  #include <linux/uaccess.h>
+>>  #include <linux/vfio.h>
+>>  #include <linux/workqueue.h>
+>> +#include <linux/dma-reserved-iommu.h>
+>>  
+>>  #define DRIVER_VERSION  "0.2"
+>>  #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>"
+>> @@ -403,10 +404,22 @@ static void vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma)
+>>  	vfio_lock_acct(-unlocked);
+>>  }
+>>  
+>> +static void vfio_unmap_reserved(struct vfio_iommu *iommu)
+>> +{
+>> +#ifdef CONFIG_IOMMU_DMA_RESERVED
+>> +	struct vfio_domain *d;
+>> +
+>> +	list_for_each_entry(d, &iommu->domain_list, next)
+>> +		iommu_unmap_reserved(d->domain);
+>> +#endif
+>> +}
+>> +
+>>  static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+>>  {
+>>  	if (likely(dma->type != VFIO_IOVA_RESERVED))
+>>  		vfio_unmap_unpin(iommu, dma);
+>> +	else
+>> +		vfio_unmap_reserved(iommu);
+>>  	vfio_unlink_dma(iommu, dma);
+>>  	kfree(dma);
+>>  }
 > 
-> Why are we making the decision to have an unbalanced map vs unmap, we
-> can create individual mappings, but only unmap the whole thing and
-> start over?  That's a strange interface.  Thanks,
-The "individual" balanced unmap also exists (iommu_put_reserved_iova)
-and this is the "normal" path. This happens on msi_domain_deactivate
-(and possibly on msi_domain_set_affinity).
+> This makes me nervous, apparently we can add reserved mappings
+> individually, but we have absolutely no granularity on remove, so if we
+> remove one, we've removed them all even though we still have them
+> linked in our rb tree.  I see later that only one reserved region is
+> allowed, but that seems very short sighted, especially to impose that
+> on the user level API.
+On kernel-size the reserved region is currently backed by a unique
+iova_domain. Do you mean you would like me to handle a list of
+iova_domains instead of using a single "cookie"?
+> 
+>> @@ -489,7 +502,8 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>>  	 */
+>>  	if (iommu->v2) {
+>>  		dma = vfio_find_dma(iommu, unmap->iova, 0);
+>> -		if (dma && dma->iova != unmap->iova) {
+>> +		if (dma && (dma->iova != unmap->iova ||
+>> +			   (dma->type == VFIO_IOVA_RESERVED))) {
+> 
+> This seems unnecessary, won't the reserved entries fall out in the
+> while loop below?
+yes that's correct
+> 
+>>  			ret = -EINVAL;
+>>  			goto unlock;
+>>  		}
+>> @@ -501,6 +515,10 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>>  	}
+>>  
+>>  	while ((dma = vfio_find_dma(iommu, unmap->iova, unmap->size))) {
+>> +		if (dma->type == VFIO_IOVA_RESERVED) {
+>> +			ret = -EINVAL;
+>> +			goto unlock;
+>> +		}
+> 
+> Hmm, API concerns here.  Previously a user could unmap from iova = 0 to
+> size = 2^64 - 1 and expect all mappings to get cleared.  Now they can't
+> do that if they've registered any reserved regions.  Seems like maybe
+> we should ignore it and continue instead of abort, but then we need to
+> change the parameters of vfio_find_dma() to get it to move on, or pass
+> the type to the function, which would prevent us from getting here in
+> the first place.
+OK I will rework this to match the existing use cases
+> 
+>>  		if (!iommu->v2 && unmap->iova > dma->iova)
+>>  			break;
+>>  		unmapped += dma->size;
+>> @@ -650,6 +668,114 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+>>  	return ret;
+>>  }
+>>  
+>> +static int vfio_register_reserved_iova_range(struct vfio_iommu *iommu,
+>> +			   struct vfio_iommu_type1_dma_map *map)
+>> +{
+>> +#ifdef CONFIG_IOMMU_DMA_RESERVED
+>> +	dma_addr_t iova = map->iova;
+>> +	size_t size = map->size;
+>> +	uint64_t mask;
+>> +	struct vfio_dma *dma;
+>> +	int ret = 0;
+>> +	struct vfio_domain *d;
+>> +	unsigned long order;
+>> +
+>> +	/* Verify that none of our __u64 fields overflow */
+>> +	if (map->size != size || map->iova != iova)
+>> +		return -EINVAL;
+>> +
+>> +	order =  __ffs(vfio_pgsize_bitmap(iommu));
+>> +	mask = ((uint64_t)1 << order) - 1;
+>> +
+>> +	WARN_ON(mask & PAGE_MASK);
+>> +
+>> +	if (!size || (size | iova) & mask)
+>> +		return -EINVAL;
+>> +
+>> +	/* Don't allow IOVA address wrap */
+>> +	if (iova + size - 1 < iova)
+>> +		return -EINVAL;
+>> +
+>> +	mutex_lock(&iommu->lock);
+>> +
+>> +	if (vfio_find_dma(iommu, iova, size)) {
+>> +		ret =  -EEXIST;
+>> +		goto out;
+>> +	}
+>> +
+>> +	dma = kzalloc(sizeof(*dma), GFP_KERNEL);
+>> +	if (!dma) {
+>> +		ret = -ENOMEM;
+>> +		goto out;
+>> +	}
+>> +
+>> +	dma->iova = iova;
+>> +	dma->size = size;
+>> +	dma->type = VFIO_IOVA_RESERVED;
+>> +
+>> +	list_for_each_entry(d, &iommu->domain_list, next)
+>> +		ret |= iommu_alloc_reserved_iova_domain(d->domain, iova,
+>> +							size, order);
+>> +
+>> +	if (ret) {
+>> +		list_for_each_entry(d, &iommu->domain_list, next)
+>> +			iommu_free_reserved_iova_domain(d->domain);
+>> +		goto out;
+>> +	}
+>> +
+>> +	vfio_link_dma(iommu, dma);
+>> +
+>> +out:
+>> +	mutex_unlock(&iommu->lock);
+>> +	return ret;
+>> +#else /* CONFIG_IOMMU_DMA_RESERVED */
+>> +	return -ENODEV;
+>> +#endif
+>> +}
+>> +
+>> +static void vfio_unregister_reserved_iova_range(struct vfio_iommu *iommu,
+>> +				struct vfio_iommu_type1_dma_unmap *unmap)
+>> +{
+>> +#ifdef CONFIG_IOMMU_DMA_RESERVED
+>> +	dma_addr_t iova = unmap->iova;
+>> +	struct vfio_dma *dma;
+>> +	size_t size = unmap->size;
+>> +	uint64_t mask;
+>> +	unsigned long order;
+>> +
+>> +	/* Verify that none of our __u64 fields overflow */
+>> +	if (unmap->size != size || unmap->iova != iova)
+>> +		return;
+>> +
+>> +	order =  __ffs(vfio_pgsize_bitmap(iommu));
+>> +	mask = ((uint64_t)1 << order) - 1;
+>> +
+>> +	WARN_ON(mask & PAGE_MASK);
+>> +
+>> +	if (!size || (size | iova) & mask)
+>> +		return;
+>> +
+>> +	/* Don't allow IOVA address wrap */
+>> +	if (iova + size - 1 < iova)
+>> +		return;
+>> +
+>> +	mutex_lock(&iommu->lock);
+>> +
+>> +	dma = vfio_find_dma(iommu, iova, size);
+>> +
+>> +	if (!dma || (dma->type != VFIO_IOVA_RESERVED)) {
+>> +		unmap->size = 0;
+>> +		goto out;
+>> +	}
+>> +
+>> +	unmap->size =  dma->size;
+>> +	vfio_remove_dma(iommu, dma);
+>> +
+>> +out:
+>> +	mutex_unlock(&iommu->lock);
+>> +#endif
+> 
+> Having a find_dma that accepts a type and a remove_reserved here seems
+> like it might simplify things.
+> 
+>> +}
+>> +
+>>  static int vfio_bus_type(struct device *dev, void *data)
+>>  {
+>>  	struct bus_type **bus = data;
+>> @@ -946,6 +1072,7 @@ static void vfio_iommu_type1_release(void *iommu_data)
+>>  	struct vfio_group *group, *group_tmp;
+>>  
+>>  	vfio_iommu_unmap_unpin_all(iommu);
+>> +	vfio_unmap_reserved(iommu);
+> 
+> If we call vfio_unmap_reserved() here, then why does vfio_remove_dma()
+> need to handle reserved entries?  We might as well have a separate
+> vfio_remove_reserved_dma().
+> 
+>>  
+>>  	list_for_each_entry_safe(domain, domain_tmp,
+>>  				 &iommu->domain_list, next) {
+>> @@ -1020,7 +1147,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>>  	} else if (cmd == VFIO_IOMMU_MAP_DMA) {
+>>  		struct vfio_iommu_type1_dma_map map;
+>>  		uint32_t mask = VFIO_DMA_MAP_FLAG_READ |
+>> -				VFIO_DMA_MAP_FLAG_WRITE;
+>> +				VFIO_DMA_MAP_FLAG_WRITE |
+>> +				VFIO_DMA_MAP_FLAG_MSI_RESERVED_IOVA;
+>>  
+>>  		minsz = offsetofend(struct vfio_iommu_type1_dma_map, size);
+>>  
+>> @@ -1030,6 +1158,9 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>>  		if (map.argsz < minsz || map.flags & ~mask)
+>>  			return -EINVAL;
+>>  
+>> +		if (map.flags & VFIO_DMA_MAP_FLAG_MSI_RESERVED_IOVA)
+>> +			return vfio_register_reserved_iova_range(iommu, &map);
+>> +
+>>  		return vfio_dma_do_map(iommu, &map);
+>>  
+>>  	} else if (cmd == VFIO_IOMMU_UNMAP_DMA) {
+>> @@ -1044,10 +1175,16 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>>  		if (unmap.argsz < minsz || unmap.flags)
+>>  			return -EINVAL;
+>>  
+>> +		if (unmap.flags & VFIO_DMA_MAP_FLAG_MSI_RESERVED_IOVA) {
+>> +			vfio_unregister_reserved_iova_range(iommu, &unmap);
+>> +			goto out;
+>> +		}
+>> +
+>>  		ret = vfio_dma_do_unmap(iommu, &unmap);
+>>  		if (ret)
+>>  			return ret;
+>>  
+>> +out:
+>>  		return copy_to_user((void __user *)arg, &unmap, minsz) ?
+>>  			-EFAULT : 0;
+>>  	}
+>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>> index 255a211..a49be8a 100644
+>> --- a/include/uapi/linux/vfio.h
+>> +++ b/include/uapi/linux/vfio.h
+>> @@ -498,12 +498,21 @@ struct vfio_iommu_type1_info {
+>>   *
+>>   * Map process virtual addresses to IO virtual addresses using the
+>>   * provided struct vfio_dma_map. Caller sets argsz. READ &/ WRITE required.
+>> + *
+>> + * In case MSI_RESERVED_IOVA flag is set, the API only aims at registering an
+>> + * IOVA region which will be used on some platforms to map the host MSI frame.
+>> + * in that specific case, vaddr and prot are ignored. The requirement for
+>> + * provisioning such IOVA range can be checked by calling VFIO_IOMMU_GET_INFO
+>> + * with the VFIO_IOMMU_INFO_REQUIRE_MSI_MAP attribute. A single
+>> + * MSI_RESERVED_IOVA region can be registered
+>>   */
+> 
+> Why do we ignore read/write flags?  I'm not sure how useful a read-only
+> reserved region might be, but certainly some platforms might support
+> write-only or read-write.  Isn't this something we should let the IOMMU
+> driver decide?  ie. pass it down and let it fail or not?
+OK Makes sense. Actually I am not very clear about whether this API is
+used for MSI binding only or likely to be used for something else.
 
-I added iommu_unmap_reserved to handle the case where the userspace
-registers a reserved iova domain and fails to unregister it. In that
-case one need to handle the cleanup on kernel-side and I chose to
-implement this on vfio_iommu_type1 release. All the reserved IOMMU
-bindings get destroyed on that event.
-
-Any advice to handle this situation?
+  Also why are
+> we making it the API spec to only allow a single reserved region of
+> this type?  We could simply let additional ones fail, or better yet add
+> a capability to the info ioctl to indicate the number available and
+> then fail if the user exceeds it.
+But this means that underneath we need to manage several iova_domains,
+right?
+> 
+>>  struct vfio_iommu_type1_dma_map {
+>>  	__u32	argsz;
+>>  	__u32	flags;
+>>  #define VFIO_DMA_MAP_FLAG_READ (1 << 0)		/* readable from device */
+>>  #define VFIO_DMA_MAP_FLAG_WRITE (1 << 1)	/* writable from device */
+>> +/* reserved iova for MSI vectors*/
+>> +#define VFIO_DMA_MAP_FLAG_MSI_RESERVED_IOVA (1 << 2)
+> 
+> nit, ...RESERVED_MSI_IOVA makes a tad more sense and if we add new
+> reserved flags seems like it puts the precedence in order.
+OK
+> 
+>>  	__u64	vaddr;				/* Process virtual address */
+>>  	__u64	iova;				/* IO virtual address */
+>>  	__u64	size;				/* Size of mapping (bytes) */
+>> @@ -519,7 +528,8 @@ struct vfio_iommu_type1_dma_map {
+>>   * Caller sets argsz.  The actual unmapped size is returned in the size
+>>   * field.  No guarantee is made to the user that arbitrary unmaps of iova
+>>   * or size different from those used in the original mapping call will
+>> - * succeed.
+>> + * succeed. A Reserved DMA region must be unmapped with MSI_RESERVED_IOVA
+>> + * flag set.
+> 
+> So map/unmap become bi-modal, with this flag set they should only
+> operate on reserved entries, otherwise they should operate on legacy
+> entries.  So clearly as a user I should be able to continue doing an
+> unmap from 0-(-1) of legacy entries and not stumble over reserved
+> entries.  Thanks,
+OK that's clear
 
 Best Regards
 
 Eric
-
 > 
 > Alex
->  
->> Currently reserved IOVAs are meant to map MSI physical doorbells. A single
->> reserved domain does exit per domain.
->>
->> Also a new domain attribute is introduced to signal whether the MSI
->> addresses must be mapped in the IOMMU
->>
->> VFIO subsystem is supposed to create/destroy the iommu reserved domain.
->>
->> When the MSI sub-system is about to handle an MSI physical address
->> that needs to be bound, it uses the dma-reserved_iommu API to map/unmap
->> the address. Since several drivers are likely to use the same doorbell,
->> a reference counting must exist on the bindings. An RB-tree indexed by PA
->> is used.
->>
->> More details & context can be found at:
->> http://www.linaro.org/blog/core-dump/kvm-pciemsi-passthrough-armarm64/
->>
->> Best Regards
->>
->> Eric
->>
->> Git: complete series available at
->> https://git.linaro.org/people/eric.auger/linux.git/shortlog/refs/heads/v4.6-rc1-pcie-passthrough-v6
->>
->> History:
->>
->> RFC v5 -> patch v6:
->> - split to ease the review process
->> - in dma-reserved-api use a spin lock instead of a mutex (reported by
->>   Jean-Philippe)
->> - revisit iommu_get_reserved_iova API to pass a size parameter upon
->>   Marc's request
->> - Consistently use the page order passed when creating the iova domain.
->> - init reserved_binding_list (reported by Julien)
->>
->> RFC v4 -> RFC v5:
->> - take into account Thomas' comments on MSI related patches
->>   - split "msi: IOMMU map the doorbell address when needed"
->>   - increase readability and add comments
->>   - fix style issues
->>  - split "iommu: Add DOMAIN_ATTR_MSI_MAPPING attribute"
->>  - platform ITS now advertises IOMMU_CAP_INTR_REMAP
->>  - fix compilation issue with CONFIG_IOMMU API unset
->>  - arm-smmu-v3 now advertises DOMAIN_ATTR_MSI_MAPPING
->>
->> RFC v3 -> v4:
->> - Move doorbell mapping/unmapping in msi.c
->> - fix ref count issue on set_affinity: in case of a change in the address
->>   the previous address is decremented
->> - doorbell map/unmap now is done on msi composition. Should allow the use
->>   case for platform MSI controllers
->> - create dma-reserved-iommu.h/c exposing/implementing a new API dedicated
->>   to reserved IOVA management (looking like dma-iommu glue)
->> - series reordering to ease the review:
->>   - first part is related to IOMMU
->>   - second related to MSI sub-system
->>   - third related to VFIO (except arm-smmu IOMMU_CAP_INTR_REMAP removal)
->> - expose the number of requested IOVA pages through VFIO_IOMMU_GET_INFO
->>   [this partially addresses Marc's comments on iommu_get/put_single_reserved
->>    size/alignment problematic - which I did not ignore - but I don't know
->>    how much I can do at the moment]
->>
->> RFC v2 -> RFC v3:
->> - should fix wrong handling of some CONFIG combinations:
->>   CONFIG_IOVA, CONFIG_IOMMU_API, CONFIG_PCI_MSI_IRQ_DOMAIN
->> - fix MSI_FLAG_IRQ_REMAPPING setting in GICv3 ITS (although not tested)
->>
->> PATCH v1 -> RFC v2:
->> - reverted to RFC since it looks more reasonable ;-) the code is split
->>   between VFIO, IOMMU, MSI controller and I am not sure I did the right
->>   choices. Also API need to be further discussed.
->> - iova API usage in arm-smmu.c.
->> - MSI controller natively programs the MSI addr with either the PA or IOVA.
->>   This is not done anymore in vfio-pci driver as suggested by Alex.
->> - check irq remapping capability of the group
->>
->> RFC v1 [2] -> PATCH v1:
->> - use the existing dma map/unmap ioctl interface with a flag to register a
->>   reserved IOVA range. Use the legacy Rb to store this special vfio_dma.
->> - a single reserved IOVA contiguous region now is allowed
->> - use of an RB tree indexed by PA to store allocated reserved slots
->> - use of a vfio_domain iova_domain to manage iova allocation within the
->>   window provided by the userspace
->> - vfio alloc_map/unmap_free take a vfio_group handle
->> - vfio_group handle is cached in vfio_pci_device
->> - add ref counting to bindings
->> - user modality enabled at the end of the series
->>
->>
->> Eric Auger (7):
->>   iommu: Add DOMAIN_ATTR_MSI_MAPPING attribute
->>   iommu/arm-smmu: advertise DOMAIN_ATTR_MSI_MAPPING attribute
->>   iommu: introduce a reserved iova cookie
->>   dma-reserved-iommu: alloc/free_reserved_iova_domain
->>   dma-reserved-iommu: reserved binding rb-tree and helpers
->>   dma-reserved-iommu: iommu_get/put_single_reserved
->>   dma-reserved-iommu: iommu_unmap_reserved
->>
->>  drivers/iommu/Kconfig              |   8 +
->>  drivers/iommu/Makefile             |   1 +
->>  drivers/iommu/arm-smmu-v3.c        |   2 +
->>  drivers/iommu/arm-smmu.c           |   2 +
->>  drivers/iommu/dma-reserved-iommu.c | 321 +++++++++++++++++++++++++++++++++++++
->>  drivers/iommu/iommu.c              |   2 +
->>  include/linux/dma-reserved-iommu.h |  80 +++++++++
->>  include/linux/iommu.h              |   7 +
->>  8 files changed, 423 insertions(+)
->>  create mode 100644 drivers/iommu/dma-reserved-iommu.c
->>  create mode 100644 include/linux/dma-reserved-iommu.h
->>
 > 
