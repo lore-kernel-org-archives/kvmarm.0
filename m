@@ -1,120 +1,283 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 03/12] KVM: arm64: Introduce new MMIO region for the
- ITS base address
-Date: Thu, 7 Apr 2016 14:44:45 +0100
-Message-ID: <5706644D.5020703@arm.com>
-References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
- <1458958450-19662-4-git-send-email-andre.przywara@arm.com>
+From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH v6 5/5] vfio/type1: return MSI mapping requirements with
+	VFIO_IOMMU_GET_INFO
+Date: Thu, 7 Apr 2016 15:44:51 +0200
+Message-ID: <57066453.4050300@linaro.org>
+References: <1459758611-2972-1-git-send-email-eric.auger@linaro.org>
+	<1459758611-2972-6-git-send-email-eric.auger@linaro.org>
+	<20160406163225.1cbadeb6@t450s.home>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D7E6540F90
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Apr 2016 09:43:26 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Cnpk0yspEGUy for <kvmarm@lists.cs.columbia.edu>;
- Thu,  7 Apr 2016 09:43:25 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B12D40BDA
- for <kvmarm@lists.cs.columbia.edu>; Thu,  7 Apr 2016 09:43:25 -0400 (EDT)
-In-Reply-To: <1458958450-19662-4-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20160406163225.1cbadeb6-1yVPhWWZRC1BDLzU/O5InQ@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: julien.grall-5wv7dgnIgG8@public.gmane.org, eric.auger-qxv4g6HH51o@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 26/03/16 02:14, Andre Przywara wrote:
-> The ARM GICv3 ITS controller requires a separate register frame to
-> cover ITS specific registers. Add a new VGIC address type and store
-> the address in a field in the vgic_dist structure.
-> Provide a function to check whether userland has provided the address,
-> so ITS functionality can be guarded by that check.
+On 04/07/2016 12:32 AM, Alex Williamson wrote:
+> On Mon,  4 Apr 2016 08:30:11 +0000
+> Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
->  Documentation/virtual/kvm/devices/arm-vgic.txt |  9 +++++++++
->  arch/arm64/include/uapi/asm/kvm.h              |  2 ++
->  include/kvm/vgic/vgic.h                        |  5 +++++
->  virt/kvm/arm/vgic/vgic.c                       | 10 ++++++++++
->  virt/kvm/arm/vgic/vgic_init.c                  |  1 +
->  virt/kvm/arm/vgic/vgic_kvm_device.c            |  7 +++++++
->  6 files changed, 34 insertions(+)
+>> This patch allows the user-space to know whether MSI addresses need to
+>> be mapped in the IOMMU. The user-space uses VFIO_IOMMU_GET_INFO ioctl and
+>> IOMMU_INFO_REQUIRE_MSI_MAP gets set if they need to.
+>>
+>> Also the number of IOMMU pages requested to map those is returned in
+>> msi_iova_pages field. User-space must use this information to allocate an
+>> IOVA contiguous region of size msi_iova_pages * ffs(iova_pgsizes) and pass
+>> it with VFIO_IOMMU_MAP_DMA iotcl (VFIO_DMA_MAP_FLAG_MSI_RESERVED_IOVA set).
+>>
+>> Signed-off-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+>>
+>> ---
+>>
+>> Currently it is assumed a single doorbell page is used per MSI controller.
+>> This is the case for known ARM MSI controllers (GICv2M, GICv3 ITS, ...).
+>> If an MSI controller were to expose more doorbells it could implement a
+>> new callback at irq_chip interface.
+>>
+>> v4 -> v5:
+>> - move msi_info and ret declaration within the conditional code
+>>
+>> v3 -> v4:
+>> - replace former vfio_domains_require_msi_mapping by
+>>   more complex computation of MSI mapping requirements, especially the
+>>   number of pages to be provided by the user-space.
+>> - reword patch title
+>>
+>> RFC v1 -> v1:
+>> - derived from
+>>   [RFC PATCH 3/6] vfio: Extend iommu-info to return MSIs automap state
+>> - renamed allow_msi_reconfig into require_msi_mapping
+>> - fixed VFIO_IOMMU_GET_INFO
+>> ---
+>>  drivers/vfio/vfio_iommu_type1.c | 147 ++++++++++++++++++++++++++++++++++++++++
+>>  include/uapi/linux/vfio.h       |   2 +
+>>  2 files changed, 149 insertions(+)
+>>
+>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>> index b330b81..f1def50 100644
+>> --- a/drivers/vfio/vfio_iommu_type1.c
+>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>> @@ -39,6 +39,7 @@
+>>  #include <linux/dma-reserved-iommu.h>
+>>  #include <linux/irqdomain.h>
+>>  #include <linux/msi.h>
+>> +#include <linux/irq.h>
+>>  
+>>  #define DRIVER_VERSION  "0.2"
+>>  #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>"
+>> @@ -95,6 +96,17 @@ struct vfio_group {
+>>  	struct list_head	next;
+>>  };
+>>  
+>> +struct vfio_irq_chip {
+>> +	struct list_head next;
+>> +	struct irq_chip *chip;
+>> +};
+>> +
+>> +struct vfio_msi_map_info {
+>> +	bool mapping_required;
+>> +	unsigned int iova_pages;
+>> +	struct list_head irq_chip_list;
+>> +};
+>> +
+>>  /*
+>>   * This code handles mapping and unmapping of user data buffers
+>>   * into DMA'ble space using the IOMMU
+>> @@ -267,6 +279,127 @@ static int vaddr_get_pfn(unsigned long vaddr, int prot, unsigned long *pfn)
+>>  	return ret;
+>>  }
+>>  
+>> +#if defined(CONFIG_GENERIC_MSI_IRQ_DOMAIN) && defined(CONFIG_IOMMU_DMA_RESERVED)
+>> +/**
+>> + * vfio_dev_compute_msi_map_info: augment MSI mapping info (@data) with
+>> + * the @dev device requirements.
+>> + *
+>> + * @dev: device handle
+>> + * @data: opaque pointing to a struct vfio_msi_map_info
+>> + *
+>> + * returns 0 upon success or -ENOMEM
+>> + */
+>> +static int vfio_dev_compute_msi_map_info(struct device *dev, void *data)
+>> +{
+>> +	struct irq_domain *domain;
+>> +	struct msi_domain_info *info;
+>> +	struct vfio_msi_map_info *msi_info = (struct vfio_msi_map_info *)data;
+>> +	struct irq_chip *chip;
+>> +	struct vfio_irq_chip *iter, *new;
+>> +
+>> +	domain = dev_get_msi_domain(dev);
+>> +	if (!domain)
+>> +		return 0;
+>> +
+>> +	/* Let's compute the needs for the MSI domain */
+>> +	info = msi_get_domain_info(domain);
+>> +	chip = info->chip;
+>> +	list_for_each_entry(iter, &msi_info->irq_chip_list, next) {
+>> +		if (iter->chip == chip)
+>> +			return 0;
+>> +	}
+>> +
+>> +	new = kzalloc(sizeof(*new), GFP_KERNEL);
+>> +	if (!new)
+>> +		return -ENOMEM;
+>> +
+>> +	new->chip = chip;
+>> +
+>> +	list_add(&new->next, &msi_info->irq_chip_list);
+>> +
+>> +	/*
+>> +	 * new irq_chip to be taken into account; we currently assume
+>> +	 * a single iova doorbell by irq chip requesting MSI mapping
+>> +	 */
+>> +	msi_info->iova_pages += 1;
+>> +	return 0;
+>> +}
+>> +
+>> +/**
+>> + * vfio_domain_compute_msi_map_info: compute MSI mapping requirements (@data)
+>> + * for vfio_domain @d
+>> + *
+>> + * @d: vfio domain handle
+>> + * @data: opaque pointing to a struct vfio_msi_map_info
+>> + *
+>> + * returns 0 upon success or -ENOMEM
+>> + */
+>> +static int vfio_domain_compute_msi_map_info(struct vfio_domain *d, void *data)
+>> +{
+>> +	int ret = 0;
+>> +	struct vfio_msi_map_info *msi_info = (struct vfio_msi_map_info *)data;
+>> +	struct vfio_irq_chip *iter, *tmp;
+>> +	struct vfio_group *g;
+>> +
+>> +	msi_info->iova_pages = 0;
+>> +	INIT_LIST_HEAD(&msi_info->irq_chip_list);
+>> +
+>> +	if (iommu_domain_get_attr(d->domain,
+>> +				   DOMAIN_ATTR_MSI_MAPPING, NULL))
+>> +		return 0;
+>> +	msi_info->mapping_required = true;
+>> +	list_for_each_entry(g, &d->group_list, next) {
+>> +		ret = iommu_group_for_each_dev(g->iommu_group, msi_info,
+>> +			   vfio_dev_compute_msi_map_info);
+>> +		if (ret)
+>> +			goto out;
+>> +	}
+>> +out:
+>> +	list_for_each_entry_safe(iter, tmp, &msi_info->irq_chip_list, next) {
+>> +		list_del(&iter->next);
+>> +		kfree(iter);
+>> +	}
+>> +	return ret;
+>> +}
+>> +
+>> +/**
+>> + * vfio_compute_msi_map_info: compute MSI mapping requirements
+>> + *
+>> + * Do some MSI addresses need to be mapped? IOMMU page size?
+>> + * Max number of IOVA pages needed by any domain to map MSI
+>> + *
+>> + * @iommu: iommu handle
+>> + * @info: msi map info handle
+>> + *
+>> + * returns 0 upon success or -ENOMEM
+>> + */
+>> +static int vfio_compute_msi_map_info(struct vfio_iommu *iommu,
+>> +				 struct vfio_msi_map_info *msi_info)
+>> +{
+>> +	int ret = 0;
+>> +	struct vfio_domain *d;
+>> +	unsigned long bitmap = ULONG_MAX;
+>> +	unsigned int iova_pages = 0;
+>> +
+>> +	msi_info->mapping_required = false;
+>> +
+>> +	mutex_lock(&iommu->lock);
+>> +	list_for_each_entry(d, &iommu->domain_list, next) {
+>> +		bitmap &= d->domain->ops->pgsize_bitmap;
+>> +		ret = vfio_domain_compute_msi_map_info(d, msi_info);
+>> +		if (ret)
+>> +			goto out;
+>> +		if (msi_info->iova_pages > iova_pages)
+>> +			iova_pages = msi_info->iova_pages;
+>> +	}
+>> +out:
+>> +	msi_info->iova_pages = iova_pages;
+>> +	mutex_unlock(&iommu->lock);
+>> +	return ret;
+>> +}
+>> +
+>> +#endif
+>> +
+>>  /*
+>>   * Attempt to pin pages.  We really don't want to track all the pfns and
+>>   * the iommu can only map chunks of consecutive pfns anyway, so get the
+>> @@ -1179,6 +1312,20 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+>>  
+>>  		info.flags = VFIO_IOMMU_INFO_PGSIZES;
+>>  
+>> +#if defined(CONFIG_GENERIC_MSI_IRQ_DOMAIN) && defined(CONFIG_IOMMU_DMA_RESERVED)
+>> +		{
+>> +			struct vfio_msi_map_info msi_info;
+>> +			int ret;
+>> +
+>> +			ret = vfio_compute_msi_map_info(iommu, &msi_info);
+>> +			if (ret)
+>> +				return ret;
+>> +
+>> +			if (msi_info.mapping_required)
+>> +				info.flags |= VFIO_IOMMU_INFO_REQUIRE_MSI_MAP;
+>> +			info.msi_iova_pages = msi_info.iova_pages;
+>> +		}
+>> +#endif
+>>  		info.iova_pgsizes = vfio_pgsize_bitmap(iommu);
+>>  
+>>  		return copy_to_user((void __user *)arg, &info, minsz) ?
+>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>> index a49be8a..e3e501c 100644
+>> --- a/include/uapi/linux/vfio.h
+>> +++ b/include/uapi/linux/vfio.h
+>> @@ -488,7 +488,9 @@ struct vfio_iommu_type1_info {
+>>  	__u32	argsz;
+>>  	__u32	flags;
+>>  #define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info */
+>> +#define VFIO_IOMMU_INFO_REQUIRE_MSI_MAP (1 << 1)/* MSI must be mapped */
+>>  	__u64	iova_pgsizes;		/* Bitmap of supported page sizes */
+>> +	__u32   msi_iova_pages;	/* number of IOVA pages needed to map MSIs */
+>>  };
+>>  
+>>  #define VFIO_IOMMU_GET_INFO _IO(VFIO_TYPE, VFIO_BASE + 12)
 > 
-> diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
-> index 59541d4..087e2d9 100644
-> --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
-> +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
-> @@ -39,6 +39,15 @@ Groups:
->        Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
->        This address needs to be 64K aligned.
->  
-> +    KVM_VGIC_V3_ADDR_TYPE_ITS (rw, 64-bit)
-> +      Base address in the guest physical address space of the GICv3 ITS
-> +      control register frame. The ITS allows MSI(-X) interrupts to be
-> +      injected into guests. This extension is optional, if the kernel
-> +      does not support the ITS, the call returns -ENODEV.
-> +      This memory is solely for the guest to access the ITS control
-> +      registers and does not cover the ITS translation register.
-> +      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
-> +      This address needs to be 64K aligned and the region covers 64 KByte.
->  
->    KVM_DEV_ARM_VGIC_GRP_DIST_REGS
->    Attributes:
-> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> index f209ea1..c2b257d 100644
-> --- a/arch/arm64/include/uapi/asm/kvm.h
-> +++ b/arch/arm64/include/uapi/asm/kvm.h
-> @@ -87,9 +87,11 @@ struct kvm_regs {
->  /* Supported VGICv3 address types  */
->  #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
->  #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
-> +#define KVM_VGIC_V3_ADDR_TYPE_ITS	4
->  
->  #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
->  #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
-> +#define KVM_VGIC_V3_ITS_SIZE		SZ_64K
->  
->  #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
->  #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
-> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-> index 7c1d145..11344e6 100644
-> --- a/include/kvm/vgic/vgic.h
-> +++ b/include/kvm/vgic/vgic.h
-> @@ -135,6 +135,9 @@ struct vgic_dist {
->  		gpa_t			vgic_redist_base;
->  	};
->  
-> +	/* The base address of the ITS control register frame */
-> +	gpa_t			vgic_its_base;
-> +
+> Take a look at the capability chain extensions I used for adding some
+> new capabilities for vfio regions and let me know why we shouldn't do
+> something similar for this info ioctl.  A fixed structure gets messy
+> almost instantly when we start adding new fields to it.  Thanks,
 
-This makes me cringe a bit. The ITS is not part of the distributor, so
-having it in vgic_dist is a bit weird. But maybe it is vgic_dist that
-has the wrong name, and it is really a bag of vgic-related information.
+Ok
 
-But my real worry is that this (and the code below) only allows a single
-ITS per VM. Is it really what we want? I would have thought that using
-the KVM IO bus abstraction would have given us the flexibility of adding
-ITSs at will (all sharing the same LPI space).
+Thank you for your time
 
-The reason this is important is that we could want an ITS serving
-emulated devices, and one doing direct interrupt injection (once we have
-GICv4 support).
+Best Regards
 
-Thoughts?
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Eric
+> 
+> Alex
+> 
+> c84982a vfio: Define capability chains
+> d7a8d5e vfio: Add capability chain helpers
+> ff63eb6 vfio: Define sparse mmap capability for regions
+> 188ad9d vfio/pci: Include sparse mmap capability for MSI-X table regions
+> c7bb4cb vfio: Define device specific region type capability
+> 28541d4 vfio/pci: Add infrastructure for additional device specific regions
+> 
