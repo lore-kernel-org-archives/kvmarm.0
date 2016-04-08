@@ -1,27 +1,26 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 17/17] arm64: kvm: Add support for 16K pages
-Date: Fri, 8 Apr 2016 17:13:22 +0200
-Message-ID: <20160408151322.GA8961@cbox>
+Subject: Re: [PATCH 00/17] kvm-arm: Add stage2 page table walker
+Date: Fri, 8 Apr 2016 17:15:01 +0200
+Message-ID: <20160408151501.GB8961@cbox>
 References: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
- <1459787177-12767-18-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FC90407AD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 11:11:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D7AFB40F90
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 11:13:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Y1n1q97fz-i8 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Apr 2016 11:11:44 -0400 (EDT)
-Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 43E90407A5
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 11:11:43 -0400 (EDT)
-Received: by mail-wm0-f51.google.com with SMTP id u206so26454950wme.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2016 08:13:10 -0700 (PDT)
+ with ESMTP id abrPwmW4w5kJ for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Apr 2016 11:13:22 -0400 (EDT)
+Received: from mail-wm0-f45.google.com (mail-wm0-f45.google.com [74.125.82.45])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E9131407A5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 11:13:21 -0400 (EDT)
+Received: by mail-wm0-f45.google.com with SMTP id l6so68618778wml.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2016 08:14:48 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1459787177-12767-18-git-send-email-suzuki.poulose@arm.com>
+In-Reply-To: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -35,71 +34,49 @@ To: Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Apr 04, 2016 at 05:26:17PM +0100, Suzuki K Poulose wrote:
-> Now that we can handle stage-2 page tables independent
-> of the host page table levels, wire up the 16K page
-> support.
+Hi Suzuki,
+
+On Mon, Apr 04, 2016 at 05:26:00PM +0100, Suzuki K Poulose wrote:
+> This series adds support for stage2 page table helpers and makes
+> the core kvm-arm MMU code make use of it. At the moment we assume
+> that the host/hyp and the stage2 page tables have same number of
+> levels and hence use the host level accessors (except for some
+> hooks, e.g kvm_p.d_addr_end) and shares the routines for unmapping
+> the page table ranges.
 > 
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_arm.h |   11 ++++++++++-
->  arch/arm64/kvm/Kconfig           |    1 -
->  2 files changed, 10 insertions(+), 2 deletions(-)
+> On arm32, the only change w.r.t the page tables is dealing
+> with > 32bit physical addresses.
 > 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index d5d5fdf..3d830a3 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -114,6 +114,7 @@
->  #define VTCR_EL2_PS_MASK	TCR_EL2_PS_MASK
->  #define VTCR_EL2_TG0_MASK	TCR_TG0_MASK
->  #define VTCR_EL2_TG0_4K		TCR_TG0_4K
-> +#define VTCR_EL2_TG0_16K	TCR_TG0_16K
->  #define VTCR_EL2_TG0_64K	TCR_TG0_64K
->  #define VTCR_EL2_SH0_MASK	TCR_SH0_MASK
->  #define VTCR_EL2_SH0_INNER	TCR_SH0_INNER
-> @@ -139,7 +140,7 @@
->   * (see hyp-init.S).
->   *
->   * Note that when using 4K pages, we concatenate two first level page tables
-> - * together.
-> + * together. With 16K pages, we concatenate 16 first level page tables.
->   *
->   * The magic numbers used for VTTBR_X in this patch can be found in Tables
->   * D4-23 and D4-25 in ARM DDI 0487A.b.
-> @@ -156,6 +157,14 @@
->   */
->  #define VTCR_EL2_TGRAN_FLAGS	(VTCR_EL2_TG0_64K | VTCR_EL2_SL0_LVL1)
->  #define VTTBR_X_TGRAN_MAGIC		38
-> +#elif defined(CONFIG_ARM64_16K_PAGES)
-> +/*
-> + * Stage2 translation configuration:
-> + * 16kB pages (TG0 = 2)
-> + * 2 level page tables (SL = 1)
-> + */
-> +#define VTCR_EL2_TGRAN_FLAGS	(VTCR_EL2_TG0_16K | VTCR_EL2_SL0_LVL1)
-> +#define VTTBR_X_TGRAN_MAGIC	42
->  #else
->  /*
->   * Stage2 translation configuration:
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index de7450d..aa2e34e 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -22,7 +22,6 @@ config KVM_ARM_VGIC_V3
->  config KVM
->  	bool "Kernel-based Virtual Machine (KVM) support"
->  	depends on OF
-> -	depends on !ARM64_16K_PAGES
->  	select MMU_NOTIFIER
->  	select PREEMPT_NOTIFIERS
->  	select ANON_INODES
-> -- 
-> 1.7.9.5
+> However on arm64, the hardware supports concatenation of tables (upto 16)
+> at the entry level, which could affect :
+>  1) number of entries in the PGD table (upto 16 * PTRS_PER_PTE)
+>  2) number of page table levels (reduced number of page table levels).
+> 
+> Also depending on the VA_BITS for the host kernel, the number of page table
+> levels for both host and stage2(40bit IPA) could differ. At present, we insert
+> (upto) one fake software page table(as the hardware is not aware of it and is
+> only used by the OS to walk the table) level to bring the number of levels to
+> that of the host/hyp table. However, with 16K + 48bit, and 40bit IPA, we could
+> end up in 2 fake levels, which complicates the code.
+> 
+> This series introduces explicit stage2 page table helpers and also defines
+> separate set of routines for unmapping hyp and stage2 tables.
+> 
+> On arm64 stage2 page table helpers are defined based on the number of levels
+> required to map the IPA bits. See patch 15 for more details.
+> 
+> Tested on TC2 (arm32), Fast models(with VHE) and real hardwares.
 > 
 
-Looks so easy now :)
+This looks pretty good overall.  Could you rebase it on kvmarm/master
+where Marc addressed the 36 bits PA size of the foundation model and
+have a look at the interactions there?
 
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+If we can solve that bit and address the cosmetic issues I had in this
+series, then I think we can queue this real soon.
+
+Thanks a lot for going the extra mile on this with rewriting the whole
+KVM page table handling!
+
+Best,
+-Christoffer
