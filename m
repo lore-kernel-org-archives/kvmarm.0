@@ -1,25 +1,27 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH 12/17] kvm-arm: Add explicit hyp page table modifiers
-Date: Fri, 8 Apr 2016 16:09:11 +0100
-Message-ID: <5707C997.3030304@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH 17/17] arm64: kvm: Add support for 16K pages
+Date: Fri, 8 Apr 2016 17:13:22 +0200
+Message-ID: <20160408151322.GA8961@cbox>
 References: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
- <1459787177-12767-13-git-send-email-suzuki.poulose@arm.com>
- <20160408131537.GR8961@cbox>
+ <1459787177-12767-18-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A0EE40BDA
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 11:07:48 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4FC90407AD
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 11:11:45 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fGg5qjL1omDw for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Apr 2016 11:07:47 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5428B407AD
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 11:07:46 -0400 (EDT)
-In-Reply-To: <20160408131537.GR8961@cbox>
+ with ESMTP id Y1n1q97fz-i8 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Apr 2016 11:11:44 -0400 (EDT)
+Received: from mail-wm0-f51.google.com (mail-wm0-f51.google.com [74.125.82.51])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 43E90407A5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 11:11:43 -0400 (EDT)
+Received: by mail-wm0-f51.google.com with SMTP id u206so26454950wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2016 08:13:10 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1459787177-12767-18-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,192 +31,75 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/04/16 14:15, Christoffer Dall wrote:
-> On Mon, Apr 04, 2016 at 05:26:12PM +0100, Suzuki K Poulose wrote:
->> We have common routines to modify hyp and stage2 page tables
->> based on the 'kvm' parameter. For a smoother transition to
->> using separate routines for each, duplicate the routines
->> and modify the copy to work on hyp.
->>
->> Marks the forked routines with _hyp_ and gets rid of the
->> kvm parameter which is no longer needed and is NULL for hyp.
->> Also, gets rid of calls to kvm_tlb_flush_by_vmid_ipa() calls
->> from the hyp versions. Uses explicit host page table accessors
->> instead of the kvm_* page table helpers.
->>
->> Suggested-by: Christoffer Dall <christoffer.dall@linaro.org>
->> Cc: Marc Zyngier <marc.zyngier@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> ---
->>  arch/arm/kvm/mmu.c |  123 +++++++++++++++++++++++++++++++++++++++++++++++++---
->>  1 file changed, 118 insertions(+), 5 deletions(-)
->>
->> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
->> index b46a337..2b491e5 100644
->> --- a/arch/arm/kvm/mmu.c
->> +++ b/arch/arm/kvm/mmu.c
->> @@ -388,6 +388,119 @@ static void stage2_flush_vm(struct kvm *kvm)
->>  	srcu_read_unlock(&kvm->srcu, idx);
->>  }
->>  
->> +static void clear_hyp_pgd_entry(pgd_t *pgd)
->> +{
->> +	pud_t *pud_table __maybe_unused = pud_offset(pgd, 0UL);
->> +	pgd_clear(pgd);
->> +	pud_free(NULL, pud_table);
->> +	put_page(virt_to_page(pgd));
->> +}
->> +
->> +static void clear_hyp_pud_entry(pud_t *pud)
->> +{
->> +	pmd_t *pmd_table __maybe_unused = pmd_offset(pud, 0);
->> +	VM_BUG_ON(pud_huge(*pud));
->> +	pud_clear(pud);
->> +	pmd_free(NULL, pmd_table);
->> +	put_page(virt_to_page(pud));
->> +}
->> +
->> +static void clear_hyp_pmd_entry(pmd_t *pmd)
->> +{
->> +	pte_t *pte_table = pte_offset_kernel(pmd, 0);
->> +	VM_BUG_ON(pmd_thp_or_huge(*pmd));
->> +	pmd_clear(pmd);
->> +	pte_free_kernel(NULL, pte_table);
->> +	put_page(virt_to_page(pmd));
->> +}
->> +
->> +static void unmap_hyp_ptes(pmd_t *pmd, phys_addr_t addr, phys_addr_t end)
->> +{
->> +	pte_t *pte, *start_pte;
->> +
->> +	start_pte = pte = pte_offset_kernel(pmd, addr);
->> +	do {
->> +		if (!pte_none(*pte)) {
->> +			pte_t old_pte = *pte;
->> +
->> +			kvm_set_pte(pte, __pte(0));
->> +
->> +			/* XXX: Do we need to invalidate the cache for device mappings ? */
+On Mon, Apr 04, 2016 at 05:26:17PM +0100, Suzuki K Poulose wrote:
+> Now that we can handle stage-2 page tables independent
+> of the host page table levels, wire up the 16K page
+> support.
 > 
-> no, we will not be swapping out any pages mapped in Hyp mode so you can
-> get rid of both of the following two lines.
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_arm.h |   11 ++++++++++-
+>  arch/arm64/kvm/Kconfig           |    1 -
+>  2 files changed, 10 insertions(+), 2 deletions(-)
 > 
->> +			if (!kvm_is_device_pfn(pte_pfn(old_pte)))
->> +				kvm_flush_dcache_pte(old_pte);
->> +
->> +			put_page(virt_to_page(pte));
->> +		}
->> +	} while (pte++, addr += PAGE_SIZE, addr != end);
->> +
->> +	if (hyp_pte_table_empty(start_pte))
->> +		clear_hyp_pmd_entry(pmd);
->> +}
->> +
->> +static void unmap_hyp_pmds(pud_t *pud, phys_addr_t addr, phys_addr_t end)
->> +{
->> +	phys_addr_t next;
->> +	pmd_t *pmd, *start_pmd;
->> +
->> +	start_pmd = pmd = pmd_offset(pud, addr);
->> +	do {
->> +		next = pmd_addr_end(addr, end);
->> +		if (!pmd_none(*pmd)) {
->> +			if (pmd_thp_or_huge(*pmd)) {
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index d5d5fdf..3d830a3 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -114,6 +114,7 @@
+>  #define VTCR_EL2_PS_MASK	TCR_EL2_PS_MASK
+>  #define VTCR_EL2_TG0_MASK	TCR_TG0_MASK
+>  #define VTCR_EL2_TG0_4K		TCR_TG0_4K
+> +#define VTCR_EL2_TG0_16K	TCR_TG0_16K
+>  #define VTCR_EL2_TG0_64K	TCR_TG0_64K
+>  #define VTCR_EL2_SH0_MASK	TCR_SH0_MASK
+>  #define VTCR_EL2_SH0_INNER	TCR_SH0_INNER
+> @@ -139,7 +140,7 @@
+>   * (see hyp-init.S).
+>   *
+>   * Note that when using 4K pages, we concatenate two first level page tables
+> - * together.
+> + * together. With 16K pages, we concatenate 16 first level page tables.
+>   *
+>   * The magic numbers used for VTTBR_X in this patch can be found in Tables
+>   * D4-23 and D4-25 in ARM DDI 0487A.b.
+> @@ -156,6 +157,14 @@
+>   */
+>  #define VTCR_EL2_TGRAN_FLAGS	(VTCR_EL2_TG0_64K | VTCR_EL2_SL0_LVL1)
+>  #define VTTBR_X_TGRAN_MAGIC		38
+> +#elif defined(CONFIG_ARM64_16K_PAGES)
+> +/*
+> + * Stage2 translation configuration:
+> + * 16kB pages (TG0 = 2)
+> + * 2 level page tables (SL = 1)
+> + */
+> +#define VTCR_EL2_TGRAN_FLAGS	(VTCR_EL2_TG0_16K | VTCR_EL2_SL0_LVL1)
+> +#define VTTBR_X_TGRAN_MAGIC	42
+>  #else
+>  /*
+>   * Stage2 translation configuration:
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index de7450d..aa2e34e 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -22,7 +22,6 @@ config KVM_ARM_VGIC_V3
+>  config KVM
+>  	bool "Kernel-based Virtual Machine (KVM) support"
+>  	depends on OF
+> -	depends on !ARM64_16K_PAGES
+>  	select MMU_NOTIFIER
+>  	select PREEMPT_NOTIFIERS
+>  	select ANON_INODES
+> -- 
+> 1.7.9.5
 > 
-> do we ever actually map anything with section mappings in the Hyp
-> mappings?
 
-No, this is purely a page mapping so far. On my system, the HYP text is
-just over 4 pages big (4k pages), so the incentive is pretty low, unless
-we can demonstrate some big gains due to the reduced TLB impact.
+Looks so easy now :)
 
->> +				pmd_t old_pmd = *pmd;
->> +
->> +				pmd_clear(pmd);
->> +				kvm_flush_dcache_pmd(old_pmd);
->> +				put_page(virt_to_page(pmd));
->> +			} else {
->> +				unmap_hyp_ptes(pmd, addr, next);
->> +			}
->> +		}
->> +	} while (pmd++, addr = next, addr != end);
->> +
->> +	if (hyp_pmd_table_empty(start_pmd))
->> +		clear_hyp_pud_entry(pud);
->> +}
->> +
->> +static void unmap_hyp_puds(pgd_t *pgd, phys_addr_t addr, phys_addr_t end)
->> +{
->> +	phys_addr_t next;
->> +	pud_t *pud, *start_pud;
->> +
->> +	start_pud = pud = pud_offset(pgd, addr);
->> +	do {
->> +		next = pud_addr_end(addr, end);
->> +		if (!pud_none(*pud)) {
->> +			if (pud_huge(*pud)) {
-> 
-> do we ever actually map anything with huge pud
-> mappings for the Hyp space?
-
-Same thing. Looks like there is some potential simplification here.
-
-> 
->> +				pud_t old_pud = *pud;
->> +
->> +				pud_clear(pud);
->> +				kvm_flush_dcache_pud(old_pud);
->> +				put_page(virt_to_page(pud));
->> +			} else {
->> +				unmap_hyp_pmds(pud, addr, next);
->> +			}
->> +		}
->> +	} while (pud++, addr = next, addr != end);
->> +
->> +	if (hyp_pud_table_empty(start_pud))
->> +		clear_hyp_pgd_entry(pgd);
->> +}
->> +
->> +static void unmap_hyp_range(pgd_t *pgdp, phys_addr_t start, u64 size)
->> +{
->> +	pgd_t *pgd;
->> +	phys_addr_t addr = start, end = start + size;
->> +	phys_addr_t next;
->> +
->> +	pgd = pgdp + pgd_index(addr);
->> +	do {
->> +		next = pgd_addr_end(addr, end);
->> +		if (!pgd_none(*pgd))
->> +			unmap_hyp_puds(pgd, addr, next);
->> +	} while (pgd++, addr = next, addr != end);
-> 
-> shouldn't we flush the EL2 (hyp) TLB here, strictly speaking?
-> 
-> Or do we rely on all mappings ever created/torn down here to always have
-> the same VA/PA relationship?  Since we didn't flush the EL2 TLB in the
-> existing code, that indeed does seem to be the case.
-
-Actually, we never unmap anything from HYP. Once a structure (kvm, vcpu)
-is mapped there, it stays forever, whatever happens to the VM (that's
-because we'd otherwise have to refcount the number of objects in a page,
-and I'm lazy...).
-
-> That, in turn, raises the question why we don't simply map all pages
-> that could be referenced by a kmalloc() in Hyp mode during the init
-> phase and be done with all this hyp mapping/unmapping stuff?
-> 
-> In any case, that behavior doesn't have to change now, but if we don't
-> add a TLB flush here, I'd like a comment to explain why that's not
-> needed.
-
-Hope you have your answer above... ;-)
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny...
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
