@@ -1,25 +1,24 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH 07/17] kvm-arm: arm32: Introduce stage2 page table helpers
-Date: Fri, 8 Apr 2016 15:39:53 +0100
-Message-ID: <5707C2B9.1020000@arm.com>
-References: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
- <1459787177-12767-8-git-send-email-suzuki.poulose@arm.com>
- <20160408124332.GL8961@cbox>
+From: Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>
+Subject: Re: [PULL 0/4] KVM/ARM Fixes for v4.6-rc4
+Date: Fri, 8 Apr 2016 16:58:33 +0200
+Message-ID: <20160408145833.GA29193@potion.redhat.com>
+References: <1460109135-6612-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3D0EE409A2
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 10:38:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B6838407A5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 10:57:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id S76jTIUFbmEW for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Apr 2016 10:38:30 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0BB904053F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 10:38:29 -0400 (EDT)
-In-Reply-To: <20160408124332.GL8961@cbox>
+ with ESMTP id C4JkF7XB90Ds for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Apr 2016 10:57:11 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7D47E4053F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 10:57:11 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <1460109135-6612-1-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,51 +29,13 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 08/04/16 13:43, Christoffer Dall wrote:
-> On Mon, Apr 04, 2016 at 05:26:07PM +0100, Suzuki K Poulose wrote:
->> Define the page table helpers for walking the stage2 pagetable
->> for arm. Since both hyp and stage2 have the same number of levels,
->> as that of the host we reuse the host helpers.
->>
->> The exceptions are the p.d_addr_end routines which have to deal
->> with IPA > 32bit, hence we use the open coded version of their host helpers
->> which supports 64bit.
->>
+2016-04-08 11:52+0200, Christoffer Dall:
+> Hi Paolo and Radim,
+> 
+> Here's another set of fixes for KVM/ARM for this release.  I guess this was
+> expected given the size of our patch queue for this merge window.
 
-
->> +#ifndef __ARM_S2_PGTABLE_H_
->> +#define __ARM_S2_PGTABLE_H_
->> +
->> +#define stage2_pgd_none(pgd)				pgd_none(pgd)
->> +#define stage2_pgd_clear(pgd)				pgd_clear(pgd)
->> +#define stage2_pgd_present(pgd)				pgd_present(pgd)
->> +#define stage2_pgd_populate(mm, pgd, pud)		pgd_populate(mm, pgd, pud)
->> +#define stage2_pud_offset(pgd, address)			pud_offset(pgd, address)
->> +#define stage2_pud_free(mm, pud)			pud_free(mm, pud)
->> +
->> +#define stage2_pud_none(pud)				pud_none(pud)
->> +#define stage2_pud_clear(pud)				pud_clear(pud)
->> +#define stage2_pud_present(pud)				pud_present(pud)
->> +#define stage2_pud_populate(mm, pud, pmd)		pud_populate(mm, pud, pmd)
->> +#define stage2_pmd_offset(pud, address)			pmd_offset(pud, address)
->> +#define stage2_pmd_free(mm, pmd)			pmd_free(mm, pmd)
->> +
->> +#define stage2_pud_huge(pud)				pud_huge(pud)
->
-> could we get rid of the mm parameter to all these stage2_ versions above
-> and simply implement them with the generic functions passing NULL in the
-> definitions instead?
-
-We could, I retained it just to match the corresponding host version. Will change
-it in the next version.
-
->
-> Otherwise:
-> Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
-
-
-Thanks
-Suzuki
+Pulled, thanks.
