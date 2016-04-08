@@ -1,73 +1,246 @@
-From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
-Subject: Re: [PATCH v6 0/7] KVM PCIe/MSI passthrough on ARM/ARM64: kernel part
-	1/3: iommu changes
-Date: Fri, 8 Apr 2016 15:31:49 +0200
-Message-ID: <5707B2C5.5050008@linaro.org>
-References: <1459757222-2668-1-git-send-email-eric.auger@linaro.org>
-	<20160406171534.794c6824@t450s.home> <5706528B.2010906@linaro.org>
-	<20160407115001.25de7d1e@t450s.home>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH 13/17] kvm-arm: Add stage2 page table modifiers
+Date: Fri, 8 Apr 2016 15:42:57 +0200
+Message-ID: <20160408134257.GW8961@cbox>
+References: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
+ <1459787177-12767-14-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-In-Reply-To: <20160407115001.25de7d1e-1yVPhWWZRC1BDLzU/O5InQ@public.gmane.org>
-List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
-List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
-List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
-List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
-List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
-	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
-Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
-To: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
-Cc: julien.grall-5wv7dgnIgG8@public.gmane.org, eric.auger-qxv4g6HH51o@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 99945409A2
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 09:41:19 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id gL57DykG3myp for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Apr 2016 09:41:18 -0400 (EDT)
+Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 542294053F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 09:41:18 -0400 (EDT)
+Received: by mail-wm0-f49.google.com with SMTP id f198so65113208wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2016 06:42:45 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1459787177-12767-14-git-send-email-suzuki.poulose@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Alex,
-On 04/07/2016 07:50 PM, Alex Williamson wrote:
-> On Thu, 7 Apr 2016 14:28:59 +0200
-> Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
+On Mon, Apr 04, 2016 at 05:26:13PM +0100, Suzuki K Poulose wrote:
+> Now that the hyp page table is handled by different set of
+> routines, rename the original shared routines to stage2 handlers.
+> Also make explicit use of the stage2 page table helpers.
 > 
->> Hi Alex,
->> On 04/07/2016 01:15 AM, Alex Williamson wrote:
->>> On Mon,  4 Apr 2016 08:06:55 +0000
->>> Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
->>>   
->>>> This series introduces the dma-reserved-iommu api used to:
->>>> - create/destroy an iova domain dedicated to reserved iova bindings
->>>> - map/unmap physical addresses onto reserved IOVAs.
->>>> - unmap and destroy all IOVA reserved bindings  
->>>
->>> Why are we making the decision to have an unbalanced map vs unmap, we
->>> can create individual mappings, but only unmap the whole thing and
->>> start over?  That's a strange interface.  Thanks,  
->> The "individual" balanced unmap also exists (iommu_put_reserved_iova)
->> and this is the "normal" path. This happens on msi_domain_deactivate
->> (and possibly on msi_domain_set_affinity).
->>
->> I added iommu_unmap_reserved to handle the case where the userspace
->> registers a reserved iova domain and fails to unregister it. In that
->> case one need to handle the cleanup on kernel-side and I chose to
->> implement this on vfio_iommu_type1 release. All the reserved IOMMU
->> bindings get destroyed on that event.
->>
->> Any advice to handle this situation?
+> unmap_range has been merged to existing unmap_stage2_range.
 > 
-> If we want to model it similar to regular iommu domains, then
-> iommu_free_reserved_iova_domain() should release all the mappings and
-> destroy the iova domain.
-Yes this sounds obvious now.
-  Additionally, since the reserved iova domain
-> is just a construct on top of an iommu domain, it should be sufficient
-> to call iommu_domain_free() to also remove the reserved iova domain if
-> one exists.  Thanks,
-Yes. For dma cookie (iommu_put_dma_cookie) I see this is done from the
-iommu driver domain_free callback.
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+> ---
+>  arch/arm/kvm/mmu.c |   97 ++++++++++++++++++++++++----------------------------
+>  1 file changed, 44 insertions(+), 53 deletions(-)
+> 
+> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+> index 2b491e5..0009a24 100644
+> --- a/arch/arm/kvm/mmu.c
+> +++ b/arch/arm/kvm/mmu.c
+> @@ -152,26 +152,26 @@ static void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
+>  	return p;
+>  }
+>  
+> -static void clear_pgd_entry(struct kvm *kvm, pgd_t *pgd, phys_addr_t addr)
+> +static void clear_stage2_pgd_entry(struct kvm *kvm, pgd_t *pgd, phys_addr_t addr)
+>  {
+> -	pud_t *pud_table __maybe_unused = pud_offset(pgd, 0);
+> -	pgd_clear(pgd);
+> +	pud_t *pud_table __maybe_unused = stage2_pud_offset(pgd, 0UL);
+> +	stage2_pgd_clear(pgd);
+>  	kvm_tlb_flush_vmid_ipa(kvm, addr);
+> -	pud_free(NULL, pud_table);
+> +	stage2_pud_free(NULL, pud_table);
+>  	put_page(virt_to_page(pgd));
+>  }
+>  
+> -static void clear_pud_entry(struct kvm *kvm, pud_t *pud, phys_addr_t addr)
+> +static void clear_stage2_pud_entry(struct kvm *kvm, pud_t *pud, phys_addr_t addr)
+>  {
+> -	pmd_t *pmd_table = pmd_offset(pud, 0);
+> -	VM_BUG_ON(pud_huge(*pud));
+> -	pud_clear(pud);
+> +	pmd_t *pmd_table __maybe_unused = stage2_pmd_offset(pud, 0);
 
-Thanks
+The __maybe_unused are slightly ugly, so it may be nicer to create the
+stage2_pmd_free() as static inline's if they're defined to do nothing
+instead.
 
-Eric
+
+> +	VM_BUG_ON(stage2_pud_huge(*pud));
+> +	stage2_pud_clear(pud);
+>  	kvm_tlb_flush_vmid_ipa(kvm, addr);
+> -	pmd_free(NULL, pmd_table);
+> +	stage2_pmd_free(NULL, pmd_table);
+>  	put_page(virt_to_page(pud));
+>  }
+>  
+> -static void clear_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr)
+> +static void clear_stage2_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr)
+>  {
+>  	pte_t *pte_table = pte_offset_kernel(pmd, 0);
+>  	VM_BUG_ON(pmd_thp_or_huge(*pmd));
+> @@ -201,7 +201,7 @@ static void clear_pmd_entry(struct kvm *kvm, pmd_t *pmd, phys_addr_t addr)
+>   * the corresponding TLBs, we call kvm_flush_dcache_p*() to make sure
+>   * the IO subsystem will never hit in the cache.
+>   */
+> -static void unmap_ptes(struct kvm *kvm, pmd_t *pmd,
+> +static void unmap_stage2_ptes(struct kvm *kvm, pmd_t *pmd,
+>  		       phys_addr_t addr, phys_addr_t end)
+>  {
+>  	phys_addr_t start_addr = addr;
+> @@ -223,19 +223,19 @@ static void unmap_ptes(struct kvm *kvm, pmd_t *pmd,
+>  		}
+>  	} while (pte++, addr += PAGE_SIZE, addr != end);
+>  
+> -	if (kvm_pte_table_empty(kvm, start_pte))
+> -		clear_pmd_entry(kvm, pmd, start_addr);
+> +	if (stage2_pte_table_empty(start_pte))
+> +		clear_stage2_pmd_entry(kvm, pmd, start_addr);
+>  }
+>  
+> -static void unmap_pmds(struct kvm *kvm, pud_t *pud,
+> +static void unmap_stage2_pmds(struct kvm *kvm, pud_t *pud,
+>  		       phys_addr_t addr, phys_addr_t end)
+>  {
+>  	phys_addr_t next, start_addr = addr;
+>  	pmd_t *pmd, *start_pmd;
+>  
+> -	start_pmd = pmd = pmd_offset(pud, addr);
+> +	start_pmd = pmd = stage2_pmd_offset(pud, addr);
+>  	do {
+> -		next = kvm_pmd_addr_end(addr, end);
+> +		next = stage2_pmd_addr_end(addr, end);
+>  		if (!pmd_none(*pmd)) {
+>  			if (pmd_thp_or_huge(*pmd)) {
+>  				pmd_t old_pmd = *pmd;
+> @@ -247,57 +247,64 @@ static void unmap_pmds(struct kvm *kvm, pud_t *pud,
+>  
+>  				put_page(virt_to_page(pmd));
+>  			} else {
+> -				unmap_ptes(kvm, pmd, addr, next);
+> +				unmap_stage2_ptes(kvm, pmd, addr, next);
+>  			}
+>  		}
+>  	} while (pmd++, addr = next, addr != end);
+>  
+> -	if (kvm_pmd_table_empty(kvm, start_pmd))
+> -		clear_pud_entry(kvm, pud, start_addr);
+> +	if (stage2_pmd_table_empty(start_pmd))
+> +		clear_stage2_pud_entry(kvm, pud, start_addr);
+>  }
+>  
+> -static void unmap_puds(struct kvm *kvm, pgd_t *pgd,
+> +static void unmap_stage2_puds(struct kvm *kvm, pgd_t *pgd,
+>  		       phys_addr_t addr, phys_addr_t end)
+>  {
+>  	phys_addr_t next, start_addr = addr;
+>  	pud_t *pud, *start_pud;
+>  
+> -	start_pud = pud = pud_offset(pgd, addr);
+> +	start_pud = pud = stage2_pud_offset(pgd, addr);
+>  	do {
+> -		next = kvm_pud_addr_end(addr, end);
+> -		if (!pud_none(*pud)) {
+> -			if (pud_huge(*pud)) {
+> +		next = stage2_pud_addr_end(addr, end);
+> +		if (!stage2_pud_none(*pud)) {
+> +			if (stage2_pud_huge(*pud)) {
+>  				pud_t old_pud = *pud;
+>  
+> -				pud_clear(pud);
+> +				stage2_pud_clear(pud);
+>  				kvm_tlb_flush_vmid_ipa(kvm, addr);
+> -
+>  				kvm_flush_dcache_pud(old_pud);
+> -
+>  				put_page(virt_to_page(pud));
+>  			} else {
+> -				unmap_pmds(kvm, pud, addr, next);
+> +				unmap_stage2_pmds(kvm, pud, addr, next);
+>  			}
+>  		}
+>  	} while (pud++, addr = next, addr != end);
+>  
+> -	if (kvm_pud_table_empty(kvm, start_pud))
+> -		clear_pgd_entry(kvm, pgd, start_addr);
+> +	if (stage2_pud_table_empty(start_pud))
+> +		clear_stage2_pgd_entry(kvm, pgd, start_addr);
+>  }
+>  
+> -
+> -static void unmap_range(struct kvm *kvm, pgd_t *pgdp,
+> -			phys_addr_t start, u64 size)
+> +/**
+> + * unmap_stage2_range -- Clear stage2 page table entries to unmap a range
+> + * @kvm:   The VM pointer
+> + * @start: The intermediate physical base address of the range to unmap
+> + * @size:  The size of the area to unmap
+> + *
+> + * Clear a range of stage-2 mappings, lowering the various ref-counts.  Must
+> + * be called while holding mmu_lock (unless for freeing the stage2 pgd before
+> + * destroying the VM), otherwise another faulting VCPU may come in and mess
+> + * with things behind our backs.
+> + */
+> +static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
+>  {
+>  	pgd_t *pgd;
+>  	phys_addr_t addr = start, end = start + size;
+>  	phys_addr_t next;
+>  
+> -	pgd = pgdp + kvm_pgd_index(addr);
+> +	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
+>  	do {
+> -		next = kvm_pgd_addr_end(addr, end);
+> -		if (!pgd_none(*pgd))
+> -			unmap_puds(kvm, pgd, addr, next);
+> +		next = stage2_pgd_addr_end(addr, end);
+> +		if (!stage2_pgd_none(*pgd))
+> +			unmap_stage2_puds(kvm, pgd, addr, next);
+>  	} while (pgd++, addr = next, addr != end);
+>  }
+>  
+> @@ -811,22 +818,6 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
+>  	return 0;
+>  }
+>  
+> -/**
+> - * unmap_stage2_range -- Clear stage2 page table entries to unmap a range
+> - * @kvm:   The VM pointer
+> - * @start: The intermediate physical base address of the range to unmap
+> - * @size:  The size of the area to unmap
+> - *
+> - * Clear a range of stage-2 mappings, lowering the various ref-counts.  Must
+> - * be called while holding mmu_lock (unless for freeing the stage2 pgd before
+> - * destroying the VM), otherwise another faulting VCPU may come in and mess
+> - * with things behind our backs.
+> - */
+> -static void unmap_stage2_range(struct kvm *kvm, phys_addr_t start, u64 size)
+> -{
+> -	unmap_range(kvm, kvm->arch.pgd, start, size);
+> -}
+> -
+>  static void stage2_unmap_memslot(struct kvm *kvm,
+>  				 struct kvm_memory_slot *memslot)
+>  {
+> -- 
+> 1.7.9.5
 > 
-> Alex
-> 
+
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
