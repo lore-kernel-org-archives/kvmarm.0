@@ -1,47 +1,73 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 11/17] kvm-arm: Use explicit stage2 helper routines
-Date: Fri, 8 Apr 2016 15:16:05 +0200
-Message-ID: <20160408131605.GV8961@cbox>
-References: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
- <1459787177-12767-12-git-send-email-suzuki.poulose@arm.com>
+From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH v6 0/7] KVM PCIe/MSI passthrough on ARM/ARM64: kernel part
+	1/3: iommu changes
+Date: Fri, 8 Apr 2016 15:31:49 +0200
+Message-ID: <5707B2C5.5050008@linaro.org>
+References: <1459757222-2668-1-git-send-email-eric.auger@linaro.org>
+	<20160406171534.794c6824@t450s.home> <5706528B.2010906@linaro.org>
+	<20160407115001.25de7d1e@t450s.home>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7AA2840FA6
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 09:14:27 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id EoGKxkI2f17g for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Apr 2016 09:14:26 -0400 (EDT)
-Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 20C6A40B58
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 09:14:26 -0400 (EDT)
-Received: by mail-wm0-f54.google.com with SMTP id n3so22244176wmn.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2016 06:15:53 -0700 (PDT)
-Content-Disposition: inline
-In-Reply-To: <1459787177-12767-12-git-send-email-suzuki.poulose@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20160407115001.25de7d1e-1yVPhWWZRC1BDLzU/O5InQ@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: julien.grall-5wv7dgnIgG8@public.gmane.org, eric.auger-qxv4g6HH51o@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Apr 04, 2016 at 05:26:11PM +0100, Suzuki K Poulose wrote:
-> We have stage2 page table helpers for both arm and arm64. Switch to
-> the stage2 helpers for routines that only deal with stage2 page table.
+Hi Alex,
+On 04/07/2016 07:50 PM, Alex Williamson wrote:
+> On Thu, 7 Apr 2016 14:28:59 +0200
+> Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
 > 
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
+>> Hi Alex,
+>> On 04/07/2016 01:15 AM, Alex Williamson wrote:
+>>> On Mon,  4 Apr 2016 08:06:55 +0000
+>>> Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
+>>>   
+>>>> This series introduces the dma-reserved-iommu api used to:
+>>>> - create/destroy an iova domain dedicated to reserved iova bindings
+>>>> - map/unmap physical addresses onto reserved IOVAs.
+>>>> - unmap and destroy all IOVA reserved bindings  
+>>>
+>>> Why are we making the decision to have an unbalanced map vs unmap, we
+>>> can create individual mappings, but only unmap the whole thing and
+>>> start over?  That's a strange interface.  Thanks,  
+>> The "individual" balanced unmap also exists (iommu_put_reserved_iova)
+>> and this is the "normal" path. This happens on msi_domain_deactivate
+>> (and possibly on msi_domain_set_affinity).
+>>
+>> I added iommu_unmap_reserved to handle the case where the userspace
+>> registers a reserved iova domain and fails to unregister it. In that
+>> case one need to handle the cleanup on kernel-side and I chose to
+>> implement this on vfio_iommu_type1 release. All the reserved IOMMU
+>> bindings get destroyed on that event.
+>>
+>> Any advice to handle this situation?
+> 
+> If we want to model it similar to regular iommu domains, then
+> iommu_free_reserved_iova_domain() should release all the mappings and
+> destroy the iova domain.
+Yes this sounds obvious now.
+  Additionally, since the reserved iova domain
+> is just a construct on top of an iommu domain, it should be sufficient
+> to call iommu_domain_free() to also remove the reserved iova domain if
+> one exists.  Thanks,
+Yes. For dma cookie (iommu_put_dma_cookie) I see this is done from the
+iommu driver domain_free callback.
 
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Thanks
+
+Eric
+> 
+> Alex
+> 
