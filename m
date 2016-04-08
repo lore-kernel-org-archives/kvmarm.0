@@ -1,100 +1,211 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 4/4] arm64: KVM: unregister notifiers in hyp mode teardown path
-Date: Fri,  8 Apr 2016 11:52:15 +0200
-Message-ID: <1460109135-6612-5-git-send-email-christoffer.dall@linaro.org>
-References: <1460109135-6612-1-git-send-email-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7787E40F77
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 05:50:49 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id WyNR6+rCXYX9 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Apr 2016 05:50:48 -0400 (EDT)
-Received: from mail-wm0-f49.google.com (mail-wm0-f49.google.com [74.125.82.49])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 8C815412A6
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 05:50:48 -0400 (EDT)
-Received: by mail-wm0-f49.google.com with SMTP id v188so12767087wme.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2016 02:52:14 -0700 (PDT)
-In-Reply-To: <1460109135-6612-1-git-send-email-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, Sudeep Holla <sudeep.holla@arm.com>, kvmarm@lists.cs.columbia.edu
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [RFC PATCH] KVM: arm/arm64: rework kvm_handle_mmio_return
+Date: Fri,  8 Apr 2016 11:43:50 +0100
+Message-ID: <1460112230-32543-1-git-send-email-andre.przywara@arm.com>
+Return-path: <kvm-owner@vger.kernel.org>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Sudeep Holla <sudeep.holla@arm.com>
+Currently we call kvm_handle_mmio_return when we need to sync back
+register content into the guest after a trap.
+This function expects its arguments packaged into struct kvm_run,
+which we only naturally use when we emulate in userspace. With
+in-kernel emulation we have to copy the data into that strcut.
+This patch fixes this by explicitly passing the required variables,
+so we save the copying in two cases.
+Also since this function is actually a NOP for an MMIO write, we
+rename it to kvm_writeback_mmio_data and move the !is_write check to
+the callers.
+This fixes a bug where we were missing a writeback for one in-kernel
+emulation case.
 
-Commit 1e947bad0b63 ("arm64: KVM: Skip HYP setup when already running
-in HYP") re-organized the hyp init code and ended up leaving the CPU
-hotplug and PM notifier even if hyp mode initialization fails.
-
-Since KVM is not yet supported with ACPI, the above mentioned commit
-breaks CPU hotplug in ACPI boot.
-
-This patch fixes teardown_hyp_mode to properly unregister both CPU
-hotplug and PM notifiers in the teardown path.
-
-Fixes: 1e947bad0b63 ("arm64: KVM: Skip HYP setup when already running in HYP")
-Cc: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>
-Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arch/arm/kvm/arm.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+Hi Christoffer,
 
+this is my take on fixing the missing MMIO writeback call.
+This rework kind of hides the actual bug-fix, that's why I dumped
+it in favour of the one-liner in my series.
+
+Cheers,
+Andre.
+
+ arch/arm/include/asm/kvm_mmio.h   |  3 ++-
+ arch/arm/kvm/arm.c                | 10 +++++---
+ arch/arm/kvm/mmio.c               | 54 ++++++++++++++++++---------------------
+ arch/arm64/include/asm/kvm_mmio.h |  3 ++-
+ virt/kvm/arm/vgic.c               |  8 ++----
+ 5 files changed, 38 insertions(+), 40 deletions(-)
+
+diff --git a/arch/arm/include/asm/kvm_mmio.h b/arch/arm/include/asm/kvm_mmio.h
+index d8e90c8..21f97ac 100644
+--- a/arch/arm/include/asm/kvm_mmio.h
++++ b/arch/arm/include/asm/kvm_mmio.h
+@@ -28,7 +28,8 @@ struct kvm_decode {
+ 	bool sign_extend;
+ };
+ 
+-int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
++int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, void *data, int len,
++			    gpa_t addr);
+ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		 phys_addr_t fault_ipa);
+ 
 diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-index b538431..dded1b7 100644
+index b538431..e9f593c 100644
 --- a/arch/arm/kvm/arm.c
 +++ b/arch/arm/kvm/arm.c
-@@ -1112,10 +1112,17 @@ static void __init hyp_cpu_pm_init(void)
- {
- 	cpu_pm_register_notifier(&hyp_init_cpu_pm_nb);
- }
-+static void __init hyp_cpu_pm_exit(void)
-+{
-+	cpu_pm_unregister_notifier(&hyp_init_cpu_pm_nb);
-+}
- #else
- static inline void hyp_cpu_pm_init(void)
- {
- }
-+static inline void hyp_cpu_pm_exit(void)
-+{
-+}
- #endif
+@@ -555,9 +555,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		return ret;
  
- static void teardown_common_resources(void)
-@@ -1141,9 +1148,7 @@ static int init_subsystems(void)
- 	/*
- 	 * Register CPU Hotplug notifier
- 	 */
--	cpu_notifier_register_begin();
--	err = __register_cpu_notifier(&hyp_init_cpu_nb);
--	cpu_notifier_register_done();
-+	err = register_cpu_notifier(&hyp_init_cpu_nb);
- 	if (err) {
- 		kvm_err("Cannot register KVM init CPU notifier (%d)\n", err);
- 		return err;
-@@ -1193,6 +1198,8 @@ static void teardown_hyp_mode(void)
- 	free_hyp_pgds();
- 	for_each_possible_cpu(cpu)
- 		free_page(per_cpu(kvm_arm_hyp_stack_page, cpu));
-+	unregister_cpu_notifier(&hyp_init_cpu_nb);
-+	hyp_cpu_pm_exit();
+ 	if (run->exit_reason == KVM_EXIT_MMIO) {
+-		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
+-		if (ret)
+-			return ret;
++		if (!run->mmio.is_write) {
++			ret = kvm_writeback_mmio_data(vcpu, run->mmio.data,
++						      run->mmio.len,
++						      run->mmio.phys_addr);
++			if (ret)
++				return ret;
++		}
+ 	}
+ 
+ 	if (vcpu->sigset_active)
+diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
+index 0f6600f..052aa02 100644
+--- a/arch/arm/kvm/mmio.c
++++ b/arch/arm/kvm/mmio.c
+@@ -86,38 +86,33 @@ static unsigned long mmio_read_buf(char *buf, unsigned int len)
  }
  
- static int init_vhe_mode(void)
+ /**
+- * kvm_handle_mmio_return -- Handle MMIO loads after user space emulation
++ * kvm_writeback_mmio_data -- Write back emulation data into the guest's
++ *                            target register after return from userspace.
+  * @vcpu: The VCPU pointer
+- * @run:  The VCPU run struct containing the mmio data
++ * @data: A pointer to the data to be written back
++ * @len:  The size of the read access
++ * @addr: The original MMIO address (for the tracepoint only)
+  *
+  * This should only be called after returning from userspace for MMIO load
+  * emulation.
+  */
+-int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
++int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, void *data_ptr, int len,
++			    gpa_t addr)
+ {
+ 	unsigned long data;
+-	unsigned int len;
+ 	int mask;
+ 
+-	if (!run->mmio.is_write) {
+-		len = run->mmio.len;
+-		if (len > sizeof(unsigned long))
+-			return -EINVAL;
++	data = mmio_read_buf(data_ptr, len);
+ 
+-		data = mmio_read_buf(run->mmio.data, len);
+-
+-		if (vcpu->arch.mmio_decode.sign_extend &&
+-		    len < sizeof(unsigned long)) {
+-			mask = 1U << ((len * 8) - 1);
+-			data = (data ^ mask) - mask;
+-		}
+-
+-		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
+-			       data);
+-		data = vcpu_data_host_to_guest(vcpu, data, len);
+-		vcpu_set_reg(vcpu, vcpu->arch.mmio_decode.rt, data);
++	if (vcpu->arch.mmio_decode.sign_extend && len < sizeof(unsigned long)) {
++		mask = 1U << ((len * 8) - 1);
++		data = (data ^ mask) - mask;
+ 	}
+ 
++	trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, addr, data);
++	data = vcpu_data_host_to_guest(vcpu, data, len);
++	vcpu_set_reg(vcpu, vcpu->arch.mmio_decode.rt, data);
++
+ 	return 0;
+ }
+ 
+@@ -202,22 +197,23 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 				      data_buf);
+ 	}
+ 
++	if (!ret) {
++		/* We handled the access successfully in the kernel. */
++		vcpu->stat.mmio_exit_kernel++;
++		if (!is_write)
++			kvm_writeback_mmio_data(vcpu, data_buf, len, fault_ipa);
++		return 1;
++	}
++
+ 	/* Now prepare kvm_run for the potential return to userland. */
+ 	run->mmio.is_write	= is_write;
+ 	run->mmio.phys_addr	= fault_ipa;
+ 	run->mmio.len		= len;
++	run->exit_reason	= KVM_EXIT_MMIO;
+ 	if (is_write)
+ 		memcpy(run->mmio.data, data_buf, len);
+ 
+-	if (!ret) {
+-		/* We handled the access successfully in the kernel. */
+-		vcpu->stat.mmio_exit_kernel++;
+-		kvm_handle_mmio_return(vcpu, run);
+-		return 1;
+-	} else {
+-		vcpu->stat.mmio_exit_user++;
+-	}
++	vcpu->stat.mmio_exit_user++;
+ 
+-	run->exit_reason	= KVM_EXIT_MMIO;
+ 	return 0;
+ }
+diff --git a/arch/arm64/include/asm/kvm_mmio.h b/arch/arm64/include/asm/kvm_mmio.h
+index fe612a9..00a57bd 100644
+--- a/arch/arm64/include/asm/kvm_mmio.h
++++ b/arch/arm64/include/asm/kvm_mmio.h
+@@ -30,7 +30,8 @@ struct kvm_decode {
+ 	bool sign_extend;
+ };
+ 
+-int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
++int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, void *data, int len,
++			    gpa_t addr);
+ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		 phys_addr_t fault_ipa);
+ 
+diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
+index 00429b3..7a9aa56 100644
+--- a/virt/kvm/arm/vgic.c
++++ b/virt/kvm/arm/vgic.c
+@@ -821,7 +821,6 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
+ 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
+ 	struct vgic_io_device *iodev = container_of(this,
+ 						    struct vgic_io_device, dev);
+-	struct kvm_run *run = vcpu->run;
+ 	const struct vgic_io_range *range;
+ 	struct kvm_exit_mmio mmio;
+ 	bool updated_state;
+@@ -850,12 +849,9 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
+ 		updated_state = false;
+ 	}
+ 	spin_unlock(&dist->lock);
+-	run->mmio.is_write	= is_write;
+-	run->mmio.len		= len;
+-	run->mmio.phys_addr	= addr;
+-	memcpy(run->mmio.data, val, len);
+ 
+-	kvm_handle_mmio_return(vcpu, run);
++	if (!is_write)
++		kvm_writeback_mmio_data(vcpu, val, len, addr);
+ 
+ 	if (updated_state)
+ 		vgic_kick_vcpus(vcpu->kvm);
 -- 
-2.1.2.330.g565301e.dirty
+2.7.3
+
