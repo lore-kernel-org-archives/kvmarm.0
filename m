@@ -1,23 +1,26 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 0/4] KVM/ARM Fixes for v4.6-rc4
-Date: Fri,  8 Apr 2016 11:52:11 +0200
-Message-ID: <1460109135-6612-1-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 1/4] arm64: KVM: Add braces to multi-line if statement in
+ virtual PMU code
+Date: Fri,  8 Apr 2016 11:52:12 +0200
+Message-ID: <1460109135-6612-2-git-send-email-christoffer.dall@linaro.org>
+References: <1460109135-6612-1-git-send-email-christoffer.dall@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8121540F77
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 05:50:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5249F4053F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 05:50:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xhRbFfMSApo1 for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Apr 2016 05:50:44 -0400 (EDT)
-Received: from mail-wm0-f47.google.com (mail-wm0-f47.google.com [74.125.82.47])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 5B7644053F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 05:50:44 -0400 (EDT)
-Received: by mail-wm0-f47.google.com with SMTP id 191so12747074wmq.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2016 02:52:10 -0700 (PDT)
+ with ESMTP id H2EWUbkxcIcD for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Apr 2016 05:50:45 -0400 (EDT)
+Received: from mail-wm0-f48.google.com (mail-wm0-f48.google.com [74.125.82.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3C0DD40F9B
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 05:50:45 -0400 (EDT)
+Received: by mail-wm0-f48.google.com with SMTP id l6so57844026wml.1
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2016 02:52:11 -0700 (PDT)
+In-Reply-To: <1460109135-6612-1-git-send-email-christoffer.dall@linaro.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,56 +31,36 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Paolo and Radim,
-
-Here's another set of fixes for KVM/ARM for this release.  I guess this was
-expected given the size of our patch queue for this merge window.
-
-The following changes since commit 5f5560b1c5f3a80e91c6babb2da34a51943bbdec:
-
-  arm64: KVM: Register CPU notifiers when the kernel runs at HYP (2016-03-31 10:27:28 +0200)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvm-arm-for-4.6-rc4
-
-for you to fetch changes up to 06a71a24bae57a07afee9cda6b00495347d8a448:
-
-  arm64: KVM: unregister notifiers in hyp mode teardown path (2016-04-06 13:47:52 +0200)
-
-
-Thanks,
--Christoffer
-
-----------------------------------------------------------------
-KVM/ARM Fixes for v4.6-rc4
-
-Addresses:
- - Wrong indentation in the PMU code from the merge window
- - A long-time bug occuring with running ntpd on the host, candidate for stable
- - Properly handle (and warn about) the unsupported configuration of running on
-   systems with less than 40 bits of PA space
- - More fixes to the PM and hotplug notifier stuff from the merge window
-
-----------------------------------------------------------------
-Marc Zyngier (2):
-      KVM: arm/arm64: Handle forward time correction gracefully
-      arm64: KVM: Warn when PARange is less than 40 bits
-
-Sudeep Holla (1):
-      arm64: KVM: unregister notifiers in hyp mode teardown path
-
-Will Deacon (1):
-      arm64: KVM: Add braces to multi-line if statement in virtual PMU code
-
- arch/arm/kvm/arm.c                | 13 ++++++++---
- arch/arm64/include/asm/kvm_arm.h  |  6 ++---
- arch/arm64/include/asm/kvm_asm.h  |  2 +-
- arch/arm64/include/asm/kvm_host.h |  7 +++---
- arch/arm64/kvm/hyp/s2-setup.c     | 39 +++++++++++++++++++++++++++++--
- virt/kvm/arm/arch_timer.c         | 49 +++++++++++++++++++++++++++++++--------
- virt/kvm/arm/pmu.c                |  3 ++-
- 7 files changed, 95 insertions(+), 24 deletions(-)
+RnJvbTogV2lsbCBEZWFjb24gPHdpbGwuZGVhY29uQGFybS5jb20+CgpUaGUga2VybmVsIGlzIHdy
+aXR0ZW4gaW4gQywgbm90IHB5dGhvbiwgc28gd2UgbmVlZCBicmFjZXMgYXJvdW5kCm11bHRpLWxp
+bmUgaWYgc3RhdGVtZW50cy4gR0NDIDYgYWN0dWFsbHkgd2FybnMgYWJvdXQgdGhpcywgdGhhbmtz
+IHRvIHRoZQpmYW50YXN0aWMgbmV3ICItV21pc2xlYWRpbmctaW5kZW50YXRpb24iIGZsYWc6Cgog
+fCB2aXJ0L2t2bS9hcm0vcG11LmM6IEluIGZ1bmN0aW9uIOKAmGt2bV9wbXVfb3ZlcmZsb3dfc3Rh
+dHVz4oCZOgogfCB2aXJ0L2t2bS9hcm0vcG11LmM6MTk4OjM6IHdhcm5pbmc6IHN0YXRlbWVudCBp
+cyBpbmRlbnRlZCBhcyBpZiBpdCB3ZXJlIGd1YXJkZWQgYnkuLi4gWy1XbWlzbGVhZGluZy1pbmRl
+bnRhdGlvbl0KIHwgICAgcmVnICY9IHZjcHVfc3lzX3JlZyh2Y3B1LCBQTUNOVEVOU0VUX0VMMCk7
+CiB8ICAgIF5+fgogfCBhcmNoL2FybTY0L2t2bS8uLi8uLi8uLi92aXJ0L2t2bS9hcm0vcG11LmM6
+MTk2OjI6IG5vdGU6IC4uLnRoaXMg4oCYaWbigJkgY2xhdXNlLCBidXQgaXQgaXMgbm90CiB8ICAg
+aWYgKCh2Y3B1X3N5c19yZWcodmNwdSwgUE1DUl9FTDApICYgQVJNVjhfUE1VX1BNQ1JfRSkpCiB8
+ICAgXn4KCkFzIGl0IHR1cm5zIG91dCwgdGhpcyBwYXJ0aWN1bGFyIGNhc2UgaXMgaGFybWxlc3Mg
+KHdlIGp1c3QgZG8gc29tZSAmPQpvcGVyYXRpb25zIHdpdGggMCksIGJ1dCB3b3J0aCBmaXhpbmcg
+bm9uZXRoZWxlc3MuCgpTaWduZWQtb2ZmLWJ5OiBXaWxsIERlYWNvbiA8d2lsbC5kZWFjb25AYXJt
+LmNvbT4KU2lnbmVkLW9mZi1ieTogQ2hyaXN0b2ZmZXIgRGFsbCA8Y2hyaXN0b2ZmZXIuZGFsbEBs
+aW5hcm8ub3JnPgotLS0KIHZpcnQva3ZtL2FybS9wbXUuYyB8IDMgKystCiAxIGZpbGUgY2hhbmdl
+ZCwgMiBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvdmlydC9rdm0v
+YXJtL3BtdS5jIGIvdmlydC9rdm0vYXJtL3BtdS5jCmluZGV4IGI1NzU0YzYuLjU3NWM3YWEgMTAw
+NjQ0Ci0tLSBhL3ZpcnQva3ZtL2FybS9wbXUuYworKysgYi92aXJ0L2t2bS9hcm0vcG11LmMKQEAg
+LTE5MywxMSArMTkzLDEyIEBAIHN0YXRpYyB1NjQga3ZtX3BtdV9vdmVyZmxvd19zdGF0dXMoc3Ry
+dWN0IGt2bV92Y3B1ICp2Y3B1KQogewogCXU2NCByZWcgPSAwOwogCi0JaWYgKCh2Y3B1X3N5c19y
+ZWcodmNwdSwgUE1DUl9FTDApICYgQVJNVjhfUE1VX1BNQ1JfRSkpCisJaWYgKCh2Y3B1X3N5c19y
+ZWcodmNwdSwgUE1DUl9FTDApICYgQVJNVjhfUE1VX1BNQ1JfRSkpIHsKIAkJcmVnID0gdmNwdV9z
+eXNfcmVnKHZjcHUsIFBNT1ZTU0VUX0VMMCk7CiAJCXJlZyAmPSB2Y3B1X3N5c19yZWcodmNwdSwg
+UE1DTlRFTlNFVF9FTDApOwogCQlyZWcgJj0gdmNwdV9zeXNfcmVnKHZjcHUsIFBNSU5URU5TRVRf
+RUwxKTsKIAkJcmVnICY9IGt2bV9wbXVfdmFsaWRfY291bnRlcl9tYXNrKHZjcHUpOworCX0KIAog
+CXJldHVybiByZWc7CiB9Ci0tIAoyLjEuMi4zMzAuZzU2NTMwMWUuZGlydHkKCl9fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCmt2bWFybSBtYWlsaW5nIGxpc3QK
+a3ZtYXJtQGxpc3RzLmNzLmNvbHVtYmlhLmVkdQpodHRwczovL2xpc3RzLmNzLmNvbHVtYmlhLmVk
+dS9tYWlsbWFuL2xpc3RpbmZvL2t2bWFybQo=
