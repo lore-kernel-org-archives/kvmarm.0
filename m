@@ -1,291 +1,196 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [RFC PATCH] KVM: arm/arm64: rework kvm_handle_mmio_return
-Date: Fri, 8 Apr 2016 17:50:03 +0100
-Message-ID: <5707E13B.4050606@arm.com>
-References: <1460112230-32543-1-git-send-email-andre.przywara@arm.com>
- <20160408110506.GA7347@cbox>
+From: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+Subject: Re: [PATCH v6 2/5] vfio: allow the user to register reserved iova
+	range for MSI mapping
+Date: Fri, 8 Apr 2016 18:57:04 +0200
+Message-ID: <5707E2E0.2010304@linaro.org>
+References: <1459758611-2972-1-git-send-email-eric.auger@linaro.org>
+	<1459758611-2972-3-git-send-email-eric.auger@linaro.org>
+	<20160406160709.1d208b45@t450s.home> <57066401.7060406@linaro.org>
+	<20160407122931.1ba3c01c@t450s.home> <5707D2B1.8080802@linaro.org>
+	<20160408104139.210cb1f1@t450s.home>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DC77940B58
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 12:48:25 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id dvDX+W9g9ykj for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Apr 2016 12:48:24 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3FC534053F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 12:48:23 -0400 (EDT)
-In-Reply-To: <20160408110506.GA7347@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Return-path: <iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+In-Reply-To: <20160408104139.210cb1f1-1yVPhWWZRC1BDLzU/O5InQ@public.gmane.org>
+List-Unsubscribe: <https://lists.linuxfoundation.org/mailman/options/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=unsubscribe>
+List-Archive: <http://lists.linuxfoundation.org/pipermail/iommu/>
+List-Post: <mailto:iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org>
+List-Help: <mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=help>
+List-Subscribe: <https://lists.linuxfoundation.org/mailman/listinfo/iommu>,
+	<mailto:iommu-request-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org?subject=subscribe>
+Sender: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+Errors-To: iommu-bounces-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org
+To: Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>
+Cc: julien.grall-5wv7dgnIgG8@public.gmane.org, eric.auger-qxv4g6HH51o@public.gmane.org, jason-NLaQJdtUoK4Be96aLqz0jA@public.gmane.org, kvm-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, patches-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org, marc.zyngier-5wv7dgnIgG8@public.gmane.org, p.fedin-Sze3O3UU22JBDgjK7y7TUQ@public.gmane.org, will.deacon-5wv7dgnIgG8@public.gmane.org, linux-kernel-u79uwXL29TY76Z2rM5mHXA@public.gmane.org, Manish.Jaggi-M3mlKVOIwJVv6pq1l3V1OdBPR1lH4CV8@public.gmane.org, iommu-cunTk1MwBs9QetFLy7KEm3xJsTq8ys+cHZ5vskTnxNA@public.gmane.org, pranav.sawargaonkar-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org, linux-arm-kernel-IAPFreCvJWM7uuMidbF8XUB+6BGkLq7r@public.gmane.org, tglx-hfZtesqFncYOwBW4kG4KsQ@public.gmane.org, kvmarm-FPEHb7Xf0XXUo1n7N8X6UoWGPAHP3yOg@public.gmane.org, christoffer.dall-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
-
-On 08/04/16 12:05, Christoffer Dall wrote:
-> On Fri, Apr 08, 2016 at 11:43:50AM +0100, Andre Przywara wrote:
->> Currently we call kvm_handle_mmio_return when we need to sync back
->> register content into the guest after a trap.
->> This function expects its arguments packaged into struct kvm_run,
->> which we only naturally use when we emulate in userspace. With
->> in-kernel emulation we have to copy the data into that strcut.
+Hi Alex,
+On 04/08/2016 06:41 PM, Alex Williamson wrote:
+> On Fri, 8 Apr 2016 17:48:01 +0200
+> Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
 > 
-> s/strcut/struct/
+> Hi Eric,
 > 
->> This patch fixes this by explicitly passing the required variables,
->> so we save the copying in two cases.
-> 
-> this patch fixes what?
-
-The strcut ;-)
-
-It fixes the unnecessary copying. Indeed worded badly.
-
->> Also since this function is actually a NOP for an MMIO write, we
->> rename it to kvm_writeback_mmio_data and move the !is_write check to
->> the callers.
->> This fixes a bug where we were missing a writeback for one in-kernel
->> emulation case.
+>> Hi Alex,
+>> On 04/07/2016 08:29 PM, Alex Williamson wrote:
+>>> On Thu, 7 Apr 2016 15:43:29 +0200
+>>> Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
+>>>   
+>>>> Hi Alex,
+>>>> On 04/07/2016 12:07 AM, Alex Williamson wrote:  
+>>>>> On Mon,  4 Apr 2016 08:30:08 +0000
+>>>>> Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org> wrote:
+>>>>>     
+>>>>>> The user is allowed to [un]register a reserved IOVA range by using the
+>>>>>> DMA MAP API and setting the new flag: VFIO_DMA_MAP_FLAG_MSI_RESERVED_IOVA.
+>>>>>> It provides the base address and the size. This region is stored in the
+>>>>>> vfio_dma rb tree. At that point the iova range is not mapped to any target
+>>>>>> address yet. The host kernel will use those iova when needed, typically
+>>>>>> when the VFIO-PCI device allocates its MSIs.
+>>>>>>
+>>>>>> This patch also handles the destruction of the reserved binding RB-tree and
+>>>>>> domain's iova_domains.
+>>>>>>
+>>>>>> Signed-off-by: Eric Auger <eric.auger-QSEj5FYQhm4dnm+yROfE0A@public.gmane.org>
+>>>>>> Signed-off-by: Bharat Bhushan <Bharat.Bhushan-KZfg59tc24xl57MIdRCFDg@public.gmane.org>
+>>>>>>
+>>>>>> ---
+>>>>>> v3 -> v4:
+>>>>>> - use iommu_alloc/free_reserved_iova_domain exported by dma-reserved-iommu
+>>>>>> - protect vfio_register_reserved_iova_range implementation with
+>>>>>>   CONFIG_IOMMU_DMA_RESERVED
+>>>>>> - handle unregistration by user-space and on vfio_iommu_type1 release
+>>>>>>
+>>>>>> v1 -> v2:
+>>>>>> - set returned value according to alloc_reserved_iova_domain result
+>>>>>> - free the iova domains in case any error occurs
+>>>>>>
+>>>>>> RFC v1 -> v1:
+>>>>>> - takes into account Alex comments, based on
+>>>>>>   [RFC PATCH 1/6] vfio: Add interface for add/del reserved iova region:
+>>>>>> - use the existing dma map/unmap ioctl interface with a flag to register
+>>>>>>   a reserved IOVA range. A single reserved iova region is allowed.
+>>>>>>
+>>>>>> Conflicts:
+>>>>>> 	drivers/vfio/vfio_iommu_type1.c
+>>>>>> ---
+>>>>>>  drivers/vfio/vfio_iommu_type1.c | 141 +++++++++++++++++++++++++++++++++++++++-
+>>>>>>  include/uapi/linux/vfio.h       |  12 +++-
+>>>>>>  2 files changed, 150 insertions(+), 3 deletions(-)
+>>>>>>
+>>>>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>>>>>> index c9ddbde..4497b20 100644
+>>>>>> --- a/drivers/vfio/vfio_iommu_type1.c
+>>>>>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>>>>>> @@ -36,6 +36,7 @@
+>>>>>>  #include <linux/uaccess.h>
+>>>>>>  #include <linux/vfio.h>
+>>>>>>  #include <linux/workqueue.h>
+>>>>>> +#include <linux/dma-reserved-iommu.h>
+>>>>>>  
+>>>>>>  #define DRIVER_VERSION  "0.2"
+>>>>>>  #define DRIVER_AUTHOR   "Alex Williamson <alex.williamson-H+wXaHxf7aLQT0dZR+AlfA@public.gmane.org>"
+>>>>>> @@ -403,10 +404,22 @@ static void vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma)
+>>>>>>  	vfio_lock_acct(-unlocked);
+>>>>>>  }
+>>>>>>  
+>>>>>> +static void vfio_unmap_reserved(struct vfio_iommu *iommu)
+>>>>>> +{
+>>>>>> +#ifdef CONFIG_IOMMU_DMA_RESERVED
+>>>>>> +	struct vfio_domain *d;
+>>>>>> +
+>>>>>> +	list_for_each_entry(d, &iommu->domain_list, next)
+>>>>>> +		iommu_unmap_reserved(d->domain);
+>>>>>> +#endif
+>>>>>> +}
+>>>>>> +
+>>>>>>  static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+>>>>>>  {
+>>>>>>  	if (likely(dma->type != VFIO_IOVA_RESERVED))
+>>>>>>  		vfio_unmap_unpin(iommu, dma);
+>>>>>> +	else
+>>>>>> +		vfio_unmap_reserved(iommu);
+>>>>>>  	vfio_unlink_dma(iommu, dma);
+>>>>>>  	kfree(dma);
+>>>>>>  }    
+>>>>>
+>>>>> This makes me nervous, apparently we can add reserved mappings
+>>>>> individually, but we have absolutely no granularity on remove, so if we
+>>>>> remove one, we've removed them all even though we still have them
+>>>>> linked in our rb tree.  I see later that only one reserved region is
+>>>>> allowed, but that seems very short sighted, especially to impose that
+>>>>> on the user level API.    
+>>>> On kernel-size the reserved region is currently backed by a unique
+>>>> iova_domain. Do you mean you would like me to handle a list of
+>>>> iova_domains instead of using a single "cookie"?  
+>>>
+>>> TBH, I'm not really sure how this works with a single iova domain.  If
+>>> we have multiple irq chips and each gets mapped by a separate page in
+>>> the iova space, then is it really sufficient to do a lookup from the
+>>> irq_data to the msi_desc to the device to the domain in order to get
+>>> reserved iova to map that msi doorbell?  Don't we need an iova from the
+>>> pool mapping the specific irqchip associated with our device?  The IOMMU
+>>> domain might span any number of irq chips, how can we assume there's
+>>> one only reserved iova space?  Maybe I'm not understanding how the code
+>>> works.  
 >>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> ---
->> Hi Christoffer,
+>> On vfio_iommu_type1 we currently compute the reserved iova needs for
+>> each domain and we take the max. Each domain then is assigned a reserved
+>> iova domain of this max size.
 >>
->> this is my take on fixing the missing MMIO writeback call.
->> This rework kind of hides the actual bug-fix, that's why I dumped
->> it in favour of the one-liner in my series.
+>> So let's say domain1 has the largest needs (say 2 doorbells)
+>> domain 1: iova domain size = 2
+>> dev A --> doorbell 1
+>> dev B -> doorbell 1
+>> dev C -> doorbell 2
+>> 2 iova pages are used
 >>
-> 
-> Hmmm, I thought I also sent a patch for this (off list), and I'm not
-> sure why your approach is better, but ok, I guess I can review your
-> patch...
-
-My approach is not better, just different. I just wanted some opinions
-because I wasn't satisfied either.
-This run-> wrapping did annoy me already some months ago, so I just took
-the opportunity to kill it.
-
+>> domain 2: iova domain size = 2
+>> dev D -> doorbell 1
+>> 1 iova page is used.
 >>
->>  arch/arm/include/asm/kvm_mmio.h   |  3 ++-
->>  arch/arm/kvm/arm.c                | 10 +++++---
->>  arch/arm/kvm/mmio.c               | 54 ++++++++++++++++++---------------------
->>  arch/arm64/include/asm/kvm_mmio.h |  3 ++-
->>  virt/kvm/arm/vgic.c               |  8 ++----
->>  5 files changed, 38 insertions(+), 40 deletions(-)
+>> Do you see something wrong here?
+> 
+> Can we really know the maximum reserved iova space for a domain?  It
+> seems like this depends on the current composition of the domain, so it
+> could change as devices are added to the domain.  Or perhaps the
+> maximum is based on a maximally configured domain, but even then the
+> system itself may be expandable so it might need to account for an
+> architectural maximum.  A user like QEMU would likely have an easier
+> time dealing with an absolute maximum than a current maximum.  Maybe a
+> single range would be sufficient under those conditions.
+
+yes definitively if the domain evolves we may need to extend the
+reserved iova domain. Also dealing with an arbitary absolute maximum is
+much easier to integrate on (QEMU) user side.
+
+> 
+>>> Conceptually, this is a generic IOMMU API extension to include reserved
+>>> ioor va space, MSI mappings are a consumer of that reserved iova pool but
+>>> I don't think we can say they will necessarily be the only consumer.
+>>> So building into the interface that there's only one is like making a
+>>> fixed length array to hold a string, it works for the initial
+>>> implementation, but it's not a robust solution.  
 >>
->> diff --git a/arch/arm/include/asm/kvm_mmio.h b/arch/arm/include/asm/kvm_mmio.h
->> index d8e90c8..21f97ac 100644
->> --- a/arch/arm/include/asm/kvm_mmio.h
->> +++ b/arch/arm/include/asm/kvm_mmio.h
->> @@ -28,7 +28,8 @@ struct kvm_decode {
->>  	bool sign_extend;
->>  };
->>  
->> -int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
->> +int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, void *data, int len,
+>> I see. On the other hand the code is quite specific to MSI binding
+>> problematic today (rb-tree indexed on PA, locking, ...). argh, storm in
+>> a teacup...
 > 
-> I think this should be called kvm_write_back_mmio_data() instead.
+> For the vfio api, the interface is already specific to MSI, so that
+> seems reasonable.  I'd still rather expose somehow to the user that
+> only a single reserved MSI region is supported, even if that's all the
+> implementation can handle, just so we have the option to expand that in
+> the future.  The iommu api is internal, so we can expand it as we go, i
+> just want to be sure to raise the issue even if we think the
+> restrictions are sufficient for now.  Thanks,
+
+OK I agree. I Will change the doc/code accordingly.
+
+Best Regards
+
+Eric
 > 
->> +			    gpa_t addr);
->>  int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
->>  		 phys_addr_t fault_ipa);
->>  
->> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
->> index b538431..e9f593c 100644
->> --- a/arch/arm/kvm/arm.c
->> +++ b/arch/arm/kvm/arm.c
->> @@ -555,9 +555,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->>  		return ret;
->>  
->>  	if (run->exit_reason == KVM_EXIT_MMIO) {
->> -		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
->> -		if (ret)
->> -			return ret;
->> +		if (!run->mmio.is_write) {
->> +			ret = kvm_writeback_mmio_data(vcpu, run->mmio.data,
->> +						      run->mmio.len,
->> +						      run->mmio.phys_addr);
->> +			if (ret)
->> +				return ret;
->> +		}
-> 
-> I preferred all the logic be encapsulated in the function instead of
-> extracting values in the caller, but it's purely a cosmetic comment.
-
-You mean the "if (!is_write)" or wrapping the values into the kvm_run
-struct?
-As mentioned in the commit message, only actual userland emulation is
-using run->, so for in-kernel emulation we have to set it up, which is
-unnecessary copying IMHO.
-By un-wrapping the parameters we just would pass is_write to exit the
-function immediately if it was false, that's why the move to the callers.
-But I agree it is probably bike shedding.
-
->>  	}
->>  
->>  	if (vcpu->sigset_active)
->> diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
->> index 0f6600f..052aa02 100644
->> --- a/arch/arm/kvm/mmio.c
->> +++ b/arch/arm/kvm/mmio.c
->> @@ -86,38 +86,33 @@ static unsigned long mmio_read_buf(char *buf, unsigned int len)
->>  }
->>  
->>  /**
->> - * kvm_handle_mmio_return -- Handle MMIO loads after user space emulation
->> + * kvm_writeback_mmio_data -- Write back emulation data into the guest's
->> + *                            target register after return from userspace.
->>   * @vcpu: The VCPU pointer
->> - * @run:  The VCPU run struct containing the mmio data
->> + * @data: A pointer to the data to be written back
->> + * @len:  The size of the read access
->> + * @addr: The original MMIO address (for the tracepoint only)
->>   *
->>   * This should only be called after returning from userspace for MMIO load
->>   * emulation.
->>   */
->> -int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
->> +int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, void *data_ptr, int len,
->> +			    gpa_t addr)
->>  {
->>  	unsigned long data;
->> -	unsigned int len;
->>  	int mask;
->>  
->> -	if (!run->mmio.is_write) {
->> -		len = run->mmio.len;
->> -		if (len > sizeof(unsigned long))
->> -			return -EINVAL;
->> +	data = mmio_read_buf(data_ptr, len);
->>  
->> -		data = mmio_read_buf(run->mmio.data, len);
->> -
->> -		if (vcpu->arch.mmio_decode.sign_extend &&
->> -		    len < sizeof(unsigned long)) {
->> -			mask = 1U << ((len * 8) - 1);
->> -			data = (data ^ mask) - mask;
->> -		}
->> -
->> -		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
->> -			       data);
->> -		data = vcpu_data_host_to_guest(vcpu, data, len);
->> -		vcpu_set_reg(vcpu, vcpu->arch.mmio_decode.rt, data);
->> +	if (vcpu->arch.mmio_decode.sign_extend && len < sizeof(unsigned long)) {
->> +		mask = 1U << ((len * 8) - 1);
->> +		data = (data ^ mask) - mask;
->>  	}
->>  
->> +	trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, addr, data);
->> +	data = vcpu_data_host_to_guest(vcpu, data, len);
->> +	vcpu_set_reg(vcpu, vcpu->arch.mmio_decode.rt, data);
->> +
->>  	return 0;
->>  }
->>  
->> @@ -202,22 +197,23 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
->>  				      data_buf);
->>  	}
->>  
->> +	if (!ret) {
->> +		/* We handled the access successfully in the kernel. */
->> +		vcpu->stat.mmio_exit_kernel++;
->> +		if (!is_write)
->> +			kvm_writeback_mmio_data(vcpu, data_buf, len, fault_ipa);
-> 
-> are you not doing this writeback twice?  Once in the vgic and once here?
-> That was the very thing I tried to address in my patch.
-
-Right, I missed that one (which was the actual reason the code worked
-before although we missed the write-back.
-Not sure why it was actually in in the first place.
-
-I guess I will just go with your patch, because it's simpler.
-
-Cheers,
-Andre.
-
->> +		return 1;
->> +	}
->> +
->>  	/* Now prepare kvm_run for the potential return to userland. */
->>  	run->mmio.is_write	= is_write;
->>  	run->mmio.phys_addr	= fault_ipa;
->>  	run->mmio.len		= len;
->> +	run->exit_reason	= KVM_EXIT_MMIO;
->>  	if (is_write)
->>  		memcpy(run->mmio.data, data_buf, len);
->>  
->> -	if (!ret) {
->> -		/* We handled the access successfully in the kernel. */
->> -		vcpu->stat.mmio_exit_kernel++;
->> -		kvm_handle_mmio_return(vcpu, run);
->> -		return 1;
->> -	} else {
->> -		vcpu->stat.mmio_exit_user++;
->> -	}
->> +	vcpu->stat.mmio_exit_user++;
->>  
->> -	run->exit_reason	= KVM_EXIT_MMIO;
->>  	return 0;
->>  }
->> diff --git a/arch/arm64/include/asm/kvm_mmio.h b/arch/arm64/include/asm/kvm_mmio.h
->> index fe612a9..00a57bd 100644
->> --- a/arch/arm64/include/asm/kvm_mmio.h
->> +++ b/arch/arm64/include/asm/kvm_mmio.h
->> @@ -30,7 +30,8 @@ struct kvm_decode {
->>  	bool sign_extend;
->>  };
->>  
->> -int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
->> +int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, void *data, int len,
->> +			    gpa_t addr);
->>  int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
->>  		 phys_addr_t fault_ipa);
->>  
->> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
->> index 00429b3..7a9aa56 100644
->> --- a/virt/kvm/arm/vgic.c
->> +++ b/virt/kvm/arm/vgic.c
->> @@ -821,7 +821,6 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
->>  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->>  	struct vgic_io_device *iodev = container_of(this,
->>  						    struct vgic_io_device, dev);
->> -	struct kvm_run *run = vcpu->run;
->>  	const struct vgic_io_range *range;
->>  	struct kvm_exit_mmio mmio;
->>  	bool updated_state;
->> @@ -850,12 +849,9 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
->>  		updated_state = false;
->>  	}
->>  	spin_unlock(&dist->lock);
->> -	run->mmio.is_write	= is_write;
->> -	run->mmio.len		= len;
->> -	run->mmio.phys_addr	= addr;
->> -	memcpy(run->mmio.data, val, len);
->>  
->> -	kvm_handle_mmio_return(vcpu, run);
->> +	if (!is_write)
->> +		kvm_writeback_mmio_data(vcpu, val, len, addr);
-> 
-> see above.
-> 
->>  
->>  	if (updated_state)
->>  		vgic_kick_vcpus(vcpu->kvm);
->> -- 
->> 2.7.3
->>
+> Alex
 > 
