@@ -1,26 +1,27 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH] KVM: arm/arm64: rework kvm_handle_mmio_return
-Date: Fri, 8 Apr 2016 13:05:06 +0200
-Message-ID: <20160408110506.GA7347@cbox>
-References: <1460112230-32543-1-git-send-email-andre.przywara@arm.com>
+Subject: Re: [PATCH 07/17] kvm-arm: arm32: Introduce stage2 page table helpers
+Date: Fri, 8 Apr 2016 14:43:32 +0200
+Message-ID: <20160408124332.GL8961@cbox>
+References: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
+ <1459787177-12767-8-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 3C24440F77
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 07:03:30 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 99DE240F90
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 08:41:56 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id zZy6sVKcI4dt for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Apr 2016 07:03:28 -0400 (EDT)
+ with ESMTP id 7rr32KYE+ilX for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  8 Apr 2016 08:41:54 -0400 (EDT)
 Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id AF6424053F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 07:03:28 -0400 (EDT)
-Received: by mail-wm0-f43.google.com with SMTP id u206so17964290wme.1
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2016 04:04:55 -0700 (PDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 970B64053F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 08:41:54 -0400 (EDT)
+Received: by mail-wm0-f43.google.com with SMTP id 191so17108929wmq.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2016 05:43:21 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1460112230-32543-1-git-send-email-andre.przywara@arm.com>
+In-Reply-To: <1459787177-12767-8-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,232 +31,113 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, Apr 08, 2016 at 11:43:50AM +0100, Andre Przywara wrote:
-> Currently we call kvm_handle_mmio_return when we need to sync back
-> register content into the guest after a trap.
-> This function expects its arguments packaged into struct kvm_run,
-> which we only naturally use when we emulate in userspace. With
-> in-kernel emulation we have to copy the data into that strcut.
-
-s/strcut/struct/
-
-> This patch fixes this by explicitly passing the required variables,
-> so we save the copying in two cases.
-
-this patch fixes what?
-
-> Also since this function is actually a NOP for an MMIO write, we
-> rename it to kvm_writeback_mmio_data and move the !is_write check to
-> the callers.
-> This fixes a bug where we were missing a writeback for one in-kernel
-> emulation case.
+On Mon, Apr 04, 2016 at 05:26:07PM +0100, Suzuki K Poulose wrote:
+> Define the page table helpers for walking the stage2 pagetable
+> for arm. Since both hyp and stage2 have the same number of levels,
+> as that of the host we reuse the host helpers.
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> The exceptions are the p.d_addr_end routines which have to deal
+> with IPA > 32bit, hence we use the open coded version of their host helpers
+> which supports 64bit.
+> 
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Christoffer Dall <christoffer.dall@linaro.org>
+> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > ---
-> Hi Christoffer,
+>  arch/arm/include/asm/kvm_mmu.h        |    1 +
+>  arch/arm/include/asm/stage2_pgtable.h |   59 +++++++++++++++++++++++++++++++++
+>  2 files changed, 60 insertions(+)
+>  create mode 100644 arch/arm/include/asm/stage2_pgtable.h
 > 
-> this is my take on fixing the missing MMIO writeback call.
-> This rework kind of hides the actual bug-fix, that's why I dumped
-> it in favour of the one-liner in my series.
-> 
-
-Hmmm, I thought I also sent a patch for this (off list), and I'm not
-sure why your approach is better, but ok, I guess I can review your
-patch...
-
-> 
->  arch/arm/include/asm/kvm_mmio.h   |  3 ++-
->  arch/arm/kvm/arm.c                | 10 +++++---
->  arch/arm/kvm/mmio.c               | 54 ++++++++++++++++++---------------------
->  arch/arm64/include/asm/kvm_mmio.h |  3 ++-
->  virt/kvm/arm/vgic.c               |  8 ++----
->  5 files changed, 38 insertions(+), 40 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_mmio.h b/arch/arm/include/asm/kvm_mmio.h
-> index d8e90c8..21f97ac 100644
-> --- a/arch/arm/include/asm/kvm_mmio.h
-> +++ b/arch/arm/include/asm/kvm_mmio.h
-> @@ -28,7 +28,8 @@ struct kvm_decode {
->  	bool sign_extend;
->  };
+> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+> index c2b2b27..7d207b4 100644
+> --- a/arch/arm/include/asm/kvm_mmu.h
+> +++ b/arch/arm/include/asm/kvm_mmu.h
+> @@ -47,6 +47,7 @@
+>  #include <linux/highmem.h>
+>  #include <asm/cacheflush.h>
+>  #include <asm/pgalloc.h>
+> +#include <asm/stage2_pgtable.h>
 >  
-> -int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
-> +int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, void *data, int len,
-
-I think this should be called kvm_write_back_mmio_data() instead.
-
-> +			    gpa_t addr);
->  int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  		 phys_addr_t fault_ipa);
->  
-> diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
-> index b538431..e9f593c 100644
-> --- a/arch/arm/kvm/arm.c
-> +++ b/arch/arm/kvm/arm.c
-> @@ -555,9 +555,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  		return ret;
->  
->  	if (run->exit_reason == KVM_EXIT_MMIO) {
-> -		ret = kvm_handle_mmio_return(vcpu, vcpu->run);
-> -		if (ret)
-> -			return ret;
-> +		if (!run->mmio.is_write) {
-> +			ret = kvm_writeback_mmio_data(vcpu, run->mmio.data,
-> +						      run->mmio.len,
-> +						      run->mmio.phys_addr);
-> +			if (ret)
-> +				return ret;
-> +		}
-
-I preferred all the logic be encapsulated in the function instead of
-extracting values in the caller, but it's purely a cosmetic comment.
-
->  	}
->  
->  	if (vcpu->sigset_active)
-> diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-> index 0f6600f..052aa02 100644
-> --- a/arch/arm/kvm/mmio.c
-> +++ b/arch/arm/kvm/mmio.c
-> @@ -86,38 +86,33 @@ static unsigned long mmio_read_buf(char *buf, unsigned int len)
->  }
->  
->  /**
-> - * kvm_handle_mmio_return -- Handle MMIO loads after user space emulation
-> + * kvm_writeback_mmio_data -- Write back emulation data into the guest's
-> + *                            target register after return from userspace.
->   * @vcpu: The VCPU pointer
-> - * @run:  The VCPU run struct containing the mmio data
-> + * @data: A pointer to the data to be written back
-> + * @len:  The size of the read access
-> + * @addr: The original MMIO address (for the tracepoint only)
->   *
->   * This should only be called after returning from userspace for MMIO load
->   * emulation.
->   */
-> -int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, void *data_ptr, int len,
-> +			    gpa_t addr)
->  {
->  	unsigned long data;
-> -	unsigned int len;
->  	int mask;
->  
-> -	if (!run->mmio.is_write) {
-> -		len = run->mmio.len;
-> -		if (len > sizeof(unsigned long))
-> -			return -EINVAL;
-> +	data = mmio_read_buf(data_ptr, len);
->  
-> -		data = mmio_read_buf(run->mmio.data, len);
-> -
-> -		if (vcpu->arch.mmio_decode.sign_extend &&
-> -		    len < sizeof(unsigned long)) {
-> -			mask = 1U << ((len * 8) - 1);
-> -			data = (data ^ mask) - mask;
-> -		}
-> -
-> -		trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, run->mmio.phys_addr,
-> -			       data);
-> -		data = vcpu_data_host_to_guest(vcpu, data, len);
-> -		vcpu_set_reg(vcpu, vcpu->arch.mmio_decode.rt, data);
-> +	if (vcpu->arch.mmio_decode.sign_extend && len < sizeof(unsigned long)) {
-> +		mask = 1U << ((len * 8) - 1);
-> +		data = (data ^ mask) - mask;
->  	}
->  
-> +	trace_kvm_mmio(KVM_TRACE_MMIO_READ, len, addr, data);
-> +	data = vcpu_data_host_to_guest(vcpu, data, len);
-> +	vcpu_set_reg(vcpu, vcpu->arch.mmio_decode.rt, data);
+>  int create_hyp_mappings(void *from, void *to);
+>  int create_hyp_io_mappings(void *from, void *to, phys_addr_t);
+> diff --git a/arch/arm/include/asm/stage2_pgtable.h b/arch/arm/include/asm/stage2_pgtable.h
+> new file mode 100644
+> index 0000000..7633b0a
+> --- /dev/null
+> +++ b/arch/arm/include/asm/stage2_pgtable.h
+> @@ -0,0 +1,59 @@
+> +/*
+> + * Copyright (C) 2016 - ARM Ltd
+> + *
+> + * stage2 page table helpers
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + *
+> + * You should have received a copy of the GNU General Public License
+> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> + */
 > +
->  	return 0;
->  }
->  
-> @@ -202,22 +197,23 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  				      data_buf);
->  	}
->  
-> +	if (!ret) {
-> +		/* We handled the access successfully in the kernel. */
-> +		vcpu->stat.mmio_exit_kernel++;
-> +		if (!is_write)
-> +			kvm_writeback_mmio_data(vcpu, data_buf, len, fault_ipa);
-
-are you not doing this writeback twice?  Once in the vgic and once here?
-That was the very thing I tried to address in my patch.
-
-> +		return 1;
-> +	}
+> +#ifndef __ARM_S2_PGTABLE_H_
+> +#define __ARM_S2_PGTABLE_H_
 > +
->  	/* Now prepare kvm_run for the potential return to userland. */
->  	run->mmio.is_write	= is_write;
->  	run->mmio.phys_addr	= fault_ipa;
->  	run->mmio.len		= len;
-> +	run->exit_reason	= KVM_EXIT_MMIO;
->  	if (is_write)
->  		memcpy(run->mmio.data, data_buf, len);
->  
-> -	if (!ret) {
-> -		/* We handled the access successfully in the kernel. */
-> -		vcpu->stat.mmio_exit_kernel++;
-> -		kvm_handle_mmio_return(vcpu, run);
-> -		return 1;
-> -	} else {
-> -		vcpu->stat.mmio_exit_user++;
-> -	}
-> +	vcpu->stat.mmio_exit_user++;
->  
-> -	run->exit_reason	= KVM_EXIT_MMIO;
->  	return 0;
->  }
-> diff --git a/arch/arm64/include/asm/kvm_mmio.h b/arch/arm64/include/asm/kvm_mmio.h
-> index fe612a9..00a57bd 100644
-> --- a/arch/arm64/include/asm/kvm_mmio.h
-> +++ b/arch/arm64/include/asm/kvm_mmio.h
-> @@ -30,7 +30,8 @@ struct kvm_decode {
->  	bool sign_extend;
->  };
->  
-> -int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
-> +int kvm_writeback_mmio_data(struct kvm_vcpu *vcpu, void *data, int len,
-> +			    gpa_t addr);
->  int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  		 phys_addr_t fault_ipa);
->  
-> diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-> index 00429b3..7a9aa56 100644
-> --- a/virt/kvm/arm/vgic.c
-> +++ b/virt/kvm/arm/vgic.c
-> @@ -821,7 +821,6 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
->  	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
->  	struct vgic_io_device *iodev = container_of(this,
->  						    struct vgic_io_device, dev);
-> -	struct kvm_run *run = vcpu->run;
->  	const struct vgic_io_range *range;
->  	struct kvm_exit_mmio mmio;
->  	bool updated_state;
-> @@ -850,12 +849,9 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
->  		updated_state = false;
->  	}
->  	spin_unlock(&dist->lock);
-> -	run->mmio.is_write	= is_write;
-> -	run->mmio.len		= len;
-> -	run->mmio.phys_addr	= addr;
-> -	memcpy(run->mmio.data, val, len);
->  
-> -	kvm_handle_mmio_return(vcpu, run);
-> +	if (!is_write)
-> +		kvm_writeback_mmio_data(vcpu, val, len, addr);
+> +#define stage2_pgd_none(pgd)				pgd_none(pgd)
+> +#define stage2_pgd_clear(pgd)				pgd_clear(pgd)
+> +#define stage2_pgd_present(pgd)				pgd_present(pgd)
+> +#define stage2_pgd_populate(mm, pgd, pud)		pgd_populate(mm, pgd, pud)
+> +#define stage2_pud_offset(pgd, address)			pud_offset(pgd, address)
+> +#define stage2_pud_free(mm, pud)			pud_free(mm, pud)
+> +
+> +#define stage2_pud_none(pud)				pud_none(pud)
+> +#define stage2_pud_clear(pud)				pud_clear(pud)
+> +#define stage2_pud_present(pud)				pud_present(pud)
+> +#define stage2_pud_populate(mm, pud, pmd)		pud_populate(mm, pud, pmd)
+> +#define stage2_pmd_offset(pud, address)			pmd_offset(pud, address)
+> +#define stage2_pmd_free(mm, pmd)			pmd_free(mm, pmd)
+> +
+> +#define stage2_pud_huge(pud)				pud_huge(pud)
 
-see above.
+could we get rid of the mm parameter to all these stage2_ versions above
+and simply implement them with the generic functions passing NULL in the
+definitions instead?
 
->  
->  	if (updated_state)
->  		vgic_kick_vcpus(vcpu->kvm);
+> +
+> +/* Open coded p*d_addr_end that can deal with 64bit addresses */
+> +static inline phys_addr_t stage2_pgd_addr_end(phys_addr_t addr, phys_addr_t end)
+> +{
+> +	phys_addr_t boundary = (addr + PGDIR_SIZE) & PGDIR_MASK;
+> +	return (boundary - 1 < end - 1) ? boundary : end;
+> +}
+> +
+> +#define stage2_pud_addr_end(addr, end)		(end)
+> +
+> +static inline phys_addr_t stage2_pmd_addr_end(phys_addr_t addr, phys_addr_t end)
+> +{
+> +	phys_addr_t boundary = (addr + PMD_SIZE) & PMD_MASK;
+> +	return (boundary - 1 < end - 1) ? boundary : end;
+> +}
+> +
+> +#define stage2_pgd_index(addr)				pgd_index(addr)
+> +
+> +#define stage2_pte_table_empty(ptep)			kvm_page_empty(ptep)
+> +#define stage2_pmd_table_empty(pmdp)			kvm_page_empty(pmdp)
+> +#define stage2_pud_table_empty(pudp)			0
+> +
+> +#endif	/* __ARM_S2_PGTABLE_H_ */
 > -- 
-> 2.7.3
+> 1.7.9.5
 > 
+
+Otherwise:
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
