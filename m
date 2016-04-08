@@ -1,155 +1,163 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: [PULL 2/4] KVM: arm/arm64: Handle forward time correction gracefully
-Date: Fri,  8 Apr 2016 11:52:13 +0200
-Message-ID: <1460109135-6612-3-git-send-email-christoffer.dall@linaro.org>
+Subject: [PULL 3/4] arm64: KVM: Warn when PARange is less than 40 bits
+Date: Fri,  8 Apr 2016 11:52:14 +0200
+Message-ID: <1460109135-6612-4-git-send-email-christoffer.dall@linaro.org>
 References: <1460109135-6612-1-git-send-email-christoffer.dall@linaro.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8A04A410EB
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 05:50:47 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YgSDIqbb5pFs for <kvmarm@lists.cs.columbia.edu>;
- Fri,  8 Apr 2016 05:50:46 -0400 (EDT)
-Received: from mail-wm0-f54.google.com (mail-wm0-f54.google.com [74.125.82.54])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7AF894053F
- for <kvmarm@lists.cs.columbia.edu>; Fri,  8 Apr 2016 05:50:46 -0400 (EDT)
-Received: by mail-wm0-f54.google.com with SMTP id n3so15743986wmn.0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 08 Apr 2016 02:52:12 -0700 (PDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1460109135-6612-1-git-send-email-christoffer.dall@linaro.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, stable@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Marc Zyngier <marc.zyngier@arm.com>
 
-On a host that runs NTP, corrections can have a direct impact on
-the background timer that we program on the behalf of a vcpu.
+We always thought that 40bits of PA range would be the minimum people
+would actually build. Anything less is terrifyingly small.
 
-In particular, NTP performing a forward correction will result in
-a timer expiring sooner than expected from a guest point of view.
-Not a big deal, we kick the vcpu anyway.
+Turns out that we were both right and wrong. Nobody has ever built
+such a system, but the ARM Foundation Model has a PARange set to 36bits.
+Just because we can. Oh well. Now, the KVM API explicitely says that
+we offer a 40bit PA space to the VM, so we shouldn't run KVM on
+the Foundation Model at all.
 
-But on wake-up, the vcpu thread is going to perform a check to
-find out whether or not it should block. And at that point, the
-timer check is going to say "timer has not expired yet, go back
-to sleep". This results in the timer event being lost forever.
+That being said, this patch offers a less agressive alternative, and
+loudly warns about the configuration being unsupported. You'll still
+be able to run VMs (at your own risks, though).
 
-There are multiple ways to handle this. One would be record that
-the timer has expired and let kvm_cpu_has_pending_timer return
-true in that case, but that would be fairly invasive. Another is
-to check for the "short sleep" condition in the hrtimer callback,
-and restart the timer for the remaining time when the condition
-is detected.
+This is just a workaround until we have a proper userspace API where
+we report the PARange to userspace.
 
-This patch implements the latter, with a bit of refactoring in
-order to avoid too much code duplication.
-
-Cc: <stable@vger.kernel.org>
-Reported-by: Alexander Graf <agraf@suse.de>
-Reviewed-by: Alexander Graf <agraf@suse.de>
 Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 ---
- virt/kvm/arm/arch_timer.c | 49 +++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 39 insertions(+), 10 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h  |  6 ++----
+ arch/arm64/include/asm/kvm_asm.h  |  2 +-
+ arch/arm64/include/asm/kvm_host.h |  7 ++++---
+ arch/arm64/kvm/hyp/s2-setup.c     | 39 +++++++++++++++++++++++++++++++++++++--
+ 4 files changed, 44 insertions(+), 10 deletions(-)
 
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index a9ad4fe..9aaa35d 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -91,6 +91,8 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
- 	vcpu = container_of(work, struct kvm_vcpu, arch.timer_cpu.expired);
- 	vcpu->arch.timer_cpu.armed = false;
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 4150fd8..3f29887 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -151,8 +151,7 @@
+  */
+ #define VTCR_EL2_FLAGS		(VTCR_EL2_TG0_64K | VTCR_EL2_SH0_INNER | \
+ 				 VTCR_EL2_ORGN0_WBWA | VTCR_EL2_IRGN0_WBWA | \
+-				 VTCR_EL2_SL0_LVL1 | VTCR_EL2_T0SZ_40B | \
+-				 VTCR_EL2_RES1)
++				 VTCR_EL2_SL0_LVL1 | VTCR_EL2_RES1)
+ #define VTTBR_X		(38 - VTCR_EL2_T0SZ_40B)
+ #else
+ /*
+@@ -163,8 +162,7 @@
+  */
+ #define VTCR_EL2_FLAGS		(VTCR_EL2_TG0_4K | VTCR_EL2_SH0_INNER | \
+ 				 VTCR_EL2_ORGN0_WBWA | VTCR_EL2_IRGN0_WBWA | \
+-				 VTCR_EL2_SL0_LVL1 | VTCR_EL2_T0SZ_40B | \
+-				 VTCR_EL2_RES1)
++				 VTCR_EL2_SL0_LVL1 | VTCR_EL2_RES1)
+ #define VTTBR_X		(37 - VTCR_EL2_T0SZ_40B)
+ #endif
  
-+	WARN_ON(!kvm_timer_should_fire(vcpu));
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index eb7490d..40a0a24 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -54,7 +54,7 @@ extern void __vgic_v3_init_lrs(void);
+ 
+ extern u32 __kvm_get_mdcr_el2(void);
+ 
+-extern void __init_stage2_translation(void);
++extern u32 __init_stage2_translation(void);
+ 
+ #endif
+ 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 227ed47..4cd4196 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -370,11 +370,12 @@ int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+ int kvm_arm_vcpu_arch_has_attr(struct kvm_vcpu *vcpu,
+ 			       struct kvm_device_attr *attr);
+ 
+-/* #define kvm_call_hyp(f, ...) __kvm_call_hyp(kvm_ksym_ref(f), ##__VA_ARGS__) */
+-
+ static inline void __cpu_init_stage2(void)
+ {
+-	kvm_call_hyp(__init_stage2_translation);
++	u32 parange = kvm_call_hyp(__init_stage2_translation);
 +
- 	/*
- 	 * If the vcpu is blocked we want to wake it up so that it will see
- 	 * the timer has expired when entering the guest.
-@@ -98,10 +100,46 @@ static void kvm_timer_inject_irq_work(struct work_struct *work)
- 	kvm_vcpu_kick(vcpu);
++	WARN_ONCE(parange < 40,
++		  "PARange is %d bits, unsupported configuration!", parange);
  }
  
-+static u64 kvm_timer_compute_delta(struct kvm_vcpu *vcpu)
-+{
-+	cycle_t cval, now;
-+
-+	cval = vcpu->arch.timer_cpu.cntv_cval;
-+	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
-+
-+	if (now < cval) {
-+		u64 ns;
-+
-+		ns = cyclecounter_cyc2ns(timecounter->cc,
-+					 cval - now,
-+					 timecounter->mask,
-+					 &timecounter->frac);
-+		return ns;
-+	}
-+
-+	return 0;
-+}
-+
- static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
+ #endif /* __ARM64_KVM_HOST_H__ */
+diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
+index 5a9f3bf..bcbe761 100644
+--- a/arch/arm64/kvm/hyp/s2-setup.c
++++ b/arch/arm64/kvm/hyp/s2-setup.c
+@@ -20,9 +20,10 @@
+ #include <asm/kvm_asm.h>
+ #include <asm/kvm_hyp.h>
+ 
+-void __hyp_text __init_stage2_translation(void)
++u32 __hyp_text __init_stage2_translation(void)
  {
- 	struct arch_timer_cpu *timer;
-+	struct kvm_vcpu *vcpu;
-+	u64 ns;
+ 	u64 val = VTCR_EL2_FLAGS;
++	u64 parange;
+ 	u64 tmp;
+ 
+ 	/*
+@@ -30,7 +31,39 @@ void __hyp_text __init_stage2_translation(void)
+ 	 * bits in VTCR_EL2. Amusingly, the PARange is 4 bits, while
+ 	 * PS is only 3. Fortunately, bit 19 is RES0 in VTCR_EL2...
+ 	 */
+-	val |= (read_sysreg(id_aa64mmfr0_el1) & 7) << 16;
++	parange = read_sysreg(id_aa64mmfr0_el1) & 7;
++	val |= parange << 16;
 +
- 	timer = container_of(hrt, struct arch_timer_cpu, timer);
-+	vcpu = container_of(timer, struct kvm_vcpu, arch.timer_cpu);
++	/* Compute the actual PARange... */
++	switch (parange) {
++	case 0:
++		parange = 32;
++		break;
++	case 1:
++		parange = 36;
++		break;
++	case 2:
++		parange = 40;
++		break;
++	case 3:
++		parange = 42;
++		break;
++	case 4:
++		parange = 44;
++		break;
++	case 5:
++	default:
++		parange = 48;
++		break;
++	}
 +
 +	/*
-+	 * Check that the timer has really expired from the guest's
-+	 * PoV (NTP on the host may have forced it to expire
-+	 * early). If we should have slept longer, restart it.
++	 * ... and clamp it to 40 bits, unless we have some braindead
++	 * HW that implements less than that. In all cases, we'll
++	 * return that value for the rest of the kernel to decide what
++	 * to do.
 +	 */
-+	ns = kvm_timer_compute_delta(vcpu);
-+	if (unlikely(ns)) {
-+		hrtimer_forward_now(hrt, ns_to_ktime(ns));
-+		return HRTIMER_RESTART;
-+	}
++	val |= 64 - (parange > 40 ? 40 : parange);
+ 
+ 	/*
+ 	 * Read the VMIDBits bits from ID_AA64MMFR1_EL1 and set the VS
+@@ -42,4 +75,6 @@ void __hyp_text __init_stage2_translation(void)
+ 			VTCR_EL2_VS_8BIT;
+ 
+ 	write_sysreg(val, vtcr_el2);
 +
- 	queue_work(wqueue, &timer->expired);
- 	return HRTIMER_NORESTART;
++	return parange;
  }
-@@ -176,8 +214,6 @@ static int kvm_timer_update_state(struct kvm_vcpu *vcpu)
- void kvm_timer_schedule(struct kvm_vcpu *vcpu)
- {
- 	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
--	u64 ns;
--	cycle_t cval, now;
- 
- 	BUG_ON(timer_is_armed(timer));
- 
-@@ -197,14 +233,7 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
- 		return;
- 
- 	/*  The timer has not yet expired, schedule a background timer */
--	cval = timer->cntv_cval;
--	now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
--
--	ns = cyclecounter_cyc2ns(timecounter->cc,
--				 cval - now,
--				 timecounter->mask,
--				 &timecounter->frac);
--	timer_arm(timer, ns);
-+	timer_arm(timer, kvm_timer_compute_delta(vcpu));
- }
- 
- void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
 -- 
 2.1.2.330.g565301e.dirty
+
