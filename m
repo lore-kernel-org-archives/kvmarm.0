@@ -1,23 +1,23 @@
 From: Julien Grall <julien.grall@arm.com>
-Subject: [PATCH v6 04/10] irqchip/gic-v2: Parse and export virtual GIC
- information
-Date: Mon, 11 Apr 2016 16:32:54 +0100
-Message-ID: <1460388780-914-5-git-send-email-julien.grall@arm.com>
+Subject: [PATCH v6 03/10] irqchip/gic-v2: Gather ACPI specific data in a
+ single structure
+Date: Mon, 11 Apr 2016 16:32:53 +0100
+Message-ID: <1460388780-914-4-git-send-email-julien.grall@arm.com>
 References: <1460388780-914-1-git-send-email-julien.grall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 706D440BDA
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Apr 2016 11:31:44 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7C670410B5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Apr 2016 11:31:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4r0XiDaZYJxI for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Apr 2016 11:31:43 -0400 (EDT)
+ with ESMTP id 3ppXsDxr5o94 for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Apr 2016 11:31:40 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2D42240F77
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Apr 2016 11:31:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A63A140F77
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Apr 2016 11:31:40 -0400 (EDT)
 In-Reply-To: <1460388780-914-1-git-send-email-julien.grall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,15 +32,16 @@ To: kvmarm@lists.cs.columbia.edu
 Cc: al.stone@linaro.org, kvm@vger.kernel.org, hanjun.guo@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, fu.wei@linaro.org, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>, linux-arm-kernel@lists.infradead.org, gg@slimlogic.co.uk
 List-Id: kvmarm@lists.cs.columbia.edu
 
-For now, the firmware tables are parsed 2 times: once in the GIC
-drivers, the other timer when initializing the vGIC. It means code
-duplication and make more tedious to add the support for another
-firmware table (like ACPI).
+The ACPI code requires to use global variables in order to collect
+information from the tables.
 
-Introduce a new structure and set of helpers to get/set the virtual GIC
-information. Also fill up the structure for GICv2.
+For now, a single global variable is used, but more will be added in a
+subsequent patch. To make clear they are ACPI specific, gather all the
+information in a single structure.
 
 Signed-off-by: Julien Grall <julien.grall@arm.com>
+Acked-by: Christofer Dall <christoffer.dall@linaro.org>
+Acked-by: Hanjun Guo <hanjun.guo@linaro.org>
 
 ---
 Cc: Thomas Gleixner <tglx@linutronix.de>
@@ -48,238 +49,56 @@ Cc: Jason Cooper <jason@lakedaemon.net>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 
     Changes in v6:
-        - Move the code to get the maintenance interrupt later. It will
-        avoid to call acpi_unregister_gsi when the function fails.
+        - Add Hanjun's acked-by
 
     Changes in v4:
-        - Change the flow to call gic_set_kvm_info when all the
-        information are present.
-        - Rework comments in arm-gic-common.h
-        - Replace WARN_ON with BUG_ON in gic_set_kvm_info
+        - Update commit message
+        - Rename cpu_phy_base to cpu_phys_base
+        - Add Christopher's acked-by
 
     Changes in v2:
-        - Use 0 rather than a negative value to know when the maintenance IRQ
-        is not present.
-        - Use resource for vcpu and vctrl
+        - Patch added
 ---
- drivers/irqchip/irq-gic-common.c       | 13 ++++++
- drivers/irqchip/irq-gic-common.h       |  3 ++
- drivers/irqchip/irq-gic.c              | 76 +++++++++++++++++++++++++++++++++-
- include/linux/irqchip/arm-gic-common.h | 33 +++++++++++++++
- 4 files changed, 124 insertions(+), 1 deletion(-)
- create mode 100644 include/linux/irqchip/arm-gic-common.h
+ drivers/irqchip/irq-gic.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/irqchip/irq-gic-common.c b/drivers/irqchip/irq-gic-common.c
-index f174ce0..2e9443b 100644
---- a/drivers/irqchip/irq-gic-common.c
-+++ b/drivers/irqchip/irq-gic-common.c
-@@ -21,6 +21,19 @@
- 
- #include "irq-gic-common.h"
- 
-+static const struct gic_kvm_info *gic_kvm_info;
-+
-+const struct gic_kvm_info *gic_get_kvm_info(void)
-+{
-+	return gic_kvm_info;
-+}
-+
-+void gic_set_kvm_info(const struct gic_kvm_info *info)
-+{
-+	BUG_ON(gic_kvm_info != NULL);
-+	gic_kvm_info = info;
-+}
-+
- void gic_enable_quirks(u32 iidr, const struct gic_quirk *quirks,
- 		void *data)
- {
-diff --git a/drivers/irqchip/irq-gic-common.h b/drivers/irqchip/irq-gic-common.h
-index fff697d..205e5fd 100644
---- a/drivers/irqchip/irq-gic-common.h
-+++ b/drivers/irqchip/irq-gic-common.h
-@@ -19,6 +19,7 @@
- 
- #include <linux/of.h>
- #include <linux/irqdomain.h>
-+#include <linux/irqchip/arm-gic-common.h>
- 
- struct gic_quirk {
- 	const char *desc;
-@@ -35,4 +36,6 @@ void gic_cpu_config(void __iomem *base, void (*sync_access)(void));
- void gic_enable_quirks(u32 iidr, const struct gic_quirk *quirks,
- 		void *data);
- 
-+void gic_set_kvm_info(const struct gic_kvm_info *info);
-+
- #endif /* _IRQ_GIC_COMMON_H */
 diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
-index 7a73786..3f1d9fd 100644
+index 282344b..7a73786 100644
 --- a/drivers/irqchip/irq-gic.c
 +++ b/drivers/irqchip/irq-gic.c
-@@ -102,6 +102,8 @@ static struct static_key supports_deactivate = STATIC_KEY_INIT_TRUE;
+@@ -1245,7 +1245,10 @@ IRQCHIP_DECLARE(pl390, "arm,pl390", gic_of_init);
+ #endif
  
- static struct gic_chip_data gic_data[CONFIG_ARM_GIC_MAX_NR] __read_mostly;
- 
-+static struct gic_kvm_info gic_v2_kvm_info;
-+
- #ifdef CONFIG_GIC_NON_BANKED
- static void __iomem *gic_get_percpu_base(union gic_base *base)
- {
-@@ -1189,6 +1191,29 @@ static bool gic_check_eoimode(struct device_node *node, void __iomem **base)
- 	return true;
- }
- 
-+static void __init gic_of_setup_kvm_info(struct device_node *node)
+ #ifdef CONFIG_ACPI
+-static phys_addr_t cpu_phy_base __initdata;
++static struct
 +{
-+	int ret;
-+	struct resource *vctrl_res = &gic_v2_kvm_info.vctrl;
-+	struct resource *vcpu_res = &gic_v2_kvm_info.vcpu;
-+
-+	gic_v2_kvm_info.type = GIC_V2;
-+
-+	gic_v2_kvm_info.maint_irq = irq_of_parse_and_map(node, 0);
-+	if (!gic_v2_kvm_info.maint_irq)
-+		return;
-+
-+	ret = of_address_to_resource(node, 2, vctrl_res);
-+	if (ret)
-+		return;
-+
-+	ret = of_address_to_resource(node, 3, vcpu_res);
-+	if (ret)
-+		return;
-+
-+	gic_set_kvm_info(&gic_v2_kvm_info);
-+}
-+
- int __init
- gic_of_init(struct device_node *node, struct device_node *parent)
- {
-@@ -1218,8 +1243,10 @@ gic_of_init(struct device_node *node, struct device_node *parent)
- 
- 	__gic_init_bases(gic_cnt, -1, dist_base, cpu_base, percpu_offset,
- 			 &node->fwnode);
--	if (!gic_cnt)
-+	if (!gic_cnt) {
- 		gic_init_physaddr(node);
-+		gic_of_setup_kvm_info(node);
-+	}
- 
- 	if (parent) {
- 		irq = irq_of_parse_and_map(node, 0);
-@@ -1248,6 +1275,10 @@ IRQCHIP_DECLARE(pl390, "arm,pl390", gic_of_init);
- static struct
- {
- 	phys_addr_t cpu_phys_base;
-+	u32 maint_irq;
-+	int maint_irq_mode;
-+	phys_addr_t vctrl_base;
-+	phys_addr_t vcpu_base;
- } acpi_data __initdata;
++	phys_addr_t cpu_phys_base;
++} acpi_data __initdata;
  
  static int __init
-@@ -1272,6 +1303,12 @@ gic_acpi_parse_madt_cpu(struct acpi_subtable_header *header,
+ gic_acpi_parse_madt_cpu(struct acpi_subtable_header *header,
+@@ -1265,10 +1268,10 @@ gic_acpi_parse_madt_cpu(struct acpi_subtable_header *header,
+ 	 * All CPU interface addresses have to be the same.
+ 	 */
+ 	gic_cpu_base = processor->base_address;
+-	if (cpu_base_assigned && gic_cpu_base != cpu_phy_base)
++	if (cpu_base_assigned && gic_cpu_base != acpi_data.cpu_phys_base)
  		return -EINVAL;
  
- 	acpi_data.cpu_phys_base = gic_cpu_base;
-+	acpi_data.maint_irq = processor->vgic_interrupt;
-+	acpi_data.maint_irq_mode = (processor->flags & ACPI_MADT_VGIC_IRQ_MODE) ?
-+				    ACPI_EDGE_SENSITIVE : ACPI_LEVEL_SENSITIVE;
-+	acpi_data.vctrl_base = processor->gich_base_address;
-+	acpi_data.vcpu_base = processor->gicv_base_address;
-+
+-	cpu_phy_base = gic_cpu_base;
++	acpi_data.cpu_phys_base = gic_cpu_base;
  	cpu_base_assigned = 1;
  	return 0;
  }
-@@ -1302,6 +1339,41 @@ static bool __init gic_validate_dist(struct acpi_subtable_header *header,
+@@ -1316,7 +1319,7 @@ static int __init gic_v2_acpi_init(struct acpi_subtable_header *header,
+ 		return -EINVAL;
+ 	}
  
- #define ACPI_GICV2_DIST_MEM_SIZE	(SZ_4K)
- #define ACPI_GIC_CPU_IF_MEM_SIZE	(SZ_8K)
-+#define ACPI_GICV2_VCTRL_MEM_SIZE	(SZ_4K)
-+#define ACPI_GICV2_VCPU_MEM_SIZE	(SZ_8K)
-+
-+static void __init gic_acpi_setup_kvm_info(void)
-+{
-+	int irq;
-+	struct resource *vctrl_res = &gic_v2_kvm_info.vctrl;
-+	struct resource *vcpu_res = &gic_v2_kvm_info.vcpu;
-+
-+	gic_v2_kvm_info.type = GIC_V2;
-+
-+	if (!acpi_data.vctrl_base)
-+		return;
-+
-+	vctrl_res->flags = IORESOURCE_MEM;
-+	vctrl_res->start = acpi_data.vctrl_base;
-+	vctrl_res->end = vctrl_res->start + ACPI_GICV2_VCTRL_MEM_SIZE - 1;
-+
-+	if (!acpi_data.vcpu_base)
-+		return;
-+
-+	vcpu_res->flags = IORESOURCE_MEM;
-+	vcpu_res->start = acpi_data.vcpu_base;
-+	vcpu_res->end = vcpu_res->start + ACPI_GICV2_VCPU_MEM_SIZE - 1;
-+
-+	irq = acpi_register_gsi(NULL, acpi_data.maint_irq,
-+				acpi_data.maint_irq_mode,
-+				ACPI_ACTIVE_HIGH);
-+	if (irq <= 0)
-+		return;
-+
-+	gic_v2_kvm_info.maint_irq = irq;
-+
-+	gic_set_kvm_info(&gic_v2_kvm_info);
-+}
- 
- static int __init gic_v2_acpi_init(struct acpi_subtable_header *header,
- 				   const unsigned long end)
-@@ -1359,6 +1431,8 @@ static int __init gic_v2_acpi_init(struct acpi_subtable_header *header,
- 	if (IS_ENABLED(CONFIG_ARM_GIC_V2M))
- 		gicv2m_init(NULL, gic_data[0].domain);
- 
-+	gic_acpi_setup_kvm_info();
-+
- 	return 0;
- }
- IRQCHIP_ACPI_DECLARE(gic_v2, ACPI_MADT_TYPE_GENERIC_DISTRIBUTOR,
-diff --git a/include/linux/irqchip/arm-gic-common.h b/include/linux/irqchip/arm-gic-common.h
-new file mode 100644
-index 0000000..ef34f6f
---- /dev/null
-+++ b/include/linux/irqchip/arm-gic-common.h
-@@ -0,0 +1,33 @@
-+/*
-+ * include/linux/irqchip/arm-gic-common.h
-+ *
-+ * Copyright (C) 2016 ARM Limited, All Rights Reserved.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+#ifndef __LINUX_IRQCHIP_ARM_GIC_COMMON_H
-+#define __LINUX_IRQCHIP_ARM_GIC_COMMON_H
-+
-+#include <linux/types.h>
-+#include <linux/ioport.h>
-+
-+enum gic_type {
-+	GIC_V2,
-+};
-+
-+struct gic_kvm_info {
-+	/* GIC type */
-+	enum gic_type	type;
-+	/* Virtual CPU interface */
-+	struct resource vcpu;
-+	/* Interrupt number */
-+	unsigned int	maint_irq;
-+	/* Virtual control interface */
-+	struct resource vctrl;
-+};
-+
-+const struct gic_kvm_info *gic_get_kvm_info(void);
-+
-+#endif /* __LINUX_IRQCHIP_ARM_GIC_COMMON_H */
+-	cpu_base = ioremap(cpu_phy_base, ACPI_GIC_CPU_IF_MEM_SIZE);
++	cpu_base = ioremap(acpi_data.cpu_phys_base, ACPI_GIC_CPU_IF_MEM_SIZE);
+ 	if (!cpu_base) {
+ 		pr_err("Unable to map GICC registers\n");
+ 		return -ENOMEM;
 -- 
 1.9.1
