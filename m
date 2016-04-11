@@ -1,26 +1,26 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [RFC PATCH 45/45] KVM: arm/arm64: vgic-new: enable build
-Date: Mon, 11 Apr 2016 15:45:02 +0100
-Message-ID: <570BB86E.2000208@arm.com>
-References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
- <1458871508-17279-46-git-send-email-andre.przywara@arm.com>
- <20160331181850.GI4126@cbox>
+From: Shanker Donthineni <shankerd@codeaurora.org>
+Subject: Re: [PATCH v5 6/9] irqchip/gic-v3: Parse and export virtual GIC
+ information
+Date: Mon, 11 Apr 2016 10:25:33 -0500
+Message-ID: <570BC1ED.9080200@codeaurora.org>
+References: <1459769860-6629-1-git-send-email-julien.grall@arm.com>
+ <1459769860-6629-7-git-send-email-julien.grall@arm.com>
+ <570B35DA.5050600@linaro.org> <570BB461.4040704@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D78540B40
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Apr 2016 10:43:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1761140B40
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Apr 2016 11:24:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id W58-ClGAGDki for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Apr 2016 10:43:12 -0400 (EDT)
-Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
- [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A6A314011D
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Apr 2016 10:43:12 -0400 (EDT)
-In-Reply-To: <20160331181850.GI4126@cbox>
+ with ESMTP id Fy0u+otervGl for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 11 Apr 2016 11:24:04 -0400 (EDT)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E412D4011D
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Apr 2016 11:24:02 -0400 (EDT)
+In-Reply-To: <570BB461.4040704@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,131 +30,54 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Julien Grall <julien.grall@arm.com>, Hanjun Guo <hanjun.guo@linaro.org>, kvmarm@lists.cs.columbia.edu
+Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, gg@slimlogic.co.uk, linux-arm-kernel@lists.infradead.org, Thomas Gleixner <tglx@linutronix.de>, fu.wei@linaro.org, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi,
+Hi Julien,
 
-On 31/03/16 19:18, Christoffer Dall wrote:
-> On Fri, Mar 25, 2016 at 02:05:08AM +0000, Andre Przywara wrote:
->> Now that the new VGIC implementation has reached feature parity with
->> the old one, add the new files to the build system and add a Kconfig
->> option to switch between the two versions.
->> We set the default to the new version to get maximum test coverage,
->> in case people experience problems they can switch back to the old
->> behaviour if needed.
+On 04/11/2016 09:27 AM, Julien Grall wrote:
+> Hello Hanjun,
+>
+> On 11/04/16 06:27, Hanjun Guo wrote:
+>> On 2016/4/4 19:37, Julien Grall wrote:
+>>> +static void __init gic_acpi_setup_kvm_info(void)
+>>> +{
+>>> +    int irq;
+>>> +
+>>> +    if (!gic_acpi_collect_virt_info()) {
+>>> +        pr_warn("Unable to get hardware information used for
+>>> virtualization\n");
+>>> +        return;
+>>> +    }
+>>> +
+>>> +    gic_v3_kvm_info.type = GIC_V3;
+>>> +
+>>> +    irq = acpi_register_gsi(NULL, acpi_data.maint_irq,
+>>> +                acpi_data.maint_irq_mode,
+>>> +                ACPI_ACTIVE_HIGH);
+>>> +    if (irq <= 0)
+>>> +        return;
+>>> +
+>>> +    gic_v3_kvm_info.maint_irq = irq;
+>>> +
+>>> +    if (acpi_data.vcpu_base) {
 >>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> ---
->>  arch/arm/kvm/Kconfig    |  7 +++++++
->>  arch/arm/kvm/Makefile   | 10 ++++++++++
->>  arch/arm64/kvm/Kconfig  |  7 +++++++
->>  arch/arm64/kvm/Makefile | 10 ++++++++++
->>  4 files changed, 34 insertions(+)
->>
->> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
->> index 95a0005..02abfff 100644
->> --- a/arch/arm/kvm/Kconfig
->> +++ b/arch/arm/kvm/Kconfig
->> @@ -46,6 +46,13 @@ config KVM_ARM_HOST
->>  	---help---
->>  	  Provides host support for ARM processors.
->>  
->> +config KVM_NEW_VGIC
->> +	bool "New VGIC implementation"
->> +	depends on KVM
->> +	default y
->> +	---help---
->> +	  uses the new VGIC implementation
->> +
-> 
-> I had imagined we'd name it in the reverse, so the option would have
-> been CONFIG_KVM_VGIC_LEGACY, but I guess the net effect should be the
-> same, assuming most people just go with the default anyway.
+>> Sorry, I'm not familiar with KVM, but I got a question here, will
+>> KVM works without valid vcpu_base in GICv3 mode?
+>
+Yes, KVM works without vcpu_base in GICv3 mode. The vcpu_base will be used
+for emulatingvGICv2 feature. The vGICv3 emulation isdone through the
+system registers.
 
-I think originally the assumption was to make the old VGIC the default
-in the beginning, but that changed later. By that time I considered it
-too tedious to change all patches in this regard, so I just kept the old
-symbol and semantic in.
-Shouldn't matter, really, I guess there are arguments for both ways.
+> vcpu_base is only required for supporting GICv2 on GICv3.
+>
+Yes, you are right,
 
-Cheers,
-Andre.
+> Regards,
+>
 
->>  source drivers/vhost/Kconfig
->>  
->>  endif # VIRTUALIZATION
->> diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
->> index eb1bf43..aa7d724 100644
->> --- a/arch/arm/kvm/Makefile
->> +++ b/arch/arm/kvm/Makefile
->> @@ -21,7 +21,17 @@ obj-$(CONFIG_KVM_ARM_HOST) += hyp/
->>  obj-y += kvm-arm.o init.o interrupts.o
->>  obj-y += arm.o handle_exit.o guest.o mmu.o emulate.o reset.o
->>  obj-y += coproc.o coproc_a15.o coproc_a7.o mmio.o psci.o perf.o
->> +
->> +ifeq ($(CONFIG_KVM_NEW_VGIC),y)
->> +obj-y += $(KVM)/arm/vgic/vgic.o
->> +obj-y += $(KVM)/arm/vgic/vgic_init.o
->> +obj-y += $(KVM)/arm/vgic/vgic_irqfd.o
->> +obj-y += $(KVM)/arm/vgic/vgic-v2.o
->> +obj-y += $(KVM)/arm/vgic/vgic_mmio.o
->> +obj-y += $(KVM)/arm/vgic/vgic_kvm_device.o
->> +else
->>  obj-y += $(KVM)/arm/vgic.o
->>  obj-y += $(KVM)/arm/vgic-v2.o
->>  obj-y += $(KVM)/arm/vgic-v2-emul.o
->> +endif
->>  obj-y += $(KVM)/arm/arch_timer.o
->> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
->> index de7450d..3f0e1ce 100644
->> --- a/arch/arm64/kvm/Kconfig
->> +++ b/arch/arm64/kvm/Kconfig
->> @@ -55,6 +55,13 @@ config KVM_ARM_PMU
->>  	  Adds support for a virtual Performance Monitoring Unit (PMU) in
->>  	  virtual machines.
->>  
->> +config KVM_NEW_VGIC
->> +	bool "New VGIC implementation"
->> +	depends on KVM
->> +	default y
->> +        ---help---
->> +          uses the new VGIC implementation
->> +
->>  source drivers/vhost/Kconfig
->>  
->>  endif # VIRTUALIZATION
->> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
->> index 122cff4..2f5d431 100644
->> --- a/arch/arm64/kvm/Makefile
->> +++ b/arch/arm64/kvm/Makefile
->> @@ -20,10 +20,20 @@ kvm-$(CONFIG_KVM_ARM_HOST) += emulate.o inject_fault.o regmap.o
->>  kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
->>  kvm-$(CONFIG_KVM_ARM_HOST) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
->>  
->> +ifeq ($(CONFIG_KVM_NEW_VGIC),y)
->> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic.o
->> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic_init.o
->> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic_irqfd.o
->> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-v2.o
->> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-v3.o
->> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic_mmio.o
->> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic_kvm_device.o
->> +else
->>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic.o
->>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v2.o
->>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v2-emul.o
->>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3.o
->>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3-emul.o
->> +endif
->>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
->>  kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
->> -- 
->> 2.7.3
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe kvm" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+-- 
+Shanker Donthineni
+Qualcomm Technologies, Inc. on behalf of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, a Linux Foundation Collaborative Project
