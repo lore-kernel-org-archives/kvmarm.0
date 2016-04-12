@@ -1,337 +1,194 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH 10/45] KVM: arm/arm64: vgic-new: Add GICv3 world
- switch backend
-Date: Tue, 12 Apr 2016 17:02:14 +0200
-Message-ID: <20160412150214.GL3039@cbox>
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: Re: [RFC PATCH 20/45] KVM: arm/arm64: vgic-new: Add TARGET registers
+ handlers
+Date: Tue, 12 Apr 2016 16:18:49 +0100
+Message-ID: <570D11D9.2090604@arm.com>
 References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
- <1458871508-17279-11-git-send-email-andre.przywara@arm.com>
- <20160330204012.GN4126@cbox>
- <570CFF28.1080808@arm.com>
+ <1458871508-17279-21-git-send-email-andre.przywara@arm.com>
+ <20160331113126.GZ4126@cbox> <570B9430.2040305@arm.com>
+ <20160412131851.GI3039@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <570CFF28.1080808@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
+In-Reply-To: <20160412131851.GI3039@cbox>
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, Eric Auger <eric.auger@linaro.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, Apr 12, 2016 at 02:59:04PM +0100, Andre Przywara wrote:
-> Hi,
-> 
-> On 30/03/16 21:40, Christoffer Dall wrote:
-> > On Fri, Mar 25, 2016 at 02:04:33AM +0000, Andre Przywara wrote:
-> >> From: Marc Zyngier <marc.zyngier@arm.com>
-> >>
-> >> As the GICv3 virtual interface registers differ from their GICv2
-> >> siblings, we need different handlers for processing maintenance
-> >> interrupts and reading/writing to the LRs.
-> >> Also as we store an IRQ's affinity directly as a MPIDR, we need a
-> >> separate change_affinity() implementation too.
-> > 
-> > not sure why we embed the vgic_v3_irq_change_affinity in this patch here
-> > and had a stand-alone patch for v2?
-> > 
-> > I think it would be better to split them up and again have one patch to
-> > introduce the infrastructure for some piece of functionality, followed
-> > by 2 patches, one plugging in the v2 part, the other plugging in the v3
-> > part.
-> 
-> Agreed. I now have:
-> 
-> KVM: arm/arm64: vgic-new: Add IRQ sorting
-> KVM: arm/arm64: vgic-new: Add IRQ sync/flush framework
-> KVM: arm/arm64: vgic-new: Add GICv2 world switch backend
-> KVM: arm/arm64: vgic-new: Add GICv3 world switch backend
-> KVM: arm/arm64: vgic-new: Implement kvm_vgic_vcpu_pending_irq
-> 
-> The second patch contains the common code and some empty stub functions,
-> that the following two patches fill with calls to their respective
-> implementations. I found this nicer than the other way around.
-> Still not sure whether IRQ sorting or kvm_vgic_vcpu_pending_irq really
-> deserve a separate patch, but it makes it easier to review, I guess.
-> 
-> >> Implement the respective handler functions and connect them to
-> >> existing code to be called if the host is using a GICv3.
-> >>
-> >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> >> ---
-> >>  virt/kvm/arm/vgic/vgic-v3.c | 191 ++++++++++++++++++++++++++++++++++++++++++++
-> >>  virt/kvm/arm/vgic/vgic.c    |   8 +-
-> >>  virt/kvm/arm/vgic/vgic.h    |  30 +++++++
-> >>  3 files changed, 225 insertions(+), 4 deletions(-)
-> >>  create mode 100644 virt/kvm/arm/vgic/vgic-v3.c
-> >>
-> >> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-> >> new file mode 100644
-> >> index 0000000..71b4bad
-> >> --- /dev/null
-> >> +++ b/virt/kvm/arm/vgic/vgic-v3.c
-> >> @@ -0,0 +1,191 @@
-> >> +/*
-> >> + * This program is free software; you can redistribute it and/or modify
-> >> + * it under the terms of the GNU General Public License version 2 as
-> >> + * published by the Free Software Foundation.
-> >> + *
-> >> + * This program is distributed in the hope that it will be useful,
-> >> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> >> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> >> + * GNU General Public License for more details.
-> >> + *
-> >> + * You should have received a copy of the GNU General Public License
-> >> + * along with this program. If not, see <http://www.gnu.org/licenses/>.
-> >> + */
-> >> +
-> >> +#include <linux/irqchip/arm-gic-v3.h>
-> >> +#include <linux/kvm.h>
-> >> +#include <linux/kvm_host.h>
-> >> +#include <linux/irqchip/arm-gic.h>
-> >> +
-> >> +#include "vgic.h"
-> >> +
-> >> +void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
-> >> +{
-> >> +	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
-> >> +	u32 model = vcpu->kvm->arch.vgic.vgic_model;
-> >> +
-> >> +	if (cpuif->vgic_misr & ICH_MISR_EOI) {
-> >> +		unsigned long eisr_bmap = cpuif->vgic_eisr;
-> >> +		int lr;
-> >> +
-> >> +		for_each_set_bit(lr, &eisr_bmap, vcpu->arch.vgic_cpu.nr_lr) {
-> >> +			u32 intid;
-> >> +			u64 val = cpuif->vgic_lr[lr];
-> >> +
-> >> +			if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
-> >> +				intid = val & ICH_LR_VIRTUAL_ID_MASK;
-> >> +			else
-> >> +				intid = val & GICH_LR_VIRTUALID;
-> >> +
-> >> +			/*
-> >> +			 * kvm_notify_acked_irq calls kvm_set_irq()
-> >> +			 * to reset the IRQ level, which grabs the dist->lock
-> >> +			 * so we call this before taking the dist->lock.
-> >> +			 */
-> > 
-> > this comment clearly doesn't apply anymore.
-> > 
-> > also, looking at the similarities here with the v2 code, we should
-> > probably have another look at sharing some more code between v2 and v3.
-> 
-> Admittedly the code _looks_ similar, but in fact it isn't.
-> The variable names are mostly the same, but many types (both the members
-> of struct vgic_v3_cpu_if and the actual LR register itself, for
-> instance) are different. Also the EISR bitmap is handled slightly
-> differently.
-> So merging this looks like it will become messy.
-> 
-> > 
-> >> +			kvm_notify_acked_irq(vcpu->kvm, 0,
-> >> +					     intid - VGIC_NR_PRIVATE_IRQS);
-> >> +
-> >> +			cpuif->vgic_lr[lr] &= ~ICH_LR_STATE; /* Useful?? */
-> > 
-> > here you don't have the WARN that you had in v2, so does this mean we
-> > can actually come here with the LR state field having some value?
-> 
-> I don't have a real clue here, I guess the semantics are the same and
-> the missing WARN_ON is just an implementation detail.
-> 
+Hi,
 
-I think the two implementations should be similar in that sense.
-Differences like this in sych symmetric code tend to be confusing later
-on.
-
-> >> +			cpuif->vgic_elrsr |= 1ULL << lr;
-> >> +		}
-> >> +
-> >> +		/*
-> >> +		 * In the next iterations of the vcpu loop, if we sync
-> >> +		 * the vgic state after flushing it, but before
-> >> +		 * entering the guest (this happens for pending
-> >> +		 * signals and vmid rollovers), then make sure we
-> >> +		 * don't pick up any old maintenance interrupts here.
-> >> +		 */
-> >> +		cpuif->vgic_eisr = 0;
-> >> +	}
-> >> +
-> >> +	cpuif->vgic_hcr &= ~ICH_HCR_UIE;
-> > 
-> > like in the v2 case, I think this should be moved out of the process
-> > maintenance function.
+On 12/04/16 14:18, Christoffer Dall wrote:
+> On Mon, Apr 11, 2016 at 01:10:24PM +0100, Andre Przywara wrote:
+>> On 31/03/16 12:31, Christoffer Dall wrote:
+>>> On Fri, Mar 25, 2016 at 02:04:43AM +0000, Andre Przywara wrote:
+>>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>>>> ---
+>>>>  virt/kvm/arm/vgic/vgic_mmio.c | 43 ++++++++++++++++++++++++++++++++++++++++++-
+>>>>  1 file changed, 42 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/virt/kvm/arm/vgic/vgic_mmio.c b/virt/kvm/arm/vgic/vgic_mmio.c
+>>>> index 76657ce..cde153f 100644
+>>>> --- a/virt/kvm/arm/vgic/vgic_mmio.c
+>>>> +++ b/virt/kvm/arm/vgic/vgic_mmio.c
+>>>> @@ -471,6 +471,47 @@ static int vgic_mmio_write_config(struct kvm_vcpu *vcpu,
+>>>>  	return 0;
+>>>>  }
+>>>>  
+>>>> +static int vgic_mmio_read_target(struct kvm_vcpu *vcpu,
+>>>> +				 struct kvm_io_device *this,
+>>>> +				 gpa_t addr, int len, void *val)
+>>>> +{
+>>>> +	struct vgic_io_device *iodev = container_of(this,
+>>>> +						    struct vgic_io_device, dev);
+>>>> +	u32 intid = (addr - iodev->base_addr);
+>>>> +	int i;
+>>>> +
+>>>> +	if (iodev->redist_vcpu)
+>>>> +		vcpu = iodev->redist_vcpu;
+>>>> +
+>>>> +	for (i = 0; i < len; i++) {
+>>>> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+>>>> +
+>>>> +		((u8 *)val)[i] = irq->targets;
+>>>> +	}
+>>>> +
+>>>> +	return 0;
+>>>> +}
+>>>> +
+>>>> +static int vgic_mmio_write_target(struct kvm_vcpu *vcpu,
+>>>> +				  struct kvm_io_device *this,
+>>>> +				  gpa_t addr, int len, const void *val)
+>>>> +{
+>>>> +	struct vgic_io_device *iodev = container_of(this,
+>>>> +						    struct vgic_io_device, dev);
+>>>> +	u32 intid = (addr - iodev->base_addr);
+>>>> +	int i;
+>>>> +
+>>>> +	/* GICD_ITARGETSR[0-7] are read-only */
+>>>> +	if (intid < VGIC_NR_PRIVATE_IRQS)
+>>>> +		return 0;
+>>>> +
+>>>> +	for (i = 0; i < len; i++)
+>>>> +		vgic_v2_irq_change_affinity(vcpu->kvm, intid + i,
+>>>> +					    ((u8 *)val)[i]);
+>>>> +
+>>>> +	return 0;
+>>>> +}
+>>>> +
+>>>
+>>> these functions are v2 specific but are in a generic file and are not
+>>> named anything specific to v2?
+>>
+>> Well, technically the target register is still defined for the GICv3
+>> distributor, but just RES0 if affinity routing is enabled.
 > 
-> I am not sure about this one (since this function deals with exactly
-> this maintenance interrupt), but moved it anyway.
+> Shouldn't we support that then (or do we do this already via a call to
+> a RAZ handle function in the register table instead)?
+
+Yes:
+	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ITARGETSR,
+		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
+
 > 
-
-ah, I was thinking of this function as dealing with EOI interrupts only,
-but you're right.  The confusing part though is that this bit is cleared
-regardless of whether or not there was a maintenance interrupt.
-
-So, it's up to you.
-
-
-> >> +}
-> >> +
-> >> +void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
-> >> +{
-> >> +	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
-> >> +
-> >> +	cpuif->vgic_hcr |= ICH_HCR_UIE;
-> >> +}
-> >> +
-> >> +void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
-> >> +{
-> >> +	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
-> >> +	u32 model = vcpu->kvm->arch.vgic.vgic_model;
-> >> +	int lr;
-> >> +
-> >> +	/* Assumes ap_list_lock held */
-> >> +
-> >> +	for (lr = 0; lr < vcpu->arch.vgic_cpu.used_lrs; lr++) {
-> >> +		u64 val = cpuif->vgic_lr[lr];
-> >> +		u32 intid;
-> >> +		struct vgic_irq *irq;
-> >> +
-> >> +		if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
-> >> +			intid = val & ICH_LR_VIRTUAL_ID_MASK;
-> >> +		else
-> >> +			intid = val & GICH_LR_VIRTUALID;
-> >> +		irq = vgic_get_irq(vcpu->kvm, vcpu, intid);
-> >> +
-> >> +		spin_lock(&irq->irq_lock);
-> >> +
-> >> +		/* Always preserve the active bit */
-> >> +		irq->active = !!(val & ICH_LR_ACTIVE_BIT);
-> >> +
-> >> +		/* Edge is the only case where we preserve the pending bit */
-> >> +		if (irq->config == VGIC_CONFIG_EDGE &&
-> >> +		    (val & ICH_LR_PENDING_BIT)) {
-> >> +			irq->pending = true;
-> >> +
-> >> +			if (intid < VGIC_NR_SGIS &&
-> >> +			    model == KVM_DEV_TYPE_ARM_VGIC_V2) {
-> >> +				u32 cpuid = val & GICH_LR_PHYSID_CPUID;
-> >> +
-> >> +				cpuid >>= GICH_LR_PHYSID_CPUID_SHIFT;
-> >> +				irq->source |= (1 << cpuid);
-> >> +			}
-> >> +		}
-> >> +
-> >> +		/* Clear soft pending state when level irqs have been acked */
-> >> +		if (irq->config == VGIC_CONFIG_LEVEL &&
-> >> +		    !(val & ICH_LR_PENDING_BIT)) {
-> >> +			irq->soft_pending = false;
-> >> +			irq->pending = irq->line_level;
-> >> +		}
-> >> +
-> >> +		spin_unlock(&irq->irq_lock);
-> >> +	}
-> >> +}
-> >> +
-> >> +/* Requires the irq to be locked already */
-> >> +void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
-> >> +{
-> >> +	u32 model = vcpu->kvm->arch.vgic.vgic_model;
-> >> +	u64 val;
-> >> +
-> >> +	if (!irq) {
-> >> +		val = 0;
-> >> +		goto out;
-> >> +	}
-> >> +
-> >> +	val = irq->intid;
-> >> +
-> >> +	if (irq->pending) {
-> >> +		val |= ICH_LR_PENDING_BIT;
-> >> +
-> >> +		if (irq->config == VGIC_CONFIG_EDGE)
-> >> +			irq->pending = false;
-> >> +
-> >> +		if (irq->intid < VGIC_NR_SGIS &&
-> >> +		    model == KVM_DEV_TYPE_ARM_VGIC_V2) {
-> >> +			u32 src = ffs(irq->source);
-> >> +
-> >> +			BUG_ON(!src);
-> >> +			val |= (src - 1) << GICH_LR_PHYSID_CPUID_SHIFT;
-> >> +			irq->source &= ~(1 << (src - 1));
-> >> +			if (irq->source)
-> >> +				irq->pending = true;
-> >> +		}
-> >> +	}
-> >> +
-> >> +	if (irq->active)
-> >> +		val |= ICH_LR_ACTIVE_BIT;
-> >> +
-> >> +	if (irq->hw) {
-> >> +		val |= ICH_LR_HW;
-> >> +		val |= ((u64)irq->hwintid) << ICH_LR_PHYS_ID_SHIFT;
-> >> +	} else {
-> >> +		if (irq->config == VGIC_CONFIG_LEVEL)
-> >> +			val |= ICH_LR_EOI;
-> >> +	}
-> > 
-> > indeed this code looks very much like the v2 code, so maybe Marc had a
-> > point when he argued for this being more shared between v2 and v3.  Is
-> > there a nice way to do that without an intermediate LR representation?
+>> But I can of course easily add a _v2_ in here.
+>>
+>> While I look at the function, it makes me wonder if the abstraction for
+>> the affinity change call is actually correct at all. In contrast to the
+>> other vgic_v<n>_* functions this one is about the _emulated_ VGIC model,
+>> not the hardware GIC version.
+>> Also we actually only have this one user here, the other call is about
+>> initializing the affinity setting, for which this function is really
+>> overkill.
 > 
-> The same arguments as above for the process_maintenance() function:
-> The types and bit offsets are all different. In the end the actual LR
-> definition is quite different between v2 and v3, so IMHO separate
-> functions are justified.
-> The similarity is the v2 multi-source SGI handling, which could be moved
-> into a separate function, maybe.
+> How is it overkill?  In that it takes locks which are not necessary?
+
+Well, yes, and the diff for the init part looks like:
+(pls excuse my stupid mailer for breaking the lines)
+
+@@ -154,6 +154,7 @@ out:
+int kvm_vgic_dist_init(struct kvm *kvm, unsigned int nr_spis)
+{
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
++	struct kvm_vcpu *vcpu0 = kvm_get_vcpu(kvm, 0);
+ 	int i;
+
+ 	dist->spis = kcalloc(nr_spis, sizeof(struct vgic_irq), GFP_KERNEL);
+@@ -174,10 +175,11 @@ int kvm_vgic_dist_init(struct kvm *kvm, unsigned
+int nr_spis)
+ 		INIT_LIST_HEAD(&irq->ap_list);
+ 		spin_lock_init(&irq->irq_lock);
+ 		irq->vcpu = NULL;
++		irq->target_vcpu = vcpu0;
+ 		if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2)
+-			vgic_v2_irq_change_affinity(kvm, irq->intid, 0);
++			irq->targets = 0;
+ 		else
+-			vgic_v3_irq_change_affinity(kvm, irq->intid, 0);
++			irq->mpidr = 0;
+ 	}
+ 	return 0;
+ }
+
+The amended MMIO handling part for the v3 IROUTER register looks similar
+(call to the function replaced with lock; assignment; unlock;). Also the
+v2 implementation is still shorter than the original function.
+So I am tempted to keep the change I just did in the next version.
+
+>> So what about we move the content of the change_affinity function in
+>> here (same for the v3 case later), and tackle the init case separately
+>> (which is trivial)?
 > 
-> Anyway we should aim at streamlining both versions, though, for having
-> the same functionality and checks in both.
+> I don't think there's much to gain in moving the code into the function,
+> on the contrary, but you could move the function into this file and make
+> it static.
 > 
-> So for the next version I will keep both process_maintenance() and
-> populate_lr() separate. Feel free to insist on a merge or even come up
-> with patches afterwards ;-)
+> So, you're saying that the current _vX_ functions we have denote the
+> hardware version, not the emulated version, so that would be wrong to do
+> here?
+
+Yes, at least for everything in vgic/vgic-v[23].c. So having
+vgic_v2_irq_change_affinity() in there is not right.
+
+Cheers,
+Andre.
+
+> In that case, I think we should just add a comment at the top of this
+> function saying it deals with GICv2 stuff only.  That, or forget I ever
+> said anything here.
 > 
-
-That's fine.  You're probably a better judge of this having fiddled
-around with the code so much.  If it feels cleaner to you to keep them
-separate for now, let's do that, and we can play with a cleanup later if
-we feel like it.
-
-> > 
-> >> +
-> >> +	/*
-> >> +	 * Currently all guest IRQs are Group1, as Group0 would result
-> >> +	 * in a FIQ in the guest, which it wouldn't expect.
-> >> +	 * Eventually we want to make this configurable, so we may
-> >> +	 * revisit this in the future.
-> > 
-> > I know we have something similar in the current code, but I actually
-> > don't understand this.  If the IRQ is programmed to be group0, then the
-> > guest *would* expect an FIQ, or?
-> > 
-> > Why is this not a matter of reading which group this IRQ is configured
-> > to be?
+> Thanks,
+> -Christoffer
 > 
-> Because we don't implement IGROUPR setting atm, neither for the old nor
-> the new VGIC. If I now start thinking about CTLR.DS and its
-> implications, my brain will overrun, I am afraid.
-> So I'd love to move an addition of this feature to a later point in time.
+>>
+>>>
+>>>>  struct vgic_register_region vgic_v2_dist_registers[] = {
+>>>>  	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
+>>>>  		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12),
+>>>> @@ -491,7 +532,7 @@ struct vgic_register_region vgic_v2_dist_registers[] = {
+>>>>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PRI,
+>>>>  		vgic_mmio_read_priority, vgic_mmio_write_priority, 8),
+>>>>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_TARGET,
+>>>> -		vgic_mmio_read_nyi, vgic_mmio_write_nyi, 8),
+>>>> +		vgic_mmio_read_target, vgic_mmio_write_target, 8),
+>>>>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_CONFIG,
+>>>>  		vgic_mmio_read_config, vgic_mmio_write_config, 2),
+>>>>  	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SOFTINT,
+>>>> -- 
+>>>> 2.7.3
+>>>>
+>>>> --
+>>>> To unsubscribe from this list: send the line "unsubscribe kvm" in
+>>>> the body of a message to majordomo@vger.kernel.org
+>>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>>
 > 
-
-That's fine, but can we tweak the comment then, because I still don't
-understand the bit about what the guest expects vs. IRQs and FIQs.
-
-If the guest programs an interrupt to Group0, wouldn't it expect to see
-an FIQ, but even in this case we inject it as IRQs?  Maybe there's some
-complexity here that I don't see.
-
-I would phrase it something like:
-
-/*
- * We don't support grouping yet and therefore hard code all interrupts
- * to be Group1 interrupts and signal IRQs (not FIQs) to the guest.
- */
-
-But as I said, maybe I'm not getting it.
-
--Christoffer
