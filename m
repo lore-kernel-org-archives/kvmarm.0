@@ -1,24 +1,28 @@
-From: Julien Grall <julien.grall@arm.com>
-Subject: [PATCH v6 10/10] clocksource: arm_arch_timer: Remove
- arch_timer_get_timecounter
-Date: Mon, 11 Apr 2016 16:33:00 +0100
-Message-ID: <1460388780-914-11-git-send-email-julien.grall@arm.com>
+From: Daniel Lezcano <daniel.lezcano@linaro.org>
+Subject: Re: [PATCH v6 01/10] clocksource: arm_arch_timer: Gather KVM
+ specific information in a structure
+Date: Tue, 12 Apr 2016 07:43:13 +0200
+Message-ID: <20160412054313.GA16636@linaro.org>
 References: <1460388780-914-1-git-send-email-julien.grall@arm.com>
+ <1460388780-914-2-git-send-email-julien.grall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E17CC409A2
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Apr 2016 11:31:58 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 0DC98407A5
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2016 01:41:43 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id fLdbHxL8YEZP for <kvmarm@lists.cs.columbia.edu>;
- Mon, 11 Apr 2016 11:31:58 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1C19C40C9A
- for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Apr 2016 11:31:58 -0400 (EDT)
-In-Reply-To: <1460388780-914-1-git-send-email-julien.grall@arm.com>
+ with ESMTP id cPWNV9lYWNKH for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 12 Apr 2016 01:41:42 -0400 (EDT)
+Received: from mail-wm0-f42.google.com (mail-wm0-f42.google.com [74.125.82.42])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id CE5A1400E9
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2016 01:41:41 -0400 (EDT)
+Received: by mail-wm0-f42.google.com with SMTP id u206so12565222wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 11 Apr 2016 22:43:18 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1460388780-914-2-git-send-email-julien.grall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,68 +32,25 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: kvmarm@lists.cs.columbia.edu
-Cc: al.stone@linaro.org, kvm@vger.kernel.org, hanjun.guo@linaro.org, marc.zyngier@arm.com, Daniel Lezcano <daniel.lezcano@linaro.org>, linux-kernel@vger.kernel.org, fu.wei@linaro.org, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org, gg@slimlogic.co.uk
+To: Julien Grall <julien.grall@arm.com>
+Cc: linux-arm-kernel@lists.infradead.org, al.stone@linaro.org, kvm@vger.kernel.org, hanjun.guo@linaro.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, gg@slimlogic.co.uk
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The only call of arch_timer_get_timecounter (in KVM) has been removed.
+On Mon, Apr 11, 2016 at 04:32:51PM +0100, Julien Grall wrote:
+> Introduce a structure which are filled up by the arch timer driver and
+> used by the virtual timer in KVM.
+> 
+> The first member of this structure will be the timecounter. More members
+> will be added later.
+> 
+> A stub for the new helper isn't introduced because KVM requires the arch
+> timer for both ARM64 and ARM32.
+> 
+> The function arch_timer_get_timecounter is kept for the time being and
+> will be dropped in a subsequent patch.
+> 
+> Signed-off-by: Julien Grall <julien.grall@arm.com>
+> Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+> 
 
-Signed-off-by: Julien Grall <julien.grall@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
-
----
-Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-
-    Changes in v4:
-        - Add Christoffer's acked-by
-
-    Changes in v3:
-        - Patch added
----
- drivers/clocksource/arm_arch_timer.c | 5 -----
- include/clocksource/arm_arch_timer.h | 6 ------
- 2 files changed, 11 deletions(-)
-
-diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-index bb58224..4814446 100644
---- a/drivers/clocksource/arm_arch_timer.c
-+++ b/drivers/clocksource/arm_arch_timer.c
-@@ -475,11 +475,6 @@ struct arch_timer_kvm_info *arch_timer_get_kvm_info(void)
- 	return &arch_timer_kvm_info;
- }
- 
--struct timecounter *arch_timer_get_timecounter(void)
--{
--	return &arch_timer_kvm_info.timecounter;
--}
--
- static void __init arch_counter_register(unsigned type)
- {
- 	u64 start_count;
-diff --git a/include/clocksource/arm_arch_timer.h b/include/clocksource/arm_arch_timer.h
-index 9dd996a..caedb74 100644
---- a/include/clocksource/arm_arch_timer.h
-+++ b/include/clocksource/arm_arch_timer.h
-@@ -58,7 +58,6 @@ struct arch_timer_kvm_info {
- 
- extern u32 arch_timer_get_rate(void);
- extern u64 (*arch_timer_read_counter)(void);
--extern struct timecounter *arch_timer_get_timecounter(void);
- extern struct arch_timer_kvm_info *arch_timer_get_kvm_info(void);
- 
- #else
-@@ -73,11 +72,6 @@ static inline u64 arch_timer_read_counter(void)
- 	return 0;
- }
- 
--static inline struct timecounter *arch_timer_get_timecounter(void)
--{
--	return NULL;
--}
--
- #endif
- 
- #endif
--- 
-1.9.1
+Acked-by: Daniel Lezcano <daniel.lezcano@linaro.org>
