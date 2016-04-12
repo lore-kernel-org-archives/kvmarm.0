@@ -1,97 +1,112 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH 15/17] kvm: arm64: Get rid of fake page table levels
-Date: Tue, 12 Apr 2016 14:03:25 +0100
-Message-ID: <570CF21D.8000600@arm.com>
-References: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
- <1459787177-12767-16-git-send-email-suzuki.poulose@arm.com>
- <20160408150523.GX8961@cbox> <570BB5C9.8040509@arm.com>
- <20160412121414.GA3039@cbox>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [RFC PATCH 16/45] KVM: arm/arm64: vgic-new: Add PENDING
+ registers handlers
+Date: Tue, 12 Apr 2016 15:10:48 +0200
+Message-ID: <20160412131048.GG3039@cbox>
+References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
+ <1458871508-17279-17-git-send-email-andre.przywara@arm.com>
+ <20160331093551.GV4126@cbox>
+ <570B8B14.3050007@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7E80A41390
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2016 09:01:53 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vJdWfhJxVmhZ for <kvmarm@lists.cs.columbia.edu>;
- Tue, 12 Apr 2016 09:01:51 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4EC00409A2
- for <kvmarm@lists.cs.columbia.edu>; Tue, 12 Apr 2016 09:01:50 -0400 (EDT)
-In-Reply-To: <20160412121414.GA3039@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=us-ascii
+Return-path: <kvm-owner@vger.kernel.org>
+Content-Disposition: inline
+In-Reply-To: <570B8B14.3050007@arm.com>
+Sender: kvm-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>, j@cbox
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 12/04/16 13:14, Christoffer Dall wrote:
-> On Mon, Apr 11, 2016 at 03:33:45PM +0100, Suzuki K Poulose wrote:
->> On 08/04/16 16:05, Christoffer Dall wrote:
->>> On Mon, Apr 04, 2016 at 05:26:15PM +0100, Suzuki K Poulose wrote:
->>
+On Mon, Apr 11, 2016 at 12:31:32PM +0100, Andre Przywara wrote:
+> On 31/03/16 10:35, Christoffer Dall wrote:
+> > On Fri, Mar 25, 2016 at 02:04:39AM +0000, Andre Przywara wrote:
+> >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> >> ---
+> >>  virt/kvm/arm/vgic/vgic_mmio.c | 87 ++++++++++++++++++++++++++++++++++++++++++-
+> >>  1 file changed, 85 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/virt/kvm/arm/vgic/vgic_mmio.c b/virt/kvm/arm/vgic/vgic_mmio.c
+> >> index 0688a69..8514f92 100644
+> >> --- a/virt/kvm/arm/vgic/vgic_mmio.c
+> >> +++ b/virt/kvm/arm/vgic/vgic_mmio.c
+> >> @@ -206,6 +206,89 @@ static int vgic_mmio_write_cenable(struct kvm_vcpu *vcpu,
+> >>  	return 0;
+> >>  }
+> >>  
+> >> +static int vgic_mmio_read_pending(struct kvm_vcpu *vcpu,
+> >> +				  struct kvm_io_device *this,
+> >> +				  gpa_t addr, int len, void *val)
+> >> +{
+> >> +	struct vgic_io_device *iodev = container_of(this,
+> >> +						    struct vgic_io_device, dev);
+> >> +	u32 intid = (addr - iodev->base_addr) * 8;
+> >> +	u32 value = 0;
+> >> +	int i;
+> >> +
+> >> +	if (iodev->redist_vcpu)
+> >> +		vcpu = iodev->redist_vcpu;
+> >> +
+> >> +	/* Loop over all IRQs affected by this read */
+> >> +	for (i = 0; i < len * 8; i++) {
+> >> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
+> >> +
+> >> +		spin_lock(&irq->irq_lock);
+> >> +		if (irq->pending)
+> >> +			value |= (1U << i);
+> >> +		spin_unlock(&irq->irq_lock);
+> > 
+> > here there clearly is no need to take the lock (because a bool read is
+> > atomic), but that should be explained in a one-line comment.
+> 
+> Is that really true? Isn't it that another lock holder expects full
+> control over the IRQ struct, including the freedom to change values at
+> will without caring about other observers?
 
->>>> -#if PGDIR_SHIFT > KVM_PHYS_SHIFT
->>>> -#define PTRS_PER_S2_PGD_SHIFT	0
->>>> -#else
->>>> -#define PTRS_PER_S2_PGD_SHIFT	(KVM_PHYS_SHIFT - PGDIR_SHIFT)
->>>> -#endif
->>>> -#define PTRS_PER_S2_PGD		(1 << PTRS_PER_S2_PGD_SHIFT)
->>>> +#define STAGE2_PGTABLE_LEVELS		ARM64_HW_PGTABLE_LEVELS(KVM_PHYS_SHIFT - 4)
->>>>
->>>>   /*
->>>> - * If we are concatenating first level stage-2 page tables, we would have less
->>>> - * than or equal to 16 pointers in the fake PGD, because that's what the
->>>> - * architecture allows.  In this case, (4 - CONFIG_PGTABLE_LEVELS)
->>>> - * represents the first level for the host, and we add 1 to go to the next
->>>> - * level (which uses contatenation) for the stage-2 tables.
->
-> just noticed: s/contatenation/concatenation/
+Consider the following three cases, assuming pending is clear in the
+initial state:
 
-Thanks for catching that. Will fix it.
+Case 1:
+	CPU A			CPU B
+	-----			-----
+	read pending
+				lock irq
+				set pending
+				unlock irq
 
->>> which case this should be reworded to just state the assumptions and why
->>> this is a good assumption.
->>>
->>> (If my assumptions are wrong here, then there are also weird cases where
->>> the host does huge pages at the PMD level and we don't.  Not sure I can
->>> see the full ramifications of that.)
->>
->> I am sorry, I didn't get your point about the PMD level.
->>
->
-> Right, I expressed that terribly, and I may have gotten myself confused
-> when writing that.
->
-> My concern is this: if the number of levels between the host and stage-2
-> are different, and the host uses huge pmd mappings (either THP or huge
-> tlb fs), then do we always do the right thing for stage-2 tables, even
-> if we support the case with more levels in Stage-2 than on the host?
+Case 2:
+	CPU A			CPU B
+	-----			-----
+				lock irq
+	read pending
+				set pending
+				unlock irq
 
-Yes. We are safe with PMD (level 2). In the worst case we will have a 2level
-page table at host and say 4 at stage2. In either case, we have a PMD level
-(which in host is folded to PGD) and both will use section mapping at level 2
-for huge pmd. Also pmd_huge() doesn't care if the PMD is folded or not. So,
-we are fine with that. I hope that answers your question.
 
->
-> Thanks for trying to parse my crytptic and potentially nonsensical
-> questions.
+Case 3:
+	CPU A			CPU B
+	-----			-----
+				lock irq
+				set pending
+				unlock irq
+	read pending
 
-No no, they make absolute sense. I had gone through these questions myself initially
-when I wrote the series, so its good to share them :-).
 
-Btw, I have rebased my series to kvmarm and have addressed the comments. I will post
-them after a round of testing.
+The only effect of adding a lock/unlock around the read_pending()
+operation is to force case 2 to be equivalent to case 3, but case 1
+could still happen, so this just boils down to observing the value
+before or after the write, both of which are fine.
 
-Cheers
-Suzuki
+If there were weird side effect from reading this value, or even getting
+to the struct would depend on other things CPU B could do while holding
+the lock, it would be a different story, but here I'm faily certain you
+don't need the lock.
+
+> I might be too paranoid here, but I think I explicitly added the lock
+> here for a reason (which I don't remember anymore, sadly).
+> 
+
+Can you can find an example where something breaks without holding the
+lock here?
+
+Thanks,
+-Christoffer
