@@ -1,118 +1,68 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [RFC PATCH 24/45] KVM: arm/arm64: vgic-new: Add GICv3 CTLR,
- IIDR, TYPER handlers
-Date: Tue, 12 Apr 2016 15:20:07 +0200
-Message-ID: <20160412132007.GJ3039@cbox>
+Subject: Re: [RFC PATCH 45/45] KVM: arm/arm64: vgic-new: enable build
+Date: Tue, 12 Apr 2016 15:21:31 +0200
+Message-ID: <20160412132131.GK3039@cbox>
 References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
- <1458871508-17279-25-git-send-email-andre.przywara@arm.com>
- <20160331115319.GD4126@cbox>
- <570B9FD2.80907@arm.com>
+ <1458871508-17279-46-git-send-email-andre.przywara@arm.com>
+ <20160331181850.GI4126@cbox>
+ <570BB86E.2000208@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Return-path: <kvm-owner@vger.kernel.org>
 Content-Disposition: inline
-In-Reply-To: <570B9FD2.80907@arm.com>
+In-Reply-To: <570BB86E.2000208@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Andre Przywara <andre.przywara@arm.com>
 Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Apr 11, 2016 at 02:00:02PM +0100, Andre Przywara wrote:
+On Mon, Apr 11, 2016 at 03:45:02PM +0100, Andre Przywara wrote:
 > Hi,
 > 
-> On 31/03/16 12:53, Christoffer Dall wrote:
-> > On Fri, Mar 25, 2016 at 02:04:47AM +0000, Andre Przywara wrote:
-> >> As in the GICv2 emulation we handle those three registers in one
-> >> function.
+> On 31/03/16 19:18, Christoffer Dall wrote:
+> > On Fri, Mar 25, 2016 at 02:05:08AM +0000, Andre Przywara wrote:
+> >> Now that the new VGIC implementation has reached feature parity with
+> >> the old one, add the new files to the build system and add a Kconfig
+> >> option to switch between the two versions.
+> >> We set the default to the new version to get maximum test coverage,
+> >> in case people experience problems they can switch back to the old
+> >> behaviour if needed.
 > >>
 > >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > >> ---
-> >>  virt/kvm/arm/vgic/vgic.h      |  2 ++
-> >>  virt/kvm/arm/vgic/vgic_mmio.c | 38 ++++++++++++++++++++++++++++++++++++--
-> >>  2 files changed, 38 insertions(+), 2 deletions(-)
+> >>  arch/arm/kvm/Kconfig    |  7 +++++++
+> >>  arch/arm/kvm/Makefile   | 10 ++++++++++
+> >>  arch/arm64/kvm/Kconfig  |  7 +++++++
+> >>  arch/arm64/kvm/Makefile | 10 ++++++++++
+> >>  4 files changed, 34 insertions(+)
 > >>
-> >> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> >> index 4b8952a..0db1abe 100644
-> >> --- a/virt/kvm/arm/vgic/vgic.h
-> >> +++ b/virt/kvm/arm/vgic/vgic.h
-> >> @@ -19,6 +19,8 @@
-> >>  #define PRODUCT_ID_KVM		0x4b	/* ASCII code K */
-> >>  #define IMPLEMENTER_ARM		0x43b
+> >> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+> >> index 95a0005..02abfff 100644
+> >> --- a/arch/arm/kvm/Kconfig
+> >> +++ b/arch/arm/kvm/Kconfig
+> >> @@ -46,6 +46,13 @@ config KVM_ARM_HOST
+> >>  	---help---
+> >>  	  Provides host support for ARM processors.
 > >>  
-> >> +#define INTERRUPT_ID_BITS_SPIS	10
+> >> +config KVM_NEW_VGIC
+> >> +	bool "New VGIC implementation"
+> >> +	depends on KVM
+> >> +	default y
+> >> +	---help---
+> >> +	  uses the new VGIC implementation
 > >> +
-> >>  struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
-> >>  			      u32 intid);
-> >>  bool vgic_queue_irq(struct kvm *kvm, struct vgic_irq *irq);
-> >> diff --git a/virt/kvm/arm/vgic/vgic_mmio.c b/virt/kvm/arm/vgic/vgic_mmio.c
-> >> index 2d10c06..13e101f 100644
-> >> --- a/virt/kvm/arm/vgic/vgic_mmio.c
-> >> +++ b/virt/kvm/arm/vgic/vgic_mmio.c
-> >> @@ -606,7 +606,29 @@ static int vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
-> >>  				  struct kvm_io_device *this,
-> >>  				  gpa_t addr, int len, void *val)
-> >>  {
-> >> -	/* TODO: implement */
-> >> +	struct vgic_io_device *iodev = container_of(this,
-> >> +						    struct vgic_io_device, dev);
-> >> +	u32 value = 0;
-> >> +
-> >> +	switch ((addr - iodev->base_addr) & ~3) {
-> >> +	case GICD_CTLR:
-> >> +		if (vcpu->kvm->arch.vgic.enabled)
-> >> +		       value |=	GICD_CTLR_ENABLE_SS_G1;
-> >> +		value |= GICD_CTLR_ARE_NS | GICD_CTLR_DS;
-> >> +		break;
-> >> +	case GICD_TYPER:
-> >> +		value = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
-> >> +		value = (value >> 5) - 1;
-> >> +		value |= (INTERRUPT_ID_BITS_SPIS - 1) << 19;
-> >> +		break;
-> >> +	case GICD_IIDR:
-> >> +		value = (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
-> >> +		break;
-> >> +	default:
-> >> +		return 0;
-> >> +	}
-> >> +
-> >> +	write_mask32(value, addr & 3, len, val);
-> >>  	return 0;
-> >>  }
-> >>  
-> >> @@ -614,7 +636,19 @@ static int vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
-> >>  				   struct kvm_io_device *this,
-> >>  				   gpa_t addr, int len, const void *val)
-> >>  {
-> >> -	/* TODO: implement */
-> >> +	struct vgic_io_device *iodev = container_of(this,
-> >> +						    struct vgic_io_device, dev);
-> >> +	bool enabled;
-> >> +
-> >> +	/* These are not the bits you are looking for ... */
 > > 
-> > haha, nice.  But I don't understand what this case is?
+> > I had imagined we'd name it in the reverse, so the option would have
+> > been CONFIG_KVM_VGIC_LEGACY, but I guess the net effect should be the
+> > same, assuming most people just go with the default anyway.
 > 
-> Of the 16 bytes this region covers (CTLR, TYPER, IIDR) only the first
-> byte is writeable, the rest is WI.
-> I am afraid I have to replace the cool quote with something more
-> meaningful ...
-> 
-
-You can maintain the fun quote and supplement it with a boring
-explanation.
-
-> >> +	if (addr - iodev->base_addr > 0)
-> >> +		return 0;
-> >> +
-> >> +	/* We only care about the enable bit, all other bits are WI. */
-> >> +	enabled = *(u8*)val & GICD_CTLR_ENABLE_SS_G1;
-> >> +
-> >> +	vcpu->kvm->arch.vgic.enabled = enabled;
-> > 
-> > I think some of the comments from the v2 side apply here as well.
-> 
-> Agreed.
+> I think originally the assumption was to make the old VGIC the default
+> in the beginning, but that changed later. By that time I considered it
+> too tedious to change all patches in this regard, so I just kept the old
+> symbol and semantic in.
+> Shouldn't matter, really, I guess there are arguments for both ways.
 > 
 
-Thanks,
+Agreed, shouldn't matter.
+
 -Christoffer
