@@ -1,28 +1,30 @@
 From: Hanjun Guo <hanjun.guo@linaro.org>
-Subject: Re: [PATCH v6 05/10] irqchip/gic-v3: Prefix all pr_* messages by
- "GICv3: "
-Date: Wed, 13 Apr 2016 18:01:48 +0800
-Message-ID: <570E190C.8020203@linaro.org>
-References: <1460388780-914-1-git-send-email-julien.grall@arm.com>
- <1460388780-914-6-git-send-email-julien.grall@arm.com>
+Subject: Re: [PATCH v5 6/9] irqchip/gic-v3: Parse and export virtual GIC
+ information
+Date: Wed, 13 Apr 2016 18:11:08 +0800
+Message-ID: <570E1B3C.8010800@linaro.org>
+References: <1459769860-6629-1-git-send-email-julien.grall@arm.com>
+ <1459769860-6629-7-git-send-email-julien.grall@arm.com>
+ <570B35DA.5050600@linaro.org> <570BB461.4040704@arm.com>
+ <570BC1ED.9080200@codeaurora.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"; Format="flowed"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 63B3649B3C
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Apr 2016 06:00:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 60EEA49B4E
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Apr 2016 06:09:41 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hTAkZ0iYDlYY for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Apr 2016 06:00:20 -0400 (EDT)
+ with ESMTP id Ydg3hIRuxqzy for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 13 Apr 2016 06:09:40 -0400 (EDT)
 Received: from mail-pa0-f44.google.com (mail-pa0-f44.google.com
  [209.85.220.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 07915412C2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Apr 2016 06:00:19 -0400 (EDT)
-Received: by mail-pa0-f44.google.com with SMTP id ot11so30917607pab.1
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Apr 2016 03:02:00 -0700 (PDT)
-In-Reply-To: <1460388780-914-6-git-send-email-julien.grall@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6395849B46
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Apr 2016 06:09:40 -0400 (EDT)
+Received: by mail-pa0-f44.google.com with SMTP id fs9so12240881pac.2
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Apr 2016 03:11:20 -0700 (PDT)
+In-Reply-To: <570BC1ED.9080200@codeaurora.org>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,42 +34,53 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, fu.wei@linaro.org, linux-arm-kernel@lists.infradead.org, gg@slimlogic.co.uk
+To: Shanker Donthineni <shankerd@codeaurora.org>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, gg@slimlogic.co.uk, linux-arm-kernel@lists.infradead.org, Thomas Gleixner <tglx@linutronix.de>, fu.wei@linaro.org, Jason Cooper <jason@lakedaemon.net>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 2016/4/11 23:32, Julien Grall wrote:
-> Currently, most of the pr_* messages in the GICv3 driver don't have a
-> prefix.  Add one to make clear where the messages come from.
+Hi Shanker, Julien,
+
+On 2016/4/11 23:25, Shanker Donthineni wrote:
+> Hi Julien,
 >
-> Signed-off-by: Julien Grall <julien.grall@arm.com>
+> On 04/11/2016 09:27 AM, Julien Grall wrote:
+>> Hello Hanjun,
+>>
+>> On 11/04/16 06:27, Hanjun Guo wrote:
+>>> On 2016/4/4 19:37, Julien Grall wrote:
+>>>> +static void __init gic_acpi_setup_kvm_info(void)
+>>>> +{
+>>>> +    int irq;
+>>>> +
+>>>> +    if (!gic_acpi_collect_virt_info()) {
+>>>> +        pr_warn("Unable to get hardware information used for
+>>>> virtualization\n");
+>>>> +        return;
+>>>> +    }
+>>>> +
+>>>> +    gic_v3_kvm_info.type = GIC_V3;
+>>>> +
+>>>> +    irq = acpi_register_gsi(NULL, acpi_data.maint_irq,
+>>>> +                acpi_data.maint_irq_mode,
+>>>> +                ACPI_ACTIVE_HIGH);
+>>>> +    if (irq <= 0)
+>>>> +        return;
+>>>> +
+>>>> +    gic_v3_kvm_info.maint_irq = irq;
+>>>> +
+>>>> +    if (acpi_data.vcpu_base) {
+>>>
+>>> Sorry, I'm not familiar with KVM, but I got a question here, will
+>>> KVM works without valid vcpu_base in GICv3 mode?
+>>
+> Yes, KVM works without vcpu_base in GICv3 mode. The vcpu_base will be used
+> for emulatingvGICv2 feature. The vGICv3 emulation isdone through the
+> system registers.
 >
-> ---
->      Changes in v6:
->          - Patch added
-> ---
->   drivers/irqchip/irq-gic-v3.c | 2 ++
->   1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
-> index 5b7d3c2..6dc6f03 100644
-> --- a/drivers/irqchip/irq-gic-v3.c
-> +++ b/drivers/irqchip/irq-gic-v3.c
-> @@ -15,6 +15,8 @@
->    * along with this program.  If not, see <http://www.gnu.org/licenses/>.
->    */
->
-> +#define pr_fmt(fmt)	"GICv3: " fmt
+>> vcpu_base is only required for supporting GICv2 on GICv3.
+>>
+> Yes, you are right,
 
-I don't think this patch is needed, as GICv3 and GICv2 will
-not be probed at the same time, did I miss something?
+Thanks for the clarify.
 
-Further more, there are prefixes in pr_fmt in this
-patch using GIC:, with your patch added, it will print:
-
-GIV3: GIC: .....
-
-which is not a good idea.
-
-Thanks
 Hanjun
