@@ -1,86 +1,63 @@
-From: Hanjun Guo <hanjun.guo@linaro.org>
-Subject: Re: [PATCH v5 6/9] irqchip/gic-v3: Parse and export virtual GIC
- information
-Date: Wed, 13 Apr 2016 18:11:08 +0800
-Message-ID: <570E1B3C.8010800@linaro.org>
-References: <1459769860-6629-1-git-send-email-julien.grall@arm.com>
- <1459769860-6629-7-git-send-email-julien.grall@arm.com>
- <570B35DA.5050600@linaro.org> <570BB461.4040704@arm.com>
- <570BC1ED.9080200@codeaurora.org>
+From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+Subject: Re: [RFC PATCH 00/45] KVM: arm/arm64: Rework virtual GIC emulation
+Date: Wed, 13 Apr 2016 17:07:56 +0100
+Message-ID: <570E6EDC.5070209@arm.com>
+References: <1458871508-17279-1-git-send-email-andre.przywara@arm.com>
+ <20160331183019.GK4126@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 60EEA49B4E
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Apr 2016 06:09:41 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ydg3hIRuxqzy for <kvmarm@lists.cs.columbia.edu>;
- Wed, 13 Apr 2016 06:09:40 -0400 (EDT)
-Received: from mail-pa0-f44.google.com (mail-pa0-f44.google.com
- [209.85.220.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6395849B46
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Apr 2016 06:09:40 -0400 (EDT)
-Received: by mail-pa0-f44.google.com with SMTP id fs9so12240881pac.2
- for <kvmarm@lists.cs.columbia.edu>; Wed, 13 Apr 2016 03:11:20 -0700 (PDT)
-In-Reply-To: <570BC1ED.9080200@codeaurora.org>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Shanker Donthineni <shankerd@codeaurora.org>, Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu
-Cc: al.stone@linaro.org, kvm@vger.kernel.org, marc.zyngier@arm.com, linux-kernel@vger.kernel.org, gg@slimlogic.co.uk, linux-arm-kernel@lists.infradead.org, Thomas Gleixner <tglx@linutronix.de>, fu.wei@linaro.org, Jason Cooper <jason@lakedaemon.net>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20160331183019.GK4126@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Shanker, Julien,
-
-On 2016/4/11 23:25, Shanker Donthineni wrote:
-> Hi Julien,
->
-> On 04/11/2016 09:27 AM, Julien Grall wrote:
->> Hello Hanjun,
+On 31/03/16 19:30, Christoffer Dall wrote:
+> On Fri, Mar 25, 2016 at 02:04:23AM +0000, Andre Przywara wrote:
+>> This series is a joint effort to re-implement KVM's GIC emulation.
 >>
->> On 11/04/16 06:27, Hanjun Guo wrote:
->>> On 2016/4/4 19:37, Julien Grall wrote:
->>>> +static void __init gic_acpi_setup_kvm_info(void)
->>>> +{
->>>> +    int irq;
->>>> +
->>>> +    if (!gic_acpi_collect_virt_info()) {
->>>> +        pr_warn("Unable to get hardware information used for
->>>> virtualization\n");
->>>> +        return;
->>>> +    }
->>>> +
->>>> +    gic_v3_kvm_info.type = GIC_V3;
->>>> +
->>>> +    irq = acpi_register_gsi(NULL, acpi_data.maint_irq,
->>>> +                acpi_data.maint_irq_mode,
->>>> +                ACPI_ACTIVE_HIGH);
->>>> +    if (irq <= 0)
->>>> +        return;
->>>> +
->>>> +    gic_v3_kvm_info.maint_irq = irq;
->>>> +
->>>> +    if (acpi_data.vcpu_base) {
->>>
->>> Sorry, I'm not familiar with KVM, but I got a question here, will
->>> KVM works without valid vcpu_base in GICv3 mode?
+>> While the current implementation is centered around providing
+>> efficient MMIO emulation, the hot path for most guests is actually
+>> the guest entry and exit, which currently is rather costly.
+>> Also the existing emulation has a global distributor lock, which
+>> quickly becomes a bottleneck once the number of VCPUs increases.
+>> Additionally the emulation was originally designed for GICv2, adding
+>> GICv3 ITS emulation support to this proved to be rather painful.
+>> Last, but not least the existing code became less and less
+>> maintainable, with many special cases handled explicitly.
 >>
-> Yes, KVM works without vcpu_base in GICv3 mode. The vcpu_base will be used
-> for emulatingvGICv2 feature. The vGICv3 emulation isdone through the
-> system registers.
->
->> vcpu_base is only required for supporting GICv2 on GICv3.
+>> The new implementation is build around a struct vgic_irq data data
+>> structure, which holds all information about a virtual interrupt.
+>> Interruts which should be injected are hold in a per-VCPU list, this
+>> make the entry/exit path much more efficient. Also the new structure
+>> allows to have more fine grained locking - per IRQ and per VCPU -
+>> getting rid of the global distributor lock.
+>> As a result of the new design ITS emulation fits in more nicely, the
+>> respective code will be provided as a follow-up series.
 >>
-> Yes, you are right,
+>> This series implements the same feature set as the existing emulation,
+>> as a goodie we now implement priorities correctly.
+>> To allow an easy transition with good test coverage, but still maintain
+>> stability, both implementations live side by side, selectable via a
+>> Kconfig option. The default is the new implementation.
+>> If this code proves to be reliable, we will later remove the current
+>> implementation with an extra patch set.
+>>
+>> Please have a look at the series, review it and give the code some
+>> serious testing (and possibly debugging). All feedback is appreciated.
+>>
+> 
+> Hmph, starting a guest a couple of times and running hackbench inside
+> the guest actually gave me (twice) the following error:
+> 
+> NMI watchdog: BUG: soft lockup - CPU#0 stuck for 23s! [kworker/0:0:4]
 
-Thanks for the clarify.
+On the host or in the guest?
+Can you reproduce it easily? If yes, can you add some lock debugging to
+see if we are stuck in a spinlock?
 
-Hanjun
+Cheers,
+Andre.
+
