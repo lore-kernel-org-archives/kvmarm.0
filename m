@@ -1,140 +1,207 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH 15/17] kvm: arm64: Get rid of fake page table levels
-Date: Thu, 14 Apr 2016 14:18:01 +0200
-Message-ID: <20160414121801.GJ30804@cbox>
-References: <1459787177-12767-1-git-send-email-suzuki.poulose@arm.com>
- <1459787177-12767-16-git-send-email-suzuki.poulose@arm.com>
- <20160408150523.GX8961@cbox>
- <570BB5C9.8040509@arm.com>
- <20160412121414.GA3039@cbox>
- <570E86C7.1020606@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+Subject: [PATCH v2 01/17] arm64: Reuse TCR field definitions for EL1 and EL2
+Date: Thu, 14 Apr 2016 14:20:49 +0100
+Message-ID: <1460640065-27658-2-git-send-email-suzuki.poulose@arm.com>
+References: <1460640065-27658-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <linux-kernel-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <570E86C7.1020606@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, marc.zyngier@arm.com, mark.rutland@arm.com, will.deacon@arm.com, catalin.marinas@arm.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C700D49B8E
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:19:51 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id M+8klgXk52dv for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Apr 2016 09:19:50 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 80D6649B88
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:19:50 -0400 (EDT)
+In-Reply-To: <1460640065-27658-1-git-send-email-suzuki.poulose@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: linux-arm-kernel@lists.infradead.org
+Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Apr 13, 2016 at 06:49:59PM +0100, Suzuki K Poulose wrote:
-> On 12/04/16 13:14, Christoffer Dall wrote:
-> >On Mon, Apr 11, 2016 at 03:33:45PM +0100, Suzuki K Poulose wrote:
-> >>On 08/04/16 16:05, Christoffer Dall wrote:
-> >>>On Mon, Apr 04, 2016 at 05:26:15PM +0100, Suzuki K Poulose wrote:
-> >>
-> >>>>diff --git a/arch/arm64/include/asm/stage2_pgtable.h b/arch/arm64/include/asm/stage2_pgtable.h
-> >>>>index 751227d..139b4db 100644
-> >>>>--- a/arch/arm64/include/asm/stage2_pgtable.h
-> >>>>+++ b/arch/arm64/include/asm/stage2_pgtable.h
-> >>>>@@ -22,32 +22,55 @@
-> >>>>  #include <asm/pgtable.h>
-> >>>>
-> >>>>  /*
-> >>>>- * In the case where PGDIR_SHIFT is larger than KVM_PHYS_SHIFT, we can address
-> >>>>- * the entire IPA input range with a single pgd entry, and we would only need
-> >>>>- * one pgd entry.  Note that in this case, the pgd is actually not used by
-> >>>>- * the MMU for Stage-2 translations, but is merely a fake pgd used as a data
-> >>>>- * structure for the kernel pgtable macros to work.
-> >>>>+ * The hardware mandates concatenation of upto 16 tables at stage2 entry level.
-> >>>
-> >>>s/upto/up to/
-> >>>
-> >>>>+ * Now, the minimum number of bits resolved at any level is (PAGE_SHIFT - 3),
-> >>>>+ * or in other words log2(PTRS_PER_PTE). On arm64, the smallest PAGE_SIZE
-> >>>
-> >>>not sure the log2 comment helps here.
-> >>
-> >>OK, will address both the above comments.
-> >>
-> >>>
-> >>>>+ * supported is 4k, which means (PAGE_SHIFT - 3) > 4 holds for all page sizes.
-> >>>>+ * This implies, the total number of page table levels at stage2 expected
-> >>>>+ * by the hardware is actually the number of levels required for (KVM_PHYS_SHIFT - 4)
-> >>>>+ * in normal translations(e.g, stage-1), since we cannot have another level in
-> >>>>+ * the range (KVM_PHYS_SHIFT, KVM_PHYS_SHIFT - 4).
-> >>>
-> >>>Is it not a design decision to always choose the maximum number of
-> >>>concatinated initial-level stage2 tables (with the constraint that
-> >>>there's a minimum number required)?
-> >>
-> 
-> I have changed the above comment to :
-> 
-> /*
->  * The hardware supports concatenation of up to 16 tables at stage2 entry level
->  * and we use the feature whenever possible.
->  *
->  * Now, the minimum number of bits resolved at any level is (PAGE_SHIFT - 3).
->  * On arm64, the smallest PAGE_SIZE supported is 4k, which means
->  *             (PAGE_SHIFT - 3) > 4 holds for all page sizes.
->  * This implies, the total number of page table levels at stage2 expected
->  * by the hardware is actually the number of levels required for (KVM_PHYS_SHIFT - 4)
->  * in normal translations(e.g, stage1), since we cannot have another level in
->  * the range (KVM_PHYS_SHIFT, KVM_PHYS_SHIFT - 4).
->  */
-> 
-> 
+TCR_EL1, TCR_EL2 and VTCR_EL2, all share some field positions
+(TG0, ORGN0, IRGN0 and SH0) and their corresponding value definitions.
 
-Looks great.
+This patch makes the TCR_EL1 definitions reusable and uses them for TCR_EL2
+and VTCR_EL2 fields.
 
-> 
-> >>>>+ * At the moment, we do not support a combination of guest IPA and host VA_BITS
-> >>>>+ * where
-> >>>>+ *       STAGE2_PGTABLE_LEVELS > CONFIG_PGTABLE_LEVELS
-> >>>
-> >>>can you change this comment to reverse the statement to avoid someone
-> >>>seeing this as a constraint, when in fact it's a negative invariant?
-> >>>
-> >>>So the case we don't support is a sufficiently larger IPA space compared
-> >>>to the host VA space such that the above happens?  (Since at the same
-> >>>IPA space size as host VA space size, the stage-2 levels will always be
-> >>>less than or equal to the host levels.)
-> >>
-> >>Correct.
-> >>
-> >>>
-> >>>I don't see how that would ever work with userspace either so I think
-> >>>this is a safe assumption and not something that ever needs fixing.  In
-> >>
-> >>For e.g, we can perfectly run a guest with 40bit IPA under a host with 16K+36bit
-> >>VA. The moment we go above 40bit IPA, we could trigger the conditions above.
-> >>I think it is perfectly fine for the guest to choose higher IPA width, and place
-> >>its memory well above as long as the qemu/lkvm doesn't exhaust its VA. I just
-> >>tried booting a VM with memory at 0x70_0000_0000 on a 16K+36bitVA host and it
-> >>boots perfectly fine.
-> >>
-> >
-> >Right, I was thinking about it as providing more than 36bits of *memory*
-> >not address space in this case, so you're right, it is at least a
-> >theoretically possible case.
-> >
-> 
-> I have reworded the comment as follows:
-> /*
->  * With all the supported VA_BITs and 40bit guest IPA, the following condition
->  * is always true:
->  *
->  *       CONFIG_PGTABLE_LEVELS >= STAGE2_PGTABLE_LEVELS
->  *
->  * We base our stage-2 page table walker helpers on this assumption and
->  * fall back to using the host version of the helper wherever possible.
->  * i.e, if a particular level is not folded (e.g, PUD) at stage2, we fall back
->  * to using the host version, since it is guaranteed it is not folded at host.
->  *
->  * If the condition breaks in the future, we can rearrange the host level
->  * definitions and reuse them for stage2. Till then...
->  */
-> #if STAGE2_PGTABLE_LEVELS > CONFIG_PGTABLE_LEVELS
-> #error "Unsupported combination of guest IPA and host VA_BITS."
-> #endif
-> 
-> ---
-> 
-> Please let me know your comments.
-> 
-> 
-Looks good, thanks for the cleanup!
+This also fixes a bug where we assume TG0 in {V}TCR_EL2 is 1bit field.
 
--Christoffer
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+---
+ arch/arm64/include/asm/kvm_arm.h       |   48 ++++++++++---------
+ arch/arm64/include/asm/pgtable-hwdef.h |   80 +++++++++++++++++++++++++-------
+ 2 files changed, 88 insertions(+), 40 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 3f29887..a46b39f 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -96,32 +96,34 @@
+ 			 SCTLR_EL2_SA | SCTLR_EL2_I)
+ 
+ /* TCR_EL2 Registers bits */
+-#define TCR_EL2_RES1	((1 << 31) | (1 << 23))
+-#define TCR_EL2_TBI	(1 << 20)
+-#define TCR_EL2_PS	(7 << 16)
+-#define TCR_EL2_PS_40B	(2 << 16)
+-#define TCR_EL2_TG0	(1 << 14)
+-#define TCR_EL2_SH0	(3 << 12)
+-#define TCR_EL2_ORGN0	(3 << 10)
+-#define TCR_EL2_IRGN0	(3 << 8)
+-#define TCR_EL2_T0SZ	0x3f
+-#define TCR_EL2_MASK	(TCR_EL2_TG0 | TCR_EL2_SH0 | \
+-			 TCR_EL2_ORGN0 | TCR_EL2_IRGN0 | TCR_EL2_T0SZ)
++#define TCR_EL2_RES1		((1 << 31) | (1 << 23))
++#define TCR_EL2_TBI		(1 << 20)
++#define TCR_EL2_PS_SHIFT	16
++#define TCR_EL2_PS_MASK		(7 << TCR_EL2_PS_SHIFT)
++#define TCR_EL2_PS_40B		(2 << TCR_EL2_PS_SHIFT)
++#define TCR_EL2_TG0_MASK	TCR_TG0_MASK
++#define TCR_EL2_SH0_MASK	TCR_SH0_MASK
++#define TCR_EL2_ORGN0_MASK	TCR_ORGN0_MASK
++#define TCR_EL2_IRGN0_MASK	TCR_IRGN0_MASK
++#define TCR_EL2_T0SZ_MASK	0x3f
++#define TCR_EL2_MASK	(TCR_EL2_TG0_MASK | TCR_EL2_SH0_MASK | \
++			 TCR_EL2_ORGN0_MASK | TCR_EL2_IRGN0_MASK | TCR_EL2_T0SZ_MASK)
+ 
+ /* VTCR_EL2 Registers bits */
+ #define VTCR_EL2_RES1		(1 << 31)
+-#define VTCR_EL2_PS_MASK	(7 << 16)
+-#define VTCR_EL2_TG0_MASK	(1 << 14)
+-#define VTCR_EL2_TG0_4K		(0 << 14)
+-#define VTCR_EL2_TG0_64K	(1 << 14)
+-#define VTCR_EL2_SH0_MASK	(3 << 12)
+-#define VTCR_EL2_SH0_INNER	(3 << 12)
+-#define VTCR_EL2_ORGN0_MASK	(3 << 10)
+-#define VTCR_EL2_ORGN0_WBWA	(1 << 10)
+-#define VTCR_EL2_IRGN0_MASK	(3 << 8)
+-#define VTCR_EL2_IRGN0_WBWA	(1 << 8)
+-#define VTCR_EL2_SL0_MASK	(3 << 6)
+-#define VTCR_EL2_SL0_LVL1	(1 << 6)
++#define VTCR_EL2_PS_MASK	TCR_EL2_PS_MASK
++#define VTCR_EL2_TG0_MASK	TCR_TG0_MASK
++#define VTCR_EL2_TG0_4K		TCR_TG0_4K
++#define VTCR_EL2_TG0_64K	TCR_TG0_64K
++#define VTCR_EL2_SH0_MASK	TCR_SH0_MASK
++#define VTCR_EL2_SH0_INNER	TCR_SH0_INNER
++#define VTCR_EL2_ORGN0_MASK	TCR_ORGN0_MASK
++#define VTCR_EL2_ORGN0_WBWA	TCR_ORGN0_WBWA
++#define VTCR_EL2_IRGN0_MASK	TCR_IRGN0_MASK
++#define VTCR_EL2_IRGN0_WBWA	TCR_IRGN0_WBWA
++#define VTCR_EL2_SL0_SHIFT	6
++#define VTCR_EL2_SL0_MASK	(3 << VTCR_EL2_SL0_SHIFT)
++#define VTCR_EL2_SL0_LVL1	(1 << VTCR_EL2_SL0_SHIFT)
+ #define VTCR_EL2_T0SZ_MASK	0x3f
+ #define VTCR_EL2_T0SZ_40B	24
+ #define VTCR_EL2_VS_SHIFT	19
+diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+index 5c25b83..936f173 100644
+--- a/arch/arm64/include/asm/pgtable-hwdef.h
++++ b/arch/arm64/include/asm/pgtable-hwdef.h
+@@ -208,23 +208,69 @@
+ #define TCR_T1SZ(x)		((UL(64) - (x)) << TCR_T1SZ_OFFSET)
+ #define TCR_TxSZ(x)		(TCR_T0SZ(x) | TCR_T1SZ(x))
+ #define TCR_TxSZ_WIDTH		6
+-#define TCR_IRGN_NC		((UL(0) << 8) | (UL(0) << 24))
+-#define TCR_IRGN_WBWA		((UL(1) << 8) | (UL(1) << 24))
+-#define TCR_IRGN_WT		((UL(2) << 8) | (UL(2) << 24))
+-#define TCR_IRGN_WBnWA		((UL(3) << 8) | (UL(3) << 24))
+-#define TCR_IRGN_MASK		((UL(3) << 8) | (UL(3) << 24))
+-#define TCR_ORGN_NC		((UL(0) << 10) | (UL(0) << 26))
+-#define TCR_ORGN_WBWA		((UL(1) << 10) | (UL(1) << 26))
+-#define TCR_ORGN_WT		((UL(2) << 10) | (UL(2) << 26))
+-#define TCR_ORGN_WBnWA		((UL(3) << 10) | (UL(3) << 26))
+-#define TCR_ORGN_MASK		((UL(3) << 10) | (UL(3) << 26))
+-#define TCR_SHARED		((UL(3) << 12) | (UL(3) << 28))
+-#define TCR_TG0_4K		(UL(0) << 14)
+-#define TCR_TG0_64K		(UL(1) << 14)
+-#define TCR_TG0_16K		(UL(2) << 14)
+-#define TCR_TG1_16K		(UL(1) << 30)
+-#define TCR_TG1_4K		(UL(2) << 30)
+-#define TCR_TG1_64K		(UL(3) << 30)
++
++#define TCR_IRGN0_SHIFT		8
++#define TCR_IRGN0_MASK		(UL(3) << TCR_IRGN0_SHIFT)
++#define TCR_IRGN0_NC		(UL(0) << TCR_IRGN0_SHIFT)
++#define TCR_IRGN0_WBWA		(UL(1) << TCR_IRGN0_SHIFT)
++#define TCR_IRGN0_WT		(UL(2) << TCR_IRGN0_SHIFT)
++#define TCR_IRGN0_WBnWA		(UL(3) << TCR_IRGN0_SHIFT)
++
++#define TCR_IRGN1_SHIFT		24
++#define TCR_IRGN1_MASK		(UL(3) << TCR_IRGN1_SHIFT)
++#define TCR_IRGN1_NC		(UL(0) << TCR_IRGN1_SHIFT)
++#define TCR_IRGN1_WBWA		(UL(1) << TCR_IRGN1_SHIFT)
++#define TCR_IRGN1_WT		(UL(2) << TCR_IRGN1_SHIFT)
++#define TCR_IRGN1_WBnWA		(UL(3) << TCR_IRGN1_SHIFT)
++
++#define TCR_IRGN_NC		(TCR_IRGN0_NC | TCR_IRGN1_NC)
++#define TCR_IRGN_WBWA		(TCR_IRGN0_WBWA | TCR_IRGN1_WBWA)
++#define TCR_IRGN_WT		(TCR_IRGN0_WT | TCR_IRGN1_WT)
++#define TCR_IRGN_WBnWA		(TCR_IRGN0_WBnWA | TCR_IRGN1_WBnWA)
++#define TCR_IRGN_MASK		(TCR_IRGN0_MASK | TCR_IRGN1_MASK)
++
++
++#define TCR_ORGN0_SHIFT		10
++#define TCR_ORGN0_MASK		(UL(3) << TCR_ORGN0_SHIFT)
++#define TCR_ORGN0_NC		(UL(0) << TCR_ORGN0_SHIFT)
++#define TCR_ORGN0_WBWA		(UL(1) << TCR_ORGN0_SHIFT)
++#define TCR_ORGN0_WT		(UL(2) << TCR_ORGN0_SHIFT)
++#define TCR_ORGN0_WBnWA		(UL(3) << TCR_ORGN0_SHIFT)
++
++#define TCR_ORGN1_SHIFT		26
++#define TCR_ORGN1_MASK		(UL(3) << TCR_ORGN1_SHIFT)
++#define TCR_ORGN1_NC		(UL(0) << TCR_ORGN1_SHIFT)
++#define TCR_ORGN1_WBWA		(UL(1) << TCR_ORGN1_SHIFT)
++#define TCR_ORGN1_WT		(UL(2) << TCR_ORGN1_SHIFT)
++#define TCR_ORGN1_WBnWA		(UL(3) << TCR_ORGN1_SHIFT)
++
++#define TCR_ORGN_NC		(TCR_ORGN0_NC | TCR_ORGN1_NC)
++#define TCR_ORGN_WBWA		(TCR_ORGN0_WBWA | TCR_ORGN1_WBWA)
++#define TCR_ORGN_WT		(TCR_ORGN0_WT | TCR_ORGN1_WT)
++#define TCR_ORGN_WBnWA		(TCR_ORGN0_WBnWA | TCR_ORGN1_WBnWA)
++#define TCR_ORGN_MASK		(TCR_ORGN0_MASK | TCR_ORGN1_MASK)
++
++#define TCR_SH0_SHIFT		12
++#define TCR_SH0_MASK		(UL(3) << TCR_SH0_SHIFT)
++#define TCR_SH0_INNER		(UL(3) << TCR_SH0_SHIFT)
++
++#define TCR_SH1_SHIFT		28
++#define TCR_SH1_MASK		(UL(3) << TCR_SH1_SHIFT)
++#define TCR_SH1_INNER		(UL(3) << TCR_SH1_SHIFT)
++#define TCR_SHARED		(TCR_SH0_INNER | TCR_SH1_INNER)
++
++#define TCR_TG0_SHIFT		14
++#define TCR_TG0_MASK		(UL(3) << TCR_TG0_SHIFT)
++#define TCR_TG0_4K		(UL(0) << TCR_TG0_SHIFT)
++#define TCR_TG0_64K		(UL(1) << TCR_TG0_SHIFT)
++#define TCR_TG0_16K		(UL(2) << TCR_TG0_SHIFT)
++
++#define TCR_TG1_SHIFT		30
++#define TCR_TG1_MASK		(UL(3) << TCR_TG1_SHIFT)
++#define TCR_TG1_16K		(UL(1) << TCR_TG1_SHIFT)
++#define TCR_TG1_4K		(UL(2) << TCR_TG1_SHIFT)
++#define TCR_TG1_64K		(UL(3) << TCR_TG1_SHIFT)
++
+ #define TCR_ASID16		(UL(1) << 36)
+ #define TCR_TBI0		(UL(1) << 37)
+ #define TCR_HA			(UL(1) << 39)
+-- 
+1.7.9.5
