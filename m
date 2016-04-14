@@ -1,25 +1,25 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 08/17] kvm-arm: arm: Introduce hyp page table empty
- checks
-Date: Thu, 14 Apr 2016 15:23:45 +0100
-Message-ID: <570FA7F1.7090403@arm.com>
+Subject: Re: [PATCH v2 09/17] kvm-arm: arm64: Introduce stage2 page table
+ helpers
+Date: Thu, 14 Apr 2016 15:31:24 +0100
+Message-ID: <570FA9BC.8020001@arm.com>
 References: <1460640065-27658-1-git-send-email-suzuki.poulose@arm.com>
- <1460640065-27658-9-git-send-email-suzuki.poulose@arm.com>
+ <1460640065-27658-10-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id DF29C49BC5
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 10:22:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C783D49BCA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 10:29:46 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Cm112xTIgeW9 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Apr 2016 10:22:05 -0400 (EDT)
+ with ESMTP id NZGrtpYkPkq5 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Apr 2016 10:29:44 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 21BA649BC4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 10:22:05 -0400 (EDT)
-In-Reply-To: <1460640065-27658-9-git-send-email-suzuki.poulose@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9CD5C49BC9
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 10:29:44 -0400 (EDT)
+In-Reply-To: <1460640065-27658-10-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -34,35 +34,14 @@ Cc: kvm@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, linux-ker
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 14/04/16 14:20, Suzuki K Poulose wrote:
-> Introduce hyp_pxx_table_empty helpers for checking whether
-> a given table entry is empty. This will be used explicitly
-> once we switch to explicit routines for hyp page table walk.
+> Introduce stage2 page table helpers for arm64. With the fake
+> page table level still in place, the stage2 table has the same
+> number of levels as that of the host (and hyp), so they all
+> fallback to the host version.
 > 
 > Cc: Marc Zyngier <marc.zyngier@arm.com>
 > Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> ---
->  arch/arm/include/asm/kvm_mmu.h |    4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-> index 7d207b4..901c1ea 100644
-> --- a/arch/arm/include/asm/kvm_mmu.h
-> +++ b/arch/arm/include/asm/kvm_mmu.h
-> @@ -162,6 +162,10 @@ static inline bool kvm_page_empty(void *ptr)
->  #define kvm_pmd_table_empty(kvm, pmdp) kvm_page_empty(pmdp)
->  #define kvm_pud_table_empty(kvm, pudp) (0)
->  
-> +#define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
-> +#define hyp_pmd_table_empty(pmdp) kvm_page_empty(pmdp)
-> +#define hyp_pud_table_empty(pudp) (0)
-> +
->  static inline void *kvm_get_hwpgd(struct kvm *kvm)
->  {
->  	return kvm->arch.pgd;
-> 
-
-Same remarks as the previous patch, but nonetheless:
 
 Acked-by: Marc Zyngier <marc.zyngier@arm.com>
 
