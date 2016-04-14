@@ -1,22 +1,22 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 10/17] kvm-arm: arm64: Introduce hyp page table empty checks
-Date: Thu, 14 Apr 2016 14:20:58 +0100
-Message-ID: <1460640065-27658-11-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH v2 12/17] kvm-arm: Add explicit hyp page table modifiers
+Date: Thu, 14 Apr 2016 14:21:00 +0100
+Message-ID: <1460640065-27658-13-git-send-email-suzuki.poulose@arm.com>
 References: <1460640065-27658-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B8D449B8C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:20:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ECFB549BA0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:20:13 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id hIdbezGhemuj for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Apr 2016 09:20:08 -0400 (EDT)
+ with ESMTP id YaBjr4ukYSIn for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Apr 2016 09:20:13 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E6CD749BBB
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:20:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BE43E49B87
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:20:11 -0400 (EDT)
 In-Reply-To: <1460640065-27658-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,41 +31,165 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Introduce hyp_pxx_table_empty helpers for checking whether
-a given table entry is empty. This will be used explicitly
-once we switch to explicit routines for hyp page table walk.
+We have common routines to modify hyp and stage2 page tables
+based on the 'kvm' parameter. For a smoother transition to
+using separate routines for each, duplicate the routines
+and modify the copy to work on hyp.
 
+Marks the forked routines with _hyp_ and gets rid of the
+kvm parameter which is no longer needed and is NULL for hyp.
+Also, gets rid of calls to kvm_tlb_flush_by_vmid_ipa() calls
+from the hyp versions. Uses explicit host page table accessors
+instead of the kvm_* page table helpers.
+
+Suggested-by: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Marc Zyngier <marc.zyngier@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm64/include/asm/kvm_mmu.h |   14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Changes since V1:
+ - Remove flush_dcache for !device_pfns in unmap_hyp_ptes()
+ - Remove huge pmd/pud checks in unmap_hyp_p.ds, since we don't
+   use huge mappings
+ - Add a comment in unmap_hyp_range() on why we don't invalidate
+   TLBs.
+---
+ arch/arm/kvm/mmu.c |  104 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 99 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index e3f53e3..edf3c62 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -249,6 +249,20 @@ static inline bool kvm_page_empty(void *ptr)
- #endif
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index f93f717..af526f6 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -388,6 +388,100 @@ static void stage2_flush_vm(struct kvm *kvm)
+ 	srcu_read_unlock(&kvm->srcu, idx);
+ }
  
++static void clear_hyp_pgd_entry(pgd_t *pgd)
++{
++	pud_t *pud_table __maybe_unused = pud_offset(pgd, 0UL);
++	pgd_clear(pgd);
++	pud_free(NULL, pud_table);
++	put_page(virt_to_page(pgd));
++}
++
++static void clear_hyp_pud_entry(pud_t *pud)
++{
++	pmd_t *pmd_table __maybe_unused = pmd_offset(pud, 0);
++	VM_BUG_ON(pud_huge(*pud));
++	pud_clear(pud);
++	pmd_free(NULL, pmd_table);
++	put_page(virt_to_page(pud));
++}
++
++static void clear_hyp_pmd_entry(pmd_t *pmd)
++{
++	pte_t *pte_table = pte_offset_kernel(pmd, 0);
++	VM_BUG_ON(pmd_thp_or_huge(*pmd));
++	pmd_clear(pmd);
++	pte_free_kernel(NULL, pte_table);
++	put_page(virt_to_page(pmd));
++}
++
++static void unmap_hyp_ptes(pmd_t *pmd, phys_addr_t addr, phys_addr_t end)
++{
++	pte_t *pte, *start_pte;
++
++	start_pte = pte = pte_offset_kernel(pmd, addr);
++	do {
++		if (!pte_none(*pte)) {
++			kvm_set_pte(pte, __pte(0));
++			put_page(virt_to_page(pte));
++		}
++	} while (pte++, addr += PAGE_SIZE, addr != end);
++
++	if (hyp_pte_table_empty(start_pte))
++		clear_hyp_pmd_entry(pmd);
++}
++
++static void unmap_hyp_pmds(pud_t *pud, phys_addr_t addr, phys_addr_t end)
++{
++	phys_addr_t next;
++	pmd_t *pmd, *start_pmd;
++
++	start_pmd = pmd = pmd_offset(pud, addr);
++	do {
++		next = pmd_addr_end(addr, end);
++		/* Hyp doesn't use huge pmds */
++		if (!pmd_none(*pmd))
++			unmap_hyp_ptes(pmd, addr, next);
++	} while (pmd++, addr = next, addr != end);
++
++	if (hyp_pmd_table_empty(start_pmd))
++		clear_hyp_pud_entry(pud);
++}
++
++static void unmap_hyp_puds(pgd_t *pgd, phys_addr_t addr, phys_addr_t end)
++{
++	phys_addr_t next;
++	pud_t *pud, *start_pud;
++
++	start_pud = pud = pud_offset(pgd, addr);
++	do {
++		next = pud_addr_end(addr, end);
++		/* Hyp doesn't use huge puds */
++		if (!pud_none(*pud))
++			unmap_hyp_pmds(pud, addr, next);
++	} while (pud++, addr = next, addr != end);
++
++	if (hyp_pud_table_empty(start_pud))
++		clear_hyp_pgd_entry(pgd);
++}
++
++static void unmap_hyp_range(pgd_t *pgdp, phys_addr_t start, u64 size)
++{
++	pgd_t *pgd;
++	phys_addr_t addr = start, end = start + size;
++	phys_addr_t next;
++
++	/*
++	 * We don't unmap anything from HYP, except at the hyp tear down.
++	 * Hence, we don't have to invalidate the TLBs here.
++	 */
++	pgd = pgdp + pgd_index(addr);
++	do {
++		next = pgd_addr_end(addr, end);
++		if (!pgd_none(*pgd))
++			unmap_hyp_puds(pgd, addr, next);
++	} while (pgd++, addr = next, addr != end);
++}
++
+ /**
+  * free_boot_hyp_pgd - free HYP boot page tables
+  *
+@@ -398,14 +492,14 @@ void free_boot_hyp_pgd(void)
+ 	mutex_lock(&kvm_hyp_pgd_mutex);
  
-+#define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
-+
-+#ifdef __PAGETABLE_PMD_FOLDED
-+#define hyp_pmd_table_empty(pmdp) (0)
-+#else
-+#define hyp_pmd_table_empty(pmdp) kvm_page_empty(pmdp)
-+#endif
-+
-+#ifdef __PAGETABLE_PUD_FOLDED
-+#define hyp_pud_table_empty(pudp) (0)
-+#else
-+#define hyp_pud_table_empty(pudp) kvm_page_empty(pudp)
-+#endif
-+
- struct kvm;
+ 	if (boot_hyp_pgd) {
+-		unmap_range(NULL, boot_hyp_pgd, hyp_idmap_start, PAGE_SIZE);
+-		unmap_range(NULL, boot_hyp_pgd, TRAMPOLINE_VA, PAGE_SIZE);
++		unmap_hyp_range(boot_hyp_pgd, hyp_idmap_start, PAGE_SIZE);
++		unmap_hyp_range(boot_hyp_pgd, TRAMPOLINE_VA, PAGE_SIZE);
+ 		free_pages((unsigned long)boot_hyp_pgd, hyp_pgd_order);
+ 		boot_hyp_pgd = NULL;
+ 	}
  
- #define kvm_flush_dcache_to_poc(a,l)	__flush_dcache_area((a), (l))
+ 	if (hyp_pgd)
+-		unmap_range(NULL, hyp_pgd, TRAMPOLINE_VA, PAGE_SIZE);
++		unmap_hyp_range(hyp_pgd, TRAMPOLINE_VA, PAGE_SIZE);
+ 
+ 	mutex_unlock(&kvm_hyp_pgd_mutex);
+ }
+@@ -430,9 +524,9 @@ void free_hyp_pgds(void)
+ 
+ 	if (hyp_pgd) {
+ 		for (addr = PAGE_OFFSET; virt_addr_valid(addr); addr += PGDIR_SIZE)
+-			unmap_range(NULL, hyp_pgd, KERN_TO_HYP(addr), PGDIR_SIZE);
++			unmap_hyp_range(hyp_pgd, KERN_TO_HYP(addr), PGDIR_SIZE);
+ 		for (addr = VMALLOC_START; is_vmalloc_addr((void*)addr); addr += PGDIR_SIZE)
+-			unmap_range(NULL, hyp_pgd, KERN_TO_HYP(addr), PGDIR_SIZE);
++			unmap_hyp_range(hyp_pgd, KERN_TO_HYP(addr), PGDIR_SIZE);
+ 
+ 		free_pages((unsigned long)hyp_pgd, hyp_pgd_order);
+ 		hyp_pgd = NULL;
 -- 
 1.7.9.5
