@@ -1,22 +1,22 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 08/17] kvm-arm: arm: Introduce hyp page table empty checks
-Date: Thu, 14 Apr 2016 14:20:56 +0100
-Message-ID: <1460640065-27658-9-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH v2 10/17] kvm-arm: arm64: Introduce hyp page table empty checks
+Date: Thu, 14 Apr 2016 14:20:58 +0100
+Message-ID: <1460640065-27658-11-git-send-email-suzuki.poulose@arm.com>
 References: <1460640065-27658-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BD3CC49B8C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:20:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B8D449B8C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:20:09 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id aFkTR121mhPp for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Apr 2016 09:20:04 -0400 (EDT)
+ with ESMTP id hIdbezGhemuj for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Apr 2016 09:20:08 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1A58149BA1
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:20:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E6CD749BBB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:20:07 -0400 (EDT)
 In-Reply-To: <1460640065-27658-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -36,26 +36,36 @@ a given table entry is empty. This will be used explicitly
 once we switch to explicit routines for hyp page table walk.
 
 Cc: Marc Zyngier <marc.zyngier@arm.com>
-Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm/include/asm/kvm_mmu.h |    4 ++++
- 1 file changed, 4 insertions(+)
+ arch/arm64/include/asm/kvm_mmu.h |   14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 7d207b4..901c1ea 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -162,6 +162,10 @@ static inline bool kvm_page_empty(void *ptr)
- #define kvm_pmd_table_empty(kvm, pmdp) kvm_page_empty(pmdp)
- #define kvm_pud_table_empty(kvm, pudp) (0)
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index e3f53e3..edf3c62 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -249,6 +249,20 @@ static inline bool kvm_page_empty(void *ptr)
+ #endif
+ 
  
 +#define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
-+#define hyp_pmd_table_empty(pmdp) kvm_page_empty(pmdp)
-+#define hyp_pud_table_empty(pudp) (0)
 +
- static inline void *kvm_get_hwpgd(struct kvm *kvm)
- {
- 	return kvm->arch.pgd;
++#ifdef __PAGETABLE_PMD_FOLDED
++#define hyp_pmd_table_empty(pmdp) (0)
++#else
++#define hyp_pmd_table_empty(pmdp) kvm_page_empty(pmdp)
++#endif
++
++#ifdef __PAGETABLE_PUD_FOLDED
++#define hyp_pud_table_empty(pudp) (0)
++#else
++#define hyp_pud_table_empty(pudp) kvm_page_empty(pudp)
++#endif
++
+ struct kvm;
+ 
+ #define kvm_flush_dcache_to_poc(a,l)	__flush_dcache_area((a), (l))
 -- 
 1.7.9.5
