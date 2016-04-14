@@ -1,22 +1,22 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 14/17] kvm-arm: Cleanup kvm_* wrappers
-Date: Thu, 14 Apr 2016 14:21:02 +0100
-Message-ID: <1460640065-27658-15-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH v2 11/17] kvm-arm: Use explicit stage2 helper routines
+Date: Thu, 14 Apr 2016 14:20:59 +0100
+Message-ID: <1460640065-27658-12-git-send-email-suzuki.poulose@arm.com>
 References: <1460640065-27658-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2892A49B9B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:20:17 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B311D49BB7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:20:12 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id npsLXGTV0J9K for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Apr 2016 09:20:16 -0400 (EDT)
+ with ESMTP id xU3-K7ef2MN4 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Apr 2016 09:20:11 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9510449BCD
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:20:15 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D2FB149BA3
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:20:09 -0400 (EDT)
 In-Reply-To: <1460640065-27658-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,119 +31,149 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Now that we have switched to explicit page table routines,
-get rid of the obsolete kvm_* wrappers.
-
-Also, kvm_tlb_flush_vmid_by_ipa is now called only on stage2
-page tables, hence get rid of the redundant check.
+We have stage2 page table helpers for both arm and arm64. Switch to
+the stage2 helpers for routines that only deal with stage2 page table.
 
 Cc: Marc Zyngier <marc.zyngier@arm.com>
 Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm/include/asm/kvm_mmu.h   |   20 --------------------
- arch/arm/kvm/mmu.c               |    9 +--------
- arch/arm64/include/asm/kvm_mmu.h |   24 ------------------------
- 3 files changed, 1 insertion(+), 52 deletions(-)
+ arch/arm/kvm/mmu.c |   48 ++++++++++++++++++++++++------------------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 901c1ea..50aa901 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -136,32 +136,12 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
- 	return (pmd_val(*pmd) & L_PMD_S2_RDWR) == L_PMD_S2_RDONLY;
- }
- 
--
--/* Open coded p*d_addr_end that can deal with 64bit addresses */
--#define kvm_pgd_addr_end(addr, end)					\
--({	u64 __boundary = ((addr) + PGDIR_SIZE) & PGDIR_MASK;		\
--	(__boundary - 1 < (end) - 1)? __boundary: (end);		\
--})
--
--#define kvm_pud_addr_end(addr,end)		(end)
--
--#define kvm_pmd_addr_end(addr, end)					\
--({	u64 __boundary = ((addr) + PMD_SIZE) & PMD_MASK;		\
--	(__boundary - 1 < (end) - 1)? __boundary: (end);		\
--})
--
--#define kvm_pgd_index(addr)			pgd_index(addr)
--
- static inline bool kvm_page_empty(void *ptr)
- {
- 	struct page *ptr_page = virt_to_page(ptr);
- 	return page_count(ptr_page) == 1;
- }
- 
--#define kvm_pte_table_empty(kvm, ptep) kvm_page_empty(ptep)
--#define kvm_pmd_table_empty(kvm, pmdp) kvm_page_empty(pmdp)
--#define kvm_pud_table_empty(kvm, pudp) (0)
--
- #define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
- #define hyp_pmd_table_empty(pmdp) kvm_page_empty(pmdp)
- #define hyp_pud_table_empty(pudp) (0)
 diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index f2a6d9b..d3fa96e 100644
+index d0c0ee9..f93f717 100644
 --- a/arch/arm/kvm/mmu.c
 +++ b/arch/arm/kvm/mmu.c
-@@ -66,14 +66,7 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
+@@ -319,9 +319,9 @@ static void stage2_flush_pmds(struct kvm *kvm, pud_t *pud,
+ 	pmd_t *pmd;
+ 	phys_addr_t next;
  
- static void kvm_tlb_flush_vmid_ipa(struct kvm *kvm, phys_addr_t ipa)
- {
--	/*
--	 * This function also gets called when dealing with HYP page
--	 * tables. As HYP doesn't have an associated struct kvm (and
--	 * the HYP page tables are fairly static), we don't do
--	 * anything there.
--	 */
--	if (kvm)
--		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, kvm, ipa);
-+	kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, kvm, ipa);
+-	pmd = pmd_offset(pud, addr);
++	pmd = stage2_pmd_offset(pud, addr);
+ 	do {
+-		next = kvm_pmd_addr_end(addr, end);
++		next = stage2_pmd_addr_end(addr, end);
+ 		if (!pmd_none(*pmd)) {
+ 			if (pmd_thp_or_huge(*pmd))
+ 				kvm_flush_dcache_pmd(*pmd);
+@@ -337,11 +337,11 @@ static void stage2_flush_puds(struct kvm *kvm, pgd_t *pgd,
+ 	pud_t *pud;
+ 	phys_addr_t next;
+ 
+-	pud = pud_offset(pgd, addr);
++	pud = stage2_pud_offset(pgd, addr);
+ 	do {
+-		next = kvm_pud_addr_end(addr, end);
+-		if (!pud_none(*pud)) {
+-			if (pud_huge(*pud))
++		next = stage2_pud_addr_end(addr, end);
++		if (!stage2_pud_none(*pud)) {
++			if (stage2_pud_huge(*pud))
+ 				kvm_flush_dcache_pud(*pud);
+ 			else
+ 				stage2_flush_pmds(kvm, pud, addr, next);
+@@ -357,9 +357,9 @@ static void stage2_flush_memslot(struct kvm *kvm,
+ 	phys_addr_t next;
+ 	pgd_t *pgd;
+ 
+-	pgd = kvm->arch.pgd + kvm_pgd_index(addr);
++	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
+ 	do {
+-		next = kvm_pgd_addr_end(addr, end);
++		next = stage2_pgd_addr_end(addr, end);
+ 		stage2_flush_puds(kvm, pgd, addr, next);
+ 	} while (pgd++, addr = next, addr != end);
+ }
+@@ -807,16 +807,16 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
+ 	pgd_t *pgd;
+ 	pud_t *pud;
+ 
+-	pgd = kvm->arch.pgd + kvm_pgd_index(addr);
+-	if (WARN_ON(pgd_none(*pgd))) {
++	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
++	if (WARN_ON(stage2_pgd_none(*pgd))) {
+ 		if (!cache)
+ 			return NULL;
+ 		pud = mmu_memory_cache_alloc(cache);
+-		pgd_populate(NULL, pgd, pud);
++		stage2_pgd_populate(pgd, pud);
+ 		get_page(virt_to_page(pgd));
+ 	}
+ 
+-	return pud_offset(pgd, addr);
++	return stage2_pud_offset(pgd, addr);
  }
  
- /*
-diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-index edf3c62..a3c0d05 100644
---- a/arch/arm64/include/asm/kvm_mmu.h
-+++ b/arch/arm64/include/asm/kvm_mmu.h
-@@ -153,13 +153,6 @@ static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
- 	return (pmd_val(*pmd) & PMD_S2_RDWR) == PMD_S2_RDONLY;
+ static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
+@@ -826,15 +826,15 @@ static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
+ 	pmd_t *pmd;
+ 
+ 	pud = stage2_get_pud(kvm, cache, addr);
+-	if (pud_none(*pud)) {
++	if (stage2_pud_none(*pud)) {
+ 		if (!cache)
+ 			return NULL;
+ 		pmd = mmu_memory_cache_alloc(cache);
+-		pud_populate(NULL, pud, pmd);
++		stage2_pud_populate(pud, pmd);
+ 		get_page(virt_to_page(pud));
+ 	}
+ 
+-	return pmd_offset(pud, addr);
++	return stage2_pmd_offset(pud, addr);
  }
  
--
--#define kvm_pgd_addr_end(addr, end)	pgd_addr_end(addr, end)
--#define kvm_pud_addr_end(addr, end)	pud_addr_end(addr, end)
--#define kvm_pmd_addr_end(addr, end)	pmd_addr_end(addr, end)
--
--#define kvm_pgd_index(addr)	(((addr) >> PGDIR_SHIFT) & (PTRS_PER_S2_PGD - 1))
--
- static inline void *kvm_get_hwpgd(struct kvm *kvm)
- {
- 	pgd_t *pgd = kvm->arch.pgd;
-@@ -232,23 +225,6 @@ static inline bool kvm_page_empty(void *ptr)
- 	return page_count(ptr_page) == 1;
+ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+@@ -1042,10 +1042,10 @@ static void stage2_wp_pmds(pud_t *pud, phys_addr_t addr, phys_addr_t end)
+ 	pmd_t *pmd;
+ 	phys_addr_t next;
+ 
+-	pmd = pmd_offset(pud, addr);
++	pmd = stage2_pmd_offset(pud, addr);
+ 
+ 	do {
+-		next = kvm_pmd_addr_end(addr, end);
++		next = stage2_pmd_addr_end(addr, end);
+ 		if (!pmd_none(*pmd)) {
+ 			if (pmd_thp_or_huge(*pmd)) {
+ 				if (!kvm_s2pmd_readonly(pmd))
+@@ -1070,12 +1070,12 @@ static void  stage2_wp_puds(pgd_t *pgd, phys_addr_t addr, phys_addr_t end)
+ 	pud_t *pud;
+ 	phys_addr_t next;
+ 
+-	pud = pud_offset(pgd, addr);
++	pud = stage2_pud_offset(pgd, addr);
+ 	do {
+-		next = kvm_pud_addr_end(addr, end);
+-		if (!pud_none(*pud)) {
++		next = stage2_pud_addr_end(addr, end);
++		if (!stage2_pud_none(*pud)) {
+ 			/* TODO:PUD not supported, revisit later if supported */
+-			BUG_ON(pud_huge(*pud));
++			BUG_ON(stage2_pud_huge(*pud));
+ 			stage2_wp_pmds(pud, addr, next);
+ 		}
+ 	} while (pud++, addr = next, addr != end);
+@@ -1092,7 +1092,7 @@ static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+ 	pgd_t *pgd;
+ 	phys_addr_t next;
+ 
+-	pgd = kvm->arch.pgd + kvm_pgd_index(addr);
++	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
+ 	do {
+ 		/*
+ 		 * Release kvm_mmu_lock periodically if the memory region is
+@@ -1104,8 +1104,8 @@ static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
+ 		if (need_resched() || spin_needbreak(&kvm->mmu_lock))
+ 			cond_resched_lock(&kvm->mmu_lock);
+ 
+-		next = kvm_pgd_addr_end(addr, end);
+-		if (pgd_present(*pgd))
++		next = stage2_pgd_addr_end(addr, end);
++		if (stage2_pgd_present(*pgd))
+ 			stage2_wp_puds(pgd, addr, next);
+ 	} while (pgd++, addr = next, addr != end);
  }
- 
--#define kvm_pte_table_empty(kvm, ptep) kvm_page_empty(ptep)
--
--#ifdef __PAGETABLE_PMD_FOLDED
--#define kvm_pmd_table_empty(kvm, pmdp) (0)
--#else
--#define kvm_pmd_table_empty(kvm, pmdp) \
--	(kvm_page_empty(pmdp) && (!(kvm) || KVM_PREALLOC_LEVEL < 2))
--#endif
--
--#ifdef __PAGETABLE_PUD_FOLDED
--#define kvm_pud_table_empty(kvm, pudp) (0)
--#else
--#define kvm_pud_table_empty(kvm, pudp) \
--	(kvm_page_empty(pudp) && (!(kvm) || KVM_PREALLOC_LEVEL < 1))
--#endif
--
--
- #define hyp_pte_table_empty(ptep) kvm_page_empty(ptep)
- 
- #ifdef __PAGETABLE_PMD_FOLDED
 -- 
 1.7.9.5
