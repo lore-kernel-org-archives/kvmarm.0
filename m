@@ -1,21 +1,24 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 00/17] kvm-arm: Add stage2 page table walker
-Date: Thu, 14 Apr 2016 14:20:48 +0100
-Message-ID: <1460640065-27658-1-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH v2 03/17] kvm arm: Move fake PGD handling to arch specific
+ files
+Date: Thu, 14 Apr 2016 14:20:51 +0100
+Message-ID: <1460640065-27658-4-git-send-email-suzuki.poulose@arm.com>
+References: <1460640065-27658-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E476449B8E
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:19:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7EA8D49B9C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:19:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 1xYFx5aKJpjd for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Apr 2016 09:19:49 -0400 (EDT)
+ with ESMTP id YxIdsF8C58jk for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Apr 2016 09:19:54 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 965E649B66
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:19:49 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 59A7749BA0
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:19:54 -0400 (EDT)
+In-Reply-To: <1460640065-27658-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -29,87 +32,170 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-This series adds support for stage2 page table helpers and makes
-the core kvm-arm MMU code make use of it. At the moment we assume
-that the host/hyp and the stage2 page tables have same number of
-levels and hence use the host level accessors (except for some
-hooks, e.g kvm_p.d_addr_end) and shares the routines for unmapping
-the page table ranges.
+Rearrange the code for fake pgd handling, which is applicable
+only for arm64. This will later be removed once we introduce
+the stage2 page table walker macros.
 
-On arm32, the only change w.r.t the page tables is dealing
-with > 32bit physical addresses.
+Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+---
+ arch/arm/include/asm/kvm_mmu.h   |   11 +++++++--
+ arch/arm/kvm/mmu.c               |   47 ++++++--------------------------------
+ arch/arm64/include/asm/kvm_mmu.h |   43 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 59 insertions(+), 42 deletions(-)
 
-However on arm64, the hardware supports concatenation of tables (upto 16)
-at the entry level, which could affect :
- 1) number of entries in the PGD table (upto 16 * PTRS_PER_PTE)
- 2) number of page table levels (reduced number of page table levels).
-
-Also depending on the VA_BITS for the host kernel, the number of page table
-levels for both host and stage2(40bit IPA) could differ. At present, we insert
-(upto) one fake software page table(as the hardware is not aware of it and is
-only used by the OS to walk the table) level to bring the number of levels to
-that of the host/hyp table. However, with 16K + 48bit, and 40bit IPA, we could
-end up in 2 fake levels, which complicates the code.
-
-This series introduces explicit stage2 page table helpers and also defines
-separate set of routines for unmapping hyp and stage2 tables.
-
-On arm64 stage2 page table helpers are defined based on the number of levels
-required to map the IPA bits. See patch 15 for more details.
-
-Tested on TC2 (arm32), Fast models(with VHE, with 36bit PARange) and real hardwares.
-
-The tree is available at :
-      git://linux-arm.org/linux-skp.git kvm-stage2/v2
-
-Changes since V1:
- * Rebased to kvmarm/master
- * Cleaned up hyp page table modifiers (hyp check, tlb flush), added comments
- * For stage2_ drop the (always NULL) mm parameter.
- * Better commentary
-
-Changes since RFC:
- * Rebased to rc2
- * Use explicit routines for modifying the hyp/stage2 page tables
- * Add pmd_thp_or_huge() for arm64 and use that for KVM
- * Reuse TCR_EL definitions
-
-Suzuki K Poulose (17):
-  arm64: Reuse TCR field definitions for EL1 and EL2
-  arm64: Cleanup VTCR_EL2 and VTTBR field values
-  kvm arm: Move fake PGD handling to arch specific files
-  arm64: Introduce pmd_thp_or_huge
-  kvm-arm: Replace kvm_pmd_huge with pmd_thp_or_huge
-  kvm-arm: Remove kvm_pud_huge()
-  kvm-arm: arm32: Introduce stage2 page table helpers
-  kvm-arm: arm: Introduce hyp page table empty checks
-  kvm-arm: arm64: Introduce stage2 page table helpers
-  kvm-arm: arm64: Introduce hyp page table empty checks
-  kvm-arm: Use explicit stage2 helper routines
-  kvm-arm: Add explicit hyp page table modifiers
-  kvm-arm: Add stage2 page table modifiers
-  kvm-arm: Cleanup kvm_* wrappers
-  kvm: arm64: Get rid of fake page table levels
-  kvm-arm: Cleanup stage2 pgd handling
-  arm64: kvm: Add support for 16K pages
-
- arch/arm/include/asm/kvm_mmu.h                |   35 +--
- arch/arm/include/asm/stage2_pgtable.h         |   59 +++++
- arch/arm/kvm/arm.c                            |    2 +-
- arch/arm/kvm/mmu.c                            |  347 +++++++++++++------------
- arch/arm64/include/asm/kvm_arm.h              |   83 +++---
- arch/arm64/include/asm/kvm_mmu.h              |   84 +-----
- arch/arm64/include/asm/pgtable-hwdef.h        |   80 ++++--
- arch/arm64/include/asm/pgtable.h              |    2 +
- arch/arm64/include/asm/stage2_pgtable-nopmd.h |   42 +++
- arch/arm64/include/asm/stage2_pgtable-nopud.h |   39 +++
- arch/arm64/include/asm/stage2_pgtable.h       |  139 ++++++++++
- arch/arm64/kvm/Kconfig                        |    1 -
- 12 files changed, 586 insertions(+), 327 deletions(-)
- create mode 100644 arch/arm/include/asm/stage2_pgtable.h
- create mode 100644 arch/arm64/include/asm/stage2_pgtable-nopmd.h
- create mode 100644 arch/arm64/include/asm/stage2_pgtable-nopud.h
- create mode 100644 arch/arm64/include/asm/stage2_pgtable.h
-
+diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
+index da44be9..c2b2b27 100644
+--- a/arch/arm/include/asm/kvm_mmu.h
++++ b/arch/arm/include/asm/kvm_mmu.h
+@@ -161,8 +161,6 @@ static inline bool kvm_page_empty(void *ptr)
+ #define kvm_pmd_table_empty(kvm, pmdp) kvm_page_empty(pmdp)
+ #define kvm_pud_table_empty(kvm, pudp) (0)
+ 
+-#define KVM_PREALLOC_LEVEL	0
+-
+ static inline void *kvm_get_hwpgd(struct kvm *kvm)
+ {
+ 	return kvm->arch.pgd;
+@@ -173,6 +171,15 @@ static inline unsigned int kvm_get_hwpgd_size(void)
+ 	return PTRS_PER_S2_PGD * sizeof(pgd_t);
+ }
+ 
++static inline pgd_t *kvm_setup_fake_pgd(pgd_t *hwpgd)
++{
++	return hwpgd;
++}
++
++static inline void kvm_free_fake_pgd(pgd_t *pgd)
++{
++}
++
+ struct kvm;
+ 
+ #define kvm_flush_dcache_to_poc(a,l)	__cpuc_flush_dcache_area((a), (l))
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index 58dbd5c..774d00b 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -684,47 +684,16 @@ int kvm_alloc_stage2_pgd(struct kvm *kvm)
+ 	if (!hwpgd)
+ 		return -ENOMEM;
+ 
+-	/* When the kernel uses more levels of page tables than the
++	/*
++	 * When the kernel uses more levels of page tables than the
+ 	 * guest, we allocate a fake PGD and pre-populate it to point
+ 	 * to the next-level page table, which will be the real
+ 	 * initial page table pointed to by the VTTBR.
+-	 *
+-	 * When KVM_PREALLOC_LEVEL==2, we allocate a single page for
+-	 * the PMD and the kernel will use folded pud.
+-	 * When KVM_PREALLOC_LEVEL==1, we allocate 2 consecutive PUD
+-	 * pages.
+ 	 */
+-	if (KVM_PREALLOC_LEVEL > 0) {
+-		int i;
+-
+-		/*
+-		 * Allocate fake pgd for the page table manipulation macros to
+-		 * work.  This is not used by the hardware and we have no
+-		 * alignment requirement for this allocation.
+-		 */
+-		pgd = kmalloc(PTRS_PER_S2_PGD * sizeof(pgd_t),
+-				GFP_KERNEL | __GFP_ZERO);
+-
+-		if (!pgd) {
+-			kvm_free_hwpgd(hwpgd);
+-			return -ENOMEM;
+-		}
+-
+-		/* Plug the HW PGD into the fake one. */
+-		for (i = 0; i < PTRS_PER_S2_PGD; i++) {
+-			if (KVM_PREALLOC_LEVEL == 1)
+-				pgd_populate(NULL, pgd + i,
+-					     (pud_t *)hwpgd + i * PTRS_PER_PUD);
+-			else if (KVM_PREALLOC_LEVEL == 2)
+-				pud_populate(NULL, pud_offset(pgd, 0) + i,
+-					     (pmd_t *)hwpgd + i * PTRS_PER_PMD);
+-		}
+-	} else {
+-		/*
+-		 * Allocate actual first-level Stage-2 page table used by the
+-		 * hardware for Stage-2 page table walks.
+-		 */
+-		pgd = (pgd_t *)hwpgd;
++	pgd = kvm_setup_fake_pgd(hwpgd);
++	if (IS_ERR(pgd)) {
++		kvm_free_hwpgd(hwpgd);
++		return PTR_ERR(pgd);
+ 	}
+ 
+ 	kvm_clean_pgd(pgd);
+@@ -831,9 +800,7 @@ void kvm_free_stage2_pgd(struct kvm *kvm)
+ 
+ 	unmap_stage2_range(kvm, 0, KVM_PHYS_SIZE);
+ 	kvm_free_hwpgd(kvm_get_hwpgd(kvm));
+-	if (KVM_PREALLOC_LEVEL > 0)
+-		kfree(kvm->arch.pgd);
+-
++	kvm_free_fake_pgd(kvm->arch.pgd);
+ 	kvm->arch.pgd = NULL;
+ }
+ 
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 22732a5..9a3409f 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -208,6 +208,49 @@ static inline unsigned int kvm_get_hwpgd_size(void)
+ 	return PTRS_PER_S2_PGD * sizeof(pgd_t);
+ }
+ 
++/*
++ * Allocate fake pgd for the host kernel page table macros to work.
++ * This is not used by the hardware and we have no alignment
++ * requirement for this allocation.
++ */
++static inline pgd_t *kvm_setup_fake_pgd(pgd_t *hwpgd)
++{
++	int i;
++	pgd_t *pgd;
++
++	if (!KVM_PREALLOC_LEVEL)
++		return hwpgd;
++
++	/*
++	 * When KVM_PREALLOC_LEVEL==2, we allocate a single page for
++	 * the PMD and the kernel will use folded pud.
++	 * When KVM_PREALLOC_LEVEL==1, we allocate 2 consecutive PUD
++	 * pages.
++	 */
++
++	pgd = kmalloc(PTRS_PER_S2_PGD * sizeof(pgd_t),
++			GFP_KERNEL | __GFP_ZERO);
++	if (!pgd)
++		return ERR_PTR(-ENOMEM);
++
++	/* Plug the HW PGD into the fake one. */
++	for (i = 0; i < PTRS_PER_S2_PGD; i++) {
++		if (KVM_PREALLOC_LEVEL == 1)
++			pgd_populate(NULL, pgd + i,
++				     (pud_t *)hwpgd + i * PTRS_PER_PUD);
++		else if (KVM_PREALLOC_LEVEL == 2)
++			pud_populate(NULL, pud_offset(pgd, 0) + i,
++				     (pmd_t *)hwpgd + i * PTRS_PER_PMD);
++	}
++
++	return pgd;
++}
++
++static inline void kvm_free_fake_pgd(pgd_t *pgd)
++{
++	if (KVM_PREALLOC_LEVEL > 0)
++		kfree(pgd);
++}
+ static inline bool kvm_page_empty(void *ptr)
+ {
+ 	struct page *ptr_page = virt_to_page(ptr);
 -- 
 1.7.9.5
