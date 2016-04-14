@@ -1,116 +1,128 @@
 From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v4 6/7] KVM: arm/arm64: enable MSI routing
-Date: Thu, 14 Apr 2016 14:04:31 +0200
-Message-ID: <20160414120431.GA30804@cbox>
+Subject: Re: [PATCH v4 1/7] KVM: api: pass the devid in the msi routing entry
+Date: Thu, 14 Apr 2016 14:04:37 +0200
+Message-ID: <20160414120437.GB30804@cbox>
 References: <1459759657-7402-1-git-send-email-eric.auger@linaro.org>
- <1459759657-7402-7-git-send-email-eric.auger@linaro.org>
+ <1459759657-7402-2-git-send-email-eric.auger@linaro.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D1D349B84
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 08:02:34 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id bXXMiN+yTDGc for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Apr 2016 08:02:33 -0400 (EDT)
+Received: from mail-wm0-f53.google.com (mail-wm0-f53.google.com [74.125.82.53])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id A6D8849B7C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 08:02:33 -0400 (EDT)
+Received: by mail-wm0-f53.google.com with SMTP id u206so122265431wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 05:04:16 -0700 (PDT)
 Content-Disposition: inline
-In-Reply-To: <1459759657-7402-7-git-send-email-eric.auger@linaro.org>
-Sender: kvm-owner@vger.kernel.org
+In-Reply-To: <1459759657-7402-2-git-send-email-eric.auger@linaro.org>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Eric Auger <eric.auger@linaro.org>
-Cc: eric.auger@st.com, marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, patches@linaro.org, pbonzini@redhat.com, p.fedin@samsung.com, Manish.Jaggi@caviumnetworks.com
+Cc: eric.auger@st.com, kvm@vger.kernel.org, patches@linaro.org, marc.zyngier@arm.com, andre.przywara@arm.com, Manish.Jaggi@caviumnetworks.com, pbonzini@redhat.com, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Apr 04, 2016 at 10:47:36AM +0200, Eric Auger wrote:
-> Up to now, only irqchip routing entries could be set. This patch
-> adds the capability to insert MSI routing entries.
-> 
-> For ARM64, let's also increase KVM_MAX_IRQ_ROUTES to 4096: this
-> include SPI irqchip routes plus MSI routes. In the future this
-> might be extended.
+On Mon, Apr 04, 2016 at 10:47:31AM +0200, Eric Auger wrote:
+> On ARM, the MSI msg (address and data) comes along with
+> out-of-band device ID information. The device ID encodes the
+> device that writes the MSI msg. Let's convey the device id in
+> kvm_irq_routing_msi and use KVM_MSI_VALID_DEVID flag value in
+> kvm_irq_routing_entry to indicate the msi devid is populated.
 > 
 > Signed-off-by: Eric Auger <eric.auger@linaro.org>
 > 
 > ---
 > v2 -> v3:
-> - remove any reference to KVM_IRQ_ROUTING_EXTENDED_MSI type
-> - unconditionnaly uapi flags and devid downto the kernel
->   routing entry struct
-> - handle KVM_MSI_VALID_DEVID flag in kvm_set_irq_routing
-> - note about KVM_CAP_MSI_DEVID moved in the first patch file
->   of the series
+> - replace usage of KVM_IRQ_ROUTING_EXTENDED_MSI type by
+>   usage of KVM_MSI_VALID_DEVID flag
+> - add note about KVM_CAP_MSI_DEVID capability
 > 
 > v1 -> v2:
-> - adapt to new routing entry types
+> - devid id passed in kvm_irq_routing_msi instead of in
+>   kvm_irq_routing_entry
 > 
-> RFC -> PATCH:
-> - move api MSI routing updates into that patch file
-> - use new devid field of user api struct
+> RFC -> PATCH
+> - remove kvm_irq_routing_extended_msi and use union instead
 > ---
->  Documentation/virtual/kvm/api.txt | 5 +++++
->  include/linux/kvm_host.h          | 2 ++
->  virt/kvm/arm/vgic/vgic_irqfd.c    | 8 ++++++++
->  virt/kvm/irqchip.c                | 2 +-
->  4 files changed, 16 insertions(+), 1 deletion(-)
+>  Documentation/virtual/kvm/api.txt | 18 ++++++++++++++++--
+>  include/uapi/linux/kvm.h          |  5 ++++-
+>  2 files changed, 20 insertions(+), 3 deletions(-)
 > 
 > diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
-> index 61f8f27..217b460 100644
+> index 536f19b..c436bb6 100644
 > --- a/Documentation/virtual/kvm/api.txt
 > +++ b/Documentation/virtual/kvm/api.txt
-> @@ -2368,6 +2368,11 @@ On arm/arm64, gsi routing being supported, the following can happen:
->  - in case no routing entry is associated to this gsi, injection fails
->  - in case the gsi is associated to an irqchip routing entry,
->    irqchip.pin + 32 corresponds to the injected SPI ID.
-> +- in case the gsi is associated to an MSI routing entry,
-> +  * without GICv3 ITS in-kernel emulation, MSI data matches the SPI ID
-> +    of the injected SPI
+> @@ -1462,7 +1462,10 @@ struct kvm_irq_routing_entry {
+>  #define KVM_IRQ_ROUTING_S390_ADAPTER 3
+>  #define KVM_IRQ_ROUTING_HV_SINT 4
+>  
+> -No flags are specified so far, the corresponding field must be set to zero.
+> +flags:
+> +- KVM_MSI_VALID_DEVID: used along with KVM_IRQ_ROUTING_MSI
+> +  routing entry type, it tells the msi devid contains a valid value.
 
-can we be more specific here and perhaps express this in the positive?
-For example, if the user creates a KVM_DEV_TYPE_ARM_VGIC_V2, then...
+s/it tells the msi devid/specifies that the devid field/
 
-> +  * with GICv3 ITS in-kernel emulation, the MSI message and device ID
-> +    are translated into an LPI.
+> +- zero otherwise
 >  
->  4.76 KVM_PPC_ALLOCATE_HTAB
+>  struct kvm_irq_routing_irqchip {
+>  	__u32 irqchip;
+> @@ -1473,9 +1476,20 @@ struct kvm_irq_routing_msi {
+>  	__u32 address_lo;
+>  	__u32 address_hi;
+>  	__u32 data;
+> -	__u32 pad;
+> +	union {
+> +		__u32 pad;
+> +		__u32 devid;
+> +	};
+>  };
 >  
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 461e480..f25613d 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -1021,6 +1021,8 @@ static inline int mmu_notifier_retry(struct kvm *kvm, unsigned long mmu_seq)
+> +devid: If KVM_MSI_VALID_DEVID is set, contains a unique device identifier
+> +       for the device that wrote the MSI message.
+> +       For PCI, this is usually a BFD identifier in the lower 16 bits.
+> +
+> +The per-VM KVM_CAP_MSI_DEVID capability advertises the need to provide
+
+"the need to" or "the possibility to"?  Is there ever a situation where
+KVM_CAP_MSI_DEVID is set but you don't need to provide a device ID and
+set the flag?
+
+> +the device ID. If this capability is not set, userland cannot rely on
+> +the kernel to allow the KVM_MSI_VALID_DEVID flag being set.
+> +
+>  struct kvm_irq_routing_s390_adapter {
+>  	__u64 ind_addr;
+>  	__u64 summary_addr;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 6a02871..52a973f 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -865,7 +865,10 @@ struct kvm_irq_routing_msi {
+>  	__u32 address_lo;
+>  	__u32 address_hi;
+>  	__u32 data;
+> -	__u32 pad;
+> +	union {
+> +		__u32 pad;
+> +		__u32 devid;
+> +	};
+>  };
 >  
->  #ifdef CONFIG_S390
->  #define KVM_MAX_IRQ_ROUTES 4096 //FIXME: we can have more than that...
-> +#elif defined(CONFIG_ARM64)
-> +#define KVM_MAX_IRQ_ROUTES 4096
->  #else
->  #define KVM_MAX_IRQ_ROUTES 1024
->  #endif
-> diff --git a/virt/kvm/arm/vgic/vgic_irqfd.c b/virt/kvm/arm/vgic/vgic_irqfd.c
-> index a76994f..a3a7f02 100644
-> --- a/virt/kvm/arm/vgic/vgic_irqfd.c
-> +++ b/virt/kvm/arm/vgic/vgic_irqfd.c
-> @@ -64,6 +64,14 @@ int kvm_set_routing_entry(struct kvm_kernel_irq_routing_entry *e,
->  		    (e->irqchip.irqchip >= KVM_NR_IRQCHIPS))
->  			goto out;
->  		break;
-> +	case KVM_IRQ_ROUTING_MSI:
-> +		e->set = kvm_set_msi;
-> +		e->msi.address_lo = ue->u.msi.address_lo;
-> +		e->msi.address_hi = ue->u.msi.address_hi;
-> +		e->msi.data = ue->u.msi.data;
-> +		e->flags = ue->flags;
-> +		e->devid = ue->u.msi.devid;
-> +		break;
->  	default:
->  		goto out;
->  	}
-> diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-> index b4222d6..269d949 100644
-> --- a/virt/kvm/irqchip.c
-> +++ b/virt/kvm/irqchip.c
-> @@ -211,7 +211,7 @@ int kvm_set_irq_routing(struct kvm *kvm,
->  			goto out;
->  
->  		r = -EINVAL;
-> -		if (ue->flags) {
-> +		if (ue->flags & ~KVM_MSI_VALID_DEVID) {
->  			kfree(e);
->  			goto out;
->  		}
+>  struct kvm_irq_routing_s390_adapter {
 > -- 
 > 1.9.1
 > 
