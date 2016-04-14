@@ -1,22 +1,22 @@
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [PATCH v2 11/17] kvm-arm: Use explicit stage2 helper routines
-Date: Thu, 14 Apr 2016 14:20:59 +0100
-Message-ID: <1460640065-27658-12-git-send-email-suzuki.poulose@arm.com>
+Subject: [PATCH v2 17/17] arm64: kvm: Add support for 16K pages
+Date: Thu, 14 Apr 2016 14:21:05 +0100
+Message-ID: <1460640065-27658-18-git-send-email-suzuki.poulose@arm.com>
 References: <1460640065-27658-1-git-send-email-suzuki.poulose@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B311D49BB7
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:20:12 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E2F1849BC2
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:20:26 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id xU3-K7ef2MN4 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Apr 2016 09:20:11 -0400 (EDT)
+ with ESMTP id b9FJPJO+uubQ for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 14 Apr 2016 09:20:21 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id D2FB149BA3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:20:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5DF6249BAC
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 09:20:21 -0400 (EDT)
 In-Reply-To: <1460640065-27658-1-git-send-email-suzuki.poulose@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,149 +31,67 @@ To: linux-arm-kernel@lists.infradead.org
 Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We have stage2 page table helpers for both arm and arm64. Switch to
-the stage2 helpers for routines that only deal with stage2 page table.
+Now that we can handle stage-2 page tables independent
+of the host page table levels, wire up the 16K page
+support.
 
 Cc: Marc Zyngier <marc.zyngier@arm.com>
-Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+Reviewed-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arch/arm/kvm/mmu.c |   48 ++++++++++++++++++++++++------------------------
- 1 file changed, 24 insertions(+), 24 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h |   13 +++++++++++--
+ arch/arm64/kvm/Kconfig           |    1 -
+ 2 files changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-index d0c0ee9..f93f717 100644
---- a/arch/arm/kvm/mmu.c
-+++ b/arch/arm/kvm/mmu.c
-@@ -319,9 +319,9 @@ static void stage2_flush_pmds(struct kvm *kvm, pud_t *pud,
- 	pmd_t *pmd;
- 	phys_addr_t next;
- 
--	pmd = pmd_offset(pud, addr);
-+	pmd = stage2_pmd_offset(pud, addr);
- 	do {
--		next = kvm_pmd_addr_end(addr, end);
-+		next = stage2_pmd_addr_end(addr, end);
- 		if (!pmd_none(*pmd)) {
- 			if (pmd_thp_or_huge(*pmd))
- 				kvm_flush_dcache_pmd(*pmd);
-@@ -337,11 +337,11 @@ static void stage2_flush_puds(struct kvm *kvm, pgd_t *pgd,
- 	pud_t *pud;
- 	phys_addr_t next;
- 
--	pud = pud_offset(pgd, addr);
-+	pud = stage2_pud_offset(pgd, addr);
- 	do {
--		next = kvm_pud_addr_end(addr, end);
--		if (!pud_none(*pud)) {
--			if (pud_huge(*pud))
-+		next = stage2_pud_addr_end(addr, end);
-+		if (!stage2_pud_none(*pud)) {
-+			if (stage2_pud_huge(*pud))
- 				kvm_flush_dcache_pud(*pud);
- 			else
- 				stage2_flush_pmds(kvm, pud, addr, next);
-@@ -357,9 +357,9 @@ static void stage2_flush_memslot(struct kvm *kvm,
- 	phys_addr_t next;
- 	pgd_t *pgd;
- 
--	pgd = kvm->arch.pgd + kvm_pgd_index(addr);
-+	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
- 	do {
--		next = kvm_pgd_addr_end(addr, end);
-+		next = stage2_pgd_addr_end(addr, end);
- 		stage2_flush_puds(kvm, pgd, addr, next);
- 	} while (pgd++, addr = next, addr != end);
- }
-@@ -807,16 +807,16 @@ static pud_t *stage2_get_pud(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
- 	pgd_t *pgd;
- 	pud_t *pud;
- 
--	pgd = kvm->arch.pgd + kvm_pgd_index(addr);
--	if (WARN_ON(pgd_none(*pgd))) {
-+	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
-+	if (WARN_ON(stage2_pgd_none(*pgd))) {
- 		if (!cache)
- 			return NULL;
- 		pud = mmu_memory_cache_alloc(cache);
--		pgd_populate(NULL, pgd, pud);
-+		stage2_pgd_populate(pgd, pud);
- 		get_page(virt_to_page(pgd));
- 	}
- 
--	return pud_offset(pgd, addr);
-+	return stage2_pud_offset(pgd, addr);
- }
- 
- static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
-@@ -826,15 +826,15 @@ static pmd_t *stage2_get_pmd(struct kvm *kvm, struct kvm_mmu_memory_cache *cache
- 	pmd_t *pmd;
- 
- 	pud = stage2_get_pud(kvm, cache, addr);
--	if (pud_none(*pud)) {
-+	if (stage2_pud_none(*pud)) {
- 		if (!cache)
- 			return NULL;
- 		pmd = mmu_memory_cache_alloc(cache);
--		pud_populate(NULL, pud, pmd);
-+		stage2_pud_populate(pud, pmd);
- 		get_page(virt_to_page(pud));
- 	}
- 
--	return pmd_offset(pud, addr);
-+	return stage2_pmd_offset(pud, addr);
- }
- 
- static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
-@@ -1042,10 +1042,10 @@ static void stage2_wp_pmds(pud_t *pud, phys_addr_t addr, phys_addr_t end)
- 	pmd_t *pmd;
- 	phys_addr_t next;
- 
--	pmd = pmd_offset(pud, addr);
-+	pmd = stage2_pmd_offset(pud, addr);
- 
- 	do {
--		next = kvm_pmd_addr_end(addr, end);
-+		next = stage2_pmd_addr_end(addr, end);
- 		if (!pmd_none(*pmd)) {
- 			if (pmd_thp_or_huge(*pmd)) {
- 				if (!kvm_s2pmd_readonly(pmd))
-@@ -1070,12 +1070,12 @@ static void  stage2_wp_puds(pgd_t *pgd, phys_addr_t addr, phys_addr_t end)
- 	pud_t *pud;
- 	phys_addr_t next;
- 
--	pud = pud_offset(pgd, addr);
-+	pud = stage2_pud_offset(pgd, addr);
- 	do {
--		next = kvm_pud_addr_end(addr, end);
--		if (!pud_none(*pud)) {
-+		next = stage2_pud_addr_end(addr, end);
-+		if (!stage2_pud_none(*pud)) {
- 			/* TODO:PUD not supported, revisit later if supported */
--			BUG_ON(pud_huge(*pud));
-+			BUG_ON(stage2_pud_huge(*pud));
- 			stage2_wp_pmds(pud, addr, next);
- 		}
- 	} while (pud++, addr = next, addr != end);
-@@ -1092,7 +1092,7 @@ static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
- 	pgd_t *pgd;
- 	phys_addr_t next;
- 
--	pgd = kvm->arch.pgd + kvm_pgd_index(addr);
-+	pgd = kvm->arch.pgd + stage2_pgd_index(addr);
- 	do {
- 		/*
- 		 * Release kvm_mmu_lock periodically if the memory region is
-@@ -1104,8 +1104,8 @@ static void stage2_wp_range(struct kvm *kvm, phys_addr_t addr, phys_addr_t end)
- 		if (need_resched() || spin_needbreak(&kvm->mmu_lock))
- 			cond_resched_lock(&kvm->mmu_lock);
- 
--		next = kvm_pgd_addr_end(addr, end);
--		if (pgd_present(*pgd))
-+		next = stage2_pgd_addr_end(addr, end);
-+		if (stage2_pgd_present(*pgd))
- 			stage2_wp_puds(pgd, addr, next);
- 	} while (pgd++, addr = next, addr != end);
- }
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 1281d98..c6cbb36 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -114,6 +114,7 @@
+ #define VTCR_EL2_PS_MASK	TCR_EL2_PS_MASK
+ #define VTCR_EL2_TG0_MASK	TCR_TG0_MASK
+ #define VTCR_EL2_TG0_4K		TCR_TG0_4K
++#define VTCR_EL2_TG0_16K	TCR_TG0_16K
+ #define VTCR_EL2_TG0_64K	TCR_TG0_64K
+ #define VTCR_EL2_SH0_MASK	TCR_SH0_MASK
+ #define VTCR_EL2_SH0_INNER	TCR_SH0_INNER
+@@ -139,7 +140,7 @@
+  * (see hyp-init.S).
+  *
+  * Note that when using 4K pages, we concatenate two first level page tables
+- * together.
++ * together. With 16K pages, we concatenate 16 first level page tables.
+  *
+  * The magic numbers used for VTTBR_X in this patch can be found in Tables
+  * D4-23 and D4-25 in ARM DDI 0487A.b.
+@@ -157,7 +158,15 @@
+  */
+ #define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_64K | VTCR_EL2_SL0_LVL1)
+ #define VTTBR_X_TGRAN_MAGIC		38
+-#else
++#elif defined(CONFIG_ARM64_16K_PAGES)
++/*
++ * Stage2 translation configuration:
++ * 16kB pages (TG0 = 2)
++ * 2 level page tables (SL = 1)
++ */
++#define VTCR_EL2_TGRAN_FLAGS		(VTCR_EL2_TG0_16K | VTCR_EL2_SL0_LVL1)
++#define VTTBR_X_TGRAN_MAGIC		42
++#else	/* 4K */
+ /*
+  * Stage2 translation configuration:
+  * 4kB pages (TG0 = 0)
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index de7450d..aa2e34e 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -22,7 +22,6 @@ config KVM_ARM_VGIC_V3
+ config KVM
+ 	bool "Kernel-based Virtual Machine (KVM) support"
+ 	depends on OF
+-	depends on !ARM64_16K_PAGES
+ 	select MMU_NOTIFIER
+ 	select PREEMPT_NOTIFIERS
+ 	select ANON_INODES
 -- 
 1.7.9.5
