@@ -1,45 +1,50 @@
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Subject: Re: [PATCH v2 00/17] kvm-arm: Add stage2 page table walker
-Date: Thu, 14 Apr 2016 17:51:13 +0100
-Message-ID: <570FCA81.9000006@arm.com>
-References: <1460640065-27658-1-git-send-email-suzuki.poulose@arm.com>
- <570F9B32.9090106@arm.com> <20160414160348.GQ30804@cbox>
- <570FC11F.4080401@arm.com> <20160414164145.GR30804@cbox>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v7 1/6] KVM: arm/arm64: Add VGICv3 save/restore API documentation
+Date: Fri, 15 Apr 2016 14:20:14 +0100
+Message-ID: <CAFEAcA8g8r5M0KtYbjLchJAn_EZbZEBu0PdoREX9Eof+KvM=2g@mail.gmail.com>
+References: <cover.1449491035.git.p.fedin@samsung.com> <204d6b178e611ee0b5aede2b945516e0a6048c3c.1449491035.git.p.fedin@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"; Format="flowed"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id AA50D49BD4
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 12:49:35 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ig4w3-uULZpQ for <kvmarm@lists.cs.columbia.edu>;
- Thu, 14 Apr 2016 12:49:35 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0D53249BD3
- for <kvmarm@lists.cs.columbia.edu>; Thu, 14 Apr 2016 12:49:34 -0400 (EDT)
-In-Reply-To: <20160414164145.GR30804@cbox>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvm@vger.kernel.org, marc.zyngier@arm.com, catalin.marinas@arm.com, will.deacon@arm.com, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset=UTF-8
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <204d6b178e611ee0b5aede2b945516e0a6048c3c.1449491035.git.p.fedin@samsung.com>
+Sender: kvm-owner@vger.kernel.org
+To: Pavel Fedin <p.fedin@samsung.com>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 14/04/16 17:41, Christoffer Dall wrote:
-> No worries.  I pushed the stuff I picked from your previous branch plus
-> the changes to bool values that Marc asked for (and added my
-> signed-off-by to those) and put it all on kvmarm/queue:
+On 7 December 2015 at 12:29, Pavel Fedin <p.fedin@samsung.com> wrote:
+> From: Christoffer Dall <christoffer.dall@linaro.org>
 >
-> git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git queue
+> Factor out the GICv3-specific documentation into a separate
+> documentation file.  Add description for how to access distributor,
+> redistributor, and CPU interface registers for GICv3 in this new file.
 
-Thanks !
+> +  KVM_DEV_ARM_VGIC_GRP_DIST_REGS
+> +  KVM_DEV_ARM_VGIC_GRP_REDIST_REGS
+> +  Attributes:
+> +    The attr field of kvm_device_attr encodes two values:
+> +    bits:     | 63   ....  32  |  31   ....    0 |
+> +    values:   |      mpidr     |      offset     |
+> +
+> +    All distributor regs are (rw, 64-bit).
+> +
+> +    KVM_DEV_ARM_VGIC_GRP_DIST_REGS accesses the main distributor registers.
+> +    KVM_DEV_ARM_VGIC_GRP_REDIST_REGS accesses the redistributor of the CPU
+> +    specified by the mpidr.
+> +
+> +    The offset is relative to the "[Re]Distributor base address" as defined
+> +    in the GICv3/4 specs.  Getting or setting such a register has the same
+> +    effect as reading or writing the register on real hardware, and the mpidr
+> +    field is used to specify which redistributor is accessed.  The mpidr is
+> +    ignored for the distributor.
 
-Suzuki
+I've just noticed an awkward wrinkle here. The (optional) registers
+GICR_STATUSR and GICD_STATUSR are both architecturally "write-1-to-clear",
+with no mechanism in the hardware to write 1 bits back into them.
+So if we want to support migrating these state fields, the behaviour
+of the userspace accessor has to be something different from the effect
+of writing the register on real hardware (eg "writes actually write the
+specified value")...
+
+thanks
+-- PMM
