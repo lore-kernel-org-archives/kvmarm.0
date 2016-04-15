@@ -1,22 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 43/45] KVM: arm/arm64: vgic-new: Wire up irqfd injection
-Date: Fri, 15 Apr 2016 18:11:54 +0100
-Message-ID: <1460740316-8755-44-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH 44/45] KVM: arm/arm64: vgic-new: implement mapped IRQ handling
+Date: Fri, 15 Apr 2016 18:11:55 +0100
+Message-ID: <1460740316-8755-45-git-send-email-andre.przywara@arm.com>
 References: <1460740316-8755-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C67E249C74
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Apr 2016 13:11:06 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A0AD849CBA
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Apr 2016 13:11:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Kb4tLLIK2J1d for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Apr 2016 13:11:05 -0400 (EDT)
+ with ESMTP id R1BtMS8a6G6Q for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Apr 2016 13:11:09 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CFEE049C5C
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Apr 2016 13:11:05 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 508AE49C04
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Apr 2016 13:11:07 -0400 (EDT)
 In-Reply-To: <1460740316-8755-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,72 +31,107 @@ To: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@a
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Connect to the new VGIC to the irqfd framework, so that we can
-inject IRQs.
-GSI routing and MSI routing is not yet implemented.
+We now store the mapped hardware IRQ number in our struct, so we
+don't need the irq_phys_map for the new VGIC.
+Implement the hardware IRQ mapping on top of the reworked arch
+timer interface.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
- virt/kvm/arm/vgic/vgic_irqfd.c | 51 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
- create mode 100644 virt/kvm/arm/vgic/vgic_irqfd.c
 
-diff --git a/virt/kvm/arm/vgic/vgic_irqfd.c b/virt/kvm/arm/vgic/vgic_irqfd.c
-new file mode 100644
-index 0000000..3eee1bd
---- /dev/null
-+++ b/virt/kvm/arm/vgic/vgic_irqfd.c
-@@ -0,0 +1,51 @@
-+/*
-+ * Copyright (C) 2015, 2016 ARM Ltd.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
+Changelog RFC..v1:
+- adapt to new arch_timer mapped IRQ interface
+- implement inject_mapped_irq() as a macro (since it is identical to
+  the "un-mapped" IRQ implementation)
+---
+ include/kvm/vgic/vgic.h  |  6 ++++++
+ virt/kvm/arm/vgic/vgic.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 53 insertions(+)
+
+diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+index 6e5e6d7..eff6626 100644
+--- a/include/kvm/vgic/vgic.h
++++ b/include/kvm/vgic/vgic.h
+@@ -209,6 +209,12 @@ int kvm_vgic_hyp_init(void);
+ 
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 			bool level);
++/* TODO: for compatibility with the old VGIC's timer implementation */
++#define kvm_vgic_inject_mapped_irq kvm_vgic_inject_irq
 +
-+#include <linux/kvm.h>
-+#include <linux/kvm_host.h>
-+#include <trace/events/kvm.h>
++int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq);
++int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq);
++bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+ 
+ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+ 
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index f8252d4..15fd146 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -17,6 +17,8 @@
+ #include <linux/kvm.h>
+ #include <linux/kvm_host.h>
+ #include <linux/list_sort.h>
++#include <linux/irq.h>
++#include <linux/interrupt.h>
+ 
+ #include "vgic.h"
+ 
+@@ -296,6 +298,39 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 
+ 	vcpu = kvm_get_vcpu(kvm, cpuid);
+ 	vgic_update_irq_pending(kvm, vcpu, intid, level);
 +
-+int kvm_irq_map_gsi(struct kvm *kvm,
-+		    struct kvm_kernel_irq_routing_entry *entries,
-+		    int gsi)
-+{
 +	return 0;
 +}
 +
-+int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned irqchip, unsigned pin)
++int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq)
 +{
-+	return pin;
-+}
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
 +
-+int kvm_set_irq(struct kvm *kvm, int irq_source_id,
-+		u32 irq, int level, bool line_status)
-+{
-+	unsigned int spi = irq + VGIC_NR_PRIVATE_IRQS;
++	BUG_ON(!irq);
 +
-+	trace_kvm_set_irq(irq, level, irq_source_id);
++	spin_lock(&irq->irq_lock);
 +
-+	BUG_ON(!vgic_initialized(kvm));
++	irq->hw = true;
++	irq->hwintid = phys_irq;
 +
-+	return kvm_vgic_inject_irq(kvm, 0, spi, level);
-+}
++	spin_unlock(&irq->irq_lock);
 +
-+/* MSI not implemented yet */
-+int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
-+		struct kvm *kvm, int irq_source_id,
-+		int level, bool line_status)
-+{
 +	return 0;
++}
++
++int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
++{
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
++
++	BUG_ON(!irq);
++
++	spin_lock(&irq->irq_lock);
++
++	irq->hw = false;
++	irq->hwintid = 0;
++
++	spin_unlock(&irq->irq_lock);
++
+ 	return 0;
+ }
+ 
+@@ -568,3 +603,15 @@ void vgic_kick_vcpus(struct kvm *kvm)
+ 			kvm_vcpu_kick(vcpu);
+ 	}
+ }
++
++bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
++{
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
++	bool map_is_active;
++
++	spin_lock(&irq->irq_lock);
++	map_is_active = irq->hw && irq->active;
++	spin_unlock(&irq->irq_lock);
++
++	return map_is_active;
 +}
 -- 
 2.7.3
