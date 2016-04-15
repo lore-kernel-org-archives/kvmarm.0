@@ -1,22 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 20/45] KVM: arm/arm64: vgic-new: Add TARGET registers handlers
-Date: Fri, 15 Apr 2016 18:11:31 +0100
-Message-ID: <1460740316-8755-21-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH 21/45] KVM: arm/arm64: vgic-new: Add SGIR register handler
+Date: Fri, 15 Apr 2016 18:11:32 +0100
+Message-ID: <1460740316-8755-22-git-send-email-andre.przywara@arm.com>
 References: <1460740316-8755-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0E10B49BEE
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Apr 2016 13:10:33 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A295549C14
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Apr 2016 13:10:34 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id IYRDKo+H1mgX for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Apr 2016 13:10:32 -0400 (EDT)
+ with ESMTP id waepJFQP39CJ for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 15 Apr 2016 13:10:34 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id ABB4849C46
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Apr 2016 13:10:31 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2C94549C4E
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Apr 2016 13:10:33 -0400 (EDT)
 In-Reply-To: <1460740316-8755-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -34,59 +34,58 @@ List-Id: kvmarm@lists.cs.columbia.edu
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 
 Changelog RFC..v1:
-- remove runtime VCPU determination from this v2-only register
-- fold in implementation of vgic_v2_irq_change_affinity()
-- replace ffs() with __ffs()
+- silently return on illegal TargetListFilter value (=3)
 ---
- virt/kvm/arm/vgic/vgic_mmio.c | 45 ++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 44 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic_mmio.c | 46 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 45 insertions(+), 1 deletion(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic_mmio.c b/virt/kvm/arm/vgic/vgic_mmio.c
-index a8a96c8..b2f329a 100644
+index b2f329a..83641b3 100644
 --- a/virt/kvm/arm/vgic/vgic_mmio.c
 +++ b/virt/kvm/arm/vgic/vgic_mmio.c
-@@ -537,6 +537,49 @@ static int vgic_mmio_write_config(struct kvm_vcpu *vcpu,
+@@ -580,6 +580,50 @@ static int vgic_mmio_write_target(struct kvm_vcpu *vcpu,
  	return 0;
  }
  
-+static int vgic_mmio_read_target(struct kvm_vcpu *vcpu,
-+				 struct kvm_io_device *dev,
-+				 gpa_t addr, int len, void *val)
++static int vgic_mmio_write_sgir(struct kvm_vcpu *source_vcpu,
++				struct kvm_io_device *dev,
++				gpa_t addr, int len, const void *val)
 +{
-+	u32 intid = addr & 0x3ff;
-+	int i;
++	int nr_vcpus = atomic_read(&source_vcpu->kvm->online_vcpus);
++	u32 value = *(u32 *)val;
++	int intid = value & 0xf;
++	int targets = (value >> 16) & 0xff;
++	int mode = (value >> 24) & 0x03;
++	int c;
++	struct kvm_vcpu *vcpu;
 +
-+	for (i = 0; i < len; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		((u8 *)val)[i] = irq->targets;
++	switch (mode) {
++	case 0x0:		/* as specified by targets */
++		break;
++	case 0x1:
++		targets = (1U << nr_vcpus) - 1;			/* all, ... */
++		targets &= ~(1U << source_vcpu->vcpu_id);	/* but self */
++		break;
++	case 0x2:		/* this very vCPU only */
++		targets = (1U << source_vcpu->vcpu_id);
++		break;
++	case 0x3:		/* reserved */
++		return 0;
 +	}
 +
-+	return 0;
-+}
++	kvm_for_each_vcpu(c, vcpu, source_vcpu->kvm) {
++		struct vgic_irq *irq;
 +
-+static int vgic_mmio_write_target(struct kvm_vcpu *vcpu,
-+				  struct kvm_io_device *dev,
-+				  gpa_t addr, int len, const void *val)
-+{
-+	u32 intid = addr & 0x3ff;
-+	int i;
++		if (!(targets & (1U << c)))
++			continue;
 +
-+	/* GICD_ITARGETSR[0-7] are read-only */
-+	if (intid < VGIC_NR_PRIVATE_IRQS)
-+		return 0;
-+
-+	for (i = 0; i < len; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid + i);
-+		int target;
++		irq = vgic_get_irq(source_vcpu->kvm, vcpu, intid);
 +
 +		spin_lock(&irq->irq_lock);
++		irq->pending = true;
++		irq->source |= 1U << source_vcpu->vcpu_id;
 +
-+		irq->targets = ((u8 *)val)[i];
-+		target = irq->targets ? __ffs(irq->targets) : 0;
-+		irq->target_vcpu = kvm_get_vcpu(vcpu->kvm, target);
-+
-+		spin_unlock(&irq->irq_lock);
++		vgic_queue_irq_unlock(source_vcpu->kvm, irq);
 +	}
 +
 +	return 0;
@@ -95,14 +94,14 @@ index a8a96c8..b2f329a 100644
  struct vgic_register_region vgic_v2_dist_registers[] = {
  	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
  		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12),
-@@ -557,7 +600,7 @@ struct vgic_register_region vgic_v2_dist_registers[] = {
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PRI,
- 		vgic_mmio_read_priority, vgic_mmio_write_priority, 8),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_TARGET,
--		vgic_mmio_read_nyi, vgic_mmio_write_nyi, 8),
-+		vgic_mmio_read_target, vgic_mmio_write_target, 8),
+@@ -604,7 +648,7 @@ struct vgic_register_region vgic_v2_dist_registers[] = {
  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_CONFIG,
  		vgic_mmio_read_config, vgic_mmio_write_config, 2),
  	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SOFTINT,
+-		vgic_mmio_read_nyi, vgic_mmio_write_nyi, 4),
++		vgic_mmio_read_raz, vgic_mmio_write_sgir, 4),
+ 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SGI_PENDING_CLEAR,
+ 		vgic_mmio_read_nyi, vgic_mmio_write_nyi, 16),
+ 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SGI_PENDING_SET,
 -- 
 2.7.3
