@@ -1,127 +1,106 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 02/45] KVM: arm/arm64: Fix MMIO emulation data handling
-Date: Fri, 15 Apr 2016 18:11:13 +0100
-Message-ID: <1460740316-8755-3-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH 05/45] KVM: arm/arm64: vgic-new: Add acccessor to new struct vgic_irq instance
+Date: Fri, 15 Apr 2016 18:11:16 +0100
+Message-ID: <1460740316-8755-6-git-send-email-andre.przywara@arm.com>
 References: <1460740316-8755-1-git-send-email-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B5D449BEA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Apr 2016 13:10:06 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id LmzdNNXxpdjx for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Apr 2016 13:10:05 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 086A049BF0
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Apr 2016 13:10:05 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1460740316-8755-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 From: Christoffer Dall <christoffer.dall@linaro.org>
 
-When the kernel was handling a guest MMIO read access internally, we
-need to copy the emulation result into the run->mmio structure in order
-for the kvm_handle_mmio_return() function to pick it up and inject the
-	result back into the guest.
+The new VGIC implementation centers around a struct vgic_irq instance
+per virtual IRQ.
+Provide a function to retrieve the right instance for a given IRQ
+number and (in case of private interrupts) the right VCPU.
 
-Currently the only user of kvm_io_bus for ARM is the VGIC, which did
-this copying itself, so this was not causing issues so far.
-
-But with the upcoming new vgic implementation we need this done
-properly.
-
-Update the kvm_handle_mmio_return description and cleanup the code to
-only perform a single copying when needed.
-
-Code and commit message inspired by Andre Przywara.
-
-Reported-by: Andre Przywara <andre.przywara@arm.com>
 Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- arch/arm/kvm/mmio.c | 14 +++++++-------
- virt/kvm/arm/vgic.c |  7 -------
- 2 files changed, 7 insertions(+), 14 deletions(-)
+ virt/kvm/arm/vgic/vgic.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h | 22 ++++++++++++++++++++++
+ 2 files changed, 63 insertions(+)
+ create mode 100644 virt/kvm/arm/vgic/vgic.c
+ create mode 100644 virt/kvm/arm/vgic/vgic.h
 
-diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
-index 0f6600f..0158e9e 100644
---- a/arch/arm/kvm/mmio.c
-+++ b/arch/arm/kvm/mmio.c
-@@ -87,11 +87,10 @@ static unsigned long mmio_read_buf(char *buf, unsigned int len)
- 
- /**
-  * kvm_handle_mmio_return -- Handle MMIO loads after user space emulation
-+ *			     or in-kernel IO emulation
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+new file mode 100644
+index 0000000..fb45537
+--- /dev/null
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -0,0 +1,41 @@
++/*
++ * Copyright (C) 2015, 2016 ARM Ltd.
 + *
-  * @vcpu: The VCPU pointer
-  * @run:  The VCPU run struct containing the mmio data
-- *
-- * This should only be called after returning from userspace for MMIO load
-- * emulation.
-  */
- int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
- {
-@@ -206,18 +205,19 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 	run->mmio.is_write	= is_write;
- 	run->mmio.phys_addr	= fault_ipa;
- 	run->mmio.len		= len;
--	if (is_write)
--		memcpy(run->mmio.data, data_buf, len);
- 
- 	if (!ret) {
- 		/* We handled the access successfully in the kernel. */
-+		if (!is_write)
-+			memcpy(run->mmio.data, data_buf, len);
- 		vcpu->stat.mmio_exit_kernel++;
- 		kvm_handle_mmio_return(vcpu, run);
- 		return 1;
--	} else {
--		vcpu->stat.mmio_exit_user++;
- 	}
- 
-+	if (is_write)
-+		memcpy(run->mmio.data, data_buf, len);
-+	vcpu->stat.mmio_exit_user++;
- 	run->exit_reason	= KVM_EXIT_MMIO;
- 	return 0;
- }
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 5efc298..e70cee4 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -820,7 +820,6 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
- 	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
- 	struct vgic_io_device *iodev = container_of(this,
- 						    struct vgic_io_device, dev);
--	struct kvm_run *run = vcpu->run;
- 	const struct vgic_io_range *range;
- 	struct kvm_exit_mmio mmio;
- 	bool updated_state;
-@@ -849,12 +848,6 @@ static int vgic_handle_mmio_access(struct kvm_vcpu *vcpu,
- 		updated_state = false;
- 	}
- 	spin_unlock(&dist->lock);
--	run->mmio.is_write	= is_write;
--	run->mmio.len		= len;
--	run->mmio.phys_addr	= addr;
--	memcpy(run->mmio.data, val, len);
--
--	kvm_handle_mmio_return(vcpu, run);
- 
- 	if (updated_state)
- 		vgic_kick_vcpus(vcpu->kvm);
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <linux/kvm.h>
++#include <linux/kvm_host.h>
++
++#include "vgic.h"
++
++struct vgic_global __section(.hyp.text) kvm_vgic_global_state;
++
++struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
++			      u32 intid)
++{
++	/* SGIs and PPIs */
++	if (intid <= VGIC_MAX_PRIVATE)
++		return &vcpu->arch.vgic_cpu.private_irqs[intid];
++
++	/* SPIs */
++	if (intid <= VGIC_MAX_SPI)
++		return &kvm->arch.vgic.spis[intid - VGIC_NR_PRIVATE_IRQS];
++
++	/* LPIs are not yet covered */
++	if (intid >= VGIC_MIN_LPI)
++		return NULL;
++
++	WARN(1, "Looking up struct vgic_irq for reserved INTID");
++	return NULL;
++}
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+new file mode 100644
+index 0000000..61b8d22
+--- /dev/null
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -0,0 +1,22 @@
++/*
++ * Copyright (C) 2015, 2016 ARM Ltd.
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++#ifndef __KVM_ARM_VGIC_NEW_H__
++#define __KVM_ARM_VGIC_NEW_H__
++
++struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
++			      u32 intid);
++
++#endif
 -- 
 2.7.3
+
