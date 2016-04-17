@@ -1,137 +1,135 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH 44/45] KVM: arm/arm64: vgic-new: implement mapped IRQ handling
-Date: Fri, 15 Apr 2016 18:11:55 +0100
-Message-ID: <1460740316-8755-45-git-send-email-andre.przywara@arm.com>
-References: <1460740316-8755-1-git-send-email-andre.przywara@arm.com>
+From: Tomasz Nowicki <tn@semihalf.com>
+Subject: Re: [PATCH] KVM: arm/arm64: Handle forward time correction gracefully
+Date: Sun, 17 Apr 2016 19:40:45 +0200
+Message-ID: <5713CA9D.1030801@semihalf.com>
+References: <1459931842-29465-1-git-send-email-marc.zyngier@arm.com>
+ <570B93F2.7000905@semihalf.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A0AD849CBA
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Apr 2016 13:11:10 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id R1BtMS8a6G6Q for <kvmarm@lists.cs.columbia.edu>;
- Fri, 15 Apr 2016 13:11:09 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 508AE49C04
- for <kvmarm@lists.cs.columbia.edu>; Fri, 15 Apr 2016 13:11:07 -0400 (EDT)
-In-Reply-To: <1460740316-8755-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <570B93F2.7000905@semihalf.com>
+Sender: kvm-owner@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We now store the mapped hardware IRQ number in our struct, so we
-don't need the irq_phys_map for the new VGIC.
-Implement the hardware IRQ mapping on top of the reworked arch
-timer interface.
+On 11.04.2016 14:09, Tomasz Nowicki wrote:
+> On 06.04.2016 10:37, Marc Zyngier wrote:
+>> On a host that runs NTP, corrections can have a direct impact on
+>> the background timer that we program on the behalf of a vcpu.
+>>
+>> In particular, NTP performing a forward correction will result in
+>> a timer expiring sooner than expected from a guest point of view.
+>> Not a big deal, we kick the vcpu anyway.
+>>
+>> But on wake-up, the vcpu thread is going to perform a check to
+>> find out whether or not it should block. And at that point, the
+>> timer check is going to say "timer has not expired yet, go back
+>> to sleep". This results in the timer event being lost forever.
+>>
+>> There are multiple ways to handle this. One would be record that
+>> the timer has expired and let kvm_cpu_has_pending_timer return
+>> true in that case, but that would be fairly invasive. Another is
+>> to check for the "short sleep" condition in the hrtimer callback,
+>> and restart the timer for the remaining time when the condition
+>> is detected.
+>>
+>> This patch implements the latter, with a bit of refactoring in
+>> order to avoid too much code duplication.
+>>
+>> Reported-by: Alexander Graf <agraf@suse.de>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+>> ---
+>>   virt/kvm/arm/arch_timer.c | 47
+>> +++++++++++++++++++++++++++++++++++++----------
+>>   1 file changed, 37 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+>> index a9ad4fe..4d0e77a 100644
+>> --- a/virt/kvm/arm/arch_timer.c
+>> +++ b/virt/kvm/arm/arch_timer.c
+>> @@ -98,10 +98,46 @@ static void kvm_timer_inject_irq_work(struct
+>> work_struct *work)
+>>       kvm_vcpu_kick(vcpu);
+>>   }
+>>
+>> +static u64 kvm_timer_compute_delta(struct kvm_vcpu *vcpu)
+>> +{
+>> +    cycle_t cval, now;
+>> +
+>> +    cval = vcpu->arch.timer_cpu.cntv_cval;
+>> +    now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
+>> +
+>> +    if (now < cval) {
+>> +        u64 ns;
+>> +
+>> +        ns = cyclecounter_cyc2ns(timecounter->cc,
+>> +                     cval - now,
+>> +                     timecounter->mask,
+>> +                     &timecounter->frac);
+>> +        return ns;
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
+>>   static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
+>>   {
+>>       struct arch_timer_cpu *timer;
+>> +    struct kvm_vcpu *vcpu;
+>> +    u64 ns;
+>> +
+>>       timer = container_of(hrt, struct arch_timer_cpu, timer);
+>> +    vcpu = container_of(timer, struct kvm_vcpu, arch.timer_cpu);
+>> +
+>> +    /*
+>> +     * Check that the timer has really expired from the guest's
+>> +     * PoV (NTP on the host may have forced it to expire
+>> +     * early). If we should have slept longer, restart it.
+>> +     */
+>> +    ns = kvm_timer_compute_delta(vcpu);
+>> +    if (unlikely(ns)) {
+>> +        hrtimer_forward_now(hrt, ns_to_ktime(ns));
+>> +        return HRTIMER_RESTART;
+>> +    }
+>> +
+>>       queue_work(wqueue, &timer->expired);
+>>       return HRTIMER_NORESTART;
+>>   }
+>> @@ -176,8 +212,6 @@ static int kvm_timer_update_state(struct kvm_vcpu
+>> *vcpu)
+>>   void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+>>   {
+>>       struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+>> -    u64 ns;
+>> -    cycle_t cval, now;
+>>
+>>       BUG_ON(timer_is_armed(timer));
+>>
+>> @@ -197,14 +231,7 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
+>>           return;
+>>
+>>       /*  The timer has not yet expired, schedule a background timer */
+>> -    cval = timer->cntv_cval;
+>> -    now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
+>> -
+>> -    ns = cyclecounter_cyc2ns(timecounter->cc,
+>> -                 cval - now,
+>> -                 timecounter->mask,
+>> -                 &timecounter->frac);
+>> -    timer_arm(timer, ns);
+>> +    timer_arm(timer, kvm_timer_compute_delta(vcpu));
+>>   }
+>>
+>>   void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
+>>
+>
+> Works for me, thanks Marc!
+>
+> Tested-by: Tomasz Nowicki <tn@semihalf.com>
+>
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+FYI: The patch was tested on Cavium ThunderX server.
 
-Changelog RFC..v1:
-- adapt to new arch_timer mapped IRQ interface
-- implement inject_mapped_irq() as a macro (since it is identical to
-  the "un-mapped" IRQ implementation)
----
- include/kvm/vgic/vgic.h  |  6 ++++++
- virt/kvm/arm/vgic/vgic.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 53 insertions(+)
+Tomasz
 
-diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-index 6e5e6d7..eff6626 100644
---- a/include/kvm/vgic/vgic.h
-+++ b/include/kvm/vgic/vgic.h
-@@ -209,6 +209,12 @@ int kvm_vgic_hyp_init(void);
- 
- int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- 			bool level);
-+/* TODO: for compatibility with the old VGIC's timer implementation */
-+#define kvm_vgic_inject_mapped_irq kvm_vgic_inject_irq
-+
-+int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq);
-+int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq);
-+bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
- 
- int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
- 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index f8252d4..15fd146 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -17,6 +17,8 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- #include <linux/list_sort.h>
-+#include <linux/irq.h>
-+#include <linux/interrupt.h>
- 
- #include "vgic.h"
- 
-@@ -296,6 +298,39 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- 
- 	vcpu = kvm_get_vcpu(kvm, cpuid);
- 	vgic_update_irq_pending(kvm, vcpu, intid, level);
-+
-+	return 0;
-+}
-+
-+int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq)
-+{
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
-+
-+	BUG_ON(!irq);
-+
-+	spin_lock(&irq->irq_lock);
-+
-+	irq->hw = true;
-+	irq->hwintid = phys_irq;
-+
-+	spin_unlock(&irq->irq_lock);
-+
-+	return 0;
-+}
-+
-+int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
-+{
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
-+
-+	BUG_ON(!irq);
-+
-+	spin_lock(&irq->irq_lock);
-+
-+	irq->hw = false;
-+	irq->hwintid = 0;
-+
-+	spin_unlock(&irq->irq_lock);
-+
- 	return 0;
- }
- 
-@@ -568,3 +603,15 @@ void vgic_kick_vcpus(struct kvm *kvm)
- 			kvm_vcpu_kick(vcpu);
- 	}
- }
-+
-+bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
-+{
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
-+	bool map_is_active;
-+
-+	spin_lock(&irq->irq_lock);
-+	map_is_active = irq->hw && irq->active;
-+	spin_unlock(&irq->irq_lock);
-+
-+	return map_is_active;
-+}
--- 
-2.7.3
