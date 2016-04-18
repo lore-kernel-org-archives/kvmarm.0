@@ -1,135 +1,54 @@
-From: Tomasz Nowicki <tn@semihalf.com>
-Subject: Re: [PATCH] KVM: arm/arm64: Handle forward time correction gracefully
-Date: Sun, 17 Apr 2016 19:40:45 +0200
-Message-ID: <5713CA9D.1030801@semihalf.com>
-References: <1459931842-29465-1-git-send-email-marc.zyngier@arm.com>
- <570B93F2.7000905@semihalf.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v7 1/6] KVM: arm/arm64: Add VGICv3 save/restore API
+ documentation
+Date: Mon, 18 Apr 2016 11:33:36 +0100
+Message-ID: <CAFEAcA9qodmWdmEnB9e-0F3RdTtC5N6x82-dKHVJnncdhau+tw@mail.gmail.com>
+References: <cover.1449491035.git.p.fedin@samsung.com>
+ <204d6b178e611ee0b5aede2b945516e0a6048c3c.1449491035.git.p.fedin@samsung.com>
+ <CAFEAcA_N7F4r6fpQTW8Duyu577=uGcRyS7VhAMxumwTDN3khcw@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <570B93F2.7000905@semihalf.com>
-Sender: kvm-owner@vger.kernel.org
-To: Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D3AA349BEE
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2016 06:32:06 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id sqZqlb2W3BHN for <kvmarm@lists.cs.columbia.edu>;
+ Mon, 18 Apr 2016 06:32:02 -0400 (EDT)
+Received: from mail-vk0-f48.google.com (mail-vk0-f48.google.com
+ [209.85.213.48])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F2B6649BD5
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2016 06:32:01 -0400 (EDT)
+Received: by mail-vk0-f48.google.com with SMTP id t129so214913770vkg.2
+ for <kvmarm@lists.cs.columbia.edu>; Mon, 18 Apr 2016 03:33:55 -0700 (PDT)
+In-Reply-To: <CAFEAcA_N7F4r6fpQTW8Duyu577=uGcRyS7VhAMxumwTDN3khcw@mail.gmail.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Pavel Fedin <p.fedin@samsung.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 11.04.2016 14:09, Tomasz Nowicki wrote:
-> On 06.04.2016 10:37, Marc Zyngier wrote:
->> On a host that runs NTP, corrections can have a direct impact on
->> the background timer that we program on the behalf of a vcpu.
->>
->> In particular, NTP performing a forward correction will result in
->> a timer expiring sooner than expected from a guest point of view.
->> Not a big deal, we kick the vcpu anyway.
->>
->> But on wake-up, the vcpu thread is going to perform a check to
->> find out whether or not it should block. And at that point, the
->> timer check is going to say "timer has not expired yet, go back
->> to sleep". This results in the timer event being lost forever.
->>
->> There are multiple ways to handle this. One would be record that
->> the timer has expired and let kvm_cpu_has_pending_timer return
->> true in that case, but that would be fairly invasive. Another is
->> to check for the "short sleep" condition in the hrtimer callback,
->> and restart the timer for the remaining time when the condition
->> is detected.
->>
->> This patch implements the latter, with a bit of refactoring in
->> order to avoid too much code duplication.
->>
->> Reported-by: Alexander Graf <agraf@suse.de>
->> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> ---
->>   virt/kvm/arm/arch_timer.c | 47
->> +++++++++++++++++++++++++++++++++++++----------
->>   1 file changed, 37 insertions(+), 10 deletions(-)
->>
->> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
->> index a9ad4fe..4d0e77a 100644
->> --- a/virt/kvm/arm/arch_timer.c
->> +++ b/virt/kvm/arm/arch_timer.c
->> @@ -98,10 +98,46 @@ static void kvm_timer_inject_irq_work(struct
->> work_struct *work)
->>       kvm_vcpu_kick(vcpu);
->>   }
->>
->> +static u64 kvm_timer_compute_delta(struct kvm_vcpu *vcpu)
->> +{
->> +    cycle_t cval, now;
->> +
->> +    cval = vcpu->arch.timer_cpu.cntv_cval;
->> +    now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
->> +
->> +    if (now < cval) {
->> +        u64 ns;
->> +
->> +        ns = cyclecounter_cyc2ns(timecounter->cc,
->> +                     cval - now,
->> +                     timecounter->mask,
->> +                     &timecounter->frac);
->> +        return ns;
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->>   static enum hrtimer_restart kvm_timer_expire(struct hrtimer *hrt)
->>   {
->>       struct arch_timer_cpu *timer;
->> +    struct kvm_vcpu *vcpu;
->> +    u64 ns;
->> +
->>       timer = container_of(hrt, struct arch_timer_cpu, timer);
->> +    vcpu = container_of(timer, struct kvm_vcpu, arch.timer_cpu);
->> +
->> +    /*
->> +     * Check that the timer has really expired from the guest's
->> +     * PoV (NTP on the host may have forced it to expire
->> +     * early). If we should have slept longer, restart it.
->> +     */
->> +    ns = kvm_timer_compute_delta(vcpu);
->> +    if (unlikely(ns)) {
->> +        hrtimer_forward_now(hrt, ns_to_ktime(ns));
->> +        return HRTIMER_RESTART;
->> +    }
->> +
->>       queue_work(wqueue, &timer->expired);
->>       return HRTIMER_NORESTART;
->>   }
->> @@ -176,8 +212,6 @@ static int kvm_timer_update_state(struct kvm_vcpu
->> *vcpu)
->>   void kvm_timer_schedule(struct kvm_vcpu *vcpu)
->>   {
->>       struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
->> -    u64 ns;
->> -    cycle_t cval, now;
->>
->>       BUG_ON(timer_is_armed(timer));
->>
->> @@ -197,14 +231,7 @@ void kvm_timer_schedule(struct kvm_vcpu *vcpu)
->>           return;
->>
->>       /*  The timer has not yet expired, schedule a background timer */
->> -    cval = timer->cntv_cval;
->> -    now = kvm_phys_timer_read() - vcpu->kvm->arch.timer.cntvoff;
->> -
->> -    ns = cyclecounter_cyc2ns(timecounter->cc,
->> -                 cval - now,
->> -                 timecounter->mask,
->> -                 &timecounter->frac);
->> -    timer_arm(timer, ns);
->> +    timer_arm(timer, kvm_timer_compute_delta(vcpu));
->>   }
->>
->>   void kvm_timer_unschedule(struct kvm_vcpu *vcpu)
->>
->
-> Works for me, thanks Marc!
->
-> Tested-by: Tomasz Nowicki <tn@semihalf.com>
->
+On 15 April 2016 at 14:58, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Nothing in here describes a mechanism for reading or writing the
+> current interrupt line_level state from the kernel (which doesn't
+> matter for edge triggered interrupts but does for level triggered
+> interrupts). Do we need accessors for these or does somebody
+> have a good rationale for why we don't need to migrate that data?
+> (Christoffer?)
 
-FYI: The patch was tested on Cavium ThunderX server.
+Relatedly, we should have a mechanism for directly reading and
+writing the pending-latch state in the KVM GIC, which for
+a level triggered interrupt is not the same as the behaviour
+of reading and writing the PENDING register.
 
-Tomasz
-
+thanks
+-- PMM
