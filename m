@@ -1,128 +1,88 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH 28/45] KVM: arm/arm64: vgic-new: Add GICv3 SGI system
- register trap handler
-Date: Tue, 19 Apr 2016 13:40:35 +0100
-Message-ID: <CAFEAcA83Mbpjh6oq7YS0+NbeJerVLukq0mN+9rfKODFUPt0g0A@mail.gmail.com>
+From: =?UTF-8?Q?Andr=c3=a9_Przywara?= <andre.przywara@arm.com>
+Subject: Re: [PATCH 26/45] KVM: arm/arm64: vgic-new: Add GICv3 IDREGS register
+ handler
+Date: Tue, 19 Apr 2016 13:57:33 +0100
+Message-ID: <57162B3D.9000307@arm.com>
 References: <1460740316-8755-1-git-send-email-andre.przywara@arm.com>
- <1460740316-8755-29-git-send-email-andre.przywara@arm.com>
+ <1460740316-8755-27-git-send-email-andre.przywara@arm.com>
+ <CAFEAcA9Hy2cSVguOWrxBo6By24BjiE2rgoCPGbfo+OuuPMtSQg@mail.gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 52B8649B8C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2016 08:38:59 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 0RPXvzZlpxBf for <kvmarm@lists.cs.columbia.edu>;
- Tue, 19 Apr 2016 08:38:58 -0400 (EDT)
-Received: from mail-vk0-f43.google.com (mail-vk0-f43.google.com
- [209.85.213.43])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 47ED349B86
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2016 08:38:58 -0400 (EDT)
-Received: by mail-vk0-f43.google.com with SMTP id n67so14866088vkf.3
- for <kvmarm@lists.cs.columbia.edu>; Tue, 19 Apr 2016 05:40:55 -0700 (PDT)
-In-Reply-To: <1460740316-8755-29-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, kvm-devel <kvm@vger.kernel.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <CAFEAcA9Hy2cSVguOWrxBo6By24BjiE2rgoCPGbfo+OuuPMtSQg@mail.gmail.com>
+Sender: kvm-owner@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 15 April 2016 at 18:11, Andre Przywara <andre.przywara@arm.com> wrote:
-> In contrast to GICv2 SGIs in a GICv3 implementation are not triggered
-> by a MMIO write, but with a system register write. KVM knows about
-> that register already, we just need to implement the handler and wire
-> it up to the core KVM/ARM code.
->
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->
-> Changelog RFC..v1:
-> - add comment about SGI_AFFINITY_LEVEL macro
+Hi Peter,
 
-> +/**
-> + * vgic_v3_dispatch_sgi - handle SGI requests from VCPUs
-> + * @vcpu: The VCPU requesting a SGI
-> + * @reg: The value written into the ICC_SGI1R_EL1 register by that VCPU
-> + *
-> + * With GICv3 (and ARE=1) CPUs trigger SGIs by writing to a system register.
-> + * This will trap in sys_regs.c and call this function.
-> + * This ICC_SGI1R_EL1 register contains the upper three affinity levels of the
-> + * target processors as well as a bitmask of 16 Aff0 CPUs.
-> + * If the interrupt routing mode bit is not set, we iterate over all VCPUs to
-> + * check for matching ones. If this bit is set, we signal all, but not the
-> + * calling VCPU.
-> + */
+thanks for going through the pain of looking into this!
 
-No ICC_SGI0R_EL1, ICC_ASGI1R_EL1 ?
+On 19/04/16 13:34, Peter Maydell wrote:
+> On 15 April 2016 at 18:11, Andre Przywara <andre.przywara@arm.com> wrote:
+>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> ---
+>>  virt/kvm/arm/vgic/vgic_mmio.c | 21 +++++++++++++++++++--
+>>  1 file changed, 19 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/virt/kvm/arm/vgic/vgic_mmio.c b/virt/kvm/arm/vgic/vgic_mmio.c
+>> index 7d275a7..dafa235 100644
+>> --- a/virt/kvm/arm/vgic/vgic_mmio.c
+>> +++ b/virt/kvm/arm/vgic/vgic_mmio.c
+>> @@ -784,6 +784,23 @@ static int vgic_mmio_read_v3r_iidr(struct kvm_vcpu *vcpu,
+>>         return 0;
+>>  }
+>>
+>> +static int vgic_mmio_read_v3_idregs(struct kvm_vcpu *vcpu,
+>> +                                   struct kvm_io_device *dev,
+>> +                                   gpa_t addr, int len, void *val)
+>> +{
+>> +       u32 regnr = (addr & 0x3f) - (GICD_IDREGS & 0x3f);
+>> +       u32 reg = 0;
+>> +
+>> +       switch (regnr + GICD_IDREGS) {
+>> +       case GICD_PIDR2:
+>> +               /* report a GICv3 compliant implementation */
+>> +               reg = 0x3b;
+>> +               break;
+>> +       }
+> 
+> We claim to be an ARM implementation, so we should report the full
+> set of ARM ID registers, not just GICD_PIDR2:
 
-> +void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg)
-> +{
-> +       struct kvm *kvm = vcpu->kvm;
-> +       struct kvm_vcpu *c_vcpu;
-> +       u16 target_cpus;
-> +       u64 mpidr;
-> +       int sgi, c;
-> +       int vcpu_id = vcpu->vcpu_id;
-> +       bool broadcast;
-> +
-> +       sgi = (reg & ICC_SGI1R_SGI_ID_MASK) >> ICC_SGI1R_SGI_ID_SHIFT;
-> +       broadcast = reg & BIT(ICC_SGI1R_IRQ_ROUTING_MODE_BIT);
-> +       target_cpus = (reg & ICC_SGI1R_TARGET_LIST_MASK) >> ICC_SGI1R_TARGET_LIST_SHIFT;
-> +       mpidr = SGI_AFFINITY_LEVEL(reg, 3);
-> +       mpidr |= SGI_AFFINITY_LEVEL(reg, 2);
-> +       mpidr |= SGI_AFFINITY_LEVEL(reg, 1);
-> +
-> +       /*
-> +        * We iterate over all VCPUs to find the MPIDRs matching the request.
-> +        * If we have handled one CPU, we clear its bit to detect early
-> +        * if we are already finished. This avoids iterating through all
-> +        * VCPUs when most of the times we just signal a single VCPU.
-> +        */
-> +       kvm_for_each_vcpu(c, c_vcpu, kvm) {
-> +               struct vgic_irq *irq;
-> +
-> +               /* Exit early if we have dealt with all requested CPUs */
-> +               if (!broadcast && target_cpus == 0)
-> +                       break;
-> +
-> +               /* Don't signal the calling VCPU */
-> +               if (broadcast && c == vcpu_id)
-> +                       continue;
-> +
-> +               if (!broadcast) {
-> +                       int level0;
-> +
-> +                       level0 = match_mpidr(mpidr, target_cpus, c_vcpu);
-> +                       if (level0 == -1)
-> +                               continue;
-> +
-> +                       /* remove this matching VCPU from the mask */
-> +                       target_cpus &= ~BIT(level0);
-> +               }
+Do we really have to? Please note that though we say our implementor is
+ARM (because we lack alternatives, I think), we don't claim to be a
+GIC-500, for instance, but a made-up KVM implementation.
+So there is no need to implement the other ID registers, except for the
+architecturally defined PIDR2, which Linux actually checks to confirm
+that this is a GICv3 compliant GIC.
 
-I think you need a check in here that the SGI is actually configured
-to be the group that's been requested.
+>         0x44, 0x00, 0x00, 0x00, 0x92, 0xB4, 0x3B, 0x00, 0x0D, 0xF0, 0x05, 0xB1
 
-> +
-> +               irq = vgic_get_irq(vcpu->kvm, c_vcpu, sgi);
-> +
-> +               spin_lock(&irq->irq_lock);
-> +               irq->pending = true;
-> +
-> +               vgic_queue_irq_unlock(vcpu->kvm, irq);
-> +       }
-> +}
->  #endif
-> --
-> 2.7.3
+Yes, I had those registers defined like this in an earlier version, but
+Marc's comment IIRC correctly was that we shouldn't claim to be a
+GIC-500, for instance, because then we would need to mimic GIC-500
+behavior quite closely, which we simply don't and also don't want to.
 
-thanks
--- PMM
+So architecturally we are fine, I think.
+
+Do you think by claiming coming from ARM we are obliged to implement all
+the other PIDR/CIDR registers the ARM way?
+
+Cheers,
+Andre.
+
+> 
+> (starting at 0xFFD0 and going up to 0xFFFC.)
+> 
+>> +       write_mask32(reg , addr & 3, len, val);
+>> +       return 0;
+>> +}
+>>  #endif
+> 
+> thanks
+> -- PMM
+> 
+
