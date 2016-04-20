@@ -1,23 +1,23 @@
-From: Mark Rutland <mark.rutland@arm.com>
+From: Andrew Jones <drjones@redhat.com>
 Subject: Re: [RFC PATCH] arm64: KVM: Allow userspace to configure guest
  MPIDR_EL1
-Date: Wed, 20 Apr 2016 15:38:38 +0100
-Message-ID: <20160420143838.GB15229@leverpostej>
+Date: Wed, 20 Apr 2016 16:39:30 +0200
+Message-ID: <20160420143930.6eamewydldojgaqw@hawk.localdomain>
 References: <1461161319-38835-1-git-send-email-ashoks@broadcom.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 559D449B21
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Apr 2016 10:37:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E8A5449B21
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Apr 2016 10:37:36 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id D0lY1ofhiI-P for <kvmarm@lists.cs.columbia.edu>;
- Wed, 20 Apr 2016 10:37:01 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id B2B704998D
- for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Apr 2016 10:37:01 -0400 (EDT)
+ with ESMTP id PBgTnPjb11LH for <kvmarm@lists.cs.columbia.edu>;
+ Wed, 20 Apr 2016 10:37:35 -0400 (EDT)
+Received: from mx1.redhat.com (mx1.redhat.com [209.132.183.28])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 799F04998D
+ for <kvmarm@lists.cs.columbia.edu>; Wed, 20 Apr 2016 10:37:34 -0400 (EDT)
 Content-Disposition: inline
 In-Reply-To: <1461161319-38835-1-git-send-email-ashoks@broadcom.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
@@ -30,34 +30,27 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Ashok Kumar <ashoks@broadcom.com>
-Cc: marc.zyngier@arm.com, will.deacon@arm.com, shannon.zhao@linaro.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Cc: marc.zyngier@arm.com, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On Wed, Apr 20, 2016 at 07:08:39AM -0700, Ashok Kumar wrote:
 > For guests with NUMA configuration, Node ID needs to
 > be recorded in the respective affinity byte of MPIDR_EL1.
-
-The MPIDR.Aff* fields are effectively arbitrary, and do not encode NUMA
-topology information. They may describe some level of closeness of CPUs
-relative to each other, but that is independent of the memory hierarchy,
-and even then is unfortunately not all that informative.
-
-NUMA topology information has to come from FW. With ACPI that's
-SRAT+SLIT, and with DT that's something like [1].
-
-There may be reasons to want to configure the MPIDR_EL1.Aff* fields, but
-this is not required for NUMA, nor is it a good idea for an OS to assume
-NUMA topology from the MPIDR_EL1.Aff* fields.
-
-Thanks,
-Mark.
-
-[1] http://lists.infradead.org/pipermail/linux-arm-kernel/2016-April/420900.html
-
 > 
 > Cache the MPIDR_EL1 programmed by userspace and use it for
 > subsequent reset_mpidr calls.
 > 
+
+It shouldn't be necessary for NUMA, but it is necessary for cpu
+topology, and likely a "socket" will map to a numa node in many
+cases. We shouldn't count on that though, and thus we shouldn't
+associate the word NUMA with MPIDR here. Let's change this to
+
+"In order for guests to be configured with arbitrary cpu
+ topologies we need to allow userspace to program the MPIDR."
+
+or some such.
+
 > Signed-off-by: Ashok Kumar <ashoks@broadcom.com>
 > ---
 >  arch/arm64/include/asm/kvm_host.h |  1 +
@@ -73,6 +66,12 @@ Mark.
 >  	u64 hcr_el2;
 >  	u32 mdcr_el2;
 > +	u64 vmpidr_el2;
+
+As this state is only used if set by the user, then I wonder if we
+should use a _user type of name. Or, as this cached value may have
+other uses (I have one in mind), then we may want to always write
+vcpu_sys_reg(vcpu, MPIDR_EL1) to it at the end of vcpu initialization.
+
 >  
 >  	/* Exception Information */
 >  	struct kvm_vcpu_fault_info fault;
@@ -103,6 +102,12 @@ Mark.
 > -	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
 > -	vcpu_sys_reg(vcpu, MPIDR_EL1) = (1ULL << 31) | mpidr;
 > +	if (!vcpu->arch.vmpidr_el2) {
+
+OK, so here we're counting on at least bit 31 being non-zero, as all
+affinity levels may be zero, per userspace's request. If we can count
+on bit 31, then that's fine, otherwise we should consider using
+INVALID_HWID, but that would require initializing vmpidr_el2...
+
 > +		/*
 > +		 * Map the vcpu_id into the first three affinity level fields of
 > +		 * the MPIDR. We limit the number of VCPUs in level 0 due to a
@@ -142,6 +147,11 @@ Mark.
 > +	ret = reg_from_user(&vcpu_sys_reg(vcpu, rd->reg), uaddr, reg->id);
 > +	if (!ret)
 > +		vcpu->arch.vmpidr_el2 = vcpu_sys_reg(vcpu, rd->reg);
+
+I think we should either sanity check bit 31 is set, or just OR it in to
+make sure it is. We should also either check or mask-off all bits outside
+MPIDR_HWID_BITMASK.
+
 > +
 > +	return ret;
 > +}
@@ -151,10 +161,7 @@ Mark.
 >  	const struct sys_reg_desc *r;
 > -- 
 > 2.1.0
-> 
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> 
+>
+
+Thanks,
+drew 
