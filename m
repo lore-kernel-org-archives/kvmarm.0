@@ -1,94 +1,128 @@
 From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v4 5/7] KVM: arm/arm64: build a default routing table
-Date: Thu, 21 Apr 2016 16:51:22 +0200
-Message-ID: <5718E8EA.4080801@linaro.org>
+Subject: Re: [PATCH v4 7/7] KVM: arm: enable KVM_SIGNAL_MSI and MSI routing
+Date: Thu, 21 Apr 2016 16:56:57 +0200
+Message-ID: <5718EA39.1040905@linaro.org>
 References: <1459759657-7402-1-git-send-email-eric.auger@linaro.org>
- <1459759657-7402-6-git-send-email-eric.auger@linaro.org>
- <20160414120505.GG30804@cbox>
+ <1459759657-7402-8-git-send-email-eric.auger@linaro.org>
+ <20160414121216.GH30804@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160414120505.GG30804@cbox>
+In-Reply-To: <20160414121216.GH30804@cbox>
 Sender: kvm-owner@vger.kernel.org
 To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: eric.auger@st.com, marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, patches@linaro.org, pbonzini@redhat.com, p.fedin@samsung.com, Manish.Jaggi@caviumnetworks.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 04/14/2016 02:05 PM, Christoffer Dall wrote:
-> On Mon, Apr 04, 2016 at 10:47:35AM +0200, Eric Auger wrote:
->> Implement a default routing table made of flat irqchip routing
->> entries (gsi = irqchip.pin) covering the VGIC SPI indexes.
->> This routing table is overwritten by the first user-space call
->> to KVM_SET_GSI_ROUTING ioctl.
+On 04/14/2016 02:12 PM, Christoffer Dall wrote:
+> On Mon, Apr 04, 2016 at 10:47:37AM +0200, Eric Auger wrote:
+>> If the ITS modality is not available, let's simply support MSI
+>> injection by transforming the MSI.data into an SPI ID.
+>>
+>> This becomes possible to use KVM_SIGNAL_MSI ioctl and MSI
+>> routing for arm too.
 >>
 >> Signed-off-by: Eric Auger <eric.auger@linaro.org>
 >>
-> 
-> so before applying this patch, but after applying the previous patch,
-> will our current GICv2m-based MSI injection work?
-
-If you don't apply that patch and kernel does not build a default table,
-userspace is obliged to do the job. if it doesn't the irqfd-> virtual
-gsi forwarding will fail. So effectively it makes sense to squash both
-patches.
-
-> 
-> If not, is there a better split of these patches (e.g. squash this one
-> into the previous one)?
-> 
 >> ---
->> ---
->>  virt/kvm/arm/vgic/vgic_init.c | 24 ++++++++++++++++++++++++
->>  1 file changed, 24 insertions(+)
 >>
->> diff --git a/virt/kvm/arm/vgic/vgic_init.c b/virt/kvm/arm/vgic/vgic_init.c
->> index e4459e3..041443b 100644
->> --- a/virt/kvm/arm/vgic/vgic_init.c
->> +++ b/virt/kvm/arm/vgic/vgic_init.c
->> @@ -261,6 +261,10 @@ int vgic_init(struct kvm *kvm)
->>  	kvm_for_each_vcpu(i, vcpu, kvm)
->>  		kvm_vgic_vcpu_init(vcpu);
->>  
->> +	ret = kvm_setup_default_irq_routing(kvm);
->> +	if (ret)
->> +		goto out;
->> +
->>  	dist->initialized = true;
->>  out:
->>  	return ret;
->> @@ -454,3 +458,23 @@ out_free_irq:
->>  			kvm_get_running_vcpus());
->>  	return ret;
+>> v2 -> v3:
+>> - reword the commit message
+>> - add sanity check about devid provision
+>>
+>> v1 -> v2:
+>> - introduce vgic_v2m_inject_msi in vgic-v2-emul.c following Andre's
+>>   advice
+>>
+>> Conflicts:
+>> 	arch/arm/kvm/Kconfig
+>>
+>> Conflicts:
+>> 	arch/arm/kvm/Kconfig
+>> ---
+>>  arch/arm/kvm/Kconfig           |  1 +
+>>  virt/kvm/arm/vgic/vgic-v2.c    | 15 +++++++++++++++
+>>  virt/kvm/arm/vgic/vgic.h       |  1 +
+>>  virt/kvm/arm/vgic/vgic_irqfd.c |  2 +-
+>>  4 files changed, 18 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+>> index 92c3aec..67019e5 100644
+>> --- a/arch/arm/kvm/Kconfig
+>> +++ b/arch/arm/kvm/Kconfig
+>> @@ -50,6 +50,7 @@ config KVM_NEW_VGIC
+>>  	bool "New VGIC implementation"
+>>  	depends on KVM
+>>  	default y
+>> +	select HAVE_KVM_MSI
+>>  	select HAVE_KVM_IRQCHIP
+>>  	select HAVE_KVM_IRQ_ROUTING
+>>  	---help---
+>> diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+>> index 5f7c289..7400af0 100644
+>> --- a/virt/kvm/arm/vgic/vgic-v2.c
+>> +++ b/virt/kvm/arm/vgic/vgic-v2.c
+>> @@ -248,6 +248,21 @@ void vgic_v2_enable(struct kvm_vcpu *vcpu)
+>>  	vcpu->arch.vgic_cpu.vgic_v2.vgic_hcr = GICH_HCR_EN;
 >>  }
->> +
->> +int kvm_setup_default_irq_routing(struct kvm *kvm)
+>>  
+>> +/**
+>> + * vgic_v2m_inject_msi: emulates GICv2M MSI injection by injecting
+>> + * the SPI ID matching the msi data
+>> + *
+>> + * @kvm: pointer to the kvm struct
+>> + * @msi: the msi struct handle
+>> + */
+>> +int vgic_v2m_inject_msi(struct kvm *kvm, struct kvm_msi *msi)
 >> +{
->> +	struct kvm_irq_routing_entry *entries;
->> +	struct vgic_dist *dist = &kvm->arch.vgic;
->> +	u32 nr = dist->nr_spis;
->> +	int i, ret;
+>> +	if (msi->flags & KVM_MSI_VALID_DEVID)
+>> +		return -EINVAL;
 >> +
->> +	entries = kcalloc(nr, sizeof(struct kvm_kernel_irq_routing_entry),
->> +			  GFP_KERNEL);
+>> +	return kvm_vgic_inject_irq(kvm, 0, msi->data, 1);
 > 
-> I think you need to check if the allocation succeeded here or not...
-sure
+> I think you need to validate the msi->data here, otherwise
+> vgic_get_irq() is going to raise warnings etc.
+OK will check it is within the SPI ID range.
 
-thanks
+Thank you for your time!
+
+Best Regards
 
 Eric
+
+
 > 
->> +	for (i = 0; i < nr; i++) {
->> +		entries[i].gsi = i;
->> +		entries[i].type = KVM_IRQ_ROUTING_IRQCHIP;
->> +		entries[i].u.irqchip.irqchip = 0;
->> +		entries[i].u.irqchip.pin = i;
->> +	}
->> +	ret = kvm_set_irq_routing(kvm, entries, nr, 0);
->> +	kfree(entries);
->> +	return ret;
 >> +}
+>> +
+>>  int vgic_v2_map_resources(struct kvm *kvm)
+>>  {
+>>  	struct vgic_dist *dist = &kvm->arch.vgic;
+>> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+>> index 223c778..354a865 100644
+>> --- a/virt/kvm/arm/vgic/vgic.h
+>> +++ b/virt/kvm/arm/vgic/vgic.h
+>> @@ -44,6 +44,7 @@ int vgic_v2_probe(struct device_node *vgic_node);
+>>  int vgic_v2_map_resources(struct kvm *kvm);
+>>  int vgic_register_dist_regions(struct kvm *kvm, gpa_t dist_base_address,
+>>  			       enum vgic_type);
+>> +int vgic_v2m_inject_msi(struct kvm *kvm, struct kvm_msi *msi);
+>>  
+>>  #ifdef CONFIG_KVM_ARM_VGIC_V3
+>>  void vgic_v3_irq_change_affinity(struct kvm *kvm, u32 intid, u64 mpidr);
+>> diff --git a/virt/kvm/arm/vgic/vgic_irqfd.c b/virt/kvm/arm/vgic/vgic_irqfd.c
+>> index a3a7f02..588cdd6 100644
+>> --- a/virt/kvm/arm/vgic/vgic_irqfd.c
+>> +++ b/virt/kvm/arm/vgic/vgic_irqfd.c
+>> @@ -100,7 +100,7 @@ int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+>>  	msi.devid = e->devid;
+>>  
+>>  	if (!vgic_has_its(kvm))
+>> -		return -ENODEV;
+>> +		return vgic_v2m_inject_msi(kvm, &msi);
+>>  
+>>  	return vits_inject_msi(kvm, &msi);
+>>  }
 >> -- 
 >> 1.9.1
 >>
