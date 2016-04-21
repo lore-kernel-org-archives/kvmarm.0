@@ -1,118 +1,122 @@
-From: Ashok Kumar <ashoks@broadcom.com>
-Subject: Re: [RFC PATCH] arm64: KVM: Allow userspace to configure guest
- MPIDR_EL1
-Date: Thu, 21 Apr 2016 04:46:21 -0700
-Message-ID: <1841.7616062381$1461239242@news.gmane.org>
-References: <1461161319-38835-1-git-send-email-ashoks@broadcom.com>
- <20160420183354.31f1bfbd@arm.com>
- <20160421070447.nwuqlxvpq7fj6h7m@hawk.localdomain>
- <57189C84.8080206@arm.com>
- <20160421095603.s7dhtwpy36nlbr2l@hawk.localdomain>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v4 1/7] KVM: api: pass the devid in the msi routing entry
+Date: Thu, 21 Apr 2016 15:31:52 +0200
+Message-ID: <5718D648.9010409@linaro.org>
+References: <1459759657-7402-1-git-send-email-eric.auger@linaro.org>
+ <1459759657-7402-2-git-send-email-eric.auger@linaro.org>
+ <20160414120437.GB30804@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <20160421095603.s7dhtwpy36nlbr2l@hawk.localdomain>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Andrew Jones <drjones@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, shannon.zhao@linaro.org
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20160414120437.GB30804@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: eric.auger@st.com, marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, patches@linaro.org, pbonzini@redhat.com, p.fedin@samsung.com, Manish.Jaggi@caviumnetworks.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, Apr 21, 2016 at 11:56:03AM +0200, Andrew Jones wrote:
-> On Thu, Apr 21, 2016 at 10:25:24AM +0100, Marc Zyngier wrote:
-> > Hey Andrew,
-> > 
-> > On 21/04/16 08:04, Andrew Jones wrote:
-> > > On Wed, Apr 20, 2016 at 06:33:54PM +0100, Marc Zyngier wrote:
-> > >> On Wed, 20 Apr 2016 07:08:39 -0700
-> > >> Ashok Kumar <ashoks@broadcom.com> wrote:
-> > >>
-> > >>> For guests with NUMA configuration, Node ID needs to
-> > >>> be recorded in the respective affinity byte of MPIDR_EL1.
-> > >>
-> > >> As others have said before, the mapping between the NUMA hierarchy and
-> > >> MPIDR_EL1 are completely arbitrary, and only the firmware description
-> > >> can help the kernel in interpreting the affinity levels.
-> > >>
-> > >> If you want any patch like this one to be considered, I'd like to see
-> > >> the corresponding userspace that:
-> > >>
-> > >> - programs the affinity into the vcpus,
-> > > 
-> > > I have a start on this for QEMU that I can dust off and send as an RFC
-> > > soon.
-> > > 
-> > >> - pins the vcpus to specific physical CPUs,
-> > > 
-> > > This wouldn't be part of the userspace directly interacting with KVM,
-> > > but rather a higher level (even higher than libvirt, e.g.
-> > > openstack/ovirt). I also don't think we should need to worry about
-> > > which/how the phyiscal cpus get chosen. Let's assume that entity
-> > > knows how to best map the guest's virtual topology to a physical one.
-> > 
-> > Surely the platform emulation userspace has to implement the pinning
-> > itself, because I can't see high level tools being involved in the
-> > creation of the vcpu threads themselves.
+Christoffer,
+On 04/14/2016 02:04 PM, Christoffer Dall wrote:
+> On Mon, Apr 04, 2016 at 10:47:31AM +0200, Eric Auger wrote:
+>> On ARM, the MSI msg (address and data) comes along with
+>> out-of-band device ID information. The device ID encodes the
+>> device that writes the MSI msg. Let's convey the device id in
+>> kvm_irq_routing_msi and use KVM_MSI_VALID_DEVID flag value in
+>> kvm_irq_routing_entry to indicate the msi devid is populated.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+>>
+>> ---
+>> v2 -> v3:
+>> - replace usage of KVM_IRQ_ROUTING_EXTENDED_MSI type by
+>>   usage of KVM_MSI_VALID_DEVID flag
+>> - add note about KVM_CAP_MSI_DEVID capability
+>>
+>> v1 -> v2:
+>> - devid id passed in kvm_irq_routing_msi instead of in
+>>   kvm_irq_routing_entry
+>>
+>> RFC -> PATCH
+>> - remove kvm_irq_routing_extended_msi and use union instead
+>> ---
+>>  Documentation/virtual/kvm/api.txt | 18 ++++++++++++++++--
+>>  include/uapi/linux/kvm.h          |  5 ++++-
+>>  2 files changed, 20 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+>> index 536f19b..c436bb6 100644
+>> --- a/Documentation/virtual/kvm/api.txt
+>> +++ b/Documentation/virtual/kvm/api.txt
+>> @@ -1462,7 +1462,10 @@ struct kvm_irq_routing_entry {
+>>  #define KVM_IRQ_ROUTING_S390_ADAPTER 3
+>>  #define KVM_IRQ_ROUTING_HV_SINT 4
+>>  
+>> -No flags are specified so far, the corresponding field must be set to zero.
+>> +flags:
+>> +- KVM_MSI_VALID_DEVID: used along with KVM_IRQ_ROUTING_MSI
+>> +  routing entry type, it tells the msi devid contains a valid value.
 > 
-> The pinning comes after the threads are created, but before they are
-> run. The virtual topology created for a guest may or may not map well
-> to the physical topology of a given host. That's not the problem of
-> the emulation though. That's a problem of a high level application
-> trying to fit it.
+> s/it tells the msi devid/specifies that the devid field/
+ok
 > 
-> > 
-> > Also, I'd like to have a "simple" tool to test this without having to
-> > deploy openstack (the day this becomes mandatory for kernel development,
-> > I'll move my carrier to something more... agricultural).
-> > 
-> > So something in QEMU would be really good...
-> > 
+>> +- zero otherwise
+>>  
+>>  struct kvm_irq_routing_irqchip {
+>>  	__u32 irqchip;
+>> @@ -1473,9 +1476,20 @@ struct kvm_irq_routing_msi {
+>>  	__u32 address_lo;
+>>  	__u32 address_hi;
+>>  	__u32 data;
+>> -	__u32 pad;
+>> +	union {
+>> +		__u32 pad;
+>> +		__u32 devid;
+>> +	};
+>>  };
+>>  
+>> +devid: If KVM_MSI_VALID_DEVID is set, contains a unique device identifier
+>> +       for the device that wrote the MSI message.
+>> +       For PCI, this is usually a BFD identifier in the lower 16 bits.
+>> +
+>> +The per-VM KVM_CAP_MSI_DEVID capability advertises the need to provide
 > 
-> To test the virtual topology only requires booting a guest, whether
-> the vcpus are pinned or not. To test that it was worth the effort to
-> create a virtual topology does require the pinning, and the perf
-> measuring. However we still don't need the pinning in QEMU. We can
-> start a guest paused, run a script that does a handful of tasksets,
-> and then resumes the guest. Or, just use libvirt, which allows one
-> to save vcpu affinities, and thus on guest launch it will automatically
-> do the affinity setting for you.
-> 
-> > > 
-> > >> - exposes the corresponding firmware description (either DT or ACPI) to
-> > >>   the kernel.
-> > > 
-> > > The QEMU patches I've started on already generate the DT (the cpu-map
-> > > node). I started looking into how to do it for ACPI too, but there
-> > > were some questions about whether or not the topology description
-> > > tables added to the 6.1 spec were sufficient. I can send the DT part
-> > > soon, and continue to look into the ACPI part later though.
-> > 
-> > That'd be great. Can you please sync with Ashok so that we have
-> > something consistent between the two of you?
-> 
-> Yup. I'm hoping Ashok will chime in to share any userspace status
-> they have.
+> "the need to" or "the possibility to"?  Is there ever a situation where
+> KVM_CAP_MSI_DEVID is set but you don't need to provide a device ID and
+> set the flag?
+I could replace by "requirement":
+if it is not requested to pass a devid, we don't set the flag. If it is
+we pass it.
 
-I tested it using qemu's arm numa patchset [1] and I don't have any
-changes for cpu-map.
-I just used qemu's thread,core,socket information from "-smp" command
-line argument to populate the affinity.
-I was hoping to see the reception for this patch and then post qemu
-changes.
+if the user fails passing the devid and this ends up in the in-kernel
+ITS emul, injection will fail.
 
-[1] https://lists.gnu.org/archive/html/qemu-arm/2016-01/msg00363.html
+Thanks
 
-Thanks,
-Ashok
+Eric
 > 
-> Thanks,
-> drew
+>> +the device ID. If this capability is not set, userland cannot rely on
+>> +the kernel to allow the KVM_MSI_VALID_DEVID flag being set.
+>> +
+>>  struct kvm_irq_routing_s390_adapter {
+>>  	__u64 ind_addr;
+>>  	__u64 summary_addr;
+>> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+>> index 6a02871..52a973f 100644
+>> --- a/include/uapi/linux/kvm.h
+>> +++ b/include/uapi/linux/kvm.h
+>> @@ -865,7 +865,10 @@ struct kvm_irq_routing_msi {
+>>  	__u32 address_lo;
+>>  	__u32 address_hi;
+>>  	__u32 data;
+>> -	__u32 pad;
+>> +	union {
+>> +		__u32 pad;
+>> +		__u32 devid;
+>> +	};
+>>  };
+>>  
+>>  struct kvm_irq_routing_s390_adapter {
+>> -- 
+>> 1.9.1
+>>
+
