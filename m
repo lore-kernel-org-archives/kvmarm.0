@@ -1,41 +1,47 @@
-From: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v7 1/6] KVM: arm/arm64: Add VGICv3 save/restore API documentation
-Date: Thu, 21 Apr 2016 19:44:49 +0100
-Message-ID: <CAFEAcA_DBA7c4T-rLpJW4CVrGoAiofZsm7iMVYB2pK46J+fQxg@mail.gmail.com>
-References: <cover.1449491035.git.p.fedin@samsung.com> <204d6b178e611ee0b5aede2b945516e0a6048c3c.1449491035.git.p.fedin@samsung.com>
- <CAFEAcA_N7F4r6fpQTW8Duyu577=uGcRyS7VhAMxumwTDN3khcw@mail.gmail.com>
- <CAMJs5B8b1kpdeUDPGOcyaiNjSo+ZSzzUZOS4+wJ6cWmjtd58dg@mail.gmail.com>
- <CAFEAcA8mtkLqrTKVQsCCG9xyb0MsFasxXZM=8bZ=covrBd6VrQ@mail.gmail.com> <20160421183056.GA25288@cbox>
+From: Alexander Graf <agraf@suse.de>
+Subject: Re: [PATCH v5 1/2] arm/arm64: KVM: Detect vGIC presence at runtime
+Date: Thu, 21 Apr 2016 23:41:45 +0200
+Message-ID: <57194919.5080007@suse.de>
+References: <cover.1448874023.git.p.fedin@samsung.com>
+ <f759b4ba37d4cacdc971d2a416cdc8ecf0c3c3d9.1448874023.git.p.fedin@samsung.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <20160421183056.GA25288@cbox>
+In-Reply-To: <f759b4ba37d4cacdc971d2a416cdc8ecf0c3c3d9.1448874023.git.p.fedin@samsung.com>
 Sender: kvm-owner@vger.kernel.org
-To: Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Pavel Fedin <p.fedin@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>
+To: Pavel Fedin <p.fedin@samsung.com>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Gleb Natapov <gleb@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 21 April 2016 at 19:30, Christoffer Dall <christoffer.dall@linaro.org> wrote:
-> So I agree about the latch state, that should be exported, if nothing
-> else so that a VM can't use this particular change to detect a
-> migration, for example.
->
-> However, for the input level, I really do see this as a wire state
-> between userspace and the kernel, and as something that userspace should
-> re-establish after migration, since userspace already knows what the
-> line level is, why does it need to pull it out of the kernel again?
 
-I guess userspace could track the line level as well as telling the
-kernel about it, but we would still need an API for telling the
-kernel "here is your line level state after a migration", because
-that's not the same as "the line level just changed because the
-device signaled an interrupt". (For the former, we just want to set
-your 'level' struct field value. For the latter, a 0->1 level change
-may mean "set pending"; but for migration we're already telling you
-the current pending state via a different ioctl and don't want to
-mess that up when we're telling you about the 'level' info.)
-And if we have to have migration API for directly writing level bits we
-might as well have the corresponding directly-read-level-bits one...
 
-thanks
--- PMM
+On 30.11.15 10:40, Pavel Fedin wrote:
+> Before commit 662d9715840aef44dcb573b0f9fab9e8319c868a
+> ("arm/arm64: KVM: Kill CONFIG_KVM_ARM_{VGIC,TIMER}") is was possible to
+> compile the kernel without vGIC and vTimer support. Commit message says
+> about possibility to detect vGIC support in runtime, but this has never
+> been implemented.
+> 
+> This patch introdices runtime check, restoring the lost functionality.
+> It again allows to use KVM on hardware without vGIC. Interrupt
+> controller has to be emulated in userspace in this case.
+> 
+> -ENODEV return code from probe function means there's no GIC at all.
+> -ENXIO happens when, for example, there is GIC node in the device tree,
+> but it does not specify vGIC resources. Normally this means that vGIC
+> hardware is defunct. Any other error code is still treated as full stop
+> because it might mean some really serious problems.
+> 
+> This patch does not touch any virtual timer code, suggesting that timer
+> hardware is actually in place. Normally on boards in question it is true,
+> however since vGIC is missing, it is impossible to correctly utilize
+> interrupts from the virtual timer. Since virtual timer handling is in
+
+So effectively all we'd need is to set CNTHCTL_EL2.EL1PCEN to 0 for
+guests that have no in-kernel irqchip, no? We should then trap on all
+timer accesses and be able to emulate them in user space where we can
+inject IRQs into an emulated GIC again.
+
+
+Alex
