@@ -1,66 +1,405 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [RFC PATCH] arm64: Fix EL1/EL2 early init inconsistencies with VHE
-Date: Thu, 21 Apr 2016 15:02:02 +0100
-Message-ID: <5718DD5A.2050800@arm.com>
-References: <1461002246-25314-1-git-send-email-Dave.Martin@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v4 4/7] KVM: arm/arm64: enable irqchip routing
+Date: Thu, 21 Apr 2016 16:44:17 +0200
+Message-ID: <5718E741.3060302@linaro.org>
+References: <1459759657-7402-1-git-send-email-eric.auger@linaro.org>
+ <1459759657-7402-5-git-send-email-eric.auger@linaro.org>
+ <20160414120458.GF30804@cbox>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C74A449B3F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2016 10:00:04 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id AFycUybxJcLX for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Apr 2016 10:00:02 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8274849B36
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2016 10:00:02 -0400 (EDT)
-In-Reply-To: <1461002246-25314-1-git-send-email-Dave.Martin@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, kvmarm@lists.cs.columbia.edu
+Return-path: <kvm-owner@vger.kernel.org>
+In-Reply-To: <20160414120458.GF30804@cbox>
+Sender: kvm-owner@vger.kernel.org
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: eric.auger@st.com, marc.zyngier@arm.com, andre.przywara@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, patches@linaro.org, pbonzini@redhat.com, p.fedin@samsung.com, Manish.Jaggi@caviumnetworks.com
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Dave,
-
-On 18/04/16 18:57, Dave Martin wrote:
-> When using the Virtualisation Host Extensions, EL1 is not used in
-> the host and requires no separate configuration.
+Hi Christoffer,
+On 04/14/2016 02:04 PM, Christoffer Dall wrote:
+> REVIEW INCOMPLETE
 > 
-> In addition, with VHE enabled, non-hyp-specific EL2 configuration
-> that does not need to be done early will be done anyway in
-> __cpu_setup via the _EL1 system register aliases.  In particular,
-> the layout and definition of CPTR_EL2 are changed by enabling VHE
-> so that they resemble CPACR_EL1, so existing code to initialise
-> CPTR_EL2 becomes architecturally wrong in this case.
+> On Mon, Apr 04, 2016 at 10:47:34AM +0200, Eric Auger wrote:
+>> This patch adds compilation and link against irqchip.
+>>
+>> On ARM, irqchip routing is not really useful since there is
+>> a single irqchip. However main motivation behind using irqchip
+>> code is to enable MSI routing code.
 > 
-> This patch simply skips the affected initialisation code in the
-> non-VHE case.
+> As commented on the cover letter, could we not have multiple ITS devices
+> in the guest at some point?  (I think Marc suggeste this may be useful
+> for a combination of passthrough and emulated devices).
+
+So yes we can and irqchip routing can be used along with irqfd injection.
+
 > 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
-> ---
+>>
+>> Routing standard callbacks now are implemented in vgic_irqfd:
+>> - kvm_set_routing_entry
+>> - kvm_set_irq
+>> - kvm_set_msi
+>>
+>> They only are supported with new_vgic code.
+>>
+>> Both HAVE_KVM_IRQCHIP and HAVE_KVM_IRQ_ROUTING are defined.
+>> KVM_CAP_IRQ_ROUTING is advertised and KVM_SET_GSI_ROUTING is allowed.
+>>
+>> MSI routing setup is not yet allowed.
 > 
-> Note -- not tested yet, and I'm still unclear on whether this is the
-> correct architectural approach...
+> Then why are we selecting CONFIG_HAVE_KVM_MSI here?
 
-This looks correct to me. Given that we're not leaving EL2, there is no
-reason to do things earlier than they are done at EL1, and this fixes an
-obvious bug on CPTR_EL2 access.
+CONFIG_HAVE_KVM_MSI does not relate to MSI routing but enables the
+capability to inject an MSI using KVM_SIGNAL_MSI ioctl
+(KVM_CAP_SIGNAL_MSI capability).
 
-I've given it a go on a VHE model, and it ran just fine, so:
+The config was set by Andre when he enabled KVM_SIGNAL_MSI in GICv3 ITS:
+"KVM: arm64: enable ITS emulation as a virtual MSI controller". This was
+relevant since it enabled the modality.
 
-Reviewed-by: Marc Zyngier <marc.zyngier@arm.com>
+However what I missed is that the previous "select HAVE_KVM_MSI" was in
+config KVM and I think it is wrong since it only works with NEW_VGIC and
+ITS emulation. So in practice you're right, HAVE_KVM_MSI should already
+be in NEW_VGIC after last Andre's patch.
+> 
+>>
+>> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+>>
+>> ---
+>> v3 -> v4:
+>> - provide support only for new-vgic
+>> - code previously in vgic.c now in vgic_irqfd.c
+>>
+>> v2 -> v3:
+>> - unconditionally set devid and KVM_MSI_VALID_DEVID flag as suggested
+>>   by Andre (KVM_IRQ_ROUTING_EXTENDED_MSI type not used anymore)
+>> - vgic_irqfd_set_irq now is static
+>> - propagate flags
+>> - add comments
+>>
+>> v1 -> v2:
+>> - fix bug reported by Andre related to msi.flags and msi.devid setting
+>>   in kvm_send_userspace_msi
+>> - avoid injecting reserved IRQ numbers in vgic_irqfd_set_irq
+>>
+>> RFC -> PATCH
+>> - reword api.txt:
+>>   x move MSI routing comments in a subsequent patch,
+>>   x clearly state GSI routing does not apply to KVM_IRQ_LINE
+>>
+>> Conflicts:
+>> 	arch/arm/include/asm/kvm_host.h
+>> 	arch/arm/kvm/Kconfig
+>> 	arch/arm64/include/asm/kvm_host.h
+>> 	arch/arm64/kvm/Kconfig
+>> ---
+>>  Documentation/virtual/kvm/api.txt | 12 ++++--
+>>  arch/arm/include/asm/kvm_host.h   |  2 +
+>>  arch/arm/kvm/Kconfig              |  2 +
+>>  arch/arm/kvm/Makefile             |  1 +
+>>  arch/arm64/include/asm/kvm_host.h |  1 +
+>>  arch/arm64/kvm/Kconfig            |  3 ++
+>>  arch/arm64/kvm/Makefile           |  1 +
+>>  include/kvm/vgic/vgic.h           |  2 -
+>>  virt/kvm/arm/vgic/vgic.c          |  7 ----
+>>  virt/kvm/arm/vgic/vgic_irqfd.c    | 83 ++++++++++++++++++++++++++++++---------
+>>  virt/kvm/irqchip.c                |  2 +
+>>  11 files changed, 85 insertions(+), 31 deletions(-)
+>>
+>> diff --git a/Documentation/virtual/kvm/api.txt b/Documentation/virtual/kvm/api.txt
+>> index c436bb6..61f8f27 100644
+>> --- a/Documentation/virtual/kvm/api.txt
+>> +++ b/Documentation/virtual/kvm/api.txt
+>> @@ -1427,13 +1427,16 @@ KVM_ASSIGN_DEV_IRQ. Partial deassignment of host or guest IRQ is allowed.
+>>  4.52 KVM_SET_GSI_ROUTING
+>>  
+>>  Capability: KVM_CAP_IRQ_ROUTING
+>> -Architectures: x86 s390
+>> +Architectures: x86 s390 arm arm64
+>>  Type: vm ioctl
+>>  Parameters: struct kvm_irq_routing (in)
+>>  Returns: 0 on success, -1 on error
+>>  
+>>  Sets the GSI routing table entries, overwriting any previously set entries.
+>>  
+>> +On arm/arm64, GSI routing has the following limitation:
+>> +- GSI routing does not apply to KVM_IRQ_LINE but only to KVM_IRQFD.
+>> +
+>>  struct kvm_irq_routing {
+>>  	__u32 nr;
+>>  	__u32 flags;
+>> @@ -2361,9 +2364,10 @@ Note that closing the resamplefd is not sufficient to disable the
+>>  irqfd.  The KVM_IRQFD_FLAG_RESAMPLE is only necessary on assignment
+>>  and need not be specified with KVM_IRQFD_FLAG_DEASSIGN.
+>>  
+>> -On ARM/ARM64, the gsi field in the kvm_irqfd struct specifies the Shared
+>> -Peripheral Interrupt (SPI) index, such that the GIC interrupt ID is
+>> -given by gsi + 32.
+>> +On arm/arm64, gsi routing being supported, the following can happen:
+>> +- in case no routing entry is associated to this gsi, injection fails
+>> +- in case the gsi is associated to an irqchip routing entry,
+>> +  irqchip.pin + 32 corresponds to the injected SPI ID.
+>>  
+>>  4.76 KVM_PPC_ALLOCATE_HTAB
+>>  
+>> diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
+>> index 494b004..67dc11d 100644
+>> --- a/arch/arm/include/asm/kvm_host.h
+>> +++ b/arch/arm/include/asm/kvm_host.h
+>> @@ -37,6 +37,8 @@
+>>  
+>>  #define KVM_VCPU_MAX_FEATURES 2
+>>  
+>> +#define KVM_IRQCHIP_NUM_PINS 988 /* 1020 - 32 is the number of SPI */
+> 
+> nit: s/SPI/SPIs/
+sure
+> 
+>> +
+>>  #include <kvm/arm_vgic.h>
+>>  
+>>  #define KVM_MAX_VCPUS VGIC_V2_MAX_CPUS
+>> diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+>> index 02abfff..92c3aec 100644
+>> --- a/arch/arm/kvm/Kconfig
+>> +++ b/arch/arm/kvm/Kconfig
+>> @@ -50,6 +50,8 @@ config KVM_NEW_VGIC
+>>  	bool "New VGIC implementation"
+>>  	depends on KVM
+>>  	default y
+>> +	select HAVE_KVM_IRQCHIP
+>> +	select HAVE_KVM_IRQ_ROUTING
+>>  	---help---
+>>  	  uses the new VGIC implementation
+>>  
+>> diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+>> index aa7d724..b8aa5ef 100644
+>> --- a/arch/arm/kvm/Makefile
+>> +++ b/arch/arm/kvm/Makefile
+>> @@ -29,6 +29,7 @@ obj-y += $(KVM)/arm/vgic/vgic_irqfd.o
+>>  obj-y += $(KVM)/arm/vgic/vgic-v2.o
+>>  obj-y += $(KVM)/arm/vgic/vgic_mmio.o
+>>  obj-y += $(KVM)/arm/vgic/vgic_kvm_device.o
+>> +obj-y += $(KVM)//irqchip.o
+>>  else
+>>  obj-y += $(KVM)/arm/vgic.o
+>>  obj-y += $(KVM)/arm/vgic-v2.o
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 2cdd7ae..95e1779 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -35,6 +35,7 @@
+>>  #define KVM_PRIVATE_MEM_SLOTS 4
+>>  #define KVM_COALESCED_MMIO_PAGE_OFFSET 1
+>>  #define KVM_HALT_POLL_NS_DEFAULT 500000
+>> +#define KVM_IRQCHIP_NUM_PINS 988 /* 1020 - 32 is the number of SPI */
+>>  
+>>  #include <kvm/arm_vgic.h>
+>>  #include <kvm/arm_arch_timer.h>
+>> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+>> index 71c9ebc..bd597dc9 100644
+>> --- a/arch/arm64/kvm/Kconfig
+>> +++ b/arch/arm64/kvm/Kconfig
+>> @@ -60,6 +60,9 @@ config KVM_NEW_VGIC
+>>  	bool "New VGIC implementation"
+>>  	depends on KVM
+>>  	default y
+>> +	select HAVE_KVM_MSI
+>> +	select HAVE_KVM_IRQCHIP
+>> +	select HAVE_KVM_IRQ_ROUTING
+>>          ---help---
+>>            uses the new VGIC implementation
+>>  
+>> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+>> index 3bec10e..37f2a47 100644
+>> --- a/arch/arm64/kvm/Makefile
+>> +++ b/arch/arm64/kvm/Makefile
+>> @@ -29,6 +29,7 @@ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-v3.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic_mmio.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic_kvm_device.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/its-emul.o
+>> +kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/irqchip.o
+>>  else
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic.o
+>>  kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v2.o
+>> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+>> index c50890f..625a777 100644
+>> --- a/include/kvm/vgic/vgic.h
+>> +++ b/include/kvm/vgic/vgic.h
+>> @@ -284,6 +284,4 @@ static inline int kvm_vgic_get_max_vcpus(void)
+>>  
+>>  bool vgic_has_its(struct kvm *kvm);
+>>  
+>> -int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi);
+>> -
+>>  #endif /* __ASM_ARM_KVM_VGIC_VGIC_H */
+>> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+>> index 82bfb33..a175d93 100644
+>> --- a/virt/kvm/arm/vgic/vgic.c
+>> +++ b/virt/kvm/arm/vgic/vgic.c
+>> @@ -623,10 +623,3 @@ bool vgic_has_its(struct kvm *kvm)
+>>  	return !IS_VGIC_ADDR_UNDEF(dist->vgic_its_base);
+>>  }
+>>  
+>> -int kvm_send_userspace_msi(struct kvm *kvm, struct kvm_msi *msi)
+>> -{
+>> -	if (vgic_has_its(kvm))
+>> -		return vits_inject_msi(kvm, msi);
+>> -	else
+>> -		return -ENODEV;
+>> -}
+> 
+> I don't understand why we're removing these two entries here, or rather,
+> why we had something here already, given that we don't select HAVE_KVM_MSI
+> before this patch as well?
 
-	M.
--- 
-Jazz is not dead. It just smells funny...
+we are not removing the functionality, we move its implementation.
+
+Before this patch we did not compile irqchip.c at all. So we implemented
+kvm_send_userspace_msi directly in the vgic.c code. Now irqchip is
+compiled,  kvm_send_userspace_msi is natively implemented in the
+irqchip.c framework and calls kvm_set_msi. This latter now is
+implemented in kvm_irqfd, in this patch. I know, its difficult to follow ;-)
+> 
+>> diff --git a/virt/kvm/arm/vgic/vgic_irqfd.c b/virt/kvm/arm/vgic/vgic_irqfd.c
+>> index 3eee1bd..a76994f 100644
+>> --- a/virt/kvm/arm/vgic/vgic_irqfd.c
+>> +++ b/virt/kvm/arm/vgic/vgic_irqfd.c
+>> @@ -17,35 +17,82 @@
+>>  #include <linux/kvm.h>
+>>  #include <linux/kvm_host.h>
+>>  #include <trace/events/kvm.h>
+>> +#include <kvm/vgic/vgic.h>
+>> +#include "vgic.h"
+>>  
+>> -int kvm_irq_map_gsi(struct kvm *kvm,
+>> -		    struct kvm_kernel_irq_routing_entry *entries,
+>> -		    int gsi)
+>> +/**
+>> + * vgic_irqfd_set_irq: inject the IRQ corresponding to the
+>> + * irqchip routing entry
+>> + *
+>> + * This is the entry point for irqfd IRQ injection
+>> + */
+>> +static int vgic_irqfd_set_irq(struct kvm_kernel_irq_routing_entry *e,
+>> +			struct kvm *kvm, int irq_source_id,
+>> +			int level, bool line_status)
+>>  {
+>> -	return 0;
+>> -}
+>> +	unsigned int spi_id = e->irqchip.pin + VGIC_NR_PRIVATE_IRQS;
+>> +	struct vgic_dist *dist = &kvm->arch.vgic;
+>>  
+>> -int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned irqchip, unsigned pin)
+>> -{
+>> -	return pin;
+>> -}
+>> +	trace_kvm_set_irq(spi_id, level, irq_source_id);
+> 
+> but this is not kvm_set_irq ?  Perhaps it doesn't matter because the
+> functionality is the same, but in that case, rename it to something more
+> generic.
+Sure
+> 
+>>  
+>> -int kvm_set_irq(struct kvm *kvm, int irq_source_id,
+>> -		u32 irq, int level, bool line_status)
+>> -{
+>> -	unsigned int spi = irq + VGIC_NR_PRIVATE_IRQS;
+>> +	BUG_ON(!vgic_initialized(kvm));
+>>  
+>> -	trace_kvm_set_irq(irq, level, irq_source_id);
+>> +	if (spi_id > min(dist->nr_spis, 1020))
+>> +		return -EINVAL;
+>> +	return kvm_vgic_inject_irq(kvm, 0, spi_id, level);
+>> +}
+>>  
+>> -	BUG_ON(!vgic_initialized(kvm));
+>> +/**
+>> + * kvm_set_routing_entry: populate a kvm routing entry
+>> + * from a user routing entry
+>> + *
+>> + * @e: kvm kernel routing entry handle
+>> + * @ue: user api routing entry handle
+>> + * return 0 on success, -EINVAL on errors.
+>> + */
+>> +int kvm_set_routing_entry(struct kvm_kernel_irq_routing_entry *e,
+>> +			  const struct kvm_irq_routing_entry *ue)
+>> +{
+>> +	int r = -EINVAL;
+>>  
+>> -	return kvm_vgic_inject_irq(kvm, 0, spi, level);
+>> +	switch (ue->type) {
+>> +	case KVM_IRQ_ROUTING_IRQCHIP:
+>> +		e->set = vgic_irqfd_set_irq;
+>> +		e->irqchip.irqchip = ue->u.irqchip.irqchip;
+>> +		e->irqchip.pin = ue->u.irqchip.pin;
+>> +		if ((e->irqchip.pin >= KVM_IRQCHIP_NUM_PINS) ||
+>> +		    (e->irqchip.irqchip >= KVM_NR_IRQCHIPS))
+>> +			goto out;
+>> +		break;
+>> +	default:
+>> +		goto out;
+>> +	}
+>> +	r = 0;
+>> +out:
+>> +	return r;
+>>  }
+>>  
+>> -/* MSI not implemented yet */
+>> +/**
+>> + * kvm_set_msi: inject the MSI corresponding to the
+>> + * MSI routing entry
+>> + *
+>> + * This is the entry point for irqfd MSI injection
+>> + * and userspace MSI injection.
+>> + */
+>>  int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
+>>  		struct kvm *kvm, int irq_source_id,
+>>  		int level, bool line_status)
+>>  {
+>> -	return 0;
+>> +	struct kvm_msi msi;
+>> +
+>> +	msi.address_lo = e->msi.address_lo;
+>> +	msi.address_hi = e->msi.address_hi;
+>> +	msi.data = e->msi.data;
+>> +	msi.flags = e->flags;
+>> +	msi.devid = e->devid;
+> 
+> why do we need to copy the data to a new struct?
+kvm_set_msi is the callback called by irqchip framework. It takes as
+parameter a kvm_kernel_irq_routing_entry pointer. This prototype is imposed.
+
+in vgic we currently us kvm_msi * instead. Maybe I should now consider
+changing the vits_inject_msi proto to take a struct
+kvm_kernel_irq_routing_entry * as a parameter.
+
+Thanks
+
+Eric
+
+> 
+>> +
+>> +	if (!vgic_has_its(kvm))
+>> +		return -ENODEV;
+>> +
+>> +	return vits_inject_msi(kvm, &msi);
+>>  }
+>> diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
+>> index 1c556cb..b4222d6 100644
+>> --- a/virt/kvm/irqchip.c
+>> +++ b/virt/kvm/irqchip.c
+>> @@ -29,7 +29,9 @@
+>>  #include <linux/srcu.h>
+>>  #include <linux/export.h>
+>>  #include <trace/events/kvm.h>
+>> +#if !defined(CONFIG_ARM) && !defined(CONFIG_ARM64)
+>>  #include "irq.h"
+>> +#endif
+>>  
+>>  int kvm_irq_map_gsi(struct kvm *kvm,
+>>  		    struct kvm_kernel_irq_routing_entry *entries, int gsi)
+>> -- 
+>> 1.9.1
+>>
+
