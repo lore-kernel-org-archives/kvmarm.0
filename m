@@ -2,7 +2,7 @@ From: Ashok Kumar <ashoks@broadcom.com>
 Subject: Re: [RFC PATCH] arm64: KVM: Allow userspace to configure guest
  MPIDR_EL1
 Date: Thu, 21 Apr 2016 04:46:21 -0700
-Message-ID: <3700.50118440322$1461239197@news.gmane.org>
+Message-ID: <1841.7616062381$1461239242@news.gmane.org>
 References: <1461161319-38835-1-git-send-email-ashoks@broadcom.com>
  <20160420183354.31f1bfbd@arm.com>
  <20160421070447.nwuqlxvpq7fj6h7m@hawk.localdomain>
@@ -11,31 +11,20 @@ References: <1461161319-38835-1-git-send-email-ashoks@broadcom.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 300E849B4C
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2016 07:44:22 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yJFsEVKSqWH8 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 21 Apr 2016 07:44:20 -0400 (EDT)
-Received: from mail-gw3-out.broadcom.com (mail-gw3-out.broadcom.com
- [216.31.210.64])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id A07C649B4A
- for <kvmarm@lists.cs.columbia.edu>; Thu, 21 Apr 2016 07:44:20 -0400 (EDT)
+Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
 Content-Disposition: inline
 In-Reply-To: <20160421095603.s7dhtwpy36nlbr2l@hawk.localdomain>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
+List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
+List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
+List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
+List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
+ <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
+Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
+Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
 To: Andrew Jones <drjones@redhat.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, shannon.zhao@linaro.org
+Cc: Marc Zyngier <marc.zyngier@arm.com>, will.deacon@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, christoffer.dall@linaro.org, shannon.zhao@linaro.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On Thu, Apr 21, 2016 at 11:56:03AM +0200, Andrew Jones wrote:
