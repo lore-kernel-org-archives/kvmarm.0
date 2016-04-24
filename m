@@ -1,24 +1,25 @@
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [RFC PATCH] arm64: Fix EL1/EL2 early init inconsistencies with VHE
-Date: Fri, 22 Apr 2016 09:54:12 +0100
-Message-ID: <20160422085411.GA2998@e104818-lin.cambridge.arm.com>
-References: <1461002246-25314-1-git-send-email-Dave.Martin@arm.com>
+From: Shanker Donthineni <shankerd@codeaurora.org>
+Subject: Re: [PATCH v6 01/10] clocksource: arm_arch_timer: Gather KVM specific
+ information in a structure
+Date: Sat, 23 Apr 2016 21:54:53 -0500
+Message-ID: <571C357D.80701@codeaurora.org>
+References: <1460388780-914-1-git-send-email-julien.grall@arm.com>
+ <1460388780-914-2-git-send-email-julien.grall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 742B349B86
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2016 04:52:14 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4961D49B59
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Apr 2016 22:52:50 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id vxCiynt-2Y3r for <kvmarm@lists.cs.columbia.edu>;
- Fri, 22 Apr 2016 04:52:11 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CF4C249B7F
- for <kvmarm@lists.cs.columbia.edu>; Fri, 22 Apr 2016 04:52:11 -0400 (EDT)
-Content-Disposition: inline
-In-Reply-To: <1461002246-25314-1-git-send-email-Dave.Martin@arm.com>
+ with ESMTP id ej4C0fvkw7Q0 for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 23 Apr 2016 22:52:49 -0400 (EDT)
+Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id F33F349B4C
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Apr 2016 22:52:48 -0400 (EDT)
+In-Reply-To: <1460388780-914-2-git-send-email-julien.grall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,27 +29,108 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Dave Martin <Dave.Martin@arm.com>
-Cc: Marc Zyngier <Marc.Zyngier@arm.com>, Will Deacon <Will.Deacon@arm.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+To: Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu
+Cc: kvm@vger.kernel.org, al.stone@linaro.org, marc.zyngier@arm.com, Daniel Lezcano <daniel.lezcano@linaro.org>, linux-kernel@vger.kernel.org, gg@slimlogic.co.uk, hanjun.guo@linaro.org, fu.wei@linaro.org, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Mon, Apr 18, 2016 at 06:57:26PM +0100, Dave P Martin wrote:
-> When using the Virtualisation Host Extensions, EL1 is not used in
-> the host and requires no separate configuration.
-> 
-> In addition, with VHE enabled, non-hyp-specific EL2 configuration
-> that does not need to be done early will be done anyway in
-> __cpu_setup via the _EL1 system register aliases.  In particular,
-> the layout and definition of CPTR_EL2 are changed by enabling VHE
-> so that they resemble CPACR_EL1, so existing code to initialise
-> CPTR_EL2 becomes architecturally wrong in this case.
-> 
-> This patch simply skips the affected initialisation code in the
-> non-VHE case.
-> 
-> Signed-off-by: Dave Martin <Dave.Martin@arm.com>
 
-I queued this for 4.6 (with Marc's ack). Thanks.
+
+On 04/11/2016 10:32 AM, Julien Grall wrote:
+> Introduce a structure which are filled up by the arch timer driver and
+> used by the virtual timer in KVM.
+>
+> The first member of this structure will be the timecounter. More members
+> will be added later.
+>
+> A stub for the new helper isn't introduced because KVM requires the arch
+> timer for both ARM64 and ARM32.
+>
+> The function arch_timer_get_timecounter is kept for the time being and
+> will be dropped in a subsequent patch.
+>
+> Signed-off-by: Julien Grall <julien.grall@arm.com>
+> Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
+>
+Tested-by: Shanker Donthineni <shankerd@codeaurora.org>
+
+Using the Qualcomm Technologies QDF2XXX server platform.
+> ---
+> Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>
+>     Changes in v6:
+>         - Add Christoffer's acked-by
+>
+>     Changes in v3:
+>         - Rename the patch
+>         - Move the KVM changes and removal of arch_timer_get_timecounter
+>         in separate patches.
+> ---
+>  drivers/clocksource/arm_arch_timer.c | 12 +++++++++---
+>  include/clocksource/arm_arch_timer.h |  5 +++++
+>  2 files changed, 14 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/clocksource/arm_arch_timer.c
+> b/drivers/clocksource/arm_arch_timer.c
+> index 5152b38..62bdfe7 100644
+> --- a/drivers/clocksource/arm_arch_timer.c
+> +++ b/drivers/clocksource/arm_arch_timer.c
+> @@ -468,11 +468,16 @@ static struct cyclecounter cyclecounter = {
+>  	.mask	= CLOCKSOURCE_MASK(56),
+>  };
+>  
+> -static struct timecounter timecounter;
+> +static struct arch_timer_kvm_info arch_timer_kvm_info;
+> +
+> +struct arch_timer_kvm_info *arch_timer_get_kvm_info(void)
+> +{
+> +	return &arch_timer_kvm_info;
+> +}
+>  
+>  struct timecounter *arch_timer_get_timecounter(void)
+>  {
+> -	return &timecounter;
+> +	return &arch_timer_kvm_info.timecounter;
+>  }
+>  
+>  static void __init arch_counter_register(unsigned type)
+> @@ -500,7 +505,8 @@ static void __init arch_counter_register(unsigned
+> type)
+>  	clocksource_register_hz(&clocksource_counter, arch_timer_rate);
+>  	cyclecounter.mult = clocksource_counter.mult;
+>  	cyclecounter.shift = clocksource_counter.shift;
+> -	timecounter_init(&timecounter, &cyclecounter, start_count);
+> +	timecounter_init(&arch_timer_kvm_info.timecounter,
+> +			 &cyclecounter, start_count);
+>  
+>  	/* 56 bits minimum, so we assume worst case rollover */
+>  	sched_clock_register(arch_timer_read_counter, 56,
+> arch_timer_rate);
+> diff --git a/include/clocksource/arm_arch_timer.h
+> b/include/clocksource/arm_arch_timer.h
+> index 25d0914..9101ed6b 100644
+> --- a/include/clocksource/arm_arch_timer.h
+> +++ b/include/clocksource/arm_arch_timer.h
+> @@ -49,11 +49,16 @@ enum arch_timer_reg {
+>  
+>  #define ARCH_TIMER_EVT_STREAM_FREQ	10000	/* 100us */
+>  
+> +struct arch_timer_kvm_info {
+> +	struct timecounter timecounter;
+> +};
+> +
+>  #ifdef CONFIG_ARM_ARCH_TIMER
+>  
+>  extern u32 arch_timer_get_rate(void);
+>  extern u64 (*arch_timer_read_counter)(void);
+>  extern struct timecounter *arch_timer_get_timecounter(void);
+> +extern struct arch_timer_kvm_info *arch_timer_get_kvm_info(void);
+>  
+>  #else
+>  
 
 -- 
-Catalin
+Shanker Donthineni
+Qualcomm Technologies, Inc. on behalf of Qualcomm Innovation Center, Inc.
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, a Linux Foundation Collaborative Project
