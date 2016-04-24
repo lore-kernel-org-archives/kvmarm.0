@@ -1,25 +1,25 @@
 From: Shanker Donthineni <shankerd@codeaurora.org>
-Subject: Re: [PATCH v6 01/10] clocksource: arm_arch_timer: Gather KVM specific
- information in a structure
-Date: Sat, 23 Apr 2016 21:54:53 -0500
-Message-ID: <571C357D.80701@codeaurora.org>
+Subject: Re: [PATCH v6 02/10] clocksource: arm_arch_timer: Extend
+ arch_timer_kvm_info to get the virtual IRQ
+Date: Sat, 23 Apr 2016 21:57:10 -0500
+Message-ID: <571C3606.3030101@codeaurora.org>
 References: <1460388780-914-1-git-send-email-julien.grall@arm.com>
- <1460388780-914-2-git-send-email-julien.grall@arm.com>
+ <1460388780-914-3-git-send-email-julien.grall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4961D49B59
- for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Apr 2016 22:52:50 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A8D7C49B62
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Apr 2016 22:55:05 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id ej4C0fvkw7Q0 for <kvmarm@lists.cs.columbia.edu>;
- Sat, 23 Apr 2016 22:52:49 -0400 (EDT)
+ with ESMTP id oIKvN4bipv-m for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 23 Apr 2016 22:55:05 -0400 (EDT)
 Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id F33F349B4C
- for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Apr 2016 22:52:48 -0400 (EDT)
-In-Reply-To: <1460388780-914-2-git-send-email-julien.grall@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id EDD2F49B59
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Apr 2016 22:55:04 -0400 (EDT)
+In-Reply-To: <1460388780-914-3-git-send-email-julien.grall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,17 +36,14 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 
 On 04/11/2016 10:32 AM, Julien Grall wrote:
-> Introduce a structure which are filled up by the arch timer driver and
-> used by the virtual timer in KVM.
+> Currently, the firmware table is parsed by the virtual timer code in
+> order to retrieve the virtual timer interrupt. However, this is already
+> done by the arch timer driver.
 >
-> The first member of this structure will be the timecounter. More members
-> will be added later.
+> To avoid code duplication, extend arch_timer_kvm_info to get the virtual
+> IRQ.
 >
-> A stub for the new helper isn't introduced because KVM requires the arch
-> timer for both ARM64 and ARM32.
->
-> The function arch_timer_get_timecounter is kept for the time being and
-> will be dropped in a subsequent patch.
+> Note that the KVM code will be modified in a subsequent patch.
 >
 > Signed-off-by: Julien Grall <julien.grall@arm.com>
 > Acked-by: Christoffer Dall <christoffer.dall@linaro.org>
@@ -54,81 +51,6 @@ On 04/11/2016 10:32 AM, Julien Grall wrote:
 Tested-by: Shanker Donthineni <shankerd@codeaurora.org>
 
 Using the Qualcomm Technologies QDF2XXX server platform.
-> ---
-> Cc: Daniel Lezcano <daniel.lezcano@linaro.org>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
->
->     Changes in v6:
->         - Add Christoffer's acked-by
->
->     Changes in v3:
->         - Rename the patch
->         - Move the KVM changes and removal of arch_timer_get_timecounter
->         in separate patches.
-> ---
->  drivers/clocksource/arm_arch_timer.c | 12 +++++++++---
->  include/clocksource/arm_arch_timer.h |  5 +++++
->  2 files changed, 14 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/clocksource/arm_arch_timer.c
-> b/drivers/clocksource/arm_arch_timer.c
-> index 5152b38..62bdfe7 100644
-> --- a/drivers/clocksource/arm_arch_timer.c
-> +++ b/drivers/clocksource/arm_arch_timer.c
-> @@ -468,11 +468,16 @@ static struct cyclecounter cyclecounter = {
->  	.mask	= CLOCKSOURCE_MASK(56),
->  };
->  
-> -static struct timecounter timecounter;
-> +static struct arch_timer_kvm_info arch_timer_kvm_info;
-> +
-> +struct arch_timer_kvm_info *arch_timer_get_kvm_info(void)
-> +{
-> +	return &arch_timer_kvm_info;
-> +}
->  
->  struct timecounter *arch_timer_get_timecounter(void)
->  {
-> -	return &timecounter;
-> +	return &arch_timer_kvm_info.timecounter;
->  }
->  
->  static void __init arch_counter_register(unsigned type)
-> @@ -500,7 +505,8 @@ static void __init arch_counter_register(unsigned
-> type)
->  	clocksource_register_hz(&clocksource_counter, arch_timer_rate);
->  	cyclecounter.mult = clocksource_counter.mult;
->  	cyclecounter.shift = clocksource_counter.shift;
-> -	timecounter_init(&timecounter, &cyclecounter, start_count);
-> +	timecounter_init(&arch_timer_kvm_info.timecounter,
-> +			 &cyclecounter, start_count);
->  
->  	/* 56 bits minimum, so we assume worst case rollover */
->  	sched_clock_register(arch_timer_read_counter, 56,
-> arch_timer_rate);
-> diff --git a/include/clocksource/arm_arch_timer.h
-> b/include/clocksource/arm_arch_timer.h
-> index 25d0914..9101ed6b 100644
-> --- a/include/clocksource/arm_arch_timer.h
-> +++ b/include/clocksource/arm_arch_timer.h
-> @@ -49,11 +49,16 @@ enum arch_timer_reg {
->  
->  #define ARCH_TIMER_EVT_STREAM_FREQ	10000	/* 100us */
->  
-> +struct arch_timer_kvm_info {
-> +	struct timecounter timecounter;
-> +};
-> +
->  #ifdef CONFIG_ARM_ARCH_TIMER
->  
->  extern u32 arch_timer_get_rate(void);
->  extern u64 (*arch_timer_read_counter)(void);
->  extern struct timecounter *arch_timer_get_timecounter(void);
-> +extern struct arch_timer_kvm_info *arch_timer_get_kvm_info(void);
->  
->  #else
->  
 
 -- 
 Shanker Donthineni
