@@ -1,25 +1,25 @@
 From: Shanker Donthineni <shankerd@codeaurora.org>
-Subject: Re: [PATCH v6 03/10] irqchip/gic-v2: Gather ACPI specific data in a
- single structure
-Date: Sat, 23 Apr 2016 21:58:37 -0500
-Message-ID: <571C365D.80605@codeaurora.org>
+Subject: Re: [PATCH v6 04/10] irqchip/gic-v2: Parse and export virtual GIC
+ information
+Date: Sat, 23 Apr 2016 22:00:00 -0500
+Message-ID: <571C36B0.9040003@codeaurora.org>
 References: <1460388780-914-1-git-send-email-julien.grall@arm.com>
- <1460388780-914-4-git-send-email-julien.grall@arm.com>
+ <1460388780-914-5-git-send-email-julien.grall@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4545D49B70
- for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Apr 2016 22:56:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E38E449B5D
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Apr 2016 22:57:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id UlZIfTr5L8NN for <kvmarm@lists.cs.columbia.edu>;
- Sat, 23 Apr 2016 22:56:31 -0400 (EDT)
+ with ESMTP id 2z6E0Sl0yLGx for <kvmarm@lists.cs.columbia.edu>;
+ Sat, 23 Apr 2016 22:57:55 -0400 (EDT)
 Received: from smtp.codeaurora.org (smtp.codeaurora.org [198.145.29.96])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 3C11149B6F
- for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Apr 2016 22:56:31 -0400 (EDT)
-In-Reply-To: <1460388780-914-4-git-send-email-julien.grall@arm.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 21B7B49B5A
+ for <kvmarm@lists.cs.columbia.edu>; Sat, 23 Apr 2016 22:57:55 -0400 (EDT)
+In-Reply-To: <1460388780-914-5-git-send-email-julien.grall@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -36,16 +36,15 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 
 On 04/11/2016 10:32 AM, Julien Grall wrote:
-> The ACPI code requires to use global variables in order to collect
-> information from the tables.
+> For now, the firmware tables are parsed 2 times: once in the GIC
+> drivers, the other timer when initializing the vGIC. It means code
+> duplication and make more tedious to add the support for another
+> firmware table (like ACPI).
 >
-> For now, a single global variable is used, but more will be added in a
-> subsequent patch. To make clear they are ACPI specific, gather all the
-> information in a single structure.
+> Introduce a new structure and set of helpers to get/set the virtual GIC
+> information. Also fill up the structure for GICv2.
 >
 > Signed-off-by: Julien Grall <julien.grall@arm.com>
-> Acked-by: Christofer Dall <christoffer.dall@linaro.org>
-> Acked-by: Hanjun Guo <hanjun.guo@linaro.org>
 >
 Tested-by: Shanker Donthineni <shankerd@codeaurora.org>
 
