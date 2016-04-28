@@ -1,61 +1,53 @@
-From: Shannon Zhao <zhaoshenglong@huawei.com>
-Subject: Re: [Query] Does Linux & Qemu support KVM for ARM32
- guest on ARM64 host
-Date: Thu, 28 Apr 2016 10:33:50 +0800
-Message-ID: <5721768E.407@huawei.com>
-References: <BE.E9.04928.D4C61275@epcpsbgx1.samsung.com>
+From: RAVINDRA KUMAR SANDE <r.sande@samsung.com>
+Subject: Re: Re: [Query] Does Linux & Qemu support KVM for ARM32 guest on ARM64
+ host
+Date: Thu, 28 Apr 2016 06:03:19 +0000 (GMT)
+Message-ID: <708585848.188261461823397987.JavaMail.weblogic@ep2mlwas06d>
+Reply-To: r.sande@samsung.com
 Mime-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Return-path: <qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org>
-In-Reply-To: <BE.E9.04928.D4C61275@epcpsbgx1.samsung.com>
-List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
-	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
-List-Archive: <http://lists.nongnu.org/archive/html/qemu-devel/>
-List-Post: <mailto:qemu-devel@nongnu.org>
-List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
-List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
-	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Errors-To: qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org
-Sender: "Qemu-devel" <qemu-devel-bounces+gceq-qemu-devel=gmane.org@nongnu.org>
-To: r.sande@samsung.com, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, qemu-arm@nongnu.org
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, qemu-devel@nongnu.org, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: base64
+Return-path: <kvm-owner@vger.kernel.org>
+MIME-version: 1.0
+Sender: kvm-owner@vger.kernel.org
+To: Shannon Zhao <zhaoshenglong@huawei.com>, RAVINDRA KUMAR SANDE <r.sande@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
+DQo+IE9uIDIwMTYvNC8yOCA5OjUwLCBSQVZJTkRSQSBLVU1BUiBTQU5ERSB3cm90ZToNCj4gPiAN
+Cj4gPiBXaGF0IEkgZGlkICA6DQo+ID4gMSkgSnVzdCBmb3IgaW52ZXN0aWdhdGlvbiwgSSB0b29r
+IGEgQVJNdjggKCBPZHJvaWRDMiApIGJvYXJkDQo+ID4gMikgIEkgY29tcGlsZWQgTGludXggMy4x
+NCB3aXRoIEtWTSBzdXBwb3J0IGZvciB0aGlzIEFSTXY4ICggT2Ryb2lkQzIgKQ0KPiA+IGJvYXJk
+LCB3aXRoIG1vZGlmaWNhdGlvbiByZXBsYWNpbmcgbWVzb25fdGltZXIgYnkgYXJtIHRpbWVyIGlu
+IGl0cyBkdHMNCj4gPiBmaWxlLg0KPiA+IFdoeSBMaW51eCAzLjE0IDogSSB0b29rIExpbnV4IDMu
+MTQgYmVjYXVzZSBkaXNwbGF5IGRyaXZlcnMgZm9yIHRoaXMNCj4gPiBib2FyZCBhcmUgb2ZmaWNp
+YWxseSBmb3IgdGhpcyB2ZXJzaW9uOyBhbmQgSSBhbSBpbnRlcmVzdGVkIGluIHNlZWluZw0KPiA+
+IHNvbWUgTGludXggZ3Vlc3QgYm9vdGluZyB3aXRoIGRpc3BsYXkgb24uDQo+ID4gMykgIEkgc2Vl
+IGZyb20gYm9vdCBsb2cgb2YgIHRoYXQgS1ZNIGlzIGluaXRpYWxpemVkIHN1Y2Nlc3NmdWxseSwg
+YW5kIEkNCj4gPiBjYW4gc2VlIC9kZXYva3ZtIG5vZGUuDQo+ID4gNCkgSSBidWlsdCBsYXRlc3Qg
+UWVtdSB3aXRoIC0tZW5hYmxlLWt2bSBvbiB0aGlzIGJvYXJkIG5hdGl2ZWx5Lg0KPiA+IA0KPiA+
+IFdoYXQgSSBmaW5kIDoNCj4gPiAxKSBydW5uaW5nICJxZW11LXN5c3RlbS1hcm0gIC1lbmFibGUt
+a3ZtICAgLW1hY2hpbmUgdmV4cHJlc3MtYTkgLi4uLiINCj4gPiBnaXZlcyBlcnJvciA6ICBubyBh
+Y2NlbGVyYXRvciBmb3VuZA0KPiA+IDIpIHJ1bm5pbmcgInFlbXUtc3lzdGVtLWFhcmNoNjQgLWVu
+YWJsZS1rdm0gIC1tYWNoaW5lIHZleHByZXNzLWE5IC4uLi4iDQo+ID4gZ2l2ZXMgZXJyb3IgOiBr
+bXZfaW5pdF92Y3B1IChJT0N0bCBvbiAvZGV2L2t2bSkgZmFpbGVkLCBndWVzdCBub3Qgc3VwcG9y
+dGVkDQo+ID4gKCBJIGV4cGVyaW1lbnRlZCBzb21lIG1vZGlmaWNhdGlvbnMgYXMgd2VsbCB0byBv
+dmVyY29tZSBhYm92ZSBlcnJvciwNCj4gPiBzdWNoIGFzIHJlcGxhY2luZyB2YWx1ZSBhc3NpZ25l
+ZCB0byBjcHUtPmt2bV90YXJnZXQgZXRjLCBidXQgSU9DdGwgY2FsbA0KPiA+IGlzIGZhaWxpbmcp
+DQo+ID4gDQo+ID4gUXVlcnk6DQo+PiAgMSkgRG9lcyBBcm02NCBMaW51eCBub3QgZW5hYmxlIEtW
+TSBzdXBwb3J0IGZvciBBcm0zMiBndWVzdCA/DQo+ID4gMikgQ2FuIHFlbXUtc3lzdGVtLWFybSBu
+b3QgdXNlIHRoZSBLVk0gZmVhdHVyZSBvbiBBcm02NCBob3N0ID8NCj4gPiAzKSBDYW4gcWVtdS1z
+eXN0ZW0tYWFyY2g2NCBub3QgdXNlIEtWTSBmZWF0dXJlIGZvciBBcm0zMiBndWVzdCA/DQo+ID4g
+DQo+IC0tLS0tLS0gT3JpZ2luYWwgTWVzc2FnZSAtLS0tLS0tDQo+IFNlbmRlciA6IFNoYW5ub24g
+Wmhhbzx6aGFvc2hlbmdsb25nQGh1YXdlaS5jb20+DQo+IA0KPiBZb3UgY2FuIHVzZSBiZWxvdyBj
+b21tYW5kIHRvIGJvb3QgYSBBUk0zMiBndWVzdCBvbiBBUk02ND8NCj4gDQo+IHFlbXUtc3lzdGVt
+LWFhcmNoNjQgLWVuYWJsZS1rdm0gLW1hY2hpbmUgdmlydCxrZXJuZWxfaXJxY2hpcD1vbiAtY3B1
+DQo+IGhvc3QsYWFyY2g2ND1vZmYgLi4uLg0KPiANCj4gLS0gDQo+IFNoYW5ub24NCg0KDQpJIHdp
+bGwgdHJ5IGFib3ZlIG9uIEFybTY0LiANCg0KSSBoYXZlIGFub3RoZXIgcXVlcnksIGZvciBBcm0z
+MiBob3N0IHdpdGggS1ZNIGVuYWJsZWQuDQpJIHNlZSB0aGF0ICJxZW11LXN5c3RlbS1hcm0gIC1l
+bmFibGUta3ZtICAgLW1hY2hpbmUgdmV4cHJlc3MtYTkgIC4uLiIgZ2l2ZXMgZXJyb3INCmttdl9p
+bml0X3ZjcHUgKElPQ3RsIG9uIC9kZXYva3ZtKSBmYWlsZWQsIGd1ZXN0IG5vdCBzdXBwb3J0ZWQu
+DQoNCklzIHRoZXJlIGFueSB3YXkgdG8gZW11bGF0ZSB2ZXhwcmVzcy1hOSAgd2l0aCAgLWVuYWJs
+ZS1rdm0gICBvbiBxZW11ID8NCg0KUmVnYXJkcywNClJhdmluZHJhIFNhbmRl
 
 
-On 2016/4/28 9:50, RAVINDRA KUMAR SANDE wrote:
-> 
-> What I did  :
-> 1) Just for investigation, I took a ARMv8 ( OdroidC2 ) board
-> 2)  I compiled Linux 3.14 with KVM support for this ARMv8 ( OdroidC2 )
-> board, with modification replacing meson_timer by arm timer in its dts
-> file.
-> Why Linux 3.14 : I took Linux 3.14 because display drivers for this
-> board are officially for this version; and I am interested in seeing
-> some Linux guest booting with display on.
-> 3)  I see from boot log of  that KVM is initialized successfully, and I
-> can see /dev/kvm node.
-> 4) I built latest Qemu with --enable-kvm on this board natively.
-> 
-> What I find :
-> 1) running "qemu-system-arm  -enable-kvm   -machine vexpress-a9 ...."
-> gives error :  no accelerator found
-> 2) running "qemu-system-aarch64 -enable-kvm  -machine vexpress-a9 ...."
-> gives error : kmv_init_vcpu (IOCtl on /dev/kvm) failed, guest not supported
-> ( I experimented some modifications as well to overcome above error,
-> such as replacing value assigned to cpu->kvm_target etc, but IOCtl call
-> is failing)
-> 
-> Query:
-> 1) Does Arm64 Linux not enable KVM support for Arm32 guest ?
-> 2) Can qemu-system-arm not use the KVM feature on Arm64 host ?
-> 3) Can qemu-system-aarch64 not use KVM feature for Arm32 guest ?
-> 
-You can use below command to boot a ARM32 guest on ARM64：
-
-qemu-system-aarch64 -enable-kvm -machine virt,kernel_irqchip=on -cpu
-host,aarch64=off ....
-
--- 
-Shannon
