@@ -1,23 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v2 46/54] KVM: arm/arm64: vgic-new: Add userland GIC CPU
- interface access
-Date: Thu, 28 Apr 2016 17:46:05 +0100
-Message-ID: <1461861973-26464-47-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v2 53/54] KVM: arm/arm64: vgic-new: implement mapped IRQ
+ handling
+Date: Thu, 28 Apr 2016 17:46:12 +0100
+Message-ID: <1461861973-26464-54-git-send-email-andre.przywara@arm.com>
 References: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CBE1B49B98
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E398C49BBE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id QbvPZr0DtxU6 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Apr 2016 12:44:43 -0400 (EDT)
+ with ESMTP id 4INK6Z6+35xW for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Apr 2016 12:44:55 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C5B8449B3D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:43 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E4D7049C15
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:53 -0400 (EDT)
 In-Reply-To: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,112 +32,106 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Using the VMCR accessors we provide access to GIC CPU interface state
-to userland by wiring it up to the existing userland interface.
+We now store the mapped hardware IRQ number in our struct, so we
+don't need the irq_phys_map for the new VGIC.
+Implement the hardware IRQ mapping on top of the reworked arch
+timer interface.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-kvm-device.c | 72 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 71 insertions(+), 1 deletion(-)
+Changelog RFC..v1:
+- adapt to new arch_timer mapped IRQ interface
+- implement inject_mapped_irq() as a macro (since it is identical to
+  the "un-mapped" IRQ implementation)
 
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index 38260ae..eaf5c1d 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -17,8 +17,11 @@
- #include <kvm/vgic/vgic.h>
- #include <linux/uaccess.h>
- #include <asm/kvm_mmu.h>
-+#include <linux/irqchip/arm-gic.h>
- #include "vgic.h"
+Changelog v1 .. v2:
+- replace inject_mapped_irq() macro with a separate implementation,
+  which only allows mapped IRQs to be injected via this interface
+
+ include/kvm/vgic/vgic.h  |  5 +++++
+ virt/kvm/arm/vgic/vgic.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 55 insertions(+)
+
+diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+index 07c3011..64aca0c 100644
+--- a/include/kvm/vgic/vgic.h
++++ b/include/kvm/vgic/vgic.h
+@@ -213,6 +213,11 @@ int kvm_vgic_hyp_init(void);
  
-+#define GICC_ARCH_VERSION_V2		0x2
-+
- /* common helpers */
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 			bool level);
++int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid, unsigned int intid,
++			       bool level);
++int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq);
++int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq);
++bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
  
- static int vgic_ioaddr_overlap(struct kvm *kvm)
-@@ -252,6 +255,69 @@ void kvm_register_vgic_device(unsigned long type)
- 	}
+ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+ 
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 970e19a..5f21742 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -310,6 +310,44 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 	return vgic_update_irq_pending(kvm, cpuid, intid, level, false);
  }
  
-+static u32 vgic_read_vcpuif(struct kvm_vcpu *vcpu, int offset)
++int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid, unsigned int intid,
++			       bool level)
 +{
-+	struct vgic_vmcr vmcr;
-+	u32 *field;
-+
-+	switch (offset) {
-+	case GIC_CPU_CTRL:
-+		field = &vmcr.ctlr;
-+		break;
-+	case GIC_CPU_PRIMASK:
-+		field = &vmcr.pmr;
-+		break;
-+	case GIC_CPU_BINPOINT:
-+		field = &vmcr.bpr;
-+		break;
-+	case GIC_CPU_ALIAS_BINPOINT:
-+		field = &vmcr.abpr;
-+		break;
-+	case GIC_CPU_IDENT:
-+		return (PRODUCT_ID_KVM << 20) |
-+		       (GICC_ARCH_VERSION_V2 << 16) |
-+		       (IMPLEMENTER_ARM << 0);
-+	default:
-+		return 0;
-+	}
-+
-+	vgic_get_vmcr(vcpu, &vmcr);
-+
-+	return *field;
++	return vgic_update_irq_pending(kvm, cpuid, intid, level, true);
 +}
 +
-+static bool vgic_write_vcpuif(struct kvm_vcpu *vcpu, int offset, u32 value)
++int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq)
 +{
-+	struct vgic_vmcr vmcr;
-+	u32 *field;
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
 +
-+	switch (offset) {
-+	case GIC_CPU_CTRL:
-+		field = &vmcr.ctlr;
-+		break;
-+	case GIC_CPU_PRIMASK:
-+		field = &vmcr.pmr;
-+		break;
-+	case GIC_CPU_BINPOINT:
-+		field = &vmcr.bpr;
-+		break;
-+	case GIC_CPU_ALIAS_BINPOINT:
-+		field = &vmcr.abpr;
-+		break;
-+	default:
-+		return false;
-+	}
++	BUG_ON(!irq);
 +
-+	vgic_get_vmcr(vcpu, &vmcr);
-+	if (*field == value)
-+		return false;
++	spin_lock(&irq->irq_lock);
 +
-+	*field = value;
-+	vgic_set_vmcr(vcpu, &vmcr);
++	irq->hw = true;
++	irq->hwintid = phys_irq;
 +
-+	return true;
++	spin_unlock(&irq->irq_lock);
++
++	return 0;
 +}
 +
- /** vgic_attr_regs_access: allows user space to read/write VGIC registers
++int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
++{
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
++
++	BUG_ON(!irq);
++
++	spin_lock(&irq->irq_lock);
++
++	irq->hw = false;
++	irq->hwintid = 0;
++
++	spin_unlock(&irq->irq_lock);
++
++	return 0;
++}
++
+ /**
+  * vgic_prune_ap_list - Remove non-relevant interrupts from the list
   *
-  * @dev: kvm device handle
-@@ -300,7 +366,11 @@ static int vgic_attr_regs_access(struct kvm_device *dev,
- 
- 	switch (attr->group) {
- 	case KVM_DEV_ARM_VGIC_GRP_CPU_REGS:
--		ret = -EINVAL;
-+		ret = 0;
-+		if (is_write)
-+			vgic_write_vcpuif(vcpu, addr, *reg);
-+		else
-+			*reg = vgic_read_vcpuif(vcpu, addr);
- 		break;
- 	case KVM_DEV_ARM_VGIC_GRP_DIST_REGS:
- 		ret = vgic_v2_dist_uaccess(vcpu, is_write, addr, reg);
+@@ -579,3 +617,15 @@ void vgic_kick_vcpus(struct kvm *kvm)
+ 			kvm_vcpu_kick(vcpu);
+ 	}
+ }
++
++bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
++{
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
++	bool map_is_active;
++
++	spin_lock(&irq->irq_lock);
++	map_is_active = irq->hw && irq->active;
++	spin_unlock(&irq->irq_lock);
++
++	return map_is_active;
++}
 -- 
 2.7.3
