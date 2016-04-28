@@ -1,7 +1,7 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v2 36/54] KVM: arm/arm64: vgic-new: Add GICv3 IROUTER register handlers
-Date: Thu, 28 Apr 2016 17:45:55 +0100
-Message-ID: <1461861973-26464-37-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v2 32/54] KVM: arm/arm64: vgic-new: Add GICv3 MMIO handling framework
+Date: Thu, 28 Apr 2016 17:45:51 +0100
+Message-ID: <1461861973-26464-33-git-send-email-andre.przywara@arm.com>
 References: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
 Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
@@ -10,112 +10,275 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Since GICv3 supports much more than the 8 CPUs the GICv2 ITARGETSR
-register can handle, the new IROUTER register covers the whole range
-of possible target (V)CPUs by using the same MPIDR that the cores
-report themselves.
-In addition to translating this MPIDR into a vcpu pointer we store
-the originally written value as well. The architecture allows to
-write any values into the register, which must be read back as written.
-
-Since we don't support affinity level 3, we don't need to take care
-about the upper word of this 64-bit register, which simplifies the
-handling a bit.
+Create a new file called vgic-mmio-v3.c and describe the GICv3
+distributor and redistributor registers there.
+This adds a special macro to deal with the split of SGI/PPI in the
+redistributor and SPIs in the distributor, which allows us to reuse
+the existing GICv2 handlers for those registers which are compatible.
+Also we provide a function to deal with the registration of the two
+separate redistributor frames per VCPU.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
 Changelog RFC..v1:
-- fold in and simplify vgic_v3_irq_change_affinity
+- adapt to new MMIO registration approach:
+  register one device for the distributor and two for each VCPU
+- implement special handling for private interrupts
+- remove empty stub functions
+- make IGROUPR return RAO
 
 Changelog v1 .. v2:
-- adapt to new MMIO framework
+- adapt to new framework, introduce vgic-mmio-v3.c
+- remove userland register access functions (for now)
+- precompute .len when describing a VGIC register
+- add missed pointer incrementation on registering redist regions
+- replace _nyi stub functions with raz/wi versions
 
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 65 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 64 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 191 +++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio.c    |   5 +
+ virt/kvm/arm/vgic/vgic-mmio.h    |   2 +
+ virt/kvm/arm/vgic/vgic.h         |   3 +
+ 4 files changed, 201 insertions(+)
+ create mode 100644 virt/kvm/arm/vgic/vgic-mmio-v3.c
 
 diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index e6f2607..09c0324 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
+new file mode 100644
+index 0000000..c6765d4
+--- /dev/null
 +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -86,6 +86,69 @@ static u32 compress_mpidr(unsigned long mpidr)
- 	return ret;
- }
+@@ -0,0 +1,191 @@
++/*
++ * VGICv3 MMIO handling functions
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++
++#include <linux/irqchip/arm-gic-v3.h>
++#include <linux/kvm.h>
++#include <linux/kvm_host.h>
++#include <kvm/iodev.h>
++#include <kvm/vgic/vgic.h>
++
++#include <asm/kvm_emulate.h>
++
++#include "vgic.h"
++#include "vgic-mmio.h"
++
++/*
++ * The GICv3 per-IRQ registers are split to control PPIs and SGIs in the
++ * redistributors, while SPIs are covered by registers in the distributor
++ * block. Trying to set private IRQs in this block gets ignored.
++ * We take some special care here to fix the calculation of the register
++ * offset.
++ */
++#define REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(off, read_ops, write_ops, bpi) \
++	{								\
++		.reg_offset = off,					\
++		.bits_per_irq = bpi,					\
++		.len = (bpi * VGIC_NR_PRIVATE_IRQS) / 8,		\
++		.read = vgic_mmio_read_raz,				\
++		.write = vgic_mmio_write_wi,				\
++	}, {								\
++		.reg_offset = off + (bpi * VGIC_NR_PRIVATE_IRQS) / 8,	\
++		.bits_per_irq = bpi,					\
++		.len = (bpi * (1024 - VGIC_NR_PRIVATE_IRQS)) / 8,	\
++		.read = read_ops,					\
++		.write = write_ops,					\
++	}
++
++static const struct vgic_register_region vgic_v3_dist_registers[] = {
++	REGISTER_DESC_WITH_LENGTH(GICD_CTLR,
++		vgic_mmio_read_raz, vgic_mmio_write_wi, 16),
++	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGROUPR,
++		vgic_mmio_read_rao, vgic_mmio_write_wi, 1),
++	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISENABLER,
++		vgic_mmio_read_enable, vgic_mmio_write_senable, 1),
++	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICENABLER,
++		vgic_mmio_read_enable, vgic_mmio_write_cenable, 1),
++	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISPENDR,
++		vgic_mmio_read_pending, vgic_mmio_write_spending, 1),
++	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICPENDR,
++		vgic_mmio_read_pending, vgic_mmio_write_cpending, 1),
++	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISACTIVER,
++		vgic_mmio_read_active, vgic_mmio_write_sactive, 1),
++	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICACTIVER,
++		vgic_mmio_read_active, vgic_mmio_write_cactive, 1),
++	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IPRIORITYR,
++		vgic_mmio_read_priority, vgic_mmio_write_priority, 8),
++	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ITARGETSR,
++		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
++	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICFGR,
++		vgic_mmio_read_config, vgic_mmio_write_config, 2),
++	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGRPMODR,
++		vgic_mmio_read_raz, vgic_mmio_write_wi, 1),
++	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IROUTER,
++		vgic_mmio_read_raz, vgic_mmio_write_wi, 64),
++	REGISTER_DESC_WITH_LENGTH(GICD_IDREGS,
++		vgic_mmio_read_raz, vgic_mmio_write_wi, 48),
++};
++
++static const struct vgic_register_region vgic_v3_redist_registers[] = {
++	REGISTER_DESC_WITH_LENGTH(GICR_CTLR,
++		vgic_mmio_read_raz, vgic_mmio_write_wi, 4),
++	REGISTER_DESC_WITH_LENGTH(GICR_IIDR,
++		vgic_mmio_read_raz, vgic_mmio_write_wi, 4),
++	REGISTER_DESC_WITH_LENGTH(GICR_TYPER,
++		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
++	REGISTER_DESC_WITH_LENGTH(GICR_PROPBASER,
++		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
++	REGISTER_DESC_WITH_LENGTH(GICR_PENDBASER,
++		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
++	REGISTER_DESC_WITH_LENGTH(GICR_IDREGS,
++		vgic_mmio_read_raz, vgic_mmio_write_wi, 48),
++};
++
++static const struct vgic_register_region vgic_v3_private_registers[] = {
++	REGISTER_DESC_WITH_LENGTH(GICR_IGROUPR0,
++		vgic_mmio_read_rao, vgic_mmio_write_wi, 4),
++	REGISTER_DESC_WITH_LENGTH(GICR_ISENABLER0,
++		vgic_mmio_read_enable, vgic_mmio_write_senable, 4),
++	REGISTER_DESC_WITH_LENGTH(GICR_ICENABLER0,
++		vgic_mmio_read_enable, vgic_mmio_write_cenable, 4),
++	REGISTER_DESC_WITH_LENGTH(GICR_ISPENDR0,
++		vgic_mmio_read_pending, vgic_mmio_write_spending, 4),
++	REGISTER_DESC_WITH_LENGTH(GICR_ICPENDR0,
++		vgic_mmio_read_pending, vgic_mmio_write_cpending, 4),
++	REGISTER_DESC_WITH_LENGTH(GICR_ISACTIVER0,
++		vgic_mmio_read_active, vgic_mmio_write_sactive, 4),
++	REGISTER_DESC_WITH_LENGTH(GICR_ICACTIVER0,
++		vgic_mmio_read_active, vgic_mmio_write_cactive, 4),
++	REGISTER_DESC_WITH_LENGTH(GICR_IPRIORITYR0,
++		vgic_mmio_read_priority, vgic_mmio_write_priority, 32),
++	REGISTER_DESC_WITH_LENGTH(GICR_ICFGR0,
++		vgic_mmio_read_config, vgic_mmio_write_config, 8),
++	REGISTER_DESC_WITH_LENGTH(GICR_IGRPMODR0,
++		vgic_mmio_read_raz, vgic_mmio_write_wi, 4),
++	REGISTER_DESC_WITH_LENGTH(GICR_NSACR,
++		vgic_mmio_read_raz, vgic_mmio_write_wi, 4),
++};
++
++unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev)
++{
++	dev->regions = vgic_v3_dist_registers;
++	dev->nr_regions = ARRAY_SIZE(vgic_v3_dist_registers);
++
++	kvm_iodevice_init(&dev->dev, &kvm_io_gic_ops);
++
++	return SZ_64K;
++}
++
++int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t redist_base_address)
++{
++	int nr_vcpus = atomic_read(&kvm->online_vcpus);
++	struct kvm_vcpu *vcpu;
++	struct vgic_io_device *devices, *device;
++	int c, ret = 0;
++
++	devices = kmalloc(sizeof(struct vgic_io_device) * nr_vcpus * 2,
++			  GFP_KERNEL);
++	if (!devices)
++		return -ENOMEM;
++
++	device = devices;
++	kvm_for_each_vcpu(c, vcpu, kvm) {
++		kvm_iodevice_init(&device->dev, &kvm_io_gic_ops);
++		device->base_addr = redist_base_address;
++		device->regions = vgic_v3_redist_registers;
++		device->nr_regions = ARRAY_SIZE(vgic_v3_redist_registers);
++		device->redist_vcpu = vcpu;
++
++		mutex_lock(&kvm->slots_lock);
++		ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS,
++					      redist_base_address,
++					      SZ_64K, &device->dev);
++		mutex_unlock(&kvm->slots_lock);
++
++		if (ret)
++			break;
++
++		device++;
++		kvm_iodevice_init(&device->dev, &kvm_io_gic_ops);
++		device->base_addr = redist_base_address + SZ_64K;
++		device->regions = vgic_v3_private_registers;
++		device->nr_regions = ARRAY_SIZE(vgic_v3_private_registers);
++		device->redist_vcpu = vcpu;
++
++		mutex_lock(&kvm->slots_lock);
++		ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS,
++					      redist_base_address + SZ_64K,
++					      SZ_64K, &device->dev);
++		mutex_unlock(&kvm->slots_lock);
++		if (ret) {
++			kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
++						  &devices[c * 2].dev);
++			break;
++		}
++		device++;
++		redist_base_address += 2 * SZ_64K;
++	}
++
++	if (ret) {
++		for (c--; c >= 0; c--) {
++			kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
++						  &devices[c * 2].dev);
++			kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
++						  &devices[c * 2 + 1].dev);
++		}
++		kfree(devices);
++	} else {
++		kvm->arch.vgic.redist_iodevs = devices;
++	}
++
++	return ret;
++}
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
+index bf4278c..80d977e 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.c
++++ b/virt/kvm/arm/vgic/vgic-mmio.c
+@@ -502,6 +502,11 @@ int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
+ 	case VGIC_V2:
+ 		len = vgic_v2_init_dist_iodev(io_device);
+ 		break;
++#ifdef CONFIG_KVM_ARM_VGIC_V3
++	case VGIC_V3:
++		len = vgic_v3_init_dist_iodev(io_device);
++		break;
++#endif
+ 	default:
+ 		BUG_ON(1);
+ 	}
+diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
+index 884eb71..3585ac6 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio.h
++++ b/virt/kvm/arm/vgic/vgic-mmio.h
+@@ -123,4 +123,6 @@ void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
  
-+static unsigned long decompress_mpidr(u32 value)
-+{
-+	unsigned long mpidr;
+ unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
+ 
++unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev);
 +
-+	mpidr  = ((value >>  0) & 0xFF) << MPIDR_LEVEL_SHIFT(0);
-+	mpidr |= ((value >>  8) & 0xFF) << MPIDR_LEVEL_SHIFT(1);
-+	mpidr |= ((value >> 16) & 0xFF) << MPIDR_LEVEL_SHIFT(2);
-+	mpidr |= (u64)((value >> 24) & 0xFF) << MPIDR_LEVEL_SHIFT(3);
-+
-+	return mpidr;
-+}
-+
-+static unsigned long vgic_mmio_read_irouter(struct kvm_vcpu *vcpu,
-+					    gpa_t addr, unsigned int len)
-+{
-+	int intid = (addr & 0x1fff) / 8;
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid);
-+	unsigned long mpidr;
-+
-+	if (!irq)
-+		return 0;
-+
-+	mpidr = decompress_mpidr(irq->mpidr);
-+	return extract_bytes(mpidr, addr & 7, len);
-+}
-+
-+static void vgic_mmio_write_irouter(struct kvm_vcpu *vcpu,
-+				    gpa_t addr, unsigned int len,
-+				    unsigned long val)
-+{
-+	int intid = (addr & 0x1fff) / 8;
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid);
-+	unsigned long mask = 0xffffffff;	/* upper word is WI */
-+	u64 mpidr;
-+
-+	if (!irq)
-+		return;
-+
-+	/*
-+	 * There are only two supported options:
-+	 * (1) aligned 64-bit access
-+	 * (2) aligned 32-bit access
-+	 *
-+	 * TODO: make this check generic and move it to dispatch_...()
-+	 */
-+	if (len != 4 && len != 8)
-+		return;
-+
-+
-+	/* The upper word is WI for us since we don't implement Aff3. */
-+	if (addr & 4)
-+		return;
-+
-+	spin_lock(&irq->irq_lock);
-+
-+	mpidr = decompress_mpidr(irq->mpidr);
-+	mpidr = (mpidr & ~mask) | (val & mask);
-+	irq->mpidr = compress_mpidr(mpidr);
-+	irq->target_vcpu = kvm_mpidr_to_vcpu(vcpu->kvm, mpidr);
-+
-+	spin_unlock(&irq->irq_lock);
-+}
-+
- static unsigned long vgic_mmio_read_v3r_typer(struct kvm_vcpu *vcpu,
- 					      gpa_t addr, unsigned int len)
+ #endif
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 1ab7d97..6fe07df 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -61,6 +61,9 @@ static inline void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr)
+ static inline void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
  {
-@@ -174,7 +237,7 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
- 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGRPMODR,
- 		vgic_mmio_read_raz, vgic_mmio_write_wi, 1),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IROUTER,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 64),
-+		vgic_mmio_read_irouter, vgic_mmio_write_irouter, 64),
- 	REGISTER_DESC_WITH_LENGTH(GICD_IDREGS,
- 		vgic_mmio_read_v3_idregs, vgic_mmio_write_wi, 48),
- };
+ }
++
+ #endif
+ 
++void kvm_register_vgic_device(unsigned long type);
++
+ #endif
 -- 
 2.7.3
 
