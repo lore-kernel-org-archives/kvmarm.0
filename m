@@ -1,23 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v2 03/54] KVM: arm/arm64: vgic: avoid map in
- kvm_vgic_map_is_active()
-Date: Thu, 28 Apr 2016 17:45:22 +0100
-Message-ID: <1461861973-26464-4-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v2 10/54] KVM: arm/arm64: Export mmio_read/write_bus
+Date: Thu, 28 Apr 2016 17:45:29 +0100
+Message-ID: <1461861973-26464-11-git-send-email-andre.przywara@arm.com>
 References: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F3B849B3F
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:43:45 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BB6C349B37
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:43:55 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id yGAlWy2yeIeG for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Apr 2016 12:43:44 -0400 (EDT)
+ with ESMTP id TM0OtLSbySEP for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Apr 2016 12:43:53 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C8BB4998D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:43:41 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B8B4649B46
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:43:51 -0400 (EDT)
 In-Reply-To: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,76 +31,96 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-For getting the active state of a mapped IRQ, we actually only need
-the virtual IRQ number, not the pointer to the mapping entry.
-Pass the virtual IRQ number from the arch timer to the VGIC directly.
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
+Rename mmio_{read,write}_bus to kvm_mmio_{read,write}_bus and export
+them out of mmio.c.
+This will be needed later for the new VGIC implementation.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Eric Auger <eric.auger@linaro.org>
 ---
-Changelog v1 .. v2:
-- rewrap phys_active determination to fit in 80 characters
+ arch/arm/include/asm/kvm_mmio.h   |  3 +++
+ arch/arm/kvm/mmio.c               | 10 +++++-----
+ arch/arm64/include/asm/kvm_mmio.h |  3 +++
+ 3 files changed, 11 insertions(+), 5 deletions(-)
 
- include/kvm/arm_vgic.h    | 2 +-
- virt/kvm/arm/arch_timer.c | 6 ++----
- virt/kvm/arm/vgic.c       | 6 +++---
- 3 files changed, 6 insertions(+), 8 deletions(-)
-
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index c4574da..5a34adc 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -347,7 +347,7 @@ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
- struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
- 					   int virt_irq, int irq);
- int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
--bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, struct irq_phys_map *map);
-+bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+diff --git a/arch/arm/include/asm/kvm_mmio.h b/arch/arm/include/asm/kvm_mmio.h
+index d8e90c8..f3a7de7 100644
+--- a/arch/arm/include/asm/kvm_mmio.h
++++ b/arch/arm/include/asm/kvm_mmio.h
+@@ -28,6 +28,9 @@ struct kvm_decode {
+ 	bool sign_extend;
+ };
  
- #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
- #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
-diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-index ceec146..f601471 100644
---- a/virt/kvm/arm/arch_timer.c
-+++ b/virt/kvm/arm/arch_timer.c
-@@ -275,10 +275,8 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
- 	* to ensure that hardware interrupts from the timer triggers a guest
- 	* exit.
- 	*/
--	if (timer->irq.level || kvm_vgic_map_is_active(vcpu, timer->map))
--		phys_active = true;
--	else
--		phys_active = false;
-+	phys_active = timer->irq.level ||
-+			kvm_vgic_map_is_active(vcpu, timer->map->virt_irq);
++void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
++unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
++
+ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		 phys_addr_t fault_ipa);
+diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
+index 0158e9e..10f80a6 100644
+--- a/arch/arm/kvm/mmio.c
++++ b/arch/arm/kvm/mmio.c
+@@ -23,7 +23,7 @@
  
- 	/*
- 	 * We want to avoid hitting the (re)distributor as much as
-diff --git a/virt/kvm/arm/vgic.c b/virt/kvm/arm/vgic.c
-index 9937d41..6911327 100644
---- a/virt/kvm/arm/vgic.c
-+++ b/virt/kvm/arm/vgic.c
-@@ -1103,18 +1103,18 @@ static bool dist_active_irq(struct kvm_vcpu *vcpu)
- 	return test_bit(vcpu->vcpu_id, dist->irq_active_on_cpu);
- }
+ #include "trace.h"
  
--bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, struct irq_phys_map *map)
-+bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
+-static void mmio_write_buf(char *buf, unsigned int len, unsigned long data)
++void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data)
  {
- 	int i;
- 
- 	for (i = 0; i < vcpu->arch.vgic_cpu.nr_lr; i++) {
- 		struct vgic_lr vlr = vgic_get_lr(vcpu, i);
- 
--		if (vlr.irq == map->virt_irq && vlr.state & LR_STATE_ACTIVE)
-+		if (vlr.irq == virt_irq && vlr.state & LR_STATE_ACTIVE)
- 			return true;
- 	}
- 
--	return vgic_irq_is_active(vcpu, map->virt_irq);
-+	return vgic_irq_is_active(vcpu, virt_irq);
+ 	void *datap = NULL;
+ 	union {
+@@ -55,7 +55,7 @@ static void mmio_write_buf(char *buf, unsigned int len, unsigned long data)
+ 	memcpy(buf, datap, len);
  }
  
- /*
+-static unsigned long mmio_read_buf(char *buf, unsigned int len)
++unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len)
+ {
+ 	unsigned long data = 0;
+ 	union {
+@@ -66,7 +66,7 @@ static unsigned long mmio_read_buf(char *buf, unsigned int len)
+ 
+ 	switch (len) {
+ 	case 1:
+-		data = buf[0];
++		data = *(u8 *)buf;
+ 		break;
+ 	case 2:
+ 		memcpy(&tmp.hword, buf, len);
+@@ -103,7 +103,7 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		if (len > sizeof(unsigned long))
+ 			return -EINVAL;
+ 
+-		data = mmio_read_buf(run->mmio.data, len);
++		data = kvm_mmio_read_buf(run->mmio.data, len);
+ 
+ 		if (vcpu->arch.mmio_decode.sign_extend &&
+ 		    len < sizeof(unsigned long)) {
+@@ -189,7 +189,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 					       len);
+ 
+ 		trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, len, fault_ipa, data);
+-		mmio_write_buf(data_buf, len, data);
++		kvm_mmio_write_buf(data_buf, len, data);
+ 
+ 		ret = kvm_io_bus_write(vcpu, KVM_MMIO_BUS, fault_ipa, len,
+ 				       data_buf);
+diff --git a/arch/arm64/include/asm/kvm_mmio.h b/arch/arm64/include/asm/kvm_mmio.h
+index fe612a9..75ea420 100644
+--- a/arch/arm64/include/asm/kvm_mmio.h
++++ b/arch/arm64/include/asm/kvm_mmio.h
+@@ -30,6 +30,9 @@ struct kvm_decode {
+ 	bool sign_extend;
+ };
+ 
++void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
++unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
++
+ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		 phys_addr_t fault_ipa);
 -- 
 2.7.3
