@@ -1,111 +1,107 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v2 33/54] KVM: arm/arm64: vgic-new: Add GICv3 CTLR, IIDR, TYPER handlers
-Date: Thu, 28 Apr 2016 17:45:52 +0100
-Message-ID: <1461861973-26464-34-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v2 22/54] KVM: arm/arm64: vgic-new: Export register access
+ interface
+Date: Thu, 28 Apr 2016 17:45:41 +0100
+Message-ID: <1461861973-26464-23-git-send-email-andre.przywara@arm.com>
 References: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 6B28349B9C
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:11 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id nfeiYig0xpvE for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Apr 2016 12:44:10 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1DCA549BAB
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:09 -0400 (EDT)
 In-Reply-To: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-As in the GICv2 emulation we handle those three registers in one
-function.
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
+Userland can access the emulated GIC to save and restore its state
+for initialization or migration purposes.
+The kvm_io_bus API requires an absolute gpa, which does not fit the
+KVM_DEV_ARM_VGIC_GRP_DIST_REGS user API, that only provides relative
+offsets. So we provide a wrapper to plug into our MMIO framework and
+find the respective register handler.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
-Changelog RFC..v1:
-- kick VCPUs if distributor gets enabled
-
 Changelog v1 .. v2:
-- rewrite write handler to use switch statement
+- adapt to new MMIO framework
+- handle endianess explicitly
 
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 50 +++++++++++++++++++++++++++++++++++++++-
+ virt/kvm/arm/vgic/vgic-mmio-v2.c | 30 ++++++++++++++++++++++++++++++
  virt/kvm/arm/vgic/vgic.h         |  2 ++
- 2 files changed, 51 insertions(+), 1 deletion(-)
+ 2 files changed, 32 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index c6765d4..64c0a8f 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -22,6 +22,54 @@
- #include "vgic.h"
- #include "vgic-mmio.h"
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index afee778..02814a0 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -60,3 +60,33 @@ unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev)
  
-+static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
-+					    gpa_t addr, unsigned int len)
-+{
-+	u32 value = 0;
+ 	return SZ_4K;
+ }
 +
-+	switch (addr & 0x0c) {
-+	case GICD_CTLR:
-+		if (vcpu->kvm->arch.vgic.enabled)
-+			value |= GICD_CTLR_ENABLE_SS_G1;
-+		value |= GICD_CTLR_ARE_NS | GICD_CTLR_DS;
-+		break;
-+	case GICD_TYPER:
-+		value = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
-+		value = (value >> 5) - 1;
-+		value |= (INTERRUPT_ID_BITS_SPIS - 1) << 19;
-+		break;
-+	case GICD_IIDR:
-+		value = (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
-+		break;
-+	default:
-+		return 0;
++/*
++ * When userland tries to access the VGIC register handlers, we need to
++ * create a usable struct vgic_io_device to be passed to the handlers and we
++ * have to set up a buffer similar to what would have happened if a guest MMIO
++ * access occurred, including doing endian conversions on BE systems.
++ */
++int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
++			int offset, u32 *val)
++{
++	unsigned int len = 4;
++	u8 buf[4];
++	int ret;
++
++	struct vgic_io_device dev = {
++		.regions = vgic_v2_dist_registers,
++		.nr_regions = ARRAY_SIZE(vgic_v2_dist_registers),
++	};
++
++	if (is_write) {
++		vgic_data_host_to_mmio_bus(buf, len, *val);
++		ret = kvm_io_gic_ops.write(vcpu, &dev.dev, offset, len, buf);
++	} else {
++		ret = kvm_io_gic_ops.read(vcpu, &dev.dev, offset, len, buf);
++		if (!ret)
++			*val = vgic_data_mmio_bus_to_host(buf, len);
 +	}
 +
-+	return extract_bytes(value, addr & 3, len);
++	return ret;
 +}
-+
-+static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
-+				    gpa_t addr, unsigned int len,
-+				    unsigned long val)
-+{
-+	switch (addr & 0x0c) {
-+	case GICD_CTLR:
-+		if (!(addr & 1)) {
-+			struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-+			bool was_enabled = dist->enabled;
-+
-+			dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
-+
-+			if (!was_enabled && dist->enabled)
-+				vgic_kick_vcpus(vcpu->kvm);
-+		}
-+		break;
-+	case GICD_TYPER:
-+	case GICD_IIDR:
-+		return;
-+	}
-+}
-+
- /*
-  * The GICv3 per-IRQ registers are split to control PPIs and SGIs in the
-  * redistributors, while SPIs are covered by registers in the distributor
-@@ -46,7 +94,7 @@
- 
- static const struct vgic_register_region vgic_v3_dist_registers[] = {
- 	REGISTER_DESC_WITH_LENGTH(GICD_CTLR,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 16),
-+		vgic_mmio_read_v3_misc, vgic_mmio_write_v3_misc, 16),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGROUPR,
- 		vgic_mmio_read_rao, vgic_mmio_write_wi, 1),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISENABLER,
 diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 6fe07df..86e9830 100644
+index 0c92cda..008588b 100644
 --- a/virt/kvm/arm/vgic/vgic.h
 +++ b/virt/kvm/arm/vgic/vgic.h
-@@ -19,6 +19,8 @@
- #define PRODUCT_ID_KVM		0x4b	/* ASCII code K */
- #define IMPLEMENTER_ARM		0x43b
+@@ -28,6 +28,8 @@ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
+ void vgic_v2_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+ void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr);
+ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
++int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
++			 int offset, u32 *val);
  
-+#define INTERRUPT_ID_BITS_SPIS	10
-+
- #define vgic_irq_is_sgi(intid) ((intid) < VGIC_NR_SGIS)
- 
- struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+ #ifdef CONFIG_KVM_ARM_VGIC_V3
+ void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu);
 -- 
 2.7.3
-
