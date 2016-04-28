@@ -1,23 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v2 29/54] KVM: arm/arm64: vgic-new: Add TARGET registers
- handlers
-Date: Thu, 28 Apr 2016 17:45:48 +0100
-Message-ID: <1461861973-26464-30-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v2 38/54] KVM: arm/arm64: vgic-new: vgic_kvm_device: KVM
+ device ops registration
+Date: Thu, 28 Apr 2016 17:45:57 +0100
+Message-ID: <1461861973-26464-39-git-send-email-andre.przywara@arm.com>
 References: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 2B84449BC8
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:20 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F6B549BE6
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:33 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id TMAc43irCNAt for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Apr 2016 12:44:19 -0400 (EDT)
+ with ESMTP id GFYaC5Ys-TUh for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Apr 2016 12:44:32 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4129949B9D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 5069749BCA
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:32 -0400 (EDT)
 In-Reply-To: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,85 +32,136 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The target register handlers are v2 emulation specific, so their
-implementation lives entirely in vgic-mmio-v2.c.
-We copy the old VGIC behaviour of assigning an IRQ to the first VCPU
-set in the target mask instead of making it possibly pending on
-multiple VCPUs.
+From: Eric Auger <eric.auger@linaro.org>
 
+This patch introduces the skeleton for the KVM device operations
+associated to KVM_DEV_TYPE_ARM_VGIC_V2 and KVM_DEV_TYPE_ARM_VGIC_V3.
+
+At that stage kvm_vgic_create is stubbed.
+
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
-Changelog RFC..v1:
-- remove runtime VCPU determination from this v2-only register
-- fold in implementation of vgic_v2_irq_change_affinity()
-- replace ffs() with __ffs()
-
 Changelog v1 .. v2:
-- adapt to new MMIO framework
+- rename vgic_kvm_device.c to vgic-kvm-device.c
 
- virt/kvm/arm/vgic/vgic-mmio-v2.c | 43 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 42 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-kvm-device.c | 108 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 108 insertions(+)
+ create mode 100644 virt/kvm/arm/vgic/vgic-kvm-device.c
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index 008a466..7364fd7 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -66,6 +66,47 @@ static void vgic_mmio_write_v2_misc(struct kvm_vcpu *vcpu,
- 	}
- }
- 
-+static unsigned long vgic_mmio_read_target(struct kvm_vcpu *vcpu,
-+					   gpa_t addr, unsigned int len)
+diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+new file mode 100644
+index 0000000..7c665f9
+--- /dev/null
++++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+@@ -0,0 +1,108 @@
++/*
++ * VGIC: KVM DEVICE API
++ *
++ * Copyright (C) 2015 ARM Ltd.
++ * Author: Marc Zyngier <marc.zyngier@arm.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ */
++#include <linux/kvm_host.h>
++#include <kvm/vgic/vgic.h>
++
++/* common helpers */
++
++static int vgic_create(struct kvm_device *dev, u32 type)
 +{
-+	u32 intid = addr & 0x3ff;
-+	int i;
-+	u64 val = 0;
-+
-+	for (i = 0; i < len; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		val |= (u64)irq->targets << (i * 8);
-+	}
-+
-+	return val;
++	return kvm_vgic_create(dev->kvm, type);
 +}
 +
-+static void vgic_mmio_write_target(struct kvm_vcpu *vcpu,
-+				   gpa_t addr, unsigned int len,
-+				   unsigned long val)
++static void vgic_destroy(struct kvm_device *dev)
 +{
-+	u32 intid = addr & 0x3ff;
-+	int i;
++	kfree(dev);
++}
 +
-+	/* GICD_ITARGETSR[0-7] are read-only */
-+	if (intid < VGIC_NR_PRIVATE_IRQS)
-+		return;
-+
-+	for (i = 0; i < len; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid + i);
-+		int target;
-+
-+		spin_lock(&irq->irq_lock);
-+
-+		irq->targets = (val >> (i * 8)) & 0xff;
-+		target = irq->targets ? __ffs(irq->targets) : 0;
-+		irq->target_vcpu = kvm_get_vcpu(vcpu->kvm, target);
-+
-+		spin_unlock(&irq->irq_lock);
++void kvm_register_vgic_device(unsigned long type)
++{
++	switch (type) {
++	case KVM_DEV_TYPE_ARM_VGIC_V2:
++		kvm_register_device_ops(&kvm_arm_vgic_v2_ops,
++					KVM_DEV_TYPE_ARM_VGIC_V2);
++		break;
++#ifdef CONFIG_KVM_ARM_VGIC_V3
++	case KVM_DEV_TYPE_ARM_VGIC_V3:
++		kvm_register_device_ops(&kvm_arm_vgic_v3_ops,
++					KVM_DEV_TYPE_ARM_VGIC_V3);
++		break;
++#endif
 +	}
 +}
 +
- static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
- 		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12),
-@@ -86,7 +127,7 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PRI,
- 		vgic_mmio_read_priority, vgic_mmio_write_priority, 8),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_TARGET,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
-+		vgic_mmio_read_target, vgic_mmio_write_target, 8),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_CONFIG,
- 		vgic_mmio_read_config, vgic_mmio_write_config, 2),
- 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SOFTINT,
++/* V2 ops */
++
++static int vgic_v2_set_attr(struct kvm_device *dev,
++			    struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++
++static int vgic_v2_get_attr(struct kvm_device *dev,
++			    struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++
++static int vgic_v2_has_attr(struct kvm_device *dev,
++			    struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++
++struct kvm_device_ops kvm_arm_vgic_v2_ops = {
++	.name = "kvm-arm-vgic-v2",
++	.create = vgic_create,
++	.destroy = vgic_destroy,
++	.set_attr = vgic_v2_set_attr,
++	.get_attr = vgic_v2_get_attr,
++	.has_attr = vgic_v2_has_attr,
++};
++
++/* V3 ops */
++
++#ifdef CONFIG_KVM_ARM_VGIC_V3
++
++static int vgic_v3_set_attr(struct kvm_device *dev,
++			    struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++
++static int vgic_v3_get_attr(struct kvm_device *dev,
++			    struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++
++static int vgic_v3_has_attr(struct kvm_device *dev,
++			    struct kvm_device_attr *attr)
++{
++	return -ENXIO;
++}
++
++struct kvm_device_ops kvm_arm_vgic_v3_ops = {
++	.name = "kvm-arm-vgic-v3",
++	.create = vgic_create,
++	.destroy = vgic_destroy,
++	.set_attr = vgic_v3_set_attr,
++	.get_attr = vgic_v3_get_attr,
++	.has_attr = vgic_v3_has_attr,
++};
++
++#endif /* CONFIG_KVM_ARM_VGIC_V3 */
++
 -- 
 2.7.3
