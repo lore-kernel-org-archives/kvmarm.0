@@ -1,23 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v2 27/54] KVM: arm/arm64: vgic-new: Add PRIORITY registers
+Subject: [PATCH v2 26/54] KVM: arm/arm64: vgic-new: Add ACTIVE registers
  handlers
-Date: Thu, 28 Apr 2016 17:45:46 +0100
-Message-ID: <1461861973-26464-28-git-send-email-andre.przywara@arm.com>
+Date: Thu, 28 Apr 2016 17:45:45 +0100
+Message-ID: <1461861973-26464-27-git-send-email-andre.przywara@arm.com>
 References: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4736C49B8C
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7B2D749B8C
  for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:18 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JQLBNqnOn3Ol for <kvmarm@lists.cs.columbia.edu>;
+ with ESMTP id sA2QO8E+q1Sa for <kvmarm@lists.cs.columbia.edu>;
  Thu, 28 Apr 2016 12:44:17 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 64FB349B9D
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:16 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E4B0449BBE
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:14 -0400 (EDT)
 In-Reply-To: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,79 +32,171 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The priority register handlers are shared between the v2 and v3
+The active register handlers are shared between the v2 and v3
 emulation, so their implementation goes into vgic-mmio.c, to be
 easily referenced from the v3 emulation as well later.
-There is a corner case when we change the priority of a pending
-interrupt which we don't handle at the moment.
+Since activation/deactivation of an interrupt may happen entirely
+in the guest without it ever exiting, we need some extra logic to
+properly track the active state.
+Putting it on an ap_list on activation is similar to the normal case
+handled by vgic_queue_irq_unlock(), but differs in some details that
+make a separate implementation worthwhile.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
+Changelog RFC..v1:
+- handling queueing in write handler
+- remove IRQ lock from read handler
+
 Changelog v1 .. v2:
 - adapt to new MMIO framework
 
- virt/kvm/arm/vgic/vgic-mmio-v2.c |  2 +-
- virt/kvm/arm/vgic/vgic-mmio.c    | 39 +++++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic-mmio.h    |  7 +++++++
- 3 files changed, 47 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-mmio-v2.c |   4 +-
+ virt/kvm/arm/vgic/vgic-mmio.c    | 120 +++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-mmio.h    |  10 ++++
+ 3 files changed, 132 insertions(+), 2 deletions(-)
 
 diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index 6b58455..78ed2ac 100644
+index 4797203..6b58455 100644
 --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
 +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -84,7 +84,7 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
+@@ -80,9 +80,9 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_CLEAR,
+ 		vgic_mmio_read_pending, vgic_mmio_write_cpending, 1),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 1),
++		vgic_mmio_read_active, vgic_mmio_write_sactive, 1),
  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_CLEAR,
- 		vgic_mmio_read_active, vgic_mmio_write_cactive, 1),
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 1),
++		vgic_mmio_read_active, vgic_mmio_write_cactive, 1),
  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PRI,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
-+		vgic_mmio_read_priority, vgic_mmio_write_priority, 8),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_TARGET,
  		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_CONFIG,
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_TARGET,
 diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index 74c76e5..ac13115 100644
+index 223cc84..74c76e5 100644
 --- a/virt/kvm/arm/vgic/vgic-mmio.c
 +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -282,6 +282,45 @@ retry:
+@@ -162,6 +162,126 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
  	}
  }
  
-+unsigned long vgic_mmio_read_priority(struct kvm_vcpu *vcpu,
-+				      gpa_t addr, unsigned int len)
++unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
++				    gpa_t addr, unsigned int len)
 +{
-+	u32 intid = addr & 0x3ff;
++	u32 intid = (addr & 0x7f) * 8;
++	u32 value = 0;
 +	int i;
-+	u64 val = 0;
 +
-+	for (i = 0; i < len; i++) {
++	/* Loop over all IRQs affected by this read */
++	for (i = 0; i < len * 8; i++) {
 +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
 +
-+		val |= (u64)irq->priority << (i * 8);
++		if (irq->active)
++			value |= (1U << i);
 +	}
 +
-+	return val;
++	return extract_bytes(value, addr & 3, len);
 +}
 +
-+/*
-+ * We currently don't handle changing the priority of an interrupt that
-+ * is already pending on a VCPU. If there is a need for this, we would
-+ * need to make this VCPU exit and re-evaluate the priorities, potentially
-+ * leading to this interrupt getting presented now to the guest (if it has
-+ * been masked by the priority mask before).
-+ */
-+void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
-+			      gpa_t addr, unsigned int len,
-+			      unsigned long val)
++void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
++			     gpa_t addr, unsigned int len,
++			     unsigned long val)
 +{
-+	u32 intid = addr & 0x3ff;
++	u32 intid = (addr & 0x7f) * 8;
 +	int i;
 +
-+	for (i = 0; i < len; i++) {
++	for_each_set_bit(i, &val, len * 8) {
 +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
 +
 +		spin_lock(&irq->irq_lock);
-+		irq->priority = (val >> (i * 8)) & 0xff;
++
++		irq->active = false;
++
++		/*
++		 * Christoffer wrote:
++		 * The question is what to do if the vcpu for this irq is
++		 * running and the LR there has the active bit set, then we'll
++		 * overwrite this change when we fold the LR state back into
++		 * the vgic_irq struct.
++		 *
++		 * Since I expect this to be extremely rare, one option is to
++		 * force irq->vcpu to exit (if non-null) and then do you
++		 * thing here after you've confirm it has exited while holding
++		 * some lock preventing it from re-entering again.
++		 * Slightly crazy.
++		 *
++		 * The alternative is to put a big fat comment nothing that
++		 * this is non-supported bad race, and wait until someone
++		 * submits a bug report relating to this...
++		 */
++
 +		spin_unlock(&irq->irq_lock);
++	}
++}
++
++void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
++			     gpa_t addr, unsigned int len,
++			     unsigned long val)
++{
++	u32 intid = (addr & 0x7f) * 8;
++	int i;
++
++	for_each_set_bit(i, &val, len * 8) {
++		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++
++		spin_lock(&irq->irq_lock);
++
++		/* As this is a special case, we can't use the
++		 * vgic_queue_irq_unlock() function to put this on a VCPU.
++		 * So deal with this here explicitly unless the IRQs was
++		 * already active, it was on a VCPU before or there is no
++		 * target VCPU assigned at the moment.
++		 */
++		if (irq->active || irq->vcpu || !irq->target_vcpu) {
++			irq->active = true;
++
++			spin_unlock(&irq->irq_lock);
++			continue;
++		}
++
++		spin_unlock(&irq->irq_lock);
++retry:
++		vcpu = irq->target_vcpu;
++
++		spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
++		spin_lock(&irq->irq_lock);
++
++		/*
++		 * Recheck after dropping the IRQ lock to see if we should
++		 * still care about queueing it.
++		 */
++		if (irq->active || irq->vcpu) {
++			irq->active = true;
++
++			spin_unlock(&irq->irq_lock);
++			spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
++
++			continue;
++		}
++
++		/* Did the target VCPU change while we had the lock dropped? */
++		if (vcpu != irq->target_vcpu) {
++			spin_unlock(&irq->irq_lock);
++			spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
++
++			goto retry;
++		}
++
++		/* Now queue the IRQ to the VCPU's ap_list. */
++		list_add_tail(&irq->ap_list, &vcpu->arch.vgic_cpu.ap_list_head);
++		irq->vcpu = vcpu;
++
++		irq->active = true;
++
++		spin_unlock(&irq->irq_lock);
++		spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
++
++		kvm_vcpu_kick(vcpu);
 +	}
 +}
 +
@@ -112,22 +204,25 @@ index 74c76e5..ac13115 100644
  {
  	const unsigned int offset = (unsigned long)key;
 diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-index fa875dc..cd04ac5 100644
+index d4fc029..fa875dc 100644
 --- a/virt/kvm/arm/vgic/vgic-mmio.h
 +++ b/virt/kvm/arm/vgic/vgic-mmio.h
-@@ -107,6 +107,13 @@ void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
- 			     gpa_t addr, unsigned int len,
- 			     unsigned long val);
+@@ -96,6 +96,16 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
+ 			      gpa_t addr, unsigned int len,
+ 			      unsigned long val);
  
-+unsigned long vgic_mmio_read_priority(struct kvm_vcpu *vcpu,
-+				      gpa_t addr, unsigned int len);
++unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
++				    gpa_t addr, unsigned int len);
 +
-+void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
-+			      gpa_t addr, unsigned int len,
-+			      unsigned long val);
++void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
++			     gpa_t addr, unsigned int len,
++			     unsigned long val);
 +
++void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
++			     gpa_t addr, unsigned int len,
++			     unsigned long val);
+ 
  unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
  
- #endif
 -- 
 2.7.3
