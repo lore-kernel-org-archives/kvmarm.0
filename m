@@ -1,22 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v2 19/54] KVM: arm/arm64: vgic-new: Implement
-Date: Thu, 28 Apr 2016 17:45:38 +0100
-Message-ID: <1461861973-26464-20-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v2 30/54] KVM: arm/arm64: vgic-new: Add SGIR register handler
+Date: Thu, 28 Apr 2016 17:45:49 +0100
+Message-ID: <1461861973-26464-31-git-send-email-andre.przywara@arm.com>
 References: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E82A649B43
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:07 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id ABE4449BBD
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RrIlwa0RxC1S for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Apr 2016 12:44:06 -0400 (EDT)
+ with ESMTP id aA4iUullUY-8 for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Apr 2016 12:44:22 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id BA7DB49B97
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:04 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id B08E949BD7
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:20 -0400 (EDT)
 In-Reply-To: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,95 +31,80 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Eric Auger <eric.auger@linaro.org>
+Triggering an IPI via this register is v2 specific, so the
+implementation lives entirely in vgic-mmio-v2.c.
 
-Tell KVM whether a particular VCPU has an IRQ that needs handling
-in the guest. This is used to decide whether a VCPU is runnable.
-
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
 Changelog RFC..v1:
-- return false if distributor is disabled
-- add vgic_kick_vcpus() implementations
+- silently return on illegal TargetListFilter value (=3)
 
- include/kvm/vgic/vgic.h  |  2 ++
- virt/kvm/arm/vgic/vgic.c | 40 ++++++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h |  1 +
- 3 files changed, 43 insertions(+)
+Changelog v1 .. v2:
+- adapt to new MMIO framework
 
-diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-index 5fae4a9..2615205 100644
---- a/include/kvm/vgic/vgic.h
-+++ b/include/kvm/vgic/vgic.h
-@@ -184,6 +184,8 @@ struct vgic_cpu {
- int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- 			bool level);
- 
-+int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
-+
- #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
- #define vgic_initialized(k)	(false)
- #define vgic_ready(k)		((k)->arch.vgic.ready)
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index ae52928..eeb766e 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -519,3 +519,43 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
- 	vgic_flush_lr_state(vcpu);
- 	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
+ virt/kvm/arm/vgic/vgic-mmio-v2.c | 43 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
+
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+index 7364fd7..bcf4b43 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
+@@ -66,6 +66,47 @@ static void vgic_mmio_write_v2_misc(struct kvm_vcpu *vcpu,
+ 	}
  }
-+
-+int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
-+{
-+	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-+	struct vgic_irq *irq;
-+	bool pending = false;
-+
-+	if (!vcpu->kvm->arch.vgic.enabled)
-+		return false;
-+
-+	spin_lock(&vgic_cpu->ap_list_lock);
-+
-+	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
-+		spin_lock(&irq->irq_lock);
-+		pending = irq->pending && irq->enabled;
-+		spin_unlock(&irq->irq_lock);
-+
-+		if (pending)
-+			break;
-+	}
-+
-+	spin_unlock(&vgic_cpu->ap_list_lock);
-+
-+	return pending;
-+}
-+
-+void vgic_kick_vcpus(struct kvm *kvm)
-+{
-+	struct kvm_vcpu *vcpu;
-+	int c;
-+
-+	/*
-+	 * We've injected an interrupt, time to find out who deserves
-+	 * a good kick...
-+	 */
-+	kvm_for_each_vcpu(c, vcpu, kvm) {
-+		if (kvm_vgic_vcpu_pending_irq(vcpu))
-+			kvm_vcpu_kick(vcpu);
-+	}
-+}
-diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index 81b1a20..0c92cda 100644
---- a/virt/kvm/arm/vgic/vgic.h
-+++ b/virt/kvm/arm/vgic/vgic.h
-@@ -21,6 +21,7 @@
- struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
- 			      u32 intid);
- bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq);
-+void vgic_kick_vcpus(struct kvm *kvm);
  
- void vgic_v2_process_maintenance(struct kvm_vcpu *vcpu);
- void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
++static void vgic_mmio_write_sgir(struct kvm_vcpu *source_vcpu,
++				 gpa_t addr, unsigned int len,
++				 unsigned long val)
++{
++	int nr_vcpus = atomic_read(&source_vcpu->kvm->online_vcpus);
++	int intid = val & 0xf;
++	int targets = (val >> 16) & 0xff;
++	int mode = (val >> 24) & 0x03;
++	int c;
++	struct kvm_vcpu *vcpu;
++
++	switch (mode) {
++	case 0x0:		/* as specified by targets */
++		break;
++	case 0x1:
++		targets = (1U << nr_vcpus) - 1;			/* all, ... */
++		targets &= ~(1U << source_vcpu->vcpu_id);	/* but self */
++		break;
++	case 0x2:		/* this very vCPU only */
++		targets = (1U << source_vcpu->vcpu_id);
++		break;
++	case 0x3:		/* reserved */
++		return;
++	}
++
++	kvm_for_each_vcpu(c, vcpu, source_vcpu->kvm) {
++		struct vgic_irq *irq;
++
++		if (!(targets & (1U << c)))
++			continue;
++
++		irq = vgic_get_irq(source_vcpu->kvm, vcpu, intid);
++
++		spin_lock(&irq->irq_lock);
++		irq->pending = true;
++		irq->source |= 1U << source_vcpu->vcpu_id;
++
++		vgic_queue_irq_unlock(source_vcpu->kvm, irq);
++	}
++}
++
+ static unsigned long vgic_mmio_read_target(struct kvm_vcpu *vcpu,
+ 					   gpa_t addr, unsigned int len)
+ {
+@@ -131,7 +172,7 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_CONFIG,
+ 		vgic_mmio_read_config, vgic_mmio_write_config, 2),
+ 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SOFTINT,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 4),
++		vgic_mmio_read_raz, vgic_mmio_write_sgir, 4),
+ 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SGI_PENDING_CLEAR,
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 16),
+ 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SGI_PENDING_SET,
 -- 
 2.7.3
