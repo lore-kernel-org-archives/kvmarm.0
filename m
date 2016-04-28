@@ -1,23 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v2 35/54] KVM: arm/arm64: vgic-new: Add GICv3 IDREGS register
- handler
-Date: Thu, 28 Apr 2016 17:45:54 +0100
-Message-ID: <1461861973-26464-36-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v2 19/54] KVM: arm/arm64: vgic-new: Implement
+Date: Thu, 28 Apr 2016 17:45:38 +0100
+Message-ID: <1461861973-26464-20-git-send-email-andre.przywara@arm.com>
 References: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 312FE49B7B
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:29 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E82A649B43
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:07 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id lLlRFD7wTox9 for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Apr 2016 12:44:28 -0400 (EDT)
+ with ESMTP id RrIlwa0RxC1S for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Apr 2016 12:44:06 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E7B8549BDC
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:27 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id BA7DB49B97
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:04 -0400 (EDT)
 In-Reply-To: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,61 +31,95 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We implement the only one ID register that is required by the
-architecture, also this is the one that Linux actually checks.
+From: Eric Auger <eric.auger@linaro.org>
 
+Tell KVM whether a particular VCPU has an IRQ that needs handling
+in the guest. This is used to decide whether a VCPU is runnable.
+
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
-Changelog v1 .. v2:
-- adapt to new MMIO framework
+Changelog RFC..v1:
+- return false if distributor is disabled
+- add vgic_kick_vcpus() implementations
 
- virt/kvm/arm/vgic/vgic-mmio-v3.c | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
+ include/kvm/vgic/vgic.h  |  2 ++
+ virt/kvm/arm/vgic/vgic.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h |  1 +
+ 3 files changed, 43 insertions(+)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index 5029281..e6f2607 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -110,6 +110,22 @@ static unsigned long vgic_mmio_read_v3r_iidr(struct kvm_vcpu *vcpu,
- 	return extract_bytes(value, addr & 3, len);
- }
+diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+index 5fae4a9..2615205 100644
+--- a/include/kvm/vgic/vgic.h
++++ b/include/kvm/vgic/vgic.h
+@@ -184,6 +184,8 @@ struct vgic_cpu {
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 			bool level);
  
-+static unsigned long vgic_mmio_read_v3_idregs(struct kvm_vcpu *vcpu,
-+					      gpa_t addr, unsigned int len)
-+{
-+	u32 regnr = (addr & 0x3f) - (GICD_IDREGS & 0x3f);
-+	u32 reg = 0;
++int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
 +
-+	switch (regnr + GICD_IDREGS) {
-+	case GICD_PIDR2:
-+		/* report a GICv3 compliant implementation */
-+		reg = 0x3b;
-+		break;
+ #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+ #define vgic_initialized(k)	(false)
+ #define vgic_ready(k)		((k)->arch.vgic.ready)
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index ae52928..eeb766e 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -519,3 +519,43 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+ 	vgic_flush_lr_state(vcpu);
+ 	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
+ }
++
++int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
++{
++	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
++	struct vgic_irq *irq;
++	bool pending = false;
++
++	if (!vcpu->kvm->arch.vgic.enabled)
++		return false;
++
++	spin_lock(&vgic_cpu->ap_list_lock);
++
++	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
++		spin_lock(&irq->irq_lock);
++		pending = irq->pending && irq->enabled;
++		spin_unlock(&irq->irq_lock);
++
++		if (pending)
++			break;
 +	}
 +
-+	return extract_bytes(reg, addr & 3, len);
++	spin_unlock(&vgic_cpu->ap_list_lock);
++
++	return pending;
 +}
 +
- /*
-  * The GICv3 per-IRQ registers are split to control PPIs and SGIs in the
-  * redistributors, while SPIs are covered by registers in the distributor
-@@ -160,7 +176,7 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
- 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IROUTER,
- 		vgic_mmio_read_raz, vgic_mmio_write_wi, 64),
- 	REGISTER_DESC_WITH_LENGTH(GICD_IDREGS,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 48),
-+		vgic_mmio_read_v3_idregs, vgic_mmio_write_wi, 48),
- };
++void vgic_kick_vcpus(struct kvm *kvm)
++{
++	struct kvm_vcpu *vcpu;
++	int c;
++
++	/*
++	 * We've injected an interrupt, time to find out who deserves
++	 * a good kick...
++	 */
++	kvm_for_each_vcpu(c, vcpu, kvm) {
++		if (kvm_vgic_vcpu_pending_irq(vcpu))
++			kvm_vcpu_kick(vcpu);
++	}
++}
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 81b1a20..0c92cda 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -21,6 +21,7 @@
+ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+ 			      u32 intid);
+ bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq);
++void vgic_kick_vcpus(struct kvm *kvm);
  
- static const struct vgic_register_region vgic_v3_redist_registers[] = {
-@@ -175,7 +191,7 @@ static const struct vgic_register_region vgic_v3_redist_registers[] = {
- 	REGISTER_DESC_WITH_LENGTH(GICR_PENDBASER,
- 		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
- 	REGISTER_DESC_WITH_LENGTH(GICR_IDREGS,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 48),
-+		vgic_mmio_read_v3_idregs, vgic_mmio_write_wi, 48),
- };
- 
- static const struct vgic_register_region vgic_v3_private_registers[] = {
+ void vgic_v2_process_maintenance(struct kvm_vcpu *vcpu);
+ void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
 -- 
 2.7.3
