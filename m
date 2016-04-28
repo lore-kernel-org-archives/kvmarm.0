@@ -1,88 +1,86 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v6 00/10] arm64: Add support for KVM with ACPI
-Date: Thu, 28 Apr 2016 14:13:23 +0100
-Message-ID: <57220C73.7010900@arm.com>
-References: <1460388780-914-1-git-send-email-julien.grall@arm.com>
+Subject: [PATCH] arm/arm64: KVM: Enforce Break-Before-Make on Stage-2 page
+ tables
+Date: Thu, 28 Apr 2016 16:16:31 +0100
+Message-ID: <1461856591-5751-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-kernel-owner@vger.kernel.org>
-In-Reply-To: <1460388780-914-1-git-send-email-julien.grall@arm.com>
-Sender: linux-kernel-owner@vger.kernel.org
-To: Julien Grall <julien.grall@arm.com>, kvmarm@lists.cs.columbia.edu, Thomas Gleixner <tglx@linutronix.de>, Jason Cooper <jason@lakedaemon.net>
-Cc: christoffer.dall@linaro.org, fu.wei@linaro.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, wei@redhat.com, al.stone@linaro.org, gg@slimlogic.co.uk, hanjun.guo@linaro.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DA9FC410B5
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 11:14:18 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 0WTSnmqyHUiF for <kvmarm@lists.cs.columbia.edu>;
+ Thu, 28 Apr 2016 11:14:17 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id A39774053F
+ for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 11:14:17 -0400 (EDT)
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-[+ Thomas, Jason]
+The ARM architecture mandates that when changing a page table entry
+from a valid entry to another valid entry, an invalid entry is first
+written, TLB invalidated, and only then the new entry being written.
 
-Do you have any objection against this going through the KVM tree? The
-dependencies are rather intricate, and Daniel gave us his green light
-already for the clocksource part.
+The current code doesn't respect this, directly writing the new
+entry and only then invalidating TLBs. Let's fix it up.
 
-If you'd rather maintain the usual flow, please let us know and we'll
-deal with it.
+Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
+---
+ arch/arm/kvm/mmu.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-Thanks,
-
-	M.
-
-On 11/04/16 16:32, Julien Grall wrote:
-> Hello,
-> 
-> This patch series allows KVM to work with ACPI on ARM64.
-> 
-> Currently, the firmware tables are parsed by the the virtual timer and virtual
-> GIC code in order to configure them correctly.
-> 
-> However the parsing of these tables is already done in the GIC and arch timer
-> drivers. This patch series introduces new helpers to retrieve the information
-> from the different drivers in order to avoid duplication of the parsing code.
-> 
-> To make the merge easier via the different trees, each patch modifies a single
-> subsystem. The suggested plan to merge the series is divided in 3 steps:
-> 
-> 1) Patches #1-#2 are merged via the clocksource tree
->    Patches #2-#7 are merged via the irqchip tree
-> 2) Patches #8-#9 are merge via the KVM tree
-> 3) Patch #10 is merged via the clocksource tree.
-> 
-> For all the changes see in each patch.
-> 
-> Regards,
-> 
-> 
-> Julien Grall (10):
->   clocksource: arm_arch_timer: Gather KVM specific information in a
->     structure
->   clocksource: arm_arch_timer: Extend arch_timer_kvm_info to get the
->     virtual IRQ
->   irqchip/gic-v2: Gather ACPI specific data in a single structure
->   irqchip/gic-v2: Parse and export virtual GIC information
->   irqchip/gic-v3: Prefix all pr_* messages by "GICv3: "
->   irqchip/gic-v3: Gather all ACPI specific data in a single structure
->   irqchip/gic-v3: Parse and export virtual GIC information
->   KVM: arm/arm64: arch_timer: Rely on the arch timer to parse the
->     firmware tables
->   KVM: arm/arm64: vgic: Rely on the GIC driver to parse the firmware
->     tables
->   clocksource: arm_arch_timer: Remove arch_timer_get_timecounter
-> 
->  drivers/clocksource/arm_arch_timer.c   |  11 ++-
->  drivers/irqchip/irq-gic-common.c       |  13 +++
->  drivers/irqchip/irq-gic-common.h       |   3 +
->  drivers/irqchip/irq-gic-v3.c           | 176 +++++++++++++++++++++++++++------
->  drivers/irqchip/irq-gic.c              |  87 +++++++++++++++-
->  include/clocksource/arm_arch_timer.h   |  12 +--
->  include/kvm/arm_vgic.h                 |   7 +-
->  include/linux/irqchip/arm-gic-common.h |  34 +++++++
->  virt/kvm/arm/arch_timer.c              |  40 +++-----
->  virt/kvm/arm/vgic-v2.c                 |  61 +++++-------
->  virt/kvm/arm/vgic-v3.c                 |  47 +++------
->  virt/kvm/arm/vgic.c                    |  50 +++++-----
->  12 files changed, 377 insertions(+), 164 deletions(-)
->  create mode 100644 include/linux/irqchip/arm-gic-common.h
-> 
-
-
+diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
+index 58dbd5c..edf1cd1 100644
+--- a/arch/arm/kvm/mmu.c
++++ b/arch/arm/kvm/mmu.c
+@@ -893,11 +893,14 @@ static int stage2_set_pmd_huge(struct kvm *kvm, struct kvm_mmu_memory_cache
+ 	VM_BUG_ON(pmd_present(*pmd) && pmd_pfn(*pmd) != pmd_pfn(*new_pmd));
+ 
+ 	old_pmd = *pmd;
+-	kvm_set_pmd(pmd, *new_pmd);
+-	if (pmd_present(old_pmd))
++	if (pmd_present(old_pmd)) {
++		pmd_clear(pmd);
+ 		kvm_tlb_flush_vmid_ipa(kvm, addr);
+-	else
++	} else {
+ 		get_page(virt_to_page(pmd));
++	}
++
++	kvm_set_pmd(pmd, *new_pmd);
+ 	return 0;
+ }
+ 
+@@ -946,12 +949,14 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
+ 
+ 	/* Create 2nd stage page table mapping - Level 3 */
+ 	old_pte = *pte;
+-	kvm_set_pte(pte, *new_pte);
+-	if (pte_present(old_pte))
++	if (pte_present(old_pte)) {
++		kvm_set_pte(pte, __pte(0));
+ 		kvm_tlb_flush_vmid_ipa(kvm, addr);
+-	else
++	} else {
+ 		get_page(virt_to_page(pte));
++	}
+ 
++	kvm_set_pte(pte, *new_pte);
+ 	return 0;
+ }
+ 
 -- 
-Jazz is not dead. It just smells funny...
+2.1.4
