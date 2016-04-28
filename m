@@ -1,53 +1,28 @@
-From: RAVINDRA KUMAR SANDE <r.sande@samsung.com>
-Subject: Re: Re: [Query] Does Linux & Qemu support KVM for ARM32 guest on ARM64
- host
-Date: Thu, 28 Apr 2016 06:03:19 +0000 (GMT)
-Message-ID: <708585848.188261461823397987.JavaMail.weblogic@ep2mlwas06d>
-Reply-To: r.sande@samsung.com
+From: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: Re: [Query] Does Linux & Qemu support KVM for ARM32 guest on
+ ARM64 host
+Date: Thu, 28 Apr 2016 07:46:09 +0100
+Message-ID: <CAFEAcA9eEdNhPSWgM39WoySe29+wLUz687PBDptHM20GwZC9Gg@mail.gmail.com>
+References: <708585848.188261461823397987.JavaMail.weblogic@ep2mlwas06d>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 Return-path: <kvm-owner@vger.kernel.org>
-MIME-version: 1.0
+In-Reply-To: <708585848.188261461823397987.JavaMail.weblogic@ep2mlwas06d>
 Sender: kvm-owner@vger.kernel.org
-To: Shannon Zhao <zhaoshenglong@huawei.com>, RAVINDRA KUMAR SANDE <r.sande@samsung.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: r.sande@samsung.com
+Cc: Shannon Zhao <zhaoshenglong@huawei.com>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-DQo+IE9uIDIwMTYvNC8yOCA5OjUwLCBSQVZJTkRSQSBLVU1BUiBTQU5ERSB3cm90ZToNCj4gPiAN
-Cj4gPiBXaGF0IEkgZGlkICA6DQo+ID4gMSkgSnVzdCBmb3IgaW52ZXN0aWdhdGlvbiwgSSB0b29r
-IGEgQVJNdjggKCBPZHJvaWRDMiApIGJvYXJkDQo+ID4gMikgIEkgY29tcGlsZWQgTGludXggMy4x
-NCB3aXRoIEtWTSBzdXBwb3J0IGZvciB0aGlzIEFSTXY4ICggT2Ryb2lkQzIgKQ0KPiA+IGJvYXJk
-LCB3aXRoIG1vZGlmaWNhdGlvbiByZXBsYWNpbmcgbWVzb25fdGltZXIgYnkgYXJtIHRpbWVyIGlu
-IGl0cyBkdHMNCj4gPiBmaWxlLg0KPiA+IFdoeSBMaW51eCAzLjE0IDogSSB0b29rIExpbnV4IDMu
-MTQgYmVjYXVzZSBkaXNwbGF5IGRyaXZlcnMgZm9yIHRoaXMNCj4gPiBib2FyZCBhcmUgb2ZmaWNp
-YWxseSBmb3IgdGhpcyB2ZXJzaW9uOyBhbmQgSSBhbSBpbnRlcmVzdGVkIGluIHNlZWluZw0KPiA+
-IHNvbWUgTGludXggZ3Vlc3QgYm9vdGluZyB3aXRoIGRpc3BsYXkgb24uDQo+ID4gMykgIEkgc2Vl
-IGZyb20gYm9vdCBsb2cgb2YgIHRoYXQgS1ZNIGlzIGluaXRpYWxpemVkIHN1Y2Nlc3NmdWxseSwg
-YW5kIEkNCj4gPiBjYW4gc2VlIC9kZXYva3ZtIG5vZGUuDQo+ID4gNCkgSSBidWlsdCBsYXRlc3Qg
-UWVtdSB3aXRoIC0tZW5hYmxlLWt2bSBvbiB0aGlzIGJvYXJkIG5hdGl2ZWx5Lg0KPiA+IA0KPiA+
-IFdoYXQgSSBmaW5kIDoNCj4gPiAxKSBydW5uaW5nICJxZW11LXN5c3RlbS1hcm0gIC1lbmFibGUt
-a3ZtICAgLW1hY2hpbmUgdmV4cHJlc3MtYTkgLi4uLiINCj4gPiBnaXZlcyBlcnJvciA6ICBubyBh
-Y2NlbGVyYXRvciBmb3VuZA0KPiA+IDIpIHJ1bm5pbmcgInFlbXUtc3lzdGVtLWFhcmNoNjQgLWVu
-YWJsZS1rdm0gIC1tYWNoaW5lIHZleHByZXNzLWE5IC4uLi4iDQo+ID4gZ2l2ZXMgZXJyb3IgOiBr
-bXZfaW5pdF92Y3B1IChJT0N0bCBvbiAvZGV2L2t2bSkgZmFpbGVkLCBndWVzdCBub3Qgc3VwcG9y
-dGVkDQo+ID4gKCBJIGV4cGVyaW1lbnRlZCBzb21lIG1vZGlmaWNhdGlvbnMgYXMgd2VsbCB0byBv
-dmVyY29tZSBhYm92ZSBlcnJvciwNCj4gPiBzdWNoIGFzIHJlcGxhY2luZyB2YWx1ZSBhc3NpZ25l
-ZCB0byBjcHUtPmt2bV90YXJnZXQgZXRjLCBidXQgSU9DdGwgY2FsbA0KPiA+IGlzIGZhaWxpbmcp
-DQo+ID4gDQo+ID4gUXVlcnk6DQo+PiAgMSkgRG9lcyBBcm02NCBMaW51eCBub3QgZW5hYmxlIEtW
-TSBzdXBwb3J0IGZvciBBcm0zMiBndWVzdCA/DQo+ID4gMikgQ2FuIHFlbXUtc3lzdGVtLWFybSBu
-b3QgdXNlIHRoZSBLVk0gZmVhdHVyZSBvbiBBcm02NCBob3N0ID8NCj4gPiAzKSBDYW4gcWVtdS1z
-eXN0ZW0tYWFyY2g2NCBub3QgdXNlIEtWTSBmZWF0dXJlIGZvciBBcm0zMiBndWVzdCA/DQo+ID4g
-DQo+IC0tLS0tLS0gT3JpZ2luYWwgTWVzc2FnZSAtLS0tLS0tDQo+IFNlbmRlciA6IFNoYW5ub24g
-Wmhhbzx6aGFvc2hlbmdsb25nQGh1YXdlaS5jb20+DQo+IA0KPiBZb3UgY2FuIHVzZSBiZWxvdyBj
-b21tYW5kIHRvIGJvb3QgYSBBUk0zMiBndWVzdCBvbiBBUk02ND8NCj4gDQo+IHFlbXUtc3lzdGVt
-LWFhcmNoNjQgLWVuYWJsZS1rdm0gLW1hY2hpbmUgdmlydCxrZXJuZWxfaXJxY2hpcD1vbiAtY3B1
-DQo+IGhvc3QsYWFyY2g2ND1vZmYgLi4uLg0KPiANCj4gLS0gDQo+IFNoYW5ub24NCg0KDQpJIHdp
-bGwgdHJ5IGFib3ZlIG9uIEFybTY0LiANCg0KSSBoYXZlIGFub3RoZXIgcXVlcnksIGZvciBBcm0z
-MiBob3N0IHdpdGggS1ZNIGVuYWJsZWQuDQpJIHNlZSB0aGF0ICJxZW11LXN5c3RlbS1hcm0gIC1l
-bmFibGUta3ZtICAgLW1hY2hpbmUgdmV4cHJlc3MtYTkgIC4uLiIgZ2l2ZXMgZXJyb3INCmttdl9p
-bml0X3ZjcHUgKElPQ3RsIG9uIC9kZXYva3ZtKSBmYWlsZWQsIGd1ZXN0IG5vdCBzdXBwb3J0ZWQu
-DQoNCklzIHRoZXJlIGFueSB3YXkgdG8gZW11bGF0ZSB2ZXhwcmVzcy1hOSAgd2l0aCAgLWVuYWJs
-ZS1rdm0gICBvbiBxZW11ID8NCg0KUmVnYXJkcywNClJhdmluZHJhIFNhbmRl
+On 28 April 2016 at 07:03, RAVINDRA KUMAR SANDE <r.sande@samsung.com> wrote:
+> I have another query, for Arm32 host with KVM enabled.
+> I see that "qemu-system-arm  -enable-kvm   -machine vexpress-a9  ..." gives error
+> kmv_init_vcpu (IOCtl on /dev/kvm) failed, guest not supported.
+>
+> Is there any way to emulate vexpress-a9  with  -enable-kvm   on qemu ?
 
+No. You can only emulate a CPU of the same type as the host
+you're using, and the vexpress-a9 must use a Cortex-A9 CPU,
+so it can't be used under virtualization.
 
+thanks
+-- PMM
