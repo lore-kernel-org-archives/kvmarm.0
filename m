@@ -1,24 +1,27 @@
-From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v2 53/54] KVM: arm/arm64: vgic-new: implement mapped IRQ
- handling
-Date: Thu, 28 Apr 2016 17:46:12 +0100
-Message-ID: <1461861973-26464-54-git-send-email-andre.przywara@arm.com>
-References: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH] arm/arm64: KVM: Enforce Break-Before-Make on Stage-2
+ page tables
+Date: Fri, 29 Apr 2016 13:31:31 +0200
+Message-ID: <20160429113131.GA24942@cbox>
+References: <1461856591-5751-1-git-send-email-marc.zyngier@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E398C49BBE
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:55 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C8B0749B9A
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2016 07:28:49 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 4INK6Z6+35xW for <kvmarm@lists.cs.columbia.edu>;
- Thu, 28 Apr 2016 12:44:55 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id E4D7049C15
- for <kvmarm@lists.cs.columbia.edu>; Thu, 28 Apr 2016 12:44:53 -0400 (EDT)
-In-Reply-To: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
+ with ESMTP id sKkYMTXbVQWG for <kvmarm@lists.cs.columbia.edu>;
+ Fri, 29 Apr 2016 07:28:49 -0400 (EDT)
+Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id E106F49B98
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2016 07:28:48 -0400 (EDT)
+Received: by mail-wm0-f43.google.com with SMTP id a17so31363223wme.0
+ for <kvmarm@lists.cs.columbia.edu>; Fri, 29 Apr 2016 04:31:13 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <1461856591-5751-1-git-send-email-marc.zyngier@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -28,110 +31,20 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+To: Marc Zyngier <marc.zyngier@arm.com>
+Cc: kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-We now store the mapped hardware IRQ number in our struct, so we
-don't need the irq_phys_map for the new VGIC.
-Implement the hardware IRQ mapping on top of the reworked arch
-timer interface.
+On Thu, Apr 28, 2016 at 04:16:31PM +0100, Marc Zyngier wrote:
+> The ARM architecture mandates that when changing a page table entry
+> from a valid entry to another valid entry, an invalid entry is first
+> written, TLB invalidated, and only then the new entry being written.
+> 
+> The current code doesn't respect this, directly writing the new
+> entry and only then invalidating TLBs. Let's fix it up.
+> 
+> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 
-Signed-off-by: Andre Przywara <andre.przywara@arm.com>
----
-Changelog RFC..v1:
-- adapt to new arch_timer mapped IRQ interface
-- implement inject_mapped_irq() as a macro (since it is identical to
-  the "un-mapped" IRQ implementation)
+Thanks for fixing this, I've applied it to next.
 
-Changelog v1 .. v2:
-- replace inject_mapped_irq() macro with a separate implementation,
-  which only allows mapped IRQs to be injected via this interface
-
- include/kvm/vgic/vgic.h  |  5 +++++
- virt/kvm/arm/vgic/vgic.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 55 insertions(+)
-
-diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-index 07c3011..64aca0c 100644
---- a/include/kvm/vgic/vgic.h
-+++ b/include/kvm/vgic/vgic.h
-@@ -213,6 +213,11 @@ int kvm_vgic_hyp_init(void);
- 
- int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- 			bool level);
-+int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid, unsigned int intid,
-+			       bool level);
-+int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq);
-+int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq);
-+bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
- 
- int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
- 
-diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
-index 970e19a..5f21742 100644
---- a/virt/kvm/arm/vgic/vgic.c
-+++ b/virt/kvm/arm/vgic/vgic.c
-@@ -310,6 +310,44 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- 	return vgic_update_irq_pending(kvm, cpuid, intid, level, false);
- }
- 
-+int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid, unsigned int intid,
-+			       bool level)
-+{
-+	return vgic_update_irq_pending(kvm, cpuid, intid, level, true);
-+}
-+
-+int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq)
-+{
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
-+
-+	BUG_ON(!irq);
-+
-+	spin_lock(&irq->irq_lock);
-+
-+	irq->hw = true;
-+	irq->hwintid = phys_irq;
-+
-+	spin_unlock(&irq->irq_lock);
-+
-+	return 0;
-+}
-+
-+int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
-+{
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
-+
-+	BUG_ON(!irq);
-+
-+	spin_lock(&irq->irq_lock);
-+
-+	irq->hw = false;
-+	irq->hwintid = 0;
-+
-+	spin_unlock(&irq->irq_lock);
-+
-+	return 0;
-+}
-+
- /**
-  * vgic_prune_ap_list - Remove non-relevant interrupts from the list
-  *
-@@ -579,3 +617,15 @@ void vgic_kick_vcpus(struct kvm *kvm)
- 			kvm_vcpu_kick(vcpu);
- 	}
- }
-+
-+bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
-+{
-+	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
-+	bool map_is_active;
-+
-+	spin_lock(&irq->irq_lock);
-+	map_is_active = irq->hw && irq->active;
-+	spin_unlock(&irq->irq_lock);
-+
-+	return map_is_active;
-+}
--- 
-2.7.3
+-Christoffer
