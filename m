@@ -1,94 +1,119 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 17/54] KVM: arm/arm64: vgic-new: Add GICv2 world
- switch backend
-Date: Mon, 2 May 2016 13:16:37 +0100
-Message-ID: <20160502131637.054b6b23@arm.com>
+From: Eric Auger <eric.auger@linaro.org>
+Subject: Re: [PATCH v2 19/54] KVM: arm/arm64: vgic-new: Implement
+Date: Mon, 2 May 2016 14:24:53 +0200
+Message-ID: <57274715.8080801@linaro.org>
 References: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
-	<1461861973-26464-18-git-send-email-andre.przywara@arm.com>
+ <1461861973-26464-20-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1461861973-26464-18-git-send-email-andre.przywara@arm.com>
+In-Reply-To: <1461861973-26464-20-git-send-email-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Andre Przywara <andre.przywara@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Thu, 28 Apr 2016 17:45:36 +0100
-Andre Przywara <andre.przywara@arm.com> wrote:
+Hi Andre,
 
-> From: Marc Zyngier <marc.zyngier@arm.com>
+minor comment: patch title has been altered since v1, should be
+
+KVM: arm/arm64: vgic-new: Implement kvm_vgic_vcpu_pending_irq
+
+Cheers
+
+Eric
+
+On 04/28/2016 06:45 PM, Andre Przywara wrote:
+> From: Eric Auger <eric.auger@linaro.org>
 > 
-> Processing maintenance interrupts and accessing the list registers
-> are dependent on the host's GIC version.
-> Introduce vgic-v2.c to contain GICv2 specific functions.
-> Implement the GICv2 specific code for syncing the emulation state
-> into the VGIC registers.
+> Tell KVM whether a particular VCPU has an IRQ that needs handling
+> in the guest. This is used to decide whether a VCPU is runnable.
 > 
-> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
-> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > Signed-off-by: Eric Auger <eric.auger@linaro.org>
 > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 > ---
 > Changelog RFC..v1:
-> - remove explicit LR_STATE clearing on maintenance interrupt handling
-> - improve documentation for vgic_v2_populate_lr()
-> - remove WARN_ON on non-edge IRQs in maintenance interrupts
-> - simplify multi-CPU source SGI handling
+> - return false if distributor is disabled
+> - add vgic_kick_vcpus() implementations
 > 
-> Changelog v1 .. v2:
-> - inject the IRQ priority into the list register
+>  include/kvm/vgic/vgic.h  |  2 ++
+>  virt/kvm/arm/vgic/vgic.c | 40 ++++++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic.h |  1 +
+>  3 files changed, 43 insertions(+)
 > 
->  include/linux/irqchip/arm-gic.h |   1 +
->  virt/kvm/arm/vgic/vgic-v2.c     | 178 ++++++++++++++++++++++++++++++++++++++++
->  virt/kvm/arm/vgic/vgic.c        |  19 ++---
->  virt/kvm/arm/vgic/vgic.h        |   6 ++
->  4 files changed, 194 insertions(+), 10 deletions(-)
->  create mode 100644 virt/kvm/arm/vgic/vgic-v2.c
+> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+> index 5fae4a9..2615205 100644
+> --- a/include/kvm/vgic/vgic.h
+> +++ b/include/kvm/vgic/vgic.h
+> @@ -184,6 +184,8 @@ struct vgic_cpu {
+>  int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+>  			bool level);
+>  
+> +int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+> +
+>  #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+>  #define vgic_initialized(k)	(false)
+>  #define vgic_ready(k)		((k)->arch.vgic.ready)
+> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+> index ae52928..eeb766e 100644
+> --- a/virt/kvm/arm/vgic/vgic.c
+> +++ b/virt/kvm/arm/vgic/vgic.c
+> @@ -519,3 +519,43 @@ void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu)
+>  	vgic_flush_lr_state(vcpu);
+>  	spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
+>  }
+> +
+> +int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+> +	struct vgic_irq *irq;
+> +	bool pending = false;
+> +
+> +	if (!vcpu->kvm->arch.vgic.enabled)
+> +		return false;
+> +
+> +	spin_lock(&vgic_cpu->ap_list_lock);
+> +
+> +	list_for_each_entry(irq, &vgic_cpu->ap_list_head, ap_list) {
+> +		spin_lock(&irq->irq_lock);
+> +		pending = irq->pending && irq->enabled;
+> +		spin_unlock(&irq->irq_lock);
+> +
+> +		if (pending)
+> +			break;
+> +	}
+> +
+> +	spin_unlock(&vgic_cpu->ap_list_lock);
+> +
+> +	return pending;
+> +}
+> +
+> +void vgic_kick_vcpus(struct kvm *kvm)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	int c;
+> +
+> +	/*
+> +	 * We've injected an interrupt, time to find out who deserves
+> +	 * a good kick...
+> +	 */
+> +	kvm_for_each_vcpu(c, vcpu, kvm) {
+> +		if (kvm_vgic_vcpu_pending_irq(vcpu))
+> +			kvm_vcpu_kick(vcpu);
+> +	}
+> +}
+> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+> index 81b1a20..0c92cda 100644
+> --- a/virt/kvm/arm/vgic/vgic.h
+> +++ b/virt/kvm/arm/vgic/vgic.h
+> @@ -21,6 +21,7 @@
+>  struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
+>  			      u32 intid);
+>  bool vgic_queue_irq_unlock(struct kvm *kvm, struct vgic_irq *irq);
+> +void vgic_kick_vcpus(struct kvm *kvm);
+>  
+>  void vgic_v2_process_maintenance(struct kvm_vcpu *vcpu);
+>  void vgic_v2_fold_lr_state(struct kvm_vcpu *vcpu);
 > 
 
-[...]
-
-> @@ -441,14 +447,12 @@ static int compute_ap_list_depth(struct kvm_vcpu *vcpu)
->  static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
->  {
->  	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
-> -	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-> -	u32 model = dist->vgic_model;
->  	struct vgic_irq *irq;
->  	int count = 0;
->  
->  	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(vgic_cpu->ap_list_lock));
->  
-> -	if (unlikely(!dist->enabled))
-> +	if (unlikely(!vcpu->kvm->arch.vgic.enabled))
->  		goto out_clean;
->  
->  	if (compute_ap_list_depth(vcpu) > kvm_vgic_global_state.nr_lr) {
-> @@ -466,14 +470,9 @@ static void vgic_flush_lr_state(struct kvm_vcpu *vcpu)
->  		 * If we get an SGI with multiple sources, try to get
->  		 * them in all at once.
->  		 */
-> -		if (model == KVM_DEV_TYPE_ARM_VGIC_V2 &&
-> -		    vgic_irq_is_sgi(irq->intid)) {
-> -			while (irq->source &&
-> -			       count < kvm_vgic_global_state.nr_lr)
-> -				vgic_populate_lr(vcpu, irq, count++);
-> -		} else {
-> +		do {
->  			vgic_populate_lr(vcpu, irq, count++);
-> -		}
-> +		} while (irq->source && count < kvm_vgic_global_state.nr_lr);
->  
->  next:
-
-Most, if not all of the changes in this function should be folded in the
-previous patch, as we only have generic code in this file (this looks
-like a leftover from an earlier rework).
-
-Thanks,
-
-	M.
--- 
-Jazz is not dead. It just smells funny.
