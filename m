@@ -1,87 +1,99 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v2 50/54] KVM: arm/arm64: vgic-new: vgic_init: implement
- map_resources
-Date: Tue, 3 May 2016 11:47:37 +0100
-Message-ID: <572881C9.300@arm.com>
+Subject: Re: [PATCH v2 05/54] KVM: arm/arm64: Remove the IRQ field from struct
+ irq_phys_map
+Date: Tue, 3 May 2016 13:15:44 +0100
+Message-ID: <57289670.6030405@arm.com>
 References: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
- <1461861973-26464-51-git-send-email-andre.przywara@arm.com>
+ <1461861973-26464-6-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1461861973-26464-51-git-send-email-andre.przywara@arm.com>
+In-Reply-To: <1461861973-26464-6-git-send-email-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
 To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 28/04/16 17:46, Andre Przywara wrote:
-> From: Eric Auger <eric.auger@linaro.org>
+On 28/04/16 17:45, Andre Przywara wrote:
+> From: Christoffer Dall <christoffer.dall@linaro.org>
 > 
-> map_resources is the last initialization step. It is executed on
-> 1st VCPU run. At that stage the code checks the userspace has provided
-> the base addresses for the relevant VGIC regions, which depend on
-> the type of VGIC that is exposed to the guest.
+> The communication of a Linux IRQ number from outside the VGIC to the
+> vgic was a leftover from the day when the vgic code cared about how a
+> particular device injects virtual interrupts mapped to a physical
+> interrupt.
 > 
-> The function also forces the vgic_init if it has not been executed yet
-> (only allowed for VGIC v2).
+> We can safely remove this notion, leaving all physical IRQ handling to
+> be done in the device driver (the arch timer in this case), which makes
+> room for a saner API for the new VGIC.
 > 
-> for GICv2, The VGIC CPU interface is mapped onto the GIC virtual CPU
-> interface.
-> 
-> Signed-off-by: Eric Auger <eric.auger@linaro.org>
+> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Reviewed-by: Eric Auger <eric.auger@linaro.org>
 > ---
->  include/kvm/vgic/vgic.h       |  1 +
->  virt/kvm/arm/vgic/vgic-init.c | 27 +++++++++++++++++++++++++
->  virt/kvm/arm/vgic/vgic-v2.c   | 47 +++++++++++++++++++++++++++++++++++++++++++
->  virt/kvm/arm/vgic/vgic-v3.c   | 44 ++++++++++++++++++++++++++++++++++++++++
->  virt/kvm/arm/vgic/vgic.h      | 16 +++++++++++++++
->  5 files changed, 135 insertions(+)
-
-[...]
-
-> diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-> index 444210f..f970e3e 100644
-> --- a/virt/kvm/arm/vgic/vgic.h
-> +++ b/virt/kvm/arm/vgic/vgic.h
-> @@ -43,6 +43,9 @@ void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
->  void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
->  void vgic_v2_enable(struct kvm_vcpu *vcpu);
->  int vgic_v2_probe(struct device_node *vgic_node);
-> +int vgic_v2_map_resources(struct kvm *kvm);
-> +int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
-> +			     enum vgic_type);
+> Changelog v1 .. v2:
+> - update kerneldoc comments on kvm_vgic_map_phys_irq()
+> 
+>  include/kvm/arm_vgic.h    |  3 +--
+>  virt/kvm/arm/arch_timer.c | 22 ++++++++++++++++++++--
+>  virt/kvm/arm/vgic.c       | 28 ++++++----------------------
+>  3 files changed, 27 insertions(+), 26 deletions(-)
+> 
+> diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+> index 43eeb18..49c559e 100644
+> --- a/include/kvm/arm_vgic.h
+> +++ b/include/kvm/arm_vgic.h
+> @@ -157,7 +157,6 @@ struct vgic_io_device {
+>  struct irq_phys_map {
+>  	u32			virt_irq;
+>  	u32			phys_irq;
+> -	u32			irq;
+>  };
 >  
->  #ifdef CONFIG_KVM_ARM_VGIC_V3
->  void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu);
-> @@ -54,6 +57,8 @@ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
->  void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
->  void vgic_v3_enable(struct kvm_vcpu *vcpu);
->  int vgic_v3_probe(struct device_node *vgic_node);
-> +int vgic_v3_map_resources(struct kvm *kvm);
-> +int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
->  #else
->  static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
+>  struct irq_phys_map_entry {
+> @@ -345,7 +344,7 @@ int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid,
+>  void vgic_v3_dispatch_sgi(struct kvm_vcpu *vcpu, u64 reg);
+>  int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+>  struct irq_phys_map *kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu,
+> -					   int virt_irq, int irq);
+> +					   int virt_irq, int phys_irq);
+>  int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+>  bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+>  
+> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
+> index 58b2439..b470632 100644
+> --- a/virt/kvm/arm/arch_timer.c
+> +++ b/virt/kvm/arm/arch_timer.c
+> @@ -301,7 +301,7 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
+>  	if (timer->active_cleared_last && !phys_active)
+>  		return;
+>  
+> -	ret = irq_set_irqchip_state(timer->map->irq,
+> +	ret = irq_set_irqchip_state(host_vtimer_irq,
+>  				    IRQCHIP_STATE_ACTIVE,
+>  				    phys_active);
+>  	WARN_ON(ret);
+> @@ -334,6 +334,9 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
 >  {
-> @@ -94,6 +99,17 @@ static inline int vgic_v3_probe(struct device_node *vgic_node)
->  {
->  	return -ENODEV;
->  }
-> +
-> +static inline int vgic_v3_map_resources(struct kvm *kvm)
-> +{
-> +	return -ENODEV;
-> +}
-> +
-> +static inline int vgic_register_redist_iodevs(struct kvm *kvm,
-> +					      gpa_t dist_base_address)
-> +{
-> +	return -ENODEV;
-> +}
+>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
+>  	struct irq_phys_map *map;
+> +	struct irq_desc *desc;
+> +	struct irq_data *data;
+> +	int phys_irq;
+>  
+>  	/*
+>  	 * The vcpu timer irq number cannot be determined in
+> @@ -353,10 +356,25 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
+>  	kvm_timer_update_state(vcpu);
+>  
+>  	/*
+> +	 * Find the physical IRQ number corresponding to the host_vtimer_irq
+> +	 */
+> +	desc = irq_to_desc(host_vtimer_irq);
 
-It would make sense to move this stub to patch 32, where the non-stub
-implementation is.
+Consider adding a #include <linux/irq.h> at the top of this file. Things
+do break once the linux/of_irq.h include is removed with the KVM/ACPI
+patches.
 
 Thanks,
 
