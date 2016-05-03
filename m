@@ -1,102 +1,57 @@
-From: Eric Auger <eric.auger@linaro.org>
-Subject: Re: [PATCH v2 06/54] KVM: arm/arm64: arch_timer: Remove irq_phys_map
-Date: Mon, 2 May 2016 18:44:18 +0200
-Message-ID: <572783E2.30204@linaro.org>
-References: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
- <1461861973-26464-7-git-send-email-andre.przywara@arm.com>
+From: Christoffer Dall <christoffer.dall@linaro.org>
+Subject: Re: [PATCH v6 00/10] arm64: Add support for KVM with ACPI
+Date: Tue, 3 May 2016 10:21:24 +0200
+Message-ID: <20160503082124.GA17923@cbox>
+References: <1460388780-914-1-git-send-email-julien.grall@arm.com>
+ <57220C73.7010900@arm.com>
+ <20160502125414.GR27057@io.lakedaemon.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <1461861973-26464-7-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 77C1749B8D
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2016 04:18:26 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id bbjJBr2o3qKE for <kvmarm@lists.cs.columbia.edu>;
+ Tue,  3 May 2016 04:18:25 -0400 (EDT)
+Received: from mail-wm0-f43.google.com (mail-wm0-f43.google.com [74.125.82.43])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 7EBBA49B81
+ for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2016 04:18:25 -0400 (EDT)
+Received: by mail-wm0-f43.google.com with SMTP id g17so24557163wme.1
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 03 May 2016 01:21:00 -0700 (PDT)
+Content-Disposition: inline
+In-Reply-To: <20160502125414.GR27057@io.lakedaemon.net>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Jason Cooper <jason@lakedaemon.net>
+Cc: al.stone@linaro.org, kvm@vger.kernel.org, hanjun.guo@linaro.org, Marc Zyngier <marc.zyngier@arm.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu, fu.wei@linaro.org, gg@slimlogic.co.uk
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 04/28/2016 06:45 PM, Andre Przywara wrote:
-> Now that the interface between the arch timer and the VGIC does not
-> require passing the irq_phys_map entry pointer anymore, let's remove
-> it from the virtual arch timer and use the virtual IRQ number instead
-> directly.
-> The remaining pointer returned by kvm_vgic_map_phys_irq() will be
-> removed in the following patch.
+On Mon, May 02, 2016 at 12:54:14PM +0000, Jason Cooper wrote:
+> On Thu, Apr 28, 2016 at 02:13:23PM +0100, Marc Zyngier wrote:
+> > [+ Thomas, Jason]
+> > 
+> > Do you have any objection against this going through the KVM tree? The
+> > dependencies are rather intricate, and Daniel gave us his green light
+> > already for the clocksource part.
+> > 
+> > If you'd rather maintain the usual flow, please let us know and we'll
+> > deal with it.
 > 
-> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> ---
-> Changelog v1 .. v2:
-> - remove extra virt_irq member from struct, instead use irq.irq directly
+> I've no objection.
 > 
->  include/kvm/arm_arch_timer.h |  3 ---
->  virt/kvm/arm/arch_timer.c    | 11 +++++------
->  2 files changed, 5 insertions(+), 9 deletions(-)
+> Acked-by: Jason Cooper <jason@lakedaemon.net>
 > 
-> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
-> index b651aed..a47b7de 100644
-> --- a/include/kvm/arm_arch_timer.h
-> +++ b/include/kvm/arm_arch_timer.h
-> @@ -53,9 +53,6 @@ struct arch_timer_cpu {
->  	/* Timer IRQ */
->  	struct kvm_irq_level		irq;
->  
-> -	/* VGIC mapping */
-> -	struct irq_phys_map		*map;
-> -
->  	/* Active IRQ state caching */
->  	bool				active_cleared_last;
->  };
-> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
-> index b470632..3a74b17 100644
-> --- a/virt/kvm/arm/arch_timer.c
-> +++ b/virt/kvm/arm/arch_timer.c
-> @@ -175,10 +175,10 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level)
->  
->  	timer->active_cleared_last = false;
->  	timer->irq.level = new_level;
-> -	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer->map->virt_irq,
-> +	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer->irq.irq,
->  				   timer->irq.level);
->  	ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
-> -					 timer->map->virt_irq,
-> +					 timer->irq.irq,
->  					 timer->irq.level);
->  	WARN_ON(ret);
->  }
-> @@ -276,7 +276,7 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
->  	* exit.
->  	*/
->  	phys_active = timer->irq.level ||
-> -			kvm_vgic_map_is_active(vcpu, timer->map->virt_irq);
-> +			kvm_vgic_map_is_active(vcpu, timer->irq.irq);
->  
->  	/*
->  	 * We want to avoid hitting the (re)distributor as much as
-> @@ -378,7 +378,6 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
->  	if (WARN_ON(IS_ERR(map)))
->  		return PTR_ERR(map);
->  
-> -	timer->map = map;
->  	return 0;
->  }
->  
-> @@ -521,8 +520,8 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
->  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
->  
->  	timer_disarm(timer);
-> -	if (timer->map)
-> -		kvm_vgic_unmap_phys_irq(vcpu, timer->map->virt_irq);
-> +	if (timer->irq.irq)
-> +		kvm_vgic_unmap_phys_irq(vcpu, timer->irq.irq);
-thought you agreed to always unmap. Is it an oversight or did you change
-your mind?
+Just to be clear, that's on all the irqchip patches, right?
 
-Besides Reviewed-by: Eric Auger <eric.auger@linaro.org>
-
-Cheers
-
-Eric
->  }
->  
->  void kvm_timer_enable(struct kvm *kvm)
-> 
-
+Thanks!
+-Christoffer
