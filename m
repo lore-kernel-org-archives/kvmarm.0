@@ -1,37 +1,19 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: [PATCH v2 42/54] KVM: arm/arm64: vgic-new: vgic_kvm_device:
  access to VGIC registers
-Date: Tue, 3 May 2016 11:12:41 +0100
-Message-ID: <57287999.4040801@arm.com>
+Date: Tue, 3 May 2016 11:16:41 +0100
+Message-ID: <57287A89.9010809@arm.com>
 References: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
  <1461861973-26464-43-git-send-email-andre.przywara@arm.com>
  <57287671.3000902@arm.com> <572878C8.5070306@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9D62349BB9
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2016 06:10:10 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id YKDCUvNdx6j3 for <kvmarm@lists.cs.columbia.edu>;
- Tue,  3 May 2016 06:10:08 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C804B49BB0
- for <kvmarm@lists.cs.columbia.edu>; Tue,  3 May 2016 06:10:08 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <572878C8.5070306@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
 On 03/05/16 11:09, Andre Przywara wrote:
@@ -89,14 +71,12 @@ On 03/05/16 11:09, Andre Przywara wrote:
 >> This definitely needs addressing, as it breaks guest migration.
 > 
 > It is implemented in patch 46/54.
-
-Ah, sorry. I was on my way there...
-
 > Shall I remove the TODO to avoid confusion and/or replace it with a note
 > either in a comment or in this commit message that the implementation
 > will follow in one the next patches?
 
-Just drop the comment.
+I just checked, and I stand by my initial comment. Patch 46 does
+implement the accessors, but nothing actually wires them here.
 
 Thanks,
 
