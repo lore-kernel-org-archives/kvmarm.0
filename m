@@ -1,26 +1,27 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: Re: [PATCH v2 06/54] KVM: arm/arm64: arch_timer: Remove irq_phys_map
-Date: Wed, 4 May 2016 11:37:51 +0100
-Message-ID: <5729D0FF.1030604@arm.com>
+Subject: Re: [PATCH v2 18/54] KVM: arm/arm64: vgic-new: Add GICv3 world switch
+ backend
+Date: Wed, 4 May 2016 14:30:34 +0100
+Message-ID: <5729F97A.1090909@arm.com>
 References: <1461861973-26464-1-git-send-email-andre.przywara@arm.com>
- <1461861973-26464-7-git-send-email-andre.przywara@arm.com>
- <572783E2.30204@linaro.org>
+ <1461861973-26464-19-git-send-email-andre.przywara@arm.com>
+ <5728CEDC.9080308@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 7FD0B49B3D
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2016 06:34:47 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id DE2B449B3D
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2016 09:27:29 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RZUn03DFpPCY for <kvmarm@lists.cs.columbia.edu>;
- Wed,  4 May 2016 06:34:46 -0400 (EDT)
+ with ESMTP id CVe8v7kLzJ3B for <kvmarm@lists.cs.columbia.edu>;
+ Wed,  4 May 2016 09:27:28 -0400 (EDT)
 Received: from cam-admin0.cambridge.arm.com (cam-admin0.cambridge.arm.com
  [217.140.96.50])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 05CFB49B21
- for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2016 06:34:45 -0400 (EDT)
-In-Reply-To: <572783E2.30204@linaro.org>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 28D8849B32
+ for <kvmarm@lists.cs.columbia.edu>; Wed,  4 May 2016 09:27:27 -0400 (EDT)
+In-Reply-To: <5728CEDC.9080308@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,110 +31,106 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Eric Auger <eric.auger@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Hi Eric,
+Hi,
 
-On 02/05/16 17:44, Eric Auger wrote:
-> On 04/28/2016 06:45 PM, Andre Przywara wrote:
->> Now that the interface between the arch timer and the VGIC does not
->> require passing the irq_phys_map entry pointer anymore, let's remove
->> it from the virtual arch timer and use the virtual IRQ number instead
->> directly.
->> The remaining pointer returned by kvm_vgic_map_phys_irq() will be
->> removed in the following patch.
+On 03/05/16 17:16, Marc Zyngier wrote:
+> On 28/04/16 17:45, Andre Przywara wrote:
+>> From: Marc Zyngier <marc.zyngier@arm.com>
 >>
+>> As the GICv3 virtual interface registers differ from their GICv2
+>> siblings, we need different handlers for processing maintenance
+>> interrupts and reading/writing to the LRs.
+>> Implement the respective handler functions and connect them to
+>> existing code to be called if the host is using a GICv3.
+>>
+>> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
 >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 >> ---
+>> Changelog RFC..v1:
+>> - remove outdated comment about the dist_lock
+>> - add WARN_ON about LR_STATE not being 0 in maintenance interrupts
+>>
 >> Changelog v1 .. v2:
->> - remove extra virt_irq member from struct, instead use irq.irq directly
+>> - inject the IRQ priority into the list register
 >>
->>  include/kvm/arm_arch_timer.h |  3 ---
->>  virt/kvm/arm/arch_timer.c    | 11 +++++------
->>  2 files changed, 5 insertions(+), 9 deletions(-)
+>>  include/linux/irqchip/arm-gic-v3.h |   1 +
+>>  virt/kvm/arm/vgic/vgic-v3.c        | 169 +++++++++++++++++++++++++++++++++++++
+>>  virt/kvm/arm/vgic/vgic.c           |  25 ++++--
+>>  virt/kvm/arm/vgic/vgic.h           |  29 +++++++
+>>  4 files changed, 219 insertions(+), 5 deletions(-)
+>>  create mode 100644 virt/kvm/arm/vgic/vgic-v3.c
 >>
->> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
->> index b651aed..a47b7de 100644
->> --- a/include/kvm/arm_arch_timer.h
->> +++ b/include/kvm/arm_arch_timer.h
->> @@ -53,9 +53,6 @@ struct arch_timer_cpu {
->>  	/* Timer IRQ */
->>  	struct kvm_irq_level		irq;
+>> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+>> index d5d798b..56fd2c5 100644
+>> --- a/include/linux/irqchip/arm-gic-v3.h
+>> +++ b/include/linux/irqchip/arm-gic-v3.h
+>> @@ -275,6 +275,7 @@
+>>  #define ICH_LR_ACTIVE_BIT		(1ULL << 63)
+>>  #define ICH_LR_PHYS_ID_SHIFT		32
+>>  #define ICH_LR_PHYS_ID_MASK		(0x3ffULL << ICH_LR_PHYS_ID_SHIFT)
+>> +#define ICH_LR_PRIORITY_SHIFT		48
 >>  
->> -	/* VGIC mapping */
->> -	struct irq_phys_map		*map;
->> -
->>  	/* Active IRQ state caching */
->>  	bool				active_cleared_last;
->>  };
->> diff --git a/virt/kvm/arm/arch_timer.c b/virt/kvm/arm/arch_timer.c
->> index b470632..3a74b17 100644
->> --- a/virt/kvm/arm/arch_timer.c
->> +++ b/virt/kvm/arm/arch_timer.c
->> @@ -175,10 +175,10 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level)
->>  
->>  	timer->active_cleared_last = false;
->>  	timer->irq.level = new_level;
->> -	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer->map->virt_irq,
->> +	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer->irq.irq,
->>  				   timer->irq.level);
->>  	ret = kvm_vgic_inject_mapped_irq(vcpu->kvm, vcpu->vcpu_id,
->> -					 timer->map->virt_irq,
->> +					 timer->irq.irq,
->>  					 timer->irq.level);
->>  	WARN_ON(ret);
->>  }
->> @@ -276,7 +276,7 @@ void kvm_timer_flush_hwstate(struct kvm_vcpu *vcpu)
->>  	* exit.
->>  	*/
->>  	phys_active = timer->irq.level ||
->> -			kvm_vgic_map_is_active(vcpu, timer->map->virt_irq);
->> +			kvm_vgic_map_is_active(vcpu, timer->irq.irq);
->>  
->>  	/*
->>  	 * We want to avoid hitting the (re)distributor as much as
->> @@ -378,7 +378,6 @@ int kvm_timer_vcpu_reset(struct kvm_vcpu *vcpu,
->>  	if (WARN_ON(IS_ERR(map)))
->>  		return PTR_ERR(map);
->>  
->> -	timer->map = map;
->>  	return 0;
->>  }
->>  
->> @@ -521,8 +520,8 @@ void kvm_timer_vcpu_terminate(struct kvm_vcpu *vcpu)
->>  	struct arch_timer_cpu *timer = &vcpu->arch.timer_cpu;
->>  
->>  	timer_disarm(timer);
->> -	if (timer->map)
->> -		kvm_vgic_unmap_phys_irq(vcpu, timer->map->virt_irq);
->> +	if (timer->irq.irq)
->> +		kvm_vgic_unmap_phys_irq(vcpu, timer->irq.irq);
-> thought you agreed to always unmap. Is it an oversight or did you change
-> your mind?
+>>  #define ICH_MISR_EOI			(1 << 0)
+>>  #define ICH_MISR_U			(1 << 1)
+>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+>> new file mode 100644
+>> index 0000000..461229b
+>> --- /dev/null
+>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+>> @@ -0,0 +1,169 @@
+>> +/*
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License version 2 as
+>> + * published by the Free Software Foundation.
+>> + *
+>> + * This program is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> + * GNU General Public License for more details.
+>> + *
+>> + * You should have received a copy of the GNU General Public License
+>> + * along with this program. If not, see <http://www.gnu.org/licenses/>.
+>> + */
+>> +
+>> +#include <linux/irqchip/arm-gic-v3.h>
+>> +#include <linux/kvm.h>
+>> +#include <linux/kvm_host.h>
+>> +#include <linux/irqchip/arm-gic.h>
+> 
+> This last line is definitely a (copy-paste) bug. We should never include
+> both GIC headers in the same file. Can you please drop that line and
+> have the following hunk instead?
+> 
+> +/* These are for GICv2 emulation only */
+> +#define GICH_LR_VIRTUALID		(0x3ffUL << 0)
+> +#define GICH_LR_PHYSID_CPUID_SHIFT	(10)
+> +#define GICH_LR_PHYSID_CPUID		(7UL << GICH_LR_PHYSID_CPUID_SHIFT)
+> +#define ICH_LR_VIRTUALID_MASK		(BIT_ULL(32) - 1)
+> +
 
-I wasn't sure about it. So for the old VGIC implementation having an
-illegal IRQ number seems to be fine (just nothing will be found in the
-map search), but on the new VGIC it will trigger a BUG_ON, so I was
-wondering if we should play safe here and also mimic the current code,
-which does this safety check for some reason.
+What about including those lines (except the last one) in arm-gic-v3.h
+then? In fact they describe a property of an _GICv3_ LR, even if it is
+only a compatibility feature.
+That would be cleaner IMHO than repeating the definitions here in a .c
+file and we would automatically get the right definitions by just
+including arm-gic-v3.h.
 
-But looking at the (current) callers again, it looks like there is
-always "27" passed in here anyways, so I guess we are safe to remove it.
-
-So if no-one intervenes, I will remove the check.
+This just compiled fine for me for both the old and new VGIC.
+I can send the patch (needs to be a separate patch because it touches
+the old VGIC as well) if you agree on that idea.
 
 Cheers,
 Andre.
 
-> Besides Reviewed-by: Eric Auger <eric.auger@linaro.org>
 > 
-> Cheers
+> which is similar to what we have in the old implementation, for the
+> exact same reason.
 > 
-> Eric
->>  }
->>  
->>  void kvm_timer_enable(struct kvm *kvm)
->>
+> Thanks,
+> 
+> 	M.
 > 
