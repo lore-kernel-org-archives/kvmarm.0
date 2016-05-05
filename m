@@ -1,29 +1,28 @@
 From: "Chalamarla, Tirumalesh" <Tirumalesh.Chalamarla@caviumnetworks.com>
-Subject: Re: [PATCH v4 04/12] KVM: arm64: handle ITS related GICv3
- redistributor registers
-Date: Thu, 5 May 2016 18:06:59 +0000
-Message-ID: <A36F639B-9E31-4B90-958D-D050E426BDF3@caviumnetworks.com>
+Subject: Re: [PATCH v4 03/12] KVM: arm64: Introduce new MMIO region for the
+ ITS base address
+Date: Thu, 5 May 2016 18:08:51 +0000
+Message-ID: <651B7BE4-D1C9-44B2-84BE-19103C1D8CE0@caviumnetworks.com>
 References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
- <1458958450-19662-5-git-send-email-andre.przywara@arm.com>
- <57066682.5040404@arm.com> <57066775.10102@arm.com>
+ <1458958450-19662-4-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4586F49B79
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2016 14:04:22 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 12C1F49B7D
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2016 14:06:14 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id XaDHLXxt5+VM for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 May 2016 14:04:20 -0400 (EDT)
-Received: from na01-bn1-obe.outbound.protection.outlook.com
- (mail-bn1on0070.outbound.protection.outlook.com [157.56.110.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0DC3C49B77
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2016 14:04:19 -0400 (EDT)
-In-Reply-To: <57066775.10102@arm.com>
+ with ESMTP id IkFEOoBTjPCu for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 May 2016 14:06:13 -0400 (EDT)
+Received: from na01-by2-obe.outbound.protection.outlook.com
+ (mail-by2on0056.outbound.protection.outlook.com [207.46.100.56])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 6E20D49B7A
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2016 14:06:11 -0400 (EDT)
+In-Reply-To: <1458958450-19662-4-git-send-email-andre.przywara@arm.com>
 Content-Language: en-US
-Content-ID: <A6114A7DA856F143896F9666A1FECF71@namprd07.prod.outlook.com>
+Content-ID: <5473AA47F4565646A39CF187EC0E4144@namprd07.prod.outlook.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -33,7 +32,8 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>
+To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Eric
+ Auger <eric.auger@linaro.org>
 Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
@@ -42,57 +42,141 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 
 
-On 4/7/16, 6:58 AM, "kvmarm-bounces@lists.cs.columbia.edu on behalf of Marc Zyngier" <kvmarm-bounces@lists.cs.columbia.edu on behalf of marc.zyngier@arm.com> wrote:
+On 3/25/16, 7:14 PM, "kvmarm-bounces@lists.cs.columbia.edu on behalf of Andre Przywara" <kvmarm-bounces@lists.cs.columbia.edu on behalf of andre.przywara@arm.com> wrote:
 
->On 07/04/16 14:54, Marc Zyngier wrote:
->> On 26/03/16 02:14, Andre Przywara wrote:
->>> In the GICv3 redistributor there are the PENDBASER and PROPBASER
->>> registers which we did not emulate so far, as they only make sense
->>> when having an ITS. In preparation for that emulate those MMIO
->>> accesses by storing the 64-bit data written into it into a variable
->>> which we later read in the ITS emulation.
->>>
->>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>> ---
->>>  include/kvm/vgic/vgic.h       |  8 ++++++++
->>>  virt/kvm/arm/vgic/vgic_mmio.c | 26 ++++++++++++++++++++++----
->>>  2 files changed, 30 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
->>> index 11344e6..8ea5dd7 100644
->>> --- a/include/kvm/vgic/vgic.h
->>> +++ b/include/kvm/vgic/vgic.h
->>> @@ -145,6 +145,14 @@ struct vgic_dist {
->>>  
->>>  	struct vgic_io_device	*dist_iodevs;
->>>  	struct vgic_io_device	*redist_iodevs;
->>> +
->>> +	/* Address of LPI configuration table shared by all redistributors */
->>> +	u64			propbaser;
->>> +
->>> +	/* Addresses of LPI pending tables per redistributor */
->>> +	u64			*pendbaser;
->> 
->> All these should probably either be phys_addr_t or gpa_t.
+>The ARM GICv3 ITS controller requires a separate register frame to
+>cover ITS specific registers. Add a new VGIC address type and store
+>the address in a field in the vgic_dist structure.
+>Provide a function to check whether userland has provided the address,
+>so ITS functionality can be guarded by that check.
 >
->Also: these registers are per redistributor. They really should appear
->as such, and not be shoved in vgic_dist.
+>Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>---
+> Documentation/virtual/kvm/devices/arm-vgic.txt |  9 +++++++++
+> arch/arm64/include/uapi/asm/kvm.h              |  2 ++
+> include/kvm/vgic/vgic.h                        |  5 +++++
+> virt/kvm/arm/vgic/vgic.c                       | 10 ++++++++++
+> virt/kvm/arm/vgic/vgic_init.c                  |  1 +
+> virt/kvm/arm/vgic/vgic_kvm_device.c            |  7 +++++++
+> 6 files changed, 34 insertions(+)
 >
->As for GICR_PROPBASER being shared: this is an implementation choice.
->All the architecture mandates is that the same value is programmed in
->all the redistributors.
->
->Yes, you can share the storage, but I'd really want to see a field per
->redist.
-+1
+>diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
+>index 59541d4..087e2d9 100644
+>--- a/Documentation/virtual/kvm/devices/arm-vgic.txt
+>+++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
+>@@ -39,6 +39,15 @@ Groups:
+>       Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+>       This address needs to be 64K aligned.
+> 
+>+    KVM_VGIC_V3_ADDR_TYPE_ITS (rw, 64-bit)
+>+      Base address in the guest physical address space of the GICv3 ITS
+>+      control register frame. The ITS allows MSI(-X) interrupts to be
+>+      injected into guests. This extension is optional, if the kernel
+>+      does not support the ITS, the call returns -ENODEV.
+>+      This memory is solely for the guest to access the ITS control
+>+      registers and does not cover the ITS translation register.
+>+      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+>+      This address needs to be 64K aligned and the region covers 64 KByte.
+> 
+>   KVM_DEV_ARM_VGIC_GRP_DIST_REGS
+>   Attributes:
+>diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+>index f209ea1..c2b257d 100644
+>--- a/arch/arm64/include/uapi/asm/kvm.h
+>+++ b/arch/arm64/include/uapi/asm/kvm.h
+>@@ -87,9 +87,11 @@ struct kvm_regs {
+> /* Supported VGICv3 address types  */
+> #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
+> #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
+>+#define KVM_VGIC_V3_ADDR_TYPE_ITS	4
+> 
+> #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
+> #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
+>+#define KVM_VGIC_V3_ITS_SIZE		SZ_64K
+> 
+> #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
+> #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
+>diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+>index 7c1d145..11344e6 100644
+>--- a/include/kvm/vgic/vgic.h
+>+++ b/include/kvm/vgic/vgic.h
+>@@ -135,6 +135,9 @@ struct vgic_dist {
+> 		gpa_t			vgic_redist_base;
+> 	};
+> 
+>+	/* The base address of the ITS control register frame */
+>+	gpa_t			vgic_its_base;
+>+
+> 	/* distributor enabled */
+> 	u32			enabled;
+> 
+>@@ -253,4 +256,6 @@ static inline int kvm_vgic_get_max_vcpus(void)
+> 	return kvm_vgic_global_state.max_gic_vcpus;
+> }
+> 
+>+bool vgic_has_its(struct kvm *kvm);
+>+
+> #endif /* __ASM_ARM_KVM_VGIC_VGIC_H */
+>diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+>index 65395af..1de2478 100644
+>--- a/virt/kvm/arm/vgic/vgic.c
+>+++ b/virt/kvm/arm/vgic/vgic.c
+>@@ -612,3 +612,13 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, u32 intid)
+> 
+> 	return map_is_active;
+> }
+>+
+>+bool vgic_has_its(struct kvm *kvm)
+>+{
+>+	struct vgic_dist *dist = &kvm->arch.vgic;
+>+
+>+	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
+>+		return false;
+>+
+>+	return !IS_VGIC_ADDR_UNDEF(dist->vgic_its_base);
+>+}
+>diff --git a/virt/kvm/arm/vgic/vgic_init.c b/virt/kvm/arm/vgic/vgic_init.c
+>index ac655b5..2301e03 100644
+>--- a/virt/kvm/arm/vgic/vgic_init.c
+>+++ b/virt/kvm/arm/vgic/vgic_init.c
+>@@ -132,6 +132,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+> 	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
+> 	kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+> 	kvm->arch.vgic.vgic_redist_base = VGIC_ADDR_UNDEF;
+>+	kvm->arch.vgic.vgic_its_base = VGIC_ADDR_UNDEF;
+> 
+> out_unlock:
+> 	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
+>diff --git a/virt/kvm/arm/vgic/vgic_kvm_device.c b/virt/kvm/arm/vgic/vgic_kvm_device.c
+>index 7f78a16..3ec2ac3 100644
+>--- a/virt/kvm/arm/vgic/vgic_kvm_device.c
+>+++ b/virt/kvm/arm/vgic/vgic_kvm_device.c
+>@@ -109,6 +109,12 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
+> 		block_size = KVM_VGIC_V3_REDIST_SIZE;
+> 		alignment = SZ_64K;
+> 		break;
+>+	case KVM_VGIC_V3_ADDR_TYPE_ITS:
+>+		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
+>+		addr_ptr = &vgic->vgic_its_base;
+>+		block_size = KVM_VGIC_V3_ITS_SIZE;
+>+		alignment = SZ_64K;
+>+		break;
 
-
->
->Thanks,
->
->	M.
+Should there be a check based on number of vcpus? 
+> #endif
+> 	default:
+> 		r = -ENODEV;
+>@@ -495,6 +501,7 @@ static int vgic_v3_has_attr(struct kvm_device *dev,
+> 		switch (attr->attr) {
+> 		case KVM_VGIC_V3_ADDR_TYPE_DIST:
+> 		case KVM_VGIC_V3_ADDR_TYPE_REDIST:
+>+		case KVM_VGIC_V3_ADDR_TYPE_ITS:
+> 			return 0;
+> 		}
+> 		break;
 >-- 
->Jazz is not dead. It just smells funny...
+>2.7.3
+>
 >_______________________________________________
 >kvmarm mailing list
 >kvmarm@lists.cs.columbia.edu
