@@ -1,28 +1,29 @@
 From: "Chalamarla, Tirumalesh" <Tirumalesh.Chalamarla@caviumnetworks.com>
-Subject: Re: [PATCH v4 02/12] KVM: arm/arm64: extend arch CAP checks to allow
- per-VM capabilities
-Date: Thu, 5 May 2016 18:00:48 +0000
-Message-ID: <33EF8FD5-9769-4FBA-8F70-7CF737CE732A@caviumnetworks.com>
+Subject: Re: [PATCH v4 04/12] KVM: arm64: handle ITS related GICv3
+ redistributor registers
+Date: Thu, 5 May 2016 18:06:59 +0000
+Message-ID: <A36F639B-9E31-4B90-958D-D050E426BDF3@caviumnetworks.com>
 References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
- <1458958450-19662-3-git-send-email-andre.przywara@arm.com>
+ <1458958450-19662-5-git-send-email-andre.przywara@arm.com>
+ <57066682.5040404@arm.com> <57066775.10102@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 27E7549B74
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2016 13:58:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4586F49B79
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2016 14:04:22 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id JiAP+mu5khV4 for <kvmarm@lists.cs.columbia.edu>;
- Thu,  5 May 2016 13:58:09 -0400 (EDT)
+ with ESMTP id XaDHLXxt5+VM for <kvmarm@lists.cs.columbia.edu>;
+ Thu,  5 May 2016 14:04:20 -0400 (EDT)
 Received: from na01-bn1-obe.outbound.protection.outlook.com
- (mail-bn1on0056.outbound.protection.outlook.com [157.56.110.56])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id E5ECC49B55
- for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2016 13:58:08 -0400 (EDT)
-In-Reply-To: <1458958450-19662-3-git-send-email-andre.przywara@arm.com>
+ (mail-bn1on0070.outbound.protection.outlook.com [157.56.110.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTPS id 0DC3C49B77
+ for <kvmarm@lists.cs.columbia.edu>; Thu,  5 May 2016 14:04:19 -0400 (EDT)
+In-Reply-To: <57066775.10102@arm.com>
 Content-Language: en-US
-Content-ID: <2E2EE8AFADAB9D46A4DEDBEDFBB1F4F1@namprd07.prod.outlook.com>
+Content-ID: <A6114A7DA856F143896F9666A1FECF71@namprd07.prod.outlook.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -32,8 +33,7 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Eric
- Auger <eric.auger@linaro.org>
+To: Marc Zyngier <marc.zyngier@arm.com>, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>
 Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
@@ -42,81 +42,57 @@ List-Id: kvmarm@lists.cs.columbia.edu
 
 
 
-On 3/25/16, 7:14 PM, "kvmarm-bounces@lists.cs.columbia.edu on behalf of Andre Przywara" <kvmarm-bounces@lists.cs.columbia.edu on behalf of andre.przywara@arm.com> wrote:
+On 4/7/16, 6:58 AM, "kvmarm-bounces@lists.cs.columbia.edu on behalf of Marc Zyngier" <kvmarm-bounces@lists.cs.columbia.edu on behalf of marc.zyngier@arm.com> wrote:
 
->KVM capabilities can be a per-VM property, though ARM/ARM64 currently
->does not pass on the VM pointer to the architecture specific
->capability handlers.
->Add a "struct kvm*" parameter to those function to later allow proper
->per-VM capability reporting.
+>On 07/04/16 14:54, Marc Zyngier wrote:
+>> On 26/03/16 02:14, Andre Przywara wrote:
+>>> In the GICv3 redistributor there are the PENDBASER and PROPBASER
+>>> registers which we did not emulate so far, as they only make sense
+>>> when having an ITS. In preparation for that emulate those MMIO
+>>> accesses by storing the 64-bit data written into it into a variable
+>>> which we later read in the ITS emulation.
+>>>
+>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>>> ---
+>>>  include/kvm/vgic/vgic.h       |  8 ++++++++
+>>>  virt/kvm/arm/vgic/vgic_mmio.c | 26 ++++++++++++++++++++++----
+>>>  2 files changed, 30 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+>>> index 11344e6..8ea5dd7 100644
+>>> --- a/include/kvm/vgic/vgic.h
+>>> +++ b/include/kvm/vgic/vgic.h
+>>> @@ -145,6 +145,14 @@ struct vgic_dist {
+>>>  
+>>>  	struct vgic_io_device	*dist_iodevs;
+>>>  	struct vgic_io_device	*redist_iodevs;
+>>> +
+>>> +	/* Address of LPI configuration table shared by all redistributors */
+>>> +	u64			propbaser;
+>>> +
+>>> +	/* Addresses of LPI pending tables per redistributor */
+>>> +	u64			*pendbaser;
+>> 
+>> All these should probably either be phys_addr_t or gpa_t.
+>
+>Also: these registers are per redistributor. They really should appear
+>as such, and not be shoved in vgic_dist.
+>
+>As for GICR_PROPBASER being shared: this is an implementation choice.
+>All the architecture mandates is that the same value is programmed in
+>all the redistributors.
+>
+>Yes, you can share the storage, but I'd really want to see a field per
+>redist.
++1
 
-This looks good
-Reviewed-by: Tirumalesh Chalamarla <tchalamarla@caviumnetworks.com> 
 
 >
->Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->---
-> arch/arm/include/asm/kvm_host.h   | 2 +-
-> arch/arm/kvm/arm.c                | 2 +-
-> arch/arm64/include/asm/kvm_host.h | 2 +-
-> arch/arm64/kvm/reset.c            | 2 +-
-> 4 files changed, 4 insertions(+), 4 deletions(-)
+>Thanks,
 >
->diff --git a/arch/arm/include/asm/kvm_host.h b/arch/arm/include/asm/kvm_host.h
->index 3850701..494b004 100644
->--- a/arch/arm/include/asm/kvm_host.h
->+++ b/arch/arm/include/asm/kvm_host.h
->@@ -265,7 +265,7 @@ static inline void __cpu_init_stage2(void)
-> 	kvm_call_hyp(__init_stage2_translation);
-> }
-> 
->-static inline int kvm_arch_dev_ioctl_check_extension(long ext)
->+static inline int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
-> {
-> 	return 0;
-> }
->diff --git a/arch/arm/kvm/arm.c b/arch/arm/kvm/arm.c
->index 5b9d9e3..e2e9be2 100644
->--- a/arch/arm/kvm/arm.c
->+++ b/arch/arm/kvm/arm.c
->@@ -205,7 +205,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> 		r = KVM_MAX_VCPUS;
-> 		break;
-> 	default:
->-		r = kvm_arch_dev_ioctl_check_extension(ext);
->+		r = kvm_arch_dev_ioctl_check_extension(kvm, ext);
-> 		break;
-> 	}
-> 	return r;
->diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
->index 71fa6fe..2cdd7ae 100644
->--- a/arch/arm64/include/asm/kvm_host.h
->+++ b/arch/arm64/include/asm/kvm_host.h
->@@ -46,7 +46,7 @@
-> 
-> int __attribute_const__ kvm_target_cpu(void);
-> int kvm_reset_vcpu(struct kvm_vcpu *vcpu);
->-int kvm_arch_dev_ioctl_check_extension(long ext);
->+int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext);
-> 
-> struct kvm_arch {
-> 	/* The VMID generation used for the virt. memory system */
->diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
->index 9677bf0..2ba7c8d 100644
->--- a/arch/arm64/kvm/reset.c
->+++ b/arch/arm64/kvm/reset.c
->@@ -63,7 +63,7 @@ static bool cpu_has_32bit_el1(void)
->  * We currently assume that the number of HW registers is uniform
->  * across all CPUs (see cpuinfo_sanity_check).
->  */
->-int kvm_arch_dev_ioctl_check_extension(long ext)
->+int kvm_arch_dev_ioctl_check_extension(struct kvm *kvm, long ext)
-> {
-> 	int r;
-> 
+>	M.
 >-- 
->2.7.3
->
+>Jazz is not dead. It just smells funny...
 >_______________________________________________
 >kvmarm mailing list
 >kvmarm@lists.cs.columbia.edu
