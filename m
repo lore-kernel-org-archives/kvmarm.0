@@ -1,22 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v3 46/55] KVM: arm/arm64: vgic-new: Add GICH_VMCR accessors
-Date: Fri,  6 May 2016 11:45:59 +0100
-Message-ID: <1462531568-9799-47-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v3 51/55] KVM: arm/arm64: vgic-new: vgic_init: implement
+ map_resources
+Date: Fri,  6 May 2016 11:46:04 +0100
+Message-ID: <1462531568-9799-52-git-send-email-andre.przywara@arm.com>
 References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F36D49CE5
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:44:10 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D1B6949CD3
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:44:17 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id HAHEEnb6TnFc for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 May 2016 06:44:09 -0400 (EDT)
+ with ESMTP id gH9uGD5InlvN for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 May 2016 06:44:16 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F0FA49CE0
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:44:09 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C9DAA49CE3
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:44:16 -0400 (EDT)
 In-Reply-To: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,144 +32,219 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Since the GIC CPU interface is always virtualized by the hardware,
-we don't have CPU interface state information readily available in our
-emulation if userland wants to save or restore it.
-Fortunately the GIC hypervisor interface provides the VMCR register to
-access the required virtual CPU interface bits.
-Provide wrappers for GICv2 and GICv3 hosts to have access to this
-register.
+From: Eric Auger <eric.auger@linaro.org>
 
+map_resources is the last initialization step. It is executed on
+1st VCPU run. At that stage the code checks the userspace has provided
+the base addresses for the relevant VGIC regions, which depend on
+the type of VGIC that is exposed to the guest.
+
+The function also forces the vgic_init if it has not been executed yet
+(only allowed for VGIC v2).
+
+for GICv2, The VGIC CPU interface is mapped onto the GIC virtual CPU
+interface.
+
+Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
-Changelog v2 .. v3:
-- remove exported v2/v3 selector functions (as per Marc's patch)
-
- include/kvm/vgic/vgic.h     |  7 +++++++
- virt/kvm/arm/vgic/vgic-v2.c | 29 +++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic-v3.c | 22 ++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h    | 14 ++++++++++++++
- 4 files changed, 72 insertions(+)
+ include/kvm/vgic/vgic.h       |  1 +
+ virt/kvm/arm/vgic/vgic-init.c | 27 +++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v2.c   | 47 +++++++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v3.c   | 44 ++++++++++++++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h      |  7 +++++++
+ 5 files changed, 126 insertions(+)
 
 diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-index 73cab36..cfc3640 100644
+index 538078a..07c3011 100644
 --- a/include/kvm/vgic/vgic.h
 +++ b/include/kvm/vgic/vgic.h
-@@ -171,6 +171,13 @@ struct vgic_v3_cpu_if {
- #endif
- };
+@@ -208,6 +208,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type);
+ void kvm_vgic_destroy(struct kvm *kvm);
+ void kvm_vgic_vcpu_early_init(struct kvm_vcpu *vcpu);
+ void kvm_vgic_vcpu_destroy(struct kvm_vcpu *vcpu);
++int kvm_vgic_map_resources(struct kvm *kvm);
+ int kvm_vgic_hyp_init(void);
  
-+struct vgic_vmcr {
-+	u32	ctlr;
-+	u32	abpr;
-+	u32	bpr;
-+	u32	pmr;
-+};
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+diff --git a/virt/kvm/arm/vgic/vgic-init.c b/virt/kvm/arm/vgic/vgic-init.c
+index 3f9c137..7fefb12 100644
+--- a/virt/kvm/arm/vgic/vgic-init.c
++++ b/virt/kvm/arm/vgic/vgic-init.c
+@@ -321,6 +321,33 @@ int vgic_lazy_init(struct kvm *kvm)
+ 	return ret;
+ }
+ 
++/* RESOURCE MAPPING */
 +
- struct vgic_cpu {
- 	/* CPU vif control registers for world switch */
- 	union {
++/**
++ * Map the MMIO regions depending on the VGIC model exposed to the guest
++ * called on the first VCPU run.
++ * Also map the virtual CPU interface into the VM.
++ * v2/v3 derivatives call vgic_init if not already done.
++ * Completion can be tested by vgic_ready
++ */
++int kvm_vgic_map_resources(struct kvm *kvm)
++{
++	struct vgic_dist *dist = &kvm->arch.vgic;
++	int ret = 0;
++
++	mutex_lock(&kvm->lock);
++	if (!irqchip_in_kernel(kvm))
++		goto out;
++
++	if (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2)
++		ret = vgic_v2_map_resources(kvm);
++	else
++		ret = vgic_v3_map_resources(kvm);
++out:
++	mutex_unlock(&kvm->lock);
++	return ret;
++}
++
+ /* GENERIC PROBE */
+ 
+ static void vgic_init_maintenance_interrupt(void *info)
 diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index 4cee616..70cac63 100644
+index 48aa877..1e411f5 100644
 --- a/virt/kvm/arm/vgic/vgic-v2.c
 +++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -176,3 +176,32 @@ void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr)
+@@ -216,6 +216,53 @@ void vgic_v2_enable(struct kvm_vcpu *vcpu)
  {
- 	vcpu->arch.vgic_cpu.vgic_v2.vgic_lr[lr] = 0;
  }
-+
-+void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+ 
++int vgic_v2_map_resources(struct kvm *kvm)
 +{
-+	u32 vmcr;
++	struct vgic_dist *dist = &kvm->arch.vgic;
++	int ret = 0;
 +
-+	vmcr  = (vmcrp->ctlr << GICH_VMCR_CTRL_SHIFT) & GICH_VMCR_CTRL_MASK;
-+	vmcr |= (vmcrp->abpr << GICH_VMCR_ALIAS_BINPOINT_SHIFT) &
-+		GICH_VMCR_ALIAS_BINPOINT_MASK;
-+	vmcr |= (vmcrp->bpr << GICH_VMCR_BINPOINT_SHIFT) &
-+		GICH_VMCR_BINPOINT_MASK;
-+	vmcr |= (vmcrp->pmr << GICH_VMCR_PRIMASK_SHIFT) &
-+		GICH_VMCR_PRIMASK_MASK;
++	if (vgic_ready(kvm))
++		goto out;
 +
-+	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = vmcr;
++	if (IS_VGIC_ADDR_UNDEF(dist->vgic_dist_base) ||
++	    IS_VGIC_ADDR_UNDEF(dist->vgic_cpu_base)) {
++		kvm_err("Need to set vgic cpu and dist addresses first\n");
++		ret = -ENXIO;
++		goto out;
++	}
++
++	/*
++	 * Initialize the vgic if this hasn't already been done on demand by
++	 * accessing the vgic state from userspace.
++	 */
++	ret = vgic_init(kvm);
++	if (ret) {
++		kvm_err("Unable to initialize VGIC dynamic data structures\n");
++		goto out;
++	}
++
++	ret = vgic_register_dist_iodev(kvm, dist->vgic_dist_base, VGIC_V2);
++	if (ret) {
++		kvm_err("Unable to register VGIC MMIO regions\n");
++		goto out;
++	}
++
++	ret = kvm_phys_addr_ioremap(kvm, dist->vgic_cpu_base,
++				    kvm_vgic_global_state.vcpu_base,
++				    KVM_VGIC_V2_CPU_SIZE, true);
++	if (ret) {
++		kvm_err("Unable to remap VGIC CPU to VCPU\n");
++		goto out;
++	}
++
++	dist->ready = true;
++
++out:
++	if (ret)
++		kvm_vgic_destroy(kvm);
++	return ret;
 +}
 +
-+void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
-+{
-+	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr;
-+
-+	vmcrp->ctlr = (vmcr & GICH_VMCR_CTRL_MASK) >>
-+			GICH_VMCR_CTRL_SHIFT;
-+	vmcrp->abpr = (vmcr & GICH_VMCR_ALIAS_BINPOINT_MASK) >>
-+			GICH_VMCR_ALIAS_BINPOINT_SHIFT;
-+	vmcrp->bpr  = (vmcr & GICH_VMCR_BINPOINT_MASK) >>
-+			GICH_VMCR_BINPOINT_SHIFT;
-+	vmcrp->pmr  = (vmcr & GICH_VMCR_PRIMASK_MASK) >>
-+			GICH_VMCR_PRIMASK_SHIFT;
-+}
+ /**
+  * vgic_v2_probe - probe for a GICv2 compatible interrupt controller in DT
+  * @node:	pointer to the DT node
 diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 43d1dd7..dca52b3 100644
+index 7cab5b9..4bfd42a 100644
 --- a/virt/kvm/arm/vgic/vgic-v3.c
 +++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -166,3 +166,25 @@ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr)
+@@ -200,6 +200,50 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
  {
- 	vcpu->arch.vgic_cpu.vgic_v3.vgic_lr[lr] = 0;
  }
-+
-+void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
+ 
++int vgic_v3_map_resources(struct kvm *kvm)
 +{
-+	u32 vmcr;
++	int ret = 0;
++	struct vgic_dist *dist = &kvm->arch.vgic;
 +
-+	vmcr  = (vmcrp->ctlr << ICH_VMCR_CTLR_SHIFT) & ICH_VMCR_CTLR_MASK;
-+	vmcr |= (vmcrp->abpr << ICH_VMCR_BPR1_SHIFT) & ICH_VMCR_BPR1_MASK;
-+	vmcr |= (vmcrp->bpr << ICH_VMCR_BPR0_SHIFT) & ICH_VMCR_BPR0_MASK;
-+	vmcr |= (vmcrp->pmr << ICH_VMCR_PMR_SHIFT) & ICH_VMCR_PMR_MASK;
++	if (vgic_ready(kvm))
++		goto out;
 +
-+	vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr = vmcr;
++	if (IS_VGIC_ADDR_UNDEF(dist->vgic_dist_base) ||
++	    IS_VGIC_ADDR_UNDEF(dist->vgic_redist_base)) {
++		kvm_err("Need to set vgic distributor addresses first\n");
++		ret = -ENXIO;
++		goto out;
++	}
++
++	/*
++	 * For a VGICv3 we require the userland to explicitly initialize
++	 * the VGIC before we need to use it.
++	 */
++	if (!vgic_initialized(kvm)) {
++		ret = -EBUSY;
++		goto out;
++	}
++
++	ret = vgic_register_dist_iodev(kvm, dist->vgic_dist_base, VGIC_V3);
++	if (ret) {
++		kvm_err("Unable to register VGICv3 dist MMIO regions\n");
++		goto out;
++	}
++
++	ret = vgic_register_redist_iodevs(kvm, dist->vgic_redist_base);
++	if (ret) {
++		kvm_err("Unable to register VGICv3 redist MMIO regions\n");
++		goto out;
++	}
++
++	dist->ready = true;
++
++out:
++	if (ret)
++		kvm_vgic_destroy(kvm);
++	return ret;
 +}
 +
-+void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
-+{
-+	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr;
-+
-+	vmcrp->ctlr = (vmcr & ICH_VMCR_CTLR_MASK) >> ICH_VMCR_CTLR_SHIFT;
-+	vmcrp->abpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
-+	vmcrp->bpr  = (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
-+	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
-+}
+ /**
+  * vgic_v3_probe - probe for a GICv3 compatible interrupt controller in DT
+  * @node:	pointer to the DT node
 diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index bc5750e..5260d23 100644
+index cad04eb..5c7dc99 100644
 --- a/virt/kvm/arm/vgic/vgic.h
 +++ b/virt/kvm/arm/vgic/vgic.h
-@@ -39,6 +39,8 @@ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
- int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
- int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
- 			 int offset, u32 *val);
-+void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
-+void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+@@ -45,6 +45,7 @@ void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ void vgic_v2_enable(struct kvm_vcpu *vcpu);
+ int vgic_v2_probe(struct device_node *vgic_node);
++int vgic_v2_map_resources(struct kvm *kvm);
  int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
  			     enum vgic_type);
  
-@@ -48,6 +50,8 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu);
- void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
- void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr);
- void vgic_v3_set_underflow(struct kvm_vcpu *vcpu);
-+void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
-+void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+@@ -58,6 +59,7 @@ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ void vgic_v3_enable(struct kvm_vcpu *vcpu);
+ int vgic_v3_probe(struct device_node *vgic_node);
++int vgic_v3_map_resources(struct kvm *kvm);
  int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
  #else
  static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
-@@ -71,6 +75,16 @@ static inline void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
- {
+@@ -100,6 +102,11 @@ static inline int vgic_v3_probe(struct device_node *vgic_node)
+ 	return -ENODEV;
  }
  
-+static inline
-+void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
++static inline int vgic_v3_map_resources(struct kvm *kvm)
 +{
-+}
-+
-+static inline
-+void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
-+{
++	return -ENODEV;
 +}
 +
  static inline int vgic_register_redist_iodevs(struct kvm *kvm,
