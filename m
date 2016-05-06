@@ -1,23 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v3 41/55] KVM: arm/arm64: vgic-new: vgic_kvm_device: implement
- kvm_vgic_addr
-Date: Fri,  6 May 2016 11:45:54 +0100
-Message-ID: <1462531568-9799-42-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v3 46/55] KVM: arm/arm64: vgic-new: Add GICH_VMCR accessors
+Date: Fri,  6 May 2016 11:45:59 +0100
+Message-ID: <1462531568-9799-47-git-send-email-andre.przywara@arm.com>
 References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 63E8949CB1
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:44:03 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F36D49CE5
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:44:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id RxTx0g6yx4AV for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 May 2016 06:44:02 -0400 (EDT)
+ with ESMTP id HAHEEnb6TnFc for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 May 2016 06:44:09 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id CDA0349BBC
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:44:01 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4F0FA49CE0
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:44:09 -0400 (EDT)
 In-Reply-To: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -32,175 +31,148 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Eric Auger <eric.auger@linaro.org>
+Since the GIC CPU interface is always virtualized by the hardware,
+we don't have CPU interface state information readily available in our
+emulation if userland wants to save or restore it.
+Fortunately the GIC hypervisor interface provides the VMCR register to
+access the required virtual CPU interface bits.
+Provide wrappers for GICv2 and GICv3 hosts to have access to this
+register.
 
-kvm_vgic_addr is used by the userspace to set the base address of
-the following register regions, as seen by the guest:
-- distributor(v2 and v3),
-- re-distributors (v3),
-- CPU interface (v2).
-
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- include/kvm/vgic/vgic.h             |   2 +
- virt/kvm/arm/vgic/vgic-kvm-device.c | 112 ++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic.h            |   3 +
- 3 files changed, 117 insertions(+)
+Changelog v2 .. v3:
+- remove exported v2/v3 selector functions (as per Marc's patch)
+
+ include/kvm/vgic/vgic.h     |  7 +++++++
+ virt/kvm/arm/vgic/vgic-v2.c | 29 +++++++++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic-v3.c | 22 ++++++++++++++++++++++
+ virt/kvm/arm/vgic/vgic.h    | 14 ++++++++++++++
+ 4 files changed, 72 insertions(+)
 
 diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
-index 2c43eb8..73cab36 100644
+index 73cab36..cfc3640 100644
 --- a/include/kvm/vgic/vgic.h
 +++ b/include/kvm/vgic/vgic.h
-@@ -194,6 +194,8 @@ struct vgic_cpu {
- 	u64 live_lrs;
+@@ -171,6 +171,13 @@ struct vgic_v3_cpu_if {
+ #endif
  };
  
-+int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write);
++struct vgic_vmcr {
++	u32	ctlr;
++	u32	abpr;
++	u32	bpr;
++	u32	pmr;
++};
 +
- int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
- 			bool level);
- 
-diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
-index e153f12..493e941 100644
---- a/virt/kvm/arm/vgic/vgic-kvm-device.c
-+++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
-@@ -16,10 +16,122 @@
- #include <linux/kvm_host.h>
- #include <kvm/arm_vgic.h>
- #include <linux/uaccess.h>
-+#include <asm/kvm_mmu.h>
- #include "vgic.h"
- 
- /* common helpers */
- 
-+static int vgic_ioaddr_overlap(struct kvm *kvm)
-+{
-+	phys_addr_t dist = kvm->arch.vgic.vgic_dist_base;
-+	phys_addr_t cpu = kvm->arch.vgic.vgic_cpu_base;
-+
-+	if (IS_VGIC_ADDR_UNDEF(dist) || IS_VGIC_ADDR_UNDEF(cpu))
-+		return 0;
-+	if ((dist <= cpu && dist + KVM_VGIC_V2_DIST_SIZE > cpu) ||
-+	    (cpu <= dist && cpu + KVM_VGIC_V2_CPU_SIZE > dist))
-+		return -EBUSY;
-+	return 0;
-+}
-+
-+static int vgic_ioaddr_assign(struct kvm *kvm, phys_addr_t *ioaddr,
-+			      phys_addr_t addr, phys_addr_t size)
-+{
-+	int ret;
-+
-+	if (addr & ~KVM_PHYS_MASK)
-+		return -E2BIG;
-+
-+	if (addr & (SZ_4K - 1))
-+		return -EINVAL;
-+
-+	if (!IS_VGIC_ADDR_UNDEF(*ioaddr))
-+		return -EEXIST;
-+	if (addr + size < addr)
-+		return -EINVAL;
-+
-+	*ioaddr = addr;
-+	ret = vgic_ioaddr_overlap(kvm);
-+	if (ret)
-+		*ioaddr = VGIC_ADDR_UNDEF;
-+
-+	return ret;
-+}
-+
-+/**
-+ * kvm_vgic_addr - set or get vgic VM base addresses
-+ * @kvm:   pointer to the vm struct
-+ * @type:  the VGIC addr type, one of KVM_VGIC_V[23]_ADDR_TYPE_XXX
-+ * @addr:  pointer to address value
-+ * @write: if true set the address in the VM address space, if false read the
-+ *          address
-+ *
-+ * Set or get the vgic base addresses for the distributor and the virtual CPU
-+ * interface in the VM physical address space.  These addresses are properties
-+ * of the emulated core/SoC and therefore user space initially knows this
-+ * information.
-+ */
-+int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
-+{
-+	int r = 0;
-+	struct vgic_dist *vgic = &kvm->arch.vgic;
-+	int type_needed;
-+	phys_addr_t *addr_ptr, block_size;
-+	phys_addr_t alignment;
-+
-+	mutex_lock(&kvm->lock);
-+	switch (type) {
-+	case KVM_VGIC_V2_ADDR_TYPE_DIST:
-+		type_needed = KVM_DEV_TYPE_ARM_VGIC_V2;
-+		addr_ptr = &vgic->vgic_dist_base;
-+		block_size = KVM_VGIC_V2_DIST_SIZE;
-+		alignment = SZ_4K;
-+		break;
-+	case KVM_VGIC_V2_ADDR_TYPE_CPU:
-+		type_needed = KVM_DEV_TYPE_ARM_VGIC_V2;
-+		addr_ptr = &vgic->vgic_cpu_base;
-+		block_size = KVM_VGIC_V2_CPU_SIZE;
-+		alignment = SZ_4K;
-+		break;
-+#ifdef CONFIG_KVM_ARM_VGIC_V3
-+	case KVM_VGIC_V3_ADDR_TYPE_DIST:
-+		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
-+		addr_ptr = &vgic->vgic_dist_base;
-+		block_size = KVM_VGIC_V3_DIST_SIZE;
-+		alignment = SZ_64K;
-+		break;
-+	case KVM_VGIC_V3_ADDR_TYPE_REDIST:
-+		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
-+		addr_ptr = &vgic->vgic_redist_base;
-+		block_size = KVM_VGIC_V3_REDIST_SIZE;
-+		alignment = SZ_64K;
-+		break;
-+#endif
-+	default:
-+		r = -ENODEV;
-+		goto out;
-+	}
-+
-+	if (vgic->vgic_model != type_needed) {
-+		r = -ENODEV;
-+		goto out;
-+	}
-+
-+	if (write) {
-+		if (!IS_ALIGNED(*addr, alignment))
-+			r = -EINVAL;
-+		else
-+			r = vgic_ioaddr_assign(kvm, addr_ptr,
-+					       *addr, block_size);
-+	} else {
-+		*addr = *addr_ptr;
-+	}
-+
-+out:
-+	mutex_unlock(&kvm->lock);
-+	return r;
-+}
-+
- static int vgic_set_common_attr(struct kvm_device *dev,
- 				struct kvm_device_attr *attr)
+ struct vgic_cpu {
+ 	/* CPU vif control registers for world switch */
+ 	union {
+diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
+index 4cee616..70cac63 100644
+--- a/virt/kvm/arm/vgic/vgic-v2.c
++++ b/virt/kvm/arm/vgic/vgic-v2.c
+@@ -176,3 +176,32 @@ void vgic_v2_clear_lr(struct kvm_vcpu *vcpu, int lr)
  {
+ 	vcpu->arch.vgic_cpu.vgic_v2.vgic_lr[lr] = 0;
+ }
++
++void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
++{
++	u32 vmcr;
++
++	vmcr  = (vmcrp->ctlr << GICH_VMCR_CTRL_SHIFT) & GICH_VMCR_CTRL_MASK;
++	vmcr |= (vmcrp->abpr << GICH_VMCR_ALIAS_BINPOINT_SHIFT) &
++		GICH_VMCR_ALIAS_BINPOINT_MASK;
++	vmcr |= (vmcrp->bpr << GICH_VMCR_BINPOINT_SHIFT) &
++		GICH_VMCR_BINPOINT_MASK;
++	vmcr |= (vmcrp->pmr << GICH_VMCR_PRIMASK_SHIFT) &
++		GICH_VMCR_PRIMASK_MASK;
++
++	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = vmcr;
++}
++
++void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
++{
++	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr;
++
++	vmcrp->ctlr = (vmcr & GICH_VMCR_CTRL_MASK) >>
++			GICH_VMCR_CTRL_SHIFT;
++	vmcrp->abpr = (vmcr & GICH_VMCR_ALIAS_BINPOINT_MASK) >>
++			GICH_VMCR_ALIAS_BINPOINT_SHIFT;
++	vmcrp->bpr  = (vmcr & GICH_VMCR_BINPOINT_MASK) >>
++			GICH_VMCR_BINPOINT_SHIFT;
++	vmcrp->pmr  = (vmcr & GICH_VMCR_PRIMASK_MASK) >>
++			GICH_VMCR_PRIMASK_SHIFT;
++}
+diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+index 43d1dd7..dca52b3 100644
+--- a/virt/kvm/arm/vgic/vgic-v3.c
++++ b/virt/kvm/arm/vgic/vgic-v3.c
+@@ -166,3 +166,25 @@ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr)
+ {
+ 	vcpu->arch.vgic_cpu.vgic_v3.vgic_lr[lr] = 0;
+ }
++
++void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
++{
++	u32 vmcr;
++
++	vmcr  = (vmcrp->ctlr << ICH_VMCR_CTLR_SHIFT) & ICH_VMCR_CTLR_MASK;
++	vmcr |= (vmcrp->abpr << ICH_VMCR_BPR1_SHIFT) & ICH_VMCR_BPR1_MASK;
++	vmcr |= (vmcrp->bpr << ICH_VMCR_BPR0_SHIFT) & ICH_VMCR_BPR0_MASK;
++	vmcr |= (vmcrp->pmr << ICH_VMCR_PMR_SHIFT) & ICH_VMCR_PMR_MASK;
++
++	vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr = vmcr;
++}
++
++void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
++{
++	u32 vmcr = vcpu->arch.vgic_cpu.vgic_v3.vgic_vmcr;
++
++	vmcrp->ctlr = (vmcr & ICH_VMCR_CTLR_MASK) >> ICH_VMCR_CTLR_SHIFT;
++	vmcrp->abpr = (vmcr & ICH_VMCR_BPR1_MASK) >> ICH_VMCR_BPR1_SHIFT;
++	vmcrp->bpr  = (vmcr & ICH_VMCR_BPR0_MASK) >> ICH_VMCR_BPR0_SHIFT;
++	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
++}
 diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
-index e7c66a5..c44ee01 100644
+index bc5750e..5260d23 100644
 --- a/virt/kvm/arm/vgic/vgic.h
 +++ b/virt/kvm/arm/vgic/vgic.h
-@@ -19,6 +19,9 @@
- #define PRODUCT_ID_KVM		0x4b	/* ASCII code K */
- #define IMPLEMENTER_ARM		0x43b
+@@ -39,6 +39,8 @@ void vgic_v2_set_underflow(struct kvm_vcpu *vcpu);
+ int vgic_v2_has_attr_regs(struct kvm_device *dev, struct kvm_device_attr *attr);
+ int vgic_v2_dist_uaccess(struct kvm_vcpu *vcpu, bool is_write,
+ 			 int offset, u32 *val);
++void vgic_v2_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
++void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ int vgic_register_dist_iodev(struct kvm *kvm, gpa_t dist_base_address,
+ 			     enum vgic_type);
  
-+#define VGIC_ADDR_UNDEF		(-1)
-+#define IS_VGIC_ADDR_UNDEF(_x)  ((_x) == VGIC_ADDR_UNDEF)
+@@ -48,6 +50,8 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu);
+ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr);
+ void vgic_v3_clear_lr(struct kvm_vcpu *vcpu, int lr);
+ void vgic_v3_set_underflow(struct kvm_vcpu *vcpu);
++void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
++void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr);
+ int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t dist_base_address);
+ #else
+ static inline void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
+@@ -71,6 +75,16 @@ static inline void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
+ {
+ }
+ 
++static inline
++void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
++{
++}
 +
- #define INTERRUPT_ID_BITS_SPIS	10
- 
- #define vgic_irq_is_sgi(intid) ((intid) < VGIC_NR_SGIS)
++static inline
++void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcr)
++{
++}
++
+ static inline int vgic_register_redist_iodevs(struct kvm *kvm,
+ 					      gpa_t dist_base_address)
+ {
 -- 
 2.7.3
