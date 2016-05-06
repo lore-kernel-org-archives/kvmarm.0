@@ -1,95 +1,92 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v3 29/55] KVM: arm/arm64: vgic-new: Add TARGET registers handlers
-Date: Fri,  6 May 2016 11:45:42 +0100
-Message-ID: <1462531568-9799-30-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v3 35/55] KVM: arm/arm64: vgic-new: Add GICv3 IDREGS register
+ handler
+Date: Fri,  6 May 2016 11:45:48 +0100
+Message-ID: <1462531568-9799-36-git-send-email-andre.przywara@arm.com>
 References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 2175D49C7F
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:43:54 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id E6yd8mPhvF07 for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 May 2016 06:43:53 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CECCB49C8D
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:43:52 -0400 (EDT)
 In-Reply-To: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The target register handlers are v2 emulation specific, so their
-implementation lives entirely in vgic-mmio-v2.c.
-We copy the old VGIC behaviour of assigning an IRQ to the first VCPU
-set in the target mask instead of making it possibly pending on
-multiple VCPUs.
+We implement the only one ID register that is required by the
+architecture, also this is the one that Linux actually checks.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
-Changelog RFC..v1:
-- remove runtime VCPU determination from this v2-only register
-- fold in implementation of vgic_v2_irq_change_affinity()
-- replace ffs() with __ffs()
-
 Changelog v1 .. v2:
 - adapt to new MMIO framework
 
- virt/kvm/arm/vgic/vgic-mmio-v2.c | 43 +++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 42 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index 2a953ec..888529e 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -66,6 +66,47 @@ static void vgic_mmio_write_v2_misc(struct kvm_vcpu *vcpu,
- 	}
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index d137242..48fba9c 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -110,6 +110,22 @@ static unsigned long vgic_mmio_read_v3r_iidr(struct kvm_vcpu *vcpu,
+ 	return extract_bytes(value, addr & 3, len);
  }
  
-+static unsigned long vgic_mmio_read_target(struct kvm_vcpu *vcpu,
-+					   gpa_t addr, unsigned int len)
++static unsigned long vgic_mmio_read_v3_idregs(struct kvm_vcpu *vcpu,
++					      gpa_t addr, unsigned int len)
 +{
-+	u32 intid = addr & 0x3ff;
-+	int i;
-+	u64 val = 0;
++	u32 regnr = (addr & 0x3f) - (GICD_IDREGS & 0x3f);
++	u32 reg = 0;
 +
-+	for (i = 0; i < len; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		val |= (u64)irq->targets << (i * 8);
++	switch (regnr + GICD_IDREGS) {
++	case GICD_PIDR2:
++		/* report a GICv3 compliant implementation */
++		reg = 0x3b;
++		break;
 +	}
 +
-+	return val;
++	return extract_bytes(reg, addr & 3, len);
 +}
 +
-+static void vgic_mmio_write_target(struct kvm_vcpu *vcpu,
-+				   gpa_t addr, unsigned int len,
-+				   unsigned long val)
-+{
-+	u32 intid = addr & 0x3ff;
-+	int i;
-+
-+	/* GICD_ITARGETSR[0-7] are read-only */
-+	if (intid < VGIC_NR_PRIVATE_IRQS)
-+		return;
-+
-+	for (i = 0; i < len; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, NULL, intid + i);
-+		int target;
-+
-+		spin_lock(&irq->irq_lock);
-+
-+		irq->targets = (val >> (i * 8)) & 0xff;
-+		target = irq->targets ? __ffs(irq->targets) : 0;
-+		irq->target_vcpu = kvm_get_vcpu(vcpu->kvm, target);
-+
-+		spin_unlock(&irq->irq_lock);
-+	}
-+}
-+
- static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_CTRL,
- 		vgic_mmio_read_v2_misc, vgic_mmio_write_v2_misc, 12),
-@@ -86,7 +127,7 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PRI,
- 		vgic_mmio_read_priority, vgic_mmio_write_priority, 8),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_TARGET,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
-+		vgic_mmio_read_target, vgic_mmio_write_target, 8),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_CONFIG,
- 		vgic_mmio_read_config, vgic_mmio_write_config, 2),
- 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SOFTINT,
+ /*
+  * The GICv3 per-IRQ registers are split to control PPIs and SGIs in the
+  * redistributors, while SPIs are covered by registers in the distributor
+@@ -160,7 +176,7 @@ static const struct vgic_register_region vgic_v3_dist_registers[] = {
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IROUTER,
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 64),
+ 	REGISTER_DESC_WITH_LENGTH(GICD_IDREGS,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 48),
++		vgic_mmio_read_v3_idregs, vgic_mmio_write_wi, 48),
+ };
+ 
+ static const struct vgic_register_region vgic_v3_rdbase_registers[] = {
+@@ -175,7 +191,7 @@ static const struct vgic_register_region vgic_v3_rdbase_registers[] = {
+ 	REGISTER_DESC_WITH_LENGTH(GICR_PENDBASER,
+ 		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
+ 	REGISTER_DESC_WITH_LENGTH(GICR_IDREGS,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 48),
++		vgic_mmio_read_v3_idregs, vgic_mmio_write_wi, 48),
+ };
+ 
+ static const struct vgic_register_region vgic_v3_sgibase_registers[] = {
 -- 
 2.7.3
-
