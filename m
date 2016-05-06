@@ -1,117 +1,132 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v3 28/55] KVM: arm/arm64: vgic-new: Add CONFIG registers handlers
-Date: Fri,  6 May 2016 11:45:41 +0100
-Message-ID: <1462531568-9799-29-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v3 33/55] KVM: arm/arm64: vgic-new: Add GICv3 CTLR, IIDR,
+ TYPER handlers
+Date: Fri,  6 May 2016 11:45:46 +0100
+Message-ID: <1462531568-9799-34-git-send-email-andre.przywara@arm.com>
 References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
-Return-path: <kvm-owner@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 00B3649C4A
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:43:51 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id fMvqBMT457sG for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 May 2016 06:43:50 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id CA91C49C3C
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:43:49 -0400 (EDT)
 In-Reply-To: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
-Sender: kvm-owner@vger.kernel.org
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-The config register handlers are shared between the v2 and v3
-emulation, so their implementation goes into vgic-mmio.c, to be
-easily referenced from the v3 emulation as well later.
+As in the GICv2 emulation we handle those three registers in one
+function.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
+Changelog RFC..v1:
+- kick VCPUs if distributor gets enabled
+
 Changelog v1 .. v2:
-- adapt to new MMIO framework
+- rewrite write handler to use switch statement
 
- virt/kvm/arm/vgic/vgic-mmio-v2.c |  2 +-
- virt/kvm/arm/vgic/vgic-mmio.c    | 46 ++++++++++++++++++++++++++++++++++++++++
- virt/kvm/arm/vgic/vgic-mmio.h    |  7 ++++++
- 3 files changed, 54 insertions(+), 1 deletion(-)
+ virt/kvm/arm/vgic/vgic-mmio-v3.c | 50 +++++++++++++++++++++++++++++++++++++++-
+ virt/kvm/arm/vgic/vgic.h         |  2 ++
+ 2 files changed, 51 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-index 2e17250..2a953ec 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-@@ -88,7 +88,7 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_TARGET,
- 		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
- 	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_CONFIG,
--		vgic_mmio_read_raz, vgic_mmio_write_wi, 2),
-+		vgic_mmio_read_config, vgic_mmio_write_config, 2),
- 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SOFTINT,
- 		vgic_mmio_read_raz, vgic_mmio_write_wi, 4),
- 	REGISTER_DESC_WITH_LENGTH(GIC_DIST_SGI_PENDING_CLEAR,
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index d7fe9e6..19fed56 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -321,6 +321,52 @@ void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
- 	}
- }
+diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+index 06c7ec5..5f4558c 100644
+--- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
++++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+@@ -22,6 +22,54 @@
+ #include "vgic.h"
+ #include "vgic-mmio.h"
  
-+unsigned long vgic_mmio_read_config(struct kvm_vcpu *vcpu,
-+				    gpa_t addr, unsigned int len)
++static unsigned long vgic_mmio_read_v3_misc(struct kvm_vcpu *vcpu,
++					    gpa_t addr, unsigned int len)
 +{
-+	u32 intid = (addr & 0xff) * 4;
 +	u32 value = 0;
-+	int i;
 +
-+	for (i = 0; i < len * 4; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-+
-+		if (irq->config == VGIC_CONFIG_EDGE)
-+			value |= (2U << (i * 2));
++	switch (addr & 0x0c) {
++	case GICD_CTLR:
++		if (vcpu->kvm->arch.vgic.enabled)
++			value |= GICD_CTLR_ENABLE_SS_G1;
++		value |= GICD_CTLR_ARE_NS | GICD_CTLR_DS;
++		break;
++	case GICD_TYPER:
++		value = vcpu->kvm->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS;
++		value = (value >> 5) - 1;
++		value |= (INTERRUPT_ID_BITS_SPIS - 1) << 19;
++		break;
++	case GICD_IIDR:
++		value = (PRODUCT_ID_KVM << 24) | (IMPLEMENTER_ARM << 0);
++		break;
++	default:
++		return 0;
 +	}
 +
 +	return extract_bytes(value, addr & 3, len);
 +}
 +
-+void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
-+			    gpa_t addr, unsigned int len,
-+			    unsigned long val)
++static void vgic_mmio_write_v3_misc(struct kvm_vcpu *vcpu,
++				    gpa_t addr, unsigned int len,
++				    unsigned long val)
 +{
-+	u32 intid = (addr & 0xff) * 4;
-+	int i;
++	switch (addr & 0x0c) {
++	case GICD_CTLR:
++		if (!(addr & 1)) {
++			struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
++			bool was_enabled = dist->enabled;
 +
-+	for (i = 0; i < len * 4; i++) {
-+		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
++			dist->enabled = val & GICD_CTLR_ENABLE_SS_G1;
 +
-+		if (intid + i < 16)
-+			continue;
-+
-+		/*
-+		 * The spec says that interrupts must be disabled before
-+		 * changing the configuration to avoid UNDEFINED behaviour.
-+		 */
-+
-+		spin_lock(&irq->irq_lock);
-+		if (test_bit(i * 2 + 1, &val)) {
-+			irq->config = VGIC_CONFIG_EDGE;
-+		} else {
-+			irq->config = VGIC_CONFIG_LEVEL;
-+			irq->pending = irq->line_level | irq->soft_pending;
++			if (!was_enabled && dist->enabled)
++				vgic_kick_vcpus(vcpu->kvm);
 +		}
-+		spin_unlock(&irq->irq_lock);
++		break;
++	case GICD_TYPER:
++	case GICD_IIDR:
++		return;
 +	}
 +}
 +
- static int match_region(const void *key, const void *elt)
- {
- 	const unsigned int offset = (unsigned long)key;
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-index cd04ac5..884eb71 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.h
-+++ b/virt/kvm/arm/vgic/vgic-mmio.h
-@@ -114,6 +114,13 @@ void vgic_mmio_write_priority(struct kvm_vcpu *vcpu,
- 			      gpa_t addr, unsigned int len,
- 			      unsigned long val);
+ /*
+  * The GICv3 per-IRQ registers are split to control PPIs and SGIs in the
+  * redistributors, while SPIs are covered by registers in the distributor
+@@ -46,7 +94,7 @@
  
-+unsigned long vgic_mmio_read_config(struct kvm_vcpu *vcpu,
-+				    gpa_t addr, unsigned int len);
-+
-+void vgic_mmio_write_config(struct kvm_vcpu *vcpu,
-+			    gpa_t addr, unsigned int len,
-+			    unsigned long val);
-+
- unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
+ static const struct vgic_register_region vgic_v3_dist_registers[] = {
+ 	REGISTER_DESC_WITH_LENGTH(GICD_CTLR,
+-		vgic_mmio_read_raz, vgic_mmio_write_wi, 16),
++		vgic_mmio_read_v3_misc, vgic_mmio_write_v3_misc, 16),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGROUPR,
+ 		vgic_mmio_read_rao, vgic_mmio_write_wi, 1),
+ 	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISENABLER,
+diff --git a/virt/kvm/arm/vgic/vgic.h b/virt/kvm/arm/vgic/vgic.h
+index 39a8a65..635e2e2 100644
+--- a/virt/kvm/arm/vgic/vgic.h
++++ b/virt/kvm/arm/vgic/vgic.h
+@@ -19,6 +19,8 @@
+ #define PRODUCT_ID_KVM		0x4b	/* ASCII code K */
+ #define IMPLEMENTER_ARM		0x43b
  
- #endif
++#define INTERRUPT_ID_BITS_SPIS	10
++
+ #define vgic_irq_is_sgi(intid) ((intid) < VGIC_NR_SGIS)
+ 
+ struct vgic_irq *vgic_get_irq(struct kvm *kvm, struct kvm_vcpu *vcpu,
 -- 
 2.7.3
-
