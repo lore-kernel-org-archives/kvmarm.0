@@ -1,22 +1,22 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v3 53/55] KVM: arm/arm64: vgic-new: Wire up irqfd injection
-Date: Fri,  6 May 2016 11:46:06 +0100
-Message-ID: <1462531568-9799-54-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v3 55/55] KVM: arm/arm64: vgic-new: enable build
+Date: Fri,  6 May 2016 11:46:08 +0100
+Message-ID: <1462531568-9799-56-git-send-email-andre.przywara@arm.com>
 References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0134949BCC
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:44:21 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id D348249D05
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:44:25 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id VVX8MHR4KLNc for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 May 2016 06:44:20 -0400 (EDT)
+ with ESMTP id QnN5r50pq-AI for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 May 2016 06:44:25 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id C455D49BFE
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:44:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id C5C9149CFE
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:44:22 -0400 (EDT)
 In-Reply-To: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,73 +31,128 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Connect to the new VGIC to the irqfd framework, so that we can
-inject IRQs.
-GSI routing and MSI routing is not yet implemented.
+Now that the new VGIC implementation has reached feature parity with
+the old one, add the new files to the build system and add a Kconfig
+option to switch between the two versions.
+We set the default to the new version to get maximum test coverage,
+in case people experience problems they can switch back to the old
+behaviour if needed.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-irqfd.c | 52 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
- create mode 100644 virt/kvm/arm/vgic/vgic-irqfd.c
+Changelog v1 .. v2:
+- adjust the changed filenames in the Makefiles
+- add vgic-mmio-v2.c and vgic-mmio-v3.c to the Makefiles
 
-diff --git a/virt/kvm/arm/vgic/vgic-irqfd.c b/virt/kvm/arm/vgic/vgic-irqfd.c
-new file mode 100644
-index 0000000..c675513
---- /dev/null
-+++ b/virt/kvm/arm/vgic/vgic-irqfd.c
-@@ -0,0 +1,52 @@
-+/*
-+ * Copyright (C) 2015, 2016 ARM Ltd.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
+ arch/arm/kvm/Kconfig          |  7 +++++++
+ arch/arm/kvm/Makefile         | 11 +++++++++++
+ arch/arm64/kvm/Kconfig        |  7 +++++++
+ arch/arm64/kvm/Makefile       | 12 ++++++++++++
+ virt/kvm/arm/hyp/vgic-v2-sr.c |  5 +++++
+ 5 files changed, 42 insertions(+)
+
+diff --git a/arch/arm/kvm/Kconfig b/arch/arm/kvm/Kconfig
+index 95a0005..02abfff 100644
+--- a/arch/arm/kvm/Kconfig
++++ b/arch/arm/kvm/Kconfig
+@@ -46,6 +46,13 @@ config KVM_ARM_HOST
+ 	---help---
+ 	  Provides host support for ARM processors.
+ 
++config KVM_NEW_VGIC
++	bool "New VGIC implementation"
++	depends on KVM
++	default y
++	---help---
++	  uses the new VGIC implementation
 +
-+#include <linux/kvm.h>
-+#include <linux/kvm_host.h>
-+#include <trace/events/kvm.h>
+ source drivers/vhost/Kconfig
+ 
+ endif # VIRTUALIZATION
+diff --git a/arch/arm/kvm/Makefile b/arch/arm/kvm/Makefile
+index eb1bf43..a596b58 100644
+--- a/arch/arm/kvm/Makefile
++++ b/arch/arm/kvm/Makefile
+@@ -21,7 +21,18 @@ obj-$(CONFIG_KVM_ARM_HOST) += hyp/
+ obj-y += kvm-arm.o init.o interrupts.o
+ obj-y += arm.o handle_exit.o guest.o mmu.o emulate.o reset.o
+ obj-y += coproc.o coproc_a15.o coproc_a7.o mmio.o psci.o perf.o
 +
-+int kvm_irq_map_gsi(struct kvm *kvm,
-+		    struct kvm_kernel_irq_routing_entry *entries,
-+		    int gsi)
-+{
-+	return 0;
-+}
++ifeq ($(CONFIG_KVM_NEW_VGIC),y)
++obj-y += $(KVM)/arm/vgic/vgic.o
++obj-y += $(KVM)/arm/vgic/vgic-init.o
++obj-y += $(KVM)/arm/vgic/vgic-irqfd.o
++obj-y += $(KVM)/arm/vgic/vgic-v2.o
++obj-y += $(KVM)/arm/vgic/vgic-mmio.o
++obj-y += $(KVM)/arm/vgic/vgic-mmio-v2.o
++obj-y += $(KVM)/arm/vgic/vgic-kvm-device.o
++else
+ obj-y += $(KVM)/arm/vgic.o
+ obj-y += $(KVM)/arm/vgic-v2.o
+ obj-y += $(KVM)/arm/vgic-v2-emul.o
++endif
+ obj-y += $(KVM)/arm/arch_timer.o
+diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+index de7450d..3f0e1ce 100644
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@ -55,6 +55,13 @@ config KVM_ARM_PMU
+ 	  Adds support for a virtual Performance Monitoring Unit (PMU) in
+ 	  virtual machines.
+ 
++config KVM_NEW_VGIC
++	bool "New VGIC implementation"
++	depends on KVM
++	default y
++        ---help---
++          uses the new VGIC implementation
 +
-+int kvm_irq_map_chip_pin(struct kvm *kvm, unsigned int irqchip,
-+			 unsigned int pin)
-+{
-+	return pin;
-+}
-+
-+int kvm_set_irq(struct kvm *kvm, int irq_source_id,
-+		u32 irq, int level, bool line_status)
-+{
-+	unsigned int spi = irq + VGIC_NR_PRIVATE_IRQS;
-+
-+	trace_kvm_set_irq(irq, level, irq_source_id);
-+
-+	BUG_ON(!vgic_initialized(kvm));
-+
-+	return kvm_vgic_inject_irq(kvm, 0, spi, level);
-+}
-+
-+/* MSI not implemented yet */
-+int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
-+		struct kvm *kvm, int irq_source_id,
-+		int level, bool line_status)
-+{
-+	return 0;
-+}
+ source drivers/vhost/Kconfig
+ 
+ endif # VIRTUALIZATION
+diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
+index 122cff4..a7a958c 100644
+--- a/arch/arm64/kvm/Makefile
++++ b/arch/arm64/kvm/Makefile
+@@ -20,10 +20,22 @@ kvm-$(CONFIG_KVM_ARM_HOST) += emulate.o inject_fault.o regmap.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += hyp.o hyp-init.o handle_exit.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += guest.o debug.o reset.o sys_regs.o sys_regs_generic_v8.o
+ 
++ifeq ($(CONFIG_KVM_NEW_VGIC),y)
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-init.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-irqfd.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-v2.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-v3.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v2.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-mmio-v3.o
++kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic/vgic-kvm-device.o
++else
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v2.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v2-emul.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3.o
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/vgic-v3-emul.o
++endif
+ kvm-$(CONFIG_KVM_ARM_HOST) += $(KVM)/arm/arch_timer.o
+ kvm-$(CONFIG_KVM_ARM_PMU) += $(KVM)/arm/pmu.o
+diff --git a/virt/kvm/arm/hyp/vgic-v2-sr.c b/virt/kvm/arm/hyp/vgic-v2-sr.c
+index caac41f..a3f12b3 100644
+--- a/virt/kvm/arm/hyp/vgic-v2-sr.c
++++ b/virt/kvm/arm/hyp/vgic-v2-sr.c
+@@ -21,7 +21,12 @@
+ 
+ #include <asm/kvm_hyp.h>
+ 
++#ifdef CONFIG_KVM_NEW_VGIC
++extern struct vgic_global kvm_vgic_global_state;
++#define vgic_v2_params kvm_vgic_global_state
++#else
+ extern struct vgic_params vgic_v2_params;
++#endif
+ 
+ static void __hyp_text save_maint_int_state(struct kvm_vcpu *vcpu,
+ 					    void __iomem *base)
 -- 
 2.7.3
