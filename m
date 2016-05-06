@@ -1,22 +1,23 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v3 52/55] KVM: arm/arm64: vgic-new: Add vgic_v2/v3_enable
-Date: Fri,  6 May 2016 11:46:05 +0100
-Message-ID: <1462531568-9799-53-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v3 54/55] KVM: arm/arm64: vgic-new: implement mapped IRQ
+ handling
+Date: Fri,  6 May 2016 11:46:07 +0100
+Message-ID: <1462531568-9799-55-git-send-email-andre.przywara@arm.com>
 References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 0B06449CFE
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:44:19 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 63BA949D07
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:44:24 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id eCtVKptBudGl for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 May 2016 06:44:18 -0400 (EDT)
+ with ESMTP id h+C102o1I7ju for <kvmarm@lists.cs.columbia.edu>;
+ Fri,  6 May 2016 06:44:22 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 4E13949CD3
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:44:18 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 4640E49BCC
+ for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:44:21 -0400 (EDT)
 In-Reply-To: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
@@ -31,77 +32,106 @@ To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@lina
 Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-From: Eric Auger <eric.auger@linaro.org>
+We now store the mapped hardware IRQ number in our struct, so we
+don't need the irq_phys_map for the new VGIC.
+Implement the hardware IRQ mapping on top of the reworked arch
+timer interface.
 
-Enable the VGIC operation by properly initialising the registers
-in the hypervisor GIC interface.
-
-Signed-off-by: Eric Auger <eric.auger@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- virt/kvm/arm/vgic/vgic-v2.c | 11 ++++++++++-
- virt/kvm/arm/vgic/vgic-v3.c | 23 ++++++++++++++++++++++-
- 2 files changed, 32 insertions(+), 2 deletions(-)
+Changelog RFC..v1:
+- adapt to new arch_timer mapped IRQ interface
+- implement inject_mapped_irq() as a macro (since it is identical to
+  the "un-mapped" IRQ implementation)
 
-diff --git a/virt/kvm/arm/vgic/vgic-v2.c b/virt/kvm/arm/vgic/vgic-v2.c
-index 1e411f5..4493593 100644
---- a/virt/kvm/arm/vgic/vgic-v2.c
-+++ b/virt/kvm/arm/vgic/vgic-v2.c
-@@ -211,9 +211,18 @@ void vgic_v2_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
- 			GICH_VMCR_PRIMASK_SHIFT;
+Changelog v1 .. v2:
+- replace inject_mapped_irq() macro with a separate implementation,
+  which only allows mapped IRQs to be injected via this interface
+
+ include/kvm/vgic/vgic.h  |  5 +++++
+ virt/kvm/arm/vgic/vgic.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 55 insertions(+)
+
+diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+index 07c3011..64aca0c 100644
+--- a/include/kvm/vgic/vgic.h
++++ b/include/kvm/vgic/vgic.h
+@@ -213,6 +213,11 @@ int kvm_vgic_hyp_init(void);
+ 
+ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 			bool level);
++int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid, unsigned int intid,
++			       bool level);
++int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq);
++int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq);
++bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+ 
+ int kvm_vgic_vcpu_pending_irq(struct kvm_vcpu *vcpu);
+ 
+diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+index 068389a..3f854c5 100644
+--- a/virt/kvm/arm/vgic/vgic.c
++++ b/virt/kvm/arm/vgic/vgic.c
+@@ -310,6 +310,44 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
+ 	return vgic_update_irq_pending(kvm, cpuid, intid, level, false);
  }
  
--/* not yet implemented */
- void vgic_v2_enable(struct kvm_vcpu *vcpu)
- {
-+	/*
-+	 * By forcing VMCR to zero, the GIC will restore the binary
-+	 * points to their reset values. Anything else resets to zero
-+	 * anyway.
-+	 */
-+	vcpu->arch.vgic_cpu.vgic_v2.vgic_vmcr = 0;
-+	vcpu->arch.vgic_cpu.vgic_v2.vgic_elrsr = ~0;
++int kvm_vgic_inject_mapped_irq(struct kvm *kvm, int cpuid, unsigned int intid,
++			       bool level)
++{
++	return vgic_update_irq_pending(kvm, cpuid, intid, level, true);
++}
 +
-+	/* Get the show on the road... */
-+	vcpu->arch.vgic_cpu.vgic_v2.vgic_hcr = GICH_HCR_EN;
++int kvm_vgic_map_phys_irq(struct kvm_vcpu *vcpu, u32 virt_irq, u32 phys_irq)
++{
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
++
++	BUG_ON(!irq);
++
++	spin_lock(&irq->irq_lock);
++
++	irq->hw = true;
++	irq->hwintid = phys_irq;
++
++	spin_unlock(&irq->irq_lock);
++
++	return 0;
++}
++
++int kvm_vgic_unmap_phys_irq(struct kvm_vcpu *vcpu, unsigned int virt_irq)
++{
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
++
++	BUG_ON(!irq);
++
++	spin_lock(&irq->irq_lock);
++
++	irq->hw = false;
++	irq->hwintid = 0;
++
++	spin_unlock(&irq->irq_lock);
++
++	return 0;
++}
++
+ /**
+  * vgic_prune_ap_list - Remove non-relevant interrupts from the list
+  *
+@@ -563,3 +601,15 @@ void vgic_kick_vcpus(struct kvm *kvm)
+ 			kvm_vcpu_kick(vcpu);
+ 	}
  }
- 
- int vgic_v2_map_resources(struct kvm *kvm)
-diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
-index 4bfd42a..6d7422f 100644
---- a/virt/kvm/arm/vgic/vgic-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-v3.c
-@@ -195,9 +195,30 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
- 	vmcrp->pmr  = (vmcr & ICH_VMCR_PMR_MASK) >> ICH_VMCR_PMR_SHIFT;
- }
- 
--/* not yet implemented */
- void vgic_v3_enable(struct kvm_vcpu *vcpu)
- {
-+	struct vgic_v3_cpu_if *vgic_v3 = &vcpu->arch.vgic_cpu.vgic_v3;
 +
-+	/*
-+	 * By forcing VMCR to zero, the GIC will restore the binary
-+	 * points to their reset values. Anything else resets to zero
-+	 * anyway.
-+	 */
-+	vgic_v3->vgic_vmcr = 0;
-+	vgic_v3->vgic_elrsr = ~0;
++bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq)
++{
++	struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, virt_irq);
++	bool map_is_active;
 +
-+	/*
-+	 * If we are emulating a GICv3, we do it in an non-GICv2-compatible
-+	 * way, so we force SRE to 1 to demonstrate this to the guest.
-+	 * This goes with the spec allowing the value to be RAO/WI.
-+	 */
-+	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
-+		vgic_v3->vgic_sre = ICC_SRE_EL1_SRE;
-+	else
-+		vgic_v3->vgic_sre = 0;
++	spin_lock(&irq->irq_lock);
++	map_is_active = irq->hw && irq->active;
++	spin_unlock(&irq->irq_lock);
 +
-+	/* Get the show on the road... */
-+	vgic_v3->vgic_hcr = ICH_HCR_EN;
- }
- 
- int vgic_v3_map_resources(struct kvm *kvm)
++	return map_is_active;
++}
 -- 
 2.7.3
