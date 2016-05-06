@@ -1,72 +1,106 @@
 From: Andre Przywara <andre.przywara@arm.com>
-Subject: [PATCH v3 11/55] KVM: arm/arm64: pmu: abstract access to number of
- SPIs
-Date: Fri,  6 May 2016 11:45:24 +0100
-Message-ID: <1462531568-9799-12-git-send-email-andre.przywara@arm.com>
+Subject: [PATCH v3 10/55] KVM: arm/arm64: Export mmio_read/write_bus
+Date: Fri,  6 May 2016 11:45:23 +0100
+Message-ID: <1462531568-9799-11-git-send-email-andre.przywara@arm.com>
 References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C5B349BD3
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:43:17 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id cb4KB2jnZwEZ for <kvmarm@lists.cs.columbia.edu>;
- Fri,  6 May 2016 06:43:17 -0400 (EDT)
-Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 6A93F49BB7
- for <kvmarm@lists.cs.columbia.edu>; Fri,  6 May 2016 06:43:16 -0400 (EDT)
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvm-owner@vger.kernel.org
 To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-Currently the PMU uses a member of the struct vgic_dist directly,
-which not only breaks abstraction, but will fail with the new VGIC.
-Abstract this access in the VGIC header file.
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
+Rename mmio_{read,write}_bus to kvm_mmio_{read,write}_bus and export
+them out of mmio.c.
+This will be needed later for the new VGIC implementation.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 ---
- include/kvm/arm_vgic.h | 2 ++
- virt/kvm/arm/pmu.c     | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ arch/arm/include/asm/kvm_mmio.h   |  3 +++
+ arch/arm/kvm/mmio.c               | 10 +++++-----
+ arch/arm64/include/asm/kvm_mmio.h |  3 +++
+ 3 files changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index 452bb85..c14ff77 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -347,6 +347,8 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
- #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
- #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
- #define vgic_ready(k)		((k)->arch.vgic.ready)
-+#define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
-+				 ((i) < (k)->arch.vgic.nr_irqs))
+diff --git a/arch/arm/include/asm/kvm_mmio.h b/arch/arm/include/asm/kvm_mmio.h
+index d8e90c8..f3a7de7 100644
+--- a/arch/arm/include/asm/kvm_mmio.h
++++ b/arch/arm/include/asm/kvm_mmio.h
+@@ -28,6 +28,9 @@ struct kvm_decode {
+ 	bool sign_extend;
+ };
  
- int vgic_v2_probe(struct device_node *vgic_node,
- 		  const struct vgic_ops **ops,
-diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
-index 575c7aa..bd2e872 100644
---- a/virt/kvm/arm/pmu.c
-+++ b/virt/kvm/arm/pmu.c
-@@ -477,7 +477,7 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
- 		 * the interrupt number is the same for all vcpus, while as an
- 		 * SPI it must be a separate number per vcpu.
- 		 */
--		if (irq < VGIC_NR_SGIS || irq >= vcpu->kvm->arch.vgic.nr_irqs ||
-+		if (irq < VGIC_NR_SGIS || !vgic_valid_spi(vcpu->kvm, irq) ||
- 		    !irq_is_valid(vcpu->kvm, irq, irq < VGIC_NR_PRIVATE_IRQS))
++void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
++unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
++
+ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		 phys_addr_t fault_ipa);
+diff --git a/arch/arm/kvm/mmio.c b/arch/arm/kvm/mmio.c
+index 0158e9e..10f80a6 100644
+--- a/arch/arm/kvm/mmio.c
++++ b/arch/arm/kvm/mmio.c
+@@ -23,7 +23,7 @@
+ 
+ #include "trace.h"
+ 
+-static void mmio_write_buf(char *buf, unsigned int len, unsigned long data)
++void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data)
+ {
+ 	void *datap = NULL;
+ 	union {
+@@ -55,7 +55,7 @@ static void mmio_write_buf(char *buf, unsigned int len, unsigned long data)
+ 	memcpy(buf, datap, len);
+ }
+ 
+-static unsigned long mmio_read_buf(char *buf, unsigned int len)
++unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len)
+ {
+ 	unsigned long data = 0;
+ 	union {
+@@ -66,7 +66,7 @@ static unsigned long mmio_read_buf(char *buf, unsigned int len)
+ 
+ 	switch (len) {
+ 	case 1:
+-		data = buf[0];
++		data = *(u8 *)buf;
+ 		break;
+ 	case 2:
+ 		memcpy(&tmp.hword, buf, len);
+@@ -103,7 +103,7 @@ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 		if (len > sizeof(unsigned long))
  			return -EINVAL;
  
+-		data = mmio_read_buf(run->mmio.data, len);
++		data = kvm_mmio_read_buf(run->mmio.data, len);
+ 
+ 		if (vcpu->arch.mmio_decode.sign_extend &&
+ 		    len < sizeof(unsigned long)) {
+@@ -189,7 +189,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 					       len);
+ 
+ 		trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, len, fault_ipa, data);
+-		mmio_write_buf(data_buf, len, data);
++		kvm_mmio_write_buf(data_buf, len, data);
+ 
+ 		ret = kvm_io_bus_write(vcpu, KVM_MMIO_BUS, fault_ipa, len,
+ 				       data_buf);
+diff --git a/arch/arm64/include/asm/kvm_mmio.h b/arch/arm64/include/asm/kvm_mmio.h
+index fe612a9..75ea420 100644
+--- a/arch/arm64/include/asm/kvm_mmio.h
++++ b/arch/arm64/include/asm/kvm_mmio.h
+@@ -30,6 +30,9 @@ struct kvm_decode {
+ 	bool sign_extend;
+ };
+ 
++void kvm_mmio_write_buf(void *buf, unsigned int len, unsigned long data);
++unsigned long kvm_mmio_read_buf(const void *buf, unsigned int len);
++
+ int kvm_handle_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run);
+ int io_mem_abort(struct kvm_vcpu *vcpu, struct kvm_run *run,
+ 		 phys_addr_t fault_ipa);
 -- 
 2.7.3
+
