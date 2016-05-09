@@ -1,344 +1,171 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH] kvm: arm64: Enable hardware updates of the Access Flag
- for Stage 2 page tables
-Date: Mon, 9 May 2016 17:33:10 +0200
-Message-ID: <20160509153310.GA27623@cbox>
-References: <1460566657-30221-1-git-send-email-catalin.marinas@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH v4 03/12] KVM: arm64: Introduce new MMIO region for the
+ ITS base address
+Date: Mon, 9 May 2016 16:47:20 +0100
+Message-ID: <5730B108.5010009@arm.com>
+References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
+ <1458958450-19662-4-git-send-email-andre.przywara@arm.com>
+ <651B7BE4-D1C9-44B2-84BE-19103C1D8CE0@caviumnetworks.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-Return-path: <linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org>
-Content-Disposition: inline
-In-Reply-To: <1460566657-30221-1-git-send-email-catalin.marinas@arm.com>
-List-Unsubscribe: <http://lists.infradead.org/mailman/options/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=unsubscribe>
-List-Archive: <http://lists.infradead.org/pipermail/linux-arm-kernel/>
-List-Post: <mailto:linux-arm-kernel@lists.infradead.org>
-List-Help: <mailto:linux-arm-kernel-request@lists.infradead.org?subject=help>
-List-Subscribe: <http://lists.infradead.org/mailman/listinfo/linux-arm-kernel>,
- <mailto:linux-arm-kernel-request@lists.infradead.org?subject=subscribe>
-Sender: "linux-arm-kernel" <linux-arm-kernel-bounces@lists.infradead.org>
-Errors-To: linux-arm-kernel-bounces+linux-arm-kernel=m.gmane.org@lists.infradead.org
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 8050349B9F
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2016 11:44:32 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id CPChcXYHpPMw for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 May 2016 11:44:31 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CBE649B4C
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2016 11:44:30 -0400 (EDT)
+In-Reply-To: <651B7BE4-D1C9-44B2-84BE-19103C1D8CE0@caviumnetworks.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: "Chalamarla, Tirumalesh" <Tirumalesh.Chalamarla@caviumnetworks.com>, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>
+Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Wed, Apr 13, 2016 at 05:57:37PM +0100, Catalin Marinas wrote:
-> The ARMv8.1 architecture extensions introduce support for hardware
-> updates of the access and dirty information in page table entries. With
-> VTCR_EL2.HA enabled (bit 21), when the CPU accesses an IPA with the
-> PTE_AF bit cleared in the stage 2 page table, instead of raising an
-> Access Flag fault to EL2 the CPU sets the actual page table entry bit
-> (10). To ensure that kernel modifications to the page table do not
-> inadvertently revert a bit set by hardware updates, certain Stage 2
-> software pte/pmd operations must be performed atomically.
+On 05/05/16 19:08, Chalamarla, Tirumalesh wrote:
 > 
-> The main user of the AF bit is the kvm_age_hva() mechanism. The
-> kvm_age_hva_handler() function performs a "test and clear young" action
-> on the pte/pmd. This needs to be atomic in respect of automatic hardware
-> updates of the AF bit. Since the AF bit is in the same position for both
-> Stage 1 and Stage 2, the patch reuses the existing
-> ptep_test_and_clear_young() functionality if
-> __HAVE_ARCH_PTEP_TEST_AND_CLEAR_YOUNG is defined. Otherwise, the
-> existing pte_young/pte_mkold mechanism is preserved.
 > 
-> The kvm_set_s2pte_readonly() (and the corresponding pmd equivalent) have
-> to perform atomic modifications in order to avoid a race with updates of
-> the AF bit. The arm64 implementation has been re-written using
-> exclusives.
 > 
-> Currently, kvm_set_s2pte_writable() (and pmd equivalent) take a pointer
-> argument and modify the pte/pmd in place. However, these functions are
-> only used on local variables rather than actual page table entries, so
-> it makes more sense to follow the pte_mkwrite() approach for stage 1
-> attributes. The change to kvm_s2pte_mkwrite() makes it clear that these
-> functions do not modify the actual page table entries.
+> 
+> 
+> On 3/25/16, 7:14 PM, "kvmarm-bounces@lists.cs.columbia.edu on behalf of Andre Przywara" <kvmarm-bounces@lists.cs.columbia.edu on behalf of andre.przywara@arm.com> wrote:
+> 
+>> The ARM GICv3 ITS controller requires a separate register frame to
+>> cover ITS specific registers. Add a new VGIC address type and store
+>> the address in a field in the vgic_dist structure.
+>> Provide a function to check whether userland has provided the address,
+>> so ITS functionality can be guarded by that check.
+>>
+>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+>> ---
+>> Documentation/virtual/kvm/devices/arm-vgic.txt |  9 +++++++++
+>> arch/arm64/include/uapi/asm/kvm.h              |  2 ++
+>> include/kvm/vgic/vgic.h                        |  5 +++++
+>> virt/kvm/arm/vgic/vgic.c                       | 10 ++++++++++
+>> virt/kvm/arm/vgic/vgic_init.c                  |  1 +
+>> virt/kvm/arm/vgic/vgic_kvm_device.c            |  7 +++++++
+>> 6 files changed, 34 insertions(+)
+>>
+>> diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
+>> index 59541d4..087e2d9 100644
+>> --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
+>> +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
+>> @@ -39,6 +39,15 @@ Groups:
+>>       Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+>>       This address needs to be 64K aligned.
+>>
+>> +    KVM_VGIC_V3_ADDR_TYPE_ITS (rw, 64-bit)
+>> +      Base address in the guest physical address space of the GICv3 ITS
+>> +      control register frame. The ITS allows MSI(-X) interrupts to be
+>> +      injected into guests. This extension is optional, if the kernel
+>> +      does not support the ITS, the call returns -ENODEV.
+>> +      This memory is solely for the guest to access the ITS control
+>> +      registers and does not cover the ITS translation register.
+>> +      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
+>> +      This address needs to be 64K aligned and the region covers 64 KByte.
+>>
+>>   KVM_DEV_ARM_VGIC_GRP_DIST_REGS
+>>   Attributes:
+>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+>> index f209ea1..c2b257d 100644
+>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>> @@ -87,9 +87,11 @@ struct kvm_regs {
+>> /* Supported VGICv3 address types  */
+>> #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
+>> #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
+>> +#define KVM_VGIC_V3_ADDR_TYPE_ITS	4
+>>
+>> #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
+>> #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
+>> +#define KVM_VGIC_V3_ITS_SIZE		SZ_64K
+>>
+>> #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
+>> #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
+>> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
+>> index 7c1d145..11344e6 100644
+>> --- a/include/kvm/vgic/vgic.h
+>> +++ b/include/kvm/vgic/vgic.h
+>> @@ -135,6 +135,9 @@ struct vgic_dist {
+>> 		gpa_t			vgic_redist_base;
+>> 	};
+>>
+>> +	/* The base address of the ITS control register frame */
+>> +	gpa_t			vgic_its_base;
+>> +
+>> 	/* distributor enabled */
+>> 	u32			enabled;
+>>
+>> @@ -253,4 +256,6 @@ static inline int kvm_vgic_get_max_vcpus(void)
+>> 	return kvm_vgic_global_state.max_gic_vcpus;
+>> }
+>>
+>> +bool vgic_has_its(struct kvm *kvm);
+>> +
+>> #endif /* __ASM_ARM_KVM_VGIC_VGIC_H */
+>> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
+>> index 65395af..1de2478 100644
+>> --- a/virt/kvm/arm/vgic/vgic.c
+>> +++ b/virt/kvm/arm/vgic/vgic.c
+>> @@ -612,3 +612,13 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, u32 intid)
+>>
+>> 	return map_is_active;
+>> }
+>> +
+>> +bool vgic_has_its(struct kvm *kvm)
+>> +{
+>> +	struct vgic_dist *dist = &kvm->arch.vgic;
+>> +
+>> +	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
+>> +		return false;
+>> +
+>> +	return !IS_VGIC_ADDR_UNDEF(dist->vgic_its_base);
+>> +}
+>> diff --git a/virt/kvm/arm/vgic/vgic_init.c b/virt/kvm/arm/vgic/vgic_init.c
+>> index ac655b5..2301e03 100644
+>> --- a/virt/kvm/arm/vgic/vgic_init.c
+>> +++ b/virt/kvm/arm/vgic/vgic_init.c
+>> @@ -132,6 +132,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+>> 	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
+>> 	kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
+>> 	kvm->arch.vgic.vgic_redist_base = VGIC_ADDR_UNDEF;
+>> +	kvm->arch.vgic.vgic_its_base = VGIC_ADDR_UNDEF;
+>>
+>> out_unlock:
+>> 	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
+>> diff --git a/virt/kvm/arm/vgic/vgic_kvm_device.c b/virt/kvm/arm/vgic/vgic_kvm_device.c
+>> index 7f78a16..3ec2ac3 100644
+>> --- a/virt/kvm/arm/vgic/vgic_kvm_device.c
+>> +++ b/virt/kvm/arm/vgic/vgic_kvm_device.c
+>> @@ -109,6 +109,12 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
+>> 		block_size = KVM_VGIC_V3_REDIST_SIZE;
+>> 		alignment = SZ_64K;
+>> 		break;
+>> +	case KVM_VGIC_V3_ADDR_TYPE_ITS:
+>> +		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
+>> +		addr_ptr = &vgic->vgic_its_base;
+>> +		block_size = KVM_VGIC_V3_ITS_SIZE;
+>> +		alignment = SZ_64K;
+>> +		break;
+> 
+> Should there be a check based on number of vcpus? 
 
-so if one CPU takes a permission fault and is in the process of updating
-the page table, what prevents another CPU from setting the access flag
-(on a read, done by HW) on that entry between us reading the old pte and
-replacing it with the new pte?
+Why would the number of vcpus influence the size of the ITS?
 
-Don't we loose the AF information in that case too?
+Thanks,
 
-> 
-> The (pte|pmd)_mkyoung() uses on Stage 2 entries (setting the AF bit
-> explicitly) do not need to be modified since hardware updates of the
-> dirty status are not supported by KVM, so there is no possibility of
-> losing such information.
-> 
-> Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Christoffer Dall <christoffer.dall@linaro.org>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> ---
-> 
-> After some digging through the KVM code, I concluded that hardware DBM
-> (dirty bit management) support is not feasible for Stage 2. A potential
-> user would be dirty logging but this requires a different bitmap exposed
-> to Qemu and, to avoid races, the stage 2 mappings need to be mapped
-> read-only on clean, writable on fault. This assumption simplifies the
-> hardware Stage 2 AF support.
-> 
-> Tested on a model with handle_access_fault() no longer being called when
-> the hardware AF is present and enabled. It needs swap enabling and light
-> memory pressure to trigger the page aging.
-> 
->  arch/arm/include/asm/kvm_mmu.h   | 10 +++++----
->  arch/arm/kvm/mmu.c               | 46 +++++++++++++++++++++++++---------------
->  arch/arm64/include/asm/kvm_arm.h |  2 ++
->  arch/arm64/include/asm/kvm_mmu.h | 27 +++++++++++++++++------
->  arch/arm64/include/asm/pgtable.h | 13 ++++++++----
->  arch/arm64/kvm/hyp/s2-setup.c    |  8 +++++++
->  6 files changed, 74 insertions(+), 32 deletions(-)
-> 
-> diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-> index da44be9db4fa..bff1ca42a97e 100644
-> --- a/arch/arm/include/asm/kvm_mmu.h
-> +++ b/arch/arm/include/asm/kvm_mmu.h
-> @@ -105,14 +105,16 @@ static inline void kvm_clean_pte(pte_t *pte)
->  	clean_pte_table(pte);
->  }
->  
-> -static inline void kvm_set_s2pte_writable(pte_t *pte)
-> +static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
->  {
-> -	pte_val(*pte) |= L_PTE_S2_RDWR;
-> +	pte_val(pte) |= L_PTE_S2_RDWR;
-> +	return pte;
->  }
->  
-> -static inline void kvm_set_s2pmd_writable(pmd_t *pmd)
-> +static inline pmd_t kvm_s2pmd_mkwrite(pmd_t pmd)
->  {
-> -	pmd_val(*pmd) |= L_PMD_S2_RDWR;
-> +	pmd_val(pmd) |= L_PMD_S2_RDWR;
-> +	return pmd;
->  }
->  
->  static inline void kvm_set_s2pte_readonly(pte_t *pte)
-> diff --git a/arch/arm/kvm/mmu.c b/arch/arm/kvm/mmu.c
-> index 58dbd5c439df..b6736ea85722 100644
-> --- a/arch/arm/kvm/mmu.c
-> +++ b/arch/arm/kvm/mmu.c
-> @@ -955,6 +955,27 @@ static int stage2_set_pte(struct kvm *kvm, struct kvm_mmu_memory_cache *cache,
->  	return 0;
->  }
->  
-> +#ifndef __HAVE_ARCH_PTEP_TEST_AND_CLEAR_YOUNG
-> +static int stage2_ptep_test_and_clear_young(pte_t *pte)
-> +{
-> +	if (pte_young(*pte)) {
-> +		*pte = pte_mkold(*pte);
-> +		return 1;
-> +	}
-> +	return 0;
-> +}
-> +#else
-> +static int stage2_ptep_test_and_clear_young(pte_t *pte)
-> +{
-> +	return __ptep_test_and_clear_young(pte);
-> +}
-> +#endif
-> +
-> +static int stage2_pmdp_test_and_clear_young(pmd_t *pmd)
-> +{
-> +	return stage2_ptep_test_and_clear_young((pte_t *)pmd);
-> +}
-> +
->  /**
->   * kvm_phys_addr_ioremap - map a device range to guest IPA
->   *
-> @@ -978,7 +999,7 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
->  		pte_t pte = pfn_pte(pfn, PAGE_S2_DEVICE);
->  
->  		if (writable)
-> -			kvm_set_s2pte_writable(&pte);
-> +			pte = kvm_s2pte_mkwrite(pte);
->  
->  		ret = mmu_topup_memory_cache(&cache, KVM_MMU_CACHE_MIN_PAGES,
->  						KVM_NR_MEM_OBJS);
-> @@ -1320,7 +1341,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		pmd_t new_pmd = pfn_pmd(pfn, mem_type);
->  		new_pmd = pmd_mkhuge(new_pmd);
->  		if (writable) {
-> -			kvm_set_s2pmd_writable(&new_pmd);
-> +			new_pmd = kvm_s2pmd_mkwrite(new_pmd);
->  			kvm_set_pfn_dirty(pfn);
->  		}
->  		coherent_cache_guest_page(vcpu, pfn, PMD_SIZE, fault_ipa_uncached);
-> @@ -1329,7 +1350,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		pte_t new_pte = pfn_pte(pfn, mem_type);
->  
->  		if (writable) {
-> -			kvm_set_s2pte_writable(&new_pte);
-> +			new_pte = kvm_s2pte_mkwrite(new_pte);
->  			kvm_set_pfn_dirty(pfn);
->  			mark_page_dirty(kvm, gfn);
->  		}
-> @@ -1348,6 +1369,8 @@ out_unlock:
->   * Resolve the access fault by making the page young again.
->   * Note that because the faulting entry is guaranteed not to be
->   * cached in the TLB, we don't need to invalidate anything.
-> + * Only the HW Access Flag updates are supported for Stage 2 (no DBM),
-> + * so there is no need for atomic (pte|pmd)_mkyoung operations.
->   */
->  static void handle_access_fault(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
->  {
-> @@ -1588,25 +1611,14 @@ static int kvm_age_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
->  	if (!pmd || pmd_none(*pmd))	/* Nothing there */
->  		return 0;
->  
-> -	if (kvm_pmd_huge(*pmd)) {	/* THP, HugeTLB */
-> -		if (pmd_young(*pmd)) {
-> -			*pmd = pmd_mkold(*pmd);
-> -			return 1;
-> -		}
-> -
-> -		return 0;
-> -	}
-> +	if (kvm_pmd_huge(*pmd))		/* THP, HugeTLB */
-> +		return stage2_pmdp_test_and_clear_young(pmd);
->  
->  	pte = pte_offset_kernel(pmd, gpa);
->  	if (pte_none(*pte))
->  		return 0;
->  
-> -	if (pte_young(*pte)) {
-> -		*pte = pte_mkold(*pte);	/* Just a page... */
-> -		return 1;
-> -	}
-> -
-> -	return 0;
-> +	return stage2_ptep_test_and_clear_young(pte);
->  }
->  
->  static int kvm_test_age_hva_handler(struct kvm *kvm, gpa_t gpa, void *data)
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index 4150fd8bae01..bbed53c2735a 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -110,6 +110,8 @@
->  
->  /* VTCR_EL2 Registers bits */
->  #define VTCR_EL2_RES1		(1 << 31)
-> +#define VTCR_EL2_HD		(1 << 22)
-> +#define VTCR_EL2_HA		(1 << 21)
->  #define VTCR_EL2_PS_MASK	(7 << 16)
->  #define VTCR_EL2_TG0_MASK	(1 << 14)
->  #define VTCR_EL2_TG0_4K		(0 << 14)
-> diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
-> index 22732a5e3119..28bdf9ddaa0c 100644
-> --- a/arch/arm64/include/asm/kvm_mmu.h
-> +++ b/arch/arm64/include/asm/kvm_mmu.h
-> @@ -121,19 +121,32 @@ static inline void kvm_clean_pmd_entry(pmd_t *pmd) {}
->  static inline void kvm_clean_pte(pte_t *pte) {}
->  static inline void kvm_clean_pte_entry(pte_t *pte) {}
->  
-> -static inline void kvm_set_s2pte_writable(pte_t *pte)
-> +static inline pte_t kvm_s2pte_mkwrite(pte_t pte)
->  {
-> -	pte_val(*pte) |= PTE_S2_RDWR;
-> +	pte_val(pte) |= PTE_S2_RDWR;
-> +	return pte;
->  }
->  
-> -static inline void kvm_set_s2pmd_writable(pmd_t *pmd)
-> +static inline pmd_t kvm_s2pmd_mkwrite(pmd_t pmd)
->  {
-> -	pmd_val(*pmd) |= PMD_S2_RDWR;
-> +	pmd_val(pmd) |= PMD_S2_RDWR;
-> +	return pmd;
->  }
->  
->  static inline void kvm_set_s2pte_readonly(pte_t *pte)
->  {
-> -	pte_val(*pte) = (pte_val(*pte) & ~PTE_S2_RDWR) | PTE_S2_RDONLY;
-> +	pteval_t pteval;
-> +	unsigned long tmp;
-> +
-> +	asm volatile("//	kvm_set_s2pte_readonly\n"
-> +	"	prfm	pstl1strm, %2\n"
-> +	"1:	ldxr	%0, %2\n"
-> +	"	and	%0, %0, %3		// clear PTE_S2_RDWR\n"
-> +	"	orr	%0, %0, %4		// set PTE_S2_RDONLY\n"
-> +	"	stxr	%w1, %0, %2\n"
-> +	"	cbnz	%w1, 1b\n"
-> +	: "=&r" (pteval), "=&r" (tmp), "+Q" (pte_val(*pte))
-
-so the +Q means "pass the memory address of the value and by the way the
-content, not the address itself, can be updated by the assembly code" ?
-
-> +	: "L" (~PTE_S2_RDWR), "L" (PTE_S2_RDONLY));
->  }
->  
->  static inline bool kvm_s2pte_readonly(pte_t *pte)
-> @@ -143,12 +156,12 @@ static inline bool kvm_s2pte_readonly(pte_t *pte)
->  
->  static inline void kvm_set_s2pmd_readonly(pmd_t *pmd)
->  {
-> -	pmd_val(*pmd) = (pmd_val(*pmd) & ~PMD_S2_RDWR) | PMD_S2_RDONLY;
-> +	kvm_set_s2pte_readonly((pte_t *)pmd);
->  }
->  
->  static inline bool kvm_s2pmd_readonly(pmd_t *pmd)
->  {
-> -	return (pmd_val(*pmd) & PMD_S2_RDWR) == PMD_S2_RDONLY;
-> +	return kvm_s2pte_readonly((pte_t *)pmd);
->  }
->  
->  
-> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-> index 989fef16d461..8d29e6eb33f7 100644
-> --- a/arch/arm64/include/asm/pgtable.h
-> +++ b/arch/arm64/include/asm/pgtable.h
-> @@ -530,14 +530,12 @@ static inline pmd_t pmd_modify(pmd_t pmd, pgprot_t newprot)
->   * Atomic pte/pmd modifications.
->   */
->  #define __HAVE_ARCH_PTEP_TEST_AND_CLEAR_YOUNG
-> -static inline int ptep_test_and_clear_young(struct vm_area_struct *vma,
-> -					    unsigned long address,
-> -					    pte_t *ptep)
-> +static inline int __ptep_test_and_clear_young(pte_t *ptep)
->  {
->  	pteval_t pteval;
->  	unsigned int tmp, res;
->  
-> -	asm volatile("//	ptep_test_and_clear_young\n"
-> +	asm volatile("//	__ptep_test_and_clear_young\n"
->  	"	prfm	pstl1strm, %2\n"
->  	"1:	ldxr	%0, %2\n"
->  	"	ubfx	%w3, %w0, %5, #1	// extract PTE_AF (young)\n"
-> @@ -550,6 +548,13 @@ static inline int ptep_test_and_clear_young(struct vm_area_struct *vma,
->  	return res;
->  }
->  
-> +static inline int ptep_test_and_clear_young(struct vm_area_struct *vma,
-> +					    unsigned long address,
-> +					    pte_t *ptep)
-> +{
-> +	return __ptep_test_and_clear_young(ptep);
-> +}
-> +
->  #ifdef CONFIG_TRANSPARENT_HUGEPAGE
->  #define __HAVE_ARCH_PMDP_TEST_AND_CLEAR_YOUNG
->  static inline int pmdp_test_and_clear_young(struct vm_area_struct *vma,
-> diff --git a/arch/arm64/kvm/hyp/s2-setup.c b/arch/arm64/kvm/hyp/s2-setup.c
-> index 5a9f3bf542b0..110267af0b83 100644
-> --- a/arch/arm64/kvm/hyp/s2-setup.c
-> +++ b/arch/arm64/kvm/hyp/s2-setup.c
-> @@ -33,6 +33,14 @@ void __hyp_text __init_stage2_translation(void)
->  	val |= (read_sysreg(id_aa64mmfr0_el1) & 7) << 16;
->  
->  	/*
-> +	 * Check the availability of Hardware Access Flag / Dirty Bit
-> +	 * Management in ID_AA64MMFR1_EL1 and enable the feature in VTCR_EL2.
-> +	 */
-> +	tmp = (read_sysreg(id_aa64mmfr1_el1) >> ID_AA64MMFR1_HADBS_SHIFT) & 0xf;
-> +	if (IS_ENABLED(CONFIG_ARM64_HW_AFDBM) && tmp)
-> +		val |= VTCR_EL2_HA;
-> +
-> +	/*
->  	 * Read the VMIDBits bits from ID_AA64MMFR1_EL1 and set the VS
->  	 * bit in VTCR_EL2.
->  	 */
+	M.
+-- 
+Jazz is not dead. It just smells funny...
