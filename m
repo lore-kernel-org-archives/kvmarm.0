@@ -1,169 +1,247 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 03/12] KVM: arm64: Introduce new MMIO region for the
- ITS base address
-Date: Mon, 9 May 2016 18:09:48 +0100
-Message-ID: <5730C45C.1070808@arm.com>
-References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
- <1458958450-19662-4-git-send-email-andre.przywara@arm.com>
- <651B7BE4-D1C9-44B2-84BE-19103C1D8CE0@caviumnetworks.com>
- <5730B108.5010009@arm.com>
- <692F5470-73B2-467D-A5D4-58439446AC93@caviumnetworks.com>
+Subject: Re: [PATCH v3 32/55] KVM: arm/arm64: vgic-new: Add GICv3 MMIO
+ handling framework
+Date: Mon, 9 May 2016 18:18:21 +0100
+Message-ID: <5730C65D.5000609@arm.com>
+References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
+ <1462531568-9799-33-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <692F5470-73B2-467D-A5D4-58439446AC93@caviumnetworks.com>
+In-Reply-To: <1462531568-9799-33-git-send-email-andre.przywara@arm.com>
 Sender: kvm-owner@vger.kernel.org
-To: "Chalamarla, Tirumalesh" <Tirumalesh.Chalamarla@cavium.com>, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 09/05/16 17:53, Chalamarla, Tirumalesh wrote:
+On 06/05/16 11:45, Andre Przywara wrote:
+> Create a new file called vgic-mmio-v3.c and describe the GICv3
+> distributor and redistributor registers there.
+> This adds a special macro to deal with the split of SGI/PPI in the
+> redistributor and SPIs in the distributor, which allows us to reuse
+> the existing GICv2 handlers for those registers which are compatible.
+> Also we provide a function to deal with the registration of the two
+> separate redistributor frames per VCPU.
 > 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> Reviewed-by: Eric Auger <eric.auger@linaro.org>
+> ---
+> Changelog RFC..v1:
+> - adapt to new MMIO registration approach:
+>   register one device for the distributor and two for each VCPU
+> - implement special handling for private interrupts
+> - remove empty stub functions
+> - make IGROUPR return RAO
 > 
+> Changelog v1 .. v2:
+> - adapt to new framework, introduce vgic-mmio-v3.c
+> - remove userland register access functions (for now)
+> - precompute .len when describing a VGIC register
+> - add missed pointer incrementation on registering redist regions
+> - replace _nyi stub functions with raz/wi versions
 > 
+> Changelog v2 .. v3:
+> - replace inclusion of kvm/vgic/vgic.h with kvm/arm_vgic.h
+> - add prototype and stub code for vgic_register_redist_iodevs
+> - rename register struct variables _rdbase_ and _sgibase_
 > 
+>  virt/kvm/arm/vgic/vgic-mmio-v3.c | 191 +++++++++++++++++++++++++++++++++++++++
+>  virt/kvm/arm/vgic/vgic-mmio.c    |   5 +
+>  virt/kvm/arm/vgic/vgic-mmio.h    |   2 +
+>  virt/kvm/arm/vgic/vgic.h         |   7 ++
+>  4 files changed, 205 insertions(+)
+>  create mode 100644 virt/kvm/arm/vgic/vgic-mmio-v3.c
 > 
-> On 5/9/16, 8:47 AM, "Marc Zyngier" <marc.zyngier@arm.com> wrote:
-> 
->> On 05/05/16 19:08, Chalamarla, Tirumalesh wrote:
->>>
->>>
->>>
->>>
->>>
->>> On 3/25/16, 7:14 PM, "kvmarm-bounces@lists.cs.columbia.edu on behalf of Andre Przywara" <kvmarm-bounces@lists.cs.columbia.edu on behalf of andre.przywara@arm.com> wrote:
->>>
->>>> The ARM GICv3 ITS controller requires a separate register frame to
->>>> cover ITS specific registers. Add a new VGIC address type and store
->>>> the address in a field in the vgic_dist structure.
->>>> Provide a function to check whether userland has provided the address,
->>>> so ITS functionality can be guarded by that check.
->>>>
->>>> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->>>> ---
->>>> Documentation/virtual/kvm/devices/arm-vgic.txt |  9 +++++++++
->>>> arch/arm64/include/uapi/asm/kvm.h              |  2 ++
->>>> include/kvm/vgic/vgic.h                        |  5 +++++
->>>> virt/kvm/arm/vgic/vgic.c                       | 10 ++++++++++
->>>> virt/kvm/arm/vgic/vgic_init.c                  |  1 +
->>>> virt/kvm/arm/vgic/vgic_kvm_device.c            |  7 +++++++
->>>> 6 files changed, 34 insertions(+)
->>>>
->>>> diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
->>>> index 59541d4..087e2d9 100644
->>>> --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
->>>> +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
->>>> @@ -39,6 +39,15 @@ Groups:
->>>>       Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
->>>>       This address needs to be 64K aligned.
->>>>
->>>> +    KVM_VGIC_V3_ADDR_TYPE_ITS (rw, 64-bit)
->>>> +      Base address in the guest physical address space of the GICv3 ITS
->>>> +      control register frame. The ITS allows MSI(-X) interrupts to be
->>>> +      injected into guests. This extension is optional, if the kernel
->>>> +      does not support the ITS, the call returns -ENODEV.
->>>> +      This memory is solely for the guest to access the ITS control
->>>> +      registers and does not cover the ITS translation register.
->>>> +      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
->>>> +      This address needs to be 64K aligned and the region covers 64 KByte.
->>>>
->>>>   KVM_DEV_ARM_VGIC_GRP_DIST_REGS
->>>>   Attributes:
->>>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
->>>> index f209ea1..c2b257d 100644
->>>> --- a/arch/arm64/include/uapi/asm/kvm.h
->>>> +++ b/arch/arm64/include/uapi/asm/kvm.h
->>>> @@ -87,9 +87,11 @@ struct kvm_regs {
->>>> /* Supported VGICv3 address types  */
->>>> #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
->>>> #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
->>>> +#define KVM_VGIC_V3_ADDR_TYPE_ITS	4
->>>>
->>>> #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
->>>> #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
->>>> +#define KVM_VGIC_V3_ITS_SIZE		SZ_64K
->>>>
->>>> #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
->>>> #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
->>>> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
->>>> index 7c1d145..11344e6 100644
->>>> --- a/include/kvm/vgic/vgic.h
->>>> +++ b/include/kvm/vgic/vgic.h
->>>> @@ -135,6 +135,9 @@ struct vgic_dist {
->>>> 		gpa_t			vgic_redist_base;
->>>> 	};
->>>>
->>>> +	/* The base address of the ITS control register frame */
->>>> +	gpa_t			vgic_its_base;
->>>> +
->>>> 	/* distributor enabled */
->>>> 	u32			enabled;
->>>>
->>>> @@ -253,4 +256,6 @@ static inline int kvm_vgic_get_max_vcpus(void)
->>>> 	return kvm_vgic_global_state.max_gic_vcpus;
->>>> }
->>>>
->>>> +bool vgic_has_its(struct kvm *kvm);
->>>> +
->>>> #endif /* __ASM_ARM_KVM_VGIC_VGIC_H */
->>>> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
->>>> index 65395af..1de2478 100644
->>>> --- a/virt/kvm/arm/vgic/vgic.c
->>>> +++ b/virt/kvm/arm/vgic/vgic.c
->>>> @@ -612,3 +612,13 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, u32 intid)
->>>>
->>>> 	return map_is_active;
->>>> }
->>>> +
->>>> +bool vgic_has_its(struct kvm *kvm)
->>>> +{
->>>> +	struct vgic_dist *dist = &kvm->arch.vgic;
->>>> +
->>>> +	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
->>>> +		return false;
->>>> +
->>>> +	return !IS_VGIC_ADDR_UNDEF(dist->vgic_its_base);
->>>> +}
->>>> diff --git a/virt/kvm/arm/vgic/vgic_init.c b/virt/kvm/arm/vgic/vgic_init.c
->>>> index ac655b5..2301e03 100644
->>>> --- a/virt/kvm/arm/vgic/vgic_init.c
->>>> +++ b/virt/kvm/arm/vgic/vgic_init.c
->>>> @@ -132,6 +132,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
->>>> 	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
->>>> 	kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
->>>> 	kvm->arch.vgic.vgic_redist_base = VGIC_ADDR_UNDEF;
->>>> +	kvm->arch.vgic.vgic_its_base = VGIC_ADDR_UNDEF;
->>>>
->>>> out_unlock:
->>>> 	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
->>>> diff --git a/virt/kvm/arm/vgic/vgic_kvm_device.c b/virt/kvm/arm/vgic/vgic_kvm_device.c
->>>> index 7f78a16..3ec2ac3 100644
->>>> --- a/virt/kvm/arm/vgic/vgic_kvm_device.c
->>>> +++ b/virt/kvm/arm/vgic/vgic_kvm_device.c
->>>> @@ -109,6 +109,12 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
->>>> 		block_size = KVM_VGIC_V3_REDIST_SIZE;
->>>> 		alignment = SZ_64K;
->>>> 		break;
->>>> +	case KVM_VGIC_V3_ADDR_TYPE_ITS:
->>>> +		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
->>>> +		addr_ptr = &vgic->vgic_its_base;
->>>> +		block_size = KVM_VGIC_V3_ITS_SIZE;
->>>> +		alignment = SZ_64K;
->>>> +		break;
->>>
->>> Should there be a check based on number of vcpus? 
->>
->> Why would the number of vcpus influence the size of the ITS?
-> 
-> does the re-distributor per VCPU thing? I think its worth to add a
-> check for re distributor size.
+> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> new file mode 100644
+> index 0000000..06c7ec5
+> --- /dev/null
+> +++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
+> @@ -0,0 +1,191 @@
+> +/*
+> + * VGICv3 MMIO handling functions
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope that it will be useful,
+> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + * GNU General Public License for more details.
+> + */
+> +
+> +#include <linux/irqchip/arm-gic-v3.h>
+> +#include <linux/kvm.h>
+> +#include <linux/kvm_host.h>
+> +#include <kvm/iodev.h>
+> +#include <kvm/arm_vgic.h>
+> +
+> +#include <asm/kvm_emulate.h>
+> +
+> +#include "vgic.h"
+> +#include "vgic-mmio.h"
+> +
+> +/*
+> + * The GICv3 per-IRQ registers are split to control PPIs and SGIs in the
+> + * redistributors, while SPIs are covered by registers in the distributor
+> + * block. Trying to set private IRQs in this block gets ignored.
+> + * We take some special care here to fix the calculation of the register
+> + * offset.
+> + */
+> +#define REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(off, read_ops, write_ops, bpi) \
+> +	{								\
+> +		.reg_offset = off,					\
+> +		.bits_per_irq = bpi,					\
+> +		.len = (bpi * VGIC_NR_PRIVATE_IRQS) / 8,		\
+> +		.read = vgic_mmio_read_raz,				\
+> +		.write = vgic_mmio_write_wi,				\
+> +	}, {								\
+> +		.reg_offset = off + (bpi * VGIC_NR_PRIVATE_IRQS) / 8,	\
+> +		.bits_per_irq = bpi,					\
+> +		.len = (bpi * (1024 - VGIC_NR_PRIVATE_IRQS)) / 8,	\
+> +		.read = read_ops,					\
+> +		.write = write_ops,					\
+> +	}
+> +
+> +static const struct vgic_register_region vgic_v3_dist_registers[] = {
+> +	REGISTER_DESC_WITH_LENGTH(GICD_CTLR,
+> +		vgic_mmio_read_raz, vgic_mmio_write_wi, 16),
+> +	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGROUPR,
+> +		vgic_mmio_read_rao, vgic_mmio_write_wi, 1),
+> +	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISENABLER,
+> +		vgic_mmio_read_enable, vgic_mmio_write_senable, 1),
+> +	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICENABLER,
+> +		vgic_mmio_read_enable, vgic_mmio_write_cenable, 1),
+> +	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISPENDR,
+> +		vgic_mmio_read_pending, vgic_mmio_write_spending, 1),
+> +	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICPENDR,
+> +		vgic_mmio_read_pending, vgic_mmio_write_cpending, 1),
+> +	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ISACTIVER,
+> +		vgic_mmio_read_active, vgic_mmio_write_sactive, 1),
+> +	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICACTIVER,
+> +		vgic_mmio_read_active, vgic_mmio_write_cactive, 1),
+> +	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IPRIORITYR,
+> +		vgic_mmio_read_priority, vgic_mmio_write_priority, 8),
+> +	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ITARGETSR,
+> +		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
+> +	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_ICFGR,
+> +		vgic_mmio_read_config, vgic_mmio_write_config, 2),
+> +	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IGRPMODR,
+> +		vgic_mmio_read_raz, vgic_mmio_write_wi, 1),
+> +	REGISTER_DESC_WITH_BITS_PER_IRQ_SHARED(GICD_IROUTER,
+> +		vgic_mmio_read_raz, vgic_mmio_write_wi, 64),
+> +	REGISTER_DESC_WITH_LENGTH(GICD_IDREGS,
+> +		vgic_mmio_read_raz, vgic_mmio_write_wi, 48),
+> +};
+> +
+> +static const struct vgic_register_region vgic_v3_rdbase_registers[] = {
+> +	REGISTER_DESC_WITH_LENGTH(GICR_CTLR,
+> +		vgic_mmio_read_raz, vgic_mmio_write_wi, 4),
+> +	REGISTER_DESC_WITH_LENGTH(GICR_IIDR,
+> +		vgic_mmio_read_raz, vgic_mmio_write_wi, 4),
+> +	REGISTER_DESC_WITH_LENGTH(GICR_TYPER,
+> +		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
+> +	REGISTER_DESC_WITH_LENGTH(GICR_PROPBASER,
+> +		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
+> +	REGISTER_DESC_WITH_LENGTH(GICR_PENDBASER,
+> +		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
+> +	REGISTER_DESC_WITH_LENGTH(GICR_IDREGS,
+> +		vgic_mmio_read_raz, vgic_mmio_write_wi, 48),
+> +};
+> +
+> +static const struct vgic_register_region vgic_v3_sgibase_registers[] = {
+> +	REGISTER_DESC_WITH_LENGTH(GICR_IGROUPR0,
+> +		vgic_mmio_read_rao, vgic_mmio_write_wi, 4),
+> +	REGISTER_DESC_WITH_LENGTH(GICR_ISENABLER0,
+> +		vgic_mmio_read_enable, vgic_mmio_write_senable, 4),
+> +	REGISTER_DESC_WITH_LENGTH(GICR_ICENABLER0,
+> +		vgic_mmio_read_enable, vgic_mmio_write_cenable, 4),
+> +	REGISTER_DESC_WITH_LENGTH(GICR_ISPENDR0,
+> +		vgic_mmio_read_pending, vgic_mmio_write_spending, 4),
+> +	REGISTER_DESC_WITH_LENGTH(GICR_ICPENDR0,
+> +		vgic_mmio_read_pending, vgic_mmio_write_cpending, 4),
+> +	REGISTER_DESC_WITH_LENGTH(GICR_ISACTIVER0,
+> +		vgic_mmio_read_active, vgic_mmio_write_sactive, 4),
+> +	REGISTER_DESC_WITH_LENGTH(GICR_ICACTIVER0,
+> +		vgic_mmio_read_active, vgic_mmio_write_cactive, 4),
+> +	REGISTER_DESC_WITH_LENGTH(GICR_IPRIORITYR0,
+> +		vgic_mmio_read_priority, vgic_mmio_write_priority, 32),
+> +	REGISTER_DESC_WITH_LENGTH(GICR_ICFGR0,
+> +		vgic_mmio_read_config, vgic_mmio_write_config, 8),
+> +	REGISTER_DESC_WITH_LENGTH(GICR_IGRPMODR0,
+> +		vgic_mmio_read_raz, vgic_mmio_write_wi, 4),
+> +	REGISTER_DESC_WITH_LENGTH(GICR_NSACR,
+> +		vgic_mmio_read_raz, vgic_mmio_write_wi, 4),
+> +};
+> +
+> +unsigned int vgic_v3_init_dist_iodev(struct vgic_io_device *dev)
+> +{
+> +	dev->regions = vgic_v3_dist_registers;
+> +	dev->nr_regions = ARRAY_SIZE(vgic_v3_dist_registers);
+> +
+> +	kvm_iodevice_init(&dev->dev, &kvm_io_gic_ops);
+> +
+> +	return SZ_64K;
+> +}
+> +
+> +int vgic_register_redist_iodevs(struct kvm *kvm, gpa_t redist_base_address)
+> +{
+> +	int nr_vcpus = atomic_read(&kvm->online_vcpus);
+> +	struct kvm_vcpu *vcpu;
+> +	struct vgic_io_device *devices, *device;
+> +	int c, ret = 0;
+> +
+> +	devices = kmalloc(sizeof(struct vgic_io_device) * nr_vcpus * 2,
+> +			  GFP_KERNEL);
+> +	if (!devices)
+> +		return -ENOMEM;
+> +
+> +	device = devices;
+> +	kvm_for_each_vcpu(c, vcpu, kvm) {
+> +		kvm_iodevice_init(&device->dev, &kvm_io_gic_ops);
+> +		device->base_addr = redist_base_address;
+> +		device->regions = vgic_v3_rdbase_registers;
+> +		device->nr_regions = ARRAY_SIZE(vgic_v3_rdbase_registers);
+> +		device->redist_vcpu = vcpu;
+> +
+> +		mutex_lock(&kvm->slots_lock);
+> +		ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS,
+> +					      redist_base_address,
+> +					      SZ_64K, &device->dev);
+> +		mutex_unlock(&kvm->slots_lock);
+> +
+> +		if (ret)
+> +			break;
+> +
+> +		device++;
+> +		kvm_iodevice_init(&device->dev, &kvm_io_gic_ops);
+> +		device->base_addr = redist_base_address + SZ_64K;
+> +		device->regions = vgic_v3_sgibase_registers;
+> +		device->nr_regions = ARRAY_SIZE(vgic_v3_sgibase_registers);
+> +		device->redist_vcpu = vcpu;
+> +
+> +		mutex_lock(&kvm->slots_lock);
+> +		ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS,
+> +					      redist_base_address + SZ_64K,
+> +					      SZ_64K, &device->dev);
+> +		mutex_unlock(&kvm->slots_lock);
+> +		if (ret) {
+> +			kvm_io_bus_unregister_dev(kvm, KVM_MMIO_BUS,
+> +						  &devices[c * 2].dev);
+> +			break;
+> +		}
+> +		device++;
+> +		redist_base_address += 2 * SZ_64K;
+> +	}
 
-This patch is implementing the ITS, not the redistributors.
+What I fail to see here is what prevents the redistributor range from
+overlapping with the distributor (or any other device). The kvm IO bus
+is happy with overlapping addresses, but I'm not sure at all that this
+is safe.
 
-If you have any comment on the GICv3 implementation (of which the
-redistributors are part of), please comment on the relevant patch (see
-the 55 patch series that has been posted on Friday).
+Care to shed some light on it?
 
 Thanks,
 
