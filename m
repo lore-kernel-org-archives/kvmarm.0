@@ -1,26 +1,26 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v4 03/12] KVM: arm64: Introduce new MMIO region for the
- ITS base address
-Date: Mon, 9 May 2016 16:47:20 +0100
-Message-ID: <5730B108.5010009@arm.com>
-References: <1458958450-19662-1-git-send-email-andre.przywara@arm.com>
- <1458958450-19662-4-git-send-email-andre.przywara@arm.com>
- <651B7BE4-D1C9-44B2-84BE-19103C1D8CE0@caviumnetworks.com>
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH] kvm: arm64: Enable hardware updates of the Access Flag
+ for Stage 2 page tables
+Date: Mon, 9 May 2016 17:50:56 +0100
+Message-ID: <20160509165056.GC20598@e104818-lin.cambridge.arm.com>
+References: <1460566657-30221-1-git-send-email-catalin.marinas@arm.com>
+ <20160509153310.GA27623@cbox>
 Mime-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
 Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 8050349B9F
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2016 11:44:32 -0400 (EDT)
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 7F97A49BAD
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2016 12:48:10 -0400 (EDT)
 Received: from mm01.cs.columbia.edu ([127.0.0.1])
  by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id CPChcXYHpPMw for <kvmarm@lists.cs.columbia.edu>;
- Mon,  9 May 2016 11:44:31 -0400 (EDT)
+ with ESMTP id 4DWR0JqfJEsl for <kvmarm@lists.cs.columbia.edu>;
+ Mon,  9 May 2016 12:48:09 -0400 (EDT)
 Received: from foss.arm.com (foss.arm.com [217.140.101.70])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 1CBE649B4C
- for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2016 11:44:30 -0400 (EDT)
-In-Reply-To: <651B7BE4-D1C9-44B2-84BE-19103C1D8CE0@caviumnetworks.com>
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id E250549BA4
+ for <kvmarm@lists.cs.columbia.edu>; Mon,  9 May 2016 12:48:08 -0400 (EDT)
+Content-Disposition: inline
+In-Reply-To: <20160509153310.GA27623@cbox>
 List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
 List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
@@ -30,142 +30,80 @@ List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
  <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
 Errors-To: kvmarm-bounces@lists.cs.columbia.edu
 Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: "Chalamarla, Tirumalesh" <Tirumalesh.Chalamarla@caviumnetworks.com>, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>
-Cc: "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+To: Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Marc Zyngier <marc.zyngier@arm.com>, Paolo Bonzini <pbonzini@redhat.com>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 05/05/16 19:08, Chalamarla, Tirumalesh wrote:
+On Mon, May 09, 2016 at 05:33:10PM +0200, Christoffer Dall wrote:
+> On Wed, Apr 13, 2016 at 05:57:37PM +0100, Catalin Marinas wrote:
+> > The ARMv8.1 architecture extensions introduce support for hardware
+> > updates of the access and dirty information in page table entries. With
+> > VTCR_EL2.HA enabled (bit 21), when the CPU accesses an IPA with the
+> > PTE_AF bit cleared in the stage 2 page table, instead of raising an
+> > Access Flag fault to EL2 the CPU sets the actual page table entry bit
+> > (10). To ensure that kernel modifications to the page table do not
+> > inadvertently revert a bit set by hardware updates, certain Stage 2
+> > software pte/pmd operations must be performed atomically.
+> > 
+> > The main user of the AF bit is the kvm_age_hva() mechanism. The
+> > kvm_age_hva_handler() function performs a "test and clear young" action
+> > on the pte/pmd. This needs to be atomic in respect of automatic hardware
+> > updates of the AF bit. Since the AF bit is in the same position for both
+> > Stage 1 and Stage 2, the patch reuses the existing
+> > ptep_test_and_clear_young() functionality if
+> > __HAVE_ARCH_PTEP_TEST_AND_CLEAR_YOUNG is defined. Otherwise, the
+> > existing pte_young/pte_mkold mechanism is preserved.
+> > 
+> > The kvm_set_s2pte_readonly() (and the corresponding pmd equivalent) have
+> > to perform atomic modifications in order to avoid a race with updates of
+> > the AF bit. The arm64 implementation has been re-written using
+> > exclusives.
+> > 
+> > Currently, kvm_set_s2pte_writable() (and pmd equivalent) take a pointer
+> > argument and modify the pte/pmd in place. However, these functions are
+> > only used on local variables rather than actual page table entries, so
+> > it makes more sense to follow the pte_mkwrite() approach for stage 1
+> > attributes. The change to kvm_s2pte_mkwrite() makes it clear that these
+> > functions do not modify the actual page table entries.
 > 
-> 
-> 
-> 
-> 
-> On 3/25/16, 7:14 PM, "kvmarm-bounces@lists.cs.columbia.edu on behalf of Andre Przywara" <kvmarm-bounces@lists.cs.columbia.edu on behalf of andre.przywara@arm.com> wrote:
-> 
->> The ARM GICv3 ITS controller requires a separate register frame to
->> cover ITS specific registers. Add a new VGIC address type and store
->> the address in a field in the vgic_dist structure.
->> Provide a function to check whether userland has provided the address,
->> so ITS functionality can be guarded by that check.
->>
->> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
->> ---
->> Documentation/virtual/kvm/devices/arm-vgic.txt |  9 +++++++++
->> arch/arm64/include/uapi/asm/kvm.h              |  2 ++
->> include/kvm/vgic/vgic.h                        |  5 +++++
->> virt/kvm/arm/vgic/vgic.c                       | 10 ++++++++++
->> virt/kvm/arm/vgic/vgic_init.c                  |  1 +
->> virt/kvm/arm/vgic/vgic_kvm_device.c            |  7 +++++++
->> 6 files changed, 34 insertions(+)
->>
->> diff --git a/Documentation/virtual/kvm/devices/arm-vgic.txt b/Documentation/virtual/kvm/devices/arm-vgic.txt
->> index 59541d4..087e2d9 100644
->> --- a/Documentation/virtual/kvm/devices/arm-vgic.txt
->> +++ b/Documentation/virtual/kvm/devices/arm-vgic.txt
->> @@ -39,6 +39,15 @@ Groups:
->>       Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
->>       This address needs to be 64K aligned.
->>
->> +    KVM_VGIC_V3_ADDR_TYPE_ITS (rw, 64-bit)
->> +      Base address in the guest physical address space of the GICv3 ITS
->> +      control register frame. The ITS allows MSI(-X) interrupts to be
->> +      injected into guests. This extension is optional, if the kernel
->> +      does not support the ITS, the call returns -ENODEV.
->> +      This memory is solely for the guest to access the ITS control
->> +      registers and does not cover the ITS translation register.
->> +      Only valid for KVM_DEV_TYPE_ARM_VGIC_V3.
->> +      This address needs to be 64K aligned and the region covers 64 KByte.
->>
->>   KVM_DEV_ARM_VGIC_GRP_DIST_REGS
->>   Attributes:
->> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
->> index f209ea1..c2b257d 100644
->> --- a/arch/arm64/include/uapi/asm/kvm.h
->> +++ b/arch/arm64/include/uapi/asm/kvm.h
->> @@ -87,9 +87,11 @@ struct kvm_regs {
->> /* Supported VGICv3 address types  */
->> #define KVM_VGIC_V3_ADDR_TYPE_DIST	2
->> #define KVM_VGIC_V3_ADDR_TYPE_REDIST	3
->> +#define KVM_VGIC_V3_ADDR_TYPE_ITS	4
->>
->> #define KVM_VGIC_V3_DIST_SIZE		SZ_64K
->> #define KVM_VGIC_V3_REDIST_SIZE		(2 * SZ_64K)
->> +#define KVM_VGIC_V3_ITS_SIZE		SZ_64K
->>
->> #define KVM_ARM_VCPU_POWER_OFF		0 /* CPU is started in OFF state */
->> #define KVM_ARM_VCPU_EL1_32BIT		1 /* CPU running a 32bit VM */
->> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
->> index 7c1d145..11344e6 100644
->> --- a/include/kvm/vgic/vgic.h
->> +++ b/include/kvm/vgic/vgic.h
->> @@ -135,6 +135,9 @@ struct vgic_dist {
->> 		gpa_t			vgic_redist_base;
->> 	};
->>
->> +	/* The base address of the ITS control register frame */
->> +	gpa_t			vgic_its_base;
->> +
->> 	/* distributor enabled */
->> 	u32			enabled;
->>
->> @@ -253,4 +256,6 @@ static inline int kvm_vgic_get_max_vcpus(void)
->> 	return kvm_vgic_global_state.max_gic_vcpus;
->> }
->>
->> +bool vgic_has_its(struct kvm *kvm);
->> +
->> #endif /* __ASM_ARM_KVM_VGIC_VGIC_H */
->> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
->> index 65395af..1de2478 100644
->> --- a/virt/kvm/arm/vgic/vgic.c
->> +++ b/virt/kvm/arm/vgic/vgic.c
->> @@ -612,3 +612,13 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, u32 intid)
->>
->> 	return map_is_active;
->> }
->> +
->> +bool vgic_has_its(struct kvm *kvm)
->> +{
->> +	struct vgic_dist *dist = &kvm->arch.vgic;
->> +
->> +	if (dist->vgic_model != KVM_DEV_TYPE_ARM_VGIC_V3)
->> +		return false;
->> +
->> +	return !IS_VGIC_ADDR_UNDEF(dist->vgic_its_base);
->> +}
->> diff --git a/virt/kvm/arm/vgic/vgic_init.c b/virt/kvm/arm/vgic/vgic_init.c
->> index ac655b5..2301e03 100644
->> --- a/virt/kvm/arm/vgic/vgic_init.c
->> +++ b/virt/kvm/arm/vgic/vgic_init.c
->> @@ -132,6 +132,7 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
->> 	kvm->arch.vgic.vgic_dist_base = VGIC_ADDR_UNDEF;
->> 	kvm->arch.vgic.vgic_cpu_base = VGIC_ADDR_UNDEF;
->> 	kvm->arch.vgic.vgic_redist_base = VGIC_ADDR_UNDEF;
->> +	kvm->arch.vgic.vgic_its_base = VGIC_ADDR_UNDEF;
->>
->> out_unlock:
->> 	for (; vcpu_lock_idx >= 0; vcpu_lock_idx--) {
->> diff --git a/virt/kvm/arm/vgic/vgic_kvm_device.c b/virt/kvm/arm/vgic/vgic_kvm_device.c
->> index 7f78a16..3ec2ac3 100644
->> --- a/virt/kvm/arm/vgic/vgic_kvm_device.c
->> +++ b/virt/kvm/arm/vgic/vgic_kvm_device.c
->> @@ -109,6 +109,12 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
->> 		block_size = KVM_VGIC_V3_REDIST_SIZE;
->> 		alignment = SZ_64K;
->> 		break;
->> +	case KVM_VGIC_V3_ADDR_TYPE_ITS:
->> +		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
->> +		addr_ptr = &vgic->vgic_its_base;
->> +		block_size = KVM_VGIC_V3_ITS_SIZE;
->> +		alignment = SZ_64K;
->> +		break;
-> 
-> Should there be a check based on number of vcpus? 
+> so if one CPU takes a permission fault and is in the process of updating
+> the page table, what prevents another CPU from setting the access flag
+> (on a read, done by HW) on that entry between us reading the old pte and
+> replacing it with the new pte?
 
-Why would the number of vcpus influence the size of the ITS?
+There isn't anything that would prevent this. However, as in the stage 1
+scenarios, explicitly writing a PTE as a result of a permission fault
+should also mark the entry as accessed (young, either as the default
+protection in PROT_DEFAULT or explicitly via pte_mkyoung).
 
-Thanks,
+> Don't we loose the AF information in that case too?
 
-	M.
+Since the hardware never clears the AF bit automatically, there is no
+information to lose in this race as long as the kvm_set_s2pte_writable()
+sets the AF bit. AFAICT, the PAGE_S2 and PAGE_S2_DEVICE definitions
+already use PROT_DEFAULT which has the AF bit set.
+
+> >  static inline void kvm_set_s2pte_readonly(pte_t *pte)
+> >  {
+> > -	pte_val(*pte) = (pte_val(*pte) & ~PTE_S2_RDWR) | PTE_S2_RDONLY;
+> > +	pteval_t pteval;
+> > +	unsigned long tmp;
+> > +
+> > +	asm volatile("//	kvm_set_s2pte_readonly\n"
+> > +	"	prfm	pstl1strm, %2\n"
+> > +	"1:	ldxr	%0, %2\n"
+> > +	"	and	%0, %0, %3		// clear PTE_S2_RDWR\n"
+> > +	"	orr	%0, %0, %4		// set PTE_S2_RDONLY\n"
+> > +	"	stxr	%w1, %0, %2\n"
+> > +	"	cbnz	%w1, 1b\n"
+> > +	: "=&r" (pteval), "=&r" (tmp), "+Q" (pte_val(*pte))
+> 
+> so the +Q means "pass the memory address of the value and by the way the
+> content, not the address itself, can be updated by the assembly code" ?
+
+Yes. I think "info gcc" isn't clear enough on this constraint (at least
+to me) but that's something we learnt from the tools guys in the early
+days of the aarch64 kernel port.
+
 -- 
-Jazz is not dead. It just smells funny...
+Catalin
