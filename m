@@ -1,59 +1,93 @@
-From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 19/55] KVM: arm/arm64: vgic-new: Add GICv3 world switch
- backend
-Date: Tue, 10 May 2016 15:22:20 +0100
-Message-ID: <5731EE9C.5000201@arm.com>
-References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
- <1462531568-9799-20-git-send-email-andre.przywara@arm.com>
- <20160510140454.GG27623@cbox>
- <CAFEAcA9U9qqsSJt7RfNJmDutCsYwnaPGfi-sEcnxYYjSm5C8sA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+From: Andre Przywara <andre.przywara@arm.com>
+Subject: [PATCH v3a] KVM: arm/arm64: pmu: abstract access to number of SPIs
+Date: Tue, 10 May 2016 15:35:06 +0100
+Message-ID: <1462890906-6134-1-git-send-email-andre.przywara@arm.com>
+References: <5731AF57.2040707@linaro.org>
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <CAFEAcA9U9qqsSJt7RfNJmDutCsYwnaPGfi-sEcnxYYjSm5C8sA@mail.gmail.com>
+In-Reply-To: <5731AF57.2040707@linaro.org>
 Sender: kvm-owner@vger.kernel.org
-To: Peter Maydell <peter.maydell@linaro.org>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: Andre Przywara <andre.przywara@arm.com>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, kvm-devel <kvm@vger.kernel.org>
+To: Marc Zyngier <marc.zyngier@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>, Eric Auger <eric.auger@linaro.org>
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/05/16 15:15, Peter Maydell wrote:
-> On 10 May 2016 at 15:04, Christoffer Dall <christoffer.dall@linaro.org> wrote:
->> On Fri, May 06, 2016 at 11:45:32AM +0100, Andre Przywara wrote:
->>> +     /*
->>> +      * Currently all guest IRQs are Group1, as Group0 would result
->>> +      * in a FIQ in the guest, which it wouldn't expect.
->>
->> I still don't like or understand this comment.  This should simply say
->> that we're making a gross assumption about all interrupts being group1
->> here.
-> 
-> It's not really an assumption so much as it's a missing feature (aka bug):
-> there's no reason the vGIC shouldn't support group 0 interrupts. We
-> just get away with only supporting group 1 because Linux guests
-> happen to only use group 1 interrupts. If/when the vGIC gains support
-> for group0 interrupts, then it should reset with interrupts configured
-> in group0 by default.
-> 
->>> +      * Eventually we want to make this configurable, so we may
->>> +      * revisit this in the future.
->>> +      */
-> 
-> The only reason to make it configurable is to work around a guest
-> kernel bug whereby Linux assumes that all interrupts start out
-> in Group1. Marc sent out a patch earlier today that fixes that bug:
->  https://lkml.org/lkml/2016/5/10/297
-> Depending on how long it takes you to fix this missing vgic feature,
-> such kernels may all be long-forgotten, in which case you can
-> get away without the config option :-)
+Currently the PMU uses a member of the struct vgic_dist directly,
+which not only breaks abstraction, but will fail with the new VGIC.
+Abstract this access in the VGIC header file.
 
-I've CC'd stable for this particular patch, so hopefully we won't have
-to make it configurable as people will diligently update their
-kernels... I also have a patch for handling both groups in KVM, but I'll
-hold onto it until we have something we agree on for the bulk of the code.
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+---
+Hi Eric, Marc,
 
-Thanks,
+as this if-statement was quite confusing (it wasn't even the negation
+that was wrong), I rewrote it a bit to be more readable.
+This one works now with PPIs (after fixing kvmtool).
 
-	M.
+Does that make sense?
+
+Cheers,
+Andre.
+
+ include/kvm/arm_vgic.h |  2 ++
+ virt/kvm/arm/pmu.c     | 19 +++++++++++--------
+ 2 files changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 6a98e05..d406f8e 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -351,6 +351,8 @@ bool kvm_vgic_map_is_active(struct kvm_vcpu *vcpu, unsigned int virt_irq);
+ #define irqchip_in_kernel(k)	(!!((k)->arch.vgic.in_kernel))
+ #define vgic_initialized(k)	(!!((k)->arch.vgic.nr_cpus))
+ #define vgic_ready(k)		((k)->arch.vgic.ready)
++#define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
++				 ((i) < (k)->arch.vgic.nr_irqs))
+ 
+ int vgic_v2_probe(struct device_node *vgic_node,
+ 		  const struct vgic_ops **ops,
+diff --git a/virt/kvm/arm/pmu.c b/virt/kvm/arm/pmu.c
+index 575c7aa..6ab9d6b 100644
+--- a/virt/kvm/arm/pmu.c
++++ b/virt/kvm/arm/pmu.c
+@@ -436,6 +436,11 @@ static int kvm_arm_pmu_v3_init(struct kvm_vcpu *vcpu)
+ 	return 0;
+ }
+ 
++/*
++ * For one VM the interrupt type must be same for each vcpu.
++ * As a PPI, the interrupt number is the same for all vcpus,
++ * while as an SPI it must be a separate number per vcpu.
++ */
+ static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
+ {
+ 	int i;
+@@ -457,6 +462,7 @@ static bool irq_is_valid(struct kvm *kvm, int irq, bool is_ppi)
+ 	return true;
+ }
+ 
++#define irq_is_ppi(irq) ((irq) >= VGIC_NR_SGIS && (irq) < VGIC_NR_PRIVATE_IRQS)
+ 
+ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ {
+@@ -471,14 +477,11 @@ int kvm_arm_pmu_v3_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr)
+ 		if (get_user(irq, uaddr))
+ 			return -EFAULT;
+ 
+-		/*
+-		 * The PMU overflow interrupt could be a PPI or SPI, but for one
+-		 * VM the interrupt type must be same for each vcpu. As a PPI,
+-		 * the interrupt number is the same for all vcpus, while as an
+-		 * SPI it must be a separate number per vcpu.
+-		 */
+-		if (irq < VGIC_NR_SGIS || irq >= vcpu->kvm->arch.vgic.nr_irqs ||
+-		    !irq_is_valid(vcpu->kvm, irq, irq < VGIC_NR_PRIVATE_IRQS))
++		/* The PMU overflow interrupt can be a PPI or a valid SPI. */
++		if (!(irq_is_ppi(irq) || vgic_valid_spi(vcpu->kvm, irq)))
++			return -EINVAL;
++
++		if (!irq_is_valid(vcpu->kvm, irq, irq < VGIC_NR_PRIVATE_IRQS))
+ 			return -EINVAL;
+ 
+ 		if (kvm_arm_pmu_irq_initialized(vcpu))
 -- 
-Jazz is not dead. It just smells funny...
+2.7.3
+
