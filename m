@@ -1,215 +1,160 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
-Subject: Re: [PATCH v3 26/55] KVM: arm/arm64: vgic-new: Add ACTIVE registers
- handlers
-Date: Tue, 10 May 2016 15:12:59 +0200
-Message-ID: <20160510131259.GA20499@cbox>
-References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
- <1462531568-9799-27-git-send-email-andre.przywara@arm.com>
- <5731D0B5.9060605@arm.com>
- <5731DC60.40809@arm.com>
+From: Marc Zyngier <marc.zyngier@arm.com>
+Subject: Re: [PATCH] KVM: arm/arm64: vgic-new: fix overlap check for device
+ addresses
+Date: Tue, 10 May 2016 14:16:44 +0100
+Message-ID: <5731DF3C.6020201@arm.com>
+References: <5730C65D.5000609@arm.com>
+ <1462877922-8743-1-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Return-path: <kvm-owner@vger.kernel.org>
-Content-Disposition: inline
-In-Reply-To: <5731DC60.40809@arm.com>
-Sender: kvm-owner@vger.kernel.org
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
+Received: from localhost (localhost [127.0.0.1])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 1036D49B9C
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2016 09:13:54 -0400 (EDT)
+Received: from mm01.cs.columbia.edu ([127.0.0.1])
+ by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id QaCrTc21ETcu for <kvmarm@lists.cs.columbia.edu>;
+ Tue, 10 May 2016 09:13:52 -0400 (EDT)
+Received: from foss.arm.com (foss.arm.com [217.140.101.70])
+ by mm01.cs.columbia.edu (Postfix) with ESMTP id 9C05449B51
+ for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2016 09:13:52 -0400 (EDT)
+In-Reply-To: <1462877922-8743-1-git-send-email-andre.przywara@arm.com>
+List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
+List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
+List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
+List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
+List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
+ <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
+Errors-To: kvmarm-bounces@lists.cs.columbia.edu
+Sender: kvmarm-bounces@lists.cs.columbia.edu
+To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Tue, May 10, 2016 at 02:04:32PM +0100, Andre Przywara wrote:
+On 10/05/16 11:58, Andre Przywara wrote:
+> When userland sets the base addresses for the GIC register frames,
+> the kernel tries to make sure that the regions for the distributor and
+> the one for the CPU interface or the redistributors do not overlap.
+> Only that this check currently takes care of a GICv2 model only.
+> Rework the overlap check to take a GICv3 in account also.
+> 
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> ---
 > Hi Marc,
 > 
-> On 10/05/16 13:14, Marc Zyngier wrote:
-> > On 06/05/16 11:45, Andre Przywara wrote:
-> >> The active register handlers are shared between the v2 and v3
-> >> emulation, so their implementation goes into vgic-mmio.c, to be
-> >> easily referenced from the v3 emulation as well later.
-> >> Since activation/deactivation of an interrupt may happen entirely
-> >> in the guest without it ever exiting, we need some extra logic to
-> >> properly track the active state.
-> >> Putting it on an ap_list on activation is similar to the normal case
-> >> handled by vgic_queue_irq_unlock(), but differs in some details that
-> >> make a separate implementation worthwhile.
-> >>
-> >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> >> ---
-> >> Changelog RFC..v1:
-> >> - handling queueing in write handler
-> >> - remove IRQ lock from read handler
-> >>
-> >> Changelog v1 .. v2:
-> >> - adapt to new MMIO framework
-> >>
-> >>  virt/kvm/arm/vgic/vgic-mmio-v2.c |   4 +-
-> >>  virt/kvm/arm/vgic/vgic-mmio.c    | 120 +++++++++++++++++++++++++++++++++++++++
-> >>  virt/kvm/arm/vgic/vgic-mmio.h    |  10 ++++
-> >>  3 files changed, 132 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/virt/kvm/arm/vgic/vgic-mmio-v2.c b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> >> index 4b87e0a..054b52d 100644
-> >> --- a/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> >> +++ b/virt/kvm/arm/vgic/vgic-mmio-v2.c
-> >> @@ -80,9 +80,9 @@ static const struct vgic_register_region vgic_v2_dist_registers[] = {
-> >>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PENDING_CLEAR,
-> >>  		vgic_mmio_read_pending, vgic_mmio_write_cpending, 1),
-> >>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_SET,
-> >> -		vgic_mmio_read_raz, vgic_mmio_write_wi, 1),
-> >> +		vgic_mmio_read_active, vgic_mmio_write_sactive, 1),
-> >>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_ACTIVE_CLEAR,
-> >> -		vgic_mmio_read_raz, vgic_mmio_write_wi, 1),
-> >> +		vgic_mmio_read_active, vgic_mmio_write_cactive, 1),
-> >>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_PRI,
-> >>  		vgic_mmio_read_raz, vgic_mmio_write_wi, 8),
-> >>  	REGISTER_DESC_WITH_BITS_PER_IRQ(GIC_DIST_TARGET,
-> >> diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-> >> index 4df1af7..dbf683e 100644
-> >> --- a/virt/kvm/arm/vgic/vgic-mmio.c
-> >> +++ b/virt/kvm/arm/vgic/vgic-mmio.c
-> >> @@ -162,6 +162,126 @@ void vgic_mmio_write_cpending(struct kvm_vcpu *vcpu,
-> >>  	}
-> >>  }
-> >>  
-> >> +unsigned long vgic_mmio_read_active(struct kvm_vcpu *vcpu,
-> >> +				    gpa_t addr, unsigned int len)
-> >> +{
-> >> +	u32 intid = (addr & 0x7f) * 8;
-> >> +	u32 value = 0;
-> >> +	int i;
-> >> +
-> >> +	/* Loop over all IRQs affected by this read */
-> >> +	for (i = 0; i < len * 8; i++) {
-> >> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-> >> +
-> >> +		if (irq->active)
-> >> +			value |= (1U << i);
-> >> +	}
-> >> +
-> >> +	return extract_bytes(value, addr & 3, len);
-> >> +}
-> >> +
-> >> +void vgic_mmio_write_cactive(struct kvm_vcpu *vcpu,
-> >> +			     gpa_t addr, unsigned int len,
-> >> +			     unsigned long val)
-> >> +{
-> >> +	u32 intid = (addr & 0x7f) * 8;
-> >> +	int i;
-> >> +
-> >> +	for_each_set_bit(i, &val, len * 8) {
-> >> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-> >> +
-> >> +		spin_lock(&irq->irq_lock);
-> >> +
-> >> +		irq->active = false;
-> >> +
-> >> +		/*
-> >> +		 * Christoffer wrote:
-> >> +		 * The question is what to do if the vcpu for this irq is
-> >> +		 * running and the LR there has the active bit set, then we'll
-> >> +		 * overwrite this change when we fold the LR state back into
-> >> +		 * the vgic_irq struct.
-> >> +		 *
-> >> +		 * Since I expect this to be extremely rare, one option is to
-> >> +		 * force irq->vcpu to exit (if non-null) and then do you
-> >> +		 * thing here after you've confirm it has exited while holding
-> >> +		 * some lock preventing it from re-entering again.
-> >> +		 * Slightly crazy.
-> >> +		 *
-> >> +		 * The alternative is to put a big fat comment nothing that
-> >> +		 * this is non-supported bad race, and wait until someone
-> >> +		 * submits a bug report relating to this...
-> >> +		 */
-> > 
-> > Don't we have a patch by Christoffer that addresses this exact issue?
+> this one goes on top of the new-vgic-v3 series.
+> Does this address your concerns about the overlap check?
+> I'd be grateful if you could apply some of your C wizardry on the first
+> function ;-)
 > 
-> Yes, and if I am not mistaken you said last week that we put this patch
-> and the firmware-independent probing on top of the queue, so I didn't
-> merge it.
+> Cheers,
+> Andre.
 > 
-> >> +
-> >> +		spin_unlock(&irq->irq_lock);
-> >> +	}
-> >> +}
-> >> +
-> >> +void vgic_mmio_write_sactive(struct kvm_vcpu *vcpu,
-> >> +			     gpa_t addr, unsigned int len,
-> >> +			     unsigned long val)
-> >> +{
-> >> +	u32 intid = (addr & 0x7f) * 8;
-> >> +	int i;
-> >> +
-> >> +	for_each_set_bit(i, &val, len * 8) {
-> >> +		struct vgic_irq *irq = vgic_get_irq(vcpu->kvm, vcpu, intid + i);
-> >> +
-> >> +		spin_lock(&irq->irq_lock);
-> >> +
-> >> +		/* As this is a special case, we can't use the
-> >> +		 * vgic_queue_irq_unlock() function to put this on a VCPU.
-> >> +		 * So deal with this here explicitly unless the IRQs was
-> >> +		 * already active, it was on a VCPU before or there is no
-> >> +		 * target VCPU assigned at the moment.
-> >> +		 */
-> >> +		if (irq->active || irq->vcpu || !irq->target_vcpu) {
-> >> +			irq->active = true;
-> >> +
-> >> +			spin_unlock(&irq->irq_lock);
-> >> +			continue;
-> >> +		}
-> >> +
-> >> +		spin_unlock(&irq->irq_lock);
-> >> +retry:
-> >> +		vcpu = irq->target_vcpu;
-> >> +
-> >> +		spin_lock(&vcpu->arch.vgic_cpu.ap_list_lock);
-> >> +		spin_lock(&irq->irq_lock);
-> >> +
-> >> +		/*
-> >> +		 * Recheck after dropping the IRQ lock to see if we should
-> >> +		 * still care about queueing it.
-> >> +		 */
-> >> +		if (irq->active || irq->vcpu) {
-> >> +			irq->active = true;
-> >> +
-> >> +			spin_unlock(&irq->irq_lock);
-> >> +			spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
-> >> +
-> >> +			continue;
-> >> +		}
-> >> +
-> >> +		/* Did the target VCPU change while we had the lock dropped? */
-> >> +		if (vcpu != irq->target_vcpu) {
-> >> +			spin_unlock(&irq->irq_lock);
-> >> +			spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
-> >> +
-> >> +			goto retry;
-> >> +		}
-> >> +
-> >> +		/* Now queue the IRQ to the VCPU's ap_list. */
-> >> +		list_add_tail(&irq->ap_list, &vcpu->arch.vgic_cpu.ap_list_head);
-> >> +		irq->vcpu = vcpu;
-> >> +
-> >> +		irq->active = true;
-> >> +
-> >> +		spin_unlock(&irq->irq_lock);
-> >> +		spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
-> >> +
-> >> +		kvm_vcpu_kick(vcpu);
-> >> +	}
-> > 
-> > This is annoyingly close to vgic_queue_irq_unlock()... Maybe switching
-> > this to some form of preprocessor template. Or not.
+>  virt/kvm/arm/vgic/vgic-kvm-device.c | 59 ++++++++++++++++++++++++++-----------
+>  1 file changed, 41 insertions(+), 18 deletions(-)
 > 
-> I think we had this discussion with Christoffer before. There are subtle
-> differences and the impression was that unifying the two would make them
-> basically unreadable because of all this special handling.
-> Not sure if the preprocessor would help here.
-> 
-If we changed the queue function slightly as I suggested, I haven't been
-able to come up with a case were we can't do:
+> diff --git a/virt/kvm/arm/vgic/vgic-kvm-device.c b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> index 2122ff2..fcf38ef 100644
+> --- a/virt/kvm/arm/vgic/vgic-kvm-device.c
+> +++ b/virt/kvm/arm/vgic/vgic-kvm-device.c
+> @@ -21,41 +21,63 @@
+>  
+>  /* common helpers */
+>  
+> -static int vgic_ioaddr_overlap(struct kvm *kvm)
+> +static phys_addr_t vgic_get_existing_region(struct kvm *kvm, phys_addr_t *addr)
+>  {
+> -	phys_addr_t dist = kvm->arch.vgic.vgic_dist_base;
+> -	phys_addr_t cpu = kvm->arch.vgic.vgic_cpu_base;
+> +	struct vgic_dist *dist = &kvm->arch.vgic;
+> +	phys_addr_t cpu_addr;
+> +	bool is_vgicv2 = (dist->vgic_model == KVM_DEV_TYPE_ARM_VGIC_V2);
+>  
+> -	if (IS_VGIC_ADDR_UNDEF(dist) || IS_VGIC_ADDR_UNDEF(cpu))
+> -		return 0;
+> -	if ((dist <= cpu && dist + KVM_VGIC_V2_DIST_SIZE > cpu) ||
+> -	    (cpu <= dist && cpu + KVM_VGIC_V2_CPU_SIZE > dist))
+> -		return -EBUSY;
+> -	return 0;
+> +	cpu_addr = is_vgicv2 ? dist->vgic_cpu_base : dist->vgic_redist_base;
+> +
+> +	if (IS_VGIC_ADDR_UNDEF(dist->vgic_dist_base)) {
+> +		if (IS_VGIC_ADDR_UNDEF(cpu_addr))
+> +			return 0;
+> +
+> +		*addr = cpu_addr;
+> +		if (is_vgicv2)
+> +			return KVM_VGIC_V2_CPU_SIZE;
+> +		return atomic_read(&kvm->online_vcpus) * KVM_VGIC_V3_REDIST_SIZE;
+> +	}
+> +
+> +	*addr = dist->vgic_dist_base;
+> +	return is_vgicv2 ? KVM_VGIC_V2_DIST_SIZE : KVM_VGIC_V3_DIST_SIZE;
+> +}
+> +
+> +static bool vgic_ioaddr_overlap(struct kvm *kvm, phys_addr_t addr,
+> +				phys_addr_t size)
+> +{
+> +	phys_addr_t used_addr, used_size;
+> +
+> +	used_size = vgic_get_existing_region(kvm, &used_addr);
+> +	if (!used_size)
+> +		return false;
+> +
+> +	if (addr + size <= used_addr)
+> +		return false;
+> +
+> +	if (used_addr + used_size <= addr)
+> +		return false;
+> +
+> +	return true;
+>  }
+>  
+>  static int vgic_ioaddr_assign(struct kvm *kvm, phys_addr_t *ioaddr,
+>  			      phys_addr_t addr, phys_addr_t size)
+>  {
+> -	int ret;
+> -
+>  	if (addr & ~KVM_PHYS_MASK)
+>  		return -E2BIG;
+>  
+> -	if (addr & (SZ_4K - 1))
+> -		return -EINVAL;
+> -
+>  	if (!IS_VGIC_ADDR_UNDEF(*ioaddr))
+>  		return -EEXIST;
+>  	if (addr + size < addr)
+>  		return -EINVAL;
+>  
+> +	if (vgic_ioaddr_overlap(kvm, addr, size))
+> +		return -EBUSY;
+> +
+>  	*ioaddr = addr;
+> -	ret = vgic_ioaddr_overlap(kvm);
+> -	if (ret)
+> -		*ioaddr = VGIC_ADDR_UNDEF;
+>  
+> -	return ret;
+> +	return 0;
+>  }
+>  
+>  /**
+> @@ -104,6 +126,7 @@ int kvm_vgic_addr(struct kvm *kvm, unsigned long type, u64 *addr, bool write)
+>  		type_needed = KVM_DEV_TYPE_ARM_VGIC_V3;
+>  		addr_ptr = &vgic->vgic_redist_base;
+>  		block_size = KVM_VGIC_V3_REDIST_SIZE;
+> +		block_size *= atomic_read(&kvm->online_vcpus);
 
-spin_lock(&irq->irq_lock);
-vgic_queue_irq_unlock(irq);
+What guarantees that the vcpus have been created already? AFAIU, you can
+perfectly create the VM, then the GIC, and then the vcpus. So this would
+be perfectly be allowed to be zero.
 
-but I need to look at it more carefully.
+Or did I miss something?
 
--Christoffer
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
