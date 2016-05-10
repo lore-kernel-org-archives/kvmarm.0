@@ -1,42 +1,21 @@
-From: Christoffer Dall <christoffer.dall@linaro.org>
+From: Marc Zyngier <marc.zyngier@arm.com>
 Subject: Re: [PATCH v3 26/55] KVM: arm/arm64: vgic-new: Add ACTIVE registers
  handlers
-Date: Tue, 10 May 2016 14:09:00 +0200
-Message-ID: <20160510120900.GD27623@cbox>
+Date: Tue, 10 May 2016 13:14:45 +0100
+Message-ID: <5731D0B5.9060605@arm.com>
 References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
  <1462531568-9799-27-git-send-email-andre.przywara@arm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Return-path: <kvmarm-bounces@lists.cs.columbia.edu>
-Received: from localhost (localhost [127.0.0.1])
- by mm01.cs.columbia.edu (Postfix) with ESMTP id 5B0BC49B9C
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2016 08:05:32 -0400 (EDT)
-Received: from mm01.cs.columbia.edu ([127.0.0.1])
- by localhost (mm01.cs.columbia.edu [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id DmjM002yu1d1 for <kvmarm@lists.cs.columbia.edu>;
- Tue, 10 May 2016 08:05:31 -0400 (EDT)
-Received: from mail-wm0-f44.google.com (mail-wm0-f44.google.com [74.125.82.44])
- by mm01.cs.columbia.edu (Postfix) with ESMTPS id 2B7AC49B9A
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2016 08:05:30 -0400 (EDT)
-Received: by mail-wm0-f44.google.com with SMTP id n129so175615505wmn.1
- for <kvmarm@lists.cs.columbia.edu>; Tue, 10 May 2016 05:08:25 -0700 (PDT)
-Content-Disposition: inline
+Return-path: <kvm-owner@vger.kernel.org>
 In-Reply-To: <1462531568-9799-27-git-send-email-andre.przywara@arm.com>
-List-Unsubscribe: <https://lists.cs.columbia.edu/mailman/options/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=unsubscribe>
-List-Archive: <https://lists.cs.columbia.edu/pipermail/kvmarm>
-List-Post: <mailto:kvmarm@lists.cs.columbia.edu>
-List-Help: <mailto:kvmarm-request@lists.cs.columbia.edu?subject=help>
-List-Subscribe: <https://lists.cs.columbia.edu/mailman/listinfo/kvmarm>,
- <mailto:kvmarm-request@lists.cs.columbia.edu?subject=subscribe>
-Errors-To: kvmarm-bounces@lists.cs.columbia.edu
-Sender: kvmarm-bounces@lists.cs.columbia.edu
-To: Andre Przywara <andre.przywara@arm.com>
-Cc: Marc Zyngier <marc.zyngier@arm.com>, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Sender: kvm-owner@vger.kernel.org
+To: Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
+Cc: Eric Auger <eric.auger@linaro.org>, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On Fri, May 06, 2016 at 11:45:39AM +0100, Andre Przywara wrote:
+On 06/05/16 11:45, Andre Przywara wrote:
 > The active register handlers are shared between the v2 and v3
 > emulation, so their implementation goes into vgic-mmio.c, to be
 > easily referenced from the v3 emulation as well later.
@@ -135,7 +114,7 @@ On Fri, May 06, 2016 at 11:45:39AM +0100, Andre Przywara wrote:
 > +		 * submits a bug report relating to this...
 > +		 */
 
-I thought I wrote a patch for this?
+Don't we have a patch by Christoffer that addresses this exact issue?
 
 > +
 > +		spin_unlock(&irq->irq_lock);
@@ -205,14 +184,11 @@ I thought I wrote a patch for this?
 > +		spin_unlock(&vcpu->arch.vgic_cpu.ap_list_lock);
 > +
 > +		kvm_vcpu_kick(vcpu);
-
-quite frankly, this looks very complicated and I really think it's worth
-reusing the queue function after seeing this (sorry I haven't been able
-to before).
-
--Christoffer
-
 > +	}
+
+This is annoyingly close to vgic_queue_irq_unlock()... Maybe switching
+this to some form of preprocessor template. Or not.
+
 > +}
 > +
 >  static int match_region(const void *key, const void *elt)
@@ -239,6 +215,10 @@ to before).
 >  
 >  unsigned int vgic_v2_init_dist_iodev(struct vgic_io_device *dev);
 >  
-> -- 
-> 2.7.3
 > 
+
+Thanks,
+
+	M.
+-- 
+Jazz is not dead. It just smells funny...
