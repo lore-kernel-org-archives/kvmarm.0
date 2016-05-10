@@ -1,187 +1,152 @@
 From: Marc Zyngier <marc.zyngier@arm.com>
-Subject: Re: [PATCH v3 17/55] KVM: arm/arm64: vgic-new: Add IRQ sync/flush
- framework
-Date: Tue, 10 May 2016 18:32:22 +0100
-Message-ID: <57321B26.1030201@arm.com>
+Subject: Re: [PATCH v3 19/55] KVM: arm/arm64: vgic-new: Add GICv3 world switch
+ backend
+Date: Tue, 10 May 2016 18:35:31 +0100
+Message-ID: <57321BE3.4080204@arm.com>
 References: <1462531568-9799-1-git-send-email-andre.przywara@arm.com>
- <1462531568-9799-18-git-send-email-andre.przywara@arm.com>
- <5731FC3E.7020700@linaro.org>
+ <1462531568-9799-20-git-send-email-andre.przywara@arm.com>
+ <5731FE09.3000007@linaro.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Return-path: <kvm-owner@vger.kernel.org>
-In-Reply-To: <5731FC3E.7020700@linaro.org>
+In-Reply-To: <5731FE09.3000007@linaro.org>
 Sender: kvm-owner@vger.kernel.org
 To: Eric Auger <eric.auger@linaro.org>, Andre Przywara <andre.przywara@arm.com>, Christoffer Dall <christoffer.dall@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
+Cc: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 List-Id: kvmarm@lists.cs.columbia.edu
 
-On 10/05/16 16:20, Eric Auger wrote:
+On 10/05/16 16:28, Eric Auger wrote:
 > On 05/06/2016 12:45 PM, Andre Przywara wrote:
 >> From: Marc Zyngier <marc.zyngier@arm.com>
 >>
->> Implement the framework for syncing IRQs between our emulation and
->> the list registers, which represent the guest's view of IRQs.
->> This is done in kvm_vgic_flush_hwstate and kvm_vgic_sync_hwstate,
->> which gets called on guest entry and exit.
->> The code talking to the actual GICv2/v3 hardware is added in the
->> following patches.
+>> As the GICv3 virtual interface registers differ from their GICv2
+>> siblings, we need different handlers for processing maintenance
+>> interrupts and reading/writing to the LRs.
+>> Implement the respective handler functions and connect them to
+>> existing code to be called if the host is using a GICv3.
 >>
 >> Signed-off-by: Marc Zyngier <marc.zyngier@arm.com>
->> Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
->> Signed-off-by: Eric Auger <eric.auger@linaro.org>
 >> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 >> ---
 >> Changelog RFC..v1:
->> - split out vgic_clear_lr() from vgic_populate_lr()
->> - rename vgic_populate_lrs() to vgic_flush_lr_state()
->> - clean all LRs when the distributor is disabled
->> - use list_del() instead of list_del_init()
->> - add comments to explain the direction of sync/flush_hwstate
->> - remove unneeded BUG_ON(in_interrupt()
+>> - remove outdated comment about the dist_lock
+>> - add WARN_ON about LR_STATE not being 0 in maintenance interrupts
+>>
+>> Changelog v1 .. v2:
+>> - inject the IRQ priority into the list register
 >>
 >> Changelog v2 .. v3:
->> - remove bogus v2 specific rebase leftovers
+>> - remove no longer needed irqchip/arm-gic.h inclusion
 >>
->>  include/kvm/vgic/vgic.h  |   4 +
->>  virt/kvm/arm/vgic/vgic.c | 193 +++++++++++++++++++++++++++++++++++++++++++++++
->>  virt/kvm/arm/vgic/vgic.h |   2 +
->>  3 files changed, 199 insertions(+)
+>>  include/linux/irqchip/arm-gic-v3.h |   1 +
+>>  virt/kvm/arm/vgic/vgic-v3.c        | 168 +++++++++++++++++++++++++++++++++++++
+>>  virt/kvm/arm/vgic/vgic.c           |  25 ++++--
+>>  virt/kvm/arm/vgic/vgic.h           |  29 +++++++
+>>  4 files changed, 218 insertions(+), 5 deletions(-)
+>>  create mode 100644 virt/kvm/arm/vgic/vgic-v3.c
 >>
->> diff --git a/include/kvm/vgic/vgic.h b/include/kvm/vgic/vgic.h
->> index 2bfb42c..5fae4a9 100644
->> --- a/include/kvm/vgic/vgic.h
->> +++ b/include/kvm/vgic/vgic.h
->> @@ -190,6 +190,10 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
->>  #define vgic_valid_spi(k, i)	(((i) >= VGIC_NR_PRIVATE_IRQS) && \
->>  			((i) < (k)->arch.vgic.nr_spis + VGIC_NR_PRIVATE_IRQS))
+>> diff --git a/include/linux/irqchip/arm-gic-v3.h b/include/linux/irqchip/arm-gic-v3.h
+>> index ec938d1..35e93cf 100644
+>> --- a/include/linux/irqchip/arm-gic-v3.h
+>> +++ b/include/linux/irqchip/arm-gic-v3.h
+>> @@ -275,6 +275,7 @@
+>>  #define ICH_LR_ACTIVE_BIT		(1ULL << 63)
+>>  #define ICH_LR_PHYS_ID_SHIFT		32
+>>  #define ICH_LR_PHYS_ID_MASK		(0x3ffULL << ICH_LR_PHYS_ID_SHIFT)
+>> +#define ICH_LR_PRIORITY_SHIFT		48
 >>  
->> +bool kvm_vcpu_has_pending_irqs(struct kvm_vcpu *vcpu);
->> +void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu);
->> +void kvm_vgic_flush_hwstate(struct kvm_vcpu *vcpu);
->> +
->>  /**
->>   * kvm_vgic_get_max_vcpus - Get the maximum number of VCPUs allowed by HW
->>   *
->> diff --git a/virt/kvm/arm/vgic/vgic.c b/virt/kvm/arm/vgic/vgic.c
->> index 4fb20fd..c6f8b9b 100644
->> --- a/virt/kvm/arm/vgic/vgic.c
->> +++ b/virt/kvm/arm/vgic/vgic.c
->> @@ -305,3 +305,196 @@ int kvm_vgic_inject_irq(struct kvm *kvm, int cpuid, unsigned int intid,
->>  {
->>  	return vgic_update_irq_pending(kvm, cpuid, intid, level, false);
->>  }
->> +
->> +/**
->> + * vgic_prune_ap_list - Remove non-relevant interrupts from the list
+>>  /* These are for GICv2 emulation only */
+>>  #define GICH_LR_VIRTUALID		(0x3ffUL << 0)
+>> diff --git a/virt/kvm/arm/vgic/vgic-v3.c b/virt/kvm/arm/vgic/vgic-v3.c
+>> new file mode 100644
+>> index 0000000..43d1dd7
+>> --- /dev/null
+>> +++ b/virt/kvm/arm/vgic/vgic-v3.c
+>> @@ -0,0 +1,168 @@
+>> +/*
+>> + * This program is free software; you can redistribute it and/or modify
+>> + * it under the terms of the GNU General Public License version 2 as
+>> + * published by the Free Software Foundation.
 >> + *
->> + * @vcpu: The VCPU pointer
+>> + * This program is distributed in the hope that it will be useful,
+>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> + * GNU General Public License for more details.
 >> + *
->> + * Go over the list of "interesting" interrupts, and prune those that we
->> + * won't have to consider in the near future.
+>> + * You should have received a copy of the GNU General Public License
+>> + * along with this program. If not, see <http://www.gnu.org/licenses/>.
 >> + */
->> +static void vgic_prune_ap_list(struct kvm_vcpu *vcpu)
+>> +
+>> +#include <linux/irqchip/arm-gic-v3.h>
+>> +#include <linux/kvm.h>
+>> +#include <linux/kvm_host.h>
+>> +
+>> +#include "vgic.h"
+>> +
+>> +void vgic_v3_process_maintenance(struct kvm_vcpu *vcpu)
 >> +{
->> +	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
->> +	struct vgic_irq *irq, *tmp;
+>> +	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+>> +	u32 model = vcpu->kvm->arch.vgic.vgic_model;
 >> +
->> +retry:
->> +	spin_lock(&vgic_cpu->ap_list_lock);
+>> +	if (cpuif->vgic_misr & ICH_MISR_EOI) {
+>> +		unsigned long eisr_bmap = cpuif->vgic_eisr;
+>> +		int lr;
 >> +
->> +	list_for_each_entry_safe(irq, tmp, &vgic_cpu->ap_list_head, ap_list) {
->> +		struct kvm_vcpu *target_vcpu, *vcpuA, *vcpuB;
+>> +		for_each_set_bit(lr, &eisr_bmap, kvm_vgic_global_state.nr_lr) {
+> used_lrs?
+
+Indeed.
+
+>> +			u32 intid;
+>> +			u64 val = cpuif->vgic_lr[lr];
 >> +
->> +		spin_lock(&irq->irq_lock);
+>> +			if (model == KVM_DEV_TYPE_ARM_VGIC_V3)
+>> +				intid = val & ICH_LR_VIRTUAL_ID_MASK;
+>> +			else
+>> +				intid = val & GICH_LR_VIRTUALID;
 >> +
->> +		BUG_ON(vcpu != irq->vcpu);
+>> +			WARN_ON(cpuif->vgic_lr[lr] & ICH_LR_STATE);
 >> +
->> +		target_vcpu = vgic_target_oracle(irq);
+>> +			kvm_notify_acked_irq(vcpu->kvm, 0,
+>> +					     intid - VGIC_NR_PRIVATE_IRQS);
 >> +
->> +		if (!target_vcpu) {
->> +			/*
->> +			 * We don't need to process this interrupt any
->> +			 * further, move it off the list.
->> +			 */
->> +			list_del(&irq->ap_list);
->> +			irq->vcpu = NULL;
->> +			spin_unlock(&irq->irq_lock);
->> +			continue;
+>> +			cpuif->vgic_elrsr |= 1ULL << lr;
 >> +		}
->> +
->> +		if (target_vcpu == vcpu) {
->> +			/* We're on the right CPU */
->> +			spin_unlock(&irq->irq_lock);
->> +			continue;
->> +		}
->> +
->> +		/* This interrupt looks like it has to be migrated. */
->> +
->> +		spin_unlock(&irq->irq_lock);
->> +		spin_unlock(&vgic_cpu->ap_list_lock);
 >> +
 >> +		/*
->> +		 * Ensure locking order by always locking the smallest
->> +		 * ID first.
+>> +		 * In the next iterations of the vcpu loop, if we sync
+>> +		 * the vgic state after flushing it, but before
+>> +		 * entering the guest (this happens for pending
+>> +		 * signals and vmid rollovers), then make sure we
+>> +		 * don't pick up any old maintenance interrupts here.
 >> +		 */
->> +		if (vcpu->vcpu_id < target_vcpu->vcpu_id) {
->> +			vcpuA = vcpu;
->> +			vcpuB = target_vcpu;
->> +		} else {
->> +			vcpuA = target_vcpu;
->> +			vcpuB = vcpu;
->> +		}
->> +
->> +		spin_lock(&vcpuA->arch.vgic_cpu.ap_list_lock);
->> +		spin_lock(&vcpuB->arch.vgic_cpu.ap_list_lock);
->> +		spin_lock(&irq->irq_lock);
->> +
->> +		/*
->> +		 * If the affinity has been preserved, move the
->> +		 * interrupt around. Otherwise, it means things have
->> +		 * changed while the interrupt was unlocked, and we
->> +		 * need to replay this.
->> +		 *
->> +		 * In all cases, we cannot trust the list not to have
->> +		 * changed, so we restart from the beginning.
->> +		 */
->> +		if (target_vcpu == vgic_target_oracle(irq)) {
->> +			struct vgic_cpu *new_cpu = &target_vcpu->arch.vgic_cpu;
->> +
->> +			list_del(&irq->ap_list);
->> +			irq->vcpu = target_vcpu;
->> +			list_add_tail(&irq->ap_list, &new_cpu->ap_list_head);
->> +		}
->> +
->> +		spin_unlock(&irq->irq_lock);
->> +		spin_unlock(&vcpuB->arch.vgic_cpu.ap_list_lock);
->> +		spin_unlock(&vcpuA->arch.vgic_cpu.ap_list_lock);
->> +		goto retry;
+>> +		cpuif->vgic_eisr = 0;
 >> +	}
 >> +
->> +	spin_unlock(&vgic_cpu->ap_list_lock);
+>> +	cpuif->vgic_hcr &= ~ICH_HCR_UIE;
 >> +}
 >> +
->> +static inline void vgic_process_maintenance_interrupt(struct kvm_vcpu *vcpu)
+>> +void vgic_v3_set_underflow(struct kvm_vcpu *vcpu)
 >> +{
+>> +	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+>> +
+>> +	cpuif->vgic_hcr |= ICH_HCR_UIE;
 >> +}
 >> +
->> +static inline void vgic_fold_lr_state(struct kvm_vcpu *vcpu)
+>> +void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
 >> +{
->> +}
+>> +	struct vgic_v3_cpu_if *cpuif = &vcpu->arch.vgic_cpu.vgic_v3;
+>> +	u32 model = vcpu->kvm->arch.vgic.vgic_model;
+>> +	int lr;
 >> +
->> +/* Requires the ap_list_lock and the irq_lock to be held. */
-> why is it needed to hold the ap_list lock here?
->> +static inline void vgic_populate_lr(struct kvm_vcpu *vcpu,
->> +				    struct vgic_irq *irq, int lr)
->> +{
->> +	DEBUG_SPINLOCK_BUG_ON(!spin_is_locked(&vcpu->arch.vgic_cpu.ap_list_lock));
-> ?
+>> +	/* Assumes ap_list_lock held */
+> I don't think there is such requirement and failed finding the lock held.
 
-Only the irq lock needs to be held for this particular function. It is
-vgic_flush_lr_state that requires the ap_list lock to be held, as it is
-iterating over all the interrupts for that particular vcpu.
+This looks like a leftover from a previous version. Folding the state is
+done on a per-irq basis, and doesn't require to parse the ap_list.
 
-Andre, can you please amend the comment and drop that assertion?
+> Besides Reviewed-by: Eric Auger <eric.auger@linaro.org>
 
 Thanks,
 
